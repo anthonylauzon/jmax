@@ -27,9 +27,9 @@
 #include "fts.h"
 #include <string.h>
 
-/********************************
+/*****************************************************************************
  *
- * catch~
+ *  catch~ object
  *
  */
 
@@ -38,15 +38,60 @@ static fts_hash_table_t catch_table;
 static fts_symbol_t sigcatch_function = 0;
 static fts_symbol_t sigcatch_64_function = 0;
 
-typedef struct sigcatch_t sigcatch_t;
-
-struct sigcatch_t
+typedef struct _sigcatch_
 {
   fts_object_t _o;
-  fts_symbol_t sym;
+  fts_symbol_t name;
   float *buf;
   int n_tick;
-};
+} sigcatch_t;
+
+static void
+sigcatch_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+{
+  sigcatch_t *this = (sigcatch_t *)o;
+  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
+  fts_atom_t a;
+
+  if(name && fts_symbol_name(name) != "" && fts_hash_table_lookup(&catch_table, name, &a))
+    {
+      post("catch~: duplicated name: %s (last ignored)\n", fts_symbol_name(name));
+      this->name = 0;
+    }
+  else
+    {
+      fts_set_ptr(&a, this);
+      fts_hash_table_insert(&catch_table, name, &a);
+
+      this->name = name;
+      dsp_list_insert(o);
+    }
+
+  this->buf = 0;
+  this->n_tick = 0;
+}
+
+static void
+sigcatch_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+{
+  sigcatch_t *this = (sigcatch_t *)o;
+  fts_atom_t a;
+
+  if(this->buf)
+    fts_free(this->buf);
+
+  if(this->name && fts_hash_table_lookup(&catch_table, this->name, &a))
+    {
+      fts_hash_table_remove(&catch_table, this->name); 
+      dsp_list_remove(o);
+    }
+}
+
+/*****************************************************************************
+ *
+ *  catch~ dsp
+ *
+ */
 
 static void
 sigcatch_64_dsp_fun(fts_word_t *argv)
@@ -93,7 +138,7 @@ sigcatch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
   else if(this->n_tick != n_tick)
     {
-      post("catch~ %s: tick size doesn't match", this->sym);
+      post("catch~ %s: tick size doesn't match\n", fts_symbol_name(this->name));
       return;
     }
   
@@ -116,50 +161,11 @@ sigcatch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
 }
 
-
-static void
-sigcatch_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
-{
-  sigcatch_t *this = (sigcatch_t *)o;
-  fts_atom_t a;
-  fts_symbol_t s = fts_get_symbol_arg(ac, at, 1, 0);
-
-  if ((s == 0) || (*(fts_symbol_name(s)) == '0'))
-    s = fts_new_symbol("sigcatch~");
-
-  if (fts_hash_table_lookup(&catch_table, s, &a))
-    {
-      post("catch~: duplicated name: %s (last ignored)\n", fts_symbol_name(this->sym));
-      this->sym = 0;
-    }
-  else
-    {
-      fts_set_ptr(&a, this);
-      fts_hash_table_insert(&catch_table, s, &a);
-
-      this->sym = s;
-    }
-
-  this->buf = 0;
-  this->n_tick = 0;
-
-  dsp_list_insert(o);
-}
-
-static void
-sigcatch_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
-{
-  sigcatch_t *this = (sigcatch_t *)o;
-  fts_atom_t a;
-
-  if(this->buf)
-    fts_free(this->buf);
-
-  if(this->sym && fts_hash_table_lookup(&catch_table, this->sym, &a))
-    fts_hash_table_remove(&catch_table, this->sym);
-
-  dsp_list_remove(o);
-}
+/*****************************************************************************
+ *
+ *  catch~ class
+ *
+ */
 
 static fts_status_t
 sigcatch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -194,27 +200,55 @@ sigcatch_config(void)
 {
   fts_hash_table_init(&catch_table);
 
-  fts_class_install(fts_new_symbol("catch~"),sigcatch_instantiate);
+  fts_class_install(fts_new_symbol("catch~"), sigcatch_instantiate);
 }
 
 
-/********************************
+/*****************************************************************************
  *
- * throw~
+ *  throw~ object
  *
  */
 
 static fts_symbol_t sigthrow_function = 0;
 static fts_symbol_t sigthrow_64_function = 0;
 
-
-typedef struct
+typedef struct _sigthrow_
 {
   fts_object_t _o;
-  fts_symbol_t sym;
+  fts_symbol_t name;
   ftl_data_t bufp;
   int n_tick;
 } sigthrow_t;
+
+static void
+sigthrow_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+{
+  sigthrow_t *this = (sigthrow_t *)o;
+  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
+
+  this->name = name;
+  this->bufp = ftl_data_new(float *);
+  this->n_tick = 0;
+
+  dsp_list_insert(o);
+}
+
+static void
+sigthrow_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+{
+  sigthrow_t *this = (sigthrow_t *)o;
+
+  ftl_data_free(this->bufp);
+
+  dsp_list_remove(o);
+}
+
+/*****************************************************************************
+ *
+ *  throw~ dsp
+ *
+ */
 
 static void
 sigthrow_dsp_fun(fts_word_t *argv)
@@ -232,7 +266,6 @@ sigthrow_dsp_fun(fts_word_t *argv)
     }
 }
 
-
 static void
 sigthrow_dsp_64_fun(fts_word_t *argv)
 {
@@ -248,7 +281,6 @@ sigthrow_dsp_64_fun(fts_word_t *argv)
     }
 }
 
-
 static void
 sigthrow_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -262,7 +294,7 @@ sigthrow_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->n_tick = n_tick;
 
   /* look here for the corresponing catch buffer, to eliminate instantiation order dependency between catch~ and throw~. */
-  if (fts_hash_table_lookup(&catch_table, this->sym, &a))
+  if (fts_hash_table_lookup(&catch_table, this->name, &a))
     {
       sigcatch_t *sigcatch = (sigcatch_t *)fts_get_ptr(&a);
 
@@ -275,7 +307,7 @@ sigthrow_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	}
       else if(sigcatch->n_tick != n_tick)
 	{
-	  post("throw~ %s: tick size doesn't match", this->sym);
+	  post("throw~ %s: tick size doesn't match\n", fts_symbol_name(this->name));
 	  *bufp = 0;
 	}
       else
@@ -296,6 +328,12 @@ sigthrow_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
 }
 
+/*****************************************************************************
+ *
+ *  throw~ user methods
+ *
+ */
+
 static void
 sigthrow_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
@@ -303,15 +341,15 @@ sigthrow_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
   float **bufp = ftl_data_get_ptr(this->bufp);
   fts_atom_t a;
 
-  this->sym = fts_get_symbol_arg(ac, at, 0, 0);
+  this->name = fts_get_symbol_arg(ac, at, 0, 0);
 
-  if(this->sym && fts_hash_table_lookup(&catch_table, this->sym, &a))
+  if(this->name && fts_hash_table_lookup(&catch_table, this->name, &a))
     {
       sigcatch_t *sigcatch = (sigcatch_t *)fts_get_ptr(&a);
 
-      if(sigcatch->n_tick != this->n_tick)
+      if(sigcatch->n_tick != 0 && sigcatch->n_tick != this->n_tick)
 	{
-	  post("throw~ %s: tick size doesn't match", this->sym);
+	  post("throw~ %s: tick size doesn't match\n", fts_symbol_name(this->name));
 	  *bufp = 0;
 	}
       else
@@ -319,18 +357,6 @@ sigthrow_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
     }
   else
     *bufp = 0;
-}
-
-static void
-sigthrow_print(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
-{
-  sigthrow_t *this = (sigthrow_t *)o;
-  fts_symbol_t s = fts_get_symbol_arg(ac, at, 0, 0);
-
-  if (!s)
-    s = fts_new_symbol("throw~");
-
-  post("%s: %s\n", fts_symbol_name(s), fts_symbol_name(this->sym));
 }
 
 static void
@@ -342,31 +368,15 @@ sigthrow_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   sprintf(str + 5, "%d", n);
   fts_set_symbol(a, fts_new_symbol_copy(str));
+
   sigthrow_set(o, winlet, s, 1, a);
 }
 
-static void
-sigthrow_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
-{
-  sigthrow_t *this = (sigthrow_t *)o;
-  fts_symbol_t s = fts_get_symbol_arg(ac, at, 1, 0);
-
-  this->sym = s;
-  this->bufp = ftl_data_new(float *);
-  this->n_tick = 0;
-
-  dsp_list_insert(o);
-}
-
-static void
-sigthrow_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
-{
-  sigthrow_t *this = (sigthrow_t *)o;
-
-  ftl_data_free(this->bufp);
-
-  dsp_list_remove(o);
-}
+/*****************************************************************************
+ *
+ *  throw~ class
+ *
+ */
 
 static fts_status_t
 sigthrow_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -384,9 +394,6 @@ sigthrow_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[0] = fts_s_ptr; 
   fts_method_define(cl, fts_SystemInlet, fts_s_put, sigthrow_put, 1, a);
 
-  a[0] = fts_s_symbol;
-  fts_method_define_optargs(cl, 0, fts_s_print, sigthrow_print, 1, a, 0);
- 
   a[0] = fts_s_symbol;
   fts_method_define(cl, 0, fts_s_set, sigthrow_set, 1, a);
  
