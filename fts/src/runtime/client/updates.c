@@ -61,7 +61,7 @@ fts_client_send_prop(fts_object_t *obj, fts_symbol_t name)
 	  
 	  d = fts_get_data(&a);
 
-	  if (! fts_data_is_exported())
+	  if (! fts_data_is_exported(d))
 	    fts_data_export(d);
 	}
 	  

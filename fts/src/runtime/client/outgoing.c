@@ -43,10 +43,17 @@ static char outbuf[1024];
 static void
 fts_client_send_string(char *msg)
 {
-  char *p;
+  int i;
 
-  for (p = msg; *p != '\0'; p++)
-    fts_char_dev_put(client_dev, *p);
+  for (i = 0; msg[i] != '\0' ; i++)
+    {
+      if (i >= 1024)
+	{
+	  fprintf(stderr, "String too long >%s<\n", msg); 
+	}
+
+      fts_char_dev_put(client_dev, msg[i]);      
+    }
 }
 
 void

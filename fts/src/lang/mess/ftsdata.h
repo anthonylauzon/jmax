@@ -21,7 +21,7 @@ extern void fts_data_call( fts_data_t *d, int key, int ac, const fts_atom_t *at)
 extern void fts_data_remote_call( fts_data_t *d, int key, int ac, const fts_atom_t *at);
 
 /* Really necessary ? */
-
+extern int fts_data_is_exported( fts_data_t *d);
 extern int fts_data_get_id( fts_data_t *d);
 extern void fts_data_id_init();
 extern void fts_data_module_init();
