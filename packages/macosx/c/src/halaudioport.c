@@ -20,33 +20,19 @@
  * 
  */
 
-/*
- * This file include the audio port for Mac OS X
- *
- * Current implementation restrictions:
- * - only interleaved
- * - don't know how to get (and set?) the number of channels
- */
-
 #include <stdio.h>
 #include <Carbon/Carbon.h>
 #include <CoreAudio/AudioHardware.h>
 #include <unistd.h>
 #include <string.h>
-/* #include <pthread.h> */
-/* #include <mach/mach.h> */
-/* #include <sys/sysctl.h> */
 
 #include <fts/fts.h>
-
-#define DEFAULT_SAMPLING_RATE (44100.)
-#define DEFAULT_FIFO_SIZE 1024
-#define DEFAULT_CHANNELS 2
 
 typedef struct {
   fts_audioport_t head;
   AudioDeviceID device;
-  float *buffer;
+  int samples_per_tick;
+  float *current_buffer;
   int xrun;
 } halaudioport_t;
 
@@ -62,7 +48,7 @@ static void halaudioport_output( fts_word_t *argv)
 
   this = (halaudioport_t *)fts_word_get_pointer( argv+0);
 
-  if ( !this->buffer)
+  if ( !this->current_buffer)
     return;
     
   n = fts_word_get_int(argv + 1);
@@ -75,7 +61,7 @@ static void halaudioport_output( fts_word_t *argv)
       j = ch;
       for ( i = 0; i < n; i++)
 	{
-	  this->buffer[j] = in[i];
+	  this->current_buffer[j] = in[i];
 	  j += channels;
 	}
     }
@@ -90,18 +76,14 @@ OSStatus halaudioport_ioproc( AudioDeviceID inDevice,
 			      void *inClientData)
 {
   halaudioport_t *this = (halaudioport_t *)inClientData;
-  float *buffer;
-  int n, samples_per_tick, samples_per_buffer;
+  int n, samples_per_buffer;
 
-  this->buffer = (float *)outOutputData->mBuffers[0].mData;
-  samples_per_tick = outOutputData->mBuffers[0].mNumberChannels * fts_dsp_get_tick_size();
   samples_per_buffer = outOutputData->mBuffers[0].mDataByteSize / sizeof( float);
 
-  for ( n = 0; n < samples_per_buffer; n += samples_per_tick)
+  for ( n = 0; n < samples_per_buffer; n += this->samples_per_tick)
     {
+      this->current_buffer = (float *)outOutputData->mBuffers[0].mData + n;
       fts_sched_run_one_tick();
-
-      this->buffer += samples_per_tick;
     }
 
   return noErr;
@@ -153,65 +135,58 @@ static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
   halaudioport_t *this = (halaudioport_t *)o;
   OSStatus err;
   UInt32 count;
-  UInt32 channels;
-  Boolean writable;
-  AudioBufferList *buffer_list;
+  UInt32 buffer_size;
+  AudioStreamBasicDescription format;
+  int channels;
 
   fts_audioport_init( &this->head);
 
   /* Get the default device */
   count = sizeof( this->device);
-  if ((err = AudioHardwareGetProperty( kAudioHardwarePropertyDefaultOutputDevice, &count, (void *)&this->device)) != noErr)
+  err = AudioHardwareGetProperty( kAudioHardwarePropertyDefaultOutputDevice, &count, (void *)&this->device);
+  if (err != noErr)
     {
       fts_object_set_error( o, "cannot get default device");
       return;
     }
 
-  /* Get the number of channels and the buffer size */
-  if ((err = AudioDeviceGetPropertyInfo( this->device, 0, false, kAudioDevicePropertyStreamConfiguration, &count, &writable)) != noErr)
+  /* Get the buffer size (in bytes) */
+  count = sizeof( buffer_size);
+  err = AudioDeviceGetProperty( this->device, 0, false, kAudioDevicePropertyBufferSize, &count, &buffer_size);
+  if (err != noErr)
     {
-      fts_object_set_error( o, "cannot get device configuration");
-      post( "cannot get device configuration\n");
+      fts_object_set_error( o, "cannot get device buffer size");
       return;
     }
 
-  buffer_list = (AudioBufferList *)alloca( count);
-  if ((err = AudioDeviceGetProperty( this->device, 0, false, kAudioDevicePropertyStreamConfiguration, &count, buffer_list)) != noErr)
+  /* Get the device data format */
+  count = sizeof( format);
+  err = AudioDeviceGetProperty( this->device, 0, false, kAudioDevicePropertyStreamFormat, &count, &format);
+  if (err != noErr)
     {
-      fts_object_set_error( o, "cannot get device configuration");
-      post( "cannot get device configuration\n");
+      fts_object_set_error( o, "cannot get device data format");
       return;
     }
 
-  /* We assume that there is only one buffer */
-  if ( buffer_list->mNumberBuffers != 1)
-    {
-      fts_log( "buffer_list->mNumberBuffers != 1\n");
-      fts_object_set_error( o, "buffer_list->mNumberBuffers != 1");
-      return;
-    }
-
-
-#if 0
-  /* For now, we don't set the buffer size and we reuse the default one. */
-  {
-    UInt32 bufferSizeProperty = 2 * sizeof( float) * fifo_size;
-    count = sizeof( bufferSizeProperty);
-  
-    if ((err = AudioDeviceSetProperty( this->device, NULL, 0, false, kAudioDevicePropertyBufferSize, count, &bufferSizeProperty)) != noErr)
-      {
-	fts_object_set_error( o, "cannot set buffer size");
-	return;
-      }
-  }
-#endif
-
-  channels = buffer_list->mBuffers[0].mNumberChannels;
-
+  channels = format.mChannelsPerFrame;
   fts_audioport_set_output_channels( (fts_audioport_t *)this, channels);
   fts_audioport_set_output_function( (fts_audioport_t *)this, halaudioport_output);
 
-  fts_sched_add(o, FTS_SCHED_ALWAYS);
+  this->samples_per_tick = fts_dsp_get_tick_size() * channels;
+
+#if 1
+  fts_log( "Buffer size %d\n", buffer_size);
+  fts_log( "sampleRate %g\n", format.mSampleRate);
+  fts_log( "mFormatFlags %08X\n", format.mFormatFlags);
+  fts_log( "mBytesPerPacket %d\n", format.mBytesPerPacket);
+  fts_log( "mFramesPerPacket %d\n", format.mFramesPerPacket);
+  fts_log( "mChannelsPerFrame %d\n", format.mChannelsPerFrame);
+  fts_log( "mBytesPerFrame %d\n", format.mBytesPerFrame);
+  fts_log( "mBitsPerChannel %d\n", format.mBitsPerChannel);
+  fts_log( "samples_per_tick %d\n", this->samples_per_tick);
+#endif
+
+  fts_sched_add( o, FTS_SCHED_ALWAYS);
 }
 
 static void halaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -221,10 +196,12 @@ static void halaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int
 
   fts_audioport_delete( &this->head);
 
-  if ((err = AudioDeviceStop( this->device, halaudioport_ioproc)) != noErr)
+  err = AudioDeviceStop( this->device, halaudioport_ioproc);
+  if (err != noErr)
     /* ??? */;
 
-  if ((err = AudioDeviceRemoveIOProc( this->device, halaudioport_ioproc)) != noErr)
+  err = AudioDeviceRemoveIOProc( this->device, halaudioport_ioproc);
+  if (err != noErr)
     /* ??? */;
 }
 
