@@ -28,7 +28,7 @@
 <UL TYPE=DOT>
   <LI><A HREF="#distribution">Installing the <i>j</i>Max distribution</A>
   <LI><A HREF="#java">Java installation</A>
-  <LI><A HREF="#site">Site Specific Configuration</A>
+  <! LI<A HREF="#site"Site Specific Configuration</A>
 </UL>
 
 <A NAME="distribution">
@@ -81,52 +81,55 @@ you will need to execute the following:
 The current version of <i>j</i>Max requires:
 <OL>
   <LI>An installation of the <i>Java Runtime Environment</i> (JRE) or<BR>
-    the <i>Java Development Kit</i> (JDK) version 1.1.5 or higher
-  <LI><i>Java Foundation Classes</i> (JFC) <i>Swing</i> 1.1 Beta 2
+    the <i>Java Development Kit</i> (JDK) version 1.1.6 or higher
+  <LI><i>Java Foundation Classes</i> (JFC) <i>Swing</i> 1.1
 </OL>
 
 <P>
-<STRONG>NOTE:</STRONG>
-<i>j</i>Max requires Swing 1.1 Beta 2.
-It is known <STRONG>not</STRONG> to work with Swing 1.1 Beta 1 and Swing 1.1 Beta 3!
-
-<P>
-For the installation of the required Java components refer to the following sites:
-
+Refer to the following site for Java download and installation:
 <UL>
   <LI><A HREF="http://www.sgi.com/Products/Evaluation/#jdk">
     <b>JDK for SGI Systems</b></A> or 
     <A HREF="http://java.sun.com/products/jdk/1.1/index.html">
     <b>Sun's JDK and JRE distributions</b></A> for multiple platforms<P>
+</UL>
+
+<P>
+<STRONG>NOTE:</STRONG>
+<i>j</i>Max requires Swing 1.1
+It will <STRONG>not</STRONG> to work with Swing 1.1 Beta x !
+
+<P>
+Starting with release 2.3.12, Swing 1.1 classes are distributed with jMax,
+and it is not longer required to download separately Swing distribution.
+
+<P>
+The <A HREF=getting_started.html#running><TT>jmax</TT> script</A> uses the
+<I>j</I>Max Swing distribution, and setting CLASSPATH is no longer required.
+However, if CLASSPATH is set and contains swing, the <TT>jmax</TT> script
+uses it in place of <I>j</I>Max Swing distribution.
+
+<P>
+To get full Swing distribution, refer to the following site:
+<UL>
   <LI><A HREF="http://developer.java.sun.com/developer/earlyAccess/jfc/index.html">
-    <b>JavaTM Foundation Classes (JFC) Swing 1.1 Beta 2</b></A><BR>
+    <b>JavaTM Foundation Classes (JFC) Swing 1.1</b></A><BR>
     (this site at Sun requires a free registration)<P>
 </UL>
 
 <P>
 The path of the Java executable must be added to the <tt>PATH</tt> environment variable
 in order to startup the Java environment by the 
-<A HREF=getting_started.html#running><i>j</i>Max script</A>.<BR>
-Furthermore for the current <i>j</i>Max distribution the CLASSPATH environment variable 
-must be set for Java to find the Swing classes.
+<A HREF=getting_started.html#running><i>j</i>Max script</A>.
+This can be done for example by adding the following line to the <tt>.cshrc</tt>
+file in the user home directory: <BR>
+&nbsp; &nbsp; &nbsp; <b><tt>setenv PATH ${PATH}:</tt> &lt;<i>Java directory</i>&gt;</b> <BR>
+for instance: <tt>setenv PATH "${PATH}:/usr/java/bin"</tt>
 
-<P>
-This can be done for example by adding the following two lines to the <tt>.cshrc</tt>
-file in the users home directory:
-
-<P>
-<UL>
-  <DT><b><tt>setenv PATH ${PATH}:</tt> &lt;<i>Java directory</i>&gt;</b>
-  <DT><tt>setenv PATH "${PATH}:/usr/java/bin"</tt>
-  <P>
-  <DT><b><tt>setenv CLASSPATH</tt> &lt;<i>Swing directory</i>&gt;<tt>/swing.jar</tt></b>
-  <DT><tt>setenv PATH "${PATH}:/usr/java/lib/swing/swingall.jar"</tt>
-</UL>
-
-<p>
-<A NAME="site">
-<HR>
-<H2>Site Specific Configuration</H2>
+<!p
+<A NAME="site"
+<HR
+<H2Site Specific Configuration</H2>
 
 <P>
 </TABLE>
