@@ -12,12 +12,12 @@ import ircam.jmax.editors.project.*; // delete me !!!
  */
 
 public class StatisticsDialog extends Dialog implements ActionListener, KeyListener{
-  ProjectWindow parent;
+  Frame parent;
   Button okButton;
   
   public StatisticsDialog(Frame dw) {
     super(dw, "System stats", false);
-    parent = (ProjectWindow)dw;
+    parent = (Frame)dw;
     
     // Do a gc before giving statistics (added by mdc).
     
