@@ -389,7 +389,7 @@ fts_outlet_int(fts_object_t *o, int woutlet, int n)
 }
 
 void 
-fts_outlet_float(fts_object_t *o, int woutlet, float f)
+fts_outlet_float(fts_object_t *o, int woutlet, double f)
 {
   fts_atom_t a;
   

@@ -27,35 +27,75 @@
  * @defgroup message message 
  */
 
-/************************************************
+/**
+ * The message class.
+ * A message object can be created empty or with a symbol as the first argument.
  *
- *  message object
+ * @code
+ *   fts_message_t *mess = (fts_message_t *)fts_object_create(fts_message_class, NULL, ac, at);
+ * @endcode
  *
+ * @defgroup mess_class
  */
+FTS_API fts_class_t *fts_message_class;
 
 typedef struct
 {
   fts_object_t o;
-
   fts_array_t args;
   fts_symbol_t s;
 } fts_message_t;
-
-FTS_API fts_class_t *fts_message_class;
 
 #define fts_message_get_selector(m) ((m)->s)
 #define fts_message_get_args(m) (&(m)->args)
 #define fts_message_get_ac(m) (fts_array_get_size(&(m)->args))
 #define fts_message_get_at(m) (fts_array_get_atoms(&(m)->args))
 
+/**
+ * Clear message (reset selector and arguments).
+ *
+ * @fn void fts_message_clear(fts_message_t *mess)
+ * @param mess the message
+ * @ingroup mess_class
+ */
+FTS_API void fts_message_clear(fts_message_t *mess);
+
+/**
+ * Set message.
+ *
+ * @fn void fts_message_set(fts_message_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at)
+ * @param mess the message
+ * @param s message symbol (selector)
+ * @param ac argument count
+ * @param at argument values
+ * @ingroup mess_class
+ */
+FTS_API void fts_message_set(fts_message_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at);
+
+/**
+* Set message from array (first element must be a symbol).
+ *
+ * @fn void fts_message_set(fts_message_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at)
+ * @param mess the message
+ * @param ac array size
+ * @param at array values
+ * @ingroup mess_class
+ */
+FTS_API void fts_message_set_from_atoms(fts_message_t *mess, int ac, const fts_atom_t *at);
+
+/**
+ * Append arguments to a message.
+ *
+ * @fn void fts_message_append(fts_message_t *mess, int ac, const fts_atom_t *at)
+ * @param mess the message
+ * @param ac argument count
+ * @param at argument values
+ * @ingroup mess_class
+ */
 #define fts_message_append(m, n, a) (fts_array_append(&(m)->args, (n), (a)))
 #define fts_message_append_int(m, x) (fts_array_append_int(&(m)->args, (x)))
 #define fts_message_append_float(m, x) (fts_array_append_float(&(m)->args, (x)))
 #define fts_message_append_symbol(m, x) (fts_array_append_symbol(&(m)->args, (x)))
-
-FTS_API void fts_message_clear(fts_message_t *mess);
-FTS_API void fts_message_set(fts_message_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at);
-FTS_API void fts_message_set_from_atoms(fts_message_t *mess, int ac, const fts_atom_t *at);
 
 #define fts_is_message(p) (fts_is_a(p, fts_message_class))
 
@@ -66,10 +106,12 @@ FTS_API void fts_message_set_from_atoms(fts_message_t *mess, int ac, const fts_a
   } while(0)
 
 
-/************************************************
+/**
+ * The message dumper.
+ * The message dumper is an abstraction permitting objects to dump their state in form of messages in any context (file saving, protocols, etc.).
+ * The current dumper structure includes a message which can be re-used for dumping. 
  *
- *  message dumper
- *
+ * @defgroup mess_dumper
  */
 
 typedef struct fts_dumper
@@ -81,11 +123,54 @@ typedef struct fts_dumper
 
 #define fts_dumper_get_message(d) ((d)->message)
 
+/**
+ * Initialize a newly created dumper.
+ *
+ * @fn void fts_dumper_init(fts_dumper_t *dumper, fts_method_t send)
+ * @param dumper the dumper
+ * @param send the dumper method
+ * @ingroup mess_dumper
+ */
 FTS_API void fts_dumper_init(fts_dumper_t *dumper, fts_method_t send);
+
+/**
+ * Deallocate the state of a dumper.
+ *
+ * @fn void fts_dumper_destroy(fts_dumper_t *dumper)
+ * @param dumper the dumper
+ * @ingroup mess_dumper
+ */
 FTS_API void fts_dumper_destroy(fts_dumper_t *dumper);
 
+/**
+ * Get an empty message from the dumper.
+ *
+ * @fn void fts_dumper_message_new(fts_dumper_t *dumper)
+ * @param dumper the dumper
+ * @ingroup mess_dumper
+ */
 FTS_API fts_message_t *fts_dumper_message_new(fts_dumper_t *dumper, fts_symbol_t selector);
+
+/**
+ * Dump a message (as object).
+ *
+ * @fn void fts_dumper_message_send(fts_dumper_t *dumper, fts_message_t *message)
+ * @param dumper the dumper
+ * @param message the message
+ * @ingroup mess_dumper
+ */
 FTS_API void fts_dumper_message_send(fts_dumper_t *dumper, fts_message_t *message);
+
+/**
+ * Dump a message.
+ *
+ * @fn void fts_dumper_send(fts_dumper_t *dumper, fts_symbol_t s, int ac, const fts_atom_t *at)
+ * @param dumper the dumper
+ * @param s the message symbol
+ * @param ac argument count
+ * @param at argument values
+ * @ingroup mess_dumper
+ */
 FTS_API void fts_dumper_send(fts_dumper_t *dumper, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 
@@ -131,6 +216,7 @@ FTS_API fts_object_t *fts_objstack[];
 
 #endif
 
+
 /* argument macros and functions */
 #define fts_get_symbol_arg(AC, AT, N, DEF) ((N) < (AC) ? fts_get_symbol(&(AT)[N]) : (DEF))
 #define fts_get_string_arg(AC, AT, N, DEF) ((N) < (AC) ? fts_get_string(&(AT)[N]) : (DEF))
@@ -145,21 +231,130 @@ FTS_API fts_object_t *fts_objstack[];
 ((N) < (AC) ? (fts_is_int(&(AT)[N]) ? (float) fts_get_int(&(AT)[N]) : \
 	      (fts_is_float(&(AT)[N]) ?  fts_get_float(&(AT)[N]) : (DEF))) : (DEF))
 
+/**
+ * Message and outlet API.
+ *
+ * @defgroup mess_api
+ */
 
-/* messages */
+/**
+ * Send an arbitrary message to an object (invoke method).
+ *
+ * @fn int fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at)
+ * @param o the target object
+ * @param s the message symbol
+ * @param ac argument count
+ * @param at argument values
+ * @return non-zero if succeeded, 0 if no method found for given arguments
+ */
 FTS_API int fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at);
+
+/**
+ * Send a varargs message to an object (invoke method).
+ *
+ * @fn int fts_send_message_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at)
+ * @param o the target object
+ * @param s the message symbol
+ * @param ac argument count
+ * @param at argument values
+ * @return non-zero if succeeded, 0 if no varargs method found
+ */
 FTS_API int fts_send_message_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at);
 
-/* outlets */
+/**
+ * Output bang (void) from outlet.
+ *
+ * @fn void fts_outlet_bang(fts_object_t *o, int woutlet)
+ * @param o the object
+ * @param woutlet outlet index
+ */
 FTS_API void fts_outlet_bang(fts_object_t *o, int woutlet);
+
+/**
+ * Output integer value from outlet.
+ *
+ * @fn void fts_outlet_int(fts_object_t *o, int woutlet, int n)
+ * @param o the object
+ * @param woutlet outlet index
+ * @param n the value
+ */
 FTS_API void fts_outlet_int(fts_object_t *o, int woutlet, int n);
-FTS_API void fts_outlet_float(fts_object_t *o, int woutlet, float f);
+
+/**
+ * Output (double) float value from outlet.
+ *
+ * @fn void fts_outlet_float(fts_object_t *o, int woutlet, double f)
+ * @param o the object
+ * @param woutlet outlet index
+ * @param f the value
+ */
+FTS_API void fts_outlet_float(fts_object_t *o, int woutlet, double f);
+
+/**
+ * Output symbol from outlet.
+ *
+ * @fn void fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s)
+ * @param o the object
+ * @param woutlet outlet index
+ * @param s the symbol
+ */
 FTS_API void fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s);
+
+/**
+* Output object value from outlet.
+ *
+ * @fn void fts_outlet_object(fts_object_t *o, int woutlet, fts_object_t *obj)
+ * @param o the object
+ * @param woutlet outlet index
+ * @param obj the object value
+ */
 FTS_API void fts_outlet_object(fts_object_t *o, int woutlet, fts_object_t *obj);
+
+/**
+ * Output any atom from outlet.
+ *
+ * @fn void fts_outlet_atom(fts_object_t *o, int woutlet, const fts_atom_t* at)
+ * @param o the object
+ * @param woutlet outlet index
+ * @param at the atom
+ */
 FTS_API void fts_outlet_atom(fts_object_t *o, int woutlet, const fts_atom_t* at);
+
+/**
+ * Output array of values from outlet.
+ *
+ * @fn void fts_outlet_varargs(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at)
+ * @param o the object
+ * @param woutlet outlet index
+ * @param ac argument count
+ * @param at argument values
+ */
 FTS_API void fts_outlet_varargs(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at);
-FTS_API void fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+
+/**
+ * Output message (with varargs) from outlet.
+ *
+ * @fn void fts_outlet_message(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ * @param o the object
+ * @param woutlet outlet index
+ * @param s the message symbol
+ * @param ac argument count
+ * @param at argument values
+ */
 FTS_API void fts_outlet_message(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+
+/**
+ * Output message (with varargs) or any values from outlet.
+ *
+ * @fn void fts_outlet_message(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ * @param o the object
+ * @param woutlet outlet index
+ * @param s the message symbol or NULL to output values
+ * @param ac argument count
+ * @param at argument values
+ */
+FTS_API void fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+
 /**
  * Return a value from a method.
  * The returned value is an atom that is copied by the calling code.

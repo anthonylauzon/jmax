@@ -55,7 +55,7 @@ create_event(int ac, const fts_atom_t *at)
     event = (event_t *)fts_object_create(event_type, NULL, 1, at + 1);
   else
   {
-    fts_class_t *type = fts_class_get_by_name( NULL, type_name);
+    fts_class_t *type = fts_class_get_by_name(NULL, type_name);
 
     if(type)
     {

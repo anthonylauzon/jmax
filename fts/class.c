@@ -40,10 +40,6 @@ static int typeid = FTS_FIRST_OBJECT_TYPEID;
 
 /* Return Status declarations */
 fts_status_description_t fts_DuplicatedClass = {"Duplicated class"};
-fts_status_description_t fts_ClassAlreadyInitialized = {"class already initialized"};
-fts_status_description_t fts_InletOutOfRange = {"inlet out of range"};
-fts_status_description_t fts_OutletOutOfRange = {"outlet out of range"};
-fts_status_description_t fts_CannotInstantiate = {"Cannot instantiate class"};
 
 
 /***********************************************************************
@@ -97,8 +93,8 @@ fts_class_alias(fts_class_t *cl, fts_symbol_t alias)
   fts_package_add_class(fts_get_current_package(), cl, alias);
 }
 
-
-static fts_class_t *get_class( fts_symbol_t package_name, fts_symbol_t class_name)
+static fts_class_t *
+get_class( fts_symbol_t package_name, fts_symbol_t class_name)
 {
   fts_package_t *pkg;
 
@@ -110,7 +106,7 @@ static fts_class_t *get_class( fts_symbol_t package_name, fts_symbol_t class_nam
 }
 
 fts_class_t *
-fts_class_get_by_name( fts_symbol_t package_name, fts_symbol_t class_name)
+fts_class_get_by_name(fts_symbol_t package_name, fts_symbol_t class_name)
 {
   fts_package_t *pkg;
   fts_class_t *cl;
@@ -512,6 +508,12 @@ void
 fts_class_inlet_thru(fts_class_t *cl, int winlet)
 {
   class_adjust_inlet(cl, winlet);
+}
+
+void
+fts_class_input_handler(fts_class_t *cl, fts_method_t method)
+{
+  cl->input_handler = method;
 }
 
 /**************************************************

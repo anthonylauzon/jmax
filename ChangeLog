@@ -1,3 +1,8 @@
+2002-12-10  Norbert Schnell  <schnell@mac-schnell2.ircam.fr>
+
+	* finalized method declaration API and outlet/message sending dispatcher
+	* added doxygen (like) comments to header files (class.h and message.h)
+
 2002-12-10  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* (re)added templates. Changed expression.c for object evaluation.
