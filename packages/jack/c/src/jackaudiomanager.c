@@ -343,7 +343,7 @@ jackaudiomanager_thread_run(fts_object_t* o, int winlet, fts_symbol_t s, int ac,
 	    /* call jack_port_unregister */
 	    if (-1 != jack_port_unregister(manager_jack_client, port->output_port))
 	    {
-	      fts_log("[jackaudiomanager] jack input port unregistered \n");
+	      fts_log("[jackaudiomanager] jack output port unregistered \n");
 	    }
 	  
 	    port->output_port = NULL;
@@ -798,8 +798,6 @@ jackaudiomanager_halt(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
 
 
   fts_log("[jackaudiomanager] jack client activated \n");
-
-  fts_sched_set_run_under_callback();
 
   /* Stop FTS scheduler */
   FD_ZERO(&rfds);
