@@ -1,7 +1,9 @@
 2003-09-15  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* fixed dependency problem with parser.h.
+
 	* changed return value of fts_get_float, now fts_get_float really return a float.
-	If you need to store double in atom, you can use the following functions:
+	If you need to store double in fts_atom_t, you can use the following functions:
 	  - fts_set_double
 	  - fts_get_double
 	
