@@ -357,7 +357,6 @@ public class FtsServer
       }
   }
 
-
   /** Send a "patcher loaded" messages to FTS.*/
 
   final void patcherLoaded(FtsObject patcher)
