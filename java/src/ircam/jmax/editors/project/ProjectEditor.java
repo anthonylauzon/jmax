@@ -108,7 +108,7 @@ public class ProjectEditor extends JFrame implements EditorContainer
 	  }
 	newProject.save( location+name);
 	newProject.setFileName( location+name);
-	newProject.setDir( location);
+	newProject.setDir( location);	
 	JMaxApplication.setCurrentProject( newProject);
 	newProject.setAsCurrentProject();
       }

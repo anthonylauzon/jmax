@@ -1371,11 +1371,6 @@ __fts_package_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   if (pkg->patcher != NULL) {
     fts_object_destroy(pkg->patcher);
   }
-  if( o->patcher)
-    {
-      fts_patcher_remove_object(o->patcher, o);
-      o->patcher = 0;
-    }
 }
 
 static void 
@@ -1606,7 +1601,13 @@ fts_package_new(fts_symbol_t name)
 void 
 fts_package_delete(fts_package_t* pkg)
 {
-  fts_object_destroy( (fts_object_t*) pkg);
+  if( ((fts_object_t *)pkg)->patcher)
+    {
+      fts_patcher_remove_object( ((fts_object_t *)pkg)->patcher, (fts_object_t *)pkg);
+      ((fts_object_t *)pkg)->patcher = 0;
+    }
+  else
+    fts_object_destroy( (fts_object_t*) pkg);
 }
 
 
