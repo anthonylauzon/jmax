@@ -127,8 +127,9 @@ abstract public class Adapter implements MappingListener{
    */
   public void setXZoom(int factor) 
   {
+    float old =  xZoomFactor; 
     xZoomFactor = factor/(float)100;
-    notifyZoom(xZoomFactor);
+    notifyZoom(xZoomFactor, old);
   }
 
 
@@ -242,7 +243,7 @@ abstract public class Adapter implements MappingListener{
     zoomListeners.removeElement(listener);
   }
 
-  private void notifyZoom(float newZoom)
+  private void notifyZoom(float newZoom, float oldZoom)
   {
     ZoomListener aListener;
 
@@ -250,7 +251,7 @@ abstract public class Adapter implements MappingListener{
       {
 	aListener = (ZoomListener) e.nextElement();
 
-	aListener.zoomChanged(newZoom);
+	aListener.zoomChanged(newZoom, oldZoom);
       }
   }
 
