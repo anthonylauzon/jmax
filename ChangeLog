@@ -1,3 +1,7 @@
+2002-10-25  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* 4.0.0 released
+
 2002-10-14  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* added . (dot) operator. Changed the grammar, the structure of the parse tree
