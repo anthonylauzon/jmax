@@ -1,4 +1,6 @@
+#ifndef SOLARIS2
 #define PTHREADS /* MDC @@@ */
+#endif
 
 #ifdef PTHREADS
 #include <pthread.h>
