@@ -281,7 +281,7 @@ static void udpreceive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int a
 
 static void udpreceive_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, NULL, sizeof( udpreceive_t), udpreceive_init, udpreceive_delete);
+  fts_class_init(cl, sizeof( udpreceive_t), udpreceive_init, udpreceive_delete);
 
   fts_class_message_varargs(cl, fts_s_sched_ready, udpreceive_receive);
 }

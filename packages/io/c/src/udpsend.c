@@ -265,7 +265,7 @@ static void udpsend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac
 static void 
 udpsend_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, NULL, sizeof( udpsend_t), udpsend_init, udpsend_delete);
+  fts_class_init(cl, sizeof( udpsend_t), udpsend_init, udpsend_delete);
 
   /*fts_class_message_varargs(cl, fts_s_anything, udpsend_anything);*/
 }

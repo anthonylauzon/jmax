@@ -25,12 +25,14 @@
 
 package ircam.jmax.editors.project;
 
-import javax.swing.*;
-/*import javax.swing.Box;
-  import javax.swing.JFrame;
-  import javax.swing.JFileChooser;
-  import javax.swing.JMenuBar;
-  import javax.swing.WindowConstants;*/
+/*import javax.swing.*;*/
+import javax.swing.Box;
+import javax.swing.JFrame;
+import javax.swing.JFileChooser;
+import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
+import javax.swing.ListModel;
+import javax.swing.WindowConstants;
 
 import java.util.*;
 import java.awt.*;

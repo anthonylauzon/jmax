@@ -326,7 +326,7 @@ jackaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 
 static void jackaudioport_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, NULL, sizeof( jackaudioport_t), jackaudioport_init, jackaudioport_delete);
+  fts_class_init(cl, sizeof( jackaudioport_t), jackaudioport_init, jackaudioport_delete);
     
   fts_class_message_varargs(cl, fts_s_sched_ready, jackaudioport_halt);
     

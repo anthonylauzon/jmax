@@ -1,8 +1,11 @@
-# $Id: Makefile.am,v 1.12 2002/12/02 15:38:17 diemo Exp $
+# $Id: Makefile.am,v 1.13 2002/12/03 14:09:14 p_tisserand Exp $
 #
 # sequence package source Makefile.am
 #
 # $Log: Makefile.am,v $
+# Revision 1.13  2002/12/03 14:09:14  p_tisserand
+# Add missing seqsym.h in noinst_HEADERS
+#
 # Revision 1.12  2002/12/02 15:38:17  diemo
 # Avoid relative paths, because they don't work when configuring in a
 # different directory, e.g.:
@@ -97,7 +100,6 @@ INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/packages/sequence/c/include
 
 noinst_HEADERS= \
 seqmess.h \
-seqmidi.h \
-seqsym.h 
+seqmidi.h 
 
 libsequence_la_LDFLAGS= -module

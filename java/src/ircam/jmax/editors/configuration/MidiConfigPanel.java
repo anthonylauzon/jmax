@@ -418,24 +418,7 @@ public class MidiConfigPanel extends JPanel implements Editor
 
   public void close(boolean doCancel)
   {
-    boolean toClose = true;
-    if( JMaxApplication.getConfig().isDirty())
-      {
-	String message = "Configuration File is not saved.\nDo you want to save it now?";
-	String title =  "Config Not Saved";
-	Object[] options = { "Save", "Don't save", "Cancel" };
-	int result = JOptionPane.showOptionDialog( window, message, title, 
-						   JOptionPane.YES_NO_CANCEL_OPTION,
-						   JOptionPane.QUESTION_MESSAGE,
-						   null, options, options[0]);
-	
-	if( result == JOptionPane.CANCEL_OPTION)
-	  return;
-	
-	if( result == JOptionPane.YES_OPTION)
-	  save();	
-      }
-    window.setVisible(false);
+    window.close();
   }
 
   public void save()

@@ -580,7 +580,7 @@ dsaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static void 
 dsaudioport_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, NULL, sizeof(dsaudioport_t), dsaudioport_init, dsaudioport_delete);
+  fts_class_init(cl, sizeof(dsaudioport_t), dsaudioport_init, dsaudioport_delete);
 }
 
 static char* 

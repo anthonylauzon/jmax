@@ -204,7 +204,7 @@ alsarawmidiport_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 static void 
 alsarawmidiport_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, NULL, sizeof( alsarawmidiport_t), alsarawmidiport_init, alsarawmidiport_delete);
+  fts_class_init(cl, sizeof( alsarawmidiport_t), alsarawmidiport_init, alsarawmidiport_delete);
 
   fts_class_message_varargs(cl, fts_s_sched_ready, alsarawmidiport_select);
 }

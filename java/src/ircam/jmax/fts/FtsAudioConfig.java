@@ -125,6 +125,9 @@ public class FtsAudioConfig extends FtsObject
   public void setListener( ircam.jmax.editors.configuration.AudioConfigPanel listener)
   {
     this.listener = listener;
+    
+    for( Enumeration e = labels.elements(); e.hasMoreElements();)
+      ((FtsAudioLabel)e.nextElement()).setListener( listener);
   }
 
   /*****************************************************/
@@ -348,6 +351,20 @@ public class FtsAudioConfig extends FtsObject
 	  return label;
       }
     return null;
+  }
+
+  public int getLabelIndex( FtsAudioLabel lb)
+  {
+    FtsAudioLabel label;
+    int i = 0;
+    for( Enumeration e = labels.elements(); e.hasMoreElements();)
+      {
+	label = (FtsAudioLabel)e.nextElement();
+	if( lb.getLabel().equals( label.getLabel()))
+	  return i;
+	i++;
+      }
+    return -1;
   }
 
   public void clear()

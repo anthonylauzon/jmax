@@ -288,7 +288,7 @@ alsamidi_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static void 
 alsamidi_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, NULL, sizeof(alsamidi_t), alsamidi_init, alsamidi_delete);
+  fts_class_init(cl, sizeof(alsamidi_t), alsamidi_init, alsamidi_delete);
 
   /* FTS MIDI manager interface implementation */
   fts_class_message_varargs(cl, fts_midimanager_s_get_default_input, alsamidi_get_default_input);

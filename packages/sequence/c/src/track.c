@@ -27,10 +27,10 @@
 #include <ftsprivate/client.h>
 #include <ftsprivate/patcher.h>
 #include <ftsconfig.h>
-#include <sequence/c/include/note.h>
-#include <sequence/c/include/event.h>
-#include <sequence/c/include/track.h>
-#include <sequence/c/include/seqsym.h>
+#include <note.h>
+#include <event.h>
+#include <track.h>
+#include <seqsym.h>
 #include "seqmidi.h"
 #include "seqmess.h"
 

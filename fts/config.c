@@ -213,7 +213,6 @@ config_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   midi_config = (midiconfig_t*)fts_object_create(midiconfig_type, NULL, 0, 0);
   fts_object_refer((fts_object_t*)midi_config);
   self->midi_config = midi_config;
-  /*fts_midiconfig_set(self->midi_config);*/
   fts_midiconfig_set_defaults(self->midi_config);
 
   /* create audio config object */
@@ -328,9 +327,7 @@ void fts_config_config(void)
   config_type = fts_class_install(config_s_name, config_instantiate);
 
   /* create config object */
-  /*fts_config_set( (config_t*)fts_object_create(config_type, NULL, 0, 0));*/
-  config = (config_t*)fts_object_create(config_type, NULL, 0, 0);
-  fts_object_refer((fts_object_t *)config);
+  fts_config_set( (config_t*)fts_object_create(config_type, NULL, 0, 0));
 
   /* define global config variable */
   fts_set_object(&a, config);
