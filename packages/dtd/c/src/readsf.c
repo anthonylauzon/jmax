@@ -126,6 +126,16 @@ static void readsf_dsp( fts_word_t *argv)
 
   if (0 == self->is_started)
   {
+    /* now fill output with zero */
+    for (channels = 0; channels < n_channels; ++channels)
+    {
+      out = (float*)fts_word_get_pointer(argv + 2 + channels);
+      /* fill output with zero */
+      for (n = 0; n < n_tick; ++n)
+      {		  
+	  out[n] = 0.0f;
+      }
+    }
     return;
   }
 
