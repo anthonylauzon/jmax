@@ -71,6 +71,19 @@ void fts_package_pop(fts_package_t* pkg);
  * @ingroup package */
 fts_package_t* fts_package_load_from_file(fts_symbol_t name, const char* filename);
 
+
+/** 
+ * Loads package with the given name
+ * 
+ * @fn fts_package_t* fts_package_looad(fts_symbol_t name)
+ * @param name the name of the package
+ * 
+ * @return pkg if package is found
+ * @return NULL if package is not found
+ * @ingroup package
+ */
+fts_package_t* fts_package_load(fts_symbol_t name);
+
 /***********************************************
  *
  *  Package
