@@ -33,7 +33,7 @@
 #include <string.h>
 #include <mach-o/dyld.h> 
 
-#include <fts/sys/hw.h>
+#include <fts/sys.h>
 
 
 /* *************************************************************************** */
