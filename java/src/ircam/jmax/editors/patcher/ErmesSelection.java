@@ -105,7 +105,7 @@ public class ErmesSelection implements Transferable
     if (! objects.contains( object))
       {
 	objects.addElement( object);
-	ftsSelection.addObject( object.getFtsObject());
+	ftsSelection.add( object.getFtsObject());
 	object.setSelected(true);
       }
   }
@@ -118,7 +118,7 @@ public class ErmesSelection implements Transferable
     if (! connections.contains( connection))
       {
 	connections.addElement( connection);
-	ftsSelection.addConnection( connection.getFtsConnection());
+	ftsSelection.add( connection.getFtsConnection());
 	connection.setSelected(true);
       }
   }
@@ -129,7 +129,7 @@ public class ErmesSelection implements Transferable
       {
 	object.setSelected(false);
 	objects.removeElement( object);
-	ftsSelection.removeObject( object.getFtsObject());
+	ftsSelection.remove( object.getFtsObject());
       }
   }
 
@@ -139,7 +139,7 @@ public class ErmesSelection implements Transferable
       {
 	connection.setSelected(false);
 	connections.removeElement( connection);
-	ftsSelection.removeConnection( connection.getFtsConnection());
+	ftsSelection.remove( connection.getFtsConnection());
       }
   }
 

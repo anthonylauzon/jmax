@@ -1049,26 +1049,20 @@ fts_bmax_code_new_selection(fts_bmax_file_t *f, fts_object_t *obj)
 	    }
 	  else
 	    {
-	      /* Code a new object and pop it from the object stack */
-	      fts_bmax_code_new_object(f, p, objidx);
-	      fts_bmax_code_pop_objs(f, 1);
+	      if(fts_object_is_connection(p))
+		{
+		  if(fts_selection_connection_ends_selected(selection, (fts_connection_t *)p))
+		    fts_bmax_code_new_connection_in_selection(f, (fts_connection_t *)p, selection);
+		}
+	      else
+		{
+		  /* Code a new object and pop it from the object stack */
+		  fts_bmax_code_new_object(f, p, objidx);
+		  fts_bmax_code_pop_objs(f, 1);
+		}
 	    }
 
 	  objidx++;
-	}
-    }
-
-  /* For each object, for each outlet, code all the connections */
-  for (i = 0; i < selection->connections_size; i++)
-    {
-      if (selection->connections[i])
-	{
-	  fts_connection_t *c;
-
-	  c = selection->connections[i];
-
-	  if(fts_selection_connection_ends_selected(selection, c))
-	    fts_bmax_code_new_connection_in_selection(f, c, selection);
 	}
     }
 

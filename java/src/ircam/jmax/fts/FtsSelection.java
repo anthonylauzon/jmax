@@ -43,13 +43,9 @@ public class FtsSelection extends FtsObject
   /*                                                                           */
   /*****************************************************************************/
 
-  /** The objects contained in the patcher */
+  /** The objects (and connections) selected in the patcher */
 
   private MaxVector objects     = new MaxVector();
-
-  /** All the connections between these objects */
-
-  private MaxVector connections = new MaxVector();
 
   protected transient FtsArgs args = new FtsArgs();
 
@@ -64,7 +60,7 @@ public class FtsSelection extends FtsObject
 
   /** Add an object to this container  */
 
-  final public void addObject(FtsObject obj)
+  final public void add(FtsObject obj)
   {
     objects.addElement(obj);
 
@@ -72,32 +68,32 @@ public class FtsSelection extends FtsObject
     args.add(obj);
       
     try{
-	send( FtsSymbol.get("add_object"), args);
+	send( FtsSymbol.get("add"), args);
     }
     catch(IOException e)
     {
-	System.err.println("[FtsSelection]: I/O Error sending addObject message!");
+	System.err.println("[FtsSelection]: I/O Error sending add message!");
 	e.printStackTrace(); 
     } 
   }
 
   /** Remove an object from this container. */
 
-  final public void removeObject(FtsObject obj)
+  final public void remove(FtsObject obj)
   {
     if (objects.contains(obj))
       {
 	objects.removeElement(obj);
-
+	
 	args.clear();
 	args.add(obj);
-      
+	
 	try{
-	    send( FtsSymbol.get("remove_object"), args);
+	    send( FtsSymbol.get("remove"), args);
 	}
 	catch(IOException e)
 	    {
-		System.err.println("[FtsSelection]: I/O Error sending removeObject message!");
+		System.err.println("[FtsSelection]: I/O Error sending remove message!");
 		e.printStackTrace(); 
 	    }      
       }
@@ -110,68 +106,20 @@ public class FtsSelection extends FtsObject
     return objects;
   }
 
-  /** Add a connection to this selection. */
-
-  final public void addConnection(FtsConnection obj)
-  {
-    connections.addElement(obj);
-
-    args.clear();
-    args.add(obj);
-      
-    try{
-	send( FtsSymbol.get("add_connection"), args);
-    }
-    catch(IOException e)
-	{
-	    System.err.println("[FtsSelection]: I/O Error sending addConnection message!");
-	    e.printStackTrace(); 
-	}   
-  }
-
-  /** Remove an connection from this container. */
-
-  final public void removeConnection(FtsConnection obj)
-  {
-    if (connections.contains(obj))
-      {
-	connections.removeElement(obj);
-	args.clear();
-	args.add(obj);
-      
-	try{
-	    send( FtsSymbol.get("remove_connection"), args);
-	}
-	catch(IOException e)
-	    {
-		System.err.println("[FtsSelection]: I/O Error sending removeConnection message!");
-		e.printStackTrace(); 
-	    }
-      }
-  }
-
-  /** Get the connections */
-
-  final public MaxVector getConnections()
-  {
-    return connections;
-  }
-
   /** clean: remove everything */
 
   final public void clean()
   {
-      objects.removeAllElements();
-      connections.removeAllElements();
+    objects.removeAllElements();
 
-      try{
-	  send( FtsSymbol.get("clear"));
+    try{
+      send( FtsSymbol.get("clear"));
+    }
+    catch(IOException e)
+      {
+	System.err.println("[FtsSelection]: I/O Error sending clean message!");
+	e.printStackTrace(); 
       }
-      catch(IOException e)
-	  {
-	      System.err.println("[FtsSelection]: I/O Error sending clean message!");
-	      e.printStackTrace(); 
-	  }
   }
 }
 

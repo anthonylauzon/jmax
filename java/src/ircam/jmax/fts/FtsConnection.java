@@ -72,9 +72,6 @@ public class FtsConnection extends FtsObject
     this.to     = to;
     this.inlet  = inlet;
     this.type   = type;
-
-    /*if (patcher != null)
-      patcher.addConnection(this);*/
   }
 
   FtsConnection(FtsServer server, FtsPatcherObject patcher, int id, FtsGraphicObject from, 
@@ -132,7 +129,7 @@ public class FtsConnection extends FtsObject
 
     deleted = true;
 
-    ircam.jmax.editors.patcher.ErmesSelection.getFtsSelection().removeConnection(this);
+    ircam.jmax.editors.patcher.ErmesSelection.getFtsSelection().remove(this);
 	
     ((FtsPatcherObject)from.getParent()).requestDeleteConnection(this);
   }

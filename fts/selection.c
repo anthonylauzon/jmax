@@ -69,28 +69,6 @@ selection_object_size_to_fit(fts_selection_t *this)
   this->objects = new_objects;
 }
 
-static void
-selection_connection_size_to_fit(fts_selection_t *this)
-{
-  int i;
-  int new_size;
-  fts_connection_t **new_connections;
-
-  new_size = this->connections_size * 2;
-  new_connections = (fts_connection_t **) fts_malloc(new_size * sizeof(fts_connection_t *));
-
-  for (i = 0; i < this->connections_size; i++)
-    new_connections[i] = this->connections[i];
-
-  for (i = this->connections_size; i < new_size; i++)
-    new_connections[i] = 0;
-
-  this->connections_size = new_size;
-
-  fts_free(this->connections);
-  this->connections = new_connections;
-}
-
 int
 fts_selection_contains_object(fts_selection_t *sel, fts_object_t *o)
 {
@@ -113,7 +91,7 @@ fts_selection_connection_ends_selected(fts_selection_t *sel, fts_connection_t *c
 }
 
 static void
-selection_add_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+selection_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_selection_t *this  = (fts_selection_t *) o;
   fts_object_t *newobj;
@@ -134,7 +112,7 @@ selection_add_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-selection_remove_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+selection_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_selection_t *this  = (fts_selection_t *) o;
   int i;
@@ -151,43 +129,6 @@ selection_remove_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
 
 static void
-selection_add_connection(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_selection_t *this  = (fts_selection_t *) o;
-  int i;
-  
-  this->connections_count++;
-
-  if (this->connections_count > this->connections_size)
-    selection_connection_size_to_fit(this);
-
-  for (i = 0; i < this->connections_size; i++)
-    if (this->connections[i] == 0)
-      {
-	this->connections[i] = (fts_connection_t *)fts_get_object(at);
-	return;
-      }
-}
-
-
-static void
-selection_remove_connection(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_selection_t *this  = (fts_selection_t *) o;
-  int i;
-  
-  this->connections_count--;
-
-  for (i = 0; i < this->connections_size; i++)
-    if (this->connections[i] == (fts_connection_t *)fts_get_object(at))
-      {
-	this->connections[i] = 0;
-	return;
-      }
-}
-
-
-static void
 selection_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_selection_t *this  = (fts_selection_t *) o;
@@ -196,10 +137,6 @@ selection_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   this->objects_count = 0;
   for (i = 0; i < this->objects_size; i++)
     this->objects[i] = 0;
-
-  this->connections_count = 0;
-  for (i = 0; i < this->connections_size; i++)
-    this->connections[i] = 0;
 }
 
 static void
@@ -214,14 +151,6 @@ selection_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   for (i = 0; i < this->objects_size; i++)
     this->objects[i] = 0;
-
-
-  this->connections_size = INITIAL_SELECTION_SIZE;
-  this->connections_count = 0;
-  this->connections = (fts_connection_t **) fts_malloc(this->connections_size * sizeof(fts_connection_t *));
-
-  for (i = 0; i < this->connections_size; i++)
-    this->connections[i] = 0;
 }
 
 static void
@@ -230,7 +159,6 @@ selection_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_selection_t *this  = (fts_selection_t *) o;
 
   fts_free(this->objects);
-  fts_free(this->connections);
 }
 
 
@@ -242,10 +170,8 @@ selection_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, selection_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, selection_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_object"),  selection_add_object);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("remove_object"), selection_remove_object);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_connection"), selection_add_connection);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("remove_connection"), selection_remove_connection);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add"),  selection_add);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("remove"), selection_remove);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear, selection_clear);
 
@@ -263,5 +189,6 @@ void fts_selection_config( void)
 {
   fts_class_install(fts_new_symbol("__selection"), selection_instantiate);
 }
+
 
 
