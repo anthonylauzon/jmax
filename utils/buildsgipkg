@@ -2,10 +2,17 @@
 # builds a SGI package
 
 BUILD_DIR=/data/jmax-build/src
+if [ $# -ge 1 ]
+then
+    BUILD_DIR=$1
+fi
+
+set -x
 
 /bin/rm -rf $BUILD_DIR
 mkdir -p $BUILD_DIR
 
+VERSION=`cat ../VERSION`
 DISTFILE=../../jmax-$VERSION-src.tar.gz
 SRCROOTDIR=jmax-$VERSION
 
@@ -13,7 +20,7 @@ gzip -cd $DISTFILE | (cd $BUILD_DIR ; tar xvf -)
 
 ( cd $BUILD_DIR/jmax-$VERSION ; gmake ARCH=r10k-irix6.5 all)
 
-/bin/rm -rf /tmp/jmax.idb /tmp/jmax.idb.sorted /tmp/jmax.spec
+/bin/rm -rf /tmp/jmax.idb /tmp/jmax.idb.sorted /tmp/jmax-sgi.spec
 
 cp jmax-sgi.spec /tmp
 
@@ -24,7 +31,7 @@ cp jmax-sgi.spec /tmp
     export RAWIDB
     gmake ARCH=r10k-irix6.5 INSTALL="install -idb ALL" install
 
-    sort +4u -6 < /tmp/jmax.idb | awk '{ printf( "%s %s %s %s %c%s%c %c%s%c %s\n", $$1, $$2, $$3, $$4, 39, $$5, 39, 39, $$6, 39, $$7); }' > /tmp/jmax.idb.sorted
+    sort +4u -6 < /tmp/jmax.idb | awk '{ printf( "%s %s %s %s %c%s%c %c%s%c %s\n", $1, $2, $3, $4, 39, $5, 39, 39, $6, 39, $7); }' > /tmp/jmax.idb.sorted
 
     /usr/sbin/gendist -root .. -sbase .. -dist .. -idb /tmp/jmax.idb.sorted -spec /tmp/jmax-sgi.spec
 )
