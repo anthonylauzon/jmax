@@ -30,7 +30,7 @@ include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 endif
 
 include VERSION
-JMAX_VERSION_TAG=V$(JMAX_MAJOR_VERSION)_$(JMAX_MINOR_VERSION)_$(JMAX_PATCH_VERSION)$(JMAX_VERSION_STATUS)
+JMAX_VERSION_TAG=V$(JMAX_MAJOR_VERSION)_$(JMAX_MINOR_VERSION)_$(JMAX_PATCH_VERSION)
 
 all:
 	$(MAKE) -C fts $@
@@ -133,11 +133,13 @@ cvs-tag: spec-files
 		echo "Not sync with cvs (do an update or commit)" ; \
 		exit 1 ; \
 	fi
-	( \
-#		echo "Tagging with tag $(JMAX_VERSION_TAG)" ; \
-#		cvs tag -F $(JMAX_VERSION_TAG) ; \
-		echo "You must do a ***BRANCH*** TAG !!!" ; \
-	)
+	if [ -f CVS/Tag ] ; \
+	then ; \
+		echo "Cannot do a non-branch tag on a branch" ; \
+		exit 1 ; \
+	fi
+	echo "Tagging with tag $(JMAX_VERSION_TAG)"
+#	cvs tag -F $(JMAX_VERSION_TAG)
 .PHONY: cvs-tag
 
 #
@@ -153,7 +155,7 @@ spec-files:
 # dist
 # does a cvs export and a .tar.gz of the sources
 #
-dist: cvs-tag
+dist: 
 	( \
 		umask 22 ; \
 		mkdir .$$$$ ; \
