@@ -64,7 +64,10 @@ FTS_API int  fts_class_doc_get (fts_class_t *cl, fts_array_t *output);
 *
 *  the class structure
 *
+*  N.B.: IF THIS STRUCTURE CHANGES, THE MACRO FTS_PRIMITIVE_CLASS IN
+*        atom.c MUST BE ADAPTED!
 */
+
 struct fts_class {
   fts_object_t head;
   

@@ -200,14 +200,14 @@ static fts_class_t VAR =                                        \
   /* class structure */                                         \
   0, /* name */                                                 \
   TYPEID, /* type_id */                                         \
+  0, /* super class */                                          \
   0, /* hash_function */                                        \
   0, /* equals_function */                                      \
+  0, /* description_function */                                 \
   0, /* copy_function */                                        \
   0, /* array_function */                                       \
-  0, /* description_function */                                 \
-  0, /* interpolation_select */                                 \
-  0, /* fts_list_t *import_handlers */				\
-  0, /* fts_list_t *export_handlers */				\
+  0, /* fts_list_t *import_handlers */                          \
+  0, /* fts_list_t *export_handlers */                          \
   0, /* instantiate_fun */                                      \
   0, /* constructor */                                          \
   0, /* deconstructor */                                        \
