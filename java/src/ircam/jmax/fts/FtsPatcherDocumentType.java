@@ -13,7 +13,7 @@ public class FtsPatcherDocumentType extends MaxDocumentType
   public FtsPatcherDocumentType()
   {
     super("patcher");
-    setPrettyName("Patcher");
+    setPrettyName("patcher");
   }
 
   /** Build an empty instance of FtsPatcherDocument, i.e. an instance

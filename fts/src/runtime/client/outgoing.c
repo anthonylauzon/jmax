@@ -163,29 +163,7 @@ fts_client_upload_object(fts_object_t *obj)
     not necessarly consistent.
     */
 
-  if (fts_object_is_inlet(obj))
-    {
-      fts_inlet_t *inlet = (fts_inlet_t *) obj;
-
-      fts_client_mess_start_msg(NEW_OBJECT_CODE);
-      fts_client_mess_add_object((fts_object_t *) obj->patcher);
-      fts_client_mess_add_long(obj->id);
-      fts_client_mess_add_sym(fts_s_inlet);
-      fts_client_mess_add_long(inlet->position);
-      fts_client_mess_send_msg();
-    }
-  else if (fts_object_is_outlet(obj))
-    {
-      fts_outlet_t *outlet = (fts_outlet_t *) obj;
-
-      fts_client_mess_start_msg(NEW_OBJECT_CODE);
-      fts_client_mess_add_object((fts_object_t *) obj->patcher);
-      fts_client_mess_add_long(obj->id);
-      fts_client_mess_add_sym(fts_s_outlet);
-      fts_client_mess_add_long(outlet->position);
-      fts_client_mess_send_msg();
-    }
-  else if (fts_object_is_abstraction(obj))
+  if (fts_object_is_abstraction(obj))
     {
       /* Send the abstraction object */
 

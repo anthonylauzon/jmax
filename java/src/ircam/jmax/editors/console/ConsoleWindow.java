@@ -1,19 +1,23 @@
 package ircam.jmax.editors.console;
 
-import ircam.jmax.*;
-import ircam.jmax.dialogs.*;
 import java.io.*;
 import java.util.*;
-/**
-  Window containing a tcl console
-  */
-
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.datatransfer.*;
 import com.sun.java.swing.*;
 
 import tcl.lang.*;
+
+import ircam.jmax.*;
+import ircam.jmax.dialogs.*;
+import ircam.jmax.mda.*;
+
+/**
+  Window containing a tcl console
+  */
+
+
  
 public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transferable{
   StringBuffer itsSbuf = new StringBuffer();
@@ -28,7 +32,7 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
   }
 
   public ConsoleWindow() {
-    super("jMax Console");
+    super("jMax Console", Mda.getDocumentTypeByName("patcher"));
 
     itsConsole = new Console(MaxApplication.getTclInterp());
     itsConsole.Start();

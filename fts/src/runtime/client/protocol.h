@@ -61,7 +61,6 @@
 #define REDEFINE_PATCHER_CODE   'Q'
 #define REPOSITION_INLET        'X'
 #define REPOSITION_OUTLET       'Y'
-#define REPLACE_OBJECT_CODE     'R'
 #define FREE_OBJECT_CODE        'f'
 #define CONNECT_OBJECTS_CODE    'c'
 #define DISCONNECT_OBJECTS_CODE 'd'

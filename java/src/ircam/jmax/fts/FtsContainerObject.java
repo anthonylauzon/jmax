@@ -140,10 +140,16 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
 
   void replaceInConnections(FtsObject oldObject, FtsObject newObject)
   {    
-    // delete the connections that no more consistent
+    // First, redo the connections
+
+    for (int i = 0; i < connections.size(); i++)
+      ((FtsConnection)connections.elementAt(i)).replace(oldObject, newObject);
+
+    // then, delete the connections that no more consistent
     // First collect them in a aux vector, then remove them
     // It is slow, but safer because removing elements in vector
-    // shift the content
+    // shift the content, so that calling "delete" in a loop on
+    // "connections" would change the connections content ...
 
     Vector toDelete = new Vector();
 
@@ -161,11 +167,6 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
 
 	conn.delete();
       }
-
-    // replace it in all the survived connections
-
-    for (int i = 0; i < connections.size(); i++)
-      ((FtsConnection)connections.elementAt(i)).replace(oldObject, newObject);
   }
 
   /** Overwrite the getObjects methods so to download the patcher

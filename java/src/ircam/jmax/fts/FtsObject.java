@@ -257,7 +257,6 @@ abstract public class FtsObject implements MaxTclInterpreter
     // not existing any more
 
     parent.replaceInConnections(oldObject, newObject);
-    FtsServer.getServer().replaceObject(oldObject, newObject);
     oldObject.delete();
 
     return newObject;

@@ -153,14 +153,14 @@ public class FtsIntegerVector implements FtsDataObject
 
   public void saveAsTcl(PrintWriter pw)
   {
-    pw.print("integerVector " + values.length + " {");
+    pw.println("integerVector " + values.length + " {");
 
     if (pw instanceof IndentedPrintWriter)
       ((IndentedPrintWriter) pw).indentMore();
 
     for (int i = 0; i < values.length; i++)
       {
-	if ((i % 8) == 0)
+	if ((i % 8) == 7)
 	  pw.println(Integer.toString(values[i]));
 	else
 	{

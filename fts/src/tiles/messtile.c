@@ -32,7 +32,6 @@
    REDEFINE_PATCHER (obj)patcher <name> <ins> <outs>
    REPOSITION_INLET (obj)obj <pos>
    REPOSITION_OUTLET (obj)obj <pos>
-   REPLACE (obj)old (obj)new
    FREE (obj)obj
    CONNECT (obj)from (int)outlet (obj)to (int)inlet
    DISCONNECT (obj)from (int)outlet (obj)to (int)inlet
@@ -560,43 +559,6 @@ fts_mess_client_reposition_outlet(int ac, const fts_atom_t *av)
 }
 
 /* 
-   REPLACE (obj)old  (obj)new
-*/
-
-static void
-fts_mess_client_replace(int ac, const fts_atom_t *av)
-{
-  trace_mess("Received replace", ac, av);
-
-  if (ac == 2 && fts_is_object(&av[0]) && fts_is_object(&av[0]))
-    {
-      fts_object_t  *old;
-      fts_object_t  *new;
-
-      old =  fts_get_object(&av[0]);
-
-      if (! old)
-	{
-	  post_mess("System Error in FOS message REPLACE: redefining a non existing object", ac, av);
-	  return;
-	}
-
-      new =  fts_get_object(&av[1]);
-
-      if (! new)
-	{
-	  post_mess("System Error in FOS message REPLACE: redefining to a non existing object", ac, av);
-	  return;
-	}
-
-      fts_object_replace(old, new);
-    }
-  else
-    post_mess("System Error in FOS message REPLACE: bad args", ac, av);
-}
-
-
-/* 
    FREE (obj)obj
 
    Free (destroy) the object identified by id.
@@ -884,7 +846,6 @@ fts_messtile_install_all()
   fts_client_mess_install(REDEFINE_PATCHER_CODE,  fts_mess_client_redefine_patcher);
   fts_client_mess_install(REPOSITION_INLET,  fts_mess_client_reposition_inlet);
   fts_client_mess_install(REPOSITION_OUTLET,  fts_mess_client_reposition_outlet);
-  fts_client_mess_install(REPLACE_OBJECT_CODE,  fts_mess_client_replace);
   fts_client_mess_install(FREE_OBJECT_CODE,  fts_mess_client_free);
   fts_client_mess_install(CONNECT_OBJECTS_CODE,  fts_mess_client_connect);
   fts_client_mess_install(DISCONNECT_OBJECTS_CODE, fts_mess_client_disconnect);

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.13 $ IRCAM $Date: 1998/04/21 12:05:44 $
+ *      $Revision: 1.14 $ IRCAM $Date: 1998/04/22 20:27:46 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -285,112 +285,6 @@ fts_object_delete(fts_object_t *obj)
 
   fts_block_free((char *)obj, obj->cl->size);
 }
-
-/*
- * >>>>>>>>> This function , and the corresponding method, will be phased
- * >>>>>>>>> out; redefining is an editing operation, coping with everything in FTS is 
- * >>>>>>>>> too complex and not very generic (think about properties: which properties we
- * >>>>>>>>> should move on to the new object ? "x" for sure, dsp_is_sink surely not !! )
- *
- * object replace substitute an object with another in the
- * graph, i.e. rebuild all the connection the old object had
- * in the new object.
- *
- * Also, the new object actually get the id of the old object.
- * and the old object get the id of the new one.
- *
- * Object rebuilding will be used instead of the current
- * hybrid mechanism to implement run time variable number of inlet/outlet
- * objects like patchers and abstractions.
- * 
- * It should raise a property changed event on the client side.
- * It should also handle the case of a container object; may be we should
- * have a "fts_object_replace" method
- * 
- * fts_object_replace do *not* delete the old object; it may be used
- * to build debug structures, for example, where you want to keep
- * the original object inside a wrapper patcher !!!
- * the new Id can be used to access the old object; note that the
- * old object is kept under the same patcher, until deleted.
- *
- * Note that the new object should be instantiated in the same
- * patch as the old; the behaviour is undefined in other cases.
- */
-
-void
-fts_object_replace(fts_object_t *old, fts_object_t *new)
-{
-  int inlet, outlet;
-  fts_atom_t at[1];
-  fts_patcher_t *patcher;
-  int id;
-
-  /*
-   * first, send to the new object a message "replace" <old>;
-   * ignore errors (i.e.,if it is not understood, no problem, 
-   * nothing to do).
-   * 
-   * The message can be used by complex object to transfer the content
-   * from the old to the new object, for example in case of a patcher.
-   */
-
-  fts_set_object(&at[0], old);
-
-  fts_message_send(new, fts_SystemInlet, fts_s_replace, 1, at);
-
-  /* swap old and new in the object table */
-
-  id = new->id;
-  if (old->id != FTS_NO_ID)
-    fts_object_table_remove(old->id);
-
-  new->id = old->id;
-
-  if (new->id != FTS_NO_ID)
-    fts_object_table_put(new->id, new);
-
-  old->id = id;
-  fts_object_table_put(old->id, old);
-
-  /* reproduce in new, and delete in old,  
-     all the old outgoing connections */
-
-  for (outlet = 0; outlet < old->cl->noutlets; outlet++)
-    {
-      fts_connection_t *p;
-
-      /* must call the real disconnect function, so that all the daemons
-	 and methods  can fire correctly */
-
-      for (p = old->out_conn[outlet]; p ;  p = old->out_conn[outlet])
-	{
-	  if (outlet < fts_object_get_outlets_number(new))
-	    fts_object_connect(new, p->woutlet, p->dst, p->winlet);
-
-	  fts_object_disconnect(old, p->woutlet, p->dst, p->winlet);
-	}
-    }
-
-  /* reproduce in new, and delete in old,  
-     all the old incoming connections */
-
-  for (inlet = 0; inlet < old->cl->ninlets; inlet++)
-    {
-      fts_connection_t *p;
-
-      /* must call the real disconnect function, so that all the daemons
-	 and methods  can fire correctly */
-
-      for (p = old->in_conn[inlet]; p; p = old->in_conn[inlet])
-	{
-	  if (inlet < fts_object_get_inlets_number(new))
-	    fts_object_connect(p->src, p->woutlet, new, p->winlet);
-
-	  fts_object_disconnect(p->src, p->woutlet, old, p->winlet);
-	}
-    }
-}
-
 
 /******************************************************************************/
 /*                                                                            */

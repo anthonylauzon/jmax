@@ -59,11 +59,18 @@ public class FtsConnection
 
   void replace(FtsObject oldObject, FtsObject newObject)
   {
-    if (from == oldObject)
-      from = newObject;
+    if ((from == oldObject) || (to == oldObject))
+      {
+	FtsServer.getServer().disconnectObjects(from, outlet, to, inlet);
 
-    if (to == oldObject)
-      to = newObject;
+	if (from == oldObject)
+	  from = newObject;
+
+	if (to == oldObject)
+	  to = newObject;
+
+	FtsServer.getServer().connectObjects(from, outlet, to, inlet);
+      }
   }
 
   /** Undo the connection. */

@@ -758,7 +758,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
     }
   else if (objclass == fts_s_inlet)
     {
-      fts_atom_t description[1];
+      fts_atom_t description[2];
 
       /* skip optional dsp flag  */
       fts_patlex_next_token(in);
@@ -767,7 +767,11 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 	fts_patlex_push_back(in);
 
       fts_set_symbol(&description[0], fts_s_inlet);
-      obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 1, description);
+
+      /* Putting a symbol as position avoid inlet positioning */
+
+      fts_set_symbol(&description[1], fts_s_inlet); 
+      obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 2, description);
 
       fts_patparse_set_square_graphic_properties(graphicDescr, obj);
     }
@@ -783,7 +787,11 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 	fts_patlex_push_back(in);
 
       fts_set_symbol(&description[0], fts_s_outlet);
-      obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 1, description);
+
+      /* Putting a symbol as position avoid outlet positioning */
+
+      fts_set_symbol(&description[1], fts_s_outlet); 
+      obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 2, description);
 
       fts_patparse_set_square_graphic_properties(graphicDescr, obj);
     }

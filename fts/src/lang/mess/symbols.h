@@ -40,7 +40,6 @@ extern fts_symbol_t fts_s_false;
 
 extern fts_symbol_t fts_s_init;
 extern fts_symbol_t fts_s_delete;
-extern fts_symbol_t fts_s_replace;
 extern fts_symbol_t fts_s_send_update;
 extern fts_symbol_t fts_s_ninlets;
 extern fts_symbol_t fts_s_noutlets;

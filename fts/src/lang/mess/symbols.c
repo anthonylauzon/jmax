@@ -27,7 +27,6 @@ fts_symbol_t fts_s_false;
 
 fts_symbol_t fts_s_init;
 fts_symbol_t fts_s_delete;
-fts_symbol_t fts_s_replace;
 fts_symbol_t fts_s_ninlets;
 fts_symbol_t fts_s_noutlets;
 fts_symbol_t fts_s_bang;
@@ -93,7 +92,6 @@ fts_predefine_symbols(void)
 
   fts_s_init 	          = fts_new_builtin_symbol("$init");
   fts_s_delete	          = fts_new_builtin_symbol("$delete");
-  fts_s_replace	          = fts_new_builtin_symbol("$replace");
   fts_s_ninlets           = fts_new_builtin_symbol("ins");
   fts_s_noutlets          = fts_new_builtin_symbol("outs");
   fts_s_bang              = fts_new_builtin_symbol("bang");

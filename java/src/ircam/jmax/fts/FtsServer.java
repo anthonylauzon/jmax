@@ -373,32 +373,6 @@ public class FtsServer
       }
   }
 
-  /** Send a "replace object" messages to FTS.*/
-
-  final void replaceObject(FtsObject oldObject, FtsObject newObject)
-  {
-    try
-      {
-	port.sendCmd(FtsClientProtocol.fts_replace_object_cmd);
-	port.sendObject(oldObject);
-	port.sendObject(newObject);
-	port.sendEom();
-
-	// In FTS, they exchanged their ID identity; 
-	// we exchange their IDs on the client side to keep
-	// consistency
-
-	int idx;
-
-	idx = oldObject.getObjId();
-	oldObject.setObjId(newObject.getObjId());
-	newObject.setObjId(idx);
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
   /** Send a "redefine object" messages to a patcher in FTS.
    *  Special optimized version for patcher loading/editing
    */
