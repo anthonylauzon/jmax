@@ -14,40 +14,95 @@ import ircam.jmax.fts.*;
 // of the insertElementAt() problem: public this function is infact "final".
 // 2) This class is then a wrapper (redefinition) of a set of methods of Vector
 //
-public class ErmesSelection {
+public class ErmesSelection
+{
   public MaxVector itsObjects = new MaxVector();
   public MaxVector itsConnections = new MaxVector();
+  public ErmesSketchPad itsOwner;
 
   public ErmesSelection() 
   {
   }
 
-  public void addObject( Object theObject) 
+  public void select(ErmesObject object) 
   {
-    itsObjects.addElement( theObject);
-    Fts.getSelection().addObject( ((ErmesObject)theObject).itsFtsObject);
+    if (object.itsSketchPad != itsOwner)
+      setOwner(object.itsSketchPad);
+
+    if (! itsObjects.contains( object))
+      {
+	itsObjects.addElement( object);
+	Fts.getSelection().addObject( object.itsFtsObject);
+	object.Select();
+      }
   }
 
-  public void addConnection( Object theConnection) 
+  public void select( ErmesConnection connection) 
   {
-    itsConnections.addElement( theConnection);
-    Fts.getSelection().addConnection( ((ErmesConnection)theConnection).itsFtsConnection);
+    if (connection.itsSketchPad != itsOwner)
+      setOwner(connection.itsSketchPad);
+
+    if (! itsConnections.contains( connection))
+      {
+	itsConnections.addElement( connection);
+	Fts.getSelection().addConnection( connection.itsFtsConnection);
+	connection.Select();
+      }
   }
 
-  public void removeObject( Object theObject) 
+  public void deselect( ErmesObject object) 
   {
-    itsObjects.removeElement( theObject);
-    Fts.getSelection().removeObject( ((ErmesObject)theObject).itsFtsObject);
+    if (itsObjects.contains( object))
+      {
+	object.Deselect();
+	itsObjects.removeElement( object);
+	Fts.getSelection().removeObject( object.itsFtsObject);
+      }
   }
 
-  public void removeConnection( Object theConnection) 
+  public void deselect( ErmesConnection connection) 
   {
-    itsConnections.removeElement( theConnection);
-    Fts.getSelection().removeConnection( ((ErmesConnection)theConnection).itsFtsConnection);
+    if (itsConnections.contains( connection))
+      {
+	connection.Deselect();
+	itsConnections.removeElement( connection);
+	Fts.getSelection().removeConnection( connection.itsFtsConnection);
+      }
   }
 
-  public void removeAllElements() 
+  public boolean isSelected(ErmesObject object)
   {
+    return itsObjects.contains( object);
+  }
+
+
+  public boolean isSelected(ErmesConnection connection)
+  {
+    return itsConnections.contains( connection);
+  }
+
+
+  public void deselectAll() 
+  {
+    if (itsObjects.size() != 0) 
+      itsOwner.GetSketchWindow().DeselectionUpdateMenu();
+
+    ErmesObject aObject;
+
+    for ( Enumeration e = itsObjects.elements() ; e.hasMoreElements(); ) 
+      {
+	aObject = ( ErmesObject) e.nextElement();
+	aObject.Deselect();
+      }
+
+    ErmesConnection aConnection;
+
+    for ( Enumeration e = itsConnections.elements() ; e.hasMoreElements(); ) 
+      {
+	aConnection = (ErmesConnection) e.nextElement();
+	aConnection.Deselect();
+      }
+
     itsObjects.removeAllElements();
     itsConnections.removeAllElements();
     Fts.getSelection().clean();
@@ -56,6 +111,23 @@ public class ErmesSelection {
   public boolean isEmpty() 
   {
     return itsObjects.isEmpty() && itsConnections.isEmpty();
+  }
+
+
+  public void setOwner(ErmesSketchPad owner)
+  {
+    if ((itsOwner != null) && (owner != itsOwner))
+      {
+	deselectAll();
+	itsOwner.repaint();
+      }
+
+    itsOwner = owner;
+  }
+
+  public  ErmesSketchPad getOwner()
+  {
+    return itsOwner;
   }
 }
 

@@ -89,32 +89,28 @@ class ErmesConnection implements ErmesDrawable {
   // Select
   // select a connection
   //--------------------------------------------------------
-  void Select( boolean paintNow) 
-    {
-      if ( !itsSelected) 
-	{
-	  itsSelected = true;
-	  if ( paintNow)
-	    DoublePaint();
-	  else
-	    itsSketchPad.addToDirtyConnections( this);
-	}
-    }
+  void Select( ) 
+  {
+    if ( !itsSelected) 
+      {
+	itsSelected = true;
+	itsSketchPad.addToDirtyConnections( this);
+      }
+  }
 
   //--------------------------------------------------------
   // Deselect
   // deselect a connection
   //--------------------------------------------------------
-  void Deselect( boolean paintNow) 
-    {
-      if ( itsSelected) 
-	{
-	  itsSelected = false;
-	  itsSketchPad.markSketchAsDirty();
-	  if ( paintNow)
-	    itsSketchPad.paintDirtyList();
-	}
-    }
+
+  void Deselect( ) 
+  {
+    if ( itsSelected) 
+      {
+	itsSelected = false;
+	itsSketchPad.markSketchAsDirty();
+      }
+  }
 
   void MouseDown( MouseEvent evt, int x, int y) 
     {

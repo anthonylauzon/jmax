@@ -301,7 +301,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
     if ( itsSketchPad.currentSelection.isEmpty() )
       ErmesPatcherInspector.inspect( itsPatcher);
     else
-      itsSketchPad.inspectSelection();
+      ErmesSketchPad.inspectSelection();
   }
 
   protected void Cut()
@@ -310,17 +310,16 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
     itsSketchPad.DeleteSelected();
   }
 
+  private int lastCopyCount;
+
   protected void Copy()
   {
-    Point tempPoint = itsSketchPad.selectionUpperLeft();
-    itsSketchPad.pasteDelta.setLocation( tempPoint.x - itsSketchPad.itsCurrentScrollingX, 
-					 tempPoint.y - itsSketchPad.itsCurrentScrollingY);
-    itsSketchPad.numberOfPaste = 0;
-
     Cursor temp = getCursor();
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
     
     ftsClipboard.copy( Fts.getSelection());
+    lastCopyCount = ftsClipboard.getCopyCount();
+    itsSketchPad.resetPaste(0);
 
     setCursor( temp);
   }
@@ -337,7 +336,15 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
     pasting = true;
+
+    if (lastCopyCount != ftsClipboard.getCopyCount())
+      {
+	itsSketchPad.resetPaste(-1);
+	lastCopyCount = ftsClipboard.getCopyCount();
+      }
+
     ftsClipboard.paste( itsPatcher);
+
     itsPatcherData.update();
     Fts.sync();
 

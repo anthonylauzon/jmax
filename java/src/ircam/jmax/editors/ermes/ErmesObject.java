@@ -295,28 +295,21 @@ abstract class ErmesObject implements ErmesDrawable {
   {
   }
 
-  void Select( boolean paintNow) 
+  void Select() 
   {
     if ( !itsSelected) 
       {
 	itsSelected = true;
-
-	if (paintNow)
-	  DoublePaint();
-	else
-	  itsSketchPad.addToDirtyObjects( this);
+	itsSketchPad.addToDirtyObjects( this);
       }
   }
 
-  void Deselect( boolean PaintNow) 
+  void Deselect() 
   {
     if (itsSelected) 
       {
 	itsSelected = false;
-	if (PaintNow)
-	  DoublePaint();
-	else
-	  itsSketchPad.addToDirtyObjects( this);
+	itsSketchPad.addToDirtyObjects( this);
       }
   }
 

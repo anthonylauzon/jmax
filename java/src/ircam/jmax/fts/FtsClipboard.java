@@ -24,6 +24,8 @@ public class FtsClipboard  extends FtsObject
    * Create a Fts clipboard;
    */
 
+  int copyCount = 0;
+
   protected  FtsClipboard(FtsObject parent, String className, String description, int objId)
   {
     super(parent, className, null, description, objId);
@@ -31,12 +33,18 @@ public class FtsClipboard  extends FtsObject
 
   public void copy(FtsSelection sel)
   {
+    copyCount++;
     Fts.getServer().sendObjectMessage(this, -1, "copy", sel);
   }
 
   public void paste(FtsObject patcher)
   {
     Fts.getServer().sendObjectMessage(this, -1, "paste", patcher);
+  }
+
+  public int getCopyCount()
+  {
+    return copyCount;
   }
 }
 
