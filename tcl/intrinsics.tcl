@@ -70,7 +70,7 @@ proc templateDirectory { dir } {
     if {[file exists "$dir/templates.tcl"]} then {
 	sourceFile $dir/templates.tcl
     } else {
-	abstractionPath $dir
+	templatePath $dir
     }
 }
     
