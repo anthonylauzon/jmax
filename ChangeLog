@@ -1,3 +1,7 @@
+2001-12-27  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* fixed unixdtd package compilation errors w.r.t. API changes
+
 2001-12-18  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* changed close strategy for patcher window (now destroys graphical instances)
