@@ -1138,12 +1138,12 @@ midiport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 /* current MIDI manager & hashtable of MIDI ports */
 static fts_midimanager_t *midimanager = NULL;
 
+fts_symbol_t fts_s_midimanager;
 fts_symbol_t fts_midimanager_s_get_default_devices;
 fts_symbol_t fts_midimanager_s_append_device_names;
 fts_symbol_t fts_midimanager_s_get_input;
 fts_symbol_t fts_midimanager_s_get_output;
 
-static fts_symbol_t fts_s_midimanager;
 static fts_symbol_t fts_midimanager_s_internal_bus;
 static fts_symbol_t fts_midimanager_s_unconnected;
 static fts_symbol_t fts_midimanager_s_inputs;

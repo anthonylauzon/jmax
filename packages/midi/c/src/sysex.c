@@ -70,7 +70,7 @@ sysexin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
   else
     {
-      this->port = fts_midiport_get_default();
+      this->port = 0;
       
       if(!this->port)
 	fts_object_set_error(o, "Default MIDI port is not defined");
@@ -145,7 +145,7 @@ sysexout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     }
   else
     {
-      this->port = fts_midiport_get_default();
+      this->port = 0;
       
       if(!this->port)
 	fts_object_set_error(o, "Default MIDI port is not defined");

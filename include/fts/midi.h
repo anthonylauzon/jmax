@@ -682,8 +682,8 @@ typedef struct fts_midimanager
   int n_labels;
 } fts_midimanager_t;
 
-
 /* MIDI manager messages */
+FTS_API fts_symbol_t fts_s_midimanager;
 FTS_API fts_symbol_t fts_midimanager_s_get_default_devices;
 FTS_API fts_symbol_t fts_midimanager_s_append_device_names;
 FTS_API fts_symbol_t fts_midimanager_s_get_input;

@@ -172,3 +172,42 @@ FTS_API void fts_eventfifo_incr_read(fts_eventfifo_t *eventfifo);
 FTS_API void fts_eventfifo_incr_write(fts_eventfifo_t *eventfifo);
 
 /*@}*/ /* event fifo */
+
+/**
+* @name call fifo
+ */
+/*@{*/
+
+typedef struct fts_fifocall
+{
+  double time;
+  fts_atom_t argument;
+  fts_method_t method;
+  fts_method_t object;
+} fts_fifocall_t;
+
+#define fts_fifocall_get_time(e) ((e)->time)
+#define fts_fifocall_get_argument(e) (&(e)->atom)
+#define fts_fifocall_get_method(e) (&(e)->method)
+#define fts_fifocall_get_object(e) (&(e)->object)
+
+#define fts_fifocall_set_time(e, x) ((e)->time = (x))
+#define fts_fifocall_set_argument(e, x) (&(e)->atom = (x))
+#define fts_fifocall_set_method(e, x) (&(e)->method = (x))
+#define fts_fifocall_set_object(e, x) (&(e)->object = (x))
+
+typedef struct fts_callfifo
+{
+  fts_fifo_t fifo;
+  int size;
+  double delta;
+} fts_callfifo_t;
+
+FTS_API void fts_callfifo_init(fts_callfifo_t *callfifo, int size);
+FTS_API void fts_callfifo_destroy(fts_callfifo_t *callfifo, int size);
+FTS_API fts_fifocall_t *fts_callfifo_get_read(fts_callfifo_t *callfifo);
+FTS_API fts_fifocall_t *fts_callfifo_get_write(fts_callfifo_t *callfifo);
+FTS_API void fts_callfifo_incr_read(fts_callfifo_t *callfifo);
+FTS_API void fts_callfifo_incr_write(fts_callfifo_t *callfifo);
+
+/*@}*/ /* call fifo */

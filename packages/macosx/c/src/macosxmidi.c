@@ -276,8 +276,11 @@ macosxmidi_get_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
       /* take midiport from Mac OS X virtual MIDI destination hashtable */
       *ptr = (fts_midiport_t *)fts_get_object(&a);
     } else {
+      char str[256];
+      snprintf(str, 256, "jMax: %s", label_name);
+      
       /* create Mac OS X virtual MIDI destination */
-      *ptr = macosxmidi_create_midiport(this, macosxmidi_input_type, label_name, 0);
+      *ptr = macosxmidi_create_midiport(this, macosxmidi_input_type, fts_new_symbol(str), 0);
     }
   } else {
     fts_set_symbol(&k, device_name);
@@ -315,8 +318,11 @@ macosxmidi_get_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       /* take midiport from Mac OS X virtual MIDI source hashtable */
       *ptr = (fts_midiport_t *)fts_get_object(&a);
     } else {
+      char str[256];
+      snprintf(str, 256, "jMax: %s", label_name);
+
       /* create Mac OS X virtual MIDI source */
-      *ptr = macosxmidi_create_midiport(this, macosxmidi_output_type, label_name, 0);
+      *ptr = macosxmidi_create_midiport(this, macosxmidi_output_type, fts_new_symbol(str), 0);
     }
   } else {
     fts_set_symbol(&k, device_name);
