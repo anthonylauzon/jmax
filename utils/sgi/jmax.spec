@@ -3,7 +3,7 @@ product jmax
     cutpoint /usr/lib/jmax
     image sw
         id "jMax environment"
-        version "2.5.1"
+        version "2.6.0"
         order 1
         subsys exec default
             id "jMax environment"
