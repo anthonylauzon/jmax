@@ -108,24 +108,6 @@ event_dump(event_t *event, fts_dumper_t *dumper)
   fts_dumper_message_send(dumper, mess);
 }
 
-void
-event_print(event_t *event)
-{
-  if(fts_is_object(&event->value))
-    {
-      fts_object_t *obj = (fts_object_t *)fts_get_object(&event->value);
-
-      post("<%s> ", event_get_type(event));
-
-      fts_send_message(obj, fts_system_inlet, fts_s_print, 0, 0);
-    }
-  else if(!fts_is_void(&event->value))
-    {
-      post_atoms(1, &event->value);
-      post("\n");
-    }
-}
-
 /**************************************************************
  *
  *  generic event methods

@@ -71,8 +71,9 @@ void
 seqmess_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   seqmess_t *this = (seqmess_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
 
-  post("%s\n", this->s);
+  fts_spost(stream, "%s\n", this->s);
 }
 
 /**************************************************************

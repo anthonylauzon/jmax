@@ -228,12 +228,13 @@ static void
 alsamidi_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   alsamidi_t *this = (alsamidi_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int i;
 
   alsamidi_update_inputs(this);
   alsamidi_update_outputs(this);
   
-  post("ALSA MIDI inputs:\n");
+  fts_spost(stream, "ALSA MIDI inputs:\n");
   for(i=0; i<fts_array_get_size(&this->inputs); i++)
     {
       fts_atom_t k, a;
@@ -244,14 +245,14 @@ alsamidi_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	  if(fts_is_object(&a))
 	    {
 	      alsarawmidiport_t *port = (alsarawmidiport_t *)fts_get_object(&a);
-	      post("  '%s': active (%s)\n", fts_get_symbol(&k), port->hw_name);
+	      fts_spost(stream, "  '%s': active (%s)\n", fts_get_symbol(&k), port->hw_name);
 	    }
 	  else if(fts_is_symbol(&a))
-	    post("  '%s': inactive (%s)\n", fts_get_symbol(&k), fts_get_symbol(&a));
+	    fts_spost(stream, "  '%s': inactive (%s)\n", fts_get_symbol(&k), fts_get_symbol(&a));
 	}
     }
 
-  post("ALSA MIDI outputs:\n");
+  fts_spost(stream, "ALSA MIDI outputs:\n");
   for(i=0; i<fts_array_get_size(&this->outputs); i++)
     {
       fts_atom_t k, a;
@@ -262,10 +263,10 @@ alsamidi_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	  if(fts_is_object(&a))
 	    {
 	      alsarawmidiport_t *port = (alsarawmidiport_t *)fts_get_object(&a);
-	      post("  '%s': active (%s)\n", fts_get_symbol(&k), port->hw_name);
+	      fts_spost(stream, "  '%s': active (%s)\n", fts_get_symbol(&k), port->hw_name);
 	    }
 	  else if(fts_is_symbol(&a))
-	    post("  '%s': inactive (%s)\n", fts_get_symbol(&k), fts_get_symbol(&a));
+	    fts_spost(stream, "  '%s': inactive (%s)\n", fts_get_symbol(&k), fts_get_symbol(&a));
 	}
     }
 }

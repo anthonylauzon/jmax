@@ -152,16 +152,17 @@ static void
 col_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   col_t *this = (col_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   mat_t *mat = this->mat;
   int size = col_get_size(this);
   int i;
   
-  post("{");
+  fts_spost(stream, "{");
 
   for(i=0; i<size; i++)
-    post_atoms(1, col_get_element(this, i));
+    fts_spost_atoms(stream, 1, col_get_element(this, i));
 
-  post("}\n");
+  fts_spost(stream, "}\n");
 }
 
 static void

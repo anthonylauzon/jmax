@@ -75,7 +75,7 @@ sysinfo_audio(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   fts_audioport_t *port = fts_audioport_get_default(o);
 
-  fts_send_message((fts_object_t *)port, fts_system_inlet, fts_s_print, 0, 0);
+  fts_send_message((fts_object_t *)port, fts_system_inlet, fts_s_print, 1, at);
 }
 
 static void
@@ -83,7 +83,7 @@ sysinfo_midi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   fts_object_t *config = fts_midiconfig_get();
 
-  fts_send_message(config, fts_system_inlet, fts_s_print, 0, 0);
+  fts_send_message(config, fts_system_inlet, fts_s_print, 1, at);
 }
 
 static fts_status_t

@@ -641,20 +641,21 @@ static void
 mat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *this = (mat_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int m = mat_get_m(this);
   int n = mat_get_n(this);
   int i;
   
-  post("{\n");
+  fts_spost(stream, "{\n");
 
   for(i=0; i<m; i++)
     {
-      post("  {");
-      post_atoms(n, mat_get_row(this, i));
-      post("}\n");
+      fts_spost(stream, "  ");
+      fts_spost_atoms(stream, n, mat_get_row(this, i));
+      fts_spost(stream, "\n");
     }
 
-  post("}\n");
+  fts_spost(stream, "}\n");
 }
 
 static void

@@ -70,10 +70,9 @@ static void
 value_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   value_t *this = (value_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
 
-  post("{");
-  post_atoms(1, &this->a);
-  post("}\n");
+  fts_spost_atoms(stream, 1, &this->a);
 }
 
 static void

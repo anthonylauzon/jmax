@@ -402,15 +402,14 @@ post_object( fts_object_t *obj)
   int ac = fts_object_get_description_size( obj);
   const fts_atom_t *at = fts_object_get_description_atoms( obj);
 
-
   if(ac > 0)
     {
-      post("[");
+      post("(:");
       post_atoms(ac, at);
-      post("] ");
+      post(") ");
     }
   else
-    post("[???] ");
+    post("(:\?\?\?) ");
 }
 #endif
 

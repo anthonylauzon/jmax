@@ -304,10 +304,11 @@ static void
 vec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vec_t *this = (vec_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
 
-  post("{");
-  post_atoms(vec_get_size(this), vec_get_ptr(this));
-  post("}\n");
+  fts_spost(stream, "{");
+  fts_spost_atoms(stream, vec_get_size(this), vec_get_ptr(this));
+  fts_spost(stream, "}\n");
 }
 
 static void

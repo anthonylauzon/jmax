@@ -267,17 +267,6 @@ explay_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
 
 static void
-explay_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  explay_t *this = (explay_t *)o;
-  fts_symbol_t sym = fts_get_symbol_arg(ac, at, 0, 0);
-
-  post("explay: %s: %s\n", (sym ? s : "explay"), this->explode_name);
-}
-
-
-
-static void
 explay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explay_t *this = (explay_t *)o;
@@ -308,7 +297,6 @@ explay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_set, explay_set);
   fts_method_define_varargs(cl, 0, fts_new_symbol("nth"), explay_nth);
-  fts_method_define_varargs(cl, 0, fts_s_print, explay_print);
   fts_method_define_varargs(cl, 0, fts_new_symbol("startat"), explay_startat);
 
   fts_outlet_type_define_varargs(cl, 0,	fts_s_int);

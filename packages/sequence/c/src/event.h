@@ -68,7 +68,4 @@ extern void event_dump(event_t *event, fts_dumper_t *dumper);
 
 extern double event_get_duration(event_t *event);
 
-extern void event_print(event_t *event);
-/*extern void event_upload(event_t *event);*/
-
 #endif

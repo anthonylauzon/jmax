@@ -476,11 +476,12 @@ static void
 cvec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   cvec_t *this = (cvec_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int size = cvec_get_size(this);
   complex *p = cvec_get_ptr(this);
   int i;
 
-  post("{");
+  fts_spost(stream, "{");
 
   if(size > 8)
     {
@@ -489,29 +490,36 @@ cvec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
       for(i=0; i<size8; i+=8)
 	{
-	  post("\n  ");
+	  fts_spost(stream, "\n  ");
 	  for(j=0; j<8; j++)
-	    post("%f+i%f ", p[i + j].re, p[i + j].im);
+	    {
+	      fts_spost_complex(stream, p[i + j].re, p[i + j].im);
+	      fts_spost(stream, " ");
+	    }
 	}
 	  
       if(i < size)
 	{
-	  post("\n  ");
+	  fts_spost(stream, "\n  ");
 	  for(; i<size; i++)
-	    post("%f+i%f ", p[i].re, p[i].im);
+	    {
+	      fts_spost_complex(stream, p[i].re, p[i].im);
+	      fts_spost(stream, " ");
+	    }
 	}
-
-      post("\n}\n");
     }
   else if(size)
     {
       for(i=0; i<size-1; i++)
-	post("%f+i%f ", p[i].re, p[i].im);
+	{
+	  fts_spost_complex(stream, p[i].re, p[i].im);
+	  fts_spost(stream, " ");
+	}
 
-      post("%f+i%f}\n", p[i].re, p[i].im);
+      fts_spost_complex(stream, p[i].re, p[i].im);
     }
-  else
-    post("}\n");
+  
+  fts_spost(stream, "}\n");
 }
 
 static void

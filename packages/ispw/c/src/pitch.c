@@ -61,7 +61,7 @@ typedef struct{
 } pitch_hist_t;
 
 typedef struct{
-  long vib_time;
+  int vib_time;
   float vib_depth;
   float reattack_thresh;
   int reattack_time;
@@ -72,7 +72,7 @@ typedef struct{
 
 typedef struct{
   float pitch;    /* pitch of ongoing note; zero if none */
-  long last_int_pitch;
+  int last_int_pitch;
   int attack;
   int peaked;
 } pitch_stat_t;
@@ -341,7 +341,7 @@ static void
 pitch_vibrato(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pitch_t *x = (pitch_t *)o;
-  long n = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
   float f = fts_get_float_arg(ac, at, 1, 0);
   
   x->ctl.vib_time = (n >= 0)? n: 0;
@@ -373,7 +373,7 @@ pitch_reattack(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   pitch_t *x = (pitch_t *)o;
   float f = (float) fts_get_float_arg(ac, at, 0, 0);
-  long n = fts_get_int_arg(ac, at, 1, 0);
+  int n = fts_get_int_arg(ac, at, 1, 0);
   
   x->ctl.reattack_thresh = (f > 0)? f: 0;
   x->ctl.reattack_time = (n > 0)? n: 0;
@@ -385,7 +385,7 @@ static void
 pitch_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pitch_t *x = (pitch_t *)o;
-  long n = fts_get_int_arg(ac, at, 0, 1);
+  int n = fts_get_int_arg(ac, at, 0, 1);
   
   x->ctl.print_me = (n > 0)? n: 0;
   
@@ -441,8 +441,8 @@ static void
 pitch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pitch_t *x = (pitch_t *)o;
-  long pt_common_arg_0 = fts_get_int_arg(ac, at, 0, 0);
-  long pt_common_arg_1 = fts_get_int_arg(ac, at, 1, 0);
+  int pt_common_arg_0 = fts_get_int_arg(ac, at, 0, 0);
+  int pt_common_arg_1 = fts_get_int_arg(ac, at, 1, 0);
   int i;
   
   if(!pt_common_init(&x->pt, pt_common_arg_0, pt_common_arg_1)) 

@@ -382,14 +382,21 @@ static void
 bpf_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int i;
 
-  post("{\n");
+  fts_spost(stream, "{\n");
 
   for(i=0; i<this->size; i++)
-    post("  (%f %f)\n", this->points[i].time, this->points[i].value);
-
-  post("}\n");
+    {
+      fts_spost(stream, "  (");
+      fts_spost_float(stream, this->points[i].time);
+      fts_spost(stream, ", ");      
+      fts_spost_float(stream, this->points[i].value);
+      fts_spost(stream, ")");
+    }
+  
+  fts_spost(stream, "}\n");
 }
 
 static void

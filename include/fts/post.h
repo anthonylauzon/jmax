@@ -76,6 +76,8 @@ FTS_API void fts_spost( fts_bytestream_t *stream, const char *format, ...);
  */
 FTS_API void fts_spost_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t *at);
 FTS_API void fts_spost_float( fts_bytestream_t *stream, double f);
+FTS_API void fts_spost_symbol( fts_bytestream_t *stream, fts_symbol_t symbol);
+FTS_API void fts_spost_complex(fts_bytestream_t *stream, double re, double im);
 
 /**
  * Print an object description on a bytestream
@@ -116,6 +118,7 @@ FTS_API void fts_log_atoms( int ac, const fts_atom_t *at);
 /*
  * Compatibility ???
  */
+FTS_API fts_bytestream_t *fts_post_get_stream( int ac, const fts_atom_t *at);
 FTS_API void post( const char *format, ...);
 FTS_API void post_atoms( int ac, const fts_atom_t *at);
 

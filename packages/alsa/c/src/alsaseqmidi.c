@@ -422,23 +422,22 @@ static void
 alsaseqmidi_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
     alsaseqmidi_t* this = (alsaseqmidi_t*)o;
+    fts_bytestream_t *stream = fts_post_get_stream(ac, at);
     
-    
-    post("\n");
-    post("ALSA Sequencer MIDI manager inputs\n");
+    fts_spost(stream, "\n");
+    fts_spost(stream, "ALSA Sequencer MIDI manager inputs\n");
     alsaseqmidi_scan_hashtable(&this->inputs);
     
-    post("\n");
-    post("ALSA Sequencer MIDI manager outputs\n");
+    fts_spost(stream, "\n");
+    fts_spost(stream, "ALSA Sequencer MIDI manager outputs\n");
     alsaseqmidi_scan_hashtable(&this->outputs);  
-    post("\n");
-    post("ALSA Sequencer MIDI manager declared sources\n");
+    fts_spost(stream, "\n");
+    fts_spost(stream, "ALSA Sequencer MIDI manager declared sources\n");
     alsaseqmidi_scan_hashtable(&this->sources);
     
-    post("\n");
-    post("ALSA Sequencer MIDI manager declared destination\n");
+    fts_spost(stream, "\n");
+    fts_spost(stream, "ALSA Sequencer MIDI manager declared destination\n");
     alsaseqmidi_scan_hashtable(&this->destinations);
-
 }
 
 static fts_status_t

@@ -337,58 +337,59 @@ static void
 midievent_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int type = fts_midievent_get_type(this);
 
   switch (type)
     {
     case midi_note:
-      post("{%d/%s %d %d %d}\n", type, fts_midi_types[type], 
+      fts_spost(stream, "{%d/<%s> %d %d %d}\n", type, fts_midi_types[type], 
 	   fts_midievent_channel_message_get_first(this), 
 	   fts_midievent_channel_message_get_second(this),
 	   fts_midievent_channel_message_get_channel(this));
       break;
       
     case midi_poly_pressure:
-      post("{<midi poly pressure> %d %d %d}\n",
+      fts_spost(stream, "{<midi poly pressure> %d %d %d}\n",
 	   fts_midievent_channel_message_get_first(this), 
 	   fts_midievent_channel_message_get_second(this),
 	   fts_midievent_channel_message_get_channel(this));
       break;
       
     case midi_control_change:
-      post("{<midi control change> %d %d %d}\n",
+      fts_spost(stream, "{<midi control change> %d %d %d}\n",
 	   fts_midievent_channel_message_get_first(this), 
 	   fts_midievent_channel_message_get_second(this),
 	   fts_midievent_channel_message_get_channel(this));
       break;
       
     case midi_program_change:
-      post("{<midi program change> %d %d}\n", 
+      fts_spost(stream, "{<midi program change> %d %d}\n", 
 	   fts_midievent_channel_message_get_first(this), 
 	   fts_midievent_channel_message_get_channel(this));
       break;
       
     case midi_channel_pressure:		
-      post("{<midi channel pressure> %d %d}\n", 
+      fts_spost(stream, "{<midi channel pressure> %d %d}\n", 
 	   fts_midievent_channel_message_get_first(this), 
 	   fts_midievent_channel_message_get_channel(this));
       break;
       
     case midi_pitch_bend:
-      post("{<midi pitch bend> %d %d %d}\n",
+      fts_spost(stream, "{<midi pitch bend> %d %d %d}\n",
 	   fts_midievent_channel_message_get_first(this), 
 	   fts_midievent_channel_message_get_second(this),
 	   fts_midievent_channel_message_get_channel(this));
       break;
       
     case midi_system_exclusive:
-	post("{<midi system exclusive message> ");
+	fts_spost(stream, "{<midi system exclusive message> ");
 	post_atoms(fts_midievent_system_exclusive_get_size(this), fts_midievent_system_exclusive_get_atoms(this));
-	post("}\n");
+	fts_spost(stream, "}\n");
       break;
       
     case midi_time_code:
-      post("{<midi time code (%d)> %d %d %d %d}\n",
+      fts_spost(stream, "{<midi time code (%d)> %d %d %d %d}\n",
 	   fts_midievent_time_code_get_type(this),
 	   fts_midievent_time_code_get_hour(this),
 	   fts_midievent_time_code_get_minute(this),
@@ -403,35 +404,35 @@ midievent_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	switch(mess)
 	  {
 	  case midi_timing_clock:
-	    post("{<timing clock tick>}\n");
+	    fts_spost(stream, "{<timing clock tick>}\n");
 	    break;
 	    
 	  case midi_undefined_0:
-	    post("{<undefined real-time message>}\n");
+	    fts_spost(stream, "{<undefined real-time message>}\n");
 	    break;
 	    
 	  case midi_start:
-	    post("{<start>}\n");
+	    fts_spost(stream, "{<start>}\n");
 	    break;
 	    
 	  case midi_continue:
-	    post("{<continue>}\n");
+	    fts_spost(stream, "{<continue>}\n");
 	    break;
 	    
 	  case midi_stop:
-	    post("{<stop>}\n");
+	    fts_spost(stream, "{<stop>}\n");
 	    break;
 	    
 	  case midi_undefined_1:
-	    post("{<undefined real-time message>}\n");
+	    fts_spost(stream, "{<undefined real-time message>}\n");
 	    break;
 	    
 	  case midi_active_sensing:
-	    post("{<active sensing>}\n");
+	    fts_spost(stream, "{<active sensing>}\n");
 	    break;
 	    
 	  case midi_system_reset:
-	    post("{<reset>}\n");
+	    fts_spost(stream, "{<reset>}\n");
 	  }
       }
     }
@@ -2179,12 +2180,13 @@ static void
 midiconfig_print( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   midiconfig_t *this = (midiconfig_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);  
   midilabel_t *label = this->labels;
   fts_midimanager_t *mm;
 
-  post("labels\n");
+  fts_spost(stream, "labels\n");
   for(label = this->labels; label != NULL; label = label->next) 
-    post("  %s: '%s' '%s'\n", label->name, label->input_name, label->output_name);
+    fts_spost(stream, "  %s: '%s' '%s'\n", label->name, label->input_name, label->output_name);
 
   /* redirect to MIDI managers */
   for(mm = midimanagers; mm != NULL; mm = mm->next)

@@ -1146,23 +1146,28 @@ static void
 fmat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *this = (fmat_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int m = fmat_get_m(this);
   int n = fmat_get_n(this);
   int i, j;
   
-  post("{\n");
+  fts_spost(stream, "{\n");
 
   for(i=0; i<m; i++)
     {
-      post("  {");
+      fts_spost(stream, "  ");
 
       for(j=0; j<n-1; j++)
-	post("%f ", fmat_get_element(this, i, j));
+	{
+	  fts_spost_float(stream, fmat_get_element(this, i, j));
+	  fts_spost(stream, " ");
+	}
 
-      post("%f}\n", fmat_get_element(this, i, j));
+      fts_spost_float(stream, fmat_get_element(this, i, j));
+      fts_spost(stream, "\n");
     }
 
-  post("}\n");
+  fts_spost(stream, "}\n");
 }
 
 static void

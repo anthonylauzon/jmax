@@ -282,12 +282,26 @@ fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
 #undef fts_outlet_send
 fts_status_t
-fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s,
-		int ac, const fts_atom_t *at)
+fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_connection_t *conn;
   fts_class_t *cl = o->head.cl;
   fts_outlet_decl_t *out;
+  int n;
+  const fts_atom_t *a;
+
+  if(ac == 1 && fts_is_tuple(at))
+    {
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(at);
+
+      n = fts_tuple_get_size(tuple);
+      a = fts_tuple_get_atoms(tuple);
+    }
+  else
+    {
+      n = ac;
+      a = at;
+    }
 
   if (woutlet >= cl->noutlets || woutlet < 0)
     return &fts_OutletOutOfRange;
@@ -302,23 +316,23 @@ fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s,
 
   conn = o->out_conn[woutlet];
 
-  if (!FTS_REACHED_MAX_CALL_DEPTH()) {
-
-    while(conn)
-      {
-	if ((conn->symb == s) || (!conn->symb && conn->mth))
-	  {
-	    /* call cashed method */
-	    FTS_OBJSTACK_PUSH(conn->dst);
-	    (*conn->mth)(conn->dst, conn->winlet, s, ac, at);
-	    FTS_OBJSTACK_POP(conn->dst);
-	  }
-	else
-	  fts_send_message_cache(conn->dst, conn->winlet, s, ac, at, &conn->symb, &conn->mth);
-	
-	conn = conn->next_same_src;
-      }
-  }
+  if (!FTS_REACHED_MAX_CALL_DEPTH()) 
+    {
+      while(conn)
+	{
+	  if ((conn->symb == s) || (!conn->symb && conn->mth))
+	    {
+	      /* call cashed method */
+	      FTS_OBJSTACK_PUSH(conn->dst);
+	      (*conn->mth)(conn->dst, conn->winlet, s, n, a);
+	      FTS_OBJSTACK_POP(conn->dst);
+	    }
+	  else
+	    fts_send_message_cache(conn->dst, conn->winlet, s, n, a, &conn->symb, &conn->mth);
+	  
+	  conn = conn->next_same_src;
+	}
+    }
 
   return fts_ok;
 }

@@ -27,74 +27,60 @@
 #include <string.h>
 #include <fts/fts.h>
 
-typedef struct {
+typedef struct 
+{
   fts_object_t o;
+  fts_bytestream_t *stream;
   fts_symbol_t prompt;
 } print_t;
-
-static fts_symbol_t sym_print = 0;
-
-/**********************************************************************
- *
- *  object
- *
- */
 
 static void
 print_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   print_t *this = (print_t *)o;
 
-  this->prompt = fts_get_symbol_arg(ac, at, 0, fts_s_print);
+  if(ac > 0 && fts_is_symbol(at))
+    this->prompt = fts_get_symbol(at);
+  else
+    this->prompt = fts_s_print;
+
+  this->stream = fts_get_default_console_stream();
 }
 
+static void
+print_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  print_t *this = (print_t *)o;
 
-/**********************************************************************
- *
- *  user methods
- *
- */
+  fts_object_destroy((fts_object_t *)this->stream);
+}
 
 static void
 print_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   print_t *this = (print_t *)o;
 
-  post("%s: bang\n", this->prompt);
+  fts_spost(this->stream, "%s: bang\n", this->prompt);
 }
 
 static void
-print_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+print_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   print_t *this = (print_t *)o;
 
-  post("%s: (", this->prompt);
-  post_atoms(ac, at);
-  post(")\n");
+  fts_spost(this->stream, "%s: (", this->prompt);
+  fts_spost_atoms(this->stream, ac, at);
+  fts_spost(this->stream, ")\n");
 }
 
 static void
-print_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+print_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   print_t *this = (print_t *)o;
 
-  post("%s: %d\n", this->prompt, fts_get_int(at));
-}
-
-static void
-print_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  print_t *this = (print_t *)o;
-
-  post("%s: %f\n", this->prompt, fts_get_float(at));
-}
-
-static void
-print_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  print_t *this = (print_t *)o;
-
-  post("%s: '%s'\n", this->prompt, fts_get_symbol(at));
+  fts_spost(this->stream, "%s: ", this->prompt);
+  fts_spost_atoms(this->stream, ac, at);
+  fts_spost(this->stream, "\n");
 }
 
 static void
@@ -102,35 +88,40 @@ print_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   print_t *this = (print_t *)o;
 
-  post("%s: ", this->prompt);
+  fts_spost(this->stream, "%s: ", this->prompt);
   
   if(ac == 0)
-    post("%s\n", s);
-  else if(ac == 1 && fts_is_object(at))
-    {
-      /* print object */
-      fts_object_t *obj = fts_get_object(at);
-
-      if(s == fts_object_get_class_name(obj))
-	{
-	  post("<%s> ", s);
-
-	  if(fts_send_message(obj, fts_system_inlet, fts_s_print, 0, 0) != fts_ok)
-	    post("<\?\?\?>\n");
-	}
-    }
+    fts_spost(this->stream, "%s\n", s);
   else if(ac == 1 && s == fts_get_selector(at))
     {
-      /* simple value */
-      post_atoms(1, at);
-      post("\n");
+      if(fts_is_object(at))
+	{
+	  fts_object_t *obj = fts_get_object(at);	  
+	  fts_method_t meth_print = fts_class_get_method(fts_object_get_class(obj), fts_system_inlet, fts_s_print);
+	  fts_atom_t a;
+	  
+	  if(meth_print)
+	    {
+	      /* print class name and let the object print its content */
+	      fts_spost(this->stream, ":%s", s);
+	      
+	      fts_set_object(&a, this->stream);
+	      meth_print(obj, fts_system_inlet, fts_s_print, 1, &a);
+	      
+	      return;
+	    }
+	}
+
+      /* simple value or object without print method */
+      fts_spost_atoms(this->stream, 1, at);
+      fts_spost(this->stream, "\n");
     }
   else
     {
       /* ordinary message */
-      post("%s ", s);
-      post_atoms(ac, at);
-      post("\n");
+      fts_spost(this->stream, "%s ", s);
+      fts_spost_atoms(this->stream, ac, at);
+      fts_spost(this->stream, "\n");
     }
 }
 
@@ -148,10 +139,13 @@ print_instantiate(fts_class_t *cl, int ac, const fts_atom_t *aat)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, print_init);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, print_bang);
-  fts_method_define_varargs(cl, 0, fts_s_int, print_int);
-  fts_method_define_varargs(cl, 0, fts_s_float, print_float);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, print_symbol);
-  fts_method_define_varargs(cl, 0, fts_s_list, print_list);
+
+  fts_method_define_varargs(cl, 0, fts_s_int, print_atom);
+  fts_method_define_varargs(cl, 0, fts_s_float, print_atom);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, print_atom);
+
+  fts_method_define_varargs(cl, 0, fts_s_list, print_atoms);
+
   fts_method_define_varargs(cl, 0, fts_s_anything, print_anything);
 
   return fts_ok;

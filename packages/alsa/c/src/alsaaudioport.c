@@ -1036,10 +1036,11 @@ alsaaudioport_print_all_device(alsaaudioport_t* this)
 static void
 alsaaudioport_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-    alsaaudioport_t* this = (alsaaudioport_t*)o;
-
-    post("[alsaaudioport] All PCM device \n");
-    alsaaudioport_print_all_device(this);
+  alsaaudioport_t* this = (alsaaudioport_t*)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
+  
+  fts_spost(stream, "[alsaaudioport] All PCM device \n");
+  alsaaudioport_print_all_device(this);
 /*
   post("Current PCM capture stream:\n");
   alsaaudioport_print_stream(&this->capture);

@@ -407,46 +407,47 @@ static void
 macosxmidi_print( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int i, n;
 
   n = MIDIGetNumberOfSources();
-  post("\n");
-  post("Mac OS X proposes %d sources(s)\n", n);
+  fts_spost(stream, "\n");
+  fts_spost(stream, "Mac OS X proposes %d sources(s)\n", n);
   for(i=0; i<n; i++) {
     MIDIEndpointRef endpoint = MIDIGetSource(i);
     MIDIEntityRef entity = NULL;
     MIDIDeviceRef device = NULL;
     
-    post("  %d: '%s' (%d)", i, macosxmidi_reference_get_name(endpoint), macosxmidi_reference_get_id(endpoint));
-    post("\n");
+    fts_spost(stream, "  %d: '%s' (%d)", i, macosxmidi_reference_get_name(endpoint), macosxmidi_reference_get_id(endpoint));
+    fts_spost(stream, "\n");
   }
 
   n = MIDIGetNumberOfDestinations();
-  post("\n");
-  post("Mac OS X proposes %d destinations(s)\n", n);
+  fts_spost(stream, "\n");
+  fts_spost(stream, "Mac OS X proposes %d destinations(s)\n", n);
   for(i=0; i<n; i++) {
     MIDIEndpointRef endpoint = MIDIGetDestination(i);
     MIDIEntityRef entity = NULL;
     MIDIDeviceRef device = NULL;
 
-    post("  %d: '%s' (%d)", i, macosxmidi_reference_get_name(endpoint), macosxmidi_reference_get_id(endpoint));
-    post("\n");
+    fts_spost(stream, "  %d: '%s' (%d)", i, macosxmidi_reference_get_name(endpoint), macosxmidi_reference_get_id(endpoint));
+    fts_spost(stream, "\n");
   }
 
-  post("\n");
-  post("Mac OS X MIDI manager inputs\n");
+  fts_spost(stream, "\n");
+  fts_spost(stream, "Mac OS X MIDI manager inputs\n");
   macosxmidi_scan_hashtable(&this->inputs);
 
-  post("\n");
-  post("Mac OS X MIDI manager outputs\n");
+  fts_spost(stream, "\n");
+  fts_spost(stream, "Mac OS X MIDI manager outputs\n");
   macosxmidi_scan_hashtable(&this->outputs);
 
-  post("\n");
-  post("Mac OS X MIDI manager declared sources\n");
+  fts_spost(stream, "\n");
+  fts_spost(stream, "Mac OS X MIDI manager declared sources\n");
   macosxmidi_scan_hashtable(&this->sources);
 
-  post("\n");
-  post("Mac OS X MIDI manager declared destinations\n");
+  fts_spost(stream, "\n");
+  fts_spost(stream, "Mac OS X MIDI manager declared destinations\n");
   macosxmidi_scan_hashtable(&this->destinations);
 }
 

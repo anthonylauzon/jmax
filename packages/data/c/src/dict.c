@@ -234,21 +234,6 @@ dict_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-dict_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  dict_t *this = (dict_t *)o;
-  
-  if(ac > 1 && (fts_is_symbol(at) || fts_is_int(at)))
-    {
-      fts_message_t *mess = (fts_message_t *)fts_object_create(fts_message_metaclass, ac - 1, at + 1);
-      fts_atom_t a;
-      
-      fts_set_object(&a, (fts_object_t *)mess);
-      dict_store(this, at, &a);
-    }
-}
-
-static void
 dict_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dict_t *this = (dict_t *)o;
@@ -279,23 +264,7 @@ dict_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	  fts_iterator_next(key_iterator, &key);
 	  fts_iterator_next(value_iterator, &value);
 
-	  if(fts_is_message(&value))
-	    {
-	      fts_message_t *message = (fts_message_t *)fts_get_object(&value);
-	      fts_symbol_t mess_s = fts_message_get_selector(message);
-	      int mess_ac = fts_message_get_ac(message);
-	      const fts_atom_t *mess_at = fts_message_get_at(message);
-	      fts_message_t *dump_mess = fts_dumper_message_new(dumper, fts_s_message);
-
-	      /* dump key */
-	      fts_message_append(dump_mess, 1, &key);
-	      
-	      /* dump message */
-	      fts_message_append_symbol(dump_mess, mess_s);
-	      fts_message_append(dump_mess, mess_ac, mess_at);
-	      fts_dumper_message_send(dumper, dump_mess);
-	    }
-	  else if(fts_is_tuple(&value))
+	  if(fts_is_tuple(&value))
 	    {
 	      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(&value);
 	      int size = fts_tuple_get_size(tuple);
@@ -492,15 +461,7 @@ dict_export_to_coll(dict_t *this, fts_symbol_t file_name)
 	  fts_iterator_next(key_iterator, &key);
 	  fts_iterator_next(value_iterator, &value);
 
-	  if(fts_is_message(&value))
-	    {
-	      fts_message_t *message = (fts_message_t *)fts_get_object(&value);
-
-	      s = fts_message_get_selector(message);
-	      ac = fts_message_get_ac(message);
-	      at = fts_message_get_at(message);
-	    }
-	  else if(fts_is_tuple(&value))
+	  if(fts_is_tuple(&value))
 	    {
 	      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(&value);
 
@@ -617,6 +578,7 @@ static void
 dict_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dict_t *this = (dict_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   fts_hashtable_t *hash[2] = {&this->table_int, &this->table_symbol};
   int size = fts_hashtable_get_size(&this->table_int) + fts_hashtable_get_size(&this->table_symbol);
   int tab;
@@ -638,51 +600,37 @@ dict_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	      fts_iterator_next(value_iterator, &value);
 	      
 	      if(fts_is_int(&key))
-		post("  %d: ", fts_get_int(&key));
+		fts_spost(stream, "  %d: ", fts_get_int(&key));
 	      else
-		post("  %s: ", fts_get_symbol(&key));
+		fts_spost(stream, "  %s: ", fts_get_symbol(&key));
 	      
-	      if(fts_is_message(&value))
-		{
-		  fts_message_t *message = (fts_message_t *)fts_get_object(&value);
-		  fts_symbol_t mess_s = fts_message_get_selector(message);
-		  int mess_ac = fts_message_get_ac(message);
-		  const fts_atom_t *mess_at = fts_message_get_at(message);
-		  
-		  post("%s ", mess_s);
-		  
-		  if(mess_ac)
-		    post_atoms(mess_ac, mess_at);
-		  
-		  post("\n");
-		}
-	      else if(fts_is_tuple(&value))
+	      if(fts_is_tuple(&value))
 		{
 		  fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(&value);
 		  int size = fts_tuple_get_size(tuple);
 		  const fts_atom_t *atoms = fts_tuple_get_atoms(tuple);
 		  
-		  post("(");
+		  fts_spost(stream, "(");
 		  
 		  if(size)
-		    post_atoms(size, atoms);
+		    fts_spost_atoms(stream, size, atoms);
 		  
-		  post(")\n");
+		  fts_spost(stream, ")\n");
 		}
 	      else if(fts_is_object(&value))
-		post("<%s>\n", fts_object_get_class_name(fts_get_object(&value)));
+		fts_spost(stream, "<%s>\n", fts_object_get_class_name(fts_get_object(&value)));
 	      else
 		{
-		  post_atoms(1, &value);
-		  post("\n");
+		  fts_spost_atoms(stream, 1, &value);
+		  fts_spost(stream, "\n");
 		}
 	    }
 	  
-	  post("}\n");
+	  fts_spost(stream, "}\n");
 	}
     }
   else
-    post("(empty dict)\n");
+    fts_spost(stream, "(empty dict)\n");
 }
 
 /**********************************************************
@@ -746,7 +694,6 @@ dict_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_instance, dict_set_from_instance);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, dict_set); /* from file */
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_message, dict_message); /* from file */
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, dict_get_array);
 
@@ -778,5 +725,4 @@ dict_config(void)
   dict_symbol = fts_new_symbol("dict");
 
   dict_type = fts_class_install(dict_symbol, dict_instantiate);
-  fts_alias_install(fts_new_symbol("messtab"), dict_symbol);
 }

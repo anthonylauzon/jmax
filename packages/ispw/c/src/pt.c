@@ -48,9 +48,9 @@ static fts_symbol_t dsp_symbol = 0;
 
 typedef struct
 {
-  long gliss_time;
+  int gliss_time;
   float reattack_slope_thresh;
-  long reattack_time;
+  int reattack_time;
   int print_me;
 } pt_ctl_t;
 
@@ -205,7 +205,7 @@ static void pt_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 static void pt_gliss_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pt_t *x = (pt_t *)o;
-  long n = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 	
   x->ctl.gliss_time = (n > 0)? n: 0;
   if(x->ctl.gliss_time)
@@ -218,7 +218,7 @@ static void pt_reattack(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 {
   pt_t *x = (pt_t *)o;
   float f = fts_get_float_arg(ac, at, 0, 0.0f);
-  long n = fts_get_int_arg(ac, at, 1, 0);
+  int n = fts_get_int_arg(ac, at, 1, 0);
 	
   if(f > 0 && n > 0)
     {
@@ -237,7 +237,7 @@ static void pt_reattack(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 static void pt_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pt_t *x = (pt_t *)o;
-  long n = fts_get_int_arg(ac, at, 0, 1);
+  int n = fts_get_int_arg(ac, at, 0, 1);
 	
   x->ctl.print_me = (n > 0)? n: 0;
 	
@@ -279,8 +279,8 @@ static void dsp_fun_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 static void pt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pt_t *x = (pt_t *)o;
-  long pt_common_arg_0 = fts_get_int_arg(ac, at, 0, 0);
-  long pt_common_arg_1 = fts_get_int_arg(ac, at, 1, 0);
+  int pt_common_arg_0 = fts_get_int_arg(ac, at, 0, 0);
+  int pt_common_arg_1 = fts_get_int_arg(ac, at, 1, 0);
 	
   if(!pt_common_init(&x->pt, pt_common_arg_0, pt_common_arg_1)) 
     return;

@@ -191,13 +191,6 @@ zll_DBprin(struct zll *x)
     post("		next ptr = ()\n");
 }		
 
-static void
-zll_prinlist(struct zll *list)
-{
-  for (; list; list = list->next)
-    zll_DBprin(list);
-}
-
 /* accepts a vector : x1 y1 x2 y2 x3 y3 ... places it in a zll list  returns list or 0 */
 static struct zll *
 zll_vecToZll(int ac, const fts_atom_t *av)
@@ -480,20 +473,6 @@ zll_reduce(struct zll *zllist, float tolerance)
 
 static struct zll *funbuff_global_undo = 0;	/*  GLOBAL funbuff undobuffer   */
 static struct zll *funbuff_global_clip = 0;	/*  GLOBAL funbuff clipboard   */
-
-/* method print, inlet 0, debug */
-
-static void
-funbuff_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  funbuff_t *this = (funbuff_t *)o;
-  struct zll *list;
-
-  list = &this->head;
-  post("funbuff: selectX= %ld  selectW= %ld \n", this->selectX, this->selectW);
-  zll_prinlist(list);
-}
-
 
 /* select region x and width */
 /* method select, inlet 0 */
@@ -1104,7 +1083,6 @@ funbuff_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_new_symbol("goto"), funbuff_goto);
   fts_method_define_varargs(cl, 0, fts_new_symbol("reduce"), funbuff_reduce);
   fts_method_define_varargs(cl, 0, fts_new_symbol("interp"), funbuff_interp);
-  fts_method_define_varargs(cl, 0, fts_s_print, funbuff_print);
 
   fts_method_define_varargs(cl, 0, fts_s_clear, funbuff_clear);
   fts_method_define_varargs(cl, 0, fts_new_symbol("interptab"), funbuff_interptab);

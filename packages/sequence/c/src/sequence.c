@@ -466,6 +466,7 @@ static void
 sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
 
   if(ac == 0)
     {
@@ -474,10 +475,10 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       int i;
 
       if(size == 0)
-	post("(empty sequence)\n");
+	fts_spost(stream, "(empty sequence)\n");
       else
 	{
-	  post("(%d track%s) {\n", size, (size > 1)? "s": "");
+	  fts_spost(stream, "(%d track%s) {\n", size, (size > 1)? "s": "");
 
 	  for(i=0; i<size; i++)
 	    {
@@ -486,13 +487,13 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	      int track_size = track_get_size(track);
 	      const char *name_str = track_name? track_name: "untitled";
 
-	      post("  track %d: \"%s\" %d %s event%s\n", i, name_str, track_size, 
+	      fts_spost(stream, "  track %d: \"%s\" %d %s event%s\n", i, name_str, track_size, 
 		   track_type, (track_size == 1)? "": "s");
 
 	      track = track_get_next(track);
   	    }
 
-	  post("}\n");      
+	  fts_spost(stream, "}\n");      
   	}
     }
   else if(ac && fts_is_number(at))
@@ -501,7 +502,7 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       track_t *track = sequence_get_track_by_index(this, index);
 
       if(track)
-	fts_send_message((fts_object_t *)track, fts_system_inlet, fts_s_print, 0, 0);
+	fts_send_message((fts_object_t *)track, fts_system_inlet, fts_s_print, 1, at);
       else
 	fts_object_signal_runtime_error(o, "print: no track %d", index);
     }

@@ -218,8 +218,16 @@ display_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   display_t * this = (display_t *)o;
 
   fts_memorystream_reset(this->stream);  
-  fts_spost((fts_bytestream_t *)this->stream, "%s ", s);
-  fts_spost_atoms((fts_bytestream_t *)this->stream, ac, at);
+
+  if(ac == 0)
+    fts_spost_symbol((fts_bytestream_t *)this->stream, s);
+  else if(ac == 1 && s == fts_get_selector(at))
+    fts_spost_atoms((fts_bytestream_t *)this->stream, 1, at);
+  else
+    {
+      fts_spost_symbol((fts_bytestream_t *)this->stream, s);
+      fts_spost_atoms((fts_bytestream_t *)this->stream, ac, at);
+    }
 
   display_deliver(this);
 }

@@ -1286,10 +1286,11 @@ static void
 fvec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int size = fvec_get_size(this);
   int i;
 
-  post("{");
+  fts_spost(stream, "{");
 
   if(size > 8)
     {
@@ -1299,30 +1300,39 @@ fvec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       for(i=0; i<size8; i+=8)
 	{
 	  /* print one line of 8 with indent */
-	  post("\n  ");
+	  fts_spost(stream, "\n  ");
 	  for(j=0; j<8; j++)
-	    post("%f ", fvec_get_element(this, i + j));
+	    {
+	      fts_spost_float(stream, fvec_get_element(this, i + j));
+	      fts_spost(stream, " ");
+	    }
 	}
 	  
       /* print last line with indent */
       if(i < size)
 	{
-	  post("\n  ");
+	  fts_spost(stream, "\n  ");
 	  for(; i<size; i++)
-	    post("%f ", fvec_get_element(this, i));
+	    {
+	      fts_spost_float(stream, fvec_get_element(this, i));
+	      fts_spost(stream, " ");
+	    }
 	}
 
-      post("\n}\n");
+      fts_spost(stream, "\n");
     }
   else if(size)
     {
       for(i=0; i<size-1; i++)
-	post("%f ", fvec_get_element(this, i));
-
-      post("%f}\n", fvec_get_element(this, size - 1));
+	{
+	  fts_spost_float(stream, fvec_get_element(this, i));
+	  fts_spost(stream, " ");
+	}
+      
+      fts_spost_float(stream, fvec_get_element(this, i));
     }
-  else
-    post("}\n");
+
+  fts_spost(stream, "}\n");
 }
 
 static void

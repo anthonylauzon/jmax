@@ -185,24 +185,23 @@ static void
 param_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_param_t *this = (fts_param_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
 
-  if(fts_is_void(&this->value))
-    post("{<empty param>}\n");
-  else if(fts_is_tuple(&this->value))
+  if(fts_is_tuple(&this->value))
     {
       fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(&this->value);
       int n = fts_tuple_get_size(tuple);
       const fts_atom_t *a = fts_tuple_get_atoms(tuple);
 
-      post("{");
-      post_atoms(n, a);
-      post("}\n");
+      fts_spost(stream, "{");
+      fts_spost_atoms(stream, n, a);
+      fts_spost(stream, "}\n");
     }
   else
     {
-      post("{");
-      post_atoms(1, &this->value);
-      post("}\n");
+      fts_spost(stream, "{");
+      fts_spost_atoms(stream, 1, &this->value);
+      fts_spost(stream, "}\n");
     }
 }
 
