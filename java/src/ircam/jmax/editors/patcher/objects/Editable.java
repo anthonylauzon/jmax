@@ -97,12 +97,21 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     computeRenderer();
 
     updateDimensions();
-
-    redraw();
+    
+    if(itsSketchPad.isAutomaticFitToText()){
+      redraw();
+      fitToText();
+    }
+    else
+      redraw();
 
     super.redefine(text);
   }
 
+
+  public int getMinimumWidth(){
+    return ((TextRenderer)renderer).getColWidth() + getTextWidthOffset();
+  }
 
   // redefined from base class
 
@@ -115,8 +124,8 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
 	super.setHeight(renderer.getHeight() + getTextHeightOffset());
       }
     else{
-      super.setWidth(((TextRenderer)renderer).getColWidth()+ getTextWidthOffset());
-      super.setHeight(renderer.getHeight() + getTextHeightOffset());
+      super.setWidth( getMinimumWidth());
+      super.setHeight( renderer.getHeight() + getTextHeightOffset());
     } 
   }
 
@@ -149,11 +158,18 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   public void fitToText()
   {
     renderer.update();
-    super.setWidth(((TextRenderer)renderer).getTextWidth() + getTextWidthOffset());
+    
+    int w = ((TextRenderer)renderer).getTextWidth()+getTextWidthOffset();
+    if(w < getMinimumWidth())
+      super.setWidth( getMinimumWidth());
+    else
+      super.setWidth( w);
+
     if(!((TextRenderer)renderer).isMultiLine())
       super.setHeight(((TextRenderer)renderer).getRHeight() + getTextHeightOffset());
     else
       super.setHeight(((TextRenderer)renderer).getTextHeight() + getTextHeightOffset());
+    
     redraw();
   }
 
@@ -181,7 +197,7 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     editing = v;
   }
 
-  // ----------------------------------------
+   // ----------------------------------------
   // Property handling
   // ----------------------------------------
 

@@ -620,12 +620,7 @@ public class DisplayList
 	break;
 
       case DRAG_LINE:
-
-	if(dragLineConnected) 
-	  g.setColor( Color.gray);
-	else  
-	  g.setColor( Color.black);
-
+	g.setColor( Color.black);
 	g.drawLine( lineStart.x, lineStart.y, lineEnd.x, lineEnd.y);
 	break;
 
@@ -914,10 +909,8 @@ public class DisplayList
     dragMode = DRAG_RECTANGLE;
   }
 
-  boolean dragLineConnected = false;
-  public void dragLine(boolean connected)
+  public void dragLine()
   {
-    dragLineConnected = connected;
     dragMode = DRAG_LINE;
   }
 

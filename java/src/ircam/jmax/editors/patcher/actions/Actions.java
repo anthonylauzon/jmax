@@ -75,11 +75,12 @@ public class Actions
   public static EditorAction bringToFrontAction = new BringToFrontAction();
   public static EditorAction sendToBackAction  = new SendToBackAction();
 
-  public static EditorAction fontSmallerAction = new FontSmallerAction();
-  public static EditorAction fontBiggerAction  = new FontBiggerAction();
-  public static EditorAction fontSizesAction   = new FontSizesAction();
-  public static EditorAction fontAction        = new FontAction();
-  public static EditorAction fitToTextAction   = new FitToTextAction();
+  public static EditorAction fontSmallerAction     = new FontSmallerAction();
+  public static EditorAction fontBiggerAction      = new FontBiggerAction();
+  public static EditorAction fontSizesAction       = new FontSizesAction();
+  public static EditorAction fontAction            = new FontAction();
+  public static EditorAction setAutomaticFitAction = new SetAutomaticFitAction();
+  public static EditorAction fitToTextAction       = new FitToTextAction();
 
   public static EditorAction cutAction       = new CutAction();
   public static EditorAction copyAction      = new CopyAction();

@@ -163,7 +163,7 @@ class DragReverseConnectInteraction extends Interaction
 		outlet = area.getNumber();
 		editor.setHighlightedOutlet(src, outlet);
 		destinationChoosen = true;
-		editor.getDisplayList().dragLine(true);
+		editor.getDisplayList().dragLine();
 		editor.getDisplayList().redrawDragLine();
 		editor.getDisplayList().setDragLine(dragStart.x, dragStart.y, 
 						    src.getOutletAnchorX(outlet), src.getOutletAnchorY(outlet));
@@ -171,7 +171,7 @@ class DragReverseConnectInteraction extends Interaction
 	      }
 	    else 
 	      {
-		editor.getDisplayList().dragLine(false);
+		editor.getDisplayList().dragLine();
 		editor.getDisplayList().redrawDragLine();
 		editor.getDisplayList().setDragLine(dragStart.x, dragStart.y, mouse.x, mouse.y);
 		editor.getDisplayList().redrawDragLine();
@@ -187,7 +187,7 @@ class DragReverseConnectInteraction extends Interaction
 	    destinationChoosen = false;
 	  }
 
-	editor.getDisplayList().dragLine(false);
+	editor.getDisplayList().dragLine();
 	editor.getDisplayList().redrawDragLine();
 	editor.getDisplayList().setDragLine(dragStart.x, dragStart.y, mouse.x, mouse.y);
 	editor.getDisplayList().redrawDragLine();

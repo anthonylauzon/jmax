@@ -190,6 +190,14 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     defaultFontSize = v;
   }
 
+  boolean automaticFitToText = false;
+  public void setAutomaticFitToText(boolean fit){
+    automaticFitToText = fit;
+  }
+  public boolean isAutomaticFitToText(){
+    return automaticFitToText;
+  }
+
   // ---------------------------------------------------------
   // cut/copy/paste variables and methods
   // ---------------------------------------------------------

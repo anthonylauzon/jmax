@@ -51,6 +51,7 @@ public class TextMenu extends EditorMenu
   JMenuItem biggerItem;
   JMenuItem smallerItem;
   JMenuItem fitItem;
+  JRadioButtonMenuItem automaticFitItem; 
   private JMenu itsSizesMenu;
   private ButtonGroup itsSizesMenuGroup;
   JRadioButtonMenuItem fakeSizeButton;
@@ -89,6 +90,10 @@ public class TextMenu extends EditorMenu
     smallerItem = add(Actions.fontSmallerAction, "Smaller", Event.CTRL_MASK, KeyEvent.VK_SUBTRACT);
 
     addSeparator();
+
+    automaticFitItem = new JRadioButtonMenuItem("Automatic Fit To Text");
+    add(automaticFitItem);
+    automaticFitItem.addActionListener(Actions.setAutomaticFitAction);
 
     fitItem = add(Actions.fitToTextAction, "Fit To Text", Event.CTRL_MASK, KeyEvent.VK_T);
 
