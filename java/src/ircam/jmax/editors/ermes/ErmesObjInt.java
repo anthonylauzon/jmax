@@ -114,7 +114,7 @@ class ErmesObjInt extends ErmesObject {
       receiving_index = 0;
       itsInteger = temp;
       //DoublePaint();
-      Paint(itsSketchPad.getGraphics());
+      Paint_specific(itsSketchPad.getGraphics());
     }		
   }
 

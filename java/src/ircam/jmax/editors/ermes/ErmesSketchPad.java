@@ -1032,11 +1032,11 @@ Rectangle previousResizeRect = new Rectangle();
       else{
 	if (!itsCurrentInOutlet.GetSelected()) {// no previously selected
 	  itsCurrentInOutlet.GetOwner().ConnectionRequested(itsCurrentInOutlet);
-	  editStatus = START_CONNECT;
-	  startConnectPoint.setLocation(itsCurrentInOutlet.GetAnchorPoint());
-	  currentConnectPoint.setLocation(startConnectPoint);
-	  previousConnectPoint.setLocation(startConnectPoint);
-	  setCursor(Cursor.getDefaultCursor());
+	  /*if (itsConnectingLet != null) { //we are going to START a connection
+	    //(not to terminate one!!)
+	    editStatus = START_CONNECT;
+	    prepareForDynamicConnect(itsCurrentInOutlet);
+	  }*/
 	}
 	else {
 	  itsCurrentInOutlet.GetOwner().ConnectionAbort(itsCurrentInOutlet, false); 
@@ -1075,8 +1075,15 @@ Rectangle previousResizeRect = new Rectangle();
     }
   }
        
+  private void prepareForDynamicConnect(ErmesObjInOutlet io) {
+    startConnectPoint.setLocation(io.GetAnchorPoint());
+    currentConnectPoint.setLocation(startConnectPoint);
+    previousConnectPoint.setLocation(startConnectPoint);
+    setCursor(Cursor.getDefaultCursor());
+  }
+
   public void mouseReleased(MouseEvent e){
-    
+System.err.println("mouseRelease in stato "+editStatus);    
     int x = e.getX();
     int y = e.getY();
 
@@ -1156,12 +1163,20 @@ Rectangle previousResizeRect = new Rectangle();
       else {//se non ha mosso
 	if(e.getClickCount() == 1){
 	  if(oldEditStatus == START_SELECT){
-	    if(itsCurrentObject instanceof ErmesObjEditableObject){
+	    /*for problems during Inits, ErmesObjComment is not, for now,
+	      a subclass of ErmesObjEditableObject as it should, but a direct
+	      child of ErmesObject.
+	      The situation is going to change soon (today is 03/05/98)*/
+	    if(itsCurrentObject instanceof ErmesObjEditableObject ||
+	       itsCurrentObject instanceof ErmesObjComment){
 	      if(clickHappenedOnAnAlreadySelected) {
 		itsHelper.deselectAll(true);
 		itsSelectedList.addElement(itsCurrentObject);
-		((ErmesObjEditableObject)itsCurrentObject).backupText();
-		((ErmesObjEditableObject)itsCurrentObject).RestartEditing();
+		if (itsCurrentObject instanceof ErmesObjEditableObject) {
+		  ((ErmesObjEditableObject)itsCurrentObject).backupText();
+		  ((ErmesObjEditableObject)itsCurrentObject).RestartEditing();
+		}
+		else ((ErmesObjComment)itsCurrentObject).RestartEditing();
 	      }
 	    }
 	  }
@@ -1545,6 +1560,7 @@ Rectangle previousResizeRect = new Rectangle();
 	  else{
 	    itsConnectingLetList.addElement(theInOutlet);
 	    theInOutlet.ChangeState(true, theInOutlet.connected, false);
+	    
 	  }
 	}
 	else {
@@ -1567,6 +1583,7 @@ Rectangle previousResizeRect = new Rectangle();
 	  else{
 	    itsConnectingLetList.addElement(theInOutlet);
 	    theInOutlet.ChangeState(true, theInOutlet.connected, true);
+
 	  }
 	}
 	else {

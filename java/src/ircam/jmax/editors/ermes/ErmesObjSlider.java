@@ -118,8 +118,7 @@ class ErmesObjSlider extends ErmesObject {
     last_value = temp;
     if ((itsThrottle != null) && (!itsMovingThrottle)) {
       itsThrottle.Move(itsThrottle.itsX, (int)(itsY+currentRect.height-BOTTOM_OFFSET-2-clippedValue/itsStep));
-      //DoublePaint();
-      Paint(itsSketchPad.getGraphics());
+      Paint_specific(itsSketchPad.getGraphics());
     }
   }
   

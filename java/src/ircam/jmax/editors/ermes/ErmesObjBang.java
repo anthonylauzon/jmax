@@ -70,7 +70,7 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
     else {
        itsFlashing = false;
     } 
-    Paint(itsSketchPad.getGraphics());
+    Paint_specific(itsSketchPad.getGraphics());
   }
 	
   public boolean NeedPropertyHandler(){

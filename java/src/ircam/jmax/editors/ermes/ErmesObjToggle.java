@@ -62,7 +62,7 @@ class ErmesObjToggle extends ErmesObject {
     if (itsToggled != temp) {
       itsToggled = temp;	
       //DoublePaint();
-      Paint(itsSketchPad.getGraphics());
+      Paint_specific(itsSketchPad.getGraphics());
     }
   }
 
