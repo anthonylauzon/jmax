@@ -23,7 +23,7 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-JMAXDISTDIR = ../../../../fts/
+JMAXDISTDIR = ../../../..
 PACKAGEROOT = ..
 PACKAGELIB=$(LIBDIR)/libsequence.so
 
