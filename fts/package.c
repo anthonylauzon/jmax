@@ -668,6 +668,50 @@ fts_package_get_class_names(fts_package_t* pkg, fts_iterator_t* iter)
   fts_hashtable_get_keys(pkg->classes, iter);
 }
 
+fts_class_t *
+fts_get_class_by_name (fts_symbol_t class_name)
+{
+  fts_package_t *pkg;
+  fts_class_t *cl;
+  fts_iterator_t iter;
+
+  /* ask the kernel package before any other package. The kernel
+     classes should not be redefined anyway. If we search the kernel
+     package before the required packages, we avoid the loading of all
+     (required) packages to find the patcher class.  */
+  pkg = fts_get_system_package ();
+  if ((cl = fts_package_get_class (pkg, class_name)) != NULL)
+    return cl;
+
+  /* ask the current package */
+  pkg = fts_get_current_package ();
+  if ((cl = fts_package_get_class (pkg, class_name)) != NULL)
+    return cl;
+
+  /* ask the required packages of the current package */
+  fts_package_get_required_packages (pkg, &iter);
+  while (fts_iterator_has_more (&iter))
+    {
+      fts_atom_t a;
+      fts_package_t *p;
+      fts_symbol_t p_name;
+
+      fts_iterator_next (&iter, &a);
+      p_name = fts_get_symbol (&a);
+      p = fts_package_get (p_name);
+
+      if (p != NULL)
+	{
+	  cl = fts_package_get_class (p, class_name);
+
+	  if (cl != NULL)
+	    return cl;
+	}
+    }
+
+  return NULL;
+}
+
 /* **********************************************************************
  *
  * Functions 

@@ -137,22 +137,6 @@ FTS_API fts_class_t *fts_class_install( fts_symbol_t name, fts_instantiate_fun_t
 FTS_API void fts_class_alias(fts_class_t *cl, fts_symbol_t alias);
 
 /**
- * Get a class by its name.
- * Search order:
- * <ol>
- * <li> the kernel package
- * <li> the current package
- * <li> the required packages of the current package
- * </ul>
- *
- * @fn fts_class_t *fts_class_get_by_name(fts_symbol_t name)
- * @param name the name
- * @return the class (handle) or NULL if no class found
- * @ingroup class_api
- */
-FTS_API fts_class_t *fts_class_get_by_name(fts_symbol_t name);
-
-/**
  * Initialize a class
  *
  * @fn void fts_class_init(fts_class_t *cl, unsigned int size, fts_method_t constructor, fts_method_t deconstructor)

@@ -147,7 +147,7 @@ fts_error_object_get_class(fts_error_object_t *obj)
     if(package != NULL)
       class = fts_package_get_class(package, class_name);
     else
-      class = fts_class_get_by_name(class_name);
+      class = fts_get_class_by_name(class_name);
   }
   
   if(class != NULL)

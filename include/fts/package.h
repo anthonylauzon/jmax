@@ -136,4 +136,18 @@ FTS_API void fts_package_get_class_names(fts_package_t* pkg, fts_iterator_t* ite
  * @ingroup package */
 FTS_API fts_class_t* fts_package_get_class(fts_package_t* pkg, fts_symbol_t name);
 
-
+/**
+ * Get a class by its name.
+ * Search order:
+ * <ol>
+ * <li> the kernel package
+ * <li> the current package
+ * <li> the required packages of the current package
+ * </ul>
+ *
+ * @fn fts_class_t *fts_class_get_by_name(fts_symbol_t name)
+ * @param name the name
+ * @return the class (handle) or NULL if no class found
+ * @ingroup class_api
+ */
+FTS_API fts_class_t *fts_get_class_by_name(fts_symbol_t name);
