@@ -28,6 +28,8 @@ package ircam.jmax.editors.sequence.tools;
 import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.utils.*;
+import ircam.jmax.fts.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -128,20 +130,32 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
     int deltaY = y-startingPoint.y;
     int deltaX = x-startingPoint.x;
 
-    // starts a serie of undoable moves	
-    ((UndoableData) egc.getDataModel()).beginUpdate();
     
-    for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
-	{
-	    aEvent = (TrackEvent) e.nextElement();
-	
-	    if (deltaX != 0) 
-		if(!a.isHorizontalMovementBounded())
-		    a.setX(aEvent, a.getX(aEvent)+deltaX);
-		else
+    if(deltaX != 0) 
+	{	    
+	    // starts a serie of undoable moves
+	    ((UndoableData) egc.getDataModel()).beginUpdate();
+
+	    if(!a.isHorizontalMovementBounded())
+		{
+		    int i = 0;
+		    for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
+			{
+			    aEvent = (TrackEvent) e.nextElement();		    
+			    FtsTrackObject.sendArgs[i].setObject(aEvent);
+			    FtsTrackObject.sendArgs[i+1].setDouble(a.getInvX(a.getX(aEvent)+deltaX));
+			    i+=2;
+			}
+		    egc.getTrack().getFtsTrack().sendMessage(FtsObject.systemInlet, "move_events", i, FtsTrackObject.sendArgs);
+		}
+	    else
+		for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
 		    {
 			int prevX = 0;
 			int nextX = 0;
+			
+			aEvent = (TrackEvent) e.nextElement();
+			
 			FtsTrackObject ftsTrk = egc.getTrack().getFtsTrack();
 			TrackEvent next = ftsTrk.getNextEvent(aEvent);
 			if(next!=null)
@@ -149,7 +163,7 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 			TrackEvent prev = ftsTrk.getPreviousEvent(aEvent);
 			if(prev!=null)
 			    prevX = a.getX(prev)+1;
-
+			
 			if((a.getX(aEvent) + deltaX > nextX)&&(next!=null))
 			    a.setX(aEvent, nextX);
 			else
@@ -158,12 +172,17 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 			    else
 				a.setX(aEvent, a.getX(aEvent) + deltaX);
 		    }
-	    if (deltaY != 0)
-		a.setY(aEvent, a.getY(aEvent)+deltaY);
 	}
-    
-    ((UndoableData) egc.getDataModel()).endUpdate();
-	
+    if(deltaY!=0)
+	{
+	    ((UndoableData) egc.getDataModel()).beginUpdate();
+	    for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
+		{
+		    aEvent = (TrackEvent) e.nextElement();
+		    a.setY(aEvent, a.getY(aEvent)+deltaY);
+		}    
+	    ((UndoableData) egc.getDataModel()).endUpdate();
+	}
     mountIModule(itsSelecter);
     gc.getGraphicDestination().repaint();    
   }
@@ -174,6 +193,8 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
     startingPoint.y+=deltaY;
   }
   //---Fields
+  MaxVector times = new MaxVector();
+  MaxVector movingEvents = new MaxVector();
 
   DirectionChooser itsDirectionChooser;
   SelectionMover itsSelectionMover;

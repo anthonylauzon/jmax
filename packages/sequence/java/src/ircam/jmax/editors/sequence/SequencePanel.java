@@ -204,8 +204,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
      * as a result of a merge */
     public void trackAdded(Track track)
     {
-	if(track.getName().equals("untitled"))
-	    track.getFtsTrack().requestSetName("untitled"+getCurrentUntitledTrackIndex());
+	//if(track.getName().equals("untitled"))
+	//  track.getFtsTrack().requestSetName("untitled"+getCurrentUntitledTrackIndex());
 
 	TrackEditor teditor = TrackEditorFactoryTable.newEditor(track, geometry);
 	teditor.getGraphicContext().setToolManager(manager);
@@ -257,14 +257,14 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	  teditor.updateNewObject((TrackEvent)e.nextElement());
     }
 
-    public int getCurrentUntitledTrackIndex()
-    {
-	int index = 0;	
-	while(sequenceData.getTrackByName("untitled"+index) != null)
-	    index++;
-
-	return index;
-    }
+    /*public int getCurrentUntitledTrackIndex()
+      {
+      int index = 0;	
+      while(sequenceData.getTrackByName("untitled"+index) != null)
+      index++;
+      
+      return index;
+      }*/
 
     public void tracksAdded(int maxTime)
     {

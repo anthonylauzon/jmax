@@ -179,16 +179,16 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
     return (Track) tracks.elementAt(i);
   }
 
-    public Track getTrackByName(String name)
-    {
-	Track track;
-	for(Enumeration e = tracks.elements(); e.hasMoreElements();)
-	    {
-		track = (Track)e.nextElement();
-		if(track.getName().equals(name)) return track;
-	    }
-	return null;
-    }
+    /*public Track getTrackByName(String name)
+      {
+      Track track;
+      for(Enumeration e = tracks.elements(); e.hasMoreElements();)
+      {
+      track = (Track)e.nextElement();
+      if(track.getName().equals(name)) return track;
+      }
+      return null;
+      }*/
     public Enumeration getTracks()
     {
 	return tracks.elements();

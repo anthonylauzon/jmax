@@ -38,6 +38,7 @@ import java.util.*;
 import java.io.*;
 import java.lang.reflect.*;
 import javax.swing.undo.*;
+import javax.swing.*;
 /**
  * A general-purpose TrackDataModel, this class
  * offers an implementation based on a variable-length 
@@ -155,28 +156,54 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     setDirty();
   }
 
-  public void moveEvent(int nArgs , FtsAtom args[])
+  public void moveEvents(int nArgs , FtsAtom args[])
   {
-      TrackEvent evt = (TrackEvent)(args[0].getObject());
-      double time = (double)(args[1].getFloat());
+     TrackEvent evt;
+     double time;
 
-      evt.moveTo(time);
-      
-      setDirty();
+     for(int i=0; i<nArgs; i+=2)
+      {
+	evt  = (TrackEvent)(args[i].getObject());
+	time = (double)(args[i+1].getFloat());
+	evt.moveTo(time);
+      }     
+
+     endUpdate();
+     
+     setDirty();
   }  
 
   public void setName(int nArgs , FtsAtom args[])
   {
-    String name = args[0].getString();
     
-    if((trackName == name)||(name == null))
-      return;
+      if(nArgs <= 0)
+	  {
+	      //here will be the sequence frame , not null but.....
+	      JOptionPane.showMessageDialog(null,
+					    "A track with this name already exist!\n Choose another name.",
+					    "Warning",
+					    JOptionPane.WARNING_MESSAGE); 
+	      return;
+	  }
+      else
+	  {
+	      String name = args[0].getString();
+    
+	      if(trackName == name)
+		  {
+		      JOptionPane.showMessageDialog(null,
+						    "A track with this name already exist!\n Please choose another name.",
+						    "Warning",
+						    JOptionPane.WARNING_MESSAGE); 
+		      return;
+		  }
+	      
+	      String old = trackName;
+	      trackName = name;
 
-    String old = trackName;
-    trackName = name;
-
-    notifyTrackNameChanged(old, trackName);
-    setDirty();
+	      notifyTrackNameChanged(old, trackName);
+	      setDirty();
+	  }
   }  
 
 
@@ -235,12 +262,12 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 
     sendMessage(FtsObject.systemInlet, "make_event", 2+nArgs, sendArgs);
   }
-    
+
   public void requestEventMove(TrackEvent evt, double newTime)
   {
     sendArgs[0].setObject(evt); 
     sendArgs[1].setDouble(newTime);
-    sendMessage(FtsObject.systemInlet, "move_event", 2, sendArgs);
+    sendMessage(FtsObject.systemInlet, "move_events", 2, sendArgs);
   }
   public void requestSetName(String newName)
   {
@@ -549,9 +576,19 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     {
       int i = 0;
       for (Enumeration e = events; e.hasMoreElements();) 
-	    sendArgs[i++].setObject((TrackEvent) e.nextElement());
+	  {	      
+	      if(i<128)
+		  sendArgs[i++].setObject((TrackEvent) e.nextElement());
+	      else
+		  {
+		      sendMessage(FtsObject.systemInlet, "remove_events", 128, sendArgs); 
+		      i = 0;
+		  }
+	  }
       
-      sendMessage(FtsObject.systemInlet, "remove_events", i, sendArgs);
+      if(i!=0)
+	  sendMessage(FtsObject.systemInlet, "remove_events", i, sendArgs);
+      
     }
 
     public void removeAllEvents()
@@ -1123,12 +1160,12 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     public DataFlavor flavors[];
     public static DataFlavor sequenceFlavor = new DataFlavor(ircam.jmax.editors.sequence.SequenceSelection.class, "SequenceSelection");
 
-    static FtsAtom[] sendArgs = new FtsAtom[128];
-    static
-    {
-	for(int i=0; i<128; i++)
-	    sendArgs[i]= new FtsAtom();
-    }
+  public static FtsAtom[] sendArgs = new FtsAtom[128];
+  static
+  {
+    for(int i=0; i<128; i++)
+      sendArgs[i]= new FtsAtom();
+  }
 }
 
 
