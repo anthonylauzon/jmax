@@ -1,0 +1,90 @@
+#!/bin/sh
+
+# ***************************************************************************
+# Constants
+# ***************************************************************************
+
+ARCHS="irix62r4k irix63r5k irix63r10k irix64r10k irix65r5i irix65r10k linuxpc"
+
+# ***************************************************************************
+# Functions
+# ***************************************************************************
+help ()
+{
+    cat >&2 << HELP_EOF
+
+Usage:
+    jmax-make-dirs
+
+Creates all directories obj and lib for all the architectures.
+
+Current architectures are : $ARCHS
+
+HELP_EOF
+}
+
+# ---------------------------------------------------------------------------
+decrypt_options ()
+{
+    OPT="none"
+    TYPE="none"
+
+    for ARG in $@
+    do
+	if [ $OPT = "none" ]
+	then
+	    case $ARG in
+	    \-type )
+		OPT=$ARG ;;
+	    \-help | \-h | \-\? )
+		help ;
+		exit 2 ;;
+	    *)
+		help ;
+		exit 2 ;;
+	    esac
+	else
+	    case $OPT in
+	    \-type )
+		TYPE=$ARG ;;
+	    esac
+	    OPT="none";
+	fi
+    done
+}
+
+# ---------------------------------------------------------------------------
+check_directory ()
+{
+    if [ \! -r VERSION ]
+    then
+	echo "You're not in jMax top directory ..."
+	exit 1
+    fi
+}
+
+# ---------------------------------------------------------------------------
+do_it ()
+{
+    for i in `find . \( -name "obj" -o -name "lib" \) -type d`
+    do
+	echo $i
+	if [ -d $i/../src ]
+	then
+	    for a in $ARCHS
+	    do
+		echo mkdir -p $i/$a/debug $i/$a/opt
+	    done
+       fi
+    done
+}
+
+# ***************************************************************************
+# Beginning of script
+# ***************************************************************************
+
+decrypt_options $@
+
+check_directory
+
+do_it
