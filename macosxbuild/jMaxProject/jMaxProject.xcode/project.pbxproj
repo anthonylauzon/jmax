@@ -3599,7 +3599,6 @@
 				5C5426F005AB0B8A0042B7A2,
 				5C5426F105AB0B8A0042B7A2,
 				5C5426F205AB0B8A0042B7A2,
-				5C5426F305AB0B8A0042B7A2,
 				5C5426F405AB0B8A0042B7A2,
 				5C5426F505AB0B8A0042B7A2,
 				5C5426F605AB0B8A0042B7A2,
@@ -3893,12 +3892,6 @@
 		};
 		5C5426F205AB0B8A0042B7A2 = {
 			fileRef = F880FD720282FA3901664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		5C5426F305AB0B8A0042B7A2 = {
-			fileRef = F880FD730282FA3901664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -19653,7 +19646,6 @@
 				F880FD710282FA3901664092,
 				F5BE0CA1035DAA3201664092,
 				F880FD720282FA3901664092,
-				F880FD730282FA3901664092,
 				F880FD770282FA3901664092,
 				F880FD780282FA3901664092,
 				F880FD790282FA3901664092,
@@ -19997,15 +19989,6 @@
 			lastKnownFileType = sourcecode.c.c;
 			name = project.c;
 			path = ../../fts/project.c;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
-		F880FD730282FA3901664092 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.c;
-			name = property.c;
-			path = ../../fts/property.c;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
