@@ -270,8 +270,8 @@ public class XYPad extends GraphicObject
     int y = getY();
     int w = getWidth();
     int h = getHeight();
-    int xRange = (xRangeMax - xRangeMin);
-    int yRange = (yRangeMax - yRangeMin);
+    int xRange = ((xRangeMax - xRangeMin) == 0) ? 1 : (xRangeMax - xRangeMin);
+    int yRange = ((yRangeMax - yRangeMin) == 0) ? 1 : (yRangeMax - yRangeMin);
     int xP = ((xValue - xRangeMin) * (w - LEFT_OFFSET - RIGHT_OFFSET)) / xRange;
     int yP = ((yRangeMax - yValue) * (h - UP_OFFSET - BOTTOM_OFFSET)) / yRange;
     

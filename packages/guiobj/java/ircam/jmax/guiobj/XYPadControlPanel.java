@@ -65,7 +65,7 @@ public class XYPadControlPanel extends JPanel implements ActionListener, ObjectC
 
     add(xLabelRangeBox);    
 
-    xMaxLabel = new JLabel("top", JLabel.CENTER);
+    xMaxLabel = new JLabel("Right", JLabel.CENTER);
     xMaxValueField = new JTextField();
     xMaxValueField.setPreferredSize(new Dimension(100, 20));
     xMaxValueField.setMaximumSize(new Dimension(100, 20));
@@ -95,7 +95,7 @@ public class XYPadControlPanel extends JPanel implements ActionListener, ObjectC
 
     add(xMaxPanel);
 
-    xMinLabel = new JLabel("bottom", JLabel.CENTER);
+    xMinLabel = new JLabel("Left", JLabel.CENTER);
     xMinValueField = new JTextField();
     xMinValueField.setPreferredSize(new Dimension(100, 20));
     xMinValueField.setMaximumSize(new Dimension(100, 20));
@@ -206,8 +206,8 @@ public class XYPadControlPanel extends JPanel implements ActionListener, ObjectC
     xMinValueField.setText(""+xMin);    
     xMax = ((XYPad)obj).getXMaxValue();
     xMaxValueField.setText(""+xMax);    
-    xMaxLabel.setText("top");
-    xMinLabel.setText("bottom");		  
+    xMaxLabel.setText("Right");
+    xMinLabel.setText("left");		  
    
     yMin = ((XYPad)obj).getYMinValue();
     yMinValueField.setText(""+yMin);    
