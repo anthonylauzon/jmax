@@ -26,7 +26,7 @@
 
 #include <fts/fts.h>
 
-#define SYNC_MAX_SIZE (sizeof(unsigned int))
+#define SYNC_MAX_SIZE (sizeof(unsigned int) * 8)
 
 static fts_symbol_t sym_all = 0;
 static fts_symbol_t sym_none = 0;
@@ -173,6 +173,8 @@ sync_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  this->reset = 0;
 	  this->require = 0;
 	}
+      else if(mode == sym_all)
+	this->trigger = this->require = this->reset = this->wait = (1 << this->n) - 1;
       else if(mode == sym_left)
 	{
 	  this->trigger = 1;

@@ -35,7 +35,6 @@ fmat.h \
 fvec.h \
 ivec.h \
 mat.h \
-message.h \
 messtab.h \
 param.h \
 preset.h \

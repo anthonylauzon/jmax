@@ -68,7 +68,13 @@ fts_outlet_atom(fts_object_t *o, int woutlet, const fts_atom_t *at)
     fts_outlet_send(o, woutlet, fts_get_selector(at), 1, at);
 }
 
-#define SYNC_MAX_SIZE (sizeof(unsigned int))
+/************************************************
+ *
+ *  tup & untup
+ *
+ */
+
+#define TUP_MAX_SIZE (sizeof(unsigned int) * 8)
 
 static fts_symbol_t sym_all = 0;
 static fts_symbol_t sym_none = 0;
@@ -80,11 +86,12 @@ static fts_symbol_t sym_right = 0;
 typedef struct _tup_
 {
   fts_object_t o;
+  int n;
   unsigned int trigger; /* control bits: trigger on input at given inlets */
   unsigned int require; /* control bits: require input on given inlets */
   unsigned int reset; /* control bits: reset memory of given inputs after on each input */
   unsigned int wait; /* status bits: wait for input at given inlet before output */
-  fts_atom_t a[SYNC_MAX_SIZE];
+  fts_atom_t a[TUP_MAX_SIZE];
   enum {mode_all, mode_select} mode;
 } tup_t;
 
@@ -104,28 +111,37 @@ static void
 tup_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   tup_t *this = (tup_t *)o;
+  int n = this->n;
+  fts_atom_t *a = this->a;
+  int i;
+  
+  if(ac > n)
+    ac = n;
 
-  fts_array_set(&this->array, ac, at);
+  for(i=0; i<ac; i++)
+    fts_atom_assign(a + i, at + i);
 }
 
 static void
 tup_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   tup_t *this = (tup_t *)o;
-  int size = fts_array_get_size(&this->array);
-  fts_atom_t *atoms = fts_array_get_atoms(&this->array);
-  fts_atom_t output[size];
+  int n = this->n;
+  fts_atom_t *a = this->a;
+  fts_atom_t output[n];
   int i;
   
-  for(i=0; i<size; i++)
+  this->wait |= this->reset & this->require;
+
+  for(i=0; i<n; i++)
     {
       fts_set_void(output + i);
-      fts_atom_assign(output + i, atoms + i);
+      fts_atom_assign(output + i, a + i);
     }
 
-  fts_outlet_send(o, 0, fts_s_list, size, output);
+  fts_outlet_send(o, 0, fts_s_list, n, output);
 
-  for(i=0; i<size; i++)
+  for(i=0; i<n; i++)
     fts_set_void(output + i);
 }
 
@@ -140,31 +156,7 @@ tup_input_primitive_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   this->wait &= ~bit;
   
   if(!this->wait && (this->trigger & bit))
-    {
-      sync_output(this);
-      this->wait |= this->reset & this->require;
-    }
-
-  fts_array_set_element(&this->array, winlet, at);
-
-  if(winlet == 0)
     tup_output(o, 0, 0, 0, 0);
-}
-
-static void
-tup_input_any_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  tup_t *this = (tup_t *)o;
-
-  if(ac == 1 && fts_get_selector(at) == s)
-    {
-      fts_array_set_element(&this->array, winlet, at);
-
-      if(winlet == 0)
-	tup_output(o, 0, 0, 0, 0);
-    }
-  else
-    fts_object_signal_runtime_error(o, "doesn't accept message on right inlet");
 }
 
 static void
@@ -180,18 +172,28 @@ tup_input_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	fts_atom_t a;
 
 	fts_set_array(&a, array);
-	fts_array_set_element(&this->array, winlet, &a);
+	tup_input_primitive_value(o, winlet, s, 1, &a);
       }
       break;
     case 1:
-      fts_array_set_element(&this->array, winlet, at);
+      /* this anyway shouln't be possible... */
+      tup_input_primitive_value(o, winlet, s, 1, at);
       break;
     case 0:
+      /* ...this neither */
       break;
     }
+}
 
-  if(winlet == 0)
-    tup_output(o, 0, 0, 0, 0);
+static void
+tup_input_any_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  tup_t *this = (tup_t *)o;
+
+  if(ac == 1 && fts_get_selector(at) == s)
+    tup_input_primitive_value(o, winlet, s, 1, at);
+  else
+    fts_object_signal_runtime_error(o, "doesn't accept message on right inlet");
 }
 
 static void
@@ -220,11 +222,131 @@ untup_input_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   int n = this->n;
   int i;
 
-  if(n < ac)
+  if(n > ac)
     n = ac;
 
   for(i=n-1; i>=0; i--)
     fts_outlet_atom(o, i, at + i);
+}
+
+/************************************************
+ *
+ *  tup mode (trigger and require)
+ *
+ */
+
+static void
+tup_set_bits(unsigned int *bits, int n, const fts_atom_t *at, int sign)
+{
+  if(fts_is_symbol(at))
+    {
+      fts_symbol_t mode = fts_get_symbol(at);
+      
+      if(mode == sym_all)
+	*bits = (1 << n) - 1;
+      else if(mode == sym_none)
+	*bits = 0;
+    }
+  else if(fts_is_number(at))
+    {
+      int in = fts_get_number_int(at) * sign;
+
+      if(in >= 0 && in < n)
+	*bits = 1 << in;
+    }
+  else if(fts_is_array(at))
+    {
+      fts_array_t *l = fts_get_array(at);
+      fts_atom_t *a = fts_array_get_atoms(l);
+      int size = fts_array_get_size(l);
+      int i;
+
+      *bits = 0;
+
+      for(i=0; i<size; i++)
+	{
+	  if(fts_is_number(a + i))
+	    {
+	      int in = fts_get_number_int(a + i) * sign;
+	      
+	      if(in >= 0 && in < n)
+		*bits |= 1 << in;
+	    }  
+	}
+    }
+}
+
+static void
+tup_set_trigger(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  tup_t *this = (tup_t *)o;
+
+  tup_set_bits(&this->trigger, this->n, at, 1);
+}
+
+static void
+tup_set_trigger_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
+{
+  tup_set_trigger(o, 0, 0, 1, value);
+}
+
+static void
+tup_set_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  tup_t *this = (tup_t *)o;
+  unsigned int once = 0;
+
+  tup_set_bits(&this->require, this->n, at, 1);
+  tup_set_bits(&once, this->n, at, -1);
+
+  this->reset = ~once;
+  this->wait = this->require | once;
+}
+
+static void
+tup_set_require_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
+{
+  tup_set_require(o, 0, 0, 1, value);
+}
+
+static void
+tup_set_sync(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  tup_t *this = (tup_t *)o;
+
+  if(fts_is_symbol(at))
+    {
+      fts_symbol_t sync = fts_get_symbol(at);
+      
+      if(sync == sym_any)
+	{
+	  this->trigger = (1 << this->n) - 1;
+	  this->reset = 0;
+	  this->require = 0;
+	}
+      else if(sync == sym_all)
+	this->trigger = this->require = this->reset = this->wait = (1 << this->n) - 1;
+      else if(sync == sym_left)
+	{
+	  this->trigger = 1;
+	  this->reset = 0;
+	  this->require = 0;
+	}
+      else if(sync == sym_right)
+	{
+	  this->trigger = (1 << (this->n - 1));
+	  this->reset = 0;
+	  this->require = 0;
+	}
+
+      this->wait = this->require;
+    }
+}
+
+static void
+tup_set_sync_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
+{
+  tup_set_sync(o, 0, 0, 1, value);
 }
 
 /************************************************
@@ -237,35 +359,59 @@ static void
 tup_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   tup_t *this = (tup_t *)o;
+  int n = 0;
+  int i;
 
   ac--;
   at++;
 
-  if(ac == 1 && fts_is_int(at))
-    {
-      int n = fts_get_int(at);
+  /* void state */
+  for(i=0; i<TUP_MAX_SIZE; i++)
+    fts_set_void(this->a + i);
 
-      if(n < 2)
-	n = 2;
-
-      fts_array_init(&this->array, 0, 0);
-      fts_array_set_size(&this->array, n);
-    }
-  else
+  if(ac == 1)
     {
-      fts_array_init(&this->array, ac, at);
-      
-      if(ac < 2)
-	fts_array_set_size(&this->array, 2);
+      if(fts_is_number(at))
+	{
+	  n = fts_get_number_int(at);
+	  
+	  if(n < 2) 
+	    n = 2;
+	  else if(n > TUP_MAX_SIZE)
+	    n = TUP_MAX_SIZE;
+	}
+      else
+	{
+	  fts_object_set_error(o, "Wrong argument");
+	  return;
+	}
     }
+  else if(ac > 1)
+    {
+      if(ac > TUP_MAX_SIZE)
+	ac = TUP_MAX_SIZE;
+
+      n = ac;
+
+      for(i=0; i<n; i++)
+	fts_atom_assign(this->a + i, at + i);
+    }
+
+  this->n = n;
+  this->trigger = 1;
+  this->reset = 0;
+  this->require = 0;
 }
 
 static void
 tup_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   tup_t *this = (tup_t *)o;
+  int i;
 
-  fts_array_destroy(&this->array);
+  /* void state */
+  for(i=0; i<this->n; i++)
+    fts_set_void(this->a + i);
 }
 
 static void
@@ -302,11 +448,17 @@ tup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   if(n < 2)
     n = 2;
+  else if(n > TUP_MAX_SIZE)
+    n = TUP_MAX_SIZE;
 
   fts_class_init(cl, sizeof(tup_t), n, 1, 0); 
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, tup_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, tup_delete);
+
+  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("trigger"), tup_set_trigger_prop);
+  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("require"), tup_set_require_prop);
+  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("sync"), tup_set_sync_prop);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, tup_output);
   fts_method_define_varargs(cl, 0, fts_s_set, tup_set);
@@ -331,11 +483,13 @@ untup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   ac--;
   at++;
 
-  if(ac == 1 && fts_is_int(at))
-    n = fts_get_int(at);
-  
-  if(n < 2)
+  if(ac == 1 && fts_is_number(at))
+    n = fts_get_number_int(at);
+
+  if(n < 2) 
     n = 2;
+  else if(n > TUP_MAX_SIZE)
+    n = TUP_MAX_SIZE;
 
   fts_class_init(cl, sizeof(untup_t), 1, n, 0); 
 
@@ -350,9 +504,31 @@ untup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
+static int
+tup_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
+{
+  ac0--;
+  at0++;
+
+  ac1--;
+  at1++;
+
+  if(ac0 == 1 && ac1 == 1 && fts_is_number(at0) && fts_is_number(at1))
+    return (fts_get_number_int(at0) == fts_get_number_int(at1));
+  else
+    return ac0 == ac1;
+}
+
+
 void
 tup_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("tup"), tup_instantiate, fts_arg_equiv);
-  fts_class_install(fts_new_symbol("untup"), untup_instantiate);
+  sym_all = fts_new_symbol("all");
+  sym_none = fts_new_symbol("none");
+  sym_any = fts_new_symbol("any");
+  sym_left = fts_new_symbol("left");
+  sym_right = fts_new_symbol("right");
+
+  fts_metaclass_install(fts_new_symbol("tup"), tup_instantiate, tup_equiv);
+  fts_metaclass_install(fts_new_symbol("untup"), untup_instantiate, fts_first_arg_equiv);
 }
