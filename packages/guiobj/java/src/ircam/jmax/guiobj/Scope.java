@@ -121,17 +121,16 @@ public class Scope extends VectorDisplay
       ScopeRunModePopUp.update(this);
       return ScopeRunModePopUp.popup;
   }
-
-  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
+  
+  public ObjectControlPanel getControlPanel()
   {
-    super.popUpUpdate(onInlet, onOutlet, area);
-    controlPanel.update(this);
-    ObjectPopUp.getInstance().add(controlPanel);
-  }
-  public void popUpReset()
-  {
-    super.popUpReset();
-    ObjectPopUp.getInstance().remove(controlPanel);
+    return this.controlPanel;
   }
 }
+
+
+
+
+
+
 

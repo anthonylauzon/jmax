@@ -41,20 +41,21 @@ import ircam.jmax.editors.patcher.objects.*;
 // The graphic pop-up menu used to change the number of an inlet or an outlet in a subpatcher.
 //
 
-public class ScopeRunModePopUp extends JPopupMenu
+public class VecDispRModePopUp extends JPopupMenu
 {
-  static public ScopeRunModePopUp popup = new ScopeRunModePopUp();
+  static public VecDispRModePopUp popup = new VecDispRModePopUp();
 
   GraphicObject target = null;
-  ScopeControlPanel controlPanel;    
+  VecDispControlPanel controlPanel;    
 
-  public ScopeRunModePopUp()
+  public VecDispRModePopUp()
   {
     super();
 
-    controlPanel = new ScopeControlPanel();
+    controlPanel = new VecDispControlPanel();
     add(controlPanel);
     validate();
+
     pack();
   }
 
@@ -62,7 +63,7 @@ public class ScopeRunModePopUp extends JPopupMenu
     return popup.target;
   }
 
-  public static void update(Scope obj)
+  public static void update(GraphicObject obj)
   {
     popup.target = obj;
     popup.controlPanel.update(obj);    

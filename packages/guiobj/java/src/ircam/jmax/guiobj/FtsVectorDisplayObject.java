@@ -160,7 +160,7 @@ public class FtsVectorDisplayObject extends FtsObject
     ((FtsDisplayListener) listener).display();
   }
 
-  public void bounds(int nArgs, FtsAtom args[])
+  public void setBounds(int nArgs, FtsAtom args[])
   {
     nValues = 0;
     wrap = 0;
@@ -172,6 +172,22 @@ public class FtsVectorDisplayObject extends FtsObject
 
     if(listener != null)
       ((FtsDisplayListener) listener).display();
+  }
+
+  public void requestSetBounds(float min, float max)
+  {
+    sendArgs[0].setFloat(min); 
+    sendArgs[1].setFloat(max); 
+    sendMessage(FtsObject.systemInlet, "setBounds", 2, sendArgs);
+  }
+
+  public float getMinimum()
+  {
+      return min;
+  }
+  public float getMaximum()
+  {
+      return max;
   }
     
   /* argument vector for sending messages to server */

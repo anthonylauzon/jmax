@@ -27,6 +27,7 @@ package ircam.jmax.guiobj;
 
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 import java.util.*;
 
 import ircam.jmax.fts.*;
@@ -52,6 +53,8 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
   int size = 0;
   int range = 0;
+
+  public static VecDispControlPanel controlPanel = new VecDispControlPanel();
 
   public VectorDisplay(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
@@ -280,9 +283,34 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
     int i;
 
     if(n > size)
-      n = size;
+       n = size;
 
     if(n > 1)
       drawVector(g, getX() + 1, getY() + getHeight() - 2, values, n);
+  }
+
+  public JPopupMenu getRunModePopUpMenu()
+  {
+      VecDispRModePopUp.update(this);
+      return VecDispRModePopUp.popup;
+  }
+
+  public ObjectControlPanel getControlPanel()
+  {
+    return this.controlPanel;
+  }
+
+  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
+  {
+    super.popUpUpdate(onInlet, onOutlet, area);
+    getControlPanel().update(this);
+    ObjectPopUp.getInstance().add((JPanel)getControlPanel());
+    ObjectPopUp.getInstance().revalidate();
+    ObjectPopUp.getInstance().pack();
+  }
+  public void popUpReset()
+  {
+    super.popUpReset();
+    ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
   }
 }

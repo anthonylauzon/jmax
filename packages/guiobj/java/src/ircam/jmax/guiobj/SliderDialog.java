@@ -103,7 +103,7 @@ public class SliderDialog extends JDialog implements ActionListener {
     int aMaxInt = 0;
     int aMinInt = 0;
 
-    if ( e.getSource() == cancelButton) 
+    if( e.getSource() == cancelButton) 
       {
 	setVisible( false);
       }
