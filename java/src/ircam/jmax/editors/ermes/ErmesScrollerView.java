@@ -18,6 +18,7 @@ public class ErmesScrollerView extends ScrollPane {
     view.validate();
     imageSize = new Dimension(view.getPreferredSize());
     add(view, 0);
+    validate();
     getHAdjustable().setUnitIncrement(10);
     getVAdjustable().setUnitIncrement(10);
     getHAdjustable().addAdjustmentListener((AdjustmentListener)theView);
@@ -26,6 +27,14 @@ public class ErmesScrollerView extends ScrollPane {
     addKeyListener((KeyListener)theSketchWindow);
   }
 }
+
+
+
+
+
+
+
+
 
 
 

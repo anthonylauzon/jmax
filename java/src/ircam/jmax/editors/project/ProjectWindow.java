@@ -93,6 +93,9 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
     gridbag.setConstraints(itsScrollerView, c);
     add(itsScrollerView);
 
+
+    validate();
+
     addKeyListener(this);
     addWindowListener(this);
   }
@@ -670,31 +673,29 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
   ////////////////////////////////////////////////////////////////keyListener --inizio
 
 
-  public void keyTyped(KeyEvent e){
-    //System.out.println("keyTyped, control is "+e.isControlDown()+" char is "+(char)e.getKeyChar());
-  }
+  public void keyTyped(KeyEvent e){}
   public void keyReleased(KeyEvent e){}
 
   public void keyPressed(KeyEvent e){
-    //    System.out.println("keyPressed, control is "+e.isControlDown()+" char is "+(char)e.getKeyChar());
+    int aInt = e.getKeyCode();
     if (e.isControlDown()){
-      if(e.getKeyChar() == 'n') New();
-      else if(e.getKeyChar() == 'o') Open();
-      else if(e.getKeyChar() == 'p') MaxApplication.getApplication().ObeyCommand(MaxApplication.PRINT_WINDOW);
-      else if(e.getKeyChar() == 'q') MaxApplication.getApplication().ObeyCommand(MaxApplication.QUIT_APPLICATION);
-      else if(e.getKeyChar() == 's'){
+      if(aInt == 78) New();//n
+      else if(aInt == 79) Open();//o
+      else if(aInt == 80) MaxApplication.getApplication().ObeyCommand(MaxApplication.PRINT_WINDOW);//p
+      else if(aInt == 81) MaxApplication.getApplication().ObeyCommand(MaxApplication.QUIT_APPLICATION);//q
+      else if(aInt == 83){//s
 	if(MaxApplication.getApplication().itsWindow != null) 
 	  MaxApplication.getApplication().itsSketchWindow.GetDocument().Save();
       }
-      else if(e.getKeyChar() == 'w') MaxApplication.getApplication().ObeyCommand(MaxApplication.CLOSE_WINDOW);
+      else if(aInt == 87) MaxApplication.getApplication().ObeyCommand(MaxApplication.CLOSE_WINDOW);//w
     }
     else{
-      if(e.getKeyCode() == ircam.jmax.utils.Platform.RETURN_KEY) {
+      if(aInt == ircam.jmax.utils.Platform.RETURN_KEY) {
 	if(itsProject.itsCurrentEntry.itsDocument==null)
 	  if(itsProject.itsCurrentEntry.OpenEntryDocument()) return;
       }
-      else if(e.getKeyCode() == Event.UP) itsProject.SelectPreviousEntry();
-      else if(e.getKeyCode() == Event.DOWN) itsProject.SelectNextEntry();
+      else if(aInt == Event.UP) itsProject.SelectPreviousEntry();
+      else if(aInt == Event.DOWN) itsProject.SelectNextEntry();
     }
   }
   ////////////////////////////////////////////////////////////////////////////
@@ -791,7 +792,6 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
   public Dimension getPreferredSize() {
     return getMinimumSize();
   }
-	
 }
 
 

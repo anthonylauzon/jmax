@@ -31,6 +31,7 @@ public class ConsoleWindow extends MaxEditor {
     c.anchor = GridBagConstraints.NORTHWEST;
     gridbag.setConstraints(theConsole, c);
     add(itsConsole);
+    itsConsole.SetContainer(this);
   }
   
   public boolean OpenFile(String thename, String thePath){

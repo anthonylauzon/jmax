@@ -675,17 +675,19 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   /////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////keyListener --inizio  
   public void keyTyped(KeyEvent e){}
+
   public void keyReleased(KeyEvent e){}
 
   public void keyPressed(KeyEvent e){
-    if (e.isControlDown()){
-      if(e.getKeyChar() == 'm') MaxApplication.getApplication().GetProjectWindow().toFront();
-      else if(e.getKeyChar() == 'n') MaxApplication.getApplication().itsProjectWindow.New();
-      else if(e.getKeyChar() == 'o') MaxApplication.getApplication().itsProjectWindow.Open();
-      else if(e.getKeyChar() == 'p') MaxApplication.getApplication().ObeyCommand(MaxApplication.PRINT_WINDOW);
-      else if(e.getKeyChar() == 'q') MaxApplication.getApplication().ObeyCommand(MaxApplication.QUIT_APPLICATION);
-      else if(e.getKeyChar() == 's')itsDocument.Save();
-      else if(e.getKeyChar() == 'w') {
+    int aInt = e.getKeyCode();
+    if(e.isControlDown()){
+      if(aInt == 77) MaxApplication.getApplication().GetProjectWindow().toFront();//m
+      else if(aInt == 78) MaxApplication.getApplication().itsProjectWindow.New();//n
+      else if(aInt == 79) MaxApplication.getApplication().itsProjectWindow.Open();//o
+      else if(aInt == 80) MaxApplication.getApplication().ObeyCommand(MaxApplication.PRINT_WINDOW);//p
+      else if(aInt == 81) MaxApplication.getApplication().ObeyCommand(MaxApplication.QUIT_APPLICATION);//q
+      else if(aInt == 83)itsDocument.Save();//s
+      else if(aInt == 87) {//w
 	if (isSubPatcher){
 	  setVisible(false);
 	  itsTopWindow.RemoveFromSubWindowList(this);
@@ -695,7 +697,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 	  dispose();
 	}
       }       
-      else if(e.getKeyChar() == 'e'){
+      else if(aInt == 69){//e
 	ErmesObject aObject;
 	itsChangingRunEditMode = true;
 	MenuItem aRunEditItem = itsWindowsMenu.getItem(0);
@@ -719,8 +721,9 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 	  aRunEditItem.setLabel("Run mode Ctrl+E");
 	  aSelectAllItem.setEnabled(true);
 	}
+	requestFocus();
       }
-      else if (e.getKeyChar() == '?'){
+      else if (aInt == 47){//?
 	//ask help for the reference Manual for the selected element...
 	// open one url *only*, because we open only one browser.
       
@@ -743,13 +746,13 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 	}   
       }
     } 
-    else if((e.getKeyCode()==ircam.jmax.utils.Platform.DELETE_KEY)||(e.getKeyCode()==ircam.jmax.utils.Platform.BACKSPACE_KEY)){
+    else if((aInt==ircam.jmax.utils.Platform.DELETE_KEY)||(aInt==ircam.jmax.utils.Platform.BACKSPACE_KEY)){
       if(itsSketchPad.GetEditField()!=null){
 	if(!itsSketchPad.GetEditField().HasFocus())
 	  itsSketchPad.itsHelper.DeleteSelected();
       }
     }
-    else if (e.getKeyChar() == '?') {//this is a patch to trap the '?'
+    else if(aInt == 47){//this is a patch to trap the '?'
       //ask help for the selected element...
       ErmesObject aObject = null;
       String fileToOpen;
@@ -761,7 +764,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 	if (fileToOpen != null)
 	  MaxApplication.getApplication().Load(fileToOpen, "");
       }
-    } 
+    }
   }
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// keyListener --fine

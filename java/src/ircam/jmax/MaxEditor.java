@@ -452,12 +452,13 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
   public void keyReleased(KeyEvent e){}
 
   public void keyPressed(KeyEvent e){
+    int aInt = e.getKeyCode();
     if (e.isControlDown()){
-      if(e.getKeyChar() == 'm') MaxApplication.getApplication().GetProjectWindow().toFront();
-      else if(e.getKeyChar() == 'o') MaxApplication.getApplication().itsProjectWindow.Open();
-      else if(e.getKeyChar() =='p')MaxApplication.getApplication().ObeyCommand(MaxApplication.PRINT_WINDOW);
-      else if(e.getKeyChar() == 's') GetDocument().Save();
-      else if(e.getKeyChar() == 'w') itsProject.CloseThisWindow();
+      if(aInt == 77) MaxApplication.getApplication().GetProjectWindow().toFront();//m
+      else if(aInt == 79) MaxApplication.getApplication().itsProjectWindow.Open();//o
+      else if(aInt == 80)MaxApplication.getApplication().ObeyCommand(MaxApplication.PRINT_WINDOW);//p
+      else if(aInt == 83) GetDocument().Save();//s
+      else if(aInt == 87) itsProject.CloseThisWindow();//w
     }
   }
   ////////////////////////////////////////////////////////////////////////////

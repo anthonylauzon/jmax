@@ -17,6 +17,7 @@ public class Console extends Panel{
   Interp itsInterp;
   PrintStream itsPrintStream; 
   ConsoleThread itsConsoleThread;
+  KeyListener itsContainer;
 
   public Console(Interp i) {
     StringBuffer sSbuf = new StringBuffer();
@@ -48,6 +49,9 @@ public class Console extends Panel{
     itsConsoleThread.start();
   }
 
+  public void SetContainer(KeyListener theContainer){
+    itsContainer = theContainer;
+  }
 
   public PrintStream getPrintStream() {
     return itsPrintStream;

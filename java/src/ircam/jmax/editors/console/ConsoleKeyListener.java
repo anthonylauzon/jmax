@@ -43,7 +43,11 @@ public class ConsoleKeyListener implements KeyListener {
     }
 
     public void keyTyped(KeyEvent evt) {
- 	char key = evt.getKeyChar();
+      if(evt.isControlDown()){
+	console.itsContainer.keyPressed(evt);
+	return;
+      }
+      char key = evt.getKeyChar();
 	
 	if ((key == '\r') || (key == '\n')) {
 	    /*
@@ -73,6 +77,13 @@ public class ConsoleKeyListener implements KeyListener {
 	}
     }
 }
+
+
+
+
+
+
+
 
 
 
