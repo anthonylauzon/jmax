@@ -24,6 +24,7 @@ extern void ftl_data_vector_element_recopy(TYPE, PTR, ELEMENT, void *src)
 extern void ftl_data_get(TYPE, PTR, FIELD, ptr_to_value)
 extern void ftl_data_vector_element_get_field(TYPE, PTR, ELEMENT, FIELD, ptr_to_value)
 
+extern void *ftl_data_get_ptr(ftl_data_t handle)
  
 Don't use this one, is for system use:
 
@@ -118,6 +119,7 @@ extern void ftl_data_free(ftl_data_t obj);
 	    *(DEST) = ( (TYPE *) ((OBJ)->ptr) )[IDX].FIELD;  \
          } while(0)
 
+#define ftl_data_get_ptr(OBJ) (OBJ)->ptr
 
 /* this macro is to simulate a specialized "atom set" function
 to cope with the type ftl_data_name_t, that are object names
