@@ -59,7 +59,8 @@ messevt_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   messevt_t *this = (messevt_t *)o;
   fts_atom_t a[3];
 
-  fts_set_float(this->at + 0, 1000.0 * event_get_time(&this->head));
+  /*fts_set_float(this->at + 0, 1000.0 * event_get_time(&this->head));*/
+  fts_set_float(this->at + 0, event_get_time(&this->head));
   fts_set_symbol(this->at + 1, messevt_symbol);
 
   fts_client_upload(o, event_symbol, ac + 2, this->at);

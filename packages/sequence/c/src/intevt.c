@@ -52,7 +52,8 @@ intevt_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   intevt_t *this = (intevt_t *)o;
   fts_atom_t a[3];
 
-  fts_set_float(a + 0, 1000.0 * event_get_time(&this->head));
+  /*fts_set_float(a + 0, 1000.0 * event_get_time(&this->head));*/
+  fts_set_float(a + 0, event_get_time(&this->head));
   fts_set_symbol(a + 1, intevt_symbol);
   a[2] = this->value;
 
