@@ -588,19 +588,33 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
         
         fts_set_void(&value);
         
-        if((locals == NULL || !fts_hashtable_get(locals, name, &value)) && 
-           (globals == NULL || !fts_hashtable_get(globals, name, &value)))
-          return fts_status_format("undefined variable %s", fts_symbol_name(fts_get_symbol(name)));
-
-        /* hashtable of name definitions */
-        if(fts_is_pointer(&value))
-          value = *(fts_definition_get_value((fts_definition_t *)fts_get_pointer(&value)));
-
-        if(fts_is_void(&value))
-          return fts_status_format("undefined variable %s", fts_symbol_name(fts_get_symbol(name)));
+        if(locals != NULL && fts_hashtable_get(locals, name, &value))
+        {
+          if(fts_is_pointer(&value))
+            value = *(fts_definition_get_value((fts_definition_t *)fts_get_pointer(&value)));
+          
+          if(!fts_is_void(&value))
+          {
+            expression_stack_push( exp, &value);
+            fts_atom_refer(&value);
+            break;
+          }
+        }
         
-        expression_stack_push( exp, &value);
-        fts_atom_refer(&value);
+        if(globals != NULL && fts_hashtable_get(globals, name, &value))
+        {
+          if(fts_is_pointer(&value))
+            value = *(fts_definition_get_value((fts_definition_t *)fts_get_pointer(&value)));
+          
+          if(!fts_is_void(&value))
+          {
+            expression_stack_push( exp, &value);
+            fts_atom_refer(&value);
+            break;
+          }
+        }
+        
+        return fts_status_format("undefined variable %s", fts_symbol_name(fts_get_symbol(name)));
       }
     }
     else

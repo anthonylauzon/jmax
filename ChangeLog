@@ -1,3 +1,7 @@
+2004-08-26  Norbert Schnell  <Norbert.Schnell@ircam.fr>
+
+	* expression.c: bug fix for accessing global names which have been shadowed by a local one before
+
 2004-08-24  Norbert Schnell  <Norbert.Schnell@ircam.fr>
 
 	* object.c: introduced fts_object_snatch() (secretly redefining an FTS object using memcopy from a new instance of the same class)
