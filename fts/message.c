@@ -61,11 +61,11 @@ void
 fts_message_set_from_atoms(fts_message_t *mess, int ac, const fts_atom_t *at)
 {
   if(fts_is_symbol(at))
-    {
-      fts_symbol_t selector = fts_get_symbol(at);
-      
-      fts_message_set(mess, selector, ac - 1, at + 1);
-    }
+  {
+    fts_symbol_t selector = fts_get_symbol(at);
+    
+    fts_message_set(mess, selector, ac - 1, at + 1);
+  }
 }
 
 static void
@@ -78,17 +78,17 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   /* check arguments */
   if(ac > 0)
+  {
+    /* first arg is symbol */
+    if(fts_is_symbol(at))
     {
-      /* first arg is symbol */
-      if(fts_is_symbol(at))
-	{
-	  fts_symbol_t selector = fts_get_symbol(at);
+      fts_symbol_t selector = fts_get_symbol(at);
 
-	  fts_message_set(this, selector, ac - 1, at + 1);
-	}
-      else
-	fts_object_error(o, "first argument must be symbol");
+      fts_message_set(this, selector, ac - 1, at + 1);
     }
+    else
+      fts_object_error(o, "first argument must be symbol");
+  }
 }
 
 static void
@@ -195,10 +195,10 @@ create_tuple(int ac, const fts_atom_t *at, fts_atom_t *atup)
 }
 
 /*****************************************************************
-*
-*  unfold method args
-*
-*/
+ *
+ *  unfold method args
+ *
+ */
 static int unfold_varargs(int ac, const fts_atom_t* at, fts_atom_t* atup, const fts_atom_t** rat);
 
 static int
@@ -229,14 +229,14 @@ unfold_varargs(int ac, const fts_atom_t* at, fts_atom_t *atup, const fts_atom_t*
 {
   switch(ac)
   {
-    case 0:
-      rat = NULL;
-      return 0;
-    case 1:
-      return unfold_atom(at, rat);
-    default:
-      *rat = at;
-      return ac;
+  case 0:
+    rat = NULL;
+    return 0;
+  case 1:
+    return unfold_atom(at, rat);
+  default:
+    *rat = at;
+    return ac;
   }
 }
 
@@ -312,24 +312,24 @@ outlet_atom(fts_object_t *o, int woutlet, const fts_atom_t *at)
           fts_method_t method = fts_connection_cache_get_method(conn);
           
           if(fts_connection_cache_get_type(conn) != type)
+	  {
+	    int varargs = 0;
+	      
+	    method = fts_class_get_inlet_method(cl, winlet, type, &varargs);
+	      
+	    if(method != NULL)
 	    {
-	      int varargs = 0;
-	      
-	      method = fts_class_get_inlet_method(cl, winlet, type, &varargs);
-	      
-	      if(method != NULL)
-		{
-		  fts_connection_cache_set_type(conn, type);
-		  fts_connection_cache_set_varargs(conn, 0);
-		  fts_connection_cache_set_method(conn, method);
-		}
-	      else
-		{
-		  fts_object_error(dst, "no %s method for inlet %d", fts_class_get_name(type), winlet);
-		  conn = fts_connection_get_next_of_same_source(conn);
-		  continue;
-		}
+	      fts_connection_cache_set_type(conn, type);
+	      fts_connection_cache_set_varargs(conn, 0);
+	      fts_connection_cache_set_method(conn, method);
 	    }
+	    else
+	    {
+	      fts_object_error(dst, "no %s method for inlet %d", fts_class_get_name(type), winlet);
+	      conn = fts_connection_get_next_of_same_source(conn);
+	      continue;
+	    }
+	  }
 
           INVOKE(method, dst, winlet, NULL, !fts_is_void(at), at);
         }
@@ -439,14 +439,14 @@ dispatch_varargs(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at, fts
 {
   switch(ac)
   {
-    case 0:
-      outlet_atom(o, woutlet, fts_null);
-      break;
-    case 1:
-      dispatch_atom(o, woutlet, at);
-      break;
-    default:
-      outlet_tuple(o, woutlet, ac, at, atup);
+  case 0:
+    outlet_atom(o, woutlet, fts_null);
+    break;
+  case 1:
+    dispatch_atom(o, woutlet, at);
+    break;
+  default:
+    outlet_tuple(o, woutlet, ac, at, atup);
   }
 }
 
@@ -602,7 +602,6 @@ dispatch_message_atom(fts_object_t *o, fts_symbol_t s, const fts_atom_t *at)
     fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at);
     int tup_ac = fts_tuple_get_size(tup);
     fts_atom_t *tup_at = fts_tuple_get_atoms(tup);
-
     return dispatch_message_varargs(o, s, tup_ac, tup_at, (fts_atom_t *)at);
   }
   else
@@ -614,12 +613,12 @@ dispatch_message_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom
 {
   switch(ac)
   {
-    case 0:
-      return send_message_atom(o, s, fts_null);
-    case 1:
-      return dispatch_message_atom(o, s, at);
-    default:
-      return send_message_tuple(o, s, ac, at, atup);
+  case 0:
+    return send_message_atom(o, s, fts_null);
+  case 1:
+    return dispatch_message_atom(o, s, at);
+  default:
+    return send_message_tuple(o, s, ac, at, atup);
   }
 }
 
@@ -740,10 +739,10 @@ fts_atom_t *fts_get_return_value( void)
 }
 
 /***********************************************************************
-*
-* Initialization
-*
-*/
+ *
+ * Initialization
+ *
+ */
 
 void
 fts_kernel_message_init(void)
@@ -751,3 +750,9 @@ fts_kernel_message_init(void)
   fts_message_class = fts_class_install(NULL, message_instantiate);
 }
 
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
