@@ -133,6 +133,28 @@ decrypt_options ()
     done
 }
 
+
+# ---------------------------------------------------------------------------
+# This function make absolut path for files given at command line
+# Must be called after decrypt_options
+make_absolute_path ()
+{
+    NEW_JMAXOPT=""
+    for args in ${JMAXOPT};
+    do
+      # Check for .jmax in args.
+      cur_arg=`echo $args | sed "s/^[^\/].*\.jmax$//g"`
+      if test "$cur_arg" = ""; then
+	  # We have a file with jMax extension which have
+	  # a relative path, so we append current working directory
+	  NEW_JMAXOPT="$NEW_JMAXOPT `pwd`/$args"
+      else
+	  NEW_JMAXOPT="$NEW_JMAXOPT $args"
+      fi
+    done
+    JMAXOPT="$NEW_JMAXOPT"
+}
+
 # ---------------------------------------------------------------------------
 display_java_error_in_term ()
 {
@@ -461,5 +483,7 @@ check_installation
 build_classpath
 
 fix_sgi_fonts
+
+make_absolute_path
 
 start_it
