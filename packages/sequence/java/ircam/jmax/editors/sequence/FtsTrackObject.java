@@ -107,6 +107,12 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 	((FtsTrackObject)obj).highlightEvents( args.getLength(), args.getAtoms());		  
       }
     });
+  FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("highlightEventsAndTime"), new FtsMessageHandler(){
+      public void invoke( FtsObject obj, FtsArgs args)
+      {
+	((FtsTrackObject)obj).highlightEventsAndTime( args.getLength(), args.getAtoms());		  
+      }
+    });
   FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("type"), new FtsMessageHandler(){
       public void invoke( FtsObject obj, FtsArgs args)
       {
@@ -327,20 +333,29 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 
   public void highlightEvents(int nArgs, FtsAtom args[])
   {
-    int selIndex;
     TrackEvent event = null;
     
     MaxVector events = new MaxVector();
 
     for(int i=0; i<nArgs; i++)
-      {
-	event = (TrackEvent)(args[i].objectValue);
-	events.addElement(event);
-      }
+      events.addElement((TrackEvent)(args[i].objectValue));
     
     double time = ((TrackEvent)args[0].objectValue).getTime();
     notifyHighlighting(events, time);
   }
+  
+  public void highlightEventsAndTime(int nArgs, FtsAtom args[])
+  {
+    MaxVector events = new MaxVector();
+    double time = args[0].doubleValue;
+    
+    if( nArgs > 1)
+      for(int i = 1; i < nArgs; i++)
+	events.addElement((TrackEvent)(args[i].objectValue));
+
+    notifyHighlighting(events, time);
+  }
+
   public void requestEventCreation(float time, String type, int nArgs, Object arguments[])
   {
     args.clear();
