@@ -39,11 +39,23 @@ import javax.swing.*;
 
 public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
 {
+  private static FtsBmaxRemoteDocumentHandler firstInstance = null;
+
   private ImageIcon jMaxDocumentIcon;
 
   public FtsBmaxRemoteDocumentHandler()
   {
     jMaxDocumentIcon = Icons.get("_jmax_patcher_file_");
+
+    if (firstInstance == null)
+      firstInstance = this;
+    else
+      System.err.println( "Someone did a second instance of this class: " + getClass() + ". That's wrong !");
+  }
+
+  public static FtsBmaxRemoteDocumentHandler getInstance()
+  {
+    return firstInstance;
   }
 
   public boolean canLoadFrom(File file)

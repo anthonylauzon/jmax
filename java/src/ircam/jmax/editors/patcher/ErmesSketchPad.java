@@ -696,7 +696,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
       }
     else 
       {
-	if(PatcherSaveManager.SaveClosing(getEditorContainer(), doCancel))
+	if(PatcherSaveManager.saveClosing(getEditorContainer(), doCancel))
 	  itsDocument.dispose();
 	// Just call dispose on the document
 	// Mda will indirectly call Destroy, and will close all the other editors

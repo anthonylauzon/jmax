@@ -1,5 +1,14 @@
 2000-03-23  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
+	* Fixed in FtsStream.java an incorrect parsing of SYMBOL_AND_DEF_CODE arguments.
+	By the way, the parser in FtsStream.java is to be redone reusing incoming.c
+
+	* Fixed MaxFileChooser.java and PatcherSaveManager.java, going toward saving as .pat.
+	Added the code that changes the file type combo box in order to use it
+	for format selection.
+	
+	Remark: we are getting closer, but this has fixed the destiny of Mda...
+
 	* Changed protocol handling: FtsStream.java
 	  - the protocol is now binary in both directions.
 	  - the symbols are cached in both directions.

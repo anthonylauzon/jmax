@@ -348,6 +348,12 @@ abstract public class FtsStream
   /*                                                                            */
   /******************************************************************************/
 
+  /*
+   * (fd) The input parser is a mess !!! (see updating of status...)
+   * It should be a finite state automata (see fts/src/runtime/client/incoming.c
+   * I will change that asap.
+   */
+
   /**
    * Parse the messages from FTS.
    * It produces a FtsMessage object that represent the received message. <p>
@@ -458,11 +464,7 @@ abstract public class FtsStream
     return c;
   }
 
-
-  /** Get the next argument of the current message as an int.
-     The caller is responsable to check that the next argument
-     have the good type before calling this method */
-  public final int getNextIntArgument()
+  private final int readInt()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     int r = 0;
@@ -471,6 +473,18 @@ abstract public class FtsStream
     r = r | ((read() & 0xff) << 16);
     r = r | ((read() & 0xff) << 8);
     r = r | ((read() & 0xff) << 0);
+
+    return r;
+  }
+
+
+  /** Get the next argument of the current message as an int.
+     The caller is responsable to check that the next argument
+     have the good type before calling this method */
+  public final int getNextIntArgument()
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
+  {
+    int r = readInt();
 
     status = read();
 
@@ -483,14 +497,10 @@ abstract public class FtsStream
   public final float getNextFloatArgument()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
-    int r = 0;
-
-    r = r | ((read() & 0xff) << 24);
-    r = r | ((read() & 0xff) << 16);
-    r = r | ((read() & 0xff) << 8);
-    r = r | ((read() & 0xff) << 0);
+    int r = readInt();
 
     status = read();
+
     return Float.intBitsToFloat(r);
   }
 
@@ -545,8 +555,6 @@ abstract public class FtsStream
     // Skip the end of string token
     // and read the next type token
 
-    status = read();
-
     return str;    
   }
 
@@ -561,22 +569,32 @@ abstract public class FtsStream
   {
     if (status == FtsClientProtocol.symbol_cached_code)
       {
-	return incomingSymbolCache[ getNextIntArgument() ];
+	int index = readInt();
+
+	status = read();
+
+	return incomingSymbolCache[ index ];
       }
     else if (status == FtsClientProtocol.symbol_and_def_code)
       {
-	int idx = getNextIntArgument();
+	int idx = readInt();
 
 	if (idx >= incomingSymbolCache.length)
 	  reallocateSymbolCache(idx);
 
 	incomingSymbolCache[idx] = readString().intern(); 
 
+	status = read();
+
 	return incomingSymbolCache[idx];
       }
     else if (status == FtsClientProtocol.symbol_code)
       {
-	return readString().intern();
+	String s = readString();
+
+	status = read();
+
+	return s.intern();
       }
     else
       return "";
@@ -593,7 +611,13 @@ abstract public class FtsStream
     if (nextIsSymbol())
       return getNextSymbolArgument();
     else
-      return readString();
+      {
+	String s = readString();
+
+	status = read();
+
+	return s;
+      }
   }
 
 

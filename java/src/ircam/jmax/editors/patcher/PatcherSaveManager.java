@@ -27,15 +27,13 @@ import ircam.jmax.toolkit.*;
 
 public class PatcherSaveManager
 {
-  private static PatcherSaveManager saveManager = new PatcherSaveManager();
-
   /****************************************************************************/
   /*                                                                          */
   /*   ACTIONS                                                                */
   /*                                                                          */
   /****************************************************************************/
   
-  static public boolean Save(EditorContainer container)
+  static public boolean save( EditorContainer container)
   {
     // first, tentative implementation:
     // the FILE is constructed now, and the ErmesSketchPad SaveTo method is invoked.
@@ -54,7 +52,7 @@ public class PatcherSaveManager
     boolean saved = false;
     
     if (! document.isRootData(patcherData))
-	return SaveFromSubPatcher(container, document);
+	return saveFromSubPatcher(container, document);
 
     if (document.canSave())
       {
@@ -69,11 +67,12 @@ public class PatcherSaveManager
 	  }
       }
     else
-      saved = SaveAs(container);
+      saved = saveAs(container);
+
     return saved;
   }
 
-  static public boolean SaveAs(EditorContainer container)
+  static public boolean saveAs(EditorContainer container)
   {
     File file;
 
@@ -91,19 +90,37 @@ public class PatcherSaveManager
       saveType = MaxFileChooser.SAVE_JMAX_TYPE;
     
     if (! document.isRootData(patcherData))
-	return SaveAsFromSubPatcher(container , document);
+	return saveAsFromSubPatcher(container , document);
 
     file = MaxFileChooser.chooseFileToSave( container.getFrame(), 
 					    document.getDocumentFile(), 
 					    "Save As",
-					    MaxFileChooser.SAVE_JMAX_TYPE);
-//  					    saveType);
+  					    saveType);
 
     if (file == null)
       return false;
     else
-      document.bindToDocumentFile( file);
+      {
+	//document.bindToDocumentFile( file);
+	// (fd) This does not work... It always binds the document to the *first* document
+	// handler that can handle it. So it there are several document handler, it's the mess.
+	// Conclusion about mda ?
 
+	document.setDocumentFile( file );
+
+	MaxDocumentHandler documentHandler = null;
+
+	if ( MaxFileChooser.getSaveType() == MaxFileChooser.SAVE_PAT_TYPE)
+	  documentHandler = FtsDotPatRemoteDocumentHandler.getInstance();
+	else
+	  documentHandler = FtsBmaxRemoteDocumentHandler.getInstance();
+
+	document.setDocumentHandler( documentHandler);
+	document.setSaved( false );
+      }
+
+//      System.err.println( "now document is " + document + " and handler is " + document.getDocumentHandler());
+    
     container.getFrame().setTitle( file.toString()); 
 
     try
@@ -120,7 +137,8 @@ public class PatcherSaveManager
 
   static ErmesSketchWindow window = null;
   static ErmesSketchPad sketch = null;
-  static boolean SaveAsFromSubPatcher(EditorContainer ec, MaxDocument document)
+
+  static boolean saveAsFromSubPatcher(EditorContainer ec, MaxDocument document)
   {
     File file;
     boolean saved = false;
@@ -144,7 +162,10 @@ public class PatcherSaveManager
     if (file == null)
       return false;
     else
-      document.bindToDocumentFile( file);
+      {
+	document.bindToDocumentFile( file);
+      }
+
 
     window.setTitle( file.toString()); 
 
@@ -160,7 +181,7 @@ public class PatcherSaveManager
     return saved;
   }
 
-  static boolean SaveFromSubPatcher(EditorContainer container, MaxDocument document)
+  static boolean saveFromSubPatcher(EditorContainer container, MaxDocument document)
   {
     boolean saved = false;
     
@@ -177,16 +198,16 @@ public class PatcherSaveManager
 	  }
       }
     else
-	saved = SaveAsFromSubPatcher(container, document);
+	saved = saveAsFromSubPatcher(container, document);
     return saved;
   }
 
-  static public void SaveTemplate(EditorContainer container)
+  static public void saveTemplate(EditorContainer container)
   {
     //nothing for now
   }
 
-  static public void SaveTo(EditorContainer container)
+  static public void saveTo(EditorContainer container)
   {
     File file;
 
@@ -219,7 +240,7 @@ public class PatcherSaveManager
       }
   }
   
-  static public boolean SaveClosing(EditorContainer container, boolean doCancel)
+  static public boolean saveClosing(EditorContainer container, boolean doCancel)
   {
     ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
 
@@ -238,14 +259,10 @@ public class PatcherSaveManager
 	  toClose = false;
 	
 	if (aDialog.getToSaveFlag())
-	  toClose = Save(container);
+	  toClose = save(container);
 
 	aDialog.dispose();
       }
     return toClose;
   }
 }
-
-
-
-

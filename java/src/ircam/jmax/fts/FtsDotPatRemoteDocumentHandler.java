@@ -40,11 +40,23 @@ import javax.swing.*;
 
 public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
 {
+  private static FtsDotPatRemoteDocumentHandler firstInstance = null;
+
   private ImageIcon patDocumentIcon;
 
   public FtsDotPatRemoteDocumentHandler()
   {
     patDocumentIcon = Icons.get("_max_patcher_file_");
+
+    if (firstInstance == null)
+      firstInstance = this;
+    else
+      System.err.println( "Someone did a second instance of this class: " + getClass() + ". That's wrong !");
+  }
+
+  public static FtsDotPatRemoteDocumentHandler getInstance()
+  {
+    return firstInstance;
   }
 
   public boolean canLoadFrom(File file)
@@ -120,7 +132,8 @@ public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
 
   public void saveDocument(MaxDocument document, File file) throws MaxDocumentException
   {
-    throw new MaxDocumentException("Cannot save in .pat file format");
+    System.err.println( this + " is trying to save document: " + document + " in file: " + file);
+    System.err.println( "Not yet ... sorry");
   }
 
   // Overwrite upper class method; we can save to a .pat file (or at least we try to...)

@@ -41,6 +41,6 @@ public class SaveAction extends EditorAction
 {
   public void doAction(EditorContainer container)
   {
-    PatcherSaveManager.Save(container);
+    PatcherSaveManager.save(container);
   }
 }

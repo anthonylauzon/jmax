@@ -49,11 +49,13 @@ import ircam.jmax.utils.*;
 public class MaxFileChooser
 {
   private static JFileChooser fd;
+  private static JComboBox formatComboBox;
 
   private static boolean configured = false;
 
   public static final int SAVE_JMAX_TYPE = 0;
   public static final int SAVE_PAT_TYPE = 1;
+
   private static int saveType = SAVE_JMAX_TYPE;
 
   static void makeFileChooser()
@@ -99,6 +101,77 @@ public class MaxFileChooser
 	  {
 	  }
       }
+
+    if (!configured)
+      configure();
+
+    if (getSaveType() == MaxFileChooser.SAVE_JMAX_TYPE)
+      formatComboBox.setSelectedIndex( 0);
+    else
+      formatComboBox.setSelectedIndex( 1);
+  }
+
+  interface ComponentMatcher {
+    public boolean match( Component c);
+  }
+
+  private static Component findInChilds( Component c, ComponentMatcher m)
+  {
+    if ( m.match( c))
+      return c;
+
+    if ( c instanceof Container)
+      {
+	for( int i = 0; i < ((Container)c).getComponentCount(); i++)
+	  {
+	    Component child = ((Container)c).getComponent( i);
+
+	    Component r = findInChilds( child, m);
+
+	    if ( r != null)
+	      return r;
+	  }
+      }
+
+    return null;
+  }
+
+  private static void nickNackFileDialog()
+  {
+    ComponentMatcher labelMatcher = new ComponentMatcher() {
+	public boolean match( Component c)
+	{
+	  return c instanceof JLabel && ((JLabel)c).getText().equals( "Files of type:");
+	}
+      };
+
+    JLabel label = (JLabel)findInChilds( fd, labelMatcher);
+
+    label.setText( "Format:");
+
+    formatComboBox = (JComboBox)label.getLabelFor();
+
+    formatComboBox.setModel( new DefaultComboBoxModel() );
+
+    formatComboBox.addItem( new FileFilter() {
+	public boolean accept( File f) { return true; }
+	public String getDescription() { return ".jmax"; }
+      });
+
+    formatComboBox.addItem( new FileFilter() {
+	public boolean accept( File f) { return true; }
+	public String getDescription() { return ".pat"; }
+      });
+
+    formatComboBox.addActionListener( new ActionListener() {
+	public void actionPerformed( ActionEvent e)
+	{
+	  if ( ((JComboBox)e.getSource()).getSelectedIndex() == 0)
+	    setSaveType( SAVE_JMAX_TYPE);
+	  else
+	    setSaveType( SAVE_PAT_TYPE);
+	}
+      } );
   }
 
   /* Added the full class name to FileFilter because of clash with java.io.FileFilter in JDK 1.2 */
@@ -117,6 +190,8 @@ public class MaxFileChooser
 	fd.setFileView(Mda.getFileView());
       }
 
+    nickNackFileDialog();
+    
     configured = true;
   }
 
