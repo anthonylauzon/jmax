@@ -807,7 +807,7 @@ __fts_package_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       result = fts_package_require(pkg, fts_get_symbol(&at[i]));
       if (result != 0)
       {
-	post("[package] error with package %s\n", fts_get_symbol(&at[i]));
+	fts_post("[package] error with package %s\n", fts_get_symbol(&at[i]));
 	if (fts_object_has_id(o))
 	{
 	  fts_atom_t a[1];

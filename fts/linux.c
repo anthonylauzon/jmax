@@ -645,7 +645,7 @@ void* thread_manager_main(void* arg)
 	      success = pthread_detach(worker->id);
 	      if (0 != success)
 		{
-		  post("[thread manager] cannot detach thread %d \n", worker->id);
+		  fts_post("[thread manager] cannot detach thread %d \n", worker->id);
 		}
 	      work_done++;
 
@@ -667,9 +667,9 @@ void* thread_manager_main(void* arg)
 	    {
 	      if (ESRCH == success)
 		{
-		  post("[thread manager] no such thread \n");
+		  fts_post("[thread manager] no such thread \n");
 		}
-	      post("[thread manager] error while cancelling thread \n");
+	      fts_post("[thread manager] error while cancelling thread \n");
 	    }
 	  work_done++;
 	}
@@ -681,7 +681,7 @@ void* thread_manager_main(void* arg)
 	  time_req.tv_sec = 0;
 	  time_req.tv_nsec = delay_ms * 1000 * 1000;
 	    
-	  /* post("[thread_manager] thread is running \n"); */
+	  /* fts_post("[thread_manager] thread is running \n"); */
 	  nanosleep(&time_req, &time_rem);
 	}
     }
