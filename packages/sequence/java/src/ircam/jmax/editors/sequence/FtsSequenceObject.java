@@ -52,13 +52,13 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
    */
   public FtsSequenceObject(Fts fts, FtsObject parent, String description, int objId)
   {
-    super(fts, parent, "sequence", null, description, objId);
+    super(fts, parent, objId, null, "sequence");
       
     listeners = new MaxVector();
   }
 
   Sequence sequence = null;
-  public void openEditor(FtsAtom[] args)
+  public void openEditor()
   {
     if(sequence==null)
       sequence = new Sequence(this);

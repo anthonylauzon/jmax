@@ -125,6 +125,8 @@ abstract public class GraphicObject implements DisplayObject
   static final int ERROR_MESSAGE_DISPLAY_PAD = ObjectGeometry.INOUTLET_PAD + ObjectGeometry.INOUTLET_WIDTH + 1;
   private static Font errorFont = new Font(ircam.jmax.utils.Platform.FONT_NAME, Font.BOLD, ircam.jmax.utils.Platform.FONT_SIZE);
 
+  
+
   final public static void setFollowingInOutletLocations(boolean v)
   {
     followingInOutletLocations = v;
@@ -199,6 +201,14 @@ abstract public class GraphicObject implements DisplayObject
     String fontName;
     int fontSize;
 
+    if(assistArgs == null)
+      {
+	assistArgs = new FtsAtom[2];
+	
+	for(int i = 0; i < assistArgs.length; i++)
+	  assistArgs[i] = new FtsAtom();
+      }
+    
     itsSketchPad = theSketchPad;
     ftsObject = theFtsObject;
 
@@ -1055,7 +1065,7 @@ abstract public class GraphicObject implements DisplayObject
   // Assist code
   // Protected against repetitions of assist messages
 
-  static MaxVector assistArgs = new MaxVector();
+  private static FtsAtom assistArgs[] = null;
 
   static FtsObject lastAssistedObject;
   static int lastPosition;
@@ -1065,7 +1075,6 @@ abstract public class GraphicObject implements DisplayObject
   static final int ASSIST_OUTLET = 3;
 
   static int lastAssistOperation = 0;
-
 
   public boolean canDoAssist(int operation, int n)
   {
@@ -1091,10 +1100,8 @@ abstract public class GraphicObject implements DisplayObject
   {
     if (canDoAssist(ASSIST_OBJECT, 0))
       {
-	assistArgs.removeAllElements();
-
-	assistArgs.addElement("object");
-	ftsObject.sendMessage(-1, "assist", assistArgs);
+	assistArgs[0].stringValue = "object";
+	ftsObject.sendMessage(-1, "assist", 1, assistArgs);
       }
   }
 
@@ -1102,11 +1109,9 @@ abstract public class GraphicObject implements DisplayObject
   {
     if (canDoAssist(ASSIST_INLET, n))
       {
-	assistArgs.removeAllElements();
-
-	assistArgs.addElement("inlet");
-	assistArgs.addElement(new Integer(n));
-	ftsObject.sendMessage(-1, "assist", assistArgs);
+	assistArgs[0].setString("inlet");
+	assistArgs[1].setInt(n);
+	ftsObject.sendMessage(-1, "assist", 2, assistArgs);
       }
   }
 
@@ -1114,11 +1119,9 @@ abstract public class GraphicObject implements DisplayObject
   {
     if (canDoAssist(ASSIST_OUTLET, n))
       {
-	assistArgs.removeAllElements();
-
-	assistArgs.addElement("outlet");
-	assistArgs.addElement(new Integer(n));
-	ftsObject.sendMessage(-1, "assist", assistArgs);
+	assistArgs[0].setString("outlet");
+	assistArgs[1].setInt(n);
+	ftsObject.sendMessage(-1, "assist", 2, assistArgs);
       }
   }
 

@@ -840,7 +840,7 @@ public class FtsObject
   }
 
   /**
-   * Send a message to an object on the server.
+   * send a message to an object on the server
    * used for objects created 
    *
    * @param inlet the inlet
@@ -852,6 +852,19 @@ public class FtsObject
   public final void sendMessage(int inlet, String selector, int nArgs, FtsAtom args[])
   {
     fts.getServer().sendObjectMessage(this, inlet, selector, nArgs, args);
+  }
+
+  /**
+   * send a message without arguments to an object on the server
+   * used for objects created 
+   *
+   * @param inlet the inlet
+   * @param selector the message selector
+   */
+
+  public final void sendMessage(int inlet, String selector)
+  {
+    fts.getServer().sendObjectMessage(this, inlet, selector, 0, null);
   }
 
   /*****************************************************************************/
@@ -899,17 +912,29 @@ public class FtsObject
 
 	try
 	  {
-	    Class parameterTypes[] = new Class[2];
-	    parameterTypes[0] = java.lang.Integer.TYPE;
-	    parameterTypes[1] = FtsAtom[].class;
-	    	    
-	    Method method = getClass().getMethod( selector, parameterTypes);
+	    FtsAtom args[] = stream.getArgs();
+	    int nArgs = stream.getNumberOfArgs();
 
-	    Object[] methodArgs = new Object[2];
-	    methodArgs[1] = stream.getArgs();
-	    methodArgs[0] = new Integer(stream.getNumberOfArgs());
+	    if(nArgs > 0)
+	      {
+		Class parameterTypes[] = new Class[2];
+		parameterTypes[0] = java.lang.Integer.TYPE;
+		parameterTypes[1] = FtsAtom[].class;
 
-	    method.invoke( this, methodArgs);
+		Method method = getClass().getMethod( selector, parameterTypes);
+
+		Object[] methodArgs = new Object[2];
+		methodArgs[1] = args;
+		methodArgs[0] = new Integer(nArgs);
+
+		method.invoke( this, methodArgs);
+	      }
+	    else
+	      {
+		Method method = getClass().getMethod(selector, null);
+		
+		method.invoke(this, null);
+	      }
 	  }
 	catch ( IllegalAccessException exc)
 	  {

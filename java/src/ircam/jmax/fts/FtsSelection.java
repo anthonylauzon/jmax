@@ -119,7 +119,7 @@ public class FtsSelection  extends FtsObject
 
   final public void clean()
   {
-    sendMessage(-1, "clear", null);
+    sendMessage(-1, "clear");
 
     objects.removeAllElements();
     connections.removeAllElements();

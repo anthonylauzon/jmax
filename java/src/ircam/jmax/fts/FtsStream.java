@@ -686,7 +686,6 @@ abstract public class FtsStream
       }
   }
 
-
   private FtsAtom args[] = null;
   private int argsCount = 0;
 
