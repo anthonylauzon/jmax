@@ -150,11 +150,10 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 
     private void sendSetMessage(String type, int nArgs, Object args[])
     {
-	sendArgs[0].setString(type);
 	for(int i=0; i<nArgs; i++)
-	    sendArgs[1+i].setValue(args[i]);
+	    sendArgs[i].setValue(args[i]);
 	
-	sendMessage(FtsObject.systemInlet, "set", 1+nArgs, sendArgs);
+	sendMessage(FtsObject.systemInlet, "set", nArgs, sendArgs);
     }
 
     /**
