@@ -46,15 +46,16 @@ public class MatDisplay extends GraphicObject implements FtsDisplayListener
   static final int DEFAULT_WIDTH = 130;
   static final int DEFAULT_HEIGHT = 130;
 
-  private static final Color displayOrange = new Color((float)0.98, (float)0.73, (float)0.32);
+  private static final Color defaultMinColor = new Color(227, 255, 227);
+  private static final Color defaultMaxColor = Color.black;
 
   int width = 130;
   int height = 130;
   MemoryImageSource source;
   Image image;
   IndexColorModel icm;
-  Color minColor;
-  Color maxColor;
+  Color minColor = defaultMinColor;
+  Color maxColor = defaultMaxColor;
   int imageWidth;
 
   public static MatDispControlPanel controlPanel = new MatDispControlPanel();
@@ -191,15 +192,10 @@ public class MatDisplay extends GraphicObject implements FtsDisplayListener
 
   public Color getBackgroundColor()
   {
-    if(minColor != null)
-      {
-	if (isSelected())
-	  return minColor.darker();
-	else
-	  return minColor;
-      }
+    if (isSelected())
+      return minColor.darker();
     else
-      return Color.orange;
+      return minColor;
   }
 
   public void drawMatrix(Graphics g, int x, int y)

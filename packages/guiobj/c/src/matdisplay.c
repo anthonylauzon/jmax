@@ -506,7 +506,7 @@ matdisplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   this->n_size = 1; 
   this->m_wind = 1;
   this->n_wind = 1;
-  this->min_color = 0xFFFFE987; /* orange */
+  this->min_color = 0x00e3ffe3;
   this->max_color = 0;
   this->m_zoom = 1;
   this->n_zoom = 1;
