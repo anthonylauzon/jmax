@@ -1,0 +1,40 @@
+Command-line options for the various parts of the jMax chain :
+
+Options for the startup script
+==============================
+
+-nofork							Do not launch in the background.
+-root <dir> | -r <dir>			Specify root directory (where to find jmax.jar).
+-javaopt <option>				Pass option directly to the JVM.
+-verbose						Display command-line before executing it.
+-help							Display help screen.
+
+ + additional java-client options (see below).
+
+
+Options for the Java client
+===========================
+
+-jmaxSplashScreen hide			Do not show splash-screen.
+-jmaxRoot <dir>					Where to find pictures (and others?).
+-jmaxNoConsole {true|false}		If 'true', redirect output to stderr instead of console.
+-jmaxConnection {pipe|socket}	How to communicate with FTS (default is pipe).
+-jmaxHost <hostname>			Server on which FTS runs.
+-jmaxPort <portnumber>			FTS' listen port.
+-jmaxServerDir <dir>			Directory where FTS lives.
+-jmaxServerName <name>			Name of the FTS executable.
+-jmaxProject <file>				Open project file.
+-jmaxConfig <file>				Open config file.
+-attach true					Attach to an existing FTS.
+
+
+Options for FTS
+===============
+
+--root=<dir>					Where to find default project and configuration
+--no-client						?
+--stdio							Use pipe to connect to client. If not present, TCP is used.
+--project=<project-file>		Specify project-file to open
+--config=<config-file>			Specify config-file to open
+--no-watchdog					? Linux only
+--listen-port					?
