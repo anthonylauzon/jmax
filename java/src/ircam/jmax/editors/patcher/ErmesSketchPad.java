@@ -603,6 +603,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
       displayList.reassignLayers();
 
     object.updateInOutlets();
+    ErmesSelection.patcherSelection.select( object);
     object.redraw();
 	
     if (doEdit && newObjectEdit && (object instanceof Editable))
