@@ -1,4 +1,4 @@
-bin_PROGRAMS=jmax2xml
+noinst_PROGRAMS=jmax2xml
 jmax2xml_SOURCES=jmax2xml.c
 
 INCLUDES=-I$(top_srcdir)/include
