@@ -266,10 +266,14 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
    * making the needed cordinate conversions (zooming).
    */
     public int getLenght(Event e) 
-  {
-    return (int) (super.getLenght(e)*geometry.getXZoom());
-  }
+    {
+	return (int) (super.getLenght(e)*geometry.getXZoom());
+    }
 
+    public int getInvLenght(Event e) 
+    {
+	return (int) (super.getLenght(e));
+    }
 
   /**
    * set the duration of the event associated with the graphic lenght l.

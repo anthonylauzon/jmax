@@ -31,6 +31,7 @@ import ircam.jmax.toolkit.*;
 import java.awt.*;
 import java.util.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * an interaction module used to resize a selection of sequence objects.
@@ -44,24 +45,98 @@ public class SequenceSelectionResizer extends SelectionResizer {
   public SequenceSelectionResizer(DragListener theListener) 
   {
     super(theListener);
-    
+
+    initAutoScroll();
   }
   
-  /**
-   * overrides SelectionResizer.mouseDragged()
-   */
-  public void mouseDragged(MouseEvent e) 
-  {
-    SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+   /******************* autoscrolling *******************/
 
-    int deltaY = egc.getAdapter().getInvY(e.getY()) - egc.getAdapter().getInvY(itsStartingPoint.y);
+    Timer scrollTimer;
+    SequenceScrollDragAction scroller;
+
+    private void initAutoScroll()
+    {
+	scroller    = new SequenceScrollDragAction();
+	scrollTimer = new Timer(8, scroller);
+	scrollTimer.setCoalesce(true);
+	scrollTimer.setRepeats(true);
+    }
+
+    class SequenceScrollDragAction implements ActionListener
+    {
+	SequencePanel sequencePanel;
+	int x, y, delta;
+	public void actionPerformed(ActionEvent ae)
+	{
+	    delta = sequencePanel.scrollBy(x, y);
+	    updateStart(-delta, 0);
+	    getListener().updateStartingPoint(-delta, 0);
+	    
+	    PartitionAdapter pa = ((PartitionAdapter)getGc().getAdapter());
+	    getGc().getStatusBar().post(getGc().getToolManager().getCurrentTool(), 
+					pa.LenghtMapper.getName()+" "+pa.getInvX(x));
+	}
+	void setEditor(SequencePanel editor)
+	{
+	    this.sequencePanel = editor;
+	}
+	void setXY(int x, int y)
+	{
+	    this.x = x;
+	    this.y = y;
+	}
+    }
+
+    void autoScrollIfNeeded(int x, int y)
+    {
+	SequencePanel panel = (SequencePanel)((Sequence)gc.getFrame()).getEditor();
+	if (! panel.pointIsVisible(x , y))
+	{
+	    scroller.setXY(x, y);
+	    if (!scrollTimer.isRunning())
+		{
+		    scroller.setEditor(panel);
+		    scrollTimer.start();
+		}
+	}
+	else 
+	    {
+		if (scrollTimer.isRunning())
+		    {
+			scrollTimer.stop();
+		    }
+	    }
+    }
+
+    public void mouseReleased(MouseEvent e)
+    {
+	if (scrollTimer.isRunning())
+	    scrollTimer.stop();
+	super.mouseReleased(e);
+    }
+
+    public void mouseDragged(MouseEvent e) 
+    { 
+	autoScrollIfNeeded(e.getX(), e.getY());
+	if(!scrollTimer.isRunning())
+	    super.mouseDragged(e);
+    }
+
+    void updateStart(int deltaX, int deltaY)
+    {
+	itsStartingPoint.x+=deltaX;
+	itsXORHandler.updateBegin(deltaX, deltaY);
+    }
     
-    egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), " dy "+deltaY);
-
-    super.mouseDragged(e);
-  }
-
-
+    DragListener getListener()
+    {
+	return itsListener;
+    }
+    
+    SequenceGraphicContext getGc()
+    {
+	return (SequenceGraphicContext)gc;
+    } 
 
   /**
    * from the XORPainter interface. The actual drawing function.
@@ -73,12 +148,19 @@ public class SequenceSelectionResizer extends SelectionResizer {
 
     Graphics g = gc.getGraphicDestination().getGraphics();
     SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+    PartitionAdapter a = (PartitionAdapter)egc.getAdapter();
 
-    g.setColor(Color.darkGray);
+    Rectangle tempr, clip; 
+    tempr = (Rectangle) g.getClip();
+    clip = ((SequenceGraphicContext)gc).getTrackClip();
+
+    g.clipRect(clip.x, clip.y, clip.width, clip.height);
+
+    g.setColor(Color.gray);
     g.setXORMode(Color.white); //there's an assumption here on the color of the background.
     
-    Adapter a = egc.getAdapter();
-    
+    TrackEvent last = egc.getSelection().getLastSelectedEvent();
+
     TrackEvent aTrackEvent;
     for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
       {
@@ -88,10 +170,16 @@ public class SequenceSelectionResizer extends SelectionResizer {
 
 	a.setLenght(tempEvent, a.getLenght(aTrackEvent)+dx);
 	aTrackEvent.getRenderer().render(tempEvent, g, false, egc);
+	
+	if(aTrackEvent == last) 
+	    egc.getStatusBar().post(egc.getToolManager().getCurrentTool(),
+				    a.LenghtMapper.getName()+" "+a.getInvLenght(tempEvent));
       }
 	 
     g.setPaintMode();
     g.setColor(Color.black);
+
+    g.setClip(tempr);//????
     g.dispose();
   }
 
@@ -99,3 +187,10 @@ public class SequenceSelectionResizer extends SelectionResizer {
 
   UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue());
 }
+
+
+
+
+
+
+

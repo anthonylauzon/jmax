@@ -101,8 +101,8 @@ abstract public class SelectionResizer extends InteractionModule implements XORP
 
 
   //---- Fields
-  DragListener itsListener;
-  XORHandler itsXORHandler;  
+  protected DragListener itsListener;
+  protected XORHandler itsXORHandler;  
   protected int previousX;
   protected int previousY;
 

@@ -76,11 +76,8 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	    updateStart(-delta, 0);
 	    getListener().updateStartingPoint(-delta, 0);
 
-	    if ((getMovements() & HORIZONTAL_MOVEMENT) != 0)
-		{
-		    double time = ((PartitionAdapter)getGc().getAdapter()).getInvX(x);
-		    getGc().getStatusBar().post(getGc().getToolManager().getCurrentTool(), " time "+time);
-		}
+	    PartitionAdapter pa = ((PartitionAdapter)getGc().getAdapter());
+	    getGc().getStatusBar().post(getGc().getToolManager().getCurrentTool(), " time "+pa.getInvX(x));
 	}
 	void setEditor(SequencePanel editor)
 	{
@@ -251,7 +248,7 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	    a.setLenght(tempEvent, a.getLenght(movTrackEvent));
 	    a.setHeigth(tempEvent, a.getHeigth(movTrackEvent));
 	    if ((itsMovements & HORIZONTAL_MOVEMENT) != 0) 
-		a.setX(tempEvent, a.getX(movTrackEvent) + dx /*+ scroller.getCount()*/);
+		a.setX(tempEvent, a.getX(movTrackEvent) + dx);
 	    
 	    if ((itsMovements & VERTICAL_MOVEMENT) != 0) 
 	      a.setY(tempEvent, a.getY(movTrackEvent)+dy);
@@ -269,7 +266,7 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 		    if ((itsMovements & HORIZONTAL_MOVEMENT) != 0)
 			((SequenceGraphicContext)gc).getStatusBar().
 			    post(((SequenceGraphicContext)gc).
-				 getToolManager().getCurrentTool(), " time "+tempEvent.getTime());
+				 getToolManager().getCurrentTool(), a.XMapper.getName()+" "+tempEvent.getTime());
 		    if ((itsMovements & VERTICAL_MOVEMENT) != 0)
 			((SequenceGraphicContext)gc).getStatusBar().
 			    post(((SequenceGraphicContext)gc).
