@@ -376,7 +376,8 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
       GetDocument().Save();
     }
     else if (theString.equals("Close Ctrl+W")) {
-      MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);//w
+      // MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);//w
+      Close();
     }
     else if (theString.equals("Print... Ctrl+P")) {
       //MaxApplication.ObeyCommand(MaxApplication.PRINT_WINDOW);
@@ -406,25 +407,11 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
       if(aDialog.GetNothingToDoFlag()) return false;
       if(aDialog.GetToSaveFlag()){
 	GetDocument().Save();
-	//if(itsProject.HaveAEntry(GetDocument().GetTitle())){
-	//if(GetDocument().GetNeverSavedFlag()) itsProject.RemoveFromProject(GetDocument());
-	//else itsProject.ResetEntry(GetDocument());
-	//}
       }
-      //else{
-      //if(itsProject.HaveAEntry(GetDocument().GetTitle())) {
-      //  if(GetDocument().GetNeverSavedFlag()) itsProject.RemoveFromProject(GetDocument());
-      //  else itsProject.ResetEntry(GetDocument());
-      //  }
-      //}
       aDialog.dispose();
     }
-    //else{ 
-    //if(itsProject.HaveAEntry(GetDocument().GetTitle()))
-    //itsProject.ResetEntry(GetDocument());
-    //}
-    //itsProject.ResetMenus(this);
-    //itsProject.RemoveFromFrameList(this);
+    MaxApplication.RemoveThisWindowFromMenus(this);
+    MaxApplication.itsEditorsFrameList.removeElement(this);
     setVisible(false);
     dispose();
     return true;
@@ -519,7 +506,8 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
    ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////WindowListener --inizio  
   public void windowClosing(WindowEvent e){
-     MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);
+    //MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);
+    Close();
   }
   public void windowOpened(WindowEvent e){}
   public void windowClosed(WindowEvent e){}
@@ -664,7 +652,8 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
       else if(aInt == 80) MaxApplication.ObeyCommand(MaxApplication.PRINT_WINDOW);//p
       else if(aInt == 81) MaxApplication.Quit(); //q
       else if(aInt == 83) GetDocument().Save();//s
-      else if(aInt == 87) MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);//w
+      else if(aInt == 87) Close();//w 
+      //MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);//w
     }
   }
   ////////////////////////////////////////////////////////////////////////////

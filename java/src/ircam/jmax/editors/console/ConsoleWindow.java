@@ -51,6 +51,11 @@ public class ConsoleWindow extends MaxEditor {
     GetClearMenu().setEnabled(false);
   }
 
+  //redefini parce-que la console ne doit pas se fermer sans quitter
+  public boolean Close(){
+    return false;
+  }
+
   public boolean CustomMenuActionPerformed(MenuItem theMenuItem, String theString){
     return true;
   }

@@ -62,10 +62,7 @@ public class ErmesSketchWindow extends JFrame implements MaxWindow, KeyListener,
   //START of the transformation of SketchWindow in a MaxEditor //
   //********************************************************** //
 
-  public abstract boolean CustomMenuActionPerformed(MenuItem theMenuItem, String theString);
-  public abstract boolean CustomMenuItemStateChanged(CheckboxMenuItem theMenuItem, String theString);
-  public abstract MaxDocument GetDocument();
-  public abstract void SetupMenu();
+
   //**********************************************************//
   // END of the transormation                                 //
   //**********************************************************//
@@ -642,8 +639,9 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 	  itsTopWindow.RemoveFromSubWindowList(this);
 	}
 	else {
-	  MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);
-	  dispose();
+	  //MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);
+	  Close();
+	  //dispose();
 	}
       }       
       else if(aInt == 69){//e
@@ -790,7 +788,8 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 	itsTopWindow.RemoveFromSubWindowList(this);
       }
       else {
-	MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);
+	//MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);
+	Close();
 	//dispose();
       }
     }
@@ -836,6 +835,8 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     itsDocument.itsPatcher.delete();
     itsDocument.DelWindow();
     itsClosing = false;
+    setVisible(false);
+    dispose();
     return true;
   }
 
@@ -1032,8 +1033,10 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       if (isSubPatcher) {
 	setVisible(false);
       }
-      else {MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);
-      dispose();
+      else {
+	//MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);
+	Close();
+	//dispose();
       }
     }
   }

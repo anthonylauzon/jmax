@@ -70,7 +70,7 @@ public class MaxApplication extends Object {
   public final static int NEW_ABSTRACTION_COMMAND = 1;
   public final static int SNAP_TO_GRID = 5;
   public final static int NEW_PROJECT = 6;
-  public final static int CLOSE_WINDOW = 7;
+  //public final static int CLOSE_WINDOW = 7;
   public final static int OPEN_COMMAND = 9;
   public final static int SAVE_COMMAND = 10;
   public final static int SAVEAS_COMMAND = 11;
@@ -505,22 +505,6 @@ public class MaxApplication extends Object {
 	aSketchWindow.SetSnapToGrid();
       }
       break;
-
-    case CLOSE_WINDOW:
-      if(itsWindow!=null) {
-	if(itsWindow.Close()) {
-	  itsWindow.GetFrame().setVisible(false);
-	  itsWindow.GetFrame().dispose();
-	}
-      }
-      if(itsSketchWindowList.isEmpty()){
-	itsSketchWindow = null;
-	if(itsEditorsFrameList.isEmpty()){
-	  itsWindow = null;	
-	  //#itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(false);
-	}
-      } 
-      break;
     case PRINT_WINDOW: 
       PrintJob aPrintJob = Toolkit.getDefaultToolkit().getPrintJob(itsSketchWindow, "print1", null);
       Graphics aPrintGraphics = aPrintJob.getGraphics();
@@ -529,11 +513,11 @@ public class MaxApplication extends Object {
       aPrintGraphics.dispose();
       aPrintJob.end();
       break;
-    case ADD_WINDOW:
+      //case ADD_WINDOW:
       //#itsProjectWindow.itsProject.AddToProject((ErmesPatcherDoc)itsSketchWindow.GetDocument(), itsSketchWindow);
-      UpdateProjectMenu();
-      break;
-    case REMOVE_FILES:
+      //UpdateProjectMenu();
+      //break;
+      //case REMOVE_FILES:
       //#itsProjectWindow.itsProject.RemoveFromProject();
       /*if(itsProjectWindow.itsProject.GetItems().size()==0){
 	itsProjectWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
@@ -543,7 +527,7 @@ public class MaxApplication extends Object {
 	}
 	}
       */
-      break;
+      //break;
     }	
   }
   
