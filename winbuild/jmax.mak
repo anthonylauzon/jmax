@@ -86,7 +86,7 @@ jmax:
 	-@cd ..\..\..\..\..
 
 	cd src\ircam\jmax\script\tcl
-	$(JAVAC) -classpath ..\..\..\..\..\classes;..\..\..\..\..\src;..\..\..\..\..\jacl.jar;..\..\..\..\..\tcljava.jar -d ..\..\..\..\..\classes *.java
+	$(JAVAC) -classpath ..\..\..\..\..\classes;..\..\..\..\..\src;..\..\..\..\..\lib\jacl\jacl.jar;..\..\..\..\..\lib\jacl\tcljava.jar -d ..\..\..\..\..\classes *.java
 	-@cd ..\..\..\..\..
 
 	cd src\ircam\jmax\script\scm
