@@ -77,18 +77,6 @@
 			settings = {
 			};
 		};
-		F53B0612035D7E5901664090 = {
-			isa = PBXFileReference;
-			name = ObjectInspector.java;
-			path = ../../java/src/ircam/jmax/editors/patcher/objects/ObjectInspector.java;
-			refType = 2;
-		};
-		F53B0613035D7E5901664090 = {
-			fileRef = F53B0612035D7E5901664090;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F53B0614035D7EDF01664090 = {
 			isa = PBXFileReference;
 			name = ToggleControlPanel.java;
@@ -97,6 +85,18 @@
 		};
 		F53B0615035D7EDF01664090 = {
 			fileRef = F53B0614035D7EDF01664090;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53B0617035D9B1501664090 = {
+			isa = PBXFileReference;
+			name = ObjectInspector.java;
+			path = ../../java/src/ircam/jmax/editors/patcher/objects/ObjectInspector.java;
+			refType = 2;
+		};
+		F53B0618035D9B1501664090 = {
+			fileRef = F53B0617035D9B1501664090;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -12594,7 +12594,6 @@
 				F88000000283043C01664092,
 				F880FCF90282F8A501664092,
 				F880FCF00282F80D01664092,
-				F53B0612035D7E5901664090,
 			);
 			isa = PBXGroup;
 			refType = 4;
@@ -14187,6 +14186,7 @@
 				F880FE300283013E01664092,
 				F880FE310283013E01664092,
 				F59FA8FC0353512801664092,
+				F53B0617035D9B1501664090,
 			);
 			isa = PBXGroup;
 			name = objects;
@@ -15642,7 +15642,7 @@
 				F8B73FC702C0DF1A01664092,
 				F59FA8FB035350B401664092,
 				F59FA8FD0353512801664092,
-				F53B0613035D7E5901664090,
+				F53B0618035D9B1501664090,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
