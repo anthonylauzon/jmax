@@ -138,8 +138,8 @@ serial_set_speed(serial_t *this, fts_symbol_t sym)
     speed = B57600;
   else if(sym == sym_b115200)
     speed = B115200;
+#ifndef SGI
   /* This is not defined on SGI */
-#ifdef B230400
   else if(sym == sym_b230400)
     speed = B230400;
 #endif
@@ -169,8 +169,11 @@ serial_set_flag(serial_t *this, fts_symbol_t sym)
     this->termios.c_cflag |= (PARENB | PARODD);
   else if(sym == sym_even)
     this->termios.c_cflag |= PARENB;
-  /* This is not defined on SGI */
-#ifdef CRTSCTS
+#ifdef SGI
+  /* This different on SGI */
+  else if(sym == sym_rtscts)
+    this->termios.c_cflag |= CNEW_RTSCTS;
+#else
   else if(sym == sym_rtscts)
     this->termios.c_cflag |= CRTSCTS;
 #endif
