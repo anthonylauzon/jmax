@@ -163,7 +163,6 @@ ASIOTime *bufferSwitchTimeInfo(ASIOTime *timeInfo, long index, ASIOBool processN
 {	
   long frames_per_buffer = current_port->asio_buffer_size;
   long samples_per_tick = fts_dsp_get_tick_size();
-  int i;
   long tmp;
   
   // number of frames available into the asio input buffer
@@ -437,7 +436,6 @@ asio_audioport_create_buffers(asio_audioport_t* port)
     }
 
     int dsp_tick_size = fts_dsp_get_tick_size();
-    int j;
 
     for (i = 0; i < port->inputChannels; ++i)
     {
