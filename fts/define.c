@@ -148,7 +148,9 @@ define_evaluate(define_t *self)
   if(error == fts_ok)
   {
     fts_patcher_t *patcher = self->patcher;
-    error = fts_expression_reduce(self->expression, patcher, 0, NULL, define_expression_callback, self);
+    fts_patcher_t *scope   = fts_patcher_get_scope(patcher);
+
+    error = fts_expression_reduce(self->expression, scope, 0, NULL, define_expression_callback, self);
 
     if(error == fts_ok)
     {

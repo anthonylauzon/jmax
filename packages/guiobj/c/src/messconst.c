@@ -69,12 +69,17 @@ messconst_expression_callback( int ac, const fts_atom_t *at, void *data)
 static int
 messconst_eval(messconst_t *this)
 {
-  fts_patcher_t *patcher = fts_object_get_patcher((fts_object_t *)this);
+  fts_patcher_t *patcher = fts_object_get_patcher((fts_object_t *) this);
   int n_inlets = fts_array_get_size(&this->inlets);
   fts_atom_t *values = fts_array_get_atoms(&this->inlets);
   fts_status_t status;
-
-  status = fts_expression_reduce(this->expression, patcher, n_inlets, values, messconst_expression_callback, (void *)this);
+  fts_patcher_t *scope = fts_patcher_get_scope(patcher);
+/*
+  fts_post("messconst_eval: this %p  context %p  patcher %p '%s'\n  scope %p\n", 
+	   this, this->o.context, patcher, fts_symbol_name(patcher->file_name),
+	   scope);
+*/
+  status = fts_expression_reduce(this->expression, scope, n_inlets, values, messconst_expression_callback, (void *)this);
 
   if (status != fts_ok)
   {
