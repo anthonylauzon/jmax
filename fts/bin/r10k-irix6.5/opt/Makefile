@@ -24,7 +24,6 @@
 #
 
 install-arch:
-	$(INSTALL_DIR) $(lib_install_dir)/fts/bin/$(ARCH)/opt
-	( cd $(ARCH)/opt ; $(INSTALL_SETUID) fts $(lib_install_dir)/fts/bin/$(ARCH)/opt )
-	if test -f $(ARCH)/opt/Makefile ; then ( cd $(ARCH)/opt ; $(MAKE) $@ ) ; fi
+	$(INSTALL_PROGRAM) fts.on0 $(lib_install_dir)/fts/bin/r10k-irix6.5/opt
+	$(INSTALL_PROGRAM) fts.on1 $(lib_install_dir)/fts/bin/r10k-irix6.5/opt
 .PHONY: install-arch

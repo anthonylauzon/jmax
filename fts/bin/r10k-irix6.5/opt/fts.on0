@@ -1,3 +1,4 @@
+#!/bin/sh
 # 
 # jMax
 # Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
@@ -23,8 +24,5 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-install-arch:
-	$(INSTALL_DIR) $(lib_install_dir)/fts/bin/$(ARCH)/opt
-	( cd $(ARCH)/opt ; $(INSTALL_SETUID) fts $(lib_install_dir)/fts/bin/$(ARCH)/opt )
-	if test -f $(ARCH)/opt/Makefile ; then ( cd $(ARCH)/opt ; $(MAKE) $@ ) ; fi
-.PHONY: install-arch
+DIR=`dirname $0`
+runon 0 ${DIR}/fts $*
