@@ -33,7 +33,7 @@ static void integer_bang( fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   integer_t *this = (integer_t *)o;
   fts_atom_t a;
 
-  fts_set_int( &a, this->n)
+  fts_set_int( &a, this->n);
   fts_outlet_send( o, 0, fts_s_int, 1, &a);
 }
 
@@ -53,7 +53,7 @@ static void integer_float( fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
   this->n = (long)fts_get_float_arg( ac, at, 0, 0);
 
-  fts_set_int( &a, this->n)
+  fts_set_int( &a, this->n);
   fts_outlet_send( o, 0, fts_s_int, 1, &a);
 }
 
