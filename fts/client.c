@@ -47,7 +47,8 @@
 #ifdef WIN32
 #include <windows.h>
 
-int win_close(int socket)
+static int
+win_close(int socket)
 {
   int r;
   char buf[1024];
