@@ -843,6 +843,14 @@ void fts_variable_find_users(fts_patcher_t *scope, fts_symbol_t name, fts_object
     fprintf(stderr, "Binding not found: %s\n", fts_symbol_name(name));
 }
 
+void fts_variable_assign(fts_patcher_t *scope, fts_symbol_t name, fts_atom_t *value)
+{
+  if (! fts_variable_is_suspended(scope, name))
+    fts_variable_define(scope, name, (fts_object_t *)scope);
+
+  fts_variable_restore(scope, name, value, (fts_object_t *)scope);
+}
+
 /* Module init function */
 
 void fts_variables_init(void)

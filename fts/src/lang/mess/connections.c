@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.2 $ IRCAM $Date: 1998/09/03 11:56:02 $
+ *      $Revision: 1.3 $ IRCAM $Date: 1998/10/06 18:34:41 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -210,7 +210,7 @@ static void fts_object_do_disconnect(fts_connection_t *conn, int do_id)
   /* First, release the client representation of the connection,
      if any */
   
-  if (conn->id != FTS_NO_ID)
+  if (do_id && conn->id != FTS_NO_ID)
     fts_client_release_connection(conn);
 
   src = conn->src;
@@ -263,7 +263,7 @@ static void fts_connection_delete_ignore_id(fts_connection_t *conn)
    is kept.
    */
 
-void fts_object_move_connections(fts_object_t *old, fts_object_t *new)
+void fts_object_move_connections(fts_object_t *old, fts_object_t *new, int do_client)
 {
   int inlet, outlet;
   fts_atom_t at[1];
@@ -290,9 +290,9 @@ void fts_object_move_connections(fts_object_t *old, fts_object_t *new)
 	      new_c = fts_connection_new(p->id, new, p->woutlet, p->dst, p->winlet);
 	      fts_connection_delete_ignore_id(p);
 
-	      /* Redefine the connection on the client side */
+	      /* Redefine the connection on the client side if needed*/
 
-	      if (new_c->id != FTS_NO_ID)
+	      if (do_client && (new_c->id != FTS_NO_ID))
 		fts_client_redefine_connection(new_c);
 	    }
 	}
@@ -321,9 +321,9 @@ void fts_object_move_connections(fts_object_t *old, fts_object_t *new)
 	      new_c = fts_connection_new(p->id, p->src, p->woutlet, new, p->winlet);
 	      fts_connection_delete_ignore_id(p);
 
-	      /* Redefine the connection on the client side */
+	      /* Redefine the connection on the client side if needed */
 
-	      if (new_c->id != FTS_NO_ID)
+	      if (do_client && (new_c->id != FTS_NO_ID))
 		fts_client_redefine_connection(new_c);
 	    }
 	}

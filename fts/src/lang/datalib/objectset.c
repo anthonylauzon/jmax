@@ -205,12 +205,6 @@ void fts_object_set_send_message(fts_object_set_t *set, int winlet, fts_symbol_t
 
 /* Iterators */
 
-void 
-fts_object_set_iterator_init( fts_object_set_iterator_t *iter, const fts_object_set_t *set)
-{
-  iter->cell = set->head;
-}
-
 
 fts_object_set_iterator_t *
 fts_object_set_iterator_new(const fts_object_set_t *set)
@@ -220,7 +214,7 @@ fts_object_set_iterator_new(const fts_object_set_t *set)
   iter = (fts_object_set_iterator_t *) fts_heap_alloc(object_set_iterator_heap);
 
   if (iter)
-    fts_object_set_iterator_init( iter, set);
+    iter->cell = set->head;
 
   return iter;
 }
@@ -236,7 +230,7 @@ fts_object_set_iterator_free(fts_object_set_iterator_t *iter)
 void 
 fts_object_set_iterator_next(fts_object_set_iterator_t *iter)
 {
-  if ( fts_object_set_iterator_end( iter) )
+  if (iter->cell == 0)
     return;
 
   iter->cell = iter->cell->next;

@@ -13,4 +13,5 @@ SOURCES = accum.c \
 	  vexp_fun.c \
 	  vexp_if.c \
 	  vexp_util.c \
+ 	  argument.c  \
 	  expr_doctor.c 

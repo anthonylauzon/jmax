@@ -67,6 +67,10 @@ void fts_abstraction_declare(fts_symbol_t name, fts_symbol_t filename)
 
   fts_set_ptr(&a, abs);
   fts_hash_table_insert(&abstraction_table, name, &a);
+
+  /* Try to fix some error object */
+
+  fts_recompute_errors();
 }
 
 
@@ -89,6 +93,10 @@ void fts_abstraction_declare_path(fts_symbol_t path)
     }
 
   search_path_table[search_path_fill++] = path;
+
+  /* Try to fix some error object */
+
+  fts_recompute_errors();
 }
 
 
@@ -279,4 +287,3 @@ fts_object_t *fts_abstraction_new_search(fts_patcher_t *patcher, int ac, const f
   else
     return 0;
 }
-  

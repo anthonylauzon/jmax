@@ -48,8 +48,6 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
     itsRange = itsRangeMax - itsRangeMin;
     itsStep = ( float)itsRange/itsPixelRange;
 
-    value = itsFtsObject.get("maxValue");
-
     if (getWidth() < 20)
       setWidth( 20);
 

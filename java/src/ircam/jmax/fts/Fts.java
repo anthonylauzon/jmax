@@ -175,6 +175,10 @@ public class Fts
     if (data instanceof MaxData)
       Mda.dispose((MaxData) data);
 
+    // Remove the object from the selection if there
+
+    Fts.getSelection().removeObject(oldObject);
+
     // Get parent and ins/outs
 
     parent = oldObject.getParent();
@@ -182,23 +186,22 @@ public class Fts
     oldInlets = oldObject.getNumberOfInlets();
     oldOutlets = oldObject.getNumberOfOutlets();
 
-    // makeFtsObject can throw a connection if the
-    // object do not exists.
+    // Allocate new Ids also for the redefinition.
+    // make things simple, and anyway it is transparent.
 
-    int id;
+    int newId;
 
-    id = oldObject.getObjectId();
+    newId = server.getNewObjectId();
 
-    // Delete locally the old object
+    // The object will be delete locally as an effect of the redefine
+    // FTS will upload the object at the right moment.
 
-    server.redefineObject(oldObject, description);
-    oldObject.release();
-    server.sendDownloadObject(id);
+    server.redefineObject(oldObject, newId, description);
     
     // Wait for FTS to do his work
 
     sync();
-    newObject = server.getObjectByFtsId(id);
+    newObject = server.getObjectByFtsId(newId);
     
     if (newObject != null)
       newObject.setDirty();

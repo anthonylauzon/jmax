@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.41 $ IRCAM $Date: 1998/09/30 17:23:56 $
+ *      $Revision: 1.42 $ IRCAM $Date: 1998/10/06 18:34:42 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -25,6 +25,7 @@ extern void fts_client_release_object(fts_object_t *c);
 
 static void fts_object_move_properties(fts_object_t *old, fts_object_t *new);
 static void fts_object_send_kernel_properties(fts_object_t *obj);
+static void fts_object_do_delete(fts_object_t *obj, int release);
 
 /******************************************************************************/
 /*                                                                            */
@@ -167,8 +168,7 @@ static void fts_object_assign_property(fts_symbol_t name, fts_atom_t *value, voi
  */
 
 
-fts_object_t *
-fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
+fts_object_t *fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 {
   fts_object_t  *obj = 0;
   fts_metaclass_t *mcl;
@@ -438,7 +438,7 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 	  /* ERROR: the object cannot define a variable,
 	     it does not have a "state" property */
 
-	  fts_object_delete(obj);
+	  fts_object_do_delete(obj, 0);
 	  obj = fts_error_object_new(patcher, aoc, aot,
 				     "Object %s cannot define a variable",
 				     fts_symbol_name(fts_get_symbol(aot + 2)));
@@ -525,8 +525,9 @@ fts_object_t *fts_object_recompute(fts_object_t *old)
 {
   fts_object_t *obj;
 
+  fts_client_release_object_data(old);
 
-  obj = fts_object_redefine(old, old->argc, old->argv);
+  obj = fts_object_redefine(old, old->id, old->argc, old->argv);
 
   /* Error property handling; currently it is a little bit
      of an hack beacause we need a explit "zero"  error
@@ -541,11 +542,16 @@ fts_object_t *fts_object_recompute(fts_object_t *old)
 }
 
 
-fts_object_t *fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
+fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const fts_atom_t *at)
 {
-  int id;
+  int do_client;
   fts_symbol_t  var;
   fts_object_t  *new;
+
+  /* If the new and the old id are the same, or if old do not have an id,
+     don't do any update on the client side */
+
+  do_client = ((old->id != FTS_NO_ID) && (old->id != new_id));
 
   /* check for the "var : <obj> syntax" and  extract the variable name if any */
 
@@ -553,8 +559,6 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *a
     var = fts_get_symbol(&at[0]);
   else
     var = 0;
-
-  /* @@@@@ WHAT IF THE OBJECT IS A WANNABE ??? */
 
   /* if the old object define a variable, and the new definition
      do not define  the same variable, delete the variable;
@@ -579,23 +583,21 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *a
   if (fts_object_is_standard_patcher(old))
     return (fts_object_t *) fts_patcher_redefine_description((fts_patcher_t *) old, ac, at); 
 
-  /* get the old id, and remove old from the object table */
+  /* if old id and new id are the same, do the replace without telling the client */
 
-  if (old->id != FTS_NO_ID)
+  if ((old->id != FTS_NO_ID) && (old->id == new_id))
     {
-      id = old->id;
       fts_object_table_remove(old->id);
       old->id = FTS_NO_ID;
-    }
-  else
-    {
-      id = FTS_NO_ID;
     }
 
   /* Make the new object  */
 
   new = fts_object_new(fts_object_get_patcher(old), ac, at);
-  fts_object_set_id(new, id);
+  fts_object_set_id(new, new_id);
+  
+  if (do_client)
+    fts_client_upload_object(new);
 
   /* If new is an error object, assure that there are enough inlets
    and outlets for the connections */
@@ -606,10 +608,10 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *a
       fts_error_object_fit_outlet(new, old->cl->noutlets - 1);
     }
 
-  fts_object_move_connections(old, new);
+  fts_object_move_connections(old, new, do_client);
   fts_object_move_properties(old, new);
 
-  fts_object_delete(old);
+  fts_object_do_delete(old, do_client);
 
   return new;
 }
@@ -658,7 +660,8 @@ void fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *a
 
 /* This is to support "changing" objects; usefull during 
  * .pat loading, where not all the information is available 
- * at the right place; used currently for explode in the fts1.5 package.
+ * at the right place; used currently for explode in the fts1.5 package,
+ * and for patcher redefinition.
  * 
  */
 
@@ -697,6 +700,27 @@ void fts_object_set_description_and_class(fts_object_t *obj, fts_symbol_t class_
 }
 
 
+/* This function delete the object description; it is intended to be used
+   in object doctor that convert the object to something else *including*
+   expressions, so must use fts_object_new for the whole thing,
+   but want to keep the original description, so after creating the object,
+   they reset the description, so that the original one is used.
+   */
+   
+
+void fts_object_reset_description(fts_object_t *obj)
+{
+  int i;
+
+  if (obj->argv)
+    {
+      fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));
+      
+      obj->argv = 0;
+      obj->argc = 0;
+    }
+}
+
 /* 
    Add the id to the object.
    Called when we know the id, usually in messtiles.c
@@ -717,10 +741,10 @@ void fts_object_set_id(fts_object_t *obj, int id)
       fts_object_table_put(id, obj);
     }
 }
-     
 
-void
-fts_object_delete(fts_object_t *obj)
+/* Don't like the function call with a flag !! */
+     
+static void fts_object_do_delete(fts_object_t *obj, int release)
 {
   int outlet, inlet;
 
@@ -775,7 +799,7 @@ fts_object_delete(fts_object_t *obj)
 
   /* Now Tell the client to release the Java part */
 
-  if (obj->id != FTS_NO_ID)
+  if (release && (obj->id != FTS_NO_ID))
     fts_client_release_object(obj);
 
   /* Delete the object from the patcher */
@@ -815,6 +839,12 @@ fts_object_delete(fts_object_t *obj)
     }
 
   fts_block_free((char *)obj, obj->cl->size);
+}
+
+void
+fts_object_delete(fts_object_t *obj)
+{
+  fts_object_do_delete(obj, 1);
 }
 
 /******************************************************************************/

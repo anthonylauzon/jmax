@@ -52,11 +52,6 @@ class ErmesObjIntegerDialog extends Dialog implements ActionListener
 
     //Initialize this dialog 
 
-    Point aPoint = theFrame.getLocation();
-
-    setLocation(aPoint.x + itsIntObject.getItsX(),
-		aPoint.y + itsIntObject.getItsY());
-
     value.setText( theValue);
     itsIntObject = theInt;
     pack();

@@ -39,10 +39,7 @@ class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandl
     //the parent patcher could destroy connections...
     GetSketchWindow().itsPatcher.watch( "deletedConnection", GetSketchWindow());
 
-    //the children could destroy connections AND objects: NO MORE<
-    // changed: FTS do not destroy the patcher content, and never will again
-
-    ( (FtsPatcherObject)itsFtsObject).redefinePatcher( itsArgs);
+    ( (FtsPatcherObject)itsFtsObject).redefinePatcher( text);
     itsText.setText( text);
   }
 	

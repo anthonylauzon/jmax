@@ -113,6 +113,7 @@ class FtsClientProtocol
 
   static final int fts_release_connection_cmd = 'd';
   static final int fts_release_object_cmd = 'l';
+  static final int fts_release_object_data_cmd = 'b';
 
   static final int fts_message_cmd = 'm';
   static final int fts_named_message_cmd = 'q';
@@ -191,6 +192,8 @@ class FtsClientProtocol
 	return "fts_release_connection";
       case 'l':
 	return "fts_release_object";
+      case 'b':
+	return "fts_release_object_data_cmd";
       case 'm':
 	return "fts_message";
       case 'q':

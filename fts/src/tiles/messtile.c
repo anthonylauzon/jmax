@@ -581,7 +581,7 @@ fts_mess_client_redefine_patcher(int ac, const fts_atom_t *av)
 }
 
 /*
-   REDEFINE_OBJECT (obj)object [<args>]*
+   REDEFINE_OBJECT (obj)object (int) new_id [<args>]*
    
    Redefine an object (not a patcher, use in re-editing).
    */
@@ -594,10 +594,11 @@ fts_mess_client_redefine_object(int ac, const fts_atom_t *av)
   if (ac >= 1 && fts_is_object(&av[0]))
     {
       fts_object_t  *object;
+      int new_id;
 
       object = fts_get_object(&av[0]);
-
-      fts_object_redefine(object, ac - 1, av + 1);
+      new_id = fts_get_int(&av[1]);
+      fts_object_redefine(object, new_id, ac - 2, av + 2);
     }
   else
     post_mess("System Error in FOS message REDEFINE OBJECT: bad args", ac, av);

@@ -636,6 +636,20 @@ abstract public class FtsObject
     Fts.getServer().deleteObject(this);
   }
 
+
+  /** 
+   * Dispose the data associated to the object, if any
+   * can be called more than once.
+   */
+
+  void releaseData()
+  {
+    Object data = get("data");
+
+    if ((data != null) && (data instanceof MaxData))
+      Mda.dispose((MaxData) data);
+  }
+
   /**
    * Delete the Java object, without touching the FTS object represented.
    * 
@@ -643,7 +657,12 @@ abstract public class FtsObject
 
   public void release()
   {
-    Fts.getSelection().removeObject(this);
+    // If we have data, dispose it, so that all
+    // the editors will be closed.
+
+    
+    releaseData();
+
     parent.setDirty();
 
     parent.removeObjectFromContainer(this); 
@@ -660,6 +679,7 @@ abstract public class FtsObject
     description = null;
 
     Fts.getServer().unregisterObject(this);
+    setObjectId(-1);
   }
 
   // Communication with the object

@@ -81,18 +81,19 @@ abstract class ErmesObject implements ErmesDrawable {
     itsSketchPad = theSketchPad;
 
     itsFtsObject = theFtsObject;
-    itsFtsObject.setRepresentation( this);
 
     itsSelected = false;
 
-    String aFont = (String)itsFtsObject.get( "font");
-    Integer aSize = (Integer)itsFtsObject.get( "fs");
+    Object value = itsFtsObject.get( "font");
 
-    if (aFont == null)
+    Object aFont = itsFtsObject.get( "font");
+    Object aSize = itsFtsObject.get( "fs");
+
+    if (aFont instanceof FtsVoid)
       {
-	if (aSize != null)
+	if (aSize instanceof Integer)
 	  {
-	    int fontSize = aSize.intValue();
+	    int fontSize = ((Integer) aSize).intValue();
 
 	    itsFont = FontCache.lookupFont( fontSize );
 	    itsFontMetrics = FontCache.lookupFontMetrics( fontSize);
@@ -104,12 +105,12 @@ abstract class ErmesObject implements ErmesDrawable {
       {
 	int aIntSize;
 
-	if (aSize == null)
+	if (aSize instanceof FtsVoid)
 	  aIntSize = itsSketchPad.sketchFont.getSize();
 	else
-	  aIntSize = aSize.intValue();
+	  aIntSize = ((Integer)aSize).intValue();
 
-	setFont( new Font( aFont, itsSketchPad.sketchFont.getStyle(), aIntSize));
+	setFont( new Font( (String) aFont, itsSketchPad.sketchFont.getStyle(), aIntSize));
       }
 
     itsRectangle = new Rectangle( theFtsObject.getX(), theFtsObject.getY(), theFtsObject.getWidth(), theFtsObject.getHeight());
@@ -631,7 +632,6 @@ abstract class ErmesObject implements ErmesDrawable {
     itsOutletList = null;
     itsFont = null;
     itsFontMetrics = null;
-    currentRect = null;
   }
 
   // Experimental MDC
@@ -650,7 +650,7 @@ abstract class ErmesObject implements ErmesDrawable {
 	Fts.sync();
 	value = itsFtsObject.get( property);
 
-	if ( value != null)
+	if (! (value instanceof FtsVoid))
 	  {
 	    annotation = value.toString();
 	    ax = itsRectangle.x + itsRectangle.width / 2;

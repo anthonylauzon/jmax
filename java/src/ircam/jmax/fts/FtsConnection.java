@@ -92,8 +92,6 @@ public class FtsConnection
 
     deleted = true;
 
-    Fts.getSelection().removeConnection(this);
-
     from.setDirty();
     to.setDirty();
 	

@@ -14,7 +14,7 @@
  * Forbidden values : 0x00 (easy message as string in C)
  * Low values: 0x01 0x02 0x03
  * Symbols   : - { } > < \
- * Lowercase : a c d f g h i l m n o p q s u x y w z  
+ * Lowercase : a b c d f g h i l m n o p q s u x y w z  
  * Uppercase : A B C D E F G H L M N O P Q R S U X Y Z 
  * 
  */
@@ -70,6 +70,7 @@
 
 #define CONNECTION_RELEASE_CODE 'd'
 #define OBJECT_RELEASE_CODE     'l'
+#define OBJECT_RELEASE_DATA_CODE 'b'
 #define MESSAGE_CODE            'm'
 #define NAMED_MESSAGE_CODE      'q'
 

@@ -483,7 +483,7 @@ public class FtsServer
   /** Send a "redefine object" messages to an object in FTS.
    */
 
-  final void redefineObject(FtsObject obj, String description)
+  final void redefineObject(FtsObject obj, int newId, String description)
   {
     if (! connected)
       return;
@@ -495,6 +495,7 @@ public class FtsServer
       {
 	port.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
 	port.sendObject(obj);
+	port.sendInt(newId);
 	FtsParse.parseAndSendObject(description, port);
 	port.sendEom();
       }
@@ -1297,16 +1298,45 @@ public class FtsServer
       break;
 
       case FtsClientProtocol.fts_release_connection_cmd:
-	FtsConnection c;
-	c = (FtsConnection)  msg.getNextArgument();
-	c.release();
-	break;
+	{
+	  FtsConnection c;
+
+	  c = (FtsConnection)  msg.getNextArgument();
+
+	  if (FtsServer.debug) 
+	    System.err.println("Connection Release" + c);
+
+
+	  Fts.getSelection().removeConnection(c);
+	  c.release();
+	  break;
+	}
 
       case FtsClientProtocol.fts_release_object_cmd:
-	FtsObject obj;
-	obj = (FtsObject)  msg.getNextArgument();
-	obj.release();
-	break;
+	{
+	  FtsObject obj;
+
+	  obj = (FtsObject)  msg.getNextArgument();
+
+	  if (FtsServer.debug) 
+	    System.err.println("Object Release" + obj);
+
+	  obj.release();
+	  break;
+	}
+
+      case FtsClientProtocol.fts_release_object_data_cmd:
+	{
+	  FtsObject obj;
+
+	  obj = (FtsObject)  msg.getNextArgument();
+
+	  if (FtsServer.debug) 
+	    System.err.println("Object Release Data" + obj);
+
+	  obj.releaseData();
+	  break;
+	}
 
       case FtsClientProtocol.remote_call_code:
 	{

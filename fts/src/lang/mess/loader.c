@@ -50,6 +50,10 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
   int symbols_size;
   char *symbuf;
 
+#ifdef LOAD_DEBUG
+  fprintf(stderr, "Reading binary file %s\n", name);
+#endif
+
   /* open the file */
   fd = open( name, O_RDONLY);
   if ( fd < 0)

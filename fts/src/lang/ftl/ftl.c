@@ -416,7 +416,6 @@ ftl_state_machine( fts_atom_list_t *alist, state_fun_t fun, void *user_data)
 
   iter = fts_atom_list_iterator_new(alist);
 
-
   for( ;
       !fts_atom_list_iterator_end( iter);
       fts_atom_list_iterator_next( iter))
@@ -441,7 +440,10 @@ ftl_state_machine( fts_atom_list_t *alist, state_fun_t fun, void *user_data)
 	    }
 	  }
 	else
-	  return &ftl_error_invalid_program;
+	  {
+	    fts_atom_list_iterator_free(iter);
+	    return &ftl_error_invalid_program;
+	  }
 	break;
       case ST_CALL_FUN:
 	if ( fts_is_symbol( a))
@@ -476,14 +478,18 @@ ftl_state_machine( fts_atom_list_t *alist, state_fun_t fun, void *user_data)
 	break;
       }
 
-      fts_atom_list_iterator_free(iter);
+
 
       ret = (*fun)(state, newstate, a, user_data);
       if (ret != fts_Success)
-	return ret;
+	{
+	  fts_atom_list_iterator_free(iter);
+	  return ret;
+	}
       state = newstate;
     }
-  
+
+  fts_atom_list_iterator_free(iter);
   return fts_Success;
 }
 

@@ -299,6 +299,13 @@ void fts_client_release_object(fts_object_t *obj)
   fts_client_mess_send_msg();
 }
 
+void fts_client_release_object_data(fts_object_t *obj)
+{
+  fts_client_mess_start_msg(OBJECT_RELEASE_DATA_CODE);
+  fts_client_mess_add_object(obj);;
+  fts_client_mess_send_msg();
+}
+
 
 
 

@@ -84,7 +84,7 @@ typedef struct
 {
   ALconfig   config;		/* the audio configuration structure */
   ALport     port;		/* the audio port */
-  stamp_t    fts_frames;		/* out frame number, for slip detection */
+  stamp_t    fts_frames;	/* out frame number, for slip detection */
   const char *name;		/* the AL2.0 device name (may be usefull) */
   int nch;			/* number of channels; used also to compute the fifo_size */
   int fifo_size;		/* the fifo size is stored in samples frames*/

@@ -46,14 +46,6 @@ class ErmesObjFloatDialog extends Dialog implements ActionListener {
     
     add("South", p2);
 
-    //Initialize this dialog 
-
-    Point aPoint = theFrame.getLocation();
-
-    setLocation(aPoint.x + itsObject.getItsX(),
-		aPoint.y + itsObject.getItsY());
-
-
     value.setText( theValue);
     itsObject = theFloat;
     pack();

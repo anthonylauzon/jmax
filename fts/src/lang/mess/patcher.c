@@ -592,6 +592,15 @@ patcher_find_errors(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 
+void fts_patcher_set_template(fts_patcher_t *this, fts_template_t *template)
+{
+  this->type     = fts_p_template;
+  this->template = template;
+
+  fts_template_add_instance(template, (fts_object_t *) this);
+}
+
+
 /* Methods: init put the pointers to zero */
 
 static void
@@ -667,6 +676,12 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   fts_patcher_t *this = (fts_patcher_t *) o;
   fts_object_t *p;
+
+  /* If it is a template, remove it from the template instance list */
+
+  if (fts_patcher_is_template(this))
+    fts_template_remove_instance(this->template, (fts_object_t *) this);
+
   /*
    * delete its content; each destroied object will take away himself
    * from the list, including inlets and outlets; this will undo the
@@ -814,10 +829,7 @@ void fts_patcher_assign_variable(fts_symbol_t name, fts_atom_t *value, void *dat
 {
   fts_patcher_t *this = (fts_patcher_t *)data;
 
-  if (! fts_variable_is_suspended(this, name))
-    fts_variable_define(this, name, (fts_object_t *)this);
-
-  fts_variable_restore(this, name, value, (fts_object_t *)this);
+  fts_variable_assign(this, name, value);
 }
 
 fts_patcher_t *fts_patcher_redefine_description(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
@@ -849,8 +861,8 @@ fts_patcher_t *fts_patcher_redefine_description(fts_patcher_t *this, int aoc, co
   /* 3- set the new variables */
 
   fts_set_atom_array(&va, this->args);
-  fts_variable_restore(this, fts_s_args, &va, (fts_object_t *)this);
   fts_expression_map_to_assignements(e, fts_patcher_assign_variable, (void *) this);
+  fts_variable_restore(this, fts_s_args, &va, (fts_object_t *)this);
 
   /* 4- register the patcher as user of the used variables */
 
@@ -859,6 +871,12 @@ fts_patcher_t *fts_patcher_redefine_description(fts_patcher_t *this, int aoc, co
   /* 5- undefine all the locals that are still suspended  */
 
   fts_variables_undefine_suspended(this, (fts_object_t *) this);
+
+  /* 6- change the patcher definition, so it will be saved correctly */
+
+  fts_object_set_description_and_class((fts_object_t *) this,
+				       fts_s_patcher,
+				       aoc, aot);
 
   return this;
 }
@@ -1036,6 +1054,19 @@ void fts_patcher_redefine(fts_patcher_t *this, int new_ninlets, int new_noutlets
 	}
     }
 
+  /*
+   *  change the patcher class (of course, not the metaclass).
+   */
+
+  {
+    fts_atom_t a[3];
+
+    fts_set_symbol(&a[0], fts_s_patcher);
+    fts_set_int(&a[1], new_ninlets);
+    fts_set_int(&a[2], new_noutlets);
+    obj_this->cl = fts_class_instantiate(3, a);
+  }
+
   {
     fts_object_t *p;
 
@@ -1050,19 +1081,6 @@ void fts_patcher_redefine(fts_patcher_t *this, int new_ninlets, int new_noutlets
     for (p = this->objects; p ; p = p->next_in_patcher)
       if (fts_object_is_outlet(p))
 	fts_outlet_reposition(p, ((fts_outlet_t *)p)->position);
-  }
-
-  /*
-   * Finally , change the patcher class (of course, not the metaclass).
-   */
-
-  {
-    fts_atom_t a[3];
-
-    fts_set_symbol(&a[0], fts_s_patcher);
-    fts_set_int(&a[1], new_ninlets);
-    fts_set_int(&a[2], new_noutlets);
-    obj_this->cl = fts_class_instantiate(3, a);
   }
 }
 

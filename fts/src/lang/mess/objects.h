@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.12 $ IRCAM $Date: 1998/08/28 16:42:11 $
+ *      $Revision: 1.13 $ IRCAM $Date: 1998/09/24 15:36:06 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -41,10 +41,12 @@ extern void fts_object_set_description(fts_object_t *obj, int argc, const fts_at
 extern void fts_object_set_description_and_class(fts_object_t *obj, fts_symbol_t class_name,
 					  int argc, const fts_atom_t *argv);
 
+extern void fts_object_reset_description(fts_object_t *obj);
+
 /* Support for redefinition  */
 
 extern fts_object_t *fts_object_recompute(fts_object_t *old);
-extern fts_object_t *fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at);
+extern fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const fts_atom_t *at);
 
 /* Object Access */
 

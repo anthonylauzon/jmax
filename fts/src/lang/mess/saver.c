@@ -1001,6 +1001,10 @@ void fts_save_patcher_as_bmax(fts_symbol_t file, fts_object_t *patcher)
 
       fts_bmax_code_return(f);
       fts_close_bmax_file(f);
+
+      /* Recompute the template instances if needed */
+
+      fts_template_file_modified(file);
     }
 }
 

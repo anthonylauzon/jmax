@@ -21,6 +21,8 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
   ErmesObjExternal( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject);
+
+    itsFtsObject.watch("error", this);
   }
 
   // ----------------------------------------
@@ -31,7 +33,6 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
     // Get the correct String from the object
     return itsFtsObject.getDescription().trim();
   }
-
 
   public void propertyChanged( FtsObject obj, String name, Object value) 
   {
@@ -44,15 +45,11 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
 	  {
 	    isError = ((Integer)value).intValue();
 	    DoublePaint();
+	    itsSketchPad.repaint();// ??? 
 	  }
       } 
     else
 	super.propertyChanged( obj, name, value);
-  }
-
-  public void YouArePatcher( boolean what) 
-  {
-    iAmPatcher = what;
   }
 
   /* Inspector */
@@ -72,8 +69,10 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
 	itsFtsObject.watch("ins", this);
 	itsFtsObject.watch("outs", this);
 	itsFtsObject.watch("error", this);
-
 	isError = -1;
+
+	System.err.println("In redefinition, putting isError to -1, but its value is " +
+			   itsFtsObject.get("error"));
       } 
     catch (FtsException e) 
       {

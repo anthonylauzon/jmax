@@ -60,6 +60,7 @@ typedef struct fts_env		fts_env_t;
 
 typedef struct fts_data			fts_data_t;
 typedef struct fts_data_class		fts_data_class_t;
+typedef struct fts_template		fts_template_t;
 
 /*
  *  SYMBOLS
@@ -389,6 +390,10 @@ struct fts_patcher
   fts_atom_array_t *args;	/* the arguments used for the "args" variable */
 
   enum {fts_p_standard, fts_p_abstraction, fts_p_error, fts_p_template} type;
+
+  /* If this patcher is a template, point to the template definition */
+
+  fts_template_t *template;
 
   /* Variables */
 

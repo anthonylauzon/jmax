@@ -53,7 +53,7 @@ public class MaxFileChooser
 
     dir = fd.getCurrentDirectory();
     fd.setDialogTitle("Open"); 
-
+    fd.rescanCurrentDirectory();
     if (fd.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION)
       return fd.getSelectedFile();
     else
@@ -78,7 +78,7 @@ public class MaxFileChooser
 
     dir = fd.getCurrentDirectory();
     fd.setDialogTitle("Save As");
-
+    fd.rescanCurrentDirectory();
     if (oldFile != null)
       fd.setSelectedFile(oldFile);
 

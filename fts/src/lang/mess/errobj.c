@@ -8,6 +8,7 @@
 #include <stdarg.h>
 #include "sys.h"
 #include "lang/mess.h"
+#include "lang/datalib.h"
 #include "lang/mess/messP.h"
 
 /*
@@ -70,3 +71,42 @@ void fts_error_object_fit_outlet(fts_object_t *obj, int noutlet)
 
 
 
+/*
+  Try to recompute all the error objects; to be called after
+  an "env" change.
+   */
+
+void fts_recompute_errors()
+{
+  fts_object_set_t *errors;
+  fts_object_t *root;
+  fts_atom_t a[1];
+  fts_object_set_iterator_t *iterator;
+
+  /* Find all the errors */
+
+  errors = fts_object_set_new();
+  root = (fts_object_t *) fts_get_root_patcher();
+
+  fts_set_data(&a[0], (fts_data_t *) errors);
+  fts_send_message(root, fts_SystemInlet, fts_s_find_errors, 1, a);
+
+  /* Recompute them all */
+
+  iterator = fts_object_set_iterator_new(errors);
+
+  while (! fts_object_set_iterator_end(iterator))
+    {
+      fts_object_t *object;
+
+
+      object = fts_object_set_iterator_current(iterator);
+
+      fts_object_recompute(object);
+
+      fts_object_set_iterator_next(iterator);
+    }
+
+  fts_object_set_iterator_free(iterator);
+  fts_object_set_delete(errors);
+}
