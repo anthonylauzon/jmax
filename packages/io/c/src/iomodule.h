@@ -34,6 +34,6 @@
 #endif
 
 IO_API void
-io_config(void)
+io_config(void);
 
 #endif /* _IO_H */
