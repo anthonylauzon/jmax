@@ -43,6 +43,8 @@
 FUNCTIONS_API void
 functions_config(void);
 
+
+
 /**********************************************************************
 *
 *  C functions
@@ -62,6 +64,8 @@ static fts_status_t FUN##_function( int ac, const fts_atom_t *at, fts_atom_t *re
 #define FUN DEFINE_FUN
 #include "mathfuns.h"
 
+
+
 /**********************************************************************
 *
 *  misc math functions
@@ -77,11 +81,24 @@ abs_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
   return fts_ok;
 }
 
+static fts_status_t 
+pow_function (int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  if (ac > 1  &&  fts_is_number(at)  &&  fts_is_number(at+1))
+    fts_set_float(ret, pow(fts_get_number_float(at), 
+			   fts_get_number_float(at+1)));
+  
+  return fts_ok;
+}
+
+
+
 /**********************************************************************
 *
 *  random function
 *
 */
+
 #define RA 16807 /* multiplier */
 #define RM 2147483647L /* 2**31 - 1 */
 #define RQ 127773L /* m div a */
@@ -144,11 +161,14 @@ random_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
   return fts_ok;
 }
 
+
+
 /**********************************************************************
 *
 *  symbol functions
 *
 */
+
 #define MAX_CONCAT_LENGTH 512
 
 static fts_status_t
@@ -180,6 +200,14 @@ cat_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
   return fts_ok;
 }
 
+
+
+/**********************************************************************
+*
+*  functions setup
+*
+*/
+
 void
 functions_config(void)
 {
@@ -189,6 +217,7 @@ functions_config(void)
   random_init();
   
   fts_function_install( fts_new_symbol("abs"), abs_function);
+  fts_function_install( fts_new_symbol("pow"), pow_function);
   fts_function_install( fts_new_symbol("random"), random_function);
   fts_function_install( fts_new_symbol("cat"), cat_function);
 }
