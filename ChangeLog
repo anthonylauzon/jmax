@@ -1,3 +1,8 @@
+2002-06-11  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* added include/fts/fifo.h and fts/fifo.c that may help writing
+	Mac OS X midi port and messages fifos. Reused the code from unixdtd package.
+
 2002-05-28  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* moved object description unparsing from JAVA to FTS. Added memory byte stream.
