@@ -1,5 +1,6 @@
 #include "sys.h"
 #include "lang/mess.h"
+#include "lang/mess/messP.h"
 #include "lang/mess/patlex.h"
 
 #include <stdio.h>		/* for error reporting, temp. */
@@ -997,7 +998,28 @@ static void pat_error(const char *description)
 static fts_object_t *
 fts_patcher_assign_in_outlets_and_rename(fts_object_t *obj, fts_symbol_t new_name)
 {
-  /* To be written */
+  fts_atom_t description[4];
+  fts_object_t *new;
+  fts_patcher_t *patcher = (fts_patcher_t *) obj;
+  int inlets;
+  int outlets;
+
+  /* Compute number of inlets and outlets */
+  inlets = fts_patcher_count_inlet_objects(patcher);
+  outlets = fts_patcher_count_inlet_objects(patcher);
+
+  /* make a new patcher and redefine the old one */
+
+  fts_set_symbol(&description[0], fts_s_patcher);
+  fts_set_symbol(&description[1], new_name);
+  fts_set_int(&description[2], inlets);
+  fts_set_int(&description[3], outlets);
+
+  new = fts_object_redefine(obj, 4, description);
+
+  /* reassign inlet and outlets (in the patcher code) */
+
+  fts_patcher_reassign_inlets_and_outlets(patcher);
 
   return obj;
 }

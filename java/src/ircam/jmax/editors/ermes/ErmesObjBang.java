@@ -77,7 +77,6 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
   protected void FtsValueChanged(Object value) {
     int on_off = ((Integer) value).intValue();
 
-    System.err.println(""+on_off);
     if (on_off == 1) {
 	itsFlashing = true;
     }

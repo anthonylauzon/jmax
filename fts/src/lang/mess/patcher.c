@@ -38,11 +38,13 @@ rewritten, i am afraid :-< ).
 #include "sys.h"
 #include "lang.h"
 
-/* Forward declarations */
 
 fts_metaclass_t *patcher_metaclass;
 fts_metaclass_t *inlet_metaclass;
 fts_metaclass_t *outlet_metaclass;
+
+fts_symbol_t fts_s_inlet;
+fts_symbol_t fts_s_outlet;
 
 /* INlets; inlets are only placeholders for the internal connections
    they receive no messages, send no messages; the messages are sent
@@ -148,7 +150,8 @@ inlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void
 internal_inlet_config(void)
 {
-  inlet_metaclass = fts_metaclass_create(fts_new_symbol("inlet"), inlet_instantiate, fts_always_equiv);
+  fts_s_inlet = fts_new_symbol("inlet");
+  inlet_metaclass = fts_metaclass_create(fts_s_inlet, inlet_instantiate, fts_always_equiv);
 }
 
 
@@ -261,7 +264,8 @@ outlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void
 internal_outlet_config(void)
 {
-  outlet_metaclass = fts_metaclass_create(fts_new_symbol("outlet"),outlet_instantiate, fts_always_equiv);
+  fts_s_outlet = fts_new_symbol("outlet");
+  outlet_metaclass = fts_metaclass_create(fts_s_outlet, outlet_instantiate, fts_always_equiv);
 }
 
 
@@ -576,6 +580,152 @@ fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj)
 	return;
       }
 }
+
+/* Functions for direct .pat loading support */
+
+int
+fts_patcher_count_inlet_objects(fts_patcher_t *this)
+{
+  int i = 0;
+  fts_object_t *p;
+
+  for (p = this->objects; p ; p = p->next_in_patcher)
+    if (fts_object_is_inlet(p))
+      i++;
+
+  return i;
+}
+
+int
+fts_patcher_count_outlet_objects(fts_patcher_t *this)
+{
+  int i = 0;
+  fts_object_t *p;
+
+  for (p = this->objects; p ; p = p->next_in_patcher)
+    if (fts_object_is_outlet(p))
+      i++;
+
+  return i;
+}
+
+/* This function take all the declared inlets and outlets
+   and assign them to the patcher in the correct order,
+   setting also the inlet and outlet status.
+   */
+
+
+void
+fts_patcher_reassign_inlets_and_outlets(fts_patcher_t *this)
+{
+  fts_object_t *p;
+  int ninlets, noutlets;
+  int inlet_count, outlet_count;
+  int i, j;
+
+  /* Get the number of inlets and outlets */
+
+  ninlets = fts_object_get_inlets_number(this);
+  noutlets = fts_object_get_outlets_number(this);
+
+  /* Store the inlets in the inlet arrays */
+
+  inlet_count = 0;
+
+  for (p = this->objects; p ; p = p->next_in_patcher)
+    if (fts_object_is_inlet(p))
+      {
+	this->inlets[inlet_count] = (fts_inlet_t *) p;
+	inlet_count++;
+      }
+
+  /* Store the outlets in the oulet arrays */
+
+  outlet_count = 0;
+
+  for (p = this->objects; p ; p = p->next_in_patcher)
+    if (fts_object_is_outlet(p))
+      {
+	this->outlets[outlet_count] = (fts_outlet_t *) p;
+	outlet_count++;
+      }
+
+  /* Sort the inlets  based on their x property*/
+
+  for (i = 1; i < ninlets; i++)
+    for (j = 0; j < i; j++)
+      {
+	fts_atom_t aix, ajx;
+	int ix, jx;
+
+	fts_object_get_prop((fts_object_t *)this->inlets[i], fts_s_x, &aix);
+	fts_object_get_prop((fts_object_t *)this->inlets[j], fts_s_x, &ajx);
+
+	ix = fts_get_int(&aix);
+	jx = fts_get_int(&ajx);
+
+	if (jx > ix)
+	  {
+	    fts_inlet_t *tmp;
+
+	    tmp = this->inlets[i];
+	    this->inlets[j] = tmp;
+	    this->inlets[i] = this->inlets[j];
+	  }
+      }
+
+  /* Sort the outlets  based on their x property*/
+
+  for (i = 1; i < noutlets; i++)
+    for (j = 0; j < i; j++)
+      {
+	fts_atom_t aix, ajx;
+	int ix, jx;
+
+	fts_object_get_prop((fts_object_t *)this->outlets[i], fts_s_x, &aix);
+	fts_object_get_prop((fts_object_t *)this->outlets[j], fts_s_x, &ajx);
+
+	ix = fts_get_int(&aix);
+	jx = fts_get_int(&ajx);
+
+	if (jx > ix)
+	  {
+	    fts_outlet_t *tmp;
+
+	    tmp = this->outlets[i];
+	    this->outlets[j] = tmp;
+	    this->outlets[i] = this->outlets[j];
+	  }
+      }
+
+  /* Actually faster "in placesolution can be used, instead
+     of redefining inlets and outlets */
+
+  /* redefine all the inlets */
+
+  for (i = 0; i < ninlets; i++)
+    {
+      fts_atom_t av[2];
+
+      fts_set_symbol(&av[0], fts_s_inlet);
+      fts_set_int(&av[1], i);
+
+      fts_object_redefine((fts_object_t *) this->inlets[i], 2, av);
+    }
+
+  /* redefine all the outlets */
+
+  for (i = 0; i < noutlets; i++)
+    {
+      fts_atom_t av[2];
+
+      fts_set_symbol(&av[0], fts_s_outlet);
+      fts_set_int(&av[1], i);
+
+      fts_object_redefine((fts_object_t *) this->outlets[i], 2, av);
+    }
+}
+
 
 /* accessing inlets and outlets in patcher */
 

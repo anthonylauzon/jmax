@@ -31,6 +31,12 @@ extern fts_class_mess_t *fts_class_mess_get(fts_class_t *cl, int winlet, fts_sym
 extern void fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj);
 extern void fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj);
 
+/* Functions for direct .pat loading support */
+
+extern int fts_patcher_count_inlet_objects(fts_patcher_t *this);
+extern int fts_patcher_count_outlet_objects(fts_patcher_t *this);
+extern void fts_patcher_reassign_inlets_and_outlets(fts_patcher_t *this);
+
 /* 
  * Property related private functions
  */
