@@ -1,3 +1,9 @@
+2003-04-28  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* configure.in, fts/linux.c: added preprocessor conditionnal on USE_ALSA before loading alsa package.
+
+	* packages/alsa/c/src/Makefile.am: use variable exported by alsa.m4 for CFLAGS and LDFLAGS.
+
 2003-04-11  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* fts/jmax.c: use pie connection as default connection (windows port)
