@@ -1307,14 +1307,15 @@ fts_package_upload_requires( fts_package_t *this)
   while (fts_iterator_has_more( &i))
     {
       fts_iterator_next( &i, a);
-      fts_client_add_symbol( (fts_object_t *)this, fts_get_symbol( a));      
-      pkg = fts_package_get( fts_get_symbol( a));
 
+      pkg = fts_package_get( fts_get_symbol( a));
       if(pkg != NULL)
       {
+	fts_client_add_symbol( (fts_object_t *)this, fts_get_symbol( a));
+	
         if (!fts_object_has_id( (fts_object_t *)pkg))
           fts_client_register_object( (fts_object_t *)pkg, fts_get_client_id( (fts_object_t *)this));
-
+	
         fts_client_add_int( (fts_object_t *)this, fts_get_object_id( (fts_object_t *)pkg));
       }
     }
