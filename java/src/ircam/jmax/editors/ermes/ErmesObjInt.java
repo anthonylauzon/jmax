@@ -181,9 +181,12 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
     if ( itsSketchPad.itsRunMode || evt.isControlDown())
       {
 	// (fd) {
-	state = 1;
-	itsSketchPad.itsSketchWindow.setKeyEventClient( this);
-	// } (fd)
+	if (!evt.isControlDown()) //"pure" run mode
+	{
+	  state = 1;
+	  itsSketchPad.itsSketchWindow.setKeyEventClient( this);
+	  // } (fd)
+	}
 
 	itsFirstY = y;
 
@@ -252,7 +255,8 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
     if ( itsSketchPad.itsRunMode || evt.isControlDown() )
       {
 	// (fd)
-	state = 2;
+	if (!evt.isControlDown())
+	  state = 2;
 
 	itsInteger = itsStartingY + (itsFirstY - y);
 	itsFtsObject.put( "value", new Integer(itsInteger));
@@ -322,8 +326,9 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
       // (4) Draw the value
       String aString;
 
-      if (state != 3)
+      if (state != 3) 
 	aString = GetVisibleString(String.valueOf(itsInteger));
+
       else
 	{
 	  aString = currentText.toString();
@@ -376,11 +381,13 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
     // DEBUG
     //System.err.println( this.getClass().getName() + "( " + e.getKeyCode() + " )");
 
+    if (e.getKeyCode() == 17) return; //avoid CTRL as valid (independent) key
+
     state = 3;
 
     if ( !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown())
       {
-	int c = e.getKeyCode();
+	int c = e.getKeyChar();
 
 	if ( c >= '0' && c <= '9')
 	  currentText.append( (char)c);
@@ -397,7 +404,7 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
 	      {
 	      }
 	    currentText.setLength(0);
-	    state = 1;
+	    state = 0;
 	  }
 	else if ( ( c == ircam.jmax.utils.Platform.DELETE_KEY)
 	     || ( c == ircam.jmax.utils.Platform.BACKSPACE_KEY) )
@@ -430,7 +437,9 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
   public void keyInputLost()
     {
       state = 0;
+      currentText.setLength(0);
       DoublePaint();
     }
   // } (fd)
 }
+

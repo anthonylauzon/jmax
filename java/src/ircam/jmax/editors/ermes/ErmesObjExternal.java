@@ -12,7 +12,7 @@ import ircam.jmax.mda.*;
 /**
  * The generic "extern" object in ermes. (example: adc1~) 
  */
-public class ErmesObjExternal extends ErmesObjEditableObject {
+public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHandler{
 
   public boolean iAmPatcher = false;
   private String itsBackupText = new String();
@@ -51,6 +51,15 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
       RestoreDimensions( false);
 
     return true;
+  }
+
+  public void propertyChanged(FtsObject obj, String name, Object value) {
+    //handle the "error" property, the only one we're listening at
+    
+    Integer errorFlag = null;
+    if (name.equals("error") && value != null)
+      DoublePaint();
+    
   }
 
   public void YouArePatcher(boolean what) {
@@ -104,6 +113,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
   
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) 
   {
+
     if ( evt.getClickCount() > 1 ) 
       {
 	Cursor temp = itsSketchPad.getCursor();

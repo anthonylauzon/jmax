@@ -346,11 +346,21 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
     GetEditMenu().add(new MenuItem("-"));
 
+    MenuItem inspectMenuItem = new MenuItem("Inspect Ctrl+I");
+    GetEditMenu().add(inspectMenuItem);
+
+    inspectMenuItem.addActionListener(new ActionListener() {
+      
+      public void actionPerformed(ActionEvent e) {
+	inspectAction();
+      }});
+    
+    GetEditMenu().add(new MenuItem("-"));
+    
     itsResizeObjectMenu =  new Menu("Resize Object");
     GetEditMenu().add(itsResizeObjectMenu);
     FillResizeObjectMenu(itsResizeObjectMenu);
 
-    GetEditMenu().add(new MenuItem("-"));
 
     itsAlignObjectMenu =  new Menu("Align Objects");
     GetEditMenu().add(itsAlignObjectMenu);
@@ -367,15 +377,24 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   }
 
   protected void Cut(){
-    /*Cursor temp = getCursor();
 
-      setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-      
-      itsSketchPad.ftsClipboard.copy(Fts.getSelection());
-      MaxApplication.systemClipboard.setContents(itsClipboardProvider, itsClipboardProvider);*/
     Copy();
     itsSketchPad.itsHelper.DeleteSelected();
     
+  }
+
+  public void inspectAction() {
+    if (itsSketchPad.currentSelection.isEmpty())
+      inspectPatcher(itsPatcher);
+    else itsSketchPad.inspectSelection();
+  }
+
+  static ErmesPatcherInspector itsPatcherInspector = null;
+
+  static public void inspectPatcher(FtsContainerObject thePatcher) {
+    if (itsPatcherInspector == null) 
+      itsPatcherInspector = new ErmesPatcherInspector(thePatcher);
+    else itsPatcherInspector.reInit(thePatcher);
   }
 
   // clipboard handling
@@ -750,7 +769,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 	      setRunMode(true);
 	  }
 	else if (aInt == 73) 
-	  itsSketchPad.inspectSelection(); // i
+	  inspectAction(); // i
 	else if (aInt == 47)
 	  {
 	    //ask help for the reference Manual for the selected element...
@@ -1150,6 +1169,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     aSelectAllItem.setEnabled(!theRunMode);
 
     itsRunModeMenuItem.setLabel(theRunMode ? "Edit Mode Ctrl+E" : "Run Mode Ctrl+E");
+    setKeyEventClient( null); //when changing mode, always remove key listeners
     requestFocus();
   }
 

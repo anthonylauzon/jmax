@@ -283,15 +283,15 @@ public class MaxApplication extends Object
 	MaxApplication.runHooks("start");
       }
 
-
+    
     // Look if there are documents to open in the 
     // command line.
-
+    
     for (int i = 0 ; i < toOpen.size(); i++)
       {
 	MaxDocument document = null;
 	File file = new File((String) toOpen.elementAt(i));
-
+	
 	try
 	  { 
 	    document = Mda.loadDocument(file);

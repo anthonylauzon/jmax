@@ -48,6 +48,9 @@ public class ErmesSelection {
     itsFtsSelection.clean();
   }
 
+  public boolean isEmpty() {
+    return itsObjects.isEmpty() && itsConnections.isEmpty();
+  }
 }
 
 

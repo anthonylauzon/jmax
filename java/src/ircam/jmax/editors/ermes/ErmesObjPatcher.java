@@ -6,7 +6,7 @@ import java.util.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
-import ircam.jmax.editors.ermes.*;
+
 import ircam.jmax.utils.*;
 
 /**
@@ -17,6 +17,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 
   String itsNameString = new String();
 
+  //static ErmesObjPatcherDialog itsPatcherDialog = null;
   public ErmesSketchWindow itsSubWindow = null;
   Dimension preferredSize = new Dimension(80,24);
   String pathForLoading;
@@ -49,6 +50,22 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
     return true;
   }
 
+  public boolean inspectorAlreadyOpen() {
+    return (ErmesSketchWindow.itsPatcherInspector != null && ErmesSketchWindow.itsPatcherInspector.isVisible() && ErmesSketchWindow.itsPatcherInspector.itsPatcherObject == itsFtsObject);
+  }
+
+  public void openInspector() {
+    ErmesSketchWindow.inspectPatcher((FtsContainerObject) itsFtsObject);
+    /*Point aPoint = GetSketchWindow().getLocation();
+    if (itsPatcherDialog == null) itsPatcherDialog = new ErmesObjPatcherDialog(MaxWindowManager.getTopFrame());
+    itsPatcherDialog.setLocation(aPoint.x + getItsX(),aPoint.y + getItsY());
+    
+    String nIns = String.valueOf(itsFtsObject.getNumberOfInlets());
+    String nOuts = String.valueOf(itsFtsObject.getNumberOfOutlets());
+    itsPatcherDialog.ReInit(nIns, nOuts, itsFtsObject, itsSketchPad.GetSketchWindow());
+    */
+  }
+
   // temporary, should probabily change
 
   public void makeFtsObject()
@@ -65,7 +82,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
       }
     catch (FtsException e)
       {
-	// ENZO !!!! AIUTO :->
+	
 	System.out.println("Error in Object Instantiation");
       }
   }
@@ -164,16 +181,9 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
     g.drawRect(getItsX()+0,getItsY()+ 0, getItsWidth()-1, getItsHeight()-1);
     g.drawRect(getItsX()+4, getItsY()+4, getItsWidth()-8, getItsHeight()-8);
     
-    /*//the triangle
-    g.drawLine(getItsX()+7,getItsY()+6,getItsX()+7,getItsY()+getItsHeight()-6);
-    g.drawLine(getItsX()+7, getItsY()+6, getItsX()+getItsHeight()/2+2, getItsY()+getItsHeight()/2);
-    g.drawLine(getItsX()+getItsHeight()/2+2,getItsY()+getItsHeight()/2, getItsX()+7, getItsY()+getItsHeight()-6);
-    */
-
     g.setFont(getFont());
     DrawParsedString(g);
-    /*g.drawString(itsArgs, getItsX()+getItsHeight()/2,getItsY()+itsFontMetrics.getAscent()+(getItsHeight()-itsFontMetrics.getHeight())/2);		
-    */
+
     g.setColor(Color.black);
     if(!itsSketchPad.itsRunMode) 
       g.fillRect(getItsX()+getItsWidth()-DRAG_DIMENSION,getItsY()+getItsHeight()-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
