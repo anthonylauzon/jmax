@@ -16,7 +16,7 @@ Arguments: none
 HELP_EOF
 }
 
-if [ `whomai` != root ]
+if [ `whoami` != root ]
 then
     echo "This script must be run as root."
     exit 2
