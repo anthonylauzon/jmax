@@ -115,7 +115,7 @@ public void paintComponent(Graphics g)
 {
   Dimension d = getSize();
   int rows = data.getRows();
-  g.setColor( MatPanel.rowsIdColor);
+  g.setColor( JMaxMatTable.rowsIdColor);
   g.fillRect(0, 0, d.width, d.height);
   
   String idxString;
@@ -128,7 +128,7 @@ public void paintComponent(Graphics g)
   int rectY = (first+1)*MatPanel.ROW_HEIGHT - yTransp;
   for(int i = first; i < last; i++)
   {
-    g.setColor( MatPanel.matGridColor);
+    g.setColor( JMaxMatTable.matGridColor);
     g.drawLine(0, rectY, d.width, rectY);
     idxString = ""+i;
     strW = fm.stringWidth(idxString);

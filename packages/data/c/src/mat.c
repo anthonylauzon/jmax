@@ -34,10 +34,6 @@ static fts_symbol_t sym_comma = 0;
 static fts_symbol_t sym_mat_append_row  = 0;
 static fts_symbol_t sym_mat_insert_rows = 0;
 static fts_symbol_t sym_mat_delete_rows = 0;
-static fts_symbol_t sym_register_obj = 0;
-
-
-
 
 /********************************************************
 *
@@ -549,7 +545,7 @@ mat_upload_from_index(mat_t *self, int row_id, int col_id, int size)
         fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
         fts_set_symbol(b+2,  fts_new_symbol((char *)fts_memorystream_get_bytes( stream)));
         
-        fts_client_send_message((fts_object_t *)self, sym_register_obj, 3, b);
+        fts_client_send_message((fts_object_t *)self, fts_s_register_object, 3, b);
         
         fts_send_message(dobj, fts_s_update_gui, 0, 0);
         
@@ -1215,7 +1211,6 @@ mat_config(void)
   sym_mat_insert_rows = fts_new_symbol("mat_insert_rows");
   sym_mat_delete_rows = fts_new_symbol("mat_delete_rows");
   mat_symbol = fts_new_symbol("mat");
-  sym_register_obj = fts_new_symbol("register_obj");
   
   mat_type = fts_class_install(mat_symbol, mat_instantiate);
 }

@@ -97,11 +97,11 @@ public class AbstractEventValue implements EventValue, java.io.Serializable
     int i = 0;
     Object prop;
     for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
-      {
-	prop = getProperty( (String)e.nextElement());
-	if((prop != null) && (prop != UNKNOWN_PROPERTY))
-	  propertyValuesArray[i++] = prop;
-      }      
+    {
+      prop = getProperty( (String)e.nextElement());
+      if((prop != null) && (prop != UNKNOWN_PROPERTY))
+        propertyValuesArray[i++] = prop;
+    }      
     return propertyValuesArray;
   }
 
@@ -110,8 +110,7 @@ public class AbstractEventValue implements EventValue, java.io.Serializable
     int i = 0;
     Object prop;
     for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
-      propertyValuesArray[i++] = getProperty( (String)e.nextElement());
-    
+      propertyValuesArray[i++] = getProperty( (String)e.nextElement());      
     return propertyValuesArray;
   }
 

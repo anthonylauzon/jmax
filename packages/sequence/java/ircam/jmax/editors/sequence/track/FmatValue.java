@@ -41,6 +41,7 @@ public class FmatValue extends AbstractEventValue
   Object value = new Integer(50);
   Object objId = new Integer(-1);
   Object varname = "";
+  Object object  = null;
   static FtsArgs args = new FtsArgs();
   
   public FmatValue()
@@ -54,14 +55,14 @@ public class FmatValue extends AbstractEventValue
   }
   
   public void setProperty(String name, Object value)
-  {    
+  {        
     if(name.equals("objid"))
     {
       if(((Integer)objId).intValue() != ((Integer)value).intValue())
       {
         objId = value;
-        
         FtsObject fmat = JMaxApplication.getFtsServer().getObject(((Integer)objId).intValue());
+        
         String varname = null;
         if(fmat != null)
           varname = ((FtsGraphicObject)fmat).getVariableName();
@@ -70,12 +71,16 @@ public class FmatValue extends AbstractEventValue
           setProperty("name", varname);
         else
           setProperty("name", "#"+((Integer)objId).intValue());
+                
+        setProperty("object", fmat);
       }
     }
     else if(name.equals("value"))
       this.value = value;
     else if(name.equals("name"))
       this.varname = value;
+    else if(name.equals("object"))
+      this.object = value;
     else 
       super.setProperty(name, value);
   }
@@ -84,6 +89,8 @@ public class FmatValue extends AbstractEventValue
   {
     if(name.equals("objid"))
       return objId;
+    else if(name.equals("object"))
+      return object;
     else if(name.equals("value"))
       return value;
     else if(name.equals("name"))

@@ -146,6 +146,7 @@ public Object getValueAt(int row, int col) {
 		else
 	  {
 	    Object val = temp.getValue().getPropertyValues()[col-2];
+      
 	    if( val != EventValue.UNKNOWN_PROPERTY) 
 	      return val;
 	    else return null;

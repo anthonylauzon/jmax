@@ -60,6 +60,7 @@ extern fts_symbol_t seqsym_cue;
 extern fts_symbol_t seqsym_section;
 extern fts_symbol_t seqsym_offset;
 extern fts_symbol_t seqsym_objid;
+extern fts_symbol_t seqsym_object;
 
 /* messages */
 extern fts_symbol_t seqsym_insert;

@@ -143,6 +143,7 @@ PREDEF_SYMBOL( fts_s_get_element, "get_element")
 PREDEF_SYMBOL( fts_s_empty_string, "")
 PREDEF_SYMBOL( fts_s_unconnected, "-")
 PREDEF_SYMBOL( fts_s_double_click, "double_click")
+PREDEF_SYMBOL( fts_s_register_object, "register_object")
 
 PREDEF_SYMBOL( fts_s_open_input, "open_input")
 PREDEF_SYMBOL( fts_s_open_output, "open_output")

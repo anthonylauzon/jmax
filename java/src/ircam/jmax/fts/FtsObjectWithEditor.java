@@ -33,26 +33,32 @@ import java.lang.*;
 import java.io.*;
 
 public abstract class FtsObjectWithEditor extends FtsUndoableObject {
-
+  
   static{
     FtsObject.registerMessageHandler( FtsObjectWithEditor.class, FtsSymbol.get("openEditor"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsObjectWithEditor)obj).openEditor( args.getLength(), args.getAtoms());
-	}
-      });
+      public void invoke( FtsObject obj, FtsArgs args)
+      {
+        ((FtsObjectWithEditor)obj).openEditor( args.getLength(), args.getAtoms());
+      }
+    });
     FtsObject.registerMessageHandler( FtsObjectWithEditor.class, FtsSymbol.get("destroyEditor"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsObjectWithEditor)obj).destroyEditor();
-	}
-      });  
+      public void invoke( FtsObject obj, FtsArgs args)
+      {
+        ((FtsObjectWithEditor)obj).destroyEditor();
+      }
+    });  
     FtsObject.registerMessageHandler( FtsObjectWithEditor.class, FtsSymbol.get("closeEditor"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsObjectWithEditor)obj).destroyEditor();
-	}
-      });  
+      public void invoke( FtsObject obj, FtsArgs args)
+      {
+        ((FtsObjectWithEditor)obj).destroyEditor();
+      }
+    });  
+    FtsObject.registerMessageHandler( FtsObjectWithEditor.class, FtsSymbol.get("register_object"), new FtsMessageHandler(){
+      public void invoke( FtsObject obj, FtsArgs args)
+      {
+        ((FtsObjectWithEditor)obj).registerObject( args.getLength(), args.getAtoms());
+      }
+    });  
   }
   
   public FtsObjectWithEditor(FtsServer server, FtsObject parent, int id, String className, FtsAtom[] args, int offset, int length)
@@ -125,10 +131,27 @@ public abstract class FtsObjectWithEditor extends FtsUndoableObject {
       hideEditor();
   }
 
-  void releaseData()
-  {
+  public void registerObject(int nArgs , FtsAtom argums[])
+  {            
+    if(nArgs > 1 && argums[0].isInt() && argums[1].isSymbol())
+    {
+      int id = argums[0].intValue;
+      String className = argums[1].symbolValue.toString();
+      
+      FtsObject obj = JMaxApplication.getFtsServer().getObject(id);
+      if(obj == null)
+      {
+        args.clear();
+        args.addString(className);
+        JMaxApplication.getObjectManager().makeFtsObject(id, className, args.getAtoms());
+      }
+    }  
+ }
+
+ void releaseData()
+ {
     requestDestroyEditor();
-  }
+ }
 
   public void requestDestroyEditor()
   {

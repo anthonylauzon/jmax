@@ -30,6 +30,7 @@ import javax.swing.*;
 
 import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.renderers.*;
+import ircam.jmax.toolkit.*;
 
 /**
 * The panel containing the JTable representation of an Explode.
@@ -43,10 +44,9 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
     this.gc = gc;
     this.trackObj = (FtsTrackObject)tmodel.getTrackDataModel();
 
-		table = new JTable(tmodel);
-		table.setGridColor( ScoreRenderer.horizontalGridLinesColor);
-		table.setShowGrid(true);				
-		/************/
+    table = new JMaxMatTable(tmodel);
+		
+    /************/
     if(trackObj.getType() == AmbitusValue.info || trackObj.getType() == MarkerValue.info)
 		{
 			JComboBox combo = new JComboBox( trackObj.getEventTypes());

@@ -234,6 +234,8 @@ void setPropertyType( String type)
     typeClass = Float.class;
   else if( type.equals("double"))
     typeClass = Double.class;
+  else if( type.equals("object"))
+    typeClass = FtsGraphicObject.class;
   else //if( type.equals("string") || type.equals("symbol") || type.equals("enum"))
     typeClass = String.class;
 

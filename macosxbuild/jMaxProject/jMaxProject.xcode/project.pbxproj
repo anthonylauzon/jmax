@@ -56,6 +56,21 @@
 			settings = {
 			};
 		};
+		3B28F8AE06EF45CA009639A3 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = JMaxMatTable.java;
+			path = ../../java/src/ircam/jmax/toolkit/JMaxMatTable.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B28F8AF06EF45CA009639A3 = {
+			fileRef = 3B28F8AE06EF45CA009639A3;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		3B513E2806A4274500F1664A = {
 			children = (
 				3BA9870506AD60A600D18F4E,
@@ -7730,6 +7745,7 @@
 				5C5429C005AB0B970042B7A2,
 				3B02488106B94BDA002BEB0D,
 				3B6D539506D11770004013FE,
+				3B28F8AF06EF45CA009639A3,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -13669,8 +13685,7 @@
 			sourceTree = SOURCE_ROOT;
 		};
 		F53489AA03D58205016640F1 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXFrameworkReference;
+			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
 			name = libfts.framework;
 			path = build/libfts.framework;
@@ -13753,8 +13768,7 @@
 			sourceTree = SOURCE_ROOT;
 		};
 		F544CDC10338861901664092 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXBundleReference;
+			isa = PBXFileReference;
 			lastKnownFileType = "wrapper.plug-in";
 			name = libdtd.bundle;
 			path = build/libdtd.bundle;
@@ -13780,8 +13794,7 @@
 			sourceTree = SOURCE_ROOT;
 		};
 		F558B51303D586C7016640F1 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXFrameworkReference;
+			isa = PBXFileReference;
 			lastKnownFileType = file;
 			name = libftsutils.framework;
 			path = build/libftsutils.framework;
@@ -14104,8 +14117,6 @@
 			sourceTree = SOURCE_ROOT;
 		};
 		F5CE98EA035CAA1801664090 = {
-			buildRules = (
-			);
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
@@ -16142,8 +16153,7 @@
 			sourceTree = SOURCE_ROOT;
 		};
 		F8448E660286DD3701664092 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXFrameworkReference;
+			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
 			name = CoreFoundation.framework;
 			path = /System/Library/Frameworks/CoreFoundation.framework;
@@ -21075,8 +21085,6 @@
 			sourceTree = "<group>";
 		};
 		F880FCEB0282F7CE01664092 = {
-			buildRules = (
-			);
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -21089,8 +21097,6 @@
 			name = Development;
 		};
 		F880FCEC0282F7CE01664092 = {
-			buildRules = (
-			);
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -21200,8 +21206,7 @@
 			sourceTree = "<group>";
 		};
 		F880FCFA0282F8A501664092 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXFrameworkReference;
+			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
 			name = Carbon.framework;
 			path = /System/Library/Frameworks/Carbon.framework;
@@ -23571,6 +23576,7 @@
 				F880FE9D0283013E01664092,
 				F880FE9E0283013E01664092,
 				3B6D539406D11770004013FE,
+				3B28F8AE06EF45CA009639A3,
 				F880FE9F0283013E01664092,
 				F880FEA00283013E01664092,
 				F880FEA10283013E01664092,
@@ -26798,8 +26804,7 @@
 			sourceTree = "<group>";
 		};
 		F8F010CD028D861401664092 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXBundleReference;
+			isa = PBXFileReference;
 			lastKnownFileType = "wrapper.plug-in";
 			name = libcontrol.bundle;
 			path = build/libcontrol.bundle;
@@ -26807,8 +26812,7 @@
 			sourceTree = "<group>";
 		};
 		F8F010CE028D861401664092 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXBundleReference;
+			isa = PBXFileReference;
 			lastKnownFileType = "wrapper.plug-in";
 			name = libdata.bundle;
 			path = build/libdata.bundle;
@@ -26816,8 +26820,7 @@
 			sourceTree = "<group>";
 		};
 		F8F010CF028D861401664092 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXBundleReference;
+			isa = PBXFileReference;
 			lastKnownFileType = "wrapper.plug-in";
 			name = libguiobj.bundle;
 			path = build/libguiobj.bundle;
@@ -26825,8 +26828,7 @@
 			sourceTree = "<group>";
 		};
 		F8F010D0028D861401664092 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXBundleReference;
+			isa = PBXFileReference;
 			lastKnownFileType = "wrapper.plug-in";
 			name = libio.bundle;
 			path = build/libio.bundle;
@@ -26834,8 +26836,7 @@
 			sourceTree = "<group>";
 		};
 		F8F010D1028D861401664092 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXBundleReference;
+			isa = PBXFileReference;
 			lastKnownFileType = "wrapper.plug-in";
 			name = libispw.bundle;
 			path = build/libispw.bundle;
@@ -26843,8 +26844,7 @@
 			sourceTree = "<group>";
 		};
 		F8F010D2028D861401664092 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXBundleReference;
+			isa = PBXFileReference;
 			lastKnownFileType = "wrapper.plug-in";
 			name = libispwmath.bundle;
 			path = build/libispwmath.bundle;
@@ -26852,8 +26852,7 @@
 			sourceTree = "<group>";
 		};
 		F8F010D3028D861401664092 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXBundleReference;
+			isa = PBXFileReference;
 			lastKnownFileType = "wrapper.plug-in";
 			name = libmacosx.bundle;
 			path = build/libmacosx.bundle;
@@ -26861,8 +26860,7 @@
 			sourceTree = "<group>";
 		};
 		F8F010D4028D861401664092 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXBundleReference;
+			isa = PBXFileReference;
 			lastKnownFileType = "wrapper.plug-in";
 			name = libmidi.bundle;
 			path = build/libmidi.bundle;
@@ -26870,8 +26868,7 @@
 			sourceTree = "<group>";
 		};
 		F8F010D5028D861401664092 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXBundleReference;
+			isa = PBXFileReference;
 			lastKnownFileType = "wrapper.plug-in";
 			name = libnumeric.bundle;
 			path = build/libnumeric.bundle;
@@ -26879,8 +26876,7 @@
 			sourceTree = "<group>";
 		};
 		F8F010D6028D861401664092 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXBundleReference;
+			isa = PBXFileReference;
 			lastKnownFileType = "wrapper.plug-in";
 			name = libsequence.bundle;
 			path = build/libsequence.bundle;
@@ -26888,8 +26884,7 @@
 			sourceTree = "<group>";
 		};
 		F8F010D7028D861401664092 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXBundleReference;
+			isa = PBXFileReference;
 			lastKnownFileType = "wrapper.plug-in";
 			name = libsignal.bundle;
 			path = build/libsignal.bundle;
@@ -26897,8 +26892,7 @@
 			sourceTree = "<group>";
 		};
 		F8F010D8028D861401664092 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXBundleReference;
+			isa = PBXFileReference;
 			lastKnownFileType = "wrapper.plug-in";
 			name = libsystem.bundle;
 			path = build/libsystem.bundle;
@@ -26906,8 +26900,7 @@
 			sourceTree = "<group>";
 		};
 		F8F010D9028D861401664092 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXBundleReference;
+			isa = PBXFileReference;
 			lastKnownFileType = "wrapper.plug-in";
 			name = libutils.bundle;
 			path = build/libutils.bundle;
@@ -26988,8 +26981,7 @@
 			sourceTree = "<group>";
 		};
 		F8F010F2028D890E01664092 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXExecutableFileReference;
+			isa = PBXFileReference;
 			lastKnownFileType = "compiled.mach-o.executable";
 			name = fts;
 			path = build/fts;
@@ -26997,8 +26989,7 @@
 			sourceTree = "<group>";
 		};
 		F8F010FD028D8A2701664092 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXFrameworkReference;
+			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
 			name = CoreAudio.framework;
 			path = /System/Library/Frameworks/CoreAudio.framework;
@@ -27006,8 +26997,7 @@
 			sourceTree = "<absolute>";
 		};
 		F8F010FE028D8A2701664092 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXFrameworkReference;
+			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
 			name = CoreMIDI.framework;
 			path = /System/Library/Frameworks/CoreMIDI.framework;

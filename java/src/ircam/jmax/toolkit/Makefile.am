@@ -24,6 +24,7 @@ InfoPanel.java\
 InteractionModule.java\
 InteractionSemaphore.java\
 JMaxEditor.java\
+JMaxMatTable.java\
 Layer.java\
 LockListener.java\
 MouseDragTracker.java\
