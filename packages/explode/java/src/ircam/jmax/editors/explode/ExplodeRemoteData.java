@@ -647,7 +647,7 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
     Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
     ExplodeSelection objectsToPaste = null;
 
-    if (clipboardContent.isDataFlavorSupported(ExplodeDataFlavor.getInstance()))
+    if (clipboardContent != null && clipboardContent.isDataFlavorSupported(ExplodeDataFlavor.getInstance()))
       {
 	try {
 	  objectsToPaste = (ExplodeSelection) clipboardContent.getTransferData(ExplodeDataFlavor.getInstance());
