@@ -102,7 +102,7 @@ fts_audioport_delete( fts_audioport_t *port)
 }
 
 void
-fts_audioport_set_channel_used( fts_audioport_t *port, int channel, int direction, int used)
+fts_audioport_set_channel_used( fts_audioport_t *port, int direction, int channel, int used)
 {
   port->inout[direction].channel_used[ channel] = used;
 
@@ -111,7 +111,7 @@ fts_audioport_set_channel_used( fts_audioport_t *port, int channel, int directio
 }
 
 int
-fts_audioport_is_channel_used( fts_audioport_t *port, int channel, int direction)
+fts_audioport_is_channel_used( fts_audioport_t *port, int direction, int channel)
 {
   return port->inout[direction].channel_used[channel];
 }
@@ -151,7 +151,7 @@ fts_audioport_add_label( fts_audioport_t *port, int direction, fts_audiolabel_t 
 
       /* FIXME */
       /* when do we set the channel used ??? */
-      fts_audioport_set_channel_used( port, fts_audiolabel_get_channel( label, direction), direction, 1);
+      fts_audioport_set_channel_used( port, direction, fts_audiolabel_get_channel( label, direction), 1);
     }
 }
 
@@ -346,7 +346,7 @@ audiolabel_set_channel( fts_audiolabel_t *label, int direction, int channel)
   label->inout[direction].channel = channel;
 
   if ( label->inout[direction].port != NULL && channel >= 0)
-    fts_audioport_set_channel_used( label->inout[direction].port, channel, direction, 1);
+    fts_audioport_set_channel_used( label->inout[direction].port, direction, channel, 1);
 }
 
 static void
@@ -655,7 +655,7 @@ audio_sched_run( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	  float *mix_buff = port->mix_buffers[channel];
 	  int i;
 
-	  if (!fts_audioport_is_channel_used( port, channel, FTS_AUDIO_OUTPUT))
+	  if (!fts_audioport_is_channel_used( port, FTS_AUDIO_OUTPUT, channel))
 	    continue;
 
 	  for ( i = 0; i < tick_size; i++)
@@ -675,7 +675,7 @@ audio_sched_run( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	{
 	  float *mix_buff = port->mix_buffers[channel];
 
-	  if (!fts_audioport_is_channel_used( port, channel, FTS_AUDIO_OUTPUT))
+	  if (!fts_audioport_is_channel_used( port, FTS_AUDIO_OUTPUT, channel))
 	    continue;
 
 	  (*fts_audioport_get_copy_fun(port, FTS_AUDIO_OUTPUT))(port, mix_buff, tick_size, channel);
