@@ -247,7 +247,7 @@ alsaseqmidi_create_midiport(alsaseqmidi_t* this, fts_class_t* cl, fts_symbol_t d
   fts_log("[alsaseqmidi] Create alsaseqmidiport label_name: %s, device_name: %s, port_address: %s\n", label_name, device_name, port_address);
 #endif /* ALSA_SEQ_MIDI_LOG */
     
-  port = fts_object_create(cl, NULL, 4, args);
+  port = fts_object_create(cl, 4, args);
 
   return (fts_midiport_t*)port;
 }
@@ -478,7 +478,7 @@ alsaseqmidi_config(void)
   alsaseqmidi_symbol_alsaseq_midi_destination = fts_new_symbol("ALSA Destination");
   alsaseqmidi_symbol_alsaseq_midi_source = fts_new_symbol("ALSA Source");
 
-  o = fts_object_create(mc, NULL, 0, 0);
+  o = fts_object_create(mc, 0, 0);
 
   if (o != NULL)
     fts_midiconfig_add_manager((fts_midimanager_t*)o);

@@ -141,7 +141,7 @@ alsamidi_get_midiport(alsamidi_t *this, fts_symbol_t name)
 	  fts_set_object(args + 0, (fts_object_t *)this);
 	  fts_set_symbol(args + 1, name);
 	  fts_set_symbol(args + 2, hw_name);
-	  port = (fts_midiport_t *)fts_object_create(alsarawmidiport_type, NULL, 3, args);
+	  port = (fts_midiport_t *)fts_object_create(alsarawmidiport_type, 3, args);
 	}
     }
 
@@ -307,5 +307,5 @@ alsamidi_config( void)
 {
   fts_class_t *mc = fts_class_install(NULL, alsamidi_instantiate);
 
-  fts_midiconfig_add_manager((fts_midimanager_t *)fts_object_create(mc, NULL, 0, 0));
+  fts_midiconfig_add_manager((fts_midimanager_t *)fts_object_create(mc, 0, 0));
 }
