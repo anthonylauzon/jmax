@@ -85,7 +85,7 @@ FTS_API void fts_stack_destroy( fts_stack_t *stack);
  * @param b the stack
  * @ingroup stack
  */
-#define fts_stack_clear(S) ((S)->top = 0)
+#define fts_stack_clear(S) ((S)->top = -1)
 
 /**
  * Push an element on the stack.<BR>
