@@ -442,7 +442,7 @@ fts_package_require(fts_package_t* pkg, fts_symbol_t required_pkg)
   if (0 == fts_hashtable_remove(&fts_package_requirement, &key))
   {
     /* not reacheable case ..... */
-    fts_log("[package] required package wasn't in require hashtable \n");
+    fts_log("[package] required package %s wasn't in require hashtable \n", required_pkg);
   }
   return status;
 }
