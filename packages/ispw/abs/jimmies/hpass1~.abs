@@ -1,0 +1,18 @@
+max v2;
+#N vpatcher 397 321 736 574 -1;
+#P inlet 31 60 17 1;
+#P comment 7 41 65 1 input signal;
+#P comment 4 1 115 5 hpass1~.abs;
+#P newex 30 153 28 1 -~;
+#P newex 48 123 72 0 lpass1~.abs;
+#P inlet 110 79 15;
+#P comment 14 203 101 1 signal out: highpass filtered signal;
+#P outlet 30 181 16 1;
+#P comment 134 5 138 1 -- first order highpass filter;
+#P comment 99 34 80 1 cutoff fq <float> (default 50hz);
+#P connect 9 0 6 0;
+#P connect 5 0 6 1;
+#P connect 9 0 5 0;
+#P connect 4 0 5 1;
+#P connect 6 0 2 0;
+#P pop;

@@ -1,0 +1,17 @@
+max v2;
+#N vpatcher 266 483 666 769 -1;
+#P outlet 92 189 15;
+#P inlet 288 109 15;
+#P newex 92 147 128 1 expr 100 + 8.6858 *log(sqrt(\\\$f1) + .00001);
+#P newex 92 125 61 1 snapshot~;
+#P newex 92 101 155 1 2p2z~ 0.0001 0.9999 0 1 0 0;
+#P inlet 92 49 15;
+#P newex 92 73 31 1 *~;
+#P connect 4 0 6 0;
+#P connect 5 0 3 0;
+#P connect 0 0 2 0;
+#P connect 2 0 3 0;
+#P connect 3 0 4 0;
+#P connect 1 0 0 1;
+#P connect 1 0 0 0;
+#P pop;

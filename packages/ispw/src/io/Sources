@@ -1,0 +1,12 @@
+ifeq ($(VENDOR),sgi)
+	ARCH_SOURCES = disk.c
+endif
+
+ifeq ($(VENDOR),solaris2)
+	ARCH_SOURCES = disk.c
+endif
+
+SOURCES = $(ARCH_SOURCES) \
+dac1.c		\
+io.c
+

@@ -1,0 +1,10 @@
+SOURCES = \
+midi_module.c \
+Rreceive.c \
+Rsend.c \
+makenote.c \
+midi.c \
+midiformat.c \
+midiparse.c \
+stripnote.c \
+sustain.c \

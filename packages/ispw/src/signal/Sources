@@ -1,0 +1,27 @@
+SOURCES = \
+fft.c \
+fft_ftl.c \
+noise.c \
+osc.c \
+phas1.c \
+resample.c \
+samphold.c \
+sbinop.c \
+sig1.c \
+sigabs.c \
+sigarctan2.c \
+sigline.c \
+signal.c \
+sigparam.c \
+sigprint.c \
+sigsnap.c \
+sigswitch.c \
+sigthres.c \
+sigthrow.c \
+sigthru.c \
+vecarithm.c \
+vecclip.c \
+veclog.c \
+vecsqrt.c \
+vectrigon.c \
+zerocross.c \

@@ -1,0 +1,11 @@
+all	all	abs
+all	all	help
+all	all	ispw.jpk
+all	all	lib/ARCH/opt/libcontrol.so
+all	all	lib/ARCH/opt/libdata.so
+all	all	lib/ARCH/opt/libfilters.so
+all	all	lib/ARCH/opt/libio.so
+all	all	lib/ARCH/opt/libmidi.so
+all	all	lib/ARCH/opt/libpitch.so
+all	all	lib/ARCH/opt/libsampling.so
+all	all	lib/ARCH/opt/libsignal.so
