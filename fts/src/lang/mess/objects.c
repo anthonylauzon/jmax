@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.55 $ IRCAM $Date: 1998/11/24 15:50:57 $
+ *      $Revision: 1.56 $ IRCAM $Date: 1998/11/26 13:02:44 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -770,6 +770,7 @@ void fts_object_delete(fts_object_t *obj)
 {
   fts_object_reset(obj);
   fts_object_tell_deleted(obj);
+  fts_object_reset_changed(obj);
   fts_object_free(obj, 1);
 }
 
@@ -777,6 +778,7 @@ static void fts_object_delete_no_release(fts_object_t *obj)
 {
   fts_object_reset(obj);
   fts_object_tell_deleted(obj);
+  fts_object_reset_changed(obj);
   fts_object_free(obj, 0);
 }
 
@@ -804,10 +806,6 @@ static void fts_object_reset(fts_object_t *obj)
 
   while (obj->var_refs)
     fts_binding_remove_user(obj->var_refs->var, obj);
-
-  /* take it away from the update queue, if there */
-
-  fts_object_reset_changed(obj);
 }
 
 

@@ -34,12 +34,15 @@ extern int ftl_program_add_signal( ftl_program_t *prog, fts_symbol_t name, int v
 extern int ftl_declare_function( fts_symbol_t name, ftl_wrapper_t wrapper);
 
 
-extern void ftl_program_print( const ftl_program_t *prog );
+extern void ftl_program_post( const ftl_program_t *prog );
+extern void ftl_program_post_signals( const ftl_program_t *prog );
+extern void ftl_program_post_signals_count( const ftl_program_t *prog);
+extern void ftl_program_post_bytecode( const ftl_program_t *prog);
 
-extern void ftl_program_print_signals( const ftl_program_t *prog );
-extern void ftl_program_print_signals_count( const ftl_program_t *prog);
+extern void ftl_program_fprint( FILE *f, const ftl_program_t *prog );
+extern void ftl_program_fprint_signals( FILE *f, const ftl_program_t *prog );
+extern void ftl_program_fprint_signals_count( FILE *f, const ftl_program_t *prog);
 
-extern void ftl_program_print_bytecode( const ftl_program_t *prog);
 
 extern int ftl_program_compile( ftl_program_t *prog);
 

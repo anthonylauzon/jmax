@@ -38,13 +38,33 @@ dsp_on_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 dsp_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dsp_chain_print();
+  dsp_chain_post();
+}
+
+static void
+dsp_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  FILE *f;
+  
+  if (fts_is_symbol(at))
+    {
+      const char *filename;
+
+      filename = fts_symbol_name(fts_get_symbol(at));
+
+      f = fopen(filename, "w");
+
+      if (f)
+	dsp_chain_fprint(f);
+
+      fclose(f);
+    }
 }
 
 static void
 dsp_print_signals(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dsp_chain_print_signals();
+  dsp_chain_post_signals();
 }
 
 static fts_status_t
@@ -64,6 +84,10 @@ dsp_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define(cl, 0, fts_s_bang, dsp_print, 0, 0);
   fts_method_define(cl, 0, fts_new_symbol("print"), dsp_print, 0, 0);
+
+  a[0] = fts_s_symbol;
+  fts_method_define(cl, 0, fts_new_symbol("save"), dsp_save, 1, a);
+
   fts_method_define(cl, 0, fts_new_symbol("print-signals"), dsp_print_signals, 0, 0);
   
   return fts_Success;

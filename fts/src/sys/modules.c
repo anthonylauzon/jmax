@@ -133,6 +133,22 @@ fts_module_load(const char *name, const char *filename)
   void *handle;
   int fd;
 
+  /* test if the module is statically linked */
+#if 0
+  /* Doesn't work yet :-< ... */
+  {
+    char module_name[512];
+    sprintf(module_name, "%s_module", name);
+    
+    if (dlsym(NULL, module_name))
+      {
+	fprintf(stderr, "Module %s statically linked\n", name);
+	return fts_Success;
+      }
+    else
+      fprintf(stderr, "Module %s NOT statically linked, error %s\n", name, dlerror());
+  }
+#endif
   /* test if the module has been already loaded  */
 
   /* Temporarly commenter @@@ */
@@ -164,7 +180,6 @@ fts_module_load(const char *name, const char *filename)
 
       if (fd < 0)
 	{
-	  fprintf(stderr, "Library %s not found\n", name);
 	  return &library_not_found;
 	}
       else
@@ -178,7 +193,6 @@ fts_module_load(const char *name, const char *filename)
 	loadpath = pathbuf;
       else
 	{
-	  fprintf(stderr, "Library %s not found\n", name);
 	  return &library_not_found;
 	}
     }

@@ -70,8 +70,11 @@ extern void	    dsp_add_funcall(fts_symbol_t , int, fts_atom_t *);
 extern void	    dsp_chain_create(int vs);
 extern void	    dsp_chain_delete(void);
 
-extern void	    dsp_chain_print(void);
-extern void         dsp_chain_print_signals(void);
+extern void	    dsp_chain_post(void);
+extern void         dsp_chain_post_signals(void);
+
+extern void         dsp_chain_fprint(FILE *f);
+extern void         dsp_chain_fprint_signals(FILE *f);
 
 extern fts_object_t *dsp_get_current_object();
 

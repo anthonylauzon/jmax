@@ -676,11 +676,11 @@ ftl_program_compile( ftl_program_t *prog)
 
 
 /* ********************************************************************** */
-/* Print functions                                                        */
+/* Print and post functions                                               */
 /* ********************************************************************** */
 
 #ifdef DEBUG
-static void ftl_print_functions_table( void)
+static void ftl_post_functions_table( void)
 {
   fts_hash_table_iterator_t it;
   ftl_function_declaration *decl;
@@ -711,7 +711,7 @@ static void ftl_print_atom( char *s, const fts_atom_t *a)
     sprintf( s, "?");
 }
 
-void ftl_program_print_signals( const ftl_program_t *prog)
+void ftl_program_post_signals( const ftl_program_t *prog)
 {
   fts_hash_table_iterator_t iter;
 
@@ -732,21 +732,49 @@ void ftl_program_print_signals( const ftl_program_t *prog)
   post( "\n");
 }
 
-void ftl_program_print_signals_count( const ftl_program_t *prog)
+void ftl_program_fprint_signals( FILE *f, const ftl_program_t *prog)
+{
+  fts_hash_table_iterator_t iter;
+
+  fprintf( f,  "/* %d signals declarations */\n", 
+       fts_hash_table_get_count(&(prog->symbol_table)));
+
+  for( fts_hash_table_iterator_init( &iter, &(prog->symbol_table));
+      ! fts_hash_table_iterator_end( &iter);
+      fts_hash_table_iterator_next( &iter) )
+    {
+      ftl_memory_declaration *m;
+      fts_symbol_t s;
+
+      m = (ftl_memory_declaration *)fts_get_ptr(fts_hash_table_iterator_current_data( &iter));
+      s = fts_hash_table_iterator_current_symbol( &iter);
+      fprintf(f, "float %s[%d];  /* adress 0x%x */\n", fts_symbol_name(s), m->size, m->address);
+    }
+  fprintf(f, "\n");
+}
+
+void ftl_program_post_signals_count( const ftl_program_t *prog)
 {
   post( "ftl_program : signals %d\n", 
        fts_hash_table_get_count(&(prog->symbol_table)));
 }
 
-struct print_info {
+
+void ftl_program_fprint_signals_count( FILE *f, const ftl_program_t *prog)
+{
+  fprintf( f,  "ftl_program : signals %d\n", 
+	   fts_hash_table_get_count(&(prog->symbol_table)));
+}
+
+struct post_info {
   int pc;
   char line[256];
   ftl_instruction_debug_info_t *debug_info;
 };
 
-static fts_status_t print_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
+static fts_status_t post_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
 {
-  struct print_info *info = (struct print_info *)user_data;
+  struct post_info *info = (struct post_info *)user_data;
   char buffer[64];
   static int pc = 0;
 
@@ -755,7 +783,7 @@ static fts_status_t print_state_fun( int state, int newstate, fts_atom_t *a, voi
   case ST_OPCODE:
     switch( fts_get_long( a)) {
     case FTL_OPCODE_RETURN:
-      post( "/* %4d */   return;\n", info->pc);
+      post( "/* %5d */   return;\n", info->pc);
       break;
     case FTL_OPCODE_CALL:
       pc = info->pc;
@@ -764,7 +792,7 @@ static fts_status_t print_state_fun( int state, int newstate, fts_atom_t *a, voi
     }
     break;
   case ST_CALL_FUN:
-    sprintf( info->line, "/* %4d */   %s( ", pc, fts_symbol_name(fts_get_symbol(a)));
+    sprintf( info->line, "/* %5d */   %s( ", pc, fts_symbol_name(fts_get_symbol(a)));
     break;
   case ST_CALL_ARGV:
     if (fts_is_ptr(a))
@@ -794,12 +822,69 @@ static fts_status_t print_state_fun( int state, int newstate, fts_atom_t *a, voi
 }
 
 
-void ftl_program_print( const ftl_program_t *prog )
+struct print_info {
+  FILE *f;
+  int pc;
+  char line[256];
+  ftl_instruction_debug_info_t *debug_info;
+};
+
+static fts_status_t fprint_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
+{
+  struct print_info *info = (struct print_info *)user_data;
+  char buffer[64];
+  static int pc = 0;
+
+  buffer[0] = ' ';
+  switch( state) {
+  case ST_OPCODE:
+    switch( fts_get_long( a)) {
+    case FTL_OPCODE_RETURN:
+      fprintf(info->f, "/* %5d */   return;\n", info->pc);
+      break;
+    case FTL_OPCODE_CALL:
+      pc = info->pc;
+      info->pc++;
+      break;
+    }
+    break;
+  case ST_CALL_FUN:
+    sprintf( info->line, "/* %5d */   %s( ", pc, fts_symbol_name(fts_get_symbol(a)));
+    break;
+  case ST_CALL_ARGV:
+    if (fts_is_ptr(a))
+      sprintf( buffer, "(void *)0x%x", fts_get_ptr(a));
+    else
+      ftl_print_atom( buffer, a);
+    strcat( info->line, buffer);
+    if ( newstate == ST_OPCODE)
+      {
+	fts_object_t *object;
+
+	strcat( info->line, " );");
+	object = info->debug_info->object;
+	if (object)
+	  fprintf(info->f, "%s /* object %s */\n", info->line, fts_symbol_name( fts_object_get_class_name(object)));
+	else
+	  fprintf(info->f, "%s /* object unknown */\n", info->line);
+	  
+	info->debug_info++;
+      }
+    else
+      strcat( info->line, ", ");
+    break;
+  }
+
+  return fts_Success;
+}
+
+
+void ftl_program_post( const ftl_program_t *prog )
 {
   ftl_subroutine_t *subr;
-  struct print_info info;
+  struct post_info info;
 
-  ftl_program_print_signals(prog);
+  ftl_program_post_signals(prog);
 
   for( subr = prog->subroutines; subr; subr = subr->next)
     {
@@ -808,13 +893,34 @@ void ftl_program_print( const ftl_program_t *prog )
       info.line[0] = 0;
       info.pc = 0;
       info.debug_info = subr->debug_info_table.info;
-      ftl_state_machine( subr->instructions, print_state_fun, &info);
+      ftl_state_machine( subr->instructions, post_state_fun, &info);
       post( "}\n\n");
     }
 }
 
 
-void ftl_program_print_bytecode( const ftl_program_t *prog)
+void ftl_program_fprint( FILE *f, const ftl_program_t *prog )
+{
+  ftl_subroutine_t *subr;
+  struct print_info info;
+
+  ftl_program_fprint_signals(f, prog);
+
+  for( subr = prog->subroutines; subr; subr = subr->next)
+    {
+      fprintf( f, "%s()\n", fts_symbol_name( subr->name));
+      fprintf( f, "{\n");
+      info.f = f;
+      info.line[0] = 0;
+      info.pc = 0;
+      info.debug_info = subr->debug_info_table.info;
+      ftl_state_machine( subr->instructions, fprint_state_fun, &info);
+      fprintf( f, "}\n\n");
+    }
+}
+
+
+void ftl_program_post_bytecode( const ftl_program_t *prog)
 {
 #if 0
   ftl_subroutine_t *subr;

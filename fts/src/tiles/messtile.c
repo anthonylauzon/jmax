@@ -353,7 +353,6 @@ fts_mess_client_download_object(int ac, const fts_atom_t *av)
 
       if (! object)
 	{
-	  printf_mess("System Error in FOS message DOWNLOAD OBJECT: null object", ac, av);
 	  return;
 	}
 
@@ -385,7 +384,6 @@ fts_mess_client_download_connection(int ac, const fts_atom_t *av)
 
       if (! connection)
 	{
-	  printf_mess("System Error in FOS message DOWNLOAD CONNECTION: null connection", ac, av);
 	  return;
 	}
 

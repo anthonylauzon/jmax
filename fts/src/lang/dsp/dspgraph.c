@@ -716,17 +716,30 @@ void dsp_add_funcall(fts_symbol_t symb, int ac, fts_atom_t *av)
   ftl_program_add_call(dsp_chain_on, symb, ac, av, currently_scheduled_object);
 }
 
-void dsp_chain_print(void)
+void dsp_chain_post(void)
 {
   post("printing dsp chain:\n");
-  ftl_program_print(dsp_chain);
+  ftl_program_post(dsp_chain);
 }
 
-void dsp_chain_print_signals(void)
+void dsp_chain_post_signals(void)
 {
   post("printing signals:\n");
-  ftl_program_print_signals_count(dsp_chain);
+  ftl_program_post_signals_count(dsp_chain);
 }
+
+void dsp_chain_fprint(FILE *f)
+{
+  fprintf(f, "printing dsp chain:\n");
+  ftl_program_fprint(f, dsp_chain);
+}
+
+void dsp_chain_fprint_signals(FILE *f)
+{
+  fprintf(f, "printing signals:\n");
+  ftl_program_fprint_signals_count(f, dsp_chain);
+}
+
 
 int dsp_is_running( void)
 {

@@ -71,7 +71,7 @@
 #define HAS_UNROLL_BY8
 #define HAS_UNIX
 /* #define HAS_TTY_DEV */ /* don't commit with this on until ttydev is fixed */
-#define VECLIB_LOOP_UNROLL 8
+#define VECLIB_LOOP_UNROLL 4
 #define FTS_USE_NAMED_PIPES
 #define FTS_HAS_BIG_ENDIAN
 
