@@ -1,5 +1,8 @@
 2000-04-06  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
+	* Added io/c/src/serial.c: a partial rewriting of Winfried Ritsch's serial object.
+	It uses now the file descriptor scheduler.
+
 	* alsadev/src/alsa*.c: added ALSA raw midi device
 
 2000-04-05  Norbert Schnell  <schnell@ircam.fr>
