@@ -2530,7 +2530,7 @@ fmat_xmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       ptr[i] = res[i]; 
  
     if(fmat_editor_is_open(self))
-      fmat_upload_data(self);
+      fmat_upload(self);
     
     fts_return_object(o);
   }
@@ -2693,7 +2693,7 @@ fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     }
     
     if(fmat_editor_is_open(self))
-      fmat_upload_data(self);
+      fmat_upload(self);
     
     fts_return_object(o);
   }
@@ -2833,7 +2833,7 @@ fmat_abs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   }
   
   if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
+    fmat_upload(self);
   
   fts_return_object(o);
 }
@@ -2881,7 +2881,7 @@ fmat_logabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   }
   
   if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
+    fmat_upload(self);
   
   fts_return_object(o);
 }
@@ -3031,7 +3031,7 @@ fmat_sqrabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   }
 
   if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
+    fmat_upload(self);
   
   fts_return_object(o);
 }
@@ -3149,7 +3149,7 @@ fmat_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   }
   
   if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
+    fmat_upload(self);
   
   fts_return_object(o);
 }
@@ -3195,7 +3195,7 @@ fmat_rifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   }
  
   if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
+    fmat_upload(self);
   
   fts_return_object(o);
 }
@@ -3826,7 +3826,7 @@ fmat_convert_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   }
     
   if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
+    fmat_upload(self);
 
   fts_return_object(o);
 }
@@ -3939,7 +3939,7 @@ fmat_convert_polar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fmat_set_format(self, fmat_format_polar);
   
   if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
+    fmat_upload(self);
   
   fts_return_object(o);
 }
