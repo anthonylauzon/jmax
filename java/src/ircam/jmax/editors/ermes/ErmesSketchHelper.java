@@ -123,13 +123,14 @@ class ErmesSketchHelper extends Object{
 	  aConnection.GetConnectionSet().Remove(aConnection);
 	}
 	if(aConnection.GetSelected()) itsSketchPad.itsSelectedConnections.removeElement(aConnection);
-	aConnection.Delete();//remove all the segments from the sketchpad components and finalize 
+	if (aConnection.itsFtsConnection != null)) aConnection.itsFtsConnection.delete();
       }
     }
     for(Enumeration e1 = theObject.GetOutletList().elements() ; e1.hasMoreElements() ;) {
       aOutlet = (ErmesObjOutlet) e1.nextElement();
       while (!aOutlet.GetConnections().isEmpty()) {
 	aConnection = (ErmesConnection) aOutlet.GetConnections().firstElement();
+	
 	aInlet = aConnection.GetInlet();
 	itsSketchPad.itsConnections.removeElement(aConnection);
 	aInlet.GetConnections().removeElement(aConnection);
@@ -142,7 +143,7 @@ class ErmesSketchHelper extends Object{
 	  aConnection.GetConnectionSet().Remove(aConnection);
 	}
 	if(aConnection.GetSelected()) itsSketchPad.itsSelectedConnections.removeElement(aConnection);
-	aConnection.Delete();//remove all the segments from the sketchpad components and finalize 
+	if (aConnection.itsFtsConnection != null) aConnection.itsFtsConnection.delete();
       }
     }
     itsSketchPad.repaint();
@@ -244,6 +245,7 @@ class ErmesSketchHelper extends Object{
 	DeleteObject(aObject);
       }
       while(!itsSketchPad.itsSelectedConnections.isEmpty()){
+	int i=0;
 	aConnection = (ErmesConnection) itsSketchPad.itsSelectedConnections.firstElement();
 	DeleteConnection(aConnection);
       }
