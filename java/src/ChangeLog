@@ -1,3 +1,10 @@
+2000-03-23  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* Changed protocol handling: FtsStream.java
+	  - the protocol is now binary in both directions.
+	  - the symbols are cached in both directions.
+	  - the code is cleaner
+
 2000-03-16  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* ircam/fts: changed FtsDatagramStream, trying to fix the

@@ -371,12 +371,6 @@ fts_halt(void)
 }
 
 void
-fts_restart(void)
-{
-  fts_modules_restart();
-}
-
-void
 fts_sched_run(void)
 {
   int tick_counter = 0;

@@ -34,7 +34,8 @@ public class FtsAtom {
   public static final int INT = 1;
   public static final int FLOAT = 2;
   public static final int STRING = 3;
-  public static final int OBJECT = 4;
+  public static final int SYMBOL = 4;
+  public static final int OBJECT = 5;
   
   public final boolean isVoid()
   {
@@ -54,6 +55,11 @@ public class FtsAtom {
   public final boolean isString()
   {
     return type == STRING;
+  }
+
+  public final boolean isSymbol()
+  {
+    return type == SYMBOL;
   }
 
   public final boolean isObject()
@@ -99,6 +105,17 @@ public class FtsAtom {
     stringValue = s;
   }
 
+  public final FtsSymbol getSymbol()
+  {
+    return symbolValue;
+  }
+
+  public final void setSymbol( FtsSymbol s)
+  {
+    type = SYMBOL;
+    symbolValue = s;
+  }
+
   public final FtsObject getObject()
   {
     return objectValue;
@@ -121,6 +138,8 @@ public class FtsAtom {
       return new Float( floatValue);
     case STRING:
       return stringValue;
+    case SYMBOL:
+      return symbolValue;
     case OBJECT:
       return objectValue;
     }
@@ -132,5 +151,6 @@ public class FtsAtom {
   public int intValue;
   public float floatValue;
   public String stringValue;
+  public FtsSymbol symbolValue;
   public FtsObject objectValue;
 }

@@ -1,3 +1,23 @@
+2000-03-23  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* Changed protocol handling: runtime/client/incoming.c, runtime/client/outgoing.c
+	  - the protocol is now binary in both directions.
+	  - the symbols are cached in both directions.
+	  - the code is cleaner
+	  - some bug fixes (symbol cache miss resulted in an infinite loop...)
+
+2000-03-22  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* Changed symbols.[ch]:
+	  - introduced predefsymbols.h in order to centralize predefined symbols definition
+	  - added doc headers to symbols.h
+	  - cleaned code in symbols.c
+
+	* Changed outgoing.c:
+	  - moved symbol cache handling there
+	  - removed useless code
+	  - fixed sending symbol as string (which happens when symbol cannot be cached)
+
 2000-02-21  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* Fixed "cannot kill fts without being super-user". This came from a bug in 

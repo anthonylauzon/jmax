@@ -326,11 +326,11 @@ void fts_data_remote_call( fts_data_t *data, int key, int ac, const fts_atom_t *
   if (! fts_data_is_exported(data))
     fts_data_export(data);
 
-  fts_client_mess_start_msg(REMOTE_CALL_CODE);
-  fts_client_mess_add_data(data);
-  fts_client_mess_add_int(key);
-  fts_client_mess_add_atoms(ac, at);
-  fts_client_mess_send_msg();
+  fts_client_start_msg(REMOTE_CALL_CODE);
+  fts_client_add_data(data);
+  fts_client_add_int(key);
+  fts_client_add_atoms(ac, at);
+  fts_client_done_msg();
 }
 
 
@@ -347,14 +347,14 @@ void fts_data_start_remote_call( fts_data_t *data, int key)
   if (! fts_data_is_exported(data))
     fts_data_export(data);
 
-  fts_client_mess_start_msg( REMOTE_CALL_CODE);
-  fts_client_mess_add_data(data);
-  fts_client_mess_add_int(key);
+  fts_client_start_msg( REMOTE_CALL_CODE);
+  fts_client_add_data(data);
+  fts_client_add_int(key);
 }
 
 void fts_data_end_remote_call()
 {
-  fts_client_mess_send_msg();
+  fts_client_done_msg();
 }
 
 /* Debug and printout functions */

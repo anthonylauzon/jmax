@@ -47,7 +47,6 @@
 extern void dsp_compiler_init(void);
 extern void dsp_install_clocks(void);
 static void dsp_module_init(void);
-static void dsp_module_restart(void);
 static void dsp_module_shutdown(void);
 extern void fts_dsp_control_config(void);
 extern void Sig_init(void);
@@ -63,7 +62,7 @@ fts_symbol_t fts_s_dsp_upsampling;
 fts_symbol_t fts_s_dsp_downsampling;
 fts_symbol_t fts_s_dsp_outputsize; /* give an absolute size for output vector */
 
-fts_module_t fts_dsp_module = {"Dsp", "Dsp compiler", dsp_module_init, dsp_module_restart, dsp_module_shutdown};
+fts_module_t fts_dsp_module = {"Dsp", "Dsp compiler", dsp_module_init, 0, dsp_module_shutdown};
 
 static void
 dsp_module_init(void)
@@ -91,13 +90,6 @@ dsp_module_init(void)
   /* Initialize the dsp control data object */
 
   fts_dsp_control_config();
-}
-
-
-static void
-dsp_module_restart(void)
-{
-  fts_param_set_int(fts_s_dsp_on, 0);
 }
 
 

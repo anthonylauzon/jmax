@@ -116,7 +116,6 @@ static fts_status_t fts_audio_reset_output_logical_dev(void);
 
 
 static void fts_audio_init(void);
-static void fts_audio_restart(void);
 static void fts_audio_shutdown(void);
 
 static void fts_audio_null_dac(fts_word_t *args);
@@ -131,7 +130,7 @@ static fts_hash_table_t fts_audio_output_logical_device_table;
 static int fts_audio_pending_close = 0; 
 
 fts_module_t fts_audio_module = {"FTS Audio", "FTS Audio Input Output system ",
-				    fts_audio_init, fts_audio_restart, fts_audio_shutdown};
+				    fts_audio_init, 0, fts_audio_shutdown};
 
 
 
@@ -205,14 +204,6 @@ static void fts_audio_close_an_output_device(fts_symbol_t name, fts_atom_t *data
 
 static void
 fts_audio_shutdown(void)
-{
-  fts_hash_table_apply(&fts_audio_input_logical_device_table, fts_audio_close_an_input_device, 0);
-  fts_hash_table_apply(&fts_audio_output_logical_device_table, fts_audio_close_an_output_device, 0);
-}
-
-
-static void
-fts_audio_restart(void)
 {
   fts_hash_table_apply(&fts_audio_input_logical_device_table, fts_audio_close_an_input_device, 0);
   fts_hash_table_apply(&fts_audio_output_logical_device_table, fts_audio_close_an_output_device, 0);

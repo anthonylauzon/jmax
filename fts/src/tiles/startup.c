@@ -57,9 +57,7 @@ int main(int argc, char **argv)
   while (argc && **argv == '-')
     {
       if (! strcmp(*argv, "-help"))
-	fprintf(stderr, "Usage: fts [-help] [-s] -norealtime <client dev description>\n");
-      else if (! strcmp(*argv, "-s"))
-	set_restart_on_eof(1);
+	fprintf(stderr, "Usage: fts [-help] <client dev description>\n");
       /* (fd) This option is disabled and will disappear soon. I think it is useless,
 	 but you never know... */
 /*        else if (! strcmp( *argv, "-norealtime")) */

@@ -73,7 +73,6 @@ static fts_status_description_t invalid_midi_dev =
 /******************************************************************************/
 
 static void midi_init(void);
-static void midi_restart(void);
 static void midi_shutdown(void);
 static void midi_poll(void);
 
@@ -83,7 +82,7 @@ static fts_status_t fts_unset_midi_logical_dev(int ac, const fts_atom_t *at);
 static fts_status_t fts_reset_midi_logical_dev(void);
 static void         fts_midi_close_all(void);
 
-fts_module_t fts_midi_module = {"Midi", "Midi communication", midi_init, midi_restart, midi_shutdown};
+fts_module_t fts_midi_module = {"Midi", "Midi communication", midi_init, 0, midi_shutdown};
 
 static void
 midi_init(void)
@@ -99,12 +98,6 @@ midi_init(void)
 			  );
 }
 
-
-static void
-midi_restart(void)
-{
-  fts_midi_close_all();
-}
 
 static void
 midi_shutdown(void)

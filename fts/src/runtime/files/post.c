@@ -97,7 +97,7 @@ static char post_buffer[POST_BUFFER_LENGTH + POST_LINE_MAXLENGTH];
 static char *fill_p = post_buffer;
 static char *flush_p = post_buffer;
 
-void post_flush()
+void post_flush( void)
 {
   char *p;
 
@@ -112,9 +112,9 @@ void post_flush()
 	  *p = '\0';
 	  p++;
 
-	  fts_client_mess_start_msg( POST_LINE_CODE);
-	  fts_client_mess_add_string( flush_p);
-	  fts_client_mess_send_msg();
+	  fts_client_start_msg( POST_LINE_CODE);
+	  fts_client_add_string( flush_p);
+	  fts_client_done_msg();
 
 	  /* 
 	   * Test if we are past POST_BUFFER_LENGTH.
@@ -198,9 +198,9 @@ void post_error(fts_object_t *obj, const char *format , ...)
   fts_set_symbol(&a, fts_new_symbol_copy(buf));
   fts_object_put_prop(obj, fts_s_error_description, &a);
 
-  fts_client_mess_start_msg(POST_CODE);
-  fts_client_mess_add_string(buf);
-  fts_client_mess_send_msg();
+  fts_client_start_msg(POST_CODE);
+  fts_client_add_string(buf);
+  fts_client_done_msg();
 }
 
 

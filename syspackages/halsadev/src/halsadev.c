@@ -95,6 +95,10 @@ static int init( int card, int device)
   if ( (err = hm_open( s_hm, card, device, sample_rate, fragment_samples)) < 0)
     {
       post( "Error: open failed: %s\n", snd_strerror( err));
+
+      fts_free( s_hm);
+      s_hm = 0;
+
       return -1;
     }
 
@@ -205,12 +209,15 @@ static fts_status_t alsa_dac_close(fts_dev_t *dev)
 
 static int alsa_dac_get_nchans( fts_dev_t *dev)
 {
+  if (!s_hm)
+    return 0;
+
   return hm_get_n_channels( s_hm);
 }
 
 static int alsa_dac_get_nerrors( fts_dev_t *dev)
 {
-  if ( underrun_count != hm_get_underrun_count( s_hm))
+  if ( s_hm && underrun_count != hm_get_underrun_count( s_hm))
     {
       underrun_count = hm_get_underrun_count( s_hm);
       return 1;
@@ -238,6 +245,9 @@ static void alsa_dac_put( fts_word_t *argv)
 {
   fts_dev_t *dev;
   int channel, n_channels, n, i;
+
+  if (!s_hm)
+    return;
 
   dev = *((fts_dev_t **)fts_word_get_ptr( argv));
 
@@ -327,6 +337,9 @@ static fts_status_t alsa_adc_close(fts_dev_t *dev)
 
 static int alsa_adc_get_nchans(fts_dev_t *dev)
 {
+  if (!s_hm)
+    return 0;
+
   return hm_get_n_channels( s_hm);
 }
 
@@ -347,6 +360,9 @@ static void alsa_adc_get( fts_word_t *argv)
 {
   fts_dev_t *dev;
   int channel, n_channels, n, i;
+
+  if (!s_hm)
+    return;
 
   dev = *((fts_dev_t **)fts_word_get_ptr( argv));
 

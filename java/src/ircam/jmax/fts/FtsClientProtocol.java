@@ -37,16 +37,16 @@ class FtsClientProtocol
 {
   // Protocol type coding Special chars
 
-  static final int string_start         = 0x01;
-  static final int string_end           = 0x02;
-  static final int int_type             = 0x03;
-  static final int float_type           = 0x04;
-  static final int symbol_cached_type   = 0x05;
-  static final int symbol_and_def_type  = 0x06;
-  static final int symbol_type          = 0x07;
-  static final int object_type          = 0x08;
-  static final int connection_type      = 0x09;
-  static final int data_type            = 0x0a;
+  static final int string_code          = 0x01;
+  static final int string_end_code      = 0x02;
+  static final int int_code             = 0x03;
+  static final int float_code           = 0x04;
+  static final int symbol_cached_code   = 0x05;
+  static final int symbol_and_def_code  = 0x06;
+  static final int symbol_code          = 0x07;
+  static final int object_code          = 0x08;
+  static final int connection_code      = 0x09;
+  static final int data_code            = 0x0a;
   static final int end_of_message       = 0x0b;
   
   // predicated coding protocol character sets
@@ -54,14 +54,14 @@ class FtsClientProtocol
   static boolean tokenStartingChar(int c)
   {
     return (
-	    (c == int_type) ||
-	    (c == float_type)   ||
-	    (c == symbol_type)   ||
-	    (c == symbol_and_def_type)   ||
-	    (c == object_type)   ||
-	    (c == connection_type) || 
-	    (c == data_type)   ||
-	    (c == string_start) ||
+	    (c == int_code) ||
+	    (c == float_code)   ||
+	    (c == symbol_code)   ||
+	    (c == symbol_and_def_code)   ||
+	    (c == object_code)   ||
+	    (c == connection_code) || 
+	    (c == data_code)   ||
+	    (c == string_code) ||
 	    (c == end_of_message)
 	     );
   }

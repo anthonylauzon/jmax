@@ -99,18 +99,6 @@ fts_modules_init(void)
 }
 
 
-void
-fts_modules_restart(void)
-{
-  fts_module_t *s;
-
-  for (s = fts_installed_modules; s; s = s->next)
-    {
-      if (s->restart_f)
-	(* s->restart_f)();
-    }
-}
-
 /* use a recursive function to call the shutdown functions 
    in the inverse order of the  init functions 
 */

@@ -255,16 +255,16 @@ static void int_vector_export_fun(fts_data_t *data)
       if(name)
 	{
 	  fts_data_start_remote_call(data, INT_VECTOR_NAME);
-	  fts_client_mess_add_symbol(name);
+	  fts_client_add_symbol(name);
 	  fts_data_end_remote_call();
 	}
     }
 
   fts_data_start_remote_call(data, INT_VECTOR_SET);
-  fts_client_mess_add_int(vector->size);
+  fts_client_add_int(vector->size);
 
   for (i = 0; i < vector->size; i++)
-    fts_client_mess_add_int(vector->values[i]);
+    fts_client_add_int(vector->values[i]);
 
   fts_data_end_remote_call();
 }
@@ -294,10 +294,10 @@ int_vector_remote_update( fts_data_t *data, int ac, const fts_atom_t *at)
   int i;
 
   fts_data_start_remote_call(data, INT_VECTOR_SET);
-  fts_client_mess_add_int(vector->size);
+  fts_client_add_int(vector->size);
 
   for (i=0; i<vector->size; i++)
-    fts_client_mess_add_int(vector->values[i]);
+    fts_client_add_int(vector->values[i]);
 
   fts_data_end_remote_call();
 }

@@ -139,26 +139,26 @@ static void fts_client_send_property(fts_object_t *obj, fts_symbol_t name)
       }
 #endif
 
-      fts_client_mess_start_msg(CLIENTPROP_CODE);
-      fts_client_mess_add_object(obj);
-      fts_client_mess_add_symbol(name);
-      fts_client_mess_add_atoms(1, &a);
-      fts_client_mess_send_msg();
+      fts_client_start_msg(CLIENTPROP_CODE);
+      fts_client_add_object(obj);
+      fts_client_add_symbol(name);
+      fts_client_add_atoms(1, &a);
+      fts_client_done_msg();
     }
 }
 
 
 static void update_group_start(void)
 {
-  fts_client_mess_start_msg(UPDATE_GROUP_START_CODE);
-  fts_client_mess_send_msg();
+  fts_client_start_msg(UPDATE_GROUP_START_CODE);
+  fts_client_done_msg();
 }
 
 
 static void update_group_end(void)
 {
-  fts_client_mess_start_msg(UPDATE_GROUP_END_CODE);
-  fts_client_mess_send_msg();
+  fts_client_start_msg(UPDATE_GROUP_END_CODE);
+  fts_client_done_msg();
 }
 
 

@@ -78,6 +78,20 @@ abstract public class FtsStream
   /*                                                                            */
   /******************************************************************************/
 
+  private final void writeInt( int i) throws java.io.IOException 
+  {
+    write( (i >> 24) & 0xff);
+    write( (i >> 16) & 0xff);
+    write( (i >> 8) & 0xff);
+    write( (i) & 0xff);
+  }
+
+  private final void writeString( String s) throws java.io.IOException 
+  {
+    for ( int i = 0; i < s.length(); i++)
+      write(s.charAt(i));
+  }
+
   /* Send a message in the connection.various methods to 
     send partial data and complete messages.
     */
@@ -88,197 +102,138 @@ abstract public class FtsStream
     write(command);
   }
 
-  /** Send an Int passes as an Integer */
-  final void sendInt(Integer io) throws java.io.IOException 
-  {
-    sendInt(io.intValue());
-  }
-
   /** Send an Int passes as an int*/
   final void sendInt(int value) throws java.io.IOException 
   {
     String s;
 	
-    write(FtsClientProtocol.int_type);
-    s = Integer.toString(value);
-	
-    for (int i = 0; i < s.length(); i++)
-      write(s.charAt(i));
+    write(FtsClientProtocol.int_code);
+    writeInt( value);
   }
 
-  /** Send an Int passes as a string */
-  final void sendInt(String s) throws java.io.IOException 
+  /** Send an Int passes as an Integer */
+  final void sendInt(Integer i) throws java.io.IOException 
   {
-    write(FtsClientProtocol.int_type);
-    
-    for (int i = 0; i < s.length(); i++)
-      write(s.charAt(i));
+    sendInt(i.intValue());
   }
- 
-
-  /** Send an Int passed  as a String Buffer */
-  final void sendInt(StringBuffer s) throws java.io.IOException 
-  {
-    write(FtsClientProtocol.int_type);
-    
-    for (int i = 0; i < s.length(); i++)
-      write(s.charAt(i));
-  }
-
-
-  /** Send a Float passed as a Float */
-  final void sendFloat(Float fo) throws java.io.IOException 
-  {
-    String s;
-
-    write(FtsClientProtocol.float_type);
-    s = fo.toString();
-
-    for (int i = 0; i < s.length(); i++)
-      write(s.charAt(i));
-  }
-
 
   /** Send a Float passed as a float */
   final void sendFloat(float value) throws java.io.IOException 
   {
-    String s;
-
-    write(FtsClientProtocol.float_type);
-    s = String.valueOf(value);
-
-    for (int i = 0; i < s.length(); i++)
-      write(s.charAt(i));
+    write(FtsClientProtocol.float_code);
+    writeInt( Float.floatToIntBits(value));
   }
 
-  /** Send a float got as a string */
-  final void sendFloat(String s) throws java.io.IOException 
+  /** Send a Float passed as a Float */
+  final void sendFloat( Float f) throws java.io.IOException 
   {
-    write(FtsClientProtocol.float_type);
-
-    for (int i = 0; i < s.length(); i++)
-      write(s.charAt(i));
+    sendFloat( f.floatValue());
   }
-
-  /** Send a float got as a string buffer */
-  final void sendFloat(StringBuffer s) throws java.io.IOException 
-  {
-    write(FtsClientProtocol.float_type);
-
-    for (int i = 0; i < s.length(); i++)
-      write(s.charAt(i));
-  }
-
 
   /** Send a string, passed as a String */
   final void sendString(String s) throws java.io.IOException 
   {
-    write(FtsClientProtocol.string_start);
-
-    for (int i = 0; i < s.length(); i++)
-      write(s.charAt(i));
-
-    write(FtsClientProtocol.string_end);
+    write(FtsClientProtocol.string_code);
+    writeString( s);
+    write( FtsClientProtocol.string_end_code);
   }
-
 
   /** Send a string, passed as a StringBuffer */
-  final void sendString(StringBuffer s) throws java.io.IOException 
+  final void sendString( StringBuffer s) throws java.io.IOException 
   {
-    write(FtsClientProtocol.string_start);
+    write(FtsClientProtocol.string_code);
 
     for (int i = 0; i < s.length(); i++)
       write(s.charAt(i));
 
-    write(FtsClientProtocol.string_end);
+    write(FtsClientProtocol.string_end_code);
   }
   
+  private static int outgoingSymbolCacheFreeIndex = 0;
+  private static final int MAX_CACHE_INDEX = 512;
 
-  /** Send an Object id */
-  final void sendObject(FtsObject obj) throws java.io.IOException 
+  /** Send a FtsSymbol */ 
+  final void sendSymbol( FtsSymbol symbol) throws java.io.IOException 
   {
-    int value;
-    String s;
+    if ( symbol.isCached() )
+      {
+	write( FtsClientProtocol.symbol_cached_code);
+	writeInt( symbol.getCacheIndex());
+      }
+    else if ( outgoingSymbolCacheFreeIndex < MAX_CACHE_INDEX)
+      {
+	symbol.setCacheIndex( outgoingSymbolCacheFreeIndex++);
+
+	write( FtsClientProtocol.symbol_and_def_code);
+	writeInt( symbol.getCacheIndex());
+	writeString( symbol.getString());
+	write( FtsClientProtocol.string_end_code);
+      }
+    else
+      {
+	write( FtsClientProtocol.symbol_code);
+	writeString( symbol.getString());
+	write( FtsClientProtocol.string_end_code);
+    }
+  }
+
+  /** Send an Object passed as an FtsObject */
+  final void sendObject( FtsObject obj) throws java.io.IOException 
+  {
+    int id;
 
     if (obj != null)
-      value = obj.getObjectId();
+      id = obj.getObjectId();
     else
-      value = 0;
+      id = 0;
 
-    write(FtsClientProtocol.object_type);
-    s = Integer.toString(value);
-		
-    for (int i = 0; i < s.length(); i++)
-      write(s.charAt(i));
+    write(FtsClientProtocol.object_code);
+    writeInt( id);
   }
 
 
-  /** Send an Object id */
-  final void sendObject(int id) throws java.io.IOException 
+  /** Send an Object passed as and object id */
+  final void sendObject( int id) throws java.io.IOException 
   {
-    int value;
-    String s;
-
-    value = id;
-
-    write(FtsClientProtocol.object_type);
-    s = Integer.toString(value);
-		
-    for (int i = 0; i < s.length(); i++)
-      write(s.charAt(i));
+    write(FtsClientProtocol.object_code);
+    writeInt( id);
   }
 
 
-  /** Send a Connection id */
+  /** Send a Connection passed as an FtsConnection */
   final void sendConnection(FtsConnection connection) throws java.io.IOException 
   {
-    int value;
-    String s;
+    int id;
 
     if (connection != null)
-      value = connection.getConnectionId();
+      id = connection.getConnectionId();
     else
-      value = 0;
+      id = 0;
 
-    write(FtsClientProtocol.connection_type);
-    s = Integer.toString(value);
-		
-    for (int i = 0; i < s.length(); i++)
-      write(s.charAt(i));
+    write(FtsClientProtocol.connection_code);
+    writeInt( id);
   }
 
-  /** Send a Connection id */
+  /** Send a Connection passed as an id */
   final void sendConnection(int id) throws java.io.IOException 
   {
-    int value;
-    String s;
-
-    value = id;
-
-    write(FtsClientProtocol.connection_type);
-    s = Integer.toString(value);
-		
-    for (int i = 0; i < s.length(); i++)
-      write(s.charAt(i));
+    write(FtsClientProtocol.connection_code);
+    writeInt( id);
   }
 
 
   /** Send a remote data id */
   final void sendRemoteData( FtsRemoteData data) throws java.io.IOException 
   {
-    int value;
-    String s;
+    int id;
 
     if ( data != null)
-      value = data.getId();
+      id = data.getId();
     else
-      value = 0;
+      id = 0;
 
-    write( FtsClientProtocol.data_type);
-    s = Integer.toString(value);
-		
-    for (int i = 0; i < s.length(); i++)
-      write(s.charAt(i));
+    write( FtsClientProtocol.data_code);
+    writeInt( id);
   }
 
   /** Send a value */
@@ -401,7 +356,7 @@ abstract public class FtsStream
    * @exception ircam.jmax.fts.FtsQuittedExcepetion For some reason the FTS server quitted.
    */
 
-  private String[] symbolCache = new String[1024];
+  private String[] incomingSymbolCache = new String[1024];
   private StringBuffer s = new StringBuffer();
   private int status = FtsClientProtocol.end_of_message; // the parser status, usually next arg type
 
@@ -410,15 +365,15 @@ abstract public class FtsStream
     int size;
     String[] newCache;
 
-    size = symbolCache.length;
+    size = incomingSymbolCache.length;
 
     while (idx < size)
       size = 2 * size;
 
     newCache = new String[size];
-    System.arraycopy(newCache, 0, symbolCache, 0, symbolCache.length);
+    System.arraycopy(newCache, 0, incomingSymbolCache, 0, incomingSymbolCache.length);
 
-    symbolCache = newCache;
+    incomingSymbolCache = newCache;
   }
 
   private final void skipToEnd()
@@ -445,52 +400,48 @@ abstract public class FtsStream
   /** Check if the next arguments in the current message  is an int */
   public final boolean nextIsInt()
   {
-    return status == FtsClientProtocol.int_type;
+    return status == FtsClientProtocol.int_code;
   }
 
   /** Check if the next arguments in the current message  is a float */
   public final boolean nextIsFloat()
   {
-    return status == FtsClientProtocol.float_type;
+    return status == FtsClientProtocol.float_code;
   }
 
 
   /** Check if the next arguments in the current message  is a symbol */
   public final boolean nextIsSymbol()
   {
-    return ((status == FtsClientProtocol.symbol_type) ||
-	    (status == FtsClientProtocol.symbol_cached_type) ||
-	    (status == FtsClientProtocol.symbol_and_def_type));
+    return ((status == FtsClientProtocol.symbol_code) ||
+	    (status == FtsClientProtocol.symbol_cached_code) ||
+	    (status == FtsClientProtocol.symbol_and_def_code));
   }
 
 
   /** Check if the next arguments in the current message  is a string */
   public final boolean nextIsString()
   {
-    return ((status == FtsClientProtocol.symbol_type) ||
-	    (status == FtsClientProtocol.symbol_and_def_type) || 
-	    (status == FtsClientProtocol.string_start));
+    return ((status == FtsClientProtocol.string_code));
   }
 
   /** Check if the next arguments in the current message  is an object */
   public final boolean nextIsObject()
   {
-    return status == FtsClientProtocol.object_type;
+    return status == FtsClientProtocol.object_code;
   }
 
   /** Check if the next arguments in the current message  is a connection  */
   public final boolean nextIsConnection()
   {
-    return status == FtsClientProtocol.connection_type;
+    return status == FtsClientProtocol.connection_code;
   }
-
 
   /** Check if the next arguments in the current message  is a remote data   */
   public final boolean nextIsData()
   {
-    return status == FtsClientProtocol.data_type;
+    return status == FtsClientProtocol.data_code;
   }
-
 
   /** Get the command code of the next message */
   public final int getCommand()
@@ -572,7 +523,7 @@ abstract public class FtsStream
   }
 
 
-  private final String getNextString()
+  private final String readString()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     String str;
@@ -583,7 +534,7 @@ abstract public class FtsStream
     /* The loop assume we have a valid status */
     c = read();
 
-    while (c != FtsClientProtocol.string_end)
+    while ( c != FtsClientProtocol.string_end_code )
       {
 	s.append((char)c);
 	c = read();
@@ -608,27 +559,24 @@ abstract public class FtsStream
   public final String getNextSymbolArgument()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
-    if (status == FtsClientProtocol.symbol_cached_type)
+    if (status == FtsClientProtocol.symbol_cached_code)
       {
-	int idx;
-	idx = getNextIntArgument();
-	return symbolCache[idx];
+	return incomingSymbolCache[ getNextIntArgument() ];
       }
-    else if (status == FtsClientProtocol.symbol_and_def_type)
+    else if (status == FtsClientProtocol.symbol_and_def_code)
       {
 	int idx = getNextIntArgument();
-	String str = getNextString().intern();
 
-	if (idx >= symbolCache.length)
+	if (idx >= incomingSymbolCache.length)
 	  reallocateSymbolCache(idx);
 
-	symbolCache[idx] = str; 
+	incomingSymbolCache[idx] = readString().intern(); 
 
-	return str;
+	return incomingSymbolCache[idx];
       }
-    else if (status == FtsClientProtocol.symbol_type)
+    else if (status == FtsClientProtocol.symbol_code)
       {
-	return getNextString().intern();
+	return readString().intern();
       }
     else
       return "";
@@ -645,7 +593,7 @@ abstract public class FtsStream
     if (nextIsSymbol())
       return getNextSymbolArgument();
     else
-      return getNextString();
+      return readString();
   }
 
 
@@ -658,27 +606,27 @@ abstract public class FtsStream
   {
     switch (status)
       {
-      case FtsClientProtocol.int_type:
+      case FtsClientProtocol.int_code:
 	return new Integer(getNextIntArgument());
 
-      case FtsClientProtocol.float_type:
+      case FtsClientProtocol.float_code:
 	return new Float(getNextFloatArgument());
 
-      case FtsClientProtocol.object_type:
+      case FtsClientProtocol.object_code:
 	return getNextObjectArgument();
 
-      case FtsClientProtocol.connection_type:
+      case FtsClientProtocol.connection_code:
 	return getNextConnectionArgument();
 
-      case FtsClientProtocol.data_type:
+      case FtsClientProtocol.data_code:
 	return getNextDataArgument();
 
-      case FtsClientProtocol.string_start:
+      case FtsClientProtocol.string_code:
 	return getNextStringArgument();
 
-      case FtsClientProtocol.symbol_cached_type:
-      case FtsClientProtocol.symbol_and_def_type:
-      case FtsClientProtocol.symbol_type:
+      case FtsClientProtocol.symbol_cached_code:
+      case FtsClientProtocol.symbol_and_def_code:
+      case FtsClientProtocol.symbol_code:
 	return getNextSymbolArgument();
 
       default:
@@ -738,29 +686,29 @@ abstract public class FtsStream
       {
 	switch (status)
 	  {
-	  case FtsClientProtocol.int_type:
+	  case FtsClientProtocol.int_code:
 	    args[ argsCount ].type = FtsAtom.INT;
 	    args[ argsCount ].intValue = getNextIntArgument();
 	    break;
 
-	  case FtsClientProtocol.float_type:
+	  case FtsClientProtocol.float_code:
 	    args[ argsCount ].type = FtsAtom.FLOAT;
 	    args[ argsCount ].floatValue = getNextFloatArgument();
 	    break;
 
-	  case FtsClientProtocol.object_type:
+	  case FtsClientProtocol.object_code:
 	    args[ argsCount ].type = FtsAtom.OBJECT;
 	    args[ argsCount ].objectValue = getNextObjectArgument();
 	    break;
 
-	  case FtsClientProtocol.string_start:
+	  case FtsClientProtocol.string_code:
 	    args[ argsCount ].type = FtsAtom.STRING;
 	    args[ argsCount ].stringValue = getNextStringArgument();
 	    break;
 
-	  case FtsClientProtocol.symbol_cached_type:
-	  case FtsClientProtocol.symbol_and_def_type:
-	  case FtsClientProtocol.symbol_type:
+	  case FtsClientProtocol.symbol_cached_code:
+	  case FtsClientProtocol.symbol_and_def_code:
+	  case FtsClientProtocol.symbol_code:
 	    args[ argsCount ].type = FtsAtom.STRING;
 	    args[ argsCount ].stringValue = getNextSymbolArgument();
 	    break;

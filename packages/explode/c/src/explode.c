@@ -1148,7 +1148,7 @@ static void explode_data_export_fun(fts_data_t *d)
   if (data->name)
     {
       fts_data_start_remote_call((fts_data_t *) data, EXPLODE_REMOTE_NAME);
-      fts_client_mess_add_symbol(data->name);
+      fts_client_add_symbol(data->name);
       fts_data_end_remote_call();
     }
 

@@ -108,16 +108,10 @@ fts_mess_init(void)
 
 
 static void
-fts_mess_restart(void)
-{
-  fts_object_table_delete_all();
-}
-
-static void
 fts_mess_shutdown(void)
 {
   fts_patcher_shutdown();
   fts_object_table_delete_all();
 }
 
-fts_module_t fts_mess_module = {"Mess", "The new Mess module", fts_mess_init, fts_mess_restart, fts_mess_shutdown, 0};
+fts_module_t fts_mess_module = {"Mess", "The new Mess module", fts_mess_init, 0, fts_mess_shutdown, 0};

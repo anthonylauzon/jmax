@@ -114,7 +114,7 @@ void fts_patcher_data_redefine(fts_patcher_data_t *d)
   /* Then set the container */
 
   fts_data_start_remote_call((fts_data_t *)d, REMOTE_SET_CONTAINER);
-  fts_client_mess_add_object((fts_object_t *) this->patcher);
+  fts_client_add_object((fts_object_t *) this->patcher);
   fts_data_end_remote_call();
 
   /* For each object and each connection,
@@ -130,7 +130,7 @@ void fts_patcher_data_redefine(fts_patcher_data_t *d)
     else
       {
 	fts_data_start_remote_call((fts_data_t *)d, REMOTE_ADD_OBJECT);
-	fts_client_mess_add_object(p);
+	fts_client_add_object(p);
 	fts_data_end_remote_call();
       }
 
@@ -148,7 +148,7 @@ void fts_patcher_data_redefine(fts_patcher_data_t *d)
 	    else
 	      {
 		fts_data_start_remote_call((fts_data_t *)d, REMOTE_ADD_CONNECTION);
-		fts_client_mess_add_connection(c);
+		fts_client_add_connection(c);
 		fts_data_end_remote_call();
 	      }
 	}
@@ -175,7 +175,7 @@ void fts_patcher_data_redefine(fts_patcher_data_t *d)
 void fts_patcher_data_blip(fts_data_t *d, const char *msg)
 {
   fts_data_start_remote_call((fts_data_t *)d, REMOTE_BLIP);
-  fts_client_mess_add_string(msg);
+  fts_client_add_string(msg);
   fts_data_end_remote_call();
 }
 

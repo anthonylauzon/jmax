@@ -59,8 +59,6 @@ static void fts_alarm_describe(char *msg, fts_clock_t *clock);
 
 static void fts_alarm_sched(void);
 static void fts_time_init(void);
-static void fts_all_clocks_restart(void);
-static void fts_time_restart(void);
 
 /* Heaps */
 
@@ -70,7 +68,7 @@ static fts_heap_t *alarms_heap;
 static fts_heap_t *timers_heap;
 static fts_heap_t *time_gates_heap;
 
-fts_module_t fts_time_module = {"Time", "Generic Time handling", fts_time_init, fts_time_restart, 0};
+fts_module_t fts_time_module = {"Time", "Generic Time handling", fts_time_init, 0, 0};
 
 static void
 fts_time_init(void)
@@ -87,13 +85,6 @@ static void fts_time_do_heaps(void)
   alarms_heap     = fts_heap_new(sizeof(fts_alarm_t));
   timers_heap     = fts_heap_new(sizeof(fts_timer_t));
   time_gates_heap = fts_heap_new(sizeof(fts_time_gate_t));
-}
-
-
-static void
-fts_time_restart(void)
-{
-  fts_all_clocks_restart();
 }
 
 
@@ -206,29 +197,6 @@ make_clock(fts_symbol_t clock_name)
   (*p)->protected    = 0;
 
   return *p;
-}
-
-
-static void
-fts_all_clocks_restart(void)
-{
-  fts_clock_t *clock;
-
-  for (clock = clock_table; clock; clock = clock->next)
-    {
-      fts_alarm_t *alarm;
-
-      alarm = clock->alarm_list;
-
-      while (alarm)
-	{
-	  fts_alarm_unarm(alarm);
-	  alarm = clock->alarm_list;
-	}
-
-      if (! clock->protected)
-	clock->enabled = 0;
-    }
 }
 
 

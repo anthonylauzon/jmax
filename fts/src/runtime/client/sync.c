@@ -39,7 +39,7 @@ static void fts_sync_dispatch(int ac, const fts_atom_t *av);
 
 void fts_client_sync_init(void)
 {
-  fts_client_mess_install(SYNC_CODE, fts_sync_dispatch);
+  fts_client_install(SYNC_CODE, fts_sync_dispatch);
 }
 
 
@@ -55,7 +55,7 @@ fts_sync_dispatch(int ac, const fts_atom_t *av)
 {
   fts_client_updates_sync();
 
-  fts_client_mess_start_msg(SYNC_DONE_CODE);
-  fts_client_mess_send_msg();
+  fts_client_start_msg(SYNC_DONE_CODE);
+  fts_client_done_msg();
 }
 

@@ -46,64 +46,9 @@ import ircam.jmax.utils.*;
  * 
  */
 
-class RadioFormatAccessory extends JPanel {
-
-  RadioFormatAccessory()
-  {
-    dotJmaxButton = new JRadioButton( ".jmax");
-    dotPatButton = new JRadioButton( ".pat");
-
-    ActionListener listener = new ActionListener() {
-	public void actionPerformed( ActionEvent e)
-	{
-	  String text = ((JRadioButton)(e.getSource())).getText();
-
-	  if ( text.equals( ".pat"))
-	    MaxFileChooser.setSaveType( MaxFileChooser.SAVE_PAT_TYPE );
-	  else
-	    MaxFileChooser.setSaveType( MaxFileChooser.SAVE_JMAX_TYPE );
-	}
-      };
-
-    dotJmaxButton.addActionListener( listener);
-    dotPatButton.addActionListener( listener);
-
-    ButtonGroup bg = new ButtonGroup();
-
-    bg.add( dotJmaxButton);
-    bg.add( dotPatButton);
-
-    JPanel panel1 = new JPanel();
-
-    TitledBorder titleBorder = new TitledBorder( LineBorder.createGrayLineBorder(), "Format");
-    titleBorder.setTitleJustification( TitledBorder.LEFT);
-
-    panel1.setBorder( titleBorder);
-
-    panel1.setLayout( new GridLayout(0, 1));
-
-    panel1.add( dotJmaxButton);
-    panel1.add( dotPatButton);
-
-    add( panel1);
-  }
-
-  void setSaveType( int saveType)
-  {
-    if (saveType == MaxFileChooser.SAVE_PAT_TYPE)
-      dotPatButton.setSelected( true);
-    else
-      dotJmaxButton.setSelected( true);
-  }
-
-  private JRadioButton dotJmaxButton;
-  private JRadioButton dotPatButton;
-}
-
 public class MaxFileChooser
 {
   private static JFileChooser fd;
-  private static RadioFormatAccessory formatAccessory;
 
   private static boolean configured = false;
 
@@ -114,7 +59,6 @@ public class MaxFileChooser
   static void makeFileChooser()
   {
     fd = new JFileChooser( MaxApplication.getProperty("user.dir"));
-    formatAccessory = new RadioFormatAccessory();
   }
 
   public static int getSaveType()
@@ -155,9 +99,6 @@ public class MaxFileChooser
 	  {
 	  }
       }
-
-    if (formatAccessory != null)
-      formatAccessory.setSaveType( type);
   }
 
   /* Added the full class name to FileFilter because of clash with java.io.FileFilter in JDK 1.2 */
@@ -258,8 +199,6 @@ public class MaxFileChooser
       makeFileChooser();
 
     setSaveType( type);
-
-    fd.setAccessory( formatAccessory );
 
     return chooseFileToSave( frame, oldFile, title);
   }

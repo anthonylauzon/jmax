@@ -413,7 +413,7 @@ static void fts_atom_list_export_fun(fts_data_t *d)
 
   while (! fts_atom_list_iterator_end(iterator))
     {
-      fts_client_mess_add_atoms(1, fts_atom_list_iterator_current(iterator));
+      fts_client_add_atoms(1, fts_atom_list_iterator_current(iterator));
       fts_atom_list_iterator_next(iterator);
     }
 
@@ -445,7 +445,7 @@ static void fts_atom_list_remote_update( fts_data_t *d, int ac, const fts_atom_t
 
   while (! fts_atom_list_iterator_end(iterator))
     {
-      fts_client_mess_add_atoms(1, fts_atom_list_iterator_current(iterator));
+      fts_client_add_atoms(1, fts_atom_list_iterator_current(iterator));
       fts_atom_list_iterator_next(iterator);
     }
 

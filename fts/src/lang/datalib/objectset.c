@@ -330,7 +330,7 @@ static void fts_object_set_export_fun(fts_data_t *d)
   fts_data_start_remote_call(d, REMOTE_APPEND);
 
   for (p = this->head; p; p = p->next)
-    fts_client_mess_add_object(p->object);
+    fts_client_add_object(p->object);
 
   fts_data_end_remote_call();
 }

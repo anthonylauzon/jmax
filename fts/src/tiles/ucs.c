@@ -123,7 +123,7 @@ fts_module_t fts_ucs_module = {"UCS", "FTS Universal Configuration System", fts_
 static void
 fts_ucs_init(void)
 {
-  fts_client_mess_install(UCS_CODE, fts_ucs_client_dispatch);
+  fts_client_install(UCS_CODE, fts_ucs_client_dispatch);
 
   fts_ucs_install_commands();
 }
@@ -386,35 +386,6 @@ fts_ucs_load_module(int argc, const fts_atom_t *argv)
   return fts_Success;
 }
 
-
-
-
-
-static fts_status_t
-fts_ucs_restart_on_eof(int argc, const fts_atom_t *argv)
-{
-  if ((argc == 1) && fts_is_symbol(&argv[0]))
-    {
-      fts_symbol_t v = fts_get_symbol(&argv[0]);
-
-      if (v == fts_new_symbol("on"))
-	set_restart_on_eof(1);
-      else if (v == fts_new_symbol("off"))
-	set_restart_on_eof(0);
-    }
-
-  return fts_Success;
-}
-
-
-static fts_status_t
-fts_ucs_restart(int argc, const fts_atom_t *argv)
-{
-  fts_restart();
-
-  return fts_Success;
-}
-
 /*
  * Scheduler debug commands
  */
@@ -642,14 +613,6 @@ fts_ucs_install_commands()
   fts_ucs_define_command(fts_new_symbol("load"), fts_new_symbol("module"), fts_ucs_load_module,
 			 "load module <name> <filename>",
 			 "dynamically load a module");
-
-  fts_ucs_define_command(fts_new_symbol("eof"), fts_new_symbol("restart"), fts_ucs_restart_on_eof,
-			 "eof restart [ on | off]",
-			 "ask for a restart on eof condition on the client connection");
-
-  fts_ucs_define_command(fts_new_symbol("restart"), fts_new_symbol("now"), fts_ucs_restart,
-			 "restart now",
-			 "ask for a restart now");
 
   /* scheduler debug functions  */
 

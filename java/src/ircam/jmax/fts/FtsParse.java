@@ -245,7 +245,16 @@ public class FtsParse
   final private void ParseInt() throws java.io.IOException
   {
     if (toStream)
-      stream.sendInt(token);
+      {
+	try
+	  {
+	    stream.sendInt( Integer.parseInt( token.toString()));
+	  }
+	catch( NumberFormatException e)
+	  {
+	    throw new java.io.IOException();
+	  }
+      }
     else
       parsedToken = new Integer(token.toString());
   }
@@ -253,7 +262,16 @@ public class FtsParse
   final private void ParseFloat() throws java.io.IOException
   {
     if (toStream)
-      stream.sendFloat(token);
+      {
+	try
+	  {
+	    stream.sendFloat( Float.valueOf( token.toString()).floatValue() );
+	  }
+	catch( NumberFormatException e)
+	  {
+	    throw new java.io.IOException();
+	  }
+      }
     else
       parsedToken = new Float(token.toString());
   }

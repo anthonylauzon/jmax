@@ -912,37 +912,37 @@ fts_mess_client_shutdown(int ac, const fts_atom_t *av)
 static void
 fts_messtile_install_all(void)
 {
-  fts_client_mess_install(SAVE_PATCHER_BMAX_CODE, fts_mess_client_save_patcher_bmax);
+  fts_client_install(SAVE_PATCHER_BMAX_CODE, fts_mess_client_save_patcher_bmax);
 
-  fts_client_mess_install(LOAD_PATCHER_BMAX_CODE, fts_mess_client_load_patcher_bmax);
-  fts_client_mess_install(LOAD_PATCHER_DPAT_CODE, fts_mess_client_load_patcher_dpat);
+  fts_client_install(LOAD_PATCHER_BMAX_CODE, fts_mess_client_load_patcher_bmax);
+  fts_client_install(LOAD_PATCHER_DPAT_CODE, fts_mess_client_load_patcher_dpat);
 
-  fts_client_mess_install(DECLARE_ABSTRACTION_CODE, fts_mess_client_declare_abstraction);
-  fts_client_mess_install(DECLARE_ABSTRACTION_PATH_CODE, fts_mess_client_declare_abstraction_path);
+  fts_client_install(DECLARE_ABSTRACTION_CODE, fts_mess_client_declare_abstraction);
+  fts_client_install(DECLARE_ABSTRACTION_PATH_CODE, fts_mess_client_declare_abstraction_path);
 
-  fts_client_mess_install(DECLARE_TEMPLATE_CODE, fts_mess_client_declare_template);
-  fts_client_mess_install(DECLARE_TEMPLATE_PATH_CODE, fts_mess_client_declare_template_path);
+  fts_client_install(DECLARE_TEMPLATE_CODE, fts_mess_client_declare_template);
+  fts_client_install(DECLARE_TEMPLATE_PATH_CODE, fts_mess_client_declare_template_path);
 
-  fts_client_mess_install(DOWNLOAD_OBJECT_CODE, fts_mess_client_download_object);
-  fts_client_mess_install(DOWNLOAD_CONNECTION_CODE, fts_mess_client_download_connection);
+  fts_client_install(DOWNLOAD_OBJECT_CODE, fts_mess_client_download_object);
+  fts_client_install(DOWNLOAD_CONNECTION_CODE, fts_mess_client_download_connection);
 
-  fts_client_mess_install(NEW_OBJECT_CODE,  fts_mess_client_new);
-  fts_client_mess_install(REDEFINE_PATCHER_CODE,  fts_mess_client_redefine_patcher);
-  fts_client_mess_install(REDEFINE_OBJECT_CODE,  fts_mess_client_redefine_object);
-  fts_client_mess_install(REPOSITION_INLET,  fts_mess_client_reposition_inlet);
-  fts_client_mess_install(REPOSITION_OUTLET,  fts_mess_client_reposition_outlet);
-  fts_client_mess_install(DELETE_OBJECT_CODE,  fts_mess_client_delete_object);
+  fts_client_install(NEW_OBJECT_CODE,  fts_mess_client_new);
+  fts_client_install(REDEFINE_PATCHER_CODE,  fts_mess_client_redefine_patcher);
+  fts_client_install(REDEFINE_OBJECT_CODE,  fts_mess_client_redefine_object);
+  fts_client_install(REPOSITION_INLET,  fts_mess_client_reposition_inlet);
+  fts_client_install(REPOSITION_OUTLET,  fts_mess_client_reposition_outlet);
+  fts_client_install(DELETE_OBJECT_CODE,  fts_mess_client_delete_object);
 
-  fts_client_mess_install(NEW_CONNECTION_CODE,  fts_mess_client_new_connection);
-  fts_client_mess_install(DELETE_CONNECTION_CODE, fts_mess_client_delete_connection);
+  fts_client_install(NEW_CONNECTION_CODE,  fts_mess_client_new_connection);
+  fts_client_install(DELETE_CONNECTION_CODE, fts_mess_client_delete_connection);
 
-  fts_client_mess_install(MESSAGE_CODE, fts_mess_client_mess);
-  fts_client_mess_install(PUTPROP_CODE,  fts_mess_client_put_prop);
-  fts_client_mess_install(GETPROP_CODE,  fts_mess_client_get_prop);
-  fts_client_mess_install(GETALLPROP_CODE,  fts_mess_client_get_all_prop);
-  fts_client_mess_install(REMOTE_CALL_CODE,  fts_mess_client_remote_call);
-  fts_client_mess_install(RECOMPUTE_ERRORS_CODE, fts_mess_client_recompute_errors);
-  fts_client_mess_install(FTS_SHUTDOWN_CODE,  fts_mess_client_shutdown);
+  fts_client_install(MESSAGE_CODE, fts_mess_client_mess);
+  fts_client_install(PUTPROP_CODE,  fts_mess_client_put_prop);
+  fts_client_install(GETPROP_CODE,  fts_mess_client_get_prop);
+  fts_client_install(GETALLPROP_CODE,  fts_mess_client_get_all_prop);
+  fts_client_install(REMOTE_CALL_CODE,  fts_mess_client_remote_call);
+  fts_client_install(RECOMPUTE_ERRORS_CODE, fts_mess_client_recompute_errors);
+  fts_client_install(FTS_SHUTDOWN_CODE,  fts_mess_client_shutdown);
 }
 
 

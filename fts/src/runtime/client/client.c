@@ -63,7 +63,6 @@ extern void fts_client_updates_init(void);
 extern void fts_client_sync_init(void);
 
 static void client_init(void);
-static void client_restart(void);
 static void client_shutdown(void);
 
 static void client_poll(void);
@@ -73,14 +72,13 @@ static fts_status_t fts_unset_client_logical_dev(int ac, const fts_atom_t *at);
 static fts_status_t fts_reset_client_logical_dev(void);
 static fts_dev_t   *fts_get_client_logical_dev(int ac, const fts_atom_t *at);
 
-fts_module_t fts_client_module = {"Client", "Client communication", client_init, client_restart, client_shutdown, 0};
+fts_module_t fts_client_module = {"Client", "Client communication", client_init, 0, client_shutdown, 0};
 
 static void
 client_init(void)
 {
   /* Initialization of sub modules */
 
-  fts_client_incoming_init();
   fts_client_sync_init();
   fts_client_updates_init();
 
@@ -98,12 +96,6 @@ client_init(void)
 			  fts_reset_client_logical_dev);
 }
 
-
-static void
-client_restart(void)
-{
-  fts_client_incoming_restart();
-}
 
 static void
 client_shutdown(void)
@@ -159,14 +151,10 @@ fts_get_client_logical_dev(int ac, const fts_atom_t *at)
 
 /* experimentally, we do the real polling every 3 ticks */
 
-static int restart_on_eof = 0;
-static int poll_count = 0;
-
-static int debug_count = 0;
-
-static void
-client_poll(void)
+static void client_poll(void)
 {
+  static int poll_count = 0;
+
   poll_count++;
 
   if (poll_count >= 3)
@@ -189,12 +177,9 @@ client_poll(void)
 	  if (ret == &fts_dev_eof)
 	    {
 	      /* End of file for client device;
-		 do a restart or shutdown */
+		 do a shutdown */
 
-	      if (restart_on_eof)
-		fts_restart();
-	      else
-		fts_halt();
+	      fts_halt();
 
 	      return;
 	    }
@@ -211,13 +196,6 @@ client_poll(void)
     }
 }
 
-
-/* functions to set the action on end of file */
-
-void set_restart_on_eof(int v)
-{
-  restart_on_eof = v;
-}
 
 
 

@@ -35,10 +35,6 @@ extern fts_module_t fts_client_module;
 
 extern fts_dev_t *client_dev;
 
-/* EOF control */
-
-extern void set_restart_on_eof(int v);
-
 #endif
 
 

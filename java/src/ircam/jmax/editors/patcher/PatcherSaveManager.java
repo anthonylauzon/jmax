@@ -96,7 +96,8 @@ public class PatcherSaveManager
     file = MaxFileChooser.chooseFileToSave( container.getFrame(), 
 					    document.getDocumentFile(), 
 					    "Save As",
-					    saveType);
+					    MaxFileChooser.SAVE_JMAX_TYPE);
+//  					    saveType);
 
     if (file == null)
       return false;
