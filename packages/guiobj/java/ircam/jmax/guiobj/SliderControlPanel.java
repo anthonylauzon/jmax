@@ -34,6 +34,7 @@ import javax.swing.event.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
+import ircam.jmax.widgets.*;
 
 import ircam.jmax.editors.patcher.objects.*;
 
@@ -48,6 +49,7 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
   JRadioButton horizontalItem, verticalItem; 
   JLabel maxLabel, minLabel;
   JPanel minPanel, maxPanel;
+  int min, max;
 
   public SliderControlPanel()
   {
@@ -72,13 +74,24 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
     maxValueField.requestDefaultFocus();
 
     maxPanel = new JPanel();
-    maxPanel.setPreferredSize(new Dimension(150, 20));
+    maxPanel.setPreferredSize(new Dimension(170, 20));
     maxPanel.setLayout(new BoxLayout(maxPanel, BoxLayout.X_AXIS));    
     maxPanel.add(Box.createRigidArea(new Dimension(5, 0)));    
     maxPanel.add(maxLabel);
     maxPanel.add(Box.createHorizontalGlue());    
     maxPanel.add( maxValueField);
-    maxPanel.add(Box.createRigidArea(new Dimension(3, 0)));    
+    maxPanel.add(new IncrementController(new IncrementListener(){
+	public void increment()
+	{
+	  max++;
+	  maxValueField.setText(""+max);    
+	}
+	public void decrement()
+	{
+	  max--;
+	  maxValueField.setText(""+max);    
+	}
+      }));
     maxPanel.validate();    
 
     add(maxPanel);
@@ -90,13 +103,24 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
     minValueField.addActionListener(this);
     
     minPanel = new JPanel();
-    minPanel.setPreferredSize(new Dimension(150, 20));
+    minPanel.setPreferredSize(new Dimension(170, 20));
     minPanel.setLayout(new BoxLayout(minPanel, BoxLayout.X_AXIS));
     minPanel.add(Box.createRigidArea(new Dimension(5, 0)));    
     minPanel.add(minLabel);
     minPanel.add(Box.createHorizontalGlue());    
     minPanel.add( minValueField);
-    minPanel.add(Box.createRigidArea(new Dimension(3, 0)));    
+    minPanel.add(new IncrementController(new IncrementListener(){
+	public void increment()
+	{
+	  min++;
+	  minValueField.setText(""+min);    
+	}
+	public void decrement()
+	{
+	  min--;
+	  minValueField.setText(""+min);    
+	}
+      }));    
     minPanel.validate();
 
     add(minPanel);
@@ -119,21 +143,21 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
      
     horizontalItem = new JRadioButton("horizontal");
     horizontalItem.addItemListener(new ItemListener(){
-	    public void itemStateChanged(ItemEvent e)
-	    {
-		if((e.getStateChange() == ItemEvent.SELECTED)&&(((Slider)target).getOrientation() != Slider.HORIZONTAL_OR))
-		  changeOrientation( Slider.HORIZONTAL_OR);
-	    }
-	});
+	public void itemStateChanged(ItemEvent e)
+	{
+	  if((e.getStateChange() == ItemEvent.SELECTED)&&(((Slider)target).getOrientation() != Slider.HORIZONTAL_OR))
+	    changeOrientation( Slider.HORIZONTAL_OR);
+	}
+      });
     orientationButtonGroup.add(horizontalItem);
     verticalItem = new JRadioButton("vertical");
     verticalItem.addItemListener(new ItemListener(){
-	    public void itemStateChanged(ItemEvent e)
-	    {
-		if((e.getStateChange() == ItemEvent.SELECTED)&&(((Slider)target).getOrientation() != Slider.VERTICAL_OR))
-		  changeOrientation( Slider.VERTICAL_OR);
-	    }
-	});
+	public void itemStateChanged(ItemEvent e)
+	{
+	  if((e.getStateChange() == ItemEvent.SELECTED)&&(((Slider)target).getOrientation() != Slider.VERTICAL_OR))
+	    changeOrientation( Slider.VERTICAL_OR);
+	}
+      });
     orientationButtonGroup.add(verticalItem);
     
     orientationPanel.add(horizontalItem);
@@ -164,9 +188,9 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
   public void update(GraphicObject obj)
   {
     target = obj;
-    int min = ((Slider)obj).getMinValue();
+    min = ((Slider)obj).getMinValue();
     minValueField.setText(""+min);    
-    int max = ((Slider)obj).getMaxValue();
+    max = ((Slider)obj).getMaxValue();
     maxValueField.setText(""+max);    
 
     if(((Slider)obj).getOrientation() == Slider.HORIZONTAL_OR)
@@ -185,22 +209,21 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
 
   public void setRange()
   {
-      int max, min;
-      try
+    try
+      {
+	max = Integer.parseInt(maxValueField.getText());
+	min = Integer.parseInt(minValueField.getText());
+	if(max<min)
 	  {
-	      max = Integer.parseInt(maxValueField.getText());
-	      min = Integer.parseInt(minValueField.getText());
-	      if(max<min)
-		  {
-		      int temp = max;
-		      max=min;min=temp;
-		  }
+	    int temp = max;
+	    max=min;min=temp;
 	  }
-      catch (NumberFormatException e1)
-	  {
-	      return;
-	  }
-      ((Slider)target).setRange(max, min);
+      }
+    catch (NumberFormatException e1)
+      {
+	return;
+      }
+    ((Slider)target).setRange(max, min);
   }
 
   public void actionPerformed( ActionEvent e)

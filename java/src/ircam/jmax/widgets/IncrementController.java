@@ -25,11 +25,10 @@
 
 package ircam.jmax.widgets;
 
-import ircam.jmax.JMaxApplication;
+import ircam.jmax.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
 import java.awt.event.*;
 
 /**
@@ -48,14 +47,9 @@ public class IncrementController extends JPanel {
 
     itsIncrementListener = l;
 
-    String fs = File.separator;
-    String path = JMaxApplication.getProperty("root");
-    if(path==null)
-      path = JMaxApplication.getProperty("jmaxRoot");
-    path = path+fs+"images"+fs;
+    JButton up = new JButton( JMaxIcons.little_up_arrow);
+    JButton down = new JButton( JMaxIcons.little_down_arrow);
 
-    JButton up = new JButton(new ImageIcon(path+"little_up_arrow.gif"));
-    JButton down = new JButton(new ImageIcon(path+"little_down_arrow.gif"));
     Insets i = new Insets(0,0,0,0);
 
     up.setMargin(i);

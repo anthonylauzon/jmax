@@ -295,7 +295,7 @@ public class FtsGraphicObject extends FtsObject {
 	}
 	catch(IOException e)
 	  {
-	    System.err.println("FtsGraphicObject: I/O Error sending setHeght Message!");
+	    System.err.println("FtsGraphicObject: I/O Error sending setHeight Message!");
 	    e.printStackTrace(); 
 	  }
 	this.height = h;
