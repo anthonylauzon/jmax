@@ -23,6 +23,7 @@ info.gif \
 ircam.gif \
 jmax_app.gif \
 jmax_icon.gif \
+jmax_icon_48x48.png \
 jmax_logo_small.gif \
 jmax_logo_small_transp.gif \
 jmax_logo_tiny.gif \
