@@ -37,6 +37,7 @@
 (declare-icon "_message_box_"       (string-append jmax-image-root "tool_mess.gif"))
 (declare-icon "_inlet_"             (string-append jmax-image-root "tool_in.gif"))
 (declare-icon "_outlet_"            (string-append jmax-image-root "tool_out.gif"))
+(declare-icon "_fork_"              (string-append jmax-image-root "tool_fork.gif"))
 (declare-icon "_button_"            (string-append jmax-image-root "tool_bang.gif"))
 (declare-icon "_toggle_"            (string-append jmax-image-root "tool_toggle.gif"))
 (declare-icon "_slider_"            (string-append jmax-image-root "tool_slider.gif"))

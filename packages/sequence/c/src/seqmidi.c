@@ -341,6 +341,49 @@ seqmidi_read_note_off(fts_midifile_t *file, int chan, int pitch, int vel)
 }
 
 static int
+seqmidi_read_controller(fts_midifile_t *file, int chan, int control, int value)
+{
+  seqmidi_data_t *data = (seqmidi_data_t *)fts_midifile_get_user_data(file);
+  eventtrk_t *track = data->track_ctrls;
+  double time = fts_midifile_get_current_time_in_seconds(file);
+  fts_object_t *note;
+  fts_atom_t a[3];
+  
+  if(!track)
+    {
+      sequence_t *sequence = data->sequence;
+      char s[] = "track9999";
+      fts_symbol_t name;
+      fts_atom_t a[3];
+  
+      sprintf(s, "track%d", sequence_get_size(sequence));
+      name = fts_new_symbol_copy(s);
+
+      /* create new track */
+      fts_set_symbol(a + 0, eventtrk_symbol);
+      fts_set_symbol(a + 1, name);
+      fts_set_symbol(a + 2, noteevt_symbol);
+      fts_object_new(0, 3, a, (fts_object_t **)&track);
+
+      /* add track to sequence */
+      sequence_add_track(sequence, (track_t *)track);
+      
+      /* store track as current */
+      data->track_ctrls = track;
+    }
+  
+  fts_set_symbol(a + 0, noteevt_symbol);
+  fts_set_int(a + 1, value);
+  fts_set_float(a + 2, 0.01);
+  fts_object_new(0, 3, a, &note);
+  
+  /* add event to track */
+  eventtrk_add_event(track, time, (event_t *)note);
+  
+  return 1;
+}
+
+static int
 seqmidi_read_track_end(fts_midifile_t *file)
 {
   seqmidi_data_t *data = (seqmidi_data_t *)fts_midifile_get_user_data(file);
@@ -382,7 +425,7 @@ sequence_read_midifile(sequence_t *sequence, fts_symbol_t name)
       read.noteon = seqmidi_read_note_on;
       read.noteoff = seqmidi_read_note_off;
       /*read.pressure = txt_pressure;*/
-      /*read.controller = txt_controller;*/
+      read.controller = seqmidi_read_controller;
       /*read.pitchbend = txt_pitchbend;*/
       /*read.program = txt_program;*/
       /*read.chanpressure = txt_chanpressure;*/

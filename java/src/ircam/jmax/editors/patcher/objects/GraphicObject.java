@@ -125,8 +125,6 @@ abstract public class GraphicObject implements DisplayObject
   static final int ERROR_MESSAGE_DISPLAY_PAD = ObjectGeometry.INOUTLET_PAD + ObjectGeometry.INOUTLET_WIDTH + 1;
   private static Font errorFont = new Font(ircam.jmax.utils.Platform.FONT_NAME, Font.BOLD, ircam.jmax.utils.Platform.FONT_SIZE);
 
-  
-
   final public static void setFollowingInOutletLocations(boolean v)
   {
     followingInOutletLocations = v;
@@ -182,6 +180,8 @@ abstract public class GraphicObject implements DisplayObject
       gobj = new ircam.jmax.editors.patcher.objects.Comment( sketch, object);
     else if ( theName.equals( "slider"))
       gobj = new ircam.jmax.editors.patcher.objects.Slider( sketch, object);
+    else if (theName.equals( "fork"))
+      gobj = new ircam.jmax.editors.patcher.objects.Fork( sketch, object);
     else if (theName.equals( "inlet"))
       gobj = new ircam.jmax.editors.patcher.objects.Inlet( sketch, object);
     else if (theName.equals( "outlet"))
@@ -357,12 +357,12 @@ abstract public class GraphicObject implements DisplayObject
   {
   }
 
-  public final int getOutletAnchorX(int outlet)
+  public int getOutletAnchorX(int outlet)
   {
     return getX() + ObjectGeometry.INOUTLET_PAD + outlet * outletDistance;
   }
 
-  public final int getOutletAnchorY(int outlet)
+  public int getOutletAnchorY(int outlet)
   {
     return getY() + getHeight();
   }
@@ -377,7 +377,7 @@ abstract public class GraphicObject implements DisplayObject
     return getY() - 1;
   }
 
-  private void paintInlets(Graphics g)
+  public void paintInlets(Graphics g)
   {
     int n = ftsObject.getNumberOfInlets();
 
@@ -407,12 +407,10 @@ abstract public class GraphicObject implements DisplayObject
 
 	    g.fillRect( x - w / 2, y - h + ObjectGeometry.INLET_OVERLAP + ObjectGeometry.INLET_OFFSET, w, h);
 	  }
-	
-
       }
   }
 
-  private void paintOutlets(Graphics g)
+  public void paintOutlets(Graphics g)
   {
     int n = ftsObject.getNumberOfOutlets();
 
@@ -452,10 +450,10 @@ abstract public class GraphicObject implements DisplayObject
     else
       g.setColor( Color.black);	  
 
+    g.drawRect( getX(), getY(), getWidth()-1, getHeight()-1);
+
     paintInlets(g);
     paintOutlets(g);
-
-    g.drawRect( getX(), getY(), getWidth()-1, getHeight()-1);
   }
 
   public void updatePaint( Graphics g){}  
@@ -493,7 +491,7 @@ abstract public class GraphicObject implements DisplayObject
     itsSketchPad.getDisplayList().redrawConnectionsFor(this);
   }
 
-  protected void updateInOutlets()
+  public void updateInOutlets()
   {
     if (ftsObject.getNumberOfInlets() > 1)
       inletDistance = (getWidth() - 2 * ObjectGeometry.INOUTLET_PAD) / (ftsObject.getNumberOfInlets() - 1);

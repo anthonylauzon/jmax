@@ -214,22 +214,20 @@ static void fts_binding_restore(fts_binding_t *var, fts_atom_t *value)
 
   while (u)
     {
-      fts_object_t *obj;
-      fts_object_list_t *tmp;
+      fts_object_list_t *freeme = u;
+      fts_object_t *obj = u->obj;
 
-      tmp = u;
       u = u->next;
 	  
-      obj = tmp->obj;
-	  
-      fts_heap_free((char *)tmp, objlist_heap);
-
 #ifdef TRACE_DEBUG
       fprintf(stderr, "\t");
       fprintf_object(stderr, obj);
       fprintf(stderr, "\n");
 #endif
+
       fts_object_recompute(obj);
+
+      fts_heap_free((char *)freeme, objlist_heap);
     }
 
 #ifdef TRACE_DEBUG
@@ -249,11 +247,19 @@ static int fts_binding_is_suspended(fts_binding_t *var)
 
 static void fts_binding_add_user(fts_binding_t *var, fts_object_t *object)
 {
-  fts_object_list_t *u;
+  fts_object_list_t *u = var->users;
   fts_binding_list_t *b;
 
-  u = (fts_object_list_t *) fts_heap_alloc(objlist_heap);
+  /* return if object is already registered as user */
+  while(u)
+    {
+      if(u->obj == object)
+	return;
+      
+      u = u->next;
+    }  
 
+  u = (fts_object_list_t *) fts_heap_alloc(objlist_heap);
   u->obj  = object;
   u->next = var->users;
   var->users = u;

@@ -74,9 +74,6 @@ extern fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 #define fts_object_is_outlet(o) ((o)->head.cl->mcl == outlet_metaclass)
 #define fts_object_is_inlet(o) ((o)->head.cl->mcl == inlet_metaclass)
 
-#define fts_object_get_noutlets(o) ((o)->head.cl->noutlets)
-#define fts_object_get_ninlets(o) ((o)->head.cl->ninlets)
-
 #define fts_object_has_id(o) ((o)->head.id != FTS_NO_ID)
 #define fts_object_get_id(o) ((o)->head.id)
 #define fts_object_get_class(o) ((o)->head.cl)
@@ -91,6 +88,9 @@ extern int fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher);
 
 /* Messages for the status line */
 extern void fts_object_blip(fts_object_t *obj, const char *format , ...);
+
+
+extern void fts_object_change_number_of_outlets(fts_object_t *o, int new_noutlets);
 
 /* Debug print */
 extern void fprintf_object(FILE *f, fts_object_t *obj);

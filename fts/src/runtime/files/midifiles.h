@@ -110,7 +110,7 @@ typedef struct _fts_midifile_read_functions_
   int (*noteon)(struct _fts_midifile_ *file, int chan, int pitch, int vol);
   int (*noteoff)(struct _fts_midifile_ *file, int chan, int pitch, int vol);
   int (*pressure)(struct _fts_midifile_ *file, int chan, int pitch, int press);
-  int (*parameter)(struct _fts_midifile_ *file, int chan, int control, int value);
+  int (*controller)(struct _fts_midifile_ *file, int chan, int control, int value);
   int (*pitchbend)(struct _fts_midifile_ *file, int chan, int msb, int lsb);
   int (*program)(struct _fts_midifile_ *file, int chan, int program);
   int (*chanpressure)(struct _fts_midifile_ *file, int chan, int  press);

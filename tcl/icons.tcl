@@ -39,6 +39,7 @@ declareIcon _comment_           $jmaxRootDir/images/tool_text.gif
 declareIcon _message_box_       $jmaxRootDir/images/tool_mess.gif
 declareIcon _inlet_             $jmaxRootDir/images/tool_in.gif
 declareIcon _outlet_            $jmaxRootDir/images/tool_out.gif
+declareIcon _fork_              $jmaxRootDir/images/tool_fork.gif
 declareIcon _button_            $jmaxRootDir/images/tool_bang.gif
 declareIcon _toggle_            $jmaxRootDir/images/tool_toggle.gif
 declareIcon _slider_            $jmaxRootDir/images/tool_slider.gif

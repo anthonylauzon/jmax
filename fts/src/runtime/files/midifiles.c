@@ -99,7 +99,7 @@ fts_midifile_read_functions_init(fts_midifile_read_functions_t *read)
   read->noteon = 0;
   read->noteoff = 0;
   read->pressure = 0;
-  read->parameter = 0;
+  read->controller = 0;
   read->pitchbend = 0;
   read->program = 0;
   read->chanpressure = 0;
@@ -531,8 +531,8 @@ readchanmessage(fts_midifile_t *file, int status, int c1, int c2)
 	(*read->pressure)(file, chan, c1, c2);
       break;
     case 0xb0:
-      if ( read->parameter )
-	(*read->parameter)(file, chan, c1, c2);
+      if ( read->controller )
+	(*read->controller)(file, chan, c1, c2);
       break;
     case 0xe0:
       if ( read->pitchbend )

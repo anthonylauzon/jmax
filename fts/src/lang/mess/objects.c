@@ -1067,3 +1067,69 @@ void post_object(fts_object_t *obj)
     post("<\"%s\" #%d>", fts_symbol_name(fts_object_get_class_name(obj)), obj->head.id);
 }
 
+void
+fts_object_change_number_of_outlets(fts_object_t *o, int new_noutlets)
+{
+  int old_noutlets = fts_object_get_outlets_number(o);
+
+  if (old_noutlets == new_noutlets)
+    return;
+
+  /* Delete all the connections that will not be pertinent any more */
+  fts_object_trim_outlets_connections(o, new_noutlets);
+
+  /* Reallocate and copy the outlets, incoming connections and outlets properties if needed */
+  if (new_noutlets == 0)
+    {
+      /* No new outlets, but there are old outlets to delete */
+      fts_block_free((char *)o->out_conn, old_noutlets * sizeof(fts_connection_t *));
+
+      o->out_conn = 0;
+    }
+  else  if (old_noutlets > 0)
+    {
+      /* There are new outlets: and there are no old outlets, so reallocate and move */
+      int i;
+      fts_outlet_t  **new_outlets;
+      fts_connection_t **new_out_conn;
+
+      new_outlets  = (fts_outlet_t **)  fts_block_alloc(new_noutlets * sizeof(fts_outlet_t *));
+      new_out_conn = (fts_connection_t **) fts_block_zalloc(new_noutlets * sizeof(fts_connection_t *));
+
+      for (i = 0; i < new_noutlets; i++)
+	{
+	  new_outlets[i] = 0;
+
+	  if (i < old_noutlets)
+	    new_out_conn[i] = o->out_conn[i];
+	  else
+	    new_out_conn[i] = 0;
+	}
+
+      fts_block_free((char *)o->out_conn, old_noutlets * sizeof(fts_connection_t *));
+	      
+      o->out_conn = new_out_conn;
+    }
+  else 
+    {
+      int i;
+
+      /* There are new outlets, but there were no outlets before, so just allocate without copying old stuff */
+      o->out_conn = (fts_connection_t **) fts_block_zalloc(new_noutlets * sizeof(fts_connection_t *));
+
+      for (i = 0; i < new_noutlets; i++)
+	o->out_conn[i] = 0;
+    }
+
+  /* change the class (of course, not the metaclass). */
+  {
+    fts_atom_t a[2];
+
+    fts_set_symbol(&a[0], fts_object_get_class_name(o));
+    fts_set_int(&a[1], new_noutlets);
+    o->head.cl = fts_class_instantiate(2, a);
+  }
+
+  if (fts_object_has_id(o))
+    fts_object_property_changed(o, fts_s_noutlets);
+}

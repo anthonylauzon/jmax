@@ -95,6 +95,10 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 	    {
 		evt = (TrackEvent)(args[i].getObject());
 		///////////FIND THE MAX TIME
+		
+		addEvent(evt);
+
+		/*
 		evtTime = (int)(evt.getTime()) + ((Integer)evt.getProperty("duration")).intValue();
 		if(evtTime>maxTime) maxTime = evtTime;
 
@@ -109,6 +113,7 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 	
 		makeRoomAt(index);
 		events[index] = evt;
+		*/
 		////////////////////////
 	    }
 

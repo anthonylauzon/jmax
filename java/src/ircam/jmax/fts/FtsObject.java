@@ -112,7 +112,7 @@ public class FtsObject
     if (className != null)
       {
 	Object ctr = creators.get(className);
-
+	
 	if(ctr != null)
 	  obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, className, nArgs, args);
 	else if (className == "jpatcher")
@@ -121,6 +121,8 @@ public class FtsObject
 	  obj =  new FtsInletObject(fts, parent, args[0].intValue);
 	else if (className == "outlet")
 	  obj =  new FtsOutletObject(fts, parent, args[0].intValue);
+	else if (className == "fork")
+	  obj =  new FtsForkObject(fts, parent, args[0].intValue);
 	else if (className == "jcomment")
 	  obj =  new FtsCommentObject(fts, parent);
 	else if (className == "messbox")
@@ -569,14 +571,13 @@ public class FtsObject
    *
    * @param fts the server
    * @param parent the parent patcher
-   * @param objId the object id
    * @param variableName the variable name or null
    * @param className the class name or null
    * @param description the object description
    */
-    protected FtsObject(Fts fts, FtsObject parent/*, int objId*/, String variableName, String className, String description)
+    protected FtsObject(Fts fts, FtsObject parent, String variableName, String className, String description)
   {
-    super();
+    //super();
 
     this.fts = fts;
     this.parent = parent;

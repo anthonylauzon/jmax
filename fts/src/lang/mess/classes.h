@@ -54,6 +54,7 @@ extern void fts_class_alias( fts_symbol_t new_name, fts_symbol_t old_name);
 #define FTS_VAR_ARGS  -1
 
 extern fts_status_t fts_class_init(fts_class_t *, unsigned int, int ninlets, int noutlets, void *);
+extern fts_class_t *fts_class_instantiate( int ac, const fts_atom_t *at);
 
 /* method definition */
 

@@ -327,7 +327,7 @@ void fts_client_upload(fts_object_t *obj, fts_symbol_t classname, int ac, const 
   fts_client_add_atoms(ac, at);
   fts_client_done_msg();
 
-  fts_object_send_properties(obj);
+  /*fts_object_send_properties(obj);*/
 }
 
 void fts_client_upload_object(fts_object_t *obj)

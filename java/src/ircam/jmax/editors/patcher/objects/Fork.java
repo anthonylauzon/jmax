@@ -1,0 +1,224 @@
+//
+// jMax
+// Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
+// 
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+// 
+// See file LICENSE for further informations on licensing terms.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+// 
+// Based on Max/ISPW by Miller Puckette.
+//
+// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+// 
+
+package ircam.jmax.editors.patcher.objects;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+import ircam.jmax.fts.*;
+import ircam.jmax.utils.*;
+
+import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.interactions.*;
+
+//
+// The "Fork" graphic object.
+//
+
+class Fork extends GraphicObject /*implements FtsOutletsListener*/
+{
+  private static FtsAtom[] sendArgs = new FtsAtom[1];
+  static { sendArgs[0]= new FtsAtom(); }
+
+  private static final int DEFAULT_DISTANCE = 25;
+  private static final int DEFAULT_WIDTH = DEFAULT_DISTANCE + 2 * ObjectGeometry.INOUTLET_PAD;
+  private static final int MINIMUM_WIDTH = DEFAULT_WIDTH;
+  private static final int CONST_HEIGHT = 12;
+
+  private int n_outlets = 0; /* @@@@@*/
+
+  public Fork( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  {
+    super( theSketchPad, theFtsObject);
+
+    inletDistance = DEFAULT_DISTANCE;
+    outletDistance = DEFAULT_DISTANCE;
+
+    int width = getWidth();
+
+    if (width == -1)
+      setWidth( DEFAULT_WIDTH);
+    else if (width <= MINIMUM_WIDTH)
+      setWidth( MINIMUM_WIDTH);
+    else
+      setWidth(width);
+
+    super.setHeight(CONST_HEIGHT);
+  }
+
+  // redefined from base class
+
+  public void setWidth( int theWidth)
+  {
+    if (theWidth < MINIMUM_WIDTH)
+      theWidth = MINIMUM_WIDTH;
+
+    /* int */n_outlets = (theWidth - 2 * ObjectGeometry.INOUTLET_PAD) / DEFAULT_DISTANCE + 1;
+
+    sendArgs[0].setInt(n_outlets); 
+    ftsObject.sendMessage(FtsObject.systemInlet, "set_outlets", 1, sendArgs);
+
+    theWidth = (n_outlets - 1) * DEFAULT_DISTANCE + 2 * ObjectGeometry.INOUTLET_PAD;
+    super.setWidth( theWidth);
+  }
+
+  /*
+  public void inletsChanged(int n)
+  {
+    redraw();
+    redrawConnections();
+    itsSketchPad.getDisplayList().updateConnectionsFor(this);
+  }
+
+  public void outletsChanged(int n)
+  {
+    redraw();
+    redrawConnections();
+    itsSketchPad.getDisplayList().updateConnectionsFor(this);
+  }
+  */
+
+  public void updateInOutlets()
+  {
+    /*
+    inletDistance = DEFAULT_DISTANCE;
+    outletDistance = DEFAULT_DISTANCE;
+    */
+  }
+
+  public int getOutletAnchorX(int outlet)
+  {
+    return getX() + ObjectGeometry.INOUTLET_PAD + outlet * DEFAULT_DISTANCE;
+  }
+
+  public int getOutletAnchorY(int outlet)
+  {
+    return getY() + getHeight();
+  }
+
+  public int getInletAnchorX(int inlet)
+  {
+    return getX() + ObjectGeometry.INOUTLET_PAD + inlet * DEFAULT_DISTANCE;
+  }
+
+  public int getInletAnchorY(int inlet)
+  {
+    return getY() - 1;
+  }
+
+  public void paintInlets(Graphics g)
+  {
+    /* just one inlet any way!! */
+    int x, y;
+    
+    x = getInletAnchorX(0);
+    y = getInletAnchorY(0);
+    
+    if (itsSketchPad.isHighlightedInlet(this, 0))
+      {
+	g.drawOval( x - 2, y - 5 + ObjectGeometry.INLET_OVERLAP + ObjectGeometry.INLET_OFFSET, 4, 4);
+      }
+    else
+      {
+	g.fillRect( x - 1, y - 4 + ObjectGeometry.INLET_OVERLAP + ObjectGeometry.INLET_OFFSET, 3, 3);
+      }
+  }
+
+  public void paintOutlets(Graphics g)
+  {
+    /*int n_outlets = ftsObject.getNumberOfOutlets();*/
+
+    for ( int i = 0; i < n_outlets; i++)
+      {
+	int x, y;
+
+	x = getOutletAnchorX(i);
+	y = getOutletAnchorY(i);
+
+	if (itsSketchPad.isHighlightedOutlet(this, i))
+	  {
+	    g.drawOval( x - 2, y - 4 + ObjectGeometry.OUTLET_OVERLAP + ObjectGeometry.OUTLET_OFFSET, 4, 4);
+	  }
+	else
+	  {
+	    g.fillRect( x - 1, y - 3 + ObjectGeometry.OUTLET_OVERLAP + ObjectGeometry.OUTLET_OFFSET, 3, 3);
+	  }
+      }
+  }
+
+  public void paint(Graphics g) 
+  {
+    int x = getX();
+    int y = getY();
+    int w = getWidth();
+    int h = getHeight();
+    /*int n = ftsObject.getNumberOfOutlets();*/
+    int x_out = getOutletAnchorX(0);
+    
+    if (!isSelected())
+      {
+	g.setColor( Color.lightGray);
+	g.drawRect( getX(), getY(), getWidth()-1, getHeight()-1);
+	
+	g.setColor( Color.black);
+	
+	paintInlets(g);
+	paintOutlets(g);
+
+	g.drawLine(x_out, y + h/2, getOutletAnchorX(n_outlets-1), y + h/2);
+	g.drawLine(x_out, y + 1, x_out, y + h - 2);
+	
+	for(int i=1; i<n_outlets; i++)
+	  {
+	    x_out = getOutletAnchorX(i);
+	    g.drawLine(x_out, y + h/2, x_out, y + h - 2);
+	  }
+      }
+    else
+      {
+	g.setColor( Color.lightGray);
+	g.fillRect( getX(), getY(), getWidth(), getHeight());
+	
+	g.setColor( Color.black);
+	
+	paintInlets(g);
+	paintOutlets(g);
+
+	g.drawLine(x_out, y + h/2, getOutletAnchorX(n_outlets-1), y + h/2);
+	g.drawLine(x_out, y + h/2 + 1, getOutletAnchorX(n_outlets-1), y + h/2 + 1);
+
+	g.drawLine(x_out, y + 1, x_out, y + h - 2);
+	g.drawLine(x_out + 1, y + 1, x_out + 1, y + h - 2);
+	
+	for(int i=1; i<n_outlets; i++)
+	  {
+	    x_out = getOutletAnchorX(i);
+	    g.drawLine(x_out, y + h/2, x_out, y + h - 2);
+	    g.drawLine(x_out + 1, y + h/2, x_out + 1, y + h - 2);
+	  }
+      }
+  }
+}

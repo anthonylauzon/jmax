@@ -40,6 +40,7 @@
 (patcher-menu "addAndEdit" "%jmax" "_patcher_" "jpatcher" "Adding New Patcher")
 (patcher-menu "add"        "%jmax" "_inlet_" "inlet -1" "Adding New Inlet")
 (patcher-menu "add"        "%jmax" "_outlet_" "outlet -1" "Adding New Outlet")
+(patcher-menu "add"        "%jmax" "_fork_" "fork 2" "Adding New Fork")
 (patcher-menu "addAndEdit" "%jmax" "_comment_" "comment" "Adding New Comment")
 (patcher-menu "add"        "%jmax" "_button_" "button" "Adding New Button")
 (patcher-menu "add"        "%jmax" "_toggle_" "toggle" "Adding New Toggle")

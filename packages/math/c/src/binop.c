@@ -52,17 +52,14 @@ extern fts_status_t binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_at
 static fts_status_t
 binop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 2)
-    {
-      if(fts_is_number(at + 1))
-	return binop_number_instantiate(cl, ac, at);
-      else if(int_vector_atom_is(at + 1))
-	return binop_ivec_instantiate(cl, ac, at);
-      else if(float_vector_atom_is(at + 1)) 
-      return binop_fvec_instantiate(cl, ac, at);
-    }
-
-  return &fts_CannotInstantiate;
+  if(ac == 2 && fts_is_number(at + 1))
+    return binop_number_instantiate(cl, ac, at);
+  else if(ac == 3 && (fts_is_number(at + 1) || int_vector_atom_is(at + 1)) && int_vector_atom_is(at + 2)) 
+    return binop_ivec_instantiate(cl, ac, at);
+  else if(ac == 3 && (fts_is_number(at + 1) || float_vector_atom_is(at + 1)) && float_vector_atom_is(at + 2)) 
+    return binop_fvec_instantiate(cl, ac, at);
+  else
+    return &fts_CannotInstantiate;
 }
 
 static fts_object_t *
