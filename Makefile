@@ -26,8 +26,8 @@
 include VERSION
 
 ifdef SNAPSHOT
-version=$(MAJOR).$(MINOR).$(PATCH_LEVEL).$(SNAPSHOT)
-disttag=substV_$(MAJOR)_$(MINOR)_$(PATCH_LEVEL).$(SNAPSHOT)
+version=$(MAJOR).$(MINOR).$(PATCH_LEVEL)$(SNAPSHOT)
+disttag=substV_$(MAJOR)_$(MINOR)_$(PATCH_LEVEL)$(SNAPSHOT)
 else
 version=$(MAJOR).$(MINOR).$(PATCH_LEVEL)
 disttag=V_$(MAJOR)_$(MINOR)_$(PATCH_LEVEL)
