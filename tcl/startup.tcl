@@ -12,6 +12,7 @@ global jmaxHost jmaxConnection jmaxPort
 global jmaxArch jmaxMode jmaxServerName
 global jmaxMidiPort jmaxPkgPath
 global jmaxSplashScreen
+global jmaxFastFileBox
 
 # set the system root directory; 
 # the root directory is always got thru the system property
@@ -44,6 +45,12 @@ if {[systemProperty "jmaxMidiPort"] != ""} then { set jmaxMidiPort [systemProper
 if {[systemProperty "jmaxPkgPath"] != ""} then { set jmaxPkgPath [systemProperty "jmaxPkgPath"]}
 if {[systemProperty "jmaxSplashScreen"] != ""} then { set jmaxSplashScreen [systemProperty jmaxSplashScreen]}
 
+# set MIDI configuration to commandline argument
+if {[systemProperty "jmaxMidiPort"] != ""} then { set jmaxMidiPort [systemProperty "jmaxMidiPort"]}
+
+# set Swing File Box "Fast"
+if {[systemProperty "jmaxFastFileBox"] != ""} then { set jmaxFastFileBox [systemProperty "jmaxFastFileBox"]}
+
 # load installation defaults
 source $jmaxRootDir/config/defaults.tcl
 
@@ -72,6 +79,11 @@ if [catch {set foo $jmaxMidiPort}] then { set jmaxMidiPort $jmaxDefaultMidiPort}
 
 # misc defaults
 if [catch {set foo $jmaxPkgPath}] then { set jmaxPkgPath $jmaxDefaultPkgPath}
+
+# File Box
+if [catch {set foo $jmaxFastFileBox}] then { set jmaxFastFileBox $jmaxDefaultFastFileBox}
+# the following is done so it can be accessed from Java
+setSystemProperty "jmaxFastFileBox" $jmaxFastFileBox
 
 # hard coded defaults
 if [catch {set foo $jmaxSplashScreen}] then { set jmaxSplashScreen "show"}
