@@ -17,7 +17,7 @@ public class FtsPatchData extends MaxTclData
 
   public FtsPatchData()
   {
-    super(MaxDataType.getTypeByName("patch"));
+    super(MaxDataType.getTypeByName("patcher"));
   }
 
   void setPatcher(FtsObject patcher)

@@ -261,10 +261,10 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       itsDocument = (ErmesPatcherDoc)theDocument;
       FtsContainerObject patcher =  itsDocument.GetFtsPatcher();
 
-      x = ((Integer) patcher.get("win.pos.x")).intValue();
-      y = ((Integer) patcher.get("win.pos.y")).intValue();
-      width  = ((Integer) patcher.get("win.size.w")).intValue();
-      height = ((Integer) patcher.get("win.size.h")).intValue();
+      x = ((Integer) patcher.get("wx")).intValue();
+      y = ((Integer) patcher.get("wy")).intValue();
+      width  = ((Integer) patcher.get("ww")).intValue();
+      height = ((Integer) patcher.get("wh")).intValue();
 
       //get the window dimension use it for: reshape to the right dimensions
 
@@ -290,17 +290,17 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       String autorouting;
       //double check the existence of the window properties. If there aren't, use defaults
       
-      x1 = (Integer) patcher.get("win.pos.x");
-      if (x1 == null) patcher.put("win.pos.x", new Integer(x));
+      x1 = (Integer) patcher.get("wx");
+      if (x1 == null) patcher.put("wx", new Integer(x));
       else  x = x1.intValue();
-      y1 = (Integer) patcher.get("win.pos.y");
-      if (y1 == null) patcher.put("win.pos.y", new Integer(y));
+      y1 = (Integer) patcher.get("wy");
+      if (y1 == null) patcher.put("wy", new Integer(y));
       else  y = y1.intValue();
-      width1  = (Integer) patcher.get("win.size.w");
-      if (width1 == null) patcher.put("win.size.w", new Integer (width));
+      width1  = (Integer) patcher.get("ww");
+      if (width1 == null) patcher.put("ww", new Integer (width));
       else  width = width1.intValue();
-      height1 = (Integer) patcher.get("win.size.h");
-      if (height1 == null) patcher.put("win.size.h", new Integer(height));
+      height1 = (Integer) patcher.get("wh");
+      if (height1 == null) patcher.put("wh", new Integer(height));
       else  height = height1.intValue();
       
       autorouting = (String) patcher.get("autorouting");
@@ -1239,10 +1239,11 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     Rectangle aRect = theSketchWindow.getBounds();
     String ermesInfo = new String();
     
-    itsPatcher.put("win.pos.x", aRect.x);
-    itsPatcher.put("win.pos.y", aRect.y);
-    itsPatcher.put("win.size.w", aRect.width);
-    itsPatcher.put("win.size.h", aRect.height);
+
+    itsPatcher.put("wx", aRect.x);
+    itsPatcher.put("wy", aRect.y);
+    itsPatcher.put("ww", aRect.width);
+    itsPatcher.put("wh", aRect.height);
 
     if (itsSketchPad.doAutorouting) itsPatcher.put("autorouting", "on");
     else itsPatcher.put("autorouting", "off");
@@ -1253,10 +1254,10 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
            
       // Set geometrical properties
       
-      aFObject.put("pos.x", aErmesObject.itsX);
-      aFObject.put("pos.y", aErmesObject.itsY);
-      aFObject.put("pos.w", aErmesObject.currentRect.width);
-      aFObject.put("pos.h", aErmesObject.currentRect.height);
+      aFObject.put("x", aErmesObject.itsX);
+      aFObject.put("y", aErmesObject.itsY);
+      aFObject.put("w", aErmesObject.currentRect.width);
+      aFObject.put("h", aErmesObject.currentRect.height);
 
       // Set the font properties
 
@@ -1264,7 +1265,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 	aFObject.put("font", aErmesObject.itsFont.getName());
 
       if (aErmesObject.itsFont.getSize() != aErmesObject.itsSketchPad.sketchFont.getSize())
-	aFObject.put("fontSize", aErmesObject.itsFont.getSize());
+	aFObject.put("fs", aErmesObject.itsFont.getSize());
 
       if (aErmesObject instanceof ircam.jmax.editors.ermes.ErmesObjExternal &&
 	  ((ErmesObjExternal)aErmesObject).itsSubWindow != null)

@@ -66,7 +66,7 @@ public class FtsDotPatParser
       obj.setSizeW(width);
 
       if (fontSize != 12)
-	obj.put("fontSize", fontSize);
+	obj.put("fs", fontSize);
     }
   }
 
@@ -786,10 +786,10 @@ public class FtsDotPatParser
     width = x2 - x;
     height = y2 - y;
 
-    parent.put("win.pos.x", x);
-    parent.put("win.pos.y", y);
-    parent.put("win.size.w", width);
-    parent.put("win.size.h", height);
+    parent.put("wx", x);
+    parent.put("wy", y);
+    parent.put("ww", width);
+    parent.put("wh", height);
   }
 
   private static void syntaxError(String description) throws FtsException

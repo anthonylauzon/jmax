@@ -23,8 +23,8 @@ abstract public class FtsObject implements MaxTclInterpreter
   {
     // Ins and outs
 
-    FtsPropertyDescriptor.setPersistent("nIns", true);
-    FtsPropertyDescriptor.setPersistent("nOuts", true);
+    FtsPropertyDescriptor.setPersistent("ins", true);
+    FtsPropertyDescriptor.setPersistent("outs", true);
 
     // Name
 
@@ -33,21 +33,21 @@ abstract public class FtsObject implements MaxTclInterpreter
 
     // Graphic information
 
-    FtsPropertyDescriptor.setPersistent("pos.x", true);
-    FtsPropertyDescriptor.setPersistent("pos.y", true);
-    FtsPropertyDescriptor.setPersistent("size.w", true);
-    FtsPropertyDescriptor.setPersistent("size.h", true);
+    FtsPropertyDescriptor.setPersistent("x", true);
+    FtsPropertyDescriptor.setPersistent("y", true);
+    FtsPropertyDescriptor.setPersistent("w", true);
+    FtsPropertyDescriptor.setPersistent("h", true);
 
-    FtsPropertyDescriptor.setPersistent("win.pos.x", true);
-    FtsPropertyDescriptor.setPersistent("win.pos.y", true);
-    FtsPropertyDescriptor.setPersistent("win.size.w", true);
-    FtsPropertyDescriptor.setPersistent("win.size.h", true);
+    FtsPropertyDescriptor.setPersistent("wx", true);
+    FtsPropertyDescriptor.setPersistent("wy", true);
+    FtsPropertyDescriptor.setPersistent("ww", true);
+    FtsPropertyDescriptor.setPersistent("wh", true);
 
     // fonts 
 
     FtsPropertyDescriptor.setPersistent("font", true);
-    FtsPropertyDescriptor.setPersistent("fontSize", true);
-    FtsPropertyDescriptor.setDefaultValue("fontSize", new Integer(12));
+    FtsPropertyDescriptor.setPersistent("fs", true);
+    FtsPropertyDescriptor.setDefaultValue("fs", new Integer(12));
   }
 
   /******************************************************************************/
@@ -245,6 +245,23 @@ abstract public class FtsObject implements MaxTclInterpreter
 	}
     }
 
+    public void removeWatch(FtsPropertyHandler handler, String name)
+    {
+      for (int i = 0; i < table.size(); i++)
+	{
+	  PropertyHandlerEntry ph = (PropertyHandlerEntry) table.elementAt(i);
+
+	  // Shitty code; actually, the handler table should 
+	  // not be a vector ... may be a linked list
+
+	  if ((ph.handler == handler) && (ph.name == name))
+	    {
+	      table.removeElement(ph);
+	      i--; // to compensate for the shift in the vector
+	    }
+	}
+    }
+
     public void watch(String property, FtsPropertyHandler handler)
     {
       new PropertyHandlerEntry(property, handler);
@@ -320,32 +337,32 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   protected boolean builtinPut(String name, Object value)
   {
-    if (name.equals("nIns"))
+    if (name.equals("ins"))
       {
 	setNumberOfInlets(((Integer)value).intValue());
 	return true;
       }
-    else if (name.equals("nOuts"))
+    else if (name.equals("outs"))
       {
 	setNumberOfOutlets(((Integer)value).intValue());
 	return true;
       }
-    else if (name.equals("pos.x"))
+    else if (name.equals("x"))
       {
 	posX = ((Integer)value).intValue();
 	return true;
       }
-    else if (name.equals("pos.y"))
+    else if (name.equals("y"))
       {
 	posY = ((Integer)value).intValue();
 	return true;
       }
-    else if (name.equals("size.w"))
+    else if (name.equals("w"))
       {
 	sizeW = ((Integer)value).intValue();
 	return true;
       }
-    else if (name.equals("size.h"))
+    else if (name.equals("h"))
       {
 	sizeH = ((Integer)value).intValue();
 	return true;
@@ -373,17 +390,17 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   protected Object builtinGet(String name)
   {
-    if (name.equals("nIns"))
+    if (name.equals("ins"))
       return new Integer(getNumberOfInlets());
-    else if (name.equals("nOuts"))
+    else if (name.equals("outs"))
       return new Integer(getNumberOfOutlets());
-    else if (name.equals("pos.x"))
+    else if (name.equals("x"))
       return new Integer(posX);
-    else if (name.equals("pos.y"))
+    else if (name.equals("y"))
       return new Integer(posY);
-    else if (name.equals("size.w"))
+    else if (name.equals("w"))
       return new Integer(sizeW);
-    else if (name.equals("size.h"))
+    else if (name.equals("h"))
       return new Integer(sizeH);
     else if (name.equals("name"))
       return getObjectName();
@@ -399,13 +416,13 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   protected void builtinPropertyNames(Vector names)
   {
-    names.addElement("nIns");
-    names.addElement("nOuts");
+    names.addElement("ins");
+    names.addElement("outs");
     names.addElement("name");
-    names.addElement("pos.x");
-    names.addElement("pos.y");
-    names.addElement("size.w");
-    names.addElement("size.h");
+    names.addElement("x");
+    names.addElement("y");
+    names.addElement("w");
+    names.addElement("h");
   }
 
   /** Local put is a version of put that do not send
@@ -516,6 +533,12 @@ abstract public class FtsObject implements MaxTclInterpreter
   {
     if (propertyHandlerTable != null)
       propertyHandlerTable.removeWatch(handler);
+  }
+
+  public void removeWatch(FtsPropertyHandler handler, String name)
+  {
+    if (propertyHandlerTable != null)
+      propertyHandlerTable.removeWatch(handler, name);
   }
 
   public void getPropertyNames(Vector names)

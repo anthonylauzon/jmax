@@ -296,8 +296,8 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
     for (int i = 1; i < ninlets; i++)
       for (int j = 0; j < i; j++)
 	{
-	  int ix = ((Integer) ((FtsObject) inlets.elementAt(i)).get("pos.x")).intValue();
-	  int jx = ((Integer) ((FtsObject) inlets.elementAt(j)).get("pos.x")).intValue();
+	  int ix = ((Integer) ((FtsObject) inlets.elementAt(i)).get("x")).intValue();
+	  int jx = ((Integer) ((FtsObject) inlets.elementAt(j)).get("x")).intValue();
 
 	  if (jx > ix)
 	    {
@@ -312,8 +312,8 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
     for (int i = 1; i < noutlets; i++)
       for (int j = 0; j < i; j++)
 	{
-	  int ix = ((Integer) ((FtsObject) outlets.elementAt(i)).get("pos.x")).intValue();
-	  int jx = ((Integer) ((FtsObject) outlets.elementAt(j)).get("pos.x")).intValue();
+	  int ix = ((Integer) ((FtsObject) outlets.elementAt(i)).get("x")).intValue();
+	  int jx = ((Integer) ((FtsObject) outlets.elementAt(j)).get("x")).intValue();
 
 	  if (jx > ix)
 	    {

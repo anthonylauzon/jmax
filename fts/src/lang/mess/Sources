@@ -9,5 +9,6 @@ SOURCES = class.c      \
 	  symbols.c    \
 	  atoms.c     \
 	  compatibility.c \
+	  loader.c       \
 	  vm.c
 

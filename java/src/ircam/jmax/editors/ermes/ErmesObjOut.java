@@ -27,12 +27,12 @@ class ErmesObjOut extends ErmesObject {
     // warning.. it seems that when the height is 0, 
     // the value is null, instead of new Integer(0)
 
-    Integer aInteger = ((Integer)theFtsObject.get("size.h"));
-    currentRect = new Rectangle(((Integer)theFtsObject.get("pos.x")).intValue(),
-				((Integer)theFtsObject.get("pos.y")).intValue(),
-				((Integer)theFtsObject.get("size.w")).intValue(),
+    Integer aInteger = ((Integer)theFtsObject.get("h"));
+    currentRect = new Rectangle(((Integer)theFtsObject.get("x")).intValue(),
+				((Integer)theFtsObject.get("y")).intValue(),
+				((Integer)theFtsObject.get("w")).intValue(),
 				(aInteger == null)?preferredSize.height:
-				((Integer)theFtsObject.get("size.h")).intValue());
+				((Integer)theFtsObject.get("h")).intValue());
 
     //currentRect = new Rectangle(x, y, d.width, d.height);
     itsId = ((FtsOutletObject) theFtsObject).getPosition();

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.2 $ IRCAM $Date: 1998/02/06 17:19:34 $
+ *      $Revision: 1.3 $ IRCAM $Date: 1998/02/20 21:25:11 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -152,8 +152,8 @@ fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
 
   if ((obj->id != FTS_NO_ID) && (! fts_object_is_patcher(obj)))
     {
-      fts_object_property_changed(obj, fts_new_symbol("nIns"));
-      fts_object_property_changed(obj, fts_new_symbol("nOuts"));
+      fts_object_property_changed(obj, fts_new_symbol("ins"));
+      fts_object_property_changed(obj, fts_new_symbol("outs"));
       fts_object_property_changed(obj, fts_new_symbol("name"));
       fts_object_property_changed(obj, fts_new_symbol("declaration"));
     }

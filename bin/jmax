@@ -1,7 +1,7 @@
 #!/bin/sh
 
 
-CLASSPATH=/usr/local/max/java/classes/jmax.jar:/usr/local/max/java/lib/jacl1.0b1/jacl.jar:/u/worksta/fts/java/lib/swing-0.7/swing.jar:/u/worksta/fts/java/lib/swing-0.7/jlf.jar:/u/worksta/fts/java/lib/swing-0.7/motif.jar:/u/worksta/fts/java/lib/swing-0.7/windows.jar ; export CLASSPATH
+CLASSPATH=/usr/local/max/java/classes/jmax.jar:/usr/local/max/java/lib/jacl1.0b1/jacl.jar:/u/worksta/fts/java/lib/swing-1.0.1/swingall.jar ; export CLASSPATH
 alias jmax java -noasyncgc -mx64m -ms2m -classpath
 
 

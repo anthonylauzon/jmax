@@ -301,10 +301,10 @@ public class MaxApplication extends Object {
 
   public static ErmesSketchWindow NewDefaultSubPatcher( FtsContainerObject theFtsPatcher) {//to use just for 'patcher' externals
 
-    theFtsPatcher.put("win.pos.x", 100);
-    theFtsPatcher.put("win.pos.y", 100);
-    theFtsPatcher.put("win.size.w", 300);
-    theFtsPatcher.put("win.size.h", 300);
+    theFtsPatcher.put("wx", 100);
+    theFtsPatcher.put("wy", 100);
+    theFtsPatcher.put("ww", 300);
+    theFtsPatcher.put("wh", 300);
 
     ErmesSketchWindow aSketchWindow = NewSubPatcherWindow(theFtsPatcher);
     aSketchWindow.isSubPatcher = true;
@@ -607,8 +607,6 @@ public class MaxApplication extends Object {
     MaxWindow aWindow;
     ErmesSketchWindow aSketchWindow;
 
-    runHooks("exit");// run the exit hooks
-
     for(Enumeration e=itsSketchWindowList.elements(); e.hasMoreElements();){
       aSketchWindow = (ErmesSketchWindow)e.nextElement();
       if (! aSketchWindow.Close())
@@ -619,6 +617,8 @@ public class MaxApplication extends Object {
       aWindow = (MaxWindow)e.nextElement();
       if(!aWindow.Close()) return;
     }
+
+    runHooks("exit");// run the exit hooks
 
     if (itsConsoleWindow != null)
       {

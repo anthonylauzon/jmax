@@ -86,19 +86,26 @@ fts_client_updates_sched(void)
       fts_symbol_t property;
       fts_object_t *obj;
       int update_count;
+      int one_done = 0;
 
       period_count = 0;
-
-      update_group_start();
 
       for (update_count = 0;
 	   (update_count < fts_updates_per_ticks) && fts_object_get_next_change(&property, &obj);
 	   update_count++)
 	{
+	  if (one_done == 0)
+	    {
+	      update_group_start();
+	      one_done = 1;
+	    }
+
+
 	  fts_client_send_prop(obj, property);
 	}
 
-      update_group_end();
+      if (one_done)
+	update_group_end();
     }
   else
     period_count++;

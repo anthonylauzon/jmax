@@ -6,7 +6,6 @@ import java.util.*;
 
 import ircam.jmax.*;
 import com.sun.java.swing.*;
-import com.sun.java.swing.basic.*;
 import com.sun.java.swing.plaf.*;
 
 public class ErmesSwToolbar extends JPanel implements /*ActionListener,*/ MouseListener{
@@ -25,9 +24,7 @@ public class ErmesSwToolbar extends JPanel implements /*ActionListener,*/ MouseL
     itsSketchPad = theSketchPad;
     setLayout (new BorderLayout());    
     itsSwToolbar = new JToolBar();
-    ToolBarUI ui = itsSwToolbar.getUI();
-    if (ui instanceof BasicToolBarUI)
-      ((BasicToolBarUI)ui).setFloatable (false);    
+    itsSwToolbar.setFloatable (false);    
     InsertButtons();
     add (itsSwToolbar, BorderLayout.WEST);
     setBackground(itsSwToolbar.getBackground());

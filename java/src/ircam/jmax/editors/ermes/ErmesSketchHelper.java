@@ -47,11 +47,11 @@ class ErmesSketchHelper extends Object{
     if(itsSketchPad.doSnapToGrid){
       int x, y;
 
-      x = ((Integer)theFtsObject.get("pos.x")).intValue();
-      y = ((Integer)theFtsObject.get("pos.y")).intValue();
+      x = ((Integer)theFtsObject.get("x")).intValue();
+      y = ((Integer)theFtsObject.get("y")).intValue();
       Point aPoint = SnapToGrid(x, y);
-      theFtsObject.put("pos.x", x);
-      theFtsObject.put("pos.y", y);
+      theFtsObject.put("x", x);
+      theFtsObject.put("y", y);
     }
 
     try

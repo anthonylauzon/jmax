@@ -12,7 +12,7 @@ public class FtsPatchDataType extends MaxDataType
 {
   public FtsPatchDataType()
   {
-    super("patch");
+    super("patcher");
   }
 
   /** Build an empty instance of FtsPatchData, i.e. an instance
@@ -29,10 +29,10 @@ public class FtsPatchDataType extends MaxDataType
 
     // Put some geometrical property for the window, so we can see it.
 
-    patcher.put("win.pos.x", 100);
-    patcher.put("win.pos.y", 100);
-    patcher.put("win.size.w", 500);
-    patcher.put("win.size.h", 480);
+    patcher.put("wx", 100);
+    patcher.put("wy", 100);
+    patcher.put("ww", 500);
+    patcher.put("wh", 480);
 
     FtsPatchData obj = new FtsPatchData();
 

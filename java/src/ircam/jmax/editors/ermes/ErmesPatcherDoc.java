@@ -225,10 +225,10 @@ public class ErmesPatcherDoc implements MaxDocument {
     Rectangle aRect = itsSketchWindow.getBounds();
     String ermesInfo = new String();
     
-    itsPatcher.put("win.pos.x", aRect.x);
-    itsPatcher.put("win.pos.y", aRect.y);
-    itsPatcher.put("win.size.w", aRect.width);
-    itsPatcher.put("win.size.h", aRect.height);
+    itsPatcher.put("wx", aRect.x);
+    itsPatcher.put("wy", aRect.y);
+    itsPatcher.put("ww", aRect.width);
+    itsPatcher.put("wh", aRect.height);
 
     for (Enumeration e=theSketchWindow.itsSketchPad.itsElements.elements(); e.hasMoreElements();) {
       aErmesObject = (ErmesObject) e.nextElement();
@@ -236,10 +236,10 @@ public class ErmesPatcherDoc implements MaxDocument {
            
       // Set geometrical properties
       
-      aFObject.put("pos.x", aErmesObject.itsX);
-      aFObject.put("pos.y", aErmesObject.itsY);
-      aFObject.put("pos.w", aErmesObject.currentRect.width);
-      aFObject.put("pos.h", aErmesObject.currentRect.height);
+      aFObject.put("x", aErmesObject.itsX);
+      aFObject.put("y", aErmesObject.itsY);
+      aFObject.put("w", aErmesObject.currentRect.width);
+      aFObject.put("h", aErmesObject.currentRect.height);
 
       // Set the font properties
 
@@ -247,7 +247,7 @@ public class ErmesPatcherDoc implements MaxDocument {
 	aFObject.put("font", aErmesObject.itsFont.getName());
 
       if (aErmesObject.itsFont.getSize() != aErmesObject.itsSketchPad.sketchFont.getSize())
-	aFObject.put("fontSize", aErmesObject.itsFont.getSize());
+	aFObject.put("fs", aErmesObject.itsFont.getSize());
 
       if (aErmesObject instanceof ircam.jmax.editors.ermes.ErmesObjExternal &&
 	  ((ErmesObjExternal)aErmesObject).itsSubWindow != null)

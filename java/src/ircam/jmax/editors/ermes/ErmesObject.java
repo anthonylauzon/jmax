@@ -282,18 +282,18 @@ public class ErmesObject implements FtsPropertyHandler {
     itsFont = itsSketchPad.sketchFont;
     itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
     laidOut = false;
-    itsX = ((Integer)theFtsObject.get("pos.x")).intValue();
-    itsY = ((Integer)theFtsObject.get("pos.y")).intValue();
+    itsX = ((Integer)theFtsObject.get("x")).intValue();
+    itsY = ((Integer)theFtsObject.get("y")).intValue();
 
     {
-      Integer widthInt = (Integer) theFtsObject.get("size.w");
+      Integer widthInt = (Integer) theFtsObject.get("w");
 
       if (widthInt != null)
 	width  = widthInt.intValue();
     }
 
     {
-      Integer heightInt = (Integer)theFtsObject.get("size.h");
+      Integer heightInt = (Integer)theFtsObject.get("h");
 
       if (heightInt != null)
 	height = heightInt.intValue();

@@ -13,7 +13,7 @@ public class ErmesModule
   {
     // Install the local mda entities
 
-    MaxDataType.getTypeByName("patch").setDefaultEditorFactory(new ErmesPatcherFactory());
+    MaxDataType.getTypeByName("patcher").setDefaultEditorFactory(new ErmesPatcherFactory());
 
     // Install the module tcl commands.
 

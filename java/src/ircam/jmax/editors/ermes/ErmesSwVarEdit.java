@@ -6,7 +6,6 @@ import java.awt.event.*;
 
 import ircam.jmax.*;
 import com.sun.java.swing.*;
-import com.sun.java.swing.basic.*;
 import com.sun.java.swing.plaf.*;
 import com.sun.java.swing.border.*;
 
@@ -45,9 +44,7 @@ public class ErmesSwVarEdit extends JPanel implements ActionListener{
     addButton.addActionListener(this);
     aToolBar.add(deleteButton);
     aToolBar.setSize(300, 30);
-    ToolBarUI ui = aToolBar.getUI();
-    if (ui instanceof BasicToolBarUI)
-      ((BasicToolBarUI)ui).setFloatable(false);   
+    aToolBar.setFloatable(false);   
     add(aToolBar, "stick_both");
     validate();
     //-----second element; the "betweex panel"

@@ -667,5 +667,6 @@ fts_vecx_fdot
 fts_vecx_fadd
 fts_vecx_fcpyre
 fts_vecx_ffillim
+fts_binary_file_load
 
 

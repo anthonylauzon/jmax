@@ -780,10 +780,10 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       Class objectClass = itsHelper.SearchFtsName(fo.getClassName());
       if (objectClass==null) continue;
 
-      objectX = ((Integer)fo.get("pos.x")).intValue();
-      objectY = ((Integer)fo.get("pos.y")).intValue();
-      fo.put("pos.x", objectX+10);//offset by 10      
-      fo.put("pos.y", objectY+10);//offset by 10
+      objectX = ((Integer)fo.get("x")).intValue();
+      objectY = ((Integer)fo.get("y")).intValue();
+      fo.put("x", objectX+10);//offset by 10      
+      fo.put("y", objectY+10);//offset by 10
       
       aObject = itsHelper.AddObject(objectClass, fo);
       itsSelectedList.addElement(aObject);

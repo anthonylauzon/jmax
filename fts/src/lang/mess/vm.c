@@ -49,21 +49,8 @@
 
 #include "sys.h"
 #include "lang/mess.h"
+#include "lang/mess/vm.h"
 
-#define RETURN          0
-#define PUSH_INT        1
-#define PUSH_FLOAT      2
-#define PUSH_SYM        3
-#define POP_ARG         4
-#define PUSH_OBJ        5
-#define MV_OBJ          6
-#define POP_OBJ         7
-#define MAKE_OBJ        8
-#define PUT_PROP        9
-#define OBJ_MESS       10
-#define PUSH_OBJ_TABLE 11
-#define POP_OBJ_TABLE  12
-#define CONNECT        13
 
 #define EVAL_STACK_DEPTH   1024
 #define OBJECT_STACK_DEPTH 1024
@@ -75,7 +62,7 @@ static fts_atom_t *eval_tos;
 static fts_object_t *object_stack[OBJECT_STACK_DEPTH];
 static fts_object_t **object_tos;
 
-static  fts_object_t **object_table_stack[OBJECT_TABLE_STACK_DEPTH];
+static fts_object_t **object_table_stack[OBJECT_TABLE_STACK_DEPTH];
 static fts_object_t ***object_table_tos;
 static fts_object_t **object_table;
 
@@ -150,8 +137,8 @@ void fts_run_mess_vm(fts_word_t *program, fts_symbol_t symbol_table[])
 	    object_tos--;
 	    *object_tos =  object_table[fts_word_get_int(p)];
 	    p++;
-	    break;
 	  }
+	break;
 
 	case MV_OBJ:
 	  {
@@ -193,22 +180,22 @@ void fts_run_mess_vm(fts_word_t *program, fts_symbol_t symbol_table[])
 	  {
 	    /* PUT_PROP   <sym> */
 
-	    fts_symbol_t prop = fts_word_get_symbol(p++);
-
+	    fts_symbol_t prop = symbol_table[fts_word_get_int(p++)];
 	    fts_object_put_prop(*object_tos, prop, eval_tos);
 	  }
-
+	break;
 
 	case OBJ_MESS:
 	  {
 	    /* OBJ_MESS   <inlet> <sel> <nargs> */
 
 	    int inlet = fts_word_get_int(p++);
-	    fts_symbol_t sel = fts_word_get_symbol(p++);
+	    fts_symbol_t sel = symbol_table[fts_word_get_int(p++)];
 	    int nargs = fts_word_get_int(p++);
 
 	    fts_message_send(*object_tos, inlet, sel, nargs, eval_tos);
 	  }
+	break;
 
 	case CONNECT:
 	  {
@@ -216,6 +203,7 @@ void fts_run_mess_vm(fts_word_t *program, fts_symbol_t symbol_table[])
 
 	    fts_object_connect(*object_tos, fts_get_int(eval_tos), *(object_tos + 1), fts_get_int((eval_tos + 1)));
 	  }
+	break;
 
 	/* Object table stack */
 
@@ -229,6 +217,7 @@ void fts_run_mess_vm(fts_word_t *program, fts_symbol_t symbol_table[])
 	    p++;
 
 	    object_table = fts_malloc(sizeof(fts_object_t *) * size);
+	    object_table[0] = 0;
 
 	    object_table_tos--;
 	    (* object_table_tos) = object_table;
