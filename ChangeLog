@@ -1,3 +1,9 @@
+2003-02-20  Patrice Tisserand <Patrice.Tisserand@ircam.fr>
+
+	* add fts_file_find_in_env function (find a file in paths defined by the contains of an environment variable
+
+	* move fts_file_find_in_path declaration from jmax/ftsprivate/file.h to jmax/include/fts/file.h (this function is now public)
+
 2003-02-20  Norbert Schnell  <schnell@mac-schnell2.ircam.fr>
 
 	* fixed MacOS X MIDI input (no more delay!)
