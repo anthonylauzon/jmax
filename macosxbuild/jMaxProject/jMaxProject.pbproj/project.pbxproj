@@ -5,6 +5,18 @@
 	};
 	objectVersion = 38;
 	objects = {
+		F5933FE503363A6501664092 = {
+			isa = PBXFileReference;
+			name = FloatBoxControlPanel.java;
+			path = ../../packages/guiobj/java/ircam/jmax/guiobj/FloatBoxControlPanel.java;
+			refType = 2;
+		};
+		F5933FE603363A6501664092 = {
+			fileRef = F5933FE503363A6501664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F5999CC1032E295001664092 = {
 			children = (
 				F5999CC2032E298301664092,
@@ -19449,6 +19461,7 @@
 				F820645D02AE144301664092,
 				F820645E02AE144301664092,
 				F889510C02ED9ACD01664092,
+				F5933FE603363A6501664092,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -19563,6 +19576,7 @@
 				F820645A02AE144301664092,
 				F820645B02AE144301664092,
 				F889510B02ED9ACD01664092,
+				F5933FE503363A6501664092,
 			);
 			isa = PBXGroup;
 			name = guiobj;
