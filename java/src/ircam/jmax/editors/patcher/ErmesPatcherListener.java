@@ -94,6 +94,8 @@ class ErmesPatcherListener implements FtsPatcherListener
        display list.
        */
 
+    System.err.println("ErmesPatcherListener connectionRemoved "+connection);
+
     SwingUtilities.invokeLater(new Runnable() {
       public void run()
 	{

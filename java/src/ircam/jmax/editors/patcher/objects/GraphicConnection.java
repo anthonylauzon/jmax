@@ -141,6 +141,12 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
     sketch.getDisplayList().remove(this);
   }
 
+  public void release()
+  {
+    ftsConnection.release();
+    sketch.getDisplayList().remove(this);
+  }
+
   public void typeChanged(int theType)
   {
     type = theType;

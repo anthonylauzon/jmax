@@ -139,7 +139,7 @@ public class FtsConnection extends FtsObject
    *  indirectly called by FTS.
    */
 
- void release()
+ public void release()
   {
     deleted = true;
 
