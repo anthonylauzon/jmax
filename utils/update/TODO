@@ -1,0 +1,17 @@
+* fix fts_method_define*() replacements (buggy)
+	# FIXED but needs testing #
+
+* fix source backup
+
+* upon warnings, place explanatory notice in source code
+
+* recognize fts_param*() obsolete functions (FTS now has a fts_param_t object)
+  -> Emit a warning?
+
+* recognize fts_outlet_type_define (replace with fts_class_outlet*())
+
+* recognize fts_hash_table*() (change to fts_hashtable*())
+	* Change fts_hash_table_lookup() into fts_hashtable_get()	(prototypes changed)
+	* Change fts_hash_table_append() into fts_hashtable_put()	(prototypes changed)
+
+* remove "static" for package_config() function
