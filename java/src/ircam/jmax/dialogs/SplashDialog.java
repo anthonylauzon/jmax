@@ -121,7 +121,7 @@ public class SplashDialog extends Dialog implements KeyListener, MouseListener, 
     g.fillRect(0, 0, d.width, d.height);        
     g.drawImage(itsImage, /*4*/12, /*4*/20,this);
     g.setColor(Color.black);
-    g.drawString(itsVersionString, 24, d.height-24);
+    g.drawString(itsVersionString, 32, d.height-24);
   }
 }
 
