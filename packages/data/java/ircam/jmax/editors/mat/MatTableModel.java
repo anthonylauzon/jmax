@@ -29,6 +29,7 @@ import java.lang.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.fts.*;
+import ircam.fts.client.*;
 
 
 class MatTableModel extends AbstractTableModel
@@ -46,7 +47,7 @@ class MatTableModel extends AbstractTableModel
 
 public void setValueAt(Object aValue, int rowIndex, int columnIndex) 
 {	    
-  if( aValue != null && !(aValue instanceof FtsGraphicObject))
+  if( aValue != null && !(aValue instanceof FtsObject))
   {
     Object obj;
     try{

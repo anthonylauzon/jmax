@@ -84,7 +84,7 @@ public class JMaxMatTable extends JTable
   {
     JButton button;
     protected static final String EDIT = "edit";
-    FtsGraphicObject currentObject = null;  
+    FtsObject currentObject = null;
     
     public FtsObjectCellEditor() 
     {
@@ -98,10 +98,9 @@ public class JMaxMatTable extends JTable
       if (EDIT.equals(e.getActionCommand())) 
       {  
         if(currentObject instanceof FtsObjectWithEditor)
-        {
           ((FtsObjectWithEditor)currentObject).requestOpenEditor();
-          fireEditingStopped();
-        }
+  
+        fireEditingStopped();
       }
     }
   
@@ -111,7 +110,7 @@ public class JMaxMatTable extends JTable
       
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) 
     {
-      currentObject = (FtsGraphicObject)value;
+      currentObject = (FtsObject)value;
       return button;
     }
   }
@@ -133,12 +132,12 @@ public class JMaxMatTable extends JTable
         String name = ((FtsGraphicObject)value).getVariableName();
       
         if( name != null && !name.equals(""))
-          setText(name+" "+((FtsGraphicObject)value).getDescription());
+          setText(((FtsGraphicObject)value).getDescription()+" "+name);
         else
-          setText("#"+((FtsGraphicObject)value).getObjectID()+" "+((FtsGraphicObject)value).getDescription());
+          setText(((FtsGraphicObject)value).getDescription()+" #"+((FtsGraphicObject)value).getObjectID());
       }
       else
-        setText("#"+((FtsObject)value).getID()+" "+((FtsObject)value).getDescription());
+        setText(((FtsObject)value).getDescription()+" #"+((FtsObject)value).getID());
       setHorizontalTextPosition( SwingConstants.CENTER);
       return this;
     }
