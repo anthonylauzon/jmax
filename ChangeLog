@@ -1,3 +1,11 @@
+2003-05-13  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* client/python/ircam/fts/client/*.py : added documentation for Python client library.
+
+	* client/python/ircam/fts/client/FtsServerConnection.py: removed writeAtoms method.
+
+	* client/python/ircam/fts/client/FtsPipeConnection.py: started to add a pipe connection for Python client library.
+	
 2003-05-09  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* client/python/ircam/fts/client/*: cleaning Python client library
