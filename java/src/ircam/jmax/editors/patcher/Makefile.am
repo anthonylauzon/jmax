@@ -7,7 +7,6 @@ ConnectionAction.java\
 DisplayList.java\
 EditField.java\
 ErmesModule.java\
-ErmesPatcherListener.java\
 ErmesSelection.java\
 ErmesSketchPad.java\
 ErmesSketchWindow.java\
