@@ -1084,24 +1084,6 @@
 			settings = {
 			};
 		};
-		F56AE66E03E56725016640F1 = {
-			isa = PBXFileReference;
-			name = default_project_macosx.jprj;
-			path = ../../config/default_project_macosx.jprj;
-			refType = 2;
-		};
-		F56AE66F03E56725016640F1 = {
-			fileRef = F56AE66E03E56725016640F1;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F56AE67203E68526016640F1 = {
-			fileRef = F56AE66E03E56725016640F1;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F56C3E180338D3DC01664092 = {
 			isa = PBXFileReference;
 			name = Actions.java;
@@ -2271,6 +2253,18 @@
 			name = macosxmidi.c;
 			path = ../../packages/macosx/c/src/macosxmidi.c;
 			refType = 2;
+		};
+		F7D8EEDE03F1326801664058 = {
+			isa = PBXFileReference;
+			name = default_project.jprj;
+			path = ../../config/default_project.jprj;
+			refType = 2;
+		};
+		F7D8EEE003F132B101664058 = {
+			fileRef = F7D8EEDE03F1326801664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 //F70
 //F71
@@ -11859,7 +11853,7 @@
 				F88000010283043C01664092,
 				F5F80BF203420AB201664092,
 				F594D066036557D601664092,
-				F56AE66E03E56725016640F1,
+				F7D8EEDE03F1326801664058,
 			);
 			isa = PBXGroup;
 			name = Resources;
@@ -12516,7 +12510,7 @@
 			dstPath = share/jmax;
 			dstSubfolderSpec = 7;
 			files = (
-				F56AE67203E68526016640F1,
+				F7D8EEE003F132B101664058,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -17583,7 +17577,6 @@
 			files = (
 				F5F80BF403420AC901664092,
 				F594D067036557D601664092,
-				F56AE66F03E56725016640F1,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -20462,7 +20455,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mv build/jMax.app/Contents/Resources/share/jmax/default_project_macosx.jprj build/jMax.app/Contents/Resources/share/jmax/default-project.jprj\nchmod a+r build/jMax.app/Contents/Resources/share/jmax/default-project.jprj";
+			shellScript = "mv build/jMax.app/Contents/Resources/share/jmax/default_project.jprj build/jMax.app/Contents/Resources/share/jmax/default-project.jprj\nchmod a+r build/jMax.app/Contents/Resources/share/jmax/default-project.jprj";
 		};
 		F8DC5EF40286A1FA01664092 = {
 			children = (

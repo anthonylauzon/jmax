@@ -40,6 +40,7 @@
 
 #include <ftsprivate/fpe.h>
 #include <ftsprivate/platform.h>
+#include <ftsprivate/package.h>
 #include <fts/thread.h>
 
 /***********************************************************************
@@ -73,6 +74,7 @@ fts_get_system_project( void)
   char path[MAXPATHLEN];
 
   fts_make_absolute_path( fts_get_root_directory(), fts_s_default_project, path, MAXPATHLEN);
+  
   if (fts_file_exists(path) && fts_is_file(path)) {
     return fts_new_symbol(path);
   }
@@ -126,7 +128,7 @@ static fts_status_description_t load_library_error = { &error_description[0]};
 
 odbc_private_extern void undefined_symbol_handler( const char *symbolName) 
 {
-  fts_log( "undefined symbol: %s", symbolName);
+  fts_log( "undefined symbol: %s)", symbolName);
   sprintf( error_description, "undefined symbol: %s", symbolName);
 } 
 
@@ -267,7 +269,7 @@ void fts_platform_init( void)
 {
   post( "Mac OS X BETA version\n");
   /* load macosx package */
-  fts_package_load(fts_new_sybmol("macosx"));
+  fts_package_load(fts_new_symbol("macosx"));
 }
 
 
