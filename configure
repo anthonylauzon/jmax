@@ -2717,6 +2717,7 @@ packages/ispw/java/src/ircam/jmax/ispw/Makefile
 packages/ispw/help/Makefile
 packages/ispw/help/control/Makefile
 packages/ispw/help/signal/Makefile
+packages/ispw/images/Makefile
 packages/ispwmath/Makefile
 packages/ispwmath/c/Makefile
 packages/ispwmath/c/src/Makefile
@@ -2730,10 +2731,6 @@ packages/math/Makefile
 packages/math/c/Makefile
 packages/math/c/src/Makefile
 packages/math/help/Makefile
-packages/mess/Makefile
-packages/mess/c/Makefile
-packages/mess/c/src/Makefile
-packages/mess/help/Makefile
 packages/midi/Makefile
 packages/midi/c/Makefile
 packages/midi/c/src/Makefile
@@ -2773,6 +2770,7 @@ packages/sequence/java/src/ircam/jmax/editors/sequence/renderers/Makefile
 packages/sequence/java/src/ircam/jmax/editors/sequence/tools/Makefile
 packages/sequence/java/src/ircam/jmax/editors/sequence/track/Makefile
 packages/sequence/help/Makefile
+packages/sequence/images/Makefile
 packages/signal/Makefile
 packages/signal/c/Makefile
 packages/signal/c/src/Makefile
@@ -2997,6 +2995,7 @@ packages/ispw/java/src/ircam/jmax/ispw/Makefile
 packages/ispw/help/Makefile
 packages/ispw/help/control/Makefile
 packages/ispw/help/signal/Makefile
+packages/ispw/images/Makefile
 packages/ispwmath/Makefile
 packages/ispwmath/c/Makefile
 packages/ispwmath/c/src/Makefile
@@ -3010,10 +3009,6 @@ packages/math/Makefile
 packages/math/c/Makefile
 packages/math/c/src/Makefile
 packages/math/help/Makefile
-packages/mess/Makefile
-packages/mess/c/Makefile
-packages/mess/c/src/Makefile
-packages/mess/help/Makefile
 packages/midi/Makefile
 packages/midi/c/Makefile
 packages/midi/c/src/Makefile
@@ -3053,6 +3048,7 @@ packages/sequence/java/src/ircam/jmax/editors/sequence/renderers/Makefile
 packages/sequence/java/src/ircam/jmax/editors/sequence/tools/Makefile
 packages/sequence/java/src/ircam/jmax/editors/sequence/track/Makefile
 packages/sequence/help/Makefile
+packages/sequence/images/Makefile
 packages/signal/Makefile
 packages/signal/c/Makefile
 packages/signal/c/src/Makefile
