@@ -66,14 +66,26 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
     maxWidth = FtsVectorDisplayObject.MAX_SIZE + 2;
 
-    buff = new BufferedImage(  DEFAULT_WIDTH -2, DEFAULT_HEIGHT -2, BufferedImage.TYPE_INT_RGB);
-    buffG = buff.createGraphics();
+    updateOffScreenBuffer();
   }
 
   public void setDefaults()
   {    
     setWidth(  DEFAULT_WIDTH);
     setHeight( DEFAULT_HEIGHT);
+  }
+
+  void updateOffScreenBuffer()
+  {
+    int w = getWidth() - 2;
+    if( w <= 0) w = DEFAULT_WIDTH - 2;
+    
+    int h = getHeight() - 2;
+    if( h <= 0) h = DEFAULT_HEIGHT - 2;
+    
+    buff = new BufferedImage( w, h, BufferedImage.TYPE_INT_RGB);
+    buffG = buff.createGraphics();
+    buffG.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
   }
 
   public void display()
@@ -100,8 +112,7 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
     if( w <= 0) w = DEFAULT_WIDTH;
     if( h <= 0) h = DEFAULT_HEIGHT;
    
-    buff = new BufferedImage(  w-2, h-2, BufferedImage.TYPE_INT_RGB);
-    buffG = buff.createGraphics();
+    updateOffScreenBuffer();
   }
 
   public void setWidth(int w) 
@@ -117,12 +128,9 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
     ((FtsVectorDisplayObject)ftsObject).setSize(size);
     
-    int h = getHeight() - 2;
-    if( h <= 0) h = DEFAULT_HEIGHT;
-    buff = new BufferedImage(  w-2, h-2, BufferedImage.TYPE_INT_RGB);
-    buffG = buff.createGraphics();
-
     super.setWidth(w);
+
+    updateOffScreenBuffer();
   }
 
   public void setHeight(int h)
@@ -138,12 +146,9 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
     ((FtsVectorDisplayObject)ftsObject).setRange(range);
 
-    int w = getWidth() - 2;
-    if( w <= 0) w = DEFAULT_WIDTH;
-    buff = new BufferedImage(  w-2, h-2, BufferedImage.TYPE_INT_RGB);
-    buffG = buff.createGraphics();
-
     super.setHeight(h);
+
+    updateOffScreenBuffer();
   }
 
   public void redefined()
