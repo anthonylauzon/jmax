@@ -57,6 +57,7 @@ data_object_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 * expression class
 *
 */
+static fts_symbol_t sym_expr = NULL;
 fts_class_t *expr_class = NULL;
 
 static void
@@ -71,6 +72,8 @@ expr_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   fts_status_t status;
   fts_atom_t a;
   
+  self->symbol = fts_get_symbol(at);
+
   strcpy(buff, str);
   buff[len + 1] = '\0'; /* tokenizer needs double null termination */
   
@@ -181,10 +184,20 @@ expr_evaluate(expr_t *self, fts_hashtable_t *locals, int ac, const fts_atom_t *a
 }
 
 static void
+expr_description_function(fts_object_t *o, fts_array_t *array)
+{
+  expr_t *self = (expr_t *)o;
+  
+  fts_array_append_symbol(array, sym_expr);
+  fts_array_append_symbol(array, self->symbol);
+}
+
+static void
 expr_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   expr_t *self = (expr_t *)o;
   
+  self->symbol = NULL;
   self->expression = NULL;
   fts_array_init(&self->descr, 0, 0);  
   
@@ -213,6 +226,7 @@ expr_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(expr_t), expr_init, expr_delete);
   
+  fts_class_set_description_function(cl, expr_description_function);
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   
   fts_class_message_varargs(cl, fts_new_symbol("eval"), _expr_evaluate);
@@ -680,7 +694,8 @@ propobj_class_append_properties(fts_class_t *cl, fts_array_t *array)
 void
 data_config(void)
 {
-  expr_class = fts_class_install(fts_new_symbol("expr"), expr_instantiate);
+  sym_expr = fts_new_symbol("expr");
+  expr_class = fts_class_install(sym_expr, expr_instantiate);
   
   vec_config();
   ivec_config();

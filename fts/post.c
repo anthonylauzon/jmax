@@ -379,19 +379,26 @@ fts_spost_object(fts_bytestream_t *stream, fts_object_t *obj)
   if(obj != NULL)
   {
     fts_class_t *cl = fts_object_get_class(obj);
+    fts_atom_t *at;
+    int ac;
     fts_array_t array;
     
     fts_array_init(&array, 0, 0);
 
-    if(cl == fts_tuple_class)
-      fts_spost(stream, "{");
-    else
-      fts_spost(stream, "<");
-      
     (*fts_class_get_description_function(cl))(obj, &array);
     
-    if(fts_array_get_size(&array) > 0)
-      fts_spost_atoms(stream, fts_array_get_size(&array), fts_array_get_atoms(&array));
+    ac = fts_array_get_size(&array);
+    at = fts_array_get_atoms(&array);    
+    
+    if(cl == fts_tuple_class)
+    {
+      fts_spost(stream, "{");
+      at++; /* skip class name */
+    }
+    else
+      fts_spost(stream, "<");
+    
+    fts_spost_atoms(stream, ac, at);
 
     if(cl == fts_tuple_class)
       fts_spost(stream, "}");

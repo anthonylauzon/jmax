@@ -45,6 +45,7 @@ DATA_API void data_object_output(fts_object_t *o, int winlet, fts_symbol_t s, in
 typedef struct
 {
   fts_object_t o;
+  fts_symbol_t symbol;
   fts_array_t descr;
   fts_expression_t *expression;
   fts_status_t status;
