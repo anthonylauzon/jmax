@@ -52,5 +52,4 @@ install:
 install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/unixdtd
 	$(INSTALL_DATA) unixdtd.jpk $(lib_install_dir)/packages/unixdtd/unixdtd.jpk
-	$(INSTALL_DATA) unixdtd.scm $(lib_install_dir)/packages/unixdtd/unixdtd.scm
 .PHONY: install-noarch
