@@ -211,8 +211,8 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     if (e.isShiftDown())
 	ret |= Squeack.SHIFT;
 
-    //if (e.isAltDown())
-    //ret |= Squeack.ALT;
+    if (e.isAltDown())
+	ret |= Squeack.ALT;
 
     if((e.getModifiers() & SHORTCUT) != 0)
 	ret |= Squeack.SHORTCUT;
