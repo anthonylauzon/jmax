@@ -1,5 +1,6 @@
 packagedir=$(pkgdatadir)/java/classes/ircam/jmax/fts
 package_JAVA = \
+FtsAudioLabel.java \
 FtsAudioConfig.java\
 FtsClipboard.java\
 FtsConfig.java\
