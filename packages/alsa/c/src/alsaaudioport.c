@@ -105,6 +105,12 @@ alsaaudioport_update_audioport_output_functions(alsaaudioport_t* self, alsastrea
 static void
 alsaaudioport_print_all_device(alsaaudioport_t* self);
 
+static void
+dummy_error_handler(const char* file, int line, const char* function, int err, const char* fmt, ...)
+{
+  return;
+}
+
 static void post_log( void)
 {
   char *p, *q;
@@ -1249,8 +1255,18 @@ void alsaaudioport_config( void)
 
   alsaaudioport_type = fts_class_install( s, alsaaudioport_instantiate);
 
+  /*
+    Scanning of plugins and device produces a lot of error,
+     so we use a dummy error handler to not put these errors in .fts-stderr
+  */
+  /* set dummy error handler */
+  snd_lib_error_set_handler(dummy_error_handler);
+
   alsaaudiomanager_scan_plugins();
   alsaaudiomanager_scan_devices();
+
+  /* restore default error handler */
+  snd_lib_error_set_handler(NULL);
 }
 
 
