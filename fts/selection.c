@@ -164,7 +164,7 @@ selection_add_connection(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   for (i = 0; i < this->connections_size; i++)
     if (this->connections[i] == 0)
       {
-	this->connections[i] = fts_get_connection(at);
+	this->connections[i] = (fts_connection_t *)fts_get_object(at);
 	return;
       }
 }
@@ -179,7 +179,7 @@ selection_remove_connection(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   this->connections_count--;
 
   for (i = 0; i < this->connections_size; i++)
-    if (this->connections[i] == fts_get_connection(at))
+    if (this->connections[i] == (fts_connection_t *)fts_get_object(at))
       {
 	this->connections[i] = 0;
 	return;
