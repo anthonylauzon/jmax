@@ -23,6 +23,8 @@
    statistics.
 */
 
+#include <stdio.h>
+
 #define OPS_LIMIT 256*1024
 #define BLOCK_CACHE_SIZE 16
 
