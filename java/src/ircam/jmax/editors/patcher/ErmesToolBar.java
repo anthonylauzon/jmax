@@ -125,16 +125,22 @@ public class ErmesToolBar extends JPanel  {
   {
     if (button.isSelected())
       {
-	if ((selectedButton != null) && (button != selectedButton))
-	  selectedButton.setSelected(false);
+	if(button != selectedButton){
+	  if(selectedButton != null)
+	    selectedButton.setSelected(false);
 	  
-	selectedButton = button;
-	sketch.setAddModeInteraction(selectedButton.getDescription(), selectedButton.getMessage(), true);
+	  selectedButton = button;
+	  sketch.setAddModeInteraction(selectedButton.getDescription(),selectedButton.getMessage(), true);
+	}
       }
     else
       {
-	if (button == selectedButton)
+	if (button == selectedButton){
 	  selectedButton = null;
+	  //trovare il modo di differenziare il click sull bottone che lo rimette a non selezionato
+	  //da quando lo chiama al mouseUp... (a che vedere col focus?)
+	  //sketch.setEditModeInteraction();
+	}
       }
   }
 

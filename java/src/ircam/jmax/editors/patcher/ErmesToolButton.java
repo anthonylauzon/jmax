@@ -36,6 +36,19 @@ class ErmesToolButton extends JToggleButton
   String description;
   String message;
   ErmesToolBar  toolBar;
+  boolean state = false;
+
+  static ChangeListener listener = new ChangeListener(){
+    public void stateChanged(ChangeEvent e){
+      ErmesToolButton button = (ErmesToolButton)e.getSource();
+      if(button.state!=button.isSelected()){	
+	button.state = !button.state;
+	button.toolBar.buttonChanged(button);
+      }
+      else
+	button.setSelected(!button.state);
+    }
+  };
 
   ErmesToolButton(ErmesToolBar  toolBar, String description, ImageIcon theIcon, String message)
   {
@@ -47,13 +60,7 @@ class ErmesToolButton extends JToggleButton
     this.message = message;
     this.toolBar = toolBar;
 
-    addChangeListener(new ChangeListener()
-		      {
-			public void stateChanged(ChangeEvent e)
-			  {
-			    ErmesToolButton.this.toolBar.buttonChanged(ErmesToolButton.this);
-			  }
-		      });
+    addChangeListener(ErmesToolButton.listener);    
   }
 
   String getDescription()

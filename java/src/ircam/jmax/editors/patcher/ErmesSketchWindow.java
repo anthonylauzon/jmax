@@ -165,6 +165,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     itsFileMenu = new FileMenu(); 
     mb.add(itsFileMenu); 
 
+
     // Build the edit menu
     itsEditMenu = new EditMenu(itsSketchPad); 
     mb.add(itsEditMenu); 

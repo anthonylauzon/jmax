@@ -880,7 +880,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
     stopTextEditing();
     setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
-    engine.setTopInteraction(Interactions.addModeInteraction);
+    engine.setTopInteraction(Interactions.addModeInteraction);    
   }
 
   public void makeAddModeObject(int x, int y, boolean edit)
