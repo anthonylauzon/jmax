@@ -33,3 +33,6 @@ $(JARFILE): $(JAR_DEP)
 
 install-data-hook:
 	cd $(DESTDIR)$(jardir); find . -name "*.class" -exec rm {} \;
+
+# We need EXTRA_DIST for automake provided with RedHat 8.0 and RedHat 9
+EXTRA_DIST=$(package_JAVA)

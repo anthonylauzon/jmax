@@ -24,3 +24,7 @@ JAVACFLAGS= @JAVACFLAGSX@
 JAVAROOT= $(top_builddir)/java
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT)
 
+
+# We need EXTRA_DIST for automake provided with RedHat 8.0 and RedHat 9
+EXTRA_DIST=$(package_JAVA)
+
