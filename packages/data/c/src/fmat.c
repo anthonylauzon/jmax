@@ -24,7 +24,6 @@
 #include <fts/packages/data/data.h>
 #include "floatfuns.h"
 
-
 fts_symbol_t fmat_symbol = 0;
 fts_class_t *fmat_type = 0;
 
@@ -658,12 +657,8 @@ fmat_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   fmat_t *self = (fmat_t *)o;
   
-  if(ac == 0)
-  {
-    if(fts_is_number(at))
-      fmat_set_const(self, (float)fts_get_number_float(at));
-  }
-  
+  if(ac > 0 && fts_is_number(at))
+    fmat_set_const(self, (float)fts_get_number_float(at));
 }
 
 static void
@@ -1532,7 +1527,7 @@ fmat_logabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   switch(id)
   {
     case fmat_format_id_vec:
-      for(i=0; i<n; i++)
+      for(i=0; i<m; i++)
         ptr[i] = logf(fabsf(ptr[i]));
       break;
     
@@ -1575,7 +1570,7 @@ fmat_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   switch(id)
   {
     case fmat_format_id_vec:
-      for(i=0; i<n; i++)
+      for(i=0; i<m; i++)
         ptr[i] = logf(ptr[i]);
       break;
     
@@ -1621,35 +1616,78 @@ fmat_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   switch(id)
   {
     case fmat_format_id_vec:
-      for(i=0; i<n; i++)
+      for(i=0; i<m; i++)
         ptr[i] = expf(ptr[i]);
       break;
-    
+      
     case fmat_format_id_rect:
       for(i=0; i<m; i++)
       {
         float mag = expf(ptr[i]);
         float arg = ptr[i + 1];
-      
+        
         ptr[i] = mag * cosf(arg);
         ptr[i + 1] = mag * sinf(arg);
       }
       break;
-    
+      
     case fmat_format_id_polar:
       for(i=0; i<m; i++)
       {
         float mag = ptr[i];
         float arg = ptr[i + 1];
-      
+        
         ptr[i] = expf(mag * cosf(arg));
         ptr[i + 1] = mag * sinf(arg);
       }
       break;
-    
+      
     default:
       for(i=0; i<m*n; i++)
         ptr[i] = expf(ptr[i]);
+      break;
+  }
+}
+
+static void
+fmat_sqrabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  int id = fmat_format_get_id(self->format);
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  int i, j;
+  
+  switch(id)
+  {
+    case fmat_format_id_vec:
+      for(i=0; i<m; i++)
+        ptr[i] *= ptr[i];
+      break;
+      
+    case fmat_format_id_rect:
+      for(i=0, j=0; i<m; i++, j+=2)
+      {
+        float re = ptr[j];
+        float im = ptr[j + 1];
+        
+        ptr[i] = re * re + im * im;
+      }
+      
+      fmat_reshape(self, m, 1);
+      break;
+      
+    case fmat_format_id_polar:
+      for(i=0, j=0; i<m; i++, j+=2)
+        ptr[i] = ptr[j] * ptr[j];
+      
+      fmat_reshape(self, m, 1);
+      break;
+      
+    default:
+      for(i=0; i<m*n; i++)
+        ptr[i] *= ptr[i];
       break;
   }
 }
@@ -1701,6 +1739,45 @@ fmat_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
         fft_ptr[i].re = fft_ptr[i].im = 0.0;
 
       fts_cfft_inplc(fft_ptr, fft_size);
+    }
+    break;
+    
+    case fmat_format_id_polar:
+    default:
+      /* fmat format error */
+      break;
+  }
+}
+
+static void
+fmat_rifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  int id = fmat_format_get_id(self->format);
+  
+  switch(id)
+  {
+    case fmat_format_id_vec:
+    {
+    } 
+    break;
+    
+    case fmat_format_id_rect:
+    {
+      /* complex FFT */
+      int size = 2 * fmat_get_m(self);
+      unsigned int fft_size = fts_get_fft_size(size);
+      float *fft_ptr;
+      unsigned int i;
+
+      fmat_reshape(self, fft_size, 1);
+      fft_ptr = fmat_get_ptr(self);
+
+      /* zero padding */      
+      for(i=size; i<fft_size; i++)
+        fft_ptr[i] = 0.0;
+
+      fts_rifft_inplc(fft_ptr, fft_size);
     }
     break;
     
@@ -1942,20 +2019,22 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fts_object_error(o, "bad column argument");
   }
   
-  fmat_reshape(self, m, n);
-  
   /* init from arguments */
   if(ac > 2)
   {
     int size = m * n;
+    
     ac -= 2;
     at += 2;
     
     if(ac > size)
       ac = size;
     
+    fmat_reshape(self, m, n);  
     fmat_set_from_atoms(self, 0, 1, ac, at);
   }
+  else
+    fmat_set_size(self, m, n);  
 }
 
 static void
@@ -2038,15 +2117,18 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_number(cl, fts_new_symbol("le"), fmat_le_number);
 
   fts_class_message_void(cl, fts_new_symbol("abs"), fmat_abs);
+  fts_class_message_void(cl, fts_new_symbol("sqrabs"), fmat_sqrabs);
   fts_class_message_void(cl, fts_new_symbol("logabs"), fmat_logabs);
   fts_class_message_void(cl, fts_new_symbol("log"), fmat_log);
   fts_class_message_void(cl, fts_new_symbol("exp"), fmat_exp);
+  /*fts_class_message_void(cl, fts_new_symbol("sqre"), fmat_sqrt);*/
 
   fts_class_message_void(cl, sym_vec, fmat_convert_vec);
   fts_class_message_void(cl, sym_rect, fmat_convert_rect);
   fts_class_message_void(cl, sym_polar, fmat_convert_polar);
   
   fts_class_message_void(cl, fts_new_symbol("fft"), fmat_fft);
+  fts_class_message_void(cl, fts_new_symbol("rifft"), fmat_rifft);
 
   fts_class_message_symbol(cl, fts_s_import, fmat_import);
   fts_class_message_void(cl, fts_s_import, fmat_import_dialog);
@@ -2078,7 +2160,7 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_s_row, "<num: index> [<num:value> ...]", "set values of given row");
   fts_class_doc(cl, fts_s_col, "<num: index> [<num:value> ...]", "set values of given column");
   fts_class_doc(cl, fts_s_fill, "<num: value>", "fill matrix with given value");
-  fts_class_doc(cl, fts_s_size, "[<num: # of rows> [<num: # of columns (default is 1)>]]", "get/set size");
+  fts_class_doc(cl, fts_s_size, "[<num: # of rows> [<num: # of columns (default is 1)>]]", "get/set matrix dimensions");
   fts_class_doc(cl, fts_new_symbol("rows"), "[<num: # of rows>]", "get/set # of rows");
   fts_class_doc(cl, fts_new_symbol("columns"), "[<num: # of rows>]", "get/set # of columns");
   
@@ -2098,6 +2180,14 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("ge"), "<num|fmat: operand>", "replace current values by result of >= comparison (0 or 1) with given scalar or fmat (element by element)");
   fts_class_doc(cl, fts_new_symbol("lt"), "<num|fmat: operand>", "replace current values by result of < comparison (0 or 1) with given scalar or fmat (element by element)");
   fts_class_doc(cl, fts_new_symbol("le"), "<num|fmat: operand>", "replace current values by result of <= comparison (0 or 1) with given scalar or fmat (element by element)");
+
+  fts_class_doc(cl, fts_new_symbol("abs"), NULL, "calulate absolute values of current values");
+  fts_class_doc(cl, fts_new_symbol("sqrabs"), NULL, "calulate square of absolute values of current values");
+  fts_class_doc(cl, fts_new_symbol("logabs"), NULL, "calulate logarithm of absolute values of current values");
+  fts_class_doc(cl, fts_new_symbol("log"), NULL, "calulate lograrithm of current values");
+  fts_class_doc(cl, fts_new_symbol("exp"), NULL, "calulate exponent fucnction of current values");
+  fts_class_doc(cl, fts_new_symbol("fft"), NULL, "calulate inplace FFT (real or complex)");
+  fts_class_doc(cl, fts_new_symbol("rifft"), NULL, "calulate inplace IFFT");
   
   fts_class_doc(cl, fts_s_import, "[<sym: file name]", "import data from file");
   fts_class_doc(cl, fts_s_export, "[<sym: file name]", "export data to file");
