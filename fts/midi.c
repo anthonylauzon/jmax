@@ -2148,7 +2148,7 @@ midiconfig_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_clear, midiconfig_clear);
   fts_class_message_varargs(cl, fts_s_default, midiconfig_set_to_defaults);
 
-  fts_class_message_varargs(cl, fts_s_restore, midiconfig_restore_label);
+  fts_class_message_varargs(cl, fts_s_label, midiconfig_restore_label);
   fts_class_message_varargs(cl, fts_s_insert, midiconfig_insert_label);
   fts_class_message_varargs(cl, fts_s_remove, midiconfig_remove_label);
   fts_class_message_varargs(cl, fts_s_input, midiconfig_input);
