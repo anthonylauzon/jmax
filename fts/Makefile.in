@@ -117,6 +117,7 @@ dsp.c \
 dspgraph.c \
 errobj.c \
 expression.c \
+fifo.c \
 file.c \
 fpe.c \
 ftl.c \
@@ -180,7 +181,7 @@ libfts_la_LIBADD =
 libfts_la_OBJECTS =  @PLATFORM@.lo abstraction.lo array.lo atom.lo \
 atomfile.lo audio.lo audiofile.lo autosave.lo bytestream.lo class.lo \
 client.lo clipboard.lo connection.lo doctor.lo dsp.lo dspgraph.lo \
-errobj.lo expression.lo file.lo fpe.lo ftl.lo ftlmem.lo fts.lo \
+errobj.lo expression.lo fifo.lo file.lo fpe.lo ftl.lo ftlmem.lo fts.lo \
 hashtable.lo label.lo list.lo loader.lo mem.lo message.lo midi.lo \
 midifile.lo object.lo objectlist.lo objectset.lo package.lo param.lo \
 patcher.lo patparser.lo post.lo project.lo property.lo saver.lo \
@@ -210,16 +211,17 @@ DEP_FILES =  .deps/@PLATFORM@.P .deps/abstraction.P .deps/array.P \
 .deps/atom.P .deps/atomfile.P .deps/audio.P .deps/audiofile.P \
 .deps/autosave.P .deps/bytestream.P .deps/class.P .deps/client.P \
 .deps/clipboard.P .deps/connection.P .deps/doctor.P .deps/dsp.P \
-.deps/dspgraph.P .deps/errobj.P .deps/expression.P .deps/file.P \
-.deps/fpe.P .deps/ftl.P .deps/ftlmem.P .deps/fts.P .deps/hashtable.P \
-.deps/label.P .deps/list.P .deps/loader.P .deps/main.P .deps/mem.P \
-.deps/message.P .deps/midi.P .deps/midifile.P .deps/object.P \
-.deps/objectlist.P .deps/objectset.P .deps/package.P .deps/param.P \
-.deps/parser.P .deps/patcher.P .deps/patparser.P .deps/post.P \
-.deps/project.P .deps/property.P .deps/saver.P .deps/sched.P \
-.deps/selection.P .deps/sigconn.P .deps/stack.P .deps/symbol.P \
-.deps/template.P .deps/time.P .deps/tokenizer.P .deps/tuple.P \
-.deps/update.P .deps/variable.P .deps/version.P .deps/vm.P
+.deps/dspgraph.P .deps/errobj.P .deps/expression.P .deps/fifo.P \
+.deps/file.P .deps/fpe.P .deps/ftl.P .deps/ftlmem.P .deps/fts.P \
+.deps/hashtable.P .deps/label.P .deps/list.P .deps/loader.P \
+.deps/main.P .deps/mem.P .deps/message.P .deps/midi.P .deps/midifile.P \
+.deps/object.P .deps/objectlist.P .deps/objectset.P .deps/package.P \
+.deps/param.P .deps/parser.P .deps/patcher.P .deps/patparser.P \
+.deps/post.P .deps/project.P .deps/property.P .deps/saver.P \
+.deps/sched.P .deps/selection.P .deps/sigconn.P .deps/stack.P \
+.deps/symbol.P .deps/template.P .deps/time.P .deps/tokenizer.P \
+.deps/tuple.P .deps/update.P .deps/variable.P .deps/version.P \
+.deps/vm.P
 SOURCES = $(libfts_la_SOURCES) $(fts_SOURCES)
 OBJECTS = $(libfts_la_OBJECTS) $(fts_OBJECTS)
 

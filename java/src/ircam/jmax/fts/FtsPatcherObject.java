@@ -1091,10 +1091,22 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     listener = null;
   }
 
+  public void setNumberOfInlets(int ins)
+  {
+    super.setNumberOfInlets( ins);
+    firePatcherChangedNumberOfInlets( ins);
+  }
+
   final void firePatcherChangedNumberOfInlets(int ins)
   {
     if (listener != null)
       listener.patcherChangedNumberOfInlets(this, ins);
+  }
+
+  public void setNumberOfOutlets(int outs)
+  {
+    super.setNumberOfOutlets( outs);
+    firePatcherChangedNumberOfOutlets( outs);
   }
 
   final void firePatcherChangedNumberOfOutlets(int outs)

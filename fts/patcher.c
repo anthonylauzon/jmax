@@ -1928,6 +1928,7 @@ fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets)
 {
   fts_object_t *obj_this = (fts_object_t *)this;
   int old_ninlets;
+  fts_atom_t a[2];
 
   old_ninlets = fts_object_get_inlets_number((fts_object_t *) this);
 
@@ -1995,8 +1996,6 @@ fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets)
 
   /* change the patcher class */
   {
-    fts_atom_t a[2];
-
     fts_set_int(a, new_ninlets);
     fts_set_int(a + 1, fts_object_get_outlets_number((fts_object_t *) this));
     obj_this->head.cl = fts_class_instantiate(patcher_metaclass, 2, a);
@@ -2018,7 +2017,11 @@ fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets)
   }
 
   if (fts_object_has_id((fts_object_t *)this))
-    fts_object_property_changed((fts_object_t *)this, fts_s_ninlets);
+    {
+      fts_set_int(a, new_ninlets);
+      //fts_object_property_changed((fts_object_t *)this, fts_s_ninlets);
+      fts_client_send_message((fts_object_t *)this, fts_s_ninlets, 1, a);
+    }
 }
 
 void 
@@ -2026,6 +2029,7 @@ fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets)
 {
   fts_object_t *obj_this = (fts_object_t *)this;
   int old_noutlets;
+  fts_atom_t a[2];
 
   old_noutlets = fts_object_get_outlets_number((fts_object_t *) this);
 
@@ -2088,8 +2092,6 @@ fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets)
 
   /* change the patcher class */
   {
-    fts_atom_t a[2];
-
     fts_set_int(a, fts_object_get_inlets_number((fts_object_t *) this));
     fts_set_int(a + 1, new_noutlets);
     obj_this->head.cl = fts_class_instantiate(patcher_metaclass, 3, a);
@@ -2111,7 +2113,11 @@ fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets)
   }
 
   if (fts_object_has_id((fts_object_t *)this))
-    fts_object_property_changed((fts_object_t *)this, fts_s_noutlets);
+    {
+      fts_set_int(a,  new_noutlets);
+      //fts_object_property_changed((fts_object_t *)this, fts_s_noutlets);
+      fts_client_send_message((fts_object_t *)this, fts_s_noutlets, 1, a);
+    }
 }
 
 /*************************************************************
