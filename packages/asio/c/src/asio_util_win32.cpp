@@ -209,6 +209,7 @@ unsigned int asio_util_scan_drivers()
   char regKeyName[MAX_DRIVER_NAME_LENGTH];
   LONG err;
   DWORD index = 0;
+  unsigned int count = 0;
   asio_driver_t* driver = 0;
   fts_atom_t at;
 
@@ -243,7 +244,9 @@ unsigned int asio_util_scan_drivers()
   		    {
 	  	      fts_object_refer((fts_object_t*)port);
 		        fts_audiomanager_put_port(fts_new_symbol(port->driver->name), (fts_audioport_t*)port);
-		        fts_log("[asio_audioport] put port : %s\n", port->driver->name);
+		        fts_log("[asio] put port : %s\n", port->driver->name);
+		        fts_post("[asio] put port : %s\n", port->driver->name);
+            count++;
   		    }
           else
           {
@@ -259,7 +262,8 @@ unsigned int asio_util_scan_drivers()
     RegCloseKey(regKeyEnum);
   }
   
-  return index;
+  fts_post("[asio] found %d port(s)\n", count);
+  return count;
 }
 
 extern "C" 
