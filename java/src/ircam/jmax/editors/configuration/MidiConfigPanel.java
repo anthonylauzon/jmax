@@ -183,7 +183,7 @@ public class MidiConfigPanel extends JPanel implements Editor
 
     public boolean isCellEditable(int row, int col)
     {
-      if((roow == 0) && ( col == 0)) return false;
+      if((row == 0) && ( col == 0)) return false;
       else return true;
     }
 
