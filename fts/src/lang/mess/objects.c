@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.23 $ IRCAM $Date: 1998/05/22 11:55:27 $
+ *      $Revision: 1.24 $ IRCAM $Date: 1998/05/26 17:43:05 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -170,6 +170,7 @@ fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
   fts_object_t  *obj;
   fts_metaclass_t *mcl;
 
+
   /* Explicit check for zero arguments; in this case, we
      just make an error object 
      */
@@ -260,6 +261,46 @@ void fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *a
 	}
       else
 	obj->argv = 0;
+    }
+}
+
+
+/* This is to support "changing" objects; usefull during 
+   .pat loading, where not all the information is available 
+   at the right place; used currently explode in the fts1.5 package.
+   */
+
+void fts_object_set_description_and_class(fts_object_t *obj, fts_symbol_t class_name,
+					  int argc, const fts_atom_t *argv)
+{
+  int i;
+
+  if (obj->argc == argc + 1)
+    {
+      /* Just copy the values, the size is correct */
+      
+      fts_set_symbol(&(obj->argv[0]), class_name);
+
+      for (i = 0; i < argc; i++)
+	obj->argv[i + 1] = argv[i];
+    }
+  else
+    {
+      /* Free the old object description, if any */
+
+      if (obj->argv)
+	fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));
+
+      /* reallocate the description if argc > -0 and copy the arguments */
+
+      obj->argc = argc;
+      
+      obj->argv = (fts_atom_t *) fts_block_zalloc(argc * sizeof(fts_atom_t));
+
+      fts_set_symbol(&(obj->argv[0]), class_name);
+
+      for (i = 0; i < argc; i++)
+	obj->argv[i + 1] = argv[i];
     }
 }
 

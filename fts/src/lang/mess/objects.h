@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.7 $ IRCAM $Date: 1998/05/14 14:25:41 $
+ *      $Revision: 1.8 $ IRCAM $Date: 1998/05/22 11:55:27 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -42,7 +42,8 @@ extern void          fts_object_send_properties(fts_object_t *obj);
 /* Change the object description; more "system" oriented */
 
 extern void fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *argv);
-
+extern void fts_object_set_description_and_class(fts_object_t *obj, fts_symbol_t class_name,
+					  int argc, const fts_atom_t *argv);
 /* Connections */
 
 extern fts_connection_t *fts_object_connect(int id, fts_object_t *, int woutlet, fts_object_t *, int winlet);

@@ -753,6 +753,15 @@ fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
   if (objidx >= 0)
     fts_bmax_code_mv_obj(f, objidx);
 
+  /* If the argc is zero, we push a zero value to the value
+     stack, in order to use "set" and not "push/pop" in the
+     property coding; in this case, we don't care about optimizing code size:
+     an object with zero argument is an empty "error" object, left there by mistake
+     during editing.
+     */
+
+  if (obj->argc == 0)
+    fts_bmax_code_push_int(f, 0);
 
   /* Write persistent properties to the file.
      Here, it should use some property data base to find out
@@ -778,7 +787,12 @@ fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
       fts_bmax_code_new_property(f, obj, fts_s_ww);
     }
 
-  fts_bmax_code_pop_args(f, obj->argc);
+  /* If argc is zero, we pop the 0 value pushed above */
+
+  if  (obj->argc == 0)
+    fts_bmax_code_pop_args(f, 1);
+  else
+    fts_bmax_code_pop_args(f, obj->argc);
 
   /* Here, send a message to the object to give it the opportunity
      to save its data, if any; ignore error return ! */

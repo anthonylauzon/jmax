@@ -383,16 +383,22 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 		}
 
 
-	      /* get the size */
-
-	      description[2] = vargs[0];
-
 	      /* Make the table */
 
 	      if (haveName)
-		lastNObject = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 3, description);
+		{
+		  /* get the size */
+
+		  description[2] = vargs[0];
+		  lastNObject = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 3, description);
+		}
 	      else
-		lastNObject = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 2, description);
+		{
+		  /* get the size */
+
+		  description[1] = vargs[0];
+		  lastNObject = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 2, description);
+		}
 
 	      lastNObjectType = fts_s_table;
 
@@ -670,16 +676,12 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 	{
 	  /*
 	   * Empty object, built and return an
-	   * error object
+	   * object with an empty description , that will be an error object.
 	   */
-
-	  fts_atom_t void_description[1];
 
 	  fts_patlex_push_back(in);
 
-	  fts_set_symbol(&void_description[0],  fts_new_symbol("empty"));
-
-	  obj = fts_object_new((fts_patcher_t *) parent, FTS_NO_ID, 1, void_description);
+	  obj = fts_object_new((fts_patcher_t *) parent, FTS_NO_ID, 0, 0);
 
 	  fts_patparse_set_text_graphic_properties(graphicDescr, obj);
 
