@@ -180,8 +180,28 @@ static void fts_patparse_set_font_index(fts_graphic_description_t *this, fts_pat
   fts_set_int(&(this->fontSize), fontIndexTable[i]);
 }
 
+static int fts_patparse_check_patch_protection( fts_graphic_description_t *this, fts_object_t *obj)
+{
+  if ( fts_get_int( &(this->x)) == (SCALE_MULT * 69696969)/ SCALE_DEN /* Magic number for patch protection */
+      || fts_get_int( &(this->y)) == (SCALE_MULT * 69696969)/ SCALE_DEN)
+    {
+      fts_atom_t a;
+
+      /* set the "no_upload" property of the object's patcher */
+      fts_set_int( &a, 1);
+      fts_object_put_prop( (fts_object_t *)fts_object_get_patcher( obj), fts_new_symbol( "no_upload"), &a);
+
+      return 1;
+    }
+
+  return 0;
+}
+
 static void fts_patparse_set_text_graphic_properties(fts_graphic_description_t *this, fts_object_t *obj)
 {
+  if (fts_patparse_check_patch_protection( this, obj))
+    return;
+
   fts_object_put_prop(obj, fts_s_x, &(this->x));
   fts_object_put_prop(obj, fts_s_y, &(this->y));
   fts_object_put_prop(obj, fts_s_width, &(this->width));
@@ -197,6 +217,9 @@ static void fts_patparse_set_slider_graphic_properties(fts_graphic_description_t
   fts_atom_t max_value;
   fts_set_int(&zero, 0);
 
+  if (fts_patparse_check_patch_protection( this, obj))
+    return;
+
   fts_object_put_prop(obj, fts_s_x, &(this->x));
   fts_object_put_prop(obj, fts_s_y, &(this->y));
   fts_object_put_prop(obj, fts_s_width, &(this->width));
@@ -210,6 +233,9 @@ static void fts_patparse_set_slider_graphic_properties(fts_graphic_description_t
 
 static void fts_patparse_set_square_graphic_properties(fts_graphic_description_t *this, fts_object_t *obj)
 {
+  if (fts_patparse_check_patch_protection( this, obj))
+    return;
+
   fts_object_put_prop(obj, fts_s_x, &(this->x));
   fts_object_put_prop(obj, fts_s_y, &(this->y));
   fts_object_put_prop(obj, fts_s_width, &(this->width));
