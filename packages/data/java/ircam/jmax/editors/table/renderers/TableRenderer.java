@@ -150,6 +150,7 @@ public class TableRenderer extends AbstractRenderer implements Layer{
   public final static int SOLID = 1;
   
   Color backColor = new Color(247, 247, 247);
-  Color foreColor = new Color( 0, 0, 0, 60);
+  Color foreColor = Color.lightGray;
 }
+
 
