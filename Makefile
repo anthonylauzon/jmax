@@ -105,6 +105,23 @@ clean_java:
 .PHONY: clean_java
 
 #
+# linuxpc
+# target for Linux/i386
+#
+linuxpc:
+	$(MAKE) ARCH=linuxpc all
+.PHONY: linuxpc
+
+#
+# sgi
+# target for SGI Irix 6.5 processors R5000 and R10000
+#
+sgi:
+	$(MAKE) ARCH=irix65r5k all
+	$(MAKE) ARCH=irix65r10k all
+.PHONY: sgi
+
+#
 # TAGS
 # do the TAGS file
 #
@@ -169,7 +186,7 @@ install-includes:
 
 #
 # idb
-# creates the SGI idb file
+# creates the SGI idb file and the distribution
 #
 sgi-pkg:
 	/bin/rm -rf /tmp/idb-doc /tmp/idb-exec /tmp/idb-includes
