@@ -49,7 +49,10 @@ public class IncrementController extends JPanel {
     itsIncrementListener = l;
 
     String fs = File.separator;
-    String path = MaxApplication.getProperty("root")+fs+"images"+fs;
+    String path = MaxApplication.getProperty("root");
+    if(path==null)
+      path = MaxApplication.getProperty("jmaxRoot");
+    path = path+fs+"images"+fs;
 
     JButton up = new JButton(new ImageIcon(path+"little_up_arrow.gif"));
     JButton down = new JButton(new ImageIcon(path+"little_down_arrow.gif"));
