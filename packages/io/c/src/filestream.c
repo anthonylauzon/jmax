@@ -20,9 +20,13 @@
  * 
  */
 #include <fts/fts.h>
-
+#include <ftsconfig.h>
 #include <string.h>
+#ifdef WIN32
+#include <io.h>
+#else
 #include <unistd.h>
+#endif
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -214,13 +218,21 @@ filestream_start(filestream_t *this)
   fts_bytestream_t *stream = (fts_bytestream_t *)this;
 
   /* open file */
+#ifdef WIN32
+  if(this->in_size > 0 && this->out_size > 0)
+    this->fd = open(this->name, O_CREAT | O_RDWR, S_IREAD | S_IWRITE);
+  else if(this->in_size > 0)
+    this->fd = open(this->name, O_RDONLY);
+  else if(this->out_size > 0)
+    this->fd = open(this->name, O_CREAT | O_WRONLY, S_IREAD | S_IWRITE);
+#else
   if(this->in_size > 0 && this->out_size > 0)
     this->fd = open(this->name, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
   else if(this->in_size > 0)
     this->fd = open(this->name, O_RDONLY);
   else if(this->out_size > 0)
     this->fd = open(this->name, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
-  
+#endif  
   if(this->fd >= 0)
     {
       if(this->in_size > 0)

@@ -664,6 +664,7 @@ wacom_init_callback(fts_object_t *o, int n, const unsigned char *c)
 		    break;
 		  }
 		  default:
+			  ;
 		}
 	    }
 	}
