@@ -67,6 +67,10 @@ public class FtsAtomList extends FtsObject
   { 
     super(server, parent, classname);
   }
+  public FtsAtomList(FtsServer server, FtsObject parent, int objId)
+  { 
+    super(server, parent, objId);
+  }
 
   /** Return the size of the atom list */
 
