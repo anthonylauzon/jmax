@@ -198,6 +198,8 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
       case 2:
 	// FTS always send the events in order (???)
 
+	if (events_fill_p >= events_size)
+	  reallocateEvents();
 	events[events_fill_p++] = new ScrEvent( ((Integer) args[0]).intValue(), 
 						((Integer) args[1]).intValue(), 
 						((Integer) args[2]).intValue(), 

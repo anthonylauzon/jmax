@@ -29,7 +29,9 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
 
   Dimension size = new Dimension(PANEL_WIDTH, PANEL_HEIGHT);
   ScrTool currentTool = null;
-  
+  Scrollbar itsTimeScrollbar;
+  Scrollbar itsTimeZoom;
+  Label itsLabel;  
 
   /**
    * Creator. 
@@ -42,25 +44,47 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     ((PartitionAdapter) itsAdapter).setXZoom(20);// just a try
     ((PartitionAdapter) itsAdapter).setYZoom(300);// just a try
     ((PartitionAdapter) itsAdapter).setYInvertion(true);// just a try
-    ((PartitionAdapter) itsAdapter).setYTransposition(122);// just a try
+    ((PartitionAdapter) itsAdapter).setYTransposition(115);// just a try
     itsRenderer = new ScoreRenderer(this, ep, this);
     itsExplodeDataModel.addListener(this);
     
     
-    Scrollbar aScrollbar = new Scrollbar(Scrollbar.HORIZONTAL, 0, 1000, 0, itsExplodeDataModel.getEventAt(itsExplodeDataModel.length()-1).getTime());
-    
-    aScrollbar.setUnitIncrement(1000);
-    aScrollbar.addAdjustmentListener(new AdjustmentListener() {
+    itsLabel = new Label();
+    itsLabel.setBounds(0, 0, 200, 30);
+    add(itsLabel, BorderLayout.NORTH);
+
+    itsTimeZoom = new Scrollbar(Scrollbar.VERTICAL, 20, 40, 10, 1000);
+    itsTimeZoom.addAdjustmentListener(new AdjustmentListener() {
       public void adjustmentValueChanged(AdjustmentEvent e) {
-	logicalTime = e.getValue();
-	
-	int temp = itsExplodeDataModel.indexOfFirstEventAfter(logicalTime);
-	((PartitionAdapter)itsAdapter).setXTransposition(-logicalTime);
-	itsRenderer.render(getGraphics(), temp, temp+10);
+	((PartitionAdapter) itsAdapter).setXZoom(e.getValue());// just a try
+	repaint();
       }
     });
-    add(aScrollbar, BorderLayout.SOUTH);
 
+    itsTimeScrollbar = new Scrollbar(Scrollbar.HORIZONTAL, 0, 1000, 0, itsExplodeDataModel.getEventAt(itsExplodeDataModel.length()-1).getTime());
+    
+    itsTimeScrollbar.setUnitIncrement(100);
+    itsTimeScrollbar.setBlockIncrement(1000);
+
+    itsTimeScrollbar.addAdjustmentListener(new AdjustmentListener() {
+      public void adjustmentValueChanged(AdjustmentEvent e) {
+	logicalTime = e.getValue();
+	int maxIndex = itsExplodeDataModel.length();
+	int howMany = 10;
+
+	int temp = itsExplodeDataModel.indexOfFirstEventAfter(logicalTime);
+	if (temp != -1) {
+	  ((PartitionAdapter)itsAdapter).setXTransposition(-logicalTime);
+	  if (maxIndex < temp+howMany) howMany = maxIndex-temp; 
+	  itsRenderer.render(getGraphics(), temp, temp+howMany);
+	}
+	itsLabel.setText("starting time: "+logicalTime+"msec"+"                 zoomfactor"+itsTimeZoom.getValue()+"%");
+      }
+    });
+    add(itsTimeScrollbar, BorderLayout.SOUTH);
+    
+    add(itsTimeZoom, BorderLayout.EAST);
+    
     //----
     //prepare the toolbar...
     initTools();

@@ -98,7 +98,7 @@ public class ScoreRenderer implements Renderer, ImageObserver{
     }
     else {
       
-      if (!g.drawImage(itsImage, 0/*12*/, 0/*20*/, this))
+      if (!g.drawImage(itsImage, 0/*12*/, -1/*20*/, this))
 	System.err.println("OH-OH something wrong: incomplete Image  ");
     }
     return true;
