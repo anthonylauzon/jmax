@@ -36,6 +36,7 @@ extern void finder_config(void);
 extern void fork_config(void);
 extern void gfloat_config(void);
 extern void gint_config(void);
+extern void input_config(void);
 extern void key_config(void);
 extern void keyserver_config(void);
 extern void messconst_config(void);
@@ -62,6 +63,7 @@ guiobj_config(void)
   fork_config();
   gfloat_config();
   gint_config();
+  input_config();
   key_config();
   keyserver_config();
   messconst_config();
