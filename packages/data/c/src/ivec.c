@@ -551,7 +551,7 @@ ivec_return_interpolated(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
     ret = y0 + (f - i) * (y1 - y0);
   }
 
-  fts_return_float(ret);
+  fts_return_float((float)ret);
 }
 
 static void
