@@ -44,7 +44,9 @@ typedef struct
 
     /* index of buffer write by FTS */
     const int* const buffer_index;
-    
+    /* eof flags set by dtd_thread */
+    const int* const is_eof;
+
     /* delay for nanosleep (see fts_thread_manager) */
     int delay_ms;
 } dtd_thread_t;

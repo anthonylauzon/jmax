@@ -55,8 +55,16 @@ dtd_thread_read(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_a
 				  com_buffer->size);
 	com_buffer->full = 1;
 	com_buffer->end_index = size;
-    }
 
+	/* check if eof occurs */
+	if (size == 0)
+	{
+	    /* we can ony read 0 sample,
+	       so we suppose that is the end of file...
+	    */
+	    *self->is_eof = 1;
+	}
+    }
 }
 
 /* 
@@ -85,6 +93,24 @@ dtd_thread_write(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
 	com_buffer->end_index = 0;
     }
 
+    if (1 == *self->is_eof)
+    {
+	/* empty second buffer */
+	buffer_to_write = *self->buffer_index;
+	com_buffer = &self->com_buffer[buffer_to_write];
+	
+	if (com_buffer->full == 1)
+	{
+	    /* this is eof so I flush the second buffer */
+	    size = fts_audiofile_write(self->sf, 
+				       com_buffer->buffer, 
+				       com_buffer->n_channels, 
+				       com_buffer->end_index);
+	    com_buffer->full = 0;
+	    com_buffer->end_index = 0;
+	}
+	
+    }
 }
 
 
@@ -114,7 +140,6 @@ dtd_thread_instantiate(fts_class_t* cl, int ac, const fts_atom_t* at)
 
     fts_class_message_varargs(cl, fts_s_write, dtd_thread_write);
     fts_class_message_varargs(cl, fts_s_read, dtd_thread_read);
-    return fts_ok;
 }
 
 void dtd_thread_config(void)
