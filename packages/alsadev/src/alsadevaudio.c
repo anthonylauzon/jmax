@@ -63,6 +63,8 @@ typedef struct alsa_pcm_dev_data {
 } alsa_pcm_dev_data_t;
 
 #define DEFAULT_N_VOICES 2
+#define DEF_SAMPLING_RATE ((float)44100.0f)
+#define DEF_FIFO_SIZE 256
 
 
 /*----------------------------------------------------------------------------*/
@@ -82,10 +84,13 @@ typedef struct alsa_pcm_dev_data {
 
 static fts_status_t alsa_dac_open( fts_dev_t *dev, int nargs, const fts_atom_t *args)
 {
-  int n_voices;
+  int n_voices, sampling_rate, fifo_size;
   int err, card, device;
   alsa_pcm_dev_data_t *data;
   snd_pcm_channel_params_t params;
+
+  sampling_rate = (int) fts_param_get_float( fts_s_sampling_rate, DEF_SAMPLING_RATE);
+  fifo_size = fts_param_get_int(fts_s_fifo_size, DEF_FIFO_SIZE);
 
   /* Parameter parsing */
   n_voices = fts_get_int_by_name(nargs, args, fts_new_symbol("voices"), DEFAULT_N_VOICES);
@@ -123,7 +128,7 @@ static fts_status_t alsa_dac_open( fts_dev_t *dev, int nargs, const fts_atom_t *
   params.channel = SND_PCM_CHANNEL_PLAYBACK;
   params.mode = SND_PCM_MODE_BLOCK;
   params.start_mode = SND_PCM_START_FULL;
-  params.stop_mode = SND_PCM_STOP_STOP;
+  params.stop_mode = SND_PCM_STOP_ROLLOVER;
 
   params.format.format = SND_PCM_SFMT_S16_LE; 
   params.format.rate = 44100;
@@ -184,8 +189,24 @@ static int alsa_dac_get_nchans( fts_dev_t *dev)
 static int alsa_dac_get_nerrors( fts_dev_t *dev)
 {
   alsa_pcm_dev_data_t *data;
+  snd_pcm_channel_status_t status;
+  int err;
 
   data = (alsa_pcm_dev_data_t *)fts_dev_get_device_data( dev);
+
+  memset(&status, 0, sizeof(status));
+  status.channel = SND_PCM_CHANNEL_PLAYBACK;
+
+  if ( (err = snd_pcm_channel_status( data->handle, &status)) < 0)
+    {
+      fprintf( stderr, "ALSA device: cannot get status (%s)\n", snd_strerror( err));
+      return 0;
+    }
+
+  if (status.underrun)
+    {
+      return 1;
+    }
 
   return 0;
 }
@@ -327,7 +348,7 @@ static fts_status_t alsa_adc_open( fts_dev_t *dev, int nargs, const fts_atom_t *
   params.channel = SND_PCM_CHANNEL_CAPTURE;
   params.mode = SND_PCM_MODE_BLOCK;
   params.start_mode = SND_PCM_START_DATA;
-  params.stop_mode = SND_PCM_STOP_STOP;
+  params.stop_mode = SND_PCM_STOP_ROLLOVER;
 
   params.format.format = SND_PCM_SFMT_S16_LE; 
   params.format.rate = 44100;
