@@ -44,13 +44,11 @@ typedef struct _seqplay_
   sequence_t *sequence;
   fts_symbol_t track_name;
   eventtrk_t *track;
-  float speed;
   event_t *event;
   fts_alarm_t alarm;
 } seqplay_t;
 
 static void seqplay_alarm_tick(fts_alarm_t *alarm, void *o);
-static void seqplay_set_speed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 static void
 seqplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -66,7 +64,6 @@ seqplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   this->track_name = track_name;
   this->track = 0;
-  this->speed = 1.0;
   this->event = 0;
 
   fts_alarm_init(&this->alarm, 0, seqplay_alarm_tick, this);
@@ -90,21 +87,29 @@ static void
 seqplay_alarm_tick(fts_alarm_t *alarm, void *o)
 {
   seqplay_t *this = (seqplay_t *)o;
+  double now = fts_get_time_in_msecs();
   event_t *event = this->event;
-  double now = event_get_time(event);
-  fts_atom_t event_at[64];
-  int event_ac = 0;
+  event_t *next = event_get_next(event);
+  fts_atom_t at[64];
+  int ac;
   fts_atom_t a[2];
 
-  fts_set_ptr(a, &event_ac);
-  fts_set_ptr(a + 1, event_at);
-      
-  this->event = event_get_next(event);
-  
-  if(this->event)
+  fts_set_object(at, (fts_object_t *)event);
+  ac = 1;
+
+  while(next && event_get_time(next) <= now)
+    {
+      fts_set_object(at + ac, (fts_object_t *)event);
+      ac++;
+
+      next = event_get_next(next);
+    }
+
+  if(next)
     {
       /* playing */
-      fts_alarm_set_delay(alarm, (event_get_time(this->event) - now) * this->speed);
+      this->event = next;
+      fts_alarm_set_delay(alarm, event_get_time(next) - now);
       fts_alarm_arm(alarm);
     }
   else
@@ -112,10 +117,22 @@ seqplay_alarm_tick(fts_alarm_t *alarm, void *o)
       /* stop */
       fts_send_message((fts_object_t *)this->track, fts_SystemInlet, seqsym_unlock, 0, 0);            
       this->track = 0;
+      this->event = 0;
     }
 
-  fts_send_message((fts_object_t *)event, fts_SystemInlet, seqsym_get_atoms, 2, a);
-  fts_outlet_send((fts_object_t *)o, 0, fts_s_list, event_ac, event_at);
+  if(sequence_editor_is_open(this->sequence))
+     fts_client_send_message((fts_object_t *)this->track, seqsym_highlightEvents, ac, at);
+
+  fts_set_ptr(a, &ac);
+  fts_set_ptr(a + 1, at);
+
+  do{
+    fts_send_message((fts_object_t *)event, fts_SystemInlet, seqsym_get_atoms, 2, a);
+    fts_outlet_send((fts_object_t *)o, 0, fts_s_list, ac, at);
+    
+    event = event_get_next(event);
+  }
+  while(event != next);
 }
 
 
@@ -146,7 +163,7 @@ seqplay_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      this->track = track;
 	      this->event = event;
 
-	      fts_alarm_set_delay(&this->alarm, event_get_time(event) * this->speed);
+	      fts_alarm_set_delay(&this->alarm, event_get_time(event));
 	      fts_alarm_arm(&this->alarm);
 	    }
 	}
@@ -168,18 +185,6 @@ seqplay_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
 }
 
-static void 
-seqplay_set_speed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  seqplay_t *this = (seqplay_t *)o;
-  float speed = fts_get_number_float(at);
-  
-  if(speed < 0.0)
-    this->speed = 0.0;
-  else
-    this->speed = speed;
-}
-
 /************************************************************
  *
  *  class
@@ -198,9 +203,6 @@ seqplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 0, fts_new_symbol("start"), seqplay_start);
       fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), seqplay_stop);
-
-      fts_method_define_varargs(cl, 1, fts_s_int, seqplay_set_speed);
-      fts_method_define_varargs(cl, 1, fts_s_float, seqplay_set_speed);
 
       return fts_Success;
     }

@@ -33,6 +33,6 @@ track_init(track_t *track, fts_symbol_t name)
   track->sequence = 0;
 
   track->name = name;
-  track->locked = 0;
+  track->lock = 0;
   track->active = 1;
 }

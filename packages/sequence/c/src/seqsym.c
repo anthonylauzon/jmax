@@ -58,6 +58,7 @@ fts_symbol_t seqsym_addTracks = 0;
 fts_symbol_t seqsym_deleteTracks = 0;
 fts_symbol_t seqsym_addEvents = 0;
 fts_symbol_t seqsym_deleteEvents = 0;
+fts_symbol_t seqsym_highlightEvents = 0;
 fts_symbol_t seqsym_openFileDialog = 0;
 
 void
@@ -95,5 +96,6 @@ seqsym_config(void)
   seqsym_deleteTracks = fts_new_symbol("deleteTracks");
   seqsym_addEvents = fts_new_symbol("addEvents");
   seqsym_deleteEvents = fts_new_symbol("deleteEvents");
+  seqsym_highlightEvents = fts_new_symbol("highlightEvents");
   seqsym_openFileDialog = fts_new_symbol("openFileDialog");
 }

@@ -41,7 +41,7 @@ struct _track_
 
   fts_symbol_t name;
   int active; /* active flag */
-  int locked; /* locked flag (non-zero: no delete of track or events) */
+  int lock; /* lock counter (non-zero: no delete of track or events) */
 };
 
 extern void track_init(track_t *track, fts_symbol_t name);
@@ -50,8 +50,8 @@ extern void track_init(track_t *track, fts_symbol_t name);
 #define track_get_name(t) ((t)->name)
 #define track_get_next(t) ((t)->next)
 
-#define track_lock(t) ((t)->locked = 1)
-#define track_unlock(t) ((t)->locked = 0)
-#define track_is_locked(t) ((t)->locked != 0)
+#define track_lock(t) ((t)->lock++)
+#define track_unlock(t) ((t)->lock--)
+#define track_is_locked(t) ((t)->lock != 0)
 
 #endif

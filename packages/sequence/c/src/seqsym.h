@@ -60,6 +60,7 @@ extern fts_symbol_t seqsym_addTracks;
 extern fts_symbol_t seqsym_deleteTracks;
 extern fts_symbol_t seqsym_addEvents;
 extern fts_symbol_t seqsym_deleteEvents;
+extern fts_symbol_t seqsym_highlightEvents;
 extern fts_symbol_t seqsym_openFileDialog;
 
 #endif
