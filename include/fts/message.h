@@ -106,6 +106,9 @@ FTS_API int fts_objstack_top; /* Next free slot; can overflow, must be checked *
 FTS_API fts_object_t *fts_objstack[];
 
 #define FTS_OBJSTACK_SIZE  8*1024
+#define FTS_CALL_DEPTH     16*1024
+
+#define FTS_REACHED_MAX_CALL_DEPTH()     (fts_objstack_top >= FTS_CALL_DEPTH) 
 
 #define FTS_OBJSTACK_PUSH(obj)   { if (fts_objstack_top < FTS_OBJSTACK_SIZE)  \
                                       fts_objstack[fts_objstack_top++] = (obj); \
@@ -120,6 +123,7 @@ FTS_API fts_object_t *fts_objstack[];
 				  (fts_object_t *)0)
 #else
 
+#define FTS_OBJSTACK_FULL()     (0) 
 #define FTS_OBJSTACK_PUSH(obj)
 #define FTS_OBJSTACK_POP(obj)
 #define fts_get_current_object() (0)

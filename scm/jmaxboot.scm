@@ -117,8 +117,7 @@
 ;; 
 (define machine-type-file (file-cat jmax-scm-root (cat jmax-host-type ".scm")))
 (if (file-exists (new-file machine-type-file))
-    (load machine-type-file)
-    (println "Didn't find a configuration file for host type " jmax-host-type))
+    (load machine-type-file))
 
 ;;
 ;; do the real startup 

@@ -87,7 +87,7 @@ tabpoke_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
   if (sampbuf_get(tab_name))
     this->tab_name = tab_name;
   else
-    post("tabpoke: %s: can't find table~\n", fts_symbol_name(tab_name));
+    post("tabpoke: %s: can't find table~\n", ((tab_name != NULL)? fts_symbol_name(tab_name) : "<unknown>"));
 }
 
 static void
@@ -115,7 +115,7 @@ tabpoke_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	fts_outlet_float(o, 0, (double)buf->samples[n]);
     }
   else
-    post("tabpoke: %s: can't find table~\n", fts_symbol_name(this->tab_name));
+    post("tabpoke: %s: can't find table~\n", ((this->tab_name != NULL)? fts_symbol_name(this->tab_name) : "<unknown>"));
 }
 
 
@@ -167,7 +167,7 @@ tabpoke_center(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	}		
     }
   else
-    post("tabpoke: %s: can't find table~\n", fts_symbol_name(this->tab_name));
+    post("tabpoke: %s: can't find table~\n", ((this->tab_name != NULL)? fts_symbol_name(this->tab_name) : "<unknown>"));
 }
 
 /******************************************************************

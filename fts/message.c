@@ -218,7 +218,7 @@ fts_send_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   mess = fts_class_mess_inlet_get(in, s, &anything);  /* @@@anything */
 
-  if (mess)
+  if (mess && !FTS_REACHED_MAX_CALL_DEPTH())
     {
       FTS_OBJSTACK_PUSH(o);
       (*mess->mth)(o, winlet, s, ac, at);
@@ -281,7 +281,7 @@ fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 	}
     }
 
-  if (mess)
+  if (mess && !FTS_REACHED_MAX_CALL_DEPTH())
     {
       FTS_OBJSTACK_PUSH(o);
       (*mess->mth)(o, winlet, s, ac, at);
@@ -325,20 +325,23 @@ fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s,
 
   conn = o->out_conn[woutlet];
 
-  while(conn)
-    {
-      if ((conn->symb == s) || (!conn->symb && conn->mth))
-	{
-	  /* call cashed method */
-	  FTS_OBJSTACK_PUSH(conn->dst);
-	  (*conn->mth)(conn->dst, conn->winlet, s, ac, at);
-	  FTS_OBJSTACK_POP(conn->dst);
-	}
-      else
-	fts_send_message_cache(conn->dst, conn->winlet, s, ac, at, &conn->symb, &conn->mth);
+  if (!FTS_REACHED_MAX_CALL_DEPTH()) {
 
-      conn = conn->next_same_src;
-    }
+    while(conn)
+      {
+	if ((conn->symb == s) || (!conn->symb && conn->mth))
+	  {
+	    /* call cashed method */
+	    FTS_OBJSTACK_PUSH(conn->dst);
+	    (*conn->mth)(conn->dst, conn->winlet, s, ac, at);
+	    FTS_OBJSTACK_POP(conn->dst);
+	  }
+	else
+	  fts_send_message_cache(conn->dst, conn->winlet, s, ac, at, &conn->symb, &conn->mth);
+	
+	conn = conn->next_same_src;
+      }
+  }
 
   return fts_Success;
 }
