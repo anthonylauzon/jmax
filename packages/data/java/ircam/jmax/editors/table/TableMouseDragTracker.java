@@ -41,8 +41,8 @@ public class TableMouseDragTracker extends MouseDragTracker {
 
     public void mousePressed(MouseEvent e) 
     {
-	if(e.getClickCount()>1) listener.doubleClick();
-	super.mousePressed(e);
+      if(e.getClickCount()>1) listener.doubleClick( e);
+      super.mousePressed(e);
     } 
     TableDynamicDragListener listener;
 }

@@ -21,6 +21,7 @@
 
 package ircam.jmax.editors.table;
 
+import java.awt.event.*;
 import ircam.jmax.toolkit.*;
 /**
  * The interface of the objects that wants to 
@@ -30,6 +31,6 @@ import ircam.jmax.toolkit.*;
  * @see InteractionModule*/
 public interface TableDynamicDragListener extends DynamicDragListener {
   
-  public abstract void doubleClick();
+  public abstract void doubleClick( MouseEvent e);
 }
 

@@ -114,8 +114,11 @@ public class ZoomTool extends TableTool implements  DirectionListener, TableDyna
     public void dragEnd(int x, int y, MouseEvent e){}
     public void updateStartingPoint(int deltaX, int deltaY){}
 
-    public void doubleClick()
+    public void doubleClick( MouseEvent e)
     {
+      /*if( e.isShiftDown())
+	(((TableGraphicContext)gc).getAdapter()).setDefaultZooms();
+	else*/
       (((TableGraphicContext)gc).getAdapter()).setDefaultZooms();
     }
   
