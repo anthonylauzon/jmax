@@ -34,7 +34,7 @@ clean:
 install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/lists
 	$(INSTALL_DATA) lists.jpk $(lib_install_dir)/packages/lists
-	$(INSTALL_DATA) lists.smc $(lib_install_dir)/packages/lists
+	$(INSTALL_DATA) lists.scm $(lib_install_dir)/packages/lists
 	( cd help; $(MAKE) $@)
 	( cd templates; $(MAKE) $@)
 .PHONY: install-noarch

@@ -34,4 +34,7 @@ clean:
 install-noarch:
 .PHONY: install-noarch
 
+install-arch:
+.PHONY: install-arch
+
 

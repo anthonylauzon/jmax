@@ -176,7 +176,7 @@ install-exec:
 	done
 	( cd packages ; $(MAKE) INSTALL_LIB="$(INSTALL_LIB)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) ARCH=$$a install-noarch )
 	for a in $(INSTALL_ARCHS) ; do \
-		( cd packages ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) ARCH=$$a install-arch ) ; \
+		( cd packages ; $(MAKE) INSTALL_LIB="$(INSTALL_LIB)" INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) ARCH=$$a install-arch ) ; \
 	done
 .PHONY: install-exec
 

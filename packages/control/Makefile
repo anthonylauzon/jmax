@@ -42,7 +42,7 @@ clean_c:
 install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/control
 	$(INSTALL_DATA) control.jpk $(lib_install_dir)/packages/control
-	$(INSTALL_DATA) control.smc $(lib_install_dir)/packages/control
+	$(INSTALL_DATA) control.scm $(lib_install_dir)/packages/control
 	( cd help; $(MAKE) $@)
 .PHONY: install-noarch
 

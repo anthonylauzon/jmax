@@ -43,7 +43,6 @@ install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/math
 	$(INSTALL_DATA) math.jpk $(lib_install_dir)/packages/math
 	$(INSTALL_DATA) math.scm $(lib_install_dir)/packages/math
-	( cd c ; $(MAKE) $@)
 	( cd help; $(MAKE) $@)
 .PHONY: install-noarch
 

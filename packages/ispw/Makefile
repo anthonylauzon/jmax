@@ -34,7 +34,7 @@ clean:
 install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw
 	$(INSTALL_DATA) ispw.jpk $(lib_install_dir)/packages/ispw
-	$(INSTALL_DATA) ispw.smc $(lib_install_dir)/packages/ispw
+	$(INSTALL_DATA) ispw.scm $(lib_install_dir)/packages/ispw
 	( cd abs ; $(MAKE) $@)
 	( cd help; $(MAKE) $@)
 	( cd sounds; $(MAKE) $@)
