@@ -59,11 +59,9 @@ tuple_copy(fts_tuple_t *org, fts_tuple_t *copy)
   fts_tuple_set_size(copy, size);
   copy_atoms = fts_tuple_get_atoms(copy);
   
-  for(i=0; i<size; i++)
-  {
-    fts_atom_release(copy_atoms + i);
+  for (i = 0; i < size; i++)
+  { /* fts_atom_copy handles release/refer of copy_atoms */
     fts_atom_copy(org_atoms + i, copy_atoms + i);
-    fts_atom_refer(copy_atoms + i);
   }
 }
 
