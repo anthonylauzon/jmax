@@ -22,8 +22,7 @@
 
 #include "dsdev.h"
 
-void 
-dsaudioport_config(void);
+extern void dsaudioport_config(void);
 
 /******************************************************************************/
 /*                                                                            */
