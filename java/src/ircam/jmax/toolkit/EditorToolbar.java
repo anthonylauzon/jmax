@@ -6,14 +6,15 @@ import java.awt.*;
 import java.awt.event.*;
 
 /**
- * A specific component used as a container of buttons 
+ * A specific component used as a container of JToggleButtons 
  * corresponding to Tools. It can have a set of listeners
  * to be called when the user selects a new tool.
  * EditorToolbar class keeps a JPopupMenu with all the tools inserted;
  * this Popup can be accessed and used as an alternative for choosing 
  * a tool (example, right-mouse click). A toolbar can be public (the same
  * object is shared between every editor's window, or private (every window
- * has its own local toolbar). 
+ * has its own local toolbar). The current implementation only allows private
+ * toolbars
  */
 public class EditorToolbar extends JToolBar implements ActionListener, WindowListener{
   

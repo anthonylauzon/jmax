@@ -89,7 +89,7 @@ public class Widget extends JPanel {
   JLabel itsLabel;
 
   static private final int WIDGET_LABEL_WIDTH = 40;
-  static private final int WIDGET_HEIGHT = 30;
+  static public final int WIDGET_HEIGHT = 30;
 
 }
 

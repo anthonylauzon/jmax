@@ -1,5 +1,7 @@
 SOURCES = \
 	IndicatorWithMemory.java	\
+	IncrementController.java	\
+	IncrementListener.java	\
 	Led.java			\
 	SimpleLed.java			\
 	MemoryLed.java			\

@@ -37,5 +37,6 @@ SOURCES = \
 	$(INCLUDE_PATH)/ToolbarProvider.java		\
 	$(INCLUDE_PATH)/UndoableData.java		\
 	$(INCLUDE_PATH)/Widget.java			\
+	$(INCLUDE_PATH)/ZoomListener.java			\
 	$(INCLUDE_PATH)/XORHandler.java			\
 	$(INCLUDE_PATH)/XORPainter.java			\
