@@ -46,7 +46,9 @@ public class MidiConfigPanel extends JPanel implements Editor
   {
     window = win;
     midiMan = mm;
-    midiMan.setListener( this);
+
+    if( midiMan != null)
+      midiMan.setListener( this);
 
     initDataModel();
 

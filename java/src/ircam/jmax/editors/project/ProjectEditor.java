@@ -196,7 +196,7 @@ public class ProjectEditor extends JFrame implements EditorContainer
     if(name.endsWith(".jmax"))
       {
 	int idx = name.indexOf(".jmax"); 
-	name = name.substring( 0, idx-1);
+	name = name.substring( 0, idx);
       }
 
     if( pkg != null)
