@@ -1,15 +1,6 @@
 noinst_DATA= \
  messbox.gif \
- messbox_cursor.gif \
- Portee1.gif \
- adder.gif \
- eraser.gif \
- hmover.gif \
- pianoroll2tr.gif \
- resizer.gif \
- selecter.gif \
- vmover.gif \
- zoomer.gif 
+ messbox_cursor.gif 
 
 CLEANFILES= time.stamp
 

@@ -306,6 +306,7 @@ packages/ispw/java/ircam/jmax/editors/explode/menus/Makefile
 packages/ispw/help/Makefile
 packages/ispw/help/control/Makefile
 packages/ispw/help/signal/Makefile
+packages/ispw/images/Makefile
 packages/ispw/sounds/Makefile
 packages/ispwmath/Makefile
 packages/ispwmath/c/Makefile
