@@ -23,8 +23,23 @@
 #ifndef _FTS_CLIENT_H_
 #define _FTS_CLIENT_H_
 
-FTS_API void fts_client_send_message(fts_object_t *obj, fts_symbol_t selector, int ac, const fts_atom_t *at);
+/**
+ * Client communication
+ *
+ * @defgroup client client
+ */
 
-FTS_API void fts_client_upload(fts_object_t *obj, fts_symbol_t classname, int ac, const fts_atom_t *at);
+/**
+ * Send a message to the client mirror of an object
+ *
+ * @fn void fts_client_send_message(fts_object_t *obj, fts_symbol_t selector, int ac, const fts_atom_t *at)
+ * @param obj the object
+ * @param selector the selector
+ * @param ac arguments count
+ * @param at arguments
+ *
+ * @ingroup client
+ */
+FTS_API void fts_client_send_message(fts_object_t *obj, fts_symbol_t selector, int ac, const fts_atom_t *at);
 
 #endif

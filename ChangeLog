@@ -1,3 +1,10 @@
+2002-01-22  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* changing FTS code to remove symbol cache index from symbol structure
+	and to remove also is_operator (replaced by a hash table). Removing fts_symbol_name().
+	NOTE: this code does not work because of the use of some pointer bits in the type
+	field of the atom. So, moving now to atom type as int.
+
 2002-01-18  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* changed client library to integrate symbol cache. Added FtsSymbol, splitted

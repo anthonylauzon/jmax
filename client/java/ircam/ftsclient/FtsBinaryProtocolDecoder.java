@@ -36,21 +36,16 @@ class SymbolCache {
     this( 512);
   }
 
-  final FtsSymbol put( int index, String s)
+  final void put( int index, FtsSymbol s)
   {
     if ( index >= cache.length)
       {
-	int newLength = cache.length;
-
-	while (newLength <= index)
-	  newLength *= 2;
-
-	FtsSymbol[] newCache = new FtsSymbol[newLength];
+	FtsSymbol[] newCache = new FtsSymbol[index+1];
 	System.arraycopy( cache, 0, newCache, 0, cache.length);
 	cache = newCache;
       }
 
-    cache[index] = FtsSymbol.get( s);
+    cache[index] = s;
 
     return cache[index];
   }
@@ -175,15 +170,6 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
 	}
       };
 
-    TransitionAction endStringAction = new TransitionAction() {
-	public void fire( byte input)
-	{
-	  if (argsCount >= 2)
-	    args.add( buffer.toString());
-	  argsCount++;
-	}
-      };
-
     TransitionAction endSymbolIndexAction = new TransitionAction() {
 	public void fire( byte input)
 	{
@@ -202,13 +188,24 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
     TransitionAction endSymbolCacheAction = new TransitionAction() {
 	public void fire( byte input)
 	{
-	  FtsSymbol s = symbolCache.put( ival, buffer.toString());
+	  FtsSymbol s = FtsSymbol.get( buffer.toString());
+
+	  symbolCache.put( ival, s);
 
 	  if (argsCount == 1)
 	    selector = s;
 	  else
 	    args.add( s);
 
+	  argsCount++;
+	}
+      };
+
+    TransitionAction endStringAction = new TransitionAction() {
+	public void fire( byte input)
+	{
+	  if (argsCount >= 2)
+	    args.add( buffer.toString());
 	  argsCount++;
 	}
       };
@@ -238,7 +235,7 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
 	}
       };
 
-    State qStart = new State( "Start");
+    State qInitial = new State( "Initial");
 
     State qInt0 = new State( "Int0");
     State qInt1 = new State( "Int1");
@@ -268,45 +265,45 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
     State qSymbolCache3 = new State( "SymbolCache3");
     State qSymbolCache4 = new State( "SymbolCache4");
 
-    qStart.addTransition( FtsProtocol.INT, qInt0, clearAction);
-    qStart.addTransition( FtsProtocol.FLOAT, qFloat0, clearAction);
-    qStart.addTransition( FtsProtocol.SYMBOL_INDEX, qSymbolIndex0, clearAction);
-    qStart.addTransition( FtsProtocol.SYMBOL_CACHE, qSymbolCache0, clearAction);
-    qStart.addTransition( FtsProtocol.STRING, qString, bufferClearAction);
-    qStart.addTransition( FtsProtocol.OBJECT, qObject0, clearAction);
-    qStart.addTransition( FtsProtocol.END_OF_MESSAGE, qStart, endMessageAction);
+    qInitial.addTransition( FtsProtocol.INT, qInt0, clearAction);
+    qInitial.addTransition( FtsProtocol.FLOAT, qFloat0, clearAction);
+    qInitial.addTransition( FtsProtocol.SYMBOL_INDEX, qSymbolIndex0, clearAction);
+    qInitial.addTransition( FtsProtocol.SYMBOL_CACHE, qSymbolCache0, clearAction);
+    qInitial.addTransition( FtsProtocol.STRING, qString, bufferClearAction);
+    qInitial.addTransition( FtsProtocol.OBJECT, qObject0, clearAction);
+    qInitial.addTransition( FtsProtocol.END_OF_MESSAGE, qInitial, endMessageAction);
 
     qInt0.addTransition( qInt1, shiftAction);
     qInt1.addTransition( qInt2, shiftAction);
     qInt2.addTransition( qInt3, shiftAction);
-    qInt3.addTransition( qStart, endIntAction);
+    qInt3.addTransition( qInitial, endIntAction);
 
     qFloat0.addTransition( qFloat1, shiftAction);
     qFloat1.addTransition( qFloat2, shiftAction);
     qFloat2.addTransition( qFloat3, shiftAction);
-    qFloat3.addTransition( qStart, endFloatAction);
+    qFloat3.addTransition( qInitial, endFloatAction);
 
     qSymbolIndex0.addTransition( qSymbolIndex1, shiftAction);
     qSymbolIndex1.addTransition( qSymbolIndex2, shiftAction);
     qSymbolIndex2.addTransition( qSymbolIndex3, shiftAction);
-    qSymbolIndex3.addTransition( qStart, endSymbolIndexAction);
+    qSymbolIndex3.addTransition( qInitial, endSymbolIndexAction);
 
     qSymbolCache0.addTransition( qSymbolCache1, shiftAction);
     qSymbolCache1.addTransition( qSymbolCache2, shiftAction);
     qSymbolCache2.addTransition( qSymbolCache3, shiftAction);
     qSymbolCache3.addTransition( qSymbolCache4, shiftAction);
-    qSymbolCache4.addTransition( (byte)0, qStart, endSymbolCacheAction);
+    qSymbolCache4.addTransition( (byte)0, qInitial, endSymbolCacheAction);
     qSymbolCache4.addTransition( qSymbolCache4, bufferShiftAction);
 
-    qString.addTransition( (byte)0, qStart, endStringAction);
+    qString.addTransition( (byte)0, qInitial, endStringAction);
     qString.addTransition( qString, bufferShiftAction);
 
     qObject0.addTransition( qObject1, shiftAction);
     qObject1.addTransition( qObject2, shiftAction);
     qObject2.addTransition( qObject3, shiftAction);
-    qObject3.addTransition( qStart, endObjectAction);
+    qObject3.addTransition( qInitial, endObjectAction);
 
-    return qStart;
+    return qInitial;
   }
 
   FtsBinaryProtocolDecoder( FtsServer server)

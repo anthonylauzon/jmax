@@ -126,6 +126,18 @@ To be written...
 <h3>Changes in the FTS expression parser</h3>
 
 <p>
+The current expression parsing and mechanism to resolve variable names are
+major sources of instability and annoyance. jMax 3 should include a very
+first version of a new parser providing  at least a very simple syntax for
+messages close to the current jMax (MAX) syntax for messages and simple
+expressions. 
+
+<p>
+The parser has to be compatible with the future developments of jMax (implemented
+with a minimal effort!!). The parser should try to keep a maximum compatibility
+with MAX style messages and the expression syntax of jMax.
+
+<p>
 The current expression parser will be modified in order to introduce
 a lexical analyser that is implemented on FTS side (it is currently
 implemented on the JAVA side:
@@ -162,23 +174,15 @@ This version will introduced
 
 <h3>variables and expression parsing</h3>
 
-<p>
-The current expression parsing and mechanism to resolve variable names are
-major sources of instability and annoyance. jMax 3 should include a very
-first version of a new parser providing  at least a very simple syntax for
-messages close to the current jMax (MAX) syntax for messages and simple
-expressions. 
 
 <p>
-  The parser has to be compatible with the future developments of jMax (implemented
- with a minimal effort!!). The parser should try to keep a maximum compatibility
- with MAX style messages and the expression syntax of jMax.
-
-<p>
-  The parser should introduce the possibility to specify the package of class
- at the instantiation of an object. This way the transition towards a new
+The parser should introduce the possibility to specify the package of class
+at the instantiation of an object. This way the transition towards a new
 object set can be simplified.
 
+<p>
+The parser should support also message invocation on objects and objects
+instantiation.
 
  
 <h3>message system</h3>

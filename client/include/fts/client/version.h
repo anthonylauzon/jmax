@@ -20,6 +20,6 @@
  * 
  */
 
-static const char *client_version = "3.0.2_latest_cvs";
+static const char *client_version = "3.1.0_latest_cvs";
 
 

@@ -32,15 +32,6 @@
  */
 
 
-struct fts_symbol_descr
-{
-  const char *name;		/* name */
-  int cache_index;		/* index in the client cache if any */
-  int operator;			/* index in the operator table, for the expression eval */
-  struct fts_symbol_descr *next_in_table; /* next in hash table for fts_new_symbol */
-};
-
-
 /**
  * Lookup a symbol and create a new definition if symbol
  * was not found.
@@ -75,13 +66,11 @@ FTS_API fts_symbol_t fts_new_symbol( const char *name);
 FTS_API fts_symbol_t fts_new_symbol_copy( const char *name);
 
 
-/**
-   Get the symbol name from a symbol.
-   @param symbol   the symbol
-   @return the symbol name (i.e. the string that was passed
-            to the fts_new_symbol() that created this symbol).
+/*
+ * Compatibility
 */
-#define fts_symbol_name(symbol)                 ((symbol)->name)
+FTS_API const char *__OLD_fts_symbol_name( const char *file, int line, fts_symbol_t symbol);
+#define fts_symbol_name(symbol) __OLD_fts_symbol_name(__FILE__, __LINE__, (symbol))
 
 /*
   Predefined symbols. See predefsymbols.h

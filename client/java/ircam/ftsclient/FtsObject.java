@@ -140,40 +140,35 @@ public class FtsObject {
     messageHandlersTable.put( new MessageHandlerEntry( cl, selector), messageHandler);
   }
 
-  public static void registerMessageHandler( Class cl, FtsMessageHandler messageHandler)
-  {
-    messageHandlersTable.put( new MessageHandlerEntry( cl, FtsSymbol.get("*")), messageHandler);
-  }
-
   static void invokeMessageHandler( FtsObject obj, FtsSymbol selector, FtsArgs args)
   {
     if (selector == obj.selectorCache)
       {
-	// Since we never cache the "catchAll" messageHandler, we are sure here that 
-	// the cached messageHandler is associated with a valid selector, hence we
-	// must call the first method of the messageHandler interface 
 	obj.messageHandlerCache.invoke( obj, args.getLength(), args.getAtoms());
 	return;
       }
 
-    lookupEntry.cl = obj.getClass();
+    Class cl = obj.getClass();
+
     lookupEntry.selector = selector;
 
-    FtsMessageHandler messageHandler = (FtsMessageHandler)messageHandlersTable.get( lookupEntry);
-
-    if (messageHandler != null)
+    do
       {
-	obj.selectorCache = selector;
-	obj.messageHandlerCache = messageHandler;
-	obj.messageHandlerCache.invoke( obj, args.getLength(), args.getAtoms());
-	return;
+	lookupEntry.cl = cl;
+
+	FtsMessageHandler messageHandler = (FtsMessageHandler)messageHandlersTable.get( lookupEntry);
+
+	if (messageHandler != null)
+	  {
+	    obj.selectorCache = selector;
+	    obj.messageHandlerCache = messageHandler;
+	    obj.messageHandlerCache.invoke( obj, args.getLength(), args.getAtoms());
+	    return;
+	  }
+
+	cl = cl.getSuperclass();
       }
-
-    lookupEntry.selector = FtsSymbol.get("*");
-    messageHandler = (FtsMessageHandler)messageHandlersTable.get( lookupEntry);
-
-    if (messageHandler != null)
-      messageHandler.invoke( obj, selector, args.getLength(), args.getAtoms());
+    while (cl != null);
   }
 
   int getID()

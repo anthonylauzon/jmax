@@ -60,7 +60,6 @@
 #include <ftsprivate/patparser.h>
 #include <ftsprivate/bmaxhdr.h>
 #include <ftsprivate/saver.h>
-#include <ftsprivate/symbol.h>
 #include <ftsprivate/template.h>
 #include <ftsprivate/platform.h>
 
@@ -327,7 +326,7 @@ static void oldclient_put_char( oldclient_t *this, unsigned char c)
 
   fts_stack_push( &this->output_buffer, unsigned char, c);
 
-  if (fts_stack_get_size( &this->output_buffer) >= UDP_PACKET_SIZE)
+  if (fts_stack_get_top( &this->output_buffer) >= UDP_PACKET_SIZE)
     oldclient_flush( this);
 }
 
@@ -339,14 +338,14 @@ static void oldclient_flush( oldclient_t *this)
   if (!this)
     return;
 
-  len = fts_stack_get_size( &this->output_buffer);
+  len = fts_stack_get_top( &this->output_buffer);
 
   if (this->stream) 
     {
       if (len <= 0)
 	return;
 
-      p = (unsigned char *)fts_stack_get_ptr( &this->output_buffer);
+      p = (unsigned char *)fts_stack_get_base( &this->output_buffer);
       
       /* Send an init packet: empty content, just the packet */
 #if WIN32
@@ -366,7 +365,7 @@ static void oldclient_flush( oldclient_t *this)
       if (len <= 3)
 	return;
 
-      p = (unsigned char *)fts_stack_get_ptr( &this->output_buffer);
+      p = (unsigned char *)fts_stack_get_base( &this->output_buffer);
       
       p[0] = this->sequence;
       
@@ -725,6 +724,9 @@ void fts_client_add_float(float value)
 
 #define MAX_CACHE_INDEX 512
 
+#define fts_symbol_set_cache_index(s,i) (i)
+#define fts_symbol_get_cache_index(s) ((int)(s))
+
 static int first_unused_symbol_cache_index = 0;
 
 static int cache_symbol( fts_symbol_t s)
@@ -811,7 +813,7 @@ fts_client_done_msg(void)
    CLIENTMESS (obj)obj (symbol)selector [(atom)<args>]* 
 */
 
-void fts_client_send_message(fts_object_t *obj, fts_symbol_t selector, int argc, const fts_atom_t *args)
+void fts_old_client_send_message(fts_object_t *obj, fts_symbol_t selector, int argc, const fts_atom_t *args)
 {
   fts_client_start_msg(CLIENTMESS_CODE);
   fts_client_add_object(obj);

@@ -267,7 +267,7 @@ static fts_symbol_t get_name_without_extension( fts_symbol_t name)
   const char *pname;
   char *pdot;
 
-  pname = fts_symbol_name( name);
+  pname =  name;
   pdot = strrchr( pname, '.');
 
   if ( pdot && ( !strcmp( pdot, ".abs") || !strcmp( pdot, ".pat")) )

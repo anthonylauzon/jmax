@@ -230,7 +230,6 @@ extern void fts_saver_config( void);
 
 /*
  * Installation of kernel packages 
- * The order is not relevant
  */
 static void fts_kernel_classes_config( void)
 {

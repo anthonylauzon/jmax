@@ -97,8 +97,8 @@ fts_template_new(fts_symbol_t name, fts_symbol_t filename, fts_symbol_t original
 
 #ifdef TEMPLATE_DEBUG 
   {
-    const char* file = (filename)? fts_symbol_name(filename) : (original_filename)? fts_symbol_name(original_filename) : "unknown"; 
-    fts_log( "[template]: New template %s, file %s\n", fts_symbol_name(name), file); /* @@@ */
+    const char* file = (filename)? filename : (original_filename)? original_filename : "unknown"; 
+    fts_log( "[template]: New template %s, file %s\n", name, file); /* @@@ */
   }
 #endif
 
@@ -124,7 +124,7 @@ fts_make_template_instance(fts_template_t *template, fts_patcher_t *patcher, int
 
   fts_package_push(template->package);
 
-  obj = fts_binary_file_load(fts_symbol_name(template->filename), (fts_object_t *) patcher, ac, at, e);
+  obj = fts_binary_file_load( template->filename, (fts_object_t *) patcher, ac, at, e);
 
   fts_package_pop(template->package);
     
@@ -142,7 +142,7 @@ fts_template_recompute_instances(fts_template_t *template)
   fts_list_t* list;
 
 #ifdef TEMPLATE_DEBUG 
-  fts_log("Recomputing instances of template %s\n", fts_symbol_name(template->name)); /* @@@ */
+  fts_log("Recomputing instances of template %s\n", template->name); /* @@@ */
 #endif
 
   list = template->instances;
@@ -171,7 +171,7 @@ fts_template_add_instance(fts_template_t *template, fts_object_t *object)
   template->instances = fts_list_prepend(template->instances, a);
        
 #ifdef TEMPLATE_DEBUG 
-  fts_log("Adding instance to template %s : \n", fts_symbol_name(template->filename)); /* @@@ */
+  fts_log("Adding instance to template %s : \n", template->filename); /* @@@ */
 #endif
 }
 
@@ -184,7 +184,7 @@ fts_template_remove_instance(fts_template_t *template, fts_object_t *object)
   template->instances = fts_list_remove(template->instances, a);
 
 #ifdef TEMPLATE_DEBUG 
-  fts_log("Removing instance from template %s : \n", fts_symbol_name(template->filename)); 
+  fts_log("Removing instance from template %s : \n", template->filename); 
 #endif
 }
 
@@ -275,11 +275,11 @@ fts_template_file_modified(fts_symbol_t filename)
 
   /* resolve the links in the path, so that we have a unique name 
      for the file */
-  realpath(fts_symbol_name(filename), buf);
+  realpath( filename, buf);
   filename = fts_new_symbol_copy(buf);
 
 #ifdef TEMPLATE_DEBUG 
-  fts_log("File %s modified.\n", fts_symbol_name(filename));
+  fts_log("File %s modified.\n", filename);
 #endif
 
   fts_get_packages( &pkg_iter);

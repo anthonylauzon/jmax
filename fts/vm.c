@@ -306,7 +306,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    s  = symbol_table[GET_B(p)];
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_SYM_B %d (%s)\n", GET_B(p), fts_symbol_name(s));
+	    fprintf(stderr, "PUSH_SYM_B %d (%s)\n", GET_B(p), s);
 #endif
 
 	    eval_tos--;
@@ -324,7 +324,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    s  = symbol_table[GET_S(p)];
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_SYM_S %s\n", fts_symbol_name(s));
+	    fprintf(stderr, "PUSH_SYM_S %s\n", s);
 #endif
 
 	    eval_tos--;
@@ -342,7 +342,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    s  = symbol_table[GET_L(p)];
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_SYM_L %s\n", fts_symbol_name(s));
+	    fprintf(stderr, "PUSH_SYM_L %s\n", s);
 #endif
 
 	    eval_tos--;
@@ -755,7 +755,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    prop = symbol_table[GET_B(p)];
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUT_PROP_B %s\n", fts_symbol_name(prop));
+	    fprintf(stderr, "PUT_PROP_B %s\n", prop);
 #endif
 
 	    fts_object_put_prop(object_stack[object_tos], prop, &eval_stack[eval_tos]);
@@ -772,7 +772,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    prop = symbol_table[GET_S(p)];
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUT_PROP_S %s\n", fts_symbol_name(prop));
+	    fprintf(stderr, "PUT_PROP_S %s\n", prop);
 #endif
 	    fts_object_put_prop(object_stack[object_tos], prop, &eval_stack[eval_tos]);
 	    p += 2;
@@ -788,7 +788,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    prop = symbol_table[GET_L(p)];
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUT_PROP_S %s\n", fts_symbol_name(prop));
+	    fprintf(stderr, "PUT_PROP_S %s\n", prop);
 #endif
 
 	    fts_object_put_prop(object_stack[object_tos], prop, &eval_stack[eval_tos]);
@@ -812,7 +812,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    p += 4;
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "OBJ_MESS %d %s %d\n", inlet, fts_symbol_name(sel), nargs);
+	    fprintf(stderr, "OBJ_MESS %d %s %d\n", inlet, sel, nargs);
 #endif
 
 	    fts_send_message(object_stack[object_tos], inlet, sel, nargs, &eval_stack[eval_tos]);

@@ -108,21 +108,21 @@ FTS_API int __fts_stack_realloc( fts_stack_t *b);
 /**
  * Get the content of a stack
  * 
- * @fn void *fts_stack_get_ptr( b)
+ * @fn void *fts_stack_get_base( b)
  * @param b the stack
  * @return a pointer to the current content of the stack
  * @ingroup stack
  */
-#define fts_stack_get_ptr(B) ((B)->buffer)
+#define fts_stack_get_base(B) ((B)->buffer)
 
 /**
  * Get the number of elements in a stack
  * 
- * @fn int fts_stack_get_size( b)
+ * @fn int fts_stack_get_top( b)
  * @param b the stack
  * @return the number of elements
  * @ingroup array
  */
-#define fts_stack_get_size(B) ((B)->top)
+#define fts_stack_get_top(B) ((B)->top)
 
 #endif

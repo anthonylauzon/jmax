@@ -1,0 +1,203 @@
+
+Below is a first description of the new implementation of packages/projects
+handling in FTS.
+
+
+1 - What is a package/project ?
+
+I don't want to write "formal" definitions, just to point out a few things.
+
+A package is a collection of ressources used to extend jMax (FTS or GUI).
+It contains:
+ - dependencies (require) 
+ - a shared library defining FTS classes
+ - declared templates 
+ - declared abstractions
+ - data files (sound files, parameter files, ...) 
+ - declaration of template and data sub-directories
+ - Java classes
+ - resources (images, ...)
+ - help patches
+
+A project is a package, more or less like any other, that contains the
+user ressources. The only difference that I would like to emphasize is
+that a project cannot load a shared library or Java classes.
+
+From now on, I will use package for both packages and projects.
+
+
+2 - General architecture
+
+The principle of the new implementation is that a package is loaded 
+independently by each component (FTS or client) of jMax and that each 
+component maintains its view of a package.
+
+The package definition is component dependant: there will not be a
+unique package definition file that contains all the informations for
+all the possible clients (for FTS, the package definition file
+is a patch file). 
+
+Many definitions will use conventions, in particular conventions
+on file and directory names.
+
+One important evolution w.r.t. the current system is that all 
+name resolution mechanisms (i.e. finding the class definition
+associated with an object name, finding the template file
+associated with a template name, ...) will be local to a package.
+In the current implementation, all resolution mechanisms use
+global variables, with some erroneous side effect. 
+
+An example of this side effect: the following situation works with the current
+implementation:
+ - .jmaxrc contains "package require B"
+ - project.env contains "package require A"
+ - a template of package A uses objects defined in B
+ - package A does not contain a "package require B"
+
+If you omit the 'package require B' in the .jmaxrc, this will of
+course not work
+
+This situation will not in the new implementation, because resolution of templates
+referenced inside package A will only use the search path of 
+package A (which is empty if A does not require any other package).
+(Note: this has interesting consequences when loading or editing
+a help patch...)
+
+Example:
+package A -+- package B --- package D
+           |
+           +- package C
+
+In package A, only classes defined by packages B and C are known.
+Classes defined by D are not known.
+
+One important consequence for the implementation is that every resource
+(class, template, ...) must contain a reference to its package.
+
+
+3 - Package directories and files
+
+Of course, as now, a package is contained in a directory which
+name is the name of the package.
+
+A package directory must follow a standard structure. Here is
+what is proposed, based on the existing:
+ - c/lib<PACKAGE_NAME>.so (Unix) or c/<PACKAGE_NAME>.DLL (Windows) : the dynamic library 
+ - java/<PACKAGE_NAME>.jar : java archive of Java classes
+ - abs : subdirectories for abstractions
+ - template : subdirectory for templates
+ - help : subdirectory for help files
+ - data : subdirectory for data files
+
+We can either 1) make the use of this structure mandatory (for instance by not providing 
+to the user a way to load a dynamic library) or 2) recommend this structure as
+the standard but provide escape mechanisms.
+In any case, package loading will automatically recognize the standard structure
+and process it without further user's intervention (such as writing a package
+definition file). This way, most of the current packages will not require any
+definition file at all.
+
+The directories holding sources are not part of the requirement. However, the
+provided package templates will use:
+ - c/src : sources of the objects
+ - java/src : sources of the Java code (with subdirectories for Java packages)
+
+
+4 - Package definition in FTS
+
+A package will be defined by a patch containing special objects.
+These objects do not trigger by themselves the associated action,
+but just add their arguments to the corresponding entry in the fts_package_t 
+structure (see below for explaination).
+
+Objects:
+ - require <PACKAGE_1> <PACKAGE_2> ...
+ - load <PATH> <LIBRARY NAME>  (PATH is a directory relative to package's root directory)
+ - template <NAME> <FILE> (FILE is a filename relative to package's root directory)
+ - abstraction <NAME> <FILE> (idem)
+ - help <NAME> <FILE> (idem)
+ - path <PATH_1> <PATH_2> ... (PATH_1, PATH_2 are directories relative to package's root directory)
+
+The "path" object is to be discussed: we have currently one path for abstractions,
+one path for templates and one path for data files, which would normally translate into
+3 objects: abstractionpath, templatepath, datapath. As the files do not have the
+same extension (.jmax for templates, .abs, .pat or nothing for abstractions, .snd, .aiff, etc
+for data files), we could use one single path for all files.
+
+
+5 - Package loading in FTS
+
+Package loading will be by necessity: the package will be loaded only when
+trying to resolve a name that is not currently defined.
+
+Because of the locality of name resolution previously described, every name
+resolution must occur within a context (which is a package). Instead of passing
+the package to all the functions that resolve a name (class, template, abstraction,
+doctor), it is proposed that to maintain a stack of packages is maintained
+and provide functions to access it ( push package, pop, get current).
+This stack is also used to prevent package require loops.
+
+The current object evaluation mechanism would become:
+
+fts_eval_object_description( ... )  // ... are the current arguments
+{
+  fts_eval_object_description_in_current_package( ...);  // this is the current function
+
+  for package in all_packages_required_by_current_package 
+    {
+      package_push( package);
+      fts_eval_object_description_in_current_package( ...);
+      package_pop();
+    }
+}
+
+
+Each component (class, abstraction, template, ...) that is loaded 
+with this mechanism keeps its loading context. This is used for instance
+to look for the help patch of an object or a template.
+
+
+6 - Package loading in Java
+
+A Java package will be defined by a Java class. The name of the class
+will be the capitalized name of the package. For instance, package 'guiobj'
+will be defined by a class named 'Guiobj'. This class must derive from 
+an abstract class "JMaxPackage".
+
+As a consequence, there will be no package file definition for Java,
+except the corresponding .class.
+
+The loading mechanism, for a package 'foo', will do the following:
+ - load the bytecode of class Foo from jar file java/classes/foo.jar
+ - if succeed, create an instance of this class
+ - call this class' "load" method (the equivalent of the method "init"
+of current class "JavaExtension")
+
+A priori, the reason for having the job done in a "load" method
+and not in the constructor is accessing the package's directory:
+this directory will be stored in a member of the class "JMaxPackage"
+and will be set after calling the constructor. The loading sequence
+will be:
+ JMaxPackage newPackage = packageClass.newInstance();
+ newPackage.setDirectory( packageDirectory);
+ newPackage.load();
+
+Another solution (the current one) is to store the package directory
+in another class ("PackageHandler").
+
+
+
+7 - Package searching and package path
+
+TO BE COMPLETED
+
+
+
+NOTES:
+ - fts_package_t can inherit from fts_patcher_t
+ - a patcher can be marked as package by setting its type (see fts_patcher_set_template)
+ - a path must be relative in a package, it can be absolute in a project (example: path /data/snd)
+ - big problem for file searching: ->conclusion: "a file is searched in all paths of all packages"
+
+
+

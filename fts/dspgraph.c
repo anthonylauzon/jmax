@@ -391,7 +391,7 @@ post_signals( fts_dsp_signal_t **sig, int n)
 
   for ( i = 0; i < n; i++)
     {
-      post( "%s[%d]", fts_symbol_name( sig->name), sig->length);
+      post( "%s[%d]", sig->name, sig->length);
       if ( i != n-1)
 	post( ",");
     }

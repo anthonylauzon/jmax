@@ -1,0 +1,9 @@
+
+Includes:
+
+Header files are divided into
+ - public headers in include/fts
+ - private headers in include/ftsprivate
+
+No header file does a #include of another header, except the toplevel
+header fts/fts.h. #include are done by .c files

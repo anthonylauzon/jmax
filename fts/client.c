@@ -47,7 +47,7 @@ int win_close(int socket)
 #define CLOSESOCKET  win_close
 #define READSOCKET(S,B,L) recv(S,B,L,0)
 #define WRITESOCKET(S,B,L) send(S,B,L,0)
-#define client_error(mess)  post("%s (error %d)\n", mess, WSAGetLastError())
+#define SOCKET_ERROR_MESSAGE (WSAGetLastError())
 
 typedef unsigned int socklen_t;
 typedef SOCKET socket_t;
@@ -78,9 +78,11 @@ typedef SOCKET socket_t;
 #define INVALID_PIPE -1
 #define SOCKET_ERROR -1
 typedef int socket_t;
-#define client_error(mess)  post("%s (%s)\n", mess, strerror( errno))
+#define SOCKET_ERROR_MESSAGE (strerror( errno))
 
 #endif
+
+#define client_error(mess)  post("%s (error %d)\n", mess, SOCKET_ERROR_MESSAGE)
 
 #include <string.h>
 #include <stdlib.h>
@@ -91,108 +93,10 @@ typedef int socket_t;
 #include "ftsprivate/client.h"
 #include "ftsprivate/protocol.h"
 
-static fts_symbol_t fts_s_client;
-static fts_symbol_t fts_s_socketstream;
-static fts_class_t *fts_socketstream_class = NULL;
-static fts_symbol_t fts_s_pipestream;
-
-/*
- * Client object
- * (the object that is created on new client connections)
- */
-typedef struct _client_t {
-  fts_object_t head;
-  fts_bytestream_t* stream;
-
-  /* Output buffer */
-  fts_stack_t send_sb;
-
-  /* Automata state */
-  unsigned char incoming;
-  int state;
-  int ival;
-
-  /* Input decoding */
-  fts_object_t *dest_object;
-  fts_symbol_t selector;
-  fts_stack_t receive_args;
-  fts_stack_t receive_sb;
-
-  /* Object table */
-  fts_hashtable_t object_table;
-
-  /* Client id */
-  int client_id;
-
-  /* Root patcher */
-  fts_object_t *root_patcher;
-} client_t;
-
-/*
- * client_manager object
- * (the object that listens for client connections) 
- */
-typedef struct {
-  fts_object_t head;
-  socket_t socket;
-} client_manager_t;
-
-/* Client table */
-static fts_hashtable_t client_table;
-static int new_client_id = 1;
-
-/*
- * socketstream
- * (the object that implements the bidirectional byte stream over a TCP/IP socket) 
- */
-
-struct _fts_socketstream_t
-{
-  fts_bytestream_t bytestream;
-  socket_t socket;
-};
-
-typedef struct _fts_socketstream_t fts_socketstream_t;
-
-static fts_status_t fts_socketstream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
-static void fts_socketstream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void fts_socketstream_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void fts_socketstream_receive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void fts_socketstream_output(fts_bytestream_t *stream, int n, const unsigned char *c);
-static void fts_socketstream_output_char(fts_bytestream_t *stream, unsigned char c);
-static void fts_socketstream_flush(fts_bytestream_t *stream);
-
-
-/*
- * pipestream
- *
- * The pipe stream object implements the byte stream over pipes. On
- * it's creation it takes the stdin and stdout of the FTS process the
- * input/output. The FTS stdout is redirected to a file.
- */
-
-struct _fts_pipestream_t
-{
-  fts_bytestream_t bytestream;
-#ifdef WIN32
-  HANDLE in;
-  HANDLE out;
-#else
-  int in;
-  int out;
-#endif
-};
-
-typedef struct _fts_pipestream_t fts_pipestream_t;
-
-static fts_status_t fts_pipestream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
-static void fts_pipestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void fts_pipestream_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void fts_pipestream_receive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void fts_pipestream_output(fts_bytestream_t *stream, int n, const unsigned char *c);
-static void fts_pipestream_output_char(fts_bytestream_t *stream, unsigned char c);
-static void fts_pipestream_flush(fts_bytestream_t *stream);
-static void fts_pipestream_receive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+/* Forward decls */
+typedef struct _client_t client_t;
+static fts_symbol_t s_client;
+static fts_symbol_t s_client_manager;
 
 /***********************************************************************
  *
@@ -200,38 +104,43 @@ static void fts_pipestream_receive(fts_object_t *o, int winlet, fts_symbol_t s, 
  *
  */
 
-static void client_table_put( int id, client_t *client)
-{
-  fts_atom_t k, v;
+static fts_stack_t client_table;
 
-  fts_set_int( &k, id);
-  fts_set_ptr( &v, client);
-  fts_hashtable_put( &client_table, &k, &v);
+static int client_table_add( client_t *client)
+{
+  fts_stack_push( &client_table, client_t *, client);
+
+  return fts_stack_get_top( &client_table) - 1;
 }
 
-static client_t *client_table_get( int id)
-{
-  fts_atom_t k, v;
-
-  fts_set_int( &k, id);
-  fts_hashtable_get( &client_table, &k, &v);
-
-  return (client_t *)fts_get_ptr( &v);
-}
+#define client_table_get(ID) ((client_t **)fts_stack_get_base( &client_table))[(ID)]
 
 static void client_table_remove( int id)
 {
-  fts_atom_t k, v;
-
-  fts_set_int( &k, id);
-  fts_hashtable_remove( &client_table, &k);
+  ((client_t **)fts_stack_get_base( &client_table))[id] = 0;
 }
+
+static void client_table_init( void)
+{
+  fts_stack_init( &client_table, client_t *);
+
+  client_table_add( 0); /* so that first client will have id 1 */
+}
+
 
 /***********************************************************************
  *
  * client_manager object
+ * (the object that listens for client connections) 
  *
  */
+
+typedef struct {
+  fts_object_t head;
+  socket_t socket;
+  fts_class_t *socketstream_class;
+} client_manager_t;
+
 
 static void client_manager_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -250,9 +159,9 @@ static void client_manager_select( fts_object_t *o, int winlet, fts_symbol_t s, 
     }
 
   fts_set_int( argv, new_socket);
-  socket_stream = fts_object_create(fts_socketstream_class, 1, argv);
+  socket_stream = fts_object_create( this->socketstream_class, 1, argv);
 
-  fts_set_symbol( argv, fts_s_client);
+  fts_set_symbol( argv, s_client);
   fts_set_object( argv+1, socket_stream);
 
   fts_object_new_to_patcher( fts_get_root_patcher(), 3, argv, (fts_object_t **)&client_object);
@@ -312,6 +221,8 @@ static void client_manager_init( fts_object_t *o, int winlet, fts_symbol_t s, in
 
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
 
+  this->socketstream_class = fts_class_get_by_name( fts_new_symbol("socketstream"));
+
   fts_log( "[client]: Listening on port %d\n", port);
 }
 
@@ -339,278 +250,584 @@ static fts_status_t client_manager_instantiate(fts_class_t *cl, int ac, const ft
 
 /***********************************************************************
  *
- *  client object
+ * client object (the object that is created on new client connections)
  *
  */
 
-/***********************************************************************
- * 
- * Messages to client
- *
+typedef void (*transition_action_t)( unsigned char input, void *data);
+typedef struct _state_t state_t;
+
+typedef struct _transition_t {
+  unsigned char input;
+  state_t *target_state;
+  transition_action_t action;
+  struct _transition_t *next;
+} transition_t;
+
+struct _state_t {
+  const char *name;
+  transition_t *transition;
+  transition_t *default_transition;
+};
+
+#define SYMBOL_CACHE_SIZE 512
+
+typedef struct {
+  int length;
+  fts_symbol_t *symbols;
+} symbol_cache_t;
+
+/* The protocol decoder state */
+typedef struct {
+  fts_object_t head;
+  /* Automata state */
+  state_t *state;
+  /* Input decoding */
+  int ival;
+  fts_stack_t args;
+  fts_stack_t buffer;
+  /* Symbol caches */
+  symbol_cache_t from_client_cache;
+  struct _client_t *client;
+} protocol_decoder_t;
+
+typedef struct {  
+  /* Output buffer */
+  fts_stack_t buffer;
+  /* Symbol caches */
+  symbol_cache_t to_client_cache;
+  fts_bytestream_t *stream;
+} protocol_encoder_t;
+
+struct _client_t {
+  fts_object_t head;
+  /* Client id */
+  int client_id;
+  /* Object table */
+  fts_hashtable_t object_table;
+  /* Root patcher */
+  fts_object_t *root_patcher;
+  /* Protocol stream */
+  fts_bytestream_t *stream;
+  /* Input protocol decoder */
+  protocol_decoder_t decoder;
+  /* Output protocol encoder */
+  protocol_encoder_t encoder;
+};
+
+/*----------------------------------------------------------------------
+ * Object table
+ */
+static void client_put_object( client_t *this, int id, fts_object_t *object)
+{
+  fts_atom_t k, v;
+
+  fts_set_int( &k, id);
+  fts_set_object( &v, object);
+  fts_hashtable_put( &this->object_table, &k, &v);
+}
+
+static fts_object_t *client_get_object( client_t *this, int id)
+{
+  fts_atom_t k, v;
+
+  fts_set_int( &k, id);
+
+  if ( !fts_hashtable_get( &this->object_table, &k, &v))
+    {
+      fprintf( stderr, "invalid object in protocol %d\n", id);
+      return 0;
+    }
+
+  return fts_get_object( &v);
+}
+
+/*----------------------------------------------------------------------
+ * Symbol cache
+ */
+static void symbol_cache_init( symbol_cache_t *cache)
+{
+  cache->length = SYMBOL_CACHE_SIZE;
+  cache->symbols = (fts_symbol_t *)fts_malloc( cache->length * sizeof( fts_symbol_t));
+}
+
+static void symbol_cache_destroy( symbol_cache_t *cache)
+{
+  fts_free( cache->symbols);
+}
+
+static void symbol_cache_put( symbol_cache_t *cache, fts_symbol_t s, int index)
+{
+  if (index >= cache->length)
+    cache->symbols = fts_realloc( cache->symbols, index+1);
+
+  cache->symbols[index] = s;
+}
+
+/*----------------------------------------------------------------------
+ * Binary protocol encoder
  */
 
-static void client_start_message( client_t *this)
+#define push_char(E,C) fts_stack_push( &(E)->buffer, unsigned char, (C))
+#define push_int(E,N) \
+	push_char(E, (unsigned char) (((N) >> 24) & 0xff)), \
+	push_char(E, (unsigned char) (((N) >> 16) & 0xff)), \
+	push_char(E, (unsigned char) (((N) >> 8) & 0xff)), \
+	push_char(E, (unsigned char) (((N) >> 0) & 0xff))
+
+static void protocol_encoder_write_int( protocol_encoder_t *encoder, int n)
 {
-  fts_stack_clear( &this->send_sb);
+  push_char( encoder, FTS_PROTOCOL_INT);
+  push_int( encoder, n);
 }
 
-/* Used by other functions */
-static void client_put( client_t *this, int n)
-{
-  fts_stack_push( &this->send_sb, unsigned char, (unsigned char) ((n >> 24) & 0xff));
-  fts_stack_push( &this->send_sb, unsigned char, (unsigned char) ((n >> 16) & 0xff));
-  fts_stack_push( &this->send_sb, unsigned char, (unsigned char) ((n >> 8) & 0xff));
-  fts_stack_push( &this->send_sb, unsigned char, (unsigned char) ((n >> 0) & 0xff));
-}
-
-static void client_put_int( client_t *this, int n)
-{
-  fts_stack_push( &this->send_sb, unsigned char, FTS_PROTOCOL_INT);
-  client_put( this, n);
-}
-
-static void client_put_float( client_t *this, float value)
+static void protocol_encoder_write_float( protocol_encoder_t *encoder, float value)
 {
   float f = value;
 
-  fts_stack_push( &this->send_sb, unsigned char, FTS_PROTOCOL_FLOAT);
-  client_put( this, *((unsigned int *)&f));
+  push_char( encoder, FTS_PROTOCOL_FLOAT);
+  push_int( encoder, *((unsigned int *)&f));
 }
 
-static void client_put_symbol( client_t *this, fts_symbol_t s)
+static void protocol_encoder_write_symbol( protocol_encoder_t *encoder, fts_symbol_t s)
 {
-  const char *p = fts_symbol_name( s);
+  int index;
+  symbol_cache_t *cache = &encoder->to_client_cache;
 
-  fts_stack_push( &this->send_sb, unsigned char, FTS_PROTOCOL_STRING);
+  index = (int)s % cache->length;
 
-  while (*p)
-    fts_stack_push( &this->send_sb, unsigned char, (unsigned char)*p++);
+  if (cache->symbols[index] == s)
+    {
+      /* just send the index */
+      push_char( encoder, FTS_PROTOCOL_SYMBOL_INDEX);
+      push_int( encoder, index);
+    }
+  else 
+    {
+      const char *p = s;
 
-  fts_stack_push( &this->send_sb, unsigned char, FTS_PROTOCOL_STRING_END);
+      cache->symbols[index] = s;
+
+      /* send both the cache index and the symbol */
+      push_char( encoder, FTS_PROTOCOL_SYMBOL_CACHE);
+      push_int( encoder, index);
+
+      while (*p)
+	push_char( encoder, (unsigned char)*p++);
+
+      push_char( encoder, 0);
+    }
 }
 
-static void client_put_object( client_t *this, fts_object_t *obj)
+static void protocol_encoder_string( protocol_encoder_t *encoder, const char *s)
 {
-  fts_stack_push( &this->send_sb, unsigned char, FTS_PROTOCOL_OBJECT);
-  client_put( this, OBJECT_ID_OBJ( fts_object_get_id( obj)));
+  push_char( encoder, FTS_PROTOCOL_STRING);
+
+  while (*s)
+    push_char( encoder, (unsigned char)*s++);
+
+  push_char( encoder, 0);
 }
 
-static void client_put_atoms( client_t *this, int ac, const fts_atom_t *at)
+static void protocol_encoder_write_object( protocol_encoder_t *encoder, fts_object_t *obj)
+{
+  push_char( encoder, FTS_PROTOCOL_OBJECT);
+  push_int( encoder, OBJECT_ID_OBJ( fts_object_get_id( obj)));
+}
+
+static void protocol_encoder_write_atoms( protocol_encoder_t *encoder, int ac, const fts_atom_t *at)
 {
   while (ac--)
     {
       if ( fts_is_int( at))
-	client_put_int( this, fts_get_int( at));
+	protocol_encoder_write_int( encoder, fts_get_int( at));
       else if ( fts_is_float( at))
-	client_put_float( this, fts_get_float( at));
+	protocol_encoder_write_float( encoder, fts_get_float( at));
       else if ( fts_is_symbol( at))
-	client_put_symbol( this, fts_get_symbol( at));
+	protocol_encoder_write_symbol( encoder, fts_get_symbol( at));
       else if ( fts_is_object( at))
-	client_put_object( this, fts_get_object( at));
+	protocol_encoder_write_object( encoder, fts_get_object( at));
 
       at++;
     }
 }
 
-static int client_end_message( client_t *this)
+static int protocol_encoder_flush( protocol_encoder_t *encoder)
 {
-  fts_stack_push( &this->send_sb, unsigned char, FTS_PROTOCOL_END_OF_MESSAGE);
+  push_char( encoder, FTS_PROTOCOL_END_OF_MESSAGE);
   
-  fts_bytestream_output( this->stream, fts_stack_get_size( &this->send_sb), fts_stack_get_ptr( &this->send_sb));
+  fts_bytestream_output( encoder->stream, fts_stack_get_top( &encoder->buffer), fts_stack_get_base( &encoder->buffer));
+
+  fts_stack_clear( &encoder->buffer);
 
   return 0;
 }
 
+static void protocol_encoder_init( protocol_encoder_t *encoder, fts_bytestream_t *stream)
+{
+  fts_stack_init( &encoder->buffer, unsigned char);
+  symbol_cache_init( &encoder->to_client_cache);
+  encoder->stream = stream;
+}
 
-/***********************************************************************
- * 
+static void protocol_encoder_destroy( protocol_encoder_t *encoder)
+{
+  fts_stack_destroy( &encoder->buffer);
+  symbol_cache_destroy( &encoder->to_client_cache);
+}
+
+/*----------------------------------------------------------------------
  * Finite state automata for protocol decoding
- *
  */
 
-static void a_end_dest_object( client_t *this)
+static transition_t *transition_new( unsigned char input, state_t *target_state, transition_action_t action, transition_t *next)
 {
-  fts_atom_t k, v;
+  transition_t *t = (transition_t *)fts_malloc( sizeof( transition_t));
+  t->input = input;
+  t->target_state = target_state;
+  t->action = action;
+  t->next = next;
+  return t;
+}
 
-  this->ival = (this->ival << 8) | this->incoming;
+static state_t *state_new( const char *name)
+{
+  state_t *s = (state_t *)fts_malloc( sizeof( state_t));
+  s->name = name;
+  s->transition = 0;
+  s->default_transition = 0;
+  return s;
+}
 
-  fts_set_int( &k, this->ival);
-  if ( !fts_hashtable_get( &this->object_table, &k, &v))
+static void state_add_transition( state_t *state, unsigned char input, state_t *target_state, transition_action_t action)
+{
+  state->transition = transition_new( input, target_state, action, state->transition);
+}
+
+static void state_add_default_transition( state_t *state, state_t *target_state, transition_action_t action)
+{
+  state->default_transition = transition_new( 0, target_state, action, 0);
+}
+
+static state_t *state_next( state_t *state, unsigned char input, void *data)
+{
+  transition_t *transition = state->transition;
+
+  while (transition)
     {
-      fprintf( stderr, "invalid object in protocol %d\n", this->ival);
-      return;
+      if (transition->input == input)
+	{
+	  (*transition->action)( input, data);
+	  return transition->target_state;
+	}
+
+      transition = transition->next;
     }
 
-  this->dest_object = fts_get_object( &v);
+  if (state->default_transition)
+    {
+      (*state->default_transition->action)( input, data);
+      return state->default_transition->target_state;
+    }
+
+  return 0;
 }
 
-static void a_end_selector( client_t *this)
-{
-  fts_stack_push( &this->receive_sb, unsigned char, '\0');
+/*----------------------------------------------------------------------
+ * Protocol decoding
+ */
 
-  this->selector = fts_new_symbol_copy( fts_stack_get_ptr( &this->receive_sb));
+/* Actions */
+
+static void clear_action( unsigned char input, void *data)
+{
+  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
+
+  decoder->ival = 0;
 }
 
-static void a_end_int_arg( client_t *this)
+static void shift_action( unsigned char input, void *data)
 {
+  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
+
+  decoder->ival = decoder->ival << 8 | input;
+}
+
+static void buffer_clear_action( unsigned char input, void *data)
+{
+  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
+
+  fts_stack_clear( &decoder->buffer);
+}
+
+static void buffer_shift_action( unsigned char input, void *data)
+{
+  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
+
+  fts_stack_push( &decoder->buffer, unsigned char, input);
+}
+
+static void end_int_action( unsigned char input, void *data)
+{
+  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
   fts_atom_t a;
 
-  this->ival = (this->ival << 8) | this->incoming;
-  fts_set_int( &a, this->ival);
-  fts_stack_push( &this->receive_args, fts_atom_t, a);
+  decoder->ival = (decoder->ival << 8) | input;
+  fts_set_int( &a, decoder->ival);
+  fts_stack_push( &decoder->args, fts_atom_t, a);
 } 
 
-static void a_end_float_arg( client_t *this)
+static void end_float_action( unsigned char input, void *data)
 {
+  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
   fts_atom_t a;
 
-  this->ival = (this->ival << 8) | this->incoming;
-  fts_set_float( &a, *((float *)&this->ival));
-  fts_stack_push( &this->receive_args, fts_atom_t, a);
+  decoder->ival = (decoder->ival << 8) | input;
+  fts_set_float( &a, *((float *)&decoder->ival));
+  fts_stack_push( &decoder->args, fts_atom_t, a);
 }
 
-static void a_end_string_arg( client_t *this)
+static void end_symbol_index_action( unsigned char input, void *data)
 {
+  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
   fts_atom_t a;
 
-  fts_stack_push( &this->receive_sb, unsigned char, '\0');
-  fts_set_symbol( &a, fts_new_symbol_copy( fts_stack_get_ptr( &this->receive_sb)));
-  fts_stack_push( &this->receive_args, fts_atom_t, a);
+  decoder->ival = (decoder->ival << 8) | input;
+  fts_set_symbol( &a, decoder->from_client_cache.symbols[ decoder->ival]);
+  fts_stack_push( &decoder->args, fts_atom_t, a);
 }
 
-static void a_end_object_arg( client_t *this)
+static void end_symbol_cache_action( unsigned char input, void *data)
 {
-  fts_atom_t k, v;
+  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
+  fts_symbol_t s = fts_new_symbol_copy( fts_stack_get_base( &decoder->buffer));
+  fts_atom_t a;
+
+  symbol_cache_put( &decoder->from_client_cache, s, decoder->ival);
+  fts_set_symbol( &a, s);
+  fts_stack_push( &decoder->args, fts_atom_t, a);
+}
+
+static void end_string_action( unsigned char input, void *data)
+{
+  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
+  fts_atom_t a;
+
+  fts_stack_push( &decoder->buffer, unsigned char, '\0');
+  fts_set_symbol( &a, fts_new_symbol_copy( fts_stack_get_base( &decoder->buffer)));
+  fts_stack_push( &decoder->args, fts_atom_t, a);
+}
+
+static void end_object_action( unsigned char input, void *data)
+{
+  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
   fts_object_t *obj = 0;
+  fts_atom_t v;
 
-  this->ival = (this->ival << 8) | this->incoming;
-
-  fts_set_int( &k, this->ival);
-  if ( !fts_hashtable_get( &this->object_table, &k, &v))
-    {
-      fprintf( stderr, "invalid object in protocol %d\n", this->ival);
-      return;
-    }
-
-  fts_stack_push( &this->receive_args, fts_atom_t, v);
+  decoder->ival = (decoder->ival << 8) | input;
+  obj = client_get_object( decoder->client, decoder->ival);
+  fts_set_object( &v, obj);
+  fts_stack_push( &decoder->args, fts_atom_t, v);
 }
 
-static void a_end_message( client_t *this)
+static void end_message_action( unsigned char input, void *data)
 {
+  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
+  fts_object_t *target;
+  fts_symbol_t selector;
   int argc;
   fts_atom_t *argv;
 
-  argc = fts_stack_get_size( &this->receive_args);
-  argv = (fts_atom_t *)fts_stack_get_ptr( &this->receive_args);
+  argc = fts_stack_get_top( &decoder->args);
+  argv = (fts_atom_t *)fts_stack_get_base( &decoder->args);
+  target = fts_get_object( argv);
+  selector = fts_get_symbol( argv+1);
+  argc -= 2;
+  argv += 2;
 
-  fts_log( "[client]: Received message dest=0x%x selector=%s args=", this->dest_object, fts_symbol_name(this->selector));
+  fts_log( "[client]: Received message dest=0x%x selector=%s args=", target, selector);
   fts_log_atoms( argc, argv);
   fts_log( "\n");
 
   /* Client messages are sent to the system inlet */
-  if (this->dest_object)
-    fts_send_message( this->dest_object, fts_SystemInlet, this->selector, argc, argv);
+  if (target)
+    fts_send_message( target, fts_SystemInlet, selector, argc, argv);
 
-  fts_stack_clear( &this->receive_args);
-
-  this->dest_object = 0;
+  fts_stack_clear( &decoder->args);
 }
 
-static void a_protocol_error( client_t *this)
+static void protocol_error_action( unsigned char input, void *data)
 {
-  fprintf( stderr, "Protocol error: state %d incoming %d\n", this->state, this->incoming);
+  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
+
+  fprintf( stderr, "Protocol error: state %s incoming %d\n", decoder->state->name, input);
 }
 
+static state_t *build_state_machine( void)
+{
+  static state_t *state_machine_single_instance = 0;
+
+  state_t *q_initial;
+
+  state_t *q_int0;
+  state_t *q_int1;
+  state_t *q_int2;
+  state_t *q_int3;
+
+  state_t *q_float0;
+  state_t *q_float1;
+  state_t *q_float2;
+  state_t *q_float3;
+
+  state_t *q_string;
+
+  state_t *q_object0;
+  state_t *q_object1;
+  state_t *q_object2;
+  state_t *q_object3;
+
+  state_t *q_symbol_index0;
+  state_t *q_symbol_index1;
+  state_t *q_symbol_index2;
+  state_t *q_symbol_index3;
+
+  state_t *q_symbol_cache0;
+  state_t *q_symbol_cache1;
+  state_t *q_symbol_cache2;
+  state_t *q_symbol_cache3;
+  state_t *q_symbol_cache4;
+
+  if (state_machine_single_instance)
+    return state_machine_single_instance;
+
+  q_initial = state_new( "Initial");
+
+  q_int0 = state_new( "Int0");
+  q_int1 = state_new( "Int1");
+  q_int2 = state_new( "Int2");
+  q_int3 = state_new( "Int3");
+
+  q_float0 = state_new( "Float0");
+  q_float1 = state_new( "Float1");
+  q_float2 = state_new( "Float2");
+  q_float3 = state_new( "Float3");
+
+  q_string = state_new( "String");
+
+  q_object0 = state_new( "Object0");
+  q_object1 = state_new( "Object1");
+  q_object2 = state_new( "Object2");
+  q_object3 = state_new( "Object3");
+
+  q_symbol_index0 = state_new( "SymbolIndex0");
+  q_symbol_index1 = state_new( "SymbolIndex1");
+  q_symbol_index2 = state_new( "SymbolIndex2");
+  q_symbol_index3 = state_new( "SymbolIndex3");
+
+  q_symbol_cache0 = state_new( "SymbolCache0");
+  q_symbol_cache1 = state_new( "SymbolCache1");
+  q_symbol_cache2 = state_new( "SymbolCache2");
+  q_symbol_cache3 = state_new( "SymbolCache3");
+  q_symbol_cache4 = state_new( "SymbolCache4");
+
+  state_add_transition( q_initial, FTS_PROTOCOL_INT, q_int0, clear_action);
+  state_add_transition( q_initial, FTS_PROTOCOL_FLOAT, q_float0, clear_action);
+  state_add_transition( q_initial, FTS_PROTOCOL_SYMBOL_INDEX, q_symbol_index0, clear_action);
+  state_add_transition( q_initial, FTS_PROTOCOL_SYMBOL_CACHE, q_symbol_cache0, clear_action);
+  state_add_transition( q_initial, FTS_PROTOCOL_STRING, q_string, buffer_clear_action);
+  state_add_transition( q_initial, FTS_PROTOCOL_OBJECT, q_object0, clear_action);
+  state_add_transition( q_initial, FTS_PROTOCOL_END_OF_MESSAGE, q_initial, end_message_action);
+
+  state_add_default_transition( q_int0, q_int1, shift_action);
+  state_add_default_transition( q_int1, q_int2, shift_action);
+  state_add_default_transition( q_int2, q_int3, shift_action);
+  state_add_default_transition( q_int3, q_initial, end_int_action);
+
+  state_add_default_transition( q_float0, q_float1, shift_action);
+  state_add_default_transition( q_float1, q_float2, shift_action);
+  state_add_default_transition( q_float2, q_float3, shift_action);
+  state_add_default_transition( q_float3, q_initial, end_float_action);
+
+  state_add_default_transition( q_symbol_index0, q_symbol_index1, shift_action);
+  state_add_default_transition( q_symbol_index1, q_symbol_index2, shift_action);
+  state_add_default_transition( q_symbol_index2, q_symbol_index3, shift_action);
+  state_add_default_transition( q_symbol_index3, q_initial, end_symbol_index_action);
+
+  state_add_default_transition( q_symbol_cache0, q_symbol_cache1, shift_action);
+  state_add_default_transition( q_symbol_cache1, q_symbol_cache2, shift_action);
+  state_add_default_transition( q_symbol_cache2, q_symbol_cache3, shift_action);
+  state_add_default_transition( q_symbol_cache3, q_symbol_cache4, shift_action);
+  state_add_transition( q_symbol_cache4, 0, q_initial, end_symbol_cache_action);
+  state_add_default_transition( q_symbol_cache4, q_symbol_cache4, buffer_shift_action);
+
+  state_add_transition( q_string, 0, q_initial, end_string_action);
+  state_add_default_transition( q_string, q_string, buffer_shift_action);
+
+  state_add_default_transition( q_object0, q_object1, shift_action);
+  state_add_default_transition( q_object1, q_object2, shift_action);
+  state_add_default_transition( q_object2, q_object3, shift_action);
+  state_add_default_transition( q_object3, q_initial, end_object_action);
+
+  state_machine_single_instance = q_initial;
+
+  return state_machine_single_instance;
+}
+
+static void protocol_decoder_run(  protocol_decoder_t *decoder, int size, const unsigned char *buffer)
+{
+  int i;
+
+  for ( i = 0; i < size; i++)
+    {
+      decoder->state = state_next( decoder->state, buffer[i], decoder);
+      if (decoder->state == 0)
+	fts_log( "[client] protocol error\n");
+    }
+}
+
+static void protocol_decoder_init( protocol_decoder_t *decoder, client_t *client)
+{
+  decoder->state = 0;
+  decoder->ival = 0;
+
+  fts_stack_init( &decoder->args, fts_atom_t);
+  fts_stack_init( &decoder->buffer, unsigned char);
+
+  decoder->client = client;
+  decoder->state = build_state_machine();
+}
+
+static void protocol_decoder_destroy( protocol_decoder_t *decoder)
+{
+  fts_stack_destroy( &decoder->args);
+  fts_stack_destroy( &decoder->buffer);
+}
+
+/*----------------------------------------------------------------------
+ * Client object methods
+ */
+
+/* Bytestream listener */
 static void client_receive( fts_object_t *o, int size, const unsigned char* buffer)
 {
   client_t *this = (client_t *)o;
-  int i;
 
   if ( size < 0)
     {
-      client_error( "[client]: Error in reading message, client stopped");
-      fts_log( "[client]: Error in reading message, client stopped\n");
+      client_error( "[client] error in reading message, client stopped");
+      fts_log( "[client] error in reading message, client stopped\n");
       fts_object_delete_from_patcher( (fts_object_t *)this);
       return;
     }
   else if (size == 0)
     {
-      fts_log( "[client]: Client stopped\n");
+      fts_log( "[client] client stopped\n");
       fts_object_delete_from_patcher( (fts_object_t *)this);
       return;
     }
 
-  for ( i = 0; i < size; i++)
-    {
-      this->incoming = buffer[i];
-
-#define MOVE( VALUE, STATE, ACTION) if ( this->incoming==(VALUE)) { this->state = STATE; ACTION; break; }
-#define UMOVE( STATE, ACTION) this->state = STATE; ACTION; break;
-
-      switch( this->state) {
-      case 0:
-	MOVE( FTS_PROTOCOL_OBJECT, 1, this->ival = 0);
-	UMOVE( 0, a_protocol_error( this));
-      case 1:
-	UMOVE( 2, this->ival = this->ival << 8 | this->incoming);
-      case 2:
-	UMOVE( 3, this->ival = this->ival << 8 | this->incoming);
-      case 3:
-	UMOVE( 4, this->ival = this->ival << 8 | this->incoming);
-      case 4:
-	UMOVE( 5, a_end_dest_object(this) );
-      case 5:
-	MOVE( FTS_PROTOCOL_STRING, 6, fts_stack_clear( &this->receive_sb));
-	UMOVE( 0, a_protocol_error(this) );
-      case 6:
-	MOVE( FTS_PROTOCOL_STRING_END, 10, a_end_selector( this));
-	UMOVE( 6, fts_stack_push( &this->receive_sb, unsigned char, this->incoming) );
-      case 10:
-	MOVE( FTS_PROTOCOL_INT, 20, this->ival = 0);
-	MOVE( FTS_PROTOCOL_FLOAT, 30, this->ival = 0);
-	MOVE( FTS_PROTOCOL_STRING, 40, fts_stack_clear( &this->receive_sb));
-	MOVE( FTS_PROTOCOL_OBJECT, 50, this->ival = 0);
-	MOVE( FTS_PROTOCOL_END_OF_MESSAGE, 0, a_end_message(this));
-	UMOVE( 0, a_protocol_error( this));
-      case 20:
-	UMOVE( 21, this->ival = this->ival << 8 | this->incoming);
-      case 21:
-	UMOVE( 22, this->ival = this->ival << 8 | this->incoming);
-      case 22:
-	UMOVE( 23, this->ival = this->ival << 8 | this->incoming);
-      case 23:
-	UMOVE( 10, a_end_int_arg(this) );
-      case 30:
-	UMOVE( 31, this->ival = this->ival << 8 | this->incoming);
-      case 31:
-	UMOVE( 32, this->ival = this->ival << 8 | this->incoming);
-      case 32:
-	UMOVE( 33, this->ival = this->ival << 8 | this->incoming);
-      case 33:
-	UMOVE( 10, a_end_float_arg(this) );
-      case 40:
-	MOVE( FTS_PROTOCOL_STRING_END, 10, a_end_string_arg( this));
-	UMOVE( 40, fts_stack_push( &this->receive_sb, unsigned char, this->incoming) );
-      case 50:
-	UMOVE( 51, this->ival = this->ival << 8 | this->incoming);
-      case 51:
-	UMOVE( 52, this->ival = this->ival << 8 | this->incoming);
-      case 52:
-	UMOVE( 53, this->ival = this->ival << 8 | this->incoming);
-      case 53:
-	UMOVE( 10, a_end_object_arg( this));
-      default:
-	fprintf( stderr, "dans un drôle d'état %d\n", this->state);
-	break;
-      }
-    }
+  protocol_decoder_run( &this->decoder, size, buffer);
 }
-
-/***********************************************************************
- * 
- * Client object methods
- *
- */
 
 static void client_new_object( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -618,7 +835,6 @@ static void client_new_object( fts_object_t *o, int winlet, fts_symbol_t s, int 
   int id;
   fts_object_t *parent;
   fts_object_t *newobj;
-  fts_atom_t k, v;
 
   parent = fts_get_object_arg( ac, at, 0, 0);
   id = fts_get_int_arg( ac, at, 1, -1);
@@ -639,9 +855,7 @@ static void client_new_object( fts_object_t *o, int winlet, fts_symbol_t s, int 
       return;
     }
 
-  fts_set_int( &k, id);
-  fts_set_object( &v, newobj);
-  fts_hashtable_put( &this->object_table, &k, &v);
+  client_put_object( this, id, newobj);
 
   newobj->head.id = OBJECT_ID( id, this->client_id);
 }
@@ -695,18 +909,15 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   ac--;
   at++;
 
-  this->stream = (fts_bytestream_t*) fts_get_object_arg( ac, at, 0, NULL);
+  this->stream = (fts_bytestream_t *)fts_get_object_arg( ac, at, 0, NULL);
 
-  if (this->stream == NULL)
+  if (this->stream == NULL || !fts_bytestream_check( (fts_object_t *)this->stream) || !fts_bytestream_is_input( this->stream) || !fts_bytestream_is_output( this->stream))
     {
       fts_object_set_error( (fts_object_t *)this, "Invalid stream");
       return;
     }
 
-  fts_bytestream_add_listener(this->stream, (fts_object_t *) this, client_receive);
-
-  this->client_id = new_client_id++;
-  client_table_put( this->client_id, this);
+  this->client_id = client_table_add( this);
 
   fts_hashtable_init( &this->object_table, FTS_HASHTABLE_INT, FTS_HASHTABLE_MEDIUM);
 
@@ -735,13 +946,10 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   fts_set_object( &v, (fts_object_t *)this);
   fts_hashtable_put( &this->object_table, &k, &v);
 
-  fts_stack_init( &this->send_sb, unsigned char);
+  protocol_encoder_init( &this->encoder, this->stream);
+  protocol_decoder_init( &this->decoder, this);
 
-  this->state = 0;
-  this->dest_object = 0;
-  fts_stack_init( &this->receive_args, fts_atom_t);
-
-  fts_stack_init( &this->receive_sb, unsigned char);
+  fts_bytestream_add_listener(this->stream, (fts_object_t *) this, client_receive);
 
   fts_log( "[client]: Accepted client connection on socket\n");
 }
@@ -757,12 +965,12 @@ static void client_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
   client_table_remove( this->client_id);
 
-  fts_stack_destroy( &this->send_sb);
-  fts_stack_destroy( &this->receive_args);
-  fts_stack_destroy( &this->receive_sb);
   fts_hashtable_destroy( &this->object_table);
 
   fts_bytestream_remove_listener(this->stream, (fts_object_t *) this);
+
+  protocol_encoder_destroy( &this->encoder);
+  protocol_decoder_destroy( &this->decoder);
 
   fts_log( "[client]: Released client connection on socket\n");
 }
@@ -883,7 +1091,7 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
   fts_connection_new( FTS_NO_ID, from, 0, (fts_object_t *)this, 0);
   fts_connection_new( FTS_NO_ID, (fts_object_t *)this, 0, to, 0);
 
-  fts_log( "[client]: Created controller on %s %s channel %d\n", fts_symbol_name( target_class_name), fts_symbol_name( fts_object_get_variable( target)), channel_number);
+  fts_log( "[client]: Created controller on %s %s channel %d\n", target_class_name, fts_object_get_variable( target), channel_number);
 }
 
 static void client_controller_delete_dummy(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -899,20 +1107,11 @@ static void client_controller_anything_fts(fts_object_t *o, int winlet, fts_symb
   if ( !this->echo && this->gate )
     return;
 
-  client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( o)) );
+  fts_log( "[client]: Sending \"%s ", s);
+  fts_log_atoms( ac, at);
+  fts_log( "\"\n");
 
-  if (client != NULL)
-    {
-      fts_log( "[client]: Sending \"%s ", fts_symbol_name(s));
-      fts_log_atoms( ac, at);
-      fts_log( "\"\n");
-
-      client_start_message( client);
-      client_put_object( client, o);
-      client_put_symbol( client, s);
-      client_put_atoms( client, ac, at);
-      client_end_message( client);
-    }
+  fts_client_send_message( o, s, ac, at);
 }
 
 static void client_controller_anything_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -952,371 +1151,90 @@ static fts_status_t client_controller_instantiate(fts_class_t *cl, int ac, const
   return fts_Success;
 }
 
-
 /***********************************************************************
  *
- * Socket bytestream
+ * Client message sending
  *
  */
-
-static fts_status_t
-fts_socketstream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+void fts_client_send_message( fts_object_t *o, fts_symbol_t selector, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(fts_socketstream_t), 0, 0, 0);
-  fts_bytestream_class_init(cl);
+  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( o)) );
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fts_socketstream_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fts_socketstream_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, fts_socketstream_receive);
-
-  return fts_Success;
-}
-
-static void 
-fts_socketstream_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_socketstream_t *this = (fts_socketstream_t *) o;
-
-  ac--;
-  at++;
-
-  fts_bytestream_init((fts_bytestream_t *) this);
-  
-  this->socket = fts_get_int_arg( ac, at, 0, INVALID_SOCKET);
-
-  if (this->socket == INVALID_SOCKET) {
-    fts_object_set_error( (fts_object_t *)this, "Invalid arguments");
+  if (!client)
     return;
-  }
 
-  fts_bytestream_set_output((fts_bytestream_t *) this, 
-			    fts_socketstream_output,
-			    fts_socketstream_output_char,
-			    fts_socketstream_flush);
-
-
-  fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
-}
-
-static void 
-fts_socketstream_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_socketstream_t *this = (fts_socketstream_t *) o;
-
-  fts_sched_remove( (fts_object_t *)this);
-
-  if (this->socket != INVALID_SOCKET) {
-    CLOSESOCKET(this->socket);
-    this->socket = INVALID_SOCKET;
-  }  
-
-  fts_bytestream_destroy((fts_bytestream_t *) this);
-}
-
-static void 
-fts_socketstream_output(fts_bytestream_t *stream, int n, const unsigned char *c)
-{
-  int r;
-  fts_socketstream_t *this = (fts_socketstream_t *) stream;
-
-  if (this->socket == INVALID_SOCKET) {
-    return;
-  }
-
-  r = WRITESOCKET(this->socket, c, n);
-
-  if ((r == SOCKET_ERROR) || (r == 0)) {
-    CLOSESOCKET(this->socket);
-    this->socket = INVALID_SOCKET;
-  }
-}
-
-static void fts_socketstream_receive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-#define NN 1024
-  fts_socketstream_t *this = (fts_socketstream_t *) o;
-  unsigned char buffer[NN];
-  int size;
-
-  size = READSOCKET( this->socket, buffer, NN);
-
-  fts_bytestream_input((fts_bytestream_t *) this, size, buffer);
-}
-
-static void 
-fts_socketstream_output_char(fts_bytestream_t *stream, unsigned char c)
-{
-  fts_socketstream_output(stream, 1, &c);
-}
-
-static void 
-fts_socketstream_flush(fts_bytestream_t *stream)
-{
-  fts_socketstream_t *this = (fts_socketstream_t *) stream;
-
-#if WIN32
-  FlushFileBuffers((HANDLE) this->socket);
-#else
-#endif
+  protocol_encoder_write_object( &client->encoder, o);
+  protocol_encoder_write_symbol( &client->encoder, selector);
+  protocol_encoder_write_atoms( &client->encoder, ac, at);
+  protocol_encoder_flush( &client->encoder);
 }
 
 
-/***********************************************************************
- *
- * Pipe bytestream
- *
- */
-
-static fts_status_t 
-fts_pipestream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init(cl, sizeof(fts_pipestream_t), 0, 0, 0);
-  fts_bytestream_class_init(cl);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fts_pipestream_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fts_pipestream_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, fts_pipestream_receive);
-
-  return fts_Success;
-}
-
-static void 
-fts_pipestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_pipestream_t *this = (fts_pipestream_t *) o;
-#ifdef WIN32
-  HANDLE _stdin, _stdout;
-#else
-  int _stdout;
-#endif
-
-  ac--;
-  at++;
-
-  fts_bytestream_init((fts_bytestream_t *) this);
-  
-  fts_bytestream_set_output((fts_bytestream_t *) this, 
-			    fts_pipestream_output,
-			    fts_pipestream_output_char,
-			    fts_pipestream_flush);
-
-#ifdef WIN32
-  /* obtain stdin and stdout */
-  _stdin = GetStdHandle(STD_INPUT_HANDLE); 
-  this->out = GetStdHandle(STD_OUTPUT_HANDLE); 
-
-  if ((this->out == INVALID_HANDLE_VALUE) || (_stdin == INVALID_HANDLE_VALUE)) {
-    fts_log("Invalid pipes.\n");    
-    fts_object_set_error( (fts_object_t *)this, "Invalid pipes");
-    return;
-  }
-
-  /* close the stdin */
-  if (!DuplicateHandle(GetCurrentProcess(), _stdin,
-		       GetCurrentProcess(), &this->in, 0,
-		       FALSE, DUPLICATE_SAME_ACCESS)) {
-    fts_log("Failed to duplicate stdin.\n");    
-    fts_object_set_error( (fts_object_t *)this, "Failed to duplicate stdin");
-  }
-  CloseHandle(_stdin);
-
-  /* redirect stdout to a file */
-  _stdout = CreateFile("C:\\fts_stdout.txt", 
-		       GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 
-		       FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH, NULL);
-  if ((_stdout == INVALID_HANDLE_VALUE) 
-      || !SetStdHandle(STD_OUTPUT_HANDLE, _stdout)) {
-    fts_log("Failed to redirect the stdout. Stdout will not be available.\n");
-  }
-
-  fts_sched_add( (fts_object_t *)this, FTS_SCHED_ALWAYS);  
-#else
-  if ( (this->in = dup( 0)) < 0)
-    fts_log( "[pipe] dup() failed");
-  if ( (this->out = dup( 1)) < 0)
-    fts_log( "[pipe] dup() failed");
-
-  close( 0);
-
-  if ( (_stdout = open( "/tmp/fts.stdout", O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
-    fts_log( "[pipe] cannot open /tmp/fts.stdout");
-
-  if ( (dup2( _stdout, 1)) < 0)
-    fts_log( "[pipe] dup2() failed");
-    
-  close( _stdout);
-
-  fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->in);  
-#endif
-
-}
-
-static void 
-fts_pipestream_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_pipestream_t *this = (fts_pipestream_t *) o;
-
-  fts_sched_remove( (fts_object_t *)this);
-
-#ifdef WIN32
-  if (this->in != INVALID_HANDLE_VALUE) {
-    CloseHandle(this->in);
-    this->in = INVALID_HANDLE_VALUE;
-  }  
-  if (this->out != INVALID_HANDLE_VALUE) {
-    CloseHandle(this->out);
-    this->out = INVALID_HANDLE_VALUE;
-  }  
-#else
-  close( this->in);
-  close( this->out);
-  this->in = -1;
-  this->out = -1;
-#endif
-
-  fts_bytestream_destroy((fts_bytestream_t *) this);
-}
-
-static void 
-fts_pipestream_receive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_pipestream_t *this = (fts_pipestream_t *) o;
-#define NN 1024
-  unsigned char buffer[NN];
-
-#if WIN32
-  DWORD n = 0, count = 0;
-
-  if (PeekNamedPipe(this->in, NULL, 0, NULL, &count, NULL) && (count > 0)) {
-    count = (count > NN)? NN : count;
-    if (ReadFile(this->in, (LPVOID) buffer, (DWORD) count, &n, NULL)) {
-      fts_bytestream_input((fts_bytestream_t *) this, n, buffer);
-    } else {
-      /* let the listeners handle the error situation */
-      fts_bytestream_input((fts_bytestream_t *) this, -1, buffer);      
-    }
-  } 
-
-#else
-  int n;
-
-  n = read( this->in, buffer, NN);
-
-  fts_bytestream_input((fts_bytestream_t *) this, n, buffer);
-#endif
-}
-
-static void 
-fts_pipestream_output(fts_bytestream_t *stream, int n, const unsigned char *buffer)
-{
-  fts_pipestream_t *this = (fts_pipestream_t *) stream;
-
-#if WIN32
-  DWORD count; 
-
-  if (!WriteFile(this->out, (LPCVOID) buffer, (DWORD) n, &count, NULL)) {
-
-    /* keep a trace of the error in the log file */
-    LPVOID msg;
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-		  NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &msg, 0, NULL);
-    fts_log("[pipe]: failed to write to pipe: (%s)\n", msg);
-    LocalFree(msg);
-  }
-#else
-  
-  fts_log( "[pipe] writing %d bytes\n", n);
-
-  if ( write( this->out, buffer, n) < n)
-    fts_log("[pipe]: failed to write to pipe: (%s)\n", strerror( errno));
-#endif
-}
-
-static void 
-fts_pipestream_output_char(fts_bytestream_t *stream, unsigned char c)
-{
-  fts_pipestream_output(stream, 1, &c);
-}
-
-static void 
-fts_pipestream_flush(fts_bytestream_t *stream)
-{
-  fts_pipestream_t *this = (fts_pipestream_t *) stream;
-
-#if WIN32
-  FlushFileBuffers(this->out);
-#endif
-}
 
 /***********************************************************************
  *
  * Initialization
  *
  */
+static void client_tcp_manager_install( void)
+{
+  int argc = 0;
+  fts_atom_t argv[2];
+  fts_object_t *client_manager_object;
+  fts_symbol_t s;
+
+  fts_set_symbol( argv, s_client_manager);
+  argc++;
+    
+  if ((s = fts_cmd_args_get( fts_new_symbol( "listen-port"))))
+    {
+      fts_set_int( argv+1, atoi( s));
+      argc++;
+    }
+    
+  fts_object_new_to_patcher( fts_get_root_patcher(), argc, argv, &client_manager_object);
+  
+  if ( !client_manager_object)
+    fprintf( stderr, "[client] cannot create client manager\n");
+}
+
+static void client_pipe_install( void)
+{
+  fts_atom_t argv[3];
+  fts_object_t *client_object;
+  fts_object_t *pipe_stream; 
+
+  pipe_stream = fts_object_create(fts_class_get_by_name( fts_new_symbol("pipestream")), 0, 0);
+  
+  fts_set_symbol( argv, s_client);
+  fts_set_object( argv+1, pipe_stream);
+  fts_set_int( argv+2, 1);
+  
+  fts_object_new_to_patcher( fts_get_root_patcher(), 3, argv, (fts_object_t **)&client_object);
+  
+  if (!client_object)
+    {
+      fprintf( stderr, "[client_manager] internal error (cannot create client object)\n");
+      return;
+    }
+}
+
 void fts_client_config( void)
 {
-  int ac = 0;
-  fts_atom_t at[2];
-  fts_symbol_t s;
-  fts_symbol_t s_client_manager;
-  fts_object_t *obj;
-  int stdio;
-
-  fts_hashtable_init( &client_table, FTS_HASHTABLE_INT, FTS_HASHTABLE_SMALL);
-
-  fts_s_socketstream = fts_new_symbol("socketstream");
-  fts_metaclass_install(fts_s_socketstream, fts_socketstream_instantiate, fts_always_equiv);
-  fts_socketstream_class = fts_class_get_by_name(fts_s_socketstream);
-
-  fts_s_pipestream = fts_new_symbol("pipestream");
-  fts_metaclass_install(fts_s_pipestream, fts_pipestream_instantiate, fts_always_equiv);
+  client_table_init();
 
   s_client_manager = fts_new_symbol("client_manager");
   fts_class_install( s_client_manager, client_manager_instantiate);
 
-  fts_s_client = fts_new_symbol("client");
-  fts_class_install( fts_s_client, client_instantiate);
+  s_client = fts_new_symbol("client");
+  fts_class_install( s_client, client_instantiate);
 
   fts_class_install( fts_new_symbol("client_controller"), client_controller_instantiate);
 
-  /* check whether we should use a piped connection thru the stdio
-     file handles */
-  stdio = (fts_cmd_args_get( fts_new_symbol( "stdio")) != NULL);
-
-  if (stdio) {
-    
-    fts_atom_t argv[3];
-    fts_object_t *client_object;
-    fts_object_t *pipe_stream; 
-
-    pipe_stream = fts_object_create(fts_class_get_by_name(fts_s_pipestream), 0, 0);
-
-    fts_set_symbol( argv, fts_s_client);
-    fts_set_object( argv+1, pipe_stream);
-    fts_set_int( argv+2, 1);
-
-    fts_object_new_to_patcher( fts_get_root_patcher(), 3, argv, (fts_object_t **)&client_object);
-
-    if (!client_object)
-      {
-	fprintf( stderr, "[client_manager] internal error (cannot create client object)\n");
-	return;
-      }
-
-  } else {
-    fts_set_symbol( at, s_client_manager);
-    ac++;
-    
-    if ((s = fts_cmd_args_get( fts_new_symbol( "listen-port"))))
-      {
-	fts_set_int( at+1, atoi( fts_symbol_name( s)));
-	ac++;
-      }
-    
-    fts_object_new_to_patcher( fts_get_root_patcher(), ac, at, &obj);
-    
-    if ( !obj)
-      fprintf( stderr, "[client] cannot create client manager\n");
-  }
+  /* check whether we should use a piped connection thru the stdio file handles */
+  if ( fts_cmd_args_get( fts_new_symbol( "stdio")) != NULL ) 
+    client_pipe_install();
+  else
+    client_tcp_manager_install();
 }
 

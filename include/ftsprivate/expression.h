@@ -37,4 +37,12 @@ extern void fts_expression_add_variables_user(fts_expression_state_t *e, fts_obj
 extern int fts_expression_map_to_assignements(fts_expression_state_t *e, 
 					      void (* f)(fts_symbol_t name, fts_atom_t *value, void *data), void *data);
 
+/*
+ * non documented 
+ */
+extern int fts_symbol_get_operator( fts_symbol_t s);
+extern void fts_symbol_set_operator( fts_symbol_t s, int op);
+extern int fts_symbol_is_operator( fts_symbol_t s);
+
+
 #endif

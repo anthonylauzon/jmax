@@ -10,6 +10,8 @@ PACKAGE=jmax
 
 AM_INIT_AUTOMAKE(jmax,${JMAX_VERSION})
 
+AC_PREFIX_DEFAULT(/usr)
+
 AM_CONFIG_HEADER(include/ftsconfig-ac.h)
 
 dnl Checks for programs.
@@ -97,7 +99,7 @@ AC_SUBST(FTS_SYS_LIBS)
 
 dnl Check installation directories
 if test "x${prefix}" = "xNONE"; then
-  AC_DEFINE_UNQUOTED(DEFAULT_ROOT, "/usr/share/jmax")
+  AC_DEFINE_UNQUOTED(DEFAULT_ROOT, "${ac_default_prefix}/share/jmax")
 else
   AC_DEFINE_UNQUOTED(DEFAULT_ROOT, "${prefix}/share/jmax")
 fi

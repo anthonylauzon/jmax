@@ -50,16 +50,19 @@ Changing JAVA GUI to FTS client library:
 <li>remove sync (used now by open and paste)</li>
 <li>remove current properties and replace by JavaBeans properties + messages</li>
 <li>reimplement updates</li>
+<li>reimplement upload mechanism</li>
 </ul>
 </p>
 
 <p>
- Change the client table to a stack, not a hashtable (can be costly because 
-it must be accessed for each message from FTS to the client).
-</p>
-
-<p>
- Implement string cache on both sides, using hashtables.
+FTS client library:
+<ul>
+<li> implement string cache on both sides (to avoid allocation on callback):
+<li> add protocol tags: SYMBOL (caractères+), SYMBOL_TO_CACHE (index,caractères+) : stringCache[index] = string.intern(), SYMBOL_CACHED (index) args.add( stringCache[index])
+<li> transform the protocol encoder/decoder in an interface and implement classes FtsBinaryProtocolEncoder and FtsBinaryProtocolDecoder
+<li> finish C++ reorganisation: split FtsServer into several classes (protocol encoder, decoder),
+remove as much references as possible, FtsValue -> FtsAtom, rewrite protocol decoder as in Java
+</ul>
 </p>
 
 <p>
@@ -118,8 +121,12 @@ Help file handling
 </p>
 
 <p>
-Configuration script for installation (see contributions from Christian
-Klippel)
+Template resolution: quite strict, but annoying for the user. May be switch to
+a global path (not per package).
+</p>
+
+<p>
+Configuration script for installation (see contributions from Christian Klippel)
 </p>
 
 <p>
@@ -260,6 +267,11 @@ Do a threaded Direct-to-Disk, using fifos and inter-thread messages
   <li>channel numbers / audioport channels</li>
   <li>error messages</li>
 </ul>
+
+<p>
+Add configure detection of ALSA and option --with-alsa (which forces compilation
+with ALSA). Check ALSA version number.
+</p>
   
 <p>
  Help patches for SGI audio port
@@ -366,6 +378,12 @@ after the .pat loader, or it must understand that the file is a .pat and
 refuse to load it (which implies some knowledger between the different loader
 objects).
 </p>
+
+<p>
+Factorize callback management: a lot of objects use callbacks, i.e. store an
+object, a method and an argument (scheduler, bytestream, updates...), but
+no code is factorized. So: implement a callback object and a callback list object,
+and use it everywhere.
 
 </body>
 </html>

@@ -64,7 +64,6 @@
 #include <fts/fts.h>
 #include <ftsprivate/expression.h>
 #include <ftsprivate/variable.h>
-#include <ftsprivate/symbol.h>
 #include <ftsprivate/patcher.h>
 
 /* Operator codes: symbols can store a special operator code,
@@ -1583,7 +1582,44 @@ static int get_array_element(int ac, const fts_atom_t *at, fts_atom_t *result)
   else
     return FTS_EXPRESSION_SYNTAX_ERROR;
 }
-  
+
+
+/***********************************************************************
+ * Compatibility:
+ * fts_symbol_set_operator  
+ * fts_symbol_get_operator  
+ * fts_symbol_is_operator
+ */
+static fts_hashtable_t operator_table;
+
+int fts_symbol_get_operator( fts_symbol_t s)
+{
+  fts_atom_t k, v;
+
+  fts_set_symbol( &k, s);
+  if (fts_hashtable_get( &operator_table, &k, &v) && fts_is_int( &v))
+    return fts_get_int( &v);
+
+  return 0;
+}
+
+void fts_symbol_set_operator( fts_symbol_t s, int op)
+{
+  fts_atom_t k, v;
+
+  fts_set_symbol( &k, s);
+  fts_set_int( &v, op);
+  fts_hashtable_put( &operator_table, &k, &v);
+}
+
+int fts_symbol_is_operator( fts_symbol_t s)
+{
+  fts_atom_t k, v;
+
+  fts_set_symbol( &k, s);
+  return fts_hashtable_get( &operator_table, &k, &v);
+}
+
 
 /***********************************************************************
  *
@@ -1613,6 +1649,7 @@ void fts_kernel_expression_init(void)
   fts_atom_type_register(fts_s_list, 0);
 
   /* operator declarations  */
+  fts_hashtable_init( &operator_table, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_MEDIUM);
   fts_symbol_set_operator(fts_s_plus,  FTS_OP_PLUS);
   fts_symbol_set_operator(fts_s_minus, FTS_OP_MINUS);
   fts_symbol_set_operator(fts_s_times, FTS_OP_TIMES);

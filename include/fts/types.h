@@ -23,7 +23,7 @@
 #ifndef _FTS_TYPES_H_
 #define _FTS_TYPES_H_
 
-typedef const struct fts_symbol_descr *fts_symbol_t;
+typedef const char *fts_symbol_t;
 
 #define fts_type_t fts_symbol_t
 #define fts_type_get_selector(T) (T)

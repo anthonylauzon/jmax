@@ -97,7 +97,19 @@ fts_array_set(fts_array_t *array, int ac, const fts_atom_t *at)
   fts_array_set_size(array, ac);
 
   for(i = 0; i < ac; i++)
+#if 0
     fts_atom_assign(array->atoms + i, at + i);
+#else
+  do 
+    {
+      if(fts_is_object(array->atoms + i)) 
+	fts_atom_release(array->atoms + i); 
+      *(array->atoms + i) = *(at + i); 
+      if(fts_is_object(at + i))
+	fts_atom_refer(at + i);
+    }
+  while(0);
+#endif
 }
 
 void 

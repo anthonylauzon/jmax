@@ -1,22 +1,23 @@
 
-Ircam's "Real-time systems" team
+jMax is developed by Ircam's "Real-time systems" team:
  - François Déchelle
  - Riccardo Borghesi
  - Norbert Schnell
 
-Past members of the team:
+Credits to:
  - Maurizio De Cecco
+ - Peter Hanappe
  - Enzo Maggi
+ - Eric Viara
 
-Peter Hanappe
-Eric Viara
-
-Contributors:
+The following people have contributed to this program:
  - Guenter Geiger
  - Marteen De Boer
  - Stéphane Letz
  - Christian Klippel
  - Aadjan van der Helm
+ - Mathieu Bouchard
+ - Maurizio Umberto Puxeddu
 
 jMax is based on Max/ISPW by Miller Puckette
 

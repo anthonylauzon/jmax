@@ -31,59 +31,59 @@
 #include <fts/fts.h>
 
 /***********************************************************************
- *
  * Symbol table
- *
  */
 
 static fts_hashtable_t symbol_table;
-static fts_heap_t *symbol_heap;
 
-static fts_symbol_t symbol_new_aux( const char *name, int copy)
+static fts_symbol_t symbol_new_aux( const char *s, int copy)
 {
-  struct fts_symbol_descr *sp;
   fts_atom_t k, v;
+  const char *p;
 
   /* Lookup symbol in the hash table */
-  fts_set_string( &k, (char *)name);
+  fts_set_string( &k, (char *)s);
   if ( fts_hashtable_get( &symbol_table, &k, &v))
     return (fts_symbol_t)fts_get_ptr( &v);
 
-  /* Symbol do not exist: copy the string if needed, and make a new symbol descriptor */
-  sp = (struct fts_symbol_descr *) fts_heap_alloc(symbol_heap);
-  sp->operator = -1;
-  sp->cache_index = -1;
+  /* Symbol do not exist: copy the string if needed */
   if (copy)
-    {
-      sp->name = strcpy( fts_malloc( strlen(name)+1 ), name);
-      /* Must copy also the key !!! */
-      fts_set_string( &k, (char *)sp->name);
-    }
+    p = strcpy( fts_malloc( strlen(s)+1 ), s);
   else
-    sp->name = name;
+    p = s;
 
-  /* Add the new symbol descriptor in the hash table */
-  fts_set_ptr( &v, sp);
+  /* Add the new symbol in the hash table */
+  fts_set_ptr( &k, (char *)p);
+  fts_set_ptr( &v, (char *)p);
   fts_hashtable_put( &symbol_table, &k, &v);
 
-  return sp;
+  return (fts_symbol_t)p;
 }
 
-fts_symbol_t fts_new_symbol(const char *name)
+fts_symbol_t fts_new_symbol(const char *s)
 {
-  return symbol_new_aux( name, 0);
+  return symbol_new_aux( s, 0);
 }
 
-fts_symbol_t fts_new_symbol_copy(const char *name)
+fts_symbol_t fts_new_symbol_copy(const char *s)
 {
-  return symbol_new_aux( name, 1);
+  return symbol_new_aux( s, 1);
 }
 
 
 /***********************************************************************
- *
+ * Compatibility
+ */
+
+const char *__OLD_fts_symbol_name( const char *file, int line, fts_symbol_t symbol)
+{
+  fprintf( stderr, "[symbol] fts_symbol_name is deprecated (file %s line %d)\n", file, line);
+
+  return symbol;
+}
+
+/***********************************************************************
  * Predefined symbols
- *
  */
 
 #undef PREDEF_SYMBOL
@@ -106,8 +106,6 @@ static void fts_predefine_symbols(void)
 
 void fts_kernel_symbol_init(void)
 {
-  symbol_heap = fts_heap_new( sizeof(struct fts_symbol_descr));
-
   fts_hashtable_init( &symbol_table, FTS_HASHTABLE_STRING, FTS_HASHTABLE_BIG);
 
   fts_predefine_symbols();

@@ -1,0 +1,117 @@
+
+Code changes for 3.0.0
+
+
+Below is a first description of the source reorganization that I plan immediately for 3.0.0:
+
+1) Source tree
+
+All the sources of FTS kernel (currently subdirectories non-portable, sys, lang, runtime
+and tiles of fts/src) will be moved to a single directory and small files will be merged.
+
+I did a small statistic on number of lines of code per kernel files:
+the kernel sources contains 179 files (75 in veclib), the total number of lines of code
+in the kernel is 43425, the average number of lines per file is 243. If we augment the 
+number of lines to 700 per file, we will have 63 files which can fit into one directory.
+
+The advantages of having less files and one directory are readability and compile time.
+
+The target directory will be fts (not src).
+
+The include files will be collapsed the same way.
+
+
+2) Compilation
+
+All makefiles will move to automake and autoconf. The compilation will produce a dynamic
+library (as on Windows), libfts.so, and an executable that will be the equivalent of 
+the current startup.c
+
+The current ARCH and MODE directories will be removed. The compilation output is placed
+by automake in a special directory (.libs for libraries).
+
+A configure script option will allow to compile with debug (./configure --with-debug).
+It will require a 'make clean', but compilation time will be smaller.
+
+
+3) File merges and suppression
+
+In directory sys, the following files will disappear:
+ - modules.c (replaced by package loader)
+ - status.c (used only in one place, code moved)
+ - smem.c (error detecting memory allocator, unused, does not detect memory allocation errors...)
+
+All fts_module_t will be removed and replaced by a direct call to the init function.
+
+mem.c will be simplified:
+ - fts_block_alloc will be removed (benchs shows that it does no real optimisation compared to
+plain malloc and is in some case slower)
+ - all filename and line arguments to functions will be removed (they were related to smem.c)
+
+In directory lang/dsp, gphiter.c, signal.c and sigconn.c will be included in dspgraph.c (result: 1114 lines)
+
+Directory runtime/devices will disappear: devices.c will be removed. unixdev.c will be integrated
+in client code.
+
+In directory runtime/files, parser.c will be removed (it is unused).
+
+In directory runtime/midi, midiport.c and midiparser.c will be merged into midi.c (947 lines)
+
+In directory runtime/audio, audioport.c, audio.c, nullaudioport.c will be merged into audio.c (938 lines)
+
+In directory runtime/client, all files will be merged into oldclient.c, which will integrate
+also some code coming from runtime/devices/unixdev.c, tiles/messtile.c. This code will be
+removed once the java gui moves to the new client model.
+
+The lang/veclib case is to be discussed: where are the functions used ? what are they ?
+Here is the list of functions that are called in the objects, obtained by:
+find packages -name '*.so' | xargs nm | grep fts_vec | sort -u
+ fts_vec_fcpy
+ fts_vec_fzero
+ fts_vecx_cmerge
+ fts_vecx_csplit
+ fts_vecx_czero
+ fts_vecx_fcpy
+ fts_vecx_fcpyre
+ fts_vecx_ffillim
+ fts_vecx_fzero
+
+Another question: fts_data removal. I propose first that we remove it from the API
+(used only in explode, can be debranched in a first version) and keep it internally
+in the kernel and secund we rewrite the objects using it (mainly patcherdata).
+
+In directory lang/mess:
+ autosave.c in saver.c
+ 
+
+4) Packages source tree
+
+The packages source tree will be unified:
+ - subdirectory c/src for the C sources
+ - subdirectory java/src for the Java sources
+
+For a package foo, the structure will be the following:
+ - foo/c/src/foo1.c, foo2.c, ...: the C sources, used to produce:
+ - foo/lib/libfoo.so or foo.dll: the dynamic library
+ - foo/java/src/bar/joe/Foo1.java, Foo2.java: the Java sources, used to produce:
+ - foo/java/foo.jar: the Java archive
+
+Question: do we keep a c/src and java/src, or do we remove the src directory ?
+This depends if we can tell libtool to put the objects in ../obj. If not, we
+remove src.
+
+
+Note: we can even place the library and the java archive in the package root directory...
+
+The ARCH and MODE will be removed (the only case where they could be helpfull
+is making a shared installation of jMax, but this can by done by other simpler way).
+
+Each package will no longer define a  "fts_module_t". A single initialization function
+(name to be defined) will replace the fts_module init function.
+The only package that uses the shutdown function is midishare, which can be replaced
+by either atexit or fts_install_shutdown.
+
+
+
+
+
