@@ -52,16 +52,22 @@ in_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
     {
       fts_object_t *obj = fts_get_object(at);
 
-      if(fts_bytestream_check(obj) && fts_bytestream_is_input((fts_bytestream_t *)obj))
+      if(fts_bytestream_check(obj))
+      {
+        if(fts_bytestream_is_input((fts_bytestream_t *)obj))
 	{  
 	  this->stream = (fts_bytestream_t *)obj;
 	  fts_bytestream_add_listener(this->stream, o, in_input);
-	  
-	  return;
-	}
+          fts_object_refer(obj);
+        }
+        else
+          fts_object_error(o, "bytestream is not input");
+
+        return;
+      }
     }
-    
-  fts_object_error(o, "first argument of input bytestream required");
+
+  fts_object_error(o, "bytestream argument required");
 }
 
 static void 
@@ -70,7 +76,10 @@ in_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   in_t *this = (in_t *)o;
 
   if(this->stream)
+  {
     fts_bytestream_remove_listener(this->stream, o);
+    fts_object_release((fts_object_t *)this->stream);
+  }
 }
 
 /************************************************************
@@ -78,20 +87,6 @@ in_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
  *  class
  *
  */
-
-static int 
-in_check(int ac, const fts_atom_t *at)
-{
-  if(ac > 1 && fts_is_object(at + 1))
-    {
-      fts_object_t *obj = fts_get_object(at + 1);
-
-      if(fts_bytestream_check(obj) && fts_bytestream_is_input((fts_bytestream_t *)obj))
-	return 1;
-    }
-  
-  return 0;
-}
 
 static void
 in_instantiate(fts_class_t *cl)

@@ -98,20 +98,36 @@ out_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       fts_object_t *obj = fts_get_object(at);
 
-      if(fts_bytestream_check(obj) && fts_bytestream_is_output((fts_bytestream_t *)obj))
-	{
-	  this->stream = (fts_bytestream_t *)obj;
-	  return;
+      if(fts_bytestream_check(obj))
+      {
+        if(fts_bytestream_is_output((fts_bytestream_t *)obj))
+        {
+          this->stream = (fts_bytestream_t *)obj;
+          fts_object_refer(obj);
 	}
+        else
+          fts_object_error(o, "bytestream is not output");
+         
+        return;
+      }
     }
-    
-  fts_object_error(o, "first argument of input bytestream required");
+
+  fts_object_error(o, "bytestream argument required");
+}
+
+static void
+out_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  out_t *this = (out_t *)o;
+
+  if(this->stream)
+    fts_object_release((fts_object_t *)this->stream);
 }
 
 static void
 out_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(out_t), out_init, 0);
+  fts_class_init(cl, sizeof(out_t), out_init, out_delete);
 
   fts_class_inlet_bang(cl, 0, out_bang);
   
@@ -120,7 +136,7 @@ out_instantiate(fts_class_t *cl)
   
   fts_class_inlet_number(cl, 1, out_number);
   fts_class_inlet_varargs(cl, 1, out_varargs);
-  }
+}
 
 void
 out_config(void)
