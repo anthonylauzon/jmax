@@ -608,6 +608,12 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
     ErmesSelection.patcherSelection.deselectAll();
     repaint();
   }
+  
+  boolean connFromClient = false;
+  public void addingConnection()
+  {
+    connFromClient = true;
+  }
 
   public GraphicConnection addNewConnection(FtsConnection fc)
   {
@@ -617,7 +623,11 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 							 fc.getToInlet(), fc.getType(), fc);
     displayList.add(connection);
     connection.updateDimensions();
-    ErmesSelection.patcherSelection.select( connection);
+    if( connFromClient)
+      {
+	ErmesSelection.patcherSelection.select( connection);
+	connFromClient = false;
+      }    
     connection.redraw();
     
     return connection;

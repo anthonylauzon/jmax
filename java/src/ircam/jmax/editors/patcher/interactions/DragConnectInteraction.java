@@ -61,40 +61,9 @@ class DragConnectInteraction extends Interaction
 	editor.showMessage("Cannot connect an object to itself !");
 	return;
       }
-    /***************************************************************/
-    /*************** ASYNCRONOUS CONNECTION CREATION *******************/
 
+    editor.addingConnection();
     editor.getFtsPatcher().requestAddConnection(src.getFtsObject(), outlet, dst.getFtsObject(), inlet);
-    
-    /*try
-      {
-      FtsConnection fc;
-      GraphicConnection connection;
-
-
-      fc = editor.getFts().makeFtsConnection(src.getFtsObject(), outlet, 
-      dst.getFtsObject(), inlet);
-	
-      connection = new GraphicConnection(editor,
-      src, outlet,
-      dst, inlet,
-      fc.getType(), fc);
-		
-      editor.getDisplayList().add(connection);
-      editor.getDisplayList().sortDisplayList();
-      connection.updateDimensions();
-      ErmesSelection.patcherSelection.select( connection);
-      connection.redraw();
-      }
-      catch (FtsException e)
-      {
-      // Just don't do the connection in case of troubles.
-      
-      // editor.showMessage("Cannot connect");
-      }*/
-
-    /***************************************************************/
-    /***************************************************************/
   }
 
   boolean destinationChoosen = false;
