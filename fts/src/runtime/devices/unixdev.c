@@ -72,7 +72,6 @@
 
 
 static void init_stdio(void);
-static void init_npipe(void);
 static void init_socket_server(void);
 static void init_socket_client(void);
 static void init_udp_client(void);
@@ -86,7 +85,6 @@ void
 unixdev_init(void)
 {
  init_stdio();
- init_npipe();
  init_socket_server();
  init_socket_client();
  init_udp_client();
