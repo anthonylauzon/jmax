@@ -1507,7 +1507,7 @@ fts_patcher_redefine_from_client( fts_object_t *o, int winlet, fts_symbol_t s, i
       stream = patcher_get_memory_stream();
       fts_memorystream_reset( stream);
       fts_spost_object_description_args( (fts_bytestream_t *)stream, argc - 1, argv + 1);
-      fts_memorystream_output_char((fts_bytestream_t *)stream,'\0');
+      fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
       fts_set_string( a,  fts_memorystream_get_bytes( stream));
       fts_client_send_message((fts_object_t *)this, sym_setDescription, 1, a);
 

@@ -540,7 +540,7 @@ static void fts_client_send_message_from_atom_list(fts_object_t *obj, fts_symbol
   
   fts_memorystream_reset( stream);      
   fts_spost_object_description_args( (fts_bytestream_t *)stream, size, a);
-  fts_memorystream_output_char((fts_bytestream_t *)stream,'\0');
+  fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
 
   fts_client_start_message(obj, fts_s_set);
   fts_client_add_string( obj, fts_memorystream_get_bytes( stream));
