@@ -684,6 +684,25 @@ public void appendBar(TrackEvent evt)
     e.printStackTrace();
   }
 }
+
+public void collapseMarkers( Enumeration events)
+{  
+  /*beginUpdate("addEvent");*/
+  
+  try{
+    args.clear();
+    for (Enumeration e = events; e.hasMoreElements();) 
+      args.addObject( (TrackEvent) e.nextElement());
+		
+    markersTrack.send( FtsSymbol.get("collapse_markers"), args);
+  }
+  catch(IOException e)
+  {
+    System.err.println("FtsTrackObject: I/O Error sending collapse_markers Message!");
+    e.printStackTrace();
+  }
+}
+
 /**
 * how many events in the database?
  */

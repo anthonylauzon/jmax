@@ -95,4 +95,6 @@ extern void marker_track_renumber_bars(track_t *marker_track, event_t *start, in
 extern event_t *marker_track_append_bar(track_t *marker_track, event_t *start_evt);
 extern void marker_track_remove_events(track_t *marker_track, int ac, const fts_atom_t *at);
 extern void marker_track_clear(track_t *marker_track);
+extern void marker_track_collapse_markers(track_t *marker_track, int ac, const fts_atom_t *at);
+
 #endif

@@ -1125,6 +1125,16 @@ _track_make_trill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   }
 }
 
+static void
+_track_collapse_markers(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *self = (track_t *)o;
+	
+	if(fts_class_get_name( track_get_type(self)) == seqsym_scomark)
+		marker_track_collapse_markers(self, ac, at);
+	else
+		marker_track_collapse_markers( track_get_or_make_markers(self), ac, at);
+}
 /******************************************************
 *
 *  persistence compatibility
@@ -2042,9 +2052,6 @@ track_export_dialog (fts_object_t *o, int winlet, fts_symbol_t s,
                          fts_project_get_dir(), default_name);
 }
 
-
-
-
 /* editor */
 
 static void
@@ -2143,9 +2150,6 @@ track_set_save_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 	}
 }
 
-
-
-
 /******************************************************
 *
 *  persistence
@@ -2239,9 +2243,6 @@ track_notify_gui_listeners(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
     fts_send_message_varargs( fts_get_object(&a), fts_s_send, ac, at);
   }
 }
-
-
-
 
 /******************************************************
 *
@@ -2374,6 +2375,7 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_new_symbol("renumber_bars"), _track_renumber_bars);
 	fts_class_message_varargs(cl, fts_new_symbol("append_bar"), _track_append_bar);
   fts_class_message_varargs(cl, fts_new_symbol("make_trill"), _track_make_trill);
+	fts_class_message_varargs(cl, fts_new_symbol("collapse_markers"), _track_collapse_markers);
   fts_class_message_varargs(cl, seqsym_marker, _track_append_marker);
   
   fts_class_inlet_thru(cl, 0);

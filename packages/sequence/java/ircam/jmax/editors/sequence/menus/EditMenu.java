@@ -70,6 +70,7 @@ public class EditMenu extends EditorMenu
     addSeparator();
     
     add(Actions.appendBarAction);
+		add(Actions.collapseMarkersAction);
   }
 
   public void updateMenu()

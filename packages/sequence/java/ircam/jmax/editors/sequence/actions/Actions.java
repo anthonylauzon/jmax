@@ -49,6 +49,7 @@ public class Actions
   public static EditorAction redoAction      = new RedoAction();
   public static EditorAction selectAllAction = new SelectAllAction();
   public static EditorAction appendBarAction = new AppendBarAction();
+	public static EditorAction collapseMarkersAction = new CollapseMarkersAction();
 
   public static EditorAction removeTrackAction  = new RemoveTrackAction();
 
@@ -162,6 +163,25 @@ public class Actions
 			}
 		}
   }
+	
+	public static class CollapseMarkersAction extends EditorAction
+  {
+    public CollapseMarkersAction()
+	  { 
+      super("Collapse Markers", null, KeyEvent.VK_M, KeyEvent.VK_M, true);
+		}
+    public void doAction(EditorContainer container)
+	  {
+      FtsGraphicObject fobj = ((SequenceEditor)container.getEditor()).getFtsObject();
+			if(fobj  instanceof FtsTrackObject)
+			{
+				SequenceSelection sel = ((SequenceEditor)container.getEditor()).getMarkerSelection();
+				TrackEvent bar = null;
+				if(sel != null && sel.size() > 1)
+					((FtsTrackObject) fobj).collapseMarkers( sel.getSelected());
+			}
+		}
+  }	
 }
 
 

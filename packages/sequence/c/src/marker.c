@@ -38,6 +38,8 @@ static void marker_track_meter_changed(track_t * marker_track, scomark_t *scomar
 static double get_next_bar_time( event_t *last_bar, fts_symbol_t last_meter, double last_tempo, event_t **event_at_same_time);
 static event_t *marker_track_get_first_bar_event(track_t *marker_track);
 static scomark_t *marker_track_get_previous_bar(track_t *marker_track, scomark_t *scomark);
+static void marker_track_get_first_and_last_event(track_t *marker_track, event_t **first_evt, double *first_time, 
+																									event_t **last_evt, double *last_time, int ac, const fts_atom_t *at);
 
 /******************************************************************************
  *
@@ -887,6 +889,34 @@ marker_track_tempo_changed(track_t * marker_track, scomark_t *scomark, double ol
 /***************************************************************************
 *  unset tempo on selection of scomarks: stretch track to previous tempo if any
 *****************************/
+static void 
+marker_track_get_first_and_last_event(track_t *marker_track, event_t **first_evt, double *first_time, 
+																			event_t **last_evt, double *last_time, int ac, const fts_atom_t *at)
+{
+	double evt_time = -1.0;
+	event_t *evt = NULL;
+	int i = 0;
+	
+	*first_evt = (event_t *)fts_get_object(at);
+	*last_evt = *first_evt;
+	*last_time = *first_time = event_get_time((event_t *)*first_evt);
+	for(i=1; i<ac; i++)
+	{
+		evt = ((event_t *)fts_get_object(at + i));
+		evt_time = event_get_time(evt);
+		if(evt_time > *last_time) 
+		{
+			*last_evt = evt;
+			*last_time = evt_time;
+		}
+		else
+			if(evt_time < *first_time)
+			{
+				*first_evt = evt;
+				*first_time = evt_time;
+			}
+	}	
+}
 
 static scomark_t *
 marker_track_get_previous_tempo(track_t *marker_track, scomark_t *scomark, double *tempo)
@@ -914,8 +944,7 @@ marker_track_unset_tempo_on_selection(track_t *marker_track, int ac, const fts_a
   int i;
   event_t *first = NULL;
   event_t *last = NULL;
-  event_t *evt = NULL;
-  double last_time, first_time, evt_time;
+  double last_time, first_time;
   double new_tempo = 0.0;
   
   if(ac == 1)
@@ -936,26 +965,10 @@ marker_track_unset_tempo_on_selection(track_t *marker_track, int ac, const fts_a
   else if(ac > 1)
   {
     int upload = 0;
-    /* search first and last object in selection */
-    first = (event_t *)fts_get_object(at);
-    last = first;
-    last_time = first_time = event_get_time(last);
-    for(i=1; i<ac; i++)
-    {
-      evt = ((event_t *)fts_get_object(at + i));
-      evt_time = event_get_time(evt);
-      if(evt_time > last_time) 
-      {
-        last = evt;
-        last_time = evt_time;
-      }
-      else
-        if(evt_time < first_time)
-        {
-          first = evt;
-          first_time = evt_time;
-        }
-    }
+		
+		/* search first and last object in selection */
+		marker_track_get_first_and_last_event(marker_track, &first, &first_time, &last, &last_time, ac, at);
+
     /* find previous tempo in track: that will be the new tempo in selection */
     marker_track_get_previous_tempo(marker_track, (scomark_t *)fts_get_object( event_get_value(first)), &new_tempo);
     
@@ -1049,14 +1062,12 @@ marker_track_clear(track_t *marker_track)
 {
 	track_t *track = (track_t *)fts_object_get_context((fts_object_t *)marker_track);
 	event_t *event = track_get_first(marker_track);
-  /*event_t *first = marker_track_get_first_bar_event(marker_track);*/
   
 	while(event)
   {
     event_t *next = event_get_next(event);
     
     event->next = event->prev = 0;
-/*		if(event != first)*/
 		fts_object_release((fts_object_t *)event);
     
     event = next;
@@ -1068,6 +1079,60 @@ marker_track_clear(track_t *marker_track)
 	
 	if( track_editor_is_open(track))
 		fts_client_send_message((fts_object_t *)marker_track, fts_s_clear, 0, 0);
+}
+
+void 
+marker_track_collapse_markers( track_t *marker_track, int ac, const fts_atom_t *at)
+{
+	if(ac > 1)
+	{
+		track_t *track = (track_t *)fts_object_get_context((fts_object_t *)marker_track);
+		
+		event_t *first_mark = NULL;
+		event_t *last_mark = NULL;
+		event_t *first_note = NULL;
+		event_t *after_note = NULL;
+		event_t *evt = NULL;
+		fts_atom_t a[1024];
+		int i = 0;
+		double last_time, first_time;
+		
+		/* find ends of selection */
+		marker_track_get_first_and_last_event(marker_track, &first_mark, &first_time, &last_mark, &last_time, ac, at);
+		
+		/* remove notes in interval */
+		track_segment_get( track, first_time, last_time, &first_note, &after_note);
+		evt = first_note;
+		while(evt != NULL && evt != after_note )
+		{
+			evt = event_get_next(evt);
+			fts_set_object(a + i, (fts_object_t *)evt);
+			track_remove_event(track, evt);
+			i++;
+		}
+		fts_client_send_message((fts_object_t *)track, seqsym_removeEvents, i, a);
+		
+		
+		/*
+		 1) trova estremi della selezione
+		 2) rimuove tutte le note che cominciano nell'intervallo
+		 3) rimuove tutti i markers nell'intervallo
+		 4)
+		 *) se gli estremi sono entrambi bars:
+		 - il primo estremo prende meter e tempo del secondo
+		 - il seconso Ž rimosso
+		 **) se il primo Ž un marker e il secondo una bar:
+		 - primo estremo diventa una bar con meter e tempo del secondo
+		 - il secondo Ž rimosso
+		 - si mette meter * su bar precedente al primo
+		 ***) se il primo Ž bar e il socondo Ž marker
+		 - il primo prende meter * e tempo del seondo estremo
+		 - il secondo estremo Ž rimosso
+		 
+		 5) shifto tutto a sinistra di (Tsecondo - Tprimo)
+		 6) renumber_bars
+		 */
+	}
 }
 
 void
