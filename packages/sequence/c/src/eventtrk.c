@@ -444,8 +444,8 @@ eventtrk_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, eventtrk_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, eventtrk_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, eventtrk_lock);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, eventtrk_unlock);
+  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_lock, eventtrk_lock);
+  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_unlock, eventtrk_unlock);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, eventtrk_upload);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, eventtrk_print);

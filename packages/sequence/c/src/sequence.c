@@ -365,7 +365,9 @@ sequence_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_s_print, sequence_print);
       fts_method_define_varargs(cl, 0, fts_new_symbol("import"), sequence_import);
       fts_method_define_varargs(cl, 0, fts_new_symbol("export"), sequence_export_track_by_name);
-
+      /*******************/
+      fts_method_define_varargs(cl, 0, fts_new_symbol("open"), sequence_open_editor);
+      /******************/
       fts_method_define_varargs(cl, fts_SystemInlet, seqsym_import_midi_dialog, sequence_import_midifile_with_dialog);
       fts_method_define_varargs(cl, fts_SystemInlet, seqsym_import_midi, sequence_import_midifile);
       

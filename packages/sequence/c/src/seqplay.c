@@ -45,6 +45,7 @@ typedef struct _seqplay_
   fts_symbol_t track_name;
   eventtrk_t *track;
   event_t *event;
+  double start_time;
   fts_alarm_t alarm;
 } seqplay_t;
 
@@ -65,6 +66,7 @@ seqplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->track_name = track_name;
   this->track = 0;
   this->event = 0;
+  this->start_time = 0.0;
 
   fts_alarm_init(&this->alarm, 0, seqplay_alarm_tick, this);
 }
@@ -87,8 +89,9 @@ static void
 seqplay_alarm_tick(fts_alarm_t *alarm, void *o)
 {
   seqplay_t *this = (seqplay_t *)o;
-  double now = fts_get_time_in_msecs();
+  double now = fts_get_time_in_msecs() - this->start_time;
   event_t *event = this->event;
+  eventtrk_t *track = this->track;
   event_t *next = event_get_next(event);
   fts_atom_t at[64];
   int ac;
@@ -99,9 +102,9 @@ seqplay_alarm_tick(fts_alarm_t *alarm, void *o)
 
   while(next && event_get_time(next) <= now)
     {
-      fts_set_object(at + ac, (fts_object_t *)event);
+      /*fts_set_object(at + ac, (fts_object_t *)event);*/
+      fts_set_object(at + ac, (fts_object_t *)next);
       ac++;
-
       next = event_get_next(next);
     }
 
@@ -109,19 +112,19 @@ seqplay_alarm_tick(fts_alarm_t *alarm, void *o)
     {
       /* playing */
       this->event = next;
-      fts_alarm_set_delay(alarm, event_get_time(next) - now);
+      fts_alarm_set_time(alarm, this->start_time + event_get_time(next));
       fts_alarm_arm(alarm);
     }
   else
     {
       /* stop */
-      fts_send_message((fts_object_t *)this->track, fts_SystemInlet, seqsym_unlock, 0, 0);            
+      fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_unlock, 0, 0);            
       this->track = 0;
       this->event = 0;
     }
 
   if(sequence_editor_is_open(this->sequence))
-     fts_client_send_message((fts_object_t *)this->track, seqsym_highlightEvents, ac, at);
+    fts_client_send_message((fts_object_t *)track, seqsym_highlightEvents, ac, at);
 
   fts_set_ptr(a, &ac);
   fts_set_ptr(a + 1, at);
@@ -158,12 +161,15 @@ seqplay_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  
 	  if(event)
 	    {
+	      double now = fts_get_time_in_msecs();
+
 	      fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_lock, 0, 0);
 	  
 	      this->track = track;
 	      this->event = event;
+	      this->start_time = now;
 
-	      fts_alarm_set_delay(&this->alarm, event_get_time(event));
+	      fts_alarm_set_time(&this->alarm, now + event_get_time(event));
 	      fts_alarm_arm(&this->alarm);
 	    }
 	}

@@ -99,3 +99,10 @@ seqsym_config(void)
   seqsym_highlightEvents = fts_new_symbol("highlightEvents");
   seqsym_openFileDialog = fts_new_symbol("openFileDialog");
 }
+
+
+
+
+
+
+
