@@ -230,9 +230,9 @@ expr_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   
   fts_class_message_varargs(cl, fts_new_symbol("eval"), _expr_evaluate);
-  /*fts_class_message_symbol(cl, fts_new_symbol("set"), expr_set);*/
   
-  fts_class_doc(cl, fts_s_print, NULL, "print expression");
+  fts_class_doc(cl, sym_expr, "<sym: expression description>", "expression");
+  fts_class_doc(cl, fts_new_symbol("eval"), "[<dict: local names>] [<any: arguments> ...]", "evaluate expression");
 }
 
 /***********************************************************************

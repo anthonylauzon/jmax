@@ -742,7 +742,7 @@ track_copy(track_t *org, track_t *copy)
   
   track_clear(copy);
   
-  while(event)
+  while(event != NULL)
   {
     double time = event_get_time(event);
     fts_atom_t *value = event_get_value(event);
