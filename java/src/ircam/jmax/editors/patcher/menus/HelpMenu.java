@@ -84,6 +84,7 @@ public class HelpMenu extends JMenu
 	    }
 	});
        }
+    addSeparator();
     
     item = new JMenuItem("Patch Editor summary");
     add(item);
