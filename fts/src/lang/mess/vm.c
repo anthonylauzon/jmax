@@ -562,6 +562,19 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 
 	    new  = fts_object_new((fts_patcher_t *) (*object_tos), FTS_NO_ID, nargs, eval_tos);
 
+	    if (! new)
+	      {
+		/* Temporary solution to the error problem: make the error object 
+		   instead 
+		   */
+
+		fts_atom_t description[1];
+
+		fts_set_symbol(&description[0], fts_new_symbol("ERROR"));
+
+		new = fts_object_new((fts_patcher_t *) (* object_tos), FTS_NO_ID, 1, description);
+	      }
+
 	    /* Push the object in the object stack */
 
 	    object_tos--;
@@ -582,6 +595,19 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 #endif
 
 	    new  = fts_object_new((fts_patcher_t *) (*object_tos), FTS_NO_ID, nargs, eval_tos);
+
+	    if (! new)
+	      {
+		/* Temporary solution to the error problem: make the error object 
+		   instead 
+		   */
+
+		fts_atom_t description[1];
+
+		fts_set_symbol(&description[0], fts_new_symbol("ERROR"));
+
+		new = fts_object_new((fts_patcher_t *) (* object_tos), FTS_NO_ID, 1, description);
+	      }
 
 	    /* Push the object in the object stack */
 
@@ -604,6 +630,19 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 #endif
 
 	    new  = fts_object_new((fts_patcher_t *) (*object_tos), FTS_NO_ID, nargs, eval_tos);
+
+	    if (! new)
+	      {
+		/* Temporary solution to the error problem: make the error object 
+		   instead 
+		   */
+
+		fts_atom_t description[1];
+
+		fts_set_symbol(&description[0], fts_new_symbol("ERROR"));
+
+		new = fts_object_new((fts_patcher_t *) (* object_tos), FTS_NO_ID, 1, description);
+	      }
 
 	    /* Push the object in the object stack */
 
@@ -733,7 +772,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 #ifdef VM_DEBUG
 	    fprintf(stderr, "CONNECT\n");
 #endif
-	    fts_object_connect(*object_tos, fts_get_int(eval_tos),
+	    fts_object_connect(FTS_NO_ID, *object_tos, fts_get_int(eval_tos),
 			       *(object_tos + 1), fts_get_int((eval_tos + 1)));
 	  }
 	break;

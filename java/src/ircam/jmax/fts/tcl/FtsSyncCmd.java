@@ -41,7 +41,7 @@ class FtsSyncCmd implements Command
 
     before = System.currentTimeMillis();
 
-    FtsServer.getServer().syncToFts();
+    Fts.getServer().syncToFts();
 
     interp.setResult((int) (System.currentTimeMillis() - before));
   }

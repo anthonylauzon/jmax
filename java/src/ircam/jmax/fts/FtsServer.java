@@ -21,32 +21,7 @@ import java.io.*;
 
 public class FtsServer 
 {
-  // Code handling the global server and the connection 
-
-  static FtsServer theServer = null;
-
   static boolean debug = false;
-
-  static public FtsServer getServer()
-  {
-    return theServer;
-  }
-  
-  public static void connectToFts(String theFtsdir, String theFtsname, String mode, String server, String port)
-  {
-    if (mode.equals("socket")) 
-      theServer = new FtsSocketServer(server, Integer.parseInt(port));
-    else if (mode.equals("client"))
-      theServer = new FtsSocketClientServer(server);
-    else if (mode.equals("local"))
-      theServer = new FtsSubProcessServer();
-    else
-      System.out.println("unknown FTS connection type "+mode+": can't connect to FTS");
-
-    theServer.setParameter("ftsdir", theFtsdir);
-    theServer.setParameter("ftsname", theFtsname);
-    theServer.start();
-  }
 
   /** The FtsPort used to communicate with FTS */
 
@@ -65,8 +40,6 @@ public class FtsServer
   Vector updateGroupListeners;
 
   /** If true, put a 10 sec timeout on Sync;
-    You can avoid the timeout with the -noTimeOut yes
-    command line flag
    */
 
   private boolean timeoutOnSync = true;
@@ -75,15 +48,8 @@ public class FtsServer
 
   FtsServer(String name, FtsPort port)
   {
-    String timeOut;
-
     this.name = name;
     this.port = port;
-
-    timeOut = MaxApplication.getProperty("noTimeOut");
-
-    if (timeOut != null)
-      timeoutOnSync = false;
 
     this.port.setServer(this);
   }
@@ -118,7 +84,7 @@ public class FtsServer
 
     try
       {
-	root = (FtsContainerObject) FtsObject.makeFtsObject(null, "patcher", "root 0 0");
+	root = (FtsContainerObject) Fts.makeFtsObject(null, "patcher", "root 0 0");
       }
     catch (FtsException e)
       {
@@ -481,7 +447,7 @@ public class FtsServer
     if (FtsServer.debug)
       System.err.println("freeObject(" + obj + ")");
 
-    if (obj.getObjId() != -1)
+    if (obj.getObjectId() != -1)
       {
 	try
 	  {
@@ -632,15 +598,16 @@ public class FtsServer
 
   /** Send a "connect objects" messages to FTS. */
 
-  final void connectObjects(FtsObject from, int outlet, FtsObject to, int inlet)
+  final void newConnection(int id, FtsObject from, int outlet, FtsObject to, int inlet)
   {
     if (FtsServer.debug)
-      System.err.println("connectObjects(" + from + ", " + outlet + ", " +
+      System.err.println("newConnection(" + id + "," + from + ", " + outlet + ", " +
 			 to + ", " + inlet + ")");
 
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_connect_objects_cmd);
+	port.sendInt(id);
 	port.sendObject(from);
 	port.sendInt(outlet);
 	port.sendObject(to);
@@ -655,19 +622,15 @@ public class FtsServer
 
   /** Send a "disconnect objects" messages to FTS. */
 
-  final void disconnectObjects(FtsObject from, int outlet, FtsObject to, int inlet)
+  final void deleteConnection(FtsConnection connection)
   {
     if (FtsServer.debug)
-      System.err.println("disconnectObjects(" + from + ", " + outlet + ", " +
-			 to + ", " + inlet + ")");
+      System.err.println("deleteConnection(" + connection + ")");
 
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_disconnect_objects_cmd);
-	port.sendObject(from);
-	port.sendInt(outlet);
-	port.sendObject(to);
-	port.sendInt(inlet);
+	port.sendConnection(connection);
 	port.sendEom();
       }
     catch (java.io.IOException e)
@@ -911,18 +874,23 @@ public class FtsServer
 
       case FtsClientProtocol.fts_connect_objects_cmd:
 	{
+	  int id;
 	  FtsObject from, to;
 	  int outlet, inlet;
+	  FtsConnection c;
 
-	  from = (FtsObject) msg.getArgument(0);
-	  outlet = ((Integer) msg.getArgument(1)).intValue();
-	  to = (FtsObject) msg.getArgument(2);
-	  inlet = ((Integer) msg.getArgument(3)).intValue();
+	  id     = ((Integer)  msg.getArgument(0)).intValue();
+	  from   = (FtsObject) msg.getArgument(1);
+	  outlet = ((Integer)  msg.getArgument(2)).intValue();
+	  to     = (FtsObject) msg.getArgument(3);
+	  inlet  = ((Integer)  msg.getArgument(4)).intValue();
 
-	  new FtsConnection(from, outlet, to, inlet, false);
+	  c = new FtsConnection(id, from, outlet, to, inlet);
+
+	  registerConnection(c);
 
 	  if (FtsServer.debug)
-	    System.err.println("NewConnection " + from + "." + outlet + " -> " + to + "." + inlet);
+	    System.err.println("New Connection #" + id + " " + from + "." + outlet + " -> " + to + "." + inlet);
 	}
 	break;
 
@@ -960,62 +928,60 @@ public class FtsServer
   }
 
 
-  /* ID HANDLING */
-
+  /* OBJECT ID HANDLING */
 
   /**
-   * The server ID Counter.
+   * The server Object ID Counter.
    *
-   * Used to generate IDs for FTS; skip zero, 
-   * and continue by increments; do not reuse the Ids,
-   * in this implementation.
+   * Used to generate IDs for FTS objects; skip zero, 
+   * and continue by increments
    */
 
-  private int ftsIDCounter = 1;	// skip zero
+  private int ftsObjectIDCounter = 1;	// skip zero
 
   /** The object table. Used to map back Ids to objects. */
 
-  private Vector objTable = new Vector();
+  private Vector objectTable = new Vector();
 
-  /** The max Id registered */
+  /** The max object Id registered */
 
-  private int maxId = 0;
+  private int maxObjectId = 0;
 
   /**
-   * ID handling.
+   * Object ID handling.
    * Each server instance have it own object table, and provide
    * a register and unregister function; also, the server store and access
    * the object id directly in the FtsObject, for efficency, but this is 
    * transparent to the object.
    *
-   * The Client use only odd IDs; server generated objects use
+   * The Client use only odd object IDs; server generated objects use
    * only even IDs; on the server, IDs are assigned by need,
    * not to all the objects.
    */
 
-  private void registerObject(FtsObject obj)
+  private void registerObject(FtsObject object)
   {
-    if (obj == null)
+    if (object == null)
       System.err.println("registerObject got a null object");
 
-    if (obj.getObjId() == -1)
+    if (object.getObjectId() == -1)
       {
 	int newid;
 
-	newid = ftsIDCounter;
-	ftsIDCounter += 2;
+	newid = ftsObjectIDCounter;
+	ftsObjectIDCounter += 2;
 
-	obj.setObjId(newid);
+	object.setObjectId(newid);
       }
 
-    if (obj.getObjId() > maxId)
+    if (object.getObjectId() > maxObjectId)
       {
-	maxId = obj.getObjId() * 2;
+	maxObjectId = object.getObjectId() * 2;
 
-	objTable.setSize(maxId + 1);
+	objectTable.setSize(maxObjectId + 1);
       }
 
-    objTable.setElementAt(obj, obj.getObjId());
+    objectTable.setElementAt(object, object.getObjectId());
   }
 
   /**
@@ -1028,17 +994,17 @@ public class FtsServer
   {
     int newid;
 
-    newid = ftsIDCounter;
-    ftsIDCounter += 2;
+    newid = ftsObjectIDCounter;
+    ftsObjectIDCounter += 2;
 
-    if (newid > maxId)
+    if (newid > maxObjectId)
       {
-	maxId = newid * 2;
+	maxObjectId = newid * 2;
 
-	objTable.setSize(maxId + 1);
+	objectTable.setSize(maxObjectId + 1);
       }
 
-    objTable.setElementAt(null, newid);
+    objectTable.setElementAt(null, newid);
 
     return newid;
   }
@@ -1053,13 +1019,12 @@ public class FtsServer
 
   private void unregisterObject(FtsObject obj)
   {
-    objTable.setElementAt(null, obj.getObjId());
+    objectTable.setElementAt(null, obj.getObjectId());
   }
 
   /**
-   * Get an FtsObject by its FtsId (used only by the FAL).
+   * Get an FtsObject by its FtsId.
    *
-   * @deprecated
    */
 
   FtsObject getObjectByFtsId(int id)
@@ -1078,11 +1043,134 @@ public class FtsServer
       }
     else
       {
-	FtsObject obj = (FtsObject) objTable.elementAt(id);
+	FtsObject object = (FtsObject) objectTable.elementAt(id);
 
 	// Returned obj can be null here !!
 
-	return obj;
+	return object;
+      }
+  }
+
+  /* CONNECTION ID HANDLING */
+
+  /**
+   * The server Connection ID Counter.
+   *
+   * Used to generate IDs for FTS connections; skip zero, 
+   * and continue by increments
+   */
+
+  private int ftsConnectionIDCounter = 1;	// skip zero
+
+  /** The connection table. Used to map back Ids to connections. */
+
+  private Vector connectionTable = new Vector();
+
+  /** The max connection Id registered */
+
+  private int maxConnectionId = 0;
+
+  /**
+   * Connection ID handling.
+   * Each server instance have it own connection table, and provide
+   * a register and unregister function; also, the server store and access
+   * the connection id directly in the FtsConnection, for efficency, but this is 
+   * transparent to the connection.
+   *
+   * The Client use only odd connection IDs; server generated connections use
+   * only even IDs; on the server, IDs are assigned by need,
+   * not to all the connections.
+   */
+
+  private void registerConnection(FtsConnection connection)
+  {
+    if (connection == null)
+      System.err.println("registerConnection got a null connection");
+
+    if (connection.getConnectionId() == -1)
+      {
+	int newid;
+
+	newid = ftsConnectionIDCounter;
+	ftsConnectionIDCounter += 2;
+
+	connection.setConnectionId(newid);
+      }
+
+    if (connection.getConnectionId() > maxConnectionId)
+      {
+	maxConnectionId = connection.getConnectionId() * 2;
+
+	connectionTable.setSize(maxConnectionId + 1);
+      }
+
+    connectionTable.setElementAt(connection, connection.getConnectionId());
+  }
+
+  /**
+   * This method reserve (and return) a new id for an connection, and make
+   * place for it in the connection table, but just put a null there.
+   *
+   */
+
+  int getNewConnectionId()
+  {
+    int newid;
+
+    newid = ftsConnectionIDCounter;
+    ftsConnectionIDCounter += 2;
+
+    if (newid > maxConnectionId)
+      {
+	maxConnectionId = newid * 2;
+
+	connectionTable.setSize(maxConnectionId + 1);
+      }
+
+    connectionTable.setElementAt(null, newid);
+
+    return newid;
+  }
+
+  /**
+   * ID handling.
+   * Each server instance have it own connection table, and provide
+   * a register and unregister function; also, the server store and access
+   * the connection id directly in the FtsConnection, for efficency, but this is 
+   * transparent to the connection.
+   */
+
+  private void unregisterConnection(FtsConnection obj)
+  {
+    connectionTable.setElementAt(null, obj.getConnectionId());
+  }
+
+  /**
+   * Get an FtsConnection by its FtsId.
+   *
+   */
+
+  FtsConnection getConnectionByFtsId(int id)
+  {
+    if (id == 0)
+      {
+	// This is usually the case at the creation of the root patcher
+
+	return null;
+      }
+    else if (id == -1)
+      {
+	System.err.println("System error: received FTS_NO_ID as connection id\n");
+	Thread.dumpStack();
+	return null;
+      }
+    else
+      {
+	FtsConnection connection = (FtsConnection) connectionTable.elementAt(id);
+
+	// Returned obj can be null here !!
+
+	return connection;
       }
   }
 }

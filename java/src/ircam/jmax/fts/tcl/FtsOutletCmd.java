@@ -40,7 +40,7 @@ class FtsOutletCmd implements Command
 	    position    = argv[1].toString();
 	    properties = argv[2];
 
-	    object = FtsObject.makeFtsObject(parent, "outlet", position);
+	    object = Fts.makeFtsObject(parent, "outlet", position);
 	    object.parseTclProperties(interp, properties);
 
 	    interp.setResult(ReflectObject.newInstance(interp, object));

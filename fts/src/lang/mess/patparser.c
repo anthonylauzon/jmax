@@ -588,7 +588,7 @@ static void fts_patparse_parse_connection(fts_object_t *parent, fts_patlex_t *in
   from = fts_get_child(parent, fromIdx);
   to   = fts_get_child(parent, toIdx);
 
-  fts_object_connect(from, outlet, to, inlet);
+  fts_object_connect(FTS_NO_ID, from, outlet, to, inlet);
 }
 
 

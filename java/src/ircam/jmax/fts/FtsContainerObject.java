@@ -239,7 +239,7 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
 
   public void updateFtsObject()
   {
-    FtsServer.getServer().redefinePatcherObject(this, objectName, ninlets, noutlets);
+    Fts.getServer().redefinePatcherObject(this, objectName, ninlets, noutlets);
   }
 
   /** Open tell FTS that this patcher is "alive";
@@ -252,8 +252,8 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
       download();
 
     open = true;
-    FtsServer.getServer().openPatcher(this);
-    FtsServer.getServer().syncToFts();
+    Fts.getServer().openPatcher(this);
+    Fts.getServer().syncToFts();
   }
 
   /** Close tell FTS that this patcher is not "alive". */
@@ -262,7 +262,7 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
   {
     open = false;
 
-    FtsServer.getServer().closePatcher(this);
+    Fts.getServer().closePatcher(this);
   }
 
   /** Check if the patcher is open. */
@@ -278,8 +278,8 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
   {
     if (! downLoaded)
       {
-	FtsServer.getServer().sendDownloadPatcher(this);
-	FtsServer.getServer().syncToFts();
+	Fts.getServer().sendDownloadPatcher(this);
+	Fts.getServer().syncToFts();
       }
 
     downLoaded = true;
@@ -302,7 +302,7 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
 
   public final void loaded()
   {
-    FtsServer.getServer().patcherLoaded(this);
+    Fts.getServer().patcherLoaded(this);
   }
 
   /** Keep the container handlers */
@@ -372,20 +372,6 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
     containerStack.pop();
   }
 
-
-  /** Selection
-   * Get the unique FtsSelect object for this container
-   */
-
-  FtsSelection selection = null;
-
-  public FtsSelection getSelection()
-  {
-    if (selection == null)
-      selection = new FtsSelection();
-    
-    return selection;
-  }
 
   /*****************************************************************************/
   /*                                                                           */

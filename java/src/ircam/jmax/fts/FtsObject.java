@@ -84,7 +84,7 @@ abstract public class FtsObject implements MaxTclInterpreter
     FtsObject obj;
     int id;
 
-    server = FtsServer.getServer();
+    server = Fts.getServer();
 
     id = server.getNewObjectId();
 
@@ -119,7 +119,7 @@ abstract public class FtsObject implements MaxTclInterpreter
     FtsObject obj;
     int id;
 
-    server = FtsServer.getServer();
+    server = Fts.getServer();
 
     id = server.getNewObjectId();
     server.newObject(parent, id, description);
@@ -311,9 +311,9 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   public static FtsObject getObject(String name)
   {
-    if (FtsServer.getServer() != null)
+    if (Fts.getServer() != null)
       {
-	FtsContainerObject root = FtsServer.getServer().getRootObject();
+	FtsContainerObject root = Fts.getServer().getRootObject();
 	Vector objects = root.getObjects();
 
 	for (int i = 0; i < objects.size(); i++)
@@ -460,7 +460,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   public void put(String name, Object value)
   {
-    FtsServer.getServer().putObjectProperty(this, name, value);
+    Fts.getServer().putObjectProperty(this, name, value);
 
     localPut(name, value);
   }
@@ -810,7 +810,7 @@ abstract public class FtsObject implements MaxTclInterpreter
     this.parent = parent;
 
     if (objId != -1)
-      setObjId(objId);
+      setObjectId(objId);
 
     // this test make sense only for the root patcher
 
@@ -941,7 +941,7 @@ abstract public class FtsObject implements MaxTclInterpreter
   {
     parent.setDirty();
     parent.removeObjectFromContainer(this); 
-    FtsServer.getServer().freeObject(this);
+    Fts.getServer().freeObject(this);
   }
 
   // Communication with the object
@@ -950,7 +950,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   public final void sendMessage(int inlet, String selector, Vector args)
   {
-    FtsServer.getServer().sendObjectMessage(this, inlet, selector, args);
+    Fts.getServer().sendObjectMessage(this, inlet, selector, args);
   }
 
   /**
@@ -1002,14 +1002,14 @@ abstract public class FtsObject implements MaxTclInterpreter
    * Get the fts object id. <p>
    */
 
-  final int getObjId()
+  final int getObjectId()
   {
     return ftsId;
   }
 
   /** Set the objid. Private, used only by the server. */
 
-  final void setObjId(int id)
+  final void setObjectId(int id)
   {
     ftsId = id;
   }

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.4 $ IRCAM $Date: 1998/04/23 16:07:21 $
+ *      $Revision: 1.5 $ IRCAM $Date: 1998/04/29 14:44:39 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -45,12 +45,8 @@ extern void fts_object_change_description(fts_object_t *obj, int argc, const fts
 
 /* Connections */
 
-extern fts_status_t fts_object_connect(fts_object_t *, int woutlet, fts_object_t *, int winlet);
-extern fts_status_t fts_object_disconnect(fts_object_t *, int woutlet, fts_object_t *, int winlet);
-extern fts_status_t fts_object_connect_perform(fts_object_t *, int woutlet, fts_object_t *, int winlet);
-extern fts_status_t fts_object_connect_outlet(fts_object_t *, int woutlet, fts_object_t *, int winlet);
-extern fts_status_t fts_object_disconnect_perform(fts_object_t *, int woutlet, fts_object_t *, int winlet);
-extern fts_status_t fts_object_disconnect_outlet(fts_object_t *, int woutlet, fts_object_t *, int winlet);
+extern fts_connection_t *fts_object_connect(int id, fts_object_t *, int woutlet, fts_object_t *, int winlet);
+extern void fts_object_disconnect(fts_connection_t *conn);
 
 /* Messaging */
 
@@ -205,8 +201,9 @@ extern fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 #define fts_object_is_outlet(o)  ((o)->cl->mcl == outlet_metaclass)
 #define fts_object_is_inlet(o)   ((o)->cl->mcl == inlet_metaclass)
 
-#define fts_object_get_id(o)     ((o)->id)
 
+#define fts_object_get_id(o)     ((o)->id)
+#define fts_connection_get_id(c)     ((c)->id)
 
 
 

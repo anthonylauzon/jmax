@@ -14,6 +14,7 @@ class FtsError
   final static int DOTPAT_ERROR = 2;
   final static int TPA_ERROR = 3;
   final static int ILLEGAL_OPERATION = 4;
+  final static int CONNECTION_ERROR = 1;
 
   String description;
   int    code;

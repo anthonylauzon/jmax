@@ -11,16 +11,12 @@
  *
  *    The size of the array is variable
  *
- * From now on, the character code and the value in the message structure
- * are the same, so the users can add as many message type as they want.
- * (of course, different from the existings ..).
- * 
  * Used Letters are:
-
+ *
  * Forbidden values : 0x00 (easy message as string in C)
  * Low values: 0x01 0x02 0x03
  * Symbols   : - { } > < \
- * Lowercase : c d f g h i m n o p q u z 
+ * Lowercase : c d f g h i m n o p q u z x
  * Uppercase : A C D E F L M N O P Q R S T U V X Y Z 
  * 
  */
@@ -98,6 +94,7 @@
 #define STRING_END_CODE   0x02
 #define STRING_QUOTE_CODE '\\'
 #define OBJECT_CODE 'o'
+#define CONNECTION_CODE 'x'
 
 /*
    End of message: this character cannot be changed, and cannot

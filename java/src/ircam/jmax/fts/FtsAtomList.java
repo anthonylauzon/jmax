@@ -97,8 +97,8 @@ public class FtsAtomList implements FtsDataObject
   {
     if (object != null)
       {
-	FtsServer.getServer().sendObjectMessage(object, -1, "update", null);
-	FtsServer.getServer().syncToFts();
+	Fts.getServer().sendObjectMessage(object, -1, "update", null);
+	Fts.getServer().syncToFts();
       }
   }
 
@@ -128,7 +128,7 @@ public class FtsAtomList implements FtsDataObject
 
     if (object != null)
       {
-	FtsServer.getServer().sendSetMessage(object, values);
+	Fts.getServer().sendSetMessage(object, values);
 	object.setDirty();
       }
   }

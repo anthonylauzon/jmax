@@ -39,7 +39,7 @@ class FtsInletCmd implements Command
 	    position    = argv[1].toString();
 	    properties = argv[2];
 
-	    object = FtsObject.makeFtsObject(parent, "inlet", position);
+	    object = Fts.makeFtsObject(parent, "inlet", position);
 	    object.parseTclProperties(interp, properties);
 
 	    interp.setResult(ReflectObject.newInstance(interp, object));

@@ -36,7 +36,7 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
   public void makeFtsObject() {
     try
       {
-	itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "button");
+	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "button");
       }
     catch (FtsException e)
       {

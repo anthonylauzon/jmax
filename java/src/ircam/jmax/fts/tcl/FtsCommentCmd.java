@@ -40,7 +40,7 @@ class FtsCommentCmd implements Command
 	    description = argv[1].toString();
 	    properties = argv[2];
 
-	    object = FtsObject.makeFtsObject(parent, "comment", description);
+	    object = Fts.makeFtsObject(parent, "comment", description);
 	    object.parseTclProperties(interp, properties);
 
 	    interp.setResult(ReflectObject.newInstance(interp, object));

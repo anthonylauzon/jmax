@@ -15,6 +15,8 @@ public class FtsConnection
     temporary, waiting for a more event/based editor
     */
 
+  private int id;
+
   boolean deleted = false; 
   FtsObject from;
   int outlet;
@@ -24,38 +26,34 @@ public class FtsConnection
 
   /** Create a FTS connection.  */
 
-  public FtsConnection(FtsObject from, int outlet, FtsObject to, int inlet)
+  FtsConnection(int id, FtsObject from, int outlet, FtsObject to, int inlet)
   {
     super();
    
+    this.id     = id;
     this.from   = from;
     this.outlet = outlet;
     this.to     = to;
     this.inlet  = inlet;
 
-    FtsServer.getServer().connectObjects(from, outlet, to, inlet);
-
     from.getParent().addConnectionToContainer(this);
-
     from.setDirty();
-    to.setDirty();
   }
 
+  /**
+   * Get the fts connection id. <p>
+   */
 
-  public FtsConnection(FtsObject from, int outlet, FtsObject to, int inlet, boolean doOnFts)
+  final int getConnectionId()
   {
-    super();
-   
-    this.from   = from;
-    this.outlet = outlet;
-    this.to     = to;
-    this.inlet  = inlet;
+    return id;
+  }
 
-    if (doOnFts)
-      FtsServer.getServer().connectObjects(from, outlet, to, inlet);
+  /** Set the objid. Private, used only by the server. */
 
-    from.getParent().addConnectionToContainer(this);
-    from.setDirty();// only one needed, they *must* reside on the same document
+  final void setConnectionId(int id)
+  {
+    this.id = id;
   }
 
 
@@ -69,7 +67,7 @@ public class FtsConnection
   {
     if ((from == oldObject) || (to == oldObject))
       {
-	FtsServer.getServer().disconnectObjects(from, outlet, to, inlet);
+	Fts.getServer().deleteConnection(this);
 
 	if (from == oldObject)
 	  from = newObject;
@@ -77,7 +75,7 @@ public class FtsConnection
 	if (to == oldObject)
 	  to = newObject;
 
-	FtsServer.getServer().connectObjects(from, outlet, to, inlet);
+	Fts.getServer().newConnection(id, from, outlet, to, inlet);
       }
   }
 
@@ -85,6 +83,8 @@ public class FtsConnection
 
   public void delete()
   {
+    System.err.println("Connection delete " + this);
+
     if (deleted)
       return;
 
@@ -92,7 +92,7 @@ public class FtsConnection
     from.setDirty();
     to.setDirty();
 	
-    FtsServer.getServer().disconnectObjects(from, outlet, to, inlet);
+    Fts.getServer().deleteConnection(this);
 
     from.getParent().removeConnectionFromContainer(this);
   }
@@ -129,30 +129,7 @@ public class FtsConnection
 
   void saveAsTcl(PrintWriter writer)
   {
-    writer.print("connection $obj(" + from.getObjId() + ") " + outlet + " $obj(" + to.getObjId() + ") " + inlet);
-  }
-
-  /**
-   * Check the  consistency of the connection.
-   * Return true if it is consistent with the
-   * status of the objects, false otherwise; i.e. it check that
-   * the inlets actually exists; it may happen that we get an error
-   * in an object instantiation, and the connection cannot be done ...
-   * It work only if the patcher is open, otherwise always return true.
-   */
-
-  public boolean checkConsistency()
-  {
-    if (from.getParent().isOpen())
-      {
-	if (inlet >= to.getNumberOfInlets())
-	  return false;
-
-	if (outlet >= from.getNumberOfOutlets())
-	  return false;
-      }
-
-    return true;
+    writer.print("connection $obj(" + from.getObjectId() + ") " + outlet + " $obj(" + to.getObjectId() + ") " + inlet);
   }
 
   public String  toString()

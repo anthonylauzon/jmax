@@ -34,7 +34,7 @@ class FtsAbstractionCmd implements Command
 	name = argv[1].toString();
 	filename = argv[2].toString();
 
-	FtsServer.getServer().sendAbstractionDeclare(name, filename);
+	Fts.getServer().sendAbstractionDeclare(name, filename);
       }
     else
       {

@@ -70,6 +70,7 @@ static struct inmess
       in_string,
       in_string_quoted,
       in_object,
+      in_connection,
       input_error
     } status;
 
@@ -162,6 +163,11 @@ fts_client_parse_char(char c)
 	    parser.status = in_object;
 	    parser.buf_fill_p = parser.buf;
 	  }
+	else if (c == CONNECTION_CODE)
+	  {
+	    parser.status = in_connection;
+	    parser.buf_fill_p = parser.buf;
+	  }
 	else if (c == STRING_START_CODE)
 	  {
 	    parser.status = in_string;
@@ -193,6 +199,11 @@ fts_client_parse_char(char c)
 	  {
 	    value_found = 1;
 	    parser.status = in_object;
+	  }
+	else if (c == CONNECTION_CODE)
+	  {
+	    value_found = 1;
+	    parser.status = in_connection;
 	  }
 	else if (c == STRING_START_CODE)
 	  {
@@ -246,6 +257,11 @@ fts_client_parse_char(char c)
 	  {
 	    value_found = 1;
 	    parser.status = in_object;
+	  }
+	else if (c == CONNECTION_CODE)
+	  {
+	    value_found = 1;
+	    parser.status = in_connection;
 	  }
 	else if (c == STRING_START_CODE)
 	  {
@@ -302,6 +318,11 @@ fts_client_parse_char(char c)
 	    value_found = 1;
 	    parser.status = in_object;
 	  }
+	else if (c == CONNECTION_CODE)
+	  {
+	    value_found = 1;
+	    parser.status = in_connection;
+	  }
 	else if (c == STRING_START_CODE)
 	  {
 	    value_found = 1;
@@ -328,6 +349,70 @@ fts_client_parse_char(char c)
 
 	    id = dtol(parser.buf);
 	    fts_set_object(&(parser.av[parser.ac]), fts_object_table_get(id));
+
+	    (parser.ac)++;
+
+	    if (parser.ac >= MAX_NARGS) 
+	      parser.status = input_error;
+
+	    parser.buf_fill_p = parser.buf;
+	  }
+      }
+      break;
+
+    case in_connection:
+      {
+	int value_found = 0;
+	
+	if (c == LONG_POS_CODE)
+	  {
+	    value_found = 1;
+	    parser.status = in_long;
+	  }
+	else if (c == FLOAT_CODE)
+	  {
+	    value_found = 1;
+	    parser.status = in_float;
+	  }
+	else if (c == OBJECT_CODE)
+	  {
+	    value_found = 1;
+	    parser.status = in_object;
+	  }
+	else if (c == CONNECTION_CODE)
+	  {
+	    value_found = 1;
+	    parser.status = in_connection;
+	  }
+	else if (c == STRING_START_CODE)
+	  {
+	    value_found = 1;
+	    parser.status = in_string;
+	  }
+	else if (c == EOM_CODE)
+	  {
+	    value_found = 1;
+	    eom = 1;
+	  }
+	else
+	  {
+	    if (parser.buf_fill_p == parser.buf + MAX_MESSAGE_LENGTH)
+	      parser.status = input_error;
+	    else
+	      *((parser.buf_fill_p)++) = c;
+	  }
+
+	if (value_found)
+	  {
+	    int id;
+
+	    *(parser.buf_fill_p) = '\0';
+
+	    id = dtol(parser.buf);
+
+	    fts_set_connection(&(parser.av[parser.ac]), fts_connection_table_get(id));
+
+	    fprintf(stderr, "Got connection Id %d, connection %lx\n", id, fts_get_connection(&(parser.av[parser.ac])));
 
 	    (parser.ac)++;
 

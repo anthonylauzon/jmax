@@ -81,7 +81,7 @@ class ErmesObjSlider extends ErmesObject {
   {
     try
       {
-	itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "slider");
+	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "slider");
       }
     catch (FtsException e)
       {
@@ -231,7 +231,7 @@ class ErmesObjSlider extends ErmesObject {
 	  
   public boolean MouseUp(MouseEvent evt,int x, int y){
     if(itsSketchPad.itsRunMode || evt.isControlDown()){
-      FtsServer.getServer().syncToFts();
+      Fts.getServer().syncToFts();
       itsMovingThrottle = false;
       //DoublePaint();
       Paint_specific(itsSketchPad.getGraphics());

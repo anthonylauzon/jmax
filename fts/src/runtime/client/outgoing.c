@@ -64,10 +64,20 @@ fts_client_mess_add_long(long value)
   fts_client_send_string(outbuf);
 }
 
+
 void
 fts_client_mess_add_object(fts_object_t *obj)
 {
   sprintf(outbuf, "%c%ld", OBJECT_CODE, (obj ? fts_object_get_id(obj) : 0));
+
+  fts_client_send_string(outbuf);
+}
+
+
+void
+fts_client_mess_add_connection(fts_object_t *obj)
+{
+  sprintf(outbuf, "%c%ld", CONNECTION_CODE, (obj ? fts_connection_get_id(obj) : 0));
 
   fts_client_send_string(outbuf);
 }
@@ -196,7 +206,11 @@ fts_client_upload_connection(fts_connection_t *c)
 {
   /* CONNECT (obj)from (int)outlet (obj)to (int)inlet */
 
+  if (c->id == FTS_NO_ID)
+    fts_connection_table_register(c);
+
   fts_client_mess_start_msg(CONNECT_OBJECTS_CODE);
+  fts_client_mess_add_long(c->id);
   fts_client_mess_add_object(c->src);
   fts_client_mess_add_long(c->woutlet);
   fts_client_mess_add_object(c->dst);

@@ -65,7 +65,7 @@ public class FtsTableObject extends FtsObject implements FtsObjectWithData
   public MaxData getData()
   {
     this.vector.forceUpdate();
-    FtsServer.getServer().syncToFts();
+    Fts.getServer().syncToFts();
 
     return vector;
   }
@@ -75,7 +75,7 @@ public class FtsTableObject extends FtsObject implements FtsObjectWithData
     // We may have a pending save/update
     // Sync, than discard the vector
 
-    FtsServer.getServer().syncToFts();
+    Fts.getServer().syncToFts();
     vector.setObject(null);
 
     // set the new vector, bind to this object

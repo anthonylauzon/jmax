@@ -154,7 +154,10 @@ class ErmesSketchHelper extends Object{
     aInlet.GetConnections().removeElement(theConnection);
     if(aInlet.GetConnections().size()==0) aInlet.SetConnected(false, false);
     if(aOutlet.GetConnections().size()==0) aOutlet.SetConnected(false, false);
-    if (theConnection.itsFtsConnection != null && theConnection.itsFtsConnection.checkConsistency()) theConnection.itsFtsConnection.delete();	//delete from FTS
+
+    if (theConnection.itsFtsConnection != null)
+      theConnection.itsFtsConnection.delete();	//delete from FTS
+
     itsSketchPad.markSketchAsDirty();
     if (paintNow) itsSketchPad.paintDirtyList();
   }

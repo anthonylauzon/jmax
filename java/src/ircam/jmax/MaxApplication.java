@@ -202,7 +202,7 @@ public class MaxApplication extends Object
     //if there were no connection statements in startup.tcl, ask the user
     
     
-    if (FtsServer.getServer() == null)
+    if (Fts.getServer() == null)
       {
 	new ConnectionDialog();
 	MaxApplication.runHooks("start");
@@ -363,8 +363,8 @@ public class MaxApplication extends Object
 	ConsoleWindow.getConsoleWindow().dispose();
       }
 
-    if (FtsServer.getServer() != null)
-      FtsServer.getServer().stop();
+    if (Fts.getServer() != null)
+      Fts.getServer().stop();
 
     Runtime.getRuntime().exit(0);
   }

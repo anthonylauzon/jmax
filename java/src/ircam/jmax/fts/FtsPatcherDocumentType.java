@@ -28,7 +28,7 @@ public class FtsPatcherDocumentType extends MaxDocumentType
 
     try
       {
-	patcher = (FtsContainerObject) FtsObject.makeFtsObject(FtsServer.getServer().getRootObject(), "patcher", "unnamed 0 0");
+	patcher = (FtsContainerObject) Fts.makeFtsObject(Fts.getServer().getRootObject(), "patcher", "unnamed 0 0");
 
 	// Put some geometrical property for the window, so we can see it.
 

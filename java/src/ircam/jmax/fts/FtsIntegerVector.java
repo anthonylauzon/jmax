@@ -103,8 +103,8 @@ public class FtsIntegerVector implements FtsDataObject
   {
     if (object != null)
       {
-	FtsServer.getServer().sendObjectMessage(object, -1, "update", null);
-	FtsServer.getServer().syncToFts();
+	Fts.getServer().sendObjectMessage(object, -1, "update", null);
+	Fts.getServer().syncToFts();
       }
   }
 
@@ -130,7 +130,7 @@ public class FtsIntegerVector implements FtsDataObject
     
     if (object != null)
       {
-	FtsServer.getServer().sendSetMessage(object, from, values, from, to);
+	Fts.getServer().sendSetMessage(object, from, values, from, to);
 	object.setDirty();
       }
   }

@@ -276,11 +276,28 @@ abstract class FtsPort implements Runnable
     String s;
 
     if (obj != null)
-      value = obj.getObjId();
+      value = obj.getObjectId();
     else
       value = 0;
 
     out_stream.write(FtsClientProtocol.object_type_code);
+    s = Integer.toString(value);
+		
+    for (int i = 0; i < s.length(); i++)
+      out_stream.write(s.charAt(i));
+  }
+
+  final void sendConnection(FtsConnection connection) throws java.io.IOException 
+  {
+    int value;
+    String s;
+
+    if (connection != null)
+      value = connection.getConnectionId();
+    else
+      value = 0;
+
+    out_stream.write(FtsClientProtocol.connection_type_code);
     s = Integer.toString(value);
 		
     for (int i = 0; i < s.length(); i++)
@@ -403,11 +420,12 @@ abstract class FtsPort implements Runnable
   // Token types for the parser
 
   private static final int blank_token   = 0;
-  private static final int int_token = 1;
+  private static final int int_token     = 1;
   private static final int float_token   = 3;
   private static final int object_token  = 4;
-  private static final int string_token  = 5;
-  private static final int end_token     = 6;
+  private static final int connection_token  = 5;
+  private static final int string_token  = 6;
+  private static final int end_token     = 7;
 
   static int tokenCode(int c)
   {
@@ -417,6 +435,8 @@ abstract class FtsPort implements Runnable
       return float_token;
     else if (c == FtsClientProtocol.object_type_code)
       return object_token;
+    else if (c == FtsClientProtocol.connection_type_code)
+      return connection_token;
     else if (c == FtsClientProtocol.string_start_code)
       return string_token;
     else if (FtsClientProtocol.isBlank(c))
@@ -524,6 +544,25 @@ abstract class FtsPort implements Runnable
 		obj = server.getObjectByFtsId(Integer.parseInt(s.toString()));
 		
 		portMsg.addArgument(obj);
+		s.setLength(0);
+	      }
+	    else
+	      s.append((char)c);
+	    break;
+
+	    /*------------------*/
+
+	  case connection_token:
+
+	    if (FtsClientProtocol.tokenStartingChar(c))
+	      {
+		FtsConnection connection;
+
+		status = tokenCode(c);
+
+		connection = server.getConnectionByFtsId(Integer.parseInt(s.toString()));
+		
+		portMsg.addArgument(connection);
 		s.setLength(0);
 	      }
 	    else

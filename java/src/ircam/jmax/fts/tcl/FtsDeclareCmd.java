@@ -39,7 +39,7 @@ class FtsDeclareCmd implements Command
 
 	try
 	  {
-	    object = FtsObject.makeFtsObject(parent, description);
+	    object = Fts.makeFtsObject(parent, description);
 	  }
 	catch (FtsException e)
 	  {

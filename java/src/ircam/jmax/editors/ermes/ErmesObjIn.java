@@ -78,7 +78,7 @@ class ErmesObjIn extends ErmesObject {
   {
     try
       {
-	itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "inlet", Integer.toString(itsId));
+	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "inlet", Integer.toString(itsId));
       }
     catch (FtsException e)
       {

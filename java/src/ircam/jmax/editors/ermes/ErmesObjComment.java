@@ -80,7 +80,7 @@ class ErmesObjComment extends ErmesObject {
   public void makeFtsObject(){
     try
       {
-	itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "comment", itsArgs);
+	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "comment", itsArgs);
       }
     catch (FtsException e)
       {

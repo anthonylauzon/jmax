@@ -64,7 +64,7 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
     FtsObject patcher;
     int id;
 
-    server = FtsServer.getServer();
+    server = Fts.getServer();
     id = server.getNewObjectId();
 
     // ask fts to load the file within this 
@@ -95,7 +95,7 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
       {
 	File file = ((MaxFileDocumentSource) source).getFile();
 
-	FtsServer.getServer().savePatcherBmax((FtsObject) document.getRootData(), file.getAbsolutePath());
+	Fts.getServer().savePatcherBmax((FtsObject) document.getRootData(), file.getAbsolutePath());
       }
     else
       throw new MaxDocumentException("Cannot save a " + document.getDocumentType() + " as Bmax file");

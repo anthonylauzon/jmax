@@ -70,14 +70,14 @@ class FtsObjectCmd implements Command
 		String content = description.substring(description.indexOf('{') + 1,
 						       description.lastIndexOf('}'));
 
-		object = FtsObject.makeFtsObject(parent, "messbox", content);
+		object = Fts.makeFtsObject(parent, "messbox", content);
 		object.parseTclProperties(interp, properties);
 
 		interp.setResult(ReflectObject.newInstance(interp, object));
 	      }
 	    else
 	      {
-		object = FtsObject.makeFtsObject(parent, description);
+		object = Fts.makeFtsObject(parent, description);
 		object.parseTclProperties(interp, properties);
 		interp.setResult(ReflectObject.newInstance(interp, object));
 	      }

@@ -40,8 +40,8 @@ public class StatisticsDialog extends Dialog implements ActionListener, KeyListe
     Label label5 = new Label("FTS SERVER");
     p1.add(label5);
     Label label6;
-    if (FtsServer.getServer() !=null)
-      label6 = new Label("Fts connection:" + FtsServer.getServer().toString());
+    if (Fts.getServer() !=null)
+      label6 = new Label("Fts connection:" + Fts.getServer().toString());
     else label6 = new Label("Fts connection: not connected" );
     p1.add(label6);
     Label label7 = new Label("TCL version: 8.00");

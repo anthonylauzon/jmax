@@ -70,7 +70,7 @@ class ErmesObjFloat extends ErmesObject {
   {
     try
       {
-	itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "floatbox");
+	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "floatbox");
       }
     catch (FtsException e)
       {
@@ -180,7 +180,7 @@ class ErmesObjFloat extends ErmesObject {
   //--------------------------------------------------------
   public boolean MouseUp(MouseEvent evt,int x, int y) {
     if(itsSketchPad.itsRunMode){
-      FtsServer.getServer().syncToFts();
+      Fts.getServer().syncToFts();
       DoublePaint();
       return true;
     }

@@ -36,7 +36,14 @@ class FtsConnectionCmd implements Command
 	int       inlet  = TclInteger.get(interp, argv[4]);
 	FtsConnection c;
 
-	c = new FtsConnection(from, outlet, to, inlet);
+	try
+	  {
+	    c = Fts.makeFtsConnection(from, outlet, to, inlet);
+	  }
+	catch (FtsException e)
+	  {
+	    throw new TclException(interp, "Connection error");
+	  }
 
 	interp.setResult(ReflectObject.newInstance(interp, c));
       }

@@ -40,6 +40,17 @@ fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
 	  else
 	    fprintf(f,"(obj)<null>");
 	}
+      else if (fts_is_connection(&at[i]))
+	{
+	  fts_connection_t *c;
+
+	  c = fts_get_connection(&at[i]);
+
+	  if (c)
+	    fprintf(f,"(obj)%d%s", fts_connection_get_id(c), ps);
+	  else
+	    fprintf(f,"(obj)<null>");
+	}
       else if (fts_is_void(&at[i]))
 	fprintf(f,"(void)%s", ps);
       else

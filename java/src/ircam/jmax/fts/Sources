@@ -1,4 +1,5 @@
 SOURCES =  \
+	  Fts.java \
 	  FtsAbstractionObject.java \
 	  FtsAtomList.java \
 	  FtsBmaxRemoteDocumentHandler.java \

@@ -30,32 +30,10 @@ public class FtsPatcherDocument extends MaxDocument implements MaxTclDocument
   {
     // Sync to fts to be sure we have all the info.
 
-    FtsServer.getServer().syncToFts();
+    Fts.getServer().syncToFts();
 
     ((FtsContainerObject) rootData).saveAsTcl(pw);
   }
-
-
-  /** temporary trick to save binary files for every .tpat file */
-
-  public void save() throws MaxDocumentException
-  {
-    String file;
-
-    super.save();
-
-    // get the file name
-
-    file = ((MaxFileDocumentSource) source).getFile().getAbsolutePath();
-
-    if (file.lastIndexOf('.') == -1)
-      file = file + ".bmax";
-    else
-      file = file.substring(0, file.lastIndexOf('.')) + ".bmax";
-    
-    FtsServer.getServer().savePatcherBmax((FtsObject) getRootData(), file);
-  }
-
 
   /** Eval function, to built the Patch Data from a Tcl file.
     Eval a given script inside this documeynt */
@@ -105,7 +83,7 @@ public class FtsPatcherDocument extends MaxDocument implements MaxTclDocument
 
 //   public void saveBmax(String fileName)
 //   {
-//     FtsServer.getServer().savePatcherBmax(patcher, fileName);
+//     Fts.getServer().savePatcherBmax(patcher, fileName);
 //   }
 
 

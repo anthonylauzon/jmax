@@ -138,9 +138,11 @@ public class MaxTclFileDocumentHandler extends MaxDocumentHandler
 
   public boolean canSaveTo(MaxDocument document, MaxDocumentSource source)
   {
-    return ((source instanceof MaxFileDocumentSource) &&
-	    (document instanceof MaxTclDocument) &&
-	    super.canSaveTo(document, source));
+    return false;
+
+    // return ((source instanceof MaxFileDocumentSource) &&
+    // (document instanceof MaxTclDocument) &&
+    // super.canSaveTo(document, source));
   }
 }
 

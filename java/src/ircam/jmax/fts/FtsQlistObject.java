@@ -49,7 +49,7 @@ public class FtsQlistObject extends FtsObject  implements FtsObjectWithData
   public MaxData getData()
   {
     this.list.forceUpdate();
-    FtsServer.getServer().syncToFts();
+    Fts.getServer().syncToFts();
 
     return list;
   }
@@ -59,7 +59,7 @@ public class FtsQlistObject extends FtsObject  implements FtsObjectWithData
     // We may have a pending save/update
     // Sync, than discard the list
 
-    FtsServer.getServer().syncToFts();
+    Fts.getServer().syncToFts();
     list.setObject(null);
 
     // set the new list, bind to this object

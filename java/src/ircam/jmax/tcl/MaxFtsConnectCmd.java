@@ -32,13 +32,13 @@ class MaxFtsConnectCmd implements Command
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
     if (argv.length == 6)
-      FtsServer.connectToFts(new String(argv[1].toString()),
+      Fts.connectToFts(new String(argv[1].toString()),
 						 new String(argv[2].toString()),
 						 new String(argv[3].toString()),
 						 new String(argv[4].toString()),
 						 new String(argv[5].toString()));
     else if (argv.length == 5)
-      FtsServer.connectToFts(new String(argv[1].toString()),
+      Fts.connectToFts(new String(argv[1].toString()),
 						 new String(argv[2].toString()),
 						 new String(argv[3].toString()),
 						 new String(argv[4].toString()),

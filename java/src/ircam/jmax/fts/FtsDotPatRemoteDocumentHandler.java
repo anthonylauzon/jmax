@@ -64,7 +64,7 @@ public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
 
     // Build an empty patcher son of root.
 
-    server = FtsServer.getServer();
+    server = Fts.getServer();
     id = server.getNewObjectId();
 
     // ask fts to load the file within this 

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.18 $ IRCAM $Date: 1998/05/11 14:46:28 $
+ *      $Revision: 1.19 $ IRCAM $Date: 1998/05/11 19:36:34 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -270,8 +270,8 @@ fts_object_delete(fts_object_t *obj)
       /* must call the real disconnect function, so that all the daemons
 	 and methods  can fire correctly */
 
-      for (p = obj->out_conn[outlet]; p ;  p = obj->out_conn[outlet])
-	fts_object_disconnect(p->src, p->woutlet, p->dst, p->winlet);
+      while (p = obj->out_conn[outlet])
+	fts_object_disconnect(p);
     }
 
   /* Delete all the survived connections ending in the object */
@@ -283,8 +283,8 @@ fts_object_delete(fts_object_t *obj)
       /* must call the real disconnect function, so that all the daemons
 	 and methods  can fire correctly */
 
-      for (p = obj->in_conn[inlet]; p; p = obj->in_conn[inlet])
-	fts_object_disconnect(p->src, p->woutlet, p->dst, p->winlet);
+      while (p = obj->in_conn[inlet])
+	fts_object_disconnect(p);
     }
 
   /* Delete the object from the patcher */
@@ -330,8 +330,7 @@ fts_object_delete(fts_object_t *obj)
 /*                                                                            */
 /******************************************************************************/
 
-fts_status_t
-fts_object_connect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
+fts_connection_t *fts_object_connect(int id, fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
 {
   fts_outlet_decl_t *outlet;
   fts_inlet_decl_t *inlet;
@@ -343,13 +342,9 @@ fts_object_connect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
 
   if (woutlet >= out->cl->noutlets || woutlet < 0)
     {
-      /*
-	fprintf(stderr,"fts_object_connect: outlet %d out of range %d for object %s(%d)\n",
-	woutlet,	out->cl->noutlets, 
-	fts_symbol_name(fts_get_class_name(out->cl)), fts_object_get_id(out));
-      */
+      post("Outlet out of range\n");
 
-      return &fts_OutletOutOfRange;
+      return 0;
     }
 
 
@@ -363,7 +358,9 @@ fts_object_connect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
 	{
 	  /* Found, return error message */
 
-	  return &fts_DoubleConnection;
+	  post("Double Connection\n");
+
+	  return 0;
 	}
     }
   }
@@ -378,13 +375,9 @@ fts_object_connect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
     inlet = &in->cl->inlets[winlet];
   else
     {
-      /* 
-      fprintf(stderr,"fts_object_connect: inlet %d out of range %d for object %s(%d)\n",
-	      winlet, in->cl->ninlets, 
-	      fts_symbol_name(fts_get_class_name(in->cl)), fts_object_get_id(in));
-      */
+      post("Inlet out of range \n");
 
-      return &fts_InletOutOfRange;
+      return 0;
     }
 
   if (outlet->tmess.symb)
@@ -393,31 +386,22 @@ fts_object_connect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
 
       if (! mess)
 	{
-	  post("fts_object_connect: cannot connect %s(%d) #%d to %s(%d) #%d\n", 
-		  fts_symbol_name(fts_get_class_name(out->cl)),
-		  fts_object_get_id(out),
-		  woutlet,
-		  fts_symbol_name(fts_get_class_name(in->cl)),
-		  fts_object_get_id(in),
-		  winlet
-		  );/* @@@@ ERROR !!! */
+	  post("Cannot connect\n");
 
-	  /*
-	  fprintf(stderr, "fts_object_connect: method for message %s not found\n",
-		  fts_symbol_name(outlet->tmess.symb));
-	  */
-
-
-	  return &fts_ObjectCannotConnect;
+	  return 0;
 	}
     }
 
   outconn = (fts_connection_t *) fts_heap_alloc(&connection_heap);
 
+  outconn->id  = id;
   outconn->src = out;
   outconn->woutlet = woutlet;
   outconn->dst = in;
   outconn->winlet = winlet;
+
+  if (id != FTS_NO_ID)
+    fts_connection_table_put(id, outconn);
 
   /* pre-initialize the cache, if possible */
 
@@ -473,48 +457,49 @@ fts_object_connect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
       in->in_conn[winlet] = outconn;
     }
 
-  return fts_Success;
+  return outconn;
 }
 
 /* disconnect return fts_NoSuchConnection if the connection didn't existed */
 
-fts_status_t
-fts_object_disconnect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
+void fts_object_disconnect(fts_connection_t *conn)
 { 
+  fts_object_t *src;
+  fts_object_t *dst;
   fts_connection_t **p;		/* indirect precursor */
-  fts_connection_t *conn = 0;
   fts_connection_t *prev = 0;
 
-  /* look for the connection in the output list of out */
+  src = conn->src;
+  dst  = conn->dst;
 
-  for (p = &out->out_conn[woutlet]; *p ; p = &((*p)->next_same_src))
+  /* look for the connection in the output list of src, and remove it */
+
+  for (p = &src->out_conn[conn->woutlet]; *p ; p = &((*p)->next_same_src))
     {
-      if (((*p)->dst == in) && ((*p)->winlet == winlet))
+      if ((*p) == conn)
 	{
-	  conn = *p;
-
 	  *p = (*p)->next_same_src;
 	  break;
 	}
     }
 
-  /* if found, look for it  in the input list of in */
+  /* look for it  in the input list of in, and remove it*/
 
-  if (conn)
-    {
-      for (p = &in->in_conn[winlet]; *p ; p = &((*p)->next_same_dst))
-	if ((*p) == conn)
-	  {
-	    *p = (*p)->next_same_dst;
-	    break;
-	  }
+  for (p = &dst->in_conn[conn->winlet]; *p ; p = &((*p)->next_same_dst))
+    if ((*p) == conn)
+      {
+	*p = (*p)->next_same_dst;
+	break;
+      }
 
-      fts_heap_free((char *) conn, &connection_heap);
+  /* Unregister the connection */
 
-      return fts_Success;
-    }
-  else
-    return &fts_NoSuchConnection;
+  if (conn->id != FTS_NO_ID)
+    fts_connection_table_remove(conn->id);
+
+  /* Free the connection, and return */
+
+  fts_heap_free((char *) conn, &connection_heap);
 }
 
 

@@ -54,8 +54,18 @@ public class ErmesConnection implements ErmesDrawable{
     itsOutlet = theOutlet;
     itsFromObject  = itsOutlet.GetOwner();
     itsToObject  = itsInlet.GetOwner();
-    itsFtsConnection = new FtsConnection(itsFromObject.itsFtsObject,theOutlet.GetOutletNum(), 
-					 itsToObject.itsFtsObject, theInlet.GetInletNum());
+
+    try
+      {
+	itsFtsConnection = Fts.makeFtsConnection(itsFromObject.itsFtsObject,theOutlet.GetOutletNum(), 
+					     itsToObject.itsFtsObject, theInlet.GetInletNum());
+      }
+    catch (FtsException e)
+      {
+	// ????????
+	System.out.println("Connection Error");
+      }
+
     itsSelected = false;
   }
 

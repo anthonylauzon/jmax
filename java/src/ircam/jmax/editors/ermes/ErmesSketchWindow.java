@@ -269,7 +269,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     
     getContentPane().setLayout(new ErmesToolBarLayout(ErmesToolBarLayout.VERTICAL));
     
-    itsSelection = itsPatcher.getSelection();
+    itsSelection = Fts.getSelection();
     itsSelection.clean();
     setSize(new Dimension(600, 300));
     itsToolBar.setSize(600, 30);    

@@ -31,7 +31,7 @@ class ErmesObjToggle extends ErmesObject {
   {
     try
       {
-	itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "toggle");
+	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "toggle");
       }
     catch (FtsException e)
       {

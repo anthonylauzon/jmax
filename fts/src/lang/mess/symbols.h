@@ -33,6 +33,7 @@ extern fts_symbol_t fts_s_ptr;
 extern fts_symbol_t fts_s_string;
 extern fts_symbol_t fts_s_symbol;
 extern fts_symbol_t fts_s_object;
+extern fts_symbol_t fts_s_connection;
 extern fts_symbol_t fts_s_true;
 extern fts_symbol_t fts_s_false;
 

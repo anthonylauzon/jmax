@@ -121,7 +121,7 @@ public class FtsSelection
 	
 	if (! (obj instanceof FtsDeclarationObject))
 	  {
-	    writer.print("set obj(" + obj.getObjId() + ")" + " [");
+	    writer.print("set obj(" + obj.getObjectId() + ")" + " [");
 
 	    obj.saveAsTcl(writer);
 
@@ -133,7 +133,7 @@ public class FtsSelection
 
 		data = (FtsDataObject) ((FtsObjectWithData) obj).getData();
 		    
-		writer.print("setData $obj(" + obj.getObjId() + ")" + " [");
+		writer.print("setData $obj(" + obj.getObjectId() + ")" + " [");
 		data.saveAsTcl(writer);
 		writer.println("]");
 	      }

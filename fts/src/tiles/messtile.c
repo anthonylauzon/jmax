@@ -628,30 +628,34 @@ fts_mess_client_connect(int ac, const fts_atom_t *av)
 {
   trace_mess("Received connect", ac, av);
 
-  if ((ac == 4) &&
-      fts_is_object(&av[0]) &&
-      fts_is_int(&av[1]) &&
-      fts_is_object(&av[2]) &&
-      fts_is_int(&av[3]))
+  if ((ac == 5) &&
+      fts_is_int(&av[0]) &&
+      fts_is_object(&av[1]) &&
+      fts_is_int(&av[2]) &&
+      fts_is_object(&av[3]) &&
+      fts_is_int(&av[4]))
     {
       int inlet, outlet;
-
+      int id;
       fts_object_t *from, *to;
       fts_status_t ret;
+      fts_connection_t *new;
 
-      from = fts_get_object(&av[0]);
-      to   = fts_get_object(&av[2]);
-
-      outlet = fts_get_int(&av[1]);
-      inlet  = fts_get_int(&av[3]);
+      id     = fts_get_int(&av[0]);
+      from   = fts_get_object(&av[1]);
+      outlet = fts_get_int(&av[2]);
+      to     = fts_get_object(&av[3]);
+      inlet  = fts_get_int(&av[4]);
 
       if (to && from)
 	{
-	  ret = fts_object_connect(from, outlet, to, inlet);
+	  new = fts_object_connect(id, from, outlet, to, inlet);
 
-	  if (ret)
-	    post("Error connecting object %d outlet %d to object %d inlet %d: %s\n",
-		 from->id, outlet, to->id, inlet, ret->description);
+	  if (! new)
+	    return;
+
+	  if (id != FTS_NO_ID)
+	    fts_client_upload_connection(new);
 	}
       else
 	post_mess("Error trying to connect non existing objects", ac, av);
@@ -662,7 +666,7 @@ fts_mess_client_connect(int ac, const fts_atom_t *av)
 
 
 /*
-  DISCONNECT (obj)from (int)outlet (obj)to (int)inlet
+  DISCONNECT (conn)connection
 
   Disconnect the outlet of a from object (identified by the from-id )
   to an inlet of a to object  (identified by the to-id)
@@ -674,33 +678,16 @@ fts_mess_client_disconnect(int ac, const fts_atom_t *av)
 {
   trace_mess("Received disconnect", ac, av);
 
-  if ((ac == 4) &&
-      fts_is_object(&av[0]) &&
-      fts_is_int(&av[1]) &&
-      fts_is_object(&av[2]) &&
-      fts_is_int(&av[3]))
+  if ((ac == 1) && fts_is_connection(&av[0]))
     {
-      int inlet, outlet;
+      fts_connection_t *c;
 
-      fts_object_t *from, *to;
-      fts_status_t ret;
+      c = fts_get_connection(&av[0]);
 
-      from = fts_get_object(&av[0]);
-      to   = fts_get_object(&av[2]);
-
-      outlet = fts_get_int(&av[1]);
-      inlet  = fts_get_int(&av[3]);
-
-      if (to && from)
-	{
-	  ret = fts_object_disconnect(from, outlet, to, inlet);
-
-	  if (ret)
-	    post("System Error in DISCONNECT: from %d, outlet %d to %d inlet %d: %s\n",
-		 from->id, outlet, to->id, inlet, ret->description);
-	}
+      if (c)
+	fts_object_disconnect(c);
       else
-	post_mess("System Error in FOS message DISCONNECT: disconnecting non existing object", ac, av);
+	post_mess("System Error in FOS message DISCONNECT: disconnecting non existing connection", ac, av);
     }
   else
     post_mess("System Error in FOS message DISCONNECT: bad args", ac, av);

@@ -12,9 +12,10 @@ class FtsClientProtocol
 {
   // Protocol type coding Special chars
 
-  static final int int_type_code = 'i';
-  static final int float_type_code   = 'z';
+  static final int int_type_code      = 'i';
+  static final int float_type_code    = 'z';
   static final int object_type_code   = 'o';
+  static final int connection_type_code   = 'x';
   static final int string_start_code = 0x01;
   static final int string_end_code   = 0x02;
   static final int end_of_message_code = 0x03;

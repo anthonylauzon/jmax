@@ -76,7 +76,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   {
     try
       {
-	itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "patcher", itsArgs);
+	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "patcher", itsArgs);
 	((FtsContainerObject) itsFtsObject).setDownloaded();
       }
     catch (FtsException e)

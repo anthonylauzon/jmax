@@ -77,7 +77,7 @@ class ErmesObjInt extends ErmesObject {
   {
     try
       {
-	itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "intbox");
+	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "intbox");
       }
     catch (FtsException e)
       {
@@ -208,7 +208,7 @@ class ErmesObjInt extends ErmesObject {
   //--------------------------------------------------------
   public boolean MouseUp(MouseEvent evt,int x, int y) {
     if(itsSketchPad.itsRunMode || evt.isControlDown()){
-      FtsServer.getServer().syncToFts();
+      Fts.getServer().syncToFts();
       //itsMovingThrottle = false;
       DoublePaint();
       return true;

@@ -50,7 +50,7 @@ class FtsUcsCmd implements Command
 	      }
 	  }
 
-	FtsServer.getServer().ucsMessage(args);
+	Fts.getServer().ucsMessage(args);
 	interp.resetResult();
       }
     else

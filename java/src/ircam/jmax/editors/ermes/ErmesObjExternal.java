@@ -81,7 +81,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
   public void makeFtsObject()
   {
     try{
-      itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, itsArgs);
+      itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, itsArgs);
     }
     catch (FtsException e){
       Toolkit.getDefaultToolkit().beep();

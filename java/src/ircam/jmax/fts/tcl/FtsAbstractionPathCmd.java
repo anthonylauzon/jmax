@@ -32,7 +32,7 @@ class FtsAbstractionPathCmd implements Command
 
 	path = argv[1].toString();
 
-	FtsServer.getServer().sendAbstractionDeclarePath(path);
+	Fts.getServer().sendAbstractionDeclarePath(path);
       }
     else
       {

@@ -769,18 +769,9 @@ Rectangle previousResizeRect = new Rectangle();
     for (Enumeration e2 = connectionVector.elements(); e2.hasMoreElements();) {
       fc = (FtsConnection)e2.nextElement();
 
-      // MDC: this test has been added to allow loading patches with errors
-      // in connections, so the debug can be done :->
-      // Actually the error reporting should be redone !!!
-
-      if (fc.checkConsistency()){
-	fromObj = (ErmesObject) fc.getFrom().getRepresentation();
-	toObj = (ErmesObject) fc.getTo().getRepresentation();
-	aConnection = itsHelper.AddConnection(fromObj, toObj, fc.getFromOutlet(), fc.getToInlet(), fc);
-      } else {
-	System.out.println("Cannot connect object " + fc.getFrom() + " outlet " + fc.getFromOutlet() 
-			   + " to object " + fc.getTo() + " inlet " + fc.getToInlet());
-      }
+      fromObj = (ErmesObject) fc.getFrom().getRepresentation();
+      toObj = (ErmesObject) fc.getTo().getRepresentation();
+      aConnection = itsHelper.AddConnection(fromObj, toObj, fc.getFromOutlet(), fc.getToInlet(), fc);
     }
     repaint();
     //paintDirtyList();
@@ -842,7 +833,7 @@ Rectangle previousResizeRect = new Rectangle();
   public ErmesSketchPad(ErmesSketchWindow theSketchWindow) {    
     super();
     itsHelper = new ErmesSketchHelper(this);
-    //FtsServer.getServer().addUpdateGroupListener(this);
+    //Fts.getServer().addUpdateGroupListener(this);
     setLayout(null);
     preferredSize = new Dimension(SKETCH_WIDTH, SKETCH_HEIGHT);
     itsSketchWindow = theSketchWindow;

@@ -27,7 +27,7 @@ extern fts_object_t *fts_object_table_get(int id);
 extern void fts_object_table_delete_all(void);
 
 
-/* extern void fts_connection_table_register(fts_connection_t *obj); */
+extern void fts_connection_table_register(fts_connection_t *obj);
 extern void fts_connection_table_put(int id, fts_connection_t *obj);
 extern void fts_connection_table_remove(int id);
 extern fts_connection_t *fts_connection_table_get(int id);

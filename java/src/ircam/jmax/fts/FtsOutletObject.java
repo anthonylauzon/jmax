@@ -39,7 +39,7 @@ public class FtsOutletObject  extends FtsObject
   {
     position = i;
     description = "outlet " + position;
-    FtsServer.getServer().repositionOutletObject(this, position);
+    Fts.getServer().repositionOutletObject(this, position);
     setDirty();
   }
 

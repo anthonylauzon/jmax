@@ -30,6 +30,7 @@ fts_s_ptr
 fts_s_string
 fts_s_symbol
 fts_s_object
+fts_s_connection
 fts_s_true
 fts_s_false
 fts_s_init

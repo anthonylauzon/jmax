@@ -137,7 +137,7 @@ public class FtsPatcherObject extends FtsContainerObject
 	
 	if (! (obj instanceof FtsDeclarationObject))
 	  {
-	    writer.print("set obj(" + obj.getObjId() + ")" + " [");
+	    writer.print("set obj(" + obj.getObjectId() + ")" + " [");
 
 	    obj.saveAsTcl(writer);
 
@@ -151,7 +151,7 @@ public class FtsPatcherObject extends FtsContainerObject
 
 		data = (FtsDataObject) ((FtsObjectWithData) obj).getData();
 		    
-		writer.print("setData $obj(" + obj.getObjId() + ")" + " [");
+		writer.print("setData $obj(" + obj.getObjectId() + ")" + " [");
 		data.saveAsTcl(writer);
 		writer.println("]");
 	      }
