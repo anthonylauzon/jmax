@@ -29,8 +29,10 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.fts.client.*;
 
-import java.io.*;
 import ircam.jmax.ispw.*;
+
+import java.io.*;
+import java.util.*;
 
 /**
  * A concrete implementation of the SequenceDataModel,
@@ -44,6 +46,7 @@ public class FtsQListObject extends FtsObjectWithEditor {
 	{
 	  FtsAtomList atomList = new FtsAtomList( JMaxApplication.getFtsServer(), null, args.getInt( 0));
 	  ((FtsQListObject)obj).setAtomList( atomList);
+	  
 	}
       });
   }
@@ -91,9 +94,14 @@ public class FtsQListObject extends FtsObjectWithEditor {
     disposeEditor();
   }
 
-  public void setAtomList(FtsAtomList list)
+  public void setAtomList(FtsAtomList l)
   {
-    this.list = list;
+    if(list != null)
+      {
+	for(Enumeration e = list.getFtsAtomListListeners(); e.hasMoreElements();)
+	  l.addFtsAtomListListener( (FtsAtomListListener) e.nextElement());
+      }
+    list = l;    
   }
 
   public FtsAtomList getAtomList()

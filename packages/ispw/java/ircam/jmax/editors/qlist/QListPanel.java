@@ -45,7 +45,7 @@ import ircam.jmax.ispw.*;
  * A panel that is able to show the content of a FtsAtomList (qlist).
  * This component does not handle the communication with FTS, but it offers
  * a simple API (fillContent, getText) in order to be used from outside. */
-public class QListPanel extends JPanel implements Editor, ClipboardOwner 
+public class QListPanel extends JPanel implements Editor, ClipboardOwner
 {  
   JTextArea itsTextArea;
   int caretPosition;
@@ -105,18 +105,20 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner
     qListFindDialog = new QListFindDialog(itsEditorContainer.getFrame(), this);
 
     fillContent(theContent);
+    
     theContent.getAtomList().addFtsAtomListListener(new FtsAtomListListener(){
-	    public void contentChanged(){
-		fillContent(itsData);
-	    }
-	});
+	public void contentChanged(){
+	  fillContent(itsData);
+	}
+      });
   }
 
   /**
    * Sets the content to the given FtsAtomList object */
   public void fillContent(FtsQListObject theContent) 
   {
-    String text = QListUnparse.unparseDescription( theContent.getAtomList().getValues());
+    String text = FtsMessageObject.preParseMessage( QListUnparse.unparseDescription( theContent.getAtomList().getValues()));
+
     if( ! text.equals( itsTextArea.getText())){
       caretPosition = itsTextArea.getCaretPosition();
       itsTextArea.setText( text);
@@ -128,6 +130,7 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner
 	itsTextArea.setCaretPosition( caretPosition);
       else itsTextArea.setCaretPosition(itsTextArea.getText().length());
     }
+    changed = false;
   }
  
   public Dimension getPreferredSize() 
@@ -210,34 +213,30 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner
 
     public void Get(){
       if(changed)
-	  {
-	      Object[] options = { "DIscard changes", "Cancel"};
-	      int result = JOptionPane.showOptionDialog(itsEditorContainer.getFrame(),
-							"Do you want really discard changes in QList text?",
-							"Warning",
-							JOptionPane.YES_NO_OPTION,
-							JOptionPane.QUESTION_MESSAGE,
-							null, options, options[0]);  
+	{
+	  Object[] options = { "Discard changes", "Cancel"};
+	  int result = JOptionPane.showOptionDialog(itsEditorContainer.getFrame(),
+						    "Do you want really discard changes in QList text?",
+						    "Warning",
+						    JOptionPane.YES_NO_OPTION,
+						    JOptionPane.QUESTION_MESSAGE,
+						    null, options, options[0]);  
 
-	      if(result == JOptionPane.YES_OPTION)
-		  {
-		      itsData.getAtomList().forceUpdate();
-		      fillContent(itsData);
-		      changed = false;
-		  }
-	  }
-      else
-	  {
+	  if(result == JOptionPane.YES_OPTION)
+	    {
 	      itsData.getAtomList().forceUpdate();
 	      fillContent(itsData);
-	      changed = false;
-	  }
+	    }
+	}
+      else
+	{
+	  itsData.getAtomList().forceUpdate();
+	  fillContent(itsData);
+	}
     }
 
   public void Set(){
     itsData.getAtomList().setValuesAsText(getText());
-    fillContent(itsData);
-    changed = false;
   }
 
   public void Find(){

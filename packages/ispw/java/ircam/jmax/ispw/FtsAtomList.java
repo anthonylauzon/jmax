@@ -153,7 +153,9 @@ public class FtsAtomList extends FtsObject
   void fireContentChanged()
   {
     for(Enumeration e = listeners.elements(); e.hasMoreElements();)
-      ((FtsAtomListListener)e.nextElement()).contentChanged();
+      {
+	((FtsAtomListListener)e.nextElement()).contentChanged();
+      }
   }
   public void addFtsAtomListListener(FtsAtomListListener listener)
   {
@@ -162,6 +164,10 @@ public class FtsAtomList extends FtsObject
   public void removeFtsAtomListListener(FtsAtomListListener listener)
   {
     listeners.removeElement(listener);
+  }
+  public Enumeration getFtsAtomListListeners()
+  {
+    return listeners.elements();
   }
 }
 

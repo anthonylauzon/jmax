@@ -109,7 +109,7 @@ public class FtsMessageObject extends FtsIntValueObject
       ((FtsMessageListener) listener).messageChanged(message);
   }
 
-  private static String preParseMessage(String text)
+  public static String preParseMessage(String text)
   {
     int index = text.indexOf(';', 0);
     int size = text.length();
