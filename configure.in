@@ -1,8 +1,11 @@
-dnl $Id: configure.in,v 1.91 2002/09/09 15:01:05 tisseran Exp $
+dnl $Id: configure.in,v 1.92 2002/09/10 11:04:19 schwarz Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.92  2002/09/10 11:04:19  schwarz
+dnl Removed sdif which is now a separate package and cvs module.
+dnl
 dnl Revision 1.91  2002/09/09 15:01:05  tisseran
 dnl Try to use pkg-config if --with-jack-cflags or --with-jack-ldflags are not used
 dnl Add test on jack/jack.h and libjack if jack support is wanted
@@ -347,10 +350,10 @@ images/Makefile
 help/Makefile
 tutorials/Makefile
 tutorials/basics/Makefile
-java/src/ircam/jmax/JMaxVersion.java
 java/Makefile
 java/src/Makefile
 java/src/ircam/Makefile
+java/src/ircam/jmax/JMaxVersion.java
 java/src/ircam/jmax/Makefile
 java/src/ircam/jmax/dialogs/Makefile
 java/src/ircam/jmax/editors/Makefile
@@ -380,6 +383,7 @@ packages/control/c/src/Makefile
 packages/control/help/Makefile
 packages/data/Makefile
 packages/data/c/Makefile
+packages/data/c/include/Makefile
 packages/data/c/src/Makefile
 packages/data/java/Makefile
 packages/data/java/ircam/Makefile
@@ -476,6 +480,7 @@ packages/unixdtd/c/Makefile
 packages/unixdtd/c/src/Makefile
 packages/utils/Makefile
 packages/utils/c/Makefile
+packages/utils/c/include/Makefile
 packages/utils/c/src/Makefile
 utils/Makefile
 utils/jmax-config/Makefile
