@@ -21,6 +21,7 @@
  */
 
 
+#include <stdlib.h>    /* for qsort */
 #include <string.h>
 #include <fts/fts.h>
 #include <fts/packages/data/data.h>
@@ -763,6 +764,7 @@ mat_insert_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   int numcols = 1;	/* number of cols to insert */
   int num, tomove, i, j, start, new_n;
   
+  /* check and test args */
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
   
@@ -772,8 +774,9 @@ mat_insert_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   if (ac > 1  &&  fts_is_number(at+1))
     numcols = fts_get_number_int(at+1) ;
   
-  if(numcols <= 0)	return;	
+  if(numcols <= 0)	return;	/* nothing to append */
   
+  /* make space, may change ptr, sets new atoms at the end to void */
   mat_set_size(self, m, n + numcols);
   new_n = n+numcols;
   
@@ -895,10 +898,17 @@ mat_return_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_atom_t a[2];
   fts_atom_t t;
   
-  fts_set_int(a + 0, mat_get_m(self));
-  fts_set_int(a + 1, mat_get_n(self));
-  fts_set_object(&t, fts_object_create(fts_tuple_class, 2, a));
-  
+  if (s == fts_s_rows)
+    fts_set_int(&t, mat_get_m(self));
+  else if (s == fts_s_cols)
+    fts_set_int(&t, mat_get_n(self));
+  else
+  {
+    fts_set_int(a + 0, mat_get_m(self));
+    fts_set_int(a + 1, mat_get_n(self));
+    fts_set_object(&t, fts_object_create(fts_tuple_class, 2, a));
+  }
+
   fts_return(&t);
 }
 
@@ -1030,6 +1040,99 @@ mat_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
   fts_object_set_state_dirty(o);
 }
+
+
+#ifdef HAVE_QSORT_R
+
+static int 
+mat_element_compare_ascending (void *thunk, const void *a, const void *b)
+{
+  int col = (int) thunk;
+
+  return fts_atom_compare((const fts_atom_t *) a + col, 
+			  (const fts_atom_t *) b + col);
+}
+
+static int 
+mat_element_compare_descending (void *thunk, const void *a, const void *b)
+{
+  int col = (int) thunk;
+
+  return fts_atom_compare((const fts_atom_t *) b + col, 
+			  (const fts_atom_t *) a + col);
+}
+
+#else
+
+static int 
+mat_element_compare_ascending (const void *a, const void *b)
+{
+  return fts_atom_compare((const fts_atom_t *) a, 
+			  (const fts_atom_t *) b);
+}
+
+static int 
+mat_element_compare_descending (const void *a, const void *b)
+{
+  return fts_atom_compare((const fts_atom_t *) b, 
+			  (const fts_atom_t *) a);
+}
+
+#endif
+
+
+static void
+mat_sort(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  mat_t *self = (mat_t *) o;
+  fts_atom_t *ptr = mat_get_ptr(self);
+  int m = mat_get_m(self);
+  int n = mat_get_n(self); 
+  int col = 0;
+  
+  if (ac > 0)
+    col = fts_get_number_int(at);
+
+#ifdef HAVE_QSORT_R
+  qsort_r((void *) ptr, m, n * sizeof(fts_atom_t), (void *) col,
+	  mat_element_compare_ascending);
+#else
+  if (col == 0)
+    qsort((void *) ptr, m, n * sizeof(fts_atom_t), 
+	  mat_element_compare_ascending);
+  else if (col > 0  &&  col < n)
+  {
+    int i;
+    
+    /* swap sort column to first one */
+    for (i = 0; i < m * n; i += n)
+    {
+      fts_atom_t a = ptr[i];
+      
+      ptr[i]       = ptr[i + col];
+      ptr[i + col] = a;
+    }
+    
+    qsort((void *) ptr, m, n * sizeof(fts_atom_t), 
+	  mat_element_compare_ascending);
+
+    /* swap column back */
+    for (i = 0; i < m * n; i += n)
+    {
+      fts_atom_t a = ptr[i];
+      
+      ptr[i]       = ptr[i + col];
+      ptr[i + col] = a;
+    }    
+  }
+#endif
+  
+  if (mat_editor_is_open(self))
+    mat_upload_data(self);
+  
+  fts_return_object(o);
+}
+
 
 static void
 mat_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1238,16 +1341,20 @@ mat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_row, mat_set_row_elements);
   fts_class_message_varargs(cl, fts_s_append, mat_append_row);
   fts_class_message_varargs(cl, fts_s_insert, mat_insert_rows);
-  fts_class_message_varargs(cl, sym_insert_cols, mat_insert_columns);
   fts_class_message_varargs(cl, fts_s_delete, mat_delete_rows);
+  fts_class_message_varargs(cl, sym_insert_cols, mat_insert_columns);
   fts_class_message_varargs(cl, sym_delete_cols, mat_delete_columns);
+  fts_class_message_void   (cl, fts_s_sort,   mat_sort);
+  fts_class_message_number (cl, fts_s_sort,   mat_sort);
   
   fts_class_message_varargs(cl, fts_s_import, mat_import); 
   fts_class_message_varargs(cl, fts_s_export, mat_export);
   
   fts_class_message_void(cl, fts_s_size, mat_return_size);
+  fts_class_message_void(cl, fts_s_rows, mat_return_size);
+  fts_class_message_void(cl, fts_s_cols, mat_return_size);
   fts_class_message_varargs(cl, fts_s_size, mat_change_size);
-  
+
   fts_class_message_varargs(cl, fts_s_get_element, mat_return_element);
   
   fts_class_inlet_bang(cl, 0, data_object_output);
