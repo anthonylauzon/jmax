@@ -1,7 +1,14 @@
+2004-05-14  Norbert Schnell  <Norbert.Schnell@ircam.fr>
+
+	* (package data) fmat.c: added new methods to fmat class
+	* (package data) fmat.c: added fts_return_object() calls to many methods without return value
+	* (package data) fvec.c: moved fslice classes (frow and fcol) to fvec.c
+	* expression.c: introduced FTS_EXPRESSION_ARG_ONSET macro (for FTM starting argument numbering with $1 instead of $0)
+
 2004-05-10  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* bin/jmax.in: added a check to know if fts is suid root.
-	If this is not the case, a warning is diplayed.
+	If this is not the case, a warning is displayed.
 	The check could be removing by creating the $HOME/.jmax/no_fts_check file.
 
 2004-05-06  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>

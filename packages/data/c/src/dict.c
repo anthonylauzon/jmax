@@ -637,6 +637,7 @@ dict_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   dict_t *self = (dict_t *)o;
 
   dict_remove_all(self);
+  fts_hashtable_destroy(&self->hash);
 }
 
 

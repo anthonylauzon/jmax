@@ -31,13 +31,9 @@
 
 fts_class_t *fmat_class = NULL;
 fts_class_t *fvec_class = NULL;
-fts_class_t *frow_class = NULL;
-fts_class_t *fcol_class = NULL;
 
 fts_symbol_t fmat_symbol = NULL;
 fts_symbol_t fvec_symbol = NULL;
-fts_symbol_t frow_symbol = NULL;
-fts_symbol_t fcol_symbol = NULL;
 
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_getcol = 0;
@@ -52,15 +48,11 @@ static fts_symbol_t sym_im = 0;
 static fts_symbol_t sym_mag = 0;
 static fts_symbol_t sym_arg = 0;
 
-
-
-
 /********************************************************
  *
  *  fmat format
  *
  */
-
 static fts_hashtable_t fmat_format_hash;
 static fmat_format_t *fmat_formats[FMAT_FORMATS_MAX + 1];
 static int fmat_n_formats = 0;
@@ -70,7 +62,7 @@ fmat_format_t *fmat_format_rect = 0;
 fmat_format_t *fmat_format_polar = 0;
 fmat_format_t *fmat_format_real = 0;
 
-static fmat_format_t *
+fmat_format_t *
 fmat_format_register(fts_symbol_t name)
 {
   fts_atom_t k, a;
@@ -94,13 +86,13 @@ fmat_format_register(fts_symbol_t name)
   return NULL;
 }
 
-static void
+void
 fmat_format_add_column(fmat_format_t *format, fts_symbol_t label)
 {
   format->columns[format->n_columns++] = label;
 }
 
-static fmat_format_t *
+fmat_format_t *
 fmat_format_get_by_name(fts_symbol_t name)
 {
   fts_atom_t k, a;
@@ -146,16 +138,13 @@ fmat_adapt_format(fmat_t *self)
 }
 
 
-
-
 /********************************************************
  *
  *  utility functions
  *
  */
-
-#define HEAD_ROWS 2 /* extra points for interpolation at start of vector */
-#define TAIL_ROWS 2 /* extra points for interpolation at end of vector */
+#define HEAD_ROWS 8 /* extra points for interpolation at start of vector */
+#define TAIL_ROWS 8 /* extra points for interpolation at end of vector */
 #define HEAD_TAIL_COLS 2 /* interpolation head and tail for 1 or 2 column vectors only */
 #define HEAD_POINTS (HEAD_TAIL_COLS * HEAD_ROWS)
 #define TAIL_POINTS (HEAD_TAIL_COLS * TAIL_ROWS)
@@ -173,24 +162,13 @@ fmat_reshape(fmat_t *self, int m, int n)
   if(size > self->alloc)
   {
     if(self->values == NULL)
-    {
       self->values = (float *)fts_malloc((size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
-      
-      /* zero head */
-      /* for(i=0; i<HEAD_POINTS; i++)
-      self->values[i] = 0.0; */
-      self->values[0] = self->values[1] = self->values[2] = self->values[3] = 0.0;
-    }
     else
       self->values = (float *)fts_realloc(self->values - HEAD_POINTS, (size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
         
     self->values += HEAD_POINTS;
     self->alloc = size;
   }
-  
-  /* zero tail */
-  /* for(i=0; i<TAIL_POINTS; i++) self->values[size + i] = 0.0; */
-  self->values[size + 0] = self->values[size + 1] = self->values[size + 2] = self->values[size + 3] = 0.0;
   
   self->m = m;
   self->n = n;
@@ -207,13 +185,7 @@ fmat_set_m(fmat_t *self, int m)
   if(m > fmat_get_m(self))
   {
     if(self->values == NULL)
-    {
       self->values = (float *)fts_malloc((size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
-
-      /* zero head */
-      /* for(i=0; i<HEAD_POINTS; i++) self->values[i] = 0.0; */
-      self->values[0] = self->values[1] = self->values[2] = self->values[3] = 0.0;    
-    }
     else
       self->values = (float *)fts_realloc(self->values - HEAD_POINTS, (size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
     
@@ -225,10 +197,6 @@ fmat_set_m(fmat_t *self, int m)
   for(i=fmat_get_m(self)*fmat_get_n(self); i<size; i++)
     self->values[i] = 0.0;
     
-  /* zero tail */
-  /* for(i=0; i<TAIL_POINTS; i++) self->values[size + i] = 0.0; */
-  self->values[size + 0] = self->values[size + 1] = self->values[size + 2] = self->values[size + 3] = 0.0;    
-  
   self->m = m;
   self->domain = 0.0;
 }
@@ -250,13 +218,7 @@ fmat_set_n(fmat_t *self, int n)
     if(n > old_n)
     {
       if(self->values == NULL)
-      {
         self->values = (float *)fts_malloc((size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
-        
-        /* zero head */
-        /* for(i=0; i<HEAD_POINTS; i++) self->values[i] = 0.0; */
-        self->values[0] = self->values[1] = self->values[2] = self->values[3] = 0.0;    
-      }
       else
         self->values = (float *)fts_realloc(self->values - HEAD_POINTS, (size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
       
@@ -298,9 +260,6 @@ fmat_set_n(fmat_t *self, int n)
       }
     }
     
-    /* zero tail */
-    /* for(i=0; i<TAIL_POINTS; i++) self->values[size + i] = 0.0; */
-    self->values[size + 0] = self->values[size + 1] = self->values[size + 2] = self->values[size + 3] = 0.0;    
     self->n = n;
     
     fmat_adapt_format(self);
@@ -333,13 +292,7 @@ fmat_set_size(fmat_t *self, int m, int n)
     if(size > self->alloc)
     {
       if(self->values == NULL)
-      {
         self->values = (float *)fts_malloc((size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
-        
-        /* zero head */
-        /* for(i=0; i<HEAD_POINTS; i++) self->values[i] = 0.0; */
-        self->values[0] = self->values[1] = self->values[2] = self->values[3] = 0.0;    
-      }
       else
         self->values = (float *)fts_realloc(self->values - HEAD_POINTS, (size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
         
@@ -387,10 +340,6 @@ fmat_set_size(fmat_t *self, int m, int n)
     /* zero new rows at end (if any) */
     for(i=min_m*n; i<size; i++)
       self->values[i] = 0.0;
-    
-    /* zero tail */
-    /* for(i=0; i<TAIL_POINTS; i++) self->values[size + i] = 0.0; */
-    self->values[size + 0] = self->values[size + 1] = self->values[size + 2] = self->values[size + 3] = 0.0;    
     
     self->m = m;
     self->n = n;
@@ -475,45 +424,11 @@ fmat_copy(fmat_t *org, fmat_t *copy)
 }
 
 
-/* copy matrix row or col reference to an fvec */
-void
-fslice_copy_to_fvec(fslice_t *org, fvec_t *copy)
-{
-    if (fslice_check_index(org))
-    {
-        fmat_t *orgmat = org->fmat;
-        float  *orgptr = fslice_get_ptr(org);
-        int     step   = fslice_get_stride(org);
-        int     size   = fslice_get_size(org);
-        int     i;
-
-        fmat_reshape(copy, size, 1);
-
-        for (i = 0; i < size; i++)
-        {
-  	    copy->values[i] = *orgptr;
-	    orgptr += step;
-        }
-
-        copy->onset  = orgmat->onset;
-        copy->domain = orgmat->domain;
-        copy->sr     = orgmat->sr;
-        /* don't copy format from orgmat, since it's set to vector by fmat_reshape */
-    }
-    else
-    {
-        /* slice index out of range: set copy empty */
-        fmat_reshape(copy, 0, 0);
-    }
-}
-
-
 static void
 fmat_copy_function(const fts_atom_t *from, fts_atom_t *to)
 {
   fmat_copy((fmat_t *)fts_get_object(from), (fmat_t *)fts_get_object(to));
 }
-
 
 float
 fmat_get_max_abs_value_in_range(fmat_t *mat, int a, int b)
@@ -577,9 +492,6 @@ fmat_get_min_value_in_range(fmat_t *mat, int a, int b)
   return min;
 }
 
-
-
-
 /********************************************************
  *
  *  files
@@ -596,7 +508,7 @@ fmat_grow(fmat_t *fmat, int size)
   while(size > alloc)
     alloc += FMAT_BLOCK_SIZE;
 
-  fmat_reshape(fmat, alloc, 1);
+  fmat_reshape(fmat, 1, alloc);
 }
 
 int
@@ -613,8 +525,6 @@ fmat_read_atom_file(fmat_t *fmat, fts_symbol_t file_name)
   if(!file)
     return -1;
 
-  fmat_set_const(fmat, 0.0);
-
   while(fts_atom_file_read(file, &a, &c))
   {
     m = i + 1;
@@ -623,9 +533,8 @@ fmat_read_atom_file(fmat_t *fmat, fts_symbol_t file_name)
     if(i == 0)
       n = j + 1;
 
-    if(m * n > fmat->alloc)
-      fmat_grow(fmat, m * n);
-
+    fmat_grow(fmat, m * n);
+    
     if(j < n)
     {
       if(fts_is_number(&a))
@@ -637,6 +546,9 @@ fmat_read_atom_file(fmat_t *fmat, fts_symbol_t file_name)
 
       if(c == '\n')
       {
+        for(; j<n; j++)
+          fmat->values[i * n + j] = 0.0;
+      
         /* reset to beginning of next row */
         i++;
         j = 0;
@@ -758,14 +670,68 @@ fmat_export_audiofile(fmat_t *mat, fts_symbol_t file_name)
   return size;
 }
 
-
-
-
 /********************************************************************
  *
- *   check & errors
+ *  check & errors
  *
  */
+
+int
+fmat_or_slice_vector(fts_object_t *obj, float **ptr, int *size, int *stride)
+{
+  fts_class_t *cl = fts_object_get_class(obj);
+
+  if(cl == fmat_class)
+  {
+    fmat_t *fmat = (fmat_t *)obj;
+    
+    *ptr = fmat_get_ptr(fmat);
+    *size = fmat_get_m(fmat);
+    *stride = fmat_get_n(fmat);
+    
+    return 1;
+  }
+  else if(cl == fcol_class)
+  {
+    fslice_t *fcol = (fslice_t *)obj;
+    int index = fcol->index;
+    fmat_t *fmat = fcol->fmat;
+    float *fmat_ptr = fmat_get_ptr(fmat);
+    int fmat_m = fmat_get_m(fmat);
+    int fmat_n = fmat_get_n(fmat);
+
+    if(index > fmat_n)
+      index = fmat_n;
+
+    *ptr = fmat_ptr + index;
+    *size = fmat_m;
+    *stride = fmat_n;
+  
+    return 1; 
+  }
+  else if(cl == frow_class)
+  {
+    fslice_t *frow = (fslice_t *)obj;
+    int index = frow->index;
+    fmat_t *fmat = frow->fmat;
+    float *fmat_ptr = fmat_get_ptr(fmat);
+    int fmat_m = fmat_get_m(fmat);
+    int fmat_n = fmat_get_n(fmat);
+
+    if(index > fmat_m)
+      index = fmat_m;
+
+    *ptr = fmat_ptr + index * fmat_n;
+    *size = fmat_n;
+    *stride = 1;
+  
+    return 1; 
+  }
+  
+  *ptr = NULL;
+
+  return 0;
+}
 
 static void
 fmat_error_dimensions(fmat_t *fmat, fmat_t *op, const char *prefix)
@@ -775,7 +741,7 @@ fmat_error_dimensions(fmat_t *fmat, fmat_t *op, const char *prefix)
   int op_m = fmat_get_m(op);
   int op_n = fmat_get_n(op);
   
-  fts_object_error((fts_object_t *)fmat, "%s argument %d x %d doesn't match matrix dimensions %d x %d\n", prefix, op_m, op_n, m, n);
+  fts_object_error((fts_object_t *)fmat, "%s: argument %d x %d doesn't match matrix dimensions %d x %d", prefix, op_m, op_n, m, n);
 }
 
 static void
@@ -788,42 +754,48 @@ fmat_error_format_and_dimensions(fmat_t *fmat, fmat_t *op, const char *prefix)
   int op_m = fmat_get_m(op);
   int op_n = fmat_get_n(op);
   
-  fts_object_error((fts_object_t *)fmat, "%s %s argument %d x%d doesn't match %s matrix %d x %d\n", prefix, 
+  fts_object_error((fts_object_t *)fmat, "%s: %s argument %d x%d doesn't match %s matrix %d x %d", prefix, 
                    fts_symbol_name(fmat_format_get_name(op_format)), op_m, op_n, 
                    fts_symbol_name(fmat_format_get_name(format)), m, n);
 }
-
-static void
-fslice_error_index(fslice_t *slice, fslice_t *op, const char *prefix)
-{
-  if(!fslice_check_index(slice))
-  {
-    char *str = (slice->type == fslice_row)? "row": "column";
-    
-    fts_object_error((fts_object_t *)slice, "%s referencing %s %d of matrix %d x %d\n", str, prefix,
-                     frow_get_index(slice), fmat_get_m(slice->fmat), fmat_get_n(slice->fmat));
-  }
-
-  if(op != NULL && !fslice_check_index(op))
-  {
-    char *str = (op->type == fslice_row)? "row": "column";
-    
-    fts_object_error((fts_object_t *)slice, "%s argument references %s %d of matrix %d x %d\n", prefix, str,
-                     frow_get_index(op), fmat_get_m(op->fmat), fmat_get_n(op->fmat));
-  }
-}
-
-
-
 
 /********************************************************************
  *
  *   user methods
  *
  */
+static void
+fmat_set_from_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  
+  fmat_copy((fmat_t *)fts_get_object(at), self);
+  
+  fts_return_object(o);
+}
 
 static void
-fmat_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fmat_set_from_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  ivec_t *ivec = (ivec_t *)fts_get_object(at);
+  int *iptr = ivec_get_ptr(ivec);
+  int size = ivec_get_size(ivec);
+  float *ptr;
+  int i;
+  
+  fmat_reshape(self, size, 1);
+  
+  ptr = fmat_get_ptr(self);
+  
+  for(i=0; i<size; i++)
+    ptr[i] = (float)iptr[i];
+
+  fts_return_object(o);
+}
+
+static void
+fmat_set_from_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
 
@@ -844,11 +816,13 @@ fmat_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     
     if(i >= 0 && i < m && j >= 0 && j < n)
       fmat_set_from_atoms(self, onset, 1, ac, at);
+
+    fts_return_object(o);
   }
 }
 
 static void
-fmat_set_row_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fmat_set_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
   
@@ -856,23 +830,48 @@ fmat_set_row_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   {
     int m = fmat_get_m(self);
     int n = fmat_get_n(self);
-    int i = fts_get_number_int(at);
+    int row = fts_get_number_int(at);
     
     /* skip index argument */
     ac--;
     at++;
-    
-    /* clip to # of cloumns */
-    if(ac > n)
-      ac = n;
-    
-    if(i >= 0 && i < m)
-      fmat_set_from_atoms(self, i * n, 1, ac, at);
+
+    if(row >= 0 && row < m)
+    {
+      if(fts_is_number(at))
+      {
+        /* clip to # of cloumns */
+        if(ac > n)
+          ac = n;
+        
+        fmat_set_from_atoms(self, row * n, 1, ac, at);
+      }
+      else if(fts_is_object(at))
+      {
+        fts_object_t *obj = fts_get_object(at);
+        int vec_size, vec_stride;
+        float *vec;
+        
+        if(fmat_or_slice_vector(obj, &vec, &vec_size, &vec_stride))
+        {
+          float *ptr = fmat_get_ptr(self) + row * n;
+          int i, j;
+                    
+          if(vec_size > n)
+            vec_size = n;
+          
+          for(i=0, j=0; i<vec_size; i++, j+=vec_stride)
+            ptr[i] = vec[j];
+        }
+      }    
+    }
   }
+  
+  fts_return_object(o);
 }
 
 static void
-fmat_set_col_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fmat_set_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
   
@@ -880,84 +879,130 @@ fmat_set_col_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   {
     int m = fmat_get_m(self);
     int n = fmat_get_n(self);
-    int j = fts_get_number_int(at);
-    
+    int col = fts_get_number_int(at);
+        
     /* skip index argument */
     ac--;
     at++;
     
-    /* clip to # of rows */
-    if(ac > m)
-      ac = m;
-    
-    if(j >= 0 && j < n)
-      fmat_set_from_atoms(self, j, n, ac, at);
+    if(col >= 0 && col < n)
+    {
+      if(fts_is_number(at))
+      {
+        /* clip to # of rows */
+        if(ac > m)
+          ac = m;
+        
+        fmat_set_from_atoms(self, col, n, ac, at);
+      }
+      else if(fts_is_object(at))
+      {
+        fts_object_t *obj = fts_get_object(at);
+        int vec_size, vec_stride;
+        float *vec;
+        
+        if(fmat_or_slice_vector(obj, &vec, &vec_size, &vec_stride))
+        {
+          float *ptr = fmat_get_ptr(self) + col;
+          int i, j;
+          
+          if(vec_size > m)
+            vec_size = m;
+          
+          for(i=0, j=0; i<vec_size*n; i+=n, j+=vec_stride)
+            ptr[i] = vec[j];
+        }
+      }
+    }
   }
+  
+  fts_return_object(o);
 }
 
 static void
-fmat_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fmat_fill_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
   
   if(ac > 0 && fts_is_number(at))
     fmat_set_const(self, (float)fts_get_number_float(at));
+
+  fts_return_object(o);
 }
 
 static void
-fmat_fill_pattern(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fmat_fill_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  int size = fmat_get_m(self) * fmat_get_n(self);
   float *ptr = fmat_get_ptr(self);
-  int n = 0;
-  int i;
-  
-  for(i=0; i<size; i++)
-  {
-    if(ac > 0 && fts_is_number(at + n))
-      ptr[i] = (float)fts_get_number_float(at + n);
-    else
-      ptr[i] = 0.0;
-      
-    if(++n >= ac)
-      n = 0;
-  }
-}
-
-static void
-fmat_fill_expr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *self = (fmat_t *)o;
-  expr_t *expr = (expr_t *)fts_get_object(at);
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
-  float *ptr = fmat_get_ptr(self);
-  fts_atom_t a[5];
-  fts_atom_t ret;
-  int i, j;
+  int i;
   
-  fts_set_object(a, o);
-  fts_set_int(a + 1, m);
-  fts_set_int(a + 2, n);
-  
-  for(i=0; i<m; i++)
+  if(ac > 0)
   {
-    fts_set_int(a + 3, i);
-    
-    for(j=0; j<n; j++)
+    if(fts_is_number(at))
     {
-      fts_set_int(a + 4, j);
-      expr_evaluate(expr, NULL, 4, a, &ret);
+      if(ac > m * n)
+        ac = m * n;
+
+      for(i=0; i<ac; i++)
+      {
+        if(fts_is_number(at + i))
+          ptr[i] = (float)fts_get_number_float(at + i);
+        else
+          ptr[i] = 0.0;
+      }
       
-      if(fts_is_number(&ret))
-        ptr[i * n + j] = fts_get_number_float(&ret);
-      else
-        ptr[i * n + j] = 0.0;
+      for(; i<m*n; i++)
+        ptr[i] = ptr[i % ac];
+    }
+    else if(fts_is_a(at, expr_class))
+    {
+      expr_t *expr = (expr_t *)fts_get_object(at);
+      int m = fmat_get_m(self);
+      int n = fmat_get_n(self);
+      float *ptr = fmat_get_ptr(self);
+      fts_hashtable_t locals;
+      fts_atom_t key_self, key_row, key_col, value;
+      fts_atom_t ret;
+      int i, j;
+      
+      fts_hashtable_init(&locals, FTS_HASHTABLE_SMALL);
+      
+      fts_set_symbol(&key_self, fts_s_self);
+      fts_set_object(&value, self);
+      fts_hashtable_put(&locals, &key_self, &value);
+      
+      fts_set_symbol(&key_row, fts_s_row);
+      fts_set_symbol(&key_col, fts_s_col);
+
+      for(i=0; i<m; i++)
+      {
+        fts_set_int(&value, i);
+        fts_hashtable_put(&locals, &key_row, &value);
+        
+        for(j=0; j<n; j++)
+        {
+          fts_set_int(&value, j);
+          fts_hashtable_put(&locals, &key_col, &value);
+
+          expr_evaluate(expr, &locals, ac - 1, at + 1, &ret);
+          
+          if(fts_is_number(&ret))
+            ptr[i * n + j] = fts_get_number_float(&ret);
+          else
+            ptr[i * n + j] = 0.0;
+        }
+      }
+      
+      fts_hashtable_destroy(&locals);
+
+      fts_set_void(fts_get_return_value());
     }
   }
   
-  fts_set_void(fts_get_return_value());
+  fts_return_object(o);
 }
 
 static void
@@ -981,6 +1026,8 @@ fmat_zero(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   
   for(i=onset; i<range+onset; i++)
     ptr[i] = 0.0;
+  
+  fts_return_object(o);
 }
 
 static void
@@ -1034,6 +1081,8 @@ _fmat_set_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     if(m >= 0 && n >= 0)
       fmat_set_size(self, m, n);
   }
+  
+  fts_return_object(o);
 }
 
 static void
@@ -1044,6 +1093,8 @@ _fmat_set_m(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   if(m >= 0)
     fmat_set_m(self, m);
+  
+  fts_return_object(o);
 }
 
 static void
@@ -1054,6 +1105,8 @@ _fmat_set_n(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   
   if(n >= 0)
     fmat_set_n(self, n);
+  
+  fts_return_object(o);
 }
 
 /* called by get element message */
@@ -1074,143 +1127,146 @@ _fmat_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     fts_return_float(fmat_get_element(self, i, j));
 }
 
-
-
-
-/******************************************************************************
- *
- * functions, i.e. methods that return a value but don't change the object
- *
- * todo: to be called in functional syntax, e.g. (.max $myfvec)
- */
-
 static void
-fmat_get_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_fmat_get_interpolated(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  const fvec_t *self = (fvec_t *) o;
-  const int size = fmat_get_m(self) * fmat_get_n(self);
+  fmat_t *this = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(this);
+  int m = fmat_get_m(this);
+  int n = fmat_get_n(this);
+  double ret = 0.0;
   
-  if(size > 0)
+  if(ac > 0)
   {
-    const float *p = fvec_get_ptr(self);
-    float min = p[0];
-    int i;
-
-    for (i = 1; i < size; i++)
-      if (p[i] < min)
-        min = p[i];
+    int i = 0;
+    int j = 0;
+    double i_frac = 0.0;
+    double j_frac = 0.0;
     
-    fts_return_float(min);
-  }
-}
-
-static void
-fmat_get_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  const fvec_t *self = (fvec_t *) o;
-  const int size = fmat_get_m(self) * fmat_get_n(self);
-
-  if(size > 0)
-  {
-    const float *p = fmat_get_ptr(self);
-    float max = p[0]; /* start with first element */
-    int i;
-    
-    for (i = 1; i < size; i++)
-      if (p[i] > max)
-        max = p[i];
-    
-    fts_return_float(max);
-  }
-}
-
-static void
-fmat_get_min_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  const fmat_t *self = (fmat_t *) o;
-  const int size = fmat_get_m(self) * fmat_get_n(self);
-
-  if(size > 0)
-  {
-    const float *p = fmat_get_ptr(self);
-    float min = p[0];
-    int mini = 0;
-    int i;
-    
-    for(i=1; i<size; i++)
+    if(fts_is_int(at))
     {
-      if(p[i] < min)
+      i = fts_get_int(at);
+      
+      if(i < 0)
+        i = 0;
+      else if(i >= m)
+        i = m - 1;
+    }
+    else if(fts_is_float(at))
+    {
+      double i_arg = fts_get_float(at);
+      
+      if(i_arg > 0.0)
       {
-        min = p[i];
-        mini = i;
+        i = (int)i_arg;
+        
+        if(i >= m - 1)
+          i = m - 1;
+        else
+          i_frac = i_arg - floor(i_arg);
       }
     }
-  
-    fts_return_int(mini);
-  }
-}
-
-static void
-fmat_get_max_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  const fmat_t *self = (fmat_t *) o;
-  const int size = fmat_get_m(self) * fmat_get_n(self);
-
-  if(size > 0)
-  {
-    const float *p = fmat_get_ptr(self);
-    float max = p[0];
-    int maxi = 0;
-    int i;
     
-    for(i=1; i<size; i++)
+    if(ac > 1 && fts_is_number(at + 1))
     {
-      if (p[i] > max)
+      if(fts_is_int(at + 1))
       {
-        max = p[i];
-        maxi = i;
+        j = fts_get_int(at + 1);
+        
+        if(j < 0)
+          j = 0;
+        else if(j >= m)
+          j = m - 1;
       }
-    }   
+      else if(fts_is_float(at + 1))
+      {
+        double j_arg = fts_get_float(at + 1);
+        
+        if(j_arg > 0.0)
+        {
+          j = (int)j_arg;
+          
+          if(j >= m - 1)
+            j = m - 1;
+          else
+            j_frac = j_arg - floor(j_arg);
+        }
+      }
+    }
     
-    fts_return_int(maxi);
+    if(i_frac != 0.0)
+    {
+      ret = (1.0 - i_frac) * ptr[i * n + j] + i_frac * ptr[(i + 1) * n + j];
+      
+      if(j_frac != 0.0)
+      {
+        double g = (1.0 - i_frac) * ptr[i * n + j + 1] + i_frac * ptr[(i + 1) * n + j + 1];
+        
+        ret = (1.0 - j_frac) * ret + j_frac * g;
+      }
+    }
+    else if(j_frac != 0.0)
+      ret = (1.0 - j_frac) * ptr[i * n + j] + j_frac * ptr[i * n + j + 1];
+    else
+      ret = ptr[i * n + j];
   }
+  
+  fts_return_float(ret);
 }
 
+
 static void
-fmat_get_sum(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fmat_get_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  const fmat_t *self = (fmat_t *) o;
-  const int size = fmat_get_m(self) * fmat_get_n(self);
-  const float *p = fmat_get_ptr(self);
-  double sum = 0.0;
+  fmat_t *this = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(this);
+  int m = fmat_get_m(this);
+  int n = fmat_get_n(this);
+  fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, 0, 0);
+  fts_atom_t *atoms;
   int i;
+
+  fts_tuple_set_size(tuple, m * n);
+  atoms = fts_tuple_get_atoms(tuple);
   
-  for (i=0; i<size; i++)
-    sum += p[i];
-  
-  fts_return_float(sum);
+  for(i=0; i<m*n; i++)
+    fts_set_float(atoms + i, ptr[i]);
+
+  fts_return_object((fts_object_t *)tuple);
 }
 
 static void
-fmat_get_mean(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_pick_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  const fmat_t *self = (fmat_t *) o;
-  const int size = fmat_get_m(self) * fmat_get_n(self);
+  fmat_t *this = (fmat_t *)o;
+  fmat_t *source = (fmat_t *)fts_get_object(at);
+  int source_size = fvec_get_size(source);
+  int size = fvec_get_size(this);
+  float *src = fvec_get_ptr(source);
+  float *ptr = fvec_get_ptr(this);
+  int onset = 0;
+  int i;
+
+  if(ac > 1 && fts_is_number(at + 1))
+    onset = fts_get_number_int(at + 1);
+
+  if(ac > 2 && fts_is_number(at + 2))
+    size = fts_get_number_int(at + 2);
+
+  if(onset + size > source_size)
+    size = source_size - onset;
 
   if(size > 0)
   {
-    const float *p = fmat_get_ptr(self);
-    double sum = 0.0;
-    int i;
-    
-    for (i=0; i<size; i++)
-      sum += p[i];
-    
-    fts_return_float(sum / (double)size);
+    fvec_set_size(this, size);
+
+    for(i=0; i<size; i++)
+      ptr[i] = src[onset + i];
   }
-  else
-    fts_return_float(0.0);
+  
+  fts_return_object(o);
 }
+
 
 static void 
 fmat_get_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1238,8 +1294,141 @@ fmat_get_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_return_object(obj);
 }
 
+/******************************************************************************
+ *
+ * functions, i.e. methods that return a value but don't change the object
+ *
+ * todo: to be called in functional syntax, e.g. (.max $myfvec)
+ */
 
+static void
+fmat_get_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  const fmat_t *self = (fmat_t *) o;
+  const int size = fmat_get_m(self) * fmat_get_n(self);
+  
+  if(size > 0)
+  {
+    const float *p = fvec_get_ptr(self);
+    float min = p[0];
+    int i;
 
+    for (i = 1; i < size; i++)
+      if (p[i] < min)
+        min = p[i];
+    
+    fts_return_float(min);
+  }
+}
+
+static void
+fmat_get_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  const fmat_t *self = (fmat_t *) o;
+  const int size = fmat_get_m(self) * fmat_get_n(self);
+
+  if(size > 0)
+  {
+    const float *p = fmat_get_ptr(self);
+    float max = p[0]; /* start with first element */
+    int i;
+    
+    for (i = 1; i < size; i++)
+      if (p[i] > max)
+        max = p[i];
+    
+    fts_return_float(max);
+  }
+}
+
+static void
+fmat_get_absmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  const fmat_t *self = (fmat_t *) o;
+  const int size = fmat_get_m(self) * fmat_get_n(self);
+
+  if(size > 0)
+  {
+    const float *p = fmat_get_ptr(self);
+    float max = p[0]; /* start with first element */
+    int i;
+    
+    for (i = 1; i < size; i++)
+      if (fabsf(p[i]) > max)
+        max = p[i];
+    
+    fts_return_float(max);
+  }
+}
+
+static void
+fmat_get_sum(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  const fmat_t *self = (fmat_t *) o;
+  const int size = fmat_get_m(self) * fmat_get_n(self);
+  const float *p = fmat_get_ptr(self);
+  double sum = 0.0;
+  int i;
+  
+  for (i=0; i<size; i++)
+    sum += p[i];
+  
+  fts_return_float(sum);
+}
+
+static void
+fmat_get_mean(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  const fmat_t *self = (fmat_t *) o;
+  const int size = fmat_get_m(self) * fmat_get_n(self);
+  
+  if(size > 0)
+  {
+    const float *p = fmat_get_ptr(self);
+    double sum = 0.0;
+    int i;
+    
+    for (i=0; i<size; i++)
+      sum += p[i];
+    
+    fts_return_float(sum / (double)size);
+  }
+  else
+    fts_return_float(0.0);
+}
+
+static void
+fmat_get_zc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *) o;
+  float *p = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+
+  if(m * n > 0)
+  {
+    int zc = 0;
+    int i, j;
+
+    for(j=0; j<n; j++)
+    {
+      float prev = p[j];
+      
+      for(i=n; i<m*n; i+=n)
+      {
+        float f = p[i + j];
+        
+        if(f != 0.0)
+        {
+          zc += (prev * f) < 0.0;
+          prev = f;
+        }
+      }
+    }
+    
+    fts_return_int(zc);
+  }
+}
 
 /******************************************************************************
  *
@@ -1264,6 +1453,8 @@ fmat_add_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
     for(i=0; i<size; i++)
       l[i] += r[i];
+  
+    fts_return_object(o);
   }
   else
     fmat_error_dimensions(self, right, "add");
@@ -1280,6 +1471,8 @@ fmat_add_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   for(i=0; i<size; i++)
     p[i] += r;
+  
+  fts_return_object(o);
 }
 
 static void
@@ -1299,6 +1492,8 @@ fmat_sub_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     
     for(i=0; i<size; i++)
       l[i] -= r[i];
+  
+    fts_return_object(o);
   }
   else
     fmat_error_dimensions(self, right, "sub");
@@ -1315,6 +1510,8 @@ fmat_sub_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   for(i=0; i<size; i++)
     p[i] -= r;
+  
+  fts_return_object(o);
 }
 
 static void
@@ -1334,6 +1531,8 @@ fmat_mul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     
     for(i=0; i<size; i++)
       l[i] *= r[i];
+  
+    fts_return_object(o);
   }
   else
     fmat_error_dimensions(self, right, "mul");
@@ -1350,6 +1549,8 @@ fmat_mul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   for(i=0; i<size; i++)
     p[i] *= r;
+  
+  fts_return_object(o);
 }
 
 static void
@@ -1369,6 +1570,8 @@ fmat_div_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     
     for(i=0; i<size; i++)
       l[i] /= r[i];
+  
+    fts_return_object(o);
   }
   else
     fmat_error_dimensions(self, right, "div");
@@ -1385,6 +1588,8 @@ fmat_div_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   for(i=0; i<size; i++)
     p[i] /= r;
+  
+  fts_return_object(o);
 }
 
 static void
@@ -1404,6 +1609,8 @@ fmat_bus_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     
     for(i=0; i<size; i++)
       l[i] = r[i] - l[i];
+  
+    fts_return_object(o);
   }
   else
     fmat_error_dimensions(self, right, "bus");
@@ -1420,6 +1627,8 @@ fmat_bus_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   for(i=0; i<size; i++)
     p[i] = r - p[i];
+  
+  fts_return_object(o);
 }
 
 static void
@@ -1439,6 +1648,8 @@ fmat_vid_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     
     for(i=0; i<size; i++)
       l[i] = r[i] / l[i];
+  
+    fts_return_object(o);
   }
   else
     fmat_error_dimensions(self, right, "vid");
@@ -1455,10 +1666,9 @@ fmat_vid_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   for(i=0; i<size; i++)
     p[i] = r / p[i];
+  
+  fts_return_object(o);
 }
-
-
-
 
 /******************************************************************************
  *
@@ -1483,6 +1693,8 @@ fmat_ee_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     
     for(i=0; i<size; i++)
       l[i] = (float)(l[i] == r[i]);
+  
+    fts_return_object(o);
   }
   else
     fmat_error_dimensions(self, right, "ee");
@@ -1499,6 +1711,8 @@ fmat_ee_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   for(i=0; i<size; i++)
     p[i] = (float)(p[i] == r);
+  
+  fts_return_object(o);
 }
 
 static void
@@ -1518,6 +1732,8 @@ fmat_ne_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     
     for(i=0; i<size; i++)
       l[i] = (float)(l[i] != r[i]);
+  
+    fts_return_object(o);
   }
   else
     fmat_error_dimensions(self, right, "ne");
@@ -1534,6 +1750,8 @@ fmat_ne_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   for(i=0; i<size; i++)
     p[i] = (float)(p[i] != r);
+  
+  fts_return_object(o);
 }
 
 static void
@@ -1553,6 +1771,8 @@ fmat_gt_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     
     for(i=0; i<size; i++)
       l[i] = (float)(l[i] > r[i]);
+  
+    fts_return_object(o);
   }
   else
     fmat_error_dimensions(self, right, "gt");
@@ -1569,6 +1789,8 @@ fmat_gt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   for(i=0; i<size; i++)
     p[i] = (float)(p[i] > r);
+  
+  fts_return_object(o);
 }
 
 static void
@@ -1588,6 +1810,8 @@ fmat_ge_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     
     for(i=0; i<size; i++)
       l[i] = (float)(l[i] >= r[i]);
+  
+    fts_return_object(o);
   }
   else
     fmat_error_dimensions(self, right, "ge");
@@ -1604,6 +1828,8 @@ fmat_ge_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   for(i=0; i<size; i++)
     p[i] = (float)(p[i] >= r);
+  
+  fts_return_object(o);
 }
 
 static void
@@ -1623,6 +1849,8 @@ fmat_lt_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     
     for(i=0; i<size; i++)
       l[i] = (float)(l[i] < r[i]);
+  
+    fts_return_object(o);
   }
   else
     fmat_error_dimensions(self, right, "lt");
@@ -1639,6 +1867,8 @@ fmat_lt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   for(i=0; i<size; i++)
     p[i] = (float)(p[i] < r);
+  
+  fts_return_object(o);
 }
 
 static void
@@ -1658,6 +1888,8 @@ fmat_le_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     
     for(i=0; i<size; i++)
       l[i] = (float)(l[i] <= r[i]);
+  
+    fts_return_object(o);
   }
   else
     fmat_error_dimensions(self, right, "le");
@@ -1674,17 +1906,15 @@ fmat_le_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   for(i=0; i<size; i++)
     p[i] = (float)(p[i] <= r);
+  
+  fts_return_object(o);
 }
-
-
-
 
 /******************************************************************************
  *
  *  complex arithmetics
  *
  */
-
 static void
 fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1717,7 +1947,7 @@ fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
             {
               l[i] *= r[i];
             }
-            break;
+              break;
             
           case fmat_format_id_rect:
             /* vec * rect */
@@ -1728,7 +1958,7 @@ fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
               l[2 * i] = l[i] * r[2 * i];
               l[2 * i + 1] = l[i] * r[2 * i + 1];
             }
-            break;
+              break;
             
           case fmat_format_id_polar:
             /* vec * polar */
@@ -1739,7 +1969,7 @@ fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
               l[2 * i] = l[i] * r[2 * i];
               l[2 * i + 1] = r[2 * i + 1];
             }
-            break;
+              break;
             
           default:
             break;
@@ -1757,7 +1987,7 @@ fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
               l[2 * i] *= r[i];
               l[2 * i + 1] *= r[i];
             }
-            break;
+              break;
             
           case fmat_format_id_rect:
             /* rect * rect */
@@ -1767,7 +1997,7 @@ fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
               l[i] = l[i] * r[i] - l[i + 1] * r[i + 1];
               l[i + 1] = l[i] * r[i + 1] + l[i + 1] * r[i];
             }
-            break;
+              break;
             
           case fmat_format_id_polar:
             /* rect * polar */
@@ -1779,7 +2009,7 @@ fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
               l[i] = l[i] * r_re - l[i + 1] * r_im;
               l[i + 1] = l[i] * r_im+ l[i + 1] * r_re;
             }
-            break;
+              break;
             
           default:
             break;
@@ -1796,7 +2026,7 @@ fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
             {
               l[2 * i] *= r[i];
             }
-            break;
+              break;
             
           case fmat_format_id_rect:
             /* polar * rect */
@@ -1808,7 +2038,7 @@ fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
               l[i] *= sqrtf(r_re * r_re + r_im * r_im);
               l[i + 1] += atan2f(r_im, r_re);
             }
-            break;
+              break;
             
           case fmat_format_id_polar:
             /* polar * polar */
@@ -1818,7 +2048,7 @@ fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
               l[i] *= r[i];
               l[i + 1] += r[i + 1];
             }
-            break;
+              break;
             
           default:
             break;
@@ -1828,24 +2058,95 @@ fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       default:
         break;
     }
+    
+    fts_return_object(o);
   }
   else
   {
-    fts_object_error((fts_object_t *)self, "cmul can't multiply %s matrix %d x %d with %s matrix %d x %d\n", 
+    fts_object_error((fts_object_t *)self, "cmul: can't multiply %s matrix %d x %d with %s matrix %d x %d", 
                      fts_symbol_name(fmat_format_get_name(format)), m, n,
                      fts_symbol_name(fmat_format_get_name(right_format)), right_m, right_n);
   }
 }
 
+static void
+fmat_cmul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  fmat_format_t *format = fmat_get_format(self);
+  int id = fmat_format_get_id(format);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  
+  if(id <= fmat_format_id_polar)
+  {
+    float r = fts_get_number_float(at);
+    float *l = fmat_get_ptr(self);
+    int i;
+    
+    switch(id)
+    {
+      case fmat_format_id_vec:
+        for(i=0; i<m; i++)
+          l[i] *= r;              
+        break;
+            
+      case fmat_format_id_rect:
+        for(i=0; i<2*m; i++)
+          l[2 * i] *= r;
+        break;
+        
+      case fmat_format_id_polar:
+        for(i=0; i<2*m; i+=2)
+          l[2 * i] *= r;
+        break;
+        
+      default:
+        break;
+    }
+  
+    fts_return_object(o);
+  }
+  else
+    fts_object_error((fts_object_t *)self, "cmul: can't multiply %s matrix %d x %d with number", fts_symbol_name(fmat_format_get_name(format)), m, n);
+}
 
-
+/******************************************************************************
+ *
+ *  vector and matrix multiplication
+ *
+ */
+static void
+fmat_get_dot(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  fmat_t *right = (fmat_t *)fts_get_object(at);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  
+  if(fmat_get_m(right) == m && fmat_get_n(right) == n && n == 1)
+  {
+    float *l = fmat_get_ptr(self);
+    float *r = fmat_get_ptr(right);
+    float sum = 0.0;
+    int i;
+    
+    for(i=0; i<m; i++)
+      sum += l[i] * r[i];
+    
+    fts_return_float(sum);
+  }
+  else if(n == 1)
+    fmat_error_dimensions(self, right, "dot");
+  else
+    fts_object_error(o, "dot: matrices must be column vectors");
+}
 
 /******************************************************************************
  *
  *  mixed real/complex math funs
  *
  */
-
 static void
 fmat_abs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1888,7 +2189,7 @@ fmat_abs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       break;
   }
   
-  fmat_set_format(self, fmat_format_rect);
+  fts_return_object(o);
 }
 
 static void
@@ -1932,6 +2233,8 @@ fmat_logabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
         ptr[i] = logf(fabsf(ptr[i]));
       break;
   }
+  
+  fts_return_object(o);
 }
 
 static void
@@ -1978,6 +2281,8 @@ fmat_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
         ptr[i] = logf(ptr[i]);
       break;
   }
+  
+  fts_return_object(o);
 }
 
 static void
@@ -2024,6 +2329,8 @@ fmat_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
         ptr[i] = expf(ptr[i]);
       break;
   }
+  
+  fts_return_object(o);
 }
 
 static void
@@ -2067,6 +2374,8 @@ fmat_sqrabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
         ptr[i] *= ptr[i];
       break;
   }
+  
+  fts_return_object(o);
 }
 
 static void
@@ -2124,6 +2433,8 @@ fmat_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       /* fmat format error */
       break;
   }
+  
+  fts_return_object(o);
 }
 
 static void
@@ -2165,6 +2476,8 @@ fmat_rifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       /* fmat format error */
       break;
   }
+  
+  fts_return_object(o);
 }
 
 static void
@@ -2198,14 +2511,13 @@ fmat_normalize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
         ptr[i] *= scale;
     }
   }
+  
+  fts_return_object(o);
 }
-
-
-
 
 /********************************************************************
  *
- *  order operations
+ *  row order operations
  *
  */
 
@@ -2213,32 +2525,47 @@ static void
 fmat_reverse(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  int size = fmat_get_m(self) * fmat_get_n(self); 
   float *ptr = fmat_get_ptr(self);
-  int i, j;
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self); 
+  float *rtp = ptr + m * n;
+  int i;
   
-  for(i=0, j=size-1; i<size/2; i++, j--)
+  for(i=0; i<m/2; i++)
   {
-    float f = ptr[i];
+    int j;
     
-    ptr[i] = ptr[j];
-    ptr[j] = f;
+    rtp -= n;
+    
+    for(j=0; j<n; j++)
+    {
+      float f = ptr[i];
+      
+      ptr[j] = rtp[j];
+      rtp[j] = f;
+    }
+    
+    ptr += n;
   }
+  
+  fts_return_object(o);
 }
 
 static void
 fmat_rotate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  int size = fmat_get_m(self) * fmat_get_n(self); 
+  int m = fmat_get_m(self); 
+  int n = fmat_get_n(self); 
+  int size = m * n; 
   float *ptr = fmat_get_ptr(self);
   
   if(size > 1)
   {
-    int shift = 1;
+    int shift = n;
     
     if(ac > 0 && fts_is_number(at))
-      shift = fts_get_number_int(at);
+      shift = fts_get_number_int(at) * n;
     
     if(shift == 1)
     {
@@ -2306,54 +2633,403 @@ fmat_rotate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	    }
     }
   }
+  
+  fts_return_object(o);
 }
 
 static int 
-fmat_element_compare(const void *left, const void *right)
+fmat_element_compare_ascending(const void *left, const void *right)
 {
-  float l = *((const float *)left);
-  float r = *((const float *)right);
+  float l = ((const float *)left)[0];
+  float r = ((const float *)right)[0];
   
   return (r < l) - (l < r);
+}
+
+static int 
+fmat_element_compare_descending(const void *left, const void *right)
+{
+  float l = ((const float *)left)[0];
+  float r = ((const float *)right)[0];
+  
+  return (l < r) - (r < l);
 }
 
 static void
 fmat_sort(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  int size = fmat_get_m(self) * fmat_get_n(self); 
   float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self); 
+  int col = 0;
   
-  qsort((void *)ptr, size, sizeof(float), fmat_element_compare);
+  if(ac > 0)
+    col = fts_get_number_int(at);
+
+  if(col == 0)
+    qsort((void *)ptr, m, n * sizeof(float), fmat_element_compare_ascending);
+  else if(col > 0 && col < n)
+  {
+    int i;
+    
+    for(i=0; i<m*n; i+=n)
+    {
+      float f = ptr[i];
+      
+      ptr[i] = ptr[i + col];
+      ptr[i + col] = f;
+    }
+    
+    qsort((void *)ptr, m, n * sizeof(float), fmat_element_compare_ascending);
+
+    for(i=0; i<m*n; i+=n)
+    {
+      float f = ptr[i];
+      
+      ptr[i] = ptr[i + col];
+      ptr[i + col] = f;
+    }    
+  }
+  
+  fts_return_object(o);
+}
+
+static void
+fmat_tros(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self); 
+  int col = 0;
+  
+  if(ac > 0)
+    col = fts_get_number_int(at);
+
+  if(col == 0)
+    qsort((void *)ptr, m, n * sizeof(float), fmat_element_compare_descending);
+  else if(col > 0 && col < n)
+  {
+    int i;
+    
+    for(i=0; i<m*n; i+=n)
+    {
+      float f = ptr[i];
+      
+      ptr[i] = ptr[i + col];
+      ptr[i + col] = f;
+    }
+    
+    qsort((void *)ptr, m, n * sizeof(float), fmat_element_compare_descending);
+
+    for(i=0; i<m*n; i+=n)
+    {
+      float f = ptr[i];
+      
+      ptr[i] = ptr[i + col];
+      ptr[i + col] = f;
+    }    
+  }
+  
+  fts_return_object(o);
 }
 
 static void
 fmat_scramble(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  int size = fmat_get_m(self) * fmat_get_n(self); 
   float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self); 
   int i;
   
-  for(i=0; i<size; i++)
+  if(n == 1)
   {
-    int random = (int)(((double)size / (double)FTS_RANDOM_RANGE) * (double)fts_random());
-    float f = ptr[i];
+    for(i=0; i<m; i++)
+    {
+      int random = (int)(((double)m / (double)FTS_RANDOM_RANGE) * (double)fts_random());
+      float f = ptr[i];
     
-    ptr[i] = ptr[random];
-    ptr[random] = f;
+      ptr[i] = ptr[random];
+      ptr[random] = f;
+    }
   }
+  else
+  {
+    for(i=0; i<m; i++)
+    {
+      int random = (int)(((double)m / (double)FTS_RANDOM_RANGE) * (double)fts_random());
+      float *row = ptr + i * n;
+      float *rand_row = ptr + random * n;
+      int j;
+      
+      for(j=0; j<n; j++)
+      {
+        float f = row[j];
+        
+        row[j] = rand_row[j];
+        rand_row[j] = f;
+      }
+    }
+  }  
+  
+  fts_return_object(o);
 }
 
+/******************************************************************************
+ *
+ *  envelopes
+ *
+ */
+static void
+fmat_fade(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self); 
+  int fade = 0;
+  float f, incr;
+  int n_fade;
+  int i, j;
 
+  if(ac > 0 && fts_is_number(at))
+    fade = fts_get_number_int(at);
 
+  n_fade = fade;
+  incr = (float)(1.0 / (float)fade);
+
+  if(n_fade > m / 2)
+    n_fade = m / 2;
+	  
+  f = 0.0;
+  
+  if(n == 1)
+  {
+    /* apply fade in/out to vector */
+    ptr[0] = 0.0;
+    
+    for(i=1, j=m-1; i<n_fade; i++, j--)
+    {
+      ptr[i] *= f;
+      ptr[j] *= f;
+      
+      f += incr;
+    }
+  }
+  else
+  {
+    /* apply fade in/out to each column */
+    float *rtp = ptr + m * n;
+    
+    for(j=0; j<n; j++)
+      ptr[j] = 0.0;
+    
+    for(i=1; i<n_fade; i++)
+    {
+      rtp -= n;
+    
+      for(j=0; j<n; j++)
+      {
+        ptr[j] *= f;
+        rtp[j] *= f;
+      }
+      
+      ptr += n;
+      f += incr;
+    }
+  }
+  
+  fts_return_object(o);
+}
+
+static void
+fmat_lookup_fmat_or_slice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  fts_object_t *obj = fts_get_object(at);
+  float *fun;
+  int fun_size, fun_stride;
+  int i;
+  
+  fmat_or_slice_vector(obj, &fun, &fun_size, &fun_stride);
+      
+  for(i=0; i<m*n; i++)
+  {
+    double f_index = ptr[i];
+    
+    if(f_index < 0.0)
+      ptr[i] = fun[0];
+    else 
+    {
+      double i_index = floor(f_index);
+      int index = (int)i_index;
+    
+      if(index >= fun_size - 1)
+        ptr[i] = fun[(fun_size - 1) * fun_stride];
+      else
+      {
+        double frac = f_index - i_index;
+        double fun_0 = fun[index * fun_stride];
+        double fun_1 = fun[(index + 1) * fun_stride];
+  
+        ptr[i] = (1.0 - frac) * fun_0 + frac * fun_1;
+      }
+    }
+  }
+  
+  fts_return_object(o);
+}
+
+static void
+fmat_lookup_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  bpf_t *bpf = (bpf_t *)fts_get_object(at);
+  int i;
+  
+  for(i=0; i<m*n; i++)
+    ptr[i] = bpf_get_interpolated(bpf, ptr[i]);
+  
+  fts_return_object(o);
+}
+    
+static void
+fmat_env_fmat_or_slice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;  
+  fts_object_t *obj = fts_get_object(at);
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  float *env;
+  int env_size, env_stride;
+    
+  fmat_or_slice_vector(obj, &env, &env_size, &env_stride);
+
+  if(env_size == m)
+  {
+    int i, j, k;
+    
+    /* simply multiply function vector each column*/
+    for(i=0, k=0; i<m*n; i+=n, k+=env_stride)
+    {
+      double f = env[k];
+      
+      for(j=0; j<n; j++)
+        ptr[i + j] *= f;
+    }
+  }
+  else
+  {
+    double incr = (double)env_size / (double)m;
+    double f_index = incr;
+    int i, j;
+    
+    /* apply envelope function to each column */
+    for(j=0; j<n; j++)
+      ptr[j] *= env[0];
+
+    for(i=n; i<m*n; i+=n)
+    {
+      double i_index = floor(f_index);
+      int index = (int)i_index;
+      double frac = f_index - i_index;
+      double env_0 = env[index * env_stride];
+      double env_1 = env[index * env_stride + env_stride];
+      
+      for(j=0; j<n; j++)
+        ptr[i + j] *= (1.0 - frac) * env_0 + frac * env_1;
+      
+      f_index += incr;
+    }
+  }
+  
+  fts_return_object(o);
+}
+
+static void
+fmat_env_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;  
+  bpf_t *bpf = (bpf_t *)fts_get_object(at);
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  double incr = bpf_get_duration(bpf) / (double)m;
+  double time = 0.0;
+  int i, j;
+  
+  /* apply bpf envelope to each column */
+  for(i=0; i<m*n; i+=n)
+  {
+    float f = bpf_get_interpolated(bpf, time);
+    
+    for(j=0; j<n; j++)
+      ptr[i + j] *= f;
+      
+    time += incr;  
+  }
+  
+  fts_return_object(o);
+}
+
+static void
+fmat_apply_expr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  expr_t *expr = (expr_t *)fts_get_object(at);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  float *ptr = fmat_get_ptr(self);
+  fts_hashtable_t locals;
+  fts_atom_t key_self, key_x, value;
+  fts_atom_t ret;
+  int i;
+  
+  fts_hashtable_init(&locals, FTS_HASHTABLE_SMALL);
+  
+  fts_set_symbol(&key_self, fts_s_self);
+  fts_set_object(&value, self);
+  fts_hashtable_put(&locals, &key_self, &value);
+  
+  fts_set_symbol(&key_x, fts_s_x);
+
+  /* apply expression to each value */  
+  for(i=0; i<m*n; i++)
+  {
+    double f = (double)ptr[i];
+  
+    fts_set_float(&value, f);
+    fts_hashtable_put(&locals, &key_x, &value);
+
+    expr_evaluate(expr, &locals, ac - 1, at + 1, &ret);
+    
+    if(fts_is_number(&ret))
+      ptr[i] = fts_get_number_float(&ret);
+    else
+      ptr[i] = 0.0;
+  }
+  
+  fts_hashtable_destroy(&locals);
+
+  fts_set_void(fts_get_return_value());
+  
+  fts_return_object(o);
+}
 
 /******************************************************************************
  *
  *  format conversion
  *
  */
-
 static void
 fmat_convert_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -2371,6 +3047,8 @@ fmat_convert_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       
     fmat_reshape(self, m, 1);
   }
+  
+  fts_return_object(o);
 }
 
 static void
@@ -2422,6 +3100,8 @@ fmat_convert_rect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   }
   
   fmat_set_format(self, fmat_format_rect);
+  
+  fts_return_object(o);
 }
 
 static void
@@ -2474,6 +3154,8 @@ fmat_convert_polar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   }
   
   fmat_set_format(self, fmat_format_rect);
+  
+  fts_return_object(o);
 }
 
 static void
@@ -2505,289 +3187,9 @@ fmat_convert_real(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     default:
       break;
   }
-}
-
-
-
-
-/******************************************************************************
- *
- *  matrix slice operations
- *
- */
-
-static void
-fslice_add_fslice(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
-{
-  fslice_t *self = (fslice_t *)o;
-  fslice_t *right = (fslice_t *)fts_get_object(at);
   
-  if(fslice_check_index(self) && fslice_check_index(right))
-  {
-    float *l = fslice_get_ptr(self);
-    float *r = fslice_get_ptr(right);
-    int l_stride = fslice_get_stride(self);
-    int r_stride = fslice_get_stride(right);
-    int size = fslice_get_size(self);
-    int i;
-    
-    if(size > fslice_get_size(right))
-      size = fslice_get_size(right);
-    
-    for(i=0; i<size; i++)
-      l[i * l_stride] += r[i * r_stride];
-  }
-  else
-    fslice_error_index(self, right, "add");
+  fts_return_object(o);
 }
-
-static void
-fslice_add_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
-{
-  fslice_t *self = (fslice_t *)o;
-  
-  if(fslice_check_index(self))
-  {
-    float *l = fslice_get_ptr(self);
-    float r = (float)fts_get_number_float(at);
-    int stride = fslice_get_stride(self);
-    int size = fslice_get_size(self);
-    int i;
-    
-    for(i=0; i<size; i++)
-      l[i * stride] += r;
-  }
-  else
-    fslice_error_index(self, NULL, "add");
-}
-
-static void
-fslice_sub_fslice(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
-{
-  fslice_t *self = (fslice_t *)o;
-  fslice_t *right = (fslice_t *)fts_get_object(at);
-  
-  if(fslice_check_index(self) && fslice_check_index(right))
-  {
-    float *l = fslice_get_ptr(self);
-    float *r = fslice_get_ptr(right);
-    int l_stride = fslice_get_stride(self);
-    int r_stride = fslice_get_stride(right);
-    int size = fslice_get_size(self);
-    int i;
-    
-    if(size > fslice_get_size(right))
-      size = fslice_get_size(right);
-    
-    for(i=0; i<size; i++)
-      l[i * l_stride] -= r[i * r_stride];
-  }
-  else
-    fslice_error_index(self, right, "sub");
-}
-
-static void
-fslice_sub_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
-{
-  fslice_t *self = (fslice_t *)o;
-  
-  if(fslice_check_index(self))
-  {
-    float *l = fslice_get_ptr(self);
-    float r = (float)fts_get_number_float(at);
-    int stride = fslice_get_stride(self);
-    int size = fslice_get_size(self);
-    int i;
-    
-    for(i=0; i<size; i++)
-      l[i * stride] -= r;
-  }
-  else
-    fslice_error_index(self, NULL, "sub");
-}
-
-static void
-fslice_mul_fslice(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
-{
-  fslice_t *self = (fslice_t *)o;
-  fslice_t *right = (fslice_t *)fts_get_object(at);
-  
-  if(fslice_check_index(self) && fslice_check_index(right))
-  {
-    float *l = fslice_get_ptr(self);
-    float *r = fslice_get_ptr(right);
-    int l_stride = fslice_get_stride(self);
-    int r_stride = fslice_get_stride(right);
-    int size = fslice_get_size(self);
-    int i;
-    
-    if(size > fslice_get_size(right))
-      size = fslice_get_size(right);
-    
-    for(i=0; i<size; i++)
-      l[i * l_stride] *= r[i * r_stride];
-  }
-  else
-    fslice_error_index(self, right, "mul");
-}
-
-static void
-fslice_mul_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
-{
-  fslice_t *self = (fslice_t *)o;
-  
-  if(fslice_check_index(self))
-  {
-    float *l = fslice_get_ptr(self);
-    float r = (float)fts_get_number_float(at);
-    int stride = fslice_get_stride(self);
-    int size = fslice_get_size(self);
-    int i;
-    
-    for(i=0; i<size; i++)
-      l[i * stride] *= r;
-  }
-  else
-    fslice_error_index(self, NULL, "mul");
-}
-
-static void
-fslice_div_fslice(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
-{
-  fslice_t *self = (fslice_t *)o;
-  fslice_t *right = (fslice_t *)fts_get_object(at);
-  
-  if(fslice_check_index(self) && fslice_check_index(right))
-  {
-    float *l = fslice_get_ptr(self);
-    float *r = fslice_get_ptr(right);
-    int l_stride = fslice_get_stride(self);
-    int r_stride = fslice_get_stride(right);
-    int size = fslice_get_size(self);
-    int i;
-    
-    if(size > fslice_get_size(right))
-      size = fslice_get_size(right);
-    
-    for(i=0; i<size; i++)
-      l[i * l_stride] /= r[i * r_stride];
-  }
-  else
-    fslice_error_index(self, right, "div");
-}
-
-static void
-fslice_div_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
-{
-  fslice_t *self = (fslice_t *)o;
-  
-  if(fslice_check_index(self))
-  {
-    float *l = fslice_get_ptr(self);
-    float r = (float)fts_get_number_float(at);
-    int stride = fslice_get_stride(self);
-    int size = fslice_get_size(self);
-    int i;
-    
-    for(i=0; i<size; i++)
-      l[i * stride] /= r;
-  }
-  else
-    fslice_error_index(self, NULL, "div");
-}
-
-static void
-fslice_bus_fslice(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
-{
-  fslice_t *self = (fslice_t *)o;
-  fslice_t *right = (fslice_t *)fts_get_object(at);
-  
-  if(fslice_check_index(self) && fslice_check_index(right))
-  {
-    float *l = fslice_get_ptr(self);
-    float *r = fslice_get_ptr(right);
-    int l_stride = fslice_get_stride(self);
-    int r_stride = fslice_get_stride(right);
-    int size = fslice_get_size(self);
-    int i;
-    
-    if(size > fslice_get_size(right))
-      size = fslice_get_size(right);
-    
-    for(i=0; i<size; i++)
-      l[i * l_stride] = r[i * r_stride] - l[i * l_stride];
-  }
-  else
-    fslice_error_index(self, right, "bus");
-}
-
-static void
-fslice_bus_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
-{
-  fslice_t *self = (fslice_t *)o;
-  
-  if(fslice_check_index(self))
-  {
-    float *l = fslice_get_ptr(self);
-    float r = (float)fts_get_number_float(at);
-    int stride = fslice_get_stride(self);
-    int size = fslice_get_size(self);
-    int i;
-    
-    for(i=0; i<size; i++)
-      l[i * stride] = r - l[i * stride];
-  }
-  else
-    fslice_error_index(self, NULL, "bus");
-}
-
-static void
-fslice_vid_fslice(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
-{
-  fslice_t *self = (fslice_t *)o;
-  fslice_t *right = (fslice_t *)fts_get_object(at);
-  
-  if(fslice_check_index(self) && fslice_check_index(right))
-  {
-    float *l = fslice_get_ptr(self);
-    float *r = fslice_get_ptr(right);
-    int l_stride = fslice_get_stride(self);
-    int r_stride = fslice_get_stride(right);
-    int size = fslice_get_size(self);
-    int i;
-    
-    if(size > fslice_get_size(right))
-      size = fslice_get_size(right);
-    
-    for(i=0; i<size; i++)
-      l[i * l_stride] = r[i * r_stride] / l[i * l_stride];
-  }
-  else
-    fslice_error_index(self, right, "vid");
-}
-
-static void
-fslice_vid_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
-{
-  fslice_t *self = (fslice_t *)o;
-  
-  if(fslice_check_index(self))
-  {
-    float *l = fslice_get_ptr(self);
-    float r = (float)fts_get_number_float(at);
-    int stride = fslice_get_stride(self);
-    int size = fslice_get_size(self);
-    int i;
-    
-    for(i=0; i<size; i++)
-      l[i * stride] = r / l[i * stride];
-  }
-  else
-    fslice_error_index(self, NULL, "vid");
-}
-
-
-
 
 /******************************************************************************
  *
@@ -2831,8 +3233,10 @@ fmat_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
     else
       size = fmat_read_atom_file(self, file_name);
     
-    if(size <= 0)
-      fts_object_error(o, "can't import from file \"%s\"\n", fts_symbol_name(file_name));
+    if(size > 0)
+      fts_return_object(o);
+    else
+      fts_object_error(o, "can't import from file \"%s\"", fts_symbol_name(file_name));
   }
 }
 
@@ -2857,8 +3261,10 @@ fmat_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
     else
       size = fmat_write_atom_file(self, file_name);
     
-    if(size <= 0)
-      fts_object_error(o, "can't export to file \"%s\"\n", fts_symbol_name(file_name));
+    if(size > 0)
+      fts_return_object(o);
+    else
+      fts_object_error(o, "can't export to file \"%s\"", fts_symbol_name(file_name));
   }
 }
 
@@ -2867,9 +3273,6 @@ fmat_export_dialog(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const f
 {
   fts_object_save_dialog(o, fts_s_export, fts_new_symbol("export fmat"), fts_project_get_dir(), fts_new_symbol(".aiff"));
 }
-
-
-
 
 /*********************************************************
  *
@@ -2924,9 +3327,6 @@ fmat_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   }
 }
 
-
-
-
 /********************************************************************
  *
  *  system functions
@@ -2945,7 +3345,7 @@ fmat_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   if(size == 0)
     fts_spost(stream, "<fmat>");
   else
-    fts_spost(stream, "<fmat %d %d>", m, n);
+    fts_spost(stream, "<fmat %dx%d>", m, n);
 }
 
 static void
@@ -2977,14 +3377,8 @@ fmat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
     fts_spost(stream, "}\n");
   }
-}
-
-static void
-fmat_set_from_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *self = (fmat_t *)o;
-
-  fmat_copy((fmat_t *)fts_get_object(at), self);
+  
+  fts_return_object(o);
 }
 
 static void
@@ -3043,9 +3437,6 @@ fmat_equals(const fts_atom_t *a, const fts_atom_t *b)
 
   return 0;
 }
-
-
-
 
 /*********************************************************
  *
@@ -3156,50 +3547,6 @@ fmat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     fts_free(self->values - HEAD_POINTS);
 }
 
-static void
-fslice_init(fts_object_t *o, int type, int ac, const fts_atom_t *at)
-{
-  fslice_t *self = (fslice_t *)o;
-  
-  self->type = type;
-  
-  if(ac > 0 && fts_is_a(at, fmat_class))
-  {
-    self->fmat = (fmat_t *)fts_get_object(at);
-    fts_object_refer((fts_object_t *)self->fmat);
-  }
-  else
-    fts_object_error(o, "fmat argument required");
-  
-  if(ac > 1 && fts_is_number(at + 1))
-    self->index = fts_get_number_int(at + 1);
-  else
-    self->index = 0;
-}
-
-static void
-fcol_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fslice_init(o, fslice_column, ac, at);
-}
-
-static void
-frow_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fslice_init(o, fslice_row, ac, at);
-}
-
-static void
-fslice_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fslice_t *self = (fslice_t *)o;
-  
-  fts_object_release(self->fmat);
-}
-
-
-
-
 /*********************************************************
  *
  *  class instantiate
@@ -3231,24 +3578,22 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_post, fmat_post);
   fts_class_message_varargs(cl, fts_s_print, fmat_print);
   
-  fts_class_set_equals_function(cl, fmat_equals);
-  
-  fts_class_message_varargs(cl, fts_s_set_from_instance, fmat_set_from_fmat);
-  
-  fts_class_message_varargs(cl, fts_s_set, fmat_set_elements);
-  fts_class_message(cl, fts_s_set, cl, fmat_set_from_fmat);
-
-  fts_class_message_varargs(cl, fts_s_row, fmat_set_row_elements);
-  fts_class_message_varargs(cl, fts_s_col, fmat_set_col_elements);
-  
   fts_class_message_varargs(cl, fts_s_get_element, _fmat_get_element);
-
-  fts_class_message_number(cl, fts_new_symbol("row"), fmat_get_row);
-  fts_class_message_number(cl, fts_new_symbol("col"), fmat_get_col);
+  fts_class_message_varargs(cl, fts_s_get, _fmat_get_element);
+  fts_class_message_varargs(cl, fts_new_symbol("iget"), _fmat_get_interpolated);
   
-  fts_class_message_number(cl, fts_s_fill, fmat_fill);
-  fts_class_message_varargs(cl, fts_s_fill, fmat_fill_pattern);
-  fts_class_message(cl, fts_s_fill, expr_class, fmat_fill_expr);
+  fts_class_message_varargs(cl, fts_s_set, fmat_set_from_list);
+  fts_class_message(cl, fts_s_set, cl, fmat_set_from_fmat);
+  fts_class_message(cl, fts_s_set, ivec_type, fmat_set_from_ivec);
+
+  fts_class_message_number(cl, fts_s_row, fmat_get_row);
+  fts_class_message_varargs(cl, fts_s_row, fmat_set_row);
+
+  fts_class_message_number(cl, fts_s_col, fmat_get_col);
+  fts_class_message_varargs(cl, fts_s_col, fmat_set_col);
+  
+  fts_class_message_number(cl, fts_s_fill, fmat_fill_number);
+  fts_class_message_varargs(cl, fts_s_fill, fmat_fill_varargs);
   fts_class_message_varargs(cl, fts_new_symbol("zero"), fmat_zero);
   
   fts_class_message_void(cl, fts_s_size, _fmat_get_size);
@@ -3260,6 +3605,13 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_new_symbol("cols"), _fmat_get_n);
   fts_class_message_number(cl, fts_new_symbol("cols"), _fmat_set_n);  
 
+  fts_class_message_void(cl, fts_new_symbol("min"), fmat_get_min);
+  fts_class_message_void(cl, fts_new_symbol("max"), fmat_get_max);
+  fts_class_message_void(cl, fts_new_symbol("absmax"), fmat_get_absmax);
+  fts_class_message_void(cl, fts_new_symbol("sum"), fmat_get_sum);
+  fts_class_message_void(cl, fts_new_symbol("mean"), fmat_get_mean);
+  fts_class_message_void(cl, fts_new_symbol("zc"), fmat_get_zc);
+  
   fmat_message(cl, fts_new_symbol("add"), fmat_add_fmat, fmat_add_number);
   fmat_message(cl, fts_new_symbol("sub"), fmat_sub_fmat, fmat_sub_number);
   fmat_message(cl, fts_new_symbol("mul"), fmat_mul_fmat, fmat_mul_number);
@@ -3272,8 +3624,9 @@ fmat_instantiate(fts_class_t *cl)
   fmat_message(cl, fts_new_symbol("ge"), fmat_ge_fmat, fmat_ge_number);
   fmat_message(cl, fts_new_symbol("lt"), fmat_lt_fmat, fmat_lt_number);
   fmat_message(cl, fts_new_symbol("le"), fmat_le_fmat, fmat_le_number);
-  
-  fts_class_message(cl, fts_new_symbol("cmul"), cl, fmat_cmul_fmat);
+
+  fmat_message(cl, fts_new_symbol("cmul"), fmat_cmul_fmat, fmat_cmul_number);
+  fts_class_message(cl, fts_new_symbol("dot"), fmat_class, fmat_get_dot);
   
   fts_class_message_void(cl, fts_new_symbol("abs"), fmat_abs);
   fts_class_message_void(cl, fts_new_symbol("sqrabs"), fmat_sqrabs);
@@ -3283,10 +3636,31 @@ fmat_instantiate(fts_class_t *cl)
   /*fts_class_message_void(cl, fts_new_symbol("sqrt"), fmat_sqrt);*/
   
   fts_class_message_void(cl, fts_new_symbol("fft"), fmat_fft);
-  fts_class_message_void(cl, fts_new_symbol("rifft"), fmat_rifft);
+  fts_class_message_void(cl, fts_new_symbol("rifft"), fmat_rifft);  
   
-  fts_class_message_varargs(cl, fts_new_symbol("normalize"), fmat_normalize);
+  fts_class_message_void(cl, fts_new_symbol("normalize"), fmat_normalize);
   
+  fts_class_message_void(cl, fts_new_symbol("sort"), fmat_sort);
+  fts_class_message_number(cl, fts_new_symbol("sort"), fmat_sort);
+  fts_class_message_void(cl, fts_new_symbol("tros"), fmat_tros);
+  fts_class_message_number(cl, fts_new_symbol("tros"), fmat_tros);
+  fts_class_message_void(cl, fts_new_symbol("rotate"), fmat_rotate);
+  fts_class_message_number(cl, fts_new_symbol("rotate"), fmat_rotate);
+  fts_class_message_void(cl, fts_new_symbol("reverse"), fmat_reverse);
+  fts_class_message_void(cl, fts_new_symbol("scramble"), fmat_scramble);
+
+  fts_class_message(cl, fts_new_symbol("lookup"), cl, fmat_lookup_fmat_or_slice);
+  fts_class_message(cl, fts_new_symbol("lookup"), fcol_class, fmat_lookup_fmat_or_slice);
+  fts_class_message(cl, fts_new_symbol("lookup"), frow_class, fmat_lookup_fmat_or_slice);
+  fts_class_message(cl, fts_new_symbol("lookup"), bpf_type, fmat_lookup_bpf);
+  
+  fts_class_message(cl, fts_new_symbol("env"), cl, fmat_env_fmat_or_slice);
+  fts_class_message(cl, fts_new_symbol("env"), fcol_class, fmat_env_fmat_or_slice);
+  fts_class_message(cl, fts_new_symbol("env"), frow_class, fmat_env_fmat_or_slice);
+  fts_class_message(cl, fts_new_symbol("env"), bpf_type, fmat_env_bpf);
+
+  fts_class_message(cl, fts_new_symbol("apply"), expr_class, fmat_apply_expr);
+
   fts_class_message_void(cl, sym_vec, fmat_convert_vec);
   fts_class_message_void(cl, sym_rect, fmat_convert_rect);
   fts_class_message_void(cl, sym_polar, fmat_convert_polar);
@@ -3297,51 +3671,45 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_symbol(cl, fts_s_export, fmat_export);
   fts_class_message_void(cl, fts_s_export, fmat_export_dialog);
   
-  fts_class_message_void(cl, fts_new_symbol("reverse"), fmat_reverse);
-  
-  fts_class_message_void(cl, fts_new_symbol("rotate"), fmat_rotate);
-  fts_class_message_number(cl, fts_new_symbol("rotate"), fmat_rotate);
-  
-  fts_class_message_void(cl, fts_new_symbol("sort"), fmat_sort);
-  fts_class_message_number(cl, fts_new_symbol("sort"), fmat_sort);
-  
-  fts_class_message_void(cl, fts_new_symbol("scramble"), fmat_scramble);
+  fts_class_set_copy_function(cl, fmat_copy_function);
+  fts_class_set_equals_function(cl, fmat_equals);
 
-  fts_class_message_void(cl, fts_new_symbol("min"), fmat_get_min);
-  fts_class_message_void(cl, fts_new_symbol("max"), fmat_get_max);
-  fts_class_message_void(cl, fts_new_symbol("mini"), fmat_get_min_index);
-  fts_class_message_void(cl, fts_new_symbol("maxi"), fmat_get_max_index);
-  fts_class_message_void(cl, fts_new_symbol("sum"), fmat_get_sum);
-  fts_class_message_void(cl, fts_new_symbol("mean"), fmat_get_mean);
-  
   fts_class_inlet_bang(cl, 0, data_object_output);
   
   fts_class_inlet_thru(cl, 0);
   fts_class_outlet_thru(cl, 0);
   
-  fts_class_set_copy_function(cl, fmat_copy_function);
-
-
-  /*
-   * fmat/fvec class documentation
-   */
+  /* fmat class documentation */
   
-  fts_class_doc(cl, fmat_symbol, "[<num: # of rows> [<num: # of columns (default is 1)> [<num: init values> ...]]]", "matrix of floats");
+  fts_class_doc(cl, fmat_symbol, "[<num: # of rows> [<num: # of columns (def 1)> [<num: init values> ...]]]", "matrix of floats");
   
-  fts_class_doc(cl, fts_s_set, "<num: row index> <num: column index> [<num:value> ...]" , "setvalues at given index");
-  fts_class_doc(cl, fts_s_set, "<fmat: other>", "set from fmat instance");
-  fts_class_doc(cl, fts_s_row, "<num: index> [<num:value> ...]", "set values of given row");
-  fts_class_doc(cl, fts_s_col, "<num: index> [<num:value> ...]", "set values of given column");
-  fts_class_doc(cl, fts_s_fill, "<num: value>", "fill with given value");
-  fts_class_doc(cl, fts_s_size, "[<num: # of rows> [<num: # of columns (default is 1)>]]", "get/set dimensions");
+  fts_class_doc(cl, fts_s_set, "<fmat: matrix>", "set dimension and values from given fmat");
+  fts_class_doc(cl, fts_s_set, "<num: row index> <num: column index> [<num:value> ...]" , "set values starting from indicated element (row by row)");
+  
+  fts_class_doc(cl, fts_s_row, "<num: index>", "get row reference (creates frow object)");
+  fts_class_doc(cl, fts_s_row, "<num: index> [<num:value> ...]", "set values of given row from list");
+  fts_class_doc(cl, fts_s_row, "<num: index> <frow|fcol: row values>", "set values of given row from frow or fcol");
+  
+  fts_class_doc(cl, fts_s_col, "<num: index>", "get column reference (creates fcol object)");
+  fts_class_doc(cl, fts_s_col, "<num: index> [<num:value> ...]", "set values of given column from list");
+  fts_class_doc(cl, fts_s_col, "<num: index> <frow|fcol: col values>", "set values of given column from frow or fcol");
+  
+  fts_class_doc(cl, fts_s_fill, "<num: value>", "fill with given value or pattern of values");
+  fts_class_doc(cl, fts_s_fill, "<expr: expression>", "fill with given expression (use $self, $row and $col)");
+  fts_class_doc(cl, fts_new_symbol("zero"), "[<num: row index> <num: column index> [<num: # of elements>]]", "zero given number of elements starting from indicated element (row by row)");
+  fts_class_doc(cl, fts_s_size, "[<num: # of rows> [<num: # of columns (def 1)>]]", "get/set dimensions");
   fts_class_doc(cl, fts_new_symbol("rows"), "[<num: # of rows>]", "get/set # of rows");
   fts_class_doc(cl, fts_new_symbol("columns"), "[<num: # of rows>]", "get/set # of columns");
   
-  fts_class_doc(cl, fts_s_get_element, "<num: row index> <num: column index>", "get value at given index");
-  fts_class_doc(cl, fts_new_symbol("max"), NULL, "get maximum value");
   fts_class_doc(cl, fts_new_symbol("min"), NULL, "get minimum value");
+  fts_class_doc(cl, fts_new_symbol("max"), NULL, "get maximum value");
+  fts_class_doc(cl, fts_new_symbol("  bsmax"), NULL, "get maximum absolute value");
   fts_class_doc(cl, fts_new_symbol("sum"), NULL, "get sum of all values");
   fts_class_doc(cl, fts_new_symbol("mean"), NULL, "get mean value of all values");
+  fts_class_doc(cl, fts_new_symbol("zc"), NULL, "get number of zerocrossings");
+  
+  fts_class_doc(cl, fts_s_get, "<num: row index> <num: column index>", "get value at given index");
+  fts_class_doc(cl, fts_new_symbol("iget"), "<num: float row index> <num: float column index>", "get (linearly) interpolated value at given float index");
   
   fts_class_doc(cl, fts_new_symbol("add"), "<num|fmat: operand>", "add given scalar or fmat (element by element) to current values");
   fts_class_doc(cl, fts_new_symbol("sub"), "<num|fmat: operand>", "substract given scalar or fmat (element by element)");
@@ -3356,73 +3724,42 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("lt"), "<num|fmat: operand>", "replace current values by result of < comparison (0 or 1) with given scalar or fmat (element by element)");
   fts_class_doc(cl, fts_new_symbol("le"), "<num|fmat: operand>", "replace current values by result of <= comparison (0 or 1) with given scalar or fmat (element by element)");
   
+  fts_class_doc(cl, fts_new_symbol("cmul"), "<num|fmat: operand>", "multiply current values of complex vector (rect or polar format) by given scalar or complex vector fmat (element by element)");
+  fts_class_doc(cl, fts_new_symbol("dot"), "<fmat: operand>", "get dot product of column vector with given vector");
+
   fts_class_doc(cl, fts_new_symbol("abs"), NULL, "calulate absolute values of current values");
   fts_class_doc(cl, fts_new_symbol("sqrabs"), NULL, "calulate square of absolute values of current values");
   fts_class_doc(cl, fts_new_symbol("logabs"), NULL, "calulate logarithm of absolute values of current values");
   fts_class_doc(cl, fts_new_symbol("log"), NULL, "calulate lograrithm of current values");
   fts_class_doc(cl, fts_new_symbol("exp"), NULL, "calulate exponent function of current values");
-  fts_class_doc(cl, fts_new_symbol("fft"), NULL, "calulate inplace FFT (real or complex)");
-  fts_class_doc(cl, fts_new_symbol("rifft"), NULL, "calulate inplace real IFFT");
-  
+  fts_class_doc(cl, fts_new_symbol("fft"), NULL, "calulate inplace FFT of real or complex vector (vec or rect format)");
+  fts_class_doc(cl, fts_new_symbol("rifft"), NULL, "calulate inplace real IFFT of complex vector (rect format)");
+
+  fts_class_doc(cl, fts_new_symbol("normalize"), NULL, "normalize to between -1.0 and 1.0");
+  fts_class_doc(cl, fts_new_symbol("reverse"), NULL, "reverse order of rows");
+  fts_class_doc(cl, fts_new_symbol("rotate"), "[<num: # of elements (def 1)>]", "rotate by given number of rows");
+  fts_class_doc(cl, fts_new_symbol("sort"), "[<num: index of column>]", "sort rows by ascending values of given column");
+  fts_class_doc(cl, fts_new_symbol("tros"), "[<num: index of column>]", "sort rows by descending values of given column");
+  fts_class_doc(cl, fts_new_symbol("scramble"), NULL, "scramble rows randomly");
+
+  fts_class_doc(cl, fts_new_symbol("lookup"), "<fmat|fcol|frow|bpf: function>", "apply given function to each value (by linear interpolation)");
+  fts_class_doc(cl, fts_new_symbol("env"), "<fmat|fcol|frow|bpf: envelope>", "multiply given envelope function to each column");
+
+  fts_class_doc(cl, fts_new_symbol("apply"), "<expr: expression>", "apply expression each value (use $self and $x)");
+
+  fts_class_doc(cl, sym_vec, NULL, "convert matrix to vector (vec format)");
+  fts_class_doc(cl, sym_rect, NULL, "convert matrix to rectangular complex vector (rect format)");
+  fts_class_doc(cl, sym_polar, NULL, "convert matrix to polar complex vector (polar format)");
+  fts_class_doc(cl, sym_real, NULL, "convert complex vectors to real column vectors (of real part)");
+
   fts_class_doc(cl, fts_s_import, "[<sym: file name]", "import data from file");
   fts_class_doc(cl, fts_s_export, "[<sym: file name]", "export data to file");
-}
-
-static void
-fslice_message(fts_class_t *cl, fts_symbol_t s, fts_method_t slice_method, fts_method_t scalar_method)
-{	
-	fts_class_message(cl, s, fcol_class, slice_method);
-	fts_class_message(cl, s, frow_class, slice_method);	  
-	fts_class_message_number(cl, s, scalar_method);	  
-}
-
-static void
-fslice_instantiate(fts_class_t *cl)
-{
-  fslice_message(cl, fts_new_symbol("add"), fslice_add_fslice, fslice_add_number);
-  fslice_message(cl, fts_new_symbol("sub"), fslice_sub_fslice, fslice_sub_number);
-  fslice_message(cl, fts_new_symbol("mul"), fslice_mul_fslice, fslice_mul_number);
-  fslice_message(cl, fts_new_symbol("div"), fslice_div_fslice, fslice_div_number);
-  fslice_message(cl, fts_new_symbol("bus"), fslice_bus_fslice, fslice_bus_number);
-  fslice_message(cl, fts_new_symbol("vid"), fslice_vid_fslice, fslice_vid_number);
-
-
-  /*
-   * fcol/frow class documentation
-   */
-  
-  fts_class_doc(cl, fts_new_symbol("add"), "<num|fcol|frow: operand>", "add given scalar, fcol or frow (element by element) to current values");
-  fts_class_doc(cl, fts_new_symbol("sub"), "<num|fcol|frow: operand>", "substract given scalar, fcol or frow (element by element)");
-  fts_class_doc(cl, fts_new_symbol("mul"), "<num|fcol|frow: operand>", "multiply current values by given scalar, fcol or frow (element by element)");
-  fts_class_doc(cl, fts_new_symbol("div"), "<num|fcol|frow: operand>", "divide current values by given scalar, fcol or frow (element by element)");
-  fts_class_doc(cl, fts_new_symbol("bus"), "<num|fcol|frow: operand>", "subtract current values from given scalar, fcol or frow (element by element)");  
-  fts_class_doc(cl, fts_new_symbol("vid"), "<num|fcol|frow: operand>", "divide given scalar, fcol or frow (element by element) by current values");
-}
-
-static void
-fcol_instantiate(fts_class_t *cl)
-{
-  fts_class_init(cl, sizeof(fslice_t), fcol_init, fslice_delete);
-
-  fts_class_doc(cl, fcol_symbol, "<num: column index>", "reference to matrix column");
-  fslice_instantiate(cl);
-}
-
-static void
-frow_instantiate(fts_class_t *cl)
-{
-  fts_class_init(cl, sizeof(fslice_t), frow_init, fslice_delete);
-  
-  fts_class_doc(cl, frow_symbol, "<num: row index>", "reference to matrix row");
-  fslice_instantiate(cl);
 }
 
 void
 fmat_config(void)
 {
   fmat_symbol = fts_new_symbol("fmat");
-  frow_symbol = fts_new_symbol("frow");
-  fcol_symbol = fts_new_symbol("fcol");
 
   sym_getcol = fts_new_symbol("getcol");
   sym_getrow = fts_new_symbol("getrow");
@@ -3439,9 +3776,7 @@ fmat_config(void)
 
   fmat_class = fts_class_install(fmat_symbol, fmat_instantiate);
   fvec_class = fts_class_install(fvec_symbol, fmat_instantiate);
-  frow_class = fts_class_install(frow_symbol, frow_instantiate);
-  fcol_class = fts_class_install(fcol_symbol, fcol_instantiate);
-  
+
   fts_hashtable_init(&fmat_format_hash, FTS_HASHTABLE_SMALL);
 
   /* init fmat format table */
@@ -3464,8 +3799,6 @@ fmat_config(void)
   /*fmat_null = (fmat_t *)fts_object_create(fmat_class, 0, 0);*/
   /*fts_object_refer((fts_object_t *)fmat_null);*/
 }
-
-
 
 /** EMACS **
  * Local variables:

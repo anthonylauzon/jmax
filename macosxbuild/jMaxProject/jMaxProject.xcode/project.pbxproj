@@ -12816,6 +12816,104 @@
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
+		5CB1CE1F065112B900B5A90F = {
+			children = (
+				5CB1CE200651132300B5A90F,
+				5CB1CE210651132300B5A90F,
+				5CB1CE220651132300B5A90F,
+				5CB1CE230651132400B5A90F,
+				5CB1CE240651132400B5A90F,
+				5CB1CE250651132400B5A90F,
+				5CB1CE260651132400B5A90F,
+				5CB1CE270651132400B5A90F,
+				5CB1CE280651132400B5A90F,
+			);
+			isa = PBXGroup;
+			name = include;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		5CB1CE200651132300B5A90F = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = bpf.h;
+			path = ../../packages/data/c/include/fts/packages/data/bpf.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5CB1CE210651132300B5A90F = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = cvec.h;
+			path = ../../packages/data/c/include/fts/packages/data/cvec.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5CB1CE220651132300B5A90F = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = data.h;
+			path = ../../packages/data/c/include/fts/packages/data/data.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5CB1CE230651132400B5A90F = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = dict.h;
+			path = ../../packages/data/c/include/fts/packages/data/dict.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5CB1CE240651132400B5A90F = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = fmat.h;
+			path = ../../packages/data/c/include/fts/packages/data/fmat.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5CB1CE250651132400B5A90F = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = fvec.h;
+			path = ../../packages/data/c/include/fts/packages/data/fvec.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5CB1CE260651132400B5A90F = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ivec.h;
+			path = ../../packages/data/c/include/fts/packages/data/ivec.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5CB1CE270651132400B5A90F = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = mat.h;
+			path = ../../packages/data/c/include/fts/packages/data/mat.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5CB1CE280651132400B5A90F = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = vec.h;
+			path = ../../packages/data/c/include/fts/packages/data/vec.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
 		5CC83F4C056D14FA00EEF904 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -23841,6 +23939,7 @@
 		F8B8E48802867E1C01664092 = {
 			children = (
 				F8B8E5910286822501664092,
+				5CB1CE1F065112B900B5A90F,
 				F8B8E48902867E1C01664092,
 				F8B8E4AC02867E1C01664092,
 				F8B8E4AD02867E1C01664092,

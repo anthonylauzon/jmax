@@ -39,6 +39,10 @@
 #include <ftsprivate/message.h>
 #include "parser.h"
 
+#ifndef FTS_EXPRESSION_ARG_ONSET
+#define FTS_EXPRESSION_ARG_ONSET 0
+#endif
+
 static fts_heap_t *expression_heap;
 
 struct _fts_expression_t {
@@ -551,9 +555,9 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
   case TK_DOLLAR:
     if (fts_is_int( &tree->value))
     {
-      int index = fts_get_int( &tree->value);
+      int index = fts_get_int( &tree->value) - FTS_EXPRESSION_ARG_ONSET;
       
-      if (index < env_ac)
+      if (index >= 0 && index < env_ac)
         expression_stack_push( exp, env_at + index);
       else
         return invalid_environment_variable_error;
@@ -749,7 +753,7 @@ static void get_env_count_aux( fts_parsetree_t *tree, int *count_p)
 
   if ( tree->token == TK_DOLLAR && fts_is_int( &tree->value))
     {
-      int n = fts_get_int( &tree->value) + 1;
+      int n = fts_get_int( &tree->value) - FTS_EXPRESSION_ARG_ONSET + 1;
       
       if (n > *count_p)
 	*count_p = n;

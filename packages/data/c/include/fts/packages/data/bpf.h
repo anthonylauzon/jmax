@@ -64,6 +64,8 @@ DATA_API fts_class_t *bpf_type;
 #define bpf_get_duration(b) ((b)->size > 0? (b)->points[(b)->size - 1].time: 0.0)
 #define bpf_get_target(b) ((b)->size > 0? (b)->points[(b)->size - 1].value: 0.0)
 
+DATA_API double bpf_get_interpolated(bpf_t *bpf, double time);
+
 DATA_API void bpf_clear(bpf_t *bpf);
 DATA_API void bpf_copy(bpf_t *bpf, bpf_t *copy);
 DATA_API void bpf_append_point(bpf_t *bpf, double time, double value);
