@@ -886,7 +886,14 @@ public class FtsPatcherObject extends FtsObjectWithEditor
       }
 
     addObject(newObj.getFtsObject());
-    newObj.getSketchPad().addNewObject(newObj, false);
+
+    boolean doEdit = false;
+    if( ((FtsGraphicObject)newObj.getFtsObject()).getClassName() == null)
+      doEdit = true;
+    else
+      if( ((FtsGraphicObject)newObj.getFtsObject()).getDescription().equals(""))
+	doEdit = true;
+    newObj.getSketchPad().addNewObject(newObj, doEdit);
   
     if( pasting)
       ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.addPastedObject( newObj);
