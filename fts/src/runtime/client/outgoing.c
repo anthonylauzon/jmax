@@ -44,9 +44,9 @@
 #include "sys.h"
 #include "lang.h"
 #include "runtime/devices.h"
+#include "runtime/time.h"
 #include "runtime/client/client.h"
 #include "runtime/client/outgoing.h"
-
 
 
 /******************************************************************************/
@@ -228,34 +228,37 @@ void fts_client_add_string(const char *s)
 }
 
 
-void fts_client_add_atoms(int ac, const fts_atom_t *args)
+static void 
+fts_client_add_atom(const fts_atom_t *atom)
+{
+  if (fts_is_int( atom))
+    fts_client_add_int( fts_get_long(atom));
+  else  if (fts_is_float( atom))
+    fts_client_add_float( fts_get_float(atom));
+  else  if (fts_is_symbol( atom))
+    fts_client_add_symbol( fts_get_symbol(atom));
+  else  if (fts_is_string( atom))
+    fts_client_add_string( fts_get_string(atom));
+  else  if (fts_is_object( atom))
+    fts_client_add_object( fts_get_object(atom));
+  else  if (fts_is_data( atom))
+    fts_client_add_data( fts_get_data( atom) );
+  else
+    fprintf(stderr, "Wrong atom type in fts_client_add_atoms: %lx\n", (unsigned long) fts_get_type(atom));
+}
+
+void 
+fts_client_add_atoms(int ac, const fts_atom_t *args)
 {
   int i;
-
-  /* pointers and void are ignored */
-
-  for (i = 0; i < ac; i++)
-    {
-      if (fts_is_int( &args[i]))
-	fts_client_add_int( fts_get_long(&args[i]));
-      else  if (fts_is_float( &args[i]))
-	fts_client_add_float( fts_get_float(&args[i]));
-      else  if (fts_is_symbol( &args[i]))
-	fts_client_add_symbol( fts_get_symbol(&args[i]));
-      else  if (fts_is_string( &args[i]))
-	fts_client_add_string( fts_get_string(&args[i]));
-      else  if (fts_is_object( &args[i]))
-	fts_client_add_object( fts_get_object(&args[i]));
-      else  if (fts_is_data( &args[i]))
-	fts_client_add_data( fts_get_data( &args[i]) );
-      else
-	fprintf(stderr, "Wrong atom type in fts_client_add_atoms: %lx\n",
-		(unsigned long) fts_get_type(&args[i]));
-    }
+  
+  for (i=0; i<ac; i++)
+    fts_client_add_atom(&args[i]);
 }
 
 
-void fts_client_done_msg(void)
+void 
+fts_client_done_msg(void)
 {
   if ( !client_dev )
     return;
@@ -272,12 +275,11 @@ void fts_client_done_msg(void)
 /* 
    Utility to send a message to an client object;
    put here for the convenience of object programmers
+   
+   CLIENTMESS (obj)obj (symbol)selector [(atom)<args>]* 
+*/
 
-   CLIENTMESS (obj)obj (symbol)selector [(atom)<args>]*
-
-   */
-
-void fts_client_message_send(fts_object_t *obj, fts_symbol_t selector, int argc, const fts_atom_t *args)
+void fts_client_send_message(fts_object_t *obj, fts_symbol_t selector, int argc, const fts_atom_t *args)
 {
   fts_client_start_msg(CLIENTMESS_CODE);
   fts_client_add_object(obj);
@@ -286,19 +288,60 @@ void fts_client_message_send(fts_object_t *obj, fts_symbol_t selector, int argc,
   fts_client_done_msg();
 }
 
+void fts_client_send_message_from_atom_list(fts_object_t *obj, fts_symbol_t selector, fts_atom_list_t *atom_list)
+{
+  fts_atom_list_iterator_t *iterator = fts_atom_list_iterator_new(atom_list);
+
+  fts_client_start_msg(CLIENTMESS_CODE);
+  fts_client_add_object(obj);
+  fts_client_add_symbol(fts_s_set);
+
+  while (! fts_atom_list_iterator_end(iterator))
+    {
+      fts_client_add_atom(fts_atom_list_iterator_current(iterator));
+      fts_atom_list_iterator_next(iterator);
+    }
+
+  fts_client_done_msg();
+  fts_atom_list_iterator_free(iterator);
+}
+
+/* (nos:) This is a new upload function, which is part of a generic object creation client/server API.
+ * Other than "fts_client_upload_object" it is called by an object in order to upload itself.
+ * In the creation of an object from the client this happens inside the "upload" method, which this way
+ * has quite a different semantic than the same message send by "fts_client_upload_object".
+ */
+void fts_client_upload(fts_object_t *obj, fts_symbol_t classname, int ac, const fts_atom_t *at)
+{
+  if (!fts_object_has_id(obj))
+    fts_object_table_register(obj);
+
+  fts_client_start_msg(NEW_OBJECT_CODE);
+
+  /* this is to be compatible with the NEW_OBJECT_CODE */
+  fts_client_add_object((fts_object_t *)0);
+  fts_client_add_data((fts_data_t *)0);
+
+  fts_client_add_int(fts_object_get_id(obj));
+  fts_client_add_symbol(classname);
+  fts_client_add_atoms(ac, at);
+  fts_client_done_msg();
+
+  fts_object_send_properties(obj);
+}
 
 void fts_client_upload_object(fts_object_t *obj)
 {
   int do_var = 0;
 
-  if (obj->id == FTS_NO_ID)
+  if (!fts_object_has_id(obj))
     fts_object_table_register(obj);
 
   /* First, check if the parent has been uploaded; if it is not,
      upload it; recursively, this will upload all the chain up
      to the root */
 
-  if (obj->patcher && ((fts_object_t *)obj->patcher)->id == FTS_NO_ID)
+  if (obj->patcher && !fts_object_has_id((fts_object_t *)obj->patcher))
     fts_client_upload_object((fts_object_t *) obj->patcher);
 
   /* 
@@ -321,8 +364,8 @@ void fts_client_upload_object(fts_object_t *obj)
   else
     fts_client_add_data((fts_data_t *) 0);
 
-  fts_client_add_int(obj->id);
-
+  fts_client_add_int(fts_object_get_id(obj));
+  
   if (do_var)
     {
       fts_client_add_symbol(fts_get_symbol(&obj->argv[0]));
@@ -330,17 +373,13 @@ void fts_client_upload_object(fts_object_t *obj)
       fts_client_add_atoms(obj->argc - 2, obj->argv + 2);
     }
   else
-    {
-      fts_client_add_atoms(obj->argc, obj->argv);
-    }
+    fts_client_add_atoms(obj->argc, obj->argv);
 
   fts_client_done_msg();
 
   fts_object_send_properties(obj);
 
-  /* Also, send to the object the message upload, in the case
-     the object have more data/initialization to do */
-
+  /* Also, send to the object the message upload, in the case the object have more data/initialization to do */
   fts_message_send(obj, fts_SystemInlet, fts_s_upload, 0, 0);
 }
 
@@ -402,13 +441,3 @@ void fts_client_release_object_data(fts_object_t *obj)
   fts_client_add_object(obj);;
   fts_client_done_msg();
 }
-
-
-
-
-
-
-
-
-
-

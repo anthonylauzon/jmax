@@ -93,6 +93,7 @@ static void fts_messtile_install_all(void);
 
 static fts_symbol_t fts_s_download;
 static fts_symbol_t fts_s_load_init;
+static fts_symbol_t fts_s_setDescription;
 
 /******************************************************************************/
 /*                                                                            */
@@ -104,8 +105,7 @@ static void fts_messtile_init(void);
 
 /* Init function */
 
-fts_module_t fts_messtile_module = {"MessTile", "The interpreter of the client commands for the message system",
-				    fts_messtile_init, 0};
+fts_module_t fts_messtile_module = {"MessTile", "The interpreter of the client commands for the message system", fts_messtile_init, 0};
 
 static void
 fts_messtile_init(void)
@@ -114,8 +114,8 @@ fts_messtile_init(void)
 
   fts_s_download = fts_new_symbol("download");
   fts_s_load_init = fts_new_symbol("load_init");
+  fts_s_setDescription = fts_new_symbol("setDescription");
 }
-
 
 /* Debug  message log, post and on the standard error */
 
@@ -200,8 +200,8 @@ fts_mess_client_load_patcher_bmax(int ac, const fts_atom_t *av)
       int id;
       fts_symbol_t filename;
 
-      parent  = (fts_object_t *) fts_get_object(&av[0]);
-      id       = fts_get_int(&av[1]);
+      parent = (fts_object_t *) fts_get_object(&av[0]);
+      id = fts_get_int(&av[1]);
       filename = fts_get_symbol(&av[2]);
 
       if (parent)
@@ -228,8 +228,7 @@ fts_mess_client_load_patcher_bmax(int ac, const fts_atom_t *av)
 	    fts_object_put_prop(patcher, fts_s_filename, &a);
 	  }
 
-	  /* activate the post-load init, like loadbangs */
-	  
+	  /* activate the post-load init, like loadbangs */	  
 	  fts_message_send(patcher, fts_SystemInlet, fts_new_symbol("load_init"), 0, 0);
 	}
       else
@@ -447,32 +446,36 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
 
   if (ac >= 2 && fts_is_object(&av[0]) && fts_is_int(&av[1]))
     {
-      /* new object in patcher */
-      fts_object_t *obj;
-      int id;
-      fts_patcher_t *parent;
-
-      parent = (fts_patcher_t *) fts_get_object(&av[0]);
-
-      if (! parent)
-	{
-	  printf_mess("System Error in FOS message NEW:  parent not found", ac, av);
-	  return;
-	}
+      fts_object_t *parent = fts_get_object(&av[0]);
       
-      id  = fts_get_int(&av[1]);
-
-      obj = fts_eval_object_description(parent, ac - 2, av + 2);
-      fts_object_set_id(obj, id);
+      if(parent && fts_object_get_class_name(parent) == fts_s_patcher)
+	{
+	  /* new object in patcher */
+	  int id = fts_get_int(&av[1]);
+	  fts_object_t *obj = fts_eval_object_description((fts_patcher_t *)parent, ac - 2, av + 2);
+	  
+	  fts_object_set_id(obj, id);
+	}
+      else
+	printf_mess("System Error in FOS message NEW:  parent not found", ac, av);
     }
   else if (ac >= 1 && fts_is_int(&av[0]))
     {
-      /* new object without context */
+      /* (nos:) This is a real HACK!!!!
+       * We are reusing the NEW_OBJECT_CODE for an asychronous object creation, 
+       * which has in addition the particularity, that it uses the "upload" message 
+       * in a different sence than "fts_mess_client_download_object".
+       * Here ths upload method of an object decides itself, what to do for the upload
+       * using the fts_client_upload function (new!).
+       */
+
       int id  = fts_get_int(&av[0]);
       fts_object_t *obj;
       
       fts_object_new(0, ac - 1, av + 1, &obj);
-      fts_object_set_id(obj, id);      
+      fts_object_set_id(obj, id);
+      
+      fts_message_send(obj, fts_SystemInlet, fts_s_upload, 0, 0);
     }
   else
     printf_mess("System Error in FOS message NEW: bad args", ac, av);
@@ -511,18 +514,17 @@ fts_mess_client_redefine_patcher(int ac, const fts_atom_t *av)
       if (fts_object_description_defines_variable(ac - 1, av + 1))
 	{
 	  /* Variable syntax */
+	  /* argv[0] = av[1]; */
+	  /* argv[1] = av[2]; */
+	  fts_set_symbol(&argv[0], fts_s_patcher); /* "jpatcher" */
 
-	  argv[0] = av[1];
-	  argv[1] = av[2];
-	  fts_set_symbol(&argv[2], fts_s_patcher);
-
-	  for (argc = 3; (argc < ac) && (argc < 512) ; argc++)
-	    argv[argc] = av[argc];
+	  /* copy arguments (ignoring variable) */
+	  for (argc = 1; (argc < ac - 2) && (argc < 512) ; argc++) 
+	    argv[argc] = av[argc + 2];
 	}
       else
 	{
 	  /* Plain syntax */
-
 	  fts_set_symbol(&argv[0], fts_s_patcher);
 
 	  for (argc = 1; (argc < ac) && (argc < 512) ; argc++)
@@ -530,6 +532,8 @@ fts_mess_client_redefine_patcher(int ac, const fts_atom_t *av)
 	}
 
       fts_patcher_redefine(patcher, argc, argv);
+
+      fts_client_send_message((fts_object_t *)patcher, fts_s_setDescription, argc - 1, argv + 1);
     }
   else
     printf_mess("System Error in FOS message REDEFINE PATCHER: bad args", ac, av);
@@ -944,8 +948,3 @@ fts_messtile_install_all(void)
   fts_client_install(RECOMPUTE_ERRORS_CODE, fts_mess_client_recompute_errors);
   fts_client_install(FTS_SHUTDOWN_CODE,  fts_mess_client_shutdown);
 }
-
-
-
-
-

@@ -30,6 +30,8 @@
 
 
 #include "sys.h"
+#include "lang.h"
+#include "runtime/devices/devices.h"
 #include "runtime/devices/profdev.h"
 
 #ifdef HAS_UNIX

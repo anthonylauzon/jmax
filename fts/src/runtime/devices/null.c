@@ -36,6 +36,7 @@
 #include "lang.h"
 #include "runtime/files.h"
 #include "runtime/devices/devices.h"
+#include "runtime/time.h"
 #include <sys/time.h>
 
 

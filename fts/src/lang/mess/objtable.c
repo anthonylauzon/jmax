@@ -55,10 +55,10 @@ static int object_id_count = 2;
 
 void fts_object_table_register(fts_object_t *obj)
 {
-  obj->id = object_id_count;
+  obj->head.id = object_id_count;
   object_id_count += 2;
 
-  fts_object_table_put(obj->id, obj);
+  fts_object_table_put(obj->head.id, obj);
 }
 
 void

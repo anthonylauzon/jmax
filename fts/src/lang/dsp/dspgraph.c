@@ -295,7 +295,7 @@ static void dsp_object_schedule(dsp_node_t *node)
 	{
 	  node->descr->in = (dsp_signal **)fts_block_zalloc(sizeof(dsp_signal *) * node->descr->ninputs); 
 	}
-      node->descr->noutputs = dsp_output_get(node->o->cl, fts_object_get_outlets_number(node->o));
+      node->descr->noutputs = dsp_output_get(fts_object_get_class(node->o), fts_object_get_outlets_number(node->o));
       node->descr->out = 0;	/* safe initialization */
     }
 
@@ -404,7 +404,7 @@ static void dsp_succ_realize( dsp_node_t *node, edge_fun_t fun)
   else
     sig = (dsp_signal **)(&zero);
 
-  outlet = node->o->cl->outlets;
+  outlet = fts_object_get_class(node->o)->outlets;
 
   for (woutlet = 0; woutlet < fts_object_get_outlets_number(node->o); woutlet++)
     {
@@ -460,7 +460,7 @@ static void dec_pred_inc_refcnt(dsp_node_t *src, int woutlet, dsp_node_t *dest, 
     {
       dest->descr = (fts_dsp_descr_t *)fts_heap_zalloc(dsp_descr_heap);
       dest->descr->ninputs = ninputs;
-      dest->descr->noutputs = dsp_output_get(dest->o->cl, fts_object_get_outlets_number(dest->o));
+      dest->descr->noutputs = dsp_output_get(fts_object_get_class(dest->o), fts_object_get_outlets_number(dest->o));
       dest->descr->in = 0;
       dest->descr->out = 0;
     }

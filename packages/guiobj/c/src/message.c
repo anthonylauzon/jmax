@@ -533,22 +533,8 @@ message_list_is_primitive(int ac, const fts_atom_t *at)
 static void message_update(fts_object_t *o)
 {
   message_t *this = (message_t *) o;
-  fts_atom_list_iterator_t *iterator;
 
-  iterator = fts_atom_list_iterator_new(this->atom_list);
-
-  fts_client_start_msg(CLIENTMESS_CODE);
-  fts_client_add_object((fts_object_t *)this);
-  fts_client_add_symbol(fts_s_set);
-
-  while (! fts_atom_list_iterator_end(iterator))
-    {
-      fts_client_add_atoms(1, fts_atom_list_iterator_current(iterator));
-      fts_atom_list_iterator_next(iterator);
-    }
-
-  fts_client_done_msg();
-  fts_atom_list_iterator_free(iterator);
+  fts_client_send_message_from_atom_list(o, fts_s_set, this->atom_list);
 }
 
 /************************************************************

@@ -27,9 +27,9 @@
 #ifndef _UNIXDEV_H_
 #define _UNIXDEV_H_
 
-#include "sys.h"
-#include "lang.h"
-#include "runtime/devices/devices.h"
+/*#include "sys.h"*/
+/*#include "lang.h"*/
+/*#include "runtime/devices/devices.h"*/
 
 extern void unixdev_init(void);
 

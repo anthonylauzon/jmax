@@ -287,7 +287,7 @@ fts_object_put_prop(fts_object_t *obj, fts_symbol_t property, const fts_atom_t *
 {
   fts_property_daemon_t d;
 
-  d = fts_property_daemon_list_get(&(obj->cl->daemons), obj_property_put, property);
+  d = fts_property_daemon_list_get(&(obj->head.cl->daemons), obj_property_put, property);
   
   if (d)
     (* d)(obj_property_put, obj, property, (fts_atom_t *)value);
@@ -312,7 +312,7 @@ fts_object_remove_prop(fts_object_t *obj, fts_symbol_t property)
   fts_property_daemon_t d;
 
 
-  d = fts_property_daemon_list_get(&(obj->cl->daemons), obj_property_remove, property);
+  d = fts_property_daemon_list_get(&(obj->head.cl->daemons), obj_property_remove, property);
 
   if (d)
     (* d)(obj_property_remove, obj, property, 0);
@@ -337,7 +337,7 @@ _fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_atom_t *value
     *value = *ret;
   else
     {
-      ret = fts_class_get_prop(obj->cl, property);
+      ret = fts_class_get_prop(obj->head.cl, property);
 
       if (ret)
 	*value = *ret;
@@ -365,7 +365,7 @@ fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
   else
     {
     
-      ret = fts_class_get_prop(obj->cl, property);
+      ret = fts_class_get_prop(obj->head.cl, property);
 
       if (ret)
 	{
@@ -373,7 +373,7 @@ fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 	}
       else
 	{
-	  d = fts_property_daemon_list_get(&(obj->cl->daemons), obj_property_get, property);
+	  d = fts_property_daemon_list_get(&(obj->head.cl->daemons), obj_property_get, property);
 
 	  if (d)
 	    (* d)(obj_property_remove, obj, property, value);

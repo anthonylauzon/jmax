@@ -27,8 +27,6 @@
 #ifndef _WTO_H_
 #define _WTO_H_
 
-#include "fts.h"
-
 typedef struct _fts_wto
 {
   float *table;

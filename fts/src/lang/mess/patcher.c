@@ -1028,7 +1028,7 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
 {
   fts_object_t *obj;
   fts_expression_state_t *e;
-  fts_symbol_t  var;
+  fts_symbol_t var = 0;
   int ac;
   fts_atom_t at[1024];
   int rac;
@@ -1037,22 +1037,21 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
 
   obj = (fts_object_t *) this; 
 
-  /* change the patcher definition */
-  fts_object_set_description(obj, aoc, aot);
-
-  /* check for the "var : <obj> syntax" and  extract the variable name if any */
+  /* check for the "var : <obj> syntax" and ignore the variable if any */
   if (fts_object_description_defines_variable(aoc, aot))
     {
-      var = fts_get_symbol(&aot[0]);
+      /* var = fts_get_symbol(&aot[0]); */
       rat = aot + 2;
       rac = aoc - 2;
     }
   else
     {
-      var = 0;
       rat = aot;
       rac = aoc;
     }
+
+  /* change the patcher definition */
+  fts_object_set_description(obj, rac, rat);
 
   /* if the old patcherr define a variable, and the new definition
      do not define  the same variable, delete the variable;
@@ -1077,11 +1076,10 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
 	      fts_set_int(&a, 1);
 	      fts_object_put_prop(obj, fts_s_error, &a);
 
-	      fts_set_symbol(&a, fts_patcher_make_error_msg("Variable %s already defined",
-							    var));
+	      fts_set_symbol(&a, fts_patcher_make_error_msg("Variable %s already defined", var));
 	      fts_object_put_prop(obj, fts_s_error_description, &a);
 
-	      if (obj->id != FTS_NO_ID)
+	      if (fts_object_has_id(obj))
 		{
 		  fts_object_property_changed(obj, fts_s_error);
 		  fts_object_property_changed(obj, fts_s_error_description);
@@ -1161,7 +1159,7 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
   /* Inform the UI that the name is probabily changed (the type cannot change);
      and the error property too. */
 
-  if (obj->id != FTS_NO_ID)
+  if (fts_object_has_id(obj))
     {
       fts_object_property_changed(obj, fts_s_error);
       fts_object_property_changed(obj, fts_s_error_description);
@@ -1256,7 +1254,7 @@ void fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets)
     fts_set_symbol(&a[0], fts_s_patcher);
     fts_set_int(&a[1], new_ninlets);
     fts_set_int(&a[2], fts_object_get_outlets_number((fts_object_t *) this));
-    obj_this->cl = fts_class_instantiate(3, a);
+    obj_this->head.cl = fts_class_instantiate(3, a);
   }
 
   {
@@ -1276,7 +1274,7 @@ void fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets)
   }
 
 
-  if (((fts_object_t *)this)->id != FTS_NO_ID)
+  if (fts_object_has_id((fts_object_t *)this))
     fts_object_property_changed((fts_object_t *)this, fts_s_ninlets);
 }
 
@@ -1355,7 +1353,7 @@ void fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlet
     fts_set_symbol(&a[0], fts_s_patcher);
     fts_set_int(&a[1], fts_object_get_inlets_number((fts_object_t *) this));
     fts_set_int(&a[2], new_noutlets);
-    obj_this->cl = fts_class_instantiate(3, a);
+    obj_this->head.cl = fts_class_instantiate(3, a);
   }
 
   {
@@ -1376,7 +1374,7 @@ void fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlet
 	}
   }
 
-  if (((fts_object_t *)this)->id != FTS_NO_ID)
+  if (fts_object_has_id((fts_object_t *)this))
     fts_object_property_changed((fts_object_t *)this, fts_s_noutlets);
 }
 

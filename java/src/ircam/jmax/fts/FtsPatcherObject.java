@@ -62,18 +62,11 @@ public class FtsPatcherObject extends FtsObject
     fts.getServer().redefinePatcherObject(this, description);
     fts.sync();
 
-    this.description = description;
-
     setDirty();
   }
+
+  public void setDescription(int nArgs, FtsAtom args[])
+  {
+    this.description = FtsParse.unparseArguments(nArgs, args);
+  }
 }
-
-
-
-
-
-
-
-
-
-

@@ -20,34 +20,64 @@
  *
  */
 
+/*
 void
-sequence_event_set(sequence_event_t *event, fts_atom_t value)
+sequence_event_set_value(sequence_event_t *event, fts_atom_t value)
 {
   event->value = value;
 }
+*/
 
 void
-sequence_event_free(sequence_event_t *event)
+sequence_event_set_value(sequence_event_t *event, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if(fts_is_object(&event->value))
-    fts_object_delete(fts_get_object(&event->value));
+  int i;
+
+  if(ac > EVENT_MAX_AC)
+    ac = EVENT_MAX_AC;
+
+  event->s = s;
+  event->ac = ac;
+  
+  for(i=0; i<ac; i++)
+    event->at[i] = at[i];
 }
 
+void
+sequence_event_reset_value(sequence_event_t *event)
+{
+  /*
+  if(fts_is_object(&event->value))
+    fts_object_delete(fts_get_object(&event->value));
+  */
+}
+
+/*
 sequence_event_t *
-sequence_event_new(fts_atom_t value)
+sequence_event_new(double time, fts_atom_t value)
 {
   sequence_event_t *event = (sequence_event_t *)fts_block_zalloc(sizeof(sequence_event_t));
 
-  sequence_event_set(event, value);
+  event->time = time;
+  sequence_event_init(event, value);
 
   return event;
 }
+*/
 
 void
 sequence_event_delete(sequence_event_t *event)
 {
-  sequence_event_free(event);
+  sequence_event_reset_value(event);
   fts_block_free(event, sizeof(sequence_event_t));
+}
+
+void 
+sequence_event_post(sequence_event_t *event)
+{
+  post("@%f (%s): %s", event->time, fts_symbol_name(event->track->name), fts_symbol_name(event->s));
+  post_atoms(event->ac, event->at);
+  post("\n");
 }
 
 /*********************************************************
@@ -76,6 +106,16 @@ static void
 sequence_track_delete(sequence_track_t *track)
 {
   fts_block_free(track, sizeof(sequence_track_t));
+}
+
+void 
+sequence_track_post(sequence_track_t *track)
+{
+  fts_symbol_t name = sequence_track_get_name(track);
+  fts_type_t type = sequence_track_get_type(track);
+  fts_symbol_t type_name = fts_type_get_selector(type);
+  
+  post("track: %s (%s)\n", fts_symbol_name(name), fts_symbol_name(type_name));
 }
 
 /*********************************************************
@@ -336,9 +376,9 @@ sequence_remove_track(sequence_t *sequence, int index)
  */
 
 void
-sequence_add_event(sequence_t *sequence, sequence_track_t *track, double time, sequence_event_t *event)
+sequence_add_event(sequence_t *sequence, sequence_track_t *track, sequence_event_t *event)
 {
-  sequence_event_t *next = sequence_get_event_by_time(sequence, time);
+  sequence_event_t *next = sequence_get_event_by_time(sequence, sequence_event_get_time(event));
   
   if(next)
     sequence_insert_event_before(sequence, next, event);

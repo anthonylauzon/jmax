@@ -39,7 +39,7 @@ bangbang_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   int i;
 
-  for (i = o->cl->noutlets - 1; i >= 0; i--)
+  for (i=fts_object_get_noutlets(o)-1; i>=0; i--)
     fts_outlet_send(o, i, fts_s_bang, 0, 0);
 }
 

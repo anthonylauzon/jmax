@@ -47,7 +47,7 @@ extern void fts_object_send_properties(fts_object_t *obj);
 extern void fts_object_send_ui_properties(fts_object_t *obj);
 
 /* This is only for object doctors (macros) */
-fts_status_t fts_object_new(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_t **ret);
+extern fts_status_t fts_object_new(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_t **ret);
 
 /* Change the object description; more "system" oriented */
 extern void fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *argv);
@@ -60,9 +60,9 @@ extern fts_object_t *fts_object_recompute(fts_object_t *old);
 extern fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const fts_atom_t *at);
 
 /* Object Access */
-#define fts_object_get_outlet_type(O, WOUTLET) (((fts_object_t *)(O))->cl->outlets[(WOUTLET)].tmess.symb)
-#define fts_object_get_outlets_number(O) (((fts_object_t *)(O))->cl->noutlets)
-#define fts_object_get_inlets_number(O) (((fts_object_t *)(O))->cl->ninlets)
+#define fts_object_get_outlet_type(O, WOUTLET) (((fts_object_t *)(O))->head.cl->outlets[(WOUTLET)].tmess.symb)
+#define fts_object_get_outlets_number(O) (((fts_object_t *)(O))->head.cl->noutlets)
+#define fts_object_get_inlets_number(O) (((fts_object_t *)(O))->head.cl->ninlets)
 #define fts_object_get_patcher(O) (((fts_object_t *)(O))->patcher)
 
 #define fts_object_get_variable(o) ((o)->varname)
@@ -71,10 +71,16 @@ extern fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, 
 extern int fts_object_handle_message(fts_object_t *o, int winlet, fts_symbol_t s);
 extern fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 
-#define fts_object_is_outlet(o) ((o)->cl->mcl == outlet_metaclass)
-#define fts_object_is_inlet(o) ((o)->cl->mcl == inlet_metaclass)
+#define fts_object_is_outlet(o) ((o)->head.cl->mcl == outlet_metaclass)
+#define fts_object_is_inlet(o) ((o)->head.cl->mcl == inlet_metaclass)
 
-#define fts_object_get_id(o) ((o)->id)
+#define fts_object_get_noutlets(o) ((o)->head.cl->noutlets)
+#define fts_object_get_ninlets(o) ((o)->head.cl->ninlets)
+
+#define fts_object_has_id(o) ((o)->head.id != FTS_NO_ID)
+#define fts_object_get_id(o) ((o)->head.id)
+#define fts_object_get_class(o) ((o)->head.cl)
+#define fts_object_get_user_data(o) ((o)->head.cl->user_data)
 
 /* Return true if the object is being deleted, i.e. if 
  the patcher (or an ancestor of the patcher) is being deleted */

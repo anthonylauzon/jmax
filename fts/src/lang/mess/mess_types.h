@@ -58,31 +58,30 @@ typedef enum fts_daemon_action {
 } fts_daemon_action_t;
 
 
-typedef struct fts_metaclass    fts_metaclass_t;
-typedef struct fts_class        fts_class_t;
-typedef struct fts_object       fts_object_t;
+typedef struct fts_metaclass fts_metaclass_t;
+typedef struct fts_class fts_class_t;
+typedef struct fts_object fts_object_t;
 
-
-typedef struct fts_mess_type    fts_mess_type_t;
-typedef struct fts_class_mess   fts_class_mess_t;
-typedef struct fts_connection   fts_connection_t;
-typedef struct fts_inlet_decl   fts_inlet_decl_t;
-typedef struct fts_outlet_decl  fts_outlet_decl_t;
+typedef struct fts_mess_type fts_mess_type_t;
+typedef struct fts_class_mess fts_class_mess_t;
+typedef struct fts_connection fts_connection_t;
+typedef struct fts_inlet_decl fts_inlet_decl_t;
+typedef struct fts_outlet_decl fts_outlet_decl_t;
 typedef struct fts_patcher_data fts_patcher_data_t;
-typedef struct fts_patcher      fts_patcher_t;
-typedef struct fts_inlet        fts_inlet_t;
-typedef struct fts_outlet       fts_outlet_t;
+typedef struct fts_patcher fts_patcher_t;
+typedef struct fts_inlet fts_inlet_t;
+typedef struct fts_outlet fts_outlet_t;
 
-typedef struct fts_selection    fts_selection_t;
+typedef struct fts_selection fts_selection_t;
 
 typedef struct fts_binding_list fts_binding_list_t;
-typedef struct fts_object_list  fts_object_list_t;
-typedef struct fts_binding	fts_binding_t;
-typedef struct fts_env		fts_env_t;
+typedef struct fts_object_list fts_object_list_t;
+typedef struct fts_binding fts_binding_t;
+typedef struct fts_env fts_env_t;
 
-typedef struct fts_data			fts_data_t;
-typedef struct fts_data_class		fts_data_class_t;
-typedef struct fts_template		fts_template_t;
+typedef struct fts_data fts_data_t;
+typedef struct fts_data_class fts_data_class_t;
+typedef struct fts_template fts_template_t;
 
 /*
  *  SYMBOLS
@@ -279,11 +278,15 @@ struct fts_outlet_decl
   fts_mess_type_t tmess;	
 };
 
+struct fts_simple_object
+{
+  fts_class_t *cl;
+  int id; /* id for the object */
+};
 
 struct fts_object
 {
-  /* Class pointer  */
-  fts_class_t *cl;
+  struct fts_simple_object head;
 
   /* the object description */
   int argc;
@@ -292,9 +295,6 @@ struct fts_object
   /* patcher housekeeping */
   fts_patcher_t *patcher;
   fts_object_t  *next_in_patcher;
-
-  /* ID housekeeping */
-  int id; /*  id for the object */
 
   /* Variable: If this object is bound to a variable, this is the variable name */
   fts_symbol_t varname;

@@ -78,7 +78,7 @@ fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts
 
   /* check the outlet range (should never happen, a part from loading) */
 
-  if (woutlet >= out->cl->noutlets || woutlet < 0)
+  if (woutlet >= out->head.cl->noutlets || woutlet < 0)
     {
       fts_object_blip(out, "Outlet out of range");
       return 0;
@@ -102,12 +102,12 @@ fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts
 
   /* find the outlet and the inlet in the class structure */
 
-  outlet = &out->cl->outlets[woutlet];
+  outlet = &out->head.cl->outlets[woutlet];
 
   if (winlet == fts_SystemInlet)
-    inlet = in->cl->sysinlet;
-  else if (winlet < in->cl->ninlets && winlet >= 0)
-    inlet = &in->cl->inlets[winlet];
+    inlet = in->head.cl->sysinlet;
+  else if (winlet < in->head.cl->ninlets && winlet >= 0)
+    inlet = &in->head.cl->inlets[winlet];
   else
     {
       fts_object_blip(out, "Inlet out of range, cannot connect.");
@@ -147,9 +147,10 @@ fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts
 	}
       else if (anything)
 	{
-	  /* we cache the method for anything here because, since the
-	   outlet is typed, we are sure we will always call the anything method
-	   for this type */
+	  /* we found an anything method at the inlet:
+	     we cache the method for anything here because, since the
+	     outlet is typed, we are sure we will always call the anything method
+	     for this type */
 
 	  conn->symb = 0;
 	  conn->mth  = mess->mth;
@@ -271,7 +272,7 @@ void fts_object_move_connections(fts_object_t *old, fts_object_t *new, int do_cl
   /* reproduce in new, and delete in old,  
      all the old outgoing connections */
 
-  for (outlet = 0; outlet < old->cl->noutlets; outlet++)
+  for (outlet = 0; outlet < old->head.cl->noutlets; outlet++)
     {
       fts_connection_t *p;
 
@@ -314,7 +315,7 @@ void fts_object_move_connections(fts_object_t *old, fts_object_t *new, int do_cl
   /* reproduce in new, and delete in old,  
      all the old incoming connections */
 
-  for (inlet = 0; inlet < old->cl->ninlets; inlet++)
+  for (inlet = 0; inlet < old->head.cl->ninlets; inlet++)
     {
       fts_connection_t *p;
 
@@ -367,7 +368,7 @@ void fts_object_trim_inlets_connections(fts_object_t *obj, int inlets)
   int inlet;
 
 
-  for (inlet = inlets; inlet < obj->cl->ninlets; inlet++)
+  for (inlet = inlets; inlet < obj->head.cl->ninlets; inlet++)
     {
       fts_connection_t *p;
 
@@ -386,7 +387,7 @@ void fts_object_trim_outlets_connections(fts_object_t *obj, int outlets)
   fts_patcher_t *patcher;
 
 
-  for (outlet = outlets; outlet < obj->cl->noutlets; outlet++)
+  for (outlet = outlets; outlet < obj->head.cl->noutlets; outlet++)
     {
       fts_connection_t *p;
 
@@ -411,7 +412,7 @@ void fprintf_connection(FILE *f, fts_connection_t *conn)
 {
   if (conn != 0)
     fprintf(f, "<CONNECTION %d.%d %d.%d #%d>",
-	    conn->src->id, conn->woutlet, conn->dst->id, conn->winlet, conn->id);
+	    conn->src->head.id, conn->woutlet, conn->dst->head.id, conn->winlet, conn->id);
   else
     fprintf(f, "<CONNECTION null>");
 }

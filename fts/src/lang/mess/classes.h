@@ -112,14 +112,4 @@ extern int fts_never_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_a
 extern int fts_always_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
 extern int fts_arg_type_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
 
-
 #endif
-
-
-
-
-
-
-
-
-

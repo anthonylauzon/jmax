@@ -300,7 +300,6 @@ fts_class_t *fts_class_instantiate( int ac, const fts_atom_t *at)
 	  fts_class_register(mcl, ac, at, cl);
 	  
 	  /* put the ninlets and noutlets in the class */
-
 	  fts_set_int(&a, cl->ninlets);
 	  fts_class_put_prop(cl, fts_s_ninlets, &a);
 
@@ -408,7 +407,6 @@ fts_status_t fts_outlet_type_define_optargs( fts_class_t *cl, int woutlet, fts_s
   return fts_Success;
 }
 
-
 fts_symbol_t fts_get_class_name( fts_class_t *cl)
 {
   return cl->mcl->name;
@@ -460,6 +458,20 @@ fts_class_mess_inlet_get(fts_inlet_decl_t *in, fts_symbol_t s,  int *panything)
   return mess_anything;
 }
 
+/* first try of something new 22.3.2000
+fts_class_mess_t *
+fts_simple_class_mess_get(fts_inlet_decl_t *in, fts_symbol_t s)
+{
+  fts_class_mess_t **messtable = in->messlist;
+  int i;
+
+  for (i=0; i<in->nmess; i++)
+    if (messtable[i]->tmess.symb == s)
+      return messtable[i];
+  
+  return 0;
+}
+*/
 
 fts_class_mess_t *
 fts_class_mess_get(fts_class_t *cl, int winlet, fts_symbol_t s, int *panything)

@@ -56,10 +56,12 @@
 
 #include "sys.h"
 #include "lang.h"
-#include "runtime/sched.h"
 #include "runtime/devices.h"
+#include "runtime/sched.h"
+#include "runtime/time.h"
 #include "runtime/client/protocol.h"
 #include "runtime/client/client.h"
+#include "runtime/client/outgoing.h"
 #include "runtime/client/updates.h"
 
 
@@ -112,7 +114,7 @@ static void fts_client_send_property(fts_object_t *obj, fts_symbol_t name)
 
 	  obj = fts_get_object(&a);
 
-	  if (obj->id == FTS_NO_ID)
+	  if (!fts_object_has_id(obj))
 	    fts_client_upload_object(obj);
 	}
 

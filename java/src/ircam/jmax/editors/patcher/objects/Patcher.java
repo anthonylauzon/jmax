@@ -78,8 +78,8 @@ class Patcher extends Editable implements FtsObjectErrorListener
   public void editContent()
   {
     itsSketchPad.waiting();
-    ftsObject.getFts().editPropertyValue(ftsObject,
-			  new MaxDataEditorReadyListener() {
+
+    ftsObject.getFts().editPropertyValue(ftsObject, new MaxDataEditorReadyListener() {
       public void editorReady(MaxDataEditor editor)
 	{itsSketchPad.stopWaiting();}
     });
@@ -169,9 +169,3 @@ class Patcher extends Editable implements FtsObjectErrorListener
       super.paint( g);
   }
 }
-
-
-
-
-
-

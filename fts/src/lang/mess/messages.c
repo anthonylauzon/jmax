@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
+ * x
  * Based on Max/ISPW by Miller Puckette.
  *
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
@@ -121,7 +121,7 @@ fts_status_t fts_send_message(fts_object_t *o, int winlet, fts_symbol_t s, int a
 
   fts_inlet_decl_t *in;
   fts_class_mess_t *mess;
-  fts_class_t *cl = o->cl;
+  fts_class_t *cl = o->head.cl;
   int anything;
 
   if (winlet == fts_SystemInlet)
@@ -131,17 +131,14 @@ fts_status_t fts_send_message(fts_object_t *o, int winlet, fts_symbol_t s, int a
   else
     return &fts_InletOutOfRange;
 
-  mess = fts_class_mess_inlet_get(in, s, &anything);
+  mess = fts_class_mess_inlet_get(in, s, &anything);  /* @@@anything */
 
   if (mess)
     {
-      if (fts_mess_get_run_time_check())
-	{
-	  status = fts_args_check(mess, ac, at);
-
-	  if (status != fts_Success)
-	    return status;
-	}
+      status = fts_args_check(mess, ac, at);
+      
+      if (status != fts_Success)
+	return status;
 
       FTS_OBJSTACK_PUSH(o);
       (*mess->mth)(o, winlet, s, ac, at);
@@ -155,13 +152,12 @@ fts_status_t fts_send_message(fts_object_t *o, int winlet, fts_symbol_t s, int a
 
 
 fts_status_t
-fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s,
-		 int ac, const fts_atom_t *at, fts_symbol_t *symb_cache, fts_method_t *mth_cache)
+fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at, fts_symbol_t *symb_cache, fts_method_t *mth_cache)
 {
   fts_status_t status;
   fts_inlet_decl_t *in;
   fts_class_mess_t *mess;
-  fts_class_t *cl = o->cl;
+  fts_class_t *cl = o->head.cl;
   fts_class_mess_t **messtable;
   unsigned int i;
 
@@ -255,7 +251,7 @@ fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s,
 		int ac, const fts_atom_t *at)
 {
   fts_connection_t *conn;
-  fts_class_t *cl = o->cl;
+  fts_class_t *cl = o->head.cl;
   fts_outlet_decl_t *out;
   fts_status_t status;
 
@@ -281,7 +277,7 @@ fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s,
 	  fts_class_mess_t *mess;
 	  int anything;
 
-	  mess = fts_class_mess_get(conn->dst->cl, conn->winlet, s, &anything);
+	  mess = fts_class_mess_get(conn->dst->head.cl, conn->winlet, s, &anything);  /* @@@anything */
 
 	  if ((status = fts_args_check(mess, ac, at)) != fts_Success)
 	    return status;

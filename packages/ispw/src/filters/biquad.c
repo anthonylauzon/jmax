@@ -64,7 +64,7 @@ static void
 biquad_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   biquad_t *this = (biquad_t *)o;
-  fts_symbol_t type = (fts_symbol_t )this->head.cl->user_data;
+  fts_symbol_t type = (fts_symbol_t )fts_object_get_user_data(o);
 
   if(ac > 1 && fts_is_symbol(at + 1))
     {
@@ -108,7 +108,7 @@ static void
 biquad_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   biquad_t *this = (biquad_t *)o;
-  fts_symbol_t type = (fts_symbol_t )this->head.cl->user_data;
+  fts_symbol_t type = (fts_symbol_t )fts_object_get_user_data(o);
   fts_atom_t argv[5];
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
 

@@ -157,7 +157,7 @@ void fts_object_set_add( fts_object_set_t *set, fts_object_t *object)
 	{
 	  fts_atom_t a;
 
-	  if (object->id == FTS_NO_ID)
+	  if (!fts_object_has_id(object))
 	    fts_client_upload_object(object);
 
 	  fts_set_object(&a, object);
@@ -291,7 +291,7 @@ static void fts_object_set_upload_objects(fts_object_set_t *set)
   fts_object_set_cell_t *p;
 
   for (p = set->head; p; p = p->next)
-    if (p->object->id == FTS_NO_ID)
+    if (!fts_object_has_id(p->object))
       fts_client_upload_object(p->object);
 }
 

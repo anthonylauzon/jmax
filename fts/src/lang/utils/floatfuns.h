@@ -27,8 +27,6 @@
 #ifndef _FLOATFUNS_H_
 #define _FLOATFUNS_H_
 
-#include "fts.h"
-
 /***************************************************************************************
  *
  *  float functions

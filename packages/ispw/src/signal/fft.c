@@ -76,7 +76,7 @@ static void
 fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fft_t *x = (fft_t *)o;
-  fft_class_t *fft_class = (fft_class_t *)x->head.cl->user_data;
+  fft_class_t *fft_class = (fft_class_t *)fts_object_get_user_data(o);
   fts_symbol_t class = 0;
   fts_symbol_t type = 0;
   fts_symbol_t real_spec = 0;
@@ -173,7 +173,7 @@ dsp_put_all(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   fft_t *x = (fft_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
-  fft_class_t *fft_class = (fft_class_t *)x->head.cl->user_data;
+  fft_class_t *fft_class = (fft_class_t *)fts_object_get_user_data(o);
   fts_symbol_t class = fft_class->name;
   fts_symbol_t type = fft_class->type;
   fts_symbol_t real_spec = fft_class->real_spec;

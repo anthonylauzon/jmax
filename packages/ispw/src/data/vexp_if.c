@@ -230,7 +230,8 @@ expr_setsymb(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void
 expr_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  t_expr *udata = (t_expr *)o->cl->user_data, *e = (t_expr *)o;
+  t_expr *udata = (t_expr *)fts_object_get_user_data(o);
+  t_expr *e = (t_expr *)o;
 
   e->exp_stack = udata->exp_stack;
   e->exp_res   = udata->exp_res;

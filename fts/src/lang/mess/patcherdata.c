@@ -125,7 +125,7 @@ void fts_patcher_data_redefine(fts_patcher_data_t *d)
      */
 
   for (p = this->patcher->objects; p ; p = p->next_in_patcher)
-    if (p->id == FTS_NO_ID)
+    if(!fts_object_has_id(p))
       fts_client_upload_object(p);
     else
       {
@@ -252,7 +252,7 @@ static void fts_patcher_data_update( fts_data_t *d, int ac, const fts_atom_t *at
   /* upload all the not uploaded objects */
 
   for (p = this->patcher->objects; p ; p = p->next_in_patcher)
-    if (p->id == FTS_NO_ID)
+    if (!fts_object_has_id(p))
       fts_client_upload_object(p);
 
   /* For each object, for each outlet, upload all the not uploaded connections */

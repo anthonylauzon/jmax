@@ -192,7 +192,7 @@ void post_error(fts_object_t *obj, const char *format , ...)
   fts_set_int(&a, 1);
   fts_object_put_prop(obj, fts_s_error, &a);
 
-  if (obj->id != FTS_NO_ID)
+  if (fts_object_has_id(obj))
     fts_object_ui_property_changed(obj, fts_s_error);
 
   fts_set_symbol(&a, fts_new_symbol_copy(buf));

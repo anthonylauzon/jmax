@@ -34,14 +34,13 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
-#include "runtime.h"
 
+/* stuff from runtime/client */
 extern void fts_client_release_object(fts_object_t *c);
 extern void fts_client_release_object_data(fts_object_t *c);
 extern void fts_client_upload_object(fts_object_t *obj);
 
 /* forward declarations  */
-
 static void fts_object_move_properties(fts_object_t *old, fts_object_t *new);
 static void fts_object_send_kernel_properties(fts_object_t *obj);
 static void fts_object_reset(fts_object_t *obj);
@@ -65,8 +64,6 @@ void fts_objects_init()
 /******************************************************************************/
 
 static fts_status_description_t fts_CannotInstantiate = {"Cannot instantiate class"};
-
-/* A static function making the real FTS object if possible. */
 
 fts_status_t 
 fts_object_new(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_t **ret)
@@ -100,13 +97,10 @@ fts_object_new(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_
     }
 
   obj = (fts_object_t *)fts_block_zalloc(cl->size);
-  obj->cl = cl;
-
-  /* Other Initializations */
-
+  obj->head.cl = cl;
+  obj->head.id = FTS_NO_ID;
   obj->properties = 0;
-  obj->varname    = 0;
-  obj->id         = FTS_NO_ID;
+  obj->varname = 0;
 
   if (cl->noutlets)
     obj->out_conn = (fts_connection_t **) fts_block_zalloc(cl->noutlets * sizeof(fts_connection_t *));
@@ -141,12 +135,12 @@ fts_object_new(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_
 	fts_patcher_remove_object(patcher, obj);
 
       if (obj->out_conn)
-	fts_block_free((char *)obj->out_conn, obj->cl->noutlets*sizeof(fts_connection_t *));
+	fts_block_free((char *)obj->out_conn, obj->head.cl->noutlets*sizeof(fts_connection_t *));
 
       if (obj->in_conn)
-	fts_block_free((char *)obj->in_conn, obj->cl->ninlets*sizeof(fts_connection_t *));
+	fts_block_free((char *)obj->in_conn, obj->head.cl->ninlets*sizeof(fts_connection_t *));
 
-      fts_block_free((char *)obj, obj->cl->size);
+      fts_block_free((char *)obj, obj->head.cl->size);
       *ret = 0;
 
       return status;
@@ -497,17 +491,17 @@ fts_object_t *fts_object_recompute(fts_object_t *old)
     {
       /* If we have an object with data, data must be released,
 	 because the object will be deleted */
-      if (old->id != FTS_NO_ID)
+      if (old->head.id != FTS_NO_ID)
 	fts_client_release_object_data(old);
 
-      obj = fts_object_redefine(old, old->id, old->argc, old->argv);
+      obj = fts_object_redefine(old, old->head.id, old->argc, old->argv);
 
       /* Error property handling; currently it is a little bit
 	 of an hack beacause we need a explit "zero"  error
 	 property on a non error redefined object; actually
 	 the error property daemon should be a global daemon !
 	 */
-      if (obj->id != FTS_NO_ID)
+      if (obj->head.id != FTS_NO_ID)
 	fts_object_send_kernel_properties(obj);
     }
 
@@ -524,7 +518,7 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
 
   /* If the new and the old id are the same, or if old do not have an id,
      don't do any update on the client side */
-  do_client = ((old->id != FTS_NO_ID) && (old->id != new_id));
+  do_client = ((old->head.id != FTS_NO_ID) && (old->head.id != new_id));
 
   /* check for the "var : <obj> syntax" and  extract the variable name if any */
   if (fts_object_description_defines_variable(ac, at))
@@ -541,10 +535,10 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
     fts_variable_suspend(old->patcher, old->varname);
 
   /* if old id and new id are the same, do the replace without telling the client */
-  if ((old->id != FTS_NO_ID) && (old->id == new_id))
+  if ((old->head.id != FTS_NO_ID) && (old->head.id == new_id))
     {
-      fts_object_table_remove(old->id);
-      old->id = FTS_NO_ID;
+      fts_object_table_remove(old->head.id);
+      old->head.id = FTS_NO_ID;
     }
 
   /* Reset the old object, and call its delete method, so that
@@ -576,8 +570,8 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
    and outlets for the connections */
   if (fts_object_is_error(new))
     {
-      fts_error_object_fit_inlet(new, old->cl->ninlets - 1);
-      fts_error_object_fit_outlet(new, old->cl->noutlets - 1);
+      fts_error_object_fit_inlet(new, old->head.cl->ninlets - 1);
+      fts_error_object_fit_outlet(new, old->head.cl->noutlets - 1);
     }
 
   /* Good order: first, move the properties, then upload the object
@@ -724,12 +718,12 @@ void fts_object_reset_description(fts_object_t *obj)
 void fts_object_set_id(fts_object_t *obj, int id)
 {
   /* set the id and put the object in the object table */
-  if (obj->id != FTS_NO_ID)
-    fts_object_table_remove(obj->id);
+  if (obj->head.id != FTS_NO_ID)
+    fts_object_table_remove(obj->head.id);
 
   if (id != FTS_NO_ID) 
     {
-      obj->id = id;
+      obj->head.id = id;
       fts_object_table_put(id, obj);
     }
 }
@@ -781,7 +775,7 @@ static void fts_object_free(fts_object_t *obj, int release)
   int outlet, inlet;
 
   /* delete all the survived connections starting in the object */
-  for (outlet = 0; outlet < obj->cl->noutlets; outlet++)
+  for (outlet = 0; outlet < obj->head.cl->noutlets; outlet++)
     {
       fts_connection_t *p;
 
@@ -792,7 +786,7 @@ static void fts_object_free(fts_object_t *obj, int release)
     }
 
   /* Delete all the survived connections ending in the object */
-  for (inlet = 0; inlet < obj->cl->ninlets; inlet++)
+  for (inlet = 0; inlet < obj->head.cl->ninlets; inlet++)
     {
       fts_connection_t *p;
 
@@ -812,12 +806,12 @@ static void fts_object_free(fts_object_t *obj, int release)
     fts_patcher_remove_object(obj->patcher, obj);
 
   /* Now Tell the client to release the Java part */
-  if (release && (obj->id != FTS_NO_ID))
+  if (release && (obj->head.id != FTS_NO_ID))
     fts_client_release_object(obj);
 
   /* remove the object from the object table */
-  if (obj->id != FTS_NO_ID)
-    fts_object_table_remove(obj->id);
+  if (obj->head.id != FTS_NO_ID)
+    fts_object_table_remove(obj->head.id);
 
   /* free the object properties */
   fts_properties_free(obj);
@@ -828,12 +822,12 @@ static void fts_object_free(fts_object_t *obj, int release)
 
   /* free the object */
   if (obj->out_conn)
-    fts_block_free((char *)obj->out_conn, obj->cl->noutlets*sizeof(fts_connection_t *));
+    fts_block_free((char *)obj->out_conn, obj->head.cl->noutlets*sizeof(fts_connection_t *));
 
   if (obj->in_conn)
-    fts_block_free((char *)obj->in_conn, obj->cl->ninlets*sizeof(fts_connection_t *));
+    fts_block_free((char *)obj->in_conn, obj->head.cl->ninlets*sizeof(fts_connection_t *));
 
-  fts_block_free((char *)obj, obj->cl->size);
+  fts_block_free((char *)obj, obj->head.cl->size);
 }
 
 /* Return true if the object is being deleted, i.e. if 
@@ -864,14 +858,14 @@ int fts_object_being_deleted(fts_object_t *obj)
 
 fts_symbol_t fts_object_get_class_name( fts_object_t *obj)
 {
-  return fts_get_class_name(obj->cl);
+  return fts_get_class_name(obj->head.cl);
 }
 
 int fts_object_handle_message(fts_object_t *o, int winlet, fts_symbol_t s)
 {
   int anything;
 
-  if (fts_class_mess_get(o->cl, winlet, s, &anything))
+  if (fts_class_mess_get(o->head.cl, winlet, s, &anything))  /* @@@anything */
     return 1;
   else
     return 0;
@@ -908,7 +902,7 @@ fts_object_send_properties(fts_object_t *obj)
      been assigned to it),
      ask the object to send the ninlets and noutlets  properties,
      and name and declaration if any. */
-  if (obj->id != FTS_NO_ID) 
+  if (obj->head.id != FTS_NO_ID) 
     { 
       fts_object_property_changed(obj, fts_s_x);
       fts_object_property_changed(obj, fts_s_y);
@@ -947,7 +941,7 @@ fts_object_send_properties(fts_object_t *obj)
 void
 fts_object_send_ui_properties(fts_object_t *obj)
 {
-  if (obj->id != FTS_NO_ID)
+  if (obj->head.id != FTS_NO_ID)
     {
       /* Ask the object to send to the client object specific UI properties */
       fts_send_message(obj, fts_SystemInlet, fts_s_send_ui_properties, 0, 0);
@@ -964,7 +958,7 @@ fts_object_send_kernel_properties(fts_object_t *obj)
      ask the object to send the ninlets and noutlets  properties,
      and name and declaration if any. */
 
-  if (obj->id != FTS_NO_ID) 
+  if (obj->head.id != FTS_NO_ID) 
     { 
       fts_object_property_changed(obj, fts_s_ninlets);
       fts_object_property_changed(obj, fts_s_noutlets);
@@ -1049,11 +1043,11 @@ void fprintf_object(FILE *f, fts_object_t *obj)
 	fprintf(f, "<{");
 
       fprintf_atoms(f, obj->argc, obj->argv);
-      fprintf(f, "} #%lx(%d)>", (unsigned long) obj, obj->id);
+      fprintf(f, "} #%lx(%d)>", (unsigned long) obj, obj->head.id);
     }
   else
     fprintf(f, "<\"%s\" #%lx(%d)>", fts_symbol_name(fts_object_get_class_name(obj)),
-	    (unsigned long) obj, obj->id);
+	    (unsigned long) obj, obj->head.id);
 }
 
 
@@ -1070,6 +1064,6 @@ void post_object(fts_object_t *obj)
       post("}");
     }
   else
-    post("<\"%s\" #%d>", fts_symbol_name(fts_object_get_class_name(obj)), obj->id);
+    post("<\"%s\" #%d>", fts_symbol_name(fts_object_get_class_name(obj)), obj->head.id);
 }
 

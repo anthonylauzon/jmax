@@ -61,18 +61,19 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
    * MESSAGES called from fts.
    */
   Sequence sequence = null;
-  public void openEditor(int nArgs , FtsAtom args[])
+
+  public void openEditor(int nArgs, FtsAtom args[])
   {
-    if(sequence==null)
+    if(sequence == null)
       sequence = new Sequence(this);
     if (! sequence.isVisible())
       sequence.setVisible(true);
     sequence.toFront();
   }
 
-  public void destroyEditor(int nArgs , FtsAtom args[])
+  public void destroyEditor(int nArgs, FtsAtom args[])
   {
-    if(sequence!=null)
+    if(sequence != null)
     {
       sequence.dispose();
       sequence = null;

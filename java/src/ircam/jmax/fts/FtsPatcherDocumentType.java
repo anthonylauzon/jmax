@@ -55,7 +55,6 @@ public class FtsPatcherDocumentType extends MaxDocumentType
     Fts fts = (Fts) context;
 
     // Build a new FtsObject, a patcher 0 in 0 out
-
     FtsObject patcher;
 
     try
@@ -89,7 +88,7 @@ public class FtsPatcherDocumentType extends MaxDocumentType
       }
     catch (FtsException e)
       {
-	System.err.println("Fts Exception " + e + "creating Patcher Document ?? ");
+	System.err.println("Fts Exception " + e + " creating Patcher Document ?? ");
 	return null;
       }
   }

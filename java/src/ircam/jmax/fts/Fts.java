@@ -207,7 +207,6 @@ public class Fts implements MaxContext
     server.sendDownloadObject(id);
     
     // Wait for FTS to do his work
-
     sync();
 
     obj = server.getObjectByFtsId(id);
