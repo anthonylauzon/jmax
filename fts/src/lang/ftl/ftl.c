@@ -12,8 +12,9 @@
  * 
  */
 #include <stdlib.h>
-
 #include <string.h>
+#include <ieeefp.h>
+
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/utils.h"
@@ -64,31 +65,45 @@ typedef enum {
   FTL_OPCODE_CALL,           /* call a wrapper function */
 } ftl_opcode_t;
 
+struct buffer_info {
+  fts_symbol_t name;
+  int size;
+  float *buffer;
+};
 
-typedef struct {
+struct _ftl_instruction_info_t {
   fts_object_t *object;
-  int profile_count;
-} ftl_instruction_debug_info_t;
+  int ninputs;
+  struct buffer_info *input_infos;
+  int noutputs;
+  struct buffer_info *output_infos;
+};
 
 typedef struct {
   int size;
   int last;
-  ftl_instruction_debug_info_t *info;
-} ftl_debug_info_table_t;
+  ftl_instruction_info_t *info;
+} ftl_info_table_t;
 
-#define DEFAULT_DEBUG_INFO_SIZE 128
+#define DEFAULT_INFO_SIZE 256
 
 
 struct _ftl_subroutine_t {
   fts_symbol_t name;
+
   fts_atom_list_t *instructions;
+
   struct _ftl_subroutine_t *next;
   struct _ftl_subroutine_t *next_in_stack;
 
   fts_word_t *bytecode;
 
-  int instruction_count;
-  ftl_debug_info_table_t debug_info_table;
+  /* Program counter for PC sampling */
+  int pc;
+
+  ftl_instruction_info_t *current_instruction_info;
+
+  ftl_info_table_t info_table;
 };
 
 
@@ -101,8 +116,8 @@ struct _ftl_program_t {
   /* Stack of subroutines calls */
   ftl_subroutine_t *subroutine_tos;
 
-  /* Program counter for PC sampling */
-  int pc;
+  /* NaN checking */
+  int check_nan;
 };
 
 static fts_hash_table_t *ftl_functions_table = 0;
@@ -117,49 +132,120 @@ fts_status_description_t ftl_error_invalid_program =
   "invalid FTL program"
 };
 
+
 /* --------------------------------------------------------------------------- */
 /*                                                                             */
 /* Debug info handling (temporary)                                             */
 /*                                                                             */
 /* --------------------------------------------------------------------------- */
 
-static void ftl_debug_info_table_init( ftl_debug_info_table_t *table)
+void ftl_instruction_info_set_object( ftl_instruction_info_t *info, fts_object_t *object)
 {
-  table->size = DEFAULT_DEBUG_INFO_SIZE;
-  table->info = (ftl_instruction_debug_info_t *)fts_malloc( table->size * sizeof(ftl_instruction_debug_info_t));
+  info->object = object;
+}
+
+void ftl_instruction_info_set_ninputs( ftl_instruction_info_t *info, int ninputs)
+{
+  info->ninputs = ninputs;
+
+  if ( ninputs > 0)
+      info->input_infos = (struct buffer_info *)fts_malloc( sizeof( struct buffer_info) * ninputs);
+}
+
+void ftl_instruction_info_set_input( ftl_instruction_info_t *info, int n, fts_symbol_t s, int size)
+{
+    ASSERT ( n >= 0 && n < info->ninputs );
+    ASSERT ( info->input_infos != 0);
+
+    info->input_infos[n].name = s;
+    info->input_infos[n].size = size;
+    info->input_infos[n].buffer = 0;
+}
+
+void ftl_instruction_info_set_noutputs( ftl_instruction_info_t *info, int noutputs)
+{
+  info->noutputs = noutputs;
+
+  if (noutputs > 0)
+      info->output_infos = (struct buffer_info *)fts_malloc( sizeof( struct buffer_info) * noutputs);
+}
+
+void ftl_instruction_info_set_output( ftl_instruction_info_t *info, int n, fts_symbol_t s, int size)
+{
+    ASSERT ( n >= 0 && n < info->noutputs );
+    ASSERT ( info->output_infos != 0);
+
+    info->output_infos[n].name = s;
+    info->output_infos[n].size = size;
+    info->output_infos[n].buffer = 0;
+}
+
+static void ftl_info_table_init( ftl_info_table_t *table)
+{
+  int i;
+
+  table->size = DEFAULT_INFO_SIZE;
+  table->info = (ftl_instruction_info_t *)fts_malloc( table->size * sizeof(ftl_instruction_info_t));
+  for ( i = 0; i < table->size; i++)
+    {
+      table->info[i].object = 0;
+      table->info[i].ninputs = 0;
+      table->info[i].input_infos = 0;
+      table->info[i].noutputs = 0;
+      table->info[i].output_infos = 0;
+    }
+
   table->last = 0;
 }
 
-static void ftl_debug_info_table_set( ftl_debug_info_table_t *table, int index, fts_object_t *object)
+static ftl_instruction_info_t *ftl_info_table_add_instruction( ftl_info_table_t *table)
 {
-  if (index >= table->size)
+  int index;
+
+  if (table->last >= table->size)
     {
-      int new_size, i;
+      int old_size, i;
 
-      new_size = table->size;
-      while (new_size <= index)
-	new_size *= 2;
+      old_size = table->size;
 
-      table->info = (ftl_instruction_debug_info_t *)fts_realloc( table->info, new_size * sizeof(ftl_instruction_debug_info_t));
+      table->size *= 2;
+      table->info = (ftl_instruction_info_t *)fts_realloc( table->info, table->size * sizeof(ftl_instruction_info_t));
 
-     for ( i = table->size; i < new_size; i++)
-       table->info[i].object = 0;
+      for ( i = old_size; i < table->size; i++)
+	{
+	  table->info[i].object = 0;
 
-     table->size = new_size;
+	  table->info[i].ninputs = 0;
+	  table->info[i].input_infos = 0;
+
+	  table->info[i].noutputs = 0;
+	  table->info[i].output_infos = 0;
+	}
     }
 
-  ASSERT( index >= 0 && index < table->size);
+  ASSERT( table->last >= 0 && table->last < table->size);
 
-  table->info[index].object = object;
-  table->info[index].profile_count = 0;
+  index = table->last;
 
-  if ( index > table->last)
-    table->last = index;
+  table->last++;
+
+  return &(table->info[index]);
 }
 
-static void ftl_debug_info_table_destroy( ftl_debug_info_table_t *table)
+static void ftl_info_table_destroy( ftl_info_table_t *table)
 {
+  int i;
+
+  for ( i = 0; i < table->size; i++)
+      {
+	  if (table->info[i].input_infos)
+	      fts_free( table->info[i].input_infos);
+	  if (table->info[i].output_infos)
+	      fts_free( table->info[i].output_infos);
+      }
+    
   fts_free( table->info);
+
   table->info = 0;
   table->size = 0;
   table->last = 0;
@@ -169,8 +255,7 @@ static void ftl_debug_info_table_destroy( ftl_debug_info_table_t *table)
 /* Subroutines handling                                                   */
 /* ********************************************************************** */
 
-static ftl_subroutine_t *
-ftl_subroutine_new( fts_symbol_t name)
+static ftl_subroutine_t *ftl_subroutine_new( fts_symbol_t name)
 {
   ftl_subroutine_t *newsubr;
 
@@ -184,15 +269,17 @@ ftl_subroutine_new( fts_symbol_t name)
   newsubr->next = 0;
   newsubr->next_in_stack = 0;
   newsubr->bytecode = 0;
-  newsubr->instruction_count = 0;
 
-  ftl_debug_info_table_init( &newsubr->debug_info_table);
+  newsubr->current_instruction_info = 0;
+
+  newsubr->pc = -1;
+
+  ftl_info_table_init( &newsubr->info_table);
 
   return newsubr;
 }
 
-static void
-ftl_subroutine_destroy( ftl_subroutine_t *subr)
+static void ftl_subroutine_destroy( ftl_subroutine_t *subr)
 {
   fts_atom_list_free(subr->instructions);
 
@@ -202,11 +289,10 @@ ftl_subroutine_destroy( ftl_subroutine_t *subr)
       subr->bytecode = 0;
     }
 
-  ftl_debug_info_table_destroy( &subr->debug_info_table);
+  ftl_info_table_destroy( &subr->info_table);
 }
 
-static fts_status_t
-ftl_subroutine_add_call( ftl_subroutine_t *subr, fts_symbol_t name, int argc, const fts_atom_t *argv, fts_object_t *object )
+static fts_status_t ftl_subroutine_add_call( ftl_subroutine_t *subr, fts_symbol_t name, int argc, const fts_atom_t *argv)
 {
   fts_atom_t a;
 
@@ -222,14 +308,12 @@ ftl_subroutine_add_call( ftl_subroutine_t *subr, fts_symbol_t name, int argc, co
   fts_atom_list_append(subr->instructions, argc, argv);
 
   /* add debugging info */
-  ftl_debug_info_table_set( &subr->debug_info_table, subr->instruction_count, object);
-  subr->instruction_count++;
+  subr->current_instruction_info = ftl_info_table_add_instruction( &subr->info_table);
 
   return fts_Success;
 }
 
-static fts_status_t
-ftl_subroutine_add_return( ftl_subroutine_t *subr)
+static fts_status_t ftl_subroutine_add_return( ftl_subroutine_t *subr)
 {
   fts_atom_t a;
 
@@ -237,8 +321,7 @@ ftl_subroutine_add_return( ftl_subroutine_t *subr)
   fts_atom_list_append(subr->instructions, 1, &a);
 
   /* add debugging info */
-  ftl_debug_info_table_set( &subr->debug_info_table, subr->instruction_count, 0);
-  subr->instruction_count++;
+  subr->current_instruction_info = ftl_info_table_add_instruction( &subr->info_table);
 
   return fts_Success;
 }
@@ -248,8 +331,7 @@ ftl_subroutine_add_return( ftl_subroutine_t *subr)
 /* Instructions and directives insertion                                  */
 /* ********************************************************************** */
 
-ftl_subroutine_t *
-ftl_program_add_subroutine( ftl_program_t *prog, fts_symbol_t name)
+ftl_subroutine_t *ftl_program_add_subroutine( ftl_program_t *prog, fts_symbol_t name)
 {
   ftl_subroutine_t **subr;
   ftl_subroutine_t *newsubr;
@@ -266,8 +348,7 @@ ftl_program_add_subroutine( ftl_program_t *prog, fts_symbol_t name)
   return newsubr;
 }
 
-ftl_subroutine_t *
-ftl_program_set_current_subroutine( ftl_program_t *prog, ftl_subroutine_t *subr)
+ftl_subroutine_t *ftl_program_set_current_subroutine( ftl_program_t *prog, ftl_subroutine_t *subr)
 {
   ftl_subroutine_t *previous;
 
@@ -276,32 +357,28 @@ ftl_program_set_current_subroutine( ftl_program_t *prog, ftl_subroutine_t *subr)
   return previous;
 }
 
-ftl_subroutine_t *
-ftl_program_add_main( ftl_program_t *prog)
+ftl_subroutine_t *ftl_program_add_main( ftl_program_t *prog)
 {
   prog->main = ftl_program_add_subroutine( prog, fts_new_symbol("main"));
 
   return prog->main;
 }
 
-fts_status_t
-ftl_program_add_call( ftl_program_t *prog, fts_symbol_t name, int argc, const fts_atom_t *argv, fts_object_t *object )
+fts_status_t ftl_program_add_call( ftl_program_t *prog, fts_symbol_t name, int argc, const fts_atom_t *argv )
 {
   if ( !prog->current_subroutine)
     return &ftl_error_uninitialized_program;
 
-  return ftl_subroutine_add_call( prog->current_subroutine, name, argc, argv, object );
+  return ftl_subroutine_add_call( prog->current_subroutine, name, argc, argv);
 }
 
 
-fts_status_t
-ftl_program_add_return( ftl_program_t *prog)
+fts_status_t ftl_program_add_return( ftl_program_t *prog)
 {
   return ftl_subroutine_add_return( prog->current_subroutine);
 }
 
-int
-ftl_program_add_signal( ftl_program_t *prog, fts_symbol_t name, int size)
+int ftl_program_add_signal( ftl_program_t *prog, fts_symbol_t name, int size)
 {
   fts_atom_t a;
 
@@ -311,8 +388,7 @@ ftl_program_add_signal( ftl_program_t *prog, fts_symbol_t name, int size)
 }
 
 
-int
-ftl_declare_function( fts_symbol_t name, ftl_wrapper_t wrapper)
+int ftl_declare_function( fts_symbol_t name, ftl_wrapper_t wrapper)
 {
   fts_atom_t a;
   ftl_function_declaration *fdecl;
@@ -336,26 +412,29 @@ ftl_declare_function( fts_symbol_t name, ftl_wrapper_t wrapper)
   return fts_hash_table_insert( ftl_functions_table, name, &a);
 }
 
+ftl_instruction_info_t *ftl_program_get_current_instruction_info( ftl_program_t *prog)
+{
+  return prog->current_subroutine->current_instruction_info;
+}
+
 
 /* ********************************************************************** */
 /* Initialization and house-keeping                                       */
 /* ********************************************************************** */
 
-void
-ftl_program_init( ftl_program_t *prog)
+void ftl_program_init( ftl_program_t *prog)
 {
   prog->buffers = 0;
   prog->subroutines = 0;
   prog->current_subroutine = 0;
   prog->main = 0;
   prog->subroutine_tos = 0;
-  prog->pc = -1;
+  prog->check_nan = 0;
 
   fts_hash_table_init( &(prog->symbol_table) );
 }
 
-ftl_program_t *
-ftl_program_new( void )
+ftl_program_t *ftl_program_new( void )
 {
   ftl_program_t *tmp;
 
@@ -365,14 +444,12 @@ ftl_program_new( void )
   return tmp;
 }
 
-static void
-free_hash_element(fts_symbol_t ignore, fts_atom_t *data, void *user_data)
+static void free_hash_element(fts_symbol_t ignore, fts_atom_t *data, void *user_data)
 {
   fts_free(fts_get_ptr(data));
 }
 
-void 
-ftl_program_destroy( ftl_program_t *prog)
+void ftl_program_destroy( ftl_program_t *prog)
 {
   ftl_subroutine_t *subr, *nextsubr;
   
@@ -397,8 +474,7 @@ ftl_program_destroy( ftl_program_t *prog)
 }
 
 
-void 
-ftl_program_free( ftl_program_t *prog)
+void ftl_program_free( ftl_program_t *prog)
 {
   ftl_program_destroy( prog);
   fts_free( prog );
@@ -416,8 +492,7 @@ typedef enum {
   ST_CALL_FUN, ST_CALL_ARGC, ST_CALL_ARGV
 } state_t;
 
-static fts_status_t
-ftl_state_machine( fts_atom_list_t *alist, state_fun_t fun, void *user_data)
+static fts_status_t ftl_state_machine( fts_atom_list_t *alist, state_fun_t fun, void *user_data)
 {
   fts_atom_t *a = 0;	    
   fts_atom_list_iterator_t *iter;
@@ -512,8 +587,51 @@ ftl_state_machine( fts_atom_list_t *alist, state_fun_t fun, void *user_data)
 /* Compilation                                                            */
 /* ********************************************************************** */
 
-static int
-ftl_program_allocate_signals( ftl_program_t *prog)
+static void ftl_program_update_instruction_infos( ftl_program_t *prog)
+{
+  ftl_subroutine_t *subr;
+
+  for( subr = prog->subroutines; subr; subr = subr->next)
+    {
+      int i;
+
+      for ( i = 0; i < subr->info_table.size; i++)
+	{
+	  ftl_instruction_info_t *info;
+	  int n;
+
+	  info = &(subr->info_table.info[i]);
+
+	  for ( n = 0; n < info->ninputs; n++)
+	    {
+	      fts_atom_t data;
+	      ftl_memory_declaration *mdecl;
+	      fts_symbol_t s;
+	
+	      s = info->input_infos[n].name;
+	      fts_hash_table_lookup( &(prog->symbol_table), s, &data);
+	      mdecl = (ftl_memory_declaration *)fts_get_ptr(&data);
+	      info->input_infos[n].buffer = mdecl->address;
+	    }
+
+	  for ( n = 0; n < info->noutputs; n++)
+	    {
+	      fts_atom_t data;
+	      ftl_memory_declaration *mdecl;
+	      fts_symbol_t s;
+	
+	      s = info->output_infos[n].name;
+	      fts_hash_table_lookup( &(prog->symbol_table), s, &data);
+	      mdecl = (ftl_memory_declaration *)fts_get_ptr(&data);
+	      info->output_infos[n].buffer = mdecl->address;
+	    }
+		      
+	}
+    }
+}
+
+
+static int ftl_program_allocate_signals( ftl_program_t *prog)
 {
   fts_hash_table_iterator_t iter;
   unsigned long total_size;
@@ -560,6 +678,8 @@ ftl_program_allocate_signals( ftl_program_t *prog)
       p = p + m->size;
     }
 
+  ftl_program_update_instruction_infos( prog);
+
   return 1;
 }
 
@@ -569,8 +689,7 @@ struct compile_info_portable {
   fts_word_t *bytecode;
 };
 
-static fts_status_t
-compile_portable_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
+static fts_status_t compile_portable_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
 {
   struct compile_info_portable *info = (struct compile_info_portable *)user_data;
   fts_word_t *bytecode;
@@ -619,8 +738,7 @@ compile_portable_state_fun( int state, int newstate, fts_atom_t *a, void *user_d
   return fts_Success;
 }
 
-static fts_status_t
-bytecode_size_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
+static fts_status_t bytecode_size_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
 {
   int *ps = (int *)user_data;
 
@@ -669,19 +787,12 @@ static int ftl_program_compile_portable( ftl_program_t *prog)
       if ( ret != fts_Success)
 	return 0;
 
-#if 0
-      fprintf( stderr, "subr %s last %d instruction_count %d\n", 
-	       fts_symbol_name(subr->name), 
-	       subr->debug_info_table.last,
-	       subr->instruction_count);
-#endif
     }
 
   return 1;
 }
 
-int
-ftl_program_compile( ftl_program_t *prog)
+int ftl_program_compile( ftl_program_t *prog)
 {
   return ftl_program_compile_portable(prog);
 }
@@ -782,7 +893,7 @@ void ftl_program_fprint_signals_count( FILE *f, const ftl_program_t *prog)
 struct post_info {
   int pc;
   char line[256];
-  ftl_instruction_debug_info_t *debug_info;
+  ftl_instruction_info_t *instr_info;
 };
 
 static fts_status_t post_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
@@ -815,16 +926,38 @@ static fts_status_t post_state_fun( int state, int newstate, fts_atom_t *a, void
     strcat( info->line, buffer);
     if ( newstate == ST_OPCODE)
       {
+	ftl_instruction_info_t *instr_info;
 	fts_object_t *object;
 
 	strcat( info->line, " );");
-	object = info->debug_info->object;
+	instr_info = info->instr_info;
+	object = instr_info->object;
 	if (object)
-	  post( "%s /* object %s */\n", info->line, fts_symbol_name( fts_object_get_class_name(object)));
+	  post( "%s /* object %s", info->line, fts_symbol_name( fts_object_get_class_name(object)));
 	else
-	  post( "%s /* object unknown */\n", info->line);
+	  post( "%s /* object unknown", info->line);
+
+	{
+	  int i;
+
+	  post( ", %d inputs {", instr_info->ninputs);
+	  for ( i = 0; i < instr_info->ninputs; i++)
+	    post( " %s[%d]", fts_symbol_name( instr_info->input_infos[i].name), instr_info->input_infos[i].size);
+	  post( "} ");
+	}
+
+	{
+	  int i;
+
+	  post( ", %d outputs {", instr_info->noutputs);
+	  for ( i = 0; i < instr_info->noutputs; i++)
+	    post( " %s[%d]", fts_symbol_name( instr_info->output_infos[i].name), instr_info->output_infos[i].size);
+	  post( "}");
+	}
+
+	post( "*/ \n");
 	  
-	info->debug_info++;
+	info->instr_info++;
       }
     else
       strcat( info->line, ", ");
@@ -839,7 +972,7 @@ struct print_info {
   FILE *f;
   int pc;
   char line[256];
-  ftl_instruction_debug_info_t *debug_info;
+  ftl_instruction_info_t *instr_info;
 };
 
 static fts_status_t fprint_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
@@ -875,13 +1008,13 @@ static fts_status_t fprint_state_fun( int state, int newstate, fts_atom_t *a, vo
 	fts_object_t *object;
 
 	strcat( info->line, " );");
-	object = info->debug_info->object;
+	object = info->instr_info->object;
 	if (object)
 	  fprintf(info->f, "%s /* object %s */\n", info->line, fts_symbol_name( fts_object_get_class_name(object)));
 	else
 	  fprintf(info->f, "%s /* object unknown */\n", info->line);
 	  
-	info->debug_info++;
+	info->instr_info++;
       }
     else
       strcat( info->line, ", ");
@@ -905,7 +1038,7 @@ void ftl_program_post( const ftl_program_t *prog )
       post( "{\n");
       info.line[0] = 0;
       info.pc = 0;
-      info.debug_info = subr->debug_info_table.info;
+      info.instr_info = subr->info_table.info;
       ftl_state_machine( subr->instructions, post_state_fun, &info);
       post( "}\n\n");
     }
@@ -926,7 +1059,7 @@ void ftl_program_fprint( FILE *f, const ftl_program_t *prog )
       info.f = f;
       info.line[0] = 0;
       info.pc = 0;
-      info.debug_info = subr->debug_info_table.info;
+      info.instr_info = subr->info_table.info;
       ftl_state_machine( subr->instructions, fprint_state_fun, &info);
       fprintf( f, "}\n\n");
     }
@@ -960,28 +1093,83 @@ void ftl_program_post_bytecode( const ftl_program_t *prog)
 /* Run functions                                                          */
 /* ********************************************************************** */
 
+static int ftl_check_nan_buffers( int n, struct buffer_info *infos)
+{
+  int i, j;
+  float *vector;
+
+  for ( i = 0; i < n; i++)
+    {
+      vector = infos[i].buffer;
+
+      for ( j = 0; j < infos[i].size; j++)
+	if (isnanf( vector[j]))
+	  {
+	    post_vector(infos[i].size, vector);
+	    
+	    return 1;
+	  }
+    }
+
+  return 0;
+}
+
 void ftl_program_call_subr( ftl_program_t *prog, ftl_subroutine_t *subr)
 {
   fts_word_t *bytecode;
 
-  prog->pc = -1;
   subr->next_in_stack = prog->subroutine_tos;
   prog->subroutine_tos = subr;
 
   bytecode = subr->bytecode;
-  while (fts_word_get_long(bytecode))
+  if ( prog->check_nan)
     {
-      ftl_wrapper_t w;
-      int argc;
+      int nan_detected = 0;
+
+      subr->pc = 0;
+
+      while (fts_word_get_long(bytecode))
+	{
+	  ftl_wrapper_t w;
+	  int argc;
+	  ftl_instruction_info_t *instr_info;
       
-      prog->pc++;
-      w = (ftl_wrapper_t) fts_word_get_fun( bytecode);
-      argc = fts_word_get_long( bytecode+1);
-      (*w)(bytecode+2);
-      bytecode += (argc + 2);
+	  w = (ftl_wrapper_t) fts_word_get_fun( bytecode);
+	  argc = fts_word_get_long( bytecode+1);
+	  (*w)(bytecode+2);
+
+	  if ( !nan_detected)
+	    {
+	      instr_info = &(subr->info_table.info[ subr->pc]);
+	      if (ftl_check_nan_buffers( instr_info->noutputs, instr_info->output_infos))
+		{
+		  fts_fpe_add_object( instr_info->object);
+		  nan_detected = 1;
+		}
+	    }
+
+	  bytecode += (argc + 2);
+	  subr->pc++;
+	}
+    }
+  else
+    {
+      subr->pc = 0;
+
+      while (fts_word_get_long(bytecode))
+	{
+	  ftl_wrapper_t w;
+	  int argc;
+      
+	  w = (ftl_wrapper_t) fts_word_get_fun( bytecode);
+	  argc = fts_word_get_long( bytecode+1);
+	  (*w)(bytecode+2);
+	  bytecode += (argc + 2);
+	  subr->pc++;
+	}
     }
 
-  prog->pc = -1;
+  subr->pc = -1;
   prog->subroutine_tos = subr->next_in_stack;
   subr->next_in_stack = 0;
 }
@@ -1003,9 +1191,19 @@ fts_object_t *ftl_program_get_current_object( ftl_program_t *prog)
   int pc;
 
   subr = prog->subroutine_tos;
-  pc = prog->pc;
-  if (subr && pc >= 0)
-    return subr->debug_info_table.info[pc].object;
+  if (subr && subr->pc >= 0)
+    return subr->info_table.info[subr->pc].object;
   else
     return 0;
+}
+
+/* --------------------------------------------------------------------------- */
+/*                                                                             */
+/* Debugging utilities                                                         */
+/*                                                                             */
+/* --------------------------------------------------------------------------- */
+
+void ftl_program_set_check_nan( ftl_program_t *prog, int check_nan)
+{
+  prog->check_nan = check_nan;
 }
