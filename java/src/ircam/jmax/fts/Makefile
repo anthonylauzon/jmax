@@ -18,16 +18,110 @@ PACKAGE_DIR = ircam/jmax/fts
 include $(ROOTDIR)/java/Makefiles/Makefile.common
 include Sources
 
-P_ROOT = ircam.jmax.fts
-
-FTS_PACKAGES = $(P_ROOT).tcl $(P_ROOT).comm $(P_ROOT).dotpat
-
-LOCAL_PACKAGES = $(FTS_PACKAGES) 
-
-all:  local
-	javac $(JFLAGS) LOCAL_PACKAGES
+all: 
+	javac $(JFLAGS) $(SOURCES)
+	(cd tcl; $(MAKE) all)
 .PHONY: all
 
-local: $(CLASS_FILES)
+FtsAbstractionTable:
+	javac $(JFLAGS) FtsAbstractionTable.java
+.PHONY: FtsAbstractionTable
+
+FtsClientProtocol:
+	javac $(JFLAGS) FtsClientProtocol.java
+.PHONY: FtsClientProtocol
+
+FtsConnection:
+	javac $(JFLAGS) FtsConnection.java
+.PHONY: FtsConnection
+
+FtsErrorStreamer:
+	javac $(JFLAGS) FtsErrorStreamer.java
+.PHONY: FtsErrorStreamer
+
+FtsGraphicDescription:
+	javac $(JFLAGS) FtsGraphicDescription.java
+.PHONY: FtsGraphicDescription
+
+FtsHelpPatchTable:
+	javac $(JFLAGS) FtsHelpPatchTable.java
+.PHONY: FtsHelpPatchTable
+
+FtsMessage:
+	javac $(JFLAGS) FtsMessage.java
+.PHONY: FtsMessage
+
+FtsMessageHandler:
+	javac $(JFLAGS) FtsMessageHandler.java
+.PHONY: FtsMessageHandler
+
+FtsObject:
+	javac $(JFLAGS) FtsObject.java
+.PHONY: FtsObject
+
+FtsParse:
+	javac $(JFLAGS) FtsParse.java
+.PHONY: FtsParse
+
+FtsPatcher:
+	javac $(JFLAGS) FtsPatcher.java
+.PHONY: FtsPatcher
+
+FtsPort:
+	javac $(JFLAGS) FtsPort.java
+.PHONY: FtsPort
+
+FtsPropertyHandler:
+	javac $(JFLAGS) FtsPropertyHandler.java
+.PHONY: FtsPropertyHandler
+
+FtsPropertyHandlerTable:
+	javac $(JFLAGS) FtsPropertyHandlerTable.java
+.PHONY: FtsPropertyHandlerTable
+
+FtsReferenceURLTable:
+	javac $(JFLAGS) FtsReferenceURLTable.java
+.PHONY: FtsReferenceURLTable
+
+FtsSaveStream:
+	javac $(JFLAGS) FtsSaveStream.java
+.PHONY: FtsSaveStream
+
+FtsServer:
+	javac $(JFLAGS) FtsServer.java
+.PHONY: FtsServer
+
+FtsSocketClientServer:
+	javac $(JFLAGS) FtsSocketClientServer.java
+.PHONY: FtsSocketClientServer
+
+FtsSocketPort:
+	javac $(JFLAGS) FtsSocketPort.java
+.PHONY: FtsSocketPort
+
+FtsSocketServer:
+	javac $(JFLAGS) FtsSocketServer.java
+.PHONY: FtsSocketServer
+
+FtsSocketServerPort:
+	javac $(JFLAGS) FtsSocketServerPort.java
+.PHONY: FtsSocketServerPort
+
+FtsSubProcessPort:
+	javac $(JFLAGS) FtsSubProcessPort.java
+.PHONY: FtsSubProcessPort
+
+FtsSubProcessServer:
+	javac $(JFLAGS) FtsSubProcessServer.java
+.PHONY: FtsSubProcessServer
+
+FtsTemplateTable:
+	javac $(JFLAGS) FtsTemplateTable.java
+.PHONY: FtsTemplateTable
+
+FtsWindowDescription:
+	javac $(JFLAGS) FtsWindowDescription.java
+.PHONY: FtsWindowDescription
+
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

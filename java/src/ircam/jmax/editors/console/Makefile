@@ -18,8 +18,17 @@ PACKAGE_DIR = ircam/jmax/editors/console
 include $(ROOTDIR)/java/Makefiles/Makefile.common
 include Sources
 
-all : local
+all: 
+	javac $(JFLAGS) $(SOURCES)
+.PHONY: all
 
-local: $(CLASS_FILES)
+ConsShell:
+	javac $(JFLAGS) ConsShell.java
+.PHONY: ConsShell
+
+Console:
+	javac $(JFLAGS) Console.java
+.PHONY: Console
+
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

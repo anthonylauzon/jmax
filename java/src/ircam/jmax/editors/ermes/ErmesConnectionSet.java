@@ -3,7 +3,7 @@ package ircam.jmax.editors.ermes;
 import java.awt.*;
 import java.util.*;
 
-import ircam.jmax.editors.ermes.objects.*;
+import ircam.jmax.editors.ermes.*;
 
 /**
  * A Set of connection coming out from an outlet.

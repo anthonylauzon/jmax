@@ -1,8 +1,18 @@
-SOURCES = \
+SSOURCES = \
           ErmesConnCircle.java \
           ErmesConnSegment.java \
           ErmesConnection.java \
           ErmesConnectionSet.java \
+          ErmesPatcherDoc.java \
+          ErmesRegion.java \
+          ErmesScrollerView.java \
+          ErmesSketchHelper.java \
+          ErmesSketchPad.java \
+          ErmesSketchWindow.java \
+          ErmesToggleButton.java \
+          ErmesToolBar.java
+
+DSOURCES = \
           ErmesObjBang.java \
           ErmesObjComment.java \
           ErmesObjEditField.java \
@@ -28,12 +38,5 @@ SOURCES = \
           ErmesObjThrottle.java \
           ErmesObjToggle.java \
           ErmesObject.java \
-          ErmesPatcherDoc.java \
-          ErmesRegion.java \
-          ErmesScrollerView.java \
-          ErmesSketchHelper.java \
-          ErmesSketchPad.java \
-          ErmesSketchWindow.java \
-          ErmesToggleButton.java \
-          ErmesToolBar.java
 
+SOURCES = $(SSOURCES) $(DSOURCES) 

@@ -18,7 +18,30 @@ PACKAGE_DIR = ircam/jmax/utils
 include $(ROOTDIR)/java/Makefiles/Makefile.common
 include Sources
 
-all: local
-local: $(CLASS_FILES)
+all: 
+	javac $(JFLAGS) $(SOURCES)
+.PHONY: all
+
+
+
+ExtensionFilter:
+	javac $(JFLAGS) ExtensionFilter.java
+.PHONY: ExtensionFilter
+
+TWOutputStream:
+	javac $(JFLAGS) TWOutputStream.java
+.PHONY: TWOutputStream
+
+TWPrintStream:
+	javac $(JFLAGS) TWPrintStream.java
+.PHONY: TWPrintStream
+
+TextWindow:
+	javac $(JFLAGS) TextWindow.java
+.PHONY: TextWindow
+
+Platform:
+	javac $(JFLAGS) Platform.java
+.PHONY: Platform
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
