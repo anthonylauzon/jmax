@@ -20,6 +20,8 @@
  * 
  */
 
+#include <string.h>
+
 #include <fts/fts.h>
 
 #define FIFO_BLOCK_SIZE 256
@@ -39,6 +41,53 @@ typedef struct
  */
 
 static void
+fifo_reinit( fts_fifo_t *fifo, void *buffer, int size)
+{
+  if(buffer != NULL)
+    {
+      if(fifo->write_index >= fifo->read_index)
+	{
+	  int fill = fifo->write_index - fifo->read_index;
+
+	  if(fill > size)
+	    fill = size;
+
+	  memcpy(buffer, (void *)fifo->buffer, fill);
+
+	  fifo->read_index = 0;
+	  fifo->write_index = fill;
+	}
+      else
+	{
+	  int head = fifo->size - fifo->read_index;
+	  int tail;
+
+	  if(head > size)
+	    head = size;
+
+	  memcpy(buffer, (char *)fifo->buffer + fifo->read_index, head);
+
+	  tail = fifo->write_index;
+	  if(head + tail > size)
+	    tail = size - head;
+
+	  memcpy((char *)buffer + head, (void *)fifo->buffer, tail);
+
+	  fifo->read_index = 0;
+	  fifo->write_index = head + tail;
+	}
+
+      fifo->buffer = buffer;
+      fifo->size = size;
+    }    
+  else
+    { 
+      fifo->read_index = 0;
+      fifo->write_index = 0;
+    }
+}
+
+static void
 fifo_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fifo_t *this = (fifo_t *)o;
@@ -52,7 +101,7 @@ fifo_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       int i;
 
       /* reset fifo to new buffer */
-      fts_fifo_reinit(&this->fifo, buffer, bytes);
+      fifo_reinit(&this->fifo, buffer, bytes);
       
       /* free old buffer */
       fts_free(this->buffer);

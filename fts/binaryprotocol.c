@@ -117,7 +117,7 @@ static void end_int_action( unsigned char input, fts_binary_protocol_t *binary_p
   fts_atom_t a;
 
   fts_stack_push( &binary_protocol->input_buffer, unsigned char, input);
-  fts_set_int( &a, get_int_from_bytes( fts_stack_base( &binary_protocol->input_buffer)));
+  fts_set_int( &a, get_int_from_bytes( (unsigned char *)fts_stack_base( &binary_protocol->input_buffer)));
   fts_stack_push( &binary_protocol->input_args, fts_atom_t, a);
 } 
 
@@ -126,7 +126,7 @@ static void end_float_action( unsigned char input, fts_binary_protocol_t *binary
   fts_atom_t a;
 
   fts_stack_push( &binary_protocol->input_buffer, unsigned char, input);
-  fts_set_float( &a, get_double_from_bytes( fts_stack_base( &binary_protocol->input_buffer)));
+  fts_set_float( &a, get_double_from_bytes( (unsigned char *)fts_stack_base( &binary_protocol->input_buffer)));
   fts_stack_push( &binary_protocol->input_args, fts_atom_t, a);
 }
 
@@ -136,7 +136,7 @@ static void end_symbol_index_action( unsigned char input, fts_binary_protocol_t 
   int index;
 
   fts_stack_push( &binary_protocol->input_buffer, unsigned char, input);
-  index = get_int_from_bytes( fts_stack_base( &binary_protocol->input_buffer));
+  index = get_int_from_bytes( (unsigned char *)fts_stack_base( &binary_protocol->input_buffer));
   fts_set_symbol( &a, binary_protocol->input_cache.symbols[ index]);
   fts_stack_push( &binary_protocol->input_args, fts_atom_t, a);
 }
@@ -147,10 +147,10 @@ static void end_symbol_cache_action( unsigned char input, fts_binary_protocol_t 
   fts_symbol_t s;
   fts_atom_t a;
 
-  index = get_int_from_bytes( fts_stack_base( &binary_protocol->input_buffer));
+  index = get_int_from_bytes( (unsigned char *)fts_stack_base( &binary_protocol->input_buffer));
 
   fts_stack_push( &binary_protocol->input_buffer, unsigned char, '\0');
-  s = fts_new_symbol( fts_stack_base( &binary_protocol->input_buffer) + sizeof( int));
+  s = fts_new_symbol( (char *)fts_stack_base( &binary_protocol->input_buffer) + sizeof( int));
 
   symbol_cache_put( &binary_protocol->input_cache, s, index);
 
@@ -163,7 +163,7 @@ static void end_string_action( unsigned char input, fts_binary_protocol_t *binar
   fts_atom_t a;
 
   fts_stack_push( &binary_protocol->input_buffer, unsigned char, '\0');
-  fts_set_string( &a, strdup( fts_stack_base( &binary_protocol->input_buffer)));
+  fts_set_string( &a, strdup( (char *)fts_stack_base( &binary_protocol->input_buffer)));
   fts_stack_push( &binary_protocol->input_args, fts_atom_t, a);
 }
 
@@ -177,7 +177,7 @@ static void end_raw_string_action( unsigned char input, fts_binary_protocol_t *b
   fts_stack_push( &binary_protocol->input_buffer, unsigned char, '\0');
   fts_stack_push( &binary_protocol->input_buffer, unsigned char, '\0');
 
-  p = fts_stack_base( &binary_protocol->input_buffer);
+  p = (char *)fts_stack_base( &binary_protocol->input_buffer);
   l = fts_stack_size( &binary_protocol->input_buffer);
   fts_tokenizer_init_buffer( &tokenizer, p, l);
 

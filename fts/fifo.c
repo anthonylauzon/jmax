@@ -32,52 +32,6 @@ void fts_fifo_init( fts_fifo_t *fifo, void *buffer, int size)
   fifo->size = size;
 }
 
-void fts_fifo_reinit( fts_fifo_t *fifo, void *buffer, int size)
-{
-  if(buffer != NULL)
-    {
-      if(fifo->write_index >= fifo->read_index)
-	{
-	  int fill = fifo->write_index - fifo->read_index;
-
-	  if(fill > size)
-	    fill = size;
-
-	  memcpy(buffer, (void *)fifo->buffer, fill);
-
-	  fifo->read_index = 0;
-	  fifo->write_index = fill;
-	}
-      else
-	{
-	  int head = fifo->size - fifo->read_index;
-	  int tail;
-
-	  if(head > size)
-	    head = size;
-
-	  memcpy(buffer, (char *)fifo->buffer + fifo->read_index, head);
-
-	  tail = fifo->write_index;
-	  if(head + tail > size)
-	    tail = size - head;
-
-	  memcpy(buffer + head, (void *)fifo->buffer, tail);
-
-	  fifo->read_index = 0;
-	  fifo->write_index = head + tail;
-	}
-
-      fifo->buffer = buffer;
-      fifo->size = size;
-    }    
-  else
-    { 
-      fifo->read_index = 0;
-      fifo->write_index = 0;
-    }
-}
-
 int fts_fifo_read_level( fts_fifo_t *fifo)
 {
   int n;

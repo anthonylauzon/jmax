@@ -561,10 +561,10 @@ fts_class_get_method_varargs(fts_class_t *cl, fts_symbol_t s)
   int varargs = 0;
   fts_method_t method = method_get(cl, (const void *)s, NULL, &varargs);
 
-  if(varargs != NULL)
+  if (varargs)
     return method;
-  else
-    return NULL;
+
+  return NULL;
 }
 
 fts_method_t

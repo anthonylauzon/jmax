@@ -78,18 +78,6 @@ typedef struct _fts_fifo_t {
 FTS_API void fts_fifo_init( fts_fifo_t *fifo, void *buffer, int size);
 
 /**
- * Move fifo content to new buffer and set pointers to new buffer
- *
- * @fn void fts_fifo_reinit( fts_fifo_t *fifo, void *buffer, int size)
- * @param fifo the fifo
- * @param buffer new buffer (if NULL only resets read and write pointer to 0)
- * @param size new buffer size 
- * @warning function is NOT thread save
- * @ingroup fifo
- */
-FTS_API void fts_fifo_reinit( fts_fifo_t *fifo, void *buffer, int size);
-
-/**
  * Get the fifo read pointer
  * Note: the returned pointer may point to a non-valid element if
  * the fifo is empty

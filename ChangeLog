@@ -1,3 +1,17 @@
+2003-03-17  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* integrating patches from Jarek for Windows compilation.
+	
+	* fts/binaryprotocol.c, fts/client.c: added missing casts
+
+	* fts/fifo.c, include/fts/fifo.h: removed fts_fifo_reinit because it is not thread-safe. 
+	The fifo.c implementation is made for a lock-free ring buffer that can be accessed 
+	concurrently by 2 threads, so its API must only contain functions that do not break this.
+
+	* fts/hashtable.c, include/fts/hashtable.h: removed unused function (get_unused_symbol...)
+
+	* packages/control/c/src/fifo.c: copied fts_fifo_reinit there.
+	
 2003-03-12  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* fts/atom.c: changed ANSI style 'type_id:...' initialization because
