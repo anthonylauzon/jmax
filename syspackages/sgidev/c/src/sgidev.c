@@ -24,6 +24,7 @@
  *
  */
 
+#include "fts.h"
 #include "sgiaudiodev.h"
 #include "shmdev.h"
 
