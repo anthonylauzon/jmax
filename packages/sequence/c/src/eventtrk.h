@@ -23,37 +23,45 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
-#ifndef _SEQUENCE_H_
-#define _SEQUENCE_H_
+#ifndef _EVENTTRK_H_
+#define _EVENTTRK_H_
 
 #include "fts.h"
 #include "track.h"
+#include "event.h"
 
 /*****************************************************************
  *
- *  sequence
+ *  track of events
  *
  */
 
-typedef struct _sequence_
+extern fts_symbol_t eventtrk_symbol;
+
+typedef struct _eventtrk_ eventtrk_t;
+
+struct _eventtrk_
 { 
-  fts_object_t o;
+  track_t head; /* generic sequence track */
 
-  track_t *tracks; /* list of tracks */ 
-  int size; /* # of tracks */ 
+  fts_symbol_t type; /* type of events */
 
-  int open; /* flag: is 1 if sequence editor is open */
-} sequence_t;
+  event_t *first; /* pointer to first event */
+  event_t *last; /* pointer to last event */
+  int size; /* # of events in track */
+};
 
-extern void sequence_init(sequence_t *sequence);
+#define eventtrk_get_type(track) ((track)->type)
 
-#define sequence_get_size(s) ((s)->size)
-#define sequence_get_first_track(s) ((s)->tracks)
+#define eventtrk_get_first(track) ((track)->first)
+#define eventtrk_get_last(track) ((track)->last)
+#define eventtrk_get_size(track) ((track)->size)
 
-#define sequence_set_editor_open(s) ((s)->open = 1)
-#define sequence_editor_open(s) ((s)->open == 1)
+#define eventtrk_get_duration(track) ((track)->last->time - (track)->first->time)
 
-extern void sequence_add_track(sequence_t *sequence, track_t *track);
-extern void sequence_remove_track(track_t *track);
+extern void eventtrk_add_event(eventtrk_t *track, double time, event_t *event);
+extern void eventtrk_add_event_after(eventtrk_t *track, double time, event_t *event, event_t *here);
+extern void eventtrk_move_event(event_t *event, double time);
+extern void eventtrk_remove_event(event_t *event);
 
 #endif

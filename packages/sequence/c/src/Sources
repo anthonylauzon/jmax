@@ -26,6 +26,9 @@
 SOURCES = \
 module.c \
 sequence.c \
-seqobj.c \
-seqnote.c \
+track.c \
+event.c \
 seqmidi.c \
+seqobj.c \
+eventtrk.c \
+noteevt.c \

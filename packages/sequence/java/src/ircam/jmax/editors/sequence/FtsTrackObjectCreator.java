@@ -14,8 +14,8 @@ public class FtsTrackObjectCreator implements FtsObjectCreator
     
     public FtsObject createInstance(Fts fts, FtsObject parent, String className, int nArgs, FtsAtom args[])
     {
-	String valueType = args[0].getString();
-	String name = args[1].getString();
+	String name = args[0].getString();
+	String valueType = args[1].getString();
 	
 	return new FtsTrackObject(fts, name, ValueInfoTable.getValueInfo(valueType));
     }

@@ -23,37 +23,43 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
-#ifndef _SEQUENCE_H_
-#define _SEQUENCE_H_
+#ifndef _EVENT_H_
+#define _EVENT_H_
 
 #include "fts.h"
-#include "track.h"
 
 /*****************************************************************
  *
- *  sequence
+ *  event
  *
  */
 
-typedef struct _sequence_
-{ 
+extern fts_symbol_t event_symbol;
+
+typedef struct _event_ event_t;
+
+struct _event_
+{
   fts_object_t o;
 
-  track_t *tracks; /* list of tracks */ 
-  int size; /* # of tracks */ 
+  /* list of events in sequence */
+  event_t *prev;
+  event_t *next;
 
-  int open; /* flag: is 1 if sequence editor is open */
-} sequence_t;
+  struct _eventtrk_ *track; /* track of event */
 
-extern void sequence_init(sequence_t *sequence);
+  double time; /* time tag */
+};
 
-#define sequence_get_size(s) ((s)->size)
-#define sequence_get_first_track(s) ((s)->tracks)
+extern void event_init(event_t *event);
 
-#define sequence_set_editor_open(s) ((s)->open = 1)
-#define sequence_editor_open(s) ((s)->open == 1)
+#define event_set_time(e, t) ((e)->time = (t))
+#define event_get_time(e) ((e)->time)
 
-extern void sequence_add_track(sequence_t *sequence, track_t *track);
-extern void sequence_remove_track(track_t *track);
+#define event_set_track(e, t) ((e)->track = (t))
+#define event_get_track(e) ((e)->track)
+
+#define event_get_prev(e) ((e)->prev)
+#define event_get_next(e) ((e)->next)
 
 #endif

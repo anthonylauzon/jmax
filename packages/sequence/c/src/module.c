@@ -26,15 +26,21 @@
 
 #include "fts.h"
 
+extern void track_setup(void);
+extern void event_setup(void);
 extern void seqobj_config(void);
-extern void seqnote_config(void);
+extern void eventtrk_config(void);
+extern void noteevt_config(void);
 
 static void
-fts_sequence_init(void)
+sequence_module_init(void)
 {
+  track_setup();
+  event_setup();
   seqobj_config();
-  seqnote_config();
+  eventtrk_config();
+  noteevt_config();
 }
 
-fts_module_t sequence_module = {"sequence", "sequence and score following classes", fts_sequence_init, 0, 0};
+fts_module_t sequence_module = {"sequence", "sequence and score following classes", sequence_module_init, 0, 0};
 

@@ -41,16 +41,16 @@ public class SequenceExtension extends tcl.lang.Extension implements JavaExtensi
  public void init(ircam.jmax.script.Interpreter interp)
   {
     FtsObject.registerFtsObjectCreator("sequence", new FtsSequenceObjectCreator());
-    FtsObject.registerFtsObjectCreator("seqtrack", new FtsTrackObjectCreator());
-    FtsObject.registerFtsObjectCreator("seqevent", new FtsEventObjectCreator());
+    FtsObject.registerFtsObjectCreator("track", new FtsTrackObjectCreator());
+    FtsObject.registerFtsObjectCreator("event", new FtsEventObjectCreator());
   }
 
     /* this method should be removed as soon as jacl is completely forgotten about */
   public void init(tcl.lang.Interp interp)
   {
     FtsObject.registerFtsObjectCreator("sequence", new FtsSequenceObjectCreator());
-    FtsObject.registerFtsObjectCreator("seqtrack", new FtsTrackObjectCreator());
-    FtsObject.registerFtsObjectCreator("seqevent", new FtsEventObjectCreator());
+    FtsObject.registerFtsObjectCreator("track", new FtsTrackObjectCreator());
+    FtsObject.registerFtsObjectCreator("event", new FtsEventObjectCreator());
   }
 }
 

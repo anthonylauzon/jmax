@@ -24,12 +24,27 @@
  *
  */
 #include "fts.h"
-#include "sequence.h"
+#include "event.h"
 
-#ifndef _SEQOBJ_H_
-#define _SEQOBJ_H_
+fts_symbol_t event_symbol = 0;
 
-extern fts_symbol_t seqevent_symbol;
-extern fts_symbol_t seqtrack_symbol;
+/*********************************************************
+ *
+ *  sequence event
+ *
+ */
 
-#endif
+void
+event_init(event_t *event)
+{
+  event->prev = 0;
+  event->next = 0;
+  event->track = 0;
+  event->time = 0.0;
+}
+
+void
+event_setup(void)
+{
+  event_symbol = fts_new_symbol("event");
+}

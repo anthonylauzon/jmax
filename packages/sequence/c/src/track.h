@@ -23,25 +23,32 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
-#ifndef _SEQNOTE_H_
-#define _SEQNOTE_H_
+#ifndef _TRACK_H_
+#define _TRACK_H_
 
 #include "fts.h"
-#include "sequence.h"
 
-extern fts_symbol_t seqnote_symbol;
+extern fts_symbol_t track_symbol;
 
-typedef struct _seqnote_
-{
-  sequence_event_t head;
-  int pitch;
-  double duration;
-} seqnote_t;
+typedef struct _track_ track_t;
 
-#define seqnote_set_pitch(n, p) ((n)->pitch = (p))
-#define seqnote_get_pitch(n) ((n)->pitch)
+struct _track_
+{ 
+  fts_object_t o;
 
-#define seqnote_set_duration(n, d) ((n)->duration = (d))
-#define seqnote_get_duration(n) ((n)->duration)
+  /* list of tracks in sequence */
+  track_t *next;
+
+  struct _sequence_ *sequence; /* sequence of track */
+
+  fts_symbol_t name;
+  int active; /* active flag */
+};
+
+extern void track_init(track_t *track, fts_symbol_t name);
+
+#define track_get_sequence(t) ((t)->sequence)
+#define track_get_name(t) ((t)->name)
+#define track_get_next(t) ((t)->next)
 
 #endif

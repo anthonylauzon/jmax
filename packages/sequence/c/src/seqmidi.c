@@ -27,8 +27,9 @@
 
 #include "fts.h"
 #include "sequence.h"
-#include "seqobj.h"
-#include "seqnote.h"
+#include "track.h"
+#include "eventtrk.h"
+#include "noteevt.h"
 
 #define MAX_MIDI_CHANNELS 16
 #define MAX_MIDI_PITCHES 128
@@ -38,8 +39,8 @@ static fts_symbol_t sym_note = 0;
 typedef struct _seqmidi_data_
 {
   sequence_t *sequence;
-  sequence_track_t *track;
-  seqnote_t *on[MAX_MIDI_CHANNELS][MAX_MIDI_PITCHES];
+  track_t *track;
+  noteevt_t *on[MAX_MIDI_CHANNELS][MAX_MIDI_PITCHES];
 } seqmidi_data_t;
 
 static int
@@ -252,17 +253,17 @@ seqmidi_read_track_start(fts_midifile_t *file)
   sequence_t *sequence = data->sequence;
   char s[] = "track9999";
   fts_symbol_t name;
-  sequence_track_t *track;
+  track_t *track;
   fts_atom_t a[3];
   
-  sprintf(s, "track%d", sequence_get_n_tracks(sequence));
+  sprintf(s, "track%d", sequence_get_size(sequence));
   name = fts_new_symbol_copy(s);
 
   /* create new track */
-  fts_set_symbol(a + 0, seqtrack_symbol);
-  fts_set_symbol(a + 1, seqnote_symbol);
-  fts_set_symbol(a + 2, name);
-  fts_object_new(0, 3, a, &track);
+  fts_set_symbol(a + 0, eventtrk_symbol);
+  fts_set_symbol(a + 1, name);
+  fts_set_symbol(a + 2, noteevt_symbol);
+  fts_object_new(0, 3, a, (fts_object_t **)&track);
 
   /* add track to sequence */
   sequence_add_track(sequence, track);
@@ -275,19 +276,18 @@ seqmidi_read_track_start(fts_midifile_t *file)
 
 
 static void
-seqmidi_set_note_off(seqnote_t *note, double time)
+seqmidi_set_note_off(noteevt_t *note, double time)
 {
-  double duration = time - sequence_event_get_time((sequence_event_t *)note);
+  double duration = time - event_get_time((event_t *)note);
 
-  seqnote_set_duration(note, duration);
+  noteevt_set_duration(note, duration);
 }
 
 static int
 seqmidi_read_note_on(fts_midifile_t *file, int chan, int pitch, int vel)
 {
   seqmidi_data_t *data = (seqmidi_data_t *)fts_midifile_get_user_data(file);
-  sequence_t *sequence = data->sequence;
-  sequence_track_t *track = data->track;
+  track_t *track = data->track;
   double time = fts_midifile_get_current_time_in_seconds(file);
 
   if(vel == 0 && data->on[chan][pitch] != 0)
@@ -300,15 +300,15 @@ seqmidi_read_note_on(fts_midifile_t *file, int chan, int pitch, int vel)
       fts_object_t *note;
       fts_atom_t a[3];
 
-      fts_set_symbol(a + 0, seqnote_symbol);
+      fts_set_symbol(a + 0, noteevt_symbol);
       fts_set_int(a + 1, pitch);
       fts_set_float(a + 2, 0.0);
       fts_object_new(0, 3, a, &note);
 
-      /* add event to sequence */
-      sequence_add_event(sequence, track, time, (sequence_event_t *)note);
+      /* add event to track */
+      eventtrk_add_event(track, time, (event_t *)note);
 
-      data->on[chan][pitch] = (seqnote_t *)note;
+      data->on[chan][pitch] = (noteevt_t *)note;
     }
     
   return 1;
@@ -318,8 +318,7 @@ static int
 seqmidi_read_note_off(fts_midifile_t *file, int chan, int pitch, int vel)
 {
   seqmidi_data_t *data = (seqmidi_data_t *)fts_midifile_get_user_data(file);
-  sequence_t *sequence = data->sequence;
-  sequence_track_t *track = data->track;
+  track_t *track = data->track;
   double time = fts_midifile_get_current_time_in_seconds(file);
 
   if(data->on[chan][pitch] != 0)
@@ -335,8 +334,7 @@ static int
 seqmidi_read_track_end(fts_midifile_t *file)
 {
   seqmidi_data_t *data = (seqmidi_data_t *)fts_midifile_get_user_data(file);
-  sequence_t *sequence = data->sequence;
-  sequence_track_t *track = data->track;
+  track_t *track = data->track;
   double time = fts_midifile_get_current_time_in_seconds(file);
   int i, j;
   

@@ -117,7 +117,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
   // Text area offset
   // ----------------------------------------
 
-  private static final int TEXT_X_OFFSET = 2; /*was 4 */
+  private static final int TEXT_X_OFFSET = 3; /*was 4 */
   private static final int TEXT_Y_OFFSET = 2;
 
   public int getTextXOffset()
@@ -132,7 +132,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
 
   public int getTextWidthOffset()
   {
-    return 6; /* was 8 */
+    return 5; /* was 8 */
   }
 
   public int getTextHeightOffset()
@@ -188,7 +188,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
 	else
 	  g.setColor( Settings.sharedInstance().getObjColor());
       }
-	
+
     int x = getX();
     int y = getY();
     int w = getWidth();
@@ -197,6 +197,11 @@ public class Standard extends Editable implements FtsObjectErrorListener
     g.fill3DRect( x+1, y+1, w-2, h-2, true);
 
     drawContent( g);
+
+    //MAX style double line borders
+    //g.setColor( Color.black);
+    //g.drawLine(x+1, y+2, x+w-2, y+2);
+    //g.drawLine(x+1, y+h-3, x+w-2, y+h-3);
 
     super.paint( g);
   }

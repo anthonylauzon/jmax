@@ -23,37 +23,25 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
-#ifndef _SEQUENCE_H_
-#define _SEQUENCE_H_
+#ifndef _NOTEEVT_H_
+#define _NOTEEVT_H_
 
 #include "fts.h"
-#include "track.h"
+#include "event.h"
 
-/*****************************************************************
- *
- *  sequence
- *
- */
+extern fts_symbol_t noteevt_symbol;
 
-typedef struct _sequence_
-{ 
-  fts_object_t o;
+typedef struct _noteevt_
+{
+  event_t head;
+  int pitch;
+  double duration;
+} noteevt_t;
 
-  track_t *tracks; /* list of tracks */ 
-  int size; /* # of tracks */ 
+#define noteevt_set_pitch(n, p) ((n)->pitch = (p))
+#define noteevt_get_pitch(n) ((n)->pitch)
 
-  int open; /* flag: is 1 if sequence editor is open */
-} sequence_t;
-
-extern void sequence_init(sequence_t *sequence);
-
-#define sequence_get_size(s) ((s)->size)
-#define sequence_get_first_track(s) ((s)->tracks)
-
-#define sequence_set_editor_open(s) ((s)->open = 1)
-#define sequence_editor_open(s) ((s)->open == 1)
-
-extern void sequence_add_track(sequence_t *sequence, track_t *track);
-extern void sequence_remove_track(track_t *track);
+#define noteevt_set_duration(n, d) ((n)->duration = (d))
+#define noteevt_get_duration(n) ((n)->duration)
 
 #endif
