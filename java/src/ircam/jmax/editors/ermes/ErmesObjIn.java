@@ -47,7 +47,7 @@ class ErmesObjIn extends ErmesObject {
   	
     Dimension d = getPreferredSize();
     currentRect = new Rectangle(x, y, d.width, d.height);
-	int temp = ((ErmesSketchWindow)theSketchPad.itsSketchWindow).itsDocument.itsPatcher.getNumberOfInlets();
+	int temp = theSketchPad.GetSketchWindow().itsDocument.itsPatcher.getNumberOfInlets();
 
 	if (theSketchPad.inCount < temp)
 	  itsId = theSketchPad.inCount++;   //for now no deleting handled

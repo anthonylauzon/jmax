@@ -173,7 +173,7 @@ public class ErmesObjPatcher extends ErmesObject {
       //
       else {
 	itsSubWindow = MaxApplication.NewSubPatcherWindow( (FtsContainerObject) itsFtsObject);
-	((ErmesSketchWindow)itsSketchPad.GetSketchWindow()).AddToSubWindowList(itsSubWindow);
+	itsSketchPad.GetSketchWindow().AddToSubWindowList(itsSubWindow);
       }
     }
     else

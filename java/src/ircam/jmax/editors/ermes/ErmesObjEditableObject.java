@@ -59,7 +59,7 @@ import ircam.jmax.fts.*;
     
     itsSketchPad.GetEditField().setVisible(true);
     itsSketchPad.GetEditField().requestFocus();
-    
+ 
     return true;
   }
   
@@ -125,7 +125,7 @@ import ircam.jmax.fts.*;
   public void RestoreDimensions(){
     itsResized = false;
     itsSketchPad.RemoveElementRgn(this);
-    int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsMaxString)+WIDTH_DIFF,
+    int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsMaxString)+2*WIDTH_DIFF+10,
 			    (itsInletList.size())*12, (itsOutletList.size())*12);
    
     int aHeight = itsFontMetrics.getHeight()*itsParsedTextVector.size()+HEIGHT_DIFF-currentRect.height;
@@ -167,7 +167,7 @@ import ircam.jmax.fts.*;
 	
   void ResizeToNewFont(Font theFont) {
     if(!itsResized){
-      Resize(itsFontMetrics.stringWidth(itsMaxString) + WIDTH_DIFF - currentRect.width,
+      Resize(itsFontMetrics.stringWidth(itsMaxString) + 2*WIDTH_DIFF+10 - currentRect.width,
 	     itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF - currentRect.height);
     }
     else ResizeToText(0,0);
@@ -176,14 +176,14 @@ import ircam.jmax.fts.*;
   public void ResizeToText(int theDeltaX, int theDeltaY){
     int aWidth = currentRect.width+theDeltaX;
     int aHeight = currentRect.height+theDeltaY;
-    if(aWidth<itsFontMetrics.stringWidth(itsMaxString) + WIDTH_DIFF) aWidth = itsFontMetrics.stringWidth(itsMaxString) + WIDTH_DIFF;
+    if(aWidth<itsFontMetrics.stringWidth(itsMaxString) + WIDTH_DIFF) aWidth = itsFontMetrics.stringWidth(itsMaxString) + 2*WIDTH_DIFF+10;
     if(aHeight<itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF) aHeight = itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF;
     Resize(aWidth-currentRect.width, aHeight-currentRect.height);
   }
   
   public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
     String temp = itsArgs;
-    if((currentRect.width+theDeltaX <itsFontMetrics.stringWidth(itsMaxString) +WIDTH_DIFF)||
+    if((currentRect.width+theDeltaX <itsFontMetrics.stringWidth(itsMaxString) +2*WIDTH_DIFF+10)||
        (currentRect.height+theDeltaY<itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF))
       return false;
     else return true;

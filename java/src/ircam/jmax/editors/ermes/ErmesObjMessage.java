@@ -189,3 +189,8 @@ class ErmesObjMessage extends ErmesObjEditableObject {
   }
 }
 
+
+
+
+
+

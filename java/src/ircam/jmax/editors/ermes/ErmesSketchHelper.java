@@ -254,7 +254,7 @@ class ErmesSketchHelper extends Object{
 	DeleteConnection(aConnection);
       }
     }
-    ((ErmesSketchWindow)itsSketchPad.itsSketchWindow).DeselectionUpdateMenu();
+    itsSketchPad.GetSketchWindow().DeselectionUpdateMenu();
     itsSketchPad.ToSave();
     itsSketchPad.repaint();
   }
@@ -264,6 +264,7 @@ class ErmesSketchHelper extends Object{
     if(itsSketchPad.itsConnectingLetList.size()==0){
       if(itsSketchPad.itsConnectingLet!=null){
 	DeleteThisInOutletConn(itsSketchPad.itsConnectingLet);
+	itsSketchPad.ResetConnect();
 	return true;
       }
     }
@@ -272,6 +273,7 @@ class ErmesSketchHelper extends Object{
 	aInOutlet = (ErmesObjInOutlet)e.nextElement();
 	DeleteThisInOutletConn(aInOutlet);
       }
+      itsSketchPad.ResetConnect();
       return true;
     }
     return false;
@@ -311,16 +313,36 @@ class ErmesSketchHelper extends Object{
     }
     theInOutlet.GetConnections().removeAllElements();
     theInOutlet.ChangeState(false, false);
-    itsSketchPad.ResetConnect();
   }
 
   //--------------------------------------------------------
   //	DeselectAll
   //	deselect all the objects AND CONNECTIONS currently selected
   //--------------------------------------------------------
-  void DeselectAll() {
+  
+  public void DeselectObjects(){
     ErmesObject aObject;
-    ErmesConnection aConnection; 
+    for (Enumeration e = itsSketchPad.itsSelectedList.elements() ; e.hasMoreElements() ;) {
+      aObject = (ErmesObject) e.nextElement();
+      aObject.Deselect();
+      aObject.Paint(itsSketchPad.offGraphics);
+    }
+    itsSketchPad.itsSelectedList.removeAllElements();
+  }
+
+  public void DeselectConnections(){
+    ErmesConnection aConnection;
+    for (Enumeration e = itsSketchPad.itsSelectedConnections.elements() ; e.hasMoreElements() ;) {
+      aConnection = (ErmesConnection) e.nextElement();
+      aConnection.Deselect();
+      aConnection.Update(itsSketchPad.GetOffGraphics());
+      aConnection.Paint(itsSketchPad.GetOffGraphics());		     
+    }
+    itsSketchPad.itsSelectedConnections.removeAllElements();
+  }
+
+
+  void DeselectAll() {
     if (itsSketchPad.GetEditField() != null && itsSketchPad.GetEditField().HasFocus()) {
       itsSketchPad.GetEditField().transferFocus();
     }
@@ -332,68 +354,68 @@ class ErmesSketchHelper extends Object{
 
     if (itsSketchPad.itsSelectedList.size() == 0 && itsSketchPad.itsSelectedConnections.size() ==0 ) return;
 
-    if(itsSketchPad.itsSelectedList.size() != 0) 
-      ((ErmesSketchWindow)itsSketchPad.GetSketchWindow()).DeselectionUpdateMenu();
+    if((itsSketchPad.itsSelectedList.size() != 0)||(itsSketchPad.itsSelectedConnections.size()!=0)) 
+      itsSketchPad.GetSketchWindow().DeselectionUpdateMenu();
 
-    for (Enumeration e = itsSketchPad.itsSelectedList.elements() ; e.hasMoreElements() ;) {
-      aObject = (ErmesObject) e.nextElement();
-      aObject.Deselect();
-      aObject.Paint(itsSketchPad.offGraphics);
-    }
-    itsSketchPad.itsSelectedList.removeAllElements();
+    DeselectObjects();
     
     if(itsSketchPad.itsConnectingLet!=null) {
       itsSketchPad.itsConnectingLet.ChangeState(false, itsSketchPad.itsConnectingLet.GetConnected());
     }
     
-    for (Enumeration e = itsSketchPad.itsSelectedConnections.elements() ; e.hasMoreElements() ;) {
-      aConnection = (ErmesConnection) e.nextElement();
-      aConnection.Deselect();
-      aConnection.Update(itsSketchPad.GetOffGraphics());
-      aConnection.Paint(itsSketchPad.GetOffGraphics());		     
-    }
-    itsSketchPad.itsSelectedConnections.removeAllElements();
+    DeselectConnections();
+    
     itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());
 
   }
+
+  public void DeselectAllInEditing(ErmesObject theObject){
+    DeselectInOutlet();
+    if (itsSketchPad.itsSelectedList.size() == 0 && itsSketchPad.itsSelectedConnections.size() ==0 ) return;
+    
+    if((itsSketchPad.itsSelectedList.size() != 0)||(itsSketchPad.itsSelectedConnections.size()!=0)) 
+      itsSketchPad.GetSketchWindow().DeselectionUpdateMenu();
+
+    DeselectObjects();
+    itsSketchPad.itsSelectedList.addElement(theObject);
+    
+    if(itsSketchPad.itsConnectingLet!=null) {
+      itsSketchPad.itsConnectingLet.ChangeState(false, itsSketchPad.itsConnectingLet.GetConnected());
+    }
+    
+    DeselectConnections();
+    
+    itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());
+  }
+
   
   public void DeselectObjAndConn(){
-    ErmesObject aObject;
-    ErmesConnection aConnection; 
     if (itsSketchPad.GetEditField() != null && itsSketchPad.GetEditField().HasFocus()) {
       itsSketchPad.GetEditField().transferFocus();
     }
     if(itsSketchPad.editStatus == ErmesSketchPad.EDITING_OBJECT){
       itsSketchPad.GetEditField().LostFocus();
     }
+
+    if(itsSketchPad.itsSelectedList.size() != 0) 
+      itsSketchPad.GetSketchWindow().DeselectionUpdateMenu();
+
     if (itsSketchPad.itsSelectedList.size() == 0 && itsSketchPad.itsSelectedConnections.size() ==0 ) return;
-    for (Enumeration e = itsSketchPad.itsSelectedList.elements() ; e.hasMoreElements() ;) {
-      aObject = (ErmesObject) e.nextElement();
-      aObject.Deselect();
-      aObject.Paint(itsSketchPad.offGraphics);
-    }
-    itsSketchPad.itsSelectedList.removeAllElements();
+
+    DeselectObjects();
     
     if(itsSketchPad.itsConnectingLet!=null) {
       itsSketchPad.itsConnectingLet.ChangeState(false, itsSketchPad.itsConnectingLet.GetConnected());
     }
     
-    for (Enumeration e = itsSketchPad.itsSelectedConnections.elements() ; e.hasMoreElements() ;) {
-      aConnection = (ErmesConnection) e.nextElement();
-      aConnection.Deselect();
-      //bug 1aConnection.Repaint();
-      aConnection.Update(itsSketchPad.GetOffGraphics());
-      aConnection.Paint(itsSketchPad.GetOffGraphics());		     
-    }
-    itsSketchPad.itsSelectedConnections.removeAllElements();
+    DeselectConnections();
+
     itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());
     itsSketchPad.editStatus = itsSketchPad.DOING_NOTHING;
   }
 
 
   void DeselectAll(ErmesConnection theConnection) {
-    ErmesObject aObject;
-    ErmesConnection aConnection; 
     if (itsSketchPad.GetEditField() != null && itsSketchPad.GetEditField().HasFocus()) {
       itsSketchPad.GetEditField().transferFocus();
     }
@@ -403,28 +425,19 @@ class ErmesSketchHelper extends Object{
 
     DeselectInOutlet();
 
+    if(itsSketchPad.itsSelectedList.size() != 0) 
+      itsSketchPad.GetSketchWindow().DeselectionUpdateMenu();
+
     if (itsSketchPad.itsSelectedList.size() == 0 && itsSketchPad.itsSelectedConnections.size() ==0 ) return;
-    for (Enumeration e = itsSketchPad.itsSelectedList.elements() ; e.hasMoreElements() ;) {
-      aObject = (ErmesObject) e.nextElement();
-      aObject.Deselect();
-      aObject.Paint(itsSketchPad.offGraphics);
-    }
-    itsSketchPad.itsSelectedList.removeAllElements();
-    
+
+    DeselectObjects();
+
     if(itsSketchPad.itsConnectingLet!=null) {
       itsSketchPad.itsConnectingLet.ChangeState(false, itsSketchPad.itsConnectingLet.GetConnected());
     }
 		
-    for (Enumeration e = itsSketchPad.itsSelectedConnections.elements() ; e.hasMoreElements() ;) {
-      aConnection = (ErmesConnection) e.nextElement();
-      if(aConnection != theConnection){
-	aConnection.Deselect();
-	//bug 1aConnection.Repaint();
-	aConnection.Update(itsSketchPad.GetOffGraphics());
-	aConnection.Paint(itsSketchPad.GetOffGraphics());
-      }		     
-    }
-    itsSketchPad.itsSelectedConnections.removeAllElements();
+    DeselectConnections();
+
     itsSketchPad.itsSelectedConnections.addElement(theConnection);
     itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());
   }

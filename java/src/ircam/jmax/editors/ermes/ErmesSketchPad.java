@@ -23,7 +23,7 @@ import ircam.jmax.utils.*;
  * offscreen and much, much more...
  */
 public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionListener, MouseListener{
-  Frame itsSketchWindow;
+  ErmesSketchWindow itsSketchWindow;
   Dimension preferredSize; 
   final static int DOING_NOTHING = 0;		
   final static int START_ADD 	 = 1;
@@ -380,6 +380,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	if(!evt.isShiftDown()) itsCurrentConnection.ChangeRoutingMode();
 	else  itsCurrentConnection.ReroutingConn();
 	
+	itsSketchWindow.UpdateRoutingMenuWithSelection();
+
 	editStatus = START_SELECT;
 	ToSave();
 	repaint();
@@ -388,7 +390,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	itsSelectedConnections.addElement(itsCurrentConnection); 
 	itsCurrentConnection.Select();
 	editStatus = START_SELECT;///////
-	((ErmesSketchWindow)itsSketchWindow).UpdateRoutingMenuWithSelection();
+	itsSketchWindow.UpdateRoutingMenuWithSelection();
 	if (offScreenPresent) {
 	  itsCurrentConnection.Paint(offGraphics);
 	  CopyTheOffScreen(getGraphics());
@@ -425,12 +427,13 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	  }
 	  itsCurrentConnection.Select();
 	  itsCurrentConnection.Repaint();
-	  ((ErmesSketchWindow)itsSketchWindow).UpdateRoutingMenuWithSelection();
+	  itsSketchWindow.UpdateRoutingMenuWithSelection();
 	}
       }
       else{//se c'e' lo shift premuto
 	if(evt.getClickCount()>1){
 	  itsCurrentConnection.ReroutingConn();
+	  itsSketchWindow.UpdateRoutingMenuWithSelection();
 	  ToSave();
 	}
 	else{
@@ -445,7 +448,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	    if((itsSelectedConnections.size()) == 0)
 	      editStatus = DOING_NOTHING;
 	  }
-	  ((ErmesSketchWindow)itsSketchWindow).UpdateRoutingMenuWithSelection();
+	  itsSketchWindow.UpdateRoutingMenuWithSelection();
 	}
 	repaint();
       }	
@@ -689,7 +692,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   //	GetSketchWindow
   //--------------------------------------------------------
   
-  public Frame GetSketchWindow(){
+  public ErmesSketchWindow GetSketchWindow(){
     return itsSketchWindow;
   }
   
@@ -875,7 +878,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   //--------------------------------------------------------
   //	CONSTRUCTOR
   //--------------------------------------------------------
-  public ErmesSketchPad(Frame theSketchWindow) {    
+  public ErmesSketchPad(ErmesSketchWindow theSketchWindow) {    
     super();
     itsHelper = new ErmesSketchHelper(this);
     setLayout(null);
@@ -912,7 +915,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     setBackground(sketchColor);
     addMouseMotionListener(this);
     addMouseListener(this);
-    addKeyListener((ErmesSketchWindow)itsSketchWindow);
+    addKeyListener(itsSketchWindow);
 
     // Initialization of the "fts class"  to "graphic object" table
 
@@ -971,7 +974,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	aJustification =(Integer)aUsedJustificationVector.elementAt(0);
       else aJustification = null;
       
-      ((ErmesSketchWindow)itsSketchWindow).SelectionUpdateMenu(aFontName, aSize, aJustification);
+      itsSketchWindow.SelectionUpdateMenu(aFontName, aSize, aJustification);
     }
   }
 
@@ -1054,7 +1057,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	x = aPoint.x;
 	y = aPoint.y;
       }
-      boolean isTopPatcher = (!((ErmesSketchWindow)itsSketchWindow).isSubPatcher);
+      boolean isTopPatcher = (!itsSketchWindow.isSubPatcher);
       if (isTopPatcher && itsAddObjectName.equals("ircam.jmax.editors.ermes.ErmesObjIn") || itsAddObjectName.equals("ircam.jmax.editors.ermes.ErmesObjOut")) {
 	//forbidden to add such objects in a top level patch
 	ErrorDialog aErr = new ErrorDialog(itsSketchWindow, "Can't instantiate inlets/outlets in a Top level patcher");
@@ -1142,7 +1145,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	    aConnection.Select();
 	    aConnection.Paint(offGraphics);
 	    itsSelectedConnections.addElement(aConnection);
-	    ((ErmesSketchWindow)itsSketchWindow).UpdateRoutingMenuWithSelection();
+	    itsSketchWindow.UpdateRoutingMenuWithSelection();
 	  }
 	}	
 
@@ -1182,12 +1185,16 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	if(e.getClickCount() == 1){
 	  if(oldEditStatus == START_SELECT){
 	    if(itsCurrentObject instanceof ErmesObjEditableObject){
-	      if(clickHappenedOnAnAlreadySelected) 
+	      if(clickHappenedOnAnAlreadySelected) {
+		itsHelper.DeselectAllInEditing(itsCurrentObject);
 		((ErmesObjEditableObject)itsCurrentObject).RestartEditing();
+	      }
 	    }
 	    else if(itsCurrentObject instanceof ErmesObjComment){
-	      if(clickHappenedOnAnAlreadySelected) 
+	      if(clickHappenedOnAnAlreadySelected) {
+		itsHelper.DeselectAllInEditing(itsCurrentObject);
 		((ErmesObjComment)itsCurrentObject).RestartEditing();
+	      }
 	    }
 	  }
 	}
@@ -1227,8 +1234,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   ////////////////////////////////////////////////////////////mouseListener--fine
   
   public boolean DynamicScrolling(int theX, int theY){
-    Adjustable aHAdjustable =((ErmesSketchWindow)itsSketchWindow).itsScrollerView.getHAdjustable();
-    Adjustable aVAdjustable =((ErmesSketchWindow)itsSketchWindow).itsScrollerView.getVAdjustable();
+    Adjustable aHAdjustable =itsSketchWindow.itsScrollerView.getHAdjustable();
+    Adjustable aVAdjustable =itsSketchWindow.itsScrollerView.getVAdjustable();
     if(theX>=aHAdjustable.getVisibleAmount()+aHAdjustable.getValue()){
       aHAdjustable.setValue(aHAdjustable.getValue()+aHAdjustable.getUnitIncrement());
       return true;
@@ -1401,7 +1408,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       itsSelectedConnections.addElement(aConnection);
       aConnection.Select();
     }
-    ((ErmesSketchWindow)itsSketchWindow).UpdateRoutingMenuWithSelection();
+    itsSketchWindow.UpdateRoutingMenuWithSelection();
     repaint();
   }
 
@@ -1523,7 +1530,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   void PrepareInChoice() {
     if (itsInChoice != null) return; //it's OK, we did it already
     
-    int temp = ((ErmesSketchWindow)itsSketchWindow).itsPatcher.getNumberOfInlets();
+    int temp = itsSketchWindow.itsPatcher.getNumberOfInlets();
     itsInChoice = new ErmesObjInOutChoice();
     for (int i=0; i<temp; i++) {
       itsInChoice.addItem(Integer.toString(i+1));
@@ -1536,7 +1543,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   void PrepareOutChoice() {
     if (itsOutChoice != null) return; //it's OK, we did it already
     
-    int temp = ((ErmesSketchWindow)itsSketchWindow).itsPatcher.getNumberOfOutlets();
+    int temp = itsSketchWindow.itsPatcher.getNumberOfOutlets();
     itsOutChoice = new ErmesObjInOutChoice();
     for (int i=0; i<temp; i++) {
       itsOutChoice.addItem(Integer.toString(i+1));
@@ -1762,13 +1769,11 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   }
 
   public void ToSave(){
-    ErmesSketchWindow aSketchWindow = (ErmesSketchWindow)itsSketchWindow;
-
-    if(aSketchWindow.isSubPatcher){
-      if(aSketchWindow.itsTopWindow!=null) 
-	aSketchWindow.itsTopWindow.itsSketchPad.ToSave();
+    if(itsSketchWindow.isSubPatcher){
+      if(itsSketchWindow.itsTopWindow!=null) 
+	itsSketchWindow.itsTopWindow.itsSketchPad.ToSave();
     }
-    else aSketchWindow.ToSave();
+    else itsSketchWindow.ToSave();
   }
 
 

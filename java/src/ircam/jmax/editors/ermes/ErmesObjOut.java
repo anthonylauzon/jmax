@@ -45,7 +45,7 @@ class ErmesObjOut extends ErmesObject {
     //the sketchPad represents a subpatcher. 
     //We need here the information about the maximum number of inlets
   	
-    int temp = ((ErmesSketchWindow)theSketchPad.itsSketchWindow).itsDocument.itsPatcher.getNumberOfOutlets();
+    int temp = theSketchPad.GetSketchWindow().itsDocument.itsPatcher.getNumberOfOutlets();
     Dimension d = getPreferredSize();
     currentRect = new Rectangle(x, y, d.width, d.height);
 

@@ -43,3 +43,7 @@ SSOURCES = \
           ErmesObject.java \
 
 SOURCES = $(SSOURCES) $(DSOURCES) 
+
+
+
+

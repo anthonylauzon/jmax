@@ -37,7 +37,7 @@ public class ErmesSwVarEdit extends JPanel implements ActionListener{
 
     setDoubleBuffered(/*3.true*/false);
     JButton addButton = new JButton("Add");
-    addButton.addActionListener((ErmesSketchWindow)theSketchPad.itsSketchWindow);
+    addButton.addActionListener(theSketchPad.GetSketchWindow());
     JButton deleteButton = new JButton("Delete");
     JButton editButton = new JButton("Edit");
     JToolBar aToolBar = new JToolBar();
