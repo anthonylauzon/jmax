@@ -26,6 +26,8 @@
 ## package declaration
 package provide system
 
+package require reftype
+
 # load dynamic libraries into the server
 global jmaxArch jmaxMode
 ucs load module system $dir/c/lib/$jmaxArch/$jmaxMode/libsystem.so
