@@ -443,7 +443,7 @@ serial_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void 
 serial_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof( serial_t), serial_init, serial_delete, 0);
+  fts_class_init(cl, sizeof( serial_t), serial_init, serial_delete);
   fts_bytestream_class_init(cl);
 
   fts_class_message_varargs(cl, fts_s_sched_ready, serial_read);
