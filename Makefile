@@ -32,6 +32,7 @@ include VERSION
 version=$(MAJOR).$(MINOR).$(PATCH_LEVEL)$(SNAPSHOT)
 disttag=V$(MAJOR)_$(MINOR)_$(PATCH_LEVEL)$(SNAPSHOT)
 distdir=jmax-$(version)
+distfile=jmax-$(version)-src.tar.gz
 
 all:
 	(cd fts; $(MAKE) all)
@@ -145,7 +146,7 @@ TAGS:
 #
 cvs-tag:
 	if cvs -n update 2>&1 | egrep -s '^[UARMC] ' ; then \
-		echo "not sync with cvs (update or commit)" ; exit 1 \
+		echo "not sync with cvs (update or commit)" ; exit 1 ; \
 	fi
 	cvs tag -F $(disttag)
 .PHONY: cvs-tag
@@ -163,15 +164,15 @@ spec_files:
 # dist
 # does a cvs export and a .tar.gz of the sources
 #
-dist: spec_files cvs-tag 
+src-dist: spec_files cvs-tag 
 	rm -rf $(distdir)
 	umask 22
 	mkdir $(distdir)
 	cvs export -r $(disttag) -d $(distdir) max
-	tar cvf - $(distdir) | gzip -c --best > $(distdir).tar.gz 
-	chmod 644 $(distdir).tar.gz 
+	tar cvf - $(distdir) | gzip -c --best > $(distfile)
+	chmod 644 $(distfile)
 	rm -rf $(distdir)
-.PHONY: dist
+.PHONY: src-dist
 
 #
 # install
