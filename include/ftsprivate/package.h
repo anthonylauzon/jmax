@@ -116,6 +116,8 @@ struct fts_package {
 
   fts_list_t* data_paths;
 
+  fts_list_t* package_paths;
+
   fts_list_t* windows;
 
   fts_symbol_t config;
@@ -309,6 +311,15 @@ fts_symbol_t fts_package_get_help(fts_package_t* pkg, fts_symbol_t name);
  * @param path the path 
  * @ingroup package */
 void fts_package_add_data_path(fts_package_t* pkg, fts_symbol_t path);
+
+/**
+ * Defines a new package path.
+ *
+ * @fn void fts_package_add_package_path(fts_package_t* pkg, fts_symbol_t path)
+ * @param pkg the package
+ * @param path the path 
+ * @ingroup package */
+void fts_package_add_package_path(fts_package_t* pkg, fts_symbol_t path);
 
 /**
  * Returns the full path of specified file name. 

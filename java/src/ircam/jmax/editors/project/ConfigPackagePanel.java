@@ -124,6 +124,14 @@ public class ConfigPackagePanel extends JPanel implements Editor
     templateScrollPane = new JScrollPane( templateTable);
     templateScrollPane.setPreferredSize(new Dimension( DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
+    /******** PackagePaths Panel ******************************************/
+
+    packagePathList = new JList( packagePathModel);
+    packagePathList.setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
+    
+    packagePathScrollPane = new JScrollPane( packagePathList);
+    packagePathScrollPane.setPreferredSize(new Dimension( DEFAULT_WIDTH, DEFAULT_HEIGHT));
+
     /******** Help Panel ******************************************/
     
     helpTable = new JTable(helpModel);
@@ -197,6 +205,10 @@ public class ConfigPackagePanel extends JPanel implements Editor
     tabbedPane = new JTabbedPane();
     tabbedPane.setBorder( BorderFactory.createEtchedBorder());
     tabbedPane.addTab("Packages", requiresScrollPane);
+    
+    if (ftsPkg instanceof FtsProject)
+      tabbedPane.addTab("Package Path", packagePathScrollPane);
+    
     tabbedPane.addTab("Template Path", templPathScrollPane);
     tabbedPane.addTab("Data Path", dataPathScrollPane);
     tabbedPane.addTab("Templates", templateScrollPane);         
@@ -255,6 +267,11 @@ public class ConfigPackagePanel extends JPanel implements Editor
     for(Enumeration e = pkg.getRequires(); e.hasMoreElements();)
       requiresModel.addRow(e.nextElement(), Boolean.TRUE);    
 
+    packagePathModel = new DefaultListModel();
+
+    for(Enumeration e = pkg.getPackagePaths(); e.hasMoreElements();)
+      packagePathModel.addElement(e.nextElement());    
+
     templPathModel = new DefaultListModel();
 
     for(Enumeration e = pkg.getTemplatePaths(); e.hasMoreElements();)
@@ -301,18 +318,22 @@ public class ConfigPackagePanel extends JPanel implements Editor
     requiresTable.getColumnModel().getColumn(1).setResizable( false);
     requiresTable.revalidate();
     
+    packagePathList.setModel( packagePathModel);
+    packagePathList.revalidate();
+    
     templPathList.setModel( templPathModel);
     templPathList.revalidate();
     
     dataPathList.setModel( dataPathModel);
     dataPathList.revalidate();
-    revalidate();    
     
     templateTable.setModel( templateModel);
     templateTable.revalidate();
 
     helpTable.setModel( helpModel);
     helpTable.revalidate();
+
+    revalidate();    
 
     tabbedPane.setSelectedIndex(0);    
     if( ftsPkg instanceof FtsProject)
@@ -328,6 +349,18 @@ public class ConfigPackagePanel extends JPanel implements Editor
       tabbedPane.setEnabledAt( 5, false);
     
     window.pack();
+  }
+
+  public void packagePathChanged()
+  {
+    packagePathModel = new DefaultListModel();
+
+    for(Enumeration e = ftsPkg.getPackagePaths(); e.hasMoreElements();)
+      packagePathModel.addElement(e.nextElement());   
+    
+    packagePathList.setModel( packagePathModel);
+    packagePathList.revalidate();
+    revalidate();    
   }
 
   public void dataPathChanged()
@@ -413,6 +446,9 @@ public class ConfigPackagePanel extends JPanel implements Editor
     if( selected == requiresScrollPane)
       requiresModel.addRow( requiresTable.getSelectedRow());
     else
+      if( selected == packagePathScrollPane)
+        chooseAndAddPath( packagePathModel, "package_path", packagePathList.getSelectedIndex());
+    else
       if( selected == templPathScrollPane)
 	chooseAndAddPath( templPathModel, "template_path", templPathList.getSelectedIndex());
       else
@@ -432,42 +468,58 @@ public class ConfigPackagePanel extends JPanel implements Editor
     if( selected == requiresScrollPane)
       requiresModel.removeRow( requiresTable.getSelectedRow());
     else
-      if( selected == templPathScrollPane)
-	{
-	  index = templPathList.getSelectedIndex();
-	  if( index == -1)
-	    {
-	      size = templPathList.getModel().getSize(); 
-	      index = size-1;
-	    }
-
-	  if(index >= 0)
-	    {
-	      templPathModel.removeElementAt( index);	  
-	      ftsPkg.set( "template_path", templPathModel.elements());
-	    }      
-	}
-      else
-	if( selected == dataPathScrollPane)
-	  {
-	    index = dataPathList.getSelectedIndex();
-	    if( index == -1)
+      if( selected == packagePathScrollPane)
+        {
+            index = packagePathList.getSelectedIndex();
+            if( index == -1)
 	      {
-		size = dataPathList.getModel().getSize(); 
+		size = packagePathList.getModel().getSize(); 
 		index = size-1;
 	      }
 
 	    if(index >= 0)
 	      {
-		dataPathModel.removeElementAt( index);
-		ftsPkg.set( "data_path", dataPathModel.elements());
+		packagePathModel.removeElementAt( index);
+		ftsPkg.set( "package_path", packagePathModel.elements());
 	      }
-	  }
+        }
 	else
-	  if( selected == templateScrollPane)
-	    templateModel.removeRow( templateTable.getSelectedRow());
-	  else
-	    helpModel.removeRow( helpTable.getSelectedRow());
+          if( selected == templPathScrollPane)
+            {
+                index = templPathList.getSelectedIndex();
+                if( index == -1)
+                {
+                    size = templPathList.getModel().getSize(); 
+                    index = size-1;
+                }
+
+                if(index >= 0)
+                {
+                    templPathModel.removeElementAt( index);	  
+                    ftsPkg.set( "template_path", templPathModel.elements());
+                }      
+            }
+        else
+            if( selected == dataPathScrollPane)
+            {
+                index = dataPathList.getSelectedIndex();
+                if( index == -1)
+                {
+                    size = dataPathList.getModel().getSize(); 
+                    index = size-1;
+                }
+
+                if(index >= 0)
+                {
+                    dataPathModel.removeElementAt( index);
+                    ftsPkg.set( "data_path", dataPathModel.elements());
+                }
+            }
+            else
+                if( selected == templateScrollPane)
+                    templateModel.removeRow( templateTable.getSelectedRow());
+                else
+                    helpModel.removeRow( helpTable.getSelectedRow());
   }
 
   /*********************************************************
@@ -968,12 +1020,12 @@ public class ConfigPackagePanel extends JPanel implements Editor
   private JTabbedPane tabbedPane;
   private JTable requiresTable, templateTable, helpTable;
   private JButton addButton, deleteButton;
-  private JList templPathList, dataPathList;
-  private JScrollPane requiresScrollPane, templPathScrollPane, dataPathScrollPane, helpScrollPane, templateScrollPane;
+  private JList packagePathList, templPathList, dataPathList;
+  private JScrollPane requiresScrollPane, packagePathScrollPane, templPathScrollPane, dataPathScrollPane, helpScrollPane, templateScrollPane;
   private RequiresTableModel requiresModel;
   private HelpTableModel helpModel;
   private TemplateTableModel templateModel;
-  private DefaultListModel templPathModel, dataPathModel;
+  private DefaultListModel packagePathModel, templPathModel, dataPathModel;
   private Window window;
   private FtsPackage ftsPkg;
   private JFileChooser fileChooser = new JFileChooser(); 

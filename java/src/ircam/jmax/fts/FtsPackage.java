@@ -40,6 +40,12 @@ public class FtsPackage extends FtsObjectWithEditor
 	  ((FtsPackage)obj).addRequires( args.getLength(), args.getAtoms());
 	}
       });
+    FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("package_path"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPackage)obj).addPackagePath( args.getLength(), args.getAtoms());
+	}
+      });  
     FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("template_path"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
@@ -86,9 +92,8 @@ public class FtsPackage extends FtsObjectWithEditor
 	}
       });
     FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("uploadDone"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	
-{
+	public void invoke( FtsObject obj, FtsArgs args)	
+       {
 	  ((FtsPackage)obj).uploadDone();
 	}
       });
@@ -105,6 +110,7 @@ public class FtsPackage extends FtsObjectWithEditor
     super(JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), FtsSymbol.get("package"));
 
     requires = new Vector();
+    packagePaths = new Vector();
     templatePaths = new Vector();
     absPaths = new Vector();
     dataPaths = new Vector();
@@ -117,6 +123,7 @@ public class FtsPackage extends FtsObjectWithEditor
     super(server, parent, id);
 
     requires = new Vector();
+    packagePaths = new Vector();
     templatePaths = new Vector();
     absPaths = new Vector();
     dataPaths = new Vector();
@@ -225,6 +232,7 @@ public class FtsPackage extends FtsObjectWithEditor
   public void update()
   {
     requires.removeAllElements();
+    packagePaths.removeAllElements();
     templatePaths.removeAllElements();
     dataPaths.removeAllElements();
     templates.removeAllElements();
@@ -265,6 +273,17 @@ public class FtsPackage extends FtsObjectWithEditor
   void addPackage(String pkgName, int id)
   {
     requires.addElement(pkgName);
+  }
+     
+  void addPackagePath(int nArgs, FtsAtom[] args)
+  {
+    packagePaths.removeAllElements();
+
+    for(int i = 0; i<nArgs; i++)
+      packagePaths.addElement( args[i].symbolValue.toString());
+
+    if( listener != null)
+      listener.packagePathChanged();
   }
 
   void addTemplatePath(int nArgs, FtsAtom[] args)
@@ -375,6 +394,11 @@ public class FtsPackage extends FtsObjectWithEditor
   {
     return requires.elements();
   }
+  
+  public Enumeration getPackagePaths()
+  {
+    return packagePaths.elements();
+  }
 
   public Enumeration getTemplatePaths()
   {
@@ -407,7 +431,7 @@ public class FtsPackage extends FtsObjectWithEditor
     public String name, fileName;
   }
 
-  private Vector requires, templatePaths, absPaths, dataPaths, templates, helpPatches;
+  private Vector requires, packagePaths, templatePaths, absPaths, dataPaths, templates, helpPatches;
   private String name;
   private String fileName;
   private String dir;

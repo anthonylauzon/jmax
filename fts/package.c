@@ -79,6 +79,7 @@ static void fts_package_load_default_files(fts_package_t* pkg);
 static void fts_package_upload_requires(fts_package_t* pkg);
 static void fts_package_upload_template_paths( fts_package_t* pkg);
 static void fts_package_upload_data_paths( fts_package_t* pkg);
+static void fts_package_upload_package_paths( fts_package_t* pkg);
 static void fts_package_upload_help( fts_package_t* pkg);
 static void fts_package_upload_templates( fts_package_t* pkg);
 static void fts_package_upload_windows( fts_package_t* pkg);
@@ -400,6 +401,25 @@ void
 fts_package_get_required_packages(fts_package_t* pkg, fts_iterator_t* iter)
 {
   fts_list_get_values(pkg->packages, iter);
+}
+
+/********************************************************************
+ *
+ *   - package path 
+ */
+
+void 
+fts_package_add_package_path(fts_package_t* pkg, fts_symbol_t path)
+{
+  fts_atom_t n;
+
+  fts_set_symbol(&n, path);
+  pkg->package_paths = fts_list_append(pkg->package_paths, &n);
+  
+  if (fts_package_paths == NULL) {
+    fts_init_package_paths();
+  }
+  fts_package_paths = fts_list_append(fts_package_paths, &n);
 }
 
 /********************************************************************
@@ -852,6 +872,29 @@ __fts_package_template_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   fts_package_set_dirty( pkg, 1);
 }
 
+
+static void 
+__fts_package_package_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+  int i;
+  fts_symbol_t path;
+
+  pkg->package_paths = NULL;  
+
+  for (i = 0; i < ac; i++) {
+    if (fts_is_symbol(&at[i])) {
+      path = fts_package_make_relative_path(pkg, fts_get_symbol(&at[i]));
+      fts_package_add_package_path(pkg, path);
+    }
+  }
+
+  if( fts_object_has_id( o) && pkg->package_paths)
+    fts_package_upload_package_paths( pkg);
+
+  fts_package_set_dirty( pkg, 1);
+}
+
 static void 
 __fts_package_data_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1005,6 +1048,9 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
   fts_bmax_code_new_object( &f, o, -1);
 
+  if ( this->package_paths)
+    fts_package_save_list( &f, this->package_paths, fts_s_package_path);
+
   if ( this->packages)
     fts_package_save_list( &f, this->packages, fts_s_require);
 
@@ -1013,7 +1059,7 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
   if ( this->data_paths)
     fts_package_save_list( &f, this->data_paths, fts_s_data_path);
-
+    
   if(( this->declared_templates) &&  fts_hashtable_get_size(this->declared_templates))
     {
       fts_atom_t* a;
@@ -1120,6 +1166,10 @@ __fts_package_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   if ( this->data_paths) {
     fts_package_print_list( this->data_paths, fts_s_data_path);
   }
+  
+  if ( this->package_paths) {
+    fts_package_print_list( this->package_paths, fts_s_package_path);
+  }
 
   if ( this->declared_templates) {
     fts_package_print_hashtable( this->declared_templates, fts_s_template, fun_template);
@@ -1185,6 +1235,8 @@ __fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
   pkg->data_paths = NULL;
 
+  pkg->package_paths = NULL;
+
   pkg->windows = NULL;
 
   pkg->config = NULL;
@@ -1196,6 +1248,9 @@ __fts_package_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   fts_package_t* pkg = (fts_package_t *)o;
   if (pkg->packages != NULL) {
     fts_list_delete(pkg->packages);
+  }
+  if (pkg->package_paths != NULL) {
+    fts_list_delete(pkg->package_paths);
   }
   if (pkg->data_paths != NULL) {
     fts_list_delete(pkg->data_paths);
@@ -1265,6 +1320,14 @@ fts_package_upload_requires( fts_package_t *this)
     }
   
   fts_client_done_message( (fts_object_t *)this);    
+}
+
+static void 
+fts_package_upload_package_paths( fts_package_t *this)
+{
+  fts_iterator_t i;
+  fts_list_get_values( this->package_paths, &i);
+  fts_package_send_list( (fts_object_t *)this, i, fts_s_package_path);
 }
 
 static void 
@@ -1345,6 +1408,9 @@ __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 
   if ( this->packages)
     fts_package_upload_requires( this);
+
+  if ( this->package_paths)
+    fts_package_upload_package_paths( this);
 
   if ( this->template_paths)
     fts_package_upload_template_paths( this);
@@ -1438,6 +1504,7 @@ fts_package_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("remove_template"), __fts_package_template_remove);
   fts_class_message_varargs(cl, fts_s_template_path, __fts_package_template_path);
   fts_class_message_varargs(cl, fts_s_data_path, __fts_package_data_path);
+  fts_class_message_varargs(cl, fts_s_package_path, __fts_package_package_path);
   fts_class_message_varargs(cl, fts_s_help, __fts_package_help);
   fts_class_message_varargs(cl, fts_s_save, __fts_package_save);
   fts_class_message_varargs(cl, fts_new_symbol("save_windows"), __fts_package_save_windows);
