@@ -242,10 +242,10 @@ check_symbol_in( fts_symbol_t s, fts_symbol_t *symbols)
   return 0;
 }
 
-static fts_symbol_t want_a_space_before_symbols[] = {"+", "-", "*", "/", "%", "&&", "&", "||", "|", "==", "=", "!=", "!", ">=", "^", ">>", ">", "<<", "<=", "<", "?", "::", ":", 0 };
-static fts_symbol_t dont_want_a_space_before_symbols[] = {")", "[", "]", "}", ",", ";", ".", "=", 0};
-static fts_symbol_t want_a_space_after_symbols[] = { "+", "-", "*", "/", "%", ",", "&&", "&", "||", "|", "==", "=", "!=", "!", ">=", ">>", ">", "<<", "<=", "<", "?", "::", ":", "^", ";", 0 };
-static fts_symbol_t dont_want_a_space_after_symbols[] = { "(", "[", "{", "$", "'", "." , "=", 0 };
+static fts_symbol_t want_a_space_before_symbols[] = {"+", "-", "*", "/", "%", "&&", "&", "||", "|", "==", "=", "!=", "!", ">=", "^", ">>", ">", "<<", "<=", "<", "?", 0 };
+static fts_symbol_t dont_want_a_space_before_symbols[] = {")", "[", "]", "}", ",", ";", ".", "=", ":", 0};
+static fts_symbol_t want_a_space_after_symbols[] = { "+", "-", "*", "/", "%", ",", "&&", "&", "||", "|", "==", "=", "!=", "!", ">=", ">>", ">", "<<", "<=", "<", "?", "^", ";", 0 };
+static fts_symbol_t dont_want_a_space_after_symbols[] = { "(", "[", "{", "$", "'", "." , "=", ":", 0 };
 static fts_symbol_t operators[] = { "$", ";", ",", "+", "-", "*", "/", "(", ")", "[", "]", "{", "}", ".", "%", "<<", ">>", "&&", "||", "!", "==", "!=", ">", ">=", "<", "<=", ":", "=", 0};
 
 static void init_punctuation( void)
@@ -429,7 +429,20 @@ fts_spost_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t *at)
 
 void fts_spost_object_description( fts_bytestream_t *stream, fts_object_t *obj)
 {
-  fts_spost_object_description_args( stream, fts_object_get_description_size( obj), fts_object_get_description_atoms( obj));
+  int ac;
+  fts_atom_t *at;
+
+  ac = fts_object_get_description_size( obj);
+  at = fts_object_get_description_atoms( obj);
+
+  /* skip the leading : only if it is the first atom */
+  if ( ac > 0 && fts_is_symbol( at) && fts_get_symbol( at) == fts_s_colon) 
+    {
+      ac--;
+      at++;
+    }
+
+  fts_spost_object_description_args( stream, ac, at);
 }
 
 void fts_spost_object_description_args( fts_bytestream_t *stream, int ac, fts_atom_t *at)

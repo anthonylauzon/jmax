@@ -203,19 +203,21 @@ static void expression_stack_print( fts_expression_t *exp, const char *msg)
       fprintf( stderr, "[%2d] ", i);
       if ( i == fp - FRAME_OFFSET)
 	{
-	  fprintf( stderr, "%-6s %d\n", "FP", fts_get_int( p+i));
+	  fprintf( stderr, "%-7s %d\n", "FP", fts_get_int( p+i));
 	  fp = fts_get_int( p+i);
 	}
       else if (fts_is_int( p+i))
-	fprintf( stderr, "%-6s %d\n", "INT", fts_get_int(p+i));
+	fprintf( stderr, "%-7s %d\n", "INT", fts_get_int(p+i));
       else if (fts_is_float( p+i))
-	fprintf( stderr, "%-6s %g\n", "FLOAT", fts_get_float(p+i));
+	fprintf( stderr, "%-7s %g\n", "FLOAT", fts_get_float(p+i));
       else if (fts_is_void( p+i))
-	fprintf( stderr, "%-6s\n", "VOID");
+	fprintf( stderr, "%-7s\n", "VOID");
       else if (fts_is_symbol( p+i))
-	fprintf( stderr, "%-6s %s\n", "SYMBOL", fts_get_symbol(p+i));
+	fprintf( stderr, "%-7s %s\n", "SYMBOL", fts_get_symbol(p+i));
       else if (fts_is_object( p+i))
-	fprintf( stderr, "%-6s %s\n", "OBJECT", fts_object_get_class_name( fts_get_object(p+i)));
+	fprintf( stderr, "%-7s %s\n", "OBJECT", fts_object_get_class_name( fts_get_object(p+i)));
+      else if (fts_is_pointer( p+i))
+	fprintf( stderr, "%-7s %p\n", "POINTER", fts_get_pointer(p+i));
     }
 }
 #endif
@@ -342,9 +344,6 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
   fts_atom_t *at, *top, ret[1];
   fts_status_t status;
   fts_tuple_t *tuple;
-  fts_metaclass_t *mcl;
-  fts_object_t *obj;
-
 
   if (!tree)
     return fts_ok;
@@ -415,39 +414,27 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     break;
 
   case TK_COLON:
-    {
-      /* is class cached ? */
-      if (fts_is_pointer( &tree->value))
-	mcl = fts_get_pointer( &tree->value);
-      else
-	{
-	  fts_symbol_t package_name = (tree->left) ? fts_get_symbol( &tree->left->value) : NULL;
+    /* for now, metaclasses are returned as pointers.
+       Once moved to classes, they will be returned as objects of the class "class"
+    */
 
-	  mcl = fts_metaclass_get_by_name( package_name, fts_get_symbol( &tree->value));
-	  if ( !mcl)
-	    return undefined_class_error;
-	  fts_set_pointer( &tree->value, mcl);
-	}
+    /* is class cached ? */
+    if (fts_is_pointer( &tree->value))
+      expression_stack_push( exp, &tree->value);
+    else
+      {
+	fts_symbol_t package_name = (tree->left) ? fts_get_symbol( &tree->left->value) : NULL;
+	fts_symbol_t class_name = fts_get_symbol( &tree->right->value);
+	fts_metaclass_t *mcl = fts_metaclass_get_by_name( package_name, class_name);
 
-      expression_stack_push_frame( exp);
+	if ( !mcl)
+	  return undefined_class_error;
 
-      if ((status = expression_eval_aux( tree->left, exp, env_ac, env_at, callback, data, 0)) != fts_ok)
-	return status;
-      if ((status = expression_eval_aux( tree->right, exp, env_ac, env_at, callback, data, 0)) != fts_ok)
-	return status;
+	fts_set_pointer( &tree->value, mcl);
+	
+	expression_stack_push( exp, &tree->value);
+      }
 
-      ac = expression_stack_frame_count( exp);
-      at = expression_stack_frame( exp);
-      expression_stack_pop_frame( exp);
-
-      obj = fts_metaclass_new_instance( mcl, NULL, ac, at);
-
-      if (!obj)
-	return object_creation_failed_error;
-
-      fts_set_object( ret, obj);
-      expression_stack_push( exp, ret);
-    }
     break;
 
   case TK_DOLLAR:
@@ -695,6 +682,8 @@ static void expression_print_aux( fts_parsetree_t *tree, int indent)
   case TK_GREATER_EQUAL: fprintf( stderr, ">=\n"); break;
   case TK_SMALLER: fprintf( stderr, "<\n"); break;
   case TK_SMALLER_EQUAL: fprintf( stderr, "<=\n"); break;
+  case TK_COLON: fprintf( stderr, ":\n"); break;
+  default: fprintf( stderr, "UNKNOWN %d\n", tree->token); 
   }
 
   expression_print_aux( tree->left, indent+1);

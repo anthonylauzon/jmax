@@ -44,8 +44,9 @@ typedef struct fts_binary_file_header_t {
   unsigned long n_symbols;
 } fts_binary_file_header_t;
 
-/* magic word is 'bMax' */
-#define FTS_BINARY_FILE_MAGIC 0x624D6178
+/* Magic numbers */
+#define FTS_BINARY_FILE_MAGIC_V1 0x624D6178  /* 'bMax' */
+#define FTS_BINARY_FILE_MAGIC_V2 0x624D6132  /* 'bMa2' */
 
 /*
  * Opcode of the bmax stack machine

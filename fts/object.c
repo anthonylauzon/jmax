@@ -22,6 +22,11 @@
 
 #include <stdarg.h>
 
+#include <ftsconfig.h>
+#if HAVE_ALLOCA_H
+#include <alloca.h>
+#endif
+
 #include <fts/fts.h>
 #include <ftsprivate/abstraction.h>
 #include <ftsprivate/client.h>
@@ -239,6 +244,17 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
 	  return;
 	}
 
+      if (ac >= 1 && fts_is_pointer( at))
+	{
+	  fts_metaclass_t *mcl = (fts_metaclass_t *)fts_get_pointer( at);
+
+	  eval_data->obj = fts_metaclass_new_instance( mcl, eval_data->patcher, ac-1, at+1);
+	  if (eval_data->obj == NULL)
+	    eval_data->obj = fts_error_object_new( eval_data->patcher, ac, at, "Error in class instantiation");
+
+	  return;
+	}
+
       eval_data->obj = fts_error_object_new( eval_data->patcher, ac, at, "No valid class name");
     }
   else
@@ -267,6 +283,8 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
   fts_expression_t *expression;
   struct eval_data data;
   fts_status_t status;
+  int new_ac;
+  fts_atom_t *new_at;
 
   if (ac == 0)
     {
@@ -279,10 +297,28 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
   data.obj = NULL;
   data.patcher = patcher;
 
-  if ((status = fts_expression_new( ac, at, patcher, &expression)) != fts_ok)
+  if ( (fts_is_symbol( at) && fts_get_symbol( at) == fts_s_colon) 
+       || (ac >= 2 && fts_is_symbol( at+1) && fts_get_symbol( at+1) == fts_s_colon))
     {
-      obj = fts_error_object_new( patcher, ac, at, fts_status_get_description( status));
-      fts_object_set_description(obj, ac, at);
+      new_ac = ac;
+      new_at = (fts_atom_t *)at;
+    }
+  else
+    {
+      int i;
+
+      new_ac = ac+1;
+      new_at = alloca( new_ac * sizeof (fts_atom_t));
+
+      fts_set_symbol( new_at, fts_s_colon);
+      for ( i = 0; i < ac; i++)
+	new_at[i+1] = at[i];
+    }
+
+  if ((status = fts_expression_new( new_ac, new_at, patcher, &expression)) != fts_ok)
+    {
+      obj = fts_error_object_new( patcher, new_ac, new_at, fts_status_get_description( status));
+      fts_object_set_description(obj, new_ac, new_at);
       CHECK_ERROR_PROPERTY(obj);
       return obj;
     }
@@ -290,13 +326,13 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
   if ((status = fts_expression_reduce( expression, 0, 0, eval_object_description_expression_callback, &data)) == fts_ok)
     {
       obj = data.obj;
-      fts_object_set_description(obj, ac, at);
+      fts_object_set_description(obj, new_ac, new_at);
       CHECK_ERROR_PROPERTY(obj);
       return obj;
     }      
 
-  obj = fts_error_object_new( patcher, ac, at, fts_status_get_description( status));
-  fts_object_set_description(obj, ac, at);
+  obj = fts_error_object_new( patcher, new_ac, new_at, fts_status_get_description( status));
+  fts_object_set_description(obj, new_ac, new_at);
   CHECK_ERROR_PROPERTY(obj);
   return obj;
 }

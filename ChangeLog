@@ -1,3 +1,15 @@
+2002-09-30  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* changed bmax file magic number. It is now bMa2 (was bMax) and the 
+	version number is passed to the loader. This is necessary for compatibility
+	w.r.t. 2 things:
+	 - the : is now part of the object description and is saved (it is skipped
+	in the display of the object description)
+	 - the variables that will be defined by a "define" object
+	bMa2 files will not be loadable by jMax version 3.x or before. bMax files can
+	be loaded inside jMax 4 and a compatibility layer handles conversion of the
+	object description.
+
 2002-09-26  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* reimplemented fts message system (API to be documented)...

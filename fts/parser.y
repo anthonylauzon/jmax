@@ -71,7 +71,6 @@ fts_status_t syntax_error_status = &syntax_error_status_description;
 %token <a> TK_FLOAT
 %token <a> TK_SYMBOL
 %token TK_SEMI
-%token TK_COLON
 %token TK_PAR
 %token TK_OPEN_PAR
 %token TK_CLOSED_PAR
@@ -218,14 +217,10 @@ variable: TK_DOLLAR TK_SYMBOL
 		{ $$ = fts_parsetree_new( TK_DOLLAR, &($2), 0, 0); }
 ;
 
-class: TK_SYMBOL TK_COLON class_name /*---*/ %prec TK_COLON
-		{ $$ = fts_parsetree_new( TK_COLON, 0, $3, fts_parsetree_new( TK_SYMBOL, &($1), 0, 0)); }
-	| TK_COLON class_name /*---*/ %prec TK_COLON
-		{
-		  fts_atom_t a;
-		  fts_set_symbol( &a, NULL);
-		  $$ = fts_parsetree_new( TK_COLON, 0, $2, fts_parsetree_new( TK_SYMBOL, &a, 0, 0));
-		}
+class: TK_SYMBOL TK_COLON class_name
+		{ $$ = fts_parsetree_new( TK_COLON, 0, fts_parsetree_new( TK_SYMBOL, &($1), 0, 0), $3); }
+	| TK_COLON class_name
+		{ $$ = fts_parsetree_new( TK_COLON, 0, 0, $2); }
 ;
 
 class_name: TK_SYMBOL
@@ -607,6 +602,7 @@ static void parsetree_print_aux( fts_parsetree_t *tree, int indent)
   case TK_GREATER_EQUAL: fprintf( stderr, ">=\n"); break;
   case TK_SMALLER: fprintf( stderr, "<\n"); break;
   case TK_SMALLER_EQUAL: fprintf( stderr, "<=\n"); break;
+  default: fprintf( stderr, "UNKNOWN %d\n", tree->token); 
   }
 
   parsetree_print_aux( tree->left, indent+1);
