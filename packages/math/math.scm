@@ -28,7 +28,7 @@
 (ucs "load" "module" "math" (file-cat dir "c" "lib" (libname "math")))
 
 ;; help
-(sshh-load (file-cat dir "help" "math.help.index.scm"))
+(load-silently (file-cat dir "help" "math.help.index.scm"))
 (help-summary "math summary" (file-cat dir "help" "math.summary.jmax"))
 
 (println "package: math (math classes)")

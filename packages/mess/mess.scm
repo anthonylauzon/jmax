@@ -17,7 +17,7 @@
 (println "package: mess (message classes)")
 
 ;; help
-(sshh-load (file-cat dir "help" "mess.help.index.scm"))
+(load-silently (file-cat dir "help" "mess.help.index.scm"))
 (help-summary "mess summary" (file-cat dir "help" "mess.summary.jmax"))
 
 

@@ -34,7 +34,7 @@
 (load-class this-package "ircam.jmax.guiobj.GuiObjExtension")
 
 ;; load help patch table
-(sshh-load (file-cat dir "help" "guiobj.help.index.scm"))
+(load-silently (file-cat dir "help" "guiobj.help.index.scm"))
 (help-summary "GUI summary" (file-cat dir "help" "guiobj.summary.jmax"))
 
 (println "package: guiobj (user interface objects)")

@@ -75,13 +75,13 @@
 ;; load installation default packages
 ;; Use sourceFile as a protection against user errors
 ;;
-(sshh-load (file-cat jmax-root "tutorials" "basics" "project.scm"))
+(load-silently (file-cat jmax-root "tutorials" "basics" "project.scm"))
 
 ;;
 ;; Load installation default packages.
-;; Use silent load (sshh-load) as a protection against user errors
+;; Use silent load (load-silently) as a protection against user errors
 ;;
-(sshh-load (file-cat jmax-root "config" "packages.scm"))
+(load-silently (file-cat jmax-root "config" "packages.scm"))
 
 ;;
 ;; Set sample rate and audio buffer.

@@ -29,7 +29,7 @@
 (define (abstraction-directory dir)
   (let ((file-name (file-cat dir "template.scm")))
     (if (file-exists (new-file file-name))
-	(sshh-load file-name)
+	(load-silently file-name)
 	(abstraction-path dir))))
 ;;
 ;; Same thing for templates
@@ -37,7 +37,7 @@
 (define (template-directory dir)
   (let ((file-name (file-cat dir "template.scm")))
     (if (file-exists (new-file file-name))
-	(sshh-load file-name)
+	(load-silently file-name)
 	(abstraction-path dir))))
 
 ;;

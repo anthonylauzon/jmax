@@ -35,7 +35,7 @@
 (load-class this-package "ircam.jmax.editors.table.TableExtension")
 
 ;; help
-(sshh-load (file-cat dir "help" "data.help.index.scm"))
+(load-silently (file-cat dir "help" "data.help.index.scm"))
 (help-summary "data summary" (file-cat dir "help" "data.summary.jmax"))
 
 (println "package: data (data structures)")

@@ -37,6 +37,6 @@
 (template "ldeco" (file-cat dir "templates" "listdecompose.jmax"))
 
 ;; load the help patch data base
-(sshh-load (file-cat dir "help" "lists.help.index.scm"))
+(load-silently (file-cat dir "help" "lists.help.index.scm"))
 
 (println "package: lists (list classes)")

@@ -54,14 +54,15 @@ public class MaxEnv
     String dir;
     String name;
     File envFile;
+    String extension = MaxApplication.getInterpreter().getProjectExtension();
 
     dir = file.getParent();
     name = file.getName();
 
     if (name.lastIndexOf('.') != -1)
-      name = name.substring(0, name.lastIndexOf('.')) + ".env";
+      name = name.substring(0, name.lastIndexOf('.')) + extension;
     else
-      name = name + ".env";
+      name = name + extension;
 
     envFile = new File(dir, name);
 
@@ -69,7 +70,7 @@ public class MaxEnv
       loadEnvFile(context, envFile);
     else
       {
-	envFile = new File(dir, "project.env");
+	envFile = new File(dir, "project" + extension);
 
 	if (envFile.exists() && envFile.canRead())
 	  loadEnvFile(context, envFile);

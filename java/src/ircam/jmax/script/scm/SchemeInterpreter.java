@@ -193,7 +193,14 @@ public abstract class SchemeInterpreter implements Interpreter
 	    throw new ScriptException(type + " is not a Scheme based jMax document");
 	}
     }
+
+
+    public String getProjectExtension();
+    {
+	return ".env";
+    }
 }
+
 
 
 

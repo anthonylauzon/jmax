@@ -175,7 +175,7 @@ FTS_API double fts_dsp_get_sample_rate(void);
 FTS_API int fts_dsp_get_tick_size(void);
 
 /**
- * Get current time of DSP susystem in milliseconds
+ * Get current time of DSP subsystem in milliseconds
  *
  * While fts_get_time() returns the logical time of a thread
  * fts_dsp_get_time() gives the time of the DSP subsystem, which

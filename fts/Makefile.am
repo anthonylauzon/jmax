@@ -60,7 +60,7 @@ vm.c
 bin_PROGRAMS=fts
 fts_SOURCES=main.c
 fts_LDADD=-L.libs -lfts -ldl -laudiofile -lm
-fts_LDFLAGS=
+fts_LDFLAGS=-rpath @ABS_TOP_SRCDIR@/fts/.libs
 
 
 INCLUDES=-I$(top_srcdir)/include

@@ -29,5 +29,5 @@
 
 (println "package: io (I/O class library: udp, ...)")
 
-(sshh-load (file-cat dir "help" "io.help.index.scm"))
+(load-silently (file-cat dir "help" "io.help.index.scm"))
 (help-summary "I/O summary" (file-cat dir "help" "io.summary.jmax"))

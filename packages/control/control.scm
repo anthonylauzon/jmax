@@ -28,7 +28,7 @@
 (ucs "load" "module" "control" (file-cat dir "c" "lib" (libname "control")))
 
 ;; help
-(sshh-load (file-cat dir "help" "control.help.index.scm"))
+(load-silently (file-cat dir "help" "control.help.index.scm"))
 (help-summary "control summary" (file-cat dir "help" "control.summary.jmax"))
 
 (println "package: control (control classes)")

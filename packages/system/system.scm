@@ -28,5 +28,5 @@
 (ucs "load" "module" "system" (file-cat dir "c" "lib" (libname "system")))
 
 ;help
-(sshh-load (file-cat dir "help" "system.help.index.scm"))
+(load-silently (file-cat dir "help" "system.help.index.scm"))
 (help-summary "system summary" (file-cat dir "help" "system.summary.jmax"))

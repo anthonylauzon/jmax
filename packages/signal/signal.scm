@@ -31,4 +31,4 @@
 
 (println "package: signal (basic signal classes)")
 
-(sshh-load (file-cat dir "help" "signal.help.index.scm"))
+(load-silently (file-cat dir "help" "signal.help.index.scm"))

@@ -139,6 +139,15 @@ public interface Interpreter
      * "boolean", "int", "float", "string" and "symbol". 
      */
     public Object ask(String question, String type);
+
+    /**
+     * DIRTY HACK TO RESOLVE TO PROJECT.ENV PROBLEM IN MAXENV.JAVA
+     * (HOPEFULLY THIS WILL BE SOLVED USING THE PROJECT OBJECT IN
+     *  IRCAM.JMAX.SCRIPT.PKG)
+     * 
+     *
+     */
+    public String getProjectExtension(); 
 }
 
 

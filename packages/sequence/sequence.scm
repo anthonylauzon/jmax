@@ -32,7 +32,7 @@
 (load-class this-package "ircam.jmax.editors.sequence.SequenceExtension")
 
 ;; load the help patch data base
-(sshh-load (file-cat dir "help" "sequence.help.index.scm"))
+(load-silently (file-cat dir "help" "sequence.help.index.scm"))
 (help-summary "sequence summary" (file-cat dir "help" "sequence.summary.jmax"))
 
 (println "package: sequence (sequencing classes)")

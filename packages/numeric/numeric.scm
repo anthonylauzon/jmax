@@ -30,7 +30,7 @@
 (println "package: numeric (numeric classes)")
 
 ;; help
-(sshh-load (file-cat dir "help" "numeric.help.index.scm"))
+(load-silently (file-cat dir "help" "numeric.help.index.scm"))
 (help-summary "numeric summary" (file-cat dir "help" "numeric.summary.jmax"))
 
 

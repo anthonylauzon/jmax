@@ -137,12 +137,12 @@
 	  (get-host-type-recur name (cdr list)))))
 
 ;;
-;; sshh-load
+;; load-silently
 ;;
 ;; Load a file silently: if an error occurs, print out a message and
 ;; return, but do not stop the evaluation of the current file.
 ;;
-(define (sshh-load file)
+(define (load-silently file)
   (scheme-interpreter-load-silently jmax-interp file))
 
 ;;

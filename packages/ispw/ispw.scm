@@ -39,8 +39,8 @@
 (data-directory (file-cat dir "sounds"))
 
 ;; load the help patch tables
-(sshh-load (file-cat dir "help" "control" "control.help.index.scm"))
-(sshh-load (file-cat dir "help" "signal" "signal.help.index.scm"))
+(load-silently (file-cat dir "help" "control" "control.help.index.scm"))
+(load-silently (file-cat dir "help" "signal" "signal.help.index.scm"))
 
 ;; load the reference manual data base
 ;sourceFile $dir/doc/reference.tcl

@@ -32,7 +32,7 @@
 (load-class this-package "ircam.jmax.editors.explode.ExplodeExtension")
 
 ;; load the help patch data base
-(sshh-load (file-cat dir "help" "explode.help.index.scm"))
+(load-silently (file-cat dir "help" "explode.help.index.scm"))
 (help-summary "explode summary" (file-cat dir "help" "explode.summary.jmax"))
 
 (println "package: explode (ISPW sequencing class with editor)")

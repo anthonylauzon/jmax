@@ -28,6 +28,6 @@
 (ucs "load" "module" "midi" (file-cat dir "c" "lib" (libname "midi")))
 
 (help-summary "MIDI summary" (file-cat dir "help" "midi.summary.jmax"))
-(sshh-load (file-cat dir "help" "midi.help.index.scm"))
+(load-silently (file-cat dir "help" "midi.help.index.scm"))
 
 (println "package: midi (basic MIDI i/o objects)")
