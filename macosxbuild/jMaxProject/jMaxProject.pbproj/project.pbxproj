@@ -2293,6 +2293,18 @@
 			settings = {
 			};
 		};
+		F73C46430531DC6801664058 = {
+			isa = PBXFileReference;
+			name = Displayer.java;
+			path = ../../java/src/ircam/jmax/toolkit/Displayer.java;
+			refType = 2;
+		};
+		F73C46440531DC6801664058 = {
+			fileRef = F73C46430531DC6801664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F746F84603F3D4BE01664058 = {
 			isa = PBXFileReference;
 			name = guilistener.c;
@@ -15093,6 +15105,7 @@
 				F880FE910283013E01664092,
 				F880FE920283013E01664092,
 				F880FE930283013E01664092,
+				F73C46430531DC6801664058,
 				F880FE940283013E01664092,
 				F880FE950283013E01664092,
 				F880FE960283013E01664092,
@@ -16040,6 +16053,7 @@
 				F7F6153E04164DA001664058,
 				F73BB60A04F4CC0E01664058,
 				F73BB60B04F4CC0E01664058,
+				F73C46440531DC6801664058,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
