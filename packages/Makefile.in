@@ -83,7 +83,7 @@ ROOTDIR = @ROOTDIR@
 STRIP = @STRIP@
 VERSION = @VERSION@
 
-SUBDIRS = control guiobj 
+SUBDIRS = control data guiobj io ispw ispwmath lists math midi numeric qlist signal system utils @PLATFORM_PACKAGES@
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 

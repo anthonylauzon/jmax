@@ -1,9 +1,26 @@
 SUBDIRS= src
 
 packagedir=$(pkgdatadir)/packages/sequence/java
-package_DATA = sequence.jar
+JAR = sequence.jar
+package_DATA= $(JAR)
+package_JAVA= Sequence.java
 
-JAR_DEP=$(shell find src -name "*.java")
+JAVAC= @JAVACX@
+JAVACFLAGS= @JAVACFLAGSX@
+JAVAROOT= @top_srcdir@/packages/sequence/java/src
+CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar
 
-sequence.jar: $(JAR_DEP)	
-	( cd src; jar -cvf ../sequence.jar `find ircam -name "*.class"` )
+JAR_DEP= \
+classpackage.stamp \
+src/ircam/jmax/editors/sequence/classpackage.stamp \
+src/ircam/jmax/editors/sequence/actions/classpackage.stamp \
+src/ircam/jmax/editors/sequence/menus/classpackage.stamp \
+src/ircam/jmax/editors/sequence/renderers/classpackage.stamp \
+src/ircam/jmax/editors/sequence/tools/classpackage.stamp \
+src/ircam/jmax/editors/sequence/track/classpackage.stamp 
+
+
+$(JAR): $(JAR_DEP)	
+	-test -f $(JAR) || rm -f $(JAR)
+	jar -cvf $(JAR) *.class src/ircam/jmax/editors/sequence/*.class src/ircam/jmax/editors/sequence/actions/*.class src/ircam/jmax/editors/sequence/menus/*.class src/ircam/jmax/editors/sequence/renderers/*.class src/ircam/jmax/editors/sequebce/tolls/*.class src/ircam/jmax/editors/sequence/track/*.class
+

@@ -74,7 +74,7 @@ seqfind_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	    continue;
 	  else if(fts_is_float(at + i) && fts_is_int(atoms + i) && fts_get_float(at + i) == (float)fts_get_int(atoms + i))
 	    continue;
-	  else if(fts_get_type(at + i) != fts_get_type(atoms + i) || fts_get_int(at + i) != fts_get_int(atoms + i))
+	  else if( !fts_atom_same_type( at+i, atoms+i) || fts_get_int(at + i) != fts_get_int(atoms + i))
 	    break;
 	}
       

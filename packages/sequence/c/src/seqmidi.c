@@ -99,7 +99,7 @@ miditrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
   fts_atom_t a;
     
   /* create a new event with the event */
-  fts_set_object_with_type(&a, midievt, fts_s_midievent);
+  fts_set_object(&a, midievt);
   event = (event_t *)fts_object_create(event_class, 1, &a);
 
   /* claim object */

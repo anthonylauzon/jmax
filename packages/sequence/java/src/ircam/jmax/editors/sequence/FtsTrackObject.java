@@ -25,7 +25,7 @@
 
 package ircam.jmax.editors.sequence;
 
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.FtsUndoableObject;
@@ -55,13 +55,13 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("addEvents"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsTrackObject)obj).addEvents(argc, argv);
+	  ((FtsTrackObject)obj).addEvents( args.getLength(), args.getAtoms());
 	}
       });
     FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("removeEvents"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsTrackObject)obj).removeEvents(argc, argv);
+	  ((FtsTrackObject)obj).removeEvents( args.getLength(), args.getAtoms());
 	}
       });
     FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("clear"), new FtsMessageHandler(){
@@ -73,7 +73,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("moveEvents"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsTrackObject)obj).moveEvents(argc, argv);
+	  ((FtsTrackObject)obj).moveEvents( args.getLength(), args.getAtoms());
 	}
       });
     FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("setName"), new FtsMessageHandler(){
@@ -107,7 +107,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
   FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("highlightEvents"), new FtsMessageHandler(){
       public void invoke( FtsObject obj, FtsArgs args)
       {
-	((FtsTrackObject)obj).highlightEvents(argc, argv);		  
+	((FtsTrackObject)obj).highlightEvents( args.getLength(), args.getAtoms());		  
       }
     });
   }
@@ -116,14 +116,14 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
      * Create an AbstractSequence and initialize the type vector
      * with the given type.
      */
-  public FtsTrackObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id)
+  public FtsTrackObject(FtsServer server, FtsObject parent, int objId, String className, FtsAtom args[], int offset, int length)
   {
-    super(server, parent, className, nArgs, args, id);
+    super(server, parent, objId, className, args, offset, length);
 
-    this.info = ValueInfoTable.getValueInfo(args[0].stringValue);
+    this.info = ValueInfoTable.getValueInfo(args[offset].stringValue);
 
-    if(nArgs>1)
-      this.trackName = args[1].stringValue;
+    if(length > 1)
+      this.trackName = args[offset+1].stringValue;
     else
       this.trackName  = "untitled";
 
@@ -158,8 +158,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     
 	// ends the undoable transition
     endUpdate();
-
-    setDirty();
   }
   public void addEvents(int nArgs , FtsAtom args[])
   {
@@ -173,8 +171,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 
     // ends the undoable transition
     endUpdate();
-
-    setDirty();
   }
 
   public void removeEvents(int nArgs , FtsAtom args[])
@@ -190,8 +186,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
       }
     // ends the undoable transition
     endUpdate();
-
-    setDirty();
   }
 
   public void clear()
@@ -206,7 +200,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     notifyTrackCleared();
 
     endUpdate();
-    setDirty();
   }
 
   public void moveEvents(int nArgs , FtsAtom args[])
@@ -251,7 +244,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
       notifyLastObjectMoved(maxEvent, maxOldIndex, maxNewIndex);
 
     endUpdate();      
-    setDirty();
   }  
 
   public void setName(String name)
@@ -280,7 +272,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	trackName = name;
 
 	notifyTrackNameChanged(old, trackName);
-	setDirty();
       }
   }  
 
@@ -321,12 +312,12 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
   public void requestEventCreation(float time, String type, int nArgs, Object arguments[])
   {
     args.clear();
-    args.add(time);
-    args.add(type);
+    args.addFloat( time);
+    args.addSymbol( FtsSymbol.get(type));
 
     for(int i=0; i<nArgs; i++)
       if(arguments[i] instanceof Double)
-	args.add(((Double)arguments[i]).floatValue());
+	args.addFloat(((Double)arguments[i]).floatValue());
       else
 	args.add(arguments[i]);
 
@@ -343,12 +334,12 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
   public void requestEventCreationWithoutUpload(float time, String type, int nArgs, Object arguments[])
   {
     args.clear();
-    args.add(time);
-    args.add(type);
+    args.addFloat( time);
+    args.addSymbol( FtsSymbol.get( type));
 
     for(int i=0; i<nArgs; i++)
       if(arguments[i] instanceof Double)
-	args.add(((Double)arguments[i]).floatValue());
+	args.addFloat(((Double)arguments[i]).floatValue());
       else
 	args.add(arguments[i]);
 
@@ -365,8 +356,8 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
   public void requestEventMove(TrackEvent evt, double newTime)
   {
     args.clear();
-    args.add(evt);
-    args.add((float)newTime);
+    args.addObject( evt);
+    args.addFloat((float)newTime);
       
     try{
       send( FtsSymbol.get("moveEvents"), args);
@@ -386,8 +377,8 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     for (Enumeration e = events; e.hasMoreElements();) 
       {	  
 	aEvent = (TrackEvent) e.nextElement();		    
-	args.add(aEvent);
-	args.add((float)a.getInvX(a.getX(aEvent)+deltaX));
+	args.addObject( aEvent);
+	args.addFloat((float)a.getInvX(a.getX(aEvent)+deltaX));
       }
       
     try{
@@ -403,7 +394,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
   public void requestSetName(String newName)
   {
     args.clear();
-    args.add(newName);
+    args.addSymbol( FtsSymbol.get( newName));
       
     try{
       send( FtsSymbol.get("setName"), args);
@@ -442,7 +433,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
   public void requestSetActive(boolean active)
   {
     args.clear();
-    args.add((active)? 1 : 0);
+    args.addInt((active)? 1 : 0);
 
     try{
       send( FtsSymbol.get("active"), args);

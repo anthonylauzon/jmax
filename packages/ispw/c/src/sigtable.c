@@ -298,21 +298,23 @@ sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 
   if(file_name)
     {
-      fts_soundfile_t *sf = fts_soundfile_open_read_float(file_name, format, sr, n_onset);
-      
-      if(sf)
+      /*fts_soundfile_t *sf = fts_soundfile_open_read_float(file_name, format, sr, n_onset);
+	
+	if(sf)
 	{
-	  int n_samples = fts_soundfile_read_float(sf, buf, size);
-	  
-	  fts_soundfile_close(sf);
-	  
-	  if(n_samples > 0)
-	    fts_outlet_int(o, 0, n_samples);
-	  else
-	    post("table~: %s: can't load samples from file \"%s\"\n", fts_symbol_name(this->name), fts_symbol_name(file_name));
+	int n_samples = fts_soundfile_read_float(sf, buf, size);
+	
+	fts_soundfile_close(sf);
+	
+	if(n_samples > 0)
+	fts_outlet_int(o, 0, n_samples);
+	else
+	post("table~: %s: can't load samples from file \"%s\"\n", fts_symbol_name(this->name), fts_symbol_name(file_name));
+      
 	}
-      else
+	else
 	post("table~: %s: can't open soundfile to read \"%s\"\n", fts_symbol_name(this->name), fts_symbol_name(file_name));
+      */	
     }
 }
 
@@ -344,19 +346,20 @@ sigtable_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 
   if(file_name)
     {
-      fts_soundfile_t *sf = fts_soundfile_open_write_float(file_name, format, sr);
+      /*fts_soundfile_t *sf = fts_soundfile_open_write_float(file_name, format, sr);
       
-      if(sf)
+	if(sf)
 	{
-	  int n_samples = fts_soundfile_write_float(sf, buf, n_save);
-
-	  fts_soundfile_close(sf);
-
-	  if(n_samples <= 0)
-	    post("table~: %s: can't save samples to file \"%s\"\n", fts_symbol_name(this->name) , fts_symbol_name(file_name));
+	int n_samples = fts_soundfile_write_float(sf, buf, n_save);
+	
+	fts_soundfile_close(sf);
+	
+	if(n_samples <= 0)
+	post("table~: %s: can't save samples to file \"%s\"\n", fts_symbol_name(this->name) , fts_symbol_name(file_name));
 	}
-      else
+	else
 	post("table~: %s: can't open soundfile to write \"%s\"\n", fts_symbol_name(this->name), fts_symbol_name(file_name));
+      */
     }
 }
 

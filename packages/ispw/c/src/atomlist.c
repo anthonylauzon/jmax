@@ -25,9 +25,12 @@
  */
 
 #include "atomlist.h"
+#include <ftsconfig.h>
 
 #if HAVE_ALLOCA_H
 #include <alloca.h>
+#else
+#include <stdlib.h>
 #endif
 
 /* Heaps */

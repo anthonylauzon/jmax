@@ -22,6 +22,7 @@
 #include "sigbus.h"
 
 fts_symbol_t fts_signal_bus_symbol = 0;
+fts_metaclass_t *fts_signal_bus_type = 0;
 fts_class_t *fts_signal_bus_class = 0;
 
 /*****************************************************************************
@@ -147,7 +148,7 @@ void
 fts_signal_bus_config(void)
 {
   fts_signal_bus_symbol = fts_new_symbol("signal_bus");
-  fts_class_install(fts_signal_bus_symbol, fts_signal_bus_instantiate);
+  fts_signal_bus_type = fts_class_install(fts_signal_bus_symbol, fts_signal_bus_instantiate);
   fts_signal_bus_class = fts_class_get_by_name(fts_signal_bus_symbol);
 
   fts_dsp_declare_function(fts_signal_bus_symbol, fts_signal_bus_toggle_and_zero);

@@ -1,5 +1,5 @@
-noinst_PROGRAMS = package
-package_SOURCES = \
+packagedir=$(pkgdatadir)
+package_JAVA = \
 ClosedTrackPopupMenu.java \
 EditMenu.java \
 FileMenu.java \
@@ -10,17 +10,8 @@ MonoTrackPopupMenu.java \
 RulerPopupMenu.java \
 TrackMenu.java 
 
-JAVACX = @JAVACX@
-JAVACFLAGSX=@JAVACFLAGSX@
-JAVAROOTX=@top_srcdir@/packages/sequence/java/src
-CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar:@top_srcdir@/packages/sequence/java/src
+JAVAC = @JAVACX@
+JAVACFLAGS=@JAVACFLAGSX@
+JAVAROOT=@top_srcdir@/packages/sequence/java/src
+CLASSPATH_ENV=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar:@top_srcdir@/packages/sequence/java/src
 
-SUFFIXES = .java .class
-
-.java.class:
-	$(CLASSPATH_ENVX) $(JAVACX) -d $(JAVAROOTX) $(JAVACFLAGSX) $?
-
-package: $(package_OBJECTS) $(package_DEPENDENCIES)
-
-clean-compile:
-	rm -f *.class

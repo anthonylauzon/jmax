@@ -79,7 +79,7 @@ argument_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   argument_t *this = (argument_t *)o;
 
-  fts_atom_void(&this->def);
+  fts_set_void(&this->def);
 }
 
 static void

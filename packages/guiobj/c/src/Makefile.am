@@ -24,10 +24,18 @@ toggle.c \
 vecdisplay.c
 
 libguiobj_la_LDFLAGS= -no-undefined -module
-libguiobj_la_LIBADD= -L$(top_srcdir)/fts/.libs -lfts
+#libguiobj_la_LIBADD= -L$(top_srcdir)/fts/.libs -lfts
 
 INCLUDES=-I@top_srcdir@/packages/data/c/src
 
 noinst_HEADERS= \
 guiobj.h \
 keyserver.h
+
+
+
+
+
+
+
+

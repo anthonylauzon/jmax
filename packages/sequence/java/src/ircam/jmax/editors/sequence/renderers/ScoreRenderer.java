@@ -35,7 +35,7 @@ import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
 import java.io.File;
-import ircam.jmax.MaxApplication;
+import ircam.jmax.JMaxApplication;
 
 /**
  * The main class for a score representation.

@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -62,6 +62,8 @@ host_triplet = @host@
 AS = @AS@
 CC = @CC@
 DLLTOOL = @DLLTOOL@
+ECHO = @ECHO@
+EXEEXT = @EXEEXT@
 FTSDIR = @FTSDIR@
 FTS_SYS_LIBS = @FTS_SYS_LIBS@
 JAVACFLAGSX = @JAVACFLAGSX@
@@ -70,15 +72,27 @@ LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
 OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PLATFORM = @PLATFORM@
 PLATFORM_PACKAGES = @PLATFORM_PACKAGES@
 RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
+STRIP = @STRIP@
 VERSION = @VERSION@
 
 packagedir = $(pkgdatadir)
-package_JAVA =  Actions.java CopyAction.java CutAction.java HollowAction.java InsertAction.java PasteAction.java RedoAction.java RefreshAction.java SolidAction.java UndoAction.java 
+package_JAVA = \
+Actions.java \
+CopyAction.java \
+CutAction.java \
+HollowAction.java \
+InsertAction.java \
+PasteAction.java \
+RedoAction.java \
+RefreshAction.java \
+SolidAction.java \
+UndoAction.java 
 
 
 JAVAC = @JAVACX@

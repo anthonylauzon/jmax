@@ -27,6 +27,7 @@
 #include <fts/fts.h>
 
 static fts_class_t *bus_class = 0;
+static fts_metaclass_t *bus_type = 0;
 static fts_symbol_t bus_symbol = 0;
 
 static fts_symbol_t throw_symbol = 0;
@@ -172,7 +173,7 @@ throw_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   ac--;
   at++;
 
-  if(ac > 0 && fts_is_a(at, bus_symbol) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))
+  if(ac > 0 && fts_is_a( at, bus_type) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))  
     {
       if(ac == 1) 
 	{
@@ -292,7 +293,7 @@ catch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   ac--;
   at++;
 
-  if(ac > 0 && fts_is_a(at, bus_symbol) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))
+  if(ac > 0 && fts_is_a(at, bus_type) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))
     {
       if(ac == 1) 
 	{
@@ -375,9 +376,7 @@ bus_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_
 static void
 bus_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  bus_t *this = (bus_t *)obj;
-
-  fts_set_object_with_type(value, this, bus_symbol);
+  fts_set_object(value, obj);
 }
 
 static fts_status_t
@@ -416,7 +415,7 @@ bus_config(void)
   catch_symbol = fts_new_symbol("catch");
   bus_symbol = fts_new_symbol("bus");
 
-  fts_metaclass_install(bus_symbol, bus_instantiate, fts_first_arg_equiv);
+  bus_type = fts_metaclass_install(bus_symbol, bus_instantiate, fts_first_arg_equiv);
   fts_metaclass_install(throw_symbol, throw_instantiate, fts_never_equiv);
   fts_metaclass_install(catch_symbol, catch_instantiate, fts_never_equiv);
 }

@@ -267,7 +267,7 @@ throw_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   ac--;
   at++;
 
-  if(ac > 0 && fts_is_a(at, fts_signal_bus_symbol) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))
+  if(ac > 0 && fts_is_a(at, fts_signal_bus_type) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))
     {
       if(ac == 1) 
 	{
@@ -429,7 +429,7 @@ catch_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   ac--;
   at++;
 
-  if(ac > 0 && fts_is_a(at, fts_signal_bus_symbol) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))
+  if(ac > 0 && fts_is_a(at, fts_signal_bus_type) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))
     {
       if(ac == 1) 
 	{
@@ -638,7 +638,7 @@ bus_tilda_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t 
 {
   bus_tilda_t *this = (bus_tilda_t *)obj;
 
-  fts_set_object_with_type(value, this->bus, fts_signal_bus_symbol);
+  fts_set_object(value, this->bus);
 }
 
 static fts_status_t

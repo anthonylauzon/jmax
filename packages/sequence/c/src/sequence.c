@@ -158,7 +158,7 @@ sequence_array_update(sequence_t *this)
     {
       fts_atom_t a;
 
-      fts_set_object_with_type(&a, (fts_object_t *)track, seqsym_track);
+      fts_set_object(&a, (fts_object_t *)track);
       fts_array_append(&this->array, 1, &a);
 
       track = track_get_next(track);
@@ -172,7 +172,7 @@ sequence_array_append(sequence_t *this, track_t *track)
 {
   fts_atom_t a;
 
-  fts_set_object_with_type(&a, (fts_object_t *)track, seqsym_track);
+  fts_set_object(&a, (fts_object_t *)track);
   fts_array_append(&this->array, 1, &a);
 
   fts_object_redefine_variable((fts_object_t *)this);
@@ -280,7 +280,7 @@ sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 	  char *error = fts_midifile_get_error(file);
 
 	  if(error)
-	    fts_object_signal_runtime_error(o, "import: read error in \"%s\" (%s)\n", fts_symbol_name(name), error);
+	    fts_object_signal_runtime_error(o, "import: read error in \"%s\" (%s)\n", name, error);
 	  else if(size <= 0)
 	    fts_object_signal_runtime_error(o, "import: couldn't get any data from \"%s\"\n", fts_midifile_get_name(file));
 	  
@@ -292,7 +292,7 @@ sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 	  sequence_array_update(this);
 	}
       else
-	fts_object_signal_runtime_error(o, "import: cannot open \"%s\"\n", fts_symbol_name(name));
+	fts_object_signal_runtime_error(o, "import: cannot open \"%s\"\n", name);
     }
 }
       
@@ -421,10 +421,10 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	      fts_symbol_t track_name = track_get_name(track);
 	      fts_symbol_t track_type = track_get_type(track);
 	      int track_size = track_get_size(track);
-	      const char *name_str = track_name? fts_symbol_name(track_name): "untitled";
+	      const char *name_str = track_name? track_name: "untitled";
 
 	      post("  track %d: \"%s\" %d %s event%s\n", i, name_str, track_size, 
-		   fts_symbol_name(track_type), (track_size == 1)? "": "s");
+		   track_type, (track_size == 1)? "": "s");
 
 	      track = track_get_next(track);
   	    }
@@ -624,7 +624,7 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 		  sequence_array_append(this, track);
 		}
 	      else
-		fts_object_set_error(o, "Cannot create track of type %s", fts_symbol_name(type));
+		fts_object_set_error(o, "Cannot create track of type %s", type);
 	    }
 	  else
 	    fts_object_set_error(o, "Wrong arguments");

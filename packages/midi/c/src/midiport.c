@@ -31,7 +31,7 @@ static void
 midiport_input( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_midiport_t *this = (fts_midiport_t *)o;
-  fts_midievent_t *event = fts_get_midievent(at);
+  fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
 
   fts_midiport_input(this, event, 0.0);
 }
@@ -43,7 +43,7 @@ midiport_output(fts_object_t *o, fts_midievent_t *event, double time)
   fts_midiport_t *this = (fts_midiport_t *)o;
   fts_atom_t a;
 
-  fts_set_midievent(&a, event);
+  fts_set_object(&a, (fts_object_t *)event);
 
   fts_outlet_send(o, 0, fts_s_midievent, 1, &a);
 }

@@ -12,7 +12,7 @@ switch.c \
 sync.c 
 
 libcontrol_la_LDFLAGS= -no-undefined -module
-libcontrol_la_LIBADD= -L$(top_srcdir)/fts/.libs -lfts
+#libcontrol_la_LIBADD= -L$(top_srcdir)/fts/.libs -lfts
 
 noinst_HEADERS=\
 control.h

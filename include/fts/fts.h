@@ -108,7 +108,6 @@ extern "C" {
 
 #include <fts/file.h>
 #include <fts/atomfile.h>
-#include <fts/soundfile.h>
 #include <fts/midi.h>
 #include <fts/midifile.h>
 #include <fts/bytestream.h>

@@ -926,13 +926,13 @@ static void fts_patcher_upload( fts_object_t *o, int winlet, fts_symbol_t s, int
       fts_object_get_prop((fts_object_t *)this, fts_s_wy, a+1);
       fts_object_get_prop((fts_object_t *)this, fts_s_ww, a+2);
       fts_object_get_prop((fts_object_t *)this, fts_s_wh, a+3);
-
+      
       if( fts_get_int( a) && fts_get_int( a+1) && fts_get_int( a+2) && fts_get_int( a+3))
 	fts_client_send_message((fts_object_t *)this, sym_setPatcherBounds, 4, a);
       
       for (p = this->objects; p ; p = p->next_in_patcher)
 	fts_client_upload_object( p, -1);
-
+      
       for (p = this->objects; p ; p = p->next_in_patcher)
 	{
 	  int outlet;

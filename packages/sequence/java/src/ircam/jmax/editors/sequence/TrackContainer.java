@@ -29,7 +29,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.editors.sequence.renderers.*;
-import ircam.jmax.MaxApplication;
+import ircam.jmax.JMaxApplication;
 
 /**
  * A graphic component that contains a single track editor*/

@@ -27,7 +27,7 @@ import java.beans.*;
 import java.awt.event.*;
 import javax.swing.*;
 import ircam.jmax.toolkit.*;
-import ircam.jmax.MaxApplication;
+import ircam.jmax.JMaxApplication;
 import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.menus.*;
 import ircam.jmax.editors.sequence.renderers.*;

@@ -63,7 +63,7 @@ create_event(int ac, const fts_atom_t *at)
 	      
 	      meth_set(obj, 0, 0, ac - 1, at + 1);
 
-	      fts_set_object_with_type(&a, obj, type);
+	      fts_set_object(&a, obj);
 	      event = (event_t *)fts_object_create(event_class, 1, &a);
 	    }
 	}
@@ -640,13 +640,13 @@ track_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   if(track_size == 0)
     {
-      post("(\"%s\" empty %s track)\n", name_str, fts_symbol_name(track_type));
+      post("(\"%s\" empty %s track)\n", name_str, track_type);
       return;
     }
   else if(track_size == 1)
-    post("(\"%s\" 1 %s event) {\n", name_str, fts_symbol_name(track_type));
+    post("(\"%s\" 1 %s event) {\n", name_str, track_type);
   else
-    post("(\"%s\" %d %s events) {\n", name_str, track_size, fts_symbol_name(track_type));
+    post("(\"%s\" %d %s events) {\n", name_str, track_size, track_type);
       
   while(event)
     {
@@ -726,7 +726,7 @@ track_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	fts_object_signal_runtime_error(o, "import: wrong arguments");  
     }
   else
-    fts_object_signal_runtime_error(o, "import: cannot import MIDI file to track of type %s", fts_symbol_name(type));
+    fts_object_signal_runtime_error(o, "import: cannot import MIDI file to track of type %s", type);
 }
 
 static void 
@@ -852,9 +852,7 @@ track_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prope
 static void
 track_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
 {
-  track_t *this = (track_t *)o;
-
-  fts_set_object_with_type(value, this, seqsym_track);
+  fts_set_object(value, o);
 }
 
 /******************************************************

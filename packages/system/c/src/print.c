@@ -60,7 +60,7 @@ print_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   print_t *this = (print_t *)o;
 
-  post("%s: bang\n", fts_symbol_name(this->prompt));
+  post("%s: bang\n", this->prompt);
 }
 
 static void
@@ -68,7 +68,7 @@ print_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   print_t *this = (print_t *)o;
 
-  post("%s: {", fts_symbol_name(this->prompt));
+  post("%s: {", this->prompt);
   post_atoms(ac, at);
   post("}\n");
 }
@@ -78,7 +78,7 @@ print_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   print_t *this = (print_t *)o;
 
-  post("%s: %d\n", fts_symbol_name(this->prompt), fts_get_int(at));
+  post("%s: %d\n", this->prompt, fts_get_int(at));
 }
 
 static void
@@ -86,7 +86,7 @@ print_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   print_t *this = (print_t *)o;
 
-  post("%s: %f\n", fts_symbol_name(this->prompt), fts_get_float(at));
+  post("%s: %f\n", this->prompt, fts_get_float(at));
 }
 
 static void
@@ -94,7 +94,7 @@ print_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   print_t *this = (print_t *)o;
 
-  post("%s: '%s'\n", fts_symbol_name(this->prompt), fts_symbol_name(fts_get_symbol(at)));
+  post("%s: '%s'\n", this->prompt, fts_get_symbol(at));
 }
 
 static void
@@ -102,10 +102,10 @@ print_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   print_t *this = (print_t *)o;
 
-  post("%s: ", fts_symbol_name(this->prompt));
+  post("%s: ", this->prompt);
   
   if(ac == 0)
-    post("%s\n", fts_symbol_name(s));
+    post("%s\n", s);
   else if(ac == 1 && fts_is_object(at))
     {
       /* print object */
@@ -113,7 +113,7 @@ print_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
       if(s == fts_object_get_class_name(obj))
 	{
-	  post("<%s> ", fts_symbol_name(s));
+	  post("<%s> ", s);
 
 	  if(fts_send_message(obj, fts_SystemInlet, fts_s_print, 0, 0) != fts_Success)
 	    post("<???>\n");
@@ -128,7 +128,7 @@ print_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   else
     {
       /* ordinary message */
-      post("%s ", fts_symbol_name(s));
+      post("%s ", s);
       post_atoms(ac, at);
       post("\n");
     }
