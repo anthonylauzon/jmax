@@ -31,7 +31,7 @@ include $(ROOTDIR)/java/Makefiles/Makefile.common
 
 all: local_all
 	(cd tcl ; $(MAKE) $@)
-#	(cd scm ; $(MAKE) $@)
+	(cd scm ; $(MAKE) $@)
 	(cd pkg ; $(MAKE) $@)
 .PHONY: all
 
