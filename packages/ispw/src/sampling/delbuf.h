@@ -11,7 +11,7 @@ typedef struct {
   long malloc_size;		/* size (NOT real size) of biggest alloc */
   float raw_size;		/* delay line size given for delwrite~ in unit */
   fts_symbol_t unit;		/* unit of raw_size given for delwrite~ */
-  long n_tick;			/* tick size for delay line accesses (but: vd~) */
+  long n_tick;			/* tick size for delay line accesses */
   int is_init;			/* flag if init was called for current DSP compiling */
 } del_buf_t;
 
