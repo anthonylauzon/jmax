@@ -68,6 +68,8 @@ public class TextPopUpMenu extends JMenu
   public TextPopUpMenu()
   {
     super("Text");
+    JMenuItem item;
+    JRadioButtonMenuItem radioItem;
 
     itsSizesMenuGroup = new ButtonGroup();
     fakeSizeButton = new JRadioButtonMenuItem( "fake");
@@ -76,41 +78,6 @@ public class TextPopUpMenu extends JMenu
     itsFontMenuGroup = new ButtonGroup();
     itsStylesMenuGroup = new ButtonGroup();
 
-    JMenuItem item;
-    item = new JMenuItem("Fit To Text");
-    item.addActionListener(Actions.fitToTextPopUpAction);
-    add(item);
-    
-    addSeparator();
-
-    item = new JMenuItem("Smaller");
-    item.addActionListener(Actions.fontSmallerPopUpAction);
-    add(item);
-
-    item = new JMenuItem("Bigger");
-    item.addActionListener(Actions.fontBiggerPopUpAction);
-    add(item);
-
-    addSeparator();
-
-    add(new JLabel(" Font Names"));
-
-    JRadioButtonMenuItem radioItem;
-    for(int i = 0; i < PatcherFontManager.getInstance().getJMaxFontNames().length; i++)
-    {
-	radioItem = new JRadioButtonMenuItem(PatcherFontManager.getInstance().getJMaxFontNames()[i]);
-	add(radioItem);
-	radioItem.addActionListener(Actions.jmaxFontPopUpAction);
-	itsFontMenuGroup.add(radioItem);
-	fontNameItems.addElement(radioItem);
-    }
-
-    itsFontsMenu = new JMenu("Java Fonts");
-    FillFontMenu(itsFontsMenu);
-    add(itsFontsMenu);
-
-    addSeparator();
-    
     add(new JLabel(" Font Sizes"));
 
     for(int i = 0; i < PatcherFontManager.getInstance().getJMaxFontSizes().length; i++)
@@ -136,6 +103,39 @@ public class TextPopUpMenu extends JMenu
     italicItem = new JCheckBoxMenuItem("Italic");
     italicItem.addActionListener(Actions.fontStylesPopUpAction);
     add(italicItem);
+
+    addSeparator();
+
+    add(new JLabel(" Font Names"));
+
+    for(int i = 0; i < PatcherFontManager.getInstance().getJMaxFontNames().length; i++)
+    {
+	radioItem = new JRadioButtonMenuItem(PatcherFontManager.getInstance().getJMaxFontNames()[i]);
+	add(radioItem);
+	radioItem.addActionListener(Actions.jmaxFontPopUpAction);
+	itsFontMenuGroup.add(radioItem);
+	fontNameItems.addElement(radioItem);
+    }
+
+    itsFontsMenu = new JMenu("Java Fonts");
+    FillFontMenu(itsFontsMenu);
+    add(itsFontsMenu);
+
+    addSeparator();
+
+    item = new JMenuItem("Fit To Text");
+    item.addActionListener(Actions.fitToTextPopUpAction);
+    add(item);
+    
+    addSeparator();
+
+    item = new JMenuItem("Smaller");
+    item.addActionListener(Actions.fontSmallerPopUpAction);
+    add(item);
+
+    item = new JMenuItem("Bigger");
+    item.addActionListener(Actions.fontBiggerPopUpAction);
+    add(item);
   }
 
   private void FillSizesMenu( JMenu menu)

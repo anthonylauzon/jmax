@@ -89,6 +89,7 @@ public class TextMenu extends EditorMenu
     setHorizontalTextPosition(AbstractButton.LEFT);
 
     JMenuItem item;
+    JRadioButtonMenuItem radioItem;
     this.sketch = sketch;
 
     itsSizesMenuGroup = new ButtonGroup();
@@ -98,38 +99,23 @@ public class TextMenu extends EditorMenu
     fakeFontButton = new JRadioButtonMenuItem( "fake");
     itsFontMenuGroup.add(fakeFontButton);
 
-    biggerItem  = add(Actions.fontBiggerAction, "Bigger", Event.CTRL_MASK, KeyEvent.VK_ADD);
-    smallerItem = add(Actions.fontSmallerAction, "Smaller", Event.CTRL_MASK, KeyEvent.VK_SUBTRACT);
+    /*add(new JLabel(" Fonts"));
 
-    addSeparator();
-
-    automaticFitItem = new JRadioButtonMenuItem("Automatic Fit To Text");
-
-    add(automaticFitItem);
-    automaticFitItem.addActionListener(Actions.setAutomaticFitAction);
-
-    fitItem = add(Actions.fitToTextAction, "Fit To Text", Event.CTRL_MASK, KeyEvent.VK_T);
-
-    addSeparator();
+      for(int i = 0; i < PatcherFontManager.getInstance().getJMaxFontNames().length; i++)
+      {
+      radioItem = new JRadioButtonMenuItem(PatcherFontManager.getInstance().getJMaxFontNames()[i]);
+      add(radioItem);
+      radioItem.addActionListener(Actions.jmaxFontAction);
+      itsFontMenuGroup.add(radioItem);
+      fontNameItems.addElement(radioItem);
+      }
     
-    add(new JLabel(" Fonts"));
+      itsFontsMenu = new JMenu("Java Fonts");
 
-    JRadioButtonMenuItem radioItem;
-    for(int i = 0; i < PatcherFontManager.getInstance().getJMaxFontNames().length; i++)
-    {
-	radioItem = new JRadioButtonMenuItem(PatcherFontManager.getInstance().getJMaxFontNames()[i]);
-	add(radioItem);
-	radioItem.addActionListener(Actions.jmaxFontAction);
-	itsFontMenuGroup.add(radioItem);
-	fontNameItems.addElement(radioItem);
-    }
+      FillFontMenu(itsFontsMenu);
+      add(itsFontsMenu);
 
-    itsFontsMenu = new JMenu("Java Fonts");
-
-    FillFontMenu(itsFontsMenu);
-    add(itsFontsMenu);
-
-    addSeparator();
+      addSeparator();*/
 
     add(new JLabel(" Font Sizes"));
 
@@ -163,6 +149,37 @@ public class TextMenu extends EditorMenu
     italicItem = new JCheckBoxMenuItem("Italic");
     italicItem.addActionListener(Actions.fontStylesAction);
     add(italicItem);
+
+    addSeparator();
+
+    add(new JLabel(" Fonts"));
+    for(int i = 0; i < PatcherFontManager.getInstance().getJMaxFontNames().length; i++)
+    {
+	radioItem = new JRadioButtonMenuItem(PatcherFontManager.getInstance().getJMaxFontNames()[i]);
+	add(radioItem);
+	radioItem.addActionListener(Actions.jmaxFontAction);
+	itsFontMenuGroup.add(radioItem);
+	fontNameItems.addElement(radioItem);
+    }
+
+    itsFontsMenu = new JMenu("Java Fonts");
+
+    FillFontMenu(itsFontsMenu);
+    add(itsFontsMenu);
+
+    addSeparator();
+
+    biggerItem  = add(Actions.fontBiggerAction, "Bigger", Event.CTRL_MASK, KeyEvent.VK_ADD);
+    smallerItem = add(Actions.fontSmallerAction, "Smaller", Event.CTRL_MASK, KeyEvent.VK_SUBTRACT);
+
+    addSeparator();
+
+    automaticFitItem = new JRadioButtonMenuItem("Automatic Fit To Text");
+      
+    add(automaticFitItem);
+    automaticFitItem.addActionListener(Actions.setAutomaticFitAction);
+
+    fitItem = add(Actions.fitToTextAction, "Fit To Text", Event.CTRL_MASK, KeyEvent.VK_T);
 
     addMenuListener(new TextMenuListener());
   }
