@@ -2094,7 +2094,7 @@ fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets)
   {
     fts_set_int(a, fts_object_get_inlets_number((fts_object_t *) this));
     fts_set_int(a + 1, new_noutlets);
-    obj_this->head.cl = fts_class_instantiate(patcher_metaclass, 3, a);
+    obj_this->head.cl = fts_class_instantiate(patcher_metaclass, 2, a);
   }
 
   {
