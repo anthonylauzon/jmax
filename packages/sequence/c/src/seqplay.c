@@ -134,6 +134,9 @@ seqplay_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   double time = 0.0;
   event_t *event;
       
+  if(this->status > status_reset)
+    seqplay_reset(this);  
+
   if(ac > 0 && fts_is_number(at))
     time = fts_get_number_float(at);
   
@@ -148,9 +151,9 @@ seqplay_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       
       /* set start time */
       this->last_location = time;
-    }
 
-  this->status = status_ready;
+      this->status = status_ready;
+    }
 }
 
 static void 
@@ -166,7 +169,7 @@ seqplay_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  /* locate */
 	  seqplay_locate(o, 0, 0, ac, at);
 
-	  if(!this->event)
+	  if(this->status != status_ready)
 	    return;
 	  
 	case status_ready:

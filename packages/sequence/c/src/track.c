@@ -146,7 +146,7 @@ static void
 insert_event_behind(track_t *track, event_t *here, event_t *event)
 {
   if(here == 0)
-    append_event(track, event);
+    prepend_event(track, event);
   else if(here == track->last)
     append_event(track, event);
   else
@@ -202,7 +202,7 @@ cutout_event(track_t *track, event_t *event)
 void
 track_add_event(track_t *track, double time, event_t *event)
 {
-  event_t *here = track_get_event_by_time(track, time);
+  event_t *here = track_get_next_by_time(track, time);
 
   insert_event_before(track, here, event);
   fts_object_refer(event);
@@ -219,18 +219,6 @@ track_append_event(track_t *track, double time, event_t *event)
   
   event_set_track(event, track);
   event_set_time(event, time);  
-}
-
-void
-track_add_event_after(track_t *track, double time, event_t *event, event_t *after)
-{
-  event_t *here = track_get_event_by_time_after(track, time, after);
-  
-  insert_event_before(track, here, event);
-  fts_object_refer(event);
-
-  event_set_track(event, track);
-  event_set_time(event, time);
 }
 
 void
@@ -255,7 +243,7 @@ track_move_event(track_t *track, event_t *event, double time)
 
       event_set_time(event, time);      
 
-      insert_event_before(track, track_get_event_by_time(track, time), event);
+      insert_event_before(track, track_get_next_by_time(track, time), event);
     }
   else
     event_set_time(event, time);
@@ -284,18 +272,36 @@ track_clear(track_t *track)
 void
 track_merge(track_t *track, track_t *merge)
 {
+  event_t *here = track_get_first(track);
   event_t *event = track_get_first(merge);
   
-  while(event)
+  if(here)
     {
-      event_t *next = event_get_next(event);
-
-      /* move event from merge track to this */
-      track_add_event(track, event_get_time(event), event);
-      
-      event = next;
+      while(event)
+	{
+	  double time = event_get_time(event);
+	  event_t *next = event_get_next(event);
+	  
+	  /* search for good place */
+	  while(here && time >= event_get_time(here))
+	    here = event_get_next(here);
+	  
+	  /* transfer event */
+	  insert_event_before(track, here, event);
+	  
+	  event_set_track(event, track);
+	  event_set_time(event, time);
+	  
+	  event = next;
+	}
     }
-
+  else
+    {
+      track->first = merge->first;
+      track->last = merge->last;
+      track->size = merge->size;
+    }  
+  
   /* merge track is empty */
   merge->first = 0;
   merge->last = 0;
@@ -325,9 +331,26 @@ track_get_event_by_time(track_t *track, double time)
     return 0;
 }
 
+/* returns next event after given time */
+event_t *
+track_get_next_by_time(track_t *track, double time)
+{
+  if(track_get_size(track) > 0 && time <= track->last->time)
+    {
+      event_t *event = track->first;
+      
+      while(time >= event->time)
+	event = event->next;
+
+      return event;  
+    }
+  else
+    return 0;
+}
+
 /* like above - searching is started from given element (here) */
 event_t *
-track_get_event_by_time_after(track_t *track, double time, event_t *here)
+track_get_next_by_time_after(track_t *track, double time, event_t *here)
 {
   if(track_get_size(track) > 0 && time <= track->last->time)
     {
@@ -338,7 +361,7 @@ track_get_event_by_time_after(track_t *track, double time, event_t *here)
       else
 	event = track->first;
       
-      while(time > event->time)
+      while(time >= event->time)
 	event = event->next;
 
       return event;  
