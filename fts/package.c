@@ -744,6 +744,48 @@ fts_package_get_function( fts_package_t *pkg, fts_symbol_t name)
   return NULL;
 }
 
+fts_fun_t
+fts_get_function_by_name(fts_symbol_t name)
+{
+  fts_package_t *pkg;
+  fts_fun_t fun;
+  fts_iterator_t iter;
+
+  /* ask the kernel package first */
+  pkg = fts_get_system_package ();
+  if ((fun = fts_package_get_function(pkg, name)) != NULL)
+    return fun;
+
+  /* ask the current package */
+  pkg = fts_get_current_package();
+  if ((fun = fts_package_get_function(pkg, name)) != NULL)
+    return fun;
+
+  /* ask the required packages of the current package */
+  fts_package_get_required_packages(pkg, &iter);
+
+  while (fts_iterator_has_more(&iter))
+    {
+      fts_atom_t a;
+      fts_package_t *p;
+      fts_symbol_t p_name;
+
+      fts_iterator_next(&iter, &a);
+      p_name = fts_get_symbol(&a);
+      p = fts_package_get(p_name);
+
+      if (p != NULL)
+	{
+	  fun = fts_package_get_function(p, name);
+
+	  if (fun != NULL)
+	    return fun;
+	}
+    }
+
+  return NULL;
+}
+
 /********************************************************************
  *
  *   - data files

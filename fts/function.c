@@ -21,6 +21,7 @@
  */
 
 #include <fts/fts.h>
+#include <ftsprivate/class.h>
 #include <ftsprivate/package.h>
 
 fts_fun_t
@@ -32,48 +33,6 @@ fts_function_install(fts_symbol_t name, fts_fun_t fun)
     return NULL;
 
   return fun;
-}
-
-fts_fun_t
-fts_function_get_by_name(fts_symbol_t name)
-{
-  fts_package_t *pkg;
-  fts_fun_t fun;
-  fts_iterator_t iter;
-
-  /* ask the kernel package first */
-  pkg = fts_get_system_package ();
-  if ((fun = fts_package_get_function(pkg, name)) != NULL)
-    return fun;
-
-  /* ask the current package */
-  pkg = fts_get_current_package();
-  if ((fun = fts_package_get_function(pkg, name)) != NULL)
-    return fun;
-
-  /* ask the required packages of the current package */
-  fts_package_get_required_packages(pkg, &iter);
-
-  while (fts_iterator_has_more(&iter))
-    {
-      fts_atom_t a;
-      fts_package_t *p;
-      fts_symbol_t p_name;
-
-      fts_iterator_next(&iter, &a);
-      p_name = fts_get_symbol(&a);
-      p = fts_package_get(p_name);
-
-      if (p != NULL)
-	{
-	  fun = fts_package_get_function(p, name);
-
-	  if (fun != NULL)
-	    return fun;
-	}
-    }
-
-  return NULL;
 }
 
 /* **********************************************************************
@@ -93,14 +52,28 @@ static void unique_function(int ac, const fts_atom_t *at)
 
 static void new_function(int ac, const fts_atom_t *at)
 {
-  fts_atom_t ret[1];						
-  fts_object_t *obj;
+  fts_atom_t a;
+  fts_object_t *obj = NULL;
+  
+  if(ac > 0)
+  {
+    fts_class_t *class = NULL;
+    
+    if(fts_is_symbol(at))
+      class = fts_get_class_by_name(fts_get_symbol(at));
+    else if(fts_is_a(&a, fts_class_class))
+      class = (fts_class_t *)fts_get_object(at);
 
-  obj = fts_eval_object_description( fts_get_root_patcher(), ac, at);
-
-  fts_set_object( ret, obj);
-
-  fts_return( ret);
+    if(class != NULL)
+      obj = fts_object_create(class, ac - 1, at + 1);
+  }
+  
+  if(obj != NULL)
+    fts_set_object(&a, obj);
+  else
+    fts_set_void(&a);
+  
+  fts_return(&a);
 }
 
 

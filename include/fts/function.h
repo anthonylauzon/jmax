@@ -41,20 +41,3 @@
  */
 FTS_API fts_fun_t fts_function_install(fts_symbol_t name, fts_fun_t fun);
 
-/**
- * Get a function by its name.
- * Search order:
- * <ol>
- * <li> the current package
- * <li> the required packages of the current package
- * </ul>
- *
- * @fn fts_fun_t *fts_function_get_by_name(fts_symbol_t name)
- * @param name the name
- * @return the function or NULL if no function found
- * @ingroup function
- */
-FTS_API fts_fun_t fts_function_get_by_name(fts_symbol_t name);
-
-
-

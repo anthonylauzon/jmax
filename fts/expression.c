@@ -467,7 +467,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 	/* it is a function call */
 	fts_fun_t fun;
 
-	fun = fts_function_get_by_name( fts_get_symbol( at));
+	fun = fts_get_function_by_name( fts_get_symbol( at));
 
 	if (!fun)
 	  return no_such_function_error;
@@ -484,7 +484,10 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 	    expression_stack_push( exp, ret);
 	  }
 	else
+	{
 	  expression_stack_push( exp, fts_get_return_value());
+          fts_atom_refer(fts_get_return_value());
+        }
       }
     else if (ac > 1 && fts_is_object( at) && fts_is_symbol( at+1))
       {
@@ -503,7 +506,10 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 	    expression_stack_push( exp, ret);
 	  }
 	else
+	{
 	  expression_stack_push( exp, fts_get_return_value());
+          fts_atom_refer(fts_get_return_value());
+        }
       }
     else if (ac == 1)
       {

@@ -1,8 +1,22 @@
+2004-01-08  Norbert Schnell  <schnell@mac-portable-schnell.ircam.fr>
+
+	* moved fts_function_get_by_name() from function.c to fts_get_function_by_name() to package.c
+
+	* fixed function "new" - new_function() in function.c: now uses fts_object_create()
+
+	* added object reference by fts_atom_refer() for function and method call return value in expression.c
+
 2004-01-08  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* utils/rpm/jmax.spec.in: added custom variable for setting the dependency with external packages.
 	I hope that can be used by packagers of other RPM based distro.
 
+2004-01-07  Norbert Schnell  <Norbert.Schnell@ircam.fr>
+
+	* moved fts_class_get_by_name() from class.c to fts_get_class_by_name() to package.c
+
+	* updated Xcode project (added package functions, and converted to "native" project)
+	
 2004-01-07  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* packages/signal/c/src/playfvec.c (play_ftl): fixed bug [ 872267 ] play bug with fvec starting by non 0 value. 

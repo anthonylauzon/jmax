@@ -21,6 +21,7 @@
  */
 
 #include <fts/packages/utils/utils.h>
+#include <ftsconfig.h>
 #include <math.h>
 #include <assert.h>
 
