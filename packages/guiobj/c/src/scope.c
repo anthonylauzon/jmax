@@ -353,7 +353,7 @@ scope_ftl(fts_word_t *argv)
 
 		      /* reset threshold for auto trigger */
 		      if(data->trigger == scope_auto)
-			data->threshold = 0.9 * max;
+			data->threshold = 0.75 * max;
 		      
 		      max = MIN_FLOAT;
 		    }
@@ -367,7 +367,7 @@ scope_ftl(fts_word_t *argv)
 		{
 		  /* reset threshold for auto trigger */
 		  if(data->trigger == scope_auto)
-		    data->threshold = 0.9 * max;
+		    data->threshold = 0.75 * max;
 		  
 		  max = MIN_FLOAT;
 

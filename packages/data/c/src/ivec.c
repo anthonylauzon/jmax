@@ -851,10 +851,14 @@ ivec_save_bmax(ivec_t *vec, fts_bmax_file_t *f)
 static void
 ivec_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ivec_t *this = (ivec_t *)o;  
-  fts_bmax_file_t *f = (fts_bmax_file_t *)fts_get_ptr(at);
+  ivec_t *this = (ivec_t *)o;
+
+  if(this->persistent)
+    {
+      fts_bmax_file_t *f = (fts_bmax_file_t *)fts_get_ptr(at);
       
-  ivec_save_bmax(this, f);
+      ivec_save_bmax(this, f);
+    }
 }
 
 static void
@@ -878,15 +882,18 @@ ivec_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-ivec_set_file(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+ivec_set_persistent(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   ivec_t *this = (ivec_t *)obj;
 
   if(fts_is_symbol(value))
     {
-      fts_symbol_t name = fts_get_symbol(value);
+      fts_symbol_t s = fts_get_symbol(value);
 
-      this->file = name;
+      if(s == fts_s_yes)
+	this->persistent = 1;
+      else
+	this->persistent = 0;	
     }
 }
 
@@ -954,7 +961,8 @@ ivec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       ivec_alloc(this, ac);
       ivec_set_from_atom_list(this, 0, ac, at);
     }
-  this->file = 0;
+
+  this->persistent = 0;
   this->opened = 0; 
   this->vsize = 0; 
   this->vindex = 0;
@@ -999,14 +1007,11 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), ivec_assist); 
 
       /* save and restore to/from bmax file */
-      /*fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, ivec_bmax); 
-	fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, ivec_set); */
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, ivec_bmax); 
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, ivec_set);
 
-      /* define variable */
       fts_class_add_daemon(cl, obj_property_get, fts_s_state, ivec_get_state);
-
-      /* set file property */
-      fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("file"), ivec_set_file);
+      fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("keep"), ivec_set_persistent);
 
       fts_method_define_varargs(cl, 0, fts_s_bang, ivec_output);
 
