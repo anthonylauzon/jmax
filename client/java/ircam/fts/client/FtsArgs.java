@@ -138,7 +138,7 @@ public class FtsArgs {
       addInt( ((Integer)value).intValue());
     else if ( value instanceof Double)
       addDouble( ((Double)value).doubleValue());
-    if ( value instanceof Float)
+    else if ( value instanceof Float)
       addDouble( (double)((Float)value).floatValue());
     else if ( value instanceof FtsSymbol)
       addSymbol((FtsSymbol)value);
