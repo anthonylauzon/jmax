@@ -47,10 +47,10 @@ public class BpfTools implements ToolProvider{
 
     try
       {
-	path  = MaxApplication.getPackageHandler().locatePackage("control").getPath()+fs+"images"+fs;
+	path  = MaxApplication.getPackageHandler().locatePackage("data").getPath()+fs+"images"+fs;
       }
     catch(FileNotFoundException e){
-	path = MaxApplication.getProperty("controlPackageDir")+File.separator+"images"+File.separator;
+	path = MaxApplication.getProperty("dataPackageDir")+File.separator+"images"+File.separator;
     }
 
     tools[0] = new ArrowTool(new ImageIcon(path+"arrow.gif"));
