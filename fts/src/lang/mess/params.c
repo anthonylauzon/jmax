@@ -18,6 +18,9 @@
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
 
+/* (fd) */
+#include <stdio.h>
+
 typedef struct fts_param
 {
   fts_symbol_t name;
@@ -55,12 +58,17 @@ void fts_param_set(fts_symbol_t name, const fts_atom_t *value)
 void fts_param_set_by(fts_symbol_t name, const fts_atom_t *value, const void *author)
 {
   fts_param_t *p;
+  int value_not_changed = 0;
+
+  /* (fd) */
+  fprintf( stderr, "setting parameter %s by 0x%x\n", fts_symbol_name( name), author);
 
   /* First, check if there, otherwise add it */
 
   for (p = param_list; p ; p = p->next)
     if (p->name == name)
       {
+	value_not_changed = fts_atom_are_equals( &p->value, value);
 	p->value = *value;
 	break;
       }
@@ -78,8 +86,10 @@ void fts_param_set_by(fts_symbol_t name, const fts_atom_t *value, const void *au
     }
 
   /* Second, run the listeners */
-
-  fts_param_run_listeners(name, value, author);
+  if ( !value_not_changed)
+    {
+      fts_param_run_listeners(name, value, author);
+    }
 }
 
 
@@ -94,7 +104,6 @@ const fts_atom_t *fts_param_get(fts_symbol_t name)
   return 0;
 }
 
-
 /* Note that is a parameter is already set, the listener is called
    at "adding" time to tell him the current value; note also that a listener
    can be added multiple times, also for the same couple value.
@@ -106,6 +115,9 @@ void fts_param_add_listener(fts_symbol_t name, void *listener,
 {
   fts_param_listener_t *p;
   fts_param_t *pp;
+
+  /* (fd) */
+  fprintf( stderr, "adding listener 0x%x for %s\n", listener_fun, fts_symbol_name( name));
 
   /* Add the listener to the list */
 
@@ -133,8 +145,12 @@ static void fts_param_run_listeners(fts_symbol_t name, const fts_atom_t *value, 
   fts_param_listener_t *p;
 
   for (p = param_listener_list; p ; p = p->next)
-    if ((p->name == name) && (p->listener != author))
-      (* p->listener_fun)(p->listener, name, value);
+    if ((p->name == name) && (author == 0 || p->listener != author))
+      {
+	/* (fd) */
+	fprintf( stderr, "calling listener 0x%x for %s value %d\n", p->listener_fun, fts_symbol_name( name), fts_get_int(value));
+	(* p->listener_fun)(p->listener, name, value);
+      }
 }
 
 
