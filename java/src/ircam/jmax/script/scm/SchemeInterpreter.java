@@ -115,7 +115,7 @@ public abstract class SchemeInterpreter implements Interpreter
 	}
     }
 
-    public Package loadPackage(Package pkg, File initfile) throws ScriptException
+    public MaxPackage loadPackage(MaxPackage pkg, File initfile) throws ScriptException
     {
 	Object old_dir = lookup("dir");
 	Object old_pkg = lookup("this-package");
@@ -151,36 +151,6 @@ public abstract class SchemeInterpreter implements Interpreter
     public static boolean isNull(Object obj) 
     {
 	return obj == null;
-    }
-
-    /**
-     *  This methods creates a MaxSchemeDocument. It can be invoked in
-     *  a Scheme file using (jmax <type> <version> <name> <info>
-     *  <body>). Unfortunately the body has to be a string and not a
-     *  procedure, because silk is not open enough to call a procedure
-     *  with the current environment and I/O. Hopefully this will
-     *  change in the future.
-     */
-    public MaxDocument loadMaxDocument(String type, String version, String name, 
-				       String info, String body) throws ScriptException 
-    {
-	MaxDocument document = null;
-
-	// Create a new instance of the type
-	document = Mda.getDocumentTypeByName(type).newDocument(MaxApplication.getFts());
-
-	if (false /*document instanceof MaxSchemeDocument FIXME*/) {
-	    // Set the name and info
-	    document.setName(name);
-	    
-	    // Eval the body inside the document 
-	    // FIXME ((MaxSchemeDocument) document).eval(this, body);
-	    
-	    // Finally, return the document to the interpreter    
-	    return document;
-	} else {
-	    throw new ScriptException(type + " is not a Scheme based jMax document");
-	}
     }
 }
 

@@ -185,22 +185,6 @@ public class KawaInterpreter extends SchemeInterpreter
 	}
     }
 
-    /* FIXME */
-    public boolean commandComplete(String s) 
-    {
-	return false;
-    }
-
-    public Project loadProject(Package context, File proj) throws ScriptException
-    {
-	throw new ScriptException("Not yet implemented");
-    }
-
-    public MaxDocument loadScriptedDocument(Package context, File script) throws ScriptException
-    {
-	throw new ScriptException("Not yet implemented");
-    }
-
     public String getScriptLanguage()
     {
 	return "scheme";
@@ -283,16 +267,20 @@ public class KawaInterpreter extends SchemeInterpreter
 	}
     }
 
-    public SettingsTable makeSettings(Package pkg) {
+  public SettingsTable getGlobalSettings() {
+    throw new RuntimeException("Not yet implemented");
+  }
+
+    public SettingsTable makeSettings(MaxPackage pkg) {
 	return null;
     }
 
-    public Object makeWorkSpace(Package pkg) { 
+    public Object makeWorkSpace(MaxPackage pkg) { 
 	return null;
     }
 
-    public void setContext(Package pkg) {}
-    public void removeContext(Package pkg) {}
+    public void setContext(MaxPackage pkg) {}
+    public void removeContext(MaxPackage pkg) {}
 
     /** The main method starts a Scheme shell. Provided for testing purposes. */
     public static void main(String[] arg) throws ScriptException {
