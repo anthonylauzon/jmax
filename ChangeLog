@@ -1,3 +1,10 @@
+2003-05-07  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* fts/expression.c: fixed lookup of classes/templates. Before, when loading a template that was
+	part of a package, the lookup was done only inside the package and its requires. Now, the lookup is
+	done first in the package of the template and its requires and then in the project and its requires.
+	This way, you don't have to add all the requires of "standard" packages in all the packages. 
+
 2003-05-05  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* packages/winbuild/packages.dsw : removed obsolete packages (Windows port)

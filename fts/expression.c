@@ -404,11 +404,44 @@ create_instance_in_package( fts_package_t *package, fts_patcher_t *patcher, fts_
 }
 
 static fts_object_t *
+create_instance_in_package_or_its_requires( fts_package_t *package, fts_patcher_t *patcher, fts_symbol_t class_name, int ac, const fts_atom_t *at, int offset, fts_status_t *status)
+{
+  fts_iterator_t iter;
+  fts_object_t *obj;
+
+  if ((obj = create_instance_in_package( package, patcher, class_name, ac, at, 2, status)) != NULL)
+    return obj;
+
+  if (*status != fts_ok)
+    return NULL;
+
+  fts_package_get_required_packages( package, &iter);
+
+  while ( fts_iterator_has_more( &iter)) 
+    {
+      fts_atom_t a;
+
+      fts_iterator_next( &iter, &a);
+
+      package = fts_package_get( fts_get_symbol( &a));
+      if (package == NULL)
+	continue;
+
+      if ((obj = create_instance_in_package( package, patcher, class_name, ac, at, 2, status)) != NULL)
+	return obj;
+
+      if (*status != fts_ok)
+        return NULL;      
+    }
+
+  return NULL;
+}
+
+static fts_object_t *
 object_or_template_create( fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_status_t *status)
 {
   fts_object_t *obj;
   fts_package_t *pkg;
-  fts_iterator_t iter;
   fts_symbol_t package_name = NULL;
   fts_symbol_t class_name;
 
@@ -421,10 +454,10 @@ object_or_template_create( fts_patcher_t *patcher, int ac, const fts_atom_t *at,
       pkg = fts_package_get( package_name);
       if (pkg != NULL)
 	{
-	  if((obj = create_instance_in_package( pkg, patcher, class_name, ac, at, 3, status)) != NULL)
+	  if ((obj = create_instance_in_package( pkg, patcher, class_name, ac, at, 3, status)) != NULL)
 	    return obj;
 
-	  if(*status == fts_ok)
+	  if (*status == fts_ok)
 	    *status = unknown_class_error;
 	}
       else
@@ -437,41 +470,27 @@ object_or_template_create( fts_patcher_t *patcher, int ac, const fts_atom_t *at,
 
   /* 1) ask kernel package */
   pkg = fts_get_system_package();
-  if((obj = create_instance_in_package( pkg, patcher, class_name, ac, at, 2, status)) != NULL)
-    return obj;
-  
-  if(*status != fts_ok)
-    return NULL;
-  
-  /* 2) ask the current package */
-  pkg = fts_get_current_package();
   if ((obj = create_instance_in_package( pkg, patcher, class_name, ac, at, 2, status)) != NULL)
     return obj;
+  
+  if (*status != fts_ok)
+    return NULL;
+  
+  /* 2) ask the current package and its requires */
+  pkg = fts_get_current_package();
+  if ((obj = create_instance_in_package_or_its_requires( pkg, patcher, class_name, ac, at, 2, status)) != NULL)
+    return obj;
 
-  if(*status != fts_ok)
+  if (*status != fts_ok)
     return NULL;
 
-  /* 3) ask the required packages of the current package */
-  fts_package_get_required_packages( pkg, &iter);
-
-  while ( fts_iterator_has_more( &iter)) 
-    {
-      fts_atom_t a;
-
-      fts_iterator_next( &iter, &a);
-
-      pkg = fts_package_get( fts_get_symbol( &a));
-      if (pkg == NULL)
-	continue;
-
-      if ((obj = create_instance_in_package( pkg, patcher, class_name, ac, at, 2, status)) != NULL)
-	return obj;
-
-      if(*status != fts_ok)
-        return NULL;      
-    }
+  /* 3) ask the current project and its requires */
+  pkg = fts_project_get();
+  if ((obj = create_instance_in_package_or_its_requires( pkg, patcher, class_name, ac, at, 2, status)) != NULL)
+    return obj;
 
   *status = unknown_class_error;      
+
   return NULL;
 }
 
