@@ -1102,23 +1102,28 @@ fts_pipestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 
 #ifdef WIN32
   /* obtain stdin and stdout */
-  _stdin = GetStdHandle(STD_INPUT_HANDLE); 
+  this->in = GetStdHandle(STD_INPUT_HANDLE); 
   this->out = GetStdHandle(STD_OUTPUT_HANDLE); 
 
-  if ((this->out == INVALID_HANDLE_VALUE) || (_stdin == INVALID_HANDLE_VALUE)) {
-    fts_log("Invalid pipes.\n");    
+  if ((this->out == INVALID_HANDLE_VALUE) || (this->in == INVALID_HANDLE_VALUE)) {
+    fts_log("[client] Invalid pipes.\n");    
     fts_object_set_error( (fts_object_t *)this, "Invalid pipes");
     return;
   }
 
   /* close the stdin */
-  if (!DuplicateHandle(GetCurrentProcess(), _stdin,
-		       GetCurrentProcess(), &this->in, 0,
-		       FALSE, DUPLICATE_SAME_ACCESS)) {
-    fts_log("Failed to duplicate stdin.\n");    
-    fts_object_set_error( (fts_object_t *)this, "Failed to duplicate stdin");
-  }
-  CloseHandle(_stdin);
+/*    _stdin = GetStdHandle(STD_INPUT_HANDLE);  */
+/*    if (!DuplicateHandle(GetCurrentProcess(), _stdin, */
+/*  		       GetCurrentProcess(), &this->in, 0, */
+/*  		       FALSE, DUPLICATE_SAME_ACCESS)) { */
+/*      LPVOID msg; */
+/*      FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, */
+/*  		  NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &msg, 0, NULL); */
+/*      fts_log("[client] Failed to duplicate stdin: (%s)\n", msg); */
+/*      fts_object_set_error( (fts_object_t *)this, "Failed to duplicate stdin"); */
+/*      LocalFree(msg); */
+/*    } */
+/*    CloseHandle(_stdin); */
 
   /* redirect stdout to a file */
   _stdout = CreateFile("C:\\fts_stdout.txt", 
@@ -1126,7 +1131,7 @@ fts_pipestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 		       FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH, NULL);
   if ((_stdout == INVALID_HANDLE_VALUE) 
       || !SetStdHandle(STD_OUTPUT_HANDLE, _stdout)) {
-    fts_log("Failed to redirect the stdout. Stdout will not be available.\n");
+    fts_log("[client] Failed to redirect the stdout. Stdout will not be available.\n");
   }
 
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_ALWAYS);  

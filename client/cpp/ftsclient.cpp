@@ -107,6 +107,7 @@ void ftsclient_init_log(void)
 
   /* truncate the file */
   log = fopen(log_file, "w");
+  fprintf(log, "[log]: ftsclient compiled on %s at %s\n", __DATE__, __TIME__);
   fprintf(log, "[log]: %s started logging\n", ftsclient_curdate(date, 64));
   fclose(log);
 }
@@ -1091,7 +1092,7 @@ void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientExceptio
   char cmdLine[2048];
   PROCESS_INFORMATION process_info;
   STARTUPINFO startup_info;
-  pipe_t new_stdin, new_stdout; 
+  pipe_t new_stdin, new_stdout, tmp_in, tmp_out; 
   SECURITY_ATTRIBUTES attr; 
   int i;
 
@@ -1103,6 +1104,7 @@ void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientExceptio
     findDefaultPath();
   }
 
+  ftsclient_log("[ftsxtra]: debug \n", _path);
   ftsclient_log("[ftsxtra]: path %s\n", _path);
 
   cmdLine[0] = 0;
@@ -1117,12 +1119,10 @@ void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientExceptio
   }
 
   /* 
-     create the pipes to replace the stdin and stdout of the FTS
-     process 
+     create two pipes and set the stdin and stdout of FTS to the pipes 
   */
 
-  /* make sure that the pipe handles can be inherited by the FTS
-     process */
+  /* make sure that the pipe handles can be inherited by FTS */
   attr.nLength = sizeof(SECURITY_ATTRIBUTES); 
   attr.bInheritHandle = TRUE; 
   attr.lpSecurityDescriptor = NULL; 
@@ -1131,39 +1131,70 @@ void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientExceptio
   pipe_t old_stdout = GetStdHandle(STD_OUTPUT_HANDLE); 
 
   /* create a pipe for the new stdout */
-  if (!CreatePipe(&this->_in, &new_stdout, &attr, 0)) {
+  if (!CreatePipe(&tmp_in, &new_stdout, &attr, 0)) {
     throw FtsClientException("Can't create the anonymous pipe for output");
   }
 
-  /* set the pipe as the new stdout, so it can be inherited by FTS */
+  /* set the pipe as the new stdout so FTS can access it */
   if (!SetStdHandle(STD_OUTPUT_HANDLE, new_stdout)) {
     throw FtsClientException("Can't set the anonymous pipe as output");
   }
+
+#if 0
+  if (!DuplicateHandle(GetCurrentProcess(), &tmp_in,
+		       GetCurrentProcess(), &this->_in, 
+		       0, FALSE, DUPLICATE_SAME_ACCESS)) {
+    throw FtsClientException("Failed to duplicate the stdin handle");
+  }
+  CloseHandle(tmp_in);
+#else
+  this->_in = tmp_in;
+#endif
 
   /* keep a handle to the old stdin */
   pipe_t old_stdin = GetStdHandle(STD_INPUT_HANDLE); 
 
   /* create a pipe for the new stdin */
-  if (!CreatePipe(&new_stdin, &this->_out, &attr, 0)) {
+  if (!CreatePipe(&new_stdin, &tmp_out, &attr, 0)) {
     throw FtsClientException("Can't create the anonymous pipe for input");
   }
 
-  /* set the pipe as the new stdin, so it can be inherited by FTS */
+  /* set the pipe as the new stdin so FTS can access it */
   if (!SetStdHandle(STD_INPUT_HANDLE, new_stdin)) {
     throw FtsClientException("Can't set the anonymous pipe as input");
   }
+
+  if (!DuplicateHandle(GetCurrentProcess(), tmp_out, 
+		       GetCurrentProcess(), &this->_out, 
+		       0, FALSE, DUPLICATE_SAME_ACCESS)) {
+    throw FtsClientException("Failed to duplicate the stdout handle");
+  }
+ 
+   CloseHandle(tmp_out); 
+
+
 
   /* 
      start FTS
   */
 
-  GetStartupInfo(&startup_info);
+  ZeroMemory(&startup_info, sizeof(STARTUPINFO));
+  startup_info.cb = sizeof(STARTUPINFO); 
 
   result = CreateProcess(_path, cmdLine, NULL, NULL, TRUE, REALTIME_PRIORITY_CLASS, 
 			 NULL, NULL, &startup_info, &process_info);
   if (result == 0) {
     throw FtsClientException("Failed to start the fts application\n");    
   }
+
+  if (!SetStdHandle(STD_INPUT_HANDLE, old_stdin)) { 
+    throw FtsClientException("Failed to set the restore the stdin\n");    
+  }
+  
+  if (!SetStdHandle(STD_OUTPUT_HANDLE, old_stdout)) {
+    throw FtsClientException("Failed to set the restore the stdout\n");    
+  }
+
 }
 #else
 void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientException)
