@@ -147,8 +147,8 @@ public class Guiobj implements JMaxPackage {
 
     JMaxClassMap.put( "standard", standardCreator, "/icons/standard.gif", "/icons/standard_cursor.gif", "standard", this);
     JMaxClassMap.put( "jpatcher", patcherCreator, "/icons/jpatcher.gif", "/icons/jpatcher_cursor.gif", "patcher", this);
-    JMaxClassMap.put( "inlet", inletCreator, "/icons/inlet.gif", "/icons/inlet_cursor.gif", "inlet", this);
-    JMaxClassMap.put( "outlet", outletCreator, "/icons/outlet.gif", "/icons/outlet_cursor.gif", "outlet", this);
+    JMaxClassMap.put( "receive", inletCreator, "/icons/inlet.gif", "/icons/inlet_cursor.gif", "receive", this);
+    JMaxClassMap.put( "send", outletCreator, "/icons/outlet.gif", "/icons/outlet_cursor.gif", "send", this);
     JMaxClassMap.put( "fork", forkCreator, "/icons/fork.gif", "/icons/fork_cursor.gif", "fork", this);
     JMaxClassMap.put( "jcomment", jcommentCreator, "/icons/jcomment.gif", "/icons/jcomment_cursor.gif", "comment", this);
     JMaxClassMap.put( "messconst", messconstCreator, "/icons/messconst.gif", "/icons/messconst_cursor.gif", "message",this);

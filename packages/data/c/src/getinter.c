@@ -25,60 +25,12 @@
 #include <data/c/include/ivec.h>
 #include <data/c/include/fvec.h>
 
-/******************************************************
- *
- *  getinter <ivec>
- *  getinter <fvec>
- *  getinter <bpf>
- *
- */
-
-typedef struct 
-{
-  fts_object_t o;
-  fts_object_t *obj;
-} getinter_t;
-
 typedef struct 
 {
   fts_object_t o;
   fts_object_t *obj;
   int index;
-} getinter_bpf_t;
-
-static void
-getinter_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  getinter_t *this = (getinter_t *)o;
-
-  this->obj = fts_get_object(at);
-  fts_object_refer(this->obj);
-}
-
-static void
-getinter_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  getinter_t *this = (getinter_t *)o;
-
-  fts_object_release(this->obj);
-}
-
-/******************************************************
- *
- *  set indices and reference
- *
- */
-
-static void
-getinter_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  getinter_t *this = (getinter_t *)o;
-  fts_object_t *obj = fts_get_object(at);
-
-  fts_object_release(this->obj);
-  this->obj = obj;
-  fts_object_refer(obj);
-}
+} getinter_t;
 
 /******************************************************
  *
@@ -151,7 +103,7 @@ getinter_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 getinter_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  getinter_bpf_t *this = (getinter_bpf_t *)o;
+  getinter_t *this = (getinter_t *)o;
   bpf_t *bpf = (bpf_t *)this->obj;
   int size = bpf_get_size(bpf);
 
@@ -210,6 +162,24 @@ getinter_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   else
     fts_outlet_float(o, 0, 0.0);    
 }
+
+static void
+getinter_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getinter_t *this = (getinter_t *)o;
+  fts_object_t *obj = fts_get_object(at);
+
+  fts_object_release(this->obj);
+  this->obj = obj;
+  fts_object_refer(obj);
+}
+
+static void
+getinter_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getinter_t *this = (getinter_t *)o;
+
+}
   
 /******************************************************
  *
@@ -217,53 +187,41 @@ getinter_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  *
  */
 
+static void
+getinter_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getinter_t *this = (getinter_t *)o;
+
+  this->obj = fts_get_object(at);
+  fts_object_refer(this->obj);
+}
+
+static void
+getinter_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getinter_t *this = (getinter_t *)o;
+
+  fts_object_release(this->obj);
+}
+
 static fts_status_t
 getinter_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 1 && fts_is_a(at, ivec_type))
-    {
-      fts_class_init(cl, sizeof(getinter_t), 2, 1, 0); 
-      
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getinter_init);
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getinter_delete);
-      
-      fts_method_define_varargs(cl, 0, fts_s_int, getinter_ivec);
-      fts_method_define_varargs(cl, 0, fts_s_float, getinter_ivec);
-
-      fts_method_define_varargs(cl, 1, ivec_symbol, getinter_set_reference);
-    }
-  else if(ac == 1 && fts_is_a(at, fvec_type))
-    {
-      fts_class_init(cl, sizeof(getinter_t), 2, 1, 0); 
-      
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getinter_init);
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getinter_delete);
-      
-      fts_method_define_varargs(cl, 0, fts_s_int, getinter_fvec);
-      fts_method_define_varargs(cl, 0, fts_s_float, getinter_fvec);
-
-      fts_method_define_varargs(cl, 1, fvec_symbol, getinter_set_reference);
-    }
-  else if(ac == 1 && fts_is_a(at, bpf_type))
-    {
-      fts_class_init(cl, sizeof(getinter_bpf_t), 2, 1, 0); 
-      
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getinter_init);
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getinter_delete);
-      
-      fts_method_define_varargs(cl, 0, fts_s_int, getinter_bpf);
-      fts_method_define_varargs(cl, 0, fts_s_float, getinter_bpf);
-
-      fts_method_define_varargs(cl, 1, bpf_symbol, getinter_set_reference);
-    }
-  else
-    return &fts_CannotInstantiate;
+  fts_class_init(cl, sizeof(getinter_t), 2, 1, 0); 
   
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getinter_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getinter_delete);
+  
+  fts_method_define_varargs(cl, 0, fts_s_int, getinter_input);
+  fts_method_define_varargs(cl, 0, fts_s_float, getinter_input);
+  
+  fts_method_define_varargs(cl, 1, ivec_symbol, getinter_set_reference);
+
   return fts_ok;
 }
 
 void
 getinter_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("getinter"), getinter_instantiate, fts_arg_type_equiv);
+  fts_class_install(fts_new_symbol("getinter"), getinter_instantiate);
 }

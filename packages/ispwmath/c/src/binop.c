@@ -20,1396 +20,596 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell, Miller Puckette.
+ * Authors: Norbert Schnell, Miller Puckette.
  *
  */
 
 
 #include <fts/fts.h>
 
-#define is_ibinop(ac, at)    (((ac) == 0) || (((ac) == 1) && fts_is_int(at)))
-#define is_fbinop(ac, at)    (((ac) == 1) && fts_is_float(at))
-#define is_sbinop(ac, at)    (((ac) == 1) && fts_is_symbol(at))
-
 typedef struct
 {
   fts_object_t o;
-  long operator;
-  long value;
-} ibinop_t;
-
-
-typedef struct
-{
-  fts_object_t o;
-  float value;
-  float operator;
-} fbinop_t;
-
-typedef struct
-{
-  fts_object_t o;
-  fts_symbol_t operator;
-  fts_symbol_t value;
-} sbinop_t;
+  fts_atom_t right;
+  fts_atom_t left;
+  enum binop_type {binop_int, binop_float, binop_symbol} type;
+} binop_t;
 
 /**************************************************************************************
  *
- *  generic methods for integer binops
- *
- *    set_right
- *    set_left
- *    list
- *    init
- *    instantiate
+ *  generic methods for number binops
  *
  */
 
 static void
-ibinop_set_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_number_set_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ibinop_t *this = (ibinop_t *)o;
+  binop_t *this = (binop_t *)o;
 
-  this->operator = (long) fts_get_number_int(at);
+  if(fts_is_number(at))
+    this->right = at[0];
+  else
+    fts_object_signal_runtime_error(o, "Bad value for right operand");
 }
 
-
 static void
-ibinop_set_left(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_number_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ibinop_t *this = (ibinop_t *)o;
+  binop_t *this = (binop_t *)o;
 
-  this->value = (long) fts_get_int_arg(ac, at, 0, 0);
-}
-
-
-static void
-ibinop_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if (ac >= 2)
-    if (fts_is_int(&at[1]) || fts_is_float(&at[1]))
-      ibinop_set_right(o, winlet, s, 1, at + 1);
-
-  if (ac >= 1)
+  switch(ac)
     {
-      if (fts_is_int(&at[0]))
-	fts_send_message(o, fts_s_left, 1, at);
-      else if (fts_is_float(&at[0]))
-	fts_send_message(o, fts_s_left, 1, at);
+    default:
+    case 2:
+      if(fts_is_number(at + 1))
+	this->right = at[1];
+      else
+	fts_object_signal_runtime_error(o, "Bad value for left operand");
+    case 1:
+      if(fts_is_number(at))
+	this->left = at[0];
+      else
+	fts_object_signal_runtime_error(o, "Bad value for left operand");
+    case 0:
     }
 }
 
-
 static void
-ibinop_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
+binop_number_left(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = 0;
-  this->operator = fts_get_int_arg(ac, at, 0, 0);
+  binop_number_set(o, 0, 0, ac, at);
+  fts_send_message(o, fts_s_bang, 0, 0);
 }
 
+static void
+binop_number_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
+{
+  binop_t *this = (binop_t *)o;
+
+  if(ac == 0 || fts_is_int(at))
+    this->type = binop_int;
+  else if(ac > 0 && fts_is_float(at))
+    this->type = binop_float;
+  else
+    fts_object_set_error(o, "Bad argument");
+
+  if(ac > 0)
+    this->right = at[0];
+}
 
 static fts_status_t
-ibinop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t bang_meth, fts_method_t number_meth)
+binop_number_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t method)
 {
-  fts_class_init(cl, sizeof(ibinop_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(binop_t), 2, 1, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, ibinop_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_left, number_meth);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, binop_number_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_bang, method);
 
-  fts_method_define_varargs(cl, 0, fts_s_set, ibinop_set_left);
+  fts_method_define_varargs(cl, 0, fts_s_bang, method);
+  fts_method_define_varargs(cl, 0, fts_s_set, binop_number_set);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, number_meth);
-  fts_method_define_varargs(cl, 0, fts_s_float, number_meth);
-  fts_method_define_varargs(cl, 0, fts_s_bang, bang_meth);
+  fts_method_define_varargs(cl, 0, fts_s_int, binop_number_left);
+  fts_method_define_varargs(cl, 0, fts_s_float, binop_number_left);
+  fts_method_define_varargs(cl, 0, fts_s_list, binop_number_left);
 
-  fts_method_define_varargs(cl, 0, fts_s_list, ibinop_list);
+  fts_method_define_varargs(cl, 1, fts_s_int, binop_number_set_right);
+  fts_method_define_varargs(cl, 1, fts_s_float, binop_number_set_right);
 
-  fts_method_define_varargs(cl, 1, fts_s_float, ibinop_set_right);
-  fts_method_define_varargs(cl, 1, fts_s_int, ibinop_set_right);
+  return fts_ok;
+}
 
-  fts_outlet_type_define_varargs(cl, 0, fts_s_int);
-      
+static void
+binop_set_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_t *this = (binop_t *)o;
+
+  if((this->type <= binop_float && fts_is_number(at)) || 
+     (this->type == binop_symbol && fts_is_symbol(at)))
+    this->right = at[0];
+  else
+    fts_object_signal_runtime_error(o, "Bad value for right operand");
+}
+
+static void
+binop_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_t *this = (binop_t *)o;
+
+  if(this->type <= binop_float)
+    {
+      switch(ac)
+	{
+	default:
+	case 2:
+	  if(fts_is_number(at + 1))
+	    this->right = at[1];
+	  else
+	    fts_object_signal_runtime_error(o, "Bad value for left operand");
+	case 1:
+	  if(fts_is_number(at))
+	    this->left = at[0];
+	  else
+	    fts_object_signal_runtime_error(o, "Bad value for left operand");
+	case 0:
+	}
+    }
+  else
+    {
+      switch(ac)
+	{
+	default:
+	case 2:
+	  if(fts_is_symbol(at + 1))
+	    this->right = at[1];
+	  else
+	    fts_object_signal_runtime_error(o, "Bad value for left operand");
+	case 1:
+	  if(fts_is_symbol(at))
+	    this->left = at[0];
+	  else
+	    fts_object_signal_runtime_error(o, "Bad value for left operand");
+	case 0:
+	}
+    }
+}
+
+static void
+binop_left(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_set(o, winlet, s, 1, at);
+  fts_send_message(o, fts_s_bang, 0, 0);
+}
+
+static void
+binop_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
+{
+  binop_t *this = (binop_t *)o;
+
+  if(ac == 0 || fts_is_int(at))
+    this->type = binop_int;
+  else if(ac > 0 && fts_is_float(at))
+    this->type = binop_float;
+  else if(ac > 0 && fts_is_symbol(at))
+    this->type = binop_symbol;
+  else
+    fts_object_set_error(o, "Bad argument");
+
+  if(ac > 0)
+    this->right = at[0];
+}
+
+static fts_status_t
+binop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t method)
+{
+  fts_class_init(cl, sizeof(binop_t), 2, 1, 0);
+
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, binop_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_bang, method);
+
+  fts_method_define_varargs(cl, 0, fts_s_bang, method);
+  fts_method_define_varargs(cl, 0, fts_s_set, binop_set);
+
+  fts_method_define_varargs(cl, 0, fts_s_int, binop_left);
+  fts_method_define_varargs(cl, 0, fts_s_float, binop_left);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, binop_left);
+  fts_method_define_varargs(cl, 0, fts_s_list, binop_left);
+
+  fts_method_define_varargs(cl, 1, fts_s_int, binop_set_right);
+  fts_method_define_varargs(cl, 1, fts_s_float, binop_set_right);
+  fts_method_define_varargs(cl, 1, fts_s_symbol, binop_set_right);
+
   return fts_ok;
 }
 
 
 /**************************************************************************************
  *
- *  generic methods for integer binops
- *
- *    set_right
- *    set_left
- *    list
- *    init
- *    instantiate
+ *  methods
  *
  */
 
 static void
-fbinop_set_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+add_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fbinop_t *this = (fbinop_t *)o;
+  binop_t *this = (binop_t *)o;
 
-  this->operator = (float) fts_get_number_float(at);
+  if(this->type == binop_int)
+    fts_outlet_int(o, 0, fts_get_number_int(&this->left) + fts_get_number_int(&this->right));
+  else
+    fts_outlet_float(o, 0, fts_get_number_float(&this->left) + fts_get_number_float(&this->right));
 }
 
-
 static void
-fbinop_set_left(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sub_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fbinop_t *this = (fbinop_t *)o;
+  binop_t *this = (binop_t *)o;
 
-  this->value = (float) fts_get_float_arg(ac, at, 0, 0.0f);
+  if(this->type == binop_int)
+    fts_outlet_int(o, 0, fts_get_number_int(&this->left) - fts_get_number_int(&this->right));
+  else
+    fts_outlet_float(o, 0, fts_get_number_float(&this->left) - fts_get_number_float(&this->right));
 }
 
+static void
+mul_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_t *this = (binop_t *)o;
+
+  if(this->type == binop_int)
+    fts_outlet_int(o, 0, fts_get_number_int(&this->left) * fts_get_number_int(&this->right));
+  else
+    fts_outlet_float(o, 0, fts_get_number_float(&this->left) * fts_get_number_float(&this->right));
+}
 
 static void
-fbinop_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+div_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if (ac >= 2)
-    if (fts_is_int(&at[1]) || fts_is_float(&at[1]))
-      fbinop_set_right(o, winlet, s, 1, at + 1);
+  binop_t *this = (binop_t *)o;
 
-  if (ac >= 1)
+  if(this->type == binop_int)
     {
-      if (fts_is_int(&at[0]))
-	fts_send_message(o, fts_s_left, 1, at);
-      else if (fts_is_float(&at[0]))
-	fts_send_message(o, fts_s_left, 1, at);
+      int right = fts_get_number_int(&this->right);
+
+      if(right != 0)
+	fts_outlet_int(o, 0, fts_get_number_int(&this->left) / right);
+      else
+	fts_outlet_int(o, 0, 0);
+    }	
+  else
+    {
+      double right = fts_get_number_float(&this->right);
+
+      if(right != 0.0)
+	fts_outlet_float(o, 0, fts_get_number_float(&this->left) / right);
+      else
+	fts_outlet_float(o, 0, 0.0);
     }
 }
 
-
 static void
-fbinop_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bus_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fbinop_t *this = (fbinop_t *)o;
+  binop_t *this = (binop_t *)o;
 
-  this->value = 0.0f;
-  this->operator = fts_get_float_arg(ac, at, 0, 0.0f);
-}
-
-
-static fts_status_t
-fbinop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t bang_meth, fts_method_t number_meth, fts_symbol_t outlet_type)
-{
-  fts_class_init(cl, sizeof(fbinop_t), 2, 1, 0);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fbinop_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_left, number_meth);
-
-  fts_method_define_varargs(cl, 0, fts_s_set, fbinop_set_left);
-
-  fts_method_define_varargs(cl, 0, fts_s_bang, bang_meth);
-
-  fts_method_define_varargs(cl, 0, fts_s_int, number_meth);
-  fts_method_define_varargs(cl, 0, fts_s_float, number_meth);
-      
-  fts_method_define_varargs(cl, 0, fts_s_list, fbinop_list);
-  
-  fts_method_define_varargs(cl, 1, fts_s_float, fbinop_set_right);
-  fts_method_define_varargs(cl, 1, fts_s_int, fbinop_set_right);
-
-  if (outlet_type == fts_s_int)
-    fts_outlet_type_define_varargs(cl, 0, fts_s_int);
+  if(this->type == binop_int)
+    fts_outlet_int(o, 0, fts_get_number_int(&this->right) - fts_get_number_int(&this->left));
   else
-    fts_outlet_type_define_varargs(cl, 0, fts_s_float);
-
-  return fts_ok;
+    fts_outlet_float(o, 0, fts_get_number_float(&this->right) - fts_get_number_float(&this->left));
 }
-
-
-/**************************************************************************************
- *
- *  generic methods for symbol binops
- *
- *    set_right
- *    set_left
- *    list
- *    init
- *    instantiate
- *
- */
 
 static void
-sbinop_set_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vid_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  sbinop_t *this = (sbinop_t *)o;
+  binop_t *this = (binop_t *)o;
 
-  this->operator = fts_get_symbol(at);
-}
-
-
-static void
-sbinop_set_left(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  sbinop_t *this = (sbinop_t *)o;
-
-  this->value = fts_get_symbol_arg(ac, at, 0, 0);
-}
-
-
-static void
-sbinop_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if (ac >= 2 && fts_is_symbol(at + 1))
-    sbinop_set_right(o, winlet, s, 1, at + 1);
-
-  if (ac >= 1 && fts_is_symbol(at))
-    fts_send_message(o, fts_s_left, 1, at);
-}
-
-
-static void
-sbinop_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
-{
-  sbinop_t *this = (sbinop_t *)o;
-
-  this->value = 0;
-  this->operator = fts_get_symbol_arg(ac, at, 0, 0);
-}
-
-
-static fts_status_t
-sbinop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t bang_meth, fts_method_t symbol_meth)
-{
-  if(ac == 1 && fts_is_symbol(at))
+  if(this->type == binop_int)
     {
-      fts_class_init(cl, sizeof(sbinop_t), 2, 1, 0);
+      int left = fts_get_number_int(&this->left);
 
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sbinop_init);
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_left, symbol_meth);
-
-      fts_method_define_varargs(cl, 0, fts_s_bang, bang_meth);
-      fts_method_define_varargs(cl, 0, fts_s_set, sbinop_set_left);
-      fts_method_define_varargs(cl, 0, fts_s_symbol, symbol_meth);
-
-      fts_method_define_varargs(cl, 0, fts_s_list, sbinop_list);
-
-      fts_method_define_varargs(cl, 1, fts_s_symbol, sbinop_set_right);
-
-      fts_outlet_type_define_varargs(cl, 0, fts_s_int);
-      
-      return fts_ok;
-    }
+      if(left != 0)
+	fts_outlet_int(o, 0, fts_get_number_int(&this->right) / left);
+      else
+	fts_outlet_int(o, 0, 0);
+    }	
   else
-    return &fts_CannotInstantiate;
+    {
+      double left = fts_get_number_float(&this->left);
+
+      if(left != 0.0)
+	fts_outlet_float(o, 0, fts_get_number_float(&this->right) / left);
+      else
+	fts_outlet_float(o, 0, 0.0);
+    }
+}
+
+static void
+ge_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_t *this = (binop_t *)o;
+
+  if(this->type == binop_int)
+    fts_outlet_int(o, 0, fts_get_number_int(&this->left) >= fts_get_number_int(&this->right));
+  else
+    fts_outlet_int(o, 0, fts_get_number_float(&this->left) >= fts_get_number_float(&this->right));
+}
+
+static void
+le_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_t *this = (binop_t *)o;
+
+  if(this->type == binop_int)
+    fts_outlet_int(o, 0, fts_get_number_int(&this->left) <= fts_get_number_int(&this->right));
+  else
+    fts_outlet_int(o, 0, fts_get_number_float(&this->left) <= fts_get_number_float(&this->right));
+}
+
+static void
+gt_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_t *this = (binop_t *)o;
+
+  if(this->type == binop_int)
+    fts_outlet_int(o, 0, fts_get_number_int(&this->left) > fts_get_number_int(&this->right));
+  else
+    fts_outlet_int(o, 0, fts_get_number_float(&this->left) > fts_get_number_float(&this->right));
+}
+
+static void
+lt_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_t *this = (binop_t *)o;
+
+  if(this->type == binop_int)
+    fts_outlet_int(o, 0, fts_get_number_int(&this->left) < fts_get_number_int(&this->right));
+  else
+    fts_outlet_int(o, 0, fts_get_number_float(&this->left) < fts_get_number_float(&this->right));
+}
+
+static void
+ee_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_t *this = (binop_t *)o;
+
+  switch(this->type)
+    {
+    case binop_int:
+      fts_outlet_int(o, 0, fts_get_number_int(&this->left) == fts_get_number_int(&this->right));
+      break;
+    case binop_float:
+      fts_outlet_int(o, 0, fts_get_number_float(&this->left) == fts_get_number_float(&this->right));
+      break;
+    case binop_symbol:
+      fts_outlet_int(o, 0, fts_get_symbol(&this->left) == fts_get_symbol(&this->right));
+      break;
+    }
+}
+
+static void
+ne_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_t *this = (binop_t *)o;
+
+  switch(this->type)
+    {
+    case binop_int:
+      fts_outlet_int(o, 0, fts_get_number_int(&this->left) != fts_get_number_int(&this->right));
+      break;
+    case binop_float:
+      fts_outlet_int(o, 0, fts_get_number_float(&this->left) != fts_get_number_float(&this->right));
+      break;
+    case binop_symbol:
+      fts_outlet_int(o, 0, fts_get_symbol(&this->left) != fts_get_symbol(&this->right));
+      break;
+    }
+}
+
+static void
+band_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_t *this = (binop_t *)o;
+
+  fts_outlet_int(o, 0, fts_get_number_int(&this->left) & fts_get_number_int(&this->right));
+}
+
+static void
+bor_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_t *this = (binop_t *)o;
+
+  fts_outlet_int(o, 0, fts_get_number_int(&this->left) | fts_get_number_int(&this->right));
+}
+
+static void
+land_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_t *this = (binop_t *)o;
+
+  fts_outlet_int(o, 0, fts_get_number_int(&this->left) && fts_get_number_int(&this->right));
+}
+
+static void
+lor_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_t *this = (binop_t *)o;
+
+  fts_outlet_int(o, 0, fts_get_number_int(&this->left) || fts_get_number_int(&this->right));
+}
+
+static void
+lshift_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_t *this = (binop_t *)o;
+
+  fts_outlet_int(o, 0, fts_get_number_int(&this->left) << fts_get_number_int(&this->right));
+}
+
+static void
+rshift_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_t *this = (binop_t *)o;
+
+  fts_outlet_int(o, 0, fts_get_number_int(&this->left) >> fts_get_number_int(&this->right));
+}
+
+static void
+mod_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_t *this = (binop_t *)o;
+  int right = fts_get_number_int(&this->right);
+
+  if(right != 0)
+    fts_outlet_int(o, 0, fts_get_number_int(&this->left) % right);
+  else
+    fts_outlet_int(o, 0, 0); 
 }
 
 /**************************************************************************************
  *
- *  addition methods
+ * instantiate functions
  *
  */
-
-static void
-iadd_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = (long) fts_get_number_int(at);
-  fts_outlet_int(o, 0, this->value + this->operator);
-}
-
-
-static void
-iadd_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value + this->operator);
-}
-
-static void
-fadd_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  this->value = (float) fts_get_number_float(at);
-  fts_outlet_float(o, 0, this->value + this->operator);
-}
-
-
-static void
-fadd_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  fts_outlet_float(o, 0, this->value + this->operator);
-}
-
 
 static fts_status_t
 add_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if (is_ibinop(ac, at))
-    return ibinop_instantiate(cl, ac, at, iadd_bang, iadd_number);
-  else if (is_fbinop(ac, at))
-    return fbinop_instantiate(cl, ac, at, fadd_bang, fadd_number, fts_s_float);
-  else
-    return &fts_CannotInstantiate;
+  return binop_number_instantiate(cl, ac, at, add_method);
 }
-
-
-/**************************************************************************************
- *
- *  substaction methods
- *
- */
-
-static void
-isub_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-  fts_outlet_int(o, 0, this->value - this->operator);
-}
-
-static void
-isub_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
-	const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value - this->operator);
-}
-
-
-static void
-fsub_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  this->value = (float) fts_get_number_float(at);
-  fts_outlet_float(o, 0, this->value - this->operator);
-}
-
-
-static void
-fsub_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  fts_outlet_float(o, 0, this->value - this->operator);
-}
-
-
 
 static fts_status_t
 sub_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if (is_ibinop(ac, at))
-  return ibinop_instantiate(cl, ac, at, isub_bang, isub_number);
-  else if (is_fbinop(ac, at))
-    return fbinop_instantiate(cl, ac, at, fsub_bang, fsub_number, fts_s_float);
-  else
-    return &fts_CannotInstantiate;
-}
-
-
-/**************************************************************************************
- *
- *  multiplication methods
- *
- */
-
-static void
-imul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-  fts_outlet_int(o, 0, this->value * this->operator);
-}
-
-
-static void
-imul_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac,	const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value * this->operator);
-}
-
-
-static void
-fmul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  this->value = (float) fts_get_number_float(at);
-  fts_outlet_float(o, 0, this->value * this->operator);
-}
-
-static void
-fmul_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  fts_outlet_float(o, 0, this->value * this->operator);
+  return binop_number_instantiate(cl, ac, at, sub_method);
 }
 
 static fts_status_t
 mul_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if (is_ibinop(ac, at))
-    return ibinop_instantiate(cl, ac, at, imul_bang, imul_number);
-  else if (is_fbinop(ac, at))
-    return fbinop_instantiate(cl, ac, at, fmul_bang, fmul_number, fts_s_float);
-  else
-    return &fts_CannotInstantiate;
-}
-
-
-/**************************************************************************************
- *
- *  division methods
- *
- */
-
-static void
-idiv_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-
-  if (this->operator == 0)
-    {
-      fts_outlet_int(o, 0, 0);
-    }
-  else
-    fts_outlet_int(o, 0, this->value / this->operator);
-}
-
-
-static void
-idiv_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac,	const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  if (this->operator == 0)
-    {
-      fts_outlet_int(o, 0, 0);
-    }
-  else
-    fts_outlet_int(o, 0, this->value / this->operator);
-}
-
-
-static void
-fdiv_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  this->value = (float) fts_get_number_float(at);
-
-  /*  if (this->operator == 0.)
-    {
-      fts_outlet_float(o, 0, 0.);
-    }
-  else */
-    fts_outlet_float(o, 0, this->value / this->operator);
-}
-
-
-static void
-fdiv_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  if (this->operator == 0.)
-    {
-      fts_outlet_float(o, 0, 0.);
-    }
-  else
-    fts_outlet_float(o, 0, this->value / this->operator);
+  return binop_number_instantiate(cl, ac, at, mul_method);
 }
 
 static fts_status_t
 div_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if (is_ibinop(ac, at))
-    return ibinop_instantiate(cl, ac, at, idiv_bang, idiv_number);
-  else if (is_fbinop(ac, at))
-    return fbinop_instantiate(cl, ac, at, fdiv_bang, fdiv_number, fts_s_float);
-  else
-    return &fts_CannotInstantiate;
+  return binop_number_instantiate(cl, ac, at, div_method);
 }
-
-
-/**************************************************************************************
- *
- *  reversed substaction methods
- *
- */
-
-static void
-ibus_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-  fts_outlet_int(o, 0, this->operator - this->value);
-}
-
-static void
-ibus_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
-	const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  fts_outlet_int(o, 0, this->operator - this->value);
-}
-
-static void
-fbus_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  this->value = (float) fts_get_number_float(at);
-  fts_outlet_float(o, 0, this->operator - this->value);
-}
-
-
-static void
-fbus_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  fts_outlet_float(o, 0, this->operator - this->value);
-}
-
 
 static fts_status_t
 bus_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if (is_ibinop(ac, at))
-    return ibinop_instantiate(cl, ac, at, ibus_bang, ibus_number);
-  else if (is_fbinop(ac, at))
-    return fbinop_instantiate(cl, ac, at, fbus_bang, fbus_number, fts_s_float);
-  else
-    return &fts_CannotInstantiate;
+  return binop_number_instantiate(cl, ac, at, bus_method);
 }
-
-
-/**************************************************************************************
- *
- *  reversed division  methods
- *
- */
-
-static void
-ivid_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-  if (this->value == 0)
-    {
-      fts_outlet_int(o, 0, 0);
-    }
-  else
-    fts_outlet_int(o, 0, this->operator / this->value);
-}
-
-static void
-ivid_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
-	const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  if (this->value == 0)
-    {
-      fts_outlet_int(o, 0, 0);
-    }
-  else
-    fts_outlet_int(o, 0, this->operator / this->value);
-}
-
-static void
-fvid_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  this->value = (float) fts_get_number_float(at);
-  if (this->value == 0.)
-    {
-      fts_outlet_float(o, 0, 0.);
-    }
-  else
-    fts_outlet_float(o, 0, this->operator / this->value);
-}
-
-
-static void
-fvid_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  if (this->value == 0.)
-    {
-      fts_outlet_float(o, 0, 0.);
-    }
-  else
-    fts_outlet_float(o, 0, this->operator / this->value);
-}
-
 
 static fts_status_t
 vid_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if (is_ibinop(ac, at))
-    return ibinop_instantiate(cl, ac, at, ivid_bang, ivid_number);
-  else if (is_fbinop(ac, at))
-    return fbinop_instantiate(cl, ac, at, fvid_bang, fvid_number, fts_s_float);
-  else
-    return &fts_CannotInstantiate;
+  return binop_number_instantiate(cl, ac, at, vid_method);
 }
-
-
-/**************************************************************************************
- *
- *  greater or equal (>=) methods
- *
- */
-
-static void
-ige_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
-       const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-  fts_outlet_int(o, 0, this->value >= this->operator);
-}
-
-
-
-static void
-ige_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
-       const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value >= this->operator);
-}
-
-
-static void
-fge_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  this->value = (float) fts_get_number_float(at);
-  fts_outlet_int(o, 0, this->value >= this->operator);
-}
-
-
-static void
-fge_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value >= this->operator);
-}
-
 
 static fts_status_t
 ge_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if (is_ibinop(ac, at))
-    return ibinop_instantiate(cl, ac, at, ige_bang, ige_number);
-  else if (is_fbinop(ac, at))
-    return fbinop_instantiate(cl, ac, at, fge_bang, fge_number, fts_s_int);
-  else
-    return &fts_CannotInstantiate;
+  return binop_number_instantiate(cl, ac, at, ee_method);
 }
-
-
-/**************************************************************************************
- *
- *  less or equal (<=) methods
- *
- */
-
-static void
-ile_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-  fts_outlet_int(o, 0, this->value <= this->operator);
-}
-
-
-static void
-ile_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value <= this->operator);
-}
-
-
-static void
-fle_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  this->value = (float) fts_get_number_float(at);
-  fts_outlet_int(o, 0, this->value <= this->operator);
-}
-
-
-static void
-fle_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value <= this->operator);
-}
-
 
 static fts_status_t
 le_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if (is_ibinop(ac, at))
-    return ibinop_instantiate(cl, ac, at, ile_bang, ile_number);
-  else if (is_fbinop(ac, at))
-    return fbinop_instantiate(cl, ac, at, fle_bang, fle_number, fts_s_int);
-  else
-    return &fts_CannotInstantiate;
-}
-
-
-/**************************************************************************************
- *
- *  greater (>) methods
- *
- */
-
-static void
-igt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-  fts_outlet_int(o, 0, this->value > this->operator);
-}
-
-
-static void
-igt_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value > this->operator);
-}
-
-static void
-fgt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  this->value = (float) fts_get_number_float(at);
-  fts_outlet_int(o, 0, this->value >this->operator);
-}
-
-static void
-fgt_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value >this->operator);
+  return binop_number_instantiate(cl, ac, at, le_method);
 }
 
 static fts_status_t
 gt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if (is_ibinop(ac, at))
-    return ibinop_instantiate(cl, ac, at, igt_bang, igt_number);
-  else if (is_fbinop(ac, at))
-    return fbinop_instantiate(cl, ac, at, fgt_bang, fgt_number, fts_s_int);
-  else
-    return &fts_CannotInstantiate;
-}
-
-
-/**************************************************************************************
- *
- *  less (<) methods
- *
- */
-
-static void
-ilt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-  fts_outlet_int(o, 0, this->value < this->operator);
-}
-
-
-static void
-ilt_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value < this->operator);
-}
-
-
-
-static void
-flt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  this->value = (float) fts_get_number_float(at);
-  fts_outlet_int(o, 0, this->value < this->operator);
-}
-
-
-static void
-flt_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value < this->operator);
+  return binop_number_instantiate(cl, ac, at, gt_method);
 }
 
 static fts_status_t
 lt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if (is_ibinop(ac, at))
-    return ibinop_instantiate(cl, ac, at, ilt_bang, ilt_number);
-  else if (is_fbinop(ac, at))
-    return fbinop_instantiate(cl, ac, at, flt_bang, flt_number, fts_s_int);
-  else
-    return &fts_CannotInstantiate;
-}
-
-
-/**************************************************************************************
- *
- *  equal (==) methods
- *
- */
-
-static void
-iee_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-  fts_outlet_int(o, 0, this->value == this->operator);
-}
-
-static void
-iee_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value == this->operator);
-}
-
-
-static void
-fee_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  this->value = (float) fts_get_number_float(at);
-  fts_outlet_int(o, 0, this->value == this->operator);
-}
-
-static void
-fee_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value == this->operator);
-}
-
-
-static void
-see_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  sbinop_t *this = (sbinop_t *)o;
-
-  this->value = fts_get_symbol(at);
-  fts_outlet_int(o, 0, this->value == this->operator);
-}
-
-static void
-see_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  sbinop_t *this = (sbinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value == this->operator);
+  return binop_number_instantiate(cl, ac, at, lt_method);
 }
 
 static fts_status_t
 ee_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if (is_ibinop(ac, at))
-    return ibinop_instantiate(cl, ac, at, iee_bang, iee_number);
-  else if (is_fbinop(ac, at))
-    return fbinop_instantiate(cl, ac, at, fee_bang, fee_number, fts_s_int);
-  else if (is_sbinop(ac, at))
-    return sbinop_instantiate(cl, ac, at, see_bang, see_symbol);
-  else
-    return &fts_CannotInstantiate;
-}
-
-
-/**************************************************************************************
- *
- *  not equal (!=) methods
- *
- */
-
-static void
-ine_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-  fts_outlet_int(o, 0, this->value != this->operator);
-}
-
-static void
-ine_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value != this->operator);
-}
-
-
-static void
-fne_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  this->value = (float) fts_get_number_float(at);
-  fts_outlet_int(o, 0, this->value != this->operator);
-}
-
-static void
-fne_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value != this->operator);
-}
-
-static void
-sne_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
-{
-  sbinop_t *this = (sbinop_t *)o;
-
-  this->value = fts_get_symbol(at);
-  fts_outlet_int(o, 0, this->value != this->operator);
-}
-
-
-static void
-sne_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  sbinop_t *this = (sbinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value != this->operator);
+  return binop_instantiate(cl, ac, at, ee_method);
 }
 
 static fts_status_t
 ne_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if (is_ibinop(ac, at))
-    return ibinop_instantiate(cl, ac, at, ine_bang, ine_number);
-  else if (is_fbinop(ac, at))
-    return fbinop_instantiate(cl, ac, at, fne_bang, fne_number, fts_s_int);
-  else if (is_sbinop(ac, at))
-    return sbinop_instantiate(cl, ac, at, sne_bang, sne_symbol);
-  else
-    return &fts_CannotInstantiate;
-}
-
-
-/**************************************************************************************
- *
- *  minimum methods
- *
- */
-
-static void
-imin_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-  fts_outlet_int(o, 0, (this->value < this->operator)? this->value: this->operator);
-}
-
-static void
-imin_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  fts_outlet_int(o, 0, (this->value < this->operator)? this->value: this->operator);
-}
-
-
-static void
-fmin_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  this->value = fts_get_number_float(at);
-  fts_outlet_int(o, 0, (this->value < this->operator)? this->value: this->operator);
-}
-
-static void
-fmin_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  fts_outlet_int(o, 0, (this->value < this->operator)? this->value: this->operator);
-}
-
-
-static fts_status_t
-min_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  if (is_ibinop(ac, at))
-    return ibinop_instantiate(cl, ac, at, imin_bang, imin_number);
-  else if (is_fbinop(ac, at))
-    return fbinop_instantiate(cl, ac, at, fmin_bang, fmin_number, fts_s_float);
-  else
-    return &fts_CannotInstantiate;
-}
-
-/**************************************************************************************
- *
- *  maximum methods
- *
- */
-
-static void
-imax_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-  fts_outlet_int(o, 0, (this->value > this->operator)? this->value: this->operator);
-}
-
-static void
-imax_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  fts_outlet_int(o, 0, (this->value > this->operator)? this->value: this->operator);
-}
-
-static void
-fmax_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  this->value = fts_get_number_float(at);
-  fts_outlet_int(o, 0, (this->value > this->operator)? this->value: this->operator);
-}
-
-static void
-fmax_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fbinop_t *this = (fbinop_t *)o;
-
-  fts_outlet_int(o, 0, (this->value > this->operator)? this->value: this->operator);
-}
-
-
-static fts_status_t
-max_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  if (is_ibinop(ac, at))
-    return ibinop_instantiate(cl, ac, at, imax_bang, imax_number);
-  else if (is_fbinop(ac, at))
-    return fbinop_instantiate(cl, ac, at, fmax_bang, fmax_number, fts_s_float);
-  else
-    return &fts_CannotInstantiate;
-}
-
-/* Binops that are only integers */
-
-/**************************************************************************************
- *
- *  bitwise AND (&) methods
- *
- */
-
-static void
-ba_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-  fts_outlet_int(o, 0, this->value & this->operator);
-}
-
-
-static void
-ba_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
-       const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value & this->operator);
-}
-
-
-static fts_status_t
-ba_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  return ibinop_instantiate(cl, ac, at, ba_bang, ba_number);
-}
-
-
-/**************************************************************************************
- *
- *  bitwise OR (|) methods
- *
- */
-
-static void
-bo_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-  fts_outlet_int(o, 0, this->value | this->operator);
-}
-
-
-static void
-bo_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value | this->operator);
-}
-
-
-static fts_status_t
-bo_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  return ibinop_instantiate(cl, ac, at, bo_bang, bo_number);
-}
-
-
-/**************************************************************************************
- *
- *  logig AND (&&) methods
- *
- */
-
-static void
-la_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-  fts_outlet_int(o, 0, this->value && this->operator);
-}
-
-
-static void
-la_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value && this->operator);
+  return binop_instantiate(cl, ac, at, ne_method);
 }
 
 static fts_status_t
-la_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+band_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  return ibinop_instantiate(cl, ac, at, la_bang, la_number);
+  return binop_number_instantiate(cl, ac, at, band_method);
 }
-
-
-/**************************************************************************************
- *
- *  logic OR (||) methods
- *
- */
-
-static void
-lo_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-  fts_outlet_int(o, 0, this->value || this->operator);
-}
-
-
-static void
-lo_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value || this->operator);
-}
-
 
 static fts_status_t
-lo_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+bor_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  return ibinop_instantiate(cl, ac, at, lo_bang, lo_number);
+  return binop_number_instantiate(cl, ac, at, bor_method);
 }
-
-/**************************************************************************************
- *
- *  modulo (%) methods
- *
- */
-
-static void
-pc_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-
-  if (this->operator == 0)
-    {
-      fts_outlet_int(o, 0, 0);
-    }
-  else
-    fts_outlet_int(o, 0, this->value % this->operator);
-}
-
-
-static void
-pc_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
-       const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  if (this->operator == 0)
-    {
-      fts_outlet_int(o, 0, 0);
-    }
-  else
-    fts_outlet_int(o, 0, this->value % this->operator);
-}
-
 
 static fts_status_t
-pc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+land_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  return ibinop_instantiate(cl, ac, at, pc_bang, pc_number);
+  return binop_number_instantiate(cl, ac, at, land_method);
 }
-
-
-static void
-ls_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-  fts_outlet_int(o, 0, this->value << this->operator);
-}
-
-
-/**************************************************************************************
- *
- *  bit shift left (<<) methods
- *
- */
-
-static void
-ls_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value << this->operator);
-}
-
 
 static fts_status_t
-ls_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+lor_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  return ibinop_instantiate(cl, ac, at, ls_bang, ls_number);
+  return binop_number_instantiate(cl, ac, at, lor_method);
 }
-
-
-/**************************************************************************************
- *
- *  bit shift right (>>) methods
- *
- */
-
-static void
-rs_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  this->value = fts_get_number_int(at);
-  fts_outlet_int(o, 0, this->value >> this->operator);
-}
-
-
-static void
-rs_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ibinop_t *this = (ibinop_t *)o;
-
-  fts_outlet_int(o, 0, this->value >> this->operator);
-}
-
 
 static fts_status_t
-rs_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+lshift_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  return ibinop_instantiate(cl, ac, at, rs_bang, rs_number);
+  return binop_number_instantiate(cl, ac, at, lshift_method);
+}
+
+static fts_status_t
+rshift_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  return binop_number_instantiate(cl, ac, at, rshift_method);
+}
+
+static fts_status_t
+mod_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  return binop_number_instantiate(cl, ac, at, mod_method);
 }
 
 void
 binop_config(void)
 {
-  /* integer components of generic multiclasses */
+  fts_class_install(fts_new_symbol("+"), add_instantiate);
+  fts_class_install(fts_new_symbol("*"), mul_instantiate);
+  fts_class_install(fts_new_symbol("/"), div_instantiate);
+  fts_class_install(fts_new_symbol("-"), sub_instantiate);
+  fts_class_install(fts_new_symbol("-+"), bus_instantiate);
+  fts_class_install(fts_new_symbol("/*"), vid_instantiate);
 
-  fts_metaclass_install(fts_new_symbol("+"), add_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(fts_new_symbol("*"), mul_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(fts_new_symbol("/"), div_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(fts_new_symbol("-"), sub_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(fts_new_symbol("inv+"), bus_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(fts_new_symbol("inv*"), vid_instantiate, fts_arg_type_equiv);
+  /* compatibility */
+  fts_class_install(fts_new_symbol("inv+"), bus_instantiate);
+  fts_class_install(fts_new_symbol("inv*"), vid_instantiate);
 
-  fts_metaclass_install(fts_new_symbol(">="), ge_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_install(fts_new_symbol("<="), le_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_install(fts_new_symbol(">"),  gt_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_install(fts_new_symbol("<"),  lt_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_install(fts_new_symbol("=="), ee_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_install(fts_new_symbol("!="), ne_instantiate,  fts_arg_type_equiv);
+  fts_class_install(fts_new_symbol(">="), ge_instantiate);
+  fts_class_install(fts_new_symbol("<="), le_instantiate);
+  fts_class_install(fts_new_symbol(">"),  gt_instantiate);
+  fts_class_install(fts_new_symbol("<"),  lt_instantiate);
+  fts_class_install(fts_new_symbol("=="), ee_instantiate);
+  fts_class_install(fts_new_symbol("!="), ne_instantiate);
   
-  fts_metaclass_install(fts_new_symbol("minimum"), min_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_install(fts_new_symbol("maximum"), max_instantiate,  fts_arg_type_equiv);
-
-  /* integer only */
-  fts_metaclass_install(fts_new_symbol("&"),  ba_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_install(fts_new_symbol("|"),  bo_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_install(fts_new_symbol("&&"), la_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_install(fts_new_symbol("||"), lo_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_install(fts_new_symbol("%"),  pc_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_install(fts_new_symbol("<<"), ls_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_install(fts_new_symbol(">>"), rs_instantiate,  fts_arg_type_equiv);
+  fts_class_install(fts_new_symbol("&"),  band_instantiate);
+  fts_class_install(fts_new_symbol("|"),  bor_instantiate);
+  fts_class_install(fts_new_symbol("&&"), land_instantiate);
+  fts_class_install(fts_new_symbol("||"), lor_instantiate);
+  fts_class_install(fts_new_symbol("<<"), lshift_instantiate);
+  fts_class_install(fts_new_symbol(">>"), rshift_instantiate);
+  fts_class_install(fts_new_symbol("%"),  mod_instantiate);
 }

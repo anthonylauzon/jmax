@@ -611,14 +611,14 @@ static int dtd_create_socket( int *pport)
   my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
   my_addr.sin_port = 0;
 
-  if ( bind( sock, &my_addr, sizeof(struct sockaddr_in)) == -1)
+  if ( bind( sock, (struct sockaddr *)&my_addr, sizeof(struct sockaddr_in)) == -1)
     {
       fprintf( stderr, "[dtdserver] cannot bind socket (%d, %s)\n", errno, strerror( errno));
       return -1;
     }
 
   len = sizeof(struct sockaddr_in);
-  if ( getsockname( sock, &my_addr, &len) < 0)
+  if ( getsockname( sock, (struct sockaddr *)&my_addr, &len) < 0)
     {
       fprintf( stderr, "[dtdserver] cannot get socket name\n");
       return -1;

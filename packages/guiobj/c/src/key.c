@@ -233,6 +233,8 @@ keystat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       keyserver_add_listener(0, o, keystat_multi_action);
       this->code = 0;
+
+      fts_object_set_outlets_number(o, 2);
     }
   else
     {
@@ -266,23 +268,10 @@ keystat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static fts_status_t
 keystat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 0)
-    {
-      fts_class_init(cl, sizeof(fts_key_t), 0, 2, 0);
-      
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, keystat_init);
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, keystat_delete);
-    }
-
-  else if(ac == 1)
-    {
-      fts_class_init(cl, sizeof(fts_key_t), 0, 1, 0);
-      
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, keystat_init);
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, keystat_delete);
-    }
-  else
-    return &fts_CannotInstantiate;
+  fts_class_init(cl, sizeof(fts_key_t), 0, 1, 0);
+  
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, keystat_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, keystat_delete);
 
   return fts_ok;
 }
@@ -312,5 +301,5 @@ key_config(void)
   sym_space = fts_new_symbol("space");
 
   fts_class_install(fts_new_symbol("key"), key_instantiate);
-  fts_metaclass_install(fts_new_symbol("keystat"), keystat_instantiate, fts_narg_equiv);
+  fts_class_install(fts_new_symbol("keystat"), keystat_instantiate);
 }

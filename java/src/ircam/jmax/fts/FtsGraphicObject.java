@@ -42,13 +42,13 @@ public class FtsGraphicObject extends FtsObject {
     
   static
   {
-    FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "ins"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "n_inlets"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsGraphicObject)obj).setNumberOfInlets( args.getInt( 0));
 	}
       });
-    FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "outs"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "n_outlets"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsGraphicObject)obj).setNumberOfOutlets( args.getInt( 0));

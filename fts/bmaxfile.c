@@ -1787,12 +1787,6 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
       fts_bmax_code_new_property(f, obj, fts_s_wy);
       fts_bmax_code_new_property(f, obj, fts_s_wh);
       fts_bmax_code_new_property(f, obj, fts_s_ww);
-
-      if (fts_patcher_is_standard((fts_patcher_t *)obj))
-	{
-	  fts_bmax_code_new_property(f, obj, fts_s_ninlets);
-	  fts_bmax_code_new_property(f, obj, fts_s_noutlets);
-	}
     }
 
   /* If argc is zero, we pop the 0 value pushed above */
@@ -1844,8 +1838,6 @@ fts_bmax_code_new_top_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
   fts_bmax_code_new_property(f, obj, fts_s_wy);
   fts_bmax_code_new_property(f, obj, fts_s_wh);
   fts_bmax_code_new_property(f, obj, fts_s_ww);
-  fts_bmax_code_new_property(f, obj, fts_s_ninlets);
-  fts_bmax_code_new_property(f, obj, fts_s_noutlets);
 
   fts_bmax_code_new_property(f, obj, fts_s_layer);
 

@@ -20,7 +20,7 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Francois Dechelle, Norbert Schnell
+ * Authors: Norbert Schnell
  *
  */
 

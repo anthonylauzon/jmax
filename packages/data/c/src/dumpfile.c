@@ -153,7 +153,7 @@ dumpfile_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	}
     }
   else
-    fts_object_signal_runtime_error(o, "open: wrong arguments");
+    fts_object_signal_runtime_error(o, "open: bad arguments");
 }
 
 static void

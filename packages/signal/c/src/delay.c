@@ -886,7 +886,7 @@ signal_delay_config(void)
   sym_vtap = fts_new_symbol("vtap~");
 
   delayline_metaclass = fts_class_install(sym_delayline, delayline_instantiate);
-  fts_metaclass_alias(delayline_metaclass, fts_new_symbol("dline~"));
+  fts_class_alias(delayline_metaclass, fts_new_symbol("dline~"));
   fts_class_install(sym_delay, delay_instantiate);
   fts_class_install(sym_tapin, tapin_instantiate);
   fts_class_install(sym_tapout, tapout_instantiate);

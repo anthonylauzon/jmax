@@ -130,6 +130,8 @@ monitor_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, monitor_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, monitor_delete);
 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_propagate_input, monitor_propagate_input);
+
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, monitor_update_real_time); 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_bang, monitor_bang);
 
@@ -140,8 +142,6 @@ monitor_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_inlet(cl, 1);
-
-  fts_class_define_thru(cl, monitor_propagate_input);
 
   return fts_ok;
 }

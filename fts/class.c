@@ -68,9 +68,9 @@ fts_metaclass_new(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_
 }
 
 fts_metaclass_t *
-fts_metaclass_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_equiv_fun_t equiv_fun)
+fts_class_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 {
-  fts_metaclass_t *mcl = fts_metaclass_new(name, instantiate_fun, equiv_fun);
+  fts_metaclass_t *mcl = fts_metaclass_new(name, instantiate_fun, 0);
 
   if(name != NULL)
     {
@@ -81,15 +81,9 @@ fts_metaclass_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun,
   return mcl;
 }
 
-fts_metaclass_t *
-fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
-{
-  return fts_metaclass_install( name, instantiate_fun, 0);
-}
-
 /* for now just recreate the same metaclass and add it to the current package */
 void
-fts_metaclass_alias(fts_metaclass_t *mcl, fts_symbol_t alias)
+fts_class_alias(fts_metaclass_t *mcl, fts_symbol_t alias)
 {
   fts_package_add_metaclass(fts_get_current_package(), mcl, alias);
 }
@@ -223,14 +217,6 @@ fts_class_new(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
       fts_atom_t a;
       
       fts_class_register(mcl, ac, at, cl);
-      
-      /* put the ninlets and noutlets in the class */
-      /*fts_set_int(&a, cl->ninlets);*/
-      /*fts_class_put_prop(cl, fts_s_ninlets, &a);*/
-      
-      /*fts_set_int(&a, cl->noutlets);*/
-      /*fts_class_put_prop(cl, fts_s_noutlets, &a);*/
-
       return cl;
     }
   else
@@ -444,46 +430,6 @@ fts_class_outlet_get_selector(fts_class_t *cl, int outlet)
   fts_outlet_decl_t *out = class_get_outlet_decl(cl, outlet);
 
   return out->selector;
-}
-
-/*****************************************************************************
- *
- *  "thru" classes
- *
- *  Thru classes don't type in- and outlets.
- *  The input propagates directly to the output or the output of another object.
- *
- *  Thru classes must implement a method fts_s_propagate_input.
- *  This message is send to each object while traversing the graph in order 
- *  propagate there input to their outputs (e.g. fork) or directly to the output 
- *  of other objects connected by index, name or variable (e.g. inlet/outlet, send/receive).
- *
- *  The called method will declare one by one the outlets to which the input 
- *  is propagated using the received function and context (structure).
- *    
- *     fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);
- *     void *propagate_context = (fts_dspgraph_t *)fts_get_pointer(at + 1);
- *
- *     propagate_fun(propagate_context, <object>, <outlet>);
- *
- */
-
-void
-fts_class_define_thru(fts_class_t *class, fts_method_t propagate_input)
-{
-  fts_atom_t a;
-
-  if(propagate_input)
-    fts_method_define_varargs(class, fts_system_inlet, fts_s_propagate_input, propagate_input);
-
-  fts_set_int(&a, 1);
-  fts_class_put_prop(class, fts_s_thru, &a);
-}
-
-int
-fts_class_is_thru(fts_class_t *class)
-{
-  return (fts_class_get_prop(class, fts_s_thru) != 0);
 }
 
 /*****************************************************************************

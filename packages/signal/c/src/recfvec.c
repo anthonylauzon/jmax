@@ -348,7 +348,7 @@ signal_rec_fvec_config(void)
 {
   sym_rec = fts_new_symbol("rec~");
 
-  fts_metaclass_install(sym_rec, rec_fvec_instantiate, fts_arg_type_equiv);
+  fts_class_install(sym_rec, rec_fvec_instantiate);
 
   fts_dsp_declare_function(sym_rec, rec_fvec_ftl);
 }

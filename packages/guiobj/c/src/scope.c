@@ -584,5 +584,5 @@ scope_config(void)
   fts_dsp_declare_function(scope_symbol, scope_ftl);  
 
   mcl = fts_class_install(scope_symbol, scope_instantiate);
-  fts_metaclass_alias(mcl, fts_new_symbol("scope"));
+  fts_class_alias(mcl, fts_new_symbol("scope"));
 }

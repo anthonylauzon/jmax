@@ -133,7 +133,7 @@ static void dtdserver_send_command( dtdserver_t *server, const char *command)
   my_addr.sin_addr.s_addr = htonl(INADDR_ANY); 
   my_addr.sin_port = htons( server->server_port);
 
-  r = sendto( server->server_socket, command, strlen( command)+1, 0, &my_addr, sizeof(my_addr));
+  r = sendto( server->server_socket, command, strlen( command)+1, 0, (const struct sockaddr *)&my_addr, sizeof(my_addr));
 
   if ( r < 0)
     {

@@ -255,7 +255,7 @@ struct ex_ex *
 
 	eptr->ex_type = ET_TBL;
 	tmp = eptr->ex_ptr;
-	if (ex_getsym(tmp, &(eptr->ex_ptr))) {
+	if (ex_getsym(tmp, (fts_symbol_t *)&(eptr->ex_ptr))) {
 	  post("expr: syntax error: problms with ex_getsym\n");
 	  return (exNULL);
 	}
@@ -1036,7 +1036,7 @@ getoken(struct expr *exp, struct ex_ex *eptr)
 	return (1);
       switch (ex.ex_type) {
      case ET_STR:
-	if (ex_getsym(ex.ex_ptr, &(eptr->ex_ptr))) {
+	if (ex_getsym(ex.ex_ptr, (fts_symbol_t *)&(eptr->ex_ptr))) {
 	  post("expr: syntax error: getoken: problms with ex_getsym\n");
 	  return (1);
 	}

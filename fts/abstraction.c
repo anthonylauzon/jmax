@@ -241,8 +241,6 @@ static fts_object_t *fts_make_abstraction(FILE *file, fts_patcher_t *patcher, in
   fts_patparse_parse_patlex(obj, in);
   fts_patlex_close(in);
 
-  fts_patcher_reassign_inlets_outlets((fts_patcher_t *) obj);
-
   return obj;
 }
 

@@ -35,6 +35,8 @@ typedef struct _fts_channel_
 } fts_channel_t;
 
 #define fts_channel_has_target(c) (!fts_objectlist_is_empty( &(c)->targets))
+#define fts_channel_get_targets(c) (&(c)->targets)
+#define fts_channel_get_origins(c) (&(c)->origins)
 
 FTS_API void fts_channel_init(fts_channel_t *channel);
 
@@ -57,7 +59,7 @@ FTS_API void fts_channel_propagate_input( fts_channel_t *channel, fts_propagate_
  *
  */
 
-FTS_API fts_metaclass_t *fts_label_type;
+FTS_API fts_metaclass_t *fts_label_metaclass;
 
 typedef struct _fts_label_
 {
@@ -67,5 +69,6 @@ typedef struct _fts_label_
 
 #define fts_label_get_channel(l) (&(l)->channel)
 FTS_API fts_label_t *fts_label_get(fts_patcher_t *patcher, fts_symbol_t name);
+FTS_API fts_label_t *fts_label_get_or_create(fts_patcher_t *patcher, fts_symbol_t name);
 #define fts_label_send(l, s, n, a) fts_channel_send( fts_label_get_channel(l), 0, (s), (n), (a))
 

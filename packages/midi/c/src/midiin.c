@@ -169,8 +169,7 @@ midiin_get_port(fts_object_t *o, int ac, const fts_atom_t *at)
     {
       fts_symbol_t label = fts_get_symbol(at);
       
-      if(label != fts_s_minus)
-	return fts_midiconfig_get_input(label);
+      return fts_midiconfig_get_input(label);
     }
   else
     return fts_midiconfig_get_input(fts_s_default);
@@ -275,6 +274,8 @@ notein_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       
       fts_midiconfig_add_listener(o);
     }
+
+  fts_object_set_outlets_number(o, midiin_get_outlets(ac, at, 3));
 }
 
 
@@ -299,6 +300,8 @@ polyin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       
       fts_midiconfig_add_listener(o);
     }
+
+  fts_object_set_outlets_number(o, midiin_get_outlets(ac, at, 3));
 }
 
 static void
@@ -322,6 +325,8 @@ ctlin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       
       fts_midiconfig_add_listener(o);
     }
+
+  fts_object_set_outlets_number(o, midiin_get_outlets(ac, at, 3));
 }
 
 static void
@@ -343,6 +348,8 @@ pgmin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
       fts_midiconfig_add_listener(o);
     }
+
+  fts_object_set_outlets_number(o, midiin_get_outlets(ac, at, 2));
 }
 
 static void
@@ -364,6 +371,8 @@ touchin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
       fts_midiconfig_add_listener(o);
     }
+
+  fts_object_set_outlets_number(o, midiin_get_outlets(ac, at, 2));
 }
 
 static void
@@ -385,6 +394,8 @@ bendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
       fts_midiconfig_add_listener(o);
     }
+
+  fts_object_set_outlets_number(o, midiin_get_outlets(ac, at, 2));
 }
 
 static void
@@ -406,6 +417,8 @@ xbendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
       fts_midiconfig_add_listener(o);
     }
+
+  fts_object_set_outlets_number(o, midiin_get_outlets(ac, at, 2));
 }
 
 static void 
@@ -420,8 +433,6 @@ midiin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static fts_status_t
 midiin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int number, channel;
-
   fts_class_init(cl, sizeof(midiin_t), 0, 1, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, midiin_init);
@@ -433,126 +444,77 @@ midiin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 notein_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int number, channel;
-
-  midiin_get_filters(ac, at, &channel, &number);
-
-  fts_class_init(cl, sizeof(midiin_t), 1, midiin_get_outlets(ac, at, 3), 0);
+  fts_class_init(cl, sizeof(midiin_t), 0, 1, 0);
   
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, notein_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midiin_delete);
 
-  if(number == midi_controller_any && channel == midi_channel_any)
-    fts_method_define_varargs(cl, 0, fts_s_midievent, note_output);
-      
   return fts_ok;
 }
 
 static fts_status_t
 polyin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int number, channel;
-
-  midiin_get_filters(ac, at, &channel, &number);
-
-  fts_class_init(cl, sizeof(midiin_t), 1, midiin_get_outlets(ac, at, 3), 0);
+  fts_class_init(cl, sizeof(midiin_t), 0, 1, 0);
   
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, polyin_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midiin_delete);
 
-  if(number == midi_controller_any && channel == midi_channel_any)
-    fts_method_define_varargs(cl, 0, fts_s_midievent, poly_output);
-      
   return fts_ok;
 }
 
 static fts_status_t
 ctlin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int number, channel;
-
-  midiin_get_filters(ac, at, &channel, &number);
-
-  fts_class_init(cl, sizeof(midiin_t), 1, midiin_get_outlets(ac, at, 3), 0);
+  fts_class_init(cl, sizeof(midiin_t), 0, 1, 0);
   
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, ctlin_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midiin_delete);
 
-  if(number == midi_controller_any && channel == midi_channel_any)
-    fts_method_define_varargs(cl, 0, fts_s_midievent, poly_output);
-      
   return fts_ok;
 }
 
 static fts_status_t
 pgmin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int number, channel;
-
-  midiin_get_filters(ac, at, &channel, &number);
-
-  fts_class_init(cl, sizeof(midiin_t), 1, midiin_get_outlets(ac, at, 2), 0);
+  fts_class_init(cl, sizeof(midiin_t), 0, 1, 0);
   
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, pgmin_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midiin_delete);
 
-  if(number == midi_controller_any && channel == midi_channel_any)
-    fts_method_define_varargs(cl, 0, fts_s_midievent, value_output);
-      
   return fts_ok;
 }
 
 static fts_status_t
 touchin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int number, channel;
-
-  midiin_get_filters(ac, at, &channel, &number);
-
-  fts_class_init(cl, sizeof(midiin_t), 1, midiin_get_outlets(ac, at, 2), 0);
+  fts_class_init(cl, sizeof(midiin_t), 0, 1, 0);
   
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, touchin_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midiin_delete);
 
-  if(number == midi_controller_any && channel == midi_channel_any)
-    fts_method_define_varargs(cl, 0, fts_s_midievent, value_output);
-      
   return fts_ok;
 }
 
 static fts_status_t
 bendin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int number, channel;
-
-  midiin_get_filters(ac, at, &channel, &number);
-
-  fts_class_init(cl, sizeof(midiin_t), 1, midiin_get_outlets(ac, at, 2), 0);
+  fts_class_init(cl, sizeof(midiin_t), 0, 1, 0);
   
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, bendin_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midiin_delete);
  
-  if(number == midi_controller_any && channel == midi_channel_any)
-    fts_method_define_varargs(cl, 0, fts_s_midievent, bend_output);
-      
   return fts_ok;
 }
 
 static fts_status_t
 xbendin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int number, channel;
-
-  midiin_get_filters(ac, at, &channel, &number);
-
-  fts_class_init(cl, sizeof(midiin_t), 1, midiin_get_outlets(ac, at, 2), 0);
+  fts_class_init(cl, sizeof(midiin_t), 0, 1, 0);
   
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, xbendin_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midiin_delete);
 
-  if(number == midi_controller_any && channel == midi_channel_any)
-    fts_method_define_varargs(cl, 0, fts_s_midievent, xbend_output);
-      
   return fts_ok;
 }
 
@@ -563,11 +525,11 @@ midiin_config(void)
 
   fts_class_install(fts_new_symbol("midiin"), midiin_instantiate);
 
-  fts_metaclass_install(fts_new_symbol("notein"), notein_instantiate, fts_arg_equiv);
-  fts_metaclass_install(fts_new_symbol("polyin"), polyin_instantiate, fts_arg_equiv);
-  fts_metaclass_install(fts_new_symbol("ctlin"), ctlin_instantiate, fts_arg_equiv);
-  fts_metaclass_install(fts_new_symbol("pgmin"), pgmin_instantiate, fts_arg_equiv);
-  fts_metaclass_install(fts_new_symbol("touchin"), touchin_instantiate, fts_arg_equiv);
-  fts_metaclass_install(fts_new_symbol("bendin"), bendin_instantiate, fts_arg_equiv);
-  fts_metaclass_install(fts_new_symbol("xbendin"), xbendin_instantiate, fts_arg_equiv);
+  fts_class_install(fts_new_symbol("notein"), notein_instantiate);
+  fts_class_install(fts_new_symbol("polyin"), polyin_instantiate);
+  fts_class_install(fts_new_symbol("ctlin"), ctlin_instantiate);
+  fts_class_install(fts_new_symbol("pgmin"), pgmin_instantiate);
+  fts_class_install(fts_new_symbol("touchin"), touchin_instantiate);
+  fts_class_install(fts_new_symbol("bendin"), bendin_instantiate);
+  fts_class_install(fts_new_symbol("xbendin"), xbendin_instantiate);
 }

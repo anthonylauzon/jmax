@@ -224,9 +224,9 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   
   /* Do we have a new object description (i.e. "ins <INT> outs <INT>") or an old one ? */
   if (ac == 4 
-      && fts_is_symbol( at) && fts_get_symbol( at) == fts_s_ninlets
+      && fts_is_symbol( at) && fts_get_symbol( at) == fts_s_n_inlets
       && fts_is_int( at+1)
-      && fts_is_symbol( at+2) && fts_get_symbol( at+2) == fts_s_noutlets
+      && fts_is_symbol( at+2) && fts_get_symbol( at+2) == fts_s_n_outlets
       && fts_is_int( at+3))
     {
       /* If new one, then it gives the number of inlets and outlets */

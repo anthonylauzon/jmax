@@ -26,8 +26,6 @@
 
 #include <fts/fts.h>
 
-static fts_symbol_t sym__remote_value = 0;
-
 fts_metaclass_t *fts_param_metaclass = 0;
 
 void 
@@ -174,6 +172,28 @@ param_input_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
+param_output_from_recieve(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_outlet_atoms(o, 0, ac, at);
+}
+
+static void
+param_add_listener(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_param_t *this = (fts_param_t *)o;
+  
+  fts_param_add_listener(this, fts_get_object(at), param_output_from_recieve);
+}
+
+static void
+param_remove_listener(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_param_t *this = (fts_param_t *)o;
+  
+  fts_param_remove_listener(this, fts_get_object(at));
+}
+
+static void
 param_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_param_t *this = (fts_param_t *)o;
@@ -301,8 +321,11 @@ param_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, param_get_array);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_array, param_set_atoms);
 
-  fts_method_define_varargs(cl, fts_system_inlet, sym__remote_value, param_input_atoms);
   fts_method_define_varargs(cl,fts_system_inlet, fts_new_symbol("load_init"), param_update);
+
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_input, param_input_atoms);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_add_listener, param_add_listener);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_remove_listener, param_remove_listener);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, param_update);
 
@@ -321,137 +344,6 @@ param_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_ok;
 }
 
-/***************************************************************************
- *
- *  psend
- *
- */
-
-typedef struct _psend_
-{
-  fts_object_t head;
-  fts_param_t *param;
-} psend_t;
-
-static void
-psend_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  psend_t *this = (psend_t *) o;
-
-  param_input_atoms((fts_object_t *)this->param, 0, 0, ac, at);
-}
-
-static void
-psend_input_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  psend_t *this = (psend_t *) o;
-
-  param_input_anything((fts_object_t *)this->param, 0, s, ac, at);
-}
-
-static void 
-psend_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc-1, o->argv+1);
-}
-
-static void
-psend_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  psend_t *this = (psend_t *) o;
-  fts_param_t *param = (fts_param_t *)fts_get_object(at);
-
-  this->param = param;
-  fts_object_refer(param);
-}
-
-static void
-psend_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  psend_t *this = (psend_t *) o;
-
-  fts_object_release(this->param);
-}
-
-fts_status_t
-psend_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init(cl, sizeof(psend_t), 1, 0, 0); 
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, psend_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, psend_delete);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_spost_description, psend_spost_description);
-
-  fts_method_define_varargs(cl, 0, fts_s_int, psend_input_atoms);
-  fts_method_define_varargs(cl, 0, fts_s_float, psend_input_atoms);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, psend_input_atoms);
-  fts_method_define_varargs(cl, 0, fts_s_list, psend_input_atoms);
-  fts_method_define_varargs(cl, 0, fts_s_anything, psend_input_anything);
-
-  return fts_ok;
-}
-
-/***************************************************************************
- *
- *  preceive
- *
- */
-
-typedef struct _preceive_
-{
-  fts_object_t head;
-  fts_param_t *param;
-} preceive_t;
-
-static void
-preceive_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  preceive_t *this = (preceive_t *)o;
-
-  switch(ac)
-    {
-    default:
-      fts_outlet_send(o, 0, fts_s_list, ac, at);
-    case 1:
-      fts_outlet_send(o, 0, fts_get_selector(at), 1, at);
-    case 0:
-      break;
-    }
-}
-
-static void
-preceive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  preceive_t *this = (preceive_t *)o;
-  fts_param_t *param = (fts_param_t *)fts_get_object(at);
-
-  fts_param_add_listener(param, o, preceive_output);
-  this->param = param;
-}
-  
-static void
-preceive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  preceive_t *this = (preceive_t *)o;
-
-  fts_param_remove_listener(this->param, o);
-}
-
-fts_status_t
-preceive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init(cl, sizeof(preceive_t), 0, 1, 0); 
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, preceive_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, preceive_delete);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_spost_description, psend_spost_description);
-
-  return fts_ok;
-}
-
-
 /***********************************************************************
  *
  * Initialisation
@@ -462,7 +354,6 @@ void
 fts_kernel_param_init(void)
 {
   fts_s_param = fts_new_symbol("param");
-  sym__remote_value = fts_new_symbol("_remote_value");
 
   fts_param_metaclass = fts_class_install(fts_s_param, param_instantiate);
 }

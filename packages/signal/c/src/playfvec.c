@@ -49,7 +49,6 @@ typedef struct _play_fvec_
 
 } play_fvec_t;
 
-
 void
 play_fvec_set_conv_position(play_fvec_t *this, double c)
 {
@@ -183,6 +182,23 @@ play_fvec_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void 
+play_fvec_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  play_fvec_t *this = (play_fvec_t *)o;
+
+  this->mode = mode_play;
+}
+
+static void
+play_fvec_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  play_fvec_t *this = (play_fvec_t *)o;
+
+  this->mode = mode_stop;
+  this->position = this->begin;
+}
+
+static void 
 play_fvec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   play_fvec_set(o, 0, 0, ac, at);
@@ -190,24 +206,11 @@ play_fvec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void 
-play_fvec_play(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  play_fvec_t *this = (play_fvec_t *)o;
-
-  if(this->mode == mode_stop)
-    this->position = this->begin;
-
-  this->mode = mode_play;
-}
-
-static void 
 play_fvec_loop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   play_fvec_t *this = (play_fvec_t *)o;
 
-  if(this->mode == mode_stop)
-    this->position = this->begin;
-
+  this->position = this->begin;
   this->mode = mode_loop;
 }
 
@@ -215,9 +218,6 @@ static void
 play_fvec_cycle(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   play_fvec_t *this = (play_fvec_t *)o;
-
-  if(this->mode == mode_stop)
-    this->position = this->begin;
 
   this->mode = mode_cycle;
   this->cycle_direction = 0;
@@ -230,14 +230,6 @@ play_fvec_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   if(this->mode != mode_stop)
     this->mode = mode_pause;
-}
-
-static void
-play_fvec_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  play_fvec_t *this = (play_fvec_t *)o;
-
-  this->mode = mode_stop;
 }
 
 static void
@@ -480,11 +472,11 @@ play_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("period"), play_fvec_set_period_prop);
   
   fts_method_define_varargs(cl, 0, fts_s_bang, play_fvec_bang);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("play"), play_fvec_play);
+  fts_method_define_varargs(cl, 0, fts_s_start, play_fvec_start);
+  fts_method_define_varargs(cl, 0, fts_s_stop, play_fvec_stop);
   fts_method_define_varargs(cl, 0, fts_new_symbol("loop"), play_fvec_loop);
   fts_method_define_varargs(cl, 0, fts_new_symbol("cycle"), play_fvec_cycle);
   fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), play_fvec_pause);
-  fts_method_define_varargs(cl, 0, fts_s_stop, play_fvec_stop);
   fts_method_define_varargs(cl, 0, fts_new_symbol("rewind"), play_fvec_rewind);
 
   fts_method_define_varargs(cl, 0, fvec_symbol, play_fvec_set_object);

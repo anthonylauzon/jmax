@@ -56,6 +56,7 @@ typedef struct _wave_
 {
   fts_object_t o;
   ftl_data_t data;
+  int fvec;
 } wave_t;
 
 extern void wave_declare_functions(void);

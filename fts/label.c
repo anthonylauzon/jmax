@@ -107,10 +107,10 @@ void fts_channel_propagate_input( fts_channel_t *channel, fts_propagate_fun_t pr
  */
 
 static fts_hashtable_t *default_labels = 0;
-fts_metaclass_t *fts_label_type = 0;
+fts_metaclass_t *fts_label_metaclass = 0;
 
-static fts_label_t *
-label_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
+fts_label_t *
+fts_label_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
 {
   fts_atom_t *value = fts_variable_get_value_or_void(scope, name);
   fts_label_t *label = NULL;
@@ -122,7 +122,7 @@ label_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
     {
       fts_object_t *obj = fts_get_object(value);
       
-      if(fts_object_get_metaclass(obj) == fts_label_type)
+      if(fts_object_get_metaclass(obj) == fts_label_metaclass)
 	return (fts_label_t *)obj;
     }
 
@@ -137,7 +137,7 @@ label_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
 
   /* if there wasn't a variable nor a default, make a default */
   fts_set_void(&a);
-  label = (fts_label_t *)fts_object_create(fts_label_type, 1, &a);
+  label = (fts_label_t *)fts_object_create(fts_label_metaclass, 1, &a);
   
   fts_set_object(&a, (fts_object_t *)label);
   fts_hashtable_put(default_labels, &key, &a);
@@ -159,7 +159,7 @@ fts_label_get(fts_patcher_t *scope, fts_symbol_t name)
 	{
 	  fts_object_t *obj = fts_get_object(value);
 	  
-	  if(fts_object_get_metaclass(obj) == fts_label_type)
+	  if(fts_object_get_metaclass(obj) == fts_label_metaclass)
 	    label = (fts_label_t *)obj;
 	}
     }
@@ -194,6 +194,24 @@ label_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_label_t *this = (fts_label_t *) o;
 
   fts_label_send(this, s, ac, at);
+}
+
+static void
+label_add_listener(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_label_t *this = (fts_label_t *) o;
+  fts_channel_t *channel = fts_label_get_channel(this);
+
+  fts_channel_add_target(channel, fts_get_object(at));
+}
+
+static void
+label_remove_listener(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_label_t *this = (fts_label_t *) o;
+  fts_channel_t *channel = fts_label_get_channel(this);
+
+  fts_channel_remove_target(channel, fts_get_object(at));
 }
 
 static void
@@ -232,12 +250,15 @@ label_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_init(cl, sizeof(fts_label_t), 1, 1, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, label_init);
+
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_propagate_input, label_propagate_input);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_find_friends, label_find_friends);
+
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_input, label_send);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_add_listener, label_add_listener);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_remove_listener, label_remove_listener);
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, label_get_state);
-
-  fts_class_define_thru(cl, label_propagate_input);
 
   /* sending anything else to lable is like sending to all channel targets */
   fts_method_define_varargs(cl, 0, fts_s_anything, label_send);
@@ -245,184 +266,8 @@ label_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_ok;
 }
 
-/***************************************************************************
- *
- *  send
- *
- */
-
-typedef struct _send_
-{
-  fts_object_t head;
-  fts_channel_t *channel;
-} send_t;
-
-typedef struct _receive_
-{
-  fts_object_t head;
-  fts_channel_t *channel;
-} receive_t;
-
-static void
-send_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  send_t *this = (send_t *) o;
-
-  fts_channel_send( this->channel, 0, s, ac, at);
-}
-
-static void
-send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  send_t *this = (send_t *) o;
-  fts_label_t *label = 0;
-
-  if(fts_is_symbol(at))
-    {
-      fts_symbol_t name = fts_get_symbol(at);
-      
-      label = label_get_or_create(fts_object_get_patcher(o), name);
-      fts_variable_add_user(fts_object_get_patcher(o), name, o);
-    }
-  else if(fts_is_label(at))
-    label = (fts_label_t *)fts_get_object(at);
-  else
-    {
-      fts_object_set_error(o, "Wrong argument");
-      return;
-    }
-
-  fts_channel_add_origin(fts_label_get_channel(label), o);  
-  this->channel = fts_label_get_channel(label);
-}
-
-static void
-send_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  send_t *this = (send_t *) o;
-
-  fts_channel_remove_origin(this->channel, (fts_object_t *)this);
-}
-
-static void
-send_find_friends(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  send_t *this = (send_t *)o;
-
-  fts_channel_find_friends(this->channel, ac, at);
-}
-
-static void
-send_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  send_t *this = (send_t *)o;
-  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);
-  void *propagate_context = fts_get_pointer(at + 1);
-
-  fts_channel_propagate_input( this->channel, propagate_fun, propagate_context, 0);
-}
-
-static void 
-send_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc-1, o->argv+1);
-}
-
-fts_status_t
-send_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init(cl, sizeof(send_t), 1, 0, 0); 
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, send_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, send_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_find_friends, send_find_friends);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_spost_description, send_spost_description); 
-
-  fts_method_define_varargs(cl, 0, fts_s_anything, send_anything);
-  fts_class_define_thru(cl, send_propagate_input);
-
-  return fts_ok;
-}
-
-/***************************************************************************
- *
- *  receive
- *
- */
-
-static void
-receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  receive_t *this = (receive_t *)o;
-  fts_label_t *label = 0;
-
-  if(fts_is_symbol(at))
-    {
-      fts_symbol_t name = fts_get_symbol(at);
-      
-      label = label_get_or_create(fts_object_get_patcher(o), name);
-      fts_variable_add_user(fts_object_get_patcher(o), name, o);
-    }
-  else if(fts_is_label(at))
-    label = (fts_label_t *)fts_get_object(at);
-  else
-    {
-      fts_object_set_error(o, "Wrong argument");
-      return;
-    }
-
-  fts_channel_add_target(fts_label_get_channel(label), o);
-  this->channel = fts_label_get_channel(label);
-}
-  
-static void
-receive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  receive_t *this = (receive_t *)o;
-
-  fts_channel_remove_target(this->channel, (fts_object_t *)this);
-}
-
-static void 
-receive_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc-1, o->argv+1);
-}
-
-fts_status_t
-receive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init(cl, sizeof(receive_t), 0, 1, 0); 
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, receive_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, receive_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_find_friends, send_find_friends);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_spost_description, receive_spost_description); 
-
-  return fts_ok;
-}
-
-
-/*************************************************************
- *
- *  inlet/outlet utilities
- *
- */
-
-static int
-label_connection_check(int ac, const fts_atom_t *at)
-{
-  return (ac == 0 || (ac == 1 && (fts_is_int(at) || fts_is_symbol(at) || fts_is_label(at))));
-}
-
-/***********************************************************************
- *
- * Initialisation
- *
- */
-
 void 
 fts_label_config(void)
 {
-  fts_label_type = fts_class_install( fts_s_label, label_instantiate);
+  fts_label_metaclass = fts_class_install( fts_s_label, label_instantiate);
 }

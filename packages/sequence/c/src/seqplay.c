@@ -351,7 +351,7 @@ seqplay_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
   
 static void 
-seqplay_play(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqplay_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqplay_t *this = (seqplay_t *)o;
   
@@ -367,7 +367,7 @@ seqplay_play(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void 
-seqplay_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqplay_play(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   seqplay_t *this = (seqplay_t *)o;
 
@@ -505,10 +505,10 @@ seqplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, seqplay_delete);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("locate"), seqplay_locate);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("play"), seqplay_play);
-  /* fts_method_define_varargs(cl, 0, fts_new_symbol("loop"), seqplay_loop); */
+  fts_method_define_varargs(cl, 0, fts_s_start, seqplay_start);
+  fts_method_define_varargs(cl, 0, fts_s_stop, seqplay_stop);
   fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), seqplay_pause);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), seqplay_stop);
+  /* fts_method_define_varargs(cl, 0, fts_new_symbol("loop"), seqplay_loop); */
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("begin"), seqplay_set_begin);
   fts_method_define_varargs(cl, 0, fts_new_symbol("end"), seqplay_set_end);
@@ -518,10 +518,9 @@ seqplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("sync"), seqplay_sync);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("start"), seqplay_start);
-  fts_method_define_varargs(cl, 0, fts_s_bang, seqplay_start);
-  fts_method_define_varargs(cl, 0, seqsym_track, seqplay_start);
-  fts_method_define_varargs(cl, 0, fts_s_list, seqplay_start);
+  fts_method_define_varargs(cl, 0, fts_s_bang, seqplay_play);
+  fts_method_define_varargs(cl, 0, seqsym_track, seqplay_play);
+  fts_method_define_varargs(cl, 0, fts_s_list, seqplay_play);
   
   fts_method_define_varargs(cl, 1, fts_s_int, seqplay_set_begin);
   fts_method_define_varargs(cl, 1, fts_s_float, seqplay_set_begin);

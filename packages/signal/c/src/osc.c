@@ -95,17 +95,25 @@ osc_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   osc_data_set_fvec(this->data, fvec);
 }
 
-static void
-osc_put(osc_t *this, fts_dsp_descr_t *dsp, struct osc_ftl_symbols *sym)
+static void 
+osc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  osc_t *this = (osc_t *)o;
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   float sr = fts_dsp_get_output_srate(dsp, 0);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
+  struct osc_ftl_symbols *sym;
+
+  if(this->fvec)
+    sym = &osc_ftl_symbols_fvec;
+  else
+    sym = &osc_ftl_symbols_fvec;
   
   this->sr = sr;
 
   osc_data_set_phase(this->data, this->phase);
 
-  if(!fts_dsp_is_sig_inlet((fts_object_t *)this, 0) || fts_dsp_is_input_null(dsp, 0))
+  if(fts_dsp_is_input_null(dsp, 0))
     {
       /* no input connected */
       fts_atom_t a[3];
@@ -114,8 +122,7 @@ osc_put(osc_t *this, fts_dsp_descr_t *dsp, struct osc_ftl_symbols *sym)
       
       fts_set_ftl_data(a + 0, this->data);
       fts_set_symbol(a + 1, fts_dsp_get_output_name(dsp, 0));
-      fts_set_int(a + 2, n_tick);
-      
+      fts_set_int(a + 2, n_tick);      
       fts_dsp_add_function(sym->control_input, 3, a);
     }
   else
@@ -144,24 +151,6 @@ osc_put(osc_t *this, fts_dsp_descr_t *dsp, struct osc_ftl_symbols *sym)
     }
 }
 
-static void 
-osc_put_cosine(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  osc_t *this = (osc_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
-
-  osc_put(this, dsp, &osc_ftl_symbols_ptr);
-}
-
-static void 
-osc_put_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  osc_t *this = (osc_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
-
-  osc_put(this, dsp, &osc_ftl_symbols_fvec);
-}
-
 static void
 osc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
@@ -175,33 +164,33 @@ osc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   this->sr = fts_dsp_get_sample_rate();
 
   this->data = osc_data_new();
-}
 
-static void
-osc_init_cosine(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  osc_t *this = (osc_t *)o;
-
-  osc_init(o, 0, 0, 0, 0);
-
-  if(ac == 1)
-    osc_set_freq(o, 0, 0, 1, at);
-
-  osc_data_set_ptr(this->data, fts_fftab_get_cosine(OSC_TABLE_SIZE));
-}
-
-static void
-osc_init_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  osc_init(o, 0, 0, 0, 0);
-
-  if(ac == 2)
+  if(ac == 0 || (ac == 1 && fts_is_number(at)))
     {
-      osc_set_freq(o, 0, 0, 1, at + 0);
-      osc_set_fvec(o, 0, 0, 1, at + 1);
+      /* cosine version */
+      if(ac > 0)
+	osc_set_freq(o, 0, 0, 1, at);
+
+      osc_data_set_ptr(this->data, fts_fftab_get_cosine(OSC_TABLE_SIZE));
+      fts_object_set_inlets_number(o, 1);
+
+      this->fvec = 0;
+    }
+  else if ((ac == 1 && fts_is_a(at, fvec_type)) || (ac == 2 && fts_is_number(at) && fts_is_a(at + 1, fvec_type)))
+    {
+      /* fvec version */
+      if(ac > 1)
+	{
+	  osc_set_freq(o, 0, 0, 1, at);
+	  osc_set_fvec(o, 0, 0, 1, at + 1);
+	}
+      else
+	osc_set_fvec(o, 0, 0, 1, at);
+
+      this->fvec = 1;
     }
   else
-    osc_set_fvec(o, 0, 0, 1, at);
+    fts_object_set_error(o, "Bad arguments");
 }
 
 static void
@@ -209,88 +198,39 @@ osc_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   osc_t *this = (osc_t *)o;
 
-  ftl_data_free(this->data);
-
-  fts_dsp_remove_object(o);
-}
-
-static void
-osc_delete_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  osc_t *this = (osc_t *)o;
-
   /* release fvec */
-  osc_data_set_fvec(this->data, 0);
+  if(this->fvec)
+    osc_data_set_fvec(this->data, 0);
 
   ftl_data_free(this->data);
-
   fts_dsp_remove_object(o);
-}
-
-static fts_status_t
-osc_instantiate_cosine(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init(cl, sizeof(osc_t), 1, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, osc_init_cosine);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, osc_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, osc_put_cosine);
-  
-  fts_method_define_varargs(cl, 0, fts_new_symbol("phase"), osc_set_phase);
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("phase"), osc_set_phase_prop);
-  
-  if(ac == 1)
-    {
-      fts_method_define_varargs(cl, 0, fts_s_int, osc_set_freq);
-      fts_method_define_varargs(cl, 0, fts_s_float, osc_set_freq);
-      fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("freq"), osc_set_freq_prop);      
-    }
-  else
-    fts_dsp_declare_inlet(cl, 0);
-
-  fts_dsp_declare_outlet(cl, 0);
-    
-  return fts_ok;
-}
-
-static fts_status_t
-osc_instantiate_fvec(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init(cl, sizeof(osc_t), 2, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, osc_init_fvec);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, osc_delete_fvec);      
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, osc_put_fvec);
-  
-  fts_method_define_varargs(cl, 0, fts_new_symbol("phase"), osc_set_phase);
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("phase"), osc_set_phase_prop);
-  
-  fts_method_define_varargs(cl, 1, fvec_symbol, osc_set_fvec);
-
-  if(ac == 2)
-    {
-      fts_method_define_varargs(cl, 0, fts_s_int, osc_set_freq);
-      fts_method_define_varargs(cl, 0, fts_s_float, osc_set_freq);
-      fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("freq"), osc_set_freq_prop);
-    }
-  else
-    fts_dsp_declare_inlet(cl, 0);
-
-  fts_dsp_declare_outlet(cl, 0);
-
-  return fts_ok;
 }
 
 static fts_status_t
 osc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 0 || (ac == 1 && fts_is_number(at)))
-    return osc_instantiate_cosine(cl, ac, at);
-  else if ((ac == 1 && fts_is_a(at, fvec_type)) || (ac == 2 && fts_is_number(at) && fts_is_a(at + 1, fvec_type)))
-    return osc_instantiate_fvec(cl, ac, at);
-  else
-    return &fts_CannotInstantiate;
-  }
+  fts_class_init(cl, sizeof(osc_t), 2, 1, 0);
+  
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, osc_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, osc_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, osc_put);
+  
+  fts_method_define_varargs(cl, 0, fts_new_symbol("phase"), osc_set_phase);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("freq"), osc_set_freq);
+
+  fts_method_define_varargs(cl, 0, fts_s_int, osc_set_freq);
+  fts_method_define_varargs(cl, 0, fts_s_float, osc_set_freq);
+
+  fts_method_define_varargs(cl, 1, fvec_symbol, osc_set_fvec);
+
+  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("phase"), osc_set_phase_prop);
+  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("freq"), osc_set_freq_prop);      
+
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
+    
+  return fts_ok;
+}
 
 /***************************************************************************************
  *
@@ -354,7 +294,7 @@ phi_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 
   phi_data_set_phase(this->data, this->phase);
 
-  if(!fts_dsp_is_sig_inlet((fts_object_t *)this, 0) || fts_dsp_is_input_null(dsp, 0))
+  if(fts_dsp_is_input_null(dsp, 0))
     {
       /* no input connected */
       fts_atom_t a[3];
@@ -411,27 +351,34 @@ phi_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     phi_set_freq(o, 0, 0, 1, at);
 }
 
+static void
+phi_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  osc_t *this = (osc_t *)o;
+
+  ftl_data_free(this->data);
+  fts_dsp_remove_object(o);
+}
+
 static fts_status_t
 phi_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(osc_t), 1, 1, 0);
   
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, phi_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, osc_delete);      
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, phi_delete);      
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, phi_put);
   
   fts_method_define_varargs(cl, 0, fts_new_symbol("phase"), phi_set_phase);
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("phase"), phi_set_phase_prop);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("freq"), phi_set_freq);
   
-  if(ac == 1)
-    {
-      fts_method_define_varargs(cl, 0, fts_s_int, phi_set_freq);
-      fts_method_define_varargs(cl, 0, fts_s_float, phi_set_freq);
-      fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("freq"), phi_set_freq_prop);      
-    }
-  else
-    fts_dsp_declare_inlet(cl, 0);
+  fts_method_define_varargs(cl, 0, fts_s_int, phi_set_freq);
+  fts_method_define_varargs(cl, 0, fts_s_float, phi_set_freq);
+  
+  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("freq"), phi_set_freq_prop);      
+  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("phase"), phi_set_phase_prop);
 
+  fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
     
   return fts_ok;
@@ -458,6 +405,6 @@ signal_osc_config(void)
   /* declare the oscillator related FTL functions (platform dependent) */
   osc_declare_functions();
 
-  fts_metaclass_install(fts_new_symbol("osc~"), osc_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(fts_new_symbol("phi~"), phi_instantiate, fts_arg_type_equiv);
+  fts_class_install(fts_new_symbol("osc~"), osc_instantiate);
+  fts_class_install(fts_new_symbol("phi~"), phi_instantiate);
 }

@@ -10,7 +10,6 @@ fvec.c \
 getinter.c \
 getrange.c \
 getsize.c \
-getval.c \
 ivec.c \
 mat.c \
 dict.c \

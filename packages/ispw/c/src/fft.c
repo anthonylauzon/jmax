@@ -69,21 +69,12 @@ fft_output_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+buffers_init(fft_t *x, fts_symbol_t type, fts_symbol_t real_spec, int ac, const fts_atom_t *at)
 {
-  fft_t *x = (fft_t *)o;
-  fts_symbol_t type = 0;
-  fts_symbol_t real_spec = 0;
   long size, hop, phase;
   complex *buf = 0;
   complex *spec = 0;
   long spec_size;
-
-  if(!check_args(ac, at, &type, &real_spec))
-    {
-      post("error: %s: bad arguments\n", x->name);
-      return;
-    }
 
   while(ac && fts_is_symbol(at)) /* skip type declaration */
     {
@@ -133,7 +124,7 @@ fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       return;
     }
 
-  x->ctl.object = o;
+  x->ctl.object = (fts_object_t *)x;
   x->ctl.buf = buf;
   x->ctl.spec = spec;
   x->ctl.size = size;
@@ -143,13 +134,51 @@ fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   x->type = type; /* default */
   x->real_spec = real_spec;
+}  
+
+static void
+fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fft_t *x = (fft_t *)o;
+  fts_symbol_t type = 0;
+  fts_symbol_t real_spec = 0;
+
+  if(!check_args(ac, at, &type, &real_spec))
+    {
+      fts_object_set_error(o, "Wrong  arguments\n");
+      return;
+    }
+
+  buffers_init(x, type, real_spec, ac, at);
+
+  if(real_spec == sym_half)
+    {
+      fts_atom_t av;
+      
+      fts_set_int(&av, 1);
+      fts_object_put_prop(o, fts_s_dsp_downsampling, &av);
+    }
   
   if(type == sym_real)
-    x->bang_out = 2;
+    {
+      fts_object_set_outlets_number(o, 3);
+
+      x->bang_out = 2;
+    }
   else if(type == sym_tandem)
-    x->bang_out = 4;
+    {
+      fts_object_set_inlets_number(o, 2);
+      fts_object_set_outlets_number(o, 5);
+
+      x->bang_out = 4;
+    }
   else /* complex */
-    x->bang_out = 2;
+    {
+      fts_object_set_inlets_number(o, 2);
+      fts_object_set_outlets_number(o, 3);
+
+      x->bang_out = 2;
+    }
 
   fts_dsp_add_object(o);
 }
@@ -158,15 +187,48 @@ static void
 ifft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fft_t *x = (fft_t *)o;
+  fts_symbol_t type = 0;
+  fts_symbol_t real_spec = 0;
 
-  fft_init(o, 0, 0, ac, at);
+  if(!check_args(ac, at, &type, &real_spec))
+    {
+      fts_object_set_error(o, "Wrong arguments\n", x->name);
+      return;
+    }
 
-  if(x->type == sym_real)
-    x->bang_out = 1;
-  else if(x->type == sym_tandem)
-    x->bang_out = 2;
+  buffers_init(x, type, real_spec, ac, at);
+
+  if(real_spec == sym_half)
+    {
+      fts_atom_t av;
+      
+      fts_set_int(&av, 1);
+      fts_object_put_prop(o, fts_s_dsp_upsampling, &av);
+    }
+  
+  if(type == sym_real)
+    {
+      fts_object_set_inlets_number(o, 2);
+      fts_object_set_outlets_number(o, 2);
+
+      x->bang_out = 1;
+    }
+  else if(type == sym_tandem)
+    {
+      fts_object_set_inlets_number(o, 4);
+      fts_object_set_outlets_number(o, 3);
+
+      x->bang_out = 2;
+    }
   else /* complex */
-    x->bang_out = 2;
+    {
+      fts_object_set_inlets_number(o, 2);
+      fts_object_set_outlets_number(o, 3);
+
+      x->bang_out = 2;
+    }
+
+  fts_dsp_add_object(o);
 }
 
 static void
@@ -440,55 +502,17 @@ fft_setphase(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t
 fft_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[4];
-  fts_symbol_t type = 0;
-  fts_symbol_t real_spec = 0;
-  int bang_out = 0;
-  
-  check_args(ac, at, &type, &real_spec);
-  
-  if(real_spec == sym_half)
-    {
-      fts_atom_t av;
-      
-      fts_set_int(&av, 1);
-      fts_class_put_prop(cl, fts_s_dsp_downsampling, &av);
-    }
-  
-  if(type == sym_real)
-    {
-      fts_class_init(cl, sizeof(fft_t), 1, 2 + 1, 0); /* + 1: bang out */
-      fts_dsp_declare_inlet(cl, 0); /* a real inlet */
-      fts_dsp_declare_outlet(cl, 0); /* a pair of outlets */
-      fts_dsp_declare_outlet(cl, 1);
-    }    
-  else if(type == sym_tandem)
-    {
-      fts_class_init(cl, sizeof(fft_t), 2, 4 + 1, 0); /* + 1: bang out */
-      fts_dsp_declare_inlet(cl, 0); /* a real inlet */
-      fts_dsp_declare_inlet(cl, 1); /* another real inlet */
-      fts_dsp_declare_outlet(cl, 0); /* a pair of outlets */
-      fts_dsp_declare_outlet(cl, 1);
-      fts_dsp_declare_outlet(cl, 2); /* another pair of outlets */
-      fts_dsp_declare_outlet(cl, 3);
-    }
-  else /* complex */
-    {
-      fts_class_init(cl, sizeof(fft_t), 2, 2 + 1, 0); /* + 1: bang out */
-      fts_dsp_declare_inlet(cl, 0); /* a pair of inlet s */
-      fts_dsp_declare_inlet(cl, 1); 
-      fts_dsp_declare_outlet(cl, 0); /* a pair of outlets */
-      fts_dsp_declare_outlet(cl, 1);
-    }
+  fts_class_init(cl, sizeof(fft_t), 1, 1, 0);
 
-  /* ... but everyone has these */
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fft_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fft_delete);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, fft_put);
   
-  /* user methods */
   fts_method_define_varargs(cl, 0, fts_s_bang, fft_bang);
   fts_method_define_varargs(cl, 0, fts_new_symbol("setphase"), fft_setphase);
+
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
   
   return fts_ok;
 }
@@ -496,62 +520,15 @@ fft_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 ifft_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[4];
-  fts_symbol_t type = 0;
-  fts_symbol_t real_spec = 0;
-  int bang_out = 0;
-  
-  check_args(ac, at, &type, &real_spec);
-  
-  if(real_spec == sym_half)
-    {
-      fts_atom_t av;
-      
-      fts_set_int(&av, 1);
-      fts_class_put_prop(cl, fts_s_dsp_upsampling, &av);
-    }
-  
-  if(type == sym_real)
-    {
-      fts_class_init(cl, sizeof(fft_t), 2, 1 + 1, 0); /* + 1: bang out */
-      fts_dsp_declare_inlet(cl, 0); /* a pair of inlets */
-      fts_dsp_declare_inlet(cl, 1);
-      fts_dsp_declare_outlet(cl, 0); /* just a real outlet */
-      bang_out = 1;
-    }
-  else if(type == sym_tandem)
-    {
-      fts_class_init(cl, sizeof(fft_t), 4, 2 + 1, 0); /* + 1: bang out */
-      fts_dsp_declare_inlet(cl, 0); /* a pair of inlets */
-      fts_dsp_declare_inlet(cl, 1);
-      fts_dsp_declare_inlet(cl, 2); /* another pair of inlets */
-      fts_dsp_declare_inlet(cl, 3);
-      fts_dsp_declare_outlet(cl, 0); /* a real outlet */
-      fts_dsp_declare_outlet(cl, 1); /* another "real" outlet */
-      bang_out = 2;
-    }
-  else /* complex */
-    {
-      fts_class_init(cl, sizeof(fft_t), 2, 2 + 1, 0); /* + 1: bang out */
-      fts_dsp_declare_inlet(cl, 0); /* one pair of inlets */
-      fts_dsp_declare_inlet(cl, 1);
-      fts_dsp_declare_outlet(cl, 0); /* one pair of outlets */
-      fts_dsp_declare_outlet(cl, 1);
-      bang_out = 2;
-    }
+  fts_class_init(cl, sizeof(fft_t), 1, 1, 0);
 
-  /* ... but everyone has these */
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fft_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, ifft_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fft_delete);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, ifft_put);
 
-  /* user methods */
   fts_method_define_varargs(cl, 0, fts_s_bang, fft_bang);
   fts_method_define_varargs(cl, 0, fts_new_symbol("setphase"), fft_setphase);
 
-  /* bang outlet */
-  fts_outlet_type_define_varargs(cl, bang_out, fts_s_bang);
-  
   return fts_ok;
 }
 
@@ -580,8 +557,8 @@ fft_ispw_config(void)
   sym_half = fts_new_symbol("half");
   sym_miller = fts_new_symbol("miller");
   
-  fts_metaclass_install(sym_fft, fft_instantiate, fft_class_equiv);
-  fts_metaclass_install(sym_ifft, ifft_instantiate, fft_class_equiv);
+  fts_class_install(sym_fft, fft_instantiate);
+  fts_class_install(sym_ifft, ifft_instantiate);
   
   if(!dsp_sym_fft_complex) 
     ftl_fft_init(); /* init the fft functions dsp symbol table */

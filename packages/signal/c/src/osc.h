@@ -52,6 +52,7 @@ typedef struct _osc_
 {
   fts_object_t o;
   ftl_data_t data;
+  int fvec;
   double freq;
   double phase;
   double sr;
@@ -80,7 +81,5 @@ extern void phi_data_set_incr(ftl_data_t ftl_data, double freq);
 extern void phi_data_set_phase(ftl_data_t ftl_data, double phase);
 
 extern void phi_declare_functions(fts_word_t *argv);
-
-
 
 #endif

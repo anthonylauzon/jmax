@@ -105,12 +105,16 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
 
   if(selector != NULL)
     {
+      fts_method_t propagate = fts_class_inlet_get_method(dst->head.cl, winlet, fts_s_propagate_input);
+
       meth = fts_class_inlet_get_method(dst->head.cl, winlet, selector);
 
       if((meth == NULL) || 
-	 (selector == fts_s_sig && meth == fts_class_inlet_get_anything(dst->head.cl, winlet) && !fts_object_is_thru(dst)))
+	 (selector == fts_s_sig && meth == fts_class_inlet_get_anything(dst->head.cl, winlet) && propagate == 0))
 	{
-	  fts_object_blip(src, "Type mismatch, cannot connect");
+	  /* mismatch if no method for typed outlet or anything method of object which is no propagating through it */
+
+	  fts_object_blip(src, "Connection type mismatch");
 	  return NULL;
 	}
     }

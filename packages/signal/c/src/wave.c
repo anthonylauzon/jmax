@@ -31,12 +31,6 @@
 struct wave_ftl_symbols wave_ftl_symbols_ptr = {0, 0};
 struct wave_ftl_symbols wave_ftl_symbols_fvec = {0, 0};
 
-/***************************************************************************
- *
- *  FTL data
- *
- */
-
 ftl_data_t 
 wave_data_new(void)
 {
@@ -96,9 +90,17 @@ wave_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
  */
 
 static void
-wave_put(wave_t *this, fts_dsp_descr_t *dsp, struct wave_ftl_symbols *sym)
+wave_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  wave_t *this = (wave_t *)o;
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
+  struct wave_ftl_symbols *sym;  
+
+  if(this->fvec)
+    sym = &wave_ftl_symbols_fvec;
+  else
+    sym = &wave_ftl_symbols_ptr;
   
   if (fts_dsp_get_input_name(dsp, 0) != fts_dsp_get_output_name(dsp, 0))
     {
@@ -121,27 +123,9 @@ wave_put(wave_t *this, fts_dsp_descr_t *dsp, struct wave_ftl_symbols *sym)
     }
 }
 
-static void 
-wave_put_cosine(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  wave_t *this = (wave_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
-
-  wave_put(this, dsp, &wave_ftl_symbols_ptr);
-}
-
-static void 
-wave_put_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  wave_t *this = (wave_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
-
-  wave_put(this, dsp, &wave_ftl_symbols_fvec);
-}
-
 /***************************************************************************************
  *
- *  init
+ *  class
  *
  */
 
@@ -150,107 +134,54 @@ wave_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 { 
   wave_t *this = (wave_t *)o;
 
-  fts_dsp_add_object((fts_object_t *)this);
+  fts_dsp_add_object(o);
 
   this->data = wave_data_new();
+
+  if(ac == 0)
+    {
+      this->fvec = 0;
+      wave_data_set_ptr(this->data, fts_fftab_get_cosine(WAVE_TABLE_SIZE));
+      fts_object_set_inlets_number(o, 1);
+    }
+  else if(ac == 1 && fts_is_a(at, fvec_type))
+    {
+      this->fvec = 1;
+      wave_set_fvec(o, 0, 0, 1, at);
+    }
+  else
+    fts_object_set_error(o, "Bad arguments");
 }
-
-static void
-wave_init_cosine(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  wave_t *this = (wave_t *)o;
-
-  wave_init(o, 0, 0, 0, 0);
-
-  wave_data_set_ptr(this->data, fts_fftab_get_cosine(WAVE_TABLE_SIZE));
-}
-
-static void
-wave_init_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  wave_init(o, 0, 0, 0, 0);
-  wave_set_fvec(o, 0, 0, 1, at);
-}
-
-/***************************************************************************************
- *
- *  delete
- *
- */
 
 static void
 wave_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   wave_t *this = (wave_t *)o;
 
-  ftl_data_free(this->data);
-
-  fts_dsp_remove_object(o);
-}
-
-static void
-wave_delete_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  wave_t *this = (wave_t *)o;
-
   /* release fvec */
-  wave_data_set_fvec(this->data, 0);
+  if(this->fvec)
+    wave_data_set_fvec(this->data, 0);
 
   ftl_data_free(this->data);
 
   fts_dsp_remove_object(o);
-}
-
-/***************************************************************************************
- *
- *  instantiate
- *
- */
-
-static fts_status_t
-wave_instantiate_cosine(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init(cl, sizeof(wave_t), 1, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, wave_init_cosine);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, wave_delete);
-      
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("put"), wave_put_cosine);
-  
-  fts_dsp_declare_inlet(cl, 0);
-  fts_dsp_declare_outlet(cl, 0);
-    
-  return fts_ok;
-}
-
-static fts_status_t
-wave_instantiate_fvec(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init(cl, sizeof(wave_t), 2, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, wave_init_fvec);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, wave_delete_fvec);
-      
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("put"), wave_put_fvec);
-  
-  fts_method_define_varargs(cl, 1, fvec_symbol, wave_set_fvec);
-
-  fts_dsp_declare_inlet(cl, 0);
-  fts_dsp_declare_outlet(cl, 0);
-    
-  return fts_ok;
 }
 
 static fts_status_t
 wave_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 0)
-    return wave_instantiate_cosine(cl, ac, at);
-  else if (ac == 1 && fts_is_a(at, fvec_type))
-    return wave_instantiate_fvec(cl, ac, at);
-  else
-    return &fts_CannotInstantiate;
-  }
+  fts_class_init(cl, sizeof(wave_t), 2, 1, 0);
+  
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, wave_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, wave_delete);
+      
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("put"), wave_put);
+  
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
+    
+  return fts_ok;
+}
 
 void
 signal_wave_config(void)
@@ -266,5 +197,5 @@ signal_wave_config(void)
   /* declare the waveillator related FTL wavections (platform dependent) */
   wave_declare_functions();
 
-  fts_metaclass_install(fts_new_symbol("wave~"), wave_instantiate, fts_arg_type_equiv);
+  fts_class_install(fts_new_symbol("wave~"), wave_instantiate);
 }

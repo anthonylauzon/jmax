@@ -29,12 +29,5 @@
 void
 ispwcomp_config(void)
 {
-  fts_metaclass_alias(fts_inlet_metaclass, fts_new_symbol("receive"));
-  fts_metaclass_alias(fts_inlet_metaclass, fts_new_symbol("r"));
-  fts_metaclass_alias(fts_inlet_metaclass, fts_new_symbol("r~"));
-
-  fts_metaclass_alias(fts_outlet_metaclass, fts_new_symbol("send"));
-  fts_metaclass_alias(fts_outlet_metaclass, fts_new_symbol("s"));
-  fts_metaclass_alias(fts_outlet_metaclass, fts_new_symbol("s~"));
 }
 

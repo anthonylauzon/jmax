@@ -77,14 +77,14 @@ fts_object_t *fts_error_object_new(fts_patcher_t *parent, int ac, const fts_atom
 void fts_error_object_fit_inlet(fts_object_t *obj, int ninlet)
 {
   if (fts_object_get_inlets_number(obj) <= ninlet)
-    fts_patcher_redefine_number_of_inlets((fts_patcher_t *) obj, ninlet + 1);
+    fts_object_set_inlets_number(obj, ninlet + 1);
 }
 
 
 void fts_error_object_fit_outlet(fts_object_t *obj, int noutlet)
 {
   if (fts_object_get_outlets_number(obj) <= noutlet)
-    fts_patcher_redefine_number_of_outlets((fts_patcher_t *) obj, noutlet + 1);
+    fts_object_set_outlets_number(obj, noutlet + 1);
 }
 
 

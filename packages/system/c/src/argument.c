@@ -129,5 +129,5 @@ argument_config(void)
   sym_argument = fts_new_symbol("argument");
 
   mcl = fts_class_install(sym_argument, argument_instantiate);
-  fts_metaclass_alias(mcl, fts_new_symbol("arg"));
+  fts_class_alias(mcl, fts_new_symbol("arg"));
 }

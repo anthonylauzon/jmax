@@ -24,26 +24,8 @@
 #define _FTS_PRIVATE_PATCHER_H_
 
 extern fts_metaclass_t *patcher_metaclass;
-extern fts_class_t *inlet_class;
-extern fts_class_t *outlet_class;
-
-struct fts_inlet
-{
-  fts_object_t o;
-  int position; /* inlet position */
-  struct fts_inlet *next; /* next inlet in the same position */
-};
-
-struct fts_outlet
-{
-  fts_object_t o;		
-  int position; /* outlet position */
-  struct fts_outlet *next; /* next outlet in the same position */
-};
 
 #define fts_object_is_patcher(o) ((o)->head.cl->mcl == patcher_metaclass)
-#define fts_object_is_inlet(o) (fts_object_get_class(o) == inlet_class)
-#define fts_object_is_outlet(o) (fts_object_get_class(o) == outlet_class)
 
 #define fts_patcher_set_standard(p)      ((p)->type = fts_p_standard)
 #define fts_patcher_set_abstraction(p)   ((p)->type = fts_p_abstraction)
@@ -78,27 +60,14 @@ extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *tem
 #define fts_patcher_set_save_id(p, i) ((p)->save_id == (i))
 #define fts_patcher_get_save_id(p, i) ((p)->save_id)
 
-extern void fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets);
-extern void fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets);
-
 extern void fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj);
 extern void fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj);
 extern int  fts_patcher_get_objects_count( fts_patcher_t *this);
 extern void fts_patcher_assign_variable(fts_symbol_t name, fts_atom_t *value, void *data);
 
-extern void fts_patcher_reassign_inlets_outlets(fts_patcher_t *obj);
-
 extern fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot);
 
 extern void fts_patcher_blip(fts_patcher_t *this, const char *msg);
-
-extern void fts_patcher_inlet_reposition(fts_object_t *o, int pos);
-extern void fts_patcher_remove_inlet(fts_patcher_t *patcher, fts_inlet_t *this);
-extern void fts_patcher_trim_number_of_inlets(fts_patcher_t *patcher);
-
-extern void fts_patcher_outlet_reposition(fts_object_t *o, int pos);
-extern void fts_patcher_remove_outlet(fts_patcher_t *patcher, fts_outlet_t *this);
-extern void fts_patcher_trim_number_of_outlets(fts_patcher_t *patcher);
 
 extern void fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj);
 

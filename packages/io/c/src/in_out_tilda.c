@@ -208,9 +208,9 @@ static fts_status_t out_tilda_instantiate(fts_class_t *cl, int ac, const fts_ato
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, out_tilda_init);
 
-  fts_dsp_declare_inlet( cl, 0);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_propagate_input, out_tilda_propagate_input);
 
-  fts_class_define_thru( cl, out_tilda_propagate_input);
+  fts_dsp_declare_inlet( cl, 0);
 
   return fts_ok;
 }

@@ -118,5 +118,5 @@ delay_config(void)
 {
   fts_metaclass_t *mcl = fts_class_install(fts_new_symbol("delay"), delay_instantiate);
 
-  fts_metaclass_alias(mcl, fts_new_symbol("del"));
+  fts_class_alias(mcl, fts_new_symbol("del"));
 }

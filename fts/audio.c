@@ -446,8 +446,9 @@ static fts_status_t indispatcher_instantiate(fts_class_t *cl, int ac, const fts_
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, indispatcher_init);
 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_propagate_input, indispatcher_propagate_input);
+
   fts_dsp_declare_inlet( cl, 0);
-  fts_class_define_thru( cl, indispatcher_propagate_input);
 
   return fts_ok;
 }

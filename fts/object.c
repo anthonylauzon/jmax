@@ -977,4 +977,3 @@ fts_object_get_package(fts_object_t *obj)
   else
     return fts_metaclass_get_package(fts_object_get_metaclass(obj));
 }
-

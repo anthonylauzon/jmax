@@ -460,6 +460,6 @@ void
 trigger_config(void)
 {
   fts_metaclass_t *mcl = fts_class_install(fts_new_symbol("trigger"), trigger_instantiate);
-  fts_metaclass_alias(mcl, fts_new_symbol("t"));
+  fts_class_alias(mcl, fts_new_symbol("t"));
 }
 

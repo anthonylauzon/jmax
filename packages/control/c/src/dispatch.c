@@ -32,8 +32,6 @@ typedef struct dispatch
   fts_object_t  o;
 } dispatch_t;
 
-static fts_symbol_t sym__remote_value = 0;
-
 static void
 dispatch_values(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -50,10 +48,10 @@ dispatch_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     {
       fts_object_t *obj = fts_get_object(a);
       fts_class_t *class = fts_object_get_class(obj);
-      fts_method_t method = fts_class_get_method(class, sym__remote_value);
+      fts_method_t method = fts_class_get_method(class, fts_s_input);
 
       if(method)
-	method(obj, fts_system_inlet, sym__remote_value, ac, at);
+	method(obj, fts_system_inlet, fts_s_input, ac, at);
       else
 	fts_object_signal_runtime_error(o, "cannot dispatch to object %s", s);
     }
@@ -76,6 +74,8 @@ dispatch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(dispatch_t), 1, 3, 0);
 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_propagate_input, dispatch_propagate_input);
+
   fts_method_define_varargs(cl, 0, fts_s_int, dispatch_values);
   fts_method_define_varargs(cl, 0, fts_s_float, dispatch_values);
   fts_method_define_varargs(cl, 0, fts_s_symbol, dispatch_values);
@@ -83,14 +83,11 @@ dispatch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_anything, dispatch_send);
 
-  fts_class_define_thru(cl, dispatch_propagate_input);
-
   return fts_ok;
 }
 
 void
 dispatch_config(void)
 {
-  sym__remote_value = fts_new_symbol("_remote_value");
   fts_class_install(fts_new_symbol("dispatch"), dispatch_instantiate);
 }

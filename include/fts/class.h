@@ -82,18 +82,14 @@ struct fts_class {
 
 
 /* Status return values */
-
 FTS_API fts_status_description_t fts_ClassAlreadyInitialized;
 FTS_API fts_status_description_t fts_InletOutOfRange;
 FTS_API fts_status_description_t fts_OutletOutOfRange;
 FTS_API fts_status_description_t fts_CannotInstantiate;
 
 /* Meta classes functions */
-
-FTS_API fts_metaclass_t *fts_metaclass_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_equiv_fun_t equiv_fun);
 FTS_API fts_metaclass_t *fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun);
-
-FTS_API void fts_metaclass_alias(fts_metaclass_t *mcl, fts_symbol_t alias);
+FTS_API void fts_class_alias(fts_metaclass_t *mcl, fts_symbol_t alias);
 
 #define fts_metaclass_get_selector(MCL) ((MCL)->selector ? (MCL)->selector : (MCL)->name)
 #define fts_metaclass_is_primitive(MCL) ((MCL)->typeid < FTS_FIRST_OBJECT_TYPEID)
@@ -107,7 +103,6 @@ FTS_API fts_class_t *fts_class_instantiate(fts_metaclass_t *mcl, int ac, const f
 FTS_API fts_metaclass_t *fts_metaclass_get_by_name( fts_symbol_t name);
 
 /* method definition */
-
 FTS_API void fts_method_define(fts_class_t *cl, int winlet, fts_symbol_t s, fts_method_t fun);
 #define fts_method_define_varargs(class, winlet, s, fun)  \
   fts_method_define(class, winlet, s, fun)
@@ -148,12 +143,25 @@ FTS_API const int fts_system_inlet;
  *
  *  "thru" classes
  *
+ *  Thru classes don't type in- and outlets.
+ *  The input propagates directly to the output or the output of another object.
+ *
+ *  Thru classes must implement a method fts_s_propagate_input.
+ *  This message is send to each object while traversing the graph in order 
+ *  propagate there input to their outputs (e.g. fork) or directly to the output 
+ *  of other objects connected by index, name or variable (e.g. inlet/outlet, send/receive).
+ *
+ *  The called method will declare one by one the outlets to which the input 
+ *  is propagated using the received function and context (structure).
+ *    
+ *     fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);
+ *     void *propagate_context = (fts_dspgraph_t *)fts_get_pointer(at + 1);
+ *
+ *     propagate_fun(propagate_context, <object>, <outlet>);
+ *
  */
 
 typedef void (*fts_propagate_fun_t)(void *ptr, fts_object_t *object, int outlet);
-
-FTS_API void fts_class_define_thru(fts_class_t *class, fts_method_t propagate_input);
-FTS_API int fts_class_is_thru(fts_class_t *class);
 
 /*****************************************************************************
  *

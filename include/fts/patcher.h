@@ -20,22 +20,27 @@
  * 
  */
 
+typedef struct patcher_inout patcher_inout_t;
 
 struct fts_patcher
 {
   fts_object_t o;
 
-  fts_inlet_t  **inlets;	/* the patcher inlet array */
-  fts_outlet_t **outlets;	/* the patcher outlet array */
-  fts_object_t *objects;	/* the patcher content, organized as a list */
+  patcher_inout_t **inlets; /* the patcher inlet array */
+  patcher_inout_t **outlets; /* the patcher outlet array */
 
-  int open;			/* the open flag */
-  int editor_open;		/* the open editor flag */
-  int load_init_fired;		/* the multiple load init protection flag*/
-  int deleted;			/* set to one during content deleting */
-  int dirty;                    /* set to one if patcher's content is not saved */
+  int n_inlets;
+  int n_outlets;
 
-  fts_tuple_t *args;	/* the arguments used for the "args" variable */
+  fts_object_t *objects; /* the patcher content, organized as a list */
+
+  int open; /* the open flag */
+  int editor_open; /* the open editor flag */
+  int load_init_fired; /* the multiple load init protection flag */
+  int deleted; /* set to one during content deleting */
+  int dirty; /* set to one if patcher's content is not saved */
+
+  fts_tuple_t *args; /* the arguments used for the "args" variable */
 
   enum {fts_p_standard, fts_p_abstraction, fts_p_error, fts_p_template} type;
 
@@ -49,9 +54,6 @@ struct fts_patcher
   
   int save_id;
 };    
-
-FTS_API fts_metaclass_t *fts_inlet_metaclass;
-FTS_API fts_metaclass_t *fts_outlet_metaclass;
 
 #define fts_patcher_get_args(p)    ((p)->args)
 #define fts_patcher_is_open(p)     ((p)->open)

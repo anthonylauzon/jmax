@@ -349,17 +349,40 @@ dsp_copy_fun(fts_word_t *argv)
   int i;
 
   for(i=0; i<n; i++)
-    out[i] = 0.0;
+    out[i] = in[i];
+}
+
+static void
+dsp_fill_fun(fts_word_t *argv)
+{
+  float c = *((float *)fts_word_get_pointer(argv + 0));
+  float *out = (float *)fts_word_get_pointer(argv + 1);
+  int n = fts_word_get_int(argv + 2);
+  int i;
+
+  for(i=0; i<n; i++)
+    out[i] = c;
 }
 
 void
-fts_dsp_add_function_zero(fts_symbol_t signal, int size)
+fts_dsp_add_function_zero(fts_symbol_t out, int size)
 {
   fts_atom_t a[2];
 
-  fts_set_symbol(a + 0, signal);
+  fts_set_symbol(a + 0, out);
   fts_set_int(a + 1, size);
   fts_dsp_add_function(dsp_zero_fun_symbol, 2, a);
+}
+
+void
+fts_dsp_add_function_fill(ftl_data_t value, fts_symbol_t out, int size)
+{
+  fts_atom_t a[3];
+
+  fts_set_ftl_data(a + 0, value);
+  fts_set_symbol(a + 1, out);
+  fts_set_int(a + 2, size);
+  fts_dsp_add_function(dsp_copy_fun_symbol, 3, a);
 }
 
 void
