@@ -1,5 +1,7 @@
 2003-09-17  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* client/python/ircam/fts/client/Makefile.am: added missing FtsPipeConnection.py in list of files to install.
+
 	* packages/signal/c/src/osc.c (osc_instantiate): added name support for osc~ object.
 
 2003-09-16  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
