@@ -1,3 +1,9 @@
+2002-03-15  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* removed class name from class instantiation functions in class.c and all objects
+	* bug fix in object redefinition and metro (crashed when redefined while running)
+	* removed math package from compilation
+
 2002-03-14  François Déchelle  <dechelle@mac-dechelle.ircam.fr>
 
 	* fixed packages compilation problems on Mac OS X (libtool is edited

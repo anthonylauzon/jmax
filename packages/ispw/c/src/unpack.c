@@ -80,15 +80,7 @@ unpack_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   ac--;
   at++;
 
-  if(!ac)
-    {
-      this->n = 2;
-      this->types = (enum unpack_types *)fts_malloc(2 * sizeof(int));
-
-      this->types[0] = type_int;
-      this->types[1] = type_int;
-    }
-  else
+  if(ac > 0)
     {
       this->n = ac;
       this->types = (enum unpack_types *)fts_malloc(ac * sizeof(int));      
@@ -112,6 +104,22 @@ unpack_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	    }
 	}
     }
+  else
+    {
+      this->n = 2;
+      this->types = (enum unpack_types *)fts_malloc(2 * sizeof(int));
+      
+      this->types[0] = type_int;
+      this->types[1] = type_int;
+    }
+}
+
+static void
+unpack_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  unpack_t *this = (unpack_t *)o;
+
+  fts_free(this->types);
 }
 
 static fts_status_t
@@ -129,6 +137,9 @@ unpack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     }
   else
     fts_class_init(cl, sizeof(unpack_t), 1, ac, 0);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, unpack_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, unpack_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_list, unpack_send);
   fts_method_define_varargs(cl, 0, fts_s_int, unpack_send);
