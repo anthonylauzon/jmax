@@ -36,7 +36,7 @@ import javax.swing.event.*;
  * of the SequenceToolManager by the knowledge of the tools */
 public class SequenceTools implements ToolProvider{
 
-  public SequenceTools()
+  public SequenceTools( boolean complete)
   {
     String path = null;
     String fs = File.separator;
@@ -47,12 +47,20 @@ public class SequenceTools implements ToolProvider{
     path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????????	 
     /*************************************************************/
 
+    if( complete)
+      tools = new Tool[6];
+    else
+      tools = new Tool[4];
+
     tools[0] = new ArrowTool(new ImageIcon(path+"arrow.gif"));
     tools[1] = new AdderTool(new ImageIcon(path+"edit.gif"));
     tools[2] = new ResizerTool(new ImageIcon(path+"resizer.gif"));
     tools[3] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
-    tools[4] = new LinerTool(new ImageIcon(path+"liner.gif"));
-    tools[5] = new CombTool(new ImageIcon(path+"comber.gif"));
+    if( complete)
+      {
+	tools[4] = new LinerTool(new ImageIcon(path+"liner.gif"));
+	tools[5] = new CombTool(new ImageIcon(path+"comber.gif"));
+      }
   }
 
   public Enumeration getTools()
@@ -84,9 +92,14 @@ public class SequenceTools implements ToolProvider{
   }
 
   //---
-  Tool tools[] = new Tool[6];
-  public static SequenceTools instance = new SequenceTools();
+  Tool tools[];
+  public static SequenceTools partialInstance = new SequenceTools( false);
+  public static SequenceTools completeInstance = new SequenceTools( true);
 }
+
+
+
+
 
 
 

@@ -69,7 +69,7 @@ public class MessageEventRenderer implements SeqObjectRenderer {
     }
   public void renderBounds(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
   {
-    render( obj, g, selected, gc);
+    render( obj, g, selected, theGc);
   }
   public void render(Object obj, Graphics g, int state, GraphicContext theGc) 
   {

@@ -72,12 +72,13 @@ public class IntegerEventRenderer implements SeqObjectRenderer {
   
   public void renderBounds(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
   {
-    render(obj, g, selected, gc);
+    render(obj, g, selected, theGc);
   }
 
   public void render(Object obj, Graphics g, int state, GraphicContext theGc) 
   {
     Event e = (Event) obj;
+    
     MonoDimensionalAdapter adapter = (MonoDimensionalAdapter)((SequenceGraphicContext) theGc).getAdapter();
     TrackDataModel model = ((SequenceGraphicContext) theGc).getDataModel();
 

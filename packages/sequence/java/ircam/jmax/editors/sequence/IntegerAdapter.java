@@ -41,6 +41,13 @@ public class IntegerAdapter extends MonoDimensionalAdapter{
 	viewMode = MonoTrackEditor.PEAKS_VIEW;
     }
 
+  public String getType( Event e)
+  {
+    return "int";
+  }
+
+  public void setType( Event e, String type){}
+
     /**
      * inherited from Adapter.
      * it returns the Y value of the event,
@@ -75,17 +82,17 @@ public class IntegerAdapter extends MonoDimensionalAdapter{
      */  
     public int getInvY(int y) 
     {
-	int temp;
-	int height = gc.getGraphicDestination().getSize().height;
-	int range = getRange();
-	float step = (float)((float)range/(float)height);
-	
-	temp = (int)((height-y)*step) + minValue;
-	
-	if(temp<minValue) temp = minValue;
-	else if(temp>maxValue) temp = maxValue;
-
-	return temp;
+      int temp;
+      int height = gc.getGraphicDestination().getSize().height;
+      int range = getRange();
+      float step = (float)((float)range/(float)height);
+      
+      temp = (int)((height-y)*step) + minValue;
+      
+      if(temp<minValue) temp = minValue;
+      else if(temp>maxValue) temp = maxValue;
+      
+      return temp;
     }
 
     /**

@@ -100,10 +100,10 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
     //- Create a toolbar associated to this ToolManager
     //- Create a status bar containing the toolbar
     
-    manager = new ToolManager(SequenceTools.instance);
+    manager = new ToolManager( SequenceTools.completeInstance);
     toolbar = new EditorToolbar(manager, EditorToolbar.HORIZONTAL);
-    toolbar.setSize(/*156*//*180*//*204*/228, 25);    
-    toolbar.setPreferredSize(new Dimension(/*156*//*180*//*204*/228, 25));    
+    toolbar.setSize( 156, 25);    
+    toolbar.setPreferredSize(new Dimension( 156, 25));    
     Tool arrow = manager.getToolByName("arrow");     
     manager.activate(arrow, null); //we do not have a gc yet...
 
