@@ -58,7 +58,7 @@ public class FtsSelection  extends FtsObject
 
   protected FtsSelection(Fts fts, FtsObject parent, int objId)
   {
-    super(fts, parent, objId, null, "__selection");
+    super(fts, parent, objId, null, "__selection", "");
   }
 
   /** Add an object to this container  */

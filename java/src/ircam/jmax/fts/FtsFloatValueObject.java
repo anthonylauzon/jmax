@@ -47,7 +47,7 @@ public class FtsFloatValueObject extends FtsObject
 
   public FtsFloatValueObject(Fts fts, FtsObject parent, int objId, String className)
   {
-    super(fts, parent, objId, null, className);
+    super(fts, parent, objId, null, className, className);
   }
 
   /** Set the value. Tell it to the server, also */

@@ -994,89 +994,6 @@ public class FtsParse
     return descr.toString();
   }
 
-  /** Version used for the comments, to avoid introducing quotes
-    in comments. Note that comments now use property for the text;
-    may be this is not needed anymore.*/
-
-  static String simpleUnparseObjectDescription(FtsStream stream)
-       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
-  {
-    boolean doNewLine = false;
-    boolean addBlank = false;
-    boolean noNewLine = false;
-    Object value1 = null;
-    Object value2 = null;
-
-    StringBuffer descr = new StringBuffer();
-
-    if (stream.endOfArguments())
-      value2 = null;
-    else
-      value2 = stream.getNextArgument();
-
-    value1 = value2;
-
-    while (value1 != null)
-      {
-	if (doNewLine)
-	  descr.append("\n");
-	else if (addBlank)
-	  descr.append(" ");
-
-	doNewLine = false;
-
-	if (stream.endOfArguments())
-	  value2 = null;
-	else
-	  value2 = stream.getNextArgument();
-
-	if (value1 instanceof Float)
-	  descr.append(formatter.format(value1));
-	else if (value1 instanceof Integer)
-	  descr.append(value1);
-	else if (value1 instanceof String)
-	  {
-	    /* Lexical quoting check */
-
-	    descr.append(value1);
-
-	    if (value1.equals("'"))
-	      noNewLine = true;
-	    else if (value1.equals(";"))
-	      {
-		if (noNewLine)
-		  noNewLine = false;
-		else
-		  doNewLine = true;
-	      }
-	    else
-	      noNewLine = false;
-	  }
-	else
-	  descr.append(value1);
-
-	/* decide to put or not a blank between the two */
-
-	if (wantASpaceAfter(value1))
-	  addBlank = true;
-	else if (dontWantASpaceAfter(value1))
-	  addBlank = false;
-	else if (value2 != null)
-	  {
-	    if (wantASpaceBefore(value2))
-	      addBlank = true;
-	    else if (dontWantASpaceBefore(value2))
-	      addBlank = false;
-	    else
-	      addBlank = true;	// if no body care, do a blank
-	  }
-
-	value1 = value2;
-      }
-
-    return descr.toString();
-  }
-
   /*  Unparse a description passed as a vector of values
       Used by atom list, available as a service for anybody.*/
 
@@ -1169,9 +1086,7 @@ public class FtsParse
   }
   
   
-  /*  Unparse a description passed as a vector of values
-      Used by atom list, available as a service for anybody.*/
-  
+  /*  Unparse a description passed as a array of FtsAtom */
   static String unparseArguments(int nArgs, FtsAtom args[])
   {
     if (nArgs > 0)

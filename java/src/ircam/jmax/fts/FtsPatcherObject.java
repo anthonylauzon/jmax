@@ -48,10 +48,9 @@ public class FtsPatcherObject extends FtsObject
    * Create a FtsPatcherObject object
    */
 
-
-  public FtsPatcherObject(Fts fts, FtsObject parent, int objId, int nArgs, FtsAtom args[])
+  public FtsPatcherObject(Fts fts, FtsObject parent, int objId, String description)
   {
-    super(fts, parent, objId, null, "jpatcher", nArgs, args);
+    super(fts, parent, objId, null, "jpatcher", description);
   }
 
   /**

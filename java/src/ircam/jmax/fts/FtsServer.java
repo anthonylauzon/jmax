@@ -1347,7 +1347,7 @@ public class FtsServer implements Runnable
     // Build the root patcher, by mapping directly to object id 1 on FTS
     // (this is guaranteed)
 
-    root = new FtsPatcherObject(fts, null, 1, 0, null);
+    root = new FtsPatcherObject(fts, null, 1, "");
     registerObject(root);
   }
 

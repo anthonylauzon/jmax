@@ -48,9 +48,9 @@ public class FtsMessageObject extends FtsIntValueObject
 
   String message; // the message content
 
-  public FtsMessageObject(Fts fts, FtsObject parent, int objId, int nArgs, FtsAtom args[])
+  public FtsMessageObject(Fts fts, FtsObject parent, int objId, String description)
   {
-    super(fts, parent, objId, "messbox", nArgs, args);
+    super(fts, parent, objId, "messbox", description);
 
     ninlets = 1;
     noutlets = 1;

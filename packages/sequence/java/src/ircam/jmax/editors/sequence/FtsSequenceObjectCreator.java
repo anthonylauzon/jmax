@@ -1,4 +1,3 @@
-
 package ircam.jmax.editors.sequence;
 
 import ircam.jmax.toolkit.*;

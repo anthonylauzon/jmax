@@ -42,8 +42,6 @@ public class FtsOutletObject  extends FtsInOutletObject
   /*                                                                           */
   /*****************************************************************************/
 
-  int position;
-
   /**
    * Create a FtsOutletObject object.
    */

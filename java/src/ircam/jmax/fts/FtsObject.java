@@ -95,18 +95,17 @@ public class FtsObject
 	Object ctr = creators.get(className);
 	
 	if(ctr != null)
-	  obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, objId, className, 0, null);
+	  obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, objId, className, nArgs, args);
+	else if (className == "jpatcher")
+	  obj =  new FtsPatcherObject(fts, parent, objId, FtsParse.unparseArguments(nArgs, args));
 	else if (className == "inlet")
 	  obj =  new FtsInletObject(fts, parent, objId, args[0].intValue);
 	else if (className == "outlet")
 	  obj =  new FtsOutletObject(fts, parent, objId, args[0].intValue);
-	else if (className == "jpatcher")
-	  /* jpatcher never has variable, yet */
-	  obj =  new FtsPatcherObject(fts, parent, objId, nArgs, args);
-	else if (className == "messbox")
-	  obj =  new FtsMessageObject(fts, parent, objId, nArgs, args);
 	else if (className == "jcomment")
-	  obj =  new FtsCommentObject(fts, parent, objId, nArgs, args);
+	  obj =  new FtsCommentObject(fts, parent, objId);
+	else if (className == "messbox")
+	  obj =  new FtsMessageObject(fts, parent, objId, FtsParse.unparseArguments(nArgs, args));
 	else if (className == "slider")
 	  obj =  new FtsSliderObject(fts, parent, objId);
 	else if (className == "intbox")
@@ -121,11 +120,13 @@ public class FtsObject
 	  obj =  new FtsSelection(fts, parent, objId);
 	else if (className == "__clipboard")
 	  obj =  new FtsClipboard(fts, parent, objId);
+	else if (variable != null)
+	  obj = new FtsObject(fts, parent, objId, variable, className, variable + " : " + className + " " + FtsParse.unparseArguments(nArgs, args));
 	else
-	  obj = new FtsObject(fts, parent, objId, variable, className, nArgs, args);
+	  obj = new FtsObject(fts, parent, objId, null, className, className + " " + FtsParse.unparseArguments(nArgs, args));
       }
     else
-      obj = new FtsObject(fts, parent, objId, variable, null);
+      obj = new FtsObject(fts, parent, objId, null, null, "");
     
     if (data != null)
       data.addObject(obj);
@@ -550,8 +551,9 @@ public class FtsObject
    * @param objId the object id
    * @param variableName the variable name or null
    * @param className the class name or null
+   * @param description the object description
    */
-  protected FtsObject(Fts fts, FtsObject parent, int objId, String variableName, String className)
+  protected FtsObject(Fts fts, FtsObject parent, int objId, String variableName, String className, String description)
   {
     super();
 
@@ -561,92 +563,10 @@ public class FtsObject
     if (objId != -1)
       setObjectId(objId);
 
-    if(variableName != null && className != null)
-      {
-	this.variableName = variableName;
-	this.className = className;
-	this.description = variableName + " : " + className;
-      }
-    else if(className != null)
-      {
-	this.variableName = null;
-	this.className = className;
-	this.description = className;
-      }
-    else
-      {
-	this.variableName = null;
-	this.className = null;
-	this.description = "";      
-      }
-  }
-
-  /**
-   * FtsObject creator (object with arguments)
-   *
-   * @param fts the server
-   * @param parent the parent patcher
-   * @param objId the object id
-   * @param variableName the variable name or null
-   * @param className the class name or null
-   * @param nArgs number of valid arguments in args array
-   * @param args arguments of object creation
-   */
-  protected FtsObject(Fts fts, FtsObject parent, int objId, String variableName, String className, int nArgs, FtsAtom args[])
-  {
-    super();
-    
-    this.fts = fts;
-    this.parent = parent;
-    
-    if (objId != -1)
-      setObjectId(objId);
-    
-    if(variableName != null && className != null)
-      {
-	this.variableName = variableName;
-	this.className = className;
-	this.description = variableName + " : " + className + FtsParse.unparseArguments(nArgs, args);
-      }
-    else if(className != null)
-      {
-	this.variableName = null;
-	this.className = className;
-	this.description = className + FtsParse.unparseArguments(nArgs, args);
-      }
-    else
-      {
-	this.variableName = null;
-	this.className = null;
-	this.description = "";      
-      }
-  }
-
-  /**
-   * FtsObject creator (object with one integer argument)
-   *
-   * @param fts the server
-   * @param parent the parent patcher
-   * @param objId the object id
-   * @param className the class name
-   * @param int an integer argument
-   */
-  protected FtsObject(Fts fts, FtsObject parent, int objId, String className, int i)
-  {
-    super();
-
-    this.fts = fts;
-    this.parent = parent;
-
-    if (objId != -1)
-      setObjectId(objId);
-
-    this.variableName = null;
+    this.variableName = variableName;
     this.className = className;
-    
-    this.description = className + i;
+    this.description = description;
   }
-
 
   /*****************************************************************************/
   /*                                                                           */
