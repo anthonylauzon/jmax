@@ -39,6 +39,7 @@
 #include <ftsprivate/class.h>
 #include <ftsprivate/bmaxhdr.h>
 #include <ftsprivate/saver.h>
+#include <ftsprivate/client.h>
 
 #define PACKAGE_STACK_SIZE    32
 
@@ -1163,11 +1164,31 @@ __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   fts_package_t *this = (fts_package_t *)o;
   fts_atom_t a[1]; 
   fts_iterator_t i, j, h, k;
+  fts_package_t *pkg;
 
   if ( this->packages)
     {
       fts_list_get_values( this->packages, &i);
-      fts_package_send_list( o, i, fts_s_require);
+      fts_client_start_message( o, fts_s_require);
+      while (fts_iterator_has_more( &i))
+	{
+	  fts_iterator_next( &i, a);
+	  fts_client_add_symbol( o, fts_get_symbol( a));      
+	  pkg = fts_package_get( fts_get_symbol( a));
+	  if (!fts_object_has_id( (fts_object_t *)pkg))
+	    fts_client_register_object( (fts_object_t *)pkg, fts_get_client_id( o));
+	  fts_client_add_int( o, fts_get_object_id( (fts_object_t *)pkg));      
+	} 
+      fts_client_done_message( o);      
+      
+      /* upload evry package ?????????????????*/
+      /*fts_list_get_values( this->packages, &i);
+	while (fts_iterator_has_more( &i))
+	{
+	fts_iterator_next( &i, a);
+	pkg = fts_package_get( fts_get_symbol( a));
+	fts_send_message( (fts_object_t *)pkg, fts_SystemInlet, fts_s_upload, 0, 0);
+	}*/
     }
   if ( this->template_paths)
     {

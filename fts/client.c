@@ -862,7 +862,7 @@ fts_client_load_patcher(fts_symbol_t file_name, int client_id)
   fts_set_int(a+2, type);
   fts_client_send_message( (fts_object_t *)client, fts_new_symbol( "patcher_loaded"), 3, a);
 
-  /* uploaod the patcher to the client */
+  /* upload the patcher to the client */
   fts_send_message( (fts_object_t *)patcher, fts_SystemInlet, fts_s_upload, 0, 0);
   fts_send_message( (fts_object_t *)patcher, fts_SystemInlet, fts_new_symbol("openEditor"), 0, 0);
 

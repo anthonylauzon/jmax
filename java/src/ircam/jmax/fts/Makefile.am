@@ -23,6 +23,7 @@ FtsOutletsListener.java\
 FtsPackage.java\
 FtsPatcherListener.java\
 FtsPatcherObject.java\
+FtsProject.java\
 FtsTemplateObject.java\
 FtsQuittedException.java\
 FtsRuntimeErrors.java\

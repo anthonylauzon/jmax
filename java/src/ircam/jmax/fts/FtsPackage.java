@@ -167,8 +167,13 @@ public class FtsPackage extends FtsObject
 
   void addRequires(int nArgs, FtsAtom[] args)
   {
-    for(int i = 0; i < nArgs; i++)
-      requires.addElement( args[i].symbolValue.toString());
+    for(int i = 0; i < nArgs; i += 2)
+      addPackage(args[i].symbolValue.toString(), args[i+1].intValue);
+  }
+
+  void addPackage(String pkgName, int id)
+  {
+    requires.addElement(pkgName);
   }
 
   void addTemplatePath(int nArgs, FtsAtom[] args)

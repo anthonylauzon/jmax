@@ -55,28 +55,6 @@ class FtsSystemOutConsole extends FtsObject {
   }
 }
 
-class LoadPackageHandler implements FtsMessageHandler {
-  public void invoke( FtsObject obj, FtsArgs args)
-  {
-    if ( args.isSymbol( 0) )
-      {
-	System.out.println( "package: " + args.getSymbol(0));
-	
-	try
-	  {
-	    JMaxPackageLoader.load( args.getSymbol( 0).toString());
-	  }
-	catch( JMaxPackageLoadingException e)
-	  {
-	    JMaxApplication.reportException( e);
-	  }
-	
-	for( int i = 1; i < args.getLength(); i += 2)
-	  FtsHelpPatchTable.addSummary( args.getSymbol( i).toString(), args.getSymbol( i+1).toString());
-      }
-  }
-}
-
 class LoadPatcherMessageHandler implements FtsMessageHandler {
   public void invoke( FtsObject obj, FtsArgs args)
   {
@@ -100,7 +78,7 @@ class ProjectMessageHandler implements FtsMessageHandler {
   {
      if ( args.isInt( 0) )
        {
-	 JMaxApplication.setCurrentProject(new FtsPackage( JMaxApplication.getFtsServer(), 
+	 JMaxApplication.setCurrentProject(new FtsProject( JMaxApplication.getFtsServer(), 
 							   JMaxApplication.getRootPatcher(),
 							   args.getInt( 0)));
        }
@@ -131,7 +109,6 @@ class JMaxClient extends FtsObject {
 
   static
   {
-    FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "package_loaded"), new LoadPackageHandler());
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "patcher_loaded"), new LoadPatcherMessageHandler());
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "project"), new ProjectMessageHandler());
   }
@@ -328,12 +305,12 @@ public class JMaxApplication {
     return singleInstance.server;
   }
 
-  public static FtsPackage getProject()
+  public static FtsProject getProject()
   {
     return singleInstance.project;
   }
 
-  public static void setCurrentProject(FtsPackage proj)
+  public static void setCurrentProject(FtsProject proj)
   {
     singleInstance.project = proj;
   }
@@ -633,15 +610,6 @@ public class JMaxApplication {
 
     try
       {
-	clientObject.send( FtsSymbol.get( "get_packages"));
-      }
-    catch(IOException e)
-      {
-	JMaxApplication.reportException( e);
-      }
-
-    try
-      {
 	clientObject.send( FtsSymbol.get( "get_project"));
       }
     catch(IOException e)
@@ -677,5 +645,5 @@ public class JMaxApplication {
   private boolean killFtsOnQuit;
   private FtsPatcherObject rootPatcher;
   private JMaxClient clientObject;
-  private FtsPackage project;
+  private FtsProject project;
 }
