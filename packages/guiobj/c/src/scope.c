@@ -284,20 +284,24 @@ scope_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
-  float sr_in_KHz = 0.001 * fts_dsp_get_input_srate(dsp, 0);
-  int n_tick = fts_dsp_get_input_size(dsp, 0);
-  fts_atom_t a[3];
 
-  data->index = 0;
-  scope_reset(data);
-
-  data->period = this->period_msec * sr_in_KHz;
-  this->sr_in_KHz = sr_in_KHz;
-
-  fts_set_ftl_data(a + 0, this->data);
-  fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
-  fts_set_int(a + 2, n_tick);
-  fts_dsp_add_function(scope_symbol, 3, a);
+  if(fts_dsp_is_sig_inlet((fts_object_t *)this, 0) && !fts_dsp_is_input_null(dsp, 0))
+    {
+      float sr_in_KHz = 0.001 * fts_dsp_get_input_srate(dsp, 0);
+      int n_tick = fts_dsp_get_input_size(dsp, 0);
+      fts_atom_t a[3];
+      
+      data->index = 0;
+      scope_reset(data);
+      
+      data->period = this->period_msec * sr_in_KHz;
+      this->sr_in_KHz = sr_in_KHz;
+      
+      fts_set_ftl_data(a + 0, this->data);
+      fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
+      fts_set_int(a + 2, n_tick);
+      fts_dsp_add_function(scope_symbol, 3, a);
+    }
 }
 
 static void

@@ -46,6 +46,9 @@ typedef struct
 
 static fts_symbol_t sym_display = 0;
 
+static void 
+display_called(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+
 /************************************************************
  *
  *  send to client with time gate
@@ -87,7 +90,7 @@ display_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      
 	      this->absmax = MIN_FLOAT;
 	      
-	      fts_timebase_add_call(fts_get_timebase(), o, display_send, 0, this->period);
+	      fts_timebase_add_call(fts_get_timebase(), o, display_called, 0, this->period);
 	    }
 	}
       else if(this->pending)
@@ -101,7 +104,7 @@ display_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  fts_set_string(&a, fts_memorystream_get_bytes(this->stream));
 	  fts_client_send_message(o, fts_s_set, 1, &a);
 	  
-	  fts_timebase_add_call(fts_get_timebase(), o, display_send, 0, this->period);
+	  fts_timebase_add_call(fts_get_timebase(), o, display_called, 0, this->period);
 	}
       else
 	this->gate = 1;
@@ -119,7 +122,19 @@ display_deliver(display_t *this)
   this->pending = 1;
 
   if(this->gate)
-    display_send((fts_object_t *)this, 0, 0, 0, 0);
+    fts_update_request( (fts_object_t *)this);
+}
+
+static void 
+display_called(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_update_request(o);
+}
+
+static void 
+display_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  display_send( o, 0, 0, 0, 0);
 }
 
 /************************************************************
@@ -147,7 +162,7 @@ display_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       this->last = MIN_FLOAT;
 
       fts_timebase_remove_object(fts_get_timebase(), o);
-      fts_timebase_add_call(fts_get_timebase(), o, display_send, 0, this->period);
+      fts_timebase_add_call(fts_get_timebase(), o, display_called, 0, this->period);
 
       fts_set_pointer(a + 0, this);
       fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
@@ -271,6 +286,8 @@ display_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, display_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, display_delete);
+
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, display_update_real_time); 
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, display_put);
 

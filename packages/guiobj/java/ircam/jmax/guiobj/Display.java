@@ -28,6 +28,7 @@ package ircam.jmax.guiobj;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.awt.image.*;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
@@ -45,6 +46,9 @@ public class Display extends GraphicObject implements FtsMessageListener
   int minWidth = ObjectGeometry.INOUTLET_PAD + ObjectGeometry.HIGHLIGHTED_INOUTLET_WIDTH;
   int underWidth = 0;
   int underWidthMax = 0;
+
+  private BufferedImage buff;
+  private Graphics2D buffG;
 
   public Display(FtsGraphicObject theFtsObject)
   {
@@ -69,6 +73,21 @@ public class Display extends GraphicObject implements FtsMessageListener
     setCurrentFont( getFont());
     ftsObject.setCurrentFontName( null);
     ///////////////////////
+
+    updateOffScreenBuffer();
+  }
+
+  void updateOffScreenBuffer()
+  {
+    int h = getHeight() - 2; 
+    if( h <= 0) h = getFontMetrics().getHeight() + 2;
+    
+    int w = getWidth() - 2;
+    if( w <= 0) w = getFontMetrics().stringWidth(display) + 2;
+
+    buff = new BufferedImage( w, h, BufferedImage.TYPE_INT_RGB);
+    buffG = buff.createGraphics();
+    buffG.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
   }
 
   // ---------------------------------------- 
@@ -89,23 +108,31 @@ public class Display extends GraphicObject implements FtsMessageListener
   public void messageChanged(String text)
   {
     int w = getFontMetrics().stringWidth(text) + 4;
-    int h = getFontMetrics().getHeight() + 4;
-
-    redraw();
 
     display = text;
 
-    if(w < minWidth)
-      ftsObject.setCurrentWidth(ScaleTransform.getInstance().invScaleX(minWidth));
-    else
-      ftsObject.setCurrentWidth(ScaleTransform.getInstance().invScaleX(w));
-
+    if( !itsSketchPad.isLocked() || (itsSketchPad.isLocked() && ( getWidth() < w)))
+      {
+	if(w < minWidth)
+	  ftsObject.setCurrentWidth(ScaleTransform.getInstance().invScaleX(minWidth));
+	else
+	  ftsObject.setCurrentWidth(ScaleTransform.getInstance().invScaleX(w));
+	
+	updateOffScreenBuffer();
+      }
+    
     if(w < underWidthMax)
       underWidth = w;
     else
       underWidth = underWidthMax;
 
-    redraw();
+    if( itsSketchPad.isLocked())
+      {
+	drawContent( buffG, 0, 0, getWidth() - 2, getHeight() - 2);
+	updateRedraw();
+      }
+    else
+      redraw();
   }
 
   public void setWidth( int theWidth) 
@@ -133,6 +160,8 @@ public class Display extends GraphicObject implements FtsMessageListener
     
     super.setWidth(w);
     super.setHeight(h);
+
+    updateOffScreenBuffer();
 
     underWidthMax = getFontMetrics().stringWidth("xx");
 
@@ -163,6 +192,8 @@ public class Display extends GraphicObject implements FtsMessageListener
       underWidth = w;
     else
       underWidth = underWidthMax;
+
+    updateOffScreenBuffer();
 
     redraw();
   }
@@ -215,13 +246,17 @@ public class Display extends GraphicObject implements FtsMessageListener
 
   public void updatePaint(Graphics g) 
   {
-    int x = getX();
-    int y = getY();
-    int w = getWidth();
-    int h = getHeight();
+    g.drawImage( buff, getX() + 1, getY() + 1, itsSketchPad);  
+  }
 
+  public void drawContent(Graphics g, int x, int y, int w, int h) 
+  {
+    g.setColor(getTextBackground());
+    g.fillRect( x, y, w, h);
+    
+    g.setColor( Color.black);
     g.setFont(getFont());
-    g.drawString(display, x + 2, y + h - getFontMetrics().getDescent() - 2);
+    g.drawString(display, x + 1, y + h - getFontMetrics().getDescent() - 1);
   }
 
   public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)

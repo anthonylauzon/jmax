@@ -1323,6 +1323,8 @@ fmat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_set, fmat_set_elements);
   fts_method_define_varargs(cl, 0, fts_s_row, fmat_set_row_elements);
   
+  fts_method_define_varargs(cl, 0, fts_s_print, fmat_print); 
+
   fts_method_define_varargs(cl, 0, fts_new_symbol("add"), fmat_add);
   fts_method_define_varargs(cl, 0, fts_new_symbol("sub"), fmat_sub);
   fts_method_define_varargs(cl, 0, fts_new_symbol("mul"), fmat_mul);
