@@ -471,24 +471,7 @@ public class JMaxApplication {
 
   public static void reportException( Throwable t)
   {
-    ByteArrayOutputStream bs = new ByteArrayOutputStream();
-    PrintWriter pw = new PrintWriter( bs);
-
-    t.printStackTrace( pw);
-    pw.flush();
-
-    JTextArea textArea = new JTextArea( bs.toString());
-
-    textArea.setEditable( false);
-    JScrollPane scrollPane = new JScrollPane( textArea);
-                
-    Object[] message = new Object[2];
-    message[0] = new JLabel( "Caught Java exception:");
-    message[1] = scrollPane;
-
-    String[] options = { "OK"};
-
-    int ret = JOptionPane.showOptionDialog( null, message, "Java exception", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, options, options[0]);
+    singleInstance._reportException( t);
   }
 
   private JMaxApplication()
@@ -786,6 +769,32 @@ public class JMaxApplication {
       }
   }
 
+  private void _reportException( Throwable t)
+  {
+    if (exceptionsPrintWriter == null)
+      {
+	exceptionsOutputStream = new ByteArrayOutputStream();
+	exceptionsPrintWriter = new PrintWriter( exceptionsOutputStream);
+      }
+
+    exceptionsPrintWriter.println( "**************************************************");
+    t.printStackTrace( exceptionsPrintWriter);
+    exceptionsPrintWriter.flush();
+
+    JTextArea textArea = new JTextArea( exceptionsOutputStream.toString());
+
+    textArea.setEditable( false);
+    JScrollPane scrollPane = new JScrollPane( textArea);
+                
+    Object[] message = new Object[2];
+    message[0] = new JLabel( "Caught Java exception:");
+    message[1] = scrollPane;
+
+    String[] options = { "OK"};
+
+    int ret = JOptionPane.showOptionDialog( null, message, "Java exception", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, options, options[0]);
+  }
+
   private RecentFileHistory recentFileHistory;
   private FtsServer server;
   private Properties properties;
@@ -793,9 +802,12 @@ public class JMaxApplication {
   private MaxVector toOpen;
   private boolean noConsole;
   private boolean killFtsOnQuit;
-    private boolean isAttached;
+  private boolean isAttached;
   private FtsPatcherObject rootPatcher;
   private JMaxClient clientObject;
   private FtsProject project;
   private FtsConfig config;
+
+  private OutputStream exceptionsOutputStream;
+  private PrintWriter exceptionsPrintWriter;
 }

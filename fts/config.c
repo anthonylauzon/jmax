@@ -176,15 +176,6 @@ config_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-config_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_config_t *this = (fts_config_t *)o;
-
-  this->editor_opened = 1;
-  fts_client_send_message(o, fts_s_openEditor, 0, 0);
-}
-
-static void
 config_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_config_t *this = (fts_config_t *)o;
@@ -222,6 +213,28 @@ config_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       fts_set_symbol( &a, this->file_name);
       fts_client_send_message( o, fts_s_name, 1, &a);
     }
+
+  this->uploaded = 1;
+}
+
+static void
+config_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_config_t *this = (fts_config_t *)o;
+
+  if (!this->uploaded)
+    {
+      config_upload( o, 0, 0, 0, 0);
+    }
+
+  this->editor_opened = 1;
+  fts_client_send_message(o, fts_s_openEditor, 0, 0);
+}
+
+static void
+config_close(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  fts_object_release( o);
 }
 
 static void
@@ -278,6 +291,8 @@ config_instantiate(fts_class_t* cl)
 
   fts_class_message_varargs(cl, fts_s_openEditor, config_open_editor);
   fts_class_message_varargs(cl, fts_s_closeEditor, config_close_editor);
+
+  fts_class_message_varargs(cl, fts_s_close, config_close);
 
   fts_class_message_varargs(cl, fts_s_print, config_print);
 }

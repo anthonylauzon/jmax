@@ -22,11 +22,13 @@
 package ircam.jmax.toolkit.actions;
 
 import java.awt.event.*;
+import java.io.*;
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.project.*;
+import ircam.jmax.editors.configuration.*;
 
 /** This class define a set of static variables 
  *  containing all the standard actions used for the
@@ -123,7 +125,7 @@ public class DefaultActions
   public static EditorAction newConfigurationAction     = new EditorAction(){
       public void doAction(EditorContainer container)
       {
-	System.err.println( "Not yet implemented");
+	ConfigurationEditor.newConfiguration();
       }
     };
   public static EditorAction openConfigurationAction     = new EditorAction(){

@@ -100,6 +100,12 @@ public class FtsAudioConfig extends FtsObject
   { 
     super( JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), FtsSymbol.get("audio_config"));
     labels = new Vector();
+    sources = new String[0];
+    sourceChannels = new int[0];
+    destinations = new String[0];
+    destinationChannels = new int[0];
+    bufferSizes = new String[0];
+    samplingRates = new String[0];
   }
 
   public void setListener( ircam.jmax.editors.configuration.AudioConfigPanel listener)
@@ -359,15 +365,15 @@ public class FtsAudioConfig extends FtsObject
     labels.removeAllElements();
   }
 
-  private String[] sources = new String[0];
-  private int[] sourceChannels = new int[0];
-  private String[] destinations = new String[0];
-  private int[] destinationChannels = new int[0];
-  private String[] bufferSizes = new String[0];
-  private String[] samplingRates = new String[0];
-  private Vector labels = null;  
+  private String[] sources;
+  private int[] sourceChannels;
+  private String[] destinations;
+  private int[] destinationChannels;
+  private String[] bufferSizes;
+  private String[] samplingRates;
+  private Vector labels;
   private int samplingRate;
   private int bufferSize;
-  private ircam.jmax.editors.configuration.AudioConfigPanel listener = null;
+  private ircam.jmax.editors.configuration.AudioConfigPanel listener;
 }
 

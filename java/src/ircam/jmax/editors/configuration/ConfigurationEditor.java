@@ -38,14 +38,14 @@ import ircam.jmax.toolkit.menus.*;
 
 public class ConfigurationEditor extends JFrame implements EditorContainer
 {    
-  public static ConfigurationEditor getInstance()
-  {
-    return configEditor;
-  }
-
   public ConfigurationEditor( FtsConfig config)
   {
     super( "Configuration Editor");
+
+    singleInstance = this;
+
+    this.config = config;
+
     getContentPane().setLayout(new BoxLayout( getContentPane(), BoxLayout.Y_AXIS));    
 
     makeMenuBar();    
@@ -64,14 +64,14 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
     addButton.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
-	  Add();
+	  add();
 	}
       });
     JButton deleteButton = new JButton("Delete");
     deleteButton.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
-	  Delete();
+	  delete();
 	}
       });
     
@@ -122,23 +122,41 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
     setJMenuBar( mb);
   }
 
-  void Add()
+  void add()
   {
     Component selected = tabbedPane.getSelectedComponent();
     if( selected == midiPanel)
-      midiPanel.Add();
+      midiPanel.add();
     else
-      audioPanel.Add();
+      audioPanel.add();
   }
 
-  void Delete()
+  void delete()
   {
     Component selected = tabbedPane.getSelectedComponent();
     
     if( selected == midiPanel)
-      midiPanel.Delete();
+      midiPanel.delete();
     else
-      audioPanel.Delete();
+      audioPanel.delete();
+  }
+
+  public static void newConfiguration()
+  {
+    try
+      {
+	if (singleInstance != null)
+	  singleInstance.close();
+
+	JMaxApplication.getConfig().send( FtsSymbol.get( "close"));
+
+	new FtsConfig().requestOpenEditor();
+      }
+    catch ( IOException e)
+      {
+	JMaxApplication.reportException( e);
+      }
+
   }
 
   public void save()
@@ -149,6 +167,7 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
     else
       saveAs();
   }
+
   public void saveAs()
   {
     String dir = JMaxApplication.getProject().getDir();
@@ -168,8 +187,7 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
 
   public void close()
   {
-    boolean toClose = true;
-    if( JMaxApplication.getConfig().isDirty())
+    if( config.isDirty())
       {
 	String message = "Configuration File is not saved.\nDo you want to save it now?";
 	String title =  "Config Not Saved";
@@ -185,7 +203,10 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
 	if( result == JOptionPane.YES_OPTION)
 	  save();	
       }
+
     setVisible(false);
+
+    singleInstance = null;
   }
 
   /************* interface EditorContainer ************************/
@@ -209,9 +230,12 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
 
   private MidiConfigPanel midiPanel;
   private AudioConfigPanel audioPanel;
-  private static ConfigurationEditor configEditor = null;
   private JTabbedPane tabbedPane;
   static Font tableFont = (Font)UIManager.get("Table.font");
   private JFileChooser fileChooser = new JFileChooser(); 
+
+  private FtsConfig config;
+
+  private static ConfigurationEditor singleInstance;
 }
 

@@ -71,7 +71,7 @@ public class FtsConfig extends FtsObjectWithEditor
 
   public FtsConfig() throws IOException
   { 
-    super( JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), FtsSymbol.get("config"));
+    super( JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), FtsSymbol.get("__config"));
   }
 
   void setMidiConfig( FtsMidiConfig mc)

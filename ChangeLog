@@ -1,3 +1,11 @@
+2003-02-07  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* cleaned exceptions report code in JMaxApplication.
+
+	* added "New Configuration" menu implementation. Dirty code in ConfigurationEditor,
+	makes FTS crash quite often. Note: it is currently not possible to "delete" an object from
+	the client in a generic way, i.e. to close its editor and delete it in FTS.
+
 2003-02-05  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* added debug code in Java client library. Debug code is activated by setting

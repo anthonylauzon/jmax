@@ -167,15 +167,18 @@ public class MidiConfigPanel extends JPanel implements Editor
     revalidate();
   }
   
-  void Add()
+  void add()
   {
     int sel = midiTable.getSelectedRow();
     midiModel.addRow( sel);
-    if( sel==-1) sel = midiTable.getRowCount()-2;
+
+    if( sel==-1)
+      sel = midiTable.getRowCount()-2;
+
     midiTable.getSelectionModel().setSelectionInterval( sel+1, sel+1);
   }
 
-  void Delete()
+  void delete()
   {
     midiModel.removeRow( midiTable.getSelectedRow());
   }

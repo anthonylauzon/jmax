@@ -370,21 +370,28 @@ public class AudioConfigPanel extends JPanel implements Editor
   void validateTable()
   {
     audioTable.revalidate();
+
     revalidate();
+
     if( audioTable.getCellEditor() != null)
       audioTable.getCellEditor().stopCellEditing();
+
     audioTable.transferFocus();
   }
 
-  void Add()
+  void add()
   {
     int sel = audioTable.getSelectedRow();
+
     audioModel.addRow( sel);
-    if( sel==-1) sel = audioTable.getRowCount()-2;
+
+    if( sel==-1)
+      sel = audioTable.getRowCount()-2;
+
     audioTable.getSelectionModel().setSelectionInterval( sel+1, sel+1);
   }
 
-  void Delete()
+  void delete()
   {
     audioModel.removeRow( audioTable.getSelectedRow());
   }

@@ -30,6 +30,7 @@ typedef struct {
   fts_audioconfig_t* audio_config;
   int editor_opened;
   int dirty;
+  int uploaded;
 } fts_config_t;
 
 extern fts_class_t* config_type;
