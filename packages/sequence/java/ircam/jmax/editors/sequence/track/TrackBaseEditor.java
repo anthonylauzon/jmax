@@ -48,7 +48,7 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
     setBackground(Color.white);
     setLayout( new BoxLayout( this, BoxLayout.Y_AXIS));
 		
-    setPreferredSize( new Dimension(SequenceWindow.DEFAULT_WIDTH-TrackContainer.BUTTON_WIDTH, DEFAULT_HEIGHT));
+    setPreferredSize( new Dimension(SequenceWindow.DEFAULT_WIDTH-TrackContainer.BUTTON_WIDTH, getInitialHeight()));
     
     setOpaque(false);
 		
@@ -471,6 +471,11 @@ public void forceBackgroundRepaint()
   getTrack().setProperty("repaint", new Boolean(rep)); //to repaint background
 }
 public void setLabelType(String type){}
+
+public int getInitialHeight()
+{
+  return DEFAULT_HEIGHT;
+}
 
 //--- MidiTrack fields
 transient Geometry geometry;

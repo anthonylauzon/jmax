@@ -37,90 +37,96 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 
 /**
- * A Monodimensional view for a generic Sequence. 
+* A Monodimensional view for a generic Sequence. 
  * This kind of editor use a MonoDimensionalAdapter
  * to map the y values. The value returned is always half of the panel,
  * and settings of y are simply ignored. */
 public class MonoTrackEditor extends TrackBaseEditor
 {
   public MonoTrackEditor(Geometry g, Track trk, boolean isInsequence)
-  {
+{
     super(g, trk, isInsequence);
     
     viewMode = PEAKS_VIEW;
-    DEFAULT_HEIGHT = 127;
-  }
+}
 
-  public void reinit(){}
-  
-  void createPopupMenu()
-  {
-    popup = new MonoTrackPopupMenu( this, gc.getFtsObject() instanceof FtsSequenceObject);
-  }
+public int getInitialHeight()
+{
+  return MONO_DEFAULT_HEIGHT;
+}
 
-  SequenceGraphicContext createGraphicContext(Geometry geometry, Track track)
-  {
-    selection = new SequenceSelection(track.getTrackDataModel());
-    
-    gc = new SequenceGraphicContext(track.getTrackDataModel(), selection, this);
-    gc.setGraphicSource(this);
-    gc.setGraphicDestination(this);
+public void reinit(){}
 
-    ad = new MonoDimensionalAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET);
-    track.getPropertySupport().addPropertyChangeListener(ad);
-    gc.setAdapter(ad);
-    
-    renderer = new MonoTrackRenderer(gc);
-    gc.setRenderManager(renderer);
-    return gc;
-  }
-  
-  public void setAdapter(MonoDimensionalAdapter adapter)
-  {
-    track.getPropertySupport().removePropertyChangeListener(ad);	
-    track.getPropertySupport().addPropertyChangeListener(adapter);
-    gc.setAdapter(adapter);	
-    ad = adapter;
-  }
+void createPopupMenu()
+{
+  popup = new MonoTrackPopupMenu( this, gc.getFtsObject() instanceof FtsSequenceObject);
+}
 
-  public void setRenderer(MonoTrackRenderer renderer)
-  {
-    this.renderer = renderer;
-    gc.setRenderManager(renderer);
-  }
+SequenceGraphicContext createGraphicContext(Geometry geometry, Track track)
+{
+  selection = new SequenceSelection(track.getTrackDataModel());
   
-  void updateEventProperties(Object whichObject, String propName, Object propValue){}
+  gc = new SequenceGraphicContext(track.getTrackDataModel(), selection, this);
+  gc.setGraphicSource(this);
+  gc.setGraphicDestination(this);
   
-  void updateRange(Object whichObject){}    
-    
-  public int getDefaultHeight()
-  {
-    return DEFAULT_HEIGHT;
-  }
+  ad = new MonoDimensionalAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET);
+  track.getPropertySupport().addPropertyChangeListener(ad);
+  gc.setAdapter(ad);
   
-  public void objectAdded(Object whichObject, int index) 
+  renderer = new MonoTrackRenderer(gc);
+  gc.setRenderManager(renderer);
+  return gc;
+}
+
+public void setAdapter(MonoDimensionalAdapter adapter)
+{
+  track.getPropertySupport().removePropertyChangeListener(ad);	
+  track.getPropertySupport().addPropertyChangeListener(adapter);
+  gc.setAdapter(adapter);	
+  ad = adapter;
+}
+
+public void setRenderer(MonoTrackRenderer renderer)
+{
+  this.renderer = renderer;
+  gc.setRenderManager(renderer);
+}
+
+void updateEventProperties(Object whichObject, String propName, Object propValue){}
+
+void updateRange(Object whichObject){}    
+
+public int getDefaultHeight()
+{
+  return DEFAULT_HEIGHT;
+}
+
+public void objectAdded(Object whichObject, int index) 
+{
+  if( !uploading)
   {
-    if( !uploading)
-      {
-	updateNewObject(whichObject);
-	updateRange(whichObject);
-	super.objectAdded(whichObject, index);
-      }
-  }
-  public void objectChanged(Object whichObject, String propName, Object propValue) 
-  {
-    updateEventProperties(whichObject, propName, propValue);
+    updateNewObject(whichObject);
     updateRange(whichObject);
-    super.objectChanged(whichObject, propName, propValue);
+    super.objectAdded(whichObject, index);
   }
+}
+public void objectChanged(Object whichObject, String propName, Object propValue) 
+{
+  updateEventProperties(whichObject, propName, propValue);
+  updateRange(whichObject);
+  super.objectChanged(whichObject, propName, propValue);
+}
 
-  static int MONODIMENSIONAL_TRACK_OFFSET = 0;
-  
-  MonoDimensionalAdapter ad;
+static int MONODIMENSIONAL_TRACK_OFFSET = 0;
 
-  static public final int PEAKS_VIEW = 2;
-  static public final int STEPS_VIEW = 3;
-  static public final int BREAK_POINTS_VIEW = 4;
+MonoDimensionalAdapter ad;
+
+static public final int PEAKS_VIEW = 2;
+static public final int STEPS_VIEW = 3;
+static public final int BREAK_POINTS_VIEW = 4;
+static public int MONO_DEFAULT_HEIGHT = 127;
+
 }
 
 

@@ -107,7 +107,7 @@ public void setPropertyToDraw(String propName, boolean toDraw)
 	
 	if(changeSize)
 	{
-		Dimension d = getSize();
+		Dimension d = getSize();    
 		int delta;
 		if(toDraw) 
 		{
@@ -119,13 +119,12 @@ public void setPropertyToDraw(String propName, boolean toDraw)
 			numPropToDraw--;			
 			delta = -DELTA_H;
 		}
-		d.height += delta;
-		
+		d.height += delta;		
 		setSize(d.width, d.height);
 		setPreferredSize(d);
 		setMinimumSize(d);
-		validate();
-		container.getEditorContainer().getFrame().pack();
+		validate();		
+    container.getEditorContainer().getFrame().pack();
 	}
 		
 	repaint();

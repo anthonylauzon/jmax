@@ -79,7 +79,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   public TrackPanel( EditorContainer container, TrackDataModel data) 
   {  
     itsContainer = container;
-    trackData = data;
+    trackData = data; 
 		
     setDoubleBuffered(false);
     ftsTrackObject = (FtsTrackObject)data;
@@ -194,19 +194,14 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
 				{
 					int grid = ((Integer) e.getNewValue()).intValue();
 					if( grid == MidiTrackEditor.MEASURES_GRID)
-					{
 						centerSection.add( tempoBar, BorderLayout.NORTH);
-						/*tempoBar.resetDisplayer();*/
-						centerSection.validate();
-						TrackPanel.this.validate();
-					}
 					else
-					{
 						centerSection.remove( tempoBar);
-						/*tempoBar.resetDisplayer();*/
-						centerSection.validate();
-						TrackPanel.this.validate();
-					}
+          
+          /*tempoBar.resetDisplayer();*/
+          centerSection.validate();
+          TrackPanel.this.validate();
+          getEditorContainer().getFrame().pack();
 				}
 			}
 		});

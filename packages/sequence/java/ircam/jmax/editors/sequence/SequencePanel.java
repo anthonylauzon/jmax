@@ -290,17 +290,24 @@ public class SequencePanel extends /*JPanel*/PopupToolbarPanel implements Sequen
 		
 		//resize the frame //////////////////////////////////////////////////////////////
 		int height;	
+    boolean toPack = false;
 		Dimension dim = itsContainer.getFrame().getSize();
 		if(dim.height < SequenceWindow.MAX_HEIGHT)
 		{
 			int tcHeight = trackContainer.getSize().height;
 			
 			if(sequenceData.trackCount() == 1)
+      {
 				itsContainer.getFrame().setSize(dim.width, SequenceWindow.EMPTY_HEIGHT + tcHeight);
-			else
+        toPack = true;
+			}
+      else
 				if(dim.height + tcHeight <= SequenceWindow.MAX_HEIGHT)
+        {
 					itsContainer.getFrame().setSize(dim.width, dim.height + tcHeight);
-			else 
+          toPack = true;
+        }
+        else 
 				if(dim.height < SequenceWindow.MAX_HEIGHT)
 					itsContainer.getFrame().setSize(dim.width, SequenceWindow.MAX_HEIGHT);
 		}
@@ -312,6 +319,8 @@ public class SequencePanel extends /*JPanel*/PopupToolbarPanel implements Sequen
 			teditor.updateNewObject((TrackEvent)e.nextElement());
 		
 		itsContainer.getFrame().validate();
+    if(toPack)
+      itsContainer.getFrame().pack();
   }
 	
   public void tracksAdded(int maxTime)
