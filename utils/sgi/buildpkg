@@ -10,7 +10,7 @@ DEFAULT_MAKE=/usr/freeware/bin/gmake
 # Constants
 
 ROOT_DIR=../..   # The root directory of jmax sources
-VERSION=`cat $ROOT_DIR/../jmax/VERSION`
+VERSION=`cat $ROOT_DIR/VERSION`
 DISTFILE=$ROOT_DIR/../jmax-$VERSION-src.tar.gz
 SRCROOTDIR=jmax-$VERSION
 TMP_IDB_SORTED=/tmp/$$.idb.sorted
