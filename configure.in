@@ -334,4 +334,5 @@ packages/utils/c/src/Makefile
 utils/Makefile
 utils/rpm/Makefile
 utils/rpm/jmax.spec
+utils/xml/Makefile
 )
