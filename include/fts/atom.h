@@ -446,5 +446,5 @@ FTS_API int fts_atom_equals(const fts_atom_t *p1, const fts_atom_t *p2);
  * Constant representing a 'void' atom
  * @ingroup atom
  */
-extern const fts_atom_t *fts_null;
+FTS_API const fts_atom_t *fts_null;
 
