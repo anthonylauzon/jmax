@@ -73,7 +73,7 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener
     cards.add("run", empty);
 
     itsSwToolbar = new JToolBar();
-    itsSwToolbar.setFloatable (false);   
+    itsSwToolbar.setFloatable (false);  
     InsertButtons();
     itsSwToolbar.addSeparator();
     tools.add(itsSwToolbar, BorderLayout.WEST);

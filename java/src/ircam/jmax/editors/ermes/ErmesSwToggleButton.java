@@ -12,6 +12,7 @@ class ErmesSwToggleButton extends JToggleButton
   ErmesSwToggleButton(String description, ImageIcon theIcon) {
     super(theIcon);
     setDoubleBuffered(false);
+    setMargin(new Insets(0,0,0,0));
     itsObjectDescription = description;
   }
     
