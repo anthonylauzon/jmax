@@ -146,6 +146,10 @@ public class FtsHelpPatchTable
   {
       return helpSummaryVector.elements();
   }
+  static public int getNumSummaries()
+  {
+      return helpSummaryVector.size();
+  }
 }
 
 

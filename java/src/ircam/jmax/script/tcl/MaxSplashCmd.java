@@ -54,8 +54,8 @@ class MaxSplashCmd implements Command
     String fileName = new String(argv[1].toString());
     //it's going to become a window instead of a dialog (no assumptions 
     //shoul be made on the presence of a frame on top of which "mount"
-    //the splash)
-    new SplashDialog(fileName, Version);    
+    //the splash) 
+    new SplashDialog(fileName, Version);   
   }
 }
 

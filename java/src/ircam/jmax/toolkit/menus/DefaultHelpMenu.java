@@ -20,24 +20,16 @@
 // 
 // Based on Max/ISPW by Miller Puckette.
 //
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell, Riccardo Borghesi.
 // 
 
 package ircam.jmax.toolkit.menus;
 
-import java.awt.*;
-import java.awt.event.*;
 import java.util.*;
-
 import javax.swing.*;
+import javax.swing.event.*;
 
-import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
-import ircam.jmax.dialogs.*;
-import ircam.jmax.utils.*;
-
-import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
 /** Implement the patcher editor File Menu */
@@ -45,7 +37,7 @@ import ircam.jmax.toolkit.actions.*;
 public class DefaultHelpMenu extends EditorMenu
 {
   private boolean initDone = false;
-
+  private int numEntries = 0;
   public DefaultHelpMenu()
   {
     super("Help");
@@ -62,20 +54,49 @@ public class DefaultHelpMenu extends EditorMenu
 	 final String str = (String) en.nextElement();
 	 add( new OpenHelpSummaryAction(str), str);
 	 initDone = true;
+	 numEntries++;
        }
-
+    
+    addMenuListener(new MenuListener(){
+	    public void menuSelected(MenuEvent e)
+	    {
+		update();
+	    }
+	    public void menuDeselected(MenuEvent e){}
+	    public void menuCanceled(MenuEvent e){}
+	});
   }
 
   public void init()
   {
     if(initDone) return;
     Enumeration en = FtsHelpPatchTable.getSummaries(); 
-
+    numEntries = 0;
     while (en.hasMoreElements())
     {
 	final String str = (String) en.nextElement();
 	add( new OpenHelpSummaryAction(str), str);
+	numEntries++;
     }   
+  }
+    
+  public void update()
+  {
+      if(FtsHelpPatchTable.getNumSummaries() > numEntries) 
+      {	      
+	  Enumeration en = FtsHelpPatchTable.getSummaries(); 
+	  int count = 1;
+	  while (en.hasMoreElements())
+	      {
+		  final String str = (String) en.nextElement();
+		  if(count > numEntries)
+		      {			      
+			  add( new OpenHelpSummaryAction(str), str);
+			  numEntries++;
+		      }
+		  count++;
+	      }
+      }
   }
 }
 

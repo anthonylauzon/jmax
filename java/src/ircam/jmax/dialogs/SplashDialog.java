@@ -30,28 +30,26 @@ import java.awt.event.*;
 import java.awt.image.*;
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
-import javax.swing.Timer;
+import javax.swing.*;
 
 /**
  * The initial dialog.
  */
 
-public class SplashDialog extends Dialog implements KeyListener, MouseListener, ActionListener {
+public class SplashDialog extends JDialog implements KeyListener, MouseListener, ActionListener {
   static final int SPLASH_WIDTH = 500;
   static final int SPLASH_HEIGHT = 280;
   String itsVersionString;
 
   Image itsImage;
-  //2003SplashDialogTimeout to;
-  
 
   public SplashDialog(String filename, String version) {
-    super(MaxWindowManager.getTopFrame(), "jMax",/* true*/false);
+    
+    super(MaxWindowManager.getTopFrame(), "jMax", false);
     
     itsVersionString = version;
     itsImage = Toolkit.getDefaultToolkit().getImage(filename);
-    
-    
+        
     addKeyListener(this);
     addMouseListener(this);
     
@@ -59,13 +57,9 @@ public class SplashDialog extends Dialog implements KeyListener, MouseListener, 
     pack();
     setVisible(true);
     
-    //2003to = new SplashDialogTimeout(2000);
-    //start2003
     Timer aTimer = new Timer(2000, this);
-    //aTimer.setInitialDelay(2000);
     aTimer.setRepeats(false);
     aTimer.start();
-    //end 2003
   }
 	
    public void actionPerformed(ActionEvent e) {
@@ -115,7 +109,7 @@ public class SplashDialog extends Dialog implements KeyListener, MouseListener, 
     Dimension d = getSize();
     g.setColor(Color.white);
     g.fillRect(0, 0, d.width, d.height);        
-    g.drawImage(itsImage, /*4*/12, /*4*/20,this);
+    g.drawImage(itsImage, 12, 20,this);
     g.setColor(Color.black);
     g.drawString(itsVersionString, 32, d.height-24);
   }

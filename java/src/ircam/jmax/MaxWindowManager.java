@@ -71,7 +71,6 @@ public class MaxWindowManager implements WindowListener
   {
   }
 
-
   /** Call this method to add a window to 
    * from  the window manager window list
    */

@@ -253,7 +253,6 @@ public class MaxApplication extends Object
     itsPackageHandler = new PackageHandler();
 
     // Create and initialize the tcl interpreter
-
     try
 	{
 	    bootstrapInterp(); 
@@ -264,7 +263,6 @@ public class MaxApplication extends Object
 	    System.out.println("Can't create the interpreter: " + e.getMessage());
 	    return;
 	}
-
     // Initialize all the submodules; first the kernel modules
 
     ircam.jmax.fts.FtsModule.initModule();
@@ -279,7 +277,6 @@ public class MaxApplication extends Object
 
     // Before booting the server, check if it is asked to run in real-time mode,
     // and if yes, inform the application layer
-
     try
 	{
 	    itsInterp.boot(MaxApplication.getProperty("jmaxRoot"));
@@ -292,7 +289,6 @@ public class MaxApplication extends Object
     // Splash screen moved to a tcl command
     ircam.jmax.editors.console.ConsoleWindow.init();
     ircam.jmax.editors.patcher.ErmesSketchWindow.touch(fts);
-    
     //if there were no connection statements in startup.tcl, ask the user
 
     if (fts == null)
