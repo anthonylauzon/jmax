@@ -45,7 +45,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
   //--------------------------------------------------------
   public Standard( FtsGraphicObject theFtsObject) 
   {
-    super( theFtsObject);
+    super( theFtsObject);    
   }
     
   // ----------------------------------------
@@ -255,6 +255,11 @@ public class Standard extends Editable implements FtsObjectErrorListener
   /**************  popup interaction ********************/ 
   public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
   {
+    if( ftsObject.isPersistent() != -1)
+      {
+	persistenceItem.setSelected( ftsObject.isPersistent() == 1);
+	ObjectPopUp.getInstance().add( persistenceItem);
+      }
     getControlPanel().update(this);
     ObjectPopUp.getInstance().add((JPanel)getControlPanel());
     ObjectPopUp.getInstance().revalidate();
@@ -263,6 +268,8 @@ public class Standard extends Editable implements FtsObjectErrorListener
   }
   public void popUpReset()
   {
+    if( ftsObject.isPersistent() != -1)
+      ObjectPopUp.getInstance().remove( persistenceItem);
     getControlPanel().done();
     ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
     super.popUpReset();
@@ -274,6 +281,18 @@ public class Standard extends Editable implements FtsObjectErrorListener
   public static StandardControlPanel controlPanel = new StandardControlPanel();
   Color varColor = new Color( 153, 204, 204, 100);
   Color selVarColor = new Color( 107, 142, 142, 100);
+  static transient private JCheckBoxMenuItem persistenceItem = new JCheckBoxMenuItem("Persistence");
+  static
+  {
+    persistenceItem.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	  int persist = ((JCheckBoxMenuItem)e.getSource()).isSelected() ? 1 : 0;
+	  ((GraphicObject)ObjectPopUp.getPopUpTarget()).getFtsObject().requestSetPersistent( persist);
+	}
+      });
+  }
+
 }
 
 

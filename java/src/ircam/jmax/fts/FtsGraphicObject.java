@@ -127,6 +127,12 @@ public class FtsGraphicObject extends FtsObject {
 	  ((FtsGraphicObject)obj).setVariableName( args.getSymbol( 0).toString());
 	}
       });
+    FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "peristence"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsGraphicObject)obj).setPersistent( args.getInt( 0));
+	}
+      });
     FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "setComment"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
@@ -184,6 +190,7 @@ public class FtsGraphicObject extends FtsObject {
   protected int noutlets = -1;
   protected int ninlets = -1;
   protected String varName = null;
+  protected int isPersistent = -1;
 
   /** Get the X property */
 
@@ -589,6 +596,36 @@ public class FtsGraphicObject extends FtsObject {
   public final String getVariableName()
   {
     return varName;
+  }
+
+  public void setPersistent( int persist)
+  {
+    this.isPersistent = persist;
+  }
+
+  public int isPersistent()
+  {
+    return isPersistent;
+  }
+
+  public void requestSetPersistent( int persist)
+  {
+    if (this.isPersistent != persist)
+      {
+	args.clear();
+	args.addInt( persist);
+
+	try{
+	  send( FtsSymbol.get("peristence"), args);
+	}
+	catch(IOException e)
+	  {
+	    System.err.println("FtsGraphicObject: I/O Error sending peristence Message!");
+	    e.printStackTrace(); 
+	  }
+
+	this.isPersistent = persist;
+      }
   }
   /********************************************************************************/
     
