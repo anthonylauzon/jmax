@@ -39,6 +39,9 @@ double fts_sched_ticks = 0.0;
 int fts_sched_tick_size = FTS_DEF_TICK_SIZE;
 double fts_sched_tick_duration = ((double)(FTS_DEF_TICK_SIZE * 1000) / 44100.0);
 
+#define FD_NO_SELECT -1
+
+
 /* the pause length; it say how often (in scheduler ticks) 
    we need to give the processor control back to the OS,
    in order to don't overload the machine. */
@@ -114,7 +117,7 @@ void fts_sched_add_fd( fts_sched_t *sched, int fd, int read, fts_method_t method
 
 void fts_sched_add( fts_sched_t *sched, fts_method_t method, fts_object_t *object)
 {
-  fts_sched_add_fd_realize( sched, -1, 1, method, object);
+  fts_sched_add_fd_realize( sched, FD_NO_SELECT, 1, method, object);
 }
 
 void fts_sched_remove_fd( fts_sched_t *sched, int fd)
@@ -147,7 +150,7 @@ void fts_sched_remove( fts_sched_t *sched, fts_method_t method)
 
   while (*p)
     {
-      if ( (*p)->fd == -1 && (*p)->method == method)
+      if ( (*p)->fd == FD_NO_SELECT && (*p)->method == method)
 	{
 	  fd_callback_t *to_remove;
 
@@ -185,6 +188,9 @@ static void fts_sched_do_select( fts_sched_t *sched)
   n_fd = 0;
   for ( callback = sched->fd_callback_head; callback; callback = callback->next)
       {
+	if (callback->fd == FD_NO_SELECT)
+	  continue;
+
 	if ( callback->fd > n_fd)
 	  n_fd = callback->fd;
 
@@ -201,20 +207,17 @@ static void fts_sched_do_select( fts_sched_t *sched)
       int fd;
 
       fd = callback->fd;
-      if ( fd >= 0)
-	{
-	  if ( FD_ISSET( fd, &rfds) || FD_ISSET( fd, &wfds))
-	    {
-	      fts_atom_t a;
-
-	      fts_set_int( &a, fd);
-	      (*(callback->method))( callback->object, -1, 0, 1, &a);
-	    }
-	}
-      else 
+      if ( fd == FD_NO_SELECT)
 	{
 	  /* Special entry that is called without select() */
 	  (*(callback->method))( callback->object, -1, 0, 0, 0);
+	}
+      else if ( FD_ISSET( fd, &rfds) || FD_ISSET( fd, &wfds))
+	{
+	  fts_atom_t a;
+
+	  fts_set_int( &a, fd);
+	  (*(callback->method))( callback->object, -1, 0, 1, &a);
 	}
     }
 }
