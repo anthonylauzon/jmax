@@ -669,8 +669,8 @@ public class JMaxApplication {
 
 	FtsProcess fts = null;
 
-        if(true)
-        /*if (o != null && ((String)o).equals( "true"))*/
+        /*if(true) DEBUG ATTACH*/
+        if (o != null && ((String)o).equals( "true"))
 	  {
 	    System.out.println( "Attaching to FTS on host " + hostName);
 	    killFtsOnQuit = true;
@@ -685,8 +685,8 @@ public class JMaxApplication {
 	  }
 	FtsServerConnection connection;
 		
-        if(false)
-	/*if (connectionType.equals("pipe"))*/
+        /*if(false) DEBUG ATTACH*/
+	if (connectionType.equals("pipe"))
 	  {
 	    if (fts == null)
 	      {
