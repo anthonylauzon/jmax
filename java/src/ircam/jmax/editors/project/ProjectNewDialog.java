@@ -2,8 +2,11 @@ package ircam.jmax.editors.project;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 import ircam.jmax.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
+
 
 /**
  * The dialog used during a menu-new operation.
@@ -30,11 +33,11 @@ public class ProjectNewDialog extends Dialog implements ItemListener, ActionList
     
     p1.add("North", new Label("New File Type"));
     itsList = new List(5, false);
-    MaxResourceId aResId;
+    MaxDataType aDataType;
     String aString;
-    for(int i=0; i< MaxApplication.resourceVector.size();i++){
-      aResId = (MaxResourceId)MaxApplication.resourceVector.elementAt(i);
-      aString = aResId.GetName();
+    for(Enumeration e = MaxDataType.getTypes().elements(); e.hasMoreElements();) {
+      aDataType = (MaxDataType) e.nextElement();
+      aString = aDataType.getName();
       itsList.add(aString);
     }
     itsList.addItemListener(this);
