@@ -24,8 +24,7 @@
 #
 
 install-doc:
-	$(INSTALL_DATA) index.html $(doc_install_dir)
-	(cd developer ; $(MAKE) $@)
+	for f in *.html ; do $(INSTALL_DATA) $$f $(doc_install_dir) ; done
 	(cd user ; $(MAKE) $@)
 	(cd images ; $(MAKE) $@)
 #	(cd release_notes ; $(MAKE) $@)

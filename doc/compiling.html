@@ -1,0 +1,357 @@
+<html>
+<!--                                                                      -->
+<!-- jMax                                                                 -->
+<!--                                                                      -->
+<!-- Copyright (C) 1999 by IRCAM                                          -->
+<!-- All rights reserved.                                                 -->
+<!--                                                                      -->
+<!-- This program may be used and distributed under the terms of the      -->
+<!-- accompanying LICENSE.                                                -->
+<!--                                                                      -->
+<!-- This program is distributed WITHOUT ANY WARRANTY. See the LICENSE    -->
+<!-- for DISCLAIMER OF WARRANTY.                                          -->
+<!--                                                                      -->
+<head>
+<title>jMax Documentation</title>
+</head>
+
+<body bgcolor="white">
+
+<table width=100% border=0 cellspacing=0 cellpadding=0>
+<tr>
+  <td align=left valign=top>
+    <a href="http://www.ircam.fr/jmax/"><img src="images/jmax_logo_small_transp.gif" border=0 alt="jMax"></A>
+  </td>
+  <td align=right valign=top>
+    <a href="http://www.ircam.fr/"><img src="images/ircam_banner.gif" border=0 alt="IRCAM - Centre Georges Pompidou"></a>
+  </td>
+</tr>
+
+</table>
+
+
+<table width=75% border=0 cellspacing=0 cellpadding=0>
+
+<tr>
+<td><spacer type="block" height="1" width="1"></td>
+</tr>
+
+<tr>
+<td align=right><font size=+3><b>Compiling <i>j</i>Max</b></font></td>
+</tr>
+
+<tr>
+<td align=right valign=top><a href="index.html"><font size=-1><i>j</i>Max Documentation</font></a></td>
+</tr>
+
+<tr>
+<td><spacer type="block" height="1" width="1"></td>
+</tr>
+
+</table>
+
+
+
+<p>
+<ul type=dot>
+  <li><a href="#introduction">Introduction</A>
+  <li><a href="#prerequisites">Prerequisites</A>
+  <li><a href="#compilation">Compilation</A>
+  <li><a href="#starting it">Starting it</A>
+</ul>
+
+<p>
+<hr size=1>
+
+<a name="introduction"> <H2>Introduction</H2> </a>
+
+<p>
+This document explains how to recompile jMax from a source distribution.
+
+
+<!-- ---------------------------------------------------------------------- -->
+<p>
+<hr>
+<a name="prerequisites"> <H2>Prerequisites</H2> </a>
+
+<h3>Platform independant</h3>
+
+<p>
+The following elements are need to recompile jMax:
+<ul>
+<li> the Java Development Kit (JDK) version 1.1.6 or higher.
+<li> the Swing classes library, which is part of the Java Foundation
+Classes. Swing can be downloaded at: 
+<a href="http://java.sun.com:80/products/jfc/index.html">
+http://java.sun.com:80/products/jfc/index.html</a>
+<li> the C compiler
+<li> GNU make
+</ul>
+
+
+<h3>SGI platform</h3>
+
+<p>
+The JDK for SGI platforms can be downloaded at:
+<a href="http://www.sgi.com/Products/Evaluation/#jdk">
+http://www.sgi.com/Products/Evaluation/#jdk</a>
+
+<p>
+On SGI platform, GNU make resides in <code>/usr/freeware/bin/gmake</code>.
+
+
+<h3>Linux platform</h3>
+
+<p>
+The JDK for Linux platforms can be downloaded at:
+<a href="http://www.blackdown.org/java-linux.html">
+http://www.blackdown.org/java-linux.html</a>
+
+<p>
+The C compiler needed for jMax compilation is Pentium gcc. Check
+<a href="http://www.gcc.ml.org">http://www.gcc.ml.org</a> for 
+further information and download.
+
+<p>
+jMax uses the <i>Audio File Library</i>,
+by Michael Pruett. This library is available under the GNU Library General Public
+License. This library must be installed before recompiling jMax.
+Please refer to <a href="http://www.68k.org/~michael/audiofile/">
+http://www.68k.org/~michael/audiofile/</a> for information and download.
+
+
+<!-- ---------------------------------------------------------------------- -->
+<p>
+<hr>
+<a name="compilation"> <h2>Compilation</h2></A>
+
+
+<h3> Building source tree </h3>
+
+<h3> Environment variables </h3>
+
+<p>
+The JAVA compilation needs to access the Swing classes, which must be
+in the <code>CLASSPATH</code> environment variable, i.e. <br>
+<code>setenv CLASSPATH <i>Swing's home</i>/swingall.jar</code> for csh <br>
+<code>export CLASSPATH=<i>Swing's home</i>/swingall.jar</code> for bash <br>
+
+<h3> Compiling</h3>
+
+<h4>Compiling for Linux</h4>
+
+<p>
+To recompile jMax for Linux, use the following command line (after cd'ing to jMax sources
+root directory):<br>
+<code>make ARCH=linuxpc all</code>
+
+
+<h4>Compiling for SGI</h4>
+
+<p>
+To recompile jMax for SGI, use the following command line (after cd'ing to jMax sources
+root directory):<br>
+<code>gmake ARCH=<i>your_architecture</i> all</code>, <br>
+where <i>your_architecture</i> is:
+<ul>
+<li> <code>irix65r4k</code> for SGI platform, IRIX 6.5, R4000 processor
+<li> <code>irix65r5k</code> for SGI platform, IRIX 6.5, R5000 processor
+<li> <code>irix65r10k</code> for SGI platform, IRIX 6.5, R10000 processor
+<li> <code>irix63r5k</code> for SGI platform, IRIX 6.3, R5000 processor
+<li> <code>irix63r10k</code> for SGI platform, IRIX 6.3, R10000 processor
+</ul>
+
+
+<h3> Compiling C parts only </h3>
+
+<p>
+To recompile C parts, use the following command line (in jMax root directory):<br>
+<code>make ARCH=<i>your_architecture</i> all_c</code> (on Linux), or <br>
+<code>gmake ARCH=<i>your_architecture</i> all_c</code> (on SGI), <br>
+where <i>your_architecture</i> is one of the previously defined architecture
+for SGI platforms.
+
+
+<h3> Compiling JAVA parts only</h3>
+
+<p>
+To recompile JAVA parts, use the following command line (in jMax root directory):<br>
+<code>make all_java</code> (on Linux), or <br>
+<code>gmake all_java</code> (on SGI) <br>
+(JAVA parts are acutally compiled with debug on)
+
+
+<!-- ---------------------------------------------------------------------- -->
+<p>
+<hr>
+<a name="starting it"> <h2>Starting it</h2></A>
+
+
+<p>
+Once recompiled, you can start jMax using the script 
+<a href="../../bin/jmax"><code>jmax</code></a>, 
+located in <i>jMax root dir</i>/bin. 
+
+<p>
+jMax uses for its configuration a file named <code>.jmaxrc</code>,
+located in user's home directory. See <a href="../user/getting_started.html">
+Getting Started</a>, <a href="../user/config/system.html">System Configuration</a>
+and <a href="../user/config/io.html">I/O Configuration</a> for further information.
+
+<p>
+Here is an minimal .jmaxrc file for the Linux platform:
+<pre>
+set jmaxHostType linuxpc
+
+when start {
+
+
+        jmaxSetSampleRate 44100
+        jmaxSetAudioBuffer 1024
+
+        openDefaultAudioIn stereoIn
+        openDefaultAudioOut stereoOut
+        openDefaultMidi midi
+     }
+</pre>
+
+<!-- ---------------------------------------------------------------------- -->
+
+<hr noshade size=1>
+
+<pre>
+Files I needed:
+  max-2.4.5.tar.gz from http://www.ircam.fr/equipes/temps-reel/jmax/
+
+  jdk_1.1.7-v3-glibc-x86.tar.gz from
+http://www.blackdown.org/java-linux.html
+
+  The jmax developers suggest that you use the JDK 117v3.
+  You'll need the glibc version for RedHat 6.0 (Redhat 5.0 and > perhaps?)
+
+  swing1_1_1.zip from http://java.sun.com/products/jfc/download.html
+
+  Be sure to get the standard .zip or .tar and NOT a Win9x/Max/Solaris
+executable.
+  The .zip is about 7 megs smaller than the tar if you have unzip on your
+system.
+
+Files I did *NOT* need:
+  missing-sound-files.tar.gz from
+http://www.ircam.fr/equipes/temps-reel/jmax/
+  sources2.tar.gz from http://www.ircam.fr/equipes/temps-reel/jmax/
+
+  The contents of the above are included in the current max-2.4.5.tar.gz
+
+  pgcc-1.1.3-linux-x86-glibc.tar.gz from
+http://www.goof.com/pcg/binaries-linux.html
+
+  The pgcc compiler seems to be up to date in RedHat 6.0 and 6.1, however
+it's in the wrong place.  A small modification to one of the jmax makefiles
+has to be made.  More on that later.
+
+
+I chose to install the JDK and Swing files in a /usr/java directory.  The
+jMax files went into /usr/jmax.  All the paths below reflect that, so modify
+the paths below to reflect where you installed these packages.  (Where would
+be an appropriate place to put java on a multi-user machine?)
+
+I edited /etc/profile to add the Java binaries to the system path, and the
+necessary swing files to the classpath environment variable.
+
+  JAVA_HOME="/usr/java/jdk117_v3"
+  SWING_HOME="/usr/java/swing1.1.1fcs"
+  PATH="$JAVA_HOME/bin:$PATH"
+  CLASSPATH="$SWING_HOME/lib/swingall.jar:$JAVA_HOME/lib/classes.zip"
+
+and at the end of the file add
+
+  export CLASSPATH
+
+I logged out, and logged back in. (There should be a way to reset the
+environment without logging out?)  I tested the settings by seeing if the
+java compiler ran from the command line in a directory other than where is
+was located.  And I echoed the CLASSPATH environment variable to double
+check that my changes had taken place.
+
+  java -version
+  echo $PATH
+  echo $CLASSPATH
+
+
+If the "Kaffe Java Virtual Machine" is installed on your system, you'll need
+to make sure that jMax finds the JDK binaries before it finds the Kaffe
+binaries.  If you have Kaffe installed you'll get the output "Kaffe Virtual
+Machine" by typing "java -version" at the command line.   You need to make
+the path to your JDK directory apprear first in your PATH statement, or you
+need to rename the Kaffe files to prevent their use.
+
+  mv /usr/bin/java /usr/bin/java-kaffe
+  mv /usr/bin/javac /usr/bin/javac-kaffe
+  mv /usr/bin/jar /usr/bin/jar-kaffe
+
+
+Then I untarred the max-2.4.5 files.
+Ran INSTALL.sh in the max-2.4.5 directory.
+Ran /usr/jmax/max-2.4.5/bin/jmax-make-dirs from the /usr/jmax/max-2.4.5
+directory.
+
+For RedHat 6.x the file /usr/jmax/max-2.4.5/fts/Makefiles/makefile.linuxpc
+must be edited.  You need to modify the locations of CC and LD in this file.
+
+Comment out:
+  CC := /usr/local/pgcc/bin/gcc
+
+So it looks like:
+  # This is the original before I changed it for RedHat 6.x
+  # CC := /usr/local/pgcc/bin/gcc
+
+And add:
+  CC := /usr/bin/gcc
+
+Make the same path modification to the LD line.
+  LD := /usr/bin/gcc
+
+
+To compile the c portions of the code, CD to the /usr/jmax/max-2.4.5
+directory:
+  make ARCH=linuxpc MODE=opt all_c
+
+ (note that the MODE=opt was required, which is not mentioned in the "How to
+recompile jMax html file.)
+
+Then to compile the java portions of the code
+  make ARCH=linuxpc MODE=debug all_java
+
+Note that on my system I needed the MODE=debug option set to compile
+successfully. (why?)
+
+See the jMax docs for editing a .jmaxrc file in your home directory.
+
+>From /usr/jmax/max-2.4.5/bin ./jmax should run.
+</pre>
+
+
+<p>
+<table width=100% border=0 cellspacing=0 cellpadding=0>
+
+<tr>
+<td><spacer type="block" height="20" width="1"></td>
+</tr>
+
+<tr>
+<td bgcolor="#cccccc"><spacer type="block" height="1" width="1"></td>
+</tr>
+
+<tr>
+<td><spacer type="block" height="20" width="1"></td>
+</tr>
+
+<tr>
+<td align=right><font size=-2>Copyright Ircam</font></td>
+</tr>
+
+</table>
+
+</body>
+</html>

@@ -1,4 +1,4 @@
-<HTML>
+<html>
 <!--                                                                      -->
 <!-- jMax                                                                 -->
 <!--                                                                      -->
@@ -11,62 +11,93 @@
 <!-- This program is distributed WITHOUT ANY WARRANTY. See the LICENSE    -->
 <!-- for DISCLAIMER OF WARRANTY.                                          -->
 <!--                                                                      -->
-<HEAD>
-<TITLE>jMax Documentation - Getting Started</TITLE>
-</HEAD>
+<head>
+<title>jMax Documentation</title>
+</head>
 
-<BODY TEXT="#000000" BGCOLOR="#CCCCCC">
+<body bgcolor="white">
 
-<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=0>
-<TR>
-  <TD ALIGN=LEFT>
-    <A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../images/jmax_logo_tiny.gif" BORDER=0 ALT="jMax"></A>
-  </TD>
-  <TD ALIGN=RIGHT>
-    <A HREF="http://www.ircam.fr/"><IMG SRC="../images/ircam_banner.gif" BORDER=0 ALT="IRCAM - Centre Georges Pompidou"></A>
-  </TD>
-</TR>
-</TABLE>
+<table width=100% border=0 cellspacing=0 cellpadding=0>
+<tr>
+  <td align=left valign=top>
+    <a href="http://www.ircam.fr/jmax/"><img src="images/jmax_logo_small_transp.gif" border=0 alt="jMax"></A>
+  </td>
+  <td align=right valign=top>
+    <a href="http://www.ircam.fr/"><img src="images/ircam_banner.gif" border=0 alt="IRCAM - Centre Georges Pompidou"></a>
+  </td>
+</tr>
 
-<UL TYPE=SQUARE>
-  <LI><A HREF=../index.html>Documentation</A>
-  <UL TYPE=SQUARE>
-    <LI><A HREF=index.html>User Documentation</A>
-  </UL>
-</UL>
+</table>
+
+
+<table width=75% border=0 cellspacing=0 cellpadding=0>
+
+<tr>
+<td><spacer type="block" height="1" width="1"></td>
+</tr>
+
+<tr>
+<td align=right><font size=+3><b>Running <i>j</i>Max</b></font></td>
+</tr>
+
+<tr>
+<td align=right valign=top><a href="index.html"><font size=-1><i>j</i>Max Documentation</font></a></td>
+</tr>
+
+<tr>
+<td><spacer type="block" height="1" width="1"></td>
+</tr>
+
+</table>
+
+<!-- ---------------------------------------------------------------------- -->
+<!-- ---------------------------------------------------------------------- -->
+<!-- End of header                                                          -->
+<!-- ---------------------------------------------------------------------- -->
+<!-- ---------------------------------------------------------------------- -->
+
 
 <p>
-<font size=+3 color=#FFFFFF><b>Getting Started</b></font>
+<ul type=dot>
+  <li><a href="#running">Running jMax</a>
+  <li><a href="#arguments">Command Line Arguments</a>
+  <li><a href="#.jmaxrc">The file <TT>.jmaxrc</TT></a>
+</ul>
 
 <p>
-<hr noshade size=1>
+<hr size=1>
 
-<UL TYPE=DOT>
-  <LI><A HREF="#running">Running jMax</A>
-  <LI><A HREF="#arguments">Command Line Arguments</A>
-  <LI><A HREF="#.jmaxrc">The file <TT>.jmaxrc</TT></A>
-</UL>
-
-<p>
-<hr noshade size=1>
-
-<TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
-<TR><TD>
-  
 <A NAME="running">
 <h2>Running <I>j</I>Max</h2>
 
-<P>
-<I>j</I>Max can be run by executing the <I>j</I>Max shell script:
+<p>
+<i>j</i>Max can be run by executing the <code>jmax</code> shell script.
+This script is located in the following directories:
+<ul>
+<li> <code>/usr/bin</code> if <i>j</i>Max has been installed (note that
+this directory may vary depending on your platform)
+<li> <code>&lt;jMax root directory&gt;/bin</code> if <i>j</i>Max has not
+been installed and is ran from a source distribution. In this case, the
+<code>-root</code> option must be passed to the <code>jmax</code> script
+</ul>
 
-<UL>
-  <DT><b>&lt;<i>jMax root directory</i>&gt;/bin/<tt>jmax</tt></b><BR>
-    <tt>/usr/local/max/bin/jmax</tt>
-</UL>
-
+<p>
 This script accepts a set of options (see <B><TT> jmax -help </TT></B> for description)
 that are either interpreted by the script or passed as command line arguments
 to the Java application.
+
+<p>
+The <code>-root</code> option of the <code>jmax</code> script specifies the
+<i>root directory</i>, i.e. where the <i>j</i>Max resources (Java classes, server binaries, 
+configuration files, standard packages, ...) are located. <i>j</i>Max 
+default root directory is <code>/usr/lib/jmax</code> and the installation
+process (either 'make install' or platform-specific installer) places
+resources there. If running from a source distribution, the 
+<code>-root</code> option must be used to specify in which directory
+the resources are located, as in:
+<pre>
+jmax -root /home/francois/jmax
+</pre>
 
 <p>
 <A NAME="arguments"> 
@@ -75,9 +106,7 @@ to the Java application.
 
 <P>
 <I>j</I>Max uses a number of <I>configuration parameters</I> to parametrize the system
-at startup.
-
-These parameters appear as TCL variables and can be also set via the command line:
+at startup.These parameters appear as TCL variables and can be also set via the command line:
 
 <UL>
   <DT><B><TT>jmax</TT> -&lt;<I>parameter name</I>&gt; &lt;<I>parameter value</I>&gt; . . .</B>
@@ -88,11 +117,10 @@ The parameter values given in the command line overwrite all default values give
 in the user or site specific configuration files (see down).
 
 <p>
-The chapters
-<A HREF="config/system.html">system configuration</A> and 
-<A HREF="config/io.html">i/o configuration</A>
-of this documentaion explain the different <i>j</i>Max configuration parameters.
-At least one of the <A HREF="config/system.html#host">host parameters</A> 
+The chapter
+<A HREF="configuration.html">configuration</A>
+of this documentation explain the different <i>j</i>Max configuration parameters.
+At least one of the <A HREF="configuration.html#host">host parameters</A> 
 should be set properly in order to start <i>j</i>Max in a default setup.
 
 <P>
@@ -127,10 +155,9 @@ The user can customize the <i>j</i>Max environment including the configuration p
 in the <TT>.jmaxrc</TT> file in his home directory:
 
 <UL>
-  <LI>set the <A HREF="config/system.html">system configuration </A> and 
-      <A HREF="config/io.html">i/o configuration</A>
-  <LI>customize the <A HREF="projects.html">project environment</A> for your patches
-  <LI>preload <i>j</i>Max <A HREF="packages.html">packages</A>
+  <LI>set the <A HREF="configuration.html">configuration</A>
+  <LI>customize the <A HREF="project-package.html">project environment</A> for your patches
+  <LI>preload <i>j</i>Max <A HREF="project-package.html">packages</A>
 </UL>
 
 <P>
@@ -196,16 +223,35 @@ if {$jmaxHost == "astor.ircam.fr"} {
 # --- end of .jmaxrc
 </PRE>
 
-<P>
-Site specific configuration parameter settings and commands should
-go in the file <A HREF=../user/installation.html#site><tt>config/site.tcl</tt></A>, 
-which is customized when <A HREF="../user/installation.html">installing</A> 
-<i>j</i>Max on a specific machine or several machines in a local network.
+<!-- ---------------------------------------------------------------------- -->
+<!-- ---------------------------------------------------------------------- -->
+<!-- Beginning of footer                                                    -->
+<!-- ---------------------------------------------------------------------- -->
+<!-- ---------------------------------------------------------------------- -->
 
+<p>
+<table width=100% border=0 cellspacing=0 cellpadding=0>
 
-</TABLE>
+<tr>
+<td><spacer type="block" height="20" width="1"></td>
+</tr>
 
-<HR NOSHADE SIZE=1>
+<tr>
+<td bgcolor="#cccccc"><spacer type="block" height="1" width="1"></td>
+</tr>
 
-</BODY>
-</HTML>
+<tr>
+<td><spacer type="block" height="20" width="1"></td>
+</tr>
+
+<tr>
+<td align=right><font size=-2>
+Copyright &copy; 1995,1999 <a href="http://www.ircam.fr/">IRCAM</a>.<br>
+All rights reserved.
+</font></td>
+</tr>
+
+</table>
+
+</body>
+</html>
