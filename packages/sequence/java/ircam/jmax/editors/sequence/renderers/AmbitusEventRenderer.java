@@ -31,7 +31,7 @@ import java.awt.*;
 
 /**
  * The piano-roll event renderer in a Score with an ambitus: the line-based event, 
- * with a lenght , variable width, black color, a label.
+ * with a length , variable width, black color, a label.
  */
 public class AmbitusEventRenderer implements SeqObjectRenderer {
 
@@ -79,17 +79,17 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
     
     int x = pa.getX(e);
     int y = pa.getY(e);
-    int lenght = pa.getLenght(e);
+    int length = pa.getLenght(e);
     String label = pa.getLabel(e);
-    int heigth = pa.getHeigth(e);
+    int height = pa.getHeigth(e);
     String type = pa.getType(e);
 
-    if (heigth == 0)
-      heigth = Adapter.NOTE_DEFAULT_HEIGTH;
+    if (height == 0)
+      height = Adapter.NOTE_DEFAULT_HEIGTH;
 
     if( type.equals("rest"))
       {
-	y = y-heigth/2;
+	y = y-height/2;
 
 	Color col, bordCol;
 	switch(state)
@@ -110,22 +110,21 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
 	  }
 
 	g.setColor( col);
-	g.fillRect(x, y, lenght, heigth);
+	g.fillRect(x, y, length, height);
 	g.setColor( bordCol);
-	g.drawLine(x, y, x, y + heigth - 1);
-	g.drawLine(x + 1, y, x + 1, y + heigth - 1);
-	g.drawLine(x + lenght, y, x + lenght, y + heigth - 1);
-	g.drawLine(x + lenght - 1, y, x + lenght - 1, y + heigth - 1);
-	g.fillRect(x , y + heigth/2 - 1, lenght, /*2*/ 3);
+	g.drawLine(x, y, x, y + height - 1);
+	g.drawLine(x + 1, y, x + 1, y + height - 1);
+	g.drawLine(x + length, y, x + length, y + height - 1);
+	g.drawLine(x + length - 1, y, x + length - 1, y + height - 1);
+	g.fillRect(x , y + height/2 - 1, length, /*2*/ 3);
       }
     else
       {
-	y = y-heigth+2;
+	y = y-height+2;
 
 	switch(state)
 	  {
 	  case Event.SELECTED:
-	    //g.setColor(Color.red);
 	    g.setColor( selectedColor);
 	    break;
 	  case Event.DESELECTED:
@@ -138,28 +137,28 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
 
 	if( type.equals("trill"))
 	  {
-	    double tw = 0.5 * (double)lenght / Math.ceil((double)lenght / 12.0);
+	    double tw = 0.5 * (double)length / Math.ceil((double)length / 12.0);
 	    double i = 0;
-	    while(i < lenght)
+	    while(i+tw <= length)
 	      {
 		int d = (int)i;
 		i += tw;
 		
-		g.drawLine(x + d, y + heigth, x + (int)i, y);
-		g.drawLine(x + 1 + d, y + heigth, x + 1 + (int)i, y);
+		g.drawLine(x + d, y + height, x + (int)i, y);
+		g.drawLine(x + 1 + d, y + height, x + 1 + (int)i, y);
 		
 		d = (int)i;
 		i += tw;
 		
-		g.drawLine( x + d, y, x + (int)i, y + heigth);
-		g.drawLine( x + 1 + d, y, x + 1 + (int)i, y + heigth);
+		g.drawLine( x + d, y, x + (int)i, y + height);
+		g.drawLine( x + 1 + d, y, x + 1 + (int)i, y + height);
 	      }
 	  }
 	else
 	  if ( gc.getSelection().getModel() != gc.getDataModel()) 
-	    g.drawRect(x, y, lenght, heigth);
+	    g.drawRect(x, y, length, height);
 	  else 
-	    g.fillRect(x, y, lenght, heigth);    
+	    g.fillRect(x, y, length, height);    
       
 	if(pa.getViewMode()==MidiTrackEditor.NMS_VIEW)
 	  {
@@ -190,24 +189,24 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
     
     int x = pa.getX(e);
     int y = pa.getY(e);
-    int lenght = pa.getLenght(e);
-    int heigth = pa.getHeigth(e);
+    int length = pa.getLenght(e);
+    int height = pa.getHeigth(e);
     String type = pa.getType(e);
 
-    if (heigth == 0)
-      heigth = Adapter.NOTE_DEFAULT_HEIGTH;
+    if (height == 0)
+      height = Adapter.NOTE_DEFAULT_HEIGTH;
 
     if( type.equals("rest"))
-      y = y-heigth/2;
+      y = y-height/2;
     else
-      y = y-heigth+2;
+      y = y-height+2;
     
     if( selected)
       g.setColor(Color.red);
     else
       g.setColor(Color.black);
 
-    g.drawRect( x, y, lenght, heigth);
+    g.drawRect( x, y, length, height);
   }
   /**
    * returns true if the given event contains the given (graphic) point
@@ -227,14 +226,14 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
 
     int evtx = gc.getAdapter().getX(e);
     int evty = gc.getAdapter().getY(e);
-    int evtlenght = gc.getAdapter().getLenght(e);
-    int evtheigth = gc.getAdapter().getHeigth(e);
+    int evtlength = gc.getAdapter().getLenght(e);
+    int evtheight = gc.getAdapter().getHeigth(e);
     String type = ((PartitionAdapter)gc.getAdapter()).getType(e);
 
     if( type.equals("rest"))
-      return (evtx<=x && (evtx+evtlenght >= x) && evty-evtheigth/2<=y && evty + evtheigth/2 >= y);
+      return (evtx<=x && (evtx+evtlength >= x) && evty-evtheight/2<=y && evty + evtheight/2 >= y);
     else
-      return (evtx<=x && (evtx+evtlenght >= x) && evty-evtheigth+2<=y && evty+2 >= y);
+      return (evtx<=x && (evtx+evtlength >= x) && evty-evtheight+2<=y && evty+2 >= y);
   }
 
 
@@ -259,16 +258,16 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
 
     int evtx = gc.getAdapter().getX(e);
     int evty = gc.getAdapter().getY(e);
-    int evtlenght = gc.getAdapter().getLenght(e);
-    int evtheigth = gc.getAdapter().getHeigth(e);
+    int evtlength = gc.getAdapter().getLenght(e);
+    int evtheight = gc.getAdapter().getHeigth(e);
     String type = ((PartitionAdapter)gc.getAdapter()).getType(e);
 
     tempRect.setBounds(x, y, w, h);
 
     if( type.equals("rest"))
-      eventRect.setBounds(evtx, evty-evtheigth/2, evtlenght, evtheigth);
+      eventRect.setBounds(evtx, evty-evtheight/2, evtlength, evtheight);
     else
-      eventRect.setBounds(evtx, evty-evtheigth+2, evtlenght, evtheigth);
+      eventRect.setBounds(evtx, evty-evtheight+2, evtlength, evtheight);
     
     return  tempRect.intersects(eventRect);
   }
