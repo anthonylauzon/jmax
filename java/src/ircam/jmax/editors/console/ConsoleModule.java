@@ -24,6 +24,7 @@
 // 
 
 package ircam.jmax.editors.console;
+import ircam.jmax.mda.*;
 
 /** The console module; the initModule function is called at init time
  *  by jmax, and install module related things
@@ -32,7 +33,8 @@ package ircam.jmax.editors.console;
 public class ConsoleModule
 {
   static public void initModule()
-  {
+  {    
+    Mda.installDocumentType( new ConsoleDocumentType());
   }
 }
 

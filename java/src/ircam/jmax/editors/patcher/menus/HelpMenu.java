@@ -38,6 +38,7 @@ import ircam.jmax.dialogs.*;
 import ircam.jmax.utils.*;
 
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.actions.*;
 
 /** Implement the patcher editor File Menu */
 
@@ -84,5 +85,8 @@ public class HelpMenu extends JMenu
 	});
        }
     
+    item = new JMenuItem("JMax Editing");
+    add(item);
+    item.addActionListener(Actions.showHtmlAction);
   }
 }

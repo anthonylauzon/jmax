@@ -1,4 +1,4 @@
- //
+//
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -19,41 +19,51 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 // Based on Max/ISPW by Miller Puckette.
-//
+// 
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.toolkit.actions;
-
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
-
-import javax.swing.*;
-import javax.swing.event.*;
-
-import ircam.jmax.*;
+package ircam.jmax.editors.console;
 import ircam.jmax.mda.*;
-import ircam.jmax.fts.*;
-import ircam.jmax.dialogs.*;
-import ircam.jmax.toolkit.*;
-import ircam.jmax.toolkit.actions.*;
 
-public class NewAction extends EditorAction
+
+/**
+ * Class defining the an executable tcl document.
+ */
+
+public class ConsoleDocumentType extends MaxDocumentType
 {
-  public void doAction(EditorContainer container)
+  public ConsoleDocumentType()
   {
-    Cursor temp = container.getFrame().getCursor();
-    try
-      {
-	container.getFrame().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-	Mda.getDocumentTypeByName( "patcher").newDocument( container.getEditor().getFts() ).edit();
-	container.getFrame().setCursor(temp);
-      }
-    catch (MaxDocumentException ex)
-      {
-	container.getFrame().setCursor(temp);
-	new ErrorDialog(container.getFrame(), ex.toString());
-      }
+    super("console");
+    setPrettyName("Console");
+  }
+
+  /** Tcl executed documents are not editable */
+
+  public boolean isEditable()
+  {
+    return false;
+  }
+
+  /** Tcl executed documents cannot be created inside jMax (still, we may add
+   a text editor, actually) */
+
+  public MaxDocument newDocument(MaxContext ignore)
+  {
+    return null;
+  }
+
+  /** Tcl executed documents cannot be created inside jMax (still, we may add
+   a text editor, actually) */
+
+  public boolean canMakeNewDocument(MaxContext ignore)
+  {
+    return false;
   }
 }
+
+
+
+
+

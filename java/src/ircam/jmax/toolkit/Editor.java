@@ -26,6 +26,7 @@
 package ircam.jmax.toolkit;
 
 import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
 
 /** An interface for the editor 
   */
@@ -33,6 +34,7 @@ public interface Editor
 {
   public Fts getFts();
   public EditorContainer getEditorContainer();
+  public MaxDocument getDocument();
   public void Close(boolean doCancel);//?????? why this parameter here ?????
 }
 

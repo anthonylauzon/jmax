@@ -45,12 +45,13 @@ import ircam.jmax.widgets.ConsoleArea;
  * Window containing a console
  */
  
-public class ConsoleWindow extends JFrame implements EditorContainer {
+public class ConsoleWindow extends JFrame implements EditorContainer, Editor {
 
   static private ConsoleWindow consoleWindowSingleInstance = null;
 
   private ConsoleArea consoleArea;
   private boolean noConsole;
+  private ConsoleDocument document;
 
   static {
     MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
@@ -106,6 +107,8 @@ public class ConsoleWindow extends JFrame implements EditorContainer {
     setLocation(0,0);
     setSize( 500, 600);
 
+    document = new ConsoleDocument(MaxApplication.getFts());
+
     setVisible( true);
   }
   
@@ -128,26 +131,29 @@ public class ConsoleWindow extends JFrame implements EditorContainer {
     setJMenuBar( mb);
   }
 
-  class ConsoleEditor implements Editor {
-    final public Fts getFts()
-    {
-      return MaxApplication.getFts();
-    }
+  // Methods from interface Editor
+  final public Fts getFts()
+  {
+    return MaxApplication.getFts();
+  }
 
-    public EditorContainer getEditorContainer()
-    {
-      return ConsoleWindow.this;
-    }
+  public EditorContainer getEditorContainer()
+  {
+    return this;
+  }
 
-    public void Close(boolean doCancel)
-    {
-    }
+  public void Close(boolean doCancel)
+  {
+  }
+
+  public MaxDocument getDocument(){
+    return document;
   }
 
   // Methods from interface EditorContainer
   public Editor getEditor()
   {
-    return new ConsoleEditor();
+    return this;
   }
 
   public Frame getFrame()
@@ -165,3 +171,4 @@ public class ConsoleWindow extends JFrame implements EditorContainer {
     return getContentPane().getBounds();
   }
 }
+
