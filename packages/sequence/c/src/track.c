@@ -1131,7 +1131,9 @@ track_set_save_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 	if(ac == 1) 
 	{
 		this->save_editor = fts_get_int(at);
-		fts_client_send_message(o, seqsym_save_editor, 1, at);
+		
+		if(track_editor_is_open(this))
+		  fts_client_send_message(o, seqsym_save_editor, 1, at);
 		
 		fts_object_set_dirty(o);
 	}
