@@ -104,6 +104,7 @@ extern "C" {
 #include <fts/time.h>
 #include <fts/sched.h>
 #include <fts/audio.h>
+#include <fts/bytestream.h>
 
 
 /*
