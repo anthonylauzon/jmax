@@ -404,7 +404,7 @@ void fts_clock_remove_reset_callback(fts_symbol_t clock_name, void (* callback)(
 	p = *c;
 	(*c) = (*c)->next;
 
-	fts_heap_free(p, clocks_heap);
+	fts_heap_free(p, callbacks_heap);
 	return;
       }
 }

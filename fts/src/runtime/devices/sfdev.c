@@ -966,6 +966,8 @@ sgi_writesf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   dev_data->file_name = fts_get_symbol(&args[0]);
   dev_data->active = 0;
 
+  fprintf(stderr, "Want to Opened file %s\n", fts_symbol_name(dev_data->file_name));
+
   /* parse the other file parameters : channels and format.
      Note that while in theory the device should automatically get the number
      of channels of the file, since this device is used by the writesf and family
@@ -995,6 +997,9 @@ sgi_writesf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
     }
 
   dev_data->format_descr = fts_soundfile_format_get_descriptor(format_name);
+
+  fprintf(stderr, "File format name %s id %d\n", fts_symbol_name(format_name), fts_get_int(dev_data->format_descr));
+
   dev_data->file_block = fts_get_int_by_name(nargs, args, fts_new_symbol("fileblock"), 16 * 1024);
   dev_data->fifo_size  = fts_get_int_by_name(nargs, args, fts_new_symbol("fifosize"),  64 * 1024);
 
@@ -1124,6 +1129,8 @@ sgi_writesf_put(fts_word_t *argv)
 */
 
 
+static int mcount = 0;
+
 static void *fts_writesf_worker(void *data)
 {
   int i;
@@ -1144,11 +1151,13 @@ static void *fts_writesf_worker(void *data)
   afInitChannels(setup, AF_DEFAULT_TRACK, dev_data->nch);
 
   file = afOpenFile(fts_symbol_name(dev_data->file_name), "w", setup);
+  fprintf(stderr, "Opening file %s\n", fts_symbol_name(dev_data->file_name));
 
   afFreeFileSetup(setup);
 
   if (file == AF_NULL_FILEHANDLE)
     {
+      fprintf(stderr, "Null file handle ?\n");
       eof = 1;
       fts_sample_fifo_reader_eof(fifo);
     }
@@ -1161,6 +1170,8 @@ static void *fts_writesf_worker(void *data)
 #endif
     }
 
+  fprintf(stderr, "Opened file %lx\n", (unsigned int) file);
+
   /*  LOOP: on the out of band status --> read the file -> Write to the sample fifo */
 
   while (! eof)
@@ -1171,6 +1182,9 @@ static void *fts_writesf_worker(void *data)
       ret = fts_sample_fifo_want_to_get(fifo, &p);
 
       afWriteFrames(file, AF_DEFAULT_TRACK, p, ret / dev_data->nch);
+
+      if (mcount++ < 10)
+	fprintf(stderr, "Written a tick on %lx\n", (unsigned int) file);
 
       if (ret != dev_data->file_block)
 	eof = 1;
@@ -1183,7 +1197,10 @@ static void *fts_writesf_worker(void *data)
   fts_sample_fifo_reader_eof(fifo);
 
   if (file != AF_NULL_FILEHANDLE)
-    afCloseFile(file);
+    {
+      fprintf(stderr, "Closing file %lx\n", (unsigned int) file);
+      afCloseFile(file);
+    }
 
   return NULL;
 }

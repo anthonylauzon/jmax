@@ -125,7 +125,7 @@ void fts_set_mess_trace(int b)
 }
 
 
-static void
+void
 trace_mess(const char *msg, int ac, const fts_atom_t *av)
 {
   if (do_mess_trace)

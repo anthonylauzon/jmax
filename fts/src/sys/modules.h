@@ -68,7 +68,6 @@ extern void fts_modules_restart(void);
 extern void fts_modules_shutdown(void);
 
 extern fts_status_t  fts_module_load(const char *name, const char *filename);
-extern void fts_load_boot_modules(void);
 
 #endif
 

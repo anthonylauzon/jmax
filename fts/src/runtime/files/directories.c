@@ -46,6 +46,13 @@ fts_set_project_dir(fts_symbol_t project_dir)
 fts_symbol_t
 fts_get_project_dir(void)
 {
-  return fts_project_dir;
+  if (fts_project_dir)
+    return fts_project_dir;
+  else
+    {
+      char buf[1024];
+
+      return fts_new_symbol(getcwd(buf, 1024));
+    }
 }
 

@@ -93,10 +93,6 @@ main(int argc, char **argv)
 
   fts_modules_init();
 
-  /* Load the dso boot modules  */
-
-  fts_load_boot_modules();
-
   /* Install the boot device, deciding on the base of the command
      line arguments.
    */

@@ -224,19 +224,23 @@ fts_ucs_execute_command_opcode(fts_symbol_t opcode, int argc, const fts_atom_t *
 }
 
 /* the fts_ucs client message dispatcher */
+extern void trace_mess(const char *msg, int ac, const fts_atom_t *av);
 
 static void
 fts_ucs_client_dispatch(int argc, const fts_atom_t *argv)
 {
   if (argc > 1)
     {
-      /* ignore the first argument, the old cpno,
-       for temporary compatibility with Max 
-       */
+      /*
+	ignore the first argument, the old cpno,
+	for temporary compatibility with Max 
+      */
 
       fts_status_t ret;
 
-      ret = fts_ucs_execute_command(argc, argv );
+      trace_mess("ucs message", argc, argv);
+
+      ret = fts_ucs_execute_command(argc, argv);
 
       if (ret != fts_Success)
 	post("Error: %s\n", ret->description);
@@ -330,7 +334,7 @@ fts_ucs_lib_set_path(int argc, const fts_atom_t *argv)
 static fts_status_t
 fts_ucs_lib_set_project_dir(int argc, const fts_atom_t *argv)
 {
-  if (fts_is_symbol(argv))
+  if ((argc >= 1) && fts_is_symbol(argv))
     fts_set_project_dir(fts_get_symbol(argv));
 
   return fts_Success;
