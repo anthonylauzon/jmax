@@ -212,31 +212,40 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
 {
   struct eval_data *eval_data = (struct eval_data *)data;
 
-  if (ac == 1 && fts_is_object( at))
+  if (eval_data->obj == NULL)
     {
-      eval_data->obj = fts_get_object( at);
-      return;
-    }
-
-  if (ac >= 1 && fts_is_symbol( at))
-    {
-      fts_metaclass_t *mcl;
-
-      mcl = fts_metaclass_get_by_name( NULL, fts_get_symbol( at));
-      if (mcl == NULL)
+      /* create the object */
+      if (ac == 1 && fts_is_object( at))
 	{
-	  eval_data->obj = fts_error_object_new( eval_data->patcher, ac, at, "Object or template %s not found", fts_get_symbol(at));
+	  eval_data->obj = fts_get_object( at);
 	  return;
 	}
 
-      eval_data->obj = fts_metaclass_new_instance( mcl, eval_data->patcher, ac-1, at+1);
-      if (eval_data->obj == NULL)
-	eval_data->obj = fts_error_object_new( eval_data->patcher, ac, at, "Error in class instantiation");
+      if (ac >= 1 && fts_is_symbol( at))
+	{
+	  fts_metaclass_t *mcl;
 
-      return;
+	  mcl = fts_metaclass_get_by_name( NULL, fts_get_symbol( at));
+	  if (mcl == NULL)
+	    {
+	      eval_data->obj = fts_error_object_new( eval_data->patcher, ac, at, "Object or template %s not found", fts_get_symbol(at));
+	      return;
+	    }
+
+	  eval_data->obj = fts_metaclass_new_instance( mcl, eval_data->patcher, ac-1, at+1);
+	  if (eval_data->obj == NULL)
+	    eval_data->obj = fts_error_object_new( eval_data->patcher, ac, at, "Error in class instantiation");
+
+	  return;
+	}
+
+      eval_data->obj = fts_error_object_new( eval_data->patcher, ac, at, "No valid class name");
     }
+  else
+    {
+      /* send the message to the already created object */
 
-  eval_data->obj = fts_error_object_new( eval_data->patcher, ac, at, "No valid class name");
+    }
 }
 
 #define CHECK_ERROR_PROPERTY(OBJ)		\
