@@ -93,6 +93,23 @@ value_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   post("}");
 }
 
+static void
+value_get_state_as_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  value_t *this = (value_t *)o;
+  fts_list_t *array = fts_get_list(at);
+
+  fts_list_set(array, 1, &this->a);
+}
+
+static void
+value_restore_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  value_t *this = (value_t *)o;
+
+  value_set(this, at[0]);
+}
+
 /********************************************************************
  *
  *   class
@@ -136,7 +153,10 @@ value_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, value_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, value_delete);
+
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("print"), value_print);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_state_as_array"), value_get_state_as_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("restore_state_from_array"), value_restore_state_from_array);
   
   fts_method_define_varargs(cl, 0, fts_s_bang, value_output);
   fts_method_define_varargs(cl, 0, fts_s_anything, value_set_and_output);

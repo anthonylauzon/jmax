@@ -33,6 +33,7 @@ extern void fvec_config(void);
 extern void fmat_config(void);
 extern void vec_config(void);
 extern void mat_config(void);
+extern void bpf_config(void);
 
 extern void getval_config(void);
 extern void getinter_config(void);
@@ -43,7 +44,7 @@ extern void getlist_config(void);
 extern void fill_config(void);
 extern void copy_config(void);
 
-extern void bpf_config(void);
+extern void preset_config(void);
 
 static void
 data_init(void)
@@ -55,6 +56,7 @@ data_init(void)
   fmat_config();
   vec_config();
   mat_config();
+  bpf_config();
 
   getval_config();  
   getinter_config();  
@@ -65,7 +67,7 @@ data_init(void)
   fill_config();
   copy_config();
 
-  bpf_config();
+  preset_config();
 }
 
 fts_module_t data_module = {"data", "data structures", data_init, 0, 0};

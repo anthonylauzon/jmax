@@ -975,6 +975,32 @@ ivec_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
+ivec_get_state_as_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  ivec_t *this = (ivec_t *)o;
+  int *values = ivec_get_ptr(this);
+  int size = ivec_get_size(this);
+  fts_list_t *array = fts_get_list(at);
+  fts_atom_t a;
+  int i;
+  
+  for(i=0; i<size; i++)
+    {
+      fts_set_int(&a, values[i]);
+  
+      fts_list_append(array, 1, &a);
+    }
+}
+
+static void
+ivec_restore_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  ivec_t *this = (ivec_t *)o;
+
+  ivec_set_from_atom_list(this, 0, ac, at);
+}
+
+static void
 ivec_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_symbol_t cmd = fts_get_symbol_arg(ac, at, 0, 0);
@@ -1112,6 +1138,8 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, ivec_delete);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, ivec_print); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_state_as_array"), ivec_get_state_as_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("restore_state_from_array"), ivec_restore_state_from_array);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), ivec_assist); 
 
       /* save and restore to/from bmax file */
@@ -1139,7 +1167,7 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_print, ivec_print); 
 
-      /* graphical editor */
+  /* graphical editor */
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), ivec_open_editor);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("close_editor"), ivec_close_editor);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_from_client"), ivec_set);

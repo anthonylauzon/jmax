@@ -701,6 +701,26 @@ static void messbox_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
     fts_object_set_add(set, o);
 }
 
+static void messbox_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  messbox_t *this = (messbox_t *) o;
+  fts_atom_list_iterator_t *iterator = fts_atom_list_iterator_new( this->atom_list);
+
+  while (! fts_atom_list_iterator_end( iterator))
+    {
+      fts_atom_t *a = fts_atom_list_iterator_current( iterator);
+
+      post_atoms(1, a);
+      post(" ");
+
+      fts_atom_list_iterator_next( iterator);
+    }
+
+  post("\n");
+
+  fts_atom_list_iterator_free( iterator);
+}
+
 /************************************************************
  *
  *  user methods
@@ -800,8 +820,9 @@ static fts_status_t messbox_instantiate(fts_class_t *cl, int ac, const fts_atom_
   a[0] = fts_s_ptr;
   fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, messbox_save_dotpat, 1, a); 
 
-  /* Application methods */
+  fts_method_define_varargs(cl, 0, fts_s_print, messbox_print);
 
+  /* Application methods */
   fts_method_define(cl, 0, fts_s_bang, messbox_eval, 0, 0);
 
   a[0] = fts_s_int;

@@ -27,5 +27,7 @@ JMAXDISTDIR = ../../../..
 PACKAGEROOT = ..
 PACKAGELIB=$(LIBDIR)/libdata.so
 
+MODULE_CFLAGS=-I../../../mess/c/src/
+
 include $(JMAXDISTDIR)/Makefiles/Makefile.package
 
