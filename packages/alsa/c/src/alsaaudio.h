@@ -37,6 +37,7 @@ fts_symbol_t s_rw_interleaved;
 fts_class_t* alsaaudioport_type;
 
 void alsaaudiomanager_scan_devices(void);
+void alsaaudiomanager_scan_plugins(void);
 
 snd_pcm_access_t alsaaudiomanager_convert_jmax_symbol_to_alsa_access(fts_symbol_t s_access);
 int alsaaudiomanager_get_channels_max(const char* device_name, int stream_mode);

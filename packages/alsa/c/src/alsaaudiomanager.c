@@ -30,7 +30,7 @@
 #include <fts/fts.h>
 #include "alsaaudio.h"
 
-
+#define FTS_MAX_CHANNELS 32
 
 
 void
@@ -109,15 +109,68 @@ alsaaudiomanager_scan_devices()
       s_devicename = fts_new_symbol(device_name);
       fts_set_symbol(&at, s_devicename);
       port = (fts_audioport_t*)fts_object_create(alsaaudioport_type, 1, &at);
-      fts_object_refer((fts_object_t*)port);
-      fts_audiomanager_put_port(fts_new_symbol(snd_pcm_info_get_name(pcminfo)), port);
-      fts_log("[alsaaudiomanager] fts_audiomanager_put_port: %s\n", snd_pcm_info_get_name(pcminfo));
+      if (NULL != port)
+      {
+	fts_object_refer((fts_object_t*)port);
+	fts_audiomanager_put_port(fts_new_symbol(snd_pcm_info_get_name(pcminfo)), port);
+	fts_log("[alsaaudiomanager] fts_audiomanager_put_port: %s\n", snd_pcm_info_get_name(pcminfo));
+      }
     }
     snd_card_next(&card);   
     snd_ctl_close(ctl_handle);
   }
 }
 
+
+void
+alsaaudiomanager_scan_plugins(void)
+{
+  snd_config_t* top_conf;
+  snd_config_t* cur_conf;
+  snd_config_iterator_t conf_it;
+  snd_config_iterator_t next_conf_it;
+  fts_symbol_t s_device_name;
+
+  int err = snd_config_update();
+  if (err < 0)
+  {
+    fts_log("[alsaaudiomanager] error while getting alsa configuration: %s\n", snd_strerror(err));
+    return;
+  }
+
+  err = snd_config_search(snd_config, "pcm", &top_conf);
+  /* snd_config_for_each is a macro .... */
+  snd_config_for_each(conf_it, next_conf_it, top_conf)
+  {
+    const char* id_configuration_node;
+    snd_config_type_t config_type;
+    cur_conf = snd_config_iterator_entry(conf_it);
+    
+    config_type = snd_config_get_type(cur_conf);
+    err = snd_config_get_id(cur_conf, &id_configuration_node);
+    if (err < 0)
+    {
+      fts_log("[alsaaudiomanager] Error while getting id configuration node : %s\n", snd_strerror(err));
+    }
+    else
+    {
+      fts_atom_t at;
+      fts_audioport_t* port;
+      fts_log("[alsaaudiomanager] Id Configuration Node: %s\n", id_configuration_node);
+      s_device_name = fts_new_symbol(id_configuration_node);
+      fts_set_symbol(&at, s_device_name);
+      port = (fts_audioport_t*)fts_object_create(alsaaudioport_type, 1, &at);
+      if (NULL != port)
+      {
+	fts_object_refer((fts_object_t*)port);
+	fts_audiomanager_put_port(s_device_name, port);
+	fts_log("[alsaaudiomanager] fts_audiomanager_put_port: %s\n", s_device_name);
+      }
+    }
+    conf_it = snd_config_iterator_next(conf_it);
+  }
+  
+}
 
 
 snd_pcm_access_t 
@@ -172,7 +225,12 @@ alsaaudiomanager_get_channels_max(const char* device_name, int stream_mode)
   }
 
   max_channels = snd_pcm_hw_params_get_channels_max(hwparams);
+  if (FTS_MAX_CHANNELS < max_channels)
+  {
+    max_channels = FTS_MAX_CHANNELS;
+  }
 
+  fts_log("[alsaaudiomanager] device %s opened with max channels = %d \n", device_name, max_channels);
   snd_pcm_close(handle);
   
   return max_channels;
