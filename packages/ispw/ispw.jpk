@@ -13,9 +13,7 @@ ucs load module pitch $dir/lib/$jmaxArch/$jmaxMode/libpitch.so
 ucs load module signal $dir/lib/$jmaxArch/$jmaxMode/libsignal.so
 
 ## set path for abstractions
-abstractionDirectory $dir/abs/jimmies
 abstractionDirectory $dir/abs/compatibility
-templateDirectory $dir/templates/jimmies
 templateDirectory $dir/templates/compatibility
 templateDirectory $dir/templates/extensions
 
@@ -24,7 +22,6 @@ dataDirectory $dir/sounds
 
 ## load the help patch tables
 sourceFile $dir/help/control/control.help.index.tcl
-# sourceFile $dir/help/jimmies/jimmies.help.index.tcl
 sourceFile $dir/help/signal/signal.help.index.tcl
 
 ## load the reference manual data base
