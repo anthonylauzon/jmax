@@ -17,6 +17,7 @@ help_DATA=\
  phi~.help.jmax		\
  pink~.help.jmax	\
  play~.help.jmax	\
+ record~.help.jmax      \
  samphold~.help.jmax	\
  snapshot~.help.jmax	\
  threshold~.help.jmax	\
