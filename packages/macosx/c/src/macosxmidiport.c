@@ -24,7 +24,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <CoreMIDI/MIDIServices.h>
 
 #include <fts/fts.h>
 #include "macosxmidi.h"

@@ -25,6 +25,8 @@
 #ifndef _MACOCXMIDI_H_
 #define _MACOCXMIDI_H_
 
+#include <CoreMIDI/MIDIServices.h>
+
 #define MACOSXMIDI_OBJECT_TYPE_ANY kMIDIObjectType_Other
 
 typedef struct _macosxmidi_
