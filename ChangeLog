@@ -1,5 +1,7 @@
 2003-07-08  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* packages/ispw/c/src/pack.c (pack_error_inlet): closed bug "[ 766895 ] [pack] weirdness bis" : added a console message if inlet > 0 receive doesn't receive a numer or a symbol.
+
 	* configure.in, client/configure.in, m4/ac_prog_jar_update.m4, */jav/*/Makefile.am: added test to know if jar support -u flag (jar from gcj-3.2 doesn't support -u).
 	added configure flag to set which jar to use (--with-jar=) 
 	replaced jar by $(JAR) in Makefile.am
