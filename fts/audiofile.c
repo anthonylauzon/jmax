@@ -150,19 +150,22 @@ fts_audiofile_open_read(fts_symbol_t filename)
 {
   if (fts_audiofile_loader != NULL) 
     {
+      int ret;
+
       fts_audiofile_t *aufile = audiofile_new(filename, fts_s_read);
       
       /* open file */
-      fts_audiofile_loader->open_read(aufile);
+      ret = fts_audiofile_loader->open_read(aufile);
 
       /* allocate buffer with default length */
-      fts_audiofile_loader->buffer_length(aufile, 0);
+      if(ret == 0)
+	ret = fts_audiofile_loader->buffer_length(aufile, 0);
 
       return aufile;
     }
   else
     {
-      fts_log("[audiofile] trying to open audiofile without loader set");
+      fts_log("[audiofile] trying to open audiofile without loader set\n");
       return NULL;
     }
 }
@@ -193,7 +196,7 @@ fts_audiofile_open_write(fts_symbol_t filename, int channels, int sample_rate, f
     }
   else
     {
-      fts_log("[audiofile] trying to open audiofile without loader set");
+      fts_log("[audiofile] trying to open audiofile without loader set\n");
       return NULL;
     }
 }

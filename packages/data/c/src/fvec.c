@@ -609,12 +609,12 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 		n_read = fts_audiofile_get_num_frames(sf);
 
 	      /* make enough space for resampled file */
-	      if(sr > 0.0 && sr != file_sr)
+	      /*
+		if(sr > 0.0 && sr != file_sr)
 		n_read = (int)((float)n_read * sr / file_sr + 0.5f);
-	      else
-		/* get temporary sample rate from file */
+		else
 		this->sr = -file_sr;
-	      
+	      */
 	      fvec_set_size(this, n_read);
 	      ptr = fvec_get_ptr(this);
 	    

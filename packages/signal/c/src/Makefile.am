@@ -20,7 +20,6 @@ INCLUDES=-I@top_srcdir@/packages/data/c/src -I@top_srcdir@/packages/utils/c/src
 
 noinst_HEADERS=  \
 osc.h \
-play.h \
 samplepool.h \
 signal.h \
 wave.h
