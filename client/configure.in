@@ -19,6 +19,7 @@ AC_PREFIX_DEFAULT(/usr)
 
 AM_CONFIG_HEADER(cpp/include/config.h)
 
+
 dnl Checks for programs.
 AC_PROG_CXX
 if test "$ac_cv_prog_cxx" = "no" ; then
@@ -97,6 +98,12 @@ AC_SUBST(JAVACFLAGSX)
 TOP_DIR_PATH=`pwd`
 AC_SUBST(TOP_DIR_PATH)
 
+dnl FTS Python Client
+dnl AM_PATH_PYTHON(2.1)
+dnl AM_PATH_PYTHON requires automake > 1.5 (on RedHat 7.3 automake version is 1.4-p5)
+dnl So we put python client in $(data_dir)/jmax/client/python .....
+
+
 AC_OUTPUT(
 Makefile
 cpp/Makefile
@@ -109,4 +116,8 @@ java/Makefile
 java/ircam/Makefile
 java/ircam/fts/Makefile
 java/ircam/fts/client/Makefile
+python/Makefile
+python/ircam/Makefile
+python/ircam/fts/Makefile
+python/ircam/fts/client/Makefile
 )

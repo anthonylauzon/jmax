@@ -9,6 +9,8 @@ else
 JAVA_SRC_DIR= 
 endif
 
-SUBDIRS= $(JAVA_SRC_DIR) cpp
+PYTHON_SRC_DIR = python
+
+SUBDIRS= $(JAVA_SRC_DIR) cpp $(PYTHON_SRC_DIR)
 
 
