@@ -27,6 +27,7 @@ namespace client {
   template <class KeyT, class ValT> class FTSCLIENT_API Hashtable;
   class BinaryProtocolDecoder;
   class BinaryProtocolEncoder;
+  class ReceiveThread;
 
   class FTSCLIENT_API FtsServerConnection {
   public:
@@ -55,13 +56,12 @@ namespace client {
     
     void startThread() throw(FtsClientException);
 
+    void receiveLoop();
   protected:
     virtual int read( unsigned char *b, int len) throw (FtsClientException) = 0;
     virtual void write( const unsigned char *b, int len) throw (FtsClientException) = 0;
 
   private:
-    static void *receiveThread( void *arg);
-
     int getNewObjectID()
     {
       int id = _newObjectID;
@@ -74,7 +74,7 @@ namespace client {
     BinaryProtocolEncoder *_encoder;
     BinaryProtocolDecoder *_decoder;
     unsigned char *_receiveBuffer;
-    pthread_t _receiveThread;
+    ReceiveThread* _receiveThread;
   };
 
 };

@@ -26,139 +26,194 @@
 #include "BinaryProtocolEncoder.h"
 #include "Hashtable.h"
 
-namespace ircam {
-namespace fts {
+namespace ircam {  
+namespace fts {    
 namespace client {
 
   const int FtsServerConnection::DEFAULT_RECEIVE_BUFFER_SIZE = 65536;
   const int FtsServerConnection::CLIENT_OBJECT_ID = 1;
-
-  void *FtsServerConnection::receiveThread( void *arg)
-  {
-    FtsServerConnection *connection = reinterpret_cast<FtsServerConnection *>(arg);
-
-    try
-      {
-	while(1)
-	  {
-	    int n = connection->read( connection->_receiveBuffer, DEFAULT_RECEIVE_BUFFER_SIZE);
   
-	    if (n < 0)
-	      throw FtsClientException( "Failed to read the input connection");
-	    if (n == 0)
-	      throw FtsClientException( "End of input");
-
-	    connection->_decoder->decode( connection->_receiveBuffer, n);
-	  }
-      }
-    catch( FtsClientException& e)
+#ifdef WIN32
+  class ReceiveThread {
+  public:
+    void start(FtsServerConnection* connection) throw(FtsClientException)
       {
-	std::cerr << " Exception message : " << e.getMessage() << std::endl;
+	unsigned long threadID;
+	
+	_thread = CreateThread(NULL, 0, run, (LPVOID) connection, 0, &threadID);
+	
+	if (_thread == NULL) 
+	  throw FtsClientException( "Cannot start receive thread");
+	
+	SetThreadPriority(_thread, THREAD_PRIORITY_HIGHEST);
+      }
+    
+    void stop()
+      {
+      }
+    
+    static DWORD WINAPI run(LPVOID arg)
+      {
+	FtsServerConnection *connection = reinterpret_cast<FtsServerConnection *>(arg);	
+	connection->receiveLoop();
+      }
+    
+  private:
+    HANDLE _thread;
+  };
+#else
+  class ReceiveThread {
+  public:
+    
+    void start(FtsServerConnection* connection) throw(FtsClientException)
+      {
+	if ( pthread_create( &_thread, NULL, run, static_cast<void*>(connection)))
+	  throw FtsClientException( "Cannot start receive thread", errno);
+      }
+    
+    void stop() 
+      {
+	pthread_cancel(_thread);
+      }
+    
+    static void *run( void *arg)
+      {
+	FtsServerConnection *connection = reinterpret_cast<FtsServerConnection *>(arg);	
+	connection->receiveLoop();	
 	pthread_exit( 0);
       }
+    
+  private:
+    pthread_t _thread;
+  };
+#endif
+  
+  void FtsServerConnection::receiveLoop()
+  {
+    try
+    {
+      while(1)
+      {
+	int n = read( _receiveBuffer, DEFAULT_RECEIVE_BUFFER_SIZE);
+	
+	if (n < 0)
+	  throw FtsClientException( "Failed to read the input connection");
+	if (n == 0)
+	  throw FtsClientException( "End of input");
 
-    return 0;
+	_decoder->decode( _receiveBuffer, n);
+      }
+    }
+    catch( FtsClientException& e)
+    {
+      std::cerr << " Exception message : " << e.getMessage() << std::endl;
+    }
   }
   
   FtsServerConnection::FtsServerConnection() throw( FtsClientException)
   {
     _newObjectID = 16; // Ids 0 to 15 are reserved for pre-defined system objects
-
-    _objectTable = new Hashtable<int, FtsObject*>();
-
+    
+    _objectTable = new Hashtable<int, FtsObject*>();    
     _decoder = new BinaryProtocolDecoder( this);
     _encoder = new BinaryProtocolEncoder();
     _receiveBuffer = new unsigned char[FtsServerConnection::DEFAULT_RECEIVE_BUFFER_SIZE];
+    _receiveThread = new ReceiveThread();
   }
-
+  
   FtsServerConnection::~FtsServerConnection()
   {
     delete _objectTable;
     delete _decoder;
     delete _encoder;	
     /* Stop thread .... */
+    _receiveThread->stop();
+    delete _receiveThread;
     delete[] _receiveBuffer;	
   }
-
+  
   FtsObject *FtsServerConnection::getObject( int id)
   {
     FtsObject *obj;
     
     if (_objectTable->get( id, obj))
       return obj;
-
+    
     return NULL;
   }
-
+  
   int FtsServerConnection::putObject( int id, FtsObject *obj)
   {
     if (id == FtsObject::NO_ID)
       return FtsObject::NO_ID;
-
+    
     if (id == FtsObject::NEW_ID)
       id = getNewObjectID();
-
+    
     _objectTable->put( id, obj);
-
+    
     return id;
   }
-
+  
   void FtsServerConnection::writeInt( int v) throw( FtsClientException)
   {
     _encoder->writeInt( v);
   }
-
+  
   void FtsServerConnection::writeDouble( double v) throw( FtsClientException) 
   {
     _encoder->writeDouble( v); 
   }
-
+  
   void FtsServerConnection::writeSymbol( const char *v) throw( FtsClientException) 
   {
     _encoder->writeSymbol( v); 
   }
-
+  
   void FtsServerConnection::writeString( const char *v) throw( FtsClientException) 
   {
     _encoder->writeString( v); 
   }
-
+  
   void FtsServerConnection::writeRawString( const char *v) throw( FtsClientException) 
   {
     _encoder->writeRawString( v); 
   }
-
+  
   void FtsServerConnection::writeObject( const FtsObject *v) throw( FtsClientException) 
   {
     _encoder->writeObject( v); 
   }
-
+  
   /* This version is used for object that have predefined IDs */
   void FtsServerConnection::writeObject( int id) throw( FtsClientException) 
   {
     _encoder->writeObject( id); 
   }
-
+  
   void FtsServerConnection::writeArgs( const FtsArgs &v) throw( FtsClientException) 
   {
     _encoder->writeArgs( v); 
   }
-
+  
   void FtsServerConnection::endOfMessage() throw( FtsClientException)
   {
-    _encoder->endOfMessage();
-
+    _encoder->endOfMessage();    
     write( _encoder->getBytes(), _encoder->getLength());
-
     _encoder->clear();
   }
-
+  
   void FtsServerConnection::startThread() throw(FtsClientException)
   {
-    if ( pthread_create( &_receiveThread, NULL, receiveThread, this))
-      throw FtsClientException( "Cannot start receive thread", errno);
-	
+    _receiveThread->start( this);	
   }
-};
-};
-};
+}; // namespace client
+}; // namespace fts
+}; // namespace ircam
+
+/** EMACS **
+ * Local variables:
+ * mode: c++
+ * c-basic-offset:2
+ * End:
+ */
