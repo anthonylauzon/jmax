@@ -1525,6 +1525,7 @@ fmat_get_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_return_object(obj);
 }
 
+
 /** append a row of atoms, augment m, clip row to n 
 * 
 * @method append
@@ -1536,6 +1537,7 @@ fmat_append_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fmat_t *self = (fmat_t *) o;
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
+  int i;
   
   /* clip to row */
   if (ac > n)
@@ -1543,7 +1545,8 @@ fmat_append_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   
   /* add space, append data */
   fmat_set_size(self, m + 1, n);
-  
+  fmat_set_from_atoms(self, m * n, 1, ac, at);
+
   if(fmat_editor_is_open(self))
   {
     fts_client_send_message(o, fts_s_append, 0, 0);
@@ -1551,6 +1554,7 @@ fmat_append_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   }
   fts_object_set_state_dirty(o);
 }
+
 
 /** insert @p num rows of atoms at row @p pos
  *  may insert num rows behind last row m --> append num rows
@@ -1741,6 +1745,9 @@ fmat_delete_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   fts_object_set_state_dirty(o);
 }
+
+
+
 
 /******************************************************************************
  *
