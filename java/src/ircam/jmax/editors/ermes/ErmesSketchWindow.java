@@ -249,18 +249,28 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     //SetupMenu();
   }
 
-
-
-    public void InitFromContainer(FtsContainerObject patcher) {
-		
-      Object aObject;
-      int x=0;
-      int y=0;
-      int width=500;
-      int height=480;
-      Integer x1, y1, width1, height1;
-      String autorouting;
-      //double check the existence of the window properties. If there aren't, use defaults
+  int horizontalOffset() {
+    //sketchPad is not there yet, and we have no time for the release.
+    //    return 20+itsSketchPad.getLocation().x; //the size of the sketch
+    return 40;
+  }
+  
+  int verticalOffset() {
+    //sketchPad is not there yet, and there's no time for the release.
+    //    return itsSketchPad.getLocation().y;//the size of the toolbar + menus
+    return 130;
+  }
+  
+  public void InitFromContainer(FtsContainerObject patcher) {
+    
+    Object aObject;
+    int x=0;
+    int y=0;
+    int width=500;
+    int height=480;
+    Integer x1, y1, width1, height1;
+    String autorouting;
+    //double check the existence of the window properties. If there aren't, use defaults
       
       x1 = (Integer) patcher.get("wx");
       if (x1 == null) patcher.put("wx", new Integer(x));
@@ -279,7 +289,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       if (autorouting == null) patcher.put("autorouting", "on");
       //get the window dimension use it for: reshape to the right dimensions
 
-      setBounds(x, y, width, height);
+      setBounds(x, y, width+horizontalOffset(), height+verticalOffset());
 
       //assigning the autorouting mode.
 
@@ -1195,13 +1205,15 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     ErmesObject aErmesObject = null;
     FtsObject aFObject = null;
     Rectangle aRect = theSketchWindow.getBounds();
-    String ermesInfo = new String();
+    Rectangle aRect1 = theSketchWindow.getContentPane().getBounds();//e.m.1103
+      //String ermesInfo = new String();
     
-
+    /*System.err.println("sketchW: "+getBounds());
+      System.err.println("sketchW.contentPane: "+getContentPane().getBounds());*/
     itsPatcher.put("wx", aRect.x);
     itsPatcher.put("wy", aRect.y);
-    itsPatcher.put("ww", aRect.width);
-    itsPatcher.put("wh", aRect.height);
+    itsPatcher.put("ww", aRect1.width);//e.m.1103
+    itsPatcher.put("wh", aRect1.height);//e.m.1103
 
     if (itsSketchPad.doAutorouting) itsPatcher.put("autorouting", "on");
     else itsPatcher.put("autorouting", "off");
