@@ -30,6 +30,15 @@ typedef union  fts_word          fts_word_t;
 typedef struct fts_atom          fts_atom_t;
 typedef struct fts_plist                 fts_plist_t;
 
+/* (fd) 
+   For now, fts_type_t is an alias of fts_symbol_t, in order
+   to be introduced in the message system API, but not force changing
+   the message system implementation and all the objects.
+   This will be changed soon to a true typing system (? ;-{)
+*/
+#define fts_type_t fts_symbol_t
+#define fts_type_get_selector(T) (T)
+
 typedef enum fts_daemon_action {
   obj_property_put, obj_property_get, obj_property_remove
 } fts_daemon_action_t;

@@ -64,6 +64,24 @@ extern fts_symbol_t fts_s_false;
 extern fts_symbol_t fts_s_data;
 extern fts_symbol_t fts_s_atom_array;
 
+/* (fd)
+   See mess_types.h for comment on fts_type_t
+*/
+#define fts_t_void fts_s_void
+#define fts_t_float fts_s_float
+#define fts_t_int fts_s_int
+#define fts_t_number fts_s_number
+#define fts_t_ptr fts_s_ptr
+#define fts_t_fun fts_s_fun
+#define fts_t_string fts_s_string
+#define fts_t_symbol fts_s_symbol
+#define fts_t_object fts_s_object
+#define fts_t_connection fts_s_connection
+#define fts_t_true fts_s_true
+#define fts_t_false fts_s_false
+#define fts_t_data fts_s_data
+#define fts_t_atom_array fts_s_atom_array
+
 /* Symbols related to messages, objects and classes */
 
 extern fts_symbol_t fts_s_init;
