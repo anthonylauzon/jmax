@@ -284,28 +284,28 @@ FTS_API void fts_dsp_declare_function(fts_symbol_t name, void (*w)(fts_word_t *)
 /**
  * Declare a DSP inlet for a class
  *
- * @fn fts_dsp_declare_inlet(fts_class_t *class, int number)
- * @param class the class
+ * @fn fts_dsp_declare_inlet(fts_class_t *cl, int number)
+ * @param cl the class
  * @param number number of the inlet
  *
  * @see fts_dsp_declare_outlet()
  *
  * @ingroup dsp
  */
-FTS_API void fts_dsp_declare_inlet(fts_class_t *class, int number);
+FTS_API void fts_dsp_declare_inlet(fts_class_t *cl, int number);
 
 /**
  * Declare a DSP outlet for a class
  *
- * @fn fts_dsp_declare_outlet(fts_class_t *class, int number)
- * @param class the class
+ * @fn fts_dsp_declare_outlet(fts_class_t *cl, int number)
+ * @param cl the class
  * @param number number of the outlet
  *
  * @see fts_dsp_declare_inlet()
  *
  * @ingroup dsp
  */
-FTS_API void fts_dsp_declare_outlet(fts_class_t *class, int number);
+FTS_API void fts_dsp_declare_outlet(fts_class_t *cl, int number);
 
 /*@}*/ /* Class declarations */
 
