@@ -25,13 +25,14 @@
  */
 
 #include <fts/fts.h>
+#include <alloca.h>
 
 void
 fts_outlet_array(fts_object_t *o, int woutlet, fts_array_t *array)
 {
   int size = fts_array_get_size(array);
   fts_atom_t *atoms = fts_array_get_atoms(array);  
-  fts_atom_t output[size];
+  fts_atom_t *output = (fts_atom_t *)alloca(sizeof(fts_atom_t) * size);
   int i;
   
   for(i=0; i<size; i++)
