@@ -238,13 +238,26 @@ static void ossaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 
   /* Set sample rate */
   p_sample_rate = sample_rate;
-  if ( (ioctl( this->fd, SNDCTL_DSP_SPEED, &p_sample_rate) == -1) || (sample_rate != p_sample_rate) )
+  if (ioctl( this->fd, SNDCTL_DSP_SPEED, &p_sample_rate) == -1)
     {
       fts_object_set_error( o, "Cannot set sample rate (%s)", strerror( errno));
       post("ossaudioport: cannot set sample rate (%s)\n", strerror( errno));
       return;
     }
 
+ if (sample_rate != p_sample_rate)
+ {
+     post("[ossaudioport]: cannot set to wanted sample rate (%d), get (%d)\n",
+	  sample_rate, p_sample_rate);
+     fts_log("[ossaudioport]: cannot set to wanted sample rate (%d), get (%d)\n",
+	     sample_rate, p_sample_rate);
+ }
+
+ /*
+   TODO:
+   Add a conditionnal to know if difference of sampling rate is too important:
+   e.g. a threshold on difference between given and wanted
+ */
   if (flags != O_WRONLY)
     {
       fts_audioport_set_input_channels( (fts_audioport_t *)this, channels);
