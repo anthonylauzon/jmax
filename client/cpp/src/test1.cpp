@@ -21,9 +21,20 @@
  */
 
 #include <iostream>
+#include <typeinfo>
 #include <fts/ftsclient.h>
 
 using namespace ircam::fts::client;
+
+class ConsoleStreamHandler: public FtsMessageHandler
+{
+public:
+    virtual void invoke(FtsObject *obj, const FtsArgs& args)
+	{
+	    std::cerr << " Console Stream Handler Invoke called !!! " << std::endl;
+	}
+};
+
 
 main( int ac, char **av)
 {
@@ -38,8 +49,20 @@ main( int ac, char **av)
       cerr << e << endl;
     }
 
-  char c;
+  FtsObject* rootPatcher = new FtsObject(connection, NULL, 0);
+
+  FtsObject* console_stream = new FtsObject(connection, rootPatcher, "console_stream");
+
+  ConsoleStreamHandler* handler = new ConsoleStreamHandler();
+
+  FtsObject::registerMessageHandler(typeid(*console_stream), "print_line", handler);
+  
+  console_stream->send("set_default");
+  int c;
   cin >> c;
+ 
+  delete rootPatcher;
+  delete connection;
 
   std::exit( 0);
 }
