@@ -255,6 +255,10 @@ class ErmesObjSlider extends ErmesObject {
     return true;
   }
 
+  public boolean isUIController() {
+    return true;
+  }
+
   public void Paint_specific(Graphics g) {
     
     if (g==null) {

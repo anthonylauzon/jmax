@@ -307,6 +307,10 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     return false;
   }
 
+  public boolean isUIController() {
+    return false;
+  }
+
   //to be redefinded if needed.
   void putOtherProperties(FtsObject theFObject){}
   
@@ -469,8 +473,14 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
   }
   
   public boolean MouseMove(MouseEvent e,int x,int y){
-    if (itsSketchPad.itsRunMode || e.isControlDown()) return false;
-    if(IsInDragBox(x,y)){
+    if (itsSketchPad.itsRunMode) return false;
+    else if (e.isControlDown()) {
+      if (isUIController()) {
+	if (itsSketchPad.itsSketchWindow.getCursor() != Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)) itsSketchPad.itsSketchWindow.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+      }
+      return true;
+    }
+    else if(IsInDragBox(x,y)){
       GetSketchWindow().setCursor(Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR));
       return true;
     }

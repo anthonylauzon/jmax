@@ -75,6 +75,10 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
     return true;
   }
 
+  public boolean isUIController() {
+    return true;
+  }
+
   public void Paint_specific(Graphics g) {
     if(!itsFlashing){
       if(!itsSelected) g.setColor(itsUINormalColor);

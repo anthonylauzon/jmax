@@ -236,6 +236,9 @@ class ErmesObjInt extends ErmesObject {
     return true;
   }
   
+  public boolean isUIController() {
+    return true;
+  }
 
   //--------------------------------------------------------
   // paint

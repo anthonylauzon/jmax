@@ -1357,7 +1357,7 @@ Rectangle previousResizeRect = new Rectangle();
       } else 
 	if (itsSketchWindow.getCursor() != Cursor.getDefaultCursor()) 
 	  setCursor(Cursor.getDefaultCursor());
-      return;
+      return; 
     }
     else if(editStatus == AREA_SELECT) {
       if((java.lang.Math.abs(x-currentPoint.x)<5)||(java.lang.Math.abs(y-currentPoint.y)<5)) 

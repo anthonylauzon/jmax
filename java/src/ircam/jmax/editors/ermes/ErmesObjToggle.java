@@ -70,6 +70,10 @@ class ErmesObjToggle extends ErmesObject {
     return true;
   }
 
+  public boolean isUIController() {
+   return false; 
+  }
+
   public void Paint_specific(Graphics g) {
     if(!itsSelected) g.setColor(itsUINormalColor/*Color.lightGray*/);
     else g.setColor(itsUISelectedColor/*Color.gray*/);

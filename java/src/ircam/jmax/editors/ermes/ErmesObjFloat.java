@@ -208,6 +208,10 @@ class ErmesObjFloat extends ErmesObject {
     return true;
   }
 
+  public boolean isUIController() {
+    return true;
+  }
+
   //--------------------------------------------------------
   // paint
   //--------------------------------------------------------

@@ -656,13 +656,15 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   ////////////////////////////////////////////////////////////////keyListener --inizio  
   public void keyTyped(KeyEvent e){}
 
-  public void keyReleased(KeyEvent e){}
+  public void keyReleased(KeyEvent e){
+    
+  }
 
   // Modified to use inheritance and call the MaxEditor method
   // for all the standard key bindings
   public void keyPressed(KeyEvent e){
     int aInt = e.getKeyCode();
-
+    
       //arrows first:
       if (isAnArrow(aInt)) {
 
