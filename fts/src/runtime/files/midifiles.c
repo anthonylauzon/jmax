@@ -114,22 +114,16 @@ ticks2sec(unsigned long ticks, int division, unsigned int tempo)
     }
 }
 
-static unsigned long 
-sec2ticks(double secs, int division, unsigned int tempo)
-{    
-  return (long)((secs * 1000.0 / 4.0 * division) / tempo);
-}
-
 double
 fts_midifile_get_current_time_in_seconds(fts_midifile_t *file)
 {
   return (ticks2sec(file->currtime, file->division, file->tempo));
 }
 
-int
+long
 fts_midifile_seconds_to_ticks(fts_midifile_t *file, double seconds)
 {
-  return (sec2ticks(seconds, file->division, file->tempo));
+  return (long)((seconds * 1000.0 / 4.0 * file->division) / file->tempo);
 }
 
 /*************************************************************
@@ -856,20 +850,20 @@ fts_midifile_write_track_end(fts_midifile_t *file)
 #define clip_channel(ch) ((ch > 15)? 15: ((ch < 0)? 0: ch))
 
 void 
-fts_midifile_write_note_off(fts_midifile_t *file, int delta_time, int channel, int number)
+fts_midifile_write_note_off(fts_midifile_t *file, long time, int channel, int number)
 {
-  file->currtime += delta_time;
-  writevarlen(file, delta_time);
+  writevarlen(file, time - file->currtime);
+  file->currtime = time;
 
   eputc(file, NOTE_OFF | clip_channel(channel));  
   eputc(file, number & 127);  
 }
 
 void 
-fts_midifile_write_note_on(fts_midifile_t *file, int delta_time, int channel, int number, int velocity)
+fts_midifile_write_note_on(fts_midifile_t *file, long time, int channel, int number, int velocity)
 {
-  file->currtime += delta_time;
-  writevarlen(file, delta_time);
+  writevarlen(file, time - file->currtime);
+  file->currtime = time;
 
   eputc(file, NOTE_ON | clip_channel(channel));  
   eputc(file, number & 127);  
@@ -877,10 +871,10 @@ fts_midifile_write_note_on(fts_midifile_t *file, int delta_time, int channel, in
 }
 
 void 
-fts_midifile_write_poly_pressure(fts_midifile_t *file, int delta_time, int channel, int number, int value)
+fts_midifile_write_poly_pressure(fts_midifile_t *file, long time, int channel, int number, int value)
 {
-  file->currtime += delta_time;
-  writevarlen(file, delta_time);
+  writevarlen(file, time - file->currtime);
+  file->currtime = time;
 
   eputc(file, POLY_PRESSURE | clip_channel(channel));  
   eputc(file, number & 127);  
@@ -888,10 +882,10 @@ fts_midifile_write_poly_pressure(fts_midifile_t *file, int delta_time, int chann
 }
 
 void 
-fts_midifile_write_control_change(fts_midifile_t *file, int delta_time, int channel, int number, int value)
+fts_midifile_write_control_change(fts_midifile_t *file, long time, int channel, int number, int value)
 {
-  file->currtime += delta_time;
-  writevarlen(file, delta_time);
+  writevarlen(file, time - file->currtime);
+  file->currtime = time;
 
   eputc(file, CONTROL_CHANGE | clip_channel(channel));  
   eputc(file, number & 127);  
@@ -899,30 +893,30 @@ fts_midifile_write_control_change(fts_midifile_t *file, int delta_time, int chan
 }
 
 void 
-fts_midifile_write_program_change(fts_midifile_t *file, int delta_time, int channel, int number)
+fts_midifile_write_program_change(fts_midifile_t *file, long time, int channel, int number)
 {
-  file->currtime += delta_time;
-  writevarlen(file, delta_time);
+  writevarlen(file, time - file->currtime);
+  file->currtime = time;
 
   eputc(file, PROGRAM_CHANGE | clip_channel(channel));  
   eputc(file, number & 127);  
 }
 
 void 
-fts_midifile_write_channel_pressure(fts_midifile_t *file, int delta_time, int channel, int value)
+fts_midifile_write_channel_pressure(fts_midifile_t *file, long time, int channel, int value)
 {
-  file->currtime += delta_time;
-  writevarlen(file, delta_time);
+  writevarlen(file, time - file->currtime);
+  file->currtime = time;
 
   eputc(file, CHANNEL_PRESSURE | clip_channel(channel));  
   eputc(file, value & 127);  
 }
 
 void
-fts_midifile_write_pitch_bend(fts_midifile_t *file, int delta_time, int channel, int value)
+fts_midifile_write_pitch_bend(fts_midifile_t *file, long time, int channel, int value)
 {
-  file->currtime += delta_time;
-  writevarlen(file, delta_time);
+  writevarlen(file, time - file->currtime);
+  file->currtime = time;
 
   eputc(file, PITCH_BEND | clip_channel(channel));  
   eputc(file, value & 127);
@@ -941,11 +935,12 @@ fts_midifile_write_pitch_bend(fts_midifile_t *file, int delta_time, int channel,
  * size - The length of the meta-event data.
  */
 int
-fts_midifile_write_meta_event(fts_midifile_t *file, int delta_time, int type, unsigned char *data, int size)
+fts_midifile_write_meta_event(fts_midifile_t *file, long time, int type, unsigned char *data, int size)
 {
   int i;
 
-  writevarlen(file, delta_time);
+  writevarlen(file, time - file->currtime);
+  file->currtime = time;
     
   /* this marks the fact we're writing a meta-event */
   eputc(file, META_EVENT);

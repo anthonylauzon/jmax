@@ -89,7 +89,7 @@ struct _fts_midifile_
  *  time
  *
  */
-extern int fts_midifile_seconds_to_ticks(fts_midifile_t *file, double seconds);
+extern long fts_midifile_seconds_to_ticks(fts_midifile_t *file, double seconds);
 
 #define fts_midifile_get_current_time(f) ((f)->currtime)
 extern double fts_midifile_get_current_time_in_seconds(fts_midifile_t *file);
@@ -119,13 +119,13 @@ extern int fts_midifile_write_track_end(fts_midifile_t *file);
 
 extern void fts_midifile_write_tempo(fts_midifile_t *file, int tempo);
 
-extern void fts_midifile_write_note_off(fts_midifile_t *file, int delta_time, int channel, int number);
-extern void fts_midifile_write_note_on(fts_midifile_t *file, int delta_time, int channel, int number, int velocity);
-extern void fts_midifile_write_poly_pressure(fts_midifile_t *file, int delta_time, int channel, int number, int value);
-extern void fts_midifile_write_control_change(fts_midifile_t *file, int delta_time, int channel, int number, int value);
-extern void fts_midifile_write_program_change(fts_midifile_t *file, int delta_time, int channel, int number);
-extern void fts_midifile_write_channel_pressure(fts_midifile_t *file, int delta_time, int channel, int value);
-extern void fts_midifile_write_pitch_bend(fts_midifile_t *file, int delta_time, int channel, int value);
-extern int fts_midifile_write_meta_event(fts_midifile_t *file, int delta_time, int type, unsigned char *data, int size);
+extern void fts_midifile_write_note_off(fts_midifile_t *file, long time, int channel, int number);
+extern void fts_midifile_write_note_on(fts_midifile_t *file, long time, int channel, int number, int velocity);
+extern void fts_midifile_write_poly_pressure(fts_midifile_t *file, long time, int channel, int number, int value);
+extern void fts_midifile_write_control_change(fts_midifile_t *file, long time, int channel, int number, int value);
+extern void fts_midifile_write_program_change(fts_midifile_t *file, long time, int channel, int number);
+extern void fts_midifile_write_channel_pressure(fts_midifile_t *file, long time, int channel, int value);
+extern void fts_midifile_write_pitch_bend(fts_midifile_t *file, long time, int channel, int value);
+extern int fts_midifile_write_meta_event(fts_midifile_t *file, long time, int type, unsigned char *data, int size);
 
 #endif

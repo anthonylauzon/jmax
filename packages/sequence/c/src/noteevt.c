@@ -25,6 +25,7 @@
  */
 #include "fts.h"
 #include "sequence.h"
+#include "seqmidi.h"
 #include "eventtrk.h"
 #include "noteevt.h"
 
@@ -120,6 +121,27 @@ noteevt_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
 /**************************************************************
  *
+ *  export to MIDI file
+ *
+ */
+void 
+noteevt_export_midi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  noteevt_t *this = (noteevt_t *)o;
+  fts_midifile_t *file = (fts_midifile_t *)fts_get_ptr(at);
+  double time = event_get_time(&this->head);
+  double time_off = time + this->duration;
+  long time_in_ticks = fts_midifile_seconds_to_ticks(file, time);
+  eventtrk_t *track = seqmidi_write_get_track(file);
+  noteoffevt_t *noteoff = seqmidi_write_get_note_off(file, this->pitch);
+  fts_midifile_write_note_on(file, time_in_ticks, 1, this->pitch, 64); /* channel 1, velocity 64 */
+
+  /* insert temporary note off event into track */
+  eventtrk_add_event_after(track, time_off, (event_t *)noteoff, (event_t *)this);
+}
+
+/**************************************************************
+ *
  *  class
  *
  */
@@ -136,7 +158,7 @@ noteevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("pitch"), noteevt_pitch);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("duration"), noteevt_duration);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("print"), noteevt_print);
-  /*fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("export_midi"), noteevt_export_midi);*/
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("export_midi"), noteevt_export_midi);
 
   return fts_Success;
 }
@@ -147,18 +169,4 @@ noteevt_config(void)
   noteevt_symbol = fts_new_symbol("noteevt");
 
   fts_class_install(noteevt_symbol, noteevt_instantiate);
-}
-
-/**************************************************************
- *
- *  class
- *
- */
-void 
-noteevt_export_midi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  noteevt_t *this = (noteevt_t *)o;
-  fts_midifile_t *file = (fts_midifile_t *)fts_get_ptr(at);
-
-  /*sequence_write_midi_event(*/
 }

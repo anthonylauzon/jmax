@@ -33,5 +33,6 @@ seqobj.c \
 eventtrk.c \
 intevt.c \
 noteevt.c \
+noteoffevt.c \
 messevt.c \
 floatevt.c \

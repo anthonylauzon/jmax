@@ -27,12 +27,34 @@
 #include "fts.h"
 #include "midiport.h"
 
+fts_symbol_t fts_s__midiport = 0;
+
+static fts_midiport_default_function_t fts_midiport_default_function = 0;
+
+void
+fts_midiport_config(void)
+{
+  fts_s__midiport = fts_new_symbol("_midiport");
+}
+
+fts_midiport_t *
+fts_midiport_get_default(void)
+{
+  return (fts_midiport_default_function)? fts_midiport_default_function(): 0;
+}
+
+void
+fts_midiport_set_default_function(fts_midiport_default_function_t fun)
+{
+  fts_midiport_default_function = fun;
+}
+
 void
 fts_midiport_init(fts_midiport_t *port)
 {
   int i, j;
 
-  for(i=fts_midi_status_note_off; i<=fts_midi_status_pitch_bend; i++)
+  for(i=fts_midi_status_note; i<=fts_midi_status_pitch_bend; i++)
     for(j=0; j<=16; j++)
       port->channel_message_listeners[i][j] = 0;
 
@@ -138,4 +160,15 @@ fts_midiport_system_exclusive(fts_midiport_t *port, fts_midi_status_t status, in
       l->callback.system_exclusive(l->listener, size, buf, time);
       l = l->next;
     }
+}
+
+void 
+fts_midiport_class_init(fts_class_t *cl, fts_midiport_channel_message_output_t chmess_out, fts_midiport_system_exclusive_output_t sysex_out)
+{
+  fts_midiport_class_data_t *data = (fts_midiport_class_data_t *)fts_malloc(sizeof(fts_midiport_class_data_t));
+
+  data->channel_message_output = chmess_out;
+  data->system_exclusive_output = sysex_out;
+
+  fts_class_set_user_data(cl, data);
 }

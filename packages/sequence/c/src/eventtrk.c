@@ -26,6 +26,7 @@
 #include "fts.h"
 #include "event.h"
 #include "eventtrk.h"
+#include "seqmidi.h"
 
 #define EVENTTRK_ADD_BLOCK_SIZE 256
 
@@ -380,42 +381,15 @@ eventtrk_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     }  
 }
 
-/*
+
 static void 
 eventtrk_export_to_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   eventtrk_t *this = (eventtrk_t *)o;
   fts_symbol_t file_name = fts_get_symbol(at);
-  fts_symbol_t track_name = track_get_name(&this->head);
-  note_off_fake_evt_t note_offs[128];
-  event_t *event;
-  fts_midifile_t *file;
 
-  event = eventtrk_get_first(this);
-
-  if(event)
-    {
-      file = fts_midifile_open_write(name);;
-
-      if(file)
-	{
-	  fts_midifile_write_header(file, 0, 1, 96);
-	  fts_midifile_write_tempo(file, 500000);
-	}
-      else
-	{
-	  post("sequence track %s: cannot open file %s\n", fts_symbol_name(track_name), fts_symbol_name(file_name));
-	  return;
-	}
-    }
-      
-  while(event)
-    {
-      sequence_write_midi_event(file, event);
-      event = event_get_next(event);
-    }  
+  eventtrk_write_midifile(this, file_name);
 }
-*/
 
 static fts_status_t
 eventtrk_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)

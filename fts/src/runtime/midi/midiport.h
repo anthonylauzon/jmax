@@ -27,7 +27,7 @@
 #ifndef _FTS_MIDIPORT_H_
 #define _FTS_MIDIPORT_H_
 
-#include "fts.h"
+extern fts_symbol_t fts_s__midiport;
 
 /****************************************************
  *
@@ -36,8 +36,7 @@
  */
 enum _fts_midi_status_ 
 {
-  fts_midi_status_note_off = 0, 
-  fts_midi_status_note_on, 
+  fts_midi_status_note = 0, 
   fts_midi_status_poly_pressure, 
   fts_midi_status_control_change, 
   fts_midi_status_program_change, 
@@ -49,6 +48,11 @@ enum _fts_midi_status_
 
 typedef enum _fts_midi_status_ fts_midi_status_t;
 
+/****************************************************
+ *
+ *  MIDI in callbacks and listeners
+ *
+ */
 typedef void (*fts_midiport_channel_message_callback_t)(fts_object_t *listener, int channel, int x, int y, double time);
 typedef void (*fts_midiport_system_exclusive_callback_t)(fts_object_t *listener, int size, char *buf, double time);
 
@@ -65,6 +69,11 @@ typedef struct _fts_midiport_listener_
   struct _fts_midiport_listener_ *next;
 } fts_midiport_listener_t;
 
+/****************************************************
+ *
+ *  MIDI port
+ *
+ */
 typedef struct _fts_midiport_
 {
   fts_object_t o;
@@ -73,6 +82,42 @@ typedef struct _fts_midiport_
 } fts_midiport_t;
 
 extern void fts_midiport_add_listener(fts_midiport_t *port, fts_midi_status_t status, int channel, fts_object_t *listener, fts_midiport_callback_t fun);
-extern void fts_midiport_remove_listener(struct _fts_midiport_ *port, fts_midi_status_t status, int channel, fts_object_t *listener);
+extern void fts_midiport_remove_listener(fts_midiport_t *port, fts_midi_status_t status, int channel, fts_object_t *listener);
+
+/****************************************************
+ *
+ *  MIDI out functions
+ *
+ */
+
+typedef void (*fts_midiport_channel_message_output_t)(fts_midiport_t *port, int status, int channel, int x, int y, double time);
+typedef void (*fts_midiport_system_exclusive_output_t)(fts_midiport_t *port, int ac, const fts_atom_t *at, double time);
+
+typedef struct _fts_midiport_class_data_
+{
+  fts_midiport_channel_message_output_t channel_message_output;
+  fts_midiport_system_exclusive_output_t system_exclusive_output;
+} fts_midiport_class_data_t;
+
+extern void fts_midiport_class_init(fts_class_t *cl, 
+				    fts_midiport_channel_message_output_t channel_message_output,
+				    fts_midiport_system_exclusive_output_t system_exclusive_output);
+
+#define fts_midiport_output_channel_message(p, s, c, x, y, t) \
+  (((fts_midiport_class_data_t *)fts_object_get_user_data((fts_object_t *)p))->channel_message_output((p), (s), (c), (x), (y), (t)))
+
+#define fts_midiport_output_system_exclusive(p, n, a, t) \
+  (((fts_midiport_class_data_t *)fts_object_get_user_data((fts_object_t *)p))->system_exclusive_output((p), (n), (a), (t)))
+
+
+/****************************************************
+ *
+ *  default MIDI port
+ *
+ */
+typedef fts_midiport_t * (*fts_midiport_default_function_t)(void);
+
+extern void fts_midiport_set_default_function(fts_midiport_default_function_t fun);
+extern fts_midiport_t *fts_midiport_get_default(void);
 
 #endif
