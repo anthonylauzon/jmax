@@ -113,10 +113,6 @@ SOURCE=..\fts\autosave.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\buffer.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\fts\bytestream.c
 # End Source File
 # Begin Source File
@@ -282,6 +278,10 @@ SOURCE=..\fts\soundfile_def.c
 # Begin Source File
 
 SOURCE=..\fts\srconv.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\fts\stack.c
 # End Source File
 # Begin Source File
 
