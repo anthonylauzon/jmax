@@ -56,7 +56,7 @@ public class ErmesToolBar extends JPanel  {
 
   ButtonGroup bGroup;
   JToggleButton noneButton;
-  JToggleButton selectedButton = null;
+  ErmesToolButton selectedButton = null;
 
   public ErmesToolBar( ErmesSketchPad theSketchPad)
   {
