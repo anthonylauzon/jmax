@@ -170,7 +170,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     g.fill3DRect(itsX+2, itsY+2, currentRect.width-4, currentRect.height-4, true);
     
     g.setColor(Color.white);
-    g.fillRect(itsX+8, itsY+2, currentRect.width-(WIDTH_DIFF), currentRect.height-HEIGHT_DIFF-4);
+    g.fillRect(itsX+8, itsY+2, currentRect.width-(WIDTH_DIFF+4), currentRect.height-HEIGHT_DIFF-4);
     g.setColor(Color.black);
     g.drawRect(itsX+0, itsY+0, currentRect.width-1, currentRect.height-1);
     
@@ -197,14 +197,14 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     else if(itsJustification == itsSketchPad.LEFT_JUSTIFICATION){
       for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
 	aString = (String)e.nextElement();
-	theGraphics.drawString(aString, itsX+WIDTH_DIFF-4, itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	theGraphics.drawString(aString, itsX+WIDTH_DIFF/*-4*/, itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
 	i++;
       }
     }
     else if(itsJustification == itsSketchPad.RIGHT_JUSTIFICATION){
       for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
 	aString = (String)e.nextElement();
-	theGraphics.drawString(aString, itsX+(currentRect.width-itsFontMetrics.stringWidth(aString))-(WIDTH_DIFF-4), itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	theGraphics.drawString(aString, itsX+(currentRect.width-itsFontMetrics.stringWidth(aString))-(WIDTH_DIFF/*-4*/), itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
 	i++;
       }
     }

@@ -89,9 +89,9 @@ class ErmesObjMessage extends ErmesObjEditableObject {
     itsSketchPad.GetEditField().itsOwner = this; //redirect the only editable field to point here...
     
     if(itsParsedTextVector.size()==0)
-      itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), itsFontMetrics.getHeight()*2);
+      itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight()*2);
     else
-      itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
+      itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
     
     itsParsedTextVector.removeAllElements();
     
@@ -150,7 +150,7 @@ class ErmesObjMessage extends ErmesObjEditableObject {
     
     if(itsFlashing) g.setColor(itsLangSelectedColor);
     else g.setColor(Color.white);
-    g.fillRect(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), currentRect.height-HEIGHT_DIFF);
+    g.fillRect(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-/*6*/2), currentRect.height-HEIGHT_DIFF);
     g.setColor(Color.black);
     g.drawRect(itsX+0, itsY+0, currentRect.width-1, currentRect.height-1);
     
@@ -176,14 +176,14 @@ class ErmesObjMessage extends ErmesObjEditableObject {
     else if(itsJustification == itsSketchPad.LEFT_JUSTIFICATION){
       for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
 	aString = (String)e.nextElement();
-	theGraphics.drawString(aString, itsX+(WIDTH_DIFF-6), itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	theGraphics.drawString(aString, itsX+(WIDTH_DIFF-/*6*/2), itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
 	i++;
       }
     }
     else if(itsJustification == itsSketchPad.RIGHT_JUSTIFICATION){
       for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
 	aString = (String)e.nextElement();
-	theGraphics.drawString(aString, itsX+(currentRect.width-itsFontMetrics.stringWidth(aString))-(WIDTH_DIFF-6), itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	theGraphics.drawString(aString, itsX+(currentRect.width-itsFontMetrics.stringWidth(aString))-(WIDTH_DIFF/*-6*/-2), itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
 	i++;
       }
     }
