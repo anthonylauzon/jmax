@@ -65,7 +65,8 @@ dsp_control_poll(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   int overflow_fpe;
   unsigned int fpe_state;
 
-  if (fts_dsp_is_running() && fts_audioport_report_xrun())
+#warning (OLD API) dsp_control_poll use fts_audioport_report_xrun (OLD _API)
+  if (fts_dsp_is_running()/*  && fts_audioport_report_xrun() */)
     dac_slip = 1;
   else
     dac_slip = 0;

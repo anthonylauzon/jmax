@@ -49,7 +49,8 @@ input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     outlets = ac;
 
   this->port = 0;
-  this->port = fts_audioport_get_default(o);
+#warning (OLD API) input_init use fts_audioport_get_default (OLD API)
+/*   this->port = fts_audioport_get_default(o); */
   if ( !this->port)
     {
       fts_object_set_error( o, "default audio port is not defined");
@@ -60,13 +61,14 @@ input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   if ( ac != 0)
     {
-      for ( i = 0; i < outlets; i++)
-	fts_audioport_add_input_object( this->port, fts_get_int(at + i) - 1, (fts_object_t *)this);
+#warning (OLD API) input_init use fts_audioport_add_input_object (OLD API)
+/*       for ( i = 0; i < outlets; i++) */
+/* 	fts_audioport_add_input_object( this->port, fts_get_int(at + i) - 1, (fts_object_t *)this); */
     }
   else
     {
-      for ( i = 0; i < 2; i++)
-	fts_audioport_add_input_object( this->port, i, (fts_object_t *)this);
+/*       for ( i = 0; i < 2; i++) */
+/* 	fts_audioport_add_input_object( this->port, i, (fts_object_t *)this); */
     }
   fts_dsp_active_add_listener(o, input_dsp_active);
 }
@@ -79,9 +81,9 @@ input_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if(this->port)
     {
       int i;
-
-      for ( i = 0; i < fts_object_get_outlets_number( o); i++)
-	fts_audioport_remove_input_object( this->port, i, (fts_object_t *)this);
+#warning (OLD API) input_delete use fts_audioport_remove_input_object (OLD API)
+/*       for ( i = 0; i < fts_object_get_outlets_number( o); i++) */
+/* 	fts_audioport_remove_input_object( this->port, i, (fts_object_t *)this); */
     }
   fts_dsp_active_remove_listener(o);
 }

@@ -85,10 +85,12 @@ monitor_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   
   if(this->port)
     {
-      fts_object_t *outdispatcher = fts_audioport_get_output_dispatcher(this->port);
+#warning (OLD API) monitor_propagate_input use fts_audioport_get_output_dispactcher and \
+fts_audioport_get_output_channel (OLD API)
+/*       fts_object_t *outdispatcher = fts_audioport_get_output_dispatcher(this->port); */
       
-      if(outdispatcher && fts_audioport_get_output_channels(this->port) >= 2)
-	(*propagate_fun)(propagate_context, outdispatcher, inlet);
+/*       if(outdispatcher && fts_audioport_get_output_channels(this->port) >= 2) */
+/* 	(*propagate_fun)(propagate_context, outdispatcher, inlet); */
     }
 }
 
@@ -99,7 +101,8 @@ monitor_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   this->port = 0;
 
-  this->port = fts_audioport_get_default(o);
+#warning (OLD API) monitor_init use fts_audioport_get_default (OLD API)
+/*   this->port = fts_audioport_get_default(o); */
   if (!this->port)
     {
       fts_object_set_error( o, "default audio port is not defined");
