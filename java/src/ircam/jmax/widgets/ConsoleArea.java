@@ -42,7 +42,7 @@ import ircam.jmax.editors.patcher.*;
  * A <code>ConsoleArea</code> Swing component is a component for
  * fast display of text lines.
  * It is read-only and cannot be used for copying text.
- * @author	François Déchelle
+ * @author	Francois Dechelle
  * @since	2.4.9
  */
 
