@@ -1853,16 +1853,13 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     if (editStatus == AREA_SELECT) {
       g.drawImage(offImage,0,0, this);
       g.setColor(Color.black);
-      g.drawRect(currentRect.x, currentRect.y, currentRect.width-1, currentRect.height-1);
+      g.drawRect(currentRect.x, currentRect.y, currentRect.width, currentRect.height);
     }
     else if (editStatus == RESIZING_OBJECT) {
       int x, y, w, h;
       g.drawImage(offImage,0,0, this);
-      //if ((currentResizeRect.x + currentResizeRect.width >=itsResizingObject.currentRect.x + 20)&&
-      //  (currentResizeRect.y + currentResizeRect.height>=itsResizingObject.currentRect.y+20)) {
-	g.setColor(Color.black);
-	g.drawRect(currentResizeRect.x, currentResizeRect.y, currentResizeRect.width-1, currentResizeRect.height-1);
-	//}
+      g.setColor(Color.black);
+      g.drawRect(currentResizeRect.x, currentResizeRect.y, currentResizeRect.width, currentResizeRect.height);
     }
     else if (editStatus == MOVING){
       g.drawImage(offImage,0,0, this);
@@ -1875,7 +1872,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       aInclusionRect.x+=(currentMouseX-itsStartMovingPt.x);
       aInclusionRect.y+=(currentMouseY-itsStartMovingPt.y);
       g.drawRect(aRect.x, aRect.y, aRect.width-1, aRect.height-1);
-      g.drawRect(aInclusionRect.x, aInclusionRect.y, aInclusionRect.width-1, aInclusionRect.height-1);
+      g.drawRect(aInclusionRect.x, aInclusionRect.y, aInclusionRect.width, aInclusionRect.height);
       return;
     }
     else if (editStatus == MOVINGSEGMENT){
