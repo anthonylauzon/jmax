@@ -99,95 +99,10 @@ public class EditMenu extends EditorMenu
 
   public void updateMenu()
   {
-/*
-    DataFlavor[] flavors = null;
-    Transferable clipboardContent = JMaxApplication.getSystemClipboard().getContents(this);
-    if( clipboardContent != null)
-      flavors = clipboardContent.getTransferDataFlavors();
-
-    if (sketch.isLocked())
-      {
-	lockItem.setText("Unlock");
-	selectAllItem.setEnabled(false);
-	cutItem.setEnabled(false);
-	copyItem.setEnabled(false);
-	duplicateItem.setEnabled(false);
-	
-	if( clipboardContent != null)
-	  pasteItem.setEnabled((flavors != null) && 
-			       clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor));
-	else
-	  pasteItem.setEnabled( false);
-
-	inspectItem.setEnabled(false);
-      }
-    else
-      {
-	lockItem.setText("Lock");
-
-	if (sketch.isTextEditingObject())
-	  {
-	    // Text editing, look at text selection
-
-	    if (sketch.getSelectedText() != null)
-	      {
-			 cutItem.setEnabled(true);
-			 copyItem.setEnabled(true);
-	      }
-	    else
-	      {
-		cutItem.setEnabled(false);
-		copyItem.setEnabled(false);
-	      }
-
-	    duplicateItem.setEnabled(false);
-
-	    if( clipboardContent != null)
-	      pasteItem.setEnabled((flavors != null) &&
-				   clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor));
-	    else
-	      pasteItem.setEnabled( false);
-	  }
-	else
-	  {
-	    if (ErmesSelection.patcherSelection.isEmpty())
-	      {
-		// Empty selection
-
-		cutItem.setEnabled(false);
-		copyItem.setEnabled(false);
-		duplicateItem.setEnabled(false);
-		inspectItem.setEnabled(false);
-		alignMenu.setEnabled(false);
-		toFrontMenuItem.setEnabled(false);
-		toBackMenuItem.setEnabled(false);
-	      }
-	    else if (ErmesSelection.patcherSelection.getOwner() == sketch)
-	      {
-		// Object selection
-
-		cutItem.setEnabled(true);
-		copyItem.setEnabled(true);
-		duplicateItem.setEnabled(true);
-		inspectItem.setEnabled(true);
-		alignMenu.setEnabled(true);
-		toFrontMenuItem.setEnabled(true);
-		toBackMenuItem.setEnabled(true);
-	      }
-
-	    if( clipboardContent != null)
-	      pasteItem.setEnabled((flavors != null) &&
-				   clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor));
-	    else
-	      pasteItem.setEnabled( false);
-	  }
-
-	selectAllItem.setEnabled(true);	
-      }
-
-	 undoAction.putValue(undoAction.NAME, "Undo " + sketch.getUndoType());
-	 redoAction.putValue(redoAction.NAME, "Redo " + sketch.getUndoType());
-*/
+		if(sketch.isLocked())
+			lockAction.putValue(EditorAction.NAME, "Unlock");
+		else
+			lockAction.putValue(EditorAction.NAME, "Lock");
   }
 }
 
