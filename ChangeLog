@@ -27,6 +27,8 @@
 
 	* merge fts_kernel_init and fts_kernel_classes_config
 
+	* add a null audio port that is always valid but never opened and that corresponds to the name "-"
+
 	
 2003-02-04  Diemo Schwarz  <schwarz@ligeti.ircam.fr>
 

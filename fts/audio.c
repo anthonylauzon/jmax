@@ -712,6 +712,51 @@ audio_sched_instantiate(fts_class_t *cl)
 
 /***********************************************************************
  *
+ * null audio port object
+ *
+ */
+
+static void nullaudioport_open(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+}
+
+static void nullaudioport_close(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+}
+
+static void nullaudioport_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  fts_audioport_t* self = (fts_audioport_t*)o;
+  
+  fts_audioport_init(self);
+  fts_audioport_set_valid(self, FTS_AUDIO_INPUT);
+  fts_audioport_set_valid(self, FTS_AUDIO_OUTPUT);
+
+  fts_audioport_set_channels(self, FTS_AUDIO_INPUT, 2);
+  fts_audioport_set_channels(self, FTS_AUDIO_OUTPUT, 2);
+  
+}
+
+static void nullaudioport_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  fts_audioport_t* self = (fts_audioport_t*)o;
+  
+  fts_audioport_delete(self);
+}
+
+static void nullaudioport_instantiate(fts_class_t* cl)
+{
+  fts_class_init(cl, sizeof(fts_audioport_t), nullaudioport_init, nullaudioport_delete);
+  fts_class_message_varargs(cl, fts_s_open_input, nullaudioport_open);
+  fts_class_message_varargs(cl, fts_s_open_output, nullaudioport_open);
+  
+  fts_class_message_varargs(cl, fts_s_close_input, nullaudioport_close);
+  fts_class_message_varargs(cl, fts_s_close_output, nullaudioport_close);
+}
+
+
+/***********************************************************************
+ *
  * Initialization
  *
  */
@@ -719,6 +764,7 @@ audio_sched_instantiate(fts_class_t *cl)
 void fts_audio_config( void)
 {
   fts_class_t *audio_sched_class;
+  fts_class_t* nullaudioport_class;
   fts_object_t *audio_sched;
 
   audiolabel_listeners_heap = fts_heap_new( sizeof( audiolabel_listener_t));
@@ -734,6 +780,9 @@ void fts_audio_config( void)
 
   audio_sched_class = fts_class_install( NULL, audio_sched_instantiate);
   audio_sched = fts_object_create( audio_sched_class, 0, 0);
+
+  nullaudioport_class = fts_class_install(NULL, nullaudioport_instantiate);
+  fts_audiomanager_put_port(fts_s_unconnected, (fts_audioport_t*)(fts_object_create(nullaudioport_class, 0, NULL)));
 }
 
 /** EMACS **
