@@ -1,8 +1,11 @@
-# $Id: Makefile.am,v 1.19 2003/07/23 12:16:13 p_tisserand Exp $
+# $Id: Makefile.am,v 1.20 2004/02/13 09:41:52 p_tisserand Exp $
 #
 # sequence package source Makefile.am
 #
 # $Log: Makefile.am,v $
+# Revision 1.20  2004/02/13 09:41:52  p_tisserand
+# Added -release version libtool flag.
+#
 # Revision 1.19  2003/07/23 12:16:13  p_tisserand
 # Changed installation directory of packages.
 # Now packages are installed in ${libdir}/jmax/packages.
@@ -115,7 +118,7 @@ track.c
 
 # package can include fts headers, other packages' headers, and its
 # own exported headers from exported headers
-INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/packages/sequence/c/include
+INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/packages/sequence/c/include -I$(top_srcdir)/packages/data/c/include -I$(top_srcdir)/packages/utils/c/include
 
 noinst_HEADERS= \
 internal_sequence.h \
