@@ -1287,6 +1287,8 @@ void fts_client_unregister_object(fts_object_t *obj)
       fts_log("[client] fts_client_release_object: Cannot release object\n");      
       return;
     }
+    
+    fts_send_message_varargs( obj, fts_s_closeEditor, 0, 0);
     client_release_object( client, obj);
   }
 }
