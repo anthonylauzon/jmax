@@ -18,19 +18,18 @@
 <BR>
 
 <UL TYPE=SQUARE>
-  <LI><A HREF=../index.html>documentation</A>
+  <LI><A HREF=../index.html>Documentation</A>
   <UL TYPE=SQUARE>
-    <LI><A HREF=index.html>user documentation</A>
+    <LI><A HREF=index.html>User Documentation</A>
   </UL>
 </UL>
 
 
-<FONT COLOR=#FFFFFF SIZE=+3><b>getting started</b></FONT>
+<FONT COLOR=#FFFFFF SIZE=+3><b>Getting Started</b></FONT>
 <UL TYPE=DOT>
   <LI><A HREF="#running">Running jMax</A>
   <LI><A HREF="#arguments">Command Line Arguments</A>
   <LI><A HREF="#.jmaxrc">The file <TT>.jmaxrc</TT></A>
-  <LI><A HREF="#site.tcl">The file <TT>config/site.tcl</TT></A>
 </UL>
 
 <HR NOSHADE SIZE=1>
@@ -52,12 +51,16 @@ This script accepts a set of options (see <B><TT> jmax -help </TT></B> for descr
 that are either interpreted by the script or passed as command line arguments
 to the Java application.
 
+<p>
+<HR>
+
 <A NAME="arguments"> 
 <h2>Command Line Arguments</h2>
 
 <P>
 <I>j</I>Max uses a number of <I>configuration parameters</I> to parametrize the system
 at startup.
+
 These parameters appear as TCL variables and can be also set via the command line:
 
 <UL>
@@ -70,9 +73,11 @@ in the user or site specific configuration files (see down).
 
 <p>
 The chapters
-<A HREF="configuration/system.html">system configuration</A> and 
-<A HREF="configuration/ioconf.html">i/o configuration</A>
+<A HREF="config/system.html">system configuration</A> and 
+<A HREF="config/io.html">i/o configuration</A>
 of this documentaion explain the different <i>j</i>Max configuration parameters.
+At least one of the <A HREF="config/system.html#host">host parameters</A> 
+should be set properly in order to start <i>j</i>Max in a default setup.
 
 <P>
 The user can implicitly define his own options in the command line using the same syntax
@@ -96,6 +101,9 @@ For example in the following construct:
   <dt><tt>if{[systemProperty myOption] == "pho"} {...}</tt>
 </ul>
 
+<p>
+<HR>
+
 <A NAME=".jmaxrc">
 <h2>The file <B><TT>.jmaxrc</TT></B></h2>
 
@@ -104,10 +112,10 @@ The user can customize the <i>j</i>Max environment including the configuration p
 in the <TT>.jmaxrc</TT> file in his home directory:
 
 <UL>
-  <LI>set the <A HREF="configuration/system.html">system configuration </A> and 
-      <A HREF="configuration/ioconf.html">i/o configuration</A>
-  <LI>customize the <A HREF="configuration/projects.html">project environment</A> for your patches
-  <LI>preload <i>j</i>Max <A HREF="configuration/packages.html">packages</A>
+  <LI>set the <A HREF="config/system.html">system configuration </A> and 
+      <A HREF="config/io.html">i/o configuration</A>
+  <LI>customize the <A HREF="projects.html">project environment</A> for your patches
+  <LI>preload <i>j</i>Max <A HREF="packages.html">packages</A>
 </UL>
 
 <P>
@@ -133,39 +141,25 @@ An example is given the following:
 <PRE>
 # --- beginning of .jmaxrc
 
-set jmaxArch  origin
+set jmaxHostType octane
 
 when start {
 
     jmaxSetSampleRate 44100
     jmaxSetAudioBuffer 1024
 
-    puts "MIDI configuration: SerialPort2"
+    openDefaultAudioIn AnalogIn
     openDefaultMidi SerialPort2
-
-    puts "audio configuration: Analog 2/2"
-    openDefaultAudioIn AnalogIn 2 
 }
 
 # --- end of .jmaxrc
 </PRE>
 
-<A NAME="site.tcl">
-<h2>The file <B><TT>config/site.tcl</TT></B></h2>
-
 <P>
-Even before the <TT>.jmaxrc</TT> file <i>j</i>Max loads the file 
-<TT>config/site.tcl</TT> in the <i>j</i>Max installation directory.
-
-<P>
-Just like <TT>.jmaxrc</TT> it can contain any TCL code.<BR>
-It's main interests is to define site specific TCL functions to simplify 
-the user configuration for a specific <i>j</i>Max installation. 
-Typically this is a TCL function for each kind of configuration provided by your site,
-which can be called in the user <TT>.jmaxrc</TT> file.
-
-<P>
-See the <TT>config/site.tcl</TT> file in the distribution for an example.
+Site specific configuration parameter settings and commands should
+go in the file <A HREF=../user/installation.html#site><tt>config/site.tcl</tt></A>, 
+which is customized when <A HREF="../user/installation.html">installing</A> 
+<i>j</i>Max on a specific machine or several machines in a local network.
 
 <P>
 </TABLE>

@@ -18,13 +18,13 @@
 <BR>
 
 <UL TYPE=SQUARE>
-  <LI><A HREF=../index.html>documentation</A>
+  <LI><A HREF=../index.html>Documentation</A>
   <UL TYPE=SQUARE>
-    <LI><A HREF=index.html>user documentation</A>
+    <LI><A HREF=index.html>User Documentation</A>
   </UL>
 </UL>
 
-<FONT COLOR=#FFFFFF SIZE=+3><b>project environment settings</b></FONT>
+<FONT COLOR=#FFFFFF SIZE=+3><b>Project Environment Settings</b></FONT>
 <UL TYPE=DOT>
   <LI><A HREF="#disclamier"> Disclamier </A>
   <LI><A HREF="#project"> What is a Project?</A>
@@ -33,12 +33,13 @@
   <LI><A HREF="#example"> Project File Example</A>
 </UL>
 
+<A NAME="disclamier"> 
 <HR NOSHADE SIZE=1>
 <TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
 <TR><TD>
   
-<A NAME="disclamier"> 
 <H2> Disclamier </H2>
+
 <P>
 The current version of <I>j</I>Max use TCL as its
 scripting language, and the feature described in this document is
@@ -48,7 +49,9 @@ will change, will be implemented with a different language and/or
 syntax, or will simply vanish.
 <P>
 
+<P>
 <A NAME="project">
+<HR>
 <H2> What is a Project?</H2>
 
 <P>
@@ -79,9 +82,10 @@ Currently <I>j</I>Max provide a simple mechanism to load/install all the compone
 by means of a script file, 
 and, thru the <A HREF="packages.html"> packages </A>, a way to handle depedencies; future
 release will introduce more functionalities.
-<P>
 
+<P>
 <A NAME="env">
+<HR>
 <H2> The Project File </H2>
 
 <P>
@@ -112,7 +116,7 @@ project directory, so that no dependency on the absolute path need to be coded i
 The project file can contains a number of TCL commands that load or
 install the different kind of components in <I>j</I>Max; for this release, the commands
 needed to install user developed libraries (<code>C</code> or <code>Java</code>) are
-not documented; the project file can also, in special case, contains <A HREF="ioconf.html">
+not documented; the project file can also, in special case, contains <A HREF="config/io.html">
 I/O configuration commands</A>, when you want to be sure that a project run 
 in a specific configuration.
 
@@ -122,14 +126,16 @@ a project file; we suggest, for the moment, to restart before changing project.
 
 <p>
 Note that in some sense you can consider your <A
-HREF="../getting_started.html#.jmaxrc"><code>.jmaxrc</code> </A> file
+HREF="getting_started.html#.jmaxrc"><code>.jmaxrc</code> </A> file
 as a default project file; all the commands available in the project
 file can be put in the <code>when start</code> hook, and thus apply to
 all the patches loaded in all the session; this is usefull while
 developping small applications that do not require a project
 organization.
 
+<P>
 <A NAME="commands">
+<HR>
 <H2> Commands</H2>
 
 <p>
@@ -187,7 +193,10 @@ scripting language will the following commands, possibly with a different syntax
     string) to the <I>j</I>Max  console when the project file is loaded.<p>
 
 </DL>
+
+<P>
 <A NAME="example">
+<HR>
 <H2> Project File Example</H2>
 
 <pre>

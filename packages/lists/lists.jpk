@@ -13,6 +13,6 @@ template listcompose $dir/templates/listcompose.jmax
 template listdecompose $dir/templates/listdecompose.jmax
 
 ## load the help patch data base
-#sourceFile $dir/help/lists.help.index.tcl
+sourceFile $dir/help/lists.help.index.tcl
 
 post "package: lists (basic list handling classes)"

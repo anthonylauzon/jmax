@@ -1,0 +1,167 @@
+<HTML>
+<HEAD>
+<TITLE> jMax I/O Configuration </TITLE>
+</HEAD>
+
+<BODY TEXT="#000000" BGCOLOR="#CCCCCC" LINK="#000000" VLINK="#000000">
+
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=0>
+<TR>
+  <TD ALIGN=LEFT>
+    <A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../../images/jmax_logo_tiny.gif" BORDER=0 ALT="jMax"></A>
+  </TD>
+  <TD ALIGN=RIGHT>
+    <A HREF="http://www.ircam.fr/"><IMG SRC="../../images/ircam_banner.gif" BORDER=0 ALT="IRCAM - Centre Georges Pompidou"></A>
+  </TD>
+</TR>
+</TABLE>
+<BR>
+
+<UL TYPE=SQUARE>
+  <LI><A HREF=../../index.html>documentation</A>
+  <UL TYPE=SQUARE>
+    <LI><A HREF=../index.html>User Documentation</A>
+  </UL>
+</UL>
+
+<FONT COLOR=#FFFFFF SIZE=+3><b>I/O Configuration</b></FONT>
+<UL TYPE=DOT>
+  <LI><A HREF="#disclamier">Disclamier</A>
+  <LI><A HREF="#introduction">Introduction</A>
+  <LI><A HREF="#audio">Audio Configuration</A>
+  <LI><A HREF="#midi">MIDI Configuration</A>
+</UL>
+
+<A NAME="disclamier"> 
+<HR NOSHADE SIZE=1>
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
+<TR><TD>
+  
+<H2> Disclamier </H2>
+
+<P>
+The current version of <I>j</I>Max use TCL as its
+scripting language, and the feature described in this document is
+currently based on TCL; future version of <I>j</I>Max may
+use a different scripting language, so the features described here
+will change, will be implemented with a different language and/or
+syntax, or will simply vanish.
+
+<p>
+<A NAME="introduction">
+<HR>
+<H2> Introduction   </H2>
+
+<P>
+Since a patch can be used on different platforms, platform specific information 
+should not be included in the patches themselves, but specified in site, user or 
+project configuration files.
+
+<p>
+For each host type 
+(see section <A HREF="system.html#host">host parameters</A>) 
+supported by <i>j</i>Max a set of i/o devices is defined, which can be used with
+these commands.
+Refer to the index of <A HREF="hosttypes.html">supported host types</A> to see which 
+audio devices are provided for each of them.
+
+<p>
+<A NAME="audio">
+<HR>
+<H2>Audio Configuration</H2>
+
+<P>
+The following set of commands handles the audio configuration.
+The first two of them are used to set the audio configuration parameters
+and should be used before the others.
+
+<DL>
+  <DT><tt><b>jmaxSetSampleRate</b></tt> <i>sr</i><p>
+  <DD> 
+    Set the <i>j</i>Max global sampling rate.<BR>
+    (<b>Note</b>: For now, the user himself must keep the sampling rate 
+    given for <i>j</i>Max consistent with the settings of the physical 
+    device using the utillities provided by the operating system, like
+    the SGI <tt>audiopanel</tt> application.)<p>
+
+  <DT><tt><b>jmaxSetAudioBuffer</b></tt> <i>buf</i><p>
+  <DD> 
+    Set the length of the audio buffer used, i.e. the length, in samples, 
+    of the output FIFO used to compensate the variation of load in <i>j</i>Max.
+    Typical values are between <tt>256</tt> and <tt>1024</tt>, can be more
+    or less depending on the application.<BR>
+    Lower values cause lower i/o latencies, while higher values reduce possible
+    audio clicks caused by system overloads.<p>
+
+  <DT><tt><b>openDefaultAudioIn</b></tt> <i>device</i><p>
+  <DD>
+    Open the audio input device <i>device</i> as the default audio device,
+    i.e. the device used by the <tt>adc~</tt> object.<p>
+
+  <DT><tt><b>openAudioIn</b></tt> <i>name</i> <i>device</i><p>
+  <DD> 
+    Open a input device named <i>name</i> connected to the objects <tt>in~</tt> 
+    which have <i>name</i> as first argument 
+    (allowing the use of multiple input devices - one for each object).<p>
+
+  <DT><tt><b>resetAudioIn</b></tt><p>
+  <DD> 
+    Reset the effects of the previous commands, i.e. close all the input audio devices,
+    and delete the registered names (usefull in projects files or other situation where
+    a clean input configuration must be installed from scratch).<p>
+
+  <DT><tt><b>openDefaultAudioOut</b></tt> <i>device</i><p>
+  <DD>
+    Open the audio output device <i>device</i> as the default audio device,
+    i.e. the device used by the <tt>dac~</tt> objects.<p>
+
+  <DT><tt><b>openAudioOut</b></tt> <i>name</i> <i>device</i><p>
+  <DD> 
+    Open an output device named <i>name</i> connected to the objects <tt>out~</tt> 
+    that have <i>name</i> as first argument
+    (allowing the use of multiple output devices - one for each object).<p>
+
+   <DT><tt><b>resetAudioOut</b></tt> <p>
+  <DD> 
+    Reset the effects of the previous commands, i.e. close all the output audio devices,
+    and delete the registered names (usefull in projects files or other situation where
+    a clean output configuration must be installed from scratch).<p>
+</DL>
+
+<p>
+<A NAME="midi">
+<HR>
+<H2>MIDI Configuration</H2>
+
+<P>
+These commands handle the MIDI configuration:
+
+<DL>
+  <DT><tt><b>openDefaultMidi</b></tt> <i>device</i><p>
+  <DD>
+    Open the MIDI device <i>device</i> as the default MIDI port, 
+    i.e. the device used by all the MIDI objects without a port number argument.<p>
+
+  <DT><tt><b>openMidi</b></tt> <i>num</i> <i>device</i><p>
+  <DD>
+    Open the MIDI device <i>device</i> as the MIDI port installed on port number <i>num</i>
+    i.e. the device used by all the MIDI objects with a port number argument of 
+    <i>num</i>.
+    A device installed with port number of <tt>0</tt> will be used by all the MIDI related 
+    object without a MIDI port number.<p>
+
+  <DT><tt><b>resetMidi</b></tt> <p>
+  <DD> 
+    Reset the effects of the previous commands, i.e. close all the MIDI devices,
+    and delete the registered port number (usefull in projects files or other situation where
+    a clean MIDI configuration must be installed from scratch).<p>
+</DL>
+
+<P>
+</TABLE>
+<HR NOSHADE SIZE=1>
+ 
+</BODY>
+</HTML>
+
+

@@ -129,6 +129,9 @@ typedef struct _fts_wrap_value
 #define fts_wrap_value_set(wv) \
   (fts_wrapper_set_raw(&(wv)->wrapper, (wv)->value))
 
+#define fts_wrap_value_set_with_offset(wv, offset) \
+  (fts_wrapper_set_raw(&(wv)->wrapper, (wv)->value) + (offset))
+
 #define fts_wrap_value_get_int(wv, range) \
   (fts_wrapper_get_integer(&(wv)->wrapper, (range)))
 
