@@ -185,7 +185,7 @@ public class FtsObject implements Serializable
     return server;
   }
 
-  public final int getID()
+  final int getID()
   {
     return id;
   }

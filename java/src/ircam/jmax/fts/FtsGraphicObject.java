@@ -150,10 +150,11 @@ public class FtsGraphicObject extends FtsObject {
   }
   
   protected transient FtsArgs args = new FtsArgs();
-  
+  protected int objectID = -1;
   public FtsGraphicObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom args[], int offset, int length)
   {
     this( server, parent, id, className, args[offset].stringValue);
+    this.objectID = id;
   }
 
   public FtsGraphicObject(FtsServer server, FtsObject parent, int id, String className, String description)
@@ -161,11 +162,13 @@ public class FtsGraphicObject extends FtsObject {
     super(server, parent, id);
     this.description = description;
     this.className = className;
+    this.objectID = id;
   }
 
   public FtsGraphicObject(FtsServer server, FtsObject parent, int id)
   {
     super(server, parent, id);
+    this.objectID = id;
   }
 
   public FtsGraphicObject(FtsServer server, FtsObject parent, FtsSymbol className) throws IOException
@@ -689,7 +692,11 @@ public class FtsGraphicObject extends FtsObject {
   {
     description = descr;
   }
-
+  
+  public int getObjectID()
+  {
+    return objectID;
+  }
   public boolean isARootPatcher()
   {
     return (getParent() == JMaxApplication.getRootPatcher());

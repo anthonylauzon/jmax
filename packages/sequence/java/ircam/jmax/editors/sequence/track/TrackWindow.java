@@ -122,7 +122,7 @@ public class TrackWindow extends JFrame implements EditorContainer{
       makeMenuBar();
 		
     validate();
-		if( !trackData.editorObject.haveContent())
+		if(trackData.editorObject != null && !trackData.editorObject.haveContent())
 			pack();
   }
 	
