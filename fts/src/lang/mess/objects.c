@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.30 $ IRCAM $Date: 1998/06/05 13:35:50 $
+ *      $Revision: 1.31 $ IRCAM $Date: 1998/06/26 15:43:03 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -179,6 +179,14 @@ fts_object_new(fts_patcher_t *patcher, long id, int aoc, const fts_atom_t *aot)
 #else
 #define at aot  
 #define ac aoc
+#endif
+
+#if 0
+  /* DEBUG TRACE */
+  fprintf(stderr, "Creating object ");
+  fprintf_atoms(stderr, aoc, aot);
+  fprintf(stderr, "\n");
+  /* DEBUG TRACE END*/
 #endif
 
   /* Explicit check for zero arguments; in this case, we

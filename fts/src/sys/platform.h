@@ -13,77 +13,85 @@
  *
  */
 
-
-
 #ifndef _PLATFORM_H
 #define _PLATFORM_H
 
-#if defined(GNU)		/* gnu (gcc) standard basic platform */
+/*********************************************************************
+ *
+ *  gnu (gcc) standard basic platform
+ *
+ */
+#if defined(GNU)
 
-/* Needed for compatibility with the newer restrict keyword */
-#define restrict
-
+#define FTS_ARCH_NAME        "gnu"
+#define restrict /* needed for compatibility with the newer restrict keyword */
 /* #define HAS_DL */
 #define HAS_TIME_OF_THE_DAY
 #define HAS_UNROLL_BY8
 #define HAS_UNIX
-/* #define HAS_frexp_AND_ldexp_AND_modf*/ /* for rough math */
 #define VECLIB_LOOP_UNROLL 8
-
 #define FTS_USE_NAMED_PIPES
 
-#define FTS_ARCH_NAME        "gnu"
+/*********************************************************************
+ *
+ *  linux/gnu (gcc) standard basic platform
+ *
+ */
+#elif defined(LINUX)
 
-#elif defined(LINUX)		/* Linux/gnu (gcc) standard basic platform */
-
-/* Needed for compatibility with the newer restrict keyword */
-#define restrict
-
-#undef HI_OPT			/* hyper experimental optimizations */
+#define FTS_ARCH_NAME "linux"
+#define restrict /* needed for compatibility with the newer restrict keyword */
+#undef HI_OPT /* hyper experimental optimizations */
 #define HAS_DL
 #define HAS_TIME_OF_THE_DAY
 #define HAS_UNROLL_BY8
 #define HAS_UNIX
-#define HAS_OSS			/* the OSS sound system */
-/* #define HAS_frexp_AND_ldexp_AND_modf*/ /* for rough math */
+#define HAS_OSS /* the OSS sound system */
 #define VECLIB_LOOP_UNROLL 4
-
 #define FTS_USE_NAMED_PIPES
-
-#define FTS_ARCH_NAME        "linux"
 #define LITTLE_ENDIAN
 
+/*********************************************************************
+ *
+ *  different SGI platforms
+ *
+ */
 #elif defined(SGI)
 
-#define HAS_DTD			/* direct to disk support */
+#define FTS_ARCH_NAME "sgi"
+
+#if defined(IRIX6_4)
+#define HAS_PTHREADS
+#else
+#define restrict /* needed for compatibility with the newer restrict keyword */
+#endif
+
+#define HAS_DTD /* direct to disk support */
 #define HAS_DL
-#define HI_OPT			/* hyper experimental optimizations */
+#define HI_OPT /* hyper experimental optimizations */
 #define HAS_TIME_OF_THE_DAY
 #define HAS_UNROLL_BY8
 #define HAS_UNIX
-/* #define HAS_TTY_DEV */ /* DOn't commit with this on until ttydev is fixed */
-#define HAS_frexp_AND_ldexp_AND_modf /* for rough math */
-
+/* #define HAS_TTY_DEV */ /* don't commit with this on until ttydev is fixed */
 #define VECLIB_LOOP_UNROLL 8
-
 #define FTS_USE_NAMED_PIPES
 #define BIG_ENDIAN
 
-#define FTS_ARCH_NAME        "sgi"
-
+/*********************************************************************
+ *
+ *  SUN workstations solaris 2
+ *
+ */
 #elif defined(SOLARIS2)
 
-/* Needed for compatibility with the newer restrict keyword */
-#define restrict
-
+#define FTS_ARCH_NAME "solaris2"
+#define restrict /* needed for compatibility with the newer restrict keyword */
 #define HAS_DL
 #define HAS_DTD
 #define HAS_TIME_OF_THE_DAY
 #define HAS_UNROLL_BY8
 #define HAS_UNIX
 #define BIG_ENDIAN
-
-#define FTS_ARCH_NAME        "solaris2"
 
 #else
 
@@ -92,6 +100,7 @@
 #endif
 
 #endif
+
 
 
 

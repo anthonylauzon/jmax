@@ -1,4 +1,4 @@
 all	all	Makefiles
 all	all	bin
 all	all     src
-
+all	all	lib

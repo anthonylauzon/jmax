@@ -1,10 +1,3 @@
-#ifndef SOLARIS2
-#define PTHREADS /* MDC @@@ */
-#endif
-
-#ifdef PTHREADS
-#include <pthread.h>
-#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -15,7 +8,9 @@
 #include "lang/veclib/include/veclib.h"
 #include "runtime/files/post.h"
 
-
+#ifdef HAS_PTHREADS
+#include <pthread.h>
+#endif
 
 #define ASSERT(e) if (!(e)) { fprintf( stderr, "Assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}
 
@@ -67,7 +62,7 @@ struct _ftl_program_t {
   int pc;
 
   /* Profiling thread */
-#ifdef PTHREADS
+#ifdef HAS_PTHREADS
   pthread_t profile_thread;
 #endif
 };
@@ -841,7 +836,7 @@ void ftl_program_run( ftl_program_t *prog )
 #define DEFAULT_PROFILE_PERIOD_NS 23000000
 #endif
 
-#ifdef PTHREADS
+#ifdef HAS_PTHREADS
 static struct timespec profile_period = { 0, DEFAULT_PROFILE_PERIOD_NS };
 
 
@@ -885,7 +880,7 @@ static void *profile_thread_fun( void *arg)
   fprintf( stderr, "Profile thread has started\n");
 #endif
 
-#ifdef PTHREADS
+#ifdef HAS_PTHREADS
   pthread_cleanup_push( profile_thread_cleanup, 0);
 
 
@@ -902,14 +897,14 @@ static void *profile_thread_fun( void *arg)
 
 static void profile_thread_start( ftl_program_t *prog)
 {
-#ifdef PTHREADS
+#ifdef HAS_PTHREADS
   pthread_create( &prog->profile_thread, 0, profile_thread_fun, prog);
 #endif
 }
 
 static void profile_thread_stop( ftl_program_t *prog)
 {
-#ifdef PTHREADS
+#ifdef HAS_PTHREADS
   pthread_cancel( prog->profile_thread);
 #endif
 }

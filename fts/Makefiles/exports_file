@@ -519,6 +519,7 @@ fts_s_shift_left
 fts_s_shift_right
 fts_s_sig
 fts_s_sig_zero
+fts_s_size
 fts_s_smaller
 fts_s_smaller_equal
 fts_s_start
