@@ -33,6 +33,8 @@ seqmidi.c \
 eventtrk.c \
 note.c \
 message.c \
+seqref.c \
+seqfind.c \
 seqstep.c \
 seqplay.c \
 seqrec.c \

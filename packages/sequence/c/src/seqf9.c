@@ -19,6 +19,7 @@
 #include "eventtrk.h"
 #include "event.h"
 #include "note.h"
+#include "seqref.h"
 
 #define NNOTES 32
 
@@ -31,11 +32,7 @@ typedef struct _note
 
 typedef struct _seqf9
 {
-  fts_object_t ob; /* object header */  
-  sequence_t *sequence;
-  int index;
-  eventtrk_t *track;
-
+  seqref_t o;  /* sequence reference object */
   char running; /* true if we're turned on */
   char atend; /* true if we've seen the last event */
   char spoofed; /* true if we've output a speculative event */
@@ -87,15 +84,8 @@ seqf9_advanceto(seqf9_t *this, f9_note_t *newnote)
   event_t *e;
   f9_note_t *wanttail;
 
-  if(sequence_editor_is_open(this->sequence))
-    {
-      fts_atom_t a[1];
-
-      fts_set_object(a, (fts_object_t *)newnote->n_evt);
-      fts_client_send_message((fts_object_t *)this->track, seqsym_highlightEvents, 1, a);
-    }
-
-  /* send the matched note (helps monitor progress) */
+  /* highlight send the matched note (helps monitor progress) */
+  seqref_highlight_event((fts_object_t *)this, newnote->n_evt);
   fts_outlet_float((fts_object_t *)this, 0, event_get_time((event_t *)newnote->n_evt));
 
   /* update value of "lastoutput" */
@@ -154,11 +144,8 @@ seqf9_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   
   if(this->running)
     {
-      track_unlock((track_t *)this->track);
-      
-      this->track = 0;
+      seqref_unlock(o);
       this->firstev = 0;
-      
       this->running = 0;
     }
 }
@@ -264,6 +251,7 @@ static void
 seqf9_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqf9_t *this = (seqf9_t *)o;
+  eventtrk_t *track;
   double locate;
 
   seqf9_stop(o, 0, 0, 0, 0);
@@ -273,48 +261,46 @@ seqf9_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   else
     locate = 0.0;
 
-  if(this->sequence)
+  track = seqref_get_reference(o);
+
+  if(track && eventtrk_get_type(track) == seqsym_note)
     {
-      eventtrk_t *track = (eventtrk_t *)sequence_get_track_by_index(this->sequence, this->index);
-
-      if(track && eventtrk_get_type(track) == seqsym_note)
+      event_t *event = eventtrk_get_event_by_time(track, locate);
+      
+      if(event)
 	{
-	  event_t *event = eventtrk_get_event_by_time(track, locate);
+	  note_t *evt_note = (note_t *)event_get_object(event);
+
+	  seqref_lock(o, track);
 	  
-	  if(event)
-	    {
-	      note_t *evt_note = (note_t *)event_get_object(event);
+	  this->spoofed = 0;
 
-	      track_lock((track_t *)track);
+	  this->atend = 0;
+	  this->lastoutput = 0;
+	  this->firstev = event;
 
-	      if(sequence_editor_is_open(this->sequence))
-		{
-		  fts_atom_t a[1];
-		  
-		  fts_set_object(a, (fts_object_t *)event);
-		  fts_client_send_message((fts_object_t *)track, seqsym_highlightEvents, 1, a);
-		}
-	      
-	      fts_outlet_float((fts_object_t *)this, 0, event_get_time((event_t *)event));
-	  
-	      this->track = track;
+	  /* reset notes */
+	  this->notes[0].n_evt = event;
+	  this->notes[0].n_value = -note_get_midi_velocity(evt_note);
+	  this->head = this->tail = this->notes;
+	  seqf9_refill(this);
 
-	      this->spoofed = 0;
+	  this->running = 1;
 
-	      this->atend = 0;
-	      this->lastoutput = 0;
-	      this->firstev = event;
-
-	      /* reset notes */
-	      this->notes[0].n_evt = event;
-	      this->notes[0].n_value = -note_get_midi_velocity(evt_note);
-	      this->head = this->tail = this->notes;
-	      seqf9_refill(this);
-
-	      this->running = 1;
-	    }
+	  /* highlight send the matched note */
+	  seqref_highlight_event(o, event);
+	  fts_outlet_float((fts_object_t *)this, 0, event_get_time((event_t *)event));	  
 	}
     }
+}
+
+static void
+seqf9_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  seqf9_t *this = (seqf9_t *)o;
+
+  seqf9_stop(o, 0, 0, 0, 0);
+  seqref_set_reference(o, ac, at);
 }
 
 /******************************************************************
@@ -327,18 +313,10 @@ static void
 seqf9_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   seqf9_t *this = (seqf9_t *)o;
-  fts_object_t *seqobj = fts_get_object(at + 1);
-  int index = fts_get_int(at + 2);
   f9_note_t *n;
   int i;
 
-  if(fts_object_get_class_name(seqobj) == seqsym_sequence)
-    this->sequence = (sequence_t *)seqobj;
-  else
-    this->sequence = 0;
-
-  this->index = index;
-  this->track = 0;
+  seqref_init(o, ac, at);
 
   /* initialize match notes */
   for (i=0, n=this->notes; i<NNOTES; i++, n++)
@@ -365,7 +343,7 @@ seqf9_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_symbol_t a[3];
       
-      fts_class_init( cl, sizeof(seqf9_t), 2, 1, 0);
+      fts_class_init( cl, sizeof(seqf9_t), 3, 1, 0);
       
       fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, seqf9_init);
       
@@ -380,6 +358,8 @@ seqf9_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs( cl, 0, fts_new_symbol("hit-score-in-tune"), seqf9_hit_score_in_tune);
       fts_method_define_varargs( cl, 0, fts_new_symbol("pitch-accuracy"), seqf9_pitch_accuracy);
       
+      fts_method_define_varargs(cl, 2, fts_s_list, seqf9_set_reference);
+
       return fts_Success;
     }
   else

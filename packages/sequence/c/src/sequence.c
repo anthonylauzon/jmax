@@ -355,7 +355,7 @@ sequence_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
       if(index >= 0)
 	{
-	  track_t *track = sequence_get_track_by_index(this, index);
+	  track_t *track = sequence_get_track_by_index(this, index - 1);
 	  
 	  if(track)
 	    fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_clear, 0, 0);
@@ -383,11 +383,11 @@ void
 sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
-  int index = fts_get_int_arg(ac, at, 0, -1);
+  int index = fts_get_int_arg(ac, at, 0, 0);
 
-  if(index >= 0)
+  if(index >= 1)
     {
-      track_t *track = sequence_get_track_by_index(this, index);
+      track_t *track = sequence_get_track_by_index(this, index - 1);
 
       if(track)
 	fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_print, 0, 0);

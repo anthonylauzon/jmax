@@ -30,13 +30,11 @@
 #include "track.h"
 #include "event.h"
 #include "eventtrk.h"
+#include "seqref.h"
 
 typedef struct _seqstep_
 {
-  fts_object_t o;
-  sequence_t *sequence;
-  int index;
-  eventtrk_t *track;
+  seqref_t o; /* sequence reference object */
   event_t *prev;
   event_t *next;
 } seqstep_t;
@@ -74,9 +72,7 @@ seqstep_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       this->prev = event_get_prev(event);
       this->next = next;
       
-      if(sequence_editor_is_open(this->sequence))
-	fts_client_send_message((fts_object_t *)this->track, seqsym_highlightEvents, n_atoms, atoms);
-
+      seqref_highlight_array(o, n_atoms, atoms);
       fts_outlet_float(o, 1, (float)time);
 
       fts_set_ptr(a, &n_atoms);
@@ -119,9 +115,7 @@ seqstep_prev(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       this->prev = prev;
       this->next = event_get_next(event);
       
-      if(sequence_editor_is_open(this->sequence))
-	fts_client_send_message((fts_object_t *)this->track, seqsym_highlightEvents, n_atoms, atoms);
-      
+      seqref_highlight_array(o, n_atoms, atoms);      
       fts_outlet_float(o, 1, (float)time);
 
       fts_set_ptr(a, &n_atoms);
@@ -142,11 +136,10 @@ seqstep_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 { 
   seqstep_t *this = (seqstep_t *)o;
 
-  if(this->track)
+  if(seqref_is_locked(o))
     {
-      track_unlock((track_t *)this->track);
+      seqref_unlock(o);
 
-      this->track = 0;
       this->prev = 0;
       this->next = 0;
     }
@@ -156,6 +149,7 @@ static void
 seqstep_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqstep_t *this = (seqstep_t *)o;
+  eventtrk_t *track;
   double locate;
 
   seqstep_stop(o, 0, 0, 0, 0);
@@ -165,60 +159,40 @@ seqstep_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   else
     locate = 0.0;
 
-  if(this->sequence)
+  track = seqref_get_reference(o);
+
+  if(track)
     {
-      eventtrk_t *track = (eventtrk_t *)sequence_get_track_by_index(this->sequence, this->index);
+      event_t *event = eventtrk_get_event_by_time(track, locate);
       
-      if(track)
+      if(event)
 	{
-	  event_t *event = eventtrk_get_event_by_time(track, locate);
+	  double time = event_get_time(event);
 	  
-	  if(event)
+	  seqref_lock(o, track);
+	  
+	  if(locate == time)
 	    {
-	      double time = event_get_time(event);
-
-	      track_lock((track_t *)track);
-	  
-	      this->track = track;
-
-	      if(locate == time)
-		{
-		  this->next = event;
-		  this->prev = event;
-		  seqstep_next(o, 0, 0, 0, 0);
-		}
-	      else
-		{
-		  this->next = event;
-		  this->prev = event_get_prev(event);
-		}
+	      this->next = event;
+	      this->prev = event;
+	      seqstep_next(o, 0, 0, 0, 0);
+	    }
+	  else
+	    {
+	      this->next = event;
+	      this->prev = event_get_prev(event);
 	    }
 	}
     }
 }
 
-static void 
-seqstep_set_sequence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
+static void
+seqstep_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
   seqstep_t *this = (seqstep_t *)o;
 
-  if(ac && fts_is_object(at))
-    {
-      fts_object_t *seqobj = fts_get_object(at);
-      
-      if(fts_object_get_class_name(seqobj) == seqsym_sequence)
-	this->sequence = (sequence_t *)seqobj;
-      else
-	this->sequence = 0;
-    }
-}
-
-static void 
-seqstep_set_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  seqstep_t *this = (seqstep_t *)o;
-
-  this->index = fts_get_int(at);
+  seqstep_stop(o, 0, 0, 0, 0);
+  seqref_set_reference(o, ac, at);
 }
 
 /************************************************************
@@ -231,16 +205,9 @@ static void
 seqstep_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqstep_t *this = (seqstep_t *)o;
-  fts_object_t *seqobj = fts_get_object(at + 1);
-  int index = fts_get_int(at + 2);
 
-  if(fts_object_get_class_name(seqobj) == seqsym_sequence)
-    this->sequence = (sequence_t *)seqobj;
-  else
-    this->sequence = 0;
+  seqref_init(o, ac, at);
 
-  this->index = index;
-  this->track = 0;
   this->prev = 0;
   this->next = 0;
 }
@@ -256,7 +223,7 @@ seqstep_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   if(ac > 2 && fts_is_symbol(at) && fts_is_object(at + 1) && fts_is_int(at + 2))
     {
-      fts_class_init(cl, sizeof(seqstep_t), 3, 2, 0);
+      fts_class_init(cl, sizeof(seqstep_t), 2, 2, 0);
   
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqstep_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqstep_delete);
@@ -266,8 +233,7 @@ seqstep_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_new_symbol("prev"), seqstep_prev);
       fts_method_define_varargs(cl, 0, fts_new_symbol("next"), seqstep_next);
 
-      fts_method_define_varargs(cl, 1, fts_s_object, seqstep_set_sequence);
-      fts_method_define_varargs(cl, 2, fts_s_symbol, seqstep_set_index);
+      fts_method_define_varargs(cl, 1, fts_s_list, seqstep_set_reference);
 
       return fts_Success;
     }

@@ -94,8 +94,8 @@ message_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   message_t *this = (message_t *)o;
   
-  this->pos = fts_get_int(at + 0);
-  this->s = fts_get_symbol(at + 1);
+  this->s = fts_get_symbol(at + 0);
+  this->pos = fts_get_int(at + ac - 1);
 }
 
 void 
@@ -105,8 +105,8 @@ message_get_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   int *n = fts_get_ptr(at);
   fts_atom_t *a = fts_get_ptr(at + 1);
 
-  fts_set_int(a + 0, this->pos);
-  fts_set_symbol(a + 1, this->s);
+  fts_set_symbol(a + 0, this->s);
+  fts_set_int(a + 1, this->pos);
 
   *n = 2;
 }
@@ -126,12 +126,10 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->ac = 0;
   this->at = 0;
 
-  if(fts_is_int(at + 1))
-    this->pos = fts_get_number_int(at + 1);
-  else
-    this->pos = 0;
+  message_set_message(o, 0, 0, 1, at + 1);
 
-  message_set_message(o, 0, 0, ac - 2, at + 2);
+  if(ac > 1)
+    this->pos = fts_get_number_int(at + 2);
 }
 
 static fts_status_t

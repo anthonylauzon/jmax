@@ -30,14 +30,12 @@
 #include "track.h"
 #include "event.h"
 #include "eventtrk.h"
+#include "seqref.h"
 
 typedef struct _seqrec_
 {
-  fts_object_t o;
-  sequence_t *sequence;
-  int index;
+  seqref_t o; /* sequence reference object */
   fts_class_t *class;
-  eventtrk_t *track;
   event_t *event;
   double start_location;
   double start_time;
@@ -54,13 +52,12 @@ seqrec_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 { 
   seqrec_t *this = (seqrec_t *)o;
 
-  if(this->track)
+  if(seqref_is_locked(o))
     {
       /* upload and unlock track after recording */
-      /*fts_send_message((fts_object_t *)this->track, fts_SystemInlet, fts_s_upload, 0, 0);*/
-      track_unlock((track_t *)this->track);
+      fts_send_message((fts_object_t *)seqref_get_track(o), fts_SystemInlet, fts_s_upload, 0, 0);
+      seqref_unlock(o);
 
-      this->track = 0;
       this->event = 0;
       this->start_time = 0.0;
     }
@@ -70,6 +67,7 @@ static void
 seqrec_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqrec_t *this = (seqrec_t *)o;
+  eventtrk_t *track;
   double locate;
 
   seqrec_stop(o, 0, 0, 0, 0);
@@ -79,28 +77,24 @@ seqrec_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   else
     locate = 0.0;
 
-  if(this->sequence)
+  track = seqref_get_reference(o);
+
+  if(track)
     {
-      eventtrk_t *track = (eventtrk_t *)sequence_get_track_by_index(this->sequence, this->index);
+      event_t *event = eventtrk_get_event_by_time(track, locate);
+      fts_symbol_t type = eventtrk_get_type(track);
       
-      if(track)
-	{
-	  event_t *event = eventtrk_get_event_by_time(track, locate);
-	  fts_symbol_t type = eventtrk_get_type(track);
-	  
-	  if(type == seqsym_int || type == seqsym_float || type == seqsym_symbol)
-	    this->class = 0;
-	  else
-	    this->class = fts_class_get_by_name(type);
-
-	  this->track = track;
-	  this->event = event;
-	  
-	  this->start_location = locate;
-	  this->start_time = 0.0;
-
-	  track_lock((track_t *)track);
-	}
+      if(type == seqsym_int || type == seqsym_float || type == seqsym_symbol)
+	this->class = 0;
+      else
+	this->class = fts_class_get_by_name(type);
+      
+      this->event = event;
+      
+      this->start_location = locate;
+      this->start_time = 0.0;
+      
+      seqref_lock(o, track);
     }
 }
 
@@ -113,10 +107,10 @@ seqrec_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       double now = fts_get_time_in_msecs();    
       
-      if(!this->track)
+      if(!seqref_is_locked(o))
 	seqrec_locate(o, 0, 0, 0, 0);
       
-      if(this->track)
+      if(seqref_is_locked(o))
 	this->start_time = now;
     }
 }
@@ -128,30 +122,6 @@ seqrec_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   double now = fts_get_time_in_msecs();
       
   this->start_location += now - this->start_time;
-}
-
-static void 
-seqrec_set_sequence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  seqrec_t *this = (seqrec_t *)o;
-
-  if(ac && fts_is_object(at))
-    {
-      fts_object_t *seqobj = fts_get_object(at);
-      
-      if(fts_object_get_class_name(seqobj) == seqsym_sequence)
-	this->sequence = (sequence_t *)seqobj;
-      else
-	this->sequence = 0;
-    }
-}
-
-static void 
-seqrec_set_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  seqrec_t *this = (seqrec_t *)o;
-
-  this->index = fts_get_int(at);
 }
 
 static void 
@@ -176,8 +146,9 @@ seqrec_record(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	event = (event_t *)fts_object_create(event_class, 1, at);
       
       /* add event to track (look for right position starting from last event) */
-      eventtrk_add_event_after(this->track, time, event, this->event);
+      eventtrk_add_event_after(seqref_get_track(o), time, event, this->event);
 
+      /*
       if(sequence_editor_is_open(this->sequence))
 	{
 	  fts_atom_t a[1];
@@ -185,11 +156,21 @@ seqrec_record(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  event_upload(event);
 
 	  fts_set_object(a, (fts_object_t *)event);    
-	  fts_client_send_message((fts_object_t *)this->track, seqsym_addEvents, 1, a);
+	  fts_client_send_message(seqref_get_track(o), seqsym_addEvents, 1, a);
 	}
+      */
 
       this->event = event;
     }
+}
+
+static void
+seqrec_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  seqrec_t *this = (seqrec_t *)o;
+
+  seqrec_stop(o, 0, 0, 0, 0);
+  seqref_set_reference(o, ac, at);
 }
 
 /************************************************************
@@ -202,16 +183,9 @@ static void
 seqrec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqrec_t *this = (seqrec_t *)o;
-  fts_object_t *seqobj = fts_get_object(at + 1);
-  int index = fts_get_int(at + 2);
 
-  if(fts_object_get_class_name(seqobj) == seqsym_sequence)
-    this->sequence = (sequence_t *)seqobj;
-  else
-    this->sequence = 0;
+  seqref_init(o, ac, at);
 
-  this->index = index;
-  this->track = 0;
   this->event = 0;
   this->start_location = 0.0;
   this->start_time = 0.0;
@@ -228,7 +202,7 @@ seqrec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   if(ac > 2 && fts_is_symbol(at) && fts_is_object(at + 1) && fts_is_int(at + 2))
     {
-      fts_class_init(cl, sizeof(seqrec_t), 3, 0, 0);
+      fts_class_init(cl, sizeof(seqrec_t), 2, 0, 0);
   
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqrec_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqrec_delete);
@@ -243,8 +217,7 @@ seqrec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_s_symbol, seqrec_record);
       fts_method_define_varargs(cl, 0, fts_s_list, seqrec_record);
 
-      fts_method_define_varargs(cl, 1, fts_s_object, seqrec_set_sequence);
-      fts_method_define_varargs(cl, 2, fts_s_symbol, seqrec_set_index);
+      fts_method_define_varargs(cl, 1, fts_s_list, seqrec_set_reference);
 
       return fts_Success;
     }

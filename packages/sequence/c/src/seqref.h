@@ -23,43 +23,31 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
+#ifndef _SEQREF_H_
+#define _SEQREF_H_
 
 #include "fts.h"
+#include "eventtrk.h"
 
-extern void seqsym_config(void);
-
-extern void sequence_config(void);
-extern void eventtrk_config(void);
-extern void event_config(void);
-
-extern void note_config(void);
-extern void message_config(void);
-
-extern void seqfind_config(void);
-extern void seqstep_config(void);
-extern void seqplay_config(void);
-extern void seqrec_config(void);
-extern void seqplode_config(void);
-extern void seqf9_config(void);
-
-static void
-sequence_module_init(void)
+typedef struct _seqref_
 {
-  seqsym_config();
+  fts_object_t o; /* sequence reference object */
+  sequence_t *sequence;
+  eventtrk_t *track;
+  int index;
+} seqref_t;
 
-  sequence_config();
-  eventtrk_config();
-  event_config();
+#define seqref_lock(o, t) (track_lock((track_t *)(t)), ((seqref_t *)(o))->track = (eventtrk_t *)(t))
+#define seqref_unlock(o) (track_unlock((track_t *)((seqref_t *)(o))->track), ((seqref_t *)(o))->track = 0)
+#define seqref_is_locked(o) (((seqref_t *)(o))->track != 0)
 
-  note_config();
-  message_config();
+#define seqref_get_track(o) (((seqref_t *)(o))->track)
 
-  seqfind_config();
-  seqstep_config();
-  seqplay_config();
-  seqrec_config();
-  seqplode_config();
-  seqf9_config();
-}
+extern void seqref_set_reference(fts_object_t *o, int ac, const fts_atom_t *at);
+extern eventtrk_t *seqref_get_reference(fts_object_t *o);
+extern void seqref_init(fts_object_t *o, int ac, const fts_atom_t *at);
 
-fts_module_t sequence_module = {"sequence", "sequence and score following classes", sequence_module_init, 0, 0};
+extern void seqref_highlight_event(fts_object_t *o, event_t *event);
+extern void seqref_highlight_array(fts_object_t *o, int ac, const fts_atom_t *at);
+
+#endif
