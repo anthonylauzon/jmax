@@ -3,6 +3,8 @@ distribution: Ircam
 vendor: Ircam
 rpmdir: .
 srcrpmdir: .
-sourcedir: /var/tmp/jmax-rpm/src
+sourcedir: .
 specdir: .
-builddir: /var/tmp/jmax-rpm/build
+builddir: .
+buildroot: /var/tmp/jmax-root
+rpmfilename: %{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}.rpm
