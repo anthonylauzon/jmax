@@ -20,54 +20,43 @@
 // 
 // Based on Max/ISPW by Miller Puckette.
 //
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+// Author: Francois Dechelle.
 // 
 
 package ircam.jmax.editors.console;
 
 import java.io.*;
+import ircam.jmax.widgets.ConsoleArea;
 
 /**
- * The Print Writer associated with the console
- * Changed to OutputStream by MDC, in order to work
- * with the System.out.
+ * The console outptut stream, used to construct a PrintStream
+ * that can be used as System.out.
  */
 
-class ConsoleWriter extends OutputStream
+class ConsoleOutputStream extends OutputStream
 {
-  Console itsConsole;
-  StringBuffer buffer = new StringBuffer();
+  private ConsoleArea consoleArea;
+  private StringBuffer buffer;
 
-  public ConsoleWriter(Console theConsole)
+  public ConsoleOutputStream( ConsoleArea consoleArea)
   {
-    super();
-    itsConsole = theConsole;
+    this.consoleArea = consoleArea;
+    buffer = new StringBuffer();
   }
 
-  public void write(int b) 
+  public void write( int b) 
   {
-    buffer.append((char)b);
+    buffer.append( (char)b );
 
     if (b == '\n')
       flush();
   }
 
-  /*  public void write(char cbuf[],
-		    int off,
-		    int len) throws IOException
-  {
-    flush();
-    itsConsole.getTextArea().append(new String(cbuf));
-  }
-  */
-
   public void flush()
   {
-    itsConsole.Put(buffer.toString());
+    consoleArea.append( buffer.toString());
+
     buffer.setLength(0);
-    String text = itsConsole.itsTextArea.getText();
-    if(text!=null)
-      itsConsole.itsTextArea.setCaretPosition(text.length());
   }
 
   public void close()

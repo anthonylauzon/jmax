@@ -35,145 +35,131 @@ import javax.swing.*;
 import ircam.jmax.script.*;
 
 import ircam.jmax.*;
-import ircam.jmax.dialogs.*;
 import ircam.jmax.mda.*;
+import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.console.menus.*;
+import ircam.jmax.widgets.ConsoleArea;
 
 /**
-  Window containing a tcl console
-  */
+ * Window containing a console
+ */
  
-public class ConsoleWindow extends JFrame implements WindowListener, EditorContainer, KeyListener {
-  StringBuffer itsSbuf = new StringBuffer();
-  Console itsConsole;
+public class ConsoleWindow extends JFrame implements EditorContainer {
 
-  private FileMenu itsFileMenu;
-  private EditMenu itsEditMenu;	
-  private JMenu itsWindowsMenu;
-  private JMenu itsToolsMenu;
+  static private ConsoleWindow consoleWindowSingleInstance = null;
 
-  static private ConsoleWindow theConsoleWindow = null;
+  private ConsoleArea consoleArea;
 
   static {
     MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
       public String getToolName() { return "Console";}
-      public void open() { theConsoleWindow.toFront();}
+      public void open() { consoleWindowSingleInstance.toFront();}
     });
   }
 
+  public static void append( String line)
+  {
+    if ( consoleWindowSingleInstance != null)
+      consoleWindowSingleInstance.consoleArea.append( line);
+  }
 
-  public ConsoleWindow() {
+  public ConsoleWindow()
+  {
     super("jMax Console");
 
-    MaxWindowManager.setTopFrame(this);
+    MaxWindowManager.setTopFrame( this);
 
-    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+    setDefaultCloseOperation( JFrame.DO_NOTHING_ON_CLOSE);
 
-    itsConsole = new Console(this, MaxApplication.getInterpreter());
-    itsConsole.Start();
+    consoleArea = new ConsoleArea( 1000, 80);
 
     if ( (MaxApplication.getProperty("jmaxNoConsole") == null) || 
 	 (MaxApplication.getProperty("jmaxNoConsole").equals("false")))
       {
-	System.setOut(itsConsole.getPrintStream());
+	System.setOut( new PrintStream( new ConsoleOutputStream( consoleArea)));
       }
     else
-      {
-	itsConsole.getTextArea().setRows( 10);
-      }
+      consoleArea.append( "Output redirected to Java standard output");
     
-    getContentPane().setLayout(new BorderLayout());
-    
-    getContentPane().add("Center", itsConsole);
-    itsConsole.SetContainer(this);
+    // Register this console window as *the* console window
 
-    // Register this console window 
-    // as *the* console window
-
-    if (theConsoleWindow == null)
-      theConsoleWindow = this;
+    if ( consoleWindowSingleInstance == null)
+      consoleWindowSingleInstance = this;
     
-    // Build The Menus and Menu Bar
     makeMenuBar();
 
-    validate();
+    getContentPane().setLayout(new BorderLayout());
+
+    JScrollPane jsp = new JScrollPane( consoleArea);
+
+    jsp.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+    jsp.getViewport().setBackingStoreEnabled( true);
+
+    getContentPane().add( BorderLayout.CENTER, jsp);
 
     setLocation(0,0);
+    setSize( 600, 400);
+
     pack();
-    setVisible(true);
+    validate();
 
-    if ((MaxApplication.getProperty("jmaxNoConsole") != null) &&
-	(MaxApplication.getProperty("jmaxNoConsole").equals("true")))
-	{
-	  itsConsole.getPrintStream().println( "Output redirected to Java standard output");
-	}
-
-    itsConsole.getTextArea().setCaretPosition(itsConsole.getTextArea().getText().length());
+    setVisible( true);
   }
   
-  private final void makeMenuBar(){
+  private final void makeMenuBar()
+  {
     JMenuBar mb = new JMenuBar();
-    
-    // Build the file menu
-    itsFileMenu = new FileMenu();
-    mb.add( itsFileMenu); 
-    
-    // Build the edit menu
-    itsEditMenu = new EditMenu(this); 
-    mb.add( itsEditMenu); 
-    
-    // New Tool menu 
-    itsToolsMenu = new ircam.jmax.toolkit.menus.MaxToolsJMenu("Tools"); 
-    mb.add(itsToolsMenu);
 
-    // New Window Manager based Menu
-    itsWindowsMenu = new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this); 
-    mb.add(itsWindowsMenu);
+    // File menu    
+    mb.add( new FileMenu()); 
 
-    setJMenuBar(mb);
+    // Edit menu
+    mb.add( new EditMenu( this));
+    
+    // Tool menu 
+    mb.add( new ircam.jmax.toolkit.menus.MaxToolsJMenu( "Tools"));
+
+    // Windows Menu
+    mb.add( new ircam.jmax.toolkit.menus.MaxWindowJMenu( "Windows", this));
+
+    setJMenuBar( mb);
   }
 
-  // ------ editorContainer interface ---------------
-  public Editor getEditor(){
-    return itsConsole;
+  class ConsoleEditor implements Editor {
+    final public Fts getFts()
+    {
+      return MaxApplication.getFts();
+    }
+
+    public EditorContainer getEditorContainer()
+    {
+      return ConsoleWindow.this;
+    }
+
+    public void Close(boolean doCancel)
+    {
+    }
   }
-  public Frame getFrame(){
+
+  // Methods from interface EditorContainer
+  public Editor getEditor()
+  {
+    return new ConsoleEditor();
+  }
+
+  public Frame getFrame()
+  {
     return this;
   }
-  public Point getContainerLocation(){
+
+  public Point getContainerLocation()
+  {
     return getLocation();
   }
-  public Rectangle getViewRectangle(){
+
+  public Rectangle getViewRectangle()
+  {
     return getContentPane().getBounds();
   }
-  // ----------------- WindowListener ---------------  
-  public void windowClosing(WindowEvent e){
-    MaxApplication.Quit();
-  }
-  public void windowOpened(WindowEvent e){}
-  public void windowClosed(WindowEvent e){}
-  public void windowIconified(WindowEvent e){}
-  public void windowDeiconified(WindowEvent e){}
-  public void windowActivated(WindowEvent e){
-    requestFocus();
-  }
-  public void windowDeactivated(WindowEvent e){}
-  ////////////////////////////////////////////////////////////WindowListener --fine
- ////////////////////////////////////////////////////////////////keyListener --inizio  
-  public void keyTyped(KeyEvent e){}
-  public void keyReleased(KeyEvent e){}
-  public void keyPressed(KeyEvent e){}
-  ///////////////////////////////////////////////////////////////// keyListener --fine
 }
-
-
-
-
-
-
-
-
-
-
-
