@@ -466,6 +466,15 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	return mutex.getCurrent();
     }
 
+    public TrackEditor getCurrentTrackEditor()
+    {
+	Track current = mutex.getCurrent();
+	if(current != null)
+	    return ((TrackContainer) trackContainers.get(current)).getTrackEditor();
+	else
+	    return null;
+    }
+
     public Frame getFrame(){
 	return itsContainer.getFrame();
     }

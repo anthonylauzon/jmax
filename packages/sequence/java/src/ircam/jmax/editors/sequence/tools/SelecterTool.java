@@ -140,7 +140,7 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
   { 
       SequenceGraphicContext egc = (SequenceGraphicContext)gc;
       //SequenceSelection.getCurrent().setModel(egc.getTrack().getTrackDataModel());
-      selectArea(gc.getRenderManager(), SequenceSelection.getCurrent(), x, y,  w,  h);
+      selectArea(egc.getRenderManager(), /*SequenceSelection.getCurrent()*/egc.getSelection(), x, y,  w,  h);
   }
 
   

@@ -78,6 +78,21 @@ public class Sequence extends JFrame implements EditorContainer{
 	
 	getContentPane().add(itsSequencePanel);
 	setSize(new Dimension(DEFAULT_WIDTH, EMPTY_HEIGHT));
+
+	addWindowListener(new WindowListener(){
+		public void windowOpened(WindowEvent e){}
+		public void windowClosed(WindowEvent e){}
+		public void windowClosing(WindowEvent e){}
+		public void windowDeiconified(WindowEvent e){}
+		public void windowIconified(WindowEvent e){}
+		public void windowActivated(WindowEvent e)
+		{
+		    TrackEditor current = itsSequencePanel.getCurrentTrackEditor();
+		    if(current!=null)
+			SequenceSelection.setCurrent(current.getSelection());
+		}
+		public void windowDeactivated(WindowEvent e){}
+	    });
 	
 	validate();
 	setVisible(true);

@@ -722,27 +722,43 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	if (objectsToPaste != null)
 	    {
 		Event event;
-		
-		
+				
 		SequenceSelection.getCurrent().deselectAll();
 
-		beginUpdate();  //the paste is undoable
+		if(objectsToPaste.hasMoreElements())
+		    {
+			event = (Event) objectsToPaste.nextElement();
+			
+			if(event.getValue().getValueInfo() != getType())
+			    {
+				System.err.println("Clipboard error in paste: attempt to copy <"+event.getValue().getValueInfo().getPublicName()+"> events in <"+getType().getPublicName()+"> track!");
+				return;
+			    }
 
-		try {
-		    while (objectsToPaste.hasMoreElements())
-			{
-			    event = (Event) objectsToPaste.nextElement();
+			try {
+
+			    beginUpdate();  //the paste is undoable
+
+
 			    requestEventCreationWithoutUpload((float)event.getTime(), 
 							      event.getValue().getValueInfo().getName(), 
 							      event.getValue().getPropertyCount(), 
 							      event.getValue().getPropertyValues());
-			}
 		    
-		    sendMessage(FtsObject.systemInlet, "upload", 0, sendArgs);
-		}
-		catch (Exception e) {}
-		
-	  }
+			    while (objectsToPaste.hasMoreElements())
+				{
+				    event = (Event) objectsToPaste.nextElement();
+				    requestEventCreationWithoutUpload((float)event.getTime(), 
+								      event.getValue().getValueInfo().getName(), 
+								      event.getValue().getPropertyCount(), 
+								      event.getValue().getPropertyValues());
+				}
+		    
+			    sendMessage(FtsObject.systemInlet, "upload", 0, sendArgs);
+			}
+			catch (Exception e) {}
+		    }
+	    }
     }
     
     /** ClipboardOwner interface */
