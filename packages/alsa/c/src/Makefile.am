@@ -4,12 +4,15 @@ libalsa_la_SOURCES= \
 alsa.c \
 alsaaudioport.c \
 alsamidi.c \
-alsarawmidiport.c 
+alsarawmidiport.c \
+alsaseqmidiport.c \
+alsaseqmidi.c 
 
 libalsa_la_CFLAGS=-DDEBUG
 libalsa_la_LIBADD=-lasound
 
 INCLUDES=-I$(top_srcdir)/include
 
-noinst_HEADERS= alsamidi.h
- 
+noinst_HEADERS= alsamidi.h \
+		alsaseqmidi.h 
+
