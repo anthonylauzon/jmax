@@ -117,7 +117,6 @@ import ircam.jmax.fts.*;
   }
 	
   void backupText() {
-    System.err.println("guarda che itsArgs e' nullo");
     itsBackupText = itsArgs.toString();
   }
 
