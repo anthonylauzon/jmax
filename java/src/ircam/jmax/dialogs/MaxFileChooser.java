@@ -54,11 +54,13 @@ public class MaxFileChooser
     fd = new JFileChooser(currentOpenDirectory);
 
     fd.setDialogTitle("Open"); 
-    fd.addChoosableFileFilter(new MaxFileFilter());
+    fd.setFileFilter(new MaxFileFilter());
+    fd.addChoosableFileFilter(fd.getAcceptAllFileFilter());
+
     // fd.setFileView(new MyFileView());
 
 
-    if (fd.showDialog(frame, "Open") == 0)
+    if (fd.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION)
       {
 	File file;
 
@@ -92,8 +94,10 @@ public class MaxFileChooser
     fd = new JFileChooser(currentOpenDirectory);
 
     fd.setDialogTitle("Save"); 
+    fd.setFileFilter(new MaxFileFilter());
+    fd.addChoosableFileFilter(fd.getAcceptAllFileFilter());
 
-    if (fd.showDialog(frame, "Save") == 0)
+    if (fd.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION)
       {
 	File file;
 	

@@ -70,7 +70,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
 	  
 	  // Clean up the last element (so it is GCed)
 
-	  itsElements[itsElementsNextFree] = null;
+	  itsElements[itsElementsNextFree - 1] = null;
 
 	  // update the fill pointer
 

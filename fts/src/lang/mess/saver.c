@@ -96,7 +96,7 @@ fts_open_bmax_file_for_writing(fts_symbol_t file, int dobackup)
 
   if (f->fd == 0)
     {
-      fprintf(stderr, "Cannot open file %s for writing: %s\n", name, strerror(errno));
+      fprintf(stderr, "Cannot open file for writing: %s\n", name);
       return 0;
     }
 

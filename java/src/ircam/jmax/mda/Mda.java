@@ -142,7 +142,6 @@ public class Mda
 
   public static boolean canLoadDocument(File file)
   {
-    System.err.println("FooBar: canLoadDocument " + file);
     for (int i = 0; i < allHandlers.size() ; i++)
       {
 	MaxDocumentHandler documentHandler;
@@ -150,12 +149,8 @@ public class Mda
 	documentHandler = (MaxDocumentHandler) allHandlers.elementAt(i);
 
 	if (documentHandler.canLoadFrom(file))
-	  {
-	    System.err.println("FooBar: canLoadDocument: " + documentHandler + " can load " + file);
-	    return true;
-	  }
+	  return true;
       }
-    System.err.println("FooBar: canLoadDocument: nobody can load " + file);
     return false;
   }
 
