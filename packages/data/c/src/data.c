@@ -149,7 +149,7 @@ data_module_init(void)
   binop_arith_inplace_init();
   binop_comp_init();
 
-  monop_obj_config();
+  /*  monop_obj_config();*/
   binop_obj_config();
   atom_obj_config();
   post_obj_config();
