@@ -121,7 +121,7 @@ nsplit_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if(v >= points[n-1])
     fts_outlet_send(o, 0, fts_s_int, 1, at);
 
-  for(i=n-1; i>0; i++)
+  for(i=n-1; i>1; i++)
     {
       if(v >= points[i - 1] && v < points[i])
 	fts_outlet_send(o, i, fts_s_int, 1, at);
@@ -143,7 +143,7 @@ nsplit_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(v >= points[n-1])
     fts_outlet_send(o, 0, fts_s_float, 1, at);
 
-  for(i=n-1; i>0; i++)
+  for(i=n-1; i>1; i++)
     {
       if(v >= points[i - 1] && v < points[i])
 	fts_outlet_send(o, i, fts_s_float, 1, at);

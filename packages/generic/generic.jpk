@@ -31,7 +31,7 @@ ucs load module generic $dir/c/lib/$jmaxArch/$jmaxMode/libgeneric.so
 puts "package: generic (generic atom classes)"
 
 # help
-helpPatch xxx $dir/help/xxx.help.jmax
+sourceFile $dir/help/generic.help.index.tcl
 helpSummary "Generic" $dir/help/generic.summary.jmax
 
 

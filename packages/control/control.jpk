@@ -31,7 +31,7 @@ ucs load module control $dir/c/lib/$jmaxArch/$jmaxMode/libcontrol.so
 puts "package: control (control classes)"
 
 # help
-helpPatch xxx $dir/help/xxx.help.jmax
+sourceFile $dir/help/control.help.index.tcl
 helpSummary "Control" $dir/help/control.summary.jmax
 
 

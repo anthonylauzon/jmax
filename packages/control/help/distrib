@@ -1,0 +1,4 @@
+all	all	control.help.index.tcl
+all	all	control.summary.jmax
+all	all	demux.help.jmax
+all	all	switch.help.jmax

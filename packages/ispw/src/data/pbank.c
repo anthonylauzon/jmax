@@ -28,8 +28,8 @@
 
 static fts_hash_table_t pbank_data_table;
 
-#define DEFAULT_N_COLS 128
-#define DEFAULT_N_ROWS 10
+#define DEFAULT_N_COLS 8
+#define DEFAULT_N_ROWS 64
 
 /******************************************************************
  *
@@ -64,7 +64,7 @@ typedef struct
 /* read and write pbank files */
 
 static int 
-pbank_read_file(pbank_data_t *data, fts_symbol_t file_name)
+pbank_data_read_file(pbank_data_t *data, fts_symbol_t file_name)
 {
   fts_atom_file_t *f;
   int ret;
@@ -127,7 +127,7 @@ pbank_read_file(pbank_data_t *data, fts_symbol_t file_name)
 }
 
 static int 
-pbank_write_file(pbank_data_t *data, fts_symbol_t file_name)
+pbank_data_write_file(pbank_data_t *data, fts_symbol_t file_name)
 {
   fts_atom_t  a, *ap;
   fts_atom_file_t *f;
@@ -172,7 +172,7 @@ pbank_write_file(pbank_data_t *data, fts_symbol_t file_name)
 }
 
 static int 
-pbank_export_file_ascii(pbank_data_t *data, fts_symbol_t file_name)
+pbank_data_export_ascii(pbank_data_t *data, fts_symbol_t file_name)
 {
   fts_atom_t  a, *ap;
   fts_atom_file_t *f;
@@ -274,7 +274,7 @@ pbank_data_get(fts_symbol_t name, int n, int m)
 	  fts_hash_table_insert(&pbank_data_table, name, &atom);
 
 	  /* read in data from file (at least try it) */
-	  pbank_read_file(data, name);
+	  pbank_data_read_file(data, name);
 	}
        else
 	 data->name = 0;
@@ -332,13 +332,13 @@ pbank_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if (n <= 0)
     {
       n = DEFAULT_N_COLS;
-      post("pbank: n_cols argument out of range, setting to %d\n", n);
+      post("pbank: # of columns argument out of range, setting to %d\n", n);
     }
        
   if (m <= 0)
     {
       m = DEFAULT_N_ROWS;
-      post("pbank: m argument out of range, setting to %d\n",m);
+      post("pbank: # of rows argument out of range, setting to %d\n",m);
     }
 
   /* name skip arg is "" */
@@ -699,7 +699,7 @@ pbank_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
 
   if(file_name)
-    pbank_read_file(this->data, file_name);
+    pbank_data_read_file(this->data, file_name);
 }
 
 static void
@@ -709,7 +709,7 @@ pbank_write(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
  
   if(file_name)
-    pbank_write_file(this->data, file_name);
+    pbank_data_write_file(this->data, file_name);
 }
 
 static void
@@ -719,7 +719,7 @@ pbank_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
   
   if(file_name)
-    pbank_export_file_ascii(this->data, file_name);
+    pbank_data_export_ascii(this->data, file_name);
 }
 
 /******************************************************************
@@ -760,6 +760,9 @@ pbank_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     }
   else
     return &fts_CannotInstantiate;
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, pbank_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, pbank_delete);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("set"), pbank_set);
   fts_method_define_varargs(cl, 0, fts_new_symbol("put"), pbank_put);

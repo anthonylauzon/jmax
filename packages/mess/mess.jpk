@@ -18,7 +18,7 @@ ucs load module mess $dir/c/lib/$jmaxArch/$jmaxMode/libmess.so
 puts "package: mess (message classes)"
 
 # help
-helpPatch xxx $dir/help/xxx.help.jmax
+sourceFile $dir/help/mess.help.index.tcl
 helpSummary "Mess" $dir/help/mess.summary.jmax
 
 

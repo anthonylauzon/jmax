@@ -31,7 +31,7 @@ ucs load module numeric $dir/c/lib/$jmaxArch/$jmaxMode/libnumeric.so
 puts "package: numeric (numeric classes)"
 
 # help
-helpPatch xxx $dir/help/xxx.help.jmax
+sourceFile $dir/help/numeric.help.index.tcl
 helpSummary "Numeric" $dir/help/numeric.summary.jmax
 
 
