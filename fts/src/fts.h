@@ -54,8 +54,7 @@
  * \li platform dependend components: dynamic loading, memory management, scheduling, ... (non-portable/)
  * \li misc utilities: hash tables, sampling rate conversion routines, four-point interpolation, ... (lang/utils/)
  *
- * This documentation is generated automatically from the comments in the header files of FTS 
- * by the \e doxygen documentation system by Dimitri van Heesch.
+ * This documentation is generated automatically from the comments in the header files of FTS.
  */
 
 #include "sys.h"
