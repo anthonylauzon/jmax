@@ -96,7 +96,7 @@ static void
 printf_mess(const char *msg, int ac, const fts_atom_t *av)
 {
   fprintf(stderr, "%s (%d args): ", msg, ac);
-  fprintf_atoms(ac, av);
+  fprintf_atoms(stderr, ac, av);
   fprintf(stderr, "\n");
 }
 

@@ -1,3 +1,4 @@
+#include "sys.h"
 #include "lang/veclib/include/vecdef.h"
 
 DEFINE_FTS_VECX_OP(fcmp_eq, float, float, long, COMP_eq)

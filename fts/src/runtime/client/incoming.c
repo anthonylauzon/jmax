@@ -62,14 +62,11 @@ enum parser_state
   waiting_type,
   waiting_value,
   in_long,
-  in_neg_long,
   in_float,
   in_string,
-  in_string_quoted,
   in_object,
   in_data,
   in_connection,
-  in_void,
   end_of_message, 
   input_error
 };

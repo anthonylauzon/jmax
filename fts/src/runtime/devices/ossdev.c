@@ -252,7 +252,7 @@ oss_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   /* Parameter parsing  */
   
-  oss_audio_data.sampling_rate = (int) fts_param_get_float(fts_s_sampling_rate, fts_new_symbol("sample_rate"), 44100);
+  oss_audio_data.sampling_rate = (int) fts_param_get_float(fts_s_sampling_rate, 44100);
   oss_audio_data.fragment_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fragment_size"), 1024);
   oss_audio_data.max_fragments = fts_get_int_by_name(nargs, args, fts_new_symbol("max_fragments"), 8);
 
@@ -373,7 +373,7 @@ oss_adc_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   /* Parameter parsing  */
 
-  oss_audio_data.sampling_rate = (int) fts_param_get_float(fts_s_sampling_rate, fts_new_symbol("sample_rate"), 44100);  
+  oss_audio_data.sampling_rate = (int) fts_param_get_float(fts_s_sampling_rate, 44100);  
 
   /* open the device */
 

@@ -12,7 +12,7 @@
 #include "runtime/sched.h"
 #include "runtime/time.h"
 
-#define TIME_DEBUG
+/* #define TIME_DEBUG */
 
 #ifdef TIME_DEBUG
 static void fts_alarm_describe(char *msg, fts_clock_t *clock);

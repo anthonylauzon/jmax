@@ -1,3 +1,4 @@
+#include "sys.h"
 #include "lang/veclib/include/vecdef.h"
 
 /***********************************************

@@ -1,3 +1,4 @@
+#include "sys.h"
 #include "lang/veclib/include/vecdef.h"
 
 DEFINE_FTS_VEC_OPSCL(scl_bitand, long, long, long, OP_bitand)

@@ -26,7 +26,7 @@
 #include "sys.h"
 
 #ifdef LINUX
-#include <unist.h>
+#include <unistd.h>
 #endif
 
 #include <stdlib.h>

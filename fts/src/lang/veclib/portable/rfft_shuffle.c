@@ -1,5 +1,6 @@
 /* rfft_shuffle.c */
 
+#include "sys.h"
 #include "lang/veclib/portable/rfft_shuffle.h"
 
 void shuffle_after_rfft_inplc(complex * restrict buf, complex * restrict coef, long n_over, long n_points)
