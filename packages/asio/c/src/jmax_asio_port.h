@@ -46,15 +46,21 @@ typedef struct
   long outputChannels;
   
   /* Buffer size */
+  /* ASIO configuration */
   long minSize;
   long maxSize;
   long preferredSize;
   long granularity;
+  /* used buffer size */
+  long allocatedBufferSize;
 
   double sampleRate;
   
   ASIOBufferInfo* bufferInfos;
   ASIOChannelInfo* channelInfos;
+
+  void** input_buffers;
+  void** output_buffers;
 
   // Information from ASIOGetSamplePosition()
   double nanoSeconds;

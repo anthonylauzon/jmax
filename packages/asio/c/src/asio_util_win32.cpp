@@ -241,8 +241,7 @@ unsigned int asio_util_scan_drivers()
 		{
 
 		  fts_object_refer((fts_object_t*)port);
-		  fts_audiomanager_put_port(port->driver->name, (fts_audioport_t*)port);
-		  //		  fts_audiomanager_put_port(fts_new_symbol("toto"), (fts_audioport_t*)port);
+		  fts_audiomanager_put_port(fts_new_symbol(port->driver->name), (fts_audioport_t*)port);
 		  fts_log("[asio_audioport] put port : %s\n", port->driver->name);
 		}
 	    }
