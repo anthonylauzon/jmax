@@ -515,7 +515,7 @@ ivec_copy_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
       int i;
       
       if(!this->copy)
-	this->copy = (ivec_t *)fts_object_create(ivec_type, NULL, 1, at + 1);
+	this->copy = (ivec_t *)fts_object_create(ivec_type, 1, at + 1);
       else
 	ivec_set_size(this->copy, size);
       
@@ -1067,29 +1067,22 @@ ivec_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-ivec_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ivec_get_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *this = (ivec_t *)o;
   int *values = ivec_get_ptr(this);
   int size = ivec_get_size(this);
-  fts_array_t *array = (fts_array_t *)fts_get_pointer(at);
+  fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, 0, 0);
   fts_atom_t *atoms;
   int i;
-  
-  fts_array_set_size(array, size);  
-  atoms = fts_array_get_atoms(array);
 
+  fts_tuple_set_size(tuple, size);
+  atoms = fts_tuple_get_atoms(tuple);
+  
   for(i=0; i<size; i++)
     fts_set_int(atoms + i, values[i]);
-}
 
-static void
-ivec_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ivec_t *this = (ivec_t *)o;
-
-  ivec_set_size(this, ac);
-  ivec_set_with_onset_from_atoms(this, 0, ac, at);
+  fts_return_object((fts_object_t *)tuple);
 }
 
 /*********************************************************
@@ -1173,9 +1166,8 @@ ivec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_print, ivec_print); 
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, ivec_set_from_instance);
-  fts_class_message_varargs(cl, fts_s_set_from_array, ivec_set_from_array);
 
-  fts_class_message_varargs(cl, fts_s_get_array, ivec_get_array);
+  fts_class_message_varargs(cl, fts_s_get_tuple, ivec_get_tuple);
 
   /* graphical editor */
   fts_class_message_varargs(cl, fts_s_openEditor, ivec_open_editor);

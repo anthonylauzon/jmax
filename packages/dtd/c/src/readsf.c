@@ -72,7 +72,7 @@ void reader_set_state(readsf_t* self,
 static void create_reader_thread(readsf_t* self)
 {
     fts_thread_worker_t* thread_worker = fts_malloc(sizeof(fts_thread_worker_t));
-    dtd_thread_t* reader = (dtd_thread_t*)fts_object_create(dtd_thread_type, NULL, 0, 0);
+    dtd_thread_t* reader = (dtd_thread_t*)fts_object_create(dtd_thread_type, 0, 0);
     fts_thread_function_t* thread_job = fts_malloc(sizeof(fts_thread_function_t));
     
     thread_job->object = (fts_object_t*)reader;

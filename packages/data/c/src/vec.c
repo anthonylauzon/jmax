@@ -143,29 +143,22 @@ vec_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-vec_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vec_get_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vec_t *this = (vec_t *)o;
   fts_atom_t *values = vec_get_ptr(this);
   int size = vec_get_size(this);
-  fts_array_t *array = (fts_array_t *)fts_get_pointer(at);
-  int onset = fts_array_get_size(array);
+  fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, 0, 0);
   fts_atom_t *atoms;
   int i;
-  
-  fts_array_set_size(array, onset + size);  
-  atoms = fts_array_get_atoms(array) + onset;
+
+  fts_tuple_set_size(tuple, size);
+  atoms = fts_tuple_get_atoms(tuple);
 
   for(i=0; i<size; i++)
     fts_atom_assign(atoms + i, values + i);
-}
 
-static void
-vec_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  vec_t *this = (vec_t *)o;
-
-  vec_set_with_onset_from_atoms(this, 0, ac, at);
+  fts_return_object((fts_object_t *)tuple);
 }
 
 static void
@@ -436,9 +429,8 @@ vec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_dump, vec_dump);
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, vec_set_from_instance);
-  fts_class_message_varargs(cl, fts_s_set_from_array, vec_set_from_array);
 
-  fts_class_message_varargs(cl, fts_s_get_array, vec_get_array);
+  fts_class_message_varargs(cl, fts_s_get_tuple, vec_get_tuple);
   
   fts_class_message_varargs(cl, fts_s_post, vec_post); 
   fts_class_message_varargs(cl, fts_s_print, vec_print); 

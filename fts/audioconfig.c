@@ -269,7 +269,7 @@ audioconfig_label_insert(fts_audioconfig_t* config, int index, fts_symbol_t name
   fts_atom_t a[1];
 
   fts_set_symbol( a, name);
-  label = (fts_audiolabel_t*)fts_object_create(fts_audiolabel_class, NULL, 1, a);
+  label = (fts_audiolabel_t*)fts_object_create(fts_audiolabel_class, 1, a);
 
   fts_object_refer((fts_object_t*)label);
 
@@ -666,8 +666,6 @@ audioconfig_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   audioconfig_update_devices(self);
 
 #ifdef AUDIO_CONFIG_DEBUG
-  post("audioconfig upload call\n");
-  post("Nb labels: %d\n", self->n_labels);
   fts_log("[audioconfig] upload done \n");
 #endif /* AUDIO_CONFIG_DEBUG */
   

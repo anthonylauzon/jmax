@@ -577,7 +577,7 @@ env_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   this->status = status_hold;
   this->mode = mode_continue;
 
-  this->local = (bpf_t *)fts_object_create(bpf_type, NULL, 0, 0);
+  this->local = (bpf_t *)fts_object_create(bpf_type, 0, 0);
   fts_object_refer((fts_object_t *)this->local);
 
   this->current = 0;

@@ -171,116 +171,6 @@ client_t *object_get_client( fts_object_t *obj)
   return client_table_get(index);
 }
 
-
-
-/***********************************************************************
- *
- * client_manager object
- * (the object that listens for client connections) 
- *
- */
-
-typedef struct {
-  fts_object_t head;
-  socket_t socket;
-} client_manager_t;
-
-
-static void client_manager_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  client_manager_t *this = (client_manager_t *)o;
-  socket_t new_socket;
-  fts_atom_t a;
-  fts_object_t *client_object;
-  fts_object_t *socket_stream; 
-
-  new_socket = accept( this->socket, NULL, NULL);
-
-  if (new_socket == INVALID_SOCKET)
-    {
-      client_error( "Cannot accept() connection");
-      return;
-    }
-
-  fts_set_int( &a, new_socket);
-  socket_stream = fts_object_create( fts_socketstream_type, NULL, 1, &a);
-
-  fts_set_object( &a, socket_stream);
-  client_object = fts_object_create( client_class, fts_get_root_patcher(), 1, &a);
-  fts_patcher_add_object(fts_get_root_patcher(), client_object);
-
-  if (!client_object)
-    {
-      fprintf( stderr, "[client_manager] internal error (cannot create client object)\n");
-      return;
-    }
-}
-
-static void client_manager_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  client_manager_t *this = (client_manager_t *)o;
-  int port;
-  struct sockaddr_in addr;
-  static int objects_count = 0;
-
-  if ( ++objects_count > 1)
-    {
-      fts_object_error( o, "object client_manager already exists");
-      return;
-    }
-
-  port = fts_get_int_arg( ac, at, 0, FTS_CLIENT_DEFAULT_PORT);
-
-  this->socket = socket( AF_INET, SOCK_STREAM, 0);
-  if (this->socket == INVALID_SOCKET)
-    {
-      client_error( "Cannot create socket");
-      return;
-    }
-
-  memset( (char *)&addr, 0, sizeof(struct sockaddr_in));
-  addr.sin_family = AF_INET;
-  addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  addr.sin_port = htons(port);
-
-  if ( bind( this->socket, (const struct sockaddr *) &addr, sizeof(struct sockaddr_in)) == SOCKET_ERROR)
-    {
-      client_error( "Cannot bind socket");
-      CLOSESOCKET( this->socket);
-      this->socket = INVALID_SOCKET;
-      return;
-    }
-
-  if ( listen( this->socket, MAX_CLIENTS) == SOCKET_ERROR)
-    {
-      client_error( "Cannot listen on socket");
-      CLOSESOCKET( this->socket);
-      this->socket = INVALID_SOCKET;
-      return;
-    }
-
-  fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
-
-  fts_log( "[client]: Listening on port %d\n", port);
-}
-
-static void client_manager_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  client_manager_t *this = (client_manager_t *)o;
-
-  if ( this->socket == INVALID_SOCKET)
-    return;
-
-  fts_sched_remove( (fts_object_t *)this);
-  CLOSESOCKET( this->socket);
-}
-
-static void client_manager_instantiate(fts_class_t *cl)
-{
-  fts_class_init(cl, sizeof( client_manager_t), client_manager_init, client_manager_delete);
-  fts_class_message_varargs(cl, fts_s_sched_ready, client_manager_select);
-}
-
 /***********************************************************************
  *
  * client object (the object that is created on new client connections)
@@ -943,7 +833,7 @@ static void client_load_project( fts_object_t *o, int winlet, fts_symbol_t s, in
   
   project = fts_project_open(project_file);
 
-  if( project->state == fts_package_corrupt) 
+  if(project == NULL || project->state == fts_package_corrupt) 
     {
       sprintf(message, "Invalid project file: \n%s\n", project_file);
       fts_set_symbol( a, message);
@@ -972,7 +862,7 @@ static void client_load_package( fts_object_t *o, int winlet, fts_symbol_t s, in
   
   package = fts_package_load_from_file(package_name, package_file);
 
-  if( package->state == fts_package_corrupt) 
+  if(package == NULL || package->state == fts_package_corrupt) 
     {
       sprintf(message, "Invalid package file: \n%s\n", package_file);
       fts_set_symbol( a, message);
@@ -1048,9 +938,6 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   this->client_id = client_table_add( this);
   this->object_id_count = 17;
-
-  /* Set my client id */
-  fts_object_set_id( (fts_object_t *)this, OBJECT_ID( 1, this->client_id));
 
   /* output protocol encoder */
   fts_stack_init( &this->output_buffer, unsigned char);
@@ -1442,7 +1329,7 @@ static void client_tcp_manager_install( void)
       ac++;
     }
     
-  client_manager_object = fts_object_create( client_manager_class, fts_get_root_patcher(), ac, at);
+  client_manager_object = fts_object_create_in_patcher( client_manager_class, fts_get_root_patcher(), ac, at);
   fts_patcher_add_object(fts_get_root_patcher(), client_manager_object);
   
   if ( !client_manager_object)
@@ -1455,10 +1342,11 @@ static void client_pipe_install( void)
   fts_object_t *client_object;
   fts_object_t *pipe_stream; 
 
-  pipe_stream = fts_object_create(fts_pipestream_type, NULL, 0, 0);
+  pipe_stream = fts_object_create(fts_pipestream_type, 0, 0);
   
   fts_set_object( &a, pipe_stream);
-  client_object = fts_object_create( client_class, fts_get_root_patcher(), 1, &a);
+  client_object = fts_object_create_in_patcher( client_class, fts_get_root_patcher(), 1, &a);
+  fts_object_set_id(client_object, OBJECT_ID( 1, ((client_t *)client_object)->client_id));
   fts_patcher_add_object(fts_get_root_patcher(), client_object);
   
   if (!client_object)
@@ -1466,6 +1354,115 @@ static void client_pipe_install( void)
       fprintf( stderr, "[client_manager] internal error (cannot create client object)\n");
       return;
     }
+}
+
+/***********************************************************************
+*
+* client_manager object
+* (the object that listens for client connections)
+*
+*/
+
+typedef struct {
+  fts_object_t head;
+  socket_t socket;
+} client_manager_t;
+
+
+static void client_manager_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  client_manager_t *this = (client_manager_t *)o;
+  socket_t new_socket;
+  fts_atom_t a;
+  fts_object_t *client_object;
+  fts_object_t *socket_stream;
+
+  new_socket = accept( this->socket, NULL, NULL);
+
+  if (new_socket == INVALID_SOCKET)
+  {
+    client_error( "Cannot accept() connection");
+    return;
+  }
+
+  fts_set_int( &a, new_socket);
+  socket_stream = fts_object_create( fts_socketstream_type, 1, &a);
+
+  fts_set_object( &a, socket_stream);
+  client_object = fts_object_create_in_patcher( client_class, fts_get_root_patcher(), 1, &a);
+  fts_object_set_id(client_object, OBJECT_ID( 1, ((client_t *)client_object)->client_id));
+  fts_patcher_add_object(fts_get_root_patcher(), client_object);
+
+  if (!client_object)
+  {
+    fprintf( stderr, "[client_manager] internal error (cannot create client object)\n");
+    return;
+  }
+}
+
+static void client_manager_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  client_manager_t *this = (client_manager_t *)o;
+  int port;
+  struct sockaddr_in addr;
+  static int objects_count = 0;
+
+  if ( ++objects_count > 1)
+  {
+    fts_object_error( o, "object client_manager already exists");
+    return;
+  }
+
+  port = fts_get_int_arg( ac, at, 0, FTS_CLIENT_DEFAULT_PORT);
+
+  this->socket = socket( AF_INET, SOCK_STREAM, 0);
+  if (this->socket == INVALID_SOCKET)
+  {
+    client_error( "Cannot create socket");
+    return;
+  }
+
+  memset( (char *)&addr, 0, sizeof(struct sockaddr_in));
+  addr.sin_family = AF_INET;
+  addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  addr.sin_port = htons(port);
+
+  if ( bind( this->socket, (const struct sockaddr *) &addr, sizeof(struct sockaddr_in)) == SOCKET_ERROR)
+  {
+    client_error( "Cannot bind socket");
+    CLOSESOCKET( this->socket);
+    this->socket = INVALID_SOCKET;
+    return;
+  }
+
+  if ( listen( this->socket, MAX_CLIENTS) == SOCKET_ERROR)
+  {
+    client_error( "Cannot listen on socket");
+    CLOSESOCKET( this->socket);
+    this->socket = INVALID_SOCKET;
+    return;
+  }
+
+  fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
+
+  fts_log( "[client]: Listening on port %d\n", port);
+}
+
+static void client_manager_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  client_manager_t *this = (client_manager_t *)o;
+
+  if ( this->socket == INVALID_SOCKET)
+    return;
+
+  fts_sched_remove( (fts_object_t *)this);
+  CLOSESOCKET( this->socket);
+}
+
+static void client_manager_instantiate(fts_class_t *cl)
+{
+  fts_class_init(cl, sizeof( client_manager_t), client_manager_init, client_manager_delete);
+  fts_class_message_varargs(cl, fts_s_sched_ready, client_manager_select);
 }
 
 void fts_client_config( void)

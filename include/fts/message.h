@@ -232,10 +232,32 @@ FTS_API fts_object_t *fts_objstack[];
 	      (fts_is_float(&(AT)[N]) ?  fts_get_float(&(AT)[N]) : (DEF))) : (DEF))
 
 /**
- * Message and outlet API.
+ * Method invokation, message sending and outlet API.
  *
  * @defgroup mess_api
  */
+
+/**
+ * Invoke a method with an unfolded list of arguments (tuple is converted to varargs).
+ *
+ * @fn int fts_invoke_varargs(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at)
+ * @param method the method
+ * @param o the target object
+ * @param ac argument count
+ * @param at argument values
+ */
+FTS_API void fts_invoke_varargs(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at);
+
+/**
+ * Invoke a method with a single argument (ac, at is converted to tuple).
+ *
+ * @fn int fts_invoke_atom(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at)
+ * @param method the method
+ * @param o the target object
+ * @param ac argument count
+ * @param at argument values
+ */
+FTS_API void fts_invoke_atom(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at);
 
 /**
  * Send an arbitrary message to an object (invoke method).
@@ -368,4 +390,7 @@ FTS_API void fts_return_int(int x);
 FTS_API void fts_return_float(float x);
 FTS_API void fts_return_symbol(fts_symbol_t x);
 FTS_API void fts_return_object(fts_object_t *x);
+
+FTS_API fts_atom_t *fts_get_return_value( void);
+
 

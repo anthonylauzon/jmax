@@ -42,6 +42,7 @@
 #define fts_object_get_inlet_connections(o, i) ((o)->patcher_data->in_conn[(i)])
 #define fts_object_get_outlet_connections(o, i) ((o)->patcher_data->out_conn[(i)])
 
+extern fts_object_t *fts_object_create_in_patcher(fts_class_t *cl, fts_patcher_t *patcher, int ac, const fts_atom_t *at);
 
 extern fts_object_patcher_data_t *fts_object_get_patcher_data(fts_object_t *obj);
 extern void fts_object_remove_patcher_data(fts_object_t *obj);

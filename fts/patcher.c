@@ -80,7 +80,7 @@ static fts_memorystream_t *patcher_memory_stream ;
 static fts_memorystream_t * patcher_get_memory_stream()
 {
   if(!patcher_memory_stream)
-    patcher_memory_stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_type, NULL, 0, 0);
+    patcher_memory_stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_type, 0, 0);
   return patcher_memory_stream;
 }
 
@@ -466,7 +466,7 @@ patcher_get_inlet(fts_patcher_t *patcher, int index)
   /* create inlet if needed */
   if(patcher->inlets[index] == NULL)
   {
-    patcher_inout_t *inlet = (patcher_inout_t *)fts_object_create(patcher_inout_class, NULL, 0, 0);
+    patcher_inout_t *inlet = (patcher_inout_t *)fts_object_create(patcher_inout_class, 0, 0);
 
     inlet->patcher = patcher;
     inlet->index = index;
@@ -491,7 +491,7 @@ patcher_get_outlet(fts_patcher_t *patcher, int index)
   /* create outlet if needed */
   if(patcher->outlets[index] == NULL)
   {
-    patcher_inout_t *outlet = (patcher_inout_t *)fts_object_create(patcher_inout_class, NULL, 0, 0);
+    patcher_inout_t *outlet = (patcher_inout_t *)fts_object_create(patcher_inout_class, 0, 0);
 
     outlet->patcher = patcher;
     outlet->index = index;
@@ -1246,11 +1246,12 @@ patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       fts_client_add_symbol( o, fts_class_get_name(class));
     else
       {
-	if( fts_object_get_description_size(obj) > 0)	  
+	if(fts_object_get_description_size(obj) > 0 && fts_is_symbol(fts_object_get_description_atoms(obj)))	  
 	  fts_client_add_symbol( o, fts_get_symbol(fts_object_get_description_atoms(obj)));
 	else
 	  fts_client_add_symbol( o, fts_s_error);
       }
+
     fts_client_add_int( o, fts_object_is_template(obj));
 
     stream = patcher_get_memory_stream();
@@ -1847,7 +1848,24 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->n_inlets = 0;
   this->n_outlets = 0;
 
+  fts_object_set_inlets_number(o, 0);
+  fts_object_set_outlets_number(o, 0);
+  
   fts_patcher_set_standard(this);
+  
+  if(ac > 0)
+  {
+    fts_atom_t va;
+    
+    /* define the "args" name */
+    this->args = (fts_tuple_t *)fts_object_create(fts_tuple_class, ac, at);
+    fts_object_refer(this->args);
+
+    fts_set_object( &va, (fts_object_t *)this->args);
+    fts_name_set_value( this, fts_s_args, &va);
+  }
+  else
+    this->args = NULL;
 
   /* init object list */
   this->objects = NULL;
@@ -1966,7 +1984,7 @@ fts_create_root_patcher()
 
   fts_set_symbol(a, fts_new_symbol("root"));
 
-  fts_root_patcher = (fts_patcher_t *)fts_object_create(patcher_class, NULL, 1, a);
+  fts_root_patcher = (fts_patcher_t *)fts_object_create(patcher_class, 1, a);
 
   fts_object_refer((fts_object_t *)fts_root_patcher);
 }

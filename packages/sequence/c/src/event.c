@@ -29,7 +29,7 @@
 #include <seqsym.h>
 #include "seqmess.h"
 
-fts_class_t *event_type = 0;
+fts_class_t *event_class = 0;
 
 /**************************************************************
  *
@@ -57,55 +57,6 @@ event_get_duration(event_t *event)
   return duration;
 }
 
-void 
-event_get_array(event_t *event, fts_array_t *array)
-{
-  if(fts_is_object(&event->value))
-    {
-      fts_object_t *obj = (fts_object_t *)fts_get_object(&event->value);
-      fts_atom_t a;
-      
-      fts_set_pointer(&a, array);
-      fts_send_message(obj, fts_s_get_array, 1, &a);
-    }
-  else if(!fts_is_void(&event->value))
-    fts_array_append(array, 1, &event->value);
-}
-
-static void
-event_get_description(event_t *event, fts_array_t *array)
-{
-  if(fts_is_object(&event->value))
-    {
-      fts_object_t *obj = (fts_object_t *)fts_get_object(&event->value);
-      fts_symbol_t type = fts_get_class_name(&event->value);
-      fts_atom_t a[2];
-      
-      fts_set_pointer(a, array);
-      fts_send_message(obj, fts_s_get_array, 1, a);
-      
-      fts_set_float(a + 0, (float) event->time);
-      fts_set_symbol(a + 1, type);
-      fts_array_prepend(array, 2, a);
-    }
-  else if(!fts_is_void(&event->value))
-    {
-      fts_array_append_float(array, (float)event->time);
-      fts_array_append(array, 1, &event->value);
-    }
-}
-
-void
-event_dump(event_t *event, fts_dumper_t *dumper)
-{
-  fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_add_event);
-
-  event_get_description(event, fts_message_get_args(mess));
-
-  /* dump add event message */
-  fts_dumper_message_send(dumper, mess);
-}
-
 /**************************************************************
  *
  *  generic event methods
@@ -120,7 +71,7 @@ event_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     {
       fts_object_t *obj = (fts_object_t *)fts_get_object(&this->value);
 
-      fts_send_message(obj, fts_s_set_from_array, ac, at);
+      fts_send_message(obj, fts_s_set, ac, at);
     }
   else if(!fts_is_void(&this->value))
     this->value = at[0];
@@ -172,5 +123,5 @@ event_instantiate(fts_class_t *cl)
 void
 event_config(void)
 {
-  event_type = fts_class_install(seqsym_event, event_instantiate);
+  event_class = fts_class_install(seqsym_event, event_instantiate);
 }

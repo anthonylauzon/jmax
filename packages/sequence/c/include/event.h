@@ -28,7 +28,7 @@
 
 #include <fts/fts.h>
 
-extern fts_class_t *event_type;
+extern fts_class_t *event_class;
 
 typedef struct _event_ event_t;
 
@@ -62,9 +62,6 @@ struct _event_
 #define event_get_object(e) fts_get_object(&(e)->value)
 
 #define event_get_type(e) (fts_get_class_name(&(e)->value))
-
-extern void event_get_array(event_t *event, fts_array_t *array);
-extern void event_dump(event_t *event, fts_dumper_t *dumper);
 
 extern double event_get_duration(event_t *event);
 

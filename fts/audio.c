@@ -690,7 +690,7 @@ void fts_audio_config( void)
   fts_hashtable_init( &audiomanager_table, FTS_HASHTABLE_SMALL);
 
   audio_sched_class = fts_class_install( NULL, audio_sched_instantiate);
-  audio_sched = fts_object_create( audio_sched_class, NULL, 0, 0);
+  audio_sched = fts_object_create( audio_sched_class, 0, 0);
 }
 
 /** EMACS **

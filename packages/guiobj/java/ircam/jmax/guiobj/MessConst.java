@@ -34,7 +34,11 @@ import ircam.jmax.editors.patcher.interactions.*;
 
 public class MessConst extends Editable implements FtsObjectErrorListener, FtsIntValueListener
 {
-  private boolean isFlashing = false;
+  private static final int  statusInvalid = -1;
+  private static final int  statusValid = 0;
+  private static final int statusFlashing = 1;
+  private static final int statusError = 2;
+  private int status = 0;
   private int minWidth = ObjectGeometry.INOUTLET_PAD + ObjectGeometry.HIGHLIGHTED_INOUTLET_WIDTH;
   private int cornerSize = 0;
   private int cornerSizeMax = 0;
@@ -58,10 +62,7 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
     
   public void valueChanged(int value) 
   {
-    if (value != 0)
-      isFlashing = true;
-    else
-      isFlashing = false;
+    status = value;
 
     updateRedraw();
   }
@@ -129,32 +130,47 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
     
   public Color getTextForeground()
   {
-    if(isFlashing) 
+    if(status == statusValid)
+      return Color.black;
+    else if(status == statusFlashing)
       return Color.white;
-    else if(ftsObject.isError())
+    else if(status == statusError)
+      return Color.red;
+    else
       {
 	if(isSelected())
 	  return Color.gray.darker();
 	else
 	  return Color.gray;
       }
-    else
-      return Color.black;
   }
 
   public Color getTextBackground()
   {
-    if(isFlashing) 
+    if(status == statusFlashing)
       return Color.black;
     else if(itsSketchPad.isLocked())
       return Color.white;
     else
-      {
-	if(isSelected())
-	  return Color.lightGray.darker();
-	else
-	  return Color.lightGray;
-      }
+    {
+      if(isSelected())
+        return Color.lightGray.darker();
+      else
+        return Color.lightGray;
+    }
+  }
+
+  public Color getFrameColor()
+  {
+    if(status == statusInvalid)
+    {
+      if(isSelected())
+        return Color.gray.darker();
+      else
+        return Color.gray;
+    }
+    else
+      return Color.black;
   }
 
   public boolean isMultiline()
@@ -179,17 +195,8 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
       g.fillRect( x + 1, y + 1, w - 1, h - 2);
     else
       g.fill3DRect( x, y + 1, w, h - 2, true);
-    
-    if(ftsObject.isError())
-      {
-	if(isSelected())
-	  g.setColor(Color.gray.darker());
-	else
-	  g.setColor(Color.gray);
-      }
-    else
-      g.setColor(Color.black);
 
+    g.setColor(getFrameColor());
     g.drawLine( x, y, x + w - 1, y);
     g.drawLine( x, y, x, y + h/4);
     g.drawLine( x, y + h - 1, x + minWidth, y + h - 1);
@@ -197,6 +204,7 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
 
     drawContent(g);
 
+    g.setColor(getFrameColor());
     paintInlets(g);
     paintOutlets(g);
   }
@@ -211,12 +219,12 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
     g.setColor(getTextBackground());
     g.fillRect( x + 1, y + 1, w - 1, h - 2);
     
-    g.setColor(Color.black);
+    g.setColor(getFrameColor());
     g.drawLine( x, y, x + w - 1, y);
     g.drawLine( x, y, x, y + cornerSize/3);
     g.drawLine( x, y + h - 1, x + cornerSize, y + h - 1);
     g.drawLine( x, y + h - 1, x, y + h - 1 - cornerSize/3);
-  
+
     drawContent(g);
   }
 }

@@ -24,7 +24,7 @@ static fts_class_t* thread_manager_type = NULL;
 int fts_thread_manager_start(void)
 {
     if (NULL == fts_thread_manager)
-      fts_thread_manager = (thread_manager_t*)fts_object_create(thread_manager_type, NULL, 0, 0);	
+      fts_thread_manager = (thread_manager_t*)fts_object_create(thread_manager_type, 0, 0);	
 
     if (fts_thread_manager != NULL)
       return 0;

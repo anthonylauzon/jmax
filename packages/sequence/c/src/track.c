@@ -36,7 +36,62 @@
 
 #define TRACK_BLOCK_SIZE 256
 
-fts_class_t *track_type = 0;
+fts_class_t *track_class = 0;
+
+/******************************************************
+*
+*  preset dumper utility
+*
+*/
+
+static fts_class_t *event_dumper_class = 0;
+
+typedef struct
+{
+  fts_dumper_t head;
+  fts_dumper_t *dumper;
+} event_dumper_t;
+
+static void
+event_dumper_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  event_dumper_t *this = (event_dumper_t *)o;
+  fts_message_t *mess = fts_dumper_message_new(this->dumper, seqsym_dump_mess);
+
+  fts_message_append_symbol(mess, s);
+  fts_message_append(mess, ac, at);
+
+  fts_dumper_message_send(this->dumper, mess);
+}
+
+static void
+event_dumper_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  event_dumper_t *this = (event_dumper_t *)o;
+
+  /* init super */
+  fts_dumper_init((fts_dumper_t *)this, event_dumper_send);
+
+  this->dumper = (fts_dumper_t *)fts_get_object(at);
+  fts_object_refer(this->dumper);
+}
+
+static void
+event_dumper_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  event_dumper_t *this = (event_dumper_t *)o;
+
+  fts_object_release(this->dumper);
+
+  /* delete super */
+  fts_dumper_destroy((fts_dumper_t *)this);
+}
+
+static void
+event_dumper_instantiate(fts_class_t *cl)
+{
+  fts_class_init(cl, sizeof(event_dumper_t), event_dumper_init, event_dumper_delete);
+}
 
 /*********************************************************
  *
@@ -48,29 +103,34 @@ fts_class_t *track_type = 0;
 static event_t *
 create_event(int ac, const fts_atom_t *at)
 {
-  fts_symbol_t type_name = fts_get_symbol(at);
-  event_t *event = 0;
+  event_t *event = NULL;
+  fts_symbol_t class_name;
 
-  if(type_name == fts_s_int || type_name == fts_s_float || type_name == fts_s_symbol)
-    event = (event_t *)fts_object_create(event_type, NULL, 1, at + 1);
+  if(fts_is_symbol(at) && fts_get_symbol(at) == fts_s_colon)
+  {
+    /* skip colon before class name */
+    ac--;
+    at++;
+  }
+  
+  class_name = fts_get_symbol(at);
+    
+  if(class_name == fts_s_int || class_name == fts_s_float || class_name == fts_s_symbol)
+    event = (event_t *)fts_object_create(event_class, 1, at + 1);
   else
   {
-    fts_class_t *type = fts_class_get_by_name(NULL, type_name);
+    fts_class_t *type = fts_class_get_by_name(NULL, class_name);
 
     if(type)
     {
-      fts_object_t *obj = fts_object_create(type, NULL, 0, 0);
-      fts_class_t *class = fts_object_get_class(obj);
-      fts_method_t meth_set = fts_class_get_method_varargs(class, fts_s_set_from_array);
+      fts_object_t *obj = fts_object_create(type, ac - 1, at + 1);
 
-      if(obj && meth_set)
+      if(obj)
       {
         fts_atom_t a;
 
-        meth_set(obj, 0, 0, ac - 1, at + 1);
-
         fts_set_object(&a, obj);
-        event = (event_t *)fts_object_create(event_type, NULL, 1, &a);
+        event = (event_t *)fts_object_create(event_class, 1, &a);
       }
     }
   }
@@ -455,7 +515,7 @@ track_highlight_and_next(track_t *track, event_t *event)
  * 
  */
 
-/* set name of track by client request (ones this will be about variables!!!) */
+/* set name of track by client request */
 static void
 track_set_name_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -575,7 +635,6 @@ track_add_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, i
     {
       /* add event to track */
       track_add_event(this, time, event);
-      
       track_add_event_at_client(this, event, ac, at);
     }
   
@@ -677,12 +736,12 @@ track_insert(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   if(ac >= 2 && fts_is_number(at))
     {
-      fts_symbol_t track_type = track_get_type(this);
+      fts_class_t *track_type = track_get_type(this);
       
-      if(track_type == fts_s_void || fts_get_class_name(at + 1) == track_type)
+      if(track_type == NULL || fts_get_class(at + 1) == track_type)
 	{
 	  double time = fts_get_number_float(at);
-	  event_t *event = (event_t *)fts_object_create(event_type, NULL, 1, at + 1);
+	  event_t *event = (event_t *)fts_object_create(event_class, 1, at + 1);
 	  
 	  /* add event to track */
 	  track_add_event(this, time, event);
@@ -714,14 +773,14 @@ track_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   track_t *this = (track_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  fts_symbol_t track_type = track_get_type(this);
+  fts_class_t *track_type = track_get_type(this);
   
-  if(track_type == fts_s_void)
+  if(track_type == NULL)
     fts_spost(stream, "(:track)");
   else
     {
       fts_spost(stream, "(:track ");
-      fts_spost_symbol(stream, track_type);
+      fts_spost_symbol(stream, fts_class_get_name(track_type));
       fts_spost(stream, ")");
     }
 }
@@ -731,21 +790,21 @@ track_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   track_t *this = (track_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  fts_symbol_t track_type = track_get_type(this);
+  fts_class_t *track_type = track_get_type(this);
   int track_size = track_get_size(this);
   event_t *event = track_get_first(this);  
 
   if(track_size == 0)
     {
-      if(track_type == fts_s_void)
+      if(track_type == NULL)
 	fts_spost(stream, "<empty track>\n");
       else
-	fts_spost(stream, "<empty %s track>\n", track_type);
+	fts_spost(stream, "<empty %s track>\n", fts_class_get_name(track_type));
     }
   else 
     {
-      if(track_type == fts_s_void)
-	fts_spost(stream, "<%s ", track_type);
+      if(track_type == NULL)
+	fts_spost(stream, "<%s ", fts_class_get_name(track_type));
       else
 	fts_spost(stream, "<");
 
@@ -762,7 +821,7 @@ track_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       
 	  while(event)
 	    {
-	      fts_spost(stream, "@%.7g, ", event_get_time(event));
+	      fts_spost(stream, "  @%.7g, ", event_get_time(event));
 	      fts_spost_atoms(stream, 1, event_get_value(event));
 	      fts_spost(stream, "\n");
 	      
@@ -809,6 +868,17 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
+track_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+
+  if(ac > 0 && fts_is_symbol(at))
+    this->name = fts_get_symbol(at);
+
+  fts_name_set_method(o, 0, NULL, ac, at);
+}
+
+static void
 track_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
@@ -838,7 +908,7 @@ track_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   track_t *this = (track_t *)o;
   fts_atom_t a;
 
-  fts_set_symbol(&a, this->type);
+  fts_set_symbol(&a, fts_class_get_name(this->type));
   fts_client_send_message(o, fts_s_type, 1, &a);
 
   fts_set_int(&a, (this->persistence > 0));
@@ -848,17 +918,11 @@ track_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-track_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+track_return_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
 
-  if(ac == 0)
-    {
-      fts_atom_t a;
-
-      fts_set_int(&a, track_get_duration(this));
-      fts_return(&a);      
-    }
+  fts_return_float(track_get_duration(this));      
 }
 
 /******************************************************
@@ -922,9 +986,9 @@ static void
 track_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
-  fts_symbol_t type = track_get_type(this);
+  fts_class_t *type = track_get_type(this);
 
-  if(type == fts_s_midievent || type == seqsym_note || type == fts_s_void)
+  if(type == fts_midievent_type || type == note_type || type == NULL)
     {
       if(ac == 0)
 	track_import_midifile_dialog(o, 0, 0, 0, 0);
@@ -1037,9 +1101,7 @@ track_end_paste(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   track_t *this = (track_t *)o;
 
   if( track_editor_is_open(this))
-    {
-      fts_client_send_message( o, seqsym_endPaste, 0, 0);
-    }
+    fts_client_send_message( o, seqsym_endPaste, 0, 0);
 }
 
 /******************************************************
@@ -1048,22 +1110,94 @@ track_end_paste(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
  * 
  */
 
+void
+track_event_dump_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+
+  /* send dump message to last loaded object */
+  if(this->load_obj != NULL)
+  {
+    fts_symbol_t selector = fts_get_symbol(at);
+    fts_send_message_varargs(this->load_obj, selector, ac - 1, at + 1);
+  }
+}
+
+void
+track_add_event_from_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  double time = fts_get_float(at + 0);
+  event_t *event;
+
+  /* make new event object */
+  if(ac == 2)
+  {
+    event = (event_t *)fts_object_create(event_class, 1, at + 1); /* primitive value */
+    this->load_obj = NULL;
+  }
+  else
+  {
+    /* create event with object from description */
+    event = create_event(ac - 1, at + 1);
+
+    /* set current event loading */
+    this->load_obj = fts_get_object(event_get_value(event));
+  }
+
+  /* add event to track (strictly ordered by time) */
+  if(event)
+    track_append_event(this, time, event);
+}
+
 static void 
 track_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
 
   if(this->persistence == 1)
+  {
+    fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+    event_dumper_t *event_dumper = (event_dumper_t *)fts_object_create(event_dumper_class, 1, at);
+    event_t *event = track_get_first(this);
+    fts_atom_t dumper_atom;
+    
+    fts_set_object(&dumper_atom, (fts_object_t *)event_dumper);
+
+    while(event)
     {
-      fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);  
-      event_t *event = track_get_first(this);
+      fts_atom_t *value = event_get_value(event);
       
-      while(event)
-	{
-	  event_dump(event, dumper);
-	  event = event_get_next(event);
-	}  
+      if(fts_is_object(value))
+      {
+        fts_object_t *obj = fts_get_object(value);
+        fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_add_event);
+
+        /* save event time and class name */
+        fts_message_append_float(mess, event_get_time(event));
+        fts_message_append_symbol(mess, fts_s_colon);
+        fts_message_append_symbol(mess, fts_object_get_class_name(obj));
+        fts_dumper_message_send(dumper, mess);
+
+        /* dump object messages */
+        fts_send_message_varargs(obj, fts_s_dump_state, 1, &dumper_atom);
+      }
+      else
+      {
+        fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_add_event);
+
+        /* save event time and (primitive) value */
+        fts_message_append_float(mess, event_get_time(event));
+        fts_message_append(mess, 1, value);
+        fts_dumper_message_send(dumper, mess);
+      }
+      
+      event = event_get_next(event);
     }
+
+    /* destroy dumper */
+    fts_object_destroy((fts_object_t *)event_dumper);
+  }
 
   fts_name_dump_method(o, 0, 0, ac, at);
 }
@@ -1086,24 +1220,6 @@ track_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     }
 
   fts_name_dump_method(o, 0, 0, ac, at);
-}
-
-void
-track_add_event_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  track_t *this = (track_t *)o;
-  double time = fts_get_float(at + 0);
-  event_t *event;
-  
-  /* make new event object */
-  if(ac == 2)
-    event = (event_t *)fts_object_create(event_type, NULL, 1, at + 1);
-  else
-    event = create_event(ac - 1, at + 1);
-  
-  /* add event to track (strictly ordered by time) */
-  if(event)
-    track_append_event(this, time, event);
 }
 
 /******************************************************
@@ -1130,15 +1246,23 @@ track_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->first = 0;
   this->last = 0;
   this->size = 0;
-  this->type = fts_s_void;
+  this->type = NULL;
   
   if(ac > 0)
+  {
+    if(fts_is_symbol(at))
     {
-      if(fts_is_symbol(at))
-	this->type = fts_get_symbol(at);
+      fts_symbol_t class_name = fts_get_symbol(at);
+      fts_class_t *class = fts_class_get_by_name(NULL, class_name);
+
+      if(class != NULL)
+        this->type = class;
       else
-	fts_object_error(o, "bad argument");
+        fts_object_error(o, "cannot create track of %s", class_name);
     }
+    else
+      fts_object_error(o, "bad argument");
+  }
 }
 
 void
@@ -1154,12 +1278,13 @@ track_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(track_t), track_init, track_delete);
 
-  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
+  fts_class_message_varargs(cl, fts_s_name, track_name);
   fts_class_message_varargs(cl, fts_s_persistence, track_persistence);
-  fts_class_message_varargs(cl, fts_s_update_gui, track_update_gui); 
+  fts_class_message_varargs(cl, fts_s_update_gui, track_update_gui);
   fts_class_message_varargs(cl, fts_s_dump, track_dump);
 
-  fts_class_message_varargs(cl, seqsym_add_event, track_add_event_from_array);
+  fts_class_message_varargs(cl, seqsym_add_event, track_add_event_from_file);
+  fts_class_message_varargs(cl, seqsym_dump_mess, track_event_dump_mess);
 
   fts_class_message_varargs(cl, fts_s_upload, track_upload);
   fts_class_message_varargs(cl, fts_s_post, track_post);
@@ -1191,11 +1316,15 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_destroyEditor, track_destroy_editor);
   fts_class_message_varargs(cl, fts_s_closeEditor, track_close_editor);
 
-  fts_class_message_varargs(cl, fts_new_symbol("duration"), track_duration);
+  fts_class_message_void(cl, fts_new_symbol("duration"), track_return_duration);
+
+  fts_class_inlet_thru(cl, 0);
 }
 
 void
 track_config(void)
 {
-  track_type = fts_class_install(seqsym_track, track_instantiate);
+  track_class = fts_class_install(seqsym_track, track_instantiate);
+
+  event_dumper_class = fts_class_install(NULL, event_dumper_instantiate);
 }

@@ -76,7 +76,7 @@ seqfind_find_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     seqfind_find_single(o, 0, 0, 1, at);
   else if(ac > 1)
     {
-      fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
+      fts_object_t *tuple = fts_object_create(fts_tuple_class, ac, at);
       fts_atom_t a;
       
       fts_set_object(&a, tuple);
@@ -134,7 +134,7 @@ seqfind_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->track = 0;
   this->mode = sym_first;
 
-  if(ac > 0 && fts_is_a(at, track_type))
+  if(ac > 0 && fts_is_a(at, track_class))
     {
       this->track = (track_t *)fts_get_object(at);
       fts_object_refer(this->track);
@@ -163,7 +163,7 @@ seqfind_instantiate(fts_class_t *cl)
   fts_class_inlet_number(cl, 0, seqfind_find_single);
   fts_class_inlet_symbol(cl, 0, seqfind_find_single);
   fts_class_inlet_varargs(cl, 0, seqfind_find_varargs);
-  fts_class_inlet(cl, 1, track_type, seqfind_set_track);
+  fts_class_inlet(cl, 1, track_class, seqfind_set_track);
 
   fts_class_outlet_varargs(cl, 0);
   fts_class_outlet_float(cl, 1);

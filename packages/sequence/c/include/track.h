@@ -29,7 +29,7 @@
 #include <fts/fts.h>
 #include "event.h"
 
-extern fts_class_t *track_type;
+extern fts_class_t *track_class;
 
 typedef struct _track_ track_t;
 
@@ -47,10 +47,12 @@ struct _track_
 
   int open; /* flag: is 1 if track editor is open */
 
-  fts_symbol_t type; /* type of events */
+  fts_class_t *type; /* type of events */
   event_t *first; /* pointer to first event */
   event_t *last; /* pointer to last event */
   int size; /* # of events in track */
+
+  fts_object_t *load_obj; /* object (event value) of currently loaded event */
 };
 
 #define track_set_sequence(t, s) ((t)->sequence = (s))
@@ -95,6 +97,7 @@ extern void track_highlight_cluster(track_t *track, event_t *event, event_t *nex
 extern event_t *track_highlight_and_next(track_t *track, event_t *event);
 
 extern void track_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-extern void track_add_event_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+extern void track_add_event_from_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+extern void track_event_dump_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 #endif

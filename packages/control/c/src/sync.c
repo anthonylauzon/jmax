@@ -73,10 +73,10 @@ sync_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->wait &= ~bit;
   
   if(!this->wait && (this->trigger & bit))
-    {
-      sync_output(this);
-      this->wait |= this->reset & this->require;
-    }
+  {
+    this->wait |= this->reset & this->require;
+    sync_output(this);
+  }
 }
 
 static void
@@ -179,6 +179,7 @@ sync_set_mode_any(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   this->trigger = (1 << this->n) - 1;
   this->reset = 0;
   this->require = 0;
+  this->wait = 0;
 }
 
 static void
@@ -251,6 +252,7 @@ sync_instantiate(fts_class_t *cl)
   fts_class_message_atom(cl, fts_new_symbol("require"), sync_set_require);
 
   fts_class_inlet_atom(cl, 0, sync_input);
+  fts_class_inlet_atom(cl, 1, sync_input);
   fts_class_outlet_varargs(cl, 0);
 }
 

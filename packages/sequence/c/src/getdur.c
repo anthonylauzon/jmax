@@ -22,38 +22,3 @@
 #include <fts/fts.h>
 #include <track.h>
 #include <seqsym.h>
-
-/******************************************************
- *
- *  user methods
- *
- */
-
-static void
-getdur_track(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  track_t *track = (track_t *)fts_get_object(at);
-
-  fts_outlet_float(o, 0, track_get_duration(track));
-}
-
-/******************************************************
- *
- *  class
- *
- */
-
-static void
-getdur_instantiate(fts_class_t *cl)
-{
-  fts_class_init(cl, sizeof(fts_object_t), 0, 0); 
-  
-  fts_class_inlet(cl, 0, track_type, getdur_track);
-  fts_class_outlet_float(cl, 0);
-}
-
-void
-getdur_config(void)
-{
-  fts_class_install(fts_new_symbol("getdur"), getdur_instantiate);
-}

@@ -124,7 +124,6 @@ void fts_load_project( void)
   fts_package_t* project = NULL;
 
   project_symbol = fts_new_symbol( "project");
-
   
   /* check if the user specified a project file on the command line  */
   project_file = fts_cmd_args_get( project_symbol);
@@ -140,13 +139,14 @@ void fts_load_project( void)
   }
 
   /* create an empty project */
-  if (project_file == NULL) {
+  if (project_file == NULL)
+  {
     fts_log("[boot]: Starting fts with an empty project. This is probably not what you want. Make sure you have a valid project file.\n");
     project = fts_package_new(project_symbol);
     fts_project_set(project);
-  } else {
-    project = fts_project_open(project_file);
   }
+  else
+    project = fts_project_open(project_file);
 }
 
 /***********************************************************************

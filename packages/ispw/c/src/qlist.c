@@ -268,10 +268,10 @@ qlist_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if(name)
     {
       fts_set_symbol(a, name);
-      this->atom_list = (fts_atom_list_t *)fts_object_create(atomlist_type, NULL, 1, a);
+      this->atom_list = (fts_atom_list_t *)fts_object_create(atomlist_type, 1, a);
     }
   else
-    this->atom_list = (fts_atom_list_t *)fts_object_create(atomlist_type, NULL, 0, 0);
+    this->atom_list = (fts_atom_list_t *)fts_object_create(atomlist_type, 0, 0);
 
   this->iterator  = fts_atom_list_iterator_new(this->atom_list);
 }

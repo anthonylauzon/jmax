@@ -73,7 +73,7 @@ void writer_set_state(writesf_t* self,
 static void create_writer_thread(writesf_t* self)
 {
     fts_thread_worker_t* thread_worker = fts_malloc(sizeof(fts_thread_worker_t));
-    dtd_thread_t* writer = (dtd_thread_t*)fts_object_create(dtd_thread_type, NULL, 0, 0);
+    dtd_thread_t* writer = (dtd_thread_t*)fts_object_create(dtd_thread_type, 0, 0);
     fts_thread_function_t* thread_job = fts_malloc(sizeof(fts_thread_function_t));
     
     thread_job->object = (fts_object_t*)writer;

@@ -53,7 +53,7 @@ dict_store_atoms(dict_t *dict, const fts_atom_t *key, int ac, const fts_atom_t *
     dict_store(dict, key, at);
   else if(ac > 1)
     {
-      fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, NULL, ac, at);
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, ac, at);
       fts_atom_t a;
       
       fts_set_object(&a, (fts_object_t *)tuple);
@@ -90,22 +90,6 @@ dict_remove_all(dict_t *dict)
   }
 
   fts_hashtable_clear(&dict->hash);
-}
-
-void
-dict_get_keys(dict_t *dict, fts_array_t *array)
-{
-  fts_iterator_t iterator;
-
-  fts_hashtable_get_keys(&dict->hash, &iterator);
-
-  while(fts_iterator_has_more(&iterator))
-    {
-      fts_atom_t key;
-      
-      fts_iterator_next(&iterator, &key);
-      fts_array_append(array, 1, &key);
-    }
 }
 
 void
@@ -516,12 +500,23 @@ dict_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
 }
 
 static void
-dict_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dict_get_keys(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dict_t *this = (dict_t *)o;
-  fts_array_t *array = (fts_array_t *)fts_get_pointer(at);
+  fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, 0, 0);
+  fts_iterator_t iterator;
 
-  dict_get_keys(this, array);
+  fts_hashtable_get_keys(&this->hash, &iterator);
+
+  while(fts_iterator_has_more(&iterator))
+  {
+    fts_atom_t key;
+
+    fts_iterator_next(&iterator, &key);
+    fts_tuple_append(tuple, 1, &key);
+  }
+
+  fts_return_object((fts_object_t *)tuple);
 }
 
 static void
@@ -542,7 +537,7 @@ dict_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if(size == 0)
     fts_spost(stream, "<empty dictionary>\n");
   else
-    {
+  {
     fts_iterator_t key_iterator;
     fts_iterator_t value_iterator;
 
@@ -571,9 +566,9 @@ dict_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       fts_spost_atoms(stream, 1, &value);
       fts_spost(stream, "\n");
     }
-    }
 
-  fts_spost(stream, "}\n");
+    fts_spost(stream, "}\n");
+  }
 }
 
 /**********************************************************
@@ -626,7 +621,7 @@ dict_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_dump, dict_dump);
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, dict_set_from_instance);
-  fts_class_message_varargs(cl, fts_s_get_array, dict_get_array);
+  fts_class_message_varargs(cl, fts_s_get_tuple, dict_get_keys);
 
   fts_class_message_varargs(cl, fts_s_post, dict_post);
   fts_class_message_varargs(cl, fts_s_print, dict_print);

@@ -29,6 +29,10 @@ typedef struct _fts_tuple_t
 
 FTS_API fts_class_t *fts_tuple_class;
 
+#define fts_tuple_get_array( t) (&(t)->args)
+#define fts_tuple_init(t, n, a) (fts_array_init(&(t)->args, (n), (a)))
+#define fts_tuple_destroy(t) (fts_array_destroy(&(t)->args))
+
 #define fts_tuple_clear(t) (fts_array_clear(&(t)->args))
 #define fts_tuple_set_size(t, n) (fts_array_set_size(&(t)->args, (n)))
 #define fts_tuple_set(t, n, a) (fts_array_set(&(t)->args, (n), (a)))
@@ -44,7 +48,5 @@ FTS_API fts_class_t *fts_tuple_class;
 #define fts_tuple_get_atoms( t) (fts_array_get_atoms(&(t)->args))
 #define fts_tuple_get_size( t) (fts_array_get_size(&(t)->args))
 #define fts_tuple_get_element( t, i) (fts_array_get_element(&(t)->args, i))
-
-#define fts_tuple_get_array( t) (&(t)->args)
 
 #define fts_is_tuple(p) (fts_is_a(p, fts_tuple_class))

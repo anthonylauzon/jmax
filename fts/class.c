@@ -61,7 +61,7 @@ static int default_equals_function( const fts_atom_t *p1, const fts_atom_t *p2)
 fts_class_t *
 fts_class_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 {
-  fts_class_t *cl = (fts_class_t *)fts_object_create( fts_class_class, NULL, 0, 0);
+  fts_class_t *cl = (fts_class_t *)fts_object_create( fts_class_class, 0, 0);
 
   cl->name = name;
   cl->instantiate_fun = instantiate_fun;
@@ -314,7 +314,7 @@ static void
 method_key_init(void)
 {
   method_key_class = fts_class_install(NULL, method_key_instantiate);
-  method_key = (method_key_t *)fts_object_create(method_key_class, NULL, 0, 0);
+  method_key = (method_key_t *)fts_object_create(method_key_class, 0, 0);
 
   fts_set_object(&method_key_atom, (fts_object_t *)method_key);
 }
@@ -322,7 +322,7 @@ method_key_init(void)
 static method_key_t *
 method_key_new(fts_symbol_t selector, fts_class_t *type)
 {
-  method_key_t *key = (method_key_t *)fts_object_create(method_key_class, NULL, 0, 0);
+  method_key_t *key = (method_key_t *)fts_object_create(method_key_class, 0, 0);
 
   key->selector = selector;
   key->type = type;

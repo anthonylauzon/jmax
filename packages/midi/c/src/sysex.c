@@ -84,6 +84,8 @@ sysexin_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(sysex_t), sysexin_init, sysexin_delete);
 
   fts_class_message_varargs(cl, fts_s_midievent, sysexin_output);
+
+  fts_class_outlet_varargs(cl, 0);
 }
 
 /************************************************************

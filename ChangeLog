@@ -1,3 +1,9 @@
+2002-12-31  Norbert Schnell  <schnell@mac-schnell2.ircam.fr>
+
+	* removed patcher from fts_object_create()
+	* finalized initstantiation and runtime error reporting
+	* fixed seqence and track saving/loading (now based on dumper)
+
 2002-12-27  Norbert Schnell  <schnell@mac-schnell2.ircam.fr>
 
 	* first modest doc revision for version 4

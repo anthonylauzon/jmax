@@ -23,6 +23,4 @@
 #ifndef _FTS_PRIVATE_MESSAGE_H_
 #define _FTS_PRIVATE_MESSAGE_H_
 
-extern fts_atom_t *fts_get_return_value( void);
-
 #endif

@@ -36,7 +36,7 @@
  */
 
 static void
-seqmess_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqmess_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   seqmess_t *this = (seqmess_t *)o;
 
@@ -54,26 +54,26 @@ seqmess_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 void 
-seqmess_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  seqmess_t *this = (seqmess_t *)o;
-  fts_array_t *array = fts_get_pointer(at);
-  fts_atom_t a;
-  
-  fts_set_symbol(&a, this->s);
-  fts_array_append(array, 1, &a);
-
-  fts_set_int(&a, this->position);
-  fts_array_append(array, 1, &a);
-}
-
-void 
 seqmess_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   seqmess_t *this = (seqmess_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
 
   fts_spost(stream, "(:seqmess %s)", this->s);
+}
+
+static void
+seqmess_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  seqmess_t *this = (seqmess_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  fts_message_t *mess;
+
+  /* send set message with pitch and duration */
+  mess = fts_dumper_message_new(dumper, fts_s_set);
+  fts_message_append_symbol(mess, this->s);
+  fts_message_append_int(mess, this->position);
+  fts_dumper_message_send(dumper, mess);
 }
 
 /**************************************************************
@@ -87,10 +87,10 @@ seqmess_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   seqmess_t *this = (seqmess_t *)o;
 
-  this->s = fts_s_bang;
+  this->s = NULL;
   this->position = 0;
 
-  seqmess_set_from_array(o, 0, 0, ac, at);
+  seqmess_set(o, 0, 0, ac, at);
 }
 
 static void
@@ -98,10 +98,10 @@ seqmess_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(seqmess_t), seqmess_init, 0);
 
+  fts_class_message_varargs(cl, fts_s_dump_state, seqmess_dump_state);
   fts_class_message_varargs(cl, fts_s_post, seqmess_post);
 
-  fts_class_message_varargs(cl, fts_s_get_array, seqmess_get_array);
-  fts_class_message_varargs(cl, fts_s_set_from_array, seqmess_set_from_array);
+  fts_class_message_varargs(cl, fts_s_set, seqmess_set);
 }
 
 void

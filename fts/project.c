@@ -72,7 +72,7 @@ project_cut_name(const char* filename, char *name)
   snprintf(name, i_end - i_begin + 1, "%s", filename + i_begin);
 }
 
-fts_package_t* 
+fts_package_t * 
 fts_project_open(const char* filename)
 {
   fts_symbol_t sym;

@@ -52,7 +52,7 @@ public class FtsRuntimeErrors extends FtsObject implements ListModel
     FtsObject.registerMessageHandler( FtsRuntimeErrors.class, FtsSymbol.get("postError"), new FtsMessageHandler() {
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsRuntimeErrors)obj).postError( (FtsGraphicObject)args.getObject( 0), args.getString( 1));
+          ((FtsRuntimeErrors)obj).postError( (FtsGraphicObject)args.getObject( 0), args.getSymbol( 1).toString());
 	}
       });
   }

@@ -164,27 +164,36 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
 
   obj = fts_binary_file_load( path, (fts_object_t *)fts_get_root_patcher(), 0, 0);
 
-  if (!obj) {
+  if (!obj)
+  {
     fts_log("[package]: Failed to load package file %s\n", path);
-    pkg = fts_package_new(name);
+    
+    /*pkg = fts_package_new(name);
     pkg->state = fts_package_corrupt;
-    goto gracefull_exit;
+    goto graceful_exit;*/
+
+    return NULL;
   }
 
   /* check whether it's a package object */
-  if (fts_object_get_class(obj) != fts_package_type) {
-/* FIXME: error corruption     fts_object_destroy(obj); */
+  if (fts_object_get_class(obj) != fts_package_type)
+  {
+    fts_patcher_remove_object(fts_get_root_patcher(), obj);
     fts_log("[package]: Invalid package file %s\n", path);
     
-    pkg = fts_package_new(name);
+    /*pkg = fts_package_new(name);
     pkg->state = fts_package_corrupt;
-    goto gracefull_exit;
+    goto graceful_exit;*/
+
+    return NULL;
   }
 
   /* so, we have a package. now load all the default files. */
-  pkg = (fts_package_t*) obj;
+  pkg = (fts_package_t*)obj;
 
- gracefull_exit:
+  fts_log("[package]: Loaded package definition from file %s\n", filename);  
+  
+ /*graceful_exit:*/
 
   pkg->name = name;
   pkg->filename = fts_new_symbol(filename);
@@ -212,37 +221,45 @@ fts_package_load(fts_symbol_t name)
 
   /* locate the directory of the package */
   if (!fts_file_find_in_path(NULL, fts_get_package_paths(), name, path, MAXPATHLEN) 
-      || !fts_is_directory(path)) {
+      || !fts_is_directory(path))
+  {
     fts_log("[package]: Couldn't find package %s\n", name);
-    pkg = fts_package_new(name);
-    pkg->state = fts_package_corrupt;
-    goto graceful_exit;
+
+    /*pkg = fts_package_new(name);
+    pkg->state = fts_package_corrupt;g
+    goto graceful_exit;*/
+
+    return NULL;
   }
   
   /* load the definition file */
   sprintf(filename, "%s%c%s.jpkg", path, fts_file_separator, name);
 
-  if (fts_file_exists(filename)) {
+  if (fts_file_exists(filename))
     pkg = fts_package_load_from_file(name, filename);
-    fts_log("[package]: Loaded %s package definition\n", name);
-    post("load package: %s\n", name);
-  } else {
+  else
+  {
     pkg = fts_package_new(name);
     pkg->state = fts_package_defined;
     pkg->name = name;
     pkg->filename = fts_new_symbol(filename);
     pkg->dir = fts_new_symbol(path);
   }
-  
-  /* load the default files */
-  fts_package_load_default_files(pkg);
 
- graceful_exit:
+  if(pkg != NULL)
+  {
+    post("load package: %s\n", name);
 
-  /* put the package in the hashtable */
-  fts_set_symbol(&n, name);
-  fts_set_pointer(&p, pkg);
-  fts_hashtable_put(&fts_packages, &n, &p);    
+    /* load the default files */
+    fts_package_load_default_files(pkg);
+
+    /*graceful_exit:*/
+
+    /* put the package in the hashtable */
+    fts_set_symbol(&n, name);
+    fts_set_pointer(&p, pkg);
+    fts_hashtable_put(&fts_packages, &n, &p);
+  }
 
   return pkg;
 }
@@ -1238,15 +1255,22 @@ fts_package_upload_requires( fts_package_t *this)
 
   fts_list_get_values( this->packages, &i);
   fts_client_start_message( (fts_object_t *)this, fts_s_require);
+
   while (fts_iterator_has_more( &i))
     {
       fts_iterator_next( &i, a);
       fts_client_add_symbol( (fts_object_t *)this, fts_get_symbol( a));      
       pkg = fts_package_get( fts_get_symbol( a));
-      if (!fts_object_has_id( (fts_object_t *)pkg))
-	fts_client_register_object( (fts_object_t *)pkg, fts_get_client_id( (fts_object_t *)this));
-      fts_client_add_int( (fts_object_t *)this, fts_get_object_id( (fts_object_t *)pkg));      
-    } 
+
+      if(pkg != NULL)
+      {
+        if (!fts_object_has_id( (fts_object_t *)pkg))
+          fts_client_register_object( (fts_object_t *)pkg, fts_get_client_id( (fts_object_t *)this));
+
+        fts_client_add_int( (fts_object_t *)this, fts_get_object_id( (fts_object_t *)pkg));
+      }
+    }
+  
   fts_client_done_message( (fts_object_t *)this);    
 }
 
@@ -1424,7 +1448,7 @@ fts_package_new(fts_symbol_t name)
   fts_atom_t a[1];
   
   fts_set_symbol(&a[0], name);
-  return (fts_package_t *) fts_object_create(fts_package_type, NULL, 1, a);
+  return (fts_package_t *) fts_object_create(fts_package_type, 1, a);
 }
 
 void 

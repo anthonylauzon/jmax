@@ -43,11 +43,15 @@
 /* forward declarations  */
 static void fts_object_move_properties(fts_object_t *old, fts_object_t *new);
 
-static fts_status_description_t class_instantiation_error_description = {
-  "class instantiation error"
+static fts_status_description_t invalid_object_description_error_description = {
+  "invalid object description"
 };
+static fts_status_t invalid_object_description_error = &invalid_object_description_error_description;
 
-static fts_status_t class_instantiation_error = &class_instantiation_error_description;
+static fts_status_description_t init_message_error_description = {
+  "invalid initialization message"
+};
+static fts_status_t init_message_error = &init_message_error_description;
 
 static void fts_object_remove_description(fts_object_t *obj);
 static void fts_object_remove_connections(fts_object_t *obj);
@@ -144,10 +148,37 @@ fts_object_free(fts_object_t *obj)
 }
 
 fts_object_t *
-fts_object_create(fts_class_t *cl, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_object_t *obj = NULL;
-  
+
+  if (!cl->size)
+    fts_class_instantiate(cl);
+
+  obj = fts_object_new(cl);
+
+  /* call constructor */
+  fts_class_get_constructor(cl)(obj, fts_system_inlet, NULL, ac, at);
+
+  if(obj->client_id == FTS_INVALID)
+  {
+    /* destroy invalid object */
+    fts_class_get_deconstructor(cl)(obj, fts_system_inlet, NULL, 0, 0);
+    fts_object_free(obj);
+
+    return NULL;
+  }
+
+  obj->client_id = FTS_NO_ID;
+
+  return obj;
+}
+
+fts_object_t *
+fts_object_create_in_patcher(fts_class_t *cl, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+{
+  fts_object_t *obj = NULL;
+
   if (!cl->size)
     fts_class_instantiate(cl);
 
@@ -168,8 +199,7 @@ fts_object_create(fts_class_t *cl, fts_patcher_t *patcher, int ac, const fts_ato
     return NULL;
   }
 
-  if(obj->client_id < FTS_NO_ID)
-    obj->client_id = FTS_NO_ID;
+  obj->client_id = FTS_NO_ID;
 
   return obj;
 }
@@ -208,18 +238,23 @@ static fts_status_t
 eval_object_description_expression_callback( int ac, const fts_atom_t *at, void *data)
 {
   struct eval_data *eval_data = (struct eval_data *)data;
-  
+  fts_status_t status = fts_ok;
+    
   if (eval_data->obj == NULL)
   {
     if (ac == 1 && fts_is_object( at))
     {
       eval_data->obj = fts_get_object( at);
 
+      /* keep object in state of creation */
+      fts_object_set_id(eval_data->obj, FTS_CREATE);
+
+      /* add object to patcher */
       fts_patcher_add_object( eval_data->patcher, eval_data->obj);
       return fts_ok;
     }
-
-    return class_instantiation_error;
+    
+    status = invalid_object_description_error;
   }
   else
   {
@@ -227,16 +262,22 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
     {
       /* send message to fresh object */
       if(fts_send_message(eval_data->obj, fts_get_symbol(at), ac - 1, at + 1))
-        return fts_ok;
+      {
+        if(fts_object_get_id(eval_data->obj) == FTS_INVALID)
+          status = fts_status_new(fts_get_error());
+      }
+      else
+        status = init_message_error;
     }
 
-    fts_patcher_remove_object(eval_data->patcher, eval_data->obj);
-    eval_data->obj = NULL;
-
-    return class_instantiation_error;
+    if(status != fts_ok)
+    {
+      fts_patcher_remove_object(eval_data->patcher, eval_data->obj);
+      eval_data->obj = NULL;
+    }
   }
 
-  return fts_ok;
+  return status;
 }
 
 fts_object_t *
@@ -249,19 +290,20 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
   int new_ac;
   fts_atom_t *new_at;
 
+  /* empty object */
   if (ac == 0)
-    {
-      /* empty object */
-      fts_atom_t a;
+  {
+    fts_atom_t a;
 
-      fts_set_symbol(&a, fts_s_empty_object);
-      obj = fts_object_create(fts_error_object_class, patcher, 1, &a);
-      fts_object_set_description(obj, ac, at);
+    /* create error object */
+    fts_set_symbol(&a, fts_s_empty_object);
+    obj = fts_object_create_in_patcher(fts_error_object_class, patcher, 1, &a);
+    fts_object_set_description(obj, ac, at);
 
-      fts_patcher_add_object( patcher, obj);    
+    fts_patcher_add_object( patcher, obj);
 
-      return obj;
-    }
+    return obj;
+  }
 
   data.obj = NULL;
   data.patcher = patcher;
@@ -270,43 +312,44 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
      FIXME ??? should it be removed ? the .jmax loader adds the :, so this is usefull only for
      the GUI evaluation ?
   */
-  if ( (fts_is_symbol( at) && fts_get_symbol( at) == fts_s_colon) 
+  if ( (fts_is_symbol( at) && fts_get_symbol( at) == fts_s_colon)
        || (ac >= 2 && fts_is_symbol( at+1) && fts_get_symbol( at+1) == fts_s_colon))
-    {
-      new_ac = ac;
-      new_at = (fts_atom_t *)at;
-    }
+  {
+    new_ac = ac;
+    new_at = (fts_atom_t *)at;
+  }
   else
-    {
-      int i;
+  {
+    int i;
 
-      new_ac = ac+1;
-      new_at = alloca( new_ac * sizeof (fts_atom_t));
+    new_ac = ac+1;
+    new_at = alloca( new_ac * sizeof (fts_atom_t));
 
-      fts_set_symbol( new_at, fts_s_colon);
-      for ( i = 0; i < ac; i++)
-	new_at[i+1] = at[i];
-    }
+    fts_set_symbol( new_at, fts_s_colon);
+    for ( i = 0; i < ac; i++)
+      new_at[i+1] = at[i];
+  }
 
   status = fts_expression_new( new_ac, new_at, &expression);
   if (status == fts_ok)
-    {
-      status = fts_expression_reduce( expression, patcher, 0, 0, eval_object_description_expression_callback, &data);
+  {
+    status = fts_expression_reduce( expression, patcher, 0, 0, eval_object_description_expression_callback, &data);
 
-      if (status == fts_ok)
-	obj = data.obj;
-    }
+    if (status == fts_ok)
+      obj = data.obj;
+  }
 
   if (status != fts_ok)
-    {
-      fts_atom_t a;
+  {
+    fts_atom_t a;
 
-      fts_set_symbol(&a, fts_get_error());
-      obj = fts_object_create(fts_error_object_class, patcher, 1, &a);
-      fts_object_set_description(obj, ac, at);
+    /* create error object */
+    fts_set_symbol(&a, fts_status_get_description(status));
+    obj = fts_object_create_in_patcher(fts_error_object_class, patcher, 1, &a);
+    fts_object_set_description(obj, ac, at);
 
-      fts_patcher_add_object( patcher, obj);
-    }
+    fts_patcher_add_object(patcher, obj);
+  }
 
   /* Add the newly created object as user of the expression's variables,
      even if it is an error object, because we may try to recompute, and recover,

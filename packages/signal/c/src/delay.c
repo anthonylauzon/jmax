@@ -177,7 +177,7 @@ delayline_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     }
   else
     {
-      this->edge = (fts_dsp_edge_t *)fts_object_create(fts_dsp_edge_class, NULL, 0, 0);
+      this->edge = (fts_dsp_edge_t *)fts_object_create(fts_dsp_edge_class, 0, 0);
       fts_object_refer((fts_object_t *)this->edge);
     }
 

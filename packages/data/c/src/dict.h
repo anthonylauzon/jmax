@@ -39,6 +39,5 @@ DATA_API fts_class_t *dict_type;
 DATA_API void dict_store(dict_t *dict, const fts_atom_t *key, const fts_atom_t *atom);
 DATA_API void dict_store_atoms(dict_t *dict, const fts_atom_t *key, int ac, const fts_atom_t *at);
 DATA_API void dict_recall(dict_t *dict, const fts_atom_t *key, fts_atom_t *atom);
-DATA_API void dict_get_keys(dict_t *dict, fts_array_t *array);
 
 #endif

@@ -124,7 +124,7 @@ fts_label_get_or_create(fts_patcher_t *patcher, fts_symbol_t name)
     }
 
   /* create new label */
-  label = (fts_label_t *)fts_object_create(fts_label_class, patcher, 0, 0);
+  label = (fts_label_t *)fts_object_create_in_patcher(fts_label_class, patcher, 0, 0);
   
   /* name the label */
   fts_object_set_name((fts_object_t *)label, name);

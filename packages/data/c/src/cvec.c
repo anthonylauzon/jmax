@@ -42,17 +42,18 @@ cvec_set_size(cvec_t *vec, int size)
 {
   int i;
 
-  if(size > vec->alloc)
+  if(2 * size > vec->alloc)
     {
-      vec->values = (float *)fts_realloc(vec->values, sizeof(complex) * size);
-      vec->alloc = size;
+      vec->values = (float *)fts_realloc(vec->values, 2 * sizeof(float) * size);
+      vec->alloc = 2 * size;
     }
 
   /* when shortening: zero old values */
   for(i=size; i<vec->m; i++)
-    ((complex *)vec->values)[i] = CZERO;
+    ((complex *)(vec->values))[i] = CZERO;
 
   vec->m = size;
+  vec->n = 2;
 }
 
 void
@@ -178,137 +179,119 @@ cvec_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
  */
 
 static void
-cvec_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+cvec_add_cvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   cvec_t *this = (cvec_t *)o;
+  cvec_t *right = (cvec_t *)fts_get_object(at);
+  int this_size = cvec_get_size(this);
+  int right_size = cvec_get_size(right);
+  int size = (this_size <= right_size)? this_size: right_size;
+  complex *l = cvec_get_ptr(this);
+  complex *r = cvec_get_ptr(right);
+  int i;
 
-  if(ac > 0)
-    {
-      if(fts_is_a(at, cvec_type))
-	{
-	  cvec_t *right = (cvec_t *)fts_get_object(at);
-	  int this_size = cvec_get_size(this);
-	  int right_size = cvec_get_size(right);
-	  int size = (this_size <= right_size)? this_size: right_size;
-	  complex *l = cvec_get_ptr(this);
-	  complex *r = cvec_get_ptr(right);
-	  int i;
-  
-	  for(i=0; i<size; i++)
-	    {
-	      l[i].re += r[i].re;
-	      l[i].im += r[i].im;
-	    }
-	}
-      else
-	fts_object_error(o, "method not implemented for given arguments");
-    }
+  for(i=0; i<size; i++)
+  {
+    l[i].re += r[i].re;
+    l[i].im += r[i].im;
+  }
 }
 
 static void
-cvec_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+cvec_sub_cvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   cvec_t *this = (cvec_t *)o;
+  cvec_t *right = (cvec_t *)fts_get_object(at);
+  int this_size = cvec_get_size(this);
+  int right_size = cvec_get_size(right);
+  int size = (this_size <= right_size)? this_size: right_size;
+  complex *l = cvec_get_ptr(this);
+  complex *r = cvec_get_ptr(right);
+  int i;
 
-  if(ac > 0)
-    {
-      if(fts_is_a(at, cvec_type))
-	{
-	  cvec_t *right = (cvec_t *)fts_get_object(at);
-	  int this_size = cvec_get_size(this);
-	  int right_size = cvec_get_size(right);
-	  int size = (this_size <= right_size)? this_size: right_size;
-	  complex *l = cvec_get_ptr(this);
-	  complex *r = cvec_get_ptr(right);
-	  int i;
-  
-	  for(i=0; i<size; i++)
-	    {
-	      l[i].re -= r[i].re;
-	      l[i].im -= r[i].im;
-	    }
-	}
-      else
-	fts_object_error(o, "method not implemented for given arguments");
-    }
+  for(i=0; i<size; i++)
+  {
+    l[i].re -= r[i].re;
+    l[i].im -= r[i].im;
+  }
 }
 
 static void
-cvec_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+cvec_mul_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   cvec_t *this = (cvec_t *)o;
+  fvec_t *right = (fvec_t *)fts_get_object(at);
+  int right_size = fvec_get_size(right);
+  int this_size = cvec_get_size(this);
+  int size = (this_size <= right_size)? this_size: right_size;
+  complex *l = cvec_get_ptr(this);
+  float *r = fvec_get_ptr(right);
+  int i;
 
-  if(ac > 0)
-    {
-      if(fts_is_a(at, fvec_type))
-	{
-	  fvec_t *right = (fvec_t *)fts_get_object(at);
-	  int right_size = fvec_get_size(right);
-	  int this_size = cvec_get_size(this);
-	  int size = (this_size <= right_size)? this_size: right_size;
-	  complex *l = cvec_get_ptr(this);
-	  float *r = fvec_get_ptr(right);
-	  int i;
-  
-	  for(i=0; i<size; i++)
-	    {
-	      l[i].re *= r[i];
-	      l[i].im *= r[i];
-	    }
-	}
-      else if(fts_is_a(at, ivec_type))
-	{
-	  ivec_t *right = (ivec_t *)fts_get_object(at);
-	  int right_size = ivec_get_size(right);
-	  int this_size = cvec_get_size(this);
-	  int size = (this_size <= right_size)? this_size: right_size;
-	  complex *l = cvec_get_ptr(this);
-	  int *r = ivec_get_ptr(right);
-	  int i;
-  
-	  for(i=0; i<size; i++)
-	    {
-	      l[i].re *= (float)r[i];
-	      l[i].im *= (float)r[i];
-	    }
-	}
-      else if(fts_is_a(at, cvec_type))
-	{
-	  cvec_t *right = (cvec_t *)fts_get_object(at);
-	  int right_size = cvec_get_size(right);
-	  int this_size = cvec_get_size(this);
-	  int size = (this_size <= right_size)? this_size: right_size;
-	  complex *l = cvec_get_ptr(this);
-	  complex *r = cvec_get_ptr(right);
-	  int i;
-  
-	  for(i=0; i<size; i++)
-	    {
-	      float l_re = l[i].re;
-	      float l_im = l[i].im;
-	      float r_re = r[i].re;
-	      float r_im = r[i].im;
+  for(i=0; i<size; i++)
+  {
+    l[i].re *= r[i];
+    l[i].im *= r[i];
+  }
+}
 
-	      l[i].re = l_re * r_re - l_im * r_im;
-	      l[i].im = l_im * r_re + l_re * r_im;
-	    }
-	}
-      else if(fts_is_number(at))
-	{
-	  float r = fts_get_number_float(at);
-	  int size = cvec_get_size(this);
-	  complex *p = cvec_get_ptr(this);
-	  int i;
-  
-	  for(i=0; i<size; i++)
-	    {
-	      p[i].re *= r;
-	      p[i].im *= r;
-	    }
-	}
-      else
-	fts_object_error(o, "method not implemented for given arguments");
-    }
+static void
+cvec_mul_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  cvec_t *this = (cvec_t *)o;
+  ivec_t *right = (ivec_t *)fts_get_object(at);
+  int right_size = ivec_get_size(right);
+  int this_size = cvec_get_size(this);
+  int size = (this_size <= right_size)? this_size: right_size;
+  complex *l = cvec_get_ptr(this);
+  int *r = ivec_get_ptr(right);
+  int i;
+
+  for(i=0; i<size; i++)
+  {
+    l[i].re *= (float)r[i];
+    l[i].im *= (float)r[i];
+  }
+}
+
+static void
+cvec_mul_cvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  cvec_t *this = (cvec_t *)o;
+  cvec_t *right = (cvec_t *)fts_get_object(at);
+  int right_size = cvec_get_size(right);
+  int this_size = cvec_get_size(this);
+  int size = (this_size <= right_size)? this_size: right_size;
+  complex *l = cvec_get_ptr(this);
+  complex *r = cvec_get_ptr(right);
+  int i;
+
+  for(i=0; i<size; i++)
+  {
+    float l_re = l[i].re;
+    float l_im = l[i].im;
+    float r_re = r[i].re;
+    float r_im = r[i].im;
+
+    l[i].re = l_re * r_re - l_im * r_im;
+    l[i].im = l_im * r_re + l_re * r_im;
+  }
+}
+
+static void
+cvec_mul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  cvec_t *this = (cvec_t *)o;
+  float r = fts_get_number_float(at);
+  int size = cvec_get_size(this);
+  complex *p = cvec_get_ptr(this);
+  int i;
+
+  for(i=0; i<size; i++)
+  {
+    p[i].re *= r;
+    p[i].im *= r;
+  }
 }
 
 static void
@@ -366,119 +349,115 @@ cvec_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-cvec_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+cvec_fft_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   cvec_t *this = (cvec_t *)o;
+  unsigned int fft_size = fts_get_fft_size(cvec_get_size(this));
+  complex *fft_ptr;
 
-  if(ac == 0)
-    {
-      /* inplace FFT */
-      unsigned int fft_size = fts_get_fft_size(cvec_get_size(this));
-      complex *fft_ptr;
+  cvec_set_size(this, fft_size);
+  fft_ptr = cvec_get_ptr(this);
 
-      cvec_set_size(this, fft_size);
-      fft_ptr = cvec_get_ptr(this);
-
-      fts_cfft_inplc(fft_ptr, fft_size);
-    }
-  else if(fts_is_a(at, fvec_type))
-    {
-      /* real FFT */
-      fvec_t *in = (fvec_t *)fts_get_object(at); 
-      float *in_ptr = fvec_get_ptr(in);
-      int in_size = fvec_get_size(in);
-      unsigned int fft_size = fts_get_fft_size(in_size);
-      float *fft_ptr;
-      int i = 0;
-
-      cvec_set_size(this, fft_size >> 1);
-      fft_ptr = (float *)cvec_get_ptr(this);
-
-      for(i=0; i<in_size; i++)
-	fft_ptr[i] = in_ptr[i];
-
-      /* zero padding */
-      for(; i<fft_size; i++)
-	fft_ptr[i] = 0.0;
-  
-      fts_rfft_inplc(fft_ptr, fft_size);
-
-      return;
-    }
-  else if(fts_is_a(at, cvec_type))
-    {
-      /* complex FFT */
-      cvec_t *in = (cvec_t *)fts_get_object(at);
-      int in_size = cvec_get_size(in);
-      unsigned int fft_size = fts_get_fft_size(in_size);
-      complex *fft_ptr;
-
-      cvec_set_size(this, fft_size);
-      fft_ptr = cvec_get_ptr(this);
-
-      if(in != this)
-	{
-	  complex *in_ptr = cvec_get_ptr(in);
-	  int i;
-
-	  for(i=0; i<in_size; i++)
-	    fft_ptr[i] = in_ptr[i];
-	  
-	  /* zero padding */
-	  for(; i<fft_size; i++)
-	    fft_ptr[i] = CZERO;      
-	}
-      
-      fts_cfft_inplc(fft_ptr, fft_size);
-    }
-  else
-    fts_object_error(o, "method not implemented for given arguments");
+  fts_cfft_inplc(fft_ptr, fft_size);
 }
 
 static void
-cvec_ifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+cvec_fft_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   cvec_t *this = (cvec_t *)o;
+  /* real FFT */
+  fvec_t *in = (fvec_t *)fts_get_object(at);
+  float *in_ptr = fvec_get_ptr(in);
+  int in_size = fvec_get_size(in);
+  unsigned int fft_size = fts_get_fft_size(in_size);
+  float *fft_ptr;
+  int i = 0;
 
-  if(ac == 0)
-    {
-      /* inplace IFFT */
-      unsigned int fft_size = fts_get_fft_size(cvec_get_size(this));
-      complex *fft_ptr;
+  cvec_set_size(this, fft_size >> 1);
+  fft_ptr = (float *)cvec_get_ptr(this);
 
-      cvec_set_size(this, fft_size);
-      fft_ptr = cvec_get_ptr(this);
+  for(i=0; i<in_size; i++)
+    fft_ptr[i] = in_ptr[i];
 
-      fts_cifft_inplc(fft_ptr, fft_size);
-    }
-  else if(fts_is_a(at, cvec_type))
-    {
-      /* complex IFFT */
-      cvec_t *in = (cvec_t *)fts_get_object(at);
-      int in_size = cvec_get_size(in);
-      unsigned int fft_size = fts_get_fft_size(in_size);
-      complex *fft_ptr;
+  /* zero padding */
+  for(; i<fft_size; i++)
+    fft_ptr[i] = 0.0;
 
-      cvec_set_size(this, fft_size);
-      fft_ptr = cvec_get_ptr(this);
+  fts_rfft_inplc(fft_ptr, fft_size);
 
-      if(in != this)
-	{
-	  complex *in_ptr = cvec_get_ptr(in);
-	  int i;
+  return;
+}
 
-	  for(i=0; i<in_size; i++)
-	    fft_ptr[i] = in_ptr[i];
-	  
-	  /* zero padding */
-	  for(; i<fft_size; i++)
-	    fft_ptr[i] = CZERO;      
-	}
-      
-      fts_cifft_inplc(fft_ptr, fft_size);
-    }
-  else
-    fts_object_error(o, "method not implemented for given arguments");
+static void
+cvec_fft_cvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  cvec_t *this = (cvec_t *)o;
+  /* complex FFT */
+  cvec_t *in = (cvec_t *)fts_get_object(at);
+  int in_size = cvec_get_size(in);
+  unsigned int fft_size = fts_get_fft_size(in_size);
+  complex *fft_ptr;
+
+  cvec_set_size(this, fft_size);
+  fft_ptr = cvec_get_ptr(this);
+
+  if(in != this)
+  {
+    complex *in_ptr = cvec_get_ptr(in);
+    int i;
+
+    for(i=0; i<in_size; i++)
+      fft_ptr[i] = in_ptr[i];
+
+    /* zero padding */
+    for(; i<fft_size; i++)
+      fft_ptr[i] = CZERO;
+  }
+
+  fts_cfft_inplc(fft_ptr, fft_size);
+}
+
+static void
+cvec_ifft_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  cvec_t *this = (cvec_t *)o;
+  /* inplace IFFT */
+  unsigned int fft_size = fts_get_fft_size(cvec_get_size(this));
+  complex *fft_ptr;
+
+  cvec_set_size(this, fft_size);
+  fft_ptr = cvec_get_ptr(this);
+
+  fts_cifft_inplc(fft_ptr, fft_size);
+}
+
+static void
+cvec_ifft_cvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  cvec_t *this = (cvec_t *)o;
+  /* complex IFFT */
+  cvec_t *in = (cvec_t *)fts_get_object(at);
+  int in_size = cvec_get_size(in);
+  unsigned int fft_size = fts_get_fft_size(in_size);
+  complex *fft_ptr;
+
+  cvec_set_size(this, fft_size);
+  fft_ptr = cvec_get_ptr(this);
+
+  if(in != this)
+  {
+    complex *in_ptr = cvec_get_ptr(in);
+    int i;
+
+    for(i=0; i<in_size; i++)
+      fft_ptr[i] = in_ptr[i];
+
+    /* zero padding */
+    for(; i<fft_size; i++)
+      fft_ptr[i] = CZERO;
+  }
+
+  fts_cifft_inplc(fft_ptr, fft_size);
 }
 
 /********************************************************************
@@ -503,13 +482,12 @@ cvec_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       
       fts_spost(stream, "(:cvec", size);
       
-      for(i=0; i<size-1; i++)
-	{
-	  fts_spost_complex(stream, p[i].re, p[i].im);
-	  fts_spost(stream, " ");
-	}
+      for(i=0; i<size; i++)
+      {
+        fts_spost(stream, " ");
+        fts_spost_complex(stream, p[i].re, p[i].im);
+      }
       
-      fts_spost_complex(stream, p[i].re, p[i].im);
       fts_spost(stream, ")");
     }
   else
@@ -688,16 +666,24 @@ cvec_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_assign, cvec_assign);
  
-  fts_class_message_varargs(cl, fts_new_symbol("add"), cvec_add);
-  fts_class_message_varargs(cl, fts_new_symbol("sub"), cvec_sub);
-  fts_class_message_varargs(cl, fts_new_symbol("mul"), cvec_mul);
+  fts_class_message(cl, fts_new_symbol("add"), cl, cvec_add_cvec);
+  fts_class_message(cl, fts_new_symbol("sub"), cl, cvec_sub_cvec);
 
-  fts_class_message_varargs(cl, fts_new_symbol("abs"), cvec_abs);
-  fts_class_message_varargs(cl, fts_new_symbol("log"), cvec_log);
-  fts_class_message_varargs(cl, fts_new_symbol("exp"), cvec_log);
+  fts_class_message(cl, fts_new_symbol("mul"), cl, cvec_mul_cvec);
+  fts_class_message(cl, fts_new_symbol("mul"), fvec_type, cvec_mul_fvec);
+  fts_class_message(cl, fts_new_symbol("mul"), ivec_type, cvec_mul_ivec);
+  fts_class_message_number(cl, fts_new_symbol("mul"), cvec_mul_number);
 
-  fts_class_message_varargs(cl, fts_new_symbol("fft"), cvec_fft);
-  fts_class_message_varargs(cl, fts_new_symbol("ifft"), cvec_ifft);
+  fts_class_message_void(cl, fts_new_symbol("abs"), cvec_abs);
+  fts_class_message_void(cl, fts_new_symbol("log"), cvec_log);
+  fts_class_message_void(cl, fts_new_symbol("exp"), cvec_exp);
+
+  fts_class_message_void(cl, fts_new_symbol("fft"), cvec_fft_inplace);
+  fts_class_message(cl, fts_new_symbol("fft"), fvec_type, cvec_fft_fvec);
+  fts_class_message(cl, fts_new_symbol("fft"), cl, cvec_fft_cvec);
+  
+  fts_class_message_void(cl, fts_new_symbol("ifft"), cvec_ifft_inplace);
+  fts_class_message(cl, fts_new_symbol("ifft"), cl, cvec_ifft_cvec);
 
   fts_class_message_void(cl, fts_s_size, cvec_return_size);
   fts_class_message_number(cl, fts_s_size, cvec_change_size);

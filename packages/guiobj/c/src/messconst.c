@@ -28,11 +28,14 @@ typedef struct {
   fts_object_t o;
   int value; /* for blinking */
   fts_expression_t *expression;
-  fts_array_t tmp;
-  /* inlet values */
-  int ac;
-  fts_atom_t *at;
+  fts_array_t descr;
+  fts_array_t inlets;
 } messconst_t;
+
+#define MESSCONST_INVALID -1
+#define MESSCONST_RESET 0
+#define MESSCONST_FLASHING 1
+#define MESSCONST_ERROR 2
 
 /************************************************
  *
@@ -45,8 +48,7 @@ messconst_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   messconst_t *this = (messconst_t *)o;
 
-  this->value = 0;
-
+  this->value = MESSCONST_RESET;
   fts_update_request((fts_object_t *)this);
 }
 
@@ -64,15 +66,32 @@ messconst_expression_callback( int ac, const fts_atom_t *at, void *data)
   return fts_ok;
 }
 
-static void
-messconst_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static int
+messconst_eval(messconst_t *this)
 {
-  messconst_t *this = (messconst_t *)o;
-  fts_patcher_t *patcher = fts_object_get_patcher(o);
-  fts_status_t status = fts_expression_reduce( this->expression, patcher, this->ac, this->at, messconst_expression_callback, this);
+  fts_patcher_t *patcher = fts_object_get_patcher((fts_object_t *)this);
+  int n_inlets = fts_array_get_size(&this->inlets);
+  fts_atom_t *values = fts_array_get_atoms(&this->inlets);
+  fts_status_t status;
+
+  status = fts_expression_reduce(this->expression, patcher, n_inlets, values, messconst_expression_callback, this);
 
   if (status != fts_ok)
-    fts_object_error( (fts_object_t *)this, "%s", fts_status_get_description( status));
+  {
+    fts_object_error( (fts_object_t *)this, fts_status_get_description(status));
+    return 0;
+  }
+
+  return 1;
+}
+
+
+static void
+messconst_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  messconst_t *this = (messconst_t *)o;
+
+  messconst_eval(this);
 }
 
 
@@ -81,16 +100,22 @@ messconst_click(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   messconst_t *this = (messconst_t *)o;
 
-  if(winlet < 0 && this->value == 0)
+  if(this->value >= MESSCONST_RESET)
+  {
+    int value = MESSCONST_FLASHING;
+    
+    if(!messconst_eval(this))
+      value = MESSCONST_ERROR;
+      
+    if(this->value == MESSCONST_RESET)
     {
       /* messbox on */
-      this->value = 1;
+      this->value = value;
       fts_update_request(o);
-  
-      fts_timebase_add_call(fts_get_timebase(), o, messconst_off, 0, MESSCONST_FLASH_TIME);
-    }
 
-  messconst_eval(o, 0, 0, 0, 0);
+      fts_timebase_add_call(fts_get_timebase(), o, messconst_off, 0, MESSCONST_FLASH_TIME);
+    }    
+  }
 }
 
 static void
@@ -98,7 +123,7 @@ messconst_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 {
   messconst_t *this = (messconst_t *) o;
 
-  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), fts_array_get_size( &this->tmp), fts_array_get_atoms( &this->tmp));
+  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), fts_array_get_size( &this->descr), fts_array_get_atoms( &this->descr));
 }
 
 static void
@@ -115,44 +140,44 @@ static void
 messconst_set_expression(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messconst_t *this = (messconst_t *) o;
-  int ninlets;
+  int n_inlets;
+  fts_atom_t *values;
   fts_status_t status;
+  int i;
 
-  status = fts_expression_set( this->expression, ac, at);
-  if (status != fts_ok)
+  fts_array_init( &this->descr, ac, at);
+  status = fts_expression_set(this->expression, ac, at);
+
+  if(status == fts_ok)
+  {
+    this->value = MESSCONST_RESET;
+
+    n_inlets = fts_expression_get_env_count(this->expression);
+    if(n_inlets == 0)
+      n_inlets = 1;
+
+    fts_array_set_size(&this->inlets, n_inlets);
+    values = fts_array_get_atoms(&this->inlets);
+    for (i=0; i<n_inlets; i++)
+      fts_set_int(values + i, 0);
+
+    if(n_inlets != fts_object_get_inlets_number(o))
     {
-      fts_object_error( o, "%s", fts_status_get_description( status));
-      return;
+      fts_object_set_inlets_number(o, n_inlets);
+
+      if (fts_object_has_id((fts_object_t *)this))
+      {
+        fts_atom_t a;
+
+        fts_set_int(&a, n_inlets);
+        fts_client_send_message(o, fts_s_n_inlets, 1, &a);
+      }
     }
-
-  fts_array_init( &this->tmp, ac, at);
-
-  ninlets = fts_expression_get_env_count( this->expression);
-  if (ninlets == 0)
-    ninlets = 1;
-
-  fts_object_set_inlets_number(o, ninlets);
-
-  if (ninlets != this->ac)
-    {
-      int i;
-
-      fts_free( this->at);
-
-      this->ac = ninlets;
-      this->at = (fts_atom_t *)fts_malloc( sizeof( fts_atom_t) * this->ac);
-
-      for ( i = 0; i < this->ac; i++)
-	fts_set_int( this->at + i, 0);
-    }
-
-  if (fts_object_has_id((fts_object_t *)this))
-    {
-      fts_atom_t a;
-
-      fts_set_int(&a, ninlets);
-      fts_client_send_message(o, fts_s_n_inlets, 1, &a);
-    }
+  }
+  else
+    this->value = MESSCONST_INVALID;
+  
+  fts_update_request(o);
 }
 
 static void
@@ -163,7 +188,7 @@ messconst_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_message_t *mess;
 
   mess = fts_dumper_message_new( dumper, fts_s_set);
-  fts_message_append( mess, fts_array_get_size( &this->tmp), fts_array_get_atoms( &this->tmp));
+  fts_message_append( mess, fts_array_get_size( &this->descr), fts_array_get_atoms( &this->descr));
   fts_dumper_message_send( dumper, mess);
 }
 
@@ -172,7 +197,7 @@ messconst_set_argument(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 {
   messconst_t *this = (messconst_t *) o;
 
-  fts_atom_assign(this->at + winlet, at);
+  fts_array_set_element(&this->inlets, winlet, at);
 }
 
 static void
@@ -180,8 +205,8 @@ messconst_set_first_and_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac
 {
   messconst_t *this = (messconst_t *) o;
 
-  fts_atom_assign(this->at, at);
-  messconst_eval(o, 0, 0, 0, 0);
+  fts_array_set_element(&this->inlets, winlet, at);
+  messconst_eval(this);
 }
 
 /************************************************
@@ -194,7 +219,8 @@ static void
 messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messconst_t *this = (messconst_t *)o;
-  int ninlets = 1;
+  fts_atom_t *values;
+  int n_inlets = 1;
   int noutlets = 1;
   int new = 0;
   int i;
@@ -208,10 +234,10 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       && fts_is_int( at+3))
     {
       /* If new one, then it gives the number of inlets and outlets */
-      ninlets = fts_get_int( at+1);
-      noutlets = fts_get_int( at+3);
+      n_inlets = fts_get_int( at + 1);
+      noutlets = fts_get_int( at + 3);
 
-      fts_object_set_inlets_number(o, ninlets);
+      fts_object_set_inlets_number(o, n_inlets);
       fts_object_set_outlets_number(o, noutlets);
 
       new = 1;
@@ -224,13 +250,16 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       return;
     }
 
-  fts_array_init( &this->tmp, 0, 0);
+  /* expression description */
+  fts_array_init( &this->descr, 0, 0);
 
-  this->ac = ninlets;
-  this->at = (fts_atom_t *)fts_malloc( sizeof( fts_atom_t) * this->ac);
+  /* inlets */
+  fts_array_init(&this->inlets, 0, 0);
+  fts_array_set_size(&this->inlets, n_inlets);
 
-  for ( i = 0; i < this->ac; i++)
-    fts_set_int( this->at + i, 0);
+  values = fts_array_get_atoms(&this->inlets);
+  for (i=0; i<n_inlets; i++)
+    fts_set_int(values + i, 0);
 
   /* if old one, then we must call the set method by hand, giving as argument the description */
   if(!new)
@@ -243,8 +272,8 @@ messconst_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   messconst_t *this = (messconst_t *)o;
 
   fts_expression_delete( this->expression);
-  fts_array_destroy( &this->tmp);
-  fts_free( this->at);
+  fts_array_destroy( &this->descr);
+  fts_array_destroy( &this->inlets);
 }
 
 static void
@@ -260,7 +289,7 @@ messconst_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_new_symbol("click"), messconst_click);
 
-  fts_class_inlet_bang(cl, 0, messconst_eval);
+  fts_class_inlet_bang(cl, 0, messconst_bang);
   fts_class_inlet_atom(cl, 0, messconst_set_first_and_eval); 
 
   fts_class_inlet_atom(cl, 1, messconst_set_argument);

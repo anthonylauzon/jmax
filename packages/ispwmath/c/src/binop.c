@@ -645,24 +645,26 @@ mod_instantiate(fts_class_t *cl)
 void
 binop_config(void)
 {
+  fts_class_t *cl_bus, *cl_vid;
+
   fts_class_install(fts_new_symbol("+"), add_instantiate);
   fts_class_install(fts_new_symbol("*"), mul_instantiate);
   fts_class_install(fts_new_symbol("/"), div_instantiate);
   fts_class_install(fts_new_symbol("-"), sub_instantiate);
-  fts_class_install(fts_new_symbol("-+"), bus_instantiate);
-  fts_class_install(fts_new_symbol("/*"), vid_instantiate);
+  cl_bus = fts_class_install(fts_new_symbol("-+"), bus_instantiate);
+  cl_vid = fts_class_install(fts_new_symbol("/*"), vid_instantiate);
 
   /* compatibility */
-  fts_class_install(fts_new_symbol("inv+"), bus_instantiate);
-  fts_class_install(fts_new_symbol("inv*"), vid_instantiate);
-
+  fts_class_alias(cl_bus, fts_new_symbol("inv+"));
+  fts_class_alias(cl_vid, fts_new_symbol("inv*"));
+   
   fts_class_install(fts_new_symbol(">="), ge_instantiate);
   fts_class_install(fts_new_symbol("<="), le_instantiate);
   fts_class_install(fts_new_symbol(">"),  gt_instantiate);
   fts_class_install(fts_new_symbol("<"),  lt_instantiate);
   fts_class_install(fts_new_symbol("=="), ee_instantiate);
   fts_class_install(fts_new_symbol("!="), ne_instantiate);
-  
+
   fts_class_install(fts_new_symbol("&"),  band_instantiate);
   fts_class_install(fts_new_symbol("|"),  bor_instantiate);
   fts_class_install(fts_new_symbol("&&"), land_instantiate);

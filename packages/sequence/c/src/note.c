@@ -209,7 +209,7 @@ note_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-note_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+note_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   switch(ac)
     {
@@ -223,17 +223,18 @@ note_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
     }
 }
 
-void 
-note_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+note_get_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   note_t *this = (note_t *)o;
-  fts_array_t *array = fts_get_pointer(at);
+  fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, 0, 0);
   
-  fts_array_append_int(array, this->pitch);
-  fts_array_append_float(array, (float)this->duration);
+  fts_tuple_append_int(tuple, this->pitch);
+  fts_tuple_append_float(tuple, this->duration);
+
 }
 
-void 
+static void 
 note_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   note_t *this = (note_t *)o;
@@ -276,6 +277,30 @@ note_get_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
+note_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  note_t *this = (note_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  fts_message_t *mess;
+  int i;
+
+  /* send set message with pitch and duration */
+  mess = fts_dumper_message_new(dumper, fts_s_set);
+  fts_message_append_int(mess, this->pitch);
+  fts_message_append_float(mess, this->duration);
+  fts_dumper_message_send(dumper, mess);
+
+  /* send a message for each of the properties */
+  for(i=0; i<fts_array_get_size(&this->properties); i++)
+  {
+    fts_atom_t *a = fts_array_get_element(&this->properties, i);
+
+    if(!fts_is_void(a))
+      fts_dumper_send(dumper, note_properties[i].name, 1, a);
+  }
+}
+
+static void
 note_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   note_t *this = (note_t *)o;
@@ -283,7 +308,7 @@ note_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   this->pitch = NOTE_DEF_PITCH;
   this->duration = NOTE_DEF_DURATION;
 
-  note_set_from_array(o, 0, 0, ac, at);
+  note_set(o, 0, 0, ac, at);
   fts_array_init(&this->properties, 0, 0);
 }
 
@@ -293,9 +318,10 @@ note_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(note_t), note_init, 0);
 
   fts_class_message_varargs(cl, fts_new_symbol("get_properties"), note_get_properties);
+  fts_class_message_varargs(cl, fts_s_dump_state, note_dump_state);
 
-  fts_class_message_varargs(cl, fts_s_get_array, note_get_array);
-  fts_class_message_varargs(cl, fts_s_set_from_array, note_set_from_array);
+  fts_class_message_varargs(cl, fts_s_get_tuple, note_get_tuple);
+  fts_class_message_varargs(cl, fts_s_set, note_set);
 
   fts_class_message_varargs(cl, fts_s_post, note_post);
 

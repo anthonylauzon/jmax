@@ -121,7 +121,7 @@ void
 fts_dumper_init(fts_dumper_t *dumper, fts_method_t send)
 {
   dumper->send = send;
-  dumper->message = (fts_message_t *)fts_object_create(fts_message_class, NULL, 0, 0);
+  dumper->message = (fts_message_t *)fts_object_create(fts_message_class, 0, 0);
 
   fts_object_refer(dumper->message);
 }
@@ -158,7 +158,7 @@ fts_dumper_send(fts_dumper_t *dumper, fts_symbol_t s, int ac, const fts_atom_t *
 
 /************************************************
  *
- *  sending values and messages
+ *  outlet and message utils
  *
  */
 
@@ -172,18 +172,18 @@ fts_object_t *fts_objstack[FTS_OBJSTACK_SIZE];
 #define INVOKE(m, o, i, s, n, a) \
 do { \
   FTS_OBJSTACK_PUSH(o); \
-  (*m)((o), (i), (s), (n), (a)); \
-  FTS_OBJSTACK_POP(o); \
+    (*m)((o), (i), (s), (n), (a)); \
+      FTS_OBJSTACK_POP(o); \
 } while(0)
 
 static int
 check_outlet(fts_object_t *o, int woutlet)
 {
   if (woutlet >= fts_object_get_outlets_number(o) || woutlet < 0)
-    {
-      fts_object_error(o, "outlet (%d) out of range", woutlet);
-      return 0;
-    }
+  {
+    fts_object_error(o, "outlet (%d) out of range", woutlet);
+    return 0;
+  }
   else
     return 1;
 }
@@ -193,9 +193,97 @@ create_tuple(int ac, const fts_atom_t *at, fts_atom_t *atup)
 {
   if(fts_is_void(atup))
   {
-    fts_object_t *tup = fts_object_create(fts_tuple_class, NULL, ac, at);
+    fts_object_t *tup = fts_object_create(fts_tuple_class, ac, at);
+
     fts_set_object(atup, tup);
+    fts_object_refer(tup);
   }
+}
+
+/*****************************************************************
+*
+*  unfold method args
+*
+*/
+static int unfold_varargs(int ac, const fts_atom_t* at, fts_atom_t* atup, const fts_atom_t *rat);
+
+static int
+unfold_atom(const fts_atom_t *at, const fts_atom_t *rat)
+{
+  if(fts_is_tuple(at))
+  {
+    fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at);
+    int tup_ac = fts_tuple_get_size(tup);
+    fts_atom_t *tup_at = fts_tuple_get_atoms(tup);
+
+    return unfold_varargs(tup_ac, tup_at, (fts_atom_t *)at, rat);
+  }
+  else if(fts_is_void(at))
+  {
+    rat = NULL;
+    return 0;
+  }
+  else
+  {
+    rat = at;
+    return 1;
+  }
+}
+
+static int
+unfold_varargs(int ac, const fts_atom_t* at, fts_atom_t *atup, const fts_atom_t *rat)
+{
+  switch(ac)
+  {
+    case 0:
+      rat = NULL;
+      return 0;
+    case 1:
+      return unfold_atom(at, rat);
+    default:
+      rat = at;
+      return ac;
+  }
+}
+
+/*****************************************************************
+ *
+ *  method invokation API
+ *
+ */
+
+void
+fts_invoke_varargs(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at)
+{
+  int meth_ac;
+  const fts_atom_t *meth_at;
+  fts_atom_t atup;
+
+  meth_ac = unfold_varargs(ac, at, &atup, meth_at);
+  (*method)(o, 0, NULL, meth_ac, meth_at);
+}
+
+void
+fts_invoke_atom(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at)
+{
+  int meth_ac;
+  const fts_atom_t *meth_at;
+  fts_atom_t atup;
+
+  fts_set_void(&atup);
+
+  meth_ac = unfold_varargs(ac, at, &atup, meth_at);
+
+  if(meth_ac > 0)
+  {
+    create_tuple(meth_ac, meth_at, &atup);
+    (*method)(o, 0, NULL, 1, &atup);
+  }
+  else
+    (*method)(o, 0, NULL, 1, meth_at);
+
+  /* release temporary tuple (if needed) */
+  fts_atom_release(&atup);
 }
 
 /*****************************************************************
@@ -312,7 +400,7 @@ outlet_tuple(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at, fts_ato
           if(varargs == 0)
           {
             create_tuple(ac, at, atup);
-            INVOKE(method, o, winlet, NULL, 1, atup);
+            INVOKE(method, dst, winlet, NULL, 1, atup);
           }
           else
             INVOKE(method, dst, winlet, NULL, ac, at);
@@ -328,7 +416,7 @@ outlet_tuple(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at, fts_ato
 
 /*****************************************************************
  *
- *  dispatch args
+ *  dispatch outlet args
  * 
  */
 static void dispatch_varargs(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at, fts_atom_t* atup);
@@ -435,8 +523,7 @@ fts_outlet_varargs(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at)
   dispatch_varargs(o, woutlet, ac, at, &atup);
   
   /* release temporary tuple (if needed) */
-  if(!fts_is_void(&atup))
-    fts_object_release(fts_get_object(&atup));
+  fts_atom_release(&atup);
 }
 
 /***************************************************
@@ -514,20 +601,16 @@ send_message_tuple(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
 static fts_method_t dispatch_message_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t* atup);
 
 static fts_method_t
-dispatch_message_tuple(fts_object_t *o, fts_symbol_t s, const fts_atom_t *at)
-{
-  fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at);
-  int tup_ac = fts_tuple_get_size(tup);
-  fts_atom_t *tup_at = fts_tuple_get_atoms(tup);
-
-  return dispatch_message_varargs(o, s, tup_ac, tup_at, (fts_atom_t *)at);
-}
-
-static fts_method_t
 dispatch_message_atom(fts_object_t *o, fts_symbol_t s, const fts_atom_t *at)
 {
   if(fts_is_tuple(at))
-    return dispatch_message_tuple(o, s, at);
+  {
+    fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at);
+    int tup_ac = fts_tuple_get_size(tup);
+    fts_atom_t *tup_at = fts_tuple_get_atoms(tup);
+
+    return dispatch_message_varargs(o, s, tup_ac, tup_at, (fts_atom_t *)at);
+  }
   else
     return send_message_atom(o, s, at);
 }
@@ -546,6 +629,12 @@ dispatch_message_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom
   }
 }
 
+/***********************************************************************
+ *
+ * message sending API
+ *
+ */
+
 int
 fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -556,8 +645,7 @@ fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at)
   method = dispatch_message_varargs(o, s, ac, at, &atup);
   
   /* release temporary tuple (if needed) */
-  if(!fts_is_void(&atup))
-    fts_object_release(fts_get_object(&atup));
+  fts_atom_release(&atup);
 
   return (method != NULL);
 }
@@ -603,8 +691,7 @@ fts_outlet_message(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const f
       }
 
       /* release temporary tuple (if needed) */
-      if(!fts_is_void(&atup))
-        fts_object_release(fts_get_object(&atup));
+      fts_atom_release(&atup);
     }
     else
       fts_object_error(o, "message stack overflow at outlet %d", woutlet);

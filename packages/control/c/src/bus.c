@@ -125,6 +125,8 @@ throw_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     fts_channel_send(bus_get_channel(this->bus, this->index), 0, s, ac, at);
   else if(s == 0 && ac > 0)
      throw_set_channel(o, 1, NULL, ac, at);
+  else
+    fts_object_error(o, "bad input at inlet 1");
 }
 
 static void
@@ -155,6 +157,7 @@ throw_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(access_t), throw_init, throw_delete);
 
   fts_class_input_handler(cl, throw_input);
+  fts_class_inlet_thru(cl, 1);
 }
 
 /*****************************************************************************

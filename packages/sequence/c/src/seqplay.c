@@ -323,7 +323,7 @@ seqplay_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     case 2:
       seqplay_set_begin(o, 0, 0, 1, at + 1);
     case 1:
-      if(fts_is_a(at, track_type))
+      if(fts_is_a(at, track_class))
 	seqplay_set_track(o, 0, 0, 1, at);
     case 0:
       break;

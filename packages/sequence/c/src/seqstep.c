@@ -250,7 +250,7 @@ seqstep_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->prev = 0;
   this->next = 0;
 
-  if(ac > 0 && fts_is_a(at, track_type))
+  if(ac > 0 && fts_is_a(at, track_class))
     {
       this->track = (track_t *)fts_get_object(at);
       fts_object_refer(this->track);
@@ -279,7 +279,7 @@ seqstep_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_next, seqstep_next);
   fts_class_message_varargs(cl, fts_s_bang, seqstep_next);
   
-  fts_class_inlet(cl, 1, track_type, seqstep_set_reference);
+  fts_class_inlet(cl, 1, track_class, seqstep_set_reference);
   
   fts_class_outlet_varargs(cl, 0);
   fts_class_outlet_float(cl, 1);

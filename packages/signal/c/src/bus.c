@@ -57,7 +57,7 @@ bus_get_or_create(fts_patcher_t *patcher, fts_symbol_t name)
   else if(fts_is_void(value))
   {
     /* create new bus */
-    bus_t *bus = (bus_t *)fts_object_create(bus_class, patcher, 0, 0);
+    bus_t *bus = (bus_t *)fts_object_create_in_patcher(bus_class, patcher, 0, 0);
 
     /* name the bus */
     fts_object_set_name((fts_object_t *)bus, name);
@@ -142,7 +142,7 @@ bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t 
     }
   else
     {
-      this->edge = (fts_dsp_edge_t *)fts_object_create(fts_dsp_edge_class, NULL, 0, 0);
+      this->edge = (fts_dsp_edge_t *)fts_object_create(fts_dsp_edge_class, 0, 0);
       fts_object_refer((fts_object_t *)this->edge);
     }
 

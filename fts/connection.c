@@ -164,7 +164,9 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
     patcher = NULL;
 
   /* init connection */
-  conn = (fts_connection_t *)fts_object_create(fts_connection_class, patcher, 0, 0);
+  conn = (fts_connection_t *)fts_object_create(fts_connection_class, 0, 0);
+  fts_object_set_patcher((fts_object_t *)conn, patcher);
+  
   conn->src = src;
   conn->woutlet = woutlet;
   conn->dst = dst;

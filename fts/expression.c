@@ -26,6 +26,7 @@
 
 #include <fts/fts.h>
 #include <ftsprivate/class.h>
+#include <ftsprivate/object.h>
 #include <ftsprivate/parser.h>
 #include <ftsprivate/message.h>
 #include <ftsprivate/package.h>
@@ -39,6 +40,21 @@ struct _fts_expression_t {
   fts_parsetree_t *tree;        /* parser abstract tree */
   int fp;                       /* frame pointer */
 };
+
+/***********************************************************************
+ *
+ *  status
+ *
+ */
+fts_status_t
+fts_status_new(fts_symbol_t description)
+{
+  fts_status_description_t *status = (fts_status_description_t *)fts_malloc(sizeof(fts_status_description_t));
+
+  status->description = description;
+
+  return (fts_status_t)status;
+}
 
 static fts_status_description_t empty_expression_error_description = {
   "empty expression"
@@ -55,40 +71,45 @@ static fts_status_description_t operand_type_mismatch_error_description = {
 };
 static fts_status_t operand_type_mismatch_error = &operand_type_mismatch_error_description;
 
-static fts_status_description_t array_access_error_description = {
-  "array access error"
+static fts_status_description_t element_access_error_description = {
+  "element access error"
 };
-static fts_status_t array_access_error = &array_access_error_description;
+static fts_status_t element_access_error = &element_access_error_description;
 
 static fts_status_description_t invalid_environment_variable_error_description = {
   "invalid environment variable"
 };
 static fts_status_t invalid_environment_variable_error = &invalid_environment_variable_error_description;
 
-static fts_status_description_t undefined_class_error_description = {
-  "undefined class"
+static fts_status_description_t unknown_class_error_description = {
+  "unknown class"
 };
-static fts_status_t undefined_class_error = &undefined_class_error_description;
+static fts_status_t unknown_class_error = &unknown_class_error_description;
 
-static fts_status_description_t object_creation_failed_error_description = {
-  "object creation failed"
+static fts_status_description_t unknown_package_error_description = {
+  "unknown package"
 };
-static fts_status_t object_creation_failed_error = &object_creation_failed_error_description;
+static fts_status_t unknown_package_error = &unknown_package_error_description;
+
+static fts_status_description_t invalid_template_error_description = {
+  "invalid template"
+};
+static fts_status_t invalid_template_error = &invalid_template_error_description;
 
 static fts_status_description_t invalid_message_error_description = {
   "invalid message"
 };
 static fts_status_t invalid_message_error = &invalid_message_error_description;
 
+/***********************************************************************
+ *
+ *  functions
+ * 
+ */
+
 #undef EXPRESSION_DEBUG
 
 static void fts_expression_print( fts_expression_t *exp);
-
-/* **********************************************************************
- *
- * Functions
- *
- */
 
 #if 0
 void fts_expression_declare_function( fts_symbol_t name, fts_function_t function)
@@ -352,57 +373,85 @@ static void expression_stack_init( fts_expression_t *exp)
 /*
  * Utility functions for creating objects
  */
-static fts_object_t *create_instance_in_package( fts_package_t *package, fts_patcher_t *patcher, fts_symbol_t class_name, int ac, const fts_atom_t *at)
+static fts_object_t *
+create_instance_in_package( fts_package_t *package, fts_patcher_t *patcher, fts_symbol_t class_name, int ac, const fts_atom_t *at, fts_status_t *status)
 {
+  fts_object_t *obj = NULL;
   fts_template_t *template;
   fts_class_t *cl;
-  fts_object_t *obj = NULL;
 
   if ((template = fts_package_get_declared_template( package, class_name)) != NULL)
-    obj = fts_template_make_instance( template, patcher, ac, at);
+  {
+    if((obj = fts_template_make_instance( template, patcher, ac, at)) != NULL)
+      return obj;
+    else
+       *status = invalid_template_error;
+  }
+  else if ((cl = fts_package_get_class( package, class_name)) != NULL)
+  {
+    if((obj = fts_object_create_in_patcher( cl, patcher, ac, at)) != NULL)
+      return obj;
+    else
+      *status = fts_status_new(fts_get_error());
+  }
+  else if ((template = fts_package_get_template_in_path( package, class_name)) != NULL)
+  {
+    if((obj = fts_template_make_instance( template, patcher, ac, at)) != NULL)
+      return obj;
+    else
+      *status = invalid_template_error;
+  }
 
-  if ((cl = fts_package_get_class( package, class_name)) != NULL)
-    obj = fts_object_create( cl, patcher, ac, at);
-
-  if ((template = fts_package_get_template_in_path( package, class_name)) != NULL)
-    obj = fts_template_make_instance( template, patcher, ac, at);
-
-  return obj;
+  return NULL;
 }
 
 static fts_object_t *
-object_or_template_create( fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+object_or_template_create( fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_status_t *status)
 {
-  fts_package_t *pkg;
   fts_object_t *obj;
+  fts_package_t *pkg;
   fts_iterator_t iter;
   fts_symbol_t package_name = NULL;
   fts_symbol_t class_name;
 
   /* is there a package name in front of the : ? */
   if ( fts_get_symbol( at) != fts_s_colon)
+  {
+    package_name = fts_get_symbol( at);
+    class_name = fts_get_symbol( at + 2);
+
+    pkg = fts_package_get( package_name);
+    if (pkg != NULL)
     {
-      package_name = fts_get_symbol( at);
-      class_name = fts_get_symbol( at + 2);
+      if((obj = create_instance_in_package( pkg, patcher, class_name, ac-3, at+3, status)) != NULL)
+        return obj;
 
-      pkg = fts_package_get( package_name);
-      if (pkg != NULL)
-	return create_instance_in_package( pkg, patcher, class_name, ac-3, at+3);
-
-      return NULL;
+      if(*status == fts_ok)
+        *status = unknown_class_error;
     }
+    else
+      *status = unknown_package_error;
 
+    return NULL;
+  }
+  
   class_name = fts_get_symbol( at + 1);
 
   /* 1) ask kernel package */
   pkg = fts_get_system_package();
-  if ((obj = create_instance_in_package( pkg, patcher, class_name, ac-2, at+2)) != NULL)
+  if((obj = create_instance_in_package( pkg, patcher, class_name, ac-2, at+2, status)) != NULL)
     return obj;
-
+  
+  if(*status != fts_ok)
+    return NULL;
+  
   /* 2) ask the current package */
   pkg = fts_get_current_package();
-  if ((obj = create_instance_in_package( pkg, patcher, class_name, ac-2, at+2)) != NULL)
+  if ((obj = create_instance_in_package( pkg, patcher, class_name, ac-2, at+2, status)) != NULL)
     return obj;
+
+  if(*status != fts_ok)
+    return NULL;
 
   /* 3) ask the required packages of the current package */
   fts_package_get_required_packages( pkg, &iter);
@@ -417,10 +466,14 @@ object_or_template_create( fts_patcher_t *patcher, int ac, const fts_atom_t *at)
       if (pkg == NULL)
 	continue;
 
-      if ((obj = create_instance_in_package( pkg, patcher, class_name, ac-2, at+2)) != NULL)
+      if ((obj = create_instance_in_package( pkg, patcher, class_name, ac-2, at+2, status)) != NULL)
 	return obj;
+
+      if(*status != fts_ok)
+        return NULL;      
   }
 
+  *status = unknown_class_error;      
   return NULL;
 }
 
@@ -428,7 +481,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 {
   int ac;
   fts_atom_t *at, *top, ret[1];
-  fts_status_t status;
+  fts_status_t status = fts_ok;
   fts_object_t *obj;
 
   if (!tree)
@@ -466,7 +519,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 
     if (ac > 1 || toplevel)
       {
-	obj = fts_object_create( fts_tuple_class, NULL, ac, at);
+	obj = fts_object_create( fts_tuple_class, ac, at);
 	fts_object_refer( obj);
 	fts_set_object( ret, obj);
       }
@@ -498,7 +551,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 
     if(!fts_send_message(fts_get_object( at), fts_s_get_element, ac-1, at+1) ||
        fts_is_void( fts_get_return_value()))
-      return array_access_error;
+      return element_access_error;
 
     fts_atom_refer(fts_get_return_value());
 
@@ -543,18 +596,20 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
       ac = expression_stack_frame_count( exp);
       at = expression_stack_frame( exp);
 
-      obj = object_or_template_create( scope, ac, at);
+      obj = object_or_template_create( scope, ac, at, &status);
 
-      if (obj)
+      if(obj)
 	{
 	  fts_object_refer( obj);
 	  fts_set_object( ret, obj);
-	}
-      else
-	fts_set_void( ret);
 
-      expression_stack_pop_frame( exp);
-      expression_stack_push( exp, ret);
+          expression_stack_pop_frame( exp);
+          expression_stack_push( exp, ret);
+
+          return fts_ok;
+        }
+
+      return status;
     }
 
     break;
@@ -749,7 +804,6 @@ fts_status_t fts_expression_reduce( fts_expression_t *exp, fts_patcher_t *scope,
 
   return expression_eval_aux( exp->tree, exp, scope, env_ac, env_at, callback, data, 1);
 }
-
 
 /* **********************************************************************
  *

@@ -110,7 +110,7 @@ fts_midievent_channel_message_init(fts_midievent_t *event, enum midi_type type, 
 fts_midievent_t *
 fts_midievent_channel_message_new(enum midi_type type, int channel, int byte1, int byte2)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, NULL, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
   fts_midievent_channel_message_init(event, type, channel, byte1, byte2);
   return event;
 }
@@ -118,7 +118,7 @@ fts_midievent_channel_message_new(enum midi_type type, int channel, int byte1, i
 fts_midievent_t *
 fts_midievent_note_new(int channel, int note, int velocity)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, NULL, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
   fts_midievent_channel_message_init(event, midi_note, channel, note, velocity);
   return event;
 }
@@ -126,7 +126,7 @@ fts_midievent_note_new(int channel, int note, int velocity)
 fts_midievent_t *
 fts_midievent_poly_pressure_new(int channel, int note, int value)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, NULL, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
   fts_midievent_channel_message_init(event, midi_poly_pressure, channel, note, value);
   return event;
 }
@@ -134,7 +134,7 @@ fts_midievent_poly_pressure_new(int channel, int note, int value)
 fts_midievent_t *
 fts_midievent_control_change_new(int channel, int number, int value)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, NULL, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
   fts_midievent_channel_message_init(event, midi_control_change, channel, number, value);
   return event;
 }
@@ -142,7 +142,7 @@ fts_midievent_control_change_new(int channel, int number, int value)
 fts_midievent_t *
 fts_midievent_program_change_new(int channel, int number)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, NULL, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
   fts_midievent_channel_message_init(event, midi_program_change, channel, number, MIDI_EMPTY_BYTE);
   return event;
 }
@@ -150,7 +150,7 @@ fts_midievent_program_change_new(int channel, int number)
 fts_midievent_t *
 fts_midievent_channel_pressure_new(int channel, int value)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, NULL, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
   fts_midievent_channel_message_init(event, midi_channel_pressure, channel, value, MIDI_EMPTY_BYTE);
   return event;
 }
@@ -158,7 +158,7 @@ fts_midievent_channel_pressure_new(int channel, int value)
 fts_midievent_t *
 fts_midievent_pitch_bend_new(int channel, int LSB, int MSB)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, NULL, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
   fts_midievent_channel_message_init(event, midi_pitch_bend, channel, LSB, MSB);
   return event;
 }
@@ -174,7 +174,7 @@ fts_midievent_system_exclusive_init(fts_midievent_t *event, int ac, const fts_at
 fts_midievent_t *
 fts_midievent_system_exclusive_new(int ac, const fts_atom_t *at)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, NULL, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
   fts_midievent_system_exclusive_init(event, ac, at);
   return event;
 }
@@ -202,7 +202,7 @@ fts_midievent_time_code_init(fts_midievent_t *event, int type, int hour, int min
 fts_midievent_t *
 fts_midievent_time_code_new(int type, int hour, int minute, int second, int frame)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, NULL, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
   fts_midievent_time_code_init(event, type, hour, minute, second, frame);
   return event;
 }
@@ -217,7 +217,7 @@ fts_midievent_real_time_init(fts_midievent_t *event, enum midi_real_time_event t
 fts_midievent_t *
 fts_midievent_real_time_new(enum midi_real_time_event tag)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, NULL, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
   fts_midievent_real_time_init(event, tag);
   return event;
 }
@@ -295,46 +295,50 @@ midievent_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
   
 static void
-midievent_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midievent_get_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
-  fts_array_t *array = (fts_array_t *)fts_get_pointer(at);
+  fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, 0, 0);
+  int type = fts_midievent_get_type(this);
 
-  fts_array_append_int(array, fts_midievent_get_type(this));
+  fts_tuple_append_symbol(tuple, fts_midi_types[type]);
 
   /* append event data */
   if(fts_midievent_is_channel_message(this))
   {
-    fts_array_append_int(array, fts_midievent_channel_message_get_first(this));
+    fts_tuple_append_int(tuple, fts_midievent_channel_message_get_first(this));
 	  
     if(fts_midievent_channel_message_has_second_byte(this))
-      fts_array_append_int(array, fts_midievent_channel_message_get_second(this));
+      fts_tuple_append_int(tuple, fts_midievent_channel_message_get_second(this));
 
-    fts_array_append_int(array, fts_midievent_channel_message_get_channel(this));
+    fts_tuple_append_int(tuple, fts_midievent_channel_message_get_channel(this));
   }
   else if(fts_midievent_is_system_exclusive(this))
   {
     int size = fts_midievent_system_exclusive_get_size(this);
     fts_atom_t *atoms = fts_midievent_system_exclusive_get_atoms(this);
 	  
-    fts_array_append(array, size, atoms);
+    fts_tuple_append(tuple, size, atoms);
   }
   else if(fts_midievent_is_time_code(this))
   {
-    fts_array_append_int(array, fts_midievent_time_code_get_type(this));
-    fts_array_append_int(array, fts_midievent_time_code_get_hour(this));
-    fts_array_append_int(array, fts_midievent_time_code_get_minute(this));
-    fts_array_append_int(array, fts_midievent_time_code_get_second(this));
-    fts_array_append_int(array, fts_midievent_time_code_get_frame(this));
+    fts_tuple_append_int(tuple, fts_midievent_time_code_get_type(this));
+    fts_tuple_append_int(tuple, fts_midievent_time_code_get_hour(this));
+    fts_tuple_append_int(tuple, fts_midievent_time_code_get_minute(this));
+    fts_tuple_append_int(tuple, fts_midievent_time_code_get_second(this));
+    fts_tuple_append_int(tuple, fts_midievent_time_code_get_frame(this));
   }
   else if(fts_midievent_is_real_time(this))
-    fts_array_append_int(array, fts_midievent_real_time_get(this));
+    fts_tuple_append_int(tuple, fts_midievent_real_time_get(this));
+
+  fts_return_object((fts_object_t *)tuple);
 }
   
 static void
 midievent_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  midievent_set(o, 0, 0, ac, at);
+  if(ac > 0)
+    midievent_set(o, 0, 0, ac, at);
 }
 
 static void
@@ -425,8 +429,7 @@ midievent_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_post, midievent_post);
 
-  fts_class_message_varargs(cl, fts_s_get_array, midievent_get_array);
-  fts_class_message_varargs(cl, fts_s_set_from_array, midievent_set);
+  fts_class_message_varargs(cl, fts_s_get_tuple, midievent_get_tuple);
   fts_class_message_varargs(cl, fts_s_set, midievent_set);
 }
 
@@ -447,7 +450,7 @@ fts_midififo_init(fts_midififo_t *fifo, int size)
 
   for(i=0; i<size; i++) 
   {
-    fts_object_t *obj = fts_object_create(fts_midievent_type, NULL, 0, 0);
+    fts_object_t *obj = fts_object_create(fts_midievent_type, 0, 0);
     fts_object_refer(obj);
     entries[i].event = (fts_midievent_t *)obj;
   }
@@ -508,7 +511,7 @@ fts_midififo_poll(fts_midififo_t *fifo)
     fts_object_release(entry->event);
       
     /* insert a new midievent into fifo and claim it */
-    entry->event = (fts_midievent_t *)fts_object_create(fts_midievent_type, NULL, 0, 0);
+    entry->event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
     fts_object_refer(entry->event);
       
     fts_fifo_incr_read(&fifo->data, sizeof(fts_midififo_entry_t));
@@ -604,7 +607,7 @@ static fts_midievent_t *
 midiparser_get_event(fts_midiparser_t *parser)
 {
   if(parser->event == NULL)
-    parser->event = (fts_midievent_t *)fts_object_create(fts_midievent_type, NULL, 0, 0);
+    parser->event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
 
   return parser->event;
 }
@@ -1597,7 +1600,7 @@ static void
 midiconfig_label_set_internal(fts_midiconfig_t *config, fts_midilabel_t *label, int index)
 {
   /* create internal MIDI port */
-  fts_midiport_t *port = (fts_midiport_t *)fts_object_create(midibus_type, NULL, 0, 0);
+  fts_midiport_t *port = (fts_midiport_t *)fts_object_create(midibus_type, 0, 0);
 
   /* set input and output to internal MIDI port */
   midiconfig_label_set_input(config, label, index, port, midiconfig_s_internal_bus);
@@ -2080,7 +2083,6 @@ fts_midiconfig_dump( fts_midiconfig_t *this, fts_bmax_file_t *f)
 static void
 midiconfig_set_to_defaults( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_midiconfig_t *this = (fts_midiconfig_t *)o;
   midiconfig_clear( o, winlet, fts_s_clear, 0, 0);
   /* this->file_name = NULL; */
   midiconfig_upload( o, winlet, fts_s_upload, 0, 0); 
@@ -2201,6 +2203,6 @@ fts_midi_config(void)
   fts_midiconfig_class = fts_class_install(midiconfig_s_name, midiconfig_instantiate);
 
   /* create global NULL MIDI port */
-  midinull = (fts_midiport_t *)fts_object_create(midinull_type, NULL, 0, 0);
+  midinull = (fts_midiport_t *)fts_object_create(midinull_type, 0, 0);
   fts_object_refer((fts_object_t *)midinull);
 }

@@ -325,11 +325,16 @@ typedef struct
 static void
 pbank_send_message_to_label(pbank_t *this, int i, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t name = this->receives[i];
-  fts_label_t *label = fts_label_get(fts_object_get_patcher((fts_object_t *)this), name);
+  fts_patcher_t *patcher = fts_object_get_patcher((fts_object_t *)this);
 
-  if(label)
-    fts_label_send(label, 0, ac, at);
+  if(patcher != NULL)
+  {
+    fts_symbol_t name = this->receives[i];
+    fts_label_t *label = fts_label_get(patcher, name);
+
+    if(label)
+      fts_label_send(label, 0, ac, at);
+  }
 }
 
 static void

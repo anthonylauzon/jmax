@@ -85,7 +85,7 @@ struct fts_object
  * @param at the arguments
  * @return the created object, NULL if instantiation failed
  */
-FTS_API fts_object_t *fts_object_create(fts_class_t *cl, fts_patcher_t *patcher, int ac, const fts_atom_t *at);
+FTS_API fts_object_t *fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at);
 FTS_API void fts_object_destroy(fts_object_t *obj);
 
 FTS_API fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int ac, const fts_atom_t *at);

@@ -55,6 +55,7 @@ fts_symbol_t seqsym_remove_track = 0;
 fts_symbol_t seqsym_move_track = 0;
 fts_symbol_t seqsym_add_event = 0;
 fts_symbol_t seqsym_active = 0;
+fts_symbol_t seqsym_dump_mess = 0;
 
 /* messages from/to client */
 fts_symbol_t seqsym_addTracks = 0;
@@ -103,7 +104,8 @@ seqsym_config(void)
   seqsym_move_track = fts_new_symbol("move_track");
   seqsym_add_event = fts_new_symbol("add_event");
   seqsym_active = fts_new_symbol("active");
-
+  seqsym_dump_mess = fts_new_symbol("dump_mess");
+  
   /* messages to client */
   seqsym_addTracks = fts_new_symbol("addTracks");
   seqsym_removeTracks = fts_new_symbol("removeTracks");

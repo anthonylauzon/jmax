@@ -163,22 +163,6 @@ preset_get_or_add(fts_preset_t *this, const fts_atom_t *key)
   return clones;
 }
 
-void
-preset_get_keys(fts_preset_t *this, fts_array_t *array)
-{
-  fts_iterator_t iterator;
-  
-  fts_hashtable_get_keys(&this->hash, &iterator);
-  
-  while(fts_iterator_has_more( &iterator))
-    {
-      fts_atom_t key;
-      
-      fts_iterator_next( &iterator, &key);
-      fts_array_append(array, 1, &key);
-    }
-}
-
 /******************************************************
  *
  *  methods
@@ -247,7 +231,7 @@ preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 		fts_object_release(clones[i]);
 
 	      /* create new clone */
-	      clones[i] = fts_object_create(type, NULL, 0, 0);
+	      clones[i] = fts_object_create(type, 0, 0);
 
 	      fts_set_object(&a, objects[i]);
 	      fts_send_message_varargs(clones[i], fts_s_set_from_instance, 1, &a);
@@ -265,7 +249,7 @@ preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      fts_class_t *type = fts_object_get_class(this->objects[i]);
 
 	      /* create new clone */
-	      clones[i] = fts_object_create(type, NULL, 0, 0);
+	      clones[i] = fts_object_create(type, 0, 0);
 
 	      fts_set_object(&a, objects[i]);
 	      fts_send_message_varargs(clones[i], fts_s_set_from_instance, 1, &a);
@@ -314,12 +298,23 @@ preset_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-preset_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+preset_get_keys(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_preset_t *this = (fts_preset_t *)o;
-  fts_array_t *array = (fts_array_t *)fts_get_pointer(at);
+  fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, 0, 0);
+  fts_iterator_t iterator;
 
-  preset_get_keys(this, array);
+  fts_hashtable_get_keys(&this->hash, &iterator);
+
+  while(fts_iterator_has_more( &iterator))
+  {
+    fts_atom_t key;
+
+    fts_iterator_next( &iterator, &key);
+    fts_tuple_append(tuple, 1, &key);
+  }
+
+  fts_return_object((fts_object_t *)tuple);
 }
 
 static void
@@ -342,7 +337,7 @@ preset_dump_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     {
       fts_class_t *type = fts_object_get_class(this->objects[index]);
 
-      this->current[index] = fts_object_create(type, NULL, 0, 0);
+      this->current[index] = fts_object_create(type, 0, 0);
     }
 
   fts_send_message_varargs(this->current[index], selector, ac - 2, at + 2);
@@ -356,7 +351,7 @@ preset_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   if(this->persistence != 0)
     {
       fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-      preset_dumper_t *preset_dumper = (preset_dumper_t *)fts_object_create(preset_dumper_type, NULL, 1, at);
+      preset_dumper_t *preset_dumper = (preset_dumper_t *)fts_object_create(preset_dumper_type, 1, at);
       fts_iterator_t iterator;
       fts_atom_t a;
 
@@ -570,7 +565,7 @@ preset_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, sym_new_preset, preset_new_preset);
   fts_class_message_varargs(cl, sym_dump_mess, preset_dump_mess);
 
-  fts_class_message_varargs(cl, fts_s_get_array, preset_get_array);
+  fts_class_message_varargs(cl, fts_s_get_tuple, preset_get_keys);
 
   fts_class_message_varargs(cl, fts_new_symbol("store"), preset_store);
   fts_class_message_varargs(cl, fts_new_symbol("recall"), preset_recall);

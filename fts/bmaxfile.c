@@ -451,7 +451,7 @@ static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *pa
 	  obj = fts_eval_object_description(patcher, 1, &s);
 	  
 	  if(ac > 1)
-	    fts_send_message_varargs(obj, fts_s_set_from_array, ac - 1, a + 1);
+	    fts_send_message_varargs(obj, fts_s_set, ac - 1, a + 1);
 
 	  return obj;
 	}
@@ -896,7 +896,7 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	    p += 4;
 
 
-	    fts_send_message_varargs(object_stack[object_tos], sel, nargs, &eval_stack[eval_tos]);
+	    fts_send_message(object_stack[object_tos], sel, nargs, &eval_stack[eval_tos]);
 	  }
 	break;
 
@@ -1104,7 +1104,7 @@ fts_bmax_file_open_fd( fts_bmax_file_t *f, FILE *file, fts_symbol_t *symbol_tabl
   if(!saver_dumper)
     {
       /* create dumper */
-      saver_dumper = (saver_dumper_t *)fts_object_create(saver_dumper_type, NULL, 0, 0);
+      saver_dumper = (saver_dumper_t *)fts_object_create(saver_dumper_type, 0, 0);
       fts_object_refer(saver_dumper);
     }
 

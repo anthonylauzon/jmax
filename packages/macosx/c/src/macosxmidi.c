@@ -216,7 +216,7 @@ macosxmidi_create_midiport(macosxmidi_t *this, fts_class_t *cl, fts_symbol_t nam
   fts_set_symbol(args + 1, name);
   fts_set_int(args + 2, id);
 
-  port = fts_object_create(cl, NULL, 2 + (id != 0), args);
+  port = fts_object_create(cl, 2 + (id != 0), args);
 
   return (fts_midiport_t *)port;
 }
@@ -528,5 +528,5 @@ macosxmidi_config( void)
   macosxmidi_symbol_iac_midi_source = fts_new_symbol("IAC Source");
   macosxmidi_symbol_iac_midi_destination = fts_new_symbol("IAC Destination");
   
-  fts_midiconfig_add_manager((fts_midimanager_t *)fts_object_create(mc, NULL, 0, 0));
+  fts_midiconfig_add_manager((fts_midimanager_t *)fts_object_create(mc, 0, 0));
 }

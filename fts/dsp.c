@@ -591,7 +591,7 @@ void fts_kernel_dsp_init(void)
 
   /* create dsp timebase in root patcher (will be cleaned up with root patcher) */
   dsp_timebase_class = fts_class_install(NULL, dsp_timebase_instantiate);
-  dsp_timebase = (fts_timebase_t *)fts_object_create(dsp_timebase_class, NULL, 0, 0);
+  dsp_timebase = (fts_timebase_t *)fts_object_create(dsp_timebase_class, 0, 0);
   fts_set_timebase( dsp_timebase);
 
   /* DSP edge class */
@@ -601,10 +601,10 @@ void fts_kernel_dsp_init(void)
   fts_dsp_signal_class = fts_class_install(NULL, dsp_signal_instantiate);
 
   /* create DSP parameter */
-  dsp_active_param = (fts_param_t *)fts_object_create(fts_param_class, NULL, 0, 0);
+  dsp_active_param = (fts_param_t *)fts_object_create(fts_param_class, 0, 0);
   fts_param_add_listener(dsp_active_param, NULL, dsp_active);
 
-  dsp_sample_rate_param = (fts_param_t*)fts_object_create(fts_param_class, NULL, 0, 0);
+  dsp_sample_rate_param = (fts_param_t*)fts_object_create(fts_param_class, 0, 0);
   fts_param_add_listener(dsp_sample_rate_param, NULL, dsp_set_sample_rate);
 
   /* create main DSP graph */

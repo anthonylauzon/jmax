@@ -435,22 +435,24 @@ bpf_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-bpf_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bpf_get_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
   int size = bpf_get_size(this);
-  fts_array_t *array = (fts_array_t *)fts_get_pointer(at);
+  fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, 0, 0);
   fts_atom_t *atoms;
   int i;
   
-  fts_array_set_size(array, size * 2);
-  atoms = fts_array_get_atoms(array);
+  fts_tuple_set_size(tuple, size * 2);
+  atoms = fts_tuple_get_atoms(tuple);
 
   for(i=0; i<size; i++)
     {
       fts_set_float(atoms + 2 * i, bpf_get_time(this, i));
       fts_set_float(atoms + 2 * i + 1, bpf_get_value(this, i));
     }
+
+  fts_return_object((fts_object_t *)tuple);
 }
 
 static void
@@ -513,6 +515,36 @@ bpf_return_interpolated(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   }
 
   fts_return_float(ret);
+}
+
+static void
+bpf_return_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  bpf_t *this = (bpf_t *)o;
+
+  fts_return_float(bpf_get_duration(this));  
+}
+
+static void
+bpf_change_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  bpf_t *this = (bpf_t *)o;
+  double new = fts_get_number_float(at);
+  double old = bpf_get_duration(this);
+
+  if(new > 0.0 && old > 0.0)
+  {
+    double scale = new / old;
+    int i;
+
+    for(i=0; i<bpf_get_size(this); i++)
+      this->points[i].time *= scale;
+  }
+
+  if(bpf_editor_is_open(this))
+    bpf_set_client(this);
+
+  data_object_set_dirty(o);
 }
 
 /************************************************************
@@ -715,8 +747,7 @@ bpf_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, bpf_set_from_instance);
   
-  fts_class_message_varargs(cl, fts_s_get_array, bpf_get_array);
-  fts_class_message_varargs(cl, fts_s_set_from_array, bpf_set);
+  fts_class_message_varargs(cl, fts_s_get_tuple, bpf_get_tuple);
   
   fts_class_message_varargs(cl, fts_s_post, bpf_post);
   fts_class_message_varargs(cl, fts_s_print, bpf_print);
@@ -734,6 +765,9 @@ bpf_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_append, bpf_append);
 
   fts_class_message_number(cl, fts_s_get_element, bpf_return_interpolated);
+
+  fts_class_message_void(cl, fts_new_symbol("duration"), bpf_return_duration);
+  fts_class_message_number(cl, fts_new_symbol("duration"), bpf_change_duration);
   
   fts_class_inlet_bang(cl, 0, data_object_output);
 

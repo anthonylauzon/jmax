@@ -749,6 +749,12 @@
 			settings = {
 			};
 		};
+		F5EEB8B503BC97A6016640F1 = {
+			fileRef = F85494DE02D24EEB01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F5EF54340352D8FC01664092 = {
 			isa = PBXFileReference;
 			name = parser.c;
@@ -7041,8 +7047,8 @@
 		F851228F028BDFF301664092 = {
 			isa = PBXFileReference;
 			name = tup.c;
-			path = ../../packages/control/c/src/tup.c;
-			refType = 2;
+			path = /Users/schnell/Projects/jmax/packages/control/c/src/tup.c;
+			refType = 0;
 		};
 		F8512290028BDFF301664092 = {
 			children = (
@@ -7343,10 +7349,11 @@
 			};
 		};
 		F85122B9028BE0F601664092 = {
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			dstPath = share/jmax/packages/control;
 			dstSubfolderSpec = 7;
 			files = (
+				F5EEB8B503BC97A6016640F1,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;

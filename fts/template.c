@@ -80,21 +80,8 @@ fts_template_make_instance(fts_template_t *template, fts_patcher_t *patcher, int
     
   if (instance)
     {
-      fts_atom_t va;
-
       fts_template_add_instance( template, (fts_object_t *)instance);
-
       fts_patcher_set_template( instance, template);
-
-      /* define the "args" name */
-      /* FIXME: should it be kept into the 'args' member of the patcher ?
-	 Probably not, because it is only accessed via the "args" variable
-	 and the binding is removed when the patcher is deleted */
-      instance->args = (fts_tuple_t *)fts_object_create( fts_tuple_class, NULL, ac, at);
-      fts_object_refer( instance->args);
-
-      fts_set_object( &va, (fts_object_t *)instance->args);
-      fts_name_set_value( instance, fts_s_args, &va);
     }
 
   return (fts_object_t *)instance;

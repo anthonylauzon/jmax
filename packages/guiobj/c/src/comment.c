@@ -40,7 +40,7 @@ static fts_memorystream_t *comment_memory_stream ;
 static fts_memorystream_t *comment_get_memory_stream()
 {
   if(!comment_memory_stream)
-    comment_memory_stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_type, NULL, 0, 0);
+    comment_memory_stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_type, 0, 0);
 
   return comment_memory_stream;
 }
@@ -184,7 +184,7 @@ comment_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_save_dotpat, comment_save_dotpat); 
   fts_class_message_varargs(cl, fts_s_update_gui, comment_update_gui); 
 
-  fts_class_message_varargs(cl, fts_s_set_from_array, comment_set_text_from_array);
+  fts_class_message_varargs(cl, fts_s_set, comment_set_text_from_array);
 
   fts_class_message_varargs(cl, fts_s_comment, comment_set_text);
   fts_class_message_varargs(cl, fts_s_color, comment_set_color); 

@@ -123,9 +123,17 @@ void fts_error_object_config(void)
 static fts_symbol_t the_error = NULL;
 
 void
-fts_set_error(fts_symbol_t error)
+fts_set_error(const char *format, ...)
 {
-  the_error = error;
+  va_list ap;
+  char buf[1024];
+
+  /* make up the errdesc property  */
+  va_start(ap, format);
+  vsprintf(buf, format, ap);
+  va_end(ap);
+
+  the_error = fts_new_symbol(buf);
 }
 
 fts_symbol_t
@@ -146,9 +154,7 @@ void
 fts_runtime_error_proxy_set(fts_object_t *obj)
 {
   runtime_error_proxy = obj;
-  
-  if(!sym_runtime_error_post) 
-    sym_runtime_error_post = fts_new_symbol("postError");
+  sym_runtime_error_post = fts_new_symbol("postError");
 }
 
 void 
@@ -202,7 +208,7 @@ fts_object_error(fts_object_t *obj, const char *format, ...)
   if(fts_object_get_id(obj) == FTS_CREATE || fts_object_get_id(obj) == FTS_INVALID)
   {
     fts_object_set_id(obj, FTS_INVALID);
-    fts_set_error(error);
+    the_error = error;
   }
   else
     fts_object_runtime_error(obj, error);

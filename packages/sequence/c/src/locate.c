@@ -181,7 +181,7 @@ locate_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   this->epsilon = 0.0;
   this->mode = seqsym_event;
 
-  if(ac > 0 && fts_is_a(at, track_type))
+  if(ac > 0 && fts_is_a(at, track_class))
     locate_set_track(o, 0, 0, ac, at);
   else
     fts_object_error(o, "argument of track required");
@@ -208,7 +208,7 @@ locate_instantiate(fts_class_t *cl)
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("epsilon"), locate_set_epsilon_prop);
 
   fts_class_inlet_number(cl, 0, locate_locate);
-  fts_class_inlet(cl, 1, track_type, locate_set_track);
+  fts_class_inlet(cl, 1, track_class, locate_set_track);
 
   fts_class_outlet_varargs(cl, 0);
   fts_class_outlet_float(cl, 1);  

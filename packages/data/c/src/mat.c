@@ -452,7 +452,7 @@ mat_return_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   fts_set_int(a + 0, mat_get_m(this));
   fts_set_int(a + 1, mat_get_n(this));
-  fts_set_object(&t, fts_object_create(fts_tuple_class, NULL, 2, a));
+  fts_set_object(&t, fts_object_create(fts_tuple_class, 2, a));
 
   fts_return(&t);
 }

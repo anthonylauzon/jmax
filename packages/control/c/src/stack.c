@@ -137,10 +137,7 @@ stack_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_clear, stack_clear);
 
   fts_class_inlet_bang(cl, 0, stack_pop);
-  fts_class_inlet_number(cl, 0, stack_input);
-  fts_class_inlet_symbol(cl, 0, stack_input);
-  fts_class_inlet_atom(cl, 0, stack_input);
-
+  fts_class_inlet_atom(cl, 1, stack_input);
 
   fts_class_outlet_varargs(cl, 0);
 }

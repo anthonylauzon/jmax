@@ -165,7 +165,7 @@ segment_set(segment_t *seg, int ac, const fts_atom_t *at)
 	if(fts_is_object(at) && fts_get_class(at) == fvec_type)
 	  fvec = (fvec_t *)fts_get_object(at);
 	else
-	  fvec = (fvec_t *)fts_object_create(fvec_type, NULL, 0, 0);
+	  fvec = (fvec_t *)fts_object_create(fvec_type, 0, 0);
 	
 	seg->fvec = fvec;	  
 	fts_object_refer(fvec);

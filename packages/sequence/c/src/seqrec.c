@@ -124,11 +124,11 @@ seqrec_record_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
       if(here > 0.0)
 	{
-	  fts_symbol_t track_type = track_get_type(this->track);
+	  fts_class_t *track_type = track_get_type(this->track);
 
-	  if(track_type == fts_s_void || fts_get_class_name(at) == track_type)
+	  if(track_type == NULL || fts_get_class(at) == track_type)
 	    {
-	      event_t *event = (event_t *)fts_object_create(event_type, NULL, 1, at);
+	      event_t *event = (event_t *)fts_object_create(event_class, 1, at);
 	  
 	      /* add event to recording track */
 	      track_append_event(this->recording, here, event);
@@ -150,7 +150,7 @@ seqrec_record_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 	seqrec_record_atom(o, 0, 0, 1, at);
       else if(ac > 1)
 	{
-	  fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
+	  fts_object_t *tuple = fts_object_create(fts_tuple_class, ac, at);
 	  fts_atom_t a;
 	  
 	  fts_set_object(&a, tuple);
@@ -188,12 +188,12 @@ seqrec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   this->start_location = 0.0;
   this->start_time = 0.0;
 
-  if(ac > 0 && fts_is_a(at, track_type))
+  if(ac > 0 && fts_is_a(at, track_class))
     {
       this->track = (track_t *)fts_get_object(at);
       fts_object_refer(this->track);
       
-      this->recording = (track_t *)fts_object_create(track_type, NULL, 0, 0);
+      this->recording = (track_t *)fts_object_create(track_class, 0, 0);
     }
   else
     fts_object_error(o, "argument of track required");
@@ -222,7 +222,7 @@ seqrec_instantiate(fts_class_t *cl)
   fts_class_inlet_symbol(cl, 0, seqrec_record_atom);
   fts_class_inlet_varargs(cl, 0, seqrec_record_atoms);
   
-  fts_class_inlet(cl, 1, track_type, seqrec_set_reference);
+  fts_class_inlet(cl, 1, track_class, seqrec_set_reference);
 }
 
 void

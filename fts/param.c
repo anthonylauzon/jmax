@@ -141,7 +141,16 @@ param_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   fts_param_t *this = (fts_param_t *)o;
 
-  fts_atom_assign(&this->value, at);
+  if(ac == 1)
+    fts_atom_assign(&this->value, at);
+  else if(ac > 1)
+  {
+    fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, ac, at);
+    fts_atom_t a;
+
+    fts_set_object(&a, (fts_object_t *)tuple);
+    fts_atom_assign(&this->value, &a);
+  }  
 }
 
 static void
@@ -151,23 +160,6 @@ param_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_param_t *param = (fts_param_t *)fts_get_object(at);
 
   fts_atom_assign(&this->value, &param->value);
-}
-
-static void
-param_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_param_t *this = (fts_param_t *)o;
-
-  if(ac == 1)
-    fts_atom_assign(&this->value, at);
-  else if(ac > 1)
-  {
-    fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, NULL, ac, at);
-    fts_atom_t a;
-
-    fts_set_object(&a, (fts_object_t *)tuple);
-    fts_atom_assign(&this->value, &a);
-  }
 }
 
 static void
@@ -221,19 +213,11 @@ param_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-param_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+param_get_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_param_t *this = (fts_param_t *)o;
-  fts_array_t *array = (fts_array_t *)fts_get_pointer(at);
 
-  if(fts_is_tuple(&this->value))
-    {
-      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(&this->value);
-
-      fts_array_copy(array, fts_tuple_get_array(tuple));
-    }
-  else
-    fts_array_append(array, 1, &this->value);
+  fts_return(&this->value);
 }
 
 static void
@@ -326,7 +310,7 @@ param_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   if(ac > 0)
   {
-    fts_send_message(o, fts_s_set, ac, at);
+    param_set(o, 0, NULL, ac, at);
     this->persistence = -1;
   }
 }
@@ -354,8 +338,7 @@ param_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_post, param_post);
 
-  fts_class_message_varargs(cl, fts_s_set_from_array, param_set_from_array);
-  fts_class_message_varargs(cl, fts_s_get_array, param_get_array);
+  fts_class_message_varargs(cl, fts_s_get_tuple, param_get_value);
 
   fts_class_message_varargs(cl, fts_new_symbol("load_init"), param_update);
 

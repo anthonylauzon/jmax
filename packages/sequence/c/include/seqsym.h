@@ -57,6 +57,7 @@ extern fts_symbol_t seqsym_remove_track;
 extern fts_symbol_t seqsym_move_track;
 extern fts_symbol_t seqsym_add_event;
 extern fts_symbol_t seqsym_active;
+extern fts_symbol_t seqsym_dump_mess;
 
 /* messages from/to client */
 extern fts_symbol_t seqsym_addTracks;
