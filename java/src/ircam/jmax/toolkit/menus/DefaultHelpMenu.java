@@ -51,7 +51,7 @@ public class DefaultHelpMenu extends EditorMenu
     super("Help");
     setHorizontalTextPosition(AbstractButton.LEFT);
 
-    add(DefaultActions.statisticsAction, "Statistics");
+    add(DefaultActions.statisticsAction, "System Info");
     addSeparator();
 
     // Adding the summaries 

@@ -44,7 +44,7 @@ public class StatisticsDialog extends JDialog implements ActionListener, KeyList
 
   public StatisticsDialog( Frame dw) {
 
-    super(dw, "System statistics", false);
+    super(dw, "System Info", false);
 
     parent = (Frame)dw;
   
