@@ -208,6 +208,9 @@ fts_ffuns_init( void)
 #elif (defined( MACOSX))
   fts_ffun_new( fts_new_symbol( "sin"), sinf);
   fts_ffun_new( fts_new_symbol( "cos"), cosf);
+#elif (defined( WIN32))
+  fts_ffun_new( fts_new_symbol( "sin"), sinf);
+  fts_ffun_new( fts_new_symbol( "cos"), cosf);
 #else
 #error No floatfuns.
 #endif

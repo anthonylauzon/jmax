@@ -128,6 +128,37 @@
 #define fts_isnanf(x) (((*(long *)&(x) & 0x7f800000L)==0x7f800000L)&& \
 			 ((*(long *)&(x) & 0x007fffffL)!=0x00000000L) )
 
+/*********************************************************************
+ *
+ *  Win32 platform
+ *
+ *  For compilation with the CygWin platform
+ */
+#elif defined(WIN32)
+
+#define FTS_ARCH_NAME "Win32 (Intel and compatible processors)"
+#define restrict
+#define HAS_UNIX
+/*define HAS_DTD direct to disk support */
+#define HAS_PTHREADS
+#define VECLIB_LOOP_UNROLL NO
+#define FTS_HAS_LITTLE_ENDIAN
+#define USE_FP_ONSET
+#define USE_IEEE_WRAP
+
+/* This macro is defined here because not all platforms have a isnanf macro (or function */
+
+#define fts_isnanf(x) (((*(long *)&(x) & 0x7f800000L)==0x7f800000L)&& \
+			 ((*(long *)&(x) & 0x007fffffL)!=0x00000000L) )
+
+/* This is included for the null device only (null.c) */
+struct timespec {
+  long tv_sec;
+  long tv_nsec;
+};
+#define nanosleep  win32_nanosleep
+int win32_nanosleep(struct timespec *, int);
+
 #else
 
 #error "platform.h : no architecture defined"

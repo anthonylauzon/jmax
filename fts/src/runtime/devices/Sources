@@ -43,6 +43,9 @@ ifeq ($(PLATFORM),macosx)
 ARCH_SOURCES = unixdev.c
 endif
 
+ifeq ($(PLATFORM),win32)
+ARCH_SOURCES = unixdev.c
+endif
 
 SOURCES = \
 	  devconf.c \

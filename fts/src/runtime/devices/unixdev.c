@@ -52,7 +52,9 @@
 /* should be: */
 #include <time.h>
 #include <netinet/in.h>
+#if !defined(WIN32)
 #include <netinet/tcp.h>
+#endif
 #include <arpa/inet.h>
 #include <netdb.h>
 

@@ -39,6 +39,10 @@ ifeq ($(PLATFORM),macosx)
   ARCH_SOURCES = soundfiles.c
 endif
 
+ifeq ($(PLATFORM),win32)
+  ARCH_SOURCES = soundfiles.c
+endif
+
 ifeq ($(VENDOR),solaris2)
   ARCH_SOURCES = sttools.c
 endif
