@@ -18,7 +18,7 @@
 # ***************************************************************************
 HOST_FOR_CVS=maelzel
 RELEASES_DIR=/u/worksta/jmaxdev/releases
-if [ _${TMP}_ == __ ]
+if [ _${TMP}_ = __ ]
 then
     TMP=/tmp
 fi
