@@ -27,6 +27,8 @@ fts_symbol_t fmat_symbol = 0;
 fts_class_t *fmat_type = 0;
 
 static fts_symbol_t sym_text = 0;
+static fts_symbol_t sym_getcol = 0;
+static fts_symbol_t sym_getrow = 0;
 
 /********************************************************
 *
@@ -514,44 +516,59 @@ fmat_return_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 
-/* copy a column (first arg) into an fvec (created here or given as second
-   argument) */
+/* copy a slice (a row or column, given in the first arg) from the
+   matrix into an fvec (created here or given as second argument) */
 static void 
-fmat_get_column(fts_object_t *o, int winlet, fts_symbol_t s, 
-		int ac, const fts_atom_t *at)
+fmat_get_slice(fts_object_t *o, int winlet, fts_symbol_t s, 
+	       int ac, const fts_atom_t *at)
 {
     fmat_t *this = (fmat_t *) o;
 
     if (ac > 0  &&  fts_is_number(at))
     {
-	int m   = fmat_get_m(this);	/* num. rows */
-	int n   = fmat_get_n(this);	/* num. columns */
-	int col = fts_get_number_int(at);
+	int rows = fmat_get_m(this);		/* num. rows */
+	int cols = fmat_get_n(this);		/* num. columns */
+	int j    = fts_get_number_int(at);	/* indexed row or col */
+	int max, pos, stride, size;
 
-	if (0 <= col  &&  col < n)
+	/* decide whether to copy a column or a row */
+	if (s == sym_getcol)
+	{
+	    max    = cols;
+	    size   = rows;
+	    pos    = j;
+	    stride = cols;
+	}
+	else
+	{
+	    max    = rows;
+	    size   = cols;
+	    pos    = j * cols;
+	    stride = 1;
+	}
+
+	if (0 <= j  &&  j < max)	/* check slice index */
 	{
 	    fvec_t *    myfvec;
 	    int		myown;
-	    int		i, pos, stride;
+	    int		i;
 	    fts_atom_t  ret;
 
 	    if (ac > 1  &&  fts_is_a(at+1, fvec_type))
 	    {
 		myfvec = (fvec_t *) fts_get_object(at+1);
-		myown  = 1;
+		myown  = 0;
 	    }
 	    else
 	    {
 		myfvec = (fvec_t *) fts_object_create(fvec_type, 0, NULL);
-		myown  = 0;
+		myown  = 1;
 	    }
 
-	    fvec_set_size(myfvec, m);
+	    fvec_set_size(myfvec, size);
     
 	    /* copy values (elem index is i * n + col) */
-	    pos    = col;
-	    stride = n;
-	    for (i = 0; i < m; i++)
+	    for (i = 0; i < size; i++)
 	    {
 		fvec_set_element(myfvec, i, this->values[pos]);
 		pos += stride;
@@ -1352,7 +1369,8 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_export, fmat_export);
 
   fts_class_message_varargs(cl, fts_s_get_element, fmat_return_element);
-  fts_class_message_varargs(cl, fts_new_symbol("getcol"), fmat_get_column);
+  fts_class_message_varargs(cl, sym_getcol, fmat_get_slice);
+  fts_class_message_varargs(cl, sym_getrow, fmat_get_slice);
 
   fts_class_inlet_bang(cl, 0, data_object_output);
 
@@ -1363,6 +1381,8 @@ fmat_instantiate(fts_class_t *cl)
 void
 fmat_config(void)
 {
+  sym_getcol = fts_new_symbol("getcol");
+  sym_getrow = fts_new_symbol("getrow");
   sym_text = fts_new_symbol("text");
   fmat_symbol = fts_new_symbol("fmat");
 
