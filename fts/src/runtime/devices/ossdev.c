@@ -84,11 +84,15 @@ static struct oss_audio_data_struct
 
   int fragment_size;
   int max_fragments;
+  int fifo_size;
 
   /* buffers  */
 
   short *dac_fmtbuf;		/* buffer to format stereo sample frames, allocated in the device open */
   short *adc_fmtbuf;		/* buffer to format stereo sample frames, allocated in the device_open */
+
+  /* output bytes count, for dac slip detection */
+  long bytes_count;
 
 } oss_audio_data;
 
@@ -165,7 +169,7 @@ static void oss_audio_set_parameters(void)
 static int oss_audiodev_update_device(void)
 {
   int fd;
-  int flags;
+  int flags = 0;
 
   if (oss_audio_data.device_opened)
     {
@@ -211,6 +215,7 @@ static fts_status_t oss_dac_close(fts_dev_t *dev);
 static void         oss_dac_put(fts_word_t *args);
 
 static int          oss_dac_get_nchans(fts_dev_t *dev);
+static int oss_dac_get_nerrors(fts_dev_t *dev);
 
 /*
  * Channels housekeeping structure
@@ -234,6 +239,8 @@ static void oss_dac_init(void)
   set_close_fun(oss_dac_class, oss_dac_close);
 
   set_sig_dev_put_fun(oss_dac_class, oss_dac_put);
+
+  set_sig_dev_get_nerrors_fun( oss_dac_class, oss_dac_get_nerrors);
 
   set_sig_dev_get_nchans_fun(oss_dac_class, oss_dac_get_nchans);
 
@@ -277,8 +284,8 @@ oss_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   /* Parameter parsing  */
   
   oss_audio_data.sampling_rate = (int) fts_param_get_float(fts_s_sampling_rate, 44100.0f);
-  oss_audio_data.fragment_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fragment_size"), 128);
-  oss_audio_data.max_fragments = fts_get_int_by_name(nargs, args, fts_new_symbol("max_fragments"), 4);
+  oss_audio_data.fragment_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fragment_size"), 256);
+  oss_audio_data.max_fragments = fts_get_int_by_name(nargs, args, fts_new_symbol("max_fragments"), 20);
 
   s = fts_get_symbol_by_name(nargs, args, fts_new_symbol("device"), fts_new_symbol("/dev/audio"));
   oss_audio_data.device_name = fts_symbol_name(s);
@@ -296,6 +303,8 @@ oss_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   /* Allocate the DAC  formatting buffer */
 
   oss_audio_data.dac_fmtbuf = (short *) fts_malloc(MAXVS * 2 * sizeof(short));
+
+  fts_dsp_set_dac_slip_dev( dev);
 
   return fts_Success;
 }
@@ -322,18 +331,40 @@ oss_dac_get_nchans(fts_dev_t *dev)
 }
 
 
+static int oss_dac_get_nerrors(fts_dev_t *dev)
+{
+  count_info info;
+  int fifo_size;
+  
+  if (ioctl( oss_audio_data.fd, SNDCTL_DSP_GETOPTR, &info) < 0)
+    {
+      post("Error in ioctl(SNDCTL_DSP_GETOPTR)\n");
+      return 0;
+    }
+
+  fifo_size = oss_audio_data.fragment_size * oss_audio_data.max_fragments;
+  if (info.bytes > (oss_audio_data.bytes_count + fifo_size))
+    {
+      oss_audio_data.bytes_count = info.bytes;
+      return 1;
+    }
+  else
+    return 0;
+}
+
 /* 
    fts_dev_t *dev, int n, float *buf1 ... bufm 
    the device is ignored (only one device for the moment allowed)
 */
 
-static void
-oss_dac_put(fts_word_t *argv)
+static void oss_dac_put(fts_word_t *argv)
 {
   long n = fts_word_get_long(argv + 1);
   int i,j, ch;
   float *in1;
   float *in2;
+
+  oss_audio_data.bytes_count += (4*n);
 
   in1 = (float *) fts_word_get_ptr(argv + 2);
   in2 = (float *) fts_word_get_ptr(argv + 3);
