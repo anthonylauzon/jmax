@@ -939,7 +939,7 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
     fts_patcher_remove_object(fts_object_get_patcher(old), old);
 
     /* upload new object if old object was uploaded */
-    if(old_id != FTS_NO_ID)
+    if(old_id > FTS_NO_ID)
     {
       fts_object_upload(new);
       fts_object_upload_connections(new);

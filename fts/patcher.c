@@ -794,7 +794,7 @@ patcher_set_arguments( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
     fts_memorystream_reset( stream);
     fts_spost_object_description_args( (fts_bytestream_t *)stream, ac, (fts_atom_t *)at);
     fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
-    fts_set_string(&a,  fts_memorystream_get_bytes( stream));
+    fts_set_string(&a,  (char *)fts_memorystream_get_bytes( stream));
     fts_client_send_message((fts_object_t *)self, sym_setDescription, 1, &a);
 
     fts_patcher_set_dirty(self, 1);
@@ -1866,34 +1866,53 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   self->dirty = 0; /* start as saved */
 }
 
-static void
-patcher_delete_objects( fts_object_t *obj)
+static void 
+patcher_mark_objects_as_deleted( fts_patcher_t *p)
 {
-  if (obj != NULL)
+  fts_object_t *obj;
+  for (obj = p->objects; obj ; obj = fts_object_get_next_in_patcher(obj))
     {
-      int outlet;
-      
-      for (outlet = 0; outlet < fts_object_get_outlets_number(obj); outlet++)
-	{
-	  fts_connection_t *c;
-	  
-	  for (c = fts_object_get_outlet_connections(obj, outlet); c ; c = c->next_same_src)
-	    fts_client_release_object( (fts_object_t *)c);
-	}
+      if( fts_object_is_patcher(obj))
+	patcher_mark_objects_as_deleted( (fts_patcher_t *)obj);
       
       fts_update_reset(obj);
       fts_client_release_object(obj);
       fts_object_set_id(obj, FTS_DELETE);
-      
-      patcher_delete_objects( fts_object_get_next_in_patcher(obj) );
-      
-      if(fts_dsp_is_active() && fts_is_dsp_object(obj))
-	fts_dsp_desactivate();
-      
-      fts_object_remove_name(obj);
-      fts_object_remove_patcher_data(obj);
-      fts_object_release( obj);
     }
+}
+
+static void
+patcher_delete_objects( fts_object_t *obj)
+{
+  if (obj != NULL)
+  {
+    int outlet;
+    
+    for (outlet = 0; outlet < fts_object_get_outlets_number(obj); outlet++)
+    {
+      fts_connection_t *c;
+      
+      for (c = fts_object_get_outlet_connections(obj, outlet); c ; c = c->next_same_src)
+	fts_client_release_object( (fts_object_t *)c);
+    }
+      
+  
+    fts_update_reset(obj);
+    fts_client_release_object(obj);
+    fts_object_set_id(obj, FTS_DELETE);
+
+    if( fts_object_is_patcher( obj))
+      patcher_mark_objects_as_deleted( (fts_patcher_t *)obj);
+    
+    patcher_delete_objects( fts_object_get_next_in_patcher(obj) );
+    
+    if(fts_dsp_is_active() && fts_is_dsp_object(obj))
+      fts_dsp_desactivate();
+    
+    fts_object_remove_name(obj);
+    fts_object_remove_patcher_data(obj);
+    fts_object_release( obj);
+  }
 }
 
 static void
