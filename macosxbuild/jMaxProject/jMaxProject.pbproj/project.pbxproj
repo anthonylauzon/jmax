@@ -3531,12 +3531,6 @@
 			settings = {
 			};
 		};
-		F848668202A2745401664092 = {
-			isa = PBXFileReference;
-			name = FtsUnparse.java;
-			path = ../../java/src/ircam/jmax/fts/FtsUnparse.java;
-			refType = 2;
-		};
 		F848668302A2745401664092 = {
 			isa = PBXFileReference;
 			name = FtsUpdateGroup.java;
@@ -3548,12 +3542,6 @@
 			name = FtsUpdateGroupListener.java;
 			path = ../../java/src/ircam/jmax/fts/FtsUpdateGroupListener.java;
 			refType = 2;
-		};
-		F848668502A2745401664092 = {
-			fileRef = F848668202A2745401664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F848668602A2745401664092 = {
 			fileRef = F848668302A2745401664092;
@@ -14508,7 +14496,6 @@
 				F880FE780283013E01664092,
 				F880FE790283013E01664092,
 				F880FE7A0283013E01664092,
-				F848668202A2745401664092,
 				F848668302A2745401664092,
 				F848668402A2745401664092,
 			);
@@ -15663,7 +15650,6 @@
 				F880FFE70283013F01664092,
 				F880FFE80283013F01664092,
 				F880FFE90283013F01664092,
-				F848668502A2745401664092,
 				F848668602A2745401664092,
 				F848668702A2745401664092,
 			);
