@@ -23,13 +23,6 @@
 #ifndef _FTS_PRIVATE_FTSDATA_H_
 #define _FTS_PRIVATE_FTSDATA_H_
 
-/* 
- * HACK!!!
- * from protocol.h
- */
-#define REMOTE_CALL_CODE                   '!'
-
-
 
 /*
  * This API is made private in order to remove it from the objects

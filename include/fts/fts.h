@@ -102,6 +102,7 @@ extern "C" {
 #include <fts/midi.h>
 #include <fts/time.h>
 #include <fts/sched.h>
+#include <fts/audio.h>
 
 #ifdef __cplusplus
 }

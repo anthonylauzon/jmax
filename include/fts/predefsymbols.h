@@ -87,6 +87,7 @@ PREDEF_SYMBOL( fts_s_default, "default")
 PREDEF_SYMBOL( fts_s_export, "export")
 PREDEF_SYMBOL( fts_s_sched_ready, "sched_ready")
 PREDEF_SYMBOL( fts_s_sched_error, "sched_error")
+PREDEF_SYMBOL( fts_s_fifo_size, "fifo_size")
 
 /* client messages */
 PREDEF_SYMBOL( fts_s_openFileDialog, "openFileDialog")
