@@ -18,7 +18,7 @@ fi
 # The root directory of sources
 ROOT_DIR=../..
 
-VERSION=`cat $ROOT_DIR/VERSION`
+VERSION=`cut -f1 -d\  $ROOT_DIR/VERSION`
 DISTFILE=$ROOT_DIR/../jmax-$VERSION-src.tar.gz
 cp -fv $DISTFILE /usr/src/redhat/SOURCES
 cp -fv jmax.spec /usr/src/redhat/SPECS
