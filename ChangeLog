@@ -1,5 +1,7 @@
 2003-12-18  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* packages/signal/c/src/playfvec.c (play_ftl): fixed bug "[ 822056 ] play~ behaves strangely 4.0.2 (jmax crash)".
+
 	* bin/jmax.in: fixed bug "[ 791671 ] jmax does not load files specified on the commandline".
 
 2003-12-17  Francois Dechelle  <dechelle@limbe.ircam.fr>
