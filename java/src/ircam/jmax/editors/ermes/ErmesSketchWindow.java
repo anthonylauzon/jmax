@@ -202,12 +202,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   }
 
   private boolean IsInSizesMenu(String theName) {
-    try {
-      Integer.valueOf(theName);
-    } catch (NumberFormatException e) {
-      return false;
-    }
-    return true;
+    return(theName.equals("8")|| theName.equals("9")||theName.equals("10")||theName.equals("12")||theName.equals("14")||theName.equals("18")||theName.equals("24")||theName.equals("36")||theName.equals("48"));
   }
 
   private Menu CreateEditMenu() {
@@ -778,6 +773,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       
       if (IsInEditMenu(itemName)) EditMenuAction(aCheckItem, itemName);
       if (IsInFontMenu(itemName)) FontMenuAction(aCheckItem, itemName);
+      if (IsInSizesMenu(itemName)) SizesMenuAction(aCheckItem, itemName);
     }
   }
 
@@ -797,7 +793,6 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       if (IsInFontMenu(itemName)) FontMenuAction(aMenuItem, itemName);
       if (IsInProjectMenu(itemName)) ProjectMenuAction(aMenuItem, itemName);
       if (IsInWindowsMenu(itemName)) WindowsMenuAction(aMenuItem, itemName);
-      if (IsInSizesMenu(itemName)) SizesMenuAction(aMenuItem, itemName);
     }
   }
 
@@ -1019,19 +1014,19 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 
   private boolean SizesMenuAction(MenuItem theMenuItem, String theString) {
     //if we are here, a font size have been choosen from the FONT menu
+    itsCurrentSizesMenu.setState(false);
+
     int fontSize = itsSketchPad.sketchFontSize;
     try {
       fontSize = Integer.parseInt(theString);
     } catch (NumberFormatException e) {}
     
-    itsCurrentSizesMenu.setState(false);
     itsCurrentSizesMenu = (CheckboxMenuItem)theMenuItem;
     itsCurrentSizesMenu.setState(true);
     
     itsSketchPad.sketchFontSize = fontSize;
     itsSketchPad.ChangeFont(new Font(itsSketchPad.sketchFont.getName(), itsSketchPad.sketchFont.getStyle(), fontSize));
-    return    true;
-    
+    return true;
   }
 	
     //--------------------------------------------------------
