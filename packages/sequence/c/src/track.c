@@ -1161,7 +1161,6 @@ track_editor_dump_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 {
   track_t *this = (track_t *)o;
   fts_symbol_t selector;
-
   if(this->editor == NULL)
     {
       fts_atom_t a;
@@ -1328,7 +1327,7 @@ track_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   this->gui_listeners = 0;
   
-	this->editor == NULL;
+	this->editor = NULL;
 	this->save_editor = 0;
 	
   if(ac > 0)
