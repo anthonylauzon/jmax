@@ -144,6 +144,13 @@ public class FtsHelpPatchTable
   {
       return helpSummaryVector.size();
   }
+
+  static public void clear()
+  {
+    helpTable.clear();
+    helpSummaryTable.clear();
+    helpSummaryVector.clear();
+  }
 }
 
 

@@ -244,6 +244,9 @@ public class JMaxApplication {
       
     // dispose (and optionally save) all the documents
     closeAllWindows( doTheSave);
+
+    //Look if current project needs to be saved
+    //if( getProject().isDirty())
     getProject().save( null);	
 
     //Look if current midi configuration needs to be saved
@@ -406,6 +409,11 @@ public class JMaxApplication {
 
   public static void setCurrentProject( FtsProject proj)
   {
+    /* discard all classes and helpPatch from old project */	 
+    JMaxClassMap.clear();
+    FtsHelpPatchTable.clear();
+
+    /* set the current project */
     singleInstance.project = proj;
   }
 

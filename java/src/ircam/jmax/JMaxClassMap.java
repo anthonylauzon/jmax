@@ -151,6 +151,12 @@ public class JMaxClassMap {
     names = new ArrayList();
   }
 
+  public static void clear()
+  {
+    instance.map.clear();
+    instance.names.clear();
+  }
+
   private static JMaxClassMap instance = new JMaxClassMap();
   private HashMap map;
   private ArrayList names;
