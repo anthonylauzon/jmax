@@ -52,8 +52,8 @@ class ErmesObjSlider extends ErmesObject {
 		
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
     makeCurrentRect(theFtsObject);
-    super.Init(theSketchPad,  theFtsObject);
-    itsThrottle = new ErmesObjThrottle(this, itsX, itsY);    
+    itsThrottle = new ErmesObjThrottle(this, itsX, itsY);   
+    super.Init(theSketchPad,  theFtsObject); 
     {
       Integer aInteger = (Integer)theFtsObject.get("minValue");
       itsRangeMin = aInteger.intValue();
