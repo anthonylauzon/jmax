@@ -20,22 +20,30 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Francois Dechelle, Norbert Schnell.
+ * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
 
-#ifndef _FTS_SIGCONN_H_
-#define _FTS_SIGCONN_H_
+#ifndef _FTS_DSP_SIGNAL_H_
+#define _FTS_DSP_SIGNAL_H_
 
-typedef struct _fts_signal_connection_table_
+typedef struct _fts_dsp_signal_
 {
-  fts_connection_t **connections;
-  int size;
-  int alloc;
-} fts_signal_connection_table_t;
+  int id;
+  fts_symbol_t name;
+  int refcnt;
+  int length;
+  float srate;
+} fts_dsp_signal_t;
 
-extern void fts_signal_connection_table_init(fts_signal_connection_table_t *table);
-extern void fts_signal_connection_add(fts_signal_connection_table_t *table, fts_connection_t* connection);
-extern void fts_signal_connection_remove_all(fts_signal_connection_table_t *table);
+extern fts_dsp_signal_t * Sig_new(int vectorSize, float sampleRate);
+extern void Sig_free(fts_dsp_signal_t *s);
+extern void Sig_unreference(fts_dsp_signal_t *s);
+extern void Sig_reference(fts_dsp_signal_t *s);
+extern fts_dsp_signal_t * Sig_getById(int id);
+extern void Sig_print(fts_dsp_signal_t *s);
+extern void Sig_setup(int vectorSize);
+extern int Sig_getCount(void);
+extern int Sig_check(void);
 
 #endif

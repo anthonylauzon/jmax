@@ -31,6 +31,7 @@ extern fts_module_t fts_mess_module;
 
 #include <fts/lang/mess/atomarray.h>
 #include <fts/lang/mess/atoms.h>
+#include <fts/lang/mess/channel.h>
 #include <fts/lang/mess/classes.h>
 #include <fts/lang/mess/connections.h>
 #include <fts/lang/mess/doctor.h>

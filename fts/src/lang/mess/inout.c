@@ -27,7 +27,6 @@
 #include <fts/sys.h>
 #include <fts/lang.h>
 #include "messP.h"
-#include "channel.h"
 
 static fts_class_t *label_class = 0;
 
@@ -50,12 +49,20 @@ extern void fts_patcher_outlet_reposition(fts_object_t *o, int pos);
  *
  */
 
-typedef fts_channel_t label_t;
+typedef struct _label_
+{
+  fts_object_t o;
+  fts_channel_t channel;
+} label_t;
+
+#define label_get_channel(l) (&(l)->channel)
 
 static void
 label_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_channel_init((fts_channel_t *)o);
+  label_t *this = (label_t *) o;
+
+  fts_channel_init(&this->channel);
 }
 
 static void
@@ -67,7 +74,9 @@ label_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prop
 static void
 label_find_friends(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_channel_find_friends((fts_channel_t *)o, ac, at);
+  label_t *this = (label_t *) o;
+
+  fts_channel_find_friends(&this->channel, ac, at);
 }
 
 static fts_status_t
@@ -93,7 +102,7 @@ send_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   fts_access_t *this = (fts_access_t *) o;
 
-  fts_channel_output_message_from_targets(fts_access_get_channel(this), s, ac, at);
+  fts_channel_output_message_from_targets(fts_access_get_channel(this), 0, s, ac, at);
 }
 
 static void
@@ -114,7 +123,7 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     label = (label_t *)fts_get_object(at + 1);
 
   fts_object_refer((fts_object_t *)label);
-  fts_channel_add_origin((fts_channel_t *)label, this);
+  fts_channel_add_origin(label_get_channel(label), this);
 }
 
 static void
@@ -172,7 +181,7 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     label = (label_t *)fts_get_object(at + 1);
 
   fts_object_refer((fts_object_t *)label);
-  fts_channel_add_target(label, this);
+  fts_channel_add_target(label_get_channel(label), this);
 }
   
 static void

@@ -27,6 +27,8 @@
 #ifndef _LANG_DSP_H_
 #define _LANG_DSP_H_
 
+#include <fts/lang/dsp/signal.h>
 #include <fts/lang/dsp/dsp.h>
+#include <fts/lang/dsp/sigbus.h>
 
 #endif

@@ -49,6 +49,7 @@ extern void dsp_install_clocks(void);
 static void dsp_module_init(void);
 static void dsp_module_shutdown(void);
 extern void fts_dsp_control_config(void);
+extern void fts_signal_bus_config(void);
 extern void Sig_init(void);
 
 fts_symbol_t fts_s_put;
@@ -84,8 +85,9 @@ dsp_module_init(void)
   /* Make the dsp off program  */
   dsp_make_dsp_off_chain();
 
-  /* Initialize the dsp control data object */
+  fts_signal_bus_config();
 
+  /* Initialize the dsp control data object */
   fts_dsp_control_config();
 }
 

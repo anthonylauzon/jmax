@@ -28,14 +28,13 @@
 #include <fts/lang/mess.h>
 #include <fts/lang/ftl.h>
 #include <fts/lang/dsp.h>
-/* (fd) For post */
-#include <fts/runtime/files.h>
+#include <fts/runtime/files.h> /* (fd) For post */
 
 static int Sig_count = 0;
 
 typedef struct _SignalCell 
 {
-  dsp_signal *s;
+  fts_dsp_signal_t *s;
   struct _SignalCell *next;
 } SignalCell, *SignalList;
 
@@ -52,12 +51,12 @@ Sig_genName( int id)
   return fts_new_symbol_copy( tmp);
 }
 
-dsp_signal *
+fts_dsp_signal_t *
 Sig_new( int vectorSize, float sampleRate)
 {
   SignalList *previous;
   SignalList current, tmp;
-  dsp_signal *s;
+  fts_dsp_signal_t *s;
 
   previous = &freeList;
   for ( current = freeList; current; current = current->next )
@@ -75,7 +74,7 @@ Sig_new( int vectorSize, float sampleRate)
 
   if ( !current)
     {
-      s = (dsp_signal *)fts_zalloc( sizeof(dsp_signal));
+      s = (fts_dsp_signal_t *)fts_zalloc( sizeof(fts_dsp_signal_t));
       s->id = Sig_count;
       Sig_count++;
       s->name = Sig_genName( s->id );
@@ -98,7 +97,7 @@ Sig_new( int vectorSize, float sampleRate)
  */
 
 void
-Sig_free( dsp_signal *s)
+Sig_free( fts_dsp_signal_t *s)
 {
   /* First, delete the signal from the inUseList */
 
@@ -129,7 +128,7 @@ Sig_free( dsp_signal *s)
 }
 
 void
-Sig_unreference(dsp_signal *s)
+Sig_unreference(fts_dsp_signal_t *s)
 {
   s->refcnt--;
 
@@ -138,15 +137,15 @@ Sig_unreference(dsp_signal *s)
 }
 
 void
-Sig_reference(dsp_signal *s)
+Sig_reference(fts_dsp_signal_t *s)
 {
   s->refcnt++;
 }
 
-dsp_signal *
+fts_dsp_signal_t *
 Sig_getById( int id)
 {
-  dsp_signal *s;
+  fts_dsp_signal_t *s;
   SignalList current;
 
   for( current = inUseList; current; current = current->next)
@@ -159,7 +158,7 @@ Sig_getById( int id)
 }
 
 void
-Sig_print( dsp_signal *s)
+Sig_print( fts_dsp_signal_t *s)
 {
   post( "dsp_signal *%p{ id=%d name=\"%s\" refCount=%p vs=%d}\n", s, s->id, fts_symbol_name(s->name), s->refcnt, s->length);
 }

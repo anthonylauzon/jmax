@@ -26,18 +26,17 @@
 #ifndef _FTS_CHANNEL_H_
 #define _FTS_CHANNEL_H_
 
-typedef struct _access_
+typedef struct _fts_access_
 {
-  fts_object_t  o;
-  struct _channel_ *channel;
-  struct _access_ *next; /* next in list of same channel */
+  fts_object_t  o; /* channel access must be an FTS object */
+  struct _fts_channel_ *channel;
+  struct _fts_access_ *next; /* next in list of same channel */
 } fts_access_t;
 
 #define fts_access_get_channel(a) ((a)->channel)
 
-typedef struct _channel_
+typedef struct _fts_channel_
 {
-  fts_object_t o;
   fts_access_t *targets; /* list of targets */
   fts_access_t *origins; /* list of origins */
 } fts_channel_t;
@@ -50,7 +49,7 @@ extern void fts_channel_remove_target(fts_channel_t *channel, fts_access_t *targ
 extern void fts_channel_add_origin(fts_channel_t *channel, fts_access_t *origin);
 extern void fts_channel_remove_origin(fts_channel_t *channel, fts_access_t *origin);
 
-extern void fts_channel_output_message_from_targets(fts_channel_t *channel, fts_symbol_t s, int ac, const fts_atom_t *at);
+extern void fts_channel_output_message_from_targets(fts_channel_t *channel, int outlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 extern void fts_channel_find_friends(fts_channel_t *channel, int ac, const fts_atom_t *at);
 
 #endif

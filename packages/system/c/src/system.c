@@ -36,6 +36,9 @@ extern void argument_init(void);
 extern void print_config(void);
 extern void blip_config(void);
 
+extern void bus_config(void);
+extern void bus_tilda_config(void);
+
 static void
 system_module_init(void)
 {
@@ -48,6 +51,9 @@ system_module_init(void)
 
   print_config();
   blip_config();
+
+  bus_config();
+  bus_tilda_config();
 }
 
 fts_module_t system_module = {"system", "Basic System Objects", system_module_init, 0, 0};

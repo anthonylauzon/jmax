@@ -33,19 +33,10 @@ extern fts_module_t fts_dsp_module;
 
 typedef struct 
 {
-  int id;
-  fts_symbol_t name;
-  int refcnt;
-  int length;
-  float srate;
-} dsp_signal;
-
-typedef struct 
-{
   int ninputs;
   int noutputs;
-  dsp_signal **in;
-  dsp_signal **out;
+  fts_dsp_signal_t **in;
+  fts_dsp_signal_t **out;
 } fts_dsp_descr_t;
 
 /* Macro to access the input and output characteristics
@@ -54,6 +45,8 @@ typedef struct
    depend on the actual dsp structure.
 */
 
+#define fts_dsp_get_signal_name(s) ((s)->name)
+
 /* get input properties */
 #define fts_dsp_get_input_name(DESC, IN) ((DESC)->in[(IN)]->name)
 #define fts_dsp_get_input_size(DESC, IN) ((DESC)->in[(IN)]->length)
@@ -61,41 +54,47 @@ typedef struct
 
 /* test for the null input special case */
 #define fts_dsp_is_input_null(DESC, IN) ((DESC)->in[(IN)]->id == 0)
+#define fts_dsp_is_output_null(DESC, IN) ((DESC)->out[(IN)]->id == 0)
 
 /* test if inlet is signal inlet */
 extern int fts_dsp_is_sig_inlet(fts_object_t *o, int num);
 
 /* get output properties */
-
 #define fts_dsp_get_output_name(DESC, OUT) ((DESC)->out[(OUT)]->name)
 #define fts_dsp_get_output_size(DESC, OUT) ((DESC)->out[(OUT)]->length)
 #define fts_dsp_get_output_srate(DESC, OUT) ((DESC)->out[(OUT)]->srate)
-/* End of macros */
+
+extern void fts_dsp_set_output(fts_dsp_descr_t *descr, int out, fts_dsp_signal_t *sig);
+
+extern fts_dsp_signal_t *fts_dsp_get_privat_signal(int vs);
+extern void fts_dsp_release_privat_signal(fts_dsp_signal_t *signal);
+
+/* object declarations */
+extern void fts_dsp_add_object(fts_object_t *o);
+extern void fts_dsp_add_object_to_prolog(fts_object_t *o);
+extern void fts_dsp_remove_object(fts_object_t *o);
+extern void fts_dsp_remove_object_from_prolog(fts_object_t *o);
+
+extern void fts_dsp_declare_inlet(fts_class_t *cl, int num);
+extern void fts_dsp_declare_outlet(fts_class_t *cl, int num);
+
+extern void fts_dsp_declare_function(fts_symbol_t name, ftl_wrapper_t fun);
+extern void fts_dsp_add_function(fts_symbol_t name, int ac, fts_atom_t *at);
+
+/* old names of user API */
+#define dsp_list_insert(o) fts_dsp_add_object(o)
+#define dsp_list_remove(o) fts_dsp_remove_object(o)
+#define dsp_sig_inlet(c, i) fts_dsp_declare_inlet((c), (i))
+#define dsp_sig_outlet(c, i) fts_dsp_declare_outlet((c), (i))
+#define dsp_declare_function(n, f) fts_dsp_declare_function((n), (f))
+#define dsp_add_funcall(s, n, a) fts_dsp_add_function((s), (n), (a))
 
 extern void fts_dsp_auto_stop(void);
 extern void fts_dsp_auto_restart(void);
 extern void fts_dsp_auto_update(void);
 
-extern dsp_signal * Sig_new(int vectorSize, float sampleRate);
-extern void Sig_free(dsp_signal *s);
-extern void Sig_unreference(dsp_signal *s);
-extern void Sig_reference(dsp_signal *s);
-extern dsp_signal * Sig_getById(int id);
-extern void Sig_print(dsp_signal *s);
-extern void Sig_setup(int vectorSize);
-extern int Sig_getCount(void);
-extern int Sig_check(void);
-
-extern void dsp_declare_function(fts_symbol_t name, ftl_wrapper_t fun);
-
-extern void dsp_list_insert(fts_object_t *o);
-extern void dsp_list_remove(fts_object_t *o);
-
-extern void dsp_sig_inlet(fts_class_t *cl, int num);
-extern void dsp_sig_outlet(fts_class_t *cl, int num);
-
+/* internal API */
 extern void dsp_add_signal(fts_symbol_t name, int vs);
-extern void dsp_add_funcall(fts_symbol_t , int, fts_atom_t *);
 
 extern void dsp_chain_create(int vs);
 extern void dsp_chain_delete(void);

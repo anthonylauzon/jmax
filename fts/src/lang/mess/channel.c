@@ -27,7 +27,6 @@
 #include <fts/sys.h>
 #include <fts/lang.h>
 #include "messP.h"
-#include "channel.h"
 
 /***************************************************************************
  *
@@ -91,13 +90,13 @@ fts_channel_remove_target(fts_channel_t *channel, fts_access_t *target)
 }
 
 void
-fts_channel_output_message_from_targets(fts_channel_t *channel, fts_symbol_t selector, int ac, const fts_atom_t *at)
+fts_channel_output_message_from_targets(fts_channel_t *channel, int outlet, fts_symbol_t selector, int ac, const fts_atom_t *at)
 {
   fts_access_t *target = channel->targets;
 
   while(target)
     {
-      fts_outlet_send((fts_object_t *)target, 0, selector, ac, at);
+      fts_outlet_send((fts_object_t *)target, outlet, selector, ac, at);
       target = target->next;
     }
 }
@@ -107,9 +106,6 @@ fts_channel_find_friends(fts_channel_t *channel, int ac, const fts_atom_t *at)
 {
   fts_object_set_t *set = (fts_object_set_t *)fts_get_data(at);
   fts_access_t *a; 
-
-  if(fts_object_get_variable((fts_object_t *)channel))
-    fts_object_set_add(set, (fts_object_t *)channel);
 
   for(a=channel->targets; a; a=a->next)
     fts_object_set_add(set, (fts_object_t *)a);

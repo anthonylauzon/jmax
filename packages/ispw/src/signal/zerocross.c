@@ -53,7 +53,7 @@ ftl_zerocross(fts_word_t *argv)
   float *in = (float *)fts_word_get_ptr(argv + 0);
   zerocross_t *this = (zerocross_t *)fts_word_get_ptr(argv + 1);
   long n = (long)fts_word_get_long(argv + 2);
-  float lastsample, current;
+  float lastsample, current = 0.0;
   unsigned int lastsamplesign, currentsign, count;
   int i;
 

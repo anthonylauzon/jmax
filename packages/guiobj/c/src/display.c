@@ -188,7 +188,7 @@ display_ftl(fts_word_t *argv)
 
   for(i=0; i<n_tick; i++)
     {
-      float absval = fabs(in[i]);
+      float absval = fabs((double)in[i]);
 
       if(absval > this->absmax)
 	this->absmax = absval;

@@ -30,4 +30,5 @@ gphiter.c \
 signal.c \
 dspcontrol.c \
 sigconn.c \
+sigbus.c \
 

@@ -40,11 +40,11 @@
   sprintf(the_string, "vec_f%s", sym_name);\
   the_symbol = fts_new_symbol_copy(the_string);\
   ftl_sym.fun_name.f.vec.vec = the_symbol;\
-  dsp_declare_function(the_symbol, ftl_vecx_f ## fun_name);\
+  fts_dsp_declare_function(the_symbol, ftl_vecx_f ## fun_name);\
   sprintf(the_string, "vec_scl_f%s", sym_name);\
   the_symbol = fts_new_symbol_copy(the_string);\
   ftl_sym.fun_name.f.vec.scl = the_symbol;\
-  dsp_declare_function(the_symbol, ftl_vecx_scl_f ## fun_name);\
+  fts_dsp_declare_function(the_symbol, ftl_vecx_scl_f ## fun_name);\
 }
 
 /* just vec so far */
@@ -57,7 +57,7 @@
   sprintf(the_string, "vec_f%s", sym_name);\
   the_symbol = fts_new_symbol_copy(the_string);\
   ftl_sym.fun_name.f.vec = the_symbol;\
-  dsp_declare_function(the_symbol, ftl_vecx_f ## fun_name);\
+  fts_dsp_declare_function(the_symbol, ftl_vecx_f ## fun_name);\
 }
 
 /* anyway just for vectors */
@@ -70,7 +70,7 @@
   sprintf(the_string, "vec_f%s", sym_name);\
   the_symbol = fts_new_symbol_copy(the_string);\
   ftl_sym.fun_name.f = the_symbol;\
-  dsp_declare_function(the_symbol, ftl_vecx_f ## fun_name);\
+  fts_dsp_declare_function(the_symbol, ftl_vecx_f ## fun_name);\
 }
 
 /* just vec so far */
@@ -83,7 +83,7 @@
   sprintf(the_string, "vec_%s", sym_name);\
   the_symbol = fts_new_symbol_copy(the_string);\
   ftl_sym.fun_name.vec = the_symbol;\
-  dsp_declare_function(the_symbol, ftl_vecx_ ## fun_name);\
+  fts_dsp_declare_function(the_symbol, ftl_vecx_ ## fun_name);\
 }
 
 ftl_function_symbols_t ftl_sym;

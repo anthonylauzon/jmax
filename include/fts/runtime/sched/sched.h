@@ -45,10 +45,12 @@ extern double fts_sched_msecs;
 extern double fts_sched_ticks;
 extern int fts_sched_tick_size;
 extern double fts_sched_tick_duration;
+extern double fts_sched_sample_rate;
 
 #define fts_get_time_in_msecs() (fts_sched_msecs)
 #define fts_get_time_in_ticks() (fts_sched_ticks)
 #define fts_get_tick_size() (fts_sched_tick_size)
+#define fts_get_sample_rate() (fts_sched_sample_rate)
 #define fts_get_tick_duration() (fts_sched_tick_duration)
 
 /* 

@@ -24,18 +24,29 @@
  *
  */
 
-#ifndef _FTS_SIGCONN_H_
-#define _FTS_SIGCONN_H_
+#ifndef _FTS_SIGBUS_H_
+#define _FTS_SIGBUS_H_
 
-typedef struct _fts_signal_connection_table_
+#define FTS_SIGNAL_BUS_MAX_CHANNELS 64
+
+typedef struct _fts_signal_bus_
 {
-  fts_connection_t **connections;
-  int size;
-  int alloc;
-} fts_signal_connection_table_t;
+  fts_object_t o;
+  int n_channels;
+  ftl_data_t buf[2]; 
+  ftl_data_t toggle; /* toggle (0/1) indicating current write buffer (swapping buffers each tick) */
+  int n_tick;
+} fts_signal_bus_t;
 
-extern void fts_signal_connection_table_init(fts_signal_connection_table_t *table);
-extern void fts_signal_connection_add(fts_signal_connection_table_t *table, fts_connection_t* connection);
-extern void fts_signal_connection_remove_all(fts_signal_connection_table_t *table);
+extern fts_symbol_t fts_signal_bus_symbol;
+extern fts_class_t *fts_signal_bus_class;
+
+
+#define fts_signal_bus_get_size(b) ((b)->n_channels)
+
+#define fts_signal_bus_get_buffer_data(b, i) ((b)->buf[i])
+#define fts_signal_bus_get_toggle_data(b) ((b)->toggle)
+
+#define fts_signal_bus_get_buffer(b, i) ((float *)ftl_data_get_ptr((b)->buf[i]))
 
 #endif

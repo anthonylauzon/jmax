@@ -357,7 +357,7 @@ void fts_dev_class_sig_set_get_fun(fts_dev_class_t *dev_class,  void (* get_fun)
 
   dev_class->methods.sig_methods.get_fun_name = get_fun_name;
   
-  dsp_declare_function(get_fun_name, get_fun);
+  fts_dsp_declare_function(get_fun_name, get_fun);
 }
 
 
@@ -373,7 +373,7 @@ void fts_dev_class_sig_set_put_fun(fts_dev_class_t *dev_class,  void (* put_fun)
 
   dev_class->methods.sig_methods.put_fun_name = put_fun_name;
   
-  dsp_declare_function(put_fun_name, put_fun);
+  fts_dsp_declare_function(put_fun_name, put_fun);
 }
 
 

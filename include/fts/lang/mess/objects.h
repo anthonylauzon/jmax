@@ -99,4 +99,7 @@ extern void fts_object_change_number_of_outlets(fts_object_t *o, int new_noutlet
 extern void fprintf_object(FILE *f, fts_object_t *obj);
 extern void post_object(fts_object_t *obj);
 
+#define fts_object_inlet_is_connected(o, i) ((o)->in_conn[(i)] != 0)
+#define fts_object_outlet_is_connected(o, i) ((o)->out_conn[(i)] != 0)
+
 #endif

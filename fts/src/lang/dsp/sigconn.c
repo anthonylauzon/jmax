@@ -75,10 +75,6 @@ fts_signal_connection_add(fts_signal_connection_table_t *table, fts_connection_t
       table->size++;
 
       fts_connection_set_type(connection, fts_c_signal);
-
-      /* mark source thru objects as hot */
-      if(fts_object_is_thru(source))
-	fts_object_set_thru_type(source, fts_c_signal);
     }
 }
 
@@ -93,10 +89,6 @@ fts_signal_connection_remove_all(fts_signal_connection_table_t *table)
       fts_object_t *source = fts_connection_get_source(ptr[i]);
 
       fts_connection_set_type(ptr[i], fts_c_anything);
-
-      /* un-mark source thru objects */
-      if(fts_object_is_thru(source))
-	fts_object_set_thru_type(source, fts_c_anything);
     }
 
   table->size = 0;
