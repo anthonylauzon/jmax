@@ -528,11 +528,15 @@ fts_class_outlet_has_message (fts_class_t * cl, int woutlet,
     return 0;
 }
 
+
+
+
 /***********************************************************************
  *
  *  class documentation
  *
  */
+
 void
 fts_class_doc_post(fts_class_t *cl)
 {
@@ -580,6 +584,62 @@ fts_class_doc_post(fts_class_t *cl)
       fts_post("}\n");
   }
 }
+
+
+/* append triples of doc-symbols to array */
+int fts_class_doc_get (fts_class_t *cl, fts_array_t *out)
+{
+    fts_class_doc_t *doc = fts_class_get_doc(cl);
+    fts_symbol_t class_name = fts_class_get_name(cl);
+    enum {state_ready, state_constructor, state_messages} state = state_ready;
+  
+    if (class_name != NULL)
+    {
+	while (doc != NULL)
+	{
+	    fts_symbol_t  name    = fts_class_doc_get_name(doc);
+	    const char   *args    = fts_class_doc_get_args(doc);
+	    const char   *comment = fts_class_doc_get_comment(doc);
+      
+	    if(args == NULL)
+		args = "";
+      
+	    if (name == class_name  &&  state != state_messages)
+	    {   /* constructor */
+		fts_array_append_symbol(out, name);
+		fts_array_append_symbol(out, fts_new_symbol(args));
+		fts_array_append_symbol(out, fts_new_symbol(comment));
+
+		state = state_constructor;
+	    }
+	    else
+	    {
+		switch(state)
+		{
+		case state_ready:
+		    fts_array_append_symbol(out, name);
+		    fts_array_append_symbol(out, fts_s_empty_string);
+		    fts_array_append_symbol(out, fts_s_empty_string);
+
+		case state_constructor:
+		case state_messages:
+		default:
+		    fts_array_append_symbol(out, name);
+		    fts_array_append_symbol(out, fts_new_symbol(args));
+		    fts_array_append_symbol(out, fts_new_symbol(comment));
+
+		    state = state_messages;
+		break;
+		}
+	    }
+      
+	    doc = fts_class_doc_get_next(doc);
+	}
+    }
+
+    return 3;	/* return number of columns (group of atoms in list) */
+}
+
 
 void
 method_post_doc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
