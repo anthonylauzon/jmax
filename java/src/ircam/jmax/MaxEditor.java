@@ -274,7 +274,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
   protected Menu CreateEditMenu() {
     MenuItem aMenuItem;
     Menu editMenu = new Menu("Edit");
-    editMenu.add(aMenuItem = new MenuItem("Cut"));
+    editMenu.add(aMenuItem = new MenuItem("Cut  Ctrl+X"));
     aMenuItem.addActionListener(this);
     editMenu.add(aMenuItem = new MenuItem("Copy  Ctrl+C"));
     aMenuItem.addActionListener(this);
@@ -286,7 +286,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
   }
 
   protected boolean IsInEditMenu(String theName) {
-    return(theName.equals("Cut") || theName.equals("Copy  Ctrl+C") || theName.equals("Paste  Ctrl+V") 
+    return(theName.equals("Cut  Ctrl+X") || theName.equals("Copy  Ctrl+C") || theName.equals("Paste  Ctrl+V") 
 		|| theName.equals("Clear"));
   }
 
@@ -407,7 +407,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
 
 
   protected boolean EditMenuAction(MenuItem theMenuItem, String theString) {
-    if (theString.equals("Cut")) return Cut();
+    if (theString.equals("Cut  Ctrl+X")) return Cut();
     else if (theString.equals("Copy  Ctrl+C")) return Copy();
     else if (theString.equals("Paste  Ctrl+V")) return Paste();
     else if (theString.equals("Clear")) return Clear();
@@ -527,7 +527,8 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
       else if(aInt == 81) MaxApplication.Quit(); //q
       else if(aInt == 83) Save();//s
       else if(aInt == 86) Paste();//v
-      else if(aInt == 87) Close();//w 
+      else if(aInt == 87) Close();//w
+      else if(aInt == 88) Cut();//x
     }
   }
   ////////////////////////////////////////////////////////////////////////////

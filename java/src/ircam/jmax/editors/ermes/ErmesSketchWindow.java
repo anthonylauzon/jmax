@@ -339,13 +339,17 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     itsExecutionMenu = AddMenu("Execution");
     FillExecutionMenu(itsExecutionMenu);
 
-    GetCutMenu().setEnabled(false);
-    GetCopyMenu().setEnabled(true);//clipboard test
-    GetPasteMenu().setEnabled(true);//clipboard test
+    GetCutMenu().setEnabled(true);
+    GetCopyMenu().setEnabled(true);
+    GetPasteMenu().setEnabled(true);
     GetClearMenu().setEnabled(false);
   }
 
-
+  protected boolean Cut(){
+    boolean temp = Copy();
+    itsSketchPad.itsHelper.DeleteSelected();
+    return temp;
+  }
 
   // clipboard handling
   protected boolean Copy() {
@@ -668,6 +672,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       else if(aInt == 81) MaxApplication.Quit(); //q
       else if(aInt == 83)Save();//s
       else if(aInt == 86) Paste();//v
+      else if(aInt == 88) Cut();//x
       else if(aInt == 87) {//w
 	if (isSubPatcher){
 	  setVisible(false);
@@ -737,18 +742,21 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   }
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// keyListener --fine
-
   public boolean Close(){
+    if(isSubPatcher) return Close(false);
+    else return Close(true);
+  }
+
+  public boolean Close(boolean deleteOnFts){
     itsClosing = true;
 
-    if (!isSubPatcher) itsPatcher.close();
+    if (deleteOnFts) itsPatcher.close();
     if(!alreadySaved){
       FileNotSavedDialog aDialog = new FileNotSavedDialog(this);
       aDialog.setLocation(300, 300);
       aDialog.setVisible(true);
       if(aDialog.GetNothingToDoFlag()) return false;
       if(aDialog.GetToSaveFlag()){
-	//return Save();
 	Save();
       }
       aDialog.dispose();
@@ -766,13 +774,10 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 
     MaxApplication.RemoveThisWindowFromMenus(this);
     MaxApplication.itsSketchWindowList.removeElement(this);
-    if (!isSubPatcher) itsPatcher.delete();
-    //itsDocument.DelWindow();
+    if (deleteOnFts) itsPatcher.delete();
     itsClosing = false;
-    //if (itsOwner != null)
-    //  ((ErmesObjPatcher)itsOwner).itsSubWindow = null;
     setVisible(false);
-    if (!isSubPatcher) dispose();
+    if (deleteOnFts) dispose();
     return true;
   }
 
