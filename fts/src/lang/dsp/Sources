@@ -1,6 +1,0 @@
-SOURCES = \
-dsp.c		\
-dspgraph.c	\
-gphiter.c	\
-signal.c	\
-dspcontrol.c

@@ -1,7 +1,0 @@
-all	all	defaults.tcl
-all	all	packages.tcl
-all	all	audio.tcl
-all	all	midi.tcl
-all	all	example.jmaxrc
-all	all	defaults.tcl
-

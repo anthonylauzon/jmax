@@ -1,3 +1,0 @@
-SOURCES = \
-	TclMdaPackage.java \
-	JMaxCmd.java
