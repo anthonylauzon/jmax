@@ -1,8 +1,12 @@
-dnl $Id: configure.in,v 1.103 2003/01/23 15:51:12 p_tisserand Exp $
+dnl $Id: configure.in,v 1.104 2003/01/24 09:35:22 p_tisserand Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.104  2003/01/24 09:35:22  p_tisserand
+dnl Add an automake conditionnnal for jack package.
+dnl Now this package is always in $make dist
+dnl
 dnl Revision 1.103  2003/01/23 15:51:12  p_tisserand
 dnl Rename default project files:
 dnl 	    config.jprj -> default_project.jprj
@@ -468,6 +472,9 @@ packages/control/help/Makefile
 packages/data/Makefile
 packages/data/c/Makefile
 packages/data/c/include/Makefile
+packages/data/c/include/fts/Makefile
+packages/data/c/include/fts/packages/Makefile
+packages/data/c/include/fts/packages/data/Makefile
 packages/data/c/src/Makefile
 packages/data/java/Makefile
 packages/data/java/ircam/Makefile
@@ -540,6 +547,9 @@ packages/oss/c/src/Makefile
 packages/sequence/Makefile
 packages/sequence/c/Makefile
 packages/sequence/c/include/Makefile
+packages/sequence/c/include/fts/Makefile
+packages/sequence/c/include/fts/packages/Makefile
+packages/sequence/c/include/fts/packages/sequence/Makefile
 packages/sequence/c/src/Makefile
 packages/sequence/java/Makefile
 packages/sequence/java/ircam/Makefile
@@ -567,6 +577,9 @@ packages/unixdtd/c/src/Makefile
 packages/utils/Makefile
 packages/utils/c/Makefile
 packages/utils/c/include/Makefile
+packages/utils/c/include/fts/Makefile
+packages/utils/c/include/fts/packages/Makefile
+packages/utils/c/include/fts/packages/utils/Makefile
 packages/utils/c/src/Makefile
 utils/Makefile
 utils/jmax-config/Makefile

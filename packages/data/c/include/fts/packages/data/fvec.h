@@ -48,6 +48,8 @@ DATA_API void fvec_set_with_onset_from_atoms(fvec_t *vector, int offset, int ac,
 
 DATA_API float fvec_get_max_value(fvec_t *vector);
 DATA_API float fvec_get_max_abs_value_in_range(fvec_t *vector, int a, int b);
+DATA_API float fvec_get_max_value_in_range(fvec_t *vector, int a, int b);
+DATA_API float fvec_get_min_value_in_range(fvec_t *vector, int a, int b);
 
 #define fvec_set_editor_open(v) ((v)->opened = 1)
 #define fvec_set_editor_close(v) ((v)->opened = 0)

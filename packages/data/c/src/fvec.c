@@ -169,6 +169,35 @@ fvec_get_max_abs_value_in_range(fvec_t *vec, int a, int b)
   return max;
 }
 
+float
+fvec_get_max_value_in_range(fvec_t *vec, int a, int b)
+{
+  float max;
+  int i;
+
+  max = vec->values[a];
+
+  for (i = a+1; (i < vec->m) && (i < b); i++)
+    if ( vec->values[i] > max)
+      max = vec->values[i];
+
+  return max;
+}
+
+float
+fvec_get_min_value_in_range(fvec_t *vec, int a, int b)
+{
+  float min;
+  int i;
+
+  min = vec->values[a];
+
+  for (i = a+1; (i < vec->m) && (i < b); i++)
+    if ( vec->values[i] < min)
+      min = vec->values[i];
+
+  return min;
+}
 
 void
 fvec_copy(fvec_t *org, fvec_t *copy)

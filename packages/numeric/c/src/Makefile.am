@@ -16,7 +16,7 @@ range.c \
 rewrap.c \
 wrap.c 
 
-INCLUDES=-I$(top_srcdir)/include -I$(top_srcdir)/packages
+INCLUDES=-I$(top_srcdir)/include -I$(top_srcdir)/packages/utils/c/include 
 
 noinst_HEADERS= \
 numeric.h

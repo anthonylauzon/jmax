@@ -67,6 +67,8 @@ DATA_API int ivec_get_sub_sum(ivec_t *vector, int from, int to);
 DATA_API int ivec_get_min_value(ivec_t *vector);
 DATA_API int ivec_get_max_value(ivec_t *vector);
 DATA_API int ivec_get_max_abs_value_in_range(ivec_t *vector, int a, int b);
+DATA_API int ivec_get_max_value_in_range(ivec_t *vector, int a, int b);
+DATA_API int ivec_get_min_value_in_range(ivec_t *vector, int a, int b);
 
 #endif
 

@@ -132,10 +132,10 @@ tabeditor_send_pixels(tabeditor_t *tabeditor)
   
       if( tabeditor_is_ivec( tabeditor))
 	for(i = 0; ((i < send)&&((int)(current+i*k)<vecsize)); i++)
-            fts_set_int(&a[i+1], ivec_get_max_abs_value_in_range((ivec_t *)tabeditor->vec, (int)(current+k*i), (int)(current+k*(i+1))));
+	  fts_set_int(&a[i+1], ivec_get_max_abs_value_in_range((ivec_t *)tabeditor->vec, (int)(current+k*i), (int)(current+k*(i+1))));
       else
 	for(i = 0; ((i < send)&&((int)(current+i*k)<vecsize)); i++)
-            fts_set_float(&a[i+1], fvec_get_max_abs_value_in_range((fvec_t *)tabeditor->vec, (int)(current+k*i), (int)(current+k*(i+1))));
+	  fts_set_float(&a[i+1], fvec_get_max_abs_value_in_range((fvec_t *)tabeditor->vec, (int)(current+k*i), (int)(current+k*(i+1))));
       
       if(!append)
 	{

@@ -18,4 +18,4 @@ rfft_shuffle.h
 
 libutils_la_LDFLAGS= -module
 
-INCLUDES=-I$(top_srcdir)/packages -I$(top_srcdir)/include 
+INCLUDES=-I$(top_srcdir)/packages/utils/c/include -I$(top_srcdir)/include 

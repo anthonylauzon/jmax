@@ -162,6 +162,35 @@ ivec_get_max_abs_value_in_range(ivec_t *vec, int a, int b)
   return max;
 }
 
+int
+ivec_get_max_value_in_range(ivec_t *vec, int a, int b)
+{
+  int max;
+  int i;	
+
+  max = vec->values[a];
+
+  for (i=a+1; i<vec->size && i < b; i++)
+    if ( vec->values[i] > max)
+      max = vec->values[i];
+
+  return max;
+}
+
+int
+ivec_get_min_value_in_range(ivec_t *vec, int a, int b)
+{
+  int min;
+  int i;	
+
+  min = vec->values[a];
+
+  for (i=a+1; i<vec->size && i < b; i++)
+    if ( vec->values[i] < min)
+      min = vec->values[i];
+
+  return min;
+}
 
 void
 ivec_copy(ivec_t *org, ivec_t *copy)

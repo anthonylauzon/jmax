@@ -30,7 +30,7 @@ wave_ieeewrap.c \
 white.c \
 zerocross.c
 
-INCLUDES=-I$(top_srcdir)/packages -I$(top_srcdir)/include
+INCLUDES=-I$(top_srcdir)/packages/utils/c/include -I$(top_srcdir)/packages/data/c/include -I$(top_srcdir)/include
 
 noinst_HEADERS=  \
 biquad.h \
