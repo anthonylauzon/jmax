@@ -56,7 +56,7 @@ import ircam.jmax.widgets.*;
 
 public class MidiConfigPanel extends JPanel implements Editor
 {
-  public MidiConfigPanel(Window win, FtsMidiConfig mm)  
+  public MidiConfigPanel(ConfigurationEditor win, FtsMidiConfig mm)  
   {
     window = win;
     midiMan = mm;
@@ -440,27 +440,11 @@ public class MidiConfigPanel extends JPanel implements Editor
 
   public void save()
   {
-    String fileName = JMaxApplication.getConfig().getFileName();
-    if( fileName != null)
-      JMaxApplication.getConfig().save( fileName);
-    else
-      saveAs();
+    window.save();
   }
   public void saveAs()
   {
-    String dir = JMaxApplication.getProject().getDir();
-    String name = dir+"/"+JMaxApplication.getProject().getName()+".midi.jcfg";    
-    
-    fileChooser.setSelectedFile( new File( name));
-    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    int result = fileChooser.showSaveDialog( window);
-
-    if ( result == JFileChooser.APPROVE_OPTION)
-      {
-	String fileName = fileChooser.getSelectedFile().getAbsolutePath();		  		
-	if( fileName != null)
-	  JMaxApplication.getConfig().save( fileName);
-      }
+    window.saveAs();
   }
   public void print(){}
 
@@ -471,12 +455,10 @@ public class MidiConfigPanel extends JPanel implements Editor
 
   private JScrollPane scrollPane;
   private MidiTableModel midiModel;
-  private Window window;
+  private ConfigurationEditor window;
   private FtsMidiConfig midiMan;
   private final int DEFAULT_WIDTH = 500;
   private final int DEFAULT_HEIGHT = 260;
-
-  private JFileChooser fileChooser = new JFileChooser(); 
 
   private Font defaultLabelFont;
 }

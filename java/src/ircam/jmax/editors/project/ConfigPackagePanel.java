@@ -144,19 +144,20 @@ public class ConfigPackagePanel extends JPanel implements Editor
     configPanel.setLayout( new BoxLayout( configPanel, BoxLayout.Y_AXIS));
     configPanel.setPreferredSize(new Dimension( DEFAULT_WIDTH, DEFAULT_HEIGHT));
     
-    JPanel midiPanel = new JPanel();
-    midiPanel.setLayout( new BoxLayout( midiPanel, BoxLayout.Y_AXIS));
-    midiPanel.setBorder( BorderFactory.createTitledBorder( BorderFactory.createEtchedBorder(), "Midi Configuration File"));    
-    midiField = new JTextField();
-    midiField.setPreferredSize(new Dimension( DEFAULT_WIDTH, 30));
-    midiField.setMaximumSize(new Dimension( 2000, 30));
-    midiField.setEditable(false);
-    if((ftsPkg instanceof FtsProject) && ((FtsProject)ftsPkg).getMidiConfig() != null)
-      midiField.setText( ((FtsProject)ftsPkg).getMidiConfig());
-    JPanel midiButtons = new JPanel();
-    midiButtons.setLayout( new BoxLayout( midiButtons, BoxLayout.X_AXIS));
-    JButton midiSetButton = new JButton("set");
-    midiSetButton.addActionListener(new ActionListener(){
+    JPanel cPanel = new JPanel();
+    cPanel.setLayout( new BoxLayout( cPanel, BoxLayout.Y_AXIS));
+    cPanel.setBorder( BorderFactory.createTitledBorder( BorderFactory.createEtchedBorder(), "Configuration File"));    
+    
+    cField = new JTextField();
+    cField.setPreferredSize(new Dimension( DEFAULT_WIDTH, 30));
+    cField.setMaximumSize(new Dimension( 2000, 30));
+    cField.setEditable(false);
+    if((ftsPkg instanceof FtsProject) && ((FtsProject)ftsPkg).getConfig() != null)
+      cField.setText( ((FtsProject)ftsPkg).getConfig());
+    JPanel cButtons = new JPanel();
+    cButtons.setLayout( new BoxLayout( cButtons, BoxLayout.X_AXIS));
+    JButton cSetButton = new JButton("set");
+    cSetButton.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
 	  JFileChooser fileChooser = new JFileChooser();
@@ -167,80 +168,32 @@ public class ConfigPackagePanel extends JPanel implements Editor
 	    {
 	      String path = fileChooser.getSelectedFile().getAbsolutePath();		  		
 	      if(path!=null)
-		((FtsProject)ftsPkg).setMidiConfig( path);
+		((FtsProject)ftsPkg).setConfig( path);
 	    }
 	}
       });
-    midiSetButton.setPreferredSize( new Dimension( 80, 30));
-    midiSetButton.setMinimumSize( new Dimension( 80, 30));
-    midiSetButton.setMaximumSize( new Dimension( 80, 30));
-    JButton midiResetButton = new JButton("reset");
-    midiResetButton.addActionListener(new ActionListener(){
+    cSetButton.setPreferredSize( new Dimension( 80, 30));
+    cSetButton.setMinimumSize( new Dimension( 80, 30));
+    cSetButton.setMaximumSize( new Dimension( 80, 30));
+    JButton cResetButton = new JButton("reset");
+    cResetButton.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
-	  ((FtsProject)ftsPkg).setMidiConfig( null);
+	  ((FtsProject)ftsPkg).setConfig( null);
 	}
       });
     
-    midiResetButton.setPreferredSize( new Dimension( 80, 30));
-    midiResetButton.setMinimumSize( new Dimension( 80, 30));
-    midiResetButton.setMaximumSize( new Dimension( 80, 30));
-    midiButtons.add( midiSetButton);
-    midiButtons.add( midiResetButton);
+    cResetButton.setPreferredSize( new Dimension( 80, 30));
+    cResetButton.setMinimumSize( new Dimension( 80, 30));
+    cResetButton.setMaximumSize( new Dimension( 80, 30));
+    cButtons.add( cSetButton);
+    cButtons.add( cResetButton);
     
-    midiPanel.add( midiField);
-    midiPanel.add( Box.createRigidArea( new Dimension(0, 5)));
-    midiPanel.add( midiButtons);
+    cPanel.add( cField);
+    cPanel.add( Box.createRigidArea( new Dimension(0, 5)));
+    cPanel.add( cButtons);
     
-    JPanel audioPanel = new JPanel();
-    audioPanel.setLayout( new BoxLayout( audioPanel, BoxLayout.Y_AXIS));
-    audioPanel.setBorder( BorderFactory.createTitledBorder( BorderFactory.createEtchedBorder(), "Audio Configuration File"));
-    audioField = new JTextField();
-    audioField.setPreferredSize(new Dimension( DEFAULT_WIDTH, 30));
-    audioField.setMaximumSize(new Dimension( 2000, 30));
-    audioField.setEditable( false);
-    if((ftsPkg instanceof FtsProject) && ((FtsProject)ftsPkg).getAudioConfig() != null)
-      audioField.setText( ((FtsProject)ftsPkg).getAudioConfig());
-    JPanel audioButtons = new JPanel();
-    audioButtons.setLayout( new BoxLayout( audioButtons, BoxLayout.X_AXIS));
-    JButton audioSetButton = new JButton("set");
-    audioSetButton.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	  JFileChooser fileChooser = new JFileChooser();
-	  fileChooser.setFileFilter( configFilter);
-	  fileChooser.setCurrentDirectory( new File( ftsPkg.getDir()));
-	  int result = fileChooser.showDialog(null, "Choose");
-	  if ( result == JFileChooser.APPROVE_OPTION)
-	    {
-	      String path = fileChooser.getSelectedFile().getAbsolutePath();		  		
-	      if(path!=null)
-		((FtsProject)ftsPkg).setAudioConfig( path);
-	    }
-	}
-      });
-    audioSetButton.setPreferredSize( new Dimension( 80, 30));
-    audioSetButton.setMinimumSize( new Dimension( 80, 30));
-    audioSetButton.setMaximumSize( new Dimension( 80, 30));
-    JButton audioResetButton = new JButton("reset");
-    audioResetButton.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	  ((FtsProject)ftsPkg).setAudioConfig( null);
-	}
-      });
-    audioResetButton.setPreferredSize( new Dimension( 80, 30));
-    audioResetButton.setMinimumSize( new Dimension( 80, 30));
-    audioResetButton.setMaximumSize( new Dimension( 80, 30));
-    audioButtons.add( audioSetButton);
-    audioButtons.add( audioResetButton);
-    
-    audioPanel.add( audioField);
-    audioPanel.add( Box.createRigidArea( new Dimension(0, 5)));
-    audioPanel.add( audioButtons);
-    
-    configPanel.add( midiPanel);
-    configPanel.add( audioPanel);
+    configPanel.add( cPanel);
     configPanel.add( Box.createVerticalGlue());
     
     /******** TabbedPane ***********************************************/
@@ -369,14 +322,10 @@ public class ConfigPackagePanel extends JPanel implements Editor
       {
 	tabbedPane.setEnabledAt( 5, true);
 	
-	if( ((FtsProject)ftsPkg).getMidiConfig() != null)
-	  midiField.setText( ((FtsProject)ftsPkg).getMidiConfig());
+	if( ((FtsProject)ftsPkg).getConfig() != null)
+	  cField.setText( ((FtsProject)ftsPkg).getConfig());
 	else
-	  midiField.setText( "");
-	if(((FtsProject)ftsPkg).getAudioConfig() != null)
-	  audioField.setText( ((FtsProject)ftsPkg).getAudioConfig());
-	else
-	  audioField.setText( "");
+	  cField.setText( "");
       }
     else
       tabbedPane.setEnabledAt( 5, false);
@@ -957,19 +906,12 @@ public class ConfigPackagePanel extends JPanel implements Editor
     window.setVisible( true);
   }
 
-  public void midiConfigChanged( String config)
+  public void configChanged( String config)
   {
     if( config != null)
-      midiField.setText( config);
+      cField.setText( config);
     else
-      midiField.setText( "");
-  }
-  public void audioConfigChanged( String config)
-  {
-    if( config != null)
-      audioField.setText( config);
-    else
-      audioField.setText( "");
+      cField.setText( "");
   }
   /************* interface Editor ************************/
   public EditorContainer getEditorContainer()
@@ -1091,7 +1033,7 @@ public class ConfigPackagePanel extends JPanel implements Editor
     }
   }
   
-  JTextField midiField, audioField;
+  JTextField cField;
   JPanel configPanel;
   private static javax.swing.filechooser.FileFilter configFilter;
   static

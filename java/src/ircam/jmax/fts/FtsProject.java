@@ -32,24 +32,14 @@ public class FtsProject extends FtsPackage
 {
   static
   {
-    FtsObject.registerMessageHandler( FtsProject.class, FtsSymbol.get("midi_config"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsProject.class, FtsSymbol.get("config"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  String config = null;
 	  if( args.getLength() == 1)
 	    config = args.getSymbol( 0).toString();
 	  
-	  ((FtsProject)obj).setCurrentMidiConfig( config);
-	}
-      });
-    FtsObject.registerMessageHandler( FtsProject.class, FtsSymbol.get("audio_config"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  String config = null;
-	  if( args.getLength() == 1)
-	    config = args.getSymbol( 0).toString();
-	  
-	  ((FtsProject)obj).setCurrentAudioConfig( config);
+	  ((FtsProject)obj).setCurrentConfig( config);
 	}
       });
   }
@@ -104,7 +94,7 @@ public class FtsProject extends FtsPackage
       }
   }
 
-  public void setMidiConfig( String fileName)
+  public void setConfig( String fileName)
   {
     args.clear();
 
@@ -112,55 +102,25 @@ public class FtsProject extends FtsPackage
       args.addSymbol( FtsSymbol.get( fileName));
     try
       {
-	send( FtsSymbol.get("midi_config"), args);
+	send( FtsSymbol.get("config"), args);
       }
     catch(IOException e)
       {
-	System.err.println("FtsProject: I/O Error sending setMidiConfig Message!");
+	System.err.println("FtsProject: I/O Error sending setConfig Message!");
 	e.printStackTrace(); 
       }
   }
 
-  public void setCurrentMidiConfig( String fileName)
+  public void setCurrentConfig( String fileName)
   {
-    midiConfig = fileName;
+    config = fileName;
     if( listener != null)
-      listener.midiConfigChanged( fileName);
+      listener.configChanged( fileName);
   }
 
-  public String getMidiConfig()
+  public String getConfig()
   {
-    return midiConfig;
-  } 
-
-  public void setAudioConfig( String fileName)
-  {
-    args.clear();
-
-    if( fileName != null)
-      args.addSymbol( FtsSymbol.get( fileName));
-    try
-      {
-	send( FtsSymbol.get("audio_config"), args);
-      }
-    catch(IOException e)
-      {
-	System.err.println("FtsProject: I/O Error sending setAudioConfig Message!");
-	e.printStackTrace(); 
-      }
-  }
-
-  public void setCurrentAudioConfig( String fileName)
-  {
-    audioConfig = fileName;
-    
-    if( listener!= null)
-      listener.audioConfigChanged( fileName);
-  }
-
-  public String getAudioConfig()
-  {
-    return audioConfig;
+    return config;
   } 
 
   public void saveWindows( Enumeration windows)
@@ -189,8 +149,7 @@ public class FtsProject extends FtsPackage
   }
 
   Hashtable packages = new Hashtable();
-  String midiConfig = null;
-  String audioConfig = null;
+  String config = null;
   public static Vector alreadyLoaded = new Vector();
 }
 

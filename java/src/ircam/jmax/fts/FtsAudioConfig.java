@@ -355,13 +355,13 @@ public class FtsAudioConfig extends FtsObject
     labels.removeAllElements();
   }
 
-  private String[] sources;
-  private int[] sourceChannels;
-  private String[] destinations;
-  private int[] destinationChannels;
-  private String[] bufferSizes;
-  private String[] samplingRates;
-  private Vector labels; 
+  private String[] sources = new String[0];
+  private int[] sourceChannels = new int[0];
+  private String[] destinations = new String[0];
+  private int[] destinationChannels = new int[0];
+  private String[] bufferSizes = new String[0];
+  private String[] samplingRates = new String[0];
+  private Vector labels = null;  
   private int samplingRate;
   private int bufferSize;
   private ircam.jmax.editors.configuration.AudioConfigPanel listener = null;

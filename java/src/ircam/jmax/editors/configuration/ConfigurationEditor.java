@@ -171,6 +171,31 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
       audioPanel.Delete();
   }
 
+  public void save()
+  {
+    String fileName = JMaxApplication.getConfig().getFileName();
+    if( fileName != null)
+      JMaxApplication.getConfig().save( fileName);
+    else
+      saveAs();
+  }
+  public void saveAs()
+  {
+    String dir = JMaxApplication.getProject().getDir();
+    String name = dir+"/"+JMaxApplication.getProject().getName()+".jcfg";    
+    
+    fileChooser.setSelectedFile( new File( name));
+    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    int result = fileChooser.showSaveDialog( this);
+
+    if ( result == JFileChooser.APPROVE_OPTION)
+      {
+	String fileName = fileChooser.getSelectedFile().getAbsolutePath();		  		
+	if( fileName != null)
+	  JMaxApplication.getConfig().save( fileName);
+      }
+  }
+
   /************* interface EditorContainer ************************/
   public Editor getEditor()
   {
@@ -195,5 +220,6 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
   private static ConfigurationEditor configEditor = null;
   private JTabbedPane tabbedPane;
   static Font tableFont = (Font)UIManager.get("Table.font");
+  private JFileChooser fileChooser = new JFileChooser(); 
 }
 

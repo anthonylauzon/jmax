@@ -37,17 +37,9 @@
  *  AUDIO/MIDI configuration class
  *
  */
+static fts_symbol_t config_s_name;
 
 static fts_class_t* config_type = NULL;
-
-/*typedef struct
-  {
-  fts_object_t* o;
-  fts_symbol_t file_name;
-  midiconfig_t* midi_config;
-  audioconfig_t* audio_config;
-  } config_t;*/
-
 
 static config_t *config;
 
@@ -207,6 +199,10 @@ config_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   self->audio_config = audio_config;
   
   self->file_name = NULL;
+
+  /* modify object description */
+  /*fts_set_symbol(&a, config_s_name);
+    fts_object_set_description(o, 1, &a);*/
 }
 
 
@@ -304,7 +300,7 @@ void fts_config_config(void)
 {
   fts_atom_t a;
 
-  fts_symbol_t config_s_name = fts_new_symbol("__config");
+  config_s_name = fts_new_symbol("__config");
 
   /* Configuration class */
   config_type = fts_class_install(config_s_name, config_instantiate);

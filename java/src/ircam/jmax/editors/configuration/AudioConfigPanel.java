@@ -60,7 +60,7 @@ import ircam.jmax.toolkit.*;
 
 public class AudioConfigPanel extends JPanel implements Editor
 {
-  public AudioConfigPanel( Window win, FtsAudioConfig config)  
+  public AudioConfigPanel( ConfigurationEditor win, FtsAudioConfig config)  
   {
     window = win;
     audioConfig = config;
@@ -684,8 +684,14 @@ public class AudioConfigPanel extends JPanel implements Editor
   }
 
   public void close(boolean doCancel){}
-  public void save(){}
-  public void saveAs(){}
+  public void save()
+  {
+    window.save();
+  }
+  public void saveAs()
+  {
+    window.saveAs();
+  }
   public void print(){} 
 
   /********************************/
@@ -697,7 +703,7 @@ public class AudioConfigPanel extends JPanel implements Editor
 
   private JScrollPane scrollPane;
   private AudioTableModel audioModel;
-  private Window window;
+  private ConfigurationEditor window;
   private FtsAudioConfig audioConfig;
   private final int TABLE_DEFAULT_WIDTH = 500;
   private final int TABLE_DEFAULT_HEIGHT = 180;

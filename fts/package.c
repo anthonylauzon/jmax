@@ -38,6 +38,7 @@
 #include <ftsprivate/class.h>
 #include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/client.h>
+#include <ftsprivate/config.h>
 
 #define PACKAGE_STACK_SIZE    32
 
@@ -937,54 +938,33 @@ __fts_package_help(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void 
-__fts_package_midi_config(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_config(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_package_t* pkg = (fts_package_t *)o;
   
   if( ac == 1)
-    pkg->midi_config = fts_package_make_relative_path(pkg, fts_get_symbol(&at[0]));  
+    pkg->config = fts_package_make_relative_path(pkg, fts_get_symbol(&at[0]));  
   else
-    pkg->midi_config = NULL;
+    pkg->config = NULL;
 
   if( fts_object_has_id( o))
     {
-      fts_client_start_message( o, fts_s_midi_config);
-      if( pkg->midi_config != NULL)
-	fts_client_add_symbol( o, pkg->midi_config);      
+      fts_client_start_message( o, fts_s_config);
+      if( pkg->config != NULL)
+	fts_client_add_symbol( o, pkg->config);      
       fts_client_done_message( o);    
     }
 
   fts_package_set_dirty( pkg, 1);
 
-  if(( pkg->midi_config != NULL) && ( fts_midiconfig_get() != NULL))
+  if(( pkg->config != NULL) && ( fts_config_get() != NULL))
     {
       fts_atom_t a[1];
-      fts_set_symbol( a, pkg->midi_config);
-      fts_send_message((fts_object_t *)fts_midiconfig_get(), fts_s_load, 1, a);
+      fts_set_symbol( a, pkg->config);
+      fts_send_message((fts_object_t *)fts_config_get(), fts_s_load, 1, a);
     }
   else
-    fts_send_message((fts_object_t *)fts_midiconfig_get(), fts_s_default, 0, 0);
-}
-
-static void 
-__fts_package_audio_config(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_package_t* pkg = (fts_package_t *)o;
-  
-  if( ac == 1)
-    pkg->audio_config = fts_get_symbol(&at[0]);  
-  else
-    pkg->audio_config = NULL;
-
-  if( fts_object_has_id( o))
-    {
-      fts_client_start_message( o, fts_s_audio_config);
-      if( pkg->audio_config != NULL)
-	fts_client_add_symbol( o, pkg->audio_config);      
-      fts_client_done_message( o);    
-    }
-
-  fts_package_set_dirty( pkg, 1);
+    fts_send_message((fts_object_t *)fts_config_get(), fts_s_default, 0, 0);
 }
 
 static void 
@@ -1080,21 +1060,12 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 #endif    
     }
 
-  if( this->midi_config)
+  if( this->config)
     {
       fts_atom_t a[1];
-      fts_set_symbol(a, this->midi_config);
+      fts_set_symbol(a, this->config);
       fts_bmax_code_push_atoms(&f, 1, a);
-      fts_bmax_code_obj_mess(&f, fts_s_midi_config, 1);
-      fts_bmax_code_pop_args(&f, 1);
-    }
-
-  if( this->audio_config)
-    {
-      fts_atom_t a[1];
-      fts_set_symbol(a, this->audio_config);
-      fts_bmax_code_push_atoms(&f, 1, a);
-      fts_bmax_code_obj_mess(&f, fts_s_audio_config, 1);
+      fts_bmax_code_obj_mess(&f, fts_s_config, 1);
       fts_bmax_code_pop_args(&f, 1);
     }
 
@@ -1203,8 +1174,7 @@ __fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
   pkg->windows = NULL;
 
-  pkg->midi_config = NULL;
-  pkg->audio_config = NULL;
+  pkg->config = NULL;
 
   fts_set_symbol(&a, fts_s_package);
   fts_object_set_description(o, 1, &a);
@@ -1371,18 +1341,11 @@ __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   if ( this->declared_templates)
     fts_package_upload_templates( this);
 
-  if( this->midi_config)
+  if( this->config)
     if( fts_object_has_id( o))
       {
-	fts_client_start_message( o, fts_s_midi_config);
-	fts_client_add_symbol( o, this->midi_config);      
-	fts_client_done_message( o);    
-      }
-  if( this->audio_config)
-    if( fts_object_has_id( o))
-      {
-	fts_client_start_message( o, fts_s_audio_config);
-	fts_client_add_symbol( o, this->audio_config);      
+	fts_client_start_message( o, fts_s_config);
+	fts_client_add_symbol( o, this->config);      
 	fts_client_done_message( o);    
       }
   
@@ -1447,8 +1410,7 @@ fts_package_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_windows, __fts_package_open_windows);
   fts_class_message_varargs(cl, fts_s_openEditor, __fts_package_open_editor);
   fts_class_message_varargs(cl, fts_new_symbol("set_as_current_project"), __fts_package_set_as_current_project);
-  fts_class_message_varargs(cl, fts_s_midi_config, __fts_package_midi_config);
-  fts_class_message_varargs(cl, fts_s_audio_config, __fts_package_audio_config);
+  fts_class_message_varargs(cl, fts_s_config, __fts_package_config);
 }
 
 /***********************************************

@@ -37,8 +37,6 @@ public class FtsConfig extends FtsObject
     FtsObject.registerMessageHandler( FtsConfig.class, FtsSymbol.get("midi_config"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  System.err.println(" FtsContig received midi_config id = "+args.getInt( 0));
-	  
 	  ((FtsConfig)obj).setMidiConfig( new FtsMidiConfig( JMaxApplication.getFtsServer(), 
 							     JMaxApplication.getRootPatcher(), 
 							     args.getInt( 0)));
@@ -47,8 +45,6 @@ public class FtsConfig extends FtsObject
     FtsObject.registerMessageHandler( FtsConfig.class, FtsSymbol.get("audio_config"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  System.err.println(" FtsContig received audio_config id = "+args.getInt( 0));
-
 	  ((FtsConfig)obj).setAudioConfig( new FtsAudioConfig( JMaxApplication.getFtsServer(), 
 							       JMaxApplication.getRootPatcher(), 
 							       args.getInt( 0)));
