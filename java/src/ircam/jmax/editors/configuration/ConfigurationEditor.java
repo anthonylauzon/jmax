@@ -244,6 +244,8 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
       }
 
     setVisible(false);
+    config.requestDestroyEditor(); 
+    MaxWindowManager.getWindowManager().removeWindow(this);
 
     singleInstance = null;
   }
