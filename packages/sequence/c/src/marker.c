@@ -1564,7 +1564,7 @@ marker_track_import_labels_txt (fts_object_t *o, int winlet, fts_symbol_t s,
     char              c;
     double            time;
     fts_memorystream_t *memstream;
-    enum { TIME, TEXT, ERROR } waitingfor = TIME;
+    enum { L_TIME, L_TEXT, L_ERROR } waitingfor = L_TIME;
 
     memstream = (fts_memorystream_t *) fts_object_create(fts_memorystream_class, 0, NULL);
     fts_object_refer((fts_object_t *) memstream);
@@ -1579,26 +1579,26 @@ marker_track_import_labels_txt (fts_object_t *o, int winlet, fts_symbol_t s,
       return;
     }
 
-    while (waitingfor != ERROR  &&  fts_atom_file_read(file, &a, &c))
+    while (waitingfor != L_ERROR  &&  fts_atom_file_read(file, &a, &c))
     {
       switch (waitingfor)
       {
-        case TIME:
+        case L_TIME:
           if (fts_is_number(&a))
           {
             time = fts_get_number_float(&a) * 1000;  /* convert to millisec */
 
             /* prepare collection of label */
             fts_memorystream_reset(memstream);
-            waitingfor = TEXT;
+            waitingfor = L_TEXT;
           }
           else
           {
-            waitingfor = ERROR;
+            waitingfor = L_ERROR;
           }
         break;
 
-        case TEXT:
+        case L_TEXT:
           fts_spost_atoms((fts_bytestream_t *) memstream, 1, &a);
 
           if (c == '\n')
@@ -1615,11 +1615,13 @@ marker_track_import_labels_txt (fts_object_t *o, int winlet, fts_symbol_t s,
             
             scomark_set_label(mrk, fts_new_symbol(lab));
 
-            waitingfor = TIME;
+            waitingfor = L_TIME;
           }
           else
             fts_spost((fts_bytestream_t *) memstream, "%c", c);
         break;
+        default:
+          break;
       }
     }
 
