@@ -31,7 +31,6 @@ CFLAGS="-Wall -Wno-unused"
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
-ACX_C_RESTRICT
 AC_C_BIGENDIAN
 
 dnl Check for Electric Fence (a library to track memory corruption errors on Linux)
@@ -55,9 +54,10 @@ dnl Check for libtool version
 dnl Carefull: the character set of the shell is eaten by m4, so we must change quoting
 dnl (autoconf manual, section 7.3 quoting)
 changequote(<<,>>)dnl
-libtool_minor_version=`$SHELL ./ltconfig --version | sed 's/.* 1\.\([0-9]\)\..*/\1/'`
+libtool_major_version=`grep "VERSION=" ltmain.sh | sed 's/VERSION=.*\([0-9]\)\.[0-9]*\..*/\1/'`
+libtool_minor_version=`grep "VERSION=" ltmain.sh | sed 's/VERSION=.*[0-9]*\.\([0-9]*\)\..*/\1/'`
 changequote([,])dnl
-if test "$libtool_minor_version" -lt 4 ; then DOT_LIBS=-L.libs; fi
+if test ("$libtool_major_version" -le 1) -a ("$libtool_minor_version" -lt 4) ; then DOT_LIBS=-L.libs; fi
 AC_SUBST(DOT_LIBS)
 
 dnl Check for platform
@@ -69,16 +69,18 @@ i*86-pc-linux-gnu)
     PLATFORM_PACKAGES="alsa oss unixdtd" ;
     FTS_SYS_LIBS="-ldl -laudiofile -lpthread" ;
     if test "$electric_fence" = "yes" ; then FTS_SYS_LIBS="-lefence $FTS_SYS_LIBS" ; fi ;
+    ACX_C_RESTRICT ;
     ;;
 mips-sgi-irix6.5)
     PLATFORM=sgi ;
     PLATFORM_PACKAGES="sgi unixdtd" ;
     FTS_SYS_LIBS="-ldl -laudiofile";
+    ACX_C_RESTRICT ;
     ;;
 powerpc-apple-darwin*)
     PLATFORM=macosx ;
-    dnl Hack for problem of restrict finding (cc makes an error but does not return correct error code)
-    AC_DEFINE(restrict,)
+    dnl Hack for problem of restrict finding (cc makes an error but does not return correct error code) 
+    AC_DEFINE(restrict,) ;
     PLATFORM_PACKAGES="macosx"  ;;
 esac
 
@@ -100,7 +102,7 @@ AC_CHECK_FUNCS(sinf cosf tanf asinf acosf atanf expf logf log10f)
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_HAVE_HEADERS( sys/param.h unistd.h alloca.h sys/time.h time.h sys/socket.h netinet/in.h arpa/inet.h netdb.h)
+AC_CHECK_HEADERS( sys/param.h unistd.h alloca.h sys/time.h time.h sys/socket.h netinet/in.h arpa/inet.h netdb.h)
 
 dnl Checks for library functions.
 AC_FUNC_ALLOCA
