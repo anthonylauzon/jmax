@@ -63,6 +63,8 @@ slider_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
   if( fts_get_int(a))
     fts_client_send_message(o, sym_setMaxValue, 1, a);
+
+  fts_object_ui_property_changed(o, fts_s_value);
 }
 
 static void
