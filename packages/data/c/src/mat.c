@@ -55,10 +55,8 @@ mat_set_size(mat_t *mat, int m, int n)
   int alloc   = mat->alloc;
   int oldsize = mat->m * mat->n;
   int newsize = m * n;
-  int i, j;
-  
+  int i, j;  
   int min_m = (m < mat->m)? m: mat->m;
-  int min_n = (n < mat->n)? n: mat->n;
   
   if (newsize > alloc)
   {
@@ -490,7 +488,6 @@ mat_upload_from_index(mat_t *self, int row_id, int col_id, int size)
 {
   fts_atom_t a[MAT_CLIENT_BLOCK_SIZE];
   fts_atom_t *d;
-  fts_memorystream_t *stream = mat_get_memory_stream();
   
   int n_cols = mat_get_n(self);
   int sent = 0;
@@ -749,7 +746,7 @@ mat_insert_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   int   n = mat_get_n(self);
   int   pos = 0;        /* col position at which to insert */
   int numcols = 1;      /* number of cols to insert */
-  int num, tomove, i, j, start, new_n;
+  int tomove, i, j, start, new_n;
   
   /* check and test args */
   if (ac > 0  &&  fts_is_number(at))
@@ -796,7 +793,7 @@ mat_delete_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   int   n = mat_get_n(self);
   int   pos = 0;        /* col position at which to insert */
   int numcols = 1;      /* number of rows to insert */
-  int num, tomove, i, j, start;
+  int tomove, i, j, start;
   
   /* check and test args */
   if (ac > 0  &&  fts_is_number(at))

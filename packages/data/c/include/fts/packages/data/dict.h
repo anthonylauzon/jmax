@@ -53,6 +53,8 @@ DATA_API void dict_recall(dict_t *dict, const fts_atom_t *key, fts_atom_t *atom)
 
 DATA_API void dict_get(dict_t *dict, const fts_atom_t *key, fts_atom_t *atom);
 
+DATA_API void dict_upload(dict_t *self);
+
 /* class configuration */
 void dict_config(void);
 

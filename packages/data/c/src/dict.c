@@ -227,7 +227,6 @@ dict_upload_data(dict_t *self)
   fts_atom_t *d;
   fts_atom_t a[DICT_CLIENT_BLOCK_SIZE];
   int size, data_size, ms, ns, sent;
-  fts_memorystream_t *stream = dict_get_memory_stream();
   
   fts_array_init(&array, 0, 0);
   dict_array_function((fts_object_t *)self, &array);
@@ -275,7 +274,7 @@ dict_upload_data(dict_t *self)
   }
 }
 
-static void
+void
 dict_upload(dict_t *self)
 {
   dict_upload_size(self);

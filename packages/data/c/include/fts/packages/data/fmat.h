@@ -141,6 +141,7 @@ DATA_API float fmat_get_max_abs_value_in_range(fmat_t *mat, int a, int b);
 DATA_API float fmat_get_max_value_in_range(fmat_t *mat, int a, int b);
 DATA_API float fmat_get_min_value_in_range(fmat_t *mat, int a, int b);
 
+DATA_API void fmat_upload(fmat_t *mat);
 /** @} end of group fmat */
 
 

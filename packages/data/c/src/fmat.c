@@ -772,7 +772,7 @@ fmat_upload_data(fmat_t *self)
   fmat_upload_from_index(self, 0, 0, fmat_get_m(self) * fmat_get_n(self));
 }
 
-static void
+void
 fmat_upload(fmat_t *self)
 {
   fmat_upload_size(self);
