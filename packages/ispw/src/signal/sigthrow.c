@@ -1,13 +1,42 @@
-/* sigthrow.c */
-
+#include "fts.h"
 #include <string.h>
 
-#include "fts.h"
+/********************************
+ *
+ *   gensampname utility
+ *
+ */
+
+static void
+gensampname(char *buf, const char *base, long int n)
+{
+  char b2[30];
+  char *s = b2+29;
+  *s = 0;
+
+  if (n < 0)
+    n = 0;
+
+  while ((*buf = *base++))
+    buf++;
+
+  if (!n)
+    *(--s) = '0';
+  else while (n)
+    {
+      *(--s) = '0' + (n%10);
+      n /= 10;
+    }
+  while ((*buf++ = *s++))
+    ;
+}
 
 
-
-
-/* --------------------------- sigcatch~ ---------------------------- */
+/********************************
+ *
+ *   catch~
+ *
+ */
 
 static fts_hash_table_t catch_table;
 static fts_symbol_t fts_s_print;
@@ -166,7 +195,12 @@ sigcatch_config(void)
   fts_metaclass_create(fts_new_symbol("catch~"),sigcatch_instantiate, fts_always_equiv);
 }
 
-/* --------------------------- sigthrow~ ---------------------------- */
+
+/********************************
+ *
+ *   throw~
+ *
+ */
 
 static fts_symbol_t sigthrow_function = 0;
 
