@@ -838,8 +838,8 @@ fslice_get_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   
   if(fslice_check_index(self))
   {
-    const int size = fslice_get_size(self);
     const int stride = fslice_get_stride(self);
+    const int size   = fslice_get_size(self) * stride;	/* index into fmat! */
     
     if(size > 0)
     {
@@ -867,8 +867,8 @@ fslice_get_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   if(fslice_check_index(self))
   {
-    const int size = fslice_get_size(self);
     const int stride = fslice_get_stride(self);
+    const int size   = fslice_get_size(self) * stride;	/* index into fmat! */
     
     if(size > 0)
     {
@@ -896,9 +896,9 @@ fslice_get_absmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
   if(fslice_check_index(self))
   {
-    const int size = fslice_get_size(self);
     const int stride = fslice_get_stride(self);
-    
+    const int size   = fslice_get_size(self) * stride;	/* index into fmat! */
+
     if(size > 0)
     {
       const float *p = fslice_get_ptr(self);
