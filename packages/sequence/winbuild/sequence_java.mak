@@ -23,7 +23,7 @@ dir:
 jar:
 	-@cd $(WINBUILD_TO_PKG)\java\classes
 	-@if exist "$(PKG).jar" erase "$(PKG).jar"
-	$(JAR) -cf ..\$(PKG).jar ircam Sequence.class
+	$(JAR) -cf ..\$(PKG).jar ircam *.class
 
 classes:
 	cd $(WINBUILD_TO_JAVA)\editors\sequence
