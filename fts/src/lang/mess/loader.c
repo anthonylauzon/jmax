@@ -130,7 +130,7 @@ static int fts_binary_file_map( FILE *f, fts_binary_file_desc_t *desc)
 	desc->symbols[symbolIndex] = fts_s_error;
 
       symbolIndex = 0;
-      while (! feof(f))
+      while (! feof(f) && (symbolIndex < header.n_symbols))
 	{
 	  buf[i] = getc(f);
 
