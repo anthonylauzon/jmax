@@ -456,7 +456,7 @@ fts_audiomanager_remove_port( fts_symbol_t name)
 
 static fts_symbol_t *audiomanager_get_names( int direction)
 {
-  static int count;
+  static int count = -1;
   static fts_symbol_t *names;
   fts_symbol_t *p;
   int n;

@@ -760,7 +760,7 @@ void fts_audioconfig_config(void)
   fts_array_init(&audioconfig_sample_rates_array, 0, 0);
   fts_array_init(&audioconfig_buffer_sizes_array, 0, 0);
 
-  fts_class_install(audioconfig_s_name, audioconfig_instantiate);
+  fts_audioconfig_class = fts_class_install(audioconfig_s_name, audioconfig_instantiate);
 }
 
 
