@@ -1,3 +1,8 @@
+2003-04-29  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>, Riccardo Borghesi  <Riccardo.Borghesi@ircam.fr>
+
+	* include/ftsprivate/template.h, fts/patcher.c (patcher_open_help_patch): added support for 
+	template help patch
+
 2003-04-28  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* configure.in, fts/linux.c: added preprocessor conditionnal on USE_ALSA before loading alsa package.
