@@ -65,7 +65,9 @@ class ConsoleWriter extends OutputStream
   {
     itsConsole.Put(buffer.toString());
     buffer.setLength(0);
-    //itsConsole.itsTextArea.setCaretPosition(itsConsole.itsTextArea.getText().length());
+    String text = itsConsole.itsTextArea.getText();
+    if(text!=null)
+      itsConsole.itsTextArea.setCaretPosition(text.length());
   }
 
   public void close()
