@@ -801,10 +801,23 @@ static void *fts_readsf_worker(void *data)
       /* Set the virtual format of the file */
 
       afSetVirtualSampleFormat(file, AF_DEFAULT_TRACK, AF_SAMPFMT_FLOAT, 32);
+#else
+
+      /* If we dont have the virtual format translation, we do a check
+	 on a the actual number of channels we got, and give do an eof if
+	 they do not match; we currently have no way to signal the error
+	 from this thread.
+      */
+
+      if (afGetChannels(file, AF_DEFAULT_TRACK) != dev_data->nch)
+	{
+	  eof = 1;
+	  fts_sample_fifo_writer_eof(fifo);
+	}
 #endif
     }
 
-  /*  LOOP: on the out of band status --> read the file -> Write to the sample fifo */
+  /*  LOOP:  read the file -> Write to the sample fifo */
 
   while (! eof)
     {
