@@ -631,7 +631,7 @@ static fts_symbol_t *audiomanager_get_names( int direction)
   if ( n > count)
     {
       count = n;
-      names = fts_realloc( names, (n+1) * sizeof( fts_symbol_t));
+      names = fts_realloc((void*)names, (n+1) * sizeof( fts_symbol_t));
     }
 
   fts_hashtable_get_keys( &audiomanager_table, &keys);
