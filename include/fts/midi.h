@@ -334,7 +334,7 @@ FTS_API void fts_midififo_get_events(fts_midififo_t *fifo);
  *
  * @fn void fts_midififo_init(fts_midififo_t *fifo, int size)
  * @param fifo the MIDI fifo
- * @size size in number of events
+ * @param size in number of events
  *
  * @ingroup midififo
  */
@@ -388,7 +388,7 @@ FTS_API void fts_midififo_write(fts_midififo_t *fifo, fts_object_t *port, double
 /**
  * Resynchronize MIDI fifo (set delta time to 0)
  *
- * @fn void fts_midififo_sync(fts_midififo_t *fifo)
+ * @fn void fts_midififo_resync(fts_midififo_t *fifo)
  * @param fifo the MIDI fifo
  *
  * @ingroup midififo
@@ -554,9 +554,11 @@ FTS_API void fts_midiport_set_output(fts_midiport_t *port, fts_midiport_output_t
  * listeners for a given MIDI channel and (if any) note or controller number.
  *
  * @fn void fts_midiport_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
- * @param port the MIDI port itself
- * @param event the incoming event
- * @param time an offset time of the incoming MIDI event (in msec) regarding the current logical (tick) time
+ * @param o the MIDI port itself
+ * @param winlet
+ * @param s
+ * @param ac
+ * @param at
  *
  * @ingroup midiport
  */
@@ -657,11 +659,11 @@ FTS_API int fts_midiport_is_output(fts_midiport_t *port);
  * In order to receive incoming MIDI messages of a certain type and channel from a MIDI port, 
  * an FTS object registeres itself as a listener to the MIDI port using this function.
  *
- * @fn void fts_midiport_add_listener(fts_midiport_t *port, enum midi_type type, int id, int number, fts_object_t *obj, fts_method_t fun)
+ * @fn void fts_midiport_add_listener(fts_midiport_t *port, enum midi_type type, int chan, int num, fts_object_t *obj, fts_method_t fun)
  * @param port the listened MIDI port
  * @param type type of midi event
- * @param id the listened MIDI channel (1..16, midi_channel_any for omni) or system event type
- * @param number the listened MIDI note or controller number (0..127, midi_number_any for omni)
+ * @param chan the listened MIDI channel (1..16, midi_channel_any for omni) or system event type
+ * @param num the listened MIDI note or controller number (0..127, midi_number_any for omni)
  * @param obj the listening object
  * @param fun callback for incoming MIDI messages of the given MIDI type, id, and number
  *
@@ -676,8 +678,9 @@ FTS_API int fts_midiport_is_output(fts_midiport_t *port);
  *
  * @fn void fts_midiport_remove_listener(fts_midiport_t *port, enum midi_type type, int chan, int num, fts_object_t *obj)
  * @param port the listened MIDI port
- * @param id the listened MIDI channel (1..16, midi_channel_any for omni) or system event type
- * @param number the listened MIDI note or controller number (0..127, midi_number_any for omni)
+ * @param type type of midi event
+ * @param chan the listened MIDI channel (1..16, midi_channel_any for omni) or system event type
+ * @param num the listened MIDI note or controller number (0..127, midi_number_any for omni)
  * @param obj the listening object
  *
  * @ingroup midiport_io

@@ -75,7 +75,7 @@ FTS_API void fts_message_set(fts_message_t *mess, fts_symbol_t s, int ac, const 
 /**
 * Set message from array (first element must be a symbol).
  *
- * @fn void fts_message_set(fts_message_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at)
+ * @fn void fts_message_set_from_atoms(fts_message_t *mess, int ac, const fts_atom_t *at)
  * @param mess the message
  * @param ac array size
  * @param at array values
@@ -145,8 +145,9 @@ FTS_API void fts_dumper_destroy(fts_dumper_t *dumper);
 /**
  * Get an empty message from the dumper.
  *
- * @fn void fts_dumper_message_new(fts_dumper_t *dumper)
+ * @fn void fts_dumper_message_new(fts_dumper_t *dumper, fts_symbol_t selector)
  * @param dumper the dumper
+ * @param selector the selector
  * @ingroup mess_dumper
  */
 FTS_API fts_message_t *fts_dumper_message_new(fts_dumper_t *dumper, fts_symbol_t selector);

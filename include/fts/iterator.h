@@ -90,10 +90,11 @@ struct _fts_iterator_t {
 #define fts_iterator_has_more(I) ((*(I)->has_more)( I))
 
 /**
- * Advance to next element in iteration
+ * Store value and advance to next element in iteration
  *
- * @fn int fts_iterator_next( fts_iterator_t *i)
+ * @fn int fts_iterator_next( fts_iterator_t *i, fts_atom_t* a)
  * @param i the iterator
+ * @param a the atom
  */
 #define fts_iterator_next(I,A) ((*(I)->next)( I, A))
 

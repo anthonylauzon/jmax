@@ -139,7 +139,7 @@ FTS_API fts_bytestream_t *fts_get_default_console_stream( void);
  * will output the chars)
  *
  * @fn void fts_set_default_console_stream( fts_bytestream_t *stream)
- * @param the default console stream
+ * @param stream the default console stream
  * @ingroup post
  */
 FTS_API void fts_set_default_console_stream( fts_bytestream_t *stream);

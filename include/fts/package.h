@@ -30,19 +30,19 @@
  * Initializes an iterator for all the registered packages. The
  * iterator returns the names of the packages.
  *
- * @fn void fts_get_package_names(fts_iterator_t* i)
+ * @fn void fts_get_package_names(fts_iterator_t* iter)
  * @param iter a pointer to an iterator object
  * @ingroup package */
-FTS_API void fts_get_package_names(fts_iterator_t* i);
+FTS_API void fts_get_package_names(fts_iterator_t* iter);
 
 /**
  * Initializes an iterator for all the registered packages. The
  * iterator returns the names of the packages.
  *
- * @fn void fts_get_packages(fts_iterator_t* i)
+ * @fn void fts_get_packages(fts_iterator_t* iter)
  * @param iter a pointer to an iterator object
  * @ingroup package */
-FTS_API void fts_get_packages(fts_iterator_t* i);
+FTS_API void fts_get_packages(fts_iterator_t* iter);
 
 /**
  * Returns the package with the specified name or NULL if the package
@@ -120,7 +120,7 @@ FTS_API char* fts_package_get_error(fts_package_t* pkg);
  * Initializes an iterator for all the required packages of this
  * package. The iterator returns the names of the packages.
  *
- * @fn void fts_package_get_required_packages(fts_package_t* pkg, fts_iterator_t* i)
+ * @fn void fts_package_get_required_packages(fts_package_t* pkg, fts_iterator_t* iter)
  * @param pkg the package
  * @param iter a pointer to an iterator object
  * @ingroup package */
@@ -130,7 +130,7 @@ FTS_API void fts_package_get_required_packages(fts_package_t* pkg, fts_iterator_
  * Initializes an iterator for all the class names of this
  * package. The iterator returns the names of the classes.
  *
- * @fn void fts_package_get_class_names(fts_package_t* pkg, fts_iterator_t* i)
+ * @fn void fts_package_get_class_names(fts_package_t* pkg, fts_iterator_t* iter)
  * @param pkg the package
  * @param iter a pointer to an iterator object
  * @ingroup package */

@@ -196,7 +196,9 @@ FTS_API void fts_bytestream_destroy(fts_bytestream_t *stream);
  *
  * @fn void fts_bytestream_set_output(fts_bytestream_t *stream, fts_bytestream_output_t output, fts_bytestream_output_char_t output_char, fts_bytestream_flush_t flush)
  * @param stream the byte stream
- * @param functions structure of implemented output functions
+ * @param output 
+ * @param output_char
+ * @param flush
  *
  * @ingroup bytestream
  */
