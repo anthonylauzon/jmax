@@ -36,31 +36,30 @@ import javax.swing.*;
  * The initial dialog.
  */
 
-public class SplashDialog extends Dialog implements KeyListener, MouseListener, ActionListener {
-  static final int Y_ONSET = 20;
+public class SplashDialog extends Window implements KeyListener, MouseListener, ActionListener {
   static final int SPLASH_WIDTH = 400;
-  static final int SPLASH_HEIGHT = 300 + Y_ONSET;
+  static final int SPLASH_HEIGHT = 300;
 
   String itsVersionString;
-
   Image itsImage;
 
   public SplashDialog(String filename, String version) {
-    
-    super(MaxWindowManager.getTopFrame(), "jMax", false);
-    
+
+    super(new Frame());
+
     itsVersionString = version;
     itsImage = Toolkit.getDefaultToolkit().getImage(filename);
         
     addKeyListener(this);
     addMouseListener(this);
     
-    setLocation(200,150);
+    Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
+    setLocation((screenDim.width - SPLASH_WIDTH) / 2, (screenDim.height - SPLASH_HEIGHT) / 2);
+
     pack();
     setVisible(true);
     
     Timer aTimer = new Timer(4000, this);
-
     aTimer.setRepeats(false);
     aTimer.start();
   }
@@ -111,9 +110,9 @@ public class SplashDialog extends Dialog implements KeyListener, MouseListener, 
   public void paint(Graphics g) {
     Dimension d = getSize();
 
-    g.drawImage(itsImage, 0, Y_ONSET, this);
+    g.drawImage(itsImage, 0, 0, this);
 
     g.setColor(Color.black);
-    g.drawString(itsVersionString, 20, Y_ONSET + 20);
+    g.drawString(itsVersionString, 20, 20);
   }
 }

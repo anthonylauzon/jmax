@@ -34,9 +34,9 @@ openConsole
 # run the official jMax splash screen 
 # if not supressed by the user in .jmaxrc
 
-if {$jmaxSplashScreen != "hide"} then {
-  splash $jmaxRootDir/images/Splash.gif [getMaxVersion]
-}
+#if {$jmaxSplashScreen != "hide"} then {
+#  splash $jmaxRootDir/images/Splash.gif [getMaxVersion]
+#}
 
 # start jMax server
 
