@@ -374,7 +374,7 @@ track_remove_event_and_upload(track_t *track, event_t *event)
   track_set_dirty(track);
 }
 
-static void
+void
 track_move_event(track_t *track, event_t *event, double time)
 {
   event_t *next = event_get_next(event);

@@ -278,78 +278,6 @@ static void fts_socketstream_instantiate(fts_class_t *cl)
 }
 #endif
 
-/***********************************************************************
- *
- * UDP bytestream
- * (the object that implements a bidirectional byte stream over a TCP/IP socket) 
- *
- */
- 
-/*#define FTS_UDP_DEFAULT_PORT 2023
-
-typedef struct _fts_udpstream_t 
-{
-  fts_bytestream_t bytestream;
-  int socket;
-  int in_port;
-  fts_symbol_t out_host;
-  int out_port;
-  struct sockaddr_in out_addr;
-} fts_udpstream_t;
-
-
-static void fts_udpstream_output(fts_bytestream_t* stream, int n, const unsigned char* c)
-{
-}
-static void fts_udpstream_output_char(fts_bytestream_t *stream, unsigned char c)
-{
-}
-static void fts_udpstream_flush(fts_bytestream_t *stream)
-{
-}
-int fts_udpstream_get_input_port(fts_udpstream_t* stream)
-{
-}
-int fts_udpstream_get_output_port(fts_udpstream_t* stream)
-{
-}*/
-
-
-/* 
-   <input>: port (int)
-   <output>: host (symbol) port (int)
-   
-   udpstream <input>          : can receive
-   udpstream <input> <output> : can receive and send
-   udpstream <->     <output> : can send  
-*/
-/*static void fts_udpstream_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
-{
-}
-
-static void fts_udpstream_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
-{
-}
-
-static void fts_udpstream_receive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-}
-
-static void fts_udpstream_instantiate(fts_class_t* cl)
-{
-}*/
-
-
-/***********************************************************************
- *
- * Pipe bytestream
- *
- * The pipe stream object implements a byte stream over pipes. On
- * its creation, it takes 2 arguments (pipe input and pipe output) which
- * defaults to stdin and stdout of the FTS process. In case stdin and stdout
- * are used, FTS stdout is redirected to a file.
- *
- */
 
 typedef struct _fts_pipestream_t {
   fts_bytestream_t bytestream;
@@ -533,16 +461,7 @@ void fts_kernel_bytestream_init( void)
   fts_s_bytestream = fts_new_symbol("bytestream");
   fts_s__superclass = fts_new_symbol("_superclass");
 
-  /*fts_socketstream_class = fts_class_install( fts_new_symbol("socketstream"), fts_socketstream_instantiate);
-  fts_udpstream_class = fts_class_install( fts_new_symbol("udpstream"), fts_udpstream_instantiate);*/
-
   fts_pipestream_class = fts_class_install( fts_new_symbol("pipestream"), fts_pipestream_instantiate);
   fts_memorystream_class = fts_class_install( fts_new_symbol("memorystream"), fts_memorystream_instantiate);
 }
 
-/** EMACS **
- * Local variables:
- * mode: c
- * c-basic-offset:2
- * End:
- */
