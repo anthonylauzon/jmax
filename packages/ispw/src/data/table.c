@@ -239,12 +239,12 @@ table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if(ac > 1 && fts_is_symbol(at + 1))
     {
       name = fts_get_symbol(at + 1);
-      size = fts_get_int_arg(ac, at, 2, FTS_TABLE_DEFAULT_SIZE);
+      size = fts_get_number_arg(ac, at, 2, FTS_TABLE_DEFAULT_SIZE);
     }
   else
     {
       name = 0;
-      size = fts_get_int_arg(ac, at, 1, FTS_TABLE_DEFAULT_SIZE);
+      size = fts_get_number_arg(ac, at, 1, FTS_TABLE_DEFAULT_SIZE);
     }
 
   this->name = name;
