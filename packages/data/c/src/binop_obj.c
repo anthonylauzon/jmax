@@ -47,43 +47,9 @@ static fts_symbol_t default_keyword = 0;
  *
  */
 
-typedef struct _binop_optype
-{
-  fts_symbol_t name; /* cash for last operand type */
-  int id; /* id of cashed type */
-} binop_optype_t;
-
-#define LEFT 0
-#define RIGHT 1
-#define RESULT 2
-
-#define LEFT_TYPE_ID(obj) ((obj)->type[LEFT].id)
-#define RIGHT_TYPE_ID(obj) ((obj)->type[RIGHT].id)
-#define LEFT_TYPE_NAME(obj) ((obj)->type[LEFT].name)
-#define RIGHT_TYPE_NAME(obj) ((obj)->type[RIGHT].name)
-
-#define LEFT_AT(obj) ((obj)->at[LEFT])
-#define RIGHT_AT(obj) ((obj)->at[RIGHT])
-#define RESULT_AT(obj) ((obj)->at[RESULT])
-
-#define FUN_ARGS(obj) ((obj)->at)
-
-#define binop_obj_set_left_type(obj, s) \
-  (((s) != LEFT_TYPE_NAME(obj))? (LEFT_TYPE_ID(obj) = data_type_get_id(s), LEFT_TYPE_NAME(obj) = (s)): (s))
-#define binop_obj_set_right_type(obj, s) \
-  (((s) != RIGHT_TYPE_NAME(obj))? (RIGHT_TYPE_ID(obj) = data_type_get_id(s), RIGHT_TYPE_NAME(obj) = (s)): (s))
-
-#define binop_obj_set_left(obj, s, at) {binop_obj_set_left_type((obj), (s)); data_atom_set(&LEFT_AT(obj), (at));}
-#define binop_obj_set_right(obj, s, at) {binop_obj_set_right_type((obj), (s)); data_atom_set(&RIGHT_AT(obj), (at));}
-
-#define binop_obj_void_left(obj) data_atom_void(&LEFT_AT(obj))
-#define binop_obj_void_right(obj) data_atom_void(&RIGHT_AT(obj))
-#define binop_obj_void_result(obj) data_atom_void(&RIGHT_AT(obj))
-
-#define binop_obj_left_is_void(obj) (fts_is_void(&LEFT_AT(obj)))
-#define binop_obj_right_is_void(obj) (fts_is_void(&RIGHT_AT(obj)))
-
-#define binop_obj_get_fun(obj) ((obj)->funs[LEFT_TYPE_ID(obj)][RIGHT_TYPE_ID(obj)])
+#define LEFT(op) ((op)[0])
+#define RIGHT(op) ((op)[1])
+#define RESULT(op) ((op)[2])
 
 /******************************************************
  *
@@ -94,10 +60,8 @@ typedef struct _binop_optype
 typedef struct _binop_obj
 {
   fts_object_t head;
-  fts_symbol_t binop;
-  operator_matrix_t funs;
-  fts_atom_t at[3]; /* left, right, result */
-  binop_optype_t type[2]; /* left, right */
+  binop_t *binop;
+  op_t op[3]; /* left, right, result */
 } binop_obj_t;
 
 int binop_obj_is_keyword(const fts_atom_t *atom)
@@ -118,35 +82,45 @@ int binop_obj_is_keyword(const fts_atom_t *atom)
     return 0;
 }
 
-static int
+static binop_t *
 binop_obj_get_args(int ac, const fts_atom_t *at, fts_symbol_t *keyword, fts_atom_t *right)
 {
-  if(ac == 3 && binop_obj_is_keyword(at + 1))
-    {
-      *keyword = fts_get_symbol(at + 1);
-      *right = at[2];
-    }
-  else if(ac == 2 && binop_obj_is_keyword(at + 1))
-    {
-      fts_symbol_t keyword_arg = fts_get_symbol(at + 1);
+  binop_t *binop = 0;
+
+  if(ac > 1 && fts_is_symbol(at + 1))
+    binop = binop_get(fts_get_symbol(at + 1));
       
-      if(keyword_arg == sym_const || keyword_arg == sym_static)
-	return 0; /* right operand required */
-      else
+  if(binop) 
+    {
+      if(ac == 4 && binop_obj_is_keyword(at + 2))
 	{
-	  *keyword = keyword_arg;
+	  *keyword = fts_get_symbol(at + 2);
+	  *right = at[3];
+	}
+      else if(ac == 3 && binop_obj_is_keyword(at + 2))
+	{
+	  fts_symbol_t keyword_arg = fts_get_symbol(at + 2);
+	  
+	  if(keyword_arg == sym_const || keyword_arg == sym_static)
+	    return 0; /* right operand required */
+	  else
+	    {
+	      *keyword = keyword_arg;
+	      fts_set_void(right);
+	    }
+	}
+      else if(ac == 3)
+	{
+	  *keyword = default_keyword;
+	  *right = at[2];
+	}
+      else if(ac == 2)
+	{
+	  *keyword = default_keyword;
 	  fts_set_void(right);
 	}
-    }
-  else if(ac == 2)
-    {
-      *keyword = default_keyword;
-      *right = at[1];
-    }
-  else if(ac == 1)
-    {
-      *keyword = default_keyword;
-      fts_set_void(right);
+
+      return binop;
     }
   else
     {
@@ -154,24 +128,12 @@ binop_obj_get_args(int ac, const fts_atom_t *at, fts_symbol_t *keyword, fts_atom
       fts_set_void(right);
       return 0; /* wrong args */
     }
-  
-  return 1;
 }
 
 static void
-binop_obj_error_operand_type(binop_obj_t *this)
+binop_obj_error_const_in_inplace(binop_t *binop)
 {
-  const char *binop_str = fts_symbol_name(this->binop);
-  const char *left_type_str = fts_symbol_name(LEFT_TYPE_NAME(this));
-  const char *right_type_str = fts_symbol_name(RIGHT_TYPE_NAME(this));
-
-  post("binop: %s: no function for operands of given types (%s and %s)\n", binop_str, left_type_str, right_type_str);
-}
-
-static void
-binop_obj_error_const_in_inplace(binop_obj_t *this)
-{
-  const char *binop_str = fts_symbol_name(this->binop);
+  const char *binop_str = fts_symbol_name(binop->name);
 
   post("binop: %s: left operand must not be constant for inplace calculation\n", binop_str);
 }
@@ -180,45 +142,40 @@ static void
 binop_obj_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_obj_t *this = (binop_obj_t *)o;
-  fts_symbol_t binop = fts_get_symbol(at);
+  op_t *op = this->op;
+  fts_symbol_t name = fts_get_symbol(at + 1);
   fts_symbol_t keyword = 0;
-  fts_atom_t left_init;
   fts_atom_t right_init;  
-  operator_matrix_t funs = 0;
 
-  fts_set_void(&left_init);
-  binop_obj_get_args(ac, at, &keyword, &right_init);
+  this->binop = binop_obj_get_args(ac, at, &keyword, &right_init);
 
-  this->binop = binop;
-
-  if(keyword == binops_s_inplace)
-    funs = binop_get_matrix(binop, binops_s_inplace);
-  else
-    funs = binop_get_matrix(binop, binops_s_recycle);
-
-  if(funs)
+  if(this->binop)
     {
-      this->funs = funs;
-      
-      fts_set_void(&LEFT_AT(this));
-      fts_set_void(&RIGHT_AT(this));
-      fts_set_void(&RESULT_AT(this));
+      if(keyword == sym_const && !data_atom_is_const(right_init))
+	{
+	  op_init_void(&RIGHT(op));
+	  post("binop %s const: constant initializer required\n", fts_symbol_name(name));
+	}
+      else
+	op_init(&RIGHT(op), right_init);
 
-      binop_obj_set_left(this, fts_s_void, left_init);
-      binop_obj_set_right(this, data_atom_get_type(right_init), right_init);
+      op_init_void(&LEFT(op));
+      op_init_void(&RESULT(op));
     }
   else
-    post("binop: unkonown operator: %s\n", fts_symbol_name(binop));
+    post("binop: unknown operator: %s\n", fts_symbol_name(name));
+
 }
 
 static void
 binop_obj_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_obj_t *this = (binop_obj_t *)o;
+  op_t *op = this->op;
 
-  binop_obj_void_left(this);
-  binop_obj_void_right(this);
-  binop_obj_void_result(this);
+  op_void(&LEFT(op));
+  op_void(&RIGHT(op));
+  op_void(&RESULT(op));
 }
 
 /******************************************************
@@ -231,24 +188,16 @@ static void
 binop_obj_left_trigger(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_obj_t *this = (binop_obj_t *)o;
+  op_t *op = this->op;
   
-  if(!binop_obj_right_is_void(this))
+  if(!op_is_void(RIGHT(op)))
     {
-      operator_fun_t fun;
+      op_set_with_type(&LEFT(op), at[0], s);
 
-      binop_obj_set_left(this, s, at[0]);
-
-      fun = binop_obj_get_fun(this);
+      if(binop_call_fun_recycle(this->binop, op))
+	op_outlet(o, winlet, RESULT(op));
       
-      if(fun)
-	{
-	  fun(FUN_ARGS(this));
-	  data_atom_outlet(o, 0, RESULT_AT(this));
-	}
-      else
-	binop_obj_error_operand_type(this);
-
-      binop_obj_void_left(this);
+      op_release(&LEFT(op));
     }
 }
 
@@ -256,32 +205,22 @@ static void
 binop_obj_left_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_obj_t *this = (binop_obj_t *)o;
-  
+  op_t *op = this->op;  
   
   if(data_atom_is_const(at[0]))
     {
-      binop_obj_error_const_in_inplace(this);
+      binop_obj_error_const_in_inplace(this->binop);
       return;
     }
 
-  if(!binop_obj_right_is_void(this))
+  if(!op_is_void(RIGHT(op)))
     {
-      operator_fun_t fun;
+      op_set_with_type(&LEFT(op), at[0], s);
 
-      data_atom_refer(at);
-      binop_obj_set_left(this, s, at[0]);
+      if(binop_call_fun_inplace(this->binop, op))
+	op_outlet(o, winlet, LEFT(op));
 
-      fun = binop_obj_get_fun(this);
-      
-      if(fun)
-	{
-	  fun(FUN_ARGS(this));
-	  data_atom_outlet(o, 0, LEFT_AT(this));
-	}
-      else
-	binop_obj_error_operand_type(this);
-
-      binop_obj_void_left(this);
+      op_release(&LEFT(op));
     }
 }
 
@@ -289,48 +228,29 @@ static void
 binop_obj_left_store_and_trigger(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_obj_t *this = (binop_obj_t *)o;
+  op_t *op = this->op;
 
-  binop_obj_set_left(this, s, at[0]);
+  op_set_with_type(&LEFT(op), at[0], s);
 
-  if(!binop_obj_right_is_void(this))
-    {
-      operator_fun_t fun;
-      
-      fun = binop_obj_get_fun(this);
-
-      if(fun)
-	{
-	  fun(FUN_ARGS(this));
-	  data_atom_outlet(o, 0, RESULT_AT(this));
-	}
-      else
-	binop_obj_error_operand_type(this);
-    }
+  if(!op_is_void(RIGHT(op)) && binop_call_fun_recycle(this->binop, op))
+    op_outlet(o, winlet, RESULT(op));
 }
 
 static void
 binop_obj_left_trigger_and_clear_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_obj_t *this = (binop_obj_t *)o;
+  op_t *op = this->op;
 
-  if(!binop_obj_right_is_void(this))
+  if(!op_is_void(RIGHT(op)))
     {
-      operator_fun_t fun;
-
-      binop_obj_set_left(this, s, at[0]);
+      op_set_with_type(&LEFT(op), at[0], s);
       
-      fun = binop_obj_get_fun(this);
+      if(binop_call_fun_recycle(this->binop, op))
+	op_outlet(o, winlet, RESULT(op));
 
-      if(fun)
-	{
-	  fun(FUN_ARGS(this));
-	  data_atom_outlet(o, 0, RESULT_AT(this));
-	}
-      else
-	binop_obj_error_operand_type(this);
-      
-      binop_obj_void_right(this);
-      binop_obj_void_left(this);
+      op_release(&LEFT(op));
+      op_void(&RIGHT(op));
     }
 }
 
@@ -338,31 +258,21 @@ static void
 binop_obj_right_store_and_trigger(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_obj_t *this = (binop_obj_t *)o;
+  op_t *op = this->op;
 
-  binop_obj_set_right(this, s, at[0]);
+  op_set_with_type(&RIGHT(op), at[0], s);
 
-  if(!binop_obj_left_is_void(this))
-    {
-      operator_fun_t fun;
-      
-      fun = binop_obj_get_fun(this);
-
-      if(fun)
-	{
-	  fun(FUN_ARGS(this));
-	  data_atom_outlet(o, 0, RESULT_AT(this));
-	}
-      else
-	binop_obj_error_operand_type(this);
-    }
+  if(!op_is_void(LEFT(op)) && binop_call_fun_recycle(this->binop, op))
+    op_outlet(o, winlet, RESULT(op));
 }
 
 static void
 binop_obj_right_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_obj_t *this = (binop_obj_t *)o;
+  op_t *op = this->op;
   
-  binop_obj_set_right(this, s, at[0]);
+  op_set_with_type(&RIGHT(op), at[0], s);
 }
 
 /******************************************************
@@ -476,12 +386,7 @@ void
 binop_obj_config(void)
 {
   fts_metaclass_create(fts_new_symbol("binop"), binop_obj_instantiate, binop_obj_equiv);
-  fts_metaclass_alias(fts_new_symbol("add"), fts_new_symbol("binop"));
-  fts_metaclass_alias(fts_new_symbol("sub"), fts_new_symbol("binop"));
-  fts_metaclass_alias(fts_new_symbol("mul"), fts_new_symbol("binop"));
-  fts_metaclass_alias(fts_new_symbol("div"), fts_new_symbol("binop"));
-  fts_metaclass_alias(fts_new_symbol("bus"), fts_new_symbol("binop"));
-  fts_metaclass_alias(fts_new_symbol("vid"), fts_new_symbol("binop"));
+  fts_metaclass_alias(fts_new_symbol("bo"), fts_new_symbol("binop"));
 
   sym_const = fts_new_symbol("const");
   sym_static = fts_new_symbol("static");

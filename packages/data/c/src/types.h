@@ -18,9 +18,15 @@
 
 #define MAX_N_DATA_TYPES 64
 
+/* primitive types */
+enum data_type_primitive {data_type_id_void, data_type_id_int, data_type_id_float, data_type_id_symbol, data_type_n_primitive};
+enum data_type_complex {data_type_id_integer_vector = data_type_n_primitive, data_type_id_float_vector};
+
 extern int n_data_types;
 
 extern int data_type_get_id(fts_symbol_t type);
 extern fts_symbol_t data_type_get(int id);
+
+#define data_type_id_is_primitive(id) ((id) < data_type_n_primitive)
 
 #endif

@@ -87,17 +87,18 @@ data_release(fts_data_t *data)
 extern void data_expr_init(void);
 extern void data_types_init(void);
 
-extern void rep_config(void);
+extern void monops_init(void);
+extern void binops_init(void);
+extern void binop_arith_init(void);
+extern void binop_arith_inplace_init(void);
+extern void binop_comp_init(void);
+
+extern void binop_obj_config(void);
+extern void atom_obj_config(void);
+extern void post_obj_config(void);
 
 extern void getelem_config(void);
 extern void getsize_config(void);
-
-extern void post_obj_config(void);
-
-extern void binops_init(void);
-extern void binop_arith_init(void);
-/*extern void binop_comp_init(void);*/
-extern void binop_obj_config(void);
 
 static void
 data_module_init(void)
@@ -105,18 +106,19 @@ data_module_init(void)
   data_expr_init();
   data_types_init();
 
-  rep_config();
+  monops_init();
+  binops_init();
+
+  binop_arith_init();
+  binop_arith_inplace_init();
+  binop_comp_init();
+
+  binop_obj_config();
+  atom_obj_config();
+  post_obj_config();
 
   getelem_config();
   getsize_config();
-
-  post_obj_config();
-
-  binops_init();
-  binop_arith_init();
-  binop_arith_inplace_init();
-  /*binop_comp_init();*/
-  binop_obj_config();
 }
 
 fts_module_t data_module = {"data", "basic data handling classes", data_module_init};

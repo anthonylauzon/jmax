@@ -16,10 +16,10 @@
 #include "data.h"
 
 static fts_symbol_t sym_ee = 0;
-static fts_symbol_t sym_gt = 0;
 static fts_symbol_t sym_ne = 0;
-static fts_symbol_t sym_ge = 0;
+static fts_symbol_t sym_gt = 0;
 static fts_symbol_t sym_lt = 0;
+static fts_symbol_t sym_ge = 0;
 static fts_symbol_t sym_le = 0;
 
 /***************************************************
@@ -28,204 +28,234 @@ static fts_symbol_t sym_le = 0;
  *
  */
 
-static fts_atom_t *
-binop_ee_i_i(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ee_i_i(op_t *op)
 {
-  int l = fts_get_int(left);
-  int r = fts_get_int(right);
+  int l = op_get_int(op[0]);
+  int r = op_get_int(op[1]);
 
-  data_atom_release(result);
-  fts_set_int(result, l == r);
+  op_release(&op[2]);
+  op_set_int(&op[2], l == r);
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_gt_i_i(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ne_i_i(op_t *op)
 {
-  int l = fts_get_int(left);
-  int r = fts_get_int(right);
+  int l = op_get_int(op[0]);
+  int r = op_get_int(op[1]);
 
-  data_atom_release(result);
-  fts_set_int(result, l > r);
+  op_release(&op[2]);
+  op_set_int(&op[2], l != r);
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_ne_i_i(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_gt_i_i(op_t *op)
 {
-  int l = fts_get_int(left);
-  int r = fts_get_int(right);
+  int l = op_get_int(op[0]);
+  int r = op_get_int(op[1]);
 
-  data_atom_release(result);
-  fts_set_int(result, l!=r);
+  op_release(&op[2]);
+  op_set_int(&op[2], l > r);
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_ge_i_i(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_lt_i_i(op_t *op)
 {
-  int l = fts_get_int(left);
-  int r = fts_get_int(right);
+  int l = op_get_int(op[0]);
+  int r = op_get_int(op[1]);
 
-  data_atom_release(result);
-  fts_set_int(result, l >= r);
+  op_release(&op[2]);
+  op_set_int(&op[2], l < r);
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_lt_i_i(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ge_i_i(op_t *op)
 {
-  binop_gt_i_i(right, left, result);
-  return result;
+  int l = op_get_int(op[0]);
+  int r = op_get_int(op[1]);
+
+  op_release(&op[2]);
+  op_set_int(&op[2], l >= r);
+
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_le_i_i(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_le_i_i(op_t *op)
 {
-  binop_ge_i_i(right, left, result);
-  return result;
-}
+  int l = op_get_int(op[0]);
+  int r = op_get_int(op[1]);
 
+  op_release(&op[2]);
+  op_set_int(&op[2], l <= r);
 
-/***************************************************
- *
- *  float @ float = int
- *
- */
-
-static fts_atom_t *
-binop_ee_f_f(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
-{
-  float l = fts_get_float(left);
-  float r = fts_get_float(right);
-
-  data_atom_release(result);
-  fts_set_int(result, l == r);
-
-  return result;
-}
-
-static fts_atom_t *
-binop_gt_f_f(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
-{
-  float l = fts_get_float(left);
-  float r = fts_get_float(right);
-
-  data_atom_release(result);
-  fts_set_int(result, l > r);
-
-  return result;
-}
-
-static fts_atom_t *
-binop_ne_f_f(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
-{
-  float l = fts_get_float(left);
-  float r = fts_get_float(right);
-
-  data_atom_release(result);
-  fts_set_int(result, l!=r);
-
-  return result;
-}
-
-static fts_atom_t *
-binop_ge_f_f(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
-{
-  float l = fts_get_float(left);
-  float r = fts_get_float(right);
-
-  data_atom_release(result);
-  fts_set_int(result, l >= r);
-
-  return result;
-}
-
-static fts_atom_t *
-binop_lt_f_f(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
-{
-  binop_gt_f_f(right, left, result);
-  return result;
-}
-
-static fts_atom_t *
-binop_le_f_f(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
-{
-  binop_ge_f_f(right, left, result);
-  return result;
+  return (op + 2);
 }
 
 
 /***************************************************
  *
- *  number @ number = int
+ *  float @ float = float
  *
  */
 
-static fts_atom_t *
-binop_ee_n_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ee_f_f(op_t *op)
 {
-  float l = fts_get_number(left);
-  float r = fts_get_number(right);
+  float l = op_get_float(op[0]);
+  float r = op_get_float(op[1]);
 
-  data_atom_release(result);
-  fts_set_int(result, l == r);
+  op_release(&op[2]);
+  op_set_int(&op[2], l == r);
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_gt_n_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ne_f_f(op_t *op)
 {
-  float l = fts_get_number(left);
-  float r = fts_get_number(right);
+  float l = op_get_float(op[0]);
+  float r = op_get_float(op[1]);
 
-  data_atom_release(result);
-  fts_set_int(result, l > r);
+  op_release(&op[2]);
+  op_set_int(&op[2], l != r);
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_ne_n_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_gt_f_f(op_t *op)
 {
-  float l = fts_get_number(left);
-  float r = fts_get_number(right);
+  float l = op_get_float(op[0]);
+  float r = op_get_float(op[1]);
 
-  data_atom_release(result);
-  fts_set_int(result, l!=r);
+  op_release(&op[2]);
+  op_set_int(&op[2], l > r);
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_ge_n_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_lt_f_f(op_t *op)
 {
-  float l = fts_get_number(left);
-  float r = fts_get_number(right);
+  float l = op_get_float(op[0]);
+  float r = op_get_float(op[1]);
 
-  data_atom_release(result);
-  fts_set_int(result, l >= r);
+  op_release(&op[2]);
+  op_set_int(&op[2], l < r);
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_lt_n_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ge_f_f(op_t *op)
 {
-  binop_gt_n_n(right, left, result);
-  return result;
+  float l = op_get_float(op[0]);
+  float r = op_get_float(op[1]);
+
+  op_release(&op[2]);
+  op_set_int(&op[2], l >= r);
+
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_le_n_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_le_f_f(op_t *op)
 {
-  binop_ge_n_n(right, left, result);
-  return result;
+  float l = op_get_float(op[0]);
+  float r = op_get_float(op[1]);
+
+  op_release(&op[2]);
+  op_set_int(&op[2], l <= r);
+
+  return (op + 2);
+}
+
+
+/***************************************************
+ *
+ *  number @ number = float
+ *
+ */
+
+static op_t *
+binop_ee_n_n(op_t *op)
+{
+  float l = op_get_number(op[0]);
+  float r = op_get_number(op[1]);
+
+  op_release(&op[2]);
+  op_set_int(&op[2], l == r);
+
+  return (op + 2);
+}
+
+static op_t *
+binop_ne_n_n(op_t *op)
+{
+  float l = op_get_number(op[0]);
+  float r = op_get_number(op[1]);
+
+  op_release(&op[2]);
+  op_set_int(&op[2], l != r);
+
+  return (op + 2);
+}
+
+static op_t *
+binop_gt_n_n(op_t *op)
+{
+  float l = op_get_number(op[0]);
+  float r = op_get_number(op[1]);
+
+  op_release(&op[2]);
+  op_set_int(&op[2], l > r);
+
+  return (op + 2);
+}
+
+static op_t *
+binop_lt_n_n(op_t *op)
+{
+  float l = op_get_number(op[0]);
+  float r = op_get_number(op[1]);
+
+  op_release(&op[2]);
+  op_set_int(&op[2], l < r);
+
+  return (op + 2);
+}
+
+static op_t *
+binop_ge_n_n(op_t *op)
+{
+  float l = op_get_number(op[0]);
+  float r = op_get_number(op[1]);
+
+  op_release(&op[2]);
+  op_set_int(&op[2], l >= r);
+
+  return (op + 2);
+}
+
+static op_t *
+binop_le_n_n(op_t *op)
+{
+  float l = op_get_number(op[0]);
+  float r = op_get_number(op[1]);
+
+  op_release(&op[2]);
+  op_set_int(&op[2], l <= r);
+
+  return (op + 2);
 }
 
 
@@ -235,11 +265,11 @@ binop_le_n_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
  *
  */
 
-static fts_atom_t *
-binop_ee_iv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ee_iv_iv(op_t *op)
 {
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  fts_integer_vector_t *right_vector = (fts_integer_vector_t *)fts_get_data(right);
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  fts_integer_vector_t *right_vector = op_get_integer_vector(op[1]);
   fts_integer_vector_t *result_vector;
   int left_size = fts_integer_vector_get_size(left_vector);
   int size = fts_integer_vector_get_size(right_vector);
@@ -248,7 +278,7 @@ binop_ee_iv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
   if(left_size < size)
     size = left_size;
 
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -258,14 +288,14 @@ binop_ee_iv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l == r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_gt_iv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ne_iv_iv(op_t *op)
 {
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  fts_integer_vector_t *right_vector = (fts_integer_vector_t *)fts_get_data(right);
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  fts_integer_vector_t *right_vector = op_get_integer_vector(op[1]);
   fts_integer_vector_t *result_vector;
   int left_size = fts_integer_vector_get_size(left_vector);
   int size = fts_integer_vector_get_size(right_vector);
@@ -274,7 +304,33 @@ binop_gt_iv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
   if(left_size < size)
     size = left_size;
 
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
+  
+  for(i=0; i<size; i++)
+    {
+      int l = fts_integer_vector_get_element(left_vector, i);
+      int r = fts_integer_vector_get_element(right_vector, i);
+
+      fts_integer_vector_set_element(result_vector, i, l != r);
+    }
+
+  return (op + 2);
+}
+
+static op_t *
+binop_gt_iv_iv(op_t *op)
+{
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  fts_integer_vector_t *right_vector = op_get_integer_vector(op[1]);
+  fts_integer_vector_t *result_vector;
+  int left_size = fts_integer_vector_get_size(left_vector);
+  int size = fts_integer_vector_get_size(right_vector);
+  int i;
+		
+  if(left_size < size)
+    size = left_size;
+
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -284,14 +340,14 @@ binop_gt_iv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l > r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_ne_iv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_lt_iv_iv(op_t *op)
 {
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  fts_integer_vector_t *right_vector = (fts_integer_vector_t *)fts_get_data(right);
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  fts_integer_vector_t *right_vector = op_get_integer_vector(op[1]);
   fts_integer_vector_t *result_vector;
   int left_size = fts_integer_vector_get_size(left_vector);
   int size = fts_integer_vector_get_size(right_vector);
@@ -300,24 +356,24 @@ binop_ne_iv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
   if(left_size < size)
     size = left_size;
 
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
       int l = fts_integer_vector_get_element(left_vector, i);
       int r = fts_integer_vector_get_element(right_vector, i);
 
-      fts_integer_vector_set_element(result_vector, i, l!=r);
+      fts_integer_vector_set_element(result_vector, i, l < r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_ge_iv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ge_iv_iv(op_t *op)
 {
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  fts_integer_vector_t *right_vector = (fts_integer_vector_t *)fts_get_data(right);
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  fts_integer_vector_t *right_vector = op_get_integer_vector(op[1]);
   fts_integer_vector_t *result_vector;
   int left_size = fts_integer_vector_get_size(left_vector);
   int size = fts_integer_vector_get_size(right_vector);
@@ -326,7 +382,7 @@ binop_ge_iv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
   if(left_size < size)
     size = left_size;
 
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -336,21 +392,33 @@ binop_ge_iv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l >= r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_lt_iv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_le_iv_iv(op_t *op)
 {
-  binop_gt_iv_iv(right, left, result);
-  return result;
-}
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  fts_integer_vector_t *right_vector = op_get_integer_vector(op[1]);
+  fts_integer_vector_t *result_vector;
+  int left_size = fts_integer_vector_get_size(left_vector);
+  int size = fts_integer_vector_get_size(right_vector);
+  int i;
+		
+  if(left_size < size)
+    size = left_size;
 
-static fts_atom_t *
-binop_le_iv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
-{
-  binop_ge_iv_iv(right, left, result);
-  return result;
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
+  
+  for(i=0; i<size; i++)
+    {
+      int l = fts_integer_vector_get_element(left_vector, i);
+      int r = fts_integer_vector_get_element(right_vector, i);
+
+      fts_integer_vector_set_element(result_vector, i, l <= r);
+    }
+
+  return (op + 2);
 }
 
 
@@ -360,16 +428,16 @@ binop_le_iv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
  *
  */
 
-static fts_atom_t *
-binop_ee_iv_i(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ee_iv_i(op_t *op)
 {
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  int r = fts_get_int(right);
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  int r = op_get_int(op[1]);
   fts_integer_vector_t *result_vector;
   int size = fts_integer_vector_get_size(left_vector);
   int i;
 		
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -378,19 +446,40 @@ binop_ee_iv_i(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l == r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_gt_iv_i(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ne_iv_i(op_t *op)
 {
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  int r = fts_get_int(right);
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  int r = op_get_int(op[1]);
   fts_integer_vector_t *result_vector;
   int size = fts_integer_vector_get_size(left_vector);
   int i;
 
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
+  
+  for(i=0; i<size; i++)
+    {
+      int l = fts_integer_vector_get_element(left_vector, i);
+
+      fts_integer_vector_set_element(result_vector, i, l != r);
+    }
+
+  return (op + 2);
+}
+
+static op_t *
+binop_gt_iv_i(op_t *op)
+{
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  int r = op_get_int(op[1]);
+  fts_integer_vector_t *result_vector;
+  int size = fts_integer_vector_get_size(left_vector);
+  int i;
+
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -399,61 +488,19 @@ binop_gt_iv_i(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l > r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_ne_iv_i(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_lt_iv_i(op_t *op)
 {
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  int r = fts_get_int(right);
-  fts_integer_vector_t *result_vector;
-  int size = fts_integer_vector_get_size(left_vector);
-  int i;
-
-  result_vector = data_recycle_atom_integer_vector(result, size);
-  
-  for(i=0; i<size; i++)
-    {
-      int l = fts_integer_vector_get_element(left_vector, i);
-
-      fts_integer_vector_set_element(result_vector, i, l!=r);
-    }
-
-  return result;
-}
-
-static fts_atom_t *
-binop_ge_iv_i(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
-{
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  int r = fts_get_int(right);
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  int r = op_get_int(op[1]);
   fts_integer_vector_t *result_vector;
   int size = fts_integer_vector_get_size(left_vector);
   int i;
 		
-  result_vector = data_recycle_atom_integer_vector(result, size);
-  
-  for(i=0; i<size; i++)
-    {
-      int l = fts_integer_vector_get_element(left_vector, i);
-
-      fts_integer_vector_set_element(result_vector, i, l >= r);
-    }
-
-  return result;
-}
-
-static fts_atom_t *
-binop_lt_iv_i(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
-{
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  int r = fts_get_int(right);
-  fts_integer_vector_t *result_vector;
-  int size = fts_integer_vector_get_size(left_vector);
-  int i;
-		
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -462,19 +509,40 @@ binop_lt_iv_i(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l < r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_le_iv_i(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ge_iv_i(op_t *op)
 {
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  int r = fts_get_int(right);
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  int r = op_get_int(op[1]);
   fts_integer_vector_t *result_vector;
   int size = fts_integer_vector_get_size(left_vector);
   int i;
 		
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
+  
+  for(i=0; i<size; i++)
+    {
+      int l = fts_integer_vector_get_element(left_vector, i);
+
+      fts_integer_vector_set_element(result_vector, i, l >= r);
+    }
+
+  return (op + 2);
+}
+
+static op_t *
+binop_le_iv_i(op_t *op)
+{
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  int r = op_get_int(op[1]);
+  fts_integer_vector_t *result_vector;
+  int size = fts_integer_vector_get_size(left_vector);
+  int i;
+		
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -483,26 +551,26 @@ binop_le_iv_i(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l <= r);
     }
 
-  return result;
+  return (op + 2);
 }
 
 
 /***************************************************
  *
- *  integer vector @ float = integer vector
+ *  integer vector @ float = float vector
  *
  */
 
-static fts_atom_t *
-binop_ee_iv_f(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ee_iv_f(op_t *op)
 {
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  float r = fts_get_float(right);
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  float r = op_get_float(op[1]);
   fts_integer_vector_t *result_vector;
   int size = fts_float_vector_get_size(left_vector);
   int i;
 		
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -511,19 +579,40 @@ binop_ee_iv_f(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l == r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_gt_iv_f(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ne_iv_f(op_t *op)
 {
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  float r = fts_get_float(right);
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  float r = op_get_float(op[1]);
   fts_integer_vector_t *result_vector;
   int size = fts_float_vector_get_size(left_vector);
   int i;
 
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
+  
+  for(i=0; i<size; i++)
+    {
+      float l = fts_float_vector_get_element(left_vector, i);
+
+      fts_integer_vector_set_element(result_vector, i, l != r);
+    }
+
+  return (op + 2);
+}
+
+static op_t *
+binop_gt_iv_f(op_t *op)
+{
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  float r = op_get_float(op[1]);
+  fts_integer_vector_t *result_vector;
+  int size = fts_float_vector_get_size(left_vector);
+  int i;
+
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -532,61 +621,19 @@ binop_gt_iv_f(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l > r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_ne_iv_f(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_lt_iv_f(op_t *op)
 {
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  float r = fts_get_float(right);
-  fts_integer_vector_t *result_vector;
-  int size = fts_float_vector_get_size(left_vector);
-  int i;
-
-  result_vector = data_recycle_atom_integer_vector(result, size);
-  
-  for(i=0; i<size; i++)
-    {
-      float l = fts_float_vector_get_element(left_vector, i);
-
-      fts_integer_vector_set_element(result_vector, i, l!=r);
-    }
-
-  return result;
-}
-
-static fts_atom_t *
-binop_ge_iv_f(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
-{
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  float r = fts_get_float(right);
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  float r = op_get_float(op[1]);
   fts_integer_vector_t *result_vector;
   int size = fts_float_vector_get_size(left_vector);
   int i;
 		
-  result_vector = data_recycle_atom_integer_vector(result, size);
-  
-  for(i=0; i<size; i++)
-    {
-      float l = fts_float_vector_get_element(left_vector, i);
-
-      fts_integer_vector_set_element(result_vector, i, l >= r);
-    }
-
-  return result;
-}
-
-static fts_atom_t *
-binop_lt_iv_f(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
-{
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  float r = fts_get_float(right);
-  fts_integer_vector_t *result_vector;
-  int size = fts_float_vector_get_size(left_vector);
-  int i;
-		
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -595,19 +642,40 @@ binop_lt_iv_f(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l < r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_le_iv_f(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ge_iv_f(op_t *op)
 {
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  float r = fts_get_float(right);
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  float r = op_get_float(op[1]);
   fts_integer_vector_t *result_vector;
   int size = fts_float_vector_get_size(left_vector);
   int i;
 		
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
+  
+  for(i=0; i<size; i++)
+    {
+      float l = fts_float_vector_get_element(left_vector, i);
+
+      fts_integer_vector_set_element(result_vector, i, l >= r);
+    }
+
+  return (op + 2);
+}
+
+static op_t *
+binop_le_iv_f(op_t *op)
+{
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  float r = op_get_float(op[1]);
+  fts_integer_vector_t *result_vector;
+  int size = fts_float_vector_get_size(left_vector);
+  int i;
+		
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -616,21 +684,21 @@ binop_le_iv_f(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l <= r);
     }
 
-  return result;
+  return (op + 2);
 }
 
 
 /***************************************************
  *
- *  float vector @ float vector = integer vector
+ *  float vector @ float vector = float vector
  *
  */
 
-static fts_atom_t *
-binop_ee_fv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ee_fv_fv(op_t *op)
 {
-  fts_float_vector_t *left_vector = (fts_float_vector_t *)fts_get_data(left);
-  fts_float_vector_t *right_vector = (fts_float_vector_t *)fts_get_data(right);
+  fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
+  fts_float_vector_t *right_vector = op_get_float_vector(op[1]);
   fts_integer_vector_t *result_vector;
   int left_size = fts_float_vector_get_size(left_vector);
   int size = fts_float_vector_get_size(right_vector);
@@ -639,7 +707,7 @@ binop_ee_fv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
   if(left_size < size)
     size = left_size;
 
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -649,14 +717,14 @@ binop_ee_fv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l == r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_gt_fv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ne_fv_fv(op_t *op)
 {
-  fts_float_vector_t *left_vector = (fts_float_vector_t *)fts_get_data(left);
-  fts_float_vector_t *right_vector = (fts_float_vector_t *)fts_get_data(right);
+  fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
+  fts_float_vector_t *right_vector = op_get_float_vector(op[1]);
   fts_integer_vector_t *result_vector;
   int left_size = fts_float_vector_get_size(left_vector);
   int size = fts_float_vector_get_size(right_vector);
@@ -665,7 +733,33 @@ binop_gt_fv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
   if(left_size < size)
     size = left_size;
 
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
+  
+  for(i=0; i<size; i++)
+    {
+      float l = fts_float_vector_get_element(left_vector, i);
+      float r = fts_float_vector_get_element(right_vector, i);
+
+      fts_integer_vector_set_element(result_vector, i, l != r);
+    }
+
+  return (op + 2);
+}
+
+static op_t *
+binop_gt_fv_fv(op_t *op)
+{
+  fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
+  fts_float_vector_t *right_vector = op_get_float_vector(op[1]);
+  fts_integer_vector_t *result_vector;
+  int left_size = fts_float_vector_get_size(left_vector);
+  int size = fts_float_vector_get_size(right_vector);
+  int i;
+		
+  if(left_size < size)
+    size = left_size;
+
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -675,14 +769,14 @@ binop_gt_fv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l > r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_ne_fv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_lt_fv_fv(op_t *op)
 {
-  fts_float_vector_t *left_vector = (fts_float_vector_t *)fts_get_data(left);
-  fts_float_vector_t *right_vector = (fts_float_vector_t *)fts_get_data(right);
+  fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
+  fts_float_vector_t *right_vector = op_get_float_vector(op[1]);
   fts_integer_vector_t *result_vector;
   int left_size = fts_float_vector_get_size(left_vector);
   int size = fts_float_vector_get_size(right_vector);
@@ -691,24 +785,24 @@ binop_ne_fv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
   if(left_size < size)
     size = left_size;
 
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
       float l = fts_float_vector_get_element(left_vector, i);
       float r = fts_float_vector_get_element(right_vector, i);
 
-      fts_integer_vector_set_element(result_vector, i, l!=r);
+      fts_integer_vector_set_element(result_vector, i, l < r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_ge_fv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ge_fv_fv(op_t *op)
 {
-  fts_float_vector_t *left_vector = (fts_float_vector_t *)fts_get_data(left);
-  fts_float_vector_t *right_vector = (fts_float_vector_t *)fts_get_data(right);
+  fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
+  fts_float_vector_t *right_vector = op_get_float_vector(op[1]);
   fts_integer_vector_t *result_vector;
   int left_size = fts_float_vector_get_size(left_vector);
   int size = fts_float_vector_get_size(right_vector);
@@ -717,7 +811,7 @@ binop_ge_fv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
   if(left_size < size)
     size = left_size;
 
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -727,40 +821,52 @@ binop_ge_fv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l >= r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_lt_fv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_le_fv_fv(op_t *op)
 {
-  binop_gt_fv_fv(right, left, result);
-  return result;
-}
+  fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
+  fts_float_vector_t *right_vector = op_get_float_vector(op[1]);
+  fts_integer_vector_t *result_vector;
+  int left_size = fts_float_vector_get_size(left_vector);
+  int size = fts_float_vector_get_size(right_vector);
+  int i;
+		
+  if(left_size < size)
+    size = left_size;
 
-static fts_atom_t *
-binop_le_fv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
-{
-  binop_ge_fv_fv(right, left, result);
-  return result;
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
+  
+  for(i=0; i<size; i++)
+    {
+      float l = fts_float_vector_get_element(left_vector, i);
+      float r = fts_float_vector_get_element(right_vector, i);
+
+      fts_integer_vector_set_element(result_vector, i, l <= r);
+    }
+
+  return (op + 2);
 }
 
 
 /***************************************************
  *
- *  float vector @ number = integer vector
+ *  float vector @ number = float vector
  *
  */
 
-static fts_atom_t *
-binop_ee_fv_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ee_fv_n(op_t *op)
 {
-  fts_float_vector_t *left_vector = (fts_float_vector_t *)fts_get_data(left);
-  float r = fts_get_number(right);
+  fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
+  float r = op_get_number(op[1]);
   fts_integer_vector_t *result_vector;
   int size = fts_float_vector_get_size(left_vector);
   int i;
 		
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -769,19 +875,40 @@ binop_ee_fv_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l == r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_gt_fv_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ne_fv_n(op_t *op)
 {
-  fts_float_vector_t *left_vector = (fts_float_vector_t *)fts_get_data(left);
-  float r = fts_get_number(right);
+  fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
+  float r = op_get_number(op[1]);
   fts_integer_vector_t *result_vector;
   int size = fts_float_vector_get_size(left_vector);
   int i;
 
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
+  
+  for(i=0; i<size; i++)
+    {
+      float l = fts_float_vector_get_element(left_vector, i);
+
+      fts_integer_vector_set_element(result_vector, i, l != r);
+    }
+
+  return (op + 2);
+}
+
+static op_t *
+binop_gt_fv_n(op_t *op)
+{
+  fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
+  float r = op_get_number(op[1]);
+  fts_integer_vector_t *result_vector;
+  int size = fts_float_vector_get_size(left_vector);
+  int i;
+
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -790,61 +917,19 @@ binop_gt_fv_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l > r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_ne_fv_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_lt_fv_n(op_t *op)
 {
-  fts_float_vector_t *left_vector = (fts_float_vector_t *)fts_get_data(left);
-  float r = fts_get_number(right);
-  fts_integer_vector_t *result_vector;
-  int size = fts_float_vector_get_size(left_vector);
-  int i;
-
-  result_vector = data_recycle_atom_integer_vector(result, size);
-  
-  for(i=0; i<size; i++)
-    {
-      float l = fts_float_vector_get_element(left_vector, i);
-
-      fts_integer_vector_set_element(result_vector, i, l!=r);
-    }
-
-  return result;
-}
-
-static fts_atom_t *
-binop_ge_fv_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
-{
-  fts_float_vector_t *left_vector = (fts_float_vector_t *)fts_get_data(left);
-  float r = fts_get_number(right);
+  fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
+  float r = op_get_number(op[1]);
   fts_integer_vector_t *result_vector;
   int size = fts_float_vector_get_size(left_vector);
   int i;
 		
-  result_vector = data_recycle_atom_integer_vector(result, size);
-  
-  for(i=0; i<size; i++)
-    {
-      float l = fts_float_vector_get_element(left_vector, i);
-
-      fts_integer_vector_set_element(result_vector, i, l >= r);
-    }
-
-  return result;
-}
-
-static fts_atom_t *
-binop_lt_fv_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
-{
-  fts_float_vector_t *left_vector = (fts_float_vector_t *)fts_get_data(left);
-  float r = fts_get_number(right);
-  fts_integer_vector_t *result_vector;
-  int size = fts_float_vector_get_size(left_vector);
-  int i;
-		
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -853,19 +938,40 @@ binop_lt_fv_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l < r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_le_fv_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ge_fv_n(op_t *op)
 {
-  fts_float_vector_t *left_vector = (fts_float_vector_t *)fts_get_data(left);
-  float r = fts_get_number(right);
+  fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
+  float r = op_get_number(op[1]);
   fts_integer_vector_t *result_vector;
   int size = fts_float_vector_get_size(left_vector);
   int i;
 		
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
+  
+  for(i=0; i<size; i++)
+    {
+      float l = fts_float_vector_get_element(left_vector, i);
+
+      fts_integer_vector_set_element(result_vector, i, l >= r);
+    }
+
+  return (op + 2);
+}
+
+static op_t *
+binop_le_fv_n(op_t *op)
+{
+  fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
+  float r = op_get_number(op[1]);
+  fts_integer_vector_t *result_vector;
+  int size = fts_float_vector_get_size(left_vector);
+  int i;
+		
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -874,7 +980,7 @@ binop_le_fv_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l <= r);
     }
 
-  return result;
+  return (op + 2);
 }
 
 
@@ -884,11 +990,11 @@ binop_le_fv_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
  *
  */
 
-static fts_atom_t *
-binop_ee_iv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ee_iv_fv(op_t *op)
 {
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  fts_float_vector_t *right_vector = (fts_float_vector_t *)fts_get_data(right);
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  fts_float_vector_t *right_vector = op_get_float_vector(op[1]);
   fts_integer_vector_t *result_vector;
   int left_size = fts_integer_vector_get_size(left_vector);
   int size = fts_float_vector_get_size(right_vector);
@@ -897,7 +1003,7 @@ binop_ee_iv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
   if(left_size < size)
     size = left_size;
 
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -907,14 +1013,14 @@ binop_ee_iv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l == r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_gt_iv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ne_iv_fv(op_t *op)
 {
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  fts_float_vector_t *right_vector = (fts_float_vector_t *)fts_get_data(right);
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  fts_float_vector_t *right_vector = op_get_float_vector(op[1]);
   fts_integer_vector_t *result_vector;
   int left_size = fts_integer_vector_get_size(left_vector);
   int size = fts_float_vector_get_size(right_vector);
@@ -923,7 +1029,33 @@ binop_gt_iv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
   if(left_size < size)
     size = left_size;
 
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
+  
+  for(i=0; i<size; i++)
+    {
+      float l = (float)fts_integer_vector_get_element(left_vector, i);
+      float r = fts_float_vector_get_element(right_vector, i);
+
+      fts_integer_vector_set_element(result_vector, i, l != r);
+    }
+
+  return (op + 2);
+}
+
+static op_t *
+binop_gt_iv_fv(op_t *op)
+{
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  fts_float_vector_t *right_vector = op_get_float_vector(op[1]);
+  fts_integer_vector_t *result_vector;
+  int left_size = fts_integer_vector_get_size(left_vector);
+  int size = fts_float_vector_get_size(right_vector);
+  int i;
+		
+  if(left_size < size)
+    size = left_size;
+
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -933,14 +1065,14 @@ binop_gt_iv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l > r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_ne_iv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_lt_iv_fv(op_t *op)
 {
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  fts_float_vector_t *right_vector = (fts_float_vector_t *)fts_get_data(right);
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  fts_float_vector_t *right_vector = op_get_float_vector(op[1]);
   fts_integer_vector_t *result_vector;
   int left_size = fts_integer_vector_get_size(left_vector);
   int size = fts_float_vector_get_size(right_vector);
@@ -949,59 +1081,7 @@ binop_ne_iv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
   if(left_size < size)
     size = left_size;
 
-  result_vector = data_recycle_atom_integer_vector(result, size);
-  
-  for(i=0; i<size; i++)
-    {
-      float l = (float)fts_integer_vector_get_element(left_vector, i);
-      float r = fts_float_vector_get_element(right_vector, i);
-
-      fts_integer_vector_set_element(result_vector, i, l!=r);
-    }
-
-  return result;
-}
-
-static fts_atom_t *
-binop_ge_iv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
-{
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  fts_float_vector_t *right_vector = (fts_float_vector_t *)fts_get_data(right);
-  fts_integer_vector_t *result_vector;
-  int left_size = fts_integer_vector_get_size(left_vector);
-  int size = fts_float_vector_get_size(right_vector);
-  int i;
-		
-  if(left_size < size)
-    size = left_size;
-
-  result_vector = data_recycle_atom_integer_vector(result, size);
-  
-  for(i=0; i<size; i++)
-    {
-      float l = (float)fts_integer_vector_get_element(left_vector, i);
-      float r = fts_float_vector_get_element(right_vector, i);
-
-      fts_integer_vector_set_element(result_vector, i, l >= r);
-    }
-
-  return result;
-}
-
-static fts_atom_t *
-binop_lt_iv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
-{
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  fts_float_vector_t *right_vector = (fts_float_vector_t *)fts_get_data(right);
-  fts_integer_vector_t *result_vector;
-  int left_size = fts_integer_vector_get_size(left_vector);
-  int size = fts_float_vector_get_size(right_vector);
-  int i;
-		
-  if(left_size < size)
-    size = left_size;
-
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -1011,14 +1091,14 @@ binop_lt_iv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l < r);
     }
 
-  return result;
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_le_iv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ge_iv_fv(op_t *op)
 {
-  fts_integer_vector_t *left_vector = (fts_integer_vector_t *)fts_get_data(left);
-  fts_float_vector_t *right_vector = (fts_float_vector_t *)fts_get_data(right);
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  fts_float_vector_t *right_vector = op_get_float_vector(op[1]);
   fts_integer_vector_t *result_vector;
   int left_size = fts_integer_vector_get_size(left_vector);
   int size = fts_float_vector_get_size(right_vector);
@@ -1027,7 +1107,33 @@ binop_le_iv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
   if(left_size < size)
     size = left_size;
 
-  result_vector = data_recycle_atom_integer_vector(result, size);
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
+  
+  for(i=0; i<size; i++)
+    {
+      float l = (float)fts_integer_vector_get_element(left_vector, i);
+      float r = fts_float_vector_get_element(right_vector, i);
+
+      fts_integer_vector_set_element(result_vector, i, l >= r);
+    }
+
+  return (op + 2);
+}
+
+static op_t *
+binop_le_iv_fv(op_t *op)
+{
+  fts_integer_vector_t *left_vector = op_get_integer_vector(op[0]);
+  fts_float_vector_t *right_vector = op_get_float_vector(op[1]);
+  fts_integer_vector_t *result_vector;
+  int left_size = fts_integer_vector_get_size(left_vector);
+  int size = fts_float_vector_get_size(right_vector);
+  int i;
+		
+  if(left_size < size)
+    size = left_size;
+
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
   
   for(i=0; i<size; i++)
     {
@@ -1037,7 +1143,7 @@ binop_le_iv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       fts_integer_vector_set_element(result_vector, i, l <= r);
     }
 
-  return result;
+  return (op + 2);
 }
 
 
@@ -1047,47 +1153,162 @@ binop_le_iv_fv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
  *
  */
 
-static fts_atom_t *
-binop_ee_fv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ee_fv_iv(op_t *op)
 {
-  binop_ee_iv_fv(right, left, result);
-  return result;
+  fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
+  fts_integer_vector_t *right_vector = op_get_integer_vector(op[1]);
+  fts_integer_vector_t *result_vector;
+  int left_size = fts_float_vector_get_size(left_vector);
+  int size = fts_integer_vector_get_size(right_vector);
+  int i;
+		
+  if(left_size < size)
+    size = left_size;
+
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
+  
+  for(i=0; i<size; i++)
+    {
+      float l = fts_float_vector_get_element(left_vector, i);
+      float r = (float)fts_integer_vector_get_element(right_vector, i);
+
+      fts_integer_vector_set_element(result_vector, i, l == r);
+    }
+
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_gt_fv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ne_fv_iv(op_t *op)
 {
-  binop_lt_iv_fv(right, left, result);
-  return result;
+  fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
+  fts_integer_vector_t *right_vector = op_get_integer_vector(op[1]);
+  fts_integer_vector_t *result_vector;
+  int left_size = fts_float_vector_get_size(left_vector);
+  int size = fts_integer_vector_get_size(right_vector);
+  int i;
+		
+  if(left_size < size)
+    size = left_size;
+
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
+  
+  for(i=0; i<size; i++)
+    {
+      float l = fts_float_vector_get_element(left_vector, i);
+      float r = (float)fts_integer_vector_get_element(right_vector, i);
+
+      fts_integer_vector_set_element(result_vector, i, l != r);
+    }
+
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_ne_fv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_gt_fv_iv(op_t *op)
 {
-  binop_ne_iv_fv(right, left, result);
-  return result;
+  fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
+  fts_integer_vector_t *right_vector = op_get_integer_vector(op[1]);
+  fts_integer_vector_t *result_vector;
+  int left_size = fts_float_vector_get_size(left_vector);
+  int size = fts_integer_vector_get_size(right_vector);
+  int i;
+		
+  if(left_size < size)
+    size = left_size;
+
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
+  
+  for(i=0; i<size; i++)
+    {
+      float l = fts_float_vector_get_element(left_vector, i);
+      float r = (float)fts_integer_vector_get_element(right_vector, i);
+
+      fts_integer_vector_set_element(result_vector, i, l > r);
+    }
+
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_ge_fv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_lt_fv_iv(op_t *op)
 {
-  binop_le_iv_fv(right, left, result);
-  return result;
+  fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
+  fts_integer_vector_t *right_vector = op_get_integer_vector(op[1]);
+  fts_integer_vector_t *result_vector;
+  int left_size = fts_float_vector_get_size(left_vector);
+  int size = fts_integer_vector_get_size(right_vector);
+  int i;
+		
+  if(left_size < size)
+    size = left_size;
+
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
+  
+  for(i=0; i<size; i++)
+    {
+      float l = fts_float_vector_get_element(left_vector, i);
+      float r = (float)fts_integer_vector_get_element(right_vector, i);
+
+      fts_integer_vector_set_element(result_vector, i, l < r);
+    }
+
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_lt_fv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_ge_fv_iv(op_t *op)
 {
-  binop_gt_iv_fv(right, left, result);
-  return result;
+  fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
+  fts_integer_vector_t *right_vector = op_get_integer_vector(op[1]);
+  fts_integer_vector_t *result_vector;
+  int left_size = fts_float_vector_get_size(left_vector);
+  int size = fts_integer_vector_get_size(right_vector);
+  int i;
+		
+  if(left_size < size)
+    size = left_size;
+
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
+  
+  for(i=0; i<size; i++)
+    {
+      float l = fts_float_vector_get_element(left_vector, i);
+      float r = (float)fts_integer_vector_get_element(right_vector, i);
+
+      fts_integer_vector_set_element(result_vector, i, l >= r);
+    }
+
+  return (op + 2);
 }
 
-static fts_atom_t *
-binop_le_fv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+static op_t *
+binop_le_fv_iv(op_t *op)
 {
-  binop_ge_iv_fv(right, left, result);
-  return result;
+  fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
+  fts_integer_vector_t *right_vector = op_get_integer_vector(op[1]);
+  fts_integer_vector_t *result_vector;
+  int left_size = fts_float_vector_get_size(left_vector);
+  int size = fts_integer_vector_get_size(right_vector);
+  int i;
+		
+  if(left_size < size)
+    size = left_size;
+
+  result_vector = op_recycle_to_integer_vector(op + 2, size);
+  
+  for(i=0; i<size; i++)
+    {
+      float l = fts_float_vector_get_element(left_vector, i);
+      float r = (float)fts_integer_vector_get_element(right_vector, i);
+
+      fts_integer_vector_set_element(result_vector, i, l <= r);
+    }
+
+  return (op + 2);
 }
+
 
 /***************************************************
  *
@@ -1098,106 +1319,106 @@ binop_le_fv_iv(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 void
 binop_comp_init(void)
 {
-  sym_ee = fts_new_symbol("ee");
-  sym_gt = fts_new_symbol("gt");
-  sym_ne = fts_new_symbol("ne");
-  sym_ge = fts_new_symbol("ge");
-  sym_lt = fts_new_symbol("lt");
-  sym_le = fts_new_symbol("le");
+  sym_ee = fts_new_symbol("==");
+  sym_ne = fts_new_symbol("!=");
+  sym_gt = fts_new_symbol(">");
+  sym_lt = fts_new_symbol("<");
+  sym_ge = fts_new_symbol(">=");
+  sym_le = fts_new_symbol("<=");
 
-  /* int(number) @ int = int */
-  binop_fun_declare(sym_ee, binop_ee_i_i, fts_s_int, fts_s_int);
-  binop_fun_declare(sym_gt, binop_gt_i_i, fts_s_int, fts_s_int);
-  binop_fun_declare(sym_ne, binop_ne_i_i, fts_s_int, fts_s_int);
-  binop_fun_declare(sym_ge, binop_ge_i_i, fts_s_int, fts_s_int);
-  binop_fun_declare(sym_lt, binop_lt_i_i, fts_s_int, fts_s_int);
-  binop_fun_declare(sym_le, binop_le_i_i, fts_s_int, fts_s_int);
+  /* int @ int = int */
+  binop_declare_fun(sym_ee, binop_ee_i_i, fts_s_int, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_i_i, fts_s_int, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_i_i, fts_s_int, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_i_i, fts_s_int, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_i_i, fts_s_int, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_le, binop_le_i_i, fts_s_int, fts_s_int, binops_s_recycle);
 
-  /* int(number) @ float(number) = int */
-  binop_fun_declare(sym_ee, binop_ee_n_n, fts_s_int, fts_s_float);
-  binop_fun_declare(sym_gt, binop_gt_n_n, fts_s_int, fts_s_float);
-  binop_fun_declare(sym_ne, binop_ne_n_n, fts_s_int, fts_s_float);
-  binop_fun_declare(sym_ge, binop_ge_n_n, fts_s_int, fts_s_float);
-  binop_fun_declare(sym_lt, binop_lt_n_n, fts_s_int, fts_s_float);
-  binop_fun_declare(sym_le, binop_le_n_n, fts_s_int, fts_s_float);
+  /* float @ float = float */
+  binop_declare_fun(sym_ee, binop_ee_f_f, fts_s_float, fts_s_float, binops_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_f_f, fts_s_float, fts_s_float, binops_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_f_f, fts_s_float, fts_s_float, binops_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_f_f, fts_s_float, fts_s_float, binops_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_f_f, fts_s_float, fts_s_float, binops_s_recycle);
+  binop_declare_fun(sym_le, binop_le_f_f, fts_s_float, fts_s_float, binops_s_recycle);    
 
-  /* float(number) @ int(number) = int */
-  binop_fun_declare(sym_ee, binop_ee_n_n, fts_s_float, fts_s_int);
-  binop_fun_declare(sym_gt, binop_gt_n_n, fts_s_float, fts_s_int);
-  binop_fun_declare(sym_ne, binop_ne_n_n, fts_s_float, fts_s_int);
-  binop_fun_declare(sym_ge, binop_ge_n_n, fts_s_float, fts_s_int);
-  binop_fun_declare(sym_lt, binop_lt_n_n, fts_s_float, fts_s_int);
-  binop_fun_declare(sym_le, binop_le_n_n, fts_s_float, fts_s_int);
+  /* int(number) @ float(number) = float */
+  binop_declare_fun(sym_ee, binop_ee_n_n, fts_s_int, fts_s_float, binops_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_n_n, fts_s_int, fts_s_float, binops_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_n_n, fts_s_int, fts_s_float, binops_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_n_n, fts_s_int, fts_s_float, binops_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_n_n, fts_s_int, fts_s_float, binops_s_recycle);
+  binop_declare_fun(sym_le, binop_le_n_n, fts_s_int, fts_s_float, binops_s_recycle); 
 
-  /* float(number) @ float(number) = int */
-  binop_fun_declare(sym_ee, binop_ee_n_n, fts_s_float, fts_s_float);
-  binop_fun_declare(sym_gt, binop_gt_n_n, fts_s_float, fts_s_float);
-  binop_fun_declare(sym_ne, binop_ne_n_n, fts_s_float, fts_s_float);
-  binop_fun_declare(sym_ge, binop_ge_n_n, fts_s_float, fts_s_float);
-  binop_fun_declare(sym_lt, binop_lt_n_n, fts_s_float, fts_s_float);
-  binop_fun_declare(sym_le, binop_le_n_n, fts_s_float, fts_s_float);
+  /* float(number) @ int(number) = float */
+  binop_declare_fun(sym_ee, binop_ee_n_n, fts_s_float, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_n_n, fts_s_float, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_n_n, fts_s_float, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_n_n, fts_s_float, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_n_n, fts_s_float, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_le, binop_le_n_n, fts_s_float, fts_s_int, binops_s_recycle);
 
   /* integer vector @ integer vector = integer vector */
-  binop_fun_declare(sym_ee, binop_ee_iv_iv, fts_s_integer_vector, fts_s_integer_vector);
-  binop_fun_declare(sym_gt, binop_gt_iv_iv, fts_s_integer_vector, fts_s_integer_vector);
-  binop_fun_declare(sym_ne, binop_ne_iv_iv, fts_s_integer_vector, fts_s_integer_vector);
-  binop_fun_declare(sym_ge, binop_ge_iv_iv, fts_s_integer_vector, fts_s_integer_vector);
-  binop_fun_declare(sym_lt, binop_lt_iv_iv, fts_s_integer_vector, fts_s_integer_vector);
-  binop_fun_declare(sym_le, binop_le_iv_iv, fts_s_integer_vector, fts_s_integer_vector);
+  binop_declare_fun(sym_ee, binop_ee_iv_iv, fts_s_integer_vector, fts_s_integer_vector, binops_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_iv_iv, fts_s_integer_vector, fts_s_integer_vector, binops_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_iv_iv, fts_s_integer_vector, fts_s_integer_vector, binops_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_iv_iv, fts_s_integer_vector, fts_s_integer_vector, binops_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_iv_iv, fts_s_integer_vector, fts_s_integer_vector, binops_s_recycle);
+  binop_declare_fun(sym_le, binop_le_iv_iv, fts_s_integer_vector, fts_s_integer_vector, binops_s_recycle);
 
   /* integer vector @ int = integer vector */
-  binop_fun_declare(sym_ee, binop_ee_iv_i, fts_s_integer_vector, fts_s_int);
-  binop_fun_declare(sym_gt, binop_gt_iv_i, fts_s_integer_vector, fts_s_int);
-  binop_fun_declare(sym_ne, binop_ne_iv_i, fts_s_integer_vector, fts_s_int);
-  binop_fun_declare(sym_ge, binop_ge_iv_i, fts_s_integer_vector, fts_s_int);
-  binop_fun_declare(sym_lt, binop_lt_iv_i, fts_s_integer_vector, fts_s_int);
-  binop_fun_declare(sym_le, binop_le_iv_i, fts_s_integer_vector, fts_s_int);
+  binop_declare_fun(sym_ee, binop_ee_iv_i, fts_s_integer_vector, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_iv_i, fts_s_integer_vector, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_iv_i, fts_s_integer_vector, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_iv_i, fts_s_integer_vector, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_iv_i, fts_s_integer_vector, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_le, binop_le_iv_i, fts_s_integer_vector, fts_s_int, binops_s_recycle);
 
-  /* integer vector @ float = integer vector */
-  binop_fun_declare(sym_ee, binop_ee_iv_f, fts_s_integer_vector, fts_s_float);
-  binop_fun_declare(sym_gt, binop_gt_iv_f, fts_s_integer_vector, fts_s_float);
-  binop_fun_declare(sym_ne, binop_ne_iv_f, fts_s_integer_vector, fts_s_float);
-  binop_fun_declare(sym_ge, binop_ge_iv_f, fts_s_integer_vector, fts_s_float);
-  binop_fun_declare(sym_lt, binop_lt_iv_f, fts_s_integer_vector, fts_s_float);
-  binop_fun_declare(sym_le, binop_le_iv_f, fts_s_integer_vector, fts_s_float);
+  /* integer vector @ float = float vector */
+  binop_declare_fun(sym_ee, binop_ee_iv_f, fts_s_integer_vector, fts_s_float, binops_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_iv_f, fts_s_integer_vector, fts_s_float, binops_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_iv_f, fts_s_integer_vector, fts_s_float, binops_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_iv_f, fts_s_integer_vector, fts_s_float, binops_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_iv_f, fts_s_integer_vector, fts_s_float, binops_s_recycle);
+  binop_declare_fun(sym_le, binop_le_iv_f, fts_s_integer_vector, fts_s_float, binops_s_recycle);
 
-  /* float vector @ float vector = integer vector */
-  binop_fun_declare(sym_ee, binop_ee_fv_fv, fts_s_float_vector, fts_s_float_vector);
-  binop_fun_declare(sym_gt, binop_gt_fv_fv, fts_s_float_vector, fts_s_float_vector);
-  binop_fun_declare(sym_ne, binop_ne_fv_fv, fts_s_float_vector, fts_s_float_vector);
-  binop_fun_declare(sym_ge, binop_ge_fv_fv, fts_s_float_vector, fts_s_float_vector);
-  binop_fun_declare(sym_lt, binop_lt_fv_fv, fts_s_float_vector, fts_s_float_vector);
-  binop_fun_declare(sym_le, binop_le_fv_fv, fts_s_float_vector, fts_s_float_vector);
+  /* float vector @ float vector = float vector */
+  binop_declare_fun(sym_ee, binop_ee_fv_fv, fts_s_float_vector, fts_s_float_vector, binops_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_fv_fv, fts_s_float_vector, fts_s_float_vector, binops_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_fv_fv, fts_s_float_vector, fts_s_float_vector, binops_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_fv_fv, fts_s_float_vector, fts_s_float_vector, binops_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_fv_fv, fts_s_float_vector, fts_s_float_vector, binops_s_recycle);
+  binop_declare_fun(sym_le, binop_le_fv_fv, fts_s_float_vector, fts_s_float_vector, binops_s_recycle);
 
-  /* float vector @ int(number) = integer vector */
-  binop_fun_declare(sym_ee, binop_ee_fv_n, fts_s_float_vector, fts_s_int);
-  binop_fun_declare(sym_gt, binop_gt_fv_n, fts_s_float_vector, fts_s_int);
-  binop_fun_declare(sym_ne, binop_ne_fv_n, fts_s_float_vector, fts_s_int);
-  binop_fun_declare(sym_ge, binop_ge_fv_n, fts_s_float_vector, fts_s_int);
-  binop_fun_declare(sym_lt, binop_lt_fv_n, fts_s_float_vector, fts_s_int);
-  binop_fun_declare(sym_le, binop_le_fv_n, fts_s_float_vector, fts_s_int);
+  /* float vector @ int(number) = float vector */
+  binop_declare_fun(sym_ee, binop_ee_fv_n, fts_s_float_vector, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_fv_n, fts_s_float_vector, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_fv_n, fts_s_float_vector, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_fv_n, fts_s_float_vector, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_fv_n, fts_s_float_vector, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_le, binop_le_fv_n, fts_s_float_vector, fts_s_int, binops_s_recycle);
 
-  /* float vector @ float(number) = integer vector */
-  binop_fun_declare(sym_ee, binop_ee_fv_n, fts_s_float_vector, fts_s_float);
-  binop_fun_declare(sym_gt, binop_gt_fv_n, fts_s_float_vector, fts_s_float);
-  binop_fun_declare(sym_ne, binop_ne_fv_n, fts_s_float_vector, fts_s_float);
-  binop_fun_declare(sym_ge, binop_ge_fv_n, fts_s_float_vector, fts_s_float);
-  binop_fun_declare(sym_lt, binop_lt_fv_n, fts_s_float_vector, fts_s_float);
-  binop_fun_declare(sym_le, binop_le_fv_n, fts_s_float_vector, fts_s_float);
+  /* float vector @ float(number) = float vector */
+  binop_declare_fun(sym_ee, binop_ee_fv_n, fts_s_float_vector, fts_s_float, binops_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_fv_n, fts_s_float_vector, fts_s_float, binops_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_fv_n, fts_s_float_vector, fts_s_float, binops_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_fv_n, fts_s_float_vector, fts_s_float, binops_s_recycle); 
+  binop_declare_fun(sym_ge, binop_ge_fv_n, fts_s_float_vector, fts_s_float, binops_s_recycle); 
+  binop_declare_fun(sym_le, binop_le_fv_n, fts_s_float_vector, fts_s_float, binops_s_recycle); 
 
-  /* integer vector @ float vector = integer vector */
-  binop_fun_declare(sym_ee, binop_ee_iv_fv, fts_s_integer_vector, fts_s_float_vector);
-  binop_fun_declare(sym_gt, binop_gt_iv_fv, fts_s_integer_vector, fts_s_float_vector);
-  binop_fun_declare(sym_ne, binop_ne_iv_fv, fts_s_integer_vector, fts_s_float_vector);
-  binop_fun_declare(sym_ge, binop_ge_iv_fv, fts_s_integer_vector, fts_s_float_vector);
-  binop_fun_declare(sym_lt, binop_lt_iv_fv, fts_s_integer_vector, fts_s_float_vector);
-  binop_fun_declare(sym_le, binop_le_iv_fv, fts_s_integer_vector, fts_s_float_vector);
+  /* integer vector @ float vector = float vector */ 
+  binop_declare_fun(sym_ee, binop_ee_iv_fv, fts_s_integer_vector, fts_s_float_vector, binops_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_iv_fv, fts_s_integer_vector, fts_s_float_vector, binops_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_iv_fv, fts_s_integer_vector, fts_s_float_vector, binops_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_iv_fv, fts_s_integer_vector, fts_s_float_vector, binops_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_iv_fv, fts_s_integer_vector, fts_s_float_vector, binops_s_recycle); 
+  binop_declare_fun(sym_le, binop_le_iv_fv, fts_s_integer_vector, fts_s_float_vector, binops_s_recycle);
 
-  /* float vector @ integer vector = integer vector */
-  binop_fun_declare(sym_ee, binop_ee_fv_iv, fts_s_float_vector, fts_s_integer_vector);
-  binop_fun_declare(sym_gt, binop_gt_fv_iv, fts_s_float_vector, fts_s_integer_vector);
-  binop_fun_declare(sym_ne, binop_ne_fv_iv, fts_s_float_vector, fts_s_integer_vector);
-  binop_fun_declare(sym_ge, binop_ge_fv_iv, fts_s_float_vector, fts_s_integer_vector);
-  binop_fun_declare(sym_lt, binop_lt_fv_iv, fts_s_float_vector, fts_s_integer_vector);
-  binop_fun_declare(sym_le, binop_le_fv_iv, fts_s_float_vector, fts_s_integer_vector);
+  /* float vector @ integer vector = float vector */
+  binop_declare_fun(sym_ee, binop_ee_fv_iv, fts_s_float_vector, fts_s_integer_vector, binops_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_fv_iv, fts_s_float_vector, fts_s_integer_vector, binops_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_fv_iv, fts_s_float_vector, fts_s_integer_vector, binops_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_fv_iv, fts_s_float_vector, fts_s_integer_vector, binops_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_fv_iv, fts_s_float_vector, fts_s_integer_vector, binops_s_recycle);
+  binop_declare_fun(sym_le, binop_le_fv_iv, fts_s_float_vector, fts_s_integer_vector, binops_s_recycle);
 }

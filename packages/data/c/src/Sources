@@ -15,13 +15,16 @@ data.c \
 expr.c \
 atoms.c \
 types.c \
-recycle.c \
+operators.c \
 utils.c \
-getelem.c \
-getsize.c \
-post.c \
+monops.c \
 binops.c \
 binop_arith.c \
 binop_arith_inplace.c \
+binop_comp.c \
 binop_obj.c \
+atom_obj.c \
+post.c \
+getelem.c \
+getsize.c \
 

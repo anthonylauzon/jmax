@@ -22,8 +22,17 @@
 extern fts_symbol_t binops_s_recycle;
 extern fts_symbol_t binops_s_inplace;
 
-extern void binop_declare_fun(fts_symbol_t binop_name, operator_fun_t fun, 
-			      fts_symbol_t left_type, fts_symbol_t right_type, fts_symbol_t version);
-extern operator_matrix_t binop_get_matrix(fts_symbol_t binop_name, fts_symbol_t version);
+typedef struct _binop
+{
+  fts_symbol_t name;
+  operator_fun_t recycle[MAX_N_DATA_TYPES][MAX_N_DATA_TYPES];
+  operator_fun_t inplace[MAX_N_DATA_TYPES][MAX_N_DATA_TYPES];
+} binop_t;
+
+extern void binop_declare_fun(fts_symbol_t binop, operator_fun_t fun, fts_symbol_t left, fts_symbol_t right, fts_symbol_t version);
+extern binop_t *binop_get(fts_symbol_t name);
+
+#define binop_call_fun_recycle(binop, ops) ((binop)->recycle[(ops)[0].type.id][(ops)[1].type.id])(ops)
+#define binop_call_fun_inplace(binop, ops) ((binop)->inplace[(ops)[0].type.id][(ops)[1].type.id])(ops)
 
 #endif
