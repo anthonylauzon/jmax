@@ -17,6 +17,7 @@
 
 # Get commandline argument
 
+if {[systemProperty "jmaxNoConsole"] != ""} then { set jmaxNoConsole [systemProperty "jmaxNoConsole"]}
 if {[systemProperty "jmaxHost"] != ""} then { set jmaxHost [systemProperty "jmaxHost"]}
 if {[systemProperty "jmaxConnection"] != ""} then { set jmaxConnection [systemProperty "jmaxConnection"]}
 if {[systemProperty "jmaxPort"] != ""} then { set jmaxPort [systemProperty "jmaxPort"]}
@@ -28,11 +29,11 @@ if {[systemProperty "jmaxSplashScreen"] != ""} then { set jmaxSplashScreen [syst
 if {[systemProperty "jmaxFastFileBox"] != ""} then { set jmaxFastFileBox [systemProperty "jmaxFastFileBox"]}
 
 
-# the following is done so it can be accessed from Java
-# Should be done better, with something more uniform.
+# the following is done so properties it can be accessed from Java
 #
 
 setSystemProperty "jmaxFastFileBox" $jmaxFastFileBox
+setSystemProperty "jmaxNoConsole" $jmaxNoConsole
 
 
 ##
