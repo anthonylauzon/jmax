@@ -8,6 +8,7 @@
 		fts/pipestream.c from fts/bytestream.c
 
 		include/fts/midievent.h from include/fts/midi.h
+		include/fts/outlet.h from include/fts/message.h
 		include/fts/patcherobject.h from include/fts/object.h
 		include/fts/socketstream.h from include/fts/bytestream.h
 
