@@ -95,24 +95,25 @@ readbyte(fts_midifile_t *file)
 static int
 readvarinum(fts_midifile_t *file)
 {
+  int c = readbyte(file);
   int value;
-  int c;
+  
+  if(c == EOF)
+    return 0;
 
-  c = readbyte(file);
-  value = c;
+  value = c & 0x7f;
 
-  if (c & 0x80) 
+  while(c & 0x80)
     {
-      value &= 0x7f;
+      c = readbyte(file);
 
-      do {
-	  c = readbyte(file);
-	  value = (value << 7) + (c & 0x7f);
-	} 
-      while (c & 0x80);
+      if(c == EOF)
+	return 0;
+
+      value = (value << 7) + (c & 0x7f);
     }
 
-  return (value);
+  return value;
 }
 
 static int
@@ -239,7 +240,7 @@ midifile_read_header(fts_midifile_t *file)
   file->n_tracks = read16bit(file);
   file->division = read16bit(file);
 
-  if(file->read->header)
+  if(!file->error && file->read->header)
     (*file->read->header)(file);
 
   /* flush any extra stuff */
@@ -271,10 +272,10 @@ midifile_read_track(fts_midifile_t *file)
   file->bytes = read32bit(file);
   file->ticks = 0;
 
-  if (file->read->track_start)
+  if (!file->error && file->read->track_start)
     (*file->read->track_start)(file);
 
-  while (file->bytes > 0) 
+  while(!file->error && file->bytes > 0)
     {
       int data1 = 0;
       int data2 = 0;
@@ -283,6 +284,9 @@ midifile_read_track(fts_midifile_t *file)
       file->ticks += readvarinum(file); /* delta time */
       byte = readbyte(file);
       
+      if(byte == EOF)
+	break;
+
       if (sysex_continue && byte != SYSTEM_EXCLUSIVE_CONTINUE)
 	{
 	  mferror(file, "didn't find expected continuation of a sysex");
@@ -292,7 +296,7 @@ midifile_read_track(fts_midifile_t *file)
       if(byte < 128)
 	{
 	  /* running status */
-	  if (status == 0)
+	  if (status < 128)
 	    {
 	      mferror(file, "unexpected running status");
 	      return;
@@ -312,6 +316,9 @@ midifile_read_track(fts_midifile_t *file)
       else
 	/* sysex or meta event */
 	status = byte & 0xff;
+
+      if(file->error != 0)
+	break;
       
       switch (status) 
 	{
@@ -503,7 +510,7 @@ midifile_read_track(fts_midifile_t *file)
 	}
     }
   
-  if (file->read->track_end)
+  if (!file->error && file->read->track_end)
     (*file->read->track_end)(file);
 }
 
@@ -691,14 +698,22 @@ fts_midifile_write_track_end(fts_midifile_t *file)
   return 1;
 }
 
-/* write events to standard MIDI file */ 
-#define clip_channel(c) (((c) > 15)? 15: (((c) < 0)? 0: (c)))
-
 void 
 fts_midifile_write_channel_message(fts_midifile_t *file, int ticks, enum midi_type type, int channel, int byte1, int byte2)
 {
-  int status = 128 + ((type & 0x0f) << 4) + (channel & 0x0f);
+  int status = 144 + ((type & 0x0f) << 4) + (channel & 0x0f);
+  int delta = ticks - file->ticks;
 
+  if(delta < 0)
+    delta = 0;
+
+  /* write delt time */
+  writevarlen(file, delta);
+
+  /* set current file ticks */
+  file->ticks = ticks;
+
+  /* write message */
   writebyte(file, status);
   writebyte(file, byte1 & 0x7f);
 
@@ -709,6 +724,17 @@ fts_midifile_write_channel_message(fts_midifile_t *file, int ticks, enum midi_ty
 void 
 fts_midifile_write_midievent(fts_midifile_t *file, int ticks, fts_midievent_t *event)
 {
+  int delta = ticks - file->ticks;
+
+  if(delta < 0)
+    delta = 0;
+
+  /* write delt time */
+  writevarlen(file, delta);
+
+  /* set current file ticks */
+  file->ticks = ticks;
+  
   if(fts_midievent_is_channel_message(event))
     {
       writebyte(file, fts_midievent_channel_message_get_status_byte(event));
@@ -746,7 +772,6 @@ fts_midifile_write_midievent(fts_midifile_t *file, int ticks, fts_midievent_t *e
     }
 }
 
-/* fts_midifile_write_meta_event() */
 int
 fts_midifile_write_meta_event(fts_midifile_t *file, int ticks, int type, unsigned char *data, int size)
 {
@@ -777,7 +802,7 @@ fts_midifile_write_meta_event(fts_midifile_t *file, int ticks, int type, unsigne
 void 
 fts_midifile_write_tempo(fts_midifile_t *file, int tempo)
 {
-  writebyte(file, 0);
+  writebyte(file, 0); /* at time 0 */
   writebyte(file, META_EVENT);
   writebyte(file, SET_TEMPO);
 

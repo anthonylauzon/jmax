@@ -35,11 +35,12 @@
 #include "track.h"
 #include "note.h"
 
-fts_symbol_t
-get_file_name(fts_symbol_t name)
+#define STRING_SIZE 1024
+
+static void
+get_stripped_file_name_with_index(char *name_str, fts_symbol_t name, int index)
 {
   const char *s = fts_symbol_name(name);
-  char name_str[128];
   int size;
   int i = strlen(s) - 1;
 
@@ -56,12 +57,11 @@ get_file_name(fts_symbol_t name)
 
   size -= i;
 
-  if(size > 127)
-    size = 127;
+  if(size > STRING_SIZE - 5)
+    size = STRING_SIZE - 5;
 
   snprintf(name_str, size + 1, "%s", s + i);
-
-  return fts_new_symbol_copy(name_str);
+  snprintf(name_str + size, 4, "-%d", index);
 }
 
 /**************************************************************************
@@ -215,6 +215,8 @@ sequence_read_track_start(fts_midifile_t *file)
 {
   seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
   double time = fts_midifile_get_time(file);
+  fts_symbol_t name = fts_midifile_get_name(file);
+  char str[STRING_SIZE];
   fts_atom_t a;
 
   if(data->track)
@@ -223,6 +225,11 @@ sequence_read_track_start(fts_midifile_t *file)
   fts_set_symbol(&a, fts_s_midievent);
   data->track = (track_t *)fts_object_create(track_class, 1, &a);
   fts_object_refer(data->track);
+
+  get_stripped_file_name_with_index(str, name, data->track_index);
+  track_set_name(data->track, fts_new_symbol_copy(str));
+
+  data->track_index++;
 }
 
 static void
@@ -301,6 +308,7 @@ sequence_import_from_midifile(sequence_t *sequence, fts_midifile_t *file)
   fts_midifile_set_read_functions(file, &read);
   
   data.sequence = sequence;
+  data.track_index = 0;
   
   read.midi_event = miditrack_read_midievent;
   read.track_start = sequence_read_track_start;
@@ -320,17 +328,11 @@ sequence_import_from_midifile(sequence_t *sequence, fts_midifile_t *file)
  *
  */
 
-/* note status pseudo event (used to keep track of note offs while writing midi files) */
-#define notestat_get_pitch(e) (fts_get_int(event_get_value(e)))
-#define notestat_is_on(e) (fts_get_int(event_get_value(e)) >= 0)
-#define notestat_set_on(e, p) fts_set_int(event_get_value(e), (p))
-#define notestat_set_off(e) fts_set_int(event_get_value(e), -1)
-
 typedef struct _seqmidi_write_data_
 {
   track_t *track;
-  track_t *note_off_track;
-  event_t notestats[128]; /* array of note_off events */
+  track_t *off_track;
+  track_t *free_track;
   int size;
 } seqmidi_write_data_t;
 
@@ -341,24 +343,36 @@ seqmidi_write_note_on(fts_midifile_t *file, double time, note_t *note)
   int pitch = note_get_pitch(note);
   double off_time = time + note_get_duration(note);
   long time_in_ticks = fts_midifile_time_to_ticks(file, time);
-  event_t *stat = data->notestats + pitch;
+  event_t *off = track_get_first(data->free_track);
 
-  if(notestat_is_on(stat))
+  fts_midifile_write_channel_message(file, time_in_ticks, midi_type_note, 0, pitch, 64);
+  data->size++;
+
+  /* schedule note off */
+  if(off)
     {
-      fts_midifile_write_channel_message(file, time_in_ticks, midi_type_note, 0, pitch, 0);
-      track_remove_event(data->note_off_track, stat);
-      fts_midifile_write_channel_message(file, time_in_ticks, midi_type_note, 0, pitch, 64);
-      data->size += 2;
+      /* prevent free event being destroyed when moved to off_track */
+      fts_object_refer(off);
+
+      /* set pitch and move free event to off track */
+      event_set_int(off, pitch);
+      track_remove_event(data->free_track, off);
+      track_add_event(data->off_track, off_time, off);
+
+      /* remove reference */
+      fts_object_release(off);
     }
   else
     {
-      fts_midifile_write_channel_message(file, time_in_ticks, midi_type_note, 0, pitch, 64);
-      data->size++;
-    }
-    
-  notestat_set_on(stat, pitch);
+      fts_atom_t a;
 
-  track_append_event(data->note_off_track, off_time, stat);
+      /* create new event */
+      fts_set_int(&a, pitch);
+      off = (event_t *)fts_object_create(event_class, 1, &a);
+
+      /* add event to note on track */
+      track_add_event(data->off_track, off_time, off);
+    }  
 }
 
 /* write all pending note offs until given time */
@@ -366,25 +380,29 @@ static void
 seqmidi_write_note_offs(fts_midifile_t *file, double time)
 {
   seqmidi_write_data_t *data = (seqmidi_write_data_t *)fts_midifile_get_user_data(file);
-  event_t *stat = track_get_first(data->note_off_track);
+  event_t *off = track_get_first(data->off_track);
 
-  while(stat && event_get_time(stat) <= time)
+  while(off && event_get_time(off) <= time)
     {
-      long off_time_in_ticks = fts_midifile_time_to_ticks(file, event_get_time(stat));
-      int off_pitch = notestat_get_pitch(stat);
+      long off_time_in_ticks = fts_midifile_time_to_ticks(file, event_get_time(off));
+      int off_pitch = event_get_int(off);
       
       /* write note off */
       fts_midifile_write_channel_message(file, off_time_in_ticks, midi_type_note, 0, off_pitch, 0);
       data->size++;
 
-      /* set note to off */
-      notestat_set_off(stat);
+      /* prevent off event being destroyed when moved to free_track */
+      fts_object_refer(off);
+
+      /* move off event to free track */
+      track_remove_event(data->off_track, off);
+      track_append_event(data->free_track, 0.0, off);
       
-      /* remove note off event from note off track */
-      track_remove_event(data->note_off_track, stat);
-      
+      /* remove reference */
+      fts_object_release(off);
+
       /* get next note off in sequence */
-      stat = track_get_first(data->note_off_track);
+      off = track_get_first(data->off_track);
     }
 }
 
@@ -392,10 +410,13 @@ int
 track_export_to_midifile(track_t *track, fts_midifile_t *file)
 {
   fts_symbol_t track_type = track_get_type(track);
+  int track_size = track_get_size(track);
+
+  if(track_size <= 0)
+    return 0;
 
   if(track_type == seqsym_note)
     {
-      fts_symbol_t track_name = track_get_name(track);
       seqmidi_write_data_t data;
       event_t *event;
       fts_atom_t a[1];
@@ -408,11 +429,8 @@ track_export_to_midifile(track_t *track, fts_midifile_t *file)
       
       /* create dummy track for creating note offs */
       fts_set_symbol(a, seqsym_export_midifile);  
-      data.note_off_track = (track_t *)fts_object_create(track_class, 1, a);
-      
-      /* init note table */
-      for(i=0; i<n_midi_notes; i++)
-	event_set_int(data.notestats + i, 0);
+      data.off_track = (track_t *)fts_object_create(track_class, 1, a);
+      data.free_track = (track_t *)fts_object_create(track_class, 1, a);
       
       /* write file header */
       fts_midifile_write_header(file, 0, 1, 384);
@@ -431,12 +449,48 @@ track_export_to_midifile(track_t *track, fts_midifile_t *file)
 	  event = event_get_next(event);
 	}  
       
-      /* write pendling note-offs */
-      if(track_get_size(data.note_off_track) > 0)
-	seqmidi_write_note_offs(file, event_get_time(track_get_last(data.note_off_track)));
+      /* write pending note-offs */
+      if(track_get_size(data.off_track) > 0)
+	seqmidi_write_note_offs(file, event_get_time(track_get_last(data.off_track)));
       
-      /* delete dummy track */
-      fts_object_destroy((fts_object_t *)(data.note_off_track));
+      /* delete dummy tracks */
+      fts_object_destroy((fts_object_t *)(data.off_track));
+      fts_object_destroy((fts_object_t *)(data.free_track));
+      
+      /* close file */
+      fts_midifile_write_track_end(file);
+      
+      return data.size;
+    }
+  else if(track_type == fts_s_midievent)
+    {
+      seqmidi_write_data_t data;
+      event_t *event;
+      fts_atom_t a[1];
+      int i, j;
+      
+      fts_midifile_set_user_data(file, &data);
+      
+      data.track = track;
+      data.size = 0;
+      
+      /* write file header */
+      fts_midifile_write_header(file, 0, 1, 384);
+      fts_midifile_write_track_begin(file);
+      fts_midifile_write_tempo(file, 500000);
+      
+      /* write events */
+      event = track_get_first(track);
+      while(event)
+	{
+	  double time = event_get_time(event);
+	  long time_in_ticks = fts_midifile_time_to_ticks(file, time);
+	  
+	  fts_midifile_write_midievent(file, time_in_ticks, (fts_midievent_t *)fts_get_object(&event->value));
+	  data.size++;
+
+	  event = event_get_next(event);
+	}  
       
       /* close file */
       fts_midifile_write_track_end(file);

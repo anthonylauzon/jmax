@@ -1,7 +1,12 @@
+2001-12-17  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* implemented MIDI file export for note and midievent tracks in track of package sequence
+	* reviewed behaiviour of import and export messages to track and sequence
+
 2001-12-15  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* adjusted objects of sequence package
-	* introduced track of midievents with import from midifiles (todo: export)
+	* introduced track of midievents with import from MIDI files (todo: export)
 	* added void type to track and removed midival
 	* moved seqplay to play
 	* moved seqrec to record

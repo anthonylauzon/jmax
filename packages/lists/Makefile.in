@@ -80,7 +80,7 @@ VERSION = @VERSION@
 SUBDIRS = c help
 
 packagedir = $(pkgdatadir)/packages/lists
-package_DATA = lists.jpk lists.jmax 
+package_DATA = lists.jpk
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 

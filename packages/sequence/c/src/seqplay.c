@@ -70,23 +70,26 @@ seqplay_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   event_t *event = this->event;
   double time = event_get_time(event);
   event_t *next = track_highlight_and_next(this->track, event);
-
+  
   /* release current event */
   fts_object_release(event);
   this->event = 0;
   
-  while(event && event != next)
+  if(track_is_active(this->track))
     {
-      fts_atom_t *a = event_get_value(event);
-
-      fts_outlet_send(o, 0, fts_get_selector(a), 1, a);
-      event = event_get_next(event);
+      while(event && event != next)
+	{
+	  fts_atom_t *a = event_get_value(event);
+	  
+	  fts_outlet_send(o, 0, fts_get_selector(a), 1, a);
+	  event = event_get_next(event);
+	}
     }
   
   if(next)
     {
       double speed = this->last_speed;
-
+      
       /* claim next event */
       this->event = next;
       fts_object_refer(next);
@@ -117,7 +120,8 @@ seqplay_sync_speed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   this->last_speed = speed;
 
   /* re-schedule event */
-  fts_timebase_add_call(this->timebase, o, seqplay_next, 0, (event_get_time(this->event) - here) / speed);
+  if(track_is_active(this->track))
+    fts_timebase_add_call(this->timebase, o, seqplay_next, 0, (event_get_time(this->event) - here) / speed);
 }
 
 static void 
@@ -126,7 +130,7 @@ seqplay_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   seqplay_t *this = (seqplay_t *)o;
   double time = 0.0;
   event_t *event;
-
+      
   if(ac && fts_is_number(at))
     time = fts_get_number_float(at);
   
@@ -142,14 +146,14 @@ seqplay_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       /* set start time */
       this->last_location = time;
     }
-}  
+}
 
 static void 
 seqplay_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqplay_t *this = (seqplay_t *)o;
   
-  if(this->speed > 0.0)
+  if(track_is_active(this->track) && this->speed > 0.0)
     {
       switch(this->status)
 	{
@@ -209,7 +213,6 @@ static void
 seqplay_sync(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqplay_t *this = (seqplay_t *)o;
-  event_t *event = this->event;
 
   if(fts_is_number(at))
     {
@@ -219,6 +222,8 @@ seqplay_sync(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
       if(sync > here)
 	{
+	  event_t *event = this->event;
+
 	  if(this->status == status_playing)
 	    {
 	      fts_timebase_remove_object(this->timebase, (fts_object_t *)this);
@@ -233,8 +238,10 @@ seqplay_sync(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  while(event && event_get_time(event) <= here)
 	    {
 	      fts_atom_t *a = event_get_value(event);
-	      
-	      fts_outlet_send(o, 0, fts_get_selector(a), 1, a);
+
+	      if(track_is_active(this->track))
+		fts_outlet_send(o, 0, fts_get_selector(a), 1, a);
+
 	      event = event_get_next(event);
 	    }
 	  

@@ -47,6 +47,7 @@ extern fts_symbol_t seqsym_add_track;
 extern fts_symbol_t seqsym_remove_track;
 extern fts_symbol_t seqsym_move_track;
 extern fts_symbol_t seqsym_add_event;
+extern fts_symbol_t seqsym_active;
 
 /* messages from/to client */
 extern fts_symbol_t seqsym_createEditor;

@@ -244,19 +244,19 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
       notifyLock(true);
   }
 
-  public void unlock(int nArgs , FtsAtom args[])
+  public void unlock(int nArgs, FtsAtom args[])
   {
       locked = false;
       notifyLock(false);
   }
 
-  public void active(int nArgs[], FtsAtom args[])
+  public void active(int nArgs, FtsAtom args[])
   {
       boolean active = (args[0].getInt() == 1);
       notifyActive(active);
   }
 
-  public void highlightEvents(int nArgs , FtsAtom args[])
+  public void highlightEvents(int nArgs, FtsAtom args[])
   {
     int selIndex;
     TrackEvent event = null;

@@ -356,7 +356,7 @@ track_get_event_by_time_after(track_t *track, double time, event_t *here)
 void
 track_highlight_event(track_t *track, event_t *event)
 {
-  if(sequence_editor_is_open(track_get_sequence((track_t *)track)))
+  if(track_editor_is_open(track))
     {
       fts_atom_t a;
       
@@ -368,7 +368,7 @@ track_highlight_event(track_t *track, event_t *event)
 void
 track_highlight_cluster(track_t *track, event_t *event, event_t *next)
 {
-  if(sequence_editor_is_open(track_get_sequence((track_t *)track)))
+  if(track_editor_is_open(track))
     {
       fts_atom_t at[64];
       int ac = 0;
@@ -390,7 +390,7 @@ track_highlight_and_next(track_t *track, event_t *event)
 {
   double time = event_get_time(event);
 
-  if(sequence_editor_is_open(track_get_sequence((track_t *)track)))
+  if(track_editor_is_open(track))
     {
       fts_atom_t at[64];
       int ac = 0;
@@ -427,7 +427,7 @@ track_highlight_and_next(track_t *track, event_t *event)
  */
 
 /* set name of track by client request (ones this will be about variables!!!) */
-void
+static void
 track_set_name_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
@@ -456,7 +456,7 @@ track_set_name_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, in
 }
 
 /* create new event and upload by client request */
-void
+static void
 track_add_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
@@ -483,7 +483,7 @@ track_add_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, i
 }
 
 /* create new event by client request without uploading */
-void
+static void
 track_make_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
@@ -499,7 +499,7 @@ track_make_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, 
 }
 
 /* delete event by client request */
-void
+static void
 track_remove_events_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
@@ -517,7 +517,7 @@ track_remove_events_by_client_request(fts_object_t *o, int winlet, fts_symbol_t 
 }
 
 /* move event by client request */
-void
+static void
 track_move_events_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
@@ -540,56 +540,65 @@ track_move_events_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s,
  * 
  */
 
-void
+static void 
+track_active(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  
+  this->active = fts_get_int(at);
+
+  if(track_editor_is_open(this))
+    fts_client_send_message((fts_object_t *)this, seqsym_active, 1, at);
+}
+
+static void
 track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
   fts_symbol_t type = track_get_type(this);
-  event_t *event = track_get_first(this);
-  fts_atom_t a[TRACK_BLOCK_SIZE];
-  int n = 0;
+  fts_symbol_t name = track_get_name(this);  
+  fts_atom_t a;
   
-  if(!fts_object_has_id((fts_object_t *)this))
+  /* set track name */
+  if(name)
     {
-      fts_symbol_t name = track_get_name(this); 
-     
-      /* create track at client */
-      fts_set_symbol(a, type);
-      fts_client_upload((fts_object_t *)this, seqsym_track, 1, a);
-
-      if(name)
-	{
-	  fts_set_symbol(a, name);
-	  fts_client_send_message(o, seqsym_setName, 1, a);
-	}
+      fts_set_symbol(&a, name);
+      fts_client_send_message((fts_object_t *)this, seqsym_setName, 1, &a);
     }
 
-  /* upload event only for known types */
-  if(type != fts_s_int && type != fts_s_float && type != fts_s_message && type != seqsym_note)
-    return;
-  
-  while(event)
+  fts_set_int(&a, track_is_active(this));
+  fts_client_send_message((fts_object_t *)this, seqsym_active, 1, &a);  
+
+  /* upload events for known types only */
+  if(type == fts_s_int || type == fts_s_float || type == seqsym_seqmess || type == seqsym_note)
     {
-      if(!fts_object_has_id((fts_object_t *)event))
+      event_t *event = track_get_first(this);
+      fts_atom_t a[TRACK_BLOCK_SIZE];
+      int n = 0;
+
+      while(event)
 	{
-	  /* create event at client */
-	  event_upload(event);
-
-	  fts_set_object(a + n, (fts_object_t *)event);
-	  n++;
-
-	  if(n == TRACK_BLOCK_SIZE)
+	  if(!fts_object_has_id((fts_object_t *)event))
 	    {
-	      fts_client_send_message((fts_object_t *)this, seqsym_addEvents, n, a);
-	      n = 0;
+	      /* create event at client */
+	      event_upload(event);
+	      
+	      fts_set_object(a + n, (fts_object_t *)event);
+	      n++;
+	      
+	      if(n == TRACK_BLOCK_SIZE)
+		{
+		  fts_client_send_message((fts_object_t *)this, seqsym_addEvents, n, a);
+		  n = 0;
+		}
 	    }
+	  
+	  event = event_get_next(event);
 	}
       
-      event = event_get_next(event);
+      if(n > 0)
+	fts_client_send_message((fts_object_t *)this, seqsym_addEvents, n, a);    
     }
-
-  if(n > 0)
-    fts_client_send_message((fts_object_t *)this, seqsym_addEvents, n, a);    
 }
 
 static void 
@@ -649,11 +658,12 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   if(file)
     {
       int size = track_import_from_midifile(this, file);
+      char *error = fts_midifile_get_error(file);
       
-      if(fts_midifile_get_error(file))
-	post("track: error reading MIDI file %s (%s)\n", fts_symbol_name(name), fts_midifile_get_error(file));
+      if(error)
+	fts_object_signal_runtime_error(o, "import: read error in \"%s\" (%s)\n", fts_symbol_name(name), error);
       else if(size <= 0)
-	post("track: couldn't import from MIDI file %s\n", fts_midifile_get_name(file));
+	fts_object_signal_runtime_error(o, "import: couldn't get any data from \"%s\"\n", fts_symbol_name(name));
       
       fts_midifile_close(file);
       
@@ -661,7 +671,7 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 	track_upload(o, 0, 0, 0, 0);
     }
   else
-    post("track: cannot open file %s\n", fts_symbol_name(name));
+    fts_object_signal_runtime_error(o, "import: cannot open \"%s\"\n", fts_symbol_name(name));
 }
       
 static void
@@ -675,15 +685,13 @@ track_import_midifile_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac
 
   snprintf(str, 1024, "%s.mid", track_name? fts_symbol_name(track_name): "untitled");
   default_name = fts_new_symbol_copy(str);
+
   fts_set_symbol(a, seqsym_import_midifile);
   fts_set_symbol(a + 1, fts_new_symbol("Open standard MIDI file"));
   fts_set_symbol(a + 2, fts_project_get_dir());
   fts_set_symbol(a + 3, default_name);
 
-  if(track_editor_is_open(this))
-    fts_client_send_message((fts_object_t *)this, seqsym_openFileDialog, 4, a);
-  else if(track_get_sequence(this))
-    fts_client_send_message((fts_object_t *)track_get_sequence(this), seqsym_openFileDialog, 4, a);    
+  fts_client_send_message((fts_object_t *)this, seqsym_openFileDialog, 4, a);
 }
 
 static void
@@ -715,16 +723,17 @@ track_export_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   if(file)
     {
       int size = track_export_to_midifile(this, file);
+      char *error = fts_midifile_get_error(file);
 
-      if(fts_midifile_get_error(file))
-	post("track: error writing MIDI file %s (%s)\n", file->name, (file->error)? file->error: "unknown");
+      if(error)
+	fts_object_signal_runtime_error(o, "export: write error in \"%s\" (%s)\n", error, fts_symbol_name(name));
       else if(size <= 0)
-	post("track: couldn't export to MIDI file %s\n", file->name);
+	fts_object_signal_runtime_error(o, "export: couldn't write any data to \"%s\"\n", fts_symbol_name(name));
       
       fts_midifile_close(file);
     }
   else
-    post("track: cannot open file %s\n", file->name);
+    fts_object_signal_runtime_error(o, "export: cannot open \"%s\"\n", fts_symbol_name(name));
 }
 
 static void 
@@ -738,15 +747,13 @@ track_export_midifile_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac
 
   snprintf(str, 1024, "%s.mid", track_name? fts_symbol_name(track_name): "untitled");
   default_name = fts_new_symbol_copy(str);
+
   fts_set_symbol(a, seqsym_export_midifile);
   fts_set_symbol(a + 1, fts_new_symbol("Save standard MIDI file"));
   fts_set_symbol(a + 2, fts_project_get_dir());
   fts_set_symbol(a + 3, default_name);
 
-  if(track_editor_is_open(this))
-    fts_client_send_message((fts_object_t *)this, seqsym_openFileDialog, 4, a);
-  else if(track_get_sequence(this))
-    fts_client_send_message((fts_object_t *)track_get_sequence(this), seqsym_openFileDialog, 4, a);    
+  fts_client_send_message((fts_object_t *)this, seqsym_openFileDialog, 4, a);
 }
 
 static void
@@ -910,6 +917,8 @@ track_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, seqsym_makeEvent, track_make_event_by_client_request);
   fts_method_define_varargs(cl, fts_SystemInlet, seqsym_removeEvents, track_remove_events_by_client_request);
   fts_method_define_varargs(cl, fts_SystemInlet, seqsym_moveEvents, track_move_events_by_client_request);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_active, track_active);
 
   return fts_Success;
 }

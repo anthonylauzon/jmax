@@ -905,6 +905,7 @@ public class FtsObject implements Serializable
     catch ( InvocationTargetException exc)
       {
 	System.err.println( exc);
+	System.err.println("exception in " + getClass().getName() + " " + selector);
       }
     catch( NoSuchMethodException exc)
       {
@@ -1040,6 +1041,7 @@ public class FtsObject implements Serializable
 			   if (fd.showDialog(parentFrame, dialogText) == JFileChooser.APPROVE_OPTION)
 			       {
 				   String path = fd.getSelectedFile().getAbsolutePath();
+
 				   sendArgs[0].setString(path); 
 				   sendMessage(FtsObject.systemInlet, callbackMethod, 1, sendArgs);
 			       } 
