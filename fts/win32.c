@@ -19,6 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 #include <fts/fts.h>
 #include <ftsconfig.h>
 #include <direct.h>
@@ -26,7 +27,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fts/thread.h>
-
+#include <shlobj.h> /* SHGetFolderPath */
 
 HINSTANCE fts_hinstance = NULL;
 
@@ -271,13 +272,40 @@ fts_get_default_root_directory( void)
   return fts_new_symbol( root);
 }
 
+
+fts_symbol_t get_user_directory(void)
+{
+  char dir[_MAX_PATH];
+  /*  
+  SHGetFolderLocation();
+  SHGetSpecialFolderPath();
+  */
+  if (SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, dir))
+    {
+      fts_log("[user] user directory: %s\n", dir);
+    }
+  else
+    {
+      fts_log("[user] cannot get user directory \n");
+      return NULL;
+    }
+
+  return fts_new_symbol(dir);
+}
+
+/* *************************************************************************** 
+ *                                                                             
+ * Project and configuration files
+ *                                                                             
+ */
+
 fts_symbol_t 
 fts_get_user_project( void)
 {  
   char *cwd = NULL;
   char path[_MAX_PATH];
-  cwd = (char*)fts_get_default_root_directory();
-  strcat(cwd,"\\config");
+  cwd = (char*)get_user_directory();
+  /*  strcat(cwd,"\\config"); */
   
   fts_make_absolute_path(cwd, fts_s_default_project, path, _MAX_PATH);
   return fts_new_symbol(path);
@@ -290,10 +318,11 @@ fts_get_system_project( void)
   fts_symbol_t root;
   char win[_MAX_PATH];
   char path[_MAX_PATH];
+  char* cwd = NULL;
 
   /* check the config file in the root directory */
-  root = fts_get_default_root_directory();
-
+  root = fts_get_default_root_directory();  
+  strcat(root, "\\config");
   fts_make_absolute_path(root, fts_s_default_project, path, _MAX_PATH);
   if (fts_file_exists(path) && fts_is_file(path)) {
     return fts_new_symbol(path);
@@ -320,9 +349,10 @@ fts_get_user_configuration( void)
   char path[_MAX_PATH];
 
   /* check for a config file in the current directory */
-  if (GetCurrentDirectory(_MAX_PATH, cwd) == 0) {
-    return NULL;
-  }
+  if (get_user_directory() == 0) 
+    {
+      return NULL;
+    }
 
   /* @@@@@ Change default configuration file name here @@@@@ */
   fts_make_absolute_path(cwd, "config.jcfg", path, _MAX_PATH);
