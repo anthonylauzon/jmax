@@ -49,33 +49,11 @@ osc_set_freq(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->freq = freq;
 }
 
-static void
-osc_set_freq_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  osc_t *this = (osc_t *)o;
-  float freq = fts_get_number_float(value);
-  
-  osc_data_set_incr(this->data, freq / this->sr);
-
-  this->freq = freq;
-}
-
 static void 
 osc_set_phase(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   osc_t *this = (osc_t *)o;
   float phase = fts_get_number_float(at);
-  
-  osc_data_set_phase(this->data, phase);
-
-  this->phase = phase;
-}
-
-static void
-osc_set_phase_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  osc_t *this = (osc_t *)o;
-  float phase = fts_get_number_float(value);
   
   osc_data_set_phase(this->data, phase);
 
@@ -221,12 +199,9 @@ osc_instantiate(fts_class_t *cl)
 
   fts_class_inlet(cl, 1, fvec_type, osc_set_fvec);
 
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("phase"), osc_set_phase_prop);
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("freq"), osc_set_freq_prop);      
-
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-    }
+}
 
 /***************************************************************************************
  *
@@ -245,33 +220,11 @@ phi_set_freq(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->freq = freq;
 }
 
-static void
-phi_set_freq_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  osc_t *this = (osc_t *)o;
-  float freq = fts_get_number_float(value);
-  
-  phi_data_set_incr(this->data, freq / this->sr);
-
-  this->freq = freq;
-}
-
 static void 
 phi_set_phase(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   osc_t *this = (osc_t *)o;
   float phase = fts_get_number_float(at);
-  
-  phi_data_set_phase(this->data, phase);
-
-  this->phase = phase;
-}
-
-static void
-phi_set_phase_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  osc_t *this = (osc_t *)o;
-  float phase = fts_get_number_float(value);
   
   phi_data_set_phase(this->data, phase);
 
@@ -369,12 +322,9 @@ phi_instantiate(fts_class_t *cl)
   fts_class_inlet_int(cl, 0, phi_set_freq);
   fts_class_inlet_float(cl, 0, phi_set_freq);
   
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("freq"), phi_set_freq_prop);      
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("phase"), phi_set_phase_prop);
-
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-    }
+}
 
 void
 signal_osc_config(void)

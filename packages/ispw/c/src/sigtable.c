@@ -413,6 +413,7 @@ sigtable_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_new_symbol("realloc"), sigtable_realloc);
 
+  fts_class_inlet_anything(cl, 0);
   fts_class_outlet_int(cl, 0);
 }
 

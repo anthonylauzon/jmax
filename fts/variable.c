@@ -172,7 +172,7 @@ fts_definition_update(fts_definition_t *def, const fts_atom_t *value)
 void
 fts_name_set_value(fts_patcher_t *patcher, fts_symbol_t name, const fts_atom_t *value)
 {
-  fts_patcher_t *scope = fts_patcher_get_top_level(patcher);
+  fts_patcher_t *scope = fts_patcher_get_scope(patcher);
   fts_definition_t *def = fts_definition_get(scope, name);
 
   if(!fts_atom_equals(value, &def->value))
@@ -182,7 +182,7 @@ fts_name_set_value(fts_patcher_t *patcher, fts_symbol_t name, const fts_atom_t *
 void
 fts_name_add_listener(fts_patcher_t *patcher, fts_symbol_t name, fts_object_t *obj)
 {
-  fts_patcher_t *scope = fts_patcher_get_top_level(patcher);
+  fts_patcher_t *scope = fts_patcher_get_scope(patcher);
   fts_definition_t *def = fts_definition_get(scope, name);
   fts_atom_t a;
 
@@ -195,7 +195,7 @@ fts_name_add_listener(fts_patcher_t *patcher, fts_symbol_t name, fts_object_t *o
 void
 fts_name_remove_listener(fts_patcher_t *patcher, fts_symbol_t name, fts_object_t *obj)
 {
-  fts_patcher_t *scope = fts_patcher_get_top_level(patcher);
+  fts_patcher_t *scope = fts_patcher_get_scope(patcher);
   fts_definition_t *def = fts_definition_get(scope, name);
 
   fts_definition_remove_listener(def, obj);
@@ -204,7 +204,7 @@ fts_name_remove_listener(fts_patcher_t *patcher, fts_symbol_t name, fts_object_t
 fts_atom_t *
 fts_name_get_value(fts_patcher_t *patcher, fts_symbol_t name)
 {
-  fts_patcher_t *scope = fts_patcher_get_top_level(patcher);
+  fts_patcher_t *scope = fts_patcher_get_scope(patcher);
   fts_definition_t *def = fts_definition_get(scope, name);
 
   return &def->value;
@@ -213,7 +213,7 @@ fts_name_get_value(fts_patcher_t *patcher, fts_symbol_t name)
 fts_symbol_t
 fts_name_get_unused(fts_patcher_t *patcher, fts_symbol_t name)
 {
-  fts_patcher_t *scope = fts_patcher_get_top_level(patcher);
+  fts_patcher_t *scope = fts_patcher_get_scope(patcher);
   fts_hashtable_t *hash = fts_patcher_get_definitions(scope);
   fts_atom_t a, k;
 
@@ -285,6 +285,7 @@ typedef struct
 {
   fts_object_t o;
   fts_symbol_t name;
+  fts_atom_t value;
 } define_t;
 
 static void 
@@ -299,6 +300,9 @@ define_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
       fts_name_set_value(patcher, name, (fts_atom_t *)(at + 1));
       this->name = name;
+      this->value = at[1];
+
+      fts_atom_refer(&this->value);
     }
   else
     fts_object_set_error(o, "bad arguments");
@@ -309,7 +313,8 @@ define_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   define_t *this = (define_t *) o;  
 
-  fts_name_reset(fts_object_get_patcher( o), this->name);
+  fts_name_set_value(fts_object_get_patcher( o), this->name, fts_null);
+  fts_atom_release(&this->value);
 }
 
 static void

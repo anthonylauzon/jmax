@@ -75,6 +75,9 @@ struct fts_object
 FTS_API fts_object_t *fts_object_create(fts_class_t *cl, fts_patcher_t *patcher, int ac, const fts_atom_t *at);
 FTS_API void fts_object_destroy(fts_object_t *obj);
 
+FTS_API void fts_object_set_name(fts_object_t *obj, fts_symbol_t sym);
+FTS_API fts_symbol_t fts_object_get_name(fts_object_t *obj);
+
 FTS_API fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int ac, const fts_atom_t *at);
 
 /* Garbage collector handling */
@@ -82,9 +85,6 @@ FTS_API fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int ac
 #define fts_object_release(o) ((--(((fts_object_t *)(o))->refcnt) > 0)? 0: (fts_object_destroy((fts_object_t *)(o)), 0))
 
 #define fts_object_has_only_one_reference(o) (((fts_object_t *)(o))->refcnt == 1)
-
-/* traditional object in patcher functions */
-FTS_API void fts_object_delete_from_patcher(fts_object_t *obj);
 
 /* object description (system functions) */
 FTS_API void fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *argv);

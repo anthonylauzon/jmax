@@ -23,7 +23,6 @@
 typedef struct fts_definition fts_definition_t;
 
 FTS_API void fts_name_set_value(fts_patcher_t *patcher, fts_symbol_t name, const fts_atom_t *value);
-#define fts_name_reset(p, n) fts_name_set_value((p), (n), fts_null)
 
 FTS_API void fts_name_add_listener(fts_patcher_t *patcher, fts_symbol_t name, fts_object_t *obj);
 FTS_API void fts_name_remove_listener(fts_patcher_t *patcher, fts_symbol_t name, fts_object_t *obj);

@@ -1697,7 +1697,7 @@ midiconfig_restore(midiconfig_t *config)
   fts_atom_t a;
 
   fts_set_object(&a, midiconfig);
-  fts_name_reset(fts_get_root_patcher(), midiconfig_s_name);
+  fts_name_set_value(fts_get_root_patcher(), midiconfig_s_name, fts_null);
   fts_name_set_value(fts_get_root_patcher(), midiconfig_s_name, &a);
 }
 

@@ -387,7 +387,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     if (ac > 1 || toplevel)
       {
 	obj = fts_object_create( fts_tuple_class, NULL, ac, at);
-	fts_object_refer( obj);
+	/*fts_object_refer( obj);*/
 	fts_set_object( ret, obj);
       }
     else
@@ -465,7 +465,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     obj = fts_object_create( cl, scope, ac, at);
     if (obj)
       {
-	fts_object_refer( obj);
+	/*fts_object_refer( obj);*/
 	fts_set_object( ret, obj);
       }
     else

@@ -557,7 +557,9 @@ tap_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if(this->line != NULL)
     fts_object_release((fts_object_t *)this->line);
 
-  ftl_data_free(this->samples);
+  if(this->samples != NULL)
+    ftl_data_free(this->samples);
+
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
@@ -814,7 +816,7 @@ vtap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fts_dsp_object_init((fts_dsp_object_t *)o);
 
   this->line = NULL;
-  this->samples = 0;
+  this->samples = NULL;
   this->mode = mode_cubic;
 
   if(ac > 0 && fts_is_a(at, delayline_class))

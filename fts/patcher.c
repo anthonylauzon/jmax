@@ -94,16 +94,11 @@ static fts_memorystream_t * patcher_get_memory_stream()
 void 
 fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj)
 {
-  fts_object_t **p = &this->objects;
+  /* add object to list of objects in patcher */
+  obj->next_in_patcher = this->objects;
+  this->objects = obj;
 
-  obj->patcher = this;
-
-  /* add object as last in the list (nos: do we still need this?) */
-  while(*p != NULL)
-    p = &((*p)->next_in_patcher);
-
-  *p = obj;
-
+  /* claim object */
   fts_object_refer(obj);
 }
 
@@ -119,7 +114,6 @@ fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj)
 
 	*p = obj->next_in_patcher;
 
-	remove->patcher = NULL;
 	fts_object_release(remove);
 
 	return;
@@ -502,25 +496,35 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(ac == 0 || fts_is_number(at))
     {
+      patcher_inout_t *in;
+      fts_atom_t a[3];
+
       /* patcher inlet */
       if(ac > 0)
-	obj = (fts_object_t *)patcher_get_inlet(patcher, fts_get_number_int(at));
+	in = patcher_get_inlet(patcher, fts_get_number_int(at));
       else
-	obj = (fts_object_t *)patcher_get_inlet(patcher, -1);	
+	in = patcher_get_inlet(patcher, -1);	
+
+      fts_set_symbol(a + 0, fts_s_colon);
+      fts_set_symbol(a + 1, fts_s_receive);
+      fts_set_int(a + 2, in->index);
+      fts_object_set_description(o, 3, a);
+
+      obj = (fts_object_t *)in;
     }
   else if(ac == 1 && fts_is_symbol(at))
     {
       /* inlet label */
       fts_symbol_t name = fts_get_symbol(at);
       fts_label_t *label = fts_label_get_or_create(patcher, name);
+      fts_atom_t a[3];
 
-      if(label)
-	obj = (fts_object_t *)label;
-      else
-	{
-	  fts_object_set_error(o, "invalid label");
-	  return;	  
-	}
+      fts_set_symbol(a + 0, fts_s_colon);
+      fts_set_symbol(a + 1, fts_s_receive);
+      fts_set_symbol(a + 2, fts_object_get_name((fts_object_t *)label));
+      fts_object_set_description(o, 3, a);
+
+      obj = (fts_object_t *)label;
     }
   else if(ac == 1 && fts_is_object(at))
     obj = fts_get_object(at);
@@ -564,26 +568,9 @@ receive_spost_description(fts_object_t *o, int wreceive, fts_symbol_t s, int ac,
 {
   fts_receive_t *this  = (fts_receive_t *)o;
   fts_class_t *cl = fts_object_get_class(this->obj);
-      fts_atom_t a;
+  fts_atom_t a;
 
-  if(cl == patcher_inout_class)
-    {
-      /* send inlet index as object description */
-      patcher_inout_t *inout = (patcher_inout_t *)this->obj;
-      
-      fts_set_int(&a, inout->index);
-      fts_spost_object_description_args((fts_bytestream_t *)fts_get_object(at), 1, &a);
-    }
-  else if(cl == fts_label_class)
-    {
-      /* send inlet index as object description */
-      fts_label_t *label = (fts_label_t *)this->obj;
-      
-      fts_set_symbol(&a, fts_object_get_name((fts_object_t *)label));
-      fts_spost_object_description_args((fts_bytestream_t *)fts_get_object(at), 1, &a);
-    }
-  else
-    fts_spost_object_description_args((fts_bytestream_t *)fts_get_object(at), o->argc - 2, o->argv + 2);
+  fts_spost_object_description_args((fts_bytestream_t *)fts_get_object(at), o->argc - 2, o->argv + 2);
 }
 
 static void
@@ -642,25 +629,35 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   if(ac == 0 || fts_is_number(at))
     {
+      patcher_inout_t *out;
+      fts_atom_t a[3];
+
       /* patcher outlet */
       if(ac > 0)
-	obj = (fts_object_t *)patcher_get_outlet(patcher, fts_get_number_int(at));
+	out = patcher_get_outlet(patcher, fts_get_number_int(at));
       else
-	obj = (fts_object_t *)patcher_get_outlet(patcher, -1);
+	out = patcher_get_outlet(patcher, -1);
+
+      fts_set_symbol(a + 0, fts_s_colon);
+      fts_set_symbol(a + 1, fts_s_send);
+      fts_set_int(a + 2, out->index);
+      fts_object_set_description(o, 3, a);
+
+      obj = (fts_object_t *)out;
     }
   else if(ac == 1 && fts_is_symbol(at))
     {
       /* outlet label */
       fts_symbol_t name = fts_get_symbol(at);
       fts_label_t *label = fts_label_get_or_create(patcher, name);
+      fts_atom_t a[3];
 
-      if(label)
-	obj = (fts_object_t *)label;
-      else
-	{
-	  fts_object_set_error(o, "invalid label");
-	  return;	  
-	}
+      fts_set_symbol(a + 0, fts_s_colon);
+      fts_set_symbol(a + 1, fts_s_send);
+      fts_set_symbol(a + 2, fts_object_get_name((fts_object_t *)label));
+      fts_object_set_description(o, 3, a);
+
+      obj = (fts_object_t *)label;
     }
   else if(ac == 1 && fts_is_object(at))
     obj = fts_get_object(at);
@@ -1306,6 +1303,8 @@ patcher_redefine_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s
 static void 
 patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  fts_patcher_t *this = (fts_patcher_t *)o;
+
   if (ac > 0)
     {
       fts_object_t *obj;
@@ -1344,7 +1343,12 @@ patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_t s,
 	      if(fts_dsp_is_active() && fts_is_dsp_object(obj))
 		fts_dsp_desactivate();
 
-	      fts_object_delete_from_patcher(obj);
+	      /* remove connections and unbind the object from used variables */
+	      fts_object_unconnect(obj);
+	      fts_object_unbind(obj);
+
+	      /* release object */
+	      fts_patcher_remove_object(this, obj);
 	    }
 	}
       
@@ -1837,7 +1841,6 @@ static void
 patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *) o;
-  fts_object_t *p;
 
   if(editor_is_open(this))
     {
@@ -1853,21 +1856,27 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   this->deleted = 1;
   this->open = 0;
 
-  while (this->objects)
+  while(this->objects)
     {
-      /* find last object in patcher */
-      p = this->objects;
-      while (p->next_in_patcher)
-	p = p->next_in_patcher;
-      
-      if(fts_dsp_is_active() && fts_is_dsp_object(p))
+      fts_object_t *remove = this->objects;
+
+      this->objects = remove->next_in_patcher;
+
+      if(fts_dsp_is_active() && fts_is_dsp_object(remove))
 	fts_dsp_desactivate();
 
-      fts_object_delete_from_patcher(p);
+      /* remove connections and unbind the object from used variables */
+      fts_object_unconnect(remove);
+      fts_object_unbind(remove);
+      
+      /* remove object from patcher */
+      remove->patcher = NULL;
+      fts_object_release(remove);
     }
 
-  /* delete all the variables */
-  fts_object_release( this->args);
+  /* delete arguments */
+  if(this->args != NULL)
+    fts_object_release( this->args);
 
   /* delete the inlets and inlets tables */
   if (this->inlets)
@@ -1919,7 +1928,11 @@ patcher_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("redefine_object"), patcher_redefine_object_from_client);
 
   fts_class_set_default_handler(cl, patcher_input);
+  fts_class_inlet_anything(cl, 0);
   fts_class_outlet_anything(cl, 0);
+
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
 }
 
 /*************************************************************
@@ -1962,7 +1975,7 @@ fts_get_root_patcher(void)
  */
 
 fts_patcher_t *
-fts_patcher_get_top_level(fts_patcher_t *patcher)
+fts_patcher_get_scope(fts_patcher_t *patcher)
 {
   if(patcher != NULL)
     {

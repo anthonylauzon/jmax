@@ -31,6 +31,7 @@ extern void signal_bus_config(void);
 
 extern void signal_binop_config(void);
 extern void signal_abs_config(void);
+extern void signal_clip_config(void);
 
 extern void signal_tilda_config(void);
 extern void signal_env_config(void);
@@ -68,6 +69,7 @@ signal_config(void)
 
   signal_binop_config();
   signal_abs_config();
+  signal_clip_config();
 
   signal_tilda_config();
   signal_env_config();

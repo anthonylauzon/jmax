@@ -28,11 +28,11 @@
 #define fts_object_set_definition(o, d) ((o)->definition = (d))
 #define fts_object_get_definition(o) ((o)->definition)
 
+extern void fts_object_unconnect(fts_object_t *obj);
+extern void fts_object_unbind(fts_object_t *obj);
+
 /* support for redefinition */
 extern fts_object_t *fts_object_recompute(fts_object_t *old);
 extern fts_object_t *fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at);
-
-extern void fts_object_set_name(fts_object_t *obj, fts_symbol_t sym);
-extern fts_symbol_t fts_object_get_name(fts_object_t *obj);
 
 #endif

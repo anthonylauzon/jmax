@@ -201,6 +201,7 @@ static void client_manager_select( fts_object_t *o, int winlet, fts_symbol_t s, 
 
   fts_set_object( &a, socket_stream);
   client_object = fts_object_create( client_class, fts_get_root_patcher(), 1, &a);
+  fts_patcher_add_object(fts_get_root_patcher(), client_object);
 
   if (!client_object)
     {
@@ -757,8 +758,10 @@ static void client_receive( fts_object_t *o, int size, const unsigned char* buff
     {
       client_error( "[client] error in reading message, client stopped");
       fts_log( "[client] error in reading message, client stopped\n");
+
       fts_bytestream_remove_listener(this->stream, (fts_object_t *) this);
-      fts_object_delete_from_patcher( (fts_object_t *)this);
+      fts_patcher_remove_object(fts_get_root_patcher(), (fts_object_t *) this);
+
       return;
     }
 
@@ -991,6 +994,7 @@ static void client_predefine_objects( client_t *this)
       return;
     }
 
+  fts_patcher_add_object(fts_get_root_patcher(), this->root_patcher);
   fts_object_refer( this->root_patcher);
 
   client_register_object( this, (fts_object_t *)fts_get_root_patcher(), FTS_CLIENT_ROOT_OBJECT_ID);
@@ -1077,7 +1081,7 @@ static void client_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
 #ifndef HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
   fts_object_release( this->root_patcher);
-  /*    fts_object_delete_from_patcher( this->root_patcher); */
+  /* fts_patcher_remove_object(fts_get_root_patcher(), client_object); */
 #endif
 
   client_table_remove( this->client_id);
@@ -1416,6 +1420,7 @@ static void client_tcp_manager_install( void)
     }
     
   client_manager_object = fts_object_create( client_manager_class, fts_get_root_patcher(), ac, at);
+  fts_patcher_add_object(fts_get_root_patcher(), client_manager_object);
   
   if ( !client_manager_object)
     fprintf( stderr, "[client] cannot create client manager\n");
@@ -1431,6 +1436,7 @@ static void client_pipe_install( void)
   
   fts_set_object( &a, pipe_stream);
   client_object = fts_object_create( client_class, fts_get_root_patcher(), 1, &a);
+  fts_patcher_add_object(fts_get_root_patcher(), client_object);
   
   if (!client_object)
     {

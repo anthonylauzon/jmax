@@ -32,8 +32,6 @@ static fts_symbol_t bus_tilda_symbol = 0;
 static fts_symbol_t throw_tilda_symbol = 0;
 static fts_symbol_t catch_tilda_symbol = 0;
 
-static fts_class_t *bus_type = 0;
-
 typedef struct
 {
   fts_dsp_object_t o;
@@ -43,6 +41,32 @@ typedef struct
   int toggle; /* toggle (0/1) indicating current write buffer (swapping buffers each tick) */
   int n_tick;  
 } bus_t;
+
+bus_t *
+bus_get_or_create(fts_patcher_t *patcher, fts_symbol_t name)
+{
+  fts_atom_t *value = fts_name_get_value(patcher, name);
+
+  if(fts_is_object(value))
+    {
+      fts_object_t *obj = fts_get_object(value);
+      
+      if(fts_object_get_class(obj) == bus_class)
+	return (bus_t *)obj;
+    }
+  else if(fts_is_void(value))
+    {
+      /* create new bus */
+      bus_t *bus = (bus_t *)fts_object_create(bus_class, NULL, 0, 0);
+      
+      fts_object_set_patcher((fts_object_t *)bus, patcher);
+      fts_object_set_name((fts_object_t *)bus, name);
+      
+      return bus;
+    }
+
+  return NULL;
+}
 
 /*****************************************************************************
  *
@@ -162,51 +186,6 @@ bus_instantiate(fts_class_t *cl)
 
 /*****************************************************************************
  *
- *  default busses
- *
- */
-static fts_hashtable_t *default_busses = 0;
-
-static bus_t *
-bus_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
-{
-  fts_atom_t *value = fts_name_get_value(scope, name);
-  bus_t *bus = 0;
-  fts_atom_t key, a;
-  
-  fts_set_symbol(&key, name);
-
-  if(value && fts_is_object(value))
-    {
-      fts_object_t *obj = fts_get_object(value);
-      
-      if(fts_object_get_class(obj) == bus_type)
-	return bus = (bus_t *)obj;
-    }
-  
-  if(default_busses == 0)
-    {
-      /* create hashtable if not existing yet */
-      default_busses = (fts_hashtable_t *) fts_malloc(sizeof(fts_hashtable_t));
-      fts_hashtable_init( default_busses, NULL, FTS_HASHTABLE_MEDIUM);
-    }
-  else if(fts_hashtable_get(default_busses, &key, &a))
-    return (bus_t *)fts_get_object(&a);
-
-  /* if there wasn't a variable nor a default, make a default */
-  bus = (bus_t *)fts_object_create(bus_type, NULL, 0, 0);
-  
-  fts_set_object(&a, (fts_object_t *)bus);
-  fts_hashtable_put(default_busses, &key, &a);
-  
-  /* claim forever (!!!???) */
-  fts_object_refer((fts_object_t *)bus);
-
-  return bus;
-}
-
-/*****************************************************************************
- *
  *  throw~/catch~
  *
  */
@@ -276,7 +255,7 @@ access_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   if(ac > 1 && fts_is_number(at + 1))
     access_set_index(o, 0, 0, 1, at + 1);
 
-  if(ac > 0 && fts_is_a(at, bus_type))
+  if(ac > 0 && fts_is_a(at, bus_class))
     access_set_bus(o, 0, 0, 1, at);	
 }
 
@@ -284,39 +263,43 @@ static void
 access_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   access_t *this = (access_t *)o;
+  bus_t **bus;
 
   this->bus = ftl_data_alloc(sizeof(bus_t *));
   this->index = ftl_data_alloc(sizeof(int));
+
+  bus = (bus_t **)ftl_data_get_ptr(this->bus);
+  *bus = NULL;
 
   if(ac > 1 && fts_is_number(at + 1))
     access_set_index(o, 0, 0, 1, at + 1);
 
   if(ac > 0)
     {
-      bus_t **ptr = ftl_data_get_ptr(this->bus);
 
       if(fts_is_symbol(at))
 	{
 	  fts_symbol_t name = fts_get_symbol(at);
 	  
-	  *ptr = bus_get_or_create(fts_object_get_patcher(o), name);
-	  fts_name_add_listener(fts_object_get_patcher(o), name, o);
+	  *bus = bus_get_or_create(fts_object_get_patcher(o), name);
 	  
-	  if(*ptr == NULL)
+	  if(*bus == NULL)
 	    {
 	      fts_object_set_error(o, "%s is not a bus~", name);
 	      return;
 	    }
+
+	  fts_name_add_listener(fts_object_get_patcher(o), name, o);
 	}
-      else if(fts_is_a(at, bus_type))
-	*ptr = (bus_t *)fts_get_object(at);
+      else if(fts_is_a(at, bus_class))
+	*bus = (bus_t *)fts_get_object(at);
       else
 	{
 	  fts_object_set_error(o, "bad argument");
 	  return;
 	}
       
-      fts_object_refer((fts_object_t *)*ptr);
+      fts_object_refer((fts_object_t *)*bus);
     }
   else
     fts_object_set_error(o, "bus~ required");
@@ -335,7 +318,9 @@ access_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
     {
       bus_t **bus = ftl_data_get_ptr(this->bus);
 
-      fts_object_release((fts_object_t *)*bus);
+      if(*bus != NULL)
+	fts_object_release((fts_object_t *)*bus);
+
       ftl_data_free(this->bus);
     }
 
@@ -404,7 +389,7 @@ throw_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_put, throw_put);
 
   fts_class_inlet_varargs(cl, 1, access_varargs);
-  fts_class_inlet(cl, 1, bus_type, access_set_bus);
+  fts_class_inlet(cl, 1, bus_class, access_set_bus);
   fts_class_inlet_int(cl, 1, access_set_index);
 
   fts_dsp_declare_inlet(cl, 0);
@@ -469,7 +454,7 @@ catch_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_put, catch_put);
 
   fts_class_inlet_varargs(cl, 0, access_varargs);
-  fts_class_inlet(cl, 0, bus_type, access_set_bus);
+  fts_class_inlet(cl, 0, bus_class, access_set_bus);
   fts_class_inlet_int(cl, 0, access_set_index);
       
   fts_dsp_declare_inlet(cl, 0);
@@ -487,7 +472,7 @@ signal_bus_config(void)
   fts_dsp_declare_function(throw_tilda_symbol, throw_ftl);
   fts_dsp_declare_function(catch_tilda_symbol, catch_ftl);
 
-  bus_type = fts_class_install(bus_tilda_symbol, bus_instantiate);
+  bus_class = fts_class_install(bus_tilda_symbol, bus_instantiate);
   fts_class_install(throw_tilda_symbol, throw_instantiate);
   fts_class_install(catch_tilda_symbol, catch_instantiate);
 }

@@ -260,7 +260,8 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
      the object, if one of this variables have been redefined. */
   fts_expression_add_variables_user( expression, patcher, obj);
 
-  fts_object_set_description(obj, new_ac, new_at);
+  if(fts_object_get_description_atoms(obj) == NULL)
+    fts_object_set_description(obj, new_ac, new_at);
 
   fts_expression_delete(expression);
 
@@ -329,7 +330,7 @@ fts_object_set_name(fts_object_t *obj, fts_symbol_t sym)
       
       if(sym != fts_s_empty_string)
 	{
-	  fts_patcher_t *scope = fts_patcher_get_top_level(patcher);
+	  fts_patcher_t *scope = fts_patcher_get_scope(patcher);
 	  fts_symbol_t name = fts_name_get_unused(scope, sym);
 	  fts_definition_t *def = fts_definition_get(scope, name);
 	  fts_atom_t a;
@@ -373,19 +374,45 @@ fts_object_get_name(fts_object_t *obj)
  *
  *  delete object
  *
+ *    fts_object_unconnect()
  *    fts_object_unbind()
  *    fts_object_unname()
- *    fts_object_unconnect()
  *    fts_object_unclient()
  *    fts_object_free()
  *
  *    fts_object_destroy()
  *    fts_object_release() ... macro!
- *    fts_object_delete_from_patcher()
  *
  */
 
-static void 
+/* remove all connections from the object (done when unplugged from the patcher) */
+void 
+fts_object_unconnect(fts_object_t *obj)
+{
+  int outlet, inlet;
+
+  /* delete all the survived connections starting in the object */
+  for (outlet=0; outlet<obj->n_outlets; outlet++)
+    {
+      fts_connection_t *p;
+
+      /* must call the real disconnect function, so that all the daemons and methods can fire correctly */
+      while ((p = obj->out_conn[outlet]))
+	fts_connection_delete(p);
+    }
+
+  /* Delete all the survived connections ending in the object */
+  for (inlet=0; inlet<obj->n_inlets; inlet++)
+    {
+      fts_connection_t *p;
+
+      /* must call the real disconnect function, so that all the daemons and methods  can fire correctly */
+      while ((p = obj->in_conn[inlet]))
+	fts_connection_delete(p);
+    }
+}
+
+void 
 fts_object_unbind(fts_object_t *obj)
 {
   fts_list_t *list = obj->name_refs;
@@ -412,33 +439,6 @@ fts_object_unname(fts_object_t *obj)
     }
 }
 
-/* remove all connections from the object (done when unplugged from the patcher) */
-static void 
-fts_object_unconnect(fts_object_t *obj)
-{
-  int outlet, inlet;
-
-  /* delete all the survived connections starting in the object */
-  for (outlet=0; outlet<obj->n_outlets; outlet++)
-    {
-      fts_connection_t *p;
-
-      /* must call the real disconnect function, so that all the daemons and methods can fire correctly */
-      while ((p = obj->out_conn[outlet]))
-	fts_connection_delete(p);
-    }
-
-  /* Delete all the survived connections ending in the object */
-  for (inlet=0; inlet<obj->n_inlets; inlet++)
-    {
-      fts_connection_t *p;
-
-      /* must call the real disconnect function, so that all the daemons and methods  can fire correctly */
-      while ((p = obj->in_conn[inlet]))
-	fts_connection_delete(p);
-    }
-}
-
 static void 
 fts_object_unclient(fts_object_t *obj)
 {
@@ -450,31 +450,18 @@ fts_object_unclient(fts_object_t *obj)
 void 
 fts_object_destroy(fts_object_t *obj)
 {
+  /* unregister name */
+  fts_object_unname(obj);
+
   /* call deconstructor */
   if(fts_class_get_deconstructor(fts_object_get_class(obj)))
     fts_class_get_deconstructor(fts_object_get_class(obj))(obj, fts_system_inlet, fts_s_delete, 0, 0);
-
-  fts_object_unname(obj);
 
   /* release all client components */
   fts_object_unclient(obj);
 
   /* free memory */
   fts_object_free(obj);
-}
-
-void 
-fts_object_delete_from_patcher(fts_object_t *obj)
-{
-  /* remove connections */
-  fts_object_unconnect(obj);
-
-  /* unbind the objects from defined and used variables */
-  fts_object_unname(obj);
-  fts_object_unbind(obj);
-
-  if(obj->patcher)
-    fts_patcher_remove_object(obj->patcher, obj);
 }
 
 /*********************************************************************************
