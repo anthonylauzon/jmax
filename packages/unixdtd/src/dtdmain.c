@@ -102,8 +102,6 @@ typedef struct {
 } dtdhandle_t;
 
 /* One read block for all */
-/* @@@@ HACK */
-#define BLOCK_MAX_CHANNELS 8
 static short read_block[BLOCK_FRAMES*BLOCK_MAX_CHANNELS];
 
 #define N 256
@@ -122,14 +120,14 @@ static int dtd_read_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, in
   if (n_read < 0)
     return -1;
 
-  dst = (volatile float *)dtdfifo_get_write_pointer( fifo);
-
   index = dtdfifo_get_write_index( fifo)/sizeof( float);
   buffer_size = dtdfifo_get_buffer_size( fifo)/sizeof( float);
   size = n_read * n_channels;
 
   if ( index + size < buffer_size )
     {
+      dst = (volatile float *)dtdfifo_get_write_pointer( fifo);
+
       for ( n = 0; n < size; n++)
 	{
 	  *dst++ = ((float)*buffer++) / 32767.0f;
@@ -137,6 +135,8 @@ static int dtd_read_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, in
     }
   else
     {
+      dst = (volatile float *)dtdfifo_get_write_pointer( fifo);
+
       for ( n = 0; n < buffer_size - index; n++)
 	{
 	  *dst++ = ((float)*buffer++) / 32767.0f;
@@ -341,15 +341,12 @@ static void dtd_open( const char *line)
 
   handle = (dtdhandle_t *)dtdfifo_get_user_data( id);
   
-  file = handle->file;
-  handle->n_channels = n_channels;
-
   dtdfifo_set_used( fifo, FIFO_LEFT, 1);
 
   /* This should not happen */
-  if ( file != AF_NULL_FILEHANDLE)
+  if ( handle->file != AF_NULL_FILEHANDLE)
     {
-      afCloseFile( file);
+      afCloseFile( handle->file);
       handle->file = AF_NULL_FILEHANDLE;
     }
 
@@ -357,12 +354,13 @@ static void dtd_open( const char *line)
     return;
 
   handle->file = file;
+  handle->n_channels = n_channels;
 
   for ( i = 0; i < BLOCK_FRAMES/PRELOAD_BLOCK_FRAMES; i++)
     {
       int ret;
 
-      ret = dtd_read_block( file, fifo, read_block, PRELOAD_BLOCK_FRAMES, handle->n_channels);
+      ret = dtd_read_block( file, fifo, read_block, PRELOAD_BLOCK_FRAMES, n_channels);
     }
 
   DTD_DEBUG( __debug( "opened `%s'", filename) );
@@ -381,8 +379,8 @@ static void dtd_close( const char *line)
 
   /*
    * A "close" command is send by FTS when it releases the fifo.
-   * It will not reallocate the fifo till it is marked
-   * as write_used, so we can safely reinitialize it here.
+   * It will not reallocate the fifo as long as it is marked
+   * as used, so we can safely reinitialize it here.
    */
   dtdfifo_set_eof( fifo, 0);
   dtdfifo_set_read_index( fifo, 0);
@@ -467,7 +465,7 @@ static void dtd_process_fifo( int id, dtdfifo_t *fifo, void *user_data)
 
       block_size = BLOCK_FRAMES * n_channels * sizeof( float);
 
-      DTD_DEBUG( __debug( "polling fifo %d", id));
+      DTD_DEBUG( __debug( "polling fifo %d channels=%d level=%d block_size=%d", id, n_channels, dtdfifo_get_write_level( fifo), block_size));
 
       if ( dtdfifo_get_write_level( fifo) >= block_size )
 	{

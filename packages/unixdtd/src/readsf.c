@@ -203,7 +203,6 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
     {
       dtdserver_new( DTD_BASE_DIR, BLOCK_FRAMES * BLOCK_MAX_CHANNELS * BLOCKS_PER_FIFO * sizeof( float));
     }
-  /* To Be Written */
 
   this->state = readsf_closed;
   this->can_post_data_late = 1;
