@@ -16,7 +16,7 @@ dir:
 jar:
 	-@cd ..\java\classes
 	-@if exist "$(PKG).jar" erase "$(PKG).jar"
-	$(JAR) -cf ..\$(PKG).jar ircam Ispw.class
+	$(JAR) -cf ..\$(PKG).jar ircam ..\icons *.class
 classes:
 	cd ..\java\ircam\jmax
 	cd ispw
