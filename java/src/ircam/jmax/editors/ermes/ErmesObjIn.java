@@ -33,13 +33,17 @@ class ErmesObjIn extends ErmesObject {
 
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
   //We need here the information about the maximum number of inlets
-  	
-    itsSketchPad = theSketchPad;
-        
-    super.Init(theSketchPad, x, y, theString);	//this was not here...
-    makeCurrentRect(x, y);
 
-    int temp = GetSketchWindow().itsPatcher.getNumberOfInlets();
+    itsSketchPad = theSketchPad;  // (fd) itsSketchPad is set in ErmesObject::Init
+
+    // >>> (fd) this piece of code which was after calling super.Init(),
+    // must be BEFORE it, because super.Init() calls makeFtsObject that uses member 
+    // variable itsId which was not initialized.
+    // i.e. 1) the constructor calls super()
+    // 2) the constructor of the super class calls an abstract function defined in the subclass
+    // 3) this function is called on a partially initialized object.
+    // May be this is a potential source of problems ?
+    int temp = theSketchPad.GetSketchWindow().itsPatcher.getNumberOfInlets();
     if (temp == 0) {//top patcher special case!
       //make the first
       temp = 1;
@@ -50,11 +54,13 @@ class ErmesObjIn extends ErmesObject {
       itsId = theSketchPad.inCount++;   //for now no deleting handled
     else
       itsId = temp - 1;
-    
+    // <<< (fd)
+
+    super.Init(theSketchPad, x, y, theString);	//this was not here...
+    makeCurrentRect(x, y);
 
     //it was here super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
 
-    
     return true;
   }
 	

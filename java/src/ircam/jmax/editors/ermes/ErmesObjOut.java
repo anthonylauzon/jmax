@@ -33,20 +33,22 @@ class ErmesObjOut extends ErmesObject {
   }
 
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-
-    //We need here the information about the maximum number of inlets
+    //We need here the information about the maximum number of outlets
   	
-    itsSketchPad = theSketchPad;
+    itsSketchPad = theSketchPad;  // (fd) itsSketchPad is set in ErmesObject::Init
+
+    // >>> (fd) See ErmesObjIn.java for comments.
+    int temp = theSketchPad.GetSketchWindow().itsPatcher.getNumberOfInlets();
+    
+    if (theSketchPad.outCount < temp)
+      itsId = theSketchPad.outCount++;   //for now no deleting handled
+    else
+      itsId = temp - 1;
+    // <<< (fd)
+
     super.Init(theSketchPad, x, y, theString);	//it was not here...
 
     makeCurrentRect(x, y);
-    int temp = GetSketchWindow().itsPatcher.getNumberOfOutlets();
-
-    if (theSketchPad.outCount < temp)
-      itsId = theSketchPad.outCount++;   //for now no deleting handled
-    else itsId = temp-1;
-    //it was here super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
-
 	
     return true;
   }
