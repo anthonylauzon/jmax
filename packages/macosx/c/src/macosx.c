@@ -21,10 +21,12 @@
  */
 
 extern void halaudioport_config( void);
+extern void macosxmidiport_config( void);
 extern void qtfile_config(void);
 
 void macosx_config(void)
 {
   halaudioport_config();
+  macosxmidiport_config();
   qtfile_config();
 }
