@@ -199,7 +199,7 @@ sgi_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   /* sample width */
 
-  ret = alSetWidth(dev_data->config, AL_SAMPLE_16);
+  ret = alSetWidth(dev_data->config, AL_SAMPLE_24);
 
   if (ret != 0)
     {
@@ -543,7 +543,7 @@ sgi_adc_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   /* Set defaults for the other values */
 
-  alSetWidth(dev_data->config, AL_SAMPLE_16); 
+  alSetWidth(dev_data->config, AL_SAMPLE_24); 
 
   /* Parameter parsing and setting: channels */
 
