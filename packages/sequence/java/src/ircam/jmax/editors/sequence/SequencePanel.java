@@ -171,12 +171,14 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     geometry.addZoomListener( new ZoomListener() {
 	public void zoomChanged(float zoom, float oldZoom)
 	    {
+		if(zoom == oldZoom) return;
 		statusBar.post(manager.getCurrentTool(),"zoom "+((int)(zoom*100))+"%");
 		repaint();
 		TrackEvent lastEvent = sequenceData.getLastEvent();
 		if(lastEvent!=null)
 		    resizePanelToTimeWithoutScroll((int)(lastEvent.getTime()+
 							 ((Double)lastEvent.getProperty("duration")).intValue()));
+		ftsSequenceObject.requestSetZoom(zoom);
 	    }
     });
 
@@ -194,6 +196,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	    int currentTime = e.getValue();
 	    
 	    geometry.setXTransposition(-currentTime);	    
+	    ftsSequenceObject.requestSetScroll(-currentTime);
 	}
     });
 

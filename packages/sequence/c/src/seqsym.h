@@ -58,6 +58,8 @@ extern fts_symbol_t seqsym_import_midi;
 extern fts_symbol_t seqsym_import_midi_dialog;
 extern fts_symbol_t seqsym_bmax_add_track;
 extern fts_symbol_t seqsym_bmax_add_event;
+extern fts_symbol_t seqsym_set_zoom;
+extern fts_symbol_t seqsym_set_scroll;
 
 /* messages to client */
 extern fts_symbol_t seqsym_createEditor;
@@ -73,6 +75,7 @@ extern fts_symbol_t seqsym_highlightEvents;
 extern fts_symbol_t seqsym_openFileDialog;
 extern fts_symbol_t seqsym_lock;
 extern fts_symbol_t seqsym_unlock;
+extern fts_symbol_t seqsym_setEditorGeometry;
 
 #endif
 

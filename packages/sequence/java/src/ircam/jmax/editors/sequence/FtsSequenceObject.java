@@ -152,6 +152,12 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 	sequence.setName(args[0].getString());
     }
 
+    public void setEditorGeometry(int nArgs , FtsAtom args[])
+    {
+	sequence.itsSequencePanel.geometry.setXZoom((int)(100*args[0].getFloat()));
+	sequence.itsSequencePanel.itsTimeScrollbar.setValue(-args[1].getInt());
+    }    
+
     public void setOpenedAllTracks(boolean opened)
     {
 	Track track;
@@ -290,6 +296,20 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
     {
 	FtsTrackObject.sendArgs[0].setObject((FtsTrackObject)track.getTrackDataModel()); 
 	sendMessage(FtsObject.systemInlet, "remove_track", 1, FtsTrackObject.sendArgs);
+    }
+    
+    public void requestSetZoom(float zoom)
+    {
+	FtsTrackObject.sendArgs[0].setFloat(zoom); 
+	sendMessage(FtsObject.systemInlet, "set_zoom", 1, FtsTrackObject.sendArgs);    
+	setDirty();
+    }
+
+    public void requestSetScroll(int scroll)
+    {
+	FtsTrackObject.sendArgs[0].setInt(scroll); 
+	sendMessage(FtsObject.systemInlet, "set_scroll", 1, FtsTrackObject.sendArgs);    
+	setDirty();
     }
 
     public void requestSequenceName()

@@ -153,6 +153,8 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->tracks = 0;
   this->size = 0;
   this->open = 0;  
+  this->zoom = 0.2;
+  this->scroll = 0;
 }
 
 static void
@@ -271,6 +273,11 @@ sequence_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   if(n > 0)
     fts_client_send_message(o, seqsym_addTracks, n, a);
+  
+  /* upload zoom and scroll */
+  fts_set_float(a+0, this->zoom);
+  fts_set_int(a+1, this->scroll);
+  fts_client_send_message(o, seqsym_setEditorGeometry, 2, a);
 }
 
 static void
@@ -290,6 +297,20 @@ sequence_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
   sequence_set_editor_close(this);
   /* here we could as well un-upload the objects (and the client would have to destroy the proxies) */
+}
+
+static void
+sequence_set_zoom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+  this->zoom = fts_get_float(at);
+}
+
+static void
+sequence_set_scroll(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+  this->scroll = fts_get_int(at);
 }
 
 static void
@@ -477,7 +498,7 @@ static void
 sequence_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
-  fts_bmax_file_t *f = (fts_bmax_file_t *) fts_get_ptr(at);  
+  fts_bmax_file_t *file = (fts_bmax_file_t *) fts_get_ptr(at);  
   track_t *track = sequence_get_first_track(this);
 
   while(track)
@@ -485,6 +506,13 @@ sequence_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       fts_send_message((fts_object_t *)track, fts_SystemInlet, fts_s_save_bmax, ac, at);
       track = track_get_next(track);
     }
+  /* save zoom and scroll */
+  fts_bmax_code_push_float(file, this->zoom);
+  fts_bmax_code_obj_mess(file, fts_SystemInlet, seqsym_set_zoom, 1);
+  fts_bmax_code_pop_args(file, 1);
+  fts_bmax_code_push_int(file, this->scroll);
+  fts_bmax_code_obj_mess(file, fts_SystemInlet, seqsym_set_scroll, 1);
+  fts_bmax_code_pop_args(file, 1);
 }
 
 /******************************************************
@@ -518,6 +546,8 @@ sequence_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("remove_track"), sequence_remove_track_by_client_request);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("move_track"), sequence_move_track_by_client_request);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_name"), sequence_send_name_to_client);
+      fts_method_define_varargs(cl, fts_SystemInlet, seqsym_set_zoom, sequence_set_zoom);
+      fts_method_define_varargs(cl, fts_SystemInlet, seqsym_set_scroll, sequence_set_scroll);
 
       fts_method_define_varargs(cl, 0, seqsym_clear, sequence_clear);
       fts_method_define_varargs(cl, 0, seqsym_print, sequence_print);
