@@ -85,7 +85,7 @@ public class HelpMenu extends JMenu
 	});
        }
     
-    item = new JMenuItem("JMax Editing");
+    item = new JMenuItem("Patch Editor summary");
     add(item);
     item.addActionListener(Actions.showHtmlAction);
   }

@@ -51,10 +51,10 @@ public class HTMLDialog extends JDialog /*implements ActionListener, KeyListener
   static HTMLDialog dialog = null;
   JEditorPane editorPane;
 
-  public static void showThisPackageDoc(String packageName)
+  public static void showThisPackageDoc(String packageName, String title)
   {
     if(dialog==null){
-      dialog = new HTMLDialog(getUrlName(packageName));
+      dialog = new HTMLDialog(getUrlName(packageName), title);
       dialog.setLocation(300, 300);
       dialog.setVisible(true);
     }
@@ -62,16 +62,16 @@ public class HTMLDialog extends JDialog /*implements ActionListener, KeyListener
       if(dialog.isVisible())
 	dialog.toFront();
       else{
-	dialog.reinit(getUrlName(packageName));      
+	dialog.reinit(getUrlName(packageName), title);      
 	dialog.setLocation(300, 300);
 	dialog.setVisible(true);
       }
   }
 
-  public static void showThisPage(String path, String pageName)
+  public static void showThisPage(String path, String pageName, String title)
   {
     if(dialog==null){
-      dialog = new HTMLDialog(path+pageName);
+      dialog = new HTMLDialog(path+pageName, title);
       dialog.setLocation(300, 300);
       dialog.setVisible(true);
     }    
@@ -79,7 +79,7 @@ public class HTMLDialog extends JDialog /*implements ActionListener, KeyListener
       if(dialog.isVisible())
 	dialog.toFront();
       else{
-	dialog.reinit(getUrlName(path+pageName));      
+	dialog.reinit(getUrlName(path+pageName), title);      
 	dialog.setLocation(300, 300);
 	dialog.setVisible(true);
       }
@@ -95,7 +95,7 @@ public class HTMLDialog extends JDialog /*implements ActionListener, KeyListener
       separator+"index.html";
   }
 
-  public HTMLDialog(String urlName)
+  public HTMLDialog(String urlName, String title)
   {
     super();
 
@@ -125,7 +125,7 @@ public class HTMLDialog extends JDialog /*implements ActionListener, KeyListener
 
     editorPane.addHyperlinkListener(new Hyperactive()); 
 
-    setTitle(editorPane.getPage().getFile());
+    setTitle(title);
     //addKeyListener(this);
 
     pack();
@@ -152,10 +152,11 @@ public class HTMLDialog extends JDialog /*implements ActionListener, KeyListener
     }
   }
 
-  void reinit(String urlName){
+  void reinit(String urlName, String title){
     try {
       URL helpURL = new URL(urlName);
       displayURL(helpURL, editorPane);
+      setTitle(title);
     } catch (Exception e) {
       System.err.println("Couldn't create help URL: " + urlName);
     }
@@ -187,4 +188,6 @@ public class HTMLDialog extends JDialog /*implements ActionListener, KeyListener
   }
   /***************************************************************/
 }
+
+
 
