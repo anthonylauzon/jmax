@@ -569,9 +569,9 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
       displayList.reassignLayers();
 
     object.updateInOutlets();
+
     if( !multiAdd)
       ErmesSelection.patcherSelection.deselectAll();
-    else multiAdd = false;
 
     if( fromToolbar)
       {
@@ -579,7 +579,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 	fromToolbar = false;
       }
     redraw();
-    if (doEdit && newObjectEdit && (object instanceof Editable))
+    if (doEdit && newObjectEdit && (!multiAdd) && (object instanceof Editable))
       {
 	// The EditField is not really ready until the control
 	// is returned back to the event loop; this is why we invoke textEditObject 
@@ -591,6 +591,8 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 	    public void run()
 	    { textEditObject((Editable)obj);}});
       }
+    
+    multiAdd = false;
   }
 
   public void objectRedefined(FtsGraphicObject fObj)

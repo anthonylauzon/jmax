@@ -240,16 +240,15 @@ public class Comment extends Editable
     selectedColor = new Color( darker.getRed(), darker.getGreen(), darker.getBlue(), color.getAlpha());
     selectedOpaqueColor = darker;
     opaqueColor = new Color( color.getRed(), color.getGreen(), color.getBlue());
-    if( color.getAlpha() < 10)
-      {
-	editColor = new Color( color.getRed(), color.getGreen(), color.getBlue(), 14);
-	editSelectedColor = new Color( darker.getRed(), darker.getGreen(), darker.getBlue(), 16);
-      }    
+    if( color.getAlpha() < 14)
+      editColor = new Color( color.getRed(), color.getGreen(), color.getBlue(), 14);
     else
-      {
-	editColor = color;
-	editSelectedColor = selectedColor;
-      }
+      editColor = color;
+
+    if( color.getAlpha() < 100)
+      editSelectedColor = new Color( darker.getRed(), darker.getGreen(), darker.getBlue(), 100);
+    else
+      editSelectedColor = selectedColor;
   }
 
   public void paint(Graphics g) 

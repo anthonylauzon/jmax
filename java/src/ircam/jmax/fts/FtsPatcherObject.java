@@ -931,7 +931,6 @@ public class FtsPatcherObject extends FtsObjectWithEditor
       {
 	String descr = ((FtsGraphicObject)newObj.getFtsObject()).getDescription();
 	if( descr!=null) descr.trim();
-	
 	if((descr!=null) && descr.equals(""))
 	  doEdit = true;
       }
