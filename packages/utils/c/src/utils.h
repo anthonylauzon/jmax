@@ -17,11 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 #ifndef _UTILS_H
 #define _UTILS_H
@@ -332,5 +327,49 @@ UTILS_API void fts_framps_set_size(fts_framps_t *ramp_vector, int size);
 
 #define fts_framps_get(ramp_vector) ((ramp_vector)->value)
 
+
+/*****************************************
+ *
+ *  complex numbers
+ *
+ */
+
+#define MAG re
+#define ARG im
+#define RE re
+#define IM im
+
+typedef struct{
+  float re, im;
+} complex;
+
+UTILS_API complex CZERO;
+
+
+/*********************************************************************************
+ *
+ *    FFT computation
+ *
+ */
+
+#define FTS_FFT_MIN_SIZE 16
+
+#define FTS_FFT_MAX_SIZE_LOG2 16
+#define FTS_FFT_MAX_SIZE (1 << FTS_FFT_MAX_SIZE_LOG2)
+
+/* intitialize FFT/IFFT procedures for a specific size (returns non zero when successfull) */
+UTILS_API int fts_fft_declaresize(int size);
+/* check FFT/IFFT size (returns non zero for valid fft size) */
+UTILS_API int fts_is_fft_size(int size);
+
+UTILS_API void fts_cfft_inplc(complex *buf, int size);
+UTILS_API void fts_cifft_inplc(complex *buf, int size);
+UTILS_API void fts_rfft_inplc(float *buf, int size); /* takes real buffer of size size */
+UTILS_API void fts_rifft_inplc(float *buf, int size); /* "returns" real buffer of size size */
+
+UTILS_API void fts_cfft(complex *in, complex *out, int size);
+UTILS_API void fts_cifft(complex *in, complex *out, int size);
+UTILS_API void fts_rfft(float *in, complex *out, int size);
+UTILS_API void fts_rifft(complex *in, float *out, int size);
 
 #endif /* _UTILS_H */

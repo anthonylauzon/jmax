@@ -29,5 +29,9 @@ cubic.c \
 floatfuns.c \
 ramps.c \
 ramp_vectors.c \
+complex.c \
+cfft.c \
+rfft_shuffle.c \
+vec_fft.c \
 utils.c 
 
