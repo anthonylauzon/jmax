@@ -427,10 +427,7 @@ void fts_async_init()
 }
 
 
-/* Simplification number one: there two device class,
-   a read and a write one, called readsf and writesf.
-   readsf will be implemented first, writesf later.
-   */
+/** READSF **/
 
 
 static fts_status_t sgi_readsf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args);
@@ -600,8 +597,6 @@ sgi_readsf_get_nchans(fts_dev_t *dev)
   return dev_data->nch;
 }
 
-/* If the file is finished, we probabily just crash ... @@@ MUST HANDLE EOF */
-/* Probabily, we should get optimized version for mono and stereo files (??) */
 
 static void
 sgi_readsf_get(fts_word_t *argv)
@@ -622,7 +617,7 @@ sgi_readsf_get(fts_word_t *argv)
 
       /* return all zeros if not active or if write only or in the eof case */
 
-      if (dev_data->active && (! dev_data->eof))
+      if (dev_data->active)
 	{
 	  float *in;
 	  int ret;
@@ -766,9 +761,334 @@ static void fts_readsf_forker(void *data)
 }
 
 
-/* File Init */
+/** WRITESF **/
 
-static void test_init(void);	/* @@@ */
+
+static fts_status_t sgi_writesf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args);
+static fts_status_t sgi_writesf_close(fts_dev_t *dev);
+
+static void sgi_writesf_put(fts_word_t *argv);
+
+static fts_status_t sgi_writesf_activate(fts_dev_t *dev);
+static fts_status_t sgi_writesf_deactivate(fts_dev_t *dev);
+static int          sgi_writesf_get_nchans(fts_dev_t *dev);
+
+static void fts_writesf_forker(void *data);
+
+static void sgi_writesf_init(void)
+{
+  fts_dev_class_t *sgi_writesf_class;
+
+  /* dac file */
+
+  sgi_writesf_class = fts_dev_class_new(fts_sig_dev, fts_new_symbol("writesf"));
+
+  /* Installation of all the device class functions */
+
+  fts_dev_class_set_open_fun(sgi_writesf_class, sgi_writesf_open);
+  fts_dev_class_set_close_fun(sgi_writesf_class, sgi_writesf_close);
+
+  fts_dev_class_sig_set_put_fun(sgi_writesf_class, sgi_writesf_put);
+
+  fts_dev_class_sig_set_activate_fun(sgi_writesf_class, sgi_writesf_activate);
+  fts_dev_class_sig_set_deactivate_fun(sgi_writesf_class, sgi_writesf_deactivate);
+  fts_dev_class_sig_set_get_nchans_fun(sgi_writesf_class, sgi_writesf_get_nchans);
+}
+
+
+/* The device data do not contain the file  descriptor, beacause
+   it is a private data of the writer thread. */
+
+struct writesf_data
+{
+  /* The reader thread */
+
+  pthread_t writer_thread;
+
+  /* The sample fifo that connect the read thread to us */
+
+  fts_sample_fifo_t *fifo;
+
+  int file_block;
+  int fifo_size;
+
+  /* main thread (open) data */
+
+  fts_symbol_t file_name;	/* the file name, filled by open */
+  fts_atom_t *format_descr;	/* the pointer to the format descriptor */
+  int nch;			/* number of channels, fill*/
+  float sr;			/* Sampling rate to use for the file */
+
+  /* housekeeping */
+
+  int active; /* Used directly by the writesf object */
+  int eof;
+};
+
+
+static void writesf_data_describe(const char *msg, struct writesf_data *data)
+{
+  fprintf(stderr, "%s: DATA %lx\n", msg, (unsigned int) data);
+  fprintf(stderr, "\tfifo %lx\n", (unsigned int) data->fifo);
+  fprintf(stderr, "\tfile_block %d\n", data->file_block);
+  fprintf(stderr, "\tfifo_size_p %d\n", data->fifo_size);
+  fprintf(stderr, "\tfile_name %s\n", fts_symbol_name(data->file_name));
+  fprintf(stderr, "\tnch %d\n", data->nch);
+  fprintf(stderr, "\tactive %d\n", data->active);
+  fprintf(stderr, "\teof %d\n", data->eof);
+}
+
+
+static fts_status_t
+sgi_writesf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
+{
+  fts_symbol_t format_name;
+  struct writesf_data *dev_data;
+
+  if ((nargs < 1) || (! fts_is_symbol(&args[0])))
+    return &fts_dev_open_error;
+
+  /* make the structure */
+
+  dev_data = (struct writesf_data *) fts_malloc(sizeof(struct writesf_data));
+  fts_dev_set_device_data(dev, dev_data);
+
+  /* get the file name */
+
+  dev_data->file_name = fts_get_symbol(&args[0]);
+  dev_data->eof = 0;
+  dev_data->active = 0;
+
+  /* parse the other file parameters : channels and format.
+     Note that while in theory the device should automatically get the number
+     of channels of the file, since this device is used by the writesf and family
+     objects, the read number of channels is fixed by the object, and not by the file;
+     anyway, it seems that the SGI library can fix this, by automagically mixing
+     the different tracks to get the needed number of channels.
+     No test is done on the number of channels, we just accept everything
+     the af library accept; will be used after the opening to set the 
+     virtual channels.
+     */
+
+  dev_data->nch = fts_get_int_by_name(nargs, args, fts_new_symbol("channels"), 2);
+  dev_data->sr  = fts_get_float_by_name(nargs, args, fts_s_sampling_rate, 44100.0f); /* mandatory! */
+
+  format_name = fts_get_symbol_by_name(nargs, args, fts_new_symbol("format"), fts_s_void);
+
+  if (format_name == fts_s_void)
+    {
+      /* Try with the filename extension */
+
+      char *extension = strrchr(fts_symbol_name(dev_data->file_name), '.');
+      
+      if (extension)
+	format_name = fts_new_symbol(extension + 1);
+      else
+	format_name = fts_soundfile_format_get_default();
+    }
+
+  dev_data->format_descr = fts_soundfile_format_get_descriptor(format_name);
+  dev_data->file_block = fts_get_int_by_name(nargs, args, fts_new_symbol("fileblock"), 16 * 1024);
+  dev_data->fifo_size  = fts_get_int_by_name(nargs, args, fts_new_symbol("fifosize"),  64 * 1024);
+
+  /* Make a sample fifo */
+
+  dev_data->fifo = fts_sample_fifo_new(dev_data->fifo_size, dev_data->file_block, MAXVS * dev_data->nch);
+
+  /*  Start the reader thread  using a async call*/
+
+  fts_async_call(fts_writesf_forker, (void *)dev_data);
+
+  return fts_Success;
+}
+
+static fts_status_t
+sgi_writesf_close(fts_dev_t *dev)
+{
+  struct writesf_data *dev_data;
+
+  dev_data = fts_dev_get_device_data(dev);
+
+  /* Just tell the worker thread to close and destroy everything */
+
+  fts_sample_fifo_set_write_status(dev_data->fifo, SFDEV_CLOSE);
+
+  return fts_Success;
+}
+
+
+static fts_status_t sgi_writesf_activate(fts_dev_t *dev)
+{
+  struct writesf_data *dev_data;
+
+  dev_data = fts_dev_get_device_data(dev);
+  dev_data->active = 1;
+
+  return fts_Success;
+}
+
+
+static fts_status_t sgi_writesf_deactivate(fts_dev_t *dev)
+{
+  struct writesf_data *dev_data;
+
+  dev_data = fts_dev_get_device_data(dev);
+  dev_data->active = 0;
+
+  return fts_Success;
+}
+
+static int
+sgi_writesf_get_nchans(fts_dev_t *dev)
+{
+  struct writesf_data *dev_data;
+
+  dev_data = fts_dev_get_device_data(dev);
+
+  return dev_data->nch;
+}
+
+
+static void
+sgi_writesf_put(fts_word_t *argv)
+{
+  fts_dev_t *dev = *((fts_dev_t **) fts_word_get_ptr(argv));
+  struct writesf_data *dev_data;
+  int nchans;
+  int n;
+  int ch;
+  int i,j;
+
+  nchans = fts_word_get_long(argv + 1);
+  n = fts_word_get_long(argv + 2);
+
+  if (dev)
+    {
+      dev_data = fts_dev_get_device_data(dev);
+
+      /* return all zeros if not active or if write only or in the eof case */
+
+      if (dev_data->active)
+	{
+	  float *out;
+	  int ret;
+
+	  out = fts_sample_fifo_want_to_put(dev_data->fifo);
+      
+	  /* do the data transfer, transforming from interleaved to separate channels */
+
+	  for (ch = 0; ch < nchans; ch++)
+	    {
+	      float *in;
+
+	      in = (float *) fts_word_get_ptr(argv + 3 + ch);
+
+	      for (i = ch, j = 0; j < n; i = i + nchans, j++)
+		in[i] = out[j];
+	    }
+
+	  /* Unlock the buffer */
+
+	  fts_sample_fifo_putted(dev_data->fifo);
+
+	  return;
+	}
+    }
+}
+
+
+/* WRITER THREAD: MUST started by an async call; will read the file
+   file_block samples at a time; note that this value should be the same
+   used to initialize the sample fifo.
+*/
+
+
+static void *fts_writesf_worker(void *data)
+{
+  int i;
+  int ret;
+  int eof = 0;
+  AFfilehandle  file;		
+  struct writesf_data *dev_data = (struct writesf_data *)data;
+  fts_sample_fifo_t *fifo = dev_data->fifo;
+  int frames_for_block = (dev_data->file_block / dev_data->nch);
+  AFfilesetup setup;
+
+  /* Actually Open the audio file  */
+
+  setup = afNewFileSetup();
+
+  afInitFileFormat(setup, fts_get_int(dev_data->format_descr));
+  afInitRate(setup, AF_DEFAULT_TRACK, dev_data->sr);
+  afInitChannels(setup, AF_DEFAULT_TRACK, dev_data->nch);
+
+  file = afOpenFile(fts_symbol_name(dev_data->file_name), "w", 0);
+
+  afFreeFileSetup(setup);
+
+  if (file == AF_NULL_FILEHANDLE)
+    {
+      eof = 1;
+      fts_sample_fifo_set_write_status(fifo, SFDEV_EOF);
+    }
+  else
+    {
+      /* Set the virtual format of the file */
+
+      afSetVirtualSampleFormat(file, AF_DEFAULT_TRACK, AF_SAMPFMT_FLOAT, 32);
+    }
+
+  /*  LOOP: on the out of band status --> read the file -> Write to the sample fifo */
+
+  while (fts_sample_fifo_get_write_status(fifo) != SFDEV_CLOSE)
+    {
+      float *p;
+
+      p = fts_sample_fifo_want_to_get(fifo);
+
+      if (! eof)
+	{
+	  /* @@@ CHECK THIS CALL */
+
+	  ret = afWriteFrames(file, AF_DEFAULT_TRACK, p, frames_for_block);
+
+	  if (ret != frames_for_block)
+	    {
+	      /* I/O Error, ignore data from now own */
+	      /* Set the eof flag */
+
+	      eof = 1;
+	    }
+	}
+
+      fts_sample_fifo_putted(fifo);
+    }
+
+  /* Close the file, free all the structures and exit the thread */
+
+  afCloseFile(file);
+  
+  fts_sample_fifo_destroy(fifo);
+  fts_free(dev_data);
+
+  return NULL;
+}
+
+/* The function called async to create a reader thread */
+
+static void fts_writesf_forker(void *data)
+{
+  int rc;
+  struct writesf_data *dev_data = (struct writesf_data *)data;
+
+  rc = pthread_create(&(dev_data->writer_thread), NULL, fts_writesf_worker, data);
+
+  if (rc)
+    fprintf(stderr, "fts_writesf_forker_init: return code from pthread_create() is %d\n", rc);
+}
+
+
+/* File Init */
 
 void sfdev_init(void)
 {
@@ -776,6 +1096,7 @@ void sfdev_init(void)
   fts_cmd_fifo_init();
   fts_async_init();
   sgi_readsf_init();
+  sgi_writesf_init();
 }
 
 
