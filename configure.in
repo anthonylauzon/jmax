@@ -1,8 +1,11 @@
-dnl $Id: configure.in,v 1.112 2003/04/01 14:26:01 borghesi Exp $
+dnl $Id: configure.in,v 1.113 2003/04/02 13:36:53 p_tisserand Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.113  2003/04/02 13:36:53  p_tisserand
+dnl Added realpath check in configure.
+dnl
 dnl Revision 1.112  2003/04/01 14:26:01  borghesi
 dnl *** empty log message ***
 dnl
@@ -291,6 +294,7 @@ AM_PATH_AUDIOFILE(0.0.2,[PLATFORM_PACKAGES="unixdtd aflib $PLATFORM_PACKAGES"],[
 AM_PATH_ALSA(0.9.0,[
 	DEFAULT_CONFIG_FILE=default_config_linux_alsa.jcfg
 	PLATFORM_PACKAGES="alsa $PLATFORM_PACKAGES"
+	CFLAGS="$CFLAGS -DUSE_ALSA"
 ],[
 	DEFAULT_CONFIG_FILE=default_config_linux_oss.jcfg
 ])
