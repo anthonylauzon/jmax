@@ -20,31 +20,32 @@
  * 
  */
 
-#ifndef _FTS_PRIVATE_AUDIO_H_
-#define _FTS_PRIVATE_AUDIO_H_
+#ifndef _FTS_PRIVATE_MIDI_H_
+#define _FTS_PRIVATE_MIDI_H_ 1
 
-typedef struct _audiolabel
+
+typedef struct _midilabel
 {
-    fts_object_t* o;
-/* dummy structure */
-/*   fts_symbol_t name; */
-/*   fts_audiostream_t *input; */
-/*   fts_audiostream_t *output; */
-/*   fts_symbol_t input_name; */
-/*   fts_symbol_t output_name; */
-/*   struct _audiolabel *next; */
-} audiolabel_t;
+  fts_symbol_t name;
+  fts_midiport_t *input;
+  fts_midiport_t *output;
+  fts_symbol_t input_name;
+  fts_symbol_t output_name;
+  struct _midilabel *next;
+} midilabel_t;
 
-typedef struct _audioconfig
+typedef struct _midiconfig
 {
-    fts_object_t o;
-    audiolabel_t* labels;
-    int n_labels;    
-    int dirty;
-} audioconfig_t;
+  fts_object_t o;
+  midilabel_t *labels;
+  int n_labels;
+  int dirty;
+} midiconfig_t;
 
-extern fts_class_t* audioconfig_type;
 
-extern void fts_audio_idle( void);
+extern fts_class_t* midiconfig_type;
 
-#endif
+void fts_midiconfig_set(midiconfig_t* config);
+void fts_midiconfig_set_defaults(midiconfig_t* config);
+
+#endif /* _FTS_PRIVATE_MIDI_H_ */
