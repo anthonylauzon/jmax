@@ -1201,7 +1201,6 @@ static void
 fslice_instantiate(fts_class_t *cl)
 {
   /* standard functions */
-/*   fts_class_set_post_function(cl, fslice_post); */
   fts_class_message_varargs(cl, fts_s_print, fslice_print);
   fts_class_message_varargs(cl, fts_s_get_element, _fslice_get_element);
   fts_class_message_varargs(cl, fts_s_get, _fslice_get_element);
