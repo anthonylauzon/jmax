@@ -20,7 +20,6 @@
  *
  */
 #include <fts/fts.h>
-#include <float.h>
 #include "bpf.h"
 #include "ivec.h"
 #include "fvec.h"
@@ -111,6 +110,25 @@ getinter_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     }
 }
 
+static void
+getinter_ivec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getinter_t *this = (getinter_t *)o;
+
+  switch(ac)
+    {
+    default:
+    case 2:
+      if(ivec_atom_is(at + 1))
+	getinter_set_reference(o, 0, 0, 1, at + 1);
+    case 1:
+      if(fts_is_number(at))
+	getinter_ivec(o, 0, 0, 1, at + 0);	
+    case 0:
+      break;
+    }
+}
+
 /******************************************************
  *
  *  fvec
@@ -142,11 +160,54 @@ getinter_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     }
 }
 
+static void
+getinter_fvec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getinter_t *this = (getinter_t *)o;
+
+  switch(ac)
+    {
+    default:
+    case 2:
+      if(fvec_atom_is(at + 1))
+	getinter_set_reference(o, 0, 0, 1, at + 1);
+    case 1:
+      if(fts_is_number(at))
+	getinter_fvec(o, 0, 0, 1, at + 0);	
+    case 0:
+      break;
+    }
+}
+
 /******************************************************
  *
  *  bpf
  *
  */
+
+static int
+bpf_advance(bpf_t *bpf, int index, double time)
+{
+  /* time must be > 0.0 */
+  if(time >= bpf_get_time(bpf, index + 1))
+    {
+      index++;
+      
+      while(time > bpf_get_time(bpf, index + 1))
+	index++;
+    }
+  else if(time < bpf_get_time(bpf, index))
+    {
+      index--;
+      
+      while(time < bpf_get_time(bpf, index))
+	index--;
+    }
+  else if(bpf_get_time(bpf, index) == bpf_get_time(bpf, index + 1))
+    index++;
+
+  return index;
+}
 
 static void
 getinter_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -154,63 +215,62 @@ getinter_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   getinter_bpf_t *this = (getinter_bpf_t *)o;
   bpf_t *bpf = (bpf_t *)this->obj;
   int size = bpf_get_size(bpf);
-
-  if(size > 0)
+  double duration = bpf_get_duration(bpf);
+  double time = fts_get_number_float(at);
+  int index;
+  
+  if(size < 2 || time < 0.0)
     {
-      double time = fts_get_number_float(at);
-      
-      if(time < bpf_get_time(bpf, 0))
+      this->index = 0;
+      fts_outlet_float(o, 0, bpf_get_value(bpf, 0));
+    }
+  else
+    {
+      if(time >= duration)
 	{
-	  this->index = 0;
-	  fts_outlet_float(o, 0, bpf_get_value(bpf, 0));
-	}
-      else if(time >= bpf_get_duration(bpf))
-	{
-	  this->index = size - 1;
-	  fts_outlet_float(o, 0, bpf_get_target(bpf));
+	  this->index = size - 2;
+	  fts_outlet_float(o, 0, bpf_get_value(bpf, size - 1));
 	}
       else
 	{
-	  int index = this->index;
-
-	  if(index > size - 2)
-	    index = size - 2;
-	  
-	  /* search index */
-	  if(time >= bpf_get_time(bpf, index + 1))
-	    {
-	      index++;
-	      
-	      while(time >= bpf_get_time(bpf, index + 1))
-		index++;
-	    }
-	  else if(time < bpf_get_time(bpf, index))
-	    {
-	      index--;
-	      
-	      while(time < bpf_get_time(bpf, index))
-		index--;
-	    }
-	  else if(bpf_get_slope(bpf, index) == DBL_MAX)
-	    {
-	      index++;
-
-	      while(bpf_get_slope(bpf, index) == DBL_MAX)
-		index++;
-	    }
-	  
-	  /* remember new index */
+	  double t0, t1, y0, y1;
+      
+	  if(this->index > size - 2)
+	    index = bpf_advance(bpf, size - 2, time);
+	  else
+	    index = bpf_advance(bpf, this->index, time);
+      
 	  this->index = index;
 	  
-	  /* output interpolated value */
-	  fts_outlet_float(o, 0, bpf_get_value(bpf, index) + 
-			   (time - bpf_get_time(bpf, index)) * bpf_get_slope(bpf, index));
+	  t0 = bpf_get_time(bpf, index + 0);
+	  t1 = bpf_get_time(bpf, index + 1);
+	  y0 = bpf_get_value(bpf, index + 0);
+	  y1 = bpf_get_value(bpf, index + 1);
+	  
+	  fts_outlet_float(o, 0, y0 + (y1 - y0) * (time - t0) / (t1 - t0));
 	}
     }
-  else
-    fts_outlet_float(o, 0, 0.0);    
 }
   
+static void
+getinter_bpf_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getinter_t *this = (getinter_t *)o;
+
+  switch(ac)
+    {
+    default:
+    case 2:
+      if(bpf_atom_is(at + 1))
+	getinter_set_reference(o, 0, 0, 1, at + 1);
+    case 1:
+      if(fts_is_number(at))
+	getinter_bpf(o, 0, 0, 1, at + 0);	
+    case 0:
+      break;
+    }
+}
+
 /******************************************************
  *
  *  class
@@ -220,12 +280,17 @@ getinter_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t
 getinter_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  ac--;
+  at++;
+
   if(ac == 1 && ivec_atom_is(at))
     {
       fts_class_init(cl, sizeof(getinter_t), 2, 1, 0); 
       
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getinter_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getinter_delete);
+      
+      fts_method_define_varargs(cl, 0, fts_s_list, getinter_ivec_list);
       
       fts_method_define_varargs(cl, 0, fts_s_int, getinter_ivec);
       fts_method_define_varargs(cl, 0, fts_s_float, getinter_ivec);
@@ -239,6 +304,8 @@ getinter_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getinter_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getinter_delete);
       
+      fts_method_define_varargs(cl, 0, fts_s_list, getinter_fvec_list);
+      
       fts_method_define_varargs(cl, 0, fts_s_int, getinter_fvec);
       fts_method_define_varargs(cl, 0, fts_s_float, getinter_fvec);
 
@@ -250,6 +317,8 @@ getinter_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getinter_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getinter_delete);
+      
+      fts_method_define_varargs(cl, 0, fts_s_list, getinter_bpf_list);
       
       fts_method_define_varargs(cl, 0, fts_s_int, getinter_bpf);
       fts_method_define_varargs(cl, 0, fts_s_float, getinter_bpf);

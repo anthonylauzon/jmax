@@ -29,5 +29,7 @@ demux.c \
 for.c \
 oneshot.c \
 range.c \
+fit.c \
 switch.c \
 count.c \
+sync.c \

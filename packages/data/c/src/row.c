@@ -27,8 +27,9 @@
 #include <fts/fts.h>
 #include "row.h"
 
+fts_type_t row_type = 0;
 fts_symbol_t row_symbol = 0;
-fts_metaclass_t *row_type = 0;
+fts_class_t *row_class = 0;
 
 /********************************************************
  *
@@ -46,9 +47,9 @@ row_void(row_t *this)
 
   for(j=0; j<size; j++)
     {
-      fts_atom_t *elem = mat_get_element(mat, i, j);
+      fts_atom_t *elem = &mat_get_element(mat, i, j);
 
-      fts_set_void(elem);
+      fts_atom_void(elem);
     }
 }
 
@@ -62,7 +63,7 @@ row_set_const(row_t *this, fts_atom_t value)
 
   for(j=0; j<size; j++)
     {
-      fts_atom_t *elem = mat_get_element(mat, i, j);
+      fts_atom_t *elem = &mat_get_element(mat, i, j);
 
       fts_atom_assign(elem, &value);
     }
@@ -81,7 +82,7 @@ row_set_from_atoms(row_t *this, int onset, int ac, const fts_atom_t *at)
 
   for(j=0; j<ac; j++)
     {
-      fts_atom_t *elem = mat_get_element(mat, i, onset + j);
+      fts_atom_t *elem = &mat_get_element(mat, i, onset + j);
 
       fts_atom_assign(elem, at + j);
     }
@@ -96,7 +97,11 @@ row_set_from_atoms(row_t *this, int onset, int ac, const fts_atom_t *at)
 static void
 row_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_object(o, 0, o);
+  row_t *this = (row_t *)o;
+  fts_atom_t a[1];
+
+  row_atom_set(a, this);
+  fts_outlet_send(o, 0, row_symbol, 1, a);
 }
 
 static void
@@ -161,15 +166,17 @@ row_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   post("{");
 
   for(i=0; i<size; i++)
-    post_atoms(1, row_get_element(this, i));
+    post_atoms(1, &row_get_element(this, i));
 
-  post("}\n");
+  post("}");
 }
 
 static void
 row_getobj(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  fts_set_object(value, obj);
+  row_t *this = (row_t *)obj;
+
+  row_atom_set(value, this);
 }
 
 /********************************************************************
@@ -232,12 +239,12 @@ row_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* user methods */
   fts_method_define_varargs(cl, 0, fts_s_bang, row_output);
   
-  fts_method_define_varargs(cl, 0, fts_s_clear, row_clear);
-  fts_method_define_varargs(cl, 0, fts_s_fill, row_fill);      
-  fts_method_define_varargs(cl, 0, fts_s_set, row_set);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), row_clear);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), row_fill);      
+  fts_method_define_varargs(cl, 0, fts_new_symbol("set"), row_set);
   
   /* type outlet */
-  fts_outlet_type_define(cl, 0, row_symbol, 1, &row_symbol);
+  fts_outlet_type_define(cl, 0, row_symbol, 1, &row_type);
   
   return fts_Success;
 }
@@ -245,7 +252,8 @@ row_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 row_config(void)
 {
-  row_symbol = fts_new_symbol("row");
+  fts_class_install(row_symbol, row_instantiate);
+  row_class = fts_class_get_by_name(row_symbol);
 
-  row_type = fts_class_install(row_symbol, row_instantiate);
+  fts_atom_type_register(row_symbol, row_class);
 }

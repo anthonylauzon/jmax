@@ -31,11 +31,14 @@ fvec.c \
 fmat.c \
 vec.c \
 mat.c \
+col.c \
+row.c \
 getval.c \
+getinter.c \
 getsize.c \
 getrange.c \
 getlist.c \
 fill.c \
 copy.c \
 bpf.c \
-
+preset.c \

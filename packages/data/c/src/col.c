@@ -27,8 +27,9 @@
 #include <fts/fts.h>
 #include "col.h"
 
-fts_metaclass_t *col_type = 0;
+fts_type_t col_type = 0;
 fts_symbol_t col_symbol = 0;
+fts_class_t *col_class = 0;
 
 /********************************************************
  *
@@ -46,7 +47,7 @@ col_void(col_t *this)
 
   for(i=0; i<size; i++)
     {
-      fts_atom_t *elem = mat_get_element(mat, i, j);
+      fts_atom_t *elem = &mat_get_element(mat, i, j);
 
       fts_atom_void(elem);
     }
@@ -62,7 +63,7 @@ col_set_const(col_t *this, fts_atom_t value)
 
   for(i=0; i<size; i++)
     {
-      fts_atom_t *elem = mat_get_element(mat, i, j);
+      fts_atom_t *elem = &mat_get_element(mat, i, j);
 
       fts_atom_assign(elem, &value);
     }
@@ -81,7 +82,7 @@ col_set_from_atoms(col_t *this, int onset, int ac, const fts_atom_t *at)
 
   for(i=0; i<ac; i++)
     {
-      fts_atom_t *elem = mat_get_element(mat, onset + i, j);
+      fts_atom_t *elem = &mat_get_element(mat, onset + i, j);
 
       fts_atom_assign(elem, at + i);
     }
@@ -96,7 +97,11 @@ col_set_from_atoms(col_t *this, int onset, int ac, const fts_atom_t *at)
 static void
 col_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_object(o, 0, o);
+  col_t *this = (col_t *)o;
+  fts_atom_t a[1];
+
+  col_atom_set(a, this);
+  fts_outlet_send(o, 0, col_symbol, 1, a);
 }
 
 static void
@@ -161,15 +166,17 @@ col_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   post("{");
 
   for(i=0; i<size; i++)
-    post_atoms(1, col_get_element(this, i));
+    post_atoms(1, &col_get_element(this, i));
 
-  post("}\n");
+  post("}");
 }
 
 static void
 col_getobj(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  fts_set_object(value, obj);
+  col_t *this = (col_t *)obj;
+
+  col_atom_set(value, this);
 }
 
 /********************************************************************
@@ -232,12 +239,12 @@ col_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* user methods */
   fts_method_define_varargs(cl, 0, fts_s_bang, col_output);
   
-  fts_method_define_varargs(cl, 0, fts_s_clear, col_clear);
-  fts_method_define_varargs(cl, 0, fts_s_fill, col_fill);      
-  fts_method_define_varargs(cl, 0, fts_s_set, col_set);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), col_clear);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), col_fill);      
+  fts_method_define_varargs(cl, 0, fts_new_symbol("set"), col_set);
   
   /* type outlet */
-  fts_outlet_type_define(cl, 0, col_symbol, 1, &col_symbol);
+  fts_outlet_type_define(cl, 0, col_symbol, 1, &col_type);
   
   return fts_Success;
 }
@@ -245,7 +252,8 @@ col_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 col_config(void)
 {
-  col_symbol = fts_new_symbol("col");
+  fts_class_install(col_symbol, col_instantiate);
+  col_class = fts_class_get_by_name(col_symbol);
 
-  col_type = fts_class_install(col_symbol, col_instantiate);
+  fts_atom_type_register(col_symbol, col_class);
 }
