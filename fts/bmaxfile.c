@@ -1605,18 +1605,20 @@ void
 fts_bmax_code_push_atoms(fts_bmax_file_t *f, int ac, const fts_atom_t *at)
 {
   int i;
-
+  
   for (i = (ac - 1); i >= 0; i--)
-    {
-      const fts_atom_t *a = &(at[i]);
-
-      if (fts_is_int(a))
-	fts_bmax_code_push_int(f, fts_get_int(a));
-      else if (fts_is_float(a))
-	fts_bmax_code_push_float(f, (float)fts_get_float(a));
-      else if (fts_is_symbol(a))
-	fts_bmax_code_push_symbol(f, fts_get_symbol(a));
-    }
+  {
+    const fts_atom_t *a = &(at[i]);
+    
+    if (fts_is_int(a))
+      fts_bmax_code_push_int(f, fts_get_int(a));
+    else if (fts_is_float(a))
+      fts_bmax_code_push_float(f, (float)fts_get_float(a));
+    else if (fts_is_symbol(a))
+      fts_bmax_code_push_symbol(f, fts_get_symbol(a));
+    else
+      fts_bmax_code_push_int(f, 0);
+  }
 }
 
 /* set atom arg: set an atom as top of the stack */

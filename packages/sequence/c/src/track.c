@@ -1779,6 +1779,9 @@ track_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     else
       fts_object_error(o, "bad argument");
   }
+  
+  if(this->type == NULL)
+    this->type = fts_int_class;
 }
 
 void

@@ -208,6 +208,11 @@ unsigned char *fts_memorystream_get_bytes( fts_memorystream_t *stream)
   return (unsigned char *)fts_stack_base( &stream->output_buffer);
 }
 
+int fts_memorystream_get_size( fts_memorystream_t *stream)
+{
+  return fts_stack_size( &stream->output_buffer);
+}
+
 void fts_memorystream_reset( fts_memorystream_t *stream)
 {
   fts_stack_clear( &stream->output_buffer);

@@ -418,6 +418,8 @@ typedef struct _fts_memorystream_t fts_memorystream_t;
  */
 FTS_API unsigned char *fts_memorystream_get_bytes( fts_memorystream_t *stream);
 
+FTS_API int fts_memorystream_get_size( fts_memorystream_t *stream);
+
 /**
  * Resets the stream to zero, so that all currently accumulated output is discarded.
  *
