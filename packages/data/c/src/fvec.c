@@ -561,7 +561,8 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   if(ac > 0 && fts_is_symbol(at))
     {
       fts_symbol_t file_name = fts_get_symbol(at);
-      fts_soundfile_t *sf = 0;
+/*        fts_soundfile_t *sf = 0; */
+      fts_audiofile_t *sf = 0;
       int size = 0;
       float sr = 0.0;
       int onset, n_read;
@@ -593,15 +594,31 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	}
       else
 	{
-	  sf = fts_soundfile_open_read_float(file_name, 0, sr, onset);
+/*  	  sf = fts_soundfile_open_read_float(file_name, 0, sr, onset); */
+
+	  /* FIXME: sample rate conversion!! */
+	  sf = fts_audiofile_open_read(file_name);
       
-	  if(sf) /* soundfile successfully opened */
+/*	  if(sf)  soundfile successfully opened */
+	  if (fts_audiofile_valid(sf)) 
 	    {
-	      float file_sr = fts_soundfile_get_samplerate(sf);
+	      float file_sr;
 	      float *ptr;
 
-	      if(!n_read)
-		n_read = fts_soundfile_get_size(sf);
+	      if (fts_audiofile_seek(sf, onset) != 0) 
+		{
+		  post("fvec: can't seek position in file \"%s\"\n", fts_symbol_name(file_name));
+		  fts_audiofile_delete(sf);
+		  return;		  
+		}
+
+/*  	      file_sr = fts_soundfile_get_samplerate(sf); */
+	      file_sr = fts_audiofile_get_sample_rate(sf);
+
+	      if(!n_read) {
+/*  		n_read = fts_soundfile_get_size(sf); */
+		n_read = fts_audiofile_get_num_frames(sf);
+	      }
 
 	      /* make enough space for resampled file */
 	      if(sr > 0.0 && sr != file_sr)
@@ -613,9 +630,11 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	      fvec_set_size(this, n_read);
 	      ptr = fvec_get_ptr(this);
 
-	      size = fts_soundfile_read_float(sf, ptr, n_read);
+/*  	      size = fts_soundfile_read_float(sf, ptr, n_read); */
+	      size = fts_audiofile_read(sf, &ptr, 1, n_read);
 
-	      fts_soundfile_close(sf);
+/*  	      fts_soundfile_close(sf); */
+	      fts_audiofile_delete(sf);
 
 	      if(size > 0)
 		fvec_output(o, 0, 0, 0, 0);
@@ -649,24 +668,29 @@ fvec_save_soundfile(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const 
       int n_write = fts_get_int_arg(ac, at, 1, 0);
       float sr = fts_get_float_arg(ac, at, 2, 0.0f);
       int vec_size = fvec_get_size(this);
-      fts_soundfile_t *sf = 0;
+/*        fts_soundfile_t *sf = 0; */
+      fts_audiofile_t *sf = 0;
       int size = 0;
       
       if(sr <= 0.0)
 	sr = fts_dsp_get_sample_rate();
 
-      sf = fts_soundfile_open_write_float(file_name, 0, sr);
+/*        sf = fts_soundfile_open_write_float(file_name, 0, sr); */
+      sf = fts_audiofile_open_write(file_name, sr, 1, fts_s_16bits);
 
-      if(sf) /* soundfile successfully opened */
+/*      if(sf)  soundfile successfully opened */
+      if (fts_audiofile_valid(sf)) 
 	{
 	  float *ptr = fvec_get_ptr(this);
 
 	  if(n_write <= 0 || n_write > vec_size)
 	    n_write = vec_size;
       
-	  size = fts_soundfile_write_float(sf, ptr, n_write);
+/*  	  size = fts_soundfile_write_float(sf, ptr, n_write); */
+	  size = fts_audiofile_write(sf, &ptr, 1, n_write);
 
-	  fts_soundfile_close(sf);
+/*  	  fts_soundfile_close(sf); */
+	  fts_audiofile_delete(sf);
 
 	  if(size <= 0)
 	    post("fvec: can't save to soundfile \"%s\"\n", fts_symbol_name(file_name));
@@ -885,21 +909,26 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	}
       else
 	{
-	  fts_soundfile_t *sf = fts_soundfile_open_read_float(file_name, 0, 0, 0);
+/*  	  fts_soundfile_t *sf = fts_soundfile_open_read_float(file_name, 0, 0, 0); */
+	  fts_audiofile_t *sf = fts_audiofile_open_read(file_name);
 
-	  if(sf) /* soundfile successfully opened */
+/*	  if(sf)  soundfile successfully opened */
+	  if (fts_audiofile_valid(sf)) 
 	    {
 	      float *ptr;
 	  
-	      size = fts_soundfile_get_size(sf);
+/*  	      size = fts_soundfile_get_size(sf); */
+	      size = fts_audiofile_get_num_frames(sf);
 	  
 	      fvec_set_size(this, size);
 	      ptr = fvec_get_ptr(this);
 	  
-	      size = fts_soundfile_read_float(sf, ptr, size);
+/*  	      size = fts_soundfile_read_float(sf, ptr, size); */
+	      size = fts_audiofile_read(sf, &ptr, 1, size);
 	      fvec_set_size(this, size);
 
-	      fts_soundfile_close(sf);
+/*  	      fts_soundfile_close(sf); */
+	      fts_audiofile_delete(sf);
 	    }
 	}
 

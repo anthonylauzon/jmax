@@ -89,6 +89,10 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   if (size < 0)
     size = 0;
 
+  if (size == 0) {
+    post("table~: %s: table size is not specified\n", fts_symbol_name(name));
+  }
+
   n_samps = samples_unit_convert(unit, size, fts_dsp_get_sample_rate());
   
   sampbuf_init(&this->buf, n_samps);
@@ -295,15 +299,36 @@ sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   else
     n_onset = 0;
 
+  if(size == 0)
+    {
+      post("table~: %s: instanciated a table of size zero. No loading will be done.\n", fts_symbol_name(this->name));
+      return;
+    }
+
   if(file_name)
     {
-      fts_soundfile_t *sf = fts_soundfile_open_read_float(file_name, format, sr, n_onset);
-      
-      if(sf)
+
+      /* FIXME: sample rate conversion!!! */
+      fts_audiofile_t* af = fts_audiofile_open_read(file_name);
+
+      if (!fts_audiofile_valid(af)) 
 	{
-	  int n_samples = fts_soundfile_read_float(sf, buf, size);
+	  post("table~: %s: can't load samples from file \"%s\"\n", fts_symbol_name(this->name), fts_symbol_name(file_name));
+	  return;
+	}
+
+      if (fts_audiofile_seek(af, n_onset) != 0) 
+	{
+	  post("table~: %s: can't seek position in file \"%s\"\n", fts_symbol_name(this->name), fts_symbol_name(file_name));
+	  fts_audiofile_delete(af);
+	  return;
+	}
+
+      if (fts_audiofile_valid(af))
+	{
+	  int n_samples = fts_audiofile_read(af, &buf, 1, size);
 	  
-	  fts_soundfile_close(sf);
+	  fts_audiofile_delete(af);
 	  
 	  if(n_samples > 0)
 	    fts_outlet_int(o, 0, n_samples);
@@ -321,7 +346,7 @@ sigtable_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   sigtable_t *this = (sigtable_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
   float save_size = fts_get_float_arg(ac, at, 1, 0.0f);
-  float sr = fts_get_float_arg(ac, at, 2, 0.0f);
+  float sr = fts_get_float_arg(ac, at, 2, fts_dsp_get_sample_rate()); /* FIXME */
   fts_symbol_t format = fts_get_symbol_arg(ac, at, 3, 0);
   int size = this->buf.size;
   float *buf = this->buf.samples;
@@ -343,13 +368,12 @@ sigtable_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 
   if(file_name)
     {
-      fts_soundfile_t *sf = fts_soundfile_open_write_float(file_name, format, sr);
+      fts_audiofile_t *af = fts_audiofile_open_write(file_name, sr, 1, format);
       
-      if(sf)
+      if (fts_audiofile_valid(af))
 	{
-	  int n_samples = fts_soundfile_write_float(sf, buf, n_save);
-
-	  fts_soundfile_close(sf);
+	  int n_samples = fts_audiofile_write(af, &buf, 1, n_save);
+	  fts_audiofile_delete(af);
 
 	  if(n_samples <= 0)
 	    post("table~: %s: can't save samples to file \"%s\"\n", fts_symbol_name(this->name) , fts_symbol_name(file_name));
@@ -418,5 +442,5 @@ sigtable_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 sigtable_config(void)
 {
-  fts_class_install(fts_new_symbol("table~"),sigtable_instantiate);
+  fts_class_install(fts_new_symbol("table~"), sigtable_instantiate);
 }

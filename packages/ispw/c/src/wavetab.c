@@ -40,19 +40,20 @@ wavetable_load(wavetab_t *wavetab)
 
     if(file_name)
     {
-      fts_soundfile_t *sf = fts_soundfile_open_read_float(wavetab->sym, 0, 0.0f, 0);
+      fts_audiofile_t *sf = fts_audiofile_open_read(wavetab->sym);
       int n_samples;
       int i;
+      float* tmp = &buf[0];
 
-      if(!sf)
+      if (!fts_audiofile_valid(sf))
 	{
 	  post("tab1~: %s: can't open wave table file\n", file_name);
 	  return;
 	}
       
-      n_samples = fts_soundfile_read_float(sf, buf, WAVE_TAB_SIZE);
-      fts_soundfile_close(sf);
-
+      n_samples = fts_audiofile_read(sf, &tmp, 1, WAVE_TAB_SIZE);
+      fts_audiofile_delete(sf);
+      
       if(n_samples < WAVE_TAB_SIZE)
 	{
 	  post("tab1~: %s: can't read wave table\n", file_name);

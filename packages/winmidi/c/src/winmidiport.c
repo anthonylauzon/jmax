@@ -328,28 +328,31 @@ winmidiport_output(fts_object_t *o, fts_midievent_t *event, double time)
 	int n = this->outhdr[cur].dwBytesRecorded;
 
 	buffer[n++] = SYSEX;
+	/* FIXME: test buffer length */
   	
 	for (i = 0; i < size; i++) {
 	  buffer[n++] = fts_get_int(atoms + i) & 0x7f;
 	  
 	  if (n == len) {
 	    int newlen = len + SYSEX_BUFFER_SIZE;
-	    char* newbuf = fts_malloc(newlen);
+	    unsigned char* newbuf = fts_malloc(newlen);
 	    memcpy(newbuf, this->outhdr[cur].lpData, newlen);
 	    fts_free(this->outhdr[cur].lpData);
 	    this->outhdr[cur].lpData = newbuf;
 	    this->outhdr[cur].dwBufferLength = newlen;
+	    buffer = newbuf;
 	  }
 	}
 	
 	buffer[n++] = SYSEX_END;
+	/* FIXME: test buffer length */
 	
 	this->outhdr[cur].dwBytesRecorded = n;	
       }
       break;
       
     case midi_real_time:
-      res = midiOutShortMsg(this->hmidiout, msg_pack(fts_midievent_channel_message_get_status_byte(event), 0, 0));
+      res = midiOutShortMsg(this->hmidiout, msg_pack(fts_midievent_real_time_get_status_byte(event), 0, 0));
       break;
       
     default:
