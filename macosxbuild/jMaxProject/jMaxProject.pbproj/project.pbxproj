@@ -17112,13 +17112,18 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>jmax</string>
+				<string>jmax.backup</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>jmax_file.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>jmax patch</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>jmax</string>
+			</array>
 			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
+			<string>Editor</string>
 			<key>LSTypeIsPackage</key>
 			<true/>
 		</dict>
@@ -17126,13 +17131,14 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>pat</string>
+				<string>pat.backup</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>jmax_file.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>.pat patch</string>
+			<string>jmax pat patch</string>
 			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
+			<string>Editor</string>
 			<key>LSTypeIsPackage</key>
 			<true/>
 		</dict>
