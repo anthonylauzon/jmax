@@ -5,26 +5,20 @@ import java.awt.event.*;
 
 import com.sun.java.swing.*;
 
-public class Led extends JComponent {
+abstract public class Led extends JComponent {
 
   public static final int OFF = 0;
   public static final int ON = 1;
 
   public Led()
   {
-    this( OFF);
+    this(  Color.red);
   }
 
-  public Led( int state)
+  public Led( Color onColor)
   {
-    this( state, Color.red, Color.white);
-  }
-
-  public Led( int state, Color onColor, Color offColor)
-  {
-    this.state = state;
+    this.state = OFF;
     this.onColor = onColor;
-    this.offColor = offColor;
   }
 
   public void setOnColor( Color color)
@@ -37,20 +31,15 @@ public class Led extends JComponent {
     return onColor;
   }
 
-  public void setOffColor( Color color)
-  {
-    offColor = color;
-  }
-
-  public Color getOffColor()
-  {
-    return offColor;
-  }
-
   public void setState( int state)
   {
     this.state = state;
     repaint();
+  }
+
+  public void setState( boolean state)
+  {
+    setState( state ? ON : OFF);
   }
 
   public int getState()
@@ -58,31 +47,16 @@ public class Led extends JComponent {
     return state;
   }
 
-  public Dimension getPreferredSize()
+  public Dimension getMinimumSize()
   {
-    return getMaximumSize();
+    return getPreferredSize();
   }
 
   public Dimension getMaximumSize()
   {
-    return new Dimension( 14, 14);
+    return getPreferredSize();
   }
 
-  public void paint( Graphics g)
-  {
-    int size = getSize().width;
-
-    g.setColor( Color.white);
-    g.drawRect( 1, 1, size - 2, size - 2);
-
-    g.setColor( Color.black);
-    g.drawRect( 0, 0, size - 2, size - 2);
-
-    g.setColor( state == OFF ? offColor: onColor);
-    g.fillRect( 2, 2, size - 5, size - 5);
-  }
-
-  private Color onColor, offColor;
-  private int state;
+  protected Color onColor;
+  protected int state;
 }
-

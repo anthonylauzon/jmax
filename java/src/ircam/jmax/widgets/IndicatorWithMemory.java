@@ -8,51 +8,48 @@ import java.awt.*;
 import java.awt.event.*;
 import java.lang.*;
 import java.util.*;
+import java.io.*;
 
 public class IndicatorWithMemory extends JPanel {
+
   boolean value = false;
 
-  public IndicatorWithMemory(String name)
+  public IndicatorWithMemory( String name)
   {
-    Border border = new TitledBorder(null, name, TitledBorder.LEFT, TitledBorder.TOP);
+    this( name, null);
+  }
 
-    setBorder( border);
+  public IndicatorWithMemory( String name, String toolTipText)
+  {
+    setBorder( new EmptyBorder( 1, 1, 1, 1));
     setLayout( new BoxLayout( this, BoxLayout.X_AXIS));
+    setToolTipText( toolTipText);
 
-    JLabel label;
+    label = new JLabel( name);
+    label.setAlignmentX( LEFT_ALIGNMENT);
+    label.setAlignmentY( CENTER_ALIGNMENT);
 
-    label = new JLabel( name + ": ");
-    indicatorLed = new Led();
-    label.setLabelFor( indicatorLed);
-    indicatorLed.setAlignmentX( CENTER_ALIGNMENT);
+    indicatorLed = new MemoryLed();
+    indicatorLed.setAlignmentX( RIGHT_ALIGNMENT);
+    indicatorLed.setAlignmentY( CENTER_ALIGNMENT);
+
     add( label);
+    add( Box.createHorizontalGlue());
     add( indicatorLed);
 
-    add( Box.createVerticalStrut( 2));
+    Font font = label.getFont();
 
-    label = new JLabel( "Memory : ");
-    memoryLed = new Led();
-    memoryLed.setAlignmentX( CENTER_ALIGNMENT);
-    label.setLabelFor( memoryLed);
-    add( label);
-    add( memoryLed);
-
-    add( Box.createVerticalStrut( 2));
-
-    JButton button = new JButton( "Reset");
-    button.setFocusPainted( false);
-    add( button);
-    button.addActionListener( new ActionListener() {
-      public void actionPerformed( ActionEvent event)
-	{
-	  reset();
-	}
-    });
+    label.setFont( new Font( font.getName(), font.getStyle(), font.getSize() - 2));
   }
 
   public Dimension getMinimumSize()
   {
-    return new Dimension( 100, 40);
+    FontMetrics fm = label.getFontMetrics( label.getFont());
+    Dimension ldim = indicatorLed.getPreferredSize();
+    int width = fm.stringWidth( label.getText()) + ldim.width;
+    int height = Math.max( fm.getMaxAscent() + fm.getMaxDescent(), ldim.height);
+
+    return new Dimension( width + 2, height + 2);
   }
 
   public Dimension getPreferredSize()
@@ -62,21 +59,10 @@ public class IndicatorWithMemory extends JPanel {
 
   public void setValue( boolean value)
   {
-    this.value = value;
-
-    indicatorLed.setState( value ? Led.ON : Led.OFF);
-
-    if (value)
-      memoryLed.setState(Led.ON);
+    indicatorLed.setState( value);
   }
 
-  public void reset()
-  {
-    if (! value)
-      memoryLed.setState( Led.OFF);
-  }
-
-  protected Led indicatorLed;
-  protected Led memoryLed;
+  protected MemoryLed indicatorLed;
+  protected JLabel label;
 }
 

@@ -1,6 +1,8 @@
 SOURCES = \
 	IndicatorWithMemory.java	\
 	Led.java			\
+	SimpleLed.java			\
+	MemoryLed.java			\
 	ObjectSelectedListener.java	\
 	ObjectSetViewer.java		\
 
