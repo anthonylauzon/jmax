@@ -50,6 +50,7 @@ public class SplashDialog extends Window {
     setLocation((screenDim.width - SPLASH_WIDTH) / 2, (screenDim.height - SPLASH_HEIGHT) / 2);
 
     setSize(SPLASH_WIDTH, SPLASH_HEIGHT);
+
     pack();
     setVisible(true);
     

@@ -429,14 +429,14 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   /** utility function */
   protected void addFlavor(DataFlavor flavor)
   {
-      //int dim = Array.getLength(flavors);
-      int dim = flavors.length;
+    //int dim = Array.getLength(flavors);
+    int dim = flavors.length;
     DataFlavor temp[] = new DataFlavor[dim+1];
     for (int i = 0; i < dim; i++){
       temp[i] = flavors[i];
     }
     //temp[dim+1]=flavor;
-    temp[dim]=flavor;
+    temp[dim] = flavor;
     flavors = temp;
   }
 

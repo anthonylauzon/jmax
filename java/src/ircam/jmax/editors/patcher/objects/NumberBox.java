@@ -368,6 +368,9 @@ abstract public class NumberBox extends Editable implements KeyEventClient {
 
   abstract public int getIntZoneWidth();
 
+  abstract public void increment( boolean up, boolean shift);
+
+  /* KeyEventClient Interface */
   public void keyPressed( KeyEvent e) 
   {
     switch (e.getKeyCode())
@@ -386,9 +389,6 @@ abstract public class NumberBox extends Editable implements KeyEventClient {
     e.consume();
     redraw();
   }
-
-  abstract public void increment( boolean up, boolean shift);
-
   public void keyReleased( KeyEvent e){}
   public void keyTyped( KeyEvent e){}
   public void keyInputGained() 

@@ -55,6 +55,8 @@ class ToolButton extends JToggleButton
   ToolButton( ToolBar toolBar, String name)
   {
     super( JMaxClassMap.getIcon( name));
+    
+    setSelectedIcon( JMaxClassMap.getSelectedIcon( name));
 
     this.cursor = JMaxClassMap.getCursor( name);
     if(!name.equals("standard"))

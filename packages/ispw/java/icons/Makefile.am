@@ -1,5 +1,6 @@
 noinst_DATA= \
  messbox.gif \
+ messbox_selected.gif \
  messbox_cursor.gif 
 
 

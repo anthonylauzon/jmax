@@ -52,7 +52,7 @@ public class Ispw implements JMaxPackage {
 	}
       }; 
 
-    JMaxClassMap.put( "messbox", messageCreator, "/icons/messbox.gif", "/icons/messbox_cursor.gif", "old message box", this);
+    JMaxClassMap.put( "messbox", messageCreator, "/icons/messbox.gif", "/icons/messbox_selected.gif", "/icons/messbox_cursor.gif", "old message box", this);
     JMaxClassMap.put( "qlist", qlistCreator, null, null, "qlist", this);
     JMaxClassMap.put( "explode", explodeCreator, null, null, "explode", this);    
   }

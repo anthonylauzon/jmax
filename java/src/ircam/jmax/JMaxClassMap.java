@@ -31,21 +31,25 @@ import javax.swing.ImageIcon;
 
 class ClassMapEntry {
 
-  ClassMapEntry( String ftsClassName, JMaxObjectCreator creator, String iconName, String cursorName, String description, JMaxPackage jmaxPackage)
+  ClassMapEntry( String ftsClassName, JMaxObjectCreator creator, String iconName, String selectedIconName,String cursorName, String description, JMaxPackage jmaxPackage)
   {
     this.creator = creator;
     if (iconName != null)
       this.icon = JMaxUtilities.loadIconFromResource( iconName, jmaxPackage);
+    if (selectedIconName != null)
+      this.selectedIcon = JMaxUtilities.loadIconFromResource( selectedIconName, jmaxPackage);
     if (cursorName != null)
       this.cursor = loadCursor( JMaxUtilities.loadIconFromResource( cursorName, jmaxPackage), ftsClassName);
     this.description = description;
   }
 
-  ClassMapEntry( String ftsClassName, JMaxObjectCreator creator, String iconPath, String cursorPath, String description)
+  ClassMapEntry( String ftsClassName, JMaxObjectCreator creator, String iconPath, String selectedIconPath, String cursorPath, String description)
   {
     this.creator = creator;
     if (iconPath != null)
       this.icon = new ImageIcon( iconPath);
+    if (selectedIconPath != null)
+      this.selectedIcon = new ImageIcon( selectedIconPath);
     if (cursorPath != null)
       this.cursor = loadCursor( new ImageIcon( cursorPath), ftsClassName);
     this.description = description;
@@ -80,7 +84,7 @@ class ClassMapEntry {
   }
 
   JMaxObjectCreator creator;
-  ImageIcon icon;
+  ImageIcon icon, selectedIcon;
   Cursor cursor;
   String description;
 }
@@ -88,28 +92,28 @@ class ClassMapEntry {
 
 public class JMaxClassMap {
 
-  public static void put( String ftsClassName, JMaxObjectCreator creator, String iconName, String cursorName, String description, JMaxPackage jmaxPackage)
+  public static void put( String ftsClassName, JMaxObjectCreator creator, String iconName, String selectedIconName, String cursorName, String description, JMaxPackage jmaxPackage)
   {
-    instance.map.put( ftsClassName, new ClassMapEntry( ftsClassName, creator, iconName, cursorName, description, jmaxPackage));
-    if(( iconName != null) && ( cursorName != null))
+    instance.map.put( ftsClassName, new ClassMapEntry( ftsClassName, creator, iconName, selectedIconName, cursorName, description, jmaxPackage));
+    if(( iconName != null) && ( cursorName != null) && ( selectedIconName != null))
       instance.names.add( ftsClassName);
   }
 
-  public static void put( String ftsClassName, JMaxObjectCreator creator, String iconPath, String cursorPath, String description)
+  public static void put( String ftsClassName, JMaxObjectCreator creator, String iconPath, String selectedIconPath, String cursorPath, String description)
   {
-    instance.map.put( ftsClassName, new ClassMapEntry( ftsClassName, creator, iconPath, cursorPath, description));
-    if(( iconPath != null) && ( cursorPath != null))
+    instance.map.put( ftsClassName, new ClassMapEntry( ftsClassName, creator, iconPath, selectedIconPath, cursorPath, description));
+    if(( iconPath != null) && ( cursorPath != null) && ( selectedIconPath != null))
       instance.names.add( ftsClassName);
   }
 
-  public static void put( String ftsClassName, JMaxObjectCreator creator, String iconName, String description, JMaxPackage jmaxPackage)
+  public static void put( String ftsClassName, JMaxObjectCreator creator, String iconName, String selectedIconName, String description, JMaxPackage jmaxPackage)
   {
-    put( ftsClassName, creator, iconName, null, description, jmaxPackage);
+    put( ftsClassName, creator, iconName, selectedIconName, null, description, jmaxPackage);
   }
 
-  public static void put( String ftsClassName, JMaxObjectCreator creator, String iconPath, String description)
+  public static void put( String ftsClassName, JMaxObjectCreator creator, String iconPath, String selectedIconPath, String description)
   {
-    put( ftsClassName, creator, iconPath, (String)null, description);
+    put( ftsClassName, creator, iconPath, selectedIconPath, (String)null, description);
   }
 
   public static JMaxObjectCreator getCreator( String ftsClassName)
@@ -123,6 +127,13 @@ public class JMaxClassMap {
   {
     if(instance.map.containsKey(ftsClassName))
       return ((ClassMapEntry)instance.map.get( ftsClassName)).icon;
+    else return null;
+  }
+
+  public static ImageIcon getSelectedIcon( String ftsClassName)
+  {
+    if(instance.map.containsKey(ftsClassName))
+      return ((ClassMapEntry)instance.map.get( ftsClassName)).selectedIcon;
     else return null;
   }
 
@@ -161,4 +172,11 @@ public class JMaxClassMap {
   private HashMap map;
   private ArrayList names;
 }
+
+
+
+
+
+
+
 
