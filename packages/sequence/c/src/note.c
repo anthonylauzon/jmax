@@ -537,14 +537,7 @@ scomark_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     fts_spost(stream, " %d/%d", self->beat, self->beat_type);
     
   if(self->tempo > 0.0)
-  {
-    int beat_type = self->beat_type;
-    
-    if(beat_type == 0)
-      beat_type = 4;
-      
-    fts_spost(stream, " (1/%d = %g)", beat_type, self->tempo);
-  }
+    fts_spost(stream, " (MM 1/4 = %g)", self->tempo);
   
   propobj_post_properties((propobj_t *)self, stream);
   

@@ -589,7 +589,7 @@ midifile_read_track(fts_midifile_t *file)
             case TIME_SIGNATURE:
             {
               int numerator = readbyte(file);
-              int denominator = readbyte(file);
+              int denominator = 1 << readbyte(file);
               int clocks_per_metronome_click = readbyte(file);
               int heals_per_quarter_note = readbyte(file); /* heals of 32nd notes per quarter note */
               

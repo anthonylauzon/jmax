@@ -256,24 +256,14 @@ scoobtrack_read_tempo(fts_midifile_t *file, int tempo)
   track_t *track = data->track;
   double time = fts_midifile_get_time(file);
   scomark_t *scomark = data->last_marker;
-  int beat_type;
   
   if(data->last_marker == NULL || time > data->last_marker_time)
-  {
     scomark = scoobtrack_append_scomark_event(data->merge, time, seqsym_tempo);
-
-    if(data->last_marker != NULL)
-      scomark_set_beat_type(scomark, scomark_get_beat_type(data->last_marker));
-  }
   
-  beat_type = scomark_get_beat_type(scomark);
-  
-  if(beat_type == 0)
-    beat_type = 4;
-  
-  scomark_set_tempo(scomark, 0.25 * (double)beat_type * 60.0 / ((double)tempo * 0.000001));
+  scomark_set_tempo(scomark, 60000000.0 / (double)tempo);
   
   data->last_marker = scomark;
+  data->last_marker_time = time;
 }
 
 static void
@@ -293,6 +283,7 @@ scoobtrack_read_time_signature(fts_midifile_t *file, int numerator, int denomina
   scomark_set_beat_type(scomark, denominator);
   
   data->last_marker = scomark;
+  data->last_marker_time = time;
 }
 
 static void
@@ -417,7 +408,7 @@ track_import_from_midifile(track_t *track, fts_midifile_t *file)
         data.n_note_on[i][j] = 0;
       }
     }
-        
+    
     read.track_end = scoobtrack_read_track_end;
     read.midi_event = scoobtrack_read_midievent;
     read.tempo = scoobtrack_read_tempo;
