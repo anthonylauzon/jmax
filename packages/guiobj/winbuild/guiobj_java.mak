@@ -9,15 +9,17 @@ dir:
 	-@if not exist "..\java\classes" mkdir "..\java\classes"
 
 jar:
-	-@cd ..\java\classes
+	-@cd ..\guiobj\java
+	$(JAVAC) -classpath ..\..\..\java\jmax.jar;..\..\..\packages\guiobj\java -d .\classes *.java
 	-@if exist "$(PKG).jar" erase "$(PKG).jar"
-	$(JAR) -cf ..\$(PKG).jar ircam
+	-@cd classes
+	$(JAR) -cf ..\$(PKG).jar ircam  *.class
 
 classes:
-	cd ..\java\src\ircam\jmax
+	cd ..\java\ircam\jmax
 
 	cd guiobj
-	$(JAVAC) -classpath ..\..\..\..\..\..\..\java\jmax.jar;..\..\..\..\..\..\..\java\lib\jacl\jacl.jar;..\..\..\..\..\..\..\java\lib\jacl\tcljava.jar;..\..\..\..\classes;..\..\..\..\src -d ..\..\..\..\classes *.java
+	$(JAVAC) -classpath ..\..\..\..\..\..\java\jmax.jar;..\..\..\..\..\..\packages\guiobj\java -d ..\..\..\..\java\classes *.java
 	-@cd ..
 
 	cd ..\..\..\..\winbuild
