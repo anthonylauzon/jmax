@@ -90,7 +90,7 @@ public class Define extends Editable implements FtsObjectErrorListener{
     updateDimensions();
   }
 
-  public int getVariableWidth()
+  public int getVariableSize()
   {
     if( variableName!= null && !isEditing())
       return boldFontMetrics.stringWidth( variableName);
@@ -159,7 +159,7 @@ public class Define extends Editable implements FtsObjectErrorListener{
 
   public void fitToText()
   {
-    forceWidth(  getTextHeightOffset() + getVariableWidth() + getFontMetrics().stringWidth(" ") + getFontMetrics().stringWidth( variableValue) + 6);
+    forceWidth(  getTextHeightOffset() + getVariableSize() + getFontMetrics().stringWidth(" ") + getFontMetrics().stringWidth( variableValue) + 6);
   }
 
   public Dimension getMinimumSize() 
@@ -176,7 +176,7 @@ public class Define extends Editable implements FtsObjectErrorListener{
 
   public int getTextXOffset()
   {
-    return getTextHeightOffset() + getVariableWidth() +2;
+    return getTextHeightOffset() + getVariableSize() +2;
   }
 
   public int getTextYOffset()
@@ -186,7 +186,7 @@ public class Define extends Editable implements FtsObjectErrorListener{
 
   public int getTextWidthOffset()
   {
-    return  getTextHeightOffset() + getVariableWidth() + 4;
+    return  getTextHeightOffset() + getVariableSize() + 4;
   }
 
   public int getTextHeightOffset()
@@ -232,7 +232,7 @@ public class Define extends Editable implements FtsObjectErrorListener{
     int y = getY();
     int w = getWidth();
     int h = getHeight();
-    int hLine = (getVariableWidth() > 0) ? getTextHeightOffset() + getVariableWidth() + 4 : getTextHeightOffset() + 2;
+    int hLine = (getVariableSize() > 0) ? getTextHeightOffset() + getVariableSize() + 4 : getTextHeightOffset() + 2;
 
     g.setColor( getTextBackground());
 
