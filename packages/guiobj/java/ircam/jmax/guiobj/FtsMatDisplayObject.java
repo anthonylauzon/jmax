@@ -114,6 +114,9 @@ public class FtsMatDisplayObject extends FtsGraphicObject
   { 
     scroll = 0;
 
+    if(pixels.length < (mSize * mZoom * nSize * nZoom))
+      pixels = new byte[nSize*nZoom*mSize*mZoom];
+    
     for(int m=0; m<mSize; m++)
       {
 	int offset = m * mZoom * nSize * nZoom;
