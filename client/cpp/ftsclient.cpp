@@ -368,6 +368,32 @@ FtsSocketConnection::FtsSocketConnection() throw( FtsClientException)
   FtsSocketConnection( "127.0.0.1", DEFAULT_PORT, DEFAULT_CONNECT_TIMEOUT);
 }
 
+int FtsSocketConnection::poll() throw( FtsClientException)
+{
+  fd_set readfds;
+  struct timeval tv;
+  int r;
+
+  FD_ZERO( &readfds);
+  FD_SET( _socket, &readfds);
+
+  tv.tv_sec = 0;
+  tv.tv_usec = 0;
+
+  r = select( _socket+1, &readfds, NULL, NULL, &tv);
+
+  if (r < 0)
+    {
+#if defined(WIN32)
+      throw FtsClientException( "Error in select()", WSAGetLastError());
+#else
+      throw FtsClientException( "Error in select()", errno);
+#endif
+    }
+
+  return r;
+}
+
 void FtsSocketConnection::close() throw( FtsClientException)
 {
 #ifdef WIN32
@@ -407,7 +433,7 @@ int FtsSocketConnection::read( unsigned char *buffer, int n) throw( FtsClientExc
   return r;
 }
 
-int FtsSocketConnection::write( unsigned char *buffer, int n) throw( FtsClientException)
+int FtsSocketConnection::write( const unsigned char *buffer, int n) throw( FtsClientException)
 {
   int r;
 
@@ -436,13 +462,13 @@ FtsPipeConnection::~FtsPipeConnection(void)
   close();
 }
 
-void FtsPipeConnection::close() 
+void FtsPipeConnection::close() throw( FtsClientException)
 {
   // Don't do anything. We didn't create the pipes, so we don't
   // destroy them.
 }
 
-int FtsPipeConnection::read( unsigned char *buffer, int n) 
+int FtsPipeConnection::read( unsigned char *buffer, int n) throw( FtsClientException) 
 {
 #if WIN32
   DWORD count; 
@@ -463,10 +489,11 @@ int FtsPipeConnection::read( unsigned char *buffer, int n)
   return count;
 
 #else
+  return 0;
 #endif
 }
 
-int FtsPipeConnection::write( unsigned char *buffer, int n) 
+int FtsPipeConnection::write( const unsigned char *buffer, int n) throw( FtsClientException)
 {
 #if WIN32
   DWORD count; 
@@ -487,6 +514,7 @@ int FtsPipeConnection::write( unsigned char *buffer, int n)
   return count;
 
 #else
+  return 0;
 #endif
 }
 
@@ -622,26 +650,8 @@ void FtsServer::receive() throw( FtsClientException)
 
 void FtsServer::poll() throw( FtsClientException)
 {
-//    fd_set readfds;
-//    struct timeval tv;
-//    int r;
-
-//    FD_ZERO( &readfds);
-//    FD_SET( _socket, &readfds);
-
-//    tv.tv_sec = 0;
-//    tv.tv_usec = 0;
-
-//    r = select( _socket+1, &readfds, NULL, NULL, &tv);
-
-//    if (r < 0)
-//      {
-//        throw FtsClientException( "Error in select()", LASTERROR);
-//      }
-//    else if ( r == 0)
-//      return;
-//    else
-//      receive();
+  if (_connection->poll())
+    receive();
 }
 
 void FtsServer::wait() throw( FtsClientException)
@@ -744,7 +754,7 @@ void FtsServer::endMessage() throw( FtsClientException)
   if (_serverState != CONNECTED)
     throw FtsClientException( "Error in sending message");
 
-  // _connection.write( _message, _message.length());
+  _connection->write( _message, _message.length());
 }
 
 void FtsServer::aEndObject()

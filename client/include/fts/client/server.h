@@ -64,8 +64,8 @@ public:
   /**
    * Receive messages from FTS, non-blocking version.
    *
-   * This method does a non-blocking select() on the socket and if the
-   * socket is ready, calls receive().
+   * This method calls connection poll() method and if the connection 
+   * is ready, calls receive().
    */
   void poll() throw( FtsClientException);
 
@@ -120,7 +120,7 @@ private:
   FtsServerConnection *_connection;
 
   // Output to FTS and protocol encoding
-  FtsBuffer<char> _message;
+  FtsBuffer<unsigned char> _message;
 
   // Input from FTS and protocol decoding
   unsigned char *_receiveBuffer;

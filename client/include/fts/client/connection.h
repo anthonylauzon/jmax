@@ -31,8 +31,9 @@
 class FTSCLIENT_API FtsServerConnection {
 public:
   virtual void close() throw( FtsClientException) = 0;
+  virtual int poll() throw( FtsClientException) = 0;
   virtual int read( unsigned char *buffer, int n) throw( FtsClientException) = 0;
-  virtual int write( unsigned char *buffer, int n) throw( FtsClientException) = 0;
+  virtual int write( const unsigned char *buffer, int n) throw( FtsClientException) = 0;
 };
 
 class FTSCLIENT_API FtsSocketConnection: public FtsServerConnection {
@@ -59,8 +60,9 @@ public:
   FtsSocketConnection() throw( FtsClientException);
 
   void close() throw( FtsClientException);
+  int poll() throw( FtsClientException);
   int read( unsigned char *buffer, int n) throw( FtsClientException);
-  int write( unsigned char *buffer, int n) throw( FtsClientException);
+  int write( const unsigned char *buffer, int n) throw( FtsClientException);
 
 private:
   // Internal methods used by constructor
@@ -80,8 +82,9 @@ public:
   virtual ~FtsPipeConnection();
 
   void close() throw( FtsClientException);
+  int poll() throw( FtsClientException);
   int read( unsigned char *buffer, int n) throw( FtsClientException);
-  int write( unsigned char *buffer, int n) throw( FtsClientException);
+  int write( const unsigned char *buffer, int n) throw( FtsClientException);
 
 private:
   FtsProcess *_fts;
