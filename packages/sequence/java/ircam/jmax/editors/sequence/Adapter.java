@@ -211,9 +211,8 @@ abstract public class Adapter implements MappingListener{
   //--- Fields
   public DoubleMapper XMapper;
   public Mapper YMapper;
-  //public Mapper LenghtMapper;
-  public DoubleMapper LenghtMapper;//*@*//
-  public Mapper HeigthMapper;
+  public DoubleMapper LenghtMapper;
+	public DoubleMapper HeigthMapper;
   public LabelsMapper LabelMapper;
 
   Geometry geometry; //package private

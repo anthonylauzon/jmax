@@ -289,7 +289,7 @@ public void setLenght(Event e, int l)
 public int getHeigth(Event e) 
 {
 	if (HeigthMapper != null) 
-		return NOTE_DEFAULT_HEIGTH*(HeigthMapper.get(e)+1);
+		return (int)(NOTE_DEFAULT_HEIGTH*(HeigthMapper.get(e)+1));
 	
 	return NOTE_DEFAULT_HEIGTH;
 }
