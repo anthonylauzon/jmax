@@ -177,6 +177,8 @@ class FtsDatagramClientStream extends FtsStream
 
     c = in_data[in_fill_p++];
 
+    if(c < 0) c+=256;
+
     if (in_fill_p >= receivedPacketSize)
       in_fill_p = -1;
 
