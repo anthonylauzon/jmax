@@ -67,6 +67,9 @@ public class FontSizesAction extends EditorAction
     if (ErmesSelection.patcherSelection.ownedBy(sketch)&& 
 	ErmesSelection.patcherSelection.hasObjects()){
       try{
+
+	sketch.setUndo("Font-Change", false, false);	
+	
 	ErmesSelection.patcherSelection.apply(new ObjectAction() {
 	  public void processObject(GraphicObject object)
 	    {

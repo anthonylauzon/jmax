@@ -40,6 +40,9 @@ public class FitToTextPopUpAction extends EditorAction
   public void doAction(EditorContainer container)
   {
     GraphicObject object = ObjectPopUp.getPopUpTarget();
+
+    object.getSketchPad().setUndo("Fit-To-Text", object, false, false);	
+    
     object.redraw();
     object.redrawConnections();
     object.fitToText();

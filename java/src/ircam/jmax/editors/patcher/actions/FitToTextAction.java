@@ -47,6 +47,9 @@ public class FitToTextAction extends EditorAction
     ErmesSketchPad sketch = (ErmesSketchPad) container.getEditor();
   
     if (ErmesSelection.patcherSelection.ownedBy(sketch)){
+
+      sketch.setUndo("Fit-To-Text", false, false);	
+      
       ErmesSelection.patcherSelection.apply(new ObjectAction() {
 	public void processObject(GraphicObject object)
 	  {

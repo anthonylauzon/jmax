@@ -58,6 +58,9 @@ public class FontStylesPopUpAction extends EditorAction
   public void doAction(EditorContainer container)
   {
     GraphicObject object = ObjectPopUp.getPopUpTarget();
+
+    object.getSketchPad().setUndo("Font-Change", object, false, false);	
+
     try{
       object.redraw();
       object.redrawConnections();

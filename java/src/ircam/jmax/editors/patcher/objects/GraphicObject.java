@@ -1263,17 +1263,21 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   /************** Undo/Redo *******************/
   int ux, uy, uw, uh;
   int rx, ry, rw, rh;
+  Font uFont, rFont;
 
   public void setUndo()
   {
     ux = getX(); uy = getY(); uw = getWidth(); uh = getHeight();
+    uFont = getFont();
   }
   public void setRedo()
   {
     rx = getX(); ry = getY(); rw = getWidth(); rh = getHeight();
+    rFont = getFont();
   }
   public void undo()
   {
+    if( uFont != getFont()) setFont( uFont);
     setX( ux); 
     setY( uy); 
     setWidth( uw); 
@@ -1281,6 +1285,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   }
   public void redo()
   {
+    if( rFont != getFont()) setFont( rFont);
     setX( rx); 
     setY( ry); 
     setWidth( rw); 

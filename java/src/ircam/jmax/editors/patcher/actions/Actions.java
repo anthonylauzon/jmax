@@ -107,7 +107,6 @@ public class Actions
   //Object popup actions
   public static EditorAction bringToFrontObjectAction = new BringToFrontObjectAction();
   public static EditorAction sendToBackObjectAction = new SendToBackObjectAction();
-    //public static EditorAction setObjectColorAction = new SetObjectColorAction();
   public static EditorAction removeConnectionsAction = new RemoveInOutletConnection();
   public static EditorAction fitToTextPopUpAction = new FitToTextPopUpAction();
   public static EditorAction fontBiggerPopUpAction = new FontBiggerPopUpAction();
