@@ -113,10 +113,9 @@ fts_object_create( fts_class_t *cl, fts_patcher_t *patcher, int ac, const fts_at
 
   obj = fts_object_new( cl);
 
-#if 1
-  if ( patcher != NULL)
-    fts_patcher_add_object( patcher, obj);
-#else
+  fts_object_set_patcher(obj, patcher);
+
+  /* this would be even more elegant!
   if (parent)
     {
       fts_atom_t a;
@@ -124,16 +123,20 @@ fts_object_create( fts_class_t *cl, fts_patcher_t *patcher, int ac, const fts_at
       fts_set_object( &a, obj);
       fts_class_get_add_child( fts_object_get_class( parent))( parent, fts_system_inlet, 1, &a);
     }
-#endif
+  */
 
   fts_class_get_constructor(cl)(obj, fts_system_inlet, fts_s_init, ac, at); 
 
-  if ( fts_object_get_error(obj) != NULL)
+  if(fts_object_get_error(obj) != NULL)
     {
+      fts_class_get_deconstructor(cl)(obj, fts_system_inlet, fts_s_delete, 0, 0); 
       fts_object_free(obj);
       
       return NULL;
     }
+ 
+  if(patcher != NULL)
+    fts_patcher_add_object(patcher, obj);    
 
   return obj;
 }
@@ -144,7 +147,8 @@ fts_object_create( fts_class_t *cl, fts_patcher_t *patcher, int ac, const fts_at
  *
  */
 
-struct eval_data {
+struct eval_data 
+{
   fts_object_t *obj;
   fts_patcher_t *patcher;
 };
@@ -198,18 +202,6 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
   return fts_ok;
 }
 
-#define CHECK_ERROR_PROPERTY(OBJ)		\
-{						\
-  fts_atom_t a;					\
-  						\
-  if (fts_object_is_error(OBJ))			\
-    fts_set_int(&a, 1);				\
-  else						\
-    fts_set_int(&a, 0);				\
-						\
-  fts_object_put_prop( OBJ, fts_s_error, &a);	\
-}
-
 fts_object_t *
 fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
@@ -222,9 +214,13 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
 
   if (ac == 0)
     {
-      obj = fts_error_object_new( patcher, 0, 0, "empty object");
+      /* empty object */
+      fts_atom_t a;
+
+      fts_set_symbol(&a, fts_s_empty_object);
+      obj = fts_object_create(fts_error_object_class, patcher, 1, &a);
       fts_object_set_description(obj, ac, at);
-      CHECK_ERROR_PROPERTY(obj);
+
       return obj;
     }
 
@@ -259,7 +255,12 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
     }
 
   if (status != fts_ok)
-    obj = fts_error_object_new( patcher, new_ac, new_at, fts_status_get_description( status));
+    {
+      fts_atom_t a;
+
+      fts_set_symbol(&a, fts_status_get_description( status));
+      obj = fts_object_create(fts_error_object_class, patcher, 1, &a);
+    }
 
   /* Add the newly created object as user of the expression's variables,
      even if it is an error object, because we may try to recompute, and recover,
@@ -267,7 +268,6 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
   fts_expression_add_variables_user( expression, patcher, obj);
 
   fts_object_set_description(obj, new_ac, new_at);
-  CHECK_ERROR_PROPERTY(obj);
 
   fts_expression_delete(expression);
 
@@ -335,9 +335,9 @@ fts_object_set_outlets_number(fts_object_t *o, int n)
 static void 
 fts_object_unbind(fts_object_t *obj)
 {
-  /* Remove it as user of its var refs */
-  while (obj->var_refs)
-    fts_binding_remove_user(obj->var_refs->var, obj);
+  if(obj->patcher != NULL)
+    {
+    }
 }
 
 /* remove all connections from the object (done when unplugged from the patcher) */

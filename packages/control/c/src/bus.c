@@ -131,6 +131,8 @@ throw_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_
 {
   access_t *this = (access_t *)o;
 
+  this->bus = NULL;
+
   throw_set_channel(o, fts_system_inlet, 0, ac, at);
 }	
 
@@ -139,8 +141,11 @@ throw_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
 {
   access_t *this = (access_t *)o;
 
-  /*fts_channel_remove_origin(bus_get_channel(this->bus, this->index), o);*/
-  fts_object_release((fts_object_t *)this->bus);
+  if(this->bus != NULL)
+    {
+      /*fts_channel_remove_origin(bus_get_channel(this->bus, this->index), o);*/
+      fts_object_release((fts_object_t *)this->bus);
+    }
 }
 
 static void
@@ -201,8 +206,11 @@ catch_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
 {
   access_t *this = (access_t *)o;
 
-  /*fts_channel_remove_origin(bus_get_channel(this->bus, this->index), o);*/
-  fts_object_release((fts_object_t *)this->bus);
+  if(this->bus != NULL)
+    {
+      fts_channel_remove_origin(bus_get_channel(this->bus, this->index), o);
+      fts_object_release((fts_object_t *)this->bus);
+    }
 }
 
 static void

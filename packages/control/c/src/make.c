@@ -50,22 +50,20 @@ make_args(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   make_t *this = (make_t *)o;
   fts_object_t *obj = fts_object_create(this->class, NULL, ac, at);
-  fts_symbol_t error = fts_object_get_error(obj);
-  fts_atom_t a;
 
-  if(error)
+  if(obj)
     {
-      fts_object_destroy((fts_object_t *)obj);
-      fts_object_signal_runtime_error(o, "error in object creation: %s", error);
-      return;
+      fts_atom_t a;
+
+      fts_object_refer(obj);
+      
+      fts_set_object(&a, obj);
+      fts_outlet_send(o, 0, this->classname, 1, &a);
+      
+      fts_object_release(obj);
     }
-
-  fts_object_refer(obj);
-
-  fts_set_object(&a, obj);
-  fts_outlet_send(o, 0, this->classname, 1, &a);
-
-  fts_object_release(obj);
+  else
+    fts_object_signal_runtime_error(o, "error in object creation");
 }
 
 static void

@@ -144,7 +144,7 @@ alsamidi_get_midiport(alsamidi_t *this, fts_symbol_t name)
 	  fts_set_symbol(args + 2, hw_name);
 	  obj = fts_object_create(alsarawmidiport_type, NULL, 3, args);
 	  
-	  if(obj == NULL || fts_object_get_error(obj) == NULL)
+	  if(obj == NULL)
 	    port = (fts_midiport_t *)obj;
 	  else 
 	    fts_object_destroy(obj);

@@ -20,58 +20,12 @@
  * 
  */
 
-typedef struct fts_binding_list fts_binding_list_t;
-typedef struct fts_mess_obj_list fts_mess_obj_list_t;
-typedef struct fts_binding fts_binding_t;
-typedef struct fts_env fts_env_t;
+FTS_API void fts_name_define(fts_patcher_t *patcher, fts_symbol_t name, fts_atom_t *value);
+FTS_API void fts_name_undefine(fts_patcher_t *patcher, fts_symbol_t name);
 
-/* Commodity structure to keep a list of objects */
-struct fts_mess_obj_list
-{
-  fts_object_t *obj;
+FTS_API void fts_name_add_listener(fts_patcher_t *patcher, fts_symbol_t name, fts_object_t *obj);
+FTS_API void fts_name_remove_listener(fts_patcher_t *patcher, fts_symbol_t name, fts_object_t *obj);
 
-  struct fts_mess_obj_list *next;
-};
+FTS_API fts_atom_t *fts_name_get_value(fts_patcher_t *patcher, fts_symbol_t name);
 
-
-/* Commodity structure to keep a list of bindings */
-struct fts_binding_list
-{
-  fts_binding_t *var;
-
-  struct fts_binding_list *next;
-};
-
-
-/* Variable structure */
-struct fts_binding
-{
-  fts_symbol_t   name;
-  int            suspended;
-  fts_atom_t     value;
-  fts_mess_obj_list_t *users;	/* object that use this variables */
-  fts_mess_obj_list_t *definitions;/* object that want to redefine this variables locally, if any*/
-  struct fts_env  *env;		/* back pointer to the environment where the variable is stored */
-  fts_binding_t *next;		/* next in the environent */
-};
-
-
-/* Variable environment */
-struct fts_env
-{
-  fts_binding_t *first;
-  fts_object_t *patcher;
-};
-
-/* Access the value of a variable in the scope represented by an object */
-FTS_API fts_atom_t *fts_variable_get_value(fts_patcher_t *scope, fts_symbol_t name);
-/* Access the value of a variable in the given scope or create void place holder in root patcher */
-FTS_API fts_atom_t *fts_variable_get_value_or_void(fts_patcher_t *scope, fts_symbol_t name);
-
-/* Add a user to a variable in a given scope.
- * A user is an object that referentiate the variable and so need to 
- * be redefined when the variable change value.
- */
-FTS_API void fts_variable_add_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user);
-FTS_API void fts_variable_remove_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user);
 

@@ -41,13 +41,10 @@ struct fts_object
 
   /* patcher housekeeping */
   fts_patcher_t *patcher;
-  fts_object_t  *next_in_patcher;
+  fts_object_t *next_in_patcher;
 
-  /* Variable: If this object is bound to a variable, this is the variable name */
-  fts_symbol_t varname;
-
-  /* Variables referred by the object */
-  fts_binding_list_t *var_refs; /* handled completely in the variable.c file */
+  /* names refered by the object */
+  fts_list_t *name_refs;
 
   /* connections */
   int n_inlets;
@@ -104,10 +101,6 @@ FTS_API void fts_object_set_inlets_number(fts_object_t *o, int n);
 #define fts_object_set_patcher(o, patcher) (((fts_object_t *)(o))->patcher = (patcher))
 
 FTS_API fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
-
-/* variables */
-#define fts_object_get_variable(o) ((o)->varname)
-#define fts_object_set_variable(o, name) ((o)->varname = (name))
 
 #define fts_object_has_id(o) ((o)->head.id > FTS_NO_ID)
 #define fts_object_get_id(o) ((o)->head.id)

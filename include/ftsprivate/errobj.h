@@ -23,6 +23,16 @@
 #ifndef _FTS_PRIVATE_ERROBJ_H_
 #define _FTS_PRIVATE_ERROBJ_H_
 
+typedef struct
+{
+  fts_object_t o;
+  fts_symbol_t description;
+} fts_error_object_t;
+
+extern fts_class_t *fts_error_object_class;
+
+#define fts_error_object_get_description(e) ((e)->description)
+
 extern void fts_error_object_fit_inlet(fts_object_t *obj, int ninlet);
 extern void fts_error_object_fit_outlet(fts_object_t *obj, int noutlet);
 

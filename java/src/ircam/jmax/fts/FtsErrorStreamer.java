@@ -96,9 +96,7 @@ public class FtsErrorStreamer implements Runnable
 	    if (c == -1)
 	      {
 		running = false;
-		out.println("FTS crashed.\n");
-		System.out.println( "FTS crashed\n");
-
+		out.println("server connection lost\n");
 		JMaxApplication.ftsQuitted();
 	      }
 	    else

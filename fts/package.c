@@ -1713,7 +1713,6 @@ fts_kernel_package_init(void)
   fts_system_package->object.head.cl = 0;
   fts_system_package->object.head.id = FTS_NO_ID;
   fts_system_package->object.properties = 0;
-  fts_system_package->object.varname = 0;
   fts_system_package->object.refcnt = 0;
   fts_system_package->object.out_conn = 0;
   fts_system_package->object.in_conn = (fts_connection_t **) fts_zalloc(sizeof(fts_connection_t *));

@@ -178,7 +178,11 @@ getinter_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
     this->meth = getinter_bpf;
   else
     {
-      fts_object_signal_runtime_error(o, "not implemented for %s", fts_get_class_name(at));
+      if(winlet < 0)
+	fts_object_set_error(o, "not implemented for %s", fts_get_class_name(at));
+      else
+	fts_object_signal_runtime_error(o, "not implemented for %s", fts_get_class_name(at));
+
       return;
     }
 
@@ -211,11 +215,10 @@ getinter_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->obj = NULL;
   this->meth = NULL;
 
-  if(fts_is_object(at))
+  if(ac > 0 && fts_is_object(at))
     getinter_set_reference(o, 0, 0, 1, at);
-
-  if(this->obj == NULL)
-    fts_object_set_error(o, "not implemented for %s", fts_get_class_name(at));
+  else
+    fts_object_set_error(o, "argument missing");
 }
 
 static void
@@ -223,7 +226,8 @@ getinter_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   getinter_t *this = (getinter_t *)o;
 
-  fts_object_release(this->obj);
+  if(this->obj)
+    fts_object_release(this->obj);
 }
 
 static void

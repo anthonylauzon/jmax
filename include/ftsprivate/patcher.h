@@ -29,7 +29,6 @@ extern fts_class_t *patcher_class;
 
 #define fts_patcher_set_standard(p)      ((p)->type = fts_p_standard)
 #define fts_patcher_set_abstraction(p)   ((p)->type = fts_p_abstraction)
-#define fts_patcher_set_error(p)         ((p)->type = fts_p_error)
 extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *template);
 #define fts_patcher_get_template(p) ((p)->template)
 
@@ -38,7 +37,6 @@ extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *tem
 
 #define fts_patcher_is_standard(p)       ((p)->type == fts_p_standard)
 #define fts_patcher_is_abstraction(p)    ((p)->type == fts_p_abstraction)
-#define fts_patcher_is_error(p)          ((p)->type == fts_p_error)
 #define fts_patcher_is_template(p)       ((p)->type == fts_p_template)
 
 #define fts_patcher_get_env(p)           (&((p)->env))
@@ -49,13 +47,10 @@ extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *tem
 #define fts_object_is_standard_patcher(o) (fts_object_is_patcher((o)) &&  \
 				      fts_patcher_is_standard((fts_patcher_t *) (o)))
 
-#define fts_object_is_error(o) (fts_object_is_patcher((o)) &&  \
-				      fts_patcher_is_error((fts_patcher_t *) (o)))
+#define fts_object_is_error(o) (fts_object_get_class(o) == fts_error_object_class)
 
 #define fts_object_is_template(o) (fts_object_is_patcher((o)) &&  \
 				      fts_patcher_is_template((fts_patcher_t *) (o)))
-
-#define fts_object_is_object(o) ((! fts_object_is_patcher((o))) || fts_object_is_error((o)))
 
 #define fts_patcher_set_save_id(p, i) ((p)->save_id == (i))
 #define fts_patcher_get_save_id(p, i) ((p)->save_id)
@@ -69,5 +64,7 @@ extern fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const f
 extern void fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj);
 
 extern void fts_patcher_redefine_connection(fts_object_t *this, fts_connection_t *c);
+
+extern fts_patcher_t *fts_patcher_get_top_level(fts_patcher_t *patcher);
 
 #endif

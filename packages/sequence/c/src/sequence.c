@@ -235,14 +235,10 @@ static void
 sequence_send_name_to_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
-
-  if(fts_object_get_variable(o))
-    {
-      fts_atom_t a[1];
-      
-      fts_set_symbol(a, fts_object_get_variable(o));
-      fts_client_send_message(o, seqsym_setName, 1, a);
-    }
+  fts_atom_t a;
+  
+  fts_set_symbol(&a, seqsym_sequence);
+  fts_client_send_message(o, seqsym_setName, 1, &a);
 }
 
 /* move track by client request */

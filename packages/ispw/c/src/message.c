@@ -306,7 +306,7 @@ static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_a
 		}
 	      else
 		{
-		  lex_out_value = fts_variable_get_value(((fts_object_t *)this)->patcher, fts_get_symbol(rd_out));
+		  lex_out_value = fts_name_get_value(((fts_object_t *)this)->patcher, fts_get_symbol(rd_out));
 		  
 		  if(lex_out_value)
 		    {

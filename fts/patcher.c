@@ -479,7 +479,7 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_symbol_t name = fts_get_symbol(at);
       fts_label_t *label = fts_label_get_or_create(patcher, name);
 
-      fts_variable_add_user(patcher, name, o);
+      fts_name_add_listener(patcher, name, o);
       obj = (fts_object_t *)label;
     }
   else if(ac == 1 && fts_is_object(at))
@@ -630,7 +630,7 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fts_symbol_t name = fts_get_symbol(at);
       fts_label_t *label = fts_label_get_or_create(patcher, name);
 
-      fts_variable_add_user(patcher, name, o);
+      fts_name_add_listener(patcher, name, o);
       obj = (fts_object_t *)label;
     }
   else if(ac == 1 && fts_is_object(at))
@@ -862,7 +862,7 @@ patcher_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   /* look if the objects in the patchers are to be found */
   for (p = this->objects; p ; p = p->next_in_patcher)
     {
-      if (fts_object_is_object(p))
+      if (!fts_object_is_patcher(p))
 	{
 	  if (!fts_object_is_error(p))
 	    {
@@ -900,20 +900,8 @@ patcher_find_errors(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   /* look if the objects in the patchers are to be found */
   for (p = this->objects; p ; p = p->next_in_patcher)
     {
-      /* check if it have the error property on */
-      fts_atom_t value;
-
-      fts_object_get_prop(p, fts_s_error, &value);
-      
-      if (fts_is_int(&value))
-	{
-	  int v = fts_get_int(&value);
-	  
-	  if (v)
-	    {
-	      fts_objectset_add(set, p);
-	    }
-	}
+      if(fts_object_is_error(p))
+	fts_objectset_add(set, p);
     }
 
   /* do the recursive calls  */
@@ -970,17 +958,14 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->n_inlets = 0;
   this->n_outlets = 0;
 
-  fts_env_init(&this->env, (fts_object_t *) this);
-
   fts_patcher_set_standard(this);
 
   /* Define the "args" variable */
   this->args = (fts_tuple_t *)fts_object_create(fts_tuple_class, NULL, ac, at);
   fts_object_refer(this->args);
 
-  fts_variable_define( this, fts_s_args);
   fts_set_object( &va, (fts_object_t *)this->args);
-  fts_variable_restore(this, fts_s_args, &va, o);
+  fts_name_define( this, fts_s_args, &va);
 
   patcher_redefine_number_of_inlets(this, n_inlets);
   patcher_redefine_number_of_outlets(this, n_outlets);
@@ -1022,7 +1007,7 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   /* If it is a template, remove it from the template instance list */
   if (fts_patcher_is_template(this))
-    fts_template_remove_instance(this->template, (fts_object_t *) this);
+    fts_template_remove_instance(fts_patcher_get_template(this), (fts_object_t *) this);
 
   /* Set the deleted and reset the open flag */
   this->deleted = 1;
@@ -1043,8 +1028,6 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   /* delete all the variables */
   fts_object_release( this->args);
-
-  fts_variables_undefine(this, (fts_object_t *)this);
 
   /* delete the inlets and inlets tables */
   if (this->inlets)
@@ -1307,8 +1290,6 @@ patcher_get_patcher_type(fts_daemon_action_t action, fts_object_t *obj, fts_symb
     fts_set_symbol(value, fts_s_abstraction);
   else if (fts_patcher_is_template(this))
     fts_set_symbol(value, fts_s_template);
-  else if (fts_patcher_is_error(this))
-    fts_set_void(value);
   else
     fts_set_symbol(value, fts_s_patcher);
 }
@@ -1535,8 +1516,7 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
       fts_set_int(a+5, obj->n_outlets);
 
       fts_object_get_prop(obj, fts_s_layer, a+6);
-      fts_object_get_prop(obj, fts_s_error, a+7);
-      
+
       fts_client_start_message( this, sym_addObject);
       fts_client_add_int( this, fts_get_object_id(obj));
       fts_client_add_int( this, fts_get_int(a));
@@ -1546,15 +1526,17 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
       fts_client_add_int( this, fts_get_int(a+4));
       fts_client_add_int( this, fts_get_int(a+5));
       fts_client_add_int( this, fts_get_int(a+6));
-      fts_client_add_int( this, fts_get_int(a+7));
-      
+
       if(fts_object_is_error(obj))
 	{
-	  fts_object_get_prop(obj, fts_s_error_description, a+8);
-	  fts_client_add_string( this, fts_get_string(a+8));
+	  fts_client_add_int( this, 1);
+	  fts_client_add_string( this, fts_error_object_get_description((fts_error_object_t *)obj));
 	}
       else
-	fts_client_add_symbol( this, fts_object_get_class_name( obj));
+	{
+	  fts_client_add_int( this, 0);      
+	  fts_client_add_symbol( this, fts_object_get_class_name( obj));
+	}
       
       fts_client_add_int( this, fts_object_is_template(obj));
       
@@ -1899,27 +1881,17 @@ fts_patcher_redefine(fts_patcher_t *this, int ac, const fts_atom_t *at)
   /* change the patcher definition */
   fts_object_set_description(obj, ac, at);
 
-  /* suspend  the patcher internal variables if any */
-  fts_variables_suspend(this, obj);
-
   /* eval the expression */
   e = fts_oldexpression_eval(obj->patcher, ac, at, 1024, at);
   ac = fts_oldexpression_get_result_count(e);
 
   if (fts_oldexpression_get_status(e) != FTS_OLDEXPRESSION_OK)
     {
-      /* undefine all the variables, and set the error property */
-      fts_variables_undefine_suspended(this, obj);
-
       /* set error to expression error */
       fts_object_set_error(obj, fts_oldexpression_get_msg(e), fts_oldexpression_get_err_arg(e));
     }
   else
     {
-      /* Set the error property to zero */
-      fts_set_int(&a, 0);
-      fts_object_put_prop(obj, fts_s_error, &a);
-
       /* reallocate the args */
       fts_tuple_set( this->args, ac - 1, at + 1);
 
@@ -1928,9 +1900,6 @@ fts_patcher_redefine(fts_patcher_t *this, int ac, const fts_atom_t *at)
 
       /* register the patcher as user of the used variables */
       fts_oldexpression_add_variables_user(e, obj);
-
-      /* undefine all the locals that are still suspended  */
-      fts_variables_undefine_suspended(this, obj);
     }
 
   /* free the expression state structure */
@@ -2064,6 +2033,26 @@ fts_patcher_t *
 fts_get_root_patcher(void)
 {
   return fts_root_patcher;
+}
+
+/***********************************************************************
+ *
+ *  top level & variables
+ *
+ */
+
+fts_patcher_t *
+fts_patcher_get_top_level(fts_patcher_t *patcher)
+{
+  while(patcher != NULL)
+    {
+      if(fts_patcher_get_template(patcher) != NULL || fts_patcher_get_file_name(patcher) != NULL)
+	break;
+
+      patcher = fts_object_get_patcher((fts_object_t *)patcher);
+    }
+
+  return patcher;
 }
 
 /***********************************************************************

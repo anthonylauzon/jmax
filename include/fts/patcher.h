@@ -42,13 +42,12 @@ struct fts_patcher
 
   fts_tuple_t *args; /* the arguments used for the "args" variable */
 
-  enum {fts_p_standard, fts_p_abstraction, fts_p_error, fts_p_template} type;
+  enum {fts_p_standard, fts_p_abstraction, fts_p_template} type;
 
   /* If this patcher is a template, point to the template definition */
   fts_template_t *template;
 
-  /* Variables */
-  fts_env_t env;
+  fts_hashtable_t variables;
 
   fts_symbol_t file_name;
   

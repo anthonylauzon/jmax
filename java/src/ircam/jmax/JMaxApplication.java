@@ -346,6 +346,8 @@ public class JMaxApplication {
 	JOptionPane.showMessageDialog( getConsoleWindow(), 
 				       "jMax server connection lost! \n Quit user interface.", 
 				       "Fatal Error", JOptionPane.ERROR_MESSAGE); 
+
+	FtsErrorStreamer.stopFtsErrorStreamer();
 	Runtime.getRuntime().exit(0);
       }
   } 

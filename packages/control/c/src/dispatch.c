@@ -42,7 +42,7 @@ static void
 dispatch_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   /* use selector to find target */
-  fts_atom_t *a = fts_variable_get_value(fts_object_get_patcher(o), s);
+  fts_atom_t *a = fts_name_get_value(fts_object_get_patcher(o), s);
 
   if(a && fts_is_object(a))
     {

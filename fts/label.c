@@ -111,7 +111,7 @@ fts_class_t *fts_label_class = 0;
 fts_label_t *
 fts_label_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
 {
-  fts_atom_t *value = fts_variable_get_value_or_void(scope, name);
+  fts_atom_t *value = fts_name_get_value(scope, name);
   fts_label_t *label = NULL;
   fts_atom_t key, a;
   
@@ -149,7 +149,7 @@ fts_label_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
 fts_label_t *
 fts_label_get(fts_patcher_t *scope, fts_symbol_t name)
 {
-  fts_atom_t *value = fts_variable_get_value(scope, name);
+  fts_atom_t *value = fts_name_get_value(scope, name);
   fts_label_t *label = 0;
   
   if(value)

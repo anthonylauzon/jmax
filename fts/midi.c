@@ -1697,8 +1697,8 @@ midiconfig_restore(midiconfig_t *config)
   fts_atom_t a;
 
   fts_set_object(&a, midiconfig);
-  fts_variable_suspend(fts_get_root_patcher(), midiconfig_s_name);
-  fts_variable_restore(fts_get_root_patcher(), midiconfig_s_name, &a, (fts_object_t *)config);
+  fts_name_undefine(fts_get_root_patcher(), midiconfig_s_name);
+  fts_name_define(fts_get_root_patcher(), midiconfig_s_name, &a);
 }
 
 static void
@@ -1866,7 +1866,7 @@ fts_midiconfig_get_output(fts_symbol_t name)
 void
 fts_midiconfig_add_listener(fts_object_t *obj)
 {
-  fts_variable_add_user(fts_get_root_patcher(), midiconfig_s_name, obj);
+  fts_name_add_listener(fts_get_root_patcher(), midiconfig_s_name, obj);
 }
 
 fts_object_t *
@@ -2255,7 +2255,5 @@ fts_midi_config(void)
 
   /* define global midiconfig variable */
   fts_set_object(&a, midiconfig);
-
-  fts_variable_define(fts_get_root_patcher(), midiconfig_s_name);
-  fts_variable_restore(fts_get_root_patcher(), midiconfig_s_name, &a, (fts_object_t *)midiconfig);
+  fts_name_define(fts_get_root_patcher(), midiconfig_s_name, &a);
 }

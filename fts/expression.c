@@ -448,9 +448,9 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
       {
 	fts_atom_t *value;
 
-	value = fts_variable_get_value_or_void( scope, fts_get_symbol( &tree->value));
+	value = fts_name_get_value(scope, fts_get_symbol( &tree->value));
 
-	if (value == 0 || fts_is_void( value))
+	if (value == NULL)
 	  return undefined_variable_error;
 	else
 	  expression_stack_push( exp, value);
@@ -638,7 +638,7 @@ static void add_variables_user_aux( fts_parsetree_t *tree, fts_patcher_t *scope,
   add_variables_user_aux( tree->right, scope, obj);
 
   if ( tree->token == TK_DOLLAR && fts_is_symbol( &tree->value) )
-    fts_variable_add_user( scope, fts_get_symbol( &tree->value), obj);
+    fts_name_add_listener(scope, fts_get_symbol( &tree->value), obj);
 }
 
 void fts_expression_add_variables_user( fts_expression_t *exp, fts_patcher_t *scope, fts_object_t *obj)

@@ -71,7 +71,7 @@ argument_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  return;
 	}
 
-      fts_variable_add_user(fts_object_get_patcher(o), fts_s_args, o);
+      fts_name_add_listener(fts_object_get_patcher(o), fts_s_args, o);
     }
   else
     fts_object_set_error(o, "bad arguments");

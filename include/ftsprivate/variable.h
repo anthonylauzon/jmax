@@ -23,61 +23,13 @@
 #ifndef _FTS_PRIVATE_VARIABLE_H_
 #define _FTS_PRIVATE_VARIABLE_H_
 
-/* Lower level functions */
-extern void fts_env_init(fts_env_t *env, fts_object_t *patcher);
-extern void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object);
+typedef struct
+{
+  fts_objectlist_t *listeners;
+} fts_definition_t;
 
-/* Bind a value/object to a variable in the inner scope corresponding to the
- * passed object ; cause automatic redefinition of any object
- * within the scope of the variable that referred an outer variable with the same
- * name.
- * 
- * The owner argument is the object that actually created the binding; is it registered,
- * and can be used as a way to identify variables to undefine/suspend.
- * 
- * If the variable is suspended, the variable is redefined not suspended, and all
- * the recursively dependent objects are redefined, and their bindings recursively
- * redefined.
- */
-extern void fts_variable_define(fts_patcher_t *scope, fts_symbol_t name);
-
-/* Verify if a fts_variable_define can be issued in the passed scope.
- * Note that this is not like testing if a variable is bound; the binding can be 
- * inherited from a surrounding patcher.
- */
-extern int fts_variable_can_define(fts_patcher_t *scope, fts_symbol_t name);
-
-/* Return 1 if the variable exists *and* it is suspended */
-extern int fts_variable_is_suspended(fts_patcher_t *scope, fts_symbol_t name);
-
-/* Remove the variable bound to the name in the scope represented by the object.
- * Can be called also on suspended variables; in this case, it recursively resolve
- * all the suspended bindings dependent on this one; to resolve means in this
- * case to redefine the object, and either redefine or undefine the object
- * binding.
- */
-extern void fts_variable_undefine(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *owner);
-
-/* Like fts_variable_undefine, but act on all the variables in the current scope defined by 'owner' */
-extern void fts_variables_undefine(fts_patcher_t *scope, fts_object_t *owner);
-
-/* Suspend  the variable bound to the name in the scope represented by the object;
- * To suspend means to keep the dependency structure and value, but don't consider
- * the binding valid; all the binding to objects dependent on this variable are
- * recursively suspended.
-  
- * Note that a variable should be suspended only temporarly; i.e. variables are
- * never suspended between two user level atomic operations.
- */
-extern void fts_variable_suspend(fts_patcher_t *scope, fts_symbol_t name);
-
-/* Like fts_variable_suspend, but act on all the variables in the current scope defined by 'owner' */
-extern void fts_variables_suspend(fts_patcher_t *scope, fts_object_t *owner);
-
-/* Undefine all the variables in the given scope that are suspended */
-extern void fts_variables_undefine_suspended(fts_patcher_t *scope, fts_object_t *owner);
-
-/* Restore a variable */
-extern void fts_variable_restore(fts_patcher_t *scope, fts_symbol_t name, fts_atom_t *value, fts_object_t *owner);
+FTS_API fts_definition_t *fts_definition_get(fts_patcher_t *patcher, fts_symbol_t name);
+FTS_API void fts_definition_add_listener(fts_definition_t *def, fts_object_t *obj);
+FTS_API void fts_definition_remove_listener(fts_definition_t *def, fts_object_t *obj);
 
 #endif

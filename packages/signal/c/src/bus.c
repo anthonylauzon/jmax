@@ -163,7 +163,7 @@ static fts_hashtable_t *default_busses = 0;
 static bus_t *
 bus_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
 {
-  fts_atom_t *value = fts_variable_get_value_or_void(scope, name);
+  fts_atom_t *value = fts_name_get_value(scope, name);
   bus_t *bus = 0;
   fts_atom_t key, a;
   
@@ -293,7 +293,7 @@ access_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
 	  fts_symbol_t name = fts_get_symbol(at);
 	  
 	  *ptr = bus_get_or_create(fts_object_get_patcher(o), name);
-	  fts_variable_add_user(fts_object_get_patcher(o), name, o);
+	  fts_name_add_listener(fts_object_get_patcher(o), name, o);
 	  
 	  if(*ptr == NULL)
 	    {

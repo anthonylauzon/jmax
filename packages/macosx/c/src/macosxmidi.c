@@ -215,14 +215,10 @@ macosxmidi_create_midiport(macosxmidi_t *this, fts_class_t *cl, fts_symbol_t nam
   fts_set_object(args + 0, (fts_object_t *)this);
   fts_set_symbol(args + 1, name);
   fts_set_int(args + 2, id);
+
   port = fts_object_create(cl, NULL, 2 + (id != 0), args);
 
-  if(port == NULL || fts_object_get_error(port) == NULL)
-    return (fts_midiport_t *)port;
-  else {
-    fts_object_destroy(port);
-    return NULL;
-  }
+  return (fts_midiport_t *)port;
 }
 
 static void
