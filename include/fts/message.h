@@ -21,6 +21,11 @@
  */
 
 
+/**
+ * Messaging
+ *
+ * @defgroup message message 
+ */
 
 /************************************************
  *
@@ -93,9 +98,6 @@ FTS_API fts_status_description_t fts_ArgumentMissing;
 FTS_API fts_status_description_t fts_ArgumentTypeMismatch;
 FTS_API fts_status_description_t fts_ExtraArguments;
 FTS_API fts_status_description_t fts_InvalidMessage;
-
-/* init function */
-FTS_API void fts_messages_init(void);
 
 /* The object stack; used for fpe handling, debug and who know what else in the future */
 
@@ -247,5 +249,15 @@ FTS_API void fts_outlet_object(fts_object_t *o, int woutlet, fts_object_t *obj);
 FTS_API void fts_outlet_primitive(fts_object_t *o, int woutlet, const fts_atom_t* a);
 FTS_API void fts_outlet_atom(fts_object_t *o, int woutlet, const fts_atom_t* a);
 FTS_API void fts_outlet_atoms(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at);
+
+/**
+ * Return a value from a method.
+ * The returned value is an atom that is copied by the calling code.
+ *
+ * @fn void fts_return( fts_atom_t *p)
+ * @param p a pointer to the atom to be returned
+ * @ingroup message
+ */
+FTS_API void fts_return( fts_atom_t *p);
 
 #endif

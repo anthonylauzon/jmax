@@ -451,3 +451,22 @@ fts_outlet_atoms(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at)
   else if(ac > 0)
     fts_outlet_send(o, woutlet, fts_s_list, ac, at);
 }
+
+
+/* **********************************************************************
+ *
+ * Return mechanism for methods/functions
+ *
+ */
+
+static fts_atom_t fts_return_value;
+
+void fts_return( fts_atom_t *p)
+{
+  *fts_return_value = *p;
+}
+
+fts_atom_t *fts_get_return_value( void)
+{
+  return &fts_return_value;
+}
