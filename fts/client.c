@@ -1508,7 +1508,7 @@ void fts_client_release_object(fts_object_t *obj)
       return;
     }
 
-  if( obj->patcher)
+  if(( obj->patcher)&&(obj->patcher != fts_get_root_patcher()))
     {
       fts_set_object(a, obj);
       fts_client_send_message( (fts_object_t *)obj->patcher, s_remove_object, 1, a);
