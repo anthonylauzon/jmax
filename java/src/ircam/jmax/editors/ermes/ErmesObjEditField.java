@@ -23,7 +23,7 @@ import ircam.jmax.utils.*;
 //
 public class ErmesObjEditField extends TextArea implements KeyListener, FocusListener {
 
-  protected ErmesObjEditableObject itsOwner = null;
+  private ErmesObjEditableObject itsOwner = null;
   private ErmesSketchPad itsSketchPad = null;
   private boolean focused = false;
 
@@ -46,6 +46,11 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     addFocusListener(this);
 
     itsSketchPad = theSketchPad;
+  }
+
+  public void setOwner( ErmesObjEditableObject owner)
+  {
+    itsOwner = owner;
   }
 
   public void removeNotify()
@@ -172,8 +177,8 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
 		else
 		  step = 30;
 
-		itsOwner.resize( itsOwner.Size().width + step, itsOwner.Size().height);
-		itsSketchPad.repaint();
+// 		itsOwner.resize( itsOwner.Size().width + step, itsOwner.Size().height);
+// 		itsSketchPad.repaint();
 		setSize( getSize().width + step, getSize().height);
 		requestFocus();
 	      }

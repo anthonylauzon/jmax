@@ -159,43 +159,27 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsInletsLi
     itsSketchPad.ClickOnObject( this, evt, x, y);
   }
 
-  // actually starts the edit operation.
-  // The inset parameter specify the relative position of the editfield
-  private void doEdit( int editFieldInset) 
-  {
-    if (itsSketchPad.GetEditField() != null)
-      itsSketchPad.GetEditField().setEditable( true);
-
-    itsSketchPad.GetEditField().setFont( getFont());
-    itsSketchPad.GetEditField().setText( getArgs());
-    itsSketchPad.GetEditField().itsOwner = this;
-
-    if ( itsText.getRows() == 0)
-      itsSketchPad.GetEditField().setBounds( getX() + editFieldInset/2,
-					     getY() + 1,
-					     getWidth() - editFieldInset,
-					     itsFontMetrics.getHeight() + 20);
-    else
-      itsSketchPad.GetEditField().setBounds( getX() + editFieldInset/2,
-					     getY() + 1,
-					     getWidth() - editFieldInset,
-					     itsFontMetrics.getHeight() * (itsText.getRows()+1));
-
-    itsSketchPad.GetEditField().setVisible( true);
-    itsSketchPad.GetEditField().requestFocus();
-    itsSketchPad.GetEditField().setCaretPosition( getArgs().length());
-  }
-
-  public void restartEditing()  // (fd) public, because public in ErmesEditable...
-  {
-    doEdit( 0); 
-  }
-
   public void startEditing()  // (fd) public, because public in ErmesEditable...
   {
-    doEdit( 6);
+    ErmesObjEditField editField = itsSketchPad.GetEditField();
+
+    if (editField != null)
+      editField.setEditable( true);
+
+    editField.setFont( getFont());
+    editField.setText( getArgs());
+    editField.setOwner( this);
+
+    editField.setBounds( getX()-3, 
+			 getY()-3, 
+			 getWidth() + 6,
+			 itsFontMetrics.getHeight() * (itsText.getRows()+1) + 6);
+
+    editField.setVisible( true);
+    editField.requestFocus();
+    editField.setCaretPosition( getArgs().length());
   }
-    
+
 //   void MouseUp( MouseEvent evt,int x,int y) 
 //   {
 //     if (itsInEdit)

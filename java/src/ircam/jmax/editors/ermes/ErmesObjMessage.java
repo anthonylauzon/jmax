@@ -83,19 +83,14 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListen
   {
     ((FtsMessageObject)itsFtsObject).setMessage( text);
 
-    // (em) set the text and adjust the size
-    setText( text);
+    setText( getArgs());
   }
 
   // Set the text when FTS change the message content
 
-  public void messageChanged(String message)
+  public void messageChanged( String message)
   {
-    // (fd) To be redone
-    // Should be a nice repaint ??
-    // (em) set the text and adjust the size
-
-    setText( message);
+    setText( getArgs());
 
     Graphics g = itsSketchPad.getGraphics();
     Paint_specific(g);

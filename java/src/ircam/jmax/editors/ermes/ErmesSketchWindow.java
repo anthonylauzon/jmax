@@ -470,7 +470,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener, C
 	  {
 	    itsSketchPad.currentSelection.deselectAll();
 
-	    ((ErmesObjEditable)obj).restartEditing();
+	    ((ErmesObjEditable)obj).startEditing();
 
 	    itsSketchPad.GetEditField().selectAll();
 	  }

@@ -18,6 +18,5 @@ package ircam.jmax.editors.ermes;
 public interface ErmesObjEditable
 {
   public abstract void startEditing();
-  public abstract void restartEditing();
 }
     
