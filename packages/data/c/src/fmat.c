@@ -48,9 +48,6 @@ static fts_symbol_t sym_im = 0;
 static fts_symbol_t sym_mag = 0;
 static fts_symbol_t sym_arg = 0;
 
-
-
-
 /********************************************************
  *
  *  fmat format
@@ -101,7 +98,7 @@ fmat_format_get_by_name(fts_symbol_t name)
   fts_atom_t k, a;
   
   fts_set_symbol(&k, name);  
-  if(fts_hashtable_get(&fmat_format_hash, &k, &a) == 0)
+  if(fts_hashtable_get(&fmat_format_hash, &k, &a) != 0)
     return (fmat_format_t *)fts_get_pointer(&a);
 
   return NULL;
@@ -139,9 +136,6 @@ fmat_adapt_format(fmat_t *self)
     }    
   }
 }
-
-
-
 
 /********************************************************
  *
@@ -2303,7 +2297,7 @@ fmat_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       break;
       
     case fmat_format_id_rect:
-      for(i=0; i<m; i+=2)
+      for(i=0; i<2*m; i+=2)
       {
         float re = ptr[i];
         float im = ptr[i + 1];
@@ -2314,7 +2308,7 @@ fmat_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       break;
       
     case fmat_format_id_polar:
-      for(i=0; i<m; i+=2)
+      for(i=0; i<2*m; i+=2)
       {
         float re = logf(ptr[i]);
         float im = ptr[i + 1];
@@ -2351,7 +2345,7 @@ fmat_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       break;
       
     case fmat_format_id_rect:
-      for(i=0; i<m; i+=2)
+      for(i=0; i<2*m; i+=2)
       {
         float mag = expf(ptr[i]);
         float arg = ptr[i + 1];
@@ -2362,7 +2356,7 @@ fmat_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       break;
       
     case fmat_format_id_polar:
-      for(i=0; i<m; i+=2)
+      for(i=0; i<2*m; i+=2)
       {
         float mag = ptr[i];
         float arg = ptr[i + 1];
@@ -3474,14 +3468,15 @@ fmat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
+  fmat_format_t *format = fmat_get_format(self);
   int size = m * n;
   int i, j;
 
   if(size == 0)
-    fts_spost(stream, "<empty fmat>\n");
+    fts_spost(stream, "<empty fmat of %s>\n", fts_symbol_name(fmat_format_get_name(format)));
   else
   {
-    fts_spost(stream, "<fmat %dx%d>\n", m, n);
+    fts_spost(stream, "<fmat %dx%d of %s>\n", m, n, fts_symbol_name(fmat_format_get_name(format)));
     fts_spost(stream, "{\n");
 
     for(i=0; i<m; i++)
