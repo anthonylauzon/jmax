@@ -11,7 +11,7 @@ RulerPopupMenu.java \
 TrackMenu.java 
 
 JAVAC = @JAVACX@
-JAVACFLAGS=@JAVACFLAGSX@ -sourcepath $(top_srcdir)/packages/sequence/java
+JAVACFLAGS=@JAVACFLAGSX@
 JAVAROOT=$(top_builddir)/packages/sequence/java
-CLASSPATH_ENV=CLASSPATH=$(JAVAROOT):$(top_builddir)/java/src:$(top_builddir)/client/java/ftsclient.jar
+CLASSPATH_ENV=CLASSPATH=$(CLASSPATH):$(JAVAROOT):$(top_builddir)/java/src:$(top_builddir)/client/java/ftsclient.jar:$(top_srcdir)/packages/sequence/java
 
