@@ -55,6 +55,93 @@ unsigned long get_sys_reference_time();
 HANDLE in;
 HANDLE out;
 
+// Utilities for buffer size alignment computation
+int PGCD(int a, int b)
+{
+  return (b == 0) ? a : PGCD(b, a%b);
+}
+
+int PPCM(int a, int b)
+{
+  return (a*b)/PGCD(a,b);
+}
+
+/* int max(int a, int b)
+{
+  return a > b ? a : b;
+}
+
+int min(int a, int b)
+{
+  return a < b ? a : b;
+}
+*/
+// compute number of frames needed for buffer alignment
+int compute_frame_shift(int asio_buffer_size, int port_buffer_size)
+{
+  int res = 0;
+  int i ;
+  for (i = asio_buffer_size; i < PPCM(asio_buffer_size, port_buffer_size); i += asio_buffer_size)
+  {
+    res = max(res, i % port_buffer_size);
+  }
+  return res;
+}
+
+void copy_from_fts_to_asio(asio_audioport_t* port, int frames, int index)
+{
+  int i;
+  /* copy output buffer to ASIO driver */
+  for (i = 0; i < port->inputChannels + port->outputChannels; ++i)
+  {
+    if (port->bufferInfos[i].isInput == ASIOFalse)
+    {
+      int buffIndex = port->bufferInfos[i].channelNum;
+      char* asio_output_buffer = (char*)port->bufferInfos[i].buffers[index];
+      char* port_output_buffer = (char*)port->output_buffers[buffIndex];
+
+      // move to offset
+      asio_output_buffer += port->asio_output_buffer_offset * port->size_of_asio_type;
+      port_output_buffer += port->output_buffer_offset * port->size_of_asio_type;
+      /* copy buffsize sample to audio card buffer */
+      memcpy(asio_output_buffer, port_output_buffer, frames * port->size_of_asio_type);
+    }
+  }
+}
+
+void copy_from_asio_to_fts(asio_audioport_t* port, int frames, int index)
+{
+  int i;
+  /* copy output buffer to ASIO driver */
+  for (i = 0; i < port->inputChannels + port->outputChannels; ++i)
+  {
+    if (port->bufferInfos[i].isInput == ASIOTrue)
+    {
+      int buffIndex = port->bufferInfos[i].channelNum;
+      char* asio_input_buffer = (char*)port->bufferInfos[i].buffers[index];
+      char* port_input_buffer = (char*)port->input_buffers[buffIndex];
+      // move to offset
+      asio_input_buffer += port->asio_input_buffer_offset * port->size_of_asio_type;
+      port_input_buffer += port->input_buffer_offset * port->size_of_asio_type;
+
+      /* copy buffsize sample to audio card buffer */
+      memcpy(port_input_buffer, asio_input_buffer, frames * port->size_of_asio_type);
+    }
+  }
+
+}
+
+
+void output_fts_to_asio(asio_audioport_t* port, int frames_number, int index)
+{
+  if (frames_number > 0)
+  {
+    copy_from_fts_to_asio(port, frames_number, index);
+    port->asio_output_buffer_offset += frames_number;
+    port->output_buffer_offset += frames_number;
+  }
+}
+
 // FROM ASIO SDK
 //----------------------------------------------------------------------------------
 // conversion from 64 bit ASIOSample/ASIOTimeStamp to double float
@@ -67,85 +154,87 @@ const double twoRaisedTo32 = 4294967296.;
 
 ASIOTime *bufferSwitchTimeInfo(ASIOTime *timeInfo, long index, ASIOBool processNow)
 {	
-  
-  // store the timeInfo for later use
-  current_port->tInfo = *timeInfo;
-  // get the time stamp of the buffer, not necessary if no
-  // synchronization to other media is required
-  if (timeInfo->timeInfo.flags & kSystemTimeValid)
-    current_port->nanoSeconds = ASIO64toDouble(timeInfo->timeInfo.systemTime);
-  else
-    current_port->nanoSeconds = 0;
-  
-  if (timeInfo->timeInfo.flags & kSamplePositionValid)
-    current_port->samples = ASIO64toDouble(timeInfo->timeInfo.samplePosition);
-  else
-    current_port->samples = 0;
-  
-  if (timeInfo->timeCode.flags & kTcValid)
-    current_port->tcSamples = ASIO64toDouble(timeInfo->timeCode.timeCodeSamples);
-  else
-    current_port->tcSamples = 0;
-  
-  // get the system reference time
-  current_port->sysRefTime = get_sys_reference_time();
-
-  // buffer size in samples
-  long buffSize = current_port->preferredSize;
-
-  current_port->currentIndex = index;
-
-  long n;
+  long frames_per_buffer = current_port->asio_buffer_size;
   long samples_per_tick = fts_dsp_get_tick_size();
   int i;
-
-#undef ASIO_INPUT_IS_ENABLE
-#ifdef ASIO_INPUT_IS_ENABLE
-  /* copy ASIO input to fts input */
-  for (i = 0; i < current_port->inputChannels + current_port->outputChannels; ++i)
-    {
-      if (current_port->bufferInfos[i].isInput == ASIOTrue)
-	{
-	  /* @@@@@ HACK TO COPY FIRST BUFFER TO ALL ASIO BUFFER @@@@ */
-	  int buffIndex = current_port->bufferInfos[i].channelNum;
-	  memcpy(current_port->input_buffers[buffIndex], current_port->bufferInfos[i].buffers[index], buffSize * sizeof(short));
-	}
-    }
-#endif /* ASIO_INPUT_IS_ENABLE */  
-
-  /* process to compute buffSize to fill audio card */
-  while (current_port->processedSamples < buffSize)
-    {
-      // run fts scheduler 
-      fts_sched_run_one_tick();
-      current_port->processedSamples += samples_per_tick;
-    }
+  long tmp;
   
-  /* copy output buffer to ASIO driver */
-  for (i = 0; i < current_port->inputChannels + current_port->outputChannels; ++i)
-    {
-      if (current_port->bufferInfos[i].isInput == ASIOFalse)
-	{
-	  int buffIndex = current_port->bufferInfos[i].channelNum;
-	  /* copy buffsize sample to audio card buffer */
-	  memcpy(current_port->bufferInfos[i].buffers[index], current_port->output_buffers[buffIndex], buffSize * sizeof(short));
-	  /* copy last samples to begin of buffer */
+  // number of frames available into the asio input buffer
+  long frames_input_asio_buffer = frames_per_buffer;
+  // number of frames needed to complete the port input buffer
+  long frames_input_port_buffer;
+  // number of frames needed to complete the asio output buffer
+  long frames_output_asio_buffer;
+  // number of frames available into the port output buffer
+  long frames_output_port_buffer;
+  
+  // reinit asio input buffer offset  
+  current_port->asio_input_buffer_offset = 0;
 
-	  short* asio_buff = (short*)current_port->output_buffers[buffIndex];
-	  if (current_port->processedSamples > buffSize)
-	    {
-	      memcpy(asio_buff, asio_buff + buffSize, (current_port->processedSamples - buffSize) * sizeof(short));
-	    }
-	}
+  // fill asio output with remaining frames in port output 
+  frames_output_asio_buffer = frames_per_buffer - current_port->asio_output_buffer_offset;
+
+  frames_output_port_buffer = current_port->inout_buffer_size - current_port->output_buffer_offset;
+
+  tmp = min(frames_output_asio_buffer, frames_output_port_buffer);
+  output_fts_to_asio(current_port, tmp, index);
+
+  // remove consumed asio output frame
+  frames_output_asio_buffer -= tmp;      
+
+  while (frames_input_asio_buffer > 0)
+  {
+    // number of frame needed to fill port input buffer
+    frames_input_port_buffer = current_port->inout_buffer_size - current_port->input_buffer_offset;
+    if (frames_input_asio_buffer >= frames_input_port_buffer)
+    {
+      // read value from asio input buffer
+      copy_from_asio_to_fts(current_port, frames_input_port_buffer, index);
+      
+      // run scheduler 
+      fts_sched_run_one_tick();
+      
+      // port output buffer is full
+      current_port->output_buffer_offset = 0;
+      
+      // port input buffer is empty
+      current_port->input_buffer_offset = 0;
+      
+      // number of frame to write on sound card
+      tmp = min(current_port->inout_buffer_size, frames_output_asio_buffer);
+
+      // write value to asio output buffer
+      output_fts_to_asio(current_port, tmp, index);
+
+      // number of frame still available on asio output 
+      frames_output_asio_buffer -= tmp;
+      // number of frame stil available on asio input 
+      frames_input_asio_buffer -= frames_input_port_buffer;      
+      // offset for asio input buffer
+      current_port->asio_input_buffer_offset += frames_input_port_buffer;
     }
-  /* set new value of processedSamples */
-  current_port->processedSamples = current_port->processedSamples - buffSize;
+    else
+    {
+      // read value from asio input buffer
+      copy_from_asio_to_fts(current_port, frames_input_asio_buffer, index);
+      // offset for port input 
+      current_port->input_buffer_offset += frames_input_asio_buffer;
+      // offset for asio input buffer
+      current_port->asio_input_buffer_offset += frames_input_asio_buffer;
+      // we have consumed all frames available for reading
+      frames_input_asio_buffer = 0;
+    }
+  }
+
+  // reinit asio output buffer offset
+  current_port->asio_output_buffer_offset = 0;
 
   // finally if the driver supports the ASIOOutputReady() optimization, do it here, all data are in place
   if (current_port->postOutput)
-    {
-      current_port->driver->driver_interface->outputReady();
-    }
+  {
+    current_port->driver->driver_interface->outputReady();
+  }
+
   return 0L;
 }
 
@@ -190,61 +279,61 @@ long asioMessages(long selector, long value, void* message, double* opt)
   // currently the parameters "value", "message" and "opt" are not used.
   long ret = 0;
   switch(selector)
-    {
-    case kAsioSelectorSupported:
-      if(value == kAsioResetRequest
-	 || value == kAsioEngineVersion
-	 || value == kAsioResyncRequest
-	 || value == kAsioLatenciesChanged
-	 // the following three were added for ASIO 2.0, you don't necessarily have to support them
-	 || value == kAsioSupportsTimeInfo
-	 || value == kAsioSupportsTimeCode
-	 || value == kAsioSupportsInputMonitor)
-	ret = 1L;
-      break;
-    case kAsioResetRequest:
-      // defer the task and perform the reset of the driver during the next "safe" situation
-      // You cannot reset the driver right now, as this code is called from the driver.
-      // Reset the driver is done by completely destruct is. I.e. ASIOStop(), ASIODisposeBuffers(), Destruction
-      // Afterwards you initialize the driver again.
-      current_port->stopped;  // In this sample the processing will just stop
+  {
+  case kAsioSelectorSupported:
+    if(value == kAsioResetRequest
+       || value == kAsioEngineVersion
+       || value == kAsioResyncRequest
+       || value == kAsioLatenciesChanged
+       // the following three were added for ASIO 2.0, you don't necessarily have to support them
+       || value == kAsioSupportsTimeInfo
+       || value == kAsioSupportsTimeCode
+       || value == kAsioSupportsInputMonitor)
       ret = 1L;
-      break;
-    case kAsioResyncRequest:
-      // This informs the application, that the driver encountered some non fatal data loss.
-      // It is used for synchronization purposes of different media.
-      // Added mainly to work around the Win16Mutex problems in Windows 95/98 with the
-      // Windows Multimedia system, which could loose data because the Mutex was hold too long
-      // by another thread.
-      // However a driver can issue it in other situations, too.
-      ret = 1L;
-      break;
-    case kAsioLatenciesChanged:
-      // This will inform the host application that the drivers were latencies changed.
-      // Beware, it this does not mean that the buffer sizes have changed!
-      // You might need to update internal delay data.
-      ret = 1L;
-      break;
-    case kAsioEngineVersion:
-      // return the supported ASIO version of the host application
-      // If a host applications does not implement this selector, ASIO 1.0 is assumed
-      // by the driver
-      ret = 2L;
-      break;
-    case kAsioSupportsTimeInfo:
-      // informs the driver wether the asioCallbacks.bufferSwitchTimeInfo() callback
-      // is supported.
-      // For compatibility with ASIO 1.0 drivers the host application should always support
-      // the "old" bufferSwitch method, too.
-      ret = 1;
-      break;
-    case kAsioSupportsTimeCode:
-      // informs the driver wether application is interested in time code info.
-      // If an application does not need to know about time code, the driver has less work
-      // to do.
-      ret = 0;
-      break;
-    }
+    break;
+  case kAsioResetRequest:
+    // defer the task and perform the reset of the driver during the next "safe" situation
+    // You cannot reset the driver right now, as this code is called from the driver.
+    // Reset the driver is done by completely destruct is. I.e. ASIOStop(), ASIODisposeBuffers(), Destruction
+    // Afterwards you initialize the driver again.
+    current_port->stopped;  // In this sample the processing will just stop
+    ret = 1L;
+    break;
+  case kAsioResyncRequest:
+    // This informs the application, that the driver encountered some non fatal data loss.
+    // It is used for synchronization purposes of different media.
+    // Added mainly to work around the Win16Mutex problems in Windows 95/98 with the
+    // Windows Multimedia system, which could loose data because the Mutex was hold too long
+    // by another thread.
+    // However a driver can issue it in other situations, too.
+    ret = 1L;
+    break;
+  case kAsioLatenciesChanged:
+    // This will inform the host application that the drivers were latencies changed.
+    // Beware, it this does not mean that the buffer sizes have changed!
+    // You might need to update internal delay data.
+    ret = 1L;
+    break;
+  case kAsioEngineVersion:
+    // return the supported ASIO version of the host application
+    // If a host applications does not implement this selector, ASIO 1.0 is assumed
+    // by the driver
+    ret = 2L;
+    break;
+  case kAsioSupportsTimeInfo:
+    // informs the driver wether the asioCallbacks.bufferSwitchTimeInfo() callback
+    // is supported.
+    // For compatibility with ASIO 1.0 drivers the host application should always support
+    // the "old" bufferSwitch method, too.
+    ret = 1;
+    break;
+  case kAsioSupportsTimeCode:
+    // informs the driver wether application is interested in time code info.
+    // If an application does not need to know about time code, the driver has less work
+    // to do.
+    ret = 0;
+    break;
+  }
   return ret;
 }
 
@@ -264,6 +353,8 @@ asio_audioport_create_buffers(asio_audioport_t* port)
   ASIOBufferInfo* info;
   ASIOError result;
   int i;
+  // Hack to use short .....
+  int size_of_asio_type = 2;
 
 
   asioCallbacks.bufferSwitch = &bufferSwitch;
@@ -277,66 +368,105 @@ asio_audioport_create_buffers(asio_audioport_t* port)
   info = port->bufferInfos;
   /* prepare inputs */
   for (i = 0; i < port->inputChannels; i++, info++)
-    {
-      info->isInput = ASIOTrue;
-      info->channelNum = i;
-      info->buffers[0] = info->buffers[1] = 0;
-    }
+  {
+    info->isInput = ASIOTrue;
+    info->channelNum = i;
+    info->buffers[0] = info->buffers[1] = 0;
+  }
   /* prepare outputs */
   for (i = 0; i < port->outputChannels; i++, info++)
-    {
-      info->isInput = ASIOFalse;
-      info->channelNum = i;
-      info->buffers[0] = info->buffers[1] = 0;
-    }
+  {
+    info->isInput = ASIOFalse;
+    info->channelNum = i;
+    info->buffers[0] = info->buffers[1] = 0;
+  }
   /* create and activate buffers */
   result = 
     port->driver->driver_interface->createBuffers(port->bufferInfos, 
 						  port->inputChannels + port->outputChannels,
 						  port->preferredSize, &asioCallbacks);
+
+
   if (ASE_OK == result)
+  {
+    port->asio_buffer_size = port->preferredSize;
+    /* allocate memory for fts buffers */
+    port->input_buffers = (void**)fts_malloc(port->inputChannels * sizeof(void*));      
+    port->output_buffers = (void**)fts_malloc(port->outputChannels * sizeof(void*));      
+
+    for (i = 0; i < port->inputChannels + port->outputChannels; i++)
     {
-      /* allocate memory for fts buffers */
-      port->input_buffers = (void**)fts_malloc(port->inputChannels * sizeof(void*));      
-      port->output_buffers = (void**)fts_malloc(port->outputChannels * sizeof(void*));      
-
-      for (i = 0; i < port->inputChannels + port->outputChannels; i++)
+      port->channelInfos[i].channel = port->bufferInfos[i].channelNum;
+      port->channelInfos[i].isInput = port->bufferInfos[i].isInput;
+      result = port->driver->driver_interface->getChannelInfo(&port->channelInfos[i]);	  
+      if (ASE_OK != result)
+      {
+	break;
+      }
+      if (port->channelInfos[i].isInput == ASIOTrue)
 	{
-	  port->channelInfos[i].channel = port->bufferInfos[i].channelNum;
-	  port->channelInfos[i].isInput = port->bufferInfos[i].isInput;
-	  result = port->driver->driver_interface->getChannelInfo(&port->channelInfos[i]);	  
-	  if (ASE_OK != result)
+	  if (port->channelInfos[i].isActive == ASIOTrue)
 	    {
-	      break;
+	      post("Input Channel %d is active\n", port->bufferInfos[i].channelNum);
+	    }
+	  else
+	    {
+	      post("Input Channel %d is not active\n", port->bufferInfos[i].channelNum);
 	    }
 	}
-
-      int dsp_tick_size = fts_dsp_get_tick_size();
-      int allocatedBufferSize;
-      int j;
-      allocatedBufferSize = port->preferredSize + dsp_tick_size - (port->preferredSize % dsp_tick_size);
-      post("Allocated size: %d\n", allocatedBufferSize);
-      for (i = 0; i < port->inputChannels; ++i)
+      else
 	{
-	  /* create fts buffers */
-	  /* @@@@@ HACK FOR TESTING 16 BITS @@@@@ */
-	  port->input_buffers[i] = (void*)fts_malloc(allocatedBufferSize * sizeof(short));
-	}
-      for (i = 0; i < port->outputChannels; ++i)
-	{
-	  /* create fts buffers */
-	  /* @@@@@ HACK FOR TESTING 16 BITS @@@@@ */
-	  port->output_buffers[i] = (void*)fts_malloc(allocatedBufferSize * sizeof(short));
-	  /* clear output buffers */
-	  for (j = 0; j < allocatedBufferSize; ++j)
+	  if (port->channelInfos[i].isActive == ASIOTrue)
 	    {
-	      short* buff = (short*)port->output_buffers[i];
-	      buff[j] = 0;
+	      post("Output Channel %d is active\n", port->bufferInfos[i].channelNum);
+	    }
+	  else
+	    {
+	      post("Output Channel %d is not active\n", port->bufferInfos[i].channelNum);
 	    }
 	}
-    
-      port->allocatedBufferSize = allocatedBufferSize;
     }
+
+    int dsp_tick_size = fts_dsp_get_tick_size();
+    int j;
+
+    for (i = 0; i < port->inputChannels; ++i)
+    {
+      /* create fts buffers */
+      port->input_buffers[i] = (void*)fts_malloc(dsp_tick_size * size_of_asio_type);
+      /* clear value */
+      port->input_buffers[i] = memset(port->input_buffers[i], 0, dsp_tick_size * size_of_asio_type);
+    }
+    for (i = 0; i < port->outputChannels; ++i)
+    {
+      /* create fts buffers */
+      port->output_buffers[i] = (void*)fts_malloc(dsp_tick_size * size_of_asio_type);
+      /* clear value */
+      port->output_buffers[i] = memset(port->output_buffers[i], 0, dsp_tick_size * size_of_asio_type);
+    }
+
+
+    port->inout_buffer_size = dsp_tick_size;
+    port->size_of_asio_type = size_of_asio_type;
+
+    int frame_shift = compute_frame_shift(port->asio_buffer_size, port->inout_buffer_size);
+
+    post("Frame shift : %d\n", frame_shift);
+    if (port->inout_buffer_size <= port->asio_buffer_size)
+    {
+      port->asio_input_buffer_offset = 0;
+      port->asio_output_buffer_offset = frame_shift;
+      port->input_buffer_offset = 0;
+      port->output_buffer_offset = port->inout_buffer_size;
+    }
+    else
+    {
+      port->asio_input_buffer_offset = 0;
+      port->asio_output_buffer_offset = 0;
+      port->input_buffer_offset = frame_shift;
+      port->output_buffer_offset = port->inout_buffer_size;
+    }
+  }
 
   return result;    
 }
@@ -347,77 +477,89 @@ asio_audioport_create_buffers(asio_audioport_t* port)
 static void
 asio_audioport_input(fts_audioport_t* port, float** buffers, int buffsize)
 {
-  asio_audioport_t* driver = (asio_audioport_t*)port;
-  // get value from driver
-#if 0 
-  switch (driver->channelInfos[0].type)
-    {
-    case ASIOSTInt16LSB:
-      // post("[sample type: ] ASIOSTInt16LSB\n");
+  // WE CAN ONLY HAVE ONE ASIO DRIVER AT THE SAME TIME
+  // So we use current_port instead of port 
+  int i, j;
+  int nbAsioChannels = current_port->inputChannels + current_port->outputChannels;
+
+  for (i = 0; i <nbAsioChannels; ++i)
+  {
+    if (current_port->bufferInfos[i].isInput == ASIOFalse)
+    {      
       // ASIO -> jMax type conversion 
-      int i, j;
-      int processedSamples = current_port->processedSamples;
-      int nbAsioChannels = current_port->inputChannels + current_port->outputChannels;
-      int index = current_port->currentIndex;
-      for (i = 0; i < nbAsioChannels; ++i)
+      switch (current_port->channelInfos[0].type)
+      {
+      case ASIOSTInt16LSB:
+	// get FTS channel index
+	int channelIndex = current_port->bufferInfos[i].channelNum;
+	// get corret fts buffer 
+	float* buff = buffers[channelIndex];
+	// get asio buffer
+	short* input_buffers = (short*)current_port->input_buffers[channelIndex];
+	for (j = 0; j < buffsize; ++j)
 	{
-	  if (current_port->bufferInfos[i].isInput == ASIOTrue)
-	    {
-	      for (j = 0; j < buffsize; ++j)
-		{
-		  // convert samples 
-		  buffers[i][j] = ((int)current_port->bufferInfos[i].buffers[index]) / 32767.0f;
-		}
-	    }
+	  // convert samples
+	  buff[j] = (float)(input_buffers[j]) / 32767.0f;
 	}
-
-
-
-      break;
- 
+	break;
+#if 0
+      case ASIOSTInt24LSB: // not implemented
+	break;	
+      case ASIOSTInt32LSB: // not implemented
+	break;	
+#endif
+      }
     }
-#endif 
+  }
 }
 
 static void
 asio_audioport_output(fts_audioport_t* port, float** buffers, int buffsize)
 {
-  //   asio_audioport_t* driver = (asio_audioport_t*)port;
-  // send value to driver
+  // WE CAN ONLY HAVE ONE ASIO DRIVER AT THE SAME TIME
+  // So we use current_port instead of port 
   int i, j;
-  int processedSamples = current_port->processedSamples;
   int nbAsioChannels = current_port->inputChannels + current_port->outputChannels;
-    
-  /* index of double buffer */
-  int index = current_port->currentIndex;
-  switch (current_port->channelInfos[0].type)
-    {
-    case ASIOSTInt16LSB:
-      // ASIO -> jMax type conversion 
-      for (i = 0; i <nbAsioChannels; ++i)
-	{
-	  if (current_port->bufferInfos[i].isInput == ASIOFalse)
-	    {
-	      // get FTS channel index
-	      int channelIndex = current_port->bufferInfos[i].channelNum;
-	      // get corret fts buffer 
-	      float* buff = buffers[channelIndex];
-	      // get asio buffer
-	      short* asio_buff = (short*)current_port->output_buffers[channelIndex];
-	      for (j = 0; j < buffsize; ++j)
-		{
-		  // convert samples 
-		  asio_buff[j + current_port->processedSamples] = (short)(buff[j] * 32767.0f);
-		}
-	    }
-	}
-      break;
-    case ASIOSTInt24LSB:
-      break;
 
-    case ASIOSTInt32LSB:
-      break;
+  for (i = 0; i <nbAsioChannels; ++i)
+  {
+    if (current_port->bufferInfos[i].isInput == ASIOFalse)
+    {      
+      // ASIO -> jMax type conversion 
+      switch (current_port->channelInfos[0].type)
+      {
+      case ASIOSTInt16LSB:
+	// get FTS channel index
+	int channelIndex = current_port->bufferInfos[i].channelNum;
+	// get corret fts buffer 
+	float* buff = buffers[channelIndex];
+	// get asio buffer
+	short* output_buffers = (short*)current_port->output_buffers[channelIndex];
+	if (fts_audioport_is_channel_used((fts_audioport_t*)current_port, FTS_AUDIO_OUTPUT, channelIndex))
+	  {
+	    for (j = 0; j < buffsize; ++j)
+	      {
+		// convert samples 
+		output_buffers[j] = (short)(buff[j] * 32767.0f);
+	      }
+	  }
+	else
+	  {
+	    for (j = 0; j < buffsize; ++j)
+	      {
+		output_buffers[j] = 0;
+	      }
+	  }
+	break;
+#if 0
+      case ASIOSTInt24LSB: // not implemented
+	break;	
+      case ASIOSTInt32LSB: // not implemented
+	break;	
+#endif
+      }
     }
+  }
 }
 
 static void 
@@ -431,7 +573,10 @@ asio_audioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
   /* before starting ASIO processing we need to stop FTS scheduler .... */
 
   /* start ASIO processing */
-  current_port->driver->driver_interface->start();
+  if (!current_port->driver->isStarted)
+  {
+    current_port->driver->driver_interface->start();
+  }
 
   /* HACK to simulate FTS scheduler stop */
   Sleep(10000);
@@ -459,15 +604,15 @@ static void
 asio_audioport_close_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   fts_audioport_unset_open((fts_audioport_t*)o, FTS_AUDIO_INPUT);
+  // dont forget to restart FTS scheduler 
   current_port->driver->driver_interface->stop();
 }
 
 static void
 asio_audioport_close_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-
-  /* before stop ASIO processing, we need to restart FTS scheduler */
   fts_audioport_unset_open((fts_audioport_t*)o, FTS_AUDIO_OUTPUT);
+  // dont forget to restart FTS scheduler  
   current_port->driver->driver_interface->stop();
 }
 
@@ -477,16 +622,16 @@ asio_audioport_sched_listener(fts_object_t* o, int winlet, fts_symbol_t s, int a
   asio_audioport_t* self = (asio_audioport_t*)o;
   
   if (!fts_sched_is_running())
-    {
-      /* stop process ... */
-      self->driver->driver_interface->stop();
+  {
+    /* stop process ... */
+    self->driver->driver_interface->stop();
 
-      /* dispose buffer ... */
-      self->driver->driver_interface->disposeBuffers();
+    /* dispose buffer ... */
+    self->driver->driver_interface->disposeBuffers();
       
-      /* exit asio ... */
-      self->driver->driver_interface->Release();
-    }
+    /* exit asio ... */
+    self->driver->driver_interface->Release();
+  }
 }
 
 static void 
@@ -499,10 +644,10 @@ asio_audioport_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const f
   asio_driver_t* driver;
   fts_audioport_init((fts_audioport_t*)self);
   
-  self->processedSamples = 0;
 
   driver = (asio_driver_t*)fts_get_pointer(at);
   self->driver = driver;
+  self->driver->isStarted = false;
 
   /* initialize driver */
   driver->driver_interface->init(driverInfo.sysRef);
@@ -526,13 +671,13 @@ asio_audioport_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const f
   self->sampleRate = (double)sampleRate;
   post("Current SampleRate : %f\n", self->sampleRate);
   if (ASE_OK == driver->driver_interface->outputReady())
-    {
-      self->postOutput = true;
-    }
+  {
+    self->postOutput = true;
+  }
   else
-    {
-      self->postOutput = false;
-    }
+  {
+    self->postOutput = false;
+  }
   post("ASIOOuputReady() - %s \n", self->postOutput ? "Supported" : "Not Supported");
   
   /* create buffers */
@@ -540,20 +685,20 @@ asio_audioport_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const f
 
   /* set for playback */
   if (0 < self->inputChannels)
-    {
-      fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_INPUT);
-      fts_audioport_set_channels((fts_audioport_t*)self, FTS_AUDIO_INPUT, self->inputChannels);
-      fts_audioport_set_io_fun((fts_audioport_t*)self, FTS_AUDIO_INPUT, asio_audioport_input);
-      post("[asio audioport] added to input port \n");
-    }
+  {
+    fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_INPUT);
+    fts_audioport_set_channels((fts_audioport_t*)self, FTS_AUDIO_INPUT, self->inputChannels);
+    fts_audioport_set_io_fun((fts_audioport_t*)self, FTS_AUDIO_INPUT, asio_audioport_input);
+    post("[asio audioport] added to input port \n");
+  }
   /* set for capture */
   if (0 < self->outputChannels)
-    {
-      fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
-      fts_audioport_set_channels((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, self->outputChannels);
-      fts_audioport_set_io_fun((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, asio_audioport_output);
-      post("[asio audioport] added to output port \n");
-    }
+  {
+    fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
+    fts_audioport_set_channels((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, self->outputChannels);
+    fts_audioport_set_io_fun((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, asio_audioport_output);
+    post("[asio audioport] added to output port \n");
+  }
   
   fts_sched_running_add_listener(o, asio_audioport_sched_listener);
 }

@@ -30,6 +30,7 @@ typedef struct
   char dllpath[MAX_PATH_LEN];
   LPVOID asiodrv;
   IASIO* driver_interface;
+  bool isStarted;
 } asio_driver_t;
 
 
@@ -51,16 +52,12 @@ typedef struct
   long maxSize;
   long preferredSize;
   long granularity;
-  /* used buffer size */
-  long allocatedBufferSize;
 
   double sampleRate;
   
   ASIOBufferInfo* bufferInfos;
   ASIOChannelInfo* channelInfos;
 
-  void** input_buffers;
-  void** output_buffers;
 
   // Information from ASIOGetSamplePosition()
   double nanoSeconds;
@@ -71,14 +68,41 @@ typedef struct
   ASIOTime tInfo; // time info state
   unsigned long sysRefTime; // system reference time, when bufferSwitch() was called
 
+
+  // driver is running ?
   bool stopped;
+  // need to call AsioOutputReady() ?
   bool postOutput;
 
-  long processedSamples;
-	long currentIndex;
+
+  // offset in asio input buffer
+  int asio_input_buffer_offset;
+  // offset in asio output buffer
+  int asio_output_buffer_offset;
+  // offset in port input buffer
+  int input_buffer_offset;
+  // offset in port output buffer
+  int output_buffer_offset;
+
+  void** input_buffers;
+  void** output_buffers;
+
+  int asio_buffer_size;
+  int inout_buffer_size;
+
+  int size_of_asio_type;
+
 } asio_audioport_t;
 
 
 extern fts_class_t* asio_audioport_type;
 
 #endif /* JMAX_ASIO_PORT_H_ */
+
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
