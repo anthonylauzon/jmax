@@ -284,15 +284,25 @@ fts_symbol_t get_user_directory(void)
   SHGetFolderLocation();
   SHGetSpecialFolderPath();
   */
-  if (SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, dir))
+  HRESULT err;
+  err = SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, dir);
+  if (SUCCEEDED(err))
     {
       fts_log("[user] user directory: %s\n", dir);
     }
   else
+  {
+    if ((S_FALSE == err) ||(E_FAIL == err))
     {
-      fts_log("[user] cannot get user directory \n");
-      return NULL;
+      fts_post("[user] get_user_directory : The folder does not exist \n");
     }
+    if (E_INVALIDARG == err)
+    {
+      fts_post("[user] get_user_directory: The CSIDL in nFolder is not valid \n");
+    }
+    fts_log("[user] cannot get user directory \n");
+    return NULL;
+  }
 
   return fts_new_symbol(dir);
 }
@@ -349,22 +359,11 @@ fts_get_system_project( void)
 fts_symbol_t 
 fts_get_user_configuration( void)
 {
-  char cwd[_MAX_PATH];
   char path[_MAX_PATH];
 
-  /* check for a config file in the current directory */
-  if (get_user_directory() == 0) 
-    {
-      return NULL;
-    }
 
-  /* @@@@@ Change default configuration file name here @@@@@ */
-  fts_make_absolute_path(cwd, "config.jcfg", path, _MAX_PATH);
-  if (fts_file_exists(path) && fts_is_file(path)) {
-    return fts_new_symbol(path);
-  }
-
-  return NULL;
+  fts_make_absolute_path(get_user_directory(), fts_s_default_config, path, _MAX_PATH);
+  return fts_new_symbol(path);
 }
 
 fts_symbol_t 
