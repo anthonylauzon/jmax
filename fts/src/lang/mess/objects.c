@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.15 $ IRCAM $Date: 1998/04/23 16:07:20 $
+ *      $Revision: 1.16 $ IRCAM $Date: 1998/04/29 14:44:38 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -938,7 +938,7 @@ fts_get_boolean_by_name(int argc, const fts_atom_t *at, fts_symbol_t name, int d
 
 
 fts_symbol_t 
-fts_object_get_class_name(fts_object_t *obj)
+fts_object_get_class_name( fts_object_t *obj)
 {
   return fts_get_class_name(obj->cl);
 }
