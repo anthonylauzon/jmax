@@ -22,8 +22,7 @@ static int running_real_time = 1;
 struct timespec pause_time = { 0, 10000};
 
 
-void
-fts_platform_init(void)
+void fts_platform_init(void)
 {
   fts_add_welcome(&gnu_welcome);
 
@@ -31,7 +30,6 @@ fts_platform_init(void)
     {
       if (setpriority(PRIO_PROCESS, 0, -20) < 0)
 	{
-	  fprintf( stderr, "fts: cannot set priority (%s) using normal priority\n", strerror(errno));
 	  running_real_time = 0;
 	}
     }
