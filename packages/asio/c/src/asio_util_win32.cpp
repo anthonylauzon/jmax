@@ -214,7 +214,6 @@ unsigned int asio_util_scan_drivers()
   fts_atom_t at;
 
   /* Initialize COM library */
-  post("Initialize COM library \n");
   CoInitialize(0);
 
   ASIODriverInfo driverInfo;
@@ -228,9 +227,7 @@ unsigned int asio_util_scan_drivers()
       err = RegEnumKey(regKeyEnum, index++, (LPSTR)regKeyName, MAX_DRIVER_NAME_LENGTH);
       if (err == ERROR_SUCCESS)
 	{	  
-	  post("Found an ASIO Driver, with name: %s\n", regKeyName);
 	  driver = asio_util_create_driver(regKeyEnum, regKeyName, index);
-	  post(" Try to open the asio driver \n");
 	  asio_open_driver(driver);	  
 	  if (0 != driver)
 	    {
