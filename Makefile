@@ -159,7 +159,7 @@ dist: cvs-tag
 		cd .$$$$ ; \
 		cvs export -r$(JMAX_VERSION_TAG) jmax ; \
 		mv jmax jmax-$(JMAX_VERSION) ; \
-		tar cvf - jmax-$(JMAX_VERSION) | gzip -c --best > ../../jmax-$(VERSION)-src.tar.gz ; \
+		tar cvf - jmax-$(JMAX_VERSION) | gzip -c --best > ../../jmax-$(JMAX_VERSION)-src.tar.gz ; \
 		chmod 644 ../../jmax-$(JMAX_VERSION)-src.tar.gz ; \
 		cd .. ; \
 		/bin/rm -rf .$$$$ ; \
