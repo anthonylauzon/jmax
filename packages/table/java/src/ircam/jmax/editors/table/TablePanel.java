@@ -39,9 +39,13 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     }
   }
 
+  public void fillTable(FtsIntegerVector aIntV) {
+    if(aIntV.getSize()!=0) initValues(aIntV.getValues(),aIntV.getSize());
+  }
+
   public void actionPerformed(ActionEvent e) {
-    System.err.println("PASSATO");
-    itsTabler.fillTable();
+    //the values[] pointer is still there with another content, right?
+    paint(getGraphics());
   }
   
 
@@ -100,6 +104,7 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
   }
   public void mouseReleased(MouseEvent e){
     ((FtsIntegerVector)(itsTabler.itsData.getContent())).changed();
+    ((FtsIntegerVector)(itsTabler.itsData.getContent())).forceUpdate();
   }
 
   public void mouseEntered(MouseEvent e){}

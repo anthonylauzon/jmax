@@ -50,6 +50,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
 
     itsRefreshButton = new Button("Refresh");
     itsRefreshButton.resize(60,20);
+    itsRefreshButton.addActionListener(itsTablePanel);
     itsFrontHeader.add("Center", itsCoordinates);
     itsFrontHeader.add("East", itsRefreshButton);
 
@@ -59,7 +60,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
     
     Init();
 
-    fillTable();
+    itsTablePanel.fillTable((FtsIntegerVector) theData.getContent());
     itsTablePanel.repaint();
 
     validate();
@@ -69,12 +70,6 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
   }
 
  
-  void fillTable() {
-    //fill the internal vector with the data contained in itsData
-    FtsIntegerVector aIntV = ((FtsIntegerVector)(itsData.getContent()));
-    if(aIntV.getSize()!=0) itsTablePanel.initValues(aIntV.getValues(),aIntV.getSize());
-  }
-
   public Tabler() {
     super();
   }
@@ -104,7 +99,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
   public void SetupMenu(){}
 
   public void setCoordinates(int x, int y){
-    itsCoordinates.setText("x: "+x+"\t\t y: "+y);
+    itsCoordinates.setText("x: "+x+"\t\t  current value: "+itsTablePanel.values[x]+"\t\t y: "+y);
   }
   
   /////////////////////////////////////////////////////////////////////////////
