@@ -104,8 +104,8 @@ class ErmesObjToggle extends ErmesObject {
   }
 
   public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
-    if((currentRect.width+theDeltaX < getPreferredSize().width)||
-       (currentRect.height+theDeltaY < getPreferredSize().height))
+    if((currentRect.width+theDeltaX < getMinimumSize().width)||
+       (currentRect.height+theDeltaY < getMinimumSize().height))
       return false;
     else return true;
   }
@@ -113,8 +113,8 @@ class ErmesObjToggle extends ErmesObject {
   public void ResizeToText(int theDeltaX, int theDeltaY){
     int aWidth = currentRect.width+theDeltaX;
     int aHeight = currentRect.height+theDeltaY;
-    if(aWidth<getPreferredSize().width) aWidth = getPreferredSize().width;
-    if(aHeight<getPreferredSize().height) aHeight = getPreferredSize().height;
+    if(aWidth<getMinimumSize().width) aWidth = getMinimumSize().width;
+    if(aHeight<getMinimumSize().height) aHeight = getMinimumSize().height;
     Resize(aWidth-currentRect.width, aHeight-currentRect.height);
   }
   
