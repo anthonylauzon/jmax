@@ -29,43 +29,60 @@ import ircam.jmax.editors.sequence.track.*;
 /**
  * A simple Mapper that accesses the duration parameter
  */ 
-public class DurationMapper extends Mapper {
-  
+public class DurationMapper extends DoubleMapper/*Mapper*///*@*//
+{ 
   /**
    * set the duration of this event
    */
-    public void set(Event e, int value) 
-  {
-    e.setProperty("duration", new Integer(value));
-  }
-
+    /*public void set(Event e, int value) 
+      {
+      e.setProperty("duration", new Integer(value));
+      }*/
+    public void set(Event e, double value) 
+    {
+	e.setProperty("duration", new Double(value));
+    }
+    
+    
   /**
    * get the duration of this event
    */
-    public int get(Event e) 
-  {
+    /*public int get(Event e) 
+      {
       return ((Integer)e.getProperty("duration")).intValue();
-  }
+      }*/
+    public double get(Event e) 
+    {
+	return ((Double)e.getProperty("duration")).doubleValue();
+    }
+    
 
-  public String getName()
+    public String getName()
     {
 	return "duration";
     }
 
-  /**
-   * access the static instance
-   */
-  static Mapper getMapper() 
-  {
-    if (itsDurationMapper == null)
-       itsDurationMapper = new DurationMapper();
-    return itsDurationMapper;
-  }
+    /**
+     * access the static instance
+     */
+    static DoubleMapper/*Mapper*/ getMapper()
+    {
+	if (itsDurationMapper == null)
+	    itsDurationMapper = new DurationMapper();
+	return itsDurationMapper;
+    }
 
-  //--- Fields
-
-  static DurationMapper itsDurationMapper;
+    //--- Fields
+    
+    static DurationMapper itsDurationMapper;
 }
+
+
+
+
+
+
+
 
 
 

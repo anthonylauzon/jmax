@@ -263,29 +263,37 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
 	super.setY(e, getInvY(y));
     }
 
-
   /**
    * inherited from Adapter.
-   * returns the lenght value of the event,
+   * returns the lenght value of the event in graphic coordinates,
    * making the needed cordinate conversions (zooming).
    */
-    public int getLenght(Event e) 
+    public int getLenght(Event e)
     {
-	return (int) (super.getLenght(e)*geometry.getXZoom());
+	return (int)(super.getLenght(e)*geometry.getXZoom());
     }
-
-    public int getInvLenght(Event e) 
+  /**
+   * inherited from Adapter.
+   * returns the lenght value of the event in logic coordinates,
+   */
+    /*public int getInvLenght(Event e)
+      {
+      return (int) (super.getLenght(e));
+      }*/
+    public double getInvLenght(Event e)//*@*// 
     {
-	return (int) (super.getLenght(e));
+	if (LenghtMapper != null) return LenghtMapper.get(e);
+	else return 0.0;
     }
 
   /**
    * set the duration of the event associated with the graphic lenght l.
    */
-    public  void setLenght(Event e, int l) 
-  {
-    super.setLenght(e, (int) (l/geometry.getXZoom()));
-  }
+    public void setLenght(Event e, int l) 
+    {
+	//super.setLenght(e, (int) (l/geometry.getXZoom()));//*@*//
+	LenghtMapper.set(e, (double)((double)l/geometry.getXZoom()) );
+    }
 
     /**
      * returns the heigth of this event */
@@ -305,43 +313,41 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
    * Reassign the mappers according to the change, and ask
    * a repaint of the graphic.
    */
-  public void mappingChanged(String graphicName, String scoreName) 
-  {
-
-    if (graphicName.equals("y")) 
-      {
+    public void mappingChanged(String graphicName, String scoreName) 
+    {
+	/*if (graphicName.equals("y")) 
+	{
 	if (scoreName.equals("pitch"))
-	  YMapper = PitchMapper.getMapper();
+	YMapper = PitchMapper.getMapper();
 	else if (scoreName.equals("duration"))
-	  YMapper = DurationMapper.getMapper();
+	YMapper = DurationMapper.getMapper();
 	else if (scoreName.equals("velocity"))
-	  YMapper = VelocityMapper.getMapper();
+	YMapper = VelocityMapper.getMapper();
 	else if (scoreName.equals("channel"))
-	  YMapper = ChannelMapper.getMapper();
-      }
-    else if (graphicName.equals("lenght")) 
-      {
+	YMapper = ChannelMapper.getMapper();
+	}
+	else if (graphicName.equals("lenght")) 
+	{
 	if (scoreName.equals("pitch"))
-	  LenghtMapper = PitchMapper.getMapper();
+	LenghtMapper = PitchMapper.getMapper();
 	else if (scoreName.equals("duration"))
-	  LenghtMapper = DurationMapper.getMapper();
+	LenghtMapper = DurationMapper.getMapper();
 	else if (scoreName.equals("velocity"))
-	  LenghtMapper = VelocityMapper.getMapper();
+	LenghtMapper = VelocityMapper.getMapper();
 	else if (scoreName.equals("channel"))
-	  LenghtMapper = ChannelMapper.getMapper();
-      }
-    else if (graphicName.equals("label")) 
-      {
+	LenghtMapper = ChannelMapper.getMapper();
+	}
+	else if (graphicName.equals("label")) 
+	{
 	if (scoreName.equals("pitch"))
-	  LabelMapper = PitchLabelMapper.getMapper();
-	/*else if (scoreName.equals("duration"))
-	  LabelMapper = DurationLabelMapper.getMapper();
-	  else if (scoreName.equals("velocity"))
-	  LabelMapper = VelocityLabelMapper.getMapper();
-	  else if (scoreName.equals("channel"))
-	  LabelMapper = ChannelLabelMapper.getMapper();*/
-      }
-
+	LabelMapper = PitchLabelMapper.getMapper();
+	else if (scoreName.equals("duration"))
+	LabelMapper = DurationLabelMapper.getMapper();
+	else if (scoreName.equals("velocity"))
+	LabelMapper = VelocityLabelMapper.getMapper();
+	else if (scoreName.equals("channel"))
+	LabelMapper = ChannelLabelMapper.getMapper();
+	}*/
   }
     public boolean isDisplayLabels()
     {

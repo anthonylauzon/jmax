@@ -171,7 +171,8 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 
 	for (int i=0 ; i<events_fill_p;i++) 
 	    {
-		time = events[i].getTime()+((Integer)events[i].getProperty("duration")).intValue();
+		//time = events[i].getTime()+((Integer)events[i].getProperty("duration")).intValue();
+		time = events[i].getTime()+(int)((Double)events[i].getProperty("duration")).doubleValue();//*@*//
 		if(time>max) max = time;
 	    }
 	return max;
@@ -763,7 +764,8 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 		    e = events[index++];	
 
 		    if (e.getTime() >= startTime || 
-			e.getTime()+((Integer)e.getProperty("duration")).intValue() >= startTime)
+			//e.getTime()+((Integer)e.getProperty("duration")).intValue() >= startTime)
+			e.getTime()+((Double)e.getProperty("duration")).doubleValue() >= startTime)//*@*//
 			{
 			    return e;
 			}
@@ -810,7 +812,8 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 		{
 		    e = events[index++];
 
-		    if (e.getTime()+((Integer)e.getProperty("duration")).intValue() <=endTime)
+		    //if (e.getTime()+((Integer)e.getProperty("duration")).intValue() <=endTime)
+		    if (e.getTime()+((Double)e.getProperty("duration")).doubleValue() <=endTime)//*@*//
 			{
 			    return e;
 			}

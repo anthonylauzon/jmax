@@ -36,9 +36,9 @@ public class TimeMapper extends DoubleMapper {
    * set the given starting time in the given event
    */
     public void set(Event e, double value) 
-  {
-    e.move(value);
-  }
+    {
+	e.move(value);
+    }
   
   /**
    * get the starting time from the given event

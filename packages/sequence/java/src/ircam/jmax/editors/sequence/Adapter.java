@@ -130,18 +130,17 @@ abstract public class Adapter implements MappingListener{
    * get the Lenght value for this event
    */
     public int getLenght(Event e) 
-  {
-    if (LenghtMapper != null) return LenghtMapper.get(e);
-    else return 0;
-  }
-
+    {
+	if (LenghtMapper != null) return (int) LenghtMapper.get(e);
+	else return 0;
+    }
   /**
    * sets the parameter of the event associated with the Lenght
    */
     public void setLenght(Event e, int lenght) 
-  {
-    LenghtMapper.set(e, lenght);
-  }
+    {
+	LenghtMapper.set(e, lenght);
+    }
 
     public void setHeigth(Event e, int heigth)
     {
@@ -197,7 +196,8 @@ abstract public class Adapter implements MappingListener{
   //--- Fields
   public DoubleMapper XMapper;
   public Mapper YMapper;
-  public Mapper LenghtMapper;
+  //public Mapper LenghtMapper;
+  public DoubleMapper LenghtMapper;//*@*//
   public Mapper HeigthMapper;
   public StringMapper LabelMapper;
 

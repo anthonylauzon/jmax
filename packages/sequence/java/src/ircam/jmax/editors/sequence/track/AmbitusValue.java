@@ -31,7 +31,7 @@ public class AmbitusValue extends AbstractEventValue
 	properties.put((String) e.nextElement(), DEFAULT_PROPERTY);
       }
     
-    setProperty("duration", new Integer(100));
+    setProperty("duration", /*new Integer(100)*/new Double(100.0));//*@*//
     setProperty("ambitus", new Integer(0));
   }
 
@@ -71,7 +71,6 @@ public class AmbitusValue extends AbstractEventValue
       return AMBITUS_PUBLIC_NAME;
     }
     
-
     public ImageIcon getIcon()
     {
       return AMBITUS_ICON;
@@ -158,7 +157,8 @@ public class AmbitusValue extends AbstractEventValue
     public boolean samePropertyValues(Object args[])
     {
 	return ((((Integer)getProperty("pitch")).intValue() == ((Integer)args[0]).intValue()) &&
-	    (((Integer)getProperty("duration")).intValue() == ((Integer)args[1]).intValue())); 
+		/*(((Integer)getProperty("duration")).intValue() == ((Integer)args[1]).intValue())*/
+		(((Double)getProperty("duration")).doubleValue() == ((Double)args[1]).doubleValue()));//*@*// 
     }
 
   //--- Fields
@@ -185,7 +185,8 @@ public class AmbitusValue extends AbstractEventValue
   }
 
     static String nameArray[] = {"pitch", "duration"};
-    static int propertyTypes[] = {INTEGER_TYPE, INTEGER_TYPE};
+    //static int propertyTypes[] = {INTEGER_TYPE, INTEGER_TYPE};
+    static int propertyTypes[] = {INTEGER_TYPE, DOUBLE_TYPE};//*@*//
     static int propertyCount = 2;
 }
 
