@@ -193,7 +193,7 @@ static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 
   this->countdown = COUNTDOWN;
 
-  fts_sched_add_fd( fts_sched_get_current(), 0, 1, hal_halt, o);
+  fts_sched_add( fts_sched_get_current(), hal_halt, o);
 }
 
 static void halaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
