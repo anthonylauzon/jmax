@@ -27,9 +27,7 @@ JMAXDISTDIR=..
 include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 
 install:
-	$(INSTALL_DIR) $(lib_install_dir)/images
 	$(INSTALL_DIR) $(doc_install_dir)/images
-	for f in *.gif ; do $(INSTALL_DATA) $$f $(lib_install_dir)/images/$$f ; done
 	for f in *.gif ; do $(INSTALL_DATA) $$f $(doc_install_dir)/images/$$f ; done
 .PHONY: install
 
