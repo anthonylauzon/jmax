@@ -51,7 +51,7 @@ public class ProjectEditor extends JFrame implements EditorContainer
     super();
 
     if( pkg instanceof FtsProject)
-      setTitle("Project Editor: current project");
+      setTitle("Project Editor: current project "+pkg.getFileName());
     else
       setTitle("Package Editor: "+pkg.getName());
 
