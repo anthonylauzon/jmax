@@ -40,7 +40,19 @@
 
 <!-- ---------------------------------------------------------------------- -->
 <h3>Dynamic client/server connection</h3>
-  
+
+<p>
+Changing JAVA GUI to FTS client library:
+<ul>
+<li>data models: implement a library of data models a la Swing (NumberModel and others)</li>
+<li>connection: create instance of FtsServerConnection chosen subclass and of FtsServer</li>
+<li>substitute commands by messages</li>
+<li>remove sync (used now by open and paste)</li>
+<li>remove current properties and replace by JavaBeans properties + messages</li>
+<li>reimplement updates</li>
+</ul>
+</p>
+
 <p>
  Change the client table to a stack, not a hashtable (can be costly because 
 it must be accessed for each message from FTS to the client).
@@ -78,7 +90,7 @@ Intelligent client connection process (auto connect to running server)
 </p>
 
 <p>
- Create a udpstream derived from bytestream
+(( Create a udpstream derived from bytestream ))
 </p>
 
 <!-- ---------------------------------------------------------------------- -->
