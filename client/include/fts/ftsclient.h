@@ -40,6 +40,12 @@
 
 #include <iostream.h>
 
+// Call this before anything else!
+FTSCLIENT_API void __stdcall ftsclient_init(const char *vendorName, const char *appName);
+
+FTSCLIENT_API const char * __stdcall ftsclient_getdir(const char *dirid);
+
+// [RS]: If you ever wonder, '...' varargs forces the call convention.
 FTSCLIENT_API void ftsclient_log(char* format, ...);
 
 /**
