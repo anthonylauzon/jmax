@@ -749,7 +749,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   public boolean Close(boolean deleteOnFts){
     itsClosing = true;
 
-    if (deleteOnFts) itsPatcher.close();
+    /*if (deleteOnFts)*/ itsPatcher.close();
     if(!(alreadySaved || isSubPatcher)){
       FileNotSavedDialog aDialog = new FileNotSavedDialog(this, itsData);
       aDialog.setLocation(300, 300);
@@ -858,8 +858,8 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 	  if(aExternal.itsSubWindow!=null){
 	    aExternal.itsSubWindow.CloseAllSubWindows();
 	    aExternal.itsSubWindow.setVisible(false);
-	    aExternal.itsSubWindow.dispose();
-	    aExternal.itsSubWindow = null;
+	    //bug11 aExternal.itsSubWindow.dispose();
+	    //bug11 aExternal.itsSubWindow = null;
 	  }
 	}
       }

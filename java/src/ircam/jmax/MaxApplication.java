@@ -476,7 +476,7 @@ public class MaxApplication extends Object {
     }
 
     //the version number as a system property
-    jmaxProperties.put("jmaxVersion", " version 2.1.0 beta");
+    jmaxProperties.put("jmaxVersion", " version 2.1.1 beta");
 
     itsHookTable = new MaxWhenHookTable(); 
 
