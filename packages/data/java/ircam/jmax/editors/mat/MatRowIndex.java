@@ -44,6 +44,8 @@ public class MatRowIndex extends JPanel
     setFont( rowIndexFont);
     fm = getFontMetrics( rowIndexFont);
 
+    setPreferredSize(fiveNumDimension);
+    
     addMouseListener(new MouseAdapter(){
 			public void mousePressed(MouseEvent e)
       {
@@ -72,6 +74,22 @@ public class MatRowIndex extends JPanel
     });
 }
 
+void updateSize()
+{
+  if(data.getRows() < 100000)
+  {
+    setPreferredSize(fiveNumDimension);
+    setSize(fiveNumDimension.width, fiveNumDimension.height);
+    validate();
+  }
+  else
+  {
+    setPreferredSize(sixNumDimension);
+    setSize(sixNumDimension.width, sixNumDimension.height);
+    validate(); 
+  }
+}
+
 int getRowIndex(int y)
 {
   int id = (y+yTransp)/MatPanel.ROW_HEIGHT;
@@ -95,7 +113,6 @@ public void paintComponent(Graphics g)
   if(last > rows) last = rows;  
   
   int rectY = (first+1)*MatPanel.ROW_HEIGHT - yTransp;
-  //for(int i = 0; i<rows; i++)
   for(int i = first; i < last; i++)
   {
     g.setColor( MatPanel.matGridColor);
@@ -108,14 +125,12 @@ public void paintComponent(Graphics g)
   }
 }
 
-public Dimension getPreferredSize()
-{ return rulerDimension; }
-
-Dimension rulerDimension = new Dimension(ROW_WIDTH, ROW_HEIGHT);
+Dimension fiveNumDimension = new Dimension(ROW_WIDTH, ROW_HEIGHT);
+Dimension sixNumDimension = new Dimension(ROW_WIDTH+10, ROW_HEIGHT);
 FontMetrics fm;
 MatDataModel data;
 MatPanel matPanel;
-public final static int ROW_WIDTH = 30; 
+public final static int ROW_WIDTH = 38; 
 public final static int ROW_HEIGHT = MatWindow.DEFAULT_HEIGHT; 
 Font rowIndexFont;
 int yTransp = 0;

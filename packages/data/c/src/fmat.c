@@ -867,6 +867,8 @@ fmat_upload_from_index(fmat_t *self, int row_id, int col_id, int size)
   int ns = col_id;
   int start_id = (ms*n_cols + ns);
   
+  fts_client_send_message((fts_object_t *)self, fts_s_start_upload, 0, 0);
+  
   while( data_size > 0)
   {
     int i = 0;
@@ -888,7 +890,9 @@ fmat_upload_from_index(fmat_t *self, int row_id, int col_id, int size)
     
     sent += n;
     data_size -= n;
-  }    
+  }
+  
+  fts_client_send_message((fts_object_t *)self, fts_s_end_upload, 0, 0);
 }
 
 static void 

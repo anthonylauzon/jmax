@@ -79,7 +79,8 @@ public class MatWindow extends JFrame implements EditorContainer{
         getContentPane().validate();
         itsMatPanel.validate();
         validate();
-    }        
+    }   
+      public void uploading(boolean uploading){}
     });
     
     addWindowListener(new WindowListener(){

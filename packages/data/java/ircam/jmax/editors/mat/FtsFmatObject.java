@@ -63,6 +63,18 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
         ((FtsFmatObject)obj).appendRow();
     }
     });
+    FtsObject.registerMessageHandler( FtsFmatObject.class, FtsSymbol.get("start_upload"), new FtsMessageHandler(){
+      public void invoke( FtsObject obj, FtsArgs args)
+    {
+        ((FtsFmatObject)obj).startUpload();
+    }
+    });
+    FtsObject.registerMessageHandler( FtsFmatObject.class, FtsSymbol.get("end_upload"), new FtsMessageHandler(){
+      public void invoke( FtsObject obj, FtsArgs args)
+    {
+        ((FtsFmatObject)obj).endUpload();
+    }
+    });    
   }
 
   /**
@@ -155,6 +167,18 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
     
     notifySizeChanged(n_rows, n_cols);
   }
+  
+  boolean uploading = false;
+  public void startUpload()
+  {
+    uploading = true;
+    notifyUpload(true);
+  }
+  public void endUpload()
+  {
+    uploading = false;
+    notifyUpload(false);
+  } 
   
   //////////////////////////////////////////////////////////////////////////////////////
   //// MESSAGES to the server
@@ -268,6 +292,11 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
   {
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
       ((MatDataListener) e.nextElement()).matSizeChanged(n_rows, n_cols);
+  }
+  private void notifyUpload(boolean uploading)
+  {
+    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+      ((MatDataListener) e.nextElement()).uploading(uploading);
   }
   /*******************************************************************/
   private Object[][] values;

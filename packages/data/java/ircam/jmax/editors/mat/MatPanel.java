@@ -45,6 +45,7 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
   EditorContainer itsContainer;
   MatTableModel tableModel;
   MatRowIndex rowIndex;
+  JPanel topCorner, westPanel;
   
   transient JScrollPane scrollPane; 
   transient JTable table;
@@ -104,7 +105,7 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
       rowIndex = new MatRowIndex(matData, this);
       rowIndex.setBorder(BorderFactory.createEtchedBorder());
       
-      JPanel topCorner = new JPanel();
+      topCorner = new JPanel();
       topCorner.setPreferredSize(new Dimension(38, MatPanel.ROW_HEIGHT));
       topCorner.setMaximumSize(new Dimension(38, MatPanel.ROW_HEIGHT));
       topCorner.setBorder(BorderFactory.createEtchedBorder());
@@ -116,12 +117,12 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
         }
       });
       
-      JPanel panel = new JPanel();
-      panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-      panel.add(topCorner);
-      panel.add(rowIndex);
+      westPanel = new JPanel();
+      westPanel.setLayout(new BoxLayout(westPanel, BoxLayout.Y_AXIS));
+      westPanel.add(topCorner);
+      westPanel.add(rowIndex);
       
-      add(BorderLayout.WEST, panel);
+      add(BorderLayout.WEST, westPanel);
     }    
   }
   void updateTableModel()
@@ -139,8 +140,29 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
       table.setAutoResizeMode( JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
     else
       table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF);
+    
+    if( matData.haveRowIdCol())
+    {
+      rowIndex.updateSize();
+      if(matData.getRows() < 100000)
+      {
+        topCorner.setPreferredSize(new Dimension( MatRowIndex.ROW_WIDTH, MatPanel.ROW_HEIGHT));
+        topCorner.setMaximumSize(new Dimension( MatRowIndex.ROW_WIDTH, MatPanel.ROW_HEIGHT));
+        westPanel.validate();
+        validate();
+        itsContainer.getFrame().pack();
+      }
+      else
+      {
+        topCorner.setPreferredSize(new Dimension(MatRowIndex.ROW_WIDTH+10, MatPanel.ROW_HEIGHT));
+        topCorner.setMaximumSize(new Dimension(MatRowIndex.ROW_WIDTH+10, MatPanel.ROW_HEIGHT));
+        westPanel.validate();
+        validate();
+        itsContainer.getFrame().pack();
+      }
+    }
   }
-   //------------------- MaxDataListener interface ---------------
+  //------------------- MaxDataListener interface ---------------
   public void matCleared()
   {
     table.revalidate();
@@ -148,8 +170,11 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
   }
   public void matDataChanged()
   {
-    table.revalidate();
-    repaint();
+    if(! uploading)
+    {
+      table.revalidate();
+      repaint();
+    }
   }
   public void matSizeChanged(int n_rows, int n_cols)
   {
@@ -159,7 +184,17 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
     scrollPane.validate();
     repaint();
   }
- 
+  
+  boolean uploading = false;
+  public void uploading(boolean uploading)
+  {
+    this.uploading = uploading;
+    if(!uploading)
+    {
+      table.revalidate();
+      repaint();
+    }
+  }
   //------------------- Editor interface ---------------
 
   public EditorContainer getEditorContainer(){
