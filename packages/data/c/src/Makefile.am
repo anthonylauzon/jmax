@@ -21,7 +21,7 @@ value.c \
 vec.c \
 dumpfile.c
 
-INCLUDES=-I$(top_srcdir)/packages/utils/c/src
+INCLUDES=-I$(top_srcdir)/include -I$(top_srcdir)/packages/utils/c/src
 
 noinst_HEADERS= \
 bpf.h \
