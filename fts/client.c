@@ -48,6 +48,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#if defined(__POWERPC__) && !(defined(__APPLE__) && defined(__MACH__))
+#include <unixfunc.h>
+#endif
+
 #ifdef WIN32
 #include <windows.h>
 
