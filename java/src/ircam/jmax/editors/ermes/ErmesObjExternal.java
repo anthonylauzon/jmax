@@ -150,11 +150,15 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 	 }
        }
        else if(itsFtsObject instanceof FtsDataObject){
-	 System.out.println("eccolo!");
+	 //System.out.println("eccolo!");
 	 try{
-	   MaxData aData = MaxDataHandler.loadDataInstance(MaxDataSource.makeDataSource(new FtsLocation(itsFtsObject)));
+	   FtsLocation aFtsLocation = new FtsLocation(itsFtsObject);
+	   if (aFtsLocation == null) 
+	     System.err.println("ftslocation null per "+itsFtsObject);
+	   MaxData aData = MaxDataHandler.loadDataInstance(MaxDataSource.makeDataSource(aFtsLocation));
+	   if (aData == null) System.err.println("MaxData nullo ");
 	   aData.edit();
-	 }catch (Exception e){}
+	   } catch (MaxDataException e){System.err.println("Max Data Exception");}
        }
      }
      else if (!itsSketchPad.itsRunMode) itsSketchPad.ClickOnObject(this, evt, x, y);
