@@ -36,5 +36,4 @@ lib_install_dir=$(prefix)/lib/jmax
 include_install_dir=$(prefix)/include
 bin_install_dir=$(prefix)/bin
 
-#INSTALL_ARCHS=r10k-irix6.5 r5k-irix6.5
-INSTALL_ARCHS=r10k-irix6.5
+INSTALL_ARCHS=r10k-irix6.5 r5k-irix6.5

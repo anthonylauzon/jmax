@@ -108,12 +108,28 @@ ppc-macosx:
 .PHONY: ppc-macosx
 
 #
+# r5k-irix6.5
+# target for Irix 6.5 on R5000 processor
+#
+r5k-irix6.5:
+	$(MAKE) ARCH=r5k-irix6.5 all
+.PHONY: r5k-irix6.5
+
+#
+# r10k-irix6.5
+# target for Irix 6.5 on R10000 processor
+#
+r10k-irix6.5:
+	$(MAKE) ARCH=r10k-irix6.5 all
+.PHONY: r10k-irix6.5
+
+#
 # sgi
 # target for SGI Irix 6.5 processors R5000 and R10000
 #
 sgi:
-	$(MAKE) ARCH=r5k-irix6.5 all
-	$(MAKE) ARCH=r10k-irix6.5 all
+	$(MAKE) r5k-irix6.5
+	$(MAKE) r10k-irix6.5
 .PHONY: sgi
 
 #
@@ -135,11 +151,21 @@ cvs-tag:
 .PHONY: cvs-tag
 
 #
+# spec_files
+# update the spec files for version number
+#
+spec_files:
+	(cd pkg/sgi ; $(MAKE) all)
+	(cd pkg/rpm ; $(MAKE) all)
+.PHONY: spec_files
+
+#
 # dist
 # does a cvs export and a .tar.gz of the sources
 #
-dist: cvs-tag
+dist: spec_files cvs-tag 
 	rm -rf $(distdir)
+	umask 22
 	mkdir $(distdir)
 	cvs export -r $(disttag) -d $(distdir) max
 	tar cvf - $(distdir) | gzip -c --best > $(distdir).tar.gz 
@@ -151,19 +177,19 @@ dist: cvs-tag
 # install
 # copies the files to the right directories
 #
-install: install-exec install-doc install-includes
+install: install_doc install_bin install_includes
 .PHONY: install
 
-install-doc:
+install_doc:
 	$(INSTALL_DIR) $(doc_install_dir)
 	$(INSTALL_DATA) LICENCE.fr $(doc_install_dir)
 	$(INSTALL_DATA) LICENSE $(doc_install_dir)
 	$(INSTALL_DATA) README $(doc_install_dir)
 	$(INSTALL_DATA) VERSION $(doc_install_dir)
-	( cd doc ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" doc_install_dir=$(doc_install_dir) $@ )
-.PHONY: install-doc
+	( cd doc ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" doc_install_dir=$(doc_install_dir) install )
+.PHONY: install_doc
 
-install-exec:
+install_bin:
 	( cd bin ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DIR="$(INSTALL_DIR)" bin_install_dir=$(bin_install_dir) install-noarch )
 	$(INSTALL_DIR) $(lib_install_dir)
 	( cd config ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) install-noarch )
@@ -182,39 +208,11 @@ install-exec:
 	for a in $(INSTALL_ARCHS) ; do \
 		( cd syspackages ; $(MAKE) INSTALL_LIB="$(INSTALL_LIB)" INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) ARCH=$$a install-arch ) ; \
 	done
-.PHONY: install-exec
+.PHONY: install-bin
 
 install-includes:
 	( cd fts ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" include_install_dir=$(include_install_dir) $@ )
 .PHONY: install-includes
-
-
-#
-# idb
-# creates the SGI idb file and the distribution
-#
-sgi-pkg:
-	/bin/rm -rf /tmp/idb-doc /tmp/idb-exec /tmp/idb-includes
-	( MAXHOME=`/bin/pwd` ; export MAXHOME ; $(MAKE) -s ARCH=sgi INSTALL="$${MAXHOME}/bin/mksgipkg jmax.doc.documentation " prefix=usr install-doc > /tmp/rawidb )
-	( MAXHOME=`/bin/pwd` ; export MAXHOME ; $(MAKE) -s ARCH=sgi INSTALL="$${MAXHOME}/bin/mksgipkg jmax.sw.exec " prefix=usr install-exec >> /tmp/rawidb )
-	( MAXHOME=`/bin/pwd` ; export MAXHOME ; $(MAKE) -s ARCH=sgi INSTALL="$${MAXHOME}/bin/mksgipkg jmax.sw.includes " prefix=usr install-includes >> /tmp/rawidb )
-	cat /tmp/rawidb | sort +4u -6 > ./pkg/sgi/jmax.idb
-	/usr/sbin/gendist -verbose -root / -sbase . -idb ./pkg/sgi/jmax.idb -spec ./pkg/sgi/jmax.spec -dist /usr/dist -all
-
-
-#
-# rpm
-# creates a binary rpm
-#
-bin-rpm:
-	rpm -bb --rcfile pkg/rpm/rpmrc pkg/rpm/jmax-local.spec
-.PHONY: bin-rpm
-
-# For redhat 6
-bin-rpm6:
-	( cd pkg/rpm ; rpm -bb --rcfile /usr/lib/rpm/rpmrc:rpmrc6 jmax-local.spec)
-.PHONY: bin-rpm6
-
 
 #
 # new-snapshot, new-patch, new-minor, new-major
