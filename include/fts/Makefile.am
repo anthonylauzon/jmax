@@ -9,8 +9,10 @@ binaryprotocol.h \
 bytestream.h \
 class.h \
 client.h \
-config-ac.h \
 config.h \
+config-ac.h \
+config-macosx.h \
+config-win32.h \
 connection.h \
 dsp.h \
 errobj.h \
