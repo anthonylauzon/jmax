@@ -1,1 +1,1 @@
-SUBDIRS=console patcher project
+SUBDIRS=configuration console patcher project

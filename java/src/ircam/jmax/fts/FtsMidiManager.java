@@ -104,8 +104,6 @@ public class FtsMidiManager extends FtsObject
     
     args.addInt( index);
     args.addSymbol( FtsSymbol.get( label));
-    
-    System.err.println("[Insert] index "+index+" label "+label);
 
     try
       {
@@ -123,8 +121,6 @@ public class FtsMidiManager extends FtsObject
     args.clear();
     
     args.addInt( index);
-    
-    System.err.println("[Remove] index "+index);
 
     try
       {
@@ -143,8 +139,6 @@ public class FtsMidiManager extends FtsObject
     
     args.addInt( index);
     args.addSymbol( FtsSymbol.get( input));
-    
-    System.err.println("[SetInput] index "+index+" input "+input);
 
     try
       {
@@ -164,8 +158,6 @@ public class FtsMidiManager extends FtsObject
     args.addInt( index);
     args.addSymbol( FtsSymbol.get( output));
     
-    System.err.println("[SetOutput] index "+index+" output "+output);
-
     try
       {
 	send( FtsSymbol.get( "output"), args);

@@ -85,6 +85,18 @@ class ProjectMessageHandler implements FtsMessageHandler {
   }
 }
 
+class MidiManagerMessageHandler implements FtsMessageHandler {
+  public void invoke( FtsObject obj, FtsArgs args)
+  {
+    if ( args.isInt( 0) )
+      {
+	JMaxApplication.setMidiManager( new FtsMidiManager( JMaxApplication.getFtsServer(), 
+							    JMaxApplication.getRootPatcher(),
+							    args.getInt( 0)));
+      }
+  }
+}
+
 class PackageMessageHandler implements FtsMessageHandler {
   public void invoke( FtsObject obj, FtsArgs args)
   {
@@ -138,6 +150,7 @@ class JMaxClient extends FtsObject {
   {
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "patcher_loaded"), new LoadPatcherMessageHandler());
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "project"), new ProjectMessageHandler());
+    FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "midi_manager"), new MidiManagerMessageHandler());
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "package"), new PackageMessageHandler());
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "showMessage"), new FtsMessageHandler() {
 	public void invoke( FtsObject obj, FtsArgs args)
@@ -355,9 +368,29 @@ public class JMaxApplication {
     return singleInstance.project;
   }
 
-  public static void setCurrentProject(FtsProject proj)
+  public static void setCurrentProject( FtsProject proj)
   {
     singleInstance.project = proj;
+  }
+
+  public static FtsMidiManager getMidiManager()
+  {
+    if(singleInstance.midiManager == null)
+      {
+	try{
+	  singleInstance.midiManager = new FtsBidonMidiManager();
+	}
+	catch(IOException e)
+	  {
+	    System.err.println("midimanagerrrrrrrrrrrrrrrrrrrr!!!!!!!!!!!!!!!!!!!!!!!");
+	  }
+      }
+    return singleInstance.midiManager; 
+ }
+
+  public static void setMidiManager( FtsMidiManager midim)
+  {
+    singleInstance.midiManager = midim;
   }
 
   public static FtsDspControl getDspControl()
@@ -528,6 +561,7 @@ public class JMaxApplication {
   {
     ircam.jmax.editors.patcher.ErmesModule.initModule();
     ircam.jmax.editors.project.ProjectEditor.registerProjectEditor();
+    ircam.jmax.editors.configuration.ConfigurationEditor.registerConfigEditor();
   }
 
   private void openConsole()
@@ -666,6 +700,15 @@ public class JMaxApplication {
       {
 	JMaxApplication.reportException( e);
       }
+
+    try
+      {
+	clientObject.send( FtsSymbol.get( "get_midi_manager"));
+      }
+    catch(IOException e)
+      {
+	JMaxApplication.reportException( e);
+      }
   }
 
   private static void openCommandLineFiles()
@@ -696,4 +739,5 @@ public class JMaxApplication {
   private FtsPatcherObject rootPatcher;
   private JMaxClient clientObject;
   private FtsProject project;
+  private FtsMidiManager midiManager;
 }

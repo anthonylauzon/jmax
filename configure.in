@@ -212,6 +212,7 @@ java/src/ircam/Makefile
 java/src/ircam/jmax/Makefile
 java/src/ircam/jmax/dialogs/Makefile
 java/src/ircam/jmax/editors/Makefile
+java/src/ircam/jmax/editors/configuration/Makefile
 java/src/ircam/jmax/editors/console/Makefile
 java/src/ircam/jmax/editors/patcher/Makefile
 java/src/ircam/jmax/editors/patcher/actions/Makefile

@@ -16,6 +16,8 @@ FtsInletsListener.java\
 FtsIntValueListener.java\
 FtsIntValueObject.java\
 FtsMessageListener.java\
+FtsBidonMidiManager.java\
+FtsMidiManager.java\
 FtsObjectErrorListener.java\
 FtsObjectSet.java\
 FtsObjectWithEditor.java\
