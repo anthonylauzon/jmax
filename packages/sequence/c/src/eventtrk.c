@@ -299,6 +299,8 @@ eventtrk_event_remove_by_client_request(fts_object_t *o, int winlet, fts_symbol_
   fts_object_delete(event);
 }
 
+extern void noteevt_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+
 void
 eventtrk_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -316,15 +318,16 @@ eventtrk_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       fts_set_symbol(a + 1, eventtrk_get_type(this));
       fts_client_upload((fts_object_t *)this, track_symbol, 2, a);
     }
-  
+
   while(event)
     {
       if(!fts_object_has_id((fts_object_t *)event))
 	{
 	  /* create event at client */
-	  fts_send_message((fts_object_t *)event, fts_SystemInlet, fts_s_upload, 0, 0);
+	  /*fts_send_message((fts_object_t *)event, fts_SystemInlet, fts_s_upload, 0, 0);*/
+
+	  noteevt_upload((fts_object_t *)event, 0, 0, 0, 0);
 	  
-	  /* add event to sequence at client */
 	  fts_set_object(a + n, (fts_object_t *)event);
 	  
 	  n++;
@@ -350,6 +353,8 @@ eventtrk_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   event_t *event = eventtrk_get_first(this);  
   
   post("%d event(s)\n", eventtrk_get_size(this));
+
+  return;
 
   while(event)
     {

@@ -25,6 +25,7 @@
  */
 #include "fts.h"
 #include "sequence.h"
+#include "eventtrk.h"
 #include "noteevt.h"
 
 #define NOTEEVT_DEF_PITCH 64
@@ -49,7 +50,7 @@ noteevt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  *
  */
 
-static void
+void
 noteevt_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   noteevt_t *this = (noteevt_t *)o;

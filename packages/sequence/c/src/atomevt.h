@@ -23,26 +23,21 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
+#ifndef _ATOMEVT_H_
+#define _ATOMEVT_H_
 
 #include "fts.h"
+#include "event.h"
 
-extern void track_setup(void);
-extern void event_setup(void);
-extern void seqobj_config(void);
-extern void eventtrk_config(void);
-extern void atomevt_config(void);
-extern void noteevt_config(void);
+extern fts_symbol_t atomevt_symbol;
 
-static void
-sequence_module_init(void)
+typedef struct _atomevt_
 {
-  track_setup();
-  event_setup();
-  seqobj_config();
-  eventtrk_config();
-  atomevt_config();
-  noteevt_config();
-}
+  event_t head;
+  fts_atom_t value;
+} atomevt_t;
 
-fts_module_t sequence_module = {"sequence", "sequence and score following classes", sequence_module_init, 0, 0};
+#define atomevt_set_value(n, v) ((n)->value = (v))
+#define atomevt_get_value(n) ((n)->value)
 
+#endif
