@@ -77,7 +77,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
   private Menu CreateFileMenu() {
     MenuItem aMenuItem;
     CheckboxMenuItem aCheckItem;
-    Menu fileMenu = new Menu("File", true);
+    Menu fileMenu = new Menu("File");
     itsNewFileMenu = CreateNewFileMenu();
     fileMenu.add(itsNewFileMenu);
     fileMenu.add(aMenuItem = new MenuItem("Open... Ctrl+O"));
@@ -106,7 +106,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
 
   private Menu CreateWindowsMenu() {
     MenuItem aMenuItem;
-    Menu windowsMenu = new Menu("Windows", true);
+    Menu windowsMenu = new Menu("Windows");
      windowsMenu.add(aMenuItem = new MenuItem("Stack"));
     aMenuItem.addActionListener(this);
     windowsMenu.add(aMenuItem = new MenuItem("Tile"));
@@ -270,7 +270,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
 
   private Menu CreateEditMenu() {
     MenuItem aMenuItem;
-    Menu editMenu = new Menu("Edit", true);
+    Menu editMenu = new Menu("Edit");
     editMenu.add(aMenuItem = new MenuItem("Cut"));
     aMenuItem.addActionListener(this);
     editMenu.add(aMenuItem = new MenuItem("Copy"));

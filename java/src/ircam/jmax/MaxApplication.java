@@ -29,11 +29,12 @@ import tcl.lang.*;
  * - quit of the application
  */
 
-public class MaxApplication extends Object{
+public class MaxApplication extends Object {
 
   // Static global services
 
   /** Get the unique active FTS Server, if any */
+
 
   public static FtsServer getFtsServer()
   {
@@ -546,6 +547,21 @@ public class MaxApplication extends Object{
     itsWindow = theWindow;
     //#ahioGetCurrentProject().SetCurrentEntry(itsWindow.GetDocument().GetTitle());
   }
+
+  public static String GetWholeWinName(String theName){
+    ErmesSketchWindow aSketchWindow;
+    int number = 0;
+    String aName;
+    System.out.println("itsSketchWindowList.size() = "+itsSketchWindowList.size());
+    for(Enumeration e=itsSketchWindowList.elements(); e.hasMoreElements();){
+      System.out.println("number = "+number);
+      aSketchWindow = (ErmesSketchWindow)e.nextElement();
+      if(theName.equals(aSketchWindow.itsPatcher.getClassName())) number++;
+    }
+    if(number>1) aName = theName+" ("+number+")";
+    else aName = theName;
+    return aName;
+  }
   
   public static ErmesSketchWindow GetCurrentWindow() {
     return itsSketchWindow;
@@ -651,7 +667,7 @@ public class MaxApplication extends Object{
 	new ConnectionDialog(GetConsoleWindow()/*#itsProjectWindow*/);
 	MaxApplication.runHooks("start");
       }
-  }
+ }
 
   /** This private method build the tcl interpreter, 
       and do all the required initialization to it

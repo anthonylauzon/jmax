@@ -21,7 +21,7 @@ import ircam.jmax.utils.*;
  * It keeps track of the toolbar state, it handles the 
  * offscreen and much, much more...
  */
-public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionListener, MouseListener/*, KeyListener */{
+public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionListener, MouseListener{
   Frame itsSketchWindow;
   Dimension preferredSize; 
   final static int DOING_NOTHING = 0;		
@@ -1028,9 +1028,14 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       else {//se non ha mosso
 	if(e.getClickCount() == 1){
 	  if(oldEditStatus == START_SELECT){
-	    if(itsCurrentObject instanceof ErmesObjEditableObject &&
-	       clickHappenedOnAnAlreadySelected)//this one
-	      ((ErmesObjEditableObject)itsCurrentObject).RestartEditing();
+	    if(itsCurrentObject instanceof ErmesObjEditableObject){
+	      if(clickHappenedOnAnAlreadySelected) 
+		((ErmesObjEditableObject)itsCurrentObject).RestartEditing();
+	    }
+	    else if(itsCurrentObject instanceof ErmesObjComment){
+	      if(clickHappenedOnAnAlreadySelected) 
+		((ErmesObjComment)itsCurrentObject).RestartEditing();
+	    }
 	  }
 	}
       }
@@ -1787,7 +1792,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	}
       }
     }
-  }
+  }  
 }
 
 

@@ -6,7 +6,7 @@ package  ircam.jmax.fts;
  * 
  */
 
-interface FtsUpdateGroupListener
+public interface FtsUpdateGroupListener
 {
   abstract public void updateGroupStart();
   abstract public void updateGroupEnd();

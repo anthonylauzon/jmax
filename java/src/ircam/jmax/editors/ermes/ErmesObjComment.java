@@ -106,26 +106,30 @@ class ErmesObjComment extends ErmesObject {
   }
 
   public boolean MouseDown_specific(MouseEvent evt, int x, int y) {
-    if (itsSketchPad.itsRunMode) return true;
-    else   
-      if (evt.getClickCount() > 1) { //re-edit the field.. 
-	if (itsSketchPad.GetTextArea() != null) itsSketchPad.GetTextArea().setEditable(true);
-	itsSketchPad.GetTextArea().setFont(itsFont);
-	itsSketchPad.GetTextArea().setText(itsArgs);
-	itsSketchPad.GetTextArea().itsOwner = this;
-	
-	itsSketchPad.GetTextArea().setBounds(itsX, itsY, currentRect.width,itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
-
-	itsParsedTextVector.removeAllElements();
-	
-	itsSketchPad.GetTextArea().setVisible(true);
-	itsSketchPad.GetTextArea().requestFocus();
-	itsSketchPad.GetTextArea().setCaretPosition(itsArgs.length());
+    if (itsSketchPad.itsRunMode) return true; 
+    /*if (evt.getClickCount() > 1) { //re-edit the field.. 
+      RestartEditing();
       }
-      else itsSketchPad.ClickOnObject(this, evt, x, y);
+      else*/
+    itsSketchPad.ClickOnObject(this, evt, x, y);
     return true;
   }
   
+  public void RestartEditing(){
+    if (itsSketchPad.GetTextArea() != null) itsSketchPad.GetTextArea().setEditable(true);
+    itsSketchPad.GetTextArea().setFont(itsFont);
+    itsSketchPad.GetTextArea().setText(itsArgs);
+    itsSketchPad.GetTextArea().itsOwner = this;
+    
+    itsSketchPad.GetTextArea().setBounds(itsX, itsY, currentRect.width,itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
+    
+    itsParsedTextVector.removeAllElements();
+    
+    itsSketchPad.GetTextArea().setVisible(true);
+    itsSketchPad.GetTextArea().requestFocus();
+    itsSketchPad.GetTextArea().setCaretPosition(itsArgs.length());
+  }
+
   public void setSize(int theH, int theV) {
     Dimension d = new Dimension(theH, theV);
     if (itsSketchPad != null) itsSketchPad.RemoveElementRgn(this);

@@ -89,6 +89,7 @@ class ErmesObjBang extends ErmesObject {
     if (itsSketchPad.itsRunMode) {
       //itsFtsObject.put("value", new Integer(1));//?????
       itsFtsObject.sendMessage(0, "bang", null);
+      System.out.println("inviato bang....");
       DoublePaint();
     }
     else 
@@ -98,6 +99,7 @@ class ErmesObjBang extends ErmesObject {
 
   protected void FtsValueChanged(Object value) {
     //1. new EObjFlashingThread(this, "aFlash").start();
+    System.out.println("value changed bang....");
     if (itsFlashingThread.isAlive()) itsFlashingThread.resume();
     else itsFlashingThread.start();
   }

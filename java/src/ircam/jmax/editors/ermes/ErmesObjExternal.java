@@ -148,6 +148,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 	   }
 	   else{	//this 'else' shouldn't be reached...
 	     itsSubWindow = new ErmesSketchWindow( GetSketchWindow().itsData, (FtsContainerObject) itsFtsObject, GetSketchWindow());
+	     MaxApplication.itsSketchWindowList.addElement(itsSubWindow);
 	     GetSketchWindow().AddToSubWindowList(itsSubWindow);
 	   }
 	   return true;

@@ -131,7 +131,8 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor {
    * constructor from a MaxData AND a ftsContainer AND a father window (subpatchers editors)
    */
   public ErmesSketchWindow (MaxData theData, FtsContainerObject theFtsPatcher, ErmesSketchWindow theTopWindow) {
-    super(theData.getName());
+    //super(theData.getName());
+    super(MaxApplication.GetWholeWinName(theFtsPatcher.getClassName()));
     itsPatcher = theFtsPatcher;
     itsData = theData;
     CommonInitializations();

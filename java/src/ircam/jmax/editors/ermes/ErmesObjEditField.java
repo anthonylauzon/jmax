@@ -28,6 +28,19 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
   }
  
 
+  public void AbortEdit(){
+    setVisible(false);
+    setLocation(-200,-200);
+    focused = false;
+    itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
+    itsOwner.itsInEdit = false;
+
+    if (itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
+    itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());
+    itsOwner = null;  
+  }
+
+
   //--------------------------------------------------------
   // lostFocus
   //--------------------------------------------------------
@@ -43,14 +56,8 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     // the TEXT into an object was deleted (this would require a delete of the object... see next comment)
     String aTextString = getText();
     if (aTextString.compareTo("") == 0 || aTextString.compareTo(" ") == 0) {
-      setVisible(false);
-      setLocation(-200,-200);
-      
-      if (itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
-      itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());//end bug 12
-      itsOwner = null;	//seems to be crazy but...
-      
-      return true; //(immediately)
+      AbortEdit();
+      return true; 
     }
     //try to test if the object was already instantiated; in case, delete the object... (how?)
     
@@ -68,8 +75,14 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     
     if (itsOwner == null) return false; //this happens when the instatiation fails
     if (itsOwner.itsFtsObject != null){
+      if(itsOwner.itsArgs.equals(aTextString)){
+	itsOwner.itsArgs = aTextString;
+	itsOwner.ParseText(aTextString);
+	AbortEdit();
+	return true;
+      }
       itsOwner.itsArgs = aTextString;
-
+      
       itsOwner.ParseText(aTextString);
 
       itsOwner.redefineFtsObject();
@@ -101,17 +114,7 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     }
     itsOwner.update(itsOwner.itsFtsObject);
     
-    itsOwner.itsInEdit = false;
-    
-    setVisible(false);
-    setLocation(-200,-200);
-    focused = false;
-    itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
-    
-    if(itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
-    itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());//end bug 12
-    //itsSketchPad.repaint();//?????
-    itsOwner = null;
+    AbortEdit();
 
     setRows(2);
     setColumns(20);
