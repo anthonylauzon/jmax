@@ -1,0 +1,14 @@
+packagedir=$(prefix)/jmax/packages/system/c
+package_LTLIBRARIES=libsystem.la
+libsystem_la_SOURCES= \
+arch.c \
+argument.c \
+blip.c \
+bus.c \
+bus_tilda.c \
+const.c \
+dsp1.c \
+print.c \
+sigbus.c \
+system.c \
+ucsobj.c 
