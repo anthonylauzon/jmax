@@ -236,7 +236,7 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
     /**
      * move an event in the database
      */
-    public void moveEvent(TrackEvent event, /*int*/double newTime)
+    public void moveEvent(TrackEvent event, double newTime)
     {
 	int index = indexOf(event);     // Find the event
 	int newIndex = getIndexAfter(newTime); //Find where to place it

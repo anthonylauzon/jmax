@@ -85,12 +85,11 @@ public class PartitionAdapter extends Adapter {
    * Returns the time associated with the value of an X coordinate after
    * the coordinate conversion.
    */
-    public /*int*/double getInvX(int x) 
-  {
+    public double getInvX(int x) 
+    {
+      if (geometry.getXInvertion()) return (double) (geometry.getXTransposition() -(x-ScoreBackground.KEYEND)/geometry.getXZoom());
 
-      if (geometry.getXInvertion()) return /*(int)*/(double) (geometry.getXTransposition() -(x-ScoreBackground.KEYEND)/geometry.getXZoom());
-
-      else return /*(int)*/(double) ((x-ScoreBackground.KEYEND)/geometry.getXZoom() - geometry.getXTransposition());
+      else return (double) ((x-ScoreBackground.KEYEND)/geometry.getXZoom() - geometry.getXTransposition());
     
   }
 

@@ -95,6 +95,8 @@ public class MutexPropertyHandler {
 	track.getPropertySupport().removePropertyChangeListener(listener);
 
 	clients.remove(track);
+
+	if(current==track) current=null;
     }
 
     public Track getCurrent()
@@ -105,7 +107,7 @@ public class MutexPropertyHandler {
 
     //--- Fields
     String name;
-    Track current;
+    Track current = null;
     Hashtable clients = new Hashtable();
     boolean ignore_callbacks = false;
 }

@@ -106,9 +106,8 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 		itsTrackDataModel.moveEvent(this, time);
 		
 		//send the move message to the fts event object
-		sendArgs[0].setObject(this);
-		sendArgs[1].setFloat((float)time); 
-		sendMessage(FtsObject.systemInlet, "event_move", 2, sendArgs);
+		sendArgs[0].setFloat((float)time); 
+		sendMessage(FtsObject.systemInlet, "move", 1, sendArgs);
 	    }
 	else setTime(time);
     }

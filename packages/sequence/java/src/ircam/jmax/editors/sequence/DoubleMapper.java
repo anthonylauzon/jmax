@@ -44,7 +44,5 @@ public abstract class DoubleMapper {
    * get the value from the given event
    */
     public abstract double get(Event e);
-
-
 }
 

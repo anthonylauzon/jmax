@@ -252,8 +252,6 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 
 	    movTrackEvent.getRenderer().render(tempEvent, g, true, gc);
 
-	    System.err.println("xor tempEvent time"+tempEvent.getTime());
-
 	    // e_m_ incorrect! instead, make this object communicate the new position to the listeners,
 	    // and make the keyboard in the MidiTrack a listener of such movements.
 	    // (something like using the ircam.jmax.toolkit.DynamicDragListener).

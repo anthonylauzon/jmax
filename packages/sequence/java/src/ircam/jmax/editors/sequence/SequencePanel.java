@@ -401,7 +401,9 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     
     public void removeActiveTrack()
     {
-	sequenceData.removeTrack(mutex.getCurrent());
+	Track track = mutex.getCurrent();
+	if(track!=null)
+	    sequenceData.removeTrack(track);
     }
 
     public Frame getFrame(){

@@ -112,7 +112,6 @@ abstract public class Adapter implements MappingListener{
    */
     public void setX(Event e, int x) 
   {
-      //XMapper.set(e, x);
       XMapper.set(e, getInvX(x));
   }
 
