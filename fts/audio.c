@@ -155,7 +155,7 @@ void fts_audioport_delete( fts_audioport_t *port)
 
   if (port->input.dsp_object)
     {
-      fts_object_unconnect( port->input.dsp_object);
+      fts_object_unpatch( port->input.dsp_object);
       fts_object_destroy( port->input.dsp_object);
     }
 
@@ -164,7 +164,7 @@ void fts_audioport_delete( fts_audioport_t *port)
 
   if (port->output.dsp_object)
     {
-      fts_object_unconnect( port->input.dsp_object);
+      fts_object_unpatch( port->input.dsp_object);
       fts_object_destroy( port->output.dsp_object);
     }
 

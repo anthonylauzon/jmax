@@ -385,7 +385,7 @@ fts_object_get_name(fts_object_t *obj)
  */
 
 /* remove all connections from the object (done when unplugged from the patcher) */
-void 
+static void 
 fts_object_unconnect(fts_object_t *obj)
 {
   int outlet, inlet;
@@ -411,7 +411,18 @@ fts_object_unconnect(fts_object_t *obj)
     }
 }
 
-void 
+static void 
+fts_object_unname(fts_object_t *obj)
+{
+  /* remove definition of named object */
+  if(obj->definition != NULL)
+    {
+      fts_definition_update(obj->definition, fts_null);
+      obj->definition = NULL;
+    }
+}
+
+static void 
 fts_object_unbind(fts_object_t *obj)
 {
   fts_list_t *list = obj->name_refs;
@@ -428,21 +439,18 @@ fts_object_unbind(fts_object_t *obj)
 }
 
 static void 
-fts_object_unname(fts_object_t *obj)
-{
-  /* remove definition of named object */
-  if(obj->definition != NULL)
-    {
-      fts_definition_update(obj->definition, fts_null);
-      obj->definition = NULL;
-    }
-}
-
-static void 
 fts_object_unclient(fts_object_t *obj)
 {
   if ( fts_object_get_id( obj) > FTS_NO_ID)
     fts_client_release_object(obj);
+}
+
+void 
+fts_object_unpatch(fts_object_t *obj)
+{
+  fts_object_unbind(obj);
+  fts_object_unname(obj);
+  fts_object_unclient(obj);
 }
 
 /* delete the unbound, unconnected object already removed from the patcher */

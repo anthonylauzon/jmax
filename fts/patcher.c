@@ -1339,9 +1339,8 @@ patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_t s,
 	      if(fts_dsp_is_active() && fts_is_dsp_object(obj))
 		fts_dsp_desactivate();
 
-	      /* remove connections and unbind the object from used variables */
-	      fts_object_unconnect(obj);
-	      fts_object_unbind(obj);
+	      /* remove connections and unbind the object from used and defined names */
+	      fts_object_unpatch(obj);
 
 	      /* release object */
 	      fts_patcher_remove_object(this, obj);
@@ -1862,8 +1861,7 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	fts_dsp_desactivate();
 
       /* remove connections and unbind the object from used variables */
-      fts_object_unconnect(remove);
-      fts_object_unbind(remove);
+      fts_object_unpatch(remove);
       
       /* remove object from patcher */
       remove->patcher = NULL;

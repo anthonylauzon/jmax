@@ -28,8 +28,7 @@
 #define fts_object_set_definition(o, d) ((o)->definition = (d))
 #define fts_object_get_definition(o) ((o)->definition)
 
-extern void fts_object_unconnect(fts_object_t *obj);
-extern void fts_object_unbind(fts_object_t *obj);
+extern void fts_object_unpatch(fts_object_t *obj);
 
 /* support for redefinition */
 extern fts_object_t *fts_object_recompute(fts_object_t *old);
