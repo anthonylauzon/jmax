@@ -517,7 +517,15 @@ abstract class FtsPort implements Runnable
 	    if (FtsClientProtocol.tokenStartingChar(c))
 	      {
 		status = tokenCode(c);
-		args.addElement(new Float(s.toString()));
+		try
+		  {
+		    args.addElement(new Float(s.toString()));
+		  }
+		catch (java.lang.NumberFormatException e)
+		  {
+		    args.addElement(new Float(Float.NaN));
+		  }
+
 		s.setLength(0);
 	      }
 	    else
