@@ -24,21 +24,42 @@ class FollowInteraction extends Interaction
   {
     if (Squeack.isMove(squeack))
       {
+	editor.resetHighlightedInlet();
+	editor.resetHighlightedOutlet();
+
 	if (Squeack.onBackground(squeack))
 	  editor.setCursor(Cursor.getDefaultCursor());
-	if (Squeack.onObject(squeack))
+	else if (Squeack.onObject(squeack))
 	  editor.setCursor(Cursor.getDefaultCursor());
-	if (Squeack.onConnection(squeack))
+	else if (Squeack.onConnection(squeack))
 	  editor.setCursor(Cursor.getDefaultCursor());
-	if (Squeack.onHResizeHandle(squeack))
+	else if (Squeack.onHResizeHandle(squeack))
 	  editor.setCursor( Cursor.getPredefinedCursor( Cursor.E_RESIZE_CURSOR));
-	if (Squeack.onVResizeHandle(squeack))
+	else if (Squeack.onVResizeHandle(squeack))
 	  editor.setCursor( Cursor.getPredefinedCursor( Cursor.S_RESIZE_CURSOR));
-	if (Squeack.onInlet(squeack))
-	  editor.setCursor(Cursor.getDefaultCursor());
-	if (Squeack.onOutlet(squeack))
-	  editor.setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
-	if (Squeack.onText(squeack))
+	else if (Squeack.onInlet(squeack))
+	  {
+	    InletSensibilityArea area = (InletSensibilityArea) dobject;
+
+	    if (! editor.isHighlightedInlet(area.getObject(), area.getNumber()))
+	      {
+		editor.unlockHighlightedInlet();
+		editor.setHighlightedInlet(area.getObject(), area.getNumber());
+		editor.setCursor(Cursor.getDefaultCursor());
+	      }
+	  }
+	else if (Squeack.onOutlet(squeack))
+	  {
+	    OutletSensibilityArea area = (OutletSensibilityArea) dobject;
+
+	    if (! editor.isHighlightedOutlet(area.getObject(), area.getNumber()))
+	      {
+		editor.unlockHighlightedOutlet();
+		editor.setHighlightedOutlet(area.getObject(), area.getNumber());
+		editor.setCursor(Cursor.getDefaultCursor());
+	      }
+	  }
+	else if (Squeack.onText(squeack))
 	  editor.setCursor(Cursor.getDefaultCursor());
       }
 

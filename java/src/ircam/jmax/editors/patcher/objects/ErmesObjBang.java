@@ -49,7 +49,7 @@ class ErmesObjBang extends ErmesObject implements FtsIntValueListener
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
     if (Squeack.isDown(squeack))
-      itsFtsObject.sendMessage( 0, "bang", null);
+      ftsObject.sendMessage( 0, "bang", null);
   }
 
   static Color bangColors[] = 

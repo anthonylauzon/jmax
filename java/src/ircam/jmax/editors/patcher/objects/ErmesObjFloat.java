@@ -30,7 +30,7 @@ public class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueLis
   {
     super( theSketchPad, theFtsObject, "-0123456789.");
 
-    itsFloat = ((FtsFloatValueObject)itsFtsObject).getValue();
+    itsFloat = ((FtsFloatValueObject)ftsObject).getValue();
   }
 
   public void valueChanged(float value) 
@@ -55,7 +55,7 @@ public class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueLis
 	return;
       }
 
-    ((FtsFloatValueObject)itsFtsObject).setValue(itsFloat);
+    ((FtsFloatValueObject)ftsObject).setValue(itsFloat);
   }
 
   static private NumberFormat numberFormat;
@@ -95,7 +95,7 @@ public class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueLis
 	previousY = mouse.y;
 	itsSketchPad.setKeyEventClient(this);
 	itsStartingValue = itsFloat;
-	((FtsFloatValueObject)itsFtsObject).setValue(itsFloat);
+	((FtsFloatValueObject)ftsObject).setValue(itsFloat);
 	redraw();
 
       }
@@ -105,7 +105,7 @@ public class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueLis
 	previousVelocity = 0;
 	acceleration = 0;
 	
-	((FtsFloatValueObject)itsFtsObject).updateValue();
+	((FtsFloatValueObject)ftsObject).updateValue();
 	Fts.sync();
 	redraw();
       }
@@ -128,7 +128,7 @@ public class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueLis
 
 	itsFloat += increment;
 
-	((FtsFloatValueObject)itsFtsObject).setValue(itsFloat);
+	((FtsFloatValueObject)ftsObject).setValue(itsFloat);
 	redraw();
       }
   }

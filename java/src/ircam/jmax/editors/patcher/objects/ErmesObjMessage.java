@@ -29,7 +29,7 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListen
   {
     // get the correct String from the object's "Message" property, that may change
 
-    return ((FtsMessageObject)itsFtsObject).getMessage();
+    return ((FtsMessageObject)ftsObject).getMessage();
   }
 
 
@@ -63,7 +63,7 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListen
 
   public void redefine( String text) 
   {
-    ((FtsMessageObject)itsFtsObject).setMessage( text);
+    ((FtsMessageObject)ftsObject).setMessage( text);
 
     super.redefine(text);
   }
@@ -87,7 +87,7 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListen
   {
     if (Squeack.isDown(squeack))
       {
-	itsFtsObject.sendMessage( 0, "bang", null);
+	ftsObject.sendMessage( 0, "bang", null);
 	itsFlashing = true;
 	redraw();
       }

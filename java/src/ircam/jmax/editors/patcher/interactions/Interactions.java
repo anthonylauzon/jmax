@@ -33,6 +33,7 @@ public class Interactions
   public static Interaction moveEditInteraction    = new MoveEditInteraction();
   public static Interaction moveInteraction        = new MoveInteraction();
   public static Interaction dragConnectInteraction = new DragConnectInteraction();
+  public static Interaction dragReverseConnectInteraction = new DragReverseConnectInteraction();
   public static Interaction followInteraction      = new FollowInteraction();
   public static Interaction connectionSelectInteraction       = new ConnectionSelectInteraction();
   public static Interaction connectionToggleSelectInteraction = new ConnectionToggleSelectInteraction();

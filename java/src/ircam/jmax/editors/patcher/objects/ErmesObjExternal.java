@@ -30,7 +30,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjec
   public String getArgs()
   {
     // get the correct String from the object
-    return itsFtsObject.getDescription();
+    return ftsObject.getDescription();
   }
 
   public void errorChanged(boolean value) 
@@ -55,7 +55,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjec
   {
     try 
       {
-	itsFtsObject = Fts.redefineFtsObject( itsFtsObject, text);
+	ftsObject = Fts.redefineFtsObject( ftsObject, text);
 	isError = -1;
       } 
     catch (FtsException e) 
@@ -70,7 +70,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjec
   public void editContent()
   {
     itsSketchPad.waiting();
-    Fts.editPropertyValue( itsFtsObject, new MaxDataEditorReadyListener() {
+    Fts.editPropertyValue( ftsObject, new MaxDataEditorReadyListener() {
       public void editorReady(MaxDataEditor editor)
 	{itsSketchPad.stopWaiting();}
     });
@@ -121,7 +121,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjec
   {
     if (isError == -1)
       {
-	if (itsFtsObject.isError())
+	if (ftsObject.isError())
 	  isError = 1;
 	else
 	  isError = 0;

@@ -808,4 +808,142 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
   {
     engine.popInteraction();
   }
+
+  // Support for the inlet/outlet highligthing;
+  // to avoid adding to much memory to every object,
+  // we store here the id of the higlighted inlet and outlet
+
+  private int highlightedInlet;
+  private ErmesObject  highlightedInletObject = null;
+  private boolean highlightedInletLocked = false;
+
+  public void lockHighlightedInlet()
+  {
+    highlightedInletLocked = true;
+  }
+
+  public void unlockHighlightedInlet()
+  {
+    highlightedInletLocked = false;
+  }
+
+  public int getHighlightedInlet()
+  {
+    return highlightedInlet;
+  }
+
+  public ErmesObject getHighlightedInletObject()
+  {
+    return highlightedInletObject;
+  }
+
+  public boolean isHighlightedInlet(ErmesObject object, int inlet)
+  {
+    return ((highlightedInletObject == object) && (highlightedInlet == inlet));
+  }
+
+  public boolean hasHighlightedInlet(ErmesObject object)
+  {
+    return (highlightedInletObject == object);
+  }
+
+  public boolean hasHighlightedInlet()
+  {
+    return (highlightedInletObject != null);
+  }
+
+  public void setHighlightedInlet(ErmesObject object, int inlet)
+  {
+    if (! highlightedInletLocked)
+      {
+	highlightedInletObject = object;
+	highlightedInlet       = inlet;
+
+	if (highlightedInletObject != null)
+	  highlightedInletObject.redraw();
+      }
+  }
+
+  public void resetHighlightedInlet()
+  {
+    if (! highlightedInletLocked)
+      {
+	if (highlightedInletObject != null)
+	  highlightedInletObject.redraw();
+
+	highlightedInletObject = null;
+      }
+  }
+
+  int highlightedOutlet;
+  ErmesObject  highlightedOutletObject = null;
+  private boolean highlightedOutletLocked = false;
+
+  public void lockHighlightedOutlet()
+  {
+    highlightedOutletLocked = true;
+  }
+
+  public void unlockHighlightedOutlet()
+  {
+    highlightedOutletLocked = false;
+  }
+
+  public int getHighlightedOutlet()
+  {
+    return highlightedOutlet;
+  }
+
+  public ErmesObject getHighlightedOutletObject()
+  {
+    return highlightedOutletObject;
+  }
+
+  public boolean isHighlightedOutlet(ErmesObject object, int outlet)
+  {
+    return ((highlightedOutletObject == object) && (highlightedOutlet == outlet));
+  }
+
+  public boolean hasHighlightedOutlet(ErmesObject object)
+  {
+    return (highlightedOutletObject == object);
+  }
+
+  public boolean hasHighlightedOutlet()
+  {
+    return (highlightedOutletObject != null);
+  }
+
+  public void setHighlightedOutlet(ErmesObject object, int outlet)
+  {
+    if (! highlightedOutletLocked)
+      {
+	highlightedOutletObject = object;
+	highlightedOutlet       = outlet;
+
+	if (highlightedOutletObject != null)
+	  highlightedOutletObject.redraw();
+      }
+  }
+
+  public void resetHighlightedOutlet()
+  {
+    if (! highlightedOutletLocked)
+      {
+	if (highlightedOutletObject != null)
+	  highlightedOutletObject.redraw();
+
+	highlightedOutletObject = null;
+      }
+  }
+
+  // General Highlighting reset function
+
+  public void resetHighlighted()
+  {
+    unlockHighlightedOutlet();
+    unlockHighlightedInlet();
+    resetHighlightedOutlet();
+    resetHighlightedInlet();
+  }
 }

@@ -26,7 +26,7 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
   {
     super( theSketchPad, theFtsObject);
 
-    Icon icon = Icons.get(itsFtsObject.getClassName());
+    Icon icon = Icons.get(ftsObject.getClassName());
 
     if (icon != null)
       {
@@ -61,7 +61,7 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
   {
     // Change the renderer if needed
 
-    Icon icon = Icons.get(itsFtsObject.getClassName());
+    Icon icon = Icons.get(ftsObject.getClassName());
 
     if (icon != null)
       {

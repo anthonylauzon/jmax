@@ -32,12 +32,12 @@ class ErmesObjPatcher extends ErmesObjEditableObject
   public String getArgs()
   {
     // get the correct String from the object
-    return itsFtsObject.getDescription();
+    return ftsObject.getDescription();
   }
 
   public void redefine( String text) 
   {
-    ( (FtsPatcherObject)itsFtsObject).redefinePatcher( text);
+    ( (FtsPatcherObject)ftsObject).redefinePatcher( text);
     
     super.redefine(text);
   }
@@ -46,7 +46,7 @@ class ErmesObjPatcher extends ErmesObjEditableObject
   public void editContent()
   {
     itsSketchPad.waiting();
-    Fts.editPropertyValue(itsFtsObject,
+    Fts.editPropertyValue(ftsObject,
 			  new MaxDataEditorReadyListener() {
       public void editorReady(MaxDataEditor editor)
 	{itsSketchPad.stopWaiting();}

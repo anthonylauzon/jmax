@@ -24,7 +24,7 @@ public class ErmesObjInt extends ErmesObjNumberBox implements FtsIntValueListene
   {
     super( theSketchPad, theFtsObject, "-0123456789");
 
-    itsInteger = ((FtsIntValueObject)itsFtsObject).getValue();
+    itsInteger = ((FtsIntValueObject)ftsObject).getValue();
   }
 
   public void valueChanged(int value) 
@@ -54,7 +54,7 @@ public class ErmesObjInt extends ErmesObjNumberBox implements FtsIntValueListene
 	return;
       }
 
-    ((FtsIntValueObject)itsFtsObject).setValue(itsInteger);
+    ((FtsIntValueObject)ftsObject).setValue(itsInteger);
   }
 
   String getValueAsText()
@@ -74,14 +74,14 @@ public class ErmesObjInt extends ErmesObjNumberBox implements FtsIntValueListene
       {
 	itsFirstY = mouse.y;
 	itsStartingY = itsInteger;
-	((FtsIntValueObject)itsFtsObject).setValue(itsInteger);
+	((FtsIntValueObject)ftsObject).setValue(itsInteger);
 	dragged = false;
 	redraw();
       }
     else if (Squeack.isDrag(squeack))
       {
 	itsInteger = itsStartingY + (itsFirstY - mouse.y);
-	((FtsIntValueObject)itsFtsObject).setValue(itsInteger);
+	((FtsIntValueObject)ftsObject).setValue(itsInteger);
 	redraw();
 	dragged = true;
       }

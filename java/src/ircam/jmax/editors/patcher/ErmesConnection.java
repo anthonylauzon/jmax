@@ -28,10 +28,8 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
   private FtsConnection ftsConnection;
   private boolean selected;
 
-  private int startX;
-  private int startY;
-  private int endX;
-  private int endY;
+  private Point start = new Point();
+  private Point end = new Point();
 
   private boolean down;
   private boolean right;
@@ -57,15 +55,13 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
 
   public void updateDimensions()
   {
-    startX = from.getConnectionStartX( outlet);
-    startY = from.getConnectionStartY( outlet);
-    endX   = to.getConnectionEndX( inlet);
-    endY   = to.getConnectionEndY( inlet);
+    from.getOutletAnchor(outlet, start);
+    to.getInletAnchor(inlet, end);
 
-    down  = (startX <= endX);
-    right = (startY <= endY);
+    down  = (start.x <= end.x);
+    right = (start.y <= end.y);
 
-    length = (float) Math.sqrt((startX - endX)*(startX - endX) + (startY - endY)*(startY - endY));
+    length = (float) Math.sqrt((start.x - end.x)*(start.x - end.x) + (start.y - end.y)*(start.y - end.y));
   }
 
 
@@ -125,27 +121,27 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
 
     if (down)
       {
-	if ((x < (startX - 4)) || (x > (endX + 4)))
+	if ((x < (start.x - 4)) || (x > (end.x + 4)))
 	  return false;
       }
     else
       {
-	if ((x < (endX - 4)) || (x > (startX + 4)))
+	if ((x < (end.x - 4)) || (x > (start.x + 4)))
 	  return false;
       }
 
     if (right)
       {
-	if ((y < startY - 4) || (y > endY + 4))
+	if ((y < start.y - 4) || (y > end.y + 4))
 	  return false;
       }
     else
       {
-	if ((y < endY - 4) || (y > startY + 4))
+	if ((y < end.y - 4) || (y > start.y + 4))
 	  return false;
       }
 
-    float z = (float) ((startY - y) * (endX - startX) - (startX - x) * (endY - startY));
+    float z = (float) ((start.y - y) * (end.x - start.x) - (start.x - x) * (end.y - start.y));
 
     if (z > 0.0)
       return ((z/length) < 4.0);
@@ -159,19 +155,19 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
 
     if ( selected) 
       {
-	if ( java.lang.Math.abs(startX - endX) > java.lang.Math.abs(startY - endY))
+	if ( java.lang.Math.abs(start.x - end.x) > java.lang.Math.abs(start.y - end.y))
 	  {
-	    g.drawLine(startX, startY, endX, endY);
-	    g.drawLine(startX, startY+1, endX, endY+1);
+	    g.drawLine(start.x, start.y, end.x, end.y);
+	    g.drawLine(start.x, start.y+1, end.x, end.y+1);
 	  } 
 	else 
 	  {
-	    g.drawLine(startX, startY, endX, endY);
-	    g.drawLine(startX+1, startY, endX+1, endY);
+	    g.drawLine(start.x, start.y, end.x, end.y);
+	    g.drawLine(start.x+1, start.y, end.x+1, end.y);
 	  }
       } 
     else
-      g.drawLine(startX, startY, endX, endY);
+      g.drawLine(start.x, start.y, end.x, end.y);
   }
 
   // Connections should store their bounds !!!
@@ -183,24 +179,24 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
 
     if (down)
       {
-	x = startX - 2;
-	width = endX - startX + 4;
+	x = start.x - 2;
+	width = end.x - start.x + 4;
       }
     else
       {
-	x = endX - 2;
-	width = startX - endX + 4;
+	x = end.x - 2;
+	width = start.x - end.x + 4;
       }
 
     if (right)
       {
-	y = startY - 2;
-	height  = endY - startY + 4;
+	y = start.y - 2;
+	height  = end.y - start.y + 4;
       }
     else
       {
-	y = endY - 2;
-	height = startY - endY + 4;
+	y = end.y - 2;
+	height = start.y - end.y + 4;
       }
 
     sketch.repaint(x, y, width, height);
@@ -214,20 +210,20 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
     if (down)
       {
 	if (right)
-	  ret =  !((r.x + r.width < startX) || (r.y + r.height < startY) ||
-		   (r.x > endX) || (r.y > endY));
+	  ret =  !((r.x + r.width < start.x) || (r.y + r.height < start.y) ||
+		   (r.x > end.x) || (r.y > end.y));
 	else
-	  ret =  !((r.x + r.width < startX) || (r.y + r.height < endY) ||
-		   (r.x > endX) || (r.y > startY));
+	  ret =  !((r.x + r.width < start.x) || (r.y + r.height < end.y) ||
+		   (r.x > end.x) || (r.y > start.y));
       }
     else
       {
 	if (right)
-	  ret = !((r.x + r.width < endX) || (r.y + r.height < startY) ||
-		   (r.x > startX) || (r.y > endY));
+	  ret = !((r.x + r.width < end.x) || (r.y + r.height < start.y) ||
+		   (r.x > start.x) || (r.y > end.y));
 	else
-	  ret =  !((r.x + r.width < endX) || (r.y + r.height < endY) ||
-		   (r.x > startX) || (r.y > startY));
+	  ret =  !((r.x + r.width < end.x) || (r.y + r.height < end.y) ||
+		   (r.x > start.x) || (r.y > start.y));
       }
 
     return ret;
@@ -240,7 +236,7 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
   {
     return ("ErmesConnection<" + from + "." + outlet + "-" +
 	    to + "." + inlet +
-	    " (" + startX + "." + startY + ")-" + length + "-(" + endX + "." + endY + ")>");
+	    " (" + start.x + "." + start.y + ")-" + length + "-(" + end.x + "." + end.y + ")>");
   }
   
 }

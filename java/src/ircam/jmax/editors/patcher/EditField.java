@@ -203,6 +203,7 @@ public class EditField extends JTextArea
 
     if (! owner.getArgs().equals(aTextString) )
       {
+	owner.redraw();
 	owner.redefine(aTextString);
 	owner.redraw();
       } 

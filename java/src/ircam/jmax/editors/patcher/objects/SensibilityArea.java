@@ -19,3 +19,4 @@ public abstract class SensibilityArea implements DisplayObject
   abstract public int getSqueackBits();
 }
 
+

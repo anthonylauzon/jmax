@@ -176,13 +176,13 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
     itsThrottle = new Throttle();
 
-    itsRangeMin = ((FtsSliderObject)itsFtsObject).getMinValue();
-    itsRangeMax = ((FtsSliderObject)itsFtsObject).getMaxValue();
+    itsRangeMin = ((FtsSliderObject)ftsObject).getMinValue();
+    itsRangeMax = ((FtsSliderObject)ftsObject).getMaxValue();
 
     if (itsRangeMax == 0)
       {
 	itsRangeMax = 127;
-	((FtsSliderObject)itsFtsObject).setMaxValue(itsRangeMax);
+	((FtsSliderObject)ftsObject).setMaxValue(itsRangeMax);
       }
 
     itsRange = itsRangeMax - itsRangeMin;
@@ -201,7 +201,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
   public void setMinValue( int theValue) 
   {
     itsRangeMin = theValue;
-    ((FtsSliderObject)itsFtsObject).setMinValue(itsRangeMin);
+    ((FtsSliderObject)ftsObject).setMinValue(itsRangeMin);
   }
 
   public int getMinValue() 
@@ -212,7 +212,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
   public void setMaxValue( int theValue) 
   {
     itsRangeMax = theValue;
-    ((FtsSliderObject)itsFtsObject).setMaxValue(itsRangeMax);
+    ((FtsSliderObject)ftsObject).setMaxValue(itsRangeMax);
   }
 
   public int getMaxValue() 
@@ -259,7 +259,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
     itsStep = (float)itsRange / itsPixelRange;
 
     itsInteger = (theCurrentInt < itsRangeMin) ? itsRangeMin:( (theCurrentInt >= itsRangeMax) ? itsRangeMax:theCurrentInt);
-    ((FtsSliderObject)itsFtsObject).setValue(itsInteger);
+    ((FtsSliderObject)ftsObject).setValue(itsInteger);
   }
 
   public void valueChanged( int value) 
@@ -331,7 +331,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 	itsThrottle.Move( itsThrottle.itsX, getY() + UP_OFFSET - 2);
       }
 
-    ((FtsSliderObject)itsFtsObject).setValue(itsInteger);	
+    ((FtsSliderObject)ftsObject).setValue(itsInteger);	
 
     redraw();
   }
@@ -353,21 +353,21 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 	
 	    itsInteger = (int)(((getY() + getHeight()) - y - BOTTOM_OFFSET) * itsStep);
 
-	    ((FtsSliderObject)itsFtsObject).setValue(itsInteger + itsRangeMin);
+	    ((FtsSliderObject)ftsObject).setValue(itsInteger + itsRangeMin);
 	
 	    itsThrottle.Move( itsThrottle.itsX, y - 2);
 	  }
 	else if( getY() + getHeight() - BOTTOM_OFFSET < y)
 	  {
 	    itsInteger = itsRangeMin;
-	    ((FtsSliderObject)itsFtsObject).setValue(itsInteger);
+	    ((FtsSliderObject)ftsObject).setValue(itsInteger);
 
 	    itsThrottle.Move( itsThrottle.itsX, getY() + getHeight() - BOTTOM_OFFSET - 2);
 	  }
 	else if( getY() + UP_OFFSET > y)
 	  {
 	    itsInteger = itsRangeMax;
-	    ((FtsSliderObject)itsFtsObject).setValue(itsInteger);
+	    ((FtsSliderObject)ftsObject).setValue(itsInteger);
 
 	    itsThrottle.Move( itsThrottle.itsX, getY() + UP_OFFSET - 2);
 	  }
@@ -381,7 +381,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
     if (itsMovingThrottle)
       {
 	itsMovingThrottle = false;
-	((FtsSliderObject)itsFtsObject).updateValue();
+	((FtsSliderObject)ftsObject).updateValue();
 	Fts.sync();
       }
   }

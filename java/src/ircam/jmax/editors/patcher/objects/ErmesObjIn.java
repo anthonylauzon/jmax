@@ -20,7 +20,7 @@ public class ErmesObjIn extends ErmesObjInOut {
 
   public void redefine( String text) 
   {
-    ((FtsInletObject)itsFtsObject).setPosition( itsId);
+    ((FtsInletObject)ftsObject).setPosition( itsId);
   }
 
   public void paint(Graphics g) 
