@@ -14,7 +14,6 @@ MaxApplication.java				\
 MaxToolFinder.java				\
 MaxVector.java					\
 MaxWindowManager.java				\
-ObjectCreatorManager.java			\
 PackageClassLoader.java				\
 Platform.java					\
 RecentFileHistory.java

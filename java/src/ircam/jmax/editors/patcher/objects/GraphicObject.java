@@ -249,6 +249,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 
   public void delete()
   {
+    itsSketchPad.getDisplayList().deleteConnectionsForObject(this);
     itsSketchPad.getDisplayList().remove(this);
     dispose();
     //ftsObject.delete();

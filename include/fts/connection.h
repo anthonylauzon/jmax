@@ -31,6 +31,8 @@ typedef enum fts_connection_type
 
 struct fts_connection
 {
+  fts_object_t o;
+
   fts_object_t *src;
   int woutlet;
 

@@ -55,12 +55,6 @@ class ErmesPatcherListener implements FtsPatcherListener
     // to the sketch.
     if(PatcherClipboardManager.getManager().isPasting())
       PatcherClipboardManager.getManager().addPastedObject(object);    
-    /***************************************************************/
-    /*************** ASYNCRONOUS OBJECT CREATION *******************/
-    /*else
-      sketch.addNewObject(object, doedit);*/
-    /***************************************************************/
-    /***************************************************************/
   }
 
   public void objectRedefined(FtsPatcherObject patch, FtsGraphicObject obj)
@@ -77,9 +71,6 @@ class ErmesPatcherListener implements FtsPatcherListener
       // each time is redefined; this is currently handled in the 
       // redefinition code in GraphicObject; if you decide to implement
       // this method, you must take care of this.
-
-      /*sketch.getDisplayList().getGraphicObjectFor(object).delete();     
-	sketch.getDisplayList().reassignLayers();*/
   }
 
   public void connectionAdded(FtsPatcherObject patch, FtsConnection connection)
@@ -91,12 +82,6 @@ class ErmesPatcherListener implements FtsPatcherListener
       
     if(PatcherClipboardManager.getManager().isPasting())
 	PatcherClipboardManager.getManager().addPastedConnection(connection);
-    /***************************************************************/
-    /*************** ASYNCRONOUS CONNECTION CREATION *******************/
-    else
-	sketch.addNewConnection(connection);
-    /***************************************************************/
-    /***************************************************************/
   }
 
   public void connectionRemoved(FtsPatcherObject patch, FtsConnection connection)

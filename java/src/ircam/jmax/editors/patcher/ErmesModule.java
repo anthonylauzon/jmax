@@ -52,15 +52,8 @@ public class ErmesModule
 	
 	//MaxApplication.getFts().addUpdateGroupListener(manager);
 
-	// Register the find panel and the fpe panel
-	//FindPanel.registerFindPanel();
-	//FpePanel.registerFpePanel();
 	ToolsPanel.registerToolsPanel();
       }
-
-    // Install the tcl commands
-
-    /* TclErmesPackage.installPackage(); Moved to ircam.jmax.script.tcl.TclInterpreter */
   }
 }
 

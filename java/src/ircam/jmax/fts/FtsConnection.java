@@ -73,8 +73,8 @@ public class FtsConnection extends FtsObject implements Serializable
     this.inlet  = inlet;
     this.type   = type;
 
-    if (patcher != null)
-	patcher.addConnection(this);
+    /*if (patcher != null)
+      patcher.addConnection(this);*/
   }
 
   FtsConnection(FtsServer server, FtsPatcherObject patcher, int id, FtsGraphicObject from, 

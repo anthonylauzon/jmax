@@ -135,6 +135,15 @@ public class FtsObject {
     encoder.flush();
   }
 
+  public void sendProperty(FtsArgs args) throws IOException
+  {
+    encoder.writeObject( server.getClient());
+    encoder.writeSymbol( FtsSymbol.get("set_object_property"));
+    encoder.writeObject( this);
+    encoder.writeArgs( args);
+    encoder.flush();
+  }
+
   public static void registerMessageHandler( Class cl, FtsSymbol selector, FtsMessageHandler messageHandler)
   {
     if (selector == null)
@@ -172,6 +181,11 @@ public class FtsObject {
 	cl = cl.getSuperclass();
       }
     while (cl != null);
+  }
+
+  public FtsObject getRoot()
+  {
+    return server.getRoot();
   }
 
   public FtsObject getParent()

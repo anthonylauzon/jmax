@@ -244,15 +244,24 @@ public class ErmesSelection implements Transferable
 
   public void deleteAll()
   {
-      for ( Enumeration e = connections.elements() ; e.hasMoreElements(); ) 
-	  ((GraphicConnection) e.nextElement()).delete();
+      if( connections.size() > 0)
+	{
+	  for ( Enumeration e = connections.elements() ; e.hasMoreElements(); ) 
+	    ((GraphicConnection) e.nextElement()).delete();
 
-      for ( Enumeration e = objects.elements() ; e.hasMoreElements(); ) 
-	  ((GraphicObject) e.nextElement()).delete();
-      //getOwner().getFtsPatcher().requestDeleteObjects(objects.elements());
+	  connections.removeAllElements();
+	}
 
-      objects.removeAllElements();
-      connections.removeAllElements();
+      if( objects.size() > 0)
+	{
+	  getOwner().getFtsPatcher().requestDeleteObjects(objects.elements());
+
+	  for ( Enumeration e = objects.elements() ; e.hasMoreElements(); ) 
+	    ((GraphicObject) e.nextElement()).delete();
+	  
+	  objects.removeAllElements();
+	}
+      
       ftsSelection.clean();
 
       if (owner != null)

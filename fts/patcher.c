@@ -1312,16 +1312,30 @@ fts_patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   fts_patcher_t *this = (fts_patcher_t *)o;
   fts_object_t *obj = fts_get_object(&at[0]);
   fts_atom_t a[2];
-  fts_object_get_prop(obj, fts_s_x, a);
-  fts_object_get_prop(obj, fts_s_y, a+1);
 
-  fts_client_start_message((fts_object_t *)this, sym_addObject);
-  fts_client_add_int((fts_object_t *)this, fts_get_object_id(obj));
-  fts_client_add_int((fts_object_t *)this, fts_get_int(a));
-  fts_client_add_int((fts_object_t *)this, fts_get_int(a+1));
-  fts_client_add_atoms((fts_object_t *)this, obj->argc, obj->argv);
-  fts_client_done_message((fts_object_t *)this);
+  if(fts_object_get_class_name(obj) == fts_s_connection)
+    {      
+      fts_client_start_message( (fts_object_t *)this, sym_addConnection);
+      fts_client_add_int( (fts_object_t *)this, fts_get_object_id(obj));
+      fts_client_add_object( (fts_object_t *)this, ((fts_connection_t *)obj)->src);
+      fts_client_add_int( (fts_object_t *)this, ((fts_connection_t *)obj)->woutlet);
+      fts_client_add_object( (fts_object_t *)this, ((fts_connection_t *)obj)->dst);
+      fts_client_add_int( (fts_object_t *)this, ((fts_connection_t *)obj)->winlet);
+      fts_client_add_int( (fts_object_t *)this, ((fts_connection_t *)obj)->type);
+      fts_client_done_message( (fts_object_t *)this);
+    }
+  else
+    {
+      fts_object_get_prop(obj, fts_s_x, a);
+      fts_object_get_prop(obj, fts_s_y, a+1);
 
+      fts_client_start_message((fts_object_t *)this, sym_addObject);
+      fts_client_add_int((fts_object_t *)this, fts_get_object_id(obj));
+      fts_client_add_int((fts_object_t *)this, fts_get_int(a));
+      fts_client_add_int((fts_object_t *)this, fts_get_int(a+1));
+      fts_client_add_atoms((fts_object_t *)this, obj->argc, obj->argv);
+      fts_client_done_message((fts_object_t *)this);
+    }
   /*fts_object_send_properties(obj);
     fts_send_message(obj, fts_SystemInlet, fts_s_upload, 0, 0);*/
 }
@@ -1407,65 +1421,24 @@ fts_patcher_redefine_from_client( fts_object_t *o, int winlet, fts_symbol_t s, i
     printf_mess("System Error in FOS message REDEFINE PATCHER: bad args", ac, at);
 }
 
-#if 0
-static void 
-fts_patcher_delete_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if ((ac == 1) && fts_is_object(&at[0]))
-    {
-      fts_object_t *obj;
-      fts_atom_t a[1];
-  
-      obj = fts_get_object(&at[0]);
-  
-      if (obj)
-	{
-	  fts_set_int(&a[0], fts_object_get_id(obj));
-  
-	  fts_object_delete_from_patcher(obj);
-  
-	  fts_client_send_message(o, sym_deleteObject, 1, a);
-	}      
-      else
-	printf_mess("System Error in message DELETE OBJECT: deleting a non existing object", ac, at);
-    }
-  else
-    printf_mess("System Error in message DELETE OBJECT: bad args", ac, at);
-}
-
 static void 
 fts_patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  post("delete objects %d \n", ac);
-  
-  if (ac >= 1)
+  if (ac > 0)
     {
       fts_object_t *obj;
-      fts_atom_t a[ac];
       int i;
   
       for(i=0; i<ac; i++)
 	{
 	  obj = fts_get_object(&at[i]);
 	  if (obj)
-	    {
-	      fts_set_int(&a[i], fts_object_get_id(obj));
 	      fts_object_delete_from_patcher(obj);
-	    }
 	  else
-	    printf_mess("System Error in message DELETE OBJECTS: deleting a non existing object", ac, at);
+	    fts_log("[patcher] delete_objects_from_client: System Error deleting a non existing object\n");
 	}
-  
-      fts_client_start_msg(CLIENTMESS_CODE);
-      fts_client_add_object(o);
-      fts_client_add_symbol(sym_deleteObjects);
-      fts_client_add_atoms(ac, a);
-      fts_client_done_msg();
     }
-  else
-    printf_mess("System Error in message DELETE OBJECT: bad args", ac, at);
 }
-#endif
 
 static void 
 fts_patcher_add_connection_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1474,12 +1447,11 @@ fts_patcher_add_connection_from_client( fts_object_t *o, int winlet, fts_symbol_
   fts_object_t *obj;
   fts_atom_t a[6];
 
-  if((ac == 5) &&
-     fts_is_int(&at[0]) &&
-     fts_is_object(&at[1]) &&
-     fts_is_int(&at[2]) &&
-     fts_is_object(&at[3]) &&
-     fts_is_int(&at[4]))
+  if((ac == 4) &&
+     fts_is_object(&at[0]) &&
+     fts_is_int(&at[1]) &&
+     fts_is_object(&at[2]) &&
+     fts_is_int(&at[3]))
     {
       int inlet, outlet;
       int id;
@@ -1487,52 +1459,33 @@ fts_patcher_add_connection_from_client( fts_object_t *o, int winlet, fts_symbol_
       fts_status_t ret;
       fts_connection_t *connection;
 
-      id     = fts_get_int(&at[0]);
-      from   = fts_get_object(&at[1]);
-      outlet = fts_get_int(&at[2]);
-      to     = fts_get_object(&at[3]);
-      inlet  = fts_get_int(&at[4]);
+      from   = fts_get_object( at);
+      outlet = fts_get_int( at+1);
+      to     = fts_get_object( at+2);
+      inlet  = fts_get_int( at+3);
 
       if (to && from)
 	{
-	  connection = fts_connection_new( id, from, outlet, to, inlet);
+	  connection = fts_connection_new( -1, from, outlet, to, inlet);
 		  
 	  if (! connection)
 	    {
 	      return;
 	    }
 
-	  fts_set_int(&a[0],id);
-	  fts_set_object(&a[1], from);
-	  fts_set_int(&a[2], outlet);
-	  fts_set_object(&a[3], to);
-	  fts_set_int(&a[4], inlet);
-	  fts_set_int(&a[5], connection->type);
-	  fts_client_send_message((fts_object_t *)this, sym_addConnection, 6, a);
+	  ((fts_object_t *)connection)->patcher = this;
+ 	  fts_client_upload_object((fts_object_t *)connection, -1);
 	}
-      else
-	printf_mess("System Error in FOS message CONNECT: Error trying to connect non existing objects", ac, at);
     }
-  else
-    printf_mess("System Error in FOS message CONNECT: bad args", ac, at);
 }
 
 static void 
 fts_patcher_delete_connection_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if ((ac == 1) && fts_is_connection(&at[0]))
-    {
-      fts_connection_t *c;
+  fts_connection_t *c = (fts_connection_t *)fts_get_object( at);
 
-      c = fts_get_connection(&at[0]);
-
-      if (c)
-	fts_connection_delete(c);
-      else
-	printf_mess("System Error in message DELETE CONNECTION: disconnecting non existing connection", ac, at);
-    }
-  else
-    printf_mess("System Error in message DELETE CONNECTION: bad args", ac, at);
+  if (c)
+    fts_connection_delete(c);
 }
 
 /****************************************************************/
@@ -1614,9 +1567,9 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 #if 0
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("delete_object"), 
 			    fts_patcher_delete_object_from_client);
+#endif
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("delete_objects"), 
 			    fts_patcher_delete_objects_from_client);
-#endif
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_connection"), 
 			    fts_patcher_add_connection_from_client);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("delete_connection"),

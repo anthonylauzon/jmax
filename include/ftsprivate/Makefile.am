@@ -13,7 +13,6 @@ expression.h \
 fpe.h \
 loader.h \
 object.h \
-objtable.h \
 package.h \
 patcher.h \
 patparser.h \

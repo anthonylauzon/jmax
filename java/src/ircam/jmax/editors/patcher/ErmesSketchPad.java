@@ -558,8 +558,6 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     
   public void addNewObject(GraphicObject object, boolean doEdit)
   {
-    //GraphicObject object = GraphicObject.makeGraphicObject( this, (FtsGraphicObject)fo);
-      
     displayList.add( object);	
     displayList.reassignLayers();
 
@@ -579,7 +577,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
       }
   }
 
-  void addNewConnection(FtsConnection fc)
+  public void addNewConnection(FtsConnection fc)
   {
       GraphicConnection connection = new GraphicConnection(this,displayList.getGraphicObjectFor(fc.getFrom()),
 							   fc.getFromOutlet(), 
@@ -1009,38 +1007,15 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     showMessage(message);
 
     stopTextEditing();
-    setCursor(Cursors.get(description));     
+    setCursor(JMaxClassMap.getCursor(description));     
 
     engine.setTopInteraction(Interactions.addModeInteraction);    
   }
 
-  /***************************************************************/
-  /*************** ASYNCRONOUS OBJECT CREATION *******************/
-  
   public void makeAddModeObject(int x, int y, boolean edit)
   {
       itsPatcher.requestAddObject(newObjectDescription, x, y, edit);
   }
-    /*public void makeAddModeObject(int x, int y, boolean edit)
-      {
-      GraphicObject object = makeObject(newObjectDescription, x, y);
-      
-      if (edit && newObjectEdit && (object instanceof Editable))
-      {
-      // The EditField is not really ready until the control
-      // is returned back to the event loop; this is why we invoke textEditObject 
-      // with an invoke later command.
-	
-      final Editable obj  = (Editable)object;
-	
-      SwingUtilities.invokeLater(new Runnable() {
-      public void run()
-      { textEditObject((Editable)obj);}});
-      }
-      }*/
-
-  /***************************************************************/
-  /***************************************************************/
 
   public  InteractionEngine getEngine()
   {

@@ -44,6 +44,7 @@ public class Fork extends GraphicObject
   static final int DEFAULT_WIDTH = DEFAULT_DISTANCE + 2 * ObjectGeometry.INOUTLET_PAD;
   private static final int MINIMUM_WIDTH = DEFAULT_WIDTH;
   static final int CONST_HEIGHT = 12;
+  static final int DEFAULT_OUTLETS = 2;
 
   private int nOutlets = 0; /* @@@@@*/
 
@@ -52,9 +53,10 @@ public class Fork extends GraphicObject
     super(theFtsObject);
 
     nOutlets = theFtsObject.getNumberOfOutlets();
+    
     if(nOutlets==0)
 	{
-	    nOutlets = 2;
+	    nOutlets = DEFAULT_OUTLETS;
 	    ((FtsForkObject)ftsObject).requestSetOutlets(nOutlets);
 	}
 

@@ -52,9 +52,9 @@ public class FtsArgs {
     FtsAtom[] newArray = new FtsAtom[size];
 
     System.arraycopy( array, 0, newArray, 0, current);
-    
+
     for ( int i = current; i < size; i++)
-      array[i] = new FtsAtom();
+      newArray[i] = new FtsAtom();
 
     array = newArray;
   }

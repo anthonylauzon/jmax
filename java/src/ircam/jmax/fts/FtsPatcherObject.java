@@ -88,7 +88,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     
     if (className != null)
       {
-	JMaxObjectCreator creator = ObjectCreatorManager.getCreator(className);
+	JMaxObjectCreator creator = JMaxClassMap.getCreator(className);
 	if(creator != null)
 	  {
 	    obj = (GraphicObject)creator.create(server, parent, objId, args, offset, nArgs);	      
@@ -297,8 +297,6 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 
   public final void setWindowX(int value)
   {
-    // Not that changing the position do
-    // not mark the file as dirty.
     if (windowX != value)
       {
 	windowX = value;
@@ -604,7 +602,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
      
     args.clear();
     args.addObject(oldObject);
-    args.addInt(getServer().getNewObjectID());
+    //args.addInt(getServer().getNewObjectID());
 
     for(int i=0; i<vec.size(); i++)
       args.add(vec.elementAt(i));
@@ -624,7 +622,6 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   public void requestAddConnection(FtsGraphicObject from, int outlet, FtsGraphicObject to, int inlet)
   {
     args.clear();
-    args.addInt(getServer().getNewObjectID());
     args.addObject(from);
     args.addInt(outlet);
     args.addObject(to);
@@ -653,6 +650,24 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	e.printStackTrace(); 
       }
   }
+
+  public void requestDeleteObjects(Enumeration objects)
+  {
+    args.clear();
+
+    for( ;objects.hasMoreElements();)      
+      args.addObject( ((GraphicObject)objects.nextElement()).getFtsObject());      
+      
+    try{
+      send( FtsSymbol.get("delete_objects"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsPatcherObject: I/O Error sending delete_objects Message!");
+	e.printStackTrace(); 
+      }
+  }
+  
 
   //used in addObject method to start editing in added object if needed 
   boolean doedit = false;
@@ -726,16 +741,18 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 
   public void addConnection(int nArgs , FtsAtom args[])
   {
-    if(nArgs==1)
-      addConnection((FtsConnection)args[0].objectValue);
-    else
-      if(nArgs==6)
-	addConnection(new FtsConnection(getServer(), this, args[0].intValue, 
-					(FtsGraphicObject)args[1].objectValue, args[2].intValue, 
-					(FtsGraphicObject)args[3].objectValue, args[4].intValue, args[5].intValue));
-    setDirty();
+    if(nArgs==6)
+      {
+	FtsConnection connection = new FtsConnection(getServer(), this, args[0].intValue, 
+						     (FtsGraphicObject)args[1].objectValue, args[2].intValue, 
+						     (FtsGraphicObject)args[3].objectValue, args[4].intValue, 
+						     args[5].intValue);   
+	addConnection(connection);
+	((ErmesSketchWindow)getEditorFrame()).itsSketchPad.addNewConnection(connection);
+	
+	setDirty();
+      }
   }
-
   public void objectRedefined(FtsGraphicObject obj)
   {
     ((FtsGraphicObject)obj).setDefaults();

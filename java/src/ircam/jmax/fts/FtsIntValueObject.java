@@ -63,6 +63,8 @@ public class FtsIntValueObject extends FtsGraphicObject
   public FtsIntValueObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
   {
     super(server, parent, id, args, offset, length);
+    setNumberOfInlets(1);
+    setNumberOfOutlets(1);
   }
 
   public void setValue(int value)

@@ -37,6 +37,7 @@ public class FtsForkObject extends FtsGraphicObject
     public FtsForkObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
     {
 	super(server, parent, id, args, offset, length);
+	setNumberOfOutlets( 2);
     }
 
     public void setDefaults()

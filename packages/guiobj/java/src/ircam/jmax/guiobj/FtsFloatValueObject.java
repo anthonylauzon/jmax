@@ -62,6 +62,10 @@ public class FtsFloatValueObject extends FtsGraphicObject
   public FtsFloatValueObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
   {
     super(server, parent, id, args, offset, length);
+    
+    j
+    setNumberOfInlets(1);
+    setNumberOfOutlets(1);
   }
 
   /** Set the value. Tell it to the server, also */

@@ -904,6 +904,8 @@ static void client_new_object( fts_object_t *o, int winlet, fts_symbol_t s, int 
 
 static void client_set_object_property( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  fts_log("[client]: setObjectProperty %d \n", ac);
+
   if ((ac == 3) &&
       fts_is_object(&at[0]) &&
       fts_is_symbol(&at[1]))
@@ -913,6 +915,8 @@ static void client_set_object_property( fts_object_t *o, int winlet, fts_symbol_
 
       obj  = fts_get_object(&at[0]);
       name = fts_get_symbol(&at[1]);
+
+      fts_log("[client]: setProperty %s \n", fts_symbol_name(name));
 
       fts_object_put_prop(obj, name, &at[2]);
     }

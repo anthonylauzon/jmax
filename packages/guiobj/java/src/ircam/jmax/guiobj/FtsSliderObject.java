@@ -77,9 +77,6 @@ public class FtsSliderObject extends FtsIntValueObject
   {
       super(server, parent, id, args, offset, length);
 
-      setNumberOfInlets(1);
-      setNumberOfOutlets(1);
-
       maxValue = 127;
       minValue = 0;
   }

@@ -174,16 +174,18 @@ public class FtsGraphicObject extends FtsObject {
     if (this.x != x)
       {
 	args.clear();
+	args.addSymbol(FtsSymbol.get("x"));
 	args.addInt((int)x);
-      
+
 	try{
-	  send( FtsSymbol.get("setX"), args);
+	  sendProperty(args);
 	}
 	catch(IOException e)
 	  {
 	    System.err.println("FtsGraphicObject: I/O Error sending setX Message!");
 	    e.printStackTrace(); 
 	  }
+
 	this.x = x;
 	setDirty();
       }
@@ -208,16 +210,18 @@ public class FtsGraphicObject extends FtsObject {
     if (this.y != y)
       {
 	args.clear();
+	args.addSymbol(FtsSymbol.get("y"));
 	args.addInt((int)y);
-      
+
 	try{
-	  send( FtsSymbol.get("setY"), args);
+	  sendProperty( args);
 	}
 	catch(IOException e)
 	  {
 	    System.err.println("FtsGraphicObject: I/O Error sending setY Message!");
 	    e.printStackTrace(); 
 	  }
+
 	this.y = y;
 	setDirty();
       }
@@ -240,16 +244,18 @@ public class FtsGraphicObject extends FtsObject {
     if (this.width != w)
       {
 	args.clear();
+	args.addSymbol(FtsSymbol.get("w"));
 	args.addInt((int)w);
-      
+
 	try{
-	  send( FtsSymbol.get("setWidth"), args);
+	  sendProperty( args);
 	}
 	catch(IOException e)
 	  {
 	    System.err.println("FtsGraphicObject: I/O Error sending setWidth Message!");
 	    e.printStackTrace(); 
-	  }  
+	  }
+
 	this.width = w;
 	setDirty();
       }
@@ -275,16 +281,17 @@ public class FtsGraphicObject extends FtsObject {
     if (this.height != h)
       {
 	args.clear();
+	args.addSymbol(FtsSymbol.get("h"));
 	args.addInt((int)h);
-      
+
 	try{
-	  send( FtsSymbol.get("setHeight"), args);
+	  sendProperty( args);
 	}
 	catch(IOException e)
 	  {
-	    System.err.println("FtsGraphicObject: I/O Error sending setHeight Message!");
+	    System.err.println("FtsGraphicObject: I/O Error sending setHeght Message!");
 	    e.printStackTrace(); 
-	  }  
+	  }
 	this.height = h;
 	setDirty();
       }
@@ -340,10 +347,11 @@ public class FtsGraphicObject extends FtsObject {
     if ((this.font == null) || (! this.font.equals(font)))
       {
 	args.clear();
+	args.addSymbol(FtsSymbol.get("font"));
 	args.addString(font);
 	  
 	try{
-	  send( FtsSymbol.get("setFont"), args);
+	  sendProperty( args);
 	}
 	catch(IOException e)
 	  {
@@ -375,10 +383,11 @@ public class FtsGraphicObject extends FtsObject {
     if (this.fontSize != fontSize)
       {
 	args.clear();
+	args.addSymbol(FtsSymbol.get("fs"));
 	args.addInt(fontSize);
 	  
 	try{
-	  send( FtsSymbol.get("setFontSize"), args);
+	  sendProperty( args);
 	}
 	catch(IOException e)
 	  {
@@ -409,10 +418,11 @@ public class FtsGraphicObject extends FtsObject {
     if (this.fontStyle != fontStyle)
       {
 	args.clear();
+	args.addSymbol(FtsSymbol.get("fst"));
 	args.addInt(fontStyle);
 	  
 	try{
-	  send( FtsSymbol.get("setFontStyle"), args);
+	  sendProperty( args);
 	}
 	catch(IOException e)
 	  {
@@ -442,10 +452,11 @@ public class FtsGraphicObject extends FtsObject {
     if (this.layer != layer)
       {
 	args.clear();
+	args.addSymbol(FtsSymbol.get("layer"));
 	args.addInt(layer);
 	  
 	try{
-	  send( FtsSymbol.get("setLayer"), args);
+	  sendProperty( args);
 	}
 	catch(IOException e)
 	  {
@@ -469,10 +480,11 @@ public class FtsGraphicObject extends FtsObject {
   public final void setColor(int color)
   {
     args.clear();
+    args.addSymbol(FtsSymbol.get("color"));
     args.addInt(color);
 	  
     try{
-      send( FtsSymbol.get("setColor"), args);
+      sendProperty( args);
     }
     catch(IOException e)
       {
@@ -519,10 +531,11 @@ public class FtsGraphicObject extends FtsObject {
   public void setComment(String comment)
   {
     args.clear();
+    args.addSymbol(FtsSymbol.get("comment"));    
     args.addString(comment);
 	  
     try{
-      send( FtsSymbol.get("setComment"), args);
+      sendProperty( args);
     }
     catch(IOException e)
       {
@@ -587,16 +600,16 @@ public class FtsGraphicObject extends FtsObject {
   public Enumeration getGenealogy()
   {
     Vector gen = new Vector();
-    FtsObject current = this;
+    FtsGraphicObject current = this;
     gen.addElement(current);
       
     if(!isARootPatcher())
-      while(!current.getParent().isARootPatcher())
+      while(!((FtsGraphicObject)current.getParent()).isARootPatcher())
 	{
 	  gen.add(0, current.getParent());
-	  current = current.getParent();
+	  current = (FtsGraphicObject) current.getParent();
 	}
-    if(current.getParent().isARootPatcher())
+    if(((FtsGraphicObject)current.getParent()).isARootPatcher())
       gen.add(0, current.getParent());
 	
     return gen.elements();

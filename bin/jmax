@@ -30,7 +30,7 @@
 # JAVA_DEFAULT_OPTIONS="-noclassgc -noasyncgc -mx64m -ms2m"
 JAVA_DEFAULT_OPTIONS="-noclassgc -mx64m -ms2m"
 
-prefix=/net/ligeti/u.ligeti/worksta/borghesi/projects/jmax-install
+prefix=/u/worksta/borghesi/projects/jmax-install
 exec_prefix=${prefix}
 rootdir=${prefix}/share/jmax
 ftsdir=${exec_prefix}/bin

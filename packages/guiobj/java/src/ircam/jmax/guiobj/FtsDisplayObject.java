@@ -48,9 +48,8 @@ public class FtsDisplayObject extends FtsGraphicObject
   public FtsDisplayObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
   {
     super(server, parent, id, args, offset, length);
-    
-    ninlets = 1;
-    noutlets = 0;
+    setNumberOfInlets(1);
+    setNumberOfOutlets(0);
   }
 
   public void display(String content)

@@ -29,9 +29,6 @@
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/OLDclient.h>
 
-#define fts_connection_table_put(id, conn) (id)
-#define fts_connection_table_remove(id) (id)
-
 /* Note that in this code there are error messages sent as blip;
    this is ok during editing, but the same error may occour while
    loading a patch in an environment where some object changed
@@ -40,14 +37,12 @@
 
 /* #define TRACE_DEBUG */
 
-static fts_heap_t *connection_heap;
-
 /******************************************************************************/
 /*                                                                            */
 /*                            Connections                                     */
 /*                                                                            */
 /******************************************************************************/
-
+  
 fts_connection_t *
 fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
 {
@@ -118,7 +113,7 @@ fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int
 	}
     }
 
-  conn = (fts_connection_t *) fts_heap_alloc(connection_heap);
+  conn = (fts_connection_t *) fts_object_create(fts_class_get_by_name(fts_s_connection), 0, 0);
 
   conn->id  = id;
   conn->src = out;
@@ -130,9 +125,6 @@ fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int
     conn->type = fts_c_invalid;
   else
     conn->type = fts_c_anything;
-
-  if (id != FTS_NO_ID)
-    fts_connection_table_put(id, conn);
 
   /* pre-initialize the cache, if possible */
 
@@ -186,6 +178,7 @@ fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int
   return conn;
 }
 
+
 static void 
 fts_object_do_disconnect(fts_connection_t *conn, int do_client)
 { 
@@ -223,13 +216,6 @@ fts_object_do_disconnect(fts_connection_t *conn, int do_client)
 	*p = (*p)->next_same_dst;
 	break;
       }
-
-  /* Unregister the connection */
-  if (do_client && conn->id != FTS_NO_ID)
-    fts_connection_table_remove(conn->id);
-
-  /* Free the connection, and return */
-  fts_heap_free((char *) conn, connection_heap);
 }
 
 void fts_connection_delete(fts_connection_t *conn)
@@ -396,6 +382,13 @@ fts_connection_set_type(fts_connection_t *connection, fts_connection_type_t type
     }
 }
 
+static fts_status_t
+connection_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(fts_connection_t), 0, 0, 0); 
+  return fts_Success;
+}
+
 /***********************************************************************
  *
  * Initialization
@@ -404,6 +397,6 @@ fts_connection_set_type(fts_connection_t *connection, fts_connection_type_t type
 
 void fts_kernel_connection_init()
 {
-  connection_heap = fts_heap_new(sizeof(fts_connection_t));
+  fts_class_install(fts_s_connection, connection_instantiate);
 }
 
