@@ -1,3 +1,7 @@
+2003-07-18  Norbert Schnell  <schnell@mac-portable-schnell.ircam.fr>
+
+	* changed post() to fts_post() and post_atoms() to fts_post_atoms()
+
 2003-07-17  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* java/src/ircam/jmax/editors/configuration/ConfigurationEditor.java: displayed path of configuration file in "Configuration Editor" window title.
