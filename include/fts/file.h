@@ -31,6 +31,10 @@ FTS_API int fts_is_directory(const char *name);
 
 FTS_API void fts_dirname(const char *name, char* buf, int size);
 
+FTS_API void fts_path_to_dirname(char *path);
+
+FTS_API const char *fts_get_basename(const char *path);
+
 /**
  *
  * @return 0 if the filename remained unchanged, 1 if it was changed
@@ -85,6 +89,16 @@ FTS_API int fts_find_directory(fts_list_t* paths, const char *dirname, char* buf
 FTS_API char fts_file_separator;
 FTS_API char fts_path_separator;
 
+/** 
+ * Make a copy of a file. Overwrites target.
+ *
+ * @fn int fts_copy_file(const char *src, const char *dest)
+ * @param src The source file name.
+ * @param dest The destination (target) file name. If the file doesn't exist, it will be created.
+ *        Otherwise it will be overwritten.
+ * @returns 0 if the copy was successful, <0 if some error occured.
+ */
+FTS_API int fts_copy_file(const char *src, const char *dest);
 
 /********************************************************************/
 /********************************************************************/
