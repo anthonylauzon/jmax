@@ -30,6 +30,7 @@ all:
 
 clean:
 	(cd src ; $(MAKE) clean)
+	-/bin/rm -f classes/jmax.jar
 .PHONY: clean
 
 install-exec:

@@ -197,6 +197,15 @@ sgi-pkg:
 	cat /tmp/idb-doc /tmp/idb-exec /tmp/idb-includes | sort +4u -6 > ./pkg/sgi/jmax.idb
 	/usr/sbin/gendist -verbose -root / -sbase .. -idb ./pkg/sgi/jmax.idb -spec ./pkg/sgi/jmax.spec -dist /usr/dist -all
 
+
+#
+# rpm
+# creates a rpm
+#
+rpm:
+	(cd pkg/rpm ; $(MAKE) VERSION=$(VERSION) rpm)
+.PHONY: rpm
+
 #
 # uninstall
 # remove the files copied by make install
