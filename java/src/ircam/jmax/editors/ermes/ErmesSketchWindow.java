@@ -265,10 +265,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
     inspectMenuItem.addActionListener( new MaxActionListener(inspectMenuItem) {
       public void actionPerformed(ActionEvent e) 
 	{
-	  if (ErmesSketchPad.currentSelection.isEmpty())
-	    ErmesPatcherInspector.inspect(itsPatcher);
-	  else
-	    ErmesSketchPad.inspectSelection();
+	  inspectAction();
 	}
     });
 
@@ -298,10 +295,15 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 
   public void inspectAction()
   {
-    if ( itsSketchPad.currentSelection.isEmpty() )
-      ErmesPatcherInspector.inspect( itsPatcher);
+    if (ErmesSketchPad.currentSelection.getOwner() == itsSketchPad)
+      {
+	if (ErmesSketchPad.currentSelection.isEmpty())
+	  ErmesPatcherInspector.inspect(itsPatcher);
+	else
+	  ErmesSketchPad.inspectSelection();
+      }
     else
-      ErmesSketchPad.inspectSelection();
+      ErmesPatcherInspector.inspect(itsPatcher);
   }
 
   protected void Cut()
@@ -618,11 +620,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 	if (aInt == 73)
 	  {
 	    // i
-
-	    if (ErmesSketchPad.currentSelection.isEmpty())
-	      ErmesPatcherInspector.inspect(itsPatcher);
-	    else
-	      ErmesSketchPad.inspectSelection();
+	    inspectAction();
 	  }
 	else if (aInt == 90)
 	  itsSketchPad.showErrorDescriptions();

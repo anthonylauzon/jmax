@@ -25,18 +25,18 @@ class FtsRexecDatagramPort extends FtsPort
   DatagramPacket in_packet;
 
   String host;
-  String path = ".";
-  String ftsName = "fts";
+  String path;
+  String ftsName;
 
-  FtsRexecDatagramPort(String host)
+  FtsRexecDatagramPort(String host, String path, String ftsName)
   {
     super(host);
-    this.host = host;
-  }
 
-  void open()
-  {
     String command;
+
+    this.host = host;
+    this.path = path;
+    this.ftsName = ftsName;
 
     try
       {
@@ -46,7 +46,6 @@ class FtsRexecDatagramPort extends FtsPort
       {
 	System.out.println("Error while opening server socket " + e);
       }
-
 
 
     try
@@ -103,11 +102,9 @@ class FtsRexecDatagramPort extends FtsPort
 	System.out.println("I/O error during accept on server socket");
 	return;
       }    
-
-    super.open();
   }
 
-  void doClose()
+  void close()
   {
     socket.close();
     in_packet = null;
@@ -128,18 +125,6 @@ class FtsRexecDatagramPort extends FtsPort
     return (socket != null);
   }
 
-
-  void setParameter(String property, Object value)
-  {
-    if (property.equals("ftsdir") && (value instanceof String))
-      {
-	path = (String) value;
-      }
-    else if (property.equals("ftsname") && (value instanceof String))
-      {
-	ftsName = (String) value;
-      }
-  }
 
   /** Method to send a char; since we can use datagram sockets or other
     means I/O is not necessarly done thru streams */

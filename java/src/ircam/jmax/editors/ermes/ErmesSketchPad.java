@@ -465,7 +465,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	    { 
 	      resetFocus();
 	      currentSelection.setOwner(this); 
-	      currentSelection.deselectAll(); // @@@
+	      currentSelection.deselectAll();
 	      currentSelection.select( theObject);
 	      paintDirtyList();
 	      CheckCurrentFont();
@@ -1706,7 +1706,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	    currentSelection.deselectAll();
 	    currentSelection.select( aObject);
 	    CheckCurrentFont();
-	    repaint();
+	    paintDirtyList();
+	    repaint(); // ?? black magic
 	  }
       }
   }
@@ -1810,7 +1811,10 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
   public void update( Graphics g)
   {
-    if (deleted || isLocked())
+    // if (deleted || isLocked()) ????????
+    // return;
+
+    if (deleted)
       return;
 
     if (editStatus == START_CONNECT) 

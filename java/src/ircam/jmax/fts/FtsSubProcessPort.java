@@ -11,19 +11,18 @@ import java.net.*;
 
 class FtsSubProcessPort extends FtsPort
 {
-  String path = ".";
-  String ftsName = "fts";
+  String path;
+  String ftsName;
   Process proc;
   InputStream in_stream = null;
   OutputStream out_stream = null;
 
-  FtsSubProcessPort()
+  FtsSubProcessPort(String path, String ftsName)
   {
     super("fts");
-  }
+    this.path = path;
+    this.ftsName = ftsName;
 
-  void open()
-  {
     try
       {
 	proc = Runtime.getRuntime().exec(path+"/"+ftsName);
@@ -36,11 +35,9 @@ class FtsSubProcessPort extends FtsPort
       {
 	System.out.println("Don't know about command " + path);
       }    
-
-    super.open();
   }
 
-  void doClose()
+  void close()
   {
     try
       {
@@ -57,18 +54,6 @@ class FtsSubProcessPort extends FtsPort
   boolean isOpen()
   {
     return (in_stream != null) && (out_stream != null);
-  }
-
-  void setParameter(String property, Object value)
-  {
-    if (property.equals("ftsdir") && (value instanceof String))
-      {
-	path = (String) value;
-      }
-    else if (property.equals("ftsname") && (value instanceof String))
-      {
-	ftsName = (String) value;
-      }
   }
 
   /** Method to send a char; since we can use datagram sockets or other

@@ -17,7 +17,7 @@ import ircam.jmax.utils.*;
  *  @see FtsClientProtocol
  */
 
-abstract class FtsPort implements Runnable
+abstract class FtsPort
 {
   FtsMessage portMsg = new FtsMessage();
 
@@ -33,8 +33,6 @@ abstract class FtsPort implements Runnable
 
   String name;
   FtsServer server;
-  boolean running  = true;
-  Thread inputThread;
 
   /**
    * Create a connection, storing the name.
@@ -53,91 +51,13 @@ abstract class FtsPort implements Runnable
     this.server = server;
   }
 
-  /** Open a connection. */
+  /** Close a connection. (connections are opened by the constructor) */
 
-  void open()
-  {
-    // the subclasses will do the actual opening, before calling super.open()
-
-    // start the input thread
-
-    inputThread = new Thread(this, name);
-    inputThread.setPriority(Thread.MAX_PRIORITY);
-    inputThread.start(); 
-  }
-
-  /** Close a connection. */
-
-  void close()
-  {
-    // ask the input thread loop to close the streams and exit
-    // this to avoid inconsistency in accessing the input thread.
-
-    running = false;
-  }
+  abstract void close();
 
   /** Check if the connection is open. */
 
   abstract boolean isOpen();
-
-  /**
-   * Close the comunication.
-   * Must be created by the implementation of the connection
-   * If the connection actually bootstrap the server, 
-   * it must be shutdown in the doClose method.
-   */
-
-  abstract void doClose();
-       
-  /** the main loop of the input listener thread. */
-
-  public void run()
-  {
-    while (running && isOpen())
-      {
-	try
-	  {
-	    FtsMessage msg;
-	    msg = receiveMessage();
-
-	    if (msg != null)
-	      server.dispatchMessage(msg);
-	  }
-	catch (java.io.InterruptedIOException e)
-	  {
-	    /* Ignore, just retry */
-	  }
-	catch (FtsQuittedException e)
-	  {
-	    server.ftsQuitted();
-	    running = false;
-	  }
-	catch (Exception e)
-	  {
-	    // Try to survive an exception
-	    
-	    // System.err.println("System exception " + e);
-	    // e.printStackTrace();
-	  }
-      }
-
-    // Send a shutdown message to fts
-
-    server.sendShutdown();
-
-    // close the thread and the streams
-
-    doClose();
-  }
-
-  /**
-   * Handle the setting of the connection parameters.
-   * Each subclass must specialize this methods for the connection
-   * dependent parameters.
-   */
-
-  abstract void setParameter(String property, Object value);
-
 
   /******************************************************************************/
   /*                                                                            */

@@ -22,27 +22,24 @@ public class Fts
     return server;
   }
   
-  public static void connectToFts(String theFtsdir, String theFtsname, String mode,
+  public static void connectToFts(String ftsDir, String ftsName, String mode,
 				  String serverName, String port)
   {
     if (mode.equals("socket")) 
       server = new FtsServer(serverName, new FtsSocketPort(serverName, Integer.parseInt(port)));
     else if (mode.equals("udp")) 
-      server = new FtsServer(serverName, new FtsDatagramPort(serverName));
+      server = new FtsServer(serverName, new FtsDatagramPort(serverName, ftsDir, ftsName));
     else if (mode.equals("udprx")) 
-      server = new FtsServer(serverName, new FtsRexecDatagramPort(serverName));
+      server = new FtsServer(serverName, new FtsRexecDatagramPort(serverName, ftsDir, ftsName));
     else if (mode.equals("udpclient")) 
       server = new FtsServer(serverName + ":" + port,
-			     new FtsDatagramClientPort(serverName, Integer.parseInt(port)));
+			     new FtsDatagramClientPort(serverName, ftsDir, ftsName, Integer.parseInt(port)));
     else if (mode.equals("client"))
-      server = new FtsServer(serverName, new FtsSocketServerPort(serverName));
+      server = new FtsServer(serverName, new FtsSocketServerPort(serverName, ftsDir, ftsName));
     else if (mode.equals("local"))
-      server = new FtsServer("fts", new FtsSubProcessPort());
+      server = new FtsServer("fts", new FtsSubProcessPort(ftsDir, ftsName));
     else
       System.out.println("unknown FTS connection type "+mode+": can't connect to FTS");
-
-    server.setParameter("ftsdir", theFtsdir);
-    server.setParameter("ftsname", theFtsname);
 
     server.start();
   }

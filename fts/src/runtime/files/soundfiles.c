@@ -37,7 +37,7 @@ fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbol_t format, float
   const char *path = fts_symbol_name(file_name);
 
   /* find file in all possible locations */
-  fts_file_find(path, full_path);
+  fts_file_get_read_path(path, full_path);
 
   if(format)
     {

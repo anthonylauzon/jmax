@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:36 $
+ *      $Revision: 1.2 $ IRCAM $Date: 1998/10/28 15:51:33 $
  *
  * writesf~, readsf~: disk recording and playback
  *
@@ -31,6 +31,26 @@ static fts_symbol_t writesf_stereo_function = 0;
 
 static fts_symbol_t readsf_mono_function = 0;
 static fts_symbol_t readsf_stereo_function = 0;
+
+/* utility function to find the real path */
+
+static char buf[1024];
+
+static const char *get_readsf_path(fts_symbol_t filename)
+{
+  fts_file_get_read_path(fts_symbol_name(filename), buf);
+  
+  return buf;
+}
+
+static const char *get_writesf_path(fts_symbol_t filename)
+{
+  fts_file_get_write_path(fts_symbol_name(filename), buf);
+
+  return buf;
+}
+  
+
 
 /* SGI and SOLARIS2 dependent implementation of writesf;
    should go in an other file ! */
@@ -82,7 +102,7 @@ writesf_file_open(writesf_t *this)
   AFinitsampfmt(fs, AF_DEFAULT_TRACK, AF_SAMPFMT_TWOSCOMP, 16L);
   AFinitchannels(fs, AF_DEFAULT_TRACK, this->nchans);
 
-  this->fh = AFopenfile(fts_symbol_name(this->sndfile), "w", fs);
+  this->fh = AFopenfile(get_writesf_path(this->sndfile), "w", fs);
   AFfreefilesetup(fs);
 
   if (!this->fh)
@@ -238,7 +258,7 @@ writesf_get_format(SFHEADER *hdr, const char *file, const char *hint)
 static int
 writesf_file_open(writesf_t *this, fts_symbol_t shint)
 {
-  const char *file = fts_symbol_name(this->sndfile);
+  const char *file = get_writesf_path(this->sndfile);
   const char *hint = (shint ? fts_symbol_name(shint) : (const char *)0);
 
   /*  this->fh = open(file, O_WRONLY | O_TRUNC | O_CREAT, 0666); */
@@ -253,8 +273,6 @@ writesf_file_open(writesf_t *this, fts_symbol_t shint)
   if (!writesf_get_format(&this->sfhdr, file, hint))
     return 0;
     
-  fprintf(stderr, "writesf_file_open(%s)\n", file);
-
   if (sfmachine(&this->sfhdr) == SF_SND)
     {
       Audio_hdr hdr;
@@ -267,7 +285,6 @@ writesf_file_open(writesf_t *this, fts_symbol_t shint)
       hdr.endian           = AUDIO_ENDIAN_BIG; /* sparc is big endian */
       hdr.data_size        = AUDIO_UNKNOWN_SIZE;
 
-      fprintf(stderr, "writesf_file_open --> SND\n");
       if (audio_write_filehdr(this->fh, &hdr, "", 1) != AUDIO_SUCCESS)
 	{
 	  post("writesf~: cannot write file header for file '%s'\n", file);
@@ -283,7 +300,6 @@ writesf_file_open(writesf_t *this, fts_symbol_t shint)
       sfsrate(hdr)   = fts_param_get_float(fts_s_sampling_rate, 44100.);
       sfchans(hdr)   = this->nchans;
 
-      fprintf(stderr, "writesf_file_open --> other format\n");
       if (STwheader(this->fh, hdr) < 0)
 	{
 	  post("writesf~: cannot write file header for file '%s'\n", file);
@@ -301,9 +317,8 @@ writesf_file_close(writesf_t *this)
     close(this->fh);
   else
     {
-      fprintf(stderr, "ST_file_close %d\n", STisAIFF(&this->sfhdr));
       if (STclose(this->fh, &this->sfhdr) < 0)
-	fprintf(stderr, "ST_file_close error\n");
+	post("ST_file_close error\n");
       close(this->fh);
     }
   this->fh = 0;
@@ -679,7 +694,7 @@ typedef struct
 static int
 readsf_file_open(readsf_t *this)
 {
-  this->fh = AFopenfile(fts_symbol_name(this->sndfile), "r", 0);
+  this->fh = AFopenfile(get_readsf_path(this->sndfile), "r", 0);
 
   return (this->fh != 0);
 }
@@ -696,7 +711,7 @@ readsf_file_close(readsf_t *this)
 static int
 readsf_file_open(readsf_t *this)
 {
-  const char *file = fts_symbol_name(this->sndfile);
+  const char *file = get_readsf_path(this->sndfile);
   Audio_hdr hdr;
   char buf[80];
 
@@ -710,14 +725,6 @@ readsf_file_open(readsf_t *this)
 
   if (audio_read_filehdr(this->fh, &hdr, buf, sizeof(buf)-1) == AUDIO_SUCCESS)
     {
-      fprintf(stderr, "hdr.sample_rate : %d\n", hdr.sample_rate);
-      fprintf(stderr, "hdr.samples_per_unit : %d\n", hdr.samples_per_unit);
-      fprintf(stderr, "hdr.bytes_per_unit : %d\n", hdr.bytes_per_unit);
-      fprintf(stderr, "hdr.channels : %d\n", hdr.channels);
-      fprintf(stderr, "hdr.encoding : %d\n", hdr.encoding);
-      fprintf(stderr, "hdr.endian : %d\n", hdr.endian);
-      fprintf(stderr, "hdr.data_size : %d\n", hdr.data_size);
-  
       if (hdr.sample_rate != fts_param_get_float(fts_s_sampling_rate, 44100.))
 	{
 	  post("readsf~: incompatible sampling rate for~ file '%s' :"
@@ -747,7 +754,6 @@ readsf_file_open(readsf_t *this)
     }
   else if (!STrheader(this->fh, &this->sfhdr))
     {
-      fprintf(stderr, "have read file header sucessfully\n");
       if (sfchans(&this->sfhdr) != this->nchans)
 	{
 	  if (sfchans(&this->sfhdr) == 1)
@@ -771,9 +777,8 @@ readsf_file_close(readsf_t *this)
     close(this->fh);
   else
     {
-      fprintf(stderr, "ST_readsf_file_close %d\n", STisAIFF(&this->sfhdr));
       if (STclose(this->fh, &this->sfhdr) < 0)
-	fprintf(stderr, "ST_file_close error\n");
+	post("ST_file_close error\n");
       close(this->fh);
     }
   this->fh = 0;

@@ -30,20 +30,20 @@ class FtsDatagramClientPort extends FtsPort
   DatagramPacket in_packet;
 
   String host;
-  String path = ".";
-  String ftsName = "fts";
+  String path;
+  String ftsName;
   int port;
 
-  FtsDatagramClientPort(String host, int port)
+  FtsDatagramClientPort(String host, String path, String ftsName, int port)
   {
     super(host);
+
+    String command;
+
     this.host = host;
     this.port = port;
-  }
-
-  void open()
-  {
-    String command;
+    this.path = path;
+    this.ftsName = ftsName;
 
     try
       {
@@ -72,11 +72,9 @@ class FtsDatagramClientPort extends FtsPort
 	System.out.println("I/O error during accept on server socket");
 	return;
       }    
-
-    super.open();
   }
 
-  void doClose()
+  void close()
   {
     socket.close();
     in_packet = null;
@@ -88,18 +86,6 @@ class FtsDatagramClientPort extends FtsPort
     return (socket != null);
   }
 
-
-  void setParameter(String property, Object value)
-  {
-    if (property.equals("ftsdir") && (value instanceof String))
-      {
-	path = (String) value;
-      }
-    else if (property.equals("ftsname") && (value instanceof String))
-      {
-	ftsName = (String) value;
-      }
-  }
 
   /** Method to send a char; since we can use datagram sockets or other
     means I/O is not necessarly done thru streams */
@@ -142,8 +128,15 @@ class FtsDatagramClientPort extends FtsPort
   void flush() throws java.io.IOException
   {
     out_packet.setLength(out_fill_p);
-    socket.send(out_packet);
-    out_fill_p = 0;
+
+    try
+      {
+	socket.send(out_packet);
+      }
+    finally
+      {
+	out_fill_p = 0;
+      }
   }
 }
 

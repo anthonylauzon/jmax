@@ -22,7 +22,7 @@ import ircam.jmax.utils.*;
  */
 
 
-public class FtsServer 
+public class FtsServer  implements Runnable
 {
   public static boolean debug = false;
 
@@ -80,43 +80,14 @@ public class FtsServer
     return root;
   }
 
-  /** Start the server. */
+  //
+  // Server Housekeeping
+  // 
 
-  public void start()
-  {
-    port.open();
 
-    if (! syncToFts(5000))
-      {
-	System.err.println("Connection to FTS failed !!!");
-      }
-    else
-      {
-	// Build the root patcher, by mapping directly to object id 1 on FTS
-	// (this is guaranteed)
-
-	root = new FtsPatcherObject(null, null, "", 1);
-	registerObject(root);
-      }
-  }
-
-  /** Stop the server. */
-
-  public void stop()
-  {
-    port.close();
-
-    /* This will cause the actual close to happen */
-
-    syncToFts();
-  }
-
-  /** Set a server parameter, <i>before</i> the server start. */
-
-  public void setParameter(String name, String value)
-  {
-    port.setParameter(name, value);
-  }
+  //
+  // Outgoing messages
+  // 
 
 
   /** Send a "save patcher as bmax" messages to FTS.*/
@@ -1177,6 +1148,87 @@ public class FtsServer
     updateGroupListeners.removeElement(listener);
   }
 
+
+  //
+  // Incoming message handling
+  //
+
+  boolean running  = true;
+  Thread inputThread;
+  /** Start the server. */
+
+  public void start()
+  {
+    inputThread = new Thread(this, name);
+    inputThread.setPriority(Thread.MAX_PRIORITY);
+    inputThread.start(); 
+
+    if (! syncToFts(5000))
+      {
+	System.err.println("Connection to FTS failed !!!");
+      }
+    else
+      {
+	// Build the root patcher, by mapping directly to object id 1 on FTS
+	// (this is guaranteed)
+
+	root = new FtsPatcherObject(null, null, "", 1);
+	registerObject(root);
+      }
+  }
+
+  /** Stop the server. */
+
+  public void stop()
+  {
+    running = false;
+
+    /* This will cause the actual close to happen */
+
+    syncToFts();
+  }
+
+  /** the main loop of the input listener thread. */
+
+  public void run()
+  {
+    while (running && port.isOpen())
+      {
+	try
+	  {
+	    FtsMessage msg;
+	    msg = port.receiveMessage();
+
+	    if (msg != null)
+	      dispatchMessage(msg);
+	  }
+	catch (java.io.InterruptedIOException e)
+	  {
+	    /* Ignore, just retry */
+	  }
+	catch (FtsPort.FtsQuittedException e)
+	  {
+	    ftsQuitted();
+	    running = false;
+	  }
+	catch (Exception e)
+	  {
+	    // Try to survive an exception
+	    
+	    // System.err.println("System exception " + e);
+	    // e.printStackTrace();
+	  }
+      }
+
+    // Send a shutdown message to fts
+
+    sendShutdown();
+
+    // close the thread and the streams
+
+    port.close();
+  }
+
   /**
    * Dispatch a server message.
    * Note that the Server object is
@@ -1473,7 +1525,9 @@ public class FtsServer
       deliverPong(); // Should we test if we are wa
   }
 
-  /* OBJECT ID HANDLING */
+  //
+  /// OBJECT ID HANDLING 
+  //
 
   /**
    * The server Object ID Counter.

@@ -16,16 +16,18 @@ class FtsSocketServerPort extends FtsPort
   int port;
   Socket socket;
   ServerSocket serverSocket;
-  String path = ".";
-  String ftsName = "fts";
+  String path;
+  String ftsName;
   Process proc;
   InputStream in_stream = null;
   OutputStream out_stream = null;
 
-  FtsSocketServerPort(String host)
+  FtsSocketServerPort(String host, String path, String ftsName)
   {
     super(host);
     this.host = host;
+    this.path = path;
+    this.ftsName = ftsName;
 
     // Create the server socket on the first free port
 
@@ -38,10 +40,7 @@ class FtsSocketServerPort extends FtsPort
       {
 	System.out.println("Error while opening server socket " + e);
       }
-  }
 
-  void open()
-  {
     String command;
 
     try
@@ -112,11 +111,9 @@ class FtsSocketServerPort extends FtsPort
 	System.out.println("Couldn't get I/O for the socket ");
 	return;
       }    
-
-    super.open();
   }
 
-  void doClose()
+  void close()
   {
     try
       {
@@ -137,18 +134,6 @@ class FtsSocketServerPort extends FtsPort
     return (in_stream != null) && (out_stream != null);
   }
 
-
-  void setParameter(String property, Object value)
-  {
-    if (property.equals("ftsdir") && (value instanceof String))
-      {
-	path = (String) value;
-      }
-    else if (property.equals("ftsname") && (value instanceof String))
-      {
-	ftsName = (String) value;
-      }
-  }
 
   /** Method to send a char; since we can use datagram sockets or other
     means I/O is not necessarly done thru streams */

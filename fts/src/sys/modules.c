@@ -115,7 +115,7 @@ static fts_status_description_t  module_not_found = { "Module Not Found."};
    the module variable name *must* be called <name>_module;
    the filename default to lib<name>.so if not specified;
    if the filename start with a "/" in the path, it is used
-   like it is, otherwise we look use fts_file_find to look
+   like it is, otherwise we look use fts_file_get_read_path to look
    for it.
 
    Note that this function overwrite the module name
@@ -174,7 +174,7 @@ fts_module_load(const char *name, const char *filename)
     }
   else
     {
-      if (fts_file_find(libname, pathbuf))
+      if (fts_file_get_read_path(libname, pathbuf))
 	loadpath = pathbuf;
       else
 	{

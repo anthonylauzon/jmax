@@ -31,7 +31,7 @@ static int file_exists(const char *path)
 
 
 
-int fts_file_find(const char *path, char *full_path)
+int fts_file_get_read_path(const char *path, char *full_path)
 {
   if (path[0] == '/')
     {
@@ -156,7 +156,7 @@ int fts_file_open(const char *name,  const char *mode)
     }
   else
     {
-      if (fts_file_find(name, path))
+      if (fts_file_get_read_path(name, path))
 	return fts_do_file_open(path, mode); /* @@@ */
       else
 	return -1;

@@ -20,12 +20,10 @@ class FtsSocketPort extends FtsPort
   FtsSocketPort(String host, int port)
   {
     super(host+":"+port);
+
     this.host = host;
     this.port = port;
-  }
 
-  void open()
-  {
     try
       {
 	socket = new Socket(host, port);
@@ -40,14 +38,12 @@ class FtsSocketPort extends FtsPort
       {
 	System.out.println("Couldn't get I/O for the connection to " + host + ":" + port);
       }    
-
-    super.open();
   }
 
   // New behaviour: stop the server when close connection: ok, because we
   // say we are now monoclient .
 
-  void doClose()
+  void close()
   {
     try
       {
@@ -64,11 +60,6 @@ class FtsSocketPort extends FtsPort
   boolean isOpen()
   {
     return (in_stream != null) && (out_stream != null);
-  }
-
-  void setParameter(String property, Object value)
-  {
-    // no parameter to set.
   }
 
   /** Method to send a char; since we can use datagram sockets or other
