@@ -1,0 +1,49 @@
+#!/bin/sh
+
+OUT=$$.cvs.out
+
+find_tag () {
+    cvs log | awk -F: -v tag=$1 '
+    $1 == "RCS file" && $2 ~ "Attic" { in_attic = 1; }
+    $1 == "RCS file" && $2 !~ "Attic" { in_attic = 0; }
+    $1 == "Working file" { file = $2; }
+    { gsub( "[ \t]*", "", $1); if (in_attic == 1 && $1 == tag) print file; }
+'
+}
+
+delete_tag () {
+    for f in `cat`
+    do
+	F=`basename $f`
+	D=`dirname $f`
+	(
+	    if [ _${D}_ != __ ] ; then cd $D ; fi
+	    echo Deleting tag $1 on file $D/$F
+	    cvs tag -d $1 $F
+	    sleep 5
+	)
+    done
+}
+
+if [ $# -eq 0 ]
+then
+    echo "Usage `basename $0` [-n] TAG"
+    exit 1
+fi
+
+if [ $1 = "-n" ]
+then
+    PRINT_ONLY="true"
+    TAG=$2
+else
+    TAG=$1
+fi
+
+
+if [ $PRINT_ONLY ]
+then
+    find_tag $TAG | cat
+else
+    find_tag $TAG | delete_tag $TAG
+fi
+/bin/rm -rf $OUT

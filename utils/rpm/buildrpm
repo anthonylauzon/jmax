@@ -22,8 +22,10 @@ fi
 # The root directory of sources
 ROOT_DIR=../..
 
-. $ROOT_DIR/VERSION
-JMAX_VERSION=${JMAX_MAJOR_VERSION}.${JMAX_MINOR_VERSION}.${JMAX_PATCH_VERSION}${JMAX_VERSION_STATUS}
+sed -e 's/(/{/g' -e 's/)/}/g' $ROOT_DIR/VERSION > $$
+. ./$$
+rm $$
+
 DISTFILE=$ROOT_DIR/../jmax-$JMAX_VERSION-src.tar.gz
 cp -fv $DISTFILE /usr/src/redhat/SOURCES
 cp -fv jmax.spec /usr/src/redhat/SPECS
