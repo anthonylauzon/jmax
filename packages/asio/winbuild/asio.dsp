@@ -102,6 +102,10 @@ SOURCE=..\c\src\asio_manager.c
 
 SOURCE=..\c\src\asio_util_win32.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=..\c\src\sample_conversions.c
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -117,6 +121,10 @@ SOURCE=..\c\src\jmax_asio_port.h
 # Begin Source File
 
 SOURCE=..\c\src\jmax_asio_util.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\sample_conversions.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"
