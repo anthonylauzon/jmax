@@ -93,10 +93,10 @@
 ;; Run the start Hooks, by hand so we are sure the correct
 ;; configuration is there ...
 ;;
-(run-hooks "platformStart")
+(run-hooks "platform-start")
 
 (if (not (run-hooks "start"))
-    (run-hooks "defaultStart"))
+    (run-hooks "default-start"))
 
 ;;
 ;; If profiling is on, close audio device 
