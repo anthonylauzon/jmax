@@ -131,7 +131,7 @@ public class DefaultActions
   public static EditorAction openConfigurationAction     = new EditorAction(){
       public void doAction(EditorContainer container)
       {
-	System.err.println( "Not yet implemented");
+	ConfigurationEditor.open( container.getFrame());
       }
     };
   public static EditorAction editCurrentConfigurationAction    = new EditorAction(){

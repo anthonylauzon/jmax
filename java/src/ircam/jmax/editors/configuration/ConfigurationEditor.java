@@ -159,6 +159,35 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
 
   }
 
+  public static void open( Frame frame)
+  {
+    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    int result = fileChooser.showOpenDialog( frame);
+
+    if ( result == JFileChooser.APPROVE_OPTION)
+      {
+	File f = fileChooser.getSelectedFile();
+
+	if ( f != null)
+	  {
+	    try
+	      {
+		if (singleInstance != null)
+		  singleInstance.close();
+
+		JMaxApplication.getConfig().send( FtsSymbol.get( "close"));
+
+		// send message to fts to open the configuration file
+		// ...
+	      }
+	    catch ( IOException e)
+	      {
+		JMaxApplication.reportException( e);
+	      }
+	  }
+      }
+  }
+
   public void save()
   {
     String fileName = JMaxApplication.getConfig().getFileName();
@@ -232,7 +261,7 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
   private AudioConfigPanel audioPanel;
   private JTabbedPane tabbedPane;
   static Font tableFont = (Font)UIManager.get("Table.font");
-  private JFileChooser fileChooser = new JFileChooser(); 
+  private static JFileChooser fileChooser = new JFileChooser(); 
 
   private FtsConfig config;
 
