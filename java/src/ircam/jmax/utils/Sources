@@ -12,4 +12,6 @@ SOURCES = \
            Enumeration2.java \
 	   MetaList.java \
 	   GlobalProbe.java \
+           Oscilloscope.java \
+           OscillSource.java \
            Probe.java

@@ -80,6 +80,14 @@ Enumeration2:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) Enumeration2.java)
 .PHONY: Enumeration2
 
+Oscilloscope:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) Oscilloscope.java)
+.PHONY: Oscilloscope
+
+OscillSource:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) OscillSource.java)
+.PHONY: OscillSource
+
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 
 

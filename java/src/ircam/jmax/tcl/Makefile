@@ -68,6 +68,10 @@ MaxPreloadClassCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxPreloadClassCmd.java)
 .PHONY: MaxPreloadClassCmd
 
+MaxOscilloscopeCmd:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxOscilloscopeCmd.java)
+.PHONY: MaxOscilloscopeCmd
+
 TclMaxPackage:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TclMaxPackage.java)
 .PHONY: TclMaxPackage

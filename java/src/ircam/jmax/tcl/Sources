@@ -10,5 +10,6 @@ SOURCES = MaxFtsConnectCmd.java\
 	  MaxSplashCmd.java    \
 	  MaxGetMaxVersionCmd.java \
           MaxPreloadClassCmd.java \
+	  MaxOscilloscopeCmd.java \
 	  TclMaxPackage.java
 
