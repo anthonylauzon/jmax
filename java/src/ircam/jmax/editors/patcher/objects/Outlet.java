@@ -32,6 +32,7 @@ import java.util.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.menus.InOutletPopUpMenu;
 
 //
 // The "out" graphic object used in subpatchers.
