@@ -54,7 +54,7 @@ static fts_symbol_t s_plug_0_0;
    we check which parameters are supported by audio card.
 */
 #define DEFAULT_FORMAT s_s32_le
-#define DEFAULT_ACCESS s_rw_interleaved
+#define DEFAULT_ACCESS s_rw_noninterleaved
 #define DEFAULT_SAMPLING_RATE (44100.)
 #define DEFAULT_FIFO_SIZE 2048
 #define DEFAULT_INPUT_CHANNELS 26
@@ -624,135 +624,108 @@ static int xrun( alsaaudioport_t *port, snd_pcm_t *handle)
   return 0;
 }
 
-#define INPUT_FUN_INTERLEAVED(FUN_NAME,TYPE,SND_PCM_FUN,SHIFT,CONV)	\
-static void FUN_NAME( fts_word_t *argv)					\
-{									\
-  alsaaudioport_t *port;						\
-  int n, channels, ch, i, j;						\
-  ssize_t r;								\
-  size_t count;								\
-  u_char *data;								\
-  TYPE *buffer;								\
-									\
-  port = (alsaaudioport_t *)fts_word_get_pointer( argv+0);		\
-  n = fts_word_get_int(argv + 1);					\
-/*   channels = fts_audioport_get_input_channels( port); */			\
-  buffer = (TYPE *)port->input_buffer;					\
-									\
-  data = (u_char *)buffer;						\
-  count = n;								\
-  while ( count > 0)							\
-    {									\
-      r = SND_PCM_FUN( port->capture.handle, data, count);		\
-									\
-      if (r == -EAGAIN || (r >= 0 && r < (ssize_t)count))		\
-	snd_pcm_wait( port->capture.handle, 1000);			\
-      else if ( r == -EPIPE )						\
-	xrun( port, port->capture.handle);				\
-      else if (r < 0)							\
-	post( "%s error: %d, %s\n", #SND_PCM_FUN, r, snd_strerror(r));	\
-									\
-      if ( r > 0)							\
-	{								\
-	  count -= r;							\
-	  data += r * port->capture.bytes_per_frame;			\
-	}								\
-    }									\
-									\
-  for ( ch = 0; ch < channels; ch++)					\
-    {									\
-      float *out = (float *) fts_word_get_pointer( argv + 2 + ch);	\
-									\
-      j = ch;								\
-      for ( i = 0; i < n; i++)						\
-	{								\
-	  out[i] = (buffer[j] >> SHIFT) / CONV;				\
-	  j += channels;						\
-	}								\
-    }									\
+
+#define INPUT_COPY_FUN_INTERLEAVED(FUN_NAME, TYPE, SHIFT, CONV)  \
+static void FUN_NAME(fts_audioport_t* port, float* buf, int buffsize, int channel)  \
+{  \
+  alsaaudioport_t* alsa_port = (alsaaudioport_t*)port;  \
+  int ch;  \
+  int channels = fts_audioport_get_max_channels(port, FTS_AUDIO_INPUT);  \
+  int i;  \
+  int j; \
+  TYPE* buffer = (TYPE*)alsa_port->input_buffer; \
+ \
+  for (ch = 0; ch < channels; ++ch) \
+  { \
+    j = ch; \
+    for (i = 0; i < buffsize; ++i) \
+    { \
+      buf[i] = (buffer[j] >> SHIFT) / CONV; \
+      j += channels; \
+    } \
+  } \
+} 
+
+
+#define INPUT_COPY_FUN_NONINTERLEAVED(FUN_NAME, TYPE, SHIFT, CONV) \
+static void FUN_NAME(fts_audioport_t* port, float* buf, int buffsize, int channel) \
+{ \
+  alsaaudioport_t* alsa_port = (alsaaudioport_t*)port; \
+  int i; \
+  TYPE* buffer; \
+ \
+  buffer = ((TYPE**)alsa_port->input_buffer)[channel]; \
+  for (i = 0; i < buffsize; ++i) \
+  { \
+    buf[i] = (buffer[i] >> SHIFT) / CONV; \
+  } \
 }
 
 
-
-
-#define INPUT_FUN_NONINTERLEAVED(FUN_NAME,TYPE,SND_PCM_FUN,SHIFT,CONV)					\
-static void FUN_NAME( fts_word_t *argv)									\
-{													\
-  alsaaudioport_t *port;										\
-  int n, channels, ch, i;										\
-  ssize_t r;												\
-  size_t count, result;											\
-  u_char **buffers;											\
-													\
-  port = (alsaaudioport_t *)fts_word_get_pointer( argv+0);						\
-  n = fts_word_get_int(argv + 1);									\
-/* WARNING  channels = fts_audioport_get_input_channels( port); */							\
-													\
-  buffers = (u_char **)alloca( channels * sizeof( u_char *));						\
-  count = n;												\
-  result = 0;												\
-  while ( count > 0)											\
-    {													\
-      for ( ch = 0; ch < channels; ch++)								\
-	buffers[ch] = ((u_char **)port->input_buffer)[ch] + result*port->capture.bytes_per_sample;	\
-													\
-      r = SND_PCM_FUN( port->capture.handle, (void **)buffers, count);					\
-													\
-      if (r == -EAGAIN || (r >= 0 && r < (ssize_t)count))						\
-	snd_pcm_wait( port->capture.handle, 1000);							\
-      else if ( r == -EPIPE )										\
-	xrun( port, port->capture.handle);								\
-      else if (r < 0)											\
-	post( "%s error: %d, %s\n", #SND_PCM_FUN, r, snd_strerror(r));					\
-													\
-      if ( r > 0)											\
-	{												\
-	  result += r;											\
-	  count -= r;											\
-	}												\
-    }													\
-													\
-  for ( ch = 0; ch < channels; ch++)									\
-    {													\
-      TYPE *buffer = ((TYPE **)port->input_buffer)[ch];							\
-      float *out = (float *) fts_word_get_pointer( argv + 2 + ch);					\
-													\
-      for ( i = 0; i < n; i++)										\
-        out[i] = (buffer[i] >> SHIFT) / CONV;								\
-    }													\
+#define INPUT_FUN_INTERLEAVED(FUN_NAME, SND_PCM_FUN) \
+static void FUN_NAME(fts_audioport_t* port) \
+{ \
+  alsaaudioport_t* alsa_port = (alsaaudioport_t*)port; \
+  ssize_t r; \
+  size_t count; \
+  u_char* data; \
+     \
+  data = (u_char*)alsa_port->input_buffer; \
+  /* @@@@@ change this @@@@@ */ \
+  count = fts_dsp_get_tick_size(); \
+ \
+  while (count > 0) \
+  { \
+    r = SND_PCM_FUN(alsa_port->capture.handle, data, count); \
+    if (r == -EAGAIN || (r >= 0 && r < (ssize_t)count)) \
+      snd_pcm_wait(alsa_port->capture.handle, 1000); \
+    else if (r == -EPIPE) \
+      xrun(alsa_port, alsa_port->capture.handle); \
+    else if (r < 0) \
+      post("%s error: %d, %s\n", #SND_PCM_FUN, r, snd_strerror(r)); \
+ \
+    if (r > 0) \
+    { \
+      count -= r; \
+      data += r * alsa_port->capture.bytes_per_frame; \
+    } \
+  } \
 }
 
-/*
-  Conversion factors:
-  16 bits: 32767
-  24 bits: 8388607
-*/
-
-/* INPUT_FUN_INTERLEAVED( alsa_input_16_rw_i, short, snd_pcm_readi, 0, 32767.0f) */
-/*   INPUT_FUN_INTERLEAVED( alsa_input_32_rw_i, long, snd_pcm_readi, 8, 8388607.0f) */
-/*   INPUT_FUN_INTERLEAVED( alsa_input_16_mmap_i, short, snd_pcm_mmap_readi, 0, 32767.0f) */
-/*   INPUT_FUN_INTERLEAVED( alsa_input_32_mmap_i, long, snd_pcm_mmap_readi, 8, 8388607.0f) */
-/*   OUTPUT_FUN_INTERLEAVED( alsa_output_16_rw_i, short, snd_pcm_writei, 0, 32767.0f) */
-/*   OUTPUT_FUN_INTERLEAVED( alsa_output_32_rw_i, long, snd_pcm_writei, 8, 8388607.0f) */
-/*   OUTPUT_FUN_INTERLEAVED( alsa_output_16_mmap_i, short, snd_pcm_mmap_writei, 0, 32767.0f) */
-/*   OUTPUT_FUN_INTERLEAVED( alsa_output_32_mmap_i, long, snd_pcm_mmap_writei, 8, 8388607.0f) */
-/*   INPUT_FUN_NONINTERLEAVED( alsa_input_16_rw_n, short, snd_pcm_readn, 0, 32767.0f) */
-/*   INPUT_FUN_NONINTERLEAVED( alsa_input_32_rw_n, long, snd_pcm_readn, 8, 8388607.0f) */
-/*   INPUT_FUN_NONINTERLEAVED( alsa_input_16_mmap_n, short, snd_pcm_mmap_readn, 0, 32767.0f) */
-/*   INPUT_FUN_NONINTERLEAVED( alsa_input_32_mmap_n, long, snd_pcm_mmap_readn, 8, 8388607.0f) */
-/*   OUTPUT_FUN_NONINTERLEAVED( alsa_output_16_rw_n, short, snd_pcm_writen, 0, 32767.0f) */
-/*   OUTPUT_FUN_NONINTERLEAVED( alsa_output_32_rw_n, long, snd_pcm_writen, 8, 8388607.0f) */
-/*   OUTPUT_FUN_NONINTERLEAVED( alsa_output_16_mmap_n, short, snd_pcm_mmap_writen, 0, 32767.0f) */
-/*   OUTPUT_FUN_NONINTERLEAVED( alsa_output_32_mmap_n, long, snd_pcm_mmap_writen, 8, 8388607.0f) */
-
-
-/* /\* to access this table: functions_table[mode][format][inout] *\/ */
-/*   static ftl_wrapper_t functions_table[4][2][2] = { */
-/*     { { alsa_input_16_mmap_n, alsa_output_16_mmap_n}, { alsa_input_32_mmap_n, alsa_output_32_mmap_n} },  */
-/*     { { alsa_input_16_mmap_i, alsa_output_16_mmap_i}, { alsa_input_32_mmap_i, alsa_output_32_mmap_i} },  */
-/*     { { alsa_input_16_rw_n, alsa_output_16_rw_n}, { alsa_input_32_rw_n, alsa_output_32_rw_n} },  */
-/*     { { alsa_input_16_rw_i, alsa_output_16_rw_i}, { alsa_input_32_rw_i, alsa_output_32_rw_i} } */
-/*   }; */
+#define INPUT_FUN_NONINTERLEAVED(FUN_NAME, SND_PCM_FUN) \
+static void FUN_NAME(fts_audioport_t* port) \
+{ \
+  alsaaudioport_t* alsa_port = (alsaaudioport_t*)port; \
+  ssize_t r; \
+  size_t count, result; \
+  int channels = fts_audioport_get_max_channels(port, FTS_AUDIO_INPUT); \
+  int ch; \
+ \
+  u_char** buffers; \
+  buffers = (u_char**)alloca(channels * sizeof(u_char*)); \
+ \
+  /* @@@@@ change this @@@@@ */     \
+  count = fts_dsp_get_tick_size(); \
+  result = 0; \
+ \
+  while (count > 0) \
+  { \
+    for (ch = 0; ch < channels; ++ch) \
+      buffers[ch] = ((u_char**)alsa_port->input_buffer)[ch] + result * alsa_port->capture.bytes_per_sample; \
+    r = SND_PCM_FUN(alsa_port->capture.handle, (void**)buffers, count); \
+    if (r == -EAGAIN || (r >= 0 && r < (ssize_t)count)) \
+      snd_pcm_wait(alsa_port->capture.handle, 1000); \
+    else if (r == -EPIPE) \
+      xrun(alsa_port, alsa_port->capture.handle); \
+    else if (r < 0) \
+      post("%s error: %d, %s\n", #SND_PCM_FUN, r, snd_strerror(r)); \
+    if (r > 0) \
+    { \
+      result += r; \
+      count -= r; \
+    } \
+  } \
+}
 
 
 #define OUTPUT_COPY_FUN_INTERLEAVED(FUN_NAME, TYPE, SHIFT, CONV) \
@@ -859,6 +832,57 @@ static void FUN_NAME(fts_audioport_t* port) \
 }
 
 
+/*
+  Conversion factors:
+  16 bits: 32767
+  24 bits: 8388607
+*/
+
+/* INPUT_FUN_INTERLEAVED( alsa_input_16_rw_i, short, snd_pcm_readi, 0, 32767.0f) */
+/*   INPUT_FUN_INTERLEAVED( alsa_input_32_rw_i, long, snd_pcm_readi, 8, 8388607.0f) */
+/*   INPUT_FUN_INTERLEAVED( alsa_input_16_mmap_i, short, snd_pcm_mmap_readi, 0, 32767.0f) */
+/*   INPUT_FUN_INTERLEAVED( alsa_input_32_mmap_i, long, snd_pcm_mmap_readi, 8, 8388607.0f) */
+/*   OUTPUT_FUN_INTERLEAVED( alsa_output_16_rw_i, short, snd_pcm_writei, 0, 32767.0f) */
+/*   OUTPUT_FUN_INTERLEAVED( alsa_output_32_rw_i, long, snd_pcm_writei, 8, 8388607.0f) */
+/*   OUTPUT_FUN_INTERLEAVED( alsa_output_16_mmap_i, short, snd_pcm_mmap_writei, 0, 32767.0f) */
+/*   OUTPUT_FUN_INTERLEAVED( alsa_output_32_mmap_i, long, snd_pcm_mmap_writei, 8, 8388607.0f) */
+/*   INPUT_FUN_NONINTERLEAVED( alsa_input_16_rw_n, short, snd_pcm_readn, 0, 32767.0f) */
+/*   INPUT_FUN_NONINTERLEAVED( alsa_input_32_rw_n, long, snd_pcm_readn, 8, 8388607.0f) */
+/*   INPUT_FUN_NONINTERLEAVED( alsa_input_16_mmap_n, short, snd_pcm_mmap_readn, 0, 32767.0f) */
+/*   INPUT_FUN_NONINTERLEAVED( alsa_input_32_mmap_n, long, snd_pcm_mmap_readn, 8, 8388607.0f) */
+/*   OUTPUT_FUN_NONINTERLEAVED( alsa_output_16_rw_n, short, snd_pcm_writen, 0, 32767.0f) */
+/*   OUTPUT_FUN_NONINTERLEAVED( alsa_output_32_rw_n, long, snd_pcm_writen, 8, 8388607.0f) */
+/*   OUTPUT_FUN_NONINTERLEAVED( alsa_output_16_mmap_n, short, snd_pcm_mmap_writen, 0, 32767.0f) */
+/*   OUTPUT_FUN_NONINTERLEAVED( alsa_output_32_mmap_n, long, snd_pcm_mmap_writen, 8, 8388607.0f) */
+
+
+/* /\* to access this table: functions_table[mode][format][inout] *\/ */
+/*   static ftl_wrapper_t functions_table[4][2][2] = { */
+/*     { { alsa_input_16_mmap_n, alsa_output_16_mmap_n}, { alsa_input_32_mmap_n, alsa_output_32_mmap_n} },  */
+/*     { { alsa_input_16_mmap_i, alsa_output_16_mmap_i}, { alsa_input_32_mmap_i, alsa_output_32_mmap_i} },  */
+/*     { { alsa_input_16_rw_n, alsa_output_16_rw_n}, { alsa_input_32_rw_n, alsa_output_32_rw_n} },  */
+/*     { { alsa_input_16_rw_i, alsa_output_16_rw_i}, { alsa_input_32_rw_i, alsa_output_32_rw_i} } */
+/*   }; */
+
+
+INPUT_COPY_FUN_INTERLEAVED( alsa_input_copy_fun_16_rw_i, short, 0, 32767.0f)
+INPUT_COPY_FUN_INTERLEAVED( alsa_input_copy_fun_32_rw_i, long, 8, 8388607.0f)
+INPUT_COPY_FUN_INTERLEAVED( alsa_input_copy_fun_16_mmap_i, short, 0, 32767.0f)
+INPUT_COPY_FUN_INTERLEAVED( alsa_input_copy_fun_32_mmap_i, long, 8, 8388607.0f)
+INPUT_COPY_FUN_NONINTERLEAVED( alsa_input_copy_fun_16_rw_n, short, 0, 32767.0f)
+INPUT_COPY_FUN_NONINTERLEAVED( alsa_input_copy_fun_32_rw_n, long, 8, 8388607.0f)
+INPUT_COPY_FUN_NONINTERLEAVED( alsa_input_copy_fun_16_mmap_n, short, 0, 32767.0f)
+INPUT_COPY_FUN_NONINTERLEAVED( alsa_input_copy_fun_32_mmap_n, long, 8, 8388607.0f)
+
+INPUT_FUN_INTERLEAVED( alsa_input_fun_16_rw_i, snd_pcm_readi)
+INPUT_FUN_INTERLEAVED( alsa_input_fun_32_rw_i, snd_pcm_readi)
+INPUT_FUN_INTERLEAVED( alsa_input_fun_16_mmap_i, snd_pcm_mmap_readi)
+INPUT_FUN_INTERLEAVED( alsa_input_fun_32_mmap_i, snd_pcm_mmap_readi)
+INPUT_FUN_NONINTERLEAVED( alsa_input_fun_16_rw_n, snd_pcm_readn)
+INPUT_FUN_NONINTERLEAVED( alsa_input_fun_32_rw_n, snd_pcm_readn)
+INPUT_FUN_NONINTERLEAVED( alsa_input_fun_16_mmap_n, snd_pcm_mmap_readn)
+INPUT_FUN_NONINTERLEAVED( alsa_input_fun_32_mmap_n, snd_pcm_mmap_readn)
+
 OUTPUT_COPY_FUN_INTERLEAVED( alsa_output_copy_fun_16_rw_i, short, 0, 32767.0f)
 OUTPUT_COPY_FUN_INTERLEAVED( alsa_output_copy_fun_32_rw_i, long, 8, 8388607.0f)
 OUTPUT_COPY_FUN_INTERLEAVED( alsa_output_copy_fun_16_mmap_i, short, 0, 32767.0f)
@@ -879,7 +903,47 @@ OUTPUT_FUN_NONINTERLEAVED( alsa_output_fun_32_mmap_n, snd_pcm_mmap_writen)
 
 
 
+/* to acess to this table: io_copy_functions_table[mode][format][inout] */
+/* static fts_audioport_copy_fun_t io_copy_functions_table */
+static fts_audioport_copy_fun_t input_copy_functions_table[4][2] = {
+  {
+    alsa_input_copy_fun_16_mmap_n,
+    alsa_input_copy_fun_32_mmap_n
+  },
+  {
+    alsa_input_copy_fun_16_mmap_i,
+    alsa_input_copy_fun_32_mmap_i
+  },
+  {
+    alsa_input_copy_fun_16_rw_n,
+    alsa_input_copy_fun_32_rw_n
+  },
+  {
+    alsa_input_copy_fun_16_rw_i,
+    alsa_input_copy_fun_32_rw_i
+  }
+};
 
+/* to access to this table: io_functions_table[mode][format][inout] */
+/* static fts_audioport_io_fun_t io_functions_table */
+static fts_audioport_io_fun_t input_functions_table[4][2] = {
+  {
+    alsa_input_fun_16_mmap_n,
+    alsa_input_fun_32_mmap_n
+  },
+  {
+    alsa_input_fun_16_mmap_i,
+    alsa_input_fun_32_mmap_i
+  },
+  {
+    alsa_input_fun_16_rw_n,
+    alsa_input_fun_32_rw_n
+  },
+  {
+    alsa_input_fun_16_rw_i,
+    alsa_input_fun_32_rw_i
+  }
+};
 
 /* to acess to this table: io_copy_functions_table[mode][format][inout] */
 /* static fts_audioport_copy_fun_t io_copy_functions_table */
@@ -965,17 +1029,16 @@ alsaaudioport_update_audioport_input_functions(alsaaudioport_t* self, alsastream
   }
   format_is_32 = (stream->format == SND_PCM_FORMAT_S32_LE);
     
-#warning (OLD API) alsaaudioport_update_audioport_input_function use fts_audioport_set_input_channels (OLD API)  
-/*     fts_audioport_set_input_channels( (fts_audioport_t *)self, stream->channels); */
-#warning (OLD API) alsaaudioport_update_audioport_input_function use fts_audioport_set_input_function (OLD API)  
-/*     fts_audioport_set_input_function( (fts_audioport_t *)self, functions_table[access_index][format_is_32][0]); */
   if (self->input_buffer)
   {
     fts_free(self->input_buffer);
   }
   self->input_buffer = alsaaudioport_allocate_buffer(stream->access, stream->channels, 
 						     fts_dsp_get_tick_size(), snd_pcm_format_physical_width(stream->format)/8);
-    
+
+  fts_audioport_set_io_fun((fts_audioport_t*)self, FTS_AUDIO_INPUT, input_functions_table[access_index][format_is_32]);
+  fts_audioport_set_copy_fun((fts_audioport_t*)self, FTS_AUDIO_INPUT, input_copy_functions_table[access_index][format_is_32]);
+
 }
 
 static void
@@ -993,7 +1056,6 @@ alsaaudioport_update_audioport_output_functions(alsaaudioport_t* self, alsastrea
   format_is_32 = (stream->format == SND_PCM_FORMAT_S32_LE);
 
 
-/*     fts_audioport_set_output_function( (fts_audioport_t *)self, functions_table[access_index][format_is_32][1]); */
   if (self->output_buffer)
   {
     fts_free(self->output_buffer);
@@ -1044,7 +1106,7 @@ alsaaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
    */
   alsaaudioport_update_audioport_input_functions(self, &self->capture);
 
-
+  fts_audioport_set_open((fts_audioport_t*)self, FTS_AUDIO_INPUT);
 }
 
 static void
