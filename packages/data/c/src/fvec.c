@@ -89,7 +89,7 @@ fvec_create_row(fmat_t *fmat)
   
   fvec->fmat = fmat;
   fts_object_refer((fts_object_t *)fmat);  
-  fvec->type = fvec_type_column;
+  fvec->type = fvec_type_row;
   
   return fvec;
 }

@@ -55,6 +55,8 @@ static fts_symbol_t sym_arg = 0;
 static fts_symbol_t sym_insert_cols = 0;
 static fts_symbol_t sym_delete_cols = 0;
 
+static fts_symbol_t sym_sr = 0;
+
 /********************************************************
  *
  *  utility functions
@@ -1012,14 +1014,37 @@ _fmat_set_n(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   fmat_t *self = (fmat_t *)o;
   int n = fts_get_number_int(at);
-    
+  
   if(n >= 0)
   {
     fmat_set_n(self, n);
-  
+    
     fts_object_changed(o);
     fts_return_object(o);
   }
+}
+
+static void
+_fmat_get_sr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  
+  fts_return_float(fts_get_sr(self));
+}
+
+static void
+_fmat_set_sr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  double sr = fts_get_number_float(at);
+  
+  if(sr < 0.001)
+    sr = 0.001;
+
+  fmat_set_sr(self, sr);
+  
+  fts_object_changed(o);
+  fts_return_object(o);
 }
 
 /* called by get element message */
@@ -2366,9 +2391,7 @@ fmat_convert_rect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       ptr[i + 1] = mag * sinf(arg); /* imaginary part */
     }
     
-    if(fmat_editor_is_open(self))
-      fmat_upload(self);
-    
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else
@@ -2484,9 +2507,7 @@ fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     else
       fmat_error_complex(right, "cmul");
     
-    if(fmat_editor_is_open(self))
-      fmat_upload(self);
-    
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else
@@ -2538,9 +2559,7 @@ fmat_cabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     
     fmat_reshape(self, m, 1);
     
-    if(fmat_editor_is_open(self))
-      fmat_upload(self);
-    
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else
@@ -2569,9 +2588,7 @@ fmat_csqrabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     
     fmat_reshape(self, m, 1);
     
-    if(fmat_editor_is_open(self))
-      fmat_upload(self);
-    
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else
@@ -2600,9 +2617,7 @@ fmat_clogabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     
     fmat_reshape(self, m, 1);
   
-    if(fmat_editor_is_open(self))
-      fmat_upload(self);
-  
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else
@@ -2695,9 +2710,7 @@ fmat_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     
     fts_rfft_inplc(fft_ptr, fft_size);
     
-    if(fmat_editor_is_open(self))
-      fmat_upload(self);
-    
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else if(n == 2)
@@ -2770,9 +2783,7 @@ fmat_rifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     
     fmat_reshape(self, fft_size, 1);
     
-    if(fmat_editor_is_open(self))
-      fmat_upload(self);
-    
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else
@@ -3649,7 +3660,9 @@ static void
 fmat_editor_callback(fts_object_t *o, void *e)
 {
   fmat_t *self = (fmat_t *)o;
-  fmat_upload(self); 
+
+  if(fmat_editor_is_open(self))
+    fmat_upload(self);
 }
 
 static void 
@@ -3712,17 +3725,17 @@ fmat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   {
     fts_spost(stream, "<fmat %d x %d>\n", m, n);
     fts_spost(stream, "{\n");
-
+    
     for(i=0; i<m; i++)
     {
       fts_spost(stream, "  ");
-
+      
       for(j=0; j<n-1; j++)
         fts_spost(stream, "%.7g ", fmat_get_element(self, i, j));
-
+      
       fts_spost(stream, "%.7g,\n", fmat_get_element(self, i, n-1));
     }
-
+    
     fts_spost(stream, "}\n");
   }
   
@@ -3761,6 +3774,10 @@ fmat_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     
     fts_dumper_message_send(dumper, mess);
   }
+
+  mess = fts_dumper_message_new(dumper, sym_sr);
+  fts_message_append_float(mess, fmat_get_sr(self));
+  fts_dumper_message_send(dumper, mess);
 }
 
 /*********************************************************
@@ -3858,7 +3875,7 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_dump_state, fmat_dump_state);
   
   fts_class_message_varargs(cl, fts_s_print, fmat_print);
-  
+
   fts_class_message_varargs(cl, fts_s_get_element, _fmat_get_element);
   fts_class_message_varargs(cl, fts_s_get, _fmat_get_element);
   fts_class_message_varargs(cl, fts_new_symbol("iget"), _fmat_get_interpolated);
@@ -3907,6 +3924,9 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_s_cols, _fmat_get_n);
   fts_class_message_number(cl, fts_s_cols, _fmat_set_n);  
 
+  fts_class_message_number(cl, sym_sr, _fmat_set_sr);
+  fts_class_message_void(cl, sym_sr, _fmat_get_sr);
+  
   fts_class_message_void(cl, fts_new_symbol("min"), fmat_get_min);
   fts_class_message_void(cl, fts_new_symbol("max"), fmat_get_max);
   fts_class_message_void(cl, fts_new_symbol("absmax"), fmat_get_absmax);
@@ -4103,7 +4123,9 @@ fmat_config(void)
 
   sym_insert_cols = fts_new_symbol("insert_cols");
   sym_delete_cols = fts_new_symbol("delete_cols");
-  
+
+  sym_sr = fts_new_symbol("sr");
+
   fmat_class = fts_class_install(fmat_symbol, fmat_instantiate);
   fmat_null = NULL;
 }
