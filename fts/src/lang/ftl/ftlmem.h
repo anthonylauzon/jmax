@@ -25,8 +25,8 @@
  */
 
 
-#ifndef _FTS_FTL_H_
-#define _FTS_FTL_H_
+#ifndef _FTS_FTLMEM_H_
+#define _FTS_FTLMEM_H_
 
 /* 
 

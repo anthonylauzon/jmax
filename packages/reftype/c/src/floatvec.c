@@ -531,11 +531,3 @@ void float_vector_config(void)
 
   fts_expression_declare_fun(float_vector_symbol, float_vector_function);
 }
-
-
-
-
-
-
-
-

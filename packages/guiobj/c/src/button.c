@@ -27,7 +27,7 @@
 
 #include "fts.h"
 
-#define DEFAULT_DURATION 125.0f
+#define DEFAULT_FLASH 125.0f
 
 static void button_tick(fts_alarm_t *alarm, void *calldata);
 
@@ -35,7 +35,7 @@ typedef struct
 {
   fts_object_t o;
   int value;
-  float duration;
+  float flash;
   int color;
   fts_alarm_t alarm;
 } button_t;
@@ -65,7 +65,7 @@ button_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   fts_alarm_init(&(this->alarm), 0, button_tick, this);
   this->value = 0;
-  this->duration = DEFAULT_DURATION;
+  this->flash = DEFAULT_FLASH;
   this->color = 1;
 }
 
@@ -94,27 +94,8 @@ button_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   fts_object_ui_property_changed(o, fts_s_value);
 
-  fts_alarm_set_delay(&this->alarm, this->duration);
+  fts_alarm_set_delay(&this->alarm, this->flash);
   fts_alarm_arm(&this->alarm);
-}
-
-static void
-button_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  button_t *this = (button_t *)o;
-  float time = fts_get_number_float(at);
-
-  if(time > 0.0f)
-    this->duration = time;
-}
-
-static void
-button_color(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  button_t *this = (button_t *)o;
-  int color = fts_get_int(at);
-
-  this->color = color;
 }
 
 /************************************************
@@ -140,10 +121,8 @@ button_tick(fts_alarm_t *alarm, void *calldata)
  */
  
 /* daemon to get the "value" property */
-
 static void
-button_get_value(fts_daemon_action_t action, fts_object_t *obj,
-		 fts_symbol_t property, fts_atom_t *value)
+button_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   button_t *this = (button_t *)obj;
 
@@ -152,8 +131,7 @@ button_get_value(fts_daemon_action_t action, fts_object_t *obj,
 
 
 static void
-button_put_value(fts_daemon_action_t action, fts_object_t *obj,
-		 fts_symbol_t property, fts_atom_t *value)
+button_put_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   button_t *this = (button_t *)obj;
 
@@ -162,15 +140,13 @@ button_put_value(fts_daemon_action_t action, fts_object_t *obj,
   this->value = this->color;
   fts_object_ui_property_changed(obj, fts_s_value);
 
-  fts_alarm_set_delay(&(this->alarm), this->duration);
+  fts_alarm_set_delay(&(this->alarm), this->flash);
   fts_alarm_arm(&(this->alarm));
 }
 
 /* Daemon for the color  propriety */
-
 static void
-button_get_color(fts_daemon_action_t action, fts_object_t *obj,
-		 fts_symbol_t property, fts_atom_t *value)
+button_get_color(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   button_t *this = (button_t *)obj;
 
@@ -179,12 +155,29 @@ button_get_color(fts_daemon_action_t action, fts_object_t *obj,
 
 
 static void
-button_put_color(fts_daemon_action_t action, fts_object_t *obj,
-		 fts_symbol_t property, fts_atom_t *value)
+button_put_color(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   button_t *this = (button_t *)obj;
 
   this->color = fts_get_int(value);
+}
+
+/* Daemon for the flash duration propriety */
+static void
+button_get_flash(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  button_t *this = (button_t *)obj;
+
+  fts_set_int(value, this->flash);
+}
+
+
+static void
+button_put_flash(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  button_t *this = (button_t *)obj;
+
+  this->flash = fts_get_int(value);
 }
 
 static void button_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -234,21 +227,17 @@ button_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* user methods */
   fts_method_define_varargs(cl, 0, fts_s_anything, button_bang);
 
-  t[0] = fts_t_number;
-  fts_method_define(cl, 0, fts_new_symbol("duration"), button_duration, 1, t);
-
-  t[0] = fts_t_int;
-  fts_method_define(cl, 0, fts_new_symbol("color"), button_color, 1, t);
-
   /* value daemons */
-
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, button_get_value);
   fts_class_add_daemon(cl, obj_property_put, fts_s_value, button_put_value);
 
   /* color daemons  */
-
   fts_class_add_daemon(cl, obj_property_get, fts_s_color, button_get_color);
   fts_class_add_daemon(cl, obj_property_put, fts_s_color, button_put_color);
+
+  /* flash duration daemons  */
+  fts_class_add_daemon(cl, obj_property_get, fts_s_flash, button_get_flash);
+  fts_class_add_daemon(cl, obj_property_put, fts_s_flash, button_put_flash);
 
   t[0] = fts_t_int;
   fts_outlet_type_define(cl, 0, fts_s_bang, 1, t);

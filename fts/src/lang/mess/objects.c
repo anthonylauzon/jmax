@@ -78,7 +78,7 @@ fts_object_new(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_
       /* Patcher behave diffreentrly w.r.t. than other objects;
 	 the metaclass do not depend on the arguments, but on the inlets/outlets.
 	 New patchers are created with zero in zero outs, and changed later 
-	 */
+      */
       fts_atom_t a[3];
 
       fts_set_symbol(&a[0], fts_s_patcher);
@@ -409,7 +409,7 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
      the object description, variables and properties;
      We check if the argv exists already; a doctor may have
      changed the object definition, for persistent fixes !!
-     */
+  */
   if ((fts_object_is_patcher(obj) && (! fts_patcher_is_standard((fts_patcher_t *)obj))) || (! obj->argv))
     fts_object_set_description(obj, aoc, aot);
 
@@ -423,7 +423,7 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
      If it is not an error, and not a template, assign the local variables/properties.
      Note that in case of the template, this operation has been done during the load vm code
      execution; little weird, but needed to avoid object recomputing during loading.
-     */
+  */
   if (e && (! fts_object_is_error(obj)) && (! fts_object_is_template(obj)))
     {
       if (fts_object_is_patcher(obj))
@@ -446,7 +446,7 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
   /* Finally, assign the error property;
      Always present, and always explicit for the moment,
      until we don't have global daemons again.
-   */
+  */
   {
     fts_atom_t a;
 
@@ -484,7 +484,7 @@ fts_object_t *fts_object_recompute(fts_object_t *old)
   /* If the object being redefined is a standard patcher,
      redefine it using a patcher function, otherwise with 
      the object function.
-     */
+  */
   if (fts_object_is_standard_patcher(old))
     obj = (fts_object_t *) fts_patcher_redefine((fts_patcher_t *) old, old->argc, old->argv);
   else
@@ -500,7 +500,7 @@ fts_object_t *fts_object_recompute(fts_object_t *old)
 	 of an hack beacause we need a explit "zero"  error
 	 property on a non error redefined object; actually
 	 the error property daemon should be a global daemon !
-	 */
+      */
       if (obj->head.id != FTS_NO_ID)
 	fts_object_send_kernel_properties(obj);
     }
@@ -530,7 +530,7 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
      do not define  the same variable, delete the variable;
      if the new object define the same variable,  just suspend it,
      but unregister the old object as definition
-     */
+  */
   if (old->varname && (old->varname == var))
     fts_variable_suspend(old->patcher, old->varname);
 
@@ -567,7 +567,7 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
   fts_vm_substitute_object(old, new);
 
   /* If new is an error object, assure that there are enough inlets
-   and outlets for the connections */
+     and outlets for the connections */
   if (fts_object_is_error(new))
     {
       fts_error_object_fit_inlet(new, old->head.cl->ninlets - 1);
@@ -581,11 +581,11 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
   fts_object_move_properties(old, new);
 
   /* If the object define the release method, we tell the new object
-    about the old one, so that for example persistent data can be
-    moved from one object to the other; we do it by sending a
-    fts_s_redefining message on the system inlet to the new object, as
-    the old one as first argument; errors are of course ignored, so
-    the method is not mandatory */
+     about the old one, so that for example persistent data can be
+     moved from one object to the other; we do it by sending a
+     fts_s_redefining message on the system inlet to the new object, as
+     the old one as first argument; errors are of course ignored, so
+     the method is not mandatory */
   if (do_redefining)
     {
       fts_atom_t a;
@@ -930,6 +930,7 @@ fts_object_send_properties(fts_object_t *obj)
       fts_object_property_changed(obj, fts_s_comment);
       fts_object_property_changed(obj, fts_s_layer);
       fts_object_property_changed(obj, fts_s_color);
+      fts_object_property_changed(obj, fts_s_flash);
 
       /* Ask the object to send to the client object specific properties */
       fts_send_message(obj, fts_SystemInlet, fts_s_send_properties, 0, 0);

@@ -874,7 +874,10 @@ fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
 
   fts_bmax_code_new_property(f, obj, fts_s_comment);
   fts_bmax_code_new_property(f, obj, fts_s_layer);
+  
+  /* button properties */
   fts_bmax_code_new_property(f, obj, fts_s_color);
+  fts_bmax_code_new_property(f, obj, fts_s_flash);
 
   if (fts_object_is_patcher(obj))
     {
@@ -959,6 +962,7 @@ fts_bmax_code_new_top_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
   fts_bmax_code_new_property(f, obj, fts_s_comment);
   fts_bmax_code_new_property(f, obj, fts_s_layer);
   fts_bmax_code_new_property(f, obj, fts_s_color);
+  fts_bmax_code_new_property(f, obj, fts_s_flash);
 
   /* pop the argument */
 
