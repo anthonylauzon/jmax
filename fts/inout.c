@@ -68,7 +68,6 @@ void fts_channel_send(fts_channel_t *channel, int outlet, fts_symbol_t selector,
 
 void fts_channel_find_friends(fts_channel_t *channel, int ac, const fts_atom_t *at)
 {
-  /*fts_objectset_t *set = (fts_objectset_t *)fts_get_data(at);*/
   fts_objectset_t *set = (fts_objectset_t *)fts_get_object(at);
   fts_objectlist_cell_t *p;
   fts_atom_t a[1];
@@ -77,9 +76,7 @@ void fts_channel_find_friends(fts_channel_t *channel, int ac, const fts_atom_t *
     {
       if ( fts_object_get_patcher( fts_objectlist_get_object(p)) != 0)
 	{
-	  /*fts_objectset_add( set, fts_objectlist_get_object(p));*/
-	  fts_set_object(&a[0], fts_objectlist_get_object(p));
-	  fts_send_message((fts_object_t *)set, fts_SystemInlet, sym_objectset_add, 1, a);
+	  fts_objectset_add( set, fts_objectlist_get_object(p));
 	}
     }
 
@@ -87,9 +84,7 @@ void fts_channel_find_friends(fts_channel_t *channel, int ac, const fts_atom_t *
     {
       if ( fts_object_get_patcher( fts_objectlist_get_object(p)) != 0)
 	{
-	  /*fts_objectset_add( set, fts_objectlist_get_object(p));*/
-	  fts_set_object(&a[0], fts_objectlist_get_object(p));
-	  fts_send_message((fts_object_t *)set, fts_SystemInlet, sym_objectset_add, 1, a);
+	  fts_objectset_add( set, fts_objectlist_get_object(p));
 	}
     }
 }

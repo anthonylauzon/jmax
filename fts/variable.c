@@ -237,9 +237,7 @@ static void fts_binding_add_users_to_set(fts_binding_t *var, fts_objectset_t *se
 
   for (u = var->users; u; u = u->next)
     {
-      /*fts_objectset_add(set, u->obj);*/
-      fts_set_object(&a[0], u->obj);
-      fts_send_message((fts_object_t *)set, fts_SystemInlet, sym_objectset_add, 1, a);
+      fts_objectset_add(set, u->obj);
     }
 }
 
@@ -338,9 +336,7 @@ static void fts_binding_add_definitions_to_set(fts_binding_t *var, fts_objectset
 
   for (u = var->definitions; u; u = u->next)
     {
-      /*fts_objectset_add(set, u->obj);*/
-      fts_set_object(&a[0], u->obj);
-      fts_send_message((fts_object_t *)set, fts_SystemInlet, sym_objectset_add, 1, a);
+      fts_objectset_add(set, u->obj);
     }
 }
 

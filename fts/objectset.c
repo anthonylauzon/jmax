@@ -31,22 +31,26 @@ fts_symbol_t objectset_symbol = 0;
  *
  */
 
-void fts_objectset_init( fts_objectset_t *set)
+fts_objectset_t* 
+fts_objectset_create()
 {
-  fts_hashtable_init( &set->hashtable, FTS_HASHTABLE_PTR, FTS_HASHTABLE_SMALL);
+  return (fts_objectset_t *) fts_object_create(fts_class_get_by_name(objectset_symbol), 0, 0);
 }
 
-void fts_objectset_destroy( fts_objectset_t *set)
+void 
+fts_objectset_destroy( fts_objectset_t *set)
 {
-  fts_hashtable_destroy( &set->hashtable);
+  fts_object_destroy( (fts_object_*) set);
 }
 
-void fts_objectset_clear( fts_objectset_t *set)
+void 
+fts_objectset_clear( fts_objectset_t *set)
 {
   fts_hashtable_clear( &set->hashtable);
 }
 
-void fts_objectset_add( fts_objectset_t *set, fts_object_t *object)
+void 
+fts_objectset_add( fts_objectset_t *set, fts_object_t *object)
 {
   fts_atom_t k, v;
   int exits_already;
@@ -66,7 +70,8 @@ void fts_objectset_add( fts_objectset_t *set, fts_object_t *object)
   }
 }
 
-void fts_objectset_remove( fts_objectset_t *set, fts_object_t *object)
+void 
+fts_objectset_remove( fts_objectset_t *set, fts_object_t *object)
 {
   fts_atom_t k;
 
@@ -74,7 +79,8 @@ void fts_objectset_remove( fts_objectset_t *set, fts_object_t *object)
   fts_hashtable_remove( &set->hashtable, &k);
 }
 
-void fts_objectset_get_objects( const fts_objectset_t *set, fts_iterator_t *i)
+void 
+fts_objectset_get_objects( const fts_objectset_t *set, fts_iterator_t *i)
 {
   fts_hashtable_get_keys( &set->hashtable, i);
 }
@@ -90,14 +96,14 @@ static void
 fts_objectset_method_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_objectset_t *this = (fts_objectset_t *)o;
-  fts_objectset_init( &this->hashtable, FTS_HASHTABLE_PTR, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init( &this->hashtable, FTS_HASHTABLE_PTR, FTS_HASHTABLE_SMALL);
 }
 
 static void 
 fts_objectset_method_destroy(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_objectset_t *this = (fts_objectset_t *)o;
-  fts_objectset_destroy( this);
+  fts_hashtable_destroy( &this->hashtable);
 }
 
 static fts_status_t

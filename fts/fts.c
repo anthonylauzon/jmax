@@ -193,7 +193,7 @@ extern void fts_kernel_ftl_init( void);
 extern void fts_kernel_hashtable_init( void);
 extern void fts_kernel_inout_init(void);
 extern void fts_kernel_midi_init( void);
-extern void fts_kernel_objectset_init( void);/*???????????????????????*/
+extern void fts_kernel_objectset_init( void);
 extern void fts_kernel_objtable_init( void);
 extern void fts_kernel_objtable_init( void);
 extern void fts_kernel_oldclient_init( void);
@@ -224,7 +224,7 @@ void fts_init( int argc, char **argv)
   fts_kernel_atom_init();
   fts_kernel_objtable_init();
   fts_kernel_class_init();
-  fts_kernel_objectset_init();/*????????*/
+  fts_kernel_objectset_init();
   fts_kernel_doctor_init();
   fts_kernel_connection_init();
   fts_kernel_property_init();

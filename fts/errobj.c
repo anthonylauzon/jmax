@@ -112,22 +112,15 @@ void fts_do_recompute_errors(void)
 
   if (need_recompute_errors)
     {
-      /* Find all the errors */
-      /*fts_objectset_init( &errors);*/
-      errors = (fts_objectset_t *)fts_object_create(fts_class_get_by_name(objectset_symbol), 0, 0);
-      
+      errors = fts_objectset_create();
       root = (fts_object_t *) fts_get_root_patcher();
-
-      /*fts_set_data(&a[0], (fts_data_t *)&errors);*/
-      fts_set_object(&a[0], (fts_object_t *)&errors);
+      fts_set_object(&a[0], (fts_object_t *) errors);
       
+      /* Find all the errors */
       fts_send_message(root, fts_SystemInlet, fts_s_find_errors, 1, a);
   
       /* Recompute them all */
-
-      /*fts_objectset_get_objects( &errors, &iterator );*/
-      fts_set_data(&a[0], (fts_data_t *)&iterator);
-      fts_send_message((fts_object_t *)errors, fts_SystemInlet, sym_objectset_get_objects, 1, a);
+      fts_objectset_get_objects( errors, &iterator );
 
       while (fts_iterator_has_more( &iterator))
 	{
@@ -140,8 +133,7 @@ void fts_do_recompute_errors(void)
 	  fts_object_recompute(object);
 	}
 
-      /*fts_objectset_destroy( &errors);*/
-      fts_send_message((fts_object_t *)errors, fts_SystemInlet, fts_s_delete, 0, 0);
+      fts_objectset_destroy( errors);
     }
 }
 

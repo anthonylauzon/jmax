@@ -56,13 +56,22 @@ typedef struct _fts_object_set_t {
 
 
 /**
- * Initializes an objectset
+ * Creates a new objectset
  *
- * @fn fts_objectset_init( fts_objectset_t *set)
+ * @fn fts_objectset_t *fts_objectset_init( void)
+ * @returns the new objectset
+ * @ingroup objectset
+ */
+FTS_API fts_objectset_t *fts_objectset_init( void);
+
+/**
+ * Frees all the ressources of the objectset
+ *
+ * @fn void fts_objectset_destroy( fts_objectset_t *set)
  * @param set the objectset
  * @ingroup objectset
  */
-FTS_API void fts_objectset_init( fts_objectset_t *set);
+FTS_API void fts_objectset_destroy( fts_objectset_t *set);
 
 /**
  * Clears objectset's content
@@ -72,15 +81,6 @@ FTS_API void fts_objectset_init( fts_objectset_t *set);
  * @ingroup objectset
  */
 FTS_API void fts_objectset_clear( fts_objectset_t *set);
-
-/**
- * Deinitializes an objectset
- *
- * @fn void fts_objectset_destroy( fts_objectset_t *set)
- * @param set the objectset
- * @ingroup objectset
- */
-FTS_API void fts_objectset_destroy( fts_objectset_t *set);
 
 /**
  * Add an object to the objectset.<BR>
@@ -116,10 +116,5 @@ FTS_API void fts_objectset_remove( fts_objectset_t *set, fts_object_t *object);
  * @ingroup objectset
  */
 FTS_API void fts_objectset_get_objects( const fts_objectset_t *set, fts_iterator_t *i);
-
-/**
- * The global objectset symbol 
- */
-FTS_API fts_symbol_t objectset_symbol;
 
 #endif

@@ -84,7 +84,6 @@ extern "C" {
 #include <fts/hashtable.h>
 #include <fts/list.h>
 #include <fts/objectlist.h>
-  /*#include <fts/objectset.h>*/
 
 #include <fts/connection.h>
 #include <fts/property.h>
@@ -92,7 +91,7 @@ extern "C" {
 #include <fts/class.h>
 #include <fts/variable.h>
 #include <fts/object.h>
-#include <fts/objectset.h>/*???????????????*/
+#include <fts/objectset.h>
 #include <fts/patcher.h>
 #include <fts/message.h>
 #include <fts/doctor.h>

@@ -43,16 +43,15 @@ void fts_fpe_add_object( fts_object_t *object)
 {
   if (fpe_objects)
     {
-      fts_atom_t a[1];
-      fts_set_object(&a[0], object);
-      fts_send_message((fts_object_t *)fpe_objects, fts_SystemInlet, sym_objectset_add, 1, a);
+      fts_objectset_add( fpe_objects, object);
     }
 }
 
 void fts_fpe_empty_collection(void)
 {
-  if (fpe_objects)
-    fts_send_message((fts_object_t *)fpe_objects, fts_SystemInlet, sym_objectset_clear, 0, 0);
+  if (fpe_objects) {
+    fts_objectset_clear( fpe_objects);
+  }
 }
 
 void fts_fpe_start_collect(fts_objectset_t *set)
