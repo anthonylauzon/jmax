@@ -222,6 +222,9 @@ public class MaxApplication extends Object
     Fts.setUserName((String) jmaxProperties.get("jmaxUserName"));
     Fts.setUserPassword((String) jmaxProperties.get("jmaxUserPassword"));
 
+    Boolean noRealTime = new Boolean( (String)jmaxProperties.get( "jmaxNoRealTime"));
+    Fts.setNoRealTime( noRealTime.booleanValue());
+
     itsHookTable = new MaxWhenHookTable(); 
 
     ircam.jmax.utils.Platform.setValues();
@@ -244,6 +247,9 @@ public class MaxApplication extends Object
     ircam.jmax.editors.console.ConsoleModule.initModule();
     ircam.jmax.editors.ermes.ErmesModule.initModule();
     ircam.jmax.editors.control.ControlModule.initModule();
+
+    // Before booting the server, check if it is asked to run in real-time mode,
+    // and if yes, inform the application layer
     
     try
       {
