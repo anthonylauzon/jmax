@@ -148,10 +148,10 @@ public class ControlPanel extends JPanel
     dspLabel.setAlignmentY(Component.CENTER_ALIGNMENT);    
     add(dspLabel);
 
-    dspOnButton = new JToggleButton(Icons.get( "_dsp_off_"));
+    dspOnButton = new JToggleButton(SystemIcons.get( "_dsp_off_"));
     dspOnButton.setDoubleBuffered( false);
     dspOnButton.setMargin( new Insets(0,0,0,0));
-    dspOnButton.setSelectedIcon( Icons.get( "_dsp_on_"));
+    dspOnButton.setSelectedIcon( SystemIcons.get( "_dsp_on_"));
     dspOnButton.setPreferredSize(new Dimension(25, 25));   
     dspOnButton.setFocusPainted( false);  
     dspOnButton.setAlignmentY(Component.CENTER_ALIGNMENT);    

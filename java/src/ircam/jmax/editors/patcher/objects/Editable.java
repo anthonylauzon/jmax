@@ -54,6 +54,7 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     super( theSketchPad, theFtsObject);
 
     computeRenderer();
+
     if ((renderer instanceof TextRenderer) && (getWidth() == -1))
       {
 	renderer.update();
@@ -84,12 +85,12 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     Renderer r;
     // Change the renderer if needed
 
-    Icon icon = Icons.get(ftsObject.getClassName());
-
-    if (icon != null)
+    /*Icon icon = Icons.get(ftsObject.getClassName());
+      
+      if (icon != null)
       renderer = new IconRenderer(this, icon);
-    else if (! (renderer instanceof TextRenderer))
-      renderer = new TextRenderer(this);
+      else if (! (renderer instanceof TextRenderer))*/
+    renderer = new TextRenderer(this);
   }
 
   public void redefine( String text) 
@@ -161,7 +162,6 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   public void fitToText()
   {
     renderer.update();
-    
     int w = ((TextRenderer)renderer).getTextWidth() + getTextWidthOffset() + 2;
 
     if(w < getMinimumWidth())
@@ -173,7 +173,7 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
       super.setHeight(((TextRenderer)renderer).getRHeight() + getTextHeightOffset());
     else
       super.setHeight(((TextRenderer)renderer).getTextHeight() + getTextHeightOffset());
-    
+
     redraw();
   }
 

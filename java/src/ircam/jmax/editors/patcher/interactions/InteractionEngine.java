@@ -212,7 +212,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
 	ret |= Squeack.SHIFT;
 
     //jdk bug fix: in macosx platform isMiddleMouseButton() function return true with
-    //both CTRL and ALT keys pressed.
+    //both CTRL and ALT keys pressed. 
     if(SwingUtilities.isMiddleMouseButton(e)&&!e.isControlDown())
 	ret |= Squeack.MIDDLE_BUTTON;
 
@@ -523,11 +523,18 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     // sketch.stopTextEditing();
   }
 
-  public void keyTyped(KeyEvent e)
-  {
-  }
+  public void keyTyped(KeyEvent e){}
   public void keyPressed(KeyEvent e)
   {
+
+      System.err.println("left "+KeyEvent.VK_LEFT);
+      System.err.println("right "+KeyEvent.VK_RIGHT);
+      System.err.println("up "+KeyEvent.VK_UP);
+
+      System.err.println("key char "+e.getKeyChar());
+      System.err.println("key code "+e.getKeyCode());
+      System.err.println("control "+e.isControlDown());
+
   }
   public void keyReleased(KeyEvent e)
   {

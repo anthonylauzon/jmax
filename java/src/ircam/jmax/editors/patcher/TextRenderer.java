@@ -118,7 +118,7 @@ public class TextRenderer implements ObjectRenderer
     int ww;
     int w = 0;
     int lines = area.getLineCount();
-    
+
     if(lines==0)
       w = owner.getWidth() - owner.getTextWidthOffset();
     else 

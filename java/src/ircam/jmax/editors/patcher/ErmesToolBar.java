@@ -75,10 +75,10 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener, Compone
     bGroup = new ButtonGroup();
     bGroup.add( noneButton);
 
-    lockEditButton = new JToggleButton( Icons.get( "_lock_mode_"));
+    lockEditButton = new JToggleButton( SystemIcons.get( "_lock_mode_"));
     lockEditButton.setDoubleBuffered( false);
     lockEditButton.setMargin( new Insets(0,0,0,0));
-    lockEditButton.setSelectedIcon( Icons.get( "_edit_mode_"));
+    lockEditButton.setSelectedIcon( SystemIcons.get( "_edit_mode_"));
     lockEditButton.setFocusPainted( false);
     lockEditButton.addItemListener( new ItemListener() {
       public void itemStateChanged(ItemEvent e)
@@ -99,7 +99,7 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener, Compone
     widgets.setLayout( new BoxLayout( widgets, BoxLayout.X_AXIS));
     
     //to save button
-    toSaveButton = new JButton(Icons.get( "_to_save_"));
+    toSaveButton = new JButton(SystemIcons.get( "_to_save_"));
     toSaveButton.setDoubleBuffered( false);
     toSaveButton.setMargin( new Insets(0,0,0,0));
     toSaveButton.addActionListener( new ActionListener() {
@@ -118,7 +118,7 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener, Compone
     if ((sketch.itsPatcher.getParent() != null) &&
 	(!sketch.isARootPatcher()))
       {
-	upButton = new JButton(Icons.get( "_up_"));
+	upButton = new JButton(SystemIcons.get( "_up_"));
 	upButton.setDoubleBuffered( false);
 	upButton.setMargin( new Insets(0,0,0,0));
 	upButton.setToolTipText("show parent patcher");
@@ -198,7 +198,7 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener, Compone
 
   private void addButton( String descr, String iconName, String cursorName, String message)
   {
-    JToggleButton button = new ErmesToolButton(this, descr, Icons.get(iconName), cursorName, message);
+    JToggleButton button = new ErmesToolButton(this, descr, SystemIcons.get(iconName), cursorName, message);
     toolBar.add( button);
     if(!AddPopUp.initDone)
       AddPopUp.addAbbreviation(iconName, descr, message, true);
@@ -218,7 +218,10 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener, Compone
       }
       if(path != null) path = path+File.separator+"images"+File.separator;
 
-      ImageIcon icon = new ImageIcon(path+className+".gif");
+      if(SystemIcons.get(className) == null)
+	  SystemIcons.loadIcon(className, path+className+".gif");
+
+      ImageIcon icon = SystemIcons.get(className);
       JToggleButton button = new ErmesToolButton(this, className, icon, path+className+"_cursor.gif",
 						   "Adding New "+className+" Object");
       toolBar.add( button);

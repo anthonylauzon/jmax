@@ -60,6 +60,7 @@ public class TclMaxPackage
     /* Declare Icon */
 
     interp.createCommand("declareIcon", new MaxDeclareIconCmd());
+    interp.createCommand("declareSystemIcon", new MaxDeclareSystemIconCmd());
     
     /* hooks */
 

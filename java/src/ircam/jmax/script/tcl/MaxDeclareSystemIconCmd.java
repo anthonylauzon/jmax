@@ -19,40 +19,34 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 // Based on Max/ISPW by Miller Puckette.
-//
+// 
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.toolkit;
+package ircam.jmax.script.tcl;
 
+import tcl.lang.*;
+
+import java.lang.*;
 import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
 import java.util.*;
-import javax.swing.*;
 
-import ircam.jmax.*;
+import ircam.jmax.toolkit.*;
 
-/** Cache/data base for the Icons; now handle the path */
+/**
+ * The icon loader command.
+ */
 
-public class Icons
+class MaxDeclareSystemIconCmd implements Command
 {
-  private static Hashtable table = new Hashtable();
-
-  public static ImageIcon get(String iconName)
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    return (ImageIcon)table.get( iconName);
-  }
-
-  public static void loadIcon(String iconName, String fileName)
-  {
-    table.put(iconName, new ImageIcon(fileName));
+    if (argv.length == 3)
+      {
+	SystemIcons.loadIcon(argv[1].toString(), argv[2].toString());
+      }
+    else
+      throw new TclNumArgsException(interp, 1, argv, "declareSystemIcon");
   }
 }
-
-
-
-
-
-
 

@@ -35,7 +35,7 @@ import ircam.jmax.*;
 
 /** Cache/data base for the Icons; now handle the path */
 
-public class Icons
+public class SystemIcons
 {
   private static Hashtable table = new Hashtable();
 

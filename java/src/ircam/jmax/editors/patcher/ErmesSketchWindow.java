@@ -70,7 +70,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     return getLocation();
   }
   public Rectangle getViewRectangle(){
-      JViewport port = itsScrollerView.getViewport();
+    JViewport port = itsScrollerView.getViewport();
     return port.getViewRect();
   }
 
@@ -95,15 +95,15 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     return (! gotMessage);
   }
   
-    public static void touch(Fts fts)
-    {	
-      MaxDocument doc = Mda.getDocumentTypeByName( "patcher").newDocument(fts);
-      FtsPatcherData data = (FtsPatcherData)(doc).getRootData();
-      ErmesSketchWindow win = new ErmesSketchWindow(data);
-      MaxWindowManager.getWindowManager().removeWindow(win);
-      win.itsSketchPad.Close(false);
-      win.dispose();
-    }
+  public static void touch(Fts fts)
+  {	
+    MaxDocument doc = Mda.getDocumentTypeByName("patcher").newDocument(fts);
+    FtsPatcherData data = (FtsPatcherData)(doc).getRootData();
+    ErmesSketchWindow win = new ErmesSketchWindow(data);
+    MaxWindowManager.getWindowManager().removeWindow(win);
+    win.itsSketchPad.Close(false);
+    win.dispose();
+  }
 
   // -----------------------------------------------
 
@@ -196,10 +196,6 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     // Build the text menu
     itsTextMenu = new TextMenu(itsSketchPad);
     mb.add( itsTextMenu);
-
-    // Build the script menu
-    //itsScriptMenu = new ScriptMenu();
-    //mb.add( itsScriptMenu);
 
     // New Window Manager based Menu
     itsWindowsMenu = new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this); 
@@ -337,7 +333,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   // Component Listener Interface
   public void componentResized( ComponentEvent e) 
   {
-    itsSketchPad.resizeToWindow(getSize().width - horizontalOffset(), getSize().height - verticalOffset());
+      itsSketchPad.resizeToWindow(getSize().width - horizontalOffset(), getSize().height - verticalOffset());
   }
 
   public void componentMoved( ComponentEvent e) 
