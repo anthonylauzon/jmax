@@ -173,9 +173,9 @@ delwrite_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(delwrite_t), 1, 1, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, delwrite_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, delwrite_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, delwrite_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, delwrite_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, delwrite_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, delwrite_put);
 
   fts_method_define_varargs(cl, 0, fts_s_clear, delwrite_clear);
   fts_method_define_varargs(cl, 0, fts_new_symbol("realloc"), delwrite_realloc);
@@ -186,7 +186,7 @@ delwrite_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   dsp_symbol = fts_new_symbol("delwrite");
   fts_dsp_declare_function(dsp_symbol, ftl_delwrite);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

@@ -137,7 +137,7 @@ makenote_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(makenote_t), 3, 2, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, makenote_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, makenote_init);
 
   fts_method_define_varargs(cl, 0, fts_s_clear, makenote_clear);
   fts_method_define_varargs(cl, 0, fts_s_stop, makenote_stop);
@@ -156,7 +156,7 @@ makenote_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
   fts_outlet_type_define_varargs(cl, 1,	fts_s_int);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 

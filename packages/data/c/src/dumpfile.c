@@ -168,7 +168,7 @@ dumpfile_dump_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 	  fts_object_t *object = fts_get_object(at);
 	  fts_class_t *class = fts_object_get_class(object);
 	  fts_symbol_t class_name = fts_class_get_name(class);
-	  fts_method_t meth_dump = fts_class_get_method(class, fts_SystemInlet, fts_s_dump);
+	  fts_method_t meth_dump = fts_class_get_method(class, fts_system_inlet, fts_s_dump);
 
 	  if(meth_dump)
 	    {
@@ -183,7 +183,7 @@ dumpfile_dump_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 
 	      /* set dumpfile as dumper */
 	      fts_set_object(&a, (fts_object_t *)o);
-	      meth_dump(object, fts_SystemInlet, fts_s_dump, 1, &a);
+	      meth_dump(object, fts_system_inlet, fts_s_dump, 1, &a);
 	      
 	      /* write final semicolon */
 	      fts_set_symbol(&a, fts_s_semi);
@@ -224,7 +224,7 @@ dumpfile_restore_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	    }
 
 	  /* clear object */
-	  fts_send_message(object, fts_SystemInlet, fts_s_clear, 0, 0);
+	  fts_send_message(object, fts_system_inlet, fts_s_clear, 0, 0);
 	  
 	  /* reset message */
 	  fts_message_set(mess, 0, 0, 0);
@@ -254,7 +254,7 @@ dumpfile_restore_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 			  mess_ac = fts_message_get_ac(mess);
 			  mess_at = fts_message_get_at(mess);
 			  
-			  fts_send_message(object, fts_SystemInlet, fts_message_get_selector(mess), mess_ac, mess_at);
+			  fts_send_message(object, fts_system_inlet, fts_message_get_selector(mess), mess_ac, mess_at);
 			  
 			  /* reset message */
 			  fts_message_set(mess, 0, 0, 0);
@@ -294,7 +294,7 @@ dumpfile_restore_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	      mess_ac = fts_message_get_ac(mess);
 	      mess_at = fts_message_get_at(mess);
 	      
-	      fts_send_message(object, fts_SystemInlet, fts_message_get_selector(mess), mess_ac, mess_at);
+	      fts_send_message(object, fts_system_inlet, fts_message_get_selector(mess), mess_ac, mess_at);
 	    }
 
 	  /* read next class name */
@@ -342,8 +342,8 @@ dumpfile_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(dumpfile_t), 1, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, dumpfile_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, dumpfile_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, dumpfile_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, dumpfile_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_open, dumpfile_open);
   fts_method_define_varargs(cl, 0, fts_s_close, dumpfile_close);
@@ -351,7 +351,7 @@ dumpfile_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_dump, dumpfile_dump_object); 
   fts_method_define_varargs(cl, 0, fts_new_symbol("restore"), dumpfile_restore_object);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

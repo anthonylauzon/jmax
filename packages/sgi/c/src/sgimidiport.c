@@ -372,14 +372,14 @@ sgimidiport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_midiport_class_init(cl);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sgimidiport_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sgimidiport_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, sgimidiport_dispatch);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sgimidiport_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sgimidiport_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_sched_ready, sgimidiport_dispatch);
 
   /* define variable */
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, sgimidiport_get_state);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

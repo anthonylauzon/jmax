@@ -272,9 +272,9 @@ sigcoef_bpass2_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(sigcoef_bpass2_t), 3, 6, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigcoef_bpass2_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigcoef_bpass2_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigcoef_bpass2_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sigcoef_bpass2_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sigcoef_bpass2_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, sigcoef_bpass2_put);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, sigcoef_bpass2_bang);
   fts_method_define_varargs(cl, 0, fts_s_float, sigcoef_bpass2_float);
@@ -290,7 +290,7 @@ sigcoef_bpass2_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_dsp_declare_inlet(cl, 0);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

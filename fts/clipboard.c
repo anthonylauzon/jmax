@@ -115,13 +115,13 @@ clipboard_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(fts_clipboard_t), 0, 0, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init,  clipboard_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete,  clipboard_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init,  clipboard_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete,  clipboard_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_paste,  clipboard_paste_in);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_copy,   clipboard_copy_selection);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_paste,  clipboard_paste_in);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_copy,   clipboard_copy_selection);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 

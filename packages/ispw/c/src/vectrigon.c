@@ -241,14 +241,14 @@ vectrigon_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_
 {
   fts_class_init(cl, sizeof(vectrigon_t), 1, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, vectrigon_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, vectrigon_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, put_method);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, vectrigon_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, vectrigon_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, put_method);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t

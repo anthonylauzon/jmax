@@ -1178,7 +1178,7 @@ explode_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 
   explode_set_editor_open(this);
   fts_client_send_message(o, fts_s_openEditor, 0, 0);
-  fts_send_message( o, fts_SystemInlet, fts_s_upload, 0, 0);
+  fts_send_message( o, fts_system_inlet, fts_s_upload, 0, 0);
 }
 
 static void
@@ -1392,17 +1392,17 @@ explode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(explode_t), 5, 5, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, explode_init_mth);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, explode_delete_mth);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, explode_init_mth);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, explode_delete_mth);
   
-  /*fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, explode_upload);*/
+  /*fts_method_define_varargs(cl, fts_system_inlet, fts_s_upload, explode_upload);*/
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_restore, explode_record_mth); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_stop, explode_stop_mth);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_restore, explode_record_mth); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_stop, explode_stop_mth);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append, explode_append_event);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, explode_dump);
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_save_dotpat, explode_save_dotpat); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_append, explode_append_event);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, explode_dump);
+  fts_method_define_varargs( cl, fts_system_inlet, fts_s_save_dotpat, explode_save_dotpat); 
 
   fts_method_define_varargs(cl, 0, fts_s_int, explode_number_mth);
   fts_method_define_varargs(cl, 0, fts_s_float, explode_number_mth);
@@ -1438,14 +1438,14 @@ explode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_new_symbol("params"), explode_params_mth);
 
   /* graphical editor */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, explode_open_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_destroyEditor, explode_destroy_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_closeEditor, explode_close_editor);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_openEditor, explode_open_editor);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_destroyEditor, explode_destroy_editor);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_closeEditor, explode_close_editor);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_add_event, explode_add);
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_remove_event, explode_remove);
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_change_event, explode_change);
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_change_time, explode_change_time);
+  fts_method_define_varargs(cl, fts_system_inlet, sym_add_event, explode_add);
+  fts_method_define_varargs(cl, fts_system_inlet, sym_remove_event, explode_remove);
+  fts_method_define_varargs(cl, fts_system_inlet, sym_change_event, explode_change);
+  fts_method_define_varargs(cl, fts_system_inlet, sym_change_time, explode_change_time);
 
   /* export standard MIDI file */
   fts_method_define_varargs(cl, 0, fts_s_export, explode_export);
@@ -1460,7 +1460,7 @@ explode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* Add the rename daemon */
   fts_class_add_daemon(cl, obj_property_put, fts_s_name, explode_put_name_daemon);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void explay_config(void);

@@ -266,12 +266,12 @@ static fts_status_t udpsend_instantiate(fts_class_t *cl, int ac, const fts_atom_
 {
   fts_class_init( cl, sizeof( udpsend_t), 1, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, udpsend_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, udpsend_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, udpsend_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, udpsend_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_anything, udpsend_anything);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void udpsend_config( void)

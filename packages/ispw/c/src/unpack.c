@@ -135,8 +135,8 @@ unpack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else
     fts_class_init(cl, sizeof(unpack_t), 1, ac, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, unpack_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, unpack_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, unpack_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, unpack_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_list, unpack_send);
   fts_method_define_varargs(cl, 0, fts_s_int, unpack_send);
@@ -159,7 +159,7 @@ unpack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	}
     }
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

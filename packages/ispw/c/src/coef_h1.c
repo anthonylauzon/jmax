@@ -277,9 +277,9 @@ sigcoef_hlshelf1_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(sigcoef_hlshelf1_t), 5, 6, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigcoef_hlshelf1_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigcoef_hlshelf1_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigcoef_hlshelf1_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sigcoef_hlshelf1_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sigcoef_hlshelf1_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, sigcoef_hlshelf1_put);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, sigcoef_hlshelf1_bang);
 
@@ -297,7 +297,7 @@ sigcoef_hlshelf1_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_dsp_declare_inlet(cl, 0);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

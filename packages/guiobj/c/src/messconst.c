@@ -282,7 +282,7 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	  && fts_is_int( at+3)) )
     {
       /* if old one, then we must call the set method by hand, giving as argument the description */
-      messconst_set( (fts_object_t *)this, fts_SystemInlet, fts_s_set, ac, at);
+      messconst_set( (fts_object_t *)this, fts_system_inlet, fts_s_set, ac, at);
     }
 }
 
@@ -315,17 +315,17 @@ messconst_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(messconst_t), ninlets, noutlets, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, messconst_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, messconst_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, messconst_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, messconst_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, messconst_set);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, messconst_set);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, messconst_dump);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, messconst_dump);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, messconst_send_ui_properties); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_spost_description, messconst_spost_description); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_ui_properties, messconst_send_ui_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_spost_description, messconst_spost_description); 
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_bang, messconst_send);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_bang, messconst_send);
   
   fts_method_define_varargs(cl, 0, fts_s_bang, messconst_bang);
   
@@ -339,7 +339,7 @@ messconst_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, messconst_get_value);
   fts_class_add_daemon(cl, obj_property_put, fts_s_value, messconst_put_value);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

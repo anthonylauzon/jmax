@@ -167,15 +167,15 @@ selection_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(fts_selection_t), 0, 0, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, selection_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, selection_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, selection_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, selection_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add"),  selection_add);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("remove"), selection_remove);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("add"),  selection_add);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("remove"), selection_remove);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear, selection_clear);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_clear, selection_clear);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 

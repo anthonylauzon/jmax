@@ -246,18 +246,18 @@ dsp_control_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(dsp_control_t), 0, 0, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, dsp_control_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, dsp_control_upload);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, dsp_control_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_upload, dsp_control_upload);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_dsp_on, dsp_control_remote_dsp_on);
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_dsp_print, dsp_control_remote_dsp_print);
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_start_collect, dsp_control_fpe_start_collect);
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_stop_collect, dsp_control_fpe_stop_collect);
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_clear_collect, dsp_control_fpe_clear_collect);
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_check_nan, dsp_control_set_check_nan);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("dsp_restart"), dsp_control_restart);
+  fts_method_define_varargs(cl, fts_system_inlet, sym_dsp_on, dsp_control_remote_dsp_on);
+  fts_method_define_varargs(cl, fts_system_inlet, sym_dsp_print, dsp_control_remote_dsp_print);
+  fts_method_define_varargs(cl, fts_system_inlet, sym_start_collect, dsp_control_fpe_start_collect);
+  fts_method_define_varargs(cl, fts_system_inlet, sym_stop_collect, dsp_control_fpe_stop_collect);
+  fts_method_define_varargs(cl, fts_system_inlet, sym_clear_collect, dsp_control_fpe_clear_collect);
+  fts_method_define_varargs(cl, fts_system_inlet, sym_check_nan, dsp_control_set_check_nan);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("dsp_restart"), dsp_control_restart);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void dspcontrol_config( void)

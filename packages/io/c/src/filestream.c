@@ -372,9 +372,9 @@ filestream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* define variable */
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, filestream_get_state);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, filestream_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, filestream_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, filestream_read);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, filestream_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, filestream_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_sched_ready, filestream_read);
 
   
   fts_method_define_varargs(cl, 0, fts_s_open, filestream_open);
@@ -383,7 +383,7 @@ filestream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_int, filestream_int);
   fts_method_define_varargs(cl, 0, fts_s_list, filestream_list);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

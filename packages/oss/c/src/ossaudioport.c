@@ -299,12 +299,12 @@ static fts_status_t ossaudioport_instantiate(fts_class_t *cl, int ac, const fts_
 {
   fts_class_init( cl, sizeof( ossaudioport_t), 0, 0, 0);
 
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, ossaudioport_init);
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_delete, ossaudioport_delete);
+  fts_method_define_varargs( cl, fts_system_inlet, fts_s_init, ossaudioport_init);
+  fts_method_define_varargs( cl, fts_system_inlet, fts_s_delete, ossaudioport_delete);
 
   fts_class_add_daemon( cl, obj_property_get, fts_s_state, ossaudioport_get_state);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void ossaudioport_config( void)

@@ -88,7 +88,7 @@ fts_status_t fts_load_library( const char *filename, const char *symbol)
 
   (*fun)();
 
-  return fts_Success;
+  return fts_ok;
 }
 
 

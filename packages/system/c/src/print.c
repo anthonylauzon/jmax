@@ -115,7 +115,7 @@ print_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	{
 	  post("<%s> ", s);
 
-	  if(fts_send_message(obj, fts_SystemInlet, fts_s_print, 0, 0) != fts_Success)
+	  if(fts_send_message(obj, fts_system_inlet, fts_s_print, 0, 0) != fts_ok)
 	    post("<\?\?\?>\n");
 	}
     }
@@ -145,7 +145,7 @@ print_instantiate(fts_class_t *cl, int ac, const fts_atom_t *aat)
 {
   fts_class_init(cl, sizeof(print_t), 1, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, print_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, print_init);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, print_bang);
   fts_method_define_varargs(cl, 0, fts_s_int, print_int);
@@ -154,7 +154,7 @@ print_instantiate(fts_class_t *cl, int ac, const fts_atom_t *aat)
   fts_method_define_varargs(cl, 0, fts_s_list, print_list);
   fts_method_define_varargs(cl, 0, fts_s_anything, print_anything);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

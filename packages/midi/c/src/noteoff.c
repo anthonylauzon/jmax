@@ -167,7 +167,7 @@ noteoff_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(noteoff_t), 4, 3, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, noteoff_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, noteoff_init);
 
   fts_method_define_varargs(cl, 0, fts_s_clear, noteoff_clear);
   fts_method_define_varargs(cl, 0, fts_s_stop, noteoff_stop);
@@ -190,7 +190,7 @@ noteoff_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_outlet_type_define_varargs(cl, 1, fts_s_int);
   fts_outlet_type_define_varargs(cl, 2, fts_s_int);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 

@@ -258,8 +258,8 @@ poly_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(poly_t), 2, 3, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, poly_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, poly_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, poly_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, poly_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_stop, poly_stop);
   fts_method_define_varargs(cl, 0, fts_s_clear, poly_clear);
@@ -272,7 +272,7 @@ poly_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 1, fts_s_int, poly_number_1);
   fts_method_define_varargs(cl, 1, fts_s_float, poly_number_1);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

@@ -278,12 +278,12 @@ static fts_status_t sgiaudioport_instantiate(fts_class_t *cl, int ac, const fts_
 {
   fts_class_init( cl, sizeof( sgiaudioport_t), 0, 0, 0);
 
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, sgiaudioport_init);
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_delete, sgiaudioport_delete);
+  fts_method_define_varargs( cl, fts_system_inlet, fts_s_init, sgiaudioport_init);
+  fts_method_define_varargs( cl, fts_system_inlet, fts_s_delete, sgiaudioport_delete);
 
   fts_class_add_daemon( cl, obj_property_get, fts_s_state, sgiaudioport_get_state);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void sgiaudioport_config( void)

@@ -274,20 +274,20 @@ param_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(fts_param_t), 1, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, param_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, param_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, param_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, param_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, param_print);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, param_print);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_instance, param_set_from_instance);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, param_set_atoms);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, param_dump);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_instance, param_set_from_instance);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, param_set_atoms);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, param_dump);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, param_get_array);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_array, param_set_atoms);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, param_get_array);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_array, param_set_atoms);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, sym__remote_value, param_input_atoms);
-  fts_method_define_varargs(cl,fts_SystemInlet, fts_new_symbol("load_init"), param_update);
+  fts_method_define_varargs(cl, fts_system_inlet, sym__remote_value, param_input_atoms);
+  fts_method_define_varargs(cl,fts_system_inlet, fts_new_symbol("load_init"), param_update);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, param_update);
 
@@ -303,7 +303,7 @@ param_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, param_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, param_get_state);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 /***************************************************************************
@@ -371,8 +371,8 @@ psend_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(psend_t), 1, 0, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, psend_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, psend_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, psend_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, psend_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_int, psend_input_atoms);
   fts_method_define_varargs(cl, 0, fts_s_float, psend_input_atoms);
@@ -380,7 +380,7 @@ psend_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_list, psend_input_atoms);
   fts_method_define_varargs(cl, 0, fts_s_anything, psend_input_anything);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /***************************************************************************
@@ -436,10 +436,10 @@ preceive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(preceive_t), 0, 1, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, preceive_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, preceive_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, preceive_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, preceive_delete);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 

@@ -126,10 +126,10 @@ static fts_status_t update_group_instantiate(fts_class_t *cl, int ac, const fts_
 {
   fts_class_init( cl, sizeof( update_group_t), 1, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, update_group_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_start, update_group_start);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, update_group_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_start, update_group_start);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 

@@ -151,13 +151,13 @@ static fts_status_t in_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom
 
   fts_class_init( cl, sizeof( fts_object_t), 0, outlets, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, in_tilda_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, in_tilda_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, in_tilda_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, in_tilda_delete);
 
   for ( i = 0; i < outlets; i++)
     fts_dsp_declare_outlet( cl, i);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 
@@ -201,14 +201,14 @@ static fts_status_t out_tilda_instantiate(fts_class_t *cl, int ac, const fts_ato
 
   fts_class_init( cl, sizeof( out_tilda_t), inlets, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, out_tilda_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, out_tilda_init);
 
   for ( i = 0; i < inlets; i++)
     fts_dsp_declare_inlet( cl, i);
 
   fts_class_define_thru( cl, out_tilda_propagate_input);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void in_out_tilda_config( void)

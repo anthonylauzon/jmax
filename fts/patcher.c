@@ -45,8 +45,6 @@
  *  For now, until Input/output typing, all the inlets and outlets are
  *  DSP, and the patcher is integrated with the DSP compiler.
  *
- *  (the object structures are defined in mess_sys.h)
- *
  */
 
 #include <stdarg.h>
@@ -209,16 +207,16 @@ inlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_class_init(cl, sizeof(fts_inlet_t), 1, 1, 0);
       
       /* define the system methods */
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, inlet_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, inlet_delete);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, inlet_save_dotpat); 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_spost_description, inlet_spost_description); 
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, inlet_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, inlet_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_save_dotpat, inlet_save_dotpat); 
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_spost_description, inlet_spost_description); 
 
       fts_class_define_thru(cl, 0);
       
       inlet_class = cl;
 
-      return fts_Success;
+      return fts_ok;
     }
   else if(ac == 1 && (fts_is_symbol(at) || fts_is_label(at)))
     return receive_instantiate(cl, ac, at);
@@ -341,11 +339,11 @@ outlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(fts_outlet_t), 1, 1, 0);
       
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, outlet_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, outlet_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, outlet_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, outlet_delete);
       
-      fts_method_define_varargs( cl, fts_SystemInlet, fts_s_save_dotpat, outlet_save_dotpat); 
-      fts_method_define_varargs( cl, fts_SystemInlet, fts_s_spost_description, outlet_spost_description); 
+      fts_method_define_varargs( cl, fts_system_inlet, fts_s_save_dotpat, outlet_save_dotpat); 
+      fts_method_define_varargs( cl, fts_system_inlet, fts_s_spost_description, outlet_spost_description); 
 
       fts_class_define_thru(cl, outlet_propagate_input);
       
@@ -353,7 +351,7 @@ outlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       
       outlet_class = cl;
       
-      return fts_Success;
+      return fts_ok;
     }
   else if(ac == 1 && (fts_is_symbol(at) || fts_is_label(at)))
     return send_instantiate(cl, ac, at);
@@ -644,7 +642,7 @@ patcher_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   p = this->objects;
   while (p)
     {
-      fts_send_message(p, fts_SystemInlet, fts_s_closeEditor, 0, 0);      
+      fts_send_message(p, fts_system_inlet, fts_s_closeEditor, 0, 0);      
       p = p->next_in_patcher;
     }
 }
@@ -1049,12 +1047,12 @@ patcher_save_objects( FILE *file, fts_object_t *object)
 	  fprintf( file, ";\n");
 	}
       else if ( ! fts_object_is_patcher( object)
-		&& fts_class_has_method( fts_object_get_class(object), fts_SystemInlet, fts_s_save_dotpat) )
+		&& fts_class_has_method( fts_object_get_class(object), fts_system_inlet, fts_s_save_dotpat) )
 	{
  	  fts_atom_t a;
 
 	  fts_set_pointer( &a, file);
-	  fts_send_message( object, fts_SystemInlet, fts_s_save_dotpat, 1, &a);
+	  fts_send_message( object, fts_system_inlet, fts_s_save_dotpat, 1, &a);
 	}
       else
 	{
@@ -1202,12 +1200,12 @@ patcher_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
  */
 static void fts_patcher_start_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  patcher_open(o, fts_SystemInlet, fts_s_open, 0, 0);
+  patcher_open(o, fts_system_inlet, fts_s_open, 0, 0);
 }
 
 static void fts_patcher_stop_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  patcher_close(o, fts_SystemInlet, fts_s_close, 0, 0);
+  patcher_close(o, fts_system_inlet, fts_s_close, 0, 0);
 }
 
 /**
@@ -1413,8 +1411,8 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
       fts_memorystream_reset( stream);
       
       fts_set_object( b, stream);
-      stat = fts_send_message( obj, fts_SystemInlet, fts_s_spost_description, 1, b);
-      if(stat != fts_Success)
+      stat = fts_send_message( obj, fts_system_inlet, fts_s_spost_description, 1, b);
+      if(stat != fts_ok)
 	{
 	  fts_spost_object_description( (fts_bytestream_t *)stream, obj);
 	}
@@ -1432,7 +1430,7 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
 	  fts_client_send_message(obj, fts_s_setFont, 3, a);
 	}
       
-      fts_send_message(obj, fts_SystemInlet, fts_s_send_properties, 0, 0);
+      fts_send_message(obj, fts_system_inlet, fts_s_send_properties, 0, 0);
     }
 }
 
@@ -1541,7 +1539,7 @@ fts_patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_
 		{
 		  fts_object_reset_changed(obj);
 		  
-		  fts_send_message( obj, fts_SystemInlet, fts_s_closeEditor, 0, 0);   
+		  fts_send_message( obj, fts_system_inlet, fts_s_closeEditor, 0, 0);   
 
 		  fts_client_release_object(obj);
 		  fts_object_set_id(obj, FTS_DELETE);
@@ -1630,7 +1628,7 @@ static void fts_patcher_paste( fts_object_t *o, int winlet, fts_symbol_t s, int 
   int dy = fts_get_int(at+2);
 
   fts_set_object(a, o);
-  fts_send_message( clipboard, fts_SystemInlet, fts_s_paste, 1, a);   
+  fts_send_message( clipboard, fts_system_inlet, fts_s_paste, 1, a);   
 
   /* upload all the not uploaded objects */
 
@@ -1716,60 +1714,60 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* initialize the class */
   fts_class_init(cl, sizeof(fts_patcher_t), ninlets, noutlets, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, patcher_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, patcher_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, patcher_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, patcher_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, fts_patcher_upload);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload_child, fts_patcher_upload_child);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_upload, fts_patcher_upload);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_upload_child, fts_patcher_upload_child);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find, patcher_find);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find_errors, patcher_find_errors);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_find, patcher_find);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_find_errors, patcher_find_errors);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, patcher_send_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_properties, patcher_send_properties); 
 
   fts_class_define_thru(cl, patcher_propagate_input);
 
   for (i = 0; i < ninlets; i ++)
     fts_method_define_varargs(cl, i, fts_s_anything, patcher_anything);
 
-  fts_method_define_varargs(cl,fts_SystemInlet, fts_new_symbol("load_init"), patcher_load_init); 
-  fts_method_define_varargs(cl,fts_SystemInlet, fts_s_open, patcher_open); 
-  fts_method_define_varargs(cl,fts_SystemInlet, fts_s_close, patcher_close); 
+  fts_method_define_varargs(cl,fts_system_inlet, fts_new_symbol("load_init"), patcher_load_init); 
+  fts_method_define_varargs(cl,fts_system_inlet, fts_s_open, patcher_open); 
+  fts_method_define_varargs(cl,fts_system_inlet, fts_s_close, patcher_close); 
 
-  fts_method_define_varargs(cl,fts_SystemInlet, fts_new_symbol("open_help_patch"), fts_patcher_open_help_patch); 
+  fts_method_define_varargs(cl,fts_system_inlet, fts_new_symbol("open_help_patch"), fts_patcher_open_help_patch); 
 
-  fts_method_define_varargs(cl,fts_SystemInlet, fts_s_save, fts_patcher_save_from_client); 
+  fts_method_define_varargs(cl,fts_system_inlet, fts_s_save, fts_patcher_save_from_client); 
 
-  fts_method_define_varargs(cl,fts_SystemInlet, fts_s_paste, fts_patcher_paste); 
+  fts_method_define_varargs(cl,fts_system_inlet, fts_s_paste, fts_patcher_paste); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, patcher_open_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_destroyEditor, patcher_destroy_editor);
-  fts_method_define_varargs(cl,fts_SystemInlet, fts_s_closeEditor, patcher_close_editor); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("show_object"), show_object);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("stop_waiting"), stop_waiting);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_openEditor, patcher_open_editor);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_destroyEditor, patcher_destroy_editor);
+  fts_method_define_varargs(cl,fts_system_inlet, fts_s_closeEditor, patcher_close_editor); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("show_object"), show_object);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("stop_waiting"), stop_waiting);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("start_updates"), fts_patcher_start_updates);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("stop_updates"), fts_patcher_stop_updates);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("patcher_update"), fts_patcher_update);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_wx"), fts_patcher_set_wx);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_wy"), fts_patcher_set_wy);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_ww"), fts_patcher_set_ww);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_wh"), fts_patcher_set_wh);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("start_updates"), fts_patcher_start_updates);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("stop_updates"), fts_patcher_stop_updates);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("patcher_update"), fts_patcher_update);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("set_wx"), fts_patcher_set_wx);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("set_wy"), fts_patcher_set_wy);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("set_ww"), fts_patcher_set_ww);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("set_wh"), fts_patcher_set_wh);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_object"), fts_patcher_add_object_from_client);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("add_object"), fts_patcher_add_object_from_client);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("delete_objects"), 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("delete_objects"), 
 			    fts_patcher_delete_objects_from_client);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_connection"), 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("add_connection"), 
 			    fts_patcher_add_connection_from_client);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("delete_connection"),
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("delete_connection"),
 			    fts_patcher_delete_connection_from_client);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("redefine_object"),
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("redefine_object"),
 			    fts_patcher_redefine_object_from_client);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("redefine_patcher"),
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("redefine_patcher"),
 			    fts_patcher_redefine_from_client);
 
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_spost_description, patcher_spost_description); 
+  fts_method_define_varargs( cl, fts_system_inlet, fts_s_spost_description, patcher_spost_description); 
 
   /* daemon for properties */
   fts_class_add_daemon(cl, obj_property_get, fts_s_patcher_type, patcher_get_patcher_type);
@@ -1778,7 +1776,7 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_add_daemon(cl, obj_property_put, fts_s_ninlets, patcher_set_ninlets);
   fts_class_add_daemon(cl, obj_property_put, fts_s_noutlets, patcher_set_noutlets);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /*************************************************************

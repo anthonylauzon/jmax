@@ -86,10 +86,10 @@ preset_dumper_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(preset_dumper_t), 0, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, preset_dumper_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, preset_dumper_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, preset_dumper_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, preset_dumper_delete);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /******************************************************
@@ -105,8 +105,8 @@ static int
 preset_check_object(preset_t *this, fts_object_t *obj)
 {
   fts_class_t *class = fts_object_get_class(obj);
-  fts_method_t meth_set = fts_class_get_method(class, fts_SystemInlet, fts_s_set_from_instance);
-  fts_method_t meth_dump = fts_class_get_method(class, fts_SystemInlet, fts_s_dump);
+  fts_method_t meth_set = fts_class_get_method(class, fts_system_inlet, fts_s_set_from_instance);
+  fts_method_t meth_dump = fts_class_get_method(class, fts_system_inlet, fts_s_dump);
 
   return (meth_set != 0) && (meth_dump != 0);
 }
@@ -243,7 +243,7 @@ preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      clones[i] = fts_object_create(type, 0, 0);
 
 	      fts_set_object(&a, objects[i]);
-	      fts_send_message(clones[i], fts_SystemInlet, fts_s_set_from_instance, 1, &a);
+	      fts_send_message(clones[i], fts_system_inlet, fts_s_set_from_instance, 1, &a);
 
 	      fts_object_refer(clones[i]);
 	    }
@@ -261,7 +261,7 @@ preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      clones[i] = fts_object_create(type, 0, 0);
 
 	      fts_set_object(&a, objects[i]);
-	      fts_send_message(clones[i], fts_SystemInlet, fts_s_set_from_instance, 1, &a);
+	      fts_send_message(clones[i], fts_system_inlet, fts_s_set_from_instance, 1, &a);
 
 	      fts_object_refer(clones[i]);
 	    }
@@ -293,7 +293,7 @@ preset_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      fts_atom_t a;
 
 	      fts_set_object(&a, clones[i]);
-	      fts_send_message(this->objects[i], fts_SystemInlet, fts_s_set_from_instance, 1, &a);
+	      fts_send_message(this->objects[i], fts_system_inlet, fts_s_set_from_instance, 1, &a);
 	    }
 
 	  fts_outlet_int(o, 0, n);
@@ -325,7 +325,7 @@ preset_dump_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       this->current[index] = fts_object_create(type, 0, 0);
     }
 
-  fts_send_message(this->current[index], fts_SystemInlet, selector, ac - 2, at + 2);
+  fts_send_message(this->current[index], fts_system_inlet, selector, ac - 2, at + 2);
 }
 
 static void
@@ -365,7 +365,7 @@ preset_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	  
 	  /* dump clone messages */
 	  fts_set_object(&a, (fts_object_t *)preset_dumper);
-	  fts_send_message(clones[i], fts_SystemInlet, fts_s_dump, 1, &a);
+	  fts_send_message(clones[i], fts_system_inlet, fts_s_dump, 1, &a);
 	}
     }
   
@@ -455,14 +455,14 @@ preset_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(preset_t), 1, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, preset_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, preset_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, preset_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, preset_delete);
 
   /* save and restore to/from bmax file */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, preset_dump); 
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_new_preset, preset_new_preset);
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_dump_mess, preset_dump_mess);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, preset_get_array);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, preset_dump); 
+  fts_method_define_varargs(cl, fts_system_inlet, sym_new_preset, preset_new_preset);
+  fts_method_define_varargs(cl, fts_system_inlet, sym_dump_mess, preset_dump_mess);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, preset_get_array);
 
   /* persistency */
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
@@ -473,7 +473,7 @@ preset_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_new_symbol("recall"), preset_recall);
   fts_method_define_varargs(cl, 0, fts_s_clear, preset_clear);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

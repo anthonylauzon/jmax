@@ -224,8 +224,8 @@ getinter_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(getinter_t), 2, 1, 0); 
       
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getinter_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getinter_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getinter_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getinter_delete);
       
       fts_method_define_varargs(cl, 0, fts_s_int, getinter_ivec);
       fts_method_define_varargs(cl, 0, fts_s_float, getinter_ivec);
@@ -236,8 +236,8 @@ getinter_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(getinter_t), 2, 1, 0); 
       
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getinter_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getinter_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getinter_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getinter_delete);
       
       fts_method_define_varargs(cl, 0, fts_s_int, getinter_fvec);
       fts_method_define_varargs(cl, 0, fts_s_float, getinter_fvec);
@@ -248,8 +248,8 @@ getinter_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(getinter_bpf_t), 2, 1, 0); 
       
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getinter_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getinter_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getinter_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getinter_delete);
       
       fts_method_define_varargs(cl, 0, fts_s_int, getinter_bpf);
       fts_method_define_varargs(cl, 0, fts_s_float, getinter_bpf);
@@ -259,7 +259,7 @@ getinter_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else
     return &fts_CannotInstantiate;
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

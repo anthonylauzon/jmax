@@ -161,9 +161,9 @@ graph_iterator_step( graph_iterator_t *iter)
       fts_set_pointer(a + 0, graph_iterator_push);
       fts_set_pointer(a + 1, iter);
       fts_set_int(a + 2, iter->top->connection->winlet);
-      stat = fts_send_message(dest, fts_SystemInlet, fts_s_propagate_input, 3, a);
+      stat = fts_send_message(dest, fts_system_inlet, fts_s_propagate_input, 3, a);
 
-      if(stat == fts_Success)
+      if(stat == fts_ok)
 	{
 	  /* skip "thru" object */
 	  oldtop->connection_to_thru = oldtop->connection;
@@ -562,7 +562,7 @@ dsp_graph_schedule_node(fts_dsp_graph_t *graph, fts_dsp_node_t *node)
       */
 
       fts_set_pointer(&a, node->descr);
-      fts_send_message(node->o, fts_SystemInlet, fts_s_put, 1, &a);
+      fts_send_message(node->o, fts_system_inlet, fts_s_put, 1, &a);
 
       {
 	ftl_instruction_info_t *info;
@@ -799,7 +799,7 @@ dsp_graph_schedule_depth(fts_dsp_graph_t *graph, fts_dsp_node_t *src, int woutle
       dsp_graph_schedule_node(graph, dest);
       dsp_graph_succ_realize(graph, dest, dsp_graph_schedule_depth, fts_c_signal);
 
-      fts_send_message( dest->o, fts_SystemInlet, fts_new_symbol("put_after_successors"), 0, 0);
+      fts_send_message( dest->o, fts_system_inlet, fts_new_symbol("put_after_successors"), 0, 0);
     }
 }
 
@@ -826,7 +826,7 @@ dsp_graph_send_message( fts_dsp_graph_t *graph, fts_symbol_t message)
   fts_dsp_node_t *node;
 
   for( node = nodes; node; node = node->next)
-    fts_send_message( node->o, fts_SystemInlet, message, 0, 0);
+    fts_send_message( node->o, fts_system_inlet, message, 0, 0);
 }
 
 static void 

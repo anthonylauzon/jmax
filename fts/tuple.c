@@ -82,13 +82,13 @@ tuple_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(fts_tuple_t), 0, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, tuple_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, tuple_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, tuple_print);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, tuple_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tuple_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, tuple_print);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_compare, tuple_compare);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_compare, tuple_compare);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

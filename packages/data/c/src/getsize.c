@@ -83,7 +83,7 @@ getsize_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fvec_symbol, getsize_fvec);
   fts_method_define_varargs(cl, 0, mat_symbol, getsize_mat);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

@@ -98,12 +98,12 @@ static fts_status_t consolestream_instantiate( fts_class_t *cl, int ac, const ft
   fts_class_init( cl, sizeof(consolestream_t), 0, 0, 0);
 
   fts_bytestream_class_init( cl);
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, consolestream_init);
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_delete, consolestream_delete);
+  fts_method_define_varargs( cl, fts_system_inlet, fts_s_init, consolestream_init);
+  fts_method_define_varargs( cl, fts_system_inlet, fts_s_delete, consolestream_delete);
 
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_new_symbol("set_default"), consolestream_set_default);
+  fts_method_define_varargs( cl, fts_system_inlet, fts_new_symbol("set_default"), consolestream_set_default);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void console_config( void)

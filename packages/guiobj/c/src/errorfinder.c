@@ -41,7 +41,7 @@ static void fts_error_finder_find( fts_object_t *o, int winlet, fts_symbol_t s, 
   fts_objectset_clear(set);
 
   fts_set_object(&a[0], (fts_object_t *) set);
-  fts_send_message(scope, fts_SystemInlet, fts_s_find_errors, 1, a);
+  fts_send_message(scope, fts_system_inlet, fts_s_find_errors, 1, a);
 }
 
 static fts_status_t
@@ -49,9 +49,9 @@ error_finder_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(fts_error_finder_t), 0, 0, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("error_finder_find"), fts_error_finder_find);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("error_finder_find"), fts_error_finder_find);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /***********************************************************************

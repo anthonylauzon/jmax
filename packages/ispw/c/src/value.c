@@ -153,8 +153,8 @@ value_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_init(cl, sizeof(value_t), 1, 1, 0); 
 
   /* define the system methods */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, value_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, value_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, value_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, value_delete);
 
   /* Value args */
   fts_method_define_varargs(cl, 0, fts_s_bang, value_bang);
@@ -163,7 +163,7 @@ value_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_float, value_scalar);
   fts_method_define_varargs(cl, 0, fts_s_symbol, value_scalar);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

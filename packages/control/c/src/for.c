@@ -260,7 +260,7 @@ for_float_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   if(for_is_int(ac, at))
     {
       fts_class_init(cl, sizeof(for_int_t), 3, 1, 0); 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, for_int_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, for_int_init);
 
       fts_method_define_varargs(cl, 0, fts_s_set, for_int_set);
       fts_method_define_varargs(cl, 0, fts_s_bang, for_int_go);
@@ -279,7 +279,7 @@ for_float_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(for_float_t), 3, 1, 0);
 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, for_float_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, for_float_init);
 
       fts_method_define_varargs(cl, 0, fts_s_set, for_float_set);
       fts_method_define_varargs(cl, 0, fts_s_bang, for_float_go);
@@ -295,7 +295,7 @@ for_float_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 2, fts_s_float, for_float_set_incr);
     }
 
-  return fts_Success;
+  return fts_ok;
 }
 
 int

@@ -114,7 +114,6 @@ and implement a first grammar for expressions (similar to the actual grammar,
 plus implementation of the dot operator and may be object creation).
 <ul>
 <li>add variables evaluation ?? should we use fts_variable_add_user ???
-<li>add error handling
 <li>add [] evaluation: move getelem_* code from getval.c to respective classes,
 make fts_return global (may be create evaluator.c or expression.c ?)
 <li>add functions: make contiguous symbols (all symbols are copied) and dispatch 
@@ -130,7 +129,11 @@ Evaluate variables.c reimplementation
 </p>
  
 <p>
-Remove copies in fts_return: 
+Check implementation of methods with return types: either fts_return or
+<pre>
+typedef void fts_return_t( fts_object_t *obj, etc, fts_atom_t *ret);
+</pre>
+If fts_return, the remove copies in it:
 <pre>
 extern fts_atom_t *fts_return_value;
 

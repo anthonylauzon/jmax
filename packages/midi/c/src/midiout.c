@@ -420,7 +420,7 @@ midiout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(midiout_t), 1, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midiout_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, midiout_init);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("panic"), midiout_panic);
   fts_method_define_varargs(cl, 0, fts_new_symbol("GM"), midiout_general_midi);
@@ -428,7 +428,7 @@ midiout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_midievent, midiout_send);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t
@@ -436,7 +436,7 @@ noteout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(midiout_t), 3, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midiout_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, midiout_init);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("off"), noteout_all_off);
 
@@ -450,7 +450,7 @@ noteout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 2, fts_s_int, midiout_set_channel);
   fts_method_define_varargs(cl, 2, fts_s_float, midiout_set_channel);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t
@@ -458,7 +458,7 @@ polyout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(midiout_t), 3, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midiout_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, midiout_init);
 
   fts_method_define_varargs(cl, 0, fts_s_int, polyout_send);
   fts_method_define_varargs(cl, 0, fts_s_float, polyout_send);
@@ -470,7 +470,7 @@ polyout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 2, fts_s_int, midiout_set_channel);
   fts_method_define_varargs(cl, 2, fts_s_float, midiout_set_channel);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t
@@ -478,7 +478,7 @@ ctlout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(midiout_t), 3, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midiout_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, midiout_init);
   fts_method_define_varargs(cl, 0, fts_s_int, ctlout_send);
   fts_method_define_varargs(cl, 0, fts_s_float, ctlout_send);
   fts_method_define_varargs(cl, 0, fts_s_list, ctlout_send);
@@ -489,7 +489,7 @@ ctlout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 2, fts_s_int, midiout_set_channel);
   fts_method_define_varargs(cl, 2, fts_s_float, midiout_set_channel);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t
@@ -497,7 +497,7 @@ pgmout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(midiout_t), 2, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midiout_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, midiout_init);
 
   fts_method_define_varargs(cl, 0, fts_s_int, pgmout_send);
   fts_method_define_varargs(cl, 0, fts_s_float, pgmout_send);
@@ -506,7 +506,7 @@ pgmout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 1, fts_s_int, midiout_set_channel);
   fts_method_define_varargs(cl, 1, fts_s_float, midiout_set_channel);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t
@@ -514,7 +514,7 @@ touchout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(midiout_t), 2, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midiout_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, midiout_init);
 
   fts_method_define_varargs(cl, 0, fts_s_int, touchout_send);
   fts_method_define_varargs(cl, 0, fts_s_float, touchout_send);
@@ -523,7 +523,7 @@ touchout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 1, fts_s_int, midiout_set_channel);
   fts_method_define_varargs(cl, 1, fts_s_float, midiout_set_channel);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 
@@ -532,7 +532,7 @@ bendout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(midiout_t), 2, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midiout_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, midiout_init);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("range"), bendout_range);
 
@@ -543,7 +543,7 @@ bendout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 1, fts_s_int, midiout_set_channel);
   fts_method_define_varargs(cl, 1, fts_s_float, midiout_set_channel);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t
@@ -551,7 +551,7 @@ xbendout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(midiout_t), 2, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midiout_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, midiout_init);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("range"), bendout_range);
 
@@ -562,7 +562,7 @@ xbendout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 1, fts_s_int, midiout_set_channel);
   fts_method_define_varargs(cl, 1, fts_s_float, midiout_set_channel);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

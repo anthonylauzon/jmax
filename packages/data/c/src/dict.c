@@ -741,19 +741,19 @@ dict_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(dict_t), 1, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, dict_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, dict_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, dict_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, dict_delete);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_instance, dict_set_from_instance);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, dict_set); /* from file */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_message, dict_message); /* from file */
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_instance, dict_set_from_instance);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, dict_set); /* from file */
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_message, dict_message); /* from file */
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, dict_get_array);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, dict_get_array);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear, dict_clear);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_clear, dict_clear);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, dict_dump);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, dict_print);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, dict_dump);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, dict_print);
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
@@ -767,7 +767,7 @@ dict_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_get, dict_get);
   fts_method_define_varargs(cl, 0, fts_s_clear, dict_clear);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

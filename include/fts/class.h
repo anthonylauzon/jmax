@@ -27,12 +27,6 @@ typedef struct fts_inlet_decl fts_inlet_decl_t;
 typedef struct fts_outlet_decl fts_outlet_decl_t;
 
 /* Predefined typeids */
-#define FTS_TYPEID_VOID     1
-#define FTS_TYPEID_INT      2
-#define FTS_TYPEID_FLOAT    3
-#define FTS_TYPEID_SYMBOL   4
-#define FTS_TYPEID_POINTER  5
-#define FTS_TYPEID_STRING   6
 #define FTS_FIRST_OBJECT_TYPEID   16
 
 struct fts_metaclass {
@@ -165,7 +159,7 @@ FTS_API fts_method_t fts_class_get_method( fts_class_t *cl, int inlet, fts_symbo
 #define fts_class_get_constructor(c) ((c)->constructor)
 #define fts_class_get_deconstructor(c) ((c)->deconstructor)
 
-FTS_API const int fts_SystemInlet;
+FTS_API const int fts_system_inlet;
 
 /*****************************************************************************
  *

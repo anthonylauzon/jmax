@@ -100,13 +100,13 @@ oneshot_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(oneshot_t), 2, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, oneshot_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, oneshot_init);
 
   fts_method_define_varargs(cl, 0, fts_s_anything, oneshot_input);
   fts_method_define_varargs(cl, 1, fts_s_bang, oneshot_open);
   fts_method_define_varargs(cl, 1, fts_s_int, oneshot_switch);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

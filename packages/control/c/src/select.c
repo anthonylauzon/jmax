@@ -131,8 +131,8 @@ select_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(select_t), n, n, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, select_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, select_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, select_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, select_delete);
   
   fts_method_define_varargs(cl, 0, fts_s_anything, select_anything);
   fts_method_define_varargs(cl, 0, fts_s_list, select_tuple);
@@ -140,7 +140,7 @@ select_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   for(i=1; i<n; i++)
     fts_method_define_varargs(cl, i, fts_s_anything, select_set_anything);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

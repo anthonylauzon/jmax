@@ -473,11 +473,11 @@ alsaseqmidiport_input_instantiate(fts_class_t* cl, int ac, const fts_atom_t* at)
 
     fts_midiport_class_init(cl);
 
-    fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, alsaseqmidiport_input_init);
-    fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, alsaseqmidiport_input_delete);
-    fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, alsaseqmidiport_select);
+    fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, alsaseqmidiport_input_init);
+    fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, alsaseqmidiport_input_delete);
+    fts_method_define_varargs(cl, fts_system_inlet, fts_s_sched_ready, alsaseqmidiport_select);
 
-    return fts_Success;
+    return fts_ok;
 }
 
 
@@ -488,10 +488,10 @@ alsaseqmidiport_output_instantiate(fts_class_t* cl, int ac, const fts_atom_t* at
 
     fts_midiport_class_init(cl);
 
-    fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, alsaseqmidiport_output_init);
-    fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, alsaseqmidiport_output_delete);
+    fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, alsaseqmidiport_output_init);
+    fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, alsaseqmidiport_output_delete);
 
-    return fts_Success;
+    return fts_ok;
 }
 
 

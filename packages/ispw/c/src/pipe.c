@@ -215,8 +215,8 @@ pipe_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(pipe_t), n, n - 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, pipe_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, pipe_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, pipe_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, pipe_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_bang,  pipe_bang);
   fts_method_define_varargs(cl, 0, fts_s_clear, pipe_clear);
@@ -237,7 +237,7 @@ pipe_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, n - 1, fts_s_int, pipe_atom_delay);
   fts_method_define_varargs(cl, n - 1, fts_s_float, pipe_atom_delay);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

@@ -113,10 +113,10 @@ objectset_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(fts_objectset_t), 0, 0, 0); 
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fts_objectset_method_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fts_objectset_method_destroy);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fts_objectset_method_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fts_objectset_method_destroy);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /***********************************************************************

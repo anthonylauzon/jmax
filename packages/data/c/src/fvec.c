@@ -1525,22 +1525,22 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_init(cl, sizeof(fvec_t), 1, 1, 0);
   
   /* init / delete */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fvec_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fvec_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fvec_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fvec_delete);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, fvec_print); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, fvec_print); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, fvec_set_elements);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_instance, fvec_set_from_instance);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_array, fvec_set_from_array);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, fvec_set_elements);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_instance, fvec_set_from_instance);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_array, fvec_set_from_array);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_size, fvec_size);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_size, fvec_size);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, fvec_get_array);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, fvec_dump);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, fvec_get_array);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, fvec_dump);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save, fvec_save_soundfile); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_load, fvec_load);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save, fvec_save_soundfile); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_load, fvec_load);
 
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("sr"), fvec_set_sr);
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
@@ -1587,7 +1587,7 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_load, fvec_load);
   fts_method_define_varargs(cl, 0, fts_s_save, fvec_save_soundfile);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 /********************************************************************

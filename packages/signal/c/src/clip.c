@@ -160,9 +160,9 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(clip_t), 3, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, clip_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, clip_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, clip_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, clip_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, clip_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, clip_put);
   
   fts_method_define_varargs(cl, 1, fts_s_int, clip_set_min);
   fts_method_define_varargs(cl, 1, fts_s_float, clip_set_min);
@@ -173,7 +173,7 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

@@ -74,7 +74,7 @@ sysinfo_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_anything, sysinfo_arch);
   fts_method_define_varargs(cl, 0, fts_new_symbol("classes"), sysinfo_classes);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

@@ -63,7 +63,7 @@ seqrec_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	  track_merge(this->track, this->recording);
 	  
 	  if(fts_object_has_id((fts_object_t *)this->track))
-	    fts_send_message((fts_object_t *)this->track, fts_SystemInlet, fts_s_upload, 0, 0);
+	    fts_send_message((fts_object_t *)this->track, fts_system_inlet, fts_s_upload, 0, 0);
 	}
 
       this->start_location = 0.0;
@@ -190,8 +190,8 @@ seqrec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(seqrec_t), 2, 0, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqrec_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqrec_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, seqrec_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, seqrec_delete);
   
   fts_method_define_varargs(cl, 0, fts_s_start, seqrec_start);
   fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), seqrec_pause);
@@ -204,7 +204,7 @@ seqrec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, 1, seqsym_track, seqrec_set_reference);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

@@ -84,7 +84,7 @@ mess_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(mess_t), 2, 1, 0);
   
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, mess_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, mess_init);
       
       fts_method_define_varargs(cl, 0, fts_s_bang, mess_atoms);
       fts_method_define_varargs(cl, 0, fts_s_int, mess_atoms);
@@ -106,7 +106,7 @@ mess_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_s_anything, mess_anything);      
     }
       
-  return fts_Success;
+  return fts_ok;
 }
 
 void

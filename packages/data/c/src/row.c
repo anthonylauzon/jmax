@@ -217,10 +217,10 @@ row_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(row_t), 1, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, row_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, row_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, row_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, row_delete);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, row_print); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, row_print); 
   
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, row_getobj);
   
@@ -234,7 +234,7 @@ row_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* type outlet */
   fts_outlet_type_define(cl, 0, row_symbol, 1, &row_symbol);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

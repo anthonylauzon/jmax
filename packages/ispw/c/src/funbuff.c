@@ -1092,7 +1092,7 @@ funbuff_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(funbuff_t), 2, 3, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, funbuff_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, funbuff_init);
 
   fts_method_define_varargs(cl, 0, fts_s_set, funbuff_set);
 
@@ -1120,7 +1120,7 @@ funbuff_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 1, fts_s_int, funbuff_number_1);
   fts_method_define_varargs(cl, 1, fts_s_float, funbuff_number_1);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

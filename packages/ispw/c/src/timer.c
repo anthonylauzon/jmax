@@ -110,7 +110,7 @@ timer_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(timer_t), 2, 1, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, timer_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, timer_init);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("zero"), timer_zero);
   fts_method_define_varargs(cl, 0, fts_s_start, timer_start);
@@ -123,7 +123,7 @@ timer_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

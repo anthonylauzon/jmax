@@ -728,22 +728,22 @@ mat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(mat_t), 1, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, mat_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, mat_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, mat_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, mat_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, mat_print); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, mat_print); 
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, mat_get_mat);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_instance, mat_set_from_instance);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, mat_set_elements);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_row, mat_set_row_elements);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_instance, mat_set_from_instance);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, mat_set_elements);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_row, mat_set_row_elements);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_size, mat_size);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_size, mat_size);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, mat_dump);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, mat_dump);
   
   fts_method_define_varargs(cl, 0, fts_s_bang, mat_output);
 
@@ -757,7 +757,7 @@ mat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_import, mat_import); 
   fts_method_define_varargs(cl, 0, fts_s_export, mat_export); 
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

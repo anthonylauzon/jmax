@@ -286,9 +286,9 @@ biquad_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(biquad_t), 6, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, biquad_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, biquad_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, biquad_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, biquad_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, biquad_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, biquad_put);
   
   fts_method_define_varargs(cl, 1, fts_s_float, biquad_set_coef_a0);
   fts_method_define_varargs(cl, 2, fts_s_float, biquad_set_coef_a1);
@@ -308,7 +308,7 @@ biquad_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

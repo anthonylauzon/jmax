@@ -1284,8 +1284,7 @@ fts_bmax_file_open( fts_bmax_file_t *f, const char *name, int dobackup, fts_symb
 }
 
 
-void 
-fts_bmax_file_sync( fts_bmax_file_t *f)
+static void fts_bmax_file_sync( fts_bmax_file_t *f)
 {
   unsigned int i;
   char c;
@@ -1327,7 +1326,6 @@ fts_bmax_file_sync( fts_bmax_file_t *f)
 void fts_bmax_file_close( fts_bmax_file_t *f)
 {
   fts_bmax_file_sync( f);
-
   fclose( f->file);
 }
 
@@ -1821,7 +1819,7 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
   if(fts_is_void(&a) || (fts_is_symbol(&a) && fts_get_symbol(&a) == fts_s_yes))
     {
       fts_set_object(&a, (fts_object_t *)saver_dumper);
-      fts_send_message(obj, fts_SystemInlet, fts_s_dump, 1, &a);
+      fts_send_message(obj, fts_system_inlet, fts_s_dump, 1, &a);
     }
 }
 
@@ -2116,7 +2114,7 @@ saver_dumper_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   saver_dumper_t *this = (saver_dumper_t *)o;
   
   fts_bmax_code_push_atoms(this->file, ac, at);
-  fts_bmax_code_obj_mess(this->file, fts_SystemInlet, s, ac);
+  fts_bmax_code_obj_mess(this->file, fts_system_inlet, s, ac);
   fts_bmax_code_pop_args(this->file, ac);
 }
 
@@ -2137,10 +2135,10 @@ saver_dumper_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(saver_dumper_t), 0, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, saver_dumper_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, saver_dumper_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, saver_dumper_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, saver_dumper_delete);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

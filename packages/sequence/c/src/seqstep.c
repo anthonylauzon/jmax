@@ -286,8 +286,8 @@ seqstep_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(seqstep_t), 2, 2, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqstep_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqstep_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, seqstep_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, seqstep_delete);
   
   fts_method_define_varargs(cl, 0, fts_new_symbol("goto"), seqstep_goto);
   fts_method_define_varargs(cl, 0, fts_new_symbol("reset"), seqstep_reset);
@@ -296,7 +296,7 @@ seqstep_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, 1, seqsym_track, seqstep_set_reference);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

@@ -181,7 +181,6 @@ extern void fts_bmax_code_return(fts_bmax_file_t *f);
 extern void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx);
 
 extern int fts_bmax_file_open( fts_bmax_file_t *f, const char *name, int dobackup, fts_symbol_t *symbol_table, int symbol_table_size);
-extern void fts_bmax_file_sync( fts_bmax_file_t *f);
 extern void fts_bmax_file_close( fts_bmax_file_t *f);
 
 extern void fts_save_patcher_as_bmax( fts_symbol_t file, fts_object_t *patcher);

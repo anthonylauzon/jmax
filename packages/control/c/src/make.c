@@ -118,7 +118,7 @@ make_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(make_t), 2, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, make_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, make_init);
 
   fts_method_define_varargs(cl, 0, fts_s_int, make_args);
   fts_method_define_varargs(cl, 0, fts_s_float, make_args);
@@ -128,7 +128,7 @@ make_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 1, fts_s_symbol, make_set_classname);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

@@ -244,15 +244,15 @@ xypad_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(xypad_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, xypad_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, xypad_dump);  
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, xypad_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, xypad_dump);  
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, xypad_send_properties); 
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_setXMinValue, xypad_set_xminvalue); 
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_setXMaxValue, xypad_set_xmaxvalue); 
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_setYMinValue, xypad_set_yminvalue); 
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_setYMaxValue, xypad_set_ymaxvalue); 
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_position, xypad_set_couple); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_properties, xypad_send_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, sym_setXMinValue, xypad_set_xminvalue); 
+  fts_method_define_varargs(cl, fts_system_inlet, sym_setXMaxValue, xypad_set_xmaxvalue); 
+  fts_method_define_varargs(cl, fts_system_inlet, sym_setYMinValue, xypad_set_yminvalue); 
+  fts_method_define_varargs(cl, fts_system_inlet, sym_setYMaxValue, xypad_set_ymaxvalue); 
+  fts_method_define_varargs(cl, fts_system_inlet, sym_position, xypad_set_couple); 
 
   fts_method_define_varargs(cl, 0, fts_s_set, xypad_set);
   fts_method_define_varargs(cl, 0, fts_s_bang, xypad_bang);
@@ -260,7 +260,7 @@ xypad_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_outlet_type_define_varargs(cl, 0, fts_s_list);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

@@ -103,10 +103,10 @@ message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(fts_message_t), 0, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, message_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, message_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, message_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, message_delete);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void
@@ -186,7 +186,7 @@ fts_send_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_class_t *cl = o->head.cl;
   int anything;
 
-  if (winlet == fts_SystemInlet)
+  if (winlet == fts_system_inlet)
     in = cl->sysinlet;
   else if (winlet < cl->ninlets && winlet >= 0)
     in = &cl->inlets[winlet];
@@ -201,7 +201,7 @@ fts_send_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       (*mess->mth)(o, winlet, s, ac, at);
       FTS_OBJSTACK_POP(o);
 
-      return fts_Success;
+      return fts_ok;
     }
 
   return &fts_MethodNotFound;
@@ -217,7 +217,7 @@ fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   fts_class_mess_t **messtable;
   int i;
 
-  if (winlet == fts_SystemInlet)
+  if (winlet == fts_system_inlet)
     in = cl->sysinlet;
   else if (winlet < cl->ninlets && winlet >= 0)
     in = &cl->inlets[winlet];
@@ -264,7 +264,7 @@ fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
       (*mess->mth)(o, winlet, s, ac, at);
       FTS_OBJSTACK_POP(o);
 
-      return fts_Success;
+      return fts_ok;
     }
   else
     {
@@ -320,7 +320,7 @@ fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s,
       }
   }
 
-  return fts_Success;
+  return fts_ok;
 }
 
 

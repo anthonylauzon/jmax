@@ -228,9 +228,9 @@ vd_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(vd_t), 2, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, vd_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, vd_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, vd_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, vd_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, vd_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, vd_put);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_inlet(cl, 1); 
@@ -245,7 +245,7 @@ vd_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   vd_miller_dsp_symbol = fts_new_symbol("vd_miller");
   fts_dsp_declare_function(vd_miller_dsp_symbol, ftl_vd_miller);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

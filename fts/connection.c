@@ -105,7 +105,7 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
   /* find the outlet and the inlet in the class structure */
   outlet = &src->head.cl->outlets[woutlet];
 
-  if (winlet == fts_SystemInlet)
+  if (winlet == fts_system_inlet)
     inlet = dst->head.cl->sysinlet;
   else if (winlet < dst->head.cl->ninlets && winlet >= 0)
     inlet = &dst->head.cl->inlets[winlet];
@@ -372,7 +372,7 @@ connection_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(fts_connection_t), 0, 0, 0); 
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /***********************************************************************

@@ -205,11 +205,11 @@ alsarawmidiport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_midiport_class_init(cl);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, alsarawmidiport_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, alsarawmidiport_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, alsarawmidiport_select);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, alsarawmidiport_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, alsarawmidiport_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_sched_ready, alsarawmidiport_select);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void 

@@ -23,8 +23,7 @@
 #ifndef _FTS_PRIVATE_TEMPLATE_H_
 #define _FTS_PRIVATE_TEMPLATE_H_
 
-struct fts_template
-{
+struct fts_template {
   fts_symbol_t name;
   fts_symbol_t filename;
   fts_symbol_t original_filename;

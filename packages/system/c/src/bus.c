@@ -178,8 +178,8 @@ throw_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
 	  fts_class_init(cl, sizeof(access_t), n_channels + 1, 0, 0);
 	  
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, throw_init);
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, throw_delete);
+	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, throw_init);
+	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, throw_delete);
 	  
 	  for(i=0; i<n_channels; i++)
 	    fts_method_define_varargs(cl, i, fts_s_anything, throw_bus_input);
@@ -191,14 +191,14 @@ throw_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	  /* channel */
 	  fts_class_init(cl, sizeof(access_t), 2, 0, 0);
 	  
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, throw_init);
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, throw_delete);
+	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, throw_init);
+	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, throw_delete);
 	  
 	  fts_method_define_varargs(cl, 0, fts_s_anything, throw_channel_input);
 	  fts_method_define_varargs(cl, 1, fts_s_int, throw_set_channel);
 	}
 
-      return fts_Success;
+      return fts_ok;
     }
   else
     return &fts_CannotInstantiate;
@@ -291,8 +291,8 @@ catch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
 	  fts_class_init(cl, sizeof(access_t), 1, n_channels, 0);
 	  
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, catch_init);
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, catch_delete);
+	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, catch_init);
+	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, catch_delete);
 	  
 	  fts_method_define_varargs(cl, 0, bus_symbol, catch_set_bus);
 	}
@@ -301,13 +301,13 @@ catch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	  /* channel */
 	  fts_class_init(cl, sizeof(access_t), 1, 1, 0);
 	  
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, catch_init);
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, catch_delete);
+	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, catch_init);
+	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, catch_delete);
 	  
 	  fts_method_define_varargs(cl, 0, fts_s_int, catch_set_channel);
 	}
 
-      return fts_Success;
+      return fts_ok;
     }
   else
     return &fts_CannotInstantiate;
@@ -379,15 +379,15 @@ bus_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(bus_t), n_channels, n_channels, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, bus_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, bus_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, bus_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, bus_delete);
 
   for(i=0; i<n_channels; i++)
     fts_method_define_varargs(cl, i, fts_s_anything, bus_input);
 	  
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, bus_get_state);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

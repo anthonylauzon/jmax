@@ -101,14 +101,14 @@ static fts_status_t udp_instantiate(fts_class_t *cl, int ac, const fts_atom_t *a
 {
   fts_class_init( cl, sizeof( udp_t), 0, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, udp_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, udp_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, udp_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, udp_delete);
 
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_sched_ready, udp_receive);
+  fts_method_define_varargs( cl, fts_system_inlet, fts_s_sched_ready, udp_receive);
 
   fts_outlet_type_define_varargs( cl, 0, fts_s_int);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void udp_config( void)

@@ -391,8 +391,8 @@ getval_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(getval_t), 2, 1, 0); 
       
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getval_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getval_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getval_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getval_delete);
       
       fts_method_define_varargs(cl, 0, fts_s_bang, getval_bang);
       fts_method_define_varargs(cl, 0, value_symbol, getval_value);
@@ -402,7 +402,7 @@ getval_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else
     return &fts_CannotInstantiate;
   
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t
@@ -412,8 +412,8 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(getelem_vec_t), 2, 1, 0); 
       
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getelem_vec_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getval_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getelem_vec_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getval_delete);
       
       fts_method_define_varargs(cl, 0, fts_s_bang, getelem_vec);
       fts_method_define_varargs(cl, 0, fts_s_int, getelem_vec_index);
@@ -425,8 +425,8 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(getelem_vec_t), 2, 1, 0); 
       
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getelem_vec_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getval_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getelem_vec_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getval_delete);
       
       fts_method_define_varargs(cl, 0, fts_s_bang, getelem_ivec);
       fts_method_define_varargs(cl, 0, fts_s_int, getelem_ivec_index);
@@ -438,8 +438,8 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(getelem_vec_t), 2, 1, 0); 
       
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getelem_vec_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getval_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getelem_vec_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getval_delete);
       
       fts_method_define_varargs(cl, 0, fts_s_bang, getelem_fvec);
       fts_method_define_varargs(cl, 0, fts_s_int, getelem_fvec_index);
@@ -452,8 +452,8 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_class_init(cl, sizeof(getelem_mat_t), 3, 1, 0);
       
       /* init/delete */
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getelem_mat_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getval_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getelem_mat_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getval_delete);
       
       fts_method_define_varargs(cl, 0, fts_s_bang, getelem_mat);
       fts_method_define_varargs(cl, 0, fts_s_int, getelem_mat_row);
@@ -467,7 +467,7 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else
     return &fts_CannotInstantiate;
   
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t
@@ -477,8 +477,8 @@ setval_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(getval_t), 2, 0, 0);
   
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getval_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getval_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getval_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getval_delete);
       
       fts_method_define_varargs(cl, 0, fts_s_anything, setval_value);
       
@@ -487,7 +487,7 @@ setval_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else
     return &fts_CannotInstantiate;
     
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t
@@ -497,8 +497,8 @@ setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(getelem_vec_t), 3, 0, 0); 
       
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getelem_vec_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getval_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getelem_vec_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getval_delete);
 	  
       fts_method_define_varargs(cl, 0, fts_s_anything, setelem_vec);
 
@@ -511,8 +511,8 @@ setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(getelem_vec_t), 3, 0, 0); 
       
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getelem_vec_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getval_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getelem_vec_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getval_delete);
 	  
       fts_method_define_varargs(cl, 0, fts_s_int, setval_ivec);
       fts_method_define_varargs(cl, 0, fts_s_float, setval_ivec);
@@ -526,8 +526,8 @@ setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(getelem_vec_t), 3, 0, 0); 
       
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getelem_vec_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getval_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getelem_vec_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getval_delete);
 	  
       fts_method_define_varargs(cl, 0, fts_s_int, setval_fvec);
       fts_method_define_varargs(cl, 0, fts_s_float, setval_fvec);
@@ -541,8 +541,8 @@ setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(getelem_mat_t), 4, 0, 0); 
       
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getelem_mat_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getval_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getelem_mat_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getval_delete);
       
       fts_method_define_varargs(cl, 0, fts_s_anything, setelem_mat);
       
@@ -557,7 +557,7 @@ setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else
     return &fts_CannotInstantiate;
   
-  return fts_Success;
+  return fts_ok;
 }
 
 /**********************************************************
@@ -677,8 +677,8 @@ getmess_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(getmess_t), 2, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getmess_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getmess_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getmess_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getmess_delete);
   
   fts_method_define_varargs(cl, 0, fts_s_bang, getmess_output);
   fts_method_define_varargs(cl, 0, fts_s_int, getmess_set_key_and_output);
@@ -686,7 +686,7 @@ getmess_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, 1, dict_symbol, getmess_set_reference);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t
@@ -694,8 +694,8 @@ putmess_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(getmess_t), 3, 0, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getmess_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getmess_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getmess_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getmess_delete);
   
   fts_method_define_varargs(cl, 0, fts_s_int, putmess_atoms);
   fts_method_define_varargs(cl, 0, fts_s_float, putmess_atoms);
@@ -708,7 +708,7 @@ putmess_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 2, dict_symbol, getmess_set_reference);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

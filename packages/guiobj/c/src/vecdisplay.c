@@ -428,16 +428,16 @@ vecdisplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(vecdisplay_t), 1, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, vecdisplay_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, vecdisplay_init);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, vecdisplay_dump);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, vecdisplay_dump);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, vecdisplay_send_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_properties, vecdisplay_send_properties); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_size, vecdisplay_set_size_by_client);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("range"), vecdisplay_set_range_by_client);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_size, vecdisplay_set_size_by_client);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("range"), vecdisplay_set_range_by_client);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_bounds, vecdisplay_set_bounds);
+  fts_method_define_varargs(cl, fts_system_inlet, sym_bounds, vecdisplay_set_bounds);
 
   fts_method_define_varargs(cl, 0, sym_bounds, vecdisplay_set_bounds);
   
@@ -449,7 +449,7 @@ vecdisplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, cvec_symbol, vecdisplay_cvec);
   fts_method_define_varargs(cl, 0, fts_s_clear, vecdisplay_clear);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void 

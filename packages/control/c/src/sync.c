@@ -261,7 +261,7 @@ sync_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(sync_t), n, n, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sync_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sync_init);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("trigger"), sync_set_trigger_prop);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("require"), sync_set_require_prop);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("mode"), sync_set_mode_prop);
@@ -269,7 +269,7 @@ sync_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   for(i=0; i<n; i++)
     fts_method_define_varargs(cl, i, fts_s_anything, sync_input);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

@@ -309,7 +309,7 @@ static fts_status_t decrypt_instantiate( fts_class_t *cl, int ac, const fts_atom
 {
   fts_class_init(cl, sizeof(decrypt_t), 2, 2, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, decrypt_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, decrypt_init);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol( "enable"), decrypt_enable);
   fts_method_define_varargs(cl, 0, fts_new_symbol( "format"), decrypt_format);
@@ -319,7 +319,7 @@ static fts_status_t decrypt_instantiate( fts_class_t *cl, int ac, const fts_atom
 
   fts_method_define_varargs(cl, 1, fts_s_int, decrypt_chn);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 

@@ -115,7 +115,7 @@ ibinop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t b
 {
   fts_class_init(cl, sizeof(ibinop_t), 2, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, ibinop_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, ibinop_init);
 
   fts_method_define_varargs(cl, 0, fts_s_set, ibinop_set_left);
 
@@ -130,7 +130,7 @@ ibinop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t b
 
   fts_outlet_type_define_varargs(cl, 0, fts_s_int);
       
-  return fts_Success;
+  return fts_ok;
 }
 
 
@@ -196,7 +196,7 @@ fbinop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t b
 {
   fts_class_init(cl, sizeof(fbinop_t), 2, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fbinop_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fbinop_init);
 
   fts_method_define_varargs(cl, 0, fts_s_set, fbinop_set_left);
 
@@ -215,7 +215,7 @@ fbinop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t b
   else
     fts_outlet_type_define_varargs(cl, 0, fts_s_float);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 
@@ -277,7 +277,7 @@ sbinop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t b
     {
       fts_class_init(cl, sizeof(sbinop_t), 2, 1, 0);
 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sbinop_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sbinop_init);
 
       fts_method_define_varargs(cl, 0, fts_s_bang, bang_meth);
       fts_method_define_varargs(cl, 0, fts_s_set, sbinop_set_left);
@@ -289,7 +289,7 @@ sbinop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t b
 
       fts_outlet_type_define_varargs(cl, 0, fts_s_int);
       
-      return fts_Success;
+      return fts_ok;
     }
   else
     return &fts_CannotInstantiate;

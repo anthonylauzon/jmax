@@ -619,9 +619,9 @@ env_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(env_t), 2, 2, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, env_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, env_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, env_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, env_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, env_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, env_put);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("mode"), env_set_mode);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("mode"), env_set_mode_prop);
@@ -642,7 +642,7 @@ env_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_dsp_declare_outlet(cl, 0);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

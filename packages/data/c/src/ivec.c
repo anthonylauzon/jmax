@@ -1093,19 +1093,19 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_init(cl, sizeof(ivec_t), 1, 1, 0);
   
   /* init / delete */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, ivec_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, ivec_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, ivec_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, ivec_delete);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, ivec_print); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, ivec_print); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, ivec_set_elements);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_instance, ivec_set_from_instance);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_array, ivec_set_from_array);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, ivec_set_elements);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_instance, ivec_set_from_instance);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_array, ivec_set_from_array);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_size, ivec_size);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_size, ivec_size);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, ivec_get_array);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, ivec_dump);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, ivec_get_array);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, ivec_dump);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("reverse"), ivec_reverse);
   fts_method_define_varargs(cl, 0, fts_new_symbol("rotate"), ivec_rotate);
@@ -1130,23 +1130,23 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_print, ivec_print); 
 
       /* graphical editor */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, ivec_open_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_closeEditor, ivec_close_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_destroyEditor, ivec_destroy_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_from_client"), ivec_set_elements);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_from_client"), ivec_get_to_client);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_pixels_from_client"), ivec_get_pixels_to_client);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_visible_window"), ivec_set_visible_window);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("end_edit"), ivec_end_edit);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("copy_from_client"), ivec_copy_by_client_request);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("paste_from_client"), ivec_paste_by_client_request);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("cut_from_client"), ivec_cut_by_client_request);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("insert_from_client"), ivec_insert_by_client_request);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_openEditor, ivec_open_editor);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_closeEditor, ivec_close_editor);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_destroyEditor, ivec_destroy_editor);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("set_from_client"), ivec_set_elements);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("get_from_client"), ivec_get_to_client);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("get_pixels_from_client"), ivec_get_pixels_to_client);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("set_visible_window"), ivec_set_visible_window);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("end_edit"), ivec_end_edit);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("copy_from_client"), ivec_copy_by_client_request);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("paste_from_client"), ivec_paste_by_client_request);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("cut_from_client"), ivec_cut_by_client_request);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("insert_from_client"), ivec_insert_by_client_request);
 
   /* type outlet */
   fts_outlet_type_define(cl, 0, ivec_symbol, 1, &ivec_symbol);      
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /********************************************************************

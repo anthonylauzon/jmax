@@ -63,9 +63,9 @@ fork_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_init(cl, sizeof(fts_object_t), 1, n_outs, 0);
   fts_method_define_varargs(cl, 0, fts_s_anything, fork_input);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_outlets"), fork_set_outlets);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("set_outlets"), fork_set_outlets);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void fork_config(void)

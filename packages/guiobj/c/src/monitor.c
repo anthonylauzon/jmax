@@ -122,12 +122,12 @@ monitor_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(monitor_t), 2, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, monitor_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, monitor_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, monitor_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, monitor_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, monitor_send_ui_properties); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, monitor_send_ui_properties); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_bang, monitor_bang);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_properties, monitor_send_ui_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_ui_properties, monitor_send_ui_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_bang, monitor_bang);
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, monitor_get_value);
 
@@ -139,7 +139,7 @@ monitor_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_define_thru(cl, monitor_propagate_input);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void 

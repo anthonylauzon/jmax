@@ -56,7 +56,7 @@ bangbang_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   for (i = 0; i < noutlets; i++)
     fts_outlet_type_define(cl, i, fts_s_bang, 0, 0);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

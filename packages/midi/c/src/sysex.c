@@ -84,12 +84,12 @@ sysexin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(sysex_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sysexin_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sysexin_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sysexin_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sysexin_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_midievent, sysexin_output);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 /************************************************************
@@ -142,14 +142,14 @@ static fts_status_t
 sysexout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(sysex_t), 1, 1, 0);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sysexout_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sysexout_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sysexout_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sysexout_delete);
   
   fts_method_define_varargs(cl, 0, fts_s_int, sysexout_send);
   fts_method_define_varargs(cl, 0, fts_s_float, sysexout_send);
   fts_method_define_varargs(cl, 0, fts_s_list, sysexout_send);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

@@ -583,7 +583,7 @@ static void messbox_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 {
   messbox_t *this = (messbox_t *) o;
 
-  fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, fts_s_delete, 0, 0);
+  fts_send_message((fts_object_t *)this->atom_list, fts_system_inlet, fts_s_delete, 0, 0);
 }
 
 
@@ -809,24 +809,24 @@ static fts_status_t messbox_instantiate(fts_class_t *cl, int ac, const fts_atom_
 {
   fts_class_init(cl, sizeof(messbox_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, messbox_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, messbox_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, messbox_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, messbox_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, messbox_set);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, messbox_set);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find, messbox_find);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_bang, messbox_eval_and_update);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_find, messbox_find);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_bang, messbox_eval_and_update);
 
   /* Atom list saving/loading/update support */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, messbox_upload);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append,  messbox_append_noupdate);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear,  messbox_clear_noupdate);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_upload, messbox_upload);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_append,  messbox_append_noupdate);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_clear,  messbox_clear_noupdate);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, messbox_dump);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, messbox_save_dotpat); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, messbox_dump);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save_dotpat, messbox_save_dotpat); 
 
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_send_properties, messbox_send_properties); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_spost_description, messbox_spost_description); 
+  fts_method_define_varargs( cl, fts_system_inlet, fts_s_send_properties, messbox_send_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_spost_description, messbox_spost_description); 
 
   fts_method_define_varargs(cl, 0, fts_s_bang, messbox_eval);
   fts_method_define_varargs(cl, 0, fts_s_int, messbox_eval);
@@ -840,7 +840,7 @@ static fts_status_t messbox_instantiate(fts_class_t *cl, int ac, const fts_atom_
   /* value daemons */
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, messbox_get_value);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void messbox_config(void)

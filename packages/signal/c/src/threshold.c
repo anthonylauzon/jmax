@@ -255,9 +255,9 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_init(cl, sizeof(threshold_t), 5, 2, 0);
 
   /* system methods */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, threshold_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, threshold_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, threshold_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, threshold_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, threshold_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, threshold_put);
   
   /* user methods */  
   fts_method_define_varargs(cl, 0, fts_s_int, threshold_status_int);
@@ -282,7 +282,7 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_outlet_type_define_varargs(cl, 0, fts_s_bang);
   fts_outlet_type_define_varargs(cl, 1, fts_s_bang);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

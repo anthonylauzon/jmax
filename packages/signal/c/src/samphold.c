@@ -138,9 +138,9 @@ samphold_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(samphold_t), 2, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, samphold_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, samphold_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, samphold_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, samphold_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, samphold_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, samphold_put);
   
   fts_method_define_varargs(cl, 0, fts_s_float, samphold_number);
   fts_method_define_varargs(cl, 0, fts_s_int, samphold_number);
@@ -150,7 +150,7 @@ samphold_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_dsp_declare_inlet(cl, 1);
   fts_dsp_declare_outlet(cl, 0);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

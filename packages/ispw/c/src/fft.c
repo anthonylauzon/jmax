@@ -482,15 +482,15 @@ fft_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     }
 
   /* ... but everyone has these */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fft_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fft_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, fft_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fft_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fft_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, fft_put);
   
   /* user methods */
   fts_method_define_varargs(cl, 0, fts_s_bang, fft_bang);
   fts_method_define_varargs(cl, 0, fts_new_symbol("setphase"), fft_setphase);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t
@@ -541,9 +541,9 @@ ifft_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     }
 
   /* ... but everyone has these */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fft_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fft_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, ifft_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fft_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fft_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, ifft_put);
 
   /* user methods */
   fts_method_define_varargs(cl, 0, fts_s_bang, fft_bang);
@@ -552,7 +552,7 @@ ifft_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* bang outlet */
   fts_outlet_type_define_varargs(cl, bang_out, fts_s_bang);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 static int

@@ -65,8 +65,8 @@
  * An example of use:
  * In class instantiation:
  * <TT>
- * fts_method_define( cl, fts_SystemInlet, fts_s_sched_ready, mth_ready);
- * fts_method_define( cl, fts_SystemInlet, fts_s_sched_error, mth_error);
+ * fts_method_define( cl, fts_system_inlet, fts_s_sched_ready, mth_ready);
+ * fts_method_define( cl, fts_system_inlet, fts_s_sched_error, mth_error);
  * </TT>
  * In init method:
  * <TT>

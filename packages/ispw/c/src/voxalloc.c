@@ -236,8 +236,8 @@ voxalloc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else
     fts_class_init(cl, sizeof(voxalloc_t), 1, 2, 0); /* no dur inlet */
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, voxalloc_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, voxalloc_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, voxalloc_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, voxalloc_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, voxalloc_bang);
   fts_method_define_varargs(cl, 0, fts_new_symbol("used"), voxalloc_used);
@@ -256,7 +256,7 @@ voxalloc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_outlet_type_define_varargs(cl, 0,	fts_s_bang);
   fts_outlet_type_define_varargs(cl, 1,	fts_s_int);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 	

@@ -195,16 +195,16 @@ button_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(button_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, button_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, button_init);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, button_send_properties); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, button_send_ui_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_properties, button_send_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_ui_properties, button_send_ui_properties); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_color, button_set_color); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_flash, button_set_flash); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_color, button_set_color); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_flash, button_set_flash); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, button_save_dotpat); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_bang, button_on);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save_dotpat, button_save_dotpat); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_bang, button_on);
 
   fts_method_define_varargs(cl, 0, fts_s_anything, button_on);
 
@@ -214,7 +214,7 @@ button_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_outlet_type_define_varargs(cl, 0, fts_s_bang);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 

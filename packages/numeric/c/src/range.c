@@ -202,8 +202,8 @@ range_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(range_t), n + 1, n + 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, range_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, range_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, range_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, range_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_int, range_int);
   fts_method_define_varargs(cl, 0, fts_s_float, range_float);
@@ -214,7 +214,7 @@ range_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, i + 1, fts_s_float, range_point);
     }
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

@@ -351,8 +351,8 @@ tup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(tup_t), n, 1, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, tup_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, tup_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, tup_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tup_delete);
 
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("trigger"), tup_set_trigger_prop);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("require"), tup_set_require_prop);
@@ -370,7 +370,7 @@ tup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, i, fts_s_anything, tup_input_anything);
     }
 
-  return fts_Success;
+  return fts_ok;
 }
 
 static int
@@ -460,7 +460,7 @@ untup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(untup_t), 1, n, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, untup_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, untup_init);
 
   fts_method_define_varargs(cl, 0, fts_s_int, untup_input_primitive);
   fts_method_define_varargs(cl, 0, fts_s_float, untup_input_primitive);
@@ -468,7 +468,7 @@ untup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_anything, untup_input_anything);
   fts_method_define_varargs(cl, 0, fts_s_list, untup_input_atoms);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /************************************************
@@ -573,8 +573,8 @@ cotup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(cotup_t), 1, 1, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, cotup_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, cotup_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, cotup_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, cotup_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_set, cotup_set);
   fts_method_define_varargs(cl, 0, fts_s_bang, cotup_output);
@@ -587,7 +587,7 @@ cotup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_list, cotup_append_atoms);
   fts_method_define_varargs(cl, 0, fts_s_anything, cotup_append_anything);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /************************************************
@@ -634,7 +634,7 @@ detup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_anything, detup_input_anything);
   fts_method_define_varargs(cl, 0, fts_s_list, detup_input_atoms);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /************************************************
@@ -677,7 +677,7 @@ getup_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	  getup_t *this = (getup_t *)o;
 	  fts_object_t *input = fts_get_object(at);
 	  fts_class_t *class = fts_object_get_class(input);
-	  fts_method_t method = fts_class_get_method(class, fts_SystemInlet, fts_s_get_array);
+	  fts_method_t method = fts_class_get_method(class, fts_system_inlet, fts_s_get_array);
 	  
 	  if(method)
 	    {
@@ -710,12 +710,12 @@ getup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(getup_t), 1, 1, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getup_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getup_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getup_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getup_delete);
   
   fts_method_define_varargs(cl, 0, fts_s_anything, getup_input);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 /************************************************

@@ -20,15 +20,6 @@
  * 
  */
 
-/* Define TRACE_DEBUG to get some debug printing during object creation.  */
-
-/* #define TRACE_DEBUG */
-
-#ifdef TRACE_DEBUG
-unsigned int debugid = 0;
-#endif
-
-
 #include <stdarg.h>
 
 #include <fts/fts.h>
@@ -72,9 +63,6 @@ fts_object_create(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
       
       obj->head.cl = cl;
       obj->head.id = FTS_NO_ID;
-      obj->properties = 0;
-      obj->varname = 0;
-      obj->refcnt = 0;
       
       if (cl->noutlets)
 	obj->out_conn = (fts_connection_t **) fts_zalloc(cl->noutlets * sizeof(fts_connection_t *));
@@ -83,7 +71,7 @@ fts_object_create(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
 	obj->in_conn = (fts_connection_t **) fts_zalloc(cl->ninlets * sizeof(fts_connection_t *));
       
       if(fts_class_get_constructor(cl))
-	fts_class_get_constructor(cl)(obj, fts_SystemInlet, fts_s_init, ac, at); 
+	fts_class_get_constructor(cl)(obj, fts_system_inlet, fts_s_init, ac, at); 
     }
 
   return obj;
@@ -137,13 +125,6 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
   obj->patcher = patcher;
   obj->head.cl = cl;
   obj->head.id = FTS_NO_ID;
-  obj->properties = 0;
-  obj->varname = 0;
-  obj->refcnt = 0;
-
-#ifdef TRACE_DEBUG
-  fts_log("[object]: p=0x%p,id=%05d,op=alloc,class=%s\n", obj, debugid++, fts_object_get_class_name(obj));
-#endif
 
   if (cl->noutlets)
     obj->out_conn = (fts_connection_t **) fts_zalloc(cl->noutlets * sizeof(fts_connection_t *));
@@ -152,7 +133,7 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
     obj->in_conn = (fts_connection_t **) fts_zalloc(cl->ninlets * sizeof(fts_connection_t *));
     
   if(fts_class_get_constructor(cl))
-    fts_class_get_constructor(cl)(obj, fts_SystemInlet, fts_s_init, ac - 1, at + 1);
+    fts_class_get_constructor(cl)(obj, fts_system_inlet, fts_s_init, ac - 1, at + 1);
 
   error = fts_object_get_error(obj);
   
@@ -171,7 +152,7 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
   fts_object_refer(obj);
 
   *ret = obj;
-  return fts_Success;
+  return fts_ok;
 }
 
 /* create an object in a patcher, appling all the expression/object semantic */
@@ -349,7 +330,7 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
 
       ret = fts_object_new_to_patcher(patcher, ac, at, &obj);
 
-      if (ret != fts_Success)
+      if (ret != fts_ok)
 	{
 	  /* Standard FTS instantiation error  */
 	  if (ret == &fts_CannotInstantiate)
@@ -524,11 +505,6 @@ fts_object_unclient(fts_object_t *obj)
 static void 
 fts_object_free(fts_object_t *obj)
 {
-
-#ifdef TRACE_DEBUG
-  fts_log("[object]: p=0x%p,id=%05d,op=free,class=%s\n", obj, debugid++, fts_object_get_class_name(obj));
-#endif
-
   /* free the object properties */
   fts_properties_free(obj);
 
@@ -552,7 +528,7 @@ fts_object_destroy(fts_object_t *obj)
 {
   /* call deconstructor */
   if(fts_class_get_deconstructor(fts_object_get_class(obj)))
-    fts_class_get_deconstructor(fts_object_get_class(obj))(obj, fts_SystemInlet, fts_s_delete, 0, 0);
+    fts_class_get_deconstructor(fts_object_get_class(obj))(obj, fts_system_inlet, fts_s_delete, 0, 0);
 
   /* take the object away from the update queue (if there) and free it */
   fts_object_reset_changed(obj);
@@ -581,7 +557,7 @@ fts_object_delete_from_patcher(fts_object_t *obj)
 
   /* call deconstructor */
   if(obj->refcnt == 0 && fts_class_get_deconstructor(fts_object_get_class(obj)))
-    fts_class_get_deconstructor(fts_object_get_class(obj))(obj, fts_SystemInlet, fts_s_delete, 0, 0);
+    fts_class_get_deconstructor(fts_object_get_class(obj))(obj, fts_system_inlet, fts_s_delete, 0, 0);
 
   /* remove from patcher */
   if(obj->patcher)
@@ -629,11 +605,6 @@ fts_object_recompute(fts_object_t *old)
     obj = (fts_object_t *) fts_patcher_redefine((fts_patcher_t *) old, old->argc, old->argv);
   else
     {
-      /* If we have an object with data, data must be released,
-	 because the object will be deleted */
-	/*if (old->head.id > FTS_NO_ID)
-	  fts_client_release_object_data(old);*/
-
       obj = fts_object_redefine(old, old->argc, old->argv);
 
       /* Error property handling; currently it is a little bit
@@ -670,7 +641,7 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
       
       /* call deconstructor */
       if(old->refcnt == 0 && fts_class_get_deconstructor(old->head.cl))
-	fts_class_get_deconstructor(old->head.cl)(old, fts_SystemInlet, fts_s_delete, 0, 0);
+	fts_class_get_deconstructor(old->head.cl)(old, fts_system_inlet, fts_s_delete, 0, 0);
       
       /* make the new object  */
       new = fts_eval_object_description(fts_object_get_patcher(old), ac, at);
@@ -971,7 +942,7 @@ fts_object_send_ui_properties(fts_object_t *obj)
   if (obj->head.id != FTS_NO_ID)
     {
       /* Ask the object to send to the client object specific UI properties */
-      fts_send_message(obj, fts_SystemInlet, fts_s_send_ui_properties, 0, 0);
+      fts_send_message(obj, fts_system_inlet, fts_s_send_ui_properties, 0, 0);
     }
 }
 
@@ -993,7 +964,7 @@ fts_object_send_kernel_properties(fts_object_t *obj)
       fts_object_property_changed(obj, fts_s_error_description);
 
       /* ask the object to send to the client object specific properties */
-      fts_send_message(obj, fts_SystemInlet, fts_s_send_properties, 0, 0);
+      fts_send_message(obj, fts_system_inlet, fts_s_send_properties, 0, 0);
     }
 }
 

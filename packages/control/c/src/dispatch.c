@@ -50,10 +50,10 @@ dispatch_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     {
       fts_object_t *obj = fts_get_object(a);
       fts_class_t *class = fts_object_get_class(obj);
-      fts_method_t method = fts_class_get_method(class, fts_SystemInlet, sym__remote_value);
+      fts_method_t method = fts_class_get_method(class, fts_system_inlet, sym__remote_value);
 
       if(method)
-	method(obj, fts_SystemInlet, sym__remote_value, ac, at);
+	method(obj, fts_system_inlet, sym__remote_value, ac, at);
       else
 	fts_object_signal_runtime_error(o, "cannot dispatch to object %s", s);
     }
@@ -85,7 +85,7 @@ dispatch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_define_thru(cl, dispatch_propagate_input);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

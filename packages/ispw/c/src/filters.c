@@ -347,9 +347,9 @@ sig2p2z_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(sig2p2z_t), 7, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sig2p2z_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sig2p2z_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sig2p2z_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sig2p2z_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sig2p2z_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, sig2p2z_put);
   
   fts_method_define_varargs(cl, 0, fts_s_clear, sig2p2z_state_clear);
 
@@ -372,7 +372,7 @@ sig2p2z_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 static void 

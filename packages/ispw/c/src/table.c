@@ -184,7 +184,7 @@ table_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   table_t *this = (table_t *)o;
   
-  fts_send_message((fts_object_t *)this->vec, fts_SystemInlet, fts_s_save, ac, at);
+  fts_send_message((fts_object_t *)this->vec, fts_system_inlet, fts_s_save, ac, at);
 }
 
 static int 
@@ -345,7 +345,7 @@ table_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   table_t *this = (table_t *)o;
 
   fts_patcher_upload_object(fts_get_root_patcher(), (fts_object_t *)this->vec);
-  fts_send_message((fts_object_t *)this->vec, fts_SystemInlet, fts_s_openEditor, 0, 0);
+  fts_send_message((fts_object_t *)this->vec, fts_system_inlet, fts_s_openEditor, 0, 0);
 }
 
 static fts_status_t
@@ -354,15 +354,15 @@ table_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* table [int] */
   fts_class_init(cl, sizeof(table_t), 2, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, table_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, table_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, table_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, table_delete);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, table_open_editor);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_openEditor, table_open_editor);
   
   /* save/load bmax file if not instantiated with reference */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, table_set_with_onset_from_atoms);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save, table_save);  
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, table_save_dotpat); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, table_set_with_onset_from_atoms);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save, table_save);  
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save_dotpat, table_save_dotpat); 
   
   /* user methods */
   fts_method_define_varargs(cl, 0, fts_s_int, table_index);
@@ -387,7 +387,7 @@ table_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_outlet_type_define_varargs(cl, 0, fts_s_int);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

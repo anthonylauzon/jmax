@@ -84,9 +84,15 @@ typedef struct fts_patlex {
 
 static int unique_count = 3333; /* the unique number generation */
 
-static fts_patlex_t *fts_patlex_open_file(FILE *file, int env_argc, const fts_atom_t *env_argv)
+static fts_patlex_t *fts_patlex_open(const char *filename, int env_argc, const fts_atom_t *env_argv)
 {
   fts_patlex_t *this;
+  FILE *file;
+
+  file  = fopen(filename, "rb");
+
+  if (file == 0)
+    return 0;
 
   this = (fts_patlex_t *) fts_malloc(sizeof(fts_patlex_t));
   this->fd = file;
@@ -96,24 +102,10 @@ static fts_patlex_t *fts_patlex_open_file(FILE *file, int env_argc, const fts_at
   this->unique_var = unique_count++; /* the unique number used in variable  0 substitution */
   this->pushedBack = 0;
   this->lookahead_valid = 0;
-  this->env_argc = env_argc;
-  this->env_argv = env_argv;
   this->buf_fill = 0;
   this->messbox_mode = 0;
 
   return this;
-}
-
-static fts_patlex_t *fts_patlex_open(const char *filename, int env_argc, const fts_atom_t *env_argv)
-{
-  FILE *file;
-
-  file  = fopen(filename, "rb");
-
-  if (file == 0)
-    return 0;
-
-  return fts_patlex_open_file( file, env_argc, env_argv);
 }
 
 static void fts_patlex_close(fts_patlex_t *this)
@@ -591,7 +583,6 @@ static fts_symbol_t patlex_sym_explode;
 static fts_symbol_t patlex_sym_connect;
 static fts_symbol_t patlex_sym_comment;
 static fts_symbol_t patlex_sym_pop;
-static fts_symbol_t patlex_sym_load_init;
 
 /* Forward declarations */
 
@@ -751,8 +742,6 @@ static void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in)
 
   while (in->ttype != FTS_LEX_EOC)
     fts_patlex_next_token(in);
-
-  /*     fts_patlex_next_token(in);  Skip the ';' */
 
   fts_patlex_next_token(in); /* Skip the '#N' */
 
@@ -1334,8 +1323,8 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
       fts_patparse_set_normal_mode(in);
 
       obj = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
-      fts_send_message(obj, fts_SystemInlet, fts_s_clear, 0, 0);
-      fts_send_message(obj, fts_SystemInlet, fts_s_append, argc, description + 1);
+      fts_send_message(obj, fts_system_inlet, fts_s_clear, 0, 0);
+      fts_send_message(obj, fts_system_inlet, fts_s_append, argc, description + 1);
 
       fts_patparse_set_text_graphic_properties(graphicDescr, obj);
     }
@@ -1495,11 +1484,8 @@ fts_object_t *fts_load_dotpat_patcher(fts_object_t *parent, fts_symbol_t filenam
 
       fts_patparse_parse_patlex(patcher, in);
       fts_patlex_close(in);
+
       fts_patcher_reassign_inlets_outlets((fts_patcher_t *) patcher);
-
-      /* activate the post-load init, like loadbangs */
-
-      fts_send_message(patcher, fts_SystemInlet, patlex_sym_load_init, 0, 0);
 
       return patcher;
     }
@@ -1573,5 +1559,4 @@ void fts_kernel_patfile_init()
   patlex_sym_connect = fts_new_symbol("connect");
   patlex_sym_comment = fts_new_symbol("comment");
   patlex_sym_pop = fts_new_symbol("pop");
-  patlex_sym_load_init = fts_new_symbol("load_init");
 }

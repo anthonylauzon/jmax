@@ -124,15 +124,15 @@ iroute_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(iroute_t), 1, ac + 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, iroute_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, iroute_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, iroute_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, iroute_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_int, iroute_int);
   fts_method_define_varargs(cl, 0, fts_s_float, iroute_int);
 
   fts_method_define_varargs(cl, 0, fts_s_list, iroute_list);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /********************************************
@@ -274,8 +274,8 @@ mroute_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(mroute_t), 1, ac + 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, mroute_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, mroute_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, mroute_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, mroute_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, mroute_bang);
   fts_method_define_varargs(cl, 0, fts_s_int, mroute_atom);
@@ -284,7 +284,7 @@ mroute_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_anything, mroute_anything);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t

@@ -489,14 +489,14 @@ midishareport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       
       fts_midiport_class_init(cl);
       
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midishareport_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midishareport_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, midishareport_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midishareport_delete);
 
       fts_method_define_varargs(cl, 0, fts_new_symbol("reset_unused"), midishareport_reset_unused);
     
       fts_class_add_daemon(cl, obj_property_get, fts_s_state, midishareport_get_state);
       
-      return fts_Success;
+      return fts_ok;
     }
      
   return &fts_CannotInstantiate;

@@ -149,8 +149,8 @@ wrap_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(wrap_t), 3, 2, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, wrap_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, wrap_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, wrap_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, wrap_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_int, wrap_number);
   fts_method_define_varargs(cl, 0, fts_s_float, wrap_number);
@@ -161,7 +161,7 @@ wrap_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 2, fts_s_int, wrap_b);
   fts_method_define_varargs(cl, 2, fts_s_float, wrap_b);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

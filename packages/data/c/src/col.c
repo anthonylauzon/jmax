@@ -217,10 +217,10 @@ col_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(col_t), 1, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, col_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, col_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, col_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, col_delete);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, col_print); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, col_print); 
   
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, col_getobj);
   
@@ -234,7 +234,7 @@ col_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* type outlet */
   fts_outlet_type_define(cl, 0, col_symbol, 1, &col_symbol);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

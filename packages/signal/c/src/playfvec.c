@@ -477,9 +477,9 @@ play_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(play_fvec_t), 4, 2, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, play_fvec_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, play_fvec_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, play_fvec_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, play_fvec_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, play_fvec_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, play_fvec_put);
 
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("period"), play_fvec_set_period_prop);
   
@@ -511,7 +511,7 @@ play_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_dsp_declare_function(play_fvec_symbol, play_fvec_ftl);
   fts_dsp_declare_outlet(cl, 0);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

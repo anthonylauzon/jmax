@@ -72,7 +72,7 @@ int fts_atom_compare( const fts_atom_t *p1, const fts_atom_t *p2)
 	  else
 	    {
 	      fts_class_t *class = fts_object_get_class(obj);
-	      fts_method_t meth_compare = fts_class_get_method(class, fts_SystemInlet, fts_s_compare);
+	      fts_method_t meth_compare = fts_class_get_method(class, fts_system_inlet, fts_s_compare);
 	      
 	      meth_compare(obj, 0, 0, 1, p2);
 	      return(fts_get_int(fts_get_return_value()));
@@ -89,23 +89,15 @@ int fts_atom_compare( const fts_atom_t *p1, const fts_atom_t *p2)
  *
  */
 
-/*
- * Note: here, we cheat a little bit by using symbols that are not obtained
- * by fts_new_symbol().
- * BUT: we are guaranteed that s == fts_new_symbol(s) the first time the symbol
- * is searched in the symbol table.
- * Thus it is possible to use directly the string before calling fts_new_symbol()
- * on it.
- */
-static const char void_metaclass_name[] = "__PRIMITIVE_VOID";
-static const char int_metaclass_name[] = "__PRIMITIVE_INT";
-static const char float_metaclass_name[] = "__PRIMITIVE_FLOAT";
-static const char symbol_metaclass_name[] = "__PRIMITIVE_SYMBOL";
-static const char pointer_metaclass_name[] = "__PRIMITIVE_POINTER";
-static const char string_metaclass_name[] = "__PRIMITIVE_STRING";
+#define FTS_TYPEID_VOID     1
+#define FTS_TYPEID_INT      2
+#define FTS_TYPEID_FLOAT    3
+#define FTS_TYPEID_SYMBOL   4
+#define FTS_TYPEID_POINTER  5
+#define FTS_TYPEID_STRING   6
 
 static fts_metaclass_t void_metaclass = {
-  void_metaclass_name,
+  NULL,
   NULL,
   FTS_TYPEID_VOID,
   NULL,
@@ -114,8 +106,9 @@ static fts_metaclass_t void_metaclass = {
   NULL
 }; 
 fts_metaclass_t *fts_t_void = &void_metaclass;
+
 static fts_metaclass_t int_metaclass = { 
-  int_metaclass_name,
+  NULL,
   NULL,
   FTS_TYPEID_INT,
   NULL,
@@ -124,8 +117,9 @@ static fts_metaclass_t int_metaclass = {
   NULL
 }; 
 fts_metaclass_t *fts_t_int = &int_metaclass;
+
 static fts_metaclass_t float_metaclass = { 
-  float_metaclass_name,
+  NULL,
   NULL,
   FTS_TYPEID_FLOAT,
   NULL,
@@ -134,8 +128,9 @@ static fts_metaclass_t float_metaclass = {
   NULL
 }; 
 fts_metaclass_t *fts_t_float = &float_metaclass;
+
 static fts_metaclass_t symbol_metaclass = { 
-  symbol_metaclass_name,
+  NULL,
   NULL,
   FTS_TYPEID_SYMBOL,
   NULL,
@@ -144,8 +139,9 @@ static fts_metaclass_t symbol_metaclass = {
   NULL
 }; 
 fts_metaclass_t *fts_t_symbol = &symbol_metaclass;
+
 static fts_metaclass_t pointer_metaclass = { 
-  pointer_metaclass_name,
+  NULL,
   NULL,
   FTS_TYPEID_POINTER,
   NULL,
@@ -154,8 +150,9 @@ static fts_metaclass_t pointer_metaclass = {
   NULL
 }; 
 fts_metaclass_t *fts_t_pointer = &pointer_metaclass;
+
 static fts_metaclass_t string_metaclass = { 
-  string_metaclass_name,
+  NULL,
   NULL,
   FTS_TYPEID_STRING,
   NULL,
@@ -167,13 +164,6 @@ fts_metaclass_t *fts_t_string = &string_metaclass;
 
 void fts_kernel_atom_init( void)
 {
-  assert( fts_new_symbol( void_metaclass_name) == void_metaclass_name);
-  assert( fts_new_symbol( int_metaclass_name) == int_metaclass_name);
-  assert( fts_new_symbol( float_metaclass_name) == float_metaclass_name);
-  assert( fts_new_symbol( symbol_metaclass_name) == symbol_metaclass_name);
-  assert( fts_new_symbol( pointer_metaclass_name) == pointer_metaclass_name);
-  assert( fts_new_symbol( string_metaclass_name) == string_metaclass_name);
-
   fts_metaclass_set_selector( &int_metaclass, fts_s_int);
   fts_metaclass_set_selector( &float_metaclass, fts_s_float);
   fts_metaclass_set_selector( &symbol_metaclass, fts_s_symbol);

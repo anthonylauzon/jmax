@@ -216,15 +216,15 @@ wave_instantiate_cosine(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(wave_t), 1, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, wave_init_cosine);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, wave_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, wave_init_cosine);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, wave_delete);
       
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("put"), wave_put_cosine);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("put"), wave_put_cosine);
   
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
     
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t
@@ -232,17 +232,17 @@ wave_instantiate_fvec(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(wave_t), 2, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, wave_init_fvec);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, wave_delete_fvec);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, wave_init_fvec);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, wave_delete_fvec);
       
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("put"), wave_put_fvec);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("put"), wave_put_fvec);
   
   fts_method_define_varargs(cl, 1, fvec_symbol, wave_set_fvec);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
     
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t

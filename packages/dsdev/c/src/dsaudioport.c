@@ -589,12 +589,12 @@ dsaudioport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(dsaudioport_t), 0, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, dsaudioport_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, dsaudioport_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, dsaudioport_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, dsaudioport_delete);
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, dsaudioport_get_state);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 static char* 

@@ -70,22 +70,18 @@
 static fts_heap_t *template_heap;
 
 static void fts_template_recompute_instances(fts_template_t *template);
-static fts_template_t *fts_template_for_file(fts_symbol_t filename);
-
-static fts_object_t* 
-fts_make_template_instance(fts_template_t *template, fts_patcher_t *patcher, int ac, const fts_atom_t *at);
+static fts_object_t *fts_make_template_instance(fts_template_t *template, fts_patcher_t *patcher, int ac, const fts_atom_t *at);
 
 /***********************************************************************
  *
  *  Template object functions
  *
  */
-fts_template_t* 
-fts_template_new(fts_symbol_t name, fts_symbol_t filename, fts_symbol_t original_filename)
+
+fts_template_t *fts_template_new(fts_symbol_t name, fts_symbol_t filename, fts_symbol_t original_filename)
 {
   fts_template_t *template;
 
-  /* Make the template */
   template = (fts_template_t *) fts_heap_alloc(template_heap);
 
   template->name = name;
@@ -193,8 +189,7 @@ fts_template_remove_instance(fts_template_t *template, fts_object_t *object)
  *
  */
 
-fts_object_t*
-fts_template_new_declared(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+fts_object_t *fts_template_new_declared( fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
   fts_template_t *template;
   fts_package_t *pkg;

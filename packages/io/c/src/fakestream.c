@@ -137,7 +137,7 @@ fakestream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_bytestream_class_init(cl);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fakestream_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fakestream_init);
   
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, fakestream_get_state);
   
@@ -145,7 +145,7 @@ fakestream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_float, fakestream_float);
   fts_method_define_varargs(cl, 0, fts_s_list, fakestream_list);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

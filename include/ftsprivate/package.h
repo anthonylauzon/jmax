@@ -160,16 +160,6 @@ void fts_package_require(fts_package_t* pkg, fts_symbol_t required_pkg);
 fts_class_t* fts_package_get_class(fts_package_t* pkg, fts_symbol_t name);
 
 /**
- * Defines a new template.
- *
- * @fn void fts_package_add_template(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t file)
- * @param pkg the package
- * @param name the name of the template
- * @param file the file name of the template
- * @ingroup package */
-void fts_package_add_template(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t file);
-
-/**
  * Adds a new path to the template path.
  *
  * @fn void fts_package_add_template_path(fts_package_t* pkg, fts_symbol_t path)

@@ -97,7 +97,7 @@ split_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(split_t), 3, 2, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, split_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, split_init);
 
   fts_method_define_varargs(cl, 0, fts_s_int, split_int);
   fts_method_define_varargs(cl, 0, fts_s_float, split_float);
@@ -110,7 +110,7 @@ split_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_list, split_list);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

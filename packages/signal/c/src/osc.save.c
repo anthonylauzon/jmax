@@ -171,10 +171,10 @@ osc_ctl_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(osc_ctl_t), 2, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, osc_ctl_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, osc_ctl_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, osc_ctl_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, osc_ctl_delete);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("put"), osc_ctl_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("put"), osc_ctl_put);
   
   fts_method_define_varargs(cl, 0, fts_s_int, osc_ctl_set_freq);
   fts_method_define_varargs(cl, 0, fts_s_float, osc_ctl_set_freq);
@@ -186,7 +186,7 @@ osc_ctl_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   sym_osc_ctl = fts_new_symbol("osc_ctl");
   fts_dsp_declare_function(sym_osc_ctl, osc_ctl_ftl);
     
-  return fts_Success;
+  return fts_ok;
 }
 
 /***********************************************************
@@ -318,10 +318,10 @@ osc_sig_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(osc_sig_t), 2, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, osc_sig_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, osc_sig_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, osc_sig_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, osc_sig_delete);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("put"), osc_sig_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("put"), osc_sig_put);
 
   fts_method_define_varargs(cl, 1, fvec_symbol, osc_sig_set_fvec);
 
@@ -331,7 +331,7 @@ osc_sig_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   sym_osc_sig = fts_new_symbol("osc_sig");
   fts_dsp_declare_function(sym_osc_sig, osc_sig_ftl);
     
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t

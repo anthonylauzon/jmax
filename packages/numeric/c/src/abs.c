@@ -65,7 +65,7 @@ abs_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_float, abs_float);
   fts_method_define_varargs(cl, 0, fts_s_list, abs_atoms);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

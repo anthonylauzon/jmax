@@ -132,14 +132,14 @@ static fts_status_t comment_instantiate(fts_class_t *cl, int ac, const fts_atom_
 {
   fts_class_init(cl, sizeof( comment_t), 0, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, comment_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, comment_dump);  
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, comment_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, comment_dump);  
 
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_save_dotpat, comment_save_dotpat); 
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_send_properties, comment_send_properties); 
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_color, comment_set_color); 
+  fts_method_define_varargs( cl, fts_system_inlet, fts_s_save_dotpat, comment_save_dotpat); 
+  fts_method_define_varargs( cl, fts_system_inlet, fts_s_send_properties, comment_send_properties); 
+  fts_method_define_varargs( cl, fts_system_inlet, fts_s_color, comment_set_color); 
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void comment_config(void)

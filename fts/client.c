@@ -271,11 +271,11 @@ static fts_status_t client_manager_instantiate(fts_class_t *cl, int ac, const ft
 {
   fts_class_init( cl, sizeof( client_manager_t), 0, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, client_manager_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, client_manager_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, client_manager_select);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, client_manager_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, client_manager_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_sched_ready, client_manager_select);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /***********************************************************************
@@ -567,7 +567,7 @@ static void end_message_action( unsigned char input, client_t *client)
 
   /* Client messages are sent to the system inlet */
   if (target)
-    fts_send_message( target, fts_SystemInlet, selector, argc, argv);
+    fts_send_message( target, fts_system_inlet, selector, argc, argv);
 
  skipped:
   fts_stack_clear( &client->input_args);
@@ -873,12 +873,6 @@ fts_client_load_patcher(fts_symbol_t file_name, int client_id)
   chdir( dir_name);
 
 
-  /* here finds the file-type if is a jmax_file do 
-     fts_binary_file_load( filename, parent, 0, 0)
-     else if is a dot_pat file do 
-     fts_load_dotpat_patcher(parent, filename)
-  */
-  
   type = ! fts_is_dotpat_file( file_name);
 
   if( type)
@@ -898,7 +892,7 @@ fts_client_load_patcher(fts_symbol_t file_name, int client_id)
   fts_patcher_set_file_name(patcher, file_name);
 
   /* activate the post-load init, like loadbangs */   
-  fts_send_message( (fts_object_t *)patcher, fts_SystemInlet, fts_new_symbol("load_init"), 0, 0);
+  fts_send_message( (fts_object_t *)patcher, fts_system_inlet, fts_new_symbol("load_init"), 0, 0);
 
   fts_set_int(a, fts_get_object_id((fts_object_t *)patcher));
   fts_set_symbol(a+1, file_name);
@@ -906,8 +900,8 @@ fts_client_load_patcher(fts_symbol_t file_name, int client_id)
   fts_client_send_message( (fts_object_t *)client, fts_new_symbol( "patcher_loaded"), 3, a);
 
   /* upload the patcher to the client */
-  fts_send_message( (fts_object_t *)patcher, fts_SystemInlet, fts_s_upload, 0, 0);
-  fts_send_message( (fts_object_t *)patcher, fts_SystemInlet, fts_new_symbol("openEditor"), 0, 0);
+  fts_send_message( (fts_object_t *)patcher, fts_system_inlet, fts_s_upload, 0, 0);
+  fts_send_message( (fts_object_t *)patcher, fts_system_inlet, fts_new_symbol("openEditor"), 0, 0);
 
   fts_log("[patcher]: Finished loading patcher %s\n", file_name);
 
@@ -938,8 +932,8 @@ static void client_load_project( fts_object_t *o, int winlet, fts_symbol_t s, in
       fts_set_int(a, fts_get_object_id( (fts_object_t *)project));
       fts_client_send_message(o, fts_s_project, 1, a);
       
-      fts_send_message( (fts_object_t *)project, fts_SystemInlet, fts_s_upload, 0, 0);
-      fts_send_message( (fts_object_t *)project, fts_SystemInlet, fts_s_openEditor, 0, 0);
+      fts_send_message( (fts_object_t *)project, fts_system_inlet, fts_s_upload, 0, 0);
+      fts_send_message( (fts_object_t *)project, fts_system_inlet, fts_s_openEditor, 0, 0);
     }
 }
 
@@ -969,9 +963,9 @@ static void client_load_package( fts_object_t *o, int winlet, fts_symbol_t s, in
 
 	  fts_set_int(a, fts_get_object_id( (fts_object_t *)package));
 	  fts_client_send_message(o, fts_s_package, 1, a);    
-	  fts_send_message( (fts_object_t *)package, fts_SystemInlet, fts_s_upload, 0, 0);
+	  fts_send_message( (fts_object_t *)package, fts_system_inlet, fts_s_upload, 0, 0);
 	}
-      fts_send_message( (fts_object_t *)package, fts_SystemInlet, fts_s_openEditor, 0, 0);
+      fts_send_message( (fts_object_t *)package, fts_system_inlet, fts_s_openEditor, 0, 0);
     }
 }
 
@@ -1056,7 +1050,7 @@ static void client_get_project( fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_set_int(a, fts_get_object_id( project));
   fts_client_send_message(o, fts_s_project, 1, a);
   
-  fts_send_message( project, fts_SystemInlet, fts_s_upload, 0, 0);
+  fts_send_message( project, fts_system_inlet, fts_s_upload, 0, 0);
 }
 
 static void client_get_midiconfig( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1073,7 +1067,7 @@ static void client_get_midiconfig( fts_object_t *o, int winlet, fts_symbol_t s, 
       fts_set_int(&a, fts_get_object_id(config));
       fts_client_send_message(o, fts_s_midi_config, 1, &a);
       
-      fts_send_message(config, fts_SystemInlet, fts_s_upload, 0, 0);
+      fts_send_message(config, fts_system_inlet, fts_s_upload, 0, 0);
     }
 }
 
@@ -1105,22 +1099,22 @@ static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t
 {
   fts_class_init( cl, sizeof( client_t), 1, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, client_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, client_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, client_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, client_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "get_project"), client_get_project);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_midi_config, client_get_midiconfig);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol( "get_project"), client_get_project);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_midi_config, client_get_midiconfig);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "new_object"), client_new_object);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "set_object_property"), client_set_object_property);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "connect_object"), client_connect_object);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "load"), client_load_patcher_file);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "load_project"), client_load_project);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "load_package"), client_load_package);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol( "new_object"), client_new_object);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol( "set_object_property"), client_set_object_property);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol( "connect_object"), client_connect_object);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol( "load"), client_load_patcher_file);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol( "load_project"), client_load_project);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol( "load_package"), client_load_package);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "shutdown"), client_shutdown);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol( "shutdown"), client_shutdown);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /***********************************************************************
@@ -1272,14 +1266,14 @@ static fts_status_t client_controller_instantiate(fts_class_t *cl, int ac, const
 {
   fts_class_init(cl, sizeof(client_controller_t), 1, 1, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, client_controller_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, client_controller_delete_dummy);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_anything, client_controller_anything_client);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, client_controller_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, client_controller_delete_dummy);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_anything, client_controller_anything_client);
   fts_method_define_varargs(cl, 0, fts_s_anything, client_controller_anything_fts);
 
   fts_class_add_daemon( cl, obj_property_put, fts_new_symbol("echo"), client_controller_set_echo);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /***********************************************************************
@@ -1499,7 +1493,7 @@ void fts_client_upload_object(fts_object_t *obj, int client_id)
   fts_client_register_object(obj, client_id);
 
   fts_set_object( a, obj);
-  fts_send_message( (fts_object_t *)fts_object_get_patcher(obj), fts_SystemInlet, fts_s_upload_child, 1, a);  
+  fts_send_message( (fts_object_t *)fts_object_get_patcher(obj), fts_system_inlet, fts_s_upload_child, 1, a);  
 }
 
 void fts_client_register_object(fts_object_t *obj, int client_id)

@@ -297,7 +297,7 @@ explay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(explay_t), 2, 5, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, explay_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, explay_init);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, explay_bang);
   fts_method_define_varargs(cl, 0, fts_s_int, explay_number);
@@ -317,7 +317,7 @@ explay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_outlet_type_define_varargs(cl, 3,	fts_s_int);
   fts_outlet_type_define_varargs(cl, 4,	fts_s_int);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

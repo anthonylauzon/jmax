@@ -38,6 +38,31 @@ struct _fts_expression_t {
   int fp;                       /* frame pointer */
 };
 
+static fts_status_description_t syntax_error_status_description = {
+  "Syntax error"
+};
+fts_status_t syntax_error_status = &syntax_error_status_description;
+
+static fts_status_description_t undefined_variable_status_description = {
+  "Undefined variable"
+};
+fts_status_t undefined_variable_status = &undefined_variable_status_description;
+
+static fts_status_description_t operand_type_mismatch_status_description = {
+  "Operand type mismatch"
+};
+fts_status_t operand_type_mismatch_status = &operand_type_mismatch_status_description;
+
+static fts_status_description_t array_access_error_status_description = {
+  "Array access error"
+};
+fts_status_t array_access_error_status = &array_access_error_status_description;
+
+static fts_status_description_t invalid_environment_variable_status_description = {
+  "Invalid environment variable"
+};
+fts_status_t invalid_environment_variable_status = &invalid_environment_variable_status_description;
+
 /* #define EXPRESSION_DEBUG */
 #undef EXPRESSION_DEBUG
 
@@ -222,85 +247,95 @@ static void expression_stack_pop_frame( fts_expression_t *expression)
  * Operators
  */
 
-#define UNOP_EVAL(OP)								\
-  expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data);	\
-  top = expression_stack_top( expression);					\
-  if (fts_is_int( top))								\
-    fts_set_int( top, OP fts_get_int( top));					\
-  else if (fts_is_float( top))							\
-    fts_set_float( top, OP fts_get_float( top));				\
-  else										\
-    fts_set_void( top);
+#define UNOP_EVAL(OP)											 \
+  if ((status = expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data)) != fts_ok) \
+    return status;											 \
+  top = expression_stack_top( expression);								 \
+  if (fts_is_int( top))											 \
+    fts_set_int( top, OP fts_get_int( top));								 \
+  else if (fts_is_float( top))										 \
+    fts_set_float( top, OP fts_get_float( top));							 \
+  else													 \
+    return operand_type_mismatch_status;
 
-#define IUNOP_EVAL(OP)								\
-  expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data);	\
-  top = expression_stack_top( expression);					\
-  if (fts_is_int( top))								\
-    fts_set_int( top, OP fts_get_int( top));					\
-  else										\
-    fts_set_void( top);
+#define IUNOP_EVAL(OP)											 \
+  if ((status = expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data)) != fts_ok) \
+    return status;											 \
+  top = expression_stack_top( expression);								 \
+  if (fts_is_int( top))											 \
+    fts_set_int( top, OP fts_get_int( top));								 \
+  else													 \
+    return operand_type_mismatch_status;
 
-#define ABINOP_EVAL(OP)									\
-  expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data);		\
-  expression_eval_aux( tree->right, expression, env_ac, env_at, callback, data);	\
-  top = expression_stack_top( expression);						\
-  if (fts_is_int( top-1) && fts_is_int( top))						\
-    fts_set_int( top-1, fts_get_int( top-1) OP fts_get_int( top));			\
-  else if (fts_is_int( top-1) && fts_is_float( top))					\
-    fts_set_float( top-1, fts_get_int( top-1) OP fts_get_float( top));			\
-  else if (fts_is_float( top-1) && fts_is_int( top))					\
-    fts_set_float( top-1, fts_get_float( top-1) OP fts_get_int( top));			\
-  else if (fts_is_float( top-1) && fts_is_float( top))					\
-    fts_set_float( top-1, fts_get_float( top-1) OP fts_get_float( top));		\
-  else											\
-    fts_set_void( top-1);								\
+#define ABINOP_EVAL(OP)											  \
+  if ((status = expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data)) != fts_ok)  \
+    return status;											  \
+  if ((status = expression_eval_aux( tree->right, expression, env_ac, env_at, callback, data)) != fts_ok) \
+    return status;											  \
+  top = expression_stack_top( expression);								  \
+  if (fts_is_int( top-1) && fts_is_int( top))								  \
+    fts_set_int( top-1, fts_get_int( top-1) OP fts_get_int( top));					  \
+  else if (fts_is_int( top-1) && fts_is_float( top))							  \
+    fts_set_float( top-1, fts_get_int( top-1) OP fts_get_float( top));					  \
+  else if (fts_is_float( top-1) && fts_is_int( top))							  \
+    fts_set_float( top-1, fts_get_float( top-1) OP fts_get_int( top));					  \
+  else if (fts_is_float( top-1) && fts_is_float( top))							  \
+    fts_set_float( top-1, fts_get_float( top-1) OP fts_get_float( top));				  \
+  else													  \
+    return operand_type_mismatch_status;								  \
   expression_stack_pop( expression, 1);
 
-#define IABINOP_EVAL(OP)								\
-  expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data);		\
-  expression_eval_aux( tree->right, expression, env_ac, env_at, callback, data);	\
-  top = expression_stack_top( expression);						\
-  if (fts_is_int( top) && fts_is_int( top-1))						\
-    fts_set_int( top-1, fts_get_int( top-1) OP fts_get_int( top) );			\
-  else											\
-    fts_set_void( top-1);								\
+#define IABINOP_EVAL(OP)										  \
+  if ((status = expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data)) != fts_ok)  \
+    return status;											  \
+  if ((status = expression_eval_aux( tree->right, expression, env_ac, env_at, callback, data)) != fts_ok) \
+    return status;											  \
+  top = expression_stack_top( expression);								  \
+  if (fts_is_int( top) && fts_is_int( top-1))								  \
+    fts_set_int( top-1, fts_get_int( top-1) OP fts_get_int( top) );					  \
+  else													  \
+    return operand_type_mismatch_status;								  \
   expression_stack_pop( expression, 1);
 
-#define LBINOP_EVAL(OP)									\
-  expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data);		\
-  expression_eval_aux( tree->right, expression, env_ac, env_at, callback, data);	\
-  top = expression_stack_top( expression);						\
-  if (fts_is_int( top) && fts_is_int( top-1))						\
-    fts_set_int( top-1, fts_get_int( top-1) OP fts_get_int( top));			\
-  else if (fts_is_int( top) && fts_is_float( top-1))					\
-    fts_set_int( top-1, fts_get_int( top-1) OP fts_get_float( top));			\
-  else if (fts_is_float( top) && fts_is_int( top-1))					\
-    fts_set_int( top-1, fts_get_float( top-1) OP fts_get_int( top));			\
-  else if (fts_is_float( top) && fts_is_float( top-1))					\
-    fts_set_int( top-1, fts_get_float( top-1) OP fts_get_float( top));			\
-  else											\
-    fts_set_void( top-1);								\
+#define LBINOP_EVAL(OP)											  \
+  if ((status = expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data)) != fts_ok)  \
+    return status;											  \
+  if ((status = expression_eval_aux( tree->right, expression, env_ac, env_at, callback, data)) != fts_ok) \
+    return status;											  \
+  top = expression_stack_top( expression);								  \
+  if (fts_is_int( top) && fts_is_int( top-1))								  \
+    fts_set_int( top-1, fts_get_int( top-1) OP fts_get_int( top));					  \
+  else if (fts_is_int( top) && fts_is_float( top-1))							  \
+    fts_set_int( top-1, fts_get_int( top-1) OP fts_get_float( top));					  \
+  else if (fts_is_float( top) && fts_is_int( top-1))							  \
+    fts_set_int( top-1, fts_get_float( top-1) OP fts_get_int( top));					  \
+  else if (fts_is_float( top) && fts_is_float( top-1))							  \
+    fts_set_int( top-1, fts_get_float( top-1) OP fts_get_float( top));					  \
+  else													  \
+    return operand_type_mismatch_status;								  \
   expression_stack_pop( expression, 1);
 
 
-void expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *expression, int env_ac, const fts_atom_t *env_at, fts_expression_callback_t callback, void *data)
+fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *expression, int env_ac, const fts_atom_t *env_at, fts_expression_callback_t callback, void *data)
 {
   int ac;
   fts_atom_t *at;
   fts_atom_t *top;
+  fts_status_t status;
 
   if (!tree)
-    return;
-
+    return fts_ok;
   
   switch( tree->token) {
 
   case FTS_TOKEN_COMMA:
-    expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data);
+    if ((status = expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data)) != fts_ok)
+      return status;
 
     expression_stack_push_frame( expression);
 
-    expression_eval_aux( tree->right, expression, env_ac, env_at, callback, data);
+    if ((status = expression_eval_aux( tree->right, expression, env_ac, env_at, callback, data)) != fts_ok)
+      return status;
 
     ac = expression_stack_frame_count( expression);
     at = expression_stack_frame( expression);
@@ -312,8 +347,10 @@ void expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *expression, i
   case FTS_TOKEN_TOPLEVEL_PAR:
     expression_stack_push_frame( expression);
 
-    expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data);
-    expression_eval_aux( tree->right, expression, env_ac, env_at, callback, data);
+    if ((status = expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data)) != fts_ok)
+      return status;
+    if ((status = expression_eval_aux( tree->right, expression, env_ac, env_at, callback, data)) != fts_ok)
+      return status;
 
     ac = expression_stack_frame_count( expression);
     at = expression_stack_frame( expression);
@@ -337,8 +374,10 @@ void expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *expression, i
   case FTS_TOKEN_PAR:
     expression_stack_push_frame( expression);
 
-    expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data);
-    expression_eval_aux( tree->right, expression, env_ac, env_at, callback, data);
+    if ((status = expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data)) != fts_ok)
+      return status;
+    if ((status = expression_eval_aux( tree->right, expression, env_ac, env_at, callback, data)) != fts_ok)
+      return status;
 
     ac = expression_stack_frame_count( expression);
     at = expression_stack_frame( expression);
@@ -364,8 +403,10 @@ void expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *expression, i
     break;
 
   case FTS_TOKEN_TUPLE:
-    expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data);
-    expression_eval_aux( tree->right, expression, env_ac, env_at, callback, data);
+    if ((status = expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data)) != fts_ok)
+      return status;
+    if ((status = expression_eval_aux( tree->right, expression, env_ac, env_at, callback, data)) != fts_ok)
+      return status;
     break;
 
   case FTS_TOKEN_INT:
@@ -382,8 +423,7 @@ void expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *expression, i
 	if ( index < env_ac)
 	  expression_stack_push( expression, env_at + index);
 	else
-	  /* FIXME */
-	  ;
+	  return invalid_environment_variable_status;
       }
     else if (fts_is_symbol( &tree->value))
       {
@@ -392,25 +432,15 @@ void expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *expression, i
 	if ((p = fts_variable_get_value( expression->scope, fts_get_symbol( &tree->value))))
 	  expression_stack_push( expression, p);
 	else
-	  {
-	    fts_atom_t a[1];
-
-	    fts_set_void( a);
-	    expression_stack_push( expression, a);
-	  }
-      }
-    else
-      {
-	fts_atom_t a[1];
-
-	fts_set_void( a);
-	expression_stack_push( expression, a);
+	  return undefined_variable_status;
       }
     break;
 
   case FTS_TOKEN_POWER:
-    expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data);
-    expression_eval_aux( tree->right, expression, env_ac, env_at, callback, data);
+    if ((status = expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data)) != fts_ok)
+      return status;
+    if ((status = expression_eval_aux( tree->right, expression, env_ac, env_at, callback, data)) != fts_ok)
+      return status;
     top = expression_stack_top( expression);
     if (fts_is_int( top-1) && fts_is_int( top))
       fts_set_int( top-1, (int)pow( (double)fts_get_int( top-1), (double)fts_get_int( top)));
@@ -421,7 +451,7 @@ void expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *expression, i
     else if (fts_is_float( top-1) && fts_is_float( top))
       fts_set_float( top-1, pow( fts_get_float( top-1), fts_get_float( top)));
     else
-      fts_set_void( top-1);
+      return operand_type_mismatch_status;
     expression_stack_pop( expression, 1);
     break;
 
@@ -517,6 +547,8 @@ void expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *expression, i
     break;
 #endif
   }
+
+  return fts_ok;
 }
 
 

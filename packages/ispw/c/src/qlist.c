@@ -212,7 +212,7 @@ qlist_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_atom_list_append(this->atom_list, ac, at);
   fts_atom_list_iterator_init(this->iterator, this->atom_list);
 
-  fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, sym_atomlist_update, 0, 0);
+  fts_send_message((fts_object_t *)this->atom_list, fts_system_inlet, sym_atomlist_update, 0, 0);
 
   fts_patcher_set_dirty((fts_patcher_t *)o->patcher, 1);
 }
@@ -227,7 +227,7 @@ qlist_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fts_atom_list_set( this->atom_list, ac, at);
   fts_atom_list_iterator_init(this->iterator, this->atom_list);
 
-  fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, sym_atomlist_update, 0, 0);
+  fts_send_message((fts_object_t *)this->atom_list, fts_system_inlet, sym_atomlist_update, 0, 0);
 
   fts_patcher_set_dirty((fts_patcher_t *)o->patcher, 1);
 }
@@ -242,7 +242,7 @@ qlist_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_atom_list_clear(this->atom_list);
   fts_atom_list_iterator_init(this->iterator, this->atom_list);
 
-  fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, sym_atomlist_update, 0, 0);
+  fts_send_message((fts_object_t *)this->atom_list, fts_system_inlet, sym_atomlist_update, 0, 0);
 
   fts_patcher_set_dirty((fts_patcher_t *)o->patcher, 1);
 }
@@ -293,7 +293,7 @@ qlist_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   qlist_t *this = (qlist_t *)o;
 
-  fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, fts_s_delete, 0, 0);
+  fts_send_message((fts_object_t *)this->atom_list, fts_system_inlet, fts_s_delete, 0, 0);
   fts_atom_list_iterator_free(this->iterator);
 
   fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
@@ -314,7 +314,7 @@ qlist_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_set_int(a, fts_get_object_id((fts_object_t *)this->atom_list));
   fts_client_send_message((fts_object_t *)this, sym_setAtomList, 1, a);
 
-  fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, fts_s_upload, 0, 0);
+  fts_send_message((fts_object_t *)this->atom_list, fts_system_inlet, fts_s_upload, 0, 0);
 }
 
 static void
@@ -429,21 +429,21 @@ qlist_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(qlist_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, qlist_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, qlist_init);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, qlist_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, qlist_upload);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, qlist_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_upload, qlist_upload);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear, qlist_clear);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, qlist_dump);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_clear, qlist_clear);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, qlist_dump);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, qlist_save_dotpat); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save_dotpat, qlist_save_dotpat); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append, qlist_append);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_append, qlist_append);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, qlist_open_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_destroyEditor, qlist_destroy_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_closeEditor, qlist_close_editor); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_openEditor, qlist_open_editor);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_destroyEditor, qlist_destroy_editor);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_closeEditor, qlist_close_editor); 
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("rewind"), qlist_rewind);
   fts_method_define_varargs(cl, 0, fts_new_symbol("flush"), qlist_flush);
@@ -456,7 +456,7 @@ qlist_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_append, qlist_append);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 

@@ -99,14 +99,14 @@ sigtab1_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(sigtab1_t), 1, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigtab1_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigtab1_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sigtab1_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sigtab1_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, sigtab1_reload);
   
   wavetable_init();
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /***************************************************************************************
@@ -220,9 +220,9 @@ osc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(osc_t), 2, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, osc_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, osc_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, osc_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, osc_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, osc_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, osc_put);
 
   fts_method_define_varargs(cl, 0, fts_s_set, osc_set);
 
@@ -233,7 +233,7 @@ osc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_dsp_declare_inlet(cl, 1);
   fts_dsp_declare_outlet(cl, 0);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 /******************************************************************
@@ -318,10 +318,10 @@ phasor_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(phasor_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, phasor_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, phasor_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, phasor_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, phasor_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, phasor_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, phasor_put);
 
   fts_method_define_varargs(cl, 0, fts_s_int, phasor_set);
   fts_method_define_varargs(cl, 0, fts_s_float, phasor_set);
@@ -329,7 +329,7 @@ phasor_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

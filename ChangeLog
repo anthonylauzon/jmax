@@ -22,6 +22,11 @@
 	   signal/c/src/Makefile.am
 	   utils/c/src/Makefile.am
 	  
+2002-09-09  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* replaced remaining API elements that included capital letters (fts_Success -> fts_ok
+	and fts_SystemInlet -> fts_system_inlet)
+
 2002-09-09  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* fix code of dtdserver, now dtdserver constructor is called by fts_object_new_patcher 

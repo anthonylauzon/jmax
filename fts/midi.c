@@ -453,16 +453,16 @@ midievent_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(fts_midievent_t), 0, 0, 0); 
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midievent_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midievent_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, midievent_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midievent_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, midievent_print);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, midievent_print);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, midievent_get_array);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_array, midievent_set);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, midievent_set);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, midievent_get_array);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_array, midievent_set);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, midievent_set);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /***************************************************
@@ -1222,13 +1222,13 @@ fts_midiport_set_output(fts_midiport_t *port, fts_midiport_output_t function)
 void
 fts_midiport_class_init(fts_class_t *cl)
 {
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_midievent, fts_midiport_input);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_midievent, fts_midiport_input);
 }
 
 int
 fts_object_is_midiport(fts_object_t *obj)
 {
-  return (fts_class_get_method(fts_object_get_class(obj), fts_SystemInlet, fts_s_midievent) == fts_midiport_input);
+  return (fts_class_get_method(fts_object_get_class(obj), fts_system_inlet, fts_s_midievent) == fts_midiport_input);
 }
 
 /****************************************************
@@ -1273,10 +1273,10 @@ midibus_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_midiport_class_init(cl);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midibus_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midibus_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, midibus_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midibus_delete);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /****************************************************
@@ -1317,10 +1317,10 @@ midinull_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_midiport_class_init(cl);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midinull_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midinull_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, midinull_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midinull_delete);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /************************************************************
@@ -1459,7 +1459,7 @@ midimanagers_get_input(fts_symbol_t device_name, fts_symbol_t label_name)
       fts_set_symbol(args + 2, label_name);
       
       for(mm = midimanagers; mm != NULL && port == NULL; mm = mm->next)
-	fts_send_message((fts_object_t *)mm, fts_SystemInlet, fts_midimanager_s_get_input, 3, args);
+	fts_send_message((fts_object_t *)mm, fts_system_inlet, fts_midimanager_s_get_input, 3, args);
     }
 
   return port;      
@@ -1480,7 +1480,7 @@ midimanagers_get_output(fts_symbol_t device_name, fts_symbol_t label_name)
       fts_set_symbol(args + 2, label_name);
       
       for(mm = midimanagers; mm != NULL && port == NULL; mm = mm->next)
-	fts_send_message((fts_object_t *)mm, fts_SystemInlet, fts_midimanager_s_get_output, 3, args);
+	fts_send_message((fts_object_t *)mm, fts_system_inlet, fts_midimanager_s_get_output, 3, args);
     }
       
   return port;
@@ -1495,12 +1495,12 @@ midimanagers_get_device_names(void)
   fts_set_pointer(&arg, &midiconfig_inputs);
   
   for(mm = midimanagers; mm != NULL; mm = mm->next)
-    fts_send_message((fts_object_t *)mm, fts_SystemInlet, fts_midimanager_s_append_input_names, 1, &arg);
+    fts_send_message((fts_object_t *)mm, fts_system_inlet, fts_midimanager_s_append_input_names, 1, &arg);
 
   fts_set_pointer(&arg, &midiconfig_outputs);
   
   for(mm = midimanagers; mm != NULL; mm = mm->next)
-    fts_send_message((fts_object_t *)mm, fts_SystemInlet, fts_midimanager_s_append_output_names, 1, &arg);
+    fts_send_message((fts_object_t *)mm, fts_system_inlet, fts_midimanager_s_append_output_names, 1, &arg);
 }
 
 static fts_symbol_t
@@ -1513,7 +1513,7 @@ midimanagers_get_default_input(void)
   fts_set_pointer(&arg, &name);
 
   for(mm = midimanagers; mm != NULL && name == NULL; mm = mm->next)
-    fts_send_message((fts_object_t *)mm, fts_SystemInlet, fts_midimanager_s_get_default_input, 1, &arg);
+    fts_send_message((fts_object_t *)mm, fts_system_inlet, fts_midimanager_s_get_default_input, 1, &arg);
 
   return name;
 }
@@ -1528,7 +1528,7 @@ midimanagers_get_default_output(void)
   fts_set_pointer(&arg, &name);
 
   for(mm = midimanagers; mm != NULL && name == NULL; mm = mm->next)
-    fts_send_message((fts_object_t *)mm, fts_SystemInlet, fts_midimanager_s_get_default_output, 1, &arg); 
+    fts_send_message((fts_object_t *)mm, fts_system_inlet, fts_midimanager_s_get_default_output, 1, &arg); 
 
   return name;
 }
@@ -1948,7 +1948,7 @@ midiconfig_set(midiconfig_t *config)
 	  fts_set_int(&a, fts_get_object_id( (fts_object_t *)config));
 	  fts_client_send_message(  (fts_object_t *) object_get_client( (fts_object_t *)config), fts_s_midi_config, 1, &a);
       
-	  fts_send_message( (fts_object_t *)config, fts_SystemInlet, fts_s_upload, 0, 0);
+	  fts_send_message( (fts_object_t *)config, fts_system_inlet, fts_s_upload, 0, 0);
 	}
     }
   
@@ -2137,7 +2137,7 @@ midiconfig_save( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	  fts_bmax_code_push_symbol(&f, label->output_name);
 	  fts_bmax_code_push_symbol(&f, label->input_name);
 	  fts_bmax_code_push_symbol(&f, label->name);
-	  fts_bmax_code_obj_mess(&f, fts_SystemInlet, fts_s_restore, 3);
+	  fts_bmax_code_obj_mess(&f, fts_system_inlet, fts_s_restore, 3);
 	  fts_bmax_code_pop_args(&f, 3);
 
 	  label = label->next;	  
@@ -2225,25 +2225,25 @@ midiconfig_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(midiconfig_t), 0, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midiconfig_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midiconfig_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, midiconfig_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midiconfig_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear, midiconfig_clear);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_default, midiconfig_set_to_defaults);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_clear, midiconfig_clear);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_default, midiconfig_set_to_defaults);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_restore, midiconfig_restore_label);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_insert, midiconfig_insert_label);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_remove, midiconfig_remove_label);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_input, midiconfig_input);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_output, midiconfig_output);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, midiconfig_upload);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_restore, midiconfig_restore_label);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_insert, midiconfig_insert_label);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_remove, midiconfig_remove_label);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_input, midiconfig_input);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_output, midiconfig_output);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_upload, midiconfig_upload);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_load, midiconfig_load);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save, midiconfig_save);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_load, midiconfig_load);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save, midiconfig_save);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, midiconfig_print);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, midiconfig_print);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /* temporary object for debugging */
@@ -2253,11 +2253,11 @@ mm_redirect( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_midimanager_t *mm;
       
   /* redirect to MIDI config */
-  fts_send_message((fts_object_t *)midiconfig, fts_SystemInlet, s, ac, at);
+  fts_send_message((fts_object_t *)midiconfig, fts_system_inlet, s, ac, at);
   
   /* redirect to MIDI managers */
   for(mm = midimanagers; mm != NULL; mm = mm->next)
-    fts_send_message((fts_object_t *)mm, fts_SystemInlet, s, ac, at);
+    fts_send_message((fts_object_t *)mm, fts_system_inlet, s, ac, at);
 }
 
 static fts_status_t
@@ -2267,7 +2267,7 @@ mm_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_anything, mm_redirect);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /************************************************************

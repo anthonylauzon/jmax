@@ -160,9 +160,9 @@ sig_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(sigobj_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sig_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sig_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sig_put_dsp_function);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sig_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sig_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, sig_put_dsp_function);
 
   fts_method_define_varargs(cl, 0, fts_s_float, sig_number);
   fts_method_define_varargs(cl, 0, fts_s_int, sig_number);
@@ -177,7 +177,7 @@ sig_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   sig_64_dsp_function = fts_new_symbol("sig64");
   fts_dsp_declare_function(sig_64_dsp_function, ftl_sig_64);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

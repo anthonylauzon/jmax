@@ -227,11 +227,11 @@ slider_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(slider_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, slider_send_properties); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, slider_send_ui_properties); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "setValue"), slider_set_value); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_properties, slider_send_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_ui_properties, slider_send_ui_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol( "setValue"), slider_set_value); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), slider_assist); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("assist"), slider_assist); 
 
   fts_method_define_varargs(cl, 0, fts_s_set, slider_set);
   fts_method_define_varargs(cl, 0, fts_s_bang, slider_bang);
@@ -240,7 +240,7 @@ slider_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_float, slider_float);
   fts_method_define_varargs(cl, 0, fts_s_list, slider_list);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, slider_save_dotpat); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save_dotpat, slider_save_dotpat); 
 
    /* Add  the value daemon */
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, slider_get_value);
@@ -248,7 +248,7 @@ slider_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_outlet_type_define_varargs(cl, 0, fts_s_int);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

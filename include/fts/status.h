@@ -25,7 +25,7 @@ struct fts_status_description {
   const char *description;
 };
 
-#define fts_Success ((fts_status_t) 0)
+#define fts_ok ((fts_status_t) 0)
 
 #define fts_status_get_description(s) ((s)->description)
 

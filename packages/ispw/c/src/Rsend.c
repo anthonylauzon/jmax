@@ -140,12 +140,12 @@ Rsend_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(Rsend_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, Rsend_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, Rsend_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, Rsend_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, Rsend_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_anything, Rsend_anything);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 

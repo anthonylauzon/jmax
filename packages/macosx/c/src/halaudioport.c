@@ -423,12 +423,12 @@ static fts_status_t halaudioport_instantiate(fts_class_t *cl, int ac, const fts_
 {
   fts_class_init( cl, sizeof( halaudioport_t), 0, 0, 0);
 
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, halaudioport_init);
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_delete, halaudioport_delete);
+  fts_method_define_varargs( cl, fts_system_inlet, fts_s_init, halaudioport_init);
+  fts_method_define_varargs( cl, fts_system_inlet, fts_s_delete, halaudioport_delete);
 
   fts_class_add_daemon( cl, obj_property_get, fts_s_state, halaudioport_get_state);
 
-  return fts_Success;
+  return fts_ok;
 }
 void halaudioport_config( void)
 {

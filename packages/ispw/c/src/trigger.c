@@ -424,7 +424,7 @@ trigger_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(trigger_t), 1, noutlets, (void *)trigger_outlet_table);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, trigger_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, trigger_init);
 
   if (all_bang)
     fts_method_define_varargs(cl, 0, fts_s_anything, trigger_all_bang);
@@ -468,7 +468,7 @@ trigger_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	}
     }
 
-    return fts_Success;
+    return fts_ok;
 }
 
 

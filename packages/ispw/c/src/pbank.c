@@ -768,8 +768,8 @@ pbank_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else
     return &fts_CannotInstantiate;
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, pbank_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, pbank_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, pbank_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, pbank_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_set, pbank_set);
   fts_method_define_varargs(cl, 0, fts_new_symbol("put"), pbank_put);
@@ -780,7 +780,7 @@ pbank_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_new_symbol("read"), pbank_read);
   fts_method_define_varargs(cl, 0, fts_s_export, pbank_export);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

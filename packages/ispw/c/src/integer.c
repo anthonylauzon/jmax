@@ -83,7 +83,7 @@ int_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(int_t), 2, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, int_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, int_init);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, int_bang);
   fts_method_define_varargs(cl, 0, fts_s_int, int_input);
@@ -96,7 +96,7 @@ int_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_outlet_type_define_varargs(cl, 0, fts_s_int);
 
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

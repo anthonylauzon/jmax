@@ -320,10 +320,10 @@ static fts_status_t pt_class_instantiate(fts_class_t *cl, int ac, const fts_atom
   pt_common_instantiate(cl);
 	
   /* the system methods */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, pt_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, pt_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, pt_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, pt_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, dsp_fun_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, dsp_fun_put);
 	
   /* class' own methods */
   fts_method_define_varargs(cl, 0, fts_s_bang, pt_bang);
@@ -342,7 +342,7 @@ static fts_status_t pt_class_instantiate(fts_class_t *cl, int ac, const fts_atom
   dsp_symbol = fts_new_symbol(DSP_NAME);
   fts_dsp_declare_function(dsp_symbol, pt_common_dsp_function);
 
-  return(fts_Success);
+  return(fts_ok);
 }
 
 void

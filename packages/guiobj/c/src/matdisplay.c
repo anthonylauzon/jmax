@@ -530,19 +530,19 @@ matdisplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(matdisplay_t), 1, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, matdisplay_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, matdisplay_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, matdisplay_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, matdisplay_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, matdisplay_send_properties); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, matdisplay_dump);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_properties, matdisplay_send_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, matdisplay_dump);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_window, matdisplay_set_window_size_by_client);
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_zoom, matdisplay_set_zoom_by_client);
+  fts_method_define_varargs(cl, fts_system_inlet, sym_window, matdisplay_set_window_size_by_client);
+  fts_method_define_varargs(cl, fts_system_inlet, sym_zoom, matdisplay_set_zoom_by_client);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_range, matdisplay_set_range);
+  fts_method_define_varargs(cl, fts_system_inlet, sym_range, matdisplay_set_range);
   fts_method_define_varargs(cl, 0, sym_range, matdisplay_set_range);
  
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_color, matdisplay_set_color);
+  fts_method_define_varargs(cl, fts_system_inlet, sym_color, matdisplay_set_color);
   fts_method_define_varargs(cl, 0, sym_color, matdisplay_set_color);
  
   fts_method_define_varargs(cl, 0, fts_s_int, matdisplay_number);
@@ -554,7 +554,7 @@ matdisplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fmat_symbol, matdisplay_fmat);
   fts_method_define_varargs(cl, 0, fts_s_clear, matdisplay_clear);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void 

@@ -87,15 +87,15 @@ change_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(change_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, change_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, change_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, change_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, change_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_anything, change_anything);
   fts_method_define_varargs(cl, 0, fts_s_set, change_set);
 
   fts_outlet_type_define_varargs(cl, 0, fts_s_int);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

@@ -233,7 +233,7 @@ static fts_status_t audp_dac_open( fts_dev_t *dev, int nargs, const fts_atom_t *
      check for I/O errors */
   fts_dsp_set_dac_slip_dev( dev);
   post("AUDP audio out open\n");
-  return fts_Success;
+  return fts_ok;
 }
 
 
@@ -248,7 +248,7 @@ static fts_status_t audp_dac_close(fts_dev_t *dev)
 
   data = (audp_dev_data_t *)fts_dev_get_device_data( dev); 
   audp_close(data->handle);
-  return fts_Success;
+  return fts_ok;
 }
 
 static int audp_dac_get_nchans( fts_dev_t *dev)
@@ -443,7 +443,7 @@ static fts_status_t audp_adc_open( fts_dev_t *dev, int nargs, const fts_atom_t *
   memset(&data->in_stats, 0, sizeof(data->in_stats));
 
   post("AUDP audio in open\n");
-  return fts_Success;
+  return fts_ok;
 }
 
 
@@ -455,7 +455,7 @@ static fts_status_t audp_adc_close(fts_dev_t *dev)
   audp_close(data->handle);
   /* Platform specific code should go here */
 
-  return fts_Success;
+  return fts_ok;
 }
 
 static int audp_adc_get_nchans(fts_dev_t *dev)

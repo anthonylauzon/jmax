@@ -29,7 +29,7 @@
 #include <ftsprivate/class.h>
 #include <ftsprivate/package.h>
 
-const int fts_SystemInlet = -1;
+const int fts_system_inlet = -1;
 
 static int typeid = FTS_FIRST_OBJECT_TYPEID;
 
@@ -127,7 +127,7 @@ fts_metaclass_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun,
 
   if(name != NULL)
     {
-      if(fts_package_add_metaclass(fts_get_current_package(), mcl) != fts_Success)
+      if(fts_package_add_metaclass(fts_get_current_package(), mcl) != fts_ok)
 	return 0;
     }
 
@@ -275,7 +275,7 @@ fts_class_new(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
   cl->mcl = mcl;
   s = mcl->instantiate_fun(cl, ac, at);
   
-  if (s == fts_Success)
+  if (s == fts_ok)
     {
       fts_atom_t a;
       
@@ -330,7 +330,7 @@ fts_class_init( fts_class_t *cl, unsigned int size, int ninlets, int noutlets, v
 
   cl->user_data = user_data;
 
-  return fts_Success;
+  return fts_ok;
 }
 
 fts_status_t
@@ -339,17 +339,17 @@ fts_method_define_optargs(fts_class_t *cl, int winlet, fts_symbol_t s, fts_metho
   fts_inlet_decl_t *in;
   fts_class_mess_t *msg;
 
-  if (winlet == fts_SystemInlet)
+  if (winlet == fts_system_inlet)
     {
       if(s == fts_s_init)
 	{
 	  cl->constructor = mth;
-	  return fts_Success;
+	  return fts_ok;
 	}
       else if(s == fts_s_delete)
 	{
 	  cl->deconstructor = mth;
-	  return fts_Success;
+	  return fts_ok;
 	}
 	
       in = cl->sysinlet;
@@ -378,7 +378,7 @@ fts_method_define_optargs(fts_class_t *cl, int winlet, fts_symbol_t s, fts_metho
       in->messlist[in->nmess++] = msg;
     }
 
-  return fts_Success;
+  return fts_ok;
 }
 
 fts_status_t 
@@ -406,7 +406,7 @@ fts_outlet_type_define_optargs( fts_class_t *cl, int woutlet, fts_symbol_t s, in
   out->tmess.nargs = ac;
   fts_atom_type_copy(ac, at, &(out->tmess.arg_types));
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /******************************************************************************/
@@ -475,7 +475,7 @@ fts_class_mess_get(fts_class_t *cl, int winlet, fts_symbol_t s)
   fts_inlet_decl_t *in;
   int panything;
 
-  if (winlet == fts_SystemInlet)
+  if (winlet == fts_system_inlet)
     in = cl->sysinlet;
   else if (winlet < cl->ninlets && winlet >= 0)
     in = &cl->inlets[winlet];
@@ -506,7 +506,7 @@ fts_method_t fts_class_get_method( fts_class_t *cl, int inlet, fts_symbol_t s)
   fts_class_mess_t **mess;
   int i; 
 
-  if (inlet == fts_SystemInlet)
+  if (inlet == fts_system_inlet)
     in = cl->sysinlet;
   else if (inlet < cl->ninlets && inlet >= 0)
     in = &cl->inlets[inlet];
@@ -554,7 +554,7 @@ fts_class_define_thru(fts_class_t *class, fts_method_t propagate_input)
   fts_atom_t a;
 
   if(propagate_input)
-    fts_method_define_varargs(class, fts_SystemInlet, fts_s_propagate_input, propagate_input);
+    fts_method_define_varargs(class, fts_system_inlet, fts_s_propagate_input, propagate_input);
 
   fts_set_int(&a, 1);
   fts_class_put_prop(class, fts_s_thru, &a);

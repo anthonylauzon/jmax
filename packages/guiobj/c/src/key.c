@@ -191,21 +191,21 @@ key_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(fts_key_t), 0, 2, 0);
       
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, key_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, key_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, key_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, key_delete);
     }
 
   else if(ac == 1)
     {
       fts_class_init(cl, sizeof(fts_key_t), 0, 2, 0);
       
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, key_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, key_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, key_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, key_delete);
     }
   else
     return &fts_CannotInstantiate;
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /*******************************************************************
@@ -275,21 +275,21 @@ keystat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(fts_key_t), 0, 2, 0);
       
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, keystat_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, keystat_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, keystat_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, keystat_delete);
     }
 
   else if(ac == 1)
     {
       fts_class_init(cl, sizeof(fts_key_t), 0, 1, 0);
       
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, keystat_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, keystat_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, keystat_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, keystat_delete);
     }
   else
     return &fts_CannotInstantiate;
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

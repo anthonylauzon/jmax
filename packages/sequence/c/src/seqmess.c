@@ -97,13 +97,13 @@ seqmess_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(seqmess_t), 0, 0, 0); 
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqmess_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, seqmess_print);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, seqmess_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, seqmess_print);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, seqmess_get_array);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_array, seqmess_set_from_array);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, seqmess_get_array);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_array, seqmess_set_from_array);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

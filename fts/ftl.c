@@ -305,7 +305,7 @@ static fts_status_t ftl_subroutine_add_call( ftl_subroutine_t *subr, fts_symbol_
   /* add debugging info */
   subr->current_instruction_info = ftl_info_table_add_instruction( &subr->info_table);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t ftl_subroutine_add_return( ftl_subroutine_t *subr)
@@ -318,7 +318,7 @@ static fts_status_t ftl_subroutine_add_return( ftl_subroutine_t *subr)
   /* add debugging info */
   subr->current_instruction_info = ftl_info_table_add_instruction( &subr->info_table);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 
@@ -542,13 +542,13 @@ static fts_status_t ftl_state_machine( fts_array_t *array, state_fun_t fun, void
       }
 
       ret = (*fun)(state, newstate, a, user_data);
-      if (ret != fts_Success)
+      if (ret != fts_ok)
 	return ret;
 
       state = newstate;
     }
 
-  return fts_Success;
+  return fts_ok;
 }
 
 
@@ -709,7 +709,7 @@ static fts_status_t compile_portable_state_fun( int state, int newstate, fts_ato
   }
   info->bytecode = bytecode;
 
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t bytecode_size_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
@@ -720,12 +720,12 @@ static fts_status_t bytecode_size_state_fun( int state, int newstate, fts_atom_t
   case ST_OPCODE:
     if (fts_get_int( a) == FTL_OPCODE_RETURN)
       *ps += 1;
-    return fts_Success;
+    return fts_ok;
   case ST_CALL_ARGC:
     *ps += (fts_get_int( a) + 2);
-    return fts_Success;
+    return fts_ok;
   default:
-    return fts_Success;
+    return fts_ok;
   }
 }
 
@@ -744,7 +744,7 @@ static int ftl_program_compile_portable( ftl_program_t *prog)
 
       size = 0;
       ret = ftl_state_machine( &subr->instructions, bytecode_size_state_fun, &size);
-      if ( ret != fts_Success)
+      if ( ret != fts_ok)
 	return 0;
 
       subr->bytecode = (fts_word_t *)fts_malloc( size*sizeof( fts_word_t));
@@ -757,7 +757,7 @@ static int ftl_program_compile_portable( ftl_program_t *prog)
       info.prog = prog;
       info.bytecode = subr->bytecode;
       ret = ftl_state_machine( &subr->instructions, compile_portable_state_fun, &info);
-      if ( ret != fts_Success)
+      if ( ret != fts_ok)
 	return 0;
 
     }
@@ -925,7 +925,7 @@ static fts_status_t post_state_fun( int state, int newstate, fts_atom_t *a, void
     break;
   }
 
-  return fts_Success;
+  return fts_ok;
 }
 
 
@@ -982,7 +982,7 @@ static fts_status_t fprint_state_fun( int state, int newstate, fts_atom_t *a, vo
     break;
   }
 
-  return fts_Success;
+  return fts_ok;
 }
 
 

@@ -954,16 +954,16 @@ binop_instantiate_realize(fts_class_t *cl, int ac, const fts_atom_t *at, fts_met
 {
   fts_class_init(cl, sizeof(binop_t), 2, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, binop_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, binop_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, binop_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, binop_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, mth);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, mth);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_inlet(cl, 1);
   fts_dsp_declare_outlet(cl, 0);
 
-  return fts_Success;
+  return fts_ok;
 }
   
 /************************************************
@@ -1001,10 +1001,10 @@ binop_const_instantiate_realize(fts_class_t *cl, int ac, const fts_atom_t *at, f
 {
   fts_class_init(cl, sizeof(binop_const_t), 2, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, binop_const_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, binop_const_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, binop_const_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, binop_const_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, mth);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, mth);
 
   fts_method_define_varargs(cl, 1, fts_s_int, binop_set_const);
   fts_method_define_varargs(cl, 1, fts_s_float, binop_set_const);
@@ -1012,7 +1012,7 @@ binop_const_instantiate_realize(fts_class_t *cl, int ac, const fts_atom_t *at, f
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
     
-  return fts_Success;
+  return fts_ok;
 }
 
 /************************************************

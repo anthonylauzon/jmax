@@ -231,8 +231,8 @@ label_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(fts_label_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, label_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find_friends, label_find_friends);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, label_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_find_friends, label_find_friends);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, label_get_state);
 
   fts_class_define_thru(cl, label_propagate_input);
@@ -240,7 +240,7 @@ label_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* sending anything else to lable is like sending to all channel targets */
   fts_method_define_varargs(cl, 0, fts_s_anything, label_send);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /***************************************************************************
@@ -331,15 +331,15 @@ send_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(send_t), 1, 0, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, send_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, send_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find_friends, send_find_friends);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_spost_description, send_spost_description); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, send_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, send_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_find_friends, send_find_friends);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_spost_description, send_spost_description); 
 
   fts_method_define_varargs(cl, 0, fts_s_anything, send_anything);
   fts_class_define_thru(cl, send_propagate_input);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /***************************************************************************
@@ -392,12 +392,12 @@ receive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(receive_t), 0, 1, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, receive_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, receive_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find_friends, send_find_friends);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_spost_description, receive_spost_description); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, receive_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, receive_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_find_friends, send_find_friends);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_spost_description, receive_spost_description); 
 
-  return fts_Success;
+  return fts_ok;
 }
 
 

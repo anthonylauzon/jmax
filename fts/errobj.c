@@ -120,7 +120,7 @@ void fts_do_recompute_errors(void)
       fts_set_object(&a[0], (fts_object_t *) errors);
       
       /* Find all the errors */
-      fts_send_message(root, fts_SystemInlet, fts_s_find_errors, 1, a);
+      fts_send_message(root, fts_system_inlet, fts_s_find_errors, 1, a);
   
       /* Recompute them all */
       fts_objectset_get_objects( errors, &iterator );

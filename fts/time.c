@@ -151,8 +151,8 @@ void
 fts_timebase_init(fts_timebase_t *timebase)
 {
   fts_class_t *class = fts_object_get_class((fts_object_t *)timebase);
-  fts_method_t tick = fts_class_get_method(class, fts_SystemInlet, fts_s_timebase_tick);
-  fts_method_t locate = fts_class_get_method(class, fts_SystemInlet, fts_s_timebase_locate);
+  fts_method_t tick = fts_class_get_method(class, fts_system_inlet, fts_s_timebase_tick);
+  fts_method_t locate = fts_class_get_method(class, fts_system_inlet, fts_s_timebase_locate);
 
   timebase->time = 0.0;
   timebase->step = 0.0;

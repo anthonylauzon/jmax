@@ -312,14 +312,14 @@ delayline_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, delayline_get_state);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, delayline_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, delayline_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, delayline_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, delayline_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, delayline_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, delayline_put);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /************************************************************
@@ -608,9 +608,9 @@ tapin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(tap_t), 3, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, tapin_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, tap_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, tapin_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, tapin_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tap_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, tapin_put);
 
   fts_method_define_varargs(cl, 1, fts_s_int, tap_set_delay);
   fts_method_define_varargs(cl, 1, fts_s_float, tap_set_delay);
@@ -619,7 +619,7 @@ tapin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0); /* hidden orderforcing connection */
 
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t
@@ -627,9 +627,9 @@ tapout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(tap_t), 2, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, tapout_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, tap_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, tapout_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, tapout_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tap_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, tapout_put);
 
   fts_method_define_varargs(cl, 0, fts_s_int, tap_set_delay);
   fts_method_define_varargs(cl, 0, fts_s_float, tap_set_delay);
@@ -638,7 +638,7 @@ tapout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_dsp_declare_inlet(cl, 0); /* hidden orderforcing connection */
   fts_dsp_declare_outlet(cl, 0);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /************************************************************
@@ -730,16 +730,16 @@ vtap_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(tap_t), 2, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, vtap_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, tap_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, vtap_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, vtap_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tap_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, vtap_put);
 
   fts_method_define_varargs(cl, 1, sym_delayline, tap_set_delayline);  
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /************************************************************

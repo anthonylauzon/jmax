@@ -217,9 +217,9 @@ tabpeek_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(tabpeek_t), 1, 1, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, tabpeek_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, tabpeek_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, tabpeek_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, tabpeek_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tabpeek_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, tabpeek_put);
 
   fts_method_define_varargs(cl, 0, fts_s_set, tabpeek_set);
   fts_method_define_varargs(cl, 0, fts_s_int, tabpeek_set_by_int);
@@ -230,7 +230,7 @@ tabpeek_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   dsp_symbol = fts_new_symbol("tabpeek");
   fts_dsp_declare_function(dsp_symbol, ftl_tabpeek);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

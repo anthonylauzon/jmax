@@ -194,9 +194,9 @@ delread_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(delread_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, delread_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, delread_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, delread_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, delread_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, delread_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, delread_put);
 
   fts_method_define_varargs(cl, 0, fts_s_int, delread_number);
   fts_method_define_varargs(cl, 0, fts_s_float, delread_number);
@@ -207,7 +207,7 @@ delread_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   delread_function_symbol = fts_new_symbol("delread");
   fts_dsp_declare_function(delread_function_symbol, ftl_delread);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

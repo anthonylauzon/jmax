@@ -116,11 +116,11 @@ toggle_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(toggle_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, toggle_send_properties); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, toggle_send_properties); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_bang, toggle_toggle);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_properties, toggle_send_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_ui_properties, toggle_send_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_bang, toggle_toggle);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, toggle_save_dotpat); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save_dotpat, toggle_save_dotpat); 
 
   fts_method_define_varargs(cl, 0, fts_s_set, toggle_set);
 
@@ -133,7 +133,7 @@ toggle_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_outlet_type_define_varargs(cl, 0, fts_s_int);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void 

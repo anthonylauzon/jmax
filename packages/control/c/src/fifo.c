@@ -198,8 +198,8 @@ fifo_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(fifo_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fifo_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fifo_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fifo_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fifo_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_int, fifo_input_atom);
   fts_method_define_varargs(cl, 0, fts_s_float, fifo_input_atom);
@@ -212,7 +212,7 @@ fifo_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_flush, fifo_flush);
   fts_method_define_varargs(cl, 0, fts_s_clear, fifo_clear);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

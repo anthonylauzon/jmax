@@ -86,14 +86,14 @@ midiparse_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(midiparse_t), 1, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midiparse_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midiparse_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, midiparse_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midiparse_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_int, midiparse_input);
   fts_method_define_varargs(cl, 0, fts_s_float, midiparse_input);
   fts_method_define_varargs(cl, 0, fts_s_list, midiparse_input);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 /************************************************************
@@ -172,7 +172,7 @@ midiunparse_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_midievent, midiunparse_input);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void

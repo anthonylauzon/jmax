@@ -234,9 +234,9 @@ veclog_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(veclog_t), 2, 1, 0);
 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, veclog_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, veclog_delete);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, expb_put);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, veclog_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, veclog_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, expb_put);
 
       fts_method_define_varargs(cl, 1, fts_s_int, veclog_set_base);
       fts_method_define_varargs(cl, 1, fts_s_float, veclog_set_base);
@@ -245,15 +245,15 @@ veclog_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(veclog_t), 1, 1, 0);
 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, veclog_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, veclog_delete);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, exp_put);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, veclog_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, veclog_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, exp_put);
     }
   
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 
@@ -264,9 +264,9 @@ siglog_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(veclog_t), 2, 1, 0);
 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, siglog_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, veclog_delete);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, logb_put);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, siglog_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, veclog_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, logb_put);
 
       fts_method_define_varargs(cl, 1, fts_s_int, siglog_set_base);
       fts_method_define_varargs(cl, 1, fts_s_float, siglog_set_base);
@@ -275,15 +275,15 @@ siglog_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(veclog_t), 1, 1, 0);
 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, veclog_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, veclog_delete);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, log_put);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, veclog_init);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, veclog_delete);
+      fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, log_put);
     }
   
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t
@@ -291,14 +291,14 @@ siglog10_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(veclog_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, veclog_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, veclog_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, log10_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, veclog_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, veclog_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, log10_put);
   
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void 

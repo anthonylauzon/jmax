@@ -120,12 +120,12 @@ static fts_status_t profileaudioport_instantiate(fts_class_t *cl, int ac, const 
 {
   fts_class_init( cl, sizeof( profileaudioport_t), 0, 1, 0);
 
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, profileaudioport_init);
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_delete, profileaudioport_delete);
+  fts_method_define_varargs( cl, fts_system_inlet, fts_s_init, profileaudioport_init);
+  fts_method_define_varargs( cl, fts_system_inlet, fts_s_delete, profileaudioport_delete);
 
   fts_class_add_daemon( cl, obj_property_get, fts_s_state, profileaudioport_get_state);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 void profileaudioport_config( void)

@@ -235,9 +235,9 @@ osc_instantiate_cosine(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(osc_t), 1, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, osc_init_cosine);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, osc_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, osc_put_cosine);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, osc_init_cosine);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, osc_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, osc_put_cosine);
   
   fts_method_define_varargs(cl, 0, fts_new_symbol("phase"), osc_set_phase);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("phase"), osc_set_phase_prop);
@@ -253,7 +253,7 @@ osc_instantiate_cosine(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_dsp_declare_outlet(cl, 0);
     
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t
@@ -261,9 +261,9 @@ osc_instantiate_fvec(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(osc_t), 2, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, osc_init_fvec);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, osc_delete_fvec);      
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, osc_put_fvec);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, osc_init_fvec);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, osc_delete_fvec);      
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, osc_put_fvec);
   
   fts_method_define_varargs(cl, 0, fts_new_symbol("phase"), osc_set_phase);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("phase"), osc_set_phase_prop);
@@ -281,7 +281,7 @@ osc_instantiate_fvec(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_dsp_declare_outlet(cl, 0);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 static fts_status_t
@@ -419,9 +419,9 @@ phi_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(osc_t), 1, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, phi_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, osc_delete);      
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, phi_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, phi_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, osc_delete);      
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, phi_put);
   
   fts_method_define_varargs(cl, 0, fts_new_symbol("phase"), phi_set_phase);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("phase"), phi_set_phase_prop);
@@ -437,7 +437,7 @@ phi_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_dsp_declare_outlet(cl, 0);
     
-  return fts_Success;
+  return fts_ok;
 }
 
 void

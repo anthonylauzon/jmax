@@ -118,8 +118,8 @@ dsp_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(dsp_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, dsp_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, dsp_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, dsp_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, dsp_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_start, dsp_start);
   fts_method_define_varargs(cl, 0, fts_s_stop, dsp_stop);
@@ -134,7 +134,7 @@ dsp_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("print-signals"), dsp_print_signals);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void
