@@ -438,13 +438,13 @@ public class JMaxApplication {
 	  }
 
 	server = new FtsServer( connection);
+	server.addFtsServerListener( new PackageServerListener());
+	server.enableNotify();
       }
     catch( Exception e)
       {
 	e.printStackTrace();
       }
-
-    server.addFtsServerListener( new PackageServerListener());
   }
 
   class FtsSystemOutConsole extends FtsObject {

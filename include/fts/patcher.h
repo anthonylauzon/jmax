@@ -30,9 +30,10 @@ struct fts_patcher
   fts_object_t *objects;	/* the patcher content, organized as a list */
 
   int open;			/* the open flag */
-  int editor_open;			/* the open editor flag */
+  int editor_open;		/* the open editor flag */
   int load_init_fired;		/* the multiple load init protection flag*/
   int deleted;			/* set to one during content deleting */
+  int dirty;                    /* set to one if patcher's content is not saved */
 
   fts_array_t *args;	/* the arguments used for the "args" variable */
 
@@ -49,5 +50,6 @@ struct fts_patcher
 #define fts_patcher_is_open(p)     ((p)->open)
 
 FTS_API fts_patcher_t *fts_get_root_patcher(void);
+
 
 

@@ -105,17 +105,23 @@ public class JMaxClassMap {
 
   public static JMaxObjectCreator getCreator( String ftsClassName)
   {
-    return ((ClassMapEntry)instance.map.get( ftsClassName)).creator;
+    if(instance.map.containsKey(ftsClassName))
+      return ((ClassMapEntry)instance.map.get( ftsClassName)).creator;
+    else return null;
   }
 
   public static ImageIcon getIcon( String ftsClassName)
   {
-    return ((ClassMapEntry)instance.map.get( ftsClassName)).icon;
+    if(instance.map.containsKey(ftsClassName))
+      return ((ClassMapEntry)instance.map.get( ftsClassName)).icon;
+    else return null;
   }
 
   public static Cursor getCursor( String ftsClassName)
   {
-    return ((ClassMapEntry)instance.map.get( ftsClassName)).cursor;
+    if(instance.map.containsKey(ftsClassName))
+      return ((ClassMapEntry)instance.map.get( ftsClassName)).cursor;
+    else return null;
   }
 
   public static Iterator getClassNames()

@@ -11,6 +11,8 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
+#SUBDIRS=control data explode guiobj io ispw ispwmath lists math midi numeric qlist sequence signal system utils alsa oss unixdtd
+
 
 SHELL = /bin/sh
 
@@ -81,7 +83,7 @@ ROOTDIR = ${prefix}/share/jmax
 STRIP = strip
 VERSION = 3.1.0_latest_cvs
 
-SUBDIRS = control data explode guiobj io ispw ispwmath lists math midi numeric qlist sequence signal system utils alsa oss unixdtd
+SUBDIRS = control guiobj 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 

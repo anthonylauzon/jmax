@@ -10,6 +10,8 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
+#SUBDIRS=control data explode guiobj io ispw ispwmath lists math midi numeric qlist sequence signal system utils @PLATFORM_PACKAGES@
+
 
 SHELL = @SHELL@
 
@@ -81,7 +83,7 @@ ROOTDIR = @ROOTDIR@
 STRIP = @STRIP@
 VERSION = @VERSION@
 
-SUBDIRS = control data explode guiobj io ispw ispwmath lists math midi numeric qlist sequence signal system utils @PLATFORM_PACKAGES@
+SUBDIRS = control guiobj 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 

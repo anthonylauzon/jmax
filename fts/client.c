@@ -909,8 +909,6 @@ static void client_new_object( fts_object_t *o, int winlet, fts_symbol_t s, int 
 
 static void client_set_object_property( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_log("[client]: setObjectProperty %d \n", ac);
-
   if ((ac == 3) &&
       fts_is_object(&at[0]) &&
       fts_is_symbol(&at[1]))
@@ -921,9 +919,9 @@ static void client_set_object_property( fts_object_t *o, int winlet, fts_symbol_
       obj  = fts_get_object(&at[0]);
       name = fts_get_symbol(&at[1]);
 
-      fts_log("[client]: setProperty %s \n", fts_symbol_name(name));
-
       fts_object_put_prop(obj, name, &at[2]);
+
+      fts_patcher_set_dirty( obj->patcher, 1);
     }
   else
     fts_log("[client]: System Error set_object_property: bad args\n");
@@ -994,26 +992,6 @@ static void client_predefine_objects( client_t *this)
   client_put_object( this, 1, (fts_object_t *)this);
 }
 
-static void client_send_package_names( client_t *this)
-{
-  fts_iterator_t i;
-  fts_atom_t a[2];
-  fts_symbol_t s;
-
-  s = fts_new_symbol( "notify");
-  fts_set_symbol( a, fts_new_symbol( "package_loaded"));
-
-  fts_get_package_names( &i);
-
-  while (fts_iterator_has_more( &i))
-    {
-      fts_iterator_next( &i, a+1);
-
-      fts_log( "[client] notify package %s\n", fts_get_symbol( a+1));
-      fts_client_send_message( (fts_object_t *)this, s, 2, a);
-    }
-}
-
 static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   client_t *this = (client_t *)o;
@@ -1047,10 +1025,36 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   client_predefine_objects( this);
 
-  client_send_package_names( this);
-
   fts_log( "[client]: Accepted client connection on socket\n");
 }
+
+static void client_send_package_names( client_t *this)
+{
+  fts_iterator_t i;
+  fts_atom_t a[2];
+  fts_symbol_t s;
+
+  s = fts_new_symbol( "notify");
+  fts_set_symbol( a, fts_new_symbol( "package_loaded"));
+
+  fts_get_package_names( &i);
+
+  while (fts_iterator_has_more( &i))
+    {
+      fts_iterator_next( &i, a+1);
+
+      fts_log( "[client] notify package %s\n", fts_get_symbol( a+1));
+      fts_client_send_message( (fts_object_t *)this, s, 2, a);
+    }
+}
+
+static void client_enable_notify( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  client_t *this = (client_t *)o;
+
+  client_send_package_names( this);
+}
+
 
 static void client_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1084,6 +1088,7 @@ static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "set_object_property"), client_set_object_property);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "connect_object"), client_connect_object);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "delete_object"), client_delete_object);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "enable_notify"), client_enable_notify);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "shutdown"), client_shutdown);
 

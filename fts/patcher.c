@@ -74,6 +74,7 @@ fts_class_t *outlet_class = 0;
 
 fts_symbol_t sym_showObject = 0;
 fts_symbol_t sym_stopWaiting = 0;
+fts_symbol_t sym_setDirty = 0;
 
 fts_symbol_t sym_redefineStart = 0;
 fts_symbol_t sym_setWX = 0;
@@ -82,8 +83,6 @@ fts_symbol_t sym_setWW = 0;
 fts_symbol_t sym_setWH = 0;
 fts_symbol_t sym_addObject = 0;
 fts_symbol_t sym_addConnection = 0;
-/*fts_symbol_t sym_deleteObject = 0;
-  fts_symbol_t sym_deleteObjects = 0;*/
 fts_symbol_t sym_redefineObject = 0;
 fts_symbol_t sym_redefineTemplateObject = 0;
 fts_symbol_t sym_objectRedefined = 0;
@@ -94,6 +93,7 @@ fts_symbol_t sym_setDescription;
 #define set_editor_open(q) ((q)->editor_open = 1)
 #define set_editor_close(q) ((q)->editor_open = 0)
 #define editor_is_open(q) ((q)->editor_open != 0)
+#define fts_patcher_is_dirty(q)    ((q)->dirty != 0)
 
 static void
 printf_mess(const char *msg, int ac, const fts_atom_t *av)
@@ -843,9 +843,10 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     this->outlets = 0;
 
   this->objects = (fts_object_t *) 0;
-  this->open = 0; /* start as closed */
+  this->open        = 0; /* start as closed */
   this->editor_open = 0; /* start with editor closed */  
-  this->deleted = 0;
+  this->deleted     = 0;
+  this->dirty       = 0; /* start as saved */
 }
 
 /* delete patcher:
@@ -1286,10 +1287,12 @@ static void fts_patcher_set_wy( fts_object_t *o, int winlet, fts_symbol_t s, int
 static void fts_patcher_set_wh( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_object_put_prop(o, fts_s_wh, at);
+  /*fts_patcher_set_dirty((fts_patcher_t *)o, 1);*/
 }
 static void fts_patcher_set_ww( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_object_put_prop(o, fts_s_ww, at);
+  /*  fts_patcher_set_dirty((fts_patcher_t *)o, 1);*/
 }
 
 /****************************************************************/
@@ -1304,6 +1307,8 @@ fts_patcher_add_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s,
   fts_object_put_prop(obj, fts_s_y, at+1);
 
   fts_client_upload_object(obj, -1);
+
+  fts_patcher_set_dirty((fts_patcher_t *)o, 1);
 }
 
 static void 
@@ -1348,42 +1353,22 @@ fts_patcher_redefine_object_from_client( fts_object_t *o, int winlet, fts_symbol
   fts_atom_t a[1];
   int do_var = 0;
 
-  if (ac >= 2 && fts_is_object(&at[0]) && fts_is_int(&at[1]))
-    {
-      if(this)
-	{
-	  /* without object upload */
-	  fts_object_t *oldobj = fts_get_object(&at[0]);
-	  int newid = fts_get_int(&at[1]);
-
-	  obj = fts_object_redefine(oldobj, newid, 0, ac - 2, at + 2);
-
-	  if(fts_object_description_defines_variable(obj->argc, obj->argv))
-	    do_var = 1;
-
-	  /***********************************************************/
-	  /*   same code of fts_client_send_message in OLDclient    **/
-	  /***********************************************************/
-	  fts_client_start_message((fts_object_t *)this, 
-				   fts_object_is_template(obj) ? sym_redefineTemplateObject : sym_redefineObject);
-	  fts_client_add_int((fts_object_t *)this, do_var);
-	  fts_client_add_int((fts_object_t *)this, newid);
-	  fts_client_add_atoms((fts_object_t *)this, obj->argc, obj->argv);
-	  fts_client_done_message((fts_object_t *)this);
-	  
-	  /***********************************************************/
-
-	  fts_object_send_properties_immediately(obj);
-	  fts_send_message(obj, fts_SystemInlet, fts_s_upload, 0, 0);
-
-	  fts_set_object(&a[0], obj);
-	  fts_client_send_message((fts_object_t *)this, sym_objectRedefined, 1, a);
-	}
-      else
-	printf_mess("System Error in redefine_object:  parent not found", ac, at);
-    }
-  else
-    printf_mess("System Error in redefine_object: bad args", ac, at);  
+  fts_object_t *oldobj = fts_get_object(&at[0]);
+      
+  obj = fts_object_redefine(oldobj, -1, 0, ac - 1, at + 1);
+      
+  /*fts_client_start_message((fts_object_t *)this, 
+    fts_object_is_template(obj) ? sym_redefineTemplateObject : sym_redefineObject);
+    fts_client_add_int((fts_object_t *)this, do_var);
+    fts_client_add_int((fts_object_t *)this, newid);
+    fts_client_add_atoms((fts_object_t *)this, obj->argc, obj->argv);
+    fts_client_done_message((fts_object_t *)this);*/
+      
+  /*fts_set_object(&a[0], obj);
+    fts_client_send_message((fts_object_t *)this, sym_objectRedefined, 1, a);*/
+  
+  fts_client_upload_object(obj, -1);
+  fts_patcher_set_dirty((fts_patcher_t *)o, 1);
 }
 
 static void 
@@ -1416,6 +1401,8 @@ fts_patcher_redefine_from_client( fts_object_t *o, int winlet, fts_symbol_t s, i
       fts_patcher_redefine(this, argc, argv);
 
       fts_client_send_message((fts_object_t *)this, sym_setDescription, argc - 1, argv + 1);
+    
+      fts_patcher_set_dirty((fts_patcher_t *)o, 1);
     }
   else
     printf_mess("System Error in FOS message REDEFINE PATCHER: bad args", ac, at);
@@ -1437,6 +1424,8 @@ fts_patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_
 	  else
 	    fts_log("[patcher] delete_objects_from_client: System Error deleting a non existing object\n");
 	}
+      
+        fts_patcher_set_dirty((fts_patcher_t *)o, 1);
     }
 }
 
@@ -1476,6 +1465,8 @@ fts_patcher_add_connection_from_client( fts_object_t *o, int winlet, fts_symbol_
 	  ((fts_object_t *)connection)->patcher = this;
  	  fts_client_upload_object((fts_object_t *)connection, -1);
 	}
+      
+      fts_patcher_set_dirty((fts_patcher_t *)o, 1);
     }
 }
 
@@ -1485,7 +1476,10 @@ fts_patcher_delete_connection_from_client( fts_object_t *o, int winlet, fts_symb
   fts_connection_t *c = (fts_connection_t *)fts_get_object( at);
 
   if (c)
-    fts_connection_delete(c);
+    {
+      fts_connection_delete(c);
+      fts_patcher_set_dirty((fts_patcher_t *)o, 1);
+    }
 }
 
 /****************************************************************/
@@ -2171,6 +2165,30 @@ fts_patcher_blip(fts_patcher_t *this, const char *msg)
     }
 }
 
+void 
+fts_patcher_set_dirty(fts_patcher_t *this, int is_dirty)
+{
+  fts_log("[patcher]: setDirty this->dirty %d, is_dirty %d\n", this->dirty, is_dirty);
+
+  if(this->dirty != is_dirty)
+    {
+      this->dirty = is_dirty;
+
+      fts_log("[patcher]: setDirty 2\n");
+
+      if (editor_is_open(this))
+	{
+	  fts_atom_t a[1];
+
+	  fts_log("[patcher]: setDirty 3\n");
+  
+	  fts_set_int(&a[0], is_dirty);
+	  fts_client_send_message((fts_object_t *)this, sym_setDirty, 1, a);
+	}
+    }
+}
+
+
 /*************************************************************
  *
  *  root patcher
@@ -2244,6 +2262,7 @@ void fts_kernel_patcher_init(void)
 {
   sym_showObject = fts_new_symbol("showObject");
   sym_stopWaiting = fts_new_symbol("stopWaiting");
+  sym_setDirty = fts_new_symbol("setDirty");
 
   sym_redefineStart = fts_new_symbol("redefineStart");
   sym_setWX = fts_new_symbol("setWX");

@@ -96,4 +96,6 @@ extern void fts_patcher_outlet_reposition(fts_object_t *o, int pos);
 extern void fts_patcher_remove_outlet(fts_patcher_t *patcher, fts_outlet_t *this);
 extern void fts_patcher_trim_number_of_outlets(fts_patcher_t *patcher);
 
+extern void fts_patcher_set_dirty(fts_patcher_t *this, int is_dirty);
+
 #endif

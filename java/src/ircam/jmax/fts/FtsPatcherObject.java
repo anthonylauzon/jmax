@@ -610,7 +610,6 @@ public class FtsPatcherObject extends FtsObjectWithEditor
      
     args.clear();
     args.addObject(oldObject);
-    //args.addInt(getServer().getNewObjectID());
 
     for(int i=0; i<vec.size(); i++)
       args.add(vec.elementAt(i));

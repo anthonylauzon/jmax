@@ -125,6 +125,11 @@ public class FtsServer {
     listeners.remove( listener);
   }
 
+  public void enableNotify() throws IOException
+  {
+    client.send( FtsSymbol.get( "enable_notify"));
+  }
+
 
   // Non-public methods
 
