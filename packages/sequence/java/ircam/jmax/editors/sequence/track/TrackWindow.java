@@ -66,8 +66,6 @@ public class TrackWindow extends JFrame implements EditorContainer{
 
     makeTitle();
     
-    //trackData.requestTrackName();
-    
     // Build The Menus and Menu Bar
     makeMenuBar();
 

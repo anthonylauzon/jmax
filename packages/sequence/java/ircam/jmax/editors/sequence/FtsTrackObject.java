@@ -79,7 +79,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 	  String name = null;
 	  if (args.getLength() > 0)
 	    name = args.getSymbol(0).toString();
-		  
+
 	  ((FtsTrackObject)obj).setName( name);
 	}
       });
@@ -286,21 +286,11 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 
   public void setName(String name)
   {    
-      /*if(trackName == name)
-      {
-	  JOptionPane.showMessageDialog(null,
-					"A track with this name already exist!\n Please choose another name.",
-					"Warning",
-					JOptionPane.WARNING_MESSAGE); 
-	  return;
-	  }*/
+    String old = trackName;
+    trackName = name;
       
-      String old = trackName;
-      trackName = name;
-      
-      notifyTrackNameChanged(old, trackName);
+    notifyTrackNameChanged(old, trackName);
   }  
-
 
   public void lock()
   {
