@@ -90,7 +90,8 @@ FTS_API void fts_object_reset_description(fts_object_t *obj);
 FTS_API int fts_object_description_defines_variable(int ac, const fts_atom_t *at);
 
 /* object access */
-#define fts_object_get_outlet_type(O, WOUTLET) (((fts_object_t *)(O))->head.cl->outlets[(WOUTLET)].tmess.symb)
+FTS_API fts_symbol_t fts_object_get_outlet_type( fts_object_t *o, int woutlet);
+
 #define fts_object_get_outlets_number(O) (((fts_object_t *)(O))->head.cl->noutlets)
 #define fts_object_get_inlets_number(O) (((fts_object_t *)(O))->head.cl->ninlets)
 #define fts_object_get_patcher(O) (((fts_object_t *)(O))->patcher)

@@ -126,6 +126,7 @@ ispwcomp.c \
 line.c \
 loadbang.c \
 metro.c \
+atomlist.c \
 message.c \
 message_doctor.c \
 nbangs.c \

@@ -944,6 +944,11 @@ fts_object_change_number_of_outlets(fts_object_t *o, int new_noutlets)
  *
  */
 
+fts_symbol_t fts_object_get_outlet_type( fts_object_t *o, int woutlet)
+{
+  return o->head.cl->outlets[woutlet].tmess.symb;
+}
+
 fts_symbol_t 
 fts_object_get_class_name(fts_object_t *obj)
 {

@@ -604,7 +604,11 @@ void fts_client_start_msg( int type)
 #ifdef OUTGOING_DEBUG_TRACE      
   fprintf(stderr, "Sending '%c' ", (char)type);
 #endif
+}
 
+void fts_client_start_clientmess(void)
+{
+  fts_client_start_msg(CLIENTMESS_CODE);
 }
 
 void fts_client_add_int(int value)

@@ -529,6 +529,24 @@ static int messbox_list_is_primitive(int ac, const fts_atom_t *at)
   return 1;
 }
 
+static void fts_client_send_message_from_atom_list(fts_object_t *obj, fts_symbol_t selector, fts_atom_list_t *atom_list)
+{
+  fts_atom_list_iterator_t *iterator = fts_atom_list_iterator_new(atom_list);
+
+  fts_client_start_clientmess();
+  fts_client_add_object(obj);
+  fts_client_add_symbol(fts_s_set);
+
+  while (! fts_atom_list_iterator_end(iterator))
+    {
+      fts_client_add_atoms( 1, fts_atom_list_iterator_current(iterator));
+      fts_atom_list_iterator_next(iterator);
+    }
+
+  fts_client_done_msg();
+  fts_atom_list_iterator_free(iterator);
+}
+
 static void messbox_update(fts_object_t *o)
 {
   messbox_t *this = (messbox_t *) o;
@@ -696,10 +714,10 @@ static void messbox_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
 static void messbox_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messbox_t *this = (messbox_t *) o;
-  fts_object_set_t *set = (fts_object_set_t *)fts_get_data(at);
+  fts_objectset_t *set = (fts_objectset_t *)fts_get_data(at);
 
   if (fts_atom_list_is_subsequence(this->atom_list, ac - 1, at + 1))
-    fts_object_set_add(set, o);
+    fts_objectset_add(set, o);
 }
 
 /************************************************************
