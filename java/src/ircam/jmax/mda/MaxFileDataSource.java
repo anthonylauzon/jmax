@@ -45,7 +45,7 @@ public class MaxFileDataSource extends MaxDataSource
 
   public boolean canWrite()
   {
-    return file.canWrite();
+    return (! file.exists()) || file.canWrite();
   }
 
   /** Return true if we can read from this source */

@@ -39,6 +39,10 @@ MaxDataHandler:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDataHandler.java)
 .PHONY: MaxDataHandler
 
+MaxTclFileDataHandler:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxTclFileDataHandler.java)
+.PHONY: MaxTclFileDataHandler
+
 MaxDataSource:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDataSource.java)
 .PHONY: MaxDataSource

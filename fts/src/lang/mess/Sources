@@ -2,7 +2,6 @@ SOURCES = $(ARCH_SOURCES) \
 atoms.c		\
 class.c		\
 classes.c	\
-compatibility.c \
 events.c	\
 loader.c	\
 mess.c		\
@@ -12,4 +11,4 @@ patcher.c	\
 properties.c	\
 symbols.c	\
 vm.c		\
-
+send.c

@@ -26,6 +26,8 @@ import com.sun.java.swing.*;
 
 public class MaxWindowManager implements WindowListener
 {
+  int windowOperationCount = 0;
+
   final static int SCREENVERT = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height;
   final static int SCREENHOR  = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width;
 
@@ -44,29 +46,43 @@ public class MaxWindowManager implements WindowListener
 
   public void addWindow(Frame window)
   {
+    windowOperationCount++;
     windows.addElement(window);
     window.addWindowListener(this);
   }
 
   public void removeWindow(Frame window)
   {
+    windowOperationCount++;
     windows.removeElement(window);
     window.removeWindowListener(this);
   }
 
   void suspendWindow(Frame window)
   {
+    windowOperationCount++;
     windows.removeElement(window);
   }
 
   void readdWindow(Frame window)
   {
+    windowOperationCount++;
     windows.addElement(window);
+  }
+
+  void retitleWindow(Frame window)
+  {
+    windowOperationCount++;
   }
 
   public ListModel getWindowList()
   {
     return windows;
+  }
+
+  public int getWindowOperationCount()
+  {
+    return windowOperationCount;
   }
 
   /** This method return a frame good for running a 

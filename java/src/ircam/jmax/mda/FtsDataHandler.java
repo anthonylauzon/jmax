@@ -27,7 +27,6 @@ public class FtsDataHandler extends MaxDataHandler
   {
     if ((source instanceof MaxFtsDataSource) && super.canLoadFrom(source))
       {
-	// ???? 
 	return true;
       }
     else
@@ -48,25 +47,31 @@ public class FtsDataHandler extends MaxDataHandler
 
     if (object instanceof FtsDataObject)
       {
-	MaxData data;
-	MaxDataType type;
-	// Actually, it is the object that have to know how to create the FTS
-	// data; we map it to the property API.
-
-	type = ((FtsDataObject)object).getObjectDataType();
-
-	data = type.newInstance();
-
-	if (data instanceof MaxFtsData)
-	  {
-	    data.setDataSource(source);
-	    data.setDataHandler(this);
-	    ((MaxFtsData) data).loadFromFtsObject();
-	 
-	    return data;
-	  }
+	if (((FtsDataObject) object).getData() != null)
+	  return ((FtsDataObject) object).getData();
 	else
-	  throw new MaxDataException("Object " + object + " produced a non MaxFtsData MaxData");
+	  {
+	    MaxData data;
+	    MaxDataType type;
+
+	    // Actually, it is the object that have to know how to create the FTS
+	    // data; we map it to the property API.
+
+	    type = ((FtsDataObject)object).getObjectDataType();
+
+	    data = type.newInstance();
+
+	    if (data instanceof MaxFtsData)
+	      {
+		data.setDataSource(source);
+		data.setDataHandler(this);
+		((MaxFtsData) data).loadFromFtsObject();
+	 
+		return data;
+	      }
+	    else
+	      throw new MaxDataException("Object " + object + " produced a non MaxFtsData MaxData");
+	  }
       }
     else
       throw new MaxDataException("Object " + object + " don't have data to edit");

@@ -37,7 +37,7 @@ public class ErrorDialog extends Dialog implements ActionListener{
 
     // locate and Show.
 
-    // setLocation(100, 100);
+    setLocation(100, 100);
     show();  
   }
 

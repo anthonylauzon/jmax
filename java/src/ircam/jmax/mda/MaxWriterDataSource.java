@@ -9,12 +9,12 @@ public class MaxWriterDataSource extends MaxDataSource
 {
   Writer Writer;
 
-  MaxWriterDataSource(Writer Writer)
+  public MaxWriterDataSource(Writer Writer)
   {
     this.Writer = Writer;
   }
 
-  Writer getWriter()
+  public Writer getWriter()
   {
     return Writer;
   }

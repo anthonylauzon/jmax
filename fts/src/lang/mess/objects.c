@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.6 $ IRCAM $Date: 1998/03/19 17:46:13 $
+ *      $Revision: 1.7 $ IRCAM $Date: 1998/03/25 16:42:50 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -373,44 +373,8 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
 /*                                                                            */
 /******************************************************************************/
 
-static fts_status_t
-fts_conninfo_send(fts_object_t *o, fts_symbol_t s, fts_object_t *out, int woutlet,
-		  fts_object_t *in, int winlet)
-{
-  fts_atom_t at[4];
-
-  fts_set_object(&at[0], out);
-  fts_set_long  (&at[1], woutlet);
-  fts_set_object(&at[2], in);
-  fts_set_long  (&at[3], winlet);
-
-  return fts_message_send(o, fts_SystemInlet, s, 4, at);
-}
-
-fts_status_t
-fts_object_connect_outlet(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
-{
-  if (fts_conninfo_send(out, fts_s_connect_outlet, out, woutlet,
-			in, winlet) == &fts_MethodNotFound)
-    return fts_object_connect_perform(out, woutlet, in, winlet);
-  else
-    return fts_Success;
-}
-
-
 fts_status_t
 fts_object_connect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
-{
-  if (fts_conninfo_send(in, fts_s_connect_inlet, out, woutlet,
-			in, winlet) == &fts_MethodNotFound)
-    return fts_object_connect_outlet(out, woutlet, in, winlet);
-  else
-    return fts_Success;
-}
-
-
-fts_status_t
-fts_object_connect_perform(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
 {
   fts_outlet_decl_t *outlet;
   fts_inlet_decl_t *inlet;
@@ -530,33 +494,10 @@ fts_object_connect_perform(fts_object_t *out, int woutlet, fts_object_t *in, int
   return fts_Success;
 }
 
-
-fts_status_t
-fts_object_disconnect_outlet(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
-{
-  if (fts_conninfo_send(out, fts_s_disconnect_outlet, out, woutlet,
-			in, winlet) == &fts_MethodNotFound)
-    return fts_object_disconnect_perform(out, woutlet, in, winlet);
-  else
-    return fts_Success;
-}
-
-
-fts_status_t
-fts_object_disconnect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
-{
-  if (fts_conninfo_send(in, fts_s_disconnect_inlet, out, woutlet,
-			in, winlet) == &fts_MethodNotFound)
-    return fts_object_disconnect_outlet(out, woutlet, in, winlet);
-  else
-    return fts_Success;
-}
-
-
 /* disconnect return fts_NoSuchConnection if the connection didn't existed */
 
 fts_status_t
-fts_object_disconnect_perform(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
+fts_object_disconnect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
 { 
   fts_connection_t **p;		/* indirect precursor */
   fts_connection_t *conn = 0;

@@ -511,6 +511,9 @@ fts_mess_client_nmess(int ac, const fts_atom_t *av)
   print_mess("Received nmess", ac, av);
 #endif
 
+  /* Note that at the moment the inlet is ignored, because
+     named "receives" recevies only on in let 0 */
+
   if ((ac >= 3) &&
       fts_is_symbol(&av[0]) &&
       fts_is_int(&av[1]) &&
@@ -518,29 +521,17 @@ fts_mess_client_nmess(int ac, const fts_atom_t *av)
     {
       int inlet;
 
-      fts_object_t *obj;
-      fts_symbol_t selector, name;
-      fts_status_t ret;
+       fts_symbol_t selector, name;
+       fts_status_t ret;
 
-      name   = fts_get_symbol(&av[0]);
-      inlet  = fts_get_int(&av[1]);
-      selector = fts_get_symbol(&av[2]);
-      obj = fts_get_receive_by_name(name);
+       name   = fts_get_symbol(&av[0]);
+       inlet  = fts_get_int(&av[1]);
+       selector = fts_get_symbol(&av[2]);
 
-
-      if (! obj)
+       if (! fts_send_message_to_receives(name, selector, ac - 3, av + 3))
 	{
 	  post("Error: receive %s do not exists", name);
 	  return;
-	}
-
-      ret = fts_message_send(obj, inlet, selector, ac - 3, av + 3);
-      
-      if (ret != fts_Success)
-	{
-	  post("Error in FOS message NMESS: %s sending message to object of class %s, named %s\n",
-	       ret->description, fts_symbol_name(fts_object_get_class_name(obj)), fts_symbol_name(name));
-	  post_mess("Message NAMED_MESSAGE_CODE", ac, av);
 	}
     }
   else

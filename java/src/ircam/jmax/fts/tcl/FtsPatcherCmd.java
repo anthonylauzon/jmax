@@ -9,8 +9,8 @@ import ircam.jmax.fts.*;
 
 
 /**
- * This class define the TCL Command <b>_patcher</b>,
- * used by the tcl function patcher, that create a FTS patcher.<br>
+ * This class define the TCL Command <b>patcher</b>,
+ * that create a FTS patcher.<br>
  * This command is a part of the <i>.tpa</i> file format. <p>
  *
  * The Command Syntax is : <p>
@@ -19,8 +19,6 @@ import ircam.jmax.fts.*;
  *  patcher <i>properties body</i>
  * </code> <p>
  *
- * The first form (without inlets, patcher and graphic data) 
- * correspond to a root patcher.
  */
 
 

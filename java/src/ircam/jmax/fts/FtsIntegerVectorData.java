@@ -7,8 +7,10 @@ import tcl.lang.*;
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
 
-/** A FtsPatchData is the Max Data instance containing an FTS Patch,
- * It have two possible loaders, FtsTpaFileDataHandler and FtsDotPatFileDataHandler
+/**
+ * This class implement the MaxData for an integer vector;
+ * it can be loaded/saved from FTS, from a .tpa file (embedded in the
+ * patch), or in a standalone tcl file.
  */
 
 public class FtsIntegerVectorData extends MaxData implements MaxTclData, MaxFtsData
@@ -104,11 +106,15 @@ public class FtsIntegerVectorData extends MaxData implements MaxTclData, MaxFtsD
     /** Otherwise, if we have an old object, unbind it */
     
     if (oldObject != null)
-      oldObject.unbindVector(vector);
+      {
+	oldObject.unbindVector(vector);
+	((FtsDataObject) oldObject).setData(null);
+      }
 
     /** And, if we have a new one, bind it to the vector */
 
     newObject.bindVector(vector);
+    ((FtsDataObject) newObject).setData(this);
   }
 
   // WARNING: TCL FORMAT TO BE DEFINED, ALSO EMBEDDED TCL FORMAT
@@ -118,30 +124,31 @@ public class FtsIntegerVectorData extends MaxData implements MaxTclData, MaxFtsD
   public void saveContentAsTcl(PrintWriter pw)
   {
     // Sync to fts to be sure we have all the info.
+    // (Probabily redundant).
 
     FtsServer.getServer().syncToFts();
 
     vector.saveAsTcl(pw);
   }
 
-  /** Eval function, to built the vector Data from a Tcl file.
-    Eval a given script inside this documeynt */
+  /**
+   * Eval function, to built the vector Data from a Tcl file.
+   * Eval a given script inside this documeynt
+   */
 
   public void eval(Interp interp, String  script) throws tcl.lang.TclException
   {
     eval (interp, TclString.newInstance(script));
   }
 
-  /** Eval function, to built the Patch Data from a Tcl file.
-    Eval a given script inside this document */
+  /**
+   * Eval function, to built the Patch Data from a Tcl file.
+   * Eval a given script inside this document
+   */
 
   public void eval(Interp interp, TclObject script) throws tcl.lang.TclException
   {
-    // To be defined !!!!
-
-    // Call the tcl function maxTclDataEval, with this as first argument,
-    // and the script as second
-
+    Object object;
     TclObject list = TclList.newInstance();
 
     TclList.append(interp, list, TclString.newInstance("_BasicThisWrapper"));
@@ -150,7 +157,12 @@ public class FtsIntegerVectorData extends MaxData implements MaxTclData, MaxFtsD
 
     interp.eval(list, 0);
 
-    vector = (FtsIntegerVector) ReflectObject.get(interp, interp.getResult());
+    object = ReflectObject.get(interp, interp.getResult());
+
+    if (object instanceof FtsIntegerVector)
+      vector = (FtsIntegerVector) ReflectObject.get(interp, interp.getResult());
+    else
+      throw new TclException(interp, "Syntax error in integerVector data");
   }
 }
 

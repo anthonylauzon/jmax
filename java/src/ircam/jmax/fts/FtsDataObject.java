@@ -13,5 +13,8 @@ import ircam.jmax.mda.*;
 public interface FtsDataObject
 {
   abstract  MaxDataType getObjectDataType();
+
+  abstract MaxData getData();
+  abstract void setData(MaxData data);
 }
   

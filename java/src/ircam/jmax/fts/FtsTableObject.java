@@ -12,6 +12,7 @@ import ircam.jmax.mda.*;
 
 public class FtsTableObject extends FtsObject implements FtsIntegerVectorObject, FtsDataObject
 {
+  MaxData data = null;
   FtsIntegerVector vector = null;
   int vectorSize = 128;
 
@@ -89,8 +90,19 @@ public class FtsTableObject extends FtsObject implements FtsIntegerVectorObject,
   public MaxDataType getObjectDataType()
   {
     return MaxDataType.getTypeByName("integerVector");
+
+
   }
 
+  public MaxData getData()
+  {
+    return data;
+  }
+
+  public void setData(MaxData data)
+  {
+    this.data = data;
+  }
 
   // Save the object *and* the table; it must be
   // sure to have the complete table, so it ask it 

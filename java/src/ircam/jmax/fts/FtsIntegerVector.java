@@ -5,23 +5,20 @@ import java.io.*;
 
 /** This class represent an Integer vector in 
  *  FTS
- * @@@ The FTS connection is missing
- * @@@ the size should be handled somewhere; there should 
- * be a dinam
  */
 
-class FtsIntegerVector
+public class FtsIntegerVector
 {
   FtsObject object; 
   int[] values = null;
 
-  FtsIntegerVector()
+  public FtsIntegerVector()
   {
   }
 
   /** Get the vector size */
 
-  public int size()
+  public int getSize()
   {
     if (values != null)
       return values.length;
@@ -32,7 +29,7 @@ class FtsIntegerVector
   /** set the vector size 
    */
 
-  void setSize(int size)
+  public void setSize(int size)
   {
     if (values == null)
       values = new int[size];
@@ -72,7 +69,7 @@ class FtsIntegerVector
 
   /** Get the values  */
 
-  public int[] values()
+  public int[] getValues()
   {
     return values;
   }

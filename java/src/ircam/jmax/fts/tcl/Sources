@@ -17,5 +17,6 @@ SOURCES = FtsAbstractionCmd.java \
 	  FtsOutletCmd.java     \
 	  FtsInletCmd.java      \
   	  FtsGetObjectByNameCmd.java \
+	  FtsIntegerVectorCmd.java \
           TclFtsPackage.java
 

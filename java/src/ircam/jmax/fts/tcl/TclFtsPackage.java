@@ -22,6 +22,7 @@ import ircam.jmax.*;
  * @see StatsCmd
  * @see FtsClassNameCmd
  * @see FtsSetPropertyCmd
+ * @see FtsIntegerVectorCmd
  */
 
 public class TclFtsPackage
@@ -80,6 +81,10 @@ public class TclFtsPackage
     // Sync
 
     interp.createCommand("sync", new FtsSyncCmd());
+
+    // Data
+
+    interp.createCommand("integerVector", new FtsIntegerVectorCmd());
   }
 }
 

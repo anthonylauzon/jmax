@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.69 $ IRCAM $Date: 1997/07/11 14:37:39 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:50:41 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -55,10 +55,10 @@ fts_mess_init(void)
   /* Create the class class */
 
   class_config();
+  
+  /* Create the send/receive class */
 
-  /* initialize the 0.26 compatibiltiy support lib */
-
-  fts_mess_compatibility_init();
+  send_config();
 }
 
 

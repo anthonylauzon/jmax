@@ -14,6 +14,7 @@ extern void fts_classes_init(void);
 extern void fts_patcher_init(void);
 extern void fts_events_init(void);
 extern void class_config(void);
+extern void send_config(void);
 
 /*
  * private class functions exported for the objects.c file

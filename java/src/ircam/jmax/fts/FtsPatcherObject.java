@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
 
 /**
@@ -231,6 +232,28 @@ public class FtsPatcherObject extends FtsContainerObject
 	    obj.saveAsTcl(writer);
 
 	    writer.println("]");
+
+	    // If the object have data, save the data
+
+	    if (obj instanceof FtsDataObject)
+	      {
+		MaxData data;
+
+
+		try
+		  {
+		    data = MaxDataHandler.loadDataInstance(MaxDataSource.makeDataSource(new FtsLocation(this)));
+
+		    writer.print("setData obj(" + obj.getObjId() + ")" + " [");
+		    data.saveTo(new MaxWriterDataSource(writer));
+
+		    writer.println("]");
+		  }
+		catch (MaxDataException e)
+		  {
+		    // Save nothing if we got an exception.
+		  }
+	      }
 	  }
       }
 

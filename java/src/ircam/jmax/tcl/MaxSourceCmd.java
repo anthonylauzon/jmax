@@ -7,6 +7,8 @@ package ircam.jmax.tcl;
 import tcl.lang.*;
 import java.io.*;
 
+import ircam.jmax.*;
+
 /*
  * This class implements  a version of the built-in "source"  that do not
  * recursively halt the sourcing of file in case of an error, but just print
@@ -23,11 +25,22 @@ class MaxSourceCmd implements Command
   {
     if (argv.length == 2)
       {
+	File file;
 	String fileName;
 	String dirName;
 
 	fileName = argv[1].toString();
-	dirName = (new File(fileName)).getParent();
+
+	file = new File(fileName);
+
+	if (file.isAbsolute())
+	  dirName = file.getParent();
+	else
+	  {
+	    dirName = ( MaxApplication.jmaxProperties.getProperty("user.dir") + 
+			MaxApplication.jmaxProperties.getProperty("file.separator") +
+			file.getParent());
+	  }
 
 	if (dirName != null)
 	  interp.eval("_doSourceFile " + dirName + " " + fileName);

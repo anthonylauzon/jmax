@@ -72,7 +72,7 @@ public class QuitDialog extends Dialog
     addKeyListener(new QuitKeyListener());
 
     pack();
-    // setLocation(300, 300);
+    setLocation(300, 300);
     setVisible(true);
   }
 

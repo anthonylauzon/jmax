@@ -655,10 +655,8 @@ fts_time_gate_new
 fts_time_gate_free
 fts_time_gate_init
 fts_time_gate_close
-fts_get_receive_by_name
-fts_set_receive_by_name
-fts_remove_receive_by_name
-fts_mess_compatibility_init
+fts_send_message_to_receives
+fts_receive_exists
 fts_ucs_execute_command_opcode
 dsp_chain_on
 fts_vecx_fzero
