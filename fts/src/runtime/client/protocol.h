@@ -112,6 +112,7 @@
 #define SYNC_DONE_CODE     '<'
 
 #define POST_CODE     'h'	/* a post request for the server */
+#define POST_LINE_CODE     'L'	/* a full-line post request for the server */
 
 
 /* DATA RELATIVE CODES */
