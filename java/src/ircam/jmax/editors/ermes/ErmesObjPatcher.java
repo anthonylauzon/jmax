@@ -17,7 +17,6 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 
   String itsNameString = new String();
 
-  //static ErmesObjPatcherDialog itsPatcherDialog = null;
   public ErmesSketchWindow itsSubWindow = null;
   Dimension preferredSize = new Dimension(80,24);
   String pathForLoading;
@@ -51,19 +50,11 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   }
 
   public boolean inspectorAlreadyOpen() {
-    return (ErmesSketchWindow.itsPatcherInspector != null && ErmesSketchWindow.itsPatcherInspector.isVisible() && ErmesSketchWindow.itsPatcherInspector.itsPatcherObject == itsFtsObject);
+    return (ErmesPatcherInspector.isOpen() && ErmesPatcherInspector.getInspectedObject() == itsFtsObject);
   }
 
   public void openInspector() {
-    ErmesSketchWindow.inspectPatcher((FtsContainerObject) itsFtsObject);
-    /*Point aPoint = GetSketchWindow().getLocation();
-    if (itsPatcherDialog == null) itsPatcherDialog = new ErmesObjPatcherDialog(MaxWindowManager.getTopFrame());
-    itsPatcherDialog.setLocation(aPoint.x + getItsX(),aPoint.y + getItsY());
-    
-    String nIns = String.valueOf(itsFtsObject.getNumberOfInlets());
-    String nOuts = String.valueOf(itsFtsObject.getNumberOfOutlets());
-    itsPatcherDialog.ReInit(nIns, nOuts, itsFtsObject, itsSketchPad.GetSketchWindow());
-    */
+    ErmesPatcherInspector.inspect((FtsContainerObject) itsFtsObject);
   }
 
   // temporary, should probabily change

@@ -6,107 +6,116 @@ import ircam.jmax.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.fts.*;
 
-class ErmesPatcherInspector extends Frame implements  ActionListener{
+class ErmesPatcherInspector extends Frame {
 
-  Frame itsParent;
-  Button okButton;
-  Button cancelButton;
   TextField itsInsField, itsOutsField;
-  FtsContainerObject itsPatcherObject = null;
-  String itsInsNum = "";
-  String itsOutsNum = "";
+  static FtsContainerObject itsPatcherObject = null;
+  private static ErmesPatcherInspector itsInspector = null;
   
-  
+  /**
+   * The only function actually needed: a static call to create (or re-assign) an
+   * ispector, given a patcher
+   */
+  public static void inspect(FtsContainerObject thePatcher) {
+    if (itsInspector == null) itsInspector = new ErmesPatcherInspector(thePatcher);
+    else if (getInspectedObject() == thePatcher) itsInspector.setVisible(true);
+    else itsInspector.reInit(thePatcher);
+  }
+
+  public static boolean isOpen() {
+    return itsInspector != null && itsInspector.isVisible();
+  }
+
+  public static FtsContainerObject getInspectedObject() {
+    return itsPatcherObject;
+  }
+
   public ErmesPatcherInspector(FtsContainerObject thePatcher) {
     super("inspector for: "+thePatcher.getName());
     
-    /*itsPatcherObject = thePatcher;
-
-    itsParent = MaxWindowManager.getTopFrame();*/
     setLayout(new BorderLayout());
     
-    //Create north section.
-    Panel p1 = new Panel();
-    p1.setLayout(new GridLayout(1,2));
-    
-    Panel p11 = new Panel();
-    p11.setLayout(new GridLayout(2,1));
-    p11.add(new Label("Number of inlets"));
-    p11.add(new Label("Number of outlets"));
+    // The action listener to be used by the Ok button and the text fields,
+    // stored in a variable!
+    ActionListener aActionListener = new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+	
+	try{
+	  itsPatcherObject.setNumberOfInlets(Integer.parseInt(itsInsField.getText()));
+	  itsPatcherObject.setNumberOfOutlets(Integer.parseInt(itsOutsField.getText()));
+	}
+	catch (NumberFormatException e1){
+	  //ignore and close
+	}
+	
+	setVisible(false);
+      }
+    };
 
-    p1.add(p11);
-    
-    Panel p12 = new Panel();
-    p12.setLayout(new GridLayout(2,1));
-    itsInsField = new TextField("", 20);
-    itsInsField.addActionListener(this);
-    p12.add(itsInsField);
-    itsOutsField = new TextField("", 20);
-    itsOutsField.addActionListener(this);
-    p12.add(itsOutsField);   
-    p1.add(p12);
+    {//Create north section (labels, textfields).
+      Panel p1 = new Panel();
+      p1.setLayout(new GridLayout(1,2));
+      
+      { //the labels
+	Panel p11 = new Panel();
+	p11.setLayout(new GridLayout(2,1));
+	p11.add(new Label("Number of inlets"));
+	p11.add(new Label("Number of outlets"));
+	
+	p1.add(p11);
+      }
+      
+      { //the edit fields
+	Panel p12 = new Panel();
+	p12.setLayout(new GridLayout(2,1));
+	itsInsField = new TextField("", 20);
+	itsInsField.addActionListener(aActionListener);
+	p12.add(itsInsField);
+	itsOutsField = new TextField("", 20);
+	itsOutsField.addActionListener(aActionListener);
+	p12.add(itsOutsField);   
+	p1.add(p12);
+      }
+      
+      add("North", p1);
+    }
 
-    add("North", p1);
-
-    //Create south section.
-    Panel p2 = new Panel();
-    p2.setLayout(new BorderLayout());
-    
-    okButton = new Button("OK");
-    okButton.setBackground(Color.white);
-    okButton.addActionListener(this);
-    p2.add("East", okButton);
-    cancelButton = new Button("Cancel");
-    cancelButton.setBackground(Color.white);
-    cancelButton.addActionListener(this);
-    p2.add("West", cancelButton);
-    
-    add("South", p2);
+    {//Create south section (Ok-Cancel buttons).
+      Panel p2 = new Panel();
+      p2.setLayout(new BorderLayout());
+      
+      Button okButton = new Button("Ok");
+      
+      okButton.setBackground(Color.white);
+      okButton.addActionListener(aActionListener);
+      
+      p2.add("East", okButton);
+      
+      Button cancelButton = new Button("Cancel");
+      cancelButton.setBackground(Color.white);
+      cancelButton.addActionListener(new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	  setVisible(false);
+	}
+      });
+      
+      p2.add("West", cancelButton);
+      
+      add("South", p2);
+    }
     //Initialize this dialog to its preferred size.
     pack();
     reInit(thePatcher);
   }
 
-   ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////// actionListener --inizio
 
-  public void actionPerformed(ActionEvent e){        
-    int aInsNum = 0;
-    int aOutsNum = 0;
-    
-    if (e.getSource()==cancelButton) {
-      setVisible(false);
-    }
-    else  { //OK button and the editable fields are handled the same
-      itsInsNum = itsInsField.getText();
-      itsOutsNum = itsOutsField.getText();
-      try{
-	aInsNum = Integer.parseInt(itsInsNum);
-	aOutsNum = Integer.parseInt(itsOutsNum);
-      }
-      catch (NumberFormatException e1){
-	setVisible(false);
-	return;
-      }
-      itsPatcherObject.setNumberOfInlets(aInsNum);
-      itsPatcherObject.setNumberOfOutlets(aOutsNum);
-
-      setVisible(false);
-    }
-  }
-  ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////// actionListener --fine
-    
   public void reInit(FtsContainerObject thePatcher){
 
-    itsInsNum = String.valueOf(thePatcher.getNumberOfInlets());
-    itsOutsNum = String.valueOf(thePatcher.getNumberOfOutlets());
-
-    itsInsField.setText(itsInsNum);
-    itsOutsField.setText(itsOutsNum);
+    itsInsField.setText(String.valueOf(thePatcher.getNumberOfInlets()));
+    itsOutsField.setText(String.valueOf(thePatcher.getNumberOfOutlets()));
 
     itsPatcherObject = thePatcher;
-    itsParent = MaxWindowManager.getTopFrame();
+
     setTitle("inspector for: "+thePatcher.getName());
     setVisible(true);
 

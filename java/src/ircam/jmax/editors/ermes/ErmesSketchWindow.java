@@ -385,17 +385,10 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
   public void inspectAction() {
     if (itsSketchPad.currentSelection.isEmpty())
-      inspectPatcher(itsPatcher);
+      ErmesPatcherInspector.inspect(itsPatcher);
     else itsSketchPad.inspectSelection();
   }
 
-  static ErmesPatcherInspector itsPatcherInspector = null;
-
-  static public void inspectPatcher(FtsContainerObject thePatcher) {
-    if (itsPatcherInspector == null) 
-      itsPatcherInspector = new ErmesPatcherInspector(thePatcher);
-    else itsPatcherInspector.reInit(thePatcher);
-  }
 
   // clipboard handling
   protected void Copy() {
