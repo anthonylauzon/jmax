@@ -27,9 +27,10 @@
 #define FTS_TYPEID_VOID     1
 #define FTS_TYPEID_INT      2
 #define FTS_TYPEID_FLOAT    3
-#define FTS_TYPEID_SYMBOL   4
-#define FTS_TYPEID_POINTER  5
-#define FTS_TYPEID_STRING   6
+#define FTS_TYPEID_DOUBLE   4
+#define FTS_TYPEID_SYMBOL   5
+#define FTS_TYPEID_POINTER  6
+#define FTS_TYPEID_STRING   7
 
 #define fts_class_get_typeid(CL) ((CL)->type_id)
 
