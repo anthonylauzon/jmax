@@ -1,8 +1,11 @@
-dnl $Id: configure.in,v 1.96 2002/10/21 13:24:49 dechelle Exp $
+dnl $Id: configure.in,v 1.97 2002/10/22 14:55:46 p_tisserand Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.97  2002/10/22 14:55:46  p_tisserand
+dnl Fix temporary variable set when checking if jack.h and libhjack are found
+dnl
 dnl Revision 1.96  2002/10/21 13:24:49  dechelle
 dnl C++ client library in progress.
 dnl Fixed $0. in expressions.
@@ -466,7 +469,6 @@ packages/numeric/help/Makefile
 packages/oss/Makefile
 packages/oss/c/Makefile
 packages/oss/c/src/Makefile
-packages/oss/help/Makefile
 packages/sequence/Makefile
 packages/sequence/c/Makefile
 packages/sequence/c/src/Makefile
