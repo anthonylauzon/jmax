@@ -52,13 +52,13 @@ wave_ftl_outplace_ptr(fts_word_t *argv)
 }
 
 static void
-wave_ftl_outplace_fvec(fts_word_t *argv)
+wave_ftl_outplace_fmat(fts_word_t *argv)
 {
   wave_data_t *data = (wave_data_t *)fts_word_get_pointer(argv + 0);
   float * restrict in = (float *) fts_word_get_pointer(argv + 1);
   float * restrict out = (float *) fts_word_get_pointer(argv + 2);
   int n_tick = fts_word_get_int(argv + 3);
-  float *buf = fvec_get_ptr(data->table.fvec);
+  float *buf = fmat_get_ptr(data->table.fmat);
   int i;
 
   for(i=0; i<n_tick; i++)
@@ -91,12 +91,12 @@ wave_ftl_inplace_ptr(fts_word_t *argv)
 }
 
 static void
-wave_ftl_inplace_fvec(fts_word_t *argv)
+wave_ftl_inplace_fmat(fts_word_t *argv)
 {
   wave_data_t *data = (wave_data_t *)fts_word_get_pointer(argv + 0);
   float * restrict sig = (float *) fts_word_get_pointer(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
-  float *buf = fvec_get_ptr(data->table.fvec);
+  float *buf = fmat_get_ptr(data->table.fmat);
   int i;
 
   for(i=0; i<n_tick; i++)
@@ -115,6 +115,6 @@ wave_declare_functions(void)
   fts_dsp_declare_function(wave_ftl_symbols_ptr.outplace, wave_ftl_outplace_ptr);
   fts_dsp_declare_function(wave_ftl_symbols_ptr.inplace, wave_ftl_inplace_ptr);
 
-  fts_dsp_declare_function(wave_ftl_symbols_fvec.outplace, wave_ftl_outplace_fvec);
-  fts_dsp_declare_function(wave_ftl_symbols_fvec.inplace, wave_ftl_inplace_fvec);
+  fts_dsp_declare_function(wave_ftl_symbols_fmat.outplace, wave_ftl_outplace_fmat);
+  fts_dsp_declare_function(wave_ftl_symbols_fmat.inplace, wave_ftl_inplace_fmat);
 }

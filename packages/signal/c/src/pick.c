@@ -29,7 +29,7 @@ fts_symbol_t pick_symbol = 0;
 typedef struct _pick_
 {
   fts_dsp_object_t o;
-  fvec_t *fvec;
+  fmat_t *fmat;
   int index;
   double conv;
   double reconv;
@@ -47,7 +47,7 @@ pick_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   pick_t *this = (pick_t *)o;
 
   if(fts_object_outlet_is_connected(o, 0))
-    fts_outlet_object((fts_object_t *)o, 0, (fts_object_t *)this->fvec);
+    fts_outlet_object((fts_object_t *)o, 0, (fts_object_t *)this->fmat);
 }
 
 static void 
@@ -59,21 +59,21 @@ pick_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void 
-pick_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pick_set_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pick_t *this = (pick_t *)o;
-  fvec_t *fvec = (fvec_t *)fts_get_object(at);
-
-  if(this->fvec != fvec)
-    {
-      if(this->fvec != NULL)
-	fts_object_release((fts_object_t *)this->fvec);
-      
-      this->fvec = fvec;
-      fts_object_refer((fts_object_t *)fvec);
-      
-      this->index = fvec_get_size(fvec);
-    }
+  fmat_t *fmat = (fmat_t *)fts_get_object(at);
+  
+  if(this->fmat != fmat)
+  {
+    if(this->fmat != NULL)
+      fts_object_release((fts_object_t *)this->fmat);
+    
+    this->fmat = fmat;
+    fts_object_refer((fts_object_t *)fmat);
+    
+    this->index = fmat_get_m(fmat);
+  }
 }
 
 /***************************************************************************************
@@ -105,8 +105,8 @@ pick_ftl(fts_word_t *argv)
   pick_t *this = (pick_t *)fts_word_get_pointer(argv + 0);
   float * restrict in = (float *)fts_word_get_pointer(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
-  float *buf = fvec_get_ptr(this->fvec);
-  int size = fvec_get_size(this->fvec);
+  float *buf = fmat_get_ptr(this->fmat);
+  int size = fmat_get_m(this->fmat);
   int index = this->index;
 
   if(index < 0)
@@ -156,7 +156,7 @@ pick_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   pick_t *this = (pick_t *)o;
   int size = 1024;
 
-  this->fvec = NULL;
+  this->fmat = NULL;
   this->index = 0;
   this->conv = 0.0;
   this->reconv = 0.0;
@@ -170,8 +170,8 @@ pick_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	  if(size < 0)
 	    size = 0;
 	}
-      else if(fts_is_a(at, fvec_type))
-	pick_set_fvec(o, 0, 0, 1, at);
+      else if(fts_is_a(at, fmat_class))
+	pick_set_fmat(o, 0, 0, 1, at);
       else
 	{
 	  fts_object_error(o, "bad argument");
@@ -179,14 +179,14 @@ pick_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	}
     }
       
-  if(this->fvec == NULL)  
+  if(this->fmat == NULL)  
     {
-      this->fvec = (fvec_t *)fts_object_create(fvec_type, 0, 0);
-      fvec_set_size(this->fvec, size);
-      fts_object_refer((fts_object_t *)this->fvec);
+      this->fmat = (fmat_t *)fts_object_create(fmat_class, 0, 0);
+      fmat_set_size(this->fmat, size, 1);
+      fts_object_refer((fts_object_t *)this->fmat);
     }
 
-  this->index = fvec_get_size(this->fvec);
+  this->index = fmat_get_m(this->fmat);
 
   fts_dsp_object_init((fts_dsp_object_t *)o);
 }
@@ -196,8 +196,8 @@ pick_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   pick_t *this = (pick_t *)o;
 
-  if(this->fvec)
-    fts_object_release((fts_object_t *)this->fvec);    
+  if(this->fmat)
+    fts_object_release((fts_object_t *)this->fmat);    
 
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
@@ -210,10 +210,10 @@ pick_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_put, pick_put);
   
   fts_class_inlet_bang(cl, 0, pick_bang);
-  fts_class_inlet(cl, 1, fvec_type, pick_set_fvec);
+  fts_class_inlet(cl, 1, fmat_class, pick_set_fmat);
 
   fts_dsp_declare_inlet(cl, 0);
-  fts_class_outlet(cl, 0, fvec_type);
+  fts_class_outlet(cl, 0, fmat_class);
 }
 
 void

@@ -37,7 +37,7 @@ typedef struct osc_data
   union
   {
     float *ptr;
-    fvec_t *fvec;
+    fmat_t *fmat;
   } table;
 
   /* phase counter */
@@ -90,17 +90,17 @@ osc_data_set_phase(ftl_data_t ftl_data, double phase)
 }
 
 void
-osc_data_set_fvec(ftl_data_t ftl_data, fvec_t *fvec)
+osc_data_set_fmat(ftl_data_t ftl_data, fmat_t *fmat)
 {
   osc_data_t *data = (osc_data_t *)ftl_data_get_ptr(ftl_data);
 
-  if(data->table.fvec)
-    fts_object_release((fts_object_t *)data->table.fvec);
+  if(data->table.fmat)
+    fts_object_release((fts_object_t *)data->table.fmat);
   
-  data->table.fvec = fvec;
+  data->table.fmat = fmat;
   
-  if(fvec)
-    fts_object_refer((fts_object_t *)fvec);
+  if(fmat)
+    fts_object_refer((fts_object_t *)fmat);
 }
 
 void
@@ -136,12 +136,12 @@ osc_ftl_control_input_ptr(fts_word_t *argv)
 }
 
 static void
-osc_ftl_control_input_fvec(fts_word_t *argv)
+osc_ftl_control_input_fmat(fts_word_t *argv)
 {
   osc_data_t *data = (osc_data_t *)fts_word_get_pointer(argv + 0);
   float * restrict out = (float *) fts_word_get_pointer(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
-  float *buf = fvec_get_ptr(data->table.fvec);
+  float *buf = fmat_get_ptr(data->table.fmat);
   fts_intphase_t phi = data->phase;
   fts_intphase_t incr = data->incr.absolute;
   int i;
@@ -186,13 +186,13 @@ osc_ftl_signal_input_ptr(fts_word_t *argv)
 }
 
 static void
-osc_ftl_signal_input_fvec(fts_word_t *argv)
+osc_ftl_signal_input_fmat(fts_word_t *argv)
 {
   osc_data_t *data = (osc_data_t *)fts_word_get_pointer(argv + 0);
   float * restrict in = (float *) fts_word_get_pointer(argv + 1);
   float * restrict out = (float *) fts_word_get_pointer(argv + 2);
   int n_tick = fts_word_get_int(argv + 3);
-  float *buf = fvec_get_ptr(data->table.fvec);
+  float *buf = fmat_get_ptr(data->table.fmat);
   fts_intphase_t phi = data->phase;
   fts_intphase_t factor = data->incr.factor;
   int i;
@@ -237,12 +237,12 @@ osc_ftl_signal_input_inplace_ptr(fts_word_t *argv)
 }
 
 static void
-osc_ftl_signal_input_inplace_fvec(fts_word_t *argv)
+osc_ftl_signal_input_inplace_fmat(fts_word_t *argv)
 {
   osc_data_t *data = (osc_data_t *)fts_word_get_pointer(argv + 0);
   float * restrict sig = (float *) fts_word_get_pointer(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
-  float *buf = fvec_get_ptr(data->table.fvec);
+  float *buf = fmat_get_ptr(data->table.fmat);
   fts_intphase_t phi = data->phase;
   fts_intphase_t factor = data->incr.factor;
   int i;
@@ -391,9 +391,9 @@ osc_declare_functions(void)
   fts_dsp_declare_function(osc_ftl_symbols_ptr.signal_input, osc_ftl_signal_input_ptr);
   fts_dsp_declare_function(osc_ftl_symbols_ptr.signal_input_inplace, osc_ftl_signal_input_inplace_ptr);
 
-  fts_dsp_declare_function(osc_ftl_symbols_fvec.control_input, osc_ftl_control_input_fvec);
-  fts_dsp_declare_function(osc_ftl_symbols_fvec.signal_input, osc_ftl_signal_input_fvec);
-  fts_dsp_declare_function(osc_ftl_symbols_fvec.signal_input_inplace, osc_ftl_signal_input_inplace_fvec);
+  fts_dsp_declare_function(osc_ftl_symbols_fmat.control_input, osc_ftl_control_input_fmat);
+  fts_dsp_declare_function(osc_ftl_symbols_fmat.signal_input, osc_ftl_signal_input_fmat);
+  fts_dsp_declare_function(osc_ftl_symbols_fmat.signal_input_inplace, osc_ftl_signal_input_inplace_fmat);
 
   fts_dsp_declare_function(phi_ftl_symbols.control_input, phi_ftl_control_input);
   fts_dsp_declare_function(phi_ftl_symbols.signal_input, phi_ftl_signal_input);

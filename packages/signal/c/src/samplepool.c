@@ -127,7 +127,7 @@ sample_pool_run(sample_pool_t *pool, float *out, int n_tick)
   while(*sample_ptr && (*sample_ptr)->time <= next)
     {
       sample_t *sample = *sample_ptr;
-      float *buf = fvec_get_ptr(sample->fvec);
+      float *buf = fmat_get_ptr(sample->fmat);
       fts_idefix_t index = sample->index;
       int delay = sample->time;
       float * restrict output = out + delay;
@@ -145,8 +145,8 @@ sample_pool_run(sample_pool_t *pool, float *out, int n_tick)
 	  /* end of sample */
 	  cut = left;
 	  
-	  /* release fvec */
-	  fts_object_release((fts_object_t *)sample->fvec);
+	  /* release fmat */
+	  fts_object_release((fts_object_t *)sample->fmat);
 
 	  /* desactivate sample */
 	  sample_move(sample_ptr, &pool->inactive);
@@ -179,7 +179,7 @@ sample_pool_run(sample_pool_t *pool, float *out, int n_tick)
 }
 
 sample_t *
-sample_schedule(sample_pool_t *pool, fvec_t *fvec, double delay, double onset, double length, double incr, float amp)
+sample_schedule(sample_pool_t *pool, fmat_t *fmat, double delay, double onset, double length, double incr, float amp)
 {
   sample_t * restrict sample = pool->inactive;
 
@@ -201,8 +201,8 @@ sample_schedule(sample_pool_t *pool, fvec_t *fvec, double delay, double onset, d
       sample->length = i_length;
       sample->duration = i_duration;
       sample->amp = amp;
-      sample->fvec = fvec;
-      fts_object_refer((fts_object_t *)fvec);
+      sample->fmat = fmat;
+      fts_object_refer((fts_object_t *)fmat);
       
       /* timing */
       sample->time = pool->time + i_delay;

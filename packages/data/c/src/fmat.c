@@ -64,7 +64,7 @@ fmat_create(int m, int n)
   
   fts_set_int(&size[0], m);
   fts_set_int(&size[1], n);
-  return ((fmat_t *) fts_object_create(fmat_type, 2, size));
+  return ((fmat_t *) fts_object_create(fmat_class, 2, size));
 }
 
 

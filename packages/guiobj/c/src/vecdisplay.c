@@ -234,14 +234,16 @@ vecdisplay_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void 
-vecdisplay_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vecdisplay_t *this = (vecdisplay_t *)o;
   int size = this->size;
-  fvec_t *vec = (fvec_t *)fts_get_object(at);
-  float *ptr = fvec_get_ptr(vec);
-  int n = fvec_get_size(vec);
-
+  fts_object_t *vec = fts_get_object(at);
+  float *ptr;
+  int n, stride;
+  
+  fmat_or_slice_vector(vec, &ptr, &n, &stride);
+  
   /* display vector */
   this->scroll = 0;
   
@@ -249,74 +251,31 @@ vecdisplay_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     n = size;
   
   if(n)
+  {
+    float min = this->min;
+    float max = this->max;
+    float value_range = max - min;
+    int i;
+    
+    for(i=0; i<n; i++)
     {
-      float min = this->min;
-      float max = this->max;
-      float value_range = max - min;
-      int i;
-
-      for(i=0; i<n; i++)
-	{
-	  float value = ptr[i];
-	  int display;
-	  
-	  if(value < min)
-	    value = min;
-	  else if (value > max)
-	    value = max;
-	  
-	  display = (int)((float)(this->range - 1) * (value - min) / value_range + 0.5);
-	  
-	  fts_set_int(this->a + i, display);
-	}
-
-      this->n = n;
+      float value = ptr[i * stride];
+      int display;
       
-      vecdisplay_deliver( this);
-    }
-}
-
-static void 
-vecdisplay_cvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  vecdisplay_t * this = (vecdisplay_t *)o;
-  int size = this->size;
-  cvec_t *vec = (cvec_t *)fts_get_object(at);
-  complex *ptr = cvec_get_ptr(vec);
-  int n = cvec_get_size(vec);
-
-  /* display vector */
-  this->scroll = 0;
-  
-  if(n > size)
-    n = size;
-  
-  if(n)
-    {
-      float min = this->min;
-      float max = this->max;
-      float value_range = max - min;
-      int i;
-
-      for(i=0; i<n; i++)
-	{
-	  float value = ptr[i].re;
-	  int display;
-	  
-	  if(value < min)
-	    value = min;
-	  else if (value > max)
-	    value = max;
-	  
-	  display = (int)((float)(this->range - 1) * (value - min) / value_range + 0.5);
-	  
-	  fts_set_int(this->a + i, display);
-	}
-
-      this->n = n;
+      if(value < min)
+        value = min;
+      else if (value > max)
+        value = max;
       
-      vecdisplay_deliver( this);
+      display = (int)((float)(this->range - 1) * (value - min) / value_range + 0.5);
+      
+      fts_set_int(this->a + i, display);
     }
+    
+    this->n = n;
+    
+    vecdisplay_deliver( this);
+  }
 }
 
 static void 
@@ -448,8 +407,8 @@ vecdisplay_instantiate(fts_class_t *cl)
   fts_class_inlet_number(cl, 0, vecdisplay_number);
   fts_class_inlet_varargs(cl, 0, vecdisplay_varargs);
   fts_class_inlet(cl, 0, ivec_type, vecdisplay_ivec);
-  fts_class_inlet(cl, 0, fvec_type, vecdisplay_fvec);
-  fts_class_inlet(cl, 0, cvec_type, vecdisplay_cvec);
+  fts_class_inlet(cl, 0, fmat_class, vecdisplay_vector);
+  fts_class_inlet(cl, 0, fvec_class, vecdisplay_vector);
 }
 
 void 

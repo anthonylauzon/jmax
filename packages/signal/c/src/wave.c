@@ -25,7 +25,7 @@
 #include "wave.h"
 
 struct wave_ftl_symbols wave_ftl_symbols_ptr = {0, 0};
-struct wave_ftl_symbols wave_ftl_symbols_fvec = {0, 0};
+struct wave_ftl_symbols wave_ftl_symbols_fmat = {0, 0};
 
 ftl_data_t 
 wave_data_new(void)
@@ -39,17 +39,17 @@ wave_data_new(void)
 }
 
 void
-wave_data_set_fvec(ftl_data_t ftl_data, fvec_t *fvec)
+wave_data_set_fmat(ftl_data_t ftl_data, fmat_t *fmat)
 {
   wave_data_t *data = (wave_data_t *)ftl_data_get_ptr(ftl_data);
 
-  if(data->table.fvec)
-    fts_object_release((fts_object_t *)data->table.fvec);
+  if(data->table.fmat)
+    fts_object_release((fts_object_t *)data->table.fmat);
   
-  data->table.fvec = fvec;
+  data->table.fmat = fmat;
   
-  if(fvec)
-    fts_object_refer((fts_object_t *)fvec);
+  if(fmat)
+    fts_object_refer((fts_object_t *)fmat);
 }
 
 void
@@ -67,16 +67,16 @@ wave_data_set_ptr(ftl_data_t ftl_data, float *ptr)
  */
 
 static void 
-wave_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+wave_set_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   wave_t *this = (wave_t *)o;
-  fvec_t *fvec = (fvec_t *)fts_get_object(at);
+  fmat_t *fmat = (fmat_t *)fts_get_object(at);
 
   /* check float vector size */
-  if(fvec_get_size(fvec) < WAVE_TABLE_SIZE + 1)
-    fvec_set_size(fvec, WAVE_TABLE_SIZE + 1);
+  if(fmat_get_m(fmat) < WAVE_TABLE_SIZE + 1)
+    fmat_set_m(fmat, WAVE_TABLE_SIZE + 1);
 
-  wave_data_set_fvec(this->data, fvec);
+  wave_data_set_fmat(this->data, fmat);
 }
 
 /***************************************************************************************
@@ -93,8 +93,8 @@ wave_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   int n_tick = fts_dsp_get_output_size(dsp, 0);
   struct wave_ftl_symbols *sym;  
 
-  if(this->fvec)
-    sym = &wave_ftl_symbols_fvec;
+  if(this->fmat)
+    sym = &wave_ftl_symbols_fmat;
   else
     sym = &wave_ftl_symbols_ptr;
   
@@ -136,14 +136,14 @@ wave_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   if(ac == 0)
     {
-      this->fvec = 0;
+      this->fmat = 0;
       wave_data_set_ptr(this->data, fts_fftab_get_cosine(WAVE_TABLE_SIZE));
       fts_object_set_inlets_number(o, 1);
     }
-  else if(ac == 1 && fts_is_a(at, fvec_type))
+  else if(ac == 1 && fts_is_a(at, fmat_class))
     {
-      this->fvec = 1;
-      wave_set_fvec(o, 0, 0, 1, at);
+      this->fmat = 1;
+      wave_set_fmat(o, 0, 0, 1, at);
     }
   else
     fts_object_error(o, "bad arguments");
@@ -154,9 +154,9 @@ wave_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   wave_t *this = (wave_t *)o;
 
-  /* release fvec */
-  if(this->fvec)
-    wave_data_set_fvec(this->data, 0);
+  /* release fmat */
+  if(this->fmat)
+    wave_data_set_fmat(this->data, 0);
 
   ftl_data_free(this->data);
 
@@ -182,8 +182,8 @@ signal_wave_config(void)
   wave_ftl_symbols_ptr.inplace = fts_new_symbol("wave_ptr_inplace");
 
   /* ftl wavections using a float vector as wave table */
-  wave_ftl_symbols_fvec.outplace = fts_new_symbol("wave_fvec_outplace");
-  wave_ftl_symbols_fvec.inplace = fts_new_symbol("wave_fvec_inplace");
+  wave_ftl_symbols_fmat.outplace = fts_new_symbol("wave_fmat_outplace");
+  wave_ftl_symbols_fmat.inplace = fts_new_symbol("wave_fmat_inplace");
 
   /* declare the waveillator related FTL wavections (platform dependent) */
   wave_declare_functions();

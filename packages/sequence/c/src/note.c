@@ -69,9 +69,7 @@ scoob_array_function(fts_object_t *o, fts_array_t *array)
 
 static void 
 scoob_description_function(fts_object_t *o, fts_array_t *array)
-{
-  scoob_t *self = (scoob_t *)o;
-  
+{  
   fts_array_append_symbol(array, seqsym_scoob);
   scoob_array_function(o, array);
 }

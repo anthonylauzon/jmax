@@ -132,53 +132,6 @@ matdisplay_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void 
-matdisplay_cvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  matdisplay_t * this = (matdisplay_t *)o;
-  cvec_t * vec = (cvec_t *)fts_get_object(at);
-  float min = this->min;
-  float max = this->max;
-  float range = max - min; 
-  int m = cvec_get_size(vec);
-  int n = this->n_wind / this->n_zoom + 1;
-
-  /* to send only the useful data */
-  
-  if(m * this->m_zoom > this->m_wind)
-    m = this->m_wind / this->m_zoom;
-
-  if(m > 0 && range != 0.0)
-    {
-      complex *c = cvec_get_ptr(vec);
-      fts_atom_t *atoms;
-      int i;
-      
-      this->m_size = m;
-      this->n_size = n;           
-
-      fts_array_set_size(&this->a, m);
-      atoms = fts_array_get_atoms(&this->a);
-
-      for(i=0; i<m;i++)
-	{
-	  float value = c[i].re;
-	  int val;
-	  
-	  if(value < min)
-	    value = min;	      
-	  else if(value > max)
-	    value = max;
-	  
-	  val = (int)((255) * ((value - min) / range));
-	  
-	  fts_set_int(atoms + i, val); 
-	}
-      this->scroll = 1; /* mode scroll = true */
-      matdisplay_deliver(this);
-    }
-}
-
-static void 
 matdisplay_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   matdisplay_t * this = (matdisplay_t *)o;
@@ -229,47 +182,49 @@ static void
 matdisplay_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   matdisplay_t * this = (matdisplay_t *)o;
-  fvec_t *vec = (fmat_t *)fts_get_object(at);
   float min = this->min;
   float max = this->max;
   float range = max - min; 
-  int m = fvec_get_size(vec);
   int n = this->n_wind / this->n_zoom + 1;
-
+  fts_object_t *vec = fts_get_object(at);
+  float *ptr;
+  int m, stride;
+  
+  fvec_vector(vec, &ptr, &m, &stride);
+  
   /* to send only the useful data */
   
   if(m * this->m_zoom > this->m_wind)
     m = this->m_wind / this->m_zoom;
-
+  
   if(m > 0 && range != 0.0)
+  {
+    fts_atom_t *atoms;
+    int i, j;
+    
+    this->m_size = m;
+    this->n_size = n;           
+    
+    fts_array_set_size(&this->a, m);
+    atoms = fts_array_get_atoms(&this->a);
+    
+    for(i=0, j=0; i<m; i++, j+=stride)
     {
-      float *f = fvec_get_ptr(vec);
-      fts_atom_t *atoms;
-      int i;
+      float value = ptr[j];
+      int val;
       
-      this->m_size = m;
-      this->n_size = n;           
-
-      fts_array_set_size(&this->a, m);
-      atoms = fts_array_get_atoms(&this->a);
-
-      for(i=0; i<m;i++)
-	{
-	  float value = f[i];
-	  int val;
-	  
-	  if(value < min)
-	    value = min;	      
-	  else if(value > max)
-	    value = max;
-	  
-	  val = (int)((255) * ((value - min) / range));
-	  
-	  fts_set_int(atoms + i, val); 
-	}
-      this->scroll = 1; /* mode scroll = true */
-      matdisplay_deliver(this);
+      if(value < min)
+        value = min;	      
+      else if(value > max)
+        value = max;
+      
+      val = (int)((255) * ((value - min) / range));
+      
+      fts_set_int(atoms + i, val); 
     }
+    this->scroll = 1; /* mode scroll = true */
+    matdisplay_deliver(this);
+  }
 }
 
 static void 
@@ -536,10 +491,9 @@ matdisplay_instantiate(fts_class_t *cl)
  
   fts_class_inlet_number(cl, 0, matdisplay_number);
   fts_class_inlet_varargs(cl, 0, matdisplay_varargs);
-  fts_class_inlet(cl, 0, fvec_type, matdisplay_fvec);
+  fts_class_inlet(cl, 0, fvec_class, matdisplay_fvec);
   fts_class_inlet(cl, 0, ivec_type, matdisplay_ivec);
-  fts_class_inlet(cl, 0, cvec_type, matdisplay_cvec);
-  fts_class_inlet(cl, 0, fmat_type, matdisplay_fmat);
+  fts_class_inlet(cl, 0, fmat_class, matdisplay_fmat);
 }
 
 void 

@@ -357,8 +357,6 @@ scomark_bar_get_meter_quotient(scomark_t *self, int *meter_num, int *meter_den)
   }
 }
 
-
-
 /************************************************************
  *
  *  methods
@@ -392,6 +390,21 @@ _scomark_set_tempo(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   double old_tempo = 0.0;
   scomark_set_tempo(self, fts_get_number_float(at), &old_tempo);
 }
+
+/*static void
+_scomark_set_label(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  scomark_t *self = (scomark_t *)o;
+  fts_symbol_t label = fts_get_symbol(at);
+  int n = strlen(fts_symbol_name(label));
+  char *buf = (char *)alloca(sizeof(char) * (n + 2));
+  fts_atom_t a;  
+  buf[0] = '_';
+  strcpy(buf + 1, fts_symbol_name(label));
+  buf[n+2] = '\0';
+  fts_set_symbol(&a, fts_new_symbol(buf));
+  propobj_set_property_by_index((propobj_t *)self, scomark_propidx_label, &a);  
+}*/
 
 static void
 _scomark_set_tempo_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -541,7 +554,7 @@ scomark_instantiate(fts_class_t *cl)
   /* properties of any marker */
   propobj_class_add_float_property(cl, seqsym_tempo, _scomark_set_tempo); /* scomark_propidx_tempo = 0 */
   propobj_class_add_int_property(cl, seqsym_cue, NULL); /* scomark_propidx_cue = 1 */
-  propobj_class_add_symbol_property(cl, fts_s_label, NULL); /* scomark_propidx_label = 2 */
+  propobj_class_add_symbol_property(cl, fts_s_label, NULL /*_scomark_set_label*/); /* scomark_propidx_label = 2 */
   
   /* properties for bars only */
   propobj_class_add_int_property(cl, seqsym_bar_num, NULL); /* scomark_propidx_bar_num = 3 */
@@ -589,7 +602,7 @@ marker_track_get_previous_meter(track_t *marker_track, scomark_t *scomark, fts_s
 {
   event_t *mark_evt = (event_t *)fts_object_get_context((fts_object_t *)scomark);    
   event_t *prev = event_get_prev(mark_evt);
-  scomark_t *marker;
+  scomark_t *marker = NULL;
         
   while(prev != NULL && *meter == NULL)
   {

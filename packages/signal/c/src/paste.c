@@ -45,15 +45,17 @@ static void
 dcopy_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dcopy_t *this = (dcopy_t *)o;
-  fvec_t *fvec = (fvec_t *)fts_get_object(at);
+  fts_object_t *vec = fts_get_object(at);
   delayline_t *delayline = this->line;
   float *buffer = delayline->buffer;
   int delay_size = delayline->delay_size;
   int ring_size = delayline->ring_size;
-  int size = fvec_get_size(fvec);
-  float *ptr = fvec_get_ptr(fvec);
+  int size, stride;
+  float *ptr;
   int onset, tail;
-  int i, k;
+  int i, j, k;
+  
+  fmat_or_slice_vector(vec, &ptr, &size, &stride);
 
   if(size > delay_size)
     size = delay_size;
@@ -68,30 +70,32 @@ dcopy_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     tail = size;
 
   /* copy fvec from delay line */
-  for(i=0; i<tail; i++)
-    ptr[i] = buffer[onset + i];
+  for(i=0, j=0; i<tail; i++, j+=stride)
+    ptr[j] = buffer[onset + i];
 
-  for(k=0; i<size; k++, i++)
-    ptr[i] = buffer[k];
+  for(k=0; i<size; k++, i++, j+=stride)
+    ptr[j] = buffer[k];
 
-  fts_outlet_object(o, 0, (fts_object_t *)fvec);
+  fts_outlet_object(o, 0, vec);
 }
 
 static void
 dpaste_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dcopy_t *this = (dcopy_t *)o;
-  fvec_t *fvec = (fvec_t *)fts_get_object(at);
+  fts_object_t *vec = fts_get_object(at);
   delayline_t *delayline = this->line;
   float *buffer = delayline->buffer;
   int phase = delayline->phase;
   int drain_size = delayline->drain_size;
   int ring_size = delayline->ring_size;
-  int size = fvec_get_size(fvec);
-  float *ptr = fvec_get_ptr(fvec);
+  int size, stride;
+  float *ptr;
   int tail;
-  int i;
-
+  int i, j;
+ 
+  fmat_or_slice_vector(vec, &ptr, &size, &stride);
+  
   if(size > drain_size)
     size = drain_size;
 
@@ -103,18 +107,18 @@ dpaste_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   /* add fvec to delay drain */
   if(tail > size)
   {
-    for(i=0; i<size; i++)
+    for(i=0, j=0; i<size; i++, j+=stride)
       buffer[phase + i] += ptr[i];
   }
   else
   {
     int k;
 
-    for(i=0; i<tail; i++)
-      buffer[phase + i] += ptr[i];
+    for(i=0, j=0; i<tail; i++, j+=stride)
+      buffer[phase + i] += ptr[j];
 
-    for(k=0; i<size; k++, i++)
-      buffer[k] += ptr[i];
+    for(k=0; i<size; k++, i++, j+=stride)
+      buffer[k] += ptr[j];
   }
 }
 
@@ -164,10 +168,11 @@ dcopy_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(dcopy_t), dcopy_init, dcopy_delete);
 
-  fts_class_inlet(cl, 0, fvec_type, dcopy_fvec);
+  fts_class_inlet(cl, 0, fvec_class, dcopy_fvec);
+  fts_class_inlet(cl, 0, fmat_class, dcopy_fvec);
   fts_class_inlet(cl, 1, delayline_class, dcopy_set_line);
 
-  fts_class_outlet(cl, 0, fvec_type);
+  fts_class_outlet(cl, 0, NULL);
 }
 
 static void
@@ -175,7 +180,8 @@ dpaste_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(dcopy_t), dcopy_init, dcopy_delete);
 
-  fts_class_inlet(cl, 0, fvec_type, dpaste_fvec);
+  fts_class_inlet(cl, 0, fvec_class, dpaste_fvec);
+  fts_class_inlet(cl, 0, fmat_class, dpaste_fvec);
   fts_class_inlet(cl, 1, delayline_class, dcopy_set_line);
 }
 

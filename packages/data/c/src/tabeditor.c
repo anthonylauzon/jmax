@@ -360,7 +360,7 @@ tabeditor_copy_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, in
       this_size = fmat_get_m( (fmat_t *)this->vec);
       
       if(!this->copy)
-        this->copy = fts_object_create(fmat_type, 1, at + 1);
+        this->copy = fts_object_create(fmat_class, 1, at + 1);
       else
         fmat_set_m((fmat_t *)this->copy, size);
       

@@ -58,26 +58,26 @@ getrange_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-getrange_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getrange_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fvec_t *vec = (fvec_t *)fts_get_object(at);
+  fmat_t *mat = (fmat_t *)fts_get_object(at);
   float min = FLT_MAX;
   float max = FLT_MIN;
-  int size = fvec_get_size(vec);
-  float *ptr = fvec_get_ptr(vec);
+  int size = fmat_get_m(mat) * fmat_get_n(mat);
+  float *ptr = fmat_get_ptr(mat);
   int i;
-
+  
   for(i=0; i<size; i++)
-    {
-      float value = ptr[i];
-
-      if(value > max)
-	max = value;
-
-      if(value < min)
-	min = value;
-    }
-
+  {
+    float value = ptr[i];
+    
+    if(value > max)
+      max = value;
+    
+    if(value < min)
+      min = value;
+  }
+  
   fts_outlet_float(o, 1, max);
   fts_outlet_float(o, 0, min);
 }
@@ -94,7 +94,7 @@ getrange_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(fts_object_t), NULL, NULL); 
   
   fts_class_inlet(cl, 0, ivec_type, getrange_ivec);
-  fts_class_inlet(cl, 0, fvec_type, getrange_fvec);
+  fts_class_inlet(cl, 0, fmat_class, getrange_fmat);
 
   fts_class_outlet_number(cl, 0);
   fts_class_outlet_number(cl, 1);

@@ -57,7 +57,7 @@ typedef struct _sogs_params_
   /* misc */
   int n_overlap;
   float scale; /* 2 / n_overlap */
-  fvec_t *fvec;
+  fmat_t *fmat;
 
   /* state */
   fts_intphase_t wind_phi; /* window phase */
@@ -70,9 +70,9 @@ typedef struct _sogs_params_
 } sogs_params_t;
 
 static double
-clip_to_vector(double value, fvec_t *fvec)
+clip_to_vector(double value, fmat_t *fmat)
 {
-  double size = fvec_get_size(fvec);
+  double size = fmat_get_m(fmat);
 
   if(value < 0.0)
     value = 0.0;
@@ -95,7 +95,7 @@ sogs_params_reset(sogs_params_t *params, double sr, int n_tick)
   }
 
   params->onset = params->target;
-  params->onset = clip_to_vector(params->onset, params->fvec);
+  params->onset = clip_to_vector(params->onset, params->fmat);
 
   if(params->duration < 4.0)
     params->duration = 4.0;
@@ -219,9 +219,9 @@ ftl_sogs(fts_word_t *a)
   int n_tick = fts_word_get_int(a + 3);
   fts_intphase_t wind_phi = params->wind_phi;
   fts_intphase_t wind_incr = params->wind_incr;
-  float * restrict samples = fvec_get_ptr(params->fvec);
+  float * restrict samples = fmat_get_ptr(params->fmat);
   float scale = params->scale;
-  int size = fvec_get_size(params->fvec);
+  int size = fmat_get_m(params->fmat);
   int i, j;
 
   for(i=0; i<n_tick; i++)
@@ -296,7 +296,7 @@ sogs_set_position(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   sogs_params_t *params = ftl_data_get_ptr(this->params);
   double position = fts_get_number_float(at);
 
-  params->onset = params->target = clip_to_vector(position * params->sr, params->fvec);
+  params->onset = params->target = clip_to_vector(position * params->sr, params->fmat);
   params->speed = 0.0;
 }
 
@@ -345,22 +345,22 @@ sogs_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-sogs_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sogs_set_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sogs_t *this = (sogs_t *)o;
   sogs_params_t *params = ftl_data_get_ptr(this->params);
-  fvec_t *fvec = (fvec_t *)fts_get_object(at);
-  int size = fvec_get_size(fvec);
+  fmat_t *fmat = (fmat_t *)fts_get_object(at);
+  int size = fmat_get_m(fmat);
 
   if(params->onset > size)
     params->onset = size;
 
-  if(params->target == fvec_get_size(params->fvec) || params->target > size)
+  if(params->target == fmat_get_m(params->fmat) || params->target > size)
     params->target = size;
 
-  fts_object_release((fts_object_t *)params->fvec);
-  params->fvec = fvec;
-  fts_object_refer((fts_object_t *)fvec);
+  fts_object_release((fts_object_t *)params->fmat);
+  params->fmat = fmat;
+  fts_object_refer((fts_object_t *)fmat);
 }
 
 static void
@@ -433,7 +433,7 @@ sogs_set_target(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       double target = fts_get_number_float(at) * params->sr;
       double period = fts_get_number_float(at + 1) * params->sr;
 
-      params->target = clip_to_vector(target, params->fvec);
+      params->target = clip_to_vector(target, params->fmat);
       params->speed = (target - params->onset) / period;
     }
   }
@@ -444,7 +444,7 @@ sogs_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 {
   sogs_t *this = (sogs_t *)o;
   sogs_params_t *params = ftl_data_get_ptr(this->params);
-  double end = fvec_get_size(params->fvec);
+  double end = fmat_get_m(params->fmat);
 
   if(ac && fts_is_number(at))
   {
@@ -465,7 +465,7 @@ sogs_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 {
   sogs_t *this = (sogs_t *)o;
   sogs_params_t *params = ftl_data_get_ptr(this->params);
-  double end = fvec_get_size(params->fvec);
+  double end = fmat_get_m(params->fmat);
   double start = 0.0;
   double target = end;
   double speed = 1.0;
@@ -592,16 +592,16 @@ sogs_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   this->params = NULL;
   this->segs = NULL;
 
-  if(ac > 0 && fts_is_a(at, fvec_type))
+  if(ac > 0 && fts_is_a(at, fmat_class))
   {
     sogs_segment_t *segs;
     sogs_params_t *params;
-    fvec_t *fvec;
+    fmat_t *fmat;
     int i;
 
-    /* get fvec argument */
-    fvec =(fvec_t *) fts_get_object(at);
-    fts_object_refer((fts_object_t *)fvec);
+    /* get fmat argument */
+    fmat =(fmat_t *) fts_get_object(at);
+    fts_object_refer((fts_object_t *)fmat);
 
     /* get optional overlap argument */
     if(ac > 1 && fts_is_number(at + 1))
@@ -639,7 +639,7 @@ sogs_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     params->n_overlap = this->max_overlap;
     params->scale = 2. / this->max_overlap;
 
-    params->fvec = fvec;
+    params->fmat = fmat;
 
     params->wind_phi = 0;
     params->wind_incr = 0;
@@ -652,7 +652,7 @@ sogs_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       sogs_set(o, 0, 0, ac - 2, at + 2);
   }
   else
-    fts_object_error(o, "first argument of fvec required");
+    fts_object_error(o, "first argument of fmat required");
 
   fts_dsp_object_init((fts_dsp_object_t *)o);
 }
@@ -666,7 +666,7 @@ sogs_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   {
     sogs_params_t *params = ftl_data_get_ptr(this->params);
 
-    fts_object_release((fts_object_t *)params->fvec);
+    fts_object_release((fts_object_t *)params->fmat);
     ftl_data_free(this->params);
     ftl_data_free(this->segs);
   }
@@ -692,7 +692,7 @@ sogs_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_set, sogs_set);
 
-  fts_class_inlet(cl, 0, fvec_type, sogs_set_fvec);
+  fts_class_inlet(cl, 0, fmat_class, sogs_set_fmat);
   fts_class_inlet_varargs(cl, 0, sogs_set_target);
   fts_class_inlet_number(cl, 0, sogs_set_position);
   fts_class_inlet_number(cl, 1, sogs_set_position_variation);

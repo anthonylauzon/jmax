@@ -36,7 +36,7 @@ struct wave_ftl_symbols
 };
 
 extern struct wave_ftl_symbols wave_ftl_symbols_ptr;
-extern struct wave_ftl_symbols wave_ftl_symbols_fvec;
+extern struct wave_ftl_symbols wave_ftl_symbols_fmat;
 
 typedef struct wave_data
 { 
@@ -44,7 +44,7 @@ typedef struct wave_data
   union
   {
     float *ptr;
-    fvec_t *fvec;
+    fmat_t *fmat;
   } table;
 } wave_data_t;
 
@@ -52,7 +52,7 @@ typedef struct _wave_
 {
   fts_dsp_object_t o;
   ftl_data_t data;
-  int fvec;
+  int fmat;
 } wave_t;
 
 extern void wave_declare_functions(void);

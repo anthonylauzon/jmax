@@ -37,7 +37,7 @@ static fts_heap_t *segment_heap = NULL;
 
 typedef struct _segment_
 {
-  fvec_t *fvec; /* sample */
+  fmat_t *fmat; /* sample */
   double begin; /* begin position */
   double end; /* end position */
   double speed; /* playing speed */
@@ -50,7 +50,7 @@ segment_new(void)
 {
   segment_t *seg = (segment_t *)fts_heap_alloc(segment_heap);
   
-  seg->fvec = NULL;
+  seg->fmat = NULL;
   seg->begin = 0.0;
   seg->end = DBL_MAX;
   seg->speed = 1.0;
@@ -63,13 +63,13 @@ segment_copy(segment_t *org)
 {
   segment_t *seg = (segment_t *)fts_heap_alloc(segment_heap);
   
-  seg->fvec = org->fvec;
+  seg->fmat = org->fmat;
   seg->begin = org->begin;
   seg->end = org->end;
   seg->speed = org->speed;
 
-  if(seg->fvec)
-    fts_object_refer(seg->fvec);
+  if(seg->fmat)
+    fts_object_refer(seg->fmat);
 
   return seg;
 }
@@ -125,8 +125,8 @@ segment_set_duration(segment_t *seg, const fts_atom_t *at)
     double begin = seg->begin;
     double end = seg->end;
 
-    if(seg->fvec != NULL && end > fvec_get_size(seg->fvec))
-      end = fvec_get_size(seg->fvec);
+    if(seg->fmat != NULL && end > fmat_get_m(seg->fmat))
+      end = fmat_get_m(seg->fmat);
       
     if(dur > 0.0)
     {
@@ -144,10 +144,10 @@ static segment_t *
 segment_set(segment_t *seg, int ac, const fts_atom_t *at)
 {
   int size;
-  fvec_t *fvec;
+  fmat_t *fmat;
       
   if ((ac > 0)
-      && (fts_is_a(at, fvec_type)))
+      && (fts_is_a(at, fmat_class)))
   {
     switch (ac)
     {
@@ -160,20 +160,20 @@ segment_set(segment_t *seg, int ac, const fts_atom_t *at)
       segment_set_begin(seg, at + 1);
     case 1:
     {
-      if(seg->fvec)
-	fts_object_release(seg->fvec);
+      if(seg->fmat)
+	fts_object_release(seg->fmat);
 
-      fvec = (fvec_t *)fts_get_object(at);      
-/*       if(fts_is_object(at) && fts_get_class(at) == fvec_type) */
+      fmat = (fmat_t *)fts_get_object(at);      
+/*       if(fts_is_object(at) && fts_get_class(at) == fmat_class) */
 
 /*       else */
-/* 	fvec = (fvec_t *)fts_object_create(fvec_type, 0, 0); */
+/* 	fmat = (fmat_t *)fts_object_create(fmat_class, 0, 0); */
       
-      seg->fvec = fvec;	  
-      fts_object_refer(fvec);
+      seg->fmat = fmat;	  
+      fts_object_refer(fmat);
 
       /* reset size if we need */
-      size = fvec_get_size(seg->fvec);
+      size = fmat_get_m(seg->fmat);
       if (0 == size)
       {
 	/* we set the empty flag to avoid creation of listener */
@@ -198,9 +198,9 @@ segment_set(segment_t *seg, int ac, const fts_atom_t *at)
   }
   if (0 == ac)
   {
-    if (seg->fvec)
+    if (seg->fmat)
     {	
-      size = fvec_get_size(seg->fvec);
+      size = fmat_get_m(seg->fmat);
       if (0 != size)
       {
 	if (1 == seg->empty)
@@ -221,8 +221,8 @@ segment_set(segment_t *seg, int ac, const fts_atom_t *at)
 static void
 segment_destroy(segment_t *seg)
 {
-  if(seg->fvec)
-    fts_object_release(seg->fvec);  
+  if(seg->fmat)
+    fts_object_release(seg->fmat);  
 
   fts_heap_free(seg, segment_heap);
 }
@@ -408,8 +408,8 @@ play_ftl(fts_word_t *argv)
   play_t *self = (play_t *) fts_word_get_pointer(argv + 0);
   float *out = (float *) fts_word_get_pointer(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
-  fvec_t *fvec = self->segment->fvec;
-  float *buf = fvec_get_ptr(fvec);
+  fmat_t *fmat = self->segment->fmat;
+  float *buf = fmat_get_ptr(fmat);
   double position = self->position;
   fts_idefix_t index;
       
@@ -417,7 +417,7 @@ play_ftl(fts_word_t *argv)
   fts_idefix_set_float(&index, position);
   
   /* if vector is empty we output zero ... */
-  if ((0 == fvec_get_size(fvec))
+  if ((0 == fmat_get_m(fmat))
       || (mode_stop == self->mode))
   {
     int j;
@@ -441,7 +441,7 @@ play_ftl(fts_word_t *argv)
   }
   else
   {
-    double size = fvec_get_size(fvec);
+    double size = fmat_get_m(fmat);
     double begin = self->segment->begin;
     double end = self->segment->end;
     double speed = (end > begin)? self->segment->speed: -self->segment->speed;
@@ -489,7 +489,7 @@ play_ftl(fts_word_t *argv)
 	    if(self->next != NULL)
 	    {
 	      segment_t *next = self->next;
-	      double next_size = fvec_get_size(next->fvec);
+	      double next_size = fmat_get_m(next->fmat);
 
 	      /* replace current segment by next*/
 	      segment_destroy(self->segment);
@@ -503,7 +503,7 @@ play_ftl(fts_word_t *argv)
 	      
 	      position = begin;
 	      /* remplace current buffer */
-	      buf = fvec_get_ptr(self->segment->fvec);
+	      buf = fmat_get_ptr(self->segment->fmat);
 	    }
 	    else
 	    {
@@ -551,7 +551,7 @@ play_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 { 
   play_t *self = (play_t *)o;
 
-  if(ac > 0 && fts_is_object(at) && fts_get_class(at) == fvec_type)
+  if(ac > 0 && fts_is_object(at) && fts_get_class(at) == fmat_class)
   {
     self->mode = mode_stop;
     self->segment = segment_new();
@@ -560,7 +560,7 @@ play_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     segment_set(self->segment, ac, at);
   }
   else
-    fts_object_error((fts_object_t *)self, "fvec required as first argument");
+    fts_object_error((fts_object_t *)self, "fmat required as first argument");
 
   fts_dsp_object_init((fts_dsp_object_t *)(fts_object_t *)self);
 }

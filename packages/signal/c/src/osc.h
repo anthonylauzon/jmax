@@ -42,13 +42,13 @@ struct osc_ftl_symbols
  *
  */
 extern struct osc_ftl_symbols osc_ftl_symbols_ptr;
-extern struct osc_ftl_symbols osc_ftl_symbols_fvec;
+extern struct osc_ftl_symbols osc_ftl_symbols_fmat;
 
 typedef struct _osc_
 {
   fts_dsp_object_t o;
   ftl_data_t data;
-  int fvec;
+  int fmat;
   double freq;
   double phase;
   double sr;
@@ -58,7 +58,7 @@ extern ftl_data_t osc_data_new(void);
 extern void osc_data_set_factor(ftl_data_t ftl_data, double sr);
 extern void osc_data_set_incr(ftl_data_t ftl_data, double freq);
 extern void osc_data_set_phase(ftl_data_t ftl_data, double phase);
-extern void osc_data_set_fvec(ftl_data_t ftl_data, fvec_t *fvec);
+extern void osc_data_set_fmat(ftl_data_t ftl_data, fmat_t *fmat);
 extern void osc_data_set_ptr(ftl_data_t ftl_data, float *ptr);
 
 extern void osc_declare_functions(void);

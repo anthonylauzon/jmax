@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <float.h>
+#include <limits.h>
 
 fts_class_t *fvec_class = NULL;
 fts_symbol_t fvec_symbol = NULL;
@@ -70,6 +71,8 @@ fvec_create_column(fmat_t *fmat)
   fvec->fmat = fmat;
   fts_object_refer((fts_object_t *)fmat);
   fvec->type = fvec_type_column;
+  
+  return fvec;
 }
 
 fvec_t *
@@ -80,6 +83,8 @@ fvec_create_row(fmat_t *fmat)
   fvec->fmat = fmat;
   fts_object_refer((fts_object_t *)fmat);  
   fvec->type = fvec_type_column;
+  
+  return fvec;
 }
 
 fvec_t *
@@ -90,6 +95,8 @@ fvec_create_diagonal(fmat_t *fmat)
   fvec->fmat = fmat;
   fts_object_refer((fts_object_t *)fmat);  
   fvec->type = fvec_type_diagonal;
+  
+  return fvec;
 }
 
 fvec_t *
@@ -100,6 +107,8 @@ fvec_create_unwrap(fmat_t *fmat)
   fvec->fmat = fmat;
   fts_object_refer((fts_object_t *)fmat);  
   fvec->type = fvec_type_unwrap;
+  
+  return fvec;
 }
 
 fvec_t *
@@ -110,6 +119,8 @@ fvec_create_vector(int size)
   fvec->fmat = fmat_create(size, 1);
   fts_object_refer((fts_object_t *) fvec->fmat);  
   fvec->type = fvec_type_vector;
+  
+  return fvec;
 }
 
 /********************************************************************
@@ -251,7 +262,9 @@ fvec_get_vector(fvec_t *fvec, float **ptr, int *size, int *stride)
       *size = fvec_size;
       *stride = 1;
       break;
-      
+    
+    default:
+      break;
   }
 }
 
@@ -1242,9 +1255,9 @@ fvec_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fvec_t *self = (fvec_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
   
-  if(self->type == fvec_type_vector)
+  if(self->type != fvec_type_vector)
   {
-    fts_message_t *mess = fts_dumper_message_new(dumper, fts_s_size);
+    fts_message_t *mess = fts_dumper_message_new(dumper, sym_vec);
     fts_message_append_int(mess, self->size);
     fts_dumper_message_send(dumper, mess);
   }
@@ -1388,6 +1401,8 @@ fvec_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fvec_t), fvec_init, fvec_delete);
   
+  fts_class_instantiate(fmat_class);
+  
   /* standard functions */
   fts_class_message_varargs(cl, fts_s_print, fvec_print);
   fts_class_message_varargs(cl, fts_s_get_element, _fvec_get_element);
@@ -1404,6 +1419,7 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, sym_refer, _fvec_set_fmat_and_dimensions);
   fts_class_message_varargs(cl, sym_col, _fvec_set_col);
   fts_class_message_varargs(cl, sym_row, _fvec_set_row);
+  fts_class_message_varargs(cl, sym_diag, _fvec_set_diag);
   fts_class_message_varargs(cl, sym_unwrap, _fvec_set_unwrap);
   fts_class_message_varargs(cl, sym_vec, _fvec_set_vector);
   

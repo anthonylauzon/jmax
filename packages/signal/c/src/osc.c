@@ -25,7 +25,7 @@
 #include "osc.h"
 
 struct osc_ftl_symbols osc_ftl_symbols_ptr = {0, 0, 0};
-struct osc_ftl_symbols osc_ftl_symbols_fvec = {0, 0, 0};
+struct osc_ftl_symbols osc_ftl_symbols_fmat = {0, 0, 0};
 struct osc_ftl_symbols phi_ftl_symbols = {0, 0, 0};
 
 /***************************************************************************************
@@ -57,23 +57,29 @@ osc_set_phase(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void 
-osc_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+osc_set_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   osc_t *this = (osc_t *)o;
-  fvec_t *fvec = (fvec_t *)fts_get_object(at);
-  int size = fvec_get_size(fvec);
+  fmat_t *vec = (fmat_t *)fts_get_object(at);
   
-  if(size < OSC_TABLE_SIZE + 1)
+  if(fmat_get_n(vec) == 1)
   {
-    int i;
-
-    fvec_set_size(fvec, OSC_TABLE_SIZE + 1);
-
-    for(i=size; i<OSC_TABLE_SIZE + 1; i++)
-      fvec_set_element(fvec, i, 0.0);
+    int size = fmat_get_m(vec);
+    
+    if(size < OSC_TABLE_SIZE + 1)
+    {
+      int i;
+      
+      fmat_set_size(vec, OSC_TABLE_SIZE + 1, 1);
+      
+      for(i=size; i<OSC_TABLE_SIZE + 1; i++)
+        fmat_set_element(vec, i, 0, 0.0);
+    }
+    
+    osc_data_set_fmat(this->data, vec);
   }
-  
-  osc_data_set_fvec(this->data, fvec);
+  else
+    fts_object_error(o, "column vector required");
 }
 
 static void 
@@ -85,8 +91,8 @@ osc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
   int n_tick = fts_dsp_get_output_size(dsp, 0);
   struct osc_ftl_symbols *sym;
 
-  if(this->fvec)
-    sym = &osc_ftl_symbols_fvec;
+  if(this->fmat)
+    sym = &osc_ftl_symbols_fmat;
   else
     sym = &osc_ftl_symbols_ptr;
   
@@ -155,20 +161,20 @@ osc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       osc_data_set_ptr(this->data, fts_fftab_get_cosine(OSC_TABLE_SIZE));
       fts_object_set_inlets_number(o, 1);
 
-      this->fvec = 0;
+      this->fmat = 0;
     }
-  else if ((ac == 1 && fts_is_a(at, fvec_type)) || (ac == 2 && fts_is_number(at) && fts_is_a(at + 1, fvec_type)))
+  else if ((ac == 1 && fts_is_a(at, fmat_type)) || (ac == 2 && fts_is_number(at) && fts_is_a(at + 1, fmat_type)))
     {
-      /* fvec version */
+      /* fmat version */
       if(ac > 1)
 	{
 	  osc_set_freq(o, 0, 0, 1, at);
-	  osc_set_fvec(o, 0, 0, 1, at + 1);
+	  osc_set_fmat(o, 0, 0, 1, at + 1);
 	}
       else
-	osc_set_fvec(o, 0, 0, 1, at);
+	osc_set_fmat(o, 0, 0, 1, at);
 
-      this->fvec = 1;
+      this->fmat = 1;
     }
   else
     fts_object_error(o, "bad arguments");
@@ -179,9 +185,9 @@ osc_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   osc_t *this = (osc_t *)o;
 
-  /* release fvec */
-  if(this->fvec)
-    osc_data_set_fvec(this->data, 0);
+  /* release fmat */
+  if(this->fmat)
+    osc_data_set_fmat(this->data, 0);
 
   ftl_data_free(this->data);
   fts_dsp_object_delete((fts_dsp_object_t *)o);
@@ -201,7 +207,7 @@ osc_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("freq"), osc_set_freq);
 
   fts_class_inlet_number(cl, 0, osc_set_freq);
-  fts_class_inlet(cl, 1, fvec_type, osc_set_fvec);
+  fts_class_inlet(cl, 1, fmat_class, osc_set_fmat);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
@@ -338,9 +344,9 @@ signal_osc_config(void)
   osc_ftl_symbols_ptr.signal_input_inplace = fts_new_symbol("osc_ptr_signal_input_inplace");
 
   /* ftl functions using a float vector as wave table */
-  osc_ftl_symbols_fvec.control_input = fts_new_symbol("osc_fvec_control_input");
-  osc_ftl_symbols_fvec.signal_input = fts_new_symbol("osc_fvec_signal_input");
-  osc_ftl_symbols_fvec.signal_input_inplace = fts_new_symbol("osc_fvec_signal_input_inplace");
+  osc_ftl_symbols_fmat.control_input = fts_new_symbol("osc_fmat_control_input");
+  osc_ftl_symbols_fmat.signal_input = fts_new_symbol("osc_fmat_signal_input");
+  osc_ftl_symbols_fmat.signal_input_inplace = fts_new_symbol("osc_fmat_signal_input_inplace");
 
   /* ftl functions using a float vector as wave table */
   phi_ftl_symbols.control_input = fts_new_symbol("phi_control_input");

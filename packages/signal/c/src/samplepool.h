@@ -28,7 +28,7 @@
 
 typedef struct _sample
 {
-  fvec_t *fvec; /* the samples */
+  fmat_t *fmat; /* the samples */
   int duration; /* output duration */ 
   int length; /* source length */ 
   float amp; /* amplitude */
@@ -65,6 +65,6 @@ extern void sample_pool_delete(sample_pool_t *pool);
 extern void sample_pool_set_size(sample_pool_t *pool, int size);
 
 extern void sample_pool_run(sample_pool_t *pool, float *out, int n_tick);
-extern sample_t *sample_schedule(sample_pool_t *pool, fvec_t *fvec, double delay, double onset, double length, double incr, float amp);
+extern sample_t *sample_schedule(sample_pool_t *pool, fmat_t *fmat, double delay, double onset, double length, double incr, float amp);
 
 #endif
