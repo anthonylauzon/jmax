@@ -165,6 +165,26 @@ fmat_t *fmat_create(int m, int n)
 }
 
 
+/* value allocation or reallocation wrapper */
+static void
+fmat_realloc_values(fmat_t *self, size_t size)
+{
+    float *values = self->values;
+    self->values  = NULL;
+
+    if (values == NULL)
+      values = (float *) fts_malloc((size + HEAD_POINTS + TAIL_POINTS) 
+				    * sizeof(float));
+    else
+      values = (float *) fts_realloc(values - HEAD_POINTS, 
+				     (size + HEAD_POINTS + TAIL_POINTS) 
+				     * sizeof(float));
+        
+    self->values = values + HEAD_POINTS;
+    self->alloc  = size;
+}
+
+
 /* change matrix "form", leaving underlying data vector untouched */
 void
 fmat_reshape(fmat_t *self, int m, int n)
@@ -176,16 +196,8 @@ fmat_reshape(fmat_t *self, int m, int n)
   
   size = m * n;
   
-  if(size > self->alloc)
-  {
-    if(self->values == NULL)
-      self->values = (float *)fts_malloc((size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
-    else
-      self->values = (float *)fts_realloc(self->values - HEAD_POINTS, (size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
-        
-    self->values += HEAD_POINTS;
-    self->alloc = size;
-  }
+  if (size > self->alloc)
+    fmat_realloc_values(self, size);
   
   self->m = m;
   self->n = n;
@@ -199,16 +211,8 @@ fmat_set_m(fmat_t *self, int m)
   int size = m * fmat_get_n(self);
   int i;
   
-  if(m > fmat_get_m(self))
-  {
-    if(self->values == NULL)
-      self->values = (float *)fts_malloc((size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
-    else
-      self->values = (float *)fts_realloc(self->values - HEAD_POINTS, (size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
-    
-    self->values += HEAD_POINTS;
-    self->alloc = size;
-  }
+  if (m > fmat_get_m(self))
+    fmat_realloc_values(self, size);
   
   /* zero new rows at end (if any) */
   for(i=fmat_get_m(self)*fmat_get_n(self); i<size; i++)
@@ -232,15 +236,9 @@ fmat_set_n(fmat_t *self, int n)
     int size = m * n;
     int i, j;
   
-    if(n > old_n)
+    if (n > old_n)
     {
-      if(self->values == NULL)
-        self->values = (float *)fts_malloc((size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
-      else
-        self->values = (float *)fts_realloc(self->values - HEAD_POINTS, (size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
-      
-      self->values += HEAD_POINTS;
-      self->alloc = size;
+      fmat_realloc_values(self, size);
 
       /* copy values (from last to first row) */
       for(i=m-1; i>=1; i--)
@@ -308,16 +306,8 @@ fmat_set_size(fmat_t *self, int m, int n)
     min_m = (m < old_m)? m: old_m;
     min_n = (n < old_n)? n: old_n;
     
-    if(size > self->alloc)
-    {
-      if(self->values == NULL)
-        self->values = (float *)fts_malloc((size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
-      else
-        self->values = (float *)fts_realloc(self->values - HEAD_POINTS, (size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
-        
-      self->values += HEAD_POINTS;
-      self->alloc = size;
-    }
+    if (size > self->alloc)
+      fmat_realloc_values(self, size);
         
     if(n > old_n)
     {
