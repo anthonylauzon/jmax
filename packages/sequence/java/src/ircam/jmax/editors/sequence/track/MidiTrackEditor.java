@@ -30,6 +30,7 @@ import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.menus.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.utils.*;
 import java.awt.*;
 import java.beans.*;
 import java.awt.event.*;
@@ -333,7 +334,24 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	    super.processMouseEvent(e);
 	}
 
-
+	public void processKeyEvent(KeyEvent e)
+	{
+	    if(SequenceTextArea.isDeleteKey(e))
+		{
+		    MaxVector v = new MaxVector();
+		    
+		    // copy the selected elements in another MaxVector (cannot remove
+		    // elements of a Vector inside a loop based on an enumeration of this vector, it simply does'nt work...)
+		    for (Enumeration en = editor.getSelection().getSelected(); en.hasMoreElements();)
+			v.addElement(en.nextElement());
+		    
+		    // remove them
+		    for (int i = 0; i< v.size(); i++)
+			gc.getDataModel().removeEvent((TrackEvent)(v.elementAt(i)));
+		    v = null;
+		}
+	}
+   
 	public void paint(Graphics g) 
 	{
 	  Rectangle r = g.getClipBounds();
@@ -351,7 +369,6 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     }
 
 
-   
     //--- MidiTrack fields
     Geometry geometry;
     SequenceGraphicContext gc;

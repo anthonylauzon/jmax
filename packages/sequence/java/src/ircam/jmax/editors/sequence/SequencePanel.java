@@ -47,7 +47,7 @@ import ircam.jmax.toolkit.*;
   /**
    * The graphic component containing the tracks of a Sequence.
    */
-public class SequencePanel extends JPanel implements Editor, TrackListener, TrackDataListener, ListSelectionListener {
+public class SequencePanel extends JPanel implements Editor, TrackListener, TrackDataListener, ListSelectionListener, ScrollManager {
     
     FtsSequenceObject ftsSequenceObject;
 
@@ -157,7 +157,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 		statusBar.post(manager.getCurrentTool(),"zoom "+((int)(zoom*100))+"%");
 		repaint();
 	    }
-      });
+    });
 
     //-------------- prepares the SOUTH scrollbar (time scrolling) and its listener    
     int totalTime = MINIMUM_TIME;
@@ -189,6 +189,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	TrackEditor teditor = TrackEditorFactoryTable.newEditor(track, geometry);
 	teditor.getGraphicContext().setToolManager(manager);
 	teditor.getGraphicContext().setFrame(itsContainer.getFrame());
+	teditor.getGraphicContext().setScrollManager(this);
 	manager.addContextSwitcher(new ComponentContextSwitcher(teditor.getComponent(), teditor.getGraphicContext()));
 
 	trackPanel.remove(verticalGlue);
@@ -302,10 +303,13 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     private void resizePanelToTime(int time)
     {
 	int maxVisibleTime = getMaximumVisibleTime();
+	int maximumTime = getMaximumTime();
 
-	if(time > getMaximumTime())
+	if(time > maximumTime)
 	{
-	    itsTimeScrollbar.setMaximum(time);
+	    int delta = maximumTime-itsTimeScrollbar.getMaximum();
+
+	    itsTimeScrollbar.setMaximum(time-delta);
 	    itsTimeScrollbar.setValue(time);
 	}
 	else 
@@ -477,6 +481,17 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	    return (int) (maxTransp -(size)/geometry.getXZoom())-1;
 	
 	else return (int) ((size)/geometry.getXZoom() - maxTransp)-1;
+    }
+
+    /////////////////ScrollerManager Interface
+    public void scrollIfNeeded(int time)
+    {
+	/*int startTime = -geometry.getXTransposition(); 
+	  int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
+	  
+	  if(time>endTime)
+	  itsTimeScrollbar.setValue(time-endTime+startTime+10);*/
+	resizePanelToTime(time);
     }
 }
 

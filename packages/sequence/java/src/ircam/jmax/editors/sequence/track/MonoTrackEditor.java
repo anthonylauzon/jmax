@@ -30,7 +30,9 @@ import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.menus.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.utils.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.beans.*;
 import java.util.*;
 import javax.swing.*;
@@ -239,6 +241,25 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     }
 
     public void updateNewObject(Object obj){};
+
+
+    public void processKeyEvent(KeyEvent e)
+    {
+	if(SequenceTextArea.isDeleteKey(e))
+	    {
+		MaxVector v = new MaxVector();
+
+		// copy the selected elements in another MaxVector (cannot remove
+		// elements of a Vector inside a loop based on an enumeration of this vector, it simply does'nt work...)
+		for (Enumeration en = selection.getSelected(); en.hasMoreElements();)
+		    v.addElement(en.nextElement());
+	    
+		// remove them
+		for (int i = 0; i< v.size(); i++)
+		    gc.getDataModel().removeEvent((TrackEvent)(v.elementAt(i)));
+		v = null;
+	    }
+    }
 
     //--- FricativeTrackEditor fields
     Geometry geometry;

@@ -79,17 +79,17 @@ public class SequenceTextArea extends JTextArea implements FocusListener
       setVisible(true);
   }
 
-  boolean isEditKey(KeyEvent e)
+  public static boolean isEditKey(KeyEvent e)
   {
       return ((!e.isActionKey())&&
 	      (e.getKeyCode()!=KeyEvent.VK_SHIFT)&&(e.getKeyCode()!=KeyEvent.VK_CONTROL));
   }
 
-  boolean isDeleteKey(KeyEvent e)
+  public static boolean isDeleteKey(KeyEvent e)
   {
       return ((e.getKeyCode() == KeyEvent.VK_DELETE)||(e.getKeyCode() == KeyEvent.VK_BACK_SPACE));
   }
-  boolean isReturnKey(KeyEvent e)
+  public static boolean isReturnKey(KeyEvent e)
   {
       return (e.getKeyCode() == KeyEvent.VK_ENTER);
   }
@@ -119,21 +119,35 @@ public class SequenceTextArea extends JTextArea implements FocusListener
       int width  = textRenderer.getTextWidth(text, gc) + borderHGap;
       int height = textRenderer.getTextHeight(text, gc) + borderVGap;
       Dimension d = getSize();
-	  
-      if((width > d.width)||(height > d.height)||(height<d.height-10))
+      Dimension maxDim = getContainer().getSize();
+
+      if((width<maxDim.width-MessageEventRenderer.BUTTON_WIDTH-ScoreBackground.KEYEND-TrackContainer.BUTTON_WIDTH)
+	 &&(height<maxDim.height))
 	  {
-	      if(width < minWidth) 
-		  width  = minWidth;
-	      d.width = width;
-      
-	      if(height < minHeight) 
-		  height = minHeight;		
-	      d.height = height;
-      
-	      setSize(d);
-      
-	      notifySizeChange(width, height);
+	      if(width > d.width)
+		  {
+		      if(width < minWidth) 
+			  width  = minWidth;
+		      d.width = width;
+		      
+		      setSize(d);
+		      
+		      notifyWidthChange(width, height);
+		}
+	      if((height > d.height)||(height<d.height-10))
+		  {
+		      if(height < minHeight) 
+			  height = minHeight;		
+		      d.height = height;
+		      
+		      setSize(d);
+		      
+		      notifyHeightChange(width, height);
+		  }
+	      
 	  }
+      else
+	  notifyEndEdit();
   }
 
   public void setMinimumSize(Dimension d)
@@ -149,6 +163,16 @@ public class SequenceTextArea extends JTextArea implements FocusListener
       borderVGap = ins.top+ins.bottom;
   }
 
+  public void setContainer(Component cont)
+  {
+      container = cont;
+  }
+  public Component getContainer()
+  {
+      if(container!=null) return container;
+      else return gc.getGraphicDestination();
+  }
+
   public void addSequenceTextAreaListener(SequenceTextAreaListener listener)
   {
       listeners.addElement(listener);
@@ -157,11 +181,22 @@ public class SequenceTextArea extends JTextArea implements FocusListener
   {
       listeners.removeElement(listener);
   }
-  void notifySizeChange(int width, int height)
-  {
-      for(Enumeration e = listeners.elements(); e.hasMoreElements();)
-	  ((SequenceTextAreaListener) e.nextElement()).sizeChanged(width, height);
-  }
+    void notifyWidthChange(int width, int height)
+    {
+	for(Enumeration e = listeners.elements(); e.hasMoreElements();)
+	    ((SequenceTextAreaListener) e.nextElement()).widthChanged(width);
+    }
+    void notifyHeightChange(int width, int height)
+    {
+	for(Enumeration e = listeners.elements(); e.hasMoreElements();)
+	    ((SequenceTextAreaListener) e.nextElement()).heightChanged(height);
+    }
+    void notifyEndEdit()
+    {
+	for(Enumeration e = listeners.elements(); e.hasMoreElements();)
+	    ((SequenceTextAreaListener) e.nextElement()).endEdit();
+    }
+
 
   //FocusListener interface
   public void focusGained(FocusEvent e){}
@@ -169,6 +204,7 @@ public class SequenceTextArea extends JTextArea implements FocusListener
 
   TextRenderer textRenderer;
   SequenceGraphicContext gc;
+  Component container = null;
 
   private Vector listeners = new Vector();  
   private int minWidth = 0;

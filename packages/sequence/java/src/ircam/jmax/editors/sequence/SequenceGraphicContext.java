@@ -42,12 +42,11 @@ public class SequenceGraphicContext extends GraphicContext {
    * Constructor */
   public SequenceGraphicContext(TrackDataModel model, SequenceSelection s, Track track)
   {
-    super();
-    setDataModel(model);
-    itsSelection = s;
-    itsTrack = track;
+      super();
+      setDataModel(model);
+      itsSelection = s;
+      itsTrack = track;
   }
-
 
   /**
    * Change the selection ownership when this graphic context become active... troppo */
@@ -175,6 +174,16 @@ public class SequenceGraphicContext extends GraphicContext {
       return ((Sequence) getFrame()).itsSequencePanel.scrollTracks.getViewPort().getViewRect();
       }*/
 
+    public void setScrollManager(ScrollManager manager)
+    {
+	scrollManager = manager;
+    }
+    public ScrollManager getScrollManager()
+    {
+	return scrollManager;
+    }
+
+
   //---- Fields 
     
     TrackDataModel itsDataModel;
@@ -186,6 +195,8 @@ public class SequenceGraphicContext extends GraphicContext {
     int itsLogicalTime;
 
     ToolManager toolManager;
+
+    ScrollManager scrollManager;
 
     Track itsTrack;
 }

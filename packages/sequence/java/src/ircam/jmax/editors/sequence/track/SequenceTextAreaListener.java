@@ -6,5 +6,7 @@ import java.awt.*;
 
 public interface SequenceTextAreaListener
 {
-    public abstract void sizeChanged(int width, int height);   
+    public abstract void widthChanged(int width);   
+    public abstract void heightChanged(int height);
+    public abstract void endEdit();
 }

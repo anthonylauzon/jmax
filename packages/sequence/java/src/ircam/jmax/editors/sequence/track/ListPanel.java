@@ -78,11 +78,21 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
       area.setMinimumSize(new Dimension(xstep-5, ystep-2));
       area.setBorder(BorderFactory.createEtchedBorder());
       area.setForeground(Color.black);
+      area.setContainer(this);
       area.addSequenceTextAreaListener(new SequenceTextAreaListener(){
-	  public void sizeChanged(int width, int height)
+	  public void widthChanged(int width)
 	  {
 	      repaint();
 	  }
+	  public void heightChanged(int height)
+	  {
+	      repaint();
+	  }
+	  public void endEdit()
+	  {
+	      //setEventValue(); 
+	  }
+	  
       });
       add(area);
       validate();

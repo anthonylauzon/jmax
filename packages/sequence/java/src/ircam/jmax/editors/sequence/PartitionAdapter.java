@@ -62,7 +62,7 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
    * it returns the X value of the event,
    * making the needed cordinate conversions.
    */
-    public int getX(Event e) 
+  public int getX(Event e) 
   {
     int temp = super.getX(e);
     

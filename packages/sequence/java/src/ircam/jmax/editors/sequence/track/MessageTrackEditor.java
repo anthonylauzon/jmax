@@ -56,13 +56,32 @@ public class MessageTrackEditor extends MonoTrackEditor
 	area = new SequenceTextArea(TextRenderer.getRenderer(), gc);
 	area.setMinimumSize(new Dimension(MessageEventRenderer.MINIMUM_WIDTH, MessageValue.DEFAULT_HEIGHT));
 	area.addSequenceTextAreaListener(new SequenceTextAreaListener(){
-	    public void sizeChanged(int width, int height)
+	    public void widthChanged(int width)
 	    {
 		int lenght = gc.getAdapter().getInvWidth(width+4+MessageEventRenderer.BUTTON_WIDTH);		
 		currentEvt.setProperty("duration", new Integer(lenght));
-		currentEvt.setProperty("height", new Integer(height));
-		//se l'oggetto in edizione esce dalla finestra deve scrollare a sinistra (anche la textArea)
 		
+		int time = (int)currentEvt.getTime()+lenght;
+		gc.getScrollManager().scrollIfNeeded(time+((PartitionAdapter)gc.getAdapter()).getInvWidth(20));
+		
+		int evtx = gc.getAdapter().getX(currentEvt)+MessageEventRenderer.BUTTON_WIDTH+2+1;
+		area.setLocation(evtx, area.getLocation().y);
+	    }
+	    public void heightChanged(int height)
+	    {
+		currentEvt.setProperty("height", new Integer(height));
+		int evty = gc.getAdapter().getY(currentEvt);
+		if(evty+height>getSize().height)
+		    {
+			int y = gc.getAdapter().getInvY(getSize().height-height);
+			currentEvt.setProperty("integer", new Integer(y));
+			area.setLocation(area.getLocation().x , getSize().height-height+1);
+		    }
+	    }
+	    public void endEdit()
+	    {
+		setMessage();
+		repaint();
 	    }
 	});
 	add(area);
