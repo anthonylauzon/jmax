@@ -1,16 +1,16 @@
 package ircam.jmax.editors.explode;
 
 /**
- * the standard, partition-like adapter for the ScrEvent records
+ * the standard, partition-like adapter for a ScrEvent
  * in the Explode database.
- * The x-coordinates corresponds to time, y to pitch, lenght to duration.
+ * The x-coordinates corresponds to time, y and label to pitch, lenght to duration.
  * This adapter can also be used to transpose and zoom.
  */
 public class PartitionAdapter extends Adapter {
   
   /**
    * constructor.
-   * It creates and assigns its mappers (Time, Pitch, Lenght), 
+   * It creates and assigns its mappers (Time, Pitch, Lenght, Label), 
    * and set the initial values for the zoom, transpose and invertion fields.
    */
   public PartitionAdapter(GraphicContext theGc) 
@@ -129,6 +129,11 @@ public class PartitionAdapter extends Adapter {
   }
 
 
+  /**
+   * From the MappingListener interface.
+   * Reassign the mappers according to the change, and ask
+   * a repaint of the graphic.
+   */
   public void mappingChanged(String graphicName, String scoreName) 
   {
 

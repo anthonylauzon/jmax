@@ -21,14 +21,19 @@ public class DurationMapper extends Mapper {
     return e.getDuration();
   }
 
+  /**
+   * access the static instance
+   */
   static Mapper getMapper() 
   {
+    if (itsDurationMapper == null)
+       itsDurationMapper = new DurationMapper();
     return itsDurationMapper;
   }
 
   //--- Fields
 
-  static DurationMapper itsDurationMapper = new DurationMapper();
+  static DurationMapper itsDurationMapper;
 }
 
 

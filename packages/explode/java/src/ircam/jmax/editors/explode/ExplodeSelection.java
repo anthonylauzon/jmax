@@ -4,7 +4,8 @@ package ircam.jmax.editors.explode;
 import java.util.*;
 
 /**
- * A selection of explode events.
+ * A selection of explode events. Use the static constructor to create the
+ * (unique) selection of the system.
  */ 
 public class ExplodeSelection implements SelectionHandler, ExplodeDataListener {
 
@@ -19,7 +20,7 @@ public class ExplodeSelection implements SelectionHandler, ExplodeDataListener {
   }
 
   /**
-   * select the object 
+   * select the given object 
    */
   public void select(Object obj) 
   {
@@ -116,6 +117,9 @@ public class ExplodeSelection implements SelectionHandler, ExplodeDataListener {
   }
 
 
+  /**
+   * call back the listener, the selection content changed
+   */
   private static void notifyListeners()
   {
     SelectionListener sl;
@@ -128,12 +132,12 @@ public class ExplodeSelection implements SelectionHandler, ExplodeDataListener {
   }
 
 
-  // ExplodeDataListener interface
+  /** ExplodeDataListener interface*/
   public void dataChanged(Object spec) 
   {
   }
 
-  // ExplodeDataListener interface
+  /** ExplodeDataListener interface */
   public void objectDeleted(Object whichObject) 
   {
     if (isInSelection(whichObject))

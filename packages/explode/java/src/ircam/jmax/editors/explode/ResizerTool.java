@@ -28,6 +28,7 @@ public class ResizerTool extends ScrTool implements PositionListener, DragListen
   }
 
 
+  /** the default interface module is a MouseTracker */
   public InteractionModule getDefaultIM() 
   {
     return itsMouseTracker;

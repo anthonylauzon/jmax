@@ -18,7 +18,7 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
      needed to allow insertions, and reallocated by need.
      Search is done with a binary search, while insertion/deleting
      need moving objects around; then, we assume that lookup
-     is more frequent than editing (true, every repain imply
+     is more frequent than editing (true, every repaint imply
      a look up) */
 
 
@@ -271,13 +271,14 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 
   /**
    * access the last event whose ENDING time is 
-   * before a given time
+   * before a given time.
    */
   public int indexOfLastEventEndingBefore(int time) 
   {
 
     int index = getIndexAfter(time);
     
+    // ENDING times are not ordered...
     while(index >= 0 && events[index].getTime()+ events[index].getDuration() > time)
       index --;
 

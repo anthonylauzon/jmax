@@ -6,7 +6,7 @@ import java.util.Enumeration;
 /**
  * the interface of the classes that are able to give
  * a graphic representation of a list of events.
- * To represent the single event, the Renderer uses
+ * To Represent the single event, the Renderer uses
  * a (specialization of) EventRenderer class.
  */
 public interface Renderer {

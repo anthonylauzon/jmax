@@ -9,7 +9,7 @@ import java.awt.event.*;
  * Specialization of these modules are used by the tools, 
  * in order to separate the low-level interaction (example rubber-banding 
  * of a selection rect) 
- * from the semantic (example selection of the objects in the rect).
+ * from the semantic (selection of the objects in the rect).
  * This base class acts like a multiple adapter for the derived class.
  */
 public abstract class InteractionModule implements MouseListener, MouseMotionListener, KeyListener{
@@ -68,7 +68,9 @@ public abstract class InteractionModule implements MouseListener, MouseMotionLis
       }
   }
 
-
+  /**
+   * set the starting point for this interaction module
+   */
   abstract public void interactionBeginAt(int x, int y);
 
   //----------- Mouse interface ------------

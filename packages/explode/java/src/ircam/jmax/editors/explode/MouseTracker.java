@@ -5,7 +5,7 @@ import java.awt.event.*;
 
 
 /**
- * a VERY simple interaction module:
+ * a simple interaction module:
  * it just waits the choice of a point in a graphicContext via mouse-clicks.
  * It communicates the choice to a "Position listener"
  */

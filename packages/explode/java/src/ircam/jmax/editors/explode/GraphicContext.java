@@ -5,7 +5,7 @@ import java.awt.*;
 /**
  * The context for an explode editing session.
  * it stores the source of graphic events, the graphic destination for 
- * the drawing operations, the selection, the adapter, the data model..
+ * the drawing operations, the Renderer, the adapter, the data model..
  */
 public class GraphicContext {
 
@@ -126,11 +126,13 @@ public class GraphicContext {
     return itsStatusBar;
   }
 
+  /** sets the awt Frame this context refers to */
   public void setFrame(Frame f) 
   {
     itsFrame = f;
   }
 
+  /** gets the awt Frame this context refers to */
   public Frame getFrame() 
   {
     if (itsFrame != null) 
@@ -138,8 +140,9 @@ public class GraphicContext {
     else return getFrame(itsGraphicDestination);
   }
 
+
   /**
-   * utility function:
+   * utility static function:
    * returns the Frame containing a component (why it's not in AWT?)
    */
   public static Frame getFrame(Component c) {

@@ -6,7 +6,6 @@ import com.sun.java.swing.ImageIcon;
 
 /**
  * the tool used to perform an erase operation.
- * The default (initial) UI Module is a MouseTracker
  */
 public class DeleteTool extends ScrTool implements PositionListener {
   
@@ -22,6 +21,9 @@ public class DeleteTool extends ScrTool implements PositionListener {
   }
 
   
+  /**
+   * the default Interaction Module
+   */
   public InteractionModule getDefaultIM() 
   {
     return itsMouseTracker;
@@ -35,7 +37,7 @@ public class DeleteTool extends ScrTool implements PositionListener {
 
   
   /**
-   * called by the UI modules
+   * called by the MouseTracker
    */
   public void positionChoosen(int x, int y, int modifiers) 
   {

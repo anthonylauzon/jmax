@@ -2,7 +2,7 @@ package ircam.jmax.editors.explode;
 
 /**
  * the interface of the objects that needs to be informed 
- * when a position have been choosen
+ * when a position have been choosen by the user. 
  */
 public interface PositionListener {
   /**

@@ -5,7 +5,10 @@ import java.util.*;
 
 /**
  * A simple layout to assign proportional space to two components.
- * WARNING: the implementation is incomplete because it does'nt take care
+ * Create it with a direction (X_AXIS, Y_AXIS) and a ratio.
+ * This layout assign a space to the first component
+ * equal to ratio*(parent's size)
+ * WARNING: this implementation does'nt take care
  * of the parent's insets.
  */
 
@@ -25,7 +28,7 @@ public class ProportionalLayout implements LayoutManager {
   }
   
 
-  /* Required by LayoutManager. */
+  /* LayoutManager interface. */
   public void addLayoutComponent(String name, Component comp) 
   {
     
@@ -37,7 +40,7 @@ public class ProportionalLayout implements LayoutManager {
   }
 
 
-    /* Required by LayoutManager. */
+    /* LayoutManager interface. */
   public void removeLayoutComponent(Component comp) 
   {
     for (int i = 0; i < 2; i++) 
@@ -51,7 +54,7 @@ public class ProportionalLayout implements LayoutManager {
   }
   
 
-  /* Required by LayoutManager. */
+  /* LayoutManager interface. */
   public Dimension preferredLayoutSize(Container parent) 
   {
     int temp;
@@ -79,7 +82,7 @@ public class ProportionalLayout implements LayoutManager {
   }
   
 
-  /* Required by LayoutManager. */
+  /* LayoutManager interface. */
   public Dimension minimumLayoutSize(Container parent) 
   {
     return preferredLayoutSize(parent);
@@ -87,7 +90,7 @@ public class ProportionalLayout implements LayoutManager {
 
 
 
-  /* The most important function */
+  /* The Layout function */
   public void layoutContainer(Container parent) 
   {
     if (itsType == X_AXIS) 

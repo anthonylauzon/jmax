@@ -21,13 +21,19 @@ public class ChannelMapper extends Mapper {
     return e.getChannel();
   }
 
+  /**
+   * access the static instance
+   */
   static public Mapper getMapper()
   {
+    if (itsChannelMapper == null)
+      itsChannelMapper = new ChannelMapper();
+    
     return itsChannelMapper;
   }
 
   //--- Fields
 
-  static ChannelMapper itsChannelMapper = new ChannelMapper();
+  static ChannelMapper itsChannelMapper;
 }
 

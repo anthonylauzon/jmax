@@ -5,9 +5,8 @@ package ircam.jmax.editors.explode;
  * selection in a plane
  */ 
 public interface GraphicSelectionListener {
-  /**
-   * a selection have been choosen
-   */
+  
+  /** a selection have been choosen */
   public abstract void selectionChoosen(int x, int y, int w, int h);
 }
 

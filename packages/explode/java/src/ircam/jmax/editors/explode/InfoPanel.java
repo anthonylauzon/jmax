@@ -5,10 +5,12 @@ import com.sun.java.swing.border.*;
 import java.awt.*;
 
 /**
- * the class of the "status" bar on top of the score
+ * the class of the "status" bar on top of the score.
+ * It implements the StatusBar interface
  */
 public class InfoPanel extends JPanel implements StatusBar{
   
+  /** constructor */
   public InfoPanel() {
 
     setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -28,6 +30,7 @@ public class InfoPanel extends JPanel implements StatusBar{
 
   }
   
+  /** Status bar interface */
   public void post(StatusBarClient theClient, String message) 
   {
     if (theClient.getIcon() != null)    

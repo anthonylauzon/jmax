@@ -22,6 +22,9 @@ public class PitchMapper extends Mapper {
     return e.getPitch();
   }
 
+
+  /**
+   * access the static instance of the class */
   static Mapper getMapper() 
   {
     return itsPitchMapper;

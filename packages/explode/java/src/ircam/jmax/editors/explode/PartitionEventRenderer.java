@@ -3,8 +3,8 @@ package ircam.jmax.editors.explode;
 import java.awt.*;
 
 /**
- * The piano-roll event renderer in a Score: the line-based note, 
- * lenght proportional to duration, fixed width, black color, no labels.
+ * The piano-roll event renderer in a Score: the line-based event, 
+ * with a lenght , a fixed width, black color, a label.
  */
 public class PartitionEventRenderer implements EventRenderer {
 

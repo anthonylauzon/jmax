@@ -6,17 +6,23 @@ import java.util.*;
 import com.sun.java.swing.*;
 import com.sun.java.swing.border.*;
 
+/**
+ * basic inspector for a generic adapter.
+ * It allows the editing of the mappings between score parameters
+ * and graphic parameters.
+ * It makes (for now) the assumption on the names of the graphic 
+ * parameters to be mapped. The client is called back when a mapping
+ * changes, with the two names associated to the new mapping (ex. "lenght" to "time")
+ * call it statically via the createSettingsDialog call.
+ */
 class SettingsDialog extends JDialog {
   
-  public SettingsDialog (Adapter theAdapter, Frame theFrame) {
-    super(theFrame, theAdapter.getName()+"Settings");
 
-    itsAdapter = theAdapter;
-
-    Box box = new Box(BoxLayout.Y_AXIS);
- 
-    titleFont = new Font(theFrame.getFont().getName(), Font.BOLD, theFrame.getFont().getSize());
-    
+    /**
+     * an inner utility class to represent a single map:
+     * it builds a panel with the given (graphic) name associated to
+     * each score parameter in a ButtonGroup.
+     */
     class SingleMapping extends JPanel {
       
       public SingleMapping(String name) 
@@ -92,6 +98,19 @@ class SettingsDialog extends JDialog {
 
 
 
+  /**
+   * builds a setting dialog for the given adapter, using the given frame
+   * as "dialog parent" frame
+   */
+  public SettingsDialog (Adapter theAdapter, Frame theFrame) {
+    super(theFrame, theAdapter.getName()+"Settings");
+
+    itsAdapter = theAdapter;
+
+    Box box = new Box(BoxLayout.Y_AXIS);
+ 
+    titleFont = new Font(theFrame.getFont().getName(), Font.BOLD, theFrame.getFont().getSize());
+    
     SingleMapping yMap = new SingleMapping("y");
     yMap.setMappingListener(itsAdapter);
     SingleMapping lMap = new SingleMapping("lenght");
@@ -129,6 +148,9 @@ class SettingsDialog extends JDialog {
   }
 
 
+  /**
+   * static constructor. Use this function to create the dialog
+   */
   public static SettingsDialog createSettingsDialog(Adapter theAdapter, Frame theFrame) 
   {
     return new SettingsDialog(theAdapter, theFrame);

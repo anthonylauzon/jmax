@@ -100,7 +100,7 @@ public class ScoreRenderer implements Renderer, ImageObserver{
   
 
   /**
-   * draws the background if the entire image is in memory.
+   * draws the background and the grid if the entire image is in memory.
    */
   boolean prepareBackground(Graphics g) 
   {  
@@ -145,7 +145,8 @@ public class ScoreRenderer implements Renderer, ImageObserver{
       }
   }
   
-  
+  /**
+   * utility function: find a good time step given a window time size */  
   private int findBestTimeStep(int windowTime) {
 
     // find a good time interval between two grid

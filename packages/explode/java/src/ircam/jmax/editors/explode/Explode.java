@@ -14,7 +14,8 @@ import com.sun.java.swing.event.*;
 
 /**
  * the main class of the explode package.
- * It inherits from MaxEditor, and implements the MaxDataEditor Interface
+ * It inherits from MaxEditor, and implements the MaxDataEditor Interface.
+ * This implementation builds a ScrPanel to represent the score.
  */
 public class Explode extends MaxEditor implements MaxDataEditor, AAAReadme {
 
@@ -38,15 +39,6 @@ public class Explode extends MaxEditor implements MaxDataEditor, AAAReadme {
     getContentPane().add(itsPanel);
     
     itsPanel.prepareToolbar();
-    
-    /*
-     * just to be able to exit quickly...*/
-    addWindowListener((new WindowAdapter() {
-
-      public void windowClosing(WindowEvent e) {
-	System.exit(0);
-      }
-    }));
     
 
     //----
@@ -101,7 +93,7 @@ public class Explode extends MaxEditor implements MaxDataEditor, AAAReadme {
   }
 
   /**
-   * personalize the menubar
+   * personalize the menubar (adds the settings menu)
    */
   public void SetupMenu()
   {

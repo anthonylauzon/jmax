@@ -165,6 +165,9 @@ abstract public class Adapter implements MappingListener{
   }
 
 
+  /**
+   * edit this adapter (settings dialog)
+   */
   public void edit(Frame theFrame) 
   {
     SettingsDialog asd = SettingsDialog.createSettingsDialog(this, theFrame);
@@ -173,7 +176,11 @@ abstract public class Adapter implements MappingListener{
   }
 
 
-  public String getName() {
+  /**
+   * return the Adapter's name
+   */
+  public String getName() 
+  {
     return itsName;
   } 
 

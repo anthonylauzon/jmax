@@ -28,7 +28,7 @@ public class MoverTool extends ScrTool implements PositionListener, DragListener
   }
 
 
-
+  /** the default interaction module */
   public InteractionModule getDefaultIM() 
   {
     return itsMouseTracker;

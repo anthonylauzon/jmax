@@ -9,8 +9,7 @@ import com.sun.java.swing.ImageIcon;
 /**
  * the tool used to perform the different operations associated
  * with the "arrow" tool, that is:
- * selection, area_selection, deselection
- * The default (initial) interface module for this tool is the MouseTracker.
+ * selection, area_selection, deselection, moving.
  */ 
 public class ArrowTool extends ScrTool implements PositionListener, DirectionListener, DragListener, GraphicSelectionListener{
 
@@ -52,9 +51,9 @@ public class ArrowTool extends ScrTool implements PositionListener, DirectionLis
   {
     ScrEvent aScrEvent = gc.getRenderer().eventContaining(x, y);
     
-    if (aScrEvent != null)
+    if (aScrEvent != null) //click on event
       if (ExplodeSelection.getSelection().isInSelection(aScrEvent)) 
-	{ //hey! wanna move?
+	{ 
 	  startingPoint.setLocation(x,y);
 	  mountIModule(itsDirectionChooser, x, y);
 	} 
@@ -62,7 +61,9 @@ public class ArrowTool extends ScrTool implements PositionListener, DirectionLis
 	{
 	  selectionChoosen(x, y, 1, 1);
 	}
-    else {
+
+    else //click on empty
+      {
       if ((modifiers & InputEvent.SHIFT_MASK) == 0)
 	{
 	  ExplodeSelection.getSelection().deselectAll(); 
@@ -72,6 +73,7 @@ public class ArrowTool extends ScrTool implements PositionListener, DirectionLis
       mountIModule(itsSelecter, x, y);
     }
   }
+
 
   /**
    * called by the DirectionChooser UI module
