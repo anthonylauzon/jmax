@@ -1832,24 +1832,8 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   fts_patcher_set_standard(self);
 
-  /* set arguments */
-  if(ac > 0)
-  {
-    fts_definition_t *def = fts_definition_get(self, fts_s_args);
-    fts_atom_t a;
-
-    self->args = (fts_tuple_t *)fts_object_create(fts_tuple_class, ac, at);
-    fts_object_refer(self->args);
-
-    /* set new definiton */
-    fts_set_object(&a, (fts_object_t *)self->args);
-    fts_definition_update(def, &a);
-
-    /* store definition in object */
-    fts_object_set_definition((fts_object_t *)self->args, def);
-  }
-  else
-    self->args = NULL;
+  /* store arguments */
+  fts_array_init(&self->args, ac, at);
 
   self->scope = 0; /* patcher isn't scope by default*/
   
@@ -1898,8 +1882,7 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   self->objects = NULL;
 
   /* delete arguments */
-  if(self->args != NULL)
-    fts_object_release(self->args);
+  fts_array_destroy(&self->args);
   
   /* delete the inlet and outlet tables */
   if (self->inlets)

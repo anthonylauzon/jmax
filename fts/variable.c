@@ -19,8 +19,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -304,42 +302,260 @@ fts_name_gui_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
  *
  */
 
+enum define_type {define_none, define_const, define_arg, define_args};
+
 typedef struct
 {
   fts_object_t o;
+  int valid;
+  fts_symbol_t type;
   fts_symbol_t name;
   fts_atom_t value;
   fts_patcher_t *patcher;
+  fts_array_t descr;
+  fts_expression_t *expression;
 } define_t;
+
+static fts_symbol_t sym_type = 0;
+static fts_symbol_t sym_const = 0;
+static fts_symbol_t sym_arg = 0;
+static fts_symbol_t sym_args = 0;
+
+static void
+define_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  define_t *this = (define_t *) o;
+  fts_atom_t a;
+
+  fts_set_int(&a, this->valid);
+  fts_client_send_message_real_time(o, fts_s_value, 1, &a);
+}
+
+static void
+define_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  define_t *this = (define_t *) o;
+  fts_atom_t a;
+
+  fts_set_symbol(&a, this->type);
+  fts_client_send_message(o, sym_type, 1, &a);
+
+  fts_name_gui_method(o, 0, 0, 0, 0);
+}
+
+static fts_status_t
+define_expression_callback(int ac, const fts_atom_t *at, void *data)
+{
+  define_t *this = (define_t *)data;
+
+  if(ac > 0)
+  {
+    if(this->type == sym_const)
+    {
+      if(ac > 1)
+      {
+        fts_object_t *tuple = fts_object_create(fts_tuple_class, ac, at);
+        fts_atom_t a;
+
+        fts_set_object(&a, tuple);
+        fts_atom_assign(&this->value, &a);
+      }
+      else
+        fts_atom_assign(&this->value, at);
+
+      return fts_ok;
+    }
+    else if(this->type == sym_arg)
+    {
+      /* define argument with default value */
+      if(ac == 2)
+      {
+        fts_array_t *args = fts_patcher_get_args(fts_patcher_get_scope(this->patcher));
+        int size = fts_array_get_size(args);
+        fts_atom_t *atoms = fts_array_get_atoms(args);
+        int index;
+
+        /* get index */
+        if(fts_is_int(at))
+          index = fts_get_int(at);
+        else
+          return fts_status_new("bad index value");
+
+        /* assign argument or given default value */
+        if(index < size)
+          fts_atom_assign(&this->value, atoms + index);
+        else
+          fts_atom_assign(&this->value, at + 1);
+      }
+      else
+        return fts_status_new("bad argument definition");
+    }
+    else if(this->type == sym_args)
+    {
+      fts_array_t *args = fts_patcher_get_args(fts_patcher_get_scope(this->patcher));
+      int size = fts_array_get_size(args);
+      fts_atom_t *atoms = fts_array_get_atoms(args);
+
+      /* concat args and default values */
+      if(ac > 1 || size > 1)
+      {
+        fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, size, atoms);
+        fts_atom_t a;
+
+        if(ac > size)
+          fts_tuple_append(tuple, ac - size, at + size);
+        
+        fts_set_object(&a, (fts_object_t *)tuple);
+        fts_atom_assign(&this->value, &a);
+      }
+      else if(size > 0)
+        fts_atom_assign(&this->value, atoms);
+      else
+        fts_atom_assign(&this->value, at);
+    }
+    else
+      return fts_status_new("bad type");
+  }
+
+  return fts_ok;
+}
+
+static void
+define_evaluate(define_t *this)
+{
+  int ac = fts_array_get_size(&this->descr);
+  const fts_atom_t *at = fts_array_get_atoms(&this->descr);
+  fts_status_t status = fts_expression_set(this->expression, ac, at);
+  int valid = 0;
+
+  fts_set_void(&this->value);
+  
+  /* evaluate expression */
+  if(status == fts_ok)
+  {
+    fts_patcher_t *patcher = this->patcher;
+    fts_status_t status = fts_expression_reduce(this->expression, patcher, 0, NULL, define_expression_callback, this);
+
+    if(status == fts_ok)
+    {
+      valid = 1;
+
+      /* reset definition */
+      if(this->name != NULL && !fts_is_void(&this->value))
+        fts_name_set_value(this->patcher, this->name, fts_null);
+    }
+  }
+  
+  /* update gui */
+  if(valid != this->valid)
+  {
+    this->valid = valid;
+    fts_update_request((fts_object_t *)this);
+  }
+}
+
+static void
+define_set_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  define_t *this = (define_t *) o;
+
+  if(fts_is_symbol(at))
+    this->type = fts_get_symbol(at);
+
+  define_evaluate(this);
+}
+
+static void
+define_set_expression(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  define_t *this = (define_t *)o;
+
+  fts_array_set(&this->descr, ac, at);
+  define_evaluate(this);
+}
+
+static void
+define_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  define_t *this = (define_t *)o;
+
+  if(fts_is_symbol(at))
+    this->type = fts_get_symbol(at);
+
+  fts_array_set(&this->descr, ac - 1, at + 1);
+
+  define_evaluate(this);
+}
+
+static void
+define_set_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  define_t *this = (define_t *)o;
+  
+  /* reset definition */
+  if(this->name != NULL && !fts_is_void(&this->value))
+    fts_name_set_value(this->patcher, this->name, fts_null);
+
+  /* set_name */
+  if(ac > 0 && fts_is_symbol(at))
+  {
+    fts_symbol_t name = fts_get_symbol(at);
+
+    if(name != fts_s_empty_string)
+    {
+      this->name = name;
+
+      /* set definition */
+      if(!fts_is_void(&this->value))
+        fts_name_set_value(this->patcher, this->name, &this->value);
+
+      /* set name of object */
+      if(fts_object_has_id(o))
+      {
+        fts_atom_t a;
+        
+        fts_set_symbol(&a, name);
+        fts_client_send_message(o, fts_s_name, 1, &a);
+      }
+    }
+  }
+}
+
+static void
+define_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  define_t *this = (define_t *) o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  fts_message_t *mess = fts_dumper_message_new(dumper, fts_s_set);
+
+  fts_message_append_symbol(mess, this->type);
+  fts_message_append(mess, fts_array_get_size( &this->descr), fts_array_get_atoms(&this->descr));
+  fts_dumper_message_send(dumper, mess);
+}
 
 static void 
 define_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  define_t *this = (define_t *) o;  
+  define_t *this = (define_t *) o;
+  fts_status_t status;
 
+  this->valid = 0;
+  this->type = sym_const;
+  this->name = NULL;
   fts_set_void(&this->value);
+  this->patcher = fts_object_get_patcher(o);
 
-  if(ac > 1 && fts_is_symbol(at))
-    {
-      fts_patcher_t *patcher = fts_object_get_patcher(o);
-      fts_symbol_t name = fts_name_get_unused(patcher, fts_get_symbol(at));
-      fts_atom_t a[3];
+  /* expression description */
+  fts_array_init(&this->descr, 0, 0);
 
-      fts_name_set_value(patcher, name, (fts_atom_t *)(at + 1));
-      this->name = name;
-      this->value = at[1];
-      this->patcher = patcher;
+  status = fts_expression_new(0, 0, &this->expression);
+  if(status != fts_ok)
+  {
+    fts_object_error(o, "%s", fts_status_get_description(status));
+    return;
+  }
 
-      fts_atom_refer(&this->value);
-
-      fts_set_symbol(a, fts_s_colon);
-      fts_set_symbol(a + 1, fts_s_define);
-      fts_set_symbol(a + 2, name);
-      a[3] = at[1];
-      fts_object_set_description(o, 4, a);
-    }
-  else
-    fts_object_error(o, "bad arguments");
+  define_set(o, 0, 0, ac, at);
 }
 
 static void 
@@ -347,6 +563,9 @@ define_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   define_t *this = (define_t *) o;  
 
+  fts_expression_delete(this->expression);
+  fts_array_destroy(&this->descr);
+  
   fts_name_set_value(this->patcher, this->name, fts_null);
   fts_atom_release(&this->value);
 }
@@ -356,74 +575,29 @@ define_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(define_t), define_init, define_delete);
   
-  fts_class_message_varargs(cl, fts_s_spost_description, define_spost_description); 
-}
-
-typedef struct
-{
-  fts_object_t o;
-  fts_atom_t *arg;
-  fts_atom_t def;
-} args_t;
-
-static void
-args_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  args_t *this = (args_t *)o;
-
-  if((ac == 1 || ac == 2) && fts_is_int(at))
-    {
-      fts_tuple_t *args = fts_patcher_get_args(fts_object_get_patcher(o));
-      fts_atom_t *ptr = fts_tuple_get_atoms(args);
-      int size = fts_tuple_get_size(args);
-      int index;
-      
-      fts_set_void(&this->def);
-      
-      index = fts_get_int(at);
-      
-      if(args && index < size)
-	this->arg = ptr + index;
-      else if(ac > 1)
-	{
-	  /*fts_atom_assign(&this->def, at + 1);*/
-	  
-	  this->arg = &this->def;
-	}
-      else
-	{
-	  fts_object_error(o, "argument %d is not defined for this patcher", index);
-	  return;
-	}
-
-      fts_name_add_listener(fts_object_get_patcher(o), fts_s_args, o);
-    }
-  else
-    fts_object_error(o, "bad arguments");
-}
-
-static void
-args_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  args_t *this = (args_t *)o;
-
-  fts_set_void(&this->def);
-}
-
-static void
-args_instantiate(fts_class_t *cl)
-{
-  fts_class_init(cl, sizeof(args_t), args_init, args_delete);
+  fts_class_message_varargs(cl, fts_s_dump, define_dump);
+  fts_class_message_varargs(cl, fts_s_name, define_set_name);
   
-  fts_class_outlet_varargs(cl, 0);
+  fts_class_message_varargs(cl, fts_s_type, define_set_type);
+  fts_class_message_varargs(cl, fts_new_symbol("expression"), define_set_expression);
+
+  fts_class_message_varargs(cl, fts_s_set, define_set);
+
+  fts_class_message_varargs(cl, fts_s_update_real_time, define_update_real_time);
+  fts_class_message_varargs(cl, fts_s_update_gui, define_update_gui); 
+  fts_class_message_varargs(cl, fts_s_spost_description, define_spost_description);
 }
 
 void 
 fts_kernel_variable_init(void)
 {
-  /*fts_class_install( fts_s_define, define_instantiate);*/
-  /*fts_class_install( fts_s_args, args_instantiate);*/
+  fts_class_install( fts_s_define, define_instantiate);
 
+  sym_type = fts_new_symbol("type");
+  sym_const = fts_new_symbol("const");
+  sym_arg = fts_new_symbol("arg");
+  sym_args = fts_new_symbol("args");
+  
   definition_heap = fts_heap_new(sizeof(fts_definition_t));
   definition_listener_heap = fts_heap_new(sizeof(fts_definition_listener_t));
 }

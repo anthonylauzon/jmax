@@ -74,7 +74,7 @@ messconst_eval(messconst_t *this)
   fts_atom_t *values = fts_array_get_atoms(&this->inlets);
   fts_status_t status;
 
-  status = fts_expression_reduce(this->expression, patcher, n_inlets, values, messconst_expression_callback, this);
+  status = fts_expression_reduce(this->expression, patcher, n_inlets, values, messconst_expression_callback, (void *)this);
 
   if (status != fts_ok)
   {
