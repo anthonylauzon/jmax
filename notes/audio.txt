@@ -27,8 +27,8 @@ audiolabel:
 
 
 open/close audio port: il faut marquer le audio port comme actif (actif entrée, actif sortie).
-Le open est un message ou une fonction ???
 
+DSP execution:
 
 DSP prélude:
  pour tous les audioport actifs, appeler audioport.input
@@ -51,13 +51,117 @@ Lors d'un changement de canal, il faut faire un mute( ancien canal)
 ======================================================================
 
 audiomanager:
+static fts_hashtable_t port_names;
+
 API publique:
 fts_audioport_t *fts_audiomanager_get_port( fts_symbol_t port_name)
 {
+  /* 
+     - lookup in hashtable
+     (it is in the hashtable because it has been entered by an audio manager, which has 
+     at the same time registered an audio port)
+
+     - return it
+  */
 }
 
-void fts_audiomanager_put_port( fts_symbol_t port_name, fts_audioport_t *port);
+/*
+  these functions are called by the native audio packages to 
+  1) fill the hashtable when package is loaded
+  2) update the hashtable when ports are added/removed
+ */
+void fts_audiomanager_put_port( fts_symbol_t port_name, fts_audioport_t *port)
+{
+  /* just insert the entry in the hash table */
+}
+
 void fts_audiomanager_remove_port( fts_symbol_t port_name);
+{
+  /* just insert the entry in the hash table */
+}
+
 API privée:
-fts_symbol_t *fts_audiomanager_get_input_names(void);
+static fts_symbol_t *names;
+fts_symbol_t *fts_audiomanager_get_input_names(void)
+{
+  /*
+    count the number of keys and reallocate if necessary a static array
+    fortunately the hashtable has a function to return the number of keys
+    iterate through the hash table on keys and values
+    for each entry:
+    if the value (which is an audio port) is input,
+    add it to the 'names' array
+  */
+}
 fts_symbol_t *fts_audiomanager_get_output_names(void);
+{
+  /*
+    idem but for output 
+  */
+}
+
+======================================================================
+audiolabel:
+
+/*
+  audiolabels must have listeners, that can be added by the native audio
+  packages to be informed when labels are created.
+  For instance, the JACK audio manager creates/deletes Jack audio ports
+  with the same name as the label when audiolabels are created/deleted
+*/
+enum fts_audiolabel_action_t { FTS_AUDIOLABEL_ADDED, FTS_AUDIOLABEL_REMOVED};
+typedef void (*fts_audiolabel_listener_t)( fts_symbol_t label_name, enum fts_audiolabel_action_t action);
+
+fts_audiolabel_add_listener( fts_audiolabel_listener_t listener);
+fts_audiolabel_remove_listener( fts_audiolabel_listener_t listener);
+
+fts_audiolabel_set_input_port( fts_audiolabel_t *label, fts_symbol_t port_name)
+{
+  /*
+    if (label->input_port)
+      forget_it
+    label->input_port = fts_audiomanager_get_port( port_name);
+    fts_audioport_add_label( label->input_port, label);
+  */
+}
+
+
+
+======================================================================
+audioport:
+
+/*
+  an audioport has a list of labels because it can be closed violently by
+  the native audio layer (for instance a jack port has been removed because the
+  application has quited) and it must inform in its close() all the labels that
+  were connected to it
+*/
+void fts_audioport_add_label( fts_audioport_t *port, fts_audiolabel_t *label)
+{
+  /*
+     - if reference count is 0, open the audio port 
+     - increment reference count
+     - add the label to the list
+   */
+}
+
+void fts_audioport_remove_label( fts_audioport_t *port, fts_audiolabel_t *label);
+{
+}
+
+void fts_audioport_open( fts_audioport_t *port)
+{
+  /*
+    call its "open" method
+  */
+}
+
+void fts_audioport_close( fts_audioport_t *port)
+{
+  /*
+    unset the audioport for all the labels that reference it
+    call its "close" method
+  */
+}
+
+
