@@ -1,3 +1,11 @@
+Thu Apr 30 14:22:10 1998  Francois Dechelle  <dechelle@astor.ircam.fr>
+
+	*  Changed: lang/dsp/dspgraph.c
+	   Restructured the code, added comments...
+	   Added use of the graph iterator.
+   	*  Added: lang/dsp/gphiter.[ch]
+	   A graph iterator that handles special objects (patcher, inoutlets, send/receive...)
+
 Mon Apr  6 17:37:16 1998  Francois Dechelle  <dechelle@linotte.ircam.fr>
 
 	*  Added:
