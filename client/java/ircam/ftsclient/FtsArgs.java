@@ -86,6 +86,24 @@ public class FtsArgs {
     array[current++].set( o);
   }
 
+    public void add(Object value)
+    {
+	if(value instanceof Integer)
+	    add(((Integer)value).intValue());
+	else
+	    if(value instanceof Float)
+		add(((Float)value).floatValue());
+	    else 
+		if(value instanceof String)
+		    add((String)value);
+		else
+		    if(value instanceof FtsObject)
+			add((FtsObject)value);
+		    else
+			if(value instanceof FtsSymbol)
+			    add((FtsSymbol)value);
+    }
+
   public void clear()
   {
     current = 0;

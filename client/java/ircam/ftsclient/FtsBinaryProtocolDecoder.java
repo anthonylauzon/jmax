@@ -46,8 +46,6 @@ class SymbolCache {
       }
 
     cache[index] = s;
-
-    return cache[index];
   }
 
   FtsSymbol[] cache;
@@ -143,6 +141,14 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
 	}
       };
 
+    TransitionAction clearAllAction = new TransitionAction() {
+	public void fire( byte input)
+	{
+	  ival = 0;
+	  buffer.setLength( 0);
+	}
+      };
+
     TransitionAction bufferShiftAction = new TransitionAction() {
 	public void fire( byte input)
 	{
@@ -218,9 +224,9 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
 	  FtsObject obj = server.getObject( ival);
 
 	  if (argsCount == 0)
-	    args.add( obj);
-	  else
 	    target = obj;
+	  else
+	    args.add( obj);
 
 	  argsCount++;
 	}
@@ -268,7 +274,7 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
     qInitial.addTransition( FtsProtocol.INT, qInt0, clearAction);
     qInitial.addTransition( FtsProtocol.FLOAT, qFloat0, clearAction);
     qInitial.addTransition( FtsProtocol.SYMBOL_INDEX, qSymbolIndex0, clearAction);
-    qInitial.addTransition( FtsProtocol.SYMBOL_CACHE, qSymbolCache0, clearAction);
+    qInitial.addTransition( FtsProtocol.SYMBOL_CACHE, qSymbolCache0, clearAllAction);
     qInitial.addTransition( FtsProtocol.STRING, qString, bufferClearAction);
     qInitial.addTransition( FtsProtocol.OBJECT, qObject0, clearAction);
     qInitial.addTransition( FtsProtocol.END_OF_MESSAGE, qInitial, endMessageAction);
@@ -324,12 +330,11 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
     for ( int i = offset; i < length; i++)
       {
 	currentState = currentState.next( data[i]);
+
 	if (currentState == null)
 	  throw new FtsClientException( "Invalid data in protocol : state=" + currentState + " input=" + data[i]);
       }
   }
-
-  private FtsServer server;
 
   private int ival;
   private StringBuffer buffer;

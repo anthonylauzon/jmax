@@ -50,6 +50,8 @@ abstract class FtsProtocolDecoder {
       }
     catch (Exception e)
       {
+	System.err.println( "FtsProtocolDecoder.run: got exception " + e);
+	e.printStackTrace();
 	return;
       }
   }

@@ -24,16 +24,11 @@ import java.io.*;
 
 public class Test {
 
-  class MyCallback implements FtsCallback {
+  class MyCallback implements FtsMessageHandler {
     public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
     {
       if (argc == 1 && argv[0].isInt())
 	System.out.println( "Callback (1) " + argv[0].intValue);
-    }
-
-    public void invoke( FtsObject obj, String selector, int argc, FtsAtom[] argv)
-    {
-      System.out.println( "Callback (2) [" + selector + "] " + obj + " argc=" + argc);
     }
   }
 
@@ -80,8 +75,8 @@ public class Test {
 
 	MyCallback mc = new MyCallback();
 
-	FtsObject.registerCallback( o1.getClass(), "int", mc);
-	FtsObject.registerCallback( o1.getClass(), mc);
+	FtsObject.registerMessageHandler( o1.getClass(), "int", mc);
+	FtsObject.registerMessageHandler( o1.getClass(), mc);
 
 	int count = 42;
 

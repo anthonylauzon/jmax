@@ -73,7 +73,7 @@ public class FtsServer {
    * Send a "shutdown" message to remote FTS.
    * This message will halt the FTS scheduler and make FTS exit.
    */
-  void shutdown() throws FtsClientException
+  public void shutdown() throws FtsClientException
   {
   }
 
@@ -92,7 +92,7 @@ public class FtsServer {
     objectTable.put( new Integer( id), object);
   }
 
-  int getNewObjectID()
+  public int getNewObjectID()
   {
     return newObjectID++;
   }

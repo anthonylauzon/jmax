@@ -176,6 +176,16 @@ public class FtsObject {
     return id;
   }
 
+  public FtsObject getRoot()
+  {
+    return server.getRoot();
+  }
+    
+  public FtsServer getServer()
+  {
+    return server;
+  }
+
   private int id;
   private FtsServer server;
   private FtsProtocolEncoder encoder;

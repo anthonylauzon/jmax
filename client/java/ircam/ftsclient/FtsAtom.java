@@ -162,5 +162,23 @@ public class FtsAtom {
     objectValue = o;
   }
 
+  public final Object getValue()
+  {
+      if(isVoid())
+	  return null;
+      else if(isInt())
+	  return new Integer( intValue);
+      else if(isFloat())
+	  return new Float( floatValue);
+      else if(isString())
+	  return stringValue;
+      else if(isSymbol())
+	  return symbolValue;
+      else if(isObject())
+	  return objectValue;
+
+      return null;
+  }
+
   private Class type;
 }

@@ -1,1 +1,1 @@
-SUBDIRS= cpp include java tests
+SUBDIRS= cpp include java
