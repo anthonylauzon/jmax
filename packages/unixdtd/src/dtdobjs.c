@@ -66,33 +66,29 @@ typedef struct {
   fts_alarm_t eof_alarm;
   int can_post_data_late;
   fts_alarm_t post_data_late_alarm;
-  char *filename;
+  fts_symbol_t filename;
 } readsf_t;
 
-static fts_symbol_t readsf_dsp_function;
+static fts_symbol_t readsf_symbol;
 
-static void readsf_do_open( readsf_t *this, const char *filename)
+static int readsf_do_open( readsf_t *this, fts_symbol_t filename)
 {
   if (filename)
+    this->filename = filename;
+  
+  if (this->filename)
     {
-      if (this->filename)
-	fts_free( this->filename);
-
-      this->filename = strcpy( (char *)fts_malloc( strlen(filename)+1), filename);
+      this->fifo = dtdserver_open_read( this->server, fts_symbol_name(this->filename), this->n_channels);
+      
+      if (this->fifo)
+	return 1;
+      else
+	post( "readsf~: error: cannot allocate fifo for dtd server\n");
     }
-  else if (!this->filename)
-    {
-      post( "readsf~: error: no file name specified\n");
-      return;
-    }
+  else
+    post( "readsf~: error: no file name specified\n");
 
-  this->fifo = dtdserver_open_read( this->server, this->filename, this->n_channels);
-
-  if ( !this->fifo)
-    {
-      post( "readsf~: error: cannot allocate fifo for dtd server\n");
-      return;
-    }
+  return 0;
 }
 
 static void readsf_do_close( readsf_t *this)
@@ -111,16 +107,16 @@ static void readsf_state_machine( readsf_t *this, fts_symbol_t message, int ac, 
   case readsf_closed:
     if (message == s_open)
       {
-	readsf_do_open( this, fts_symbol_name( fts_get_symbol( at)));
-	this->state = readsf_opened;
+	if(readsf_do_open( this, fts_get_symbol( at)))
+	  this->state = readsf_opened;
       }
     else if (message == fts_s_stop)
       {
       }
     else if (message == fts_s_start)
       {
-	readsf_do_open( this, 0);
-	this->state = readsf_pending;
+	if(readsf_do_open( this, 0))
+	  this->state = readsf_pending;
       }
     else if (message == s_pause)
       {
@@ -131,7 +127,9 @@ static void readsf_state_machine( readsf_t *this, fts_symbol_t message, int ac, 
     if (message == s_open)
       {
 	readsf_do_close( this);
-	readsf_do_open( this, fts_symbol_name( fts_get_symbol( at)));
+
+	if(!readsf_do_open( this, fts_get_symbol( at)))
+	  this->state = readsf_closed;	  
       }
     else if (message == fts_s_stop)
       {
@@ -149,8 +147,11 @@ static void readsf_state_machine( readsf_t *this, fts_symbol_t message, int ac, 
     if (message == s_open)
       {
 	readsf_do_close( this);
-	readsf_do_open( this, fts_symbol_name( fts_get_symbol( at)));
-	this->state = readsf_opened;
+
+	if(readsf_do_open( this, fts_get_symbol( at)))
+	  this->state = readsf_opened;
+	else
+	  this->state = readsf_closed;	  
       }
     else if (message == fts_s_stop)
       {
@@ -169,8 +170,11 @@ static void readsf_state_machine( readsf_t *this, fts_symbol_t message, int ac, 
     if (message == s_open)
       {
 	readsf_do_close( this);
-	readsf_do_open( this, fts_symbol_name( fts_get_symbol( at)));
-	this->state = readsf_opened;
+
+	if(readsf_do_open( this, fts_get_symbol( at)))
+	  this->state = readsf_opened;
+	else
+	  this->state = readsf_closed;	  
       }
     else if (message == fts_s_stop)
       {
@@ -190,8 +194,11 @@ static void readsf_state_machine( readsf_t *this, fts_symbol_t message, int ac, 
     if (message == s_open)
       {
 	readsf_do_close( this);
-	readsf_do_open( this, fts_symbol_name( fts_get_symbol( at)));
-	this->state = readsf_opened;
+
+	if(readsf_do_open( this, fts_get_symbol( at)))
+	  this->state = readsf_opened;
+	else
+	  this->state = readsf_closed;	  
       }
     else if (message == fts_s_stop)
       {
@@ -226,41 +233,26 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 {
   readsf_t *this = (readsf_t *)o;
   int n_channels;
-  const char *filename;
+  fts_symbol_t filename;
 
   ac--;
   at++;
 
-  n_channels = fts_get_long_arg(ac, at, 0, 1);
+  this->server = 0;
+  this->filename = 0;
+
+  n_channels = fts_get_int_arg(ac, at, 0, 1);
   this->n_channels = (n_channels < 1) ? 1 : n_channels;
 
-  if ( ac == 2)
-    {
-      if (fts_is_symbol( at+1))
-	{
-	  filename = fts_symbol_name( fts_get_symbol( at+1));
-	  this->filename = strcpy( (char *)fts_malloc( strlen(filename)+1), filename);
-	}
-      else if (fts_is_object( at+1))
-	this->server = (dtdserver_t *)fts_get_object( at+1);
-    }
-  else if ( ac == 3)
-    {
-      if (fts_is_symbol( at+1))
-	{
-	  filename = fts_symbol_name( fts_get_symbol( at+1));
-	  this->filename = strcpy( (char *)fts_malloc( strlen(filename)+1), filename);
-	}
-      if (fts_is_object( at+2))
-	this->server = (dtdserver_t *)fts_get_object( at+2);
-    }
+  if(ac == 2 && fts_is_symbol( at + 1))
+    this->filename = fts_get_symbol( at + 1);
 
-  if (!this->server)
+  if(!this->server)
     this->server = dtdserver_get_default_instance();
 
-  if (!this->server)
+  if(!this->server)
     {
-      fts_object_set_error( o, "Error starting Direct-To-Disk server");
+      fts_object_set_error( o, "Error starting direct-to-disk server");
       return;
     }
 
@@ -272,7 +264,7 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_alarm_init( &(this->eof_alarm), 0, readsf_eof_alarm, this);	
   fts_alarm_init( &(this->post_data_late_alarm), 0, readsf_post_data_late_alarm, this);	
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void readsf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -284,7 +276,7 @@ static void readsf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   fts_alarm_reset( &this->eof_alarm);	
   fts_alarm_reset( &this->post_data_late_alarm);	
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static void clear_outputs( int n, int n_channels, fts_word_t *outputs)
@@ -333,8 +325,8 @@ static void readsf_dsp( fts_word_t *argv)
   fts_word_t *outputs;
 
   this = (readsf_t *)fts_word_get_ptr( argv + 0);
-  n = fts_word_get_long( argv + 1);
-  outputs = argv+2;
+  n = fts_word_get_int( argv + 1);
+  outputs = argv + 2;
 
   n_channels = this->n_channels;
 
@@ -404,7 +396,7 @@ static void readsf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   for ( i = 0; i < this->n_channels; i++)
     fts_set_symbol( argv + 2 + i, fts_dsp_get_output_name( dsp, i));
 
-  dsp_add_funcall( readsf_dsp_function, 2 + this->n_channels, argv);
+  fts_dsp_add_function( readsf_symbol, 2 + this->n_channels, argv);
 }
 
 static void readsf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -444,25 +436,18 @@ static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   int n_channels, i;
   fts_type_t a[4];
 
-  n_channels = fts_get_long_arg(ac, at, 1, 1);
+  n_channels = fts_get_int_arg(ac, at, 1, 1);
 
   if (n_channels < 1)
     n_channels = 1;
 
   fts_class_init(cl, sizeof(readsf_t), 1, n_channels + 1, 0);
 
-  a[0] = fts_t_symbol;
-  a[1] = fts_t_int;
-  a[2] = fts_t_int;
-  a[3] = fts_t_int;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, readsf_init, 4, a, 1);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, readsf_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, readsf_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, readsf_put);
 
-  a[0] = fts_t_symbol;
-  a[1] = fts_t_int;
-  a[2] = fts_t_symbol;
-  fts_method_define_optargs(cl, 0, s_open,  readsf_open, 3, a, 0);
+  fts_method_define_varargs(cl, 0, s_open,  readsf_open);
 
   fts_method_define_varargs( cl, 0, fts_s_bang, readsf_start);
   fts_method_define_varargs( cl, 0, fts_s_int, readsf_number);
@@ -476,10 +461,9 @@ static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   fts_method_define_varargs( cl, 0, s_close, readsf_stop);
 
   for (i = 0; i < n_channels; i++)
-    dsp_sig_outlet(cl, i);
+    fts_dsp_declare_outlet(cl, i);
 
-  readsf_dsp_function = fts_new_symbol( "readsf~");
-  dsp_declare_function( readsf_dsp_function, readsf_dsp);
+  fts_dsp_declare_function( readsf_symbol, readsf_dsp);
 
   return fts_Success;
 }
@@ -509,36 +493,28 @@ typedef struct {
   dtdfifo_t *fifo;
   int can_post_fifo_overflow;
   fts_alarm_t post_fifo_overflow_alarm;
-  char *filename;
+  fts_symbol_t filename;
 } writesf_t;
 
-static fts_symbol_t writesf_dsp_function;
+static fts_symbol_t writesf_symbol;
 
 
-static void writesf_do_open( writesf_t *this, const char *filename)
+static void writesf_do_open( writesf_t *this, fts_symbol_t filename)
 {
-  if (filename)
+  if(filename)
+    this->filename = filename;
+  
+  if(this->filename)
     {
-      if (this->filename)
-	fts_free( this->filename);
-
-      this->filename = strcpy( (char *)fts_malloc( strlen(filename)+1), filename);
+      this->fifo = dtdserver_open_write( this->server, fts_symbol_name(this->filename), this->n_channels);
+      
+      if (this->fifo)
+	this->state = writesf_opened;
+      else
+	post( "writesf~: error: cannot allocate fifo for DTD server\n");
     }
-  else if (!this->filename)
-    {
-      post( "writesf~: error: no file name specified\n");
-      return;
-    }
-
-  this->fifo = dtdserver_open_write( this->server, this->filename, this->n_channels);
-
-  if ( !this->fifo)
-    {
-      post( "writesf~: error: cannot allocate fifo for DTD server\n");
-      return;
-    }
-
-  this->state = writesf_opened;
+  else
+    post( "writesf~: error: no file name specified\n");
 }
 
 static void writesf_do_close( writesf_t *this)
@@ -557,7 +533,7 @@ static void writesf_state_machine( writesf_t *this, fts_symbol_t message, int ac
   switch( this->state) {
   case writesf_closed:
     if (message == s_open)
-      writesf_do_open( this, fts_symbol_name( fts_get_symbol( at)));
+      writesf_do_open( this, fts_get_symbol( at));
     else if (message == s_close)
       {
       }
@@ -572,7 +548,7 @@ static void writesf_state_machine( writesf_t *this, fts_symbol_t message, int ac
     if (message == s_open)
       {
 	writesf_do_close( this);
-	writesf_do_open( this, fts_symbol_name( fts_get_symbol( at)));
+	writesf_do_open( this, fts_get_symbol( at));
       }
     else if (message == s_close)
       writesf_do_close( this);
@@ -587,7 +563,7 @@ static void writesf_state_machine( writesf_t *this, fts_symbol_t message, int ac
     if (message == s_open)
       {
 	writesf_do_close( this);
-	writesf_do_open( this, fts_symbol_name( fts_get_symbol( at)));
+	writesf_do_open( this, fts_get_symbol( at));
       }
     else if (message == s_close)
       writesf_do_close( this);
@@ -604,7 +580,7 @@ static void writesf_state_machine( writesf_t *this, fts_symbol_t message, int ac
     if (message == s_open)
       {
 	writesf_do_close( this);
-	writesf_do_open( this, fts_symbol_name( fts_get_symbol( at)));
+	writesf_do_open( this, fts_get_symbol( at));
       }
     else if (message == s_close)
       writesf_do_close( this);
@@ -633,14 +609,20 @@ static void writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   ac--;
   at++;
 
-  n_channels = fts_get_long_arg(ac, at, 0, 1);
+  this->server = 0;
+  this->filename = 0;
+
+  n_channels = fts_get_int_arg(ac, at, 0, 1);
   this->n_channels = (n_channels < 1) ? 1 : n_channels;
+
+  if(ac == 2 && fts_is_symbol( at + 1))
+    this->filename = fts_get_symbol( at + 1);
 
   this->server = (dtdserver_t *)fts_get_ptr_arg(ac, at, 1, dtdserver_get_default_instance());
 
   if (!this->server)
     {
-      fts_object_set_error( o, "Error starting Direct-To-Disk server");
+      fts_object_set_error( o, "Error starting direct-to-disk server");
       return;
     }
 
@@ -651,7 +633,7 @@ static void writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   fts_alarm_init( &(this->post_fifo_overflow_alarm), 0, writesf_post_fifo_overflow_alarm, this);	
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void writesf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -662,7 +644,7 @@ static void writesf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
   fts_alarm_reset( &this->post_fifo_overflow_alarm);	
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static void write_fifo( int n, int n_channels, dtdfifo_t *fifo, fts_word_t *inputs)
@@ -697,8 +679,8 @@ static void writesf_dsp( fts_word_t *argv)
   fts_word_t *inputs;
 
   this = (writesf_t *)fts_word_get_ptr( argv + 0);
-  n = fts_word_get_long( argv + 1);
-  inputs = argv+2;
+  n = fts_word_get_int( argv + 1);
+  inputs = argv + 2;
 
   n_channels = this->n_channels;
 
@@ -742,7 +724,7 @@ static void writesf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   for ( i = 0; i < this->n_channels; i++)
     fts_set_symbol( argv + 2 + i, fts_dsp_get_input_name( dsp, i));
 
-  dsp_add_funcall( writesf_dsp_function, 2 + this->n_channels, argv);
+  fts_dsp_add_function( writesf_symbol, 2 + this->n_channels, argv);
 }
 
 static void writesf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -779,30 +761,19 @@ static void writesf_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
 static fts_status_t writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int n_channels, i;
-  fts_type_t a[4];
-
-  n_channels = fts_get_long_arg(ac, at, 1, 1);
+  int n_channels = fts_get_int_arg(ac, at, 1, 1);
+  int i;
 
   if (n_channels < 1)
     n_channels = 1;
 
   fts_class_init(cl, sizeof(writesf_t), n_channels, 0, 0);
 
-  a[0] = fts_t_symbol;
-  a[1] = fts_t_int;
-  a[2] = fts_t_int;
-  a[3] = fts_t_int;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, writesf_init, 4, a, 1);
-
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, writesf_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, writesf_delete);
-
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, writesf_put);
 
-  a[0] = fts_t_symbol;
-  a[1] = fts_t_int;
-  a[2] = fts_t_symbol;
-  fts_method_define_optargs(cl, 0, s_open, writesf_open, 3, a, 0);
+  fts_method_define_varargs(cl, 0, s_open, writesf_open);
 
   fts_method_define_varargs( cl, 0, fts_s_bang, writesf_record);
   fts_method_define_varargs( cl, 0, fts_s_int, writesf_number);
@@ -816,10 +787,9 @@ static fts_status_t writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_
   fts_method_define_varargs( cl, 0, s_close, writesf_close);
 
   for (i = 0; i < n_channels; i++)
-    dsp_sig_inlet(cl, i);
+    fts_dsp_declare_inlet(cl, i);
 
-  writesf_dsp_function = fts_new_symbol( "writesf~");
-  dsp_declare_function( writesf_dsp_function, writesf_dsp);
+  fts_dsp_declare_function( writesf_symbol, writesf_dsp);
 
   return fts_Success;
 }
@@ -834,8 +804,11 @@ static fts_status_t writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_
 
 void dtdobjs_init( void)
 {
-  fts_metaclass_install(fts_new_symbol("readsf~"), readsf_instantiate, fts_first_arg_equiv);
-  fts_metaclass_install(fts_new_symbol("writesf~"), writesf_instantiate, fts_first_arg_equiv);
+  readsf_symbol = fts_new_symbol( "readsf~");
+  writesf_symbol = fts_new_symbol( "writesf~");
+
+  fts_metaclass_install(readsf_symbol, readsf_instantiate, fts_first_arg_equiv);
+  fts_metaclass_install(writesf_symbol, writesf_instantiate, fts_first_arg_equiv);
 
   s_open = fts_new_symbol( "open");
   s_close = fts_new_symbol( "close");
