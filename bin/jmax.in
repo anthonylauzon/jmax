@@ -169,11 +169,12 @@ build_classpath ()
 	JMAX_CLASSPATH=${javadir}/jmax.jar
     fi
 
+    INTERP_CLASSPATH=${javadir}/lib/jacl/jacl.jar:${javadir}/lib/jacl/tcljava.jar
     if [ $CLASSPATH ]
     then
-	CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${javadir}/jacl.jar:${javadir}/tcljava.jar
+	CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${INTERP_CLASSPATH}
     else
-	CLASSPATH=${JMAX_CLASSPATH}:${javadir}/jacl.jar:${javadir}/tcljava.jar
+	CLASSPATH=${JMAX_CLASSPATH}:${INTERP_CLASSPATH}
     fi
 }
 
