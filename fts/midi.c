@@ -1306,26 +1306,32 @@ void
 fts_midimanager_set_input(fts_midimanager_t *mm, int index, fts_midiport_t *midiport, fts_symbol_t name)
 {
   fts_midilabel_t *label = fts_midimanager_get_label_by_index(mm, index);
-  fts_atom_t args[2];
 
   fts_midilabel_set_input(label, midiport, name);
 
-  fts_set_int(args + 0, index);
-  fts_set_symbol(args + 1, name);
-  fts_client_send_message((fts_object_t *)mm, fts_s_input, 2, args);
+  if(fts_object_has_id((fts_object_t *)mm)) {
+    fts_atom_t args[2];
+    
+    fts_set_int(args + 0, index);
+    fts_set_symbol(args + 1, name);
+    fts_client_send_message((fts_object_t *)mm, fts_s_input, 2, args);
+  }
 }
 
 void
 fts_midimanager_set_output(fts_midimanager_t *mm, int index, fts_midiport_t *midiport, fts_symbol_t name)
 {
   fts_midilabel_t *label = fts_midimanager_get_label_by_index(mm, index);
-  fts_atom_t args[2];
 
   fts_midilabel_set_output(label, midiport, name);
 
-  fts_set_int(args + 0, index);
-  fts_set_symbol(args + 1, name);
-  fts_client_send_message((fts_object_t *)mm, fts_s_output, 2, args);
+  if(fts_object_has_id((fts_object_t *)mm)) {
+    fts_atom_t args[2];
+    
+    fts_set_int(args + 0, index);
+    fts_set_symbol(args + 1, name);
+    fts_client_send_message((fts_object_t *)mm, fts_s_output, 2, args);
+  }
 }
 
 void

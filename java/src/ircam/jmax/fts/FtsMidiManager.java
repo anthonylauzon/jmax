@@ -58,6 +58,12 @@ public class FtsMidiManager extends FtsObject
             ((FtsMidiManager)obj).setOutput( args.getInt( 0), args.getSymbol( 3).toString());            
 	}
       });
+    FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("set"), new FtsMessageHandler(){
+      public void invoke( FtsObject obj, FtsArgs args)
+      {
+        ((FtsMidiManager)obj).set( args.getInt( 0), args.getSymbol( 1).toString(), args.getSymbol( 2).toString(), args.getSymbol( 3).toString());
+      }
+    });    
      FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("remove"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
@@ -96,6 +102,8 @@ public class FtsMidiManager extends FtsObject
 
   public void requestInsertLabel( int index, String label)
   {
+    labels.insertElementAt( new MidiLabel( label, null, null), index);
+    
     args.clear();
     
     args.addInt( index);
@@ -213,7 +221,7 @@ public class FtsMidiManager extends FtsObject
 
   void removeLabel( int index)
   {
-    if( index >0 && index < labels.size())
+    if( index >= 0 && index < labels.size())
         labels.remove( index);	
   }
 
@@ -222,14 +230,25 @@ public class FtsMidiManager extends FtsObject
     return labels.elements();
   }
 
+  void set( int index, String name, String input, String output)
+  {
+    ((MidiLabel)labels.elementAt( index)).set( name, input, output);
+    if(listener != null)
+      listener.labelChanged( index, name, input, output);
+  }
+  
   void setInput( int index, String input)
   {
     ((MidiLabel)labels.elementAt( index)).setInput( input);
+    if(listener != null)
+      listener.labelChanged( index, null, input, null);
   }
 
   void setOutput( int index, String output)
   {
     ((MidiLabel)labels.elementAt( index)).setOutput( output);
+    if(listener != null)
+      listener.labelChanged( index, null, null, output);
   }
 
   public class MidiLabel extends Object
@@ -240,6 +259,7 @@ public class FtsMidiManager extends FtsObject
       this.input = input;
       this.output = output;
     }
+    public void set( String name, String in, String out){label = name; input = in; output = out;}
     public void setInput( String in){ input = in;}
     public void setOutput( String out){ output = out;}
     public String label, input, output;

@@ -250,20 +250,16 @@ macosxmidi_update( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     if(input != NULL) {
       int id = macosxmidiport_get_id(input);
 
-      if(id != 0 && macosxmidi_get_by_unique_id(id, kMIDIObjectType_Source) == NULL) {
-        fts_midilabel_set_input(label, NULL, fts_s_none);
-        input = NULL;
-      }
+      if(id != 0 && macosxmidi_get_by_unique_id(id, kMIDIObjectType_Source) == NULL)
+        fts_midimanager_set_input(mm, i, NULL, fts_s_none);
     }
 
     /* check output */
     if(output != NULL) {
       int id = macosxmidiport_get_id(output);
 
-      if(id != 0 && macosxmidi_get_by_unique_id(id, kMIDIObjectType_Destination) == NULL) {
-        fts_midilabel_set_output(label, NULL, fts_s_none);
-        output = NULL;
-      }
+      if(id != 0 && macosxmidi_get_by_unique_id(id, kMIDIObjectType_Destination) == NULL)
+        fts_midimanager_set_output(mm, i, NULL, fts_s_none);
     }
 
     label = fts_midilabel_get_next(label);
@@ -308,6 +304,7 @@ macosxmidi_insert_label( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   fts_midimanager_t *mm = (fts_midimanager_t *)o;
   int index = fts_get_int(at);
   fts_symbol_t name = fts_get_symbol(at + 1);
+  fts_atom_t a[4];
 
   /* check if name is not already used */
   if(fts_midimanager_get_label_by_name(mm, name) != NULL)
@@ -315,7 +312,12 @@ macosxmidi_insert_label( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   /* insert label and send to client */
   fts_midimanager_insert_label_at_index(mm, index, name);
-  fts_client_send_message(o, fts_s_insert, 2, at);
+
+  fts_set_int(a, index);
+  fts_set_symbol(a + 1, name);
+  fts_set_symbol(a + 2, fts_s_none);
+  fts_set_symbol(a + 3, fts_s_none);
+  fts_client_send_message(o, fts_s_set, 4, a);
 }
 
 /* remove <index> */
@@ -329,6 +331,8 @@ macosxmidi_remove_label( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   /* remove label and send to client */
   fts_midimanager_remove_label_at_index(mm, index);
   fts_client_send_message(o, fts_s_remove, 1, at);
+
+  macosxmidi_update(o, 0, 0, 0, 0);
 }
 
 static void
@@ -568,9 +572,12 @@ static void
 macosxmidi_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
+  int i;
 
   fts_hashtable_init(&this->sources, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
   fts_hashtable_init(&this->destinations, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+
+  /*macosxmidi_set_default_label(this);*/
    
   MIDIClientCreate(CFSTR("jMax"), macosxmidi_notify, (void *)o, &this->client);
 }
@@ -593,6 +600,7 @@ macosxmidi_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, macosxmidi_upload);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, macosxmidi_print);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_update, macosxmidi_update);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_insert, macosxmidi_insert_label); /* insert <index> <name> */
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_remove, macosxmidi_remove_label); /* remove <name>  */

@@ -141,9 +141,19 @@ public class MidiConfigPanel extends JPanel implements Editor
     revalidate(); 
   }
 
+  public void labelChanged( int id, String name, String in, String out)
+  {
+    midiModel.setRowValues( id, name, in, out);
+    midiTable.revalidate();
+    revalidate();
+  }
+  
   void Add()
   {
-    midiModel.addRow( midiTable.getSelectedRow());
+    int sel = midiTable.getSelectedRow();
+    midiModel.addRow( sel);
+    if( sel==-1) sel = midiTable.getRowCount()-2;
+    midiTable.getSelectionModel().setSelectionInterval( sel+1, sel+1);
   }
 
   void Delete()
@@ -198,49 +208,84 @@ public class MidiConfigPanel extends JPanel implements Editor
 
     public void addRow(int index)
     {
-      size++;    
-      if((size > rows) || (index != -1))
-	{
-	  Object[][] temp = new Object[size+5][3];
-	  if(index == -1)
-	    for(int i = 0; i < size-1; i++)
-	      {
-		temp[i][0] = data[i][0];
-		temp[i][1] = data[i][1];
-		temp[i][2] = data[i][2];
-	      }
-	  else
-	    {
-	      for(int i = 0; i < index+1; i++)
-	      {
-		temp[i][0] = data[i][0];
-		temp[i][1] = data[i][1];
-		temp[i][2] = data[i][2];
-	      }
+      size++;
+      Object[][] temp;
+      
+      if( size > rows)
+      {
+        temp = new Object[size+5][3];
+        rows = size+5;
+      }
+      else
+        temp = new Object[size][3];
 
-	      temp[index+1][0] = null;
-	      temp[index+1][1] = null;
-	      temp[index+1][2] = null;
+      if(index == -1)
+        {
+          for(int i = 0; i < size-1; i++)
+          {
+            temp[i][0] = data[i][0];
+            temp[i][1] = data[i][1];
+            temp[i][2] = data[i][2];
+          }
+          temp[size-1][0] = "unnamed";
+          temp[size-1][1] = null;
+          temp[size-1][2] = null;
+          index = size-2;
+        }
+      else
+        {
+          for(int i = 0; i < index+1; i++)
+          {
+            temp[i][0] = data[i][0];
+            temp[i][1] = data[i][1];
+            temp[i][2] = data[i][2];
+          }
 
-	      for(int j = index+2; j < size; j++)
-	      {
-		temp[j][0] = data[j-1][0];
-		temp[j][1] = data[j-1][1];
-		temp[j][2] = data[j-1][2];
-	      }
-	    }
-	  data = temp;
-	  rows = size+5;
-	}
-      fireTableDataChanged();
+          temp[index+1][0] = "unnamed";
+          temp[index+1][1] = null;
+          temp[index+1][2] = null;
+
+          for(int j = index+2; j < size; j++)
+          {
+            temp[j][0] = data[j-1][0];
+            temp[j][1] = data[j-1][1];
+            temp[j][2] = data[j-1][2];
+          }
+        }
+
+      data = temp;
+
+      if( midiMan != null)
+        midiMan.requestInsertLabel( index+1, "unnamed");
+
+      fireTableDataChanged();      
     }
 
     public void addRow(Object v1, Object v2, Object v3)
     {
-      addRow(-1);
-      data[size-1][0] = v1;
-      data[size-1][1] = v2;
-      data[size-1][2] = v3;
+      size++;
+      Object[][] temp;
+
+      if( size > rows)
+        {
+          temp = new Object[size+5][3];
+          rows = size+5;
+        }
+      else
+        temp = new Object[size][3];
+
+      for(int i = 0; i < size-1; i++)
+        {
+          temp[i][0] = data[i][0];
+          temp[i][1] = data[i][1];
+          temp[i][2] = data[i][2];
+        }
+      
+      temp[size-1][0] = v1;
+      temp[size-1][1] = v2;
+      temp[size-1][2] = v3;
+      
+      data = temp;
     }
 
     public void removeRow(int rowId)
@@ -257,6 +302,8 @@ public class MidiConfigPanel extends JPanel implements Editor
 		  data[i][2] = data[i+1][2];
 		}
 	    }
+          else rowId = size;
+          
 	  data[size][0] = null;
 	  data[size][1] = null;
 	  data[size][2] = null;
@@ -273,6 +320,25 @@ public class MidiConfigPanel extends JPanel implements Editor
 	return data[row][col];
     }
 
+    public void setRowValues(int row, Object v1, Object v2, Object v3)
+    {
+      if( v1 != null)
+      {
+        data[row][0] = v1;
+        fireTableCellUpdated(row, 0);
+      }
+      if( v2 != null)
+      {
+        data[row][1] = v2;
+        fireTableCellUpdated(row, 1);
+      }
+      if( v3 != null)
+      {
+        data[row][2] = v3;
+        fireTableCellUpdated(row, 2);
+      }
+    }
+    
     public void setValueAt(Object value, int row, int col) 
     {
       if(row > size) return;
@@ -286,11 +352,13 @@ public class MidiConfigPanel extends JPanel implements Editor
 	{
 	  if( col==0)
 	    {
+              if( ((String)value).equals("")) value = "unnamed";
+            
 	      if( oldValue == null)
 		midiMan.requestInsertLabel( row, (String)value);	      
 	      else
 		{
-		  midiMan.requestRemoveLabel( row);	
+                  midiMan.requestRemoveLabel( row);	
 		  midiMan.requestInsertLabel( row, (String)value);	
 		  if(data[row][1] != null)
 		    midiMan.requestSetInput( row, (String) data[row][1]);	
