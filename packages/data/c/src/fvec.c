@@ -156,11 +156,11 @@ fvec_get_max_abs_value_in_range(fvec_t *vec, int a, int b)
   int i;
 
   max = vec->values[a];
-  abs_max = fabsf(max);
+  abs_max = (float)fabs((double)max);
 
   for (i = a+1; (i < vec->m) && (i < b); i++)
   {
-    abs_val = fabsf(vec->values[i]);
+    abs_val = (float)fabs((double)vec->values[i]);
     if ( abs_val > abs_max)
     {
       max = vec->values[i];
