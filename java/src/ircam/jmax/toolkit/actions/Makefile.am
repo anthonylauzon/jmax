@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)
+packagedir=$(pkgdatadir)/java/classes/ircam/jmax/toolkit/actions
 package_JAVA = \
 CloseAction.java\
 DSPAction.java\

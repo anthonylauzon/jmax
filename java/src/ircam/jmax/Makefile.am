@@ -1,6 +1,6 @@
 SUBDIRS=dialogs editors fts toolkit widgets
 
-packagedir=$(pkgdatadir)
+packagedir=$(pkgdatadir)/java/classes/ircam/jmax
 package_JAVA =					\
 JMaxApplication.java				\
 JMaxClassMap.java				\

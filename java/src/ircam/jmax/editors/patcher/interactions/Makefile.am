@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)
+packagedir=$(pkgdatadir)/java/classes/ircam/jmax/editors/patcher/interactions
 package_JAVA = \
 AddModeInteraction.java\
 BgPopUpInteraction.java\

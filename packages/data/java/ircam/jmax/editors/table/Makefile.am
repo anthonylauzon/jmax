@@ -1,6 +1,6 @@
 SUBDIRS= actions menus renderers tools
 
-packagedir=$(pkgdatadir)
+packagedir=$(pkgdatadir)/packages/data/java/classes/ircam/jmax/editors/table
 package_JAVA = \
 ChangeRangeDialog.java \
 CoordinateWriter.java \

@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)
+packagedir=$(pkgdatadir)/packages/data/java/classes/ircam/jmax/editors/bpf/renderers
 package_JAVA = \
 BpfBackground.java \
 BpfForeground.java \

@@ -1,6 +1,6 @@
 SUBDIRS= actions interactions menus objects
 
-packagedir=$(pkgdatadir)
+packagedir=$(pkgdatadir)/java/classes/ircam/jmax/editors/patcher
 package_JAVA = \
 AddPopUp.java\
 ConnectionAction.java\

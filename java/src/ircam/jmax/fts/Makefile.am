@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)
+packagedir=$(pkgdatadir)/java/classes/ircam/jmax/fts
 package_JAVA = \
 FtsAtomList.java\
 FtsAtomListListener.java\

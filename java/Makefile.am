@@ -1,8 +1,8 @@
 SUBDIRS= src
 
-packagedir=$(pkgdatadir)/java
+jardir=$(pkgdatadir)/java
 JAR=jmax.jar
-package_DATA = $(JAR)
+jar_DATA = $(JAR)
 
 JAR_DEP=\
 	src/ircam/jmax/classpackage.stamp \

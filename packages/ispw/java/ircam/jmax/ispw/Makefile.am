@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)
+packagedir=$(pkgdatadir)/packages/ispw/java/classes
 package_JAVA = \
 FtsMessageObject.java \
 Message.java 

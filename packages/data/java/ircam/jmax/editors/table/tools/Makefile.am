@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)
+packagedir=$(pkgdatadir)/packages/data/java/classes/ircam/jmax/editors/table/actions/tools
 package_JAVA = \
 LinerTool.java \
 PencilTool.java \

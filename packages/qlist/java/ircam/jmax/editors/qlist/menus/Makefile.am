@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)
+packagedir=$(pkgdatadir)/packages/qlist/java/classes/ircam/jmax/editors/qlist/menus
 package_JAVA = \
 EditMenu.java \
 FileMenu.java 

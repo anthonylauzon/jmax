@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)
+packagedir=$(pkgdatadir)/java/classes/ircam/jmax/editors/patcher/objects
 package_JAVA = \
 DisplayObject.java\
 Editable.java\

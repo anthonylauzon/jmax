@@ -1,6 +1,6 @@
 #noinst_JAVA= 
 
-packagedir=$(pkgdatadir)
+packagedir=$(datadir)/jmax/client/java/classes/ircam/fts/client
 package_JAVA = \
 FtsArgs.java \
 FtsAtom.java \

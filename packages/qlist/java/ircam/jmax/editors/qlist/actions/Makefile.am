@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)
+packagedir=$(pkgdatadir)/packages/qlist/java/classes/ircam/jmax/editors/qlist/actions
 package_JAVA = \
 Actions.java \
 CopyAction.java \

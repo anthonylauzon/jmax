@@ -1,8 +1,8 @@
 SUBDIRS= ircam
 
-packagedir=$(datadir)/jmax/client/java
+jardir=$(datadir)/jmax/client/java
 JAR=ftsclient.jar
-package_DATA = $(JAR)
+jar_DATA = $(JAR)
 
 JAR_DEP=ircam/fts/client/classpackage.stamp
 

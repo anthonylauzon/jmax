@@ -1,14 +1,16 @@
 SUBDIRS= ircam
 
-packagedir=$(pkgdatadir)/packages/qlist/java
-JAR= qlist.jar
-package_DATA= $(JAR)
+packagedir=$(pkgdatadir)/packages/qlist/java/classes
 package_JAVA= Qlist.java
 
 JAVAC= @JAVACX@
 JAVACFLAGS= @JAVACFLAGSX@
 JAVAROOT= @top_srcdir@/packages/qlist/java
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar
+
+jardir=$(pkgdatadir)/packages/qlist/java
+JAR= qlist.jar
+jar_DATA= $(JAR)
 
 JAR_DEP= \
 classpackage.stamp \

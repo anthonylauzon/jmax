@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)
+packagedir=$(pkgdatadir)/java/classes/ircam/jmax/widgets
 package_JAVA = \
 BeanPanel.java\
 ColorPropertyEditor.java\

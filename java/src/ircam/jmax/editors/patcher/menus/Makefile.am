@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)
+packagedir=$(pkgdatadir)/java/classes/ircam/jmax/editors/patcher/menus
 package_JAVA = \
 AlignMenu.java\
 EditMenu.java\

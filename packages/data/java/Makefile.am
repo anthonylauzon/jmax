@@ -1,14 +1,16 @@
 SUBDIRS= ircam
 
-packagedir=$(pkgdatadir)/packages/data/java
-JAR= data.jar
-package_DATA= $(JAR)
+packagedir=$(pkgdatadir)/packages/data/java/classes
 package_JAVA= Data.java
 
 JAVAC= @JAVACX@
 JAVACFLAGS= @JAVACFLAGSX@
 JAVAROOT= @top_srcdir@/packages/data/java
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):@top_srcdir@/java/src:@top_srcdir@/packages/guiobj/java/guiobj.jar:@top_srcdir@/client/java/ftsclient.jar
+
+jardir=$(pkgdatadir)/packages/data/java
+JAR= data.jar
+jar_DATA= $(JAR)
 
 JAR_DEP= \
 classpackage.stamp \
