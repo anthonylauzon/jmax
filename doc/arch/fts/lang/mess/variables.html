@@ -195,7 +195,14 @@ a value obtained thru a variable argument; in general, this pointer is not
 dereferenced, but it could with a special purpose equivalence function;
 this problem need a good solution.</i>
 <p>
-
+An other limit in the current algorithm is that the almost everywhere
+in the code there is the assumption that a scope is closed by a patcher;
+inserting an explicit scope operator, like '::' in C++, like for
+example composed names ($foo.bar), will break this assumption, and many critical
+parts of the algorithm will not work any more, in particular the object
+stealing; the whole code base should be carefully reviewed before 
+a scope operator can be added.
+<p>
 
 <A NAME="structures"> 
 <H2>Main Data Structures</H2> 
