@@ -740,22 +740,23 @@ track_segment_quantize(track_t *self, event_t *first, event_t *after, double beg
 void 
 track_copy(track_t *org, track_t *copy)
 {
-  event_t *event = track_get_first(org);
+  event_t *orgevent = track_get_first(org);
   
   track_clear(copy);
   
-  while(event != NULL)
+  while (orgevent != NULL)
   {
-    double time = event_get_time(event);
-    fts_atom_t *value = event_get_value(event);
-    fts_atom_t a = *fts_null;
-    event_t *event;
+    double      time  = event_get_time(orgevent);
+    fts_atom_t *value = event_get_value(orgevent);
+    fts_atom_t  a;
+    event_t    *eventcopy;
     
+    fts_set_void(&a);
     fts_atom_copy(value, &a);
-    event = (event_t *)fts_object_create(event_class, 1, &a);
-    track_append_event(copy, time, event);
+    eventcopy = (event_t *) fts_object_create(event_class, 1, &a);
+    track_append_event(copy, time, eventcopy);
     
-    event = event_get_next(event);
+    orgevent = event_get_next(orgevent);
   }
 }
 

@@ -85,6 +85,8 @@ extern void track_move_event(track_t *track, event_t *event, double time);
 extern void track_remove_event(track_t *track, event_t *event);
 extern void track_merge(track_t *track, track_t *merge);
 extern void track_clear(track_t *track);
+extern void track_copy(track_t *org, track_t *copy);
+
 
 extern void track_add_event_and_upload(track_t *track, double time, event_t *event);
 extern void track_add_event_after_and_upload(track_t *track, double time, event_t *event, event_t *after);
