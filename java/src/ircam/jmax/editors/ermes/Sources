@@ -13,7 +13,9 @@ SSOURCES = \
 	  ErmesSwVarEdit.java \
 	  ErmesToolBarLayout.java \
 	  ErmesSwToggleButton.java \
-	  ErmesPatcherFactory.java
+	  ErmesPatcherFactory.java \
+	  ErmesClipboardProvider.java
+
 
 
 DSOURCES = \

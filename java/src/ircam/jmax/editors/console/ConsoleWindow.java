@@ -10,12 +10,14 @@ import java.util.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.datatransfer.*;
 import tcl.lang.*;
-
-public class ConsoleWindow extends MaxEditor {
+ 
+public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transferable{
   StringBuffer itsSbuf = new StringBuffer();
   Console itsConsole;
   ConsoleDocument itsConsoleDocument = new ConsoleDocument(this);
+  String itsCopiedText;
 
   public ConsoleWindow(Console theConsole, String theTitle) {
     super(theTitle);
@@ -46,9 +48,52 @@ public class ConsoleWindow extends MaxEditor {
     GetSaveAsMenu().setEnabled(false);
     GetPrintMenu().setEnabled(true);
     GetCutMenu().setEnabled(false);
-    GetCopyMenu().setEnabled(false);
-    GetPasteMenu().setEnabled(false);
+    GetCopyMenu().setEnabled(true);//clipboard test
+    GetPasteMenu().setEnabled(true);
     GetClearMenu().setEnabled(false);
+  }
+
+  // start of ClipboardOwner, Tranferable interface methods
+  public void lostOwnership(Clipboard clipboard, Transferable contents) {
+    //nun me ne po' frega' de meno
+    System.err.println("dice che non e' piu' mia la clipboard");
+  }
+  //--
+  public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+    return itsCopiedText;
+  }
+
+  public DataFlavor[] getTransferDataFlavors() {
+    DataFlavor flavorList[] = new DataFlavor[1];
+    flavorList[0] = DataFlavor.plainTextFlavor;
+    //    System.err.println("quali flavor supporto? io dico plainText "+DataFlavor.plainTextFlavor.toString());
+    return (flavorList);
+  }
+
+  public boolean isDataFlavorSupported(DataFlavor flavor) {
+    //System.err.println("is supported "+flavor.toString()+"? io dico si");
+    return true;
+  }
+  //end
+
+  protected boolean Copy() {
+    MaxApplication.systemClipboard.setContents(this, this);
+    itsCopiedText = itsConsole.itsTextArea.getSelectedText();//tout simplement
+    return true;
+  }
+
+  protected boolean Paste(){
+    String aPastingString = new String();
+    Transferable aTransferable = MaxApplication.systemClipboard.getContents(this);
+
+    try {
+      aPastingString = (String) aTransferable.getTransferData(DataFlavor.plainTextFlavor);
+    } catch (Exception e) {
+      System.err.println("e mi sono beccato pure una eccezione" + e.toString());
+    }
+
+    itsConsole.Put(aPastingString);
+    return true;
   }
 
   //redefini parce-que la console ne doit pas se fermer sans quitter

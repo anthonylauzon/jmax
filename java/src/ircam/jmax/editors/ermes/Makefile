@@ -196,4 +196,8 @@ ErmesKeyAdapter:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesKeyAdapter.java)
 .PHONY: ErmesKeyAdapter
 
+ErmesClipboardProvider:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesClipboardProvider.java)
+.PHONY: ErmesClipboardProvider
+
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

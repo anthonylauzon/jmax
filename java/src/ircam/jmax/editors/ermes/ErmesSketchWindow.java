@@ -299,11 +299,17 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     FillExecutionMenu(itsExecutionMenu);
 
     GetCutMenu().setEnabled(false);
-    GetCopyMenu().setEnabled(false);
+    GetCopyMenu().setEnabled(true);//clipboard test
     GetPasteMenu().setEnabled(false);
     GetClearMenu().setEnabled(false);
   }
 
+  // clipboard test
+  protected boolean Copy() {
+    ErmesClipboardProvider aCP = new ErmesClipboardProvider(itsSketchPad.itsSelectedList);
+    MaxApplication.systemClipboard.setContents(aCP, aCP);
+    return true;
+  }
 
   private boolean IsInSizesMenu(String theName) {
     return(theName.equals("8")|| theName.equals("9")||theName.equals("10")||theName.equals("12")||theName.equals("14")||theName.equals("18")||theName.equals("24")||theName.equals("36")||theName.equals("48"));

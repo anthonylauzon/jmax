@@ -2,6 +2,7 @@ package ircam.jmax;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.datatransfer.*;
 import java.util.*;
 import java.io.*;
 
@@ -15,13 +16,12 @@ import ircam.jmax.editors.ermes.*;
 import tcl.lang.*;
 
 /**
- * The main application class in Ermes. Contains the global parameters 
+ * The main application class in jMax. Contains the global parameters 
  * and/or the global functionalities of the system. 
  * It is also the entry point for several TCL commands. It handles, for example:
  * - the startup process, the TCL initialization
  * - the FTS connection
  * - the resource definition loading
- * - the project manager activation (no more)
  * - a set of global functions related to the window list (stack, tile, close)
  * - file format versions handling
  * - system properties
@@ -48,6 +48,7 @@ public class MaxApplication extends Object {
     return itsInterp;
   }
 
+  public static Clipboard systemClipboard = new Clipboard("system");
   static Interp itsInterp;//e.m.
   public static Vector itsSketchWindowList;
   public static Vector itsEditorsFrameList;
@@ -89,7 +90,7 @@ public class MaxApplication extends Object {
       itsServer = new FtsSocketClientServer(server);
     else if (mode.equals("local"))
       itsServer = new FtsSubProcessServer();
-    else System.out.println("unknown FTS connection type "+mode+": can't cconnect to FTS");
+    else System.out.println("unknown FTS connection type "+mode+": can't connect to FTS");
     itsServer.setParameter("ftsdir", theFtsdir);
     itsServer.setParameter("ftsname", theFtsname);
     itsServer.start();
@@ -173,14 +174,13 @@ public class MaxApplication extends Object {
       {
 	ourData = MaxDataHandler.loadDataInstance(MaxDataSource.makeDataSource(file));
 
-	System.err.println("Nome del MaxData: " + ourData.getName());
 	try
 	  {
 	    ourEditor = ourData.edit();
 	  }
 	catch (MaxDataException e)
 	  {
-	    // Ignore MaxDataExcpetion exception in running the editor
+	    // Ignore MaxDataException exception in running the editor
 	    // May be an hack, may be is ok; move this stuff to an action
 	    // handler !!
 	  }
@@ -197,7 +197,7 @@ public class MaxApplication extends Object {
   }
 
 
-  public static void Load(File file)
+  /*  public static void Load(File file)
   {
     boolean temp = doAutorouting;
 
@@ -227,7 +227,7 @@ public class MaxApplication extends Object {
     catch (Exception e)
       {
 	e.printStackTrace(); // temporary, MDC
-	ErrorDialog aErr = new ErrorDialog(/*#*/GetConsoleWindow(), "Error " + e + " while importing "+ file);
+	ErrorDialog aErr = new ErrorDialog(GetConsoleWindow(), "Error " + e + " while importing "+ file);
 	aErr.setLocation(100, 100);
 	aErr.setVisible(true);
 	return;
@@ -244,7 +244,7 @@ public class MaxApplication extends Object {
     // Restore autorouting
 
     doAutorouting = temp;
-  }
+  }*/
   
   static public void AddThisWindowToMenus(ErmesSketchWindow theSketchWindow){
     ErmesSketchWindow aSketchWindow;
@@ -358,26 +358,6 @@ public class MaxApplication extends Object {
       itsConsoleWindow.ChangeWinNameMenu(theOldName, theNewName);
   }
   
-  //static utility function (patcher creations)
-  /*public static ErmesSketchWindow NewPatcherWindow(FtsContainerObject theFtsPatcher) {
-    ErmesPatcherDoc aPatcherDoc = new ErmesPatcherDoc(theFtsPatcher);
-    aPatcherDoc.alreadySaved = true;
-    itsSketchWindow = new ErmesSketchWindow(false, itsSketchWindow, false);
-    itsSketchWindow.Init();
-    theFtsPatcher.open();
-    itsSketchWindow.repaint();
-    itsWindow = itsSketchWindow;
-    ErmesSketchWindow aSketch = (ErmesSketchWindow)itsSketchWindow;
-    itsSketchWindow.InitFromDocument(aPatcherDoc);
-    itsSketchWindow.inAnApplet = false;
-    itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetTitle());
-    aPatcherDoc.SetWindow(itsSketchWindow);
-    itsSketchWindow.setVisible(true);
-    return itsSketchWindow;
-  }*/
-
-
-
   public static ErmesSketchWindow NewSubPatcherWindow(FtsContainerObject theFtsPatcher) {
     ErmesPatcherDoc aPatcherDoc = new ErmesPatcherDoc(theFtsPatcher);
     ErmesSketchWindow aSketchWindow;

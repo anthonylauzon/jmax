@@ -268,7 +268,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
   }
   
 
-  private Menu CreateEditMenu() {
+  protected Menu CreateEditMenu() {
     MenuItem aMenuItem;
     Menu editMenu = new Menu("Edit");
     editMenu.add(aMenuItem = new MenuItem("Cut"));
@@ -282,7 +282,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     return editMenu;
   }
 
-  private boolean IsInEditMenu(String theName) {
+  protected boolean IsInEditMenu(String theName) {
     return(theName.equals("Cut") || theName.equals("Copy") || theName.equals("Paste") 
 		|| theName.equals("Clear"));
   }
@@ -404,10 +404,19 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
   }
 
 
-  private boolean EditMenuAction(MenuItem theMenuItem, String theString) {
-    return true;
+  protected boolean EditMenuAction(MenuItem theMenuItem, String theString) {
+    if (theString.equals("Cut")) return Cut();
+    else if (theString.equals("Copy")) return Copy();
+    else if (theString.equals("Paste")) return Paste();
+    else if (theString.equals("Clear")) return Clear();
+    else return true;
   }
 
+  protected boolean Cut(){return true;};
+  protected boolean Copy(){return true;};
+  protected boolean Paste(){return true;};
+  protected boolean Clear(){return true;};
+  
   private boolean WindowsMenuAction(MenuItem theMenuItem, String theString) {
     if (theString.equals("Stack")) {
       MaxApplication.StackWindows();
