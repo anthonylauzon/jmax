@@ -111,7 +111,10 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
 
 
   public int getMinimumWidth(){
-    return ((TextRenderer)renderer).getColWidth() + getTextWidthOffset();
+      if(renderer instanceof TextRenderer)
+	  return ((TextRenderer)renderer).getColWidth() + getTextWidthOffset();
+      else 
+	  return renderer.getWidth();
   }
 
   // redefined from base class
