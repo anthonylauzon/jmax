@@ -23,7 +23,7 @@
 #include <fts/fts.h>
 #include <fts/packages/sequence/sequence.h>
 
-typedef struct _seqrec_
+typedef struct
 {
   fts_object_t head; /* sequence reference object */
   fts_timebase_t *timebase;

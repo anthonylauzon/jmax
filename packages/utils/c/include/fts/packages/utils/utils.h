@@ -118,8 +118,11 @@ UTILS_API float *fts_fftab_get_hanning(int size); /* hanning (offset cosine) win
 #define FTS_CUBIC_INTPHASE_FRAC_BITS (FTS_CUBIC_TABLE_BITS + FTS_CUBIC_INTPHASE_LOST_BITS)
 #define FTS_CUBIC_INTPHASE_FRAC_SIZE (1 << FTS_CUBIC_INTPHASE_FRAC_BITS)
 
-#define fts_cubic_get_table_index(i) \
-   ((int)(((i).frac & FTS_CUBIC_IDEFIX_BIT_MASK) >> FTS_CUBIC_IDEFIX_SHIFT_BITS))
+#define fts_cubic_get_table_index_from_idefix(i) \
+  ((int)(((i).frac & FTS_CUBIC_IDEFIX_BIT_MASK) >> FTS_CUBIC_IDEFIX_SHIFT_BITS))
+
+#define fts_cubic_get_table_index_from_frac(f) \
+  ((unsigned int)((f) * (double)FTS_CUBIC_TABLE_SIZE) & (FTS_CUBIC_TABLE_SIZE - 1))
 
 #define FTS_CUBIC_IDEFIX_SHIFT_BITS 24
 #define FTS_CUBIC_IDEFIX_BIT_MASK 0xff000000
@@ -138,12 +141,15 @@ typedef struct
 
 UTILS_API fts_cubic_coefs_t *fts_cubic_table;
 
+#define fts_cubic_get_coefs(f) \
+  (fts_cubic_table + fts_cubic_get_table_index_from_frac(f))
+
 #define fts_cubic_calc(x, p) \
   ((x)[-1] * (p)->pm1 + (x)[0] * (p)->p0 + (x)[1] * (p)->p1 + (x)[2] * (p)->p2)
 
 #define fts_cubic_idefix_interpolate(p, i, y) \
   do { \
-    fts_cubic_coefs_t *ft = fts_cubic_table + fts_cubic_get_table_index(i); \
+    fts_cubic_coefs_t *ft = fts_cubic_table + fts_cubic_get_table_index_from_idefix(i); \
     *(y) = fts_cubic_calc((p) + (i).index, ft); \
   } while(0)
 
@@ -156,7 +162,7 @@ UTILS_API fts_cubic_coefs_t *fts_cubic_table;
 
 #define fts_cubic_interpolate(p, i, f, y) \
   do { \
-    fts_cubic_coefs_t *ft = fts_cubic_table + ((unsigned int)((f) * (double)FTS_CUBIC_TABLE_SIZE) & (FTS_CUBIC_TABLE_SIZE - 1)); \
+    fts_cubic_coefs_t *ft = fts_cubic_table + fts_cubic_get_table_index_from_frac(f); \
     *(y) = fts_cubic_calc((p) + (i), ft); \
   } while(0)
 
