@@ -177,27 +177,28 @@ generate_file /tmp/$$ VERSION
 ( cd doc/release_notes ; touch release_notes.${NEW_VERSION}.html; cvs add release_notes.${NEW_VERSION}.html )
 
 cat <<EOF >/tmp/$$
-<HTML>
-<HEAD>
-<TITLE> jMax $NEW_VERSION release notes </TITLE>
-</HEAD>
+<html>
+<head>
+<title> jMax $NEW_VERSION release notes </title>
+</head>
 
-<CENTER> <H2> <I>j</I>Max $NEW_VERSION release notes </H2> </CENTER>
+<center> <h2> <i>j</i>Max $NEW_VERSION release notes </h2> </center>
 
-<P>
-This is release $NEW_VERSION of <I>j</I>Max.
-
-<H3>Status</H3>
+<p>
+This is release $NEW_VERSION of <i>j</i>Max.
 
 
-<H3>Supported platforms</H3>
+<h3>Status</h3>
 
 
-<H3>Bug tracking system</H3>
+<h3>Supported platforms</h3>
 
-<P>
+
+<h3>Bug tracking system</h3>
+
+<p>
 Bugs are repertoried in the Ircam bug tracking system, at the following URL:
-<A HREF="http://www.ircam.fr/Bugs/">http://www.ircam.fr/Bugs/</A> ; 
+<a href="http://www.ircam.fr/Bugs/">http://www.ircam.fr/Bugs/</a> ; 
 you will find there a list of known and fixed bugs, updated
 on a daily base, and a bug report submission page that must be used for
 bug report submission.
@@ -207,7 +208,7 @@ In order to ease bug tracking and fixing, users are kindly required to use
 the previously mentionned URL to report bugs.
 
 </body>
-</HTML>
+</html>
 EOF
 generate_file /tmp/$$ doc/release_notes/release_notes.${NEW_VERSION}.html
 cat <<EOF >> doc/release_notes/distrib
