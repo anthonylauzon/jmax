@@ -1,3 +1,9 @@
+2002-12-06  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* Split audio.c into audio.c, audioconfig.c and audiolabel.c
+
+	* Work in progress for client<->server audio configuration communication
+
 2002-12-03  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* Begin to merge audio and midi configuration in fts/config.c:
