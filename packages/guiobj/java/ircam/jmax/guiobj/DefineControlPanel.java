@@ -70,7 +70,6 @@ public class DefineControlPanel extends JPanel implements ActionListener, Object
             setType();
         }
       });
-    //typeCombo.setPreferredSize( new Dimension( 160, 20));
 
     Box typeBox = new Box(BoxLayout.X_AXIS);
     typeBox.add( Box.createRigidArea(new Dimension(5, 0)));  
@@ -107,6 +106,7 @@ public class DefineControlPanel extends JPanel implements ActionListener, Object
   {
     target = obj;
     type = ((Define)obj).getType();
+    typeCombo.setSelectedItem( type);
     
     name = target.getFtsObject().getVariableName();
     nameField.setText( name);    

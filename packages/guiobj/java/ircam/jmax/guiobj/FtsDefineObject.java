@@ -29,7 +29,7 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.fts.client.*;
 
-public class FtsDefineObject extends FtsIntValueObject
+public class FtsDefineObject extends FtsGraphicObject
 {
   static
   {
@@ -42,7 +42,13 @@ public class FtsDefineObject extends FtsIntValueObject
       FtsObject.registerMessageHandler( FtsDefineObject.class, FtsSymbol.get("expression"), new FtsMessageHandler(){
 	  public void invoke(FtsObject obj, FtsArgs args)
 	  {
-	    ((FtsDefineObject)obj).setExpression( args.getSymbol(0).toString());
+	    ((FtsDefineObject)obj).setExpression( args.getString(0));
+	  }
+	});
+     FtsObject.registerMessageHandler( FtsDefineObject.class, FtsSymbol.get("valid"), new FtsMessageHandler(){
+	  public void invoke(FtsObject obj, FtsArgs args)
+	  {
+	    ((FtsDefineObject)obj).setValid( (args.getInt(0) != 0));
 	  }
 	});
     }
@@ -109,8 +115,9 @@ public class FtsDefineObject extends FtsIntValueObject
   }
   
   public void setExpression( String expression)
-  {
+  {  
     this.expression = expression;
+    ((Define)listener).expressionChanged( expression);	
   }
   
   public String getType()
@@ -121,10 +128,24 @@ public class FtsDefineObject extends FtsIntValueObject
   public void setType( String type)
   {
     this.type = type;
+    ((Define)listener).typeChanged( type);
   }
+  
+   public boolean isValid()
+  {
+    return valid;
+  }
+  
+  public void setValid( boolean valid)
+  {
+    this.valid = valid;
+    ((Define)listener).validChanged( valid);
+  }
+
   
   private String expression;
   private String type;
+  private boolean valid = true;
 }
 
 

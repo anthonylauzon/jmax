@@ -32,17 +32,11 @@ import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.toolkit.*;
 
-public class Define extends Editable implements FtsObjectErrorListener, FtsIntValueListener{
+public class Define extends Editable implements FtsObjectErrorListener{
 
   private static final int DEFAULT_WIDTH = 44;
   private static final int MINIMUM_WIDTH = 20;
 
-  private static final int  statusInvalid = 0;
-  private static final int  statusValid = 1;
-  private int status = 1;
-
-  private String variableName;
-  private String variableValue;
   protected FontMetrics boldFontMetrics = null;
   protected Font boldFont = null;
 
@@ -67,7 +61,6 @@ public class Define extends Editable implements FtsObjectErrorListener, FtsIntVa
   public void setDefaults()
   {
     setWidth( getWidth());
-    updateDimensions();
   }
 
   public void setType( String type)
@@ -84,7 +77,7 @@ public class Define extends Editable implements FtsObjectErrorListener, FtsIntVa
 
   public String getArgs()
   {
-    return ftsObject.getDescription();
+    return ((FtsDefineObject)ftsObject).getExpression();
   }
 
   // redefined from base class
@@ -138,16 +131,27 @@ public class Define extends Editable implements FtsObjectErrorListener, FtsIntVa
     redraw();
   } 
 
-  public void valueChanged(int value) 
+  public void typeChanged(String type) 
   {
-    status = value;
-
+    typeWidth = boldFontMetrics.stringWidth( type);
+    fitToText();
     redraw();
-  }
+  } 
+
+  public void expressionChanged(String expr) 
+  {
+    fitToText();
+    redraw();
+  } 
+    
+  public void validChanged( boolean valid) 
+  {
+    redraw();
+  } 
 
   public void fitToText()
   {
-    forceWidth(  getTextHeightOffset() + getTypeWidth() + getFontMetrics().stringWidth(" ") + getFontMetrics().stringWidth( variableValue) + 6);
+    forceWidth(  getTextHeightOffset() + getTypeWidth() + getFontMetrics().stringWidth(" ") + getFontMetrics().stringWidth( ((FtsDefineObject)ftsObject).getExpression()) + 6);
   }
 
   public Dimension getMinimumSize() 
@@ -164,7 +168,7 @@ public class Define extends Editable implements FtsObjectErrorListener, FtsIntVa
 
   public int getTextXOffset()
   {
-    return getTextHeightOffset() + getTypeWidth() +2;
+    return getTextHeightOffset() + getTypeWidth() + 4;
   }
 
   public int getTextYOffset()
@@ -174,7 +178,7 @@ public class Define extends Editable implements FtsObjectErrorListener, FtsIntVa
 
   public int getTextWidthOffset()
   {
-    return  getTextHeightOffset() + getTypeWidth() + 4;
+    return  getTextHeightOffset() + getTypeWidth() + 6;
   }
 
   public int getTextHeightOffset()
@@ -184,7 +188,7 @@ public class Define extends Editable implements FtsObjectErrorListener, FtsIntVa
     
   public Color getTextForeground()
   {
-    if(status == statusValid)
+    if( ((FtsDefineObject)ftsObject).isValid())
       return Color.black;
     else
       {
@@ -235,22 +239,22 @@ public class Define extends Editable implements FtsObjectErrorListener, FtsIntVa
     int y = getY();
     int w = getWidth();
     int h = getHeight();
-    int hLine = (getTypeWidth() > 0) ? getTextHeightOffset() + getTypeWidth() + 4 : getTextHeightOffset() + 2;
 
     g.setColor( getTextBackground());
 
     g.fillRect( x + 1, y + 1, w - 2,  h - 2);
-    g.fill3DRect( x + 1, y + 1, hLine - 2,  h-2, true);
+    g.fill3DRect( x + 1, y + 1, getTextXOffset() - 2,  h-2, true);
 
-    if( variableName != null && !isEditing())
-      {
-	g.setColor( getTextForeground());
+    g.setColor( getTextForeground());
 
-	int bottom = getFontMetrics().getAscent() + (h - getFontMetrics().getHeight())/2;
-	g.setFont( boldFont);
-	g.drawString( ((FtsDefineObject)ftsObject).getType(), x + 4, y + bottom);
+    int bottom = getFontMetrics().getAscent() + (h - getFontMetrics().getHeight())/2;
+    g.setFont( boldFont);
+    g.drawString( ((FtsDefineObject)ftsObject).getType(), x + 4, y + bottom);
+        
+     if( !isEditing())
+      {       
 	g.setFont( getFont());
-	g.drawString( ((FtsDefineObject)ftsObject).getExpression(), x + hLine + 1, y + bottom);
+	g.drawString( ((FtsDefineObject)ftsObject).getExpression(), x + getTextXOffset(), y + bottom);
       }
     super.paint( g);
   }
