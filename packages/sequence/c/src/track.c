@@ -52,8 +52,8 @@ prepend_event(track_t *track, event_t *event)
 {
   if(track->size == 0)
   {
-    event->next = 0;
-    event->prev = 0;
+    event->next = NULL;
+    event->prev = NULL;
     
     track->first = event;
     track->last = event;
@@ -63,7 +63,7 @@ prepend_event(track_t *track, event_t *event)
   else
   {
     event->next = track->first;
-    event->prev = 0;
+    event->prev = NULL;
     
     track->first->prev = event;
     track->first = event;
@@ -77,8 +77,8 @@ append_event(track_t *track, event_t *event)
 {
   if(track->size == 0)
   {
-    event->next = 0;
-    event->prev = 0;
+    event->next = NULL;
+    event->prev = NULL;
     
     track->first = event;
     track->last = event;
@@ -88,7 +88,7 @@ append_event(track_t *track, event_t *event)
   else
   {
     event->prev = track->last;
-    event->next = 0;
+    event->next = NULL;
     
     track->last->next = event;
     track->last = event;
@@ -138,25 +138,25 @@ insert_event_behind(track_t *track, event_t *here, event_t *event)
 static void
 cutout_event(track_t *track, event_t *event)
 {
-  if(event->prev == 0)
+  if(event->prev == NULL)
   {
-    if(event->next == 0)
+    if(event->next == NULL)
     {
-      track->first = 0;
-      track->last = 0;
+      track->first = NULL;
+      track->last = NULL;
     }
     else
     {
       /* event is first of track */
       track->first = event->next;
-      track->first->prev = 0;
+      track->first->prev = NULL;
     }
   }
-  else if(event->next == 0)
+  else if(event->next == NULL)
   {
     /* event is last of track */
     track->last = event->prev;
-    track->last->next = 0;
+    track->last->next = NULL;
   }
   else
   {
@@ -393,8 +393,9 @@ track_remove_event(track_t *track, event_t *event)
 {
   cutout_event(track, event);
   
-  event->next = event->prev = 0;
-  
+  event->next = event->prev = NULL;
+  event_set_track(event, track);
+
   fts_object_release(event);
 }
 
@@ -454,16 +455,17 @@ track_clear(track_t *track)
   {
     event_t *next = event_get_next(event);
     
-    event->next = event->prev = 0;
+    event->next = event->prev = NULL;
+    event->track = NULL;
     fts_object_release((fts_object_t *)event);
     
     event = next;
   }
   
   /* merge track is empty */
-  track->first = 0;
-  track->last = 0;
-  track->size = 0;
+  track->first = NULL;
+  track->last = NULL;
+  track->size = NULL;
 }
 
 void

@@ -1895,7 +1895,10 @@ fmat_add_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
 
-  if(fmat_get_m(right) == m && fmat_get_n(right) == n)
+  if(m > fmat_get_m(right))
+    m = fmat_get_m(right);
+  
+  if(fmat_get_n(right) == n)
   {
     float *l = fmat_get_ptr(self);
     float *r = fmat_get_ptr(right);
@@ -1940,7 +1943,10 @@ fmat_sub_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
   
-  if(fmat_get_m(right) == m && fmat_get_n(right) == n)
+  if(m > fmat_get_m(right))
+    m = fmat_get_m(right);
+  
+  if(fmat_get_n(right) == n)
   {
     float *l = fmat_get_ptr(self);
     float *r = fmat_get_ptr(right);
@@ -1985,7 +1991,10 @@ fmat_mul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
   
-  if(fmat_get_m(right) == m && fmat_get_n(right) == n)
+  if(m > fmat_get_m(right))
+    m = fmat_get_m(right);
+  
+  if(fmat_get_n(right) == n)
   {
     float *l = fmat_get_ptr(self);
     float *r = fmat_get_ptr(right);
@@ -2030,7 +2039,10 @@ fmat_div_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
   
-  if(fmat_get_m(right) == m && fmat_get_n(right) == n)
+  if(m > fmat_get_m(right))
+    m = fmat_get_m(right);
+  
+  if(fmat_get_n(right) == n)
   {
     float *l = fmat_get_ptr(self);
     float *r = fmat_get_ptr(right);
@@ -2075,7 +2087,10 @@ fmat_bus_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
   
-  if(fmat_get_m(right) == m && fmat_get_n(right) == n)
+  if(m > fmat_get_m(right))
+    m = fmat_get_m(right);
+  
+  if(fmat_get_n(right) == n)
   {
     float *l = fmat_get_ptr(self);
     float *r = fmat_get_ptr(right);
@@ -2120,7 +2135,10 @@ fmat_vid_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
   
-  if(fmat_get_m(right) == m && fmat_get_n(right) == n)
+  if(m > fmat_get_m(right))
+    m = fmat_get_m(right);
+  
+  if(fmat_get_n(right) == n)
   {
     float *l = fmat_get_ptr(self);
     float *r = fmat_get_ptr(right);
@@ -2171,7 +2189,10 @@ fmat_ee_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
   
-  if(fmat_get_m(right) == m && fmat_get_n(right) == n)
+  if(m > fmat_get_m(right))
+    m = fmat_get_m(right);
+  
+  if(fmat_get_n(right) == n)
   {
     float *l = fmat_get_ptr(self);
     float *r = fmat_get_ptr(right);
@@ -2216,7 +2237,10 @@ fmat_ne_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
   
-  if(fmat_get_m(right) == m && fmat_get_n(right) == n)
+  if(m > fmat_get_m(right))
+    m = fmat_get_m(right);
+  
+  if(fmat_get_n(right) == n)
   {
     float *l = fmat_get_ptr(self);
     float *r = fmat_get_ptr(right);
@@ -2261,7 +2285,10 @@ fmat_gt_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
 
-  if(fmat_get_m(right) == m && fmat_get_n(right) == n)
+  if(m > fmat_get_m(right))
+    m = fmat_get_m(right);
+  
+  if(fmat_get_n(right) == n)
   {
     float *l = fmat_get_ptr(self);
     float *r = fmat_get_ptr(right);
@@ -2306,7 +2333,10 @@ fmat_ge_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
   
-  if(fmat_get_m(right) == m && fmat_get_n(right) == n)
+  if(m > fmat_get_m(right))
+    m = fmat_get_m(right);
+  
+  if(fmat_get_n(right) == n)
   {
     float *l = fmat_get_ptr(self);
     float *r = fmat_get_ptr(right);
@@ -2351,7 +2381,10 @@ fmat_lt_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
   
-  if(fmat_get_m(right) == m && fmat_get_n(right) == n)
+  if(m > fmat_get_m(right))
+    m = fmat_get_m(right);
+  
+  if(fmat_get_n(right) == n)
   {
     float *l = fmat_get_ptr(self);
     float *r = fmat_get_ptr(right);
@@ -2396,7 +2429,10 @@ fmat_le_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
   
-  if(fmat_get_m(right) == m && fmat_get_n(right) == n)
+  if(m > fmat_get_m(right))
+    m = fmat_get_m(right);
+  
+  if(fmat_get_n(right) == n)
   {
     float *l = fmat_get_ptr(self);
     float *r = fmat_get_ptr(right);
@@ -2513,7 +2549,10 @@ fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   int right_m = fmat_get_m(right);
   int right_n = fmat_get_n(right);
   
-  if(right_m == m && id <= fmat_format_id_polar && right_id <= fmat_format_id_polar)
+  if(m > right_m)
+    m = right_m;
+  
+  if(id <= fmat_format_id_polar && right_id <= fmat_format_id_polar)
   {
     float *r = fmat_get_ptr(right);
     float *l;
@@ -3750,23 +3789,35 @@ static void
 fmat_convert_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
+  int id = fmat_format_get_id(self->format);
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int i, j;
   
-  if(self->format != fmat_format_vec)
+  switch(id)
   {
-    float *ptr = fmat_get_ptr(self);
-    int m = fmat_get_m(self);
-    int n = fmat_get_n(self);
-    int i, j;
-  
-    for(i=0, j=0; i<m; i++, j+=n)
-      ptr[i] = ptr[j];
+    case fmat_format_id_vec:
+      break;
       
-    fmat_reshape(self, m, 1);
-  
-    if(fmat_editor_is_open(self))
-      fmat_upload(self);
+    case fmat_format_id_rect:
+      for(i=0, j=0; i<m; i++, j+=2)
+        ptr[i] = ptr[j];          
+      fmat_reshape(self, m, 1);
+      break;
+      
+    case fmat_format_id_polar:
+      for(i=0, j=0; i<m; i++, j+=2)
+        ptr[i] = ptr[j] * cosf(ptr[j + 1]);
+      fmat_reshape(self, m, 1);
+      break;
+      
+    default:
+      break;
   }
-  
+    
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
+
   fts_return_object(o);
 }
 
@@ -3875,7 +3926,7 @@ fmat_convert_polar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       break;
   }
   
-  fmat_set_format(self, fmat_format_rect);
+  fmat_set_format(self, fmat_format_polar);
   
   if(fmat_editor_is_open(self))
     fmat_upload_data(self);
@@ -3887,40 +3938,17 @@ static void
 fmat_convert_real(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  int id = fmat_format_get_id(self->format);
-  float *ptr = fmat_get_ptr(self);
-  int m = fmat_get_m(self);
-  int i, j;
   
-  switch(id)
+  if(self->format != fmat_format_vec)
   {
-    case fmat_format_id_vec:
-      break;
-      
-    case fmat_format_id_rect:
-      for(i=0, j=0; i<m; i++, j+=2)
-        ptr[i] = ptr[j];          
-      fmat_reshape(self, m, 1);
-      break;
-      
-    case fmat_format_id_polar:
-      for(i=0, j=0; i<m; i++, j+=2)
-        ptr[i] = ptr[j] * cosf(ptr[j + 1]);
-      fmat_reshape(self, m, 1);
-      break;
-      
-    default:
-      break;
+    fmat_set_format(self, fmat_format_rect);
+
+    if(fmat_editor_is_open(self))
+      fmat_upload_data(self);
   }
-    
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
 
   fts_return_object(o);
 }
-
-
-
 
 /******************************************************************************
  *
@@ -4460,10 +4488,10 @@ fmat_instantiate(fts_class_t *cl)
 
   fts_class_doc(cl, fts_new_symbol("apply"), "<expr: expression>", "apply expression each value (use $self and $x)");
 
-  fts_class_doc(cl, sym_vec, NULL, "convert matrix to vector (vec format)");
+  fts_class_doc(cl, sym_vec, NULL, "convert matrix or complex vector to real vector (vec format)");
   fts_class_doc(cl, sym_rect, NULL, "convert matrix to rectangular complex vector (rect format)");
   fts_class_doc(cl, sym_polar, NULL, "convert matrix to polar complex vector (polar format)");
-  fts_class_doc(cl, sym_real, NULL, "convert complex vectors to real column vectors (of real part)");
+  fts_class_doc(cl, sym_real, NULL, "convert complex vectors to real matrices (real format)");
 
   fts_class_doc(cl, fts_s_import, "[<sym: file name]", "import data from file");
   fts_class_doc(cl, fts_s_export, "[<sym: file name]", "export data to file");
