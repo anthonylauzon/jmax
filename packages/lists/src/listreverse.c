@@ -25,36 +25,28 @@
  */
 
 #include "fts.h"
+#include "list.h"
 
 typedef struct 
 {
   fts_object_t o;
-  fts_atom_t *list;
-  int size;
-  int alloc;
+  list_t list;
 } listreverse_t;
 
 static void
 listreverse_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   listreverse_t *this = (listreverse_t *)o;
+  fts_atom_t *ta;
   int i, j;
 
-  if(ac > this->alloc)
-    {
-      if(this->alloc)
-	fts_block_free(this->list, this->alloc);
-
-      this->list = (fts_atom_t *)fts_block_alloc(ac * sizeof(fts_atom_t));
-      this->alloc = ac;
-    }
+  list_raw_resize(&this->list, ac);
+  ta = list_get_ptr(&this->list);
 
   for(i=0, j=ac-1; i<ac; i++, j--)
-    this->list[i] = at[j];
+    ta[i] = at[j];
 
-  this->size = ac;
-  
-  fts_outlet_send(o, 0, fts_s_list, this->size, this->list);
+  fts_outlet_send(o, 0, fts_s_list, ac, ta);
 }
 
 static void
@@ -62,8 +54,7 @@ listreverse_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   listreverse_t *this = (listreverse_t *)o;
 
-  this->size = 0;
-  this->alloc = 0;
+  list_init(&this->list);
 }
 
 static void
@@ -71,7 +62,7 @@ listreverse_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   listreverse_t *this = (listreverse_t *)o;
 
-  fts_block_free(this->list, this->alloc);
+  list_free(&this->list);
 }
 
 static fts_status_t
@@ -80,21 +71,17 @@ listreverse_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_symbol_t a[3];
 
   /* initialize the class */
-
   fts_class_init(cl, sizeof(listreverse_t), 1, 1, 0); 
 
   /* define the system methods */
-
   a[0] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, listreverse_init, 1, a);
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, listreverse_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, listreverse_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, listreverse_delete);
 
   /* define the methods */
-
   fts_method_define_varargs(cl, 0, fts_s_list, listreverse_list);
 
   /* Type the outlet */
-
   fts_outlet_type_define_varargs(cl, 0,	fts_s_list);
 
   return fts_Success;

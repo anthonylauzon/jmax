@@ -31,7 +31,7 @@ listsum.c \
 listelement.c \
 listhead.c \
 listjoin.c \
-listlength.c \
+listsize.c \
 listreverse.c \
 listsublist.c \
 listtail.c

@@ -34,7 +34,7 @@ extern void listsum_config(void);
 extern void listelement_config(void);
 extern void listhead_config(void);
 extern void listjoin_config(void);
-extern void listlength_config(void);
+extern void listsize_config(void);
 extern void listreverse_config(void);
 extern void listsublist_config(void);
 extern void listtail_config(void);
@@ -48,7 +48,7 @@ lists_module_init(void)
   listelement_config();
   listhead_config();
   listjoin_config();
-  listlength_config();
+  listsize_config();
   listreverse_config();
   listsublist_config();
   listtail_config();

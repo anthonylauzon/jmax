@@ -25,14 +25,133 @@
  */
 
 #include "fts.h"
+#include "list.h"
+#include "refdata.h"
 
-typedef struct 
+/************************************************
+ *
+ *  list utils
+ *
+ */
+ 
+#define LIST_ALLOC_BLOCK 64
+
+void
+list_init(list_t *list)
 {
-  fts_object_t o;
-  fts_atom_t *list;
-  int size;
-  int alloc;
-} list_t;
+  int i;
+  
+  list->at = fts_block_alloc(LIST_ALLOC_BLOCK * sizeof(fts_atom_t));
+  list->ac = 0;
+  list->alloc = LIST_ALLOC_BLOCK;
+  
+  /* set all atoms to void */
+  for(i=0; i<LIST_ALLOC_BLOCK; i++)
+    fts_set_void(list->at + i);
+}
+
+void
+list_free(list_t *list)
+{
+  if(list->alloc)
+    fts_block_alloc(list->alloc * sizeof(fts_atom_t));
+}
+
+void
+list_set_size(list_t *list, int size)
+{
+  int alloc = list->alloc;
+
+  if(size > alloc)
+    {
+      int i;
+
+      if(alloc)
+	fts_block_free(list->at, size * sizeof(fts_atom_t));
+
+      while(alloc < size)
+	alloc += LIST_ALLOC_BLOCK;
+
+      list->at = fts_block_alloc(alloc * sizeof(fts_atom_t));
+
+      /* set newly allocated region to void */
+      for(i=list->alloc; i<size; i++)
+	fts_set_void(list->at + i);
+      
+      list->alloc = alloc;
+    }
+  else
+    {
+      int i;
+
+      if(size <= 0)
+	size = 0;
+
+      /* void region cut off at end */
+      for(i=size; i<list->ac; i++)
+	{
+	  fts_atom_t *ap = list->at + i;
+
+	  if(refdata_atom_is(ap))
+	    refdata_atom_release(ap);
+	  
+	  fts_set_void(ap);
+	}
+    }
+
+  list->ac = size;
+}
+
+void
+list_set(list_t *list, int ac, const fts_atom_t *at)
+{
+  int i;
+ 
+  list_set_size(list, ac);
+
+  for(i=0; i<ac; i++)
+    {
+      fts_atom_t *ap = list->at + i;
+      
+      if(refdata_atom_is(ap))
+	refdata_atom_release(ap);
+      
+      *ap = at[i];
+      
+      if(refdata_atom_is(at + i))
+	refdata_atom_refer(at + i);	
+    }
+}
+
+void
+list_raw_resize(list_t *list, int size)
+{
+  int alloc = list->alloc;
+
+  if(size > alloc)
+    {
+      if(alloc)
+	fts_block_free(list->at, list->alloc);
+
+      while(alloc < size)
+	alloc += LIST_ALLOC_BLOCK;
+
+      list->at = (fts_atom_t *)fts_block_alloc(alloc * sizeof(fts_atom_t));
+      list->alloc = alloc;
+    }
+
+  list->ac = size;
+}
+
+void 
+list_raw_set(list_t *list, int offset, int ac, const fts_atom_t *at)
+{
+  fts_atom_t *ap = list->at + offset;
+  int i;
+ 
+  for(i=0; i<ac; i++)
+    ap[i] = at[i];
+}
 
 
 /************************************************
@@ -41,35 +160,27 @@ typedef struct
  *
  */
  
-static void
-list_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+typedef struct 
 {
-  list_t *this = (list_t *)o;
+  fts_object_t o;
+  list_t list;
+} list_obj_t;
 
-  this->size = 0;
+static void
+list_obj_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  list_obj_t *this = (list_obj_t *)o;
+
+  list_init(&this->list);
+  list_set(&this->list, ac - 1, at + 1);
 }
 
 static void
-list_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+list_obj_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  list_t *this = (list_t *)o;
+  list_obj_t *this = (list_obj_t *)o;
 
-  fts_block_free(this->list, this->alloc);
-}
-
-static void
-list_resize_buffer(list_t *this, int size)
-{
-  if(size > this->alloc)
-    {
-      if(this->alloc)
-	fts_block_free(this->list, this->alloc);
-
-      this->list = (fts_atom_t *)fts_block_alloc(size * sizeof(fts_atom_t));
-      this->alloc = size;
-    }
-
-  this->size = size;
+  list_free(&this->list);
 }
 
 /************************************************
@@ -79,32 +190,28 @@ list_resize_buffer(list_t *this, int size)
  */
 
 static void
-list_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+list_obj_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  list_t *this = (list_t *)o;
+  list_obj_t *this = (list_obj_t *)o;
 
-  fts_outlet_send(o, 0, fts_s_list, this->size, this->list);
+  fts_outlet_send(o, 0, fts_s_list, list_get_size(&this->list), list_get_ptr(&this->list));
 }
 
 static void
-list_list_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+list_obj_store_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  list_t *this = (list_t *)o;
-  int i;
+  list_obj_t *this = (list_obj_t *)o;
 
-  list_resize_buffer(this, ac);
-
-  for(i=0; i<ac; i++)
-    this->list[i] = at[i];
+  list_set(&this->list, ac, at);
 }
 
 static void
-list_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+list_obj_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  list_t *this = (list_t *)o;
+  list_obj_t *this = (list_obj_t *)o;
 
-  list_list_store(o, 0, 0, ac, at);
-  list_bang(o, 0, 0, 0, 0);
+  list_set(&this->list, ac, at);
+  fts_outlet_send(o, 0, fts_s_list, list_get_size(&this->list), list_get_ptr(&this->list));
 }
 
 /************************************************
@@ -114,26 +221,22 @@ list_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
  */
 
 static fts_status_t
-list_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+list_obj_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[3];
 
   /* initialize the class */
-
-  fts_class_init(cl, sizeof(list_t), 2, 1, 0); 
+  fts_class_init(cl, sizeof(list_obj_t), 2, 1, 0); 
 
   /* define the system methods */
-
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, list_init, 1, a);
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, list_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, list_obj_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, list_obj_delete);
 
   /* user methods */
+  fts_method_define_varargs(cl, 0, fts_s_bang, list_obj_bang);
 
-  fts_method_define(cl, 0, fts_s_bang, list_bang, 0, 0);
-
-  fts_method_define_varargs(cl, 0, fts_s_list, list_list);
-  fts_method_define_varargs(cl, 1, fts_s_list, list_list_store);
+  fts_method_define_varargs(cl, 0, fts_s_list, list_obj_list);
+  fts_method_define_varargs(cl, 1, fts_s_list, list_obj_store_list);
 
   /* type the outlet */
   fts_outlet_type_define_varargs(cl, 0,	fts_s_list);
@@ -144,5 +247,5 @@ list_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 list_config(void)
 {
-  fts_class_install(fts_new_symbol("list"), list_instantiate);
+  fts_class_install(fts_new_symbol("list"), list_obj_instantiate);
 }

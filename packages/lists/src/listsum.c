@@ -63,11 +63,9 @@ listsum_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_symbol_t a[3];
 
   /* initialize the class */
-
   fts_class_init(cl, sizeof(listsum_t), 1, 1, 0); 
 
   /* list args */
-
   fts_method_define_varargs(cl, 0, fts_s_list, listsum_list);
 
   return fts_Success;

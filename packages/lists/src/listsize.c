@@ -26,32 +26,29 @@
 
 #include "fts.h"
 
-#define MAX_length 128
-
-
 typedef struct 
 {
   fts_object_t ob;	 
-} listlength_t;
+} listsize_t;
 
 static void
-listlength_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+listsize_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_outlet_int(o, 0, ac);
 }
 
 static fts_status_t
-listlength_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+listsize_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[3];
 
   /* initialize the class */
 
-  fts_class_init(cl, sizeof(listlength_t), 1, 1, 0); 
+  fts_class_init(cl, sizeof(listsize_t), 1, 1, 0); 
 
   /* list args */
 
-  fts_method_define_varargs(cl, 0, fts_s_list, listlength_list);
+  fts_method_define_varargs(cl, 0, fts_s_list, listsize_list);
 
   /* Type the outlet */
 
@@ -62,12 +59,8 @@ listlength_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 }
 
 void
-listlength_config(void)
+listsize_config(void)
 {
-  fts_class_install(fts_new_symbol("listlength"), listlength_instantiate);
+  fts_class_install(fts_new_symbol("listsize"), listsize_instantiate);
+  fts_class_alias(fts_new_symbol("listlength"), fts_new_symbol("listsize"));
 }
-
-
-
-
-

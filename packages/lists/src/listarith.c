@@ -25,14 +25,8 @@
  */
 
 #include "fts.h"
+#include "list.h"
 
-typedef struct
-{
-  fts_atom_t *at;
-  int ac;
-  int alloc;
-} list_t;
-  
 typedef struct 
 {
   fts_object_t o;
@@ -62,7 +56,7 @@ atom_add(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       else if(fts_is_a(right, fts_s_float))
 	fts_set_float(result, l + fts_get_float(right));
       else
-	*result = *left;
+	fts_set_int(result, 0);
     }
   else if(fts_is_a(left, fts_s_float))
     {
@@ -73,15 +67,10 @@ atom_add(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       else if(fts_is_a(right, fts_s_float))
 	fts_set_float(result, l + fts_get_float(right));
       else
-	*result = *left;
+	fts_set_int(result, 0);
     }
   else
-    {
-      if(fts_is_a(right, fts_s_int) || fts_is_a(right, fts_s_float))
-	*result = *right;
-      else
-	*result = *left;
-    }
+    fts_set_int(result, 0);
 }
 
 static void
@@ -96,7 +85,7 @@ atom_sub(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       else if(fts_is_a(right, fts_s_float))
 	fts_set_float(result, l - fts_get_float(right));
       else
-	*result = *left;
+	fts_set_int(result, 0);
     }
   else if(fts_is_a(left, fts_s_float))
     {
@@ -107,17 +96,10 @@ atom_sub(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       else if(fts_is_a(right, fts_s_float))
 	fts_set_float(result, l - fts_get_float(right));
       else
-	*result = *left;
-    }
-  else
-    {
-      if(fts_is_a(right, fts_s_int))
-	fts_set_int(result, -fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
-	fts_set_float(result, fts_get_float(right));
-      else
 	fts_set_int(result, 0);
     }
+  else
+    fts_set_int(result, 0);
 }
 
 static void
@@ -132,7 +114,7 @@ atom_mul(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       else if(fts_is_a(right, fts_s_float))
 	fts_set_float(result, l * fts_get_float(right));
       else
-	*result = *left;
+	fts_set_int(result, 0);
     }
   else if(fts_is_a(left, fts_s_float))
     {
@@ -143,15 +125,10 @@ atom_mul(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       else if(fts_is_a(right, fts_s_float))
 	fts_set_float(result, l * fts_get_float(right));
       else
-	*result = *left;
+	fts_set_int(result, 0);
     }
   else
-    {
-      if(fts_is_a(right, fts_s_int) || fts_is_a(right, fts_s_float))
-	*result = *right;
-      else
-	fts_set_int(result, 1);
-    }
+    fts_set_int(result, 0);
 }
 
 static void
@@ -166,7 +143,7 @@ atom_div(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       else if(fts_is_a(right, fts_s_float))
 	fts_set_float(result, l / fts_get_float(right));
       else
-	*result = *left;
+	fts_set_int(result, 0);
     }
   else if(fts_is_a(left, fts_s_float))
     {
@@ -177,20 +154,13 @@ atom_div(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       else if(fts_is_a(right, fts_s_float))
 	fts_set_float(result, l / fts_get_float(right));
       else
-	*result = *left;
+	fts_set_int(result, 0);
     }
   else
-    {
-      if(fts_is_a(right, fts_s_int))
-	fts_set_float(result, 1.0f / (float)fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
-	fts_set_float(result, 1.0f / fts_get_float(right));
-      else
-	fts_set_int(result, 1);
-    }
+    fts_set_int(result, 0);
 }
 
-void
+static void
 atom_gt(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_a(left, fts_s_int))
@@ -202,7 +172,7 @@ atom_gt(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       else if(fts_is_a(right, fts_s_float))
 	fts_set_int(result, l > fts_get_float(right));
       else
-	fts_set_int(result, l > 0);
+	fts_set_int(result, 0);
     }
   else if(fts_is_a(left, fts_s_float))
     {
@@ -213,20 +183,13 @@ atom_gt(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       else if(fts_is_a(right, fts_s_float))
 	fts_set_int(result, l > fts_get_float(right));
       else
-	fts_set_int(result, l > 0.0f);
-    }
-  else
-    {
-      if(fts_is_a(right, fts_s_int))
-	fts_set_int(result, 0.0f > fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
-	fts_set_int(result, 0.0f > fts_get_float(right));
-      else
 	fts_set_int(result, 0);
     }
+  else
+    fts_set_int(result, 0);
 }
 
-void
+static void
 atom_ge(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_a(left, fts_s_int))
@@ -238,7 +201,7 @@ atom_ge(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       else if(fts_is_a(right, fts_s_float))
 	fts_set_int(result, l >= fts_get_float(right));
       else
-	fts_set_int(result, l >= 0);
+	fts_set_int(result, 0);
     }
   else if(fts_is_a(left, fts_s_float))
     {
@@ -249,20 +212,13 @@ atom_ge(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       else if(fts_is_a(right, fts_s_float))
 	fts_set_int(result, l >= fts_get_float(right));
       else
-	fts_set_int(result, l >= 0.0f);
-    }
-  else
-    {
-      if(fts_is_a(right, fts_s_int))
-	fts_set_int(result, 0.0f >= fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
-	fts_set_int(result, 0.0f >= fts_get_float(right));
-      else
 	fts_set_int(result, 0);
     }
+  else
+    fts_set_int(result, 0);
 }
 
-void
+static void
 atom_lt(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_a(left, fts_s_int))
@@ -274,7 +230,7 @@ atom_lt(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       else if(fts_is_a(right, fts_s_float))
 	fts_set_int(result, l < fts_get_float(right));
       else
-	fts_set_int(result, l < 0);
+	fts_set_int(result, 0);
     }
   else if(fts_is_a(left, fts_s_float))
     {
@@ -285,20 +241,13 @@ atom_lt(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       else if(fts_is_a(right, fts_s_float))
 	fts_set_int(result, l < fts_get_float(right));
       else
-	fts_set_int(result, l < 0.0f);
-    }
-  else
-    {
-      if(fts_is_a(right, fts_s_int))
-	fts_set_int(result, 0.0f < fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
-	fts_set_int(result, 0.0f < fts_get_float(right));
-      else
 	fts_set_int(result, 0);
     }
+  else
+    fts_set_int(result, 0);
 }
 
-void
+static void
 atom_le(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_a(left, fts_s_int))
@@ -310,7 +259,7 @@ atom_le(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       else if(fts_is_a(right, fts_s_float))
 	fts_set_int(result, l <= fts_get_float(right));
       else
-	fts_set_int(result, l <= 0);
+	fts_set_int(result, 0);
     }
   else if(fts_is_a(left, fts_s_float))
     {
@@ -321,20 +270,13 @@ atom_le(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
       else if(fts_is_a(right, fts_s_float))
 	fts_set_int(result, l <= fts_get_float(right));
       else
-	fts_set_int(result, l <= 0.0f);
-    }
-  else
-    {
-      if(fts_is_a(right, fts_s_int))
-	fts_set_int(result, 0.0f <= fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
-	fts_set_int(result, 0.0f <= fts_get_float(right));
-      else
 	fts_set_int(result, 0);
     }
+  else
+    fts_set_int(result, 0);
 }
 
-void
+static void
 atom_ne(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_a(left, fts_s_int))
@@ -360,17 +302,10 @@ atom_ne(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 	fts_set_int(result, 1);
     }
   else
-    {
-      if(fts_is_a(right, fts_s_int))
-	fts_set_int(result, 1);
-      else if(fts_is_a(right, fts_s_float))
-	fts_set_int(result, 1);
-      else
-	fts_set_int(result, fts_get_symbol(left) != fts_get_symbol(right));
-    }
+    fts_set_int(result, (fts_get_type(left) != fts_get_type(right)) || (fts_get_int(left) != fts_get_int(right)));
 }
 
-void
+static void
 atom_ee(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_a(left, fts_s_int))
@@ -396,48 +331,7 @@ atom_ee(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 	fts_set_int(result, 0);
     }
   else
-    {
-      if(fts_is_a(right, fts_s_int))
-	fts_set_int(result, 0);
-      else if(fts_is_a(right, fts_s_float))
-	fts_set_int(result, 0);
-      else
-	fts_set_int(result, fts_get_symbol(left) == fts_get_symbol(right));
-    }
-}
-
-/*********************************************
- *
- *  mem utils
- *
- */
-
-static void
-list_set_size(list_t *list, int ac)
-{
-  int alloc = list->alloc;
-
-  if(ac > alloc)
-    {
-      if(list->alloc) 
-	fts_block_free(list->at, list->alloc);
-      
-      while(alloc < ac)
-	alloc += LIST_ALLOC_BLOCK;
-      
-      list->at = (fts_atom_t *) fts_block_alloc(alloc * sizeof(fts_atom_t));
-      list->alloc = alloc;
-    }
-  else
-    list->ac = ac;
-}
-
-static void
-list_init(list_t *list)
-{
-  list->at = 0;
-  list->ac = 0;
-  list->alloc = 0;
+    fts_set_int(result, (fts_get_type(left) == fts_get_type(right)) && (fts_get_int(left) == fts_get_int(right)));
 }
 
 /*********************************************
@@ -452,9 +346,7 @@ listarith_set_right_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   listarith_t *this = (listarith_t *)o;
   int i;
 
-  list_set_size(&(this->right_list), ac);
-  memcpy((char *)this->right_list.at, at, ac * sizeof(fts_atom_t)); /* copy incomming list to right */
-
+  list_set(&this->right_list, ac, at);
   this->right_type = fts_s_list;
 }
 
@@ -462,7 +354,7 @@ static void
 listarith_set_right_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   listarith_t *this = (listarith_t *)o;
-
+  
   this->right_atom = at[0];
   this->right_type = fts_get_type(at);
 } 
@@ -479,17 +371,17 @@ listarith_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       if(this->right_list.ac < ac)
 	ac = this->right_list.ac;
       
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_add(at + i, &(this->right_list.at[i]), &(this->list.at[i]));
+	atom_add(at + i, this->right_list.at + i, this->list.at + i);
     }
   else
     {
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_add(at + i, &(this->right_atom), &(this->list.at[i]));
+	atom_add(at + i, &this->right_atom, this->list.at + i);
     }
 
   fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
@@ -506,17 +398,17 @@ listarith_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       if(this->right_list.ac < ac)
 	ac = this->right_list.ac;
       
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_sub(at + i, &(this->right_list.at[i]), &(this->list.at[i]));
+	atom_sub(at + i, this->right_list.at + i, this->list.at + i);
     }
   else
     {
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_sub(at + i, &(this->right_atom), &(this->list.at[i]));
+	atom_sub(at + i, &this->right_atom, this->list.at + i);
     }
   
   fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
@@ -533,17 +425,17 @@ listarith_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       if(this->right_list.ac < ac)
 	ac = this->right_list.ac;
       
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_mul(at + i, &(this->right_list.at[i]), &(this->list.at[i]));
+	atom_mul(at + i, this->right_list.at + i, this->list.at + i);
     }
   else
     {
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_mul(at + i, &(this->right_atom), &(this->list.at[i]));
+	atom_mul(at + i, &this->right_atom, this->list.at + i);
     }
 
   fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
@@ -560,17 +452,17 @@ listarith_div(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       if(this->right_list.ac < ac)
 	ac = this->right_list.ac;
       
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_div(at + i, &(this->right_list.at[i]), &(this->list.at[i]));
+	atom_div(at + i, this->right_list.at + i, this->list.at + i);
     }
   else
     {
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_div(at + i, &(this->right_atom), &(this->list.at[i]));
+	atom_div(at + i, &this->right_atom, this->list.at + i);
     }
   
   fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
@@ -587,17 +479,17 @@ listarith_gt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       if(this->right_list.ac < ac)
 	ac = this->right_list.ac;
       
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_gt(at + i, &(this->right_list.at[i]), &(this->list.at[i]));
+	atom_gt(at + i, this->right_list.at + i, this->list.at + i);
     }
   else
     {
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_gt(at + i, &(this->right_atom), &(this->list.at[i]));
+	atom_gt(at + i, &this->right_atom, this->list.at + i);
     }
   
   fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
@@ -614,17 +506,17 @@ listarith_ge(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       if(this->right_list.ac < ac)
 	ac = this->right_list.ac;
       
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_ge(at + i, &(this->right_list.at[i]), &(this->list.at[i]));
+	atom_ge(at + i, this->right_list.at + i, this->list.at + i);
     }
   else
     {
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_ge(at + i, &(this->right_atom), &(this->list.at[i]));
+	atom_ge(at + i, &this->right_atom, this->list.at + i);
     }
   
   fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
@@ -641,17 +533,17 @@ listarith_lt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       if(this->right_list.ac < ac)
 	ac = this->right_list.ac;
       
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_lt(at + i, &(this->right_list.at[i]), &(this->list.at[i]));
+	atom_lt(at + i, this->right_list.at + i, this->list.at + i);
     }
   else
     {
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_lt(at + i, &(this->right_atom), &(this->list.at[i]));
+	atom_lt(at + i, &this->right_atom, this->list.at + i);
     }
   
   fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
@@ -668,17 +560,17 @@ listarith_le(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       if(this->right_list.ac < ac)
 	ac = this->right_list.ac;
       
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_le(at + i, &(this->right_list.at[i]), &(this->list.at[i]));
+	atom_le(at + i, this->right_list.at + i, this->list.at + i);
     }
   else
     {
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_le(at + i, &(this->right_atom), &(this->list.at[i]));
+	atom_le(at + i, &this->right_atom, this->list.at + i);
     }
   
   fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
@@ -695,17 +587,17 @@ listarith_ne(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       if(this->right_list.ac < ac)
 	ac = this->right_list.ac;
       
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_ne(at + i, &(this->right_list.at[i]), &(this->list.at[i]));
+	atom_ne(at + i, this->right_list.at + i, this->list.at + i);
     }
   else
     {
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_ne(at + i, &(this->right_atom), &(this->list.at[i]));
+	atom_ne(at + i, &this->right_atom, this->list.at + i);
     }
   
   fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
@@ -722,17 +614,17 @@ listarith_ee(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       if(this->right_list.ac < ac)
 	ac = this->right_list.ac;
       
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_ee(at + i, &(this->right_list.at[i]), &(this->list.at[i]));
+	atom_ee(at + i, this->right_list.at + i, this->list.at + i);
     }
   else
     {
-      list_set_size(&(this->list), ac);
+      list_raw_resize(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_ee(at + i, &(this->right_atom), &(this->list.at[i]));
+	atom_ee(at + i, &this->right_atom, this->list.at + i);
     }
   
   fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
@@ -752,13 +644,10 @@ listarith_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   list_init(&this->list);
   list_init(&this->right_list);
 
-  list_set_size(&this->list, LIST_ALLOC_BLOCK);
-  list_set_size(&this->right_list, LIST_ALLOC_BLOCK);
-
   if(ac == 2)
-    listarith_set_right_atom(o, 0, 0, 1, at+1);
+    listarith_set_right_atom(o, 0, 0, 1, at + 1);
   else
-    listarith_set_right_list(o, 0, 0, ac-1, at+1);
+    listarith_set_right_list(o, 0, 0, ac - 1, at + 1);
 
 }
 
@@ -835,6 +724,7 @@ listarith_config(void)
   fts_class_install(fts_new_symbol("list-"), listarith_instantiate);
   fts_class_install(fts_new_symbol("list*"), listarith_instantiate);
   fts_class_install(fts_new_symbol("list/"), listarith_instantiate);
+
   fts_class_install(fts_new_symbol("list<"), listarith_instantiate);
   fts_class_install(fts_new_symbol("list<="), listarith_instantiate);
   fts_class_install(fts_new_symbol("list>"), listarith_instantiate);
