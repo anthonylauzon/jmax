@@ -930,7 +930,14 @@ patcher_open_help_patch( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   }
   else
   {
-    class_name = fts_object_get_class_name(obj);
+    if (!fts_object_is_template(obj))
+    {
+      class_name = fts_object_get_class_name(obj);
+    }
+    else
+    {
+      class_name = fts_template_get_name(fts_patcher_get_template((fts_patcher_t*)obj));
+    }
     pkg = fts_object_get_package(obj);
   }
 
