@@ -53,7 +53,7 @@ public class MessageTrackPopupMenu extends JPopupMenu
   private boolean added = false;
   JMenuItem displayLabelItem;
   JMenu moveMenu;
-  int trackCount = 1;
+  int trackCount = 0;
 
   public MessageTrackPopupMenu()
   {
@@ -62,7 +62,7 @@ public class MessageTrackPopupMenu extends JPopupMenu
 
     addSeparator();
     moveMenu = new JMenu("Move to Position");
-    item = new JMenuItem("1");
+    item = new JMenuItem(""+trackCount);
     item.addActionListener(Actions.moveMonodimensionalTrackToAction);
     moveMenu.add(item);
     
@@ -168,7 +168,7 @@ public class MessageTrackPopupMenu extends JPopupMenu
     void updateMoveToMenu()
     {
 	JMenuItem item;
-	int count =  target.trackCount();
+	int count =  target.trackCount()-1;
 	if(trackCount==count)
 	    return;
 	else

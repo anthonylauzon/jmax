@@ -100,14 +100,6 @@ public class AmbitusValue extends AbstractEventValue
       return new AmbitusValue();
     }
 
-    /**
-     * Create a new Widget for the associated Value */ 
-    /*public Component newWidget(SequenceGraphicContext gc)
-      {
-      ScrEventWidget widget = new ScrEventWidget(BoxLayout.Y_AXIS, gc);
-      return widget;
-      }*/
-   
     public Enumeration getPropertyNames()
     {
       return new ArrayEnumeration(defNamesArray);
@@ -205,7 +197,6 @@ public class AmbitusValue extends AbstractEventValue
 	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
       }
     catch(FileNotFoundException e){
-      //System.err.println("Can't locate sequence images");
       path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
     }
     AMBITUS_ICON = new ImageIcon(path+"note.gif");

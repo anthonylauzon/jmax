@@ -68,7 +68,6 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 	      TrackEvent evt;
 	      int index;	      
 	      Rectangle rect = null;
-	      //Component component = ((Component)table.getCellRenderer(0, 0));
 	      for (Enumeration e = hhElements; e.hasMoreElements();) 
 		{
 		    evt = (TrackEvent) e.nextElement();			  
@@ -78,10 +77,6 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 			rect = rect.union(table.getCellRect(index, 0, true));
 		    else
 			rect = table.getCellRect(index, 0, true);
-		    //component.setBackground(Color.green);
-		    //Rectangle rect = table.getCellRect(index, 0, true);
-		    //table.repaint(rect.x, rect.y, rect.width, rect.height);
-		    //component.setBackground(Color.white);
 		}
 	      if(rect != null)
 		  table.scrollRectToVisible(rect);
@@ -96,10 +91,11 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 	 {
 	     repaint();
 	 }
-      public void objectMoved(Object whichObject, int oldIndex, int newIndex)
+      public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex)
 	{
 	    repaint();
 	}
+      public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
       public void objectAdded(Object whichObject, int index)
 	{
 	    table.revalidate();
@@ -142,35 +138,10 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
     }
 
     /*
-     * Setup typed editors in table: in jdk1.3 setup only multilines textArea for string values
-     * The rest is a bug fix for JTable in jdk 117.
+     * Setup typed editors in table
      */
-    private void setUpEditors() {
-	// Set up the editor for the numeric cells.
-	/*final WholeNumberField integerField = new WholeNumberField(0, 5);
-	  integerField.setHorizontalAlignment(WholeNumberField.RIGHT);
-	  final JTextField numberField = new JTextField();
-	  numberField.setHorizontalAlignment(WholeNumberField.RIGHT);
-
-	  DefaultCellEditor integerEditor =  new DefaultCellEditor(integerField) {
-	  public Object getCellEditorValue() {
-	  return new Integer(integerField.getValue());
-	  }
-	  };
-	  DefaultCellEditor doubleEditor = new DefaultCellEditor(numberField) {
-	  public Object getCellEditorValue() {
-	  try { 
-	  return Double.valueOf(numberField.getText()); // parse double
-	  } catch (NumberFormatException exc) {
-	  Toolkit.getDefaultToolkit().beep();
-	  System.err.println("Error:  invalid number format!");
-	  return null;
-	  }
-	  }
-	  };
-
-	  table.setDefaultEditor(Integer.class, integerEditor);
-	  table.setDefaultEditor(Double.class,  doubleEditor);*/
+    private void setUpEditors() 
+    {
 	table.setDefaultEditor(String.class,  new CellEditorArea(new JTextField()));
     }
   
@@ -199,4 +170,5 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
   JScrollPane scrollPane; 
   JTable table;
 }
+
 

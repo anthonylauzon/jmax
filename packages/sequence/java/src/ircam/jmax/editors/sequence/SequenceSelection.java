@@ -300,6 +300,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   }
   public void objectsAdded(int maxTime) {}
 
+  public void lastObjectMoved(Object o, int oldIndex, int newIndex){}
   /**
    * TrackDataListener interface: keep the index-based selection consistent. */
   public void objectMoved(Object o, int oldIndex, int newIndex)
@@ -312,7 +313,6 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
     // status of these indexes coherent with the shifts.
 
     boolean wasSelected = isSelectedIndex(oldIndex);
-
 
     if (oldIndex == newIndex) 
 	return; //no changes in the object's order

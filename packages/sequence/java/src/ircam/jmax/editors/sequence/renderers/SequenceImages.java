@@ -47,6 +47,8 @@ public class SequenceImages {
 	imageIcons.put("closed_track", new ImageIcon(path+"closed_track_arrow.gif"));
 	imageIcons.put("unselected_track", new ImageIcon(path+"unselected_track.gif"));
 	imageIcons.put("selected_track", new ImageIcon(path+"selected_track.gif"));
+	imageIcons.put("unmute", new ImageIcon(path+"unmute.gif"));
+	imageIcons.put("mute", new ImageIcon(path+"mute.gif"));
     }
 
     public static Image getImage(String name)

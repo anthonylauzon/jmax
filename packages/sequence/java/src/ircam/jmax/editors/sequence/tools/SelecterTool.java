@@ -108,9 +108,9 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
   }
 
   public void selectionPointDoubleClicked(int x, int y, int modifiers) 
-    {
-	edit(x, y, modifiers);
-    }
+  {
+      edit(x, y, modifiers);
+  }
 
   /**
    * called by the selecter UI module
@@ -157,8 +157,7 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
   abstract void multipleObjectSelected();
 
   //--- Fields
-    //Selecter itsSelecter;
-    SequenceSelecter itsSelecter;
+  SequenceSelecter itsSelecter;
 
   Point startingPoint = new Point();
 

@@ -69,7 +69,8 @@ public class MonoTrackEditor extends ircam.jmax.toolkit.PopupToolbarPanel implem
 		updateRange(whichObject);
 		MonoTrackEditor.this.repaint();
 	    }
-	    public void objectMoved(Object whichObject, int oldIndex, int newIndex) {
+		public void objectMoved(Object whichObject, int oldIndex, int newIndex) {}
+	    public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex) {
 		MonoTrackEditor.this.repaint();
 	    }
 	    public void trackNameChanged(String oldName, String newName) {
@@ -85,7 +86,7 @@ public class MonoTrackEditor extends ircam.jmax.toolkit.PopupToolbarPanel implem
 		    
 		    Rectangle clipRect = gc.getTrackClip().intersection(gc.getScrollManager().getViewRectangle());
 		    Graphics gr = getGraphics();		    
-		    gr./*setClip*/clipRect(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
+		    gr.clipRect(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
 
 		    for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
 			{
@@ -188,7 +189,7 @@ public class MonoTrackEditor extends ircam.jmax.toolkit.PopupToolbarPanel implem
     {
 	selection = new SequenceSelection(model);
 
-	gc = new SequenceGraphicContext(model, selection, itsTrack); //loopback?
+	gc = new SequenceGraphicContext(model, selection, this); //loopback?
 	gc.setGraphicSource(this);
 	gc.setGraphicDestination(this);
 	ad = new MonoDimensionalAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET);
@@ -247,11 +248,7 @@ public class MonoTrackEditor extends ircam.jmax.toolkit.PopupToolbarPanel implem
 
     private void createListDialog()
     {
-	/*****************/
-	//list-->table//
-	//listDialog = new ListDialog(itsTrack, gc.getFrame(), gc);
 	listDialog = new SequenceTableDialog(itsTrack, gc.getFrame(), gc);
-	/*****************/
     }
 
     public void updateNewObject(Object obj){};
@@ -290,7 +287,7 @@ public class MonoTrackEditor extends ircam.jmax.toolkit.PopupToolbarPanel implem
 
     public Dimension getPreferredSize()
     {
-	return new Dimension(800, DEFAULT_HEIGHT);
+	return new Dimension(Sequence.DEFAULT_WIDTH-TrackContainer.BUTTON_WIDTH, DEFAULT_HEIGHT);
     }
 
     public Track getTrack()
@@ -331,11 +328,7 @@ public class MonoTrackEditor extends ircam.jmax.toolkit.PopupToolbarPanel implem
     Track itsTrack;
     
     MaxVector oldElements = new MaxVector();
-    /*****************/
-    //list-->table//
-    //ListDialog listDialog = null;
     SequenceTableDialog listDialog = null;
-    /*****************/
 
     int viewMode = PEAKS_VIEW;
     static public final int PEAKS_VIEW = 2;

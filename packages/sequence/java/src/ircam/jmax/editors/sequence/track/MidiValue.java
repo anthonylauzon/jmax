@@ -196,7 +196,6 @@ public class MidiValue extends AbstractEventValue
 		path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
 	    }
 	catch(FileNotFoundException e){
-	    //System.err.println("Can't locate sequence images");
 	    path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
 	}
 	MIDI_ICON = new ImageIcon(path+"midi.gif");

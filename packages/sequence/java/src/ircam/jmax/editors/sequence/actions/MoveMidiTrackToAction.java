@@ -43,7 +43,7 @@ public class MoveMidiTrackToAction extends EditorAction
   int position;
   public  void actionPerformed(ActionEvent e)
   {
-    position = Integer.valueOf(((JMenuItem)e.getSource()).getText()).intValue()-1;
+    position = Integer.valueOf(((JMenuItem)e.getSource()).getText()).intValue();
     super.actionPerformed(e);
   }
 

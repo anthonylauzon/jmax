@@ -59,8 +59,26 @@ public class TrackMenu extends EditorMenu
     add(Actions.exportAction, "Export Track");
 
     //******** Merge reintroduction *******************//
+    add(Actions.mergeAction, "Merge Active Tracks", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_M);
+
     addSeparator();
-    add(Actions.mergeAction, "Merge Tracks...", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_M);
+    JMenuItem item;
+    item = new JMenuItem("Close All Tracks");
+    item.addActionListener(new ActionListener(){
+	    public void actionPerformed(ActionEvent e)
+	    {
+		((FtsSequenceObject)TrackMenu.this.sequenceModel).setOpenedAllTracks(false);
+	    }
+	});
+    add(item);
+    item = new JMenuItem("Open All Tracks");
+    item.addActionListener(new ActionListener(){
+	    public void actionPerformed(ActionEvent e)
+	    {
+		((FtsSequenceObject)TrackMenu.this.sequenceModel).setOpenedAllTracks(true);
+	    }
+	});
+    add(item);
   }
     
   private void FillAddTrackMenu(JMenu menu)

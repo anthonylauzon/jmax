@@ -78,16 +78,8 @@ class SequenceTableDialog extends JDialog implements TrackDataListener/*, TrackL
     }
     
     public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
+    public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){}
     public void trackNameChanged(String oldName, String newName){};
-
-    /**
-     * PopupProvider interface
-     */
-    /*public JPopupMenu getMenu()
-      {
-      ListPopupMenu.update(list);
-      return ListPopupMenu.getInstance();
-      }*/
 
     Track track;
     SequenceTablePanel tabPanel;

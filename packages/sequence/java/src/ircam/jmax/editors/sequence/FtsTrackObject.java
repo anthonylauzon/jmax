@@ -197,9 +197,10 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 		      maxOldIndex = oldIndex;
 		      maxNewIndex = newIndex;
 		  }
+	      notifyObjectMoved(evt, oldIndex, newIndex);
 	  }
       if(nArgs>0)
-	  notifyObjectMoved(maxEvent, maxOldIndex, maxNewIndex);
+        notifyLastObjectMoved(maxEvent, maxOldIndex, maxNewIndex);
 
       endUpdate();      
       setDirty();
@@ -726,6 +727,11 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     {
 	for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
 	    ((TrackDataListener) e.nextElement()).objectMoved(spec, oldIndex, newIndex);
+    }
+    private void notifyLastObjectMoved(Object spec, int oldIndex, int newIndex)
+    {
+	for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+	    ((TrackDataListener) e.nextElement()).lastObjectMoved(spec, oldIndex, newIndex);
     }
     private void notifyHighlighting(MaxVector hhobj, double time)
     {

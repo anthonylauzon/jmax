@@ -129,7 +129,7 @@ public class AbstractEventValue extends FtsRemoteData implements EventValue
 
     //--- Fields
     private String name;
-    protected Hashtable properties/* = new Hashtable()*/;
+    protected Hashtable properties;
 }
 
 

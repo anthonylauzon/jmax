@@ -170,7 +170,7 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	
 	//--- make this selection the current one when the track is activated
 	track.getPropertySupport().addPropertyChangeListener(new MidiTrackPropertyChangeListener());
-	gc = new SequenceGraphicContext(track.getTrackDataModel(), selection, track); //loopback?
+	gc = new SequenceGraphicContext(track.getTrackDataModel(), selection, this); //loopback?
 	gc.setGraphicSource(itsScore);
 	gc.setGraphicDestination(itsScore);
 	PartitionAdapter ad = new PartitionAdapter(geometry, gc);
@@ -223,10 +223,12 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	repaint();
     }
     
-    public void objectMoved(Object whichObject, int oldIndex, int newIndex) 
+    public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex) 
     {
 	repaint();
     }
+
+    public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
     
     public void trackNameChanged(String oldName, String newName) 
     {
@@ -305,7 +307,7 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 
     public Dimension getPreferredSize()
     {
-	return new Dimension(800, DEFAULT_HEIGHT);
+	return new Dimension(Sequence.DEFAULT_WIDTH-TrackContainer.BUTTON_WIDTH, DEFAULT_HEIGHT);
     }
 
     public Track getTrack()
@@ -315,10 +317,6 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 
     public void updateNewObject(Object obj){};
 
-    public SequenceGraphicContext getGc()
-    {
-	return gc;
-    }
     public void setViewMode(int viewType)
     {
 	if(viewMode!=viewType)

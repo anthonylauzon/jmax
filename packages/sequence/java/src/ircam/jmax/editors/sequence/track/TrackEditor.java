@@ -27,6 +27,8 @@ public interface TrackEditor {
     public void updateNewObject(Object obj);
 
     public void reinit();
+
+    public void showListDialog();    
 }
 
 

@@ -53,7 +53,8 @@ public class MidiTrackPopupMenu extends JPopupMenu
   private boolean added = false;
   JMenuItem displayLabelItem;
   JMenu moveMenu;
-  int trackCount = 1;
+  //int trackCount = 1;
+  int trackCount = 0;
 
   JLabel maxLabel, minLabel;
   JSlider maxSlider, minSlider;
@@ -66,7 +67,7 @@ public class MidiTrackPopupMenu extends JPopupMenu
 
     addSeparator();
     moveMenu = new JMenu("Move to Position");
-    item = new JMenuItem("1");
+    item = new JMenuItem(""+trackCount);
     item.addActionListener(Actions.moveMidiTrackToAction);
     moveMenu.add(item);
     
@@ -144,11 +145,11 @@ public class MidiTrackPopupMenu extends JPopupMenu
 	public void actionPerformed(ActionEvent e)
 	{
 	    ChangeTrackNameDialog.changeName(MidiTrackPopupMenu.getPopupTarget().getTrack(),  
-					     MidiTrackPopupMenu.getPopupTarget().getGc().getFrame(),
+					     MidiTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame(),
 					     SwingUtilities.convertPoint(MidiTrackPopupMenu.getPopupTarget(), 
 									 MidiTrackPopupMenu.getPopupX(),
 									 MidiTrackPopupMenu.getPopupY(),
-									 MidiTrackPopupMenu.getPopupTarget().getGc().getFrame()));
+									 MidiTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame()));
 	}
     });
 
@@ -200,7 +201,7 @@ public class MidiTrackPopupMenu extends JPopupMenu
     item.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
-	    MidiTrackPopupMenu.getPopupTarget().getGc().getFtsSequenceObject().
+	    MidiTrackPopupMenu.getPopupTarget().getGraphicContext().getFtsSequenceObject().
 		removeTrack(MidiTrackPopupMenu.getPopupTarget().getTrack());
 	}
     });
@@ -258,7 +259,7 @@ public class MidiTrackPopupMenu extends JPopupMenu
     void updateMoveToMenu()
     {
 	JMenuItem item;
-	int count =  target.trackCount();
+	int count =  target.trackCount()-1;
 	if(trackCount==count)
 	    return;
 	else

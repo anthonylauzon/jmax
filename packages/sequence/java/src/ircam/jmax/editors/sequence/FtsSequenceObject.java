@@ -28,15 +28,9 @@ package ircam.jmax.editors.sequence;
 import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.editors.sequence.renderers.*;
 
-/* FIXME: check how many imports are really needed */
-import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
-import ircam.jmax.toolkit.*;
 
-import java.awt.datatransfer.*;
-import java.io.*;
 import java.util.*;
 import javax.swing.*;
 
@@ -46,7 +40,6 @@ import javax.swing.*;
  */
 public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDataModel
 {
-
   /**
    * constructor.
    */
@@ -145,9 +138,11 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
       
 	FtsTrackObject trackObj = (FtsTrackObject)(args[0].getObject());
 	Track track = getTrack(trackObj);
-	int position = args[1].getInt();
+	int oldPosition = getTrackIndex(track);
+	int newPosition = args[1].getInt();
 	
-	sequence.itsSequencePanel.moveTrackTo(track, position);
+	sequence.itsSequencePanel.moveTrackTo(track, newPosition);
+	notifyTrackMoved(track, oldPosition, newPosition);
 
 	setDirty();
     }
@@ -157,6 +152,15 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 	sequence.setName(args[0].getString());
     }
 
+    public void setOpenedAllTracks(boolean opened)
+    {
+	Track track;
+	Object val;
+	if(opened) val = Boolean.TRUE;
+	else val = Boolean.FALSE;
+	for(Enumeration e = tracks.elements(); e.hasMoreElements();)
+	    ((Track)e.nextElement()).setProperty("opened", val);
+    }
 
   /**
    * return how many tracks in the sequence
@@ -182,13 +186,30 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
     return (Track) tracks.elementAt(i);
   }
 
-    public Enumeration getTracks()
-    {
-	return tracks.elements();
-    }
-   /**
-   * Returns the track associated with this FtsTrackObject 
-   */
+  public int getTrackIndex(Track track)
+  {
+      return tracks.indexOf(track);
+  }
+    
+  public Enumeration getTracks()
+  {
+      return tracks.elements();
+  }
+
+  public Enumeration getTracks(ValueInfo type)
+  {
+      Track track;
+      Vector temp = new Vector();
+      for(Enumeration e = tracks.elements(); e.hasMoreElements();)
+      {
+	track = (Track)e.nextElement();
+	if(track.getTrackDataModel().getType() == type) temp.addElement(track);
+      }
+      return temp.elements();
+  }
+    /**
+     * Returns the track associated with this FtsTrackObject 
+     */
   public Track getTrack(FtsTrackObject obj)
   {
     Track track;
@@ -199,7 +220,18 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
       }
     return null;
   }
-  
+
+    public Enumeration getTypes()
+    {
+	ValueInfo type;
+	Vector types = new Vector();
+	for(Enumeration e = tracks.elements(); e.hasMoreElements();)
+	{
+	    type = ((Track)e.nextElement()).getTrackDataModel().getType();
+	    if(!types.contains(type)) types.addElement(type);
+	}
+	return types.elements();
+    }
 
   /**
    * Remove a Track from this sequencer 
@@ -313,6 +345,12 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
   {
     for (Enumeration e=listeners.elements(); e.hasMoreElements();)
       ((TrackListener)(e.nextElement())).trackChanged(track);
+  }
+
+  private void notifyTrackMoved(Track track, int oldPosition, int newPosition)
+  {
+    for (Enumeration e=listeners.elements(); e.hasMoreElements();)
+      ((TrackListener)(e.nextElement())).trackMoved(track, oldPosition, newPosition);
   }
 
   Sequence sequence = null;  

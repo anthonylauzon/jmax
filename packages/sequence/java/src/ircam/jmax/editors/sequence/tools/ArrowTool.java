@@ -83,6 +83,12 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
   {
   }
 
+  public void selectionPointDoubleClicked(int x, int y, int modifiers) 
+  {
+    super.selectionPointDoubleClicked(x, y, modifiers);
+    if (gc.getRenderManager().firstObjectContaining(x, y) == null)
+	((SequenceGraphicContext)gc).getTrackEditor().showListDialog();
+  }
 
     public void edit(int x, int y, int modifiers)
     {

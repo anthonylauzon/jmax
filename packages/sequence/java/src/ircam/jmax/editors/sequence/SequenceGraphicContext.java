@@ -40,12 +40,12 @@ public class SequenceGraphicContext extends GraphicContext {
 
   /**
    * Constructor */
-  public SequenceGraphicContext(TrackDataModel model, SequenceSelection s, Track track)
+  public SequenceGraphicContext(TrackDataModel model, SequenceSelection s, TrackEditor editor)
   {
       super();
       setDataModel(model);
       itsSelection = s;
-      itsTrack = track;
+      itsEditor = editor;
   }
 
   /**
@@ -96,14 +96,6 @@ public class SequenceGraphicContext extends GraphicContext {
   }
 
   /**
-   * set the logical time
-   */
-    /*public void setLogicalTime(int theTime) 
-  {
-    itsLogicalTime = theTime;
-    }*/
-
-  /**
    * returns the current logical time
    */
   public int getLogicalTime() 
@@ -142,7 +134,12 @@ public class SequenceGraphicContext extends GraphicContext {
 
     public Track getTrack()
     {
-	return itsTrack;
+	return itsEditor.getTrack();
+    }
+
+    public TrackEditor getTrackEditor()
+    {
+	return itsEditor;
     }
 
     // IMPLEMENTATION NOTES:
@@ -158,10 +155,6 @@ public class SequenceGraphicContext extends GraphicContext {
 	return ((Sequence) getFrame()).itsSequencePanel.statusBar;
     }
 
-    /*public SequenceRemoteData getSequenceRemoteData()
-      {
-      return ((Sequence) getFrame()).sequenceData;
-      }*/
     public FtsSequenceObject getFtsSequenceObject()
     {
 	return ((Sequence) getFrame()).sequenceData;
@@ -171,11 +164,6 @@ public class SequenceGraphicContext extends GraphicContext {
     {
 	return ((Sequence) getFrame()).itsSequencePanel.toolbar;
     }
-
-    /*public  Rectangle getWindowViewRect()
-      {
-      return ((Sequence) getFrame()).itsSequencePanel.scrollTracks.getViewPort().getViewRect();
-      }*/
 
     public void setScrollManager(ScrollManager manager)
     {
@@ -201,7 +189,7 @@ public class SequenceGraphicContext extends GraphicContext {
 
     ScrollManager scrollManager;
 
-    Track itsTrack;
+    TrackEditor itsEditor;
 }
 
 

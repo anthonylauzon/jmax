@@ -71,7 +71,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     public final int INITIAL_ZOOM = 20;
     public static final int MINIMUM_TIME = 10000;
 
-    static public Color violetColor = new Color(102,102,153);
+    static public Color violetColor = new Color(102, 102, 153);
     static public Font rulerFont = new Font("SansSerif", Font.PLAIN, 10);
 
     Component verticalGlue = Box.createVerticalGlue();
@@ -111,8 +111,10 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     toolbar.setPreferredSize(new Dimension(/*156*//*180*//*204*/228, 25));    
     Tool arrow = manager.getToolByName("arrow");     
     manager.activate(arrow, null); //we do not have a gc yet...
+
     //------------------- prepare the track panel:
     trackPanel = new Box(BoxLayout.Y_AXIS);
+
     scrollTracks = new JScrollPane(trackPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
 				   JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     
@@ -141,7 +143,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	    }
 	});
  
-    statusBar.setSize(300, 30);
+    statusBar.setSize(Sequence.DEFAULT_WIDTH, 30);
+    //statusBar.setPreferredSize(new Dimension(Sequence.DEFAULT_WIDTH, 30));
 
     JPanel toolbarPanel = new JPanel();
     toolbarPanel.setSize(228, 25);
@@ -152,7 +155,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     statusBar.addWidgetAt(toolbarPanel, 2);
     statusBar.validate();
 
-    ruler.setSize(300, 20);
+    ruler.setSize(Sequence.DEFAULT_WIDTH, 20);
+    //ruler.setPreferredSize(new Dimension(Sequence.DEFAULT_WIDTH, 30));
 
     northSection.add(statusBar);
     northSection.add(ruler);	
@@ -162,7 +166,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     itsContainer.getFrame().pack();
 
     itsContainer.getFrame().setVisible(true);
-    
+
     //---------- prepares the time zoom listeners
     geometry.addZoomListener( new ZoomListener() {
 	public void zoomChanged(float zoom, float oldZoom)
@@ -178,7 +182,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 
     //-------------- prepares the SOUTH scrollbar (time scrolling) and its listener    
     int totalTime = MINIMUM_TIME;
-    
+
     itsTimeScrollbar = new JScrollBar(Scrollbar.HORIZONTAL, 0, 1000, 0, totalTime);
     itsTimeScrollbar.setUnitIncrement(10);
     itsTimeScrollbar.setBlockIncrement(1000);
@@ -192,7 +196,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	    geometry.setXTransposition(-currentTime);	    
 	}
     });
- 
+
     separate_tracks.add(itsTimeScrollbar, BorderLayout.SOUTH);
     add(separate_tracks, BorderLayout.CENTER);
   }
@@ -230,27 +234,31 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	track.getTrackDataModel().addListener(this);    
 	//add sequenceRuler as highlighting listener 
 	track.getTrackDataModel().addHighlightListener(ruler);    
-    
-	//resize the frame
+
+	//resize the frame //////////////////////////////////////////////////////////////
 	int height;	
-	Dimension dim = itsContainer.getFrame().getSize();	
+	Dimension dim = itsContainer.getFrame().getSize();
 	if(dim.height < Sequence.MAX_HEIGHT)
 	{
+	    int tcHeight = trackContainer.getSize().height;
+	    
 	    if(sequenceData.trackCount() == 1)
 		itsContainer.getFrame().
-		    setSize(dim.width, Sequence.EMPTY_HEIGHT + ruler.getSize().height + 21 + trackContainer.getSize().height);
+		    setSize(dim.width, Sequence.EMPTY_HEIGHT + ruler.getSize().height + 21 + tcHeight);
 	    else
-		if(dim.height + trackContainer.getSize().height <= Sequence.MAX_HEIGHT)
-		    itsContainer.getFrame().setSize(dim.width, dim.height + trackContainer.getSize().height);
+		if(dim.height + tcHeight <= Sequence.MAX_HEIGHT)
+		    itsContainer.getFrame().setSize(dim.width, dim.height + tcHeight);
 		else 
 		    if(dim.height < Sequence.MAX_HEIGHT)
 			itsContainer.getFrame().setSize(dim.width, Sequence.MAX_HEIGHT);
 	}
 
+	///////////////////////////////////////////////////////////////////////////////////
 	//updates events in track
+
 	for(Enumeration e = track.getTrackDataModel().getEvents(); e.hasMoreElements();)
-	  teditor.updateNewObject((TrackEvent)e.nextElement());
-    
+	    teditor.updateNewObject((TrackEvent)e.nextElement());
+	
 	itsContainer.getFrame().validate();
     }
 
@@ -288,6 +296,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 						Sequence.EMPTY_HEIGHT+ruler.getSize().height+21+getAllTracksHeight());	
     
 	itsContainer.getFrame().validate();
+	
+	resetTrackIndexs();
     }
 
     /**
@@ -299,10 +309,22 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	trackPanel.validate();
 	scrollTracks.validate();
 
-	Rectangle absBounds = SwingUtilities.convertRectangle(trackContainer, trackContainer.getBounds(), trackPanel);
-	scrollTracks.getViewport().scrollRectToVisible(absBounds);
+	/*Rectangle absBounds = SwingUtilities.convertRectangle(trackContainer, trackContainer.getBounds(), trackPanel);
+	  scrollTracks.getViewport().scrollRectToVisible(absBounds);
+	  
+	  itsContainer.getFrame().validate();*/
+    }
+
+    public void trackMoved(Track track, int oldPosition, int newPosition)
+    {
+	resetTrackIndexs();
+    }
     
-	itsContainer.getFrame().validate();
+    void resetTrackIndexs()
+    {
+	Component[] comp = trackPanel.getComponents();  
+	for(int i = 0; i < comp.length-1; i++)
+	    ((TrackContainer)comp[i]).changeIndex(i);
     }
 
     public int getAllTracksHeight()
@@ -345,7 +367,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     }
     public void objectDeleted(Object whichObject, int index){}
     public void trackCleared(){}
-    public void objectMoved(Object whichObject, int oldIndex, int newIndex) 
+    public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
+    public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex)
     {
 	resizePanelToEventTime((TrackEvent)whichObject);
     }
@@ -446,13 +469,45 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	      }
   }
 
-    /*public void Settings(){
-      itsScrPanel.settings();
-      }*/
-
     //******** Merge reintroduction *******************//
     public void Merge(){
-	new MergeDialog(sequenceData, geometry, this);
+	ValueInfo type;
+	Track track;
+	boolean first = true;
+	TrackDataModel firstTrackModel = null;
+
+	int result = JOptionPane.showConfirmDialog( this,
+						    "Merging tracks is not Undoable.\nOK to merge ?",
+						    "Warning",
+						    JOptionPane.YES_NO_OPTION,
+						    JOptionPane.WARNING_MESSAGE);
+	if (result == JOptionPane.OK_OPTION)
+	    {
+		for(Enumeration e = ftsSequenceObject.getTypes(); e.hasMoreElements();)
+		    {
+			type = (ValueInfo) e.nextElement();
+			first = true;
+			for (Enumeration en = ftsSequenceObject.getTracks(type); en.hasMoreElements();)
+			    {
+				track = (Track) en.nextElement();				
+				if((track.getProperty("mute") == null)||!((Boolean)track.getProperty("mute")).booleanValue())
+				    {
+					if(first) 
+					    {
+						firstTrackModel = track.getTrackDataModel();
+						reinitTrackEditor(track);
+						first = false;
+					    }
+					else
+					    {				
+						firstTrackModel.mergeModel(track.getTrackDataModel());
+						ftsSequenceObject.requestTrackRemove(track);
+					    }
+				    }
+			    }
+		    }
+
+	    }	
     }
     
     public void reinitTrackEditor(Track track)

@@ -70,7 +70,6 @@ class TrackTableModel extends AbstractTableModel{
 	  if(col == 1) 
 	      return Double.class;
 	  else	      
-	      //return model.getTypeAt(0).getPropertyType(col-2);
 	      return model.getType().getPropertyType(col-2);
   }
 
@@ -80,7 +79,6 @@ class TrackTableModel extends AbstractTableModel{
    * @see WholeNumberField*/
   public void setValueAt(java.lang.Object aValue, int rowIndex, int columnIndex) 
   {
-
       if(columnIndex == 0) return;
       
       Event event = model.getEventAt(rowIndex);
@@ -95,7 +93,6 @@ class TrackTableModel extends AbstractTableModel{
 
     if (model instanceof UndoableData)
 	((UndoableData) model).endUpdate();
-
   }
 
   /**
@@ -119,7 +116,6 @@ class TrackTableModel extends AbstractTableModel{
 	      else
 		  {
 		      int i = 2;
-		      //for(Enumeration e = model.getTypeAt(0).getPropertyNames(); e.hasMoreElements();)
 		      for(Enumeration e = model.getType().getPropertyNames(); e.hasMoreElements();)
 			  {
 			      name = (String)e.nextElement();

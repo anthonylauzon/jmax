@@ -55,7 +55,7 @@ public class Sequence extends JFrame implements EditorContainer{
     public final static int DEFAULT_WIDTH  = 800;
     public final static int DEFAULT_HEIGHT = 553;
     public final static int MAX_HEIGHT     = 800;
-    public final static int EMPTY_HEIGHT   = 78;
+    public final static int EMPTY_HEIGHT   = 88;
   /**
    * Constructor with FtsSequenceObject
    */
@@ -136,12 +136,6 @@ public class Sequence extends JFrame implements EditorContainer{
 	// Build the track menu
 	mb.add(new TrackMenu(this, sequenceData)) ; 	
 
-	// Build the options menu
-	//mb.add(new OptionsMenu(this) );
-	    
-	// New Tool menu 
-	//mb.add(new ircam.jmax.toolkit.menus.MaxToolsJMenu("Tools")); 
-	
 	// New Window Manager based Menu
 	mb.add(new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this)); 
 	

@@ -53,7 +53,7 @@ public class ClosedTrackPopupMenu extends JPopupMenu
   private boolean added = false;
   JMenuItem displayLabelItem;
   JMenu moveMenu;
-  int trackCount = 1;
+  int trackCount = 0;
 
   public ClosedTrackPopupMenu()
   {
@@ -61,7 +61,7 @@ public class ClosedTrackPopupMenu extends JPopupMenu
     JMenuItem item;
 
     moveMenu = new JMenu("Move to Position");
-    item = new JMenuItem("1");
+    item = new JMenuItem(""+trackCount);
     item.addActionListener(Actions.moveClosedTrackToAction);
     moveMenu.add(item);
     
@@ -101,7 +101,7 @@ public class ClosedTrackPopupMenu extends JPopupMenu
     {
 	JMenuItem item;
 	//int count = target.trackCount();
-	int count = target.getGraphicContext().getFtsSequenceObject().trackCount();
+	int count = target.getGraphicContext().getFtsSequenceObject().trackCount()-1;
 	if(trackCount==count)
 	    return;
 	else
