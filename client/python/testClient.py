@@ -24,6 +24,14 @@ FtsObject.registerMessageHandler(console_stream.__class__, "print_line", handler
 
 console_stream.send("set_default")
 
+clientPatcher = FtsObject(connection, rootPatcher, 1);
+args = FtsArgs()
+args.clear()
+# add path to patch to load
+args.addString(sys.argv[1])
+# send load message to fts
+clientPatcher.send("load", args)
+
 # sleep one second
 time.sleep(1)
 
