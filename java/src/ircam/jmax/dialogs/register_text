@@ -1,3 +1,4 @@
+
 Welcome to jMax !
 
 Please consider registering yourself as jMax user. 
@@ -21,9 +22,9 @@ Please also consider subscribing to the Ircam Forum:
 http://www.ircam.fr/forum
 
 NOTE:
- This panel will be automatically disabled by adding a file
- named .jmaxregistered in your home directory. If this panel
- opens again, you can either create this file by hand, start
- jMax with the option '-jmaxNoRegister true' or put in your
- .jmaxrc file the command 'set jmaxNoRegister true'.
-
+ This panel is automatically disabled and will not show 
+ again next time you start jMax. If this does not happen,
+ you can disable it by hand either by creating a file named
+ .jmaxregistered in your home directory, start jMax with 
+ the option '-jmaxNoRegister true' or put in your .jmaxrc 
+ file the command 'set jmaxNoRegister true'.
