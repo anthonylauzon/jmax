@@ -33,16 +33,17 @@ public class TableRenderer extends AbstractRenderer implements Layer{
    * this means building a Point each single value painting...*/
   private void render(Graphics g, int x, int y)
   {
-    g.setColor(Color.white);
     int zero = gc.getAdapter().getY(0);
     int width = (int)( gc.getAdapter().getXZoom());
     int height;
 
     if (width < 1) width = 1;
     
-    g.fillRect(x, 0, width, zero);
-    g.fillRect(x, zero+1, width, gc.getGraphicDestination().getSize().height);
+    // erase the old point
+    g.setColor(Color.white);
+    g.fillRect(x, 0, width, gc.getGraphicDestination().getSize().height);
 
+    // redraw it
     g.setColor(Color.black);
     
     if (itsMode == SOLID)
@@ -62,6 +63,11 @@ public class TableRenderer extends AbstractRenderer implements Layer{
 	g.fillRect(x,  y, width, height);
       }
   
+    // draw the red line
+    g.setColor(Color.red);
+    g.setXORMode(Color.white);
+    g.fillRect(x, zero, width, 1);
+    g.setPaintMode();
   }
 
   /**

@@ -29,9 +29,7 @@ public class FreeHandDrawer extends TableInteractionModule {
    */
   public void mousePressed(MouseEvent e) 
   {
-    previousX = e.getX();
-    previousY = e.getY();
-    itsListener.dragStart(previousX, previousY);
+    itsListener.dragStart(e.getX(), e.getY());
     active = true;
   }
 
@@ -56,14 +54,8 @@ public class FreeHandDrawer extends TableInteractionModule {
   public void mouseDragged(MouseEvent e) 
   {
     if (! active) return;
-    int x = e.getX();
-    int y = e.getY();
 
-    itsListener.dynamicDrag(x, y);
-    LinerTool.drawLine(previousX, previousY, x, y, getGc());
-    previousX = x;
-    previousY = y;
-    
+    itsListener.dynamicDrag(e.getX(), e.getY());
   } 
 
   /**
@@ -79,7 +71,5 @@ public class FreeHandDrawer extends TableInteractionModule {
 
   //---- Fields
   DynamicDragListener itsListener;
-  int previousX;
-  int previousY;
   boolean active = false;
 }

@@ -41,6 +41,12 @@ public interface TableDataModel extends UndoableData{
 
 
   /**
+   * Sets the range of points between start and end interpolating between the initial
+   * and ending values. This operation corresponds to draw a line in the model. */
+  public abstract void interpolate(int start, int end, int startValue, int endValue);
+
+
+  /**
    * requires to be notified when the database changes
    */
   public abstract void addListener(TableDataListener theListener);

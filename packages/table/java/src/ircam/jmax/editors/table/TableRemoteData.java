@@ -91,6 +91,29 @@ public class TableRemoteData implements TableDataModel {
   }
 
   /**
+   * Sets the range of points between start and end interpolating between the initial
+   * and ending values. This operation graphically corresponds to a line. */
+  public void interpolate(int start, int end, int y1, int y2)
+  {
+    float coeff;
+    if (y1 != y2) 
+      coeff = ((float)(y1 - y2))/(end - start);
+    else coeff = 0;
+
+    prepareBuffer(end-start+1);
+
+    if (end >= getSize()) 
+      end = getSize()-1;
+    
+    for (int i = start; i < end; i+=1)
+      {
+	buffer[i-start] = (int)(y1-Math.abs(i-start)*coeff);
+      }
+
+    setValues(buffer, start, end-start);
+  }
+
+  /**
    * Force the values in FTS to be transmitted in the editor */
   public void forceUpdate()
   {
@@ -171,9 +194,22 @@ public class TableRemoteData implements TableDataModel {
       ((TableDataListener) e.nextElement()).valueChanged(index1, index2);
   }
   
+  /**
+   * Utility private function to allocate a buffer used during the interpolate operations.
+   * The computation is done in a private vector that is stored in one shot. */
+  private static void prepareBuffer(int lenght)
+  {
+    if (buffer == null || buffer.length < lenght)
+      {
+	buffer = new int[lenght];
+      }
+  }
+
   //--- Fields
   FtsIntegerVector itsData;
   MaxVector listeners;
+  static int buffer[];
+
 }
 
 

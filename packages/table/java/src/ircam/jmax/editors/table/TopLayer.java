@@ -5,7 +5,7 @@ import ircam.jmax.toolkit.*;
 import java.awt.*;
 
 /** 
- * The "decoration layer" of the table editor (the zero line and the gray) */
+ * The "decoration layer" of the table editor (only the gray area for now) */
 public class TopLayer extends AbstractLayer {
 
   /**
@@ -23,12 +23,9 @@ public class TopLayer extends AbstractLayer {
     int middleY = ta.getY(0);
     int end = ta.getX(tgc.getDataModel().getSize());
 
-    //box around the table
-    g.drawRect(ta.getX(0), 0, end, tgc.getGraphicDestination().getSize().height );
-
-    //horizontal zero line
-    g.setColor(Color.red);
-    g.drawLine(0, middleY, end, middleY);
+    //vertical black line at the end of the table area
+    g.setColor(Color.black);
+    g.drawLine(end, 0, end, tgc.getGraphicDestination().getSize().height );
 
 
     //unused vertical area
