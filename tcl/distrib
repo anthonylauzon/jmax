@@ -2,6 +2,7 @@ all	all	config
 all	all	defaults.tcl
 all	all	devices.tcl
 all	all	icons.tcl
+all	all	menu.tcl
 all	all	intrinsics.tcl
 all	all	jmaxboot.tcl
 all	all	jmaxpkg.tcl

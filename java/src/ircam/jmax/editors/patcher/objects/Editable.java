@@ -69,6 +69,7 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   {
     computeRenderer();
     renderer.update();
+    redraw();
     updateDimensions();
 
     super.redefine(text);
