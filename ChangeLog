@@ -1,3 +1,27 @@
+2002-09-10  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* change package exported header file hierarchy. Now exported header file are located in 
+	package_name/c/include and no more in package_name/c/src
+	Exported header files are installed in:
+	$(includedir)/fts/packages/package_name
+	
+	The following files were moved:
+	   data/c/src/bpf.h    -> data/c/include/bpf.h
+	   data/c/src/cvec.h   -> data/c/include/cvec.h
+	   data/c/src/data.h   -> data/c/include/data.h
+	   data/c/src/fmat.h   -> data/c/include/fmat.h
+	   data/c/src/fvec.h   -> data/c/include/fvec.h
+	   data/c/src/ivec.h   -> data/c/include/ivec.h
+	   utils/c/src/utils.h -> utils/c/include/utils.h
+
+	* change Makefile.am of the following packages to reflect file hierarchy changes:
+	   data/c/src/Makefile.am
+	   guiobj/c/src/Makefile.am
+	   ispw/c/src/Makefile.am
+	   numeric/c/src/Makefile.am
+	   signal/c/src/Makefile.am
+	   utils/c/src/Makefile.am
+	  
 2002-09-09  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* fix code of dtdserver, now dtdserver constructor is called by fts_object_new_patcher 
