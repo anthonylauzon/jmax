@@ -32,6 +32,12 @@ typedef struct {
 } input_t;
 
 static void 
+input_dsp_active(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_update_request(o);
+}
+
+static void 
 input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   input_t *this = (input_t *)o;
@@ -62,6 +68,7 @@ input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       for ( i = 0; i < 2; i++)
 	fts_audioport_add_input_object( this->port, i, (fts_object_t *)this);
     }
+  fts_dsp_active_add_listener(o, input_dsp_active);
 }
 
 static void 
@@ -76,6 +83,7 @@ input_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       for ( i = 0; i < fts_object_get_outlets_number( o); i++)
 	fts_audioport_remove_input_object( this->port, i, (fts_object_t *)this);
     }
+  fts_dsp_active_remove_listener(o);
 }
 
 static void 
