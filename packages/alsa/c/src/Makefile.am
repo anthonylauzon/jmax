@@ -10,3 +10,6 @@ libalsa_la_CFLAGS=-DDEBUG
 libalsa_la_LIBADD=-lasound
 
 INCLUDES=-I$(top_srcdir)/include
+
+noinst_HEADERS= alsamidi.h
+ 
