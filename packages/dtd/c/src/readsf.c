@@ -411,7 +411,7 @@ static void readsf_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
       {
 	  fts_free(com_buffer->buffer[j]);
       }
-      fts_free(com_buffer);
+      fts_free(com_buffer->buffer);
   }
   fts_free(self->com_buffer);
 
