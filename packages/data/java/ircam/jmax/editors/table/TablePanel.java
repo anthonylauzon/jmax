@@ -369,10 +369,16 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
    * TableDataListener interface */
   public void valueChanged(int index1, int index2)
   {    
-    int x = gc.getAdapter().getX( index1);
-    int w = gc.getAdapter().getX( index2+1) - x;
+    int x = gc.getAdapter().getX((index1 > 2) ? index1-2 : index1);
+    int w = gc.getAdapter().getX( (index2 < gc.getDataModel().getSize()-2) ? index2+2 : index2+1) - x;        
+    if( gc.getAdapter().getXZoom() < 0.5)
+        if( w < 20)
+        {		
+            w = 20;
+            x = (x > 10) ? x-10 : x;
+        }
     itsCenterPanel.repaint( new Rectangle( x, 0, w, itsCenterPanel.getSize().height));
-  }
+  }	
   public void pixelsChanged(int index1, int index2)
   {    
     itsCenterPanel.repaint();

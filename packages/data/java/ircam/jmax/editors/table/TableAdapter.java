@@ -24,7 +24,7 @@ package ircam.jmax.editors.table;
 import ircam.jmax.*;
 import ircam.jmax.toolkit.*;
 import java.awt.*;
-
+import javax.swing.*;
 /**
  * A simple coordinates converter in a Table window. 
  * It handles the conversion of x, y coordinates, an origin, and two zoom factors.
@@ -74,8 +74,8 @@ public class TableAdapter {
   
   public void zoomToWindow()
   {
-    int width = gc.getGraphicDestination().getSize().width;
-    setXZoom( findZoomRatioClosestTo( (float)width/dataModel.getSize()));
+    setXZoom( findZoomRatioClosestTo( (float)gc.getGraphicDestination().getSize().width/dataModel.getSize()));
+    setYZoom( (float)gc.getGraphicDestination().getSize().height/gc.getVerticalRange());	
   }
   
   /**

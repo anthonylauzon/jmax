@@ -156,6 +156,10 @@ public class TableGraphicContext extends GraphicContext{
   {
     return ((TableDisplay)getGraphicDestination()).panel.itsVerticalControl.isVisible();
   }
+  public boolean isHorizontalScrollbarVisible()
+  {
+    return ((TableDisplay)getGraphicDestination()).panel.itsHorizontalControl.isVisible();
+  }
 
   public void scrollTo(int x)
   {

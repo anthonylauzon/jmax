@@ -115,8 +115,13 @@ public class TablePopupMenu extends JPopupMenu
   public void update()
   {
     int dm = target.getDisplayMode();
-    if( dm == TableRenderer.SOLID) solidItem.setSelected( true);
-    else hollowItem.setSelected( true);    
+    if( dm == TableRenderer.SOLID) 
+        solidItem.setSelected( true);
+    else 
+        if( dm == TableRenderer.HOLLOW) 
+            hollowItem.setSelected( true);    
+        else
+            boundedItem.setSelected( true);    
     revalidate();
   }
 }

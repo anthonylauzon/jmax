@@ -115,6 +115,17 @@ public class TableRenderer extends AbstractRenderer implements Layer{
     g.fillRect(x,  gc.getAdapter().getY( topy), width, height);
     g.fillRect(x,  gc.getAdapter().getY( bottomy), width, height);
   }
+  
+  public void drawPixBoundPoint( Graphics g, int x, double topy, double bottomy, int nextx, double nexttopy, double nextbottomy, int zero)
+  {
+    int ty = gc.getAdapter().getY( topy);
+    int by = gc.getAdapter().getY( bottomy);
+    int nty = gc.getAdapter().getY( nexttopy);
+    int nby = gc.getAdapter().getY( nextbottomy);
+
+    g.drawLine( x, ty, nextx, nty);
+    g.drawLine( x, by, nextx, nby);
+  }
   /**
    * From the Layer interface: renders the content of the table (except the
    * zero line and the surrounding gray, that are rendered by the TopLayer */
@@ -133,7 +144,7 @@ public class TableRenderer extends AbstractRenderer implements Layer{
     g.setColor( outRangeColor);
     g.fillRect(r.x, r.y, r.width, r.height);
     g.setColor( backColor);
-    g.fillRect(r.x, yMax, r.width, (yMin-yMax));
+    g.fillRect(r.x-10, yMax, r.width+20, (yMin-yMax));
     g.setColor( borderRangeColor);
     g.drawLine( r.x, yMax, r.x+r.width, yMax);
     g.drawLine( r.x, yMin, r.x+r.width, yMin);
@@ -163,14 +174,20 @@ public class TableRenderer extends AbstractRenderer implements Layer{
 	      drawHollowPoint(g, gc.getAdapter().getX(i), 
 			      gc.getAdapter().getY( gc.getFtsObject().getVisibleValue(i)));
 	  else
-	    {
-	      int i;
+	    {//Bounded
+	      int i;              
+              if(index>0)
+                drawBoundPoint(g, gc.getAdapter().getX(index-1), 
+			       gc.getAdapter().getY( gc.getFtsObject().getVisibleValue(index-1)),
+			       gc.getAdapter().getX(index), 
+			       gc.getAdapter().getY( gc.getFtsObject().getVisibleValue(index)));
+              
 	      for (i = index; (i < visibleSize)&&(i<tableSize-1); i++)
 		drawBoundPoint(g, gc.getAdapter().getX(i), 
 			       gc.getAdapter().getY( gc.getFtsObject().getVisibleValue(i)),
 			       gc.getAdapter().getX(i+1), 
 			       gc.getAdapter().getY( gc.getFtsObject().getVisibleValue(i+1)));
-	      if( i == tableSize-2)
+	      if( i == tableSize-1)
 		{
 		  int x = gc.getAdapter().getX(i);
 		  int y = gc.getAdapter().getY( gc.getFtsObject().getVisibleValue(i));
@@ -186,9 +203,27 @@ public class TableRenderer extends AbstractRenderer implements Layer{
                 drawPixSolidPoint( g, i, gc.getFtsObject().getTopPixel(i), 
                                    gc.getFtsObject().getBottomPixel(i), zero);
         else
-	  for (int i = 0; i < pixSize-1; i++)
-	    drawPixHollowPoint( g, i, gc.getFtsObject().getTopPixel(i), 
-				gc.getFtsObject().getBottomPixel(i));
+            if( itsMode == HOLLOW)
+                for (int i = 0; i < pixSize-1; i++)
+                    drawPixHollowPoint( g, i, gc.getFtsObject().getTopPixel(i), 
+                                        gc.getFtsObject().getBottomPixel(i));
+            else//Bounded
+            {
+	      for (int i = 0; i < pixSize-2; i++)
+		 drawPixBoundPoint(g, i, 
+                                   gc.getFtsObject().getTopPixel(i),
+			           gc.getFtsObject().getBottomPixel(i),
+                                   i+1,
+			           gc.getFtsObject().getTopPixel(i+1),
+                                   gc.getFtsObject().getBottomPixel(i+1), zero);
+
+              drawPixBoundPoint(g, pixSize-2, 
+                                gc.getFtsObject().getTopPixel( pixSize-2), 
+                                gc.getFtsObject().getBottomPixel( pixSize-2), 
+                                pixSize-1,
+                                gc.getFtsObject().getTopPixel( pixSize-1), 
+                                gc.getFtsObject().getBottomPixel( pixSize-1), zero);
+            }
       }
     
     g.setColor( Color.red);
