@@ -1034,9 +1034,7 @@ public class FtsObject
 			       {
 				   String path = fd.getSelectedFile().getAbsolutePath();
 				   sendArgs[0].setString(path); 
-				   System.err.println("send 1 "+callbackMethod+" with "+path);
 				   sendMessage(FtsObject.systemInlet, callbackMethod, 1, sendArgs);
-				   System.err.println("send 2 "+callbackMethod);
 			       } 
 			}
 		});
