@@ -9,7 +9,7 @@ EXTRA_DIST= \
 	jmax_file32.gif \
 	jmax_file48.gif \
 	jmax_file.icns \
-	jmax.icns \ \
+	jmax.icns \
 	JMaxWrapper.java \
 	libcontrol-info.plist \
 	libdata-info.plist \
