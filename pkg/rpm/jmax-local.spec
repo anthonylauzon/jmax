@@ -1,6 +1,6 @@
 Summary: graphical programming environment for developing audio applications
 Name: jMax
-Version: 2.4.8b
+Version: 2.4.8
 Release: 1
 Copyright: GPL
 Group: Development/Languages
@@ -26,7 +26,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-, root, root)
-/usr/doc/jMax-2.4.8b
+/usr/doc/jMax-2.4.8
 /usr/bin/jmax
 /usr/lib/jmax
 /usr/include/fts

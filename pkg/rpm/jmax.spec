@@ -1,6 +1,6 @@
 Summary: graphical programming environment for developing audio applications
 Name: jMax
-Version: 2.4.8b
+Version: 2.4.8
 Release: 1
 Copyright: GPL
 Group: Development/Languages
