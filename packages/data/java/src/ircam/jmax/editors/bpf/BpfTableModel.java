@@ -89,9 +89,12 @@ class BpfTableModel extends AbstractTableModel{
 	      float nextTime = -1;
 	      if(rowIndex>0)
 		  prevTime = model.getPointAt(rowIndex-1).getTime();
-	      if(rowIndex< model.length())
-		  nextTime = model.getPointAt(rowIndex+1).getTime();
 	      
+	      if(rowIndex< model.length()-1)
+		  nextTime = model.getPointAt(rowIndex+1).getTime();
+	      else
+		  nextTime = current;
+
 	      if(current > nextTime) current = nextTime;
 	      else if(current < prevTime) current = prevTime;
 	      
