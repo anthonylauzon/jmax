@@ -51,5 +51,6 @@
 ;; load the reference manual data base
 ;sourceFile $dir/doc/reference.tcl
 
-;post "package: ISPW (ISPW standard class library)"
+(println "package: ISPW (ISPW standard class library)")
+
 
