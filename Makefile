@@ -32,38 +32,32 @@ endif
 all:
 	(cd fts; $(MAKE) $@)
 	(cd java ; $(MAKE) $@)
-	(cd lib; $(MAKE) $@)
 	(cd packages; $(MAKE) $@)
 .PHONY: all
 
 all_c:
 	(cd fts; $(MAKE) all)
-	(cd lib; $(MAKE) all_c)
 	(cd packages; $(MAKE) all_c)
 .PHONY: all_c
 
 all_java:
 	(cd java ; $(MAKE) all)
-	(cd lib; $(MAKE) all_java)
 	(cd packages; $(MAKE) all_java)
 .PHONY: all_java
 
 clean:
 	(cd fts; $(MAKE) $@)
 	(cd java ; $(MAKE) $@)
-	(cd lib; $(MAKE) $@)
 	(cd packages; $(MAKE) $@)
 .PHONY: clean
 
 clean_c:
 	(cd fts; $(MAKE) clean)
 	(cd packages; $(MAKE) clean_c)
-	(cd lib; $(MAKE) clean_c)
 .PHONY: clean_c
 
 clean_java:
 	(cd java ; $(MAKE) clean)
-	(cd lib; $(MAKE) clean_java)
 	(cd packages; $(MAKE) clean_java)
 .PHONY: clean_java
 
