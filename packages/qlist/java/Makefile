@@ -34,7 +34,7 @@ clean:
 
 install-exec:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/qlist/java/classes
-	( cd classes ; $(INSTALL_DATA) qlist.jar $(lib_install_dir)packages/qlist/java/classes )
+	( cd classes ; $(INSTALL_DATA) qlist.jar $(lib_install_dir)/packages/qlist/java/classes )
 .PHONY: install-exec
 
 # remove the files copied by make install ?

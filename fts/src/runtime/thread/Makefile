@@ -33,8 +33,8 @@ $(LIBDIR)/libThread.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libThread.a $(OBJECTS)
 
 install-includes:
-	$(INSTALL_DIR) $(include_install_dir)fts/runtime/thread
-	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/runtime/thread ; done
+	$(INSTALL_DIR) $(include_install_dir)/fts/runtime/thread
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/runtime/thread ; done
 .PHONY: install-includes
 
 # remove the files copied by make install ?

@@ -55,7 +55,7 @@ clean_java:
 .PHONY: clean_java
 
 install-exec:
-	$(INSTALL_DIR) $(lib_install_dir)packages
+	$(INSTALL_DIR) $(lib_install_dir)/packages
 	for i in $(C_TARGETS) ; do ( cd $$i; $(MAKE) $@) ; done
 	for i in $(JAVA_TARGETS) ; do ( cd $$i; $(MAKE) $@ ) ; done
 	for i in $(MIXED_TARGETS) ; do ( cd $$i; $(MAKE) $@ ) ; done

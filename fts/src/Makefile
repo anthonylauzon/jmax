@@ -40,8 +40,8 @@ clean:
 .PHONY: all
 
 install-includes:
-	$(INSTALL_DIR) $(include_install_dir)fts
-	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts ; done
+	$(INSTALL_DIR) $(include_install_dir)/fts
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts ; done
 	for d in lang runtime sys ; do (cd $$d ; $(MAKE) $@ ) ; done
 .PHONY: install-includes
 

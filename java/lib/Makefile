@@ -24,9 +24,9 @@
 #
 
 install-exec:
-	$(INSTALL_DIR) $(lib_install_dir)java/lib
-	$(INSTALL_DIR) $(lib_install_dir)java/lib/jacl
-	( cd jacl ; for f in jacl.jar README license.terms ; do $(INSTALL_DATA) $$f $(lib_install_dir)java/lib/jacl ; done )
+	$(INSTALL_DIR) $(lib_install_dir)/java/lib
+	$(INSTALL_DIR) $(lib_install_dir)/java/lib/jacl
+	( cd jacl ; for f in jacl.jar README license.terms ; do $(INSTALL_DATA) $$f $(lib_install_dir)/java/lib/jacl ; done )
 .PHONY: install-exec
 
 # remove the files copied by make install ?

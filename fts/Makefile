@@ -35,7 +35,7 @@ clean:
 .PHONY: all
 
 install-exec:
-	$(INSTALL_DIR) $(lib_install_dir)fts
+	$(INSTALL_DIR) $(lib_install_dir)/fts
 	( cd bin ; $(MAKE) $@ )
 .PHONY: install-exec
 

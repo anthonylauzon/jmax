@@ -46,8 +46,8 @@ END { printf("#define FTS_VERSION_STRING \"jMax server version %d.%d.%d%s\"\n",m
 ' < $(ROOTDIR)/../VERSION >> version.h
 
 install-includes:
-	$(INSTALL_DIR) $(include_install_dir)fts/sys
-	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/sys ; done
+	$(INSTALL_DIR) $(include_install_dir)/fts/sys
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/sys ; done
 .PHONY: install-includes
 
 # remove the files copied by make install ?

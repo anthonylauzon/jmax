@@ -34,17 +34,17 @@ clean:
 install-exec:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw
 	$(INSTALL_DATA) ispw.jpk $(lib_install_dir)/packages/ispw
-	for d in $(SUB_ARCHS) ; do $(INSTALL_DIR) $(lib_install_dir)packages/ispw/lib/$$d/opt ; done
+	for d in $(SUB_ARCHS) ; do $(INSTALL_DIR) $(lib_install_dir)/packages/ispw/lib/$$d/opt ; done
 	for d in $(SUB_ARCHS) ; do \
 		( cd lib/$$d/opt ; \
-			$(INSTALL_LIB) libcontrol.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_LIB) libdata.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_LIB) libfilters.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_LIB) libio.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_LIB) libmidi.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_LIB) libpitch.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_LIB) libsampling.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_LIB) libsignal.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_LIB) libcontrol.so $(lib_install_dir)/packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_LIB) libdata.so $(lib_install_dir)/packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_LIB) libfilters.so $(lib_install_dir)/packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_LIB) libio.so $(lib_install_dir)/packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_LIB) libmidi.so $(lib_install_dir)/packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_LIB) libpitch.so $(lib_install_dir)/packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_LIB) libsampling.so $(lib_install_dir)/packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_LIB) libsignal.so $(lib_install_dir)/packages/ispw/lib/$$d/opt ; \
 		) ; done
 	( cd abs ; $(MAKE) $@)
 	( cd help; $(MAKE) $@)

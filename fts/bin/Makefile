@@ -37,8 +37,8 @@ else
 ifeq ($(ARCH),linuxpc)
 
 install-exec:
-	$(INSTALL_DIR) $(lib_install_dir)fts/bin/linuxpc/opt
-	( cd linuxpc/opt ; $(INSTALL_SETUID) fts $(lib_install_dir)fts/bin/linuxpc/opt )
+	$(INSTALL_DIR) $(lib_install_dir)/fts/bin/linuxpc/opt
+	( cd linuxpc/opt ; $(INSTALL_SETUID) fts $(lib_install_dir)/fts/bin/linuxpc/opt )
 .PHONY: install-exec
 
 endif

@@ -20,8 +20,8 @@ clean:
 
 install-exec:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/mess/c
-	for d in $(SUB_ARCHS) ; do $(INSTALL_DIR) $(lib_install_dir)packages/mess/c/lib/$$d/opt ; done
-	for d in $(SUB_ARCHS) ; do ( cd lib/$$d/opt ; $(INSTALL_LIB) libmess.so $(lib_install_dir)packages/mess/c/lib/$$d/opt ) ; done
+	for d in $(SUB_ARCHS) ; do $(INSTALL_DIR) $(lib_install_dir)/packages/mess/c/lib/$$d/opt ; done
+	for d in $(SUB_ARCHS) ; do ( cd lib/$$d/opt ; $(INSTALL_LIB) libmess.so $(lib_install_dir)/packages/mess/c/lib/$$d/opt ) ; done
 .PHONY: install-exec
 
 uninstall:

@@ -4,25 +4,25 @@ product jmax
         id "Software"
         version 2.3.8a
         order 9999
-        subsys binaries default
-            id "jMax binaries and libraries"
+        subsys exec default
+            id "jMax executables and libraries"
             replaces self
-            exp jmax.sw.binaries
+            exp jmax.sw.exec
+        endsubsys
+        subsys includes default
+            id "jMax includes"
+            replaces self
+            exp jmax.sw.includes
         endsubsys
     endimage
-    image man
-        id "Man Pages"
-        version 1
-        order 9999
-        subsys manpages
-            id "Man Pages"
+    image doc
+        id "jMax doc"
+        version 2.4.8a
+        order 1
+        subsys documentation default
+            id "jMax Documentation"
             replaces self
-            exp jmax.man.manpages
-        endsubsys
-        subsys relnotes
-            id "Release Notes"
-            replaces self
-            exp jmax.man.relnotes
+            exp jmax.doc.documentation
         endsubsys
     endimage
 endproduct

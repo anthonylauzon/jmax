@@ -25,7 +25,7 @@
 
 install-doc:
 	$(INSTALL_DIR) $(doc_install_dir)/user
-	for f in *.html ; do $(INSTALL_DATA) $$f $(doc_install_dir)user ; done
+	for f in *.html ; do $(INSTALL_DATA) $$f $(doc_install_dir)/user ; done
 	(cd config ; $(MAKE) $@)
 .PHONY: install-doc
 

@@ -34,8 +34,8 @@ $(LIBDIR)/libDsp.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libDsp.a $(OBJECTS)
 
 install-includes:
-	$(INSTALL_DIR) $(include_install_dir)fts/lang/dsp
-	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/lang/dsp ; done
+	$(INSTALL_DIR) $(include_install_dir)/fts/lang/dsp
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/lang/dsp ; done
 .PHONY: install-includes
 
 # remove the files copied by make install ?

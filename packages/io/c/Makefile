@@ -33,8 +33,8 @@ clean:
 
 install-exec:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/io/c
-	for d in $(SUB_ARCHS) ; do $(INSTALL_DIR) $(lib_install_dir)packages/io/c/lib/$$d/opt ; done
-	for d in $(SUB_ARCHS) ; do ( cd lib/$$d/opt ; $(INSTALL_LIB) libio.so $(lib_install_dir)packages/io/c/lib/$$d/opt ) ; done
+	for d in $(SUB_ARCHS) ; do $(INSTALL_DIR) $(lib_install_dir)/packages/io/c/lib/$$d/opt ; done
+	for d in $(SUB_ARCHS) ; do ( cd lib/$$d/opt ; $(INSTALL_LIB) libio.so $(lib_install_dir)/packages/io/c/lib/$$d/opt ) ; done
 .PHONY: install-exec
 
 uninstall:

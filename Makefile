@@ -43,9 +43,9 @@ INSTALL_SETUID=$(INSTALL) -m 4755
 INSTALL_LIB=$(INSTALL) -m 755
 INSTALL_DIR=$(INSTALL) -d -m 755
 prefix=/usr
-doc_install_dir=$(prefix)/webdocs/jmax/
-lib_install_dir=$(prefix)/lib/jmax/
-include_install_dir=$(prefix)/include/
+doc_install_dir=$(prefix)/webdocs/jmax
+lib_install_dir=$(prefix)/lib/jmax
+include_install_dir=$(prefix)/include
 bin_install_dir=$(prefix)/bin
 SUB_ARCHS=irix65r10k irix65r5k
 else
@@ -57,9 +57,9 @@ INSTALL_SETUID=$(INSTALL) --mode=4755
 INSTALL_LIB=$(INSTALL) --mode=0755
 INSTALL_DIR=$(INSTALL) -d --mode=0755
 prefix=/usr
-doc_install_dir=$(prefix)/doc/jmax/
-lib_install_dir=$(prefix)/lib/jmax/
-include_install_dir=$(prefix)/include/
+doc_install_dir=$(prefix)/doc/jmax
+lib_install_dir=$(prefix)/lib/jmax
+include_install_dir=$(prefix)/include
 bin_install_dir=$(prefix)/bin
 SUB_ARCHS=linuxpc
 else
@@ -148,7 +148,7 @@ install-doc:
 	$(INSTALL_DATA) LICENSE $(doc_install_dir)
 	$(INSTALL_DATA) README $(doc_install_dir)
 	$(INSTALL_DATA) VERSION $(doc_install_dir)
-	( cd doc ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" prefix=$(prefix) doc_install_dir=$(doc_install_dir) $@ )
+	( cd doc ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" doc_install_dir=$(doc_install_dir) $@ )
 .PHONY: install-doc
 
 install-exec:
@@ -171,9 +171,14 @@ install-includes:
 # idb
 # creates the SGI idb file
 #
-idb:
-	( RAWIDB=/tmp/idb ; export RAWIDB ; $(MAKE) install )
-#	( SRC=$$HOME; export SRC ; RAWIDB=/tmp/idb ; export RAWIDB ; $(MAKE) install )
+sgi-pkg:
+	/bin/rm -rf /tmp/idb-doc /tmp/idb-exec /tmp/idb-includes
+	( RAWIDB=/tmp/idb-doc ; export RAWIDB ; $(MAKE) ARCH=sgi INSTALL="install -idb jmax.doc.documentation" install-doc )
+	( RAWIDB=/tmp/idb-exec ; export RAWIDB ; $(MAKE) ARCH=sgi INSTALL="install -idb jmax.sw.exec" install-exec )
+	( RAWIDB=/tmp/idb-includes ; export RAWIDB ; $(MAKE) ARCH=sgi INSTALL="install -idb jmax.sw.includes" install-includes )
+	/bin/rm -rf ./pkg/sgi/jmax.idb
+	cat /tmp/idb-doc /tmp/idb-exec /tmp/idb-includes | sort +4u -6 > ./pkg/sgi/jmax.idb
+	/usr/sbin/gendist -verbose -root / -sbase .. -idb ./pkg/sgi/jmax.idb -spec ./pkg/sgi/jmax.spec -dist /usr/dist -all
 
 #
 # uninstall

@@ -45,8 +45,8 @@ $(LIBDIR)/libVecLib.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libVecLib.a $(OBJECTS)
 
 install-includes:
-	$(INSTALL_DIR) $(include_install_dir)fts/lang/veclib
-	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/lang/veclib ; done
+	$(INSTALL_DIR) $(include_install_dir)/fts/lang/veclib
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/lang/veclib ; done
 	(cd include ; $(MAKE) install-includes)
 	(cd portable ; $(MAKE) install-includes)
 .PHONY: install-includes

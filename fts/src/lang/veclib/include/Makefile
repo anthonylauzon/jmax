@@ -24,8 +24,8 @@
 
 
 install-includes:
-	$(INSTALL_DIR) $(include_install_dir)fts/lang/veclib/include
-	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/lang/veclib/include ; done
+	$(INSTALL_DIR) $(include_install_dir)/fts/lang/veclib/include
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/lang/veclib/include ; done
 .PHONY: install-includes
 
 # remove the files copied by make install ?

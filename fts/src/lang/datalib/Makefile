@@ -35,8 +35,8 @@ $(LIBDIR)/libDatalib.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libDatalib.a $(OBJECTS)
 
 install-includes:
-	$(INSTALL_DIR) $(include_install_dir)fts/lang/datalib
-	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/lang/datalib ; done
+	$(INSTALL_DIR) $(include_install_dir)/fts/lang/datalib
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/lang/datalib ; done
 .PHONY: install-includes
 
 # remove the files copied by make install ?

@@ -41,8 +41,8 @@ clean:
 .PHONY: clean
 
 install-includes:
-	$(INSTALL_DIR) $(include_install_dir)fts/lang
-	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/lang ; done
+	$(INSTALL_DIR) $(include_install_dir)/fts/lang
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/lang ; done
 	for d in datalib dsp ftl mess utils veclib; do ( cd $$d ; $(MAKE) $@ ; ) ; done
 .PHONY: install-includes
 

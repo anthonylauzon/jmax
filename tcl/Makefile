@@ -24,8 +24,8 @@
 #
 
 install-exec:
-	$(INSTALL_DIR) $(lib_install_dir)tcl
-	for f in *.tcl ; do $(INSTALL_DATA) $$f $(lib_install_dir)tcl ; done
+	$(INSTALL_DIR) $(lib_install_dir)/tcl
+	for f in *.tcl ; do $(INSTALL_DATA) $$f $(lib_install_dir)/tcl ; done
 	(cd config ; $(MAKE) $@ )
 .PHONY: install-exec
 
