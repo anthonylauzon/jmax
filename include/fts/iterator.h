@@ -67,11 +67,13 @@
 
 /*@{*/
 
-typedef struct _fts_iterator_t {
-  int (*has_more)( void *);
-  void (*next)( void *, fts_atom_t *);
+typedef struct _fts_iterator_t fts_iterator_t;
+ 
+struct _fts_iterator_t {
+  int (*has_more)( fts_iterator_t *);
+  void (*next)( fts_iterator_t *, fts_atom_t *);
   void *data;
-} fts_iterator_t;
+};
 
 /*@}*/
        
@@ -87,7 +89,7 @@ typedef struct _fts_iterator_t {
  * @param i the iterator
  * @return 1 if iterator has more elements, 0 otherwise
  */
-#define fts_iterator_has_more(I) ((*(I)->has_more)( (I)->data))
+#define fts_iterator_has_more(I) ((*(I)->has_more)( I))
 
 /**
  * Advance to next element in iteration
@@ -95,6 +97,6 @@ typedef struct _fts_iterator_t {
  * @fn int fts_iterator_next( fts_iterator_t *i)
  * @param i the iterator
  */
-#define fts_iterator_next(I,A) ((*(I)->next)( (I)->data,A))
+#define fts_iterator_next(I,A) ((*(I)->next)( I, A))
 
 #endif
