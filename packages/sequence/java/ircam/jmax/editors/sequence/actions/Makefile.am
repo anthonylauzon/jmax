@@ -6,8 +6,7 @@ ImportAction.java \
 LabelTypesAction.java \
 MergeAction.java \
 MoveClosedTrackToAction.java \
-MoveMidiTrackToAction.java \
-MoveMonoTrackToAction.java \
+MoveTrackToAction.java \
 RemoveTrackAction.java
 
 JAVAC = @JAVACX@

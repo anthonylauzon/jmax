@@ -27,6 +27,7 @@ import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.menus.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.*;
+import ircam.jmax.fts.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
@@ -40,186 +41,44 @@ import javax.swing.event.*;
  * This kind of editor use a MonoDimensionalAdapter
  * to map the y values. The value returned is always half of the panel,
  * and settings of y are simply ignored. */
-public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionListener, TrackEditor
+public class MonoTrackEditor extends TrackBaseEditor
 {
-  public MonoTrackEditor(Geometry g, Track track)
+  public MonoTrackEditor(Geometry g, Track trk)
   {
-    super();
-
-    this.geometry = g;
-    this.itsTrack = track;
+    super(g, trk);
     
-    itsTrack.getTrackDataModel().addListener(new TrackDataListener() {
-	boolean uploading = false;
-	public void objectDeleted(Object whichObject, int oldIndex) {MonoTrackEditor.this.repaint();}
-	public void trackCleared() {MonoTrackEditor.this.repaint();}
-	public void startTrackUpload( TrackDataModel track, int size) 
-	{
-	  uploading = true;
-	}
-	public void endTrackUpload( TrackDataModel track) 
-	{
-	  uploading = false;
-	}
-	public void startPaste() {}
-	public void endPaste() {}
-	public void objectAdded(Object whichObject, int index) {
-	  if( !uploading)
-	    {
-	      updateNewObject(whichObject);
-	      updateRange(whichObject);
-	      MonoTrackEditor.this.repaint();			
-	    }
-	}
-	public void objectsAdded(int maxTime) {
-	  MonoTrackEditor.this.repaint();
-	}
-	public void objectChanged(Object whichObject, String propName, Object propValue) {
-	  updateEventProperties(whichObject, propName, propValue);
-	  updateRange(whichObject);
-	  MonoTrackEditor.this.repaint();
-	}
-	public void objectMoved(Object whichObject, int oldIndex, int newIndex) {}
-	public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex) {
-	  MonoTrackEditor.this.repaint();
-	}
-	public void trackNameChanged(String oldName, String newName) {
-	  itsTrack.setProperty("trackName", newName);
-	}
-      });
-    
-    itsTrack.getTrackDataModel().addHighlightListener(new HighlightListener(){
-	public void highlight(Enumeration elements, double time)
-	{
-	  TrackEvent temp;
-	  boolean first = true; 
-	  
-	  Rectangle clipRect = gc.getTrackClip().intersection(gc.getScrollManager().getViewRectangle());
-	  Graphics gr = getGraphics();		    
-	  gr.clipRect(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
-	  
-	  for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
-	    {
-	      temp = (TrackEvent) e.nextElement();
-	      temp.setHighlighted(false);
-	      temp.getRenderer().render(temp, gr, false, gc);
-	    }
-	  oldElements.removeAllElements();		    
-	  
-	  for (Enumeration e = elements; e.hasMoreElements();) 
-	    {
-	      temp = (TrackEvent) e.nextElement();
-	      if(first)
-		{
-		  gc.getScrollManager().makeVisible(temp);
-		  first = false;
-		}
-	      temp.setHighlighted(true);
-	      temp.getRenderer().render(temp, gr, true, gc);
-	      oldElements.addElement(temp);
-	    }
-	}
-      });
-    
-    itsTrack.getTrackDataModel().addTrackStateListener(new TrackStateListener(){
-	public void lock(boolean lock)
-	{
-	  for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
-	    ((TrackEvent) e.nextElement()).setHighlighted(false);
-	  
-	  oldElements.removeAllElements();
-	  getTrack().setProperty("locked", new Boolean(lock));
-	}
-	public void active(boolean active)
-	{
-	  getTrack().setProperty("active", (active) ? Boolean.TRUE : Boolean.FALSE);
-	}
-      });
-    
-    geometry.addTranspositionListener(new TranspositionListener() {
-	public void transpositionChanged(int newTranspose)
-	{
-	  repaint();
-	}
-      });
-
-    createGraphicContext(geometry, itsTrack.getTrackDataModel());
-
-    //--- make this track's selection the current 
-    // one when the track is activated
-    itsTrack.getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
-	public void propertyChange(PropertyChangeEvent e)
-	{	  
-	  if (e.getPropertyName().equals("selected") && e.getNewValue().equals(Boolean.TRUE))
-	    SequenceSelection.setCurrent(selection);
-	}
-      });
-
-	
-    selection.addListSelectionListener(this);
-    
-    selection.setOwner(new SelectionOwner() {
-	public void selectionDisactivated()
-	{
-	  repaint();
-	}
-	public void selectionActivated()
-	{
-	  repaint();
-	}
-      });
-
-    setBackground(Color.white);
-    
-    setOpaque(false);
+    viewMode = PEAKS_VIEW;
+    DEFAULT_HEIGHT = 127;
   }
 
   public void reinit(){}
   
-  public JMenu getToolsMenu()
+  void createPopupMenu()
   {
-    return gc.getToolbar().itsMenu;
+    popup = new MonoTrackPopupMenu( this, gc.getFtsObject() instanceof FtsSequenceObject);
   }
+
+  SequenceGraphicContext createGraphicContext(Geometry geometry, Track track)
+  {
+    selection = new SequenceSelection(track.getTrackDataModel());
     
-  public JPopupMenu getMenu()
-  {
-    MonoTrackPopupMenu.getInstance().update(this);
-    return MonoTrackPopupMenu.getInstance();
-  }
-
-  public int trackCount()
-  {
-    if( gc.getFtsObject() instanceof FtsSequenceObject)
-      return ((FtsSequenceObject)gc.getFtsObject()).trackCount();
-    else
-      return 1;
-  }
-
-  public void paintComponent(Graphics g) 
-  {
-    Rectangle r = g.getClipBounds();
-    renderer.render(g, r); //et c'est tout	
-  }
-
-  private void createGraphicContext(Geometry geometry, TrackDataModel model)
-  {
-    selection = new SequenceSelection(model);
-    
-    gc = new SequenceGraphicContext(model, selection, this); //loopback?
+    gc = new SequenceGraphicContext(track.getTrackDataModel(), selection, this);
     gc.setGraphicSource(this);
     gc.setGraphicDestination(this);
+
     ad = new MonoDimensionalAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET);
-    itsTrack.getPropertySupport().addPropertyChangeListener(ad);
+    track.getPropertySupport().addPropertyChangeListener(ad);
     gc.setAdapter(ad);
     
     renderer = new MonoTrackRenderer(gc);
     gc.setRenderManager(renderer);
+    return gc;
   }
   
   public void setAdapter(MonoDimensionalAdapter adapter)
   {
-    itsTrack.getPropertySupport().removePropertyChangeListener(ad);	
-    itsTrack.getPropertySupport().addPropertyChangeListener(adapter);
+    track.getPropertySupport().removePropertyChangeListener(ad);	
+    track.getPropertySupport().addPropertyChangeListener(adapter);
     gc.setAdapter(adapter);	
     ad = adapter;
   }
@@ -230,126 +89,38 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     gc.setRenderManager(renderer);
   }
   
-  /**
-   * ListSelectionListener interface
-   */
-  
-  public void valueChanged(ListSelectionEvent e)
-  {
-    repaint();
-  }
-  
-  public void setViewMode(int viewType)
-  {
-    if(viewMode!=viewType)
-      {
-	viewMode=viewType;
-	itsTrack.setProperty("viewMode", new Integer(viewType));
-	repaint();
-      }    
-  }
-  
-  public int getViewMode()
-  {
-    return viewMode;
-  }
-
-    
-  public void showListDialog()
-  {
-    if(listDialog==null) 
-      createListDialog();
-    listDialog.setVisible(true);
-  }
-
-  private void createListDialog()
-  {
-    listDialog = new SequenceTableDialog(itsTrack, gc.getFrame(), gc);
-  }
-
-  public void updateNewObject(Object obj){};
-  
   void updateEventProperties(Object whichObject, String propName, Object propValue){}
   
   void updateRange(Object whichObject){}    
-  /**
-   * Track editor interface */
-  
-  public Component getComponent()
-  {
-    return this;
-  }
-  
-  public SequenceGraphicContext getGraphicContext()
-  {
-    return gc;
-  }
-
+    
   public int getDefaultHeight()
   {
     return DEFAULT_HEIGHT;
   }
   
-  public void dispose()
+  public void objectAdded(Object whichObject, int index) 
   {
-    if(listDialog != null)
-      listDialog.dispose();
+    if( !uploading)
+      {
+	updateNewObject(whichObject);
+	updateRange(whichObject);
+	super.objectAdded(whichObject, index);
+      }
   }
+  public void objectChanged(Object whichObject, String propName, Object propValue) 
+  {
+    updateEventProperties(whichObject, propName, propValue);
+    updateRange(whichObject);
+    super.objectChanged(whichObject, propName, propValue);
+  }
+
+  static int MONODIMENSIONAL_TRACK_OFFSET = 0;
   
-  public SequenceSelection getSelection()
-  {
-    return selection;
-  }
+  MonoDimensionalAdapter ad;
 
-    public Dimension getPreferredSize()
-    {
-	return new Dimension(SequenceWindow.DEFAULT_WIDTH-TrackContainer.BUTTON_WIDTH, DEFAULT_HEIGHT);
-    }
-
-    public Track getTrack()
-    {
-	return itsTrack;
-    }
-
-
-    public void processKeyEvent(KeyEvent e)
-    {
-	if(SequenceTextArea.isDeleteKey(e))
-	    {
-		if(e.getID()==KeyEvent.KEY_PRESSED)
-		    {
-			((UndoableData)itsTrack.getTrackDataModel()).beginUpdate();
-			selection.deleteAll();
-		    }
-	    }
-	else if((e.getKeyCode() == KeyEvent.VK_TAB)&&(e.getID()==KeyEvent.KEY_PRESSED))
-	    if(e.isControlDown())
-		selection.selectPrevious();
-	    else
-		selection.selectNext();
-
-	super.processKeyEvent(e);
-	requestFocus();
-    }
-
-    //--- FricativeTrackEditor fields
-    Geometry geometry;
-    SequenceGraphicContext gc;
-    SequenceSelection selection;
-    static int MONODIMENSIONAL_TRACK_OFFSET = 0;
-    static public int DEFAULT_HEIGHT = 127;
-    MonoTrackRenderer renderer;
-    MonoDimensionalAdapter ad;
-
-    Track itsTrack;
-    
-    MaxVector oldElements = new MaxVector();
-    SequenceTableDialog listDialog = null;
-
-    int viewMode = PEAKS_VIEW;
-    static public final int PEAKS_VIEW = 2;
-    static public final int STEPS_VIEW = 3;
-    static public final int BREAK_POINTS_VIEW = 4;
+  static public final int PEAKS_VIEW = 2;
+  static public final int STEPS_VIEW = 3;
+  static public final int BREAK_POINTS_VIEW = 4;
 }
 
 

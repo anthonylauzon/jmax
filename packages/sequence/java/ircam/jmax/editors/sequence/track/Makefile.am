@@ -37,6 +37,7 @@ TextDialog.java \
 ToggleBar.java \
 Track.java \
 TrackBase.java \
+TrackBaseEditor.java \
 TrackDataListener.java \
 TrackDataModel.java \
 TrackEditor.java \

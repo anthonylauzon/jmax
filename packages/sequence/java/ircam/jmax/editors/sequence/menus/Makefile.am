@@ -5,10 +5,10 @@ EditMenu.java \
 FileMenu.java \
 AnythingTrackPopupMenu.java \
 MessageTrackPopupMenu.java \
-MidiEventPopupMenu.java \
 MidiTrackPopupMenu.java \
 MonoTrackPopupMenu.java \
 RulerPopupMenu.java \
+TrackBasePopupMenu.java \
 TrackMenu.java 
 
 JAVAC = @JAVACX@

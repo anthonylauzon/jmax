@@ -40,45 +40,45 @@ import javax.swing.event.*;
  * and settings of y are simply ignored. */
 public class IntegerTrackEditor extends MonoTrackEditor
 {
-    public IntegerTrackEditor(Geometry g, Track track)
-    {
-	super(g, track);
+  public IntegerTrackEditor(Geometry g, Track trk)
+  {
+    super(g, trk);
 
-	if(track.getProperty("maximumValue")==null)
-	    track.setProperty("maximumValue", new Integer(IntegerValue.DEFAULT_MAX_VALUE));
-	if(track.getProperty("minimumValue")==null)
-	    track.setProperty("minimumValue", new Integer(IntegerValue.DEFAULT_MIN_VALUE));
-	if(track.getProperty("viewMode")==null)
-	    track.setProperty("viewMode", new Integer(viewMode));
+    if(track.getProperty("maximumValue")==null)
+      track.setProperty("maximumValue", new Integer(IntegerValue.DEFAULT_MAX_VALUE));
+    if(track.getProperty("minimumValue")==null)
+      track.setProperty("minimumValue", new Integer(IntegerValue.DEFAULT_MIN_VALUE));
+    if(track.getProperty("viewMode")==null)
+      track.setProperty("viewMode", new Integer(viewMode));
 
-	((MonoDimensionalAdapter)gc.getAdapter()).LabelMapper.setLabelType("value");
-	setRenderer(new IntegerTrackRenderer(gc));
+    ((MonoDimensionalAdapter)gc.getAdapter()).LabelMapper.setLabelType("value");
+    setRenderer(new IntegerTrackRenderer(gc));
 
-	super.setAdapter(new IntegerAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET));
-    }
+    super.setAdapter(new IntegerAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET));
+  }
     
-    public void reinit()
-    {
-	itsTrack.setProperty("maximumValue", new Integer(IntegerValue.DEFAULT_MAX_VALUE));
-	itsTrack.setProperty("minimumValue", new Integer(IntegerValue.DEFAULT_MIN_VALUE));
-	itsTrack.setProperty("viewMode", new Integer(PEAKS_VIEW));
-	((FtsTrackObject)itsTrack.getTrackDataModel()).setUntitled();
-    }
+  public void reinit()
+  {
+    track.setProperty("maximumValue", new Integer(IntegerValue.DEFAULT_MAX_VALUE));
+    track.setProperty("minimumValue", new Integer(IntegerValue.DEFAULT_MIN_VALUE));
+    track.setProperty("viewMode", new Integer(PEAKS_VIEW));
+    ((FtsTrackObject)track.getTrackDataModel()).setUntitled();
+  }
 
-    void updateRange(Object obj)
-    {
-	int max = ((IntegerAdapter)gc.getAdapter()).getMaximumValue();	
-	int min = ((IntegerAdapter)gc.getAdapter()).getMinimumValue();
-	int value = ((Integer)((TrackEvent)obj).getProperty("value")).intValue();
+  void updateRange(Object obj)
+  {
+    int max = ((IntegerAdapter)gc.getAdapter()).getMaximumValue();	
+    int min = ((IntegerAdapter)gc.getAdapter()).getMinimumValue();
+    int value = ((Integer)((TrackEvent)obj).getProperty("value")).intValue();
     
-	if(value>max) itsTrack.setProperty("maximumValue", new Integer(value));
-	if(value<min) itsTrack.setProperty("minimumValue", new Integer(value));
-    }
-
-    int viewMode = PEAKS_VIEW;
-    static public final int PEAKS_VIEW = 2;
-    static public final int STEPS_VIEW = 3;
-    static public final int BREAK_POINTS_VIEW = 4;
+    if(value>max) track.setProperty("maximumValue", new Integer(value));
+    if(value<min) track.setProperty("minimumValue", new Integer(value));
+  }
+  
+  int viewMode = PEAKS_VIEW;
+  static public final int PEAKS_VIEW = 2;
+  static public final int STEPS_VIEW = 3;
+  static public final int BREAK_POINTS_VIEW = 4;
 }
 
 

@@ -63,7 +63,7 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
   transient JLabel itsZoomLabel;
   transient JScrollBar itsTimeScrollbar;
   transient Geometry geometry;
-  transient ToolManager manager;
+  transient SequenceToolManager manager;
   
   public final int INITIAL_ZOOM = 20;
   public static final int MINIMUM_TIME = 10000;
@@ -108,7 +108,7 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
     //- Create a toolbar associated to this ToolManager
     //- Create a status bar containing the toolbar
     
-    manager = new ToolManager( SequenceTools.completeInstance);
+    manager = new SequenceToolManager( SequenceTools.completeInstance);
     toolbar = new EditorToolbar(manager, EditorToolbar.HORIZONTAL);
     toolbar.setSize( 156, 25);    
     toolbar.setPreferredSize(new Dimension( 156, 25));    

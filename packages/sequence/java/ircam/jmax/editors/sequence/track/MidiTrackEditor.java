@@ -27,6 +27,7 @@ import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.menus.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.*;
+import ircam.jmax.fts.*;
 import java.awt.*;
 import java.beans.*;
 import java.awt.event.*;
@@ -38,107 +39,18 @@ import javax.swing.event.*;
 /**
  * A view for a Midi sequence (sequence composed of events whose Value field is
  * a Midi value) */
-public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSelectionListener, ircam.jmax.toolkit.PopupProvider, TrackEditor
+public class MidiTrackEditor extends TrackBaseEditor
 {
-  public MidiTrackEditor(Geometry geometry, Track track)
+  public MidiTrackEditor(Geometry geometry, Track trk)
   {
+    super( geometry, trk);
+
     if(track.getProperty("maximumPitch")==null)
       track.setProperty("maximumPitch", new Integer(AmbitusValue.DEFAULT_MAX_PITCH));
     if(track.getProperty("minimumPitch")==null)
       track.setProperty("minimumPitch", new Integer(AmbitusValue.DEFAULT_MIN_PITCH));
-    
-    setLayout(new BorderLayout());
-    setBackground(Color.white);
 
-    setOpaque(false);
-    
-    this.track = track;
-    this.geometry = geometry;
-
-    //-- prepares the CENTER panel (the score)
-    // a simple panel, that just uses a Renderer as its paint method...
-    // it takes care of the popup showing.
-    
-    itsScore = new ScorePanel(this);
-
-    gc = prepareGraphicContext(geometry, track);
-
-    add(itsScore, BorderLayout.CENTER);
-
-    //---- simple things for simple minds
-    
-    geometry.addTranspositionListener(new TranspositionListener() {
-	public void transpositionChanged(int newTranspose)
-	{
-	  itsScore.repaint();
-	}
-      });
-    // make this panel repaint when the selection status change
-    // either in content or in ownership.
-    selection.addListSelectionListener(this);
-
-    selection.setOwner(new SelectionOwner() {
-	public void selectionDisactivated()
-	{
-	  itsScore.repaint();
-	}
-	public void selectionActivated()
-	{
-	  itsScore.repaint();
-	}
-      });
-
-    track.getTrackDataModel().addListener(this);
-    
-    track.getTrackDataModel().addTrackStateListener(new TrackStateListener(){
-	public void lock(boolean lock)
-	{
-	  for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
-	    ((TrackEvent) e.nextElement()).setHighlighted(false);
-	  
-	  oldElements.removeAllElements();
-	  getTrack().setProperty("locked", new Boolean(lock));
-	}
-	public void active(boolean active)
-	{
-	  getTrack().setProperty("active", (active) ? Boolean.TRUE : Boolean.FALSE);
-	}
-      });
-	
-    track.getTrackDataModel().addHighlightListener(new HighlightListener(){
-	public void highlight(Enumeration elements, double time)
-	{
-	  TrackEvent temp;
-	  boolean first = true;
-	  
-	  Rectangle clipRect = gc.getTrackClip().intersection(gc.getScrollManager().getViewRectangle());
-	  Graphics g = itsScore.getGraphics();  
-	  g.setClip(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
-	  
-	  for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
-	    {
-	      temp = (TrackEvent) e.nextElement();
-	      temp.setHighlighted(false);
-	      temp.getRenderer().render(temp, g, false, gc);			    
-	    }
-	  oldElements.removeAllElements();
-	  
-	  for (Enumeration e = elements; e.hasMoreElements();) 
-	    {
-	      temp = (TrackEvent) e.nextElement();
-	      if(first)
-		{
-		  gc.getScrollManager().makeVisible(temp);
-		  first = false;
-		}
-	      temp.setHighlighted(true);
-	      temp.getRenderer().render(temp, g, Event.HIGHLIGHTED, gc);
-	      oldElements.addElement(temp);			    
-	    }
-	}
-      });
-    
-    component = this;
+    viewMode = PIANOROLL_VIEW;
   }
 
   public void reinit()
@@ -149,33 +61,20 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     ((FtsTrackObject)track.getTrackDataModel()).setUntitled();
   }
   
-  public JMenu getToolsMenu()
+  void createPopupMenu()
   {
-    return gc.getToolbar().itsMenu;
-  }
-  public JPopupMenu getMenu()
-  {
-    MidiTrackPopupMenu.getInstance().update(this);
-    return MidiTrackPopupMenu.getInstance();
+    popup = new MidiTrackPopupMenu( this, gc.getFtsObject() instanceof FtsSequenceObject);
   }
 
-  public int trackCount()
-  {
-    if( gc.getFtsObject() instanceof FtsSequenceObject)
-      return ((FtsSequenceObject)gc.getFtsObject()).trackCount();
-    else
-      return 1;
-  }
-
-  private SequenceGraphicContext prepareGraphicContext(Geometry geometry, Track track)
+  SequenceGraphicContext createGraphicContext(Geometry geometry, Track track)
   {
     selection = new SequenceSelection(track.getTrackDataModel());
     
     //--- make this selection the current one when the track is activated
-    track.getPropertySupport().addPropertyChangeListener(new MidiTrackPropertyChangeListener());
-    gc = new SequenceGraphicContext(track.getTrackDataModel(), selection, this); //loopback?
-    gc.setGraphicSource(itsScore);
-    gc.setGraphicDestination(itsScore);
+    gc = new SequenceGraphicContext(track.getTrackDataModel(), selection, this);
+    gc.setGraphicSource(this);
+    gc.setGraphicDestination(this);
+
     PartitionAdapter ad = new PartitionAdapter(geometry, gc);
     track.getPropertySupport().addPropertyChangeListener(ad);
     gc.setAdapter(ad);
@@ -184,165 +83,18 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     return gc;
   }
   
-    /**
-     * Callback from the toolbar when a new tool have been
-     * selected by the user
-     */ 
-    public void toolChanged(ToolChangeEvent e) 
-    {
-	//SUSPENDED: requires knowledge of the status bar
-	/*if (e.getTool() != null) 
-	  {
-	  itsStatusBar.post(e.getTool(), "");
-	  }*/
-    }
-    
-  /**
-   * called when the database is changed: DataTrackListener interface
-   */
-  
-  boolean uploading  = false;
-  public void objectChanged(Object spec, String propName, Object propValue) 
-  {
-    repaint();
-  }
-  
-  public void objectAdded(Object spec, int index) 
-  {
-    if( !uploading)
-      repaint();
-  }
-  
-  public void objectsAdded(int maxTime) 
-  {
-    repaint();
-  }
-  
-  public void objectDeleted(Object whichObject, int index) 
-  {
-    repaint();
-  }
-  
-  public void trackCleared() 
-  {
-    repaint();
-  }
-  public void startTrackUpload( TrackDataModel track, int size)
-  {
-    uploading  = true;
-  }
-  public void endTrackUpload( TrackDataModel track)
-  {
-    uploading  = false;
-  }
-  public void startPaste(){}
-  public void endPaste(){}
-    
-  public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex) 
-  {
-    repaint();
-  }
-  
-  public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
-  
-  public void trackNameChanged(String oldName, String newName) 
-  {
-    track.setProperty("trackName", newName);
-  }
-  
-  /**
-   * ListSelectionListener interface
-   */
-    
-  public void valueChanged(ListSelectionEvent e)
-  {
-    repaint();
-  }
-
-  /* avoid to paint the white background twice*/   
-  public void update(Graphics g) {}
-  
-  
   /**
    * get the lenght (in milliseconds) of the window
    */
   public int windowTimeWidth() 
   {
-    return (int) (gc.getAdapter().getInvX(itsScore.getSize().width) - gc.getAdapter().getInvX(ScoreBackground.KEYEND)) - 1;
-    
+    return (int) (gc.getAdapter().getInvX(getSize().width) - gc.getAdapter().getInvX(ScoreBackground.KEYEND)) - 1;
   }
   
-  
-  /**
-   * from the StatusBarClient interface
-   */
-  public String getName() 
-  {
-    return "";
-  }
-
-
-  /**
-   * from the StatusBarClient interface
-   */
-  public ImageIcon getIcon() 
-  {
-    return null;
-  }
-
-  public SequenceSelection getSelection()
-  {
-    return selection;
-  }
-  
-
-  public void dispose()
-  {
-    if(listDialog != null)
-      listDialog.dispose();
-  }
-  
-
-  public Component getComponent()
-  {
-    return component;
-  }
-  
-  public void setComponent(Component c)
-  {
-    component = c;
-  }
-  
-  public SequenceGraphicContext getGraphicContext()
-  {
-    return gc;
-  }
-
-  public Dimension getPreferredSize()
-  {
-    return new Dimension(SequenceWindow.DEFAULT_WIDTH-TrackContainer.BUTTON_WIDTH, DEFAULT_HEIGHT);
-  }
-  
-  public Track getTrack()
-  {
-    return track;
-  }
-  
-  public void updateNewObject(Object obj){};
-
   public void setViewMode(int viewType)
   {
-    if(viewMode!=viewType)
-      {
-	viewMode=viewType;
-	renderer.setViewMode(viewMode);
-	track.setProperty("viewMode", new Integer(viewType));
-	repaint();
-      }    
-  }
-  public int getViewMode()
-  {
-    return viewMode;
+    super.setViewMode(viewType);
+    ((ScoreRenderer)renderer).setViewMode(viewMode);
   }
 
   String labelType = "none";
@@ -362,107 +114,14 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
   {
     return ((PartitionAdapter)gc.getAdapter()).getRangeHeight();
   }
-  public void showListDialog()
-  {
-    if(listDialog==null) 
-      createListDialog();
-    listDialog.setVisible(true);
-  }
 
-  private void createListDialog()
-  {
-    listDialog = new SequenceTableDialog(track, gc.getFrame(), gc);
-  }
+   //--- MidiTrack fields
+  transient MaxVector oldElements = new MaxVector();
+  transient SequenceTableDialog listDialog = null;
   
-  class ScorePanel extends ircam.jmax.toolkit.PopupToolbarPanel
-  {
-    MidiTrackEditor editor;
-    ScorePanel(MidiTrackEditor editor)
-    {
-      super(editor);
-      this.editor = editor; 
-    }
-
-    protected void processMouseEvent(MouseEvent e)
-    {
-      if(e.isPopupTrigger())
-	{
-	  if(editor.renderer.getViewMode()==NMS_VIEW)
-	    {
-	      TrackEvent event = null;
-	      int x = e.getX();
-	      int y = e.getY();
-	      event = (TrackEvent)editor.renderer.firstObjectContaining(x,y);
-	      if(event!=null)
-		{
-		  MidiEventPopupMenu popup = (MidiEventPopupMenu)event.getValue().getPopupMenu();
-		  if(popup!=null)
-		    {
-		      popup.update(event, editor.gc);
-		      popup.show (e.getComponent(), x-10, y-10);
-		    }		      
-		  return;
-		}
-	    }
-	}
-      super.processMouseEvent(e);
-    }
-
-    public void processKeyEvent(KeyEvent e)
-    {
-      if(SequenceTextArea.isDeleteKey(e))
-	{
-	  if(e.getID()==KeyEvent.KEY_PRESSED)
-	    {
-	      ((UndoableData)track.getTrackDataModel()).beginUpdate();
-	      editor.getSelection().deleteAll();
-	    }	    
-	}
-      else if((e.getKeyCode() == KeyEvent.VK_TAB)&&(e.getID()==KeyEvent.KEY_PRESSED))
-	if(e.isControlDown())
-	  editor.getSelection().selectPrevious();
-	else
-	  editor.getSelection().selectNext();
-      
-      super.processKeyEvent(e);
-      requestFocus();
-    }
-   
-    public void paint(Graphics g) 
-    {
-      Rectangle r = g.getClipBounds();
-      renderer.render(g, r); //et c'est tout	
-    }
-  }
-
-  class MidiTrackPropertyChangeListener implements PropertyChangeListener 
-  {
-    public void propertyChange(PropertyChangeEvent e)
-    {
-      if (e.getPropertyName().equals("selected") && e.getNewValue().equals(Boolean.TRUE))
-	SequenceSelection.setCurrent(selection);
-    }
-  }
-
-
-    //--- MidiTrack fields
-    transient Geometry geometry;
-    transient SequenceGraphicContext gc;
-    transient Track track;
-    transient ScoreRenderer renderer;
-    transient Component component;
-    transient SequenceSelection selection;
-    
-    transient ScorePanel itsScore;
-
-    transient MaxVector oldElements = new MaxVector();
-    transient SequenceTableDialog listDialog = null;
-    /*****************/
-
-    int viewMode = PIANOROLL_VIEW;
-    public static int DEFAULT_HEIGHT = 430;
-    static public final int PIANOROLL_VIEW = 0;
-    static public final int NMS_VIEW = 1;
+  public static int DEFAULT_HEIGHT = 430;
+  static public final int PIANOROLL_VIEW = 0;
+  static public final int NMS_VIEW = 1;
 }
 
 

@@ -119,11 +119,7 @@ public class Actions
 
   //******** Merge reintroduction *******************//
   public static EditorAction mergeAction     = new MergeAction();
-
-  public static EditorAction moveMidiTrackToAction = new MoveMidiTrackToAction();
-  public static EditorAction moveMonodimensionalTrackToAction = new MoveMonoTrackToAction();
   public static EditorAction moveClosedTrackToAction = new MoveClosedTrackToAction();
-  public static EditorAction labelTypesAction = new LabelTypesAction();
 }
 
 

@@ -40,29 +40,28 @@ import javax.swing.event.*;
  * and settings of y are simply ignored. */
 public class FloatTrackEditor extends MonoTrackEditor
 {
-    public FloatTrackEditor(Geometry g, Track track)
-    {
-      super(g, track);
+  public FloatTrackEditor(Geometry g, Track trk)
+  {
+    super(g, trk);
+    
+    if(track.getProperty("maximumValue")==null)
+      track.setProperty("maximumValue", new Integer(FloatValue.DEFAULT_MAX_VALUE));
+    if(track.getProperty("minimumValue")==null)
+      track.setProperty("minimumValue", new Integer(FloatValue.DEFAULT_MIN_VALUE));
+    if(track.getProperty("viewMode")==null)
+      track.setProperty("viewMode", new Integer(viewMode));
       
-      if(track.getProperty("maximumValue")==null)
-	track.setProperty("maximumValue", new Integer(FloatValue.DEFAULT_MAX_VALUE));
-      if(track.getProperty("minimumValue")==null)
-	track.setProperty("minimumValue", new Integer(FloatValue.DEFAULT_MIN_VALUE));
-      if(track.getProperty("viewMode")==null)
-	track.setProperty("viewMode", new Integer(viewMode));
-      
-      //((MonoDimensionalAdapter)gc.getAdapter()).setLabelMapper(IntegerLabelMapper.getMapper());
-      setRenderer(new IntegerTrackRenderer(gc));
+    setRenderer(new IntegerTrackRenderer(gc));
 
-      super.setAdapter(new FloatAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET));
-    }
+    super.setAdapter(new FloatAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET));
+  }
 
   public void reinit()
   {
-    itsTrack.setProperty("maximumValue", new Integer(FloatValue.DEFAULT_MAX_VALUE));
-    itsTrack.setProperty("minimumValue", new Integer(FloatValue.DEFAULT_MIN_VALUE));
-    itsTrack.setProperty("viewMode", new Integer(PEAKS_VIEW));
-    ((FtsTrackObject)itsTrack.getTrackDataModel()).setUntitled();
+    track.setProperty("maximumValue", new Integer(FloatValue.DEFAULT_MAX_VALUE));
+    track.setProperty("minimumValue", new Integer(FloatValue.DEFAULT_MIN_VALUE));
+    track.setProperty("viewMode", new Integer(PEAKS_VIEW));
+    ((FtsTrackObject)track.getTrackDataModel()).setUntitled();
   }
     
   void updateRange(Object obj)
@@ -71,8 +70,8 @@ public class FloatTrackEditor extends MonoTrackEditor
     int min = ((IntegerAdapter)gc.getAdapter()).getMinimumValue();
     float value = ((Float)((TrackEvent)obj).getProperty("value")).floatValue();
     
-    if(value>(float)max) itsTrack.setProperty("maximumValue", new Integer((int)value+1));
-    if(value<(float)min) itsTrack.setProperty("minimumValue", new Integer((int)value-1));
+    if(value>(float)max) track.setProperty("maximumValue", new Integer((int)value+1));
+    if(value<(float)min) track.setProperty("minimumValue", new Integer((int)value-1));
   }
 
   int viewMode = PEAKS_VIEW;

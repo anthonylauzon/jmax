@@ -39,8 +39,7 @@ public class MoveClosedTrackToAction extends EditorAction
   int position;
   public  void actionPerformed(ActionEvent e)
   {
-      //position = Integer.valueOf(((JMenuItem)e.getSource()).getText()).intValue()-1;
-      position = Integer.valueOf(((JMenuItem)e.getSource()).getText()).intValue();
+    position = Integer.valueOf(((JMenuItem)e.getSource()).getText()).intValue();
     super.actionPerformed(e);
   }
 

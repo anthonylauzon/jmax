@@ -125,10 +125,10 @@ public class TrackWindow extends JFrame implements EditorContainer{
     setJMenuBar(mb);
   }
 
-   public EditMenu getEditMenu()
-	  {
-		 return editMenu;
-	  }
+  public EditMenu getEditMenu()
+  {
+    return editMenu;
+  }
     
   // ------ editorContainer interface ---------------
   public Editor getEditor(){

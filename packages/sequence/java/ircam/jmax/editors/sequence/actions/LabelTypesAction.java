@@ -30,6 +30,7 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.menus.*;
+import ircam.jmax.editors.sequence.track.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
@@ -37,6 +38,13 @@ import ircam.jmax.toolkit.actions.*;
 public class LabelTypesAction extends EditorAction
 {
   String type;
+  MidiTrackEditor editor;
+  public LabelTypesAction( MidiTrackEditor editor)
+  {
+    super();
+    this.editor = editor;
+  }
+
   public  void actionPerformed(ActionEvent e)
   {
     type = ((JMenuItem)e.getSource()).getText();
@@ -45,7 +53,7 @@ public class LabelTypesAction extends EditorAction
 
   public void doAction(EditorContainer container)
   {
-    MidiTrackPopupMenu.getPopupTarget().setLabelType( type);
+    editor.setLabelType( type);
   }
 }
 

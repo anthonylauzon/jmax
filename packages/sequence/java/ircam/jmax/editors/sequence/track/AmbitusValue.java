@@ -124,7 +124,6 @@ public class AmbitusValue extends AbstractEventValue
 
   public JPopupMenu getPopupMenu()
   {
-    //return MidiEventPopupMenu.getInstance();
     return null;
   } 
 

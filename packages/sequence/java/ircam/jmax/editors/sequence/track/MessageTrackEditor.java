@@ -26,6 +26,7 @@ import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.menus.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.fts.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
@@ -92,10 +93,9 @@ public class MessageTrackEditor extends MonoTrackEditor
       });
   }
     
-  public JPopupMenu getMenu()
+  void createPopupMenu()
   {
-    MessageTrackPopupMenu.getInstance().update(this);
-    return MessageTrackPopupMenu.getInstance();
+    popup = new MessageTrackPopupMenu( this, (((FtsGraphicObject)track.getTrackDataModel()) instanceof FtsSequenceObject));
   }
   
   void doEdit(Event evt, int x, int y)
@@ -162,9 +162,9 @@ public class MessageTrackEditor extends MonoTrackEditor
     if(isEditing)
       if((id==MouseEvent.MOUSE_PRESSED)&&(e.getClickCount() == 1))
 	{
-	  ((UndoableData)itsTrack.getTrackDataModel()).beginUpdate();
+	  ((UndoableData)track.getTrackDataModel()).beginUpdate();
 	  setMessage();
-	  ((UndoableData)itsTrack.getTrackDataModel()).endUpdate();
+	  ((UndoableData)track.getTrackDataModel()).endUpdate();
 	}
       else if(isExitedFromTrack(e))
 	{
@@ -253,9 +253,9 @@ public class MessageTrackEditor extends MonoTrackEditor
 	  }
     }
 
-    SequenceTextArea area;
-    boolean isEditing = false;
-    Event currentEvt = null;
+  SequenceTextArea area;
+  boolean isEditing = false;
+  Event currentEvt = null;
 }
 
 

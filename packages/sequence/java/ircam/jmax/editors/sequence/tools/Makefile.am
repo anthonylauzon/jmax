@@ -6,6 +6,7 @@ CombTool.java \
 LinerTool.java \
 ResizerTool.java \
 SelecterTool.java \
+SequenceToolManager.java \
 SequenceTools.java \
 VResizerTool.java \
 ZoomTool.java 

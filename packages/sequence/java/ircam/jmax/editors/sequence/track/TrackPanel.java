@@ -58,7 +58,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   transient JLabel itsZoomLabel;
   transient JScrollBar itsTimeScrollbar;
   transient Geometry geometry;
-  transient ToolManager manager;
+  transient SequenceToolManager manager;
   transient TrackBase track;
   transient TrackEditor trackEditor;
   transient JProgressBar progressBar;
@@ -100,14 +100,14 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     
     if( ftsTrackObject.getType().getName().equals( AmbitusValue.AMBITUS_NAME) )
       {
-	manager = new ToolManager( SequenceTools.scoobInstance);
+	manager = new SequenceToolManager( SequenceTools.scoobInstance);
 	toolbar = new EditorToolbar( manager, EditorToolbar.HORIZONTAL);
 	toolbar.setSize( 110, 25);    
 	toolbar.setPreferredSize( new Dimension( 110, 25));    
       }    
     else
       {
-	manager = new ToolManager( SequenceTools.numberInstance);
+	manager = new SequenceToolManager( SequenceTools.numberInstance);
 	toolbar = new EditorToolbar( manager, EditorToolbar.HORIZONTAL);
 	toolbar.setSize( 156, 25);    
 	toolbar.setPreferredSize( new Dimension( 156, 25));    

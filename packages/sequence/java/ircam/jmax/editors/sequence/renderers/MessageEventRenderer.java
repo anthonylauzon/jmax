@@ -44,7 +44,7 @@ public class MessageEventRenderer implements SeqObjectRenderer {
    */
     public MessageEventRenderer(SequenceGraphicContext theGc) 
     {
-	gc = theGc;
+      gc = theGc;
     }
 
   /**
@@ -189,19 +189,19 @@ public class MessageEventRenderer implements SeqObjectRenderer {
    */
     public boolean touches(Object obj, int x, int y, int w, int h, GraphicContext theGc) 
     {
-	Event e = (Event) obj;
-	SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
-	MessageAdapter a = (MessageAdapter)gc.getAdapter();
+      Event e = (Event) obj;
+      SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
+      MessageAdapter a = (MessageAdapter)gc.getAdapter();
 
-	int evtx = a.getX(e);
-	int evty = a.getY(e);
+      int evtx = a.getX(e);
+      int evty = a.getY(e);
 	
-	int evtLenght = a.getLenght(e);
-	int evtHeight = ((Integer)e.getProperty("height")).intValue()+2;
+      int evtLenght = a.getLenght(e);
+      int evtHeight = ((Integer)e.getProperty("height")).intValue()+2;
 
-	eventRect.setBounds(evtx, evty, evtLenght, evtHeight);
-	tempRect.setBounds(x, y, w, h);
-	return  eventRect.intersects(tempRect);
+      eventRect.setBounds(evtx, evty, evtLenght, evtHeight);
+      tempRect.setBounds(x, y, w, h);
+      return  eventRect.intersects(tempRect);
     }
 
     public static MessageEventRenderer getRenderer()

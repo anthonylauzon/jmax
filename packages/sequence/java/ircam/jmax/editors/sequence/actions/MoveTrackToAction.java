@@ -30,13 +30,21 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.menus.*;
+import ircam.jmax.editors.sequence.track.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
-public class MoveMidiTrackToAction extends EditorAction
+public class MoveTrackToAction extends EditorAction
 {
   int position;
+  TrackEditor editor;
+  
+  public MoveTrackToAction( TrackEditor editor)
+  {
+    super();
+    this.editor = editor;
+  }
   public  void actionPerformed(ActionEvent e)
   {
     position = Integer.valueOf(((JMenuItem)e.getSource()).getText()).intValue();
@@ -45,8 +53,8 @@ public class MoveMidiTrackToAction extends EditorAction
 
   public void doAction(EditorContainer container)
   {
-      ((SequencePanel)container.getEditor()).getFtsSequenceObject().
-	  requestTrackMove( MidiTrackPopupMenu.getPopupTarget().getTrack(), position);    
+    ((SequencePanel)container.getEditor()).getFtsSequenceObject().
+      requestTrackMove( editor.getTrack(), position);    
   }
 }
 

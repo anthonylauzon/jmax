@@ -35,44 +35,32 @@ import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.actions.*;
 import ircam.jmax.editors.sequence.track.*;
 
-//
-// The graphic pop-up menu used to change the number of an inlet or an outlet in a subpatcher.
-//
-
-public class MidiTrackPopupMenu extends JPopupMenu 
+public class MidiTrackPopupMenu extends TrackBasePopupMenu 
 {
-  static private MidiTrackPopupMenu popup = new MidiTrackPopupMenu();
-
-  int x;
-  int y;
-  MidiTrackEditor target = null;    
-  private boolean added = false;
-  JMenuItem removeItem, nameItem;
-  JMenu moveMenu, labelTypesMenu;
+  JMenu labelTypesMenu;
   private ButtonGroup labelTypesMenuGroup;
-  //int trackCount = 1;
-  int trackCount = 0;
 
   JLabel maxLabel, minLabel;
   JSlider maxSlider, minSlider;
   Box maxBox, minBox;
+  LabelTypesAction labelAction;
 
-  public MidiTrackPopupMenu()
+  public MidiTrackPopupMenu( MidiTrackEditor editor, boolean isInSequence)
   {
-    super();
-    JMenuItem item;
-
-    addSeparator();
-    moveMenu = new JMenu("Move to Position");
-    item = new JMenuItem(""+trackCount);
-    item.addActionListener( Actions.moveMidiTrackToAction);
-    moveMenu.add(item);
-    
-    add(moveMenu);
+    super(editor, isInSequence);
 
     addSeparator();
 
-    ////////////////////// Range Menu //////////////////////////////
+    labelTypesMenu = new JMenu("Labels");
+    add( labelTypesMenu);
+
+    labelAction = new LabelTypesAction((MidiTrackEditor)target);
+
+    pack();
+  }
+
+  void addRangeMenu()
+  {
     JMenu rangeMenu = new JMenu("Range");
     JMenu maxRangeMenu = new JMenu("Maximum");
     JMenu minRangeMenu = new JMenu("Minimum");
@@ -87,25 +75,25 @@ public class MidiTrackPopupMenu extends JPopupMenu
     maxSlider.setPaintTicks(true);
     maxSlider.addChangeListener(new ChangeListener(){
 	public void stateChanged(ChangeEvent e) {
-	    JSlider source = (JSlider)e.getSource();
-	    int max = (int)source.getValue();
-	    int min = ((Integer)target.getTrack().getProperty("minimumPitch")).intValue();	    
-	    if(max<min) max = min+1;
+	  JSlider source = (JSlider)e.getSource();
+	  int max = (int)source.getValue();
+	  int min = ((Integer)target.getTrack().getProperty("minimumPitch")).intValue();	    
+	  if(max<min) max = min+1;
 	    
-	    if(!source.getValueIsAdjusting())
-		target.getTrack().setProperty("maximumPitch", new Integer(max));
-	    
-	    maxLabel.setText(""+max);
+	  if(!source.getValueIsAdjusting())
+	    target.getTrack().setProperty("maximumPitch", new Integer(max));
+	  
+	  maxLabel.setText(""+max);
 	}
-    });
+      });
     maxBox = new Box(BoxLayout.Y_AXIS);
     maxBox.add(maxSlider);
     maxBox.add(maxLabel);
     maxBox.validate();
-
+    
     minLabel = new JLabel("  0  ", JLabel.CENTER);
     minLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+    
     minSlider = new JSlider(JSlider.VERTICAL, 0, 127, 0);
     minSlider.setMajorTickSpacing(12);
     minSlider.setMinorTickSpacing(6);
@@ -113,148 +101,52 @@ public class MidiTrackPopupMenu extends JPopupMenu
     minSlider.setPaintTicks(true);
     minSlider.addChangeListener(new ChangeListener(){
 	public void stateChanged(ChangeEvent e) {
-	    JSlider source = (JSlider)e.getSource();
-	    int min = (int)source.getValue();
-	    int max = ((Integer)target.getTrack().getProperty("maximumPitch")).intValue();
-	    if(min>max) min = max-1;
-
-	    if (!source.getValueIsAdjusting())
-		target.getTrack().setProperty("minimumPitch", new Integer(min));
-	    
-	    minLabel.setText(""+min);
+	  JSlider source = (JSlider)e.getSource();
+	  int min = (int)source.getValue();
+	  int max = ((Integer)target.getTrack().getProperty("maximumPitch")).intValue();
+	  if(min>max) min = max-1;
+	  
+	  if (!source.getValueIsAdjusting())
+	    target.getTrack().setProperty("minimumPitch", new Integer(min));
+	  
+	  minLabel.setText(""+min);
 	}
-    });
+      });
     minBox = new Box(BoxLayout.Y_AXIS);
     minBox.add(minSlider);
     minBox.add(minLabel);
     minBox.validate();
-
+    
     maxRangeMenu.add(maxBox);
     minRangeMenu.add(minBox);
-
+    
     rangeMenu.add(maxRangeMenu);
     rangeMenu.add(minRangeMenu);
-
-    add(rangeMenu);
-
-    nameItem = new JMenuItem("Name");
-    nameItem.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	  ChangeTrackNameDialog.changeName(MidiTrackPopupMenu.getPopupTarget().getTrack(),  
-					   MidiTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame(),
-					   SwingUtilities.convertPoint(MidiTrackPopupMenu.getPopupTarget(), 
-								       MidiTrackPopupMenu.getPopupX(),
-								       MidiTrackPopupMenu.getPopupY(),
-								       MidiTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame()));
-	}
-      });
     
-    add(nameItem);
-    ////////////////////// View Menu //////////////////////////////
+    add(rangeMenu);
+  }
+
+  void addViewMenu()
+  {
+    JMenuItem item;
     JMenu viewMenu = new JMenu("View");
     item = new JMenuItem("Pianoroll");
-    item.addActionListener(new SetViewAction(MidiTrackEditor.PIANOROLL_VIEW));
+    item.addActionListener(new SetViewAction(MidiTrackEditor.PIANOROLL_VIEW, target));
     viewMenu.add(item);    
     item = new JMenuItem("Staves");
-    item.addActionListener(new SetViewAction(MidiTrackEditor.NMS_VIEW));
+    item.addActionListener(new SetViewAction(MidiTrackEditor.NMS_VIEW, target));
     viewMenu.add(item);
 
-    addSeparator();
     add(viewMenu);
-
-    item = new JMenuItem("View as list");
-    item.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	    MidiTrackPopupMenu.getPopupTarget().showListDialog();
-	}
-    });
-    add(item);
-    addSeparator();
-
-    ////////////////////// others  //////////////////////////////
-    labelTypesMenu = new JMenu("Labels");
-    add( labelTypesMenu);
-
-    item = new JMenuItem("Select All");
-    item.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	    MidiTrackPopupMenu.getPopupTarget().getSelection().selectAll();
-	    MidiTrackPopupMenu.getPopupTarget().getGraphicContext().getGraphicDestination().requestFocus();
-	}
-    });
-    add(item);
-
-    addSeparator();
-    removeItem = new JMenuItem("Remove Track");
-    removeItem.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	  ((FtsSequenceObject)MidiTrackPopupMenu.getPopupTarget().getGraphicContext().getFtsObject()).
-	    removeTrack(MidiTrackPopupMenu.getPopupTarget().getTrack());
-	}
-    });
-    add(removeItem);
-
-    addSeparator();
-    item = new JMenuItem("Export Track");
-    item.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	    MidiTrackPopupMenu.getPopupTarget().getTrack().getFtsTrack().export();
-	}
-    });
-    add(item);
-
-    pack();
   }
 
-  static public MidiTrackPopupMenu getInstance()
+  public void update( MidiTrackEditor editor)
   {
-    return popup;
-  }
+    updateChangeRangeMenu();
 
-  static public MidiTrackEditor getPopupTarget(){
-    return popup.target;
-  }
-
-  static public void update( MidiTrackEditor editor)
-  {
-    if( !popup.added) 
-      {
-	popup.insert( editor.getToolsMenu(), 0);
-        popup.target = editor;
-	popup.added = true;
-	popup.pack();
-      }
-    else
-      {
-	popup.remove(popup.target.getToolsMenu());
-	MonoTrackPopupMenu.getInstance().remove( popup.target.getToolsMenu());
-	
-	popup.insert( editor.getToolsMenu(), 0);
-	popup.target = editor;
-	popup.pack();
-      }
-    popup.updateChangeRangeMenu();
-
-    popup.updateLabelTypesMenu();
+    updateLabelTypesMenu();
     
-    if( popup.target.getGraphicContext().getFtsObject() instanceof FtsSequenceObject)
-      {
-	popup.moveMenu.setEnabled( true);
-	popup.removeItem.setEnabled( true);
-	popup.nameItem.setEnabled( true);
-	popup.updateMoveToMenu();
-      }
-    else
-      {
-	popup.moveMenu.setEnabled( false);
-	popup.removeItem.setEnabled( false);
-	popup.nameItem.setEnabled( false);
-      }
+    super.update(editor);
   }
 
   void updateLabelTypesMenu()
@@ -262,12 +154,12 @@ public class MidiTrackPopupMenu extends JPopupMenu
     labelTypesMenu.removeAll();
     labelTypesMenuGroup = new ButtonGroup();
     
-    String currentType = target.getLabelType();
+    String currentType = ((MidiTrackEditor)target).getLabelType();
     String type;
 
     JRadioButtonMenuItem selectItem = null;
     JRadioButtonMenuItem item =  new JRadioButtonMenuItem( "none"); 
-    item.addActionListener( Actions.labelTypesAction);
+    item.addActionListener( labelAction);
     labelTypesMenu.add( item);
     labelTypesMenuGroup.add(item);
     if( currentType.equals("none"))
@@ -277,7 +169,7 @@ public class MidiTrackPopupMenu extends JPopupMenu
       {
 	type = (String)e.nextElement();
 	item = new JRadioButtonMenuItem( type);
-	item.addActionListener( Actions.labelTypesAction);
+	item.addActionListener( labelAction);
 	labelTypesMenu.add(item);
 	labelTypesMenuGroup.add(item);
 	if( currentType.equals(type)) selectItem = item;
@@ -286,30 +178,6 @@ public class MidiTrackPopupMenu extends JPopupMenu
     if( selectItem != null) selectItem.setSelected( true);
   }
 
-  void updateMoveToMenu()
-  {
-    JMenuItem item;
-    int count =  target.trackCount()-1;
-    if(trackCount==count)
-      return;
-    else
-      {
-	int dif = count-trackCount;
-	
-	if(dif>0)
-	  for(int i=1; i<=dif; i++)
-	    {
-	      item = new JMenuItem(""+(trackCount+i));
-	      item.addActionListener(Actions.moveMidiTrackToAction);
-	      moveMenu.add(item);			
-	    }		
-	else
-	  for(int i=0; i<-dif; i++)
-	    moveMenu.remove(moveMenu.getItemCount()-1);
-	trackCount = count;
-      }
-  }
-    
   void updateChangeRangeMenu()
   {
     int max =  ((Integer)target.getTrack().getProperty("maximumPitch")).intValue();
@@ -318,39 +186,6 @@ public class MidiTrackPopupMenu extends JPopupMenu
     if(maxSlider.getValue()!=max) maxSlider.setValue(max);
     if(minSlider.getValue()!=min) minSlider.setValue(min);
   }
-
-  class SetViewAction extends AbstractAction {
-    SetViewAction(int viewType)
-    {
-      super("Set View");
-      this.viewType = viewType;
-    }
-    
-    public void actionPerformed(ActionEvent e)
-    {
-      MidiTrackPopupMenu.getPopupTarget().setViewMode(viewType);
-    }
-	
-    int viewType;    
-  }  
-
-  public void show(Component invoker, int x, int y)
-  {
-      this.x = x;
-      this.y = y;
-      
-      super.show(invoker, x, y);
-  }
-  static public int getPopupX()
-  {
-      return popup.x;
-  }
-  static public int getPopupY()
-  {
-      return popup.y;
-  }
-    
-
 }
 
 
