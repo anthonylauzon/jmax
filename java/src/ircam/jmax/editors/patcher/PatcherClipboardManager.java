@@ -243,25 +243,6 @@ public class PatcherClipboardManager implements ClipboardOwner
 
     Copy(container); 
     Paste(container);
-
-    // (fd) if only one object duplicated, then edit it with all text selected
-
-    if (ErmesSelection.patcherSelection.isSingleton())
-      {
-	GraphicObject obj = (GraphicObject)ErmesSelection.patcherSelection.getSingleton();
-
-	if (obj instanceof Editable)
-	  {
-	    ErmesSelection.patcherSelection.deselectAll();
-
-	    sketch.textEditObject((Editable)obj);
-	    SwingUtilities.invokeLater(new Runnable(){
-	      public void run(){
-		sketch.getEditField().selectAll();
-	      }
-	    });
-	  }
-      }
   }
 }
 

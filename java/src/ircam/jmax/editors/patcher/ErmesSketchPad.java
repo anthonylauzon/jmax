@@ -104,17 +104,17 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
     Graphics gr;
 
     if (isLocked()){
-	gr = getGraphics();
-	if(gr!=null)
-	    {
-		((Graphics2D)gr).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		SwingUtilities.computeIntersection(rect.x, rect.y, rect.width, rect.height, invalid);
-		gr.setClip(invalid);
-		displayList.updatePaint(gr);
-	    }
+      gr = getGraphics();
+      if(gr!=null)
+	{
+	  ((Graphics2D)gr).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	  SwingUtilities.computeIntersection(rect.x, rect.y, rect.width, rect.height, invalid);
+	  gr.setClip(invalid);
+	  displayList.updatePaint(gr);
+	}
     }    
     else
-	repaint(invalid); 
+      repaint(invalid); 
   }
 
   // ------------------------------------------------
@@ -197,22 +197,22 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
   public final void changeDefaultFontStyle(String style, boolean selected) 
   {
     if(style.equals("Bold"))
-	{
-	    if((defaultFontStyle == Font.BOLD || defaultFontStyle == Font.BOLD+Font.ITALIC)&&(!selected))
-		defaultFontStyle -= Font.BOLD;
-	    else
-	      if((defaultFontStyle != Font.BOLD && defaultFontStyle != Font.BOLD+Font.ITALIC)&&(selected))
-		  defaultFontStyle += Font.BOLD;
+      {
+	if((defaultFontStyle == Font.BOLD || defaultFontStyle == Font.BOLD+Font.ITALIC)&&(!selected))
+	  defaultFontStyle -= Font.BOLD;
+	else
+	  if((defaultFontStyle != Font.BOLD && defaultFontStyle != Font.BOLD+Font.ITALIC)&&(selected))
+	    defaultFontStyle += Font.BOLD;
       }
-      else
-	  if(style.equals("Italic"))
-	      {
-		  if((defaultFontStyle == Font.ITALIC || defaultFontStyle == Font.BOLD+Font.ITALIC)&&(!selected))
-		      defaultFontStyle -= Font.ITALIC;
-		  else
-		      if((defaultFontStyle != Font.ITALIC && defaultFontStyle != Font.BOLD+Font.ITALIC)&&(selected))
-			  defaultFontStyle += Font.ITALIC;
-	      }
+    else
+      if(style.equals("Italic"))
+	{
+	  if((defaultFontStyle == Font.ITALIC || defaultFontStyle == Font.BOLD+Font.ITALIC)&&(!selected))
+	    defaultFontStyle -= Font.ITALIC;
+	  else
+	    if((defaultFontStyle != Font.ITALIC && defaultFontStyle != Font.BOLD+Font.ITALIC)&&(selected))
+	      defaultFontStyle += Font.ITALIC;
+	}
   }
 
   private boolean automaticFitToText = false;
@@ -318,6 +318,25 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
     pastedConnections.removeAllElements();
     
     fixSize();
+
+    // (fd) if only one object pasted, then edit it with all text selected
+    if (ErmesSelection.patcherSelection.isSingleton())
+      {
+	GraphicObject obj = (GraphicObject)ErmesSelection.patcherSelection.getSingleton();
+      
+	if (obj instanceof Editable)
+	  {
+	    ErmesSelection.patcherSelection.deselectAll();
+      
+	    textEditObject((Editable)obj);
+	    SwingUtilities.invokeLater(new Runnable(){
+		public void run(){
+		  getEditField().selectAll();
+		}
+	      });
+	  }
+      }
+
     repaint();
   }
 
