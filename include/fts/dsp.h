@@ -438,6 +438,9 @@ FTS_API void dsp_chain_fprint(FILE *f);
 FTS_API void dsp_chain_fprint_signals(FILE *f);
 FTS_API ftl_program_t *dsp_get_current_dsp_chain( void);
 
+FTS_API void fts_dsp_add_function_zero(fts_symbol_t signal, int size);
+FTS_API void fts_dsp_add_function_copy(fts_symbol_t in, fts_symbol_t out, int size);
+
 /* old names of user API */
 #define dsp_list_insert(o) fts_dsp_add_object(o)
 #define dsp_list_remove(o) fts_dsp_remove_object(o)
