@@ -63,7 +63,7 @@ public class ToolsPanel extends JFrame implements FtsActionListener
     static void registerToolsPanel()
     {
 	MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
-		public String getToolName() { return "Tools Panel";}
+		public String getToolName() { return "Tools";}
 		public void open() { ToolsPanel.open();}
 	    });
     }

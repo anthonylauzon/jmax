@@ -341,6 +341,12 @@ send_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   fts_channel_propagate_input( this->channel, propagate_fun, propagate_context, 0);
 }
 
+static void 
+send_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc-1, o->argv+1);
+}
+
 fts_status_t
 send_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
@@ -349,6 +355,7 @@ send_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, send_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, send_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find_friends, send_find_friends);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_spost_description, send_spost_description); 
 
   fts_method_define_varargs(cl, 0, fts_s_anything, send_anything);
   fts_class_define_thru(cl, send_propagate_input);
@@ -404,6 +411,12 @@ receive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_channel_remove_target(this->channel, (fts_object_t *)this);
 }
 
+static void 
+receive_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc-1, o->argv+1);
+}
+
 fts_status_t
 receive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
@@ -412,6 +425,7 @@ receive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, receive_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, receive_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find_friends, send_find_friends);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_spost_description, receive_spost_description); 
 
   return fts_Success;
 }

@@ -214,7 +214,7 @@ inlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, inlet_delete);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, inlet_save_dotpat); 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_spost_description, inlet_spost_description); 
-      
+
       fts_class_define_thru(cl, 0);
       
       inlet_class = cl;
