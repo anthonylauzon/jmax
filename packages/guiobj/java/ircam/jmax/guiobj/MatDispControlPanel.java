@@ -188,6 +188,8 @@ public class MatDispControlPanel extends JPanel implements ActionListener, Objec
 
     add(minPanel);
 
+    add( new JSeparator());
+
     JLabel zoomLabel = new JLabel("Zoom", JLabel.CENTER);
     zoomLabel.setForeground(Color.black);
 

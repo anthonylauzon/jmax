@@ -48,8 +48,6 @@ public class FloatBoxControlPanel extends JPanel implements ActionListener, Obje
     super();
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-    add( new JSeparator());
-
     JLabel incrLabel = new JLabel("Increment", JLabel.CENTER);
     incrLabel.setForeground(Color.black);
 
@@ -61,15 +59,14 @@ public class FloatBoxControlPanel extends JPanel implements ActionListener, Obje
     add(labelBox);    
 
     incrField = new JTextField();
-    incrField.setPreferredSize(new Dimension(120, 20));
-    incrField.setMaximumSize(new Dimension(120, 20));
+    incrField.setPreferredSize(new Dimension(140, 20));
     incrField.addActionListener(this);
     incrField.requestDefaultFocus();
 
     Box fieldBox = new Box( BoxLayout.X_AXIS);
-    fieldBox.add( Box.createRigidArea(new Dimension(20, 0)));    
+    fieldBox.add( Box.createRigidArea(new Dimension(2, 0)));    
     fieldBox.add( incrField);    
-    fieldBox.add( Box.createHorizontalGlue());    
+    fieldBox.add( Box.createRigidArea(new Dimension(2, 0)));    
 
     add( fieldBox);
 

@@ -70,7 +70,6 @@ public class XYPad extends GraphicObject
   private int yRangeMax;
   private int yRangeMin;
 
-  public static XYPadControlPanel controlPanel = new XYPadControlPanel();
 
   /*private BufferedImage buff;
     private Graphics2D buffG;*/
@@ -400,26 +399,16 @@ public class XYPad extends GraphicObject
       return super.findSensibilityArea( mouseX, mouseY);
   }
 
- public ObjectControlPanel getControlPanel()
- {
-   return this.controlPanel;
- }
-
- public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
+  public ObjectControlPanel getControlPanel()
   {
-    super.popUpUpdate(onInlet, onOutlet, area);
-    ObjectPopUp.addSeparation();    
-    getControlPanel().update(this);
-    ObjectPopUp.getInstance().add((JPanel)getControlPanel());
-    ObjectPopUp.getInstance().revalidate();
-    ObjectPopUp.getInstance().pack();    
+    ObjectControlPanel panel = new XYPadControlPanel();
+    panel.update( this);
+    return panel;
   }
-  public void popUpReset()
+
+  public boolean isInspectable()
   {
-    super.popUpReset();
-    getControlPanel().done();
-    ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
-    ObjectPopUp.removeSeparation();
+    return true;
   }
 
   void updateDimension()

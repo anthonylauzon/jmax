@@ -46,11 +46,41 @@ public class BangControlPanel extends JPanel implements ObjectControlPanel
   GraphicObject target = null;
   JSlider durationSlider;
   JLabel durationLabel;
+  JButton colorButton;
 
   public BangControlPanel()
   {
     super();
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+    JLabel colorLabel = new JLabel("Flash Color", JLabel.CENTER);    
+    colorLabel.setForeground(Color.black);
+    
+    colorButton = new JButton();
+    colorButton.setPreferredSize(new Dimension(60, 20));
+    colorButton.setMaximumSize(new Dimension(60, 20));
+    colorButton.setMinimumSize(new Dimension(60, 20));
+    colorButton.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	  Color color = JColorChooser.showDialog(null,"Choose Bang Color", Color.yellow);
+	  
+	  if(color != null && color !=  ((Bang)target).getColor())
+	    {
+	      colorButton.setBackground( color);
+	      colorButton.repaint();
+	      ((Bang)target).setColor(color);
+	    }
+	}
+      });
+
+    JPanel colorBox = new JPanel();
+    colorBox.setLayout( new BoxLayout( colorBox, BoxLayout.X_AXIS));
+    colorBox.add( Box.createRigidArea( new Dimension( 20, 0)));    
+    colorBox.add( colorLabel);    
+    colorBox.add( Box.createHorizontalGlue());    
+    colorBox.add( colorButton);    
+    colorBox.add( Box.createRigidArea( new Dimension( 6, 0)));    
 
     JLabel titleLabel = new JLabel("Flash Duration", JLabel.CENTER);
     titleLabel.setForeground(Color.black);
@@ -65,7 +95,6 @@ public class BangControlPanel extends JPanel implements ObjectControlPanel
     labelBox.add(Box.createRigidArea(new Dimension(20, 0)));    
 
     durationSlider = new JSlider(JSlider.HORIZONTAL, 10, 500, 125);
-    durationSlider.setBorder(BorderFactory.createEmptyBorder(0,0,0,10));
     durationSlider.addChangeListener(new ChangeListener(){
 	public void stateChanged(ChangeEvent e) {
 	  JSlider source = (JSlider)e.getSource();
@@ -81,8 +110,10 @@ public class BangControlPanel extends JPanel implements ObjectControlPanel
 	}
       });
 
-    add(labelBox);    
-    add(durationSlider);        
+    add( colorBox);
+    add( new JSeparator());
+    add( labelBox);    
+    add( durationSlider);        
     validate();
   }
 
@@ -92,6 +123,8 @@ public class BangControlPanel extends JPanel implements ObjectControlPanel
     int duration = ((FtsBangObject)obj.getFtsObject()).getFlashDuration();
     durationSlider.setValue(duration);
     durationLabel.setText(""+duration);    
+
+    colorButton.setBackground( ((Bang)target).getColor());
   }
   public void done(){}
 }

@@ -40,44 +40,61 @@ import ircam.jmax.widgets.*;
 public class StandardControlPanel extends JPanel implements ActionListener, ObjectControlPanel
 {
   GraphicObject target = null;
-  JTextField nameField;
-  String name;
+  JTextField nameField = null;
+  String name = null;
+  JCheckBox persistentCB = null;
 
-  public StandardControlPanel()
+  public StandardControlPanel( GraphicObject obj)
   {
     super();
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-    JLabel titleLabel = new JLabel("Name", JLabel.RIGHT);
-    titleLabel.setForeground(Color.black);
+    target = obj;
+    name = obj.getFtsObject().getVariableName();
 
-    nameField = new JTextField();
-    nameField.setPreferredSize(new Dimension(100, 20));
-    nameField.setMaximumSize(new Dimension(100, 20));
-    nameField.addActionListener(this);
+    /* persistence handling */
+    if( target.getFtsObject().isPersistent() != -1)
+      {
+	persistentCB = new JCheckBox("Persistence");
+	persistentCB.addActionListener( new ActionListener(){
+	    public void actionPerformed(ActionEvent e)
+	    {
+	      int persist = ((JCheckBox)e.getSource()).isSelected() ? 1 : 0;
+	      target.getFtsObject().requestSetPersistent( persist);
+	    }
+	  });
+	persistentCB.setSelected( obj.getFtsObject().isPersistent() == 1);
 
-    JPanel namePanel = new JPanel();
-    namePanel.setPreferredSize(new Dimension(150, 20));
-    namePanel.setLayout( new BoxLayout( namePanel, BoxLayout.X_AXIS));    
-    namePanel.add(Box.createRigidArea(new Dimension(5, 0)));  
-    namePanel.add(titleLabel);    
-    namePanel.add(Box.createRigidArea(new Dimension(5, 0)));    
-    namePanel.add( nameField);
-    namePanel.add(Box.createHorizontalGlue());    
+	add( persistentCB);
 
-    add(namePanel);
+	add( new JSeparator());
+      }
+    
+    /* name handling */
+    if( obj.getName() != null)
+      {
+	JLabel titleLabel = new JLabel("Name", JLabel.RIGHT);
+	titleLabel.setForeground(Color.black);
 
-    add( new JSeparator());
+	nameField = new JTextField();
+	nameField.setPreferredSize(new Dimension(180, 20));
+	nameField.addActionListener(this);
+	nameField.setText( name);    
+
+	JPanel namePanel = new JPanel();
+	namePanel.setLayout( new BoxLayout( namePanel, BoxLayout.X_AXIS));    
+	namePanel.add(Box.createRigidArea(new Dimension(5, 0)));  
+	namePanel.add(titleLabel);    
+	namePanel.add(Box.createRigidArea(new Dimension(5, 0)));  
+	namePanel.add( nameField);
+
+	add(namePanel);
+      }
 
     validate();
   }
 
-  public void update( GraphicObject obj)
-  {
-    target = obj;
-    name = obj.getFtsObject().getVariableName();
-    nameField.setText( name);    
-  }
+  public void update( GraphicObject obj){}
 
   public void done()
   {
@@ -91,14 +108,17 @@ public class StandardControlPanel extends JPanel implements ActionListener, Obje
 
   public void setName()
   {
-    String text = nameField.getText().trim();
+    if( nameField != null)
+      {
+	String text = nameField.getText().trim();
 
-    if( text != null)
-      if( ((this.name == null) && !text.equals("")) || ((this.name != null) && !text.equals( this.name)))
-	{
-	  target.getFtsObject().requestSetName( text);
-	  name = text;
-	}
+	if( text != null)
+	  if( ((this.name == null) && !text.equals("")) || ((this.name != null) && !text.equals( this.name)))
+	    {
+	      target.getFtsObject().requestSetName( text);
+	      name = text;
+	    }
+      }
   }
 }
 

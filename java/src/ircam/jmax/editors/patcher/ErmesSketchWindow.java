@@ -353,7 +353,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   // Component Listener Interface
   public void componentResized( ComponentEvent e) 
   {
-      itsSketchPad.resizeToWindow(getSize().width - horizontalOffset(), getSize().height - verticalOffset());
+    itsSketchPad.resizeToWindow(getSize().width - horizontalOffset(), getSize().height - verticalOffset());
   }
 
   public void componentMoved( ComponentEvent e) 

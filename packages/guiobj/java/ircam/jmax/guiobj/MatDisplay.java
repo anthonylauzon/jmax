@@ -59,8 +59,6 @@ public class MatDisplay extends GraphicObject
   Color maxColor = defaultMaxColor;
   int imageWidth;
 
-  public static MatDispControlPanel controlPanel = new MatDispControlPanel();
-
   ImageObserver observer;
 
   public MatDisplay(FtsGraphicObject theFtsObject)
@@ -272,23 +270,13 @@ public class MatDisplay extends GraphicObject
 
   public ObjectControlPanel getControlPanel()
   {
-    return this.controlPanel;
+    ObjectControlPanel panel = new MatDispControlPanel();
+    panel.update( this);
+    return panel;
   }
   
-  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
+  public boolean isInspectable()
   {
-    super.popUpUpdate(onInlet, onOutlet, area);
-    ObjectPopUp.addSeparation();
-    getControlPanel().update(this);
-    ObjectPopUp.getInstance().add((JPanel)getControlPanel());
-    ObjectPopUp.getInstance().revalidate();
-    ObjectPopUp.getInstance().pack();
-  }
-  public void popUpReset()
-  {
-    super.popUpReset();
-    getControlPanel().done();
-    ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
-    ObjectPopUp.removeSeparation();
+    return true;
   }
 }

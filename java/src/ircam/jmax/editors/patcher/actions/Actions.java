@@ -27,6 +27,7 @@ package ircam.jmax.editors.patcher.actions;
 
 import java.awt.event.*;
 
+import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
@@ -115,7 +116,12 @@ public class Actions
   public static EditorAction fontStylesPopUpAction = new FontStylesPopUpAction();
   public static EditorAction fontPopUpAction = new FontPopUpAction();
   public static EditorAction jmaxFontPopUpAction = new JMaxFontPopUpAction();
-    //public static EditorAction inspectObjectAction = new InspectObjectAction();
+  public static EditorAction inspectObjectAction = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	ObjectPopUp.getPopUpTarget().inspect();
+      }
+    };
 }
 
 

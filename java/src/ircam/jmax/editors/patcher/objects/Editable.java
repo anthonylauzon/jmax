@@ -29,9 +29,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-// import javax.swing.*;
-import javax.swing.Renderer;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 import ircam.jmax.fts.*;
 import ircam.fts.client.*;
@@ -293,10 +291,11 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     itsSketchPad.textEditObject(this, point);
   }
 
+  JSeparator mySeparator = new JSeparator();
   public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
   {
     super.popUpUpdate(onInlet, onOutlet, area);
-    ObjectPopUp.addSeparation();
+    ObjectPopUp.getInstance().add( mySeparator);
     TextPopUpMenu.update(this);
     ObjectPopUp.addMenu(TextPopUpMenu.getInstance());
   }
@@ -304,7 +303,7 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   {
     super.popUpReset();
     ObjectPopUp.removeMenu(TextPopUpMenu.getInstance());
-    ObjectPopUp.removeSeparation();
+    ObjectPopUp.getInstance().remove( mySeparator);
   }
 }
 

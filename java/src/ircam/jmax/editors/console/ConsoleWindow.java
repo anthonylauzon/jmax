@@ -106,13 +106,13 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
         //BUG FIX on MacOSX to avoid QUIT on CMD-a
         public boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed)
         {
-            if( e.getKeyChar() == 'a')
-                return false;
-            else
-                return super.processKeyBinding(ks, e, condition, pressed);
+	  if( e.getKeyChar() == 'a')
+	    return false;
+	  else
+	    return super.processKeyBinding(ks, e, condition, pressed);
         }		
-    };
-
+      };
+    
     EditorMenu fileMenu = new DefaultFileMenu();
     fileMenu.setEnabled( false, 3);
     fileMenu.setEnabled( false, 4);

@@ -61,12 +61,6 @@ public class Standard extends Editable implements FtsObjectErrorListener
     redraw();
   }
     
-  /* Inspector */
-    
-  public void inspect() 
-  {
-  }
-
   public void redefine( String text) 
   {
     ((FtsPatcherObject)ftsObject.getParent()).requestRedefineObject(ftsObject, text);    
@@ -96,7 +90,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
   {
     if( name.equals(""))
       {
-	varName = null;
+	varName = "";
 	varWidth = 0;
       }
     else
@@ -106,6 +100,11 @@ public class Standard extends Editable implements FtsObjectErrorListener
       }
 
     redraw();
+  }
+
+  public String getName()
+  {
+    return varName;
   }
 
   public void setFont( Font theFont)
@@ -265,51 +264,22 @@ public class Standard extends Editable implements FtsObjectErrorListener
     super.paint( g);
   }
 
-  /**************  popup interaction ********************/ 
-  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
-  {
-    if( ftsObject.isPersistent() != -1)
-      {
-	persistenceItem.setSelected( ftsObject.isPersistent() == 1);
-	ObjectPopUp.getInstance().add( persistenceItem);
-      }
-    getControlPanel().update(this);
-    ObjectPopUp.getInstance().add((JPanel)getControlPanel());
-    ObjectPopUp.getInstance().revalidate();
-    ObjectPopUp.getInstance().pack();
-    super.popUpUpdate(onInlet, onOutlet, area);
-  }
-  public void popUpReset()
-  {
-    if( ftsObject.isPersistent() != -1)
-      ObjectPopUp.getInstance().remove( persistenceItem);
-    getControlPanel().done();
-    ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
-    super.popUpReset();
-  }  
   public ObjectControlPanel getControlPanel()
   {
-    return this.controlPanel;
+    return new StandardControlPanel( this);
   }
-  public static StandardControlPanel controlPanel = new StandardControlPanel();
+
+  public boolean isInspectable()
+  {
+    return (( ftsObject.isPersistent() != -1) || ( varName != null));
+  }
+  
   Color varColor = new Color( 153, 204, 204, 100);
   Color selVarColor = new Color( 107, 142, 142, 100);
   Color persistColor = new Color( 230, 230, 40);
   Color selPersistColor = new Color( 178, 178, 40);
   Color varPersistColor = new Color( 230, 230, 40, 100);
   Color selVarPersistColor = new Color( 178, 178, 40, 100);
-  static transient private JCheckBoxMenuItem persistenceItem = new JCheckBoxMenuItem("Persistence");
-  static
-  {
-    persistenceItem.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	  int persist = ((JCheckBoxMenuItem)e.getSource()).isSelected() ? 1 : 0;
-	  ((GraphicObject)ObjectPopUp.getPopUpTarget()).getFtsObject().requestSetPersistent( persist);
-	}
-      });
-  }
-
 }
 
 

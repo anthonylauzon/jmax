@@ -56,8 +56,6 @@ public class VectorDisplay extends GraphicObject
   int size = 0;
   int range = 0;
 
-  public static VecDispControlPanel controlPanel = new VecDispControlPanel();
-
   private BufferedImage buff;
   private Graphics2D buffG;
 
@@ -339,23 +337,13 @@ public class VectorDisplay extends GraphicObject
 
   public ObjectControlPanel getControlPanel()
   {
-    return this.controlPanel;
+    ObjectControlPanel panel = new VecDispControlPanel();
+    panel.update( this);
+    return panel;
   }
 
-  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
+  public boolean isInspectable()
   {
-    super.popUpUpdate(onInlet, onOutlet, area);
-    ObjectPopUp.addSeparation();
-    getControlPanel().update(this);
-    ObjectPopUp.getInstance().add((JPanel)getControlPanel());
-    ObjectPopUp.getInstance().revalidate();
-    ObjectPopUp.getInstance().pack();
-  }
-  public void popUpReset()
-  {
-    super.popUpReset();
-    getControlPanel().done();
-    ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
-    ObjectPopUp.removeSeparation();
+    return true;
   }
 }

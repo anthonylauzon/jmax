@@ -53,7 +53,7 @@ public class ObjectPopUp extends JPopupMenu implements PopupMenuListener
   static private ObjectPopUp popup = new ObjectPopUp();
   private Hashtable subMenus = new Hashtable();
   private Hashtable items = new Hashtable();
-  public JMenuItem removeMenuItem;
+  public JMenuItem removeMenuItem, inspectItem;
 
   int x;
   int y;
@@ -65,9 +65,12 @@ public class ObjectPopUp extends JPopupMenu implements PopupMenuListener
     removeMenuItem = new JMenuItem("Remove Connections");
     removeMenuItem.addActionListener(Actions.removeConnectionsAction);
 
+    inspectItem = new JMenuItem("Inspect");
+    inspectItem.addActionListener(Actions.inspectObjectAction);
+
     add(Actions.bringToFrontObjectAction, "Bring To Front");
     add(Actions.sendToBackObjectAction, "Send To Back");
-    //add(Actions.inspectObjectAction, "Inspect");
+
     pack();
 
     addPopupMenuListener(this);
@@ -84,7 +87,7 @@ public class ObjectPopUp extends JPopupMenu implements PopupMenuListener
   }
   static public void removeSeparation()
   {
-      if(popup.separation)
+    if(popup.separation)
       {
 	if(popup.inOutItemAdded)
 	  popup.remove(3);
@@ -96,7 +99,8 @@ public class ObjectPopUp extends JPopupMenu implements PopupMenuListener
   }
  
   boolean inOutItemAdded = false;
-  static public void update(int where, String text)
+  boolean inspectAdded = false;
+  static public void update(int where, String text, boolean isInspectable)
   {
       popup.removeMenuItem.setText(text);
       switch(where)
@@ -118,6 +122,30 @@ public class ObjectPopUp extends JPopupMenu implements PopupMenuListener
 	      }
 	    break;
 	  }
+
+      /* inspect item handle */
+      if( isInspectable)
+	{
+	  if( !popup.inspectAdded)
+	    {
+	      popup.add( new Separator());
+	      popup.separation = true;
+	      
+	      popup.add( popup.inspectItem);
+	      popup.inspectAdded = true;
+	      
+	    }
+	}
+      else
+	{
+	  if( popup.inspectAdded)
+	    {
+	      removeSeparation();
+	      popup.remove( popup.inspectItem);
+	      popup.inspectAdded = false;
+	    }
+	}
+      
       popup.revalidate();
       popup.pack();
   }

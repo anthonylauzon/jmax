@@ -68,8 +68,6 @@ public class Slider extends GraphicObject implements FtsIntValueListener
   private int rangeMin;
   private int orientation;
 
-  public static SliderControlPanel controlPanel = new SliderControlPanel();
-
   private BufferedImage buff;
   private Graphics2D buffG;
 
@@ -325,26 +323,16 @@ public class Slider extends GraphicObject implements FtsIntValueListener
       return super.findSensibilityArea( mouseX, mouseY);
   }
 
- public ObjectControlPanel getControlPanel()
- {
-   return this.controlPanel;
- }
-
- public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
+  public ObjectControlPanel getControlPanel()
   {
-    super.popUpUpdate(onInlet, onOutlet, area);
-    ObjectPopUp.addSeparation();    
-    getControlPanel().update(this);
-    ObjectPopUp.getInstance().add((JPanel)getControlPanel());
-    ObjectPopUp.getInstance().revalidate();
-    ObjectPopUp.getInstance().pack();    
+    ObjectControlPanel panel = new SliderControlPanel();
+    panel.update( this);
+    return panel;
   }
-  public void popUpReset()
+
+  public boolean isInspectable()
   {
-    super.popUpReset();
-    getControlPanel().done();
-    ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
-    ObjectPopUp.removeSeparation();
+    return true;
   }
 
   void updateDimension()
@@ -356,3 +344,8 @@ public class Slider extends GraphicObject implements FtsIntValueListener
     itsSketchPad.repaint();//???
   }
 }
+
+
+
+
+

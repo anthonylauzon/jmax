@@ -5,6 +5,7 @@ Editable.java\
 GraphicConnection.java\
 GraphicObject.java\
 NumberBox.java\
+ObjectInspector.java\
 ObjectPopUp.java\
 SensibilityArea.java\
 Standard.java\

@@ -303,28 +303,19 @@ public class Comment extends Editable
   
   public ObjectControlPanel getControlPanel()
   {
-    return this.controlPanel;
+    //return this.controlPanel;
+    ObjectControlPanel panel = new CommentControlPanel();
+    panel.update( this);
+    return panel;
   }
 
-  /**************  popup interaction ********************/ 
-  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
+  public boolean isInspectable()
   {
-    getControlPanel().update(this);
-    ObjectPopUp.getInstance().add((JPanel)getControlPanel());
-    ObjectPopUp.getInstance().revalidate();
-    ObjectPopUp.getInstance().pack();
-    super.popUpUpdate(onInlet, onOutlet, area);
-  }
-  public void popUpReset()
-  {
-    getControlPanel().done();
-    ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
-    super.popUpReset(); 
+    return true;
   }
 
   private transient Color color, selectedColor, selectedOpaqueColor, opaqueColor, editColor, editSelectedColor;
   int colorId, alpha;  
-  public static CommentControlPanel controlPanel = new CommentControlPanel();
   private static Color DEFAULT_COLOR = new Color( 255, 255, 255, 0);
   static final int DEFAULT_WIDTH = 130;
 }

@@ -53,8 +53,6 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
   private int itsLastY;
   private int intZoneWidth = 0;
   private double DECIMAL_INCR = 0.001;
-
-  public static FloatBoxControlPanel controlPanel = new FloatBoxControlPanel();
   
   public FloatBox(FtsGraphicObject theFtsObject) 
   {
@@ -219,22 +217,14 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
   /**** Popup *************************************/
   public ObjectControlPanel getControlPanel()
   {
-    return this.controlPanel;
+    ObjectControlPanel panel = new FloatBoxControlPanel();
+    panel.update( this);
+    return panel;
   }
 
-  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
+  public boolean isInspectable()
   {
-    super.popUpUpdate(onInlet, onOutlet, area);
-    getControlPanel().update(this);
-    ObjectPopUp.getInstance().add((JPanel)getControlPanel());
-    ObjectPopUp.getInstance().revalidate();
-    ObjectPopUp.getInstance().pack();    
-  }
-  public void popUpReset()
-  {
-    super.popUpReset();    
-    getControlPanel().done();
-    ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
+    return true;
   }
 }
 

@@ -61,21 +61,6 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
   int flashColorIndex = 1;  
   transient Color itsColor = Color.yellow;
   
-  private transient static JMenuItem colorItem = new JMenuItem("Change color");
-  static
-  {
-    colorItem.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	  Color color = JColorChooser.showDialog(null,"Choose Source Color", Color.yellow);
-
-	  if(color!=null)
-	    ((Bang)ObjectPopUp.getPopUpTarget()).setColor(color);
-	}
-      });
-  }
-  public transient static BangControlPanel controlPanel = new BangControlPanel();
-  
   public Bang(FtsGraphicObject theFtsObject) 
   {
     super(theFtsObject);	
@@ -177,10 +162,20 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
     ((FtsBangObject)ftsObject).setColor( flashColorIndex);
   }
     
+  public Color getColor()
+  {
+    return itsColor;
+  }
+
   public void setCurrentColor( int indexColor)
   {
     flashColorIndex = indexColor;
-    itsColor = new Color(flashColorIndex);
+
+    if( flashColorIndex == 1)
+      itsColor = Color.yellow;
+    else
+      itsColor = new Color(flashColorIndex);
+    
     updateFlashingImage(getWidth(), flashColorIndex, itsColor);	
   }
 
@@ -309,28 +304,20 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
 
   public ObjectControlPanel getControlPanel()
   {
-    return this.controlPanel;
+    //return this.controlPanel;
+    ObjectControlPanel panel = new BangControlPanel();
+    panel.update( this);
+    return panel;
   }
 
-  //popup interaction 
-  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
+  public boolean isInspectable()
   {
-    super.popUpUpdate(onInlet, onOutlet, area);
-    ObjectPopUp.addSeparation();
-    ObjectPopUp.getInstance().add(colorItem);    
-    getControlPanel().update(this);
-    ObjectPopUp.getInstance().add((JPanel)getControlPanel());
+    return true;
   }
-  public void popUpReset()
-  {
-    super.popUpReset();
-    ObjectPopUp.getInstance().remove(colorItem);
-    ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
-    ObjectPopUp.removeSeparation();
-  }
-    /*
-     * Double key class (image width and flash color) to the image HashTable 
-     */
+
+  /*
+   * Double key class (image width and flash color) to the image HashTable 
+   */
   public class BangKey 
     {
 	int itsWidth;

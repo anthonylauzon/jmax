@@ -27,6 +27,7 @@ package ircam.jmax.editors.patcher.objects;
 
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 import java.util.*;
 
 import java.awt.image.*;
@@ -165,10 +166,6 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
   // ----------------------------------------
   abstract public void setValueAsText( String value);
   abstract public String getValueAsText();
-
-  public void inspect() 
-  {
-  }
 
   public void paint( Graphics g) 
   {
@@ -415,10 +412,11 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
     redraw();
   }
 
+  JSeparator mySeparator = new JSeparator();
   public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
   {
     super.popUpUpdate(onInlet, onOutlet, area);
-    ObjectPopUp.addSeparation();
+    ObjectPopUp.getInstance().add( mySeparator);
     TextPopUpMenu.update(this);
     ObjectPopUp.addMenu(TextPopUpMenu.getInstance());
   }
@@ -426,7 +424,7 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
   {
     super.popUpReset();
     ObjectPopUp.removeMenu(TextPopUpMenu.getInstance());
-    ObjectPopUp.removeSeparation();
+    ObjectPopUp.getInstance().remove( mySeparator);
   }
 
   public void setEditMode( int mode)

@@ -42,6 +42,7 @@ import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.interactions.*;
 import ircam.jmax.editors.patcher.actions.*;
+import ircam.jmax.toolkit.*;
 
 // The base class of all the graphic objects on the sketch.
 // This class has a knowledge of its corrisponding fos object. It contains
@@ -541,10 +542,6 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 
   public void updatePaint( Graphics g){}  
 
-  public void inspect() 
-  {
-      //InspectDialog.inspect(this);
-  }
 
   // Add one to cope with the inlet/outlets
 
@@ -979,7 +976,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 	wherePopup = ON_OBJECT;
 	text = "";
       }
-    ObjectPopUp.update(wherePopup, text); 
+    ObjectPopUp.update(wherePopup, text, isInspectable()); 
   }
 
   public boolean isPopUpVisible()
@@ -1049,6 +1046,24 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   {
     return true;
   }
+
+  public boolean isInspectable()
+  {
+    return false;
+  }
+
+  public void inspect()
+  {
+    if( isInspectable())
+      new ObjectInspector( this);
+  }
+
+  public String getName()
+  {
+    return null;
+  }
+
+  public ObjectControlPanel getControlPanel(){ return null;}
 
   // Get the bounds in a rectangle
 

@@ -54,6 +54,7 @@ public class EditMenu extends EditorMenu
   JMenuItem copyItem;
   JMenuItem pasteItem;
   JMenuItem duplicateItem;
+  JMenuItem inspectItem;
   JMenuItem selectAllItem;
   JMenuItem lockItem;
   AlignMenu alignMenu;
@@ -72,6 +73,10 @@ public class EditMenu extends EditorMenu
     copyItem      = add(Actions.copyAction, "Copy", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_C);
     pasteItem     = add(Actions.pasteAction, "Paste", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_V);
     duplicateItem = add(Actions.duplicateAction, "Duplicate", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_D);
+
+    addSeparator();
+
+    inspectItem = add(Actions.inspectAction, "Inspect", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_I);
 
     addSeparator();
 
@@ -116,6 +121,8 @@ public class EditMenu extends EditorMenu
 	
 	pasteItem.setEnabled((flavors != null) &&
 			     clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor));
+      
+	inspectItem.setEnabled(false);
       }
     else
       {
@@ -150,6 +157,7 @@ public class EditMenu extends EditorMenu
 		cutItem.setEnabled(false);
 		copyItem.setEnabled(false);
 		duplicateItem.setEnabled(false);
+		inspectItem.setEnabled(false);
 		alignMenu.setEnabled(false);
 		toFrontMenuItem.setEnabled(false);
 		toBackMenuItem.setEnabled(false);
@@ -161,6 +169,7 @@ public class EditMenu extends EditorMenu
 		cutItem.setEnabled(true);
 		copyItem.setEnabled(true);
 		duplicateItem.setEnabled(true);
+		inspectItem.setEnabled(true);
 		alignMenu.setEnabled(true);
 		toFrontMenuItem.setEnabled(true);
 		toBackMenuItem.setEnabled(true);
