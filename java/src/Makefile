@@ -27,21 +27,37 @@ PACKAGE_DIR =
 
 include $(ROOTDIR)/java/Makefiles/Makefile.common
 
-DOC_PACKAGES = \
-	ircam.jmax \
-	ircam.jmax.tcl \
-	ircam.jmax.utils \
-	ircam.jmax.dialogs \
-	ircam.jmax.widgets \
-	ircam.jmax.toolkit \
-	ircam.jmax.fts \
-	ircam.jmax.fts.tcl \
-	ircam.jmax.editors.console \
-	ircam.jmax.editors.console.tcl \
-	ircam.jmax.editors.patcher \
-	ircam.jmax.script \
-	ircam.jmax.script.pkg \
-	to.be.completed
+# this list can be obtained by:
+# $ find . -type d \! \( -name CVS -prune \)
+# plus removing :
+# ./ircam/jmax/editors	
+# ./ircam/jmax/editors/project	
+PACKAGES = \
+ircam/jmax	\
+ircam/jmax/fts	\
+ircam/jmax/mda	\
+ircam/jmax/tcl	\
+ircam/jmax/dialogs	\
+ircam/jmax/script	\
+ircam/jmax/script/pkg	\
+ircam/jmax/script/scm	\
+ircam/jmax/script/tcl	\
+ircam/jmax/widgets	\
+ircam/jmax/utils	\
+ircam/jmax/editors/patcher	\
+ircam/jmax/editors/patcher/interactions	\
+ircam/jmax/editors/patcher/actions	\
+ircam/jmax/editors/patcher/objects	\
+ircam/jmax/editors/patcher/menus	\
+ircam/jmax/editors/console	\
+ircam/jmax/editors/control	\
+ircam/jmax/toolkit	\
+ircam/jmax/toolkit/actions	\
+ircam/jmax/toolkit/menus	\
+
+JAR_FILE= jmax.jar
+
+ALL_CLASSES=$(shell find $(JAVA_CLASSES_ROOT)/ircam -name '*.class')
 
 all: $(JAVA_CLASSES_ROOT)
 	(cd ircam ; $(MAKE) all)
@@ -52,16 +68,18 @@ clean:
 .PHONY: clean
 
 doc:  
-	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH ; javadoc -d $(ROOTDIR)/java/doc $(DOC_PACKAGES))
+	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH ; javadoc -d $(ROOTDIR)/java/doc $(PACKAGES))
 .PHONY: doc
 
 doc_private:  
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javadoc -private -d $(ROOTDIR)/java/doc_private $(DOC_PACKAGES))
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javadoc -private -d $(ROOTDIR)/java/doc_private $(PACKAGES))
 .PHONY: doc_private
 
-jar:  
-	(cd $(ROOTDIR)/java/classes ; /bin/rm -f jmax.jar ; jar -cvf ../classes/jmax.jar ircam )
+jar: $(JAVA_CLASSES_ROOT)/$(JAR_FILE)
 .PHONY: jar
+
+$(JAVA_CLASSES_ROOT)/$(JAR_FILE): $(ALL_CLASSES)
+	(cd $(JAVA_CLASSES_ROOT) ; /bin/rm -f $(JAR_FILE) ; jar -cvf $(JAR_FILE) ircam )
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 

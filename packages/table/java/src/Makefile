@@ -33,6 +33,10 @@ include $(JMAXROOTDIR)/java/Makefiles/Makefile.package
 
 DOC_PACKAGES =  ircam.jmax.editors.table
 
+JAR_FILE= $(MAX_PACKAGE_NAME).jar
+
+ALL_CLASSES=$(shell find $(JAVA_CLASSES_ROOT)/ircam -name '*.class')
+
 all: $(JAVA_CLASSES_ROOT)
 	(cd ircam ; $(MAKE) all)
 .PHONY: all
@@ -49,9 +53,10 @@ doc_private:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javadoc -private -d $(ROOTDIR)/java/doc_private $(ALL_PACKAGES))
 .PHONY: doc_private
 
-jar:  
-	(cd $(PACKAGE_ROOT)/java/classes ; /bin/rm -f table.jar ; jar -cvf table.jar ircam )
+jar: $(JAVA_CLASSES_ROOT)/$(JAR_FILE)
 .PHONY: jar
 
+$(JAVA_CLASSES_ROOT)/$(JAR_FILE): $(ALL_CLASSES)
+	(cd $(JAVA_CLASSES_ROOT) ; /bin/rm -f $(JAR_FILE) ; jar -cvf $(JAR_FILE) ircam )
 
 include $(JMAXROOTDIR)/java/Makefiles/Makefile.package.misc
