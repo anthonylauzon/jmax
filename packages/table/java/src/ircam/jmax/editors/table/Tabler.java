@@ -59,7 +59,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
   void fillTable() {
     //fill the internal vector with the data contained in itsData
     FtsIntegerVector aIntV = ((FtsIntegerVector)(itsData.getContent()));
-    itsTablePanel.initValues(aIntV.getValues(),aIntV.getSize());
+    if(aIntV.getSize()!=0) itsTablePanel.initValues(aIntV.getValues(),aIntV.getSize());
   }
 
   public Tabler() {
@@ -111,7 +111,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
   ///////////////////////////////////////////////////////////////// keyListener --fine
 
   public Dimension preferredSize() {
-    return new Dimension(310,412);
+    return new Dimension(/*310*/512,412);
   }
 
   public Dimension minimumSize() {

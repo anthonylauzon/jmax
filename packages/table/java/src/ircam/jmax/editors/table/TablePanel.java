@@ -42,13 +42,13 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
    //////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////mouseMotionListener--inizio
   public void mouseMoved(MouseEvent e){
-    int x = e.getX();
+    int x = e.getX()/x_scale_factor;
     int y = e.getY();
     itsTabler.setCoordinates(x, getSize().height-y);
   }
   
   public void mouseDragged(MouseEvent e){
-    int x = e.getX();
+    int x = e.getX()/x_scale_factor;
     int y = e.getY();
     y = getSize().height-y;
     if (x<0 || x> N_POINTS-2) return;
@@ -83,9 +83,9 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
   public void mouseClicked(MouseEvent e){}
   
   public void mousePressed(MouseEvent e){
-    int x = e.getX();
+    int x = e.getX()/4;
     int y = e.getY();
-    y = size().height-y;
+    y = getSize().height-y;
     if (x<0 || x>N_POINTS-2) return;
     old_dragx = x;
     old_dragy = y;
@@ -99,11 +99,15 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
   ////////////////////////////////////////////////////////////mouseListener--fine
   void PaintSingle(int index, Graphics g) {
     Dimension d = size();
-    
+    index = index*x_scale_factor;
     g.setColor(Color.white);
-    g.drawLine(index, d.height, index, 0);	//erase old line
+    for(int i=0;i<x_scale_factor;i++){
+      g.drawLine(index+i, d.height, index+i,0);
+    }    
     g.setColor(Color.black);
-    g.drawLine(index, d.height, index, d.height-values[index]);	//paint new
+    for(int i=0;i<x_scale_factor;i++){
+      g.drawLine(index+i, d.height, index+i, d.height-values[index/x_scale_factor]);
+    }
   }
 
   void ApplyFormula(String theFormula) {
@@ -154,7 +158,7 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
 
   public Dimension preferredSize() {
     Dimension d = new Dimension();
-    d.width = N_POINTS;
+    d.width = N_POINTS*x_scale_factor;
     d.height = MAX_VALUE;
     return d;
   }
@@ -163,4 +167,10 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     return preferredSize();
   }
 }
+
+
+
+
+
+
 
