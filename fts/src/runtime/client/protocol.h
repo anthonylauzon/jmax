@@ -50,6 +50,7 @@
 #define DOWNLOAD_CONNECTION_CODE  'H'
 
 #define NEW_OBJECT_CODE         'n'
+#define NEW_OBJECT_VAR_CODE     'N'
 #define DELETE_OBJECT_CODE      'f'
 
 #define REDEFINE_PATCHER_CODE   'Q'

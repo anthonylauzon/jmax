@@ -68,7 +68,7 @@ class ErmesConnection implements ErmesDrawable {
 
       itsSelected = false;
 
-      update( itsFtsConnection); // (fd) ???
+      itsSketchPad.itsConnections.addElement( this);
     }
 
 
@@ -81,14 +81,9 @@ class ErmesConnection implements ErmesDrawable {
       itsInletNum = theInlet;
       itsOutletNum = theOutlet;
       itsSelected = false;
-    }
 
-  void update( FtsConnection theFtsConnection) 
-    {
-      itsFtsConnection = theFtsConnection;
       itsSketchPad.itsConnections.addElement( this);
     }
-
 
   //--------------------------------------------------------
   // Select

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.47 $ IRCAM $Date: 1998/10/15 16:59:36 $
+ *      $Revision: 1.48 $ IRCAM $Date: 1998/10/21 16:35:29 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -528,19 +528,34 @@ fts_object_t *fts_object_recompute(fts_object_t *old)
 {
   fts_object_t *obj;
 
-  if (old->id != FTS_NO_ID)
-    fts_client_release_object_data(old);
-
-  obj = fts_object_redefine(old, old->id, old->argc, old->argv);
-
-  /* Error property handling; currently it is a little bit
-     of an hack beacause we need a explit "zero"  error
-     property on a non error redefined object; actually
-     the error property daemon should be a global daemon !
+  /* If the object being redefined is a standard patcher,
+     redefine it using a patcher function, otherwise with 
+     the object function.
      */
 
-  if (obj->id != FTS_NO_ID)
-    fts_object_send_kernel_properties(obj);
+  if (fts_object_is_standard_patcher(old))
+    obj = (fts_object_t *) fts_patcher_redefine((fts_patcher_t *) old, old->argc, old->argv);
+  else
+    {
+      /* @@@ Later, here, handle the trasfer of a patcher data between two templates !! */
+
+      /* If we have an object with data, data must be released,
+	 because the object will be deleted */
+
+      if (old->id != FTS_NO_ID)
+	fts_client_release_object_data(old);
+
+      obj = fts_object_redefine(old, old->id, old->argc, old->argv);
+
+      /* Error property handling; currently it is a little bit
+	 of an hack beacause we need a explit "zero"  error
+	 property on a non error redefined object; actually
+	 the error property daemon should be a global daemon !
+	 */
+
+      if (obj->id != FTS_NO_ID)
+	fts_object_send_kernel_properties(obj);
+    }
 
   return obj;
 }
@@ -580,12 +595,6 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
 
       old->varname = 0;
     }
-
-  /* Second, if the object being redefined is a standard patcher,
-     redefine it */
-
-  if (fts_object_is_standard_patcher(old))
-    return (fts_object_t *) fts_patcher_redefine_description((fts_patcher_t *) old, ac, at); 
 
   /* if old id and new id are the same, do the replace without telling the client */
 

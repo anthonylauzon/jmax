@@ -436,11 +436,13 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
 
 
 /*
-   REDEFINE_PATCHER (obj)old (sym)name (int)ins (int)outs
+   REDEFINE_PATCHER (obj)old [<args>]*
    
-   Redefine patcher use a special primitive of the message system
-   to change the patcher class without doing a real redefine.
-
+   Redefine the patcher in place; for the moment, the
+   accepted arguments are what the user type in the box
+   (ie.  [<var name> : ] <args>*) without the class name,
+   and to the translation to the real format here;
+   in the future it will be the client to do the work.
    */
 
 static void
@@ -450,6 +452,8 @@ fts_mess_client_redefine_patcher(int ac, const fts_atom_t *av)
 
   if (ac >= 1)
     {
+      fts_atom_t argv[512];
+      int argc;
       fts_patcher_t  *patcher;
 
       patcher = (fts_patcher_t *) fts_get_object(&av[0]);
@@ -460,7 +464,29 @@ fts_mess_client_redefine_patcher(int ac, const fts_atom_t *av)
 	  return;
 	}
 
-      fts_patcher_redefine_description(patcher, ac - 1, av + 1);
+      if ((ac >= 3) && fts_is_symbol(&av[1]) && fts_is_symbol(&av[2]) &&
+	  (fts_get_symbol(&av[2]) == fts_s_column))
+	{
+	  /* Variable syntax */
+
+	  argv[0] = av[1];
+	  argv[1] = av[2];
+	  fts_set_symbol(&argv[2], fts_s_patcher);
+
+	  for (argc = 3; (argc < ac) && (argc < 512) ; argc++)
+	    argv[argc] = av[argc];
+	}
+      else
+	{
+	  /* Plain syntax */
+
+	  fts_set_symbol(&argv[0], fts_s_patcher);
+
+	  for (argc = 1; (argc < ac) && (argc < 512) ; argc++)
+	    argv[argc] = av[argc];
+	}
+
+      fts_patcher_redefine(patcher, argc, argv);
     }
   else
     post_mess("System Error in FOS message REDEFINE PATCHER: bad args", ac, av);

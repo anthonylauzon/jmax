@@ -57,7 +57,11 @@ public class FtsParse
     
     numberFormat = NumberFormat.getInstance(Locale.US);
     numberFormat.setMaximumFractionDigits(6);
-    numberFormat.setMinimumFractionDigits(1);
+    numberFormat.setMinimumFractionDigits(0);
+
+    if (numberFormat instanceof DecimalFormat)
+      ((DecimalFormat) numberFormat).setDecimalSeparatorAlwaysShown(true);
+
     numberFormat.setGroupingUsed(false);
   }
 

@@ -26,7 +26,7 @@ public class FtsClipboard  extends FtsObject
 
   protected  FtsClipboard(FtsObject parent, String className, String description, int objId)
   {
-    super(parent, className, description, objId);
+    super(parent, className, null, description, objId);
   }
 
   public void copy(FtsSelection sel)

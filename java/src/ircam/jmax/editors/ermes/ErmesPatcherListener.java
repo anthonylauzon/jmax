@@ -62,3 +62,4 @@ class ErmesPatcherListener implements FtsPatcherListener
     // not implemented yet; it should redo the sketch content.
   }
 }
+

@@ -89,7 +89,7 @@ public class FtsServer
     // Build the root patcher, by mapping directly to object id 1 on FTS
     // (this is guaranteed)
 
-    root = new FtsPatcherObject(null, "", 1);
+    root = new FtsPatcherObject(null, null, "", 1);
     registerObject(root);
   }
 
@@ -1105,7 +1105,27 @@ public class FtsServer
 
 	  try
 	    {
-	      newObj = FtsObject.makeFtsObjectFromMessage(msg);
+	      newObj = FtsObject.makeFtsObjectFromMessage(msg, false);
+	      registerObject(newObj);
+
+	      if (FtsServer.debug)
+		System.err.println("NewObjectMessage " + newObj + " " + msg);
+	    }
+	  catch (FtsException e)
+	    {
+	      System.err.println("System error, cannot instantiate from message " + msg);
+	    }
+
+	  break;
+	}
+
+      case FtsClientProtocol.fts_new_object_var_cmd:
+	{
+	  FtsObject newObj;
+
+	  try
+	    {
+	      newObj = FtsObject.makeFtsObjectFromMessage(msg, true);
 	      registerObject(newObj);
 
 	      if (FtsServer.debug)

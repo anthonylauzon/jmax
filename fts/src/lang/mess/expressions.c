@@ -32,7 +32,7 @@
   before while and after evalutating an expression
   */
 
-/* #define EXPRESSION_TRACE_DEBUG  */
+/* #define EXPRESSION_TRACE_DEBUG */
 
 #include "sys.h"
 #include "lang/mess.h"
@@ -122,6 +122,7 @@ static fts_heap_t *expr_prop_heap;
 typedef struct fts_expr_var_ref
 {
   fts_symbol_t name;
+  fts_patcher_t *scope;
   struct fts_expr_var_ref *next;
 } fts_expr_var_ref_t;
 
@@ -304,7 +305,7 @@ static void fts_expression_declare_fun(fts_symbol_t name, fts_expression_fun_t f
 
 static int fts_op_eval(fts_expression_state_t *e);
 static void fts_expression_add_assignement(fts_expression_state_t *e, fts_symbol_t name, fts_atom_t *value);
-static void fts_expression_add_var_ref(fts_expression_state_t *e, fts_symbol_t name);
+static void fts_expression_add_var_ref(fts_expression_state_t *e, fts_patcher_t *scope, fts_symbol_t name);
 
 static fts_heap_t *expr_state_heap;
 
@@ -874,6 +875,10 @@ static int fts_op_eval(fts_expression_state_t *e)
   int pop = op_stack_peek(e, 1);
   int op_type = op_type_stack_top(e);
 
+#ifdef EXPRESSION_TRACE_DEBUG
+  fprintf(stderr, "Evaluting op %d\n", op);
+#endif
+    
   if (op_type == FTS_UNARY_OP_TYPE)
     {
       fts_atom_t *tos = value_stack_top(e);
@@ -891,7 +896,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 
 	      if (value)
 		{
-		  fts_expression_add_var_ref(e, varname);
+		  fts_expression_add_var_ref(e, e->scope, varname);
 
 		  if (fts_is_void(value))
 		    return expression_error(e, FTS_EXPRESSION_UNDEFINED_VARIABLE, "Variable %s is undefined",
@@ -1068,34 +1073,21 @@ static int fts_op_eval(fts_expression_state_t *e)
 	  break;
 
 	case FTS_OP_DOT:
-	  if (fts_is_symbol(tos) && fts_is_object(ptos))
+	  if (fts_is_symbol(tos) && fts_is_object(ptos) && fts_object_is_patcher(fts_get_object(ptos)))
 	    {
 	      fts_object_t *obj = fts_get_object(ptos);
-	      fts_symbol_t prop = fts_get_symbol(tos);
+	      fts_symbol_t varname = fts_get_symbol(tos);
+	      fts_atom_t *value;
 
-	      if (fts_object_is_patcher(obj))
+	      value = fts_variable_get_value((fts_patcher_t *)obj, varname);
+
+	      if (value)
 		{
-		  fts_atom_t *value;
-		  fts_symbol_t varname;
-
-		  varname = fts_get_symbol(tos);
-		  value = fts_variable_get_value(e->scope, varname);
-
-		  if (value)
-		    {
-		      *tos = *value;
-		      fts_expression_add_var_ref(e, varname);
-		    }
-		  else
-		    OP_ERROR;
+		  *ptos = *value;
+		  fts_expression_add_var_ref(e, (fts_patcher_t *)obj, varname);
 		}
 	      else
-		{
-		  fts_object_get_prop(obj, prop, ptos);
-
-		  if (fts_is_void(ptos))
-		    OP_ERROR;
-		}
+		OP_ERROR;
 	    }
 	  else
 	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator .", 0);
@@ -1386,13 +1378,14 @@ int fts_expression_map_to_assignements(fts_expression_state_t *e,
 
 /* Variable reference handling */
 
-static void fts_expression_add_var_ref(fts_expression_state_t *e, fts_symbol_t name)
+static void fts_expression_add_var_ref(fts_expression_state_t *e, fts_patcher_t *scope, fts_symbol_t name)
 {
   fts_expr_var_ref_t *p;
 
   p = (fts_expr_var_ref_t *) fts_heap_alloc(expr_var_ref_heap);
 
   p->name  = name;
+  p->scope = scope;
   p->next  = e->var_refs;
   e->var_refs = p;
 }
@@ -1410,12 +1403,10 @@ void fts_expression_add_variables_user(fts_expression_state_t *e, fts_object_t *
       
       p2 = p;
 
-      fts_variable_add_user(obj->patcher, p->name, obj);
+      fts_variable_add_user(p->scope, p->name, obj);
 
       p = p->next;
     }
-
-  e->var_refs = 0;
 }
 
 

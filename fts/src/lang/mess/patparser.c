@@ -715,8 +715,19 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
 	  if (argc > 1)
 	    {
+	      fts_atom_t new_args[512];
+	      int i;
+
 	      fts_patcher_reassign_inlets_outlets((fts_patcher_t *)lastNObject);
-	      fts_patcher_reassign_name((fts_patcher_t *)lastNObject, fts_get_symbol(&args[1]));
+
+	      new_args[0] = args[1];
+	      fts_set_symbol(&new_args[1], fts_s_column);
+	      fts_set_symbol(&new_args[2], fts_s_patcher);
+	      
+	      for (i = 2; (i < argc) && (i < 512 - 2); i++)
+		new_args[i + 1] = args[i];
+
+	      fts_patcher_redefine((fts_patcher_t *)lastNObject, argc + 2, new_args);
 	    }
 	  else
 	    {

@@ -216,10 +216,20 @@ static fts_object_t *fts_make_abstraction(FILE *file, fts_patcher_t *patcher, in
 
   fts_patcher_reassign_inlets_outlets((fts_patcher_t *) obj);
 
-  /* Add the template like variable in order to support direct
+  /* Add the template like variables in order to support direct
      .abs to template traslation */
 
-  fts_patcher_redefine_description((fts_patcher_t *)obj, ac, at);
+  {
+    fts_atom_t rat[256];
+    int i;
+
+    fts_set_symbol(&rat[0], fts_s_patcher);
+
+    for (i = 0; (i < ac) && (i < 256) ; i++)
+      rat[i + 1] = at[i];
+
+    fts_patcher_redefine((fts_patcher_t *)obj, ac + 1, rat);
+  }
 
   fts_patlex_close(in);
 

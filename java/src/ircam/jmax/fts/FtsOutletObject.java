@@ -24,7 +24,7 @@ public class FtsOutletObject  extends FtsObject
 
   public FtsOutletObject(FtsObject parent, int position, int objId)
   {
-    super(parent, "outlet", "outlet " + position, objId);
+    super(parent, "outlet", null, "outlet " + position, objId);
 
     this.position = position;
 

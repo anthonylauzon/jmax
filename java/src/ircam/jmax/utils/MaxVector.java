@@ -124,6 +124,18 @@ public class MaxVector
     objects[fillPointer++] = obj;
   }
 
+  public final void insertElementAt(Object obj, int index)
+  {
+    if (index < fillPointer + 1)
+      {
+	ensureCapacity(fillPointer + 1);
+	System.arraycopy(objects, index, objects, index + 1, fillPointer - index);
+	objects[index] = obj;
+	fillPointer++;
+    }
+  }
+
+
   public final boolean removeElement(Object obj)
   {
     for (int i = 0 ; i < fillPointer ; i++)

@@ -96,7 +96,7 @@ void fts_client_mess_add_float(float value)
   fts_client_send_string(outbuf);
 }
 
-void fts_client_mess_add_sym(fts_symbol_t s)
+void fts_client_mess_add_symbol(fts_symbol_t s)
 {
   if (s)
     fts_client_mess_add_string(fts_symbol_name(s));
@@ -129,7 +129,7 @@ void fts_client_mess_add_atoms(int ac, const fts_atom_t *args)
       else  if (fts_is_float(&args[i]))
 	fts_client_mess_add_float(fts_get_float(&args[i]));
       else  if (fts_is_symbol(&args[i]))
-	fts_client_mess_add_sym(fts_get_symbol(&args[i]));
+	fts_client_mess_add_symbol(fts_get_symbol(&args[i]));
       else  if (fts_is_string(&args[i]))
 	fts_client_mess_add_string(fts_get_string(&args[i]));
       else  if (fts_is_object(&args[i]))
@@ -165,7 +165,7 @@ void fts_object_send_mess(fts_object_t *obj, fts_symbol_t selector, int argc, co
 {
   fts_client_mess_start_msg(CLIENTMESS_CODE);
   fts_client_mess_add_object(obj);
-  fts_client_mess_add_sym(selector);
+  fts_client_mess_add_symbol(selector);
   fts_client_mess_add_atoms(argc, args);
   fts_client_mess_send_msg();
 }
@@ -173,6 +173,8 @@ void fts_object_send_mess(fts_object_t *obj, fts_symbol_t selector, int argc, co
 
 void fts_client_upload_object(fts_object_t *obj)
 {
+  int do_var = 0;
+
   if (obj->id == FTS_NO_ID)
     fts_object_table_register(obj);
 
@@ -183,9 +185,20 @@ void fts_client_upload_object(fts_object_t *obj)
   if (obj->patcher && ((fts_object_t *)obj->patcher)->id == FTS_NO_ID)
     fts_client_upload_object((fts_object_t *) obj->patcher);
 
-  /* NEW  (obj)pid (int)new-id [<args>]+ */
+  /* 
+     NEW_OBJECT_VAR_CODE (obj)parent (dta) data (int)new-id (symbol) var [<args>]+
+     NEW_OBJECT_CODE (obj)parent (dta) data (int)new-id [<args>]+
+   */
 
-  fts_client_mess_start_msg(NEW_OBJECT_CODE);
+  if ((obj->argc >= 3) && fts_is_symbol(&(obj->argv[0])) && fts_is_symbol(&(obj->argv[1])) &&
+      (fts_get_symbol(&(obj->argv[1])) == fts_s_column))
+    do_var = 1;
+
+  if (do_var)
+    fts_client_mess_start_msg(NEW_OBJECT_VAR_CODE);
+  else
+    fts_client_mess_start_msg(NEW_OBJECT_CODE);
+
   fts_client_mess_add_object((fts_object_t *) obj->patcher);
   
   if (obj->patcher)
@@ -194,7 +207,17 @@ void fts_client_upload_object(fts_object_t *obj)
     fts_client_mess_add_data((fts_data_t *) 0);
 
   fts_client_mess_add_long(obj->id);
-  fts_client_mess_add_atoms(obj->argc, obj->argv);
+
+  if (do_var)
+    {
+      fts_client_mess_add_symbol(fts_get_symbol(&obj->argv[0]));
+      fts_client_mess_add_atoms(obj->argc - 2, obj->argv + 2);
+    }
+  else
+    {
+      fts_client_mess_add_atoms(obj->argc, obj->argv);
+    }
+
   fts_client_mess_send_msg();
 
   fts_object_send_properties(obj);

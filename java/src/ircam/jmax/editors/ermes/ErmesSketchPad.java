@@ -1482,7 +1482,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
 		      if (aConnection != null)
 			{
-			  itsConnections.addElement( aConnection);
 			  aConnection.DoublePaint();
 			}
 		    }
@@ -2049,9 +2048,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
   final ErmesConnection AddConnection( ErmesObject fromObj, ErmesObject toObj, int fromOutlet, int toInlet, FtsConnection fc) 
   {
-    ErmesConnection aConnection = new ErmesConnection( this, fromObj, toObj, fromOutlet, toInlet, fc);
-    aConnection.update( fc);
-    return aConnection;
+    return new ErmesConnection( this, fromObj, toObj, fromOutlet, toInlet, fc);
   }
 	
   //--------------------------------------------------------
@@ -2073,10 +2070,13 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   //--------------------------------------------------------
   // (***fd) is probably messed, because the object should be put
   // at the beginning of the vector, not at the end
+  
   final void ChangeObjectPrecedence( ErmesObject theObject)
   {
-    itsElements.removeElement( theObject);
-    itsElements.addElement( theObject);	
+    // Need the new paint structure to work well,
+    // because of a bad interaction with the dirty list.
+    //itsElements.removeElement( theObject);
+    // itsElements.insertElementAt( theObject, 0);
   }
   
   //--------------------------------------------------------
@@ -2097,7 +2097,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   {
     currentSelection.removeConnection( theConnection);
     itsConnections.removeElement( theConnection);
-  
+
     markSketchAsDirty();
 
     if (paintNow)

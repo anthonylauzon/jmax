@@ -81,7 +81,9 @@ fts_symbol_t fts_s_size;
 fts_symbol_t fts_s_error;
 fts_symbol_t fts_s_error_description;
 fts_symbol_t fts_s_state;
-
+fts_symbol_t fts_s_abstraction;
+fts_symbol_t fts_s_template;
+fts_symbol_t fts_s_patcher_type;
 
 /* Symbols related to builtin classes */
 
@@ -195,6 +197,9 @@ fts_predefine_symbols(void)
   fts_s_error_description  = fts_new_symbol("errdesc");
   fts_s_size       = fts_new_symbol("size");
   fts_s_state      = fts_new_symbol("state");
+  fts_s_abstraction = fts_new_symbol("abstraction");
+  fts_s_template   = fts_new_symbol("template");
+  fts_s_patcher_type = fts_new_symbol("type");
 
   /* Symbols related to builtin classes */
 

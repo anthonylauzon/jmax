@@ -79,7 +79,7 @@ fts_client_send_prop(fts_object_t *obj, fts_symbol_t name)
 
       fts_client_mess_start_msg(CLIENTPROP_CODE);
       fts_client_mess_add_object(obj);
-      fts_client_mess_add_sym(name);
+      fts_client_mess_add_symbol(name);
       fts_client_mess_add_atoms(1, &a);
       fts_client_mess_send_msg();
     }

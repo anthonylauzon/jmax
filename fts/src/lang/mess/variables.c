@@ -17,7 +17,7 @@
 #include "lang/mess/messP.h"
 #include "lang/datalib.h"
 
-/* #define TRACE_DEBUG  */
+/* #define TRACE_DEBUG */
 
 /* Errors */
 

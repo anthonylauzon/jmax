@@ -27,14 +27,15 @@ public class FtsPatcherObject extends FtsObject
    */
 
 
-  public FtsPatcherObject(FtsObject parent, String description, int objId)
+  public FtsPatcherObject(FtsObject parent, String variableName, String description, int objId)
   {
-    super(parent, "jpatcher", description, objId);
+    super(parent, "jpatcher", variableName, description, objId);
   }
 
 
   /**
    * Special method to redefine a patcher without looosing its content 
+   * To be changed according to the new syntax. !!!!!!
    */
 
   public void redefinePatcher(String description)

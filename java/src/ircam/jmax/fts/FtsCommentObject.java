@@ -26,7 +26,7 @@ public class FtsCommentObject extends FtsObject
 
   public FtsCommentObject(FtsObject parent, String description, int objId)
   {
-    super(parent, "comment", description, objId);
+    super(parent, "comment", null, description, objId);
 
     ninlets = 0;
     noutlets = 0;

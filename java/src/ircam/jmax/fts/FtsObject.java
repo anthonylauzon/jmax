@@ -30,11 +30,12 @@ public class FtsObject
    *  Used also in the message box.
    */
 
-  static FtsObject makeFtsObjectFromMessage(FtsMessage msg) throws FtsException
+  static FtsObject makeFtsObjectFromMessage(FtsMessage msg, boolean doVariable) throws FtsException
   {
     FtsPatcherData data;
     FtsObject parent;
     FtsObject obj;
+    String variable = null;
     String className;
     StringBuffer description;
     int objId;
@@ -42,19 +43,32 @@ public class FtsObject
 
     parent = (FtsObject) msg.getNextArgument();
     data   = (FtsPatcherData) msg.getNextArgument();
-    objId = ((Integer) msg.getNextArgument()).intValue();
+    objId  = ((Integer) msg.getNextArgument()).intValue();
 
+    if (doVariable)
+      variable =  (String) msg.getNextArgument();
+      
     /* Check for null description object */
 
     className = (String) msg.getNextArgument();
 
     if (className == null)
-      return new FtsObject(parent, "", "", objId);
+      return new FtsObject(parent, "", null, "", objId);
     else
       className = className.intern();
 
+    /* Note that we do the unparsing relative to ':' and variables
+       here; in the future, a dedicated API should be used ! */
+
     if (className == "jpatcher")
-      obj =  new FtsPatcherObject(parent, FtsParse.unparseObjectDescription(msg), objId);
+      {
+	if (doVariable)
+	  obj =  new FtsPatcherObject(parent, variable,
+				      variable + " : " + FtsParse.unparseObjectDescription(msg), objId);
+	else
+	  obj =  new FtsPatcherObject(parent, variable,
+				      FtsParse.unparseObjectDescription(msg), objId);
+      }
     else if (className == "inlet")
       obj =  new FtsInletObject(parent, ((Integer) msg.getNextArgument()).intValue(), objId);
     else if (className == "outlet")
@@ -68,7 +82,14 @@ public class FtsObject
     else if (className == "__clipboard")
       obj =  new FtsClipboard(parent, className, "__clipboard", objId);
     else
-      obj = new FtsObject(parent, className, FtsParse.unparseObjectDescription(className, msg), objId);
+      {
+	if (doVariable)
+	  obj = new FtsObject(parent, className, variable,
+			      variable + " : " + FtsParse.unparseObjectDescription(className, msg), objId);
+	else
+	  obj = new FtsObject(parent, className, variable,
+			      FtsParse.unparseObjectDescription(className, msg), objId);
+      }
 
     if (data != null)
       data.addObject(obj);
@@ -418,6 +439,10 @@ public class FtsObject
 
   String className;	
 
+  /** the variable name, if any */
+
+  String variableName = null;
+
   /** The object name, if exists */
 
   String objectName;
@@ -520,13 +545,14 @@ public class FtsObject
    * Create a FtsObject object.
    */
 
-  protected FtsObject(FtsObject parent, String className, String description, int objId)
+  protected FtsObject(FtsObject parent, String className, String variableName, String description, int objId)
   {
     super();
 
-    this.className = className;
-    this.description = description;
-    this.parent = parent;
+    this.variableName = variableName;
+    this.className    = className;
+    this.description  = description;
+    this.parent       = parent;
 
     if (objId != -1)
       setObjectId(objId);

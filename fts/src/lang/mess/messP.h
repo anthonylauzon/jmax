@@ -50,7 +50,7 @@ extern void fts_patcher_assign_variable(fts_symbol_t name, fts_atom_t *value, vo
 extern void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in);
 
 extern void fts_patcher_reassign_inlets_outlets(fts_patcher_t *obj);
-extern void fts_patcher_reassign_name(fts_patcher_t *this, fts_symbol_t new_name);
+
 
 /* 
  * Property related private functions

@@ -28,7 +28,7 @@ public class FtsInletObject  extends FtsObject
   
   public FtsInletObject(FtsObject parent, int position, int objId)
   {
-    super(parent, "inlet", "inlet " + position, objId);
+    super(parent, "inlet", null, "inlet " + position, objId);
 
     this.position = position;
 

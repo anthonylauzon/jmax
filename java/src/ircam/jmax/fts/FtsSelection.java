@@ -34,7 +34,7 @@ public class FtsSelection  extends FtsObject
 
   protected  FtsSelection(FtsObject parent, String className, String description, int objId)
   {
-    super(parent, className, description, objId);
+    super(parent, className, null, description, objId);
   }
 
   /** Add an object to this container  */

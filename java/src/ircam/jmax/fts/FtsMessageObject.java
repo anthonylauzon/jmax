@@ -26,7 +26,7 @@ public class FtsMessageObject extends FtsObject
 
   public FtsMessageObject(FtsObject parent, String description, int objId)
   {
-    super(parent, "messbox", description, objId);
+    super(parent, "messbox", null, description, objId);
 
     ninlets = 1;
     noutlets = 1;

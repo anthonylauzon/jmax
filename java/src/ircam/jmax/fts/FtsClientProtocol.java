@@ -94,6 +94,7 @@ class FtsClientProtocol
   static final int fts_download_connection_cmd = 'H';
 
   static final int fts_new_object_cmd = 'n';
+  static final int fts_new_object_var_cmd = 'N';
   static final int fts_delete_object_cmd = 'f';
 
   static final int fts_redefine_patcher_cmd = 'Q';
@@ -157,6 +158,8 @@ class FtsClientProtocol
 	return "fts_download_connection";
       case 'n':
 	return "fts_new_object";
+      case 'N':
+	return "fts_new_object_var";
       case 'Q':
 	return "fts_redefine_patcher";
       case 'R':

@@ -97,6 +97,9 @@ extern fts_symbol_t fts_s_size;
 extern fts_symbol_t fts_s_error;
 extern fts_symbol_t fts_s_error_description;
 extern fts_symbol_t fts_s_state;
+extern fts_symbol_t fts_s_abstraction;
+extern fts_symbol_t fts_s_template;
+extern fts_symbol_t fts_s_patcher_type;
 
 /* Symbols related to builtin classes */
 

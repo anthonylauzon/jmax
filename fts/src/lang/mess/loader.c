@@ -221,9 +221,6 @@ fts_object_t *fts_binary_file_load( const char *name,
 
   obj = fts_run_mess_vm(parent, desc.code, desc.symbols, ac, at, e);
 
-  if (obj == 0)
-    post("fts_binary_file_load: VM return null for %s\n", name);
-
   fts_binary_file_dispose( &desc);
 
   return obj;

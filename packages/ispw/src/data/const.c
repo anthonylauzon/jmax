@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1998/08/27 10:16:44 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:20 $
  *
  * Maintain a symbol table and define a message-passing system
  */
@@ -98,3 +98,4 @@ const_obj_get_state(fts_daemon_action_t action, fts_object_t *obj,
 
   *value = this->a;
 }
+
