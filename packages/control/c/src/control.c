@@ -26,26 +26,21 @@
 
 #include <fts/fts.h>
 
-/*extern void bus_config(void);*/
-/*extern void throw_config(void);*/
-/*extern void catch_config(void);*/
 extern void switch_config(void);
 extern void oneshot_config(void);
 extern void demux_config(void);
 extern void for_config(void);
+extern void count_config(void);
 extern void range_config(void);
-extern void keys_config(void);
 
 static void
 control_init(void)
 {
-  /*bus_config();*/
-  /*throw_config();*/
-  /*catch_config();*/
   switch_config();
   oneshot_config();
   demux_config();
   for_config();
+  count_config();
   range_config();
 }
 

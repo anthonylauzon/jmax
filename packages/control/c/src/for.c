@@ -92,12 +92,12 @@ for_int_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   int incr = this->incr;
   int i;
 
-  if(incr > 0.0 && init < limit)
+  if(incr > 0 && init < limit)
     {
       for(i=init; i<limit; i+=incr)
 	fts_outlet_int(o, 0, i);
     }
-  else if(incr < 0.0 && init > limit)
+  else if(incr < 0 && init > limit)
     {
       for(i=init; i>limit; i+=incr)
 	fts_outlet_int(o, 0, i);
@@ -236,7 +236,15 @@ for_float_set_and_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 int
 for_is_int(int ac, const fts_atom_t *at)
 {
-  return (ac <= 1 || fts_is_int(at + 1)) && (ac <= 2 || fts_is_int(at + 2)) && (ac <= 3 || fts_is_int(at + 3));
+  int i;
+
+  for(i=0; i<ac; i++)
+    {
+      if(!fts_is_int(at + i))
+	return 0;
+    }
+  
+  return 1;
 }
 
 static fts_status_t
@@ -245,7 +253,10 @@ for_float_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_symbol_t a[3];
   int i;
 
-  for(i=1; i<ac; i++)
+  ac--;
+  at++;
+
+  for(i=0; i<ac; i++)
     if(!fts_is_number(at + i))
       return &fts_CannotInstantiate;
 
@@ -293,7 +304,7 @@ for_float_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 int
 for_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
-  return for_is_int(ac0, at0) == for_is_int(ac1, at1);
+  return for_is_int(ac0 - 1, at0 + 1) == for_is_int(ac1 - 1, at1 + 1);
 }
 
 void
