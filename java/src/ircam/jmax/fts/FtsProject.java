@@ -147,8 +147,6 @@ public class FtsProject extends FtsPackage
       {      
 	patch = (FtsPatcherObject)e.nextElement();
 	args.addSymbol( FtsSymbol.get( patch.getName()));
-	/*args.addInt( patch.getX());
-	  args.addInt( patch.getY());*/
       }
     try
       {

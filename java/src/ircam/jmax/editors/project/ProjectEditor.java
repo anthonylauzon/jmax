@@ -253,9 +253,8 @@ public class ProjectEditor extends JFrame implements EditorContainer
 	  }
       }
     /* save the open windows in the project */
-    if( patchs.size() > 0)
-      JMaxApplication.getProject().saveWindows( patchs.elements());
-    
+    JMaxApplication.getProject().saveWindows( patchs.elements());
+
     JMaxApplication.getProject().save( null);
   }
 
@@ -276,8 +275,7 @@ public class ProjectEditor extends JFrame implements EditorContainer
 	    patchs.add( patcher);
 	}
     }
-    if( patchs.size() > 0)
-      JMaxApplication.getProject().saveWindows( patchs.elements());
+    JMaxApplication.getProject().saveWindows( patchs.elements());
   }
 
   /****************** Packages ***********************************/
