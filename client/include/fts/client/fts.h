@@ -20,6 +20,13 @@
  * 
  */
 
+#ifdef WIN32
+/* Disable an annoying warning ("C++ exception specification ignored").
+ * VC6 doesn't seem to handle the "void func(args) throw exception;" syntax.
+ */
+#pragma warning ( disable: 4290 )
+#endif
+
 #include <fts/client/types.h>
 
 /**
@@ -73,7 +80,7 @@ class FTSCLIENT_API FtsProcess : public Fts {
   }
 
  private:
-  void init( const char *path, FtsArgs &args) throw( FtsClientException);
+  void init( const char *path, FtsArgs &args, const char *vendorName = NULL, const char *appName = NULL) throw( FtsClientException);
   void findDefaultPath() throw( FtsClientException);
 
   const char *_path;
