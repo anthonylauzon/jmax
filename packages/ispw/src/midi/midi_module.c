@@ -8,6 +8,7 @@ extern void midiformat_config(void);
 extern void midiparse_config(void);
 extern void stripnote_config(void);
 extern void sustain_config(void);
+extern void mididecrypt_config( void);
 
 static void
 midi_module_init(void)
@@ -16,6 +17,7 @@ midi_module_init(void)
   Rsend_config();
   makenote_config();
   midi_config();
+  mididecrypt_config();
   midiformat_config();
   midiparse_config();
   stripnote_config();

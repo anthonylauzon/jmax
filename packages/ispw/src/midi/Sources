@@ -1,9 +1,10 @@
 SOURCES = \
-midi_module.c \
 Rreceive.c \
 Rsend.c \
 makenote.c \
 midi.c \
+midi_module.c \
+mididecrypt.c \
 midiformat.c \
 midiparse.c \
 stripnote.c \
