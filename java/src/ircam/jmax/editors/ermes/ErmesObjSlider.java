@@ -154,19 +154,22 @@ class ErmesObjSlider extends ErmesObject {
 	  itsFtsObject.put("value", new Integer(itsInteger+itsRangeMin));
 	  itsThrottle.Move(itsThrottle.itsX, y-2);
 	  itsMovingThrottle = true;
-	  DoublePaint();
+	  //double
+	  Paint_specific(itsSketchPad.getGraphics());
 	}
 	else if(itsY+currentRect.height-BOTTOM_OFFSET<y){
 	  itsFtsObject.put("value", new Integer(itsRangeMin));
 	  itsInteger = 0;
 	  itsThrottle.Move(itsThrottle.itsX, itsY+currentRect.height-BOTTOM_OFFSET-2);
-	  DoublePaint();
+	  //DoublePaint();
+	  Paint_specific(itsSketchPad.getGraphics());
 	}
 	else if(itsY+UP_OFFSET>=y){
 	  itsFtsObject.put("value", new Integer(itsRangeMax));
 	  itsInteger = itsRangeMax;
 	  itsThrottle.Move(itsThrottle.itsX, itsY+UP_OFFSET-2);
-	  DoublePaint();
+	  //DoublePaint();
+	  Paint_specific(itsSketchPad.getGraphics());
 	}
 	//else if(evt.getClickCount()>1){
 	//SetSliderDialog();
@@ -187,19 +190,22 @@ class ErmesObjSlider extends ErmesObject {
 	itsInteger = (int)(((itsY+currentRect.height)-y-BOTTOM_OFFSET)*itsStep);
 	itsFtsObject.put("value", new Integer(itsInteger+itsRangeMin));
 	itsThrottle.Move(itsThrottle.itsX, y-2);
-	DoublePaint();
+	//DoublePaint();
+	Paint_specific(itsSketchPad.getGraphics());
       }
       else if(itsY+currentRect.height-BOTTOM_OFFSET<y){//theValue is the minimum
 	itsFtsObject.put("value", new Integer(itsRangeMin));
 	itsInteger = 0;
 	itsThrottle.Move(itsThrottle.itsX, itsY+currentRect.height-BOTTOM_OFFSET-2);
-	DoublePaint();
+	//DoublePaint();
+	Paint_specific(itsSketchPad.getGraphics());
       }
       else if(itsY+UP_OFFSET>=y){
 	itsFtsObject.put("value", new Integer(itsRangeMax));
 	itsInteger = itsRangeMax;
 	itsThrottle.Move(itsThrottle.itsX, itsY+UP_OFFSET-2);
-	DoublePaint();
+	//DoublePaint();
+	Paint_specific(itsSketchPad.getGraphics());
       }
       return true;
     }
@@ -226,7 +232,8 @@ class ErmesObjSlider extends ErmesObject {
     if(itsSketchPad.itsRunMode || evt.isControlDown()){
       FtsServer.getServer().syncToFts();
       itsMovingThrottle = false;
-      DoublePaint();
+      //DoublePaint();
+      Paint_specific(itsSketchPad.getGraphics());
       return true;
     }
     else return super.MouseUp(evt, x, y);
@@ -248,7 +255,8 @@ class ErmesObjSlider extends ErmesObject {
   void MoveThrottleTo(int value) {//value between 0 and itsRange, to be scaled to 0ÖcurrentRect.height
     itsThrottle.Move(itsThrottle.itsX, itsThrottle.DragToAbsolute((int)(value*itsStep))-2);
     if (itsSketchPad.getGraphics() != null)
-      DoublePaint();//?
+      //DoublePaint();//?
+      Paint_specific(itsSketchPad.getGraphics());
   }
 	
   public boolean NeedPropertyHandler(){
@@ -260,11 +268,6 @@ class ErmesObjSlider extends ErmesObject {
   }
 
   public void Paint_specific(Graphics g) {
-    
-    if (g==null) {
-      System.out.println("Error in graphic update: null graphic contest");
-      return;
-    }
     if(!itsSelected) g.setColor(itsUINormalColor);
     else g.setColor(itsUISelectedColor);
     g.fill3DRect(itsX+1,itsY+1, currentRect.width-2,  currentRect.height-2, true);
@@ -275,6 +278,25 @@ class ErmesObjSlider extends ErmesObject {
     //paint dragBox
     if(!itsSketchPad.itsRunMode) 
       g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
+    //paint throttle
+    itsThrottle.Paint(g);
+  }
+
+  public void SperimentalPaint_specific(Graphics g) {
+    
+    g.setColor(Color.white);
+    g.drawLine(itsX+currentRect.width-2, itsY+1, itsX+currentRect.width-2, itsY+currentRect.height-2); g.drawLine(itsX+currentRect.width-2, itsY+currentRect.height-2, itsX+1, itsY+currentRect.height-2);
+    
+    if(!itsSelected) g.setColor(itsUINormalColor);
+    else g.setColor(itsUISelectedColor);
+    g.fillRect(itsX+1,itsY+1, currentRect.width-3,  currentRect.height-3);
+    g.setColor(Color.black);
+    g.drawRect(itsX+0,itsY+ 0, currentRect.width-1, currentRect.height-1);
+    g.drawLine(itsX+currentRect.width/2, itsY+UP_OFFSET, itsX+currentRect.width/2, itsY+currentRect.height-BOTTOM_OFFSET);
+	  
+    //paint dragBox
+    if(!itsSketchPad.itsRunMode) 
+    g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
     //paint throttle
     itsThrottle.Paint(g);
   }
