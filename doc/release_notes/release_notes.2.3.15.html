@@ -22,11 +22,62 @@ This is release 2.3.15 of <I>j</I>Max.
 
 <H3>Status</H3>
 
+<P>
+This release is considered:
+<UL>
+<LI> <STRONG>stable</STRONG> on SGI
+<LI> <STRONG>beta</STRONG> on Linux. Namely, the system has not
+been extensively tested and its performance is not fully representative
+of the final performance that can be achieved on Linux.
+</UL>
+
 
 <H3>Supported platforms</H3>
 
+<p>
+This release have been compiled on:
+<ul>
+<li> IRIX 6.5 for R10000, R5000, R4x00 processors
+<li> IRIX 6.3 for R10000, R5000 processors
+<LI> Linux for Intel Pentium-Pro and Pentium-II processors
+</ul>
 
-<H3>Bug tracking system</H3>
+<h3>Fixed bugs</h3>
+
+<p>
+The following bugs have been fixed:
+<ul>
+<li> #154: systune maxlkmem must be checked
+<li> #155: Pasting in a text field with already selected text
+<li> (not reported): qlist jumps to top of text after paste
+</ul>
+
+<p>
+This release implements a workaround for the following bug:
+<ul>
+<li> #139: printing in the console can freeze jmax. <BR>
+By starting jMax either with the option "-jmaxNoConsole true"
+or by adding the command "set jmaxNoConsole true" in your
+.jmaxrc file, console printout will not show in the console 
+window, but in the standard output of the java process, usually 
+a shell, and will not freeze java. A new console graphic 
+component will be implemented in a next release.
+</ul>
+
+<h3>Floating-point exceptions tracking</h3>
+
+<p>
+Support has been added to track floating-point exceptions.
+When floating-point exceptions occur, you can open the
+"Fpe Panel" in "Tools" menu. This panel will show the
+objects that triggered these exceptions (either in control
+or in DSP computation). A supplementary option allows
+to track floating point NaN (Not a Number) in DSP computation.<BR>
+<STRONG>Warning:</STRONG> This option is very time-consuming
+and can dramatically decrease performance.
+
+
+<h3>Bug tracking system</h3>
 
 <P>
 Bugs are repertoried in the Ircam bug tracking system, at the following URL:
