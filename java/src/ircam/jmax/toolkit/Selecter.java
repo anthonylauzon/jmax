@@ -129,7 +129,7 @@ public class Selecter extends InteractionModule implements XORPainter {
   public void XORDraw(int dx, int dy) 
   {
     Graphics g = gc.getGraphicDestination().getGraphics();
-
+		
     g.setColor(Color.gray);
     g.setXORMode(Color.white); //there's an assumption here on the color of the background.
 
@@ -138,7 +138,18 @@ public class Selecter extends InteractionModule implements XORPainter {
     tempRect.setBounds( startSelection.x, startSelection.y, movingPoint.x-startSelection.x, movingPoint.y-startSelection.y);
     normalizeRectangle(tempRect);
 
-    if((tempRect.width>=2)||(tempRect.height>=2)) 
+		if(tempRect.x < 0) 
+		{
+			tempRect.width+=tempRect.x;
+			tempRect.x = 0;
+		}
+		if(tempRect.y < 0) 
+		{
+			tempRect.height+=tempRect.y;
+			tempRect.y = 0;
+		}
+		
+		if((tempRect.width>=2)||(tempRect.height>=2)) 
       g.drawRect(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
 
     g.setPaintMode();
@@ -152,7 +163,7 @@ public class Selecter extends InteractionModule implements XORPainter {
    */
   public static void normalizeRectangle(Rectangle r) 
   {  
-    /* sets the origin */
+		/* sets the origin */
     if (r.width < 0) r.x = r.x+r.width;
     
     if (r.height < 0) r.y = r.y+r.height;
