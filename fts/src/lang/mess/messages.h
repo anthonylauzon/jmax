@@ -15,9 +15,6 @@
 #ifndef _MESSAGES_H_
 #define _MESSAGES_H_
 
-/* For isnanf */
-#include <ieeefp.h>
-
 /* Return status values */
 
 extern fts_status_description_t fts_MethodNotFound;
@@ -152,9 +149,6 @@ do { \
   fts_connection_t *__conn; \
   fts_atom_t __a; \
  \
-  if (isnanf( (F))) \
-      fts_fpe_add_object( O); \
-  \
   fts_set_float(&__a, (F)); \
   \
   __conn = (O)->out_conn[(WOUTLET)]; \
