@@ -211,12 +211,12 @@ static void ftl_info_table_destroy( ftl_info_table_t *table)
   int i;
 
   for ( i = 0; i < table->size; i++)
-      {
-	  if (table->info[i].input_infos)
-	      fts_free( table->info[i].input_infos);
-	  if (table->info[i].output_infos)
-	      fts_free( table->info[i].output_infos);
-      }
+    {
+      if (table->info[i].input_infos)
+	fts_free( table->info[i].input_infos);
+      if (table->info[i].output_infos)
+	fts_free( table->info[i].output_infos);
+    }
     
   fts_free( table->info);
 
@@ -493,7 +493,7 @@ static fts_status_t ftl_state_machine( fts_array_t *array, state_fun_t fun, void
   size = fts_array_get_size( array);
   a = fts_array_get_atoms( array);
 
-  for( i = 0; i < size; i++)
+  for( i = 0; i < size; i++, a++)
     {
       switch( state) {
       case ST_OPCODE:
