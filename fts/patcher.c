@@ -880,7 +880,7 @@ patcher_unregister_objects(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
       for (c = fts_object_get_outlet_connections(p, outlet); c ; c = c->next_same_src)
       {
         if(fts_object_has_client( (fts_object_t *)c))
-          fts_client_unregister_object((fts_object_t *)c);
+	  fts_client_unregister_object((fts_object_t *)c);
       }
     }    
     
@@ -1952,12 +1952,12 @@ patcher_mark_objects_as_deleted( fts_patcher_t *p)
   
   for (obj = p->objects; obj ; obj = fts_object_get_next_in_patcher(obj))
   {
-    if( fts_object_is_patcher(obj))
-      patcher_mark_objects_as_deleted( (fts_patcher_t *)obj);
-    
     fts_update_reset(obj);
     fts_client_release_object(obj);
     fts_object_set_status(obj, FTS_OBJECT_STATUS_PENDING_DELETE);
+
+    if( fts_object_is_patcher(obj))
+      patcher_mark_objects_as_deleted( (fts_patcher_t *)obj);
   }
 }
 
