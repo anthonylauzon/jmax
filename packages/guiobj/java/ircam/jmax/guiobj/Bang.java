@@ -82,12 +82,7 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
 
   public void setDefaults()
   {
-    int width = getWidth();
-
-    if (width == -1)
-      setWidth( DEFAULT_WIDTH);
-    else if (width <= MINIMUM_WIDTH)
-      setWidth( MINIMUM_WIDTH);       
+    setWidth( DEFAULT_WIDTH);
   }
   // redefined from base class
   public void setWidth( int theWidth)

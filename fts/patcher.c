@@ -1368,6 +1368,10 @@ fts_patcher_redefine_object_from_client( fts_object_t *o, int winlet, fts_symbol
   obj = fts_object_redefine(oldobj, -1, 0, ac - 1, at + 1);
       
   fts_client_upload_object(obj, -1);
+
+  fts_set_object(a, obj);
+  fts_client_send_message(o, sym_objectRedefined, 1, a);
+
   fts_patcher_set_dirty((fts_patcher_t *)o, 1);
 }
 

@@ -59,10 +59,10 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
 
   public void setDefaults()
   {
-    if (getWidth() == -1)     
-      setWidth(getDefaultWidth());
-    else
-      updateDimensions();
+    //if (getWidth() == -1)     
+    setWidth(getDefaultWidth());
+    /*else
+      updateDimensions();*/
   }
 
   public void updateDimensions()

@@ -65,13 +65,29 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
   public void setDefaults()
   {    
-    setWidth( getWidth());
-    setHeight( getHeight());
+    setWidth(  DEFAULT_WIDTH);
+    setHeight( DEFAULT_HEIGHT);
   }
 
   public void display()
   {
     redraw();
+  }
+
+  public void setCurrentBounds(int x, int y, int w, int h)
+  {
+    super.setCurrentBounds( x, y, w, h);
+    
+    if(w > 2)
+      {      
+	size = w-2;
+	((FtsVectorDisplayObject)ftsObject).setSize( size);
+      }
+    if(h > 2)
+      {
+	range = h-2;
+	((FtsVectorDisplayObject)ftsObject).setRange( range);
+      }
   }
 
   public void setWidth(int w) 

@@ -613,6 +613,18 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
       }
   }
 
+  public void objectRedefined(FtsGraphicObject fObj)
+  {
+    GraphicObject obj = displayList.getGraphicObjectFor( fObj);
+    if ((obj instanceof Editable)&&(getTextEditedObject() == obj))
+      stopTextEditing();
+    else 
+      {
+	obj.setDefaults();
+	repaint();
+      }
+  }
+
   public GraphicConnection addNewConnection(FtsConnection fc)
   {
       GraphicConnection connection = new GraphicConnection(this,displayList.getGraphicObjectFor(fc.getFrom()),

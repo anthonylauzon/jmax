@@ -65,8 +65,10 @@ public class Fork extends GraphicObject
 
   public void setDefaults()
   {
-    setWidth( getWidth());
-    setHeight(CONST_HEIGHT);
+    super.setWidth( DEFAULT_WIDTH);
+    super.setHeight(CONST_HEIGHT);
+    setInletDistance(DEFAULT_DISTANCE);
+    setOutletDistance(DEFAULT_DISTANCE);
   }
 
   // redefined from base class

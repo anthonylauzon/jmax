@@ -88,17 +88,9 @@ public class Slider extends GraphicObject implements FtsIntValueListener
 
   public void setDefaults()
   {
-    if(getWidth() <= 0)
-      setWidth( DEFAULT_WIDTH);
-    else if(getWidth() <= MINIMUM_DIMENSION)
-      setWidth(MINIMUM_DIMENSION);
-
-    /* Probabily usefull only for new object */
-
+    setWidth( DEFAULT_WIDTH);
     int h = BOTTOM_OFFSET + (rangeMax - rangeMin) + UP_OFFSET;
-    
-    if (getHeight() < BOTTOM_OFFSET +  UP_OFFSET)
-      setHeight( h);
+    setHeight( h);
   }
   public void setMinValue( int theValue) 
   {

@@ -56,7 +56,8 @@ public class Toggle extends GraphicObject implements FtsIntValueListener
 
   public void setDefaults()
   {
-    setWidth( getWidth());
+    super.setWidth( DEFAULT_WIDTH);
+    super.setHeight( DEFAULT_WIDTH);
   }
 
   // redefined from base class

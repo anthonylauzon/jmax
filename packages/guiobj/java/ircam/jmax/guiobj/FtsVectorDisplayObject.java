@@ -125,10 +125,10 @@ public class FtsVectorDisplayObject extends FtsGraphicObject
 	send( FtsSymbol.get("range"), args);
     }
     catch(IOException e)
-	{
-	    System.err.println("FtsVectorDisplayObject: I/O Error sending range Message!");
-	    e.printStackTrace(); 
-	}
+      {
+	System.err.println("FtsVectorDisplayObject: I/O Error sending range Message!");
+	e.printStackTrace(); 
+      }
 
     computeZero();
   }  
@@ -180,19 +180,19 @@ public class FtsVectorDisplayObject extends FtsGraphicObject
       {
 	for(int i=0; i<wrap; i++)
 	  values[wrap - i - 1] = args[i].intValue;
-	
+
 	int tail = nArgs - wrap;
 
 	for(int i=0; i<tail; i++)
 	  values[MAX_SIZE - i - 1] = args[wrap + i].intValue;
-	
+
 	wrap = MAX_SIZE - tail;
       }
     
     nValues += nArgs;
     if(nValues > size)
       nValues = size;
-
+    
     ((FtsDisplayListener) listener).display();
   }
 

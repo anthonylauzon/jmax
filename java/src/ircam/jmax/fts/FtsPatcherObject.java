@@ -937,7 +937,10 @@ public class FtsPatcherObject extends FtsObjectWithEditor
       }
   }
 
-  public void objectRedefined(FtsGraphicObject obj){}
+  public void objectRedefined(FtsGraphicObject obj)
+  {
+    ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.objectRedefined( obj);
+  }
 
   /**************************************************************/
   /**************************************************************/

@@ -59,13 +59,8 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
 
   public void setDefaults()
   {
-    int minWidth = getMinWidth();
-    if (getWidth() < minWidth)
-      super.setWidth( minWidth);
-
-    int minHeight = getMinHeight();
-    if ( getHeight() < minHeight)
-      super.setHeight( minHeight);
+    super.setWidth( getMinWidth());
+    super.setHeight( getMinHeight());
   }
 
   private int getMinWidth()
