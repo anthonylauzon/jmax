@@ -235,15 +235,21 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
   {
     int i = 0;      
     pixelsSize = args[0].intValue;    
-    pixels = new double[pixelsSize + 10];
+    t_pixels = new double[pixelsSize + 10];
+    b_pixels = new double[pixelsSize + 10];
 
     if( isIvec())
-      for(i = 0; i<nArgs-1; i++)
-	pixels[i] = (double)args[i+1].intValue;
+      for(i = 0; i<nArgs-2; i+=2)
+	{	
+	  t_pixels[i] = (double)args[i+1].intValue;
+	  b_pixels[i] = (double)args[i+2].intValue;
+	}
     else
-      for(i = 0; i<nArgs-1; i++)
-	pixels[i] = args[i+1].doubleValue;
-    
+      for(i = 0; i<nArgs-2; i+=2)
+	{
+	  t_pixels[i] = args[i+1].doubleValue;
+	  b_pixels[i] = args[i+2].doubleValue;
+	}
     if(pixelsSize <= nArgs-1)
       notifySet();
   }
@@ -251,51 +257,82 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
   public void appendPixels(int nArgs , FtsAtom args[])
   {
     int startIndex = args[0].intValue;
-    int i=0;
+    int i = 0; int j = 0;
 
     if( isIvec())
-      for(i = 0; (i < nArgs-1)&&(startIndex+i < pixels.length) ; i++)
-	pixels[startIndex+i] = (double)args[i+1].intValue;
+      for(i = 0; (i < nArgs-2)&&(startIndex+j < t_pixels.length) ; i+=2)
+	{
+	  t_pixels[startIndex+j] = (double)args[i+1].intValue;
+	  b_pixels[startIndex+j] = (double)args[i+2].intValue;
+	  j++;
+	}
     else
-      for(i = 0; (i < nArgs-1)&&(startIndex+i < pixels.length) ; i++)
-	pixels[startIndex+i] = args[i+1].doubleValue;
-    
+      for(i = 0; (i < nArgs-2)&&(startIndex+j < t_pixels.length) ; i+=2)
+	{
+	  t_pixels[startIndex+j] = args[i+1].doubleValue;
+	  b_pixels[startIndex+j] = args[i+2].doubleValue;
+	  j++;
+	}
     if(pixelsSize <= startIndex+nArgs-1)
-      notifyPixelsChanged( startIndex, startIndex+i-1);
+      notifyPixelsChanged( startIndex, startIndex+j-1);
   }
 
   public void addPixels(int nArgs , FtsAtom args[])
   {
     int startIndex = args[0].intValue;
-    int i=0;
-    int newp = nArgs-1;
-    double[] temp = new double[pixelsSize + 10];    
+    int i=0; int j=0;
+    int newp = (int)(nArgs-1)/2;
+    double[] t_temp = new double[pixelsSize + 10];    
+    double[] b_temp = new double[pixelsSize + 10];    
 
     if(startIndex==0)
       {
 	if( isIvec())
-	  for(i = 0; i < newp; i++)
-	    temp[i] = (double)args[i+1].intValue;
+	  for(i = 0; i < (nArgs-1); i+=2)
+	    {
+	      t_temp[j] = (double)args[i+1].intValue;
+	      b_temp[j] = (double)args[i+2].intValue;
+	      j++;
+	    }	
 	else
-	  for(i = 0; i < newp; i++)
-	    temp[i] = args[i+1].doubleValue;
+	  for(i = 0; i < (nArgs-1); i+=2)
+	    {
+	      t_temp[j] = args[i+1].doubleValue;
+	      b_temp[j] = args[i+2].doubleValue;
+	      j++;
+	    }
 
 	for(i = newp; i< pixelsSize; i++)
-	  temp[i] = pixels[i-newp];
+	  {	  
+	    t_temp[i] = t_pixels[i-newp];
+	    b_temp[i] = b_pixels[i-newp];
+	  }
       }
     else
       {
 	for(i = 0; i<pixelsSize-newp; i++)
-	  temp[i] = pixels[i+newp];
-	
+	  {
+	    t_temp[i] = t_pixels[i+newp];
+	    b_temp[i] = b_pixels[i+newp];
+	  }
+
+	j = 1;
 	if( isIvec())
-	  for(i = 1; i<= newp; i++)
-	    temp[pixelsSize-newp-1+i] = (double)args[i].intValue;
+	  for(i = 1; i<= (nArgs-1); i+=2)
+	    {
+	      t_temp[pixelsSize-newp-1+j] = (double)args[i].intValue;
+	      b_temp[pixelsSize-newp-1+j] = (double)args[i+1].intValue;
+	      j++;
+	    }	
 	else
-	  for(i = 1; i<= newp; i++)
-	    temp[pixelsSize-newp-1+i] = args[i].doubleValue;
+	  for(i = 1; i<= (nArgs-1); i+=2)
+	    {
+	      t_temp[pixelsSize-newp-1+j] = args[i].doubleValue;
+	      b_temp[pixelsSize-newp-1+j] = args[i+1].doubleValue;
+	    }
       }
-    pixels = temp;
+    t_pixels = t_temp;
+    b_pixels = b_temp;
     notifySet();
   }
 
@@ -512,7 +549,8 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
 
   private double[] visibles;
   private int visibleSize = 0;
-  private double[] pixels;
+  private double[] t_pixels;
+  private double[] b_pixels;
   private int pixelsSize = 0;
   
   public int getVisibleSize()
@@ -527,11 +565,17 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
   {
     return pixelsSize;
   }
-  public double getPixel(int index)
+  public double getTopPixel(int index)
   {
     if(index >= pixelsSize) return 0;
     else
-      return pixels[index];
+      return t_pixels[index];
+  }
+  public double getBottomPixel(int index)
+  {
+    if(index >= pixelsSize) return 0;
+    else
+      return b_pixels[index];
   }
   
   public int getSize()

@@ -157,7 +157,8 @@ tabeditor_send_pixels(tabeditor_t *tabeditor)
   int i;
   fts_atom_t a[IVEC_CLIENT_BLOCK_SIZE];
   int vecsize = tabeditor_get_size( tabeditor);
-  int n = (tabeditor->pixsize)*2;
+  int n = tabeditor->pixsize;
+  int num_val = n*2;
   float k = (1/tabeditor->zoom);
   
   int append = 0;
@@ -165,14 +166,14 @@ tabeditor_send_pixels(tabeditor_t *tabeditor)
   int send = 0;
   int current = tabeditor->vindex;
   
-  while(n > 0)
+  while(num_val > 0)
     {
       if(!append)
 	fts_set_int(&a[0], n);
       else
 	fts_set_int(&a[0], count);
       
-      send = (n > IVEC_CLIENT_BLOCK_SIZE-1)? (IVEC_CLIENT_BLOCK_SIZE-1): n;
+      send = (num_val > IVEC_CLIENT_BLOCK_SIZE-1)? (IVEC_CLIENT_BLOCK_SIZE-1): num_val;
       
       if( tabeditor_is_ivec( tabeditor))
 	for(i = 0; ((i < send-1)&&((int)(current+i*k)<vecsize)); i+=2)
@@ -197,7 +198,7 @@ tabeditor_send_pixels(tabeditor_t *tabeditor)
       
       current+=k*send;
       count+=send;
-      n -= send;
+      num_val -= send;
     }
 }
 
@@ -232,7 +233,7 @@ tabeditor_insert_pixels(tabeditor_t *tabeditor, int startId, int size)
   fts_atom_t a[IVEC_CLIENT_BLOCK_SIZE];
   int vecsize = tabeditor_get_size( tabeditor);
   float k = (1 / tabeditor->zoom);
-  int send = ((int)(size * tabeditor->zoom) + 1) * 2;
+  int send = ((int)(size * tabeditor->zoom) + 1)*2;
   int current = startId;
 
   fts_set_int(&a[0], (int)((startId - tabeditor->vindex) * tabeditor->zoom));
@@ -321,14 +322,15 @@ tabeditor_append_pixels(tabeditor_t *tabeditor, int deltax, int deltap)
   fts_atom_t a[IVEC_CLIENT_BLOCK_SIZE];
   int vecsize = tabeditor_get_size( tabeditor);
   float k = (1/tabeditor->zoom);
-  int n = (deltax > 0)? deltax*2 : -deltax*2;
-  
+  int n = (deltax > 0)? deltax : -deltax;
+  int num_val = n*2;
+
   int current = (deltax < 0)? tabeditor->vindex : (tabeditor->vindex + tabeditor->vsize-deltap);
   int start = (deltax < 0)? 0 : tabeditor->pixsize-deltax;
   
-  while(n > 0)
+  while(num_val > 0)
     {
-      int send = (n > IVEC_CLIENT_BLOCK_SIZE-1)? IVEC_CLIENT_BLOCK_SIZE-1: n;
+      int send = (num_val > IVEC_CLIENT_BLOCK_SIZE-1)? IVEC_CLIENT_BLOCK_SIZE-1: num_val;
       
       fts_set_int(&a[0], start);
       
@@ -349,7 +351,7 @@ tabeditor_append_pixels(tabeditor_t *tabeditor, int deltax, int deltap)
   
       current+=k*i;
       start+=send;
-      n -= send;
+      num_val -= send;
     }
 }
 
