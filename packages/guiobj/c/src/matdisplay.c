@@ -26,7 +26,6 @@
 #include <math.h>
 #include <string.h>
 #include <fts/fts.h>
-#include <alloca.h>
 #include "ivec.h"
 #include "fvec.h"
 #include "fmat.h"
