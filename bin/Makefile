@@ -23,12 +23,8 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(bin_install_dir)
 	$(INSTALL_PROGRAM) jmax $(bin_install_dir)
-.PHONY: install-exec
-
-# remove the files copied by make install ?
-uninstall:
-.PHONY: uninstall
+.PHONY: install-noarch
 

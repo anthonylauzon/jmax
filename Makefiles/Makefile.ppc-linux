@@ -23,9 +23,7 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-install-noarch:
-	$(INSTALL_DIR) $(lib_install_dir)/config
-	for f in *.scm *.tcl ; do $(INSTALL_DATA) $$f $(lib_install_dir)/config ; done
-.PHONY: install-noarch
+include Makefiles/Makefile.linux
 
+INSTALL_ARCHS=ppc-linux
 

@@ -34,15 +34,12 @@ clean:
 	(cd src; $(MAKE) clean)
 .PHONY: all
 
-install-exec:
+install-arch:
 	$(INSTALL_DIR) $(lib_install_dir)/fts
 	( cd bin ; $(MAKE) $@ )
-.PHONY: install-exec
+.PHONY: install-arch
 
 install-includes:
 	( cd src ; $(MAKE) $@ )
 .PHONY: install-includes
 
-# remove the files copied by make install ?
-uninstall:
-.PHONY: uninstall

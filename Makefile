@@ -23,48 +23,15 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
+ifdef ARCH
+include Makefiles/Makefile.$(ARCH)
+endif
+
 include VERSION
 
-ifdef SNAPSHOT
 version=$(MAJOR).$(MINOR).$(PATCH_LEVEL)$(SNAPSHOT)
 disttag=V$(MAJOR)_$(MINOR)_$(PATCH_LEVEL)$(SNAPSHOT)
-else
-version=$(MAJOR).$(MINOR).$(PATCH_LEVEL)
-disttag=V$(MAJOR)_$(MINOR)_$(PATCH_LEVEL)
-endif
 distdir=jmax-$(version)
-
-
-ifeq ($(ARCH),sgi)
-INSTALL=install
-INSTALL_DATA=$(INSTALL) -m 644
-INSTALL_PROGRAM=$(INSTALL) -m 755
-INSTALL_SETUID=$(INSTALL) -m 4755
-INSTALL_LIB=$(INSTALL) -m 755
-INSTALL_DIR=$(INSTALL) -d -m 755
-prefix=/usr
-doc_install_dir=$(prefix)/webdocs/jMax
-lib_install_dir=$(prefix)/lib/jmax
-include_install_dir=$(prefix)/include
-bin_install_dir=$(prefix)/bin
-SUB_ARCHS=irix65r10k irix65r5k
-else
-ifeq ($(ARCH),linuxpc)
-INSTALL=install
-INSTALL_DATA=$(INSTALL) --mode=0644
-INSTALL_PROGRAM=$(INSTALL) --mode=0755
-INSTALL_SETUID=$(INSTALL) --mode=4755
-INSTALL_LIB=$(INSTALL) --mode=0755
-INSTALL_DIR=$(INSTALL) -d --mode=0755
-prefix=/usr
-doc_install_dir=$(prefix)/doc/jMax-$(version)
-lib_install_dir=$(prefix)/lib/jmax
-include_install_dir=$(prefix)/include
-bin_install_dir=$(prefix)/bin
-SUB_ARCHS=linuxpc
-else
-endif
-endif
 
 all:
 	(cd fts; $(MAKE) all)
@@ -109,36 +76,44 @@ clean_java:
 .PHONY: clean_java
 
 #
-# linuxpc
+# i386-linux
 # target for Linux/i386
 #
-linuxpc:
-	$(MAKE) ARCH=linuxpc all
-.PHONY: linuxpc
+i386-linux:
+	$(MAKE) ARCH=i386-linux all
+.PHONY: i386-linux
 
 #
-# linuxppc
+# i686-linux
+# target for Linux/PentiumPro-PentiumIIx
+#
+i686-linux:
+	$(MAKE) ARCH=i686-linux all
+.PHONY: i686-linux
+
+#
+# ppc-linux
 # target for Linux/PowerPC
 #
-linuxppc:
-	$(MAKE) ARCH=linuxppc all
-.PHONY: linuxppc
+ppc-linux:
+	$(MAKE) ARCH=ppc-linux all
+.PHONY: ppc-linux
 
 #
-# macosx
-# target for Mac OS/X
+# ppc-macosx
+# target for Mac OS/X on PowerPC
 #
-macosx:
-	$(MAKE) ARCH=macosx all
-.PHONY: macosx
+ppc-macosx:
+	$(MAKE) ARCH=ppc-macosx all
+.PHONY: ppc-macosx
 
 #
 # sgi
 # target for SGI Irix 6.5 processors R5000 and R10000
 #
 sgi:
-	$(MAKE) ARCH=irix65r5k all
-	$(MAKE) ARCH=irix65r10k all
+	$(MAKE) ARCH=r5k-irix6.5 all
+	$(MAKE) ARCH=r10k-irix6.5 all
 .PHONY: sgi
 
 #
@@ -189,15 +164,20 @@ install-doc:
 .PHONY: install-doc
 
 install-exec:
-	( cd bin ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DIR="$(INSTALL_DIR)" bin_install_dir=$(bin_install_dir) $@ )
+	( cd bin ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DIR="$(INSTALL_DIR)" bin_install_dir=$(bin_install_dir) install-noarch )
 	$(INSTALL_DIR) $(lib_install_dir)
-	( cd config ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
-	( cd fts ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_SETUID="$(INSTALL_SETUID)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
-	( cd images ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
-	( cd java ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
-	( cd scm ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
-	( cd tcl ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
-	( cd packages ; $(MAKE) INSTALL_LIB="$(INSTALL_LIB)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) SUB_ARCHS="$(SUB_ARCHS)" $@ )
+	( cd config ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) install-noarch )
+	( cd images ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) install-noarch )
+	( cd java ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) install-noarch )
+	( cd scm ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) install-noarch )
+	( cd tcl ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) install-noarch )
+	for a in $(INSTALL_ARCHS) ; do \
+		( cd fts ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_SETUID="$(INSTALL_SETUID)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) ARCH=$$a install-arch ) ; \
+	done
+	( cd packages ; $(MAKE) INSTALL_LIB="$(INSTALL_LIB)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) ARCH=$$a install-noarch )
+	for a in $(INSTALL_ARCHS) ; do \
+		( cd packages ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) ARCH=$$a install-arch ) ; \
+	done
 .PHONY: install-exec
 
 install-includes:

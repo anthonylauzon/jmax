@@ -31,7 +31,3 @@ install-doc:
 #	(cd release_notes ; $(MAKE) $@)
 .PHONY: install-doc
 
-# remove the files copied by make install ?
-uninstall:
-.PHONY: uninstall
-
