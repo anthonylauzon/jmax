@@ -41,8 +41,9 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
-#include <fts/fts.h>
+#include <fts/ftsnew.h>
 
 /***********************************************************************
  *
@@ -139,7 +140,7 @@ void fts_free(void *p)
 #define SHARED_HEAP_MAX_SIZE 256
 #define FREE_TO_USED_RATIO    5
 
-struct fts_heap {
+struct _fts_heap_t {
   char *free_list;
   unsigned int current_block_group;
   unsigned int block_size;
