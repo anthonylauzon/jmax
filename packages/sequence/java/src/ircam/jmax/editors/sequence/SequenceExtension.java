@@ -25,28 +25,31 @@
 
 package ircam.jmax.editors.sequence;
 
-import tcl.lang.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
-
+import ircam.jmax.script.pkg.*;
+import ircam.jmax.script.*;
 /**
  * The sequence extension; install the sequence data type,
  * register the remote data class, installs
  * the sequence editor factory
  */
-public class SequenceExtension extends tcl.lang.Extension
+public class SequenceExtension extends tcl.lang.Extension implements JavaExtension
 {
-
-  /**
-   * overrides tcl.lang.Extension.init()
-   */
-  public void init(Interp interp)
+ public void init(ircam.jmax.script.Interpreter interp)
   {
     Mda.installEditorFactory( new SequenceFactory());
 
     Fts.registerRemoteDataClass( "sequence_data", ircam.jmax.editors.sequence.SequenceRemoteData.class);
   }
 
+    /* this method should be removed as soon as jacl is completely forgotten about */
+  public void init(tcl.lang.Interp interp)
+  {
+    Mda.installEditorFactory( new SequenceFactory());
+
+    Fts.registerRemoteDataClass( "sequence_data", ircam.jmax.editors.sequence.SequenceRemoteData.class);
+  }
 }
 
 

@@ -5,7 +5,7 @@ import ircam.jmax.*;
 import java.awt.Component;
 import ircam.jmax.editors.sequence.SequenceGraphicContext;
 import javax.swing.*;
-import java.io.File;
+import java.io.*;
 
 /**
  * A convenience implementation of the ValueInfo interface.
@@ -43,10 +43,24 @@ public class AbstractValueInfo implements ValueInfo {
 	return instance;
     }
 
-    //--- AbstractValueInfo fields
-    public static AbstractValueInfo instance = new AbstractValueInfo();
-    static String path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images" +File.separator;
-    public static ImageIcon GENERIC_ICON = new ImageIcon(path+"genericAdder.gif");
+  //--- AbstractValueInfo fields
+  public static AbstractValueInfo instance = new AbstractValueInfo();
+  public static final String fs = File.separator;
+  static String path;
+  public static ImageIcon GENERIC_ICON;
+
+  static 
+  {
+     try
+      {
+	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
+	GENERIC_ICON = new ImageIcon(path+"genericAdder.gif");
+      }
+    catch(FileNotFoundException e){
+      System.err.println("Couldn't locate sequence images");
+    }
+  }
+
 }
 
 

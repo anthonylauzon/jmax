@@ -3,10 +3,10 @@ package ircam.jmax.editors.sequence;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.*;
-import java.io.File;
+import java.io.*;
 import java.util.*;
 import javax.swing.*;
-
+import javax.swing.event.*;
 
 /**
  * The class containing the Tools used by a Sequence editor.
@@ -14,41 +14,56 @@ import javax.swing.*;
  * of the SequenceToolManager by the knowledge of the tools */
 public class SequenceTools implements ToolProvider{
 
-    public Enumeration getTools()
-    {
-	return new ToolEnumeration();
+  public SequenceTools()
+  {
+    String path = null;
+    String fs = File.separator;
+
+    try
+      {
+	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
+      }
+    catch(FileNotFoundException e){
+      System.err.println("Couldn't locate sequence images");
     }
 
-    class ToolEnumeration implements Enumeration 
+    tools[0] = new ArrowTool(new ImageIcon(path+"selecter.gif"));
+    tools[1] = new AdderTool(new ImageIcon(path+"genericAdder.gif"));
+    tools[2] = new DeleteTool(new ImageIcon(path+"eraser.gif"));
+    tools[3] = new ResizerTool(new ImageIcon(path+"resizer.gif"));
+    tools[4] = new VResizerTool(new ImageIcon(path+"vresizer.gif"));
+  }
+
+  public Enumeration getTools()
+  {
+    return new ToolEnumeration();
+  }
+
+  class ToolEnumeration implements Enumeration 
+  {
+    ToolEnumeration()
     {
-	ToolEnumeration()
-	{
-	    index = 0;
-	}
-
-	public boolean hasMoreElements()
-	{
-	    return index < tools.length;
-	}
-
-	public Object nextElement()
-	{
-	    return tools[index++];
-	}
-
-	//---
-	int index;
+      index = 0;
     }
-
+    
+    public boolean hasMoreElements()
+    {
+      return index < instance.tools.length;
+    }
+    
+    public Object nextElement()
+    {
+      return instance.tools[index++];
+    }
+    
     //---
-    static String fs = File.separator;
-    static String path = MaxApplication.getProperty("sequencePackageDir")+fs+"images" +fs;
-    
-    
-    static Tool tools[] ={ new ArrowTool(new ImageIcon(path+"selecter.gif")),
-			   new AdderTool(new ImageIcon(path+"genericAdder.gif")),
-			   new DeleteTool(new ImageIcon(path+"eraser.gif")),
-			   new ResizerTool(new ImageIcon(path+"resizer.gif")),
-			   new VResizerTool(new ImageIcon(path+"vresizer.gif"))};
-    public static SequenceTools instance = new SequenceTools();
+    int index;
+  }
+
+  //---
+  Tool tools[] = new Tool[5];
+  public static SequenceTools instance = new SequenceTools();
 }
+
+
+
