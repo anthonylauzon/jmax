@@ -6,7 +6,6 @@ import java.awt.datatransfer.*;
 import java.util.*;
 import java.io.*;
 import java.text.*;//DateFormat...
-import ircam.jmax.editors.table.*;//try on 13/03 (to be removed before 20/23)
 
 import tcl.lang.*;
 
@@ -893,10 +892,10 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   private void CustomEditMenuAction(MenuItem theMenuItem, String theString) {
 
     //try on (13-03) to be removed before (20-03)
-    Tabler aTable = new Tabler("pizza");
-    aTable.Init();
+    //Tabler aTable = new Tabler("pizza");
+    //aTable.Init();
     //aTable.setLocation(0,0);
-    aTable.pack();
+    //aTable.pack();
     //aTable.setVisible(true);
     if (theString.equals("Select All  Ctrl+A")) GetSketchPad().SelectAll();
   }
