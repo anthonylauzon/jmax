@@ -42,553 +42,312 @@ import ircam.jmax.dialogs.*;
 import ircam.jmax.script.*;
 import ircam.jmax.script.pkg.*;
 
-// MaxApplication.getProperty should disappear, and properties stored in the system
-// properties, that can *also* be loaded from a file.
-
 /**
  * The main application class in jMax. Contains the global parameters 
  * and/or the global functionalities of the system. 
- * It is also the entry point for several TCL commands. It handles, for example:
- * - the startup process, the TCL initialization
- * - the FTS connection
- * - the resource definition loading
- * - a set of global functions related to the window list (stack, tile, close)
- * - file format versions handling
- * - system properties
- * - creation of new windows (new, double-click on a subpatcher, etc.)
- * - quit of the application
  */
-
-public class MaxApplication extends Object
+public class MaxApplication
 {
-  // The global server
+    /* (em 13-01-99)  in order to use the real system clipboard
+     * instead of a local one, the following declaration would be sufficient: */
+    public static Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
-  static Fts fts;
+    protected static ProjectHandler itsProjectHandler;
+    protected static Project itsProject;
 
-  public static Fts getFts()
-  {
-    return fts;
-  }
+    public static Fts getFts() {
+	return itsProject.getFts();
+    }
 
-  public static void setFts(Fts s)
-  {
-    fts = s;
-  }
+    public static String getProperty(String key) {
+	return itsInterpreter.getGlobalSettings().getSetting(key);
+    }
 
-  // public static Clipboard systemClipboard = new Clipboard("system"); 
+    public static String setProperty(String key, String value) {
+	String s = getProperty(key);
+	itsInterpreter.getGlobalSettings().setSetting(key, value);
+	return s;
+    }
 
-  // (em 13-01-99)  in order to use the real system clipboard
-  // instead of a local one, the following declaration would be sufficient:
+    public static Enumeration enumerateProperty(String key) {
+	return itsInterpreter.getGlobalSettings().enumerateSetting(key);
+    }
+    
+    /* The interpreter */
+    protected static Interpreter itsInterpreter;
 
-  public static Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+    public static Interpreter getInterpreter() {
+	return itsInterpreter;
+    }
 
-  // Unfortunately, the actual java implementation on Irix (3.1.1) is buggy,
-  // and the X11 selection contained in the systemClipboard returns a null
-  // array for the list of the MIME types (DataFlavors) supported, and
-  // exits with an internal null exception on the isDataFlavorSupported() call
+    public static void setInterpreter(Interpreter i) {
+	itsInterpreter = i;
+    }
 
-
-  // (fd) changed because FtsServer uses MaxApplication.getProperty for timeOut
-  // This is not clean because you cannot use the application layer without calling
-  // MaxApplication.main !!! 
-  // i.e. cannot write an application in Java that is not jMax...
-
-  //  private static Properties jmaxProperties;
-  private static Properties jmaxProperties = new Properties(System.getProperties());
-
-  /** Method to get system wide properties, stored
-    in jmaxProperties */
-
-  public static String getProperty(String key)
-  {
-    return jmaxProperties.getProperty(key);
-  }
-
-  /** Method to get system wide properties, stored
-    in jmaxProperties */
-
-  public static String getProperty(String key, String defaultValue)
-  {
-    return jmaxProperties.getProperty(key, defaultValue);
-  }
-
-  /** Method to set system wide properties, stored in jmaxProperties */
-
-  public static String setProperty(String key, String value)
-  {
-    return (String)jmaxProperties.put( key, value);
-  }
-
-  public static Properties getProperties()
-  {
-    return jmaxProperties;
-  }
-
-    /* The name of the class that implements the interpreter
-     * interface. By default we load the Silk interpreter. This value
-     * can be overriden with the -jmaxInterp <fullClassName> option */
-
-    static protected Interpreter itsInterp = null;
-
-    public static Interpreter getInterpreter()
-    {
-	return itsInterp;
+    protected static Interpreter makeInterpeter(String interpName) throws Exception {
+	if (interpName.equalsIgnoreCase("jacl")) {
+	    interpName = "ircam.jmax.script.tcl.TclInterpreter";
+	} else if (interpName.equalsIgnoreCase("silk")) {
+	    interpName = "ircam.jmax.script.scm.silk.SilkInterpreter";
+	} else if (interpName.equalsIgnoreCase("kawa")) {
+	    interpName = "ircam.jmax.script.scm.kawa.KawaInterpreter";
+	}
+	return (Interpreter) Class.forName(interpName).newInstance();
     }
 
     /** The package handler that keeps trace of the loaded package. */
-  
-    static protected PackageHandler itsPackageHandler = null;
+     protected static MaxPackageLoader itsPackageLoader = null;
 
-    public static PackageHandler getPackageHandler()
-    {
-	return itsPackageHandler;
+    public static MaxPackageLoader getPackageLoader() {
+	return itsPackageLoader;
     }
 
-  static MaxWhenHookTable  itsHookTable = null;
+    public static void setPackageLoader(MaxPackageLoader p) {
+	itsPackageLoader = p;
+    }
 
-  /** Functions to add application hooks */
+    /** The hook table */
+    static MaxWhenHookTable itsHookTable = null;
 
-  public static void addHook(String name, Script code)
-  {
-    if (itsHookTable == null)
-      itsHookTable = new MaxWhenHookTable(); 
-      
-    itsHookTable.addHook(name, code);
-  }
-
-  /** Functions to run application hooks */
-
-  public static boolean runHooks(String name)
-  {
-    if (itsHookTable == null)
-      return false;
-    else
-      return itsHookTable.runHooks(name);
-  }
-
-
-  /** Registration method */
-  private static void askForRegister()
-  {
-    boolean alreadyRegistered = false;
-    File registerFile = null;
-
-    // Open the register panel if needed
-    try
-      {
-	registerFile = new File( System.getProperty("user.home"), ".jmaxregistered");
-	alreadyRegistered = registerFile.exists();
-      }
-    catch( SecurityException e)
-      {
-	return;
-      }
-
-    if ( !alreadyRegistered)
-      {
-	RegisterDialog.popup();
-
-	try
-	  {
-	    FileOutputStream fos = new FileOutputStream( registerFile);
-	    fos.write( 42);
-	    fos.close();
-	  }
-	catch ( IOException e)
-	  {
-	  }
-	catch ( SecurityException e)
-	  {
-	  }
-
-      }
-  }
-
-  /** His majesty the main method */
-
-  public static void main(String args[]) 
-  {
-    MaxVector toOpen = new MaxVector();
-
-    // main function parse the argument line and create the main class...
-    //create a new default Properties object
-
-    jmaxProperties = new Properties(System.getProperties());
-
-    //start parsing arguments
-    // don't check for valid options, so the user can set
-    // command line arguments that can be accessed from tcl scripts
-    // and we don't know yet
-    // The parsing is done with a finite state automata; any option
-    // that don't have a value (i.e. followed by nothing or another value)
-    // get "true" as value, any value that is *not* a option value
-    // is interpreted as a file name and opened by jMax.
-
-    boolean inOpt = false;
-    String option = null;
-
-    for (int i = 0; i <= args.length; i++)
-      {
-	if (inOpt)
-	  {
-	    // Waiting for a value
-
-	    if (i == args.length)
-	      {
-		// End of arguments
-
-		jmaxProperties.put(option.substring(1), "true");
-		inOpt  = false;
-	      }
-	    else if (args[i].startsWith("-"))
-	      {
-		// Got another option
-
-		jmaxProperties.put(option.substring(1), "true");
-		option = args[i];
-		inOpt  = true;
-	      }
-	    else
-	      {
-		// Got a value
-
-		jmaxProperties.put(option.substring(1), args[i]);
-
-		inOpt  = false;
-	      }
-	  }
-	else
-	  {
-	    // Waiting for a option
-
-	    if (i == args.length)
-	      {
-		// do nothing
-		inOpt  = false;
-	      }
-	    else if (args[i].startsWith("-"))
-	      {
-		// Got option
-
-		option = args[i];
-		inOpt  = true;
-	      }
-	    else
-	      {
-		// Got a value, i.e. a argument to open
-
-		toOpen.addElement(args[i]);
-		inOpt  = false;
-	      }
-	  }
-
-      }
-
-    // Default values
-    if (jmaxProperties.get("jmaxRoot") == null)
-      {
-	//user didn't specify the root. Take the default directory.
-	jmaxProperties.put("jmaxRoot", "/usr/lib/jmax");
-      }
-
-    if (jmaxProperties.get("jmaxInterp") == null)
-      {
-	//user didn't specify the interp. Take default.
-	jmaxProperties.put("jmaxInterp", "jacl");
-	//jmaxProperties.put("jmaxInterp", "silk");
-      }
-
-    //the version number as a system property
-    try
-      {
-	jmaxProperties.put("jmaxVersion", MaxVersion.getMaxVersion());
-      }
-    catch (java.lang.NoClassDefFoundError e)
-      {
-	jmaxProperties.put("jmaxVersion", "version info not available");
-      }
-
-    // Get optional username and password
-
-    itsHookTable = new MaxWhenHookTable(); 
-
-    ircam.jmax.utils.Platform.setValues();
-
-    // Create the package handler
-
-    itsPackageHandler = new PackageHandler();
-
-    // Create and initialize the tcl interpreter
-
-    try
-	{
-	    bootstrapInterp(); 
+    /** Functions to add application hooks */
+    public static void addHook(String name, Script code) {
+	if (itsHookTable == null) {
+	    itsHookTable = new MaxWhenHookTable(); 
 	}
-    catch (Exception e)
-	{
-	    e.printStackTrace(); // FIXME
-	    System.out.println("Couldn't create the interpreter: " + e.getMessage());
-	    return;
+	itsHookTable.addHook(name, code);
+    }
+
+    /** Functions to run application hooks */
+    public static boolean runHooks(String name) {
+	if (itsHookTable == null) {
+	    return false;
+	} else {
+	    return itsHookTable.runHooks(name);
 	}
+    }
 
-    // Initialize all the submodules; first the kernel modules
-
-    ircam.jmax.mda.MdaModule.initModule();
-    ircam.jmax.fts.FtsModule.initModule();
-
-    // Initialize dialogs
-
-    ircam.jmax.dialogs.DialogsModule.initModule();
-
-    // then the builtin editors 
-
-    ircam.jmax.editors.console.ConsoleModule.initModule();
-    ircam.jmax.editors.patcher.ErmesModule.initModule(true);
-    ircam.jmax.editors.control.ControlModule.initModule();
-
-    /* Show register dialog if not disabled by option */
-    if ( MaxApplication.getProperty("jmaxNoRegister") == null
-	 || !MaxApplication.getProperty("jmaxNoRegister").equals("true"))
-      MaxApplication.askForRegister();
-
-    // Before booting the server, check if it is asked to run in real-time mode,
-    // and if yes, inform the application layer
+    public static void usage() {
+	System.out.println("Usage: jmax [options] [project]");
+	System.out.println("The options can be anything of the form:");
+	System.out.println("  -name=value or -name:value");
+	System.out.println("Please refer to the documentation.");
+    }
     
-    try
-	{
-	    itsInterp.boot(MaxApplication.getProperty("jmaxRoot"));
-	}
-    catch (ScriptException e)
-	{
-	    System.out.println("Interpreter error in initialization: " + e.getMessage());
-	}
-    
-    // Splash screen moved to a tcl command
-    
-    //if there were no connection statements in startup.tcl, ask the user
-    
-    if (fts == null)
-      {
-	System.err.println("No Fts Server Specified");
-	return;
-      }
+    public static void main(String[] arg) {
+	String interpName = "silk";
+	String root = "/usr/lib/jmax";
+	String projectName = null;
+	File projectFile = null;
 
-    // Look if there are documents to open in the 
-    // command line.
+	try {
+	    /* Parse the command line settings */
+	    final MaxPackageData cmdLineSettings = new MaxPackageData();
+	    StringBuffer buf = new StringBuffer();
+	    for (int i = 0; i < arg.length; i++) {
+		if (arg[i].charAt(0) != '-') {
+		    if (i < arg.length - 1) {
+			System.out.println("Project name should be last argument: " + arg[i]);
+			usage();
+			System.exit(0);
+		    } else {
+			projectName = arg[i];
+			break;
+		    }
+		} else {
+		    try {
+			Object setting = SettingsParser.parseLine(arg[i].substring(1));
+			cmdLineSettings.addElement(setting);
+		    } catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Can't parse option " + arg[i]);
+			usage();
+			System.exit(0);
+		    }
+		}
+	    }
 
-    long startTime = 0;
-    if (getProperty("jmaxLoadBenchmark") != null)
-      startTime = System.currentTimeMillis();
+	    /* Check whether the user specified an interpreter or a
+	     * root. This is done the hard way since the settings are
+	     * not hashed yet. */
+	    int len = cmdLineSettings.size();
+	    for (int i = 0; i < len; i++) {
+		Assignment setting = (Assignment) cmdLineSettings.elementAt(i);
+		if (setting.name.equals("interpreter")) {
+		    interpName = setting.value;
+		}
+		if (setting.name.equals("root")) {
+		    root = setting.value;
+		}
+	    }
 
-    for (int i = 0 ; i < toOpen.size(); i++)
-      {
-	MaxDocument document = null;
-	File file = new File((String) toOpen.elementAt(i));
-	
-	try
-	  {
-	    document = Mda.loadDocument(fts, file);
-	  }
-	catch (MaxDocumentException e)
-	  {
-	    System.out.println("Cannot load " + file);
-	  }
+	    /* Check whether the project file exists */
+	    if (projectName == null) {
+		projectName = root + File.separator + "packages" + File.separator + "jmax" + File.separator + "jmax.def";
+	    }
+	    projectFile = new File(projectName);
+	    if (!projectFile.exists()) {
+		System.out.println("Can't find project " + projectName);
+		System.exit(0);
+	    }
 
-	try
-	  { 
-	    if ((document != null) && document.getDocumentType().isEditable())
-	      document.edit();
+	    /* Create the interpreter, package handler and hook table */
+	    itsPackageLoader = new MaxPackageLoader();
+	    itsInterpreter = makeInterpeter(interpName);
+	    itsHookTable = new MaxWhenHookTable(); 
+	    itsProjectHandler = new ProjectHandler();
+	    ircam.jmax.utils.Platform.setValues();
 
-	    /* Special Support for load/unload benchmark  */
-
-	    if (getProperty("jmaxLoadUnloadBenchmark") != null)
-	      {
-		final MaxDocument documentToKill = document;
-
-		/* Use a invoke Later to close, so that we destroy 
-		   the editor after the first paint completed, otherwise
-		   the AWT will try to pain an inconsistent editor */
-		
-		SwingUtilities.invokeLater(new Runnable() {
-		  public void run() {documentToKill.dispose();}});
-	      }
-	  }
-	catch (MaxDocumentException e)
-	  {
-	    // Ignore MaxDocumentException exception in running the editor
-	    // May be an hack, may be is ok; move this stuff to an action
-	    // handler !!
-	  }
-      }
+	    /** Globally defined settings.  */
+	    itsInterpreter.define("pkg-path", null);
+	    itsInterpreter.define("root", root);
+	    itsInterpreter.define("slash", File.separator);
 
 
-    /* Report the loading time if needed */
+	    /* Create the package */
+	    itsProject = new Project(itsPackageLoader, "<startup>"); 
 
-
-    if (getProperty("jmaxLoadBenchmark") != null)
-      {
-	long elapsedTime;
-
-	elapsedTime = System.currentTimeMillis() - startTime;
-
-	System.err.println("jMax version " + MaxVersion.getMaxVersion());
-	System.err.println(" date " + new Date());
-	System.err.println(" loading time " + elapsedTime + " msecs");
-	System.err.println("Total memory " + Runtime.getRuntime().totalMemory());
-	System.err.println("Used memory " + (Runtime.getRuntime().totalMemory() -
-					     Runtime.getRuntime().freeMemory()));
-
-      }
-  }
-  
-
-  /** This private method build the interpreter. */
-
-  static private void bootstrapInterp() throws Exception
-  {
-      String interpName = (String) jmaxProperties.get("jmaxInterp");
-      String interpClassName = interpName;
-      
-      if (interpName.equalsIgnoreCase("jacl")) {
-	  interpClassName = "ircam.jmax.script.tcl.TclInterpreter";
-      } else if (interpName.equalsIgnoreCase("silk")) {
-	  interpClassName = "ircam.jmax.script.scm.silk.SilkInterpreter";
-      } else if (interpName.equalsIgnoreCase("kawa")) {
-	  interpClassName = "ircam.jmax.script.scm.kawa.KawaInterpreter";
-      }
-
-      itsInterp = (Interpreter) Class.forName(interpClassName).newInstance();
-  }
-
-  /**
-   * Quit verify if there is anything to save
-   * Currently, this is done in the wrong way: we get the list
-   * of windows from the MaxWindowManager, and for those that 
-   * are MaxEditor, we do the check;
-   * In reality, we should look in the MDA document data base
-   * to do the work.
-   */
-
-  public static void Quit()
-  {
-    ListModel windows;
-    boolean someOneNeedSave = false;
-    boolean doTheSave = false;
-
-    // First, search if there is anything to save
-    // Loop in all the documents in all the  types.
-    
-    ListModel types = Mda.getDocumentTypes();
-
-  search: for (int i = 0; i < types.getSize(); i++)
-    {
-      MaxDocumentType type = (MaxDocumentType) types.getElementAt(i);
-      ListModel documents = type.getDocuments();
-
-      for (int j = 0; j < documents.getSize(); j++)
-	{
-	  MaxDocument document = (MaxDocument) documents.getElementAt(j);
-	
-	  if (! document.isSaved())
+	    /* This is a dirty hack. (Another one!). It assures that
+	     * the jmax.scm file gets loaded before the jMax required
+	     * packages are loaded. This is necessary since the
+	     * package scripts may use the functions defined in
+	     * jmax.scm */
+	    // FIXME
 	    {
-	      someOneNeedSave = true;
-	      break search;
+		MaxPackage jmaxPkg;
+		if (projectName.endsWith("jmax.def")) {
+		    jmaxPkg = itsProject;
+		} else {
+		    itsPackageLoader.insert("jmax", "0.0.0");
+		    jmaxPkg = itsPackageLoader.getPackage("jmax"); 
+		}
+		jmaxPkg.addListener(new DefaultPackageListener() {
+		    public void finishedSettings(MaxPackage pkg, SettingsTable settings) {
+			try {
+			    String jmaxscript = settings.getSetting("dir") + File.separator + "scm" + File.separator + "intrinsics.scm";
+			    System.out.println("Loading script " + jmaxscript);		
+			    MaxApplication.getInterpreter().load(jmaxscript);
+			} catch (Exception e) {
+			    e.printStackTrace();
+			}
+		    }
+		});
+	    }
+
+	    /* Make sure the command line settings get loaded at the
+	     * end of the settings */
+	    itsProject.addListener(new DefaultPackageListener() {
+		public void finishedSettings(MaxPackage pkg, SettingsTable settings) {
+		    MaxPackageDocument.hash(cmdLineSettings, settings);
+		}
+	    });
+
+	    itsProjectHandler.openProjectFile(itsProject, projectFile);
+
+	} catch (Exception e) {
+	    String m = e.getClass().getName() + ((e.getMessage() != null) ? (": " + e.getMessage()) : "");
+	    System.out.println("Can't boot the application: " + m);
+	    e.printStackTrace(); // FIXME
+	}
+	
+    }
+
+    /**
+     * Quit verify if there is anything to save
+     * Currently, this is done in the wrong way: we get the list
+     * of windows from the MaxWindowManager, and for those that 
+     * are MaxEditor, we do the check;
+     * In reality, we should look in the MDA document data base
+     * to do the work.
+     */
+    public static void Quit() {
+	ListModel windows;
+	boolean someOneNeedSave = false;
+	boolean doTheSave = false;
+
+	// First, search if there is anything to save
+	// Loop in all the documents in all the  types.
+	ListModel types = Mda.getDocumentTypes();
+
+    search: 
+	for (int i = 0; i < types.getSize(); i++) {
+	    MaxDocumentType type = (MaxDocumentType) types.getElementAt(i);
+	    ListModel documents = type.getDocuments();
+	  
+	    for (int j = 0; j < documents.getSize(); j++) {
+		MaxDocument document = (MaxDocument) documents.getElementAt(j);
+	      
+		if (! document.isSaved()) {
+		    someOneNeedSave = true;
+		    break search;
+		}
 	    }
 	}
-    }
-
-    // in such case, should give the offer to cancel the quit.
-
-    if (someOneNeedSave)
-      {
-	QuitDialog quitDialog = new QuitDialog(MaxWindowManager.getWindowManager().getTopFrame());
-
-	switch (quitDialog.getAnswer())
-	  {
-	  case QuitDialog.JUST_QUIT:
-	    doTheSave = false;
-	    break;
-	  case QuitDialog.REVIEW_AND_QUIT:
-	    doTheSave = true;
-	    break;
-	  case QuitDialog.CANCEL:
-	    return;
-	  }
-
-	quitDialog.dispose();
-      }
-
-    // dispose (and optionally save) all the documents
-
-    for (int i = 0; i < types.getSize(); i++)
-      {
-	MaxDocumentType type = (MaxDocumentType) types.getElementAt(i);
-	ListModel documents = type.getDocuments();
-
-	for (int j = 0; j < documents.getSize(); j++)
-	  {
-	    MaxDocument document = (MaxDocument) documents.getElementAt(j);
+      
+	// in such case, should give the offer to cancel the quit.
+	if (someOneNeedSave) {
+	    QuitDialog quitDialog = new QuitDialog(MaxWindowManager.getWindowManager().getTopFrame());
 	
-	    if (doTheSave && (! document.isSaved()))
-	      {
+	    switch (quitDialog.getAnswer()) {
+	    case QuitDialog.JUST_QUIT:
+		doTheSave = false;
+		break;
+	    case QuitDialog.REVIEW_AND_QUIT:
+		doTheSave = true;
+		break;
+	    case QuitDialog.CANCEL:
+		return;
+	    }
+	
+	    quitDialog.dispose();
+	}
 
-		if (YesOrNo.ask(MaxWindowManager.getWindowManager().getTopFrame(),
-				"Save " + document.getName(), "Save", "Don't Save"))
-		  {
-		    if (! document.canSave())
-		      {
-			File file;
-			file= MaxFileChooser.chooseFileToSave(null, document.getDocumentFile(), "Save As");
+	// dispose (and optionally save) all the documents
+	for (int i = 0; i < types.getSize(); i++) {
+	    MaxDocumentType type = (MaxDocumentType) types.getElementAt(i);
+	    ListModel documents = type.getDocuments();
+	
+	    for (int j = 0; j < documents.getSize(); j++) {
+		MaxDocument document = (MaxDocument) documents.getElementAt(j);
+	    
+		if (doTheSave && (! document.isSaved())) {
+		    if (YesOrNo.ask(MaxWindowManager.getWindowManager().getTopFrame(),
+				    "Save " + document.getName(), "Save", "Don't Save")) {
+			if (! document.canSave()) {
+			    File file;
+			    file= MaxFileChooser.chooseFileToSave(null, document.getDocumentFile(), "Save As");
 
-			if (file != null)
-			  document.bindToDocumentFile(file);
-		      }
+			    if (file != null) {
+				document.bindToDocumentFile(file);
+			    }
+			}
+			if (document.canSave()) {
+			    try {
+				document.save();
+			    } catch (MaxDocumentException e) {
+				System.err.println(e.toString());
+			    }
+			} else {
+			    new ErrorDialog(MaxWindowManager.getWindowManager().getTopFrame(), "Cannot Save " + document.getName());
+			}
+		    }		    
+		    document.dispose();
+		}
+	    }
+	}
 
-		    if (document.canSave())
-		      {
-			try
-			  {
-			    document.save();
-			  }
-			catch (MaxDocumentException e)
-			  {
-			    System.err.println(e.toString());
-			  }
-		      }
-		    else
-		      {
-			new ErrorDialog(MaxWindowManager.getWindowManager().getTopFrame(),
-					"Cannot Save " + document.getName());
-		      }
-		  }		    
+	// Now, the quit is sure, we execute the exit hooks
+	runHooks("exit");
 
-		document.dispose();
-	      }
-	  }
-      }
-
-    // Now, the quit is sure, we execute the exit hooks
-
-    runHooks("exit");
-
-    if (MaxWindowManager.getTopFrame() != null)
-      {
-	MaxWindowManager.getTopFrame().setVisible(false);
-	MaxWindowManager.getTopFrame().dispose();
-      }
-
-    if (fts != null)
-      fts.stop();
-
-    Runtime.getRuntime().exit(0);
-  }
+	if (MaxWindowManager.getTopFrame() != null) {
+	    MaxWindowManager.getTopFrame().setVisible(false);
+	    MaxWindowManager.getTopFrame().dispose();
+	}
+	if (getFts() != null) {
+	    getFts().stop();
+	}
+	Runtime.getRuntime().exit(0);
+    }
 }
-
-
-
-
-
-
 
 
 
