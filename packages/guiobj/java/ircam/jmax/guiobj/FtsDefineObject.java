@@ -36,13 +36,13 @@ public class FtsDefineObject extends FtsGraphicObject
     FtsObject.registerMessageHandler( FtsDefineObject.class, FtsSymbol.get("type"), new FtsMessageHandler(){
 	  public void invoke(FtsObject obj, FtsArgs args)
 	  {
-	    ((FtsDefineObject)obj).setType( args.getSymbol(0).toString());
+	    ((FtsDefineObject)obj).setCurrentType( args.getSymbol(0).toString());
 	  }
 	});
       FtsObject.registerMessageHandler( FtsDefineObject.class, FtsSymbol.get("expression"), new FtsMessageHandler(){
 	  public void invoke(FtsObject obj, FtsArgs args)
 	  {
-	    ((FtsDefineObject)obj).setExpression( args.getSymbol(0).toString());
+	    ((FtsDefineObject)obj).setCurrentExpression( args.getSymbol(0).toString());
 	  }
       });
     }
@@ -101,6 +101,8 @@ public class FtsDefineObject extends FtsGraphicObject
 	System.err.println("FtsDefineObject: I/O Error sending setType Message!");
 	e.printStackTrace(); 
       }
+
+    ((Define)listener).typeChanged( type);
   }
   
   public String getExpression()
@@ -108,7 +110,7 @@ public class FtsDefineObject extends FtsGraphicObject
     return expression;
   }
   
-  public void setExpression( String expression)
+  public void setCurrentExpression( String expression)
   {  
     this.expression = expression;
     ((Define)listener).expressionChanged( expression);	
@@ -119,14 +121,13 @@ public class FtsDefineObject extends FtsGraphicObject
     return type;
   }
   
-  public void setType( String type)
+  public void setCurrentType( String type)
   {
     this.type = type;
-    ((Define)listener).typeChanged( type);
   }
   
-  private String expression;
-  private String type;
+  private String expression = null;
+  private String type = null;
 }
 
 

@@ -123,7 +123,10 @@ public class Define extends Editable implements FtsObjectErrorListener{
     else
       space = getFontMetrics().stringWidth(" ");
     
-    forceWidth(  getTextHeightOffset() + getTypeWidth() + space + getFontMetrics().stringWidth( text) + 6 + getVariableWidth());
+    int tw =  getTextHeightOffset() + getTypeWidth() + space + getFontMetrics().stringWidth( text) + 6 + getVariableWidth();
+
+    if( getWidth() != tw)
+      forceWidth( tw);
   }
 
   public void setFont( Font theFont)
