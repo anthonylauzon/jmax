@@ -48,9 +48,7 @@
 #include <dmedia/audiofile.h>
 #include <dmedia/midi.h>
 
-#include "sys.h"
-#include "lang.h"
-#include "runtime/devices/devices.h"
+#include "fts.h"
 
 extern void fts_dsp_set_dac_slip_dev(fts_dev_t *dev);
 
