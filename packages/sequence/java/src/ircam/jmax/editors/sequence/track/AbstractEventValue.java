@@ -7,6 +7,7 @@ import ircam.jmax.toolkit.*;
 import javax.swing.*;
 
 import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.renderers.*;
 
 /**
  * A basic implementation of the EventValue interface, with a default property handling (no actions). 
@@ -96,7 +97,7 @@ public class AbstractEventValue extends FtsRemoteData implements EventValue
 
     /**
      * Returns the renderer for this object */
-    public ObjectRenderer getRenderer()
+    public SeqObjectRenderer getRenderer()
     {
 	return null; 
     }

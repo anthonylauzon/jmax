@@ -163,7 +163,7 @@ public class UtilTrackEvent implements Event, Drawable
 
     /* --------- Drawable interface ----------*/
 
-    public ObjectRenderer getRenderer()
+    public SeqObjectRenderer getRenderer()
     {
 	if (value!= null)
 	    return value.getRenderer();

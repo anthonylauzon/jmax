@@ -37,7 +37,7 @@ import java.awt.*;
  * The renderer of a string in a track: simply writes the string in the position given by
  * the adapter.
  */
-public class MessageEventRenderer implements ObjectRenderer {
+public class MessageEventRenderer implements SeqObjectRenderer {
 
     public MessageEventRenderer()
     {
@@ -66,6 +66,14 @@ public class MessageEventRenderer implements ObjectRenderer {
    */
     public void render(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
     {
+	if(selected)
+	    render(obj, g, Event.SELECTED, theGc); 
+	else
+	    render(obj, g, Event.DESELECTED, theGc); 
+    }
+  
+    public void render(Object obj, Graphics g, int state, GraphicContext theGc) 
+    {
 	Event e = (Event) obj;
 
 	SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
@@ -83,17 +91,31 @@ public class MessageEventRenderer implements ObjectRenderer {
 	if(height==0)
 	    height = fm.getHeight();
 
-	if (selected) 
-	    g.setColor(Color.pink);
-	else 
-	    g.setColor(Color.lightGray);
+	switch(state)
+	    {
+	    case Event.SELECTED:
+		g.setColor(Color.pink);
+		break;
+	    case Event.DESELECTED:
+		g.setColor(Color.lightGray);
+		break;
+	    case Event.HIGHLIGHTED:
+		g.setColor(Color.green.brighter());
+	    }
 
 	g.fillRect(x, y, BUTTON_WIDTH, height);
-		
-	if (selected) 
-	    g.setColor(Color.red);
-	else 
-	    g.setColor(Color.black);
+
+	switch(state)
+	    {
+	    case Event.SELECTED:
+		g.setColor(Color.red);
+		break;
+	    case Event.DESELECTED:
+		g.setColor(Color.black);
+		break;
+	    case Event.HIGHLIGHTED:
+		g.setColor(Color.green);
+	    }
 	
 	g.drawRect(x, y, BUTTON_WIDTH, height);
 
@@ -104,10 +126,17 @@ public class MessageEventRenderer implements ObjectRenderer {
 		g.setColor(Color.white);
 		g.fillRect(x+BUTTON_WIDTH+1, y, width, height);
 
-		if (selected) 
-		    g.setColor(Color.red);
-		else 
-		    g.setColor(Color.darkGray);
+		switch(state)
+		    {
+		    case Event.SELECTED:
+			g.setColor(Color.red);
+			break;
+		    case Event.DESELECTED:
+			g.setColor(Color.darkGray);
+			break;
+		    case Event.HIGHLIGHTED:
+			g.setColor(Color.green);
+		    }
 
 		g.drawRect(x+BUTTON_WIDTH+1, y, width, height);
 

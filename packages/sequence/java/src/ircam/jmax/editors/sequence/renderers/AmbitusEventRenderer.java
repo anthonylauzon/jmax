@@ -36,7 +36,7 @@ import java.awt.*;
  * The piano-roll event renderer in a Score with an ambitus: the line-based event, 
  * with a lenght , variable width, black color, a label.
  */
-public class AmbitusEventRenderer implements ObjectRenderer {
+public class AmbitusEventRenderer implements SeqObjectRenderer {
 
   public AmbitusEventRenderer()
     {
@@ -65,53 +65,65 @@ public class AmbitusEventRenderer implements ObjectRenderer {
    */
   public void render(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
   {
-    Event e = (Event) obj;
-    SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
-    PartitionAdapter pa = (PartitionAdapter)gc.getAdapter();
-
-    int x = pa.getX(e);
-    int y = pa.getY(e);
-    int lenght = pa.getLenght(e);
-    String label = pa.getLabel(e);
-    int heigth = pa.getHeigth(e);
-
-    if (heigth == 0)
-	heigth = Adapter.NOTE_DEFAULT_HEIGTH;
-
-    y = y-heigth/2;
-
-    if (selected) 
-      {
-	  g.setColor(Color.red);
-	  //g.setColor(selectionColor);
-	  if (SequenceSelection.getCurrent().getModel() != gc.getDataModel()) g.drawRect(x, y, lenght, heigth);
-	else g.fillRect(x, y, lenght, heigth);
-      }
-    else 
-      {
-	g.setColor(Color.black);
-	g.fillRect(x, y, lenght, heigth);
-      }
-    if(pa.getViewMode()==MidiTrackEditor.NMS_VIEW)
-    {
-	int alt = pa.getAlteration(e);
-	g.setFont(altFont);
-	switch(alt)
-	    {
-	    case PartitionAdapter.ALTERATION_DIESIS:
-		g.drawString("#", x-8, y+5);
-		break;
-	    case PartitionAdapter.ALTERATION_BEMOLLE:
-		g.drawString("b", x-8, y+5);
-	    }
-    }
-    if(pa.isDisplayLabels())
-	{
-	    g.setFont(SequencePanel.rulerFont);
-	    g.drawString(label, x, y-5);
-	}
+      if(selected)
+	  render(obj, g, Event.SELECTED, theGc); 
+      else
+	  render(obj, g, Event.DESELECTED, theGc); 
   }
   
+  public void render(Object obj, Graphics g, int state, GraphicContext theGc) 
+  {
+      Event e = (Event) obj;
+      SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
+      PartitionAdapter pa = (PartitionAdapter)gc.getAdapter();
+
+      int x = pa.getX(e);
+      int y = pa.getY(e);
+      int lenght = pa.getLenght(e);
+      String label = pa.getLabel(e);
+      int heigth = pa.getHeigth(e);
+
+      if (heigth == 0)
+	  heigth = Adapter.NOTE_DEFAULT_HEIGTH;
+
+      y = y-heigth/2;
+
+      switch(state)
+      {
+      case Event.SELECTED:
+	  g.setColor(Color.red);
+	  if (SequenceSelection.getCurrent().getModel() != gc.getDataModel()) g.drawRect(x, y, lenght, heigth);
+	  else g.fillRect(x, y, lenght, heigth);
+	  break;
+      case Event.DESELECTED:
+	  g.setColor(Color.black);
+	  g.fillRect(x, y, lenght, heigth);
+	  break;
+      case Event.HIGHLIGHTED:
+	  g.setColor(Color.green);
+	  g.fillRect(x, y, lenght, heigth);
+	  break;
+      }
+
+      if(pa.getViewMode()==MidiTrackEditor.NMS_VIEW)
+      {
+	  int alt = pa.getAlteration(e);
+	  g.setFont(altFont);
+	  switch(alt)
+	      {
+	      case PartitionAdapter.ALTERATION_DIESIS:
+		  g.drawString("#", x-8, y+5);
+		  break;
+	      case PartitionAdapter.ALTERATION_BEMOLLE:
+		  g.drawString("b", x-8, y+5);
+	      }
+      }
+      if(pa.isDisplayLabels())
+      {
+	  g.setFont(SequencePanel.rulerFont);
+	  g.drawString(label, x, y-5);
+      }
+  }
   /**
    * returns true if the given event contains the given (graphic) point
    */
@@ -176,7 +188,6 @@ public class AmbitusEventRenderer implements ObjectRenderer {
 
   //------------Fields
   final static int NOTE_DEFAULT_WIDTH = 5;
-    //final static int NOTE_DEFAULT_HEIGHT = 3;
   public SequenceGraphicContext gc;
   public static AmbitusEventRenderer staticInstance;
   static public Font altFont = new Font("SansSerif", Font.BOLD, 12);

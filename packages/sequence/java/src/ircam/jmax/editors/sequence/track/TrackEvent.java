@@ -186,7 +186,7 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 
     /* --------- Drawable interface ----------*/
 
-    public ObjectRenderer getRenderer()
+    public SeqObjectRenderer getRenderer()
     {
 	if (value!= null)
 	    return value.getRenderer();

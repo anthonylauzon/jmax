@@ -41,6 +41,10 @@ public interface Event
 
     /** Set the FtsData corresponding to this event */
     public abstract void setValue(EventValue value);
+
+    final public static int SELECTED    = 0;
+    final public static int DESELECTED  = 1;
+    final public static int HIGHLIGHTED = 2;
 }
 
 

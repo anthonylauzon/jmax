@@ -263,7 +263,7 @@ public class MessageValue extends AbstractEventValue
 
     /**
      * Returns its specialized renderer (an AmbitusEventRenderer) */
-    public ObjectRenderer getRenderer()
+    public SeqObjectRenderer getRenderer()
     {
 	return MessageEventRenderer.getRenderer();
     }

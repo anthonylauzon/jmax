@@ -99,7 +99,7 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
 		    }
 
 		int hhX = utilityPartitionAdapter.getX(hhTime)+3+TrackContainer.BUTTON_WIDTH;
-		g.setColor(Color.red);
+		g.setColor(Color.green);
 		g.fillRect(hhX-1, 1, 3, d.height-2);
 
 		hh = false;				

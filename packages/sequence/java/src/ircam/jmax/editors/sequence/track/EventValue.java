@@ -7,6 +7,7 @@ import java.util.*;
 import javax.swing.*;
 
 import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.renderers.*;
 /**
  * The interface of the objects that can be values of events in a sequence.
  * The needed functionalities are generic property handling, without assumptions
@@ -40,7 +41,7 @@ public interface EventValue
 
     /**
      * Returns the ObjectRenderer for this object */
-    public abstract ObjectRenderer getRenderer();
+    public abstract SeqObjectRenderer getRenderer();
 
     /**
      * Returns an Enumeration of all the property names known by this

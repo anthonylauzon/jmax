@@ -36,7 +36,7 @@ import java.awt.*;
 /**
  * An IntegerValue event renderer. It is represented as a vertical black bar
  */
-public class IntegerEventRenderer implements ObjectRenderer {
+public class IntegerEventRenderer implements SeqObjectRenderer {
 
   public IntegerEventRenderer()
     {
@@ -65,6 +65,14 @@ public class IntegerEventRenderer implements ObjectRenderer {
    */
   public void render(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
   {
+      if(selected)
+	  render(obj, g, Event.SELECTED, theGc); 
+      else
+	  render(obj, g, Event.DESELECTED, theGc); 
+  }
+  
+  public void render(Object obj, Graphics g, int state, GraphicContext theGc) 
+  {
       Event e = (Event) obj;
       MonoDimensionalAdapter adapter = (MonoDimensionalAdapter)((SequenceGraphicContext) theGc).getAdapter();
       TrackDataModel model = ((SequenceGraphicContext) theGc).getDataModel();
@@ -72,15 +80,22 @@ public class IntegerEventRenderer implements ObjectRenderer {
       int x = adapter.getX(e);
       int y = adapter.getY(e);    
 
-      if (selected) 
-	  g.setColor(Color.red);
-      else 
-	  g.setColor(Color.black);
-
+      switch(state)
+	  {
+	  case Event.SELECTED:
+	      g.setColor(Color.red);
+	      break;
+	  case Event.DESELECTED:
+	      g.setColor(Color.black);
+	      break;
+	  case Event.HIGHLIGHTED:
+	      g.setColor(Color.green);
+	  }
+      
       if(adapter.getViewMode() == MonoTrackEditor.BREAK_POINTS_VIEW)
 	  {
 	      g.fillOval(x-2, y-2, 5, 5);
-	      if(selected)
+	      if(state != Event.DESELECTED)
 		  g.drawOval(x-4, y-4, 9, 9);
 	
 	      Event next = model.getNextEvent(e);		
@@ -122,7 +137,7 @@ public class IntegerEventRenderer implements ObjectRenderer {
 		  }
 	      else //normal paint
 		  {
-		      if(selected)
+		      if(state != Event.DESELECTED)
 			  g.setColor(Color.black);
 
 		      if(next != null)

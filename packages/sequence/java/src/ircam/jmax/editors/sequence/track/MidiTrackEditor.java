@@ -118,7 +118,8 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 				    gc.getScrollManager().makeVisible(temp);
 				    first = false;
 				}
-			    temp.getRenderer().render(temp, g, true, gc);
+			    //temp.getRenderer().render(temp, g, true, gc);
+			    temp.getRenderer().render(temp, g, Event.HIGHLIGHTED, gc);
 			    oldElements.addElement(temp);
 			}
 		}

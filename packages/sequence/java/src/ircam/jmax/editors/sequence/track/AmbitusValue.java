@@ -128,7 +128,7 @@ public class AmbitusValue extends AbstractEventValue
 
   /**
    * Returns its specialized renderer (an AmbitusEventRenderer) */
-  public ObjectRenderer getRenderer()
+  public SeqObjectRenderer getRenderer()
   {
     return AmbitusEventRenderer.getRenderer();
   }

@@ -54,6 +54,15 @@ public class ScoreRenderer extends AbstractRenderer{
     super();
     gc = theGc;
     gc.setRenderManager(this);
+    //gc.setAdapter(new PartitionAdapter());
+    {//-- prepares the parameters for the geometry object
+
+	Geometry g = gc.getAdapter().getGeometry();
+	g.setXZoom(20);
+	g.setYZoom(300);
+	g.setYInvertion(true);
+	g.setYTransposition(136);//??
+    }
 
     tempList = new MaxVector();
 

@@ -123,7 +123,7 @@ public class FloatValue extends AbstractEventValue
 
     /**
      * Returns its specialized renderer (an AmbitusEventRenderer) */
-    public ObjectRenderer getRenderer()
+    public SeqObjectRenderer getRenderer()
     {
 	return IntegerEventRenderer.getRenderer();
     }
