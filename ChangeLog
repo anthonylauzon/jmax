@@ -1,3 +1,15 @@
+2002-07-24  Patrice Tisserand  <tisseran@lithium.ircam.fr>
+
+	* clean documentation directory.
+	Add rules to Makefile.am to generate documentation with doxygen.
+	Add creation of Makefile in doc directory in configure.in
+	The following file was added:
+	        doc/api/Makefile.am
+	The following file were removed:
+	        doc/api/html/files.html
+		doc/api/html/index.html
+		doc/api/html/modules.html
+	
 2002-07-23  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* removed all doctors
