@@ -159,6 +159,13 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 
 	setDirty();
     }
+
+    public void setName(int nArgs , FtsAtom args[])
+    {
+	sequence.setName(args[0].getString());
+    }
+
+
   /**
    * return how many tracks in the sequence
    */
@@ -259,6 +266,11 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
     {
 	FtsTrackObject.sendArgs[0].setObject((FtsTrackObject)track.getTrackDataModel()); 
 	sendMessage(FtsObject.systemInlet, "remove_track", 1, FtsTrackObject.sendArgs);
+    }
+
+    public void requestSequenceName()
+    {
+	sendMessage(FtsObject.systemInlet, "get_name", 0, null);
     }
 
     public void importMidiFile()

@@ -68,8 +68,10 @@ public class Sequence extends JFrame implements EditorContainer{
 
 	initTrackEditorFactoryTable();
 	
-	makeTitle(data);
-	
+	makeTitle();
+
+	sequenceData.requestSequenceName();
+
 	// Build The Menus and Menu Bar
 	makeMenuBar();
 
@@ -110,10 +112,16 @@ public class Sequence extends JFrame implements EditorContainer{
 	TrackEditorFactoryTable.setFactoryFor(MidiValue.info, IntegerTrackEditorFactory.instance);
     }
 
-    private final void makeTitle(FtsSequenceObject maxData){
-	setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Sequence " + maxData.getName()));
+    private final void makeTitle(){
+	setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Sequence"));
 	MaxWindowManager.getWindowManager().windowChanged(this);
     } 
+
+    public void setName(String name)
+    {
+	setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Sequence " + name));
+	MaxWindowManager.getWindowManager().windowChanged(this);
+    }
 
     private final void makeMenuBar(){
 	JMenuBar mb = new JMenuBar();
