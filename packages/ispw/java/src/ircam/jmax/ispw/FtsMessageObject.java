@@ -91,7 +91,7 @@ public class FtsMessageObject extends FtsIntValueObject
   {
       int index = text.indexOf(';', 0);
       int size = text.length();
-      while(index > 0)
+      while(index >= 0)
       { 
 	  if(index<size-2)
 	      {
