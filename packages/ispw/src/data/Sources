@@ -16,7 +16,6 @@ SOURCES = \
   data.c \
   float.c \
   symbol.c \
-  const.c \
   funbuff.c \
   integer.c \
   pbank.c \
@@ -26,5 +25,4 @@ SOURCES = \
   vexp_fun.c \
   vexp_if.c \
   vexp_util.c \
-  argument.c \
   expr_doctor.c 

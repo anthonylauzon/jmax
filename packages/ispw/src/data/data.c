@@ -17,7 +17,6 @@ extern void accum_config(void);
 extern void bag_config(void);
 extern void float_config(void);
 extern void symbol_obj_config(void);
-extern void const_obj_config(void);
 extern void funbuff_config(void);
 extern void integer_config(void);
 extern void pbank_config(void);
@@ -25,7 +24,6 @@ extern void table_config(void);
 extern void value_config(void);
 extern void expr_config(void);
 extern void expr_doctor_init(void);
-extern void argument_init(void);
 
 static void
 data_module_init(void)
@@ -48,12 +46,6 @@ data_module_init(void)
 
   expr_config();
   expr_doctor_init();
-  
-  /* The const filter to get patcher argument; should go elsewhere
-     with const */
-
-  const_obj_config();
-  argument_init();
 }
 
 fts_module_t data_module = {"data", "ISPW data classes", data_module_init};
