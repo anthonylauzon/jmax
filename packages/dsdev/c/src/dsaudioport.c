@@ -22,7 +22,7 @@
 
 #define INITGUID
 
-#define CAPTURE 0
+#define CAPTURE 0 /* disabled until fixed */
 
 #include <fts/fts.h>
 #include <windows.h>
@@ -270,7 +270,7 @@ dsaudioport_xrun(fts_audioport_t *port)
   
   if (!dev->no_xrun_message_already_posted) 
   {
-    fts_post( "Warning: the audio device does not yet support out-of-sync detection\n");
+    fts_post( "Warning: out-of-sync detection is not implemented with dsound\n");
     fts_post( "         Synchronisation errors (\"dac slip\") will not be reported\n");
     dev->no_xrun_message_already_posted = 1;
   }
@@ -321,6 +321,7 @@ dsaudioport_scan_output_device(LPGUID lpGuid, LPCSTR lpcstrDescription, LPCSTR l
   fts_set_symbol(at, device_name);
   fts_set_pointer(at + 1, (void*)lpGuid);
   fts_set_symbol(at + 2, fts_s_output);
+
   device = fts_object_create(dsaudioport_type, ac, at);
   if (device != NULL)
   {
@@ -348,7 +349,7 @@ dsaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, cons
   dsaudioport_t* dev = (dsaudioport_t*)o;
   HRESULT hr;
 
-  /* do something when when you want to open input */
+  /* do something when you want to open input */
   fts_log("[dsaudioport] dsaudioport_open_input\n");
 
   hr = IDirectSoundCaptureBuffer_Start(dev->dscBuffer, DSCBSTART_LOOPING);
@@ -360,13 +361,13 @@ dsaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
 {
   dsaudioport_t* dev = (dsaudioport_t*)o;
   HRESULT hr;
-  /* do something when when you want to open output */
+  /* do something when you want to open output */
   fts_log("[dsaudioport] dsaudioport_open_output\n");
 
   hr = IDirectSoundBuffer_Play(dev->dsBuffer, 0, 0, DSBPLAY_LOOPING);
   if (hr != S_OK) {
-    
-    /* FIXME */
+    fts_log("[dsaudioport] IDirectSoundBuffer_Play failed\n");
+    return; /* error */
   }
 
   dev->state = dsaudioport_running;
@@ -550,12 +551,15 @@ dsaudioport_input_init(dsaudioport_t* dev, fts_symbol_t device_name, LPGUID guid
     fts_object_error(o, "error opening DirectSound device (failed to set notify positions: %s)", fts_win32_error(hr));
     goto error_recovery;
   }
-error_recovery:
-  /* dsaudioport_cleanup(dev); */
 
   fts_audioport_set_channels((fts_audioport_t*)dev, FTS_AUDIO_INPUT, channels);
   fts_audioport_set_io_fun((fts_audioport_t*)dev, FTS_AUDIO_INPUT, dsaudioport_input);
   fts_audioport_set_valid((fts_audioport_t*)dev, FTS_AUDIO_INPUT);
+
+
+error_recovery:
+  return;
+  //dsaudioport_cleanup(dev); 
 }
 
 static void 
@@ -723,14 +727,14 @@ dsaudioport_output_init(dsaudioport_t* dev, fts_symbol_t device_name, LPGUID gui
     fts_object_error(o, "error opening DirectSound device (failed to set notify positions: %s)", fts_win32_error(hr));
     goto error_recovery;
   }
-error_recovery:
-  /* dsaudioport_cleanup(dev); */
-  
   
   fts_audioport_set_channels((fts_audioport_t*)dev, FTS_AUDIO_OUTPUT, channels);
   fts_audioport_set_io_fun((fts_audioport_t*)dev, FTS_AUDIO_OUTPUT, dsaudioport_output);
   fts_audioport_set_valid((fts_audioport_t*)dev, FTS_AUDIO_OUTPUT);
 
+error_recovery:
+  //dsaudioport_cleanup(dev);
+  return;
 }
 
 
@@ -905,7 +909,7 @@ fts_open_direct_sound(char *device)
 
   hr = IDirectSound_SetCooperativeLevel(fts_direct_sound, fts_wnd, DSSCL_PRIORITY);
   if (hr != DS_OK) {
-    fts_post( "Warning: dsaudioport: failed to create set the cooperative level\n");
+    fts_post( "Warning: dsaudioport: failed to set the cooperative level\n");
     IDirectSound_Release(fts_direct_sound); 
     fts_direct_sound = NULL;
     return -3;
@@ -1007,7 +1011,7 @@ fts_win32_create_window()
   myClass.cbWndExtra = 0;
   if (!RegisterClass(&myClass)) 
   {
-    fts_post( "Warning: dsaudioport: failed to register the window class\n");
+    fts_post( "[dsound] Error: failed to register the window class\n");
     return -100;
   }
   fts_wnd = CreateWindow((LPSTR) "FtsDsDev", (LPSTR) "FtsDsDev", WS_OVERLAPPEDWINDOW,
@@ -1015,7 +1019,7 @@ fts_win32_create_window()
 			 dsdev_instance, (LPSTR) NULL);  
   if (fts_wnd == NULL) 
   {
-    fts_post( "Warning: dsaudioport: failed to create the window\n");
+    fts_post( "[dsound] Error: failed to create the window\n");
     return -101;
   }
   return 0;
@@ -1037,28 +1041,36 @@ BOOL WINAPI DllMain(HANDLE hModule, DWORD reason, LPVOID lpReserved)
 {
   switch (reason) {
   case DLL_PROCESS_ATTACH:
-  case DLL_THREAD_ATTACH:
     dsdev_instance = (HINSTANCE) hModule;
     break;
-
+  case DLL_THREAD_ATTACH:
   case DLL_THREAD_DETACH:
+    break;
   case DLL_PROCESS_DETACH:
-    fts_log("[dsdev]: Cleaning up\n");
-    fts_win32_destroy_window();
-    fts_close_direct_sound_capture();
-    fts_close_direct_sound();
-    fts_log("[dsdev]: Done\n");
+    break;
   }
   return TRUE;
 }
 
-void 
-dsaudioport_config(void)
+
+void dsaudioport_at_exit(void)
+{
+    fts_log("[dsound] Cleaning up\n");
+    fts_close_direct_sound_capture();
+    fts_close_direct_sound();
+    fts_win32_destroy_window();
+    fts_log("[dsound] Done\n");
+
+    /* Release the COM library */
+    CoUninitialize();
+}
+
+void dsaudioport_config(void)
 {
   fts_symbol_t dsaudioport_symbol;
 
   /* make sure we have a valid instance handle */
-  if (dsdev_instance == NULL) 
+  if(dsdev_instance == NULL) 
   {
     fts_post("Warning: dsaudioport: invalid DLL instance handle\n");
     fts_log("[dsaudioport] Warning: dsaudioport: invalid DLL instance handle\n");
@@ -1066,21 +1078,34 @@ dsaudioport_config(void)
   }
 
   /* create an invisible window */
-  if ((fts_wnd == NULL) 
+  if((fts_wnd == NULL) 
       && (fts_win32_create_window() != 0)) {
     return;
   }
 
+  /* initialize the COM library */
+  CoInitialize(0);
+
   dsaudioport_symbol = fts_new_symbol("dsaudioport");
   dsaudioport_type = fts_class_install( dsaudioport_symbol, dsaudioport_instantiate);
 
-  /* scan for input device */
-  fts_log("[dsaudioport]: Scan audio output devices\n"); 
+  /* scan for output devices */
+  fts_log("[dsound] Scaning audio output devices\n");
+  fts_post("[dsound] Scaning output devices...\n"); 
   DirectSoundEnumerate((LPDSENUMCALLBACK) dsaudioport_scan_output_device, NULL); 
     
-  /* scan for output device */
-  fts_log("[dsaudioport]: Scan audio input devices\n"); 
+  /* scan for input devices */
+#if CAPTURE
+  fts_log("[dsound] Scaning audio input devices\n");
+  fts_post("[dsound] Scaning input devices...\n"); 
   DirectSoundCaptureEnumerate((LPDSENUMCALLBACK) dsaudioport_scan_input_device, NULL);
+#else
+  fts_log("[dsound] Skiping audio input devices scan\n");
+  fts_post("[dsound] Capture has been disabled until it is fixed\n"); 
+#endif
+
+  /* Register exit method */
+  atexit(dsaudioport_at_exit);
 
 }
 

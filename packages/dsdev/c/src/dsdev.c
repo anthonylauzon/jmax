@@ -33,5 +33,5 @@ extern void dsaudioport_config(void);
 void 
 dsdev_config(void)
 {
-  dsaudioport_config();
+  dsaudioport_config();  
 }
