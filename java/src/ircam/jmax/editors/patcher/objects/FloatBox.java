@@ -79,7 +79,9 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
   {
     try
       {
-	value = (double)((Double)formatter.parse(v)).floatValue();
+	  Number n = formatter.parse(v); 
+
+	  value = n.floatValue();
       }
     catch (java.text.ParseException  e1)
       {
