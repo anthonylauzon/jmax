@@ -28,7 +28,6 @@ include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 
 install:
 	for f in *.html ; do $(INSTALL_DATA) $$f $(doc_install_dir) ; done
-	(cd user ; $(MAKE) $@)
 	(cd images ; $(MAKE) $@)
 .PHONY: install
 
