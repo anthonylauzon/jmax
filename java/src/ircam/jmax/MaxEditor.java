@@ -411,7 +411,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     aNewDialog.setLocation(aPoint.x+100, aPoint.y+100);
     aNewDialog.setVisible(true);
     aNewFileType = aNewDialog.GetNewFileType();
-    MaxApplication.NewFile(aNewFileType);
+    if(!aNewFileType.equals("")) MaxApplication.NewFile(aNewFileType);
   }
 
 

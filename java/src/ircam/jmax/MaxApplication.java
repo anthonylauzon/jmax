@@ -72,6 +72,8 @@ public class MaxApplication extends Object {
     // the registered default editor factory.
     // sorry, using names for now...
 
+    System.out.println("theFileType"+theFileType);
+
     MaxData ourData;
     MaxDataEditor ourEditor;
     
