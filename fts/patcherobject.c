@@ -964,16 +964,13 @@ fts_object_get_package(fts_object_t *obj)
 *
 */
 void
-fts_object_open_dialog(fts_object_t *o, fts_symbol_t callback, fts_symbol_t prompt, fts_symbol_t path, fts_symbol_t default_name)
+fts_object_open_dialog(fts_object_t *o, fts_symbol_t callback, fts_symbol_t prompt)
 {
-	fts_atom_t a[4];
+	fts_atom_t a[2];
 	
 	fts_set_symbol(a, callback);
 	fts_set_symbol(a + 1, prompt);
-	fts_set_symbol(a + 2, path);
-	fts_set_symbol(a + 3, default_name);
-
-	fts_client_send_message(o, fts_s_openFileDialog, 4, a);
+	fts_client_send_message(o, fts_s_openFileDialog, 2, a);
 }
 
 void

@@ -1536,7 +1536,7 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       data_object_set_dirty( o);
     }
   else
-	fts_object_open_dialog(o, fts_s_load, sym_open_file, fts_project_get_dir(), fts_new_symbol(" "));
+	fts_object_open_dialog(o, fts_s_load, sym_open_file);
 }
 
 static void

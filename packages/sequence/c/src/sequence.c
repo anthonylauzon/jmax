@@ -293,7 +293,7 @@ sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 static void
 sequence_import_midifile_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-	fts_object_open_dialog(o, seqsym_import_midifile, fts_new_symbol("Import standard MIDI file"), fts_project_get_dir(), fts_new_symbol(" "));
+	fts_object_open_dialog(o, seqsym_import_midifile, fts_new_symbol("Import standard MIDI file"));
 }
 
 static void
