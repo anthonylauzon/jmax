@@ -190,14 +190,15 @@ void fts_spost_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t *at)
 
 static int check_symbol_in( fts_atom_t *p, fts_symbol_t *symbols)
 {
-  int i;
-
   if ( !fts_is_symbol( p))
     return 0;
 
-  for ( i = 0; symbols[i]; i++)
-    if ( symbols[i] == fts_get_symbol( p))
-      return 1;
+  while (*symbols)
+    {
+      if ( *symbols == fts_get_symbol( p))
+	return 1;
+      symbols++;
+    }
 
   return 0;
 }
@@ -236,19 +237,21 @@ static int needs_quote( fts_atom_t *p)
     {	    
       switch (*s) {
       case ' ':
+      case '\n':
       case '\t':
-      case '=':
-      case '.':
       case '$':
+      case ',':
       case '(':
       case ')':
       case '[':
       case ']':
       case '{':
       case '}':
-      case ';':
-      case ',':
       case ':':
+      case ';':
+      case '=':
+      case '\'':
+      case '.':
 	return 1;
       }
 
@@ -305,10 +308,12 @@ void fts_spost_object_description_args( fts_bytestream_t *stream, int ac, fts_at
 	    fts_spost( stream, "%g", f_num);
 	}
       else if ( fts_is_symbol( value1))
-	if( needs_quote( value1))
-	  fts_spost( stream, "%c%s%c", '"', fts_get_symbol( value1), '"');
-	else
-	  fts_spost( stream, "%s", fts_get_symbol( value1));
+	{
+	  if( needs_quote( value1))
+	    fts_spost( stream, "%c%s%c", '"', fts_get_symbol( value1), '"');
+	  else
+	    fts_spost( stream, "%s", fts_get_symbol( value1));
+	}
       else 
 	fts_spost( stream, "??");
 
@@ -319,7 +324,7 @@ void fts_spost_object_description_args( fts_bytestream_t *stream, int ac, fts_at
 	add_blank = 0;
       else if (value2)
 	{
-	  if (want_a_space_before( value2))
+	  if (want_a_space_before( fts_get_symbol( value2)))
 	    add_blank = 1;
 	  else if (dont_want_a_space_before( value2))
 	    add_blank = 0;

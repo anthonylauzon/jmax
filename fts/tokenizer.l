@@ -45,7 +45,7 @@ decdigit	[0-9]
 hexdigit	[0-9a-fA-F]
 decint		[\-\+]?{decdigit}+
 hexint		0x{hexdigit}+
-float		-?{decdigit}+(\.{decdigit}*)?([eE][+-]?{decdigit}+)?
+float		[\-\+]?{decdigit}+(\.{decdigit}*)?([eE][+-]?{decdigit}+)?
 dollar		\$
 semi		;
 comma		,
@@ -75,7 +75,7 @@ smaller		\<
 smaller_equal	\<=
 colon		:
 equal		=
-symbol		[^ \t=\.\$\(\)\[\]\{\};,:\-+][^ \t=\.\$\(\)\[\]\{\};,:]*
+symbol		[^ \n\t\$\,\(\)\[\]\{\}\:\;\=\'\.]+
 quoted_symbol	\"[^\"]+\"
 
 %%
@@ -139,32 +139,3 @@ void fts_tokenizer_destroy( fts_tokenizer_t *tokenizer)
 {
   yy_delete_buffer( (YY_BUFFER_STATE)tokenizer->p);
 }
-
-
-#ifdef TEST
-static void print_atom( const fts_atom_t *p)
-{
-  if ( fts_is_int( p))
-    printf( "int: %d\n", fts_get_int( p));
-  else if ( fts_is_float( p))
-    printf( "float: %g\n", fts_get_float( p));
-  else if ( fts_is_symbol( p))
-    printf( "symbol: %s\n", fts_get_symbol( p));
-}
-
-int main( int argc, char **argv)
-{
-  fts_atom_t a;
-  fts_tokenizer_t tokenizer;
-
-  fts_tokenizer_init( &tokenizer, argv[1]);
-  while (fts_tokenizer_run( &tokenizer, &a) != 0)
-    {
-      print_atom( &a);
-    }
-  fts_tokenizer_destroy( &tokenizer);
-
-  return 0;
-}
-
-#endif
