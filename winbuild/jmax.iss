@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=jMax
-AppVerName=jMax 4.1.0
+AppVerName=jMax 4.1.0_WIN32
 AppPublisher=IRCAM
 AppPublisherURL=http://www.ircam.fr/jmax
 AppSupportURL=http://www.ircam.fr/jmax
@@ -54,6 +54,13 @@ Source: "..\images\*.gif"; DestDir: "{app}\images\"; Flags: ignoreversion
 ;; Help patches
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Source: "..\help\*.jmax"; DestDir: "{app}\help\"; Flags: ignoreversion
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Tutorial patches
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Source: "..\tutorials\basics\*.jmax"; DestDir: "{app}\tutorials\basics\"; Flags: ignoreversion
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; PACKAGES
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
