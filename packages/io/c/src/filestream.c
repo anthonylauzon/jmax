@@ -357,6 +357,11 @@ filestream_instantiate(fts_class_t *cl)
   fts_class_inlet_number(cl, 0, filestream_number);
   fts_class_inlet_varargs(cl, 0, filestream_varargs);
 
+  /* name support */
+  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method); 
+  fts_class_message_varargs(cl, fts_s_update_gui, fts_name_gui_method); 
+  fts_class_message_varargs(cl, fts_s_dump, fts_name_dump_method); 
+
   fts_class_outlet_int(cl, 0);
 }
 
