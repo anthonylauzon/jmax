@@ -76,6 +76,8 @@ int
 fts_file_exists( const char *filename)
 {
   struct stat statbuf;
+  if(filename == NULL || filename == "") 
+    return 0;
 
   return stat( filename, &statbuf) == 0;
 }
@@ -84,7 +86,8 @@ int
 fts_is_file(const char *name)
 {
   struct stat statbuf;
-
+  if(name == NULL || name == "") 
+    return 0;
   return ( stat( name, &statbuf) == 0) && (statbuf.st_mode & S_IFREG);
 }
 

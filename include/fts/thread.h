@@ -1,6 +1,8 @@
 #ifdef HAVE_PTHREAD_H
 #include <pthread.h>
 #endif
+#include <fts/fts.h>
+#include <ftsconfig.h>
 
 /**************************************************
  *
@@ -53,6 +55,9 @@ typedef struct fts_thread_worker
 {
     fts_thread_function_t* thread_function;
     int id;
+#ifdef WIN32
+    HANDLE threadHandle;
+#endif
 } fts_thread_worker_t;
 
 /** 
@@ -82,8 +87,15 @@ FTS_API int fts_thread_manager_start(void);
 /* Platform dependant function                        */
 /*                                                    */
 /* ************************************************** */
+#ifdef WIN32
+FTS_API int thread_manager_start(thread_manager_t* self);
+FTS_API int thread_manager_cancel_thread(fts_thread_worker_t* thread_worker);
+void* WINAPI thread_manager_run_thread(void* arg);
+void* WINAPI thread_manager_main(void* arg);
+#else
 FTS_API int thread_manager_start(thread_manager_t* self);
 FTS_API int thread_manager_cancel_thread(fts_thread_worker_t* thread_worker);
 FTS_API void* thread_manager_run_thread(void* arg);
 FTS_API void* thread_manager_main(void* arg);
+#endif
 

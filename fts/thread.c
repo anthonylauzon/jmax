@@ -1,5 +1,7 @@
 #include <time.h>
+#ifndef WIN32
 #include <unistd.h>
+#endif
 #ifdef HAVE_PTHREAD_H
 #include <pthread.h>
 #endif
