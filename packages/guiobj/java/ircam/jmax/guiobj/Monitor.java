@@ -55,9 +55,6 @@ public class Monitor extends GraphicObject implements FtsIntValueListener
     super(theFtsObject);
 
     iconWidth = JMaxIcons.dspOn.getIconWidth() + 10;
-
-    super.setWidth( FIXED_WIDTH);
-    super.setHeight( FIXED_HEIGHT);
   }
 
   public void setDefaults()
