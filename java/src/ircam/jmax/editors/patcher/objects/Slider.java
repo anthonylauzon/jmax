@@ -27,6 +27,7 @@ package ircam.jmax.editors.patcher.objects;
 
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 import java.util.*;
 import java.lang.Math;
 
@@ -34,20 +35,22 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.actions.*;
+import ircam.jmax.editors.patcher.menus.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
 //
 // The "slider" graphic object
 //
 
-class Slider extends GraphicObject implements FtsIntValueListener
+public class Slider extends GraphicObject implements FtsIntValueListener
 {
   //
   // The graphic throttle contained into a 'slider' object.
   //
 
   static final int THROTTLE_LATERAL_OFFSET = 2;
-  static final int THROTTLE_HEIGHT = 5;
+  static final int THROTTLE_HEIGHT = 3;
   private static final int MINIMUM_DIMENSION = 15;
   protected final static int BOTTOM_OFFSET = 5;
   protected final static int UP_OFFSET = 5;
@@ -55,10 +58,9 @@ class Slider extends GraphicObject implements FtsIntValueListener
   private int value = 0;
   private int rangeMax;
   private int rangeMin;
+  private boolean isVertical = true;
 
-  private static SliderDialog inspector = null;
-
-  Slider( ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  public Slider( ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
     super( theSketchPad, theFtsObject);
 
@@ -123,15 +125,15 @@ class Slider extends GraphicObject implements FtsIntValueListener
     super.setHeight(h);
   }
 
-  public void fromDialogValueChanged( int theCurrentInt, int theMaxInt, int theMinInt)
+  public void setRange(int theMaxInt, int theMinInt)
   {
     setMaxValue( theMaxInt);
     setMinValue( theMinInt);
 
-    ((FtsSliderObject)ftsObject).setValue((theCurrentInt < rangeMin) ?
-					  rangeMin:
-					  ((theCurrentInt >= rangeMax) ? rangeMax:theCurrentInt)
-					  );
+    if(value<rangeMin) ((FtsSliderObject)ftsObject).setValue(rangeMin);
+    else if(value>rangeMax) ((FtsSliderObject)ftsObject).setValue(rangeMax);
+
+    redraw();
   }
 
   public void valueChanged(int v) 
@@ -143,36 +145,29 @@ class Slider extends GraphicObject implements FtsIntValueListener
 
   public void inspect()
   {
-    //Point aPoint = itsSketchPad.getSketchWindow().getLocation();
     Point aPoint = itsSketchPad.getEditorContainer().getContainerLocation();
-
-    if ( inspector == null) 
-      inspector = new SliderDialog();
-
-    inspector.setLocation( aPoint.x + getX(), aPoint.y + getY() - 25);
-
-    inspector.ReInit( String.valueOf( rangeMax),
-		      String.valueOf( rangeMin),
-		      String.valueOf( value),
-		      this,
-		      //itsSketchPad.getSketchWindow()
-		      itsSketchPad.getEditorContainer().getFrame());
+    SliderDialog dialog = new SliderDialog(itsSketchPad.getEditorContainer().getFrame(), this);
+    dialog.setBounds( aPoint.x + getX(), aPoint.y + getY() - 25, 200, 100);
+    dialog.setVisible( true);
+    dialog = null;//for the gc
   }
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
     int newValue;
 
-    if ( getY() + getHeight() - BOTTOM_OFFSET >= mouse.y && getY() + UP_OFFSET < mouse.y) 
-      newValue = (((( getY() + getHeight()) - mouse.y - BOTTOM_OFFSET) * (rangeMax - rangeMin)) /
-		  (getHeight() - BOTTOM_OFFSET - UP_OFFSET));
+    if(isVertical)
+      newValue = ((( getY() + getHeight() - mouse.y - BOTTOM_OFFSET) * (rangeMax - rangeMin)) /
+		  (getHeight() - BOTTOM_OFFSET - UP_OFFSET-THROTTLE_HEIGHT)) + rangeMin;
+    else
+      newValue = (((mouse.x - (getX()+ UP_OFFSET)) * (rangeMax - rangeMin)) /
+		  (getWidth() - BOTTOM_OFFSET - UP_OFFSET-THROTTLE_HEIGHT)) + rangeMin;
+    
+    if(newValue>rangeMax) newValue = rangeMax;
+    else if(newValue<rangeMin) newValue = rangeMin;
 
-    else if( getY() + getHeight() - BOTTOM_OFFSET < mouse.y)
-      newValue = rangeMin;
-    else 
-      newValue = rangeMax;
-
-    ((FtsSliderObject)ftsObject).setValue(newValue);
+    if(newValue!=value)
+	((FtsSliderObject)ftsObject).setValue(newValue);
   }
 
   public void paint( Graphics g) 
@@ -192,20 +187,22 @@ class Slider extends GraphicObject implements FtsIntValueListener
     g.fill3DRect( x+1, y+1, w-2,  h-2, true);
 
     /* Paint the throttle */
+    g.setColor( Color.black);  
+    int pixels, pos;
+    if(isVertical)
+    {
+      pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
+      pos = y + BOTTOM_OFFSET + pixels  - (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
+      //pos = y + h - BOTTOM_OFFSET - (value-rangeMin) * (h - BOTTOM_OFFSET - UP_OFFSET)/(rangeMax - rangeMin);
 
-    int pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
-    int pos = y + BOTTOM_OFFSET + pixels - (pixels * value) / (rangeMax - rangeMin);
-
-    g.setColor( Settings.sharedInstance().getSelectedColor());
-
-    if (! isSelected()) 
-      g.fillRect( x + THROTTLE_LATERAL_OFFSET + 1, pos + 1,
-		  w - 2*THROTTLE_LATERAL_OFFSET - 2, THROTTLE_HEIGHT - 2);
-
-    g.setColor( Color.black);
-
-    g.drawRect(x + THROTTLE_LATERAL_OFFSET, pos, w - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
-
+      g.drawRect(x + THROTTLE_LATERAL_OFFSET, pos, w - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
+    }
+    else
+    {
+      pixels = w - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
+      pos = x + UP_OFFSET + (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
+      g.drawRect(pos, y + THROTTLE_LATERAL_OFFSET, THROTTLE_HEIGHT - 1, h - 2*THROTTLE_LATERAL_OFFSET - 1); 
+    }
     super.paint(g);
   }
 
@@ -221,15 +218,21 @@ class Slider extends GraphicObject implements FtsIntValueListener
     g.fillRect( x+2, y+2, w-4,  h-4);
 
     /* Paint the throttle */
-    int pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
-    int pos = y + BOTTOM_OFFSET + pixels - (pixels * value) / (rangeMax - rangeMin);
-
-    /*g.setColor( Settings.sharedInstance().getSelectedColor());
-      g.fillRect( x + THROTTLE_LATERAL_OFFSET + 1, pos + 1,
-      w - 2*THROTTLE_LATERAL_OFFSET - 2, THROTTLE_HEIGHT - 2);*/
-
     g.setColor( Color.black);
-    g.drawRect(x + THROTTLE_LATERAL_OFFSET, pos, w - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
+    int pixels, pos;
+    if(isVertical)
+    {
+      pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
+      pos = y + BOTTOM_OFFSET + pixels - (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
+      //pos = y + h - BOTTOM_OFFSET - (value-rangeMin) * (h - BOTTOM_OFFSET - UP_OFFSET)/(rangeMax - rangeMin);
+      g.drawRect(x + THROTTLE_LATERAL_OFFSET, pos, w - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
+    }
+    else
+    {
+      pixels = w - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
+      pos = x + UP_OFFSET + (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
+      g.drawRect(pos, y + THROTTLE_LATERAL_OFFSET, THROTTLE_HEIGHT - 1, h - 2*THROTTLE_LATERAL_OFFSET - 1); 
+    }
   }
 
   protected SensibilityArea findSensibilityArea( int mouseX, int mouseY)
@@ -242,5 +245,39 @@ class Slider extends GraphicObject implements FtsIntValueListener
     else
       return super.findSensibilityArea( mouseX, mouseY);
   }
+
+ public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
+  {
+    super.popUpUpdate(onInlet, onOutlet, area);
+    ObjectPopUp.addMenu(SliderPopUpMenu.getInstance());
+  }
+  public void popUpReset()
+  {
+    super.popUpReset();
+    ObjectPopUp.removeMenu(SliderPopUpMenu.getInstance());
+  }
+
+  public void changeOrientation()
+  {
+    isVertical = !isVertical;
+    updateDimension();
+  }
+  void updateDimension()
+  {
+    int w = getWidth();
+    int h = getHeight();
+    setWidth(h);
+    setHeight(w);
+    itsSketchPad.repaint();//???
+  }
 }
+
+
+
+
+
+
+
+
+
 

@@ -71,7 +71,6 @@ public class EditMenu extends EditorMenu
   JMenuItem pasteItem;
   JMenuItem duplicateItem;
   JMenuItem selectAllItem;
-  JMenuItem inspectItem;
   JMenuItem lockItem;
   AlignMenu alignMenu;
   JMenuItem toFrontMenuItem;
@@ -98,10 +97,6 @@ public class EditMenu extends EditorMenu
 
     add(Actions.findAction, "Find", Event.CTRL_MASK, KeyEvent.VK_F);
     add(Actions.findErrorsAction, "Find Errors");
-
-    addSeparator();
-
-    inspectItem = add(Actions.inspectAction, "Inspect");
 
     addSeparator();
 
@@ -133,7 +128,6 @@ public class EditMenu extends EditorMenu
 	cutItem.setEnabled(false);
 	copyItem.setEnabled(false);
 	duplicateItem.setEnabled(false);
-	inspectItem.setEnabled(false);
 	
 	pasteItem.setEnabled((flavors != null) &&
 			     clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor));
@@ -191,7 +185,6 @@ public class EditMenu extends EditorMenu
 				 clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor));
 	  }
 
-	inspectItem.setEnabled(true);
 	selectAllItem.setEnabled(true);
       }
   }

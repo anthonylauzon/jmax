@@ -95,7 +95,10 @@ public class Actions
   public static EditorAction saveAction     = new SaveAction();
   public static EditorAction saveAsAction   = new SaveAsAction();
   public static EditorAction saveToAction   = new SaveToAction();
+  public static EditorAction saveTemplateAction = new SaveToAction();
+
   public static EditorAction printAction    = new PrintAction();
+
 
   public static EditorAction openHelpPatchAction = new OpenHelpPatchAction();
   public static EditorAction showHtmlAction = new ShowHTMLAction();
@@ -110,6 +113,8 @@ public class Actions
   public static EditorAction fontSmallerPopUpAction = new FontSmallerPopUpAction();
   public static EditorAction fontSizesPopUpAction = new FontSizesPopUpAction();
   public static EditorAction fontPopUpAction = new FontPopUpAction();
+  public static EditorAction inspectObjectAction = new InspectObjectAction();
+  public static EditorAction changeSliderOrientationAction = new ChangeSliderOrientationAction();
 }
 
 

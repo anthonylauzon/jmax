@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.menus;
+package ircam.jmax.editors.patcher.actions;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -31,48 +31,17 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
-import ircam.jmax.editors.patcher.actions.*;
+import ircam.jmax.editors.patcher.objects.*;
 
 import ircam.jmax.toolkit.*;
-import ircam.jmax.toolkit.menus.*;
+import ircam.jmax.toolkit.actions.*;
 
-/** Implement the patcher editor File Menu */
-
-public class FileMenu extends DefaultFileMenu
+public class InspectObjectAction extends EditorAction
 {
-  public FileMenu(ErmesSketchPad sketch)
+  public void doAction(EditorContainer container)
   {
-    /*insert(Actions.saveAction, "Save", Event.CTRL_MASK, KeyEvent.VK_S, 3);
-
-      insert(Actions.printAction, "Print", Event.CTRL_MASK, KeyEvent.VK_P, 6);
-      insertSeparator(7);
-
-    
-      if(sketch.isARootPatcher())
-      insert(Actions.saveAsAction, "SaveAs", 4);
-      else
-      insert(Actions.saveToAction, "Save As Template", 4);*/
-
-    if(sketch.isARootPatcher())
-      {
-	insert(Actions.saveAction, "Save", Event.CTRL_MASK, KeyEvent.VK_S, 3);
-	insert(Actions.saveAsAction, "SaveAs", 4);
-      }
-    else
-      if(sketch.isASubPatcher())
-	{
-	  insert(Actions.saveAction, "Save", Event.CTRL_MASK, KeyEvent.VK_S, 3);
-	  insert(Actions.saveToAction, "Save As Template", 4);
-	}
-      else //is a template
-	{
-	  insert(Actions.saveTemplateAction, "Save Template", 3);
-	  insert(Actions.saveToAction, "SaveAs", 4);
-	}
-     insertSeparator(6);
-     insert(Actions.printAction, "Print", Event.CTRL_MASK, KeyEvent.VK_P, 7);
-
+      ObjectPopUp.getPopUpTarget().inspect();
   }
 }
-

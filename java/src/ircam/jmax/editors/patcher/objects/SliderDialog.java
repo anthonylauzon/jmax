@@ -27,81 +27,79 @@ package ircam.jmax.editors.patcher.objects;
 
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.*;
 
 /* Not static any ore */
 
-class SliderDialog extends Frame implements ActionListener {
+class SliderDialog extends JDialog implements ActionListener {
 
-  Button okButton;
-  Button cancelButton;
-  TextField itsMaxValueField, itsMinValueField, itsCurrentValueField;
+  JButton okButton, cancelButton;
+  JTextField itsMaxValueField, itsMinValueField;
   Slider itsSliderObject = null;
   String itsMaxValue = "";
   String itsMinValue = "";
-  String itsCurrentValue = "";
-  
-  public SliderDialog() 
+
+  public SliderDialog(Frame frame, Slider slider) 
   {
-    super( "Slider setting");
-    
-    setLayout( new BorderLayout());
-    
-    //Create north section.
-    Panel p1 = new Panel();
-    p1.setLayout(new GridLayout(1,2));
-    
-    Panel p11 = new Panel();
-    p11.setLayout(new GridLayout(3,1));
-    p11.add( new Label("Slider Maximum Value"));
-    p11.add( new Label("Slider Minimum Value"));
-    p11.add( new Label("Slider Current Value"));
-    p1.add( p11);
-    
-    Panel p12 = new Panel();
-    p12.setLayout(new GridLayout(3,1));
+    super(frame, "Slider Range", true);
+    getContentPane().setLayout(new GridLayout(3,1));
 
-    itsMaxValueField = new TextField("", 20);
+    JPanel p1 = new JPanel();
+    p1.setLayout(new BoxLayout(p1, BoxLayout.X_AXIS));
+    p1.setBorder(BorderFactory.createEtchedBorder());
+    JLabel maxLabel = new JLabel(" Maximum Value: ", JLabel.CENTER);
+    maxLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+    p1.add(maxLabel);
+    itsMaxValueField = new JTextField();
     itsMaxValueField.addActionListener( this);
-    p12.add( itsMaxValueField);
+    itsMaxValueField.setAlignmentX(Component.CENTER_ALIGNMENT);
+    p1.add( itsMaxValueField);
 
-    itsMinValueField = new TextField("", 20);
+    JPanel p2 = new JPanel();
+    p2.setLayout(new BoxLayout(p2, BoxLayout.X_AXIS));
+    p2.setBorder(BorderFactory.createEtchedBorder());
+    JLabel minLabel = new JLabel(" Minimum Value: ", JLabel.CENTER);
+    minLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+    p2.add(minLabel);
+    itsMinValueField = new JTextField();
     itsMinValueField.addActionListener( this);
-    p12.add( itsMinValueField);   
+    itsMinValueField.setAlignmentX(Component.CENTER_ALIGNMENT);
+    p2.add( itsMinValueField);
 
-    itsCurrentValueField = new TextField("", 20);
-    itsCurrentValueField.addActionListener( this);
-    p12.add( itsCurrentValueField);
+    getContentPane().add(p1);
+    getContentPane().add(p2);
 
-    p1.add( p12);
-
-    add("North", p1);
-
-    //Create south section.
-    Panel p2 = new Panel();
-    p2.setLayout( new BorderLayout());
+    JPanel p4 = new JPanel();
+    p4.setLayout(new BoxLayout(p4, BoxLayout.X_AXIS));
     
-    okButton = new Button("OK");
-    okButton.setBackground( Color.white);
+    okButton = new JButton("OK"); 
+    okButton.setPreferredSize(new Dimension(90, 30));
+    okButton.setAlignmentY(Component.CENTER_ALIGNMENT);
     okButton.addActionListener( this);
-    p2.add( "East", okButton);
 
-    cancelButton = new Button( "Cancel");
-    cancelButton.setBackground( Color.white);
+    cancelButton = new JButton("Cancel");
+    cancelButton.setPreferredSize(new Dimension(90, 30));
+    cancelButton.setAlignmentY(Component.CENTER_ALIGNMENT);
     cancelButton.addActionListener( this);
-    p2.add( "West", cancelButton);
-    
-    add( "South", p2);
 
+    p4.add(Box.createHorizontalGlue());
+    p4.add(okButton);
+    p4.add(cancelButton);
+    p4.add(Box.createHorizontalGlue());
+
+    getContentPane().add(p4);
+    
     pack();
+
+    init(slider);
   }
 
   public void actionPerformed( ActionEvent e)
   {
     int aMaxInt = 0;
-    int aCurrentInt = 0;
     int aMinInt = 0;
 
     if ( e.getSource() == cancelButton) 
@@ -111,12 +109,10 @@ class SliderDialog extends Frame implements ActionListener {
     else  
       { 
 	itsMaxValue = itsMaxValueField.getText();
-	itsCurrentValue = itsCurrentValueField.getText();
 	itsMinValue = itsMinValueField.getText();
 	try
 	  {
 	    aMaxInt = Integer.parseInt( itsMaxValue);
-	    aCurrentInt = Integer.parseInt( itsCurrentValue);
 	    aMinInt = Integer.parseInt( itsMinValue);
 	  }
 	catch (NumberFormatException e1)
@@ -124,24 +120,23 @@ class SliderDialog extends Frame implements ActionListener {
 	    setVisible(false);
 	    return;
 	  }
-	itsSliderObject.fromDialogValueChanged( aCurrentInt, aMaxInt, aMinInt);
+	itsSliderObject.setRange(aMaxInt, aMinInt);
 	itsSliderObject = null; // make the gc happy.
 	setVisible( false);
       }
   }
     
-  public void ReInit( String theMaxValue, String theMinValue, String theCurrentValue,Slider theSlider, Frame theParent)
+  private void init(Slider theSlider)
   {
-    itsMaxValue = theMaxValue;
-    itsMinValue = theMinValue;
-    itsCurrentValue = theCurrentValue;
-    itsMaxValueField.setText( theMaxValue);
-    itsMinValueField.setText( theMinValue);
-    itsCurrentValueField.setText( theCurrentValue);
     itsSliderObject = theSlider;
+    itsMaxValue = String.valueOf(itsSliderObject.getMaxValue());
+    itsMinValue = String.valueOf(itsSliderObject.getMinValue());
+    itsMaxValueField.setText( itsMaxValue);
+    itsMinValueField.setText( itsMinValue);
 
-    setVisible( true);
-
-    itsMaxValueField.requestFocus();
+    itsMaxValueField.requestFocus();//??
   }
 }
+
+
+

@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -27,52 +27,35 @@ package ircam.jmax.editors.patcher.menus;
 
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
-import javax.swing.event.*;
 
+import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.actions.*;
 
-import ircam.jmax.toolkit.*;
-import ircam.jmax.toolkit.menus.*;
-
 /** Implement the patcher editor File Menu */
 
-public class FileMenu extends DefaultFileMenu
+public class SliderPopUpMenu extends JMenu
 {
-  public FileMenu(ErmesSketchPad sketch)
+  static private SliderPopUpMenu sliderPopup = new SliderPopUpMenu();
+
+  public SliderPopUpMenu()
   {
-    /*insert(Actions.saveAction, "Save", Event.CTRL_MASK, KeyEvent.VK_S, 3);
+    super("Slider");
 
-      insert(Actions.printAction, "Print", Event.CTRL_MASK, KeyEvent.VK_P, 6);
-      insertSeparator(7);
+    JMenuItem item;
+    item = new JMenuItem("Set Range");
+    item.addActionListener(Actions.inspectObjectAction);
+    add(item);    
+    item = new JMenuItem("Change Orientation");
+    item.addActionListener(Actions.changeSliderOrientationAction);
+    add(item);
+  }
 
-    
-      if(sketch.isARootPatcher())
-      insert(Actions.saveAsAction, "SaveAs", 4);
-      else
-      insert(Actions.saveToAction, "Save As Template", 4);*/
-
-    if(sketch.isARootPatcher())
-      {
-	insert(Actions.saveAction, "Save", Event.CTRL_MASK, KeyEvent.VK_S, 3);
-	insert(Actions.saveAsAction, "SaveAs", 4);
-      }
-    else
-      if(sketch.isASubPatcher())
-	{
-	  insert(Actions.saveAction, "Save", Event.CTRL_MASK, KeyEvent.VK_S, 3);
-	  insert(Actions.saveToAction, "Save As Template", 4);
-	}
-      else //is a template
-	{
-	  insert(Actions.saveTemplateAction, "Save Template", 3);
-	  insert(Actions.saveToAction, "SaveAs", 4);
-	}
-     insertSeparator(6);
-     insert(Actions.printAction, "Print", Event.CTRL_MASK, KeyEvent.VK_P, 7);
-
+  public static SliderPopUpMenu getInstance()
+  {
+    return sliderPopup;
   }
 }
+
 
