@@ -2019,7 +2019,6 @@ fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets)
   if (fts_object_has_id((fts_object_t *)this))
     {
       fts_set_int(a, new_ninlets);
-      //fts_object_property_changed((fts_object_t *)this, fts_s_ninlets);
       fts_client_send_message((fts_object_t *)this, fts_s_ninlets, 1, a);
     }
 }

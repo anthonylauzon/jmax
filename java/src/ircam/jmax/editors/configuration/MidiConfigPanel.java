@@ -121,7 +121,6 @@ public class MidiConfigPanel extends JPanel implements Editor
   {    
     initDataModel();
     midiTable.setModel( midiModel);
-    //initCellEditors();
     midiTable.revalidate();
     revalidate();    
     window.pack();
@@ -290,6 +289,7 @@ public class MidiConfigPanel extends JPanel implements Editor
 
     public void removeRow(int rowId)
     {
+      if( rowId==0) return;
       if(size > 0)
 	{
 	  size--;    
@@ -344,6 +344,10 @@ public class MidiConfigPanel extends JPanel implements Editor
       if(row > size) return;
 
       Object oldValue = data[row][col];
+
+      if((((String)oldValue) != null) && ( ((String)oldValue).equals( value)))
+	return;
+
       data[row][col] = value;
 
       fireTableCellUpdated(row, col);
