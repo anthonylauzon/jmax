@@ -35,7 +35,7 @@ public class FontBiggerAction extends EditorAction
 {
   public FontBiggerAction()
   {
-    super("font bigger");
+    super("font bigger", "font bigger", KeyEvent.VK_ADD, KeyEvent.VK_ADD, true); 
   }
 
   public void doAction(EditorContainer container)

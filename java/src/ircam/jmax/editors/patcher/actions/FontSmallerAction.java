@@ -35,7 +35,7 @@ public class FontSmallerAction extends EditorAction
 {
   public FontSmallerAction()
   {
-    super("font smaller");
+    super("font smaller", "font smaller", KeyEvent.VK_SUBTRACT, KeyEvent.VK_SUBTRACT, true); 
   }
 
   public void doAction(EditorContainer container)

@@ -35,7 +35,7 @@ public class FitToTextAction extends EditorAction
 {
   public FitToTextAction()
   {
-    super("fit to text");
+    super("fit to text", "fit to text", KeyEvent.VK_T, KeyEvent.VK_T, true); 
   }
 
   public void doAction(EditorContainer container)

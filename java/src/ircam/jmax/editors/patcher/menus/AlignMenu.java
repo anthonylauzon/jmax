@@ -1,4 +1,4 @@
- //
+//
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -42,15 +42,15 @@ import ircam.jmax.toolkit.menus.*;
 public class AlignMenu extends EditorMenu
 {
   public AlignMenu(EditMenu parent)
-  {
+{
     super("Align objects");
-
-	setMnemonic(KeyEvent.VK_A);
+    
+    setMnemonic(KeyEvent.VK_A);
     setHorizontalTextPosition(AbstractButton.LEFT);
-
+    
     add(parent.alignTopAction);
     add(parent.alignLeftAction);
     add(parent.alignBottomAction);
     add(parent.alignRightAction);
-  }
+}
 }
