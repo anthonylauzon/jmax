@@ -583,6 +583,9 @@ fmat_get_slice(fts_object_t *o, int winlet, fts_symbol_t s,
 
 	    if (myown)
 		fts_object_release(myfvec);
+	    else /* if a given fvec was used, see if we have to update
+		    the editor (same as fvec_fill), and set data dirty */
+		fvec_changed(myfvec);
 	}
     }
 }

@@ -366,6 +366,18 @@ fvec_load_audiofile(fvec_t *vec, fts_symbol_t file_name, int onset, int n_read)
   return size;
 }
 
+
+/* if another object changed our data, do the necessary stuff */
+void fvec_changed(fvec_t *this)
+{
+    if (this->editor)
+	tabeditor_send((tabeditor_t *) this->editor);
+
+    data_object_set_dirty((fts_object_t *) this);
+}
+
+
+
 /*********************************************************
 *
 *  client methods

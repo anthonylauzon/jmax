@@ -53,4 +53,10 @@ DATA_API float fvec_get_min_value_in_range(fvec_t *vector, int a, int b);
 #define fvec_set_editor_close(v) ((v)->opened = 0)
 #define fvec_editor_is_open(v) ((v)->opened)
 
+/**
+ * If another object changed our data, do the necessary stuff
+ * (update editor, set data dirty)
+ */
+DATA_API void fvec_changed(fvec_t *this);
+
 #endif
