@@ -68,6 +68,11 @@ public class NewDialog extends Dialog implements ItemListener, ActionListener, K
     addKeyListener(this);
   }
   
+  public void Init(Frame theFrame){
+    itsParent = theFrame;
+    itsCurrentItem = "";
+  }
+
   public void itemStateChanged(ItemEvent e){
     if(e.getStateChange() == ItemEvent.SELECTED) itsCurrentItem = (itsList.getSelectedItems())[0];
   }

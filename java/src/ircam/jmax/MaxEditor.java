@@ -24,6 +24,8 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   public Menu itsWindowsMenu;
 
   Vector itsWindowMenuList;
+  static NewDialog itsNewDialog;
+
 	
   public MaxEditor(String title)
   {
@@ -473,11 +475,12 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   public void New()
   {
     String aNewFileType;
-    NewDialog aNewDialog = new NewDialog(this);
+    if(itsNewDialog==null) itsNewDialog=new NewDialog(this);
+    else itsNewDialog.Init(this);
     Point aPoint = getLocation();
-    aNewDialog.setLocation(aPoint.x+100, aPoint.y+100);
-    aNewDialog.setVisible(true);
-    aNewFileType = aNewDialog.GetNewFileType();
+    itsNewDialog.setLocation(aPoint.x+100, aPoint.y+100);
+    itsNewDialog.setVisible(true);
+    aNewFileType = itsNewDialog.GetNewFileType();
     if(!aNewFileType.equals("")) MaxApplication.NewFile(aNewFileType);
   }
 

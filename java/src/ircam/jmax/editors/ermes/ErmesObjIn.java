@@ -118,10 +118,20 @@ class ErmesObjIn extends ErmesObject {
     g.fillRect(itsX+1,itsY+1, currentRect.width-2,  currentRect.height-2);
     g.fill3DRect(itsX+2,itsY+2, currentRect.width-4,  currentRect.height-4, true);
     g.setColor(Color.black);
+    //the box
     g.drawRect(itsX+0,itsY+ 0, currentRect.width-1, currentRect.height-1);
-    g.drawString(""+(itsId+1), itsX + 7, itsY + 7+7);
+    //the triangle
+    g.drawLine(itsX+1,itsY+1, itsX+currentRect.width/2, itsY+currentRect.height/2);
+    g.drawLine(itsX+currentRect.width/2,itsY+currentRect.height/2, itsX+currentRect.width-1, itsY+1);
+    //g.drawString(""+(itsId+1), itsX + 7, itsY + 7+7);
+    g.setFont(itsFont);
+    g.drawString(""+(itsId+1), itsX+2, itsY/* + 7+7-itsFontMetrics.getHeight()*/-2);
   }
 	
+  void ResizeToNewFont(Font theFont) {
+    itsSketchPad.repaint();
+  }
+
   public boolean MouseDown_specific(MouseEvent evt, int x, int y) {
     
     if (itsSketchPad.itsRunMode || evt.getClickCount() == 1) {

@@ -282,7 +282,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     for (Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
       aObject = (ErmesObject) e.nextElement();
       if((aObject instanceof ErmesObjEditableObject)||(aObject instanceof ErmesObjComment)||
-	 (aObject instanceof ErmesObjInt)||(aObject instanceof ErmesObjFloat)){
+	 (aObject instanceof ErmesObjInt)||(aObject instanceof ErmesObjFloat)||
+	 (aObject instanceof ErmesObjIn)||(aObject instanceof ErmesObjOut)){
 	aFont = new Font(theFontName, sketchFont.getStyle(), aObject.GetFont().getSize());
 	try {
 	  FontMetrics aFontMetrics = Toolkit.getDefaultToolkit().getFontMetrics(aFont);
@@ -310,7 +311,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     for (Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
       aObject = (ErmesObject) e.nextElement();
       if((aObject instanceof ErmesObjEditableObject)||(aObject instanceof ErmesObjComment)||
-	 (aObject instanceof ErmesObjInt)||(aObject instanceof ErmesObjFloat)){
+	 (aObject instanceof ErmesObjInt)||(aObject instanceof ErmesObjFloat)||
+	 (aObject instanceof ErmesObjIn)||(aObject instanceof ErmesObjOut)){
 	aFont = new Font(aObject.GetFont().getName(), sketchFont.getStyle(), fontSize);
 	try {
 	  FontMetrics aFontMetrics = Toolkit.getDefaultToolkit().getFontMetrics(aFont);
