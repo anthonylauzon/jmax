@@ -35,85 +35,22 @@
  *
  */
 
-/* Naming and reference counting of fts_ivec_t is done here, locally
-   and privately for tables; tables store ivec in the table only
-   if named, otherwise allocate directly the vecint.
-   */  
-static fts_hash_table_t table_ivec_table; /* the name binding table */
+static fts_hash_table_t table_int_vector_table; /* the name binding table */
 
-static fts_ivec_t *
-table_ivec_get(fts_symbol_t name, int size)
-{
-  fts_atom_t atom;
-  fts_ivec_t *ivec;
-
-  if(fts_hash_table_lookup(&table_ivec_table, name, &atom))
-    {
-      int stored_size;
-
-      ivec = fts_get_ivec(&atom);
-      fts_data_refer((fts_data_t *)ivec);
-
-      stored_size = fts_ivec_get_size(ivec);
-
-      if(size != stored_size)
-	{
-	  post("table %s: size mismatch (fit to larger)\n", fts_symbol_name(name));
-	  
-	  if(size > stored_size)
-	    fts_ivec_set_size(ivec, size);
-	}
-
-      return ivec;
-    }
-  else
-    {
-      ivec = fts_ivec_new(size);
-
-      fts_data_refer((fts_data_t *)ivec);
-      fts_data_set_name((fts_data_t *)ivec, name);
-
-      fts_set_ivec(&atom, ivec);
-      fts_hash_table_insert(&table_ivec_table, name, &atom);
-
-      return ivec;
-    }
-}
-
-static void
-table_ivec_release(fts_symbol_t name)
+/* find a tables int_vector by name */
+int_vector_t *
+table_int_vector_get_by_name(fts_symbol_t name)
 {
   fts_atom_t atom;
 
-  if (fts_hash_table_lookup(&table_ivec_table, name, &atom))
+  if (fts_hash_table_lookup(&table_int_vector_table, name, &atom))
     {
-      fts_ivec_t *ivec = fts_get_ivec(&atom);
-      
-      if(fts_data_derefer((fts_data_t *)ivec) == 0)
-	{
-	  fts_ivec_delete(ivec);
-	  fts_hash_table_remove(&table_ivec_table, name);
-	}
-    }
-  else
-    return;
-}
-
-/* find a tables fts_ivec by name */
-fts_ivec_t *
-table_ivec_get_by_name(fts_symbol_t name)
-{
-  fts_atom_t atom;
-
-  if (fts_hash_table_lookup(&table_ivec_table, name, &atom))
-    {
-      fts_ivec_t *vec = fts_get_ivec(&atom);
+      int_vector_t *vec = int_vector_atom_get(&atom);
       return vec;
     }
   else
     return 0;
 }
-
 
 /********************************************************************
  *
@@ -122,15 +59,15 @@ table_ivec_get_by_name(fts_symbol_t name)
  */
 
 static int
-quantile(fts_ivec_t *vector, int n)
+quantile(int_vector_t *vector, int n)
 {
   int index, i;
   int v = 0;
-  int size = fts_ivec_get_size(vector);
+  int size = int_vector_get_size(vector);
 
   v = 0;
   for(i=0; i<size; i++)
-    v += fts_ivec_get_element(vector, i);
+    v += int_vector_get_element(vector, i);
 
   if(v == 0)
     return 0;
@@ -140,7 +77,7 @@ quantile(fts_ivec_t *vector, int n)
       
       for (i=0; i<size; i++)
 	{
-	  index -= fts_ivec_get_element(vector, i);
+	  index -= int_vector_get_element(vector, i);
 	  if (index <= 0)
 	    break;
 	}
@@ -161,57 +98,106 @@ quantile(fts_ivec_t *vector, int n)
 typedef struct 
 {
   fts_object_t ob;
-  fts_symbol_t name;
   fts_atom_t value;
-  fts_ivec_t *vector; /* integer vector */
+  int_vector_t *vector; /* integer vector */
+  fts_symbol_t name;
 } table_t;
 
 static void
-table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_init_define(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   table_t *this = (table_t *)o;
-  fts_symbol_t name = 0;
-  int size;
+  int size = fts_get_int_arg(ac, at, 1, FTS_TABLE_DEFAULT_SIZE);
   
-  if(ac == 2 && fts_is_ivec(at + 1))
-    {
-      this->vector = fts_get_ivec(at + 1);
-      fts_data_refer((fts_data_t *)this->vector);
-    }
-  else if(ac > 1 && fts_is_symbol(at + 1))
-    {
-      name = fts_get_symbol(at + 1);
-      size = fts_get_int_arg(ac, at, 2, FTS_TABLE_DEFAULT_SIZE);
-      
-      this->vector = table_ivec_get(name, size);
-      fts_register_named_object(o, name);
-    }
-  else
-    {
-      size = fts_get_int_arg(ac, at, 1, FTS_TABLE_DEFAULT_SIZE);
-      
-      this->vector = fts_ivec_new(size);
-      fts_data_refer((fts_data_t *)this->vector);
-    }
-
-  this->name = name;    
+  this->vector = int_vector_new(size);
+  int_vector_refer(this->vector);
+  int_vector_set_creator(this->vector, o);
 }
 
 static void
-table_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_init_refer(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   table_t *this = (table_t *)o;
+  int size;
+  
+  this->vector = int_vector_atom_get(at + 1);
+  int_vector_refer(this->vector);
+}
 
-  if(this->name)
+static void
+table_init_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  table_t *this = (table_t *)o;
+  fts_symbol_t name = fts_get_symbol(at + 1);
+  int size = fts_get_int_arg(ac, at, 2, FTS_TABLE_DEFAULT_SIZE);
+  fts_atom_t atom;
+  int_vector_t *vec;
+
+  if(fts_hash_table_lookup(&table_int_vector_table, name, &atom))
     {
-      table_ivec_release(this->name);
-      fts_unregister_named_object(o, this->name);
+      /* refer to existing vector */
+      int stored_size;
+
+      vec = int_vector_atom_get(&atom);
+      int_vector_refer(vec);
+
+      stored_size = int_vector_get_size(vec);
+      if(size != stored_size)
+	{
+	  post("table %s: size mismatch (fit to larger)\n", fts_symbol_name(name));
+	  
+	  if(size > stored_size)
+	    int_vector_set_size(vec, size);
+	}
     }
   else
     {
-      if(fts_data_derefer((fts_data_t *)this->vector) == 0)
-	fts_ivec_delete(this->vector);
+      /* new vector */
+      vec = int_vector_new(size);
+      int_vector_refer(vec);
+      int_vector_set_creator(vec, o);
+
+      /* put to hashtable */
+      int_vector_atom_set(&atom, vec);
+      fts_hash_table_insert(&table_int_vector_table, name, &atom);
     }
+
+  this->vector = vec;
+  this->name = name;
+
+  fts_register_named_object(o, name);
+}
+
+static void
+table_delete_define(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  table_t *this = (table_t *)o;
+
+  int_vector_release(this->vector);
+}
+
+static void
+table_delete_refer(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  table_t *this = (table_t *)o;
+
+  int_vector_release(this->vector);
+}
+
+static void
+table_delete_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  table_t *this = (table_t *)o;
+  int_vector_t *vec = this->vector;
+  fts_symbol_t name = this->name;
+  
+  /* remove from hash table if last reference *&!^%%&*!)@#!$^& */
+  if(vec->refdata.cnt == 1)
+    fts_hash_table_remove(&table_int_vector_table, name);
+  
+  int_vector_release(vec);
+  
+  fts_unregister_named_object(o, name);
 }
 
 /*********************************************************************
@@ -225,15 +211,9 @@ table_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prop
 {
   table_t *this = (table_t *)obj;
 
-  fts_set_ivec(value, this->vector);
+  int_vector_atom_set(value, this->vector);  
 }
 
-/* Daemon for getting the property "data".
-   Note that we return a pointer to the data; 
-   if the request come from the client, it will be the
-   kernel to handle the export of the data, not the table
-   object.
- */
 static void
 table_get_data(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
@@ -261,9 +241,9 @@ static void
 table_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   table_t *this = (table_t *)o;
-  fts_ivec_t *vec = this->vector;
+  int_vector_t *vec = this->vector;
   int index = fts_get_int_arg(ac, at, 0, 0);
-  int size = fts_ivec_get_size(this->vector);
+  int size = int_vector_get_size(this->vector);
 
   if (index < 0)
     index = 0;
@@ -271,9 +251,9 @@ table_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     index = size - 1;
 
   if(fts_is_number(&this->value))
-     fts_ivec_set_element(vec, index, fts_get_number_int(&this->value));
+     int_vector_set_element(vec, index, fts_get_number_int(&this->value));
   else
-    fts_outlet_int(o, 0, fts_ivec_get_element(vec, index));
+    fts_outlet_int(o, 0, int_vector_get_element(vec, index));
 
   fts_set_void(&this->value);
 }
@@ -293,42 +273,42 @@ table_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 table_set_from_atom_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_ivec_t *vec = ((table_t *)o)->vector;
+  int_vector_t *vec = ((table_t *)o)->vector;
   int offset;
 
   offset = fts_get_int_arg(ac, at, 0, 0);
 
   if (ac > 1)
-    fts_ivec_set_from_atom_list(vec, offset, ac - 1, at + 1);
+    int_vector_set_from_atom_list(vec, offset, ac - 1, at + 1);
 }
 
 static void
 table_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_ivec_t *vec = ((table_t *)o)->vector;
+  int_vector_t *vec = ((table_t *)o)->vector;
 
-  fts_ivec_set_const(vec, 0);
+  int_vector_set_const(vec, 0);
 }
 
 static void
 table_const(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_ivec_t *vec = ((table_t *)o)->vector;
+  int_vector_t *vec = ((table_t *)o)->vector;
   int constant = fts_get_int(&at[0]);
 
-  fts_ivec_set_const(vec, constant);
+  int_vector_set_const(vec, constant);
 }
 
 static void
 table_inv(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_ivec_t *vec = ((table_t *)o)->vector;
+  int_vector_t *vec = ((table_t *)o)->vector;
   int value = fts_get_int(at);
-  int size = fts_ivec_get_size(vec);
+  int size = int_vector_get_size(vec);
   int i;
 
   for(i=0; i<size; i++)
-    if (fts_ivec_get_element(vec, i) > value)
+    if (int_vector_get_element(vec, i) > value)
       break;
 
   if(i == 0 || i == size)
@@ -340,7 +320,7 @@ table_inv(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static void
 table_get_random(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_ivec_t *vec = ((table_t *)o)->vector;
+  int_vector_t *vec = ((table_t *)o)->vector;
 
   fts_outlet_int(o, 0, quantile(vec, rand() & 0x7fff));
 }
@@ -348,7 +328,7 @@ table_get_random(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static void
 table_quantile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_ivec_t *vec = ((table_t *)o)->vector;
+  int_vector_t *vec = ((table_t *)o)->vector;
   int n = fts_get_int(at);
 
   fts_outlet_int(o, 0, quantile(vec, n));
@@ -357,27 +337,27 @@ table_quantile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void
 table_sum(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_ivec_t *vec = ((table_t *)o)->vector;
+  int_vector_t *vec = ((table_t *)o)->vector;
 
-  fts_outlet_int(o, 0, fts_ivec_get_sum(vec));
+  fts_outlet_int(o, 0, int_vector_get_sum(vec));
 }
 
 static void
 table_resize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_ivec_t *vec = ((table_t *)o)->vector;
+  int_vector_t *vec = ((table_t *)o)->vector;
   int size = fts_get_int(&at[0]);
 
-  fts_ivec_set_size(vec, size);
+  int_vector_set_size(vec, size);
 }
 
 static void
 table_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_ivec_t *vec = ((table_t *)o)->vector;
+  int_vector_t *vec = ((table_t *)o)->vector;
   fts_bmax_file_t *f = (fts_bmax_file_t *)fts_get_ptr(at);
   
-  fts_ivec_save_bmax(vec, f);
+  int_vector_save_bmax(vec, f);
 }
 
 /********************************************************************
@@ -390,64 +370,77 @@ static fts_status_t
 table_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[3];
-
-  if(ac == 1 || (ac > 1 && (fts_is_ivec(at + 1) || fts_is_symbol(at + 1)) || fts_is_int(at + 1)))
+  
+  if(ac == 1 || (ac == 2 && fts_is_int(at + 1)))
     {
+      /* [var :] table [int] */
       fts_class_init(cl, sizeof(table_t), 2, 1, 0);
       
-      /* system methods */
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, table_init);
-      fts_method_define(cl, fts_SystemInlet, fts_s_delete, table_delete, 0, 0);
-      
-      /* the method set is also installed on the system inlet, and is used for .bmax loading */
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, table_init_define);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, table_delete_define);
+
+      /* save/load bmax file if not instantiated with reference */
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, table_save_bmax);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, table_set_from_atom_list);
+
+      /* define variable */
+      fts_class_add_daemon(cl, obj_property_get, fts_s_state, table_get_state);
+    }
+  else if(ac == 2 && int_vector_atom_is(at + 1))
+    {
+      /* table <int vector> */
+      fts_class_init(cl, sizeof(table_t), 2, 1, 0);
       
-      /* get data for editor */
-      fts_class_add_daemon(cl, obj_property_get, fts_s_data, table_get_data);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, table_init_refer);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, table_delete_refer);
+    }
+  else if((ac == 2 && fts_is_symbol(at + 1)) || (ac == 3 && fts_is_symbol(at + 1) && fts_is_number(at + 2)))
+    {
+      /* table <symbol> [int] */
+      fts_class_init(cl, sizeof(table_t), 2, 1, 0);
       
-      if(ac > 1 && !fts_is_ivec(at + 1))
-	{
-	  /* save to bmax file if not instantiated with reference */
-	  a[0] = fts_s_ptr;
-	  fts_method_define(cl, fts_SystemInlet, fts_s_save_bmax, table_save_bmax, 1, a);
-	  
-	  /* define variable if not instantiated with reference and without name */
-	  if(!fts_is_symbol(at + 1))
-	    fts_class_add_daemon(cl, obj_property_get, fts_s_state, table_get_state);
-	}
-      
-      /* user methods */
-      fts_method_define_number(cl, 0, table_index);
-      fts_method_define_number(cl, 1, table_store_value);
-      
-      fts_method_define_varargs(cl, 0, fts_s_list, table_list);
-      fts_method_define_varargs(cl, 0, fts_s_set, table_set_from_atom_list);
-      
-      fts_method_define(cl, 0, fts_new_symbol("const"), table_const, 1, a);
-      fts_method_define(cl, 0, fts_s_clear, table_clear, 0, 0);
-      
-      a[0] = fts_s_int;
-      fts_method_define(cl, 0, fts_new_symbol("inv"), table_inv, 1, a);
-      fts_method_define(cl, 0, fts_new_symbol("quantile"), table_quantile, 1,  a);
-      fts_method_define(cl, 0, fts_s_bang, table_get_random, 0, 0);
-      
-      fts_method_define(cl, 0, fts_new_symbol("sum"), table_sum, 0, 0);
-      
-      a[0] = fts_s_int;
-      fts_method_define(cl, 0, fts_new_symbol("size"), table_resize, 1, a);
-      
-      fts_outlet_type_define(cl, 0, fts_s_int, 1, a);
-      
-      return fts_Success;
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, table_init_symbol);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, table_delete_symbol);
+
+      /* save/load bmax file if not instantiated with reference */
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, table_save_bmax);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, table_set_from_atom_list);
     }
   else
     return &fts_CannotInstantiate;
+
+  /* get data for editor */
+  fts_class_add_daemon(cl, obj_property_get, fts_s_data, table_get_data);
+
+  /* user methods */
+  fts_method_define_number(cl, 0, table_index);
+  fts_method_define_number(cl, 1, table_store_value);
+  
+  fts_method_define_varargs(cl, 0, fts_s_list, table_list);
+  fts_method_define_varargs(cl, 0, fts_s_set, table_set_from_atom_list);
+  
+  fts_method_define(cl, 0, fts_new_symbol("const"), table_const, 1, a);
+  fts_method_define(cl, 0, fts_s_clear, table_clear, 0, 0);
+  
+  a[0] = fts_s_int;
+  fts_method_define(cl, 0, fts_new_symbol("inv"), table_inv, 1, a);
+  fts_method_define(cl, 0, fts_new_symbol("quantile"), table_quantile, 1,  a);
+  fts_method_define(cl, 0, fts_s_bang, table_get_random, 0, 0);
+  
+  fts_method_define(cl, 0, fts_new_symbol("sum"), table_sum, 0, 0);
+  
+  a[0] = fts_s_int;
+  fts_method_define(cl, 0, fts_new_symbol("size"), table_resize, 1, a);
+  
+  fts_outlet_type_define(cl, 0, fts_s_int, 1, a);
+
+  return fts_Success;
 }
 
 void
 table_config(void)
 {
-  fts_hash_table_init(&table_ivec_table);
+  fts_hash_table_init(&table_int_vector_table);
 
   fts_metaclass_install(fts_new_symbol("table"), table_instantiate, fts_arg_type_equiv);
 }

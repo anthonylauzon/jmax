@@ -29,6 +29,8 @@ PACKAGEROOT = ../..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
+MODULE_CFLAGS=-I$(PACKAGEROOT)/../reftype/c/src
+
 all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libdata.a $(LIBDIR)/libdata.so
 
 $(LIBDIR)/libdata.a: $(OBJECTS)

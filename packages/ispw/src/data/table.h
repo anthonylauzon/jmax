@@ -27,8 +27,10 @@
 #ifndef _TABLE_H_
 #define _TABLE_H_
 
+#include "intvec.h"
+
 #define FTS_TABLE_DEFAULT_SIZE 128  /* default size 128 elements */
 
-fts_ivec_t *table_ivec_get_by_name(fts_symbol_t s);
+int_vector_t *table_int_vector_get_by_name(fts_symbol_t s);
 
 #endif

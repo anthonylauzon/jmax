@@ -49,11 +49,11 @@
 int
 max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *optr)
 {
-  fts_ivec_t *tw = 0;
+  int_vector_t *tw = 0;
   long i;
   float rest;
   
-  tw = table_ivec_get_by_name(s);
+  tw = table_int_vector_get_by_name(s);
 
   if (! tw)
     {
@@ -65,7 +65,7 @@ max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *op
 
   optr->ex_type = ET_INT;
 
-  if (! fts_ivec_get_size(tw)) {
+  if (! int_vector_get_size(tw)) {
     optr->ex_int = 0;
     return (0);
   } 
@@ -73,15 +73,15 @@ max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *op
   switch (arg->ex_type) {
   case ET_INT:
 
-    optr->ex_int =  fts_ivec_get_element(tw, arg->ex_int % fts_ivec_get_size(tw)); 
+    optr->ex_int =  int_vector_get_element(tw, arg->ex_int % int_vector_get_size(tw)); 
     break;
   case ET_FLT:
     /* CHANGE are we zero based or one based? */
 
-    i = (int)arg->ex_flt % fts_ivec_get_size(tw); 
+    i = (int)arg->ex_flt % int_vector_get_size(tw); 
 
-    optr->ex_int =  fts_ivec_get_element(tw,i);
-    if (i  == fts_ivec_get_size(tw) - 1)
+    optr->ex_int =  int_vector_get_element(tw,i);
+    if (i  == int_vector_get_size(tw) - 1)
       break;
 
     /*
@@ -89,7 +89,7 @@ max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *op
      * the table do a interpolation with the fraction 
      */
     rest = arg->ex_flt - (int)arg->ex_flt;
-    optr->ex_int+=(int) ((float)(fts_ivec_get_element(tw,i)- fts_ivec_get_element(tw,i+1))*rest);
+    optr->ex_int+=(int) ((float)(int_vector_get_element(tw,i)- int_vector_get_element(tw,i+1))*rest);
     break;
 
   default:	/* do something with strings */
