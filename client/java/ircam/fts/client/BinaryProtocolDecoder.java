@@ -103,6 +103,7 @@ class BinaryProtocolDecoder {
 
     if (argsCount >= 2)
       args.addDouble( Double.longBitsToDouble( lval) );
+
     argsCount++;
   }
 
@@ -236,7 +237,7 @@ class BinaryProtocolDecoder {
       break;
     case qFloat3:
       currentState = qFloat4;
-      endFloatAction( input);
+      shiftAction( input);
       break;
     case qFloat4:
       currentState = qFloat5;

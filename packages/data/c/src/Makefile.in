@@ -59,6 +59,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_alias = @host_alias@
 host_triplet = @host@
+ADDITIONAL_PACKAGES = @ADDITIONAL_PACKAGES@
 ALSA_CFLAGS = @ALSA_CFLAGS@
 ALSA_LIBS = @ALSA_LIBS@
 AS = @AS@
@@ -73,6 +74,8 @@ ECHO = @ECHO@
 EXEEXT = @EXEEXT@
 FTSDIR = @FTSDIR@
 FTS_SYS_LIBS = @FTS_SYS_LIBS@
+JACK_CFLAGS = @JACK_CFLAGS@
+JACK_LDFLAGS = @JACK_LDFLAGS@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
 JAVACFLAGS = @JAVACFLAGS@
@@ -80,6 +83,7 @@ JAVACFLAGSX = @JAVACFLAGSX@
 JAVACX = @JAVACX@
 JAVAFLAGS = @JAVAFLAGS@
 JAVAPREFIX = @JAVAPREFIX@
+JMAX_VERSION = @JMAX_VERSION@
 LEX = @LEX@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -91,6 +95,9 @@ PLATFORM = @PLATFORM@
 PLATFORM_PACKAGES = @PLATFORM_PACKAGES@
 RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
+SDIF_INCLUDE = @SDIF_INCLUDE@
+SDIF_LIBDIR = @SDIF_LIBDIR@
+SDIF_LIBNAME = @SDIF_LIBNAME@
 STRIP = @STRIP@
 VERSION = @VERSION@
 YACC = @YACC@
@@ -106,13 +113,12 @@ data.c \
 fmat.c \
 fvec.c \
 getinter.c \
-getlist.c \
 getrange.c \
 getsize.c \
 getval.c \
 ivec.c \
 mat.c \
-messtab.c \
+dict.c \
 preset.c \
 row.c \
 value.c \
@@ -131,7 +137,7 @@ fmat.h \
 fvec.h \
 ivec.h \
 mat.h \
-messtab.h \
+dict.h \
 preset.h \
 row.h \
 value.h \
@@ -151,8 +157,8 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libdata_la_LIBADD = 
 libdata_la_OBJECTS =  bpf.lo col.lo cvec.lo data.lo fmat.lo fvec.lo \
-getinter.lo getlist.lo getrange.lo getsize.lo getval.lo ivec.lo mat.lo \
-messtab.lo preset.lo row.lo value.lo vec.lo dumpfile.lo
+getinter.lo getrange.lo getsize.lo getval.lo ivec.lo mat.lo dict.lo \
+preset.lo row.lo value.lo vec.lo dumpfile.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -168,10 +174,10 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/bpf.P .deps/col.P .deps/cvec.P .deps/data.P \
-.deps/dumpfile.P .deps/fmat.P .deps/fvec.P .deps/getinter.P \
-.deps/getlist.P .deps/getrange.P .deps/getsize.P .deps/getval.P \
-.deps/ivec.P .deps/mat.P .deps/messtab.P .deps/preset.P .deps/row.P \
-.deps/value.P .deps/vec.P
+.deps/dict.P .deps/dumpfile.P .deps/fmat.P .deps/fvec.P \
+.deps/getinter.P .deps/getrange.P .deps/getsize.P .deps/getval.P \
+.deps/ivec.P .deps/mat.P .deps/preset.P .deps/row.P .deps/value.P \
+.deps/vec.P
 SOURCES = $(libdata_la_SOURCES)
 OBJECTS = $(libdata_la_OBJECTS)
 

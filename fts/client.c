@@ -1316,10 +1316,7 @@ static void client_write_float( client_t *client, double v)
 #endif
 
   for ( i = 0; i < sizeof( double); i++)
-    {
-      put_byte( client, p[i]);
-      p++;
-    }
+    put_byte( client, p[i]);
 }
 
 static void client_write_symbol( client_t *client, fts_symbol_t s)

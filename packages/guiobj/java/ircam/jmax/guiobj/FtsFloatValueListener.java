@@ -32,5 +32,5 @@ package ircam.jmax.guiobj;
 
 public interface FtsFloatValueListener
 {
-  public void valueChanged(float value);
+  public void valueChanged( double value);
 }

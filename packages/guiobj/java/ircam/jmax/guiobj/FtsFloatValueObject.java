@@ -46,7 +46,7 @@ public class FtsFloatValueObject extends FtsGraphicObject
     FtsObject.registerMessageHandler(FtsFloatValueObject.class, FtsSymbol.get("setValue"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsFloatValueObject)obj).setCurrentValue(args.getFloat(0));
+	  ((FtsFloatValueObject)obj).setCurrentValue( args.getDouble( 0));
 	}
       });
   }
@@ -57,7 +57,7 @@ public class FtsFloatValueObject extends FtsGraphicObject
   /*                                                                           */
   /*****************************************************************************/
   
-  private float value; 
+  private double value; 
   
   public FtsFloatValueObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom args[], int offset, int length)
   {
@@ -68,12 +68,12 @@ public class FtsFloatValueObject extends FtsGraphicObject
 
   /** Set the value. Tell it to the server, also */
 
-  public void setValue(float value)
+  public void setValue(double value)
   {
     this.value = value;
    
     args.clear();
-    args.addFloat(value);
+    args.addDouble( value);
     try{
       send( FtsSymbol.get("setValue"), args);
     }
@@ -86,7 +86,7 @@ public class FtsFloatValueObject extends FtsGraphicObject
   
   /** Get the current value */
   
-  public float getValue()
+  public double getValue()
   {
     return value;
   }
@@ -96,7 +96,7 @@ public class FtsFloatValueObject extends FtsGraphicObject
   public void updateValue()
   {
     try{
-      send(FtsSymbol.get("getValue"));
+      send( FtsSymbol.get("getValue"));
     }
     catch(IOException e)
       {
@@ -108,12 +108,12 @@ public class FtsFloatValueObject extends FtsGraphicObject
   /** Over write the localPut message to handle value changes.
    */
 
-  protected void setCurrentValue(float newValue)
+  protected void setCurrentValue( double newValue)
   {
     value = newValue;
     
     if (listener instanceof FtsFloatValueListener)
-      ((FtsFloatValueListener) listener).valueChanged(newValue);
+      ((FtsFloatValueListener) listener).valueChanged( newValue);
   }
 }
 

@@ -54,7 +54,7 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
   {
     super(theFtsObject, "-0123456789.");
 
-    value = (double)((FtsFloatValueObject)ftsObject).getValue();    
+    value = ((FtsFloatValueObject)ftsObject).getValue();    
   }
 
   public void setDefaults()
@@ -63,9 +63,9 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
     updateIntegerZone();
   }
 
-  public void valueChanged(float v) 
+  public void valueChanged( double v) 
   {
-    this.value = (double)v;
+    this.value = v;
     updateIntegerZone();
     updateRedraw();
   }
@@ -96,20 +96,20 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
       {
 	  Number n = formatter.parse(v); 
 
-	  value = n.floatValue();
+	  value = n.doubleValue();
       }
     catch (java.text.ParseException  e1)
       {
 	return;
       }
 
-    ((FtsFloatValueObject)ftsObject).setValue((float)value);
+    ((FtsFloatValueObject)ftsObject).setValue( value);
   }
 
 
   public String getValueAsText()
   {
-    return formatter.format(value);
+    return formatter.format( value);
   }
 
   public void setFont( Font theFont)
@@ -140,7 +140,7 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
 	    else
 	      increment = 0.001;
 	    
-	    ((FtsFloatValueObject)ftsObject).setValue((float)value);
+	    ((FtsFloatValueObject)ftsObject).setValue( value);
 	    
 	    itsLastY = mouse.y;
 	    dragged = true;
@@ -152,7 +152,7 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
 	    else
 	      value = value + (double)(itsLastY - mouse.y) * increment;
 
-	    ((FtsFloatValueObject)ftsObject).setValue((float)value);
+	    ((FtsFloatValueObject)ftsObject).setValue( value);
 	    
 	    itsLastY = mouse.y;
 	  }

@@ -59,6 +59,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_alias = @host_alias@
 host_triplet = @host@
+ADDITIONAL_PACKAGES = @ADDITIONAL_PACKAGES@
 ALSA_CFLAGS = @ALSA_CFLAGS@
 ALSA_LIBS = @ALSA_LIBS@
 AS = @AS@
@@ -73,6 +74,8 @@ ECHO = @ECHO@
 EXEEXT = @EXEEXT@
 FTSDIR = @FTSDIR@
 FTS_SYS_LIBS = @FTS_SYS_LIBS@
+JACK_CFLAGS = @JACK_CFLAGS@
+JACK_LDFLAGS = @JACK_LDFLAGS@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
 JAVACFLAGS = @JAVACFLAGS@
@@ -80,6 +83,7 @@ JAVACFLAGSX = @JAVACFLAGSX@
 JAVACX = @JAVACX@
 JAVAFLAGS = @JAVAFLAGS@
 JAVAPREFIX = @JAVAPREFIX@
+JMAX_VERSION = @JMAX_VERSION@
 LEX = @LEX@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -91,6 +95,9 @@ PLATFORM = @PLATFORM@
 PLATFORM_PACKAGES = @PLATFORM_PACKAGES@
 RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
+SDIF_INCLUDE = @SDIF_INCLUDE@
+SDIF_LIBDIR = @SDIF_LIBDIR@
+SDIF_LIBNAME = @SDIF_LIBNAME@
 STRIP = @STRIP@
 VERSION = @VERSION@
 YACC = @YACC@
@@ -99,11 +106,16 @@ uudecode = @uudecode@
 packagedir = $(pkgdatadir)/packages/signal/c
 package_LTLIBRARIES = libsignal.la
 libsignal_la_SOURCES = \
+abs.c \
 binop.c \
+biquad.c \
+clip.c \
 cut.c \
 delay.c \
 env.c \
+fir.c \
 harmtap.c \
+iir.c \
 matrix.c \
 osc.c \
 osc_ieeewrap.c \
@@ -112,18 +124,26 @@ pick.c \
 pink.c \
 playfvec.c \
 recfvec.c \
+samphold.c \
 samplepool.c \
 signal.c \
+snapshot.c \
+threshold.c \
 tilda.c \
+wahwah.c \
 wave.c \
 wave_ieeewrap.c \
-white.c
+white.c \
+zerocross.c
 
 
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/packages/data/c/src -I$(top_srcdir)/packages/utils/c/src
 
 noinst_HEADERS = \
+biquad.h \
 delay.h \
+fir.h \
+iir.h \
 osc.h \
 samplepool.h \
 signal.h \
@@ -142,10 +162,11 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libsignal_la_LIBADD = 
-libsignal_la_OBJECTS =  binop.lo cut.lo delay.lo env.lo harmtap.lo \
-matrix.lo osc.lo osc_ieeewrap.lo paste.lo pick.lo pink.lo playfvec.lo \
-recfvec.lo samplepool.lo signal.lo tilda.lo wave.lo wave_ieeewrap.lo \
-white.lo
+libsignal_la_OBJECTS =  abs.lo binop.lo biquad.lo clip.lo cut.lo \
+delay.lo env.lo fir.lo harmtap.lo iir.lo matrix.lo osc.lo \
+osc_ieeewrap.lo paste.lo pick.lo pink.lo playfvec.lo recfvec.lo \
+samphold.lo samplepool.lo signal.lo snapshot.lo threshold.lo tilda.lo \
+wahwah.lo wave.lo wave_ieeewrap.lo white.lo zerocross.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -160,11 +181,13 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =  .deps/binop.P .deps/cut.P .deps/delay.P .deps/env.P \
-.deps/harmtap.P .deps/matrix.P .deps/osc.P .deps/osc_ieeewrap.P \
+DEP_FILES =  .deps/abs.P .deps/binop.P .deps/biquad.P .deps/clip.P \
+.deps/cut.P .deps/delay.P .deps/env.P .deps/fir.P .deps/harmtap.P \
+.deps/iir.P .deps/matrix.P .deps/osc.P .deps/osc_ieeewrap.P \
 .deps/paste.P .deps/pick.P .deps/pink.P .deps/playfvec.P \
-.deps/recfvec.P .deps/samplepool.P .deps/signal.P .deps/tilda.P \
-.deps/wave.P .deps/wave_ieeewrap.P .deps/white.P
+.deps/recfvec.P .deps/samphold.P .deps/samplepool.P .deps/signal.P \
+.deps/snapshot.P .deps/threshold.P .deps/tilda.P .deps/wahwah.P \
+.deps/wave.P .deps/wave_ieeewrap.P .deps/white.P .deps/zerocross.P
 SOURCES = $(libsignal_la_SOURCES)
 OBJECTS = $(libsignal_la_OBJECTS)
 

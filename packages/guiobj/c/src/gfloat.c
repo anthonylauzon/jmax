@@ -1,3 +1,4 @@
+
 /*
  * jMax
  * Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
@@ -29,7 +30,7 @@
 
 typedef struct {
   fts_object_t o;
-  float f;
+  double f;
 } gfloat_t;
 
 
@@ -47,7 +48,7 @@ gfloat_send_ui_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 }
 
 static void
-gfloat_update(gfloat_t *this, float f)
+gfloat_update(gfloat_t *this, double f)
 {
   if (this->f != f)
     {
@@ -68,7 +69,7 @@ static void
 gfloat_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   gfloat_t *this = (gfloat_t *)o;
-  float f = fts_get_number_float(at);
+  double f = fts_get_number_float(at);
 
   gfloat_update(this, f);
   fts_outlet_float(o, 0, this->f);
@@ -81,7 +82,7 @@ gfloat_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   if (ac && fts_is_number(at))
     {
-      float f = fts_get_number_float(at);
+      double f = fts_get_number_float(at);
       
       gfloat_update(this, f);
       fts_outlet_float(o, 0, this->f);
@@ -92,7 +93,7 @@ static void
 gfloat_incr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   gfloat_t *this = (gfloat_t *)o;
-  float f;
+  double f;
 
   if(ac && fts_is_number(at))
     f = this->f + fts_get_number_float(at);
@@ -107,7 +108,7 @@ static void
 gfloat_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   gfloat_t *this = (gfloat_t *)o;
-  float f = fts_get_number_float(at);
+  double f = fts_get_number_float(at);
 
   gfloat_update(this, f);  
 }
@@ -145,7 +146,7 @@ static void
 gfloat_put_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   gfloat_t *this = (gfloat_t *)obj;
-  float f = fts_get_float(value);
+  double f = fts_get_float(value);
 
   this->f = f;
 
@@ -189,6 +190,6 @@ gfloat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 gfloat_config(void)
 {
-  fts_class_install(fts_new_symbol("floatbox"),gfloat_instantiate);
+  fts_class_install(fts_new_symbol("floatbox"), gfloat_instantiate);
 }
 

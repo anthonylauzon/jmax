@@ -59,6 +59,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_alias = @host_alias@
 host_triplet = @host@
+ADDITIONAL_PACKAGES = @ADDITIONAL_PACKAGES@
 ALSA_CFLAGS = @ALSA_CFLAGS@
 ALSA_LIBS = @ALSA_LIBS@
 AS = @AS@
@@ -73,6 +74,8 @@ ECHO = @ECHO@
 EXEEXT = @EXEEXT@
 FTSDIR = @FTSDIR@
 FTS_SYS_LIBS = @FTS_SYS_LIBS@
+JACK_CFLAGS = @JACK_CFLAGS@
+JACK_LDFLAGS = @JACK_LDFLAGS@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
 JAVACFLAGS = @JAVACFLAGS@
@@ -80,6 +83,7 @@ JAVACFLAGSX = @JAVACFLAGSX@
 JAVACX = @JAVACX@
 JAVAFLAGS = @JAVAFLAGS@
 JAVAPREFIX = @JAVAPREFIX@
+JMAX_VERSION = @JMAX_VERSION@
 LEX = @LEX@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -91,6 +95,9 @@ PLATFORM = @PLATFORM@
 PLATFORM_PACKAGES = @PLATFORM_PACKAGES@
 RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
+SDIF_INCLUDE = @SDIF_INCLUDE@
+SDIF_LIBDIR = @SDIF_LIBDIR@
+SDIF_LIBNAME = @SDIF_LIBNAME@
 STRIP = @STRIP@
 VERSION = @VERSION@
 YACC = @YACC@
@@ -100,7 +107,14 @@ packagedir = $(pkgdatadir)/packages/numeric/c
 package_LTLIBRARIES = libnumeric.la
 libnumeric_la_SOURCES = \
 numeric.c \
+abs.c \
+clip.c \
+drunk.c \
+exscale.c \
 fit.c \
+logscale.c \
+random.c \
+range.c \
 rewrap.c \
 wrap.c 
 
@@ -123,7 +137,8 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libnumeric_la_LIBADD = 
-libnumeric_la_OBJECTS =  numeric.lo fit.lo rewrap.lo wrap.lo
+libnumeric_la_OBJECTS =  numeric.lo abs.lo clip.lo drunk.lo exscale.lo \
+fit.lo logscale.lo random.lo range.lo rewrap.lo wrap.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -138,7 +153,9 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =  .deps/fit.P .deps/numeric.P .deps/rewrap.P .deps/wrap.P
+DEP_FILES =  .deps/abs.P .deps/clip.P .deps/drunk.P .deps/exscale.P \
+.deps/fit.P .deps/logscale.P .deps/numeric.P .deps/random.P \
+.deps/range.P .deps/rewrap.P .deps/wrap.P
 SOURCES = $(libnumeric_la_SOURCES)
 OBJECTS = $(libnumeric_la_OBJECTS)
 

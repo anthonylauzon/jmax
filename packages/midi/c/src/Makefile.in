@@ -59,6 +59,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_alias = @host_alias@
 host_triplet = @host@
+ADDITIONAL_PACKAGES = @ADDITIONAL_PACKAGES@
 ALSA_CFLAGS = @ALSA_CFLAGS@
 ALSA_LIBS = @ALSA_LIBS@
 AS = @AS@
@@ -73,6 +74,8 @@ ECHO = @ECHO@
 EXEEXT = @EXEEXT@
 FTSDIR = @FTSDIR@
 FTS_SYS_LIBS = @FTS_SYS_LIBS@
+JACK_CFLAGS = @JACK_CFLAGS@
+JACK_LDFLAGS = @JACK_LDFLAGS@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
 JAVACFLAGS = @JAVACFLAGS@
@@ -80,6 +83,7 @@ JAVACFLAGSX = @JAVACFLAGSX@
 JAVACX = @JAVACX@
 JAVAFLAGS = @JAVAFLAGS@
 JAVAPREFIX = @JAVAPREFIX@
+JMAX_VERSION = @JMAX_VERSION@
 LEX = @LEX@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -91,6 +95,9 @@ PLATFORM = @PLATFORM@
 PLATFORM_PACKAGES = @PLATFORM_PACKAGES@
 RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
+SDIF_INCLUDE = @SDIF_INCLUDE@
+SDIF_LIBDIR = @SDIF_LIBDIR@
+SDIF_LIBNAME = @SDIF_LIBNAME@
 STRIP = @STRIP@
 VERSION = @VERSION@
 YACC = @YACC@
@@ -102,7 +109,9 @@ libmidi_la_SOURCES = \
 midi.c \
 midiin.c \
 midiout.c \
-rawmidiport.c \
+midiparse.c \
+mtof.c \
+noteoff.c \
 sysex.c 
 
 
@@ -124,8 +133,8 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libmidi_la_LIBADD = 
-libmidi_la_OBJECTS =  midi.lo midiin.lo midiout.lo rawmidiport.lo \
-sysex.lo
+libmidi_la_OBJECTS =  midi.lo midiin.lo midiout.lo midiparse.lo mtof.lo \
+noteoff.lo sysex.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -141,7 +150,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/midi.P .deps/midiin.P .deps/midiout.P \
-.deps/rawmidiport.P .deps/sysex.P
+.deps/midiparse.P .deps/mtof.P .deps/noteoff.P .deps/sysex.P
 SOURCES = $(libmidi_la_SOURCES)
 OBJECTS = $(libmidi_la_OBJECTS)
 

@@ -59,6 +59,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_alias = @host_alias@
 host_triplet = @host@
+ADDITIONAL_PACKAGES = @ADDITIONAL_PACKAGES@
 ALSA_CFLAGS = @ALSA_CFLAGS@
 ALSA_LIBS = @ALSA_LIBS@
 AS = @AS@
@@ -73,6 +74,8 @@ ECHO = @ECHO@
 EXEEXT = @EXEEXT@
 FTSDIR = @FTSDIR@
 FTS_SYS_LIBS = @FTS_SYS_LIBS@
+JACK_CFLAGS = @JACK_CFLAGS@
+JACK_LDFLAGS = @JACK_LDFLAGS@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
 JAVACFLAGS = @JAVACFLAGS@
@@ -80,6 +83,7 @@ JAVACFLAGSX = @JAVACFLAGSX@
 JAVACX = @JAVACX@
 JAVAFLAGS = @JAVAFLAGS@
 JAVAPREFIX = @JAVAPREFIX@
+JMAX_VERSION = @JMAX_VERSION@
 LEX = @LEX@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -91,6 +95,9 @@ PLATFORM = @PLATFORM@
 PLATFORM_PACKAGES = @PLATFORM_PACKAGES@
 RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
+SDIF_INCLUDE = @SDIF_INCLUDE@
+SDIF_LIBDIR = @SDIF_LIBDIR@
+SDIF_LIBNAME = @SDIF_LIBNAME@
 STRIP = @STRIP@
 VERSION = @VERSION@
 YACC = @YACC@
@@ -98,11 +105,21 @@ uudecode = @uudecode@
 
 helpdir = $(pkgdatadir)/packages/signal/help
 help_DATA = \
+ abs~.help.jmax \
  binop.help.jmax \
+ biquad~.help.jmax \
+ clip~.help.jmax \
+ matrix~.help.jmax \
  osc~.help.jmax \
+ phi~.help.jmax \
+ samphold~.help.jmax \
  signal.summary.jmax \
+ snapshot~.help.jmax \
+ threshold~.help.jmax \
  tilda.help.jmax \
- wave.aiff 
+ wahwah~.help.jmax \
+ wave.aiff \
+ zerocross~.help.jmax
 
 
 EXTRA_DIST = $(help_DATA)

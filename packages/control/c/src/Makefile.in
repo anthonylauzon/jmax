@@ -59,6 +59,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_alias = @host_alias@
 host_triplet = @host@
+ADDITIONAL_PACKAGES = @ADDITIONAL_PACKAGES@
 ALSA_CFLAGS = @ALSA_CFLAGS@
 ALSA_LIBS = @ALSA_LIBS@
 AS = @AS@
@@ -73,6 +74,8 @@ ECHO = @ECHO@
 EXEEXT = @EXEEXT@
 FTSDIR = @FTSDIR@
 FTS_SYS_LIBS = @FTS_SYS_LIBS@
+JACK_CFLAGS = @JACK_CFLAGS@
+JACK_LDFLAGS = @JACK_LDFLAGS@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
 JAVACFLAGS = @JAVACFLAGS@
@@ -80,6 +83,7 @@ JAVACFLAGSX = @JAVACFLAGSX@
 JAVACX = @JAVACX@
 JAVAFLAGS = @JAVAFLAGS@
 JAVAPREFIX = @JAVAPREFIX@
+JMAX_VERSION = @JMAX_VERSION@
 LEX = @LEX@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -91,6 +95,9 @@ PLATFORM = @PLATFORM@
 PLATFORM_PACKAGES = @PLATFORM_PACKAGES@
 RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
+SDIF_INCLUDE = @SDIF_INCLUDE@
+SDIF_LIBDIR = @SDIF_LIBDIR@
+SDIF_LIBNAME = @SDIF_LIBNAME@
 STRIP = @STRIP@
 VERSION = @VERSION@
 YACC = @YACC@
@@ -99,17 +106,23 @@ uudecode = @uudecode@
 packagedir = $(pkgdatadir)/packages/control/c
 package_LTLIBRARIES = libcontrol.la
 libcontrol_la_SOURCES = \
+change.c \
 control.c \
 count.c \
+delay.c \
 demux.c \
 dispatch.c \
 fifo.c \
 for.c \
 invoke.c \
+line.c \
 make.c \
 mess.c \
+metro.c \
 oneshot.c \
-range.c \
+retard.c \
+select.c \
+speedlim.c \
 stack.c \
 switch.c \
 sync.c \
@@ -122,7 +135,7 @@ control.h
 
 libcontrol_la_LDFLAGS = -module
 
-INCLUDES = -I$(top_srcdir)/include
+INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/packages/data/c/src -I$(top_srcdir)/packages/utils/c/src
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
@@ -134,9 +147,10 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libcontrol_la_LIBADD = 
-libcontrol_la_OBJECTS =  control.lo count.lo demux.lo dispatch.lo \
-fifo.lo for.lo invoke.lo make.lo mess.lo oneshot.lo range.lo stack.lo \
-switch.lo sync.lo tup.lo
+libcontrol_la_OBJECTS =  change.lo control.lo count.lo delay.lo demux.lo \
+dispatch.lo fifo.lo for.lo invoke.lo line.lo make.lo mess.lo metro.lo \
+oneshot.lo retard.lo select.lo speedlim.lo stack.lo switch.lo sync.lo \
+tup.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -151,10 +165,11 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =  .deps/control.P .deps/count.P .deps/demux.P \
-.deps/dispatch.P .deps/fifo.P .deps/for.P .deps/invoke.P .deps/make.P \
-.deps/mess.P .deps/oneshot.P .deps/range.P .deps/stack.P .deps/switch.P \
-.deps/sync.P .deps/tup.P
+DEP_FILES =  .deps/change.P .deps/control.P .deps/count.P .deps/delay.P \
+.deps/demux.P .deps/dispatch.P .deps/fifo.P .deps/for.P .deps/invoke.P \
+.deps/line.P .deps/make.P .deps/mess.P .deps/metro.P .deps/oneshot.P \
+.deps/retard.P .deps/select.P .deps/speedlim.P .deps/stack.P \
+.deps/switch.P .deps/sync.P .deps/tup.P
 SOURCES = $(libcontrol_la_SOURCES)
 OBJECTS = $(libcontrol_la_OBJECTS)
 
