@@ -129,15 +129,27 @@ public class AdderTool extends Tool implements PositionListener {
 
     private void requestEventCreation(String trackName, float time, String type, int nArgs, Object args[])
     {
-	sendArgs[0].setObject(((SequenceGraphicContext)gc).getFtsSequenceObject()); 
+      SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+      
+      //////////////////////////////////////
+      /*sendArgs[0].setObject(egc.getFtsSequenceObject()); 
 	sendArgs[1].setString(trackName); 
 	sendArgs[2].setFloat(time); 
 	sendArgs[3].setString(type);
       
 	for(int i=0; i<nArgs; i++)
-	    sendArgs[4+i].setValue(args[i]);
+	sendArgs[4+i].setValue(args[i]);
+      
+	MaxApplication.getFts().makeFtsObjectAsync("seqevent", 4+nArgs, sendArgs);*/
 
-	MaxApplication.getFts().makeFtsObjectAsync("seqevent", 4+nArgs, sendArgs);
+      sendArgs[0].setString(trackName); 
+      sendArgs[1].setFloat(time); 
+      sendArgs[2].setString(type);
+      
+      for(int i=0; i<nArgs; i++)
+	sendArgs[3+i].setValue(args[i]);
+	
+      egc.getFtsSequenceObject().sendMessage(FtsObject.systemInlet, "event_new", 3+nArgs, sendArgs);
     }
 
     void popupChoose(int x, int y, Track track)

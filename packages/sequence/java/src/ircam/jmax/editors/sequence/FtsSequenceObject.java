@@ -80,11 +80,12 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
     }
   }
     
-  /*static Object[] evtArgs = new Object[128];
-  
-    public void addEvent(int nArgs , FtsAtom args[])
-    {
-    }*/
+  public void addEvent(int nArgs , FtsAtom args[])
+  {
+    String trackName = args[0].getString();
+    TrackEvent evt = (TrackEvent)(args[1].getObject());
+    getTrackByName(trackName).getTrackDataModel().addEvent(evt);
+  }
 
   /**
    * how many events in the data base?
