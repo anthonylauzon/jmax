@@ -752,6 +752,8 @@ winmidiport_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   fts_sched_add(o, FTS_SCHED_ALWAYS);
 
+  return;
+
  error_recovery:
 
   winmidiport_close(o, 0, NULL, 0, NULL);
