@@ -178,7 +178,7 @@ public class SelectionMover extends InteractionModule implements XORPainter {
 
     previousX = dx;
     previousY = dy;
-
+    g.dispose();
   }
 
   //---- Fields

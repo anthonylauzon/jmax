@@ -93,6 +93,7 @@ public class SelectionResizer extends InteractionModule implements XORPainter {
 	 
     g.setPaintMode();
     g.setColor(Color.black);
+    g.dispose();
   }
 
   //---- Fields

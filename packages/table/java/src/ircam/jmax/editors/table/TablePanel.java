@@ -86,7 +86,10 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     values[x] = y;
     Interpolate(old_dragx, old_dragy, x, y);
     old_dragx = x; old_dragy = y;
-    PaintSingle(x, getGraphics());
+
+    Graphics tempG = getGraphics();
+    PaintSingle(x, tempG);
+    tempG.dispose();
 
     itsTabler.setCoordinates(x, y);
   }
@@ -95,21 +98,25 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
 
   void Interpolate(int oldx, int oldy, int newx, int newy) {
     Dimension d = size();
-    Graphics temp = getGraphics();
+    Graphics tempG;
     
     if (oldx == newx) return;	//nothing to do
     
+    tempG = getGraphics();
+
     float factor = (newy-oldy)/Math.abs(newx-oldx);
     if (newx>oldx) for (int i=oldx+1; i<newx; i++) 
       {
       values[i] = (int) (values[i-1]+factor);
-      PaintSingle(i, getGraphics());
+      PaintSingle(i, tempG);
       }
     else for (int i=oldx-1; i>newx; i--) 
       {
       values[i] = (int) (values[i+1]+factor);
-      PaintSingle(i, getGraphics());
+      PaintSingle(i, tempG);
       }
+
+    tempG.dispose();
   }
   
   public void mouseClicked(MouseEvent e){}
@@ -123,8 +130,10 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     old_dragy = y;
 
     values[x] = y;
-    PaintSingle(x, getGraphics());
 
+    Graphics tempG = getGraphics();
+    PaintSingle(x, tempG);
+    tempG.dispose();
   }
 
   public void mouseReleased(MouseEvent e){

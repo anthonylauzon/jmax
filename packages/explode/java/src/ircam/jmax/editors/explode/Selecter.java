@@ -102,6 +102,7 @@ public class Selecter extends InteractionModule implements XORPainter {
 
     g.setPaintMode();
     g.setColor(Color.black);
+    g.dispose();
   }
 
 
