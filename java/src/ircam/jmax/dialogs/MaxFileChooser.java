@@ -36,7 +36,7 @@ import javax.swing.filechooser.*; // tmp !!
 
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
-
+import ircam.jmax.utils.*;
 /**
  * 
  * A File Dialog that provide the concept
@@ -51,16 +51,62 @@ public class MaxFileChooser
   static private JFileChooser fd;
   static private boolean configured = false;
 
+  static final int SAVE_JMAX_TYPE = 0;
+  static final int SAVE_PAT_TYPE = 1;
+  static private int saveType = SAVE_JMAX_TYPE;
+
+  static boolean wasSaving = false;
+
+  static private Component filtersCombo;
+  static private JLabel label;
+  static private JComboBox saveTypeCombo;
+  static private JTextField textField;
+  
   static void makeFileChooser()
   {
     fd = new JFileChooser(MaxApplication.getProperty("user.dir"));
+    
+    //get filters comboBox
+    filtersCombo = ((Container)((Container)fd.getComponent(5)).getComponent(3)).getComponent(3);
+    // get label
+    label = (JLabel)((Container)((Container)fd.getComponent(5)).getComponent(1)).getComponent(2);
+    //get file textfield 
+    textField = (JTextField)((Container)((Container)fd.getComponent(5)).getComponent(3)).getComponent(1);
 
+    //create save types comboBox
+    String[] types = {".jmax", ".pat"};
+    saveTypeCombo = new JComboBox(types);
+    saveTypeCombo.addActionListener(new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	    JComboBox cb = (JComboBox)e.getSource();
+	    setSaveType((String)cb.getSelectedItem());
+	}
+    });
   }
 
-    /* Added the full class name to FileFilter because of clash with java.io.FileFilter in JDK 1.2 */
+ public static int getSaveType()
+ {
+   return saveType; 
+ }
+
+ public static void setSaveType(String type)
+ {
+   if(type.equals(".pat"))
+   {
+     saveType = SAVE_PAT_TYPE;
+     textField.setText("untitled.pat");
+   }   
+   else
+   {
+     saveType = SAVE_JMAX_TYPE;
+     textField.setText("untitled.jmax");
+   } 
+ }
+
+ /* Added the full class name to FileFilter because of clash with java.io.FileFilter in JDK 1.2 */
   private static void configure()
   {
-    if (MaxApplication.getProperty("jmaxFastFileBox").equals("false"))
+      if (MaxApplication.getProperty("jmaxFastFileBox").equals("false"))
       {
 	fd.setFileFilter(Mda.getAllDocumentsFileFilter());
 
@@ -91,6 +137,8 @@ public class MaxFileChooser
 
     if (fd == null)
       makeFileChooser();
+
+    reInit(true);
 
     if ( !configured)
       configure();
@@ -125,6 +173,8 @@ public class MaxFileChooser
     if (fd == null)
       makeFileChooser();
 
+    reInit(false);
+
     if ( !configured)
       configure();
 
@@ -145,6 +195,33 @@ public class MaxFileChooser
 
 	return null;
       }
+  }
+
+  static private void reInit(boolean open)
+  {
+    if(open)
+    {
+      if(wasSaving)
+      {
+	  ((Container)((Container)fd.getComponent(5)).getComponent(3)).remove(saveTypeCombo);
+	  ((Container)((Container)fd.getComponent(5)).getComponent(3)).add(filtersCombo, 3);
+	  label.setText("Files of type");
+	  wasSaving = false;
+      }
+      textField.setText("");
+    }
+    else
+    {
+      if(!wasSaving)
+      {
+	  ((Container)((Container)fd.getComponent(5)).getComponent(3)).remove(filtersCombo);
+	  ((Container)((Container)fd.getComponent(5)).getComponent(3)).add(saveTypeCombo, 3);
+	  label.setText("Save as type");
+	  wasSaving = true;
+      }
+      saveTypeCombo.setSelectedIndex(0);
+      textField.setText("untitled.jmax");
+    }
   }
 }
 
