@@ -207,6 +207,11 @@ bin-rpm:
 	rpm -bb --rcfile pkg/rpm/rpmrc pkg/rpm/jmax-local.spec
 .PHONY: bin-rpm
 
+# For redhat 6
+bin-rpm6:
+	( cd pkg/rpm ; rpm --rcfile /usr/lib/rpm/rpmrc:rpmrc6 -bb jmax-local.spec)
+.PHONY: bin-rpm6
+
 
 #
 # new-snapshot, new-patch, new-minor, new-major
