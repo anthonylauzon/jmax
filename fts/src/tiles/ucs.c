@@ -445,6 +445,13 @@ fts_ucs_default_midi(int argc, const fts_atom_t *argv)
 {
   if ((argc >= 1)  && (fts_is_symbol(&argv[0])))
     { 
+      post( "Setting default MIDI port to \"");
+      post_atoms( 1, argv);
+      post( "\" (arguments: ");
+      post_atoms( argc-1, argv+1);
+      post( ")\n");
+
+      fts_midiport_set_default( argc, argv);
     }
 
   return fts_Success;

@@ -60,8 +60,8 @@ typedef struct {
 } ossaudioport_t;
 
 static fts_symbol_t s_slash_dev_slash_audio;
-static fts_symbol_t s_input_only;
-static fts_symbol_t s_output_only;
+static fts_symbol_t s_read_only;
+static fts_symbol_t s_write_only;
 
 static void ossaudioport_input( fts_word_t *argv)
 {
@@ -188,9 +188,9 @@ static void ossaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 
   channels = fts_get_int_arg( ac, at, 1, DEFAULT_CHANNELS);
 
-  if ( fts_get_symbol_arg( ac, at, 3, 0) == s_input_only)
+  if ( fts_get_symbol_arg( ac, at, 3, 0) == s_read_only)
     flags = O_RDONLY;
-  else if ( fts_get_symbol_arg( ac, at, 3, 0) == s_output_only)
+  else if ( fts_get_symbol_arg( ac, at, 3, 0) == s_write_only)
     flags = O_WRONLY;
   else
     flags = O_RDWR;
@@ -298,6 +298,6 @@ void ossaudioport_config( void)
   fts_class_install( fts_new_symbol("ossaudioport"), ossaudioport_instantiate);
 
   s_slash_dev_slash_audio = fts_new_symbol( "/dev/audio");
-  s_input_only = fts_new_symbol( "input_only");
-  s_output_only = fts_new_symbol( "output_only");
+  s_read_only = fts_new_symbol( "read_only");
+  s_write_only = fts_new_symbol( "write_only");
 }

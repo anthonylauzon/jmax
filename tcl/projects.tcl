@@ -99,7 +99,7 @@ proc defaultAudio { audioPortName args } {
 }
 
 proc defaultMidi { midiPortName args } {
-  eval [ concat "ucs" "default" "audio" $midiPortName $args ]
+  eval [ concat "ucs" "default" "midi" $midiPortName $args ]
 }
 
 
