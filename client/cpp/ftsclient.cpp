@@ -1276,14 +1276,6 @@ void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientExceptio
 void FtsProcess::findDefaultPath() throw( FtsClientException)
 {
   char fullpath[1024];
-
-  Fts::defaultRoot(fullpath, 1024);
-  snprintf(fullpath, 1024, "%s\\bin\\%s", fullpath, "fts.exe");
-  _path = strdup(fullpath);
-}
-
-void Fts::defaultRoot(char* path, int len) throw( FtsClientException)
-{
   unsigned char buf[1024];
   unsigned char version[256];
   HKEY key, version_key;
@@ -1320,21 +1312,20 @@ void Fts::defaultRoot(char* path, int len) throw( FtsClientException)
 
   RegCloseKey(key);
   RegCloseKey(version_key);
-  
-  snprintf(path, len, "%s", buf);
+
+  snprintf(fullpath, 1024, "%s\\bin\\%s", buf, "fts.exe");
+
+  _path = strdup(fullpath);
 }
+
 #else
+
 void FtsProcess::findDefaultPath() throw( FtsClientException)
 {
   // We hope that the executable will be in PATH, as we use execvp
   _path = "fts";
 }
 
-void Fts::defaultRoot(char* path, int len) throw( FtsClientException)
-{
-  // FIXME!!!!
-  snprintf(path, len, "/usr/share/jmax");
-}
 #endif
 
 /***************************************************
