@@ -30,7 +30,7 @@
 
 #include <common/config.h>
 
-
+/* Static variables */
 static char l_appName[1024];
 static char l_vendorName[1024];
 
@@ -62,9 +62,10 @@ fts_symbol_t fts_cmd_args_get( fts_symbol_t name)
   return 0;
 }
 
-// "pass" must be 1 or 2
-// 1 is for special arguments
-// 2 is for fts-style args
+/*  "pass" must be 1 or 2
+ *  1 is for special arguments
+ *  2 is for fts-style args
+ */
 static void fts_cmd_args_parse( int argc, char **argv, int pass)
 {
     int filecount = 1;
@@ -80,7 +81,7 @@ static void fts_cmd_args_parse( int argc, char **argv, int pass)
     argv++;
     while (argc)
     {
-        // special hard coded arguments
+        /* special hard coded arguments */
         if (!strcmp( *argv, "-appname"))
         {
             argv++;
@@ -92,7 +93,7 @@ static void fts_cmd_args_parse( int argc, char **argv, int pass)
                 strcpy(l_appName, *argv);
             }
         }
-        // special hard coded arguments
+        /* special hard coded arguments */
         else if (!strcmp( *argv, "-vendorname"))
         {
             argv++;
@@ -104,8 +105,26 @@ static void fts_cmd_args_parse( int argc, char **argv, int pass)
                 strcpy(l_vendorName, *argv);
             }
         }
+        else if (   (!strcmp( *argv, "--help"))
+                 || (!strcmp( *argv, "-h"))
+                )
+        {
+            /* TODO: correct/complete this help */
+            printf("FTS/jMax 3 - (c) IRCAM-Centre Georges Pompidou, Paris, France\n"
+                   "%s [global options] [options]\n"
+                   " where a global option may be:\n"
+                   "   -appname <name>      : to specify the <name> of the FTS client application.\n"
+                   "   -vendorname <name>   : to specify the <name> of the vendor of the application.\n"
+                   " and an option may be:\n"
+                   "   --project=<filename> : to specify a project file named <filename>\n"
+                   "   --<name>=<value>     : to create a variable in the patch named <name> and with a value of <value>.\n"
+                   "   <filename>           : to create a variable named 'fileXXX' in the patch with a value of <filename>.\n"
+                   , argv[0]
+                  );
+            exit(0);
+        }
         
-        // other arguments
+        /* other arguments */
         else if(pass == 2)
         {
             if (!strncmp( *argv, "--", 2))
@@ -360,7 +379,7 @@ void fts_init( int argc, char **argv)
   fts_cmd_args_parse(argc, argv, 1);
 
   /* config.c initialization */
-  fts_config_init(l_vendorName, l_appName, fts_log);
+  fts_config_init(l_vendorName, l_appName, NULL, fts_log);
 
   /* WARNING - WARNING - WARNING - WARNING - WARNING - WARNING */
   /* WARNING - WARNING - WARNING - WARNING - WARNING - WARNING */
