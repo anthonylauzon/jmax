@@ -33,12 +33,14 @@ Installation on MacOSX
 System Requirement;
   - Mac OS X 10.2 or later
 
-jMax4.0 for MacOSX is distributed as an Application package for MacOSX.
+jMax4.0.1 for MacOSX is distributed as an Application package for MacOSX.
 
-  - Mount jMax4.0.dmg
-  - Drag the jMax.app folder to your Applications folder or whatever
+  - Mount jMax4.0.1.dmg and drag the jMax.app folder to your Applications folder or whatever
     other folder or disk you would like to keep it in.
 
+ or
+
+  - Open jMax4.0.1.pkg and follow the instructions (jMax will be installed by default in /Applications folder)  
 -------------------------------------------------------------------------
 Contact
 
