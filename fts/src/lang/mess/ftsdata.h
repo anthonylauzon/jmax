@@ -61,10 +61,12 @@ extern void fts_data_delete( fts_data_t *data);
 /* (nos): data can be constant */
 #define fts_data_is_const(data) ((data)->cnst != 0)
 #define fts_data_set_const(data) ((data)->cnst = 1)
+#define fts_data_set_var(data) ((data)->cnst = 0)
 
 /* (nos): reference counting */
 #define fts_data_refer(data) (++(data)->refcnt)
 #define fts_data_derefer(data) (--(data)->refcnt)
+#define fts_data_has_no_reference(data) ((data)->refcnt == 0)
 #define fts_data_has_just_one_reference(data) ((data)->refcnt == 1)
 
 /* class name */
