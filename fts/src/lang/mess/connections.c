@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.31 $ IRCAM $Date: 1998/06/26 15:43:03 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/08/19 15:15:38 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -15,9 +15,9 @@
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
 
-#define TRACE_DEBUG
+/* #define TRACE_DEBUG */
 
-static fts_heap_t connection_heap;
+static fts_heap_t *connection_heap;
 
 static void fts_client_delete_connection(fts_connection_t *c);
 static void fts_client_redefine_connection(fts_connection_t *c);
@@ -30,7 +30,7 @@ static void fts_client_redefine_connection(fts_connection_t *c);
 
 void fts_connections_init()
 {
-  fts_heap_init(&connection_heap, sizeof(fts_connection_t), 256);
+  connection_heap = fts_heap_new(sizeof(fts_connection_t));
 }
 
 /******************************************************************************/
@@ -127,7 +127,7 @@ fts_connection_t *fts_object_connect(int id, fts_object_t *out, int woutlet, fts
 	}
     }
 
-  outconn = (fts_connection_t *) fts_heap_alloc(&connection_heap);
+  outconn = (fts_connection_t *) fts_heap_alloc(connection_heap);
 
   outconn->id  = id;
   outconn->src = out;
@@ -237,7 +237,7 @@ static void fts_object_do_disconnect(fts_connection_t *conn, int do_id)
 
   /* Free the connection, and return */
 
-  fts_heap_free((char *) conn, &connection_heap);
+  fts_heap_free((char *) conn, connection_heap);
 }
 
 void fts_object_disconnect(fts_connection_t *conn)

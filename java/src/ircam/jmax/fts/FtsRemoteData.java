@@ -4,13 +4,18 @@ import java.lang.*;
 import ircam.jmax.mda.*;
 
 public abstract class FtsRemoteData implements MaxData {
+  
+  void setMaster()
+  {
+    master = true;
+  }
 
-  public int getId()
-    {
-      return id;
-    }
+  int getId()
+  {
+    return id;
+  }
 
-  public void setId( int id)
+  void setId( int id)
     {
       this.id = id;
     }
@@ -22,6 +27,25 @@ public abstract class FtsRemoteData implements MaxData {
 
   abstract public void call( int key, FtsMessage msg);
 
+  /* Subclasses should implement the release method */
+
+  public void delete()
+  {
+    if (master)
+      {
+	Object args[] = new Object[1];
+
+	args[0] = this;
+	FtsRemoteMetaData.getRemoteMetaData().remoteCall(FtsRemoteMetaData.REMOTE_DELETE, args);
+      }
+
+    release();
+  }
+
+  protected void release()
+  {
+    FtsRemoteDataID.release(id);
+  }
 
   /* We implement a family of remoteCall methods.
      The first one accept the argument as an object array;
@@ -43,8 +67,14 @@ public abstract class FtsRemoteData implements MaxData {
     Fts.getServer().remoteCall( this, key, offset, size, values);
   }
 
-  protected int id;
+  public void remoteCall( int  key, int id, String name, Object args[])
+  {
+    Fts.getServer().remoteCall(this, key, id, name, args);
+  }
 
+  protected int id;
+  private boolean master = false;	// true if the object has been created by the client
+  
   //  The MaxData interface
 
   /* Temporary handle the MaxDocument; a MaxData ust be declared

@@ -6,15 +6,68 @@ import ircam.jmax.mda.*;
 
 class FtsRemoteMetaData extends FtsRemoteData
 {
+  // Remote call codes
+
+  static final int REMOTE_NEW     = 1;
+  static final int REMOTE_DELETE  = 2;
+  static final int REMOTE_RELEASE = 3;
+ 
+  static private FtsRemoteMetaData metaData;
+
   public static void install()
   {
-    FtsRemoteDataID.put( 1, new FtsRemoteMetaData());
+    metaData = new FtsRemoteMetaData();
+    FtsRemoteDataID.put( 1, metaData);
+  }
+
+  static FtsRemoteMetaData getRemoteMetaData()
+  {
+    return metaData;
   }
 
   protected FtsRemoteMetaData()
   {
     super();
   }
+
+  /* Called by Fts.newRemoteData */
+
+  final FtsRemoteData newInstance(String name, Object args[])
+  {
+    FtsRemoteData data;
+    int id;
+
+    id = FtsRemoteDataID.getNewDataID();
+    remoteCall(REMOTE_NEW, id, name, args);
+   
+    Fts.sync();
+
+    data = FtsRemoteDataID.get(id);
+    data.setMaster();
+    return data;
+  }
+
+
+  /* Remote Calls implementation   */
+
+  public final void call( int key, FtsMessage msg)
+  {
+    switch( key)
+      {
+      case REMOTE_NEW:
+	newFtsRemoteData(msg);
+	break;
+      case REMOTE_RELEASE:
+	releaseRemoteData(msg); 
+      default:
+	break;
+      }
+  }
+
+
+  /*
+   * Remote calls implementation 
+   */
 
   private void newFtsRemoteData( FtsMessage msg)
   {
@@ -50,15 +103,12 @@ class FtsRemoteMetaData extends FtsRemoteData
     FtsRemoteDataID.put( newId, newRemoteData);
   }
 
-  public final void call( int key, FtsMessage msg)
+
+  private void releaseRemoteData( FtsMessage msg)
   {
-    switch( key) {
-    case 1:
-      newFtsRemoteData(msg);
-      break;
-    default:
-      break;
-    }
+    FtsRemoteData data = (FtsRemoteData) msg.getArgument(2);
+
+    data.release();
   }
 
   /* MaxData interface */

@@ -126,7 +126,7 @@ fts_hash_table_insert( fts_hash_table_t *ht, fts_symbol_t sym, void *data)
       return 0;
 
   if (! hash_cell_heap)
-    hash_cell_heap = fts_heap_new(sizeof( hash_cell_t), 16);
+    hash_cell_heap = fts_heap_new(sizeof( hash_cell_t));
 
   new = (hash_cell_t *)fts_heap_zalloc(hash_cell_heap);
   if ( !new)

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.37 $ IRCAM $Date: 1998/08/28 13:52:36 $
+ *      $Revision: 1.38 $ IRCAM $Date: 1998/08/28 16:42:10 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -198,8 +198,8 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 
       /* If the variable already exists in this local context, make an wannabe error object  */
 
-      if (! (fts_variable_is_suspended((fts_object_t *) patcher, var) ||
-	     fts_variable_can_define((fts_object_t *) patcher, var)))
+      if (! (fts_variable_is_suspended(patcher, var) ||
+	     fts_variable_can_define(patcher, var)))
 	{
 	  /* Error: redefined variable */
 
@@ -207,7 +207,7 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 				     "Variable %s is already defined", fts_symbol_name(var));
 	  obj->is_wannabe = 1;
 
-	  fts_variable_add_wannabe((fts_object_t *) patcher, var, obj);
+	  fts_variable_add_wannabe(patcher, var, obj);
 
 	  var = 0;		/* forget about the variable, no binding to do */
 	}
@@ -228,13 +228,13 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 
   /* prepare the variable, if defined */
 
-  if ((var != 0) && ( ! fts_variable_is_suspended((fts_object_t *) patcher, var)))
+  if ((var != 0) && ( ! fts_variable_is_suspended(patcher, var)))
     {
       /* Define the variable, suspended;
 	 this will also steal all the objects referring to the same variable name
 	 in the local scope from any variable defined outside the scope */
 
-      fts_variable_define((fts_object_t *) patcher, var, obj);
+      fts_variable_define(patcher, var, obj);
     }
 
   /* Then, check for zero arguments, and produce an error object in this case */
@@ -307,7 +307,7 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 
       if (ac > 1)
 	{
-	  e = fts_expression_eval((fts_object_t *)patcher, ac, at,  1024, new_args);
+	  e = fts_expression_eval(patcher, ac, at,  1024, new_args);
 	  
 	  if (fts_expression_get_status(e) != FTS_EXPRESSION_OK)
 	    {
@@ -394,7 +394,7 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 	  else if (ret == &fts_ExtraArguments)
 	    obj = fts_error_object_new(patcher, aoc, aot, "Extra argument in object");
 	  else if (ret == &fts_ArgumentTypeMismatch)
-	    obj = fts_error_object_new(patcher, aoc, aot, "Wrong types for the object arguments");
+	    obj = fts_error_object_new(patcher, aoc, aot, "Argument types mismatch");
 	  else
 	    obj = fts_error_object_new(patcher, aoc, aot, "Error in object instantiation");
 	}
@@ -438,7 +438,8 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 
 	  fts_object_delete(obj);
 	  obj = fts_error_object_new(patcher, aoc, aot,
-				     "Object %s cannot define a variable",fts_symbol_name(fts_get_symbol(aot)));
+				     "Object %s cannot define a variable",
+				     fts_symbol_name(fts_get_symbol(aot + 2)));
 	}
     }
 
@@ -479,7 +480,7 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 
   if (var != 0)
     {
-      fts_variable_restore(obj, var, &state, obj);
+      fts_variable_restore(patcher, var, &state, obj);
       obj->varname = var;
     }
 
@@ -561,9 +562,9 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *a
   if (old->varname)
     {
       if (old->varname == var)
-	fts_variable_suspend(old, old->varname);
+	fts_variable_suspend(old->patcher, old->varname);
       else
-	fts_variable_undefine(old, old->varname);
+	fts_variable_undefine(old->patcher, old->varname);
 
       /* Anyway, take away the name from the old object */
 
@@ -724,12 +725,12 @@ fts_object_delete(fts_object_t *obj)
   /* Unbind it from its variable if any */
 
   if (fts_object_get_variable(obj))
-    fts_variable_undefine(obj, fts_object_get_variable(obj));
+    fts_variable_undefine(obj->patcher, fts_object_get_variable(obj));
 
   /* Or, if the object is a wannabe, remove it from the variable */
 
   if (obj->is_wannabe)
-    fts_variable_remove_wannabe(obj, obj->varname, obj);
+    fts_variable_remove_wannabe(obj->patcher, obj->varname, obj);
 
   /* Remove it as user of its var refs */
 
@@ -989,10 +990,10 @@ void fprintf_object(FILE *f, fts_object_t *obj)
 	fprintf(f, "<{");
 
       fprintf_atoms(f, obj->argc, obj->argv);
-      fprintf(f, "} #%d>", obj->id);
+      fprintf(f, "} #%lx(%d)>", (unsigned int) obj, obj->id);
     }
   else
-    fprintf(f, "<\"%s\" #%d>", fts_symbol_name(fts_object_get_class_name(obj)), obj->id);
+    fprintf(f, "<\"%s\" #%lx(%d)>", fts_symbol_name(fts_object_get_class_name(obj)), (unsigned int) obj, obj->id);
 }
 
 

@@ -26,8 +26,8 @@ static double dsp_tick_clock = 0;
 
 /* Heaps for graph and descriptors */
 
-static fts_heap_t dsp_graph_heap;
-static fts_heap_t dsp_descr_heap;
+static fts_heap_t *dsp_graph_heap;
+static fts_heap_t *dsp_descr_heap;
 
 /* For switch hack, this variable is temporaly made global */
 ftl_program_t *dsp_chain_on = 0;
@@ -278,7 +278,7 @@ static void dsp_object_schedule(dsp_node_t *node)
 
   if (! node->descr)
     {
-      node->descr = (fts_dsp_descr_t *)fts_heap_zalloc(&dsp_descr_heap);
+      node->descr = (fts_dsp_descr_t *)fts_heap_zalloc(dsp_descr_heap);
       node->descr->ninputs  = dsp_input_get(node->o, fts_object_get_inlets_number(node->o));
       if ( node->descr->ninputs)
 	node->descr->in = (dsp_signal **)fts_block_zalloc(sizeof(dsp_signal *) * node->descr->ninputs);
@@ -344,7 +344,7 @@ static void dsp_object_schedule(dsp_node_t *node)
   if (node->descr->noutputs)
     fts_block_free((char *) node->descr->out, sizeof(dsp_signal *) * node->descr->noutputs);
 
-  fts_heap_free((char *)node->descr, &dsp_descr_heap);
+  fts_heap_free((char *)node->descr, dsp_descr_heap);
   node->descr = 0;
 }
 
@@ -421,7 +421,7 @@ static void dec_pred_inc_refcnt(dsp_node_t *src, int woutlet, dsp_node_t *dest, 
 
   if (! dest->descr)
     {
-      dest->descr = (fts_dsp_descr_t *)fts_heap_zalloc(&dsp_descr_heap);
+      dest->descr = (fts_dsp_descr_t *)fts_heap_zalloc(dsp_descr_heap);
       dest->descr->ninputs = ninputs;
       dest->descr->noutputs = dsp_output_get(dest->o->cl, fts_object_get_outlets_number(dest->o));
     }
@@ -664,7 +664,7 @@ void dsp_list_insert(fts_object_t *o)
   dsp_node_t *node;
   fts_atom_t v;
 
-  node = (dsp_node_t *)fts_heap_zalloc(&dsp_graph_heap);
+  node = (dsp_node_t *)fts_heap_zalloc(dsp_graph_heap);
 
   node->o = o;
 
@@ -703,10 +703,10 @@ void dsp_list_remove(fts_object_t *o)
 	    {
 	      fts_block_free((char *) node->descr->in, sizeof(dsp_signal *) * node->descr->ninputs);
 	      fts_block_free((char *) node->descr->out, sizeof(dsp_signal *) * node->descr->noutputs);
-	      fts_heap_free((char *)node->descr, &dsp_descr_heap);
+	      fts_heap_free((char *)node->descr, dsp_descr_heap);
 	    }
 
-	  fts_heap_free((char *)node, &dsp_graph_heap);
+	  fts_heap_free((char *)node, dsp_graph_heap);
 	  return;
 	}
 
@@ -792,7 +792,7 @@ void dsp_chain_poll(void)
 
 void dsp_compiler_init(void)
 {
-  fts_heap_init(&dsp_graph_heap, sizeof(dsp_node_t), 32);
-  fts_heap_init(&dsp_descr_heap, sizeof(fts_dsp_descr_t), 32);
+  dsp_graph_heap = fts_heap_new(sizeof(dsp_node_t));
+  dsp_descr_heap = fts_heap_new(sizeof(fts_dsp_descr_t));
 }
 

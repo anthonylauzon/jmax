@@ -85,6 +85,9 @@
 
 #define POST_CODE     'h'	/* a post request for the server */
 
+
+/* DATA RELATIVE CODES */
+
 #define REMOTE_CALL_CODE    '!'
 
 

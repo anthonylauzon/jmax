@@ -14,7 +14,7 @@ struct stack_element_t {
   stack_element_t *next;
 };
 
-static fts_heap_t stack_element_heap;
+static fts_heap_t *stack_element_heap;
 
 static int inited = 0;
 
@@ -58,11 +58,11 @@ static void graph_iterator_push( graph_iterator_t *iter, fts_object_t *object, i
 
   if (!inited)
     {
-      fts_heap_init( &stack_element_heap, sizeof( stack_element_t), 64);
+      stack_element_heap =  fts_heap_new(sizeof( stack_element_t));
       inited = 1;
     }
 
-  new_elem = (stack_element_t *)fts_heap_zalloc( &stack_element_heap);
+  new_elem = (stack_element_t *)fts_heap_zalloc(stack_element_heap);
 
   new_elem->object = object;
   new_elem->connection = object->out_conn[outlet];
@@ -129,7 +129,7 @@ static void graph_iterator_pop( graph_iterator_t *iter)
 
   next = iter->top->next;
 
-  fts_heap_free( (char *)iter->top, &stack_element_heap);
+  fts_heap_free( (char *)iter->top, stack_element_heap);
 
   iter->top = next;
 }

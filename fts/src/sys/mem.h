@@ -17,17 +17,12 @@ extern void *fts_zalloc(int size);
 extern void *fts_realloc(void *p, int size);
 extern void fts_free(void *p);
 
-typedef struct _fts_heap_t
-{
-  char *free_list;
-  int current_block_group;
-  int block_size;
-
-} fts_heap_t;
+struct fts_heap;
+typedef struct fts_heap fts_heap_t;
 
 
-extern void        fts_heap_init(fts_heap_t *p, int block_size, int block_group);
-extern fts_heap_t *fts_heap_new(int block_size, int block_group);
+
+extern fts_heap_t *fts_heap_new(int block_size);
 
 extern char *fts_heap_alloc(fts_heap_t *p);
 extern char *fts_heap_zalloc(fts_heap_t *p);

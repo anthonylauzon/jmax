@@ -12,7 +12,7 @@ typedef struct _SignalCell {
   struct _SignalCell *next;
 } SignalCell, *SignalList;
 
-static fts_heap_t signal_cell_heap;
+static fts_heap_t *signal_cell_heap;
 
 static SignalList freeList = 0, inUseList = 0;
 
@@ -39,7 +39,7 @@ Sig_new( int vectorSize)
       if ( s->length == vectorSize)
 		  {
 			 *previous = current->next;
-			 fts_heap_free((char *)current, &signal_cell_heap);
+			 fts_heap_free((char *)current, signal_cell_heap);
 			 break;
 		  }
       else
@@ -59,7 +59,7 @@ Sig_new( int vectorSize)
   s->length = vectorSize;
   s->srate = fts_dsp_get_sampling_rate() / (double)(DEFAULTVS/vectorSize);
 
-  tmp = (SignalList) fts_heap_zalloc(&signal_cell_heap);
+  tmp = (SignalList) fts_heap_zalloc(signal_cell_heap);
   tmp->s = s;
   tmp->next = inUseList;
   inUseList = tmp;
@@ -85,7 +85,7 @@ Sig_free( dsp_signal *s)
       if (s == current->s)
 	{
 	  *previous = current->next;
-	  fts_heap_free((char *) current,  &signal_cell_heap);
+	  fts_heap_free((char *) current, signal_cell_heap);
 
 	  break;
 	}
@@ -95,7 +95,7 @@ Sig_free( dsp_signal *s)
 
   /* Then add it to the free list */
 
-  tmp = (SignalList) fts_heap_zalloc(&signal_cell_heap);
+  tmp = (SignalList) fts_heap_zalloc(signal_cell_heap);
   tmp->s = s;
   tmp->next = freeList;
   freeList = tmp;
@@ -146,7 +146,7 @@ SignalList_free(SignalList *list)
     {
       fts_free( current->s );
       next = current->next;
-      fts_heap_free((char *) current,  &signal_cell_heap);
+      fts_heap_free((char *) current, signal_cell_heap);
     }
   *list = 0;
 }
@@ -190,5 +190,5 @@ Sig_check( void )
 void
 Sig_init(void)
 {
-  fts_heap_init(&signal_cell_heap, sizeof(SignalCell), 32);
+  signal_cell_heap = fts_heap_new(sizeof(SignalCell));
 }

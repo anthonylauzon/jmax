@@ -20,9 +20,7 @@
    to catch memory problems without purify
 */
 
-#ifdef DEBUG
 #define HELP_PURIFY 
-#endif
 
 /* #include "smem.h"  */
 
@@ -41,12 +39,12 @@
 /*                                                                            */
 /******************************************************************************/
 
-static void fts_block_init(void);
+static void fts_heaps_init(void);
 
 void
 mem_init(void)
 {
-  fts_block_init();
+  fts_heaps_init();
 }
 
 /******************************************************************************/
@@ -102,6 +100,29 @@ fts_free(void *p)
 /******************************************************************************/
 
 
+#define SHARED_HEAP_MAX_SIZE 256
+#define FREE_TO_USED_RATIO    5
+
+struct fts_heap
+{
+  char *free_list;
+  int current_block_group;
+  int block_size;
+  int reserved_blocks;
+};
+
+static fts_heap_t *fts_heaps[SHARED_HEAP_MAX_SIZE / sizeof(long)];
+
+static void
+fts_heaps_init(void)
+{
+  int i;
+
+  for (i = 0; i < (SHARED_HEAP_MAX_SIZE / sizeof(long)); i++)
+    fts_heaps[i] = 0;
+}
+
+
 
 static void
 fts_heap_grow(fts_heap_t *p)
@@ -110,38 +131,67 @@ fts_heap_grow(fts_heap_t *p)
   int i;
 
   mem = fts_malloc(p->current_block_group * p->block_size);
-
+  
   for (i = 0; i < (p->current_block_group - 1); i++)
     *((char **) (mem + i * p->block_size)) = mem + (i + 1) * p->block_size;
 
   *((char **)(mem + (p->current_block_group - 1) * p->block_size)) = p->free_list;
   p->free_list = mem;
+
+  /* Compute next block_size so to have an average of 
+     FREE_TO_USED_RATIO free memory to used memory in the heap,
+     in case of continous grow */
+
+  p->reserved_blocks += p->current_block_group;
+  
+  if (p->reserved_blocks / FREE_TO_USED_RATIO > p->current_block_group / 2)
+    p->current_block_group = (p->reserved_blocks / FREE_TO_USED_RATIO) * 2;
 }
 
-
-
-void
-fts_heap_init(fts_heap_t *p, int block_size, int block_group)
-{
-  /* initialize to an empty heap */
-
-  p->free_list = 0;
-  p->block_size = ( block_size > sizeof(char **) ? block_size : sizeof(char **));
-  p->current_block_group = (block_group ? block_group : 512);
-}
 
 
 fts_heap_t *
-fts_heap_new(int block_size, int block_group)
+fts_heap_new(int block_size)
 {
-  fts_heap_t *p;
+  if (block_size > SHARED_HEAP_MAX_SIZE)
+    {
+      /* Unshared heap */
 
-  p = (fts_heap_t *) fts_malloc(sizeof(fts_heap_t));
-  fts_heap_init(p, block_size, block_group);
+      fts_heap_t *p;
 
-  return p;
+      p = (fts_heap_t *) fts_malloc(sizeof(fts_heap_t));
+      p->free_list = 0;
+      p->block_size = ( block_size > sizeof(char **) ? block_size : sizeof(char **));
+      p->current_block_group = 64;
+      p->reserved_blocks = 0;
+
+      return p;
+    }
+  else
+    {
+      /* shared heap */
+
+      int idx;
+
+      idx = (block_size / sizeof(long)) - 1;
+
+      if (fts_heaps[idx])
+	return fts_heaps[idx];
+      else
+	{
+	  fts_heap_t *p;
+
+	  p = (fts_heap_t *) fts_malloc(sizeof(fts_heap_t));
+	  p->free_list = 0;
+	  p->block_size = (idx + 1) * sizeof(long);
+	  p->current_block_group = 64;
+	  fts_heaps[idx] = p;
+	  p->reserved_blocks = 0;
+
+	  return p;
+	}
+    }
 }
-
 
 
 char *
@@ -206,19 +256,6 @@ fts_heap_free(char *m, fts_heap_t *p)
  */
 
 
-#define MAX_SIZE 64
-
-fts_heap_t mess_heaps[MAX_SIZE / sizeof(long)];
-
-static void
-fts_block_init(void)
-{
-  int i;
-
-  for (i = 0; i < (MAX_SIZE / sizeof(long)); i++)
-    fts_heap_init(mess_heaps + i, (i + 1) * sizeof(long), 32);
-}
-
 
 char *
 fts_block_alloc(int size)
@@ -226,10 +263,19 @@ fts_block_alloc(int size)
 #ifdef HELP_PURIFY
   return fts_malloc(size);
 #else
-  if (size > MAX_SIZE)
+  if (size > SHARED_HEAP_MAX_SIZE)
     return fts_malloc(size);
   else
-    return fts_heap_alloc(&(mess_heaps[(size / sizeof(long)) - 1]));
+    {
+      int idx;
+
+      idx = (size / sizeof(long)) - 1;
+
+      if (! fts_heaps[idx])
+	fts_heaps[idx] = fts_heap_new((i + 1) * sizeof(long));
+
+      return fts_heap_alloc(fts_heaps[idx]);
+    }
 #endif
 }
 
@@ -240,10 +286,19 @@ fts_block_zalloc(int size)
 #ifdef HELP_PURIFY
   return fts_zalloc(size);
 #else
-  if (size > MAX_SIZE)
+  if (size > SHARED_HEAP_MAX_SIZE)
     return fts_zalloc(size);
   else
-    return fts_heap_zalloc(&(mess_heaps[(size / sizeof(long)) - 1]));
+    {
+      int idx;
+
+      idx = (size / sizeof(long)) - 1;
+
+      if (! fts_heaps[idx])
+	fts_heaps[idx] = fts_heap_new((i + 1) * sizeof(long));
+
+      return fts_heap_zalloc(fts_heaps[idx]);
+    }
 #endif
 }
 
@@ -254,10 +309,23 @@ fts_block_free(char *p, int size)
 #ifdef HELP_PURIFY
   fts_free(p);
 #else
-  if (size > MAX_SIZE)
+  if (size > SHARED_HEAP_MAX_SIZE)
     fts_free(p);
   else
-    fts_heap_free(p, &(mess_heaps[(size / sizeof(long)) - 1]));
+    {
+      int idx;
+
+      idx = (size / sizeof(long)) - 1;
+
+      if (! fts_heaps[idx])
+	return;			/* error !!! */
+
+      fts_heap_free(p, fts_heaps[idx]);
+    }
 #endif
 }
+
+
+
+
 

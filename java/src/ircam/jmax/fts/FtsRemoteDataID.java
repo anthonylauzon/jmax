@@ -56,6 +56,17 @@ class FtsSimpleTable {
 }
 
 class FtsRemoteDataID {
+  static int ftsDataIDCounter = 3;	// Skip zero and one, use odd numbers
+
+  public static int getNewDataID()
+  {
+    int newid;
+
+    newid = ftsDataIDCounter;
+    ftsDataIDCounter += 2;
+
+    return newid;
+  }
 
   public static FtsRemoteData get( int id)
     {
@@ -76,7 +87,7 @@ class FtsRemoteDataID {
     {
       try
 	{
-	  dataTable.put( id, (Object)data);
+	  dataTable.put( id, data);
 	}
       catch ( IndexOutOfBoundsException e)
 	{
@@ -84,10 +95,21 @@ class FtsRemoteDataID {
 	}
     }
 
-  protected static FtsSimpleTable dataTable;
-
-  static
+  public static void release( int id)
     {
-      dataTable = new FtsSimpleTable();
+      try
+	{
+	  dataTable.put( id, null);
+	  
+	  if (id == ftsDataIDCounter)
+	    while ((ftsDataIDCounter >= 3) && (dataTable.get(ftsDataIDCounter) != null))
+	      ftsDataIDCounter -= 2;
+	}
+      catch ( IndexOutOfBoundsException e)
+	{
+	  System.err.println( "FtsRemoteDataID::put: invalid id " + id);
+	}
     }
+
+  protected static FtsSimpleTable dataTable = new FtsSimpleTable();
 }

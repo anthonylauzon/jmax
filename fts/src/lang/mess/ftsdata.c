@@ -1,10 +1,9 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include <assert.h>
-#include <string.h>
 #include "sys.h"
 #include "lang/mess.h"
+#include "lang/utils.h"
 #include "lang/mess/messP.h"
+
 /* (fd) I know, this is not correct. But it is needed ... */
 #include "runtime.h"
 
@@ -37,6 +36,11 @@
  * fts_malloc are used instead malloc.
  */
 
+/* Meta data remote call keys */
+
+#define REMOTE_NEW     1
+#define REMOTE_DELETE  2
+#define REMOTE_RELEASE 3
 
 #define FUNCTION_TABLE_SIZE 32
 
@@ -44,42 +48,74 @@
 struct fts_data_class {
   fts_symbol_t data_class_name;
   fts_data_export_fun_t export_fun;
+  fts_data_remote_constructor_t remote_constructor;
+  fts_data_remote_destructor_t remote_destructor;
   fts_data_fun_t  functions_table[FUNCTION_TABLE_SIZE];
 };
 
 static fts_data_t *meta_data = 0;
+
+static fts_hash_table_t fts_data_class_table;
+
+static void fts_data_remote_new(fts_data_t *d, int ac, const fts_atom_t *at);
+static void fts_data_remote_delete(fts_data_t *d, int ac, const fts_atom_t *at);
 
 static void meta_data_init()
 {
   meta_data = (fts_data_t *) fts_malloc( sizeof( fts_data_t));
   assert( meta_data != 0);
 
-  meta_data->class = 0;
+  meta_data->class = fts_data_class_new(fts_new_symbol("_meta_data"));
   meta_data->id = 1;
 
   fts_data_id_put( 1, meta_data);
+  fts_data_class_define_function(meta_data->class, REMOTE_NEW, fts_data_remote_new);
+  fts_data_class_define_function(meta_data->class, REMOTE_DELETE, fts_data_remote_delete);
 }
 
 fts_data_class_t *fts_data_class_new( fts_symbol_t data_class_name)
 {
-  int i;
+  void *data;
   fts_data_class_t *class;
+  int i;
 
-  class = (fts_data_class_t *)fts_malloc( sizeof( fts_data_class_t));
-  assert( class != 0);
+  if (fts_hash_table_lookup(&fts_data_class_table, data_class_name, &data))
+    return (fts_data_class_t *) data;
+  else
+    {
+      class = (fts_data_class_t *)fts_malloc( sizeof( fts_data_class_t));
+      assert( class != 0);
 
-  class->data_class_name = data_class_name;
+      class->data_class_name = data_class_name;
 
-  for (i = 0; i < FUNCTION_TABLE_SIZE; i++)
-    class->functions_table[i] = 0;
+      for (i = 0; i < FUNCTION_TABLE_SIZE; i++)
+	class->functions_table[i] = 0;
 
-  return class;
+      fts_hash_table_insert(&fts_data_class_table, data_class_name, (void *)class);
+
+      return class;
+    }
 }
 
 void fts_data_class_define_export_function( fts_data_class_t *class, fts_data_export_fun_t export_fun)
 {
   class->export_fun = export_fun;
 }
+
+
+void fts_data_class_define_remote_constructor( fts_data_class_t *class,
+					       fts_data_remote_constructor_t constructor)
+{
+  class->remote_constructor = constructor;
+}
+
+
+void fts_data_class_define_remote_destructor( fts_data_class_t *class,
+					       fts_data_remote_destructor_t destructor)
+{
+  class->remote_destructor = destructor;
+}
+
 
 void fts_data_class_define_function( fts_data_class_t *class, int key, fts_data_fun_t function)
 {
@@ -97,25 +133,103 @@ static int new_id()
 
 #define NO_ID -1
 
+/* Local creation and deletion: when a fts data is created locally
+   In FTS, it is created and destroyed by C functions, and not 
+   by pubblic constructors/destructors; when is created and destroyed
+   remotely, the constructors/destructors are used; this is tricky,
+   the problem being the low level nature and use of fts data.
+ */
+
 void fts_data_init( fts_data_t *d, fts_data_class_t *class)
 {
   d->class = class;
   d->id = NO_ID;
 }
 
+void fts_data_delete( fts_data_t *d)
+{
+  if (d->id != NO_ID)
+    {
+      fts_data_id_remove(d->id, d);
+      fts_data_remote_call(d, REMOTE_RELEASE, 0, 0);
+    }
+}
+
+/* Remote version, as remote function of the meta data object */
+
+static void fts_data_remote_new(fts_data_t *d, int ac, const fts_atom_t *at)
+{
+  void *data;
+  fts_data_class_t *class;
+  fts_data_t *new;
+  int id;
+  fts_symbol_t data_class_name;
+
+  if (ac < 2)
+    return;			/* error */
+
+  data_class_name = fts_get_symbol(&at[0]);
+  id = fts_get_int(&at[1]);
+
+  if (fts_hash_table_lookup(&fts_data_class_table, data_class_name, &data))
+    class = (fts_data_class_t *) data;
+  else
+    return;			/* error */
+
+  if (class->remote_constructor)
+    {
+      /* Automatically export the object back to the server */
+
+      fts_atom_t a[2];
+
+      new = class->remote_constructor(ac - 2, at + 2);
+      new->class = class;
+      new->id = id;
+
+      fts_data_id_put(id, new);
+
+      fts_set_int( &(a[0]), new->id);
+      fts_set_symbol( &(a[1]), new->class->data_class_name);
+      fts_data_remote_call( meta_data, REMOTE_NEW, 2, a);
+
+      (* new->class->export_fun)(new);
+
+    }
+  else
+    return;			/* error */
+}
+
+/* Remote Delete is a remote function of the object itself;
+   there is no remote release; the release is only meaningfull
+   for the client.
+ */
+
+static void fts_data_remote_delete(fts_data_t *d, int ac, const fts_atom_t *at)
+{
+  if (d->id != NO_ID)
+    {
+      if (d->class->remote_destructor)
+	(* d->class->remote_destructor)(d);
+
+      fts_data_id_remove(d->id, d);
+    }
+}
+
+/* Exporting */
+
 void fts_data_export( fts_data_t *d)
 {
-  fts_atom_t a[2];
-
   if ( d->id == NO_ID)
     {
+      fts_atom_t a[2];
+
       d->id = new_id();
 
       fts_data_id_put( d->id, d);
 
       fts_set_int( &(a[0]), d->id);
       fts_set_symbol( &(a[1]), d->class->data_class_name);
-      fts_data_remote_call( meta_data, 1, 2, a);
+      fts_data_remote_call( meta_data, REMOTE_NEW, 2, a);
 
       (* d->class->export_fun)(d);
     }
@@ -126,6 +240,7 @@ int fts_data_is_exported( fts_data_t *d)
 {
   return d->id != NO_ID;
 }
+
 
 int fts_data_get_id( fts_data_t *d)
 {
@@ -147,14 +262,15 @@ void fts_data_call( fts_data_t *d, int key, int ac, const fts_atom_t *at)
   (*function)( d, ac, at);
 }
 
+
 void fts_data_remote_call( fts_data_t *d, int key, int ac, const fts_atom_t *at)
 {
   if (! fts_data_is_exported(d))
     fts_data_export(d);
 
   fts_client_mess_start_msg( REMOTE_CALL_CODE);
-  fts_client_mess_add_int( d->id);
-  fts_client_mess_add_int( key);
+  fts_client_mess_add_data(d);
+  fts_client_mess_add_int(key);
   fts_client_mess_add_atoms( ac, at);
   fts_client_mess_send_msg();
 }
@@ -188,5 +304,12 @@ void fts_data_end_remote_call()
 
 void fts_data_module_init()
 {
+  fts_hash_table_init(&fts_data_class_table);
   meta_data_init();
 }
+
+
+
+
+
+

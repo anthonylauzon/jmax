@@ -25,6 +25,10 @@ clean_java:
 	(cd java ; $(MAKE) clean)
 	(cd packages; $(MAKE) clean_java)
 
+tags:
+	(find . \( -name "*.c" -o -name "*.h" -o -name "*.java" \) -print | etags -t - )
+.PHONY: tags
+
 .PHONY: all
 .PHONY: all_c
 .PHONY: all_java

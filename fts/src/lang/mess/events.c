@@ -17,7 +17,7 @@ typedef struct _error_handler
   struct _error_handler *next;
 } fts_event_handler_t;
 
-static fts_heap_t handler_heap;
+static fts_heap_t *handler_heap;
 
 fts_event_handler_t *global_handlers = 0;
 fts_event_handler_t *default_handlers = 0;
@@ -29,7 +29,7 @@ fts_event_add_handler(fts_object_t *handler)
 {
   fts_event_handler_t *hnd;
 
-  hnd = (fts_event_handler_t *) fts_heap_alloc(&handler_heap);
+  hnd = (fts_event_handler_t *) fts_heap_alloc(handler_heap);
 
   hnd->next = global_handlers;
   hnd->handler = handler;
@@ -55,7 +55,7 @@ fts_event_remove_handler(fts_object_t *handler)
 
 	  *phnd = ((*phnd)->next);
 
-	  fts_heap_free((char *) hnd, &handler_heap);
+	  fts_heap_free((char *) hnd, handler_heap);
 	}
       else 
 	phnd = & ((*phnd)->next);
@@ -68,7 +68,7 @@ fts_event_push_handler(fts_object_t *handler)
 {
   fts_event_handler_t *hnd;
 
-  hnd = (fts_event_handler_t *) fts_heap_alloc(&handler_heap);
+  hnd = (fts_event_handler_t *) fts_heap_alloc(handler_heap);
 
   hnd->next = handlers_stack;
   hnd->handler = handler;
@@ -89,7 +89,7 @@ fts_event_pop_handler(fts_object_t *handler)
       current = hnd->handler;
 
       handlers_stack = hnd->next;
-      fts_heap_free((char *) hnd, &handler_heap);
+      fts_heap_free((char *) hnd, handler_heap);
     }
   while (current != handler);
 }
@@ -103,7 +103,7 @@ fts_event_add_default_handler(fts_object_t *handler)
 {
   fts_event_handler_t *hnd;
 
-  hnd = (fts_event_handler_t *) fts_heap_alloc(&handler_heap);
+  hnd = (fts_event_handler_t *) fts_heap_alloc(handler_heap);
 
   hnd->next = default_handlers;
   hnd->handler = handler;
@@ -165,5 +165,5 @@ fts_event(fts_symbol_t s, int ac, const fts_atom_t *at)
 void
 fts_events_init(void)
 {
-  fts_heap_init(&handler_heap, sizeof(fts_event_handler_t), 32);
+  handler_heap = fts_heap_new(sizeof(fts_event_handler_t));
 }

@@ -20,7 +20,10 @@ struct fts_intvec
   int size;	
 };
 
+/* Remote call codes */
 
+#define INTEGER_VECTOR_SET    1
+#define INTEGER_VECTOR_UPDATE 2
 
 /********************************************************************/
 /*                                                                  */
@@ -228,6 +231,7 @@ fts_intvec_t *fts_intvec_new(int size)
 void
 fts_intvec_delete(fts_intvec_t *this)
 {
+  fts_data_delete((fts_data_t *) this);
   fts_free((void *)this->vec);
   fts_free((void *)this);
 }
@@ -314,7 +318,7 @@ void fts_intvec_save_bmax(fts_intvec_t *this, fts_bmax_file_t *f)
  */
 
 
-void fts_intvec_export_fun(fts_data_t *d)
+static void fts_intvec_export_fun(fts_data_t *d)
 {
   fts_intvec_t *this = (fts_intvec_t *)d;
   int i;
@@ -335,7 +339,7 @@ void fts_intvec_export_fun(fts_data_t *d)
  * No checks here, correctness by design.
  */
 
-void fts_intvec_remote_set( fts_data_t *d, int ac, const fts_atom_t *at)
+static void fts_intvec_remote_set( fts_data_t *d, int ac, const fts_atom_t *at)
 {
   fts_intvec_t *this = (fts_intvec_t *)d;
   int offset;
@@ -356,7 +360,7 @@ void fts_intvec_remote_set( fts_data_t *d, int ac, const fts_atom_t *at)
 }
 
 
-void fts_intvec_remote_update( fts_data_t *d, int ac, const fts_atom_t *at)
+static void fts_intvec_remote_update( fts_data_t *d, int ac, const fts_atom_t *at)
 {
   fts_intvec_t *this = (fts_intvec_t *)d;
   int i;
@@ -376,7 +380,7 @@ void fts_intvec_remote_update( fts_data_t *d, int ac, const fts_atom_t *at)
 /*                                                                  */
 /********************************************************************/
 
-void fts_intvec_init(void)
+void fts_intvec_config(void)
 {
   fts_intvec_data_class = fts_data_class_new( fts_new_symbol( "intvec_data"));
   fts_data_class_define_export_function(fts_intvec_data_class, fts_intvec_export_fun);

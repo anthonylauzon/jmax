@@ -130,8 +130,8 @@ public class FtsIntegerVector extends FtsRemoteData
 	if ((values == null) || size != values.length)
 	  values = new int[size];
 	
-	for (int i = 3 ; i < size + 2; i++)
-	  values[i - 3] = ((Integer) msg.getArgument(i)).intValue();
+	for (int i = 0 ; i < size; i++)
+	  values[i] = ((Integer) msg.getArgument(i + 3)).intValue();
 	break;
       default:
 	break;

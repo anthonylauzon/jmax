@@ -33,7 +33,7 @@ fts_status_description_t fts_CannotInstantiate = {"Cannot instantiate class"};
 
 static fts_hash_table_t fts_metaclass_table;
 static fts_hash_table_t fts_metaclass_alias_table;
-static fts_heap_t class_mess_heap;
+static fts_heap_t *class_mess_heap;
 
 /* Forward declarations */
 
@@ -59,7 +59,7 @@ fts_classes_init(void)
 
   fts_hash_table_init(&fts_metaclass_table);
   fts_hash_table_init(&fts_metaclass_alias_table);
-  fts_heap_init(&class_mess_heap, sizeof(fts_class_mess_t), 64);
+  class_mess_heap = fts_heap_new(sizeof(fts_class_mess_t));
 }
 
 /******************************************************************************/
@@ -379,7 +379,7 @@ fts_get_class_name(fts_class_t *cl)
 static fts_class_mess_t *
 fts_class_mess_create(fts_symbol_t s, fts_method_t mth, int mandatory_args, int nargs, fts_symbol_t *arg_types)
 {
-  fts_class_mess_t *cm = (fts_class_mess_t *) fts_heap_alloc(&class_mess_heap);
+  fts_class_mess_t *cm = (fts_class_mess_t *) fts_heap_alloc(class_mess_heap);
 
   fts_atom_type_copy(nargs, arg_types, &(cm->tmess.arg_types));
   cm->tmess.mandatory_args = mandatory_args;

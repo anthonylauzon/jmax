@@ -102,7 +102,7 @@ static int op_binary[FTS_OP_FIRST_UNUSED];
 #define fts_is_comma(a)          (fts_is_symbol((a)) && (fts_get_symbol(a) == fts_s_comma))
 #define fts_is_dollar(a)         (fts_is_symbol((a)) && (fts_get_symbol(a) == fts_s_dollar))
 #define fts_is_dot(a)            (fts_is_symbol((a)) && (fts_get_symbol(a) == fts_s_dot)) 
-#define fts_is_equal(a)            (fts_is_symbol((a)) && (fts_get_symbol(a) == fts_s_equal))
+#define fts_is_assign(a)         (fts_is_symbol((a)) && (fts_get_symbol(a) == fts_s_assign))
 
 /* Function hash table */
 
@@ -117,7 +117,7 @@ typedef struct fts_expr_assignement
   struct fts_expr_assignement *next;
 } fts_expr_assignement_t;
 
-static fts_heap_t expr_prop_heap;
+static fts_heap_t *expr_prop_heap;
 
 typedef struct fts_expr_var_ref
 {
@@ -125,7 +125,7 @@ typedef struct fts_expr_var_ref
   struct fts_expr_var_ref *next;
 } fts_expr_var_ref_t;
 
-static fts_heap_t expr_var_ref_heap;
+static fts_heap_t *expr_var_ref_heap;
 
 /* The espression type, with the relative macros/functions.
  *
@@ -146,7 +146,7 @@ struct fts_expression_state
 
   int expr_size;		/* the expression list being parsed */
   const fts_atom_t *expr; 
-  fts_object_t     *object;	/* the object giving the variable resolution context */
+  fts_patcher_t    *scope;	/* the scope where the expression should be evaluated */
 
   int in;			/* current input atom in expression list*/
   int count;			/* result counter */
@@ -306,7 +306,7 @@ static void fts_expression_add_var_ref(fts_expression_state_t *e, fts_symbol_t n
 
 static fts_expression_state_t *expr_state = 0;
 
-static fts_expression_state_t *fts_get_expression_state(fts_object_t *object,
+static fts_expression_state_t *fts_get_expression_state(fts_patcher_t *scope,
 							int expr_size, const fts_atom_t *expr)
 {
   if (expr_state == NULL)
@@ -327,20 +327,20 @@ static fts_expression_state_t *fts_get_expression_state(fts_object_t *object,
       
 	  p2 = p;
 	  p = p->next;
-	  fts_heap_free((char *) p2, &expr_prop_heap);
+	  fts_heap_free((char *) p2, expr_prop_heap);
 	}
     }
 
   value_stack_set_empty(expr_state);
   op_stack_set_empty(expr_state);
-  expr_state->expr         = expr; /* expression  */
-  expr_state->expr_size    = expr_size;	/* expression size */
-  expr_state->object       = object; /* expression  */
-  expr_state->in           = 0;		/* input counter */
-  expr_state->count        = 0;	/* result counter */
-  expr_state->assignements = 0;	/* init assignement  list */
-  expr_state->var_refs     = 0;	/* init var ref list */
-  expr_state->ret          = FTS_EXPRESSION_OK;	/* init return status */
+  expr_state->expr         = expr; 
+  expr_state->expr_size    = expr_size;
+  expr_state->scope        = scope;
+  expr_state->in           = 0;		
+  expr_state->count        = 0;	
+  expr_state->assignements = 0;	
+  expr_state->var_refs     = 0;	
+  expr_state->ret          = FTS_EXPRESSION_OK;	
 
   return expr_state;
 }
@@ -441,6 +441,8 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 
 	      value_stack_pop(e, args);
 	      value_stack_push(e, &result);
+
+	      status = waiting_op;
 	    }
 	  else
 	    {
@@ -564,12 +566,14 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 
 		  value_stack_pop(e, args);
 		  value_stack_push(e, &result);
+
+		  status = waiting_op;
 		}
 	      else
 		return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR,
 					"Syntax error in function call", 0);
 	    }
-	  else if (fts_is_operator(current_in(e)) && (! fts_is_equal(current_in(e))))
+	  else if (fts_is_operator(current_in(e)) && (! fts_is_assign(current_in(e))))
 	    {
 	      int op;
 
@@ -639,7 +643,7 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
  * substituted by one argument and some check more added to the basic parser.
  */
 
-static int fts_expression_eval_simple(fts_expression_state_t *e)
+/*static*/ int fts_expression_eval_simple(fts_expression_state_t *e)
 {
   int ret;
   int i;
@@ -716,6 +720,8 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 
 	      value_stack_pop(e, args);
 	      value_stack_push(e, &result);
+
+	      status = waiting_op;
 	    }
 	  else
 	    {
@@ -777,7 +783,7 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 	    }
 	  else if (fts_is_operator(current_in(e)))
 	    {
-	      if (fts_is_dot(current_in(e)) || fts_is_equal(current_in(e)))
+	      if (fts_is_dot(current_in(e)) || fts_is_assign(current_in(e)))
 		{
 		  int op;
 
@@ -859,7 +865,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 	      fts_symbol_t varname;
 
 	      varname = fts_get_symbol(tos);
-	      value = fts_variable_get_value(e->object, varname);
+	      value = fts_variable_get_value(e->scope, varname);
 
 	      if (value)
 		{
@@ -1020,7 +1026,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 		  fts_symbol_t varname;
 
 		  varname = fts_get_symbol(tos);
-		  value = fts_variable_get_value(e->object, varname);
+		  value = fts_variable_get_value(e->scope, varname);
 
 		  if (value)
 		    {
@@ -1178,7 +1184,34 @@ static int fts_op_eval(fts_expression_state_t *e)
 	case FTS_OP_ARRAY_REF:
 	  if (fts_is_int(tos) || fts_is_atom_array(ptos))
 	    {
-	      *value_stack_top(e) = fts_atom_array_get(fts_get_atom_array(ptos), fts_get_int(tos));
+	      fts_atom_array_t *aa;
+	      int idx;
+	      
+	      aa = fts_get_atom_array(ptos);
+	      idx = fts_get_int(tos);
+
+#ifdef EXPRESSION_TRACE_DEBUG
+	      fprintf(stderr, "Accessing array ");
+	      fprintf_atom_array(stderr, aa);
+	      fprintf(stderr, " Position %d ", idx);
+
+	      if (fts_atom_array_check(aa, idx))
+		{
+		  fts_atom_t a;
+
+		  fprintf(stderr, " value ");
+		  a = fts_atom_array_get(aa, idx);
+		  fprintf_atoms(stderr, 1, &a);
+		  fprintf(stderr, "\n");
+		}
+	      else
+		fprintf(stderr, "(Array index out of bound)\n");
+#endif
+
+	      if (fts_atom_array_check(aa, idx))
+		*value_stack_top(e) = fts_atom_array_get(aa, idx);
+	      else
+		return expression_error(e, FTS_EXPRESSION_ARRAY_ACCESS_ERROR, "Array index out of bound", 0);
 	    }
 	  else
 	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for array access", 0);
@@ -1227,7 +1260,7 @@ static void fts_expression_add_assignement(fts_expression_state_t *e, fts_symbol
 {
   fts_expr_assignement_t *p;
 
-  p = (fts_expr_assignement_t *) fts_heap_alloc(&expr_prop_heap);
+  p = (fts_expr_assignement_t *) fts_heap_alloc(expr_prop_heap);
 
   p->name  = name;
   p->value = *value;
@@ -1267,7 +1300,7 @@ static void fts_expression_add_var_ref(fts_expression_state_t *e, fts_symbol_t n
 {
   fts_expr_var_ref_t *p;
 
-  p = (fts_expr_var_ref_t *) fts_heap_alloc(&expr_var_ref_heap);
+  p = (fts_expr_var_ref_t *) fts_heap_alloc(expr_var_ref_heap);
 
   p->name  = name;
   p->next  = e->var_refs;
@@ -1287,10 +1320,10 @@ void fts_expression_add_variables_user(fts_expression_state_t *e, fts_object_t *
       
       p2 = p;
 
-      fts_variable_add_user(obj, p->name, obj);
+      fts_variable_add_user(obj->patcher, p->name, obj);
 
       p = p->next;
-      fts_heap_free((char *) p2, &expr_var_ref_heap);
+      fts_heap_free((char *) p2, expr_var_ref_heap);
     }
 
   e->var_refs = 0;
@@ -1315,7 +1348,7 @@ void fts_expression_printf_assignements(fts_expression_state_t *e)
 }
 
 
-fts_expression_state_t *fts_expression_eval(fts_object_t *object,
+fts_expression_state_t *fts_expression_eval(fts_patcher_t *scope,
 					    int expr_size, const fts_atom_t *expr,
 					    int result_size, fts_atom_t *result)
 {
@@ -1327,7 +1360,7 @@ fts_expression_state_t *fts_expression_eval(fts_object_t *object,
   fprintf(stderr, "\n");
 #endif
 
-  e = fts_get_expression_state(object, expr_size, expr);
+  e = fts_get_expression_state(scope, expr_size, expr);
 
   while ((e->count < result_size) && (e->in < expr_size))
     {
@@ -1379,8 +1412,8 @@ static int unique(int ac, const fts_atom_t *at, fts_atom_t *result)
 void
 fts_expressions_init(void)
 {
-  fts_heap_init(&expr_prop_heap, sizeof(fts_expr_assignement_t), 16);
-  fts_heap_init(&expr_var_ref_heap, sizeof(fts_expr_var_ref_t), 16);
+  expr_prop_heap    = fts_heap_new(sizeof(fts_expr_assignement_t));
+  expr_var_ref_heap = fts_heap_new(sizeof(fts_expr_var_ref_t));
 
   fts_hash_table_init(&fts_expression_fun_table);
 
@@ -1402,7 +1435,7 @@ fts_expressions_init(void)
   fts_symbol_set_operator(fts_s_bit_and, FTS_OP_BIT_AND);
   fts_symbol_set_operator(fts_s_bit_or,  FTS_OP_BIT_OR);
   fts_symbol_set_operator(fts_s_bit_xor,  FTS_OP_BIT_XOR);
-  fts_symbol_set_operator(fts_s_bit_not, FTS_OP_BIT_NOT);
+  /* fts_symbol_set_operator(fts_s_bit_not, FTS_OP_BIT_NOT); */
   fts_symbol_set_operator(fts_s_logical_and, FTS_OP_LOGICAL_AND);
   fts_symbol_set_operator(fts_s_logical_or,  FTS_OP_LOGICAL_OR);
   fts_symbol_set_operator(fts_s_logical_not, FTS_OP_LOGICAL_NOT);

@@ -146,6 +146,7 @@ public class FtsParse
   /**
    * Identify characters that always start a new token
    * also if not separated; they must be put in the new token.
+   * '~' suppressed !!!
    */
 
   final private boolean isStartToken()
@@ -158,7 +159,7 @@ public class FtsParse
 	    (c == '{') || (c == '}') ||
 	    (c == '+') || (c == '-') ||
 	    (c == '*') || (c == '/') ||
-	    (c == '%') || (c == '~') ||
+	    (c == '%') || 
 	    (c == '&') || (c == '|') ||
 	    (c == '^') || (c == '.') ||
 	    (c == '<') || (c == '>') ||

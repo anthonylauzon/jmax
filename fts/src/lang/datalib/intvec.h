@@ -3,7 +3,6 @@
 
 
 struct fts_intvec;
-
 typedef struct fts_intvec fts_intvec_t;
 
 
@@ -25,9 +24,5 @@ extern void fts_intvec_set_size(fts_intvec_t *x, int n);
 extern void fts_intvec_set(fts_intvec_t *x, int onset, int ac, const fts_atom_t *at);
 
 
-/* Remote call codes */
-
-#define INTEGER_VECTOR_SET    1
-#define INTEGER_VECTOR_UPDATE 2
 
 #endif

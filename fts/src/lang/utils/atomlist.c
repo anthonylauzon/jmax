@@ -24,7 +24,7 @@ fts_atom_list_cell_new( void )
   fts_atom_list_cell *cell;
 
   if (! atom_list_cell_heap)
-    atom_list_cell_heap = fts_heap_new(sizeof( fts_atom_list_cell), 16);
+    atom_list_cell_heap = fts_heap_new(sizeof( fts_atom_list_cell));
 
   cell = (fts_atom_list_cell *) fts_heap_alloc(atom_list_cell_heap);
   if (cell)
@@ -58,7 +58,7 @@ fts_atom_list_new( void)
   fts_atom_list_t *list;
 
   if (! atom_list_heap)
-    atom_list_heap = fts_heap_new(sizeof( fts_atom_list_t), 8);
+    atom_list_heap = fts_heap_new(sizeof( fts_atom_list_t));
 
   list = (fts_atom_list_t *) fts_heap_alloc(atom_list_heap);
 

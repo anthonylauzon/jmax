@@ -32,5 +32,9 @@ public class FtsModule
     // Install the Integer vector class
 
     Fts.registerRemoteDataClass("intvec_data", ircam.jmax.fts.FtsIntegerVector.class);
+
+    // Install the Object set class
+
+    Fts.registerRemoteDataClass("objectset_data", ircam.jmax.fts.FtsObjectSet.class);
   }
 }

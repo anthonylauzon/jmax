@@ -25,50 +25,6 @@ import ircam.jmax.mda.*;
 
 abstract public class FtsContainerObject extends FtsObject implements MaxData, FtsObjectWithData
 {
-  /// MaxData implementation
-
-  /** The Max Document his container belong to, or null in case
-   *  we should ask the parent
-   */
-
-  FtsPatcherDocument document;
-
-  public MaxDocument getDocument()
-  {
-    if (document == null)
-      {
-	if (parent != null)
-	  return parent.getDocument();
-	else
-	  return null;
-      }
-	    
-    else
-      return (MaxDocument) document;
-  }
-
-  public void setDocument(MaxDocument document)
-  {
-    this.document = (FtsPatcherDocument) document;
-  }
-
-  public String getName()
-  {
-    return getObjectName();
-  }
-
-  // FtsObjectWithData implementation
-
-  public MaxData getData()
-  {
-    return this;
-  }
-
-  public void setData(MaxData data) throws FtsException
-  {
-    throw new FtsException(new FtsError(FtsError.ILLEGAL_OPERATION, "Cannot set the content of a  patcher"));
-  }
-
   /** The objects contained in the patcher */
 
   private Vector objects     = new Vector();
@@ -323,56 +279,6 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
 
   /*****************************************************************************/
   /*                                                                           */
-  /*                    Special support for find                               */
-  /*                                                                           */
-  /*****************************************************************************/
-
-  /**
-   * Find all the objects that have a given pattern 
-   * in its descriptions.
-   */
-
-  public Vector find(String pattern)
-  {
-    Vector v = new Vector();
-
-    find(pattern, v);
-
-    return v;
-  }
-
-  /**
-   * Find all the objects that have a given pattern 
-   * in its descriptions.
-   */
-
-  void find(String pattern, Vector v)
-  {
-    // We do two loops to find all the objects in a patcher
-    // before looking in the contained patcher.
-
-    for (int i = 0; i < getObjects().size(); i++)
-      {
-	FtsObject obj   =  (FtsObject) getObjects().elementAt(i);
-	
-	if (obj.getDescription().indexOf(pattern) != -1)
-	  v.addElement(obj);
-      }
-
-    for (int i = 0; i < getObjects().size(); i++)
-      {
-	FtsObject obj   =  (FtsObject) getObjects().elementAt(i);
-
-	if (obj instanceof FtsContainerObject)
-	  {
-	    ((FtsContainerObject) obj).find(pattern, v);
-	  }
-      }
-  }
-
-
-  /*****************************************************************************/
-  /*                                                                           */
   /*                    Object Naming                                          */
   /*                                                                           */
   /*****************************************************************************/
@@ -416,6 +322,50 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
       }
 
     return null;
+  }
+
+  /// MaxData implementation
+
+  /** The Max Document his container belong to, or null in case
+   *  we should ask the parent
+   */
+
+  FtsPatcherDocument document;
+
+  public MaxDocument getDocument()
+  {
+    if (document == null)
+      {
+	if (parent != null)
+	  return parent.getDocument();
+	else
+	  return null;
+      }
+	    
+    else
+      return (MaxDocument) document;
+  }
+
+  public void setDocument(MaxDocument document)
+  {
+    this.document = (FtsPatcherDocument) document;
+  }
+
+  public String getName()
+  {
+    return getObjectName();
+  }
+
+  // FtsObjectWithData implementation
+
+  public MaxData getData()
+  {
+    return this;
+  }
+
+  public void setData(MaxData data) throws FtsException
+  {
+    throw new FtsException(new FtsError(FtsError.ILLEGAL_OPERATION, "Cannot set the content of a  patcher"));
   }
 }
 

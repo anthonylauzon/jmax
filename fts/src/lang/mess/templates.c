@@ -103,6 +103,8 @@ static fts_symbol_t fts_template_find_declared_file(fts_symbol_t name)
     {
       fts_template_t *template = (fts_template_t *) d;
 
+      /* it should use stat here !!! */
+
       file = fopen(fts_symbol_name(template->filename), "r");
 
       /* Here, we should handle differently declarations that are
@@ -146,6 +148,7 @@ static fts_symbol_t fts_template_find_path_file(fts_symbol_t name)
     {
       fts_symbol_t filename = template_search_path_table[i];
 	  
+      /* it should use stat here !!! */
 
       sprintf(buf, "%s/%s.tpl", fts_symbol_name(filename), fts_symbol_name(name));
 

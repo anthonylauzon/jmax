@@ -10,6 +10,10 @@ extern void fts_atom_array_free(fts_atom_array_t *v);
 
 #define fts_atom_array_set(v, i, a)  ((v)->at[(i)] = (a))
 
+#define fts_atom_array_check(v, i)  ((i >= 0) && (i < (v)->ac))
+
+extern void fprintf_atom_array(FILE *file, fts_atom_array_t *v);
+
 extern void fts_atom_array_init();
 
 #endif

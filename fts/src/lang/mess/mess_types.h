@@ -163,6 +163,8 @@ struct fts_plist
 
 typedef void (*fts_data_fun_t)( fts_data_t *d, int ac, const fts_atom_t *at);
 typedef void (*fts_data_export_fun_t)( fts_data_t *d);
+typedef void *(*fts_data_remote_constructor_t)( int ac, const fts_atom_t *at);
+typedef void *(*fts_data_remote_destructor_t)( fts_data_t *d);
 
 
 /*

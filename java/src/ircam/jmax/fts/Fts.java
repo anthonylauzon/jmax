@@ -213,6 +213,7 @@ public class Fts
 
 	    if (obj instanceof FtsContainerObject)
 	      {
+
 		ret = ((FtsContainerObject) obj).getObjectByName(name);
 
 		if (ret != null)
@@ -224,7 +225,12 @@ public class Fts
     return null;
   }
 
+  /* Data objects */
 
+  public FtsRemoteData newRemoteData(String name, Object args[])
+  {
+    return FtsRemoteMetaData.getRemoteMetaData().newInstance(name, args);
+  }
 
   /** Selection handling */
 

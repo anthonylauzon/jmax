@@ -703,7 +703,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
 
   // Experimental MDC
 
-  public void drawAnnotation(String property)
+  public void showAnnotation(String property)
   {
     if (itsFtsObject != null)
       {
@@ -711,6 +711,8 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
 	String annotation;
 	Object value;
 	Graphics g;
+
+	itsSketchPad.setAnnotating();
 
 	itsFtsObject.ask(property);
 	Fts.sync();

@@ -17,6 +17,7 @@ SOURCES = \
 	FtsHelpPatchTable.java		\
 	FtsInletObject.java		\
 	FtsIntegerVector.java		\
+	FtsObjectSet.java               \
 	FtsMessage.java			\
 	FtsMessageHandler.java		\
 	FtsMessageObject.java		\
@@ -47,7 +48,6 @@ SOURCES = \
 	FtsStandardObject.java		\
 	FtsSubProcessPort.java		\
 	FtsSubProcessServer.java	\
-	FtsTableObject.java		\
 	FtsUpdateGroupListener.java
 
 

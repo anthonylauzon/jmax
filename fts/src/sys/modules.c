@@ -135,6 +135,9 @@ fts_module_load(const char *name, const char *filename)
 
   /* test if the module has been already loaded  */
 
+  /* Temporarly commenter @@@ */
+
+  /*
   for (s = fts_installed_modules; s; s = s->next)
     {
       if (s->name && (! strcmp(s->name, name)))
@@ -143,6 +146,7 @@ fts_module_load(const char *name, const char *filename)
 	  return &module_loaded;
 	}
     }
+    */
 
   if (! filename)
     {

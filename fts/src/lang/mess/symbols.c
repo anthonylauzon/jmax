@@ -248,7 +248,7 @@ fts_predefine_symbols(void)
 				 * protocols and binary format (to reduce symbol table size)
 				 * The system support 256 symbols like this.
 				 */
-fts_heap_t symbol_heap;
+static fts_heap_t *symbol_heap;
 
 static struct _symbol_table
 {
@@ -268,7 +268,7 @@ fts_symbols_init(void)
   for (i = 0; i < SYMTABSIZE; i++)
     symbol_table.symbol_hash_table[i] = 0;
 
-  fts_heap_init(&symbol_heap, sizeof(struct fts_symbol_descr), 32);
+  symbol_heap = fts_heap_new(sizeof(struct fts_symbol_descr));
 
   fts_predefine_symbols();
 }
@@ -323,7 +323,7 @@ fts_new_symbol(const char *name)
   /* Second, the symbol do not exist already: 
      and make a new one */
 
-  sp = (struct fts_symbol_descr *) fts_heap_alloc(&symbol_heap);
+  sp = (struct fts_symbol_descr *) fts_heap_alloc(symbol_heap);
   sp->name = name;
   sp->operator = -1;
 
@@ -363,7 +363,7 @@ fts_new_symbol_copy(const char *name)
   s = fts_malloc(strlen(name)+1);
   strcpy(s, name);
 
-  sp = (struct fts_symbol_descr *) fts_heap_alloc(&symbol_heap);
+  sp = (struct fts_symbol_descr *) fts_heap_alloc(symbol_heap);
 
   sp->name = s;
   sp->operator = -1;

@@ -847,6 +847,30 @@ public class FtsServer
       }
   }
 
+  final void remoteCall( FtsRemoteData data, int  key, int id, String name, Object args[])
+  {
+    if (FtsServer.debug)
+      System.err.println( "remoteCall(" + data + ", " + key + ", " + id + ", " + name + ", " + args + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.remote_call_code);
+	port.sendRemoteData(data);
+	port.sendInt(key);
+	port.sendInt(id);
+	port.sendString(name);
+
+	if (args != null)
+	  port.sendArray( args); // we may have zero args call
+
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+	System.err.println("IOException in FtsServer:remoteCall(data, key, id, name, args)");
+      }
+  }
+
   /**
    * Sync point with FTS.
    * Send a ping message, and sychroniuosly
@@ -1081,13 +1105,11 @@ public class FtsServer
 	      break;
 	    }
 
-	  int id = ((Integer) msg.getArgument(0)).intValue();
-
-	  FtsRemoteData data = FtsRemoteDataID.get( id);
+	  FtsRemoteData data = (FtsRemoteData) msg.getArgument(0);
 
 	  if (data == null)
 	    {
-	      System.err.println( "FtsServer: Unknown data " + id);
+	      System.err.println( "FtsServer: Unknown data");
 	      return;
 	    }
 

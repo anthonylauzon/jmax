@@ -1983,25 +1983,28 @@ Rectangle previousResizeRect = new Rectangle();
 
   private boolean annotating = false;
 
+  void setAnnotating()
+  {
+    annotating = true;
+  }
+
   public void showAnnotations(String property)
   {
     if (! annotating)
       {
 	ErmesObject aObject;
 
-	annotating = true;
-
 	if (currentSelection.itsObjects.size() == 0)
 	  for (Enumeration e =itsElements.elements(); e.hasMoreElements();)
 	    {
 	      aObject = (ErmesObject) e.nextElement();
-	      aObject.drawAnnotation(property);
+	      aObject.showAnnotation(property);
 	    }
 	else
 	  for (Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();)
 	    {
 	      aObject = (ErmesObject) e.nextElement();
-	      aObject.drawAnnotation(property);
+	      aObject.showAnnotation(property);
 	    }
       }
   }

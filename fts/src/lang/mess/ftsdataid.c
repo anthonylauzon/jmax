@@ -49,6 +49,16 @@ void fts_data_id_put( int id, fts_data_t *d)
   data_table[id] = d;
 }
 
+/* We should have a way to recycle ids in big deletes */
+
+void fts_data_id_remove( int id, fts_data_t *d)
+{
+  if ((id <= 0) || (id >= data_table_size))
+    return;
+    
+  data_table[id] = 0;
+}
+
 fts_data_t *fts_data_id_get( int id)
 {
   if (id <= 0 || id > data_table_size)

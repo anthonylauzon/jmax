@@ -6,7 +6,7 @@ extern void fts_expressions_init(void);
 typedef struct fts_expression_state fts_expression_state_t;
 struct fts_expression_state;
 
-extern fts_expression_state_t *fts_expression_eval(fts_object_t *object,
+extern fts_expression_state_t *fts_expression_eval(fts_patcher_t *scope,
 						   int expr_size, const fts_atom_t *expr,
 						   int result_size, fts_atom_t *result);
 
@@ -23,6 +23,7 @@ typedef int (* fts_expression_fun_t)(int ac, const fts_atom_t *at, fts_atom_t *r
 #define  FTS_EXPRESSION_OP_TYPE_ERROR          -3
 #define  FTS_EXPRESSION_ERROR_OBJECT_REFERENCE -4
 #define  FTS_EXPRESSION_UNDEFINED_FUNCTION     -5
+#define  FTS_EXPRESSION_ARRAY_ACCESS_ERROR     -6
 
 
 extern int  fts_expression_get_status(fts_expression_state_t *e);

@@ -362,11 +362,11 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   /* Define the "args" variable */
 
-  this->args = fts_atom_array_new_fill(ac, at);
+  this->args = fts_atom_array_new_fill(ac - 1, at + 1);
 
-  fts_variable_define(o, fts_s_args, o);
+  fts_variable_define(this, fts_s_args, o);
   fts_set_atom_array(&va, this->args);
-  fts_variable_restore(o, fts_s_args, &va, o);
+  fts_variable_restore(this, fts_s_args, &va, o);
 
   /* Put the name as property if any */
 
@@ -448,7 +448,7 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   /* Delete all the variables */
 
   fts_atom_array_free(this->args);
-  fts_variables_undefine((fts_object_t *)this, (fts_object_t *)this);
+  fts_variables_undefine(this, (fts_object_t *)this);
 
   /* delete the inlets and inlets tables */
 
@@ -540,16 +540,16 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
 void fts_patcher_assign_variable(fts_symbol_t name, fts_atom_t *value, void *data)
 {
-  fts_object_t *obj = (fts_object_t *)data;
+  fts_patcher_t *this = (fts_patcher_t *)data;
 
-  if (fts_variable_is_suspended(obj, name))
+  if (fts_variable_is_suspended(this, name))
     {
-      fts_variable_restore(obj, name, value, obj);
+      fts_variable_restore(this, name, value, (fts_object_t *)this);
     }
   else
     {
-      fts_variable_define(obj, name, obj);
-      fts_variable_restore(obj, name, value, obj);
+      fts_variable_define(this, name, (fts_object_t *)this);
+      fts_variable_restore(this, name, value, (fts_object_t *)this);
     }
 }
 
@@ -562,7 +562,7 @@ fts_patcher_t *fts_patcher_redefine_description(fts_patcher_t *this, int aoc, co
 
   /* 1- suspend  the patcher internal variables if any */
 
-  fts_variables_suspend((fts_object_t *) this, (fts_object_t *) this);
+  fts_variables_suspend(this, (fts_object_t *) this);
 
   /* 1-bis: free the args array */
 
@@ -572,7 +572,7 @@ fts_patcher_t *fts_patcher_redefine_description(fts_patcher_t *this, int aoc, co
      Ignore the errors, for the moment !!
      */
 
-  e = fts_expression_eval((fts_object_t *)this, aoc, aot, 1024, at);
+  e = fts_expression_eval(((fts_object_t *)this)->patcher, aoc, aot, 1024, at);
   ac = fts_expression_get_count(e);
 
   /* 2 bis, reallocate the atom array */
@@ -582,7 +582,7 @@ fts_patcher_t *fts_patcher_redefine_description(fts_patcher_t *this, int aoc, co
   /* 3- set the new variables */
 
   fts_set_atom_array(&va, this->args);
-  fts_variable_restore((fts_object_t *)this, fts_s_args, &va, (fts_object_t *)this);
+  fts_variable_restore(this, fts_s_args, &va, (fts_object_t *)this);
   fts_expression_map_to_assignements(e, fts_patcher_assign_variable, (void *) this);
 
   /* 4- register the patcher as user of the used variables */
@@ -591,7 +591,7 @@ fts_patcher_t *fts_patcher_redefine_description(fts_patcher_t *this, int aoc, co
 
   /* 5- undefine all the locals that are still suspended  */
 
-  fts_variables_undefine_suspended((fts_object_t *) this, (fts_object_t *) this);
+  fts_variables_undefine_suspended(this, (fts_object_t *) this);
 
   return this;
 }

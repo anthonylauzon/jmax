@@ -25,18 +25,18 @@ extern void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object);
    redefined.
  */
 
-extern void fts_variable_define(fts_object_t *scope, fts_symbol_t name, fts_object_t *owner);
+extern void fts_variable_define(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *owner);
 
 /* Verify if a fts_variable_define can be issued in the passed scope.
    Note that this is not like testing if a variable is bound; the binding can be 
    inherited from a surrounding patcher.
  */
 
-extern int fts_variable_can_define(fts_object_t *scope, fts_symbol_t name);
+extern int fts_variable_can_define(fts_patcher_t *scope, fts_symbol_t name);
 
 /* Return 1 if the variable exists *and* it is suspended */
 
-extern int fts_variable_is_suspended(fts_object_t *scope, fts_symbol_t name);
+extern int fts_variable_is_suspended(fts_patcher_t *scope, fts_symbol_t name);
 
 /*
   Remove the variable bound to the name in the scope represented by the object.
@@ -48,7 +48,7 @@ extern int fts_variable_is_suspended(fts_object_t *scope, fts_symbol_t name);
    binding.
    */
 
-extern void fts_variable_undefine(fts_object_t *scope, fts_symbol_t name);
+extern void fts_variable_undefine(fts_patcher_t *scope, fts_symbol_t name);
 
 
 /*
@@ -56,7 +56,7 @@ extern void fts_variable_undefine(fts_object_t *scope, fts_symbol_t name);
   by 'owner'
   */
 
-extern void fts_variables_undefine(fts_object_t *scope, fts_object_t *owner);
+extern void fts_variables_undefine(fts_patcher_t *scope, fts_object_t *owner);
 
 /*
   Suspend  the variable bound to the name in the scope represented by the object;
@@ -69,29 +69,29 @@ extern void fts_variables_undefine(fts_object_t *scope, fts_object_t *owner);
   */
 
 
-extern void fts_variable_suspend(fts_object_t *scope, fts_symbol_t name);
+extern void fts_variable_suspend(fts_patcher_t *scope, fts_symbol_t name);
 
 /*
   Like fts_variable_suspend, but act on all the variables in the current scope defined
   by 'owner'
   */
 
-extern void fts_variables_suspend(fts_object_t *scope, fts_object_t *owner);
+extern void fts_variables_suspend(fts_patcher_t *scope, fts_object_t *owner);
 
 /*
  * Undefine all the variables in the given scope that are suspended.
  * 
  */
 
-extern void fts_variables_undefine_suspended(fts_object_t *scope, fts_object_t *owner);
+extern void fts_variables_undefine_suspended(fts_patcher_t *scope, fts_object_t *owner);
 
 /* Restore a variable */
 
-extern void fts_variable_restore(fts_object_t *scope, fts_symbol_t name, fts_atom_t *value, fts_object_t *owner);
+extern void fts_variable_restore(fts_patcher_t *scope, fts_symbol_t name, fts_atom_t *value, fts_object_t *owner);
 
 /* Access the value of a variable in the scope represented by an object */
 
-extern fts_atom_t *fts_variable_get_value(fts_object_t *scope, fts_symbol_t name);
+extern fts_atom_t *fts_variable_get_value(fts_patcher_t *scope, fts_symbol_t name);
 
 
 /*
@@ -100,7 +100,7 @@ extern fts_atom_t *fts_variable_get_value(fts_object_t *scope, fts_symbol_t name
   be redefined when the variable change value.
   */
 
-extern void fts_variable_add_user(fts_object_t *scope, fts_symbol_t name, fts_object_t *user);
+extern void fts_variable_add_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user);
 
 /*
   A variable wannabe is an object that want to redefine that variable.
@@ -108,8 +108,8 @@ extern void fts_variable_add_user(fts_object_t *scope, fts_symbol_t name, fts_ob
   should be selected to become the new variable definer.
   */
 
-extern void fts_variable_add_wannabe(fts_object_t *scope, fts_symbol_t name, fts_object_t *wannabe);
-extern void fts_variable_remove_wannabe(fts_object_t *scope, fts_symbol_t name, fts_object_t *wannabe);
+extern void fts_variable_add_wannabe(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *wannabe);
+extern void fts_variable_remove_wannabe(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *wannabe);
 
 
 

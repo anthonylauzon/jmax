@@ -53,8 +53,9 @@
 static const fts_atom_t *fts_class_get_prop(fts_class_t *cl, fts_symbol_t property);
 static const fts_atom_t *fts_class_inlet_get_prop(fts_class_t *cl, int inlet, fts_symbol_t property);
 static const fts_atom_t *fts_class_outlet_get_prop(fts_class_t *cl, int outlet, fts_symbol_t property);
-static fts_heap_t daemon_heap;
-static fts_heap_t plist_heap;
+static fts_heap_t *daemon_heap;
+static fts_heap_t *plist_cell_heap;
+static fts_heap_t *plist_heap;
 
 
 /** Local and naive implementation of property lists 
@@ -72,7 +73,7 @@ struct fts_plist_cell {
 static fts_plist_t *
 fts_plist_new( void)
 {
-  fts_plist_t *tmp = (fts_plist_t *)fts_malloc(sizeof( fts_plist_t));
+  fts_plist_t *tmp = (fts_plist_t *)fts_heap_alloc(plist_heap);
 
   tmp->head = 0;
 
@@ -88,11 +89,11 @@ fts_plist_free( fts_plist_t *plist)
   for( c = plist->head; c; c = next)
     {
       next = c->next;
-      fts_heap_free((char *)c, &plist_heap);
+      fts_heap_free((char *)c, plist_cell_heap);
     }
 
   plist->head = 0;
-  fts_free( plist);
+  fts_heap_free( (char *)plist, plist_heap);
 }
 
 
@@ -129,7 +130,7 @@ fts_plist_put( fts_plist_t *plist, fts_symbol_t property, const fts_atom_t *valu
   for( current = plist->head; current; current = current->next )
     prev = current;
 
-  insert = (struct fts_plist_cell *) fts_heap_alloc(&plist_heap);
+  insert = (struct fts_plist_cell *) fts_heap_alloc(plist_cell_heap);
 
   insert->property =  property;
   insert->value = *value;
@@ -160,7 +161,7 @@ fts_plist_remove( fts_plist_t *plist, fts_symbol_t property)
 	  else
 	    plist->head = next;
 
-	  fts_heap_free((char *)current, &plist_heap);
+	  fts_heap_free((char *)current, plist_cell_heap);
 	}
       else
 	prev = current;
@@ -189,7 +190,7 @@ fts_property_daemon_list_add(fts_daemon_entry_t **list,
 			     fts_symbol_t         property,
 			     fts_property_daemon_t daemon)
 {
-  fts_daemon_entry_t *entry = (fts_daemon_entry_t *) fts_heap_alloc(&daemon_heap);
+  fts_daemon_entry_t *entry = (fts_daemon_entry_t *) fts_heap_alloc(daemon_heap);
 
   entry->action   = action;
   entry->property = property;
@@ -216,7 +217,7 @@ fts_property_daemon_list_remove(fts_daemon_entry_t **list,
 	  old = *p;
 	  *p = (*p)->next;
 
-	  fts_heap_free((char *) old, &daemon_heap);	  
+	  fts_heap_free((char *) old, daemon_heap);	  
 	}
     }
 }
@@ -806,7 +807,7 @@ struct changes
   struct changes *next;
 };
 
-static fts_heap_t changes_heap;
+static fts_heap_t *changes_heap;
 static struct changes *changes_queue_head = 0;
 static struct changes *urgent_changes_queue_head = 0;
 
@@ -826,7 +827,7 @@ fts_object_get_next_change(fts_symbol_t *property, fts_object_t **object)
 
       changes_queue_head = p->next;
 
-      fts_heap_free((char *)p, &changes_heap);
+      fts_heap_free((char *)p, changes_heap);
 
       return 1;
     }
@@ -850,7 +851,7 @@ fts_object_get_next_change_urgent(fts_symbol_t *property, fts_object_t **object)
 
       urgent_changes_queue_head = p->next;
 
-      fts_heap_free((char *)p, &changes_heap);
+      fts_heap_free((char *)p, changes_heap);
 
       return 1;
     }
@@ -875,7 +876,7 @@ fts_object_property_changed(fts_object_t *obj, fts_symbol_t property)
      if it is null, there are no element in the list.
    */
 
-  p = (struct changes *)fts_heap_alloc(&changes_heap);
+  p = (struct changes *)fts_heap_alloc(changes_heap);
 
   p->property = property;
   p->obj = obj;
@@ -906,7 +907,7 @@ fts_object_property_changed_urgent(fts_object_t *obj, fts_symbol_t property)
      if it is null, there are no element in the list.
    */
 
-  p = (struct changes *)fts_heap_alloc(&changes_heap);
+  p = (struct changes *)fts_heap_alloc(changes_heap);
 
   p->property = property;
   p->obj = obj;
@@ -969,7 +970,7 @@ fts_object_reset_changed(fts_object_t *obj)
 
 	  (*pp) = (*pp)->next;
 
-	  fts_heap_free((char *)p, &changes_heap);
+	  fts_heap_free((char *)p, changes_heap);
 	}
       else
 	pp = &((*pp)->next);
@@ -987,7 +988,7 @@ fts_object_reset_changed(fts_object_t *obj)
 
 	  (*pp) = (*pp)->next;
 
-	  fts_heap_free((char *)p, &changes_heap);
+	  fts_heap_free((char *)p, changes_heap);
 	}
       else
 	pp = &((*pp)->next);
@@ -998,9 +999,10 @@ fts_object_reset_changed(fts_object_t *obj)
 
 void fts_properties_init(void)
 {
-  fts_heap_init(&daemon_heap, sizeof(struct daemon_list), 32);
-  fts_heap_init(&plist_heap, sizeof(struct fts_plist_cell), 32);
-  fts_heap_init(&changes_heap, sizeof(struct changes), 256);
+  daemon_heap  = fts_heap_new(sizeof(struct daemon_list));
+  plist_cell_heap   = fts_heap_new(sizeof(struct fts_plist_cell));
+  plist_heap   = fts_heap_new(sizeof(fts_plist_t));
+  changes_heap = fts_heap_new(sizeof(struct changes));
 }
 
 

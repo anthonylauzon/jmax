@@ -50,8 +50,13 @@ fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
 	fprintf(f,"<void>%s", ps);
       else if (fts_is_error(&at[i]))
 	fprintf(f,"<error>%s", ps);
-      else
+      else if (fts_is_atom_array(&at[i]))
+	fprintf_atom_array(f, fts_get_atom_array(&at[i]));
+      else if (fts_get_type(&at[i]))
 	fprintf(f,"<%s>%lx%s", fts_symbol_name(fts_get_type(&at[i])), 
+		(unsigned long) fts_get_ptr( &at[i]), ps);
+      else
+	fprintf(f,"<NULL TYPE>%lx%s", 
 		(unsigned long) fts_get_ptr( &at[i]), ps);
     }
 }
