@@ -5,7 +5,7 @@ import java.io.*;
 
 import ircam.jmax.fts.*;
 
-public class MaxDataSource
+abstract public class MaxDataSource
 {
 
   /** This static method produce a MaxDataSource of the good
@@ -52,6 +52,10 @@ public class MaxDataSource
   {
     return new MaxFileDataSource(file);
   }  
+
+  /** Return a name that can be used as document name */
+
+  abstract public String getName();
 }
 
 

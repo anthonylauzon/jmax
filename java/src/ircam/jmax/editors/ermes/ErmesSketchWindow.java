@@ -751,7 +751,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 
     if (deleteOnFts) itsPatcher.close();
     if(!(alreadySaved || isSubPatcher)){
-      FileNotSavedDialog aDialog = new FileNotSavedDialog(this);
+      FileNotSavedDialog aDialog = new FileNotSavedDialog(this, itsData);
       aDialog.setLocation(300, 300);
       aDialog.setVisible(true);
       if(aDialog.GetNothingToDoFlag()) return false;
@@ -785,16 +785,10 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   }
 
   private boolean SaveBody(){
-    // This line will not work for patches loaded from
-    // sources that are not files !!!
-      
-    //e.m.1103setTitle(((MaxFileDataSource)itsData.getDataSource()).getFile().getName()); 
-    setTitle(itsData.getDataSource().toString()); 
-    CreateFtsGraphics(this);
 
-    // This code is temporary, just to test the MDA
-    // save architecture; real code will substitute
-    // the whole thing.
+    setTitle(itsData.getDataSource().toString()); 
+
+    CreateFtsGraphics(this);
 
     try
       {
@@ -803,10 +797,13 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       }
     catch (MaxDataException e)
       {
-	System.out.println("ERROR " + e + " while saving " + itsData.getDataSource());
-	e.printStackTrace(); // temporary, MDC
+	ErrorDialog aErr = new ErrorDialog(this, e.getMessage());
+	aErr.setLocation(100, 100);
+	aErr.show();  
 	return false;
       }
+
+
 
     alreadySaved = true;
     neverSaved = false;

@@ -87,6 +87,7 @@ abstract public class MaxData
   {
     this.source = source;
     this.handler = MaxDataHandler.findDataHandlerFor(source);
+    this.name = source.getName();
   }
 
   /** To set both the handler and the source at the same time;
@@ -97,6 +98,7 @@ abstract public class MaxData
   {
     this.source = source;
     this.handler = handler;
+    this.name = source.getName();
   }
 
   /** Getting the type */
@@ -175,7 +177,7 @@ abstract public class MaxData
     else if (handler == null)
       return false;
     else
-      return  handler.canSaveTo(source);
+      return handler.canSaveTo(source);
   }
     
   /** Save the instance to its data source */

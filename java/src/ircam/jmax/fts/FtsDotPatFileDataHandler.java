@@ -68,7 +68,6 @@ public class FtsDotPatFileDataHandler extends MaxFileDataHandler
     FtsPatchData obj = new FtsPatchData();
 
     obj.setPatcher(patcher);
-    obj.setName(file.getName());
 
     return obj;
   }

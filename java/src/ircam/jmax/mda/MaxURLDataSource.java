@@ -20,4 +20,12 @@ class MaxURLDataSource extends MaxDataSource
   {
     return url.toString();
   }
+
+  public String getName()
+  {
+    String name;
+
+    name = url.toString();
+    return name.substring(0, name.lastIndexOf('.'));
+  }
 }

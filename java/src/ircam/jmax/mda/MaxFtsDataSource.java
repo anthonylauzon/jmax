@@ -20,4 +20,12 @@ class MaxFtsDataSource extends MaxDataSource
   {
     return locator.toString();
   }
+
+  public String getName()
+  {
+    String name;
+
+    name = locator.toString();
+    return name.substring(0, name.lastIndexOf('.'));
+  }
 }

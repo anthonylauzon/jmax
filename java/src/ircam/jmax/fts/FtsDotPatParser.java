@@ -473,6 +473,11 @@ public class FtsDotPatParser
     in.nextToken(); 
     inlet  = (int) in.getNVal();
 
+    //    System.err.println("In " + parent + " adding connection " + fromIdx + " " + outlet + " " + toIdx + " " + inlet);
+
+    // for (int i = 0; i < objects.size(); i++)
+    //      System.err.println("Object " + (objects.size() - i - 1) + " : " + objects.elementAt(i));
+
     from = (FtsObject) objects.elementAt(objects.size() - fromIdx - 1);
     to = (FtsObject) objects.elementAt(objects.size() - toIdx - 1);
 

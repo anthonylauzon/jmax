@@ -17,9 +17,12 @@ public class FileNotSavedDialog extends Dialog implements ActionListener, KeyLis
 
   public FileNotSavedDialog(Frame theFrame, MaxData theData) {
     super(theFrame, "File Not Saved Message", true);
-    itsMessage = ("File " + (((MaxFileDataSource)theData.getDataSource()).getFile().getName()) +
-		  " is not saved.\n Do you want to save it now?");
-    
+
+    if (theData.getDataSource() != null)
+      itsMessage = "File " + theData.getDataSource() + " is not saved.\n Do you want to save it now?";
+    else
+      itsMessage = ("Patch " + theData.getName() + " is not saved.\n Do you want to save it now?");
+
     setLayout(new BorderLayout());
     
     //Create middle section.

@@ -6,7 +6,7 @@ usage ()
 
 Usage:
 
-  make-abstraction-index [-all] dir
+  jmax-make-abstraction-index [-all] dir
 
 USAGE_EOF
 }

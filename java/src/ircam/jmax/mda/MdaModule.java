@@ -13,10 +13,6 @@ public class MdaModule
 
     MaxDataHandler.installDataHandler( new MaxTclFileDataHandler());
 
-    // The following is to review.
-
-    MaxDataHandler.installDataHandler( new MaxTclStringDataHandler());
-
     // Install the tcl commands for Mda
 
     ircam.jmax.mda.tcl.TclMdaPackage.installPackage();
