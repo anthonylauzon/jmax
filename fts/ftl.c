@@ -607,9 +607,8 @@ static void ftl_program_update_instruction_infos( ftl_program_t *prog)
 static int ftl_program_allocate_signals( ftl_program_t *prog)
 {
   fts_iterator_t iter;
-  unsigned long total_size;
+  unsigned long total_size, i;
   float *p;
-  int i;
 
   total_size = 0;
 

@@ -807,8 +807,6 @@ fts_midiport_set_input(fts_midiport_t *port)
 
   for(type=midi_type_any; type<n_midi_types; type++)
     {
-      int i;
-
       switch(type)
 	{
 	case midi_type_any:

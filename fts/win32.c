@@ -150,7 +150,6 @@ void fts_platform_init( int argc, char **argv)
   WORD wVersionRequested;
   WSADATA wsaData;
   int result;
-  struct hostent *hostptr;
   SOCKET sock;
 
   wVersionRequested = MAKEWORD(2, 2);

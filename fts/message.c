@@ -58,8 +58,6 @@ fts_message_clear(fts_message_t *mess)
 void
 fts_message_set(fts_message_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  int i;
-
   mess->s = s;
   fts_array_clear(&mess->args);
   fts_array_append(&mess->args, ac, at);
@@ -206,8 +204,6 @@ fts_object_t *fts_objstack[FTS_OBJSTACK_SIZE];
 fts_status_t 
 fts_send_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_status_t status;
-
   fts_inlet_decl_t *in;
   fts_class_mess_t *mess;
   fts_class_t *cl = o->head.cl;
@@ -238,12 +234,11 @@ fts_send_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 fts_status_t
 fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at, fts_symbol_t *symb_cache, fts_method_t *mth_cache)
 {
-  fts_status_t status;
   fts_inlet_decl_t *in;
   fts_class_mess_t *mess;
   fts_class_t *cl = o->head.cl;
   fts_class_mess_t **messtable;
-  unsigned int i;
+  int i;
 
   if (winlet == fts_SystemInlet)
     in = cl->sysinlet;
@@ -316,7 +311,6 @@ fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s,
   fts_connection_t *conn;
   fts_class_t *cl = o->head.cl;
   fts_outlet_decl_t *out;
-  fts_status_t status;
 
   if (woutlet >= cl->noutlets || woutlet < 0)
     return &fts_OutletOutOfRange;

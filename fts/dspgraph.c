@@ -501,7 +501,7 @@ gen_outputs(fts_object_t *o, fts_dsp_descr_t *descr, int vector_size, double sam
         }
     }
 
-  sr = sample_rate * (double)size / (double)vector_size;
+  sr = (float) (sample_rate * (double)size / (double)vector_size);
 
   /* note that output signals are assigned only when the output have at least one connection to a dsp object */
   for (i=0, iop=descr->out; i< descr->noutputs; i++, iop++)

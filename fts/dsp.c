@@ -137,7 +137,7 @@ dsp_set_tick_size(void *listener, fts_symbol_t name, const fts_atom_t *value)
 {
   if (fts_is_number(value))
     {
-      float n = fts_get_number_int(value);
+      int n = fts_get_number_int(value);
 
       dsp_tick_size = n;
       dsp_reset();

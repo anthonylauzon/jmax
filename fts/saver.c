@@ -305,7 +305,6 @@ fts_bmax_add_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
       /* resize symbol table  */
       fts_symbol_t *new_table;
       int new_size;
-      int i;
 
       new_size  = (f->symbol_table_size * 3) / 2;
       new_table = (fts_symbol_t *) fts_malloc(new_size * sizeof(fts_symbol_t)); 

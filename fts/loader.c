@@ -132,7 +132,7 @@ static int fts_binary_file_map( FILE *f, fts_binary_file_desc_t *desc)
     {
       int i = 0;
       char buf[1024]; /* max  symbol size */
-      int symbolIndex = 0;
+      unsigned int symbolIndex = 0;
 
       desc->symbols = (fts_symbol_t *)fts_malloc( header.n_symbols * sizeof( fts_symbol_t));
 

@@ -620,7 +620,6 @@ write16bit(fts_midifile_t *file, int data)
 int
 fts_midifile_write_header(fts_midifile_t *file, int format, int n_tracks, int division) 
 {
-  int i;
   unsigned int ident = MThd; /* head chunk identifier */
   unsigned int length = 6; /* chunk length */
     

@@ -157,6 +157,7 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   const char *host = "127.0.0.1";
   struct hostent *hostptr;
   fts_symbol_t value;
+  struct in_addr addr;
 
   /*
    * Get values from command line args
@@ -171,13 +172,24 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   this->stream = (fts_cmd_args_get( s_tcp) != NULL);
 
-  hostptr = gethostbyname( host);
+  /* convert the host name to the inet address. call gethostbyname
+     only when the host is not in a numbers-and-dots notation. this
+     avoids a name resolution on windows machines */
+  addr.s_addr = inet_addr( host);
 
-  if ( !hostptr)
-    {
-      fts_log("[oldclient]: Unknown host: %s\n", host);
-      return;
-    }
+  if (addr.s_addr == INADDR_NONE) {
+
+    /* host is not a numbers-and-dots notation. resolve the name. */
+    hostptr = gethostbyname( host);
+
+    if ( !hostptr)
+      {
+	fts_log("[oldclient]: Unknown host: %s\n", host);
+	return;
+      }
+
+    addr = *(struct in_addr *)hostptr->h_addr_list[0];
+  }
 
   fts_stack_init( &this->output_buffer, unsigned char);
 
@@ -198,7 +210,7 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
       my_addr.sin_port = 0;
       
-      if (bind( this->socket, &my_addr, sizeof(struct sockaddr_in)) == -1)
+      if (bind( this->socket, (const struct sockaddr *) &my_addr, sizeof(struct sockaddr_in)) == -1)
 	{
 	  fts_log( "[oldclient] cannot bind socket (%s)\n", strerror( errno));
 	  return;
@@ -206,11 +218,11 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       
       memset( &this->client_addr, 0, sizeof(this->client_addr));
       this->client_addr.sin_family = AF_INET;
-      this->client_addr.sin_addr = *(struct in_addr *)hostptr->h_addr_list[0];
+      this->client_addr.sin_addr = addr;
       this->client_addr.sin_port = htons(port);
 
       /* Connect the socket to the client */
-      if ( connect(this->socket, &this->client_addr, sizeof(this->client_addr)) < 0) 
+      if ( connect(this->socket, (const struct sockaddr *) &this->client_addr, sizeof(this->client_addr)) < 0) 
 	{
 	  fts_log( "[oldclient] cannot connect (%s)\n", strerror( errno));
 	  return;
@@ -234,7 +246,7 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
       my_addr.sin_port = 0;
       
-      if (bind( this->socket, &my_addr, sizeof(struct sockaddr_in)) == -1)
+      if (bind( this->socket, (const struct sockaddr *) &my_addr, sizeof(struct sockaddr_in)) == -1)
 	{
 	  fts_log( "[oldclient] cannot bind socket (%s)\n", strerror( errno));
 	  return;
@@ -246,7 +258,9 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       this->client_addr.sin_port = htons(port);
       
       /* Send an init packet: empty content, just the packet */
-      if ( sendto( this->socket, "init", 4, 0, &this->client_addr, sizeof( this->client_addr)) < 0)
+      if ( sendto( this->socket, "init", 4, 0, 
+		   (const struct sockaddr *) &this->client_addr, 
+		   sizeof( this->client_addr)) < 0)
 	{
 	  fts_log( "[oldclient] cannot send init packet (%s)\n", strerror( errno));
 	  return;
@@ -387,7 +401,9 @@ static void oldclient_flush( oldclient_t *this)
       }
 #endif
       
-      r = sendto( this->socket, p, len, 0, &this->client_addr, sizeof( this->client_addr));
+      r = sendto( this->socket, p, len, 0, 
+		  (const struct sockaddr *) &this->client_addr, 
+		  sizeof( this->client_addr));
 
       if ( r != len)
 	fts_log( "[oldclient] error sending (%s)\n", strerror( errno));
