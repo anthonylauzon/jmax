@@ -65,7 +65,6 @@ static int yyerror( const char *msg);
 %token <a> TK_FLOAT
 %token <a> TK_SYMBOL
 %token TK_SEMI
-%token TK_PAR
 %token TK_OPEN_PAR
 %token TK_CLOSED_PAR
 %token TK_OPEN_CPAR
@@ -74,6 +73,7 @@ static int yyerror( const char *msg);
 
 /* Tokens that are used only to label nodes in the parse tree */
 %token TK_TUPLE
+%token TK_PAR
 %token TK_ELEMENT
 
 /* Operators */
@@ -104,10 +104,10 @@ static int yyerror( const char *msg);
 %type <n> primitive
 %type <n> tuple
 %type <n> reference
+%type <n> variable
 %type <n> par
 %type <n> unary
 %type <n> binary
-%type <n> element
 
 %%
 /* **********************************************************************
@@ -139,20 +139,6 @@ toplevel_term: primitive
 	| par
 ;
 
-term_list: term_list term  /*---*/ %prec TK_SPACE
-		{ $$ = fts_parsetree_new( TK_SPACE, 0, $1, $2); }
-	|
-		{ $$ = 0; }
-;
-
-term: primitive
-	| reference
-	| par
-	| unary
-	| binary
-	| element
-;
-
 primitive: TK_INT
 		{ $$ = fts_parsetree_new( TK_INT, &($1), 0, 0); }
 	| TK_FLOAT
@@ -166,7 +152,25 @@ tuple: TK_OPEN_CPAR term_list TK_CLOSED_CPAR
 		{ $$ = fts_parsetree_new( TK_TUPLE, 0, $2, 0); }
 ;
 
-reference: TK_DOLLAR TK_SYMBOL
+term_list: term_list term  /*---*/ %prec TK_SPACE
+		{ $$ = fts_parsetree_new( TK_SPACE, 0, $1, $2); }
+	|
+		{ $$ = 0; }
+;
+
+term: primitive
+	| reference
+	| par
+	| unary
+	| binary
+;
+
+reference: variable TK_OPEN_SQPAR term_list TK_CLOSED_SQPAR
+		{ $$ = fts_parsetree_new( TK_ELEMENT, 0, $1, $3); }
+	| variable
+;
+
+variable: TK_DOLLAR TK_SYMBOL
 		{ $$ = fts_parsetree_new( TK_DOLLAR, &($2), 0, 0); }
 	| TK_DOLLAR TK_INT
 		{ $$ = fts_parsetree_new( TK_DOLLAR, &($2), 0, 0); }
@@ -174,10 +178,10 @@ reference: TK_DOLLAR TK_SYMBOL
 
 par: TK_OPEN_PAR 
 		{ ((parser_data_t *)parm)->par_level++; } 
-	term
+	term_list
 		{ ((parser_data_t *)parm)->par_level--; } 
 	TK_CLOSED_PAR
-		{ $$ = $3; }
+		{ $$ = fts_parsetree_new( TK_PAR, 0, $3, 0); }
 ;
 
 unary: TK_PLUS term %prec TK_UPLUS
@@ -220,10 +224,6 @@ binary: term TK_PLUS term
 		{ $$ = fts_parsetree_new( TK_SMALLER, 0, $1, $3); }
 	| term TK_SMALLER_EQUAL term
 		{ $$ = fts_parsetree_new( TK_SMALLER_EQUAL, 0, $1, $3); }
-;
-
-element: term TK_OPEN_SQPAR term_list TK_CLOSED_SQPAR
-		{ $$ = fts_parsetree_new( TK_ELEMENT, 0, $1, $3); }
 ;
 
 %%
@@ -351,9 +351,6 @@ token_table_init( void)
   token_table_put_entry( fts_s_greater_equal, TK_GREATER_EQUAL, 1);
   token_table_put_entry( fts_s_smaller, TK_SMALLER, 1);
   token_table_put_entry( fts_s_smaller_equal, TK_SMALLER_EQUAL, 1);
-#if 0
-  token_table_put_entry( fts_s_dot, TK_DOT, 1);
-#endif
 }
 
 /* **********************************************************************

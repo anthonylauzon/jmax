@@ -63,7 +63,8 @@ static fts_package_t* fts_system_package = NULL;
 static fts_package_t* fts_package_stack[PACKAGE_STACK_SIZE];
 static int fts_package_stack_top = 0;
 
-static fts_status_description_t fts_DuplicatedClass = {"Duplicated class"};
+static fts_status_description_t fts_duplicated_class = {"Duplicated class"};
+static fts_status_description_t fts_duplicated_function = {"Duplicated function"};
 
 #if defined(WIN32)
 #define fts_lib_prefix   ""
@@ -638,7 +639,7 @@ fts_package_add_class( fts_package_t* pkg, fts_class_t *cl, fts_symbol_t name)
 
   fts_set_symbol( &k, name);
   if (fts_hashtable_get(pkg->classes, &k, &data))
-    return &fts_DuplicatedClass;
+    return &fts_duplicated_class;
 
   fts_set_pointer(&data, cl);
   fts_hashtable_put(pkg->classes, &k, &data);
@@ -667,49 +668,35 @@ fts_package_get_class_names(fts_package_t* pkg, fts_iterator_t* iter)
   fts_hashtable_get_keys(pkg->classes, iter);
 }
 
-fts_class_t *
-fts_get_class_by_name(fts_symbol_t class_name)
+/* **********************************************************************
+ *
+ * Functions 
+ *
+ */
+fts_status_t
+fts_package_add_function( fts_package_t *pkg, fts_fun_t fun, fts_symbol_t name)
 {
-  fts_package_t *pkg;
-  fts_class_t *cl;
-  fts_iterator_t iter;
+  fts_atom_t v, k;
+
+  fts_set_symbol( &k, name);
+  if (fts_hashtable_get(pkg->functions, &k, &v))
+    return &fts_duplicated_function;
+
+  fts_set_pointer( &v, fun);
+  fts_hashtable_put( pkg->functions, &k, &v);
+
+  return fts_ok;
+}
+
+fts_fun_t
+fts_package_get_function( fts_package_t *pkg, fts_symbol_t name)
+{
+  fts_atom_t k, v;
   
-  /* ask the kernel package before any other package. The kernel
-    classes should not be redefined anyway. If we search the kernel
-    package before the required packages, we avoid the loading of all
-    (required) packages to find the patcher class.  */
-  pkg = fts_get_system_package();
-  
-  if ((cl = fts_package_get_class(pkg, class_name)) != NULL)
-    return cl;
-  
-  /* ask the current package */
-  pkg = fts_get_current_package();
-  if ((cl = fts_package_get_class(pkg, class_name)) != NULL)
-    return cl;
-  
-  /* ask the required packages of the current package */
-  fts_package_get_required_packages(pkg, &iter);
-  
-  while(fts_iterator_has_more( &iter)) 
-  {
-    fts_atom_t a;
-    fts_package_t *p;
-    fts_symbol_t p_name;
-    
-    fts_iterator_next( &iter, &a);
-    p_name = fts_get_symbol( &a);
-    p = fts_package_get(p_name);
-    
-    if(p != NULL)
-    {
-      cl = fts_package_get_class(p , class_name);
-      
-      if (cl != NULL)
-        return cl;
-    }
-  }
-  
+  fts_set_symbol( &k, name);
+  if ( fts_hashtable_get( pkg->functions, &k, &v))
+    return (fts_fun_t)fts_get_pointer(&v);
+
   return NULL;
 }
 
@@ -1285,6 +1272,7 @@ __fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   pkg->packages = NULL;
 
   pkg->classes = fts_hashtable_new( FTS_HASHTABLE_SMALL);
+  pkg->functions = fts_hashtable_new( FTS_HASHTABLE_SMALL);
   pkg->declared_templates = fts_hashtable_new( FTS_HASHTABLE_SMALL);
 
   pkg->template_names = NULL;
@@ -1318,6 +1306,7 @@ __fts_package_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     fts_list_delete(pkg->windows);
 
   fts_hashtable_destroy(pkg->classes);
+  fts_hashtable_destroy(pkg->functions);
 
   fts_hashtable_destroy(pkg->declared_templates);
   fts_list_delete(pkg->template_names);
@@ -1636,12 +1625,6 @@ void
 fts_package_set_state(fts_package_t* pkg, fts_package_state_t s)
 {
   pkg->state = s;
-}
-
-char* 
-fts_package_get_error(fts_package_t* pkg)
-{
-  return pkg->error;
 }
 
 /***************************************************

@@ -235,7 +235,7 @@ static int post_buffer_size;
 static int 
 check_symbol_in( fts_symbol_t s, fts_symbol_t *symbols)
 {
-  while (*symbols)
+  while (*symbols != NULL)
     {
       if ( *symbols == s)
 	return 1;
@@ -252,31 +252,32 @@ static const char *want_a_space_after_strings[] = { "+", "-", "*", "/", "%", ","
 static const char *dont_want_a_space_after_strings[] = { "(", "[", "{", "$", "'"};
 static const char *operator_strings[] = { "$", ";", ",", "(", ")", "[", "]", "{", "}", "+", "-", "*", "/", "%", "<<", ">>", "&&", "||", "!", "==", "!=", ">", ">=", "<", "<="};
 
-static fts_symbol_t want_a_space_before_symbols[sizeof(want_a_space_before_strings)/sizeof(const char *)];
-static fts_symbol_t dont_want_a_space_before_symbols[sizeof(want_a_space_after_strings)/sizeof(const char *)];
-static fts_symbol_t want_a_space_after_symbols[sizeof(want_a_space_after_strings)/sizeof(const char *)];
-static fts_symbol_t dont_want_a_space_after_symbols[sizeof(dont_want_a_space_after_strings)/sizeof(const char *)];
-static fts_symbol_t operator_symbols[sizeof(operator_strings)/sizeof(const char *)];
+#define DECLARE_PUNCTUATION_ARRAY( A) static fts_symbol_t A##_symbols[ sizeof(A##_strings) / sizeof( const char *) + 1];
+DECLARE_PUNCTUATION_ARRAY( want_a_space_before)
+DECLARE_PUNCTUATION_ARRAY( dont_want_a_space_before)
+DECLARE_PUNCTUATION_ARRAY( want_a_space_after)
+DECLARE_PUNCTUATION_ARRAY( dont_want_a_space_after)
+DECLARE_PUNCTUATION_ARRAY( operator)
+
+#define INIT_PUNCTUATION_ARRAY( A)						\
+{										\
+  int i, size = sizeof(A##_strings) / sizeof( const char *);			\
+										\
+  for ( i = 0; i < size; i++)							\
+    A##_symbols[i] = fts_new_symbol( A##_strings[i]);				\
+										\
+  /* Must add one NULL element at the end; see function check_symbol_in() */	\
+  A##_symbols[ size] = NULL;							\
+}
 
 static void 
 init_punctuation( void)
 {
-  int i;
-
-  for(i=0; i<sizeof(want_a_space_before_strings)/sizeof(const char *); i++)
-    want_a_space_before_symbols[i] = fts_new_symbol(want_a_space_before_strings[i]);
-  
-  for(i=0; i<sizeof(dont_want_a_space_before_strings)/sizeof(const char *); i++)
-    dont_want_a_space_before_symbols[i] = fts_new_symbol(dont_want_a_space_before_strings[i]);
-  
-  for(i=0; i<sizeof(want_a_space_after_strings)/sizeof(const char *); i++)
-    want_a_space_after_symbols[i] = fts_new_symbol(want_a_space_after_strings[i]);
-  
-  for(i=0; i<sizeof(dont_want_a_space_after_strings)/sizeof(const char *); i++)
-    dont_want_a_space_after_symbols[i] = fts_new_symbol(dont_want_a_space_after_strings[i]);
-  
-  for(i=0; i<sizeof(operator_strings)/sizeof(const char *); i++)
-    operator_symbols[i] = fts_new_symbol(operator_strings[i]);
+  INIT_PUNCTUATION_ARRAY( want_a_space_before);
+  INIT_PUNCTUATION_ARRAY( dont_want_a_space_before);
+  INIT_PUNCTUATION_ARRAY( want_a_space_after);
+  INIT_PUNCTUATION_ARRAY( dont_want_a_space_after);
+  INIT_PUNCTUATION_ARRAY( operator);
 }
 
 #define want_a_space_before(v) (fts_is_symbol(v)? check_symbol_in( fts_get_symbol(v), want_a_space_before_symbols): 0)

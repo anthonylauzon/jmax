@@ -297,21 +297,6 @@ object_or_template_create( fts_patcher_t *patcher, int ac, const fts_atom_t *at,
 
 /***********************************************************************
 *
-*  dirty in patcher
-*
-*/
-void
-fts_object_set_dirty(fts_object_t *o)
-{
-  fts_patcher_t *patcher = fts_object_get_patcher(o);
-  
-  if(patcher != NULL)
-    fts_patcher_set_dirty(patcher, 1);
-}
-
-
-/***********************************************************************
-*
 * evaluate an object description using the expression evaluator
 *
 */
@@ -436,6 +421,21 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
 
   return obj;
 }
+
+/***********************************************************************
+*
+*  dirty in patcher
+*
+*/
+void
+fts_object_set_dirty(fts_object_t *o)
+{
+  fts_patcher_t *patcher = fts_object_get_patcher(o);
+  
+  if(patcher != NULL)
+    fts_patcher_set_dirty(patcher, 1);
+}
+
 
 /***********************************************************************
 *

@@ -27,6 +27,7 @@ typedef union  fts_word fts_word_t;
 typedef struct fts_atom fts_atom_t;
 typedef struct fts_class fts_class_t;
 typedef void (*fts_method_t) (fts_object_t *, int, fts_symbol_t , int, const fts_atom_t *);
+typedef void (*fts_fun_t) (int, const fts_atom_t *);
 
 /* Should it be declared forward ??? */
 typedef struct fts_connection fts_connection_t;

@@ -75,83 +75,20 @@ static fts_status_description_t invalid_message_error_description = {
 };
 static fts_status_t invalid_message_error = &invalid_message_error_description;
 
-/***********************************************************************
- *
- *  functions
- * 
- */
+static fts_status_description_t invalid_parenthized_expression_error_description = {
+  "invalid parenthized expression"
+};
+static fts_status_t invalid_parenthized_expression_error = &invalid_parenthized_expression_error_description;
 
-/* #define this if you want a printout on stderr of the expression before its evaluation */
-#undef EXPRESSION_DEBUG
+static fts_status_description_t invalid_method_invocation_error_description = {
+  "invalid method invocation"
+};
+static fts_status_t invalid_method_invocation_error = &invalid_method_invocation_error_description;
 
-static void fts_expression_print( fts_expression_t *exp);
-
-#if 0
-void fts_expression_declare_function( fts_symbol_t name, fts_function_t function)
-{
-  fts_atom_t k, v;
-
-  fts_set_symbol( &k, name);
-  fts_set_pointer( &v, function);
-  fts_hashtable_put( &fts_token_table, &k, &v);
-}
-
-static void unique_function(int ac, const fts_atom_t *at)
-{
-  static int seed = 1;
-  fts_atom_t ret[1];						\
-
-								  fts_set_int( ret, seed++);
-  
-  fts_return( ret);
-}
-
-#define DEFINE_FUN(FUN)						\
-static void FUN##_function( int ac, const fts_atom_t *at)	\
-{								\
-  fts_atom_t ret[1];						\
-								\
-  if (ac == 1 && fts_is_number( at))				\
-    fts_set_float( ret, FUN( fts_get_number_float( at)));	\
-								\
-  fts_return( ret);						\
-}
-
-#define FUN DEFINE_FUN
-FUN(sin);
-FUN(cos)
-     FUN(tan)
-     FUN(asin)
-     FUN(acos)
-     FUN(atan)
-     FUN(sinh)
-     FUN(cosh)
-     FUN(tanh)
-     FUN(asinh)
-     FUN(acosh)
-     FUN(atanh)
-
-     static void declare_functions( void)
-{
-#define DECLARE_FUN(FUN)							\
-  fts_expression_declare_function( fts_new_symbol( #FUN), FUN##_function);
-
-#define FUN DECLARE_FUN
-  FUN(unique);
-  FUN(sin);
-  FUN(cos);
-  FUN(tan);
-  FUN(asin);
-  FUN(acos);
-  FUN(atan);
-  FUN(sinh);
-  FUN(cosh);
-  FUN(tanh);
-  FUN(asinh);
-  FUN(acosh);
-  FUN(atanh);
-}
-#endif
+static fts_status_description_t no_such_function_error_description = {
+  "no such function"
+};
+static fts_status_t no_such_function_error = &no_such_function_error_description;
 
 
 /* **********************************************************************
@@ -501,7 +438,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     if(!fts_send_message(fts_get_object( at), fts_s_get_element, ac-1, at+1) || fts_is_void( fts_get_return_value()))
       return element_access_error;
 
-      fts_atom_refer(fts_get_return_value());
+    fts_atom_refer(fts_get_return_value());
 
     expression_stack_pop_frame( exp);
     expression_stack_push( exp, fts_get_return_value());
@@ -515,44 +452,73 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
       return status;
     break;
 
-  case TK_INT:
-  case TK_FLOAT:
-  case TK_SYMBOL:
-    expression_stack_push( exp, &tree->value);
-    break;
-
-#if 0
-  case TK_DOT:
+  case TK_PAR:
     expression_stack_push_frame( exp);
 
     if ((status = expression_eval_aux( tree->left, exp, scope, env_ac, env_at, callback, data)) != fts_ok)
-      return status;
-    if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data)) != fts_ok)
       return status;
 
     ac = expression_stack_frame_count( exp);
     at = expression_stack_frame( exp);
 
-    if (!fts_is_object( at))
-      return operand_type_mismatch_error;
+    if (ac > 0 && fts_is_symbol( at))
+      {
+	/* it is a function call */
+	fts_fun_t fun;
 
-    {
-      fts_symbol_t selector = fts_get_symbol( &tree->value);
+	fun = fts_function_get_by_name( fts_get_symbol( at));
 
-      fts_set_void( fts_get_return_value());
+	if (!fun)
+	  return no_such_function_error;
 
-      if (!fts_send_message(fts_get_object( at), selector, ac - 1, at + 1))
-	return invalid_message_error;
-    }
+	(*fun)(ac-1, at+1);
 
-    fts_atom_refer(fts_get_return_value());
+	expression_stack_pop_frame( exp);
 
-    expression_stack_pop_frame( exp);
-    if (!fts_is_void( fts_get_return_value()))
-      expression_stack_push( exp, fts_get_return_value());
+	if (fts_is_void( fts_get_return_value()))
+	  {
+	    fts_set_int( ret, 0);
+	    expression_stack_push( exp, ret);
+	  }
+	else
+	  expression_stack_push( exp, fts_get_return_value());
+      }
+    else if (ac > 1 && fts_is_object( at) && fts_is_symbol( at+1))
+      {
+	/* it is a method invocation */
+
+	if (!fts_send_message(fts_get_object( at), fts_get_symbol(at+1), ac-2, at+2))
+	  return invalid_method_invocation_error;
+
+	expression_stack_pop_frame( exp);
+
+	if (fts_is_void( fts_get_return_value()))
+	  {
+	    fts_set_int( ret, 0);
+	    expression_stack_push( exp, ret);
+	  }
+	else
+	  expression_stack_push( exp, fts_get_return_value());
+      }
+    else if (ac == 1)
+      {
+	/* it is a plain parenthized term */
+	ret[0] = at[0];
+
+	expression_stack_pop_frame( exp);
+
+	expression_stack_push( exp, ret);
+      }
+    else
+      return invalid_parenthized_expression_error;
 
     break;
-#endif
+
+  case TK_INT:
+  case TK_FLOAT:
+  case TK_SYMBOL:
+    expression_stack_push( exp, &tree->value);
+    break;
 
   case TK_DOLLAR:
     if (fts_is_int( &tree->value))
@@ -883,9 +849,5 @@ void fts_expression_delete( fts_expression_t *exp)
 void fts_kernel_expression_init( void)
 {
   expression_heap = fts_heap_new( sizeof( fts_expression_t));
-
-#if 0
-  declare_functions();
-#endif
 }
 

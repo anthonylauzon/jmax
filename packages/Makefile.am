@@ -20,7 +20,31 @@ else
 UNIXDTD_DIR=
 endif
 
-SUBDIRS=utils control data guiobj io ispw ispwmath midi macosx numeric sequence signal system dtd @PLATFORM_PACKAGES@ $(JACK_PKG_DIR) winbuild dsdev mmio winmidi $(MIDISHARE_PKG_DIR) asio $(UNIXDTD_DIR)
+SUBDIRS= \
+$(JACK_PKG_DIR) \
+$(MIDISHARE_PKG_DIR) \
+$(UNIXDTD_DIR) \
+@PLATFORM_PACKAGES@ \
+asio \
+control \
+data \
+dsdev \
+dtd \
+functions \
+guiobj \
+io \
+ispw \
+ispwmath \
+macosx \
+midi \
+mmio \
+numeric \
+sequence \
+signal \
+system \
+utils \
+winbuild \
+winmidi 
 
 
 

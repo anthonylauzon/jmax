@@ -1,3 +1,13 @@
+2003-12-17  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* renamed fts_get_class_by_name to fts_class_get_by_name and moved it from package.c
+	to class.c
+
+	* updated the syntax to get method invocation and function calls:
+	  - functions are installed using fts_function_install and can be in any package
+	  - syntax is (function_name arg1 arg2 ...)
+	  - standard math functions are located in package functions
+
 2003-12-15  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* packages/ispw/c/src/route.c (route_bang): fixed bug "[ 832360 ] sending bang into [route] does nothing".

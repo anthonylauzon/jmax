@@ -101,6 +101,8 @@ struct fts_package {
   fts_list_t* packages;
   fts_hashtable_t* classes;
 
+  fts_hashtable_t *functions;
+
   fts_hashtable_t* declared_templates;
   fts_list_t* template_names;
 
@@ -271,6 +273,9 @@ fts_status_t fts_package_add_class( fts_package_t* pkg, fts_class_t *cl, fts_sym
  * @return the class or NULL if this package doesn't define the meta class.
  * @ingroup package */
 fts_class_t *fts_package_get_class(fts_package_t* pkg, fts_symbol_t name);
+
+fts_status_t fts_package_add_function( fts_package_t *pkg, fts_fun_t fun, fts_symbol_t name);
+fts_fun_t fts_package_get_function( fts_package_t *pkg, fts_symbol_t name);
 
 /**
  * Defines a new help.

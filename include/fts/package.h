@@ -107,16 +107,6 @@ FTS_API fts_symbol_t fts_package_get_dir(fts_package_t* pkg);
 FTS_API fts_package_state_t fts_package_get_state(fts_package_t* pkg);
 
 /**
- * Returns the error message of the package. If no error occured, this
- * function returns NULL.
- *
- * @fn char* fts_package_get_error(fts_package_t* pkg)
- * @param pkg the package
- * @return the last error message of the package as a string
- * @ingroup package */
-FTS_API char* fts_package_get_error(fts_package_t* pkg);
-
-/**
  * Initializes an iterator for all the required packages of this
  * package. The iterator returns the names of the packages.
  *
@@ -146,4 +136,4 @@ FTS_API void fts_package_get_class_names(fts_package_t* pkg, fts_iterator_t* ite
  * @ingroup package */
 FTS_API fts_class_t* fts_package_get_class(fts_package_t* pkg, fts_symbol_t name);
 
-FTS_API fts_class_t *fts_get_class_by_name(fts_symbol_t class_name);
+

@@ -22,6 +22,7 @@ fpe.h \
 ftl.h \
 ftlmem.h \
 fts.h \
+function.h \
 hashtable.h \
 iterator.h \
 label.h \

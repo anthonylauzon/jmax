@@ -579,6 +579,11 @@ packages/dsdev/winbuild/Makefile
 packages/dtd/Makefile
 packages/dtd/c/Makefile
 packages/dtd/c/src/Makefile
+packages/functions/Makefile
+packages/functions/c/Makefile
+packages/functions/c/src/Makefile
+packages/functions/help/Makefile
+packages/functions/winbuild/Makefile
 packages/guiobj/Makefile
 packages/guiobj/c/Makefile
 packages/guiobj/c/src/Makefile

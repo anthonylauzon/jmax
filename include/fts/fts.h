@@ -86,6 +86,7 @@ extern "C" {
 #include <fts/patcherobject.h>
 #include <fts/object.h>
 #include <fts/class.h>
+#include <fts/function.h>
 #include <fts/connection.h>
 #include <fts/expression.h>
 #include <fts/objectset.h>

@@ -118,7 +118,7 @@ FTS_API fts_status_description_t fts_ClassAlreadyInitialized;
  * Install a class
  * Create a class (without initializing) and register it by name in the current package.
  *
- * @fn void fts_class_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
+ * @fn fts_class_t *fts_class_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
  * @param name the name (NULL for unregistered classes)
  * @param instantiate_fun class initialization function
  * @return the class (handle)
@@ -135,6 +135,22 @@ FTS_API fts_class_t *fts_class_install( fts_symbol_t name, fts_instantiate_fun_t
  * @ingroup class_api
  */
 FTS_API void fts_class_alias(fts_class_t *cl, fts_symbol_t alias);
+
+/**
+ * Get a class by its name.
+ * Search order:
+ * <ol>
+ * <li> the kernel package
+ * <li> the current package
+ * <li> the required packages of the current package
+ * </ul>
+ *
+ * @fn fts_class_t *fts_class_get_by_name(fts_symbol_t name)
+ * @param name the name
+ * @return the class (handle) or NULL if no class found
+ * @ingroup class_api
+ */
+FTS_API fts_class_t *fts_class_get_by_name(fts_symbol_t name);
 
 /**
  * Initialize a class

@@ -273,6 +273,7 @@ void fts_kernel_init( void)
   _K_DECNCALL( fts_kernel_tuple_init);
   _K_DECNCALL( fts_kernel_connection_init);
   _K_DECNCALL( fts_kernel_variable_init);
+  _K_DECNCALL( fts_kernel_function_init);
   _K_DECNCALL( fts_kernel_define_init);
   _K_DECNCALL( fts_kernel_bytestream_init); /* Must be before patcher_init */
   _K_DECNCALL( fts_kernel_pipestream_init); /* Must be before patcher_init */

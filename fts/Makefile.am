@@ -30,6 +30,7 @@ fpe.c \
 ftl.c \
 ftlmem.c \
 fts.c \
+function.c \
 hashtable.c \
 label.c \
 list.c \
