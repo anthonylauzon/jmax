@@ -17,7 +17,7 @@ $(JAVA_HOME)\bin
 
 Add path to 'jvm.dll' to your system or user $PATH variable
 For example in java sdk 1.4, add path
-$(JAVA_HOME)\jre\client\bin
+$(JAVA_HOME)\jre\bin\client
 ------------------------------------------------------------------------
 Define environment variable (system or user) CYGWIN_HOME and point it to
 the root of your cygwin installation directory (D:\cygwin)
