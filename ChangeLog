@@ -1,3 +1,11 @@
+2002-12-03  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* Begin to merge audio and midi configuration in fts/config.c:
+	- create audioconfig_type class
+	- create config_type class
+
+	* Begin to add emacs local variables for indentation to modified files
+
 2002-11-29  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* changed hashtable.[ch]: hashtables now accept keys of any type. A class can set its
