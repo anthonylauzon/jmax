@@ -1,3 +1,7 @@
+2003-12-29  Alexandre Pages  <alexandre.pages@ircam.fr>
+  
+      * added "key bindings and shortcuts summary" html help file in /doc.
+
 2003-12-18  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* packages/signal/c/src/playfvec.c (play_ftl): fixed bug "[ 822056 ] play~ behaves strangely 4.0.2 (jmax crash)".
