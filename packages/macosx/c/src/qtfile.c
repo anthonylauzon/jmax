@@ -53,7 +53,7 @@ static qtfile_handle_t *
 qtfile_handle_alloc(void)
 {
   qtfile_handle_t *handle = (qtfile_handle_t *)fts_malloc(sizeof(qtfile_handle_t));
-  
+
   handle->file_ref = 0;
   handle->buffer = NULL;
   handle->buffer_length = 0;  
@@ -83,7 +83,7 @@ qtfile_loader_open_read(fts_audiofile_t* audiofile)
   SoundComponentData descr;
   unsigned long n_frames;
   unsigned long offset;
-  
+
   if(FSPathMakeRef(filename, &fs_ref, NULL) != noErr ||
      FSGetCatalogInfo(&fs_ref, kFSCatInfoNone, NULL, NULL, &fs_spec, NULL) != noErr ||
      FSpOpenDF(&fs_spec, fsRdPerm, &file_ref) != noErr)
@@ -91,20 +91,20 @@ qtfile_loader_open_read(fts_audiofile_t* audiofile)
       qtfile_loader_error(audiofile, "Failed to open file %s", filename);
       return -1;
     }
-  
+
   err = ParseAIFFHeader(file_ref, &descr, &n_frames, &offset);
   if(err != noErr)
     {
       qtfile_loader_error(audiofile, "Failed to open file %s", filename);
       return -1;
     }
-  
+
   if(descr.format != k16BitBigEndianFormat)
     {
       qtfile_loader_error(audiofile, "Invalid file format (must be signed 16 bits)");
       return -1;
     }
-  
+
   /* seek file to beginning of sample data */
   err = SetFPos(file_ref, fsFromStart, offset);
   if(err != noErr)
@@ -127,8 +127,40 @@ qtfile_loader_open_read(fts_audiofile_t* audiofile)
 static int 
 qtfile_loader_open_write(fts_audiofile_t* audiofile)
 {
-  /* not yet implemented */
-  return -1;
+  const char* filename = fts_audiofile_get_filename(audiofile);
+  qtfile_handle_t* handle = qtfile_handle_alloc();
+  OSStatus err = noErr;
+  FSRef fs_ref;
+  FSSpec fs_spec;
+  short file_ref;
+  SoundComponentData descr;
+  unsigned long nframes;
+
+  if(FSPathMakeRef(filename, &fs_ref, NULL) != noErr ||
+     FSpOpenDF(&fs_spec, fsWrPerm, &file_ref) != noErr)
+  {
+    qtfile_loader_error(audiofile, "Failed to open file %s", filename);
+    return -1;
+  }
+
+  /* setup AIFF header */
+  err = SetupAIFFHeader(file_ref, 
+			fts_audiofile_get_num_channels(audiofile),
+			fts_audiofile_get_sample_rate(audiofile),
+			fts_audiofile_get_bytes_per_sample(audiofile),
+			kSoundNotCompressed,
+			0, /* Don't forget to recall SetupAIFFHeader after writing all samples */ 
+			0);
+
+  if (err == noErr)
+  {
+    return 0;
+  }
+  else
+  {
+    qtfile_loader_error(audiofile, "Cannot create AIFF header for file %s", filename);
+    return -1;
+  }
 }
 
 static int 
@@ -166,17 +198,17 @@ qtfile_loader_read(fts_audiofile_t* audiofile, float **buf, int n_buf, unsigned 
   int n_total = 0;
   SInt32 n_read = 0;
   int ch, n_ch;
-  
+
   if(n_buf > file_channels)
     n_ch = file_channels;
   else
     n_ch = n_buf;
-  
+
   do
     {
       if(n_total + buffer_length > buflen)
 	buffer_length = buflen - n_total;
-      
+
       /* bytes to read */
       n_read = buffer_length * bytes_per_frame;
 
@@ -199,29 +231,69 @@ qtfile_loader_read(fts_audiofile_t* audiofile, float **buf, int n_buf, unsigned 
 	      j += file_channels;;
 	    }
 	}
-      
+
       n_total += n_read;
-      
+
     } while(n_read > 0 && n_total < buflen);
-  
+
   /* fill remaining buffers with zeroes */
   for(; ch<n_buf; ch++)
     {
       float *out = buf[ch];
       int i;
-      
+
       for(i=0; i<buflen; i++)
 	out[i] = 0.0;
     }
-  
+
   return n_total;
 }
 
 static int 
 qtfile_loader_write(fts_audiofile_t* audiofile, float** buf, int n_buf, unsigned int buflen)
 {
-  /* not yet implemented */
-  return -1;
+  qtfile_handle_t *handle = (qtfile_handle_t *)fts_audiofile_get_handle(audiofile);
+  int file_channels = fts_audiofile_get_num_channels(audiofile);
+  int bytes_per_sample = fts_audiofile_get_bytes_per_sample(audiofile);
+  int bytes_per_frame = bytes_per_sample * file_channels;
+  short file_ref = handle->file_ref;
+  short *buffer = (short *)handle->buffer;
+  unsigned int buffer_length = handle->buffer_length;
+  int n_total = 0;
+  SInt32 n_write = 0;
+  int ch, n_ch;
+
+  if(n_buf > file_channels)
+    n_ch = file_channels;
+  else
+    n_ch = n_buf;
+
+  do
+  {
+    n_write = buffer_length * bytes_per_frame;
+
+    /* convert */
+    for(ch=0; ch<n_ch; ch++)
+    {
+      float *in = buf[ch] + n_total;
+      int j = ch;
+      int i;
+
+      for(i=0; i< buffer_length; i++)
+      {
+	buffer[j] = (short)(in[i] * 32767.0f);
+	j += file_channels;;
+      }
+    }
+    FSWrite(file_ref, &n_write, buffer);
+
+    n_total += (n_write / bytes_per_frame);
+
+  } while (n_write > 0 && n_total < buflen);
+
+  fts_audiofile_get_num_frames(audiofile) += n_total;
+
+  return n_total;
 }
 
 static int 
@@ -235,7 +307,33 @@ static int
 qtfile_loader_close(fts_audiofile_t* audiofile)
 {
   qtfile_handle_t *handle = (qtfile_handle_t *)fts_audiofile_get_handle(audiofile);
+  OSErr err = noErr;
+  /* check if we were in write mode */
+  if (audiofile->mode == fts_s_write)
+  {
+    unsigned int frames = fts_audiofile_get_num_frames(audiofile);
+    unsigned int bytes_per_sample = fts_audiofile_get_bytes_per_sample(audiofile);
+    int channels = fts_audiofile_get_num_channels(audiofile);
+    /* go to begin of file */
+    err = SetFPos(handle->file_ref, fsFromStart, 0);
+    if (err != noErr)
+    {
+      qtfile_loader_error(audiofile, "Cannot seek to begin fo file");
+    }
+    else
+    {
+      /* update AIFF header */
+	err = SetupAIFFHeader(handle->file_ref, 
+			      channels,
+			      fts_audiofile_get_sample_rate(audiofile),
+			      fts_audiofile_get_bytes_per_sample(audiofile),
+			      kSoundNotCompressed,
+			      frames * bytes_per_sample * channels,
+			      0);
 
+    }
+
+  }
   if(handle)
     {
       if(handle->file_ref)
@@ -263,3 +361,10 @@ void qtfile_config(void)
 {
   fts_audiofile_set_loader( "QuickTime Audiofiles", &qtfile_loader);
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
