@@ -86,23 +86,30 @@ fts_template_make_instance(fts_template_t *template, fts_patcher_t *patcher, int
   fts_set_symbol(&value, template->filename);
   if (1 == fts_hashtable_put(&template_file_to_load, &key, &value))
   {
-      /* cyclic dependency in template definition */
-      fts_log("[template] cyclic definition for template %s \n", template->name);
-      fts_post("[template] cyclic definition for template %s \n", template->name);
+    /* cyclic dependency in template definition */
+    fts_log("[template] cyclic definition for template %s \n", template->name);
+    fts_post("[template] cyclic definition for template %s \n", template->name);
   }
   else
   {
-      fts_file_load( template->filename, (fts_object_t *)patcher, ac, at, (fts_object_t **)&instance);
+    fts_file_load( template->filename, (fts_object_t *)patcher, ac, at, (fts_object_t **)&instance);
+  }
+  
+  /* remove filename in file to load */
+  if (0 == fts_hashtable_remove(&template_file_to_load, &key))
+  {
+    /* not reachable case */
+    fts_log("[template] file to load %s wasn't in file_to_load hashtable \n", template->filename);
   }
 
   fts_package_pop(template->package);
-    
+  
   if (instance)
-    {
-      fts_template_add_instance( template, (fts_object_t *)instance);
-      fts_patcher_set_template( instance, template);
-    }
-
+  {
+    fts_template_add_instance( template, (fts_object_t *)instance);
+    fts_patcher_set_template( instance, template);
+  }
+  
   return (fts_object_t *)instance;
 }
 
@@ -180,3 +187,10 @@ void fts_kernel_template_init()
   fts_hashtable_init(&template_file_to_load, FTS_HASHTABLE_MEDIUM);
 }
 
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
