@@ -21,6 +21,6 @@ udpsend.c
 noinst_HEADERS= \
 iomodule.h
 
-libio_la_LDFLAGS= -module
+libio_la_LDFLAGS= -L$(top_builddir)/fts -lfts  -module
 
 INCLUDES=-I$(top_srcdir)/include

@@ -21,5 +21,5 @@ INCLUDES=-I$(top_srcdir)/include -I$(top_srcdir)/packages/utils/c/include
 noinst_HEADERS= \
 numeric.h
 
-libnumeric_la_LDFLAGS= -module
+libnumeric_la_LDFLAGS= -L$(top_builddir)/fts -lfts  -module
 

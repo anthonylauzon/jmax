@@ -33,5 +33,5 @@ noinst_HEADERS= \
 guiobj.h \
 keyserver.h
 
-libguiobj_la_LDFLAGS= -module
+libguiobj_la_LDFLAGS= -L$(top_builddir)/fts -lfts  -module
 

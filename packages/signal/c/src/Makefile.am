@@ -43,4 +43,4 @@ samplepool.h \
 signal.h \
 wave.h
 
-libsignal_la_LDFLAGS= -module
+libsignal_la_LDFLAGS= -L$(top_builddir)/fts -lfts  -module

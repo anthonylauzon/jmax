@@ -6,7 +6,7 @@ jackaudiomanager.c \
 jackaudioport.c 
 
 CFLAGS = @CFLAGS@ @JACK_CFLAGS@
-libjmax_jack_la_LDFLAGS= @LDFLAGS@ @JACK_LDFLAGS@
+libjmax_jack_la_LDFLAGS= -L$(top_builddir)/fts -lfts  @LDFLAGS@ @JACK_LDFLAGS@
 INCLUDES=-I$(top_srcdir)/include
 
 noinst_HEADERS = jackaudio.h

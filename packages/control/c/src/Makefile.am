@@ -22,6 +22,6 @@ tup.c
 noinst_HEADERS=\
 control.h
 
-libcontrol_la_LDFLAGS=-module
+libcontrol_la_LDFLAGS= -L$(top_builddir)/fts -lfts -module
 
 INCLUDES=-I$(top_srcdir)/include

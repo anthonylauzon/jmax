@@ -1,8 +1,15 @@
-# $Id: Makefile.am,v 1.15 2003/01/28 11:01:22 nschnell Exp $
+# $Id: Makefile.am,v 1.16 2003/02/04 18:34:35 diemo Exp $
 #
 # sequence package source Makefile.am
 #
 # $Log: Makefile.am,v $
+# Revision 1.16  2003/02/04 18:34:35  diemo
+# Removed spurious "A track with this name already exist!" message.
+# Editors update track/sequence name.
+# Fixed bug with track persistence -> no more crash on loading saved tracks.
+# Added track_highlight_events* functions.
+# Added message "start" for play object.
+#
 # Revision 1.15  2003/01/28 11:01:22  nschnell
 # *** empty log message ***
 #
@@ -103,4 +110,4 @@ noinst_HEADERS= \
 seqmess.h \
 seqmidi.h 
 
-libsequence_la_LDFLAGS= -module
+libsequence_la_LDFLAGS= -L$(top_builddir)/fts -lfts  -module

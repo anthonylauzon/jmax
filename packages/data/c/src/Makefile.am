@@ -23,5 +23,5 @@ col.h \
 row.h \
 tabeditor.h
 
-libdata_la_LDFLAGS=-module
+libdata_la_LDFLAGS= -L$(top_builddir)/fts -lfts -module
 

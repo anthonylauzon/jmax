@@ -13,6 +13,6 @@ sysex.c
 noinst_HEADERS= \
 midi.h
 
-libmidi_la_LDFLAGS= -module
+libmidi_la_LDFLAGS= -L$(top_builddir)/fts -lfts  -module
 
 INCLUDES=-I$(top_srcdir)/include
