@@ -131,7 +131,7 @@ winmidiport_callback_in(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD dwParam1
 
     EnterCriticalSection(&this->critical_section);
 
-    if (!winmidiport_buffer_full(this)) {
+    if ((this->hmidiin != NULL) && !winmidiport_buffer_full(this)) {
       this->incoming[this->head++] = dwParam1;
       if (this->head == BUFFER_SIZE) {
 	this->head = 0;
