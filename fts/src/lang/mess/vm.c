@@ -102,7 +102,7 @@
    */
 
 
-/* #define  VM_DEBUG */
+#define  VM_DEBUG
 
 #ifdef DEBUG
 #define  VM_SAFE

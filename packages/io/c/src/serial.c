@@ -402,13 +402,13 @@ serial_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       
       if(this->fd < 0)
 	{
-	  fts_object_set_error(o, "can't open serial port \"%s\" (%s)\n", fts_symbol_name(name), strerror( errno));
+	  fts_object_set_error(o, "can't open serial port \"%s\" (%s)", fts_symbol_name(name), strerror( errno));
 	  return;
 	}
       
       if(tcsetattr(this->fd, TCSANOW, &this->termios) < 0)
 	{
-	  fts_object_set_error(o, "can't set termios configuration (%s)\n", strerror(errno));
+	  fts_object_set_error(o, "can't set termios configuration (%s)", strerror(errno));
 	  
 	  close(this->fd);
 	  return;

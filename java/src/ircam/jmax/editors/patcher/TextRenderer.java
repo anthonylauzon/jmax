@@ -199,10 +199,3 @@ public class TextRenderer implements ObjectRenderer
       ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);	
   }
 }
-
-
-
-
-
-
-
