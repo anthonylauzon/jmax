@@ -278,7 +278,9 @@ public class ErmesObject implements FtsPropertyHandler {
     return false;
   }
 
-  
+  //to be redefinded if needed.
+  void putOtherProperties(FtsObject theFObject){}
+
 // This init method is only called in "from skratch" initializations
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
     itsSelected = false;

@@ -119,6 +119,12 @@ class ErmesObjSlider extends ErmesObject {
     }
   }
   
+  public void putOtherProperties(FtsObject theFObject) {
+    theFObject.put("minValue", new Integer(itsRangeMin));
+    theFObject.put("maxValue", new Integer(itsRangeMax));
+  }
+
+
   private void SetSliderDialog(){
     Point aPoint = GetSketchWindow().getLocation();
     itsSketchPad.GetSliderDialog().setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
