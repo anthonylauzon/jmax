@@ -104,6 +104,11 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 		    ((UndoableData) itsTrackDataModel).postEdit(new UndoableMove(this));
 		
 		itsTrackDataModel.moveEvent(this, time);
+		
+		//send the move message to the fts event object
+		sendArgs[0].setObject(this);
+		sendArgs[1].setFloat((float)time); 
+		sendMessage(FtsObject.systemInlet, "event_move", 2, sendArgs);
 	    }
 	else setTime(time);
     }
@@ -252,6 +257,13 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
     public static double DEFAULT_TIME = 0;
 
     private TrackDataModel itsTrackDataModel;
+
+    static FtsAtom[] sendArgs = new FtsAtom[128];
+    static
+    {
+	for(int i=0; i<128; i++)
+	    sendArgs[i]= new FtsAtom();
+    }
 }
 
 
