@@ -281,13 +281,27 @@ static void client_start_message( client_t *this)
   fts_stack_clear( &this->send_sb);
 }
 
-static void client_put_int( client_t *this, int n)
+/* Used by other functions */
+static void client_put( client_t *this, int n)
 {
-  fts_stack_push( &this->send_sb, unsigned char, FTS_PROTOCOL_INT);
   fts_stack_push( &this->send_sb, unsigned char, (unsigned char) ((n >> 24) & 0xff));
   fts_stack_push( &this->send_sb, unsigned char, (unsigned char) ((n >> 16) & 0xff));
   fts_stack_push( &this->send_sb, unsigned char, (unsigned char) ((n >> 8) & 0xff));
   fts_stack_push( &this->send_sb, unsigned char, (unsigned char) ((n >> 0) & 0xff));
+}
+
+static void client_put_int( client_t *this, int n)
+{
+  fts_stack_push( &this->send_sb, unsigned char, FTS_PROTOCOL_INT);
+  client_put( this, n);
+}
+
+static void client_put_float( client_t *this, float value)
+{
+  float f = value;
+
+  fts_stack_push( &this->send_sb, unsigned char, FTS_PROTOCOL_FLOAT);
+  client_put( this, *((unsigned int *)&f));
 }
 
 static void client_put_symbol( client_t *this, fts_symbol_t s)
@@ -304,13 +318,8 @@ static void client_put_symbol( client_t *this, fts_symbol_t s)
 
 static void client_put_object( client_t *this, fts_object_t *obj)
 {
-  int n = OBJECT_ID_OBJ( fts_object_get_id( obj));
-
   fts_stack_push( &this->send_sb, unsigned char, FTS_PROTOCOL_OBJECT);
-  fts_stack_push( &this->send_sb, unsigned char, (unsigned char) ((n >> 24) & 0xff));
-  fts_stack_push( &this->send_sb, unsigned char, (unsigned char) ((n >> 16) & 0xff));
-  fts_stack_push( &this->send_sb, unsigned char, (unsigned char) ((n >> 8) & 0xff));
-  fts_stack_push( &this->send_sb, unsigned char, (unsigned char) ((n >> 0) & 0xff));
+  client_put( this, OBJECT_ID_OBJ( fts_object_get_id( obj)));
 }
 
 static void client_put_atoms( client_t *this, int ac, const fts_atom_t *at)
@@ -319,6 +328,8 @@ static void client_put_atoms( client_t *this, int ac, const fts_atom_t *at)
     {
       if ( fts_is_int( at))
 	client_put_int( this, fts_get_int( at));
+      else if ( fts_is_float( at))
+	client_put_float( this, fts_get_float( at));
       else if ( fts_is_symbol( at))
 	client_put_symbol( this, fts_get_symbol( at));
       else if ( fts_is_object( at))
