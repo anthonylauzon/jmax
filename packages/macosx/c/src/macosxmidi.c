@@ -182,35 +182,38 @@ macosxmidi_set_input( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   int label_index = fts_get_int(at);
   fts_symbol_t source_name = fts_get_symbol(at + 1);
   fts_midilabel_t *label = fts_midimanager_get_label_by_index(mm, label_index);
-  
-  if(source_name == fts_s_none)
-    {
-    fts_midilabel_set_input(label, NULL);
 
-    /* send to client */
-    }
-  else if(source_name == fts_s_export)
+  if(label != NULL)
     {
-    fts_atom_t args[2];
+    if(source_name == fts_s_none)
+      {
+      fts_midilabel_set_input(label, NULL);
 
-    fts_set_object(args + 0, o);
-    fts_set_symbol(args + 1, fts_midilabel_get_name(label));
-    fts_midilabel_set_input(label, (fts_midiport_t *)fts_object_create(macosxmidi_input_type, 2, args));
+      /* send to client */
+      }
+    else if(source_name == fts_s_export)
+      {
+      fts_atom_t args[2];
 
-    /* send to client */
-    }
-  else if(source_name == fts_s_internal)
-    {
-    fts_midilabel_set_internal(label);
-    
-    /* send to client */
-    }
-  else
-    {
-    /* get or create MIDI port */
-    /* set input */
+      fts_set_object(args + 0, o);
+      fts_set_symbol(args + 1, fts_midilabel_get_name(label));
+      fts_midilabel_set_input(label, (fts_midiport_t *)fts_object_create(macosxmidi_input_type, 2, args));
 
-    /* send to client */
+      /* send to client */
+      }
+    else if(source_name == fts_s_internal)
+      {
+      fts_midilabel_set_internal(label);
+
+      /* send to client */
+      }
+    else
+      {
+      /* get or create MIDI port */
+      /* set input */
+
+      /* send to client */
+      }
     }
 }
 
@@ -223,32 +226,35 @@ macosxmidi_set_output( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   fts_symbol_t destination_name = fts_get_symbol(at + 1);
   fts_midilabel_t *label = fts_midimanager_get_label_by_index(mm, label_index);
 
-  if(destination_name == fts_s_none)
+  if(label != NULL)
     {
-    fts_midilabel_set_output(label, NULL);
+    if(destination_name == fts_s_none)
+      {
+      fts_midilabel_set_output(label, NULL);
 
-    /* send to client */
-    }
-  else if(destination_name == fts_s_export)
-    {
-    fts_atom_t args[2];
+      /* send to client */
+      }
+    else if(destination_name == fts_s_export)
+      {
+      fts_atom_t args[2];
 
-    fts_set_object(args + 0, o);
-    fts_set_symbol(args + 1, fts_midilabel_get_name(label));
-    fts_midilabel_set_output(label, (fts_midiport_t *)fts_object_create(macosxmidi_output_type, 2, args));
-    }
-  else if(destination_name == fts_s_internal)
-    {
-    fts_midilabel_set_internal(label);
+      fts_set_object(args + 0, o);
+      fts_set_symbol(args + 1, fts_midilabel_get_name(label));
+      fts_midilabel_set_output(label, (fts_midiport_t *)fts_object_create(macosxmidi_output_type, 2, args));
+      }
+    else if(destination_name == fts_s_internal)
+      {
+      fts_midilabel_set_internal(label);
 
-    /* send to client */
-    }
-  else
-    {
-    /* get or create MIDI port */
-    /* set output */
+      /* send to client */
+      }
+    else
+      {
+      /* get or create MIDI port */
+      /* set output */
 
-    /* send to client */
+      /* send to client */
+      }
     }
 }
 
