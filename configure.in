@@ -66,23 +66,23 @@ AC_CANONICAL_HOST
 case "$host" in
 dnl FIXME: must add conditionnal tests for ALSA
 i*86-pc-linux-gnu)
-    platform=linux ;
+    PLATFORM=linux ;
     PLATFORM_PACKAGES="alsa oss unixdtd" ;
     FTS_SYS_LIBS="-ldl -laudiofile -lpthread" ;
     if test "$electric_fence" = "yes" ; then FTS_SYS_LIBS="-lefence $FTS_SYS_LIBS" ; fi ;
     ;;
 
 mips-sgi-irix6.5)
-    platform=sgi ;
+    PLATFORM=sgi ;
     PLATFORM_PACKAGES="sgi unixdtd" ;
     FTS_SYS_LIBS="-ldl -laudiofile";
     ;;
 powerpc-apple-darwin*)
-	platform=macosx ;
-	PLATFORM_PACKAGES="macosx"  ;;
+    PLATFORM=macosx ;
+    PLATFORM_PACKAGES="macosx"  ;;
 esac
 
-AC_LINK_FILES(fts/${platform}.c, fts/platform.c) 
+AC_SUBST(PLATFORM)
 AC_SUBST(PLATFORM_PACKAGES)
 AC_SUBST(FTS_SYS_LIBS)
 

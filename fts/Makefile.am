@@ -1,6 +1,7 @@
 lib_LTLIBRARIES= libfts.la
 
 libfts_la_SOURCES= \
+@PLATFORM@.c \
 OLDclient.c \
 abstraction.c \
 array.c \
@@ -39,7 +40,6 @@ package.c \
 param.c \
 patcher.c \
 patparser.c \
-platform.c \
 post.c \
 project.c \
 property.c \
@@ -61,6 +61,8 @@ vm.c
 bin_PROGRAMS=fts
 fts_SOURCES=main.c
 fts_LDADD=-L.libs -lfts @FTS_SYS_LIBS@ -lm
+
+EXTRA_DIST=linux.c sgi.c macosx.c
 
 INCLUDES=-I$(top_srcdir)/include
 

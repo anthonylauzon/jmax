@@ -1,6 +1,5 @@
 SUBDIRS=actions menus
 
-EXTRA_DIST= package.html
 noinst_PROGRAMS = package
 package_SOURCES = \
 AbstractLayer.java\

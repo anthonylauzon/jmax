@@ -129,18 +129,20 @@ main( int ac, char **av)
       o2->install( "int", new ReceiveCallback1());
       o2->install( new ReceiveCallback2());
 
-      for (;;)
-	{
+//        for (;;)
+//  	{
 	  int i;
 
 //  	  cout << "Value ?" << endl;
 
 	  cin >> i;
-	  if ( cin.eof() )
-	    break;
+//  	  if ( cin.eof() )
+//  	    break;
 
-	  o1->send( i);
-	}
+//  	  o1->send( i);
+//  	}
+
+      server->shutdown();
     }
   catch( FtsClientException e)
     {

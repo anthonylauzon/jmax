@@ -1,6 +1,5 @@
 SUBDIRS=renderers tools
 
-EXTRA_DIST = package.html
 noinst_PROGRAMS = package
 package_SOURCES = \
 Bpf.java \

@@ -70,12 +70,12 @@ LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
 OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
+PLATFORM = @PLATFORM@
 PLATFORM_PACKAGES = @PLATFORM_PACKAGES@
 RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
 VERSION = @VERSION@
 
-EXTRA_DIST = package.html
 noinst_PROGRAMS = package
 package_SOURCES =  Bang.java BangControlPanel.java Comment.java Display.java FloatBox.java Fork.java FtsBangObject.java FtsCommentObject.java FtsDisplayListener.java FtsDisplayObject.java FtsFloatValueListener.java FtsFloatValueObject.java FtsForkObject.java FtsMessConstObject.java FtsScopeObject.java FtsSliderObject.java FtsVectorDisplayObject.java GuiObjExtension.java IntBox.java MessConst.java ObjectControlPanel.java Scope.java ScopeControlPanel.java ScopeRunModePopUp.java Slider.java SliderControlPanel.java Toggle.java VecDispControlPanel.java VecDispRModePopUp.java VectorDisplay.java 
 
@@ -191,7 +191,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

@@ -1,6 +1,5 @@
 SUBDIRS=pkg scm tcl
 
-EXTRA_DIST= package.html
 noinst_PROGRAMS = package
 package_SOURCES = \
 Interpreter.java\

@@ -1,6 +1,5 @@
 SUBDIRS=silk
 
-EXTRA_DIST= package.html
 noinst_PROGRAMS = package
 package_SOURCES = \
 DefaultSchemeScript.java\

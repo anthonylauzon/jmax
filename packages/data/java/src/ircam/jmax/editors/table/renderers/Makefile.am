@@ -1,6 +1,5 @@
 SUBDIRS=
 
-EXTRA_DIST = package.html
 noinst_PROGRAMS = package
 package_SOURCES = \
 SelectionLayer.java \

@@ -20,7 +20,7 @@
  * 
  */
 
-#define HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
+#undef HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
 
 #include "ftsconfig.h"
 

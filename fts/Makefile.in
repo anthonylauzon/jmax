@@ -72,6 +72,7 @@ LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
 OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
+PLATFORM = @PLATFORM@
 PLATFORM_PACKAGES = @PLATFORM_PACKAGES@
 RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
@@ -79,12 +80,14 @@ VERSION = @VERSION@
 
 lib_LTLIBRARIES = libfts.la
 
-libfts_la_SOURCES =  OLDclient.c abstraction.c array.c atom.c atomfile.c audio.c autosave.c bytestream.c class.c client.c clipboard.c connection.c doctor.c dsp.c dspgraph.c errobj.c expression.c file.c fpe.c ftl.c ftlmem.c fts.c hashtable.c label.c list.c loader.c mem.c message.c midi.c midifile.c object.c objectlist.c objectset.c objtable.c package.c param.c patcher.c patparser.c platform.c post.c project.c property.c saver.c sched.c selection.c sigconn.c soundfile.c soundfile_af.c srconv.c stack.c symbol.c template.c time.c variable.c version.c vm.c 
+libfts_la_SOURCES =  @PLATFORM@.c OLDclient.c abstraction.c array.c atom.c atomfile.c audio.c autosave.c bytestream.c class.c client.c clipboard.c connection.c doctor.c dsp.c dspgraph.c errobj.c expression.c file.c fpe.c ftl.c ftlmem.c fts.c hashtable.c label.c list.c loader.c mem.c message.c midi.c midifile.c object.c objectlist.c objectset.c objtable.c package.c param.c patcher.c patparser.c post.c project.c property.c saver.c sched.c selection.c sigconn.c soundfile.c soundfile_af.c srconv.c stack.c symbol.c template.c time.c variable.c version.c vm.c 
 
 
 bin_PROGRAMS = fts
 fts_SOURCES = main.c
 fts_LDADD = -L.libs -lfts @FTS_SYS_LIBS@ -lm
+
+EXTRA_DIST = linux.c sgi.c macosx.c
 
 INCLUDES = -I$(top_srcdir)/include
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -99,13 +102,13 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libfts_la_LDFLAGS = 
 libfts_la_LIBADD = 
-libfts_la_OBJECTS =  OLDclient.lo abstraction.lo array.lo atom.lo \
-atomfile.lo audio.lo autosave.lo bytestream.lo class.lo client.lo \
-clipboard.lo connection.lo doctor.lo dsp.lo dspgraph.lo errobj.lo \
-expression.lo file.lo fpe.lo ftl.lo ftlmem.lo fts.lo hashtable.lo \
-label.lo list.lo loader.lo mem.lo message.lo midi.lo midifile.lo \
-object.lo objectlist.lo objectset.lo objtable.lo package.lo param.lo \
-patcher.lo patparser.lo platform.lo post.lo project.lo property.lo \
+libfts_la_OBJECTS =  @PLATFORM@.lo OLDclient.lo abstraction.lo array.lo \
+atom.lo atomfile.lo audio.lo autosave.lo bytestream.lo class.lo \
+client.lo clipboard.lo connection.lo doctor.lo dsp.lo dspgraph.lo \
+errobj.lo expression.lo file.lo fpe.lo ftl.lo ftlmem.lo fts.lo \
+hashtable.lo label.lo list.lo loader.lo mem.lo message.lo midi.lo \
+midifile.lo object.lo objectlist.lo objectset.lo objtable.lo package.lo \
+param.lo patcher.lo patparser.lo post.lo project.lo property.lo \
 saver.lo sched.lo selection.lo sigconn.lo soundfile.lo soundfile_af.lo \
 srconv.lo stack.lo symbol.lo template.lo time.lo variable.lo version.lo \
 vm.lo
@@ -126,20 +129,21 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =  .deps/OLDclient.P .deps/abstraction.P .deps/array.P \
-.deps/atom.P .deps/atomfile.P .deps/audio.P .deps/autosave.P \
-.deps/bytestream.P .deps/class.P .deps/client.P .deps/clipboard.P \
-.deps/connection.P .deps/doctor.P .deps/dsp.P .deps/dspgraph.P \
-.deps/errobj.P .deps/expression.P .deps/file.P .deps/fpe.P .deps/ftl.P \
-.deps/ftlmem.P .deps/fts.P .deps/hashtable.P .deps/label.P .deps/list.P \
-.deps/loader.P .deps/main.P .deps/mem.P .deps/message.P .deps/midi.P \
-.deps/midifile.P .deps/object.P .deps/objectlist.P .deps/objectset.P \
-.deps/objtable.P .deps/package.P .deps/param.P .deps/patcher.P \
-.deps/patparser.P .deps/platform.P .deps/post.P .deps/project.P \
-.deps/property.P .deps/saver.P .deps/sched.P .deps/selection.P \
-.deps/sigconn.P .deps/soundfile.P .deps/soundfile_af.P .deps/srconv.P \
-.deps/stack.P .deps/symbol.P .deps/template.P .deps/time.P \
-.deps/variable.P .deps/version.P .deps/vm.P
+DEP_FILES =  .deps/@PLATFORM@.P .deps/OLDclient.P .deps/abstraction.P \
+.deps/array.P .deps/atom.P .deps/atomfile.P .deps/audio.P \
+.deps/autosave.P .deps/bytestream.P .deps/class.P .deps/client.P \
+.deps/clipboard.P .deps/connection.P .deps/doctor.P .deps/dsp.P \
+.deps/dspgraph.P .deps/errobj.P .deps/expression.P .deps/file.P \
+.deps/fpe.P .deps/ftl.P .deps/ftlmem.P .deps/fts.P .deps/hashtable.P \
+.deps/label.P .deps/list.P .deps/loader.P .deps/main.P .deps/mem.P \
+.deps/message.P .deps/midi.P .deps/midifile.P .deps/object.P \
+.deps/objectlist.P .deps/objectset.P .deps/objtable.P .deps/package.P \
+.deps/param.P .deps/patcher.P .deps/patparser.P .deps/post.P \
+.deps/project.P .deps/property.P .deps/saver.P .deps/sched.P \
+.deps/selection.P .deps/sigconn.P .deps/soundfile.P \
+.deps/soundfile_af.P .deps/srconv.P .deps/stack.P .deps/symbol.P \
+.deps/template.P .deps/time.P .deps/variable.P .deps/version.P \
+.deps/vm.P
 SOURCES = $(libfts_la_SOURCES) $(fts_SOURCES)
 OBJECTS = $(libfts_la_OBJECTS) $(fts_OBJECTS)
 
@@ -287,7 +291,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

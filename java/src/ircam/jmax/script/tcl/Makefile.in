@@ -70,12 +70,12 @@ LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
 OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
+PLATFORM = @PLATFORM@
 PLATFORM_PACKAGES = @PLATFORM_PACKAGES@
 RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
 VERSION = @VERSION@
 
-EXTRA_DIST = package.html
 noinst_PROGRAMS = package
 package_SOURCES =  AbbreviationCmd.java ConsoleOpenCmd.java DefaultTclScript.java DefineScaleFactorCmd.java FtsAbstractionCmd.java FtsAbstractionPathCmd.java FtsHelpPatchCmd.java FtsHelpSummaryCmd.java FtsReferenceURLCmd.java FtsSyncCmd.java FtsTemplateCmd.java FtsTemplatePathCmd.java FtsUcsCmd.java JMaxCmd.java MaxDeclareIconCmd.java MaxDeclareSystemIconCmd.java MaxFtsConnectCmd.java MaxGetMaxVersionCmd.java MaxOpenCmd.java MaxQuitCmd.java MaxRunHooksCmd.java MaxSetSystemPropertyCmd.java MaxSourceCmd.java MaxSplashCmd.java MaxSysSourceCmd.java MaxSystemPropertyCmd.java MaxTclDocument.java MaxTclExeDocument.java MaxTclExeDocumentHandler.java MaxTclExeDocumentType.java MaxWhenCmd.java TclConsolePackage.java TclErmesPackage.java TclFtsPackage.java TclInterpreter.java TclMaxPackage.java TclMdaPackage.java TclScript.java
 
@@ -195,7 +195,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

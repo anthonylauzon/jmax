@@ -1,6 +1,5 @@
 SUBDIRS=actions menus renderers tools track
 
-EXTRA_DIST = package.html
 noinst_PROGRAMS = package
 package_SOURCES = \
 AbstractValueDataFlavor.java \

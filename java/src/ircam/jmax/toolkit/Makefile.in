@@ -70,6 +70,7 @@ LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
 OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
+PLATFORM = @PLATFORM@
 PLATFORM_PACKAGES = @PLATFORM_PACKAGES@
 RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
@@ -77,7 +78,6 @@ VERSION = @VERSION@
 
 SUBDIRS = actions menus
 
-EXTRA_DIST = package.html
 noinst_PROGRAMS = package
 package_SOURCES =  AbstractLayer.java AbstractRenderer.java AbstractSelection.java AbstractUndoableObject.java ClipableData.java ComponentContextSwitcher.java ContextSwitcher.java Cursors.java DirectionChooser.java DirectionListener.java DragListener.java DynamicDragListener.java Editor.java EditorContainer.java EditorToolbar.java Geometry.java GraphicContext.java GraphicSelectionListener.java IconCache.java Icons.java InfoPanel.java InteractionModule.java InteractionSemaphore.java Layer.java LockListener.java MaxToolsJMenu.java MaxToolsMenu.java MaxWindowJMenu.java MaxWindowMenu.java MouseDragTracker.java MouseTracker.java NumericPropertyEditor.java NumericalWidget.java ObjectRenderer.java PopupProvider.java PopupToolbarPanel.java PositionListener.java ProportionalLayout.java RenderManager.java Selecter.java SelectionHandler.java SelectionListener.java SelectionMover.java SelectionOwner.java SelectionResizer.java StatusBar.java StatusBarClient.java SwitchListener.java SystemIcons.java Tool.java ToolChangeEvent.java ToolListener.java ToolManager.java ToolProvider.java ToolbarProvider.java TranspositionListener.java UndoableData.java Widget.java WindowContextSwitcher.java XORHandler.java XORPainter.java ZoomListener.java
 
@@ -289,7 +289,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

@@ -1,6 +1,5 @@
 SUBDIRS=dialogs editors fts mda script toolkit widgets
 
-EXTRA_DIST = package.html
 noinst_PROGRAMS = package
 package_SOURCES = \
 RecentFileHistory.java\

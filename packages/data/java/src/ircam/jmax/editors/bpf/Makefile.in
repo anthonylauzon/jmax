@@ -70,6 +70,7 @@ LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
 OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
+PLATFORM = @PLATFORM@
 PLATFORM_PACKAGES = @PLATFORM_PACKAGES@
 RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
@@ -77,7 +78,6 @@ VERSION = @VERSION@
 
 SUBDIRS = renderers tools
 
-EXTRA_DIST = package.html
 noinst_PROGRAMS = package
 package_SOURCES =  Bpf.java BpfAdapter.java BpfDataListener.java BpfDataModel.java BpfEditor.java BpfExtension.java BpfGraphicContext.java BpfPanel.java BpfPoint.java BpfPopupMenu.java BpfSelection.java BpfSelectionMover.java BpfTableDialog.java BpfTableModel.java BpfTablePanel.java BpfToolManager.java Drawable.java FtsBpfObject.java ScrollManager.java UtilBpfPoint.java 
 
@@ -275,7 +275,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

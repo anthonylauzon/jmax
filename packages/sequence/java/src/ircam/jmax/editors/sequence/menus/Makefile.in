@@ -70,6 +70,7 @@ LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
 OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
+PLATFORM = @PLATFORM@
 PLATFORM_PACKAGES = @PLATFORM_PACKAGES@
 RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
@@ -77,7 +78,6 @@ VERSION = @VERSION@
 
 SUBDIRS = 
 
-EXTRA_DIST = package.html
 noinst_PROGRAMS = package
 package_SOURCES =  ClosedTrackPopupMenu.java EditMenu.java FileMenu.java MessageTrackPopupMenu.java MidiEventPopupMenu.java MidiTrackPopupMenu.java MonoTrackPopupMenu.java RulerPopupMenu.java TrackMenu.java 
 

@@ -70,6 +70,7 @@ LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
 OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
+PLATFORM = @PLATFORM@
 PLATFORM_PACKAGES = @PLATFORM_PACKAGES@
 RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
@@ -77,7 +78,6 @@ VERSION = @VERSION@
 
 SUBDIRS = 
 
-EXTRA_DIST = package.html
 noinst_PROGRAMS = package
 package_SOURCES =  AbstractEventValue.java AbstractValueInfo.java AmbitusValue.java AnythingTrackEditor.java AnythingValue.java ArrayEnumeration.java ChangeRangeDialog.java ChangeTrackNameDialog.java Drawable.java Editable.java Event.java EventValue.java FloatTrackEditor.java FloatTrackEditorFactory.java FloatValue.java IntegerTrackEditor.java IntegerTrackEditorFactory.java IntegerValue.java ListContainer.java TrackStateListener.java MessageTrackEditor.java MessageTrackEditorFactory.java MessageValue.java MidiTrackEditor.java MidiTrackEditorFactory.java MidiValue.java MonoTrackEditor.java MonoTrackEditorFactory.java NullEditor.java SequenceTableDialog.java SequenceTablePanel.java SequenceTextArea.java SequenceTextAreaListener.java TextDialog.java ToggleBar.java Track.java TrackBase.java TrackDataListener.java TrackDataModel.java TrackEditor.java TrackEditorFactory.java TrackEditorFactoryTable.java TrackEvent.java TrackListListener.java TrackListener.java TrackTableModel.java UtilTrackEvent.java ValueEditor.java ValueInfo.java ValueInfoTable.java 
 

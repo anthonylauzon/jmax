@@ -1,6 +1,6 @@
 Name: jmax
 Summary: a visual programming environment for real-time, interactive multimedia applications
-Version: 2.5.1
+Version: 3.0.1
 Release: 1
 Copyright: GPL
 Group: Applications/Multimedia
@@ -14,26 +14,12 @@ jMax is a visual programming environment for developing real-time, interactive m
 %setup -n jmax-%{version}
 
 %build
-%ifarch i386
-make all ARCH=i386-linux ENABLE_ALSA=$ENABLE_ALSA
-%endif
-%ifarch i686
-make all ARCH=i686-linux ENABLE_ALSA=$ENABLE_ALSA
-%endif
-%ifarch ppc
-make all ARCH=ppc-linux
+./configure
+make
 %endif
 
 %install
-rm -rf $RPM_BUILD_ROOT
-%ifarch i386
-make install ARCH=i386-linux prefix=$RPM_BUILD_ROOT/usr ENABLE_ALSA=$ENABLE_ALSA
-%endif
-%ifarch i686
-make install ARCH=i686-linux prefix=$RPM_BUILD_ROOT/usr ENABLE_ALSA=$ENABLE_ALSA
-%endif
-%ifarch ppc
-make install ARCH=ppc-linux prefix=$RPM_BUILD_ROOT/usr
+make install
 %endif
 
 %clean
@@ -45,7 +31,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-, root, root)
 %doc LICENCE.fr LICENSE README VERSION doc/*
 /usr/bin/jmax
-/usr/lib/jmax
+/usr/share/jmax
 /usr/include/fts
 
 

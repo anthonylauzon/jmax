@@ -1995,72 +1995,16 @@ EOF
 
 fi
 
-echo $ac_n "checking for C restrict keyword""... $ac_c" 1>&6
-echo "configure:2000: checking for C restrict keyword" >&5
-if eval "test \"`echo '$''{'acx_cv_c_restrict'+set}'`\" = set"; then
-  echo $ac_n "(cached) $ac_c" 1>&6
-else
-  acx_cv_c_restrict=unsupported
- 
- ac_ext=c
-# CFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='${CC-cc} -c $CFLAGS $CPPFLAGS conftest.$ac_ext 1>&5'
-ac_link='${CC-cc} -o conftest${ac_exeext} $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
-cross_compiling=$ac_cv_prog_cc_cross
-
- # Try the official restrict keyword, then gcc's __restrict__, then
- # SGI's __restrict.  __restrict has slightly different semantics than
- # restrict (it's a bit stronger, in that __restrict pointers can't
- # overlap even with non __restrict pointers), but I think it should be
- # okay under the circumstances where restrict is normally used.
- for acx_kw in restrict __restrict__ __restrict; do
-   cat > conftest.$ac_ext <<EOF
-#line 2020 "configure"
-#include "confdefs.h"
-
-int main() {
-float * $acx_kw x;
-; return 0; }
-EOF
-if { (eval echo configure:2027: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
-  rm -rf conftest*
-  acx_cv_c_restrict=$acx_kw; break
-else
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-fi
-rm -f conftest*
- done
- ac_ext=c
-# CFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='${CC-cc} -c $CFLAGS $CPPFLAGS conftest.$ac_ext 1>&5'
-ac_link='${CC-cc} -o conftest${ac_exeext} $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
-cross_compiling=$ac_cv_prog_cc_cross
-
-
-fi
-
-echo "$ac_t""$acx_cv_c_restrict" 1>&6
- if test "$acx_cv_c_restrict" != "restrict"; then
-   acx_kw="$acx_cv_c_restrict"
-   if test "$acx_kw" = unsupported; then acx_kw=""; fi
-   cat >> confdefs.h <<EOF
-#define restrict $acx_kw
-EOF
-
- fi
-
+ACX_C_RESTRICT
 echo $ac_n "checking whether byte ordering is bigendian""... $ac_c" 1>&6
-echo "configure:2057: checking whether byte ordering is bigendian" >&5
+echo "configure:2001: checking whether byte ordering is bigendian" >&5
 if eval "test \"`echo '$''{'ac_cv_c_bigendian'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   ac_cv_c_bigendian=unknown
 # See if sys/param.h defines the BYTE_ORDER macro.
 cat > conftest.$ac_ext <<EOF
-#line 2064 "configure"
+#line 2008 "configure"
 #include "confdefs.h"
 #include <sys/types.h>
 #include <sys/param.h>
@@ -2071,11 +2015,11 @@ int main() {
 #endif
 ; return 0; }
 EOF
-if { (eval echo configure:2075: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:2019: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   # It does; now see whether it defined to BIG_ENDIAN or not.
 cat > conftest.$ac_ext <<EOF
-#line 2079 "configure"
+#line 2023 "configure"
 #include "confdefs.h"
 #include <sys/types.h>
 #include <sys/param.h>
@@ -2086,7 +2030,7 @@ int main() {
 #endif
 ; return 0; }
 EOF
-if { (eval echo configure:2090: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:2034: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_c_bigendian=yes
 else
@@ -2106,7 +2050,7 @@ if test "$cross_compiling" = yes; then
     { echo "configure: error: can not run test program while cross compiling" 1>&2; exit 1; }
 else
   cat > conftest.$ac_ext <<EOF
-#line 2110 "configure"
+#line 2054 "configure"
 #include "confdefs.h"
 main () {
   /* Are we little or big endian?  From Harbison&Steele.  */
@@ -2119,7 +2063,7 @@ main () {
   exit (u.c[sizeof (long) - 1] == 1);
 }
 EOF
-if { (eval echo configure:2123: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:2067: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   ac_cv_c_bigendian=no
 else
@@ -2146,19 +2090,19 @@ fi
 # The Ultrix 4.2 mips builtin alloca declared by alloca.h only works
 # for constant arguments.  Useless!
 echo $ac_n "checking for working alloca.h""... $ac_c" 1>&6
-echo "configure:2150: checking for working alloca.h" >&5
+echo "configure:2094: checking for working alloca.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_alloca_h'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 2155 "configure"
+#line 2099 "configure"
 #include "confdefs.h"
 #include <alloca.h>
 int main() {
 char *p = alloca(2 * sizeof(int));
 ; return 0; }
 EOF
-if { (eval echo configure:2162: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:2106: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   ac_cv_header_alloca_h=yes
 else
@@ -2179,12 +2123,12 @@ EOF
 fi
 
 echo $ac_n "checking for alloca""... $ac_c" 1>&6
-echo "configure:2183: checking for alloca" >&5
+echo "configure:2127: checking for alloca" >&5
 if eval "test \"`echo '$''{'ac_cv_func_alloca_works'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 2188 "configure"
+#line 2132 "configure"
 #include "confdefs.h"
 
 #ifdef __GNUC__
@@ -2212,7 +2156,7 @@ int main() {
 char *p = (char *) alloca(1);
 ; return 0; }
 EOF
-if { (eval echo configure:2216: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:2160: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   ac_cv_func_alloca_works=yes
 else
@@ -2244,12 +2188,12 @@ EOF
 
 
 echo $ac_n "checking whether alloca needs Cray hooks""... $ac_c" 1>&6
-echo "configure:2248: checking whether alloca needs Cray hooks" >&5
+echo "configure:2192: checking whether alloca needs Cray hooks" >&5
 if eval "test \"`echo '$''{'ac_cv_os_cray'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 2253 "configure"
+#line 2197 "configure"
 #include "confdefs.h"
 #if defined(CRAY) && ! defined(CRAY2)
 webecray
@@ -2274,12 +2218,12 @@ echo "$ac_t""$ac_cv_os_cray" 1>&6
 if test $ac_cv_os_cray = yes; then
 for ac_func in _getb67 GETB67 getb67; do
   echo $ac_n "checking for $ac_func""... $ac_c" 1>&6
-echo "configure:2278: checking for $ac_func" >&5
+echo "configure:2222: checking for $ac_func" >&5
 if eval "test \"`echo '$''{'ac_cv_func_$ac_func'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 2283 "configure"
+#line 2227 "configure"
 #include "confdefs.h"
 /* System header to define __stub macros and hopefully few prototypes,
     which can conflict with char $ac_func(); below.  */
@@ -2302,7 +2246,7 @@ $ac_func();
 
 ; return 0; }
 EOF
-if { (eval echo configure:2306: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:2250: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_func_$ac_func=yes"
 else
@@ -2329,7 +2273,7 @@ done
 fi
 
 echo $ac_n "checking stack direction for C alloca""... $ac_c" 1>&6
-echo "configure:2333: checking stack direction for C alloca" >&5
+echo "configure:2277: checking stack direction for C alloca" >&5
 if eval "test \"`echo '$''{'ac_cv_c_stack_direction'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2337,7 +2281,7 @@ else
   ac_cv_c_stack_direction=0
 else
   cat > conftest.$ac_ext <<EOF
-#line 2341 "configure"
+#line 2285 "configure"
 #include "confdefs.h"
 find_stack_direction ()
 {
@@ -2356,7 +2300,7 @@ main ()
   exit (find_stack_direction() < 0);
 }
 EOF
-if { (eval echo configure:2360: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:2304: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   ac_cv_c_stack_direction=1
 else
@@ -2380,12 +2324,12 @@ fi
 for ac_func in socket
 do
 echo $ac_n "checking for $ac_func""... $ac_c" 1>&6
-echo "configure:2384: checking for $ac_func" >&5
+echo "configure:2328: checking for $ac_func" >&5
 if eval "test \"`echo '$''{'ac_cv_func_$ac_func'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 2389 "configure"
+#line 2333 "configure"
 #include "confdefs.h"
 /* System header to define __stub macros and hopefully few prototypes,
     which can conflict with char $ac_func(); below.  */
@@ -2408,7 +2352,7 @@ $ac_func();
 
 ; return 0; }
 EOF
-if { (eval echo configure:2412: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:2356: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_func_$ac_func=yes"
 else
@@ -2449,7 +2393,7 @@ else { echo "configure: error: can not run $ac_config_sub" 1>&2; exit 1; }
 fi
 
 echo $ac_n "checking host system type""... $ac_c" 1>&6
-echo "configure:2453: checking host system type" >&5
+echo "configure:2397: checking host system type" >&5
 
 host_alias=$host
 case "$host_alias" in
@@ -2471,23 +2415,23 @@ echo "$ac_t""$host" 1>&6
 
 case "$host" in
 i*86-pc-linux-gnu)
-    platform=linux ;
+    PLATFORM=linux ;
     PLATFORM_PACKAGES="alsa oss unixdtd" ;
     FTS_SYS_LIBS="-ldl -laudiofile -lpthread" ;
     if test "$electric_fence" = "yes" ; then FTS_SYS_LIBS="-lefence $FTS_SYS_LIBS" ; fi ;
     ;;
 
 mips-sgi-irix6.5)
-    platform=sgi ;
+    PLATFORM=sgi ;
     PLATFORM_PACKAGES="sgi unixdtd" ;
     FTS_SYS_LIBS="-ldl -laudiofile";
     ;;
 powerpc-apple-darwin*)
-	platform=macosx ;
-	PLATFORM_PACKAGES="macosx"  ;;
+    PLATFORM=macosx ;
+    PLATFORM_PACKAGES="macosx"  ;;
 esac
 
- 
+
 
 
 
@@ -2856,6 +2800,7 @@ s%@LN_S@%$LN_S%g
 s%@LIBTOOL@%$LIBTOOL%g
 s%@CPP@%$CPP%g
 s%@ALLOCA@%$ALLOCA%g
+s%@PLATFORM@%$PLATFORM%g
 s%@PLATFORM_PACKAGES@%$PLATFORM_PACKAGES%g
 s%@FTS_SYS_LIBS@%$FTS_SYS_LIBS%g
 s%@FTSDIR@%$FTSDIR%g
@@ -3242,51 +3187,6 @@ cat >> $CONFIG_STATUS <<\EOF
   fi
 fi; done
 
-EOF
-
-cat >> $CONFIG_STATUS <<EOF
-ac_sources="fts/${platform}.c"
-ac_dests="fts/platform.c"
-EOF
-
-cat >> $CONFIG_STATUS <<\EOF
-srcdir=$ac_given_srcdir
-while test -n "$ac_sources"; do
-  set $ac_dests; ac_dest=$1; shift; ac_dests=$*
-  set $ac_sources; ac_source=$1; shift; ac_sources=$*
-
-  echo "linking $srcdir/$ac_source to $ac_dest"
-
-  if test ! -r $srcdir/$ac_source; then
-    { echo "configure: error: $srcdir/$ac_source: File not found" 1>&2; exit 1; }
-  fi
-  rm -f $ac_dest
-
-  # Make relative symlinks.
-  # Remove last slash and all that follows it.  Not all systems have dirname.
-  ac_dest_dir=`echo $ac_dest|sed 's%/[^/][^/]*$%%'`
-  if test "$ac_dest_dir" != "$ac_dest" && test "$ac_dest_dir" != .; then
-    # The dest file is in a subdirectory.
-    test ! -d "$ac_dest_dir" && mkdir "$ac_dest_dir"
-    ac_dest_dir_suffix="/`echo $ac_dest_dir|sed 's%^\./%%'`"
-    # A "../" for each directory in $ac_dest_dir_suffix.
-    ac_dots=`echo $ac_dest_dir_suffix|sed 's%/[^/]*%../%g'`
-  else
-    ac_dest_dir_suffix= ac_dots=
-  fi
-
-  case "$srcdir" in
-  [/$]*) ac_rel_source="$srcdir/$ac_source" ;;
-  *) ac_rel_source="$ac_dots$srcdir/$ac_source" ;;
-  esac
-
-  # Make a symlink if possible; otherwise try a hard link.
-  if ln -s $ac_rel_source $ac_dest 2>/dev/null ||
-    ln $srcdir/$ac_source $ac_dest; then :
-  else
-    { echo "configure: error: can not link $ac_dest to $srcdir/$ac_source" 1>&2; exit 1; }
-  fi
-done
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
