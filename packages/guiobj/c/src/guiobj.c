@@ -40,6 +40,7 @@ extern void gint_config(void);
 extern void key_config(void);
 extern void keyserver_config(void);
 extern void messconst_config(void);
+extern void monitor_config(void);
 extern void panel_config(void);
 extern void runtime_errors_config(void);
 extern void scope_config(void);
@@ -64,6 +65,7 @@ guiobj_config(void)
   key_config();
   keyserver_config();
   messconst_config();
+  monitor_config();
   panel_config();
   runtime_errors_config();
   scope_config();

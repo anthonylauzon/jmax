@@ -15,6 +15,7 @@ FtsFloatValueObject.java \
 FtsForkObject.java \
 FtsInletObject.java \
 FtsMessConstObject.java \
+FtsMonitorObject.java \
 FtsOutletObject.java \
 FtsScopeObject.java \
 FtsSliderObject.java \
@@ -24,6 +25,7 @@ Inlet.java \
 InOutlet.java \
 IntBox.java \
 MessConst.java \
+Monitor.java \
 ObjectControlPanel.java \
 Outlet.java \
 Patcher.java \

@@ -526,7 +526,7 @@ scope_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 scope_config(void)
 {
-  scope_symbol = fts_new_symbol("scope");
+  scope_symbol = fts_new_symbol("scope~");
   sym_display = fts_new_symbol("display");
   sym_auto = fts_new_symbol("auto");
   sym_off = fts_new_symbol("off");

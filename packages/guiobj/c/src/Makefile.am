@@ -16,6 +16,7 @@ guiobj.c \
 key.c \
 keyserver.c \
 messconst.c \
+monitor.c \
 panel.c \
 runtimeerrors.c \
 scope.c \

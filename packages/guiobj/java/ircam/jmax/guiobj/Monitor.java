@@ -36,70 +36,49 @@ import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
-//
-// The "toggle" graphic object.
-//
 
-public class Toggle extends GraphicObject implements FtsIntValueListener
+public class Monitor extends GraphicObject implements FtsIntValueListener
 {
-  static transient final int DEFAULT_WIDTH = 20;
-  private transient static final int MINIMUM_WIDTH = 15;
+  private static transient final int FIXED_WIDTH = 60;
+  private static transient final int FIXED_HEIGHT = 20;
 
   private transient static final Color itsCrossColor = new Color(0, 0, 128);
 
-  private transient boolean isToggled = false;
+  private transient boolean isOn = false;
 
-  public Toggle(FtsGraphicObject theFtsObject) 
+  public Monitor(FtsGraphicObject theFtsObject) 
   {
     super(theFtsObject);
+
+    super.setWidth( FIXED_WIDTH);
+    super.setHeight( FIXED_HEIGHT);
   }
 
   public void setDefaults()
   {
-    super.setWidth( DEFAULT_WIDTH);
-    super.setHeight( DEFAULT_WIDTH);
+    super.setWidth( FIXED_WIDTH);
+    super.setHeight( FIXED_HEIGHT);
   }
 
-  // redefined from base class
-
-  public void setWidth( int theWidth)
-  {
-    if ( theWidth <= 0)
-      setWidth( DEFAULT_WIDTH);
-    else if ( theWidth < MINIMUM_WIDTH)
-      theWidth = MINIMUM_WIDTH;
-
-    super.setWidth( theWidth);
-    super.setHeight( theWidth);
-  }
-
-  // redefined from base class
-
-  public void setHeight( int theHeight)
+  public void setWidth(int w)
   {
   }
 
-  public boolean isSquare()
+  public void setHeight(int h)
   {
-    return true;
   }
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
     if (Squeack.isDown(squeack))
-	((FtsToggleObject)ftsObject).sendBang();
+	((FtsMonitorObject)ftsObject).sendBang();
   }
 
   public void valueChanged(int value) 
   {
-    isToggled = (value == 1);
+    isOn = (value == 1);
 
     updateRedraw();
-  }
-
-  public void redefined()
-  {
-    setDefaults();
   }
 
   public void paint(Graphics g) 
@@ -116,7 +95,7 @@ public class Toggle extends GraphicObject implements FtsIntValueListener
     
     g.fill3DRect( x + 1, y + 1, w - 2, h - 2, true);
 
-    if (isToggled) 
+    if (isOn) 
       {
 	g.setColor( itsCrossColor);
 	g.drawLine( x + 4, y + 4, x + w - 6, y + h - 6);
@@ -137,7 +116,7 @@ public class Toggle extends GraphicObject implements FtsIntValueListener
 
     g.fillRect( x + 3, y + 3, w - 6, h - 6);
 
-    if (isToggled) 
+    if (isOn) 
       {
 	g.setColor( itsCrossColor);
 	g.drawLine( x + 4, y + 4, x + w - 6, y + h - 6);

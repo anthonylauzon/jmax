@@ -126,6 +126,12 @@ public class Guiobj implements JMaxPackage {
 	  return new Scope( new FtsScopeObject( server, parent, objId, className, args, offset, length));
 	}
       };
+    JMaxObjectCreator monitorCreator = new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+	{
+	  return new Monitor( new FtsMonitorObject( server, parent, objId, className, args, offset, length));
+	}
+      };
 
     JMaxClassMap.put( "standard", standardCreator, "/icons/standard.gif", "/icons/standard_cursor.gif", this);
     JMaxClassMap.put( "jpatcher", patcherCreator, "/icons/jpatcher.gif", "/icons/jpatcher_cursor.gif", this);
@@ -141,6 +147,7 @@ public class Guiobj implements JMaxPackage {
     JMaxClassMap.put( "floatbox", floatboxCreator, "/icons/floatbox.gif", "/icons/floatbox_cursor.gif", this);
     JMaxClassMap.put( "display", displayCreator, "/icons/display.gif", "/icons/display_cursor.gif", this);
     JMaxClassMap.put( "vecdisplay", vecdisplayCreator, "/icons/vecdisplay.gif", "/icons/vecdisplay_cursor.gif", this);
-    JMaxClassMap.put( "scope", scopeCreator, "/icons/scope.gif", "/icons/scope_cursor.gif", this);
+    JMaxClassMap.put( "scope~", scopeCreator, "/icons/scope.gif", "/icons/scope_cursor.gif", this);
+    JMaxClassMap.put( "monitor~", monitorCreator, "/icons/monitor.gif", "/icons/monior_cursor.gif", this);
   }
 }
