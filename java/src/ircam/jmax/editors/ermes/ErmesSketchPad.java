@@ -125,6 +125,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   Vector itsInletList;
   Vector itsOutletList;
   static public ErmesSelection currentSelection;
+  static public FtsObject ftsClipboard;
   Vector itsTempSelected;
   public Vector itsElements;
   //  static ErmesSelection itsSelection.itsConnections;
@@ -840,7 +841,13 @@ Rectangle previousResizeRect = new Rectangle();
     itsConnections = new Vector();
     itsInletList = new Vector();
     itsOutletList = new Vector();
-    if (currentSelection==null) currentSelection = new ErmesSelection(/*WARN!!passare FtsSelection in qualche modo*/);
+    if (currentSelection==null) currentSelection = new ErmesSelection(Fts.getSelection());
+    try {
+      if (ftsClipboard==null) ftsClipboard = Fts.makeFtsObject(Fts.getServer().getRootObject(), "__clipboard");
+    }
+    catch (FtsException e) {
+      System.out.println("warning: failed to create an Fts clipboard");
+    }
     itsElements = new Vector();
     itsStartMovingPt = new Point(0,0);    
     itsStartInclusionRect = new Rectangle();  

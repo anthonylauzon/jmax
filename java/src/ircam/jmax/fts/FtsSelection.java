@@ -86,7 +86,7 @@ public class FtsSelection  extends FtsObject
 
   /** Remove an connection from this container. */
 
-  final void removeConnection(FtsConnection obj)
+  final public void removeConnection(FtsConnection obj)
   {
     connections.removeElement(obj);
 

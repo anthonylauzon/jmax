@@ -42,29 +42,29 @@ public class ErmesClipboardProvider implements Transferable, ClipboardOwner {
   /**
    * Fill the clipboard starting from an FtsSelection
    */
-  void addSelection(FtsSelection theSelection) {
-    if (theSelection.getObjects().size() == 0)
+  /*  void addSelection(FtsSelection theSelection) {
+      if (theSelection.getObjects().size() == 0)
       return;
-
-    flushContent();
-
-     try 
+      
+      flushContent();
+      
+      try 
       {
-	//PrintWriter aPrintWriter = new PrintWriter(itsStringWriter);
-	IndentedPrintWriter pw = new IndentedPrintWriter(itsStringWriter); 
-	theSelection.saveAsTcl(pw);
+      //PrintWriter aPrintWriter = new PrintWriter(itsStringWriter);
+      IndentedPrintWriter pw = new IndentedPrintWriter(itsStringWriter); 
+      theSelection.saveAsTcl(pw);
       }
-    catch (Exception e)
+      catch (Exception e)
       {
-	System.out.println("ERROR " + e + " while copying ");
-	e.printStackTrace(); // temporary
+      System.out.println("ERROR " + e + " while copying ");
+      e.printStackTrace(); // temporary
       }   
-  }
-
+      }*/
+  
   /**
    * Fill the clipboard starting from a list of fts objects (ErmesObjects)
    */
-  public void addFtsObjects(Vector theSelectedList) {
+  /*public void addFtsObjects(Vector theSelectedList) {
     // actually call, for now,  the objects' saveAsTcl method.
     flushContent();
     
@@ -76,32 +76,8 @@ public class ErmesClipboardProvider implements Transferable, ClipboardOwner {
       aPrintWriter.println("");
       itsFtsGroup.addElement(aFtsObject);
     }
-  }
+  }*/
 
-  /**
-   * Utility to put text in clipboard
-   */
-  public void addText(String text) {
-    itsStoredText = new String(text);
-    MaxApplication.systemClipboard.setContents(this, this);
-  }
-
-
-  /**
-   * Utility function to get Text from a clipboard ("") if empty
-   */
-  public String getText() {
-    String stringToReturn;
-    Transferable aTransferable = MaxApplication.systemClipboard.getContents(this);
-    
-    try {
-      stringToReturn = (String) aTransferable.getTransferData(DataFlavor.plainTextFlavor);
-    return stringToReturn;
-    } catch (Exception e) {
-      return ("");
-    }
-  }
-  
   /**
    * returns the list of flavors it supports
    */
@@ -120,11 +96,7 @@ public class ErmesClipboardProvider implements Transferable, ClipboardOwner {
   
   public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException 
   {
-    if (flavor.equals(tclGroupFlavor) || 
-	flavor.equals(DataFlavor.plainTextFlavor)) 
-      return itsStringWriter.toString();
-    else if (flavor.equals(ftsGroupFlavor)) return itsFtsGroup;
-    else throw new UnsupportedFlavorException(flavor);
+    return itsFtsGroup;
   }
 
 

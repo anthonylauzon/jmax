@@ -330,39 +330,23 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   // clipboard handling
   protected void Copy() {
     CreateFtsGraphics(this);
-    itsSelection.clean();
-    //fill the Fts selection
 
-    for (Enumeration e = ErmesSketchPad.currentSelection.itsObjects.elements(); e.hasMoreElements();) {
-      ErmesObject aObj = (ErmesObject)e.nextElement();
-      itsSelection.addObject(aObj.itsFtsObject);
-    }
+    //fill the systemClipboard AND the FtsClipboard
 
-    for (Enumeration e = ErmesSketchPad.currentSelection.itsConnections.elements(); e.hasMoreElements();) {
-      ErmesConnection aConnection = (ErmesConnection)e.nextElement();
-      itsSelection.addConnection(aConnection.itsFtsConnection);
-    }
+    Vector arg = new Vector();
+    arg.addElement(Fts.getSelection());
+    ErmesSketchPad.ftsClipboard.sendMessage(-1, "copy", arg);
 
-    itsClipboardProvider.addSelection(itsSelection);
-
+    /*itsClipboardProvider.addSelection(Fts.getSelection());*/
     MaxApplication.systemClipboard.setContents(itsClipboardProvider, itsClipboardProvider);
   }
 
 
 
   protected void Paste() {
-    String tclScriptToExecute = null;
-    if(itsSketchPad.itsRunMode) return;
-    // take the objects list from the clipboard, if any. Only tclGroups for now
-    Transferable aTransferable = MaxApplication.systemClipboard.getContents(this);
-    if ((aTransferable == null) || !aTransferable.isDataFlavorSupported(ErmesClipboardProvider.tclGroupFlavor))
-      return;
+    //it does no more use ErmesClipboardProvider
 
-    try {
-      tclScriptToExecute = (String) aTransferable.getTransferData(ErmesClipboardProvider.tclGroupFlavor);
-    } catch (Exception e) {
-      System.err.println("Error in clipboard handling (paste)" + e.toString());
-    }
+    if(itsSketchPad.itsRunMode) return;
 
     ftsObjectsPasted.removeAllElements();
     ftsConnectionsPasted.removeAllElements();
@@ -371,14 +355,9 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     itsPatcher.watch("newObject", this);
     itsPatcher.watch("newConnection", this);
 
-    try {
-      itsPatcher.eval(MaxApplication.getTclInterp(), tclScriptToExecute);
-    } catch (TclException e) {
-      System.out.println("bad format, cannot paste:" + e.toString());
-    }
-    
-    //ftsObjectPasted vector contains the needed new, pasted objects
-    //ftsConnectionPasted vector contains the needed new, pasted objects
+    Vector arg = new Vector();
+    arg.addElement(this);
+    ErmesSketchPad.ftsClipboard.sendMessage(-1, "paste", arg);
 
     itsPatcher.removeWatch("newObject", this);    
     itsPatcher.removeWatch("newConnection", this);    

@@ -15,40 +15,36 @@ import ircam.jmax.fts.*;
 public class ErmesSelection {
   public Vector itsObjects = new Vector();
   public Vector itsConnections = new Vector();
-  //WARN!!+ FtsSelection itsFtsSelection = new FtsSelection();
+  FtsSelection itsFtsSelection;
 
-  public ErmesSelection(FtsObject theFtsObject) {
-    //WARN!!+itsFtsSelection = theFtsSelection;
-  }
-
-  public ErmesSelection(/*WARN!! to be removed*/) {
-    //itsFtsSelection = theSelection; 
+  public ErmesSelection(FtsSelection theFtsSelection) {
+    itsFtsSelection = theFtsSelection;
   }
 
   public void addObject(Object theObject) {
     itsObjects.addElement(theObject);
-    //WARN!!+itsFtsSelection.addObject(((ErmesObject)theObject).itsFtsObject);
+    itsFtsSelection.addObject(((ErmesObject)theObject).itsFtsObject);
   }
 
   public void addConnection(Object theConnection) {
     itsConnections.addElement(theConnection);
-    //WARN!!+itsFtsSelection.addConnection(((ErmesConnection)theConnection).itsFtsConnection);
+    itsFtsSelection.addConnection(((ErmesConnection)theConnection).itsFtsConnection);
   }
 
   public void removeObject(Object theObject) {
     itsObjects.removeElement(theObject);
-    //WARN!!+itsFtsSelection.removeObject(((ErmesObject)theObject).itsFtsObject);
+    itsFtsSelection.removeObject(((ErmesObject)theObject).itsFtsObject);
   }
 
   public void removeConnection(Object theConnection) {
     itsConnections.removeElement(theConnection);
-    //WARN!!+itsFtsSelection.removeConnection(((ErmesConnection)theConnection).itsFtsConnection);
+    itsFtsSelection.removeConnection(((ErmesConnection)theConnection).itsFtsConnection);
   }
 
   public void removeAllElements() {
     itsObjects.removeAllElements();
     itsConnections.removeAllElements();
-    //WARN!!+itsFtsSelection.clean();
+    itsFtsSelection.clean();
   }
 
 }

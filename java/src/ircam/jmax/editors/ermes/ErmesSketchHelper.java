@@ -547,7 +547,12 @@ class ErmesSketchHelper extends Object{
   //--------------------------------------------------------
   
   public ErmesConnection TraceConnection(ErmesObjOutlet theSourceOutlet, ErmesObjInlet theDestInlet, boolean paintNow){
-    ErmesConnection aConnection = new ErmesConnection(itsSketchPad, theDestInlet, theSourceOutlet);
+    ErmesConnection aConnection;
+    try {
+      aConnection = new ErmesConnection(itsSketchPad, theDestInlet, theSourceOutlet);}
+    catch (FtsException e) {
+      return null;
+    }
     theSourceOutlet.AddConnection(aConnection);
     theDestInlet.AddConnection(aConnection); 
     itsSketchPad.itsConnections.addElement(aConnection);

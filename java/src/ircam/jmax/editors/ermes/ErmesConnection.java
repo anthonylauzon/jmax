@@ -47,7 +47,7 @@ public class ErmesConnection implements ErmesDrawable{
   //	to be used from user-driven connections, unlike the second constructor, which receives
   //	the FtsConnection. This is going to change in a middle-term (4/03/97)
   //--------------------------------------------------------
-  public ErmesConnection(ErmesSketchPad theSketchPad, ErmesObjInlet theInlet, ErmesObjOutlet theOutlet){
+  public ErmesConnection(ErmesSketchPad theSketchPad, ErmesObjInlet theInlet, ErmesObjOutlet theOutlet) throws FtsException{
 		
     itsSketchPad = theSketchPad;
     itsInlet = theInlet;
@@ -64,6 +64,8 @@ public class ErmesConnection implements ErmesDrawable{
       {
 	// ????????
 	System.out.println("Connection Error");
+	Toolkit.getDefaultToolkit().beep();
+	throw e;
       }
 
     itsSelected = false;
