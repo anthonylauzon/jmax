@@ -948,16 +948,6 @@ static fts_graphic_description_t *fts_patparse_parse_graphic_description(fts_pat
  * or the file contains an unimplemented construct.
  */
 
-static int fts_patparse_check_patch_protection( fts_graphic_description_t *this, fts_object_t *obj)
-{
-  if ( fts_get_int( &(this->x)) == (SCALE_MULT * 69696969)/ SCALE_DEN /* Magic number for patch protection */
-      || fts_get_int( &(this->y)) == (SCALE_MULT * 69696969)/ SCALE_DEN)
-    {
-    }
-
-  return 0;
-}
-
 static void fts_patparse_parse_window_properties(fts_object_t *parent, fts_patlex_t *in)
 {
   int x1, y1, x2, y2;
@@ -977,12 +967,11 @@ static void fts_patparse_parse_window_properties(fts_object_t *parent, fts_patle
   fts_patlex_next_token(in);
   y2 = (SCALE_MULT * fts_get_int(&(in->val)))/ SCALE_DEN;
 
-  /* If patcher window has negative coordinates */
-  if (x1 < 0 || y1 < 0)
+  /* If patcher window has big negative coordinates */
+  if (x1 < -10000 || y1 < -10000)
     {
       fts_atom_t a;
 
-      /* set the "no_upload" property of the object's patcher */
       fts_set_int( &a, 1);
       fts_object_put_prop( parent, fts_new_symbol( "no_upload"), &a);
 
