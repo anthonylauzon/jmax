@@ -696,6 +696,20 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	currentSelection.select( aConnection);
       }
 
+    if (currentSelection.itsObjects.size() == 1)
+      {
+	ErmesObject obj = (ErmesObject)currentSelection.itsObjects.elementAt( 0);
+
+	if (obj instanceof ErmesObjEditable)
+	  {
+	    currentSelection.deselectAll();
+
+	    ((ErmesObjEditable)obj).restartEditing();
+
+	    itsEditField.selectAll();
+	  }
+      }
+
     editStatus = START_SELECT;
     paintDirtyList();
   }
@@ -1312,6 +1326,20 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	RequestOffScreen();
 	DrawOffScreen( g);
 	g.dispose();
+      }
+
+    if ( e.isAltDown())
+      {
+	itsCurrentObject = getObjectContaining( x, y);
+
+	if ( itsCurrentObject != null)
+	  {
+	    if (! FtsHelpPatchTable.openHelpPatch( itsCurrentObject.itsFtsObject))
+	      new ErrorDialog( itsSketchWindow, 
+			       "Sorry, no help for object " + itsCurrentObject.itsFtsObject.getClassName());
+	  }
+
+	return;
       }
     
     if ( isLocked() || e.isControlDown()) 
