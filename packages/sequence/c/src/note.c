@@ -65,7 +65,7 @@ note_get_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_atom_t *a = fts_get_ptr(at + 1);
 
   fts_set_int(a, this->pitch);
-  fts_set_float(a + 1, this->duration);
+  fts_set_float(a + 1, (float) this->duration);
 
   if(this->midi_channel < 0)
     *n = 2;

@@ -345,7 +345,7 @@ catch_tilda_read_from_bus(fts_word_t *a)
   int n_tick = fts_word_get_int(a + 3);
   float *buffer = fts_signal_bus_get_buffer(bus, 1 - toggle);
   int bus_channels = fts_signal_bus_get_size(bus);
-  int i, j, n;
+  int i, j;
 
   if(n_channels <= bus_channels)
     {

@@ -103,7 +103,7 @@ event_upload(event_t *event)
       fts_atom_t atoms[64];
       int n_atoms;
 
-      fts_set_float(atoms + 0, event->time);
+      fts_set_float(atoms + 0, (float) event->time);
       fts_set_symbol(atoms + 1, type);
   
       event_get_atoms(event, &n_atoms, atoms + 2);
@@ -122,7 +122,7 @@ event_save_bmax(fts_bmax_file_t *file, event_t *event)
       fts_atom_t atoms[64];
       int n_atoms;
 
-      fts_set_float(atoms + 0, event->time);
+      fts_set_float(atoms + 0, (float) event->time);
       fts_set_symbol(atoms + 1, type);
   
       event_get_atoms(event, &n_atoms, atoms + 2);

@@ -362,7 +362,6 @@ sequence_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   if(ac == 0)
     {  
       track_t *track = sequence_get_first_track(this);
-      fts_atom_t a[128];
       
       while(track)
 	{      

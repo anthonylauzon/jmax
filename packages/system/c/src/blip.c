@@ -61,8 +61,6 @@ blip_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static fts_status_t
 blip_instantiate(fts_class_t *cl, int ac, const fts_atom_t *aat)
 {
-  fts_symbol_t a[2];
-
   fts_class_init(cl, sizeof(blip_t), 1, 0, 0);
 
   fts_method_define_list(cl, 0, blip_list);

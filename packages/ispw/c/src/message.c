@@ -715,16 +715,12 @@ static void messbox_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
 static void messbox_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messbox_t *this = (messbox_t *) o;
-  fts_atom_t a[1];
 
-  /*fts_objectset_t *set = (fts_objectset_t *)fts_get_data(at);*/
   fts_objectset_t *set = (fts_objectset_t *)fts_get_object(at);
 
   if (fts_atom_list_is_subsequence(this->atom_list, ac - 1, at + 1))
     {
-      /*fts_objectset_add(set, o);*/
-      fts_set_object(&a[0], o);
-      fts_send_message((fts_object_t *)set, fts_SystemInlet, sym_objectset_add, 1, a);
+      fts_objectset_add(set, o);
     }
 }
 

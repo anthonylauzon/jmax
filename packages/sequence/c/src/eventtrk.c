@@ -46,7 +46,6 @@ create_event(int ac, const fts_atom_t *at)
 {
   fts_symbol_t type = fts_get_symbol(at);
   event_t *event = 0;
-  fts_atom_t a[2];
 
   if(type == seqsym_int || type == seqsym_float || type == seqsym_symbol)
     event = (event_t *)fts_object_create(event_class, 1, at + 1);

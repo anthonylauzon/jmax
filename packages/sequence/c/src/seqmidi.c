@@ -96,7 +96,6 @@ static int
 seqmidi_read_track_start(fts_midifile_t *file)
 {
   seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
-  int i;
 
   data->midi_track_number++;
   data->note_track = 0;
@@ -307,7 +306,6 @@ seqmidi_read_track_end(fts_midifile_t *file)
 int
 sequence_read_midifile(sequence_t *sequence, fts_symbol_t name)
 {
-  char ch;
   fts_midifile_t *file = fts_midifile_open_read(name);
   fts_midifile_read_functions_t read;
   seqmidi_read_data_t data;

@@ -55,7 +55,6 @@ fts_signal_bus_put_prologue(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   fts_signal_bus_t *this = (fts_signal_bus_t *)o;
   int n_tick = fts_dsp_get_tick_size();
   fts_atom_t a[4];
-  int i;
 
   this->n_tick = n_tick;
 
@@ -89,7 +88,7 @@ fts_signal_bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const 
 {
   fts_signal_bus_t *this = (fts_signal_bus_t *)o;
   int n_channels;
-  int i, n;
+  int n;
 
   ac--;
   at++;
