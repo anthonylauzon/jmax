@@ -177,7 +177,8 @@ public class ErmesObjPatcher extends ErmesObject {
   //--------------------------------------------------------
   // Load
   //--------------------------------------------------------
-  public boolean Load(String file, String path) {
+  /*  ???? 
+    public boolean Load(String file, String path) {
     itsNameString = file;
     pathForLoading = path;
     Dimension d = SetDimension(itsNameString);
@@ -187,6 +188,7 @@ public class ErmesObjPatcher extends ErmesObject {
     currentRect.height = preferredSize.height;
     return true;
   }
+  */
 	
   //--------------------------------------------------------
   // paint

@@ -92,13 +92,13 @@ public class FtsConnection
       {
 	if (inlet >= to.getNumberOfInlets())
 	  {
-	    System.err.println("Cannot connect to inlet " + inlet + " of object " + to);
+	    System.out.println("Cannot connect to inlet " + inlet + " of object " + to);
 	    return false;
 	  }
 
 	if (outlet >= from.getNumberOfOutlets())
 	  {
-	    System.err.println("Cannot connect to outlet " + outlet + " of object " + from);
+	    System.out.println("Cannot connect to outlet " + outlet + " of object " + from);
 	    return false;
 	  }
       }

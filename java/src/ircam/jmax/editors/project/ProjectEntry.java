@@ -15,9 +15,10 @@ public class ProjectEntry extends Panel implements MouseListener/*, KeyListener*
   int itsFontStyle;	
   MaxDocument itsDocument;
   public Project itsProject;
-  String  itsfName, itsrType, itsfSize;
+  File itsFile;
+  String itsTitle;
+  String itsrType, itsfSize;
   int itsSize = 0;
-  String itsPath;
   boolean itsSelected = false;
   Vector itsEntryList;//List of sub-entry
   int itsAbstractionNumber = 0;
@@ -32,8 +33,8 @@ public class ProjectEntry extends Panel implements MouseListener/*, KeyListener*
     itsEntryList = new Vector();
     itsDocument = theDocument;
     itsProject = theProject;
-    itsPath = itsDocument.GetPath();
-    itsfName = theDocument.GetName();
+    itsTitle = theDocument.GetTitle();
+    itsFile  = theDocument.GetFile();
     itsrType = theDocument.GetType();
     itsfSize = String.valueOf(itsSize);
     int fontStyle = theDocument.GetSaveFlag() ? Font.PLAIN : Font.ITALIC;
@@ -49,15 +50,15 @@ public class ProjectEntry extends Panel implements MouseListener/*, KeyListener*
   //--------------------------------------------------------
   //	CONSTRUCTOR
   //--------------------------------------------------------
-  public ProjectEntry(String theName, String theType, String thePath, Project theProject) {
+  public ProjectEntry(String theTitle, String theType, File theFile, Project theProject) {
     
     itsEntryList = new Vector();
     itsDocument = null;
     itsProject = theProject;
-    itsfName = theName;
+    itsFile  = theFile;
+    itsTitle = theTitle;
     itsrType = theType;
     itsfSize = String.valueOf(itsSize);
-    itsPath = thePath;
     int fontStyle = Font.PLAIN;
 
     String aFontName = (Toolkit.getDefaultToolkit().getFontList())[0];
@@ -67,16 +68,24 @@ public class ProjectEntry extends Panel implements MouseListener/*, KeyListener*
     addMouseListener(this);
   }
 
-  public void SetFileName(String theFileName, String thePathName){
-    itsfName = theFileName;
-    itsPath = thePathName;
+  public void SetFile(File theFile){
+    itsFile = theFile;
+    itsTitle = theFile.getName();
     repaint();
   }
+
   //--------------------------------------------------------
-  //	GetWholeName
+  //	GetTitle
   //--------------------------------------------------------
-  public String GetWholeName(){
-    return itsPath+itsfName;
+  public String GetTitle(){
+    return itsTitle;
+  }
+
+  //--------------------------------------------------------
+  //	GetFile
+  //--------------------------------------------------------
+  public File GetFile(){
+    return itsFile;
   }
   
   //--------------------------------------------------------
@@ -144,7 +153,7 @@ public class ProjectEntry extends Panel implements MouseListener/*, KeyListener*
   public void mouseExited(MouseEvent e){}
 
   boolean OpenEntryDocument(){
-    if(itsProject.itsProjectWindow.OpenFile(itsfName, itsPath)){
+    if(itsProject.itsProjectWindow.OpenFile(itsFile)){
       itsDocument = MaxApplication.getApplication().itsWindow.GetDocument();
       if(itsDocument instanceof ErmesPatcherDoc){
 	((ErmesSketchWindow)(itsDocument.GetWindow())).SetEntry(this);//?????
@@ -184,9 +193,9 @@ public class ProjectEntry extends Panel implements MouseListener/*, KeyListener*
       g.drawLine(14,5,10,14);
       g.drawLine(10,14,6,5);
     }
-    g.drawString(itsfName, 20, getSize().height/3*2);
-    g.drawString(itsrType, 40+fm.stringWidth(itsfName), getSize().height/3*2);
-    g.drawString(itsfSize, 60+fm.stringWidth(itsfName)+fm.stringWidth(itsrType),getSize().height/3*2);
+    g.drawString(itsTitle, 20, getSize().height/3*2);
+    g.drawString(itsrType, 40+fm.stringWidth(itsTitle), getSize().height/3*2);
+    g.drawString(itsfSize, 60+fm.stringWidth(itsTitle)+fm.stringWidth(itsrType),getSize().height/3*2);
   }
 			
   public void Reset(){

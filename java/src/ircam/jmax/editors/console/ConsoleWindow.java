@@ -34,7 +34,7 @@ public class ConsoleWindow extends MaxEditor {
     itsConsole.SetContainer(this);
   }
   
-  public boolean OpenFile(String thename, String thePath){
+  public boolean OpenFile(File file){
     return true;
   }
   public MaxDocument GetDocument(){

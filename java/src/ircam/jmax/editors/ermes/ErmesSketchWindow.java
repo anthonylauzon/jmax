@@ -1,8 +1,10 @@
 package ircam.jmax.editors.ermes;
 
 import java.awt.*;
-import java.util.*;
 import java.awt.event.*;
+import java.util.*;
+import java.io.*;
+
 
 import tcl.lang.*;
 
@@ -102,19 +104,8 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       //get the FtsWindowDescription, and use it for: reshape to the right dimensions
       setBounds(aFtsWindow.x, aFtsWindow.y, aFtsWindow.width, aFtsWindow.height+80);
       //assigning the right name to the window.
-      if (aFtsWindow.ermesInfo != null) {
-      StringTokenizer st = new StringTokenizer(aFtsWindow.ermesInfo, "\"\t\n\r:()");
-      String attribute;
-      if (st.hasMoreTokens()) {
-	attribute = st.nextToken(); //should be in the form (name: pipponzio)
-	if (attribute.equals("name")) {
-	  itsDocument.SetFileName(st.nextToken());
-	}
-      }
-      else {}//old system, no names for the patcher. No solutions for now
-      //System.out.println("attribute era "+attribute+", ora itsDocument.itsFileName = "+itsDocument.GetName());
-      }
-      if((!isSubPatcher)&&(! MaxApplication.getApplication().doAutorouting)) SetAutorouting();//???
+
+      if((!isSubPatcher)&&(! MaxApplication.doAutorouting)) SetAutorouting();//???
       validate();
       itsSketchPad.InitFromDocument(itsDocument);
       itsSketchPad.repaint();//force a repaint to build an offGraphics context
@@ -370,7 +361,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     }
     for (int j=0; j< MaxApplication.itsEditorsFrameList.size(); j++) {
       aWindow = (MaxWindow) MaxApplication.itsEditorsFrameList.elementAt(j);
-      theWindowMenu.add(aMenuItem = new MenuItem(aWindow.GetDocument().GetName()));
+      theWindowMenu.add(aMenuItem = new MenuItem(aWindow.GetDocument().GetTitle()));
       aMenuItem.addActionListener(this);
     }
   }
@@ -392,7 +383,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     MaxWindow aWindow; 
     for (int i=0; i< MaxApplication.itsEditorsFrameList.size(); i++) {
       aWindow = (MaxWindow) MaxApplication.itsEditorsFrameList.elementAt(i);
-      if(aWindow.GetDocument().GetName().equals(theName)) return true;
+      if(aWindow.GetDocument().GetTitle().equals(theName)) return true;
     }
     return false;
   } 
@@ -659,14 +650,14 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     else if(aInt == 47){//this is a patch to trap the '?'
       //ask help for the selected element...
       ErmesObject aObject = null;
-      String fileToOpen;
+      File fileToOpen;
       for (Enumeration en = itsSketchPad.itsSelectedList.elements(); en.hasMoreElements();) {
 	aObject = (ErmesObject) en.nextElement();
 	
 	fileToOpen = aObject.itsFtsObject.getHelpPatch();
 	
 	if (fileToOpen != null)
-	  MaxApplication.getApplication().Load(fileToOpen, "");
+	  MaxApplication.Load(fileToOpen);
       }
     }
   }
@@ -712,7 +703,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       itsDocument.Save();
     }
     if (theString.equals("Save As...")) {
-      itsDocument.SetFileName("");
+      itsDocument.SetFile(null);
       itsDocument.Save();
     }
     else if (theString.equals("Close   Ctrl+W")) {
@@ -798,7 +789,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     ProjectEntry aEntry;
     for (Enumeration e = itsSketchPad.itsPatcherElements.elements(); e.hasMoreElements();){
       aPatcher = (ErmesObjPatcher)e.nextElement();
-      aEntry = MaxApplication.getApplication().GetProjectWindow().GetProject().GetTheEntry(aPatcher.GetPath()+aPatcher.GetName());
+      aEntry = MaxApplication.getApplication().GetProjectWindow().GetProject().GetTheEntry(aPatcher.GetName());
       aEntry.DecAbstractionNumber();
       if(aEntry.GetAbstractionNumber()==0) itsProjectEntry.itsProject.RemoveFromProject(aEntry);
     }
@@ -836,12 +827,12 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       MaxApplication.getApplication().ObeyCommand(MaxApplication.ADD_WINDOW);
     }
     else if (theString.equals("Add files...")) {
-      FileDialog fd = new FileDialog(this, "Add To Project");
-      fd.setFile("");
-      fd.show();
-      if(fd.getFile()==null) return;
-      if(fd.getFile().compareTo("")!= 0)
-	MaxApplication.getApplication().AddToProject(fd.getFile(), fd.getDirectory());
+      File file = MaxApplication.getOpenFileName(this, "Add To Project");
+
+      if (file != null)
+	MaxApplication.AddToProject(file);
+      else
+	return;
     }
     else if (theString.equals("Remove files")) {
       MaxApplication.getApplication().ObeyCommand(MaxApplication.REMOVE_FILES);
@@ -892,7 +883,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 
     for (int j=0; j< MaxApplication.itsEditorsFrameList.size(); j++) {
       aWindow = (MaxWindow) MaxApplication.itsEditorsFrameList.elementAt(j);
-      if(aWindow.GetDocument().GetName().equals(theName)) {
+      if(aWindow.GetDocument().GetTitle().equals(theName)) {
 	aWindow.ToFront();
 	return;
       }

@@ -18,7 +18,7 @@ public class FileNotSavedDialog extends Dialog implements ActionListener, KeyLis
   public FileNotSavedDialog(Frame theFrame) {
     super(theFrame, "File Not Saved Message", true);
     itsParent = (MaxWindow)theFrame;
-    itsMessage = "File "+itsParent.GetDocument().GetName()+" is not saved."+'\n'+" Do you want to save it now?";
+    itsMessage = "File " + itsParent.GetDocument().GetFile() + " is not saved."+'\n'+" Do you want to save it now?";
     
     setLayout(new BorderLayout());
     

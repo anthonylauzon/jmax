@@ -39,23 +39,10 @@ class MaxOpenCmd implements Command {
     if (argv.length == 2)
       {
 	ProjectWindow aProjectWindow = MaxApplication.getApplication().itsProjectWindow;
-	String pathName, fileName;
-	String fileSeparator = System.getProperty("file.separator");
-	String name = new String(argv[1].toString());
-	int lastSeparatorIndex = name.lastIndexOf(fileSeparator);
 
-	if (lastSeparatorIndex == -1)
-	  {
-	    pathName = "./";
-	    fileName = name;
-	  }
-	else
-	  {
-	    fileName = name.substring(lastSeparatorIndex+1);
-	    pathName = name.substring(0, lastSeparatorIndex)+"/";
-	  }
+	// Should call MaxApplication.Open, not the project !!!
 
-	aProjectWindow.OpenFile(fileName, pathName);
+	aProjectWindow.OpenFile(new File(new String(argv[1].toString())));
 	// Should return the document produced !!!
       }
     else

@@ -47,15 +47,39 @@ if {$jmaxArch == "mips1"} {
     ucs default out~ Analog
 } elseif {$jmaxArch == "origin"} {
     puts "    ADAT: 8/8 (default)"
+
+# Astor config
+
 #    ucs open device in~ ADAT as SgiALIn ALdevice ADATIn channels 8 fifo_size $jmaxAudioBuffer
     ucs open device out~ ADAT as SgiALOut ALdevice ADATOut channels 8 fifo_size $jmaxAudioBuffer
     
-    puts "    AES: 2/2"
+#    puts "    AES: 2/2"
 #    ucs open device in~ AES as SgiALIn ALdevice AESIn channels 2 fifo_size $jmaxAudioBuffer
     ucs open device out~ AES as SgiALOut ALdevice AESOut channels 2 fifo_size $jmaxAudioBuffer
     
-    ucs default in~ ADAT
+#    ucs default in~ ADAT
     ucs default out~ ADAT
+
+#mimi config
+
+#    post "    multiA and multiB (ADAT 1 and 2) 8/8"
+#    post "    stereoA and stereoB (AES 1 and 2): 2/2"
+
+#    ucs open device in~ multiA as SgiALIn ALdevice RAD1.ADATIn channels 8 fifo_size 512
+#    ucs open device out~ multiA as SgiALOut ALdevice RAD1.ADATOut channels 8 fifo_size 512
+
+#    ucs open device in~ stereoA as SgiALIn ALdevice RAD1.AESIn channels 2 fifo_size 512
+#    ucs open device out~ stereoA as SgiALOut ALdevice RAD1.AESOut channels 2 fifo_size 512
+
+#    ucs open device in~ multiB as SgiALIn ALdevice RAD2.ADATIn channels 8 fifo_size 512
+#    ucs open device out~ multiB as SgiALOut ALdevice RAD2.ADATOut channels 8 fifo_size 512
+
+#    ucs open device in~ stereoB as SgiALIn ALdevice RAD2.AESIn channels 2 fifo_size 512
+#    ucs open device out~ stereoB as SgiALOut ALdevice RAD2.AESOut channels 2 fifo_size 512
+
+#    ucs default in~ multiA
+#    ucs default out~ multiA
+
 } else {
 
     puts "Unknow architecture, profile DACs installed"

@@ -1,3 +1,25 @@
+Fri Jan 30 12:50:41 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Changed *all* the methods previously using directory/name string
+	  pairs or pathnames, to method accepting/returning File objects, including
+	  MaxDocument and MaxEditor.
+
+	* Added the static method MaxApplication.getOpenFileName(frame, title)
+	  and its brother getOpenFileName(frame, title, fileNameFilter)
+	  that return a file for opening/loading/adding after asking to the user;
+	  This function handle the current directory for loading, so that successive
+	  load from the same directory do not need to manually rechange directory
+	  each time.
+
+	  The method return an instance of the "File" object, that is the proper
+	  way to send files around; all the functions using the name/directory string
+	  pair should be converted to use the File object.
+
+	  All calls to FileDialog *for loading* in the code have been converted to
+	  use the new method; the current directory is appropriate for saving,
+	  so code for saving is unchanged.
+	
+
 Thu Jan 29 16:32:27 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
 
 	* Changed the site configuration file name to "jmax.cfg"

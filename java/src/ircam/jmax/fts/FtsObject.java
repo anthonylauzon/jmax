@@ -1,9 +1,11 @@
 package ircam.jmax.fts;
 
 import tcl.lang.*;
-import ircam.jmax.*;
+
 import java.io.*;
 import java.util.*;
+
+import ircam.jmax.*;
 
 /**
  * Class implementing the proxy of an FTS object.
@@ -295,7 +297,14 @@ public class FtsObject
 
   /** The Fts object class Name */
 
-  String className;	
+  private String className;	
+
+  // sometimes, like in template and abstractions
+  // the class name used by FTS differer from the official
+  // className; by the way, this is an hack to be solved with
+  // multiple classes.
+
+  private String ftsClassName;	
 
   /** The vector containing the obejct argument */
 
@@ -412,6 +421,7 @@ public class FtsObject
 
 
     this.className = className;
+    this.ftsClassName = className; // by default
     this.args = args;
     this.parent = parent;
 
@@ -436,9 +446,9 @@ public class FtsObject
 	
 	description = getDescription(); 
 
-	// Then, reset the className to "patcher"
+	// Then, reset the ftsClassName to "patcher"
 
-	this.className = "patcher";
+	this.ftsClassName = "patcher";
 
 	//create a 0 in 0 out patcher FtsObject
 
@@ -514,9 +524,9 @@ public class FtsObject
 	
 	description = getDescription(); 
 
-	// Then, reset the className to "patcher"
+	// Then, reset the ftsClassName to "patcher"
 
-	this.className = "patcher";
+	this.ftsClassName = "patcher";
 
 	// First, remove the .pat or the .abs if present, and
 	// compute the real name
@@ -529,13 +539,13 @@ public class FtsObject
 	  realName = className;
 
 
+
 	if (FtsAbstractionTable.exists(realName))
 	  {
 	    patname = FtsAbstractionTable.getFilename(realName);
 	  }
 	else
 	  patname = realName;
-
 
 	//create a 0 in 0 out patcher FtsObject
 
@@ -561,11 +571,11 @@ public class FtsObject
 	  }
 	catch (FtsDotPatException e)
 	  {
-	    System.err.println("Error " + e + " in reading abstraction " + realName);
+	    System.out.println("Error " + e + " in reading abstraction " + realName);
 	  }
 	catch (java.io.IOException e)
 	  {
-	    System.err.println("I/O Error " + e + " in reading abstraction " + realName);
+	    System.out.println("I/O Error " + e + " in reading abstraction " + realName);
 	  }
 
 	subPatcher.assignInOutletsAndName("unnamed");
@@ -777,9 +787,11 @@ public class FtsObject
   {
     this.args = args;
 
-    MaxApplication.getFtsServer().redefineObject(this, className, args);
+    // Use fts class name, not user class name
 
-    if (className.equals("patcher"))
+    MaxApplication.getFtsServer().redefineObject(this, ftsClassName, args);
+
+    if (ftsClassName.equals("patcher"))
       {
 	subPatcher.redefine(((Integer)args.elementAt(1)).intValue(),
 			    ((Integer)args.elementAt(2)).intValue());
@@ -1023,7 +1035,6 @@ public class FtsObject
    * Get the object id. <p>
    * Should *not* be public, the TCL IDs should be handled
    * separately, so to handle other kind of objects.
-   * @deprecated
    */
 
   int getObjId()
@@ -1282,15 +1293,17 @@ public class FtsObject
 
   /** Access to the help patch for an object. */
 
-  public String getHelpPatch()
+  public File getHelpPatch()
   {
     if (FtsHelpPatchTable.exists(className))
-      return FtsHelpPatchTable.getHelpPatch(className);
+      return new File(FtsHelpPatchTable.getHelpPatch(className));
     else
       return null;
   }
 
   /** Access to the html documentation for an object. */
+
+  // Should return an URL object
 
   public String getReferenceURL()
   {

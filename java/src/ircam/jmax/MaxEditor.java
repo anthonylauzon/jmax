@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.io.*;
+
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.project.*; // @@@ !!
@@ -120,7 +121,7 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
     for (int j=0; j< MaxApplication.itsEditorsFrameList.size(); j++) {
       aWindow = (MaxWindow) MaxApplication.itsEditorsFrameList.elementAt(j);
      if(aWindow!=this){
-       theWindowMenu.add(aMenuItem = new MenuItem(aWindow.GetDocument().GetName()));
+       theWindowMenu.add(aMenuItem = new MenuItem(aWindow.GetDocument().GetTitle()));
        aMenuItem.addActionListener(this);
      }
     }
@@ -248,7 +249,7 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
     MaxWindow aWindow; 
     for (int i=0; i< MaxApplication.itsEditorsFrameList.size(); i++) {
       aWindow = (MaxWindow)MaxApplication.itsEditorsFrameList.elementAt(i);
-      if(aWindow.GetDocument().GetName().equals(theName)) return true;
+      if(aWindow.GetDocument().GetTitle().equals(theName)) return true;
     }
     return false;
   } 
@@ -275,7 +276,7 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
       GetDocument().Save();
     }
     else if (theString.equals("Save As...")) {
-      GetDocument().SetFileName("");
+      GetDocument().SetFile(null);
       GetDocument().Save();
     }
     else if (theString.equals("Close Ctrl+W")) {
@@ -295,13 +296,13 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
       if(aDialog.GetNothingToDoFlag()) return false;
       if(aDialog.GetToSaveFlag()){
 	GetDocument().Save();
-	if(itsProject.HaveAEntry(GetDocument().GetWholeName())){
+	if(itsProject.HaveAEntry(GetDocument().GetTitle())){
 	  if(GetDocument().GetNeverSavedFlag()) itsProject.RemoveFromProject(GetDocument());
 	  else itsProject.ResetEntry(GetDocument());
 	}
       }
       else{
-	if(itsProject.HaveAEntry(GetDocument().GetWholeName())){ 
+	if(itsProject.HaveAEntry(GetDocument().GetTitle())) {
 	  if(GetDocument().GetNeverSavedFlag()) itsProject.RemoveFromProject(GetDocument());
 	  else itsProject.ResetEntry(GetDocument());
 	}
@@ -309,7 +310,7 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
       aDialog.dispose();
     }
     else{ 
-      if(itsProject.HaveAEntry(GetDocument().GetWholeName()))
+      if(itsProject.HaveAEntry(GetDocument().GetTitle()))
 	itsProject.ResetEntry(GetDocument());
     }
     itsProject.ResetMenus(this);
@@ -353,7 +354,7 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
     }
     for (int j=0; j< MaxApplication.itsEditorsFrameList.size(); j++) {
       aWindow = (MaxWindow) MaxApplication.itsEditorsFrameList.elementAt(j);
-      if(aWindow.GetDocument().GetName().equals(theName)) {
+      if(aWindow.GetDocument().GetTitle().equals(theName)) {
 	aWindow.ToFront();
 	return;
       }
@@ -389,19 +390,15 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
   public void InitFromDocument(MaxDocument theDocument){}  
   
   public boolean Open(){
-    FileDialog fd = new FileDialog(this, "FileDialog");
-    String aOpeningFile;
-    fd.setFile("");
-    fd.show();
-    aOpeningFile = fd.getFile();
-    if(aOpeningFile==null) return false;
-    if(!(aOpeningFile.equals(""))){
-     return OpenFile(aOpeningFile, fd.getDirectory());
-    }
-    return false;
+    File file = MaxApplication.getOpenFileName(this, "Open File");
+
+    if (file != null)
+      return OpenFile(file);
+    else
+	return false;
   }
 
-  public abstract boolean OpenFile(String thename, String thePath);
+  public abstract boolean OpenFile(File file);
   public abstract MaxDocument GetDocument();
 
   public Frame GetFrame(){

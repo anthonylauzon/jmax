@@ -233,8 +233,6 @@ public class FtsDotPatParser
 			// the open patcher flag has been specified
 
 			in.nextToken();	// skip ';'
-
-			(parent.getWindowDescription()).open = true;
 		      }
 		    
 		    return ;
@@ -343,19 +341,21 @@ public class FtsDotPatParser
     try
       {
 	in  = new FtsDotPatTokenizer(new FileInputStream(inputFile), env);
+
+	readFromFtsDotPatTokenizer(parent, in);
+
+	return parent;
       }
     catch (FileNotFoundException e)
       {
-	System.out.println("file not found" + inputFile.getName()); // Should raise an exception
+	System.out.println("Loading abstraction : file not found: " + inputFile.getName()); // Should raise an exception
+	return null;
       }
     catch (IOException e)
       {
-	System.out.println("io error" + inputFile.getName()); // Should raise an exception
+	System.out.println("Loading abstraction : io error: " + inputFile.getName()); // Should raise an exception
+	return null;
       }
-
-    readFromFtsDotPatTokenizer(parent, in);
-
-    return parent;
   }
 
 

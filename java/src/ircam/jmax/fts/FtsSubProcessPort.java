@@ -32,7 +32,7 @@ class FtsSubProcessPort extends FtsPort
       }
     catch (IOException e)
       {
-	System.err.println("Don't know about command " + path);
+	System.out.println("Don't know about command " + path);
       }    
   }
 
@@ -46,7 +46,7 @@ class FtsSubProcessPort extends FtsPort
       } 
     catch (IOException e)
       {
-	System.err.println("Cannot quit " + path);
+	System.out.println("Cannot quit " + path);
       }
 
   }

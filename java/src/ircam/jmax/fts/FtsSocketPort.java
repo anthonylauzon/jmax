@@ -34,11 +34,11 @@ class FtsSocketPort extends FtsPort
       }
     catch (UnknownHostException e)
       {
-	System.err.println("Don't know about host " + host + ":" + port);
+	System.out.println("Don't know about host " + host + ":" + port);
       }
     catch (IOException e)
       {
-	System.err.println("Couldn't get I/O for the connection to " + host + ":" + port);
+	System.out.println("Couldn't get I/O for the connection to " + host + ":" + port);
       }    
   }
 
@@ -55,7 +55,7 @@ class FtsSocketPort extends FtsPort
       } 
     catch (IOException e)
       {
-	System.err.println("I/O failed on closing the connection to " + host + ":" + port);
+	System.out.println("I/O failed on closing the connection to " + host + ":" + port);
       }
 
   }

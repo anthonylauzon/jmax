@@ -3,6 +3,8 @@ package ircam.jmax.editors.project;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.io.*;
+
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.ermes.*;
@@ -75,7 +77,7 @@ public class Project extends Panel implements AdjustmentListener{
       itsCurrentEntry = newEntry;
       itsCurrentEntry.Select();
       add(newEntry, itsItems.size()-1-itsAbstractionNum);//-itsAbstractinoNum per mettere le abstractino tutte assieme
-      itsOldString = newEntry.GetWholeName();
+      itsOldString = newEntry.GetTitle();
       if(theWindow instanceof ErmesSketchWindow) ((ErmesSketchWindow)theWindow).SetEntry(newEntry);
       validate();
       repaint();
@@ -84,16 +86,16 @@ public class Project extends Panel implements AdjustmentListener{
 	ErmesObjPatcher aPatcher;
 	for(Enumeration e = ((ErmesSketchWindow)theWindow).GetSketchPad().GetPatcherElements().elements() ; e.hasMoreElements() ;) {
 	  aPatcher = (ErmesObjPatcher) e.nextElement();
-	  AddToProject(aPatcher.GetName(),"Abstraction",aPatcher.GetPath());
+	  AddToProject(aPatcher.GetName(), "Abstraction", null);
 	}
       }
     }
   }
 	
-  public void AddToProject(String theName, String theType, String thePath) {
-    if(!HaveAEntry(theName+thePath)){
+  public void AddToProject(String theName, String theType, File file) {
+    if(!HaveAEntry(theName)){
       itsAdd = true;
-      ProjectEntry newEntry = new ProjectEntry(theName, theType, thePath, this);
+      ProjectEntry newEntry = new ProjectEntry(theName, theType, file, this);
       itsItems.addElement(newEntry);
       //solo per estetica
       if(itsPanelList.size()>0) {
@@ -112,12 +114,12 @@ public class Project extends Panel implements AdjustmentListener{
 	itsAbstractionNum++;
       }
       else add(newEntry, itsItems.size()-1-itsAbstractionNum);
-      itsOldString = theName+thePath;
+      itsOldString = theName;
       validate();
       repaint();
     }
     else if(theType.compareTo("Abstraction")==0){
-      GetTheEntry(theName+thePath).IncAbstractionNumber();
+      GetTheEntry(theName).IncAbstractionNumber();
     }
   }
 	
@@ -126,10 +128,10 @@ public class Project extends Panel implements AdjustmentListener{
   //--------------------------------------------------------
   public boolean HaveAEntry(MaxDocument theDocument){
     ProjectEntry aEntry;
-    String aName = theDocument.GetWholeName();
+    String aName = theDocument.GetTitle();
     for(int i=0; i<itsItems.size();i++){
       aEntry = (ProjectEntry) itsItems.elementAt(i);
-      if(aName.equals(aEntry.GetWholeName())) return true;
+      if(aName.equals(aEntry.GetTitle())) return true;
     }
     return false;
   }
@@ -138,7 +140,7 @@ public class Project extends Panel implements AdjustmentListener{
     ProjectEntry aEntry;
     for(int i=0; i<itsItems.size();i++){
       aEntry = (ProjectEntry) itsItems.elementAt(i);
-      if(theName.equals(aEntry.GetWholeName())) return true;
+      if(theName.equals(aEntry.GetTitle())) return true;
     }
     return false;
   }
@@ -159,7 +161,7 @@ public class Project extends Panel implements AdjustmentListener{
     ProjectEntry aEntry = null;
     for(int i=0; i<itsItems.size();i++){
       aEntry = (ProjectEntry) itsItems.elementAt(i);
-      if(theName.equals(aEntry.GetWholeName())) 
+      if(theName.equals(aEntry.GetTitle()))
 	break;
     }
     return aEntry;
@@ -205,7 +207,7 @@ public class Project extends Panel implements AdjustmentListener{
 	
 	for (int i=0; i<itsItems.size(); i++) {
 	  aEntry = (ProjectEntry)itsItems.elementAt(i);
-	  if (aEntry.GetWholeName().equals(theString))
+	  if (aEntry.GetTitle().equals(theString))
 	    break;
 	}
 	
@@ -234,10 +236,10 @@ public class Project extends Panel implements AdjustmentListener{
 
   public void ResetEntry(MaxDocument theDocument) {
     ProjectEntry aEntry;
-    String aString = theDocument.GetWholeName();
+    String aString = theDocument.GetTitle();
     for (int i=0; i<itsItems.size(); i++) {
       aEntry = (ProjectEntry) itsItems.elementAt(i);
-      if(aEntry.GetWholeName().equals(aString)){
+      if(aEntry.GetTitle().equals(aString)){
 	aEntry.itsDocument = null;
 	break;
       }
@@ -253,10 +255,10 @@ public class Project extends Panel implements AdjustmentListener{
   //--------------------------------------------------------
   public void RemoveFromProject(MaxDocument theDocument) {
     ProjectEntry aEntry;
-    String aString = theDocument.GetWholeName();
+    String aString = theDocument.GetTitle();
     for (int i=0; i<itsItems.size(); i++) {
       aEntry = (ProjectEntry) itsItems.elementAt(i);
-      if(aEntry.GetWholeName().equals(aString)){
+      if(aEntry.GetTitle().equals(aString)){
 	itsItems.removeElement(aEntry);			
 	remove(aEntry);
 	break;

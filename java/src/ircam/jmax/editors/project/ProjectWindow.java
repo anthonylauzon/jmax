@@ -3,6 +3,8 @@ package ircam.jmax.editors.project;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.io.*;
+
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
@@ -333,7 +335,7 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
     String aString;
     for (int i=0; i< MaxApplication.itsSketchWindowList.size(); i++) {
       aSketchWindow = (ErmesSketchWindow) MaxApplication.itsSketchWindowList.elementAt(i);
-      aString = aSketchWindow.GetDocument().GetName();
+      aString = aSketchWindow.GetDocument().GetTitle();
       if(aString.equals(theName)) return true;
     }
     return false;
@@ -343,7 +345,7 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
     MaxWindow aWindow; 
     for (int i=0; i< MaxApplication.itsEditorsFrameList.size(); i++) {
       aWindow = (MaxWindow) MaxApplication.itsEditorsFrameList.elementAt(i);
-      if(aWindow.GetDocument().GetName().equals(theName)) return true;
+      if(aWindow.GetDocument().GetTitle().equals(theName)) return true;
     }
     return false;
   } 
@@ -401,80 +403,61 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
     if(theFileType.equals("patcher"))MaxApplication.getApplication().ObeyCommand(MaxApplication.NEW_COMMAND);
     else if(theFileType.equals("")) return null;
     /* @@@@@@ Change new to use resources to find dynamically the editor
-    else if(theFileType.equals("table")){
-      Tabler aTable = new Tabler();
-      aTable.Init(itsProject);
-      aTable.InitDoc("tab_untitled"+(untitledTabCounter++), itsProject);
-      MaxApplication.itsEditorsFrameList.addElement(aTable.GetWindow());
-      MaxApplication.getApplication().SetCurrentWindow(aTable);
-      MaxApplication.getApplication().AddThisFrameToMenus(aTable.GetName());
-      return aTable;
-    }
-    else if((theFileType.equals("espresso"))||(theFileType.equals("text"))){
-      TextEditor aTextEditor = new TextEditor();
-      aTextEditor.Init(itsProject);
-      aTextEditor.InitDoc("tx_untitled"+(untitledTxtCounter++), itsProject);
-      MaxApplication.itsEditorsFrameList.addElement(aTextEditor.GetWindow());
-      MaxApplication.getApplication().SetCurrentWindow(aTextEditor);
-      MaxApplication.getApplication().AddThisFrameToMenus(aTextEditor.GetName());
-    }
-    else if(theFileType.equals("sequence")){
-      Sequencer aSequencer = new Sequencer();
-      aSequencer.Init(itsProject);
-      aSequencer.InitDoc("seq_untitled"+(untitledSeqCounter++), itsProject);
-      MaxApplication.itsEditorsFrameList.addElement(aSequencer.GetWindow());
-      MaxApplication.getApplication().SetCurrentWindow(aSequencer);
-      MaxApplication.getApplication().AddThisFrameToMenus(aSequencer.GetName());
-    }
     */
     return null;//WARNING
   }
   
   public boolean Open(){
-    FileDialog fd = new FileDialog(this, "FileDialog");
-    String aOpeningFile;
-    fd.setFile("");
-    fd.show();
-    aOpeningFile = fd.getFile();
-    if(aOpeningFile==null) return false;
-    if(!(aOpeningFile.equals(""))){
-      return OpenFile(aOpeningFile, fd.getDirectory());
-    }
-    return false;
+    File file = MaxApplication.getOpenFileName(this, "Open File");
+
+    if (file != null)
+      {
+	return OpenFile(file);
+      }
+    else
+	return false;
   }
 
 
-  public String GetExtension(String theFileName){
+  public String GetExtension(File theFile)
+  {
+    String theFileName = theFile.getName();
     int aLength = theFileName.length();
-    String aExtension = theFileName.substring(aLength-3, aLength);
-    if(theFileName.endsWith("."+aExtension)) return aExtension;
-    else return "";
+
+    if (aLength > 4)
+      {
+	String aExtension = theFileName.substring(aLength-3, aLength);
+	if(theFileName.endsWith("."+aExtension)) return aExtension;
+	else return "";
+      }
+    else
+      return "";
   }
 
-  public boolean OpenFile(String theFileName, String theDirectory){
-    
-    String aExtension = GetExtension(theFileName);
+  public boolean OpenFile(File file)
+  {
+    String aExtension = GetExtension(file);
     MaxResourceId aResId = null;
 
-    if(aExtension.equals("tpa")){
-            try {
-	      MaxApplication.getTclInterp().evalFile(theDirectory+theFileName);
+    if(aExtension.equals("tpa"))
+      {
+	try {
+	  MaxApplication.getTclInterp().evalFile(file.getPath());
 	}
-	catch (Exception e) {
-	System.out.println("error while opening .tpa"+theDirectory+theFileName+" "+e.toString());
-	e.printStackTrace();
-	return false;
-	}
-      MaxApplication.itsSketchWindowList.addElement(MaxApplication.getApplication().itsSketchWindow);
-      MaxApplication.getApplication().AddThisWindowToMenus(MaxApplication.getApplication().itsSketchWindow);
-      return true;
-    }
-    else if(aExtension.equals("pat")){
-      boolean temp = MaxApplication.getApplication().doAutorouting;//files .pat charged without autorouting
-      MaxApplication.getApplication().doAutorouting = false;
-      MaxApplication.getApplication().Load(theFileName, theDirectory);
-      MaxApplication.getApplication().doAutorouting = temp;
-      return true;
+	catch (Exception e)
+	  {
+	    System.out.println("error while opening .tpa " + file +" : " + e.toString());
+	    // e.printStackTrace();
+	    return false;
+	  }
+	MaxApplication.itsSketchWindowList.addElement(MaxApplication.getApplication().itsSketchWindow);
+	MaxApplication.getApplication().AddThisWindowToMenus(MaxApplication.getApplication().itsSketchWindow);
+	return true;
+      }
+    else if(aExtension.equals("pat"))
+      {
+	MaxApplication.Load(file);
+	return true;
     }
     else if ((aResId = ResIdWithExtension("."+aExtension))!=null) {
       Object placeHolder;
@@ -500,23 +483,16 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
 	}
 	
 	aDocument = (MaxDocument) placeHolder;
-	aDocument.InitDoc(theFileName, theDirectory, theFileName, itsProject);
+	aDocument.InitDoc(file.getName(), file, itsProject);
 	MaxApplication.itsEditorsFrameList.addElement(aDocument.GetWindow());
 	MaxApplication.getApplication().SetCurrentWindow(aDocument.GetWindow());
-	MaxApplication.getApplication().AddThisFrameToMenus(aDocument.GetName());
+	MaxApplication.getApplication().AddThisFrameToMenus(aDocument.GetTitle());
       }
       return true;
     }
     //tutto il resto viene aperto con il text editor
     else {
-      
-      //       TextEditor aDocument = null; 
-      //       aDocument = new TextEditor();
-      //       aDocument.Init(itsProject);
-      //       aDocument.InitDoc(theFileName,theDirectory,theFileName,itsProject); 
-      //       MaxApplication.itsEditorsFrameList.addElement(aDocument.GetWindow());
-      //       MaxApplication.getApplication().SetCurrentWindow(aDocument.GetWindow());
-      //       MaxApplication.getApplication().AddThisFrameToMenus(aDocument.GetName()); 
+      // ...
     }
     return true;
  }
@@ -540,24 +516,19 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
       return Open();
     }
     else if (theString.equals("Import...")) {
-      FileDialog fd = new FileDialog(this, "FileDialog");
-      fd.setFile("");
-      fd.setFilenameFilter(itsPatFilter);
-      fd.show();
-      if(fd.getFile()==null) return false;
-      if(!(fd.getFile().equals(""))){
-	boolean temp = MaxApplication.getApplication().doAutorouting;
-	MaxApplication.getApplication().doAutorouting = false;
-	MaxApplication.getApplication().Load(fd.getFile(), fd.getDirectory());
-	MaxApplication.getApplication().doAutorouting = temp;
-      }
+      File file = MaxApplication.getOpenFileName(this, "Import File", itsPatFilter);
+
+      if (file != null)
+	MaxApplication.Load(file);
+      else
+	return false;
     }
     if (theString.equals("Save  Ctrl+S")) {
       if(MaxApplication.getApplication().itsWindow != null) MaxApplication.getApplication().itsSketchWindow.GetDocument().Save();
     }
     if (theString.equals("Save As...")) {
       if(MaxApplication.getApplication().itsWindow != null){
-	MaxApplication.getApplication().itsWindow.GetDocument().SetFileName("");
+	MaxApplication.getApplication().itsWindow.GetDocument().SetFile(null);
 	MaxApplication.getApplication().itsWindow.GetDocument().Save();
       }
     }
@@ -572,7 +543,7 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
       MaxApplication.getApplication().ObeyCommand(MaxApplication.QUIT_APPLICATION);
     }
     else if (theString.equals("Open with Autorouting")) {
-      MaxApplication.getApplication().doAutorouting = !MaxApplication.getApplication().doAutorouting;
+      MaxApplication.doAutorouting = !MaxApplication.doAutorouting;
     }
     else if (theString.equals("System statistics...")) {
       StatisticsDialog aDialog = new StatisticsDialog(this);
@@ -594,12 +565,13 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
       MaxApplication.getApplication().ObeyCommand(MaxApplication.ADD_WINDOW);
     }
     else if (theString.equals("Add files...")) {
-      FileDialog fd = new FileDialog(this, "Add To Project");
-      fd.setFile("");
-      fd.show();
-      if(fd.getFile()==null) return false;
-      if(fd.getFile().compareTo("")!= 0)
-	MaxApplication.getApplication().AddToProject(fd.getFile(), fd.getDirectory());
+
+      File file = MaxApplication.getOpenFileName(this, "Add To Project");
+
+      if (file != null)
+	MaxApplication.AddToProject(file);
+      else
+	return false;
     }
     else if (theString.equals("Remove files")) {
       MaxApplication.getApplication().ObeyCommand(MaxApplication.REMOVE_FILES);
@@ -639,7 +611,7 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
     }
     for (int j=0; j< MaxApplication.itsEditorsFrameList.size(); j++) {
       aWindow = (MaxWindow) MaxApplication.itsEditorsFrameList.elementAt(j);
-      aString = aWindow.GetDocument().GetName();
+      aString = aWindow.GetDocument().GetTitle();
       if(aString.equals(theName)) {
 	aWindow.ToFront();
 	return;

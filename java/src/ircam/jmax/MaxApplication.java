@@ -55,21 +55,55 @@ public class MaxApplication extends Object {
     return itsInterp;
   }
 
+  /** New Loading structure (beginning): global "Open" FileDialog that handle current directory */
+
+  static private String openFileDirectory = null; // temp !!
+
+  public static File getOpenFileName(Frame frame, String title)
+  {
+    return getOpenFileName(frame, title, null);
+  }
+
+  public static File getOpenFileName(Frame frame, String title, FilenameFilter filter)
+  {
+    FileDialog fd = new FileDialog(frame, title);
+    String file;
+
+    fd.setFile("");
+
+    if (openFileDirectory != null)
+      fd.setDirectory(openFileDirectory);
+
+    if (filter != null)
+      fd.setFilenameFilter(filter);
+    
+    fd.show();
+
+    openFileDirectory = fd.getDirectory();
+    file = fd.getFile();
+
+    if ((file == null) || file.equals(""))
+      return null;
+
+    return new File(openFileDirectory, file);
+  }
+
   static Interp itsInterp;//e.m.
   public static Vector itsSketchWindowList;
   public static Vector itsEditorsFrameList;
-  ConnectionDialog itsConnDialog;
-  String	fileToLoad;
-  String	pathForLoading;
-  public FtsServer     itsServer = null;
-  public boolean doAutorouting = true; // Should become a static in the Patcher editor
+
+  static ConnectionDialog itsConnDialog;
+  private static     FtsServer itsServer = null;
+  public static boolean doAutorouting = true; // Should become a static in the Patcher editor
+  //e.m.public static ConsShell itsShell;
+
   public static Properties ermesProperties;
 
-  public Vector resourceVector = new Vector();
+  public static Vector resourceVector = new Vector();
   int MAX_RESOURCE_FILE_LENGHT = 1024;
-  public ErmesSketchWindow itsSketchWindow;
-  public MaxWindow itsWindow;
-  public /*static*/ ProjectWindow itsProjectWindow;
+  public static ErmesSketchWindow itsSketchWindow;
+  public static MaxWindow itsWindow;
+  public static ProjectWindow itsProjectWindow;
 
   static MaxWhenHookTable  itsHookTable;
   public final static int NEW_COMMAND = 0;
@@ -93,7 +127,7 @@ public class MaxApplication extends Object {
   public final static int SELECT_ALL = 18;
   public final static int PRINT_WINDOW = 19;
 
-  ConsoleWindow itsConsoleWindow = null;
+  static ConsoleWindow itsConsoleWindow = null;
   Dimension d = new Dimension(java.awt.Toolkit.getDefaultToolkit().getScreenSize());
   final int SCREENVERT = d.height;
   final int SCREENHOR = d.width;
@@ -245,21 +279,97 @@ public class MaxApplication extends Object {
     return itsServer != null;
   }
   
-  public boolean Load(String file, String path) {
+  public static void Load(File file)
+  {
     //for now, only '.pat' accepted...
-    // so, if fileToLoad does not terminate with '.pat', error
-    fileToLoad = file;
-    pathForLoading = path;
-    return ObeyCommand(OPEN_COMMAND);
+    // so, if file does not terminate with '.pat', error
+
+    //files .pat always charged without autorouting
+
+    boolean temp = doAutorouting;
+
+    doAutorouting = false;
+
+    // create a new document from skratch
+
+    ErmesPatcherDoc aPatcherDoc = new ErmesPatcherDoc();
+
+    // invocate the 'Load' method of the document
+    
+    aPatcherDoc.Import(file);
+
+    // create the new SketchWindow based on the Document created....
+
+    itsSketchWindow = new ErmesSketchWindow(false, null);
+    itsWindow = itsSketchWindow;
+
+    //itsSketchWindow.addKeyListener(itsSketchWindow);
+    itsSketchWindow.itsSketchPad.GetOffGraphics();
+
+    try
+      {
+	itsSketchWindow.InitFromDocument(aPatcherDoc);
+      }
+    catch (Exception e)
+      {
+	ErrorDialog aErr = new ErrorDialog(itsProjectWindow, "Error while importing "+ file);
+	aErr.setLocation(100, 100);
+	aErr.setVisible(true);
+	return;
+      }
+
+    itsSketchWindowList.addElement(itsSketchWindow);
+    itsSketchWindow.inAnApplet = false;
+    itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetTitle());
+    aPatcherDoc.SetWindow(itsSketchWindow);
+    CheckboxMenuItem aEditMenuItem = (CheckboxMenuItem)itsSketchWindow.itsEditMenu.getItem(9);
+    aEditMenuItem.setState(doAutorouting);
+
+    if(itsProjectWindow.itsProject.GetItems().size()==0)
+      itsSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
+
+    if(itsSketchWindowList.size() == 1)
+      itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);
+
+    AddThisWindowToMenus(itsSketchWindow);
+    itsSketchWindow.setVisible(true);
+
+    // Restore autorouting
+
+    doAutorouting = temp;
   }
   
-  public boolean AddToProject(String file, String path){
-    fileToLoad = file;
-    pathForLoading = path;
-    return ObeyCommand(ADD_FILES);
+  public static void AddToProject(File file)
+  {
+    String aType = new String();
+    MaxResourceId aResId;
+    boolean found = false;
+
+    for (Enumeration e= resourceVector.elements(); e.hasMoreElements() && !found;)
+      {
+	aResId = (MaxResourceId) e.nextElement();
+
+	for (Enumeration e1 = aResId.resourceExtensions.elements(); e1.hasMoreElements();)
+	  {
+	    String aExt = (String) e1.nextElement();
+
+	    if (file.getName().endsWith(aExt))
+	      {
+		aType = aResId.resourceName;
+		found = true;
+		break;
+	      }
+	  }
+      }
+
+    if (!found)
+      aType = "unknown";
+
+    itsProjectWindow.itsProject.AddToProject(file.getName(), aType, file);
+    UpdateProjectMenu();
   }
 	
-  public void AddThisWindowToMenus(ErmesSketchWindow theSketchWindow){
+  static public void AddThisWindowToMenus(ErmesSketchWindow theSketchWindow){
     ErmesSketchWindow aSketchWindow;
     MaxWindow aWindow;
     if(!theSketchWindow.isSubPatcher){
@@ -288,7 +398,7 @@ public class MaxApplication extends Object {
     }
     for(int i=0;i<itsEditorsFrameList.size();i++){
       aWindow = (MaxWindow)itsEditorsFrameList.elementAt(i);
-	if(!theName.equals(aWindow.GetDocument().GetName()))
+	if(!theName.equals(aWindow.GetDocument().GetTitle()))
 	  aWindow.AddWindowToMenu(theName);
     }
     itsProjectWindow.AddWindowToMenu(theName);
@@ -341,17 +451,17 @@ public class MaxApplication extends Object {
     for(int i=0;i<itsSketchWindowList.size();i++){
       aSketchWindow = (ErmesSketchWindow)itsSketchWindowList.elementAt(i);
       if(aSketchWindow != theWindow) 
-	aSketchWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetName());
+	aSketchWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetTitle());
     }
     for(int i=0;i<itsEditorsFrameList.size();i++){
       aWindow = (MaxWindow)itsEditorsFrameList.elementAt(i);
       if(aWindow != theWindow)
-	aWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetName());
+	aWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetTitle());
     }
-    itsProjectWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetName());
+    itsProjectWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetTitle());
 
     if (itsConsoleWindow != null)
-      itsConsoleWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetName());
+      itsConsoleWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetTitle());
   }
   
   public void ChangeWinNameMenus(String theOldName, String theNewName){
@@ -382,7 +492,7 @@ public class MaxApplication extends Object {
     ErmesSketchWindow aSketch = (ErmesSketchWindow)itsSketchWindow;
     itsSketchWindow.InitFromDocument(aPatcherDoc);
     itsSketchWindow.inAnApplet = false;
-    itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetName());
+    itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetTitle());
     aPatcherDoc.SetWindow(itsSketchWindow);
     if(itsProjectWindow.itsProject.GetItems().size()==0)
       itsSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
@@ -405,7 +515,7 @@ public class MaxApplication extends Object {
     itsSketchWindow.InitFromDocument(aPatcherDoc);
     itsSketchWindowList.addElement(itsSketchWindow);
     itsSketchWindow.inAnApplet = false;
-    itsSketchWindow.setTitle(itsSketchWindow.GetDocument().GetName());
+    itsSketchWindow.setTitle(itsSketchWindow.GetDocument().GetTitle());
     aPatcherDoc.SetWindow(itsSketchWindow);
     CheckboxMenuItem aEditMenuItem = (CheckboxMenuItem)itsSketchWindow.itsEditMenu.getItem(9);
     aEditMenuItem.setState(temp);
@@ -437,7 +547,7 @@ public class MaxApplication extends Object {
       itsSketchWindow.inAnApplet = false;
       itsSketchWindow.itsDocument.itsPatcher.open();	//remember to close
       
-      itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetName());
+      itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetTitle());
       itsSketchWindow.pack();
       itsSketchWindow.setLocation(40,40);
       if(itsProjectWindow.itsProject.GetItems().size()==0)
@@ -447,39 +557,6 @@ public class MaxApplication extends Object {
       AddThisWindowToMenus(itsSketchWindow);
       itsSketchWindow.setVisible(true);
       break;	
-    case OPEN_COMMAND:
-      // create a new document from skratch
-      ErmesPatcherDoc aPatcherDoc = new ErmesPatcherDoc();
-      // invocate the 'Load' method of the document
-      aPatcherDoc.Load(fileToLoad, pathForLoading);
-      // create the new SketchWindow based on the Document created....
-      itsSketchWindow = new ErmesSketchWindow(false, null);
-      itsWindow = itsSketchWindow;
-      itsSketchWindow.itsSketchPad.GetOffGraphics();
-      try {
-	itsSketchWindow.InitFromDocument(aPatcherDoc);
-      }
-      catch (Exception e) {
-	ErrorDialog aErr = new ErrorDialog(itsProjectWindow, "Error while importing "+pathForLoading+fileToLoad);
-	aErr.setLocation(100, 100);
-	aErr.setVisible(true);
-	e.printStackTrace(); // temporary, MDC
-	return false;
-      }
-
-      itsSketchWindowList.addElement(itsSketchWindow);
-      itsSketchWindow.inAnApplet = false;
-      itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetName());
-      aPatcherDoc.SetWindow(itsSketchWindow);
-      CheckboxMenuItem aEditMenuItem = (CheckboxMenuItem)itsSketchWindow.itsEditMenu.getItem(9);
-      aEditMenuItem.setState(doAutorouting);
-      if(itsProjectWindow.itsProject.GetItems().size()==0)
-	itsSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
-      if(itsSketchWindowList.size() == 1)
-	itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);
-      AddThisWindowToMenus(itsSketchWindow);
-      itsSketchWindow.setVisible(true);
-      break;
       
     case NEW_PROJECT:
       itsProjectWindow = new ProjectWindow();
@@ -611,28 +688,6 @@ public class MaxApplication extends Object {
       itsProjectWindow.itsProject.AddToProject((ErmesPatcherDoc)itsSketchWindow.GetDocument(), itsSketchWindow);
       UpdateProjectMenu();
       break;
-    case ADD_FILES:
-      String aType = new String();
-      MaxResourceId aResId;
-      String aExt;
-      boolean found = false;
-      /*if (fileToLoad.endsWith(".pat")) aType = "patcher";	
-	else if (fileToLoad.endsWith(".esp")) aType = "espresso";*/
-      for (Enumeration e= resourceVector.elements(); e.hasMoreElements() && !found;) {
-	aResId = (MaxResourceId) e.nextElement();
-	for (Enumeration e1 = aResId.resourceExtensions.elements(); e1.hasMoreElements();) {
-	  aExt = (String) e1.nextElement();
-	  if (fileToLoad.endsWith(aExt)) {
-	    aType = aResId.resourceName;
-	    found = true;
-	    break;
-	  }
-	}
-      }
-      if (!found) aType = "unknown";
-      itsProjectWindow.itsProject.AddToProject(fileToLoad, aType, pathForLoading);//per ora
-      UpdateProjectMenu();
-      break;
     case REMOVE_FILES:
       itsProjectWindow.itsProject.RemoveFromProject();
       if(itsProjectWindow.itsProject.GetItems().size()==0){
@@ -756,7 +811,7 @@ public class MaxApplication extends Object {
   public void SetCurrentWindow(MaxWindow theWindow){
     if(theWindow instanceof ErmesSketchWindow)itsSketchWindow = (ErmesSketchWindow)theWindow;
     itsWindow = theWindow;
-    GetCurrentProject().SetCurrentEntry(itsWindow.GetDocument().GetWholeName());
+    GetCurrentProject().SetCurrentEntry(itsWindow.GetDocument().GetTitle());
   }
   
   public ErmesSketchWindow GetCurrentWindow() {
@@ -775,7 +830,7 @@ public class MaxApplication extends Object {
     return itsProjectWindow.itsProject;
   }
 	
-  public void UpdateProjectMenu(){
+  public static void UpdateProjectMenu(){
     ErmesSketchWindow aSketchWindow;
     if(itsProjectWindow.itsProject.GetItems().size()==1){
       itsProjectWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(true);

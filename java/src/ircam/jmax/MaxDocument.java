@@ -1,5 +1,6 @@
 package ircam.jmax;
 
+import java.io.*;
 import  ircam.jmax.editors.project.*;
 
 /**
@@ -12,52 +13,39 @@ import  ircam.jmax.editors.project.*;
 	 protected String itsDocumentType = "";
 	 protected boolean alreadySaved =false;*/
 	
- /** 
- * The document's load method.
- */
-  abstract boolean Load(String theWholeName);
+  /** 
+   * The document's load method.
+   */
+
+  abstract boolean Load(File file);
+
   /*
    * The document's save.
    */ 
- abstract boolean Save();	
-  abstract boolean SaveAs(String theWholeName);
-	
-  abstract public void InitDoc(String theTitle, String thePath, String thefName, Project theProject);
-  /*prova prova public String GetWholeName() {
-    return itsFileName + itsPathName;
-    }*/abstract public String GetWholeName();
+  abstract boolean Save();	
+
+  abstract boolean SaveAs(File file);
+
+  abstract public void InitDoc(String theTitle, File file, Project theProject);
+
+  abstract public String GetType();
+
+  abstract public String GetTitle();
+
+  abstract public File GetFile();
   
-  /*prova prova public String GetName() {
-    return itsFileName; 
-    }*/abstract public String GetName();
-  
-  /*prova prova public String GetType() {
-    return itsDocumentType; 
-    }*/abstract public String GetType();
-  
-  /*prova prova public String GetPath() {
-    return itsPathName; 
-    }*/abstract public String GetPath();
-  
-  /*prova prova public boolean GetSaveFlag() {
-    return alreadySaved;
-    }*/abstract public boolean GetSaveFlag();
+  abstract public boolean GetSaveFlag();
 
   abstract public boolean GetNeverSavedFlag();
 
   abstract public MaxWindow GetWindow();
   
-  /*prova prova protected void SetFileName(String theName) {
-    itsFileName = theName;
-    }*/abstract public void SetFileName(String theName);
+  abstract public void SetFile(File theFile);
   
-  /*prova prova protected void SetPathName(String theName) {
-    itsPathName = theName;
-    }*/abstract public void SetPathName(String theName);
-
   /**
    * The document needs to be saved.
    */
+
   abstract public void ToSave();
 }
 

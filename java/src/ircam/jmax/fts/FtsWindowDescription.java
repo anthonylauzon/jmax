@@ -29,14 +29,6 @@ public class FtsWindowDescription
 
   public int width;
 
-  /** Additional information on the object. */
-
-  public String ermesInfo = null;
-
-  /** Flag that register if a Window is open or not */
-
-  public boolean open = false;
-
 
   /** Build a Window Description from discrete argument. */
 
@@ -55,41 +47,19 @@ public class FtsWindowDescription
 
   public FtsWindowDescription(String descr)
   {
-    // Temporarly we parse the string immediately.
-    // it should really parse by need when the value
-    // is accessed; also, the parser can be smarter
-
-    // The format *must* be <x> <y> <width> <height> <open> ["ermes info"].
-    //for a description of the ermesInfo, see the FtsGraphicDescription.java file
-    // the ermesInfo, for now, contains AT LEAST the attribute (name: theName)
-    // where open can be 1 or 0
-
     StringTokenizer st = new StringTokenizer(descr);
-    int toOpen;
 
     x  = Integer.parseInt(st.nextToken());
     y  = Integer.parseInt(st.nextToken());
     width  = Integer.parseInt(st.nextToken());
     height = Integer.parseInt(st.nextToken());
-    toOpen  = Integer.parseInt(st.nextToken());
-
-    if (descr.indexOf('"') != -1)
-      ermesInfo = descr.substring(descr.indexOf('"')+1, descr.lastIndexOf('"'));
-    else
-      ermesInfo = null;//old format..
-
-    if (toOpen == 1)
-      open = true;
   }
 
   /** Save the description to a stream */
 
   void saveAsTcl(FtsSaveStream stream)
   {
-    if (ermesInfo == null)
-      stream.print("{" + x + " " + y + " " + width + " " + height + " " + (open ? 1 : 0) + "}");
-    else
-      stream.print("{" + x + " " + y + " " + width + " " + height + " " + (open ? 1 : 0) + " "+"\""+ermesInfo+"\""+"}");
+      stream.print("{" + x + " " + y + " " + width + " " + height + "}");
   }
 }
 

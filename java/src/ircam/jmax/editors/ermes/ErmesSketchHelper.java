@@ -197,14 +197,14 @@ class ErmesSketchHelper extends Object{
       itsSketchPad.itsPatcherElements.removeElement(theObject);
       ErmesObjPatcher aPatcher = (ErmesObjPatcher)theObject;
       if(((ErmesSketchWindow)itsSketchPad.itsSketchWindow).GetProjectEntry()!=null){
-	if(MaxApplication.getApplication().GetProjectWindow().GetProject().
-	   HaveAEntry(aPatcher.GetName()+aPatcher.GetPath())){
-	  ProjectEntry aEntry = MaxApplication.getApplication().GetProjectWindow().
-	    GetProject().GetTheEntry(aPatcher.GetName()+aPatcher.GetPath());
-	  aEntry.DecAbstractionNumber();
-	  if(aEntry.GetAbstractionNumber()==0) 
-	    MaxApplication.getApplication().GetProjectWindow().GetProject().RemoveFromProject(aEntry);
-	}
+	if (MaxApplication.getApplication().GetProjectWindow().GetProject().HaveAEntry(aPatcher.GetName()))
+	  {
+	    ProjectEntry aEntry = MaxApplication.getApplication().GetProjectWindow().
+	      GetProject().GetTheEntry(aPatcher.GetName());
+	    aEntry.DecAbstractionNumber();
+	    if(aEntry.GetAbstractionNumber()==0) 
+	      MaxApplication.getApplication().GetProjectWindow().GetProject().RemoveFromProject(aEntry);
+	  }
       }
     }
     if (theObject.itsFtsObject != null) theObject.itsFtsObject.delete();//a Delete() must be implemented in EObject

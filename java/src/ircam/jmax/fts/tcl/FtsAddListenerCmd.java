@@ -47,7 +47,7 @@ class FtsAddListenerCmd implements Command
 	}
       catch (TclException e1)
 	{
-	  System.err.println("TCL Error in proc " + tclFunction + ":" + interp.getResult());
+	  System.out.println("TCL Error in proc " + tclFunction + ":" + interp.getResult());
 	}
     }
   }

@@ -34,7 +34,7 @@ class FtsSocketServerPort extends FtsPort
       }
     catch (java.io.IOException e)
       {
-	System.err.println("Error while opening server socket " + e);
+	System.out.println("Error while opening server socket " + e);
       }
   }
 
@@ -49,7 +49,7 @@ class FtsSocketServerPort extends FtsPort
       }
     catch (UnknownHostException e)
       {
-	System.err.println("Cannot find local host");
+	System.out.println("Cannot find local host");
 	return;
       }
 
@@ -62,7 +62,7 @@ class FtsSocketServerPort extends FtsPort
       }
     catch (IOException e)
       {
-	System.err.println("Cannot exec command: " + command);
+	System.out.println("Cannot exec command: " + command);
 	return;
       }
 
@@ -74,7 +74,7 @@ class FtsSocketServerPort extends FtsPort
       }
     catch (IOException e)
       {
-	System.err.println("I/O error during accept on server socket");
+	System.out.println("I/O error during accept on server socket");
 	return;
 
       }    
@@ -85,7 +85,7 @@ class FtsSocketServerPort extends FtsPort
       }
     catch (SocketException e)
       {
-	System.err.println("setTcpNoDelay exception: " + e);
+	System.out.println("setTcpNoDelay exception: " + e);
       } 
 
     // Set the in and out stream
@@ -99,7 +99,7 @@ class FtsSocketServerPort extends FtsPort
       }
     catch (IOException e)
       {
-	System.err.println("Couldn't get I/O for the socket ");
+	System.out.println("Couldn't get I/O for the socket ");
 	return;
       }    
   }
@@ -116,7 +116,7 @@ class FtsSocketServerPort extends FtsPort
       } 
     catch (IOException e)
       {
-	System.err.println("I/O failed on closing the serverSocket connection to " + host);
+	System.out.println("I/O failed on closing the serverSocket connection to " + host);
       }
   }
 

@@ -52,13 +52,11 @@ public class ConsoleMouseListener implements MouseListener {
     StringBuffer editBuffer = new StringBuffer(itsConsole.getTextArea().getText());
     
     if (itsConsole.getTextArea().getText().length() > itsConsole.itsKeyListener.intercept) {
-      System.err.println("text ("+itsConsole.getTextArea().getText().length() +"  maggiore di intercept "+itsConsole.itsKeyListener.intercept);
+
       String tutto = itsConsole.getTextArea().getText();
       int intercept = itsConsole.itsKeyListener.intercept;
       //String buff = itsConsole.itsKeyListener.sbuf;
-      System.err.println("tutto.lenght = "+tutto.length()+" intercept = "+intercept );
       String daAggiungere = tutto.substring(intercept, tutto.length());
-      System.err.println("aggiungo "+daAggiungere);
       itsConsole.itsKeyListener.sbuf.append(daAggiungere);
 	}
   

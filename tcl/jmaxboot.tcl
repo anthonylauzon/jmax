@@ -37,7 +37,9 @@ package provide jMax 2.0.2
 ## User Configuration (use source to get global variables)
 ##
 
-source [systemProperty user.home]/.jmaxrc
+if {[file exists [systemProperty user.home]/.jmaxrc]} then {
+    source [systemProperty user.home]/.jmaxrc
+}
 
 ##
 ## Standard config.
