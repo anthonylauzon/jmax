@@ -149,9 +149,14 @@ public class MidiTrackEditor extends TrackBaseEditor
 		}
 		else
 		{				
-			getTrack().setProperty("maximumPitch", new Integer(getMaximumPitchInTrack()));
-			getTrack().setProperty("minimumPitch", new Integer(getMinimumPitchInTrack()));			
-		}
+      int max = getMaximumPitchInTrack();
+      int min = getMinimumPitchInTrack();
+      if(max < min) // track is empty
+        return;
+      
+      getTrack().setProperty("maximumPitch", new Integer(max));
+      getTrack().setProperty("minimumPitch", new Integer(min));			
+    }
     
     if(changed)
     {
