@@ -160,7 +160,7 @@ public class TableRemoteData implements TableDataModel, ClipableData, ClipboardO
     
     for (int i = start; i < end; i+=1)
       {
-	buffer[i-start] = (int)(y1-Math.abs(i-start)*coeff);
+	buffer[i-start] = (int)(y1-Math.abs(i-start)*coeff + 0.5);
       }
 
     setValues(buffer, start, end-start);
