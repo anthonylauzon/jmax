@@ -6,10 +6,13 @@ FtsAtom.java \
 FtsCallback.java \
 FtsClientException.java \
 FtsObject.java \
+FtsPipeConnection.java \
+FtsProcess.java \
 FtsProtocol.java \
 FtsProtocolDecoder.java \
-FtsServer.java
-
+FtsServer.java \
+FtsServerConnection.java \
+FtsSocketConnection.java
 
 JAVACX = @JAVACX@
 JAVACFLAGSX=@JAVACFLAGSX@

@@ -79,9 +79,13 @@ main( int ac, char **av)
     {
       if (ac < 2)
 	{
-	  fprintf( stderr, "usage: %s patch\n", av[0]);
+	  fprintf( stderr, "usage: %s [--pipe|--socket] patch\n", av[0]);
 	  return -1;
 	}
+
+      int pipe = !strcmp( av[1], "--pipe");
+
+      cerr << "Using a " << ((pipe) ? "pipe" : "socket") << " connection" << endl;
 
       FtsArgs args;
 
@@ -94,17 +98,22 @@ main( int ac, char **av)
 //        fts = new FtsProcess( "xterm", args);
 
       args.add( "--no-watchdog");
-      args.add( "--stdio");
+      if (pipe)
+	args.add( "--stdio");
 
       fts = new FtsProcess( "/u/worksta/dechelle/projects/jmax/3.0.0/jmax-install/bin/fts", args);
 
-      FtsPipeConnection *connection = new FtsPipeConnection( fts);
+      FtsServerConnection *connection;
+      if (pipe)
+	connection = new FtsPipeConnection( fts);
+      else
+	connection = new FtsSocketConnection();
 
       server = new FtsServer( connection);
 
       // load a patch
       args.clear();
-      args.add( av[1]);
+      args.add( av[2]);
       server->getRoot()->send( "load_jmax_file", args);
 
       args.clear();

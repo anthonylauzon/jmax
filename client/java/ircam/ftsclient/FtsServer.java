@@ -53,8 +53,6 @@ class ReceiveThread extends Thread {
 
 public class FtsServer {
 
-  private static final int DEFAULT_PORT = 2023;
-  private static final int DEFAULT_CONNECT_TIMEOUT = 30;
 
   // We don't use java.io.BufferedOutputStream here because it does not resize
   // the buffer, and in case of an UDP connection, we want to be sure that the
@@ -101,11 +99,9 @@ public class FtsServer {
     private int length;
   }
 
-  public FtsServer()
+  public FtsServer( FtsServerConnection connection)
   {
-    hostname = "127.0.0.1";
-    port = DEFAULT_PORT;
-    connectTimeout = DEFAULT_CONNECT_TIMEOUT;
+    this.connection = connection;
 
     newObjectID = 16; // Ids 0 to 15 are reserved for pre-defined system objects
     objectTable = new Hashtable();
@@ -114,118 +110,6 @@ public class FtsServer {
     inputBuffer = new byte[0x10000];
 
     decoder = new FtsProtocolDecoder( this);
-  }
-
-
-  /**
-   * set value of "hostname" property, the hostname to which to establish connection
-   *
-   * @param hostname the host name
-   */
-  public void setHostname( String hostname)
-  {
-    this.hostname = hostname;
-  }
-
-  /**
-   * get value of "hostname" property, the hostname to which to establish connection
-   *
-   * @return the host name
-   */
-  public String getHostname()
-  {
-    return hostname;
-  }
-
-  /**
-   * set value of "port" property, the port number used to connect to FTS. 
-   * Default value is: 2023
-   *
-   * @param port the port number
-   */
-  public void setPort( int port)
-  {
-    this.port = port;
-  }
-
-  /**
-   * get value of "port" property, the port number used to connect to FTS. 
-   *
-   * @return the port number
-   */
-  public int getPort()
-  {
-    return port;
-  }
-
-  /**
-   * set value of "connectTimeout" property, which determines the timeout in seconds 
-   * when trying to connect to FTS.
-   * Default value is: 30
-   *
-   * @param connectTimeoutInSeconds the timeout value
-   */
-  public void setConnectTimeout( int connectTimeoutInSeconds)
-  {
-    this.connectTimeout = connectTimeoutInSeconds;
-  }
-  
-  /**
-   * get value of "connectTimeout" property, which determines the timeout in seconds 
-   * when trying to connect to FTS.
-   *
-   * @return the timeout value
-   */
-  public int getConnectTimeout()
-  {
-    return connectTimeout;
-  }
-
-  /**
-   * Establish the real connection
-   *
-   * Tries to connect to FTS. Retries until connection is made or timed'out,
-   * then starts the receive thread if needed.
-   *
-   * @throws IOException if an I/O error occurs when creating the socket
-   * @throws FtsClientException if a timeout occured when trying to connect
-
-   */
-  public void connect() throws FtsClientException, IOException, UnknownHostException
-  {
-    socket = null;
-
-    do
-      {
-	try
-	  {
-	    socket = new Socket( hostname, port);
-	  }
-	catch( IOException e)
-	  {
-	  }
-
-	if (socket != null)
-	  break;
-
-	try
-	  {
-	    Thread.sleep( 1);
-	  }
-	catch (InterruptedException e)
-	  {
-	    throw new FtsClientException( "Connection interrupted");
-	  }
-
-	connectTimeout--;
-      }
-    while (connectTimeout > 0);
-
-    if ( connectTimeout <= 0)
-      throw new FtsClientException( "Cannot connect");
-
-    output = socket.getOutputStream();
-    input = socket.getInputStream();
 
     root = new FtsObject( this, 0);
     remote = new FtsObject( this, 1);
@@ -234,15 +118,16 @@ public class FtsServer {
     receiveThread.start();
   }
 
+
   /**
    * Close the connection.
    *
    * Closes the connection socket and wait for end of receive thread execution.
    * Closing the socket will make the receive thread exit after a short while.
    */
-  void disconnect() throws FtsClientException, IOException
+  void close() throws FtsClientException, IOException
   {
-    socket.close();
+    connection.close();
   }
 
   /**
@@ -264,7 +149,7 @@ public class FtsServer {
    */
   void receive() throws IOException,FtsClientException
   {
-    int len = input.read( inputBuffer, 0, inputBuffer.length);
+    int len = connection.read( inputBuffer, 0, inputBuffer.length);
 
     decoder.decode( inputBuffer, 0, len);
   }
@@ -333,12 +218,15 @@ public class FtsServer {
   {
     outputBuffer.append( FtsProtocol.END_OF_MESSAGE);
 
-    output.write( outputBuffer.getBytes(), 0, outputBuffer.getLength());
-    output.flush();
+    connection.write( outputBuffer.getBytes(), 0, outputBuffer.getLength());
 
     outputBuffer.clear();
   }
 
+  public FtsObject getRoot()
+  {
+    return root;
+  }
 
   FtsObject getObject( int id)
   {
@@ -355,20 +243,14 @@ public class FtsServer {
     return newObjectID++;
   }
 
-  
-  // Properties
-  private String hostname;
-  private int port;
-  private int connectTimeout;
-
-  private Socket socket;
+  // Connection to FTS
+  private FtsServerConnection connection;
 
   // Output to FTS
   private OutputStream output;
   private OutputBuffer outputBuffer;
 
   // Input from FTS
-  private InputStream input;
   private byte[] inputBuffer;
   private FtsProtocolDecoder decoder;
   private Thread receiveThread;

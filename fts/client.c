@@ -135,7 +135,9 @@ typedef struct {
   socket_t socket;
 } client_manager_t;
 
-static client_t *client_table[MAX_CLIENTS];
+/* Client table */
+static fts_hashtable_t client_table;
+static int new_client_id = 1;
 
 /*
  * socketstream
@@ -192,6 +194,39 @@ static void fts_pipestream_receive(fts_object_t *o, int winlet, fts_symbol_t s, 
 
 /***********************************************************************
  *
+ * client table handling
+ *
+ */
+
+static void client_table_put( int id, client_t *client)
+{
+  fts_atom_t k, v;
+
+  fts_set_int( &k, id);
+  fts_set_ptr( &v, client);
+  fts_hashtable_put( &client_table, &k, &v);
+}
+
+static client_t *client_table_get( int id)
+{
+  fts_atom_t k, v;
+
+  fts_set_int( &k, id);
+  fts_hashtable_get( &client_table, &k, &v);
+
+  return (client_t *)fts_get_ptr( &v);
+}
+
+static void client_table_remove( int id)
+{
+  fts_atom_t k, v;
+
+  fts_set_int( &k, id);
+  fts_hashtable_remove( &client_table, &k);
+}
+
+/***********************************************************************
+ *
  * client_manager object
  *
  */
@@ -200,20 +235,9 @@ static void client_manager_select( fts_object_t *o, int winlet, fts_symbol_t s, 
 {
   client_manager_t *this = (client_manager_t *)o;
   socket_t new_socket;
-  int new_client_id;
   fts_atom_t argv[3];
   fts_object_t *client_object;
   fts_object_t *socket_stream; 
-
-  for ( new_client_id = 0; new_client_id < MAX_CLIENTS; new_client_id++)
-    if (!client_table[new_client_id])
-      break;
-
-  if (new_client_id >= MAX_CLIENTS)
-    {
-      post( "No more client connections available (max %d)\n", MAX_CLIENTS);
-      return;
-    }
 
   new_socket = accept( this->socket, NULL, NULL);
 
@@ -228,8 +252,6 @@ static void client_manager_select( fts_object_t *o, int winlet, fts_symbol_t s, 
 
   fts_set_symbol( argv, fts_s_client);
   fts_set_object( argv+1, socket_stream);
-  /* Client id is index in table + 1, so that no client can have id 0 */
-  fts_set_int( argv+2, new_client_id+1);
 
   fts_object_new_to_patcher( fts_get_root_patcher(), 3, argv, (fts_object_t **)&client_object);
 
@@ -238,8 +260,6 @@ static void client_manager_select( fts_object_t *o, int winlet, fts_symbol_t s, 
       fprintf( stderr, "[client_manager] internal error (cannot create client object)\n");
       return;
     }
-
-  client_table[new_client_id] = (struct _client_t *)client_object;
 }
 
 static void client_manager_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -674,13 +694,15 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   at++;
 
   this->stream = (fts_bytestream_t*) fts_get_object_arg( ac, at, 0, NULL);
-  this->client_id = fts_get_int_arg( ac, at, 1, -1);
 
   if (this->stream == NULL)
     {
       fts_object_set_error( (fts_object_t *)this, "Invalid stream");
       return;
     }
+
+  this->client_id = new_client_id++;
+  client_table_put( this->client_id, this);
 
   fts_bytestream_add_listener(this->stream, (fts_object_t *) this, client_receive);
 
@@ -720,7 +742,7 @@ static void client_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
   fts_object_delete_from_patcher( this->root_patcher);
 
-  client_table[ this->client_id - 1] = 0;
+  client_table_remove( this->client_id);
 
   fts_stack_destroy( &this->send_sb);
   fts_stack_destroy( &this->receive_args);
@@ -859,7 +881,7 @@ static void client_controller_anything_fts(fts_object_t *o, int winlet, fts_symb
   if ( !this->echo && this->gate )
     return;
 
-  client = client_table[OBJECT_ID_CLIENT( fts_object_get_id( o))-1];
+  client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( o)) );
 
   if (client != NULL)
     {
@@ -1161,19 +1183,20 @@ fts_pipestream_receive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   int n;
 
   n = read( this->in, buffer, NN);
+
   fts_bytestream_input((fts_bytestream_t *) this, n, buffer);
 #endif
 }
 
 static void 
-fts_pipestream_output(fts_bytestream_t *stream, int n, const unsigned char *c)
+fts_pipestream_output(fts_bytestream_t *stream, int n, const unsigned char *buffer)
 {
   fts_pipestream_t *this = (fts_pipestream_t *) stream;
 
 #if WIN32
   DWORD count; 
 
-  if (!WriteFile(this->out, (LPCVOID) c, (DWORD) n, &count, NULL)) {
+  if (!WriteFile(this->out, (LPCVOID) buffer, (DWORD) n, &count, NULL)) {
 
     /* keep a trace of the error in the log file */
     LPVOID msg;
@@ -1183,7 +1206,8 @@ fts_pipestream_output(fts_bytestream_t *stream, int n, const unsigned char *c)
     LocalFree(msg);
   }
 #else
-  if ( write( this->out, c, n) < n)
+  
+  if ( write( this->out, buffer, n) < n)
     fts_log("[pipe]: failed to write to pipe: (%s)\n", strerror( errno));
 #endif
 }
@@ -1217,6 +1241,8 @@ void fts_client_config( void)
   fts_symbol_t s_client_manager;
   fts_object_t *obj;
   int stdio;
+
+  fts_hashtable_init( &client_table, FTS_HASHTABLE_INT, FTS_HASHTABLE_SMALL);
 
   fts_s_socketstream = fts_new_symbol("socketstream");
   fts_metaclass_install(fts_s_socketstream, fts_socketstream_instantiate, fts_always_equiv);
@@ -1270,7 +1296,7 @@ void fts_client_config( void)
     fts_object_new_to_patcher( fts_get_root_patcher(), ac, at, &obj);
     
     if ( !obj)
-      post( "cannot create client manager\n");
+      fprintf( stderr, "[client] cannot create client manager\n");
   }
 }
 
