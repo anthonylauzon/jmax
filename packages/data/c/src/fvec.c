@@ -136,7 +136,7 @@ fvec_get_min_value(fvec_t *vec)
 }
 
 
-static float
+float
 fvec_get_max_value(fvec_t *vec)
 {
   float max;
@@ -150,6 +150,28 @@ fvec_get_max_value(fvec_t *vec)
 
   return max;
 }
+
+float
+fvec_get_max_abs_value_in_range(fvec_t *vec, int a, int b)
+{
+  float max, abs_max, abs_val;
+  int i;
+
+  max = vec->values[a];
+  abs_max = fabsf(max);
+
+  for (i = a+1; (i < vec->m) && (i < b); i++)
+  {
+    abs_val = fabsf(vec->values[i]);
+    if ( abs_val > abs_max)
+    {
+      max = vec->values[i];
+      abs_max = abs_val;
+    }
+  }
+  return max;
+}
+
 
 void
 fvec_copy(fvec_t *org, fvec_t *copy)
@@ -1399,6 +1421,11 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	size = fvec_read_atom_file(this, file_name);
       else
 	size = fvec_load_audiofile(this, file_name, onset, n_read);
+    
+      if( fvec_editor_is_open( this))
+	tabeditor_send( (tabeditor_t *)this->editor);
+
+      data_object_set_dirty( o);
     }
   else
     {
