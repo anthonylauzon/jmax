@@ -332,8 +332,12 @@ static struct extension2format {
   { ".wav", AF_FILE_WAVE},
   { ".aiff", AF_FILE_AIFF},
   { ".snd", AF_FILE_NEXTSND},
+#ifdef AF_FILE_VOC
   { ".voc", AF_FILE_VOC},
-  { ".sf", AF_FILE_IRCAM}
+#endif
+#ifdef AF_FILE_IRCAM
+  { ".sf", AF_FILE_IRCAM},
+#endif
 };
 
 static void dtd_open_write( const char *line)
