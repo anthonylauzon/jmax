@@ -163,7 +163,7 @@ void fts_load_project( void)
 static void fts_kernel_init( void)
 {
   /*
-   *** Attention !!! The order is important ***
+   *** Attention !!! The order is important, at least for the first lines ***
    */
   _K_DECNCALL( fts_kernel_hashtable_init);
   _K_DECNCALL( fts_kernel_symbol_init);
@@ -209,8 +209,6 @@ static void fts_kernel_classes_config( void)
   _K_DECNCALL( fts_objectset_config);
   _K_DECNCALL( fts_selection_config);
   _K_DECNCALL( fts_saver_config);
-
-  _K_DECNCALL( fts_parser_config);
 }
 
 void fts_init( int argc, char **argv)

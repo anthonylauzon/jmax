@@ -31,6 +31,8 @@
 
 const int fts_SystemInlet = -1;
 
+static int typeid = FTS_TYPEID_FIRST_FREE;
+
 /* Return Status declarations */
 
 fts_status_description_t fts_DuplicatedMetaclass = {"Duplicated metaclass"};
@@ -108,6 +110,8 @@ fts_metaclass_new(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_
   mcl->equiv_fun = equiv_fun;
   mcl->selector = name;
   mcl->package = 0;
+
+  mcl->typeid = typeid++;
 
   /* for simple classes create first class instance without arguments */
   if(equiv_fun == 0)
@@ -220,7 +224,7 @@ fts_class_register( fts_metaclass_t *mcl, int ac, const fts_atom_t *at, fts_clas
 	     However, this is related to metaclass mechanism, which we hope to
 	     remove soon.
 	  */
-	  store[i].typeid = fts_get_class( at+i);
+	  store[i].type = fts_get_class( at+i);
 	  fts_word_set_object( &store[i].value, 0);
 	}
     }

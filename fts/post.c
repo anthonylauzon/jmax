@@ -158,7 +158,7 @@ static int mempost_atoms( char **pp, int *psize, int offset, int ac, const fts_a
 static char *post_buffer = NULL;
 static int post_buffer_size;
 
-static void fts_vspost( fts_bytestream_t *stream, const char *format, va_list ap)
+void fts_vspost( fts_bytestream_t *stream, const char *format, va_list ap)
 {
   int n;
 
@@ -505,7 +505,7 @@ void fts_set_default_console_stream( fts_bytestream_t *stream)
   /* Post accumulated messages */
   if (post_stack != NULL)
     {
-      fts_bytestream_output( stream, fts_stack_get_top( post_stack), fts_stack_get_base( post_stack));
+      fts_bytestream_output( stream, fts_stack_get_size( post_stack), fts_stack_get_base( post_stack));
       fts_bytestream_flush( stream);
     }
 }

@@ -27,7 +27,7 @@ void __fts_stack_init( fts_stack_t *s, int element_size)
   s->alloc = 256;
   s->element_size = element_size;
   s->buffer = fts_malloc( s->alloc * s->element_size);
-  s->top = 0;
+  s->top = -1;
 }
 
 void fts_stack_destroy( fts_stack_t *s)

@@ -575,7 +575,7 @@ static void fts_memorystream_output(fts_bytestream_t *stream, int n, const unsig
     fts_stack_push( &this->output_buffer, unsigned char, c[i]);
 }
 
-void fts_memorystream_output_char(fts_bytestream_t *stream, unsigned char c)
+static void fts_memorystream_output_char(fts_bytestream_t *stream, unsigned char c)
 {
   fts_memorystream_output(stream, 1, &c);
 }

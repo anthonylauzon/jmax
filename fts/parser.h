@@ -2,7 +2,7 @@
 #define YYSTYPE int
 #endif
 #define	FTS_TOKEN_INT	257
-#define	FTS_TOKEN_FLOAT	258
+#define	FTS_TOKEN_DOUBLE	258
 #define	FTS_TOKEN_SYMBOL	259
 #define	FTS_TOKEN_SEMI	260
 #define	FTS_TOKEN_COLON	261

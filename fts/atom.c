@@ -70,23 +70,71 @@ int fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2)
  */
 static const char void_metaclass_name[] = "__PRIMITIVE_VOID";
 static const char int_metaclass_name[] = "__PRIMITIVE_INT";
-static const char float_metaclass_name[] = "__PRIMITIVE_FLOAT";
+static const char double_metaclass_name[] = "__PRIMITIVE_DOUBLE";
 static const char symbol_metaclass_name[] = "__PRIMITIVE_SYMBOL";
 static const char pointer_metaclass_name[] = "__PRIMITIVE_POINTER";
 static const char string_metaclass_name[] = "__PRIMITIVE_STRING";
 
-static fts_metaclass_t void_metaclass = { void_metaclass_name, NULL, NULL, NULL, NULL, NULL}; 
-static fts_metaclass_t int_metaclass = { int_metaclass_name, NULL, NULL, NULL, NULL, NULL}; 
-static fts_metaclass_t float_metaclass = { float_metaclass_name, NULL, NULL, NULL, NULL, NULL}; 
-static fts_metaclass_t symbol_metaclass = { symbol_metaclass_name, NULL, NULL, NULL, NULL, NULL}; 
-static fts_metaclass_t pointer_metaclass = { pointer_metaclass_name, NULL, NULL, NULL, NULL, NULL}; 
-static fts_metaclass_t string_metaclass = { string_metaclass_name, NULL, NULL, NULL, NULL, NULL}; 
+static fts_metaclass_t void_metaclass = {
+  void_metaclass_name,
+  NULL,
+  FTS_TYPEID_VOID,
+  NULL,
+  NULL,
+  NULL,
+  NULL
+}; 
+static fts_metaclass_t int_metaclass = { 
+  int_metaclass_name,
+  NULL,
+  FTS_TYPEID_INT,
+  NULL,
+  NULL,
+  NULL,
+  NULL
+}; 
+static fts_metaclass_t double_metaclass = { 
+  double_metaclass_name,
+  NULL,
+  FTS_TYPEID_DOUBLE,
+  NULL,
+  NULL,
+  NULL,
+  NULL
+}; 
+static fts_metaclass_t symbol_metaclass = { 
+  symbol_metaclass_name,
+  NULL,
+  FTS_TYPEID_SYMBOL,
+  NULL,
+  NULL,
+  NULL,
+  NULL
+}; 
+static fts_metaclass_t pointer_metaclass = { 
+  pointer_metaclass_name,
+  NULL,
+  FTS_TYPEID_POINTER,
+  NULL,
+  NULL,
+  NULL,
+  NULL
+}; 
+static fts_metaclass_t string_metaclass = { 
+  string_metaclass_name,
+  NULL,
+  FTS_TYPEID_STRING,
+  NULL,
+  NULL,
+  NULL,
+  NULL
+}; 
 
 #define make_primitive_typeid(M) ((fts_metaclass_t *)UINT_TO_POINTER( POINTER_TO_UINT(M) + 1))
 
 fts_metaclass_t *fts_t_void = make_primitive_typeid( &void_metaclass);
 fts_metaclass_t *fts_t_int = make_primitive_typeid( &int_metaclass);
-fts_metaclass_t *fts_t_float = make_primitive_typeid( &float_metaclass);
+fts_metaclass_t *fts_t_double = make_primitive_typeid( &double_metaclass);
 fts_metaclass_t *fts_t_symbol = make_primitive_typeid( &symbol_metaclass);
 fts_metaclass_t *fts_t_pointer = make_primitive_typeid( &pointer_metaclass);
 fts_metaclass_t *fts_t_string = make_primitive_typeid( &string_metaclass);
@@ -95,13 +143,13 @@ void fts_kernel_atom_init( void)
 {
   assert( fts_new_symbol( void_metaclass_name) == void_metaclass_name);
   assert( fts_new_symbol( int_metaclass_name) == int_metaclass_name);
-  assert( fts_new_symbol( float_metaclass_name) == float_metaclass_name);
+  assert( fts_new_symbol( double_metaclass_name) == double_metaclass_name);
   assert( fts_new_symbol( symbol_metaclass_name) == symbol_metaclass_name);
   assert( fts_new_symbol( pointer_metaclass_name) == pointer_metaclass_name);
   assert( fts_new_symbol( string_metaclass_name) == string_metaclass_name);
 
   fts_metaclass_set_selector( &int_metaclass, fts_s_int);
-  fts_metaclass_set_selector( &float_metaclass, fts_s_float);
+  fts_metaclass_set_selector( &double_metaclass, fts_s_double);
   fts_metaclass_set_selector( &symbol_metaclass, fts_s_symbol);
   fts_metaclass_set_selector( &pointer_metaclass, fts_s_pointer);
   fts_metaclass_set_selector( &string_metaclass, fts_s_string);

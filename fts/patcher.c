@@ -1410,7 +1410,7 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
 	{
 	  fts_spost_object_description( (fts_bytestream_t *)stream, obj);
 	}
-      fts_memorystream_output_char((fts_bytestream_t *)stream,'\0');
+      fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
       fts_client_add_string( this, fts_memorystream_get_bytes( stream));
 
       fts_client_done_message( this);

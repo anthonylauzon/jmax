@@ -25,18 +25,71 @@
 #include <unistd.h>
 #include <fts/fts.h>
 
+#define free fts_free
+
 #define YYSTYPE fts_atom_t
 #define YYPARSE_PARAM data
 #define YYLEX_PARAM data
-#define free fts_free
 
 static int yylex( YYSTYPE *lvalp, void *data);
 static int yyerror( const char *msg);
 
-/* Actions */
-static void push_frame( void);
-static void pop_frame( void);
-static void push_value( const fts_atom_t *yylval);
+typedef struct {
+  int ac;
+  fts_atom_t *at;
+  int *tokens;
+  int *current_token;
+} fts_parser_t;
+
+#define ARITH_UNNOP( ret, a1, OP)			\
+  if (fts_is_int( a1))					\
+    fts_set_int( ret, OP fts_get_int( a1));		\
+  else if (fts_is_double( a1))				\
+    fts_set_double( ret, OP fts_get_double( a1));	\
+  else							\
+    fts_set_void( ret);
+
+#define ARITH_IUNNOP( ret, a1, OP)		\
+  if (fts_is_int( a1))				\
+    fts_set_int( ret, OP fts_get_int( a1));	\
+  else						\
+    fts_set_void( ret);
+
+#define ARITH_BINOP( ret, a1, a2, OP)							\
+  if (fts_is_int( a1) && fts_is_int( a2))						\
+    fts_set_int( ret, fts_get_int( a1) OP fts_get_int( a2));				\
+  else if (fts_is_double( a1) && fts_is_double( a2))					\
+    fts_set_double( ret, fts_get_number_double( a1) OP fts_get_number_double( a2));	\
+  else											\
+    fts_set_void( ret);
+
+#define ARITH_IBINOP( ret, a1, a2, OP)							\
+  if (fts_is_int( a1) && fts_is_int( a2))						\
+    fts_set_int( ret, fts_get_int( a1) OP fts_get_int( a2));				\
+  else											\
+    fts_set_void( ret);
+
+#define LOGIC_BINOP( ret, a1, a2, OP)					\
+  if (fts_is_int( a1))							\
+    {									\
+      if (fts_is_int( a2))						\
+	fts_set_int( ret, fts_get_int( a1) OP fts_get_int( a2)); 	\
+      else if (fts_is_double( a2))					\
+	fts_set_int( ret, fts_get_int( a1) OP fts_get_double( a2)); 	\
+      else								\
+	fts_set_void( ret);						\
+    }									\
+  else if (fts_is_double( a1))						\
+    {									\
+      if (fts_is_int( a2))						\
+	fts_set_int( ret, fts_get_double( a1) OP fts_get_int( a2)); 	\
+      else if (fts_is_double( a2))					\
+	fts_set_int( ret, fts_get_double( a1) OP fts_get_double( a2)); 	\
+      else								\
+	fts_set_void( ret);						\
+    }									\
+  else									\
+    fts_set_void( ret);
 
 %}
 
@@ -47,7 +100,7 @@ static void push_value( const fts_atom_t *yylval);
  */
 
 %token FTS_TOKEN_INT
-%token FTS_TOKEN_FLOAT
+%token FTS_TOKEN_DOUBLE
 %token FTS_TOKEN_SYMBOL
 
 %token FTS_TOKEN_SEMI
@@ -62,15 +115,6 @@ static void push_value( const fts_atom_t *yylval);
 /*
  * Operators
  */
-
-/*
-  Idea
-  add the +=, -= etc operators so that you can do something like
-  x : fvec
-  $x += 1
-  (:fvec 1 2 3) += 3
-*/
-
 
 
 %left FTS_TOKEN_SPACE
@@ -110,38 +154,40 @@ term: primitive
 	| ref
 ;
 
-primitive: FTS_TOKEN_INT { push_value( &($1)); }
-	| FTS_TOKEN_FLOAT { push_value( &($1)); }
-	| FTS_TOKEN_SYMBOL { push_value( &($1)); }
+primitive: FTS_TOKEN_INT
+	| FTS_TOKEN_DOUBLE
+	| FTS_TOKEN_SYMBOL
 ;
 
-par_op: FTS_TOKEN_OPEN_PAR term FTS_TOKEN_CLOSED_PAR
+par_op: FTS_TOKEN_OPEN_PAR term FTS_TOKEN_CLOSED_PAR         { $$ = $2; }
 
-unary_op: FTS_TOKEN_PLUS term %prec FTS_TOKEN_UNARY_PLUS
-	| FTS_TOKEN_MINUS term %prec FTS_TOKEN_UNARY_MINUS
-	| FTS_TOKEN_LOGICAL_NOT term
+unary_op: FTS_TOKEN_PLUS term %prec FTS_TOKEN_UNARY_PLUS     { ARITH_UNNOP( &($$), &($2), +); }
+	| FTS_TOKEN_MINUS term %prec FTS_TOKEN_UNARY_MINUS   { ARITH_UNNOP( &($$), &($2), -); }
+	| FTS_TOKEN_LOGICAL_NOT term                         { ARITH_IUNNOP( &($$), &($2), !); }
 ;
 
-binary_op: term FTS_TOKEN_PLUS term
-	| term FTS_TOKEN_MINUS term
-	| term FTS_TOKEN_TIMES term
-	| term FTS_TOKEN_DIV term
-	| term FTS_TOKEN_PERCENT term
-	| term FTS_TOKEN_SHIFT_LEFT term
-	| term FTS_TOKEN_SHIFT_RIGHT term
-	| term FTS_TOKEN_LOGICAL_AND term
-	| term FTS_TOKEN_LOGICAL_OR term
-	| term FTS_TOKEN_EQUAL_EQUAL term
-	| term FTS_TOKEN_NOT_EQUAL term
-	| term FTS_TOKEN_GREATER term
-	| term FTS_TOKEN_GREATER_EQUAL term
-	| term FTS_TOKEN_SMALLER term
-	| term FTS_TOKEN_SMALLER_EQUAL term
+binary_op: term FTS_TOKEN_PLUS term             { ARITH_BINOP( &($$), &($1), &($3), +); }
+	| term FTS_TOKEN_MINUS term             { ARITH_BINOP( &($$), &($1), &($3), -); }
+	| term FTS_TOKEN_TIMES term             { ARITH_BINOP( &($$), &($1), &($3), *); }
+	| term FTS_TOKEN_DIV term               { ARITH_BINOP( &($$), &($1), &($3), /); }
+	| term FTS_TOKEN_PERCENT term           { ARITH_IBINOP( &($$), &($1), &($3), %); }
+	| term FTS_TOKEN_SHIFT_LEFT term        { ARITH_IBINOP( &($$), &($1), &($3), <<); }
+	| term FTS_TOKEN_SHIFT_RIGHT term       { ARITH_IBINOP( &($$), &($1), &($3), >>); }
+	| term FTS_TOKEN_LOGICAL_AND term       { ARITH_IBINOP( &($$), &($1), &($3), &&); }
+	| term FTS_TOKEN_LOGICAL_OR term        { ARITH_IBINOP( &($$), &($1), &($3), ||); }
+	| term FTS_TOKEN_EQUAL_EQUAL term       { LOGIC_BINOP( &($$), &($1), &($3), ==); }
+	| term FTS_TOKEN_NOT_EQUAL term         { LOGIC_BINOP( &($$), &($1), &($3), !=); }
+	| term FTS_TOKEN_GREATER term           { LOGIC_BINOP( &($$), &($1), &($3), >); }
+	| term FTS_TOKEN_GREATER_EQUAL term     { LOGIC_BINOP( &($$), &($1), &($3), >=); }
+	| term FTS_TOKEN_SMALLER term           { LOGIC_BINOP( &($$), &($1), &($3), <); }
+	| term FTS_TOKEN_SMALLER_EQUAL term     { LOGIC_BINOP( &($$), &($1), &($3), <=); }
 ;
 
-ref: FTS_TOKEN_DOLLAR FTS_TOKEN_SYMBOL
-	| ref FTS_TOKEN_OPEN_SQPAR term FTS_TOKEN_CLOSED_SQPAR %prec FTS_TOKEN_ARRAY_INDEX
-	| ref FTS_TOKEN_DOT FTS_TOKEN_SYMBOL
+ref: variable
+	| variable FTS_TOKEN_OPEN_SQPAR term FTS_TOKEN_CLOSED_SQPAR %prec FTS_TOKEN_ARRAY_INDEX
+;
+
+variable: FTS_TOKEN_DOLLAR FTS_TOKEN_SYMBOL
 ;
 
 %%
@@ -152,88 +198,13 @@ ref: FTS_TOKEN_DOLLAR FTS_TOKEN_SYMBOL
  *
  */
 
-static fts_stack_t interpreter_stack;
-static int fp = 0;
-
-#define PUSH(V) fts_stack_push( &interpreter_stack, fts_atom_t, (V))
-#define POP(N) fts_stack_pop( &interpreter_stack, (N))
-
-#define TOP fts_stack_get_top( &interpreter_stack)
-#define BASE ((fts_atom_t *)fts_stack_get_base( &interpreter_stack))
-
-static void print_stack( const char *msg);
-
-/*
-
-Description of stack organization:
-
-Before calling a method or outputing a message:
-           <- top
-arg3  
-arg2
-arg1       <- fp
-savedfp
-retval
-arg2'
-arg1'
-savedfp'
-retval'
-
-After poping one frame:
-
-
-arg3  
-arg2
-arg1
-savedfp      <- top
-retval
-arg2'
-arg1'        <- fp
-savedfp'
-retval'
-
-*/
-
-static void push_frame()
-{
-  fts_atom_t a;
-
-  /* return value */
-  fts_set_void( &a);
-  PUSH( a);
-
-  /* saved frame pointer */
-  fts_set_int( &a, fp);
-  PUSH( a);
-  fp = TOP;
-
-  print_stack( "Stack after pushing frame");
-}
-
-static void pop_frame()
-{
-  int old_fp;
-
-  print_stack( "Stack before poping frame");
-
-  old_fp = fp;
-  fp = fts_get_int( BASE + fp - 1);
-  POP( TOP - old_fp + 1);
-
-  print_stack( "Stack after poping frame");
-}
-
-static void push_value( const fts_atom_t *yylval)
-{
-  PUSH( *yylval);
-}
-
 static int yyerror( const char *msg)
 {
   fprintf( stderr, "%s\n", msg);
 
   return 0;
 }
+
 
 /* **********************************************************************
  * 
@@ -242,68 +213,17 @@ static int yyerror( const char *msg)
  */
 
 static fts_hashtable_t token_table;
-static fts_metaclass_t *token_type;
-static fts_object_t *unique_token;
 
-#define is_token(at) fts_is_a( at, token_type)
-#define set_token(at,t) (fts_set_object( at, unique_token), fts_word_set_int( &fts_get_value( at), t))
-#define get_token(at) (fts_word_get_int( &fts_get_value( at)))
-
-typedef struct {
-  int ac;
-  fts_atom_t *at;
-} fts_parser_data_t;
-
-int fts_parse_atoms( int ac, fts_atom_t *at)
-{
-  fts_parser_data_t data;
-
-  data.ac = ac;
-  data.at = at;
-
-  return yyparse( &data);
-}
-
-static int yylex( YYSTYPE *lvalp, void *data)
-{
-  fts_parser_data_t *parser_data = (fts_parser_data_t *)data;
-  fts_atom_t *at = parser_data->at;
-  int token = -1;
-
-  if (parser_data->ac <= 0)
-    return 0; /* end of file */
-
-  if (fts_is_int( at))
-    {
-      *lvalp = *at;
-      token = FTS_TOKEN_INT;
-    }
-  else if (fts_is_float( at))
-    {
-      *lvalp = *at;
-      token = FTS_TOKEN_FLOAT;
-    }
-  else if (fts_is_symbol( at))
-    {
-      *lvalp = *at;
-      token = FTS_TOKEN_SYMBOL;
-    }
-  else if (is_token( at))
-    {
-      token = get_token( at);
-    }
-
-  parser_data->at++;
-  parser_data->ac--;
-
-  return token;
-}
-
-void fts_parser_init( /*fts_parser_t *parser,*/ int ac, fts_atom_t *at)
+void fts_parser_init( fts_parser_t *parser, int ac, fts_atom_t *at)
 {
   int i;
 
-  for ( i =0; i < ac; i++)
+  parser->ac = ac;
+  parser->at = at;
+
+  parser->tokens = (int *)fts_malloc( ac * sizeof( int));
+
+  for ( i = 0; i < ac; i++)
     {
       if ( fts_is_symbol( at+i))
 	{
@@ -311,81 +231,49 @@ void fts_parser_init( /*fts_parser_t *parser,*/ int ac, fts_atom_t *at)
 
 	  k = *at;
 	  if (fts_hashtable_get( &token_table, &k, &v))
-	    set_token( at+i, fts_get_int( &v));
+	    parser->tokens[i] = fts_get_int( &v);
+	  else
+	    parser->tokens[i] = FTS_TOKEN_SYMBOL;
 	}
+      else if (fts_is_int( at+i))
+	parser->tokens[i] = FTS_TOKEN_INT;
+      else if (fts_is_double( at+i))
+	parser->tokens[i] = FTS_TOKEN_DOUBLE;
     }
 }
 
-
-/* **********************************************************************
- * 
- * Debug code
- *
- */
-
-static void print_stack( const char *msg)
+static int yylex( YYSTYPE *lvalp, void *data)
 {
-  int i, current_fp;
-  fts_atom_t *p = BASE;
+  fts_parser_t *parser = (fts_parser_t *)data;
+  fts_atom_t *at = parser->at;
+  int token = -1;
 
-  post( "%s:\n", msg);
+  if (parser->ac <= 0)
+    return 0; /* end of file */
 
-  current_fp = fp;
+  token = *parser->current_token;
+  parser->current_token++;
 
-  for ( i = TOP - 1; i >= 0; i--)
-    {
-      post( "[%2d]", i);
-      if ( i == current_fp - 1)
-	{
-	  post( "* ");
-	  current_fp = fts_get_int( p+i);
-	}
-      else
-	post( "  ");
+  *lvalp = *at;
 
-      post_atoms( 1, p+i);
-      post( "\n");
-    }
+  parser->at++;
+  parser->ac--;
+
+  return token;
 }
 
-#ifdef HACK_DEBUG
-
-static void fts_stdoutstream_output(fts_bytestream_t *stream, int n, const unsigned char *buffer)
+int fts_parser_run( fts_parser_t *parser)
 {
-  write( 1, buffer, n);
+  parser->current_token = parser->tokens;
+
+  return yyparse( parser);
 }
 
-static void fts_stdoutstream_output_char(fts_bytestream_t *stream, unsigned char c)
+void fts_parser_destroy( fts_parser_t *parser)
 {
-  write( 1, &c, 1);
+  fts_free( parser->tokens);
 }
 
-static void fts_stdoutstream_flush(fts_bytestream_t *stream)
-{
-}
-
-static void fts_stdoutstream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_bytestream_init( (fts_bytestream_t *) o);
-  fts_bytestream_set_output( (fts_bytestream_t *) o, fts_stdoutstream_output, fts_stdoutstream_output_char, fts_stdoutstream_flush);
-}
-
-static void fts_stdoutstream_receive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  post( "Parsing ?\n");
-  fts_parse_string( NULL);
-}
-
-static fts_status_t fts_stdoutstream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init(cl, sizeof(fts_bytestream_t), 0, 0, 0);
-  fts_bytestream_class_init(cl);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fts_stdoutstream_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, fts_stdoutstream_receive);
-
-  return fts_Success;
-}
-#endif
 
 /* **********************************************************************
  *
@@ -396,8 +284,6 @@ static fts_status_t fts_stdoutstream_instantiate(fts_class_t *cl, int ac, const 
 void fts_kernel_parser_init( void)
 {
   fts_atom_t k, v;
-
-  fts_stack_init( &interpreter_stack, fts_atom_t);
 
   fts_hashtable_init( &token_table, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_MEDIUM);
 
@@ -429,31 +315,4 @@ void fts_kernel_parser_init( void)
   PUT( fts_s_smaller_equal, FTS_TOKEN_SMALLER_EQUAL);
   PUT( fts_s_colon, FTS_TOKEN_COLON);
   PUT( fts_s_equal, FTS_TOKEN_EQUAL);
-}
-
-static fts_status_t
-token_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init( cl, sizeof(fts_object_t), 0, 0, 0);
-
-  return fts_Success;
-}
-
-void fts_parser_config( void)
-{
-#ifdef HACK_DEBUG
-  {
-    fts_metaclass_t *stdoutstream_type;
-    fts_bytestream_t *stream;
-
-    stdoutstream_type = fts_class_install( fts_new_symbol("stdoutstream"), fts_stdoutstream_instantiate);
-    stream = (fts_bytestream_t *)fts_object_create( stdoutstream_type, 0, 0);
-    fts_set_default_console_stream( stream);
-
-    fts_sched_add( (fts_object_t *)stream, FTS_SCHED_ALWAYS);  
-  }
-#endif
-
-  token_type = fts_class_install( fts_new_symbol( "_token"), token_instantiate);
-  unique_token = fts_object_create( token_type, 0, 0);
 }

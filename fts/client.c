@@ -129,7 +129,7 @@ static int client_table_add( client_t *client)
 {
   fts_stack_push( &client_table, client_t *, client);
 
-  return fts_stack_get_top( &client_table) - 1;
+  return fts_stack_get_top( &client_table);
 }
 
 static void client_table_remove( int id)
@@ -157,7 +157,7 @@ client_t *object_get_client( fts_object_t *obj)
 
   index = OBJECT_ID_CLIENT( id );
 
-  if (index < 0 || index >= fts_stack_get_top( &client_table))
+  if (index < 0 || index >= fts_stack_get_size( &client_table))
     return NULL;
 
   return client_table_get(index);
@@ -480,7 +480,7 @@ static void end_raw_string_action( unsigned char input, client_t *client)
   fts_stack_push( &client->input_buffer, unsigned char, '\0');
 
   p = fts_stack_get_base( &client->input_buffer);
-  l = fts_stack_get_top( &client->input_buffer);
+  l = fts_stack_get_size( &client->input_buffer);
   fts_tokenizer_init_buffer( &tokenizer, p, l);
 
   while ( fts_tokenizer_next( &tokenizer, &a) != 0)
@@ -515,7 +515,7 @@ static void end_message_action( unsigned char input, client_t *client)
   int argc;
   fts_atom_t *argv;
 
-  argc = fts_stack_get_top( &client->input_args);
+  argc = fts_stack_get_size( &client->input_args);
   argv = (fts_atom_t *)fts_stack_get_base( &client->input_args);
 
   selector = fts_get_symbol( argv+1);
@@ -1373,7 +1373,7 @@ void fts_client_done_message( fts_object_t *obj)
 
   write_char( client, FTS_PROTOCOL_END_OF_MESSAGE);
   
-  fts_bytestream_output( client->stream, fts_stack_get_top( &client->output_buffer), fts_stack_get_base( &client->output_buffer));
+  fts_bytestream_output( client->stream, fts_stack_get_size( &client->output_buffer), fts_stack_get_base( &client->output_buffer));
 
   fts_stack_clear( &client->output_buffer);
 }

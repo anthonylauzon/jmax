@@ -44,7 +44,7 @@ typedef struct fts_status_description fts_status_description_t, *fts_status_t;
 union fts_word
 {
   int                 fts_int;
-  float               fts_float;
+  double              fts_double;
   fts_symbol_t        fts_symbol;
   fts_object_t        *fts_object;
   void                *fts_pointer;
@@ -56,10 +56,12 @@ union fts_word
  */
 
 struct fts_atom { 
-  fts_metaclass_t *typeid;
+  fts_metaclass_t *type;
   fts_word_t value;
 };
 
 
 typedef void (*fts_method_t) (fts_object_t *, int, fts_symbol_t , int, const fts_atom_t *);
+
+typedef void (*fts_function_t) (int, const fts_atom_t *);
 

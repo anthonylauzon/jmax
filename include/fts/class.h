@@ -34,6 +34,9 @@ struct fts_metaclass {
      Set only for metaclasses representing primitive types.
   */
   fts_symbol_t selector; 
+  
+  /* An integer id used for efficient dispatch */
+  int typeid;
 
   fts_instantiate_fun_t instantiate_fun;
   fts_equiv_fun_t equiv_fun;

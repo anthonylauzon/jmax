@@ -98,7 +98,7 @@ FTS_API void fts_stack_destroy( fts_stack_t *stack);
  * @param v the value to push
  * @ingroup stack
  */
-#define fts_stack_push(S,T,V) (((S)->top+1 >= (S)->alloc) ? __fts_stack_realloc((S)) : 0, ((T*)(S)->buffer)[(S)->top++] = (V))
+#define fts_stack_push(S,T,V) (((S)->top+1 >= (S)->alloc) ? __fts_stack_realloc((S)) : 0, ((T*)(S)->buffer)[++(S)->top] = (V))
 
 /* This function is not to be called directly */
 FTS_API int __fts_stack_realloc( fts_stack_t *b);
@@ -134,11 +134,11 @@ FTS_API int __fts_stack_realloc( fts_stack_t *b);
 #define fts_stack_get_top(S) ((S)->top)
 
 /**
- * Set the top of a stack
+ * Get the size of a stack (number of elements)
  * 
- * @fn void fts_stack_set_top( s, top)
- * @param s the stack
- * @param top the new stack top
+ * @fn int fts_stack_get_size( b)
+ * @param b the stack
+ * @return the stack size
  * @ingroup stack
  */
-#define fts_stack_set_top(S,TOP) ((S)->top = (TOP))
+#define fts_stack_get_size(S) ((S)->top + 1)
