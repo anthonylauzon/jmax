@@ -81,8 +81,11 @@ wave_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   wave_t *this = (wave_t *)o;
   float_vector_t *fvec = float_vector_atom_get(at);
 
-  if(float_vector_get_alloc_size(fvec) >= WAVE_TABLE_SIZE + 1)
-    wave_data_set_fvec(this->data, fvec);
+  /* check float vector size */
+  if(float_vector_get_size(fvec) < WAVE_TABLE_SIZE + 1)
+    float_vector_set_size(fvec, WAVE_TABLE_SIZE + 1);
+
+  wave_data_set_fvec(this->data, fvec);
 }
 
 /***************************************************************************************
@@ -167,15 +170,10 @@ static void
 wave_init_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   wave_t *this = (wave_t *)o;
-  float_vector_t *fvec = float_vector_atom_get(at + 1);
 
   wave_init(o, 0, 0, 0, 0);
 
-  /* check float vector size */
-  if(float_vector_get_alloc_size(fvec) < WAVE_TABLE_SIZE + 1)
-    float_vector_set_size(fvec, WAVE_TABLE_SIZE + 1);
-
-  wave_data_set_fvec(this->data, fvec);
+  wave_set_fvec(o, 0, 0, 1, at + 1);
 }
 
 /***************************************************************************************

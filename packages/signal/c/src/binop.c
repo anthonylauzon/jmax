@@ -37,14 +37,6 @@ typedef struct
   ftl_data_t data;
 } binop_const_t;
 
-typedef struct
-{
-  fts_object_t head;
-  ftl_data_t data;
-  float time;
-  float sr;
-} binop_ramp_t;
-
 static fts_symbol_t sym_copy;
 
 static fts_symbol_t sym_add;
@@ -82,20 +74,6 @@ static fts_symbol_t sym_sub_const_inplace;
 static fts_symbol_t sym_div_const_inplace;
 static fts_symbol_t sym_bus_const_inplace;
 static fts_symbol_t sym_vid_const_inplace;
-
-static fts_symbol_t sym_add_ramp;
-static fts_symbol_t sym_mul_ramp;
-static fts_symbol_t sym_sub_ramp;
-static fts_symbol_t sym_div_ramp;
-static fts_symbol_t sym_bus_ramp;
-static fts_symbol_t sym_vid_ramp;
-
-static fts_symbol_t sym_add_ramp_inplace;
-static fts_symbol_t sym_mul_ramp_inplace;
-static fts_symbol_t sym_sub_ramp_inplace;
-static fts_symbol_t sym_div_ramp_inplace;
-static fts_symbol_t sym_bus_ramp_inplace;
-static fts_symbol_t sym_vid_ramp_inplace;
 
 /**************************************************************
  *
@@ -477,204 +455,6 @@ ftl_vid_const_inplace(fts_word_t *argv)
     sig[i] = c / sig[i];
 }
 
-/**************************************************************
- *
- *  dsp functions with sliding scalar (const)
- *
- */
-
-static void 
-ftl_add_ramp(fts_word_t *argv)
-{
-  fts_ramp_t *ramp = (fts_ramp_t *)fts_word_get_ptr(argv + 0);
-  float * restrict in = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
-  int n = fts_word_get_int(argv + 3);
-  int i;
-
-  for (i=0; i<n; i++)
-    {
-      fts_ramp_incr(ramp);
-      out[i] = in[i] + fts_ramp_get_value(ramp);
-    }
-}
-
-static void 
-ftl_sub_ramp(fts_word_t *argv)
-{
-  fts_ramp_t *ramp = (fts_ramp_t *)fts_word_get_ptr(argv + 0);
-  float * restrict in = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
-  int n = fts_word_get_int(argv + 3);
-  int i;
-
-  for (i=0; i<n; i++)
-    {
-      fts_ramp_incr(ramp);
-      out[i] = in[i] - fts_ramp_get_value(ramp);
-    }
-}
-
-static void 
-ftl_mul_ramp(fts_word_t *argv)
-{
-  fts_ramp_t *ramp = (fts_ramp_t *)fts_word_get_ptr(argv + 0);
-  float * restrict in = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
-  int n = fts_word_get_int(argv + 3);
-  int i;
-
-  for (i=0; i<n; i++)
-    {
-      fts_ramp_incr(ramp);
-      out[i] = in[i] * fts_ramp_get_value(ramp);
-    }
-}
-
-static void 
-ftl_div_ramp(fts_word_t *argv)
-{
-  fts_ramp_t *ramp = (fts_ramp_t *)fts_word_get_ptr(argv + 0);
-  float * restrict in = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
-  int n = fts_word_get_int(argv + 3);
-  int i;
-
-  for (i=0; i<n; i++)
-    {
-      fts_ramp_incr(ramp);
-      out[i] = in[i] + fts_ramp_get_value(ramp);
-    }
-}
-
-static void 
-ftl_bus_ramp(fts_word_t *argv)
-{
-  fts_ramp_t *ramp = (fts_ramp_t *)fts_word_get_ptr(argv + 0);
-  float * restrict in = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
-  int n = fts_word_get_int(argv + 3);
-  int i;
-
-  for (i=0; i<n; i++)
-    {
-      fts_ramp_incr(ramp);
-      out[i] = fts_ramp_get_value(ramp) - in[i];
-    }
-}
-
-static void 
-ftl_vid_ramp(fts_word_t *argv)
-{
-  fts_ramp_t *ramp = (fts_ramp_t *)fts_word_get_ptr(argv + 0);
-  float * restrict in = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
-  int n = fts_word_get_int(argv + 3);
-  int i;
-
-  for (i=0; i<n; i++)
-    {
-      fts_ramp_incr(ramp);
-      out[i] = fts_ramp_get_value(ramp) / in[i];
-    }
-}
-
-/**************************************************************
- *
- *  dsp functions with sliding scalar (const) inplace
- *
- */
-
-static void 
-ftl_add_ramp_inplace(fts_word_t *argv)
-{
-  fts_ramp_t *ramp = (fts_ramp_t *)fts_word_get_ptr(argv + 0);
-  float * restrict sig = (float *)fts_word_get_ptr(argv + 1);
-  int n = fts_word_get_int(argv + 2);
-  int i;
-
-  for (i=0; i<n; i++)
-    {
-      fts_ramp_incr(ramp);
-      sig[i] += fts_ramp_get_value(ramp);
-    }
-}
-
-static void 
-ftl_sub_ramp_inplace(fts_word_t *argv)
-{
-  fts_ramp_t *ramp = (fts_ramp_t *)fts_word_get_ptr(argv + 0);
-  float * restrict sig = (float *)fts_word_get_ptr(argv + 1);
-  int n = fts_word_get_int(argv + 2);
-  int i;
-
-  for (i=0; i<n; i++)
-    {
-      fts_ramp_incr(ramp);
-      sig[i] -= fts_ramp_get_value(ramp);
-    }
-}
-
-static void 
-ftl_mul_ramp_inplace(fts_word_t *argv)
-{
-  fts_ramp_t *ramp = (fts_ramp_t *)fts_word_get_ptr(argv + 0);
-  float * restrict sig = (float *)fts_word_get_ptr(argv + 1);
-  int n = fts_word_get_int(argv + 2);
-  int i;
-
-  for (i=0; i<n; i++)
-    {
-      fts_ramp_incr(ramp);
-      sig[i] *= fts_ramp_get_value(ramp);
-    }
-}
-
-static void 
-ftl_div_ramp_inplace(fts_word_t *argv)
-{
-  fts_ramp_t *ramp = (fts_ramp_t *)fts_word_get_ptr(argv + 0);
-  float * restrict sig = (float *)fts_word_get_ptr(argv + 1);
-  int n = fts_word_get_int(argv + 2);
-  int i;
-
-  for (i=0; i<n; i++)
-    {
-      fts_ramp_incr(ramp);
-      sig[i] /= fts_ramp_get_value(ramp);
-    }
-}
-
-static void 
-ftl_bus_ramp_inplace(fts_word_t *argv)
-{
-  fts_ramp_t *ramp = (fts_ramp_t *)fts_word_get_ptr(argv + 0);
-  float * restrict sig = (float *)fts_word_get_ptr(argv + 1);
-  int n = fts_word_get_int(argv + 2);
-  int i;
-
-  for (i=0; i<n; i++)
-    {
-      fts_ramp_incr(ramp);
-      sig[i] = sig[i] - fts_ramp_get_value(ramp);
-    }
-}
-
-static void 
-ftl_vid_ramp_inplace(fts_word_t *argv)
-{
-  fts_ramp_t *ramp = (fts_ramp_t *)fts_word_get_ptr(argv + 0);
-  float * restrict sig = (float *)fts_word_get_ptr(argv + 1);
-  int n = fts_word_get_int(argv + 2);
-  int i;
-
-  for (i=0; i<n; i++)
-    {
-      fts_ramp_incr(ramp);
-      sig[i] = sig[i] / fts_ramp_get_value(ramp);
-    }
-}
-
 /************************************************
  *
  *  binop put
@@ -1018,79 +798,6 @@ binop_const_put_vid(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 
 /************************************************
  *
- *  binop ramp put
- *
- */
-
-static void
-binop_ramp_put(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t sym, fts_symbol_t sym_inplace)
-{
-  binop_ramp_t *this = (binop_ramp_t *)o;
-  fts_ramp_t *ramp = (fts_ramp_t *)ftl_data_get_ptr(this->data);
-  float sr = fts_dsp_get_output_srate(dsp, 0);
-  fts_atom_t argv[4];
-
-  this->sr = sr;
-  fts_ramp_jump(ramp);
-
-  if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
-    {
-      /* inplace */
-      fts_set_ftl_data(argv + 0, this->data);
-      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-      fts_set_int(argv + 2, fts_dsp_get_output_size(dsp, 0));
-      
-      dsp_add_funcall(sym_inplace, 3, argv);
-    }
-  else
-    {
-      fts_set_ftl_data(argv + 0, this->data);
-      fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 0));
-      fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
-      fts_set_int(argv + 3, fts_dsp_get_output_size(dsp, 0));
-      
-      dsp_add_funcall(sym, 4, argv);
-    }
-}
-
-static void 
-binop_ramp_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  binop_ramp_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_add_ramp, sym_add_ramp_inplace);
-}
-
-static void 
-binop_ramp_put_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  binop_ramp_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_sub_ramp, sym_sub_ramp_inplace);
-}
-
-static void 
-binop_ramp_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  binop_ramp_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_mul_ramp, sym_mul_ramp_inplace);
-}
-
-static void 
-binop_ramp_put_div(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  binop_ramp_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_div_ramp, sym_div_ramp_inplace);
-}
-
-static void 
-binop_ramp_put_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  binop_ramp_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_bus_ramp, sym_bus_ramp_inplace);
-}
-
-static void 
-binop_ramp_put_vid(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  binop_ramp_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_vid_ramp, sym_vid_ramp_inplace);
-}
-
-/************************************************
- *
  *  binop user methods
  *
  */
@@ -1102,28 +809,6 @@ binop_set_const(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   float *ptr = (float *)ftl_data_get_ptr(this->data);
 
   *ptr = fts_get_number_float(at);
-}
-
-void
-binop_set_target(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  binop_ramp_t *this = (binop_ramp_t *)o;
-  fts_ramp_t *ramp = (fts_ramp_t *)ftl_data_get_ptr(this->data);
-  float value = fts_get_number_float(at);
-
-  fts_ramp_set_target(ramp, value, this->time, this->sr);
-}
-
-void
-binop_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  binop_ramp_t *this = (binop_ramp_t *)o;
-  float value = fts_get_number_float(at);
-
-  if(value >= 0)
-    this->time = value;
-  else
-    this->time = 0.0;
 }
 
 /************************************************
@@ -1212,62 +897,6 @@ binop_const_instantiate_realize(fts_class_t *cl, int ac, const fts_atom_t *at, f
 
 /************************************************
  *
- *  binop const init delete instantiate
- *
- */
-
-static void
-binop_ramp_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  binop_ramp_t *this = (binop_ramp_t *)o;
-  fts_ramp_t *data;
-
-  this->time = 0.0;
-  this->sr = 1.0;
-
-  this->data = ftl_data_alloc(sizeof(fts_ramp_t));
-
-  binop_set_time(o, 0, 0, 1, at + 2);
-  binop_set_target(o, 0, 0, 1, at + 1);
-  
-  dsp_list_insert(o);
-}
-
-static void
-binop_ramp_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  binop_ramp_t *this = (binop_ramp_t *)o;
-
-  ftl_data_free(this->data);
-
-  dsp_list_remove(o);
-}
-
-
-static fts_status_t
-binop_ramp_instantiate_realize(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t mth)
-{
-  fts_class_init(cl, sizeof(binop_ramp_t), 3, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, binop_ramp_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, binop_ramp_delete);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, mth);
-
-  fts_method_define_varargs(cl, 1, fts_s_int, binop_set_target);
-  fts_method_define_varargs(cl, 1, fts_s_float, binop_set_target);
-
-  fts_method_define_varargs(cl, 2, fts_s_int, binop_set_time);
-  fts_method_define_varargs(cl, 2, fts_s_float, binop_set_time);
-
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
-    
-  return fts_Success;
-}
-
-/************************************************
- *
  * instantiate
  *
  */
@@ -1279,8 +908,6 @@ binop_add_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     return binop_instantiate_realize(cl, ac, at, binop_put_add);
   else if (ac == 2)
     return binop_const_instantiate_realize(cl, ac, at, binop_const_put_add);
-  else if (ac == 3)
-    return binop_ramp_instantiate_realize(cl, ac, at, binop_ramp_put_add);
   else
     return &fts_CannotInstantiate;
 }
@@ -1293,8 +920,6 @@ binop_sub_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     return binop_instantiate_realize(cl, ac, at, binop_put_sub);
   else if (ac == 2)
     return binop_const_instantiate_realize(cl, ac, at, binop_const_put_sub);
-  else if (ac == 3)
-    return binop_ramp_instantiate_realize(cl, ac, at, binop_ramp_put_sub);
   else
     return &fts_CannotInstantiate;
 }
@@ -1307,8 +932,6 @@ binop_mul_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     return binop_instantiate_realize(cl, ac, at, binop_put_mul);
   else if (ac == 2)
     return binop_const_instantiate_realize(cl, ac, at, binop_const_put_mul);
-  else if (ac == 3)
-    return binop_ramp_instantiate_realize(cl, ac, at, binop_ramp_put_mul);
   else
     return &fts_CannotInstantiate;
 }
@@ -1321,8 +944,6 @@ binop_div_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     return binop_instantiate_realize(cl, ac, at, binop_put_div);
   else if (ac == 2)
     return binop_const_instantiate_realize(cl, ac, at, binop_const_put_div);
-  else if (ac == 3)
-    return binop_ramp_instantiate_realize(cl, ac, at, binop_ramp_put_div);
   else
     return &fts_CannotInstantiate;
 }
@@ -1334,8 +955,6 @@ binop_bus_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     return binop_instantiate_realize(cl, ac, at, binop_put_bus);
   else if (ac == 2)
     return binop_const_instantiate_realize(cl, ac, at, binop_const_put_bus);
-  else if (ac == 3)
-    return binop_ramp_instantiate_realize(cl, ac, at, binop_ramp_put_bus);
   else
     return &fts_CannotInstantiate;
 }
@@ -1347,8 +966,6 @@ binop_vid_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     return binop_instantiate_realize(cl, ac, at, binop_put_vid);
   else if (ac == 2)
     return binop_const_instantiate_realize(cl, ac, at, binop_const_put_vid);
-  else if (ac == 3)
-    return binop_ramp_instantiate_realize(cl, ac, at, binop_ramp_put_vid);
   else
     return &fts_CannotInstantiate;
 }
@@ -1454,46 +1071,6 @@ signal_binop_config(void)
 
   sym_vid_const_inplace = fts_new_symbol("vid_const_inplace");
   dsp_declare_function(sym_vid_const_inplace, ftl_vid_const_inplace);
-
-  /* signal x ramp */
-
-  sym_add_ramp = fts_new_symbol("add_ramp");
-  dsp_declare_function(sym_add_ramp, ftl_add_ramp);
-
-  sym_sub_ramp = fts_new_symbol("sub_ramp");
-  dsp_declare_function(sym_sub_ramp, ftl_sub_ramp);
-
-  sym_mul_ramp = fts_new_symbol("mul_ramp");
-  dsp_declare_function(sym_mul_ramp, ftl_mul_ramp);
-
-  sym_div_ramp = fts_new_symbol("div_ramp");
-  dsp_declare_function(sym_div_ramp, ftl_div_ramp);
-
-  sym_bus_ramp = fts_new_symbol("bus_ramp");
-  dsp_declare_function(sym_bus_ramp, ftl_bus_ramp);
-
-  sym_vid_ramp = fts_new_symbol("vid_ramp");
-  dsp_declare_function(sym_vid_ramp, ftl_vid_ramp);
-
-  /* signal x ramp inplace */
-
-  sym_add_ramp_inplace = fts_new_symbol("add_ramp_inplace");
-  dsp_declare_function(sym_add_ramp_inplace, ftl_add_ramp_inplace);
-
-  sym_sub_ramp_inplace = fts_new_symbol("sub_ramp_inplace");
-  dsp_declare_function(sym_sub_ramp_inplace, ftl_sub_ramp_inplace);
-
-  sym_mul_ramp_inplace = fts_new_symbol("mul_ramp_inplace");
-  dsp_declare_function(sym_mul_ramp_inplace, ftl_mul_ramp_inplace);
-
-  sym_div_ramp_inplace = fts_new_symbol("div_ramp_inplace");
-  dsp_declare_function(sym_div_ramp_inplace, ftl_div_ramp_inplace);
-
-  sym_bus_ramp_inplace = fts_new_symbol("bus_ramp_inplace");
-  dsp_declare_function(sym_bus_ramp_inplace, ftl_bus_ramp_inplace);
-
-  sym_vid_ramp_inplace = fts_new_symbol("vid_ramp_inplace");
-  dsp_declare_function(sym_vid_ramp_inplace, ftl_vid_ramp_inplace);
 
   fts_metaclass_install(fts_new_symbol("+~"), binop_add_instantiate, fts_narg_equiv);
   fts_metaclass_install(fts_new_symbol("-~"), binop_sub_instantiate, fts_narg_equiv);

@@ -86,8 +86,11 @@ osc_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   osc_t *this = (osc_t *)o;
   float_vector_t *fvec = float_vector_atom_get(at);
 
-  if(float_vector_get_alloc_size(fvec) >= OSC_TABLE_SIZE + 1)
-    osc_data_set_fvec(this->data, fvec);
+  /* check float vector size */
+  if(float_vector_get_size(fvec) < OSC_TABLE_SIZE + 1)
+    float_vector_set_size(fvec, OSC_TABLE_SIZE + 1);
+
+  osc_data_set_fvec(this->data, fvec);
 }
 
 /***************************************************************************************
@@ -208,16 +211,10 @@ osc_init_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if(ac == 3)
     {
       osc_set_freq(o, 0, 0, 1, at + 1);
-      fvec = float_vector_atom_get(at + 2);
+      osc_set_fvec(o, 0, 0, 1, at + 2);
     }
   else
-    fvec = float_vector_atom_get(at + 1);
-
-  /* check float vector size */
-  if(float_vector_get_alloc_size(fvec) < OSC_TABLE_SIZE + 1)
-    float_vector_set_size(fvec, OSC_TABLE_SIZE + 1);
-
-  osc_data_set_fvec(this->data, fvec);
+    osc_set_fvec(o, 0, 0, 1, at + 1);
 }
 
 /***************************************************************************************

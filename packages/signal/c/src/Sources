@@ -33,6 +33,4 @@ osc.c \
 osc_ieeewrap.c \
 wave.c \
 wave_ieeewrap.c \
-
-
-
+bpf.c \

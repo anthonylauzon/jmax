@@ -26,29 +26,96 @@
 
 #include "fts.h"
 
+/************************************************************
+ *
+ *  break points
+ *
+ */
+
+static fts_heap_t *bp_heap;
+
 typedef struct _bp_
 {
-  fts_object_t o;
   double time;
   double value;
   struct _bp_ *next; /* list of break points */
 } bp_t;
 
+#define bp_get_time(b) ((b)->time)
+#define bp_get_value(b) ((b)->value)
+#define bp_get_next(b) ((b)->next)
+
+static bp_t *
+bp_new(double time, double value)
+{
+  bp_t *bp = fts_heap_alloc(bp_heap);
+  
+  bp->time = time;
+  bp->value = value;
+  bp->next = 0;
+
+  return bp;
+}
+
+static void
+bp_delete(bp_t *bp)
+{
+  fts_heap_free(bp, bp_heap);
+}
+
+/************************************************************
+ *
+ *  bpf
+ *
+ */
+
 typedef struct _bpf_
 {
   fts_object_t o;
-  ftl_data_t data;
-  bp_t *first;
-  bp_t *last;
-  float sr;
+  fts_ramp_t ramp;
+  bp_t *first; /* first break point of function */
+  bp_t *last; /* last break point of function */
+  bp_t *next; /* next break point to be triggered */
+  double duration;
+  double sr;
 } bpf_t;
 
 static fts_symbol_t sym_bpf = 0;
 
-static void
-bpf_append_point(bpt_t *this, )
-{
+#define bpf_advance(b) ((b)->next = (b)->next->next)
 
+static void
+bpf_clear(bpf_t *bpf)
+{
+  bp_t *bp = bpf->first;
+
+  while(bp)
+    {
+      bp_t *next = bp_get_next(bp);
+
+      bp_delete(bp);
+      bp = next;
+    }
+  
+  bpf->first = 0;
+  bpf->last = 0;
+  bpf->next = 0;  
+
+  bpf->duration = 0.0;
+}
+
+static void
+bpf_append(bpf_t *bpf, bp_t *bp)
+{
+  if(bpf->first == 0)
+    bpf->first = bpf->last = bp;
+  else
+    {
+      bpf->last->next = bp;
+      bpf->last = bp;
+    }
+
+  bpf->duration += bp->time;
 }
 
 /************************************************************
@@ -57,35 +124,68 @@ bpf_append_point(bpt_t *this, )
  *
  */
 
-void
+static void
+bpf_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  bpf_t *this = (bpf_t *)o;
+
+  if(this->first)
+    {
+      fts_ramp_set_target(&this->ramp, bp_get_value(this->first), bp_get_time(this->first), this->sr);
+
+      this->next = this->first->next;
+    }
+}
+
+static void
+bpf_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  bpf_t *this = (bpf_t *)o;
+
+  fts_ramp_freeze(&this->ramp);
+
+  this->next = 0;
+}
+
+static void
 bpf_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
-  fts_ramp_t *ramp = (fts_ramp_t *)ftl_data_get_ptr(this->data);
-  float value = fts_get_number_float(at);
 
-  fts_ramp_set_target(ramp, value, this->time, this->sr);
+  bpf_clear(this);
+  
+  if(ac)
+    {
+      int i = ac & 1;
+      
+      if(i)
+	{
+	  if(fts_is_number(at))
+	    {
+	      double value = fts_get_number_float(at);
+
+	      bpf_append(this, bp_new(0.0, value));
+	    }
+	}
+
+      for(; i<ac; i+=2)
+	{
+	  if(fts_is_number(at + i) && fts_is_number(at + i + 1))
+	    {
+	      double time = fts_get_number_float(at + i);
+	      double value = fts_get_number_float(at + i + 1);
+	      
+	      bpf_append(this, bp_new(time, value));
+	    }
+	}    
+    }
 }
 
-void
-bpf_set_function(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  bpf_t *this = (bpf_t *)o;
-  float *c = (float *)ftl_data_get_ptr(this->data);
-
-  *c = fts_get_number_float(at);
-}
-
-void
-bpf_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  bpf_t *this = (bpf_t *)o;
-  float value = fts_get_number_float(at);
-
-  if(value >= 0)
-    this->time = value;
-  else
-    this->time = 0.0;
+static void
+bpf_set_and_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{  
+  bpf_set(o, 0, 0, ac, at);
+  bpf_go(o, 0, 0, ac, at);
 }
 
 /************************************************************
@@ -94,16 +194,20 @@ bpf_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  *
  */
 
-void
+static void
 bpf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
-  float sr = fts_dsp_get_output_srate(dsp, 0);
+  double sr = fts_dsp_get_output_srate(dsp, 0);
   fts_atom_t a[3];
 
-  fts_set_ftl_data(a + 0, this->data);
+  this->sr = sr;
+
+  bpf_stop(o, 0, 0, 0, 0);
+
+  fts_set_ptr(a + 0, this);
   fts_set_symbol(a + 1, fts_dsp_get_output_name(dsp, 0));
   fts_set_int(a + 2, n_tick);
   
@@ -113,15 +217,45 @@ bpf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 static void
 bpf_ftl(fts_word_t *argv)
 {
-  fts_ramp_t *ramp = (fts_ramp_t *) fts_word_get_ptr(argv + 0);
+  bpf_t *this = (bpf_t *) fts_word_get_ptr(argv + 0);
   float *out = (float *) fts_word_get_ptr(argv + 1);
+  fts_ramp_t *ramp = &this->ramp;
   int n_tick = fts_word_get_int(argv + 2);
-  int i;
-  
-  for(i=0; i<n_tick; i++)
+  int i = 0;
+
+  while(i < n_tick)
     {
-      fts_ramp_incr(ramp);
-      out[i] = fts_ramp_get_value(ramp);
+      if(fts_ramp_running(ramp))
+	{
+	  double value = fts_ramp_get_value(ramp);
+	  double incr = fts_ramp_get_incr(ramp);
+	  int n_target = i + fts_ramp_get_steps(ramp);
+	  int n_left = n_tick - i;
+
+	  if(n_target > n_tick)
+	    n_target = n_tick;
+	  
+	  for(; i<n_target; i++)
+	    {
+	      out[i] = value;
+	      value += incr;
+	    }
+	  
+	  fts_ramp_incr_by(ramp, n_left);
+	}
+      else if(this->next)
+	{
+	  fts_ramp_set_target(ramp, bp_get_value(this->next), bp_get_time(this->next), this->sr);
+
+	  bpf_advance(this);
+	}
+      else
+	{
+	  double value = fts_ramp_get_value(ramp);
+
+	  for(; i<n_tick; i++)
+	    out[i] = value;
+	}
     }
 }
 
@@ -138,20 +272,17 @@ bpf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   dsp_list_insert(o);
 
-  this->data = ftl_data_alloc(sizeof(float)); /* just a constant */
+  fts_ramp_init(&this->ramp, 0.0);
 
-  this->time = 0.0;
+  /* init break points */
+  this->first = 0;
+  this->last = 0;
+  this->next = 0;
+  this->duration = 0.0;
+
   this->sr = 1.0;
 
-  if(ac == 2)
-    bpf_set_const(o, 0, 0, 1, at + 1);  
-  else
-    {
-      fts_atom_t a[1];
-      
-      fts_set_int(a, 0);
-      bpf_set_const(o, 0, 0, 1, a);
-    }
+  bpf_set(o, 0, 0, ac - 1, at + 1);
 }
 
 static void
@@ -161,38 +292,47 @@ bpf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   dsp_list_remove(o);
 
-  ftl_data_free(this->data);
+  bpf_clear(this);
 }
 
 static fts_status_t
 bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 1 || (ac == 2 && fts_is_number(at + 1)))
-    {
-      /* constant */
-      fts_class_init(cl, sizeof(bpf_t), 1, 1, 0); 
+  int i;
 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, bpf_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, bpf_delete);
+  for(i=1; i<ac; i++)
+    if(!fts_is_number(at + i))
+      return &fts_CannotInstantiate;
 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, bpf_put);
+  fts_class_init(cl, sizeof(bpf_t), 2, 1, 0); 
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, bpf_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, bpf_delete);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, bpf_put);
+  
+  fts_method_define_varargs(cl, 0, fts_s_bang, bpf_go);
 
-      fts_method_define_varargs(cl, 0, fts_s_int, bpf_set);
-      fts_method_define_varargs(cl, 0, fts_s_float, bpf_set);
-
-      dsp_sig_outlet(cl, 0);
-      
-      return fts_Success;
-   }
-  else
-    return &fts_CannotInstantiate;
+  fts_method_define_varargs(cl, 0, fts_s_int, bpf_set_and_go);
+  fts_method_define_varargs(cl, 0, fts_s_float, bpf_set_and_go);
+  fts_method_define_varargs(cl, 0, fts_s_list, bpf_set_and_go);
+  
+  fts_method_define_varargs(cl, 1, fts_s_int, bpf_set);
+  fts_method_define_varargs(cl, 1, fts_s_float, bpf_set);
+  fts_method_define_varargs(cl, 1, fts_s_list, bpf_set);
+  
+  dsp_sig_outlet(cl, 0);
+  
+  return fts_Success;
 }
 
 void
 signal_bpf_config(void)
 {
+  bp_heap = fts_heap_new(sizeof(bp_t));
+
   fts_metaclass_install(fts_new_symbol("bpf~"), bpf_instantiate, fts_arg_type_equiv);
 
   sym_bpf = fts_new_symbol("bpf");
-  dsp_declare_function(sym_bpf, bpf_ftl_const);
+  dsp_declare_function(sym_bpf, bpf_ftl);
 }

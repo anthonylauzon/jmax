@@ -31,7 +31,7 @@ typedef struct
   fts_object_t o;
   ftl_data_t data;
   float time;
-  float sr;
+  float cr;
 } tilda_t;
 
 static fts_symbol_t sym_tilda_const = 0;
@@ -59,7 +59,7 @@ tilda_set_target(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_ramp_t *ramp = (fts_ramp_t *)ftl_data_get_ptr(this->data);
   float value = fts_get_number_float(at);
 
-  fts_ramp_set_target(ramp, value, this->time, this->sr);
+  fts_ramp_set_target(ramp, value, this->time, this->cr);
 }
 
 void
@@ -86,7 +86,7 @@ tilda_put_const(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   tilda_t *this = (tilda_t *)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
-  float sr = fts_dsp_get_output_srate(dsp, 0);
+  float cr = fts_dsp_get_output_srate(dsp, 0) / n_tick;
   fts_atom_t a[3];
 
   fts_set_ftl_data(a + 0, this->data);
@@ -103,11 +103,11 @@ tilda_put_ramp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_ramp_t *ramp = (fts_ramp_t *)ftl_data_get_ptr(this->data);  
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
-  float sr = fts_dsp_get_output_srate(dsp, 0);
+  float cr = fts_dsp_get_output_srate(dsp, 0) / n_tick;
   fts_atom_t a[3];
 
   fts_ramp_jump(ramp);
-  this->sr = sr;
+  this->cr = cr;
   
   fts_set_ftl_data(a + 0, this->data);
   fts_set_symbol(a + 1, fts_dsp_get_output_name(dsp, 0));
@@ -136,10 +136,25 @@ tilda_ftl_ramp(fts_word_t *argv)
   int n_tick = fts_word_get_int(argv + 2);
   int i;
   
-  for(i=0; i<n_tick; i++)
+  if(fts_ramp_running(ramp))
     {
+      double incr = fts_ramp_get_incr(ramp) / n_tick;
+      double value = fts_ramp_get_value(ramp);
+
+      for(i=0; i<n_tick; i++)
+	{
+	  out[i] = value;
+	  value += incr;
+	}
+
       fts_ramp_incr(ramp);
-      out[i] = fts_ramp_get_value(ramp);
+    }
+  else
+    {
+      float c = fts_ramp_get_value(ramp);
+
+      for(i=0; i<n_tick; i++)
+	out[i] = c;
     }
 }
 
@@ -159,7 +174,7 @@ tilda_init_const(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->data = ftl_data_alloc(sizeof(float)); /* just a constant */
 
   this->time = 0.0;
-  this->sr = 1.0;
+  this->cr = 1.0;
 
   if(ac == 2)
     tilda_set_const(o, 0, 0, 1, at + 1);  
@@ -182,7 +197,7 @@ tilda_init_ramp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   this->data = ftl_data_alloc(sizeof(fts_ramp_t)); /* ramp */
 
   this->time = 0.0;
-  this->sr = 1.0;
+  this->cr = 1.0;
 
   tilda_set_time(o, 0, 0, 1, at + 2);
   tilda_set_target(o, 0, 0, 1, at + 1);

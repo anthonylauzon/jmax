@@ -262,7 +262,9 @@ osc_data_new(void)
   osc_data_t *data = (osc_data_t *)ftl_data_get_ptr(ftl_data);
 
   data->table.ptr = 0;
+  data->table.fvec = 0;
   data->phase = 0.0;
+  data->incr.factor = 0.0;
   data->incr.absolute = 0.0;
 
   return ftl_data;

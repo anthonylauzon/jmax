@@ -31,5 +31,4 @@ ucs load module signal $dir/c/lib/$jmaxArch/$jmaxMode/libsignal.so
 puts "package: signal (basic signal classes)"
 
 # help
-#helpPatch osc $dir/help/osc.help.jmax
-helpSummary "Signal" $dir/help/signal.summary.jmax
+sourceFile $dir/help/signal.help.index.tcl

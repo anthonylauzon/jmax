@@ -117,7 +117,7 @@ osc_ctl_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   osc_ctl_data_t *data = (osc_ctl_data_t *)ftl_data_get_ptr(this->data);
   float_vector_t *fvec = float_vector_atom_get(at);
 
-  if(float_vector_get_alloc_size(fvec) >= OSC_TABLE_SIZE + 1)
+  if(float_vector_get_size(fvec) >= OSC_TABLE_SIZE + 1)
     {
       float_vector_release(data->fvec);
       data->fvec = fvec;
@@ -138,7 +138,7 @@ osc_ctl_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   data = (osc_ctl_data_t *)ftl_data_get_ptr(this->data);
 
   /* check float vector size */
-  if(float_vector_get_alloc_size(fvec) < OSC_TABLE_SIZE + 1)
+  if(float_vector_get_size(fvec) < OSC_TABLE_SIZE + 1)
     float_vector_set_size(fvec, OSC_TABLE_SIZE + 1);
 
   /* refer to fvec */
@@ -269,7 +269,7 @@ osc_sig_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   osc_sig_data_t *data = (osc_sig_data_t *)ftl_data_get_ptr(this->data);
   float_vector_t *fvec = float_vector_atom_get(at);
 
-  if(float_vector_get_alloc_size(fvec) >= OSC_TABLE_SIZE + 1)
+  if(float_vector_get_size(fvec) >= OSC_TABLE_SIZE + 1)
     {
       float_vector_release(data->fvec);
       data->fvec = fvec;
@@ -290,7 +290,7 @@ osc_sig_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   data = (osc_sig_data_t *)ftl_data_get_ptr(this->data);
 
   /* init float vector */
-  if(float_vector_get_alloc_size(fvec) < OSC_TABLE_SIZE + 1)
+  if(float_vector_get_size(fvec) < OSC_TABLE_SIZE + 1)
     float_vector_set_size(fvec, OSC_TABLE_SIZE + 1);
 
   data->fvec = fvec;
