@@ -92,25 +92,27 @@ fts_platform_init(void)
     {
       struct sched_param param;
   
-      /* Lock to physical memory, if we can */
-
-      if (mlockall(MCL_CURRENT | MCL_FUTURE) == 0)
-	{
-	  memory_is_locked = 1;
-	}
-      else
-	{
-	  /* ??? */
-
-	  post("Cannot lock memory: %s\n", strerror (errno));
-	}
-
       /* raise priority to a high value */
 
       param.sched_priority  = sched_get_priority_max(SCHED_FIFO);
 
       if (sched_setscheduler(0, SCHED_FIFO, &param) < 0)
 	running_real_time = 0;
+      else
+	{
+	  /* Iff we are running real time, lock to physical memory, if we can */
+
+	  if (mlockall(MCL_CURRENT | MCL_FUTURE) == 0)
+	    {
+	      memory_is_locked = 1;
+	    }
+	  else
+	    {
+	      /* ??? */
+
+	      post("Cannot lock memory: %s\n", strerror (errno));
+	    }
+	}
     }
 #else
   if (running_real_time)
