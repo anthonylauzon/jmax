@@ -1,3 +1,7 @@
+2004-02-12  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* packages/aflib/c/src/aflib.c (aflib_loader_seek): implemented seek for audiofile.
+
 2004-02-12  Alexandre Pages  <Alexandre.Pages@ircam.fr>
 
         * ftsdll.dsp : removed fts/property.c from the project
