@@ -166,12 +166,17 @@ public class FtsProject extends FtsPackage
   public void saveWindows( Enumeration windows)
   {
     String name;
+    FtsPatcherObject patch;
 
     args.clear();
 
     for(Enumeration e = windows; e.hasMoreElements();)
-      args.addSymbol( FtsSymbol.get( (String)e.nextElement()));
-     
+      {      
+	patch = (FtsPatcherObject)e.nextElement();
+	args.addSymbol( FtsSymbol.get( patch.getName()));
+	/*args.addInt( patch.getX());
+	  args.addInt( patch.getY());*/
+      }
     try
       {
 	send( FtsSymbol.get("save_windows"), args);

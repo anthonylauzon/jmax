@@ -162,11 +162,11 @@ public class ProjectEditor extends JFrame implements EditorContainer
       }
   }
 
-  static void closeWindowsAndSave()
+  public static void closeWindowsAndSave()
   { 
     Frame win;
     FtsPatcherObject patcher;
-    Vector fileNames = new Vector();
+    Vector patchs = new Vector();
     Object[] windows = MaxWindowManager.getWindowManager().getWindowListArrayCopy();
     boolean someOneNeedSave = false;
     boolean somePatcherIsOpen = false;
@@ -244,7 +244,7 @@ public class ProjectEditor extends JFrame implements EditorContainer
 		      }
 
 		    if( patcher.getName() != null)
-		      fileNames.add( patcher.getName());
+		      patchs.add( patcher);
 
 		    patcher.stopUpdates();		      
 		    patcher.requestDestroyEditor();
@@ -255,8 +255,8 @@ public class ProjectEditor extends JFrame implements EditorContainer
 	  }
       }
     /* save the open windows in the project */
-    if( fileNames.size() > 0)
-      JMaxApplication.getProject().saveWindows( fileNames.elements());
+    if( patchs.size() > 0)
+      JMaxApplication.getProject().saveWindows( patchs.elements());
     
     JMaxApplication.getProject().save( null);
   }
@@ -264,7 +264,7 @@ public class ProjectEditor extends JFrame implements EditorContainer
   public static void saveWindows()
   {
     ListModel windows = MaxWindowManager.getWindowManager().getWindowList();
-    Vector fileNames = new Vector();
+    Vector patchs = new Vector();
     Frame win;
     FtsPatcherObject patcher;
     
@@ -275,11 +275,11 @@ public class ProjectEditor extends JFrame implements EditorContainer
 	{
 	  patcher = ((ErmesSketchWindow)win).getSketchPad().getFtsPatcher();
 	  if( patcher.getName() != null)
-	    fileNames.add( patcher.getName());
+	    patchs.add( patcher);
 	}
     }
-    if( fileNames.size() > 0)
-      JMaxApplication.getProject().saveWindows( fileNames.elements());
+    if( patchs.size() > 0)
+      JMaxApplication.getProject().saveWindows( patchs.elements());
   }
 
   /****************** Packages ***********************************/

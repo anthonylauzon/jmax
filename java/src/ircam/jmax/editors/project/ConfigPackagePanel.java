@@ -481,7 +481,7 @@ public class ConfigPackagePanel extends JPanel implements Editor
 
   void Delete()
   {
-    int index;
+    int index, size;
     Component selected = tabbedPane.getSelectedComponent();
     if( selected == requiresScrollPane)
       requiresModel.removeRow( requiresTable.getSelectedRow());
@@ -489,7 +489,13 @@ public class ConfigPackagePanel extends JPanel implements Editor
       if( selected == templPathScrollPane)
 	{
 	  index = templPathList.getSelectedIndex();
-	  if(index != -1)
+	  if( index == -1)
+	    {
+	      size = templPathList.getModel().getSize(); 
+	      index = size-1;
+	    }
+
+	  if(index >= 0)
 	    {
 	      templPathModel.removeElementAt( index);	  
 	      ftsPkg.set( "template_path", templPathModel.elements());
@@ -499,7 +505,13 @@ public class ConfigPackagePanel extends JPanel implements Editor
 	if( selected == dataPathScrollPane)
 	  {
 	    index = dataPathList.getSelectedIndex();
-	    if(index != -1)
+	    if( index == -1)
+	      {
+		size = dataPathList.getModel().getSize(); 
+		index = size-1;
+	      }
+
+	    if(index >= 0)
 	      {
 		dataPathModel.removeElementAt( index);
 		ftsPkg.set( "data_path", dataPathModel.elements());

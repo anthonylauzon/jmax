@@ -291,7 +291,7 @@ public class JMaxApplication {
   {
     Frame win;
     FtsPatcherObject patcher;
-    Vector fileNames = new Vector();
+    Vector patches = new Vector();
     Object[] windows = MaxWindowManager.getWindowManager().getWindowListArrayCopy();
 
     for (int i = 0; i < windows.length ; i++)
@@ -330,7 +330,7 @@ public class JMaxApplication {
 		      }
 		  }
 		if( patcher.getName() != null)
-		  fileNames.add( patcher.getName());
+		  patches.add( patcher);
 
 		patcher.stopUpdates();		      
 		patcher.requestDestroyEditor();
@@ -340,8 +340,8 @@ public class JMaxApplication {
 	  }
       }
     /* save the open windows in the project */
-    if( fileNames.size() > 0)
-      getProject().saveWindows( fileNames.elements());
+    if( patches.size() > 0)
+      getProject().saveWindows( patches.elements());
   }
 
   private static boolean shown = false;

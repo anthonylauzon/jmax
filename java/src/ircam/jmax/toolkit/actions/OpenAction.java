@@ -33,6 +33,7 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.fts.client.*;
 import ircam.jmax.dialogs.*;
+import ircam.jmax.editors.project.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
@@ -54,6 +55,7 @@ public class OpenAction extends EditorAction
   public void doAction(EditorContainer container)
   {
     File file;
+    String fileName;
 
     if (preset_file == null)
       file = MaxFileChooser.chooseFileToOpen(container.getFrame());
@@ -61,20 +63,55 @@ public class OpenAction extends EditorAction
       file = preset_file;
 	
     frame = container.getFrame();
-
+    
     if (file != null)
       {
-	//FtsPatcherObject.fireAtomicAction(true);
-	RecentFileHistory recentFileHistory = JMaxApplication.getRecentFileHistory();
-	recentFileHistory.addFile(file);
-
-	try
-	  {	
-	    JMaxApplication.load(file.getAbsolutePath());
-	  }
-	catch(IOException e)
+	fileName = file.getAbsolutePath();
+	
+	/* open a jmax project*/
+	if( fileName.endsWith("jprj"))
 	  {
-	    System.err.println("[OpenAction]: I/O error loading file "+file.getAbsolutePath());
+	    ProjectEditor.closeWindowsAndSave();
+	    
+	    try
+	      {	
+		JMaxApplication.loadProject( fileName);
+	      }
+	    catch(IOException e)
+	      {
+		System.err.println("[ProjectEditor]: I/O error loading project "+fileName);
+	      }
+	  }
+	/* open a jmax package*/
+	else if( fileName.endsWith("jpkg"))
+	  {
+	    String name = file.getName();
+	    int idx = name.indexOf(".jpkg"); 
+	    name = name.substring( 0, idx);
+	    
+	    try
+	      {	
+		JMaxApplication.loadPackage( name, fileName);
+	      }
+	    catch(IOException e)
+	      {
+		System.err.println("[ProjectEditor]: I/O error loading package "+fileName);
+	      }
+	  }
+	/* open jmax patch file*/
+	else
+	  {
+	    RecentFileHistory recentFileHistory = JMaxApplication.getRecentFileHistory();
+	    recentFileHistory.addFile(file);
+	    
+	    try
+	      {	
+		JMaxApplication.load(fileName);
+	      }
+	    catch(IOException e)
+	      {
+		System.err.println("[OpenAction]: I/O error loading file "+fileName);
+	      }
 	  }
       }
   }

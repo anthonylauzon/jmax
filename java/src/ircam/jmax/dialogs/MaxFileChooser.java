@@ -219,8 +219,10 @@ public class MaxFileChooser
     File dir;
 
     if (fd == null)
-      makeFileChooser();
-
+      {
+	makeFileChooser();
+	fd.setFileFilter( allJMaxFilesFilter);
+      }
     fd.setAccessory( null);
 
     if ( !configured)
@@ -286,6 +288,30 @@ public class MaxFileChooser
     setSaveType( type);
 
     return chooseFileToSave( frame, oldFile, title);
+  }
+
+  private static javax.swing.filechooser.FileFilter allJMaxFilesFilter;
+  static
+  {
+    allJMaxFilesFilter = new javax.swing.filechooser.FileFilter(){	
+	public boolean accept( File f) {
+	  if (f.isDirectory())
+	    return true;
+	  
+	  String name = f.getAbsolutePath();
+	  if (name != null)
+	    {
+	      if( name.endsWith(".jmax") || name.endsWith(".jmax.backup") || name.endsWith(".jmax%%") || name.endsWith(".jmax.backup%%") || name.endsWith(".pat") || name.endsWith(".pat.backup") || name.endsWith(".pat.backup%%") || name.endsWith(".pat%%") || name.endsWith(".jprj") || name.endsWith(".jprj.backup") || name.endsWith(".jprj.backup%%") || name.endsWith(".jprj%%") || name.endsWith(".jpkg") || name.endsWith(".jpkg.backup") || name.endsWith(".jpkg.backup%%") || name.endsWith(".jpkg%%") || name.endsWith(".jcfg") || name.endsWith(".jcfg.backup") || name.endsWith(".jcfg.backup%%") || name.endsWith(".jcfg%%"))
+		return true;
+	      else
+		return false;
+	    }
+	  return false;
+	}
+	public String getDescription() {
+	  return "jMax Projects";
+	}
+      };
   }
 }
 
