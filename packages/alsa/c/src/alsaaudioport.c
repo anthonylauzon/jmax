@@ -45,8 +45,6 @@
 #define DEFAULT_ACCESS s_mmap_noninterleaved
 #define DEFAULT_SAMPLING_RATE (44100.)
 #define DEFAULT_FIFO_SIZE 2048
-#define DEFAULT_INPUT_CHANNELS 26
-#define DEFAULT_OUTPUT_CHANNELS 26
 
 /* ---------------------------------------------------------------------- */
 /* Structure used for both capture and playback                           */
@@ -102,6 +100,9 @@ alsaaudioport_update_audioport_input_functions(alsaaudioport_t* self, alsastream
 
 static void
 alsaaudioport_update_audioport_output_functions(alsaaudioport_t* self, alsastream_t* stream);
+
+static void
+alsaaudioport_print_all_device(alsaaudioport_t* self);
 
 static void post_log( void)
 {
@@ -441,6 +442,7 @@ static int alsastream_open( alsastream_t *stream, const char *pcm_name, int whic
 /*     snd_pcm_access_mask_t *mask; */
   snd_pcm_hw_params_t *hwparams;
   snd_pcm_sw_params_t *swparams;
+  snd_pcm_type_t pcm_type;
 
   int err = 0;
   int open_mode = 0;
@@ -469,9 +471,17 @@ static int alsastream_open( alsastream_t *stream, const char *pcm_name, int whic
     return err;
   }
 
+  
   /*
    * Set the access mode:
    */
+  /* if this is a plugin, we use mmap_interleaed as a default */
+  pcm_type = snd_pcm_type(stream->handle);
+  if (SND_PCM_TYPE_HW != pcm_type)
+  {
+    *access = SND_PCM_ACCESS_MMAP_INTERLEAVED;
+    fts_log("[alsaaudioport] %s is not a Kernel Level PCM, so we start with mmap_interleaved \n", pcm_name);
+  }
   /* 
      Check if acces type is available,
      return a better choice if not 
@@ -609,10 +619,7 @@ static int xrun( alsaaudioport_t *port, snd_pcm_t *handle)
   snd_pcm_status_t *status;
   int err;
   
-
-/*   post("[alsaaudioport] XRUN !!!! \n"); */
-/*   return 0; */
-
+/*   fts_log("[alsaaudioport] xrun with alsaaudioport %s\n", port->device_name); */
   snd_pcm_status_alloca(&status);
   if ( (err = snd_pcm_status( handle, status)) < 0)
     return err;
@@ -1049,8 +1056,6 @@ static void alsaaudioport_close_input(fts_object_t* o, int winlet, fts_symbol_t 
 {
   alsaaudioport_t* self = (alsaaudioport_t*)o;
 
-  post("[alsaaudioport_close_input]\n");
-
   fts_audioport_unset_open((fts_audioport_t*)self, FTS_AUDIO_INPUT);
 
   if (self->capture.handle != 0)
@@ -1142,6 +1147,8 @@ alsaaudioport_print_all_device(alsaaudioport_t* self)
   snd_output_t *out;
   int err;
 
+  post("****************************************\n");
+  post("****************************************\n");
   err = snd_output_buffer_open(&out);
   if (err < 0)
   {
@@ -1162,8 +1169,11 @@ alsaaudioport_print_all_device(alsaaudioport_t* self)
       post("Capture Stream \n");
       post_snd_output_buffer(out);
     }
+    snd_output_flush(out);
   }
-  snd_output_flush(out);
+
+  post("****************************************\n");
+  post("****************************************\n");
 
   if (NULL != self->playback.handle)
   {
@@ -1179,6 +1189,9 @@ alsaaudioport_print_all_device(alsaaudioport_t* self)
     }
     snd_output_flush(out);
   }
+  post("****************************************\n");
+  post("****************************************\n");
+
 
   snd_output_close(out);    
 }
@@ -1214,6 +1227,7 @@ void alsaaudioport_config( void)
   alsaaudioport_type = fts_class_install( s, alsaaudioport_instantiate);
 
   alsaaudiomanager_scan_devices();
+  alsaaudiomanager_scan_plugins();
 }
 
 
