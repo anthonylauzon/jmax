@@ -41,6 +41,8 @@ typedef struct {
 
 static fts_class_t *macosxaudioport_class;
 
+static int sched_pipe_des[2];
+
 /**
  * The audioport IO function calls the native audio layer to read/write a buffer
  * of samples in the native format.
@@ -177,6 +179,7 @@ static void macosxaudioport_halt(fts_object_t *o, int winlet, fts_symbol_t s, in
 {
   macosxaudioport_t *self = (macosxaudioport_t *)o;
   OSStatus err;
+  fd_set rfds;
 
   fts_sched_remove( o);
 
@@ -201,11 +204,15 @@ static void macosxaudioport_halt(fts_object_t *o, int winlet, fts_symbol_t s, in
       return;
     }
 
+  
   /* halt scheduler main loop */
-  if (select( 0, NULL, NULL, NULL, NULL) < 0)
+  FD_ZERO(&rfds);
+  FD_SET(sched_pipe_des[0], &rfds);
+  if (select( sched_pipe_des[0] + 1 , &rfds, NULL, NULL, NULL) < 0)
     fts_log( "select() failed\n");
 
-  fts_log( "After select() ????????\n");
+  fts_log( "[macosxaudioport] RESTART FTS SCHEDULER \n");
+  /* @@@@ Need to stop audio device ? @@@@@ */
 }
 
 static void macosxaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -304,6 +311,20 @@ get_channels( macosxaudioport_t *self, int direction)
   return channels;
 }
 
+static void 
+macosxaudioport_sched_listener(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{  
+  int dummy = 0;
+  
+  if (!fts_sched_is_running)
+  {
+    /* restart FTS scheduler */
+    write(sched_pipe_des[1], &dummy, sizeof(int));
+    /* @@@@@ delete audio port  @@@@ */
+    fts_object_release(o);
+  }
+}
+
 static void macosxaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   macosxaudioport_t *self = (macosxaudioport_t *)o;
@@ -327,6 +348,8 @@ static void macosxaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, i
 
   fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_INPUT);
   fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
+
+  fts_sched_running_add_listener(o, macosxaudioport_sched_listener);
 }
 
 static void macosxaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -347,6 +370,8 @@ static void macosxaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, 
       post( "cannot remove IOProc\n");
       return;
     }
+
+  fts_sched_running_remove_listener(o, macosxaudioport_sched_listener);
 }
 
 static void macosxaudioport_instantiate(fts_class_t *cl)
@@ -434,6 +459,13 @@ macosxaudiomanager_scan_devices( void)
 void macosxaudioport_config( void)
 {
   macosxaudioport_class = fts_class_install( fts_new_symbol("macosxaudioport"), macosxaudioport_instantiate);
+
+  /* create pipe */
+  if (0 != pipe(sched_pipe_des))
+  {
+    fts_log("[macosxaudioport] cannot create pipe descriptors \n");
+    return;
+  }
 
   macosxaudiomanager_scan_devices();
 }
