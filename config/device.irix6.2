@@ -1,0 +1,15 @@
+post "SGI irix6.2 default configuration (2/2 @ 44.1kHz)"
+
+ucs set sample_rate 44100
+
+ucs open device out~ main as SgiALOut channels 2 fifo_size 512
+ucs open device in~ main as SgiALIn channels 2 fifo_size 512
+
+ucs default out~ main 
+ucs default in~ main
+
+// post "SGI MIDI default configuration (FTSmidi)"
+// ucs open device midi 0 as sgi_midi port FTSmidi
+
+// shell command for serial port 1: startmidi -d /dev/ttyd1 -n FTSmidi
+// shell command for serial port 2: startmidi -d /dev/ttyd2 -n FTSmidi

@@ -1,0 +1,33 @@
+post "_______________________________________________"
+post "SGI origin default configuration (RAD @ 441000)"
+post "audio device routing:"
+post "in~ multi <--- ADAT In ch: 1..8 (default in)"
+post "in~ stereo <--- AES In ch: 1 2"
+post "out~ multi ---> ADAT Out ch: 1..8 (default out)"
+post "out~ stereo ---> AES Out  ch: 1 2"
+
+ucs set sample_rate 44100
+
+ucs open device in~ multi as SgiALIn ALdevice ADATIn channels 8 fifo_size 512
+ucs open device out~ multi as SgiALOut ALdevice ADATOut channels 8 fifo_size 512
+
+ucs open device in~ stereo as SgiALIn ALdevice AESIn channels 2 fifo_size 512
+ucs open device out~ stereo as SgiALOut ALdevice AESOut channels 2 fifo_size 512
+
+ucs default in~ multi
+ucs default out~ multi
+
+post "_______________________________________________"
+post "SGI origin default MIDI configuration (FTSmidi)"
+
+ucs open device midi 0 as sgi_midi port FTSmidi
+
+// shell command for serial port 1: startmidi -d /dev/tty4d1 -s 31250 -n FTSmidi
+// shell command for serial port 2: startmidi -d /dev/tty4d2 -s 31250 -n FTSmidi
+
+
+
+
+
+
+

@@ -1,0 +1,18 @@
+post "________________________________________________"
+post "SGI O2 default audio configuration (2/4 @ 44100)"
+post "audio device routing:"
+post "in~ main <--- Analog In ch: 1 2 (default in)"
+post "out~ front ---> Analog Out ch: 1 2 (default out)"
+post "out~ rear ---> Analog Out 2 ch: 1 2"
+
+ucs set sample_rate 44100
+
+ucs open device in~ main as SgiALIn ALdevice AnalogIn channels 2 fifo_size 512
+ucs open device out~ front as SgiALOut ALdevice AnalogOut channels 2 fifo_size 512
+ucs open device out~ rear as SgiALOut ALdevice AnalogOut2 channels 2 fifo_size 512
+
+ucs default in~ main
+ucs default out~ front
+
+post (no MIDI configured)
+
