@@ -53,7 +53,7 @@ data_object_set_dirty(fts_object_t *o)
   data_object_t *this = (data_object_t *)o;
   fts_patcher_t *patcher = fts_object_get_patcher(o);
   
-  if(patcher != NULL && data_object_is_persistent(o))
+  if(patcher != NULL && data_object_is_persistent(o) && fts_object_has_id( (fts_object_t *) this))
     fts_patcher_set_dirty((fts_patcher_t *)o, 1);
 }
 
