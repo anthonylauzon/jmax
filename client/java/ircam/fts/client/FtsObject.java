@@ -196,7 +196,7 @@ public class FtsObject implements Serializable
   private transient FtsServer server;
   private transient BinaryProtocolEncoder encoder;
 
-  private FtsObject parent;
+  private transient FtsObject parent;
 
   private transient FtsSymbol selectorCache;
   private transient FtsMessageHandler messageHandlerCache;
