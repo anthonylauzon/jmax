@@ -362,6 +362,163 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
 		    }
 	    }
     }
+
+    public void moveSelection(int deltaX, int deltaY, BpfGraphicContext bgc)
+    {
+	BpfAdapter a = bgc.getAdapter();
+	FtsBpfObject ftsObj = (FtsBpfObject)itsModel;
+	//clip deltaY///////////////////
+	if(deltaY > 0)
+	{
+	    int minY = a.getY(getMinValueInSelection());
+	    int hMin = a.getY(ftsObj.getMinimumValue());
+	    if(minY + deltaY > hMin)
+		deltaY = hMin - minY;
+	}
+	else
+	{
+	    int maxY = a.getY(getMaxValueInSelection());
+	    int hMax = a.getY(ftsObj.getMaximumValue());
+	    if(maxY + deltaY < hMax)
+		deltaY = hMax - maxY;
+	}
+
+	//clip deltaX///////////////////
+	BpfPoint last, first;
+	int firstIndex, lastIndex;
+	first =  getFirstInSelection();
+	firstIndex = getMinSelectionIndex();
+	if(size()==1)
+	    {
+		last = first;
+		lastIndex = firstIndex;
+	    }
+	else
+	    {
+		last =  getLastInSelection();
+		lastIndex = getMaxSelectionIndex();
+	    }
+	int lastX =  a.getX(last);
+	int firstX = a.getX(first);
+	
+	BpfPoint next = ftsObj.getNextPoint(last);
+	BpfPoint prev = ftsObj.getPreviousPoint(first);
+	int nextX = -1;
+	int prevX = -1;
+	
+	if(next!=null)
+	    nextX = a.getX(next);
+	else
+	    nextX = a.getX(bgc.getMaximumTime()) - BpfAdapter.DX;
+
+	if(prev!=null)
+	    prevX = a.getX(prev);
+	else
+	    prevX = a.getX(0);
+
+	if(lastX + deltaX > nextX) 
+	    deltaX = nextX-lastX;
+	else if(firstX+deltaX < prevX)
+	    deltaX = prevX-firstX;
+
+	// starts a serie of undoable moves
+	((UndoableData) itsModel).beginUpdate();
+
+	int i = 0;
+	int selSize = size();
+	float[] times = new float[selSize];
+	float[] values = new float[selSize];
+	BpfPoint aPoint;
+	for (Enumeration e = getSelected(); e.hasMoreElements();)
+	    {
+		aPoint = (BpfPoint) e.nextElement();
+		times[i] = a.getInvX(a.getX(aPoint) + deltaX);
+		values[i++] = a.getInvY(a.getY(aPoint)+deltaY);
+	    }
+	
+	ftsObj.requestSetPoints(firstIndex, times, values);
+    }
+    
+    public void alignTop()
+    {
+	float max = getMaxValueInSelection();
+	BpfPoint aPoint;
+	int i = 0;
+	int selSize = size();
+	float[] times = new float[selSize];
+	float[] values = new float[selSize];
+	int firstIndex = getMinSelectionIndex();
+
+	((UndoableData) itsModel).beginUpdate(); 
+	
+	for (Enumeration e = getSelected(); e.hasMoreElements();)
+	{
+	    aPoint = (BpfPoint) e.nextElement();
+	    times[i] = aPoint.getTime();
+	    values[i++] = max;
+	}
+	((FtsBpfObject)itsModel).requestSetPoints(firstIndex, times, values);
+    }
+    public void alignBottom()
+    {
+	float min = getMinValueInSelection();
+	BpfPoint aPoint;
+	int i = 0;
+	int selSize = size();
+	float[] times = new float[selSize];
+	float[] values = new float[selSize];
+	int firstIndex = getMinSelectionIndex();
+	
+	((UndoableData) itsModel).beginUpdate(); 
+	
+	for (Enumeration e = getSelected(); e.hasMoreElements();)
+	{
+	    aPoint = (BpfPoint) e.nextElement();
+	    times[i] = aPoint.getTime();
+	    values[i++] = min;
+	}
+	((FtsBpfObject)itsModel).requestSetPoints(firstIndex, times, values);
+    }
+    public void alignLeft()
+    {
+	BpfPoint aPoint;
+	int i = 0;
+	int selSize = size();
+	float[] times = new float[selSize];
+	float[] values = new float[selSize];
+	int firstIndex = getMinSelectionIndex();
+	float left = getFirstInSelection().getTime();	
+
+	((UndoableData) itsModel).beginUpdate(); 
+	
+	for (Enumeration e = getSelected(); e.hasMoreElements();)
+	{
+	    aPoint = (BpfPoint) e.nextElement();
+	    times[i] = left;
+	    values[i++] = aPoint.getValue();
+	}
+	((FtsBpfObject)itsModel).requestSetPoints(firstIndex, times, values);
+    }
+    public void alignRight()
+    {
+	BpfPoint aPoint;
+	int i = 0;
+	int selSize = size();
+	float[] times = new float[selSize];
+	float[] values = new float[selSize];
+	int firstIndex = getMinSelectionIndex();
+	float right = getLastInSelection().getTime();	
+
+	((UndoableData) itsModel).beginUpdate(); 
+	
+	for (Enumeration e = getSelected(); e.hasMoreElements();)
+	{
+	    aPoint = (BpfPoint) e.nextElement();
+	    times[i] = right;
+	    values[i++] = aPoint.getValue();
+	}
+	((FtsBpfObject)itsModel).requestSetPoints(firstIndex, times, values);
+    }
 }
 
 

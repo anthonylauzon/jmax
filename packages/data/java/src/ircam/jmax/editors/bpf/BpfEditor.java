@@ -44,12 +44,12 @@ import java.beans.*;
  * and settings of y are simply ignored. */
 public class BpfEditor extends PopupToolbarPanel implements ListSelectionListener
 {
-    public BpfEditor(Geometry g, FtsBpfObject model, BpfToolManager manager)
+    public BpfEditor(Geometry g, FtsBpfObject dataModel, BpfToolManager manager)
     {
 	super();
 
 	this.geometry = g;
-	this.model = model;
+	this.model = dataModel;
 
 	setLayout(null);
 	displayLabel = new JLabel();
@@ -163,6 +163,23 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 			}
 		}
 	    });
+
+	addKeyListener(new KeyListener(){
+		public void keyTyped(KeyEvent e){}
+		public void keyPressed(KeyEvent e)
+		{
+		    if(isDeleteKey(e))
+			{
+			    model.beginUpdate();
+			    gc.getSelection().deleteAll();
+			}		
+		    else if(isArrowKey(e))
+			{
+			    consumeArrowKeyEvent(e);
+			}
+		}
+		public void keyReleased(KeyEvent e){}
+	    });
     }
 
     public void reinit(){}
@@ -269,29 +286,69 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 
     public void processKeyEvent(KeyEvent e)
     {
-	if(isDeleteKey(e))
-	    {
-		if(e.getID()==KeyEvent.KEY_PRESSED)
-		    {
-			((UndoableData)model).beginUpdate();
-			gc.getSelection().deleteAll();
-		    }
-	    }
-	else if((e.getKeyCode() == KeyEvent.VK_TAB)&&(e.getID()==KeyEvent.KEY_PRESSED))
+	if((e.getKeyCode() == KeyEvent.VK_TAB)&&(e.getID()==KeyEvent.KEY_PRESSED))
 	    if(e.isControlDown())
 		gc.getSelection().selectPrevious();
 	    else
 		gc.getSelection().selectNext();
-	  
+	
 	super.processKeyEvent(e);
 	requestFocus();
+    }
+
+    void consumeArrowKeyEvent(KeyEvent e)
+    {
+	if(!e.isControlDown())
+	    {
+		int dx = 0;
+		int dy = 0;
+		int DXY;
+		if(e.isShiftDown())
+		    DXY = 5;
+		else
+		    DXY = 1;
+		switch(e.getKeyCode())
+		    {
+		    case KeyEvent.VK_UP:
+			dy  = -DXY;
+			break;
+		    case KeyEvent.VK_DOWN:
+			dy  = DXY;
+			break;
+		    case KeyEvent.VK_RIGHT:
+			dx  = DXY;
+			break;
+		    case KeyEvent.VK_LEFT:
+			dx  = -DXY;
+		    }
+
+		gc.getSelection().moveSelection(dx, dy, gc);
+	    }
+	else
+	    switch(e.getKeyCode())
+		{
+		case KeyEvent.VK_UP:
+		    gc.getSelection().alignTop();
+		    break;
+		case KeyEvent.VK_DOWN:
+		    gc.getSelection().alignBottom();
+		    break;
+		case KeyEvent.VK_RIGHT:
+		    gc.getSelection().alignRight();
+		    break;
+		case KeyEvent.VK_LEFT:
+		    gc.getSelection().alignLeft();
+		}
     }
 
     public static boolean isDeleteKey(KeyEvent e)
     {
 	return ((e.getKeyCode() == KeyEvent.VK_DELETE)||(e.getKeyCode() == KeyEvent.VK_BACK_SPACE));
     }
-
+    public static boolean isArrowKey(KeyEvent e)
+    {
+	return ((e.getKeyCode() == KeyEvent.VK_UP)||(e.getKeyCode() == KeyEvent.VK_DOWN) ||(e.getKeyCode() == KeyEvent.VK_LEFT) || (e.getKeyCode() == KeyEvent.VK_RIGHT));
+    }
     //--- BpfEditor fields
     Geometry geometry;
     BpfGraphicContext gc;
