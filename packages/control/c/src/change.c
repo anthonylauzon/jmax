@@ -34,18 +34,30 @@ static void
 change_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   change_t *self = (change_t *)o;
-
-  if (ac > 0)
+  fts_tuple_t* atup;
+  fts_atom_t a;
+  
+  switch(ac)
   {
-    fts_atom_assign(&self->state, at);
-  }
-  else
-  {
-    /* we set state at void */
+  case 0:
+    /* the bang case */
     if (!fts_is_void(&self->state))
     {
       fts_atom_void(&self->state);
     }
+    break;
+  case 1:
+    /* a value case */
+    fts_atom_assign(&self->state, at);
+    break;
+  default:
+    /* the tuple case */
+    atup = (fts_tuple_t*)fts_object_create(fts_tuple_class, ac, at);
+    fts_object_refer(atup);
+    fts_set_object(&a, atup);
+    /* another refer is done in fts_atom_assign */
+    fts_atom_assign(&self->state, &a);
+    fts_object_release(atup);
   }
 }
 
