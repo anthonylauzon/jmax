@@ -6,7 +6,6 @@ import java.io.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.editors.project.*; // delete me !!!
 
 /**
  * The "system statistics" dialog.
@@ -16,7 +15,7 @@ public class StatisticsDialog extends Dialog implements ActionListener, KeyListe
   Frame parent;
   Button okButton;
   
-  public StatisticsDialog(Frame dw) {
+  public StatisticsDialog( Frame dw) {
     super(dw, "System stats", false);
     parent = (Frame)dw;
     
@@ -44,8 +43,6 @@ public class StatisticsDialog extends Dialog implements ActionListener, KeyListe
       label6 = new Label("Fts connection:" + Fts.getServer().toString());
     else label6 = new Label("Fts connection: not connected" );
     p1.add(label6);
-    Label label7 = new Label("TCL version: 8.00");
-    p1.add(label7);
     Label label8 = new Label("Total memory " + Runtime.getRuntime().totalMemory());
     p1.add(label8);
     Label label9 = new Label("Used memory " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));

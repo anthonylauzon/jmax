@@ -3,10 +3,10 @@ PACKAGE_DIR =
 
 include $(ROOTDIR)/java/Makefiles/Makefile.common
 
-BASIC_PACKAGES =  ircam.jmax ircam.jmax.tcl ircam.jmax.utils ircam.jmax.dialogs
+BASIC_PACKAGES =  ircam.jmax ircam.jmax.tcl ircam.jmax.utils ircam.jmax.dialogs ircam.jmax.widgets
 
 FTS_PACKAGES = ircam.jmax.fts ircam.jmax.fts.tcl
-EDITORS_PACKAGES = ircam.jmax.editors.console ircam.jmax.editors.console.tcl ircam.jmax.editors.project 
+EDITORS_PACKAGES = ircam.jmax.editors.console ircam.jmax.editors.console.tcl
 ERMES_PACKAGES = ircam.jmax.editors.ermes ircam.jmax.editors.ermes.tcl
 ALL_PACKAGES = $(BASIC_PACKAGES) $(FTS_PACKAGES) $(EDITORS_PACKAGES) $(ERMES_PACKAGES)
 
