@@ -384,11 +384,9 @@ FTS_API fts_class_t *fts_string_class;
 #define fts_atom_assign(dest, src)		\
   do						\
     {						\
-      if(fts_is_object(dest))			\
-	fts_atom_release(dest);			\
+      fts_atom_release(dest);			\
       *(dest) = *(src);				\
-      if (fts_is_object(src))			\
-	fts_atom_refer(src);			\
+      fts_atom_refer(src);			\
     }						\
   while(0)
 
@@ -404,8 +402,7 @@ FTS_API fts_class_t *fts_string_class;
 #define fts_atom_void(p)		        \
   do						\
     {						\
-      if(fts_is_object(p))			\
-	fts_atom_release(p);			\
+      fts_atom_release(p);			\
       fts_set_void(p);                          \
     }						\
   while(0)
@@ -454,14 +451,18 @@ FTS_API int fts_atom_equals(const fts_atom_t *p1, const fts_atom_t *p2);
 FTS_API int fts_atom_compare(const fts_atom_t *a, const fts_atom_t *b);
 
 /**
- * Copies an atom
- * For objects the copy function of the class is used
+ * Copies atom value or object (not just reference) from one atom to another.
+ * For objects the copy function of the class is used.
  *
- * @param from pointer to original
- * @param to pointer to copy
+ * Precondition:  target atom has to be initialized (it will be free properly).
+ *
+ * Postcondition: target atom is properly referenced copy of source.
+ *
+ * @param from pointer to original atom
+ * @param to   pointer to destination atom
  * @ingroup atom
  */
-FTS_API void fts_atom_copy( const fts_atom_t *from, fts_atom_t *to);
+FTS_API void fts_atom_copy (const fts_atom_t *from, fts_atom_t *to);
 
 /**
  * Constant representing a 'void' atom

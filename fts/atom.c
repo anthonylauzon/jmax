@@ -146,32 +146,36 @@ fts_atom_compare (const fts_atom_t *a, const fts_atom_t *b)
     case FTS_TYPEID_POINTER:
         return (int) fts_get_pointer(a) - (int) fts_get_pointer(b);
 
-    default:    /* TODO: call object comparison function */
+    default:    /* for objects, return arbitrary pointer distance.
+		   TODO: call object comparison function */
         return (int) fts_get_object(a) - (int) fts_get_object(b);
     }
 }
 
 
+/* copy atom value or object (not just reference) from one atom to another 
+   (target atom has to be initialized) */
 void
-fts_atom_copy( const fts_atom_t *from, fts_atom_t *to)
+fts_atom_copy (const fts_atom_t *from, fts_atom_t *to)
 {
-  if(fts_is_object(from) && fts_is_object(to))
-  {
-    fts_object_t *obj_from = fts_get_object(from);
-    fts_object_t *obj_to = fts_get_object(to);
-    fts_class_t *class_from = fts_object_get_class(obj_from);
-    fts_class_t *class_to = fts_object_get_class(obj_to);
-    
-    if(class_from == class_to)
-    {
-      fts_class_copy_function_t copy = fts_class_get_copy_function(class_from);
-      
-      if(copy != NULL)
-        (*copy)(obj_from, obj_to);
-    }
-  }
+    fts_atom_release(to);	/* free if target contained an object */
 
-  *to = *from;
+    if (fts_is_object(from))
+    {
+	fts_object_t *obj_from = fts_get_object(from);
+	fts_class_t  *cls_from = fts_object_get_class(obj_from);
+	fts_object_t *obj_to   = fts_object_create(cls_from, 0, 0);    
+	fts_class_copy_function_t copy = fts_class_get_copy_function(cls_from);
+
+	if (copy != NULL)
+	    (*copy)(obj_from, obj_to);
+	/* else: class can not be copied: leave empty object */
+	/* alternative: fts_set_void(to); ? */
+
+	fts_object_refer(obj_to);  /* lock new object */
+    }
+    else /* binary atom copy for non-objects */
+	*to = *from;
 }
 
 
