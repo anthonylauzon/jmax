@@ -66,7 +66,7 @@ fts_LDADD=-L.libs -lfts @FTS_SYS_LIBS@ -lm
 EXTRA_DIST=linux.c sgi.c macosx.c win32.c
 
 INCLUDES=-I$(top_srcdir)/include
-
+AM_INSTALL_PROGRAM_FLAGS= --mode=4755
 
 
 
