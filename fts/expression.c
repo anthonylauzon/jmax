@@ -59,7 +59,7 @@
   before, while and after evaluating an expression
   */
 
-/* #define EXPRESSION_TRACE_DEBUG */
+#define EXPRESSION_TRACE_DEBUG 
 
 #include <fts/fts.h>
 #include <ftsprivate/OLDexpression.h>

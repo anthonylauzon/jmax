@@ -11,6 +11,10 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
+# fts.wrapper is only use on Mac OS X which doesn't use anymore
+# automake stuff
+# bin_SCRIPTS=jmax fts.wrapper
+
 
 SHELL = /bin/sh
 
@@ -76,7 +80,7 @@ FTS_SYS_LIBS = -ldl -lpthread
 JAVA = java
 JAVAC = javac
 JAVACFLAGS = @JAVACFLAGS@
-JAVACFLAGSX = -g
+JAVACFLAGSX =  -g
 JAVACX = javac
 JAVAFLAGS = @JAVAFLAGS@
 JAVAPREFIX = @JAVAPREFIX@
@@ -96,7 +100,7 @@ VERSION = 3.1.0_latest_cvs
 YACC = bison -y
 uudecode = yes
 
-bin_SCRIPTS = jmax fts.wrapper
+bin_SCRIPTS = jmax
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES =  jmax

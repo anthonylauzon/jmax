@@ -301,7 +301,7 @@ void fts_spost_object_description_args( fts_bytestream_t *stream, int ac, fts_at
 	  fts_spost( stream, "%c%s%c", '"', fts_get_symbol( value1), '"');
 	else
 	  fts_spost( stream, "%s", fts_get_symbol( value1));
-      else
+      else 
 	fts_spost( stream, "??");
 
       /* decide to put or not a blank between the two */

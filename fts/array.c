@@ -54,9 +54,9 @@ fts_array_set_size(fts_array_t *array, int new_size)
     {
       while (array->alloc < new_size)
 	array->alloc += array->alloc_increment;
-
+    
       array->atoms = fts_realloc(array->atoms, array->alloc * sizeof(fts_atom_t));
-
+      
       /* void newly allocated region */
       for(i=array->size; i < array->alloc; i++)
 	fts_set_void(array->atoms + i);
@@ -65,13 +65,13 @@ fts_array_set_size(fts_array_t *array, int new_size)
     {
       if(new_size < 0)
 	new_size = 0;
-
+  
       /* void region cut off at end */
       for(i=new_size; i<array->size; i++)
 	fts_atom_assign( array->atoms + i, fts_null);
     }
 
-  array->size = new_size;
+  array->size = new_size;  
 }
 
 void 

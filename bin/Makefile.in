@@ -10,6 +10,10 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
+# fts.wrapper is only use on Mac OS X which doesn't use anymore
+# automake stuff
+# bin_SCRIPTS=jmax fts.wrapper
+
 
 SHELL = @SHELL@
 
@@ -96,7 +100,7 @@ VERSION = @VERSION@
 YACC = @YACC@
 uudecode = @uudecode@
 
-bin_SCRIPTS = jmax fts.wrapper
+bin_SCRIPTS = jmax
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES =  jmax

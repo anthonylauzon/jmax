@@ -120,6 +120,8 @@ dtdfifo.h \
 dtdserver.h \
 libtime.h
 
+
+INCLUDES = -I$(top_srcdir)/include
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 

@@ -88,6 +88,7 @@ public class TextRenderer implements ObjectRenderer
     area.setLineWrap(true);
     area.setWrapStyleWord(true);
     area.setBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 0));
+    area.setBounds(0, 0, 100, 30);
     //defaultWidth = SwingUtilities.computeStringWidth(owner.getFontMetrics(), "pack 1 2 3");
   }
 
@@ -192,7 +193,7 @@ public class TextRenderer implements ObjectRenderer
 
   public void render(Graphics g, int x, int y, int w, int h)
   {
-      SwingUtilities.paintComponent(g, area, ic, x, y, w, h);
+    SwingUtilities.paintComponent(g, area, ic, x, y, w, h);
   }
 }
 

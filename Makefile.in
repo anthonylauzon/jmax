@@ -96,7 +96,9 @@ VERSION = @VERSION@
 YACC = @YACC@
 uudecode = @uudecode@
 
-SUBDIRS = client fts include java packages bin images tutorials config utils help
+SUBDIRS = client fts include java packages bin images tutorials config utils help doc
+
+EXTRA_DIST = AUTHORS CHANGES ChangeLog JMAX-VERSION LICENCE.fr LICENSE README LISEZMOI
 
 #
 # new-patch, new-minor, new-major

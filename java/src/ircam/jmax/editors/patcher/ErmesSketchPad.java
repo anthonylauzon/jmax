@@ -156,8 +156,6 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
   }
   public boolean isATemplate()
   {
-      
-      //return ((!itsDocument.isRootData(itsPatcher))&&!(itsPatcher instanceof FtsPatcherObject));
       return (itsPatcher instanceof FtsTemplateObject);
   }
 
@@ -567,7 +565,6 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
   public void addNewObject(GraphicObject object, boolean doEdit)
   {
     displayList.add( object);
-	
     if((object.getLayer() == -1)||( pasting))
       displayList.reassignLayers();
 
@@ -582,7 +579,6 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 	fromToolbar = false;
       }
     redraw();
-	
     if (doEdit && newObjectEdit && (object instanceof Editable))
       {
 	// The EditField is not really ready until the control
