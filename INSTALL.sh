@@ -44,3 +44,19 @@ do
     chmod u+s $fts
 done
 
+# On SGI, check maximum lockable memory
+if [ -x /usr/sbin/systune maxlkmem ]
+then
+    MAXLKMEM=`/usr/sbin/systune maxlkmem | awk '{ print $3;}'`
+    if [ $MAXLKMEM -lt 2000 ]
+    then
+	echo ""
+	echo "WARNING:"
+	echo "System parameter \"maxlkmem\" has value: $MAXLKMEM"
+	echo "This value may degrade real-time performance for some jMax applications."
+	echo "Please consider increasing it with the command :"
+	echo "\"/usr/sbin/systune maxlkmem VALUE\""
+	echo ""
+	echo "See \"man systune\" for further details."
+    fi
+fi
