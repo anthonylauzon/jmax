@@ -90,8 +90,11 @@ FTS_API void fts_audioport_delete( fts_audioport_t *port);
 
 #define fts_audioport_get_max_channels( port, direction) \
   ((port)->inout[(direction)].max_channels)
-#define fts_audioport_set_max_channels( port, direction, max_channel) \
+#define fts_audioport_set_max_channels( port, direction, max_channels) \
   ((port)->inout[(direction)].max_channels = (max_channels))
+
+#define fts_audioport_set_valid(port, direction) \
+  ((port)->inout[(direction)].valid = 1)
 
 #define fts_audioport_set_io_fun( port, direction, fun) \
   ((port)->inout[(direction)].io_fun = (fun))
@@ -113,7 +116,6 @@ FTS_API void fts_audioport_delete( fts_audioport_t *port);
   ((port)->mute_fun = (fun))
 #define fts_audioport_set_xrun_fun( port, fun) \
   ((port)->idle_fun = (fun))
-
 
 /**
  * 
