@@ -610,8 +610,6 @@ audioconfig_buffer_size(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
   int buffer_size = fts_get_int(at);
   fts_atom_t arg;
       
-  post("[audioconfig:] new buffer size: %d\n", fts_audioconfig_set_buffer_size(self, buffer_size));  
-
   fts_set_int(&arg, self->buffer_size);
   fts_client_send_message( o, audioconfig_s_buffer_size, 1, &arg);
 
@@ -626,8 +624,6 @@ audioconfig_sample_rate(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
   int sample_rate = fts_get_int(at);
   fts_atom_t arg;
 
-  post("[audioconfig:] new sample rate: %d\n", fts_audioconfig_set_sample_rate(self, sample_rate));  
- 
   fts_set_int(&arg, self->sample_rate);
   fts_client_send_message( o, audioconfig_s_sampling_rate, 1, &arg); 
 
