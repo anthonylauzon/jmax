@@ -60,19 +60,35 @@ public class IncrementController extends JPanel {
     add(up);
     add(down);
 
-    up.addActionListener(new ActionListener() {
+    /*up.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e)
-	{
-	  itsIncrementListener.increment();
-	}
-    });
+      {
+      System.err.println(" modifiers "+e.getModifiers());
+      System.err.println(" shift "+((e.getModifiers()  & ActionEvent.SHIFT_MASK) != 0));
+      
+      itsIncrementListener.increment( (e.getModifiers() & ActionEvent.SHIFT_MASK) != 0);
+      }
+      });
 
-    down.addActionListener(new ActionListener() {
+      down.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e)
-	{
-	  itsIncrementListener.decrement();
+      {
+      itsIncrementListener.decrement( (e.getModifiers() & InputEvent.SHIFT_MASK) != 0);
 	}
-    });
+	});*/
+    up.addMouseListener(new MouseAdapter() {
+	public void mousePressed(MouseEvent e)
+	{
+	  itsIncrementListener.increment( e.isShiftDown());
+	}
+      });
+
+    down.addMouseListener(new MouseAdapter() {
+	public void mousePressed( MouseEvent e)
+	{
+	  itsIncrementListener.decrement( e.isShiftDown());
+	}
+      });
 
   }
 

@@ -80,14 +80,26 @@ public class XYPadControlPanel extends JPanel implements ActionListener, ObjectC
     xMaxPanel.add(Box.createHorizontalGlue());    
     xMaxPanel.add( xMaxValueField);
     xMaxPanel.add(new IncrementController(new IncrementListener(){
-	public void increment()
+	public void increment( boolean shiftPressed)
 	{
-	  xMax++;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;
+
+	  xMax+=incr;
 	  xMaxValueField.setText(""+xMax);    
 	}
-	public void decrement()
+	public void decrement( boolean shiftPressed)
 	{
-	  xMax--;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;
+
+	  xMax-=incr;
 	  xMaxValueField.setText(""+xMax);    
 	}
       }));
@@ -109,14 +121,26 @@ public class XYPadControlPanel extends JPanel implements ActionListener, ObjectC
     xMinPanel.add(Box.createHorizontalGlue());    
     xMinPanel.add( xMinValueField);
     xMinPanel.add(new IncrementController(new IncrementListener(){
-	public void increment()
+	public void increment( boolean shiftPressed)
 	{
-	  xMin++;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;
+
+	  xMin+=incr;
 	  xMinValueField.setText(""+xMin);    
 	}
-	public void decrement()
+	public void decrement( boolean shiftPressed)
 	{
-	  xMin--;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;
+
+	  xMin-=incr;
 	  xMinValueField.setText(""+xMin);    
 	}
       }));    
@@ -151,14 +175,26 @@ public class XYPadControlPanel extends JPanel implements ActionListener, ObjectC
     yMaxPanel.add(Box.createHorizontalGlue());    
     yMaxPanel.add(yMaxValueField);
     yMaxPanel.add(new IncrementController(new IncrementListener(){
-	public void increment()
+	public void increment( boolean shiftPressed)
 	{
-	  yMax++;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;
+
+	  yMax+=incr;
 	  yMaxValueField.setText(""+yMax);    
 	}
-	public void decrement()
+	public void decrement( boolean shiftPressed)
 	{
-	  yMax--;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;
+
+	  yMax-=incr;
 	  yMaxValueField.setText(""+yMax);    
 	}
       }));
@@ -180,14 +216,26 @@ public class XYPadControlPanel extends JPanel implements ActionListener, ObjectC
     yMinPanel.add(Box.createHorizontalGlue());    
     yMinPanel.add( yMinValueField);
     yMinPanel.add(new IncrementController(new IncrementListener(){
-	public void increment()
+	public void increment( boolean shiftPressed)
 	{
-	  yMin++;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;
+
+	  yMin+=incr;
 	  yMinValueField.setText(""+yMin);    
 	}
-	public void decrement()
+	public void decrement( boolean shiftPressed)
 	{
-	  yMin--;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;
+
+	  yMin-=incr;
 	  yMinValueField.setText(""+yMin);    
 	}
       }));    

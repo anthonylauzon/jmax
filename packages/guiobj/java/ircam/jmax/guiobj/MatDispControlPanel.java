@@ -99,14 +99,26 @@ public class MatDispControlPanel extends JPanel implements ActionListener, Objec
     maxPanel.add(Box.createHorizontalGlue());    
     maxPanel.add( maxValueField);
     maxPanel.add(new IncrementController(new IncrementListener(){
-	public void increment()
-	{
-	  max += 0.1f;
+	public void increment( boolean shiftPressed)
+	{	  
+	  float incr;
+	  if( shiftPressed)
+	    incr = 1.0f;
+	  else
+	    incr = 0.1f;
+
+	  max += incr;
 	  maxValueField.setText(""+max);    
 	}
-	public void decrement()
+	public void decrement( boolean shiftPressed)
 	{
-	  max -= 0.1f;
+	  float incr;
+	  if( shiftPressed)
+	    incr = 1.0f;
+	  else
+	    incr = 0.1f;
+
+	  max -= incr;
 	  maxValueField.setText(""+max);    
 	}
       }));
@@ -148,14 +160,26 @@ public class MatDispControlPanel extends JPanel implements ActionListener, Objec
     minPanel.add(Box.createHorizontalGlue());    
     minPanel.add( minValueField);
     minPanel.add(new IncrementController(new IncrementListener(){
-	public void increment()
+	public void increment( boolean shiftPressed)
 	{
-	  min += 0.1f;
+	  float incr;
+	  if( shiftPressed)
+	    incr = 1.0f;
+	  else
+	    incr = 0.1f;
+
+	  min += incr;
 	  minValueField.setText(""+min);    
 	}
-	public void decrement()
+	public void decrement( boolean shiftPressed)
 	{
-	  min -= 0.1f;
+	  float incr;
+	  if( shiftPressed)
+	    incr = 1.0f;
+	  else
+	    incr = 0.1f;
+
+	  min -= incr;
 	  minValueField.setText(""+min);    
 	}
       }));    
@@ -188,14 +212,26 @@ public class MatDispControlPanel extends JPanel implements ActionListener, Objec
     nZoomPanel.add(Box.createHorizontalGlue());    
     nZoomPanel.add( nZoomValueField);
     nZoomPanel.add(new IncrementController(new IncrementListener(){
-	public void increment()
+	public void increment( boolean shiftPressed)
 	{
-	  nZoom++;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;
+
+	  nZoom+=incr;
 	  nZoomValueField.setText(""+nZoom);    
 	}
-	public void decrement()
+	public void decrement( boolean shiftPressed)
 	{
-	  nZoom--;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;
+
+	  nZoom-=incr;
 	  nZoomValueField.setText(""+nZoom);    
 	}
       }));
@@ -217,14 +253,26 @@ public class MatDispControlPanel extends JPanel implements ActionListener, Objec
     mZoomPanel.add(Box.createHorizontalGlue());    
     mZoomPanel.add( mZoomValueField);
     mZoomPanel.add(new IncrementController(new IncrementListener(){
-	public void increment()
+	public void increment( boolean shiftPressed)
 	{
-	  mZoom++;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;
+
+	  mZoom+=incr;
 	  mZoomValueField.setText(""+mZoom);    
 	}
-	public void decrement()
+	public void decrement( boolean shiftPressed)
 	{
-	  mZoom--;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;
+
+	  mZoom-=incr;
 	  mZoomValueField.setText(""+mZoom);    
 	}
       }));    

@@ -81,14 +81,26 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
     maxPanel.add(Box.createHorizontalGlue());    
     maxPanel.add( maxValueField);
     maxPanel.add(new IncrementController(new IncrementListener(){
-	public void increment()
+	public void increment( boolean shiftPressed)
 	{
-	  max++;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;
+	  
+	  max+=incr;
 	  maxValueField.setText(""+max);    
 	}
-	public void decrement()
+	public void decrement( boolean shiftPressed)
 	{
-	  max--;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;
+
+	  max-=incr;
 	  maxValueField.setText(""+max);    
 	}
       }));
@@ -110,14 +122,26 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
     minPanel.add(Box.createHorizontalGlue());    
     minPanel.add( minValueField);
     minPanel.add(new IncrementController(new IncrementListener(){
-	public void increment()
+	public void increment( boolean shiftPressed)
 	{
-	  min++;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;
+	  
+	  min+=incr;
 	  minValueField.setText(""+min);    
 	}
-	public void decrement()
+	public void decrement( boolean shiftPressed)
 	{
-	  min--;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;
+
+	  min-=incr;
 	  minValueField.setText(""+min);    
 	}
       }));    

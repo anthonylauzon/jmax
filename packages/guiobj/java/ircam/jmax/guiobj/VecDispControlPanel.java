@@ -77,14 +77,26 @@ public class VecDispControlPanel extends JPanel implements ActionListener, Objec
     maxPanel.add(Box.createHorizontalGlue());    
     maxPanel.add( maxValueField);
     maxPanel.add(new IncrementController(new IncrementListener(){
-	public void increment()
+	public void increment( boolean shiftPressed)
 	{
-	  max++;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;	  
+
+	  max+=incr;
 	  maxValueField.setText(""+max);    
 	}
-	public void decrement()
+	public void decrement( boolean shiftPressed)
 	{
-	  max--;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;	
+
+	  max-=incr;
 	  maxValueField.setText(""+max);    
 	}
       }));
@@ -106,14 +118,26 @@ public class VecDispControlPanel extends JPanel implements ActionListener, Objec
     minPanel.add(Box.createHorizontalGlue());    
     minPanel.add( minValueField);
     minPanel.add(new IncrementController(new IncrementListener(){
-	public void increment()
+	public void increment( boolean shiftPressed)
 	{
-	  min++;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;
+
+	  min+=incr;
 	  minValueField.setText(""+min);    
 	}
-	public void decrement()
+	public void decrement( boolean shiftPressed)
 	{
-	  min--;
+	  int incr;
+	  if( shiftPressed)
+	    incr = 10;
+	  else
+	    incr = 1;
+
+	  min-=incr;
 	  minValueField.setText(""+min);    
 	}
       }));    
