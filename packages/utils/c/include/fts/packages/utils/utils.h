@@ -147,10 +147,19 @@ UTILS_API fts_cubic_coefs_t *fts_cubic_table;
 #define fts_cubic_calc(x, p) \
   ((x)[-1] * (p)->pm1 + (x)[0] * (p)->p0 + (x)[1] * (p)->p1 + (x)[2] * (p)->p2)
 
+#define fts_cubic_calc_stride(x, p, s) \
+  ((x)[-(s)] * (p)->pm1 + (x)[0] * (p)->p0 + (x)[s] * (p)->p1 + (x)[2 * (s)] * (p)->p2)
+
 #define fts_cubic_idefix_interpolate(p, i, y) \
+do { \
+    fts_cubic_coefs_t *ft = fts_cubic_table + fts_cubic_get_table_index_from_idefix(i); \
+      *(y) = fts_cubic_calc((p) + (i).index, ft); \
+  } while(0)
+
+#define fts_cubic_idefix_interpolate_stride(p, i, s, y) \
   do { \
     fts_cubic_coefs_t *ft = fts_cubic_table + fts_cubic_get_table_index_from_idefix(i); \
-    *(y) = fts_cubic_calc((p) + (i).index, ft); \
+      *(y) = fts_cubic_calc((p) + (i).index, ft, (s)); \
   } while(0)
 
 #define fts_cubic_intphase_interpolate(p, i, y) \
