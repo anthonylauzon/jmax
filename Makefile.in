@@ -381,6 +381,13 @@ final:
 	) > JMAX-VERSION.out
 	mv JMAX-VERSION.out JMAX-VERSION
 
+mrproper: maintainer-clean
+	-rm -f config.guess config.sub configure
+	-rm -f aclocal.m4
+	-rm -f install-sh
+	-rm -f ltconfig ltmain.sh
+	-rm -f missing mkinstalldirs 
+
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

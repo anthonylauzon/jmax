@@ -125,6 +125,8 @@ fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int
   else
     conn->type = fts_c_anything;
 
+  ((fts_object_t *)conn)->patcher = conn->src->patcher;
+
   /* pre-initialize the cache, if possible */
 
   if (mess)
@@ -186,14 +188,12 @@ fts_object_do_disconnect(fts_connection_t *conn, int do_client)
   fts_connection_t **p;		/* indirect precursor */
   fts_connection_t *prev = 0;
 
-#if 0
   /* First, release the client representation of the connection, if any */
   if (do_client)
     {
-      if (conn->id != FTS_NO_ID)
-	fts_client_release_connection(conn);
+      if ( fts_object_has_id( (fts_object_t *)conn))
+	fts_patcher_release_connection((fts_object_t *)conn->src->patcher, conn);
     }
-#endif
 
   src = conn->src;
   dst  = conn->dst;
@@ -257,22 +257,7 @@ fts_object_move_connections(fts_object_t *old, fts_object_t *new, int do_client)
 	      fts_connection_t *new_c;
 
 	      new_c = fts_connection_new(p->id, new, p->woutlet, p->dst, p->winlet);
-
-	      if (new_c)
-		{
-		  fts_connection_delete_ignore_id(p);
-
-#if 0
-		  /* Redefine the connection on the client side if needed */
-		  if (do_client && (new_c->id != FTS_NO_ID))
-		    fts_client_redefine_connection(new_c);
-#endif
-		}
-	      else
-		{
-		  /* we got an error in redoing the connection, simply throw the old one away */
-		  fts_connection_delete(p);
-		}
+	      fts_connection_delete(p);
 	    }
 	}
       else
@@ -296,25 +281,7 @@ fts_object_move_connections(fts_object_t *old, fts_object_t *new, int do_client)
 	      fts_connection_t *new_c;
 
 	      new_c = fts_connection_new(p->id, p->src, p->woutlet, new, p->winlet);
-	      
-	      if (new_c)
-		{
-		  fts_connection_delete_ignore_id(p);
-
-		  /* Redefine the connection on the client side if needed */
-
-#if 0
-		  if (do_client && (new_c->id != FTS_NO_ID))
-		    fts_client_redefine_connection(new_c);
-#endif
-		}
-	      else
-		{
-		  /* we got an error in redoing the connection,
-		     simply throw the old one away */
-
-		  fts_connection_delete(p);
-		}
+	      fts_connection_delete(p);
 	    }
 	}
       else
@@ -323,6 +290,24 @@ fts_object_move_connections(fts_object_t *old, fts_object_t *new, int do_client)
     }
 }
 
+void 
+fts_object_upload_connections(fts_object_t *obj)
+{
+  int inlet, outlet;
+  fts_connection_t *p;
+
+  for (outlet = 0; outlet < obj->head.cl->noutlets; outlet++)
+    {
+      for (p = obj->out_conn[outlet]; p ; p = p->next_same_src)
+	fts_client_upload_object((fts_object_t *)p, -1);
+    }
+
+  for (inlet = 0; inlet < obj->head.cl->ninlets; inlet++)
+    {
+      for (p = obj->in_conn[inlet]; p; p = p->next_same_dst)
+	fts_client_upload_object((fts_object_t *)p, -1);
+    }
+}
 
 /*   
  * Assuming that the number of inlets or outlets
@@ -374,10 +359,8 @@ fts_connection_set_type(fts_connection_t *connection, fts_connection_type_t type
     {
       connection->type = type;
       
-#if 0
-      if (connection->id != FTS_NO_ID)
-	fts_client_redefine_connection(connection);
-#endif
+      if ( fts_object_has_id( (fts_object_t *)connection))
+	fts_patcher_redefine_connection((fts_object_t *)connection->src->patcher, connection);
     }
 }
 

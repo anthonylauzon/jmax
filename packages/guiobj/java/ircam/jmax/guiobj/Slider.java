@@ -308,7 +308,7 @@ public class Slider extends GraphicObject implements FtsIntValueListener
     getControlPanel().update(this);
     ObjectPopUp.getInstance().add((JPanel)getControlPanel());
     ObjectPopUp.getInstance().revalidate();
-    ObjectPopUp.getInstance().pack();
+    ObjectPopUp.getInstance().pack();    
   }
   public void popUpReset()
   {

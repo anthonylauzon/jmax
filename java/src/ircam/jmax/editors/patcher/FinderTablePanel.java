@@ -46,41 +46,41 @@ public class FinderTablePanel extends JPanel implements JMaxToolPanel{
   {
     public Component getTableCellRendererComponent(JTable table, Object obj, 
 						   boolean selected, boolean hasFocus, int row, int column)
-      {
-	  super.getTableCellRendererComponent(table, obj, selected, hasFocus, row, column);
-	  
-	  setText((String) obj);
-	  setIcon(ObjectSetViewer.getObjectIcon((FtsGraphicObject)((FinderTableModel)table.getModel()).
-						getListModel().getElementAt(row)));
-	  
-	  return this;
-      }
+    {
+      super.getTableCellRendererComponent(table, obj, selected, hasFocus, row, column);
+      
+      setText((String) obj);
+      setIcon(ObjectSetViewer.getObjectIcon((FtsGraphicObject)((FinderTableModel)table.getModel()).
+					    getListModel().getElementAt(row)));
+      
+      return this;
+    }
   }
-
+  
   public FinderTablePanel()
   {
     setLayout( new BoxLayout( this, BoxLayout.Y_AXIS));
     
     try
-	{
-	    set = new FtsObjectSet();
-	}
+      {
+	set = new FtsObjectSet();
+      }
     catch(IOException e)
-	{
-	    System.err.println("[FinderTablePanel]: Error in FtsObjectSet creation!");
-	    e.printStackTrace();
-	}
-
+      {
+	System.err.println("[FinderTablePanel]: Error in FtsObjectSet creation!");
+	e.printStackTrace();
+      }
+    
     try
-	{
-	    ftsFinder = new FtsFinderObject();
-	}
+      {
+	ftsFinder = new FtsFinderObject();
+      }
     catch(IOException e)
-	{
-	    System.err.println("[FinderTablePanel]: Error in FtsFinderObject creation!");
-	    e.printStackTrace();
-	}
-
+      {
+	System.err.println("[FinderTablePanel]: Error in FtsFinderObject creation!");
+	e.printStackTrace();
+      }
+    
     /* ############ TextField ###################### */
     JPanel labelPanel = new JPanel();
     labelPanel.setBorder( new EmptyBorder( 15, 15, 15, 15));
@@ -99,11 +99,11 @@ public class FinderTablePanel extends JPanel implements JMaxToolPanel{
     label.setLabelFor( textField);
     textField.getAccessibleContext().setAccessibleName( label.getText());
     textField.addActionListener( new ActionListener() {
-      public void actionPerformed( ActionEvent event)
+	public void actionPerformed( ActionEvent event)
 	{
 	  find();
 	}
-    });
+      });
 
     labelPanel.add( label);
     labelPanel.add( textField);

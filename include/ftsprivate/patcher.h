@@ -99,4 +99,7 @@ extern void fts_patcher_trim_number_of_outlets(fts_patcher_t *patcher);
 extern void fts_patcher_set_dirty(fts_patcher_t *this, int is_dirty);
 extern void fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj);
 
+extern void fts_patcher_redefine_connection(fts_object_t *this, fts_connection_t *c);
+extern void fts_patcher_release_connection(fts_object_t *this, fts_connection_t *c);
+
 #endif

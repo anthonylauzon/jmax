@@ -191,12 +191,11 @@ public class TextRenderer implements ObjectRenderer
 	area.setForeground(color);
     }
 
-  static Container ic = new Panel();
+  static Container ic = new JPanel();
 
   public void render(Graphics g, int x, int y, int w, int h)
   {
-    if( area != null)
-      SwingUtilities.paintComponent(g, area, ic, x, y, w, h);
+    SwingUtilities.paintComponent(g, area, ic, x, y, w, h);
   }
 }
 

@@ -85,8 +85,9 @@ fts_symbol_t sym_setWH = 0;
 fts_symbol_t sym_setPatcherBounds = 0;
 fts_symbol_t sym_addObject = 0;
 fts_symbol_t sym_addConnection = 0;
+fts_symbol_t sym_redefineConnection = 0;
+fts_symbol_t sym_releaseConnection = 0;
 fts_symbol_t sym_redefineObject = 0;
-fts_symbol_t sym_redefineTemplateObject = 0;
 fts_symbol_t sym_objectRedefined = 0;
 fts_symbol_t sym_setRedefined = 0;
 fts_symbol_t sym_blip = 0;
@@ -1338,6 +1339,10 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
 	  fts_object_get_prop(obj, fts_s_error_description, a+8);
 	  fts_client_add_string( this, fts_get_string(a+8));
 	}
+      else
+	fts_client_add_symbol( this, fts_object_get_class_name( obj));
+      
+      /*fts_client_add_int( this, fts_object_is_template(obj));*/
 
       fts_client_add_atoms( this, obj->argc, obj->argv);
       fts_client_done_message( this);
@@ -1355,6 +1360,28 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
     }
 }
 
+void 
+fts_patcher_redefine_connection(fts_object_t *patcher, fts_connection_t *c)
+{
+  fts_client_start_message( patcher, sym_redefineConnection);
+  fts_client_add_object( patcher, (fts_object_t *)c);
+  fts_client_add_object( patcher, c->src);
+  fts_client_add_int( patcher, c->woutlet);
+  fts_client_add_object( patcher, c->dst);
+  fts_client_add_int( patcher, c->winlet);
+  fts_client_add_int( patcher, c->type);
+  fts_client_done_message( patcher);
+}
+
+void 
+fts_patcher_release_connection(fts_object_t *patcher, fts_connection_t *c)
+{
+  fts_atom_t a[1];
+
+  fts_set_object(a, (fts_object_t *)c);
+  fts_client_send_message( patcher, sym_releaseConnection, 1, a);
+}
+
 static void 
 fts_patcher_redefine_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1365,9 +1392,12 @@ fts_patcher_redefine_object_from_client( fts_object_t *o, int winlet, fts_symbol
 
   fts_object_t *oldobj = fts_get_object(&at[0]);
       
-  obj = fts_object_redefine(oldobj, -1, 0, ac - 1, at + 1);
+  obj = fts_object_redefine(oldobj, -1, 1, ac - 1, at + 1);
       
   fts_client_upload_object(obj, -1);
+
+  /* qui dovrebbe uploadare le connessioni sull'oggetto */
+  fts_object_upload_connections(obj);
 
   fts_set_object(a, obj);
   fts_client_send_message(o, sym_objectRedefined, 1, a);
@@ -2337,8 +2367,9 @@ void fts_kernel_patcher_init(void)
   sym_setPatcherBounds = fts_new_symbol("setPatcherBounds");
   sym_addObject = fts_new_symbol("addObject");
   sym_addConnection = fts_new_symbol("addConnection");
+  sym_redefineConnection = fts_new_symbol("redefineConnection");
+  sym_releaseConnection = fts_new_symbol("releaseConnection");
   sym_redefineObject = fts_new_symbol("redefineObject");
-  sym_redefineTemplateObject = fts_new_symbol("redefineTemplateObject");
   sym_objectRedefined = fts_new_symbol("objectRedefined");
   sym_setRedefined = fts_new_symbol("setRedefined");
   sym_endUpload = fts_new_symbol("endUpload");

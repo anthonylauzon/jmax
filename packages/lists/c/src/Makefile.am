@@ -3,7 +3,7 @@ package_LTLIBRARIES=liblists.la
 liblists_la_SOURCES= \
 list.c \
 listarith.c \
-Listelement.c \
+listelement.c \
 listhead.c \
 listjoin.c \
 listreverse.c \

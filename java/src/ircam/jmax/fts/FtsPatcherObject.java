@@ -133,16 +133,22 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	  ((FtsPatcherObject)obj).addObject( args.getLength(), args.getAtoms());
 	}
       });
-    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("redefineTemplateObject"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsPatcherObject)obj).redefineTemplateObject( args.getLength(), args.getAtoms());
-	}
-      });
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("addConnection"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsPatcherObject)obj).addConnection( args.getLength(), args.getAtoms());
+	}
+      });
+    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("redefineConnection"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPatcherObject)obj).redefineConnection( args.getLength(), args.getAtoms());
+	}
+      });
+    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("releaseConnection"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ( ( FtsPatcherObject)obj).releaseConnection( ( FtsConnection)args.getObject( 0));
 	}
       });
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("objectRedefined"), new FtsMessageHandler(){
@@ -855,22 +861,29 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     int numOuts = args[6].intValue;
     int layer = args[7].intValue;
     int error = args[8].intValue;
-    int offset;
     String errorDescription = "";
+    String className = null;
+
+    /*int offset = 11;
+      boolean isTemplate = (args[10].intValue == 1);*/
+    int offset = 10;
 
     if(error!=0)
       {
 	errorDescription = args[9].stringValue;
-	offset = 10;
-      }
-    else offset = 9;
+	
+	if((offset<nArgs) && args[offset].isSymbol()) 
+	  className = args[offset].symbolValue.toString();
+      }    
+    else 
+      className = args[9].symbolValue.toString();
 
-    String className = null;
-
-    if(args[offset].isSymbol()) 
-      className = args[offset].symbolValue.toString();
-
-    GraphicObject newObj = makeGraphicObjectFromServer( getServer(), this, objId, className, args, offset, nArgs-offset);
+    GraphicObject newObj;
+    
+    /*if(isTemplate)
+      newObj = new Standard( new FtsTemplateObject( getServer(), this, objId, className, args, offset, nArgs-offset));
+      else*/
+    newObj = makeGraphicObjectFromServer( getServer(), this, objId, className, args, offset, nArgs-offset);
 
     newObj.getFtsObject().setCurrentLayer( layer);
 
@@ -899,35 +912,6 @@ public class FtsPatcherObject extends FtsObjectWithEditor
       ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.addPastedObject( newObj);
   }
 
-  public void redefineTemplateObject(int nArgs , FtsAtom args[]) 
-  {
-    /*String className = null;
-      String variable = null;
-      int startIndex, numArgs;
-      //boolean defVar = (args[0].getInt()==1)? true : false;
-      int newObjId = args[0].intValue;
-      
-      if(args[1].isString()) 
-      {
-      className = args[1].stringValue;
-      numArgs = nArgs-2;
-      startIndex = 2;
-      }
-      else
-      { 
-      numArgs = nArgs-1;
-      startIndex = 1;
-      }
-      
-      FtsAtom[] arguments = new FtsAtom[numArgs];
-      for(int i=0; i<numArgs; i++)
-      arguments[i] = args[startIndex+i];
-      
-      FtsGraphicObject newObj = new FtsTemplateObject( getServer(), this, FtsSymbol.get(className), numArgs, arguments, newObjId);
-
-      addObject(newObj);*/
-  }
-
   public void addConnection(int nArgs , FtsAtom args[])
   {
     if(nArgs==6)
@@ -942,6 +926,22 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	if( pasting)
 	  ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.addPastedConnection( gc);
       }
+  }
+
+  public void redefineConnection(int nArgs , FtsAtom args[])
+  {
+    FtsConnection connection = (FtsConnection) args[0].objectValue;
+    connection.redefine((FtsGraphicObject)args[1].objectValue, args[2].intValue, 
+			(FtsGraphicObject)args[3].objectValue, args[4].intValue, 
+			args[5].intValue);
+    ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.repaint();
+  }
+
+  public void releaseConnection(FtsConnection c)
+  {
+    removeConnection( c);
+    if( getEditorFrame() != null)
+      ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.getDisplayList().remove( c);
   }
 
   public void objectRedefined(FtsGraphicObject obj)

@@ -198,6 +198,12 @@ public class DisplayList
     displayObjects.removeElement( connection);
   }
 
+  public void remove(FtsConnection connection)
+  {    
+    remove( getGraphicConnectionFor( connection));
+    reassignLayers();
+  }
+
   GraphicConnection getGraphicConnectionFor(FtsConnection c)
   {
     Object[] values = displayObjects.getObjectArray();
