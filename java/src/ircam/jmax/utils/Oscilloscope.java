@@ -12,14 +12,18 @@ import java.util.*;
  * - The refresh rate (in Hz)
  *  In the Oscilloscope window, press the start button to see 
  * your data changing.
+ * You can launch an oscilloscope from the TCL console, via
+ * "oscilloscope" or
+ * "oscilloscope <oscillsource> <freq>" 
+ * The first command just launches a test-only, 300 Hz oscilloscope
  * LIMITATIONS:
  * The present version does not allow you to change:
- * - the speed of the "pencil" (every tick is a point)
+ * - the speed of the "pencil" (every tick is an horizontal pixel)
  * - the zero position and the normalization of the values
  * - the size of the video screen ...
  * Important WARNING:
  * A refresh rate too high can interfere with other threads in the program,
- * and can cause a crash. A ErmesSlider for example can be tracked up to 200Hz
+ * and can cause a crash. A ErmesSlider for example can be tracked up to 200Hz.
  */
 
 public class Oscilloscope extends Frame implements  OscillSource{
