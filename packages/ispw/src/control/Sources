@@ -45,4 +45,6 @@ ftom.c \
 binop.c \
 logscale.c \
 mtof.c \
-scale.c
+bus.c \
+scale.c \
+
