@@ -105,3 +105,4 @@ FTS_API fts_audioport_t *fts_audioport_get_default( fts_object_t *obj);
 FTS_API void fts_audioport_set_default_class( fts_symbol_t name);
 FTS_API fts_symbol_t fts_audioport_get_default_class( void);
 
+

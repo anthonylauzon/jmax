@@ -2046,69 +2046,24 @@ midiconfig_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 /*   } */
 }
 
-static void
-midiconfig_load( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+
+void
+fts_midiconfig_dump( midiconfig_t *this, fts_bmax_file_t *f)
 {
-  fts_symbol_t file_name = fts_get_symbol(at);
-  fts_symbol_t project_dir = fts_project_get_dir();
-  fts_object_t *obj = NULL;
-  char path[MAXPATHLEN];
-
-  fts_make_absolute_path(project_dir, file_name, path, MAXPATHLEN);
-
-  obj = fts_binary_file_load(path, (fts_object_t *)fts_get_root_patcher(), 0, 0);
-
-  if(obj != NULL && fts_object_get_class(obj) == midiconfig_type) 
+  midilabel_t *label = this->labels;
+  
+  while(label) 
   {
-    /* replace current config by loaded config */
-    fts_midiconfig_set((midiconfig_t *)obj);
-
-/*     ((midiconfig_t *)obj)->file_name = fts_new_symbol( path); */
-      
-    midiconfig_set_dirty( (midiconfig_t *)obj, 0);
-  }
-  else
-    fts_log( "midiconfig load: cannot read MIDI configuration from file %s\n", file_name);
-}
-
-static void
-midiconfig_save( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  midiconfig_t *this = (midiconfig_t *)o;
-  fts_symbol_t file_name = fts_get_symbol(at);
-  fts_symbol_t project_dir = fts_project_get_dir();
-  char path[MAXPATHLEN];
-  fts_bmax_file_t f;
-
-  post("MIDI CONFIG SAVE \n");
-
-  fts_make_absolute_path(project_dir, file_name, path, MAXPATHLEN);
-
-  if (fts_bmax_file_open(&f, path, 0, 0, 0) >= 0)
-  {
-    midilabel_t *label = this->labels;
-
-    fts_bmax_code_new_object(&f, o, -1);
-      
-    while(label) 
-    {
-      /* code insert message for each label */
-      fts_bmax_code_push_symbol(&f, label->output_name);
-      fts_bmax_code_push_symbol(&f, label->input_name);
-      fts_bmax_code_push_symbol(&f, label->name);
-      fts_bmax_code_obj_mess(&f, fts_s_restore, 3);
-      fts_bmax_code_pop_args(&f, 3);
-
-      label = label->next;	  
-    }
-
-    fts_bmax_code_return(&f);
-    fts_bmax_file_close(&f);
+    /*code insert message for each label */
+    fts_bmax_code_push_symbol(f, label->output_name);
+    fts_bmax_code_push_symbol(f, label->input_name);
+    fts_bmax_code_push_symbol(f, label->name);
+    fts_bmax_code_push_symbol(f, fts_s_label);
+    fts_bmax_code_obj_mess(f, fts_s_midi_config, 4);
+    fts_bmax_code_pop_args(f, 4);
     
-    midiconfig_set_dirty( this, 0);
+    label = label->next;	  
   }
-  else
-    fts_log( "midiconfig save: cannot open file %s\n", file_name);
 }
 
 static void
@@ -2199,9 +2154,6 @@ midiconfig_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_input, midiconfig_input);
   fts_class_message_varargs(cl, fts_s_output, midiconfig_output);
   fts_class_message_varargs(cl, fts_s_upload, midiconfig_upload);
-
-  fts_class_message_varargs(cl, fts_s_load, midiconfig_load);
-  fts_class_message_varargs(cl, fts_s_save, midiconfig_save);
 
   fts_class_message_varargs(cl, fts_s_print, midiconfig_print);
 }

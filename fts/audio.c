@@ -718,6 +718,14 @@ audioconfig_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
   audioconfig_t* self = (audioconfig_t*)o;
 }
 
+void
+fts_audioconfig_dump( audioconfig_t *this, fts_bmax_file_t *f)
+{
+  /* save what you want, Patrice */
+  /* mais chaque message doit etre sauve' avec selecteur fts_audio_config 
+     et avec premier argument le vrai selecteur */
+}
+
 /* DUMMY DESTRUCTOR */
 static void
 audioconfig_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)

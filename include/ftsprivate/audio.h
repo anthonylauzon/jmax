@@ -19,6 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
  */
+#include <ftsprivate/bmaxfile.h> 
 
 #ifndef _FTS_PRIVATE_AUDIO_H_
 #define _FTS_PRIVATE_AUDIO_H_
@@ -46,5 +47,6 @@ typedef struct _audioconfig
 extern fts_class_t* audioconfig_type;
 
 extern void fts_audio_idle( void);
+extern void fts_audioconfig_dump( audioconfig_t *mc, fts_bmax_file_t *f);
 
 #endif

@@ -19,6 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
  */
+#include <ftsprivate/bmaxfile.h> 
 
 #ifndef _FTS_PRIVATE_MIDI_H_
 #define _FTS_PRIVATE_MIDI_H_ 1
@@ -47,5 +48,12 @@ extern fts_class_t* midiconfig_type;
 
 void fts_midiconfig_set(midiconfig_t* config);
 void fts_midiconfig_set_defaults(midiconfig_t* config);
+extern void fts_midiconfig_dump( midiconfig_t *mc, fts_bmax_file_t *f);
 
 #endif /* _FTS_PRIVATE_MIDI_H_ */
+
+
+
+
+
+

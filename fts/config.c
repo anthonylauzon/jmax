@@ -85,12 +85,10 @@ config_load(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   if (obj != NULL && fts_object_get_class(obj) == config_type)
   {
     /* replace current config by loaded config */
-    /* TODO:
-       set midi config
-       set audio config 
-    */
-    /* config_set((config_t*)obj); */
+    /*config_set((config_t*)obj);*/
+
     ((config_t*)obj)->file_name = fts_new_symbol(path);
+
     /* config_set_dirty((config_t*)obj, 0); */
   }
   else
@@ -102,27 +100,48 @@ config_load(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 config_save(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  config_t* self = (config_t*)o;
+  config_t* this = (config_t*)o;
   fts_symbol_t file_name = fts_get_symbol(at);
   fts_symbol_t project_dir = fts_project_get_dir();
   char path[MAXPATHLEN];
   fts_bmax_file_t f;
     
-  fts_make_absolute_path(project_dir, file_name, path, MAXPATHLEN);
+  fts_make_absolute_path( project_dir, file_name, path, MAXPATHLEN);
 
-  if (fts_bmax_file_open(&f, path, 0, 0, 0) >= 0)
+  if (fts_bmax_file_open( &f, path, 0, 0, 0) >= 0)
   {
     /* write config object */
-    fts_bmax_code_new_object(&f, o, -1);
+    fts_bmax_code_new_object( &f, o, -1);
 
-    /* how to write audio and midi config ? */
-/*     /\* save audio config *\/ */
-/*     fts_bmax_code_new_object(&f, (fts_object_t*)(self->audio_config),0 ); */
-	
-/*     /\* save midi config *\/ */
-/*     fts_bmax_code_new_object(&f, (fts_object_t*)(self->midi_config),1 ); */
+    /* save audio config */
+    fts_audioconfig_dump( this->audio_config, &f);
+    
+    /* save midi config */
+    fts_midiconfig_dump( this->midi_config, &f);
+    
+    fts_bmax_code_return( &f);
+    fts_bmax_file_close( &f);    
+    
+    /*config_set_dirty( this, 0);*/
   }
+  else
+    fts_log( "config save: cannot open file %s\n", file_name);
+}
 
+static void
+config_midi_message(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  config_t* this = (config_t*)o;
+  fts_symbol_t selector = fts_get_symbol( at);
+  fts_send_message( ((fts_object_t *)this->midi_config), selector, ac - 1, at + 1);
+}
+
+static void
+config_audio_message(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  config_t* this = (config_t*)o;
+  fts_symbol_t selector = fts_get_symbol( at);
+  fts_send_message( ((fts_object_t *)this->audio_config), selector, ac - 1, at + 1);
 }
 
 static void
@@ -175,6 +194,8 @@ config_instantiate(fts_class_t* cl)
 
   fts_class_message_varargs(cl, fts_s_load, config_load);
   fts_class_message_varargs(cl, fts_s_save, config_save);
+  fts_class_message_varargs(cl, fts_s_midi_config, config_midi_message);
+  fts_class_message_varargs(cl, fts_s_audio_config, config_audio_message);
 
   fts_class_message_varargs(cl, fts_s_print, config_print);
 }
