@@ -44,7 +44,7 @@ helpPatch funbuff $dir/funbuff.help.jmax
 helpPatch int $dir/int.help.jmax
 helpPatch pbank $dir/pbank.help.jmax
 helpPatch table $dir/table.help.jmax
-helpPatch value $dir/value.help.jmax
+helpPatch v $dir/value.help.jmax
 
 ## lists (3)
 helpPatch pack $dir/pack.help.jmax

@@ -56,10 +56,10 @@ binop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     return binop_number_instantiate(cl, ac, at);
   else if(ac == 2 && ivec_atom_is(at + 1))
     return binop_ivec_instantiate(cl, ac, at);
-  else if(ac == 3 && (fts_is_number(at + 1) || ivec_atom_is(at + 1)) && ivec_atom_is(at + 2)) 
-    return binop_ivec_instantiate(cl, ac, at);
   else if(ac == 2 && fvec_atom_is(at + 1))
     return binop_fvec_instantiate(cl, ac, at);
+  else if(ac == 3 && (fts_is_number(at + 1) || ivec_atom_is(at + 1)) && ivec_atom_is(at + 2)) 
+    return binop_ivec_instantiate(cl, ac, at);
   else if(ac == 3 && (fts_is_number(at + 1) || fvec_atom_is(at + 1)) && fvec_atom_is(at + 2)) 
     return binop_fvec_instantiate(cl, ac, at);
   else

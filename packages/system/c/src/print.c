@@ -96,7 +96,7 @@ print_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	  post(" ");
 
 	  if(fts_send_message(obj, fts_SystemInlet, fts_s_print, 0, 0) != fts_Success)
-	    post("?");
+	    post("???");
       
 	  post("\n");
 	}

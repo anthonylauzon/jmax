@@ -47,18 +47,14 @@ const_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   if(ac > 1)
     this->a = at[1];
-  
-  if(fts_is_object(&this->a))
-    fts_refer(&this->a);
+  else
+    fts_object_set_error(o, "No value given");
 }
 
 static void
 const_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   const_t *this = (const_t *) o;
-
-  if(fts_is_object(&this->a))
-    fts_release(&this->a);
 }
 
 static void

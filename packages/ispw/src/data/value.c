@@ -160,34 +160,6 @@ value_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
-static fts_object_t *
-value_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
-{
-  fts_object_t *obj;
-  int i;
-
-  /* change object "value <symbol> ..." to "v" <symbol> ..." */
-  if(ac > 1 && fts_is_symbol(at + 1))
-    {
-      fts_atom_t a[3];
-
-      fts_set_symbol(a + 0, sym_v);
-      a[1] = at[1];
-
-      if(ac > 2)
-	{
-	  a[2] = at[2];
-	  ac = 3;
-	}
-      
-      obj = fts_eval_object_description(patcher, ac, a);
-
-      return obj;
-    }
-  else
-    return 0;
-}
-
 void
 ispw_value_config(void)
 {
@@ -196,8 +168,4 @@ ispw_value_config(void)
   fts_hash_table_init(&value_table);
 
   fts_class_install(sym_v, value_instantiate);
-
-  /* ispw value compatibility */
-  fts_register_object_doctor(fts_new_symbol("value"), value_doctor);
 }
-

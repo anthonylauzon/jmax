@@ -181,7 +181,7 @@ setelem_set_ij(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  */
 
 static void
-getval_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getval_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   getval_t *this = (getval_t *)o;
   fts_atom_t out = value_get((value_t *)this->obj);
@@ -197,12 +197,12 @@ getval_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-getval_value_setval_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getval_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   getval_t *this = (getval_t *)o;
   
   getval_set_reference(o, 0, 0, 1, at);
-  getval_value(o, 0, 0, 0, 0);
+  getval_bang(o, 0, 0, 0, 0);
 }
 
 static void
@@ -219,10 +219,17 @@ setval_value_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   getval_t *this = (getval_t *)o;
 
-  if(ac > 1 && vec_atom_is(at + 1))
-    getval_set_reference(o, 0, 0, 1, at + 1);
-
-  setval_value(o, 0, 0, 1, at);
+  switch(ac)
+    {
+    default:
+    case 2:
+      if(value_atom_is(at + 1))
+	getval_set_reference(o, 0, 0, 1, at + 1);
+    case 1:
+      value_set((value_t *)this->obj, at[0]);
+    case 0:
+      break;
+    }
 }
 
 /******************************************************
@@ -256,13 +263,18 @@ getval_ivec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   getelem_vec_t *this = (getelem_vec_t *)o;
 
-  if(ac > 1 && ivec_atom_is(at + 1))
-    getval_set_reference(o, 0, 0, 1, at + 1);
-
-  if(ac > 0 && fts_is_number(at))
-    this->i = fts_get_number_int(at);
-
-  getval_ivec(o, 0, 0, 0, 0);
+  switch(ac)
+    {
+    default:
+    case 2:
+      if(ivec_atom_is(at + 1))
+	getval_set_reference(o, 0, 0, 1, at + 1);
+    case 1:
+      if(fts_is_number(at))
+	this->i = fts_get_number_int(at);
+    case 0:
+      break;
+    }
 }
 
 static void
@@ -281,14 +293,21 @@ setval_ivec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   getelem_vec_t *this = (getelem_vec_t *)o;
 
-  if(ac > 2 && ivec_atom_is(at + 2))
-    getval_set_reference(o, 0, 0, 1, at + 2);
-
-  if(ac > 1 && fts_is_number(at + 1))
-    this->i = fts_get_number_int(at + 1);
-
-  if(ac > 0 && fts_is_number(at))
-    setval_ivec(o, 0, 0, 1, at);
+  switch(ac)
+    {
+    default:
+    case 3:
+      if(ivec_atom_is(at + 2))
+	getval_set_reference(o, 0, 0, 1, at + 2);
+    case 2:
+      if(fts_is_number(at + 1))
+	this->i = fts_get_number_int(at + 1);
+    case 1:
+      if(fts_is_number(at))
+	setval_ivec(o, 0, 0, 1, at);
+    case 0:
+      break;
+    }
 }
 
 /******************************************************
@@ -322,13 +341,19 @@ getval_fvec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   getelem_vec_t *this = (getelem_vec_t *)o;
 
-  if(ac > 1 && fvec_atom_is(at + 1))
-    getval_set_reference(o, 0, 0, 1, at + 1);
-
-  if(ac > 0 && fts_is_number(at))
-    this->i = fts_get_number_int(at);
-
-  getval_fvec(o, 0, 0, 0, 0);
+  switch(ac)
+    {
+    default:
+    case 2:
+      if(fvec_atom_is(at + 1))
+	getval_set_reference(o, 0, 0, 1, at + 1);
+    case 1:
+      if(fts_is_number(at))
+	this->i = fts_get_number_int(at);
+    case 0:
+      getval_fvec(o, 0, 0, 0, 0);
+      break;
+    }
 }
 
 static void
@@ -347,14 +372,21 @@ setval_fvec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   getelem_vec_t *this = (getelem_vec_t *)o;
 
-  if(ac > 2 && fvec_atom_is(at + 2))
-    getval_set_reference(o, 0, 0, 1, at + 2);
-
-  if(ac > 1 && fts_is_number(at + 1))
-    this->i = fts_get_number_int(at + 1);
-
-  if(ac > 0 && fts_is_number(at))
-    setval_fvec(o, 0, 0, 1, at);
+  switch(ac)
+    {
+    default:
+    case 3:
+      if(fvec_atom_is(at + 2))
+	getval_set_reference(o, 0, 0, 1, at + 2);
+    case 2:
+      if(fts_is_number(at + 1))
+	this->i = fts_get_number_int(at + 1);
+    case 1:
+      if(fts_is_number(at))
+	setval_fvec(o, 0, 0, 1, at);
+    case 0:
+      break;
+    }
 }
 
 /******************************************************
@@ -399,13 +431,19 @@ getelem_vec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   getelem_vec_t *this = (getelem_vec_t *)o;
 
-  if(ac > 1 && vec_atom_is(at + 1))
-    getval_set_reference(o, 0, 0, 1, at + 1);
-
-  if(ac > 0 && fts_is_number(at))
-    this->i = fts_get_number_int(at);
-
-  getelem_vec(o, 0, 0, 0, 0);
+  switch(ac)
+    {
+    default:
+    case 2:
+      if(vec_atom_is(at + 1))
+	getval_set_reference(o, 0, 0, 1, at + 1);
+    case 1:
+      if(fts_is_number(at))
+	this->i = fts_get_number_int(at);
+    case 0:
+      getelem_vec(o, 0, 0, 0, 0);
+      break;
+    }
 }
 
 static void
@@ -424,13 +462,21 @@ setelem_vec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   getelem_vec_t *this = (getelem_vec_t *)o;
 
-  if(ac > 2 && vec_atom_is(at + 2))
-    getval_set_reference(o, 0, 0, 1, at + 2);
-
-  if(ac > 1 && fts_is_number(at + 1))
-    this->i = fts_get_number_int(at + 1);
-
-  setelem_vec(o, 0, 0, 1, at);
+  switch(ac)
+    {
+    default:
+    case 3:
+      if(vec_atom_is(at + 2))
+	getval_set_reference(o, 0, 0, 1, at + 2);
+    case 2:
+      if(fts_is_number(at + 1))
+	this->i = fts_get_number_int(at + 1);
+    case 1:
+      if(fts_is_number(at))
+	setelem_vec(o, 0, 0, 1, at);
+    case 0:
+      break;
+    }
 }
 
 /******************************************************
@@ -486,16 +532,22 @@ getelem_mat_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   getelem_mat_t *this = (getelem_mat_t *)o;
 
-  if(ac > 2 && mat_atom_is(at + 2))
-    getval_set_reference(o, 0, 0, 1, at + 2);
-
-  if(ac > 1 && fts_is_number(at + 1))
-    this->j = fts_get_number_int(at + 1);
-    
-  if(ac > 0 && fts_is_number(at))
-    this->i = fts_get_number_int(at);
-
-  getelem_mat(o, 0, 0, 0, 0);
+  switch(ac)
+    {
+    default:
+    case 3:
+      if(mat_atom_is(at + 2))
+	getval_set_reference(o, 0, 0, 1, at + 2);
+    case 2:
+      if(fts_is_number(at + 1))
+	this->j = fts_get_number_int(at + 1);
+    case 1:
+      if(fts_is_number(at))
+	this->i = fts_get_number_int(at);
+    case 0:
+      getelem_mat(o, 0, 0, 0, 0);
+      break;
+    }
 }
 
 static void
@@ -517,16 +569,23 @@ setelem_mat_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   getelem_mat_t *this = (getelem_mat_t *)o;
 
-  if(ac > 3 && mat_atom_is(at + 3))
-    getval_set_reference(o, 0, 0, 1, at + 3);
-
-  if(ac > 2 && fts_is_number(at + 2))
-    this->j = fts_get_number_int(at + 2);
-    
-  if(ac > 1 && fts_is_number(at + 1))
-    this->i = fts_get_number_int(at + 1);
-  
-  setelem_mat(o, 0, 0, 1, at);
+  switch(ac)
+    {
+    default:
+    case 4:
+      if(mat_atom_is(at + 3))
+	getval_set_reference(o, 0, 0, 1, at + 3);
+    case 3:
+      if(fts_is_number(at + 2))
+	this->j = fts_get_number_int(at + 2);
+    case 2:
+      if(fts_is_number(at + 1))
+	this->i = fts_get_number_int(at + 1);
+    case 1:
+      setelem_mat(o, 0, 0, 1, at);
+    case 0:
+      break;
+    }
 }
 
 /******************************************************
@@ -540,13 +599,15 @@ getval_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   if(ac == 2 && value_atom_is(at + 1))
     {
-      fts_class_init(cl, sizeof(getval_t), 1, 1, 0); 
+      fts_class_init(cl, sizeof(getval_t), 2, 1, 0); 
       
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getval_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getval_delete);
       
-      fts_method_define_varargs(cl, 0, fts_s_bang, getval_value);
-      fts_method_define_varargs(cl, 0, value_symbol, getval_set_reference);
+      fts_method_define_varargs(cl, 0, fts_s_bang, getval_bang);
+      fts_method_define_varargs(cl, 0, value_symbol, getval_value);
+
+      fts_method_define_varargs(cl, 1, value_symbol, getval_set_reference);
     }
   else
     return &fts_CannotInstantiate;
@@ -635,7 +696,7 @@ setval_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_s_list, setval_value_list);
       fts_method_define_varargs(cl, 0, fts_s_anything, setval_value);
       
-      fts_method_define_varargs(cl, 1, vec_symbol, getval_set_reference);
+      fts_method_define_varargs(cl, 1, value_symbol, getval_set_reference);
     }
   else
     return &fts_CannotInstantiate;
