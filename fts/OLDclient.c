@@ -701,7 +701,7 @@ void fts_oldclient_add_connection(fts_connection_t *c)
 void fts_oldclient_add_float(float value)
 {
   oldclient_put_char( oldclient, FLOAT_CODE);
-  fts_client_send_int( *((unsigned int *)&value) );
+  fts_oldclient_send_int( *((unsigned int *)&value) );
 }
 
 /*
@@ -746,19 +746,19 @@ void fts_oldclient_add_symbol(fts_symbol_t s)
   if ( fts_symbol_get_cache_index(s) >= 0 )   /* Is symbol cached ? */
     {
       oldclient_put_char( oldclient, SYMBOL_CACHED_CODE);
-      fts_client_send_int( fts_symbol_get_cache_index(s));
+      fts_oldclient_send_int( fts_symbol_get_cache_index(s));
     }
   else if (cache_symbol(s))   /* Try to cache it and if succeeded, send a cache definition */
     {
       oldclient_put_char( oldclient, SYMBOL_AND_DEF_CODE);
-      fts_client_send_int( fts_symbol_get_cache_index(s));
-      fts_client_send_string( fts_symbol_name(s));
+      fts_oldclient_send_int( fts_symbol_get_cache_index(s));
+      fts_oldclient_send_string( fts_symbol_name(s));
       oldclient_put_char( oldclient, STRING_END_CODE);
     }
   else   /* Send it as string, but with a SYMBOL_CODE */
     {
       oldclient_put_char( oldclient, SYMBOL_CODE);
-      fts_client_send_string(fts_symbol_name(s));
+      fts_oldclient_send_string(fts_symbol_name(s));
       oldclient_put_char( oldclient, STRING_END_CODE);
     }
 }
@@ -766,7 +766,7 @@ void fts_oldclient_add_symbol(fts_symbol_t s)
 void fts_oldclient_add_string(const char *s)
 {
   oldclient_put_char( oldclient, STRING_CODE);
-  fts_client_send_string(s);
+  fts_oldclient_send_string(s);
   oldclient_put_char( oldclient, STRING_END_CODE);
 }
 
@@ -821,7 +821,7 @@ void fts_oldclient_send_message(fts_object_t *obj, fts_symbol_t selector, int ar
  * In the creation of an object from the client this happens inside the "upload" method, which this way
  * has quite a different semantic than the same message send by "fts_client_upload_object".
  */
-void fts_client_upload(fts_object_t *obj, fts_symbol_t classname, int ac, const fts_atom_t *at)
+void fts_oldclient_upload(fts_object_t *obj, fts_symbol_t classname, int ac, const fts_atom_t *at)
 {
   if (!fts_object_has_id(obj))
     fts_object_table_register(obj);
@@ -836,10 +836,10 @@ void fts_client_upload(fts_object_t *obj, fts_symbol_t classname, int ac, const 
   fts_oldclient_add_atoms(ac, at);
   fts_oldclient_done_msg();
 
-  fts_object_send_properties(obj);*/
+  fts_object_send_properties(obj);
 }
 
-void fts_client_upload_object(fts_object_t *obj)
+void fts_oldclient_upload_object(fts_object_t *obj)
 {
   int do_var = 0;
 
@@ -851,7 +851,7 @@ void fts_client_upload_object(fts_object_t *obj)
      to the root */
 
   if (obj->patcher && !fts_object_has_id((fts_object_t *)obj->patcher))
-    fts_client_upload_object((fts_object_t *) obj->patcher);
+    fts_oldclient_upload_object((fts_object_t *) obj->patcher);
 
   /* 
      NEW_OBJECT_VAR_CODE (obj)parent (int)new-id (symbol) var [<args>]+
@@ -892,14 +892,14 @@ void fts_client_upload_object(fts_object_t *obj)
 }
 
 
-void fts_client_upload_connection(fts_connection_t *c)
+void fts_oldclient_upload_connection(fts_connection_t *c)
 {
   /* CONNECT (obj)from (int)outlet (obj)to (int)inlet */
 
   if (c->id == FTS_NO_ID)
     fts_connection_table_register(c);
     
-  fts_client_start_msg(NEW_CONNECTION_CODE);
+  fts_oldclient_start_msg(NEW_CONNECTION_CODE);
 
   fts_oldclient_start_msg(NEW_CONNECTION_CODE);
 
@@ -923,7 +923,7 @@ void fts_client_upload_connection(fts_connection_t *c)
 
 /* Handling of connections and object release and refine */
 
-void fts_client_release_connection(fts_connection_t *c)
+void fts_oldclient_release_connection(fts_connection_t *c)
 {
   fts_oldclient_start_msg(CONNECTION_RELEASE_CODE);
   fts_oldclient_add_connection(c);
@@ -931,7 +931,7 @@ void fts_client_release_connection(fts_connection_t *c)
 }
 
 
-void fts_client_redefine_connection(fts_connection_t *c)
+void fts_oldclient_redefine_connection(fts_connection_t *c)
 {
   fts_oldclient_start_msg(REDEFINE_CONNECTION_CODE);
   fts_oldclient_add_connection(c);
@@ -943,7 +943,7 @@ void fts_client_redefine_connection(fts_connection_t *c)
   fts_oldclient_done_msg();
 }
 
-void fts_client_release_object(fts_object_t *obj)
+void fts_oldclient_release_object(fts_object_t *obj)
 {
   fts_oldclient_start_msg(OBJECT_RELEASE_CODE);
   fts_oldclient_add_object(obj);
@@ -1040,7 +1040,7 @@ void fts_client_send_property(fts_object_t *obj, fts_symbol_t name)
 	  obj = fts_get_object(&a);
 
 	  if (!fts_object_has_id(obj))
-	    fts_client_upload_object(obj);
+	    fts_oldclient_upload_object(obj);
 	}
 
       if (fts_is_void(&a))
@@ -1300,7 +1300,7 @@ fts_client_updates_init(void)
 
 static fts_symbol_t fts_s_download;
 static fts_symbol_t fts_s_load_init;
-/*static fts_symbol_t fts_s_setDescription;*/
+static fts_symbol_t fts_s_setDescription;
 
 /******************************************************************************/
 /*                                                                            */
@@ -1491,7 +1491,7 @@ fts_mess_client_download_object(int ac, const fts_atom_t *av)
 	  return;
 	}
 
-      fts_client_upload_object(object);    
+      fts_oldclient_upload_object(object);    
     }
   else
     printf_mess("System Error in FOS message DOWNLOAD OBJECT: bad args", ac, av);
@@ -1521,7 +1521,7 @@ fts_mess_client_download_connection(int ac, const fts_atom_t *av)
 	  return;
 	}
 
-      fts_client_upload_connection(connection);
+      fts_oldclient_upload_connection(connection);
     }
   else
     printf_mess("System Error in FOS message DOWNLOAD CONNECTION: bad args", ac, av);
@@ -1900,7 +1900,7 @@ static void fts_messtile_init(void)
 {
   fts_s_download = fts_new_symbol("download");
   fts_s_load_init = fts_new_symbol("load_init");
-  /*fts_s_setDescription = fts_new_symbol("setDescription");*/
+  fts_s_setDescription = fts_new_symbol("setDescription");
 
   fts_client_install(SAVE_PATCHER_BMAX_CODE, fts_mess_client_save_patcher_bmax);
 

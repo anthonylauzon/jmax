@@ -67,7 +67,7 @@ fts_objectset_add( fts_objectset_t *set, fts_object_t *object)
   if (fts_object_has_id((fts_object_t *) set) && !exits_already) {
 
     if (!fts_object_has_id(object))
-      fts_client_upload_object(object);
+      fts_oldclient_upload_object(object);
     
     fts_set_object(&a[0], object);
     fts_client_send_message((fts_object_t *) set, sym_objectset_append, 1, a);

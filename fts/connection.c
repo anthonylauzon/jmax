@@ -194,12 +194,14 @@ fts_object_do_disconnect(fts_connection_t *conn, int do_client)
   fts_connection_t **p;		/* indirect precursor */
   fts_connection_t *prev = 0;
 
+#if 0
   /* First, release the client representation of the connection, if any */
   if (do_client)
     {
       if (conn->id != FTS_NO_ID)
 	fts_client_release_connection(conn);
     }
+#endif
 
   src = conn->src;
   dst  = conn->dst;
@@ -275,9 +277,11 @@ fts_object_move_connections(fts_object_t *old, fts_object_t *new, int do_client)
 		{
 		  fts_connection_delete_ignore_id(p);
 
+#if 0
 		  /* Redefine the connection on the client side if needed */
 		  if (do_client && (new_c->id != FTS_NO_ID))
 		    fts_client_redefine_connection(new_c);
+#endif
 		}
 	      else
 		{
@@ -314,8 +318,10 @@ fts_object_move_connections(fts_object_t *old, fts_object_t *new, int do_client)
 
 		  /* Redefine the connection on the client side if needed */
 
+#if 0
 		  if (do_client && (new_c->id != FTS_NO_ID))
 		    fts_client_redefine_connection(new_c);
+#endif
 		}
 	      else
 		{
@@ -383,8 +389,10 @@ fts_connection_set_type(fts_connection_t *connection, fts_connection_type_t type
     {
       connection->type = type;
       
+#if 0
       if (connection->id != FTS_NO_ID)
 	fts_client_redefine_connection(connection);
+#endif
     }
 }
 

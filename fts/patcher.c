@@ -943,6 +943,7 @@ static void fts_patcher_upload( fts_object_t *o, int winlet, fts_symbol_t s, int
 	 to reduce the client/server traffic during patcher opening
       */
 
+#if 0
       for (p = this->objects; p ; p = p->next_in_patcher)
 	if(!fts_object_has_id(p))
 	  fts_client_upload_object(p);
@@ -977,6 +978,7 @@ static void fts_patcher_upload( fts_object_t *o, int winlet, fts_symbol_t s, int
 
       fts_client_updates_sync();
 
+#endif
       /*
        * Then tell the patcher data the redefinition is completed, and can call
        * the various listeners
@@ -1246,11 +1248,12 @@ static void fts_patcher_update( fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_patcher_t *this = (fts_patcher_t *)o;
   fts_object_t *p;
 
+#if 0
   /* upload all the not uploaded objects */
 
   for (p = this->objects; p ; p = p->next_in_patcher)
     if (!fts_object_has_id(p))
-      fts_client_upload_object(p);
+      fts_oldclient_upload_object(p);
 
   /* For each object, for each outlet, upload all the not uploaded connections */
 
@@ -1264,9 +1267,10 @@ static void fts_patcher_update( fts_object_t *o, int winlet, fts_symbol_t s, int
 
 	  for (c = p->out_conn[outlet]; c ; c = c->next_same_src)
 	    if (c->id == FTS_NO_ID)
-	      fts_client_upload_connection(c);
+	      fts_oldclient_upload_connection(c);
 	}
     }
+#endif
 }
 
 /* Handle geometric properties */
@@ -1332,16 +1336,6 @@ fts_patcher_redefine_object_from_client( fts_object_t *o, int winlet, fts_symbol
 	  /***********************************************************/
 	  /*   same code of fts_client_send_message in OLDclient    **/
 	  /***********************************************************/
-#if 0
-	  fts_oldclient_start_msg(CLIENTMESS_CODE);
-	  fts_oldclient_add_object((fts_object_t *)this);
-	  fts_oldclient_add_symbol(fts_object_is_template(obj) ? sym_redefineTemplateObject : sym_redefineObject);
-	  fts_oldclient_add_int(do_var);
-	  fts_oldclient_add_int(newid);
-	  fts_oldclient_add_atoms(obj->argc, obj->argv);
-	  fts_oldclient_done_msg();
-#endif
-
 	  fts_client_start_message((fts_object_t *)this, 
 				   fts_object_is_template(obj) ? sym_redefineTemplateObject : sym_redefineObject);
 	  fts_client_add_int((fts_object_t *)this, do_var);
@@ -1602,10 +1596,12 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_wh"), fts_patcher_set_wh);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_object"), fts_patcher_add_object_from_client);
-  /*fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("delete_object"), 
-    fts_patcher_delete_object_from_client);
-    fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("delete_objects"), 
-    fts_patcher_delete_objects_from_client);*/
+#if 0
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("delete_object"), 
+			    fts_patcher_delete_object_from_client);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("delete_objects"), 
+			    fts_patcher_delete_objects_from_client);
+#endif
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_connection"), 
 			    fts_patcher_add_connection_from_client);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("delete_connection"),
