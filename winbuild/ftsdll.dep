@@ -375,6 +375,7 @@
 	
 
 ..\fts\client.c : \
+	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
@@ -422,7 +423,6 @@
 	"..\include\ftsprivate\client.h"\
 	"..\include\ftsprivate\connection.h"\
 	"..\include\ftsprivate\patcher.h"\
-	"c:\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	
 
 ..\fts\clipboard.c : \
@@ -768,6 +768,7 @@
 	
 
 ..\fts\file.c : \
+	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
@@ -812,7 +813,6 @@
 	"..\include\fts\word.h"\
 	"..\include\ftsconfig-win32.h"\
 	"..\include\ftsconfig.h"\
-	"c:\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	
 
 ..\fts\fpe.c : \
@@ -1563,6 +1563,7 @@
 	
 
 ..\fts\OLDclient.c : \
+	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
@@ -1621,7 +1622,6 @@
 	"..\include\ftsprivate\saver.h"\
 	"..\include\ftsprivate\symbol.h"\
 	"..\include\ftsprivate\template.h"\
-	"c:\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	
 
 ..\fts\package.c : \
@@ -2025,6 +2025,7 @@
 	
 
 ..\fts\sched.c : \
+	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
@@ -2069,7 +2070,6 @@
 	"..\include\fts\word.h"\
 	"..\include\ftsconfig-win32.h"\
 	"..\include\ftsconfig.h"\
-	"c:\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	
 
 ..\fts\selection.c : \
@@ -2589,6 +2589,7 @@
 	
 
 ..\fts\win32.c : \
+	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
@@ -2632,5 +2633,4 @@
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
 	"..\include\ftsconfig-win32.h"\
-	"c:\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	

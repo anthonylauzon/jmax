@@ -1,6 +1,7 @@
 # Microsoft Developer Studio Generated Dependency File, included by fts.mak
 
 ..\fts\main.c : \
+	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
@@ -43,5 +44,4 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
-	"c:\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	

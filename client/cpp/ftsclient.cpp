@@ -1068,7 +1068,7 @@ void FtsObject::install( FtsCallback *callback)
  */
 
 #if WIN32
-FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientException)
+void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientException)
 {
   BOOL result;
   char cmdLine[2048];
@@ -1086,7 +1086,8 @@ FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientException)
     findDefaultPath();
   }
 
-  ftsclient_log("[fts]: path %s\n", _path);
+  ftsclient_log("[ftsxtra]: path %s\n", _path);
+
   cmdLine[0] = 0;
   strcat(cmdLine, _path);
   strcat(cmdLine, " ");
@@ -1326,8 +1327,8 @@ void FtsPlugin::init( FtsArgs &args) throw( FtsClientException)
   _argv[_argc] = NULL;
   
 #ifdef WIN32
-  thread = CreateThread(NULL, 0, &FtsPlugin::main, (LPVOID) this, 0, &threadID);
-  if (thread == NULL) {
+  _thread = CreateThread(NULL, 0, &FtsPlugin::main, (LPVOID) this, 0, &threadID);
+  if (_thread == NULL) {
     throw FtsClientException("Can't create thread");
   }
 #else
@@ -1362,7 +1363,7 @@ FtsPlugin::~FtsPlugin()
 DWORD WINAPI FtsPlugin::main(LPVOID data)
 {
   FtsPlugin* self = (FtsPlugin*) data;
-  self->_init_function(self->argc, self->argv);
+  self->_init_function(self->_argc, self->_argv);
   self->_run_function();
   ExitThread(0);
   return 0;

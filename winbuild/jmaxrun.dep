@@ -1,8 +1,8 @@
 # Microsoft Developer Studio Generated Dependency File, included by jmaxrun.mak
 
 ..\fts\jmax.c : \
-	"c:\program files\ibm\java13\include\jni.h"\
-	"c:\program files\ibm\java13\include\jni_md.h"\
-	"c:\program files\ibm\java13\include\jniproto_md.h"\
-	"c:\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	"..\..\..\program files\ibm\java13\include\jni.h"\
+	"..\..\..\program files\ibm\java13\include\jni_md.h"\
+	"..\..\..\program files\ibm\java13\include\jniproto_md.h"\
+	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	

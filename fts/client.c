@@ -1145,10 +1145,16 @@ fts_pipestream_receive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   unsigned char buffer[NN];
 
 #if WIN32
-  DWORD size = 0, available = 0;
+  DWORD n = 0, count = 0;
 
-  if (PeekNamedPipe(this->in, (LPVOID) buffer, NN, &size, &available, NULL)) {
-      fts_bytestream_input((fts_bytestream_t *) this, size, buffer);
+  if (PeekNamedPipe(this->in, NULL, 0, NULL, &count, NULL) && (count > 0)) {
+    count = (count > NN)? NN : count;
+    if (ReadFile(this->in, (LPVOID) buffer, (DWORD) count, &n, NULL)) {
+      fts_bytestream_input((fts_bytestream_t *) this, n, buffer);
+    } else {
+      /* let the listeners handle the error situation */
+      fts_bytestream_input((fts_bytestream_t *) this, -1, buffer);      
+    }
   } 
 
 #else

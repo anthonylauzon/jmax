@@ -166,6 +166,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\ftlmem.obj" \
 	"$(INTDIR)\fts.obj" \
 	"$(INTDIR)\hashtable.obj" \
+	"$(INTDIR)\label.obj" \
 	"$(INTDIR)\list.obj" \
 	"$(INTDIR)\loader.obj" \
 	"$(INTDIR)\mem.obj" \
@@ -198,8 +199,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\variable.obj" \
 	"$(INTDIR)\version.obj" \
 	"$(INTDIR)\vm.obj" \
-	"$(INTDIR)\win32.obj" \
-	"$(INTDIR)\label.obj"
+	"$(INTDIR)\win32.obj"
 
 "..\bin\fts.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -350,6 +350,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\ftlmem.obj" \
 	"$(INTDIR)\fts.obj" \
 	"$(INTDIR)\hashtable.obj" \
+	"$(INTDIR)\label.obj" \
 	"$(INTDIR)\list.obj" \
 	"$(INTDIR)\loader.obj" \
 	"$(INTDIR)\mem.obj" \
@@ -382,8 +383,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\variable.obj" \
 	"$(INTDIR)\version.obj" \
 	"$(INTDIR)\vm.obj" \
-	"$(INTDIR)\win32.obj" \
-	"$(INTDIR)\label.obj"
+	"$(INTDIR)\win32.obj"
 
 "..\bin\fts.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<

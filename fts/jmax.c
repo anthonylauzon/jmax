@@ -494,7 +494,7 @@ jmax_get_root_from_registry(char *buf, jint bufsize)
     return 0;
   }
 
-  if (!jmax_get_string_from_registry(key, "CurrentVersion", version, 256)) {
+  if (!jmax_get_string_from_registry(key, "jMaxVersion", version, 256)) {
     jmax_log("Failed to read the value of registry key: '%s\\jMaxVersion'\n", JMAX_KEY);
     RegCloseKey(key);
     return 0;
@@ -530,7 +530,7 @@ jmax_get_server_root_from_registry(char *buf, jint bufsize)
     return 0;
   }
 
-  if (!jmax_get_string_from_registry(key, "CurrentVersion", version, 256)) {
+  if (!jmax_get_string_from_registry(key, "FtsVersion", version, 256)) {
     jmax_log("Failed to read the value of registry key: '%s\\FtsVersion'\n", JMAX_KEY);
     RegCloseKey(key);
     return 0;
