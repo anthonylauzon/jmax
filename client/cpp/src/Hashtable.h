@@ -44,34 +44,34 @@ namespace client {
 
     void stats( ostream &os);
 
-  protected:
+    static unsigned int hash( const char *s);
 
-    unsigned int hash( const char *s);
-
-    unsigned int hash( int k)
+    static unsigned int hash( int k)
       {
 	return (unsigned int)k; 
       }
 
-    unsigned int hash( void *p)
+    static unsigned int hash( void *p)
       {
 	return (unsigned int)p>>3; 
       }
 
-    int equals( int k1, int k2)
+    static int equals( int k1, int k2)
       {
 	return k1 == k2; 
       }
 
-    int equals( const char *s1, const char *s2)
+    static int equals( const char *s1, const char *s2)
       {
 	return strcmp(s1, s2) == 0; 
       }
 
-    int equals( void *p1, void *p2)
+    static int equals( void *p1, void *p2)
       {
 	return p1 == p2; 
       }
+
+  protected:
 
     void rehash();
 
@@ -133,7 +133,7 @@ namespace client {
     {
       HashtableCell< KeyT, ValT> **c;
 
-      c = &_table[ hash( key) % _length];
+      c = &_table[ Hashtable<KeyT, ValT>::hash( key) % _length];
 
       while (*c && !equals( (*c)->_key, key))
 	c = &(*c)->_next;
@@ -178,7 +178,7 @@ namespace client {
 
 	  for ( c = oldTable[i]; c; c = next)
 	    {
-	      int index = hash( c->_key) % _length;
+	      int index = Hashtable<KeyT, ValT>::hash( c->_key) % _length;
 
 	      next = c->_next;
 	      c->_next = _table[index];

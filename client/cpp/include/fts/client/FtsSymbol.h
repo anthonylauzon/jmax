@@ -52,5 +52,5 @@ namespace client {
 };
 };
 
-ostream &operator<<( ostream &os, const ircam::fts::client::FtsSymbol &s);
+std::ostream &operator<<( std::ostream &os, const ircam::fts::client::FtsSymbol &s);
 

@@ -42,6 +42,6 @@ namespace client {
 };
 };
 
-std::ostream &::operator<<( std::ostream &os, const ircam::fts::client::FtsClientException &e);
+std::ostream &operator<<( std::ostream &os, const ircam::fts::client::FtsClientException &e);
 
 

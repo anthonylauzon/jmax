@@ -155,4 +155,4 @@ namespace client {
 };
 };
 
-ostream &operator<<( ostream &os, const ircam::fts::client::FtsArgs &a);
+std::ostream &operator<<( std::ostream &os, const ircam::fts::client::FtsArgs &a);

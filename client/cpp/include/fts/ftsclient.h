@@ -40,5 +40,6 @@
 #include <fts/client/FtsClientException.h>
 #include <fts/client/FtsMessageHandler.h>
 #include <fts/client/FtsServerConnection.h>
+#include <fts/client/FtsObject.h>
 
 #endif

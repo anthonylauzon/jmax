@@ -39,6 +39,7 @@
 
 %option noyywrap
 %option never-interactive
+%x AFTER_DOLLAR
 
 whites		[ \t\n]
 decdigit	[0-9]
@@ -81,40 +82,42 @@ quoted_symbol	\"[^\"]+\"
 %%
 
 {whites}+
-{decint}	{ SET_INT( yytext); return 1; }
-{hexint} 	{ SET_HEXINT( yytext+2); return 1; }
-{float} 	{ SET_FLOAT( yytext); return 1; }
-{dollar}	{ SET_SYMBOL( fts_s_dollar); return 1; }
-{semi}		{ SET_SYMBOL( fts_s_semi); return 1; }
-{comma}		{ SET_SYMBOL( fts_s_comma); return 1; }
-{plus}		{ SET_SYMBOL( fts_s_plus); return 1; }
-{minus}		{ SET_SYMBOL( fts_s_minus); return 1; }
-{times}		{ SET_SYMBOL( fts_s_times); return 1; }
-{div}		{ SET_SYMBOL( fts_s_div); return 1; }
-{power}		{ SET_SYMBOL( fts_s_power); return 1; }
-{open_par}	{ SET_SYMBOL( fts_s_open_par); return 1; }
-{closed_par}	{ SET_SYMBOL( fts_s_closed_par); return 1; }
-{open_sqpar}	{ SET_SYMBOL( fts_s_open_sqpar); return 1; }
-{closed_sqpar}	{ SET_SYMBOL( fts_s_closed_sqpar); return 1; }
-{open_cpar}	{ SET_SYMBOL( fts_s_open_cpar); return 1; }
-{closed_cpar}	{ SET_SYMBOL( fts_s_closed_cpar); return 1; }
-{dot}		{ SET_SYMBOL( fts_s_dot); return 1; }
-{percent}	{ SET_SYMBOL( fts_s_percent); return 1; }
-{shift_left}	{ SET_SYMBOL( fts_s_shift_left); return 1; }
-{shift_right}	{ SET_SYMBOL( fts_s_shift_right); return 1; }
-{logical_and}	{ SET_SYMBOL( fts_s_logical_and); return 1; }
-{logical_or}	{ SET_SYMBOL( fts_s_logical_or); return 1; }
-{logical_not}	{ SET_SYMBOL( fts_s_logical_not); return 1; }
-{equal_equal}	{ SET_SYMBOL( fts_s_equal_equal); return 1; }
-{not_equal}	{ SET_SYMBOL( fts_s_not_equal); return 1; }
-{greater}	{ SET_SYMBOL( fts_s_greater); return 1; }
-{greater_equal}	{ SET_SYMBOL( fts_s_greater_equal); return 1; }
-{smaller}	{ SET_SYMBOL( fts_s_smaller); return 1; }
-{smaller_equal}	{ SET_SYMBOL( fts_s_smaller_equal); return 1; }
-{colon}		{ SET_SYMBOL( fts_s_colon); return 1; }
-{equal}		{ SET_SYMBOL( fts_s_equal); return 1; }
-{quoted_symbol}	{ yytext[yyleng-1] = '\0'; SET_SYMBOL_NEW( yytext+1); return 1; }
-{symbol}	{ SET_SYMBOL_NEW( yytext); return 1; }
+{decint}		{ SET_INT( yytext); return 1; }
+{hexint} 		{ SET_HEXINT( yytext+2); return 1; }
+{float} 		{ SET_FLOAT( yytext); return 1; }
+{dollar}		{ BEGIN( AFTER_DOLLAR); SET_SYMBOL( fts_s_dollar); return 1; }
+<AFTER_DOLLAR>{decint}	{ BEGIN(INITIAL); SET_INT( yytext); return 1; }
+<AFTER_DOLLAR>{symbol}	{ BEGIN(INITIAL); SET_SYMBOL_NEW( yytext); return 1; }
+{semi}			{ SET_SYMBOL( fts_s_semi); return 1; }
+{comma}			{ SET_SYMBOL( fts_s_comma); return 1; }
+{plus}			{ SET_SYMBOL( fts_s_plus); return 1; }
+{minus}			{ SET_SYMBOL( fts_s_minus); return 1; }
+{times}			{ SET_SYMBOL( fts_s_times); return 1; }
+{div}			{ SET_SYMBOL( fts_s_div); return 1; }
+{power}			{ SET_SYMBOL( fts_s_power); return 1; }
+{open_par}		{ SET_SYMBOL( fts_s_open_par); return 1; }
+{closed_par}		{ SET_SYMBOL( fts_s_closed_par); return 1; }
+{open_sqpar}		{ SET_SYMBOL( fts_s_open_sqpar); return 1; }
+{closed_sqpar}		{ SET_SYMBOL( fts_s_closed_sqpar); return 1; }
+{open_cpar}		{ SET_SYMBOL( fts_s_open_cpar); return 1; }
+{closed_cpar}		{ SET_SYMBOL( fts_s_closed_cpar); return 1; }
+{dot}			{ SET_SYMBOL( fts_s_dot); return 1; }
+{percent}		{ SET_SYMBOL( fts_s_percent); return 1; }
+{shift_left}		{ SET_SYMBOL( fts_s_shift_left); return 1; }
+{shift_right}		{ SET_SYMBOL( fts_s_shift_right); return 1; }
+{logical_and}		{ SET_SYMBOL( fts_s_logical_and); return 1; }
+{logical_or}		{ SET_SYMBOL( fts_s_logical_or); return 1; }
+{logical_not}		{ SET_SYMBOL( fts_s_logical_not); return 1; }
+{equal_equal}		{ SET_SYMBOL( fts_s_equal_equal); return 1; }
+{not_equal}		{ SET_SYMBOL( fts_s_not_equal); return 1; }
+{greater}		{ SET_SYMBOL( fts_s_greater); return 1; }
+{greater_equal}		{ SET_SYMBOL( fts_s_greater_equal); return 1; }
+{smaller}		{ SET_SYMBOL( fts_s_smaller); return 1; }
+{smaller_equal}		{ SET_SYMBOL( fts_s_smaller_equal); return 1; }
+{colon}			{ SET_SYMBOL( fts_s_colon); return 1; }
+{equal}			{ SET_SYMBOL( fts_s_equal); return 1; }
+{quoted_symbol}		{ yytext[yyleng-1] = '\0'; SET_SYMBOL_NEW( yytext+1); return 1; }
+{symbol}		{ SET_SYMBOL_NEW( yytext); return 1; }
 
 %%
 

@@ -110,6 +110,7 @@ fts_status_t syntax_error_status = &syntax_error_status_description;
 %type <n> comma_expression_list
 %type <n> expression
 %type <n> invocation
+%type <n> function
 %type <n> par
 %type <n> primitive
 %type <n> reference
@@ -141,6 +142,7 @@ comma_expression_list: comma_expression_list TK_COMMA expression
 expression: instance
 	| tuple
 	| invocation
+	| function
 ;
 
 instance: TK_SYMBOL TK_COLON class_name term_list
@@ -270,6 +272,9 @@ variable: TK_DOLLAR TK_SYMBOL
 		{ $$ = fts_parsetree_new( TK_DOLLAR, &($2), 0, 0); }
 ;
 
+function: TK_DOT TK_SYMBOL term_list
+		{ $$ = 0; }
+;
 %%
 
 #ifndef STANDALONE

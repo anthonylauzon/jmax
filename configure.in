@@ -1,8 +1,11 @@
-dnl $Id: configure.in,v 1.94 2002/09/17 19:09:10 tisseran Exp $
+dnl $Id: configure.in,v 1.95 2002/09/18 15:27:17 borghesi Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.95  2002/09/18 15:27:17  borghesi
+dnl *** empty log message ***
+dnl
 dnl Revision 1.94  2002/09/17 19:09:10  tisseran
 dnl First integration of threaded direct to disk (package dtd)
 dnl
@@ -206,7 +209,7 @@ then
   CFLAGS="$CFLAGS -O3 -OPT:roundoff=3:IEEE_arithmetic=3:alias=typed:Olimit=0 -TARG:platform=ip27:processor=r10000 -float_const -INLINE:=ON:dfe=ON  -LNO:opt=1"
 fi
 PLATFORM_PACKAGES="sgi unixdtd"
-FTS_SYS_LIBS="-ldl -laudiofile"
+FTS_SYS_LIBS="-ldl"
 CONFIG_FILE=config_sgi.jprj
 ACX_C_RESTRICT
 ;;

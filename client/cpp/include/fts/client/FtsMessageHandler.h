@@ -29,7 +29,7 @@ namespace client {
 
   class FtsObject;
 
-  class FtsMessageHandler {
+  class FTSCLIENT_API FtsMessageHandler {
   public:
     virtual void invoke( FtsObject *obj, const FtsArgs *args) = 0;
   };

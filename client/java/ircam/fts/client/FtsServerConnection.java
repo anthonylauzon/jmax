@@ -27,17 +27,17 @@ public abstract class FtsServerConnection {
 
   public abstract void close() throws IOException;
 
-  public int read( byte[] b) throws IOException
-  {
-    return read( b, 0, b.length);
-  }
+//   public int read( byte[] b) throws IOException
+//   {
+//     return read( b, 0, b.length);
+//   }
 
   public abstract int read( byte[] b, int off, int len) throws IOException;
 
-  public void write( byte[] b) throws IOException
-  {
-    write( b, 0, b.length);
-  }
+//   public void write( byte[] b) throws IOException
+//   {
+//     write( b, 0, b.length);
+//   }
 
   public abstract void write( byte[] b, int off, int len) throws IOException;
 }

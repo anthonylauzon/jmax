@@ -4,6 +4,7 @@ FtsAtom.cpp \
 FtsSymbol.cpp \
 FtsArgs.cpp \
 FtsException.cpp \
+FtsObject.cpp \
 BinaryProtocolDecoder.cpp \
 BinaryProtocolEncoder.cpp
 

@@ -25,7 +25,7 @@ namespace ircam {
 namespace fts {
 namespace client {
 
-  class FtsServerConnection {
+  class FTSCLIENT_API FtsServerConnection {
 
   public:
     virtual void close() throw (FtsClientException) = 0;

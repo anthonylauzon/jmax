@@ -17,7 +17,7 @@ AM_INIT_AUTOMAKE($PACKAGE,$VERSION, no-define)
 
 AC_PREFIX_DEFAULT(/usr)
 
-AM_CONFIG_HEADER(include/config.h)
+AM_CONFIG_HEADER(cpp/include/config.h)
 
 dnl Checks for programs.
 AC_PROG_CXX
@@ -25,7 +25,7 @@ if test "$ac_cv_prog_cxx" = "no" ; then
    AC_MSG_ERROR([*** No C++ compiler])
 fi
 
-CXXFLAGS="-I../include"
+CXXFLAGS=
 
 dnl Check for debug
 AC_ARG_ENABLE(debug,
@@ -73,12 +73,13 @@ AC_SUBST(TOP_DIR_PATH)
 AC_OUTPUT(
 Makefile
 cpp/Makefile
+cpp/include/Makefile
+cpp/include/fts/Makefile
+cpp/include/fts/client/Makefile
+cpp/include/fts/client/version.h
+cpp/src/Makefile
 java/Makefile
 java/ircam/Makefile
 java/ircam/fts/Makefile
 java/ircam/fts/client/Makefile
-include/Makefile
-include/fts/Makefile
-include/fts/client/Makefile
-include/fts/client/version.h
 )
