@@ -1021,7 +1021,7 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   if ( this->data_paths)
     fts_package_save_list( &f, this->data_paths, fts_s_data_path);
 
-  if ( fts_hashtable_get_size(this->declared_templates))
+  if(( this->declared_templates) &&  fts_hashtable_get_size(this->declared_templates))
     {
       fts_atom_t* a;
       int i = 0;
@@ -1051,7 +1051,7 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 #endif    
     }
 
-  if ( fts_hashtable_get_size(this->help))
+  if ((this->help ) &&  fts_hashtable_get_size(this->help))
     {
       fts_atom_t* a;
       int i = 0;
