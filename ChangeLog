@@ -1,3 +1,13 @@
+2003-06-13  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* packages/asio/: this package add ASIO support on Windows version.
+	  - ASIO Output works with M AUDIO USB QUATTRO (ASIOType is ASIOTInt16LSB).
+	  - ASIO Input is not tested.
+	  - TODO:
+	    - test ASIO input.
+	    - add switch between FTS scheduler and ASIO callback.
+	    - add all conversion function between all ASIO format and FTS.
+
 2003-05-28  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* client/python/ircam/fts/client/FtsServerConnection.py: fixed thread stop if socket is closed.
