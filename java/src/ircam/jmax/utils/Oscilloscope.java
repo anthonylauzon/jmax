@@ -4,6 +4,24 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
+/**
+ * A 'software' oscilloscope.
+ * This version works in a thread, in a "polling" mode.
+ * Usage: create the oscilloscope with two arguments:
+ * - The source of data (an object that implements the OscillSource interface)
+ * - The refresh rate (in Hz)
+ *  In the Oscilloscope window, press the start button to see 
+ * your data changing.
+ * LIMITATIONS:
+ * The present version does not allow you to change:
+ * - the speed of the "pencil" (every tick is a point)
+ * - the zero position and the normalization of the values
+ * - the size of the video screen ...
+ * Important WARNING:
+ * A refresh rate too high can interfere with other threads in the program,
+ * and can cause a crash. A ErmesSlider for example can be tracked up to 200Hz
+ */
+
 public class Oscilloscope extends Frame implements  OscillSource{
   MainPanel itsMainPanel;
   Button itsStartButton;
@@ -70,7 +88,8 @@ public class Oscilloscope extends Frame implements  OscillSource{
   }
 
   /**
-   * create an oscilloscope without source (yet)
+   * create an oscilloscope without source (yet).
+   * It will just have a "test" and a "stop" button.
    */
   public Oscilloscope() {
     super("oscilloscope");
@@ -99,6 +118,10 @@ public class Oscilloscope extends Frame implements  OscillSource{
     setVisible(true);
   }
 
+  /**
+   * Create an oscilloscope bind to the given source that draw points
+   * at a 'freq' rate (in Hz).
+   */
   public Oscilloscope(OscillSource theSource, int freq) {
     super("oscilloscope");
     itsSource = theSource;
@@ -130,6 +153,9 @@ public class Oscilloscope extends Frame implements  OscillSource{
     setVisible(true);
   }
 
+  /**
+   * stop the oscilloscope and delete the window.
+   */
   public void stop () {
     if (itsTimingThread != null) 
       itsTimingThread.stop();
@@ -138,6 +164,9 @@ public class Oscilloscope extends Frame implements  OscillSource{
     dispose();    
   }
 
+  /**
+   * start the oscilloscope.
+   */
   public void start() {
     if (itsSource == null) System.err.println("Error: no source for oscilloscope");
     if (itsFreq==0) {
@@ -167,6 +196,9 @@ public class Oscilloscope extends Frame implements  OscillSource{
     return values[(value_index++)%noPoints];
   }
 
+  /**
+   * Change the Oscilloscope refresh rate.
+   */
   public void setFrequency(int freq) {
     if (freq != 0) {
       itsFreq = freq;
@@ -175,10 +207,17 @@ public class Oscilloscope extends Frame implements  OscillSource{
     else System.err.println("Error: null frequency for Oscilloscope");
   }
 
+  /**
+   * Set the source of data for this oscilloscope.
+   */
   public void setSource(OscillSource theSource) {
     itsSource = theSource;
   }
 
+  /**
+   * Fills a sinusoidal table and start the oscilloscope giving it
+   * the values in the table (it's a test mode)
+   */
   public void testMode() {
     // in this mode, the oscilloscope itself is providing the data to be shown
     //(a cosinus wave)
