@@ -21,10 +21,7 @@ import java.util.*;
 import ircam.jmax.*;
 
 /**
- * Class implementing the proxy of an FTS object.
- * It deals with: Object creation/deletion, connections
- * object properties, class and instance information,
- * FTS instantiation 
+ * Proxy of an Outlet FTS object.
  */
 
 public class FtsOutletObject  extends FtsInOutletObject
@@ -37,6 +34,10 @@ public class FtsOutletObject  extends FtsInOutletObject
 
   int position;
 
+  /**
+   * Create a FtsOutletObject object.
+   */
+
   public FtsOutletObject(Fts fts, FtsObject parent, int position, int objId)
   {
     super(fts, parent, "outlet", position, objId);
@@ -44,6 +45,8 @@ public class FtsOutletObject  extends FtsInOutletObject
     ninlets = 1;
     noutlets = 0;
   }
+
+  /** Set the position. Tell the server about the new position */
 
   public void setPosition(int i)
   {

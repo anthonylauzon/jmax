@@ -18,7 +18,11 @@ package ircam.jmax.fts;
 import ircam.jmax.*;
 
 /**
- * A generic FTS object with an float value; floatbox and sliders, for example
+ * A generic FTS object with an float value.
+ * Used for floatbox.
+ * If the listener of this object is an instance
+ * of FtsFloatValueListener, fire it when the we got a new value
+ * from the server.
  */
 
 public class FtsFloatValueObject extends FtsObject
@@ -31,14 +35,12 @@ public class FtsFloatValueObject extends FtsObject
 
   float value; 
 
-  /**
-   * Create a FtsObject object;
-   */
-
   public FtsFloatValueObject(Fts fts, FtsObject parent, String className, String description, int objId)
   {
     super(fts, parent, className, null, description, objId);
   }
+
+  /** Set the value. Tell it to the server, also */
 
   public void setValue(float value)
   {
@@ -46,17 +48,21 @@ public class FtsFloatValueObject extends FtsObject
     fts.getServer().putObjectProperty(this, "value", value);
   }
 
+  /** Get the current value */
+
   public float getValue()
   {
     return value;
   }
+
+  /** Ask the server for the latest value */
 
   public void updateValue()
   {
     fts.getServer().askObjectProperty(this, "value");
   }
        
-  /* Over write the localPut message to handle value changes;
+  /** Over write the localPut message to handle value changes.
    */
 
   protected void localPut(String name, float newValue)

@@ -136,6 +136,7 @@ class FtsClientProtocol
   static final int fts_recompute_error_objects_cmd = 'e';
   static final int fts_shutdown_cmd = 's';
 
+  /** Decode a command. For debug purposes */
 
   static public String getCommandName(int command)
   {

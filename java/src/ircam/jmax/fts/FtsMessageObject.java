@@ -21,10 +21,11 @@ import java.util.*;
 import ircam.jmax.*;
 
 /**
- * Class implementing the proxy of an FTS object.
- * It deals with: Object creation/deletion, connections
- * object properties, class and instance information,
- * FTS instantiation 
+ * Class implementing the proxy of a message box.
+ * 
+ * If the listener of this object is an instance
+ * of FtsMessageListener, fire it when the we got a new message content
+ * from the server.
  */
 
 public class FtsMessageObject extends FtsIntValueObject
@@ -37,10 +38,6 @@ public class FtsMessageObject extends FtsIntValueObject
 
   String message; // the message content
 
-  /**
-   * Create a FtsObject object;
-   */
-
   public FtsMessageObject(Fts fts, FtsObject parent, String description, int objId)
   {
     super(fts, parent, "messbox", description, objId);
@@ -51,6 +48,8 @@ public class FtsMessageObject extends FtsIntValueObject
     message = description;
   }
 
+  /** Set the message content. Tell the server, too */
+
   public void setMessage(String message)
   {
     this.message = message;
@@ -58,12 +57,14 @@ public class FtsMessageObject extends FtsIntValueObject
     setDirty();
   }
 
+  /** Get the message content. */
+
   public String getMessage()
   {
     return message;
   }
        
-  /* Over write the handle message to handle message box changes */
+  /** Over write the handle message to handle message box changes. */
 
   void handleMessage(FtsStream stream)
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException

@@ -52,6 +52,8 @@ class FtsSubProcessStream extends FtsStream
       }    
   }
 
+  /** Close the connection and shutdown the server */
+
   void close()
   {
     FtsErrorStreamer.stopFtsErrorStreamer();
@@ -67,6 +69,8 @@ class FtsSubProcessStream extends FtsStream
 	System.out.println("Cannot quit " + path);
       }
   }
+
+  /** Check if the connection is open */
 
   boolean isOpen()
   {

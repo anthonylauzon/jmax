@@ -45,6 +45,12 @@ class FtsDatagramStream extends FtsStream
   String ftsName;
   Process proc;
 
+  /** Instantiate the connection.
+   * Start the server using a rsh command; this require a proper
+   * configuration of the .rhosts user file.
+   */
+
+
   FtsDatagramStream(String host, String path, String ftsName)
   {
     super(host);
@@ -121,6 +127,9 @@ class FtsDatagramStream extends FtsStream
       }    
   }
 
+
+  /** Close the connection. Shutdown the server. */
+
   void close()
   {
     FtsErrorStreamer.stopFtsErrorStreamer();
@@ -130,6 +139,9 @@ class FtsDatagramStream extends FtsStream
 
     proc.destroy();
   }
+
+
+  /** Tell if the connection is open. */
 
   boolean isOpen()
   {
@@ -148,8 +160,8 @@ class FtsDatagramStream extends FtsStream
       flush();
   }
 
-  /** Method to receive a char; since we can use datagram sockets or other
-    means I/O is not necessarly done thru streams */
+  /** Method to receive a char. Since we can use datagram sockets I/O
+    is not done thru Java streams */
 
   protected int read() throws java.io.IOException
   {
@@ -189,9 +201,9 @@ class FtsDatagramStream extends FtsStream
     return c;
   }
 
-  /** Method to Ask for an explicit output flush ; since we
-    can use datagram sockets or other means I/O is not necessarly done
-    thru streams */
+  /** Method to Ask for an explicit output flush. 
+    Since we can use datagram sockets I/O
+    is not done thru Java streams */
 
   void flush() throws java.io.IOException
   {
@@ -207,6 +219,11 @@ class FtsDatagramStream extends FtsStream
       }
   }
 }
+
+
+
+
+
 
 
 

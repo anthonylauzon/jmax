@@ -22,10 +22,9 @@ import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
 import javax.swing.*;
 
-/** An instance of this document handler can load MaxDocument from
- *  a  remote binary file.
- *
- * This file should
+/** Document handler for jmax binary files. 
+ * An instance of this document handler can load MaxDocument from
+ * a  remote binary file.
  */
 
 public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
@@ -36,8 +35,6 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
   {
     jMaxDocumentIcon = Icons.get("_jmax_patcher_file_");
   }
-
-  /** We can load from a file start with the "bmax" or the "mbxa" string (??) */
 
   public boolean canLoadFrom(File file)
   {

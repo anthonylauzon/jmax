@@ -21,9 +21,8 @@ import java.util.*;
 import ircam.jmax.*;
 
 /**
- * Class implementing the proxy of an FTS comment object.
- * Do nothing, the actual comment is stored in the comment 
- * property.
+ * The proxy of an FTS comment object.
+ * The comment is stored in the comment property.
  */
 
 public class FtsCommentObject extends FtsObject

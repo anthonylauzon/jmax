@@ -21,7 +21,7 @@ import java.io.*;
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
 
-/** A FtsPatcherDocument is the Max Document containing an FTS Patch.
+/** A FtsPatcherDocument is the Max Document containing an FTS Patch file.
  */
 
 public class FtsPatcherDocument extends MaxDocument 

@@ -39,8 +39,8 @@ public class FtsObject
   /******************************************************************************/
 
   /** This function create an application layer object for an already existing
-   *  object in FTS; take directly the FtsStream as argument.
-   *  Used also in the message box.
+   * object in FTS; take directly the FtsStream as argument, where we are receiving
+   * an object upload message.
    */
 
   static FtsObject makeFtsObjectFromMessage(Fts fts, FtsStream stream, boolean doVariable)
@@ -79,6 +79,10 @@ public class FtsObject
 	
 	/* Note that we do the unparsing relative to ':' and variables
 	   here; in the future, a dedicated API should be used ! */
+
+	// Here we do the mapping between fts names and application layer classes
+	// Any addition of special classes should start by adding some lines
+	// of code here.
 
 	if (className == "jpatcher")
 	  {
@@ -135,9 +139,20 @@ public class FtsObject
   /******************************************************************************/
 
 
-  /** Local put is a version of put that do not send
-    values to FTS.
-    */
+  /** Set an integer property coming from the server.
+   *  Called by FtsServer when a property value message is received
+   * from the server; handle the basic property by name, that are mapped
+   * to beans like property for FtsObject instances.
+   * Subclasses can specialize the method (calling super.localPut !!)
+   * in order to add special property handling.
+   * 
+   * Responsable for firing the properties listener.
+   * In order to simplify property listener handling, and reduce
+   * memory overhead, we support only one listener for each instance
+   * of FtsObject; this listener can listen for many different kind of event;
+   * the listener is fired on a given event if it implements the correct interface
+   * for handling the event.
+   */
 
   protected void localPut(String name, int value)
   {
@@ -198,11 +213,21 @@ public class FtsObject
       }
   }
 
+
+  /** Set an integer property coming from the server.
+   * Currently, no property have a float type.
+   */
+
   protected void localPut(String name, float value)
   {
     // No float property at this level
   }
 
+
+  /** Set a non integer nor float property coming from the server.
+   * 
+   * See the other version of localPut.
+   */
 
   protected void localPut(String name, Object value)
   {
@@ -228,14 +253,16 @@ public class FtsObject
   }
 
 
-  // New simplified beanified system
-
   protected Object listener;
+
+  /** Set the unique object listener */
 
   public void setObjectListener(Object obj)
   {
     listener = obj;
   }
+
+  /** Get the current object listener */
 
   public Object getObjectListener()
   {
@@ -307,10 +334,15 @@ public class FtsObject
   //  Handling of properties
   //
 
+  /** Get the X property */
+
   public final int getX()
   {
     return x;
   }
+
+
+  /** Set the X property. Tell it to the server, too. */
 
   public final void setX(int x)
   {
@@ -322,10 +354,14 @@ public class FtsObject
       }
   }
 
+  /** Get the Y property */
+
   public final int getY()
   {
     return y;
   }
+
+  /** Set the Y property. Tell it to the server, too. */
 
   public final void setY(int y)
   {
@@ -337,10 +373,15 @@ public class FtsObject
       }
   }
 
+  /** Get the Width property */
+
   public final int getWidth()
   {
     return width;
   }
+
+
+  /** Set the Width property. Tell it to the server, too. */
 
   public final void setWidth(int w)
   {
@@ -352,10 +393,15 @@ public class FtsObject
       }
   }
 
+  /** Get the Height property */
+
   public final int getHeight()
   {
     return height;
   }
+
+
+  /** Set the Height property. Tell it to the server, too. */
 
   public final void setHeight(int h)
   {
@@ -367,23 +413,29 @@ public class FtsObject
       }
   }
 
-  // Is Error is read only
+
+  /** Get the Error property. Error is a read only property. */
 
   public final boolean isError()
   {
     return isError;
   }
 
+  /** Get the error description property. Error description is a read only property. */
 
   public final String getErrorDescription()
   {
     return errorDescription;
   }
 
+  /** Get the font property */
+
   public final String getFont()
   {
     return font;
   }
+
+  /** Set the font property. Tell it to the server, too. */
 
   public final void setFont(String font)
   {
@@ -395,10 +447,14 @@ public class FtsObject
       }
   }
 
+  /** Get the font size property */
+
   public final int getFontSize()
   {
     return fontSize;
   }
+
+  /** Set the font size property. Tell it to the server, too. */
 
   public final void setFontSize(int fontSize)
   {
@@ -410,10 +466,14 @@ public class FtsObject
       }
   }
 
+  /** Get the layer  property */
+
   public final int getLayer()
   {
     return layer;
   }
+
+  /** Set the layer property. Tell it to the server, too. */
 
   public final void setLayer(int layer)
   {
@@ -425,8 +485,11 @@ public class FtsObject
       }
   }
 
-  /* Colors are not stored, can only be set, and it is meaningfull only
-     for some object */
+
+  /** Set the color property. Tell it to the server.
+    Colors are not locally stored, can only be set, and they are meaningfull only
+    for some object
+    */
 
   public final void setColor(int color)
   {
@@ -434,30 +497,40 @@ public class FtsObject
     setDirty();
   }
 
-  public Fts getFts()
-  {
-    return fts;
-  }
+  /** Get the data property of this object.*/
 
   public MaxData getData()
   {
     return data;
   }
 
+  /** Ask the server to update the data property of this object.*/
+
   public void updateData()
   {
     fts.getServer().askObjectProperty(this, "data");
   }
+
+  /** Get the comment property of this object.*/
 
   public String getComment()
   {
     return comment;
   }
 
+  /** Set the comment property. Tell it to the server, too. */
+
   public void setComment(String v)
   {
     comment = v;
     fts.getServer().putObjectProperty(this, "comment", comment);
+  }
+
+  /** Get the FTS instance this object belong to */
+
+  public Fts getFts()
+  {
+    return fts;
   }
 
   /*****************************************************************************/
@@ -505,7 +578,7 @@ public class FtsObject
 
   /* Accessors and selectors. */
 
-  /** Get the object including patcher. */
+  /** Get the patcher including this object. */
 
   public final FtsObject getParent()
   {
@@ -519,12 +592,12 @@ public class FtsObject
     return className;
   }
 
+  FtsPatcherDocument document;
+
   /** Get the MaxDocument this objects is part of;
-   * Temporary; actually the patcher document should be
+   * Actually the patcher document should be
    * a remote data and be known on the FTS side.
    */
-
-  FtsPatcherDocument document;
 
   public MaxDocument getDocument()
   {
@@ -536,11 +609,12 @@ public class FtsObject
       return null;
   }
 
+  /** Set the Max document this obect belong to */
+
   public void setDocument(MaxDocument document)
   {
     this.document = (FtsPatcherDocument) document;
   }
-
 
   /** Tell the document this object is changed, 
    *  and do not represent the state of the original file (if any)
@@ -660,7 +734,7 @@ public class FtsObject
 
   // Communication with the object
 
-  /** Send a message to an object (in FTS). */
+  /** Send a message to an object in the server. */
 
   public final void sendMessage(int inlet, String selector, MaxVector args)
   {

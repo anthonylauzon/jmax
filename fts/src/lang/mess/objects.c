@@ -153,9 +153,10 @@ fts_object_new(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_
    */
 
 
-static void fts_object_assign_property(fts_symbol_t name, fts_atom_t *value, void *data)
+static void fts_object_assign(fts_symbol_t name, fts_atom_t *value, void *data)
 {
   fts_object_t *obj = (fts_object_t *)data;
+
 
   fts_object_put_prop(obj, name, value); 
 }
@@ -454,7 +455,7 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
       if (fts_object_is_patcher(obj))
 	fts_expression_map_to_assignements(e, fts_patcher_assign_variable, (void *) obj);
       else
-	fts_expression_map_to_assignements(e, fts_object_assign_property, (void *) obj);
+	fts_expression_map_to_assignements(e, fts_object_assign, (void *) obj);
     }
 
   /* Free the expression state structure if any */

@@ -21,13 +21,13 @@ import java.util.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
 
-/** This class represent an Integer list in 
- *  FTS
+/** 
+ * The Java Implementation for the atom list remote data class.
  */
 
 public class FtsAtomList extends FtsRemoteData
 {
-  /** Key for remote calls */
+  /* Keys for remote calls */
 
   static final int REMOTE_UPDATE = 1;
   static final int REMOTE_SET    = 2;
@@ -39,24 +39,29 @@ public class FtsAtomList extends FtsRemoteData
     super();
   }
 
+  /** Return the size of the atom list */
+
   public int getSize()
   {
     return values.size();
   }
+
+  /** Get the content of the atom list as a MaxVector */
 
   public MaxVector getValues()
   {
     return values;
   }
 
-  /** Get the list in text form; it should use the FtsParse unparser !!*/
+  /** Get the content of the atom list as text. */
 
   public String getValuesAsText()
   {
     return FtsParse.unparseDescription(values);
   }
 
-  /** Set the list as text */
+
+  /** Set the content of the atom list as text. */
   
   public void setValuesAsText(String value)
   {
@@ -65,7 +70,8 @@ public class FtsAtomList extends FtsRemoteData
     changed();
   }
 
-  /** Get the whole content  of the list from FTS */
+
+  /** Update the content of the atom list from the server. */
 
   public void forceUpdate()
   {
@@ -73,8 +79,9 @@ public class FtsAtomList extends FtsRemoteData
     fts.sync();
   }
 
-  /** Declare that a range in the list has been changed
-   * and this range need to be sent to FTS
+
+  /** 
+   * Send the content of the atom list to the server.
    */
 
   public void changed()
@@ -83,7 +90,7 @@ public class FtsAtomList extends FtsRemoteData
   }
 
 
-  /* a method inherited from FtsRemoteData */
+  /** Implement the remote calls from the server */
 
   public final void call( int key, FtsStream stream)
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException

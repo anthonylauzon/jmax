@@ -18,7 +18,11 @@ package ircam.jmax.fts;
 import ircam.jmax.*;
 
 /**
- * A generic FTS object with an int value; intbox and sliders, for example
+ * A generic FTS object with an int value.
+ * Used for intbox and sliders, for example.
+ * If the listener of this object is an instance
+ * of FtsIntValueListener, fire it when the we got a new value
+ * from the server.
  */
 
 public class FtsIntValueObject extends FtsObject
@@ -31,14 +35,12 @@ public class FtsIntValueObject extends FtsObject
 
   int value; 
 
-  /**
-   * Create a FtsObject object;
-   */
-
   public FtsIntValueObject(Fts fts, FtsObject parent, String className, String description, int objId)
   {
     super(fts, parent, className, null, description, objId);
   }
+
+  /** Set the value. Tell it to the server, also */
 
   public void setValue(int value)
   {
@@ -46,10 +48,14 @@ public class FtsIntValueObject extends FtsObject
     fts.getServer().putObjectProperty(this, "value", value);
   }
 
+  /** Get the current value */
+
   public int getValue()
   {
     return value;
   }
+
+  /** Ask the server for the latest value */
 
   public void updateValue()
   {

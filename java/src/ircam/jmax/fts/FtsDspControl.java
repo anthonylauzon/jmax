@@ -18,7 +18,15 @@ package ircam.jmax.fts;
 import java.beans.*;
 import ircam.jmax.fts.*;
 
-public class FtsDspControl extends FtsRemoteData
+/** Java class for the dsp control remote data class.
+ *
+ * It offer visibility and control over a number of DSP related
+ * server parameter and status.
+ * It is implemented as a Java Beans, with Java Beans Properties 
+ * corresponding to DSP server properties.
+ */
+
+ public class FtsDspControl extends FtsRemoteData
 {
   /* Incoming calls */
 

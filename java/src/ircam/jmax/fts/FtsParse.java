@@ -20,12 +20,13 @@ import java.text.*;
 
 import ircam.jmax.utils.*;
 
-/**
+/** Lexical analyzer/unparser.
  * This class implement a lexical analizer for object and message box
  * content; it is in the object layer
  * because the lexical conventions depend on the fts language, and not
  * on the editor; other clients can use the same lexical analizer. <p>
- * The parsing should do straight to FTS !!
+ *
+ * The lexical parsing should be done in FTS, actually !!
  * 
  * The lexer is done in the  non-deterministic, multiple 
  * automata style, and is implemented  by the class FtsParse. <p>
@@ -40,10 +41,10 @@ import ircam.jmax.utils.*;
 
 public class FtsParse
 {
-  final static int lex_long_start = 0;
-  final static int lex_long_in_value = 1;
-  final static int lex_long_in_sign = 2;
-  final static int lex_long_end = 3;
+  final static int lex_int_start = 0;
+  final static int lex_int_in_value = 1;
+  final static int lex_int_in_sign = 2;
+  final static int lex_int_end = 3;
 
   final static int lex_float_start = 0;
   final static int lex_float_in_value = 1;
@@ -99,7 +100,7 @@ public class FtsParse
     toStream = true;
   }
 
-  /** try/backtrack handling */
+  /** try handling */
 
   final private void tryParse()
   {
@@ -107,12 +108,13 @@ public class FtsParse
     backtrack_pos = pos;
   }
 
+  /** backtrack handling */
+
   final private void backtrack()
   {
     pos = backtrack_pos;
   }
 
-  /** manipulate the state */
 
   final private char currentChar()
   {
@@ -164,9 +166,8 @@ public class FtsParse
   }
 
   /**
-   * Identify characters that always start a new token
-   * also if not separated; they must be put in the new token.
-   * binops  suppressed !!!
+   * Identify characters that always start a new token.
+   * Also if not separated; they must be put in the new token.
    */
 
   static final private boolean isStartToken(char c)
@@ -231,7 +232,7 @@ public class FtsParse
      and put it in the parsedToken variable.
      */
 
-  final private void ParseLong() throws java.io.IOException
+  final private void ParseInt() throws java.io.IOException
   {
     if (toStream)
       stream.sendInt(token);
@@ -255,11 +256,9 @@ public class FtsParse
       parsedToken = token.toString();
   }
 
-  /* The keyword parser is not an automata
+  /** Reconize keywords. The keyword parser is not an automata
      Reconize tokens which are always tokens, i.e. tokens
      which end is predefined and do not depend on what follow.
-
-     ~ and . suppressed
      */
 
   private boolean tryKeywords() throws java.io.IOException
@@ -297,49 +296,51 @@ public class FtsParse
   }
 
 
-  private boolean tryLong() throws java.io.IOException
+  /** Reconize an integer */
+
+  private boolean tryInt() throws java.io.IOException
   {
     int status;
 
     tryParse();
-    status = lex_long_start;
+    status = lex_int_start;
 
-    while (status != lex_long_end)
+    while (status != lex_int_end)
       {
 	switch (status)
 	  {
-	  case lex_long_start:
+	  case lex_int_start:
 	    if (atEndOfString())
 	      {backtrack(); return false;}
 	    else if (isDigit(currentChar()))
-	      {storeChar(currentChar()); status = lex_long_in_value;}
+	      {storeChar(currentChar()); status = lex_int_in_value;}
 	    else if (isSign(currentChar()))
-	      {storeChar(currentChar()); status = lex_long_in_sign;}
+	      {storeChar(currentChar()); status = lex_int_in_sign;}
 	    else
 	      {backtrack(); return false;}
 	    break;
 
-	  case lex_long_in_sign:
+	  case lex_int_in_sign:
 	    if (atEndOfString())
 	      {backtrack(); return false;}
 	    else if (isDigit(currentChar()))
-	      {storeChar(currentChar()); status = lex_long_in_value;}
+	      {storeChar(currentChar()); status = lex_int_in_value;}
 	    else
 	      {backtrack(); return false;}
 	    break;
 
-	  case lex_long_in_value:
+	  case lex_int_in_value:
 	    if (atEndOfString() ||
 		isSeparator(currentChar())     ||
 		isStartToken(currentChar()))
-	      {ungetChar(); ParseLong(); status = lex_long_end;}
+	      {ungetChar(); ParseInt(); status = lex_int_end;}
 	    else if (isDigit(currentChar()))
-	      {storeChar(currentChar()); status = lex_long_in_value;}
+	      {storeChar(currentChar()); status = lex_int_in_value;}
 	    else
 	      {backtrack(); return false;}
 	    break;
 
-	  case lex_long_end:
+	  case lex_int_end:
 	    break;
 	  }
 
@@ -349,6 +350,7 @@ public class FtsParse
     return true;
   }
 
+  /** Reconize an float */
 
   private boolean tryFloat() throws java.io.IOException
   {
@@ -423,7 +425,7 @@ public class FtsParse
   }
 
 
-  /**
+  /** Reconize a quoted string.
    * A qstring is a string surrounded by quote-start
    * quote-end pairs (usually, double quotes)
    */
@@ -477,6 +479,8 @@ public class FtsParse
   }
 
 
+  /** Reconize a string (symbol) */
+
   private boolean tryString() throws java.io.IOException
   {
     int  status;
@@ -525,7 +529,7 @@ public class FtsParse
     return true;
   }
 
-  /** Parse an object argument description (without the class Name),
+  /** Parse an object argument description. Without the class Name.
    * and send it to an FtsStream (optimization to reduce object allocation
    * during editing).
    */
@@ -562,7 +566,7 @@ public class FtsParse
 
 	if (! parser.tryKeywords())
 	  if (! parser.tryFloat())
-	    if (! parser.tryLong())
+	    if (! parser.tryInt())
 	      if (! parser.tryQString())
 		parser.tryString();
       }
@@ -607,7 +611,7 @@ public class FtsParse
 	       */
 
 	    if (! parser.tryKeywords())
-	      if (! parser.tryLong())
+	      if (! parser.tryInt())
 		if (! parser.tryFloat())
 		  if (! parser.tryQString())
 		    parser.tryString();
@@ -621,9 +625,9 @@ public class FtsParse
       }
   }
 
-  /* Unparse an object description from a FTS message, starting
-     from the given offset.
-     */
+
+  // Unparser.
+  // Functions to classify values and tokens.
 
   static private final boolean wantASpaceBefore(Object value)
   {
@@ -809,12 +813,15 @@ public class FtsParse
     return false;
   }
 
+  /** Unparse an object description from a FTS message.  */
 
   static String unparseObjectDescription(FtsStream stream)
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     return unparseObjectDescription(stream.getNextArgument(), stream);
   }
+
+  /** Unparse an object description from a FTS message.  */
 
   static String unparseObjectDescription(Object initValue, FtsStream stream)
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
@@ -901,8 +908,9 @@ public class FtsParse
     return descr.toString();
   }
 
-  // Version used for the comments, to avoid introducing quotes
-  // in comments
+  /** Version used for the comments, to avoid introducing quotes
+    in comments. Note that comments now use property for the text;
+    may be this is not needed anymore.*/
 
   static String simpleUnparseObjectDescription(FtsStream stream)
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
@@ -983,8 +991,8 @@ public class FtsParse
     return descr.toString();
   }
 
-  // Unparse a description passed as a vector of values
-  // Used by atom list, available as a service for anybody.
+  /*  Unparse a description passed as a vector of values
+      Used by atom list, available as a service for anybody.*/
 
   static String unparseDescription(MaxVector values)
   {
@@ -1073,8 +1081,6 @@ public class FtsParse
 
     return descr.toString();
   }
-
-
 }
 
 

@@ -22,9 +22,8 @@ import ircam.jmax.*;
 import ircam.jmax.utils.*;
 
 /**
- * Implement the selection; for now, without listener, and
- * local to each patcher; later, unique, and more integrated with FTS.
- * 
+ * Implement the selection.
+ * Only one instance for server is built.
  */
 
 public class FtsSelection  extends FtsObject

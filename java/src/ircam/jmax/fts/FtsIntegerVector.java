@@ -21,8 +21,8 @@ import java.util.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
 
-/** This class represent an Integer vector in 
- *  FTS
+/** 
+ *  The Java implementation of the FtsIntegerVector remote data.
  */
 
 public class FtsIntegerVector extends FtsRemoteUndoableData
@@ -43,6 +43,7 @@ public class FtsIntegerVector extends FtsRemoteUndoableData
   {
     super();
   }
+
   /** Get the vector name */
 
   public String getName()
@@ -60,6 +61,10 @@ public class FtsIntegerVector extends FtsRemoteUndoableData
       return 0;
   }
 
+
+  /** Set the size of the vector. Reallocate the vector
+    if needed, keeping old values.
+    */
 
   public void setSize(int size)
   {
@@ -99,7 +104,7 @@ public class FtsIntegerVector extends FtsRemoteUndoableData
     return values;
   }
 
-  /** Get the whole content  of the vector from FST */
+  /** Get the whole content of the vector from FST */
 
   public void forceUpdate()
   {
@@ -135,7 +140,7 @@ public class FtsIntegerVector extends FtsRemoteUndoableData
     changed(0, values.length);
   }
 
-  /* a method inherited from FtsRemoteData */
+  /** Execute the remote calls from the server */
 
   public final void call( int key, FtsStream stream)
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException

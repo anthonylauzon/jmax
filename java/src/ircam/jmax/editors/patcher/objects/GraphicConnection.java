@@ -94,6 +94,17 @@ public class GraphicConnection implements DisplayObject
   }
 
 
+  public int getInlet()
+  {
+    return inlet;
+  }
+
+
+  public int getOutlet()
+  {
+    return outlet;
+  }
+
   public FtsConnection getFtsConnection()
   {
     return ftsConnection;

@@ -136,6 +136,9 @@ class FtsSocketServerStream extends FtsStream
       }    
   }
 
+
+  /** Close the connection and shutdown the server */
+
   void close()
   {
     FtsErrorStreamer.stopFtsErrorStreamer();
@@ -153,6 +156,8 @@ class FtsSocketServerStream extends FtsStream
 	System.out.println("I/O failed on closing the serverSocket connection to " + host);
       }
   }
+
+  /** Check if the connection is  open */
 
   boolean isOpen()
   {

@@ -21,7 +21,7 @@ import ircam.jmax.*;
 import ircam.jmax.utils.*;
 
 /**
- * This class implement a listener on the stream. <br>
+ * This class implement a listener on a stream. <br>
  * When instantiated with the startFtsErrorStream static method,
  * it listen an input stream, and pop up a window where the input 
  * stream is copied.<br>

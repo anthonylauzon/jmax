@@ -23,7 +23,7 @@ import ircam.jmax.*;
 import ircam.jmax.utils.*;
 
 /**
- * Implement an interface to the FTS the clipboard.
+ * Implement an interface to the FTS clipboard.
  * Support two methods: copy from a FtsSelection, and paste to an FtsContainer 
  */
 

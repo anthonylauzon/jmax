@@ -15,8 +15,7 @@
 //
 package ircam.jmax.fts;
 
-/*
- * 
+/**
  * An exception to signal that FTS quitted
  */
 

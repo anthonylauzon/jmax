@@ -139,19 +139,19 @@ slider_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   if (cmd == fts_s_object)
     {
-      fts_object_blip(o, "I am a nice Slider, am'nt i ?");
+      fts_object_blip(o, "Slider");
     }
   else if (cmd == fts_s_inlet)
     {
       int n = fts_get_int_arg(ac, at, 1, 0);
 
-      fts_object_blip(o, "I am a nice Inlet %d, am'nt i ?", n);
+      fts_object_blip(o, "<int> set and output the value,set <int> set only");
     }
   else if (cmd == fts_s_outlet)
     {
       int n = fts_get_int_arg(ac, at, 1, 0);
 
-      fts_object_blip(o, "I am a nice Outlet %d, am'nt i ?", n);
+      fts_object_blip(o, "Output the slider position as an integer", n);
     }
 }
 

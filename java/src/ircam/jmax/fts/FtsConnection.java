@@ -20,17 +20,13 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Class implementing the proxy of an Fts connection in the client
- * deals with the connection creation/deletion and saving/loading
+ * The proxy of an Fts connection.
+ * Deals with the connection creation/deletion and saving/loading.
  */
 
 public class FtsConnection 
 {
   Fts  fts; // the server this connection belong to.
-
-  /** to protect against double deletion.
-    temporary, waiting for a more event/based editor
-    */
 
   private int id;
 
@@ -41,7 +37,10 @@ public class FtsConnection
   FtsObject to;
   int inlet;
 
-  /** Create a FTS connection.  */
+  /** Create a FTS connection instance.
+   * The FTS side of the connection is created in the Fts class.
+   * @see ircam.jmax.fts.Fts#makeFtsConnection
+   */
 
   FtsConnection(Fts fts,
 		FtsPatcherData data, int id, FtsObject from, int outlet, FtsObject to, int inlet)
@@ -58,6 +57,8 @@ public class FtsConnection
     if (data != null)
       data.addConnection(this);
   }
+
+  /** Locally redefine a connection */
 
   void redefine(FtsObject from, int outlet, FtsObject to, int inlet)
   {
@@ -100,7 +101,7 @@ public class FtsConnection
   }
 
 
-  /** Undo the connection, only the client part;
+  /** Undo the connection, only the client part.
    *  indirectly called by FTS.
    */
 
@@ -146,6 +147,8 @@ public class FtsConnection
   {
     return inlet;
   }
+
+  /** Get a string debug representation for the connection */
 
   public String  toString()
   {

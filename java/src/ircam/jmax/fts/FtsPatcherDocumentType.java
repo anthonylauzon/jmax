@@ -20,7 +20,7 @@ import java.util.*;
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
 
-/** Class defining the fts patch type (named patch);
+/** Class defining the max Document type "fts patch".
  */
 
 public class FtsPatcherDocumentType extends MaxDocumentType

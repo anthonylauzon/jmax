@@ -19,6 +19,8 @@ import java.lang.*;
 import java.io.*;
 import ircam.jmax.mda.*;
 
+/** Remote meta data class */
+
 class FtsRemoteMetaData extends FtsRemoteData
 {
   // Remote call codes

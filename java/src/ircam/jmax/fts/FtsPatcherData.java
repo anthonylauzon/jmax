@@ -21,19 +21,20 @@ import java.util.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
 
-/** This class represent the content of a patcher.
- *  Geometry ???
+/**
+ * Remote data class representing the content of a patcher.
  *
  * The patcher data content is handled completely in FTS;
  * objects are always created on the fts side and then uploaded,
  * and then added to the container by FTS.
- * To be seen for object creation at the editor level, if we call
- * anyway the patcher listener.
  * At the distruction, objects are taken away from the container
  * by FTS, either all together, or one at a time.
  * 
  * Also for the Paste, objects and connections created in an exported
  * patcher are automatically uploaded.
+ *
+ * Also the geometrical property of a patcher window are handled at this
+ * level; a patcher editor is essentially an editor of an instance of FtsPatcherData.
  */
 
 public class FtsPatcherData extends FtsRemoteData
@@ -67,7 +68,7 @@ public class FtsPatcherData extends FtsRemoteData
   int windowHeight = 0;
   int windowWidth  = 0;
 
-  /**
+  /*
     Patcher content: the edit mode;
     temporary hack, local, not propagated to fts,
     should disappear with the toolbar instead of the mode
@@ -97,20 +98,30 @@ public class FtsPatcherData extends FtsRemoteData
   //  Content Management and Acess
   // 
 
+  /** get the patcher this patcherdata corresponds to */
+
   public final FtsObject getContainerObject()
   {
     return container; 
   }
+
+
+  /** Get all the objects in this patcherdata */
 
   public final MaxVector getObjects()
   {
     return objects;
   }
 
+  /** Get all the connections in this patcherdata */
+
   public final MaxVector getConnections()
   {
     return connections;
   }
+
+  /** Get the document this data belong to.
+    Find it thru the patcher object */
 
   public final MaxDocument getDocument()
   {
@@ -118,10 +129,16 @@ public class FtsPatcherData extends FtsRemoteData
   }
 
 
+  /** get the patcher window x position */
+
   public final int getWindowX()
   {
     return windowX;
   }
+
+  /** set the patcher window x position.
+    Tell the server.
+   */
 
   public final void setWindowX(int value)
   {
@@ -135,11 +152,16 @@ public class FtsPatcherData extends FtsRemoteData
       }
   }
 
+  /** get the patcher window y position */
+
   public final int getWindowY()
   {
     return windowY;
   }
 
+  /** set the patcher window y position.
+    Tell the server.
+   */
   
   public final void setWindowY(int value)
   {
@@ -153,10 +175,18 @@ public class FtsPatcherData extends FtsRemoteData
       }
   }
 
+  /** get the patcher window height */
+
   public final int getWindowHeight()
   {
     return windowHeight;
   }
+
+
+  /** set the patcher window height
+   * Tell the server.
+   */
+
 
   public final void setWindowHeight(int value)
   {
@@ -168,11 +198,16 @@ public class FtsPatcherData extends FtsRemoteData
       }
   }
 
+  /** get the patcher window width */
 
   public final int getWindowWidth()
   {
     return windowWidth;
   }
+
+  /** set the patcher window width
+   * Tell the server.
+   */
 
   public final void setWindowWidth(int value)
   {
@@ -184,10 +219,24 @@ public class FtsPatcherData extends FtsRemoteData
       }
   }
 
+  /** Get the edit mode of this patcher data.
+   * The edit mode is stored in the patcher data 
+   * because we need to know it in order to decide
+   * the initial mode of a new patcher editor.
+   */
+
   public final int getEditMode()
   {
     return editMode;
   }
+
+  /** Get the edit mode of this patcher data,
+   * or, if unknown, the first known edit mode in
+   * its patcher ancestor chain.
+   * The edit mode is stored in the patcher data 
+   * because we need to know it in order to decide
+   * the initial mode of a new patcher editor.
+   */
 
   public final int getRecursiveEditMode()
   {
@@ -204,11 +253,20 @@ public class FtsPatcherData extends FtsRemoteData
       return editMode;
   }
 
+
+  /** Set the edit mode of this patcher data.
+   * The edit mode is stored in the patcher data 
+   * because we need to know it in order to decide
+   * the initial mode of a new patcher editor.
+   */
+
   public final void setEditMode(int value)
   {
     editMode = value;
   }
 
+
+  /** Add an object to this patcher data */
 
   final void addObject(FtsObject obj)
   {
@@ -216,17 +274,23 @@ public class FtsPatcherData extends FtsRemoteData
     fireObjectAdded(obj);
   }
 
+  /** Add a connection to this patcher data */
+
   final void addConnection(FtsConnection c)
   {
     connections.addElement(c);
     fireConnectionAdded(c);
   }
 
+  /** Remove an object to this patcher data */
+
   final void removeObject(FtsObject obj)
   {
     objects.removeElement(obj);
     fireObjectRemoved(obj);
   }
+
+  /** Remove a connection to this patcher data */
 
   final void removeConnection(FtsConnection c)
   {
@@ -247,7 +311,9 @@ public class FtsPatcherData extends FtsRemoteData
   //
 
 
-  /** Close tell FTS that this patcher is  "alive". */
+  /** Tell FTS that this patcher is  "alive". 
+   * Fts will send updates for this patcher.
+   */
 
   public final void startUpdates()
   {
@@ -255,7 +321,9 @@ public class FtsPatcherData extends FtsRemoteData
   }
 
 
-  /** Close tell FTS that this patcher is not "alive". */
+  /** Tell FTS that this patcher is not "alive".
+   * Fts will stop sending updates for this patcher.
+   */
 
   public final void stopUpdates()
   {
@@ -268,10 +336,14 @@ public class FtsPatcherData extends FtsRemoteData
 
   FtsPatcherListener listener;
 
+  /** Set the patcher data listener */
+
   public void setPatcherListener(FtsPatcherListener listener)
   {
     this.listener = listener;
   }
+
+  /** Reset the patcher data listener */
 
   public void resetPatcherListener()
   {
@@ -337,6 +409,8 @@ public class FtsPatcherData extends FtsRemoteData
     connections = null;
     super.release();
   }
+
+  /** Execute remote calls */
 
   public final void call( int key, FtsStream msg)
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException

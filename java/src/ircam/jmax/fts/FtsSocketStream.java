@@ -55,8 +55,8 @@ class FtsSocketStream extends FtsStream
       }    
   }
 
-  // New behaviour: stop the server when close connection: ok, because we
-  // say we are now monoclient .
+
+  /** Close the connection and shutdown the server */
 
   void close()
   {
@@ -71,6 +71,8 @@ class FtsSocketStream extends FtsStream
 	System.out.println("I/O failed on closing the connection to " + host + ":" + port);
       }
   }
+
+  /** Check if the connection is opened */
 
   boolean isOpen()
   {

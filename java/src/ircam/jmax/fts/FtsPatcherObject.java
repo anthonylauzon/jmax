@@ -23,10 +23,7 @@ import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
 
 /**
- * Class implementing the proxy of an FTS object.
- * It deals with: Object creation/deletion, connections
- * object properties, class and instance information,
- * FTS instantiation 
+ * Proxy of an FTS patcher.
  */
 
 public class FtsPatcherObject extends FtsObject
@@ -49,8 +46,7 @@ public class FtsPatcherObject extends FtsObject
 
 
   /**
-   * Special method to redefine a patcher without looosing its content 
-   * To be changed according to the new syntax. !!!!!!
+   * Redefine a patcher without looosing its content.
    */
 
   public void redefinePatcher(String description)

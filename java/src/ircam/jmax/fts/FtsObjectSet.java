@@ -23,8 +23,8 @@ import ircam.jmax.utils.*;
 import ircam.jmax.mda.*;
 
 
-/** This class represent an object set in 
- *  FTS
+/** Object set remote data class.
+ *  
  */
 
 public class FtsObjectSet extends FtsRemoteData
@@ -92,6 +92,11 @@ public class FtsObjectSet extends FtsRemoteData
     model = new ObjectSetListModel();
   }
   
+  /** Overwrite the super class fts.
+    The object set need to be an edit listener, to autmatically
+    delete a deleted object from the set.
+    */
+
   public void setFts(Fts fts)
   {
     super.setFts(fts);
@@ -105,14 +110,15 @@ public class FtsObjectSet extends FtsRemoteData
     fts.removeEditListener(editListener);
     super.release();
   }
-  /** Get the vector size */
+
+  /** get the content of the set as a list model */
 
   public ListModel getListModel()
   {
     return model;
   }
 
-  /* a method inherited from FtsRemoteData */
+  /** execute remote calls */
 
   public final void call( int key, FtsStream stream)
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException

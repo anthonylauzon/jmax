@@ -50,8 +50,19 @@ abstract public class GraphicObject implements DisplayObject
 
     static final int INOUTLET_WIDTH = 5;
     static final int INOUTLET_HEIGHT = 3;
-    static final int HIGHLIGHTED_INOUTLET_HEIGHT = 7;
+
+    static final int HIGHLIGHTED_INOUTLET_HEIGHT = 5;
     static final int HIGHLIGHTED_INOUTLET_WIDTH = 6;
+
+    // The part of the highlight that go inside the 
+    // Rectangle 
+
+    static final int HIGHLIGHTED_INLET_OVERLAP = 4;
+
+    // The part of the highlight that go inside the 
+    // Rectangle 
+
+    static final int HIGHLIGHTED_OUTLET_OVERLAP = 4;
 
     // PAD is the distance between the object border and the 
     // center of the inlet/outlet; CHANGE the Connection geometry
@@ -340,14 +351,19 @@ abstract public class GraphicObject implements DisplayObject
 	  {
 	    w = ObjectGeometry.HIGHLIGHTED_INOUTLET_WIDTH;
 	    h = ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT;
+
+	    g.fillRect( x - w / 2,
+			y - h + ObjectGeometry.HIGHLIGHTED_INLET_OVERLAP + ObjectGeometry.INLET_OFFSET, w, h);
 	  }
 	else
 	  {
 	    w = ObjectGeometry.INOUTLET_WIDTH;
 	    h = ObjectGeometry.INOUTLET_HEIGHT;
+
+	    g.fillRect( x - w / 2, y - h + ObjectGeometry.INLET_OVERLAP + ObjectGeometry.INLET_OFFSET, w, h);
 	  }
 	
-	g.fillRect( x - w / 2, y - h + ObjectGeometry.INLET_OVERLAP + ObjectGeometry.INLET_OFFSET, w, h);
+
       }
   }
 
@@ -366,14 +382,17 @@ abstract public class GraphicObject implements DisplayObject
 	  {
 	    w = ObjectGeometry.HIGHLIGHTED_INOUTLET_WIDTH;
 	    h = ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT;
+
+	    g.fillRect( x - w / 2,
+			y - ObjectGeometry.HIGHLIGHTED_OUTLET_OVERLAP - ObjectGeometry.OUTLET_OFFSET, w, h);
 	  }
 	else
 	  {
 	    w = ObjectGeometry.INOUTLET_WIDTH;
 	    h = ObjectGeometry.INOUTLET_HEIGHT;
+
+	    g.fillRect( x - w / 2, y - ObjectGeometry.OUTLET_OVERLAP - ObjectGeometry.OUTLET_OFFSET, w, h);
 	  }
-	
-	g.fillRect( x - w / 2, y - ObjectGeometry.OUTLET_OVERLAP - ObjectGeometry.OUTLET_OFFSET, w, h);
       }
   }
 
@@ -515,7 +534,7 @@ abstract public class GraphicObject implements DisplayObject
     else
       horizontalOutletSensibility = Math.min(ObjectGeometry.INOUTLET_MAX_SENSIBLE_AREA, outletDistance / 2);
 
-    verticalInOutletSensibility = Math.min(ObjectGeometry.INOUTLET_MAX_SENSIBLE_AREA, h / 4);
+    verticalInOutletSensibility = Math.min(ObjectGeometry.INOUTLET_MAX_SENSIBLE_AREA, h / 3);
 
     if (followingInOutletLocations)
       {

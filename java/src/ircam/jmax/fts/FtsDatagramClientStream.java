@@ -19,10 +19,9 @@ import java.io.*;
 import java.net.*;
 
 /**
- * The datagram socket connection.
- * Implement a specialed connection using a datagram socket 
- * for communicating with FTS; start FTS thru a rsh command,
- * so it will work only on unix machines and the like.
+ * The datagram client socket connection.
+ * Implement a specialized connection using a datagram socket 
+ * for communicating with FTS; require the server to be started by hand.
  */
 
 
@@ -43,6 +42,15 @@ class FtsDatagramClientStream extends FtsStream
   String path;
   String ftsName;
   int port;
+
+  /** Instantiate the connection.
+   * Actually, the fts server must be started by hand, and the good port passed
+   * as argument; this constructor establish the communication.
+   * This stream is usefull to start fts in a debugger; in that case,
+   * the fts command line must be "fts udp <hostname>:<port>".
+   * Where hostname is the name of the host where the client is running,
+   * and port is the port passed as argument to this constructor.
+   */
 
   FtsDatagramClientStream(String host, String path, String ftsName, int port)
   {
@@ -84,6 +92,9 @@ class FtsDatagramClientStream extends FtsStream
       }    
   }
 
+
+  /** Close the connection. Do not shutdown the server by itself. */
+
   void close()
   {
     socket.close();
@@ -91,14 +102,17 @@ class FtsDatagramClientStream extends FtsStream
     out_packet = null;
   }
 
+
+  /** Tell if the connection is open. */
+
   boolean isOpen()
   {
     return (socket != null);
   }
 
 
-  /** Method to send a char; since we can use datagram sockets or other
-    means I/O is not necessarly done thru streams */
+  /** Send a char. Since we can use datagram sockets I/O
+    is not done thru Java streams */
 
   protected void write(int data) throws java.io.IOException
   {
@@ -108,8 +122,9 @@ class FtsDatagramClientStream extends FtsStream
       flush();
   }
 
-  /** Method to receive a char; since we can use datagram sockets or other
-    means I/O is not necessarly done thru streams */
+
+  /** Receive a char. Since we can use datagram sockets I/O
+    is not done thru Java streams */
 
   protected int read() throws java.io.IOException
   {
@@ -148,9 +163,9 @@ class FtsDatagramClientStream extends FtsStream
     return c;
   }
 
-  /** Method to Ask for an explicit output flush ; since we
-    can use datagram sockets or other means I/O is not necessarly done
-    thru streams */
+  /** Ask for an explicit output flush. Since we can use datagram
+    sockets or other means I/O is not necessarly done thru streams
+    */
 
   void flush() throws java.io.IOException
   {

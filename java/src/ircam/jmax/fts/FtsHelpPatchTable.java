@@ -23,6 +23,7 @@ import ircam.jmax.mda.*;
 /**
  * This class provide a registration service for help Patches.
  * The class is filled thru the TCL Command <b>helpPatch</b>.
+ * Note that there is a single help patch data base for all the servers.
  *
  * @see FtsHelpPatchCmd
  */
@@ -33,35 +34,50 @@ public class FtsHelpPatchTable
   static Hashtable helpTable = new Hashtable(256, 0.99f);
   static Hashtable helpSummaryTable = new Hashtable();
 
+  /** Add an help patch for an fts object class */
+
   static public void add(String className, String patch)
   {
     helpTable.put(className, patch);
   }
+
+  /** Add an help summary patch */
 
   static public void addSummary(String name, String patch)
   {
     helpSummaryTable.put(name, patch);
   }
 
+  /** Check if the help patch for a given fts object class exists */
+
   static public boolean exists(String className)
   {
     return helpTable.containsKey(className);
   }
+
+  /** Check if a named help patch summary exists */
 
   static public boolean summaryExists(String name)
   {
     return helpSummaryTable.containsKey(name);
   }
 
+  /** Get the help patch filename for a given fts object class exists */
+
   static String getHelpPatch(String className)
   {
     return (String) helpTable.get(className);
   }
 
+
+  /** Get a named help patch summary filename */
+
   static String getHelpSummaryPatch(String className)
   {
     return (String) helpSummaryTable.get(className);
   }
+
+  /** Open an help patch for a given fts object */
 
   static public boolean openHelpPatch(FtsObject obj)
   {
@@ -86,6 +102,9 @@ public class FtsHelpPatchTable
       return false;
   }
 
+
+  /** Open an help summary patch */
+
   static public boolean openHelpSummary(MaxContext context, String name)
   {
     if (summaryExists(name))
@@ -108,6 +127,8 @@ public class FtsHelpPatchTable
     else
       return false;
   }
+
+  /** Get an enumeration of the available summaries */
 
   static public Enumeration getSummaries()
   {

@@ -205,6 +205,70 @@ public class DisplayList
 	}
   }
 
+  public void deleteConnectionsForOutlet(GraphicObject obj, int pos)
+  {
+    MaxVector toDelete = new MaxVector();
+    Object[] values;
+    int size;
+
+    values = displayObjects.getObjectArray();
+    size = displayObjects.size();
+
+    for ( int i = 0; i < size; i++)
+      if (values[i] instanceof GraphicConnection)
+	{
+	  GraphicConnection connection = (GraphicConnection) values[i];
+
+	  if ((connection.getSourceObject() == obj) &&
+	      (connection.getOutlet() == pos))
+	    toDelete.addElement(connection);
+	}
+
+    values = toDelete.getObjectArray();
+    size = toDelete.size();
+
+    for ( int i = 0; i < size; i++)
+      if (values[i] instanceof GraphicConnection)
+	{
+	  GraphicConnection connection = (GraphicConnection) values[i];
+
+	  connection.redraw();
+	  connection.delete();
+	}
+  }
+
+  public void deleteConnectionsForInlet(GraphicObject obj, int pos)
+  {
+    MaxVector toDelete = new MaxVector();
+    Object[] values;
+    int size;
+
+    values = displayObjects.getObjectArray();
+    size = displayObjects.size();
+
+    for ( int i = 0; i < size; i++)
+      if (values[i] instanceof GraphicConnection)
+	{
+	  GraphicConnection connection = (GraphicConnection) values[i];
+
+	  if ((connection.getDestObject() == obj) &&
+	      (connection.getInlet() == pos))
+	    toDelete.addElement(connection);
+	}
+
+    values = toDelete.getObjectArray();
+    size = toDelete.size();
+
+    for ( int i = 0; i < size; i++)
+      if (values[i] instanceof GraphicConnection)
+	{
+	  GraphicConnection connection = (GraphicConnection) values[i];
+
+	  connection.redraw();
+	  connection.delete();
+	}
+  }
+
   // Generic operation on objects in the display List
 
   public void applyToConnections(ConnectionAction action)

@@ -20,11 +20,12 @@ import ircam.jmax.mda.*;
 /**
  * A specialized listener that is called when 
  * a new data value is available for an object
- * New  Data Listener are installed and remove globally
- * in the Fts class.
+ * New  Data Listener are installed and remove locally 
+ * in the Fts class; these listeners are private to the fts
+ * package
  */
 
-public interface FtsNewDataListener
+interface FtsNewDataListener
 {
   public void newDataFor(FtsObject obj, MaxData data);
 }

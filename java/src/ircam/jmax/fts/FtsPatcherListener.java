@@ -17,9 +17,7 @@
 package ircam.jmax.fts;
 
 /** This interface define a listener of the changes
-  inside a patcher; for now, only edit changes are reported.
-  In the short future, this class will completely substitute
-  properties watchers.
+  inside a patcher. It is installed on a FtsPatcherData instance
   */
 
 public interface FtsPatcherListener

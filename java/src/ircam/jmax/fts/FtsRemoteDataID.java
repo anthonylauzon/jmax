@@ -13,11 +13,13 @@
 // for DISCLAIMER OF WARRANTY.
 // 
 //
+
 package ircam.jmax.fts;
 
 import java.lang.*;
 import java.util.*;
 
+/** Remote class id table */
 
 class FtsRemoteDataID
 {

@@ -13,6 +13,7 @@
 // for DISCLAIMER OF WARRANTY.
 // 
 //
+
 package ircam.jmax.fts;
 
 import java.lang.*;
@@ -20,6 +21,10 @@ import java.util.*;
 
 import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
+
+/**
+ * Remote data generic class.
+ */
 
 public abstract class FtsRemoteData implements MaxData
 {

@@ -13,6 +13,7 @@
 // for DISCLAIMER OF WARRANTY.
 // 
 //
+
 package ircam.jmax.fts;
 
 import java.io.*;
@@ -21,10 +22,7 @@ import java.util.*;
 import ircam.jmax.*;
 
 /**
- * Class implementing the proxy of an FTS object.
- * It deals with: Object creation/deletion, connections
- * object properties, class and instance information,
- * FTS instantiation 
+ * SuperClass for proxies of an Inlet or Outlet FTS object.
  */
 
 public class FtsInOutletObject  extends FtsObject
@@ -48,6 +46,11 @@ public class FtsInOutletObject  extends FtsObject
     this.position = position;
   }
 
+  /** Se the position of the inlet/outlet.
+   * Do nothing on fts here; it is the responsability
+   * of the subclass
+   */
+
   public void setPosition(int i)
   {
     position = i;
@@ -55,6 +58,8 @@ public class FtsInOutletObject  extends FtsObject
 
     setDirty();
   }
+
+  /** Get the position of the inlet/outlet. */
 
   public int getPosition()
   {

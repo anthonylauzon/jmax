@@ -21,10 +21,7 @@ import java.util.*;
 import ircam.jmax.*;
 
 /**
- * Class implementing the proxy of an FTS object.
- * It deals with: Object creation/deletion, connections
- * object properties, class and instance information,
- * FTS instantiation 
+ * Proxy of an Inlet FTS object.
  */
 
 public class FtsInletObject  extends FtsInOutletObject
@@ -48,6 +45,8 @@ public class FtsInletObject  extends FtsInOutletObject
   }
 
 
+  /** Set the position. Tell the server about the new position */
+
   public void setPosition(int i)
   {
     super.setPosition(i);
@@ -55,7 +54,7 @@ public class FtsInletObject  extends FtsInOutletObject
     fts.getServer().repositionInletObject(this, i);
   }
 
-  /** Get the number of inlets of the object 
+  /** Get the number of inlets of the object.
     Overwrite the FtsObject method because inlets
     do not believe to FTS, when it say inlets have
     inlets.

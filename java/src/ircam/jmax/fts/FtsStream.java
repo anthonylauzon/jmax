@@ -91,15 +91,21 @@ abstract public class FtsStream
     send partial data and complete messages.
     */
 
+  /** Send the command code of a message */
+    
   final void sendCmd(int command) throws java.io.IOException 
   {
     write(command);
   }
 
+  /** Send an Int passes as an Integer */
+
   final void sendInt(Integer io) throws java.io.IOException 
   {
     sendInt(io.intValue());
   }
+
+  /** Send an Int passes as an int*/
 
   final void sendInt(int value) throws java.io.IOException 
   {
@@ -112,7 +118,7 @@ abstract public class FtsStream
       write(s.charAt(i));
   }
 
-  /** Send an Int passed got as a string */
+  /** Send an Int passes as a string */
 
   final void sendInt(String s) throws java.io.IOException 
   {
@@ -123,7 +129,7 @@ abstract public class FtsStream
   }
  
 
-  /** Send an Int passed got as a String Buffer */
+  /** Send an Int passed  as a String Buffer */
 
   final void sendInt(StringBuffer s) throws java.io.IOException 
   {
@@ -132,7 +138,9 @@ abstract public class FtsStream
     for (int i = 0; i < s.length(); i++)
       write(s.charAt(i));
   }
- 
+
+
+  /** Send a Float passed as a Float */
 
   final void sendFloat(Float fo) throws java.io.IOException 
   {
@@ -144,6 +152,9 @@ abstract public class FtsStream
     for (int i = 0; i < s.length(); i++)
       write(s.charAt(i));
   }
+
+
+  /** Send a Float passed as a float */
 
   final void sendFloat(float value) throws java.io.IOException 
   {
@@ -177,6 +188,7 @@ abstract public class FtsStream
   }
 
 
+  /** Send a string, passed as a String */
 
   final void sendString(String s) throws java.io.IOException 
   {
@@ -188,6 +200,9 @@ abstract public class FtsStream
     write(FtsClientProtocol.string_end);
   }
 
+
+  /** Send a string, passed as a StringBuffer */
+
   final void sendString(StringBuffer s) throws java.io.IOException 
   {
     write(FtsClientProtocol.string_start);
@@ -198,6 +213,9 @@ abstract public class FtsStream
     write(FtsClientProtocol.string_end);
   }
   
+
+  /** Send an Object id */
+
   final void sendObject(FtsObject obj) throws java.io.IOException 
   {
     int value;
@@ -216,6 +234,8 @@ abstract public class FtsStream
   }
 
 
+  /** Send an Object id */
+
   final void sendObject(int id) throws java.io.IOException 
   {
     int value;
@@ -230,6 +250,8 @@ abstract public class FtsStream
       write(s.charAt(i));
   }
 
+
+  /** Send a Connection id */
 
   final void sendConnection(FtsConnection connection) throws java.io.IOException 
   {
@@ -248,6 +270,7 @@ abstract public class FtsStream
       write(s.charAt(i));
   }
 
+  /** Send a Connection id */
 
   final void sendConnection(int id) throws java.io.IOException 
   {
@@ -262,6 +285,9 @@ abstract public class FtsStream
     for (int i = 0; i < s.length(); i++)
       write(s.charAt(i));
   }
+
+
+  /** Send a remote data id */
 
   final void sendRemoteData( FtsRemoteData data) throws java.io.IOException 
   {
@@ -280,6 +306,7 @@ abstract public class FtsStream
       write(s.charAt(i));
   }
 
+  /** Send a value */
 
   final void sendValue(Object o) throws java.io.IOException 
   {
@@ -310,6 +337,8 @@ abstract public class FtsStream
   }
   
 
+  /** Send multiple values */
+
   final void sendVector(MaxVector args) throws java.io.IOException 
   {
     for (int narg = 0; narg < args.size(); narg++)
@@ -320,6 +349,9 @@ abstract public class FtsStream
 	  sendValue(o);
       }
   }
+
+
+  /** Send multiple values */
 
   final void sendArray(Object[] args) throws java.io.IOException 
   {
@@ -332,6 +364,7 @@ abstract public class FtsStream
       }
   }
 
+  /** Send multiple int values */
 
   final void sendArray(int[] values, int from , int howMany) throws java.io.IOException 
   {
@@ -339,12 +372,15 @@ abstract public class FtsStream
       sendInt(values[from + i]);
   }
 
+  /** Send multiple float values */
+
   final void sendArray(float[] values, int from, int howMany) throws java.io.IOException 
   {
     for (int i = 0; i < howMany; i++)
       sendFloat(values[from + i]);
   }
 
+  /** Send the end of message mark */
 
   final void sendEom() throws java.io.IOException 
   {
@@ -402,21 +438,29 @@ abstract public class FtsStream
   }
 
 
+  /** Check if there are more arguments in the current message */
+
   public final boolean endOfArguments()
   {
     return status == FtsClientProtocol.end_of_message;
   }
 
-  
+  /** Check if the next arguments in the current message  is an int */
+
   public final boolean nextIsInt()
   {
     return status == FtsClientProtocol.int_type;
   }
 
+  /** Check if the next arguments in the current message  is a float */
+
   public final boolean nextIsFloat()
   {
     return status == FtsClientProtocol.float_type;
   }
+
+
+  /** Check if the next arguments in the current message  is a symbol */
 
   public final boolean nextIsSymbol()
   {
@@ -425,6 +469,9 @@ abstract public class FtsStream
 	    (status == FtsClientProtocol.symbol_and_def_type));
   }
 
+
+  /** Check if the next arguments in the current message  is a string */
+
   public final boolean nextIsString()
   {
     return ((status == FtsClientProtocol.symbol_type) ||
@@ -432,21 +479,30 @@ abstract public class FtsStream
 	    (status == FtsClientProtocol.string_start));
   }
 
+  /** Check if the next arguments in the current message  is an object */
+
   public final boolean nextIsObject()
   {
     return status == FtsClientProtocol.object_type;
   }
+
+  /** Check if the next arguments in the current message  is a connection  */
 
   public final boolean nextIsConnection()
   {
     return status == FtsClientProtocol.connection_type;
   }
 
+
+  /** Check if the next arguments in the current message  is a remote data   */
+
   public final boolean nextIsData()
   {
     return status == FtsClientProtocol.data_type;
   }
 
+
+  /** Get the command code of the next message */
 
   public final int getCommand()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
@@ -463,6 +519,10 @@ abstract public class FtsStream
   }
 
 
+  /** Get the next argument of the current message as an int.
+     The caller is responsable to check that the next argument
+     have the good type before calling this method */
+
   public final int getNextIntArgument()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
@@ -478,6 +538,10 @@ abstract public class FtsStream
     return r;
   }
 
+  /** Get the next argument of the current message as a float.
+     The caller is responsable to check that the next argument
+     have the good type before calling this method */
+
   public final float getNextFloatArgument()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
@@ -492,6 +556,10 @@ abstract public class FtsStream
     return Float.intBitsToFloat(r);
   }
 
+  /** Get the next argument of the current message as an fts object.
+     The caller is responsable to check that the next argument
+     have the good type before calling this method */
+
   public final FtsObject getNextObjectArgument()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
@@ -499,12 +567,19 @@ abstract public class FtsStream
   }
 
 
+  /** Get the next argument of the current message as an fts connection
+     The caller is responsable to check that the next argument
+     have the good type before calling this method */
+
   public final FtsConnection getNextConnectionArgument()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     return server.getConnectionByFtsId(getNextIntArgument());
   }
 
+  /** Get the next argument of the current message as a remote data
+     The caller is responsable to check that the next argument
+     have the good type before calling this method */
 
   public final FtsRemoteData getNextDataArgument()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
@@ -512,10 +587,6 @@ abstract public class FtsStream
     return server.getRemoteTable().get(getNextIntArgument());
   }
 
-
-  /* a symbol is an interned string, send by fts using the symbol cache;
-     strings are generally not sent as symbol, unless we want the interned/cached
-     version */
 
   private final String getNextString()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
@@ -545,6 +616,12 @@ abstract public class FtsStream
     return str;    
   }
 
+  /** Get the next argument of the current message as a symbol
+     The caller is responsable to check that the next argument
+     have the good type before calling this method.
+     A symbol is an interned string, send by fts using the symbol cache;
+     strings are generally not sent as symbol, unless we want the interned/cached
+     version */
 
   public final String getNextSymbolArgument()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
@@ -575,6 +652,12 @@ abstract public class FtsStream
       return "";
   }
 
+
+  /** Get the next argument of the current message as a string
+     The caller is responsable to check that the next argument
+     have the good type before calling this method.
+     */
+
   public final String getNextStringArgument()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
@@ -584,6 +667,11 @@ abstract public class FtsStream
       return getNextString();
   }
 
+
+  /** Get the next argument of the current message.
+    Call this method when you don't have expect a specific type;
+    less efficent for basic type because it needs to allocate Integer and Float objects.
+   */
 
   public final Object getNextArgument()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
