@@ -49,7 +49,8 @@ public class FtsSelection extends FtsAbstractContainerObject
     removeObjectFromContainer(obj);
   }
 
-  /** Add an connection to this container. */
+  /** Add an connection to this selection.
+   */
 
   final public void addConnection(FtsConnection obj)
   {
@@ -68,8 +69,8 @@ public class FtsSelection extends FtsAbstractContainerObject
 
   final public void clean()
   {
-    objects.setSize(0);
-    connections.setSize(0);
+    objects.removeAllElements();
+    connections.removeAllElements();
   }
 
   /** This object is not persistent */
@@ -78,6 +79,7 @@ public class FtsSelection extends FtsAbstractContainerObject
   {
     return true;
   }
+
 
   /** Since this object is not persistent, this function is
     not called to save it as a part of a .tpa file, 
@@ -90,9 +92,6 @@ public class FtsSelection extends FtsAbstractContainerObject
     //
     // First, store the declarations; declaration don't have
     // connections, so we don't store them in variables.
-
-    if (writer instanceof IndentedPrintWriter)
-      ((IndentedPrintWriter)writer).indentMore();
 
     for (int i = 0; i < objects.size(); i++)
       {
@@ -122,17 +121,18 @@ public class FtsSelection extends FtsAbstractContainerObject
       }
 
     // Then, store the connections
+    // Connections are only stored if both ends are in the selection !
 
     for (int i = 0; i < connections.size(); i++)
       {
 	FtsConnection c   =  (FtsConnection) connections.elementAt(i);
-	
-	c.saveAsTcl(writer);
-	writer.println();
-      }
 
-    if (writer instanceof IndentedPrintWriter)
-      ((IndentedPrintWriter)writer).indentLess();
+	if (objects.contains(c.to) && objects.contains(c.from))
+	  {
+	    c.saveAsTcl(writer);
+	    writer.println();
+	  }
+      }
   }
 }
 

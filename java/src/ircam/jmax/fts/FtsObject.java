@@ -226,18 +226,23 @@ abstract public class FtsObject implements MaxTclInterpreter
 	if (name.equals(this.name))
 	  handler.propertyChanged(FtsObject.this, name, value);
       }
-
-      public void removeHandler(FtsPropertyHandler handler)
-      {
-	if (this.handler == handler)
-	  table.removeElement(this);
-      }
     }
 
     public void removeWatch(FtsPropertyHandler handler)
     {
       for (int i = 0; i < table.size(); i++)
-	((PropertyHandlerEntry) table.elementAt(i)).removeHandler(handler);
+	{
+	  PropertyHandlerEntry ph = (PropertyHandlerEntry) table.elementAt(i);
+
+	  // Shitty code; actually, the handler table should 
+	  // not be a vector ... may be a linked list
+
+	  if (ph.handler == handler)
+	    {
+	      table.removeElement(ph);
+	      i--; // to compensate for the shift in the vector
+	    }
+	}
     }
 
     public void watch(String property, FtsPropertyHandler handler)
@@ -790,7 +795,8 @@ abstract public class FtsObject implements MaxTclInterpreter
   public void removeMessageHandler(FtsMessageHandler handler)
   {
     if (messageTable != null)
-      messageTable.removeElement(handler);
+      while (messageTable.removeElement(handler))
+	;
   }
 
 

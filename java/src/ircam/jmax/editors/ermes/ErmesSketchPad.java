@@ -8,7 +8,7 @@ import java.util.*;
 import java.lang.*;
 import java.io.*;
 
-import ircam.jmax.*;//this is going to desappear
+import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
@@ -758,7 +758,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 
   // note: the following function is a reduced version of InitFromFtsContainer.
   // better organization urges
-  void PasteObjects(Vector objectVector) {
+  void PasteObjects(Vector objectVector, Vector connectionVector) {
     FtsObject	fo;
     FtsConnection fc;
     ErmesObject aObject;
@@ -776,6 +776,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       
       Class objectClass = itsHelper.SearchFtsName(fo.getClassName());
       if (objectClass==null) continue;
+
       objectX = ((Integer)fo.get("pos.x")).intValue();
       objectY = ((Integer)fo.get("pos.y")).intValue();
       fo.put("pos.x", objectX+10);//offset by 10      
@@ -788,6 +789,20 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       
       if (aObject != null) fo.setRepresentation(aObject);
     }
+
+    // chiama tanti AddConnection...
+
+    ErmesObject fromObj, toObj;
+    
+    for (Enumeration e2 = connectionVector.elements(); e2.hasMoreElements();) {
+      fc = (FtsConnection)e2.nextElement();
+
+      fromObj = (ErmesObject) fc.getFrom().getRepresentation();
+      toObj = (ErmesObject) fc.getTo().getRepresentation();
+      itsHelper.AddConnection(fromObj, toObj, fc.getFromOutlet(), fc.getToInlet(), fc);
+    }
+
+      System.err.println("Paste end ");
   }
   
   
@@ -938,9 +953,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     nameTable.put("slider", ircam.jmax.editors.ermes.ErmesObjSlider.class);
     nameTable.put("inlet", ircam.jmax.editors.ermes.ErmesObjIn.class);
     nameTable.put("outlet", ircam.jmax.editors.ermes.ErmesObjOut.class);
-    // At the moment, if we put patchers in the green box, we cannot edit them ??
-    nameTable.put("patcher", ircam.jmax.editors.ermes.ErmesObjExternal.class);
-    // nameTable.put("patcher", ircam.jmax.editors.ermes.ErmesObjPatcher.class);
+    // nameTable.put("patcher", ircam.jmax.editors.ermes.ErmesObjExternal.class);
+    nameTable.put("patcher", ircam.jmax.editors.ermes.ErmesObjPatcher.class);
   }
 	
   static public void RequestOffScreen(ErmesSketchPad theSketchPad) {

@@ -27,7 +27,7 @@ public class ErmesClipboardProvider implements Transferable, ClipboardOwner {
   StringWriter itsStringWriter = new StringWriter();
   Vector itsFtsGroup = new Vector();
   static String itsStoredText;
-  FtsSelection itsSelection;
+
   /**
    * Simple constructor.
    * Provides tcl script format, text format, ftsObject vector format.
@@ -44,12 +44,12 @@ public class ErmesClipboardProvider implements Transferable, ClipboardOwner {
    */
   void addSelection(FtsSelection theSelection) {
     flushContent();
-    itsSelection = theSelection;
+
      try 
       {
 	//PrintWriter aPrintWriter = new PrintWriter(itsStringWriter);
 	IndentedPrintWriter pw = new IndentedPrintWriter(itsStringWriter); 
-	itsSelection.saveAsTcl(pw);
+	theSelection.saveAsTcl(pw);
       }
     catch (Exception e)
       {
@@ -57,33 +57,6 @@ public class ErmesClipboardProvider implements Transferable, ClipboardOwner {
 	e.printStackTrace(); // temporary
       }   
   }
-
-  /**
-   * Fill the clipboard starting from a list of graphic objects (ErmesObjects)
-   */
-  void addGraphicObjects(Vector theSelectedList) {
-    // actually call, for now,  the objects' saveAsTcl method.
-    flushContent();
-
-    try 
-      {
-	//PrintWriter aPrintWriter = new PrintWriter(itsStringWriter);
-	IndentedPrintWriter pw = new IndentedPrintWriter(itsStringWriter/*aPrintWriter*/); 
-	FtsSelection selection = FtsServer.getServer().getRootObject().getSelection();
-
-	for(Enumeration e = theSelectedList.elements(); e.hasMoreElements();)
-	  selection.addObject(((ErmesObject) e.nextElement()).itsFtsObject);
-
-	selection.saveAsTcl(pw);
-	selection.clean();
-      }
-    catch (Exception e)
-      {
-	System.out.println("ERROR " + e + " while saving ");
-	e.printStackTrace(); // temporary
-      }
-  }
-
 
   /**
    * Fill the clipboard starting from a list of fts objects (ErmesObjects)

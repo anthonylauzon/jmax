@@ -24,7 +24,7 @@ public class ErmesConnection {
   Point itsStartPoint, itsEndPoint;
   ErmesSketchPad itsSketchPad;
   ErmesConnectionSet itsConnectionSet;
-  public FtsConnection itsFtsConnection;
+  FtsConnection itsFtsConnection;
   ErmesObject	itsFromObject;
   ErmesObject	 itsToObject;
   boolean itsErrorState;

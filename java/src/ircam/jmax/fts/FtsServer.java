@@ -37,7 +37,8 @@ public class FtsServer
       theServer = new FtsSocketClientServer(server);
     else if (mode.equals("local"))
       theServer = new FtsSubProcessServer();
-    else System.out.println("unknown FTS connection type "+mode+": can't connect to FTS");
+    else
+      System.out.println("unknown FTS connection type "+mode+": can't connect to FTS");
     theServer.setParameter("ftsdir", theFtsdir);
     theServer.setParameter("ftsname", theFtsname);
     theServer.start();

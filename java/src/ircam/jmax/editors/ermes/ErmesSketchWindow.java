@@ -27,12 +27,15 @@ import com.sun.java.swing.*;
 public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPropertyHandler {
 
   public void propertyChanged(FtsObject object, String name, Object value) {
-    if (name.equals("newObject") || name.equals("newContainer"))
+    if (name.equals("newObject"))
       ftsObjectsPasted.addElement(value);
+    else if (name.equals("newConnection"))
+      ftsConnectionsPasted.addElement(value);
   }
 
   FtsSelection itsSelection;
   Vector ftsObjectsPasted = new Vector();
+  Vector ftsConnectionsPasted = new Vector();
   public static ErmesClipboardProvider itsClipboardProvider = new ErmesClipboardProvider();
   public boolean inAnApplet = false;
   public boolean isSubPatcher = false;
@@ -142,10 +145,20 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   }
   /**
    * constructor from a MaxData AND a ftsContainer AND a father window (subpatchers editors)
+   * added better window titles for patchers.
    */
+
+  static String chooseWindowName(FtsContainerObject theFtsPatcher)
+  {
+    if (theFtsPatcher instanceof FtsPatcherObject)
+      return "patcher " + theFtsPatcher.getObjectName();
+    else
+      return theFtsPatcher.getClassName();
+  }
+
   public ErmesSketchWindow (MaxData theData, FtsContainerObject theFtsPatcher, ErmesSketchWindow theTopWindow) {
     //super(theData.getName());
-    super(MaxApplication.GetWholeWinName(theFtsPatcher.getClassName()));
+    super(MaxApplication.GetWholeWinName(chooseWindowName(theFtsPatcher)));
     itsPatcher = theFtsPatcher;
     itsData = theData;
     CommonInitializations();
@@ -337,13 +350,19 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     CreateFtsGraphics(this);
     itsSelection.clean();
     //fill the Fts selection
-    ErmesObject aObj;
+
     for (Enumeration e = itsSketchPad.itsSelectedList.elements(); e.hasMoreElements();) {
-      aObj = (ErmesObject)e.nextElement();
+      ErmesObject aObj = (ErmesObject)e.nextElement();
       itsSelection.addObject(aObj.itsFtsObject);
     }
+
+    for (Enumeration e = itsSketchPad.itsSelectedConnections.elements(); e.hasMoreElements();) {
+      ErmesConnection aConnection = (ErmesConnection)e.nextElement();
+      itsSelection.addConnection(aConnection.itsFtsConnection);
+    }
+
     itsClipboardProvider.addSelection(itsSelection);
-    //itsClipboardProvider.addGraphicObjects(itsSketchPad.itsSelectedList);
+
     MaxApplication.systemClipboard.setContents(itsClipboardProvider, itsClipboardProvider);
     return true;
   }
@@ -364,9 +383,11 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     }
 
     ftsObjectsPasted.removeAllElements();
+    ftsConnectionsPasted.removeAllElements();
     //evaluate the script
     itsPatcher.watch("newObject", this);
-    //    itsPatcher.watch("newContainer", this);
+    itsPatcher.watch("newConnection", this);
+
     try {
       itsPatcher.eval(MaxApplication.getTclInterp(), tclScriptToExecute);
     } catch (TclException e) {
@@ -374,10 +395,12 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     }
     
     //ftsObjectPasted vector contains the needed new, pasted objects
+    //ftsConnectionPasted vector contains the needed new, pasted objects
+
     itsPatcher.removeWatch(this);    
-    //itsPatcher.removeWatch(this);
+
     // make the sketch do the graphic job
-    itsSketchPad.PasteObjects(ftsObjectsPasted);
+    itsSketchPad.PasteObjects(ftsObjectsPasted, ftsConnectionsPasted);
     ErmesSketchPad.RequestOffScreen(itsSketchPad);
     itsSketchPad.repaint();
     return true;

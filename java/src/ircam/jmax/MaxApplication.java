@@ -453,9 +453,7 @@ public class MaxApplication extends Object {
     ErmesSketchWindow aSketchWindow;
     int number = 0;
     String aName;
-    System.out.println("itsSketchWindowList.size() = "+itsSketchWindowList.size());
     for(Enumeration e=itsSketchWindowList.elements(); e.hasMoreElements();){
-      System.out.println("number = "+number);
       aSketchWindow = (ErmesSketchWindow)e.nextElement();
       if(theName.equals(aSketchWindow.itsPatcher.getClassName())) number++;
     }

@@ -930,11 +930,12 @@ class ErmesSketchHelper extends Object{
   //--------------------------------------------------------
   public Class SearchFtsName(String theName)
   {
-    if (itsSketchPad.nameTable.containsKey(theName))
+    if (theName.equals("selection"))
+      return null;
+    else if (itsSketchPad.nameTable.containsKey(theName))
       return (Class) itsSketchPad.nameTable.get(theName);
     else {
-      return null;
-      //      return ircam.jmax.editors.ermes.ErmesObjExternal.class;
+      return ircam.jmax.editors.ermes.ErmesObjExternal.class;
     }
   }
   

@@ -121,6 +121,11 @@ public class FtsConnection
 
     return true;
   }
+
+  public String  toString()
+  {
+    return "FtsConnection(" + from + "," + outlet + "," + to + "," + inlet + ")";
+  }
 }
 
 
