@@ -39,6 +39,7 @@ public class FileMenu extends DefaultFileMenu
 {
   public FileMenu()
   {
+    super();
     insert(Actions.importAction, "Import", 3);
     setEnabled( false, 4);
     setEnabled( false, 5);

@@ -390,7 +390,11 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   public void endTrackUpload( TrackDataModel track) 
   {
     uploading = false;
-    deselectAll();
+    SwingUtilities.invokeLater( new Runnable(){
+      public void run(){
+        deselectAll();
+      }
+    });
   }
   public void startPaste() 
   {

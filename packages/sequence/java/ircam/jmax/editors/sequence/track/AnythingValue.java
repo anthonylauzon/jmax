@@ -85,31 +85,10 @@ public class AnythingValue extends AbstractEventValue
     {
       return new AnythingValue();
     }
-
-    /*public Enumeration getPropertyNames()
-     {
-     return new ArrayEnumeration(defNamesArray);
-     }
-     public int getPropertyCount()
-     {
-     return defPropertyCount;
-     }*/
-
     public DataFlavor getDataFlavor()
     {
       return null;
     }
-
-    /*public Class getPropertyType(int index)
-      {
-      if(index==0)
-      return String.class;
-      else
-      return Integer.class;
-      }
- 
-      String defNamesArray[] = {"type"};
-      int defPropertyCount = 1;*/
   }
 
   public JPopupMenu getPopupMenu()
@@ -143,10 +122,6 @@ public class AnythingValue extends AbstractEventValue
     path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;  
     ANYTHING_ICON = new ImageIcon(path+"anything.gif");
   }
-
-  /*static String nameArray[] = {"type"};
-    static int propertyTypes[] = {STRING_TYPE};
-    static int propertyCount = 1;*/
 }
 
 

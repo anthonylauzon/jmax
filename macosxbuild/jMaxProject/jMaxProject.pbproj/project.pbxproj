@@ -2498,6 +2498,54 @@
 			settings = {
 			};
 		};
+		F7DA5E61052DDD6301664058 = {
+			isa = PBXFileReference;
+			name = MoveTrackToAction.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/actions/MoveTrackToAction.java;
+			refType = 2;
+		};
+		F7DA5E62052DDD6301664058 = {
+			fileRef = F7DA5E61052DDD6301664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F7DA5E63052DDD8A01664058 = {
+			isa = PBXFileReference;
+			name = TrackBaseEditor.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/TrackBaseEditor.java;
+			refType = 2;
+		};
+		F7DA5E64052DDD8A01664058 = {
+			fileRef = F7DA5E63052DDD8A01664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F7DA5E65052DDDD501664058 = {
+			isa = PBXFileReference;
+			name = SequenceToolManager.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/tools/SequenceToolManager.java;
+			refType = 2;
+		};
+		F7DA5E66052DDDD501664058 = {
+			fileRef = F7DA5E65052DDDD501664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F7DA5E67052DDDED01664058 = {
+			isa = PBXFileReference;
+			name = TrackBasePopupMenu.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/menus/TrackBasePopupMenu.java;
+			refType = 2;
+		};
+		F7DA5E68052DDDED01664058 = {
+			fileRef = F7DA5E67052DDDED01664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F7DC467B04273D3501664058 = {
 			isa = PBXFileReference;
 			name = to_save_selected.gif;
@@ -9261,8 +9309,6 @@
 				F8512455028BEAB401664092,
 				F8512456028BEAB401664092,
 				F8512457028BEAB401664092,
-				F8512458028BEAB401664092,
-				F8512459028BEAB401664092,
 				F851245D028BEAB401664092,
 				F851245F028BEAB401664092,
 				F8512460028BEAB401664092,
@@ -9291,7 +9337,6 @@
 				F8512477028BEAB401664092,
 				F8512478028BEAB401664092,
 				F8512479028BEAB401664092,
-				F851247A028BEAB401664092,
 				F851247B028BEAB401664092,
 				F851247C028BEAB401664092,
 				F85124B8028BEBB301664092,
@@ -9357,6 +9402,10 @@
 				F704740B04040A7901664058,
 				F7050A2304055D1C01664058,
 				F7050A2504055D4401664058,
+				F7DA5E62052DDD6301664058,
+				F7DA5E64052DDD8A01664058,
+				F7DA5E66052DDDD501664058,
+				F7DA5E68052DDDED01664058,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -9395,8 +9444,7 @@
 				F7050A2404055D4401664058,
 				F85123AD028BEAB301664092,
 				F85123AE028BEAB301664092,
-				F85123AF028BEAB301664092,
-				F85123B0028BEAB301664092,
+				F7DA5E61052DDD6301664058,
 				F85123B4028BEAB301664092,
 			);
 			isa = PBXGroup;
@@ -9433,18 +9481,6 @@
 			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/actions/MoveClosedTrackToAction.java;
 			refType = 2;
 		};
-		F85123AF028BEAB301664092 = {
-			isa = PBXFileReference;
-			name = MoveMidiTrackToAction.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/actions/MoveMidiTrackToAction.java;
-			refType = 2;
-		};
-		F85123B0028BEAB301664092 = {
-			isa = PBXFileReference;
-			name = MoveMonoTrackToAction.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/actions/MoveMonoTrackToAction.java;
-			refType = 2;
-		};
 		F85123B4028BEAB301664092 = {
 			isa = PBXFileReference;
 			name = RemoveTrackAction.java;
@@ -9462,6 +9498,7 @@
 				F85123BC028BEAB301664092,
 				F85123BD028BEAB301664092,
 				F85123BE028BEAB301664092,
+				F7DA5E67052DDDED01664058,
 				F85123BF028BEAB301664092,
 			);
 			isa = PBXGroup;
@@ -9663,6 +9700,7 @@
 				F851247E028BEBB201664092,
 				F851247F028BEBB201664092,
 				F8512481028BEBB201664092,
+				F7DA5E65052DDDD501664058,
 				F8512482028BEBB201664092,
 				F8512483028BEBB201664092,
 				F8512484028BEBB201664092,
@@ -9727,6 +9765,7 @@
 				F85124A6028BEBB201664092,
 				F85124A7028BEBB201664092,
 				F85124A8028BEBB201664092,
+				F7DA5E63052DDD8A01664058,
 				F85124A9028BEBB201664092,
 				F85124AA028BEBB201664092,
 				F85124AB028BEBB201664092,
@@ -10462,18 +10501,6 @@
 			settings = {
 			};
 		};
-		F8512458028BEAB401664092 = {
-			fileRef = F85123AF028BEAB301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8512459028BEAB401664092 = {
-			fileRef = F85123B0028BEAB301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F851245D028BEAB401664092 = {
 			fileRef = F85123B4028BEAB301664092;
 			isa = PBXBuildFile;
@@ -10638,12 +10665,6 @@
 		};
 		F8512479028BEAB401664092 = {
 			fileRef = F85123D2028BEAB301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F851247A028BEAB401664092 = {
-			fileRef = F85123D4028BEAB301664092;
 			isa = PBXBuildFile;
 			settings = {
 			};

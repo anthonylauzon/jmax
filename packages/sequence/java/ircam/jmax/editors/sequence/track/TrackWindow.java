@@ -64,17 +64,14 @@ public class TrackWindow extends JFrame implements EditorContainer{
     trackData = data;
 
     TrackEditorFactoryTable.init();
-
-    makeTitle();
     
-    // Build The Menus and Menu Bar
-    makeMenuBar();
-
+    makeTitle();
+        
     //... then the SequencePanel
     trackPanel = new TrackPanel( this, data);
-    
-    getContentPane().add( trackPanel);
+
     setSize( new Dimension( DEFAULT_WIDTH, EMPTY_HEIGHT));
+    getContentPane().add( trackPanel);
     
     addWindowListener(new WindowListener(){
 	public void windowOpened(WindowEvent e){}
@@ -92,10 +89,14 @@ public class TrackWindow extends JFrame implements EditorContainer{
 	}
 	public void windowDeactivated(WindowEvent e){}
       });
-	
+
+    pack();
+    
+    // Build The Menus and Menu Bar
+    makeMenuBar();
+
     validate();
     pack();
-    setVisible(true);
   }
 
   private final void makeTitle(){
@@ -111,17 +112,14 @@ public class TrackWindow extends JFrame implements EditorContainer{
 
   private final void makeMenuBar(){
     JMenuBar mb = new JMenuBar();
-    
     // Build the file menu	
     mb.add( new FileMenu());
-    
     // Build the edit menu
-	editMenu = new EditMenu(this);
-    mb.add(editMenu); 
-    
+    editMenu = new EditMenu(this);
+    mb.add(editMenu);
     // New Window Manager based Menu
-    mb.add(new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this)); 
-    
+    mb.add(new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this));
+
     setJMenuBar(mb);
   }
 

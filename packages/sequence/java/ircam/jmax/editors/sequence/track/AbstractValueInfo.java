@@ -112,25 +112,11 @@ public class AbstractValueInfo implements ValueInfo, Serializable
   static String path;
   public transient static ImageIcon GENERIC_ICON;
 
-  static 
+ static 
   {
-      /*
-	WARNING:
-	Waiting for a method to get the packagePath from the package name
-      */
-      /*try
-	{
-	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-	}
-	catch(FileNotFoundException e){
-	//System.err.println("Can't locate sequence images");
-	path = JMaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-	}*/
-      path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
-      /*************************************************************/
+    path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
     GENERIC_ICON = new ImageIcon(path+"genericAdder.gif");
   }
-
 }
 
 

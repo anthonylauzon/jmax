@@ -59,6 +59,10 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
     return itsSelecter;
   }
 
+  public void controlAction(int x, int y, int modifiers)
+  {
+    //
+  }
 
     /**
      * Called at double-click. Interested tools will derive this method
@@ -72,14 +76,18 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
    */
   public void selectionPointChoosen(int x, int y, int modifiers) 
   {
-    SequenceGraphicContext egc = (SequenceGraphicContext)gc;
+    if((modifiers & SHORTCUT)!=0)
+      controlAction(x, y, modifiers);
+    else
+    {
+      SequenceGraphicContext egc = (SequenceGraphicContext)gc;
 
-    egc.getTrack().setProperty("selected", Boolean.TRUE);	    
-    
-    egc.getGraphicDestination().requestFocus();//???
-    
-    TrackEvent aTrackEvent = (TrackEvent) gc.getRenderManager().firstObjectContaining(x, y);
-    if (aTrackEvent != null) 
+      egc.getTrack().setProperty("selected", Boolean.TRUE);	    
+
+      egc.getGraphicDestination().requestFocus();//???
+
+      TrackEvent aTrackEvent = (TrackEvent) gc.getRenderManager().firstObjectContaining(x, y);
+      if (aTrackEvent != null) 
       { //click on event
 	startingPoint.setLocation(x,y);
 	
@@ -97,13 +105,14 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
         
         egc.getTrack().getFtsTrack().requestNotifyGuiListeners( egc.getAdapter().getInvX(x), aTrackEvent);
       }
-    else 
-    {//click on empty
-      if ((modifiers & InputEvent.SHIFT_MASK) == 0)
-	if ( !egc.getSelection().isSelectionEmpty())
-	  egc.getSelection().deselectAll(); 
-     
-       egc.getTrack().getFtsTrack().requestNotifyGuiListeners( egc.getAdapter().getInvX(x), null);
+      else
+      {//click on empty
+        if ((modifiers & InputEvent.SHIFT_MASK) == 0)
+          if ( !egc.getSelection().isSelectionEmpty())
+            egc.getSelection().deselectAll(); 
+
+        egc.getTrack().getFtsTrack().requestNotifyGuiListeners( egc.getAdapter().getInvX(x), null);
+      }
     }
   }
   
@@ -160,6 +169,6 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
   SequenceSelecter itsSelecter;
 
   Point startingPoint = new Point();
-
+  public static int SHORTCUT = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 }
 

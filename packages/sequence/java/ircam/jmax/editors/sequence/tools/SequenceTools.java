@@ -48,32 +48,31 @@ public class SequenceTools implements ToolProvider{
     /*************************************************************/
 
     if( type == COMPLETE_TOOLS)
-      tools = new Tool[6];
-    else if( type == SCOOB_TOOLS)
-      tools = new Tool[4];
-    else
       tools = new Tool[5];
+    else if( type == SCOOB_TOOLS)
+      tools = new Tool[3];
+    else
+      tools = new Tool[4];
 
     tools[0] = new ArrowTool(new ImageIcon(path+"arrow.gif"));
-    tools[1] = new AdderTool(new ImageIcon(path+"edit.gif"));
     
     if( type == COMPLETE_TOOLS)
       {
-	tools[2] = new ResizerTool(new ImageIcon(path+"resizer.gif"));
-	tools[3] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
-	tools[4] = new LinerTool(new ImageIcon(path+"liner.gif"));
-	tools[5] = new CombTool(new ImageIcon(path+"comber.gif"));
-      }
-    else if( type == SCOOB_TOOLS)
-      {
-	tools[2] = new ResizerTool(new ImageIcon(path+"resizer.gif"));
-	tools[3] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
-      }
-    else
-      {
+	tools[1] = new ResizerTool(new ImageIcon(path+"resizer.gif"));
 	tools[2] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
 	tools[3] = new LinerTool(new ImageIcon(path+"liner.gif"));
 	tools[4] = new CombTool(new ImageIcon(path+"comber.gif"));
+      }
+    else if( type == SCOOB_TOOLS)
+      {
+	tools[1] = new ResizerTool(new ImageIcon(path+"resizer.gif"));
+	tools[2] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
+      }
+    else
+      {
+	tools[1] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
+	tools[2] = new LinerTool(new ImageIcon(path+"liner.gif"));
+	tools[3] = new CombTool(new ImageIcon(path+"comber.gif"));
       }
   }
 

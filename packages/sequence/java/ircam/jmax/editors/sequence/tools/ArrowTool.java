@@ -47,7 +47,7 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
    */
   public ArrowTool(ImageIcon theImageIcon) 
   {
-    super("arrow", theImageIcon);
+    super("edit", theImageIcon);
     
     itsDirectionChooser = new DirectionChooser(this);
     itsSelectionMover = new SequenceSelectionMover(this, SelectionMover.HORIZONTAL_MOVEMENT);
@@ -79,6 +79,49 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
   {
   }
 
+  /******************************************************************************
+   *********** AddingEvents *****************************************************
+   ******************************************************************************/
+    public void controlAction(int x, int y, int modifiers)
+  {
+    mountIModule(itsSelectionMover);
+
+    SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+    egc.getTrack().setProperty("selected", Boolean.TRUE);
+
+    if(egc.getDataModel().isLocked()) return;
+
+    // starts an undoable transition
+    ((UndoableData) egc.getDataModel()).beginUpdate();
+    //endUpdate is called in addEvents in dataModel
+
+    //with Shift add to selection
+    if((modifiers & InputEvent.SHIFT_MASK) == 0) egc.getSelection().deselectAll();
+
+    ValueInfo info = egc.getTrack().getTrackDataModel().getType();
+    addEvent(x, y, (EventValue) info.newInstance());
+
+    mountIModule(itsSelecter);
+  }
+
+  void addEvent(int x, int y, EventValue value)
+  {
+    SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+    UtilTrackEvent aEvent = new UtilTrackEvent(value, egc.getDataModel());
+
+    egc.getAdapter().setX(aEvent, x);
+
+    egc.getAdapter().setY(aEvent, y);
+
+    egc.getTrack().getFtsTrack().requestEventCreation((float)aEvent.getTime(),
+                                                      value.getValueInfo().getName(),
+                                                      value.getDefinedPropertyCount()*2,
+                                                      value.getDefinedPropertyNamesAndValues());
+  }
+
+  /***********************************************************************************************
+  ************************************************************************************************/
+  
   public void selectionPointDoubleClicked(int x, int y, int modifiers) 
   {
     super.selectionPointDoubleClicked(x, y, modifiers);

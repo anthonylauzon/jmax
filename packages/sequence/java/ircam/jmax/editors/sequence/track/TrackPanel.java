@@ -76,7 +76,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
 
     setDoubleBuffered(false);
     ftsTrackObject = (FtsTrackObject)data;
-  
+    
     track = new TrackBase( ftsTrackObject);
     track.setProperty("selected", Boolean.TRUE);
 
@@ -97,7 +97,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     //- Create the ToolManager with the needed tools
     //- Create a toolbar associated to this ToolManager
     //- Create a status bar containing the toolbar
-    
+
     if( ftsTrackObject.getType().getName().equals( AmbitusValue.AMBITUS_NAME) )
       {
 	manager = new SequenceToolManager( SequenceTools.scoobInstance);
@@ -124,38 +124,32 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     trackEditor.getSelection().addListSelectionListener(this);
     SequenceSelection.setCurrent( trackEditor.getSelection());
     data.addListener(this); 
-    data.addHighlightListener(ruler);    
+    data.addHighlightListener(ruler);
     manager.addContextSwitcher(new ComponentContextSwitcher( trackEditor.getComponent(), trackEditor.getGraphicContext()));//???
     manager.contextChanged( trackEditor.getGraphicContext());//????
-
     scrollTracks = new JScrollPane( trackEditor.getComponent(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
 				    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
     setLayout( new BorderLayout());
 
     JPanel separate_tracks = new JPanel();
     separate_tracks.setLayout( new BorderLayout());
-
     separate_tracks.add( scrollTracks, BorderLayout.CENTER);
     
     //------------------ prepares the Status bar    
     Box northSection = new Box(BoxLayout.Y_AXIS);
     
     statusBar = new InfoPanel();
-
     manager.addToolListener(new ToolListener() {
-	public void toolChanged(ToolChangeEvent e) 
-	{
-		
-	  if (e.getTool() != null) 
-	    {
-	      statusBar.post(e.getTool(), "");
+      public void toolChanged(ToolChangeEvent e)
+    {
+
+        if (e.getTool() != null)
+        {
+          statusBar.post(e.getTool(), "");
 	    }
 	}
       });
- 
     statusBar.setSize(SequenceWindow.DEFAULT_WIDTH, 30);
-    //statusBar.setPreferredSize(new Dimension(SequenceWindow.DEFAULT_WIDTH, 30));
 
     JPanel toolbarPanel = new JPanel();
     toolbarPanel.setSize(228, 25);
@@ -164,7 +158,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     toolbarPanel.add(toolbar, BorderLayout.CENTER);
     toolbarPanel.validate();
     statusBar.addWidgetAt(toolbarPanel, 2);
-
+      
     JPanel panel = new JPanel();
     panel.setSize( 150, 10);
     panel.setVisible( false);
@@ -179,18 +173,12 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     statusBar.addWidget( progressBar);
 
     statusBar.validate();
-    
+
     ruler.setSize(SequenceWindow.DEFAULT_WIDTH, 20);
 
     northSection.add(statusBar);
     northSection.add(ruler);	
     separate_tracks.add(northSection, BorderLayout.NORTH);
-
-    itsContainer.getFrame().validate();
-    itsContainer.getFrame().pack();
-
-    itsContainer.getFrame().setVisible(true);
-
     //---------- prepares the time zoom listeners
     geometry.addZoomListener( new ZoomListener() {
 	public void zoomChanged(float zoom, float oldZoom)
@@ -206,29 +194,22 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
 
     //-------------- prepares the SOUTH scrollbar (time scrolling) and its listener    
     int totalTime = MINIMUM_TIME;
-
     itsTimeScrollbar = new JScrollBar(Scrollbar.HORIZONTAL, 0, 1000, 0, totalTime);
     itsTimeScrollbar.setUnitIncrement(10);
     itsTimeScrollbar.setBlockIncrement(1000);
-    
-    itsTimeScrollbar.addAdjustmentListener(new AdjustmentListener() {
-	
+    itsTimeScrollbar.addAdjustmentListener(new AdjustmentListener() {	
 	public void adjustmentValueChanged(AdjustmentEvent e) {
-	  
-	  int currentTime = e.getValue();
-	  
-	  geometry.setXTransposition(-currentTime);	    
-	}
-      });
-    
+          int currentTime = e.getValue();
+          geometry.setXTransposition(-currentTime);
+        }
+    });
     separate_tracks.add( itsTimeScrollbar, BorderLayout.SOUTH);
     add( separate_tracks, BorderLayout.CENTER);
 
     validate();
-
+    
     for(Enumeration e = data.getEvents(); e.hasMoreElements();)
       trackEditor.updateNewObject((TrackEvent)e.nextElement());
-  
   }
 
   boolean isVisible(int y)
@@ -265,14 +246,22 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     uploading = true;
     progressBar.setMaximum( size);
     progressBar.setValue( 0);
-    progressBar.setVisible( true);
+    SwingUtilities.invokeLater( new Runnable(){
+      public void run(){
+          progressBar.setVisible( true);
+      }
+    });
   }
   public void endTrackUpload( TrackDataModel track)
   {
     uploading = false;
     if( track.length() > 0)
       resizePanelToEventTimeWithoutScroll( track.getLastEvent());
-    progressBar.setVisible( false);
+    SwingUtilities.invokeLater( new Runnable(){
+      public void run(){
+        progressBar.setVisible( false);
+      }
+    });
   }
   public void startPaste(){}
   public void endPaste(){}

@@ -26,7 +26,6 @@ import java.util.*;
 
 /**
  * A class used to register ValueInfo and acces it by name*/
-
 public class ValueInfoTable {
 
   public static void registerInfo(ValueInfo info)
