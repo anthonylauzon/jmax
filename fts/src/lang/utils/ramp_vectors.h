@@ -33,7 +33,7 @@
  *
  */
 
-typedef struct _fts_float_vector_ramp
+typedef struct _fts_framps
 {
   float *value;
   float *target;
@@ -41,26 +41,26 @@ typedef struct _fts_float_vector_ramp
   int n_steps;
   int size;
   int alloc;
-} fts_float_vector_ramp_t;
+} fts_framps_t;
 
-extern fts_float_vector_ramp_t *fts_float_vector_ramp_new(int size);
-extern void fts_float_vector_ramp_delete(fts_float_vector_ramp_t *ramp_vector);
-extern void fts_float_vector_ramp_zero(fts_float_vector_ramp_t *ramp_vector);
-extern void fts_float_vector_ramp_zero_tail(fts_float_vector_ramp_t *ramp_vector, int index);
+extern fts_framps_t *fts_framps_new(int size);
+extern void fts_framps_delete(fts_framps_t *ramp_vector);
+extern void fts_framps_zero(fts_framps_t *ramp_vector);
+extern void fts_framps_zero_tail(fts_framps_t *ramp_vector, int index);
 
-extern void fts_float_vector_ramp_set_targets(fts_float_vector_ramp_t *ramp_vector, float *targets, int size, float time, float rate);
-extern void fts_float_vector_ramp_set_targets_hold_and_jump(fts_float_vector_ramp_t *ramp_vector, float *targets, int size, float time, float rate);
-extern void fts_float_vector_ramp_set_intervals(fts_float_vector_ramp_t *ramp_vector, float *intervals, int size, float time, float rate);
-extern void fts_float_vector_ramp_set_slopes(fts_float_vector_ramp_t *ramp_vector, float *slopes, int size, float time, float rate);
+extern void fts_framps_set_targets(fts_framps_t *ramp_vector, float *targets, int size, float time, float rate);
+extern void fts_framps_set_targets_hold_and_jump(fts_framps_t *ramp_vector, float *targets, int size, float time, float rate);
+extern void fts_framps_set_intervals(fts_framps_t *ramp_vector, float *intervals, int size, float time, float rate);
+extern void fts_framps_set_slopes(fts_framps_t *ramp_vector, float *slopes, int size, float time, float rate);
 
-extern void fts_float_vector_ramp_jump(fts_float_vector_ramp_t *ramp_vector);
-extern void fts_float_vector_ramp_freeze(fts_float_vector_ramp_t *ramp_vector);
+extern void fts_framps_jump(fts_framps_t *ramp_vector);
+extern void fts_framps_freeze(fts_framps_t *ramp_vector);
 
-extern void fts_float_vector_ramp_incr(fts_float_vector_ramp_t *ramp_vector);
+extern void fts_framps_incr(fts_framps_t *ramp_vector);
 
-#define fts_float_vector_ramp_get_size(ramp_vector) ((ramp_vector)->size)
-extern void fts_float_vector_ramp_set_size(fts_float_vector_ramp_t *ramp_vector, int size);
+#define fts_framps_get_size(ramp_vector) ((ramp_vector)->size)
+extern void fts_framps_set_size(fts_framps_t *ramp_vector, int size);
 
-#define fts_float_vector_ramp_get(ramp_vector) ((ramp_vector)->value)
+#define fts_framps_get(ramp_vector) ((ramp_vector)->value)
 
 #endif

@@ -395,8 +395,7 @@ fadd_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
 
 static void
-fadd_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
-	  const fts_atom_t *at)
+fadd_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fbinop_t *this = (fbinop_t *)o;
 

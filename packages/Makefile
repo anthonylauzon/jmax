@@ -22,7 +22,7 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
-C_TARGETS=control generic guiobj io ispw lists mess numeric sources system 
+C_TARGETS=control generic guiobj io ispw lists mess numeric sources system reftypes
 
 JAVA_TARGETS=table
 MIXED_TARGETS=explode qlist

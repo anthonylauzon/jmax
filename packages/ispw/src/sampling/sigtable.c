@@ -167,7 +167,8 @@ sigtable_read(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   char tempbuf[TEMPBUFSIZE+320];
   int fd;
 
-  if (!this->name) return;
+  if(!this->name)
+    return;
 
   if ((fd = fts_file_open(fts_symbol_name(file_name), "r")) < 0){
     post("table~: %s: can't open\n", fts_symbol_name(file_name));
@@ -224,7 +225,8 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
   float *buf_ptr;
   int bufno = 0;
 
-  if (!this->name) return;
+  if (!this->name)
+    return;
 
   if ((fd = fts_file_open(fts_symbol_name(file_name), "w")) < 0){
     post("table~: can't create file: %s\n", fts_symbol_name(file_name));
@@ -291,6 +293,9 @@ sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   float *buf = this->buf.samples;
   int n_onset;
 
+  if(!this->name)
+    return;
+
   if(onset > 0)
     n_onset = fts_unit_convert_to_base(this->unit, onset, &sr);
   else
@@ -328,6 +333,9 @@ sigtable_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   float *buf = this->buf.samples;
   long n_save;
 
+  if(!this->name)
+    return;
+
   if(sr <= 0.0f)
     sr = fts_param_get_float(fts_s_sampling_rate, 44100.0f);
 
@@ -363,7 +371,8 @@ sigtable_clear(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_a
   sigtable_t *this = (sigtable_t *)o;
   long i;
 
-  if(!this->name) return;  
+  if(!this->name)
+    return;  
 
   sampbuf_zero(&this->buf);
 }
