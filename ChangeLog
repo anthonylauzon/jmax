@@ -1,3 +1,8 @@
+2002-12-16  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* add python fts client into autoconf stuff (install into $(datadir)/jmax/client/python).
+	We can't use AM_PATH_PYTHON which is only available for automake version > 1.5 (RedHat 7.3 use automake-1.4-p5)
+
 2002-12-12  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* fixed templates w.r.t. $args[] variable and object description
