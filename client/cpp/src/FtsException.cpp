@@ -22,7 +22,7 @@
 #include <iostream>
 #include <cstring>
 
-#include <fts/ftsclient.h>
+#include <fts/client/ftsclient.h>
 
 std::ostream& operator<<( std::ostream &os, const ircam::fts::client::FtsClientException &e)
 {

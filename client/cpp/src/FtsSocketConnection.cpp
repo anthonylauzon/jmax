@@ -29,7 +29,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-#include <fts/ftsclient.h>
+#include <fts/client/ftsclient.h>
 
 namespace ircam {
 namespace fts {

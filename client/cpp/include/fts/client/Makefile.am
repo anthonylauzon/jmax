@@ -1,6 +1,7 @@
 clientdir=$(includedir)/fts/client
 
 client_HEADERS=\
+ftsclient.h                                     \
 FtsArgs.h					\
 FtsAtom.h					\
 FtsClientException.h				\

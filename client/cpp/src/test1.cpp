@@ -22,7 +22,7 @@
 
 #include <iostream>
 #include <typeinfo>
-#include <fts/ftsclient.h>
+#include <fts/client/ftsclient.h>
 
 using namespace ircam::fts::client;
 

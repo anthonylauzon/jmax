@@ -21,7 +21,7 @@
 
 #include <pthread.h>
 #include <errno.h>
-#include <fts/ftsclient.h>
+#include <fts/client/ftsclient.h>
 #include "BinaryProtocolDecoder.h"
 #include "BinaryProtocolEncoder.h"
 #include "Hashtable.h"

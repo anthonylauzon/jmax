@@ -20,7 +20,7 @@
 // 
 
 #include <typeinfo>
-#include <fts/ftsclient.h>
+#include <fts/client/ftsclient.h>
 #include "Hashtable.h"
 #include "BinaryProtocolEncoder.h"
 

@@ -22,7 +22,7 @@
 #ifndef _SYMBOLCACHE_H_
 #define _SYMBOLCACHE_H_
 
-#include <fts/ftsclient.h>
+#include <fts/client/ftsclient.h>
 #include "Hashtable.h"
 
 #define DEFAULT_INITIAL_CAPACITY 1031
