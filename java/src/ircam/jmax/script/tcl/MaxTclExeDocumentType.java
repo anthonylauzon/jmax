@@ -31,9 +31,9 @@ import ircam.jmax.mda.*;
  * Class defining the an executable tcl document.
  */
 
-public class MaxTclExecutedDocumentType extends MaxDocumentType
+public class MaxTclExeDocumentType extends MaxDocumentType
 {
-  public MaxTclExecutedDocumentType()
+  public MaxTclExeDocumentType()
   {
     super(".tcl");
     setPrettyName("Tcl");

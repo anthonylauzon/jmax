@@ -74,7 +74,7 @@ public class MaxTclExeDocumentHandler extends MaxDocumentHandler
 	throw new MaxDocumentException("Tcl error: " + e.getMessage());
       }
 
-    MaxDocument document = (MaxDocument) new MaxTclExecutedDocument(context);
+    MaxDocument document = (MaxDocument) new MaxTclExeDocument(context);
 
     document.setDocumentFile(file);
     document.setDocumentHandler(this);
@@ -86,7 +86,7 @@ public class MaxTclExeDocumentHandler extends MaxDocumentHandler
 
   public void saveDocument(MaxDocument document, File file) throws MaxDocumentException
   {
-    throw new MaxDocumentException("Cannot save a MaxTclExecutedDocument");
+    throw new MaxDocumentException("Cannot save a MaxTclExeDocument");
   }
 
   /** Return true if this Document Handler can save a given document
