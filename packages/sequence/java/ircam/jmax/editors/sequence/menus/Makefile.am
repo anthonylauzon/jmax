@@ -7,6 +7,7 @@ FileMenu.java \
 MidiTrackPopupMenu.java \
 MonoTrackPopupMenu.java \
 RulerPopupMenu.java \
+SequenceSimpleMenu.java \
 TempoBarPopupMenu.java \
 TrackBasePopupMenu.java \
 TrackMenu.java \
