@@ -227,7 +227,7 @@ int fts_file_find_in_env( const char *root, fts_symbol_t env, const char *filena
     while (*start != '\0')
     {
       end = start;
-      while (*end != ':' && *end != '\0')
+      while (*end != fts_path_separator && *end != '\0')
       {
 	end++;
       }
