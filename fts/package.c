@@ -49,11 +49,6 @@ static int fts_package_stack_top = 0;
 
 static fts_status_description_t fts_DuplicatedMetaclass = {"Duplicated metaclass"};
 
-static fts_symbol_t s_require = 0;
-static fts_symbol_t s_template_path = 0;
-static fts_symbol_t s_data_path = 0;
-static fts_symbol_t s_package = 0;
-
 #ifdef WIN32
 #define fts_lib_prefix   ""
 #define fts_lib_postfix  ".dll"

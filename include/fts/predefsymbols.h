@@ -163,6 +163,13 @@ PREDEF_SYMBOL( fts_s_outlet, "outlet")
 PREDEF_SYMBOL( fts_s_label, "label")
 PREDEF_SYMBOL( fts_s_receive, "receive")
 PREDEF_SYMBOL( fts_s_send, "send")
+PREDEF_SYMBOL( fts_s_audiofile, "audiofile")
+
+/* Symbols related to sample formats */
+PREDEF_SYMBOL( fts_s_8bits, "8bits")
+PREDEF_SYMBOL( fts_s_16bits, "16bits")
+PREDEF_SYMBOL( fts_s_24bits, "24bits")
+PREDEF_SYMBOL( fts_s_32bits, "32bits")
 
 PREDEF_SYMBOL( fts_s_qlist, "qlist")
 PREDEF_SYMBOL( fts_s_table, "table")

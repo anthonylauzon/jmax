@@ -139,6 +139,18 @@ char* win32_realpath(const char* path, char* resolved_path)
   return NULL;
 }
 
+
+/* *************************************************************************** */
+/*                                                                             */
+/* System time                                                                   */
+/*                                                                             */
+/* *************************************************************************** */
+
+double fts_systime()
+{
+  return (double) GetTickCount();
+}
+
 /* *************************************************************************** */
 /*                                                                             */
 /* Platform specific initialization                                            */

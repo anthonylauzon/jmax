@@ -109,6 +109,10 @@ SOURCE=..\fts\audio.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\fts\audiofile.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\fts\autosave.c
 # End Source File
 # Begin Source File

@@ -204,6 +204,7 @@ void post_error(fts_object_t *obj, const char *format , ...)
  */
 
 static char* log_file = NULL;
+static double log_time = 0;
 
 char* fts_log_date(char* buf, int len)
 {
@@ -239,9 +240,11 @@ void fts_log_init(void)
   }
 #endif
 
+  log_time = fts_systime();
+
   /* truncate the file */
   log = fopen(log_file, "w");
-  fprintf(log, "[log]: Started logging at %s\n", fts_log_date(buf, 1024));
+  fprintf(log, "[log]: Started logging on %s\n", fts_log_date(buf, 1024));
   fclose(log);
 }
 
@@ -264,6 +267,8 @@ void fts_log(char* fmt, ...)
   if (log == NULL) {
     return;
   }
+
+  fprintf(log, "[%u]", (unsigned int) (fts_systime() - log_time));
 
   va_start (args, fmt); 
   vfprintf(log, fmt, args); 

@@ -117,6 +117,7 @@ extern "C" {
 #include <fts/post.h>
 #include <fts/sched.h>
 #include <fts/audio.h>
+#include <fts/audiofile.h>
 #include <fts/bytestream.h>
 
 #include <fts/project.h>

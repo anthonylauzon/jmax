@@ -201,6 +201,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "mmio"=..\mmio\winbuild\mmio.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "numeric"=..\numeric\winbuild\numeric.dsp - Package Owner=<4>
 
 Package=<5>

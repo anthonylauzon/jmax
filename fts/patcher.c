@@ -1158,7 +1158,7 @@ patcher_load_jmax_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   const char *filename = fts_symbol_name( fts_get_symbol( at));
   fts_object_t *patcher;
 
-  fts_log("[patcher]: Load file %s\n", filename);
+  fts_log("[patcher]: Load patcher %s\n", filename);
 
   patcher = fts_binary_file_load( filename, o, 0, 0, 0);
 
@@ -1174,6 +1174,8 @@ patcher_load_jmax_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
   /* activate the post-load init, like loadbangs */	  
   fts_send_message( patcher, fts_SystemInlet, fts_new_symbol("load_init"), 0, 0);
+
+  fts_log("[patcher]: Finished loading patcher %s\n", filename);
 }
 
 

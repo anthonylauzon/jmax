@@ -90,11 +90,15 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   }
   argv[argc] = NULL;
 
-  fts_log("[winmain]: Command line: ");
-  for (state = 0; state < argc; state++) {
-    fts_log("%s ", argv[state]);
+  {
+    char buf[2048];
+    _snprintf(buf, 2048, "[winmain]: Command line: ");
+    for (state = 0; state < argc; state++) {
+      _snprintf(buf, 2048, "%s %s", buf, argv[state]);
+    }
+    _snprintf(buf, 2048, "%s\n", buf);
+    fts_log(buf);
   }
-  fts_log("\n");
 
   /* Initialize FTS */
   fts_init( argc, argv);

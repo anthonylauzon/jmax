@@ -372,3 +372,15 @@ void fts_platform_init( void )
   sgi_init_fpu();
 }
 
+/* *************************************************************************** */
+/*                                                                             */
+/* System time                                                                   */
+/*                                                                             */
+/* *************************************************************************** */
+
+double fts_systime()
+{
+  struct timeval now;
+  gettimeofday(&now, NULL);
+  return (double) now.tv_sec * 1000.0 + (double) now.tv_usec / 1000.0;
+}
