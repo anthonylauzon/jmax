@@ -26,11 +26,12 @@ import java.awt.event.*;
  */
 
 public class ConsoleKeyListener implements KeyListener {
-    public static final int DELETE = 177;
-    public static final int BACK_SPACE = 8;
+  public static final int DELETE = 177;
+  public static final int BACK_SPACE = 8;
   /*private*/ public StringBuffer sbuf;
   public int intercept = 0;
   /*AppletConsole*/ Console console;
+  boolean itsControlDown = false;
 
     public ConsoleKeyListener(/*AppletConsole*/Console c) {
 	sbuf = new StringBuffer();
@@ -38,6 +39,11 @@ public class ConsoleKeyListener implements KeyListener {
     }
 
     public void keyPressed(KeyEvent evt) {
+      if(evt.isControlDown()){
+	console.getTextArea().setCaretPosition(console.getTextArea().getText().length());
+	itsControlDown = true;
+	return;
+      }
     }
 
     public void keyReleased(KeyEvent evt) {
@@ -45,10 +51,11 @@ public class ConsoleKeyListener implements KeyListener {
 
     public void keyTyped(KeyEvent evt) {
       intercept = console.getTextArea().getText().length();
-      
-      if(evt.isControlDown()){
+      if(itsControlDown){
 	//console.itsContainer.keyPressed(evt);
-	System.out.println("il control e' pigiato!");
+	String aText = console.getTextArea().getText();
+	console.getTextArea().setText(aText.substring(0, aText.length()-1));
+	itsControlDown = false;
 	return;
       }
       char key = evt.getKeyChar();

@@ -38,7 +38,6 @@ public class ConsoleWindow extends MaxEditor {
   public boolean OpenFile(File file){
     String aExtension = GetExtension(file);
     MaxResourceId aResId = null;
-    
     if(aExtension.equals("tpa")){
 	try {
 	  MaxApplication.getTclInterp().evalFile(file.getPath());

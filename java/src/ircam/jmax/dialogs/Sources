@@ -4,5 +4,9 @@ SOURCES = \
            FileNotSavedDialog.java \
            SplashDialog.java \
 	   MaxFileChooser.java \
-           StatisticsDialog.java
+           StatisticsDialog.java \
+	   ProgressBarDialog.java \
+	   ProgressBarPanel.java
+
+
 

@@ -819,7 +819,7 @@ public class MaxApplication extends Object {
     System.setOut(itsConsole.getPrintStream());
 
     itsConsoleWindow = new ConsoleWindow(itsConsole, "jMax Console");
-    itsConsoleWindow.Init(/*#itsProjectWindow.itsProject*/);
+    itsConsoleWindow.Init(/*itsProjectWindow.itsProject*/);
     itsConsoleWindow.setLocation(0,0);
     itsConsoleWindow.pack();
     itsConsoleWindow.setVisible(true);
