@@ -1,78 +1,178 @@
 #!/bin/sh
+
+
+# ***************************************************************************
+# Constants
+# ***************************************************************************
+JAVA_DEFAULT_OPTIONS="-noclassgc -noasyncgc -mx64m -ms2m"
+
+
+# ***************************************************************************
+# Functions
+# ***************************************************************************
 help ()
 {
     cat << HELP_EOF
 
 Usage:
-    jmax [-install <installation>] 
+    jmax [-javaopt <java-option>]
+	    [-nofork]
+	    [-nojar]
+	    [-verbose] [<other-jmax-options>]
 
 Starts jMax.
 
 Options and arguments:
-  -install <installation>    (optional)
-    Defines the installation to use.
-    <installation> can be one of the following keywords:
-	standard :
-	    to use jMax standard installation ( in /usr/local/max)
-	snapshot :
-	    to use jMax ``snapshot'' installation (in /usr/local/max-snapshot)
-	development, user :
-	    to use jMax installation in ${HOME}/projects/max
-    or <installation> can be a directory, in which case this directory is used
-    as root directory of jMax
-    Defaults to standard.
+  -javaopt <java-option>     (optional)
+    Defines an option that is to be passed directly to the Java interpreter.
+    Several [-javaopt java-option] can appear in the command line.
+
+  -nofork
+    Do not go into the background.  By default, jMax forks itself to give control 
+    back to the shell.
+
+  -nojar
+    Do not use the jMax Java classes in JAR file jmax.jar. Use the .class files
+    in their package directories instead.
+    By default, jMax uses the jMax Java classes in JAR file jmax.jar
+
+  <other-jmax-options>       (optional)
+    Defines jMax options that are passed directly to ircam.jmax.MaxApplication as 
+    command line options (for instance, jmaxArch, jmaxMode, ...)
+
+  -verbose                   (optional)
+    prints the command line before starting jMax
 
   -help
     to print this help
 
+Notes:
+  - jMax is started in background (i.e. the script terminates immediately). To overide this,
+    use ``-nofork'' option
+  - the Java interpreter (started by the command ``java'') must be in the PATH
+
 HELP_EOF
 }
 
-opt="none"
-OPTIONS=""
-INSTALL="standard"
 
-for arg in $@
-do
-    if [ $opt = "none" ]
+# ---------------------------------------------------------------------------
+decrypt_options ()
+{
+    opt="none"
+    JAVAOPT=""
+    JMAXOPT=""
+    VERBOSE=
+    NOFORK=
+    NOJAR=
+
+    for arg in $@
+    do
+	if [ $opt = "none" ]
+	then
+	    case $arg in
+	    \-javaopt)
+		opt=$arg ;;
+	    \-help | \-h | \-\? )
+		help ;
+		exit 2 ;;
+	    \-verbose | \-v)
+		VERBOSE="yes" ;;
+	    \-nofork)
+		NOFORK="yes" ;;
+	    \-nojar)
+		NOJAR="yes" ;;
+	    *)
+		JMAXOPT="${JMAXOPT} $arg" ;;
+	    esac
+	else
+	    case $opt in
+	    \-javaopt)
+		JAVAOPT="${JAVAOPT} $arg" ;;
+	    esac
+	    opt="none";
+	fi
+
+    done
+
+}
+
+# ---------------------------------------------------------------------------
+start_it ()
+{
+    if [ $VERBOSE ]
     then
-	case $arg in
-	\-install | \-i )
-	    opt=$arg ;;
-	\-help | \-h | \-\? )
-	    help ;
-	    exit 2 ;;
-	*)
-	    OPTIONS="${OPTIONS} $arg" ;;
-	esac
-    else
-	case $opt in
-	\-install | \-i)
-	    INSTALL=$arg ;;
-	esac
-	opt="none";
+	echo "CLASSPATH=${CLASSPATH}"
     fi
-done
 
-case $INSTALL in
-standard)
-    ROOTDIR=/usr/local/max ;;
-snapshot)
-    ROOTDIR=/usr/local/max-snapshot ;;
-development | user)
-    ROOTDIR=${HOME}/projects/max ;;
-*)
-    if [ -d $INSTALL ]
+    if [ $NOFORK ]
     then
-	ROOTDIR=$INSTALL
+	if [ $VERBOSE ]
+	then
+	    echo "java $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT"
+	fi
+	( CLASSPATH=${CLASSPATH} ; export CLASSPATH ; java $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT )
     else
-	help
-	exit 2
-    fi ;;
-esac
+	if [ $VERBOSE ]
+	then
+	    echo "java $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT &"
+	fi
+	( CLASSPATH=${CLASSPATH} ; export CLASSPATH ; java $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT & )
+    fi
+}
 
-${ROOTDIR}/bin/run-jmax -root ${ROOTDIR} ${OPTIONS}
+# ---------------------------------------------------------------------------
+# Special version for SGI architecture:
+# for obscure reasons, starting java without -classpath option doesn't work
+start_it_SGI ()
+{
+    if [ $VERBOSE ]
+    then
+	echo "CLASSPATH=${CLASSPATH}"
+    fi
+
+    if [ $NOFORK ]
+    then
+	if [ $VERBOSE ]
+	then
+	    echo "java $JAVA_DEFAULT_OPTIONS $JAVAOPT -classpath ${CLASSPATH} ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT"
+	fi
+	java $JAVA_DEFAULT_OPTIONS $JAVAOPT -classpath ${CLASSPATH} ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT
+    else
+	if [ $VERBOSE ]
+	then
+	    echo "java $JAVA_DEFAULT_OPTIONS $JAVAOPT -classpath ${CLASSPATH} ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT &"
+	fi
+	java $JAVA_DEFAULT_OPTIONS $JAVAOPT -classpath ${CLASSPATH} ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT &
+    fi
+}
 
 
+# ***************************************************************************
+# Beginning of script
+# ***************************************************************************
 
+decrypt_options $@
+
+DIR=`dirname $0`
+ROOTDIR=`(cd ${DIR}/.. ; pwd)`
+
+if [ $NOJAR ]
+then
+    JMAX_CLASSPATH=${ROOTDIR}/java/classes
+else
+    JMAX_CLASSPATH=${ROOTDIR}/java/classes/jmax.jar
+fi
+
+JACL_CLASSPATH=${ROOTDIR}/java/lib/jacl1.0/jacl.jar
+
+CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${JACL_CLASSPATH}
+
+
+if [ `arch` = "sgi" ]
+then
+    CLASSPATH=/usr/java/lib/rt.jar:${CLASSPATH}
+    start_it_SGI
+else
+    start_it
+fi
 
