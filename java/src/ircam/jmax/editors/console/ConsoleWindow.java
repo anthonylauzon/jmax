@@ -53,6 +53,7 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
     setLocation(0,0);
     pack();
     setVisible(true);
+    itsConsole.getTextArea().setCaretPosition(itsConsole.getTextArea().getText().length());
   }
   
 

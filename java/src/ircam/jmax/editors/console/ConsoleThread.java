@@ -30,7 +30,7 @@ class ConsoleThread extends Thread {
   
   public synchronized void run() {
     /* itsConsole.PutLine("\n  **** jmax console/ TCL interpreter started ****"); */
-    itsConsole.Put("\n");
+    /* itsConsole.Put("\n"); */
     while (true) {
       // try {
 	//wait();

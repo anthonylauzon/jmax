@@ -47,13 +47,17 @@ set jmaxDefaultPkgPath "[systemProperty user.home]/jmax"
 
 ## default architecture if not specified for host name
 ## just works if server runns on same machine as client
-set Arch [exec arch]
-if {$Arch == "Linux"} {
-  set jmaxDefaultArch "pclinux"
-} elseif {$Arch == "sgi"} {
-  set jmaxDefaultArch "irix6.2"
-} else {
-  set jmaxDefaultArch ""
-}
+
+set jmaxDefaultArch "irix6.2"
+
+#set Arch [exec arch]
+#if {$Arch == "Linux"} {
+#  set jmaxDefaultArch "pclinux"
+#} elseif {$Arch == "sgi"} {
+#  set jmaxDefaultArch "irix6.2"
+#} else {
+#  set jmaxDefaultArch ""
+#}
+
   
 

@@ -6,8 +6,7 @@
 
 global jmaxArch 
 global jmaxHost
-global jmaxSampleRate 
-global jmaxAudioBuffer 
+global jmaxMidiPort
 
 #  ... aswell as any additional system property specified in the command line
 # for example: jmax -myProperty "myValue"
@@ -38,7 +37,7 @@ if {[systemProperty "myProperty"] == "myValue"} {
 #   MIDI is not yet supported on O2 (o2r5k and o2r10k)
 #
 
-if {$jmaxArch == "irix6.2" || $jmaxArch == "irix5.3" || $jmaxArch == "mips1"} {
+if {$jmaxArch == "origin" || $jmaxArch == "irix6.2" || $jmaxArch == "irix5.3" || $jmaxArch == "mips1"} {
 
     puts "jMax default MIDI configuration"
     puts "(make sure that you lauched the MIDI deamon using the startmidi command)"
