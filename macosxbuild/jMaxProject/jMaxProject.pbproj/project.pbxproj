@@ -20550,7 +20550,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mv build/jMax.app/Contents/Resources/share/jmax/default_project.jprj build/jMax.app/Contents/Resources/share/jmax/default-project.jprj\nchmod a+r build/jMax.app/Contents/Resources/share/jmax/default-project.jprj\nmv build/jMax.app/Contents/Resources/share/jmax/default_config_macosx.jcfg build/jMax.app/Contents/Resources/share/jmax/default-config.jcfg\nchmod a+r build/jMax.app/Contents/Resources/share/jmax/default-config.jcfg";
+			shellScript = "chmod a+r build/jMax.app/Contents/Resources/share/jmax/default_project.jprj\nmv build/jMax.app/Contents/Resources/share/jmax/default_config_macosx.jcfg build/jMax.app/Contents/Resources/share/jmax/default_config.jcfg\nchmod a+r build/jMax.app/Contents/Resources/share/jmax/default_config.jcfg";
 		};
 		F8DC5EF40286A1FA01664092 = {
 			children = (

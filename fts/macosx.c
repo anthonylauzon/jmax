@@ -34,10 +34,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/param.h>
-#include <sys/stat.h> 
+#include <sys/param.h> 
+#include <sys/time.h>
 #include <sys/types.h>
-#include <sys/time.h> 
+#include <sys/stat.h>
 #include <mach-o/dyld.h> 
 
 #include <ftsprivate/fpe.h>
@@ -97,7 +97,7 @@ fts_get_system_project( void)
 {
   char path[MAXPATHLEN];
 
-  fts_make_absolute_path(DEFAULT_ROOT, fts_s_default_project, path, MAXPATHLEN);
+  fts_make_absolute_path( fts_get_root_directory(), fts_s_default_project, path, MAXPATHLEN);
 
   return fts_new_symbol(path);
 }
@@ -117,7 +117,7 @@ fts_get_system_configuration(void)
 {
   char path[MAXPATHLEN];
 
-  fts_make_absolute_path(DEFAULT_ROOT, fts_s_default_config, path, MAXPATHLEN);
+  fts_make_absolute_path( fts_get_root_directory(), fts_s_default_config, path, MAXPATHLEN);
 
   return fts_new_symbol(path);
 }
