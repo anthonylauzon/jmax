@@ -19,6 +19,12 @@ EDITORS_ACC := $(EDITORS_ACC) $(SOURCES)
 INCLUDE_PATH := $(EDITORS_PATH)/control
 include $(INCLUDE_PATH)/Sources2
 
+EDITORS_ACC := $(EDITORS_ACC) $(SOURCES)
+
+############################### newconsole
+INCLUDE_PATH := $(EDITORS_PATH)/newconsole
+include $(INCLUDE_PATH)/Sources2
+
 SOURCES := $(EDITORS_ACC) $(SOURCES)
 
 
