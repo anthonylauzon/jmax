@@ -194,7 +194,8 @@ messconst_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 {
   messconst_t *this = (messconst_t *) o;
 
-  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), fts_array_get_size( &this->tmp), fts_array_get_atoms( &this->tmp));
+  /*fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), fts_array_get_size( &this->tmp), fts_array_get_atoms( &this->tmp));*/
+  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc-1, o->argv+1);
 }
 
 static void
