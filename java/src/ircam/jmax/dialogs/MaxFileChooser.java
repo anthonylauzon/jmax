@@ -6,6 +6,7 @@ import java.awt.event.*;
 
 import com.sun.java.swing.*;
 import com.sun.java.swing.preview.*;
+import com.sun.java.swing.preview.filechooser.*;
 
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
@@ -18,12 +19,28 @@ import ircam.jmax.mda.*;
  * 
  */
 
-public class MaxFileChooser {
+public class MaxFileChooser
+{
+  static class MaxFileFilter extends FileFilter
+  {
+    public boolean accept(File f)
+    {
+      if (f.isDirectory()) 
+	return true;
+      else
+	return Mda.canLoadDocument(f);
+    }
+    
+    public String getDescription()
+    {
+	return "jMax documents";
+    }
+  }
 
-  static private String currentOpenDirectory = null; // temp !!
+
+  static private String currentOpenDirectory = null; 
 
   /** New Loading structure (beginning): global "Open" FileDialog that handle current directory */
-
 
   /** CHoose a file for opening, in the current directory, with a given f ilename filter */
 
@@ -36,7 +53,10 @@ public class MaxFileChooser {
 
     fd = new JFileChooser(currentOpenDirectory);
 
-    fd.setDialogTitle("Save"); 
+    fd.setDialogTitle("Open"); 
+    fd.addChoosableFileFilter(new MaxFileFilter());
+    // fd.setFileView(new MyFileView());
+
 
     if (fd.showDialog(frame, "Open") == 0)
       {

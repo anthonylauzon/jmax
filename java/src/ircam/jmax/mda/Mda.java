@@ -138,6 +138,27 @@ public class Mda
     allHandlers.addElement(handler);
   }
 
+  /** Return true if we can load a document from a given file) */
+
+  public static boolean canLoadDocument(File file)
+  {
+    System.err.println("FooBar: canLoadDocument " + file);
+    for (int i = 0; i < allHandlers.size() ; i++)
+      {
+	MaxDocumentHandler documentHandler;
+
+	documentHandler = (MaxDocumentHandler) allHandlers.elementAt(i);
+
+	if (documentHandler.canLoadFrom(file))
+	  {
+	    System.err.println("FooBar: canLoadDocument: " + documentHandler + " can load " + file);
+	    return true;
+	  }
+      }
+    System.err.println("FooBar: canLoadDocument: nobody can load " + file);
+    return false;
+  }
+
   /** Load an document from a given file) */
 
   public static MaxDocument loadDocument(File file) throws MaxDocumentException
@@ -229,4 +250,14 @@ public class Mda
     throw new MaxDocumentException("Cannot create document for " + data);
   }
 }
+
+
+
+
+
+
+
+
+
+
 
