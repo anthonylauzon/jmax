@@ -100,7 +100,7 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
 
       itsOwner.makeFtsObject();
     }
-
+        
     itsOwner.UpdateOnly(itsSketchPad.GetOffGraphics());//
 
     int lenght = getFontMetrics(getFont()).stringWidth(itsOwner.itsMaxString);
@@ -121,6 +121,8 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     //itsOwner.Repaint();
     itsOwner.update(itsOwner.itsFtsObject);
     
+    //itsSketchPad.SaveOneElementRgn(itsOwner);
+
     AbortEdit();
 
     setRows(2);
@@ -270,6 +272,7 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
   }
   
 }
+
 
 
 

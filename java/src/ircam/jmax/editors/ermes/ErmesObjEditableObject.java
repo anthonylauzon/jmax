@@ -122,7 +122,8 @@ import ircam.jmax.fts.*;
     itsSketchPad.GetEditField().setFont(itsFont);
     itsSketchPad.GetEditField().setText(itsArgs);
     itsSketchPad.GetEditField().itsOwner = this; 
-    
+
+    itsSketchPad.RemoveElementRgn(this);
 
     if(itsParsedTextVector.size()==0)
       itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight()*2);

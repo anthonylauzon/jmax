@@ -303,7 +303,7 @@ Rectangle previousResizeRect = new Rectangle();
 	  aErr.show();  
 	  return;
 	}
-	
+       
 	RemoveElementRgn(aObject);
 	aObject.ChangeFont(aFont);
 	SaveOneElementRgn(aObject);
@@ -1699,7 +1699,7 @@ Rectangle previousResizeRect = new Rectangle();
     Rectangle aRect;
     aRect = theObject.Bounds();
     aRect.grow(3,6);
-    itsElementRgn.Add(aRect);	
+    itsElementRgn.Add(aRect);
   }
   
   public void SetAutorouting(boolean t) {

@@ -192,8 +192,9 @@ public class ErmesObject implements FtsPropertyHandler {
 
     itsFtsObject.setRepresentation(this);
     if (maxPads * PADS_DISTANCE > aRect.width) { //the pads are longer then the element
+      itsSketchPad.RemoveElementRgn(this);
       Reshape(aRect.x, aRect.y, maxPads*PADS_DISTANCE, aRect.height);
-
+      itsSketchPad.SaveOneElementRgn(this);
     }
     if (n_inlts > 1) in_local_distance = (aRect.width-10)/(n_inlts-1) ;
     if (n_outlts > 1) out_local_distance = (aRect.width-10)/(n_outlts-1) ;

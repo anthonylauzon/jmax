@@ -113,9 +113,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   //--------------------------------------------------------
   // SetDimension
   //--------------------------------------------------------
-  private Dimension SetDimension(String theString){
-    //Font f = itsSketchPad.getFont();
-    //FontMetrics fm = itsSketchPad.getFontMetrics(f);
+  /* private Dimension SetDimension(String theString){
     int lenght = itsFontMetrics.stringWidth(theString);
     Dimension d1 = getMinimumSize();
     d1.width = MaxWidth(itsFontMetrics.stringWidth(theString)+32,
@@ -126,7 +124,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
     Resize1(d1.width, d1.height);
     itsSketchPad.validate();
     return d1;
-  }
+  }*/
 	
   public int MaxWidth(int uno, int due, int tre, int quattro){
     int MaxInt = uno;
