@@ -23,10 +23,6 @@
 #include <fts/fts.h>
 #include <ftsconfig.h>
 
-#if defined(__POWERPC__) && !(defined(__APPLE__) && defined(__MACH__))
-#include <unixfunc.h>
-#endif
-
 #include <string.h>
 #include <stdlib.h>
 #ifdef HAVE_SYS_TYPES_H
@@ -141,23 +137,18 @@ fts_template_file_modified(fts_symbol_t filename)
   char buf[MAXPATHLEN];
   fts_template_t *template;
 
-  /* resolve the links in the path, so that we have a unique name 
-     for the file */
-  realpath( filename, buf);
-  filename = fts_new_symbol(buf);
-
   fts_get_packages( &pkg_iter);
   
-  while ( fts_iterator_has_more( &pkg_iter)) {
+  while ( fts_iterator_has_more( &pkg_iter))
+    {
+      fts_iterator_next( &pkg_iter, &pkg_atom);
+      pkg = fts_get_pointer(&pkg_atom);
 
-    fts_iterator_next( &pkg_iter, &pkg_atom);
-    pkg = fts_get_pointer(&pkg_atom);
+      template = fts_package_get_template_from_file(pkg, filename);
 
-    template = fts_package_get_template_from_file(pkg, filename);
-
-    if (template)
-      fts_template_recompute_instances(template);
-  }
+      if (template)
+	fts_template_recompute_instances(template);
+    }
 }
 
 

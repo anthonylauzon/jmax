@@ -32,10 +32,6 @@
 
 #include <ftsconfig.h>
 
-#if defined(__POWERPC__) && !(defined(__APPLE__) && defined(__MACH__))
-#include <unixfunc.h>
-#endif
-
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
@@ -149,10 +145,13 @@ char *fts_make_absolute_path(const char* parent, const char* file, char* buf, in
   fts_file_correct_separators(path);
 
   /* try to resolve symbolic links */
-  if (realpath(path, buf) == NULL)
-    snprintf(buf, len, "%s", path);      
-
-  return buf;
+#ifdef HAVE_REALPATH
+  if (realpath(path, buf) != NULL)
+    return buf;
+  return path;
+#else
+  return path;
+#endif
 }
 
 /*  fts_find_file_aux
