@@ -132,7 +132,7 @@ _scoob_get_interval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   scoob_t *self = (scoob_t *)o;
   
   fts_return_float(self->interval);
-}	
+}       
 
 static void
 _scoob_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -153,6 +153,7 @@ _scoob_get_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   
   fts_return_float(self->duration);
 }
+
 
 static void
 scoob_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -181,13 +182,16 @@ scoob_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
         _scoob_set_pitch(o, 0, 0, 1, at + 1);
       
     case 1:
-      if(fts_is_symbol(at))
+      if (fts_is_symbol(at))
         _scoob_set_type(o, 0, 0, 1, at);
+      else
+        fts_object_error(o, "can't create scoob: need type as first argument");
       
     case 0:
       break;
   }
 }
+
 
 static void
 scoob_set_from_scoob(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -308,7 +312,7 @@ scoob_append_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_array_append_symbol(array, seqsym_pitch);
   fts_array_append_float(array, self->pitch);
   
-	fts_array_append_symbol(array, seqsym_interval);
+        fts_array_append_symbol(array, seqsym_interval);
   fts_array_append_float(array, self->interval);
   
   fts_array_append_symbol(array, seqsym_duration);
@@ -317,11 +321,15 @@ scoob_append_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   propobj_append_properties((propobj_t *)self, array);
 }
 
-/**************************************************************************************
+
+
+
+/******************************************************************************
  *
  *  scoob class
  *
  */
+
 static void
 scoob_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
