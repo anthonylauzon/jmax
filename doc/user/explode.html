@@ -3,86 +3,56 @@
    <TITLE> jMax documentation </TITLE>
 </HEAD>
 
-<BODY TEXT="#000000" BGCOLOR="#FFFFFF">
+<HTML>
+<HEAD>
+<TITLE> jMax documentation </TITLE>
+</HEAD>
 
-<IMG SRC="../images/logo.jpeg" ALT="IRCAM - Centre Georges Pompidou">
+<BODY TEXT="#000000" BGCOLOR="#CCCCCC" LINK="#000000" VLINK="#000000">
 
-<BR>
-<BR>
-
-<TABLE CELLSPACING=0 CELLPADDING=0 >
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=0>
 <TR>
-<TD ALIGN=CENTER VALIGN=TOP>
-<A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../images/jmax_logo_small.gif" ALT="jMax" BORDER=0></A>
-</TD>
-
-<TD>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-</TD>
-
-<TD ALIGN=LEFT VALIGN=MIDDLE>
-<DL>
-<DT><IMG SRC="../images/dot.gif"> <A HREF="../index.html">Documentation</A>
-</DT>
-
-<DL>
-<DT><IMG SRC="../images/dot.gif"> <A HREF="index.html">User
-documentation</A> </DT>
-
-<DL>
-<DT><IMG SRC="../images/dot.gif"> <A HREF="editors.html">Editors</A>
-</DT>
-
-<DL>
-<DT><IMG SRC="../images/arrow_grey.gif"> <B><FONT SIZE=+2>Explode
-editor</FONT></B> </DT>
-</DL>
-</DL>
-</DL>
-</DL>
-</TD>
+  <TD ALIGN=LEFT>
+    <A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../images/jmax_logo_tiny.gif" BORDER=0 ALT="jMax"></A>
+  </TD>
+  <TD ALIGN=RIGHT>
+    <A HREF="http://www.ircam.fr/"><IMG SRC="../images/ircam_banner.gif" BORDER=0 ALT="IRCAM - Centre Georges Pompidou"></A>
+  </TD>
 </TR>
 </TABLE>
+<BR>
 
-<HR>
-
-<UL>
-<LI><A HREF="#Introduction">Introduction</A></LI>
-
-<LI><A HREF="#The toolbar">Toolbar</A></LI>
-
-<LI><A HREF="#The status bar">Status bar</A></LI>
-
-<LI><A HREF="#The score panel">Score panel</A></LI>
-
-<LI><A HREF="#The tools">Tools</A></LI>
-
-<UL>
-<LI><A HREF="#Arrow tool">Arrow</A></LI>
-
-<LI><A HREF="#Adder tool">Adder</A></LI>
-
-<LI><A HREF="#Eraser tool">Eraser</A></LI>
-
-<LI><A HREF="#Vertical and Horizontal mover tools">Vertical and horizontal
-movers</A></LI>
-
-<LI><A HREF="#Zoomer tool">Zoomer</A></LI>
+<UL TYPE=SQUARE>
+  <LI><A HREF=../index.html>documentation</A>
+  <UL TYPE=SQUARE>
+    <LI><A HREF=index.html>user documentation</A>
+  </UL>
 </UL>
 
-<LI><A HREF="#Zoom and scroll sliders">Zoom and scroll sliders</A></LI>
-
-<LI><A HREF="#The settings panel">Settings panel</A></LI>
+<FONT COLOR=#FFFFFF SIZE=+3><b>the explode editor</b></FONT>
+<UL>
+  <LI><A HREF="#The toolbar">Toolbar</A>
+  <LI><A HREF="#The status bar">Status bar</A>
+  <LI><A HREF="#The score panel">Score panel</A>
+  <LI><A HREF="#The tools">Tools</A>
+  <UL>
+    <LI><A HREF="#Arrow tool">Arrow</A></LI>
+    <LI><A HREF="#Adder tool">Adder</A></LI>
+    <LI><A HREF="#Eraser tool">Eraser</A></LI>
+    <LI><A HREF="#Mover tools">Vertical and horizontal movers</A></LI>
+    <LI><A HREF="#Zoomer tool">Zoomer</A></LI>
+  </UL>
+  <LI><A HREF="#Zoom and scroll sliders">Zoom and scroll sliders</A></LI>
+  <LI><A HREF="#The settings panel">Settings panel</A></LI>
 </UL>
 
-<P>
-<HR WIDTH="100%"></P>
+<HR NOSHADE SIZE=1>
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
+<TR><TD>
 
-<H2><A NAME="Introduction"></A>Introduction</H2>
-
-<P>The aim of this editor is to represent the data contained in an <I>explode</I>
-object. It is activated with a double-click on the corresponding object
-in the sketch.</P>
+<P>The aim of the explode editor editor is to represent the data contained in an 
+<I>explode</I> object. 
+It is activated with a double-click on the corresponding object in the patcher.</P>
 
 <P>The data contained in an explode is essentially a collection of <I>events</I>,
 caracterized by a starting time and a set of MIDI parameters. Every event
@@ -106,7 +76,8 @@ representation.</P>
 <P>A <A HREF="#The settings panel">setting panel</A>, that 
 can be retrieved by selecting the options-&gt;settings menu, allows the user to choose the association between the score parameters and the graphic parameters of the events.</P>
 
-<H3><A NAME="The toolbar"></A>The toolbar</H3>
+<A NAME="The toolbar">
+<h3>The toolbar</h3>
 
 <P>It contains the tools selectable by the user: every tool as an associated
 icon and name, and once selected, it is active until next tool's selection.</P>
@@ -127,7 +98,7 @@ shown in the status bar of every window.</P>
 
 <P>See <A HREF="#The tools">later</A> for a description of the tool's behaviour.</P>
 
-<H2><A NAME="The status bar"></A>The status bar</H2>
+<A NAME="The status bar"></A>The status bar</h2>
 
 <P>This component, placed in the top of the window, show the following
 informations:</P>
@@ -148,7 +119,8 @@ Entrering a value in a field (i.e. typing a value and hit the return/enter
 key) changes the value of the specified parameter for all the current selected
 events.</P>
 
-<H2><A NAME="The score panel"></A>The score panel </H2>
+<A NAME="The score panel">
+<h2>The score panel </h2>
 
 <P>The central area of the window contains the piano roll representation
 of the events in the data base. The vertical grid indicates time values
@@ -184,12 +156,13 @@ velocity, channel. The default setting associate the label to the <I>pitch</I>.<
 state of the event.</LI>
 </UL>
 
-<H2><A NAME="The tools"></A>The tools</H2>
+<A NAME="The tools"></A>The tools</h2>
 
 <P>The initial, default tool for the explode editor is the selecter (the
 arrow). </P>
 
-<H3><A NAME="Arrow tool"></A>Arrow tool</H3>
+<A NAME="Arrow tool">
+<h3>Arrow tool</h3>
 
 <P>The tasks of the Arrow are the following:</P>
 
@@ -206,7 +179,7 @@ it just add the objects to the current selection.</LI>
 <LI>Moving: clicking and dragging the mouse on a selected object dinamically
 moves the selected object(s). The move is always constrained to be vertical
 or horizontal: the first mouse move will identify the direction of move
-(see also the <A HREF="#Vertical and Horizontal mover tools">mover tools</A>).
+(see also the <A HREF="#Mover tools">mover tools</A>).
 Please note that since the y parameter (vertical) can be assigned to a
 parameter other then the pitch, moving an object along the y axis can be
 used to modify every parameter of an event (except the starting time).
@@ -215,7 +188,8 @@ the ssigned parameter for the vertical movements). <I>Upper</I> clipping
 is implemented just for the channel parameter, whose maximum value is 15.</LI>
 </UL>
 
-<H3><A NAME="Adder tool"></A>Adder tool</H3>
+<A NAME="Adder tool">
+<h3>Adder tool</h3>
 
 <P>This tool, whose icon is a little note, allows entering new notes in
 the explode data base. The status bar reports the current position of the
@@ -257,7 +231,8 @@ a new note will produce an event in the score with </P>
 <LI>channel = 0</LI>
 </UL>
 
-<H3><A NAME="Eraser tool"></A>Eraser tool</H3>
+<A NAME="Eraser tool">
+<h3>Eraser tool</h3>
 
 <P>The icon of this tool is a little blue eraser gum. The status bar reports
 the current mouse coordinates (time, y parameter).</P>
@@ -266,8 +241,8 @@ the current mouse coordinates (time, y parameter).</P>
 If the note was selected, the click erases all the selection (please remember
 that in explode the undo/redo is unlimited...)</P>
 
-<H3><A NAME="Vertical and Horizontal mover tools"></A>Vertical and Horizontal
-mover tools</H3>
+<A NAME="Mover tools">
+<h3>Vertical and Horizontal mover tools</h3>
 
 <P>These tools are used to move selections of objects. Their icons are
 double vertical/horizontal red arrows with a black circle (a little note)
@@ -275,7 +250,8 @@ in the middle. The only difference between a mover tool and the moving
 capability of the arrow tool is the direction of movement, that is fixed
 for these specific movers.</P>
 
-<H3><A NAME="Resizer tool"></A>Resizer tool</H3>
+<A NAME="Resizer tool">
+<h3>Resizer tool</h3>
 
 <P>This tool allows the resizing (changing the length) of a selection of
 object. Its icon is a thick horizontal black line with two red arrows at
@@ -296,7 +272,8 @@ starting time). Resizing cannot produce negative values for the length.</P>
 parameter (example, the velocity), resizing an event could result in changing
 <I>also</I> its y position, and vice-versa...</P>
 
-<H3><A NAME="Zoomer tool"></A>Zoomer tool</H3>
+<A NAME="Zoomer tool">
+<h3>Zoomer tool</h3>
 
 <P>This tool allows the changing of the x zoom factor of the current representation.
 A click everywhere in the score multiply the current zoom factor by two,
@@ -304,7 +281,8 @@ while an ALT-click divide the zoom factor by the same amount. Note that
 a more fine tuned zoom can be achieved via the <A HREF="#Zoom and scroll sliders">zoom
 slider</A> at the bottom of the window.</P>
 
-<H2><A NAME="Zoom and scroll sliders"></A>Zoom and scroll sliders</H2>
+<A NAME="Zoom and scroll sliders">
+<h2>Zoom and scroll sliders</h2>
 
 <P>Since the x-axis is always associated with time, scrolling the score
 panel always means moving the initial time of the representation's window.
@@ -315,7 +293,8 @@ represented events will change after a zoom even if this length is <I>not
 </I>associated to the duration. This behaviour will be eventually revised
 in future versions.</P>
 
-<H2><A NAME="The settings panel"></A>The settings panel</H2>
+<A NAME="The settings panel">
+<h2>The settings panel</h2>
 
 <P>This panel is composed by a set of rows of radio buttons, where each
 row represents a graphic parameter, and each column an event's (score)
@@ -328,6 +307,10 @@ can be represented by more then one graphic parameter.</P>
 <P>In this version, only the &quot;Cancel&quot; button in the panel is
 active, because the modifications are reported immediately in the score
 and there's no need to explicitly &quot;apply&quot; them.</P>
+
+<P>
+</TABLE>
+<HR NOSHADE SIZE=1>
 
 </BODY>
 </HTML>

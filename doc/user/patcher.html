@@ -3,80 +3,49 @@
 <TITLE> jMax documentation </TITLE>
 </HEAD>
 
-<BODY TEXT="#000000" BGCOLOR="#FFFFFF">
+<BODY TEXT="#000000" BGCOLOR="#CCCCCC" LINK="#000000" VLINK="#000000">
 
-<IMG SRC="../images/logo.jpeg" ALT="IRCAM - Centre Georges Pompidou">
-
-<BR>
-<BR>
-
-<TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0>
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=0>
 <TR>
-<TD ALIGN=CENTER VALIGN=TOP>
-<A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../images/jmax_logo_small.gif" ALT="jMax" BORDER=0></A>
-</TD>
-
-<TD>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-</TD>
-
-<TD ALIGN=LEFT VALIGN=MIDDLE>
-<DL>
-<DT> <IMG SRC="../images/dot.gif"> <A HREF="../index.html">Documentation</A>
-<DL>
-<DT> <IMG SRC="../images/dot.gif"> <A HREF="index.html">User documentation</A>
-<DL>
-<DT> <IMG SRC="../images/dot.gif"> <A HREF="editors.html">Editors</A>
-<DL>
-<DT> <IMG SRC="../images/arrow_grey.gif"> <B><FONT SIZE=+2>Patch editor</FONT></B>
-</DL>
-</DL>
-</DL>
-</DL>
-</TD>
-
+  <TD ALIGN=LEFT>
+    <A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../images/jmax_logo_tiny.gif" BORDER=0 ALT="jMax"></A>
+  </TD>
+  <TD ALIGN=RIGHT>
+    <A HREF="http://www.ircam.fr/"><IMG SRC="../images/ircam_banner.gif" BORDER=0 ALT="IRCAM - Centre Georges Pompidou"></A>
+  </TD>
 </TR>
 </TABLE>
+<BR>
 
-
-<HR>
-
-<UL>
-<LI> 
-  <A HREF="#edit/lock mode">edit/lock mode</A>
-<LI> 
-  <A HREF="#toolbar">toolbar</A>
-<LI> 
-  <A HREF="#adding object">adding object</A>
-<LI> 
-  <A HREF="#connecting objects">connecting objects</A>
-<LI> 
-  <A HREF="#selecting object">selecting object</A>
-<LI> 
-  <A HREF="#editing object">editing object</A>
-<LI> 
-  <A HREF="#opening an editor">opening an editor</A>
-<LI> 
-  <A HREF="#moving object">moving object</A>
-<LI> 
-  <A HREF="#resizing object">resizing object</A>
-<LI> 
-  <A HREF="#copy/cut/pasting objects">copy/cut/pasting objects</A>
-<LI> 
-  <A HREF="#using key bindings">using key bindings</A>
-<LI> 
-  <A HREF="#changing patcher in/outlets">changing patcher in/outlets</A>
-<LI> 
-  <A HREF="#specific objects changes">specific objects changes</A>
-<LI> 
-  <A HREF="#lexical conventions">lexical conventions</A>
+<UL TYPE=SQUARE>
+  <LI><A HREF=../index.html>documentation</A>
+  <UL TYPE=SQUARE>
+    <LI><A HREF=index.html>user documentation</A>
+  </UL>
 </UL>
 
+<FONT COLOR=#FFFFFF SIZE=+3><b>the patch editor</b></FONT>
+<UL>
+  <LI><A HREF="#toolbar">Toolbar</A>
+  <LI><A HREF="#edit_lock">Edit and Lock Mode</A>
+  <LI><A HREF="#adding">Adding an Object</A>
+  <LI><A HREF="#connecting">Connecting Objects</A>
+  <LI><A HREF="#selecting">Selecting an Object</A>
+  <LI><A HREF="#moving">Moving an Object</A>
+  <LI><A HREF="#resizing">Resizing an Object</A>
+  <LI><A HREF="#copy_cut_paste">Copy, Cut & Paste</A>
+  <LI><A HREF="#editing">Editing an Object</A>
+  <LI><A HREF="#patcher">The Patcher Object</A>
+  <LI><A HREF="#editor">Opening an Editor</A>
+  <LI><A HREF="#key_bindings">Key Bindings</A>
+  <LI><A HREF="#changes">Specific Differences to ISPW Max</A>
+</UL>
 
+<HR NOSHADE SIZE=1>
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
+<TR><TD>
 
-<HR>
-
-<P>
+<p>
 As <I>j</I>Max and other Max environments share a common paradigm,
 part of the graphic appearence is the same, and using <I>j</I>Max
 patch editor will be easy for a user that already has experience
@@ -85,15 +54,104 @@ between the jMax patcher editor and the other environments, from an user
 interface point of view.
 
 
-<A NAME="toolbar"><H2>Toolbar</H2></A>
+<A NAME="edit_lock">
+<h2>Edit/lock mode</h2>
 
 <P>
-Every button in the toolbar, except the first, represent a class of objects that can be added in a patcher. 
-The first button is the lock/edit mode button, that represent the current mode of interaction
-with the patcher.
+Since the <i>j</i>Max patch editor is also the frame work for some graphical 
+controllers it supports two modes <i>edit</i> and <i>lock</i>.<BR>
+<p>
+The edit/lock button in the top left of the patcher window can be used to switch 
+from one mode to the other (also CTRL-e) and indicates the current mode:
 
+<P>
+<CENTER>
+<TABLE WIDTH=90% BORDER=1 CELLSPACING=0 CELLPADDING=5 BGCOLOR=#CCCCCC>
+  <TR>
+    <TD ALIGN=TOP><IMG SRC="../images/jmax/tool_edit_mode.gif" BORDER=0></TD>
+    <TD><b>edit mode</b><BR>
+      the toolbar is shown and objects can be added, connected, ... in the patcher window</TD>
+  </TR>
+  <TR>
+    <TD ALIGN=TOP><IMG SRC="../images/jmax/tool_lock_mode.gif" BORDER=0></TD>
+    <TD><b>lock mode</b><BR>
+      the patch can not be editted and the graphical controllers are active
+  </TR>
+</TABLE>
+</CENTER>
 
-<A NAME="adding object"><H2>Adding object</H2></A>
+<P>
+A graphical controler can be activated also in edit mode by clicking on it with the 
+CTRL key pressed.
+
+<A NAME="toolbar">
+<h2>Toolbar</h2>
+
+<P>
+In edit mode the toolbar in the top of the patcher window so far shows the palette 
+of object which can be instatiated in the patcher window:
+
+<P>
+<CENTER>
+<TABLE WIDTH=90% BORDER=1 CELLSPACING=0 CELLPADDING=5 BGCOLOR=#CCCCCC>
+  <TR>
+    <TD VALIGN=TOP><IMG SRC="../images/jmax/tool_ext.gif" BORDER=0></TD> 
+    <TD><b>generic object</b><BR>
+      the generic <i>j</i>Max object ones uses by typing first the class name in</TD>
+  </TR>
+  <TR>
+    <TD VALIGN=TOP><IMG SRC="../images/jmax/tool_patcher.gif" BORDER=0></TD>
+    <TD><b>patcher object</b><BR>
+      the patcher object to create a patcher inside the patcher</TD>
+  </TR>
+  <TR>
+    <TD VALIGN=TOP><IMG SRC="../images/jmax/tool_in.gif" BORDER=0></TD>
+    <TD><b>inlet</b><BR>
+      an inlet for a (sub)patcher or template</TD>
+  </TR>
+  <TR>
+    <TD VALIGN=TOP><IMG SRC="../images/jmax/tool_text.gif" BORDER=0></TD>
+    <TD><b>comment box</b><BR>
+      an outlet for a (sub)patcher or template</TD>
+  </TR>
+  <TR>
+    <TD VALIGN=TOP><IMG SRC="../images/jmax/tool_bang.gif" BORDER=0></TD>
+    <TD><b>bang button</b><BR>
+      a button which outputs a <tt>bang</tt> message when pressed</TD>
+  </TR>
+  <TR>
+    <TD VALIGN=TOP><IMG SRC="../images/jmax/tool_toggle.gif" BORDER=0> </TD>
+    <TD><b>toggle button</b><BR>
+      a button toggling between (and ouputting) <tt>0</tt> and <tt>1</tt> when pressed</TD>
+  </TR>
+  <TR>
+    <TD VALIGN=TOP><IMG SRC="../images/jmax/tool_slider.gif" BORDER=0> </TD>
+    <TD><b>slider</b><BR>
+      a slider outputting integers</TD>
+  </TR>
+  <TR>
+    <TD VALIGN=TOP><IMG SRC="../images/jmax/tool_int.gif" BORDER=0></TD>
+    <TD><b>int box</b><BR>
+      the ISPW compatible integer box to display and input integer values</TD>
+  </TR>
+  <TR>
+    <TD VALIGN=TOP><IMG SRC="../images/jmax/tool_float.gif" BORDER=0></TD> 
+    <TD><b>float box</b><BR>
+      the ISPW compatible float box to display and input float values</TD>
+  </TR>
+  <TR>
+    <TD VALIGN=TOP><IMG SRC="../images/jmax/tool_mess.gif" BORDER=0></TD>
+    <TD><b>message box</b><BR>
+      the ISPW compatible message box</TD>
+  </TR>
+</TABLE>
+</CENTER>
+
+<P>
+(Refer to the object reference and help patch for further information about the objects.)
+
+<A NAME="adding">
+<h2>Adding an Object</h2>
 
 <P>
 Adding an object is done by clicking on a toolbar button: this selects the corresponding 
@@ -106,42 +164,8 @@ A double click on a button of the toolbar
 reselecting. Another click in the toolbar deselect the locked one, as well
 as a click on an object and/or connection in the patch.
 
-<P>
-The subpatcher object is associated with a separate toolbar button 
-<IMG SRC="../images/tool_patcher.gif" BORDER=2 ALIGN=TOP>. The subpatcher object
-is a normal editable object.
-
-
-<A NAME="editing object"><H2>Editing object</H2></A>
-
-<P>
-Editing text inside objects is done by first selecting the object, then
-clicking on it (<I>Warning</I>: not a double click). This opens a text edit field that will be 
-dynamically enlarged to contain the text.
-
-
-
-<A NAME="opening an editor"><H2>Opening an editor</H2></A>
-
-<P>
-Opening the editor associated to an object is done by double-clicking on the object.
-The object class determines what editor will be loaded (i.e. the patcher editor
-for a patcher or a template instance, the table editor for a table, the explode
-editor for an explode, etc.)
-
-
-<A NAME="resizing object"><H2>Resizing object</H2></A>
-
-<P>
-Resizing can be started from the right or bottom side of the
-object by dragging from the resize sensibility area (cursor is changed to
-resize cursor when mouse is in this area). Resizing is always constrained: horizontal only for text objects
-and number/float boxes; both direction together for the &quot;squared&quot;
-objects like bang, toggle, inlet and outlet; 
-horizontal OR vertical for the slider, depending on the chosen area.</LI>
-
-
-<A NAME="connecting objects"><H2>Connecting objects</H2></A>
+<A NAME="connecting">
+<h2>Connecting Objects</h2>
 
 <P>
 Connecting two objects is done by clicking on an outlet, then dragging
@@ -150,8 +174,8 @@ shape when moved over a starting outlet or (dragged over) a destination
 inlet, and that the sensible area where to start (or end) a connection
 is always inside the objects itself, spanning over a greater surface.</LI>
 
-
-<A NAME="selecting object"><H2>Selecting object</H2></A>
+<A NAME="selecting">
+<h2>Selecting object</h2>
 
 <P>
 Clicking on an object selects it. Selection
@@ -161,194 +185,207 @@ it, on a non selected object selects it and add it to the selection.
 <P>
 Area selection is obtained by mouse drag outside objects.
 
-
-<A NAME="moving object"><H2>Moving object</H2></A>
+<A NAME="moving">
+<h2>Moving object</h2>
 
 <P>
 Moving a selection is obtained with the usual click-and-drag behaviour
 
+<A NAME="resizing">
+<h2>Resizing object</h2>
 
-<A NAME="copy/cut/pasting objects"><H2>Copy/cut/pasting objects</H2></A>
+<P>
+Resizing can be started from the right or bottom side of the
+object by dragging from the resize sensibility area (cursor is changed to
+resize cursor when mouse is in this area). Resizing is always constrained: horizontal only for text objects
+and number/float boxes; both direction together for the &quot;squared&quot;
+objects like bang, toggle, inlet and outlet; 
+horizontal OR vertical for the slider, depending on the chosen area.</LI>
+
+<A NAME="copy_cut_paste">
+<h2>Copy/cut/pasting objects</h2>
 
 <P>
 Copy/cut/paste is obtained either via the "Edit" menu, or via menu shortcuts.
 The position of the pasted object(s) is always offsetted down and right from the 
 original copied object(s).
 
+<A NAME="editing">
+<h2>Editing object</h2>
 
-<A NAME="using key bindings"><H2>Using key bindings</H2></A>
+<P>
+Editing text inside objects is done by first selecting the object, 
+then clicking on it (<I>Warning</I>: not a double click). 
+This opens a text edit field that will be dynamically enlarged to contain the text.
+
+<A NAME="patcher">
+<h2>The Patcher Object</h2>
+
+<P>
+The patcher object, which can be instantiated from the objet palette in the toolbar,
+can be used in order to group objects to a subpatcher embedded in the patcher.
+A patcher object can behave like any other object, it can have in- and outlets 
+and can be parametrized by arguments.
+
+<p>
+The first value typed to the patcher object (a symbol) is it's name.
+Double clicking on the patcher object opens another patcher window
+where the content of the patcher can be editted.
+Inlets and outlets can be added inside with the inlet and outlet object from 
+the palette in the toolbar.
+
+<P>
+The inlets and outlets of a patcher are numbered, starting from 0.
+The index correspond to the position of the inlet or outlet on the
+patcher object.
+A new inlet (outlet) object instantiated gets the lowest index which
+is not used yet by another inlet (outlet).
+Copying an inlet (outlet) creates an inlet (outlet) with the same index.
+
+<p>
+A patcher may contain several inlets (outlets) having same number. 
+In this case, they receive the same data (in undefined order) from
+the same connection connected to the patcher object.
+
+<P>
+The index of an inlet (outlet) index can be changed via a pop-up menu obtained 
+by double-clicking and dragging (argh...) on the object.
+The inlet (outlet) object with the greatest index determines the number
+of inlets (outlets) of the patcher (which is it's index plus one).
+
+<P>
+(Note that the index of an inlet or outlet is a characteristic of this object 
+and <b>not</b> a function of the it's geometric position in the patch like in 
+ISPW Max)
+
+<P>
+Please refer to the <A HREF="language.html">language</A> section of this 
+documentaion for further information about patchers, variables and templates.
+
+<A NAME="editor">
+<h2>Opening an editor</h2>
+
+<P>
+Opening the editor associated to an object is done by double-clicking on the object.
+The object class determines what editor will be loaded (i.e. the patcher editor
+for a patcher or a template instance, the table editor for a table, the explode
+editor for an explode, etc.)
+
+<A NAME="key_bindings">
+<h2>Using key bindings</h2>
 
 <P>
 The following key bindings are currently available:
 
 <P>
-<TABLE BORDER=2>
+<CENTER>
+<TABLE WIDTH=90% BORDER=1 CELLSPACING=0 CELLPADDING=5 BGCOLOR=#CCCCCC>
 <TR>
- <TH> Keys </TH>
- <TH> Action </TH>
+  <TH> Keys </TH>
+  <TH> Action </TH>
 </TR>
-
 <TR>
- <TD> LEFT<BR> RIGHT<BR> UP<BR> DOWN </TD>
- <TD> move selection one unit in given direction </TD>
+  <TD> LEFT<BR> RIGHT<BR> UP<BR> DOWN </TD>
+  <TD> move selection one unit in given direction </TD>
 </TR>
-
 <TR>
- <TD> SHIFT-LEFT<BR> SHIFT-RIGHT<BR> SHIFT-UP<BR> SHIFT-DOWN </TD>
- <TD> move selection faster </TD>
+  <TD> SHIFT-LEFT<BR> SHIFT-RIGHT<BR> SHIFT-UP<BR> SHIFT-DOWN </TD>
+  <TD> move selection faster </TD>
 </TR>
-
 <TR>
- <TD> CTRL-LEFT<BR> CTRL-RIGHT<BR> CTRL-UP<BR> CTRL-DOWN </TD>
- <TD> resize selection by one unit in the given direction </TD>
+  <TD> CTRL-LEFT<BR> CTRL-RIGHT<BR> CTRL-UP<BR> CTRL-DOWN</TD>
+  <TD> resize selection by one unit in the given direction </TD>
 </TR>
-
 <TR>
- <TD> SHIFT-CTRL-LEFT<BR> SHIFT-CTRL-RIGHT<BR> SHIFT-CTRL-UP<BR> SHIFT-CTRL-DOWN </TD>
- <TD> resize selection faster </TD>
+  <TD> SHIFT-CTRL-LEFT<BR> SHIFT-CTRL-RIGHT<BR> SHIFT-CTRL-UP<BR> SHIFT-CTRL-DOWN </TD>
+  <TD> resize selection faster </TD>
 </TR>
-
 <TR>
- <TD> ALT-LEFT<BR> ALT-RIGHT<BR> ALT-UP<BR> ALT-DOWN </TD>
- <TD> align selection to the right, left, up or bottom
+  <TD> ALT-LEFT<BR> ALT-RIGHT<BR> ALT-UP<BR> ALT-DOWN </TD>
+  <TD> align selection to the right, left, up or bottom
 </TR>
-
 <TR>
- <TD> ? </TD>
- <TD> open help for selected objects </TD>
+  <TD> CTRL-a </TD>
+  <TD> select all objects in current patcher </TD>
 </TR>
-
 <TR>
- <TD> CTRL-a </TD>
- <TD> select all objects in current patcher </TD>
+  <TD> CTRL-c </TD>
+  <TD> copy the selection to the clipboard </TD>
 </TR>
-
 <TR>
- <TD> CTRL-c </TD>
- <TD> copy the selection to the clipboard </TD>
+  <TD> CTRL-x </TD>
+  <TD> move the selection to the clipboard </TD>
 </TR>
-
 <TR>
- <TD> CTRL-x </TD>
- <TD> move the selection to the clipboard </TD>
+  <TD> CTRL-v </TD>
+  <TD> paste the clipboard </TD>
 </TR>
-
 <TR>
- <TD> CTRL-v </TD>
- <TD> paste the clipboard </TD>
+  <TD> CTRL-e </TD>
+  <TD> toggle edit/lock mode </TD>
 </TR>
-
 <TR>
- <TD> CTRL-e </TD>
- <TD> toggle edit/lock mode </TD>
+  <TD> CTRL-o </TD>
+  <TD> open a file </TD>
 </TR>
-
 <TR>
- <TD> CTRL-o </TD>
- <TD> open a file </TD>
+  <TD> CTRL-n </TD>
+  <TD> create a new patcher </TD>
 </TR>
-
 <TR>
- <TD> CTRL-n </TD>
- <TD> create a new patcher </TD>
+  <TD> CTRL-w </TD>
+  <TD> close current patcher </TD>
 </TR>
-
 <TR>
- <TD> CTRL-w </TD>
- <TD> close current patcher </TD>
+  <TD> CTRL-s </TD>
+  <TD> save current patcher (if patcher was loaded from file) </TD>
 </TR>
-
 <TR>
- <TD> CTRL-s </TD>
- <TD> save current patcher (if patcher was loaded from file) </TD>
-</TR>
-
-<TR>
- <TD> CTRL-q </TD>
- <TD> quit <I>j</I>Max </TD>
-</TR>
-
-</TABLE>
-
-
-<A NAME="edit/lock mode"><H2>Edit/lock mode</H2></A>
-
-<P>
-Switching from edit mode (where objects can be added, deleted, edited, connected, ...)
-and lock mode (where only graphical controlers are active) is done by:
-<UL>
-<LI> clicking on the leftmost button of the palette (closed hand = lock mode,
-open hand = edit mode
-<LI> typing CTRL-e
-</UL>
-
-<P>
-The current state is reflected by the palette and by the color of the background (gray/white).
-
-<P>
-A graphical controler (slider, number box, button, etc) can be actionned
-in edit mode by clicking on it with the CTRL key pressed.
-
-
-
-<A NAME="changing patcher in/outlets"><H2>Changing patcher in/outlets</H2></A>
-
-<P>
-The inlets/outlets of a patcher are numbered, starting from 0. The main
-difference introduced by <I>j</I>Max is that the index of an inlet/outlet 
-is a characteristic of this object and is <I>NOT</I>
-a function of the inlet/outlet geometric position in the patch.
-The inlet/outlet index is visible inside the inlet/outlet object.
-
-<P>
-When an inlet (resp. outlet) is added to a patcher, it is given an index
-equals to the current number of inlets (resp. outlets) of the patcher
-plus one.
-
-<P>
-The inlet/outlet index can be changed
-via a pop-up menu obtained by double-clicking and dragging (argh...)
-on the object.
-
-<P>
-A patcher may contain several inlets/outlets having same number. In this case,
-they are considered (from the connected objects point of view) as being one
-single inlet/outlet.
-
-<A NAME="specific objects changes"><H2>Specific objects changes</H2></A>
-<p>
-A couple of objects have local changes; they are converted automatically
-when loading a Max 0.26 file.
-<p>
-<TABLE BORDER=2>
-<TR>
- <TH> Object </TH>
- <TH> Changes </TH>
-</TR>
-
-<TR>
- <TD> <code>expr</code> <p>
- <TD> The <code>expr</code> object now accept only one argument, a symbol,
-that include the complete text of the expression.
-</TR>
-
-<TR>
- <TD> <code> Message Box </code> <p>
- <TD> The <code> Message Box </code> now use the single quote instead of the backslash.
-It also accept <code>$name</code> that is evaluated to the value of a variable;
-see <A HREF="language.html#variables"> the languages documentation for details</A>.
+  <TD> CTRL-q </TD>
+  <TD> quit <I>j</I>Max </TD>
 </TR>
 </TABLE>
+</CENTER>
+
+<A NAME="changes">
+<h2>Specific Differences to ISPW Max</h2>
 
 <p>
+The <A HREF="language.html#lexical">lexical conventions</A> of <i>j</i>Max 
+differ slightly from that ones of ISPW Max.
+Objects loaded from original ISPW patches are converted on the fly to the <i>j</i>Max 
+syntax.
 
-
-
-<A NAME="lexical conventions"><H2>Lexical Conventions</H2></A>
 <p>
-The lexical conventions, i.e. the quoting rules, for the object text are
-changed; see <A HREF="language.html#lexical"> the languages documentation for details</A>.
+Following ISPW Max objects have been modified in order to provide a compatible behaivour:
+
 <p>
+<CENTER>
+<TABLE WIDTH=90% BORDER=1 CELLSPACING=0 CELLPADDING=5 BGCOLOR=#FFFFFF>
+<TR>
+  <TH>Object</TH>
+  <TH>Changes</TH>
+</TR>
+<TR>
+  <TD ALIGN=RIGHT VALIGN=TOP><tt><b>expr</b></tt></TD>
+  <TD>The ibject <tt>expr</tt> now accepts only one argument, a symbol,
+    that include the complete text of the expression.
+    In general double quotes must be used at the beginning and end of
+    the expression.</TD>
+</TR>
+<TR>
+  <TD ALIGN=RIGHT VALIGN=TOP><b>message box<b></TD>
+  <TD>The message box uses a single quote instead of backslash @@@@@.<BR>
+      It now accepts <A HREF="language.html#variables">variables</A><tt>$name</t>,
+      which are evaluated at the creation of the message box.<BR>
+      (Note that the message box does not evaluate expressions.)</TD>
+</TR>
+</TABLE>
+</CENTER>
+
+<P>
+</TABLE>
+<HR NOSHADE SIZE=1>
 
 </BODY>
 </HTML>

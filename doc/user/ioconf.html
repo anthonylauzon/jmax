@@ -1,0 +1,178 @@
+<HTML>
+<HEAD>
+<TITLE> jMax I/O Configuration </TITLE>
+</HEAD>
+
+<BODY TEXT="#000000" BGCOLOR="#CCCCCC" LINK="#000000" VLINK="#000000">
+
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=0>
+<TR>
+  <TD ALIGN=LEFT>
+    <A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../images/jmax_logo_tiny.gif" BORDER=0 ALT="jMax"></A>
+  </TD>
+  <TD ALIGN=RIGHT>
+    <A HREF="http://www.ircam.fr/"><IMG SRC="../images/ircam_banner.gif" BORDER=0 ALT="IRCAM - Centre Georges Pompidou"></A>
+  </TD>
+</TR>
+</TABLE>
+<BR>
+
+<UL TYPE=SQUARE>
+  <LI><A HREF=../index.html>documentation</A>
+  <UL TYPE=SQUARE>
+    <LI><A HREF=index.html>user documentation</A>
+  </UL>
+</UL>
+
+<FONT COLOR=#FFFFFF SIZE=+3><b>i/o configuration</b></FONT>
+<UL TYPE=DOT>
+  <LI><A HREF="#disclamier"> Disclamier </A>
+  <LI><A HREF="#introduction"> Introduction  </A>
+  <LI><A HREF="#commands"> I/O Configuration Commands </A>
+</UL>
+
+<HR NOSHADE SIZE=1>
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
+<TR><TD>
+  
+<A NAME="disclamier"> 
+<H2> Disclamier </H2>
+
+<P>
+The current version of <I>j</I>Max use TCL as its
+scripting language, and the feature described in this document is
+currently based on TCL; future version of <I>j</I>Max may
+use a different scripting language, so the features described here
+will change, will be implemented with a different language and/or
+syntax, or will simply vanish.
+
+<A NAME="introduction">
+<H2> Introduction   </H2>
+
+<P>
+Make an I/O configuration means two things: first, choosing and <i>opening</i> 
+the platform specific I/O devices that will be used, second, to associate these 
+devices with the objects in <i>j</i>Max patches; since a patch can be moved between 
+different platform, platform specif information should not be included in the patches
+themselves, but specified in site, user or project configuration files, by means of 
+a set of TCL commands. <p>
+Two commands allow the control of global parameters, the main sampling rate and the 
+audio buffer size.
+
+<P>
+<A NAME="commands">
+<H2> I/O Configuration Commands </H2>
+<P>
+The following set of commands is subject to change in future releases.
+<DL>
+  <DT> <code><b>jmaxSetSampleRate</b></code> <i>sr</i><p>
+  <DD> 
+    Set the <i>j</i>Max main sampling rate; note that for this release,
+    on Sgi machines the sampling rate must also be set by hand using the <code>audiopanel</code>
+    for all the devices used.<p>
+
+  <DT><code><b>jmaxSetAudioBuffer</b></code> <i>buf</i> <p>
+  <DD> 
+    Set the length of the audio buffer used, i.e. the length, in samples, 
+    of the output fifo used to compensate the variation of load in <i>j</i>Max;
+    typical values are between <code>256</code> and <code>1024</code>, can be more
+    or less depending on the application.<p>
+
+  <DT><code><b>openDefaultAudioIn</b></code>  <i>device</i> <i>ch</i> <p>
+  <DD>
+    Open the audio input device <i>device</i> as the default audio device,
+    i.e. the device used by the <code>adc~</code> objects; the <i>device</i> meaning
+    is platform dependent; for the Sgi version, <i>device</i> is the name of the input
+    device as it appear in the audio panel (without the blanks) (see the man page
+    for <code>audio</code> keyword); depending on the workstation model and on the installed
+    options, valid names are <code>AnalogIn</code>, <code>AESIn</code>, <code>AdatIn</code>,
+    or <code>RADx.AdatIn</code> and <code>RADx.AESIn</code> for the RAD card x.
+    The <i>ch</i> argument must be the number of channels supported by the interface,
+    usually <code>2</code> or <code>8</code>.<p>
+
+  <DT> <code><b>openAudioIn</b></code> <i>name</i> <i>device</i> <i>ch</i>  <p>
+  <DD> 
+    As the previous command, but open an input named  device connected to
+    the objects <code>in~</code> that have <i>name</i> as first argument; these
+    objects are equivalent to the <code>adc~</code> object, but allow the use
+    of multiple input device, one for object.<p>
+
+  <DT> <code><b>openNamedDefaultAudioIn</b></code> <i>name</i> <i>device</i> <i>ch</i>  <p>
+  <DD> 
+    Like the previous two combined; i.e. open a named input device that can
+    be used with the <code>in~</code> object, and set this device also as the device
+    used by the <code>adc~</code> object.<p>
+
+  <DT> <code><b>resetAudioIn</b></code><p>
+  <DD> 
+    Reset the effects of the previous commands, i.e. close all the input audio devices,
+    and delete the register names. Usefull in projects files or other situation where
+    a clean input configuration must be installed from scratch.<p>
+
+  <DT> <code><b>openDefaultAudioOut</b></code> <i>device</i> <i>ch</i> <p>
+  <DD>
+    Open the audio output device <i>device</i> as the default audio device,
+    i.e. the device used by the <code>dac~</code> objects; the <i>device</i> meaning
+    is platform dependent; for the Sgi version, <i>device</i> is the name of the output
+    device as it appear in the audio panel (without the blanks) (see the man page
+    for <code>audio</code> keyword); depending on the workstation model and on the installed
+    options, valid names are <code>AnalogOut</code>, <code>AESOut</code>, <code>AdatOut</code>,
+    or <code>RADx.AdatOut</code> and <code>RADx.AESOut</code> for the RAD card x.
+    The <i>ch</i> argument must be the number of channels supported by the interface,
+    usually <code>2</code> or <code>8</code>.<p>
+
+  <DT> <code><b>openAudioOut</b></code> <i>name</i> <i>device</i> <i>ch</i> <p>
+  <DD> 
+    As the previous command, but open an output named  device connected to
+    the objects <code>out~</code> that have <i>name</i> as first argument; these
+    objects are equivalent to the <code>dac~</code> object, but allow the use
+    of multiple output device, one for object.<p>
+
+  <DT> <code><b>openNamedDefaultAudioOut</b></code> <i>name</i> <i>device</i> <i>ch</i>  <p>
+  <DD> 
+    Like the previous two combined; i.e. open a named output device that can
+    be used with the <code>out~</code> object, and set this device also as the device
+    used by the <code>dac~</code> object.<p>
+
+  <DT> <code><b>resetAudioOut</b></code> <p>
+  <DD> 
+    Reset the effects of the previous commands, i.e. close all the output audio devices,
+    and delete the register names. Usefull in projects files or other situation where
+    a clean output configuration must be installed from scratch.<p>
+
+  <DT> <code><b>openDefaultMidi</b></code>  <i>port</i><p>
+  <DD>
+    Open the MIDI <i>port</i> as the default MIDI device, 
+    i.e. the device used by all the MIDI objects without a port number argument; the <i>port</i> meaning
+    is platform dependent; for the Sgi version, <i>device</i> is the name of the midi port
+    as given in the <code>startmidi</code> command (see the its man page for details on MIDI
+    on IRIX).<br>
+    Currently the default MIDI device is the port installed with port number <code>0</code>, so this comand
+    is equivalent to the next one with first argument <code>0</code>.<p>
+
+  <DT> <code><b>openMidi</b></code>  <i>num</i> <i>port</i><p>
+  <DD>
+    Open the MIDI <i>port</i> as the MIDI device installed on port number <i>num</i>
+    i.e. the device used by all the MIDI objects with a port number argument of 
+    <i>num</i>; the <i>port</i> meaning is platform dependent; 
+    for the Sgi version, <i>device</i> is the name of the midi port
+    as given in the <code>startmidi</code> command (see the its man page for details on MIDI
+    on IRIX). <br>
+    A device installed with port number of <code>0</code> will be used by all the MIDI related object
+    without a MIDI port number.<p>
+
+  <DT><code><b>resetMidi</b></code> <p>
+  <DD> 
+    Reset the effects of the previous commands, i.e. close all the MIDI devices,
+    and delete the registered port number. Usefull in projects files or other situation where
+    a clean MIDI configuration must be installed from scratch.
+</DL>
+
+<P>
+</TABLE>
+<HR NOSHADE SIZE=1>
+ 
+</BODY>
+</HTML>
+
+

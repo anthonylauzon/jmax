@@ -3,156 +3,133 @@
 <TITLE> jMax documentation </TITLE>
 </HEAD>
 
-<BODY TEXT="#000000" BGCOLOR="#FFFFFF">
+<BODY TEXT="#000000" BGCOLOR="#CCCCCC" LINK="#000000" VLINK="#000000">
 
-<IMG SRC="../images/logo.jpeg" ALT="IRCAM - Centre Georges Pompidou">
-
-<BR>
-<BR>
-
-<TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0>
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=0>
 <TR>
-<TD ALIGN=CENTER VALIGN=MIDDLE>
-<A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../images/jmax_logo_small.gif" ALT="jMax" BORDER=0></A>
-</TD>
-
-<TD>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-</TD>
-
-<TD ALIGN=LEFT VALIGN=MIDDLE>
-<DL>
-<DT> <IMG SRC="../images/dot.gif"> <A HREF="../index.html"> Documentation </A>
-<DL>
-<DT> <IMG SRC="../images/dot.gif"> <A HREF="index.html"> User documentation </A>
-<DL>
-<DT> <IMG SRC="../images/arrow_grey.gif"> <B><FONT SIZE=+2>Installation</FONT></B>
-</DL>
-</DL>
-</DL>
-</TD>
-
+  <TD ALIGN=LEFT>
+    <A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../images/jmax_logo_tiny.gif" BORDER=0 ALT="jMax"></A>
+  </TD>
+  <TD ALIGN=RIGHT>
+    <A HREF="http://www.ircam.fr/"><IMG SRC="../images/ircam_banner.gif" BORDER=0 ALT="IRCAM - Centre Georges Pompidou"></A>
+  </TD>
 </TR>
 </TABLE>
+<BR>
 
-<HR>
-
-<UL>
-  <LI>
-    <A HREF="#distribution">Installing the <I>j</I>Max distribution</A>
-  <LI>
-    <A HREF="#java">Java installation</A>
-  <LI>
-    <A HREF="#configuration">Configuration files</A>
+<UL TYPE=SQUARE>
+  <LI><A HREF=../index.html>documentation</A>
+  <UL TYPE=SQUARE>
+    <LI><A HREF=index.html>user documentation</A>
+  </UL>
 </UL>
 
-<HR>
+<FONT COLOR=#FFFFFF SIZE=+3><b>installation instructions</b></FONT>
+<UL TYPE=DOT>
+  <LI><A HREF="#distribution">Installing the <i>j</i>Max distribution</A>
+  <LI><A HREF="#java">Java installation</A>
+</UL>
 
+<HR NOSHADE SIZE=1>
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
+<TR><TD>
+  
 <A NAME="distribution">
-<H2>Installing the <I>j</I>Max distribution</H2>
+<H2>Installing the <i>j</i>Max distribution</H2>
 
-<I>j</I>Max is distributed as a tar gzip'ed file. After downloading the <I>j</I>Max 
+<i>j</i>Max is distributed as a tar gzip'ed file. After downloading the <i>j</i>Max 
 distribution file (for instance jmax.free.linuxpc.2.3.12.tar.gz),
 you will need to execute the following:
 
 <OL>
-<LI> untar the package:
-<PRE>
-tar xvzf DISTRIB-FILE
-</PRE>
-This will create a directory max-&lt;VERSION NUMBER&gt;. To keep environment unchanged with
-new releases of <I>j</I>Max, you can make a symbolic link to it, as :
-<PRE>
-ln -s max-2.3.12 max
-</PRE>
-Note: be carefull to untar the files with the correct access permissions.
+  <LI>Untar the package in the directory where you want to install <i>j</i>Max<BR>
+    (typically <tt>/usr/local</tt>):
+    <P>
+    <UL>
+      <DT><b><tt>tar xvzf</tt> &lt;<i>distribution file</i>&gt;</b><BR>
+      <tt>tar xvzf jmax.free.linuxpc.2.3.12.tar.gz</tt>
+    </UL>
+    <P>
+    This will create the <i>j</i>Max version directory as &nbsp;<b><tt>max-</tt> &lt;<i>version number</i>&gt;</b>.<BR>
+    To keep the environment unchanged with new releases of <i>j</i>Max, 
+    you can make a symbolic link from the version directory to a constant <i>j</i>Max root directory, like:
+    <P>
+    <UL>
+      <DT><b><tt>ln -s</tt> &lt;<i>version directory</i>&gt &lt;<i>jMax root directory</i>&gt</b><BR>
+        <tt>ln -s /usr/local/max-2.3.12 /usr/local/max</tt>
+    </UL>
+    <P>
+    (Note: Be carefull to untar the files with the correct access permissions.)
 
-<P>
-<LI> execute as root the script INSTALL.sh in <I>j</I>Max root directory. This script
-will change the access permissions of <I>j</I>Max server executables to allow
-it to switch to real-time scheduling policy and priority.
+  <P>
+  <LI>Execute the installation script in the <i>j</i>Max root directory with superuser permissions (as root):
+    <P>
+    <UL>
+      <DT><b><tt>INSTALL.sh</tt></b>
+    </UL>
+    <P>
+    This script will change the access permissions of <i>j</i>Max server executables to allow
+    it to switch to real-time scheduling policy and priority.
 </OL>
-<p>
-Note that you can install multiple distribution files relative to different architectures,
-and untar them in the same place, of course if they come from the same release.
+
 <HR>
 
 <A NAME="java">
 <H2>Java Installation</H2>
 
-The current version of <I>j</I>Max requires:
+The current version of <i>j</i>Max requires:
 <OL>
-<LI> an installation of the <I>Java Runtime Environment (JRE)</I> or the 
-<I>Java Development Kit (JDK)</I> version 1.1.5 or higher.
-<LI> JavaTM Foundation Classes (JFC) Swing 1.1 Beta 2
+  <LI>An installation of the <i>Java Runtime Environment</i> (JRE) or<BR>
+    the <i>Java Development Kit</i> (JDK) version 1.1.5 or higher
+  <LI><i>Java Foundation Classes</i> (JFC) <i>Swing</i> 1.1 Beta 2
 </OL>
 
 <P>
-<STRONG>NOTE:</STRONG> <I>j</I>Max requires Swing 1.1 Beta 2. It is known <STRONG>not</STRONG> to work
-with Swing 1.1 Beta 1 and Swing 1.1 Beta 3 !
+<STRONG>NOTE:</STRONG>
+<i>j</i>Max requires Swing 1.1 Beta 2.
+It is known <STRONG>not</STRONG> to work with Swing 1.1 Beta 1 and Swing 1.1 Beta 3!
 
 <P>
-How to get the <I>JRE</I> or <I>JDK</I> and how to install it on your machine will be better 
-explained there:
+For the installation of the required Java components refer to the following sites:
+
 <UL>
-<LI> JDK: <A HREF="http://java.sun.com/products/jdk/1.1/index.html"> 
-http://java.sun.com/products/jdk/1.1/index.html</A> 
-<LI> Silicon Graphics Java Development Environment: <A HREF="http://www.sgi.com/Products/Evaluation/#jdk">
-http://www.sgi.com/Products/Evaluation/#jdk</A>
+  <LI><A HREF="http://www.sgi.com/Products/Evaluation/#jdk">
+    <b>JDK for SGI Systems</b></A> or 
+    <A HREF="http://java.sun.com/products/jdk/1.1/index.html">
+    <b>Sun's JDK and JRE distributions</b></A> for multiple platforms<P>
+  <LI><A HREF="http://developer.java.sun.com/developer/earlyAccess/jfc/index.html">
+    <b>JavaTM Foundation Classes (JFC) Swing 1.1 Beta 2</b></A><BR>
+    (this site at Sun requires a free registration)<P>
 </UL>
 
 <P>
-JavaTM Foundation Classes (JFC) Swing 1.1 Beta 2 can be found at:<BR>
-<A HREF="http://developer.java.sun.com/developer/earlyAccess/jfc/index.html">
-http://developer.java.sun.com/developer/earlyAccess/jfc/index.html</A><BR>
-This site requires registration (which is free...).
-
-
-
-<HR>
-
-<A NAME="configuration">
-<H2>Configuration files</H2>
+The path of the Java executable must be added to the <tt>PATH</tt> environment variable
+in order to startup the Java environment by the 
+<A HREF=getting_started.html#running><i>j</i>Max script</A>.<BR>
+Furthermore for the current <i>j</i>Max distribution the CLASSPATH environment variable 
+must be set for Java to find the Swing classes.
 
 <P>
-In the current distribution, the configuration for an installation
-depends on the following files in the <B><TT>config</TT></B> directory:
-
-<DL>
-  <DT><TT><B>defaults.tcl</B></TT>
-  <DD>
-    installation default settings of the <I>system properties</I><BR>
-    (overwritten by user settings and command line arguments)
-    <P>
-  <DT><TT><B>packages.tcl</B></TT>
-  <DD>
-     packages loaded by default for this installation<BR>
-    <P>
-  <DT><TT><B>audio.cfg</B></TT>
-  <DD>
-     default audio configuration at startup<BR>
-    <P>
-  <DT><TT><B>midi.cfg</B></TT>
-  <DD>
-     default MIDI configuration at startup<BR>
-    <P>
-</DL>
+This can be done for example by adding the following two lines to the <tt>.cshrc</tt>
+file in the users home directory:
 
 <P>
-These files should assure that a user can startup <I>j</I>Max anytime 
-running a minimum configuration without further declarations.
-They should be modified to match your installation
-(at least edit <TT>defaults.tcl</TT> to set the right server architecture).
+<UL>
+  <DT><b><tt>setenv PATH ${PATH}:</tt> &lt;<i>Java directory</i>&gt;</b>
+  <DT><tt>setenv PATH "${PATH}:/usr/java/bin"</tt>
+  <P>
+  <DT><b><tt>setenv CLASSPATH</tt> &lt;<i>Swing directory</i>&gt;<tt>/swing.jar</tt></b>
+  <DT><tt>setenv PATH "${PATH}:/usr/java/lib/swing/swingall.jar"</tt>
+</UL>
 
 <P>
-The <I>j</I>Max user can give his own values for the system properties
-in his user configuration file <TT>~/.jmaxrc</TT>.
-You find an example of a user configuration file the <TT>config</TT> directory
-of the distribution as <TT>examples.jmaxrc</TT>.
-
-
-<P>
-<HR>
-
+</TABLE>
+<HR NOSHADE SIZE=1>
+ 
 </BODY>
 </HTML>
+
+
+
+
+

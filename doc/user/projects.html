@@ -3,71 +3,53 @@
 <TITLE> jMax Project Configuration </TITLE>
 </HEAD>
 
-<BODY TEXT="#000000" BGCOLOR="#FFFFFF">
+<BODY TEXT="#000000" BGCOLOR="#CCCCCC" LINK="#000000" VLINK="#000000">
 
-<IMG SRC="../../images/logo.jpeg" ALT="IRCAM - Centre Georges Pompidou">
-
-<BR>
-<BR>
-
-<TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0>
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=0>
 <TR>
-<TD ALIGN=CENTER VALIGN=MIDDLE>
-<A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../../images/jmax_logo_small.gif" ALT="jMax" BORDER=0></A>
-</TD>
-
-<TD>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-</TD>
-
-<TD ALIGN=LEFT VALIGN=MIDDLE>
-<DL>
-<DT> <IMG SRC="../../images/dot.gif"> <A HREF="../../index.html"> Documentation </A>
-<DL>
-<DT> <IMG SRC="../../images/dot.gif"> <A HREF="../index.html"> User documentation </A>
-<DL>
-<DT> <IMG SRC="../../images/dot.gif"> <A HREF="index.html"> Configuration</A>
-<DL>
-<DT> <IMG SRC="../../images/arrow_grey.gif"> <B><FONT SIZE=+2> Project Configuration</FONT></B>
-</DL>
-</DL>
-</DL>
-</DL>
-</TD>
-
+  <TD ALIGN=LEFT>
+    <A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../images/jmax_logo_tiny.gif" BORDER=0 ALT="jMax"></A>
+  </TD>
+  <TD ALIGN=RIGHT>
+    <A HREF="http://www.ircam.fr/"><IMG SRC="../images/ircam_banner.gif" BORDER=0 ALT="IRCAM - Centre Georges Pompidou"></A>
+  </TD>
 </TR>
 </TABLE>
+<BR>
 
-<HR>
-
-<UL>
-  <LI>
-    <A HREF="#disclamier"> Disclamier </A>
-  <LI>
-    <A HREF="#project"> What is a Project </A>
-  <LI>
-    <A HREF="#env"> The Project File </A>
-  <LI>
-    <A HREF="#commands"> Commands</A>
-  <LI>
-    <A HREF="#example"> Project File Example</A>
+<UL TYPE=SQUARE>
+  <LI><A HREF=../index.html>documentation</A>
+  <UL TYPE=SQUARE>
+    <LI><A HREF=index.html>user documentation</A>
+  </UL>
 </UL>
 
-<HR>
+<FONT COLOR=#FFFFFF SIZE=+3><b>project environment settings</b></FONT>
+<UL TYPE=DOT>
+  <LI><A HREF="#disclamier"> Disclamier </A>
+  <LI><A HREF="#project"> What is a Project?</A>
+  <LI><A HREF="#env"> The Project File </A>
+  <LI><A HREF="#commands"> Commands</A>
+  <LI><A HREF="#example"> Project File Example</A>
+</UL>
 
+<HR NOSHADE SIZE=1>
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
+<TR><TD>
+  
 <A NAME="disclamier"> 
 <H2> Disclamier </H2>
 <P>
-The current version of <I>j</I>Max use <code>tcl</code> as its
+The current version of <I>j</I>Max use TCL as its
 scripting language, and the feature described in this document is
-currently based on <code>tcl</code>; future version of <I>j</I>Max may
+currently based on TCL; future version of <I>j</I>Max may
 use a different scripting language, so the features described here
 will change, will be implemented with a different language and/or
 syntax, or will simply vanish.
 <P>
 
 <A NAME="project">
-<H2> What is a Project </H2>
+<H2> What is a Project?</H2>
 
 <P>
 <I>j</I>Max is, after all, a programming language; and while it's
@@ -76,6 +58,7 @@ starting developping small MIDI or sounds oriented applications, it is
 often used to develop medium or large sized projects, projects in the
 order of hundred of thousands of objects, equivalent to program of
 hundred of thousands lines of code.
+
 <P>
 Projects of this size require, together with easy of use of the basic
 tools, some tool that help to manage the complexity of developements
@@ -83,12 +66,14 @@ and delivery of applications and libraries.  In this release
 <I>j</I>Max introduce two set of features, a simple and rougth support for projects to handle
 applications, and the support of the concept of <A HREF="packages.html"> package
 </A>, to handle delivery of libraries.
+
 <P>
 A <I>j</I>Max project is usually made by of many kind of components: patches, templates,
 soundfiles,  object libraries, Java libraries, documentation, help files and so on; managing a project
 means being able to load/install all these components, to browse and edit the project structure,
 to handle the dependencies between this components and other components external to the project
 and so on.
+
 <P>
 Currently <I>j</I>Max provide a simple mechanism to load/install all the components,
 by means of a script file, 
@@ -98,14 +83,17 @@ release will introduce more functionalities.
 
 <A NAME="env">
 <H2> The Project File </H2>
+
 <P>
 A <I>j</I>Max project is contained in a directory and all its subdirectory; 
 this directory is called <I> the project directory</I>.
 The main patch, i.e. the patch that is loaded in order to load the project,
 should be in the project directory.
+
 <P>
 The project directory can contain an other file, called the project 
 file, that is a script that load/install all the components needed by the project.
+
 <P>
 The project  file is loaded before the patch, and is found thru a naming
 convention; if the file is called "foo.jmax" or "foo.pat", <I>j</I>Max look first
@@ -113,21 +101,25 @@ for a file called "foo.env", and if this file does not exists, it look for a fil
 called "project.env"; this naming convention allows to have multiple project file
 in the same directory (usefull for small projects) or to share a single project file
 between different patches (for example, different version of the same patch).
+
 <P>
-The project file is currently a <code>tcl</code> file; the <code>tcl</code> commands
+The project file is currently a TCL file; the TCL commands
 are evaluated in an environment where the <code>dir</code> variable is defined to have
 the value of the project directory, so it can be used to build filename relative to the
 project directory, so that no dependency on the absolute path need to be coded in the
+
 <P>
-The project file can contains a number of <code>tcl</code> commands that load or
+The project file can contains a number of TCL commands that load or
 install the different kind of components in <I>j</I>Max; for this release, the commands
 needed to install user developed libraries (<code>C</code> or <code>Java</code>) are
 not documented; the project file can also, in special case, contains <A HREF="ioconf.html">
 I/O configuration commands</A>, when you want to be sure that a project run 
 in a specific configuration.
+
 <P>
 The currently <I>j</I>Max is not able to properly undo all the action in
 a project file; we suggest, for the moment, to restart before changing project.
+
 <p>
 Note that in some sense you can consider your <A
 HREF="../getting_started.html#.jmaxrc"><code>.jmaxrc</code> </A> file
@@ -136,57 +128,63 @@ file can be put in the <code>when start</code> hook, and thus apply to
 all the patches loaded in all the session; this is usefull while
 developping small applications that do not require a project
 organization.
-<P>
 
 <A NAME="commands">
 <H2> Commands</H2>
+
 <p>
 The following are the available commands; the command name is printed in
 <code>this</code> typeface, while the arguments are type in <i>this</i> typeface;
-since the project file is a <code>tcl</code> file, any <code>tcl</code> command
+since the project file is a TCL file, any TCL command
 can be included in the file; but, as we <A HREF="#disclamier"> said </A>, we don't guarantee
-that future version will still use <code>tcl</code> as scripting language; anyway, future
+that future version will still use TCL as scripting language; anyway, future
 scripting language will the following commands, possibly with a different syntax.
-<P>
-
 
 <DL>
-<DT> <code>#</code> <i>anything</i> <p>
-<DD>Anything after the <code>#</code> is considered a comment and ignored.<p>
+  <DT><tt><b>#</b></tt> <i>anything</i><p>
+  <DD>
+    Anything after the <code>#</code> is considered a comment and ignored.<p>
 
-<DT> <code>package require</code> <i>package</i> <p>
-<DD> Load a package named <i>package</i>; packages are libraries of different kind of 
-functionalities, including patch libraries and UI components; see 
-<A HREF="packages.html"> the packages documentation</A> for details.  <p>
+  <DT><tt><b>package require</b></tt> <i>package</i><p>
+  <DD> 
+    Load a package named <i>package</i>; packages are libraries of different kind of 
+    functionalities, including patch libraries and UI components; see 
+    <A HREF="packages.html"> the packages documentation</A> for details.  <p>
 
-<DT> <code>templateDirectory</code> <i>directory</i><p>
-<DD> Add the directory <i>directory</i> to the list of directories where
-templates are searched; in a project file, usually <i>directory</i>
-is a subdirectory of the project directory where templates are stored.<p>
+  <DT><tt><b>templateDirectory</b></tt> <i>directory</i><p>
+  <DD> 
+    Add the directory <i>directory</i> to the list of directories where
+    templates are searched; in a project file, usually <i>directory</i>
+    is a subdirectory of the project directory where templates are stored.<p>
 
-<DT> <code>template</code> <i> name </i> <i>filename</i><p>
-<DD> Declare a single template called <i>name</i>, and set its definition
-to be the patch stored in the file <i>filename</i>; the file must be a 
-in the <I>j</I>Max format.<p>
+  <DT><tt><b>template</b></tt> <i>name</i> <i>filename</i><p>
+  <DD> 
+    Declare a single template called <i>name</i>, and set its definition
+    to be the patch stored in the file <i>filename</i>; the file must be a 
+    in the <I>j</I>Max format.<p>
 
-<DT> <code>abstractionDirectory</code>  <i>directory</i><p>
-<DD> Add the directory <i>directory</i> to the list of directories where
-Max 0.26 abstractions  are searched; in a project file, usually <i>directory</i>
-is a subdirectory of the project directory where abstractions are stored.<p>
+  <DT><tt><b>abstractionDirectory</b></tt> <i>directory</i><p>
+  <DD> 
+    Add the directory <i>directory</i> to the list of directories where
+    Max 0.26 abstractions  are searched; in a project file, usually <i>directory</i>
+    is a subdirectory of the project directory where abstractions are stored.<p>
 
-<DT> <code>abstraction</code> <i> name </i> <i>filename</i><p>
-<DD> Declare a single Max 0.26 abstraction called <i>name</i>, and set its definition
-to be the patch stored in the file <i>filename</i>;  the file must be a 
-in the Max 0.26 format.<p>
+  <DT><tt><b>abstraction</b></tt> <i>name</i> <i>filename</i><p>
+  <DD> 
+    Declare a single Max 0.26 abstraction called <i>name</i>, and set its definition
+    to be the patch stored in the file <i>filename</i>;  the file must be a 
+    in the Max 0.26 format.<p>
 
-<DT> <code>dataDirectory</code> <i>directory</i><p>
-<DD> Add the directory <i>directory</i> to the list of directories where
-soundfiles and miscellaneous data files are searched. The project directory
-is always implicitly part of this list.<p>
+  <DT><tt><b>dataDirectory</b></tt> <i>directory</i><p>
+  <DD> 
+    Add the directory <i>directory</i> to the list of directories where
+    soundfiles and miscellaneous data files are searched. The project directory
+    is always implicitly part of this list.<p>
 
-<DT> <code>puts</code> <i>arg</i><p>
-<DD> A <code>tcl</code> commands, print its argument (that can be a double quoted
-string) to the <I>j</I>Max  console when the project file is loaded.<p>
+  <DT><tt><b>puts</b></tt> <i>arg</i><p>
+  <DD> 
+    A TCL commands, print its argument (that can be a double quoted
+    string) to the <I>j</I>Max  console when the project file is loaded.<p>
 
 </DL>
 <A NAME="example">
@@ -219,9 +217,10 @@ dataDirectory $dir/snd
 # pbank and other files are in the data directory
 
 dataDirectory $dir/data
-
 </pre>
-<HR>
+
+</TABLE>
+<HR NOSHADE SIZE=1>
 
 </BODY>
 </HTML>

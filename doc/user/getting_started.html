@@ -3,137 +3,173 @@
 <TITLE> jMax documentation </TITLE>
 </HEAD>
 
-<BODY TEXT="#000000" BGCOLOR="#FFFFFF">
+<BODY TEXT="#000000" BGCOLOR="#CCCCCC" LINK="#000000" VLINK="#000000">
 
-<IMG SRC="../images/logo.jpeg" ALT="IRCAM - Centre Georges Pompidou">
-
-<BR>
-<BR>
-
-<TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0>
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=0>
 <TR>
-<TD ALIGN=CENTER VALIGN=MIDDLE>
-<A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../images/jmax_logo_small.gif" ALT="jMax" BORDER=0></A>
-</TD>
-
-<TD>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-</TD>
-
-<TD ALIGN=LEFT VALIGN=MIDDLE>
-<DL>
-<DT> <IMG SRC="../images/dot.gif"> <A HREF="../index.html"> Documentation </A>
-<DL>
-<DT> <IMG SRC="../images/dot.gif"> <A HREF="index.html"> User documentation </A>
-<DL>
-<DT> <IMG SRC="../images/arrow_grey.gif"> <B><FONT SIZE=+2>Getting started</FONT></B>
-</DL>
-</DL>
-</DL>
-</TD>
-
+  <TD ALIGN=LEFT>
+    <A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../images/jmax_logo_tiny.gif" BORDER=0 ALT="jMax"></A>
+  </TD>
+  <TD ALIGN=RIGHT>
+    <A HREF="http://www.ircam.fr/"><IMG SRC="../images/ircam_banner.gif" BORDER=0 ALT="IRCAM - Centre Georges Pompidou"></A>
+  </TD>
 </TR>
 </TABLE>
+<BR>
 
-<HR>
-
-<UL>
-  <LI>
-    <A HREF="#running"> Running jMax </A>
-  <LI>
-    <A HREF="#System properties"> System properties </A>
-  <LI>
-    <A HREF="#.jmaxrc"> <B><TT>.jmaxrc</B></TT> file </A>
+<UL TYPE=SQUARE>
+  <LI><A HREF=../index.html>documentation</A>
+  <UL TYPE=SQUARE>
+    <LI><A HREF=index.html>user documentation</A>
+  </UL>
 </UL>
 
-<HR>
 
-<A NAME="running"> 
-<H2>Running <I>j</I>Max</H2>
+<FONT COLOR=#FFFFFF SIZE=+3><b>getting started</b></FONT>
+<UL TYPE=DOT>
+  <LI><A HREF="#running">Running jMax</A>
+  <LI><A HREF="#arguments">Command Line Arguments</A>
+  <LI><A HREF="#.jmaxrc">The file <TT>.jmaxrc</TT></A>
+  <LI><A HREF="#site.tcl">The file <TT>config/site.tcl</TT></A>
+</UL>
+
+<HR NOSHADE SIZE=1>
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
+<TR><TD>
+  
+<A NAME="running">
+<h2>Running <I>j</I>Max</h2>
 
 <P>
-<I>j</I>Max can be run by executing the shell script &lt;INSTALLATION_DIRECTORY&gt;/bin/jmax.
+<I>j</I>Max can be run by executing the <I>j</I>Max shell script:
+
+<UL>
+  <DT><b>&lt;<i>jMax root directory</i>&gt;/bin/<tt>jmax</tt></b><BR>
+    <tt>/usr/local/max/bin/jmax</tt>
+</UL>
+
 This script accepts a set of options (see <B><TT> jmax -help </TT></B> for description)
 that are either interpreted by the script or passed as command line arguments
-to the <code>Java</code> application as <I>system properties</I>.
+to the Java application.
 
-
-<A NAME="System properties"> 
-<H2> System properties </H2>
-
+<A NAME="arguments"> 
+<h2>Command Line Arguments</h2>
 
 <P>
-<I>j</I>Max uses a number of <I>properties</I> to parametrize the system. 
-A <I>property</I> is a named option,
-that can be set by a <code>tcl</code> script or by command-line arguments, and that can be accessed from
-<code>Java</code> and <code>tcl</code> code.
+<I>j</I>Max uses a number of <I>configuration parameters</I> to parametrize the system
+at startup.
+These parameters appear as TCL variables and can be also set via the command line:
 
-<P>
-The system properties given by a default in
-<TT>defaults.<code>tcl</code></TT> or in the user configuration file.
-can be overwritten by command line arguments to <TT>jmax</TT> script:
-
-<P>
-&nbsp; &nbsp; 
-<B><TT>-jmax</TT>&lt;<I>system property name</I>&gt; &lt;<I>system property value</I>&gt;</B>
-
-<P>
-Additional system properties can be defined by using the same syntax 
-(see <A HREF="./configuration.html"><I>Configuration</I></A>).
-
-
-<A NAME=".jmaxrc">
-<H2> <B><TT>.jmaxrc</TT></B> file </H2>
-
-<P>
-At the startup <i>j</i>Max load the <B><TT>.jmaxrc</TT></B> file in
-the user home directory; it is <code>tcl</code> script that is loaded
-at <I>j</I>Max startup.  It can contain any <code>tcl</code> code,
-though the following is probably of main interest:
 <UL>
-<LI> <A HREF="configuration/system.html"> set system properties to customize system environment </A>
-<LI> <A HREF="configuration/ioconf.html"> set the <i>j</i>Max configuration </A>
-<LI> <A HREF="configuration/projects.html"> optionally, set the environment for your patches</A>
-<LI> <A HREF="configuration/packages.html"> optionally, load some prepackaged library</A>
+  <DT><B><TT>jmax</TT> -&lt;<I>parameter name</I>&gt; &lt;<I>parameter value</I>&gt; . . .</B>
 </UL>
 
-In the current release, the first two step, system and i/o configuration <strong>must</strong>
-be present.
+<p>
+The parameter values given in the command line overwrite all default values given
+in the user or site specific configuration files (see down).
 
-It is possible to declare declare a number of <I>hooks</I>, <code>tcl</code> code that will be executed at precise points during the initialization process. In particular, the <B><I>start</I></B>
-hook is executed after server start and must be used for I/O, environment and package loading
-purpose.
+<p>
+The chapters
+<A HREF="configuration/system.html">system configuration</A> and 
+<A HREF="configuration/ioconf.html">i/o configuration</A>
+of this documentaion explain the different <i>j</i>Max configuration parameters.
 
 <P>
-A set of template <TT>.jmaxrc</TT> files can be found in the distribution.
+The user can implicitly define his own options in the command line using the same syntax
+like for the configuration parameters.
+For example, the command
+<ul>
+  <dt><TT>jmax -jmaxHost jack -myOption pho</TT><BR>
+</ul>
+sets the <i>j</i>Max server host name to <i>jack</i> and the user option
+named <i>myOption</i> to the value <i>pho</i> while starting up <i>j</i>Max.
+The value of this user option can be accessed through the TCL command
+<tt>systemProperty</tt>
+
+<ul>
+  <dt><b><tt>systemProperty</tt> &lt;<i>option name</i>&gt;</b>
+</ul>
+
+For example in the following construct:
+
+<ul>
+  <dt><tt>if{[systemProperty myOption] == "pho"} {...}</tt>
+</ul>
+
+<A NAME=".jmaxrc">
+<h2>The file <B><TT>.jmaxrc</TT></B></h2>
 
 <P>
-As an example, the following file can be used for an Octane configuration,
-using the ADAT audio I/O:
+The user can customize the <i>j</i>Max environment including the configuration parameters
+in the <TT>.jmaxrc</TT> file in his home directory:
+
+<UL>
+  <LI>set the <A HREF="configuration/system.html">system configuration </A> and 
+      <A HREF="configuration/ioconf.html">i/o configuration</A>
+  <LI>customize the <A HREF="configuration/projects.html">project environment</A> for your patches
+  <LI>preload <i>j</i>Max <A HREF="configuration/packages.html">packages</A>
+</UL>
+
+<P>
+The configuration parameters set in the <TT>.jmaxrc</TT> file overwrite the site specific
+default values (see down) and they are overwritten by values set via the command line.
+
+<P>
+<strong>NOTE:</strong>
+In the current release the system and i/o configuration 
+<strong>must</strong> be set in the <TT>.jmaxrc</TT> file.
+
+<p>
+The file is loaded at startup and can contain any TCL code.<BR>
+It is possible to declare declare a number of <I>hooks</I>. 
+These hooks contain TCL code that will be executed at precise points during the initialization process.
+In particular, the <B><I>start</I></B> hook is executed after server start and must be used for I/O, 
+environment and package loading purpose.
+
+<P>
+A template <TT>.jmaxrc</TT> file can be found in the distribution.<BR>
+An example is given the following:
+
 <PRE>
-# --- .jmaxrc
+# --- beginning of .jmaxrc
+
 set jmaxArch  origin
+
 when start {
-jmaxSetSampleRate 44100
-jmaxSetAudioBuffer 512
-ucs open device in~ default as SgiALIn ALdevice ADATIn channels 8 
-ucs open device out~ default as SgiALOut ALdevice ADATOut channels 8 
+
+    jmaxSetSampleRate 44100
+    jmaxSetAudioBuffer 1024
+
+    puts "MIDI configuration: SerialPort2"
+    openDefaultMidi SerialPort2
+
+    puts "audio configuration: Analog 2/2"
+    openDefaultAudioIn AnalogIn 2 
 }
+
 # --- end of .jmaxrc
 </PRE>
-<P>
-<A NAME="config/site.tcl">
-<H2> <B><TT>.jmaxrc</TT></B> file </H2>
+
+<A NAME="site.tcl">
+<h2>The file <B><TT>config/site.tcl</TT></B></h2>
 
 <P>
-At the startup <i>j</i>Max load also the <B><TT>config/site.tcl</TT></B> file in
-the <i>j</i>Max installation directory; it also can contain any <code>tcl</code> code,
-but its main interests is to put define site specific tcl functions to simplify 
-user installation; tipically, a tcl function for each kind of installation you have
-in your site, functions that can be called in the user <B><TT>.jmaxrc</TT></B> file.
-See the file for an example of such a function.
+Even before the <TT>.jmaxrc</TT> file <i>j</i>Max loads the file 
+<TT>config/site.tcl</TT> in the <i>j</i>Max installation directory.
+
 <P>
-<HR>
+Just like <TT>.jmaxrc</TT> it can contain any TCL code.<BR>
+It's main interests is to define site specific TCL functions to simplify 
+the user configuration for a specific <i>j</i>Max installation. 
+Typically this is a TCL function for each kind of configuration provided by your site,
+which can be called in the user <TT>.jmaxrc</TT> file.
+
+<P>
+See the <TT>config/site.tcl</TT> file in the distribution for an example.
+
+<P>
+</TABLE>
+<HR NOSHADE SIZE=1>
 
 </BODY>
 </HTML>
