@@ -158,7 +158,7 @@ class ErmesObjSlider extends ErmesObject {
 	  
   public boolean MouseUp(MouseEvent evt,int x, int y){
     if(itsSketchPad.itsRunMode){
-      MaxApplication.getFtsServer().syncToFts();
+      FtsServer.getServer().syncToFts();
       itsMovingThrottle = false;
       DoublePaint();
       return true;

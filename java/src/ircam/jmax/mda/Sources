@@ -1,4 +1,5 @@
 SOURCES =  \
+ 	  MdaModule.java \
 	  MaxData.java \
 	  MaxDataException.java \
 	  MaxDataHandler.java \

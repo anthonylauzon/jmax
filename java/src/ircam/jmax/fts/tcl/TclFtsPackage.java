@@ -1,6 +1,7 @@
 package ircam.jmax.fts.tcl;
 
 import tcl.lang.*;
+import ircam.jmax.*;
 
 /**
  * Tcl FTS extension.
@@ -31,8 +32,10 @@ public class TclFtsPackage
    * @param interp the TCL interpreter instance
    */
 
-  static public void installPackage(Interp interp)
+  static public void installPackage()
   {
+    Interp interp = MaxApplication.getTclInterp();
+
     // File Format
 
     interp.createCommand("patcher",   new FtsPatcherCmd());

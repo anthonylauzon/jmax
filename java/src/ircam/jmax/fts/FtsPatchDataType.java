@@ -25,7 +25,7 @@ public class FtsPatchDataType extends MaxDataType
 
     FtsObject patcher;
 
-    patcher = new FtsPatcherObject(MaxApplication.getFtsServer().getRootObject());
+    patcher = new FtsPatcherObject(FtsServer.getServer().getRootObject());
 
     // Put some geometrical property for the window, so we can see it.
 
@@ -40,7 +40,13 @@ public class FtsPatchDataType extends MaxDataType
 
     return obj;
   }
+
+  public boolean canMakeNewInstance()
+  {
+    return true;
+  }
 }
+
 
 
 

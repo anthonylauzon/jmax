@@ -2,6 +2,8 @@ package ircam.jmax.mda.tcl;
 
 import tcl.lang.*;
 
+import ircam.jmax.*;
+
 /**
  * Tcl Mda extension.
  * Add all the Max Data Architecture TCL commands to the tcl interpreter.
@@ -15,8 +17,10 @@ public class TclMdaPackage
    * @param interp the TCL interpreter instance
    */
 
-  static public void installPackage(Interp interp)
+  static public void installPackage()
   {
+    Interp interp = MaxApplication.getTclInterp();
+
     interp.createCommand("installDataType", new MaxInstallDataTypeCmd());
     interp.createCommand("installDataHandler", new MaxInstallDataHandlerCmd()); 
 

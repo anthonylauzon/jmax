@@ -38,7 +38,7 @@ public class FtsTemplateObject extends FtsContainerObject
 
     //create a 0 in 0 out patcher FtsObject
 
-    MaxApplication.getFtsServer().newPatcherObject(parent, this, "unnamed", 0, 0);
+    FtsServer.getServer().newPatcherObject(parent, this, "unnamed", 0, 0);
 
     // Set  the object property
 
@@ -72,7 +72,7 @@ public class FtsTemplateObject extends FtsContainerObject
       {
 	updated = true;
 
-	MaxApplication.getFtsServer().syncToFts();
+	FtsServer.getServer().syncToFts();
       }
   }
 

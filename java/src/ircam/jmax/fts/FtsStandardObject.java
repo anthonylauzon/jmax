@@ -30,12 +30,12 @@ public class FtsStandardObject extends FtsObject
   {
     super(parent, className, description);
 
-    MaxApplication.getFtsServer().newObject(parent, this, description);
+    FtsServer.getServer().newObject(parent, this, description);
 
     if (parent.isOpen())
       {
 	updated = true;
-	MaxApplication.getFtsServer().syncToFts();
+	FtsServer.getServer().syncToFts();
       }
   }
 

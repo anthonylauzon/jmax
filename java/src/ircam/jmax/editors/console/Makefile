@@ -22,6 +22,11 @@ all:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
 .PHONY: all
 
+ConsoleModule:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ConsoleModule.java)
+.PHONY: ConsoleModule.java
+
+
 Console:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) Console.java)
 .PHONY: Console

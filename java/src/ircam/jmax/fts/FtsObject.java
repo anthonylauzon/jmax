@@ -154,7 +154,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 
     parent.replace(oldObject, newObject);
 
-    MaxApplication.getFtsServer().replaceObject(oldObject, newObject);
+    FtsServer.getServer().replaceObject(oldObject, newObject);
 
     oldObject.delete();
 
@@ -263,7 +263,7 @@ abstract public class FtsObject implements MaxTclInterpreter
   public void put(String name, Object value)
   {
     if (! FtsPropertyDescriptor.isClientOnly(name))
-	MaxApplication.getFtsServer().putObjectProperty(this, name, value);
+	FtsServer.getServer().putObjectProperty(this, name, value);
 
     localPut(name, value);
   }
@@ -726,7 +726,7 @@ abstract public class FtsObject implements MaxTclInterpreter
   public void delete()
   {
     parent.removeObject(this); 
-    MaxApplication.getFtsServer().freeObject(this);
+    FtsServer.getServer().freeObject(this);
   }
 
   // Communication with the object
@@ -735,7 +735,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   public final void sendMessage(int inlet, String selector, Vector args)
   {
-    MaxApplication.getFtsServer().sendObjectMessage(this, inlet, selector, args);
+    FtsServer.getServer().sendObjectMessage(this, inlet, selector, args);
   }
 
   /**

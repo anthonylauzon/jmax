@@ -70,7 +70,7 @@ abstract public class FtsContainerObject extends FtsObject
 
   public void updateFtsObject()
   {
-    MaxApplication.getFtsServer().redefinePatcherObject(this, objectName, ninlets, noutlets);
+    FtsServer.getServer().redefinePatcherObject(this, objectName, ninlets, noutlets);
   }
 
   /** Add an object to this container  */
@@ -192,8 +192,8 @@ abstract public class FtsContainerObject extends FtsObject
   public final void open()
   {
     open = true;
-    MaxApplication.getFtsServer().openPatcher(this);
-    MaxApplication.getFtsServer().syncToFts();
+    FtsServer.getServer().openPatcher(this);
+    FtsServer.getServer().syncToFts();
   }
 
   /** Close tell FTS that this patcher is not "alive". */
@@ -202,7 +202,7 @@ abstract public class FtsContainerObject extends FtsObject
   {
     open = false;
 
-    MaxApplication.getFtsServer().closePatcher(this);
+    FtsServer.getServer().closePatcher(this);
   }
 
   /** Check if the patcher is open. */
@@ -219,7 +219,7 @@ abstract public class FtsContainerObject extends FtsObject
 
   public final void loaded()
   {
-    MaxApplication.getFtsServer().patcherLoaded(this);
+    FtsServer.getServer().patcherLoaded(this);
   }
 
 

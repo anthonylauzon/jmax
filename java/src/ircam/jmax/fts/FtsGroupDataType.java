@@ -26,7 +26,7 @@ public class FtsGroupDataType extends MaxDataType
     Vector aVector = new Vector();
     /*FtsObject patcher;
       
-      patcher = new FtsPatcherObject(MaxApplication.getFtsServer().getRootObject());
+      patcher = new FtsPatcherObject(FtsServer.getServer().getRootObject());
       
       // Put some geometrical property for the window, so we can see it.
       

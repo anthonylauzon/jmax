@@ -62,13 +62,16 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
      
     for(Enumeration e = MaxDataType.getTypes().elements(); e.hasMoreElements();) {
       final MaxDataType aDataType = (MaxDataType) e.nextElement();
-      aMenuItem = new MenuItem(aDataType.getName());
-      newFileMenu.add(aMenuItem); 
+      if (aDataType.canMakeNewInstance())
+	{
+	  aMenuItem = new MenuItem(aDataType.getName());
+	  newFileMenu.add(aMenuItem); 
 
-      aMenuItem.addActionListener(new ActionListener() {
-	public  void actionPerformed(ActionEvent e)
-	  { MaxApplication.NewType(aDataType);}});
+	  aMenuItem.addActionListener(new ActionListener() {
+	    public  void actionPerformed(ActionEvent e)
+	      { MaxApplication.NewType(aDataType);}});
 	}
+    }
 
     return newFileMenu;
 

@@ -34,7 +34,7 @@ public class FtsInletObject  extends FtsObject
 
     parent.addInlet(this); // support for .pat
 
-    MaxApplication.getFtsServer().newInletObject(parent, this); // create the fts inlet
+    FtsServer.getServer().newInletObject(parent, this); // create the fts inlet
 
     ninlets = 1;
     noutlets = 1;
@@ -49,7 +49,7 @@ public class FtsInletObject  extends FtsObject
 
     parent.addInlet(this, position);
 
-    MaxApplication.getFtsServer().newInletObject(parent, this, position);// create the fts inlet
+    FtsServer.getServer().newInletObject(parent, this, position);// create the fts inlet
 
     ninlets = 1;
     noutlets = 1;
@@ -60,7 +60,7 @@ public class FtsInletObject  extends FtsObject
     position = i;
     description = "inlet " + position;
 
-    MaxApplication.getFtsServer().redefineInletObject(this, position);
+    FtsServer.getServer().redefineInletObject(this, position);
   }
 
   public int getPosition()

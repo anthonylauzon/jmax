@@ -30,7 +30,7 @@ public class FtsMessageObject extends FtsObject
   {
     super(parent, "messbox", description);
 
-    MaxApplication.getFtsServer().newObject(parent, this, "messbox", description);
+    FtsServer.getServer().newObject(parent, this, "messbox", description);
 
     ninlets = 1;
     noutlets = 1;
@@ -44,7 +44,7 @@ public class FtsMessageObject extends FtsObject
   {
     description = message;
 
-    MaxApplication.getFtsServer().redefineMessageObject(this, description);
+    FtsServer.getServer().redefineMessageObject(this, description);
   }
 
 

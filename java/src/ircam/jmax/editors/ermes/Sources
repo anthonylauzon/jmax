@@ -1,4 +1,5 @@
 SSOURCES = \
+	  ErmesModule.java \
           ErmesConnCircle.java \
           ErmesConnSegment.java \
           ErmesConnection.java \
@@ -15,10 +16,6 @@ SSOURCES = \
 	  ErmesSwToggleButton.java \
 	  ErmesPatcherFactory.java \
 	  ErmesClipboardProvider.java
-
-
-
-DSOURCES = \
           ErmesObjBang.java \
           ErmesObjComment.java \
           ErmesObjEditField.java \

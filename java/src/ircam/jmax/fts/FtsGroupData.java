@@ -49,7 +49,7 @@ public class FtsGroupData extends MaxTclData
   {
     // Sync to fts to be sure we have all the info.
 
-    MaxApplication.getFtsServer().syncToFts();
+    FtsServer.getServer().syncToFts();
 
     FtsObject aObject;
     for (Enumeration e=group.elements(); e.hasMoreElements();) {

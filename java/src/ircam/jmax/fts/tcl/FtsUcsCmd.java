@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
+import ircam.jmax.fts.*;
 
 /**
  * This class define the TCL Command <b>ucs</b>,
@@ -49,7 +50,7 @@ class FtsUcsCmd implements Command
 	      }
 	  }
 
-	MaxApplication.getFtsServer().ucsMessage(args);
+	FtsServer.getServer().ucsMessage(args);
 	interp.resetResult();
       }
     else

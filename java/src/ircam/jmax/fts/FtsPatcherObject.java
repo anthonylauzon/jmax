@@ -87,7 +87,7 @@ public class FtsPatcherObject extends FtsContainerObject
     setNumberOfOutlets(((Integer) args.elementAt(2)).intValue());
     updateDescription();
 
-    MaxApplication.getFtsServer().newPatcherObject(parent, this,
+    FtsServer.getServer().newPatcherObject(parent, this,
 						   name,
 						   ninlets,
 						   noutlets);
@@ -110,7 +110,7 @@ public class FtsPatcherObject extends FtsContainerObject
     setNumberOfOutlets(0);
     updateDescription();
 
-    MaxApplication.getFtsServer().newPatcherObject(parent, this,
+    FtsServer.getServer().newPatcherObject(parent, this,
 						   objectName,
 						   ninlets,
 						   noutlets);

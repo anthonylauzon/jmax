@@ -20,6 +20,29 @@ import java.io.*;
 
 public class FtsServer 
 {
+  // Code handling the global server and the connection 
+
+  static FtsServer theServer = null;
+
+  static public FtsServer getServer()
+  {
+    return theServer;
+  }
+  
+  public static void connectToFts(String theFtsdir, String theFtsname, String mode, String server, String port)
+  {
+    if (mode.equals("socket")) 
+      theServer = new FtsSocketServer(server, Integer.parseInt(port));
+    else if (mode.equals("client"))
+      theServer = new FtsSocketClientServer(server);
+    else if (mode.equals("local"))
+      theServer = new FtsSubProcessServer();
+    else System.out.println("unknown FTS connection type "+mode+": can't connect to FTS");
+    theServer.setParameter("ftsdir", theFtsdir);
+    theServer.setParameter("ftsname", theFtsname);
+    theServer.start();
+  }
+
   /** Count objects for statistics */
 
   int objCount = 0;

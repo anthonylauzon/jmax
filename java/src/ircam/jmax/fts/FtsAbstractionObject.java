@@ -43,7 +43,7 @@ public class FtsAbstractionObject  extends FtsContainerObject
     
     //create a 0 in 0 out patcher FtsObject
 
-    MaxApplication.getFtsServer().newPatcherObject(parent, this, "unnamed", 0, 0);
+    FtsServer.getServer().newPatcherObject(parent, this, "unnamed", 0, 0);
 
     // Parse the description to get the argument for the abstraction expander
     
@@ -76,7 +76,7 @@ public class FtsAbstractionObject  extends FtsContainerObject
     if (parent.isOpen())
       {
 	updated = true;
-	MaxApplication.getFtsServer().syncToFts();
+	FtsServer.getServer().syncToFts();
       }
   }
 

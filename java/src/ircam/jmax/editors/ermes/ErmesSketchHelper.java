@@ -38,7 +38,7 @@ class ErmesSketchHelper extends Object{
   //	AddObject
   //  adding an object of the given class name in the given location
   //--------------------------------------------------------
-  ErmesObject AddObject(String theName, FtsObject theFtsObject) {
+  ErmesObject AddObject(Class theClass, FtsObject theFtsObject) {
 
     ErmesObject aObject = null;	//wasting time...
     Rectangle aRect;
@@ -59,27 +59,20 @@ class ErmesSketchHelper extends Object{
       //there was an error "aObject may not have been initialized"
       // Yes, because if the following statement raise an exception,
       // the fi
-      aObject = (ErmesObject) Class.forName(theName).newInstance();
+      aObject = (ErmesObject) theClass.newInstance();
       aObject.Init(itsSketchPad, theFtsObject);
-      }
-    catch(ClassNotFoundException e)
-      {
-	System.out.println("Internal Error: ErmesSketchHelper.AddObject(" +
-			   theName + "," + theFtsObject +
-			   ") : class not found " + e);
-	return null;
       }
     catch(IllegalAccessException e)
       {
 	System.out.println("Internal Error: ErmesSketchHelper.AddObject(" +
-			   theName + "," + theFtsObject +
+			   theClass.getName() + "," + theFtsObject +
 			   ") : illegal access" + e);
 	return null;
       }
     catch(InstantiationException e) 
       {
 	System.out.println("Internal Error: ErmesSketchHelper.AddObject(" +
-			   theName + "," + theFtsObject +
+			   theClass.getName() + "," + theFtsObject +
 			   ") : instantiation exception " + e);
 	return null;
       }
@@ -921,12 +914,12 @@ class ErmesSketchHelper extends Object{
   //	SearchFtsName
   //  corrispondence between fts names and ermes names (new and old format...)
   //--------------------------------------------------------
-  public String SearchFtsName(String theName)
+  public Class SearchFtsName(String theName)
   {
     if (itsSketchPad.nameTable.containsKey(theName))
-      return (String) itsSketchPad.nameTable.get(theName);
+      return (Class) itsSketchPad.nameTable.get(theName);
     else
-      return "ircam.jmax.editors.ermes.ErmesObjExternal";
+      return ircam.jmax.editors.ermes.ErmesObjExternal.class;
   }
   
   //??	public void SetSelectedSegment(ErmesConnSegment theSegment)

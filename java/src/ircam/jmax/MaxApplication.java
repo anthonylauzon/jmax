@@ -33,14 +33,6 @@ public class MaxApplication extends Object {
 
   // Static global services
 
-  /** Get the unique active FTS Server, if any */
-
-
-  public static FtsServer getFtsServer()
-  {
-    return itsServer;
-  }
-
   /** Get the unique active TCL interpreter */
 
   public static Interp getTclInterp()
@@ -54,7 +46,6 @@ public class MaxApplication extends Object {
   public static Vector itsEditorsFrameList;
   //  private static HashTable editorFactories; //association between MaxDataTypes and MaxDataEditorFactories
   static ConnectionDialog itsConnDialog;
-  private static     FtsServer itsServer = null;
   public static boolean doAutorouting = true; // Should become a static in the Patcher editor
   //e.m.public static ConsShell itsShell;
 
@@ -62,7 +53,6 @@ public class MaxApplication extends Object {
 
   public static ErmesSketchWindow itsSketchWindow;
   public static MaxWindow itsWindow;
-  //public static ProjectWindow itsProjectWindow;
 
   static MaxWhenHookTable  itsHookTable;
   public final static int SNAP_TO_GRID = 5;
@@ -80,21 +70,6 @@ public class MaxApplication extends Object {
 
   static final int SCREENVERT = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height;
   static final int SCREENHOR = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width;
-
-
-  public static void ConnectToFts(String theFtsdir, String theFtsname, String mode, String server, String port)
-  {
-    if (mode.equals("socket")) 
-      itsServer = new FtsSocketServer(server, Integer.parseInt(port));
-    else if (mode.equals("client"))
-      itsServer = new FtsSocketClientServer(server);
-    else if (mode.equals("local"))
-      itsServer = new FtsSubProcessServer();
-    else System.out.println("unknown FTS connection type "+mode+": can't connect to FTS");
-    itsServer.setParameter("ftsdir", theFtsdir);
-    itsServer.setParameter("ftsname", theFtsname);
-    itsServer.start();
-  }
 
 
   // Data handling
@@ -259,7 +234,6 @@ public class MaxApplication extends Object {
 	aWindow = (MaxWindow)itsEditorsFrameList.elementAt(i);
 	aWindow.AddWindowToMenu(theSketchWindow.getTitle());
       }
-      //#itsProjectWindow.AddWindowToMenu(theSketchWindow.getTitle());
 
       if (itsConsoleWindow != null)
 	itsConsoleWindow.AddWindowToMenu(theSketchWindow.getTitle());
@@ -278,7 +252,6 @@ public class MaxApplication extends Object {
 	if(!theName.equals(aWindow.GetDocument().GetTitle()))
 	  aWindow.AddWindowToMenu(theName);
     }
-    //#itsProjectWindow.AddWindowToMenu(theName);
 
     if (itsConsoleWindow != null)
       itsConsoleWindow.AddWindowToMenu(theName);
@@ -296,7 +269,6 @@ public class MaxApplication extends Object {
       aWindow = (MaxWindow)itsEditorsFrameList.elementAt(i);
       aWindow.AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
     }
-    //#itsProjectWindow.AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
 
     if (itsConsoleWindow != null)
       itsConsoleWindow.AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
@@ -335,8 +307,6 @@ public class MaxApplication extends Object {
       if(aWindow != theWindow)
 	aWindow.RemoveWindowFromMenu(theWindow.GetTitle());
     }
-    //#itsProjectWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetTitle());
-
     if (itsConsoleWindow != null)
       itsConsoleWindow.RemoveWindowFromMenu(theWindow.GetTitle());
   }
@@ -352,7 +322,6 @@ public class MaxApplication extends Object {
       aWindow = (MaxWindow)itsEditorsFrameList.elementAt(i);
       aWindow.ChangeWinNameMenu(theOldName,theNewName);
     }
-    //#itsProjectWindow.ChangeWinNameMenu(theOldName, theNewName);
 
     if (itsConsoleWindow != null)
       itsConsoleWindow.ChangeWinNameMenu(theOldName, theNewName);
@@ -525,7 +494,6 @@ public class MaxApplication extends Object {
   public static void SetCurrentWindow(MaxWindow theWindow){
     if(theWindow instanceof ErmesSketchWindow)itsSketchWindow = (ErmesSketchWindow)theWindow;
     itsWindow = theWindow;
-    //#ahioGetCurrentProject().SetCurrentEntry(itsWindow.GetDocument().GetTitle());
   }
 
   public static String GetWholeWinName(String theName){
@@ -547,27 +515,8 @@ public class MaxApplication extends Object {
     return itsSketchWindow;
   }
 	
-/*#abolita public static ProjectWindow GetProjectWindow() {
-  return itsProjectWindow;
-  }*/
-	
   public static ConsoleWindow GetConsoleWindow() {
     return itsConsoleWindow;
-  }
-
-/*#abolita public static Project GetCurrentProject() {
-  return itsProjectWindow.itsProject;
-  }*/
-	
-  public static void UpdateProjectMenu(){
-    ErmesSketchWindow aSketchWindow;
-    /*if(itsProjectWindow.itsProject.GetItems().size()==1){
-      itsProjectWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(true);
-      for(int m=0; m<itsSketchWindowList.size(); m++){
-      aSketchWindow = (ErmesSketchWindow) itsSketchWindowList.elementAt(m);
-      aSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(true);
-      }
-      }*/
   }
 
   /** Functions to add application hooks */
@@ -612,16 +561,22 @@ public class MaxApplication extends Object {
 
     ircam.jmax.utils.Platform.setValues();
 
-    itsSketchWindowList = new Vector();
+    itsSketchWindowList = new Vector(); // move to MaxWindowManager :->
     itsEditorsFrameList = new Vector();
 
-    // The console creation moved in a tcl command !!!
-
-    //#ahio itsProjectWindow = new ProjectWindow();
-
-    itsInterp = new tcl.lang.Interp(); // should go away here !!!
+    // Create and initialize the tcl interpreter
 
     makeTclInterp(); 
+
+    // Initialize all the submodules; first the kernel modules
+
+    ircam.jmax.mda.MdaModule.initModule();
+    ircam.jmax.fts.FtsModule.initModule();
+
+    // than the builtin editors 
+
+    ircam.jmax.editors.console.ConsoleModule.initModule();
+    ircam.jmax.editors.ermes.ErmesModule.initModule();
 
     try
       {
@@ -642,39 +597,27 @@ public class MaxApplication extends Object {
 
     //if there were no connection statements in startup.tcl, ask the user
 
-    if (itsServer == null)
+    if (FtsServer.getServer() == null)
       {
-	new ConnectionDialog(GetConsoleWindow()/*#itsProjectWindow*/);
+	new ConnectionDialog(GetConsoleWindow());
 	MaxApplication.runHooks("start");
       }
  }
 
   /** This private method build the tcl interpreter, 
-      and do all the required initialization to it
-      (load the jmax commands, set global jmax variables
-      and so on, load the bootstrap file and all the boot
-      time packages).
-      Must be called after argument parsing.
+      and do all the required initialization relative
+      to the jmax package *only*; each module load its
+      own tcl commands.
       */
 
   static private void makeTclInterp()
   {
-    // itsInterp = new tcl.lang.Interp(); should move here !!!
+    itsInterp = new tcl.lang.Interp(); 
 
-    // Installing the kernel packages 
+    ircam.jmax.tcl.TclMaxPackage.installPackage();
+    
+    ircam.jmax.editors.ermes.tcl.TclErmesPackage.installPackage();
 
-    ircam.jmax.tcl.TclMaxPackage.installPackage(itsInterp);
-    ircam.jmax.fts.tcl.TclFtsPackage.installPackage(itsInterp);
-    ircam.jmax.editors.ermes.tcl.TclErmesPackage.installPackage(itsInterp);
-
-    // The MDA package; still not used, but soon !!!
-
-    ircam.jmax.mda.tcl.TclMdaPackage.installPackage(itsInterp);
-
-    /* what follows has been moved to the LoadResources method, and instanciated dinamically 
-    MaxDataType.installDataType(new FtsPatchDataType());
-    MaxDataHandler.installDataHandler(new MaxTclFileDataHandler());
-    MaxDataHandler.installDataHandler(new FtsDotPatFileDataHandler());*/
   }
 
   /** This method install the console; a part of it should go
@@ -719,13 +662,11 @@ public class MaxApplication extends Object {
     if (itsConsoleWindow != null)
       {
 	itsConsoleWindow.setVisible(false);
-	//#itsProjectWindow.setVisible(false);
 	itsConsoleWindow.dispose();
-	//#itsProjectWindow.dispose();
       }
 
-    if (itsServer != null)
-      itsServer.stop();
+    if (FtsServer.getServer() != null)
+      FtsServer.getServer().stop();
 
     Runtime.getRuntime().exit(0);
   }

@@ -10,12 +10,6 @@
 set jmaxRootDir [systemProperty "root"]
 
 ##
-## Basic Data/Editor/Hanlders configuration
-## 
-
-source $jmaxRootDir/tcl/jmaxEditors.tcl
-
-##
 ## Intrinsic functions
 ## Must be loaded with "source", and not sourceFile,
 

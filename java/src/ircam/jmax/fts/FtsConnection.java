@@ -28,7 +28,7 @@ public class FtsConnection
     this.to     = to;
     this.inlet  = inlet;
 
-    MaxApplication.getFtsServer().connectObjects(from, outlet, to, inlet);
+    FtsServer.getServer().connectObjects(from, outlet, to, inlet);
 
     from.getParent().addConnection(this);
   }
@@ -53,7 +53,7 @@ public class FtsConnection
 
   public void delete()
   {
-    MaxApplication.getFtsServer().disconnectObjects(from, outlet, to, inlet);
+    FtsServer.getServer().disconnectObjects(from, outlet, to, inlet);
 
     from.getParent().removeConnection(this);
   }

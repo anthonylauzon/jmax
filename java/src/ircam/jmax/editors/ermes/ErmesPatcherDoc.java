@@ -38,7 +38,7 @@ public class ErmesPatcherDoc implements MaxDocument {
   public ErmesPatcherDoc() {
     // create an empty ErmesPatcherDoc
 
-    itsPatcher = new FtsPatcherObject(MaxApplication.getFtsServer().getRootObject());
+    itsPatcher = new FtsPatcherObject(FtsServer.getServer().getRootObject());
   }
 
   public ErmesPatcherDoc(FtsContainerObject theFtsPatcher) {
@@ -65,7 +65,7 @@ public class ErmesPatcherDoc implements MaxDocument {
     itsTitle  = getNewUntitledName();
     itsDocumentType = "patcher";
     itsSketchWindow = theSketchWindow;
-    itsPatcher = new FtsPatcherObject(MaxApplication.getFtsServer().getRootObject());
+    itsPatcher = new FtsPatcherObject(FtsServer.getServer().getRootObject());
   }
 
   public static String getNewUntitledName() {
@@ -145,7 +145,7 @@ public class ErmesPatcherDoc implements MaxDocument {
     itsDocumentType = "patcher";
 
     try {
-      itsPatcher = (FtsContainerObject) FtsDotPatParser.importPatcher(MaxApplication.getFtsServer(), file);
+      itsPatcher = (FtsContainerObject) FtsDotPatParser.importPatcher(FtsServer.getServer(), file);
       itsPatcher.open();
     } catch (Exception e) {
       System.out.println(e.toString() + " can't import "+ file);

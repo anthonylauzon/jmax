@@ -123,6 +123,16 @@ abstract public class MaxDataType
 
   abstract public MaxData newInstance();
 
+  /** Return true if the data type can instantiate a empty instance
+   * from scratch (not all the data types can); only the data type
+   * that can will be automatically put in the "New" menu.
+   */
+
+  public boolean canMakeNewInstance()
+  {
+    return false;
+  }
+
   /** private, called when an instance is disposed */
 
   public void disposeInstance(MaxData instance)

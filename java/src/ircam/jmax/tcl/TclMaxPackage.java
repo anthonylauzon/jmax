@@ -6,9 +6,12 @@
 package ircam.jmax.tcl;
 
 import tcl.lang.*;
+
 import java.lang.*;
 import java.io.*;
 import java.util.*;
+
+import ircam.jmax.*;
 
 /**
  * The Ermes package (as a set of TCL/ready commands).
@@ -17,8 +20,10 @@ import java.util.*;
 
 public class TclMaxPackage 
 {
-  static public void installPackage(Interp interp)
+  static public void installPackage()
   {
+    Interp interp = MaxApplication.getTclInterp();
+
     /* TCL generic */
 
     interp.createCommand("_sysSourceFile", new MaxSysSourceCmd());

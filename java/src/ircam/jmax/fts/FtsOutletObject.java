@@ -34,7 +34,7 @@ public class FtsOutletObject  extends FtsObject
 
     parent.addOutlet(this); 
 
-    MaxApplication.getFtsServer().newOutletObject(parent, this); // create the fts outlet
+    FtsServer.getServer().newOutletObject(parent, this); // create the fts outlet
 
     ninlets = 1;
     noutlets = 1;
@@ -49,7 +49,7 @@ public class FtsOutletObject  extends FtsObject
 
     parent.addOutlet(this, position);
 
-    MaxApplication.getFtsServer().newOutletObject(parent, this, position);// create the fts inlet
+    FtsServer.getServer().newOutletObject(parent, this, position);// create the fts inlet
 
     ninlets = 1;
     noutlets = 1;
@@ -60,7 +60,7 @@ public class FtsOutletObject  extends FtsObject
   {
     position = i;
     description = "outlet " + position;
-    MaxApplication.getFtsServer().redefineOutletObject(this, position);
+    FtsServer.getServer().redefineOutletObject(this, position);
   }
 
   public int getPosition()

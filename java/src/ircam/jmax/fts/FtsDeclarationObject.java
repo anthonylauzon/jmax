@@ -31,7 +31,7 @@ public class FtsDeclarationObject extends FtsObject
   {
     super(parent, className, description);
 
-    MaxApplication.getFtsServer().newObject(parent, this, description);
+    FtsServer.getServer().newObject(parent, this, description);
   }
 
   /*****************************************************************************/

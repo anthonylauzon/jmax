@@ -63,7 +63,7 @@ class FtsMessCmd implements Command
       }
     catch (TclException e)
       {
-	MaxApplication.getFtsServer().sendNamedObjectMessage(new String(argv[1].toString()),
+	FtsServer.getServer().sendNamedObjectMessage(new String(argv[1].toString()),
 							  TclInteger.get(interp, argv[2]),
 							  new String(argv[3].toString()),
 							  args);

@@ -146,7 +146,7 @@ public class ConnectionDialog extends Dialog implements KeyListener, ActionListe
     // also the whole tcl init structure would not work; it must
     // be called from the TCL script, and not here !!!
 
-    MaxApplication.ConnectToFts("/usr/local/max/fts/bin/origin/opt" , "fts", connType, hostName, portNo);
+    ircam.jmax.fts.FtsServer.connectToFts("/usr/local/max/fts/bin/origin/opt" , "fts", connType, hostName, portNo);
   }
 
   ////////////////////////////////////////////////////////////////////////

@@ -23,6 +23,10 @@ all:
 	(cd tcl; $(MAKE) all)
 .PHONY: all
 
+FtsModule:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsModule.java)
+.PHONY: FtsModule
+
 FtsAbstractionTable:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsAbstractionTable.java)
 .PHONY: FtsAbstractionTable

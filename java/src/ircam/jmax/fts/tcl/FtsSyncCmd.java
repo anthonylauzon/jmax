@@ -41,7 +41,7 @@ class FtsSyncCmd implements Command
 
     before = System.currentTimeMillis();
 
-    MaxApplication.getFtsServer().syncToFts();
+    FtsServer.getServer().syncToFts();
 
     interp.setResult((int) (System.currentTimeMillis() - before));
   }

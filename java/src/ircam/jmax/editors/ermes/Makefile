@@ -23,10 +23,9 @@ all:
 	(cd tcl; $(MAKE) all)
 .PHONY: all
 
-dynamics:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(DSOURCES))
-.PHONY: all
-
+ErmesModule:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesModule.java)
+.PHONY: ErmesModule
 
 ErmesConnCircle:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesConnCircle.java)

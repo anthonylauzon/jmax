@@ -9,6 +9,8 @@ import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 
+import ircam.jmax.*;
+
 /**
  * The Ermes package (as a set of TCL/ready commands).
  */
@@ -21,9 +23,11 @@ public class TclErmesPackage
    * start-up scripts (ToDo).
    */
 
-  static public void  installPackage(Interp interp)
+  static public void  installPackage()
   {
-      /* Ermes commands*/
+    Interp interp = MaxApplication.getTclInterp();
+
+    /* Ermes commands*/
     
     /* patcher commands */
     interp.createCommand("PatNew", new ErmesPatNewCmd());

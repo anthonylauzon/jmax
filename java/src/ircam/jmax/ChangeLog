@@ -1,3 +1,49 @@
+Mon Mar  2 14:47:16 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Added the "canMakeNewInstance" method to MaxDataType, to check 
+	  if a type can new instances from scratch, and so if can be put
+	  in the "new" menu.
+
+	* Moved the itsServer variable and the ConnectToFts and getFtsServer methods
+	  from ircam.jmax.MaxApplication to ircam.jmax.fts.FtsServer, to which they really
+	  belong.
+
+	* Moved all the tcl package initialization commands to
+ 	  <module>Module classes; i.e. now each module do its own tcl
+ 	  initialization (make sense, doesn't it :).
+
+	* Removed the file jmaxEditors.tcl, and added for each module a <module>Module
+	  class with a static init methods, to be called from MaxApplication.main.
+
+	  There are multiple reasons:
+
+	  1- a MDA entity (data type, data handler) is not a Java class, is a Java object; the tcl 
+	     command in jmaxEditor could not specify constructor arguments, so it force
+	     a mapping Java Class == MDA object that is not what we want; for example,
+	     different instances of the MaxTclFileDataHandler may exists, one for each
+	     file extension.
+	  2- The mechanism do not work for external modules, beacause of the use of the
+	     default class loaded; mda entities must be installed from Java code in order
+	     to work with the correct class loader.
+	  3- Installing a MDA entity from the module that define it is more consistent
+	     than having a global installation; so the module class and init method
+	     are defined.
+	  4- Since an editor is defined for a given data type, and cannot really be
+	     applied to others, it do not make a lot of sense to separate its implementation
+	     from the binding to the data type.
+	  5- The tcl file brake completely the makefiles, and make impossible to 
+	     compile the whole system in a sigle compile command, thing that is very important
+	     to have the method calls inlined across Java classes and modules.
+
+	* editors/ermes/ErmesSketchPad.java: Changed searchFtsName to return
+	  the Java Class itself, and not the name, of the graphic object to
+	  build; this make the complex 'dynamic' makefile thing useless, without
+	  doing anything for the genericity and dynamicity of the mechanism.
+	  The trick work because the nameTable is filled using JDK 1.1 class literals,
+	  i.e. class constants known to the compiler (like 
+	  ircam.jmax.editors.ermes.ErmesSketchPad.class), that allow the compiler
+	  to discover which classes it need to compile.
+
 Wed Feb 11 18:07:21 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
 
 	* Changed the Application layer structure: delete FtsPatcher, and

@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.io.*;
 
 import ircam.jmax.*;
+import ircam.jmax.fts.*;
 import ircam.jmax.editors.project.*; // delete me !!!
 
 /**
@@ -37,8 +38,8 @@ public class StatisticsDialog extends Dialog implements ActionListener, KeyListe
     Label label5 = new Label("FTS SERVER");
     p1.add(label5);
     Label label6;
-    if (MaxApplication.getFtsServer() !=null)
-      label6 = new Label("Fts connection:" + MaxApplication.getFtsServer().toString());
+    if (FtsServer.getServer() !=null)
+      label6 = new Label("Fts connection:" + FtsServer.getServer().toString());
     else label6 = new Label("Fts connection: not connected" );
     p1.add(label6);
     Label label7 = new Label("TCL version: 8.00");

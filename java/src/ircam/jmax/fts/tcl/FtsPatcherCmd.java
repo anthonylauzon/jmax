@@ -41,8 +41,8 @@ class FtsPatcherCmd implements Command
 
 	if (FtsContainerObject.containerStack.empty())
 	  {
-	    parent     = MaxApplication.getFtsServer().getRootObject();
-	    MaxApplication.getFtsServer().setFlushing(false);
+	    parent     = FtsServer.getServer().getRootObject();
+	    FtsServer.getServer().setFlushing(false);
 	  }
 	else
 	  parent     = (FtsContainerObject) FtsContainerObject.containerStack.peek();
@@ -66,7 +66,7 @@ class FtsPatcherCmd implements Command
 	    // the stack
 
 	    if (FtsContainerObject.containerStack.empty())
-	      MaxApplication.getFtsServer().setFlushing(true);
+	      FtsServer.getServer().setFlushing(true);
 
 	    interp.setResult(ReflectObject.newInstance(interp, object));
 	  }

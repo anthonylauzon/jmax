@@ -125,6 +125,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   int editStatus = DOING_NOTHING;
   int oldEditStatus = DOING_NOTHING;
 
+  // ?? Not used anymore ??
+
   static String objectNames[] ={ "ircam.jmax.editors.ermes.ErmesObjExternal",
 				 "ircam.jmax.editors.ermes.ErmesObjMessage",
 				 "ircam.jmax.editors.ermes.ErmesObjBang",
@@ -713,13 +715,13 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       // additional information, like a non default graphic representation
       // the code will need a small change here
 
-      String objectName = itsHelper.SearchFtsName(fo.getClassName());
-      aObject = itsHelper.AddObject(objectName, fo);
+      Class objectClass = itsHelper.SearchFtsName(fo.getClassName());
+      aObject = itsHelper.AddObject(objectClass, fo);
       //resizes the object to the dimensions 
       //les deux dimensions ne correspondent pas directement aux dimensions effectives
       //dans le format .pat??????????????????????????????????????
 
-      if (objectName == "ircam.jmax.editors.ermes.ErmesObjPatcher")
+      if (objectClass == ircam.jmax.editors.ermes.ErmesObjPatcher.class)
 	itsPatcherElements.addElement(aObject);
 
       if (aObject != null) fo.setRepresentation(aObject);
@@ -762,15 +764,15 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       // additional information, like a non default graphic representation
       // the code will need a small change here
       
-      String objectName = itsHelper.SearchFtsName(fo.getClassName());
+      Class objectClass = itsHelper.SearchFtsName(fo.getClassName());
       objectX = ((Integer)fo.get("pos.x")).intValue();
       objectY = ((Integer)fo.get("pos.y")).intValue();
       fo.put("pos.x", objectX+10);//offset by 10      
       fo.put("pos.y", objectY+10);//offset by 10
       
-      aObject = itsHelper.AddObject(objectName, fo);
+      aObject = itsHelper.AddObject(objectClass, fo);
       
-      if (objectName == "ircam.jmax.editors.ermes.ErmesObjPatcher")
+      if (objectClass == ircam.jmax.editors.ermes.ErmesObjPatcher.class)
 	itsPatcherElements.addElement(aObject);
       
       if (aObject != null) fo.setRepresentation(aObject);
@@ -794,10 +796,10 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       // additional information, like a non default graphic representation
       // the code will need a small change here
 
-      String objectName = itsHelper.SearchFtsName(fo.getClassName());
-      aObject = itsHelper.AddObject(objectName, fo);
+      Class objectClass = itsHelper.SearchFtsName(fo.getClassName());
+      aObject = itsHelper.AddObject(objectClass, fo);
     
-      if (objectName == "ircam.jmax.editors.ermes.ErmesObjPatcher")
+      if (objectClass == ircam.jmax.editors.ermes.ErmesObjPatcher.class)
 	itsPatcherElements.addElement(aObject);
 
       if (aObject != null) fo.setRepresentation(aObject);
@@ -911,18 +913,18 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     // Initialization of the "fts class"  to "graphic object" table
 
     nameTable = new Hashtable(16, (float) 0.5);
-    nameTable.put("messbox", "ircam.jmax.editors.ermes.ErmesObjMessage");
-    nameTable.put("button", "ircam.jmax.editors.ermes.ErmesObjBang");
-    nameTable.put("toggle", "ircam.jmax.editors.ermes.ErmesObjToggle");
-    nameTable.put("intbox", "ircam.jmax.editors.ermes.ErmesObjInt");
-    nameTable.put("floatbox", "ircam.jmax.editors.ermes.ErmesObjFloat");
-    nameTable.put("comment", "ircam.jmax.editors.ermes.ErmesObjComment");
-    nameTable.put("slider", "ircam.jmax.editors.ermes.ErmesObjSlider");
-    nameTable.put("inlet", "ircam.jmax.editors.ermes.ErmesObjIn");
-    nameTable.put("outlet", "ircam.jmax.editors.ermes.ErmesObjOut");
+    nameTable.put("messbox", ircam.jmax.editors.ermes.ErmesObjMessage.class);
+    nameTable.put("button", ircam.jmax.editors.ermes.ErmesObjBang.class);
+    nameTable.put("toggle", ircam.jmax.editors.ermes.ErmesObjToggle.class);
+    nameTable.put("intbox", ircam.jmax.editors.ermes.ErmesObjInt.class);
+    nameTable.put("floatbox", ircam.jmax.editors.ermes.ErmesObjFloat.class);
+    nameTable.put("comment", ircam.jmax.editors.ermes.ErmesObjComment.class);
+    nameTable.put("slider", ircam.jmax.editors.ermes.ErmesObjSlider.class);
+    nameTable.put("inlet", ircam.jmax.editors.ermes.ErmesObjIn.class);
+    nameTable.put("outlet", ircam.jmax.editors.ermes.ErmesObjOut.class);
     // At the moment, if we put patchers in the green box, we cannot edit them ??
-    nameTable.put("patcher", "ircam.jmax.editors.ermes.ErmesObjExternal");
-    // nameTable.put("patcher", "ircam.jmax.editors.ermes.ErmesObjPatcher");
+    nameTable.put("patcher", ircam.jmax.editors.ermes.ErmesObjExternal.class);
+    // nameTable.put("patcher", ircam.jmax.editors.ermes.ErmesObjPatcher.class);
   }
 	
   static public void RequestOffScreen(ErmesSketchPad theSketchPad) {

@@ -1,4 +1,5 @@
-SOURCES = Console.java \
+SOURCES = ConsoleModule.java \
+	  Console.java \
 	  ConsoleKeyListener.java \
 	  ConsoleWriter.java \
           ConsoleWindow.java \

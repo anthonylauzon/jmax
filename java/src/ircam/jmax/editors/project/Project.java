@@ -306,7 +306,6 @@ public class Project extends Panel implements AdjustmentListener{
   }
   
   public void UpdateProjectMenu(){
-    MaxApplication.UpdateProjectMenu();
   }
 
   //--------------------------------------------------------
