@@ -108,7 +108,8 @@ static fts_status_description_t bmax_internal_error_status_description = {
 };
 fts_status_t bmax_internal_error = &bmax_internal_error_status_description;
 
-static fts_status_t fts_binary_file_map( FILE *f, fts_binary_file_descr_t *descr)
+static fts_status_t 
+fts_binary_file_map( FILE *f, fts_binary_file_descr_t *descr)
 {
   fts_binary_file_header_t header;
 
@@ -187,7 +188,8 @@ static fts_status_t fts_binary_file_map( FILE *f, fts_binary_file_descr_t *descr
   return fts_ok;
 }
 
-static void fts_binary_file_dispose( fts_binary_file_descr_t *descr)
+static void 
+fts_binary_file_dispose( fts_binary_file_descr_t *descr)
 {
   fts_free( descr->code);
   fts_free( descr->symbols);
@@ -197,21 +199,21 @@ static void fts_binary_file_dispose( fts_binary_file_descr_t *descr)
    at top level (again, usually the top level patcher, but can be different
    for clipboards).
    */
-fts_status_t fts_bmax_file_load( const char *name, fts_object_t *parent, int ac, const fts_atom_t *at, fts_object_t **ret)
+fts_status_t 
+fts_bmax_file_load( const char *name, fts_object_t *parent, int ac, const fts_atom_t *at, fts_object_t **ret)
 {
   FILE *f;
   fts_binary_file_descr_t descr;
-  fts_status_t result;
+  fts_status_t status;
 
   if ( !(f = fopen( name, "rb")))
     return fts_cannot_open_file_error;
 
-  result = fts_binary_file_map(f, &descr);
-  if (result != fts_ok)
+  if ((status = fts_binary_file_map(f, &descr)) != fts_ok)
     {
       fclose(f);
       post("fts_bmax_file_load: Cannot load jMax max file %s\n", name);
-      return result;
+      return status;
     }
 
   fclose(f);
@@ -229,19 +231,18 @@ fts_status_t fts_bmax_file_load( const char *name, fts_object_t *parent, int ac,
    for clipboards).
    */
 
-fts_status_t fts_bmax_filedesc_load( FILE *f, fts_object_t *parent, int ac, const fts_atom_t *at, fts_object_t **ret)
+fts_status_t
+fts_bmax_filedesc_load( FILE *f, fts_object_t *parent, int ac, const fts_atom_t *at, fts_object_t **ret)
 {
   fts_binary_file_descr_t descr;
-  fts_status_t result;
+  fts_status_t status;
 
   /* Rewind the file */
-
   fseek(f, 0, SEEK_SET);
 
   /* Read it */
-  result = fts_binary_file_map(f, &descr);
-  if (result != fts_ok)
-    return result;
+  if ((status = fts_binary_file_map(f, &descr)) != fts_ok)
+    return status;
 
   /* Eval it */
   *ret = fts_run_mess_vm(parent, &descr, ac, at);
