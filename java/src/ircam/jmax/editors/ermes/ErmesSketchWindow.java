@@ -2,6 +2,7 @@ package ircam.jmax.editors.ermes;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.datatransfer.*;
 import java.util.*;
 import java.io.*;
 import java.text.*;//DateFormat...
@@ -22,8 +23,15 @@ import com.sun.java.swing.*;
  * it is showing, and the fospatcher to which it is associated.
  * It handles all the sketch menus, it knows how to load from a fospatcher.
  */
-public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor {
+public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPropertyHandler {
 
+  public void propertyChanged(FtsObject object, String name, Object value) {
+    if (name.equals("newObject") || name.equals("newContainer"))
+      ftsObjectsPasted.addElement(value);
+  }
+
+  Vector ftsObjectsPasted = new Vector();
+  public static ErmesClipboardProvider itsClipboardProvider = new ErmesClipboardProvider();
   public boolean inAnApplet = false;
   public boolean isSubPatcher = false;
   public boolean isAbstraction = false;
@@ -300,14 +308,48 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 
     GetCutMenu().setEnabled(false);
     GetCopyMenu().setEnabled(true);//clipboard test
-    GetPasteMenu().setEnabled(false);
+    GetPasteMenu().setEnabled(true);//clipboard test
     GetClearMenu().setEnabled(false);
   }
 
   // clipboard test
   protected boolean Copy() {
-    ErmesClipboardProvider aCP = new ErmesClipboardProvider(itsSketchPad.itsSelectedList);
-    MaxApplication.systemClipboard.setContents(aCP, aCP);
+    CreateFtsGraphics(this);
+    itsClipboardProvider.addGraphicObjects(itsSketchPad.itsSelectedList);
+    MaxApplication.systemClipboard.setContents(itsClipboardProvider, itsClipboardProvider);
+    return true;
+  }
+
+  protected boolean Paste() {
+    String tclScriptToExecute = null;
+    
+    // take the objects list from the clipboard, if any. Only tclGroups for now
+    Transferable aTransferable = MaxApplication.systemClipboard.getContents(this);
+    if ((aTransferable == null) || !aTransferable.isDataFlavorSupported(ErmesClipboardProvider.tclGroupFlavor))  return false;
+
+    try {
+      tclScriptToExecute = (String) aTransferable.getTransferData(ErmesClipboardProvider.tclGroupFlavor);
+    } catch (Exception e) {
+      System.err.println("Error in clipboard handling (paste)" + e.toString());
+    }
+
+    ftsObjectsPasted.removeAllElements();
+    //evaluate the script
+    itsPatcher.watch("newObject", this);
+    itsPatcher.watch("newContainer", this);
+    try {
+      itsPatcher.eval(MaxApplication.getTclInterp(), tclScriptToExecute);
+    } catch (TclException e) {
+      System.out.println("bad format: cannot paste");
+    }
+    
+    //ftsObjectPasted contains the needed additions
+    itsPatcher.removeWatch(this);    
+    itsPatcher.removeWatch(this);
+    // make the sketch do the graphic job
+    itsSketchPad.PasteObjects(ftsObjectsPasted);
+    ErmesSketchPad.RequestOffScreen(itsSketchPad);
+    itsSketchPad.repaint();
     return true;
   }
 
@@ -1008,6 +1050,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   public Dimension getPreferredSize() {
       return preferredsize;
   }
+
   public void CreateFtsGraphics(ErmesSketchWindow theSketchWindow)
   {
     //create the graphic descriptions for the FtsObjects, before saving them

@@ -15,6 +15,7 @@ public class MaxDataSource
 
   static public MaxDataSource makeDataSource(String address) throws java.net.MalformedURLException
   {
+    
     if (address.startsWith("http:") ||
 	address.startsWith("ftp:") ||
 	address.startsWith("file:"))
@@ -50,6 +51,14 @@ public class MaxDataSource
   public static MaxDataSource makeDataSource(File file)
   {
     return new MaxFileDataSource(file);
+  }  
+
+  /** This static method produce a data source from an internal  buffer
+   */
+
+  public static MaxDataSource makeStringDataSource(StringBuffer dataSource)
+  {
+    return new MaxStringDataSource(dataSource);
   }
 }
 

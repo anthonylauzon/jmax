@@ -14,7 +14,12 @@ SOURCES =  \
 	  MaxDataEditorFactory.java \
 	  MaxTclEditorFactory.java  \
 	  MaxTclData.java      \
-          MaxTclInterpreter.java
+          MaxTclInterpreter.java \
+	  MaxStringDataHandler.java \
+	  MaxTclStringDataHandler.java \
+	  MaxStringDataSource.java
+
+
 
 
 

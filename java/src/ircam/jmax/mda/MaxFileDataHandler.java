@@ -89,3 +89,6 @@ abstract public class MaxFileDataHandler extends MaxDataHandler
   abstract protected MaxData makeInstance(File file) throws MaxDataException;
 }
 
+
+
+

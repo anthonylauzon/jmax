@@ -680,6 +680,39 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     }
   }
 	
+  // note: the following function is a reduced version of InitFromFtsContainer.
+  // better organization urges
+  void PasteObjects(Vector objectVector) {
+    FtsObject	fo;
+    FtsConnection fc;
+    ErmesObject aObject;
+
+    int objectX;    
+    int objectY;
+
+    if (objectVector == null) return;
+    for (Enumeration e = objectVector.elements(); e.hasMoreElements();) {
+      fo = (FtsObject)e.nextElement();
+      // Note that the representation is now found from the fts className,
+      // made unique; the new file format will allow for specifing
+      // additional information, like a non default graphic representation
+      // the code will need a small change here
+
+      String objectName = itsHelper.SearchFtsName(fo.getClassName());
+      objectX = ((Integer)fo.get("pos.x")).intValue();
+      objectY = ((Integer)fo.get("pos.y")).intValue();
+      fo.put("pos.x", objectX+10);//offset by 10      
+      fo.put("pos.y", objectY+10);//offset by 10
+
+      aObject = itsHelper.AddObject(objectName, fo);
+    
+      if (objectName == "ircam.jmax.editors.ermes.ErmesObjPatcher")
+	itsPatcherElements.addElement(aObject);
+
+      if (aObject != null) fo.setRepresentation(aObject);
+    }
+  }
+
   public void InitFromFtsContainer(FtsContainerObject theContainerObject){
 	
     FtsContainerObject aFtsPatcher = theContainerObject;
@@ -828,8 +861,9 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   }
 	
   static public void RequestOffScreen(ErmesSketchPad theSketchPad) {
-    if (lastSketchWithOffScreen!=null)
+    if (lastSketchWithOffScreen!=null) 
       lastSketchWithOffScreen.offScreenPresent = false;
+    
     theSketchPad.offScreenPresent = true;
     lastSketchWithOffScreen = theSketchPad;
     //no check for now: change the OffScreen property
@@ -858,9 +892,9 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     ErmesConnection aConnection;
 		
     
-    if(itsFirstClick){
+    if (!offScreenPresent) {
+      RequestOffScreen(this);
       DrawOffScreen(getGraphics());
-      itsFirstClick = false;
     }
     
     if (itsRunMode) {

@@ -1,6 +1,7 @@
 package ircam.jmax.editors.console;
 
 import ircam.jmax.*;
+import ircam.jmax.editors.ermes.*;//this is just to access the clipboard. is going to desappear soon
 import ircam.jmax.dialogs.*;
 import java.io.*;
 import java.util.*;
@@ -93,6 +94,7 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
     }
 
     itsConsole.Put(aPastingString);
+
     return true;
   }
 
