@@ -166,7 +166,7 @@ public class FloatValue extends AbstractEventValue
 
     //--- Fields
     public static final String fs = File.separator;
-    public static final String FLOAT_NAME = "floatevt";
+    public static final String FLOAT_NAME = "float";
     public static ImageIcon FLOAT_ICON; 
     static String path;
     public static final String FLOAT_PUBLIC_NAME = "float";

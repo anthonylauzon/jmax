@@ -25,7 +25,7 @@
  */
 
 /* 
-   New implementation of the message.
+   New implementation of the messbox.
 
    It is based on the atomlist (a clearer, faster, and more (?)
    memory hungry implementation of the old binbuf concept).
@@ -42,7 +42,7 @@ typedef struct {
   fts_atom_list_t *atom_list;
   fts_alarm_t alarm;
   int value;
-} message_t;
+} messbox_t;
 
 /************************************************************
  *
@@ -131,7 +131,7 @@ static fts_atom_t *atom_stack_pointer = &atom_stack[0];	/* next usable value */
    "reader engine" controlled by specific opcode.
    
  */
-static void fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts_atom_t *env_at,
+static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_ac, const fts_atom_t *env_at,
 		   fts_object_t *default_dst, int outlet)
 {
   /* reader command and status */
@@ -270,7 +270,7 @@ static void fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_a
 		}
 	      else
 		{
-		  post("message: invalid $ argument\n"); /*ERROR: should be an event ? */
+		  post("messbox: invalid $ argument\n"); /*ERROR: should be an event ? */
 		  lex_out_type = lex_type_error;
 		  lex_status = lex_list_read;
 		}
@@ -306,12 +306,12 @@ static void fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_a
 		{
 		  fts_symbol_t var_name = fts_get_symbol(rd_out);
 		  
-		  post("message: undefined variable %s\n", fts_symbol_name(var_name)); /*ERROR: should be an event ? */
+		  post("messbox: undefined variable %s\n", fts_symbol_name(var_name)); /*ERROR: should be an event ? */
 		}
 	    }
 	  else
 	    {
-	      post("message: syntax error after $\n"); /*ERROR: should be an event ? */
+	      post("messbox: syntax error after $\n"); /*ERROR: should be an event ? */
 	      lex_out_type = lex_type_error;
 	    }
 	  break;
@@ -370,7 +370,7 @@ static void fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_a
 	      switch (lex_out_type)
 		{
 		case lex_type_void:
-		  post("message: invalid void message destination after a ;\n");
+		  post("messbox: invalid void message destination after a ;\n");
 		  break;
 		case lex_type_value:
 		  if (fts_is_symbol(lex_out_value))
@@ -382,22 +382,22 @@ static void fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_a
 		      ev_status = ev_get_first_arg;
 
 		      if (! fts_named_object_exists(target_name))
-			post("message: invalid message destination \"%s\"\n", fts_symbol_name(target_name));
+			post("messbox: invalid message destination \"%s\"\n", fts_symbol_name(target_name));
 		    }
 		  else
 		    {
-		      post("message: invalid message destination\n");
+		      post("messbox: invalid message destination\n");
 		      ev_status = ev_end;
 		    }
 		  break;
 
 		case lex_type_comma:
-		  post("message: invalid message destination \",\"\n");
+		  post("messbox: invalid message destination \",\"\n");
 		  ev_status = ev_end;
 		  break;
 
 		case lex_type_semi:
-		  post("message: invalid message destination  \";\"\n");
+		  post("messbox: invalid message destination  \";\"\n");
 		  ev_status = ev_end;
 		  break;
 		case lex_type_end:
@@ -510,7 +510,7 @@ static void fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_a
   fts_atom_list_iterator_free(iter);
 }
 
-static int message_list_is_primitive(int ac, const fts_atom_t *at)
+static int messbox_list_is_primitive(int ac, const fts_atom_t *at)
 {
   int i;
 
@@ -518,7 +518,7 @@ static int message_list_is_primitive(int ac, const fts_atom_t *at)
     {
       if(!fts_is_primitive(at + i))
 	{
-	  post("message: can not set value of type <%s>\n", fts_symbol_name(fts_get_selector(at + i)));
+	  post("messbox: can not set value of type <%s>\n", fts_symbol_name(fts_get_selector(at + i)));
 	  return 0;
 	}
     }
@@ -526,9 +526,9 @@ static int message_list_is_primitive(int ac, const fts_atom_t *at)
   return 1;
 }
 
-static void message_update(fts_object_t *o)
+static void messbox_update(fts_object_t *o)
 {
-  message_t *this = (message_t *) o;
+  messbox_t *this = (messbox_t *) o;
 
   fts_client_send_message_from_atom_list(o, fts_s_set, this->atom_list);
 }
@@ -539,9 +539,9 @@ static void message_update(fts_object_t *o)
  *
  */
 
-static void message_tick(fts_alarm_t *alarm, void *calldata)
+static void messbox_tick(fts_alarm_t *alarm, void *calldata)
 {
-  message_t *this = (message_t *)calldata;
+  messbox_t *this = (messbox_t *)calldata;
 
   this->value = 0;
   fts_object_ui_property_changed((fts_object_t *)this, fts_s_value);
@@ -554,67 +554,67 @@ static void message_tick(fts_alarm_t *alarm, void *calldata)
  *
  */
 
-static void message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  message_t *this = (message_t *) o;
+  messbox_t *this = (messbox_t *) o;
 
   this->atom_list = fts_atom_list_new();
-  fts_alarm_init(&(this->alarm), 0, message_tick, this);
+  fts_alarm_init(&(this->alarm), 0, messbox_tick, this);
   this->value = 0;
 }
 
 
-static void message_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  message_t *this = (message_t *) o;
+  messbox_t *this = (messbox_t *) o;
 
   fts_atom_list_free(this->atom_list);
   fts_alarm_unarm(&(this->alarm));
 }
 
 
-static void message_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  message_update(o);
+  messbox_update(o);
 }
 
-static void message_set_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_set_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  message_t *this = (message_t *) o;
+  messbox_t *this = (messbox_t *) o;
   
-  if(message_list_is_primitive(ac, at))
+  if(messbox_list_is_primitive(ac, at))
     fts_atom_list_set(this->atom_list, ac, at);
 }
 
-static void message_append_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_append_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  message_t *this = (message_t *) o;
+  messbox_t *this = (messbox_t *) o;
 
-  if(message_list_is_primitive(ac, at))
+  if(messbox_list_is_primitive(ac, at))
     fts_atom_list_append(this->atom_list, ac, at);
 }
 
 
-static void message_clear_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_clear_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  message_t *this = (message_t *) o;
+  messbox_t *this = (messbox_t *) o;
 
   fts_atom_list_clear(this->atom_list);
 }
 
 
-static void message_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  message_t *this = (message_t *)o;
+  messbox_t *this = (messbox_t *)o;
   fts_bmax_file_t *f = (fts_bmax_file_t *) fts_get_ptr(at);
 
   fts_atom_list_save_bmax(this->atom_list, f, (fts_object_t *) this);
 }
 
 
-static void message_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  message_t *this = (message_t *) o;
+  messbox_t *this = (messbox_t *) o;
   FILE *file;
   int x, y, w, font_index;
   fts_atom_t a;
@@ -690,9 +690,9 @@ static void message_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
   fprintf( file, ";\n");
 }
 
-static void message_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  message_t *this = (message_t *) o;
+  messbox_t *this = (messbox_t *) o;
   fts_object_set_t *set = (fts_object_set_t *)fts_get_data(at);
 
   if (fts_atom_list_is_subsequence(this->atom_list, ac - 1, at + 1))
@@ -711,31 +711,31 @@ static void message_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
    evalution of the box content.
 */
 
-static void message_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  message_t *this = (message_t *) o;
+  messbox_t *this = (messbox_t *) o;
 
-  if(message_list_is_primitive(ac, at))
+  if(messbox_list_is_primitive(ac, at))
     fts_atom_list_set(this->atom_list, ac, at);
 
   if (fts_object_patcher_is_open((fts_object_t *) this))
-    message_update(o);
+    messbox_update(o);
 }
 
-static void message_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  message_t *this = (message_t *) o;
+  messbox_t *this = (messbox_t *) o;
 
-  if(message_list_is_primitive(ac, at))
+  if(messbox_list_is_primitive(ac, at))
     fts_atom_list_append(this->atom_list, ac, at);
 
   if (fts_object_patcher_is_open((fts_object_t *) this))
-    message_update(o);
+    messbox_update(o);
 }
 
-static void message_eval_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_eval_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {  
-  message_t *this = (message_t *) o;
+  messbox_t *this = (messbox_t *) o;
 
   this->value = 1;
   fts_object_ui_property_changed(o, fts_s_value);
@@ -746,9 +746,9 @@ static void message_eval_and_update(fts_object_t *o, int winlet, fts_symbol_t s,
   fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
 }
 
-static void message_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {  
-  message_t *this = (message_t *) o;
+  messbox_t *this = (messbox_t *) o;
 
   fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
 }
@@ -764,70 +764,70 @@ static void message_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
  * it is used to make the message box flash like the messages; java is not
  * reialable for this kind of real time flashing.
  */
-static void message_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+static void messbox_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  message_t *this = (message_t *)obj;
+  messbox_t *this = (messbox_t *)obj;
 
   fts_set_int(value, this->value);
 }
 
 
-static fts_status_t message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static fts_status_t messbox_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[1];
 
-  fts_class_init(cl, sizeof(message_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(messbox_t), 1, 1, 0);
 
   a[0] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, message_init, 1, a);
+  fts_method_define(cl, fts_SystemInlet, fts_s_init, messbox_init, 1, a);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, message_delete, 0, 0);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, message_set);
+  fts_method_define(cl, fts_SystemInlet, fts_s_delete, messbox_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, messbox_set);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find, message_find);
-  fts_method_define(cl, fts_SystemInlet, fts_s_bang, message_eval_and_update, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find, messbox_find);
+  fts_method_define(cl, fts_SystemInlet, fts_s_bang, messbox_eval_and_update, 0, 0);
 
   /* Atom list saving/loading/update support */
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_upload, message_upload, 0, 0);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append,  message_append_noupdate);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear,  message_clear_noupdate);
+  fts_method_define(cl, fts_SystemInlet, fts_s_upload, messbox_upload, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append,  messbox_append_noupdate);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear,  messbox_clear_noupdate);
 
   a[0] = fts_s_ptr;
-  fts_method_define(cl, fts_SystemInlet, fts_s_save_bmax, message_save_bmax, 1, a);
+  fts_method_define(cl, fts_SystemInlet, fts_s_save_bmax, messbox_save_bmax, 1, a);
 
   a[0] = fts_s_ptr;
-  fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, message_save_dotpat, 1, a); 
+  fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, messbox_save_dotpat, 1, a); 
 
   /* Application methods */
 
-  fts_method_define(cl, 0, fts_s_bang, message_eval, 0, 0);
+  fts_method_define(cl, 0, fts_s_bang, messbox_eval, 0, 0);
 
   a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, message_eval, 1, a);
+  fts_method_define(cl, 0, fts_s_int, messbox_eval, 1, a);
 
   a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, message_eval, 1, a);
+  fts_method_define(cl, 0, fts_s_float, messbox_eval, 1, a);
 
   a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_s_symbol, message_eval, 1, a);
+  fts_method_define(cl, 0, fts_s_symbol, messbox_eval, 1, a);
 
-  fts_method_define_varargs(cl, 0, fts_s_list, message_eval);
+  fts_method_define_varargs(cl, 0, fts_s_list, messbox_eval);
 
-  fts_method_define_varargs(cl, 0, fts_s_set, message_set);
+  fts_method_define_varargs(cl, 0, fts_s_set, messbox_set);
 
-  fts_method_define_varargs(cl, 0, fts_s_append,  message_append);
+  fts_method_define_varargs(cl, 0, fts_s_append,  messbox_append);
 
   /* value daemons */
 
-  fts_class_add_daemon(cl, obj_property_get, fts_s_value, message_get_value);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_value, messbox_get_value);
 
   return fts_Success;
 }
 
-void message_config(void)
+void messbox_config(void)
 {
   init_eval();
 
-  fts_class_install(fts_new_symbol("messbox"), message_instantiate);
+  fts_class_install(fts_new_symbol("messbox"), messbox_instantiate);
 }

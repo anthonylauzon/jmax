@@ -151,13 +151,10 @@ public class MessageValue extends AbstractEventValue
 	    {
 		//for the undo/redo
 		evt.setProperty("message", text);
-		
-		//evt.setProperty("duration", new Integer(width));
 		evt.setProperty("duration", new Double(width));
-		
 		evt.setProperty("height", new Integer(height));
-		Object[] obj = {text};
-		evt.sendThisMessage("set_from_string", info.getName(), 1, obj);
+
+		evt.sendSetMessage(MESSAGE_NAME, getPropertyCount(), getPropertyValues());
 	    }
 	else
 	    {
@@ -331,7 +328,7 @@ public class MessageValue extends AbstractEventValue
 
     //--- Fields
     public static final String fs = File.separator;
-    public static final String MESSAGE_NAME = "messevt";
+    public static final String MESSAGE_NAME = "message";
     public static final String MESSAGE_PUBLIC_NAME = "message";
     public static MessageValueInfo info = new MessageValueInfo();
     public static final int DEFAULT_WIDTH = 290;
@@ -357,11 +354,3 @@ public class MessageValue extends AbstractEventValue
 	MESSAGE_ICON = new ImageIcon(path+"message.gif");
     }
 }
-
-
-
-
-
-
-
-

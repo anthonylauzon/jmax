@@ -162,7 +162,7 @@ public class IntegerValue extends AbstractEventValue
 
     //--- Fields
     public static final String fs = File.separator;
-    public static final String INTEGER_NAME = "intevt";
+    public static final String INTEGER_NAME = "int";
     public static ImageIcon INTEGER_ICON; 
     static String path;
     public static final String INTEGER_PUBLIC_NAME = "integer";

@@ -1246,8 +1246,11 @@ void fts_save_selection_as_bmax(FILE *file, fts_object_t *selection)
     }
 }
 
-
-
-
-
+void
+fts_bmax_save_message(fts_bmax_file_t *file, fts_symbol_t selector, int ac, const fts_atom_t *at)
+{
+  fts_bmax_code_push_atoms(file, ac, at);
+  fts_bmax_code_obj_mess(file, fts_SystemInlet, selector, ac);
+  fts_bmax_code_pop_args(file, ac);
+}
 

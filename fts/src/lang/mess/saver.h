@@ -57,5 +57,7 @@ extern void fts_bmax_code_push_atoms(fts_bmax_file_t *f, int ac, const fts_atom_
 
 extern void fts_bmax_code_set_atom(fts_bmax_file_t *f, const fts_atom_t *a);
 
+extern void fts_bmax_save_message(fts_bmax_file_t *file, fts_symbol_t selector, int ac, const fts_atom_t *at);
+
 
 #endif

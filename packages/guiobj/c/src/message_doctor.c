@@ -26,16 +26,16 @@
 
 
 /*
-  Message doctor.
+  Messbox doctor.
 
-  Fix message boxes created with as argument the content of the message.
+  Fix messbox boxes created with as argument the content of the messbox.
   Message box like that are present in some binary and tcl patches
   around, saved before 20/5/1998.
  */
 
 #include "fts.h"
 
-static fts_object_t *message_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+static fts_object_t *messbox_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
   if (ac >= 1)
     {
@@ -56,8 +56,8 @@ static fts_object_t *message_doctor(fts_patcher_t *patcher, int ac, const fts_at
 }
 
 
-void message_doctor_init(void)
+void messbox_doctor_init(void)
 {
-  fts_register_object_doctor(fts_new_symbol("messbox"), message_doctor);
+  fts_register_object_doctor(fts_new_symbol("messbox"), messbox_doctor);
 }
     

@@ -35,8 +35,6 @@
 #include "pt_tools.h"
 #include "pt_meth.h"
 
-#define SHADOCKISM_LEVEL 32767
-
 #define CLASS_NAME "pitch~"
 #define DSP_NAME "_pitch"
 
@@ -106,13 +104,6 @@ typedef struct{
   pitch_out_t out;
 } pitch_t;
 
-#if SHADOCKISM_LEVEL > 1
-static void 
-pitch_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  post("pitch: Shadockism level has reached level %d on Prof.Shadocko's scale\n", SHADOCKISM_LEVEL);
-}
-#endif
 /*************************************************
  *
  *    analysis
@@ -128,23 +119,33 @@ analysis(pitch_t *x)
   
   new_power = pt_common_millers_mean_power(x->pt.buf.main, (float *)x->pt.buf.for_fft, x->wind, x->pt.n_points);
   x->out.power = (new_power > 0.0f)? (DB_POW(new_power)): (-120);
-  if(x->ctl.print_me){ 
-    post("  power measure (in dB) %f\n", x->out.power); 
-  }
 
-  found_candidate = pt_common_find_pitch_candidate(&x->pt, &candidate, &pitch_power, &total_power, x->ctl.print_me);
-  if(found_candidate){
-    new_pitch = pt_common_candidate_midi_pitch(&x->pt, candidate);
-    if(x->ctl.print_me){
-      post("  found candidate:\n");
-      post("    bin %f\n", candidate);
-      post("    note %f\n", new_pitch);
+  if(x->ctl.print_me)
+    { 
+      post("  power measure (in dB) %f\n", x->out.power); 
     }
-  }else{
-    if(x->ctl.print_me) post("  sorry, no pitch!\n");
-    new_pitch = 0.0f;
-  }
+  
+  found_candidate = pt_common_find_pitch_candidate(&x->pt, &candidate, &pitch_power, &total_power, x->ctl.print_me);
 
+  if(found_candidate)
+    {
+      new_pitch = pt_common_candidate_midi_pitch(&x->pt, candidate);
+
+      if(x->ctl.print_me)
+	{
+	  post("  found candidate:\n");
+	  post("    bin %f\n", candidate);
+	  post("    note %f\n", new_pitch);
+	}
+    }
+  else
+    {
+      if(x->ctl.print_me) 
+	post("  sorry, no pitch!\n");
+
+      new_pitch = 0.0f;
+    }
+  
   /* update history */
   x->hist.idx = (x->hist.idx + 1) & HISTORY_MASK;
   x->hist.ory[x->hist.idx].pitch = new_pitch;
@@ -156,66 +157,81 @@ analysis(pitch_t *x)
    * playing.  This also takes care of the case where new_pitch == 0.
    */
   
-  if(x->stat.pitch > 0){
-    float error = new_pitch - x->stat.pitch;
-    
-    /* eliminate octave jumps */
-    if(error > 6) error -= 12;
-    else if(error < -6) error += 12;
-  
-    if(error > x->ctl.vib_depth || error < -x->ctl.vib_depth){
-      x->stat.pitch = 0;
-      x->hist.ory[(x->hist.idx - 1) & HISTORY_MASK].pitch = 0.0f;
-      /* bash previous pitch history. This prevents the stability criterion
-       * from being met until x->hist.n_pitch new pitches have been measured.
-       */
+  if(x->stat.pitch > 0)
+    {
+      float error = new_pitch - x->stat.pitch;
+      
+      /* eliminate octave jumps */
+      if(error > 6) error -= 12;
+      else if(error < -6) error += 12;
+      
+      if(error > x->ctl.vib_depth || error < -x->ctl.vib_depth)
+	{
+	  x->stat.pitch = 0;
+	  x->hist.ory[(x->hist.idx - 1) & HISTORY_MASK].pitch = 0.0f;
+	  /* bash previous pitch history. This prevents the stability criterion
+	   * from being met until x->hist.n_pitch new pitches have been measured.
+	   */
+	}
     }
-  }
   
   /* test for reattack:
    * it is a condition on the amplitude envelope.
    * Reattack is also marked by setting current pitch to zero;
    * the note-on conditions must apply before a new note is output.
    */
-  if(!x->stat.peaked){
-    if(x->hist.n_power &&
-      (new_power * (x->ctl.reattack_thresh + 1) < x->hist.ory[(x->hist.idx - x->hist.n_power) & HISTORY_MASK].power)
-    ){
-      x->stat.peaked = 1;
+  if(!x->stat.peaked)
+    {
+      if(x->hist.n_power && (new_power * (x->ctl.reattack_thresh + 1) < x->hist.ory[(x->hist.idx - x->hist.n_power) & HISTORY_MASK].power))
+	{
+	  x->stat.peaked = 1;
+	}
     }
-  }else{
+  else{
     if(x->hist.n_power &&
       pitch_power > x->pt.ctl.power_on &&
       (new_power > (x->ctl.reattack_thresh + 1) * x->hist.ory[(x->hist.idx - x->hist.n_power) & HISTORY_MASK].power)
     ){
       x->stat.pitch = 0.0f;
-      if(x->ctl.loud){
-	post("%s: reattack: power %f\n", CLASS_NAME, sqrt(pitch_power)/x->pt.n_points);
-      }
+
+      if(x->ctl.loud)
+	{
+	  post("%s: reattack: power %f\n", CLASS_NAME, sqrt(pitch_power)/x->pt.n_points);
+	}
       
       /* here's the good part:
        * there's a reattack and we haven't reported a note yet since the last one,
        * look again RETROACTIVELY, using laxer criteria
        */
-      if(x->hist.count < 100){ /* '100' seems like a value god gave to you, right? Miller? */
-        float best_pitch = 0.0f;
-        float best_power = 0.0f;
-        float recent_power = new_power;
-        int look_for_best = 0;
-        int hist_depth = (x->hist.count > N_HISTORY)? N_HISTORY: x->hist.count;
-      
-        for(i=1; i<hist_depth; i++){
-          float history_power = x->hist.ory[(x->hist.idx - i) & HISTORY_MASK].power;
-          if(!look_for_best){
-            if(history_power > recent_power) look_for_best = 1;
-            recent_power = history_power;
-          }else if(history_power > best_power){
-            best_power = history_power;
-            best_pitch = x->hist.ory[(x->hist.idx - i) & HISTORY_MASK].pitch;
-          }
-        }
-        if(best_power > 0) x->stat.pitch = x->out.midi_pitch = best_pitch;
-      }
+      if(x->hist.count < 100)
+	{ /* '100' seems like a value god gave to you, right? Miller? */
+	  float best_pitch = 0.0f;
+	  float best_power = 0.0f;
+	  float recent_power = new_power;
+	  int look_for_best = 0;
+	  int hist_depth = (x->hist.count > N_HISTORY)? N_HISTORY: x->hist.count;
+	  
+	  for(i=1; i<hist_depth; i++)
+	    {
+	      float history_power = x->hist.ory[(x->hist.idx - i) & HISTORY_MASK].power;
+	      
+	      if(!look_for_best)
+		{
+		  if(history_power > recent_power) 
+		    look_for_best = 1;
+
+		  recent_power = history_power;
+		}
+	      else if(history_power > best_power)
+		{
+		  best_power = history_power;
+		  best_pitch = x->hist.ory[(x->hist.idx - i) & HISTORY_MASK].pitch;
+		}
+	    }
+	  
+	  if(best_power > 0) 
+	    x->stat.pitch = x->out.midi_pitch = best_pitch;
+	}
       x->hist.count = 0; 
       x->stat.peaked = 0;
       x->out.attack = 1;
@@ -369,12 +385,6 @@ pitch_loud(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   ((pitch_t *)o)->ctl.loud = fts_get_int_arg(ac, at, 0, 0);
 }
 
-static void 
-pitch_obsolete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  /* error("%s: obsolete message: %s", CLASS_NAME, fts_symbol_name(s)); */
-}
-
 /*************************************************
  *
  *    system called methods
@@ -520,12 +530,6 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[0] = fts_s_number;
   fts_method_define(cl, 0, fts_new_symbol("print"), pitch_print, 1, a);
 
-#if SHADOCKISM_LEVEL > 1
-  fts_method_define(cl, 0, fts_s_bang, pitch_bang, 0, 0);
-
-  fts_method_define_varargs(cl, 0, fts_new_symbol("gliss-time"), pitch_obsolete);
-#endif
-  
   /* classes signal inlets and outlets */
   dsp_sig_inlet(cl, INLET_sig);
 

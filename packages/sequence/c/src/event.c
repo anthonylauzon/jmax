@@ -52,7 +52,7 @@ event_print(event_t *event)
       post("<%s> ", fts_symbol_name(fts_object_get_class_name(obj)));
       post_atoms(n_atoms, atoms);
     }
-  else
+  else if(!fts_is_void(&event->value))
     {
       post("<%s> ", fts_symbol_name(fts_type_get_selector(fts_get_type(&event->value))));
       post_atoms(1, &event->value);
@@ -80,7 +80,7 @@ event_upload(event_t *event)
 
       fts_client_upload((fts_object_t *)event, seqsym_event, n_atoms + 2, atoms);
     }
-  else
+  else if(!fts_is_void(&event->value))
     { 
       fts_atom_t atoms[3];
      
@@ -111,7 +111,7 @@ event_save_bmax(fts_bmax_file_t *file, event_t *event)
 
       fts_bmax_save_message(file, seqsym_bmax_add_event, n_atoms + 2, atoms);
     }
-  else
+  else if(!fts_is_void(&event->value))
     { 
       fts_atom_t atoms[3];
      

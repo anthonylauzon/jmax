@@ -27,8 +27,8 @@
 #include "fts.h"
 
 extern void toggle_config(void);
-extern void message_config(void);
-extern void message_doctor_init(void);
+extern void messbox_config(void);
+extern void messbox_doctor_init(void);
 extern void panel_config(void);
 extern void gint_config(void);
 extern void slider_config(void);
@@ -42,8 +42,8 @@ static void
 fts_guiobj_init(void)
 {
   toggle_config();
-  message_config();
-  message_doctor_init();
+  messbox_config();
+  messbox_doctor_init();
   panel_config();
   gint_config();
   slider_config();
