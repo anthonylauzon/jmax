@@ -2,16 +2,17 @@ package ircam.jmax.editors.ermes;
 
 import java.awt.*;
 import java.awt.event.*;
+import com.sun.java.swing.*;
 
 /**
- * The toolbar's button. It handles the selected/unselected state,
- * and inform the toolbar when it is pressed.
+ * The toolbar's button. It knows it number. The mouse interaction is kept by the toolbar
+ * itself.
  */
-class ErmesToggleButton extends Canvas implements MouseListener{
-  boolean pressed;
+class ErmesToggleButton extends JToggleButton implements {
+  //boolean pressed;
   private int itsNum;
-  Image itsImage1, itsImage2;
-  ErmesToolBar itsToolBar;
+  //Image itsImage1, itsImage2;
+  //ErmesToolBar itsToolBar;
   
 	
   //--------------------------------------------------------

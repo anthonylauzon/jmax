@@ -10,7 +10,11 @@ SSOURCES = \
           ErmesSketchPad.java \
           ErmesSketchWindow.java \
           ErmesToggleButton.java \
-          ErmesToolBar.java
+          ErmesToolBar.java \
+	  ErmesSwToolbar.java \
+	  ErmesSwVarEdit.java \
+	  ErmesToolBarLayout.java \
+	  ErmesSwToggleButton.java
 
 DSOURCES = \
           ErmesObjBang.java \

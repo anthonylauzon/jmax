@@ -109,7 +109,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   static Image offImage;
 		
 		
-  ErmesToolBar itsToolBar;
+  /*provasw ErmesToolBar itsToolBar; questa riga e quella dopo (aggiunta)*/
+  ErmesSwToolbar itsToolBar;
   ErmesConnSegment itsSelectedSegment;
   Point itsStartMovingPt;
   Rectangle itsStartInclusionRect;
@@ -137,6 +138,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 
   Hashtable nameTable; // substitute name lists, initialized in the constructor.
   int itsAddObject;
+  String itsAddObjectName;
   Rectangle resizeRect = new Rectangle();
   public ErmesSketchHelper itsHelper;
 
@@ -464,7 +466,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   //	message received from the ToolBar when an object is DEselected
   //--------------------------------------------------------
   public void DoNothing() {
-    itsToolBar.Deselect();
+    //itsToolBar.Deselect();
     editStatus = DOING_NOTHING;
   }
   
@@ -613,7 +615,6 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     return itsSketchWindow;
   }
   
-
   public ErmesObjMessThread GetMessThread(){
     return itsMessThread;
   }
@@ -861,7 +862,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	y = aPoint.y;
       }
       boolean isTopPatcher = (!((ErmesSketchWindow)itsSketchWindow).isSubPatcher);
-      if (isTopPatcher && (objectNames[itsAddObject].equals("ircam.jmax.editors.ermes.ErmesObjIn") || objectNames[itsAddObject].equals("ircam.jmax.editors.ermes.ErmesObjOut"))) {
+      if (isTopPatcher && itsAddObjectName.equals("ircam.jmax.editors.ermes.ErmesObjIn") || itsAddObjectName.equals("ircam.jmax.editors.ermes.ErmesObjOut")) {
 	//forbidden to add such objects in a top level patch
 	ErrorDialog aErr = new ErrorDialog(itsSketchWindow, "Can't instantiate inlets/outlets in a Top level patcher");
 	aErr.setLocation(100, 100);
@@ -869,11 +870,10 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	editStatus = DOING_NOTHING;
 	return;
       }
-
       try
 	{
 	  //there was an error "aObject may not have been initialized"
-	  aObject = (ErmesObject) Class.forName(objectNames[itsAddObject]).newInstance();
+	  aObject = (ErmesObject) Class.forName(itsAddObjectName).newInstance();
 	}
       catch (ClassNotFoundException e1)
 	{
@@ -895,7 +895,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       itsElements.addElement(aObject);
       aObject.Paint(offGraphics);
       CopyTheOffScreen(getGraphics());
-      if(objectNames[itsAddObject] == "ircam.jmax.editors.ermes.ErmesObjPatcher")
+      if(itsAddObjectName == "ircam.jmax.editors.ermes.ErmesObjPatcher")
 	itsPatcherElements.addElement(aObject);
       if (!itsToolBar.locked && editStatus != EDITING_OBJECT) editStatus = DOING_NOTHING;	
       aRect = new Rectangle(aObject.currentRect.x, aObject.currentRect.y, aObject.currentRect.width, aObject.currentRect.height);
@@ -1499,7 +1499,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   //	SetToolBar
   //  ToolBar associated with the SketchPad
   //--------------------------------------------------------
-  public void SetToolBar(ErmesToolBar theToolBar) {
+  /*provaSw public void SetToolBar(ErmesToolBar theToolBar) { questa riga sostituita a quella dopo*/
+  public void SetToolBar(ErmesSwToolbar theToolBar) {
     itsToolBar = theToolBar;
   }
   
@@ -1513,6 +1514,11 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     itsAddObject = theObject;
   }
   
+  public void startAdd(String theObject) {
+    itsHelper.DeselectAll();
+    editStatus = START_ADD;
+    itsAddObjectName = theObject;
+  }
 
   public void ToSave(){
     ErmesSketchWindow aSketchWindow = (ErmesSketchWindow)itsSketchWindow;

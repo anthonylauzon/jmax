@@ -176,5 +176,24 @@ ErmesToolBar:
 	javac $(JFLAGS) ErmesToolBar.java
 .PHONY: ErmesToolBar
 
+ErmesSwToolbar:
+	javac $(JFLAGS) ErmesSwToolbar.java
+.PHONY: ErmesSwToolbar
+
+ErmesSwVarEdit:
+	javac $(JFLAGS) ErmesSwVarEdit.java
+.PHONY: ErmesSwVarEdit
+
+ErmesToolBarLayout:
+	javac $(JFLAGS) ErmesToolBarLayout.java
+.PHONY: ErmesToolBarLayout
+
+ErmesSwToggleButton:
+	javac $(JFLAGS) ErmesSwToggleButton.java
+.PHONY: ErmesSwToggleButton
+
+ErmesKeyAdapter:
+	javac $(JFLAGS) ErmesKeyAdapter.java
+.PHONY: ErmesKeyAdapter
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
