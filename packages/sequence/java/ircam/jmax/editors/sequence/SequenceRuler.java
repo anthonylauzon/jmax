@@ -85,7 +85,6 @@ public void paintComponent(Graphics g)
 	Rectangle clip = g.getClipBounds();
 	
 	int logicalTime = -geometry.getXTransposition();
-	/*int windowTime = scrollManager.getMaximumVisibleTime();*/
 	int windowTime = (int) (utilityPartitionAdapter.getInvX(d.width) - utilityPartitionAdapter.getInvX(ScoreBackground.KEYEND))-1;	
 	int timeStep = ScoreBackground.findBestTimeStep(windowTime/*-logicalTime*/);
 	
@@ -97,46 +96,32 @@ public void paintComponent(Graphics g)
 	else k=1;
 		
 	g.setColor(SequencePanel.violetColor);
-	
-	if(hh)//during highlighting
-	{
-		for (int i=logicalTime+timeStep; i < logicalTime+windowTime; i+=timeStep*k) 
-	  {
-	    snappedTime = (i/timeStep)*timeStep;
-	    xPosition = utilityPartitionAdapter.getX(snappedTime)+getXIndentation();
+  for (int i=logicalTime+timeStep; i<logicalTime+windowTime; i+=timeStep*k) 
+  {
+    snappedTime = (i/timeStep)*timeStep;
+    xPosition = utilityPartitionAdapter.getX(snappedTime)+getXIndentation();
+    
+    if(unity==MILLISECONDS_UNITY)		    
+      timeString = ""+snappedTime;
+    else
+      timeString = ""+(float)(snappedTime/(float)1000.0);
 	    
-	    if(unity==MILLISECONDS_UNITY)		    
-	      timeString = ""+snappedTime;
-	    else
-	      timeString = ""+(float)(snappedTime/(float)1000.0);		
-	    stringWidth = fm.stringWidth(timeString);
-	    
-	    if((xPosition <= clip.x+clip.width+20)&&(xPosition+stringWidth >= clip.x-20))
-				g.drawString(timeString, xPosition-stringWidth/2, RULER_HEIGHT-3);		  
-	  }
-		
-		int hhX = utilityPartitionAdapter.getX(hhTime)+getXIndentation();
-		g.setColor(Color.green);
-		g.fillRect(hhX-1, 1, 3, d.height-2);
-		
-		hh = false;				
-	}
-	else
-	{
-		for (int i=logicalTime+timeStep; i<logicalTime+windowTime; i+=timeStep*k) 
-	  {
-	    snappedTime = (i/timeStep)*timeStep;
-	    xPosition = utilityPartitionAdapter.getX(snappedTime)+getXIndentation();
-	    
-	    if(unity==MILLISECONDS_UNITY)		    
-	      timeString = ""+snappedTime;
-	    else
-	      timeString = ""+(float)(snappedTime/(float)1000.0);
-	    
-	    stringWidth = fm.stringWidth(timeString);
-	    g.drawString(timeString, xPosition-stringWidth/2, RULER_HEIGHT-3);		  
-	  }
-	}
+    stringWidth = fm.stringWidth(timeString);
+    g.drawString(timeString, xPosition-stringWidth/2, RULER_HEIGHT-3);		  
+  }
+  
+  if(hh)
+    drawMarker(g);
+}
+
+void drawMarker(Graphics g)
+{
+  Dimension d = getSize();
+  int hhX = utilityPartitionAdapter.getX(hhTime)+getXIndentation();
+  g.setColor(Color.green);
+  g.fillRect(hhX, 1, 4, d.height-2);
+  g.setColor(Color.darkGray);
+  g.drawRect(hhX, 1, 3, d.height-3);
 }
 
 int getXIndentation()
@@ -197,9 +182,9 @@ public void highlight(Enumeration elements, double time)
 	int timeX = utilityPartitionAdapter.getX(time) + getXIndentation();
 	
 	if(time >= hhTime)
-		paintRect.setBounds(hhX-1, 1, timeX-hhX+3, getSize().height-2);
+		paintRect.setBounds(hhX, 1, timeX-hhX+5, getSize().height-2);
 	else
-		paintRect.setBounds(timeX-1, 1, hhX-timeX+3, getSize().height-2);
+		paintRect.setBounds(timeX, 1, hhX-timeX+5, getSize().height-2);
 	
 	repaint(paintRect);
 	
