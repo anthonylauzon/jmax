@@ -93,6 +93,8 @@ typedef struct
   propobj_t propobj;
   fts_symbol_t type;
   double tempo;
+  int beat;
+  int beat_type;
 } scomark_t;
 
 enum scomark_type_enum
@@ -105,5 +107,19 @@ enum scomark_type_enum
 
 extern fts_class_t *scomark_class;
 extern enumeration_t *scomark_type_enumeration;
+
+#define scomark_set_type(s, b) ((s)->type = (b))
+#define scomark_get_type(s) ((s)->type)
+
+#define scomark_set_tempo(s, b) ((s)->tempo = (b))
+#define scomark_get_tempo(s) ((s)->tempo)
+
+#define scomark_set_beat(s, b) ((s)->beat = (b))
+#define scomark_get_beat(s) ((s)->beat)
+
+#define scomark_get_beat_type(s) ((s)->beat_type)
+#define scomark_set_beat_type(s, b) ((s)->beat_type = (b))
+
+void scomark_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 #endif

@@ -53,10 +53,10 @@ data_object_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 /***********************************************************************
- *
- * expression class
- *
- */
+*
+* expression class
+*
+*/
 fts_class_t *expr_class = NULL;
 
 static void
@@ -337,10 +337,10 @@ enumeration_get_name(enumeration_t *e, int index)
 }
 
 /***********************************************************************
- *
- *  propobj, base class with dynamic properties
- *
- */
+*
+*  propobj, base class with dynamic properties
+*
+*/
 void
 propobj_get_property(propobj_t *self, propobj_property_t *prop, fts_atom_t *p)
 {
@@ -501,10 +501,10 @@ propobj_equals(const fts_atom_t *a, const fts_atom_t *b)
 }
 
 /************************************************************************************
- *
- *  propobj class
- *
- */
+*
+*  propobj class
+*
+*/
 #define PROPOBJ_ALLOC_BLOCK 32
 
 void
@@ -587,7 +587,7 @@ _get_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   propobj_get_property_by_name(self, s, fts_get_return_value());
 }
 
-static int 
+static propobj_property_t * 
 propobj_class_insert_property(fts_class_t *cl, fts_symbol_t name, fts_symbol_t type)
 {
   propobj_class_description_t *descr = propobj_class_get_descritption(cl);
@@ -609,56 +609,59 @@ propobj_class_insert_property(fts_class_t *cl, fts_symbol_t name, fts_symbol_t t
   descr->array[index].type = type;  
   descr->n_properties++;
   
-  return index;
+  return descr->array + index;
 }
 
-int 
+propobj_property_t * 
 propobj_class_add_int_property(fts_class_t *cl, fts_symbol_t name)
 {
-  int index;
+  propobj_property_t *prop;
   
   fts_class_instantiate(cl);
-  index = propobj_class_insert_property(cl, name, fts_s_int);
+  prop = propobj_class_insert_property(cl, name, fts_s_int);
   
   fts_class_message_number(cl, name, _set_int_method);
   fts_class_message_void(cl, name, _get_method);
   
-  return index;
+  return prop;
 }
 
-int 
+propobj_property_t * 
 propobj_class_add_float_property(fts_class_t *cl, fts_symbol_t name)
 {
-  int index;
+  propobj_property_t *prop;
   
   fts_class_instantiate(cl);
-  index = propobj_class_insert_property(cl, name, fts_s_float);
+  prop = propobj_class_insert_property(cl, name, fts_s_float);
   
   fts_class_message_number(cl, name, _set_float_method);
   fts_class_message_void(cl, name, _get_method);
   
-  return index;
+  return prop;
 }
 
-int 
+propobj_property_t * 
 propobj_class_add_symbol_property(fts_class_t *cl, fts_symbol_t name, enumeration_t *e)
 {
-  int index;
+  propobj_property_t *prop;
   
   fts_class_instantiate(cl);
-  index = propobj_class_insert_property(cl, name, fts_s_symbol);
+  prop = propobj_class_insert_property(cl, name, fts_s_symbol);
   
   fts_class_message_symbol(cl, name, _set_method);
   fts_class_message_void(cl, name, _get_method);
   
-  return index;
+  return prop;
 }
 
 propobj_property_t *
 propobj_class_get_property_by_name(fts_class_t *cl, fts_symbol_t name)
 {
-  propobj_class_description_t *descr = propobj_class_get_descritption(cl);
+  propobj_class_description_t *descr;
   fts_atom_t k, v;
+  
+  fts_class_instantiate(cl);
+  descr = propobj_class_get_descritption(cl);
   
   fts_set_symbol(&k, name);
   if(fts_hashtable_get(&descr->hash, &k, &v))
@@ -670,7 +673,10 @@ propobj_class_get_property_by_name(fts_class_t *cl, fts_symbol_t name)
 propobj_property_t *
 propobj_class_get_property_by_index(fts_class_t *cl, int index)
 {
-  propobj_class_description_t *descr = propobj_class_get_descritption(cl);
+  propobj_class_description_t *descr;
+  
+  fts_class_instantiate(cl);
+  descr = propobj_class_get_descritption(cl);
   
   if(index >= 0 && index < descr->n_properties)
     return descr->array + index;
@@ -692,10 +698,10 @@ propobj_class_append_properties(fts_class_t *cl, fts_array_t *array)
 }
 
 /***********************************************************************
- *
- *  config
- *
- */
+*
+*  config
+*
+*/
 void
 data_config(void)
 {
@@ -712,9 +718,9 @@ data_config(void)
   bpf_config();
   dict_config();
   tabeditor_config();
-
+  
   getrange_config();  
-
+  
   dumpfile_config();
   
   fts_hashtable_init(&global_enumeration_table, FTS_HASHTABLE_MEDIUM);

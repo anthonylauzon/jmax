@@ -73,6 +73,8 @@ typedef struct _seqmidi_read_data_
   int size; /* number of event read */
   event_t *note_is_on[n_midi_channels][n_midi_notes]; /* table for reading notes */
   int n_note_on[n_midi_channels][n_midi_notes]; /* counter for overlapping notes */
+  scomark_t *last_marker;
+  double last_marker_time;
   event_t *last;
 } seqmidi_read_data_t;
 
@@ -84,6 +86,8 @@ seqmidi_read_data_init(seqmidi_read_data_t *data)
   data->merge = NULL;
   data->track_index = 0;
   data->size = 0;
+  data->last_marker = NULL;
+  data->last_marker_time = 0.0;
   data->last = NULL;
 } 
 
@@ -223,6 +227,72 @@ scoobtrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
   }
 }
 
+static scomark_t *
+scoobtrack_append_scomark_event(track_t *track, double time, fts_symbol_t type)
+{
+  track_t *markers = track_get_or_make_markers(track);
+  scomark_t *scomark;
+  event_t *event;
+  fts_atom_t a;
+  
+  /* create a scomark */
+  fts_set_symbol(&a, type);
+  scomark = (scomark_t *)fts_object_create(scomark_class, 1, &a);
+  
+  /* create a new event with the scomark */
+  fts_set_object(&a, (fts_object_t *)scomark);
+  event = (event_t *)fts_object_create(event_class, 1, &a);
+  
+  /* append event to track */
+  track_append_event(markers, time, event);
+  
+  return scomark;
+}
+
+static void
+scoobtrack_read_tempo(fts_midifile_t *file, int tempo)
+{
+  seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
+  track_t *track = data->track;
+  double time = fts_midifile_get_time(file);
+  scomark_t *scomark = data->last_marker;
+  int beat_type;
+  
+  if(data->last_marker == NULL || data->last_marker_time > time)
+  {
+    scomark = scoobtrack_append_scomark_event(track, time, seqsym_tempo);
+
+    if(data->last_marker != NULL)
+      scomark_set_beat_type(scomark, scomark_get_beat_type(data->last_marker));
+  }
+  
+  beat_type = scomark_get_beat_type(scomark);
+  
+  if(beat_type == 0)
+    beat_type = 4;
+  
+  scomark_set_tempo(scomark, 0.25 * (double)beat_type * 60.0 / ((double)tempo * 0.000001));
+}
+
+static void
+scoobtrack_read_time_signature(fts_midifile_t *file, int numerator, int denominator, int clocks_per_metronome_click, int heals_per_quarter_note)
+{
+  seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
+  track_t *track = data->track;
+  double time = fts_midifile_get_time(file);
+  scomark_t *scomark = data->last_marker;
+  
+  if(data->last_marker == NULL || data->last_marker_time > time)
+    scomark = scoobtrack_append_scomark_event(track, time, seqsym_bar);
+  else
+    scomark_set_type(scomark, seqsym_bar);
+  
+  scomark_set_beat(scomark, numerator);
+  scomark_set_beat_type(scomark, denominator);
+  
+  data->last_marker = scomark;
+}
+
 static void
 scoobtrack_read_track_end(fts_midifile_t *file)
 {
@@ -338,14 +408,18 @@ track_import_from_midifile(track_t *track, fts_midifile_t *file)
     
     /* set oll notes to off */
     for(i=0; i<n_midi_channels; i++)
+    {
       for(j=0; j<n_midi_notes; j++)
       {
         data.note_is_on[i][j] = 0;
         data.n_note_on[i][j] = 0;
       }
+    }
         
-        read.track_end = scoobtrack_read_track_end;
+    read.track_end = scoobtrack_read_track_end;
     read.midi_event = scoobtrack_read_midievent;
+    read.tempo = scoobtrack_read_tempo;
+    read.time_signature = scoobtrack_read_time_signature;
   }
   else if(track_get_type(track) == fts_int_class)
   {

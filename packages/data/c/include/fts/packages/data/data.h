@@ -18,15 +18,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-
-
 #ifndef _DATA_H
 #define _DATA_H
-
-/** package with data classes (matrices, vectors, dictionaries, etc.).
- *  @file     data.h
- *  @defgroup data	data package
- */
 
 #include <fts/fts.h>
 
@@ -45,13 +38,10 @@
 DATA_API void data_object_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);  
 
 /******************************************************************* 
- *
- *  expression class
- *
- */
-/** expression class.
- *  @class expression
- */
+*
+*  expression class
+*
+*/
 typedef struct
 {
   fts_object_t o;
@@ -66,10 +56,10 @@ DATA_API void expr_evaluate(expr_t *self, fts_hashtable_t *locals, int ac, const
 DATA_API void expr_evaluate_in_scope(expr_t *self, fts_patcher_t *scope, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 /******************************************************************* 
- *
- *  enumeration type support
- *
- */
+*
+*  enumeration type support
+*
+*/
 typedef struct
 {
   fts_hashtable_t hash;
@@ -87,16 +77,18 @@ int enumeration_get_index(enumeration_t *e, const fts_symbol_t name);
 fts_symbol_t enumeration_get_name(enumeration_t *e, int index);
 
 /******************************************************************* 
- *
- *  propobj, base class with properties
- *
- */
+*
+*  propobj, base class with properties
+*
+*/
 typedef struct
 {
   int index;
   fts_symbol_t name;
   fts_symbol_t type;
 } propobj_property_t;
+
+#define propobj_property_get_index(p) ((p)->index)
 
 typedef struct
 {
@@ -129,9 +121,9 @@ void propobj_class_init(fts_class_t *cl);
 propobj_class_description_t *propobj_class_get_descritption(fts_class_t *cl);
 propobj_class_description_t *propobj_get_descritption(propobj_t *self);
 
-int propobj_class_add_int_property(fts_class_t *cl, fts_symbol_t name);
-int propobj_class_add_float_property(fts_class_t *cl, fts_symbol_t name);
-int propobj_class_add_symbol_property(fts_class_t *cl, fts_symbol_t name, enumeration_t *e);
+propobj_property_t *propobj_class_add_int_property(fts_class_t *cl, fts_symbol_t name);
+propobj_property_t *propobj_class_add_float_property(fts_class_t *cl, fts_symbol_t name);
+propobj_property_t *propobj_class_add_symbol_property(fts_class_t *cl, fts_symbol_t name, enumeration_t *e);
 propobj_property_t *propobj_class_get_property_by_name(fts_class_t *cl, fts_symbol_t name);
 propobj_property_t *propobj_class_get_property_by_index(fts_class_t *cl, int index);
 
@@ -146,10 +138,10 @@ void propobj_copy_function(const fts_atom_t *from, fts_atom_t *to);
 int propobj_equals(const fts_atom_t *a, const fts_atom_t *b);
 
 /******************************************************************* 
- *
- *  data classes
- *
- */
+*
+*  data classes
+*
+*/
 #include <fts/packages/data/mat.h>
 #include <fts/packages/data/vec.h>
 #include <fts/packages/data/ivec.h>

@@ -65,10 +65,10 @@
 #define FTS_MIDIFILE_DEFAULT_TEMPO 500000
 
 /*************************************************************
- *
- *  error handling
- *
- */
+*
+*  error handling
+*
+*/
 static void
 mferror(fts_midifile_t *file, char *s)
 {
@@ -76,27 +76,27 @@ mferror(fts_midifile_t *file, char *s)
 }
 
 /*************************************************************
- *
- *  read utilities
- *
- */
+*
+*  read utilities
+*
+*/
 
 /* read a single character and abort on EOF */
 static int
 readbyte(fts_midifile_t *file)
 {
   int c = getc(file->fp);
-
+  
   if (c == EOF)
-    {
-      mferror(file, "unexspected end of file");
-      return EOF;
-    }
+  {
+    mferror(file, "unexspected end of file");
+    return EOF;
+  }
   else
-    {
-      file->bytes--; 
-      return c;
-    }
+  {
+    file->bytes--; 
+    return c;
+  }
 }
 
 /* read a varying-length number, and return the number of characters it took */
@@ -108,19 +108,19 @@ readvarinum(fts_midifile_t *file)
   
   if(c == EOF)
     return 0;
-
+  
   value = c & 0x7f;
-
+  
   while(c & 0x80)
-    {
-      c = readbyte(file);
-
-      if(c == EOF)
-	return 0;
-
-      value = (value << 7) + (c & 0x7f);
-    }
-
+  {
+    c = readbyte(file);
+    
+    if(c == EOF)
+      return 0;
+    
+    value = (value << 7) + (c & 0x7f);
+  }
+  
   return value;
 }
 
@@ -131,7 +131,7 @@ read32bit(fts_midifile_t *file)
   int c2 = readbyte(file);
   int c3 = readbyte(file);
   int c4 = readbyte(file);
-
+  
   return (c1 << 24) + (c2 << 16) + (c3 << 8) + c4;
 }
 
@@ -140,7 +140,7 @@ read16bit(fts_midifile_t *file)
 {
   int msb = readbyte(file);
   int lsb = readbyte(file);
-
+  
   return (msb << 8) + lsb;
 }
 
@@ -150,46 +150,46 @@ static void
 midifile_tempo_map_add_entry(fts_midifile_t *file, int tick, int tempo)
 {
   fts_midifile_tempo_map_entry_t *e = file->tempo_map;
-
+  
   if(e == NULL)
+  {
+    fts_midifile_tempo_map_entry_t *entry = (fts_midifile_tempo_map_entry_t *)fts_malloc(sizeof(fts_midifile_tempo_map_entry_t));
+    
+    if(tick == 0)
     {
-      fts_midifile_tempo_map_entry_t *entry = (fts_midifile_tempo_map_entry_t *)fts_malloc(sizeof(fts_midifile_tempo_map_entry_t));
-
-      if(tick == 0)
-	{
-	  entry->tick = 0;
-	  entry->time = 0.0;
-	  entry->conv = 0.001 * tempo / (double)file->division;
-	  entry->next = 0;
-
-	  file->tempo_map = entry;
-	}
-      else
-	{
-	  midifile_tempo_map_add_entry(file, 0, FTS_MIDIFILE_DEFAULT_TEMPO);
-
-	  entry->tick = tick;
-	  entry->time = tick * file->tempo_map->conv;
-	  entry->conv = 0.001 * tempo / (double)file->division;
-	  entry->next = 0;
-
-	  file->tempo_map->next = entry;
-	}
-    }
-  else
-    {
-      fts_midifile_tempo_map_entry_t *entry = (fts_midifile_tempo_map_entry_t *)fts_malloc(sizeof(fts_midifile_tempo_map_entry_t));
-
-      while(e->next != NULL)
-	e = e->next;
-      
-      entry->tick = tick;
-      entry->time = e->time + (tick - e->tick) * e->conv;
+      entry->tick = 0;
+      entry->time = 0.0;
       entry->conv = 0.001 * tempo / (double)file->division;
       entry->next = 0;
       
-      e->next = entry;
+      file->tempo_map = entry;
     }
+    else
+    {
+      midifile_tempo_map_add_entry(file, 0, FTS_MIDIFILE_DEFAULT_TEMPO);
+      
+      entry->tick = tick;
+      entry->time = tick * file->tempo_map->conv;
+      entry->conv = 0.001 * tempo / (double)file->division;
+      entry->next = 0;
+      
+      file->tempo_map->next = entry;
+    }
+  }
+  else
+  {
+    fts_midifile_tempo_map_entry_t *entry = (fts_midifile_tempo_map_entry_t *)fts_malloc(sizeof(fts_midifile_tempo_map_entry_t));
+    
+    while(e->next != NULL)
+      e = e->next;
+    
+    entry->tick = tick;
+    entry->time = e->time + (tick - e->tick) * e->conv;
+    entry->conv = 0.001 * tempo / (double)file->division;
+    entry->next = 0;
+    
+    e->next = entry;
+  }
 }
 
 static void
@@ -198,14 +198,14 @@ midifile_tempo_map_destroy(fts_midifile_t *file)
   fts_midifile_tempo_map_entry_t *e = file->tempo_map;
   
   while(e != NULL)
-    {
-      fts_midifile_tempo_map_entry_t *next = e->next;
-
-      fts_free(e);
-
-      e = next;
-    }
-
+  {
+    fts_midifile_tempo_map_entry_t *next = e->next;
+    
+    fts_free(e);
+    
+    e = next;
+  }
+  
   file->tempo_map = NULL;
 }
 
@@ -214,13 +214,13 @@ static void
 midifile_channel_message_call(fts_midifile_t *file, enum midi_type type, int channel, int byte1, int byte2)
 {
   if (file->read->midi_event)
-    {
-      fts_midievent_t *event = fts_midievent_channel_message_new(type, channel, byte1, byte2);
-      
-      fts_object_refer(event);
-      file->read->midi_event(file, event); 
-      fts_object_release(event);
-   }
+  {
+    fts_midievent_t *event = fts_midievent_channel_message_new(type, channel, byte1, byte2);
+    
+    fts_object_refer(event);
+    file->read->midi_event(file, event); 
+    fts_object_release(event);
+  }
 }
 
 /* system exclusive message buffer */
@@ -228,13 +228,13 @@ static void
 midifile_system_exclusive_start(fts_midifile_t *file)
 {
   fts_midievent_t *sysex_event = file->system_exclusive;
-
+  
   if(sysex_event)
     fts_object_release(sysex_event);
-
+  
   sysex_event = fts_midievent_system_exclusive_new(0, 0);
   fts_object_refer(sysex_event);
-
+  
   file->system_exclusive = sysex_event;
 }
 
@@ -248,15 +248,15 @@ static void
 midifile_system_exclusive_call(fts_midifile_t *file)
 {
   fts_midievent_t *sysex_event = file->system_exclusive;
-
+  
   if(sysex_event)
-    {
-      if(file->read->midi_event && fts_midievent_system_exclusive_get_size(sysex_event) > 0)
-	file->read->midi_event(file, sysex_event);
-      
-      fts_object_release((fts_object_t *)sysex_event);
-      file->system_exclusive = 0;
-    }
+  {
+    if(file->read->midi_event && fts_midievent_system_exclusive_get_size(sysex_event) > 0)
+      file->read->midi_event(file, sysex_event);
+    
+    fts_object_release((fts_object_t *)sysex_event);
+    file->system_exclusive = 0;
+  }
 }
 
 /* divers meta data buffer */
@@ -271,11 +271,11 @@ midifile_string_add_char(fts_midifile_t *file, int c)
 {
   /* If necessary, allocate larger message buffer */
   if (file->string_size >= file->string_alloc)
-    {
-      file->string_alloc += 128;
-      file->string = (char *)fts_realloc(file->string, sizeof(char) * file->string_alloc);
-    }
-
+  {
+    file->string_alloc += 128;
+    file->string = (char *)fts_realloc(file->string, sizeof(char) * file->string_alloc);
+  }
+  
   file->string[file->string_size++] = c;
 }
 
@@ -285,14 +285,14 @@ midifile_read_mt(fts_midifile_t *file, char *s)
 {
   FILE *fp = file->fp;
   int i;
-
+  
   for(i=0; i<4; i++)
-    {
-      int c = getc(fp);
-
-      if (c == EOF || c != s[i])
-	return 0;
-    }
+  {
+    int c = getc(fp);
+    
+    if (c == EOF || c != s[i])
+      return 0;
+  }
   
   return 1;
 }
@@ -302,37 +302,37 @@ static int
 midifile_read_header(fts_midifile_t *file)
 {
   char c;
-
+  
   if (midifile_read_mt(file, "MThd") == 0)
-    {
-      mferror(file, "exspected beginning of header (didn't find 'MThd' tag)");
-      return 0;
-    }
-
+  {
+    mferror(file, "exspected beginning of header (didn't find 'MThd' tag)");
+    return 0;
+  }
+  
   file->bytes = read32bit(file);
-
+  
   file->format = read16bit(file);
   file->n_tracks = read16bit(file);
   file->division = read16bit(file);
-
+  
   if(file->division > 0)
     file->time_conv = 0.001 * FTS_MIDIFILE_DEFAULT_TEMPO / (double)file->division;
   else
-    {
-      double smpte_format = (file->division & 0xff00) >> 8;
-      double smpte_resolution = file->division & 0xff;
-
-      file->time_conv = 1000.0 / (smpte_format * smpte_resolution);
-    }
-
+  {
+    double smpte_format = (file->division & 0xff00) >> 8;
+    double smpte_resolution = file->division & 0xff;
+    
+    file->time_conv = 1000.0 / (smpte_format * smpte_resolution);
+  }
+  
   if(!file->error && file->read->header)
     (*file->read->header)(file);
-
+  
   /* flush any extra stuff */
   c = 0;
   while (c != EOF && file->bytes > 0)
     c = readbyte(file);
-
+  
   if(c == EOF)
     return 0;
   else
@@ -346,314 +346,314 @@ midifile_read_track(fts_midifile_t *file)
   int sysex_continue = 0;
   int status = 0;
   int channel = 0;
-
+  
   if (midifile_read_mt(file, "MTrk") == 0)
-    {
-      mferror(file, "exspected beginning of track (didn't find 'MTrk' tag)");
-      return;
-    }
-
+  {
+    mferror(file, "exspected beginning of track (didn't find 'MTrk' tag)");
+    return;
+  }
+  
   file->bytes = read32bit(file);
-
+  
   /* time starts at zero */
   file->ticks = 0;
   file->time = 0.0;
   file->tempo_map_pointer = file->tempo_map;
-
+  
   if (!file->error && file->read->track_start)
     (*file->read->track_start)(file);
-
+  
   while(!file->error && file->bytes > 0)
+  {
+    int delta = readvarinum(file);
+    int byte = readbyte(file);
+    int data1 = 0;
+    int data2 = 0;
+    
+    if(byte == EOF)
+      break;
+    
+    file->ticks += delta; /* delta time in ticks */
+    
+    if(file->tempo_map_pointer != NULL)
     {
-      int delta = readvarinum(file);
-      int byte = readbyte(file);
-      int data1 = 0;
-      int data2 = 0;
-
-      if(byte == EOF)
-	break;
-
-      file->ticks += delta; /* delta time in ticks */
-
-      if(file->tempo_map_pointer != NULL)
-	{
-	  fts_midifile_tempo_map_entry_t *p = file->tempo_map_pointer;
-
-	  /* adjust tempo map pointer */
-	  while(p->next && p->next->tick <= file->ticks)
-	    p = p->next;
-
-	  file->time = p->time + (file->ticks - p->tick) * p->conv;
-
-	  file->tempo_map_pointer = p;
-	}
-      else
-	file->time += delta * file->time_conv; /* delta time in msec */
-
-      if(sysex_continue && byte != SYSTEM_EXCLUSIVE_CONTINUE)
-	{
-	  mferror(file, "didn't find expected continuation of a sysex");
-	  return;
-	}
+      fts_midifile_tempo_map_entry_t *p = file->tempo_map_pointer;
       
-      if(byte < 128)
-	{
-	  /* running status */
-	  if(status < 128)
+      /* adjust tempo map pointer */
+      while(p->next && p->next->tick <= file->ticks)
+        p = p->next;
+      
+      file->time = p->time + (file->ticks - p->tick) * p->conv;
+      
+      file->tempo_map_pointer = p;
+    }
+    else
+      file->time += delta * file->time_conv; /* delta time in msec */
+    
+    if(sysex_continue && byte != SYSTEM_EXCLUSIVE_CONTINUE)
+    {
+      mferror(file, "didn't find expected continuation of a sysex");
+      return;
+    }
+    
+    if(byte < 128)
+    {
+      /* running status */
+      if(status < 128)
 	    {
 	      mferror(file, "unexpected running status");
 	      return;
 	    }
-
-	  data1 = byte;
-	}
-      else if(byte < SYSTEM_EXCLUSIVE)
-	{
-	  /* channel message status byte */
-	  status = byte & 0xf0;
-	  channel = (byte & 0x0f) + 1;
-	  
-	  /* read first data byte */
-	  data1 = readbyte(file);
-	}
-      else
-	/* sysex or meta event */
-	status = byte & 0xff;
-
-      if(file->error != 0)
-	break;
       
-      switch (status) 
-	{
-	case NOTE_OFF:
-	  data2 = readbyte(file); /* read but ignore */
-	  midifile_channel_message_call(file, midi_note, channel, data1, 0);
-	  break;
-
-	case NOTE_ON:
-	  data2 = readbyte(file);
-	  midifile_channel_message_call(file, midi_note, channel, data1, data2);
-	  break;
-	  
-	case POLY_PRESSURE:
-	  data2 = readbyte(file);
-	  midifile_channel_message_call(file, midi_poly_pressure, channel, data1, data2);
-	  break;
-	  
-	case CONTROL_CHANGE:
-	  data2 = readbyte(file);
-	  midifile_channel_message_call(file, midi_control_change, channel, data1, data2);
-	  break;
-	  
-	case PROGRAM_CHANGE:
-	  midifile_channel_message_call(file, midi_program_change, channel, data1, MIDI_EMPTY_BYTE);
-	  break;
-	  
-	case CHANNEL_PRESSURE:
-	  midifile_channel_message_call(file, midi_channel_pressure, channel, data1, MIDI_EMPTY_BYTE);
-	  break;
-	  
-	case PITCH_BEND:
-	  data2 = readbyte(file);
-	  midifile_channel_message_call(file, midi_pitch_bend, channel, data1, data2);
-	  break;
-
-	case SYSTEM_EXCLUSIVE: /* start of system exclusive */
-	  {
-	    int lookfor = file->bytes - readvarinum(file);
-	    
-	    midifile_system_exclusive_start(file);
-	    
-	    while (file->bytes > lookfor)
-	      {
-		byte = readbyte(file);
-		midifile_system_exclusive_byte(file, byte);
-	      }
-	    
-	    if (byte == SYSTEM_EXCLUSIVE_END)
-	      midifile_system_exclusive_call(file);
-	    else
-	      sysex_continue = 1; /* merge into next message */
-	    
-	    break;
-	    
-	  case SYSTEM_EXCLUSIVE_CONTINUE: /* sysex continuation */
-	    
-	    lookfor = file->bytes - readvarinum(file);
-	    
-	    if (!sysex_continue)
-	      midifile_system_exclusive_start(file);
-	    
-	    while (file->bytes > lookfor)
-	      {
-		byte = readbyte(file);
-		midifile_system_exclusive_byte(file, byte);
-	      }
-	    
-	    if (!sysex_continue)
-	      midifile_system_exclusive_call(file); /* arbitrary message */
-	    else if(byte == SYSTEM_EXCLUSIVE_END)
-	      {
-		midifile_system_exclusive_call(file);
-		sysex_continue = 0;
-	      }
-	  }
-	  break;
-	  
-	case META_EVENT: /* meta event */
-	  {
-	    int meta = readbyte(file);
-	    int lookfor = file->bytes - readvarinum(file);
-	    
-	    switch(meta) 
-	      {
-	      case SEQUENCE_NUMBER:
-		{
-		  int msb = readbyte(file);
-		  int lsb = readbyte(file);
-		  
-		  if (file->read->sequence_number)
-		    (*file->read->sequence_number)(file, (msb << 8) + lsb);
-		}
-		break;
-		
-	      case TEXT_EVENT:
-	      case COPYRIGHT_NOTICE:
-	      case SEQUENCE_NAME:
-	      case INSTRUMENT_NAME:
-	      case LYRIC:
-	      case MARKER:
-	      case CUE_POINT:
-	      case 0x08:
-	      case 0x09:
-	      case 0x0a:
-	      case 0x0b:
-	      case 0x0c:
-	      case 0x0d:
-	      case 0x0e:
-	      case 0x0f:
-		/* text events */
-		midifile_string_clear(file);
-	      
-		while (file->bytes > lookfor)
-		  midifile_string_add_char(file, readbyte(file));
-	      
-		if (file->read->text)
-		  (*file->read->text)(file, meta, file->string_size, file->string);
-
-		break;
-
-	      case END_OF_TRACK:
-		if (file->read->end_of_track)
-		  (*file->read->end_of_track)(file);
-
-		break;
-
-	      case SET_TEMPO:
-		{
-		  int b0 = readbyte(file);
-		  int b1 = readbyte(file);
-		  int b2 = readbyte(file);
-		  int tempo = (b0 << 16) + (b1 << 8) + b2;
-
-		  if(file->format == 1)
-		    midifile_tempo_map_add_entry(file, file->ticks, tempo);
-		  else
-		    {
-		      if(file->division > 0)
-			file->time_conv = 0.001 * (double)tempo / (double)file->division;
-
-		      file->tempo = tempo;
-		    }
-		
-		  if (file->read->tempo)
-		    (*file->read->tempo)(file, tempo);
-		}
-		break;
-
-	      case SMPTE_OFFSET:
-		{
-		  int byte = readbyte(file);
-		  int type = (byte & 0x60) >> 5;
-		  int hour = (byte & 0x1f);
-		  int minute = readbyte(file);
-		  int second = readbyte(file);
-		  int frame = readbyte(file);
-		  int frac = readbyte(file);
-		
-		  if (file->read->smpte)
-		    (*file->read->smpte)(file, type, hour, minute, second, frame, frac);
-		}
-		break;
-
-	      case TIME_SIGNATURE:
-		{
-		  int numerator = readbyte(file);
-		  int denominator = readbyte(file);
-		  int clocks_per_metronome_click = readbyte(file);
-		  int heals_per_quarter_note = readbyte(file); /* heals of 32nd notes per quarter note */
-		  
-		  if (file->read->time_signature)
-		    (*file->read->time_signature)(file, numerator, denominator, clocks_per_metronome_click, heals_per_quarter_note);
-		}
-		break;
-
-	      case KEY_SIGNATURE:
-		{
-		  int n_sharps_or_flats = readbyte(file);
-		  int major_or_minor = readbyte(file);
-		  
-		  if (file->read->key_signature)
-		    (*file->read->key_signature)(file, n_sharps_or_flats, major_or_minor);
-		  break;
-		}
-
-	      case SEQUENCER_SPECIFIC:
-		{
-		  /* sequencer specific data */
-		  midifile_string_clear(file);
-		  
-		  while (file->bytes > lookfor)
-		    midifile_string_add_char(file, readbyte(file));
-		  
-		  /* ignore data */
-
-		  break;
-		}
-
-	      default:
-		{
-		  /* unknown meta event */
-		  midifile_string_clear(file);
-		  
-		  while (file->bytes > lookfor)
-		    midifile_string_add_char(file, readbyte(file));
-		  
-		  /* ignore data */
-		  
-		  break;
-		}
-	      }
-	  }
-	  break;
-	  
-	default:
-	  mferror(file, "found unexpected byte");
-	  return;
-
-	  break;
-	}
+      data1 = byte;
     }
+    else if(byte < SYSTEM_EXCLUSIVE)
+    {
+      /* channel message status byte */
+      status = byte & 0xf0;
+      channel = (byte & 0x0f) + 1;
+      
+      /* read first data byte */
+      data1 = readbyte(file);
+    }
+    else
+      /* sysex or meta event */
+      status = byte & 0xff;
+    
+    if(file->error != 0)
+      break;
+    
+    switch (status) 
+    {
+      case NOTE_OFF:
+        data2 = readbyte(file); /* read but ignore */
+        midifile_channel_message_call(file, midi_note, channel, data1, 0);
+        break;
+        
+      case NOTE_ON:
+        data2 = readbyte(file);
+        midifile_channel_message_call(file, midi_note, channel, data1, data2);
+        break;
+        
+      case POLY_PRESSURE:
+        data2 = readbyte(file);
+        midifile_channel_message_call(file, midi_poly_pressure, channel, data1, data2);
+        break;
+        
+      case CONTROL_CHANGE:
+        data2 = readbyte(file);
+        midifile_channel_message_call(file, midi_control_change, channel, data1, data2);
+        break;
+        
+      case PROGRAM_CHANGE:
+        midifile_channel_message_call(file, midi_program_change, channel, data1, MIDI_EMPTY_BYTE);
+        break;
+        
+      case CHANNEL_PRESSURE:
+        midifile_channel_message_call(file, midi_channel_pressure, channel, data1, MIDI_EMPTY_BYTE);
+        break;
+        
+      case PITCH_BEND:
+        data2 = readbyte(file);
+        midifile_channel_message_call(file, midi_pitch_bend, channel, data1, data2);
+        break;
+        
+      case SYSTEM_EXCLUSIVE: /* start of system exclusive */
+      {
+        int lookfor = file->bytes - readvarinum(file);
+        
+        midifile_system_exclusive_start(file);
+        
+        while (file->bytes > lookfor)
+	      {
+          byte = readbyte(file);
+          midifile_system_exclusive_byte(file, byte);
+	      }
+        
+        if (byte == SYSTEM_EXCLUSIVE_END)
+          midifile_system_exclusive_call(file);
+        else
+          sysex_continue = 1; /* merge into next message */
+        
+        break;
+        
+        case SYSTEM_EXCLUSIVE_CONTINUE: /* sysex continuation */
+          
+          lookfor = file->bytes - readvarinum(file);
+          
+          if (!sysex_continue)
+            midifile_system_exclusive_start(file);
+            
+          while (file->bytes > lookfor)
+            {
+              byte = readbyte(file);
+              midifile_system_exclusive_byte(file, byte);
+            }
+              
+              if (!sysex_continue)
+                midifile_system_exclusive_call(file); /* arbitrary message */
+          else if(byte == SYSTEM_EXCLUSIVE_END)
+          {
+            midifile_system_exclusive_call(file);
+            sysex_continue = 0;
+          }
+      }
+        break;
+          
+        case META_EVENT: /* meta event */
+        {
+          int meta = readbyte(file);
+          int lookfor = file->bytes - readvarinum(file);
+          
+          switch(meta) 
+          {
+            case SEQUENCE_NUMBER:
+            {
+              int msb = readbyte(file);
+              int lsb = readbyte(file);
+              
+              if (file->read->sequence_number)
+                (*file->read->sequence_number)(file, (msb << 8) + lsb);
+            }
+              break;
+              
+            case TEXT_EVENT:
+            case COPYRIGHT_NOTICE:
+            case SEQUENCE_NAME:
+            case INSTRUMENT_NAME:
+            case LYRIC:
+            case MARKER:
+            case CUE_POINT:
+            case 0x08:
+            case 0x09:
+            case 0x0a:
+            case 0x0b:
+            case 0x0c:
+            case 0x0d:
+            case 0x0e:
+            case 0x0f:
+              /* text events */
+              midifile_string_clear(file);
+              
+              while (file->bytes > lookfor)
+                midifile_string_add_char(file, readbyte(file));
+                
+                if (file->read->text)
+                  (*file->read->text)(file, meta, file->string_size, file->string);
+                  
+                  break;
+              
+            case END_OF_TRACK:
+              if (file->read->end_of_track)
+                (*file->read->end_of_track)(file);
+              
+              break;
+              
+            case SET_TEMPO:
+            {
+              int b0 = readbyte(file);
+              int b1 = readbyte(file);
+              int b2 = readbyte(file);
+              int tempo = (b0 << 16) + (b1 << 8) + b2;
+              
+              if(file->format == 1)
+                midifile_tempo_map_add_entry(file, file->ticks, tempo);
+              else
+              {
+                if(file->division > 0)
+                  file->time_conv = 0.001 * (double)tempo / (double)file->division;
+                
+                file->tempo = tempo;
+              }
+              
+              if (file->read->tempo)
+                (*file->read->tempo)(file, tempo);
+            }
+              break;
+              
+            case SMPTE_OFFSET:
+            {
+              int byte = readbyte(file);
+              int type = (byte & 0x60) >> 5;
+              int hour = (byte & 0x1f);
+              int minute = readbyte(file);
+              int second = readbyte(file);
+              int frame = readbyte(file);
+              int frac = readbyte(file);
+              
+              if (file->read->smpte)
+                (*file->read->smpte)(file, type, hour, minute, second, frame, frac);
+            }
+              break;
+              
+            case TIME_SIGNATURE:
+            {
+              int numerator = readbyte(file);
+              int denominator = readbyte(file);
+              int clocks_per_metronome_click = readbyte(file);
+              int heals_per_quarter_note = readbyte(file); /* heals of 32nd notes per quarter note */
+              
+              if (file->read->time_signature)
+                (*file->read->time_signature)(file, numerator, denominator, clocks_per_metronome_click, heals_per_quarter_note);
+            }
+              break;
+              
+            case KEY_SIGNATURE:
+            {
+              int n_sharps_or_flats = readbyte(file);
+              int major_or_minor = readbyte(file);
+              
+              if (file->read->key_signature)
+                (*file->read->key_signature)(file, n_sharps_or_flats, major_or_minor);
+              break;
+            }
+              
+            case SEQUENCER_SPECIFIC:
+            {
+              /* sequencer specific data */
+              midifile_string_clear(file);
+              
+              while (file->bytes > lookfor)
+                midifile_string_add_char(file, readbyte(file));
+              
+              /* ignore data */
+              
+              break;
+            }
+              
+            default:
+            {
+              /* unknown meta event */
+              midifile_string_clear(file);
+              
+              while (file->bytes > lookfor)
+                midifile_string_add_char(file, readbyte(file));
+              
+              /* ignore data */
+              
+              break;
+            }
+          }
+        }
+          break;
+            
+          default:
+            mferror(file, "found unexpected byte");
+            return;
+            
+            break;
+    }
+  }
   
   if (!file->error && file->read->track_end)
     (*file->read->track_end)(file);
 }
 
 /*************************************************************
- *
- *  write utilities
- *
- */
+*
+*  write utilities
+*
+*/
 
 /*
  * writevarlen()
@@ -678,17 +678,17 @@ writebyte(fts_midifile_t *file, unsigned char c)
   int i;
 	
   i = putc(c, fp);
-
+  
   if (i == EOF)
-    {
-      mferror(file, "write error");
-      return EOF;
-    }
+  {
+    mferror(file, "write error");
+    return EOF;
+  }
   else
-    {
-      file->size++;
-      return i;
-    }
+  {
+    file->size++;
+    return i;
+  }
 }
 
 /* write multi-length bytes to MIDI format files */
@@ -696,25 +696,25 @@ static void
 writevarlen(fts_midifile_t *file, unsigned int value)
 {
   unsigned int buffer;
-
+  
   buffer = value & 0x7f;
-
+  
   while((value >>= 7) > 0)
-    {
-      buffer <<= 8;
-      buffer |= 0x80;
-      buffer += (value & 0x7f);
-    }
-
+  {
+    buffer <<= 8;
+    buffer |= 0x80;
+    buffer += (value & 0x7f);
+  }
+  
   while(1)
-    {
-      writebyte(file, (unsigned)(buffer & 0xff));
-      
-      if(buffer & 0x80)
-	buffer >>= 8;
-      else
-	return;
-    }
+  {
+    writebyte(file, (unsigned)(buffer & 0xff));
+    
+    if(buffer & 0x80)
+      buffer >>= 8;
+    else
+      return;
+  }
 }
 
 static void 
@@ -764,16 +764,16 @@ fts_midifile_write_header(fts_midifile_t *file, int format, int n_tracks, int di
 {
   unsigned int ident = MThd; /* head chunk identifier */
   unsigned int length = 6; /* chunk length */
-    
+  
   /* write header */
   write32bit(file, ident);
   write32bit(file, length);
   write16bit(file, format);
   write16bit(file, n_tracks);
   write16bit(file, division);
-
+  
   file->division = division;
-
+  
   return 1;
 }
 
@@ -785,15 +785,15 @@ fts_midifile_write_track_begin(fts_midifile_t *file)
 	
   /* remember where the length was written, because we don't know how long it will be until we've finished writing */
   file->bytes = ftell(file->fp);
-
+  
   /* write the track chunk header */
   write32bit(file, trkhdr);
   write32bit(file, 0); /* write length as 0 and correct later */
-
+  
   file->ticks = 0; /* time starts from zero */
   file->time = 0.0;
   file->size = 0; /* the header's length doesn't count */
-
+  
   return 1;
 }
 
@@ -804,33 +804,33 @@ fts_midifile_write_track_end(fts_midifile_t *file)
   unsigned int trkhdr = MTrk;
   int place_marker;
   int size;
-
+  
   /* write end of track meta event */
   writebyte(file, 0);
   writebyte(file, META_EVENT);
   writebyte(file, END_OF_TRACK);
-
+  
   writebyte(file, 0);
 	 
   /* It's impossible to know how long the track chunk will be beforehand,
-     so the position of the track length data is kept so that it can
-     be written after the chunk has been generated */
+    so the position of the track length data is kept so that it can
+    be written after the chunk has been generated */
   place_marker = ftell(file->fp);
 	
   if(fseek(file->fp, file->bytes, 0) < 0)
-    {
-      mferror(file, "error seeking during final stage of write");
-      return EOF;
-    }
-
+  {
+    mferror(file, "error seeking during final stage of write");
+    return EOF;
+  }
+  
   size = file->size; /* get number of written bytes until HERE! */
-
+  
   /* Re-write the track chunk header with right length */
   write32bit(file, trkhdr);
   write32bit(file, size);
-
+  
   fseek(file->fp, place_marker, 0);
-
+  
   return 1;
 }
 
@@ -839,20 +839,20 @@ fts_midifile_write_channel_message(fts_midifile_t *file, int ticks, enum midi_ty
 {
   int status = 144 + ((type & 0x0f) << 4) + ((channel - 1) & 0x0f);
   int delta = ticks - file->ticks;
-
+  
   if(delta < 0)
     delta = 0;
-
+  
   /* write delt time */
   writevarlen(file, delta);
-
+  
   /* set current file ticks */
   file->ticks = ticks;
-
+  
   /* write message */
   writebyte(file, status);
   writebyte(file, byte1 & 0x7f);
-
+  
   if(byte2 != MIDI_EMPTY_BYTE)
     writebyte(file, byte2 & 0x7f);
 }
@@ -861,76 +861,76 @@ void
 fts_midifile_write_midievent(fts_midifile_t *file, int ticks, fts_midievent_t *event)
 {
   int delta = ticks - file->ticks;
-
+  
   if(delta < 0)
     delta = 0;
-
+  
   /* write delt time */
   writevarlen(file, delta);
-
+  
   /* set current file ticks */
   file->ticks = ticks;
   
   if(fts_midievent_is_channel_message(event))
-    {
-      writebyte(file, fts_midievent_channel_message_get_status_byte(event));
-      writebyte(file, (fts_midievent_channel_message_get_first(event) & 0x7f));
-
-      if(fts_midievent_channel_message_has_second_byte(event))
-	writebyte(file, (fts_midievent_channel_message_get_second(event) & 0x7f));
-    }
+  {
+    writebyte(file, fts_midievent_channel_message_get_status_byte(event));
+    writebyte(file, (fts_midievent_channel_message_get_first(event) & 0x7f));
+    
+    if(fts_midievent_channel_message_has_second_byte(event))
+      writebyte(file, (fts_midievent_channel_message_get_second(event) & 0x7f));
+  }
   else 
+  {
+    switch(fts_midievent_get_type(event))
     {
-      switch(fts_midievent_get_type(event))
-	{
-	case midi_system_exclusive:
-	  {
-	    int size = fts_midievent_system_exclusive_get_size(event);
-	    fts_atom_t *atoms = fts_midievent_system_exclusive_get_atoms(event);
-	    int i, n;
-	    
-	    writebyte(file, SYSTEM_EXCLUSIVE);
-	    
-	    for(i=0, n=1; i<size; i++)
-	      writebyte(file, fts_get_int(atoms + i) & 0x7f);
-	    
-	    writebyte(file, SYSTEM_EXCLUSIVE_END);
-	  }
-	  break;
-	  
-	case midi_real_time:
-	  writebyte(file, fts_midievent_real_time_get_status_byte(event));
-	  break;
-	  
-	default:
-	  break;
-	}
+      case midi_system_exclusive:
+      {
+        int size = fts_midievent_system_exclusive_get_size(event);
+        fts_atom_t *atoms = fts_midievent_system_exclusive_get_atoms(event);
+        int i, n;
+        
+        writebyte(file, SYSTEM_EXCLUSIVE);
+        
+        for(i=0, n=1; i<size; i++)
+          writebyte(file, fts_get_int(atoms + i) & 0x7f);
+        
+        writebyte(file, SYSTEM_EXCLUSIVE_END);
+      }
+        break;
+        
+      case midi_real_time:
+        writebyte(file, fts_midievent_real_time_get_status_byte(event));
+        break;
+        
+      default:
+        break;
     }
+  }
 }
 
 int
 fts_midifile_write_meta_event(fts_midifile_t *file, int ticks, int type, unsigned char *data, int size)
 {
   int i;
-
+  
   writevarlen(file, ticks - file->ticks);
   file->ticks = ticks;
-    
+  
   /* this marks the fact we're writing a meta-event */
   writebyte(file, META_EVENT);
-
+  
   /* the type of meta event */
   writebyte(file, type);
-
+  
   /* the length of the data bytes to follow */
   writevarlen(file, size); 
-
+  
   for(i=0; i<size; i++)
-    {
-      if(writebyte(file, data[i]) != data[i])
-	return -1; 
-    }
-
+  {
+    if(writebyte(file, data[i]) != data[i])
+      return -1; 
+  }
+  
   return size;
 }
 
@@ -941,20 +941,20 @@ fts_midifile_write_tempo(fts_midifile_t *file, int tempo)
   writebyte(file, 0); /* at time 0 */
   writebyte(file, META_EVENT);
   writebyte(file, SET_TEMPO);
-
+  
   writebyte(file, 3);
   writebyte(file, (unsigned)(0xff & (tempo >> 16)));
   writebyte(file, (unsigned)(0xff & (tempo >> 8)));
   writebyte(file, (unsigned)(0xff & tempo));
-
+  
   file->tempo = tempo;
 }
 
 /*************************************************************
- *
- *  API
- *
- */
+*
+*  API
+*
+*/
 
 void
 fts_midifile_read_functions_init(fts_midifile_read_functions_t *read)
@@ -977,29 +977,29 @@ fts_midifile_init(fts_midifile_t *file, FILE *fp, fts_symbol_t name)
 {
   file->fp = fp;
   file->name = name;
-
+  
   file->format = 0;
   file->n_tracks = 0;
   file->division = 0;
   file->tempo = FTS_MIDIFILE_DEFAULT_TEMPO;
-
+  
   file->tempo_map = NULL;
   file->tempo_map_pointer = NULL;
-
+  
   file->read = 0;
-
+  
   file->ticks = 0;
   file->bytes = 0;
   file->size = 0;
-
+  
   file->system_exclusive = 0;
-
+  
   file->string = 0;
   file->string_size = 0;
   file->string_alloc = 0;
-
+  
   file->error = 0;
-
+  
   file->user = 0;
 }
 
@@ -1008,20 +1008,20 @@ fts_midifile_open_read(fts_symbol_t name)
 {
   char full_path[MAXPATHLEN];
   FILE *fp;
-
+  
   if (fts_file_find( name, full_path, MAXPATHLEN) == NULL)
     return 0;
-
+  
   fp = fopen(full_path, "rb");
-
+  
   if(fp != 0)
-    {
-      fts_midifile_t *file = fts_malloc(sizeof(fts_midifile_t));
-      
-      fts_midifile_init(file, fp, name);
-
-      return file;
-    }
+  {
+    fts_midifile_t *file = fts_malloc(sizeof(fts_midifile_t));
+    
+    fts_midifile_init(file, fp, name);
+    
+    return file;
+  }
   else
     return 0;
 }
@@ -1031,19 +1031,19 @@ fts_midifile_open_write(fts_symbol_t name)
 {
   char full_path[1024];
   FILE *fp;
-
+  
   fts_make_absolute_path( NULL, name, full_path, MAXPATHLEN);
-
+  
   fp = fopen(full_path, "wb");
-
+  
   if(fp != 0)
-    {
-      fts_midifile_t *file = fts_malloc(sizeof(fts_midifile_t));
-      
-      fts_midifile_init(file, fp, name);
-
-      return file;
-    }
+  {
+    fts_midifile_t *file = fts_malloc(sizeof(fts_midifile_t));
+    
+    fts_midifile_init(file, fp, name);
+    
+    return file;
+  }
   else
     return 0;
 }
@@ -1060,25 +1060,25 @@ fts_midifile_read(fts_midifile_t *file)
 {
   int size;
   int i;
-
+  
   size = midifile_read_header(file);
   
   for(i=0; i<size; i++)
-    {
-      midifile_read_track(file);
-      
-      if(file->error != 0)
-	break;
-    }
-
-return i;
+  {
+    midifile_read_track(file);
+    
+    if(file->error != 0)
+      break;
+  }
+  
+  return i;
 }
 
 /*************************************************************
- *
- *  timing
- *
- */
+*
+*  timing
+*
+*/
 
 int
 fts_midifile_time_to_ticks(fts_midifile_t *file, double time)

@@ -225,12 +225,13 @@ scoob_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       fts_spost(stream, "<scoob trill %g %g %g", self->pitch, self->interval, self->duration);
       break;
     default:
+      fts_spost(stream, "<scoob %s %g %g %g", fts_symbol_name(self->type), self->pitch, self->interval, self->duration);
       break;
   }  
   
   propobj_post_properties((propobj_t *)self, stream);
   
-  fts_spost(stream, ">", self->pitch, self->duration);
+  fts_spost(stream, ">");
 }
 
 static void 
@@ -524,6 +525,32 @@ scomark_append_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   propobj_append_properties((propobj_t *)self, array);
 }
 
+void 
+scomark_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  scomark_t *self = (scomark_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
+  
+  fts_spost(stream, "<scoomark %s", fts_symbol_name(self->type));
+
+  if(self->beat > 0)
+    fts_spost(stream, " %d/%d", self->beat, self->beat_type);
+    
+  if(self->tempo > 0.0)
+  {
+    int beat_type = self->beat_type;
+    
+    if(beat_type == 0)
+      beat_type = 4;
+      
+    fts_spost(stream, " (1/%d = %g)", beat_type, self->tempo);
+  }
+  
+  propobj_post_properties((propobj_t *)self, stream);
+  
+  fts_spost(stream, ">");  
+}
+
 static void
 scomark_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -533,6 +560,8 @@ scomark_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   self->type = seqsym_tempo;
   self->tempo = 0.0;
+  self->beat = 0;
+  self->beat_type = 0;
   
   scomark_set(o, 0, 0, ac, at);
 }
@@ -551,18 +580,20 @@ scomark_instantiate(fts_class_t *cl)
   /* types and properties */
   propobj_class_init(cl);
   
+  propobj_class_add_int_property(cl, seqsym_bar);
   propobj_class_add_int_property(cl, seqsym_section);
   
   fts_class_message_varargs(cl, seqsym_get_property_list, scomark_get_property_list);
   fts_class_message_varargs(cl, seqsym_append_properties, scomark_append_properties);
   
+  fts_class_message_varargs(cl, fts_s_post, scomark_post);
   fts_class_message_varargs(cl, fts_s_dump_state, scomark_dump_state);
   
   fts_class_message_symbol(cl, seqsym_type, _scomark_set_type);
   fts_class_message_void(cl, seqsym_type, _scomark_get_type);
   
-  fts_class_message_number(cl, seqsym_pitch, _scomark_set_tempo);
-  fts_class_message_void(cl, seqsym_pitch, _scomark_get_tempo);
+  fts_class_message_number(cl, seqsym_tempo, _scomark_set_tempo);
+  fts_class_message_void(cl, seqsym_tempo, _scomark_get_tempo);
   
   fts_class_message_varargs(cl, fts_s_set, scomark_set);  
 }
@@ -571,13 +602,20 @@ void
 scoob_config(void)
 {
   scoob_type_enumeration = enumeration_new(fts_new_symbol("scoob_type"));
+  scomark_type_enumeration = enumeration_new(fts_new_symbol("scomark_type"));
   
   enumeration_add_name(scoob_type_enumeration, seqsym_note);
   enumeration_add_name(scoob_type_enumeration, seqsym_interval);
   enumeration_add_name(scoob_type_enumeration, seqsym_rest);
   enumeration_add_name(scoob_type_enumeration, seqsym_trill);
   
+  enumeration_add_name(scomark_type_enumeration, seqsym_tempo);
+  enumeration_add_name(scomark_type_enumeration, seqsym_bar);
+  enumeration_add_name(scomark_type_enumeration, seqsym_end);
+  enumeration_add_name(scomark_type_enumeration, seqsym_double);
+  
   scoob_class = fts_class_install(seqsym_scoob, scoob_instantiate);
+  scomark_class = fts_class_install(seqsym_scomark, scomark_instantiate);
   fts_class_alias(scoob_class, seqsym_note);
 }
 

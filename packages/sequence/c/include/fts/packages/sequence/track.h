@@ -49,6 +49,8 @@ struct _track_
   fts_list_t *gui_listeners; /* list of guilisteners */
 
   fts_object_t *load_obj; /* object (event value) of currently loaded event */
+  
+  track_t *markers;
 };
 
 /* for sequence */
@@ -76,6 +78,9 @@ struct _track_
 #define track_set_editor_close(t) ((t)->open = 0)
 #define track_editor_is_open(t) (((t)->sequence && sequence_editor_is_open((t)->sequence)) || ((!(t)->sequence) && ((t)->open != 0)))
 
+#define track_set_markers(t, m) ((t)->markers = (m))
+#define track_get_markers(t) ((t)->markers)
+
 extern void track_add_event(track_t *track, double time, event_t *event);
 extern void track_add_event_and_upload(track_t *track, double time, event_t *event);
 extern void track_add_event_after(track_t *track, double time, event_t *event, event_t *here);
@@ -93,6 +98,7 @@ extern event_t *track_get_event_by_time(track_t *track, double time);
 extern event_t *track_get_next_by_time(track_t *track, double time);
 extern event_t *track_get_next_by_time_after(track_t *track, double time, event_t *here);
 
+extern track_t *track_get_or_make_markers(track_t *track);
 
 /** @name highlighting events in editor
  *  @{ */

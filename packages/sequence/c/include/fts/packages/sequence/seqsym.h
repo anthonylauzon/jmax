@@ -35,6 +35,7 @@ extern fts_symbol_t seqsym_segment;
 
 /* events */
 extern fts_symbol_t seqsym_scoob;
+extern fts_symbol_t seqsym_scomark;
 extern fts_symbol_t seqsym_enum;
 extern fts_symbol_t seqsym_undefined;
 extern fts_symbol_t seqsym_note;
@@ -43,6 +44,9 @@ extern fts_symbol_t seqsym_rest;
 extern fts_symbol_t seqsym_trill;
 extern fts_symbol_t seqsym_midi;
 extern fts_symbol_t seqsym_seqmess;
+extern fts_symbol_t seqsym_bar;
+extern fts_symbol_t seqsym_end;
+extern fts_symbol_t seqsym_double;
 extern fts_symbol_t seqsym_type;
 extern fts_symbol_t seqsym_pitch;
 extern fts_symbol_t seqsym_duration;
