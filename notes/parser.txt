@@ -1,0 +1,90 @@
+
+
+Questions
+
+1) Is evaluation done during parsing or do we generate intermediate code ?
+
+The second solution seems preferable as we want these expressions to be evaluated
+in real-time. However, as the same parser will be used for objects, it requires
+that code is generated for each object expression (a standard box) and evaluated
+only once.
+
+
+2) Is the parser/evaluator for the message box the same as the parser/evaluator for
+standard objects ?
+
+It is highly desirable (same syntax, code reuse), but for now, the common syntax
+is not clear. Plus the question above.
+
+
+
+*****************************************************************************
+
+Features:
+ - variable value
+ - variable definition (is it necessary ?)
+ - class instantiation
+ - simple operators arithmetic
+ - functions arithmetic
+ - sequencing of expressions
+ - message output
+ - inlets
+ - patcher arguments
+ - targetted message (labels, params, busses, ...)
+ - object member
+ - method invocation
+ - array access
+
+
+*************************************************************************
+
+Proposal:
+ - variable value: $<variable name>
+ - variable definition: ???
+ - class instantiation: ???
+ - simple operators arithmetic: obvious
+ - functions arithmetic: can be assimilated to method invocation (cf. java)
+ - sequencing of expressions: obviously ;
+ - message output: everything that has a value is output. Alternative: $0 = <expression>
+ - inlets: $0, $1
+ - patcher arguments
+ - targetted message (labels, params, busses, ...): assimilated to method invocation (problem, see later)
+ - object member : assimilated to method invocation
+ - method invocation: <target>.<selector> <arguments>
+ - array access
+
+Proposal: use of .
+target '.' tuple_expression
+
+a tuple_expression is evaluated with the following rule:
+ - if the first element is a symbol, then the result is a message
+ - if not, the result is the tuple itself
+
+This implies that there is no way to send out of the message box a tuple which has
+a symbol as first element. Is this OK ? Probably.
+
+coucou 1 2 3 -> message, is output to the outlet of the message box
+1 2 3 -> tuple
+$x.coucou 1 2 3 -> coucou 1 2 3 evaluates as message, $x as object, the result is object.message
+$x.1 2 3 -> right operand of . has wrong type (tuple, not message)
+.sin 3.14 -> message sin to the "global" value, i.e. function
+
+
+But, big problem: how do we send messages to labels, busses, params, etc ?
+
+$label start   // is it a tuple of 2 elements, an object and a symbol, or sending message start to the label
+$label.start   // OK
+$label.1 2 3   // to send to the label a tuple of 3 elements ???
+$label.1       // to send to the label an int ???
+
+Other possibility: distinguish label (and others) objects
+$label start   // $label is a label, it is a message
+$label 1 2 3   // idem
+$label 1       // idem
+$x 1 2 3       // $x is not a label, so this is a tuple of 4 elements
+
+
+
+
+
+
