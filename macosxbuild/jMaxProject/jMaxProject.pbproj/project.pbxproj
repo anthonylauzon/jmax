@@ -9,6 +9,7 @@
 			children = (
 				F80902C102B762B101664092,
 				F80902C202B762B101664092,
+				F822188D02BE2B1801664092,
 			);
 			isa = PBXGroup;
 			name = project;
@@ -298,6 +299,18 @@
 			);
 			shellPath = /bin/sh;
 			shellScript = "echo \"root\" > jmax.jar.root\njar -uvf build/jmax.jar jmax.jar.root";
+		};
+		F822188D02BE2B1801664092 = {
+			isa = PBXFileReference;
+			name = NewProjectDialog.java;
+			path = ../../java/src/ircam/jmax/editors/project/NewProjectDialog.java;
+			refType = 2;
+		};
+		F822188E02BE2B1801664092 = {
+			fileRef = F822188D02BE2B1801664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 		F823078002916C7401664092 = {
 			includeInIndex = 0;
@@ -7515,7 +7528,6 @@
 				F8512327028BE48001664092,
 				F8512328028BE48001664092,
 				F8512329028BE48001664092,
-				F851232A028BE48001664092,
 				F851232B028BE48001664092,
 				F851232C028BE48001664092,
 			);
@@ -7549,7 +7561,6 @@
 				F851231F028BE47F01664092,
 				F8512320028BE47F01664092,
 				F8512321028BE47F01664092,
-				F8512322028BE47F01664092,
 				F8512323028BE47F01664092,
 				F8512324028BE47F01664092,
 			);
@@ -7579,12 +7590,6 @@
 			isa = PBXFileReference;
 			name = midiout.c;
 			path = ../../packages/midi/c/src/midiout.c;
-			refType = 2;
-		};
-		F8512322028BE47F01664092 = {
-			isa = PBXFileReference;
-			name = midiport.c;
-			path = ../../packages/midi/c/src/midiport.c;
 			refType = 2;
 		};
 		F8512323028BE47F01664092 = {
@@ -7637,12 +7642,6 @@
 		};
 		F8512329028BE48001664092 = {
 			fileRef = F8512321028BE47F01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F851232A028BE48001664092 = {
-			fileRef = F8512322028BE47F01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -15717,6 +15716,7 @@
 				F80902C402B762B101664092,
 				F854BE7302B7C9BC01664092,
 				F858D1C302B8DCC801664092,
+				F822188E02BE2B1801664092,
 			);
 			isa = PBXSourcesBuildPhase;
 		};
