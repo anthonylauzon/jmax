@@ -1475,19 +1475,15 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
   /********************************************************
    *  FtsObjectWithEditor
    ********************************************************/
-  transient TrackWindow trackWindow = null;
   public void openEditor(int argc, FtsAtom[] argv)
   {
-    if( trackWindow == null)
-      {
-	trackWindow = new TrackWindow(this);
-	setEditorFrame( trackWindow);
-      }
+    if(getEditorFrame() == null)
+      setEditorFrame( new TrackWindow(this));
+
     showEditor();
   }
   public void destroyEditor()
   {
-    trackWindow = null;
     disposeEditor();
     System.gc();
   }

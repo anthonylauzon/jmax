@@ -58,9 +58,7 @@ public class TrackWindow extends JFrame implements EditorContainer{
   public TrackWindow(FtsTrackObject data)
   {
     super();
-    
-    MaxWindowManager.getWindowManager().addWindow(this);
-    
+        
     trackData = data;
 
     TrackEditorFactoryTable.init();

@@ -55,15 +55,10 @@ public class BpfWindow extends JFrame implements EditorContainer{
     {
       super();
       
-      MaxWindowManager.getWindowManager().addWindow(this);
-      
       bpfData = data;
       
       makeTitle();
-      
-      // Build The Menus and Menu Bar
-      makeMenuBar();
-      
+            
       setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
       
       //... then the SequencePanel
@@ -86,10 +81,13 @@ public class BpfWindow extends JFrame implements EditorContainer{
 	  {
 	  }
 	});
+      pack();
+      
+      // Build The Menus and Menu Bar
+      makeMenuBar();
       
       validate();
       pack();
-      setVisible(true);
     }
   
   private final void makeTitle(){

@@ -216,7 +216,7 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
   boolean hh = false;
   double hhTime;
   
-  Dimension rulerDimension = new Dimension(200, RULER_HEIGHT);
+  Dimension rulerDimension = new Dimension(SequenceWindow.DEFAULT_WIDTH, RULER_HEIGHT);
   FontMetrics fm;
   String unityName = "Milliseconds";
   int unity = MILLISECONDS_UNITY;

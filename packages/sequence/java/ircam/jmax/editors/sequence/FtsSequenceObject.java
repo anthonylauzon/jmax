@@ -88,11 +88,9 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
    */
   public void openEditor(int argc, FtsAtom[] argv)
   {
-    if(sequence == null)
-      {
-	sequence = new SequenceWindow(this);
-	setEditorFrame(sequence);
-      }
+    if( getEditorFrame() == null)
+	setEditorFrame( new SequenceWindow(this));
+  
     showEditor();
   }
 
@@ -101,7 +99,6 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
    */
   public void destroyEditor()
   {
-    sequence = null;
     disposeEditor();
   }
   public void addTracks(int nArgs , FtsAtom args[])
@@ -143,13 +140,14 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
     Track track = getTrack(trackObj);
     int oldPosition = getTrackIndex(track);
     
-    sequence.itsSequencePanel.moveTrackTo(track, newPosition);
+    ((SequenceWindow)getEditorFrame()).itsSequencePanel.moveTrackTo(track, newPosition);
     notifyTrackMoved(track, oldPosition, newPosition);
   }
 
   public void setName(String name)
   {
-    sequence.setName(name);
+    if(getEditorFrame() != null)
+      ((SequenceWindow)getEditorFrame()).setName(name);
   }
 
   public void setOpenedAllTracks(boolean opened)
@@ -242,7 +240,7 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
     
     int result = JOptionPane.OK_OPTION;
     if(track.getTrackDataModel().length() > 0)
-      result = JOptionPane.showConfirmDialog( sequence,
+      result = JOptionPane.showConfirmDialog( getEditorFrame(),
 					      "Removing tracks is not Undoable.\nOK to remove ?",
 					      "Warning",
 					      JOptionPane.YES_NO_OPTION,
@@ -388,8 +386,6 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
     for (Enumeration e=listeners.elements(); e.hasMoreElements();)
       ((TrackListener)(e.nextElement())).trackMoved(track, oldPosition, newPosition);
   }
-
-  transient SequenceWindow sequence = null;  
   
   transient Vector tracks = new Vector();
   transient MaxVector listeners = new MaxVector();

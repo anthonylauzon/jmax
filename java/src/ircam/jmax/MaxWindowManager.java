@@ -89,7 +89,7 @@ public class MaxWindowManager implements WindowListener
   {
     windowOperationCount++;
     windows.removeElement(window);
-    window.removeWindowListener(this);
+    window.removeWindowListener(this);    
   }
 
   /** call this method to tell the window 

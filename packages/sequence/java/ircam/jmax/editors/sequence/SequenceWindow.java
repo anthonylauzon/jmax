@@ -58,21 +58,15 @@ public class SequenceWindow extends JFrame implements EditorContainer{
   public SequenceWindow(FtsSequenceObject data)
   {
     super();
-    
-    MaxWindowManager.getWindowManager().addWindow(this);
-    
+        
     sequenceData = data;
 
-    //initTrackEditorFactoryTable();
-	TrackEditorFactoryTable.init();
+    TrackEditorFactoryTable.init();
 
     makeTitle();
     
     sequenceData.requestSequenceName();
     
-    // Build The Menus and Menu Bar
-    makeMenuBar();
-
     //... then the SequencePanel
     itsSequencePanel = new SequencePanel(this, data);
     
@@ -96,9 +90,13 @@ public class SequenceWindow extends JFrame implements EditorContainer{
 	}
 	public void windowDeactivated(WindowEvent e){}
       });
-	
+    pack();
+    
+    // Build The Menus and Menu Bar
+    makeMenuBar();
+    
     validate();
-    setVisible(true);
+    pack();
   }
 
   private final void makeTitle(){

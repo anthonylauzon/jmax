@@ -125,14 +125,10 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
     Box northSection = new Box(BoxLayout.Y_AXIS);
     
     ruler.setSize(SequenceWindow.DEFAULT_WIDTH, 20);
+    ruler.setPreferredSize(new Dimension(SequenceWindow.DEFAULT_WIDTH, 20));
 
     northSection.add(ruler);	
     separate_tracks.add(northSection, BorderLayout.NORTH);
-
-    itsContainer.getFrame().validate();
-    itsContainer.getFrame().pack();
-
-    itsContainer.getFrame().setVisible(true);
 
     //---------- prepares the time zoom listeners
     geometry.addZoomListener( new ZoomListener() {
@@ -163,6 +159,7 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
 
     separate_tracks.add(itsTimeScrollbar, BorderLayout.SOUTH);
     add(separate_tracks, BorderLayout.CENTER);
+    validate();
   }
 
     /**
