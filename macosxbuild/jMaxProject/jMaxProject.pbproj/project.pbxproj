@@ -714,18 +714,6 @@
 			settings = {
 			};
 		};
-		F5C8117703AE515601664092 = {
-			isa = PBXFileReference;
-			name = "input~.help.jmax";
-			path = "../../packages/guiobj/help/input~.help.jmax";
-			refType = 2;
-		};
-		F5C8117903AE518001664092 = {
-			fileRef = F5C8117703AE515601664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F5CE98EA035CAA1801664090 = {
 			buildRules = (
 			);
@@ -19673,7 +19661,6 @@
 				F5FB89C4035E0C68016640F1,
 				F5FB89C5035E0C68016640F1,
 				F5FB89C6035E0C68016640F1,
-				F5C8117703AE515601664092,
 			);
 			isa = PBXGroup;
 			name = help;
@@ -20928,7 +20915,6 @@
 				F8DC5EE7028685AF01664092,
 				F8DC5EE8028685AF01664092,
 				F8DC5EE9028685AF01664092,
-				F5C8117903AE518001664092,
 				F8DC5EEA028685AF01664092,
 				F8DC5EEB028685AF01664092,
 				F5FB89CA035E0C91016640F1,
