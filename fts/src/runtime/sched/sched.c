@@ -175,7 +175,7 @@ static void fts_sched_do_select( fts_sched_t *sched)
   fd_set rfds, wfds;
   struct timeval tv;
   fd_callback_t *callback;
-  int r, n_fd;
+  int r, n_fd, no_select_found;
 
   tv.tv_sec = 0;
   tv.tv_usec = 0;
@@ -184,10 +184,14 @@ static void fts_sched_do_select( fts_sched_t *sched)
   FD_ZERO( &wfds);
 
   n_fd = 0;
+  no_select_found = 0;
   for ( callback = sched->fd_callback_head; callback; callback = callback->next)
       {
 	if (callback->fd == FD_NO_SELECT)
-	  continue;
+	  {
+	    no_select_found = 1;
+	    continue;
+	  }
 
 	if ( callback->fd > n_fd)
 	  n_fd = callback->fd;
@@ -201,7 +205,7 @@ static void fts_sched_do_select( fts_sched_t *sched)
 	  }
       }
 
-  if (n_fd == 0)
+  if (n_fd == 0 && !no_select_found)
     return;
 
   r = select( n_fd+1, &rfds, &wfds, NULL, &tv);

@@ -46,9 +46,10 @@ typedef struct {
   fts_audioport_t head;
   AudioDeviceID device;
   float *buffer;
-  int count;
-  int buffer_size;
+  int countdown;
 } halaudioport_t;
+
+/*  #define LOTS_OF_PRINTOUT */
 
 static void halaudioport_input( fts_word_t *argv)
 {
@@ -60,29 +61,22 @@ static void halaudioport_output( fts_word_t *argv)
   int n, channels, ch, i, j;
 
   this = (halaudioport_t *)fts_word_get_ptr( argv+0);
-  n = fts_word_get_long(argv + 1);
+  if (!this->buffer)
+    return;
+
+  n = fts_word_get_long( argv + 1);
   channels = fts_audioport_get_output_channels( (fts_audioport_t *)this);
 
   for ( ch = 0; ch < channels; ch++)
     {
       float *in = (float *) fts_word_get_ptr( argv + 2 + ch);
 
-      j = this->count + ch;
+      j = ch;
       for ( i = 0; i < n; i++)
 	{
 	  this->buffer[j] = in[i];
 	  j += channels;
 	}
-    }
-
-  this->count += n * channels;
-
-/*    post( "*** this->count %d\n", this->count); */
-
-  if (this->count >= this->buffer_size)
-    {
-/*        post( "*** Wrap\n"); */
-      this->count = 0;
     }
 }
 
@@ -95,18 +89,26 @@ OSStatus halaudioport_ioproc( AudioDeviceID inDevice,
 			      void *inClientData)
 {
   halaudioport_t *this = (halaudioport_t *)inClientData;
-  int n;
+  float *buffer;
+  int n, samples_per_tick, samples_per_buffer;
 
-/*    post( "*** Running scheduler for %d bytes\n", outOutputData->mBuffers[0].mDataByteSize); */
+#ifdef LOTS_OF_PRINTOUT
+  post( "*** Running scheduler for %d bytes\n", outOutputData->mBuffers[0].mDataByteSize);
+#endif
 
-  for ( n = 0; n < outOutputData->mBuffers[0].mDataByteSize; n += fts_get_tick_size()*2*sizeof( float))
+  this->buffer = (float *)outOutputData->mBuffers[0].mData;
+  samples_per_tick = outOutputData->mBuffers[0].mNumberChannels * fts_get_tick_size();
+  samples_per_buffer = outOutputData->mBuffers[0].mDataByteSize / sizeof( float);
+
+  for ( n = 0; n < samples_per_buffer; n += samples_per_tick)
     {
-/*        post( "*** Running scheduler for 1 tick (%d bytes)\n", fts_get_tick_size()*2*sizeof( float)); */
+#ifdef LOTS_OF_PRINTOUT
+      post( "*** Running scheduler for 1 tick (%d bytes)\n", fts_get_tick_size()*2*sizeof( float));
+#endif
       fts_sched_run_one_tick_without_select();
-    }
 
-  memcpy( outOutputData->mBuffers[0].mData, this->buffer, outOutputData->mBuffers[0].mDataByteSize);
-/*    memset( outOutputData->mBuffers[0].mData, 0, outOutputData->mBuffers[0].mDataByteSize); */
+      this->buffer += samples_per_tick;
+    }
 
   return noErr;
 }
@@ -122,15 +124,20 @@ static void hal_halt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 {
   fd_set rfds;
   halaudioport_t *this = (halaudioport_t *)o;
+  OSStatus err;
 
   this->countdown--;
 
   if (this->countdown > 0)
     return;
 
+  fprintf( stderr, "hal_halt\n");
+
   err = AudioDeviceAddIOProc( this->device, halaudioport_ioproc, this);
   if (err != noErr)
     {
+      fprintf( stderr, "Cannot set IO proc\n");
+
       fts_object_set_error( o, "Cannot set IO proc");
       return;
     }
@@ -138,6 +145,8 @@ static void hal_halt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   err = AudioDeviceStart( this->device, halaudioport_ioproc);
   if (err != noErr)
     {
+      fprintf( stderr, "Cannot start device\n");
+
       fts_object_set_error( o, "Cannot start device");
       return;
     }
@@ -146,8 +155,12 @@ static void hal_halt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   FD_ZERO( &rfds);
   FD_SET( 0, &rfds);
 
+  fprintf( stderr, "About to select()\n");
+
   if (select( 1, &rfds, NULL, NULL, NULL) < 0)
     fprintf( stderr, "select() failed\n");
+
+  fprintf( stderr, "After select() ????????\n");
 }
 
 static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -188,9 +201,7 @@ static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 
   post( "*** Buffer size %d\n", bufferSizeProperty);
 
-  this->buffer = (float *)fts_malloc( bufferSizeProperty);
-  this->buffer_size = bufferSizeProperty / sizeof( float);
-
+  this->buffer = 0;
   this->countdown = COUNTDOWN;
 
   fts_sched_add( fts_sched_get_current(), hal_halt, o);
@@ -210,8 +221,6 @@ static void halaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int
   err = AudioDeviceRemoveIOProc( this->device, halaudioport_ioproc);
   if (err != noErr)
     ;
-
-  fts_free( this->buffer);
 }
 
 static void halaudioport_get_state( fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
