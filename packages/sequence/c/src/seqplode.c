@@ -115,7 +115,17 @@ seqplode_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	{
 	  /* if you haven't already sent one */
 	  if (!eat)	
-	    fts_outlet_float((fts_object_t *)this, 0, event_get_time((event_t *)sp2->evt)); /* send the match */
+	    {
+	      if(sequence_editor_is_open(this->sequence))
+		{
+		  fts_atom_t a[1];
+		  
+		  fts_set_object(a, (fts_object_t *)sp2->evt);
+		  fts_client_send_message((fts_object_t *)this->track, seqsym_highlightEvents, 1, a);
+		}
+	      
+	      fts_outlet_float((fts_object_t *)this, 0, event_get_time((event_t *)sp2->evt)); /* send the match */
+	    }
 
 	  drop = eat = 1;
 	}
@@ -183,6 +193,14 @@ seqplode_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     }
 
   /* output the winning note */
+  if(sequence_editor_is_open(this->sequence))
+    {
+      fts_atom_t a[1];
+      
+      fts_set_object(a, (fts_object_t *)this->event);
+      fts_client_send_message((fts_object_t *)this->track, seqsym_highlightEvents, 1, a);
+    }
+  
   fts_outlet_float((fts_object_t *)this, 0, event_get_time((event_t *)this->event));
 
   /* and set pointer to the note after that */

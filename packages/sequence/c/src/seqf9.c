@@ -292,6 +292,15 @@ seqf9_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  if(event)
 	    {
 	      fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_lock, 0, 0);
+
+	      if(sequence_editor_is_open(this->sequence))
+		{
+		  fts_atom_t a[1];
+		  
+		  fts_set_object(a, (fts_object_t *)event);
+		  fts_client_send_message((fts_object_t *)track, seqsym_highlightEvents, 1, a);
+		}
+	      
 	      fts_outlet_float((fts_object_t *)this, 0, event_get_time((event_t *)event));
 	  
 	      this->track = track;
