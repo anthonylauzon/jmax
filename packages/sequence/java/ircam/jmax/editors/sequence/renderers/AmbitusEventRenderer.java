@@ -125,13 +125,14 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
 	switch(state)
 	  {
 	  case Event.SELECTED:
-	    g.setColor(Color.red);
+	    //g.setColor(Color.red);
+	    g.setColor( selectedColor);
 	    break;
 	  case Event.DESELECTED:
-	    g.setColor(Color.black);
+	    g.setColor( deselectedColor);
 	    break;
 	  case Event.HIGHLIGHTED:
-	    g.setColor(Color.green);
+	    g.setColor( highlightColor);
 	    break;
 	  }
 
@@ -230,7 +231,6 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
     int evtheigth = gc.getAdapter().getHeigth(e);
     String type = ((PartitionAdapter)gc.getAdapter()).getType(e);
 
-    //return (evtx<=x && (evtx+evtlenght >= x) && evty-evtheigth/2<=y && (evty+evtheigth/2) >= y);
     if( type.equals("rest"))
       return (evtx<=x && (evtx+evtlenght >= x) && evty-evtheigth/2<=y && evty + evtheigth/2 >= y);
     else
@@ -265,7 +265,6 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
 
     tempRect.setBounds(x, y, w, h);
 
-    //eventRect.setBounds(evtx, evty, evtlenght, evtheigth);
     if( type.equals("rest"))
       eventRect.setBounds(evtx, evty-evtheigth/2, evtlenght, evtheigth);
     else
@@ -291,9 +290,9 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
   Color restColor = new Color(165, 165, 165, 60);
   Color restSelColor = new Color(255, 0, 0, 60);
   Color restHighlightColor = new Color(0, 255, 0, 60);
-  Color intervColor = new Color(165, 165, 165, 40);
-  Color intervSelColor = new Color(255, 0, 0, 40);
-  Color intervHighlightColor = new Color(0, 255, 0, 40);
+  Color deselectedColor = new Color( 0, 0, 0, 180);
+  Color selectedColor = new Color(255, 0, 0, 180);
+  Color highlightColor = new Color(0, 255, 0, 180);
 
   int oldX, oldY;
 }
