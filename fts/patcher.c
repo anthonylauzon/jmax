@@ -1245,6 +1245,26 @@ static void fts_patcher_set_ww( fts_object_t *o, int winlet, fts_symbol_t s, int
   /*  fts_patcher_set_dirty((fts_patcher_t *)o, 1);*/
 }
 
+static fts_patcher_t * get_patcher_by_file_name( fts_symbol_t file_name)
+{
+  fts_patcher_t *root = fts_get_root_patcher();  
+  fts_object_t *p = 0;
+
+  for (p = root->objects; p ; p = p->next_in_patcher)
+    {
+      if (fts_object_is_patcher(p))
+	{
+	  fts_patcher_t *patcher = (fts_patcher_t *)p;
+	  fts_symbol_t fime_name = fts_patcher_get_file_name(patcher);
+	  
+	  if(file_name == fts_patcher_get_file_name(patcher))
+	    return patcher;
+	}
+    }
+
+  return 0;
+}
+
 static void 
 fts_patcher_open_help_patch( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1262,7 +1282,7 @@ fts_patcher_open_help_patch( fts_object_t *o, int winlet, fts_symbol_t s, int ac
 
   fts_log("[patcher] help %s\n", file_name);
 
-  help_patch = fts_client_get_patcher_by_file_name(file_name);
+  help_patch = get_patcher_by_file_name(file_name);
 
   if(help_patch)
     patcher_open_editor((fts_object_t *)help_patch, 0, 0, 0, 0);

@@ -78,6 +78,9 @@ typedef SOCKET socket_t;
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+#if HAVE_ALLOCA_H
+#include <alloca.h>
+#endif
 #include <errno.h>
 
 #define CLOSESOCKET  close
@@ -1023,6 +1026,7 @@ fts_client_load_patcher(fts_symbol_t file_name, fts_object_t *parent, int id)
   fts_atom_t a[3];
   int client_id;
   client_t *client;
+  char *dir_name;
 
   if(id == -1)
     client_id = fts_get_client_id( parent);  
@@ -1033,6 +1037,16 @@ fts_client_load_patcher(fts_symbol_t file_name, fts_object_t *parent, int id)
 
   fts_log("[client]: Load patcher %s\n", file_name);
 
+  /*
+    FIXME
+    Hack to get the templates that are in the same directory
+    as the patch we are opening.
+  */
+  dir_name = (char *)alloca( strlen( file_name) + 1);
+  strcpy( dir_name, file_name);
+  fts_package_add_template_path( fts_project_get(), fts_new_symbol( fts_dirname( dir_name)));
+  fts_package_add_abstraction_path( fts_project_get(), fts_new_symbol( fts_dirname( dir_name)));
+  fts_package_add_data_path( fts_project_get(), fts_new_symbol( fts_dirname( dir_name)));
   /* here finds the file-type if is a jmax_file do 
      fts_binary_file_load( filename, parent, 0, 0)
      else if is a dot_pat file do 
@@ -1072,27 +1086,6 @@ fts_client_load_patcher(fts_symbol_t file_name, fts_object_t *parent, int id)
   fts_log("[patcher]: Finished loading patcher %s\n", file_name);
 
   return patcher;
-}
-
-fts_patcher_t *
-fts_client_get_patcher_by_file_name(fts_symbol_t file_name)
-{
-  fts_patcher_t *root = fts_get_root_patcher();  
-  fts_object_t *p = 0;
-
-  for (p = root->objects; p ; p = p->next_in_patcher)
-    {
-      if (fts_object_is_patcher(p))
-	{
-	  fts_patcher_t *patcher = (fts_patcher_t *)p;
-	  fts_symbol_t fime_name = fts_patcher_get_file_name(patcher);
-	  
-	  if(file_name == fts_patcher_get_file_name(patcher))
-	    return patcher;
-	}
-    }
-
-  return 0;
 }
 
 static void client_shutdown( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

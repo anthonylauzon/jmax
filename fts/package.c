@@ -24,6 +24,7 @@
 #include <ftsconfig.h>
 
 #include <stdlib.h> 
+#include <string.h> 
 
 #if HAVE_SYS_PARAM_H
 #include <sys/param.h>
@@ -114,7 +115,7 @@ fts_package_t*
 fts_package_load_from_file(fts_symbol_t name, const char* filename)
 {
   char path[MAXPATHLEN];
-  char dir[MAXPATHLEN];
+  char *dir;
   fts_object_t* obj;
   fts_package_t* pkg = NULL;
 
@@ -149,8 +150,8 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
 
   pkg->name = name;
 
-  fts_dirname(path, dir, MAXPATHLEN);
-  pkg->dir = fts_new_symbol_copy(dir);
+  dir = strcpy( fts_malloc( strlen( path) + 1), path);
+  pkg->dir = fts_new_symbol( fts_dirname( dir));
 
   fts_package_pop(fts_system_package);
   return pkg;

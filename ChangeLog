@@ -1,3 +1,8 @@
+2002-04-09  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* hacked loading of patch files so that the search paths of the
+	project contains the directory of the patch file.
+
 2002-04-08  François Déchelle  <dechelle@lipari.ircam.fr>
 
 	* changed JMaxApplication so that it can guess its directory from the jmax.jar

@@ -88,18 +88,14 @@ fts_is_directory(const char *name)
   return ( stat( name, &statbuf) == 0) && (statbuf.st_mode & S_IFDIR);
 }
 
-void 
-fts_dirname(const char *name, char* buf, int size)
+char *fts_dirname( char *name)
 {
-  int len = strlen(name);
-  
-  snprintf(buf, size, "%s", name);
-  while (--len >= 0) {
-    if (buf[len] == fts_file_separator) {
-      buf[len] = 0;
-      break;
-    }
-  }
+  char *end;
+
+  if ((end = strrchr( name, fts_file_separator)) != NULL)
+    *end = '\0';
+
+  return name;
 }
 
 int 
@@ -243,11 +239,10 @@ fts_find_file(const char* root, fts_list_t* paths, const char* filename, char* b
   return 0;
 }
 
-/**************************************************************/
-/**************************************************************/
-/**************** old stuff, should disappear *****************/
-/**************************************************************/
-/**************************************************************/
+/*
+  FIXME
+  old stuff, should disappear
+*/
 
 /* global search path */
 static fts_symbol_t fts_search_path = 0;

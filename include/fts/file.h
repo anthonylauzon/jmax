@@ -27,7 +27,7 @@ FTS_API int fts_is_file(const char *name);
 
 FTS_API int fts_is_directory(const char *name);
 
-FTS_API void fts_dirname(const char *name, char* buf, int size);
+FTS_API char *fts_dirname( char *name);
 
 /**
  *
