@@ -34,45 +34,45 @@ public class FtsMidiManager extends FtsObject
 
   static
   {
-    FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("sources"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("sources"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsMidiManager)obj).setSources( args.getLength(), args.getAtoms());
 	}
       });
-    FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("destinations"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("destinations"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsMidiManager)obj).setDestinations( args.getLength(), args.getAtoms());
 	}
       });
-    FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("insert"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("insert"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsMidiManager)obj).insertLabel( args.getInt( 0), args.getSymbol( 1).toString(), 
 					     args.getSymbol( 2).toString(), args.getSymbol( 3).toString());
 	}
       });
-     FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("remove"), new FtsMessageHandler(){
+     FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("remove"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsMidiManager)obj).removeLabel( args.getInt( 0));
 	}
       });
-     FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("input"), new FtsMessageHandler(){
+     FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("input"), new FtsMessageHandler(){
 	 public void invoke( FtsObject obj, FtsArgs args)
 	 {
 	   ((FtsMidiManager)obj).setInput( args.getInt( 0), args.getSymbol( 1).toString());
 	 }
        });
-     FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("output"), new FtsMessageHandler(){
+     FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("output"), new FtsMessageHandler(){
 	 public void invoke( FtsObject obj, FtsArgs args)
 	 {
 	   ((FtsMidiManager)obj).setOutput( args.getInt( 0), args.getSymbol( 1).toString());
 	 }
        });
 
-     /*FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("uploadDone"), new FtsMessageHandler(){
+     /*FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("uploadDone"), new FtsMessageHandler(){
        public void invoke( FtsObject obj, FtsArgs args)
        {
        ((FtsPackage)obj).listener.ftsActionDone();
@@ -84,7 +84,6 @@ public class FtsMidiManager extends FtsObject
   public FtsMidiManager(FtsServer server, FtsObject parent, int id)
   {
     super(server, parent, id);
-
     labels = new Vector();
   }
 
@@ -195,6 +194,8 @@ public class FtsMidiManager extends FtsObject
   }
   void setDestinations(int nArgs, FtsAtom[] args)
   {
+   System.err.println("setSources "+nArgs);
+  
     destinations = new String[ nArgs];
     for(int i = 0; i < nArgs; i++)
       destinations[i] = args[i].symbolValue.toString();

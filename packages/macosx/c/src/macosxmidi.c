@@ -378,13 +378,17 @@ macosxmidi_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   
   fts_client_start_message( o, fts_s_sources);
 
+  fts_log("[midimanager] upload sources\n");
+
   while(fts_iterator_has_more(&keys))
     {
       fts_symbol_t name;
       
       fts_iterator_next(&keys, &k);
       name = fts_get_symbol(&k);
-      fts_client_add_symbol( o, fts_get_symbol( name));  
+      fts_client_add_symbol( o, name);  
+    
+      fts_log("[midimanager] upload sources %s\n", name);	
     }
   fts_client_add_symbol( o, fts_s_internal); 
   fts_client_add_symbol( o, fts_s_export); 
@@ -400,7 +404,7 @@ macosxmidi_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       fts_symbol_t name;
       fts_iterator_next(&keys, &k);
       name = fts_get_symbol(&k);
-      fts_client_add_symbol( o, fts_get_symbol( name)); 
+      fts_client_add_symbol( o, name); 
     }
   fts_client_add_symbol( o, fts_s_internal); 
   fts_client_add_symbol( o, fts_s_export); 
