@@ -24,10 +24,7 @@ public class ExplodeSelection extends AbstractSelection implements ExplodeDataLi
    */
   public void selectAll() 
   {
-    for (Enumeration e = itsModel.getEvents(); e.hasMoreElements();) 
-      {
-	select(e.nextElement());
-      }
+    select(itsModel.getEvents());
   }
 
   /**
