@@ -55,16 +55,16 @@ static int ivalue = 0;
 static int count = 0;
 static int shift_table[4] = { 24, 16, 8, 0};
 
-static fts_symbol_t *symbol_cache;
-static int symbol_cache_size;
+static fts_symbol_t *symbol_cache = 0;
+static int symbol_cache_size = 0;
 
-static int ac;
-static fts_atom_t *at;
-static int at_size;
+static int ac = 0;
+static fts_atom_t *at = 0;
+static int at_size = 0;
 
-static int buffer_fill_p;
-static char *buffer;
-static int buffer_size;
+static int buffer_fill_p = 0;
+static char *buffer = 0;
+static int buffer_size = 0;
 
 static void add_char( char c)
 {
@@ -82,7 +82,7 @@ static void add_arg( fts_atom_t *a)
   if (ac >= at_size) 
     {
       at_size = (at_size == 0) ? AT_INITIAL_SIZE : 2 * at_size;
-      at = (fts_atom_t *)fts_realloc( at, at_size);
+      at = (fts_atom_t *)fts_realloc( at, sizeof(fts_atom_t) * at_size);
     }
 
   at[ ac++ ] = *a;
