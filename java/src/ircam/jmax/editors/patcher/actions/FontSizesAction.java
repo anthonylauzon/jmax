@@ -66,7 +66,15 @@ public class FontSizesAction extends EditorAction
     if (ErmesSelection.patcherSelection.ownedBy(sketch)&& 
 	ErmesSelection.patcherSelection.hasObjects()){
       try{
-	ErmesSelection.patcherSelection.setFontSize(size);
+	ErmesSelection.patcherSelection.apply(new ObjectAction() {
+	  public void processObject(GraphicObject object)
+	    {
+	      object.redraw();
+	      object.redrawConnections();
+	      object.setFontSize(size);
+	      object.redraw();
+	      object.redrawConnections();
+	    }});
       }
       catch (Exception e){
 	ErrorDialog aErr = new ErrorDialog(container.getFrame(), "This font does not exist on this platform");

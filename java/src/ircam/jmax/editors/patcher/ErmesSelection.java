@@ -396,82 +396,6 @@ public class ErmesSelection implements Transferable
     if(hasObjects())
       owner.getDisplayList().objectsToBack(objects.getObjectArray(), objects.size());
   }
-  // Add the proper throw
-
-  public void setFontName( String theFontName)
-  {
-    Font font;
-
-    Object[] values = objects.getObjectArray();
-    int size = objects.size();
-
-    for ( int i = 0; i < size; i++) 
-      {
-	GraphicObject object = (GraphicObject) values[i];
-
-	object.redraw();
-	object.redrawConnections();
-	object.setFontName( theFontName);
-	object.redraw();
-	object.redrawConnections();
-      }
-  }
-
-  // Add the proper throw exception
-
-  public void setFontSize( int fontSize) 
-  {
-    Object[] values = objects.getObjectArray();
-    int size = objects.size();
-
-    for ( int i = 0; i < size; i++)
-      {
-	GraphicObject object = (GraphicObject) values[i];
-
-	object.redraw();
-	object.redrawConnections();
-	object.setFontSize(fontSize);
-	object.redraw();
-	object.redrawConnections();
-      }
-  }
-
-
-  public void fontSmaller()
-  {
-    Object[] values = objects.getObjectArray();
-    int size = objects.size();
-
-    for ( int i = 0; i < size; i++)
-      {
-	GraphicObject object = (GraphicObject) values[i];
-
-	object.redraw();
-	object.redrawConnections();
-	object.fontSmaller();
-	object.redraw();
-	object.redrawConnections();
-      }
-  }
-
-
-  public void fontBigger()
-  {
-    Object[] values = objects.getObjectArray();
-    int size = objects.size();
-
-    for ( int i = 0; i < size; i++)
-      {
-	GraphicObject object = (GraphicObject) values[i];
-
-	object.redraw();
-	object.redrawConnections();
-	object.fontBigger();
-	object.redraw();
-	object.redrawConnections();
-      }
-  }
-
 
   public boolean openHelpPatches()
   {
@@ -487,7 +411,6 @@ public class ErmesSelection implements Transferable
 
     return true;
   }
-
 
   // Queries about selection geometry
 

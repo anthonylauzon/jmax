@@ -50,6 +50,7 @@ public class TextMenu extends EditorMenu
 {
   JMenuItem biggerItem;
   JMenuItem smallerItem;
+  JMenuItem fitItem;
   private JMenu itsSizesMenu;
   private ButtonGroup itsSizesMenuGroup;
   JRadioButtonMenuItem fakeSizeButton;
@@ -86,6 +87,12 @@ public class TextMenu extends EditorMenu
 
     biggerItem  = add(Actions.fontBiggerAction, "Bigger", Event.CTRL_MASK, KeyEvent.VK_ADD);
     smallerItem = add(Actions.fontSmallerAction, "Smaller", Event.CTRL_MASK, KeyEvent.VK_SUBTRACT);
+
+    addSeparator();
+
+    fitItem = add(Actions.fitToTextAction, "Fit To Text", Event.CTRL_MASK, KeyEvent.VK_T);
+
+    addSeparator();
 
     itsSizesMenu = new JMenu("Sizes");
     FillSizesMenu( itsSizesMenu);
@@ -152,6 +159,7 @@ public class TextMenu extends EditorMenu
       {
 	biggerItem.setEnabled(false);
 	smallerItem.setEnabled(false);
+	fitItem.setEnabled(false);
 
 	fontName = sketch.getDefaultFontName();
 	fontSize = sketch.getDefaultFontSize();
@@ -160,7 +168,8 @@ public class TextMenu extends EditorMenu
       {
 	biggerItem.setEnabled(true);
 	smallerItem.setEnabled(true);
-
+	fitItem.setEnabled(true);
+	
 	GraphicObject object = ErmesSelection.patcherSelection.getSingleton();
 
 	fontName = object.getFontName();
@@ -170,6 +179,7 @@ public class TextMenu extends EditorMenu
       {
 	biggerItem.setEnabled(true);
 	smallerItem.setEnabled(true); 
+	fitItem.setEnabled(true); 
 	fakeFontButton.setSelected(true);
 	fakeSizeButton.setSelected(true);
 

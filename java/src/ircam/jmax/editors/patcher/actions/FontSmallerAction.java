@@ -49,7 +49,16 @@ public class FontSmallerAction extends EditorAction
   {
     ErmesSketchPad sketch = (ErmesSketchPad) container.getEditor();
   
-    if (ErmesSelection.patcherSelection.ownedBy(sketch))
-      ErmesSelection.patcherSelection.fontSmaller();
+    if (ErmesSelection.patcherSelection.ownedBy(sketch)){
+      ErmesSelection.patcherSelection.apply(new ObjectAction() {
+	public void processObject(GraphicObject object)
+	  {
+	    object.redraw();
+	    object.redrawConnections();
+	    object.fontSmaller();
+	    object.redraw();
+	    object.redrawConnections();
+	  }});
+    }
   }
 }

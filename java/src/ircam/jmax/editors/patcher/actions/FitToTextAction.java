@@ -38,11 +38,11 @@ import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
-public class FontBiggerAction extends EditorAction
+public class FitToTextAction extends EditorAction
 {
-  public FontBiggerAction()
+  public FitToTextAction()
   {
-    super("Font Bigger");
+    super("Fit To Text");
   }
 
   public void doAction(EditorContainer container)
@@ -53,12 +53,15 @@ public class FontBiggerAction extends EditorAction
       ErmesSelection.patcherSelection.apply(new ObjectAction() {
 	public void processObject(GraphicObject object)
 	  {
-	    object.redraw();
-	    object.redrawConnections();
-	    object.fontBigger();
-	    object.redraw();
-	    object.redrawConnections();
-	  }});
+	    if(object instanceof Editable){
+	      object.redraw();
+	      object.redrawConnections();
+	      ((Editable)object).fitToText();
+	      object.redraw();
+	      object.redrawConnections();
+	    }
+	}});
+      
     }
   }
 }

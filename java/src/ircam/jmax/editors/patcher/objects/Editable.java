@@ -135,6 +135,17 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     redraw();
   }
 
+  public void fitToText()
+  {
+    renderer.update();
+    super.setWidth(((TextRenderer)renderer).getTextWidth() + getTextWidthOffset());
+    if(!((TextRenderer)renderer).isMultiLine())
+      super.setHeight(renderer.getHeight() + getTextHeightOffset());
+    else
+      super.setHeight(((TextRenderer)renderer).getTextHeight() + getTextHeightOffset());
+    redraw();
+  }
+
   // ----------------------------------------
   // ``Args'' property
   // ----------------------------------------

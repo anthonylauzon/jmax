@@ -54,19 +54,19 @@ public class TextRenderer implements ObjectRenderer
     public int getRHeight(){
       return super.getRowHeight();
     }
-    /*public String getTextLine(int line){
+    public String getTextLine(int line){
       String text = "";
       if(line<getLineCount()){
-      try{
-      text = getText().substring(getLineStartOffset(line), getLineEndOffset(line)-1);
-      }catch(BadLocationException be){
-      text = "";
-      }catch(StringIndexOutOfBoundsException se){
-      text = "";
-      }
+	try{
+	  text = getText().substring(getLineStartOffset(line), getLineEndOffset(line)-1);
+	}catch(BadLocationException be){
+	  text = "";
+	}catch(StringIndexOutOfBoundsException se){
+	  text = "";
+	}
       }
       return text;
-      }*/
+    }
   }
 
   private Editable owner;
@@ -107,44 +107,44 @@ public class TextRenderer implements ObjectRenderer
     area.setText(owner.getArgs()); 
   }
 
-  /*public int getTextWidth(){
+  public int getTextWidth(){
     int ww;
     int w = 0;
     int lines = area.getLineCount();
     
     if(lines==0)
-    w = owner.getWidth() - owner.getTextWidthOffset();
+      w = owner.getWidth() - owner.getTextWidthOffset();
     else 
-    if(lines==1){
-    w = SwingUtilities.computeStringWidth(owner.getFontMetrics(), owner.getArgs());
-    if(w<defaultWidth) w = defaultWidth;
-    }
-    else{
-    for(int i=0;i<lines;i++){
-    ww = SwingUtilities.computeStringWidth(owner.getFontMetrics(), area.getTextLine(i));
-    if(ww>w) w = ww;
-    }
-    if(w==0) w = owner.getWidth() - owner.getTextWidthOffset();
-    }
+      if(lines==1){
+	w = SwingUtilities.computeStringWidth(owner.getFontMetrics(), owner.getArgs());
+	//if(w<defaultWidth) w = defaultWidth;
+      }
+      else{
+	for(int i=0;i<lines;i++){
+	  ww = SwingUtilities.computeStringWidth(owner.getFontMetrics(), area.getTextLine(i));
+	  if(ww>w) w = ww;
+	}
+	if(w==0) w = owner.getWidth() - owner.getTextWidthOffset();
+      }
     return w;
-    }
+  }
     
-    public int getTextHeight(){
+  public int getTextHeight(){
     int h = 0;
     int lines = area.getLineCount();
     if(lines==0)
-    h = owner.getHeight() - owner.getTextHeightOffset();
+      h = owner.getHeight() - owner.getTextHeightOffset();
     else 
-    h = owner.getFontMetrics().getHeight()*lines;
+      h = area.getRHeight()*lines;
     return h;
-    }*/
+  }
 
   public boolean canResizeWidthTo(int width)
   {
     return area.canResizeWidthTo(width);
   }
 
-  boolean isMultiLine(){
+  public boolean isMultiLine(){
     return (area.getLineCount()>1);
   }
 
