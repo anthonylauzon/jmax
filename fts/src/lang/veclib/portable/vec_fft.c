@@ -11,7 +11,6 @@
  * for DISCLAIMER OF WARRANTY.
  * 
  */
-/* vecfft.c */
 
 #include "sys.h"
 #include "lang/mess.h"

@@ -264,7 +264,7 @@ static int dsp_gen_outputs(fts_object_t *o, fts_dsp_descr_t *descr)
 
   sig_zero->length = invs;
 
-  sig_zero->srate = fts_param_get_float(fts_s_sampling_rate, 44100.) / (double)(DEFAULTVS/size);
+  sig_zero->srate = fts_param_get_float(fts_s_sampling_rate, 44100.) / ((double)DEFAULTVS/(double)size);
 
   return 1;
 }
