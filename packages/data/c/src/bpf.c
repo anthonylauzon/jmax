@@ -239,16 +239,16 @@ bpf_copy(bpf_t *org, bpf_t *copy)
 }
 
 static void
-bpf_copy_function(const fts_atom_t *from, fts_atom_t *to)
+bpf_copy_function(const fts_object_t *from, fts_object_t *to)
 {
-  bpf_copy((bpf_t *)fts_get_object(from), (bpf_t *)fts_get_object(to));
+  bpf_copy((bpf_t *)from, (bpf_t *)to);
 }
 
 static int
-bpf_equals_function(const fts_atom_t *a, const fts_atom_t *b)
+bpf_equals_function(const fts_object_t *a, const fts_object_t *b)
 {
-  bpf_t *o = (bpf_t *)fts_get_object(a);
-  bpf_t *p = (bpf_t *)fts_get_object(b);
+  bpf_t *o = (bpf_t *)a;
+  bpf_t *p = (bpf_t *)b;
   int o_n = bpf_get_size(o);
   int p_n = bpf_get_size(p);
   
@@ -742,6 +742,7 @@ bpf_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(bpf_t), bpf_init, bpf_delete);  
   
+  fts_class_set_copy_function(cl, bpf_copy_function);
   fts_class_set_equals_function(cl, bpf_equals_function);
   fts_class_set_array_function(cl, bpf_array_function);
   fts_class_set_post_function(cl, bpf_post_function);

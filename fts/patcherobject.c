@@ -149,12 +149,7 @@ fts_object_set_patcher(fts_object_t *o, fts_patcher_t *patcher)
 fts_object_t *
 fts_object_create_in_patcher(fts_class_t *cl, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
-  fts_object_t *obj = NULL;
-
-  if (!cl->size)
-    fts_class_instantiate(cl);
-
-  obj = fts_object_new(cl);
+  fts_object_t *obj = fts_object_alloc(cl);
 
   if(patcher != NULL)
     fts_object_set_patcher(obj, patcher);

@@ -293,9 +293,9 @@ midievent_copy(fts_midievent_t *org, fts_midievent_t *copy)
 }
 
 static void
-midievent_copy_function(const fts_atom_t *from, fts_atom_t *to)
+midievent_copy_function(const fts_object_t *from, fts_object_t *to)
 {
-  midievent_copy((fts_midievent_t *)fts_get_object(from), (fts_midievent_t *)fts_get_object(to));
+  midievent_copy((fts_midievent_t *)from, (fts_midievent_t *)to);
 }
 
 static void

@@ -32,59 +32,65 @@
 static fts_atom_t __fts_null;
 const fts_atom_t *fts_null = &__fts_null;
 
-int fts_atom_identical( const fts_atom_t *p1, const fts_atom_t *p2)
+int fts_atom_identical( const fts_atom_t *first, const fts_atom_t *second)
 {
-  if ( !fts_atom_same_type( p1, p2))
+  if ( !fts_atom_same_type( first, second))
     return 0;
 
-  switch( fts_class_get_typeid( fts_get_class( p1)) ) {
+  switch( fts_class_get_typeid( fts_get_class( first)) ) {
   case FTS_TYPEID_VOID:
-    return fts_is_void( p2);
+    return fts_is_void( second);
   case FTS_TYPEID_INT:
-    return fts_get_int( p1) == fts_get_int( p2);
+    return fts_get_int( first) == fts_get_int( second);
   case FTS_TYPEID_FLOAT:
-    return fts_get_float( p1) == fts_get_float( p2);
+    return fts_get_float( first) == fts_get_float( second);
   case FTS_TYPEID_SYMBOL:
-    return fts_get_symbol( p1) == fts_get_symbol( p2);
+    return fts_get_symbol( first) == fts_get_symbol( second);
   case FTS_TYPEID_POINTER:
-    return fts_get_pointer( p1) == fts_get_pointer( p2);
+    return fts_get_pointer( first) == fts_get_pointer( second);
   case FTS_TYPEID_STRING :
-    return ! strcmp( fts_get_string( p1), fts_get_string( p2));
+    return ! strcmp( fts_get_string( first), fts_get_string( second));
   default:
-    return fts_get_object( p1) == fts_get_object( p2);
+    return fts_get_object( first) == fts_get_object( second);
   }
 
   return 0;
 }
 
 int
-fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2)
+fts_atom_equals( const fts_atom_t *first, const fts_atom_t *second)
 {
-  if(fts_is_int(p1))
+  if(fts_is_int(first))
   {
-    if(fts_is_int(p2))
-      return fts_get_int( p1) == fts_get_int( p2);
-    else if(fts_is_float(p2))
-      return (double)fts_get_int( p1) == fts_get_float( p2);
+    if(fts_is_int(second))
+      return fts_get_int( first) == fts_get_int( second);
+    else if(fts_is_float(second))
+      return (double)fts_get_int( first) == fts_get_float( second);
   }
-  else if(fts_is_float(p1) && fts_is_number(p2))
-    return fabs(fts_get_float( p1) - fts_get_number_float( p2)) < 1.0e-7;
-  else if (fts_atom_same_type( p1, p2))
+  else if(fts_is_float(first) && fts_is_number(second))
+    return fabs(fts_get_float( first) - fts_get_number_float( second)) < 1.0e-7;
+  else if (fts_atom_same_type( first, second))
   {
-    if ( fts_is_symbol( p1))
-      return fts_get_symbol( p1) == fts_get_symbol( p2);
-    else if ( fts_is_object( p1))
+    if ( fts_is_symbol( first))
+      return fts_get_symbol( first) == fts_get_symbol( second);
+    else if ( fts_is_object( first))
     {
-      fts_object_t *obj = fts_get_object( p1);
+      fts_object_t *obj_first = fts_get_object( first);
+      fts_object_t *obj_second = fts_get_object( second);
       
-      if(obj == fts_get_object( p2))
+      if(obj_first == obj_second)
         return 1;
       else
       {
-        fts_class_t *class = fts_object_get_class(obj);
-        fts_equals_function_t equals = fts_class_get_equals_function(class);
+        fts_class_t *class_first = fts_object_get_class(obj_first);
+        fts_class_t *class_second = fts_object_get_class(obj_second);
         
-        return (*equals)(p1, p2);
+        if(class_first == class_second)
+        {
+          fts_equals_function_t equals = fts_class_get_equals_function(class_first);
+        
+          return (*equals)(obj_first, obj_second);
+        }
       }
     }
   }
@@ -95,16 +101,23 @@ fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2)
 void
 fts_atom_copy( const fts_atom_t *from, fts_atom_t *to)
 {
-  if(fts_is_object(from))
+  if(fts_is_object(from) && fts_is_object(to))
   {
-    fts_object_t *obj = fts_get_object(from);
-    fts_class_t *class = fts_object_get_class(obj);
-    fts_copy_function_t copy = fts_class_get_copy_function(class);
+    fts_object_t *obj_from = fts_get_object(from);
+    fts_object_t *obj_to = fts_get_object(to);
+    fts_class_t *class_from = fts_object_get_class(obj_from);
+    fts_class_t *class_to = fts_object_get_class(obj_to);
     
-    (*copy)(from, to);
+    if(class_from == class_to)
+    {
+      fts_copy_function_t copy = fts_class_get_copy_function(class_from);
+      
+      if(copy != NULL)
+        (*copy)(obj_from, obj_to);
+    }
   }
-  else
-    *to = *from;
+
+  *to = *from;
 }
 
 /***********************************************************************

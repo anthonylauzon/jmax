@@ -470,16 +470,14 @@ propobj_copy(propobj_t *org, propobj_t *copy)
 }
 
 void
-propobj_copy_function(const fts_atom_t *from, fts_atom_t *to)
+propobj_copy_function(const fts_object_t *from, fts_object_t *to)
 {
-  propobj_copy((propobj_t *)fts_get_object(from), (propobj_t *)fts_get_object(to));
+  propobj_copy((propobj_t *)from, (propobj_t *)to);
 }
 
 int
-propobj_equals(const fts_atom_t *a, const fts_atom_t *b)
+propobj_equals(const propobj_t *o, const propobj_t *p)
 {
-  propobj_t *o = (propobj_t *)fts_get_object(a);
-  propobj_t *p = (propobj_t *)fts_get_object(b);
   int o_n_prop = fts_array_get_size(&o->properties);
   int p_n_prop = fts_array_get_size(&p->properties);
   int i;

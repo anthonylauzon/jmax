@@ -23,8 +23,8 @@
 /* "system methods" every class should implement */
 typedef void (*fts_instantiate_fun_t)(fts_class_t *);
 typedef unsigned int (*fts_hash_function_t)( const fts_atom_t *);
-typedef int (*fts_equals_function_t)( const fts_atom_t *, const fts_atom_t *);
-typedef void (*fts_copy_function_t)( const fts_atom_t *, fts_atom_t *);
+typedef int (*fts_equals_function_t)( const fts_object_t *, const fts_object_t *);
+typedef void (*fts_copy_function_t)( const fts_object_t *, fts_object_t *);
 typedef void (*fts_post_function_t)(fts_object_t *obj, fts_bytestream_t *stream);
 typedef void (*fts_array_function_t)(fts_object_t *obj, fts_array_t *array);
 typedef void (*fts_description_function_t)(fts_object_t *obj, fts_array_t *array);

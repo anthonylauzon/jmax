@@ -22,6 +22,7 @@
 
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <fts/fts.h>
 #include <ftsprivate/class.h>
@@ -36,10 +37,14 @@
  *
  */
 fts_object_t *
-fts_object_new( fts_class_t *cl)
+fts_object_alloc( fts_class_t *cl)
 {
-  fts_object_t *obj = (fts_object_t *)fts_heap_zalloc(cl->heap);
+  fts_object_t *obj;
 
+  if(cl->size == 0)
+    fts_class_instantiate(cl);
+  
+  obj = (fts_object_t *)fts_heap_zalloc(cl->heap);
   obj->cl = cl;
   fts_object_set_client_id( obj, FTS_NO_ID);
   fts_object_set_id( obj, FTS_NO_ID);
@@ -51,51 +56,69 @@ fts_object_new( fts_class_t *cl)
 void
 fts_object_free(fts_object_t *obj)
 {
-  fts_heap_free(obj, fts_object_get_class( obj)->heap);
+  fts_class_t *cl = fts_object_get_class(obj);
+
+  fts_heap_free(obj, cl->heap);
+}
+
+void
+fts_object_reset(fts_object_t *obj)
+{
+  fts_class_t *cl = fts_object_get_class(obj);
+
+  /* call deconstructor */
+  if(fts_class_get_deconstructor(cl))
+    fts_class_get_deconstructor(cl)(obj, fts_system_inlet, fts_s_delete, 0, 0);
+  
+  /* release all client components */
+  fts_object_reset_client(obj);
+}  
+
+void 
+fts_object_snatch(fts_object_t *obj, fts_object_t *replace)
+{
+  fts_class_t *cl = fts_object_get_class(obj);
+  
+  /* empty object to be snatched */
+  if(fts_object_get_status( obj) != FTS_OBJECT_STATUS_CREATE)
+    fts_object_reset(obj);
+  
+  /* return of the body snatchers */
+  memcpy(obj + 1, replace + 1, cl->size - sizeof(fts_object_t));
+  
+  /* free the snatcher (no return for the body snatcher) */
+  fts_object_free(replace);
 }
 
 fts_object_t *
 fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_object_t *obj = NULL;
-
-  if (!cl->size)
-    fts_class_instantiate(cl);
-
-  obj = fts_object_new(cl);
-
+  fts_object_t *obj = fts_object_alloc(cl);
+  
   /* call constructor */
   fts_class_get_constructor(cl)(obj, fts_system_inlet, NULL, ac, at);
-
-  if( fts_object_get_status( obj) == FTS_OBJECT_STATUS_INVALID)
+  
+  if(fts_object_get_status(obj) == FTS_OBJECT_STATUS_INVALID)
   {
     /* destroy invalid object */
     fts_class_get_deconstructor(cl)(obj, fts_system_inlet, NULL, 0, 0);
     fts_object_free(obj);
-
+    
     return NULL;
   }
-
-  fts_object_set_status( obj, 0);
-
+  
+  fts_object_set_status(obj, FTS_OBJECT_STATUS_OK);
+  
   return obj;
 }
 
-/* delete the unbound, unconnected object already removed from the patcher */
+/* delete object */
 void
 fts_object_destroy(fts_object_t *obj)
 {
-  /* call deconstructor */
-  if(fts_class_get_deconstructor(fts_object_get_class(obj)))
-    fts_class_get_deconstructor(fts_object_get_class(obj))(obj, fts_system_inlet, fts_s_delete, 0, 0);
-
-  /* release all client components */
-  fts_object_reset_client(obj);
-
-  /* free memory */
+  fts_object_reset(obj);
   fts_object_free(obj);
 }
-
 
 /*****************************************************************************
 *

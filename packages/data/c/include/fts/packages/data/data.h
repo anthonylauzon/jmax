@@ -137,8 +137,8 @@ void propobj_dump_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac
 void propobj_remove_property(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 void propobj_copy(propobj_t *org, propobj_t *copy);
-void propobj_copy_function(const fts_atom_t *from, fts_atom_t *to);
-int propobj_equals(const fts_atom_t *a, const fts_atom_t *b);
+void propobj_copy_function(const fts_object_t *from, fts_object_t *to);
+int propobj_equals(const propobj_t *a, const propobj_t *b);
 
 /******************************************************************* 
 *

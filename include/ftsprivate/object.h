@@ -24,6 +24,7 @@
 #define _FTS_PRIVATE_OBJECT_H_
 
 /* object status */
+#define FTS_OBJECT_STATUS_OK ((unsigned long)0)
 #define FTS_OBJECT_STATUS_CREATE ((unsigned long)1)
 #define FTS_OBJECT_STATUS_INVALID ((unsigned long)2)
 #define FTS_OBJECT_STATUS_PENDING_DELETE ((unsigned long)3)
@@ -34,8 +35,10 @@
 #define fts_object_get_status(o) ((o)->flag.status)
 #define fts_object_set_status(o,f) ((o)->flag.status = (f))
 
-extern fts_object_t *fts_object_new( fts_class_t *cl);
+extern fts_object_t *fts_object_alloc( fts_class_t *cl);
 extern void fts_object_free(fts_object_t *obj);
+extern void fts_object_snatch(fts_object_t *obj, fts_object_t *replace);
+
 extern void fts_object_reset_client(fts_object_t *obj);
 
 /* client id */

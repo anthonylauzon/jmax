@@ -159,17 +159,22 @@ definition_recompute_listeners(fts_definition_t *def)
 void
 fts_definition_update(fts_definition_t *def, const fts_atom_t *value)
 {
-  fts_definition_set_value(def, value);
-  definition_recompute_listeners(def);
-
-  if(def->global != NULL)
+  fts_atom_t *old_value = fts_definition_get_value(def);
+  
+  if(!fts_atom_identical(value, old_value))
   {
-    fts_definition_set_value(def->global, value);
-    definition_recompute_listeners(def->global);
+    fts_definition_set_value(def, value);
+    definition_recompute_listeners(def);
     
-    /* undefined names are always local */
-    if(fts_is_void(value))
-      def->global = NULL;
+    if(def->global != NULL)
+    {
+      fts_definition_set_value(def->global, value);
+      definition_recompute_listeners(def->global);
+      
+      /* undefined names are always local */
+      if(fts_is_void(value))
+        def->global = NULL;
+    }
   }
 }
 

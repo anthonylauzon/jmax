@@ -29,10 +29,10 @@ fts_class_t *vec_type = 0;
 static fts_symbol_t sym_text = 0;
 
 static int
-vec_equals_function(const fts_atom_t *a, const fts_atom_t *b)
+vec_equals_function(const fts_object_t *a, const fts_object_t *b)
 {
-  vec_t *o = (vec_t *)fts_get_object(a);
-  vec_t *p = (vec_t *)fts_get_object(b);
+  vec_t *o = (vec_t *)a;
+  vec_t *p = (vec_t *)b;
   int o_n = vec_get_size(o);
   int p_n = vec_get_size(p);
   

@@ -1,3 +1,12 @@
+2004-08-24  Norbert Schnell  <Norbert.Schnell@ircam.fr>
+
+	* object.c: introduced fts_object_snatch() (secretly redefining an FTS object using memcopy from a new instance of the same class)
+
+2004-08-19  Norbert Schnell  <Norbert.Schnell@ircam.fr>
+
+	* class.c: simplified class equals_function and cop_function (adapted object set)
+	* object.c: introduced fts_object_alloc (former fts_object_new) and fts_object_finalize to (includes/ftsprivate/object.h)
+
 2004-08-18  Norbert Schnell  <Norbert.Schnell@ircam.fr>
 
 	* class.c: introduced description_function to class

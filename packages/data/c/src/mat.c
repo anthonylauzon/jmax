@@ -205,7 +205,7 @@ mat_copy(mat_t *org, mat_t *copy)
 }
 
 static void
-mat_post(fts_object_t *o, fts_bytestream_t *stream)
+mat_post_function(fts_object_t *o, fts_bytestream_t *stream)
 {
   mat_t *self = (mat_t *) o;
   int m = mat_get_m(self);
@@ -816,7 +816,7 @@ mat_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   int m = mat_get_m(self);
   int n = mat_get_n(self);
   fts_message_t *mess;
-  int i, j;
+  int i;
   
   /* dump size message */
   mess = fts_dumper_message_new(dumper, fts_s_size);  
@@ -824,25 +824,15 @@ mat_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_message_append_int(mess, n);
   fts_dumper_message_send(dumper, mess);
   
-  for(i=0; i<m; i++)
+  if(n > 0)
   {
-    /* new row */
-    mess = fts_dumper_message_new(dumper, fts_s_row);  
-    fts_message_append_int(mess, i);
-	  
-    for(j=0; j<n; j++)
+    for(i=0; i<m; i++)
     {
-      fts_atom_t *d = data + i * n + j;
-      
-      /* cannot dump objects yet */
-      if(fts_is_object(d))
-        fts_message_append_int(mess, 0);
-      else
-        fts_message_append(mess, 1, d);
-    }
-	  
-    if(n > 0)
+      mess = fts_dumper_message_new(dumper, fts_s_row);  
+      fts_message_append_int(mess, i); /* row index */
+      fts_message_append(mess, n, data + i * n); /* row data */      
       fts_dumper_message_send(dumper, mess);
+    }
   }
 }
 
@@ -879,10 +869,10 @@ mat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static int
-mat_equals(const fts_atom_t *a, const fts_atom_t *b)
+mat_equals_function(const fts_object_t *a, const fts_object_t *b)
 {
-  mat_t *o = (mat_t *)fts_get_object(a);
-  mat_t *p = (mat_t *)fts_get_object(b);
+  mat_t *o = (mat_t *)a;
+  mat_t *p = (mat_t *)b;
   
   if(mat_get_m(o) == mat_get_m(p) && mat_get_n(o) == mat_get_n(p))
   {
@@ -1006,8 +996,8 @@ mat_instantiate(fts_class_t *cl)
     
   fts_class_message_varargs(cl, fts_s_print, mat_print); 
   
-  fts_class_set_equals_function(cl, mat_equals);
-  fts_class_set_post_function(cl, mat_post);
+  fts_class_set_equals_function(cl, mat_equals_function);
+  fts_class_set_post_function(cl, mat_post_function);
   
   fts_class_message_varargs(cl, fts_s_set_from_instance, mat_set_from_instance);
   

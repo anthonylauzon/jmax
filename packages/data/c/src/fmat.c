@@ -440,16 +440,16 @@ fmat_copy(fmat_t *org, fmat_t *copy)
 
 
 static void
-fmat_copy_function(const fts_atom_t *from, fts_atom_t *to)
+fmat_copy_function(const fts_object_t *from, fts_object_t *to)
 {
-  fmat_copy((fmat_t *)fts_get_object(from), (fmat_t *)fts_get_object(to));
+  fmat_copy((fmat_t *)from, (fmat_t *)to);
 }
 
 static int
-fmat_equals_function(const fts_atom_t *a, const fts_atom_t *b)
+fmat_equals_function(const fts_object_t *a, const fts_object_t *b)
 {
-  fmat_t *o = (fmat_t *)fts_get_object(a);
-  fmat_t *p = (fmat_t *)fts_get_object(b);
+  fmat_t *o = (fmat_t *)a;
+  fmat_t *p = (fmat_t *)b;
   
   if(fmat_get_m(o) == fmat_get_m(p) && fmat_get_n(o) == fmat_get_n(p))
   {

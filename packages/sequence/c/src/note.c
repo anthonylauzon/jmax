@@ -42,19 +42,19 @@ scoob_copy(scoob_t *org, scoob_t *copy)
 }
 
 static void
-scoob_copy_function(const fts_atom_t *from, fts_atom_t *to)
+scoob_copy_function(const fts_object_t *from, fts_object_t *to)
 {
-  scoob_copy((scoob_t *)fts_get_object(from), (scoob_t *)fts_get_object(to));
+  scoob_copy((scoob_t *)from, (scoob_t *)to);
 }
 
 static int
-scoob_equals_function(const fts_atom_t *a, const fts_atom_t *b)
+scoob_equals_function(const fts_object_t *a, const fts_object_t *b)
 {
-  scoob_t *o = (scoob_t *)fts_get_object(a);
-  scoob_t *p = (scoob_t *)fts_get_object(b);
+  scoob_t *o = (scoob_t *)a;
+  scoob_t *p = (scoob_t *)b;
   
   if(o->type == p->type && o->pitch == p->pitch && o->interval == p->pitch && o->duration == p->duration)
-    return propobj_equals(a, b);
+    return propobj_equals((propobj_t *)a, (propobj_t *)b);
   
   return 0;
 }

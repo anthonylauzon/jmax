@@ -205,16 +205,16 @@ ivec_copy(ivec_t *org, ivec_t *copy)
 }
 
 static void
-ivec_copy_function(const fts_atom_t *from, fts_atom_t *to)
+ivec_copy_function(const fts_object_t *from, fts_object_t *to)
 {
-  ivec_copy((ivec_t *)fts_get_object(from), (ivec_t *)fts_get_object(to));
+  ivec_copy((ivec_t *)from, (ivec_t *)to);
 }
 
 static int
-ivec_equals_function(const fts_atom_t *a, const fts_atom_t *b)
+ivec_equals_function(const fts_object_t *a, const fts_object_t *b)
 {
-  ivec_t *o = (ivec_t *)fts_get_object(a);
-  ivec_t *p = (ivec_t *)fts_get_object(b);
+  ivec_t *o = (ivec_t *)a;
+  ivec_t *p = (ivec_t *)b;
   int o_n = ivec_get_size(o);
   int p_n = ivec_get_size(p);
   

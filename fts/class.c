@@ -50,15 +50,9 @@ default_hash_function (const fts_atom_t * p)
 }
 
 static int
-default_equals_function (const fts_atom_t * p1, const fts_atom_t * p2)
+default_equals_function (const fts_object_t *o, const fts_object_t *p)
 {
-  return fts_get_object (p1) == fts_get_object (p2);
-}
-
-static void
-default_copy_function (const fts_atom_t * p1, fts_atom_t * p2)
-{
-  fts_set_object(p2, fts_get_object(p1));
+  return o == p;
 }
 
 static void
@@ -92,7 +86,7 @@ fts_class_install (fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 
   fts_class_set_hash_function (cl, default_hash_function);
   fts_class_set_equals_function (cl, default_equals_function);
-  fts_class_set_copy_function (cl, default_copy_function);
+  fts_class_set_copy_function (cl, NULL);
   fts_class_set_post_function (cl, default_post_function);
   fts_class_set_array_function (cl, default_array_function);
   fts_class_set_description_function (cl, default_description_function);
@@ -272,10 +266,10 @@ method_key_hash (const fts_atom_t * a)
 }
 
 static int
-method_key_equals (const fts_atom_t * a, const fts_atom_t * b)
+method_key_equals (const fts_object_t *a, const fts_object_t *b)
 {
-  method_key_t *key_a = (method_key_t *) fts_get_object (a);
-  method_key_t *key_b = (method_key_t *) fts_get_object (b);
+  method_key_t *key_a = (method_key_t *)a;
+  method_key_t *key_b = (method_key_t *)b;
 
   return (key_a->selector == key_b->selector && key_a->type == key_b->type);
 }

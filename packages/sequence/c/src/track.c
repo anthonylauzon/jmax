@@ -437,7 +437,7 @@ track_merge(track_t *track, track_t *merge)
   merge->size = 0;
 }
 
-static void
+void 
 track_copy(track_t *org, track_t *copy)
 {
   event_t *event = track_get_first(org);
@@ -460,9 +460,9 @@ track_copy(track_t *org, track_t *copy)
 }
 
 static void
-track_copy_function(const fts_atom_t *from, fts_atom_t *to)
+track_copy_function(const fts_object_t *from, fts_object_t *to)
 {
-  track_copy((track_t *)fts_get_object(from), (track_t *)fts_get_object(to));
+  track_copy((track_t *)from, (track_t *)to);
 }
 
 static void

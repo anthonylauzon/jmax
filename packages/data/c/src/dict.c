@@ -161,9 +161,9 @@ dict_copy(dict_t *org, dict_t *copy)
 }
 
 static void
-dict_copy_function(const fts_atom_t *from, fts_atom_t *to)
+dict_copy_function(const fts_object_t *from, fts_object_t *to)
 {
-  dict_copy((dict_t *)fts_get_object(from), (dict_t *)fts_get_object(to));
+  dict_copy((dict_t *)from, (dict_t *)to);
 }
 
 static void
@@ -396,10 +396,6 @@ dict_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       /* dump tuple */
       fts_message_append(dump_mess, size, atoms);
       fts_dumper_message_send(dumper, dump_mess);
-    }
-    else if(fts_is_object(&value))
-    {
-      /* don't now how to do yet */
     }
     else
     {

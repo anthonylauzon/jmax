@@ -25,10 +25,10 @@
 fts_class_t *fts_tuple_class = 0;
 
 static int
-tuple_equals_function(const fts_atom_t *a, const fts_atom_t *b)
+tuple_equals_function(const fts_object_t *a, const fts_object_t *b)
 {
-  fts_tuple_t *a_tup = (fts_tuple_t *)fts_get_object(a);
-  fts_tuple_t *b_tup = (fts_tuple_t *)fts_get_object(b);
+  fts_tuple_t *a_tup = (fts_tuple_t *)a;
+  fts_tuple_t *b_tup = (fts_tuple_t *)b;
   int a_n = fts_tuple_get_size(a_tup);
   int b_n = fts_tuple_get_size(b_tup);
   
@@ -48,7 +48,7 @@ tuple_equals_function(const fts_atom_t *a, const fts_atom_t *b)
   return 0;
 }
 
-static void 
+void 
 tuple_copy(fts_tuple_t *org, fts_tuple_t *copy)
 {
   int size = fts_tuple_get_size(org);
@@ -66,10 +66,10 @@ tuple_copy(fts_tuple_t *org, fts_tuple_t *copy)
   }
 }
 
-static void
-tuple_copy_function(const fts_atom_t *from, fts_atom_t *to)
+static void 
+tuple_copy_function(const fts_object_t *from, fts_object_t *to)
 {
-  tuple_copy((fts_tuple_t *)fts_get_object(from), (fts_tuple_t *)fts_get_object(to));
+  tuple_copy((fts_tuple_t *)from, (fts_tuple_t *)to);
 }
 
 static void
@@ -175,6 +175,7 @@ tuple_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_dump_state, tuple_dump_state);  
   fts_class_message_varargs(cl, fts_s_print, tuple_print);
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   
   fts_class_message_varargs(cl, fts_s_get_element, tuple_element);
   fts_class_message_void(cl, fts_s_size, tuple_size);

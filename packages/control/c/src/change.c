@@ -123,15 +123,16 @@ change_anything(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_a
 	  {
 	    fts_object_t* obj1 = fts_get_object(&self->state);
 	    fts_object_t* obj2 = fts_get_object(at);
+      
 	    if (obj1 != obj2)
 	    {
 	      fts_class_t* class = fts_object_get_class(obj1);
 	      fts_equals_function_t equals = fts_class_get_equals_function(class);
-	      if ((NULL == equals)
-		  || (0 == (*equals)(&self->state, at)))
+        
+	      if ((NULL == equals) || (0 == (*equals)(obj1, obj2)))
 	      {
-		fts_atom_assign(&self->state, at);
-		fts_outlet_atom(o, 0, at);
+          fts_atom_assign(&self->state, at);
+          fts_outlet_atom(o, 0, at);
 	      }
 	    }
 	  }

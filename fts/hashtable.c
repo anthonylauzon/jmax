@@ -102,7 +102,7 @@ static int equals( const fts_atom_t *p1, const fts_atom_t *p2)
   case FTS_TYPEID_STRING :
     return ! strcmp( fts_get_string( p1), fts_get_string( p2));
   default:
-    return (*fts_class_get_equals_function( fts_get_class(p1)))( p1, p2);
+    return (*fts_class_get_equals_function( fts_get_class(p1)))(fts_get_object(p1), fts_get_object(p2));
   }
 
   return 0;
