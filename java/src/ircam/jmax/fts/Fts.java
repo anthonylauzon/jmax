@@ -35,7 +35,6 @@ import ircam.jmax.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
 
-
 /**
  * Represent a running FTS server.
  * The server is represented by a structure of three object:
@@ -204,7 +203,7 @@ public class Fts implements MaxContext
     id = server.getNewObjectId();
     server.newObject(parent, id, description);
     server.sendDownloadObject(id);
-    
+
     // Wait for FTS to do his work
     sync();
 
@@ -373,6 +372,8 @@ public class Fts implements MaxContext
     
     return selection;
   }
+
+  
 
 
   /** Syncronize with FTS.
@@ -544,15 +545,24 @@ public class Fts implements MaxContext
   }
 
 
-  FtsDspControl dspController = null;
+    FtsDspControl dspController = null;
 
   /** Get the Dsp Controller for this server. */ 
 
   public FtsDspControl getDspController()
   {
-    if (dspController == null)
-      dspController = (FtsDspControl) newRemoteData("dspcontrol_data", null);
-    
+      if (dspController == null)
+      {
+	try
+	  {
+	      dspController  = (FtsDspControl) makeFtsObject(server.getRootObject(), "__dspcontrol");
+	  }
+	catch (FtsException e)
+	  {
+	      System.out.println("System error: cannot get dsp control object");
+	  }
+      } 
+  
     return dspController;
   }
 

@@ -144,6 +144,8 @@ public class FtsObject implements Serializable
 	      obj =  new FtsSelection(fts, parent);
 	  else if (className == "__clipboard")
 	      obj =  new FtsClipboard(fts, parent);
+	  else if (className == "__dspcontrol")
+	      obj =  new FtsDspControl(fts, parent);
 	  else
 	    {
 		String descrpt;
