@@ -31,6 +31,7 @@ extern void gate_config(void);
 extern void ispwcomp_config(void);
 extern void line_config(void);
 extern void loadbang_config(void);
+extern void atom_list_config(void);
 extern void messbox_config(void);
 extern void messbox_doctor_init(void);
 extern void metro_config(void);
@@ -154,6 +155,7 @@ ispw_config(void)
   ispwcomp_config();
   line_config();
   loadbang_config();
+  atom_list_config();
   messbox_config();
   messbox_doctor_init();
   metro_config();

@@ -35,6 +35,7 @@
 
 #include <fts/fts.h>
 #include "naming.h"
+#include "atomlist.h"
 
 #define DEFAULT_DURATION 125.0f
 
