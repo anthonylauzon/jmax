@@ -203,6 +203,11 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 	return gc;
     }
 
+    public int getDefaultHeight()
+    {
+	return DEFAULT_HEIGHT;
+    }
+
     public void dispose()
     {
 	if(listDialog != null)
@@ -216,7 +221,7 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 
     public Dimension getPreferredSize()
     {
-	return new Dimension(800, 127);
+	return new Dimension(800, DEFAULT_HEIGHT);
     }
 
     public Track getTrack()
@@ -229,6 +234,7 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     SequenceGraphicContext gc;
     SequenceSelection selection;
     static int MONODIMENSIONAL_TRACK_OFFSET = 0;
+    static public int DEFAULT_HEIGHT = 127;
     MonoTrackRenderer renderer;
 
     Track track;

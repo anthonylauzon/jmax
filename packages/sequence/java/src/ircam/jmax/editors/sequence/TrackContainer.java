@@ -68,7 +68,7 @@ public class TrackContainer extends JPanel {
 	    }
     });
 
-    toggleBar = new ToggleBar(track);
+    toggleBar = new ToggleBar(trackEditor);
     add(toggleBar, BorderLayout.NORTH);
     toggleBar.setVisible(false);
     
@@ -113,11 +113,22 @@ public class TrackContainer extends JPanel {
 	  {
 	      opened = ((Boolean) evt.getNewValue()).booleanValue();
 
+	      int height;
+	      if(opened)
+		  height = trackEditor.getDefaultHeight();
+	      else
+		  height = ToggleBar.TOGGLEBAR_HEIGHT+4;
+	      
+	      setPreferredSize(new Dimension(getPreferredSize().width, height));
+	      setMaximumSize(new Dimension(getMaximumSize().width, height));
+
 	      trackEditor.getComponent().setVisible(opened);
 	      buttonPanel.setVisible(opened);
 	      toggleBar.setVisible(!opened);
 
-	      validate();
+	      if(opened)
+		  trackEditor.getGraphicContext().getFtsSequenceObject().changeTrack(track);
+	      //validate();
 	  }
       else 
 	  if(name.equals("maximumPitch") || name.equals("minimumPitch"))

@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -25,46 +25,32 @@
 
 package ircam.jmax.editors.sequence.actions;
 
+import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
+import javax.swing.event.*;
+
+import ircam.jmax.*;
+import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.menus.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
-/** This class define a set of static variables 
- *  containing all the standard actions used for the
- *  sequence editor; please notes that actions objects are
- *  shared between all the editor instances.
- */
-
-public class Actions
+public class MoveClosedTrackToAction extends EditorAction
 {
-  public static EditorAction cutAction       = new CutAction();
-  public static EditorAction copyAction      = new CopyAction();
-  public static EditorAction pasteAction     = new PasteAction();
-  public static EditorAction duplicateAction = new DuplicateAction();
+  int position;
+  public  void actionPerformed(ActionEvent e)
+  {
+    position = Integer.valueOf(((JMenuItem)e.getSource()).getText()).intValue()-1;
+    super.actionPerformed(e);
+  }
 
-  public static EditorAction undoAction      = new UndoAction();
-  public static EditorAction redoAction      = new RedoAction();
-
-  public static EditorAction removeTrackAction      = new RemoveTrackAction();
-
-  public static EditorAction settingsAction  = new SettingsAction();
-    //public static EditorAction mergeAction     = new MergeAction();
-
-  public static EditorAction moveMidiTrackToAction = new MoveMidiTrackToAction();
-  public static EditorAction moveMonodimensionalTrackToAction = new MoveMonoTrackToAction();
-  public static EditorAction moveClosedTrackToAction = new MoveClosedTrackToAction();
+  public void doAction(EditorContainer container)
+  {
+    ((SequencePanel)container.getEditor()).moveTrackTo( ClosedTrackPopupMenu.getPopupTarget(), position);    
+  }
 }
-
-
-
-
-
-
-
-
-
-
 
 

@@ -245,6 +245,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 
 	TrackContainer trackContainer = new TrackContainer(track, teditor);
 	trackContainer.setBorder(new EtchedBorder()); 
+	trackContainer.setMaximumSize(new Dimension(trackContainer.getMaximumSize().width, teditor.getDefaultHeight()));//?????
+
 	trackPanel.add(trackContainer);
 	trackPanel.add(verticalGlue);
 	
@@ -279,6 +281,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	trackContainer.getTrackEditor().dispose();
 
 	trackPanel.validate();
+	trackPanel.repaint();
 	scrollTracks.validate();
 
 	mutex.remove(track);
@@ -295,6 +298,15 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	trackContainer.validate();
 	trackPanel.validate();
 	scrollTracks.validate();
+
+	Rectangle absBounds = SwingUtilities.convertRectangle(trackContainer, trackContainer.getBounds(), trackPanel);
+	scrollTracks.getViewport().scrollRectToVisible(absBounds);
+    }
+
+    boolean isVisible(int y)
+    {
+	Rectangle r = scrollTracks.getViewport().getViewRect();
+	return ((y >= r.y)&&(y <= r.y +r.height));
     }
 
   public void moveTrackTo(TrackEditor editor, int pos)

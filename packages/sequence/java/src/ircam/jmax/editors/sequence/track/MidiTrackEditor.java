@@ -246,7 +246,7 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 
     public Dimension getPreferredSize()
     {
-	return new Dimension(800, 430);
+	return new Dimension(800, DEFAULT_HEIGHT);
     }
 
     public Track getTrack()
@@ -273,6 +273,10 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
       return viewMode;
     }
 
+    public int getDefaultHeight()
+    {
+	return ((PartitionAdapter)gc.getAdapter()).getRangeHeight();
+    }
     public void showListDialog()
     {
 	if(listDialog==null) 
@@ -361,6 +365,7 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     ListDialog listDialog = null;
 
     int viewMode = PIANOROLL_VIEW;
+    public static int DEFAULT_HEIGHT = 430;
     static public final int PIANOROLL_VIEW = 0;
     static public final int NMS_VIEW = 1;
 }

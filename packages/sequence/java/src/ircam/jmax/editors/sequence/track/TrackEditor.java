@@ -1,6 +1,7 @@
 package ircam.jmax.editors.sequence.track;
 
 import java.awt.*;
+import javax.swing.*;
 import ircam.jmax.editors.sequence.*;
 
 /**
@@ -15,6 +16,10 @@ public interface TrackEditor {
     public SequenceGraphicContext getGraphicContext();
 
     public Track getTrack();
+
+    public JPopupMenu getMenu();
+
+    public int getDefaultHeight();
 
     public void dispose();
     public SequenceSelection getSelection();
