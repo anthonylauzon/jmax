@@ -84,7 +84,15 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
   {
     String trackName = args[0].getString();
     TrackEvent evt = (TrackEvent)(args[1].getObject());
-    getTrackByName(trackName).getTrackDataModel().addEvent(evt);
+    TrackdataModel model = getTrackByName(trackName).getTrackDataModel();
+
+    // starts an undoable transition
+    model.beginUpdate();
+    
+    model.addEvent(evt);
+    
+    // ends the undoable transition
+    model.endUpdate()
   }
 
   /**
@@ -160,10 +168,10 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
     if(track==null) return;
     tracks.removeElement(track);
 
-    /*messVect.removeAllElements();
-      messVect.addElement(track);
+    messVect.removeAllElements();
+    messVect.addElement(track.getName());
       
-      sendMessage(FtsObject.systemInlet, "track_delete", messVect);*/
+    sendMessage(FtsObject.systemInlet, "track_remove", messVect);
 
     notifyTrackRemoved(track);
   }
