@@ -97,10 +97,6 @@ abstract public class MaxDataType
     return name;
   }
 
-  /** the Java class instances belong to */
-
-  abstract public Class instanceClass();
-
   /** Set the default editor factory
    */
 

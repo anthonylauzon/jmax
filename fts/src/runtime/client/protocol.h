@@ -83,7 +83,6 @@ are the same, so the users can add as many message type as they want.
 */
    
 #define LONG_POS_CODE 'i'
-#define LONG_NEG_CODE 'n'
 #define FLOAT_CODE 'z'
 #define STRING_START_CODE '\"'
 #define STRING_END_CODE '\"'

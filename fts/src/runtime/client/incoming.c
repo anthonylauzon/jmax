@@ -92,16 +92,28 @@ init_parser(void)
   cp_in.status = waiting_type;
 }
 
+/* Convert a string to long, taking in account the sign,
+   if any */
+
 static long
 dtol(char *s)
 {
   long n = 0;
+  int  sign = 1;
+
+  if (*s == '-')
+    {
+      s++;
+      sign = -1;
+    }
+  else if (*s == '+')
+    s++;
 
   for (; *s; s++)
     if (('0' <= *s) && (*s <= '9'))
       n = n * 10 + (*s - '0');
 
-  return n;
+  return n * sign;
 }
 
 
@@ -160,11 +172,6 @@ fts_client_parse_char(char c)
 	    cp_in.status = in_long;
 	    cp_in.i_pt = cp_in.i_buf;
 	  }
-	else if (c == LONG_NEG_CODE)
-	  {
-	    cp_in.status = in_neg_long;
-	    cp_in.i_pt = cp_in.i_buf;
-	  }
 	else if (c == FLOAT_CODE)
 	  {
 	    cp_in.status = in_float;
@@ -201,11 +208,6 @@ fts_client_parse_char(char c)
 	  {
 	    value_found = 1;
 	    cp_in.status = in_long;
-	  }
-	else if (c == LONG_NEG_CODE)
-	  {
-	    value_found = 1;
-	    cp_in.status = in_neg_long;
 	  }
 	else if (c == FLOAT_CODE)
 	  {
@@ -254,71 +256,6 @@ fts_client_parse_char(char c)
       }
       break;
 
-    case in_neg_long:
-      {
-	int value_found = 0;
-	
-	if ((c == ' ') || (c == '\t'))
-	  {
-	    value_found = 1;
-	    cp_in.status = waiting_value;
-	  }
-	else if (c == LONG_POS_CODE)
-	  {
-	    value_found = 1;
-	    cp_in.status = in_long;
-	  }
-	else if (c == LONG_NEG_CODE)
-	  {
-	    value_found = 1;
-	    cp_in.status = in_neg_long;
-	  }
-	else if (c == FLOAT_CODE)
-	  {
-	    value_found = 1;
-	    cp_in.status = in_float;
-	  }
-	else if (c == OBJECT_CODE)
-	  {
-	    value_found = 1;
-	    cp_in.status = in_object;
-	  }
-	else if (c == STRING_START_CODE)
-	  {
-	    value_found = 1;
-	    cp_in.status = in_string;
-	  }
-	else if (c == EOM_CODE)
-	  {
-	    value_found = 1;
-	    eom = 1;
-	  }
-	else
-	  {
-	    LCHECK();
-	    if (cp_in.i_pt == cp_in.i_buf + MAX_ARGLEN)
-	      cp_in.status = input_error;
-	    else
-	      *((cp_in.i_pt)++) = c;
-	  }
-
-	if (value_found)
-	  {
-	    *(cp_in.i_pt) = '\0';
-
-	    fts_set_long(cp_in.i_ap, (-1) * dtol(cp_in.i_buf));
-
-	    (cp_in.i_ac)++;
-	    (cp_in.i_ap)++;
-
-	    if (cp_in.i_ac >= MARG) 
-	      cp_in.status = input_error;
-
-	    cp_in.i_pt = cp_in.i_buf;
-	  }
-      }
-      break;
-
     case in_float:
       {
 	int value_found = 0;
@@ -332,11 +269,6 @@ fts_client_parse_char(char c)
 	  {
 	    value_found = 1;
 	    cp_in.status = in_long;
-	  }
-	else if (c == LONG_NEG_CODE)
-	  {
-	    value_found = 1;
-	    cp_in.status = in_neg_long;
 	  }
 	else if (c == FLOAT_CODE)
 	  {
@@ -399,11 +331,6 @@ fts_client_parse_char(char c)
 	  {
 	    value_found = 1;
 	    cp_in.status = in_long;
-	  }
-	else if (c == LONG_NEG_CODE)
-	  {
-	    value_found = 1;
-	    cp_in.status = in_neg_long;
 	  }
 	else if (c == FLOAT_CODE)
 	  {

@@ -61,10 +61,12 @@ public class FtsDotPatParser
 
     void setGraphicProperties(FtsObject obj)
     {
-      obj.put("pos.x", x);
-      obj.put("pos.y", y);
-      obj.put("size.w", width);
-      obj.put("fontSize", fontSize);
+      obj.setPosX(x);
+      obj.setPosY(y);
+      obj.setSizeW(width);
+
+      if (fontSize != 12)
+	obj.put("fontSize", fontSize);
     }
   }
 

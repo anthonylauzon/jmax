@@ -37,8 +37,8 @@ SOURCES = \
 	  FtsDotPatFileDataHandler.java  \
 	  FtsPatchData.java  \
 	  FtsPatchDataType.java \
-          FtsUpdateGroupListener.java	
-
+          FtsUpdateGroupListener.java \
+	  FtsParseToPort.java
 
 
 

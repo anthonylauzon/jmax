@@ -12,8 +12,7 @@ class FtsClientProtocol
 {
   // Protocol type coding Special chars
 
-  static final int pos_int_type_code = 'i';
-  static final int neg_int_type_code = 'n';
+  static final int int_type_code = 'i';
   static final int float_type_code   = 'z';
   static final int object_type_code   = 'o';
   static final int string_start_code = '\"';
@@ -26,8 +25,7 @@ class FtsClientProtocol
   static boolean tokenStartingChar(int c)
   {
     return (
-	    (c == pos_int_type_code) ||
-	    (c == neg_int_type_code) ||
+	    (c == int_type_code) ||
 	    (c == float_type_code)   ||
 	    (c == object_type_code)   ||
 	    (c == string_start_code) ||

@@ -236,3 +236,5 @@ abstract public class MaxData
 
   abstract protected void setContent(Object content);
 }
+
+

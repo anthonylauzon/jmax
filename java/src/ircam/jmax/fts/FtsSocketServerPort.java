@@ -92,7 +92,7 @@ class FtsSocketServerPort extends FtsPort
 
     try
       {
-	out_stream = socket.getOutputStream();
+	out_stream = new BufferedOutputStream(socket.getOutputStream(), 1024);
 	in_stream  = socket.getInputStream();
 
 	FtsErrorStreamer.startFtsErrorStreamer(proc.getErrorStream());

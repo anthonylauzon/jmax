@@ -192,6 +192,9 @@ FtsUpdateGroupListener:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsUpdateGroupListener.java)
 .PHONY: FtsUpdateGroupListener
 
+FtsParseToPort:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsParseToPort.java)
+.PHONY: FtsParseToPort
 
 
 

@@ -70,7 +70,7 @@ proc abstractionDirectory { dir } {
 ##
 
 
-source $jmaxRootDir/tcl/tpacmds.tcl
+#source $jmaxRootDir/tcl/tpacmds.tcl
 
 
 

@@ -10,18 +10,11 @@ import ircam.jmax.mda.*;
 
 public class FtsPatchData extends MaxTclData
 {
-  static MaxDataType patchType = null;
-
   FtsObject patcher;
-
-  static void setFtsPatchType(MaxDataType type)
-  {
-    patchType = type;
-  }
 
   public FtsPatchData()
   {
-    super(patchType);
+    super(MaxDataType.getTypeByName("patch"));
   }
 
   void setPatcher(FtsObject patcher)
@@ -46,6 +39,7 @@ public class FtsPatchData extends MaxTclData
     patcher = (FtsObject) content;
   }
 
+
   /** Save the content (a patcher) as TCL code */
 
   public void saveContentAsTcl(PrintWriter pw)
@@ -56,20 +50,7 @@ public class FtsPatchData extends MaxTclData
 
     patcher.saveAsTcl(pw);
   }
-
-  /** This method provide the subclasses of MaxTclData a way to specify
-    what to bind to the this Tcl variable; for the FtsPatchData, the 
-    Tcl "this" identity  is the patcher stored in the instance
-      */
-
-  protected Object tclTarget()
-  {
-    return patcher;
-  }
 }
-
-
-
 
 
 

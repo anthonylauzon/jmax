@@ -15,7 +15,7 @@ import ircam.jmax.fts.*;
  * The Command Syntax is : <p>
  *
  * <code>
- *      _object <i> parent <description> <properties> <i>
+ *      object <i> <description> <properties> <i>
  * </code>
  */
 
@@ -25,7 +25,7 @@ class FtsObjectCmd implements Command
 
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if (argv.length == 4)
+    if (argv.length == 3)
       {
 	FtsObject object;
 	FtsContainerObject parent;
@@ -35,9 +35,9 @@ class FtsObjectCmd implements Command
 
 	// Retrieve the arguments
 
-	parent = (FtsContainerObject) ReflectObject.get(interp, argv[1]);
-	description = argv[2].toString();
-	properties = argv[3];
+	parent = (FtsContainerObject) FtsPatcherCmd.patcherStack.peek();
+	description = argv[1].toString();
+	properties = argv[2];
 
 	className = FtsParse.parseClassName(description);
 

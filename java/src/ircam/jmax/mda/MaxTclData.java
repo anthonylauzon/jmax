@@ -49,21 +49,12 @@ public abstract class  MaxTclData extends MaxData implements MaxTclInterpreter
     TclObject list = TclList.newInstance();
 
     TclList.append(interp, list, TclString.newInstance("_BasicThisWrapper"));
-    TclList.append(interp, list, ReflectObject.newInstance(interp, this.tclTarget()));
+    TclList.append(interp, list, ReflectObject.newInstance(interp, this));
     TclList.append(interp, list, script);
 
     interp.eval(list, 0);
 
     setContent(ReflectObject.get(interp, interp.getResult()));
-  }
-
-  /** This method provide the subclasses of MaxTclData a way to specify
-      what to bind to the this Tcl variable
-      */
-
-  protected Object tclTarget()
-  {
-    return this;
   }
 }
 

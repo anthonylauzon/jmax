@@ -1,18 +1,14 @@
 package ircam.jmax;
 
 import java.io.*;
-import  ircam.jmax.editors.project.*;
 
 /**
  * The interface implemented by a generic Ermes Document.
  * (Load, Save, SaveAs, saved flag...).
  */
-/*prova prova abstract class*/public interface MaxDocument {
-	/*prova prova protected String itsFileName = "";
-	 protected String itsPathName = "";
-	 protected String itsDocumentType = "";
-	 protected boolean alreadySaved =false;*/
-	
+
+public interface MaxDocument
+{
   /** 
    * The document's load method.
    */

@@ -97,6 +97,17 @@ public class FtsServer
     port.setParameter(name, value);
   }
 
+
+  /** Set the flushing mode; set this to true during loading,
+   *  false during interaction. Sync ask for a flush, to avoid deadlocks.
+   */
+
+  public void setFlushing(boolean flushing)
+  {
+    if (port != null)
+      port.setFlushing(flushing);
+  }
+
   /** Send a "open patcher" messages to FTS.*/
 
   final void openPatcher(FtsObject patcher)
@@ -182,23 +193,14 @@ public class FtsServer
 
   final  void newObject(FtsObject patcher, FtsObject obj, String description)
   {
-    String className;
-    Vector args;
-
-    args = new Vector();
-    
-    className = FtsParse.parseObject(description, args);
-
     try
       {
 	registerObject(obj);
 	port.sendCmd(FtsClientProtocol.fts_new_object_cmd);
 	port.sendObject(patcher);
 	port.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
-	port.sendString(className);
 
-	if (args != null) 
-	  port.sendVector(args); 
+	FtsParseToPort.parseAndSendObject(description, port);
 
 	port.sendEom();
       }
@@ -392,20 +394,13 @@ public class FtsServer
 
   final void redefineMessageObject(FtsObject obj, String description)
   {
-    Vector args;
-    
-    args = new Vector();
-    
-    FtsParse.parseObjectArgs(description, args);
-
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
 	port.sendObject(obj);
 	port.sendString("messbox");
 
-	if (args != null)
-	  port.sendVector(args);
+	FtsParseToPort.parseAndSendObject(description, port);
 
 	port.sendEom();
       }
@@ -585,7 +580,9 @@ public class FtsServer
       {
 	port.sendCmd(FtsClientProtocol.sync_cmd);
 	port.sendEom();
+	port.flush();
       }
+
     catch (java.io.IOException e)
       {
       }

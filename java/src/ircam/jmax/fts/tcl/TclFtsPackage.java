@@ -35,12 +35,12 @@ public class TclFtsPackage
   {
     // File Format
 
-    interp.createCommand("_patcher",   new FtsPatcherCmd());
-    interp.createCommand("_object",    new FtsObjectCmd());
-    interp.createCommand("_declare",   new FtsDeclareCmd());
-    interp.createCommand("_comment",   new FtsCommentCmd());
-    interp.createCommand("_inlet",     new FtsInletCmd());
-    interp.createCommand("_outlet",    new FtsOutletCmd());
+    interp.createCommand("patcher",   new FtsPatcherCmd());
+    interp.createCommand("object",    new FtsObjectCmd());
+    interp.createCommand("declare",   new FtsDeclareCmd());
+    interp.createCommand("comment",   new FtsCommentCmd());
+    interp.createCommand("inlet",     new FtsInletCmd());
+    interp.createCommand("outlet",    new FtsOutletCmd());
     interp.createCommand("connection", new FtsConnectionCmd());
 
 

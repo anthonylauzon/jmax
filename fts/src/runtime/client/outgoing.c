@@ -57,10 +57,7 @@ fts_client_mess_start_msg(int type)
 void
 fts_client_mess_add_long(long value)
 {
-  if (value >= 0)
-    sprintf(outbuf_fill, "%c%ld", LONG_POS_CODE, value);
-  else 
-    sprintf(outbuf_fill, "%c%ld", LONG_NEG_CODE, (-1) * value);
+  sprintf(outbuf_fill, "%c%ld", LONG_POS_CODE, value);
 
   outbuf_fill = outbuf_fill + strlen(outbuf_fill);
 }

@@ -1,8 +1,9 @@
-package ircam.jmax.editors.project;
+package ircam.jmax.dialogs;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
@@ -11,7 +12,7 @@ import ircam.jmax.utils.*;
 /**
  * The dialog used during a menu-new operation.
  */
-public class ProjectNewDialog extends Dialog implements ItemListener, ActionListener, KeyListener{
+public class NewDialog extends Dialog implements ItemListener, ActionListener, KeyListener{
   Frame itsParent;
   Button okButton;
   Button cancelButton;
@@ -20,7 +21,7 @@ public class ProjectNewDialog extends Dialog implements ItemListener, ActionList
   String itsCurrentItem = "";
   
   
-  public ProjectNewDialog(Frame theFrame) {
+  public NewDialog(Frame theFrame) {
     super(theFrame, "New File", true);
     
     itsParent = theFrame;

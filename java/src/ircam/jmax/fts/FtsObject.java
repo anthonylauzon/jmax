@@ -29,6 +29,7 @@ abstract public class FtsObject implements MaxTclInterpreter
     // Name
 
     FtsPropertyDescriptor.setPersistent("name", true);
+    FtsPropertyDescriptor.setDefaultValue("name", "unnamed");
 
     // Graphic information
 
@@ -46,6 +47,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 
     FtsPropertyDescriptor.setPersistent("font", true);
     FtsPropertyDescriptor.setPersistent("fontSize", true);
+    FtsPropertyDescriptor.setDefaultValue("fontSize", new Integer(12));
   }
 
   /******************************************************************************/
@@ -290,6 +292,26 @@ abstract public class FtsObject implements MaxTclInterpreter
 	setNumberOfOutlets(((Integer)value).intValue());
 	return true;
       }
+    else if (name.equals("pos.x"))
+      {
+	posX = ((Integer)value).intValue();
+	return true;
+      }
+    else if (name.equals("pos.y"))
+      {
+	posY = ((Integer)value).intValue();
+	return true;
+      }
+    else if (name.equals("size.w"))
+      {
+	sizeW = ((Integer)value).intValue();
+	return true;
+      }
+    else if (name.equals("size.h"))
+      {
+	sizeH = ((Integer)value).intValue();
+	return true;
+      }
     else if (name.equals("name"))
       {
 	// whatever passed, get it as a string
@@ -317,7 +339,15 @@ abstract public class FtsObject implements MaxTclInterpreter
       return new Integer(getNumberOfInlets());
     else if (name.equals("nOuts"))
       return new Integer(getNumberOfOutlets());
-    if (name.equals("name"))
+    else if (name.equals("pos.x"))
+      return new Integer(posX);
+    else if (name.equals("pos.y"))
+      return new Integer(posY);
+    else if (name.equals("size.w"))
+      return new Integer(sizeW);
+    else if (name.equals("size.h"))
+      return new Integer(sizeH);
+    else if (name.equals("name"))
       return getObjectName();
     else
       return null;
@@ -334,6 +364,10 @@ abstract public class FtsObject implements MaxTclInterpreter
     names.addElement("nIns");
     names.addElement("nOuts");
     names.addElement("name");
+    names.addElement("pos.x");
+    names.addElement("pos.y");
+    names.addElement("size.w");
+    names.addElement("size.h");
   }
 
   /** Local put is a version of put that do not send
@@ -396,18 +430,18 @@ abstract public class FtsObject implements MaxTclInterpreter
       return v;
     else
       {
-	if (properties == null)
-	  return null;
-
-	for (int i = 0; i < properties.size(); i++)
+	if (properties != null)
 	  {
-	    Property p = (Property)(properties.elementAt(i));
-
-	    if (p.name.equals(name))
-	      return p.value;
+	    for (int i = 0; i < properties.size(); i++)
+	      {
+		Property p = (Property)(properties.elementAt(i));
+		
+		if (p.name.equals(name))
+		  return p.value;
+	      }
 	  }
 
-	return null;
+	return FtsPropertyDescriptor.getDefaultValue(name);
       }
   }
 
@@ -523,6 +557,56 @@ abstract public class FtsObject implements MaxTclInterpreter
   /** on screen representation of the Fts Object */
 
   Object representation;
+
+  /** Test: x, y, to cache locally the position */
+
+  int posX; // @@@@
+  int posY;
+  int sizeW;
+  int sizeH;
+
+  /** Direct access to geometric properties; recomended when possible */
+  /** They don't fire listener, they should !!! */
+
+  public final int getPosX()
+  {
+    return posX;
+  }
+
+  public final void setPosX(int p)
+  {
+    posX = p;
+  }
+
+  public final int getPosY()
+  {
+    return posY;
+  }
+
+  public final void setPosY(int p)
+  {
+    posY = p;
+  }
+
+  public final int getSizeW()
+  {
+    return sizeW;
+  }
+
+  public final void setSizeW(int p)
+  {
+    sizeW = p;
+  }
+
+  public final int getSizeH()
+  {
+    return sizeH;
+  }
+
+  public final void setSizeH(int p)
+  {
+    sizeH = p;
+  }
 
   /*****************************************************************************/
   /*                                                                           */
@@ -773,10 +857,12 @@ abstract public class FtsObject implements MaxTclInterpreter
 	    if (FtsPropertyDescriptor.isPersistent(property))
 	      {
 		Object value;
+		Object defaultValue;
 		
 		value = this.get(property);
+		defaultValue =  FtsPropertyDescriptor.getDefaultValue(property);
 
-		if (value != null)
+		if ((value != null) && ((defaultValue == null) || (! value.equals(defaultValue))))
 		  {
 		    if (! firstDone)
 		      firstDone = true;

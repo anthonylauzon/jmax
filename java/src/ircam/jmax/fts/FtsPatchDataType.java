@@ -13,13 +13,6 @@ public class FtsPatchDataType extends MaxDataType
   public FtsPatchDataType()
   {
     super("patch");
-
-    FtsPatchData.setFtsPatchType(this);
-  }
-
-  public Class instanceClass()
-  {
-    return FtsPatchData.class;
   }
 
   /** Build an empty instance of FtsPatchData, i.e. an instance
@@ -48,3 +41,7 @@ public class FtsPatchDataType extends MaxDataType
     return obj;
   }
 }
+
+
+
+

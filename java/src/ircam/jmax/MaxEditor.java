@@ -9,7 +9,6 @@ import java.io.*;
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.mda.*;
-import ircam.jmax.editors.project.*; // @@@ !!
 import ircam.jmax.editors.ermes.*; // @@@ !!
 import com.sun.java.swing.*;
 
@@ -19,15 +18,12 @@ import com.sun.java.swing.*;
  */
 public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener,FocusListener,WindowListener,ActionListener, ItemListener{
   public Menu itsFileMenu;
-  //public Menu itsProjectMenu;
   public Menu itsNewFileMenu;
   public Menu itsEditMenu;	
   public Menu itsWindowsMenu;
 
   Vector itsWindowMenuList;
 	
-  //public Project itsProject;
-  
   public MaxEditor(String title) {
     super(title);
   }
@@ -38,18 +34,14 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
   }
   
   public final void Init(){
-    //itsProject = theProject;
     itsWindowMenuList = new Vector();
     
     MenuBar mb = new MenuBar();
     itsFileMenu = CreateFileMenu();
     itsEditMenu = CreateEditMenu();
-    //itsProjectMenu = CreateProjectMenu();
     itsWindowsMenu = CreateWindowsMenu();
     mb.add(itsFileMenu);
     mb.add(itsEditMenu);
-    //mb.add(itsProjectMenu);
-    //mb.add(itsWindowsMenu);
 
     setMenuBar(mb);
     
@@ -60,7 +52,6 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
   }
 
   private Menu CreateNewFileMenu(){
-    MaxDataType aDataType;
     MenuItem aMenuItem;
     String aString;
     Menu newFileMenu = new Menu("New...  Ctrl+N");
@@ -70,11 +61,14 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     // resources.erm tcl script)
 
     for(Enumeration e = MaxDataType.getTypes().elements(); e.hasMoreElements();) {
-      aDataType = (MaxDataType) e.nextElement();
-      aString = aDataType.getName();
-      newFileMenu.add(aMenuItem = new MenuItem(aString));
-      aMenuItem.addActionListener(this);
-    }
+      final MaxDataType aDataType = (MaxDataType) e.nextElement();
+      aMenuItem = new MenuItem(aDataType.getName());
+      newFileMenu.add(aMenuItem); 
+
+      aMenuItem.addActionListener(new ActionListener() {
+	public  void actionPerformed(ActionEvent e)
+	  { MaxApplication.NewType(aDataType);}});
+	}
 
     return newFileMenu;
   }
@@ -82,12 +76,10 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
   private Menu CreateFileMenu() {
     MenuItem aMenuItem;
     CheckboxMenuItem aCheckItem;
-    Menu fileMenu = new Menu("File");
+    Menu fileMenu = new Menu("File", true);
     itsNewFileMenu = CreateNewFileMenu();
     fileMenu.add(itsNewFileMenu);
     fileMenu.add(aMenuItem = new MenuItem("Open... Ctrl+O"));
-    aMenuItem.addActionListener(this);
-    fileMenu.add(aMenuItem = new MenuItem("Import..."));
     aMenuItem.addActionListener(this);
     fileMenu.add(aMenuItem = new MenuItem("Close   Ctrl+W"));
     aMenuItem.addActionListener(this);
@@ -111,20 +103,9 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     return fileMenu;
   }
 
-  /*private Menu CreateProjectMenu() {
-    MenuItem aMenuItem;
-    Menu ProjectMenu = new Menu("Project");
-    ProjectMenu.add(aMenuItem = new MenuItem("Add Window"));
-    aMenuItem.addActionListener(this);
-    return ProjectMenu;
-    }
-    private boolean IsInProjectMenu(String theName) {
-    return(theName.equals("Add Window"));
-    }*/
-
   private Menu CreateWindowsMenu() {
     MenuItem aMenuItem;
-    Menu windowsMenu = new Menu("Windows");
+    Menu windowsMenu = new Menu("Windows", true);
      windowsMenu.add(aMenuItem = new MenuItem("Stack"));
     aMenuItem.addActionListener(this);
     windowsMenu.add(aMenuItem = new MenuItem("Tile"));
@@ -132,8 +113,6 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     windowsMenu.add(aMenuItem = new MenuItem("Tile Vertical"));
     aMenuItem.addActionListener(this);
     windowsMenu.add(new MenuItem("-"));
-    // windowsMenu.add(aMenuItem = new MenuItem("Project Manager Ctrl+M"));
-    //aMenuItem.addActionListener(this);
     windowsMenu.add(aMenuItem = new MenuItem("jMax Console  Ctrl+J"));
     aMenuItem.addActionListener(this);
     AddWindowItems(windowsMenu);
@@ -276,31 +255,17 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
   }
 
   private boolean IsInFileMenu(String theName) {
-    return( theName.equals("Open... Ctrl+O")||theName.equals("Import...")
+    return( theName.equals("Open... Ctrl+O")
 	    ||theName.equals("Close   Ctrl+W")||theName.equals("Open with Autorouting") 
 	    ||theName.equals("Save  Ctrl+S")||theName.equals("Save As...") 
 	    ||theName.equals("Print... Ctrl+P")||theName.equals("Quit    Ctrl+Q")
-	    ||theName.equals("System statistics...")||IsInNewFileMenu(theName));
+	    ||theName.equals("System statistics..."));
   }
   
 
-  private boolean IsInNewFileMenu(String theName){
-    MaxDataType aDataType;
-    String aString;
-    // to be optimized: this function builds an enumeration for each menu selection 
-    // (even if it is not in the "new" menu). A list of datatype names should be kept
-    // somewhere
-    for(Enumeration e=MaxDataType.getTypes().elements(); e.hasMoreElements();) {
-      aDataType = (MaxDataType) e.nextElement();
-      aString = aDataType.getName();
-      if(aString.equals(theName)) return true;
-    }
-    return false;
-  }
-  
   private Menu CreateEditMenu() {
     MenuItem aMenuItem;
-    Menu editMenu = new Menu("Edit");
+    Menu editMenu = new Menu("Edit", true);
     editMenu.add(aMenuItem = new MenuItem("Cut"));
     aMenuItem.addActionListener(this);
     editMenu.add(aMenuItem = new MenuItem("Copy"));
@@ -318,7 +283,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
   }
 
   private boolean IsInWindowsMenu(String theName) {
-    return(theName.equals("Stack") || theName.equals("Tile") || theName.equals("Tile Vertical")/*||theName.equals("Project Manager Ctrl+M")*/||theName.equals("jMax Console  Ctrl+J")||IsAWindowName(theName)|| IsAnEditorFrameName(theName));
+    return(theName.equals("Stack") || theName.equals("Tile") || theName.equals("Tile Vertical")||theName.equals("jMax Console  Ctrl+J")||IsAWindowName(theName)|| IsAnEditorFrameName(theName));
   }
   
   private boolean IsAWindowName(String theName){
@@ -361,7 +326,6 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     
       if (IsInFileMenu(itemName)) FileMenuAction(aMenuItem, itemName);
       else if (IsInEditMenu(itemName)) EditMenuAction(aMenuItem, itemName);
-      //if (IsInProjectMenu(itemName)) ProjectMenuAction(aMenuItem, itemName);
       else if (IsInWindowsMenu(itemName)) WindowsMenuAction(aMenuItem, itemName);
       else CustomMenuActionPerformed(aMenuItem, itemName);
     }
@@ -370,14 +334,6 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
  public boolean FileMenuAction(MenuItem theMenuItem, String theString) {
     if (theString.equals("Open... Ctrl+O")) {
       Open();
-    }
-    else if (theString.equals("Import...")) {
-      // File file = MaxFileChooser.chooseFileToOpen(this, "Import File", itsPatFilter);
-      
-      //if (file != null)
-      //	MaxApplication.Load(file);
-      //else
-      return false;
     }
     else if (theString.equals("Save Ctrl+S")) {
       GetDocument().Save();
@@ -403,9 +359,6 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
       StatisticsDialog aDialog = new StatisticsDialog(this);
       aDialog.setLocation(100, 100);
       aDialog.setVisible(true);
-    }
-    else{//qui siamo nel caso di New...
-      MaxApplication.NewFile(theString);
     }
     return true;
   }
@@ -433,7 +386,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
 
   public void New(){
     String aNewFileType;
-    ProjectNewDialog aNewDialog = new ProjectNewDialog(this);
+    NewDialog aNewDialog = new NewDialog(this);
     Point aPoint = getLocation();
     aNewDialog.setLocation(aPoint.x+100, aPoint.y+100);
     aNewDialog.setVisible(true);
@@ -456,9 +409,6 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     else if (theString.equals("Tile Vertical")) {
       MaxApplication.TileVerticalWindows();
     }
-    /*else if (theString.equals("Project Manager Ctrl+M")) {
-      itsProject.itsProjectWindow.toFront();
-      }*/
     else if (theString.equals("jMax Console  Ctrl+J")) {
       MaxApplication.GetConsoleWindow().ToFront();
     }
@@ -550,8 +500,6 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
   public void keyPressed(KeyEvent e){
     int aInt = e.getKeyCode();
     if (e.isControlDown()){
-      /*if(aInt == 77) MaxApplication.GetProjectWindow().toFront();//m
-	else*/ 
       if(aInt == 78) New();//n
       else if(aInt == 79) Open();//o
       else if(aInt == 80) Print();//p

@@ -80,28 +80,6 @@ public class MaxApplication extends Object{
   static final int SCREENHOR = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width;
 
 
-  static void LoadResources() {
-    //New implementation:
-    //reads from the file resources.erm the list of MaxDataTypes
-    //available for the system, and the MaxDataEditorFactory associated.
-    //The resources.erm file is just a TCL script, as usual
-    
-    String pathForResources = jmaxProperties.getProperty("root")+jmaxProperties.getProperty("file.separator")+"config"+jmaxProperties.getProperty("file.separator")+"resources.erm";
-    try
-      {
-	// Load the "jmaxboot.tcl" file that will do whatever is needed to
-	// create the startup configuration, included reading user files
-
-	itsInterp.evalFile(pathForResources);
-      }
-    catch (TclException e)
-      {
-	System.out.println("Error in resources initialization: " + itsInterp.getResult());
-      }
-
-  }
-  
-	
   public static void ConnectToFts(String theFtsdir, String theFtsname, String mode, String server, String port)
   {
     if (mode.equals("socket")) 
@@ -149,6 +127,36 @@ public class MaxApplication extends Object{
   }
 
 
+  /** Method to create a new MaxData of a named type */
+
+  public static MaxData NewType(MaxDataType type){
+    
+    // Editor activation starting from the choice of a type.
+    // We use the edit method, that automatically start a new
+    // instance of the default editor for a type, used
+    // the registered default editor factory.
+    // sorry, using names for now...
+
+    MaxData ourData;
+    MaxDataEditor ourEditor;
+
+    try
+      {
+    	ourData = type.newInstance();
+	ourEditor = ourData.edit();
+      }
+    catch (MaxDataException e)
+      {
+	ErrorDialog aErr = new ErrorDialog(GetConsoleWindow(), "Error " + e + "while creating new "+ type.getName());
+	aErr.setLocation(100, 100);
+	aErr.setVisible(true);
+	return null;
+      }
+
+    return ourData;
+  }
+
+
   /**
    * Open a file, given its name.
    * This function choose the type of loading procedure
@@ -163,7 +171,18 @@ public class MaxApplication extends Object{
     try
       {
 	ourData = MaxDataHandler.loadDataInstance(MaxDataSource.makeDataSource(file));
-	ourEditor = ourData.edit();
+
+	System.err.println("Nome del MaxData: " + ourData.getName());
+	try
+	  {
+	    ourEditor = ourData.edit();
+	  }
+	catch (MaxDataException e)
+	  {
+	    // Ignore MaxDataExcpetion exception in running the editor
+	    // May be an hack, may be is ok; move this stuff to an action
+	    // handler !!
+	  }
 
 	return ourData;
       }
@@ -607,12 +626,11 @@ public class MaxApplication extends Object{
 
     makeTclInterp(); 
 
-    LoadResources();
-
     try
       {
 	// Load the "jmaxboot.tcl" file that will do whatever is needed to
 	// create the startup configuration, included reading user files
+	// installing editors, data types and data handlers
 
 	itsInterp.evalFile(jmaxProperties.getProperty("root") +
 			   jmaxProperties.getProperty("file.separator") + "tcl" +

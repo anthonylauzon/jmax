@@ -52,7 +52,9 @@ public class FtsDotPatFileDataHandler extends MaxFileDataHandler
 
     try
       {
+	MaxApplication.getFtsServer().setFlushing(false);
 	patcher = FtsDotPatParser.importPatcher(MaxApplication.getFtsServer(), file);
+	MaxApplication.getFtsServer().setFlushing(true);
       }
     catch (java.io.IOException e)
       {
@@ -66,6 +68,7 @@ public class FtsDotPatFileDataHandler extends MaxFileDataHandler
     FtsPatchData obj = new FtsPatchData();
 
     obj.setPatcher(patcher);
+    obj.setName(file.getName());
 
     return obj;
   }

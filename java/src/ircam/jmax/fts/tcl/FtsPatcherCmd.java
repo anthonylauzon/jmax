@@ -16,7 +16,7 @@ import ircam.jmax.fts.*;
  * The Command Syntax is : <p>
  *
  * <code>
- *  _patcher <i>patcher properties body</i>
+ *  patcher <i>properties body</i>
  * </code> <p>
  *
  * The first form (without inlets, patcher and graphic data) 
@@ -27,11 +27,13 @@ import ircam.jmax.fts.*;
 
 class FtsPatcherCmd implements Command
 {
+  static Stack patcherStack = new Stack();
+
   /** Method implementing the TCL command */
 
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if (argv.length == 4) 
+    if (argv.length == 3) 
       {
 	Vector args;
 	FtsPatcherObject object;
@@ -39,9 +41,16 @@ class FtsPatcherCmd implements Command
 	TclObject properties;
 	TclObject body;
 
-	parent     = (FtsContainerObject) ReflectObject.get(interp, argv[1]);
-	properties = argv[2];
-	body       = argv[3];
+	if (patcherStack.empty())
+	  {
+	    parent     = MaxApplication.getFtsServer().getRootObject();
+	    MaxApplication.getFtsServer().setFlushing(false);
+	  }
+	else
+	  parent     = (FtsContainerObject) patcherStack.peek();
+
+	properties = argv[1];
+	body       = argv[2];
 
 	try
 	  {
@@ -49,11 +58,20 @@ class FtsPatcherCmd implements Command
 
 	    object.parseTclProperties(interp, properties);
 	    object.updateFtsObject(); //neede to update ins/outs and name
+
+	    patcherStack.push(object);
 	    object.eval(interp, body);
+	    patcherStack.pop();
 
 	    // Run the after load init of the patcher
 
 	    object.loaded();
+
+	    // Set back the server to flushing if we are at the top of 
+	    // the stack
+
+	    if (patcherStack.empty())
+	      MaxApplication.getFtsServer().setFlushing(true);
 
 	    interp.setResult(ReflectObject.newInstance(interp, object));
 	  }
@@ -65,7 +83,7 @@ class FtsPatcherCmd implements Command
       }
     else
       {
-	throw new TclNumArgsException(interp, 1, argv, "<patcher> <properties> <body>");
+	throw new TclNumArgsException(interp, 1, argv, "<properties> <body>");
       }
   }
 }
