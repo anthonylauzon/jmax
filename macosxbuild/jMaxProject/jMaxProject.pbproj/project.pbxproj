@@ -5,6 +5,18 @@
 	};
 	objectVersion = 38;
 	objects = {
+		F5033DED035CA47101664092 = {
+			isa = PBXFileReference;
+			name = ObjectInspector.java;
+			path = ../../java/src/ircam/jmax/editors/patcher/objects/ObjectInspector.java;
+			refType = 2;
+		};
+		F5033DEE035CA47101664092 = {
+			fileRef = F5033DED035CA47101664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F519DF6D034B353A01664092 = {
 			isa = PBXFileReference;
 			name = bus.c;
@@ -14146,6 +14158,7 @@
 				F880FE2C0283013E01664092,
 				F880FE2D0283013E01664092,
 				F880FE2E0283013E01664092,
+				F5033DED035CA47101664092,
 				F880FE2F0283013E01664092,
 				F880FE300283013E01664092,
 				F880FE310283013E01664092,
@@ -15605,6 +15618,7 @@
 				F8B73FC702C0DF1A01664092,
 				F59FA8FB035350B401664092,
 				F59FA8FD0353512801664092,
+				F5033DEE035CA47101664092,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
