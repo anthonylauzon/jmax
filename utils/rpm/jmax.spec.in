@@ -7,6 +7,11 @@ Group: Applications/Multimedia
 Source: ftp://ftp.ircam.fr/pub/IRCAM/equipes/temps-reel/jmax/releases/jmax-%{version}.tar.gz
 BuildRoot: /var/tmp/jmax-%{version}-root
 Provides: %{name}-common = %{version}, %{name}-java = %{version}
+
+# gnome and kde menu
+%define _gnome_menu_dir /usr/share/gnome/apps/Multimedia
+%define _kde_menu_dir /usr/share/applnk/Multimedia
+
 %description
 jMax is a visual programming environment for developing real-time, interactive multimedia applications. 
 
@@ -73,6 +78,14 @@ find $RPM_BUILD_ROOT%{_datadir}/jmax -name "*.jar" | sed "s|$RPM_BUILD_ROOT||g" 
 # for global rpm (without jack support)
 cat /var/tmp/rpm.jmax.java.list /var/tmp/rpm.jmax.common.list >> /var/tmp/rpm.jmax.global.list
 
+# gnome menu
+mkdir -p $RPM_BUILD_ROOT%{_gnome_menu_dir}
+install -c -m 644 ./utils/linux_desktop/%{name}.desktop $RPM_BUILD_ROOT%{_gnome_menu_dir}
+
+#kde menu
+mkdir -p $RPM_BUILD_ROOT%{_kde_menu_dir}
+install -c -m 644 ./utils/linux_desktop/%{name}.desktop $RPM_BUILD_ROOT%{_kde_menu_dir}
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -85,6 +98,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/fts
 %{_libdir}/libfts-%{version}.so
 %{_libdir}/libfts.so
+%{_kde_menu_dir}/*
+%{_gnome_menu_dir}/*
 
 %files common -f /var/tmp/rpm.jmax.common.list
 %defattr(-,root,root)
@@ -115,6 +130,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/jmax/packages/jack
 
 %changelog
+* Fri Feb 28 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
+- add jMax in KDE and GNOME menus
 * Fri Feb  7 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
 - remove client C++ headers from devel subpackage
 - add jack subpackage building
