@@ -72,6 +72,18 @@ public class MidiConfigPanel extends JPanel implements Editor
 	      return super.getCellEditor(row, column);
 	    }
 	}
+	public TableCellRenderer getCellRenderer(int row, int column){
+	  switch( column)
+	    {
+	    case 0:
+	      DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) super.getCellRenderer(row, column);
+	      if( row == 0)
+		renderer.setForeground( Color.red);
+	      return renderer;
+	    default: 
+	      return super.getCellRenderer(row, column);
+	    }
+	}
       }; 
 
     midiTable.setPreferredScrollableViewportSize( new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
