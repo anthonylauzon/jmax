@@ -24,6 +24,11 @@
 #include <fts/fts.h>
 #include <fts/private/class.h>
 #include <fts/private/connection.h>
+#include <fts/private/object.h>
+#include <fts/private/errobj.h>
+#include <fts/private/patcher.h>
+#include <fts/private/objtable.h>
+#include <fts/private/OLDclient.h>
 
 /* Note that in this code there are error messages sent as blip;
    this is ok during editing, but the same error may occour while

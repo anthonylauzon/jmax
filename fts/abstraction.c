@@ -247,7 +247,8 @@ static fts_object_t *fts_make_abstraction(FILE *file, fts_patcher_t *patcher, in
 
 static fts_symbol_t get_name_without_extension( fts_symbol_t name)
 {
-  char *pname, *pdot;
+  const char *pname;
+  char *pdot;
 
   pname = fts_symbol_name( name);
   pdot = strrchr( pname, '.');

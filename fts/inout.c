@@ -21,6 +21,7 @@
  */
 
 #include <fts/fts.h>
+#include <fts/private/inout.h>
 #include <fts/private/patcher.h>
 
 /***********************************************************************
@@ -117,7 +118,7 @@ send_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   send_t *this = (send_t *) o;
 
-  fts_channel_output_message_from_targets(this->channel, 0, s, ac, at);
+  fts_channel_send( this->channel, 0, s, ac, at);
 }
 
 static void

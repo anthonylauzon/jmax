@@ -28,6 +28,8 @@
 #include <string.h>
 
 #include <fts/fts.h>
+#include <fts/private/connection.h>
+#include <fts/private/OLDftsdata.h>
 
 static fts_hashtable_t fts_atom_type_table;
 
@@ -47,7 +49,7 @@ void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
 
       if (fts_is_symbol(&at[i]))
 	fprintf(f,"%s%s", fts_symbol_name(fts_get_symbol(&at[i])), ps);
-      else if (fts_is_long(&at[i]))
+      else if (fts_is_int(&at[i]))
 	fprintf(f,"%d%s", fts_get_int(&at[i]), ps);
       else if (fts_is_float(&at[i]))
 	fprintf(f,"%f%s", fts_get_float(&at[i]), ps);
@@ -113,7 +115,7 @@ void sprintf_atoms(char *s, int ac, const fts_atom_t *at)
 
       if (fts_is_symbol(&at[i]))
 	sprintf(s + strlen(s),"%s%s", fts_symbol_name(fts_get_symbol(&at[i])), ps);
-      else if (fts_is_long(&at[i]))
+      else if (fts_is_int(&at[i]))
 	sprintf(s + strlen(s),"%d%s", fts_get_int(&at[i]), ps);
       else if (fts_is_float(&at[i]))
 	sprintf(s + strlen(s),"%f%s", fts_get_float(&at[i]), ps);
@@ -151,18 +153,12 @@ int fts_atom_are_equals(const fts_atom_t *a1, const fts_atom_t *a2)
 	return fts_get_ptr(a1) == fts_get_ptr(a2);
       else if (fts_is_int(a1))
 	return fts_get_int(a1) == fts_get_int(a2);
-      else if (fts_is_long(a1))
-	return fts_get_long(a1) == fts_get_long(a2);
       else if (fts_is_float(a1))
 	return fts_get_float(a1) == fts_get_float(a2);
       else if (fts_is_object(a1))
 	return fts_get_object(a1) == fts_get_object(a2);
       else if (fts_is_data(a1))
 	return fts_get_data(a1) == fts_get_data(a2);
-      else if (fts_is_true(a1))
-	return fts_is_true(a2);
-      else if (fts_is_false(a1))
-	return fts_is_false(a2);
       else
 	return 0;
     }
@@ -182,16 +178,10 @@ int fts_atom_is_null(const fts_atom_t *a)
     return fts_get_ptr(a) == 0;
   else if (fts_is_int(a))
     return fts_get_int(a) == 0;
-  else if (fts_is_long(a))
-    return fts_get_long(a) == 0;
   else if (fts_is_float(a))
     return fts_get_float(a) == 0.0;
   else if (fts_is_object(a))
     return fts_get_object(a) == 0;
-  else if (fts_is_true(a))
-    return 0;
-  else if (fts_is_false(a))
-    return 1;
   else
     return 0;
 }

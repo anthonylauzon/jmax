@@ -105,6 +105,8 @@
 #endif
 
 #include <fts/fts.h>
+#include <fts/private/expression.h>
+#include <fts/private/connection.h>
 #include <fts/private/vm.h>
 
 #define EVAL_STACK_DEPTH   8192

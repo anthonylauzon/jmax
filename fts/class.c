@@ -67,10 +67,7 @@ static void fts_array_alloc( void **array, unsigned int size, unsigned int *nall
     {
       unsigned int newalloc = wanted + ALLOC_INC;
 
-      if (*array)
-	*array = fts_realloc(*array, newalloc*size);
-      else
-	*array = fts_malloc(newalloc*size);
+      *array = fts_realloc(*array, newalloc*size);
 
       memset((char *)(*array)+(*nalloc)*size, 0, (newalloc-*nalloc)*size);
       *nalloc = newalloc;
@@ -84,7 +81,7 @@ static void fts_atom_type_copy( int ac, fts_symbol_t *at, fts_symbol_t **sat)
     {
       int i;
 
-      *sat = (fts_symbol_t *) fts_block_alloc(ac*sizeof(fts_symbol_t ));
+      *sat = (fts_symbol_t *) fts_malloc( ac*sizeof(fts_symbol_t ) );
 
       for (i = 0; i < ac; i++)
 	(*sat)[i]=at[i];
@@ -609,9 +606,9 @@ int fts_arg_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1
       if (fts_get_type(at0) != fts_get_type(at1))
 	return 0;
 
-      if (fts_is_long(at0))
+      if (fts_is_int(at0))
 	{
-	  if (fts_get_long(at0) != fts_get_long(at1))
+	  if (fts_get_int(at0) != fts_get_int(at1))
 	    return 0;
 	}
       else if (fts_is_float(at0))
@@ -657,9 +654,9 @@ fts_arg_equiv_or_float(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_
       if (fts_get_type(at0) != fts_get_type(at1))
 	return 0;
 
-      if (fts_is_long(at0))
+      if (fts_is_int(at0))
 	{
-	  if (fts_get_long(at0) != fts_get_long(at1))
+	  if (fts_get_int(at0) != fts_get_int(at1))
 	    return 0;
 	}
       else if (fts_is_float(at0))
@@ -701,9 +698,9 @@ fts_first_arg_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *a
 
       if (fts_get_type(at0) == fts_get_type(at1))
 	{
-	  if (fts_is_long(at0))
+	  if (fts_is_int(at0))
 	    {
-	      if (fts_get_long(at0) == fts_get_long(at1))
+	      if (fts_get_int(at0) == fts_get_int(at1))
 		return 1;
 	    }
 	  else if (fts_is_float(at0))

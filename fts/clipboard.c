@@ -31,18 +31,21 @@
    to the object itself.
 */
 
-#include <fts/fts.h>
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include <stdlib.h>
-#include <sys/types.h>
-
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-
 #if HAVE_PROCESS_H
 #include <process.h>
 #endif
+
+#include <fts/fts.h>
+#include <fts/private/loader.h>
+#include <fts/private/saver.h>
 
 typedef struct {
   fts_object_t ob;

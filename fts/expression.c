@@ -63,6 +63,8 @@
 
 #include <fts/fts.h>
 #include <fts/private/expression.h>
+#include <fts/private/symbol.h>
+#include <fts/private/patcher.h>
 
 /* Operator codes: symbols can store a special operator code,
    to identify them as operators, and to do direct access to some

@@ -20,15 +20,15 @@
  * 
  */
 
-#include <limits.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <string.h>
-#include <errno.h>
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+
+#include <stdio.h>
 
 #include <fts/fts.h>
 #include <fts/private/bmaxhdr.h>

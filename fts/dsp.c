@@ -25,6 +25,7 @@
 #include <fts/private/connection.h>
 #include <fts/private/sigconn.h>
 #include <fts/private/dspgraph.h>
+#include <fts/private/audio.h>
 
 #define FTS_DSP_DEFAULT_SAMPLE_RATE 44100
 
