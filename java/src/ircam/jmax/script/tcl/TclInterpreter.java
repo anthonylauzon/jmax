@@ -173,10 +173,12 @@ public class TclInterpreter implements ircam.jmax.script.Interpreter
 	return "tcl";
     }
 
-    public void addScriptMenuItem(String parent, String name, Object key, Script script) {}
+    public void addScriptMenu(String type, Script script, String name, Object key) 
+    {}
 
-    public Menu getScriptMenu(String type)
+    public Object ask(String question, String type) 
     {
-	return  null;
+	return "Not yet implemented";
     }
+
 }
