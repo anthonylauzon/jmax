@@ -127,6 +127,11 @@ public class FtsServer {
     objectTable.put( new Integer( id), object);
   }
 
+  void removeObject( int id)
+  {
+    objectTable.remove( new Integer( id));
+  }
+
   BinaryProtocolEncoder getEncoder()
   {
     return encoder;

@@ -123,6 +123,16 @@ public class FtsObject implements Serializable
     encoder.flush();
   }
   
+  /**
+   * Unmap the object in the client object table
+   *
+   */
+  public void dispose()
+  {
+    if (id != NO_ID)
+      server.removeObject( id);
+  }
+
   public static void registerMessageHandler( Class cl, FtsSymbol selector, FtsMessageHandler messageHandler)
   {
     if (selector == null)
