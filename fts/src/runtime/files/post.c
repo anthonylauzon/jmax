@@ -86,35 +86,41 @@ void post( const char *format, ...)
 
 
 
-/* Convenience functions to post status values (errors)
-   temporary stuff, will go away with the new error system.
-   */
+/* 
+ * The way to post object error message is to use this function;
+ * Same syntax as post, add a first object argument; this argument
+ * will be used to allow the user to retrieve the patch where the 
+ * objetc is.
+ *
+ * Currently, the strategy is to use the error and errdesc properties;
+ * it is actually a temporary hack, a special "console" should be written.
+ * 
+ */
 
-void
-post_error(fts_status_t error)
+void post_error(fts_object_t *obj, const char *format , ...)
 {
-  post("Error: %s\n", error->description);
-}
+  fts_atom_t a;
+  va_list ap;
+  char buf[512];
 
-/*
-   Clobber now use a global clobber time gate, with a fixed two second window.
-   no more time gate in the error structure.
-*/
+  va_start( ap, format);
 
-static fts_time_gate_t clobber_time_gate;
-static int time_gate_initted = 0;
+  vsprintf(buf, format, ap);
 
-void
-post_error_noclobber(fts_status_t error)
-{
-  if (! time_gate_initted)
-    {
-      time_gate_initted = 1;
-      fts_time_gate_init(&clobber_time_gate, 0);
-    }
+  va_end(ap);
 
-  if (fts_time_gate_close(&clobber_time_gate, 2000.0))
-    post_error(error);
+  fts_set_int(&a, 1);
+  fts_object_put_prop(obj, fts_s_error, &a);
+
+  if (obj->id != FTS_NO_ID)
+    fts_object_ui_property_changed(obj, fts_s_error);
+
+  fts_set_symbol(&a, fts_new_symbol_copy(buf));
+  fts_object_put_prop(obj, fts_s_error_description, &a);
+
+  fts_client_mess_start_msg(POST_CODE);
+  fts_client_mess_add_string(buf);
+  fts_client_mess_send_msg();
 }
 
 

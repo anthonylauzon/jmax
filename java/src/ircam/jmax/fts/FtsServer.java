@@ -24,6 +24,9 @@ public class FtsServer
 {
   public static boolean debug = false;
 
+  boolean running;
+  boolean waiting = false;
+
   /** The FtsPort used to communicate with FTS */
 
   FtsPort port;
@@ -53,6 +56,8 @@ public class FtsServer
     this.port = port;
 
     this.port.setServer(this);
+
+    running = true;
   }
 
   /** Give a string representation of the server */
@@ -1182,20 +1187,29 @@ public class FtsServer
 
   private synchronized void waitForPong()
   {
-    try
-      {
-	// naive solution to the FTS crash problem
-	// it should be smarter, detect the problem,
-	// and set the server as halted.
+    // If FTS quitted, just return 
 
-	if (timeoutOnSync)
-	  wait(10000);
-	else
-	  wait();
-      }
-    catch (java.lang.InterruptedException e)
+    if (running)
       {
-	// ignore iand continue
+	try
+	  {
+	    // naive solution to the FTS crash problem
+	    // it should be smarter, detect the problem,
+	    // and set the server as halted.
+
+	    waiting = true;
+
+	    if (timeoutOnSync)
+	      wait(10000);
+	    else
+	      wait();
+
+	    waiting = false;
+	  }
+	catch (java.lang.InterruptedException e)
+	  {
+	    // ignore iand continue
+	  }
       }
   }
 
@@ -1206,6 +1220,15 @@ public class FtsServer
     notifyAll();
   }
 
+  /** Recovery for FTS Crashes */
+
+  void ftsQuitted()
+  {
+    running = false;
+
+    if (waiting)
+      deliverPong(); // Should we test if we are wa
+  }
 
   /* OBJECT ID HANDLING */
 

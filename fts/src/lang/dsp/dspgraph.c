@@ -225,7 +225,7 @@ static int dsp_gen_outputs(fts_object_t *o, fts_dsp_descr_t *descr)
 	  invs = (*iop)->length;
 	else if (invs != (*iop)->length)
 	  {
-	    post("DSP [%d] inputs don't match for object %s\n", depth, full_name( o));
+	    post_error(o, "DSP [%d] inputs don't match for object %s\n", depth, full_name( o));
 	    return 0;
 	  }
       }
@@ -460,7 +460,7 @@ static void dec_pred_inc_refcnt(dsp_node_t *src, int woutlet, dsp_node_t *dest, 
       else
 	{
 #if DSP_MULTIPLE_CONN_WARN
-	  post( "Multiple signal connections between outlet %d of object %s and inlet %d of object %s (connection ignored)\n",
+	  post_error( src->o,  "Multiple signal connections between outlet %d of object %s and inlet %d of object %s (connection ignored)\n",
 		woutlet, fts_symbol_name(fts_object_get_class_name(src->o)),
 		winlet, fts_symbol_name(fts_object_get_class_name(dest->o)));
 #endif
@@ -551,7 +551,7 @@ static void dsp_graph_check_loop( void)
   for( node = dsp_graph; node; node = node->next)
     if ( !IS_SCHEDULED(node))
       {
-	post( "Loop in dsp graph: object %s not scheduled\n", full_name( node->o));
+	post_error(node->o, "Loop in dsp graph: object %s not scheduled\n", full_name( node->o));
       }
 }
 

@@ -226,10 +226,10 @@ fts_ucs_client_dispatch(int argc, const fts_atom_t *argv)
       ret = fts_ucs_execute_command(argc, argv );
 
       if (ret != fts_Success)
-	post_error(ret);		/* Should become raise error !!! */
+	post("Error: %s\n", ret->description);
     }
   else
-    post_error(&bad_command);		/* Should become raise error !!! */
+    post("Error: %s\n", bad_command.description);		/* Should become raise error !!! */
 }
 
 
@@ -348,7 +348,7 @@ fts_ucs_load_module(int argc, const fts_atom_t *argv)
 			    fts_symbol_name(fts_get_symbol(&argv[1])));
 
       if (ret != fts_Success)
-	post_error(ret);
+	post("Error: %s\n", ret->description);
     }
 
   return fts_Success;

@@ -1483,9 +1483,9 @@ Rectangle previousResizeRect = new Rectangle();
     for (Enumeration e = currentSelection.itsObjects.elements() ; e.hasMoreElements() ;) {
       aObject = (ErmesObject) e.nextElement();
       aRect = aObject.Bounds();
-      aRect.width -= 1;
-      aRect.height -=1; 
-      itsMovingRectangles.addElement(aRect);
+      /* (fd, mdc) the copy of the rectangle is made here, not in Bound */
+
+      itsMovingRectangles.addElement(new Rectangle(aRect.x, aRect.y, aRect.width - 1, aRect.height - 1));
     }
   }
 

@@ -690,11 +690,10 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
     resize(width, height);
   }
   
-  public Rectangle Bounds() {
-    Rectangle aRect = new Rectangle (currentRect.x, currentRect.y, currentRect.width, currentRect.height);
-    return aRect;
-
-    // return currentRect;// ???? Why not ??
+  final Rectangle Bounds() {
+    // (fd, mdc) Bounds don't copy the bound rectangle any more
+    // and nobody is allowed to modify it.
+    return currentRect;
   }
 	
   public Dimension Size() {

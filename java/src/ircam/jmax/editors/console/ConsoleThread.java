@@ -15,6 +15,7 @@ class ConsoleThread extends Thread {
   Console itsConsole;
 
   public ConsoleThread(Console theConsole) {
+    super("Console Thread");
     itsConsole = theConsole;
     /*
      * The console thread runs as a daemon so that it gets terminated 

@@ -315,11 +315,12 @@ public class MaxApplication extends Object
     // Tcl interpreter, so that the TCL event system work
     // (and in particular, tcl built panels; thanks to the
     // jacl doc, that make this absolutely unclear.
+    // NO MORE TCL Notification
 
-    Notifier notifier = itsInterp.getNotifier();
+    //Notifier notifier = itsInterp.getNotifier();
       
-    while (true)
-      notifier.doOneEvent(TCL.ALL_EVENTS);
+    // while (true)
+    //notifier.doOneEvent(TCL.ALL_EVENTS);
   }
   
   /** This private method build the tcl interpreter, 

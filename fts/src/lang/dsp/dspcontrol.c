@@ -50,7 +50,7 @@ static void fts_dsp_control_poll(fts_alarm_t *alarm, void *data)
   int overflow_fpe;
   unsigned int fpe_state;
 
-  if (this->dac_slip_dev && fts_sig_dev_get_nerrors(this->dac_slip_dev) > 0)
+  if (this->dac_slip_dev &&  dsp_is_running() && fts_sig_dev_get_nerrors(this->dac_slip_dev) > 0)
     dac_slip = 1;
   else
     dac_slip = 0;

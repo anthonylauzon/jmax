@@ -418,8 +418,21 @@ patcher_find_errors(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   /* First, look if the objects in the patchers are to be found */
 
   for (p = this->objects; p ; p = p->next_in_patcher)
-    if (fts_object_is_error(p))
-      fts_objectset_add(set, p);
+    {
+      /* Check if it have  the error property on */
+
+      fts_atom_t value;
+
+      fts_object_get_prop(p, fts_s_error, &value);
+      
+      if (fts_is_int(&value))
+	{
+	  int v = fts_get_int(&value);
+	  
+	  if (v)
+	    fts_objectset_add(set, p);
+	}
+      }
 
   /* First, do the recursive calls  */
 
