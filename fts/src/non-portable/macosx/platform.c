@@ -39,7 +39,7 @@ extern void macosx_fpu_init( void);
   Arguments: none
   Returns: none
 */
-void fts_platform_init( void)
+void fts_platform_init( int argc, char **argv)
 {
   fts_real_time_on();
 

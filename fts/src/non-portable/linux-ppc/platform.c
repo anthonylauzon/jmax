@@ -43,7 +43,7 @@ extern void linux_ppc_init_fpu( void);
   Arguments: none
   Returns: none
 */
-void fts_platform_init( void)
+void fts_platform_init( int argc, char **argv)
 {
   struct sched_param sp;
 

@@ -41,7 +41,7 @@ extern void linux_intel_init_fpu( void);
   Arguments: none
   Returns: none
 */
-void fts_platform_init( void)
+void fts_platform_init( int argc, char **argv)
 {
   fts_real_time_on();
 
