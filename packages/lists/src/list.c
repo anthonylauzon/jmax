@@ -67,7 +67,7 @@ list_set_size(list_t *list, int size)
       int i;
 
       if(alloc)
-	fts_block_free(list->at, size * sizeof(fts_atom_t));
+	fts_block_free(list->at, alloc * sizeof(fts_atom_t));
 
       while(alloc < size)
 	alloc += LIST_ALLOC_BLOCK;

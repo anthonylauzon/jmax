@@ -32,6 +32,7 @@ gfloat.c \
 gint.c \
 slider.c \
 panel.c \
+messconst.c \
 message.c \
 message_doctor.c \
 toggle.c \

@@ -182,7 +182,7 @@ fvec_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
 }
 
 static void
-fvec_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -221,6 +221,14 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t
 	  return;
 	}
     }
+}
+
+static void
+fvec_set_file(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
+{
+  fvec_t *this = (fvec_t *)o;
+
+  fvec_load(o, 0, 0, 1, value);
 }
 
 static void
@@ -332,6 +340,9 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       /* define variable */
       fts_class_add_daemon(cl, obj_property_get, fts_s_state, fvec_get_state);
+
+      /* load file at init */
+      fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("file"), fvec_set_file);
 
       /* user methods */
       fts_method_define_varargs(cl, 0, fts_s_bang, fvec_output); 

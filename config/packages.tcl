@@ -29,7 +29,9 @@
 ##
 
 # new classes
+# load gui server side objects
 package require data
+
 package require control
 package require mess
 package require numeric

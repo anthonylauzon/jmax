@@ -35,6 +35,3 @@ ucs load module system $dir/c/lib/$jmaxArch/$jmaxMode/libsystem.so
 #help
 sourceFile $dir/help/system.help.index.tcl
 helpSummary "System" $dir/help/system.summary.jmax
-
-#load silently
-#post "package: system"

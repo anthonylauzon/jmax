@@ -40,6 +40,7 @@
 
 patcherMenu addAndEdit "%jmax" "_object_" " " "Adding New Object"
 patcherMenu addAndEdit "%jmax" "_message_box_" "messbox" "Adding New Message Box"
+patcherMenu addAndEdit "%jmax" "_messconst_" "messconst" "Adding New Message"
 patcherMenu addAndEdit "%jmax" "_patcher_" "jpatcher" "Adding New Patcher"
 patcherMenu add  "%jmax" "_inlet_" "inlet -1" "Adding New Inlet"
 patcherMenu add  "%jmax" "_outlet_" "outlet -1" "Adding New Outlet"

@@ -35,6 +35,7 @@
 (declare-icon "_error_object_"      (string-append jmax-image-root "tool_err.gif"))
 (declare-icon "_comment_"           (string-append jmax-image-root "tool_text.gif"))
 (declare-icon "_message_box_"       (string-append jmax-image-root "tool_mess.gif"))
+(declare-icon "_messconst_"         (string-append jmax-image-root "tool_messconst.gif"))
 (declare-icon "_inlet_"             (string-append jmax-image-root "tool_in.gif"))
 (declare-icon "_outlet_"            (string-append jmax-image-root "tool_out.gif"))
 (declare-icon "_fork_"              (string-append jmax-image-root "tool_fork.gif"))

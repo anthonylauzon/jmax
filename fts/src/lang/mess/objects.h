@@ -82,6 +82,9 @@ extern fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 #define fts_object_get_metaclass(o) ((o)->head.cl->mcl)
 #define fts_object_get_user_data(o) ((o)->head.cl->user_data)
 
+#define fts_object_get_at(o) ((o)->argv)
+#define fts_object_get_ac(o) ((o)->argc)
+
 /* Return true if the object is being deleted, i.e. if 
  the patcher (or an ancestor of the patcher) is being deleted */
 extern int fts_object_being_deleted(fts_object_t *obj);

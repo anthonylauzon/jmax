@@ -37,6 +37,7 @@
 
 (patcher-menu "addAndEdit" "%jmax" "_object_" " " "Adding New Object")
 (patcher-menu "addAndEdit" "%jmax" "_message_box_" "messbox" "Adding New Message Box")
+(patcher-menu "addAndEdit" "%jmax" "_messconst_" "messconst" "Adding New Message")
 (patcher-menu "addAndEdit" "%jmax" "_patcher_" "jpatcher" "Adding New Patcher")
 (patcher-menu "add"        "%jmax" "_inlet_" "inlet -1" "Adding New Inlet")
 (patcher-menu "add"        "%jmax" "_outlet_" "outlet -1" "Adding New Outlet")

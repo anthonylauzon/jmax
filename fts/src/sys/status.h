@@ -38,4 +38,6 @@ typedef fts_status_description_t *fts_status_t;
 
 #define fts_Success ((fts_status_t) 0)
 
+#define fts_status_get_description(s) ((s)->description)
+
 #endif

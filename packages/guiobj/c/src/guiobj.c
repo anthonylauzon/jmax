@@ -29,6 +29,7 @@
 extern void toggle_config(void);
 extern void messbox_config(void);
 extern void messbox_doctor_init(void);
+extern void messconst_config(void);
 extern void panel_config(void);
 extern void gint_config(void);
 extern void slider_config(void);
@@ -47,6 +48,7 @@ fts_guiobj_init(void)
   toggle_config();
   messbox_config();
   messbox_doctor_init();
+  messconst_config();
   panel_config();
   gint_config();
   slider_config();

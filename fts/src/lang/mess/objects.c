@@ -385,7 +385,7 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
 	  else if (ret == &fts_ArgumentTypeMismatch)
 	    obj = fts_error_object_new(patcher, aoc, aot, "Argument types mismatch");
 	  else
-	    obj = fts_error_object_new(patcher, aoc, aot, "Error in object instantiation");
+	    obj = fts_error_object_new(patcher, aoc, aot, "Error in class instantiation");
 	}
     }
 

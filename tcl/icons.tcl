@@ -37,6 +37,7 @@ declareIcon _object_            $jmaxRootDir/images/tool_ext.gif
 declareIcon _error_object_      $jmaxRootDir/images/tool_err.gif
 declareIcon _comment_           $jmaxRootDir/images/tool_text.gif
 declareIcon _message_box_       $jmaxRootDir/images/tool_mess.gif
+declareIcon _messconst_         $jmaxRootDir/images/tool_messconst.gif
 declareIcon _inlet_             $jmaxRootDir/images/tool_in.gif
 declareIcon _outlet_            $jmaxRootDir/images/tool_out.gif
 declareIcon _fork_              $jmaxRootDir/images/tool_fork.gif

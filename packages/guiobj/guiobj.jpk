@@ -33,6 +33,3 @@ ucs load module guiobj $dir/c/lib/$jmaxArch/$jmaxMode/libguiobj.so
 ## load help patch table
 sourceFile $dir/help/guiobj.help.index.tcl
 helpSummary "GUI" $dir/help/guiobj.summary.jmax
-
-# load silently
-#post "package: guiobj"

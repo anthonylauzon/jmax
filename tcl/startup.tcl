@@ -67,8 +67,9 @@ ftsconnect $jmaxServerDir $jmaxServerName $jmaxConnection $jmaxHost $jmaxServerO
 sync
 
 # load gui server side objects
-package require guiobj
 package require system
+package require reftype
+package require guiobj
 
 #
 # load installation default packages

@@ -39,6 +39,7 @@ typedef struct _reftype_
 } reftype_t;
 
 extern reftype_t *reftype_declare(fts_symbol_t sym, reftype_dispatcher_t dispatcher, reftype_destructor_t destructor);
+extern reftype_t *reftype_get_by_symbol(fts_symbol_t sym);
 
 #define reftype_get_dispatcher(t) ((t)->dispatcher)
 #define reftype_get_destructor(t) ((t)->destructor)
