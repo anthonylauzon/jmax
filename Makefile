@@ -140,6 +140,7 @@ cvs-tag: spec-files
 		echo "Not sync with cvs (do an update or commit)" ; \
 		exit 1 ; \
 	fi
+	echo "Tagging with tag" `sed -e 's/\./_/g' -e 's/^/V/' VERSION`
 	cvs tag -F `sed -e 's/\./_/g' -e 's/^/V/' VERSION`
 .PHONY: cvs-tag
 
