@@ -68,8 +68,8 @@ public class BpfRuler extends JPanel {
 	int timeStep = BpfBackground.findBestTimeStep(windowTime-logicalTime);
 	
 	//controll if the time string is too long (in this case draw one string on two)
-	int stringLenght = fm.stringWidth(""+(logicalTime+timeStep));
-	int delta = utilityBpfAdapter.getX(logicalTime+timeStep)-utilityBpfAdapter.getX(logicalTime);
+	int stringLenght = fm.stringWidth(""+(windowTime));
+	int delta = utilityBpfAdapter.getX(windowTime)-utilityBpfAdapter.getX(windowTime-timeStep);
 	int k, stringWidth;
 	if(stringLenght>delta-10) k = 2;
 	else k=1;

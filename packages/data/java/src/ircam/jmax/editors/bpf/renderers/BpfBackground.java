@@ -98,7 +98,15 @@ public class BpfBackground implements Layer, ImageObserver{
       int xPosition;
       int snappedTime;
     
-      for (int i=logicalTime+timeStep; i<windowTime+timeStep; i+=timeStep) 
+      //////////////
+      int stringLenght = fm.stringWidth(""+(windowTime));
+      int delta = gc.getAdapter().getX(windowTime)-gc.getAdapter().getX(windowTime-timeStep);
+      int k, stringWidth;
+      if(stringLenght>delta-10) k = 2;
+      else k=1;
+
+      /////////////
+      for (int i=logicalTime+timeStep; i<windowTime+timeStep; i+=timeStep*k) 
 	  {
 	      snappedTime = (i/timeStep)*timeStep;
 	      xPosition = gc.getAdapter().getX(snappedTime);
