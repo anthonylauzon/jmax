@@ -117,13 +117,31 @@ aflib_loader_open_write(fts_audiofile_t* audiofile)
 {
   const char *filename = fts_audiofile_get_filename(audiofile);
   aflib_handle_t *handle = aflib_handle_alloc();
+  AFfilehandle af_file;
+  AFfilesetup af_setup;
 
+  
+  af_setup = afNewFileSetup();
+  
+  afInitSampleFormat(af_setup, AF_DEFAULT_TRACK,
+		     fts_audiofile_get_sample_format(audiofile),
+		     fts_audiofile_get_bytes_per_sample(audiofile));
+  afInitRate(af_setup, AF_DEFAULT_TRACK, (double)fts_audiofile_get_sample_rate(audiofile));
+  afInitChannels(af_setup, AF_DEFAULT_TRACK, fts_audiofile_get_num_channels(audiofile));
+  
+
+  if ((af_file = afOpenFile(filename, "w", af_setup)) == AF_NULL_FILEHANDLE)
+  {
+      aflib_loader_error(audiofile, "Failed to open file %s", filename);
+      return -1;
+  }
+  handle->af_file = af_file;
   fts_audiofile_set_handle(audiofile, handle);
 
-  /* not yet implemented */
-
-  return -1;
+  afFreeFileSetup(af_setup);
+  return 0;
 }
+
 
 static int 
 aflib_loader_buffer_length(fts_audiofile_t* audiofile, unsigned int length)
@@ -200,8 +218,44 @@ aflib_loader_read(fts_audiofile_t* audiofile, float **buf, int n_buf, unsigned i
 static int 
 aflib_loader_write(fts_audiofile_t* audiofile, float** buf, int n_buf, unsigned int buflen)
 {
-  /* not yet implemented */
-  return -1;
+  aflib_handle_t *handle = (aflib_handle_t *)fts_audiofile_get_handle(audiofile);
+  int file_channels = fts_audiofile_get_num_channels(audiofile);
+  short *buffer = (short *)handle->buffer;
+  unsigned int buffer_length = handle->buffer_length;
+  int n_total = 0;
+  int n_write = 0;
+  int ch, n_ch;
+
+  if(n_buf > file_channels)
+      n_ch = file_channels;
+  else
+      n_ch = n_buf;
+  
+  do
+  {
+      for(ch=0; ch<n_ch; ch++)
+      {
+	  float *in = buf[ch] + n_total;
+	  int j = ch;
+	  int i;
+	  
+	  for(i=0; i < buffer_length; i++)
+	  {
+	      buffer[j] = (short)(in[i] * 32767.0f);
+	      j += file_channels;
+	  }
+      }
+      
+      n_write = afWriteFrames(handle->af_file, AF_DEFAULT_TRACK, buffer, buffer_length);
+      
+      
+      n_total += n_write;
+      
+    } while(n_write > 0 && n_total < buflen);
+  
+  
+  return n_total;
+
 }
 
 static int 
