@@ -26,9 +26,11 @@
 static fts_symbol_t sym_meter_2_4 = NULL;
 static fts_symbol_t sym_meter_3_4 = NULL;
 static fts_symbol_t sym_meter_4_4 = NULL;
+static fts_symbol_t sym_meter_empty = NULL;
 
 static scomark_t *marker_track_get_previous_tempo(track_t *marker_track, scomark_t *scomark, double *tempo);
 static scomark_t *marker_track_get_previous_meter(track_t *marker_track, scomark_t *scomark, fts_symbol_t *meter);
+static scomark_t *marker_track_get_next_bar(track_t *marker_track, scomark_t *scomark);
 static void marker_track_tempo_changed(track_t * marker_track, scomark_t *scomark, double old_tempo, double new_tempo, int upload);
 static void marker_track_meter_changed(track_t * marker_track, scomark_t *scomark, fts_symbol_t old_meter, fts_symbol_t new_meter, int upload);
 
@@ -254,17 +256,23 @@ scomark_bar_set_meter(scomark_t *self, fts_symbol_t meter_sym, fts_symbol_t *old
   {
     int num = 0;
     int den = 0;
+    int set_ok = 0;
     fts_atom_t a;
     
-	track_t * marker_track = (track_t *)fts_object_get_context((fts_object_t *)fts_object_get_context((fts_object_t *)self));
+    track_t * marker_track = (track_t *)fts_object_get_context((fts_object_t *)fts_object_get_context((fts_object_t *)self));
     scomark_bar_get_meter(self, old_meter);
     
     if(*old_meter == NULL)
       marker_track_get_previous_meter(marker_track, self, old_meter);
 	
-    scomark_meter_symbol_get_quotient(meter_sym, &num, &den);
-    
-    if(num > 0 && den > 0)
+    if(meter_sym == sym_meter_empty)
+      set_ok = 1;
+    else
+    {
+      scomark_meter_symbol_get_quotient(meter_sym, &num, &den);
+      if(num > 0 && den > 0) set_ok = 1;
+    }
+    if(set_ok)
     {
       fts_set_symbol(&a, meter_sym);
       propobj_set_property_by_index((propobj_t *)self, scomark_propidx_meter, &a);    
@@ -508,6 +516,7 @@ scomark_config(void)
   sym_meter_2_4 = fts_new_symbol("2/4");
   sym_meter_3_4 = fts_new_symbol("3/4");
   sym_meter_4_4 = fts_new_symbol("4/4");
+  sym_meter_empty = fts_new_symbol("*");
   
   scomark_class = fts_class_install(seqsym_scomark, scomark_instantiate);
 }
@@ -539,37 +548,106 @@ marker_track_get_previous_meter(track_t *marker_track, scomark_t *scomark, fts_s
     return NULL;
 }
 
+static scomark_t *
+marker_track_get_next_bar(track_t *marker_track, scomark_t *scomark)
+{
+  event_t *mark_evt = (event_t *)fts_object_get_context((fts_object_t *)scomark);    
+  event_t *next_evt = event_get_next(mark_evt);
+  scomark_t *next_marker = NULL;
+  
+  while(next_evt != NULL)
+  {
+    next_marker = (scomark_t *)fts_get_object( event_get_value(next_evt));
+    if(scomark_is_bar(next_marker))
+      break;
+    next_evt = event_get_next(next_evt);
+  }
+  if(next_evt != NULL)
+    return next_marker;
+  else
+    return NULL;
+}
+
+
 static void
 marker_track_meter_changed(track_t * marker_track, scomark_t *scomark, fts_symbol_t old_meter, fts_symbol_t new_meter, int upload)
 {  
   if(new_meter != NULL && old_meter != NULL)
   {
     track_t *track = (track_t *)fts_object_get_context((fts_object_t *)marker_track);
-    event_t *first_mark_evt = (event_t *)fts_object_get_context((fts_object_t *)scomark);    
-    event_t *mark_evt = first_mark_evt;
-    double begin = event_get_time(mark_evt);
-    double end = 2.0 * track_get_total_duration(track);
-    double t = -1.0;
-    event_t *first = NULL;
-    event_t *after = NULL;
-    scomark_t *marker = NULL;
+    event_t *marker_evt = (event_t *)fts_object_get_context((fts_object_t *)scomark);    
+    scomark_t *next_bar = marker_track_get_next_bar(marker_track, scomark);
+    double next_bar_time = -1.0;
+    event_t *next_evt = NULL;
     
-    /*mark_evt = event_get_next(mark_evt);
-    if(mark_evt != NULL)
+    if(next_bar != NULL)
     {
-      scomark_bar_get_meter((scomark_t *)fts_get_object( event_get_value(mark_evt)), &t);
+      fts_symbol_t meter = NULL;
+      double next_time = -1.0;
+      double bar_duration = 0.0;
+      double tempo = -1.0;
+      int numerator = 0;
+      int denominator = 0;
       
-      while(mark_evt != NULL && t < 0.0)
+      /* set meter of next bar */
+      scomark_bar_get_meter(next_bar, &meter);
+      if(meter == NULL) 
       {
-        scomark_get_tempo((scomark_t *)fts_get_object( event_get_value(mark_evt)), &t);
-        mark_evt = event_get_next(mark_evt);
+        scomark_bar_set_meter( next_bar, old_meter, &meter);
+        event_set_at_client((event_t *)fts_object_get_context((fts_object_t *)next_bar));
       }
+      /* get timetag of current next bar */
+      next_evt = (event_t *)fts_object_get_context((fts_object_t *)next_bar);    
+      next_bar_time = event_get_time(next_evt);      
+    
+      /* calculate timetag of future next bar  */
+      scomark_get_tempo(scomark, &tempo);
+      if(tempo < 0.0)
+        marker_track_get_previous_tempo(marker_track, scomark, &tempo);
+        
+      scomark_meter_symbol_get_quotient(new_meter, &numerator, &denominator);
+      bar_duration = ((double)numerator * 240000.0) / (tempo * (double)denominator);
+      next_time = event_get_time(marker_evt) + bar_duration; 
       
-      if(mark_evt != NULL)
-        end = event_get_time(mark_evt);
+      /* is quite the next event so do nothing */
+      if(next_time < next_bar_time + MARKERS_BAR_TOLERANCE && next_time > next_bar_time - MARKERS_BAR_TOLERANCE)
+        return;
+      
+      /* insert enough new bars */
+      if(next_time < next_bar_time - MARKERS_BAR_TOLERANCE)
+      {
+        int last_number = -1;
+        scomark_t *new_bar = NULL;
+        event_t *new_event = NULL;
+        scomark_bar_get_number( scomark, &last_number);
+        
+        while(next_time < next_bar_time - MARKERS_BAR_TOLERANCE)
+        {
+          new_bar = marker_track_insert_marker(marker_track, next_time, seqsym_bar, &new_event);     
+          scomark_bar_set_number( new_bar, ++last_number);
+          next_time = next_time + bar_duration;
+  
+          track_upload_event(marker_track, new_event);
+        }
+
+        /* devo rinumerare tutte le bar */
+        marker_track_renumber_bars(marker_track, next_evt, last_number+1, 1);
+        /* l'ultimo bar se non coicide con next_bar avrˆ metrics == * */
+        if(next_time > next_bar_time + MARKERS_BAR_TOLERANCE)
+        {
+          scomark_bar_set_meter( new_bar, sym_meter_empty, &old_meter);
+          event_set_at_client(new_event);
+        }
+      }
+      else
+      {
+        /*next_bar lo sposta a next_time e shifta markers and events di delta (dove delta = next_time - next_bar_time)*/
+      }
     }
+
+    
     // stretch scoob track 
-    track_segment_get(track, begin, end, &first, &after);
+    /*track_segment_get(track, begin, end, &first, &after);
     if(first != NULL)
     {
       track_segment_stretch(track, first, after, begin, end, stretch);
@@ -638,7 +716,7 @@ marker_track_get_previous_tempo(track_t *marker_track, scomark_t *scomark, doubl
 {
   event_t *mark_evt = (event_t *)fts_object_get_context((fts_object_t *)scomark);    
   event_t *prev = event_get_prev(mark_evt);
-  scomark_t *marker;
+  scomark_t *marker = NULL;
   
   while(prev != NULL && *tempo <= 0.0)
   {
@@ -802,7 +880,7 @@ marker_track_insert_marker(track_t *marker_track, double time, fts_symbol_t type
 }
 
 void 
-marker_track_renumber_bars(track_t *marker_track, event_t *start, int start_num)
+marker_track_renumber_bars(track_t *marker_track, event_t *start, int start_num, int upload)
 {  
   int num = start_num;
   event_t *event = start;
@@ -811,7 +889,10 @@ marker_track_renumber_bars(track_t *marker_track, event_t *start, int start_num)
   { 
     scomark_t *marker = (scomark_t *)fts_get_object( event_get_value(event));
     if(marker->type == seqsym_bar)
+    {
       scomark_bar_set_number(marker, num++);
+      if(upload) event_set_at_client(event);
+    }
     event = event_get_next(event);
   }  
 }
@@ -826,10 +907,12 @@ marker_track_append_bar(track_t *marker_track)
   {
     event_t *marker_event = track_get_first(marker_track);
     event_t *last_bar = NULL;
+    scomark_t *last_scomark_bar = NULL;
     scomark_t *scomark = NULL;
     scomark_t *new_bar = NULL;
     fts_symbol_t last_meter = NULL;
     fts_symbol_t meter = NULL;
+    fts_symbol_t old_meter = NULL;
     int last_number = 0;
     int numerator = 0;
     int denominator = 0;
@@ -840,7 +923,7 @@ marker_track_append_bar(track_t *marker_track)
     double next_bar_time = 0.0;
     
     /* get last bar meter and tempo */
-    while(marker_event != NULL && next_bar_time == 0.0)
+    while(marker_event != NULL)
     {
       double t = NULL;
       scomark = (scomark_t *)fts_get_object(event_get_value(marker_event));
@@ -852,8 +935,9 @@ marker_track_append_bar(track_t *marker_track)
       if(scomark_is_bar(scomark))
       {
         last_bar = marker_event;
+        last_scomark_bar = scomark;
         scomark_bar_get_meter(scomark, &meter);
-        if( meter != NULL) last_meter = meter;
+        if( meter != NULL && meter != sym_meter_empty) last_meter = meter;
         last_tempo = tempo;
         scomark_bar_get_number( scomark, &last_number);
       }  
@@ -864,7 +948,6 @@ marker_track_append_bar(track_t *marker_track)
     if(last_bar == NULL)
     {
       double old_tempo = 0.0;
-	  fts_symbol_t old_meter = NULL;
       /* insert first bar with default metrics and tempo */
       new_bar = marker_track_insert_marker(marker_track, 0.0, seqsym_bar, &new_event);      
       scomark_bar_set_meter( new_bar, sym_meter_4_4, &old_meter);
@@ -872,7 +955,7 @@ marker_track_append_bar(track_t *marker_track)
       scomark_bar_set_number( new_bar, 0);
     }
     else
-    {
+    {      
       scomark_meter_symbol_get_quotient(last_meter, &numerator, &denominator);
       
       bar_duration = ((double)numerator * 240000.0) / (last_tempo * (double)denominator);
@@ -909,9 +992,14 @@ marker_track_append_bar(track_t *marker_track)
             time = event_get_time(marker_event);
         }
       }
-      
+      /*unset meter on last bar*/
+      scomark_bar_get_meter(last_scomark_bar, &meter);
+      if(meter == sym_meter_empty)
+        event_unset_property(last_bar, seqsym_meter);
+
       new_bar = marker_track_insert_marker(marker_track, next_bar_time, seqsym_bar, &new_event);     
       scomark_bar_set_number( new_bar, last_number+1);
+      scomark_bar_set_meter( new_bar, sym_meter_empty, &old_meter);/*set empty_meter on last bar*/
     }
   }
   return new_event;

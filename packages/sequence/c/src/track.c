@@ -37,7 +37,7 @@
 fts_class_t *track_class = 0;
 
 static void track_upload_markers(track_t *self);
-static void track_upload_event(track_t *this, event_t *event, fts_array_t *temp_array);
+static void track_upload_event_with_array(track_t *this, event_t *event, fts_array_t *temp_array);
 static void track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 
@@ -255,17 +255,11 @@ track_add_event(track_t *track, double time, event_t *event)
 
 void
 track_add_event_and_upload(track_t *track, double time, event_t *event)
-{
-  fts_array_t temp_array;
-  
+{  
   track_add_event(track, time, event);
   
   if(track_editor_is_open(track))
-  {
-    fts_array_init(&temp_array, 0, 0);
-    track_upload_event( track, event, &temp_array);
-    fts_array_destroy(&temp_array);
-  }
+    track_upload_event( track, event);
   
   fts_object_set_state_dirty((fts_object_t *)track);
 }
@@ -668,7 +662,6 @@ track_insert_marker_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_symbol_t sc_type = fts_get_symbol(at + 1);
   track_t *markers = self;
   event_t *event = NULL;
-  fts_array_t temp_array;
   
   if(tr_type != seqsym_scomark)
   {
@@ -677,10 +670,7 @@ track_insert_marker_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int
   }
   marker_track_insert_marker(markers, time, sc_type, &event);
   
-  /* upload the event */
-  fts_array_init(&temp_array, 0, 0);
-  track_upload_event(markers, event, &temp_array);
-  fts_array_destroy(&temp_array);
+  track_upload_event(markers, event);
   
   fts_object_set_state_dirty((fts_object_t *)self);
 }
@@ -728,7 +718,6 @@ _track_append_bar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   track_t *self = (track_t *)o;
   track_t *markers = self;
   event_t *new_bar = NULL;
-  fts_array_t temp_array;
   fts_symbol_t tr_type = fts_class_get_name( track_get_type(self));
   
   if(tr_type != seqsym_scomark)
@@ -738,13 +727,9 @@ _track_append_bar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   }
   new_bar = marker_track_append_bar( markers);
  
-  /* upload the event */
-  fts_array_init(&temp_array, 0, 0);
-  track_upload_event(markers, new_bar, &temp_array);
-  fts_array_destroy(&temp_array);
+  track_upload_event(markers, new_bar);
 }
 
-#define MARKERS_BAR_TOLERANCE 20.0 /* tolerance for bars */
 #define MARKERS_BAR_EPSILON 0.001
 
 static void
@@ -859,7 +844,7 @@ _track_make_bars(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       next_bar_time += ((double)numerator * 240000.0) / (tempo * (double)denominator);
     }      
     
-    marker_track_renumber_bars(markers, track_get_first(markers), 0);
+    marker_track_renumber_bars(markers, track_get_first(markers), 0, 0);
     
     if(track_editor_is_open(self))
       fts_send_message((fts_object_t *)self->markers, fts_s_upload, 0, NULL);
@@ -1648,7 +1633,7 @@ track_upload_property_list(track_t *self, fts_array_t *temp_array)
 }
 
 static void
-track_upload_event(track_t *self, event_t *event, fts_array_t *temp_array)
+track_upload_event_with_array(track_t *self, event_t *event, fts_array_t *temp_array)
 {
   fts_class_t *type = event_get_type(event);
   fts_atom_t a[4];
@@ -1706,6 +1691,16 @@ track_upload_event(track_t *self, event_t *event, fts_array_t *temp_array)
   }
 }
 
+void
+track_upload_event(track_t *self, event_t *event)
+{
+  fts_array_t temp_array;  
+  
+  fts_array_init(&temp_array, 0, 0);
+  track_upload_event_with_array( self, event, &temp_array);
+  fts_array_destroy(&temp_array);
+}
+
 static void
 track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1737,7 +1732,7 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   {
     /* create event at client */
     if(fts_object_has_client((fts_object_t *)event) == 0)
-      track_upload_event(self, event, &temp_array);
+      track_upload_event_with_array(self, event, &temp_array);
     else
       event_set_at_client(event);/*?????????*/
       
@@ -1838,7 +1833,7 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 	      fts_set_int(&ret, size);
         
         if(self->markers)
-          marker_track_renumber_bars(self->markers, track_get_first(self->markers), 0);
+          marker_track_renumber_bars(self->markers, track_get_first(self->markers), 0, 0);
         
 	      track_update_editor(self);
       }

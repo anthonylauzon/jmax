@@ -46,6 +46,12 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
       ((TrackEvent)obj).setCurrentProperties( args.getLength(), args.getAtoms());
   }
 		});
+  FtsObject.registerMessageHandler( TrackEvent.class, FtsSymbol.get("unset"), new FtsMessageHandler(){
+    public void invoke( FtsObject obj, FtsArgs args)
+    {
+      ((TrackEvent)obj).unsetCurrentProperty( args.getSymbol(0));
+    }
+  });
 }
 
 public TrackEvent(FtsServer server, FtsObject parent, int objId, String className, FtsAtom args[], int offset, int length)
@@ -211,6 +217,12 @@ public void unsetProperty( String name)
     
   if( value != null)
     value.unsetProperty( name);
+}
+
+public void unsetCurrentProperty(FtsSymbol prop)
+{
+  if( value != null)
+    value.unsetProperty(prop.toString());
 }
 
 void sendSetProperty( String propName, Object propValue)

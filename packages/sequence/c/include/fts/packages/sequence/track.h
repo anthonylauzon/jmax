@@ -52,6 +52,8 @@ struct _track_
   track_t *markers;
 };
 
+#define MARKERS_BAR_TOLERANCE 20.0 /* tolerance for bars */
+
 #define track_get_name(t) (NULL)
 #define track_set_name(t, n)
 
@@ -84,6 +86,8 @@ extern void track_remove_event(track_t *track, event_t *event);
 extern void track_remove_event_and_upload(track_t *track, event_t *event);
 extern void track_move_event(track_t *track, event_t *event, double time);
 extern void track_update_editor (track_t *self);
+
+extern void track_upload_event(track_t *self, event_t *event);
 
 extern void track_merge(track_t *track, track_t *merge);
 extern void track_clear(track_t *track);

@@ -78,6 +78,20 @@ event_set_duration(event_t *event, double duration)
   }
 }
 
+void event_unset_property(event_t *event, fts_symbol_t prop)
+{
+  fts_atom_t *value = &event->value;
+  if(fts_is_object(value))
+  {
+    fts_atom_t a;
+  
+    fts_set_symbol(&a, prop);
+    propobj_remove_property( fts_get_object(value), 0, NULL, 1, &a);
+  
+    /* poi mandare unset al cliente */
+    fts_client_send_message((fts_object_t *)event, fts_s_unset, 1, &a);
+  }
+}
 /**************************************************************
 *
 *  generic event methods

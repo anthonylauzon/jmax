@@ -69,5 +69,6 @@ extern void event_set_duration(event_t *event, double duration);
  */
 void event_set_at_client(event_t *this);
 
+void event_unset_property(event_t *event, fts_symbol_t prop);
 
 #endif

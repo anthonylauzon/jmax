@@ -312,7 +312,7 @@ scoob_append_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_array_append_symbol(array, seqsym_pitch);
   fts_array_append_float(array, self->pitch);
   
-        fts_array_append_symbol(array, seqsym_interval);
+  fts_array_append_symbol(array, seqsym_interval);
   fts_array_append_float(array, self->interval);
   
   fts_array_append_symbol(array, seqsym_duration);
