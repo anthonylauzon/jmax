@@ -23,13 +23,12 @@
 #define DSP_CONTROL_INVALID_FPE_STATE   2
 #define DSP_CONTROL_DIVIDE0_FPE_STATE   3
 #define DSP_CONTROL_OVERFLOW_FPE_STATE  4
-#define DSP_CONTROL_INEXACT_FPE_STATE   5
-#define DSP_CONTROL_SAMPLING_RATE       6
-#define DSP_CONTROL_FIFO_SIZE           7
-#define DSP_CONTROL_DSP_ON              8
+#define DSP_CONTROL_SAMPLING_RATE       5
+#define DSP_CONTROL_FIFO_SIZE           6
+#define DSP_CONTROL_DSP_ON              7
 
-#define DSP_CONTROL_FPE_START_COLLECT   9
-#define DSP_CONTROL_FPE_STOP_COLLECT   10
+#define DSP_CONTROL_FPE_START_COLLECT   8
+#define DSP_CONTROL_FPE_STOP_COLLECT    9
 
 
 extern fts_dev_t * fts_dsp_get_dac_slip_dev();
@@ -48,7 +47,6 @@ typedef struct fts_dsp_control
 
   int prev_dac_slip;
   int prev_invalid_fpe;
-  int prev_inexact_fpe;
   int prev_divide0_fpe;
   int prev_overflow_fpe;
 } fts_dsp_control_t;
@@ -60,7 +58,6 @@ static void fts_dsp_control_poll(fts_alarm_t *alarm, void *data)
   fts_atom_t a;
   int dac_slip;
   int invalid_fpe;
-  int inexact_fpe;
   int divide0_fpe;
   int overflow_fpe;
   unsigned int fpe_state;
@@ -87,17 +84,6 @@ static void fts_dsp_control_poll(fts_alarm_t *alarm, void *data)
 
       fts_set_int(&a, invalid_fpe);
       fts_data_remote_call((fts_data_t *)this, DSP_CONTROL_INVALID_FPE_STATE, 1, &a);
-    }
-
-
-  inexact_fpe  = ((fpe_state & FTS_INEXACT_FPE) ? 1 : 0);
-
-  if (inexact_fpe != this->prev_inexact_fpe)
-    {
-      this->prev_inexact_fpe = inexact_fpe;
-
-      fts_set_int(&a, inexact_fpe);
-      fts_data_remote_call((fts_data_t *)this, DSP_CONTROL_INEXACT_FPE_STATE, 1, &a);
     }
 
   divide0_fpe  = ((fpe_state & FTS_DIVIDE0_FPE) ? 1 : 0);
@@ -135,7 +121,6 @@ static fts_data_t *fts_dsp_control_new(int ac, const fts_atom_t *at)
 
   this->prev_dac_slip = 0;
   this->prev_invalid_fpe = 0;
-  this->prev_inexact_fpe = 0;
   this->prev_divide0_fpe = 0;
   this->prev_overflow_fpe = 0;
 
