@@ -381,6 +381,8 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
     fixSize();
 
+    KeyEventsManager.addProducer(this);
+
     requestDefaultFocus(); 
 
     //glass = ((GlassPanel)((JFrame)itsEditorContainer.getFrame()).getGlassPane());
@@ -716,18 +718,20 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
   public void Close(boolean doCancel)
   {
-    if (! itsDocument.isRootData(itsPatcherData))
-      {
-	itsPatcherData.stopUpdates();
-	Mda.dispose(itsPatcherData); 
-      }
-    else 
-      {
-	if(PatcherSaveManager.saveClosing(getEditorContainer(), doCancel))
-	  itsDocument.dispose();
-	// Just call dispose on the document
-	// Mda will indirectly call Destroy, and will close all the other editors
-      }
+      if (! itsDocument.isRootData(itsPatcherData))
+	  {
+	      itsPatcherData.stopUpdates();
+	      Mda.dispose(itsPatcherData); 
+	  }
+      else 
+	  {
+	      if(PatcherSaveManager.saveClosing(getEditorContainer(), doCancel))
+		  itsDocument.dispose();
+	      // Just call dispose on the document
+	      // Mda will indirectly call Destroy, and will close all the other editors
+	  }
+    
+      KeyEventsManager.removeProducer(this);
   }
 
   

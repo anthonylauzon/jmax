@@ -90,7 +90,6 @@ public class Standard extends Editable implements FtsObjectErrorListener
     super.redefine(text);
   }
 
-
   public void editContent()
   {
     itsSketchPad.waiting();
