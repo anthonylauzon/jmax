@@ -24,23 +24,16 @@
 
 
 
-ROOTDIR = ../../../../..
-PACKAGE_DIR = ircam/jmax/toolkit
+ROOTDIR = ../../../../../..
+PACKAGE_DIR = ircam/jmax/toolkit/menus
 
 include $(ROOTDIR)/java/Makefiles/Makefile.common
 
-all: local_all
-	(cd actions ; $(MAKE) all)
-	(cd menus ; $(MAKE) all)
+all: $(CLASSES)
 .PHONY: all
 
-local_all: $(CLASSES)
-.PHONY: local_all
-
-clean: local_clean	
-	(cd actions ; $(MAKE) clean)
-	(cd menus ; $(MAKE) clean)
+clean: local_clean
+.PHONY: clean
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
-
 
