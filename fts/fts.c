@@ -28,6 +28,10 @@
 #include <ftsprivate/package.h>
 #include <fts/project.h>
 
+#include <common/config.h>
+
+
+static char l_appName[1024];
 
 /***********************************************************************
  * 
@@ -57,48 +61,69 @@ fts_symbol_t fts_cmd_args_get( fts_symbol_t name)
   return 0;
 }
 
-static void fts_cmd_args_parse( int argc, char **argv)
+// "pass" must be 1 or 2
+// 1 is for special arguments
+// 2 is for fts-style args
+static void fts_cmd_args_parse( int argc, char **argv, int pass)
 {
-  int filecount = 1;
-  char filevar[32];
-  fts_symbol_t name, value, s_yes;
-
-  fts_hashtable_init( &cmd_args, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
-
-  s_yes = fts_new_symbol( "yes");
-
-  argc--;
-  argv++;
-  while (argc)
+    int filecount = 1;
+    char filevar[32];
+    fts_symbol_t name, value, s_yes;
+    
+    if(pass == 2) {
+        fts_hashtable_init( &cmd_args, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+        s_yes = fts_new_symbol( "yes");
+    }
+    
+    argc--;
+    argv++;
+    while (argc)
     {
-      if (!strncmp( *argv, "--", 2))
-	{
-	  char *p = strchr( *argv, '=');
+        // special hard coded arguments
+        if (!strcmp( *argv, "-appname"))
+        {
+            argv++;
+            argc--;
+            if(!argc)
+                break;
 
-	  if (p != NULL)
-	    *p = '\0';
-
-	  name = fts_new_symbol_copy( *argv + 2);
-
-	  if (p == NULL || p[1] == '\0')
-	    value = s_yes;
-	  else
-	    {
-	      p++;
-	      value = fts_new_symbol_copy( p);
-	    }
-	}
-      else
-	{
-	  sprintf( filevar, "file%d", filecount++);
-	  name = fts_new_symbol_copy( filevar);
-	  value = fts_new_symbol_copy( *argv);
-	}
-
-      fts_cmd_args_put( name, value);
-
-      argc--;
-      argv++;
+            if(pass==1) {
+                strcpy(l_appName, *argv);
+            }
+        }
+        
+        // other arguments
+        else if(pass == 2)
+        {
+            if (!strncmp( *argv, "--", 2))
+            {
+                char *p = strchr( *argv, '=');
+                
+                if (p != NULL)
+                    *p = '\0';
+                
+                name = fts_new_symbol_copy( *argv + 2);
+                
+                if (p == NULL || p[1] == '\0')
+                    value = s_yes;
+                else
+                {
+                    p++;
+                    value = fts_new_symbol_copy( p);
+                }
+            }
+            else
+            {
+                sprintf( filevar, "file%d", filecount++);
+                name = fts_new_symbol_copy( filevar);
+                value = fts_new_symbol_copy( *argv);
+            }
+            
+            fts_cmd_args_put( name, value);
+        }
+        
+        argc--;
+        argv++;
     }
 }
 
@@ -114,6 +139,8 @@ fts_symbol_t fts_get_root_directory( void)
   /* if not passed on command line, use the platform specific default value */
   return fts_get_default_root_directory();
 }
+
+
 
 void fts_load_project( void)
 {
@@ -140,7 +167,57 @@ void fts_load_project( void)
     fts_log("[boot]: Starting fts with an empty project. This is probably not what you want. Make sure you have a valid project file.\n");
     fts_project_set(fts_project_new(project_symbol));
   } else {
-    fts_project_set(fts_project_open(fts_symbol_name( project_file)));
+
+#ifndef WIN32
+#error "Implemented for win32 only!"
+#else
+      const char *path, *name;
+      char *prjname;
+      char tempname[1024];
+      const char *local_dir, *user_local_dir;
+      
+      // Retrieve the file name from the file path.
+      path = fts_symbol_name(project_file);
+      name = fts_get_basename(path);
+                  
+      local_dir = fts_config_get_local_config_dir();
+      user_local_dir = fts_config_get_user_local_config_dir();
+
+      _snprintf(tempname, sizeof(tempname)-1, "%s\\%s", user_local_dir, name);
+      if(fts_file_exists(tempname)) {
+          prjname = tempname;
+          fts_log("[fts] using user local file as project file: '%s'\n", prjname);
+      }
+      else {
+          _snprintf(tempname, sizeof(tempname)-1, "%s\\%s", local_dir, name);
+          if(fts_file_exists(tempname)) {
+              prjname = tempname;
+              fts_log("[fts] using local file as project file: '%s'\n", prjname);
+          }
+          else {
+              int errcode;
+
+              _snprintf(tempname, sizeof(tempname)-1, "%s\\%s", user_local_dir, name);
+
+              fts_log("[fts] copying default project file to user local file:\n");
+              fts_log("[fts] copying '%s' to '%s'...\n", path, tempname);
+
+              if( (errcode = fts_copy_file(path, tempname)) < 0 ) {
+                  fts_log("[fts] copy FAILED (reason code: %d).\n", errcode);
+                  prjname = name;
+              }
+              else {
+                  fts_log("[fts] done.\n");
+                  prjname = tempname;
+              }
+
+              prjname = tempname;
+              fts_log("[fts] using '%s' as project file.\n", prjname);
+          }
+      }
+#endif
+      
+      fts_project_set(fts_project_open(prjname));
   }
 }
 
@@ -250,15 +327,33 @@ static void fts_kernel_classes_config( void)
 
 void fts_init( int argc, char **argv)
 {
+  int i;
+
+  strcpy(l_appName, "fts");
+
+  /* 1st pass */
+  fts_cmd_args_parse( argc, argv, 1);
+
+  /* config.c initialization */
+  fts_config_init(l_appName, fts_log);
+  fts_config_log_info();
+ 
   fts_log("[fts]: Kernel initialization\n");
 
   /* Initialization */
   fts_kernel_init();
 
-  fts_log("[fts]: Parsing command line arguments\n");
-
   /* Must be here, since it can be used by further modules */
-  fts_cmd_args_parse( argc, argv);
+  fts_log("[fts]: Parsing command line arguments:\n");
+
+  /* 2nd pass */
+  fts_cmd_args_parse( argc, argv, 2);
+
+  fts_log("[fts]: FTS Command line: ");
+  for (i = 0; i < argc; i++) {
+    fts_log("%s ", argv[i]);
+  }
+  fts_log("\n");
 
   fts_log("[fts]: Platform initialization\n");
 
