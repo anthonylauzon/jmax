@@ -1,5 +1,5 @@
 C_TARGETS= fts1.5 manoury eric
-JAVA_TARGETS=table qlist
+JAVA_TARGETS=table qlist explode
 
 all: all_c all_java
 .PHONY: all
