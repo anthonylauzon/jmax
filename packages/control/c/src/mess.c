@@ -58,6 +58,17 @@ mess_args(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
+mess_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  mess_t *this = (mess_t *)o;
+
+  if(ac == 1 && fts_get_selector(at) == s)
+    mess_args(o, 0, 0, 1, at);
+  else
+    fts_object_signal_runtime_error(o, "Doesn't understand '%s'", fts_symbol_name(s));
+}
+
+static void
 mess_set_selector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mess_t *this = (mess_t *)o;
@@ -161,6 +172,7 @@ mess_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_float, mess_args);
   fts_method_define_varargs(cl, 0, fts_s_symbol, mess_args);
   fts_method_define_varargs(cl, 0, fts_s_list, mess_args);
+  fts_method_define_varargs(cl, 0, fts_s_anything, mess_anything);
 
   fts_method_define_varargs(cl, 1, fts_s_symbol, mess_set_selector);
   fts_method_define_varargs(cl, 1, fts_s_list, mess_set_method);

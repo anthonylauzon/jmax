@@ -163,7 +163,7 @@ segment_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static fts_status_t
 segment_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(segment_t), 0, 0, 0); 
+  fts_class_init(cl, sizeof(segment_t), 1, 0, 0); 
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, segment_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, segment_delete);
@@ -171,9 +171,9 @@ segment_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, segment_get_array);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_array, segment_set);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("duration"), segment_set_duration);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("attack"), segment_set_attack);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("release"), segment_set_release);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("duration"), segment_set_duration);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("attack"), segment_set_attack);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("release"), segment_set_release);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, segment_print);
 

@@ -62,7 +62,7 @@ struct _track_
 #define track_get_first(t) ((t)->first)
 #define track_get_last(t) ((t)->last)
 #define track_get_size(t) ((t)->size)
-#define track_get_duration(t) ((t)->last->time)
+#define track_get_duration(t) (((t)->last)? (t)->last->time: 0.0)
 
 #define track_is_active(t) ((t)->active != 0)
 
