@@ -13,6 +13,6 @@ ObjectSetViewer.java\
 SimpleLed.java
 
 JAVAC= @JAVACX@
-JAVACFLAGS= @JAVACFLAGSX@
-JAVAROOT= @top_srcdir@/java/src
-CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):@top_srcdir@/client/java/ftsclient.jar
+JAVACFLAGS= @JAVACFLAGSX@ -sourcepath $(top_srcdir)/java/src
+JAVAROOT= $(top_builddir)/java/src
+CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/client/java/ftsclient.jar
