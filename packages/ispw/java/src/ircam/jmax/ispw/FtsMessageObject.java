@@ -50,22 +50,22 @@ public class FtsMessageObject extends FtsIntValueObject
   String message; // the message content
   
   public FtsMessageObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
-    {
-	super(fts, parent, "messbox", FtsParse.unparseArguments(nArgs, args));
-    
-	ninlets = 1;
-	noutlets = 1;
-    
-	message = FtsParse.unparseArguments(nArgs, args);
+  {
+      super(fts, parent, "messbox", FtsMessageObject.preParseMessage(FtsParse.unparseArguments(nArgs, args)));
+      
+      ninlets = 1;
+      noutlets = 1;
+      
+      message = FtsMessageObject.preParseMessage(FtsParse.unparseArguments(nArgs, args));
   }
 
   /** Set the message content. Tell the server, too */
 
   public void setMessage(String message)
   {
-    this.message = message;
-    getFts().getServer().sendSetMessage(this, message);
-    setDirty();
+      this.message = message;
+      getFts().getServer().sendSetMessage(this, message);
+      setDirty();
   }
 
   /** Get the message content. */
@@ -80,11 +80,36 @@ public class FtsMessageObject extends FtsIntValueObject
   public void handleMessage(String selector, int nArgs, FtsAtom args[])
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
-    this.message = FtsParse.unparseArguments(nArgs, args);
+    this.message = FtsMessageObject.preParseMessage(FtsParse.unparseArguments(nArgs, args));
     setDirty();
 
     if (listener instanceof FtsMessageListener)
       ((FtsMessageListener) listener).messageChanged(message);
+  }
+
+  private static String preParseMessage(String text)
+  {
+      int index = text.indexOf(';', 0);
+      int size = text.length();
+      while(index > 0)
+      { 
+	  if(index<size-2)
+	      {
+		  if(!text.substring(index+1, index+2).equals("\n"))
+		      if(text.substring(index+1, index+2).equals(" "))
+			  text = text.substring(0, index+1)+"\n"+text.substring(index+2);
+		      else
+			  text = text.substring(0, index+1)+"\n"+text.substring(index+1);
+	      }
+	  else
+	      {
+		  if((index == size-2)&&(text.endsWith(" ")))
+		      text = text.substring(0, index);
+	      }
+	  
+	  index = text.indexOf(';', index+1);
+      }
+      return text;
   }
 }
 

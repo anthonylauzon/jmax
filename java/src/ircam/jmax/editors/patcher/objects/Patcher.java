@@ -135,6 +135,11 @@ public class Patcher extends Editable implements FtsObjectErrorListener
 	else 
 	    return Settings.sharedInstance().getObjColor();
   }
+    
+  public boolean isMultiline()
+  {
+      return true;
+  }
 
   // ----------------------------------------
   // Inspector

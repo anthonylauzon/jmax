@@ -121,8 +121,8 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
 	System.err.println("Error in redefining object, action cancelled");
       }
 
-    redraw();
-    setWidth(getWidth());
+    setWidthToText(getArgs());
+
     super.redefine(text); 
   }
 
@@ -186,6 +186,11 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
 	else
 	  return Color.lightGray;
       }
+  }
+
+  public boolean isMultiline()
+  {
+    return false;
   }
 
   // ----------------------------------------

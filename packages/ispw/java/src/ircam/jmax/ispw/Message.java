@@ -85,9 +85,14 @@ public class Message extends Editable implements FtsMessageListener, FtsIntValue
     return 4;
   }
 
+  public boolean isMultiline()
+  {
+      return true;
+  }
+
   public void redefine( String text) 
   {
-    ((FtsMessageObject)ftsObject).setMessage( text);
+      ((FtsMessageObject)ftsObject).setMessage( text);
   }
 
   // Set the text when FTS change the message content

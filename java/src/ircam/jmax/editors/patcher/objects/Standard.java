@@ -97,9 +97,9 @@ public class Standard extends Editable implements FtsObjectErrorListener
     ftsObject.sendMessage(FtsObject.systemInlet, "open_editor");
 
     ftsObject.getFts().editPropertyValue( ftsObject, new MaxDataEditorReadyListener() {
-	public void editorReady(MaxDataEditor editor)
-	{itsSketchPad.stopWaiting();}
-      });
+	    public void editorReady(MaxDataEditor editor)
+	    {itsSketchPad.stopWaiting();}
+	});
   }
 
   public boolean hasContent()
@@ -158,6 +158,11 @@ public class Standard extends Editable implements FtsObjectErrorListener
 	return Settings.sharedInstance().getObjColor();
     else
       return Color.white;
+  }
+
+  public boolean isMultiline()
+  {
+      return true;
   }
 
   // ----------------------------------------
