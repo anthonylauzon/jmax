@@ -390,7 +390,8 @@ play_ftl(fts_word_t *argv)
   fts_idefix_set_float(&index, position);
   
   /* if vector is empty we output zero ... */
-  if (0 == fvec_get_size(fvec))
+  if ((0 == fvec_get_size(fvec))
+      || (mode_stop == self->mode))
   {
     int j;
     for (j = 0; j < n_tick; ++j)
@@ -400,7 +401,7 @@ play_ftl(fts_word_t *argv)
     return;
   }
 
-  if(self->mode <= mode_pause)
+  if(self->mode == mode_pause)
   {
     /* stop or pause */
     float f;
