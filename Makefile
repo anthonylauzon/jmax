@@ -166,7 +166,10 @@ spec-files:
 # dist
 # does a cvs export and a .tar.gz of the sources
 #
-src-dist: spec-files cvs-tag 
+src-dist: $(distfile)
+.PHONY: src-dist
+
+$(distfile): spec-files cvs-tag 
 	rm -rf $(distdir)
 	umask 22
 	mkdir $(distdir)
@@ -174,12 +177,11 @@ src-dist: spec-files cvs-tag
 	tar cvf - $(distdir) | gzip -c --best > $(distfile)
 	chmod 644 $(distfile)
 	rm -rf $(distdir)
-.PHONY: src-dist
 
 
 #
-# rpm
-# builds a rpm
+# rpm targets
+# builds a rpm on various architectures
 #
 rpm-i686: $(distfile)
 	umask 22
@@ -192,6 +194,27 @@ rpm-ppc: $(distfile)
 	cp -fv $(distfile) /usr/src/redhat/SOURCES
 	tar xvzf $(distfile) -O jmax-$(version)/pkg/rpm/jmax.spec > /usr/src/redhat/SPECS/jmax.spec
 	(cd /usr/src/redhat/SPECS ; rpm -ba --target ppc jmax.spec)
+
+#
+# sgipkg targets
+# builds a SGI package
+#
+DEFAULT_BUILD_DIR=/data/build
+
+sgi-pkg: $(distfile)
+	mkdir -p $BUILD_DIR/src
+	gzip -cd $(distfile) | (cd $(BUILD_DIR)/src ; tar xvf -)
+	( cd $(BUILD_DIR)/src/$(distdir) ; gmake ARCH=r10k-irix6.5 all)
+	gzip -cd $(distfile) | tar xvf - -O jmax-$(version)/pkg/rpm/jmax.spec > /tmp/jmax.spec
+	( cd $(BUILD_DIR)/src/$(distdir) ; \
+		/bin/rm -rf /tmp/jmax.idb ; \
+		RAWIDB=/tmp/jmax.idb ; \
+		export RAWIDB ; \
+		gmake ARCH=r10k-irix6.5 INSTALL="install -idb ALL" install ; \
+		sort +4u -6 < /tmp/jmax.idb > /tmp/jmax.idb.sorted ; \
+		/usr/sbin/gendist -root .. -sbase .. -dist .. -idb /tmp/jmax.idb.sorted -spec /tmp/jmax.spec )
+	( cd $(BUILD_DIR)/src/$(distdir) ; tar cvf - jmax jmax.* ) > jmax-$(version).r10k.tardist 
+.PHONY: sgi-pkg
 
 #
 # install
