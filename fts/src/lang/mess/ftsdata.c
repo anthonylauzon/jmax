@@ -75,12 +75,12 @@ static void meta_data_init()
 
 fts_data_class_t *fts_data_class_new( fts_symbol_t data_class_name)
 {
-  void *data;
+  fts_atom_t data;
   fts_data_class_t *class;
   int i;
 
   if (fts_hash_table_lookup(&fts_data_class_table, data_class_name, &data))
-    return (fts_data_class_t *) data;
+    return (fts_data_class_t *) fts_get_ptr(&data);
   else
     {
       class = (fts_data_class_t *)fts_malloc( sizeof( fts_data_class_t));
@@ -95,7 +95,8 @@ fts_data_class_t *fts_data_class_new( fts_symbol_t data_class_name)
       for (i = 0; i < FUNCTION_TABLE_SIZE; i++)
 	class->functions_table[i] = 0;
 
-      fts_hash_table_insert(&fts_data_class_table, data_class_name, (void *)class);
+      fts_set_ptr(&data, class);
+      fts_hash_table_insert(&fts_data_class_table, data_class_name, &data);
 
       return class;
     }
@@ -154,8 +155,11 @@ void fts_data_delete( fts_data_t *d)
 {
   if (d->id != NO_ID)
     {
+      fts_atom_t a;
+
       fts_data_id_remove(d->id, d);
-      fts_data_remote_call(d, REMOTE_RELEASE, 0, 0);
+      fts_set_data(&a, d);
+      fts_data_remote_call( meta_data, REMOTE_RELEASE, 1, &a);
     }
 }
 
@@ -166,7 +170,7 @@ void fts_data_delete( fts_data_t *d)
 
 static void fts_data_remote_new(fts_data_t *d, int ac, const fts_atom_t *at)
 {
-  void *data;
+  fts_atom_t data;
   fts_data_class_t *class;
   fts_data_t *new;
   int id;
@@ -179,7 +183,7 @@ static void fts_data_remote_new(fts_data_t *d, int ac, const fts_atom_t *at)
   id = fts_get_int(&at[0]);
 
   if (fts_hash_table_lookup(&fts_data_class_table, data_class_name, &data))
-    class = (fts_data_class_t *) data;
+    class = (fts_data_class_t *) fts_get_ptr(&data);
   else
     return;			/* error */
 

@@ -5,8 +5,8 @@ import java.lang.*;
 import java.awt.event.*;
 import java.awt.*;
 import ircam.jmax.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
 import com.sun.java.swing.*;
 import com.sun.java.swing.table.*;
 import com.sun.java.swing.event.*;
@@ -17,21 +17,19 @@ import com.sun.java.swing.event.*;
  * It inherits from MaxEditor, and implements the MaxDataEditor Interface.
  * This implementation builds a ScrPanel to represent the score.
  */
-public class Explode extends MaxEditor implements MaxDataEditor, AAAReadme {
+public class Explode extends MaxEditor implements AAAReadme {
 
   /**
    * constructor.
    * It creates a panel that will display the datas in maxData
    */
-  public Explode( MaxData maxData)
+  public Explode(ExplodeRemoteData maxData)
   {
     super( Mda.getDocumentTypeByName( "explodeRemoteData"));
 
-    this.maxData = maxData;
-
     Init();
 
-    setTitle( "Explode");
+    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Explode"));
 
     ExplodeRemoteData explodeRemoteData = (ExplodeRemoteData) maxData;
 
@@ -49,66 +47,10 @@ public class Explode extends MaxEditor implements MaxDataEditor, AAAReadme {
   }
 
 
-  /** 
-   * MaxDataEditor interface
-   */
-  public MaxData getData()
-  {
-    return maxData;
-  }
-
-
-  /** 
-   * MaxDataEditor interface
-   */
-  public void reEdit()
-  {
-    if (!isVisible()) 
-      setVisible(true);
-
-    toFront();
-  }
-
-
-  /** 
-   * MaxDataEditor interface
-   */
-  public void quitEdit()
-  {
-    Close();
-    dispose();
-  }
-
-
-  /** 
-   * MaxDataEditor interface
-   */
-  public void syncData()
-  {
-  }
-
-
-  public void showObject(Object object)
-  {
-  }
-
-  /**
-   * We should Use AbstractMaxDataEditor to build a separate MaxDataEditor
-   * object.
-   */
-
-  public void addEditorReadyListener(MaxEditorReadyListener l)
-  {
-    l.editorReady(this);
-  }
-
-  public void removeEditorReadyListener(MaxEditorReadyListener l)
-  {
-  }
-
   /**
    * personalize the menubar (adds the settings menu)
    */
+
   public void SetupMenu()
   {
     Menu settingsMenu = new Menu("Settings");
@@ -130,7 +72,6 @@ public class Explode extends MaxEditor implements MaxDataEditor, AAAReadme {
 
   //------------------- fields
 
-  MaxData maxData;
   ScrPanel itsPanel;
 }  
 

@@ -13,10 +13,10 @@ static fts_hash_table_t global_name_table; /* the name binding table */
 fts_object_t *
 fts_get_object_by_name(fts_symbol_t name)
 {
-  void *d;
+  fts_atom_t d;
 
   if (fts_hash_table_lookup(&global_name_table, name, &d))
-    return  (fts_object_t *) d;
+    return  (fts_object_t *) fts_get_object(&d);
   else
     return 0;
 }
@@ -25,7 +25,10 @@ fts_get_object_by_name(fts_symbol_t name)
 void
 fts_register_named_object(fts_object_t *obj, fts_symbol_t name)
 {
-  fts_hash_table_insert(&global_name_table, name, (void *)obj);
+  fts_atom_t a;
+
+  fts_set_object(&a, obj);
+  fts_hash_table_insert(&global_name_table, name, &a);
 }
 
 void

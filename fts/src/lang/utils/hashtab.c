@@ -6,28 +6,25 @@ fts_heap_t *hash_cell_heap = 0;
 
 struct _hash_cell_t {
   fts_symbol_t symbol;
-  void *user_data;
+  fts_atom_t user_data;
   struct _hash_cell_t *next;
 };
 
 #define HASH_TABLE_DEFAULT_LENGTH 11
 
-static unsigned int
-hash( const fts_hash_table_t *ht, fts_symbol_t sym)
+static unsigned int hash( const fts_hash_table_t *ht, fts_symbol_t sym)
 {
   return ((unsigned int)sym) % ht->length;
 }
 
-void
-fts_hash_table_init( fts_hash_table_t *ht)
+void fts_hash_table_init( fts_hash_table_t *ht)
 {
   ht->length = HASH_TABLE_DEFAULT_LENGTH;
   ht->cells_cnt = 0;
   ht->table = (hash_cell_t **) fts_zalloc( ht->length * sizeof( hash_cell_t *));
 }
 
-fts_hash_table_t *
-fts_hash_table_new( void)
+fts_hash_table_t *fts_hash_table_new( void)
 {
   fts_hash_table_t *ht;
 
@@ -38,8 +35,7 @@ fts_hash_table_new( void)
   return ht;
 }
 
-void
-fts_hash_table_destroy( fts_hash_table_t *ht)
+void fts_hash_table_destroy( fts_hash_table_t *ht)
 {
   int i;
   hash_cell_t *c, *next;
@@ -58,23 +54,20 @@ fts_hash_table_destroy( fts_hash_table_t *ht)
 }
 
 
-void
-fts_hash_table_free( fts_hash_table_t *ht)
+void fts_hash_table_free( fts_hash_table_t *ht)
 {
   fts_hash_table_destroy( ht);
   fts_free( ht);
 }
 
 
-int
-fts_hash_table_get_count( const fts_hash_table_t *ht)
+int fts_hash_table_get_count( const fts_hash_table_t *ht)
 {
   return ht->cells_cnt;
 }
 
 
-int
-fts_hash_table_lookup( const fts_hash_table_t *ht, fts_symbol_t sym, void **data)
+int fts_hash_table_lookup( const fts_hash_table_t *ht, fts_symbol_t sym, fts_atom_t *data)
 {
   hash_cell_t *first;
   int h;
@@ -89,8 +82,8 @@ fts_hash_table_lookup( const fts_hash_table_t *ht, fts_symbol_t sym, void **data
   return 0;
 }
 
-int
-fts_hash_table_remove( fts_hash_table_t *ht, fts_symbol_t sym)
+
+int fts_hash_table_remove( fts_hash_table_t *ht, fts_symbol_t sym)
 {
   hash_cell_t *item, *prev = 0;
   int h;
@@ -114,8 +107,7 @@ fts_hash_table_remove( fts_hash_table_t *ht, fts_symbol_t sym)
   return 0;
 }
 
-int
-fts_hash_table_insert( fts_hash_table_t *ht, fts_symbol_t sym, void *data)
+int fts_hash_table_insert( fts_hash_table_t *ht, fts_symbol_t sym, fts_atom_t *data)
 {
   hash_cell_t **insert, *new;
   int h;
@@ -132,7 +124,7 @@ fts_hash_table_insert( fts_hash_table_t *ht, fts_symbol_t sym, void *data)
   if ( !new)
     return 0;
   new->symbol = sym;
-  new->user_data = data;
+  new->user_data = *data;
   new->next = 0;
   *insert = new;
 
@@ -140,39 +132,19 @@ fts_hash_table_insert( fts_hash_table_t *ht, fts_symbol_t sym, void *data)
   return 1;
 }
 
-void
-fts_hash_table_apply( const fts_hash_table_t *ht, void (*fun)( fts_symbol_t sym, void *data, void *user_data),  void *user_data)
+
+void fts_hash_table_apply( const fts_hash_table_t *ht, void (*fun)( fts_symbol_t sym, fts_atom_t *data, void *user_data),  void *user_data)
 {
   hash_cell_t *cell;
   int i;
 
   for ( i=0; i<ht->length; i++)
     for ( cell = ht->table[i]; cell; cell = cell->next)
-      (*fun) ( cell->symbol, cell->user_data, user_data);
-}
-
-void
-fts_hash_table_print( const fts_hash_table_t *ht)
-{
-  hash_cell_t *cell;
-  int i;
-
-  for ( i=0; i<ht->length; i++)
-    {
-      if ( ht->table[i] )
-	post( "[%d]\n", i);
-      for ( cell = ht->table[i]; cell; cell = cell->next)
-	{
-	  post( "cell 0x%p { %s, 0x%p, 0x%p}\n", cell, fts_symbol_name(cell->symbol), 
-	       cell->user_data, cell->next);
-	}
-    }
-
+      (*fun) ( cell->symbol, &(cell->user_data), user_data);
 }
 
 
-static void
-fts_hash_table_iterator_skip_null( fts_hash_table_iterator_t *iter, int i)
+static void fts_hash_table_iterator_skip_null( fts_hash_table_iterator_t *iter, int i)
 {
   const fts_hash_table_t *ht;
 
@@ -186,15 +158,14 @@ fts_hash_table_iterator_skip_null( fts_hash_table_iterator_t *iter, int i)
     iter->cell = ht->table[i];
 }
 
-void
-fts_hash_table_iterator_init( fts_hash_table_iterator_t *iter, const fts_hash_table_t *ht)
+void fts_hash_table_iterator_init( fts_hash_table_iterator_t *iter, const fts_hash_table_t *ht)
 {
   iter->ht = ht;
   fts_hash_table_iterator_skip_null( iter, 0);
 }
 
-fts_hash_table_iterator_t *
-fts_hash_table_iterator_new( const fts_hash_table_t *ht)
+
+fts_hash_table_iterator_t *fts_hash_table_iterator_new( const fts_hash_table_t *ht)
 {
   fts_hash_table_iterator_t *iter;
 
@@ -206,28 +177,24 @@ fts_hash_table_iterator_new( const fts_hash_table_t *ht)
   return iter;
 }
 
-void
-fts_hash_table_iterator_next( fts_hash_table_iterator_t *iter)
+void fts_hash_table_iterator_next( fts_hash_table_iterator_t *iter)
 {
   iter->cell = iter->cell->next;
   if ( !iter->cell)
     fts_hash_table_iterator_skip_null( iter, iter->i+1);
 }
 
-int
-fts_hash_table_iterator_end( const fts_hash_table_iterator_t *iter)
+int fts_hash_table_iterator_end( const fts_hash_table_iterator_t *iter)
 {
   return iter->cell == 0 && iter->i >= iter->ht->length;
 }
 
-fts_symbol_t 
-fts_hash_table_iterator_current_symbol( const fts_hash_table_iterator_t *iter)
+fts_symbol_t fts_hash_table_iterator_current_symbol( const fts_hash_table_iterator_t *iter)
 {
   return iter->cell->symbol;
 }
 
-void *
-fts_hash_table_iterator_current_data( const fts_hash_table_iterator_t *iter)
+fts_atom_t *fts_hash_table_iterator_current_data( const fts_hash_table_iterator_t *iter)
 {
-  return iter->cell->user_data;
+  return &(iter->cell->user_data);
 }

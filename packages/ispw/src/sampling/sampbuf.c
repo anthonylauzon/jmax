@@ -14,29 +14,31 @@ sampbuf_table_init(void)
 sampbuf_t *
 sampbuf_get(fts_symbol_t name)
 {
-  sampbuf_t *buf;
+  fts_atom_t data;
   
-  if(!name) return(0);
-  
-  if(fts_hash_table_lookup(&the_sampbuf_hashtable, name, (void **)&buf)){
-    return(buf);
-  }else{
-    /* no error message here, it may be called just to be informed !! */
+  if (! name)
     return(0);
-  }
+  
+  if(fts_hash_table_lookup(&the_sampbuf_hashtable, name, &data))
+    return (sampbuf_t *) fts_get_ptr(&data);
+  else
+    return 0;
 }
 
 int
 sampbuf_name_already_registered(fts_symbol_t name)
 {
-  sampbuf_t *buf;
-  return(fts_hash_table_lookup(&the_sampbuf_hashtable, name, (void **)&buf));
+  fts_atom_t data;
+  return(fts_hash_table_lookup(&the_sampbuf_hashtable, name, &data));
 }
 
 void
 sampbuf_add(fts_symbol_t name, sampbuf_t *buf)
 {
-  fts_hash_table_insert(&the_sampbuf_hashtable, name, (void *)buf);
+  fts_atom_t data;
+
+  fts_set_ptr(&data, buf);
+  fts_hash_table_insert(&the_sampbuf_hashtable, name, &data);
 }
 
 void

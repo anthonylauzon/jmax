@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.3 $ IRCAM $Date: 1998/09/11 16:55:53 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:24 $
  *
  * vexp.c -- a variable expression evaluator
  *
@@ -722,7 +722,8 @@ struct ex_ex *
     }
     return (eptr);
     
-    EVAL_INT(%);
+    /* Was here after the return :-< ??*/
+    /* EVAL_INT(%); */
  case OP_ADD:
     EVAL(+);
  case OP_SUB:

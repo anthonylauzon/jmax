@@ -30,7 +30,7 @@ public abstract class FtsRemoteData implements MaxData {
 
   abstract public void call( int key, FtsMessage msg);
 
-  /* Subclasses should implement the release method */
+  /* Subclasses should implement the release method (calling super !!) */
 
   public void delete()
   {
@@ -47,7 +47,9 @@ public abstract class FtsRemoteData implements MaxData {
 
   protected void release()
   {
+    Mda.dispose(this);
     FtsRemoteDataID.release(id);
+    
   }
 
   /* We implement a family of remoteCall methods.

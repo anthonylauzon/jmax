@@ -54,7 +54,7 @@ void fts_template_init()
 void fts_template_declare(fts_symbol_t name, fts_symbol_t filename)
 {
   fts_template_t *template;
-  void *d;
+  fts_atom_t d;
 
   /* If the declaration existed already, remove it first */
 
@@ -65,8 +65,8 @@ void fts_template_declare(fts_symbol_t name, fts_symbol_t filename)
 
   template->name = name;
   template->filename = filename;
-
-  fts_hash_table_insert(&template_table, name, (void *)template);
+  fts_set_ptr(&d, template);
+  fts_hash_table_insert(&template_table, name, &d);
 }
 
 
@@ -95,13 +95,13 @@ void fts_template_declare_path(fts_symbol_t path)
 static fts_symbol_t fts_template_find_declared_file(fts_symbol_t name)
 {
   FILE *file;
-  void *d;
+  fts_atom_t d;
 
   /* First, look in the template declaration table */
 
   if (fts_hash_table_lookup(&template_table, name, &d))
     {
-      fts_template_t *template = (fts_template_t *) d;
+      fts_template_t *template = (fts_template_t *) fts_get_ptr(&d);
 
       /* it should use stat here !!! */
 

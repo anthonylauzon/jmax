@@ -36,12 +36,14 @@ typedef struct{
 static delay_entry_t *
 delay_table_get_entry(fts_symbol_t delay_name)
 {
-  delay_entry_t *p;
+  fts_atom_t data;
   
-  if (fts_hash_table_lookup(&delay_table, delay_name, (void **)&p))
-    return p;
+  if (fts_hash_table_lookup(&delay_table, delay_name, &data))
+    return (delay_entry_t *) fts_get_ptr(&data);
   else
     {
+      delay_entry_t *p;
+
       /* entry not found, create and initialize one; delay entry are never freed */
 
       p = (delay_entry_t *) fts_malloc(sizeof(delay_entry_t));
@@ -53,7 +55,8 @@ delay_table_get_entry(fts_symbol_t delay_name)
       p->delwrite = 0;
       p->first_delreader = 0;
 
-      fts_hash_table_insert(&delay_table, delay_name, (void *)p);
+      fts_set_ptr(&data, p);
+      fts_hash_table_insert(&delay_table, delay_name, &data);
       
       return p;
     }

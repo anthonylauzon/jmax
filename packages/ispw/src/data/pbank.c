@@ -171,7 +171,7 @@ pbank_write_file(pbank_data_t *data, fts_symbol_t file_name, fts_symbol_t vol)
 static pbank_data_t *
 pbank_data_new(fts_symbol_t name, long columns, long rows)
 {
-  void *data;
+  fts_atom_t data;
 
   if(columns < 1)
     columns = DEFAULT_COLUMNS;
@@ -183,7 +183,7 @@ pbank_data_new(fts_symbol_t name, long columns, long rows)
     {
       /* pbank_data  found, check its dimension and reference it */
 
-      pbank_data_t *p = (pbank_data_t *) data;
+      pbank_data_t *p = (pbank_data_t *) fts_get_ptr(&data);
 
       if (p->columns != columns || p->rows != rows)
 	{
@@ -238,7 +238,10 @@ pbank_data_new(fts_symbol_t name, long columns, long rows)
       /* if named, record it in the table */
 
       if (name)
-	fts_hash_table_insert(&pbank_data_table, name, p);
+	{
+	  fts_set_ptr(&data, p);
+	  fts_hash_table_insert(&pbank_data_table, name, &data);
+	}
 
       /* finally, return it */
 

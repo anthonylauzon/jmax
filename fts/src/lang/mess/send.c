@@ -69,7 +69,7 @@ static receive_list_t *
 get_or_create_receive_list(fts_symbol_t name)
 {
   fts_atom_t a[2];
-  void *d;
+  fts_atom_t d;
   receive_list_t *t;
 
   if (name == 0)
@@ -78,7 +78,7 @@ get_or_create_receive_list(fts_symbol_t name)
 
   if (fts_hash_table_lookup(&receive_list_table, name, &d))
     {
-      t = (receive_list_t *) d;
+      t = (receive_list_t *) fts_get_ptr(&d);
     }
   else
     {
@@ -87,8 +87,8 @@ get_or_create_receive_list(fts_symbol_t name)
       t->name = name;
       t->first_receive = 0;
 
-
-      fts_hash_table_insert(&receive_list_table, name, (void *)t);
+      fts_set_ptr(&d, t);
+      fts_hash_table_insert(&receive_list_table, name, &d);
     }
 
   return t;

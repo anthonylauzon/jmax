@@ -203,26 +203,6 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener
     AddButton("intbox", path+"tool_int.gif");
     AddButton("floatbox", path+"tool_float.gif");
   }
-
-
-  public Dimension getMinimumSize(){
-    return new Dimension(200, /*150630*/25);
-  }
-
-  public Dimension getMaximumSize(){
-    return new Dimension(300, /*150630*/25);
-  }
-  public Dimension getPreferredSize(){
-    return new Dimension(200, /*150630*/25);
-  }
-
-  /*public Dimension minimumSize(){
-    return new Dimension(500, 50);
-    }
-    public Dimension preferredSize(){
-    return new Dimension(500,50);
-    }*/
-  
 }
 
                     

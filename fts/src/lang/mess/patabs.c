@@ -53,11 +53,11 @@ void fts_abstraction_init()
 void fts_abstraction_declare(fts_symbol_t name, fts_symbol_t filename)
 {
   fts_abstraction_t *abs;
-  void *d;
+  fts_atom_t a;
 
   /* If the declaration existed already, remove it first */
 
-  if (fts_hash_table_lookup(&abstraction_table, name, &d))
+  if (fts_hash_table_lookup(&abstraction_table, name, &a))
     fts_hash_table_remove(&abstraction_table, name);
 
   abs = (fts_abstraction_t *) fts_malloc(sizeof(fts_abstraction_t));
@@ -65,7 +65,8 @@ void fts_abstraction_declare(fts_symbol_t name, fts_symbol_t filename)
   abs->name = name;
   abs->filename = filename;
 
-  fts_hash_table_insert(&abstraction_table, name, (void *)abs);
+  fts_set_ptr(&a, abs);
+  fts_hash_table_insert(&abstraction_table, name, &a);
 }
 
 
@@ -94,13 +95,13 @@ void fts_abstraction_declare_path(fts_symbol_t path)
 static FILE *fts_abstraction_find_declared_file(fts_symbol_t name)
 {
   FILE *file;
-  void *d;
+  fts_atom_t a;
 
   /* First, look in the abstraction declaration table */
 
-  if (fts_hash_table_lookup(&abstraction_table, name, &d))
+  if (fts_hash_table_lookup(&abstraction_table, name, &a))
     {
-      fts_abstraction_t *abs = (fts_abstraction_t *) d;
+      fts_abstraction_t *abs = (fts_abstraction_t *) fts_get_ptr(&a);
 
       file = fopen(fts_symbol_name(abs->filename), "r");
 

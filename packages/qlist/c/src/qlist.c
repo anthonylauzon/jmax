@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.11 $ IRCAM $Date: 1998/05/12 10:16:44 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:57:09 $
  *
  * FTS by Miller Puckette
  * 
@@ -27,8 +27,8 @@ typedef struct
 {
   fts_object_t  ob;
 
-  fts_atom_list_t atom_list;
-  fts_atom_list_iterator_t iterator;
+  fts_atom_list_t *atom_list;
+  fts_atom_list_iterator_t *iterator;
 
 } qlist_t;
 
@@ -40,13 +40,8 @@ qlist_rewind(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   qlist_t *this = (qlist_t *)o;
 
-  fts_atom_list_iterator_init(&(this->iterator), &(this->atom_list));
+  fts_atom_list_iterator_init(this->iterator, this->atom_list);
 }
-
-#define MILLER_VERSION
-
-#ifdef MILLER_VERSION
-
 
 
 /* Qlist NEXT version translated directly one-to-one from the
@@ -65,12 +60,12 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
   int ac;
   fts_symbol_t who_name = 0;
   
-  while (! fts_atom_list_iterator_end(&this->iterator))
+  while (! fts_atom_list_iterator_end(this->iterator))
     {
       int is_comma = 0;
 
-      av[0] = *fts_atom_list_iterator_current(&(this->iterator));
-      fts_atom_list_iterator_next(&this->iterator);
+      av[0] = *fts_atom_list_iterator_current(this->iterator);
+      fts_atom_list_iterator_next(this->iterator);
 
       if (!who_name)
 	{
@@ -83,12 +78,12 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 	      
 	      while (1)
 		{
-		  *wp = *fts_atom_list_iterator_current(&(this->iterator));
+		  *wp = *fts_atom_list_iterator_current(this->iterator);
 
 		  if ((! fts_is_long(wp)) && (! fts_is_float(wp)))
 		    break;
 
-		  fts_atom_list_iterator_next(&this->iterator);
+		  fts_atom_list_iterator_next(this->iterator);
 		  if (count < 11) {count++; wp++;}
 		}
 
@@ -118,7 +113,7 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 
 
 
-      for (ac = 0, ap = av; ! fts_atom_list_iterator_end(&this->iterator);ac++)
+      for (ac = 0, ap = av; ! fts_atom_list_iterator_end(this->iterator);ac++)
 	{
 	  if (fts_is_symbol(ap))
 	    {
@@ -132,9 +127,9 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 		}
 	    }
 
-	  *(++ap) = *(fts_atom_list_iterator_current(&(this->iterator)));
+	  *(++ap) = *(fts_atom_list_iterator_current(this->iterator));
 
-	  fts_atom_list_iterator_next(&this->iterator);
+	  fts_atom_list_iterator_next(this->iterator);
 	}
 
       ap = av;
@@ -194,382 +189,6 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 }
 
 
-#else
-/* Method for message "next" [<int>] inlet 0 */
-
-  /* SHADOCK WARNING: 
-
-     The qlist have a number of bizzare and ad hoc behaviour
-     that are too complex to solve with compatibilty messages, so
-     probabily the best thing to do is to ignore it, and substitute
-     it in the future.
-
-     So, the following implementation use a finite state automata
-     to rebuild the 0.26 shadock semantic
-     */
-
-
-
-  /* private macros */
-
-
-#define NATOMS 256
-
-#define ADVANCE_POINTER      fts_atom_list_iterator_next(&this->iterator);
-
-#define GET_DESTINATION      \
-     dest = fts_get_receive_by_name(fts_get_symbol(fts_atom_list_iterator_current(&(this->iterator))))
-
-#define GET_SELECTOR         selector = fts_get_symbol(fts_atom_list_iterator_current(&(this->iterator)))
-
-#define GET_ARG              args[args_count++] = *(fts_atom_list_iterator_current(&(this->iterator)))
-#define RESET_ARGS           args_count = 0
-
-#define SEND_INT_TO_OUTLET   fts_outlet_send(o, 0, fts_s_int,   args_count, args)
-#define SEND_FLOAT_TO_OUTLET fts_outlet_send(o, 0, fts_s_float, args_count, args)
-#define SEND_LIST_TO_OUTLET  fts_outlet_send(o, 0, fts_s_list,  args_count, args)
-
-#define SEND_MSG_TO_DEST     if (dest && (! drop)) fts_message_send(dest, 0, selector, args_count, args)
-#define SEND_FLOAT_TO_DEST   if (dest && (! drop)) fts_message_send(dest, 0, fts_s_float, args_count, args)
-#define SEND_INT_TO_DEST     if (dest && (! drop)) fts_message_send(dest, 0, fts_s_int, args_count, args)
-#define SEND_LIST_TO_DEST    if (dest && (! drop)) fts_message_send(dest, 0, fts_s_list, args_count, args)
-
-
-static void
-qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  qlist_t *this = (qlist_t *)o;
-  long drop = fts_get_long_arg(ac, at, 0, 0);
-  fts_atom_t args[NATOMS];
-
-  fts_object_t *dest;
-  fts_symbol_t selector;
-  int args_count;
-
-  enum
-    {
-      qlist_start,
-
-      qlist_o_got_int,
-      qlist_o_got_float,
-      qlist_o_got_list,
-      
-      qlist_d_got_dst,
-      qlist_d_got_sel,
-      qlist_d_got_int,
-      qlist_d_got_float,
-      qlist_d_got_list,
-
-      qlist_stop
-    } status;
-
-  enum
-    {
-      qlist_in_end,
-      qlist_in_semi,
-      qlist_in_symbol,
-      qlist_in_float,
-      qlist_in_int
-    } in_type;
-
-  status = qlist_start;
-  args_count = 0;
-  
-  while (status != qlist_stop)
-    {
-      /* Get the input, and analize it in in_type */
-
-      if (fts_atom_list_iterator_end(&this->iterator))
-	in_type = qlist_in_end;
-      else if (fts_is_symbol(fts_atom_list_iterator_current(&(this->iterator))))
-	{
-	  if ((fts_get_symbol(fts_atom_list_iterator_current(&(this->iterator))) == fts_s_semi) ||
-	      (fts_get_symbol(fts_atom_list_iterator_current(&(this->iterator))) == fts_s_comma))
-	    in_type = qlist_in_semi;
-	  else
-	    in_type = qlist_in_symbol;
-	}
-      else if (fts_is_long(fts_atom_list_iterator_current(&(this->iterator))))
-	in_type = qlist_in_int;
-      else if (fts_is_float(fts_atom_list_iterator_current(&(this->iterator))))
-	in_type = qlist_in_float;
-
-      /* the actual finite state automata; look big, but is simpler than
-	 what you can expect 
-	 */
-
-      switch (status)
-	{
-	case qlist_start:
-	  switch (in_type)
-	    {
-	    case qlist_in_end:
-	      status = qlist_stop;
-	      break;
-
-	    case qlist_in_semi:
-	      status = qlist_start;
-	      ADVANCE_POINTER;
-	      break;
-
-	    case qlist_in_symbol:
-	      status = qlist_d_got_dst;
-	      GET_DESTINATION;
-	      ADVANCE_POINTER;
-	      break;
-
-	    case qlist_in_float:
-	      status = qlist_o_got_float;
-	      GET_ARG;
-	      ADVANCE_POINTER;
-	      break;
-
-	    case qlist_in_int:
-	      status = qlist_o_got_int;
-	      GET_ARG;
-	      ADVANCE_POINTER;
-	      break;
-	    }
-	  break;
-
-	case qlist_o_got_int:
-	  switch (in_type)
-	    {
-	    case qlist_in_end:
-	      status = qlist_stop;
-	      SEND_INT_TO_OUTLET;
-	      RESET_ARGS;
-	      break;
-
-	    case qlist_in_semi:
-	      status = qlist_stop;
-	      SEND_INT_TO_OUTLET;
-	      RESET_ARGS;
-	      ADVANCE_POINTER;
-	      break;
-
-	    case qlist_in_symbol:
-	      status = qlist_stop;
-	      SEND_INT_TO_OUTLET;
-	      RESET_ARGS;
-	      break;
-
-	    case qlist_in_float:
-	    case qlist_in_int:
-	      status = qlist_o_got_list;
-	      GET_ARG;
-	      ADVANCE_POINTER;
-	      break;
-	    }
-	  break;
-
-	case qlist_o_got_float:
-	  switch (in_type)
-	    {
-	    case qlist_in_end:
-	      status = qlist_stop;
-	      SEND_FLOAT_TO_OUTLET;
-	      RESET_ARGS;
-	      break;
-
-	    case qlist_in_semi:
-	      status = qlist_stop;
-	      SEND_FLOAT_TO_OUTLET;
-	      RESET_ARGS;
-	      ADVANCE_POINTER;
-	      break;
-
-	    case qlist_in_symbol:
-	      status = qlist_stop;
-	      SEND_FLOAT_TO_OUTLET;
-	      RESET_ARGS;
-	      break;
-
-	    case qlist_in_float:
-	    case qlist_in_int:
-	      status = qlist_o_got_list;
-	      GET_ARG;
-	      ADVANCE_POINTER;
-	      break;
-	    }
-	  break;
-
-	case qlist_o_got_list:
-	  switch (in_type)
-	    {
-	    case qlist_in_end:
-	      status = qlist_stop;
-	      SEND_LIST_TO_OUTLET;
-	      RESET_ARGS;
-	      break;
-
-	    case qlist_in_semi:
-	      status = qlist_stop;
-	      SEND_LIST_TO_OUTLET;
-	      RESET_ARGS;
-	      ADVANCE_POINTER;
-	      break;
-
-	    case qlist_in_symbol:
-	      status = qlist_stop;
-	      SEND_LIST_TO_OUTLET;
-	      RESET_ARGS;
-	      break;
-
-	    case qlist_in_float:
-	    case qlist_in_int:
-	      status = qlist_o_got_list;
-	      GET_ARG;
-	      ADVANCE_POINTER;
-	      break;
-	    }
-	  break;
-
-      
-	case qlist_d_got_dst:
-	  switch (in_type)
-	    {
-	    case qlist_in_end:
-	      status = qlist_stop;
-	      break;
-
-	    case qlist_in_semi:
-	      status = qlist_d_got_dst;
-	      ADVANCE_POINTER;
-	      break;
-
-	    case qlist_in_symbol:
-	      status = qlist_d_got_sel;
-	      GET_SELECTOR;
-	      ADVANCE_POINTER;
-	      break;
-
-	    case qlist_in_float:
-	      status = qlist_d_got_float;
-	      GET_ARG;
-	      ADVANCE_POINTER;
-	      break;
-
-	    case qlist_in_int:
-	      status = qlist_d_got_int;
-	      GET_ARG;
-	      ADVANCE_POINTER;
-	      break;
-	    }
-	  break;
-
-	case qlist_d_got_sel:
-	  switch (in_type)
-	    {
-	    case qlist_in_end:
-	      status = qlist_stop;
-	      SEND_MSG_TO_DEST;
-	      RESET_ARGS;
-	      break;
-
-	    case qlist_in_semi:
-	      status = qlist_start;
-	      SEND_MSG_TO_DEST;
-	      RESET_ARGS;
-	      ADVANCE_POINTER;
-	      break;
-
-	    case qlist_in_symbol:
-	    case qlist_in_float:
-	    case qlist_in_int:
-	      status = qlist_d_got_sel;
-	      GET_ARG;
-	      ADVANCE_POINTER;
-	      break;
-	    }
-	  break;
-
-	case qlist_d_got_int:
-	  switch (in_type)
-	    {
-	    case qlist_in_end:
-	      status = qlist_stop;
-	      SEND_INT_TO_DEST;
-	      RESET_ARGS;
-	      break;
-
-	    case qlist_in_semi:
-	      status = qlist_start;
-	      SEND_INT_TO_DEST;
-	      RESET_ARGS;
-	      ADVANCE_POINTER;
-	      break;
-
-	    case qlist_in_symbol:
-	    case qlist_in_float:
-	    case qlist_in_int:
-	      status = qlist_d_got_list;
-	      GET_ARG;
-	      ADVANCE_POINTER;
-	      break;
-	    }
-	  break;
-
-	case qlist_d_got_float:
-	  switch (in_type)
-	    {
-	    case qlist_in_end:
-	      status = qlist_stop;
-	      SEND_FLOAT_TO_DEST;
-	      RESET_ARGS;
-	      break;
-
-	    case qlist_in_semi:
-	      status = qlist_start;
-	      SEND_FLOAT_TO_DEST;
-	      RESET_ARGS;
-	      ADVANCE_POINTER;
-	      break;
-
-	    case qlist_in_symbol:
-	    case qlist_in_float:
-	    case qlist_in_int:
-	      status = qlist_d_got_list;
-	      GET_ARG;
-	      ADVANCE_POINTER;
-	      break;
-	    }
-	  break;
-
-	case qlist_d_got_list:
-	  switch (in_type)
-	    {
-	    case qlist_in_end:
-	      status = qlist_stop;
-	      SEND_LIST_TO_DEST;
-	      RESET_ARGS;
-	      break;
-
-	    case qlist_in_semi:
-	      status = qlist_start;
-	      SEND_LIST_TO_DEST;
-	      RESET_ARGS;
-	      ADVANCE_POINTER;
-	      break;
-
-	    case qlist_in_symbol:
-	    case qlist_in_float:
-	    case qlist_in_int:
-	      status = qlist_d_got_list;
-	      GET_ARG;
-	      ADVANCE_POINTER;
-	      break;
-	    }
-	  break;
-
-	case qlist_stop:
-	  break;
-	}
-    }
-}
-
-#endif
-
 
 /* Method for message "append" [<arg>*] inlet 0 */
 
@@ -578,8 +197,8 @@ qlist_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   qlist_t *this = (qlist_t *)o;
 
-  fts_atom_list_append( &(this->atom_list), ac, at);
-  fts_atom_list_iterator_init(&(this->iterator), &(this->atom_list));
+  fts_atom_list_append(this->atom_list, ac, at);
+  fts_atom_list_iterator_init(this->iterator, this->atom_list);
 }
 
 /* Method for message "set" [<arg>*] inlet 0 */
@@ -589,8 +208,8 @@ qlist_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   qlist_t *this = (qlist_t *)o;
 
-  fts_atom_list_set( &(this->atom_list), ac, at);
-  fts_atom_list_iterator_init(&(this->iterator), &(this->atom_list));
+  fts_atom_list_set( this->atom_list, ac, at);
+  fts_atom_list_iterator_init(this->iterator, this->atom_list);
 }
 
 /* Method for message "clear" inlet 0 */
@@ -600,8 +219,8 @@ qlist_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   qlist_t *this = (qlist_t *)o;
 
-  fts_atom_list_destroy(&(this->atom_list));
-  fts_atom_list_iterator_init(&(this->iterator), &(this->atom_list));
+  fts_atom_list_clear(this->atom_list);
+  fts_atom_list_iterator_init(this->iterator, this->atom_list);
 }
 
 /* Method for message "flush" inlet 0 */
@@ -617,22 +236,22 @@ static void
 qlist_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   qlist_t *this = (qlist_t *)o;
-  fts_atom_list_iterator_t iterator;
+  fts_atom_list_iterator_t *iterator;
 
-  fts_atom_list_iterator_init(&iterator, &(this->atom_list));
+  iterator = fts_atom_list_iterator_new(this->atom_list);
 
   fts_client_mess_start_msg(CLIENTMESS_CODE);
   fts_client_mess_add_object(o);
   fts_client_mess_add_sym(fts_new_symbol("atomList"));
 
-  while (! fts_atom_list_iterator_end(&iterator))
+  while (! fts_atom_list_iterator_end(iterator))
     {
-      fts_client_mess_add_atoms(1, fts_atom_list_iterator_current(&iterator));
-      fts_atom_list_iterator_next(&iterator);
+      fts_client_mess_add_atoms(1, fts_atom_list_iterator_current(iterator));
+      fts_atom_list_iterator_next(iterator);
     }
 
-
   fts_client_mess_send_msg();
+  fts_atom_list_iterator_free(iterator);
 }
 
 
@@ -652,8 +271,8 @@ qlist_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   qlist_t *this = (qlist_t *)o;
 
-  fts_atom_list_init(&(this->atom_list));
-  fts_atom_list_iterator_init(&(this->iterator), &(this->atom_list));
+  this->atom_list = fts_atom_list_new();
+  this->iterator  = fts_atom_list_iterator_new(this->atom_list);
 }
 
 
@@ -663,7 +282,8 @@ qlist_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   qlist_t *this = (qlist_t *)o;
 
-  fts_atom_list_destroy(&(this->atom_list));
+  fts_atom_list_free(this->atom_list);
+  fts_atom_list_iterator_free(this->iterator);
 }
 
 static void
@@ -672,7 +292,7 @@ qlist_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   qlist_t *this = (qlist_t *)o;
   fts_bmax_file_t *f = (fts_bmax_file_t *) fts_get_ptr(at);
 
-  fts_atom_list_save_bmax(&(this->atom_list), f, (fts_object_t *) this);
+  fts_atom_list_save_bmax(this->atom_list, f, (fts_object_t *) this);
 }
 
 

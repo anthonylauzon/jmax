@@ -17,6 +17,10 @@ ExplodeFactory:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ExplodeFactory.java )
 .PHONY: ExplodeFactory
 
+ExplodeDataEditor:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ExplodeDataEditor.java )
+.PHONY: ExplodeDataEditor
+
 ExplodeExtension:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ExplodeExtension.java )
 .PHONY: ExplodeExtension

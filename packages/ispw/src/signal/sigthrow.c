@@ -95,7 +95,8 @@ sigcatch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void
 sigcatch_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  sigcatch_t *this = (sigcatch_t *)o, *sigc;
+  sigcatch_t *this = (sigcatch_t *)o;
+  fts_atom_t a;
   fts_symbol_t s = fts_get_symbol_arg(ac, at, 1, 0);
 
   if ((s == 0) || (*(fts_symbol_name(s)) == '0'))
@@ -103,10 +104,13 @@ sigcatch_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 
   this->sym = s;
 
-  if (fts_hash_table_lookup(&catch_table, this->sym, (void **)&sigc))
+  if (fts_hash_table_lookup(&catch_table, this->sym, &a))
     post("catch~: duplicated name: %s\n", fts_symbol_name(this->sym));
   else
-    fts_hash_table_insert(&catch_table, this->sym, (void *)this);
+    {
+      fts_set_ptr(&a, this);
+      fts_hash_table_insert(&catch_table, this->sym, &a);
+    }
 
   dsp_list_insert(o);
 }
@@ -114,10 +118,11 @@ sigcatch_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 static void
 sigcatch_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  sigcatch_t *this = (sigcatch_t *)o, *sigc;
+  sigcatch_t *this = (sigcatch_t *)o;
+  fts_atom_t a;
   fts_symbol_t s = this->sym;
 
-  if (fts_hash_table_lookup(&catch_table, s, (void **)&sigc))
+  if (fts_hash_table_lookup(&catch_table, s, &a))
     fts_hash_table_remove(&catch_table, s);
 
   dsp_list_remove(o);
@@ -237,14 +242,15 @@ sigthrow_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   sigthrow_t *this = (sigthrow_t *)o;
   fts_atom_t argv[3];
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
-  sigcatch_t *sigc;
+  fts_atom_t a;
 
   /* look here for the corresponing catch buffer, to eliminate
      instantiation order dependency between catch~ and throw~.
    */
 
-  if (fts_hash_table_lookup(&catch_table, this->sym, (void **)&sigc))
+  if (fts_hash_table_lookup(&catch_table, this->sym, &a))
     {
+      sigcatch_t *sigc = (sigcatch_t *) fts_get_ptr(&a);
       float *samps = sigc->samps;
 
       ftl_data_copy(float *, this->ftl_data, &samps);
@@ -278,12 +284,13 @@ sigthrow_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
 {
   fts_symbol_t s = fts_get_symbol_arg(ac, at, 0, 0);
   sigthrow_t *this = (sigthrow_t *)o;
-  sigcatch_t *c;
+  fts_atom_t a;
 
   this->sym = s;
 
-  if (fts_hash_table_lookup(&catch_table, s, (void **)&c))
+  if (fts_hash_table_lookup(&catch_table, s, &a))
     {
+      sigcatch_t *c = (sigcatch_t *) fts_get_ptr(&a);
       float *samps = c->samps;
 
       ftl_data_copy(float *, this->ftl_data, &samps);

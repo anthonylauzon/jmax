@@ -116,7 +116,7 @@ fts_metaclass_create(fts_symbol_t name,
 		     fts_method_instantiate_t mth_instantiate,
 		     fts_method_equiv_t mth_equiv)
 {
-  void *data;
+  fts_atom_t data;
   fts_metaclass_t *mcl;
 
   mcl = fts_zalloc(sizeof(fts_metaclass_t));
@@ -130,7 +130,10 @@ fts_metaclass_create(fts_symbol_t name,
       return &fts_DuplicatedMetaclass;
     }
   else
-    fts_hash_table_insert(&fts_metaclass_table, name, (void *)mcl);
+    {
+      fts_set_ptr(&data, mcl);
+      fts_hash_table_insert(&fts_metaclass_table, name, &data);
+    }
 
   return fts_Success;
 }
@@ -139,23 +142,26 @@ fts_metaclass_create(fts_symbol_t name,
 void
 fts_metaclass_alias(fts_symbol_t new_name, fts_symbol_t old_name)
 {
-  void *data;
+  fts_atom_t data;
 
   if ((fts_hash_table_lookup(&fts_metaclass_alias_table, new_name, &data)) ||
-       (fts_hash_table_lookup(&fts_metaclass_table, new_name, &data)))
-    fprintf(stderr, "fts_metaclass_alias: duplicated alias entry `%s'\n", fts_symbol_name(new_name)); /* @@@ ERROR !!! */
+      (fts_hash_table_lookup(&fts_metaclass_table, new_name, &data)))
+    return;			/* error: duplicated meta class */
   else
-    fts_hash_table_insert(&fts_metaclass_alias_table, new_name, (void *)old_name);
+    {
+      fts_set_symbol(&data, old_name);
+      fts_hash_table_insert(&fts_metaclass_alias_table, new_name, &data);
+    }
 }
 
 
 static fts_symbol_t 
 fts_metaclass_get_real_name(fts_symbol_t name)
 {
-  void *data;
+  fts_atom_t data;
 
   if (fts_hash_table_lookup(&fts_metaclass_alias_table, name, &data))
-    return (fts_symbol_t )data;
+    return (fts_symbol_t )fts_get_symbol(&data);
   else
     return name;
 }
@@ -164,10 +170,10 @@ fts_metaclass_get_real_name(fts_symbol_t name)
 fts_metaclass_t *
 fts_metaclass_get_by_name(fts_symbol_t name)
 {
-  void *data;
+  fts_atom_t data;
 
   if (fts_hash_table_lookup(&fts_metaclass_table, fts_metaclass_get_real_name(name), &data))
-    return (fts_metaclass_t *) data;
+    return (fts_metaclass_t *) fts_get_ptr(&data);
   else
     return (fts_metaclass_t *) 0;
 }

@@ -4,6 +4,7 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/utils.h"
+#include "lang/datalib.h"
 #include "lang/ftl.h"
 #include "lang/veclib/include/veclib.h"
 #include "runtime/files/post.h"
@@ -67,7 +68,7 @@ typedef struct {
 
 struct _ftl_subroutine_t {
   fts_symbol_t name;
-  fts_atom_list_t instructions;
+  fts_atom_list_t *instructions;
   struct _ftl_subroutine_t *next;
   struct _ftl_subroutine_t *next_in_stack;
 
@@ -165,7 +166,7 @@ ftl_subroutine_new( fts_symbol_t name)
     return 0;
 
   newsubr->name = name;
-  fts_atom_list_init( &(newsubr->instructions) );
+  newsubr->instructions = fts_atom_list_new();
 
   newsubr->next = 0;
   newsubr->next_in_stack = 0;
@@ -180,7 +181,7 @@ ftl_subroutine_new( fts_symbol_t name)
 static void
 ftl_subroutine_destroy( ftl_subroutine_t *subr)
 {
-  fts_atom_list_destroy( &(subr->instructions));
+  fts_atom_list_free(subr->instructions);
 
   if ( subr->bytecode)
     {
@@ -197,15 +198,15 @@ ftl_subroutine_add_call( ftl_subroutine_t *subr, fts_symbol_t name, int argc, co
   fts_atom_t a;
 
   fts_set_long( &a, FTL_OPCODE_CALL);
-  fts_atom_list_append( &(subr->instructions), 1, &a);
+  fts_atom_list_append(subr->instructions, 1, &a);
 
   fts_set_symbol( &a, name);
-  fts_atom_list_append( &(subr->instructions), 1, &a);
+  fts_atom_list_append(subr->instructions, 1, &a);
 
   fts_set_long( &a, argc);
-  fts_atom_list_append( &(subr->instructions), 1, &a);
+  fts_atom_list_append(subr->instructions, 1, &a);
 
-  fts_atom_list_append( &(subr->instructions), argc, argv);
+  fts_atom_list_append(subr->instructions, argc, argv);
 
   /* add debugging info */
   ftl_debug_info_table_set( &subr->debug_info_table, subr->instruction_count, object);
@@ -220,7 +221,7 @@ ftl_subroutine_add_return( ftl_subroutine_t *subr)
   fts_atom_t a;
 
   fts_set_long( &a, FTL_OPCODE_RETURN);
-  fts_atom_list_append( &(subr->instructions), 1, &a);
+  fts_atom_list_append(subr->instructions, 1, &a);
 
   /* add debugging info */
   ftl_debug_info_table_set( &subr->debug_info_table, subr->instruction_count, 0);
@@ -289,36 +290,37 @@ ftl_program_add_return( ftl_program_t *prog)
 int
 ftl_program_add_signal( ftl_program_t *prog, fts_symbol_t name, int size)
 {
-  ftl_memory_declaration *mdecl;
+  fts_atom_t a;
 
-  mdecl = ftl_memory_declaration_new( size);
+  fts_set_ptr(&a, ftl_memory_declaration_new( size));
 
-  return fts_hash_table_insert( &(prog->symbol_table), name, mdecl);
+  return fts_hash_table_insert( &(prog->symbol_table), name, &a);
 }
 
 
 int
 ftl_declare_function( fts_symbol_t name, ftl_wrapper_t wrapper)
 {
+  fts_atom_t a;
   ftl_function_declaration *fdecl;
 
   if ( !ftl_functions_table)
     ftl_functions_table = fts_hash_table_new();
   else
     {
-      void *data;
+      fts_atom_t data;
   
       if (fts_hash_table_lookup(ftl_functions_table, name,  &data))
 	{
-	  fdecl = (ftl_function_declaration *)data;
+	  fdecl = (ftl_function_declaration *)fts_get_ptr(&data);
 	  fts_hash_table_remove(ftl_functions_table, name);
 	  ftl_function_declaration_free(fdecl);
 	}
     }
 
-  fdecl = ftl_function_declaration_new( wrapper);
+  fts_set_ptr(&a, ftl_function_declaration_new( wrapper));
 
-  return fts_hash_table_insert( ftl_functions_table, name, fdecl);
+  return fts_hash_table_insert( ftl_functions_table, name, &a);
 }
 
 
@@ -351,9 +353,9 @@ ftl_program_new( void )
 }
 
 static void
-free_hash_element(fts_symbol_t ignore, void *data, void *user_data)
+free_hash_element(fts_symbol_t ignore, fts_atom_t *data, void *user_data)
 {
-  fts_free(data);
+  fts_free(fts_get_ptr(data));
 }
 
 void 
@@ -405,18 +407,21 @@ static fts_status_t
 ftl_state_machine( fts_atom_list_t *alist, state_fun_t fun, void *user_data)
 {
   fts_atom_t *a = 0;	    
-  fts_atom_list_iterator_t iter;
+  fts_atom_list_iterator_t *iter;
   int state, newstate, argc;
   fts_status_t ret;
 
   state = ST_OPCODE;
   argc  = 0;
 
-  for( fts_atom_list_iterator_init( &iter, alist );
-      !fts_atom_list_iterator_end( &iter);
-      fts_atom_list_iterator_next( &iter))
+  iter = fts_atom_list_iterator_new(alist);
+
+
+  for( ;
+      !fts_atom_list_iterator_end( iter);
+      fts_atom_list_iterator_next( iter))
     {
-      a = fts_atom_list_iterator_current( &iter);
+      a = fts_atom_list_iterator_current( iter);
 
       switch( state) {
       case ST_OPCODE:
@@ -431,6 +436,7 @@ ftl_state_machine( fts_atom_list_t *alist, state_fun_t fun, void *user_data)
 	      newstate = ST_OPCODE;
 	      break;
 	    default:
+	      fts_atom_list_iterator_free(iter);
 	      return &ftl_error_invalid_program;
 	    }
 	  }
@@ -441,7 +447,10 @@ ftl_state_machine( fts_atom_list_t *alist, state_fun_t fun, void *user_data)
 	if ( fts_is_symbol( a))
 	  newstate = ST_CALL_ARGC;
 	else
-	  return &ftl_error_invalid_program;
+	  {
+	    fts_atom_list_iterator_free(iter);
+	    return &ftl_error_invalid_program;
+	  }
 	break;
       case ST_CALL_ARGC:
 	if ( fts_is_long( a) )
@@ -453,7 +462,10 @@ ftl_state_machine( fts_atom_list_t *alist, state_fun_t fun, void *user_data)
 	      newstate = ST_OPCODE;
 	  }
 	else
-	  return &ftl_error_invalid_program;
+	  {
+	    fts_atom_list_iterator_free(iter);
+	    return &ftl_error_invalid_program;
+	  }
 	break;
       case ST_CALL_ARGV:
 	argc--;
@@ -463,6 +475,8 @@ ftl_state_machine( fts_atom_list_t *alist, state_fun_t fun, void *user_data)
 	  newstate = ST_CALL_ARGV;
 	break;
       }
+
+      fts_atom_list_iterator_free(iter);
 
       ret = (*fun)(state, newstate, a, user_data);
       if (ret != fts_Success)
@@ -553,10 +567,12 @@ compile_portable_state_fun( int state, int newstate, fts_atom_t *a, void *user_d
     break;
   case ST_CALL_FUN:
     {
+      fts_atom_t data;
       ftl_function_declaration *fdecl;
 
-      fts_hash_table_lookup( ftl_functions_table, fts_get_symbol(a), (void **)&fdecl);
-      fts_word_set_ptr( bytecode, (void *)fdecl->wrapper);
+      fts_hash_table_lookup( ftl_functions_table, fts_get_symbol(a), &data);
+      fdecl =  (ftl_function_declaration *) fts_get_ptr(&data);
+      fts_word_set_fun( bytecode, (void (*)()) fdecl->wrapper);
       bytecode++;
     }
     break;
@@ -567,9 +583,11 @@ compile_portable_state_fun( int state, int newstate, fts_atom_t *a, void *user_d
   case ST_CALL_ARGV:
     if ( fts_is_symbol(a))
       {
+	fts_atom_t data;
 	ftl_memory_declaration *mdecl;
 	
-	fts_hash_table_lookup( &(info->prog->symbol_table), fts_get_symbol(a), (void **)&mdecl);
+	fts_hash_table_lookup( &(info->prog->symbol_table), fts_get_symbol(a), &data);
+	mdecl = (ftl_memory_declaration *)fts_get_ptr(&data);
 	fts_word_set_ptr( bytecode, mdecl->address);
 	bytecode++;
       }
@@ -616,7 +634,7 @@ ftl_program_compile_portable( ftl_program_t *prog)
       int size;
 
       size = 0;
-      ret = ftl_state_machine( &subr->instructions, bytecode_size_state_fun, &size);
+      ret = ftl_state_machine( subr->instructions, bytecode_size_state_fun, &size);
       if ( ret != fts_Success)
 	return 0;
 
@@ -629,7 +647,7 @@ ftl_program_compile_portable( ftl_program_t *prog)
 
       info.prog = prog;
       info.bytecode = subr->bytecode;
-      ret = ftl_state_machine( &subr->instructions, compile_portable_state_fun, &info);
+      ret = ftl_state_machine( subr->instructions, compile_portable_state_fun, &info);
       if ( ret != fts_Success)
 	return 0;
 
@@ -784,7 +802,7 @@ void ftl_program_print( const ftl_program_t *prog )
       info.line[0] = 0;
       info.pc = 0;
       info.debug_info = subr->debug_info_table.info;
-      ftl_state_machine( &subr->instructions, print_state_fun, &info);
+      ftl_state_machine( subr->instructions, print_state_fun, &info);
       post( "}\n\n");
     }
 }
@@ -832,7 +850,7 @@ void ftl_program_call_subr( ftl_program_t *prog, ftl_subroutine_t *subr)
       int argc;
       
       prog->pc++;
-      w = (ftl_wrapper_t) fts_word_get_ptr( bytecode);
+      w = (ftl_wrapper_t) fts_word_get_fun( bytecode);
       argc = fts_word_get_long( bytecode+1);
       (*w)(bytecode+2);
       bytecode += (argc + 2);

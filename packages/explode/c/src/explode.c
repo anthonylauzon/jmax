@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.13 $ IRCAM $Date: 1998/09/16 10:21:15 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/18 11:56:51 $
  *
  * Explode by Miller Puckette
  * Code ported and modified by MDC
@@ -41,10 +41,10 @@ static fts_hash_table_t explode_table;
 explode_t *
 explode_get_by_name(fts_symbol_t name)
 {
-  void *data;
+  fts_atom_t data;
 
   if (fts_hash_table_lookup(&explode_table, name, &data))
-    return (explode_t *)data;
+    return (explode_t *) fts_get_ptr(&data);
   else
     return 0;
 }
@@ -53,13 +53,14 @@ explode_get_by_name(fts_symbol_t name)
 static int
 register_explode(explode_t *this, fts_symbol_t name)
 {
-  void *data;
+  fts_atom_t data;
 
   if (fts_hash_table_lookup(&explode_table, name, &data))
     return 0;
   else
     {
-      fts_hash_table_insert(&explode_table, name, this);
+      fts_set_ptr(&data, this);
+      fts_hash_table_insert(&explode_table, name, &data);
       return 1;
     }
 }

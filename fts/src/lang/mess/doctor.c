@@ -50,39 +50,40 @@ void fts_doctor_init()
 void fts_register_object_doctor(fts_symbol_t class_name,
 				fts_object_t *(* fun)(fts_patcher_t *patcher, int ac, const fts_atom_t *at))
 {
-  void *data;
+  fts_atom_t data;
   fts_object_doctor_t *d;
 
   if (fts_hash_table_lookup(&fts_doctor_table, class_name, &data))
     {
       fts_hash_table_remove(&fts_doctor_table, class_name);
-      fts_free(data);
+      fts_free(fts_get_ptr(&data));
     }
 
   d = (fts_object_doctor_t *) fts_malloc(sizeof(fts_object_doctor_t));
   d->fun = fun;
 
-  fts_hash_table_insert(&fts_doctor_table, class_name, (void *)d);
+  fts_set_ptr(&data, d);
+  fts_hash_table_insert(&fts_doctor_table, class_name, &data);
 
 }
 
 int fts_object_doctor_exists(fts_symbol_t class_name)
 {
-  void *data;
+  fts_atom_t data;
 
   return fts_hash_table_lookup(&fts_doctor_table, class_name, &data);
 }
 
 fts_object_t *fts_call_object_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
-  void *data;
+  fts_atom_t data;
   fts_symbol_t class_name;
 
   class_name = fts_get_symbol(at);
 
   if (fts_hash_table_lookup(&fts_doctor_table, class_name, &data))
     {
-      fts_object_doctor_t *d = (fts_object_doctor_t *) data;
+      fts_object_doctor_t *d = (fts_object_doctor_t *) fts_get_ptr(&data);
 
       return (* d->fun)(patcher, ac, at);
     }

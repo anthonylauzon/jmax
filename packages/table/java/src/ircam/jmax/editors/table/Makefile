@@ -17,6 +17,10 @@ TableFactory:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TableFactory.java )
 .PHONY: TableFactory
 
+TableDataEditor:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TableDataEditor.java )
+.PHONY: TableDataEditor
+
 TableExtension:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TableExtension.java )
 .PHONY: TableExtension

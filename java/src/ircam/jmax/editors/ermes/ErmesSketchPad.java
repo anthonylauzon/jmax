@@ -606,6 +606,10 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
     if ( (offGraphics == null)){	//first sketch created, allocate the offscreen buffer
       offDimension = d;
       offImage = createImage(d.width, d.height);
+
+      if (offImage == null)
+	System.err.print("No offImage !!");
+
       offGraphics = offImage.getGraphics();
     }
     else //we already created an offscreen. To who it belongs?
@@ -618,6 +622,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
       //e copiarci dentro l'immagine del vecchio
       Image oldOffImage = offImage;
       offImage = createImage(d.width, d.height);
+      if (offImage == null)
+	System.err.print("No offImage !!");
       offGraphics = offImage.getGraphics();
       offGraphics.drawImage(oldOffImage, 0, 0, this);
     }
@@ -688,6 +694,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
     if ( (offGraphics == null)){	//first sketch of the day. We do this even if it doesn't belong
       offDimension = d;
       offImage = createImage(d.width, d.height);
+      if (offImage == null)
+	System.err.print("No offImage !!");
       if (offImage != null) {		//this can happen...
       	offGraphics = offImage.getGraphics();	
 	RequestOffScreen(this);	//a call to this function change the offscreen property.

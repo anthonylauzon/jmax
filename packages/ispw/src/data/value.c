@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.3 $ IRCAM $Date: 1998/05/18 11:17:20 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:24 $
  *
  * 
  * The value object it is stilllonger implemented using through,
@@ -29,18 +29,19 @@ static fts_hash_table_t value_table;
 static struct value_keeper *
 get_keeper(fts_symbol_t s)
 {
-  void *data;
+  fts_atom_t data;
   struct value_keeper *v;
 
   if (fts_hash_table_lookup(&value_table, s, &data))
-    v = (struct value_keeper *)data;
+    v = (struct value_keeper *)fts_get_ptr(&data);
   else
     {
       v = (struct value_keeper *) fts_malloc(sizeof(struct value_keeper));
       v->sym = s;
       v->count = 0;
       fts_set_long(&(v->atom), 0);
-      fts_hash_table_insert(&value_table, s, (void *)v);
+      fts_set_ptr(&data, v);
+      fts_hash_table_insert(&value_table, s, &data);
     }
 
   v->count++;
@@ -57,21 +58,6 @@ free_keeper(struct value_keeper *v)
       fts_hash_table_remove(&value_table, v->sym);
       fts_free(v);
     }
-}
-
-
-/* This is a pubblic function, used in eval, and in general
-   to access a variable defined by a value object */
-
-fts_atom_t *
-get_global_value(fts_symbol_t s)
-{
-  void *data;
-
-  if (fts_hash_table_lookup(&value_table, s, &data))
-    return &((struct value_keeper *)data)->atom;
-  else
-    return (fts_atom_t *)0;
 }
 
 

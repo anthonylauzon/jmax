@@ -137,10 +137,10 @@ fts_audio_init(void)
 }
 
 
-static void fts_audio_unset_an_input_device(fts_symbol_t name, void *data, void *user_data)
+static void fts_audio_unset_an_input_device(fts_symbol_t name, fts_atom_t *data, void *user_data)
 {
   fts_atom_t a;
-  fts_audio_input_logical_device_t *ldev = (fts_audio_input_logical_device_t *)data;
+  fts_audio_input_logical_device_t *ldev = (fts_audio_input_logical_device_t *) fts_get_ptr(data);
 
   if (ldev->active)
     {
@@ -154,10 +154,10 @@ static void fts_audio_unset_an_input_device(fts_symbol_t name, void *data, void 
 }
 
 
-static void fts_audio_unset_an_output_device(fts_symbol_t name, void *data, void *user_data)
+static void fts_audio_unset_an_output_device(fts_symbol_t name, fts_atom_t *data, void *user_data)
 {
   fts_atom_t a;
-  fts_audio_output_logical_device_t *ldev = (fts_audio_output_logical_device_t *)data;
+  fts_audio_output_logical_device_t *ldev = (fts_audio_output_logical_device_t *) fts_get_ptr(data);
 
   if (ldev->active)
     {
@@ -223,7 +223,7 @@ fts_audio_restart(void)
 
 fts_audio_input_logical_device_t *fts_audio_get_input_logical_device(fts_symbol_t name)
 {
-  void *data;
+  fts_atom_t data;
   int ret;
 
   if (name == (fts_symbol_t )0)
@@ -232,7 +232,7 @@ fts_audio_input_logical_device_t *fts_audio_get_input_logical_device(fts_symbol_
   ret = fts_hash_table_lookup(&fts_audio_input_logical_device_table, name, &data);
 
   if (ret)
-    return (fts_audio_input_logical_device_t *)data;
+    return (fts_audio_input_logical_device_t *)fts_get_ptr(&data);
   else
     {
       /* build an inactive logical device and put it in the
@@ -245,7 +245,8 @@ fts_audio_input_logical_device_t *fts_audio_get_input_logical_device(fts_symbol_
       ldev->object_count = 0;	/* object count can be valid for an non active logical device */
       ldev->name = name;
       ldev->buffer = 0;
-      fts_hash_table_insert(&fts_audio_input_logical_device_table, name, (void *)ldev);
+      fts_set_ptr(&data, ldev);
+      fts_hash_table_insert(&fts_audio_input_logical_device_table, name, &data);
 
       return ldev;
     }
@@ -254,7 +255,7 @@ fts_audio_input_logical_device_t *fts_audio_get_input_logical_device(fts_symbol_
 
 fts_audio_output_logical_device_t *fts_audio_get_output_logical_device(fts_symbol_t name)
 {
-  void *data;
+  fts_atom_t data;
   int ret;
 
   if (name == (fts_symbol_t )0)
@@ -263,7 +264,7 @@ fts_audio_output_logical_device_t *fts_audio_get_output_logical_device(fts_symbo
   ret = fts_hash_table_lookup(&fts_audio_output_logical_device_table, name, &data);
 
   if (ret)
-    return (fts_audio_output_logical_device_t *)data;
+    return (fts_audio_output_logical_device_t *)fts_get_ptr(&data);
   else
     {
       /* build an inactive logical device and put it in the
@@ -277,7 +278,9 @@ fts_audio_output_logical_device_t *fts_audio_get_output_logical_device(fts_symbo
       ldev->name = name;
       ldev->buffer = 0;
       ldev->channel_set = 0;
-      fts_hash_table_insert(&fts_audio_output_logical_device_table, name, (void *)ldev);
+
+      fts_set_ptr(&data, ldev);
+      fts_hash_table_insert(&fts_audio_output_logical_device_table, name, &data);
 
       return ldev;
     }
@@ -708,9 +711,9 @@ fts_audio_get_scheduled_input_object_count(fts_audio_input_logical_device_t *lde
 /* call this before starting dsp */
 
 
-static void fts_audio_activate_input_logical_device(fts_symbol_t name, void *data, void *user_data)
+static void fts_audio_activate_input_logical_device(fts_symbol_t name, fts_atom_t *data, void *user_data)
 {
-  fts_audio_input_logical_device_t *ldev = (fts_audio_input_logical_device_t *)data;
+  fts_audio_input_logical_device_t *ldev = (fts_audio_input_logical_device_t *) fts_get_ptr(data);
 
   if (ldev->active)
     {
@@ -720,10 +723,10 @@ static void fts_audio_activate_input_logical_device(fts_symbol_t name, void *dat
 }
 
 
-static void fts_audio_activate_output_logical_device(fts_symbol_t name, void *data, void *user_data)
+static void fts_audio_activate_output_logical_device(fts_symbol_t name, fts_atom_t *data, void *user_data)
 {
   int i;
-  fts_audio_output_logical_device_t *ldev = (fts_audio_output_logical_device_t *)data;
+  fts_audio_output_logical_device_t *ldev = (fts_audio_output_logical_device_t *) fts_get_ptr(data);
 
   if (ldev->active)
     {
@@ -746,19 +749,19 @@ fts_audio_activate_devices(void)
 
 /* call this after stopping  dsp */
 
-static void fts_audio_deactivate_input_logical_device(fts_symbol_t name, void *data, void *user_data)
+static void fts_audio_deactivate_input_logical_device(fts_symbol_t name, fts_atom_t *data, void *user_data)
 {
-  fts_audio_input_logical_device_t *ldev = (fts_audio_input_logical_device_t *)data;
+  fts_audio_input_logical_device_t *ldev = (fts_audio_input_logical_device_t *) fts_get_ptr(data);
 
   if (ldev->active)
     fts_sig_dev_deactivate(ldev->device);
 }
 
 
-static void fts_audio_deactivate_output_logical_device(fts_symbol_t name, void *data, void *user_data)
+static void fts_audio_deactivate_output_logical_device(fts_symbol_t name, fts_atom_t *data, void *user_data)
 {
   int i;
-  fts_audio_output_logical_device_t *ldev = (fts_audio_output_logical_device_t *)data;
+  fts_audio_output_logical_device_t *ldev = (fts_audio_output_logical_device_t *) fts_get_ptr(data);
 
   if (ldev->active)
     {
@@ -786,9 +789,9 @@ fts_audio_deactivate_devices(void)
 
 /* Generate ftl code to put zeros in all the outputs */
 
-static void fts_audio_add_out_zero_fun_uncond(fts_symbol_t name, void *data, void *user_data)
+static void fts_audio_add_out_zero_fun_uncond(fts_symbol_t name, fts_atom_t *data, void *user_data)
 {
-  fts_audio_output_logical_device_t *ldev = (fts_audio_output_logical_device_t *)data;
+  fts_audio_output_logical_device_t *ldev = (fts_audio_output_logical_device_t *) fts_get_ptr(data);
 
   if (ldev->active)
     {
@@ -810,9 +813,9 @@ static void fts_audio_add_out_zero_fun_uncond(fts_symbol_t name, void *data, voi
 }
 
 
-static void fts_audio_add_in_read_fun_uncond(fts_symbol_t name, void *data, void *user_data)
+static void fts_audio_add_in_read_fun_uncond(fts_symbol_t name, fts_atom_t *data, void *user_data)
 {
-  fts_audio_input_logical_device_t *ldev = (fts_audio_input_logical_device_t *)data;
+  fts_audio_input_logical_device_t *ldev = (fts_audio_input_logical_device_t *) fts_get_ptr(data);
 
   if (ldev->active)
     {
@@ -842,9 +845,9 @@ fts_audio_add_all_zero_fun(void)
 }
 
 
-static void fts_audio_add_zero_fun_unused(fts_symbol_t name, void *data, void *user_data)
+static void fts_audio_add_zero_fun_unused(fts_symbol_t name, fts_atom_t *data, void *user_data)
 {
-  fts_audio_output_logical_device_t *ldev = (fts_audio_output_logical_device_t *)data;
+  fts_audio_output_logical_device_t *ldev = (fts_audio_output_logical_device_t *) fts_get_ptr(data);
 
   if (ldev->active && (ldev->object_count == 0))
     {
@@ -866,9 +869,9 @@ static void fts_audio_add_zero_fun_unused(fts_symbol_t name, void *data, void *u
 }
 
 
-static void fts_audio_add_in_read_fun_unused(fts_symbol_t name, void *data, void *user_data)
+static void fts_audio_add_in_read_fun_unused(fts_symbol_t name, fts_atom_t *data, void *user_data)
 {
-  fts_audio_input_logical_device_t *ldev = (fts_audio_input_logical_device_t *)data;
+  fts_audio_input_logical_device_t *ldev = (fts_audio_input_logical_device_t *) fts_get_ptr(data);
 
   if (ldev->active && (ldev->object_count == 0))
     {

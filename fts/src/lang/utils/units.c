@@ -54,11 +54,13 @@ fts_unit_conv_identity(float value, void *nix)
 int 
 fts_unit_add(fts_symbol_t unit_name, fts_symbol_t base, fts_unit_conv_t conv, int depends)
 {
+  fts_atom_t a;
   fts_unit_t *unit;
 
   unit = (fts_unit_t *)fts_malloc(sizeof(fts_unit_t));
 
-  if (! fts_hash_table_insert(&the_units_hashtable, unit_name, (void *)unit))
+  fts_set_ptr(&a, unit);
+  if (! fts_hash_table_insert(&the_units_hashtable, unit_name, &a))
     {
       fts_free((void *)unit);
       return(0);
@@ -86,30 +88,37 @@ fts_unit_add(fts_symbol_t unit_name, fts_symbol_t base, fts_unit_conv_t conv, in
 int
 fts_is_unit(fts_symbol_t unit_name, fts_symbol_t base_name)
 {
-  fts_unit_t *unit;
+  fts_atom_t unit;
 
-  return fts_hash_table_lookup(&the_units_hashtable, unit_name, (void **)&unit);
+  return fts_hash_table_lookup(&the_units_hashtable, unit_name, &unit);
 }
 
 
 int
 fts_unit_is_of_base(fts_symbol_t unit_name, fts_symbol_t base_name)
 {
+  fts_atom_t data;
   fts_unit_t *unit;
 
-  if (! fts_hash_table_lookup(&the_units_hashtable, unit_name, (void **)&unit))
+  if (! fts_hash_table_lookup(&the_units_hashtable, unit_name, &data))
     return 0;
   else
-    return (unit->base == base_name);
+    {
+      unit = (fts_unit_t *)fts_get_ptr(&data);
+      return (unit->base == base_name);
+    }
 }
 
 float
 fts_unit_convert_to_base(fts_symbol_t unit_name, float value, void *dependency)
 {
+  fts_atom_t data;
   fts_unit_t *unit;
 
-  if (! fts_hash_table_lookup(&the_units_hashtable, unit_name, (void **)&unit))
+  if (! fts_hash_table_lookup(&the_units_hashtable, unit_name, &data))
     return 0.0f; /* check it in advance! */
+
+  unit = (fts_unit_t *)fts_get_ptr(&data);
 
   if (unit->base == unit_name)
     return value;
@@ -121,11 +130,13 @@ fts_unit_convert_to_base(fts_symbol_t unit_name, float value, void *dependency)
 int
 fts_unit_depends(fts_symbol_t unit_name)
 {
+  fts_atom_t data;
   fts_unit_t *unit;
 
-  if (! fts_hash_table_lookup(&the_units_hashtable, unit_name, (void **)&unit))
+  if (! fts_hash_table_lookup(&the_units_hashtable, unit_name, &data))
     return 0;
 
+  unit = (fts_unit_t *)fts_get_ptr(&data);
   return unit->depends;
 }
 

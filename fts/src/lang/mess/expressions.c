@@ -284,17 +284,20 @@ static int more_in(fts_expression_state_t *e)
 
 static fts_expression_fun_t get_expression_fun(fts_symbol_t name)
 {
-  void *data;
+  fts_atom_t data;
 
   if (fts_hash_table_lookup(&fts_expression_fun_table, name, &data))
-    return (fts_expression_fun_t) data;
+    return (fts_expression_fun_t) fts_get_fun(&data);
   else
     return (fts_expression_fun_t) 0;
 }
 
 static void fts_expression_declare_fun(fts_symbol_t name, fts_expression_fun_t f)
 {
-  fts_hash_table_insert(&fts_expression_fun_table, name, (void *)f);
+  fts_atom_t a;
+
+  fts_set_fun(&a, (void (*)())f);
+  fts_hash_table_insert(&fts_expression_fun_table, name, &a);
 }
 
 /* Return 1 in case of error, 0 otherwise */

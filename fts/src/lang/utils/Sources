@@ -1,5 +1,4 @@
 SOURCES = units.c    \
-	  atomlist.c \
 	  hashtab.c  \
 	  utils.c
 

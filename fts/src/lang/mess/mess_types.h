@@ -92,12 +92,13 @@ union fts_word
   long                fts_long;
   float               fts_float;
   fts_symbol_t        fts_symbol;
-  void                *fts_ptr;		/*  just a pointer somewhere */
   char                *fts_str;
   fts_object_t        *fts_obj;
   fts_connection_t    *fts_connection;
   fts_atom_array_t    *fts_atom_array;
   fts_data_t          *fts_data;
+  void                *fts_ptr;		/*  just a pointer somewhere */
+  void                (*fts_fun)();     /*  just a pointer to some function */
 };
 
 /*

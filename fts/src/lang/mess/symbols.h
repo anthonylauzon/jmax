@@ -32,6 +32,7 @@ extern fts_symbol_t fts_s_float;
 extern fts_symbol_t fts_s_int;
 extern fts_symbol_t fts_s_number;
 extern fts_symbol_t fts_s_ptr;
+extern fts_symbol_t fts_s_fun;
 extern fts_symbol_t fts_s_string;
 extern fts_symbol_t fts_s_symbol;
 extern fts_symbol_t fts_s_object;

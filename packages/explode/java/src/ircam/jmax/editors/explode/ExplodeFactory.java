@@ -21,7 +21,7 @@ public class ExplodeFactory implements MaxDataEditorFactory {
    */
   public MaxDataEditor newEditor( MaxData maxData) 
   {
-    return new Explode( maxData);
+    return new ExplodeDataEditor((ExplodeRemoteData) maxData);
   }
 }
 

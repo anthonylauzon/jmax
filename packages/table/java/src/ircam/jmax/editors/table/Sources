@@ -2,5 +2,6 @@ SOURCES = \
 	  Tabler.java \
 	  TableExtension.java \
 	  TableFactory.java \
+	  TableDataEditor.java \
 	  TablePanel.java
 

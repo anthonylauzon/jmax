@@ -9,7 +9,13 @@ import ircam.jmax.utils.*;
 
 public abstract class AbstractMaxDataEditor implements  MaxDataEditor
 {
+  MaxData data;
   private boolean ready = false;
+
+  protected AbstractMaxDataEditor(MaxData data)
+  {
+    this.data = data;
+  }
 
   /**
    * This method is called when an edit is asked
@@ -25,7 +31,10 @@ public abstract class AbstractMaxDataEditor implements  MaxDataEditor
    * This method return the data instance the editor is editing
    */
 
-  abstract public MaxData getData();
+  public MaxData getData()
+  {
+    return data;
+  }
        
   /** This method ask to the stop editing the data.
    *  This probabily means that the data item or the editor is about to
@@ -34,16 +43,6 @@ public abstract class AbstractMaxDataEditor implements  MaxDataEditor
    */
 
   public void quitEdit()
-  {
-  }
-
-  /** Tell the editor to syncronize, i.e. to store in the
-   * data all the information possibly cached in the editor
-   * and still not passed to the data instance; this usually
-   * happen before saving an instance.
-   */
-
-  public void syncData()
   {
   }
 
@@ -62,7 +61,7 @@ public abstract class AbstractMaxDataEditor implements  MaxDataEditor
 
   private MaxVector listeners;
 
-  public void addEditorReadyListener(MaxEditorReadyListener l)
+  public void addEditorReadyListener(MaxDataEditorReadyListener l)
   {
     if (ready)
       {
@@ -79,7 +78,7 @@ public abstract class AbstractMaxDataEditor implements  MaxDataEditor
       }
   }
 
-  public void removeEditorReadyListener(MaxEditorReadyListener l)
+  public void removeEditorReadyListener(MaxDataEditorReadyListener l)
   {
     if (listeners != null)
       listeners.removeElement(l);
@@ -92,10 +91,10 @@ public abstract class AbstractMaxDataEditor implements  MaxDataEditor
 	Object[] objects = listeners.getObjectArray();
 
 	for (int i = 0; i < listeners.size(); i++)
-	  ((MaxEditorReadyListener) objects[i]).editorReady(this);
-
-	ready = true;
+	  ((MaxDataEditorReadyListener) objects[i]).editorReady(this);
       }
+
+    ready = true;
   }
 }
 

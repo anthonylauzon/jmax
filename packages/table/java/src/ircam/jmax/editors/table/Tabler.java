@@ -1,8 +1,8 @@
 
 package ircam.jmax.editors.table;
 import ircam.jmax.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -14,7 +14,7 @@ import com.sun.java.swing.*;
  A simple table editor
  */
 
-public class Tabler extends MaxEditor implements MaxDataEditor {
+public class Tabler extends MaxEditor {
   
   TablePanel itsTablePanel;
   TextField itsFormula;
@@ -28,10 +28,10 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
 
   public FtsIntegerVector itsData;
   
-  public Tabler(MaxData theData) {
+  public Tabler(FtsIntegerVector theData) {
     super(Mda.getDocumentTypeByName("Table"));
 
-    itsData = (FtsIntegerVector) theData;
+    itsData = theData;
 
     if (itsData.getDocument().getName()==null)
       setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("table"));
@@ -115,22 +115,12 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
     setVisible(true);
   }
 
-  public MaxData getData()
-  {
-    return itsData;
-  }
  
   public Tabler() {
     super();
   }
 
    // the MaxDataEditor interface
-
-  public void quitEdit()
-  {
-    Close();
-    dispose();
-  }
 
   public void reEdit()
   {
@@ -140,42 +130,6 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
 
     toFront();
   }
-
-  /** Tell the editor to syncronize, i.e. to store in the
-   * data all the information possibly cached in the editor
-   * and still not passed to the data instance; this usually
-   * happen before saving an instance.
-   */
-  public void syncData(){}
-  /** Tell the editor the data has changed; it pass a sigle Java
-   * Object that may code what is changed and where; if the argument
-   * is null, means usually that all the data is changed
-   */
-  public void dataChanged(Object reason){}
-
-
-  /** Nothing special to show */
-
-  public void  showObject(Object obj){}
-
-
-  /**
-   * We should Use AbstractMaxDataEditor to build a separate MaxDataEditor
-   * object.
-   */
-
-  public void addEditorReadyListener(MaxEditorReadyListener l)
-  {
-    l.editorReady(this);
-  }
-
-  public void removeEditorReadyListener(MaxEditorReadyListener l)
-  {
-  }
-
-
-  //end of the MaxDataEditor interface
-
 
   public void SetupMenu(){
     GetEditMenu().add(new MenuItem("-"));

@@ -3,7 +3,6 @@
 
 extern fts_module_t fts_utils_module;
 
-#include "utils/atomlist.h"
 #include "utils/hashtab.h"
 #include "utils/units.h"
 

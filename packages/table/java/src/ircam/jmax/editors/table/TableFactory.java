@@ -12,7 +12,7 @@ public class TableFactory implements MaxDataEditorFactory {
   }
   
   public MaxDataEditor newEditor(MaxData theData) {
-    return new Tabler(theData);
+    return new TableDataEditor((FtsIntegerVector) theData);
   }
 }
 

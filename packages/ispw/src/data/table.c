@@ -24,11 +24,11 @@ static fts_intvec_t *
 table_intvec_get(fts_symbol_t name, int size)
 {
   table_intvec_t *this;
-  void *d;
+  fts_atom_t d;
 
   if (fts_hash_table_lookup(&table_intvec_table, name, &d))
     {
-      this = (table_intvec_t *) d;
+      this = (table_intvec_t *) fts_get_ptr(&d);
       this->refcount++;
     }
   else
@@ -38,8 +38,8 @@ table_intvec_get(fts_symbol_t name, int size)
       this->v = fts_intvec_new(size);
       this->refcount = 1;
 
-      d = (void *) this;
-      fts_hash_table_insert(&table_intvec_table, name, d);
+      fts_set_ptr(&d, this);
+      fts_hash_table_insert(&table_intvec_table, name, &d);
     }
 
   return this->v;
@@ -49,12 +49,12 @@ table_intvec_get(fts_symbol_t name, int size)
 static void
 table_intvec_release(fts_symbol_t name)
 {
-  void *d;
+  fts_atom_t d;
   table_intvec_t *this;
 
   if (fts_hash_table_lookup(&table_intvec_table, name, &d))
     {
-      this = (table_intvec_t *) d;
+      this = (table_intvec_t *) fts_get_ptr(&d);
       this->refcount--;
     }
   else
@@ -74,12 +74,12 @@ table_intvec_release(fts_symbol_t name)
 fts_intvec_t *
 table_intvec_get_by_name(fts_symbol_t name)
 {
-  void *d;
+  fts_atom_t d;
   table_intvec_t *this;
 
   if (fts_hash_table_lookup(&table_intvec_table, name, &d))
     {
-      this = (table_intvec_t *) d;
+      this = (table_intvec_t *) fts_get_ptr(&d);
       return this->v;
     }
   else

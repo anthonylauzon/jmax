@@ -12,6 +12,7 @@ SOURCES = \
 	ExplodeDataModel.java	\
 	ExplodeExtension.java	\
 	ExplodeFactory.java	\
+	ExplodeDataEditor.java  \
 	ExplodeRemoteData.java	\
 	ExplodeSelection.java	\
 	GraphicContext.java	\

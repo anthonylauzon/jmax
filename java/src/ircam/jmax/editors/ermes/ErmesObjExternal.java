@@ -159,8 +159,8 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
 
 		// Add ready listener
 
-		editor.addEditorReadyListener(new MaxEditorReadyListener() {
-		  public void editorReady(MaxDataEditor editor) { itsSketchPad.stopWaiting();}
+		editor.addEditorReadyListener(new MaxDataEditorReadyListener() {
+		  public void editorReady(MaxDataEditor editor) {itsSketchPad.stopWaiting();}
 		});
 	      }
 	    catch ( MaxDocumentException e)

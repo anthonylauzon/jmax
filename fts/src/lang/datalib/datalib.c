@@ -5,6 +5,7 @@
 extern void fts_intvec_config(void);  
 extern void floatvector_config(void);  
 extern void fts_objectset_config(void);  
+extern void fts_atom_list_config(void);
 
 static void fts_datalib_init(void);
 

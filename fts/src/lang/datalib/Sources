@@ -1,6 +1,7 @@
 SOURCES = datalib.c \
 	  floatvector.c \
 	  intvec.c  \
+	  atomlist.c \
 	  objectset.c
 
 

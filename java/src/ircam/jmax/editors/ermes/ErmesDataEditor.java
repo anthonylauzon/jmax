@@ -10,14 +10,18 @@ import ircam.jmax.mda.*;
 public class ErmesDataEditor extends AbstractMaxDataEditor
 {
   private ErmesSketchWindow window = null;
-  private FtsContainerObject patcher;
   
   public ErmesDataEditor(FtsContainerObject p)
   {
-    patcher = p;
+    super(p);
+
+    final FtsContainerObject patcher = p;
 
     if (patcher.isDownloaded())
-      setSketchWindow(new ErmesSketchWindow(patcher));
+      {
+	setSketchWindow(new ErmesSketchWindow(patcher));
+	fireEditorReadyListeners();
+      }
     else
       patcher.download(new Runnable() {
 	public void run() {
@@ -49,17 +53,6 @@ public class ErmesDataEditor extends AbstractMaxDataEditor
       }
   }
 
-  /**
-   * This method return the data instance the editor is editing
-   */
-
-  public MaxData getData()
-  {
-    if (window != null)
-      return (MaxData) window.itsPatcher;
-    else
-      return null;
-  }
        
   /** This method ask to the stop editing the data.
    *  This probabily means that the data item or the editor is about to

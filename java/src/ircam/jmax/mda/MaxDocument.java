@@ -186,15 +186,6 @@ abstract public class MaxDocument
     if (! canSave())
       throw new MaxDocumentException("Cannot save to " + file);
 
-    for (int i = 0; i < editors.size() ; i++)
-      {
-	MaxDataEditor editor;
-
-	editor = (MaxDataEditor) editors.elementAt(i);
-
-	editor.syncData();
-      }
-
     if (handler == null)
       throw new MaxDocumentException("No document handler for " + file);
 
@@ -213,15 +204,6 @@ abstract public class MaxDocument
 
     if (handler == null)
       throw new MaxDocumentException("Cannot save to " + file);
-
-    for (int i = 0; i < editors.size() ; i++)
-      {
-	MaxDataEditor editor;
-
-	editor = (MaxDataEditor) editors.elementAt(i);
-
-	editor.syncData();
-      }
 
     handler.saveDocument(this, file);
   }
@@ -246,15 +228,6 @@ abstract public class MaxDocument
 
 	if (handler == null)
 	  throw new MaxDocumentException("Cannot save to " + file);
-
-	for (int i = 0; i < editors.size() ; i++)
-	  {
-	    MaxDataEditor editor;
-
-	    editor = (MaxDataEditor) editors.elementAt(i);
-
-	    editor.syncData();
-	  }
 
 	handler.saveSubDocument(this, data, file);
       }

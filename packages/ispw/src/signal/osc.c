@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:53:40 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:37:02 $
  *
  * Oscillator.
  * Based on the old version by Miller Puckette.
@@ -170,17 +170,17 @@ sigtab1_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void
 sigtab1_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
+  fts_atom_t data;
   sigtab1_t *this = (sigtab1_t *)o;
   fts_symbol_t s = fts_get_symbol_arg(ac, at, 1, 0);
-  wavetab_t *wavetab;
   int r;
 
   if (!s)
     return;
 
-  if (fts_hash_table_lookup(sigtab1_ht, s, (void **)&wavetab))
+  if (fts_hash_table_lookup(sigtab1_ht, s, &data))
     {
-      this->wavetab = wavetab;
+      this->wavetab = (wavetab_t *)fts_get_ptr(&data);
       this->wavetab->refcnt++;
     }
   else
@@ -609,14 +609,18 @@ osc_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *
 {
   osc_t *this = (osc_t *)o;
   fts_symbol_t s = fts_get_symbol_arg(ac, at, 0, 0);
-  wavetab_t *wavetab;
+  fts_atom_t data;
 
   this->sym = s;
   
   if (s)
     {
-      if (fts_hash_table_lookup(sigtab1_ht, s, (void **)&wavetab))
-	ftl_data_set(osc_control_t, this->osc_ftl_data, samps, &(wavetab->samps));
+      if (fts_hash_table_lookup(sigtab1_ht, s, &data))
+	{
+	  wavetab_t *wavetab = (wavetab_t *) fts_get_ptr(&data);
+	  
+	  ftl_data_set(osc_control_t, this->osc_ftl_data, samps, &(wavetab->samps));
+	}
       else
 	post("osc1~: set %s: can not find table\n", fts_symbol_name(s));
     }
@@ -633,7 +637,7 @@ osc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
   float f;
   const double zero = 0.0f;
-  wavetab_t *wavetab;
+  fts_atom_t data;
 
   f = 1.0f / fts_dsp_get_output_srate(dsp, 0);
   ftl_data_set(osc_control_t, this->osc_ftl_data, fconv, &f);
@@ -641,8 +645,10 @@ osc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 
   if (this->sym)
     {
-      if (fts_hash_table_lookup(sigtab1_ht, this->sym, (void **)&wavetab))
+      if (fts_hash_table_lookup(sigtab1_ht, this->sym, &data))
 	{
+	  wavetab_t *wavetab = (wavetab_t *) fts_get_ptr(&data);
+
           ftl_data_set(osc_control_t, this->osc_ftl_data, samps, &(wavetab->samps));
 	}
       else

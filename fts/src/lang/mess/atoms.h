@@ -49,6 +49,9 @@
 #define fts_set_ptr(ap, x)         \
         do {fts_set_type(ap, fts_s_ptr); fts_word_set_ptr(fts_get_value(ap), (x));} while (0)
 
+#define fts_set_fun(ap, x)         \
+        do {fts_set_type(ap, fts_s_fun); fts_word_set_fun(fts_get_value(ap), (x));} while (0)
+
 #define fts_set_int(ap, x)         \
      do {fts_set_type(ap, fts_s_int); fts_word_set_int(fts_get_value(ap), (x));} while (0)
 
@@ -82,6 +85,7 @@
 #define fts_get_symbol(ap)         (fts_word_get_symbol(fts_get_value(ap)))
 #define fts_get_string(ap)         (fts_word_get_string(fts_get_value(ap)))
 #define fts_get_ptr(ap)            (fts_word_get_ptr(fts_get_value(ap)))
+#define fts_get_fun(ap)            (fts_word_get_fun(fts_get_value(ap)))
 #define fts_get_int(ap)            (fts_word_get_int(fts_get_value(ap)))
 #define fts_get_long(ap)           fts_get_int(ap)
 #define fts_get_float(ap)          (fts_word_get_float(fts_get_value(ap)))
@@ -100,6 +104,7 @@
 #define fts_is_symbol(ap)          fts_is_a(ap, fts_s_symbol)
 #define fts_is_string(ap)          fts_is_a(ap, fts_s_string)
 #define fts_is_ptr(ap)             fts_is_a(ap, fts_s_ptr)
+#define fts_is_fun(ap)             fts_is_a(ap, fts_s_fun)
 #define fts_is_int(ap)             fts_is_a(ap, fts_s_int)
 #define fts_is_long(ap)            fts_is_int(ap)
 #define fts_is_float(ap)           fts_is_a(ap, fts_s_float)

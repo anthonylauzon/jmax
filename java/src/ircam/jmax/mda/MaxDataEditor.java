@@ -33,14 +33,6 @@ public interface MaxDataEditor
 
   abstract public void quitEdit();
 
-  /** Tell the editor to syncronize, i.e. to store in the
-   * data all the information possibly cached in the editor
-   * and still not passed to the data instance; this usually
-   * happen before saving an instance.
-   */
-
-  abstract public void syncData();
-
   /*
    * Tell the editor to show a specif piece of data, here
    * represented by a Java Object.
@@ -55,8 +47,8 @@ public interface MaxDataEditor
    * Use AbstractMaxDataEditor to build a new one easily.
    */
 
-  abstract void addEditorReadyListener(MaxEditorReadyListener l);
-  abstract void removeEditorReadyListener(MaxEditorReadyListener l);
+  abstract void addEditorReadyListener(MaxDataEditorReadyListener l);
+  abstract void removeEditorReadyListener(MaxDataEditorReadyListener l);
 }
 
 

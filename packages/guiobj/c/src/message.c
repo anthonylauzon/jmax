@@ -16,7 +16,7 @@ static void init_eval(void);
 typedef struct 
 {
   fts_object_t o;
-  fts_atom_list_t atom_list;
+  fts_atom_list_t *atom_list;
 } message_t;
 
 static void fts_eval_atom_list(message_t *this,
@@ -28,21 +28,22 @@ static void
 message_update(fts_object_t *o)
 {
   message_t *this = (message_t *) o;
-  fts_atom_list_iterator_t iterator;
+  fts_atom_list_iterator_t *iterator;
 
-  fts_atom_list_iterator_init(&iterator, &(this->atom_list));
+  iterator = fts_atom_list_iterator_new(this->atom_list);
 
   fts_client_mess_start_msg(CLIENTMESS_CODE);
   fts_client_mess_add_object((fts_object_t *)this);
   fts_client_mess_add_sym(fts_new_symbol("atomList"));
 
-  while (! fts_atom_list_iterator_end(&iterator))
+  while (! fts_atom_list_iterator_end(iterator))
     {
-      fts_client_mess_add_atoms(1, fts_atom_list_iterator_current(&iterator));
-      fts_atom_list_iterator_next(&iterator);
+      fts_client_mess_add_atoms(1, fts_atom_list_iterator_current(iterator));
+      fts_atom_list_iterator_next(iterator);
     }
 
   fts_client_mess_send_msg();
+  fts_atom_list_iterator_free(iterator);
 }
 
 static void
@@ -63,7 +64,7 @@ message_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {  
   message_t *this = (message_t *) o;
 
-  fts_eval_atom_list(this, &(this->atom_list), ac, at, o, 0);
+  fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
 }
 
 static void
@@ -71,7 +72,7 @@ message_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   message_t *this = (message_t *) o;
 
-  fts_atom_list_set(&(this->atom_list), ac, at);
+  fts_atom_list_set(this->atom_list, ac, at);
 
   if (fts_object_patcher_is_open((fts_object_t *) this))
     message_update(o);
@@ -84,7 +85,7 @@ message__set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   message_t *this = (message_t *) o;
 
-  fts_atom_list_set(&(this->atom_list), ac, at);
+  fts_atom_list_set(this->atom_list, ac, at);
 }
 
 static void
@@ -92,7 +93,7 @@ message_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   message_t *this = (message_t *) o;
 
-  fts_atom_list_append(&(this->atom_list), ac, at);
+  fts_atom_list_append(this->atom_list, ac, at);
 
   if (fts_object_patcher_is_open((fts_object_t *) this))
     message_update(o);
@@ -103,7 +104,7 @@ message_append_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 {
   message_t *this = (message_t *) o;
 
-  fts_atom_list_append(&(this->atom_list), ac, at);
+  fts_atom_list_append(this->atom_list, ac, at);
 }
 
 
@@ -112,7 +113,7 @@ message_clear_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 {
   message_t *this = (message_t *) o;
 
-  fts_atom_list_destroy(&(this->atom_list));
+  fts_atom_list_clear(this->atom_list);
 }
 
 
@@ -121,7 +122,7 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   message_t *this = (message_t *) o;
 
-  fts_atom_list_init(&(this->atom_list));
+  this->atom_list = fts_atom_list_new();
 }
 
 
@@ -130,7 +131,7 @@ message_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   message_t *this = (message_t *) o;
 
-  fts_atom_list_destroy(&(this->atom_list));
+  fts_atom_list_free(this->atom_list);
 }
 
 
@@ -140,7 +141,7 @@ message_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   message_t *this = (message_t *)o;
   fts_bmax_file_t *f = (fts_bmax_file_t *) fts_get_ptr(at);
 
-  fts_atom_list_save_bmax(&(this->atom_list), f, (fts_object_t *) this);
+  fts_atom_list_save_bmax(this->atom_list, f, (fts_object_t *) this);
 }
 
 
@@ -150,7 +151,7 @@ message_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   message_t *this = (message_t *) o;
   fts_objectset_t *set = (fts_objectset_t *)fts_get_data(at);
 
-  if (fts_atom_list_is_subsequence(&(this->atom_list), ac - 1, at + 1))
+  if (fts_atom_list_is_subsequence(this->atom_list, ac - 1, at + 1))
     fts_objectset_add(set, o);
 }
 
@@ -313,11 +314,11 @@ fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts
 
   enum {rd_idle, rd_read_list, rd_read_env} rd_command;
 
-  fts_atom_list_iterator_t iter;	/* iterator to read the list */
+  fts_atom_list_iterator_t *iter; /* iterator to read the list */
 
   int       rd_env_count;	/* counter for reading the env  */
 
-  const fts_atom_t *rd_out;		/* reader output; NULL if end of the list or end of the
+  const fts_atom_t *rd_out;	/* reader output; NULL if end of the list or end of the
 				   env */
 
   /* lexical machine status */
@@ -352,7 +353,7 @@ fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts
   /* Init the reader */
 
   rd_command = rd_read_list;
-  fts_atom_list_iterator_init(&iter, list);
+  iter = fts_atom_list_iterator_new(list);
 
   /* Init the lexical machine */
 
@@ -385,12 +386,12 @@ fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts
 	     and then increment the iterator.
 	     */
 	     
-	  if (fts_atom_list_iterator_end( &iter))
+	  if (fts_atom_list_iterator_end(iter))
 	    rd_out = 0;
 	  else
 	    {
-	      rd_out = fts_atom_list_iterator_current(&iter);
-	      fts_atom_list_iterator_next(&iter);
+	      rd_out = fts_atom_list_iterator_current(iter);
+	      fts_atom_list_iterator_next(iter);
 	    }
 	  break;
 
@@ -707,6 +708,7 @@ fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts
     }
 
   RESTORE_ATOM_STACK_FRAME(ev_fp);
+  fts_atom_list_iterator_free(iter);
 }
 
 

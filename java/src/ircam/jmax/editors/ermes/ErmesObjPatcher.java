@@ -101,7 +101,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsProper
 
 	    // Add ready listener
 
-	    editor.addEditorReadyListener(new MaxEditorReadyListener() {
+	    editor.addEditorReadyListener(new MaxDataEditorReadyListener() {
 	      public void editorReady(MaxDataEditor editor) { itsSketchPad.stopWaiting();}
 	    });
 	  }

@@ -613,8 +613,7 @@ public class FtsParse
   }
 
   /* Unparse an object description from a FTS message, starting
-     from the given offset; use == to compare strings because fts
-     strings are always interned.
+     from the given offset.
      */
 
   static private final boolean wantASpaceBefore(Object value)
@@ -626,7 +625,7 @@ public class FtsParse
 			     ">>", ">", "<<", "<=", "<", "?", ":" };
 
 	for (int i = 0 ; i < keywords.length; i++)
-	  if (keywords[i] == ((String) value))
+	  if (keywords[i].equals((String) value))
 	    return true;
 
 	return false;
@@ -644,7 +643,7 @@ public class FtsParse
 
 
 	for (int i = 0 ; i < keywords.length; i++)
-	  if (keywords[i] == ((String) value))
+	  if (keywords[i].equals((String) value))
 	    return true;
 
 	return false;
@@ -663,7 +662,7 @@ public class FtsParse
 			      ";" };
 
 	for (int i = 0 ; i < keywords.length; i++)
-	  if (keywords[i] == ((String) value))
+	  if (keywords[i].equals((String) value))
 	    return true;
 
 	return false;
@@ -680,7 +679,7 @@ public class FtsParse
 			      "$", "'" };
 
 	for (int i = 0 ; i < keywords.length; i++)
-	  if (keywords[i] == ((String) value))
+	  if (keywords[i].equals((String) value))
 	    return true;
 
 	return false;
@@ -698,7 +697,7 @@ public class FtsParse
 			  ";", "'" };
     
     for (int i = 0 ; i < keywords.length; i++)
-      if (keywords[i] == ((String) value))
+      if (keywords[i].equals((String) value))
 	return true;
 
     return false;
@@ -770,9 +769,9 @@ public class FtsParse
 	    else
 	      descr.append(value1);
 
-	    if (value1 == "'")
+	    if (value1.equals("'"))
 	      noNewLine = true;
-	    else if (value1 == ";")
+	    else if (value1.equals(";"))
 	      {
 		if (noNewLine)
 		  noNewLine = false;
@@ -849,9 +848,9 @@ public class FtsParse
 
 	    descr.append(value1);
 
-	    if (value1 == "'")
+	    if (value1.equals("'"))
 	      noNewLine = true;
-	    else if (value1 == ";")
+	    else if (value1.equals(";"))
 	      {
 		if (noNewLine)
 		  noNewLine = false;

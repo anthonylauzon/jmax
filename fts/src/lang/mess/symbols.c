@@ -16,6 +16,7 @@ fts_symbol_t fts_s_float;
 fts_symbol_t fts_s_int;
 fts_symbol_t fts_s_number;
 fts_symbol_t fts_s_ptr;
+fts_symbol_t fts_s_fun;
 fts_symbol_t fts_s_string;
 fts_symbol_t fts_s_symbol;
 fts_symbol_t fts_s_object;
@@ -135,6 +136,7 @@ fts_predefine_symbols(void)
   fts_s_int        = fts_new_symbol("int");
   fts_s_number     = fts_new_symbol("number");
   fts_s_ptr        = fts_new_symbol("ptr");
+  fts_s_fun        = fts_new_symbol("fun");
   fts_s_string     = fts_new_symbol("string");
   fts_s_symbol     = fts_new_symbol("symbol");
   fts_s_object     = fts_new_symbol("object");
