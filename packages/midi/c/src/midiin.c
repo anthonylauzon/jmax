@@ -49,7 +49,7 @@ midiin_callback(fts_object_t *listener, fts_midievent_t *event, double time)
   fts_atom_t a;
 
   fts_set_midievent(&a, event);
-  fts_outlet_send(listener, 0, 0, 1, &a);
+  fts_outlet_send(listener, 0, fts_s_midievent, 1, &a);
 }
 
 static void

@@ -303,6 +303,9 @@ midiout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 { 
   midiout_t *this = (midiout_t *)o;
 
+  ac--;
+  at++;
+
   this->port = 0;
   this->channel = 0;
   this->number = 0;
