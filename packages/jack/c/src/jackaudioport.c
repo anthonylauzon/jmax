@@ -154,7 +154,9 @@ jackaudioport_close_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
 
   fts_audioport_unset_open(port, FTS_AUDIO_INPUT);
 
+
   jackaudiomanager_close_port(o, port_flag);
+  post("[jackaudioport] jackaudioport_close_input \n");
 }
 
 
@@ -163,9 +165,11 @@ jackaudioport_close_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, 
 {
   fts_audioport_t* port = (fts_audioport_t*)o;
   fts_symbol_t port_flag = fts_s_output;
+
   fts_audioport_unset_open(port, FTS_AUDIO_OUTPUT);
 
   jackaudiomanager_close_port(o, port_flag);
+  post("[jackaudioport] jackaudioport_close_output \n");
 }
 
 static void
@@ -242,7 +246,7 @@ jackaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   jackaudioport_t* self = (jackaudioport_t*)o;
   jack_client_t* client = jackaudiomanager_get_jack_client();
 
-  fts_audioport_delete(&self->head);
+  fts_audioport_delete((fts_audioport_t*)self);
   if (0 != self->input_buffer)
   {
     fts_free(self->input_buffer);
