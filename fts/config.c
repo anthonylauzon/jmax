@@ -79,10 +79,10 @@ config_load(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     
   if (obj != NULL && fts_object_get_class(obj) == config_type)
   {
+    ((config_t*)obj)->file_name = fts_new_symbol(path);
+
     /* replace current config by loaded config */
     fts_config_set( (config_t*)obj);
-
-    ((config_t*)obj)->file_name = fts_new_symbol(path);
 
     fts_config_set_dirty((config_t*)obj, 0);
   }
