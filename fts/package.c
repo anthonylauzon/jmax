@@ -54,6 +54,8 @@ fts_symbol_t s_updateDone = 0;
 fts_symbol_t s_uploadDone = 0;
 
 static fts_hashtable_t fts_packages;
+static fts_hashtable_t fts_package_requirement;
+
 static fts_list_t* fts_package_paths = NULL;
 
 static fts_class_t *fts_package_type = NULL;
@@ -408,6 +410,19 @@ fts_package_require(fts_package_t* pkg, fts_symbol_t required_pkg)
   fts_atom_t n;
   int status = 0;
   fts_package_t* req_pkg = NULL;
+  fts_atom_t key;
+  fts_atom_t value;
+
+  /* add package required in package_require stack */
+  fts_set_symbol(&key, required_pkg);
+  fts_set_symbol(&value, required_pkg);
+  if (1 == fts_hashtable_put(&fts_package_requirement, &key, &value))
+  {
+    /* required package is already in hashtable -> cyclic dependency */
+    fts_log("[package] cyclic dependency with package %s \n", required_pkg);
+    fts_post("[package] cyclic dependency with package %s \n", required_pkg);
+    return -1;
+  }
 
   /* provoke the loading the package */
   req_pkg = fts_package_load(required_pkg);
@@ -420,6 +435,14 @@ fts_package_require(fts_package_t* pkg, fts_symbol_t required_pkg)
   else
   {
     status = -1;
+  }
+  
+  /* remove package required of package_require_stack */
+  /* check if package was really in hashtable */
+  if (0 == fts_hashtable_remove(&fts_package_requirement, &key))
+  {
+    /* not reacheable case ..... */
+    fts_log("[package] required package wasn't in require hashtable \n");
   }
   return status;
 }
@@ -1627,6 +1650,8 @@ fts_kernel_package_init(void)
     fts_package_stack[i] = NULL;
 
   fts_hashtable_init( &fts_packages, FTS_HASHTABLE_MEDIUM);
+  /* create hashtable for requirement */
+  fts_hashtable_init( &fts_package_requirement, FTS_HASHTABLE_MEDIUM);
 
   /* create the system package */
   system_symbol = fts_new_symbol("_system_");
