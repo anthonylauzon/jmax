@@ -281,9 +281,9 @@ void fts_platform_init( void)
 {
   post( "Mac OS X BETA version\n");
 
-  /*  if we don't want to have audio,
-   we don't load audio packages */
-  if (fts_s_noaudio != fts_cmd_args_get(fts_s_config))
+  /*  if we want to have audio,
+   we load audio packages */
+  if (NULL == fts_cmd_args_get(fts_s_noaudio))
   {        
     /* load macosx package */
     fts_package_load(fts_new_symbol("macosx"));
