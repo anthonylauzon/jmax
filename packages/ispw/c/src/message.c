@@ -719,7 +719,7 @@ static void messbox_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   if(messbox_list_is_primitive(ac, at))
     fts_atom_list_set(this->atom_list, ac, at);
 
-  if (winlet == 0 && fts_patcher_is_open( fts_object_get_patcher( (fts_object_t *) this)) )
+  if (fts_patcher_is_open( fts_object_get_patcher( (fts_object_t *) this)) )
     messbox_update(o);
 }
 
@@ -729,7 +729,7 @@ static void messbox_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 
   fts_atom_list_clear(this->atom_list);
 
-  if (winlet == 0 && fts_patcher_is_open( fts_object_get_patcher( (fts_object_t *) this)))
+  if (fts_patcher_is_open( fts_object_get_patcher( (fts_object_t *) this)))
     messbox_update(o);
 }
 
