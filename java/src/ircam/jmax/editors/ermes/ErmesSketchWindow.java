@@ -65,8 +65,8 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
   }
 
 
-  static MaxVector ftsObjectsPasted = new MaxVector();
-  static MaxVector ftsConnectionsPasted = new MaxVector();
+  static private MaxVector ftsObjectsPasted = new MaxVector();
+  static  private MaxVector ftsConnectionsPasted = new MaxVector();
 
   public static int preferredWidth = 490;
   public static int preferredHeight = 450;
@@ -337,13 +337,11 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
-    ftsObjectsPasted.removeAllElements();
-    ftsConnectionsPasted.removeAllElements();
-
     pasting = true;
     ftsClipboard.paste( itsPatcher);
     itsPatcherData.update();
     Fts.sync();
+
     pasting = false;
 
     // make the sketch do the graphic job
@@ -353,6 +351,10 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 	itsSketchPad.RequestOffScreen();
 	itsSketchPad.repaint();
       }
+
+    ftsObjectsPasted.removeAllElements();
+    ftsConnectionsPasted.removeAllElements();
+
     setCursor( temp);
   }
 

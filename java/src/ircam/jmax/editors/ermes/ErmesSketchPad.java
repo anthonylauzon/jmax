@@ -668,7 +668,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     ErmesObject aObject;
     ErmesConnection aConnection;
 
-    int objectX;    
+    int objectX;
     int objectY;
     int minX=0;
     int minY=0;
@@ -711,8 +711,12 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	objectX = fo.getX();
 	objectY = fo.getY();
 
+	// System.err.println("Pasting object " + fo + " at position (" + objectX + "," + objectY + ")");
+
 	int newPosX = objectX - minX + itsCurrentScrollingX + pasteDelta.x + numberOfPaste*incrementalPasteOffsetX;
 	int newPosY = objectY - minY + itsCurrentScrollingY + pasteDelta.y + numberOfPaste*incrementalPasteOffsetY;
+
+	// System.err.println("Moved object " + fo + " at position (" + newPosX + "," + newPosY + ")");
 
 	fo.setX( newPosX);     
 	fo.setY( newPosY);
