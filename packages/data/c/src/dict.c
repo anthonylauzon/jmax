@@ -29,7 +29,9 @@ fts_class_t *dict_type = 0;
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_coll = 0;
 
-
+#define dict_set_editor_open(m) ((m)->opened = 1)
+#define dict_set_editor_close(m) ((m)->opened = 0)
+#define dict_editor_is_open(m) ((m)->opened)
 
 /* 
  *  data write access functions 
@@ -190,6 +192,94 @@ dict_array_function(fts_object_t *o, fts_array_t *array)
     fts_array_append(array, 1, &value);
   }
 }
+/********************************************************************
+*
+*   upload methods
+*
+*/
+#define DICT_CLIENT_BLOCK_SIZE 128
+
+static fts_memorystream_t *dict_memory_stream ;
+
+static fts_memorystream_t * dict_get_memory_stream()
+{
+  if(!dict_memory_stream)
+    dict_memory_stream = (fts_memorystream_t *)fts_object_create(fts_memorystream_class, 0, 0);
+  
+  return dict_memory_stream;
+}
+
+static void 
+dict_upload_size(dict_t *self)
+{
+  fts_atom_t a[2];
+  int m = fts_hashtable_get_size(&self->hash);
+  int n = 2;
+  
+  fts_set_int(a, m);
+  fts_set_int(a+1, n);
+  fts_client_send_message((fts_object_t *)self, fts_s_size, 2, a);
+}
+
+static void 
+dict_upload_data(dict_t *self)
+{  
+  fts_array_t array;
+  fts_atom_t *atoms;
+  fts_atom_t *d;
+  fts_atom_t a[DICT_CLIENT_BLOCK_SIZE];
+  int size, data_size, ms, ns, sent;
+  fts_memorystream_t *stream = dict_get_memory_stream();
+  
+  fts_array_init(&array, 0, 0);
+  dict_array_function((fts_object_t *)self, &array);
+  atoms = fts_array_get_atoms(&array);
+  size = fts_array_get_size(&array);
+  
+  data_size = size*2;
+  ms = 0;
+  ns = 0;
+  sent = 0;
+  while( data_size > 0)
+  {
+    int i = 0;
+    int n = (data_size > DICT_CLIENT_BLOCK_SIZE-2)? DICT_CLIENT_BLOCK_SIZE-2: data_size;
+    
+    if( sent)
+    {
+      ms = sent/2;
+      ns = sent - ms*2;
+    }
+    fts_set_int(a, ms);
+    fts_set_int(a+1, ns);
+    
+    for(i=0; i<n; i++)
+    {
+      d = atoms + sent + i;
+      
+      if(fts_is_object(d))
+      {
+        fts_memorystream_reset(stream);
+        fts_spost_object((fts_bytestream_t *)stream, fts_get_object(d));
+        fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
+        fts_set_symbol(&a[i],  fts_new_symbol((char *)fts_memorystream_get_bytes( stream)));      
+      }
+      else
+        fts_atom_copy(d, &a[2+i]);
+    }
+    fts_client_send_message((fts_object_t *)self, fts_s_set, n+2, a);
+    
+    sent += n;
+    data_size -= n;
+  }
+}
+
+static void
+dict_upload(dict_t *self)
+{
+  dict_upload_size(self);
+  dict_upload_data(self);
+}
 
 /**********************************************************
  *
@@ -204,6 +294,9 @@ dict_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   
   dict_remove_all(self);
   fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
+
+  if(dict_editor_is_open(self))
+    dict_upload(self);
 }
 
 static void
@@ -213,6 +306,9 @@ dict_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   
   dict_store_list(self, ac, at);
   fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
+
+  if(dict_editor_is_open(self))
+    dict_upload(self);
 }
 
 static void
@@ -222,6 +318,9 @@ dict_remove_entry(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   
   dict_remove(self, at);
   fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
+
+  if(dict_editor_is_open(self))
+    dict_upload(self);
 }
 
 static void
@@ -246,6 +345,9 @@ dict_set_from_dict(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   dict_copy((dict_t *)fts_get_object(at), self);
 
   fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
+
+  if(dict_editor_is_open(self))
+    dict_upload(self);
 }
 
 static void
@@ -530,6 +632,9 @@ dict_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
     fts_post("dict: can't import from file \"%s\"\n", fts_symbol_name(file_name));
 
   fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
+
+  if(dict_editor_is_open(self))
+    dict_upload(self);
 }
 
 static void
@@ -622,7 +727,36 @@ dict_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   }
 }
 
+static void
+dict_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dict_t *self = (dict_t *)o;
+  
+  dict_set_editor_open(self);
+  fts_client_send_message(o, fts_s_openEditor, 0, 0);
+  
+  dict_upload(self);
+}
 
+static void 
+dict_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dict_t *self = (dict_t *) o;
+  
+  if(dict_editor_is_open(self))
+  {
+    dict_set_editor_close(self);
+    fts_client_send_message(o, fts_s_closeEditor, 0, 0);  
+  }
+}
+
+static void
+dict_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dict_t *self = (dict_t *)o;
+  
+  dict_set_editor_close(self);
+}
 
 /**********************************************************
  *
@@ -699,6 +833,10 @@ dict_instantiate(fts_class_t *cl)
   
   fts_class_inlet_bang(cl, 0, data_object_output);
 
+  fts_class_message_varargs(cl, fts_s_openEditor, dict_open_editor);
+  fts_class_message_varargs(cl, fts_s_closeEditor, dict_close_editor); 
+  fts_class_message_varargs(cl, fts_s_destroyEditor, dict_destroy_editor);  
+  
   fts_class_inlet_thru(cl, 0);
   fts_class_outlet_thru(cl, 0);
 

@@ -37,6 +37,8 @@ typedef struct dict
 {
   fts_object_t o;
   fts_hashtable_t hash;
+  
+  int opened; /* non zero if editor open */
 } dict_t;
 
 #define dict_get_hashtable(d) (&(d)->hash)

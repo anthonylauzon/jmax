@@ -41,7 +41,7 @@ import ircam.jmax.toolkit.*;
    */
 public class MatPanel extends JPanel implements Editor, MatDataListener
 {    
-  FtsMatObject matData;
+  MatDataModel matData;
   EditorContainer itsContainer;
   MatTableModel tableModel;
   DefaultTableCellRenderer rowsIdRenderer;
@@ -52,7 +52,7 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
   public static final Color rowsIdColor = new Color(245, 245, 245);
   public static final int COLUMN_MIN_WIDTH = 70;
   
-  public MatPanel(EditorContainer container, FtsMatObject data) 
+  public MatPanel(EditorContainer container, MatDataModel data) 
   {  
     itsContainer = container;
 
@@ -84,8 +84,12 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
     table.setPreferredScrollableViewportSize(new Dimension( MatWindow.DEFAULT_WIDTH, MatWindow.DEFAULT_HEIGHT));
     table.setRowHeight(17);
     table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF);
-    table.getColumnModel().getColumn(0).setMinWidth(40);
-    table.getColumnModel().getColumn(0).setMaxWidth(40);
+    if( matData.haveRowIdCol())
+    {
+      table.getColumnModel().getColumn(0).setMinWidth(40);
+      table.getColumnModel().getColumn(0).setMaxWidth(40);
+    }
+    table.getTableHeader().setReorderingAllowed(false);
     scrollPane = new JScrollPane(table);
     add(BorderLayout.CENTER, scrollPane);
     
@@ -108,10 +112,12 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
     for (int i = 1; i < matData.getColumns(); i++) 
       table.getColumnModel().getColumn(i).setMinWidth(COLUMN_MIN_WIDTH);
     
-    table.getColumnModel().getColumn(0).setMaxWidth(40);
-    table.getColumnModel().getColumn(0).setMinWidth(40);
-    
-    table.getColumnModel().getColumn(0).setCellRenderer(rowsIdRenderer);
+    if( matData.haveRowIdCol())
+    {
+      table.getColumnModel().getColumn(0).setMinWidth(40);
+      table.getColumnModel().getColumn(0).setMaxWidth(40);
+      table.getColumnModel().getColumn(0).setCellRenderer(rowsIdRenderer);
+    }    
   }
   
   void updateTableToSize(int width)
@@ -148,7 +154,7 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
   }
   public void close(boolean doCancel){
     itsContainer.getFrame().setVisible(false);
-    matData.requestDestroyEditor(); 
+    ((FtsObjectWithEditor)matData).requestDestroyEditor(); 
     MaxWindowManager.getWindowManager().removeWindow((Frame)itsContainer);
   }
   public void save(){}

@@ -41,12 +41,14 @@ class MatTableModel extends AbstractTableModel
 
 public int getColumnCount() 
 { 
-  return model.getColumns() + 1;
+  if(model.haveRowIdCol())
+    return model.getColumns() + 1;
+  else return model.getColumns();
 }
 
 public void setValueAt(Object aValue, int rowIndex, int columnIndex) 
 {	
-  if(columnIndex == 0) return;
+  if(model.haveRowIdCol() && columnIndex == 0) return;
   
   if( aValue != null)
   {
@@ -64,33 +66,45 @@ public void setValueAt(Object aValue, int rowIndex, int columnIndex)
         obj = aValue;
       }
     } 
-    model.requestSetValue( obj, rowIndex, columnIndex-1);
+    
+    if(model.haveRowIdCol())
+      model.requestSetValue( obj, rowIndex, columnIndex-1);
+    else
+      model.requestSetValue( obj, rowIndex, columnIndex);
   }
 }
 
 public boolean isCellEditable(int row, int col)
 {
-	return col != 0;
+  if(model.haveRowIdCol())
+    return col != 0;
+  else return true;
 }
 
 public String getColumnName(int col)
 {
-	if(col == 0)
-		return "Row Id";
-	else     
-    return model.getColumnName(col-1);
+  if(model.haveRowIdCol())
+  {
+    if(col == 0)
+      return "Row Id";
+    else     
+      return model.getColumnName(col-1);
+  }
+  else return model.getColumnName(col);
 }
-
 public int getRowCount() { 
   return model.getRows();
 }
 
 public Object getValueAt(int row, int col) 
 { 
-  if(col == 0)
-		return new Integer(row);
-	else 
-    return model.getValueAt(row, col-1);
+  if(model.haveRowIdCol())
+    if(col == 0)
+      return new Integer(row);
+    else 
+      return model.getValueAt(row, col-1);
+  else
+    return model.getValueAt(row, col);
 }
 
 public MatDataModel getMatDataModel()

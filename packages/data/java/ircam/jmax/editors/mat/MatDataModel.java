@@ -35,7 +35,9 @@ public interface MatDataModel {
     
     public abstract String getColumnName(int col_id);
     
-     public abstract int getColumns();
+    public abstract boolean haveRowIdCol();
+    
+    public abstract int getColumns();
     
     public abstract void setSize(int m, int n);
     

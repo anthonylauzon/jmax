@@ -35,32 +35,32 @@ import javax.swing.*;
  * A concrete implementation of the SequenceDataModel,
  * this class represents a model of a set of tracks.
  */
-public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
+public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
 {
   static
   {
-    FtsObject.registerMessageHandler( FtsMatObject.class, FtsSymbol.get("clear"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsDictObject.class, FtsSymbol.get("clear"), new FtsMessageHandler(){
       public void invoke( FtsObject obj, FtsArgs args)
       {
-          ((FtsMatObject)obj).clear();
+          ((FtsDictObject)obj).clear();
       }
     });
-    FtsObject.registerMessageHandler( FtsMatObject.class, FtsSymbol.get("set"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsDictObject.class, FtsSymbol.get("set"), new FtsMessageHandler(){
       public void invoke( FtsObject obj, FtsArgs args)
       {
-        ((FtsMatObject)obj).set( args.getLength(), args.getAtoms());
+        ((FtsDictObject)obj).set( args.getLength(), args.getAtoms());
       }
    });
-    FtsObject.registerMessageHandler( FtsMatObject.class, FtsSymbol.get("size"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsDictObject.class, FtsSymbol.get("size"), new FtsMessageHandler(){
       public void invoke( FtsObject obj, FtsArgs args)
     {
-        ((FtsMatObject)obj).setSize( args.getInt(0), args.getInt(1));
+        ((FtsDictObject)obj).setSize( args.getInt(0), args.getInt(1));
     }
     });
-    FtsObject.registerMessageHandler( FtsMatObject.class, FtsSymbol.get("mat_append_row"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsDictObject.class, FtsSymbol.get("dict_append_row"), new FtsMessageHandler(){
       public void invoke( FtsObject obj, FtsArgs args)
     {
-        ((FtsMatObject)obj).appendRow();
+        ((FtsDictObject)obj).appendRow();
     }
     });
   }
@@ -68,7 +68,7 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
   /**
    * constructor.
    */
-  public FtsMatObject(FtsServer server, FtsObject parent, int objId, String classname, FtsAtom args[], int offset, int length)
+  public FtsDictObject(FtsServer server, FtsObject parent, int objId, String classname, FtsAtom args[], int offset, int length)
   {
     super(server, parent, objId, classname, args, offset, length); 
     
@@ -163,19 +163,51 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
   public void requestSetValue( java.lang.Object aValue, int rowIndex, int columnIndex)
   {
     args.clear();
-    args.addInt( rowIndex);
-    args.addInt( columnIndex);
-    if(aValue instanceof String)
-      args.addSymbol( FtsSymbol.get((String) aValue));
-    else
-      args.add( aValue);
     
+    if(columnIndex == 0)
+    {
+      Object val = getValueAt(rowIndex, 1);
+      
+      /* remove old key entry */
+      args.add( getValueAt(rowIndex, 0));
+      try{
+        send( FtsSymbol.get("remove"), args);
+      }
+      catch(IOException e)
+      {
+        System.err.println("FtsDictObject: I/O Error sending remove Message!");
+        e.printStackTrace(); 
+      }    
+      
+      /* no new value, only remove entry */
+      if(aValue == null || ((aValue instanceof String) && ((String)aValue).equals("")) )
+        return;
+      
+      /* add new key entry with old value */
+      args.clear();
+      if(aValue instanceof String)
+        args.addSymbol( FtsSymbol.get((String) aValue));
+      else
+        args.add( aValue);
+      
+      args.add(val);
+    }
+    else
+    {
+      /* */
+      args.add( getValueAt(rowIndex, 0));
+      
+      if(aValue instanceof String)
+        args.addSymbol( FtsSymbol.get((String) aValue));
+      else
+        args.add( aValue);
+    }
     try{
       send( FtsSymbol.get("set"), args);
     }
     catch(IOException e)
     {
-      System.err.println("FtsMatObject: I/O Error sending set Message!");
+      System.err.println("FtsDictObject: I/O Error sending set Message!");
       e.printStackTrace(); 
     }    
   }
@@ -187,7 +219,7 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
     }
     catch(IOException e)
     {
-      System.err.println("FtsMatObject: I/O Error sending append Message!");
+      System.err.println("FtsDictObject: I/O Error sending append Message!");
       e.printStackTrace(); 
     }    
   }
@@ -211,12 +243,17 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
   
   public boolean haveRowIdCol()
   {
-    return true;
+    return false;
   }
   
   public String getColumnName(int col_id)
   {
-    return "col "+col_id;
+    switch(col_id)
+    {
+      case 0: return "keys";
+      case 1: return "values";
+      default: return "";
+    }
   }
   
   public void setRows(int m)

@@ -41,14 +41,14 @@ public class MatWindow extends JFrame implements EditorContainer{
   
   //------------------- fields
   MatPanel itsMatPanel;
-  FtsMatObject matData;
+  MatDataModel matData;
   
   public final static int DEFAULT_WIDTH  = 600;
   public final static int DEFAULT_HEIGHT = 350;
   public final static int MAX_HEIGHT     = 800;
   public final static int EMPTY_HEIGHT   = 78;
   
-  public MatWindow(FtsMatObject data)
+  public MatWindow(MatDataModel data)
   {
     super();
     
