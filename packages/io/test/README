@@ -3,34 +3,58 @@ This directory contains test material for io package.
 
 1) udp test
 
-This test requires to recompile the Java sources.
-  make all
-(swingall.jar must be in CLASSPATH)
+1.1) with the Java program
 
-To test the udp object:
+ - recompile the Java sources, in java/ subdirectory:
+	make all (swingall.jar must be in CLASSPATH)
  - run jmax
  - load patch test-udp.jmax
  - run UDPTest.class
-   java UDPTest <host name> <port>
-     where <host name> is the host name of the host running jMax
-           <port> is the port number (specified as argument of the udp object)
+	java UDPTest <host name> <port>
+		<host name> is the host name of the host running jMax
+		<port> is the port number (specified as argument of the udp object)
  - this will open a Java application with a window containing a slider. Move the slider, 
    the slider in the jMax patch should move too... 
+
+1.2) with the C program
+
+ - recompile the C sources, in c/ subdirectory:
+ - run jmax
+ - load patch test-udp.jmax
+ - run udptest
+ 	udptest <host name> <port>
+		<host name> is the host name of the host running jMax
+		<port> is the port number (specified as argument of the udp object)
+ - this program reads number on standard input and send them to jMax. The slider
+	in the patch should move to the number you typed...
+ 
 
 2) udpmessage test
 
-This test requires to recompile the Java sources.
-  make all
-(swingall.jar must be in CLASSPATH)
+2.1) with the Java program
 
-To test the udpmessage object:
+ - recompile the Java sources, in java/ subdirectory:
+	make all (swingall.jar must be in CLASSPATH)
  - run jmax
  - load patch test-udpmessage.jmax
  - run UDPMessageTest.class
-   make run MAIN=UDPMessageTest ARGS="<host name> <port> freq vol mod"
-     where <host name> is the host name of the host running jMax
-           <port> is the port number (specified as argument of the udp object)
-	   and remaining arguments are message names
- - this will open a Java application with a window containing a slider. Move the slider, 
-   the slider in the jMax patch should move too... 
+	make run MAIN=UDPMessageTest ARGS="<host name> <port> freq vol mod"
+		<host name> is the host name of the host running jMax
+		<port> is the port number (specified as argument of the udp object)
+		remaining arguments are message names
+ - this will open a Java application with a window containing a number of sliders. 
+	Move the sliders, the corresponding sliders in the jMax patch should move too... 
 
+2.2) with the C program
+
+ - recompile the C sources, in c/ subdirectory:
+ - run jmax
+ - load patch test-udp.jmax
+ - run udpmessagetest
+ 	udpmessagetest <host name> <port>
+		<host name> is the host name of the host running jMax
+		<port> is the port number (specified as argument of the udp object)
+ - this program reads command lines on standard input. A command line is a string
+	followed by a number (either int or float). The string and the number are 
+	sent to jMax using the protocol. In the receiving patch, the string is used
+	as a selector and the number is send to the corresponding slider.
