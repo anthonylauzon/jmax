@@ -111,7 +111,7 @@ udpout_send(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
 
 static void
-udpin_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, fts_atom_t* at)
+udpin_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   udp_t* self = (udp_t*)o;
   fts_bytestream_remove_listener(self->udp_stream, (fts_object_t*)self);
@@ -177,7 +177,7 @@ udpout_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void
 udpin_instantiate(fts_class_t* cl)
 {
-  fts_class_init(cl, sizeof(udp_t), udpin_init, udpout_delete);
+  fts_class_init(cl, sizeof(udp_t), udpin_init, udpin_delete);
 
   fts_class_message_varargs(cl, s_connect, udp_connect);
   fts_class_message_varargs(cl, s_status, udp_status);
