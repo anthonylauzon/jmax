@@ -74,8 +74,15 @@ public class IntegerEventRenderer implements ObjectRenderer {
     int lenght = gc.getAdapter().getLenght(e); //fixed length
 
     //negative value
-    if(((Integer)e.getProperty("integer")).intValue() < 0) 
-	y -= heigth;
+    /*if(((Integer)e.getProperty("integer")).intValue() < 0) 
+      y -= heigth;*/
+
+    /* for now the height can eb negatiev for the negative values (to speed the render)*/
+    if(heigth<0)
+	{
+	    y += heigth;
+	    heigth -= heigth;
+	}
 
     if (selected) 
 	g.setColor(Color.red);
@@ -108,9 +115,16 @@ public class IntegerEventRenderer implements ObjectRenderer {
     int evtlenght = gc.getAdapter().getLenght(e);
 
     //negative value
-    if(((Integer)e.getProperty("integer")).intValue() < 0) 
-	evty -= evtheigth;
-    
+    /*if(((Integer)e.getProperty("integer")).intValue() < 0) 
+      evty -= evtheigth;*/
+
+    /* for now the height can eb negatiev for the negative values (to speed the search)*/
+    if(evtheigth<0)
+	{
+	    evty += evtheigth;
+	    evtheigth -= evtheigth;
+	}
+
     return  (evtx<=x && (evtx+evtlenght >= x) && evty<=y && (evty+evtheigth) >= y);
   }
 
@@ -140,8 +154,15 @@ public class IntegerEventRenderer implements ObjectRenderer {
     int evtlenght = gc.getAdapter().getLenght(e);
 
     //negative value
-    if(((Integer)e.getProperty("integer")).intValue() < 0) 
-	evty -= evtheigth;
+    /*if(((Integer)e.getProperty("integer")).intValue() < 0) 
+      evty -= evtheigth;*/
+
+    /* for now the height can eb negatiev for the negative values (to speed the search)*/
+    if(evtheigth<0)
+	{
+	    evty += evtheigth;
+	    evtheigth -= evtheigth;
+	}
 
     eventRect.setBounds(evtx, evty, evtlenght, evtheigth);
     tempRect.setBounds(x, y, w, h);

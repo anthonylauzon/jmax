@@ -112,9 +112,10 @@ public class MonoDimensionalAdapter extends PartitionAdapter {
     public int getHeigth(Event e) 
     {
 	int y = getY(e);
-	int y0 = getY(0); 
-	if(y>y0)  return (y-y0);
-	else return (y0-y);
+	int y0 = getY(0);
+	/* for now return a height positive or negative*/
+	//if(y>y0)  return (y-y0);
+	/*else*/ return (y0-y);
     }
 
     public int getRange()
