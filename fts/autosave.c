@@ -20,8 +20,11 @@
  * 
  */
 
-
+#if defined(__APPLE__) && defined(__MACH__)
+#include <sys/signal.h>
+#else
 #include <signal.h>
+#endif
 #include <stdlib.h>
 
 #include <fts/fts.h>
