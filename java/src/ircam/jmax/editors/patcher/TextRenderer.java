@@ -47,11 +47,31 @@ public class TextRenderer implements ObjectRenderer
     {
       return width > getColumnWidth();
     }
+    
+    public int getColWidth(){
+      return super.getColumnWidth();
+    }
+    public int getRHeight(){
+      return super.getRowHeight();
+    }
+    /*public String getTextLine(int line){
+      String text = "";
+      if(line<getLineCount()){
+      try{
+      text = getText().substring(getLineStartOffset(line), getLineEndOffset(line)-1);
+      }catch(BadLocationException be){
+      text = "";
+      }catch(StringIndexOutOfBoundsException se){
+      text = "";
+      }
+      }
+      return text;
+      }*/
   }
 
   private Editable owner;
   private RenderTextArea area;
-
+  private int defaultWidth;
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
@@ -66,34 +86,79 @@ public class TextRenderer implements ObjectRenderer
     area.setEditable(false);
     area.setLineWrap(true);
     area.setWrapStyleWord(true);
+    //defaultWidth = SwingUtilities.computeStringWidth(owner.getFontMetrics(), "pack 1 2 3");
   }
 
   public void update()
   {
-    if (owner.getHeight() > 0)
+    if (owner.getHeight() > 0){
       area.setBounds(owner.getX() + owner.getTextXOffset(),
 		     owner.getY() + owner.getTextYOffset(),
 		     owner.getWidth() - owner.getTextWidthOffset(),
 		     owner.getHeight() - owner.getTextHeightOffset());
+    }    
     else
       area.setBounds(owner.getX() + owner.getTextXOffset(),
-		     owner.getY() + owner.getTextYOffset(),
+		     owner.getY() + owner.getTextYOffset(), 
 		     owner.getWidth() - owner.getTextWidthOffset(),
 		     5);
-
-
+    
     area.setFont(owner.getFont());
-    area.setText(owner.getArgs());
+    area.setText(owner.getArgs()); 
   }
+
+  /*public int getTextWidth(){
+    int ww;
+    int w = 0;
+    int lines = area.getLineCount();
+    
+    if(lines==0)
+    w = owner.getWidth() - owner.getTextWidthOffset();
+    else 
+    if(lines==1){
+    w = SwingUtilities.computeStringWidth(owner.getFontMetrics(), owner.getArgs());
+    if(w<defaultWidth) w = defaultWidth;
+    }
+    else{
+    for(int i=0;i<lines;i++){
+    ww = SwingUtilities.computeStringWidth(owner.getFontMetrics(), area.getTextLine(i));
+    if(ww>w) w = ww;
+    }
+    if(w==0) w = owner.getWidth() - owner.getTextWidthOffset();
+    }
+    return w;
+    }
+    
+    public int getTextHeight(){
+    int h = 0;
+    int lines = area.getLineCount();
+    if(lines==0)
+    h = owner.getHeight() - owner.getTextHeightOffset();
+    else 
+    h = owner.getFontMetrics().getHeight()*lines;
+    return h;
+    }*/
 
   public boolean canResizeWidthTo(int width)
   {
     return area.canResizeWidthTo(width);
   }
 
+  boolean isMultiLine(){
+    return (area.getLineCount()>1);
+  }
+
+  boolean isTextLonger(){
+    return (SwingUtilities.computeStringWidth(owner.getFontMetrics(), owner.getArgs()) > 
+	     owner.getWidth() - owner.getTextWidthOffset());
+  }
+
   public int getHeight()
   {
-    return area.getPreferredSize().height;
+    if(isTextLonger()||isMultiLine())
+      return area.getPreferredSize().height;
+    else
+      return area.getRHeight();
   }
 
   public int getWidth()
@@ -113,4 +178,8 @@ public class TextRenderer implements ObjectRenderer
     SwingUtilities.paintComponent(g, area, ic, x, y, w, h);
   }
 }
+
+
+
+
 

@@ -430,7 +430,6 @@ public class ErmesSelection implements Transferable
 
 	object.redraw();
 	object.redrawConnections();
-	object.fontSmaller();
 	object.setFontSize(fontSize);
 	object.redraw();
 	object.redrawConnections();

@@ -1,4 +1,4 @@
- //
+  //
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -109,7 +109,6 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   public  void setWidth(int w) 
   {
     // renderer.update();
-
     if (renderer.canResizeWidthTo(w - getTextWidthOffset()))
       {
 	super.setWidth(w);
