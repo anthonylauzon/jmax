@@ -217,6 +217,7 @@ eventtrk_move_event(eventtrk_t *track, event_t *event, double time)
  *
  */
 
+/* returns first event at or after given time */
 event_t *
 eventtrk_get_event_by_time(eventtrk_t *track, double time)
 {
@@ -233,6 +234,7 @@ eventtrk_get_event_by_time(eventtrk_t *track, double time)
     return 0;
 }
 
+/* like above - searching is started from given element (here) */
 event_t *
 eventtrk_get_event_by_time_after(eventtrk_t *track, double time, event_t *here)
 {
@@ -270,10 +272,17 @@ eventtrk_set_name_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s,
   /* check if name is in use in this sequence */
   if(sequence_get_track_by_name(track_get_sequence(&this->head), name))
     {
-      fts_atom_t a[1];
+      fts_symbol_t old_name = track_get_name(&this->head);
       
-      fts_set_symbol(a, track_get_name(&this->head));
-      fts_client_send_message((fts_object_t *)this, seqsym_setName, 1, a);
+      if(old_name)
+	{
+	  fts_atom_t a[1];
+
+	  fts_set_symbol(a, old_name);
+	  fts_client_send_message((fts_object_t *)this, seqsym_setName, 1, a);
+	}
+      else
+	fts_client_send_message((fts_object_t *)this, seqsym_setName, 0, 0);
     }
   else
     {
@@ -298,20 +307,17 @@ eventtrk_add_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s
 
       if(event)
 	{
+	  fts_atom_t a[1];
+
 	  /* add event to track */
 	  eventtrk_add_event(this, time, event);
+	  	      
+	  /* create event at client (short cut: could also send upload message to event object) */
+	  fts_client_upload((fts_object_t *)event, seqsym_event, ac, at);
 	  
-	  if(!fts_object_has_id((fts_object_t *)this))
-	    {
-	      fts_atom_t a[1];
-	      
-	      /* create event at client (short cut: could also send upload message to event object) */
-	      fts_client_upload((fts_object_t *)event, seqsym_event, ac, at);
-	      
-	      /* add event to track at client */
-	      fts_set_object(a, (fts_object_t *)event);    
-	      fts_client_send_message((fts_object_t *)this, seqsym_addEvents, 1, a);
-	    }
+	  /* add event to track at client */
+	  fts_set_object(a, (fts_object_t *)event);    
+	  fts_client_send_message((fts_object_t *)this, seqsym_addEvents, 1, a);
 	}
     }
 }
