@@ -56,6 +56,8 @@ namespace client {
     void endOfMessage() throw( FtsClientException);
 
     virtual void close() throw (FtsClientException) = 0;
+    
+    void startThread() throw(FtsClientException);
 
   protected:
     virtual int read( unsigned char *b, int len) throw (FtsClientException) = 0;
