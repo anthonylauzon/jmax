@@ -1099,7 +1099,7 @@ Rectangle previousResizeRect = new Rectangle();
       //in the offScreen. Do it now!
       //Optimization: use the dirty lists. Try to avoid to repaint in case
       //of CTRL click on the sketch when nothing was changed "pseudo run mode" 
-      (!itsRunMode) repaint();
+      if (!itsRunMode) repaint();
       return;
     }
 
