@@ -414,7 +414,7 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   if (dev->device != fts_s_default) {
 
-    if (device_list == NULL) {
+    if (dsdevice_list == NULL) {
       DirectSoundEnumerate((LPDSENUMCALLBACK) dsaudioport_enum_callback, NULL);              
     }
     
