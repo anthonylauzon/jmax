@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.2 $ IRCAM $Date: 1998/09/25 17:36:12 $
+ *      $Revision: 1.3 $ IRCAM $Date: 1998/11/09 18:52:26 $
  *
  * Explode by Miller Puckette
  * Code ported and modified by MDC
@@ -115,6 +115,19 @@ explode_doappend(explode_t *this, long int time, long int pit, long int vel, lon
 	this->data.evt = e;
 
       this->current = e;
+
+      if (fts_data_is_exported((fts_data_t *) &(this->data)))
+	{
+	  fts_atom_t args[5];
+
+	  fts_set_long( &(args[0]), e->time);
+	  fts_set_long( &(args[1]), e->pit);
+	  fts_set_long( &(args[2]), e->vel);
+	  fts_set_long( &(args[3]), e->dur);
+	  fts_set_long( &(args[4]), e->chan);
+	  
+	  fts_data_remote_call((fts_data_t *) &(this->data), EXPLODE_APPEND, 5, args);
+	}
     }
 }
 
@@ -176,6 +189,9 @@ explode_clear(explode_t *this)
   this->serial = 0;
 
   explode_stop(this);
+
+  if (fts_data_is_exported((fts_data_t *) &(this->data)))
+    fts_data_remote_call((fts_data_t *) &(this->data), EXPLODE_CLEAN, 0, 0);
 
   e = this->data.evt;
   while ( e)
@@ -987,6 +1003,7 @@ void explode_remote_add( fts_data_t *d, int ac, const fts_atom_t *at)
 
   e->next = (*pe);
   (*pe)  = e;
+
   return;
 }
 
@@ -1028,7 +1045,7 @@ void explode_remote_change( fts_data_t *d, int ac, const fts_atom_t *at)
   e->dur  = fts_get_long(&at[4]);
   e->chan = fts_get_long(&at[5]);
 
-  /* Put it back in the correct order */
+  /* Find the correct new position */
 
   pe = &(data->evt); 
   while (*pe && ((*pe)->time < e->time))
@@ -1055,7 +1072,7 @@ static void explode_data_export_fun(fts_data_t *d)
   evt_t *e;
   fts_atom_t args[5];
 
-  fts_data_remote_call(d, EXPLODE_CLEAN, 0, 0);
+  fts_data_remote_call(d, EXPLODE_LOAD_CLEAN, 0, 0);
 
   for ( e = data->evt; e; e = e->next)
     {
@@ -1065,7 +1082,7 @@ static void explode_data_export_fun(fts_data_t *d)
       fts_set_long( &(args[3]), e->dur);
       fts_set_long( &(args[4]), e->chan);
 
-      fts_data_remote_call((fts_data_t *) data, EXPLODE_APPEND, 5, args);
+      fts_data_remote_call((fts_data_t *) data, EXPLODE_LOAD_APPEND, 5, args);
     }
 }
 

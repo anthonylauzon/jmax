@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.7 $ IRCAM $Date: 1998/09/15 19:12:28 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/18 11:56:52 $
  *
  * Explode by Miller Puckette
  * Porting and simplifications by MDC.
@@ -102,11 +102,13 @@ typedef struct
 
 /* explode data function keys */
 
-#define EXPLODE_CLEAN         1
-#define EXPLODE_APPEND        2
-#define EXPLODE_REMOTE_ADD    3
-#define EXPLODE_REMOTE_REMOVE 4
-#define EXPLODE_REMOTE_CHANGE 5
+#define EXPLODE_LOAD_CLEAN    1
+#define EXPLODE_LOAD_APPEND   2
+#define EXPLODE_CLEAN         3
+#define EXPLODE_APPEND        4
+#define EXPLODE_REMOTE_ADD    5
+#define EXPLODE_REMOTE_REMOVE 6
+#define EXPLODE_REMOTE_CHANGE 7
 
 /* finding an explode by name */
 
