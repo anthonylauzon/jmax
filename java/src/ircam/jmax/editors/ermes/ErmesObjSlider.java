@@ -286,4 +286,20 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
     super.MoveBy( theDeltaH, theDeltaV);
     itsThrottle.MoveByAbsolute( theDeltaH, theDeltaV);
   }
+
+  private static VResizeSensibilityArea vResizeArea = new VResizeSensibilityArea();
+
+  SensibilityArea findSensibilityArea( int mouseX, int mouseY)
+  {
+    int x = getX();
+    int y = getY();
+    int w = getWidth();
+    int h = getHeight();
+
+    if (mouseY >= y + h - VResizeSensibilityArea.height
+	 && mouseX >= x + w / 2)
+      return vResizeArea;
+    else
+      return super.findSensibilityArea( mouseX, mouseY);
+  }
 }

@@ -47,7 +47,7 @@ abstract class ErmesObject implements ErmesDrawable {
   private static InletSensibilityArea inletArea= new InletSensibilityArea();
   private static OutletSensibilityArea outletArea= new OutletSensibilityArea();
   private static InletOutletSensibilityArea inletOutletArea= new InletOutletSensibilityArea();
-  private static ResizeSensibilityArea resizeArea = new ResizeSensibilityArea();
+  private static HResizeSensibilityArea hResizeArea = new HResizeSensibilityArea();
   private static NothingSensibilityArea nothingArea = new NothingSensibilityArea();
 
 
@@ -411,10 +411,10 @@ abstract class ErmesObject implements ErmesDrawable {
       int w = getWidth();
       int h = getHeight();
 
-      if ( mouseX >= x + w - ResizeSensibilityArea.width 
+      if ( mouseX >= x + w - HResizeSensibilityArea.width 
 	   && mouseY > y + InletOutletSensibilityArea.height
 	   && mouseY < y + h - InletOutletSensibilityArea.height)
-	return resizeArea;
+	return hResizeArea;
       else if ( mouseY < y + InletOutletSensibilityArea.height)
 	{
 	  int inlet = findNearestInOutlet( mouseX, itsFtsObject.getNumberOfInlets());

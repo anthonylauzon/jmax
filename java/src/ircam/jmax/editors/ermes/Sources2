@@ -36,12 +36,13 @@ SOURCES := \
 	$(INCLUDE_PATH)/FindPanel.java			\
 	$(INCLUDE_PATH)/FpePanel.java			\
 	$(INCLUDE_PATH)/FontCache.java			\
+	$(INCLUDE_PATH)/HResizeSensibilityArea.java	\
 	$(INCLUDE_PATH)/InletOutletSensibilityArea.java	\
 	$(INCLUDE_PATH)/InletSensibilityArea.java	\
 	$(INCLUDE_PATH)/KeyEventClient.java		\
 	$(INCLUDE_PATH)/MultiLineText.java		\
 	$(INCLUDE_PATH)/NothingSensibilityArea.java	\
 	$(INCLUDE_PATH)/OutletSensibilityArea.java	\
-	$(INCLUDE_PATH)/ResizeSensibilityArea.java	\
 	$(INCLUDE_PATH)/SensibilityArea.java		\
+	$(INCLUDE_PATH)/VResizeSensibilityArea.java	\
 

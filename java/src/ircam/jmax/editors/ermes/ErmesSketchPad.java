@@ -91,7 +91,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   final static int AREA_SELECT 	 = 3;		
   final static int MOVING 	 = 4;
   final static int MOVINGSEGMENT    = 5;	
-  final static int RESIZING_OBJECT  = 6;
+  final static int H_RESIZING_OBJECT = 6;
+  final static int V_RESIZING_OBJECT = 60;
   final static int EDITING_OBJECT   = 7;
   final static int EDITING_COMMENT  = 8;
   final static int FromOutToIn 	    = 1;
@@ -1119,7 +1120,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   // ----------------------------------------
 
   private static final int cursorStateNormal = 0;
-  private static final int cursorStateResize = 1;
+  private static final int cursorStateHResize = 1;
+  private static final int cursorStateVResize = 10;
   private static final int cursorStateInletOutlet = 2;
   private static final int cursorStateControl = 3;
   private static final int cursorStateConnect = 4;
@@ -1154,12 +1156,20 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
 	SensibilityArea area = itsCurrentObject.findSensibilityArea( x, y);
 
-	if (area instanceof ResizeSensibilityArea)
+	if (area instanceof HResizeSensibilityArea)
 	  {
-	    if ( cursorState != cursorStateResize)
+	    if ( cursorState != cursorStateHResize)
 	      {
 		setCursor( Cursor.getPredefinedCursor( Cursor.E_RESIZE_CURSOR));
-		cursorState = cursorStateResize;
+		cursorState = cursorStateHResize;
+	      }
+	  }
+	else if (area instanceof VResizeSensibilityArea)
+	  {
+	    if ( cursorState != cursorStateVResize)
+	      {
+		setCursor( Cursor.getPredefinedCursor( Cursor.S_RESIZE_CURSOR));
+		cursorState = cursorStateVResize;
 	      }
 	  }
 	else if (area instanceof OutletSensibilityArea)
@@ -1195,7 +1205,9 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     int x = e.getX();
     int y = e.getY();
 
-    if (cursorState != cursorStateNormal)
+    if (cursorState != cursorStateNormal 
+	&& cursorState != cursorStateHResize
+	&& cursorState != cursorStateVResize)
       {
 	setCursor( Cursor.getDefaultCursor());
 	cursorState = cursorStateNormal;
@@ -1272,13 +1284,27 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	return;
       }
 
-    case RESIZING_OBJECT:
+    case H_RESIZING_OBJECT:
       {
 	int prevX = previousResizeRect.x + previousResizeRect.width;
+
+	// (***fd) must resize selection, and maintain a vector of resize rectangles
+	itsResizingObject.resizeBy( x - prevX, 0);
+	currentResizeRect.setSize( itsResizingObject.getWidth(), itsResizingObject.getHeight());
+
+	Graphics g = getGraphics();
+	update( g);
+	g.dispose();
+
+	return;
+      } 
+
+    case V_RESIZING_OBJECT:
+      {
 	int prevY = previousResizeRect.y + previousResizeRect.height;
 
 	// (***fd) must resize selection, and maintain a vector of resize rectangles
-	itsResizingObject.resizeBy( x - prevX, y - prevY);
+	itsResizingObject.resizeBy( 0, y - prevY);
 	currentResizeRect.setSize( itsResizingObject.getWidth(), itsResizingObject.getHeight());
 
 	Graphics g = getGraphics();
@@ -1307,7 +1333,9 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
     itsSketchWindow.requestFocus();
 
-    if (cursorState != cursorStateNormal)
+    if (cursorState != cursorStateNormal 
+	&& cursorState != cursorStateHResize
+	&& cursorState != cursorStateVResize)
       {
 	setCursor( Cursor.getDefaultCursor());
 	cursorState = cursorStateNormal;
@@ -1365,9 +1393,13 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
 	SensibilityArea area = itsCurrentObject.findSensibilityArea( x, y);
 
-	if (area instanceof ResizeSensibilityArea)
+	if (area instanceof HResizeSensibilityArea)
 	  {
-	    SetResizeState( itsCurrentObject);
+	    SetResizeState( itsCurrentObject, H_RESIZING_OBJECT);
+	  }
+	else if (area instanceof VResizeSensibilityArea)
+	  {
+	    SetResizeState( itsCurrentObject, V_RESIZING_OBJECT);
 	  }
 	else if (area instanceof OutletSensibilityArea)
 	  {
@@ -1489,9 +1521,9 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 		}
 	    }
 
-	    currentConnectPoint.setLocation( 0,0);
-	    startConnectPoint.setLocation( 0,0);
-	    previousConnectPoint.setLocation( 0,0);
+	    currentConnectPoint.setLocation( 0, 0);
+	    startConnectPoint.setLocation( 0, 0);
+	    previousConnectPoint.setLocation( 0, 0);
 
 	    setCursor( Cursor.getDefaultCursor());
 
@@ -1589,7 +1621,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	      }
 	  }
       }
-    else if (editStatus == RESIZING_OBJECT)
+    else if (editStatus == H_RESIZING_OBJECT || editStatus == V_RESIZING_OBJECT)
       {
 	itsResizingObject.MouseUp( e,x,y);
 	editStatus = START_SELECT;
@@ -1767,9 +1799,9 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       }
   }		
   
-  void SetResizeState( ErmesObject theResizingObject)
+  void SetResizeState( ErmesObject theResizingObject, int newStatus)
   {
-    editStatus = RESIZING_OBJECT;
+    editStatus = newStatus;
 
     itsResizingObject = theResizingObject;
 
@@ -1847,7 +1879,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	previousRect.setBounds( currentRect);
 	erased = false;
       }
-    else if ( editStatus == RESIZING_OBJECT)
+    else if ( editStatus == H_RESIZING_OBJECT || editStatus == V_RESIZING_OBJECT)
       {
 	//faster version
 	if ( !erased)
