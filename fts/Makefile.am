@@ -50,6 +50,7 @@ property.c \
 sched.c \
 selection.c \
 sigconn.c \
+socketstream.c \
 stack.c \
 status.c \
 symbol.c \
