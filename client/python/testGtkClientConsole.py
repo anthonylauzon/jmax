@@ -4,6 +4,8 @@ import time
 import gtk
 import gobject
 
+from new import classobj
+
 from ircam.fts.client import *
 
 class ConsoleArea:
@@ -35,6 +37,18 @@ class ConsoleArea:
         self.window.show()
     
 
+class FtsConnection(FtsObject):
+    # private static member
+    __fts_connection_invalid = -1
+    __fts_connection_anything = 0
+    __fts_connection_message = 1
+    __fts_connection_value = 2
+    __fts_connection_audio = 3
+    __fts_connection_audio_active = 4
+    
+    # public static member
+
+    
 class FtsConsoleStream(FtsObject):
     def __init__(self, window, box, serverConnection, parent, *args):
         # Call parent class constructor
@@ -42,20 +56,46 @@ class FtsConsoleStream(FtsObject):
         # Create ConsoleArea:
         self.console_area = ConsoleArea(window, box)
 
+    def print_line(self, args):
+        self.console_area.post(args)
+        return
 
-class FtsConsoleStreamHandler:
-    def invoke(self, obj, args):
-        obj.console_area.post(args.getString(0))
+
+class FtsPatcherObject(FtsObject):
+    def __init__(self, serverConnection, parent, *args):
+        self.object_list = []
+        
+    def addObject(self, args):
+        print 'FtsPatcherObject: addObject Received'
+        print 'Object ID: ', args.getInt(0)
+        print 'x position: ', args.getInt(1)
+        print 'y position: ', args.getInt(2)
+        print 'width : ', args.getInt(3)
+        print 'heights : ', args.getInt(4)
+        print 'numIns : ', args.getInt(5)
+        print 'numOuts : ', args.getInt(6)
+        print 'layer : ', args.getInt(7)
+        print 'Error Description: ', args.getString(8)
+        print 'Classname: ', args.getString(9)
+        print 'IsTemplate: ', args.getInt(10)
+        # create object and add it to object list
+        
+    def addConnection(self, args):
+        print 'FtsPatcherObject: addConnection'
+
+
 
 class JMaxApplication:
+    rootPatcher = None
+    connection = None
+    
     def destroy(self, widget, data=None):
         return gtk.mainquit()    
 
     def file_ok_sel(self, widget, fileSel):
         fileName = fileSel.get_filename()
-        args = FtsArgs()
-        args.clear()
-        args.addString(fileName)
+        args = []
+        args.append(FtsRawString(fileName))
         self.clientPatcher.send("load", args)
         
     def menuitem_response(self, widget, string):
@@ -98,29 +138,31 @@ class JMaxApplication:
         connection.putObject(0, rootPatcher)
         
         self.console_stream = FtsConsoleStream(self.window, vbox, connection, rootPatcher, "console_stream")
-        FtsObject.registerMessageHandler(self.console_stream.__class__,"print_line", FtsConsoleStreamHandler())
         self.console_stream.send("set_default")
-        self.rootPatcher = rootPatcher
-        self.connection = connection
-        self.clientPatcher = FtsObject(self.connection, self.rootPatcher, 1)
-        
+        self.clientPatcher = FtsObject(connection, rootPatcher, 1)
+        JMaxApplication.connection = connection
+        JMaxApplication.rootPatcher = rootPatcher
+    
+    
     def start(self):
         gtk.threads_enter()
         gtk.mainloop()
         gtk.threads_leave()
 
+    def getRootPatcher():
+        return JMaxApplication.rootPatcher
+
+    getRootPatcher = staticmethod(getRootPatcher)
+    
+    def getFtsServer():
+        return JMaxApplication.connection
+
+    getFtsServer = staticmethod(getFtsServer)
+
+
 
 
         
-
-#clientPatcher = FtsObject(connection, rootPatcher, 1);
-#args = FtsArgs()
-#args.clear()
-# add path to patch to load
-#args.addString(sys.argv[1])
-# send load message to fts
-#clientPatcher.send("load", args)
-
 
 myApp = JMaxApplication()
 myApp.start()
