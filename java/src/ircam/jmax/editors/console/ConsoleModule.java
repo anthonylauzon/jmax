@@ -22,7 +22,7 @@
 //
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
-
+ 
 package ircam.jmax.editors.console;
 import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;

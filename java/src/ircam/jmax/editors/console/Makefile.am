@@ -5,7 +5,6 @@ ConsoleModule.java\
 ConsoleOutputStream.java\
 ConsoleWindow.java\
 ControlPanel.java\
-PrintAction.java\
 FileMenu.java
 
 JAVACX=@JAVACX@
@@ -24,4 +23,8 @@ clean-compile:
 
 clean-generic:
 	rm -f *~
+
+
+
+
 

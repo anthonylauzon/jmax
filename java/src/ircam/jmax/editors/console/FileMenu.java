@@ -27,23 +27,40 @@ package ircam.jmax.editors.console;
 
 import java.awt.*;
 import java.awt.event.*;
-
-import javax.swing.*;
-import javax.swing.event.*;
+import java.awt.print.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
+import ircam.jmax.toolkit.actions.*;
 
 /** Implement the console editor File Menu */
 
 public class FileMenu extends DefaultFileMenu
 {
-  public FileMenu()
-  {
-    super();
-    insert(new PrintAction(), "Print", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_P, 3);
+    public FileMenu()
+    {
+	super();
+	insert(new PrintAction(), "Print", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_P, 3);
+	
+	remove(4);
+    }
 
-    remove(4);
-  }
+    public class PrintAction extends EditorAction
+    {
+	public void doAction(EditorContainer container)
+	{
+	    PrinterJob printJob = PrinterJob.getPrinterJob();
+	    PageFormat format = printJob.pageDialog(printJob.defaultPage());    
+	    printJob.setPrintable((ConsoleWindow)container, format);
+	    
+	    if (printJob.printDialog()) {
+		try {
+		    printJob.print();
+		} catch (Exception ex) {
+		    ex.printStackTrace();
+		}
+	    }
+	}
+    } 
 }
 

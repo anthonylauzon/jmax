@@ -77,6 +77,11 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
     consoleWindowSingleInstance.helpMenu.init();
   }
 
+  public static ConsoleWindow getInstance()
+  {
+    return consoleWindowSingleInstance;
+  }
+
   public ConsoleWindow()
   {
     super("jMax Console");

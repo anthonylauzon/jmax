@@ -76,7 +76,7 @@ VERSION = @VERSION@
 
 EXTRA_DIST = package.html
 noinst_PROGRAMS = package
-package_SOURCES =  ConsoleModule.java ConsoleOutputStream.java ConsoleWindow.java ControlPanel.java PrintAction.java FileMenu.java
+package_SOURCES =  ConsoleModule.java ConsoleOutputStream.java ConsoleWindow.java ControlPanel.java FileMenu.java
 
 
 JAVACX = @JAVACX@
@@ -95,7 +95,7 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 package_OBJECTS =  ConsoleModule.class ConsoleOutputStream.class \
-ConsoleWindow.class ControlPanel.class PrintAction.class FileMenu.class
+ConsoleWindow.class ControlPanel.class FileMenu.class
 package_LDADD = $(LDADD)
 package_DEPENDENCIES = 
 package_LDFLAGS = 
