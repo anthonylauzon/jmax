@@ -96,6 +96,7 @@ public class MidiConfigPanel extends JPanel implements Editor
       public void mousePressed( MouseEvent e){
         midiTable.clearSelection();
         stopEdit();
+        midiTable.transferFocus();
       }
     });
 
@@ -109,7 +110,6 @@ public class MidiConfigPanel extends JPanel implements Editor
   {
     if( midiTable.getCellEditor() != null)
       midiTable.getCellEditor().stopCellEditing();
-    midiTable.transferFocus();
   }
 
   void initDataModel()

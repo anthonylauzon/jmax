@@ -170,6 +170,7 @@ public class AudioConfigPanel extends JPanel implements Editor
 	public void mousePressed( MouseEvent e){
 	  audioTable.clearSelection();
 	  stopEdit();
+          audioTable.transferFocus();
 	}
       });
 
@@ -183,7 +184,6 @@ public class AudioConfigPanel extends JPanel implements Editor
   {
     if( audioTable.getCellEditor() != null)
       audioTable.getCellEditor().stopCellEditing();
-    audioTable.transferFocus();
   }
 
   void initDataModel()
