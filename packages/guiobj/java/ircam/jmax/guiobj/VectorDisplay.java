@@ -97,8 +97,9 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
 	((FtsVectorDisplayObject)ftsObject).setRange( range);
       }
     
-    if( w <= 0) h = DEFAULT_WIDTH;
+    if( w <= 0) w = DEFAULT_WIDTH;
     if( h <= 0) h = DEFAULT_HEIGHT;
+   
     buff = new BufferedImage(  w-2, h-2, BufferedImage.TYPE_INT_RGB);
     buffG = buff.createGraphics();
   }
