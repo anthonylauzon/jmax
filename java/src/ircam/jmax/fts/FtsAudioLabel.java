@@ -69,16 +69,16 @@ public class FtsAudioLabel extends FtsObject
     super(server, parent, id);
     
     label = args[ offset].symbolValue.toString();
-    
-    if( length-offset >= 3)
+    setType(args[offset + 1].intValue);
+    if( length-offset >= 4)
       {
-	input = args[offset+1].symbolValue.toString();
-	inChannel = args[offset+2].intValue;
+	input = args[offset+2].symbolValue.toString();
+	inChannel = args[offset+3].intValue;
       }
-    if( length-offset == 5)
+    if( length-offset == 6)
       {
-	output = args[offset+3].symbolValue.toString();
-	outChannel = args[offset+4].intValue;
+	output = args[offset+4].symbolValue.toString();
+	outChannel = args[offset+5].intValue;
       }
   }
 
