@@ -74,7 +74,7 @@ class BpfTableModel extends AbstractTableModel{
    * @see WholeNumberField*/
   public void setValueAt(java.lang.Object aValue, int rowIndex, int columnIndex) 
   {
-      if(columnIndex == 0) return;
+      if((columnIndex == 0)||(aValue==null)) return;
       
       float current;
       BpfPoint point = model.getPointAt(rowIndex);
