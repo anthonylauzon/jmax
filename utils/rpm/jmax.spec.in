@@ -95,7 +95,14 @@ install -c -m 644 ./images/jmax_icon_48x48.png $RPM_BUILD_ROOT%{_pixmaps_dir}/jm
 
 
 %clean
+# Clean build root (where jmax is compiled)
 rm -rf $RPM_BUILD_ROOT
+# Clean files used for subpackages file list.
+rm -f /var/tmp/rpm.jmax.common.list
+rm -f /var/tmp/rpm.jmax.java.list
+rm -f /var/tmp/rpm.jmax.global.list
+# Removed sources 
+rm -rf $RPM_BUILD_DIR/jmax-%{version}
 
 %post
 
@@ -146,6 +153,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/jmax/packages/jack
 
 %changelog
+* Wed May 28 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
+- removed file list in %clean script
+- removed directory created when sources are extracted from tarball
 * Thu May 22 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
 - added installation of jmax.m4 
 * Wed Mar  5 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
