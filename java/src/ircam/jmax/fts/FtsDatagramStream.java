@@ -26,7 +26,7 @@ import java.net.*;
 class FtsDatagramStream extends FtsStream
 {
   int sequence = -1;
-  final static private int max_packet_size = 512;
+  final static private int max_packet_size = 2048;
   DatagramSocket socket = null;
   byte in_data[] = new byte[max_packet_size];
   byte out_data[] = new byte[max_packet_size];

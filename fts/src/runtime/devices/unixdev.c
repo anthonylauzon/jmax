@@ -43,10 +43,6 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-#if 0
-#include <sys/bsd_types.h> /* ? */
-#endif
-
 #ifdef HAS_TTY_DEV
 #include <termios.h> 
 #endif
@@ -1085,7 +1081,7 @@ file_dev_seek(fts_dev_t *dev, long offset, int whence)
   */
 
 
-#define UDP_PACKET_SIZE 512
+#define UDP_PACKET_SIZE 2048
 
 typedef struct udp_dev_data
 {
