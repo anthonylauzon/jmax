@@ -26,3 +26,7 @@ cp -r $HOME/projects/jmax-install/share/jmax/images $APPDIR/Contents/Resources/s
 cp -r $HOME/projects/jmax-install/share/jmax/packages $APPDIR/Contents/Resources/share/jmax
 cp -r $HOME/projects/jmax-install/share/jmax/config.jmax $APPDIR/Contents/Resources/share/jmax
 
+# Fix icons buf
+cp $APPDIR/Contents/Resources/Java/jmax.icns $APPDIR/Contents/Resources
+
+
