@@ -1,8 +1,13 @@
-dnl $Id: configure.in,v 1.101 2002/11/21 13:55:19 p_tisserand Exp $
+dnl $Id: configure.in,v 1.102 2002/11/21 15:17:47 p_tisserand Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.102  2002/11/21 15:17:47  p_tisserand
+dnl configure.in: add shell script to set restrict definition in include/fts/config-ac.h
+dnl utils.h: change include of ftsconfig.h into include <fts/config.h> and include <fts/wrap.h>
+dnl Move wrap utilities to fts/wrap.h
+dnl
 dnl Revision 1.101  2002/11/21 13:55:19  p_tisserand
 dnl Add config-ac.h for system dependant configuration of packages.
 dnl
@@ -243,10 +248,10 @@ PLATFORM_PACKAGES="oss"
 
 AM_PATH_AUDIOFILE(0.0.2,[PLATFORM_PACKAGES="unixdtd aflib $PLATFORM_PACKAGES"],[echo packages unixdtd and aflib will not be build])
 AM_PATH_ALSA(0.9.0,[
-	CONFIG_FILE=config_linux_alsa.jprj
+	DEFAULT_PROJECT_FILE=default_project_linux_alsa.jprj
 	PLATFORM_PACKAGES="alsa $PLATFORM_PACKAGES"
 ],[
-	CONFIG_FILE=config_linux_oss.jprj
+	DEFAULT_PROJECT_FILE=default_project_linux_oss.jprj
 ])
 
 FTS_SYS_LIBS="-ldl -lpthread `test $check_memory = yes && echo -lmpatrol -lbfd -liberty`"
@@ -262,7 +267,7 @@ then
 fi
 PLATFORM_PACKAGES="sgi unixdtd"
 FTS_SYS_LIBS="-ldl"
-CONFIG_FILE=config_sgi.jprj
+DEFAULT_PROJECT_FILE=config_sgi.jprj
 ACX_C_RESTRICT
 ;;
 
@@ -275,7 +280,7 @@ then
   CFLAGS="$CFLAGS -O3 -funroll-loops -fno-inline"
 fi
 PLATFORM_PACKAGES="macosx"
-CONFIG_FILE=config_macosx.jprj
+DEFAULT_PROJECT_FILE=config_macosx.jprj
 dnl Hack for problem of restrict finding (cc makes an error but does not return correct error code) 
 AC_DEFINE(restrict,)
 ;;
@@ -293,7 +298,7 @@ AC_SUBST(FTS_DEFINE_RESTRICT)
 AC_SUBST(PLATFORM)
 AC_SUBST(PLATFORM_PACKAGES)
 AC_SUBST(FTS_SYS_LIBS)
-AC_SUBST(CONFIG_FILE)
+
 
 dnl Check installation directories
 if test "x${prefix}" = "xNONE"; then
@@ -390,6 +395,7 @@ then
 	ADDITIONAL_PACKAGES="$ADDITIONAL_PACKAGES jack"
 	dnl Define macro to enable scheduler special function (fts_sched_run_one_tick)
 	CFLAGS="$CFLAGS -DUSE_JACK"
+	DEFAULT_PROJECT_FILE=default_project_linux_jack.jprj
 fi
 
 AC_SUBST(JACK_CFLAGS)
@@ -399,6 +405,7 @@ AC_SUBST(JACK_LDFLAGS)
 dnl tell makefiles to use this variable 
 AC_SUBST(ADDITIONAL_PACKAGES)
 
+AC_SUBST(DEFAULT_PROJECT_FILE)
 
 dnl Run configure in subdirectories
 AC_CONFIG_SUBDIRS(client)
