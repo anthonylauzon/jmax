@@ -463,7 +463,7 @@ static fts_atom_t fts_return_value;
 
 void fts_return( fts_atom_t *p)
 {
-  *fts_return_value = *p;
+  fts_return_value = *p;
 }
 
 fts_atom_t *fts_get_return_value( void)
