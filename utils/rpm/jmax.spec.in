@@ -18,7 +18,8 @@ jMax is a visual programming environment for developing real-time, interactive m
 make
 
 %install
-make install
+rm -rf $RPM_BUILD_ROOT
+make DESTDIR=$RPM_BUILD_ROOT install
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -27,7 +28,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-, root, root)
-%doc LICENCE.fr LICENSE README VERSION doc/*
+%doc LICENCE.fr LICENSE README
 /usr/bin/jmax
 /usr/share/jmax
 /usr/include/fts
