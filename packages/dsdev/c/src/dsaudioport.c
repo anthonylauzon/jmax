@@ -85,9 +85,16 @@ typedef struct {
 
 } dsaudioport_t;
 
-static void dsaudioport_input( fts_word_t *argv);
-static void dsaudioport_output(fts_word_t *argv);
+static void dsaudioport_input( fts_audioport_t* port, float** buffers, int buffsize);
+static void dsaudioport_output(fts_audioport_t* port, float** buffers, int buffsize);
 static int dsaudioport_xrun(fts_audioport_t *port);
+
+static void dsaudioport_open_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void dsaudioport_open_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void dsaudioport_close_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void dsaudioport_close_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+
+
 static void dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 static void dsaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 static void dsaudioport_cleanup(dsaudioport_t *dev);
@@ -95,8 +102,8 @@ static void dsaudioport_instantiate(fts_class_t *cl);
 
 
 
-static void 
-dsaudioport_input( fts_word_t *argv)
+static void
+dsaudioport_input(fts_audioport_t* port, float** buffers, int buffsize)
 {
   dsaudioport_t *dev;
   int n, channels, ch, i, j;
@@ -111,14 +118,14 @@ dsaudioport_input( fts_word_t *argv)
 #endif
 
  
-  dev = (dsaudioport_t *) fts_word_get_pointer(argv+0);
+  dev = (dsaudioport_t *)port;
   if (dev->state != dsaudioport_running) {
     /* FIXME */
     return;
   }
 
-  n = fts_word_get_int(argv + 1);
-  channels = fts_audioport_get_input_channels(dev);
+  n = buffsize;
+  channels = fts_audioport_get_channels(port, FTS_AUDIO_INPUT);
 
 #if CAPTURE
 
@@ -144,7 +151,7 @@ dsaudioport_input( fts_word_t *argv)
 				      (void*) &buf1, &bytes1, (void*) &buf2, &bytes2, 0);
 
   for (ch = 0; ch < channels; ch++) {
-    float *out = (float *) fts_word_get_pointer(argv + 2 + ch);
+    float *out = buffers[ch];
     
     for (i = 0, j = ch; i < n; i++, j += channels) {
       out[i] = (float) buf1[j] / 32767.0f;
@@ -165,7 +172,7 @@ dsaudioport_input( fts_word_t *argv)
 #else
 
   for (ch = 0; ch < channels; ch++) {
-    float *out = (float *) fts_word_get_pointer(argv + 2 + ch);
+      float *out = buffers[ch];
     
     for (i = 0, j = ch; i < n; i++, j += channels) {
       out[i] = 0.0f;
@@ -178,23 +185,23 @@ dsaudioport_input( fts_word_t *argv)
     dev->cur_cbuffer = 0;
   }
 }
+    
 
-static void 
-dsaudioport_output(fts_word_t *argv)
+static void
+dsaudioport_output(fts_audioport_t* port, float** buffers, int buffsize)
 {
   dsaudioport_t *dev;
   short *buf1, *buf2;
   DWORD bytes1, bytes2;    
   int boffset, soffset, n, channels, ch, i, j;
 
-  dev = (dsaudioport_t *) fts_word_get_pointer(argv+0);
+  dev = (dsaudioport_t *)port;
   if (dev->state != dsaudioport_running) {
     /* FIXME */
     return;
   }
 
-  n = fts_word_get_int(argv + 1);
-  channels = fts_audioport_get_output_channels(dev);
+  channels = fts_audioport_get_channels(port, FTS_AUDIO_OUTPUT);
 
   /* Wait till the next buffer becomes available */
   WaitForSingleObject(dev->event[dev->cur_buffer], INFINITE);
@@ -214,9 +221,9 @@ dsaudioport_output(fts_word_t *argv)
 
   /* Interleave the sample buffer into the output buffer */
   for (ch = 0; ch < channels; ch++) {
-    float *in = (float *) fts_word_get_pointer(argv + 2 + ch);
+    float *in = buffers[ch];
 
-    for (i = 0, j = ch; i < n; i++, j += channels) {
+    for (i = 0, j = ch; i < buffsize; i++, j += channels) {
       buf1[j] = (short) (32767.0f * in[i]);
     }
   }
@@ -229,6 +236,7 @@ dsaudioport_output(fts_word_t *argv)
     dev->cur_buffer = 0;
   }
 }
+
 
 static int 
 dsaudioport_xrun(fts_audioport_t *port)
@@ -250,6 +258,34 @@ dsaudioport_enum_callback(LPGUID lpGuid, LPCSTR lpcstrDescription,
 {
   fts_log("[dsaudioport]: %s\n", lpcstrDescription);
   return 1;
+}
+
+static void
+dsaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  /* do something when when you want to open input */
+  fts_audioport_set_open((fts_audioport_t*)o, FTs_AUDIO_INPUT);
+}
+
+static void
+dsaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  /* do something when when you want to open output */
+  fts_audioport_set_open((fts_audioport_t*)o, FTs_AUDIO_OUTPUT);
+}
+
+static void
+dsaudioport_close_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  /* do something when you want to close input */
+  fts_audioport_unset_open((fts_audioport_t*)o, FTS_AUDIO_INPUT);
+}
+
+static void
+dsaudioport_close_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  /* do something when you want to close output */
+  fts_audioport_unset_open((fts_audioport_t*)o, FTS_AUDIO_OUTPUT);
 }
 
 static void 
@@ -310,7 +346,7 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   }
 #endif
 
-  fts_audioport_set_xrun_function((fts_audioport_t *) dev, dsaudioport_xrun);
+/*   fts_audioport_set_xrun_function((fts_audioport_t *) dev, dsaudioport_xrun); */
 
   /*************************** settings and format ********************************/
 
@@ -397,8 +433,9 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     goto error_recovery;
   }
 
-  fts_audioport_set_output_channels((fts_audioport_t *) dev, channels);
-  fts_audioport_set_output_function((fts_audioport_t *) dev, dsaudioport_output);
+  fts_audioport_set_channels((fts_audioport_t*)dev, FTS_AUDIO_OUTPUT, channels);
+  fts_audioport_set_io_fun((fts_audioport_t*)dev, FTS_AUDIO_OUTPUT, dsaudioport_output);
+  fts_audioport_set_valid((fts_audioport_t*)dev, FTS_AUDIO_OUTPUT);
 
   /*************************** input ********************************/
 #if CAPTURE
@@ -450,8 +487,10 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     goto error_recovery;
   }
 
-  fts_audioport_set_input_channels((fts_audioport_t *) dev, channels);
-  fts_audioport_set_input_function((fts_audioport_t *) dev, dsaudioport_input);
+  fts_audioport_set_channels((fts_audioport_t*)dev, FTS_AUDIO_INPUT, channels);
+  fts_audioport_set_io_fun((fts_audioport_t*)dev, FTS_AUDIO_INPUT, dsaudioport_input);
+  fts_audioport_set_valid((fts_audioport_t*)dev, FTS_AUDIO_INPUT);
+
 #endif
 
   /*************************** finish and start ********************************/
@@ -478,11 +517,10 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   dsaudioport_cleanup(dev);
 
-  fts_audioport_set_input_channels((fts_audioport_t *) dev, 0);
-  fts_audioport_set_input_function((fts_audioport_t *) dev, NULL);
-  fts_audioport_set_output_channels((fts_audioport_t *) dev, 0);
-  fts_audioport_set_output_function((fts_audioport_t *) dev, NULL);
-  fts_audioport_set_xrun_function((fts_audioport_t *) dev, NULL);
+  fts_audioport_set_channels((fts_audioport_t *) dev, FTS_AUDIO_INPUT, 0);
+  fts_audioport_set_io_fun((fts_audioport_t*)dev, FTS_AUDIO_INPUT, NULL);
+  fts_audioport_set_channels((fts_audioport_t*)dev, FTS_AUDIO_OUTPUT, 0);
+  fts_audioport_set_io_fun((fts_audioport_t*)dev, FTS_AUDIO_OUTPUT, NULL);
 
   dev->state = dsaudioport_corrupted;
 }
@@ -582,6 +620,15 @@ static void
 dsaudioport_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(dsaudioport_t), dsaudioport_init, dsaudioport_delete);
+
+  /* open messages */
+  fts_class_message_varargs(cl, fts_s_open_input, dsaudioport_open_input);
+  fts_class_message_varargs(cl, fts_s_open_output, dsaudioport_open_output);
+
+  /* close messages */
+  fts_class_message_varargs(cl, fts_s_close_input, dsaudioport_close_input);
+  fts_class_message_varargs(cl, fts_s_close_output, dsaudioport_close_output);
+
 }
 
 static char* 
@@ -769,7 +816,9 @@ BOOL WINAPI DllMain(HANDLE hModule, DWORD reason, LPVOID lpReserved)
 void 
 dsaudioport_config(void)
 {
+  fts_class_t* dsaudioport_type;
   fts_symbol_t dsaudioport_symbol;
+  fts_object_t* default_dev;
 
   /* make sure we have a valid instance handle */
   if (dsdev_instance == NULL) {
@@ -796,9 +845,21 @@ dsaudioport_config(void)
   }
 
   dsaudioport_symbol = fts_new_symbol("dsaudioport");
-  fts_class_install( dsaudioport_symbol, dsaudioport_instantiate);
-  fts_audioport_set_default_class(dsaudioport_symbol);
+  dsaudioport_type = fts_class_install( dsaudioport_symbol, dsaudioport_instantiate);
 
-  /* FIXME: force the creation of the audio device */
-  fts_audioport_get_default(NULL);
+  /* @@@@@ FIXME @@@@@ */
+  /* 
+     Create an audioport and add it in audio port list,
+     this is a hack to add a default dsaudioport in audioport llist 
+  */
+  default_dev = fts_object_create(dsaudioport_type, 0, NULL);
+  fts_object_refer(default_dev);
+  fts_audiomanager_put_port(fts_new_symbol("default"), (fts_audioport_t*)default_dev);
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
