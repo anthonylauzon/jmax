@@ -97,6 +97,10 @@ static fts_symbol_t s_activate;
 static fts_symbol_t s_deactivate;
 static fts_symbol_t s_connect;
 
+/* non connected jMax jack port name */
+static fts_symbol_t s_jmax_jack_input;
+static fts_symbol_t s_jmax_jack_output;
+
 
 static fts_hashtable_t jack_port_input_ht;
 static fts_hashtable_t jack_port_output_ht;
@@ -520,11 +524,18 @@ jackaudiomanager_thread_run(fts_object_t* o, int winlet, fts_symbol_t s, int ac,
 	    fts_log("[jackaudiomanager] jack input port %s registered \n", port_name);
 	    if (is_jack_client_active)
 	    {
-	      /* call jack_connect if jack client is active */
-	      jack_connect(manager_jack_client, port->port_name, jack_port_name(port->input_port));
-	      fts_log("[jackaudiomanager] connect %s to %s \n", 
-		      port->port_name, 
-		      jack_port_name(port->input_port));
+	      if (port->port_name != s_jmax_jack_input)
+	      {
+		/* call jack_connect if jack client is active */
+		jack_connect(manager_jack_client, port->port_name, jack_port_name(port->input_port));
+		fts_log("[jackaudiomanager] connect %s to %s \n", 
+			port->port_name, 
+			jack_port_name(port->input_port));
+	      }
+	      else
+	      {
+		fts_log("[jackaudiomanager] open %s\n", s_jmax_jack_input);
+	      }
 	      fts_audioport_set_open((fts_audioport_t*)port, FTS_AUDIO_INPUT);
 	    }
 	  }
@@ -542,11 +553,18 @@ jackaudiomanager_thread_run(fts_object_t* o, int winlet, fts_symbol_t s, int ac,
 	    fts_log("[jackaudiomanager] jack output port %s registered \n", port_name);
 	    if (is_jack_client_active)
 	    {
-	      /* call jack_connect if jack is active */
-	      jack_connect(manager_jack_client, jack_port_name(port->output_port), port->port_name);	
-	      fts_log("[jackaudiomanager] connect %s to %s \n", 
-		      jack_port_name(port->output_port), 
-		      port->port_name);
+	      if (port->port_name != s_jmax_jack_output)
+	      {
+		/* call jack_connect if jack is active */
+		jack_connect(manager_jack_client, jack_port_name(port->output_port), port->port_name);	
+		fts_log("[jackaudiomanager] connect %s to %s \n", 
+			jack_port_name(port->output_port), 
+			port->port_name);
+	      }
+	      else
+	      {
+		fts_log("[jackaudiomanager] open %s\n", s_jmax_jack_output);
+	      }
 	      fts_audioport_set_open((fts_audioport_t*)port, FTS_AUDIO_OUTPUT);
 	    }
 	  }
@@ -1139,6 +1157,8 @@ void jackaudiomanager_config( void)
   fts_object_t* o;
   fts_class_t* jam;
 
+  fts_atom_t at[2]; /* for non connected jMax jack port */
+
   /* create pipe */
   if (0 != pipe(pipedes))
   {
@@ -1162,6 +1182,10 @@ void jackaudiomanager_config( void)
   s_deactivate = fts_new_symbol("deactivate");
   s_connect = fts_new_symbol("connect");
 
+  /* non connected jMax jack port name */
+  s_jmax_jack_input = fts_new_symbol("jMax jack input");
+  s_jmax_jack_output = fts_new_symbol("jMax jack output");
+
   jackaudiomanager_type = fts_class_install( s, jackaudiomanager_instantiate);
 
   fts_hashtable_init(&jack_port_input_ht, FTS_HASHTABLE_SMALL);
@@ -1173,6 +1197,26 @@ void jackaudiomanager_config( void)
   */
   jackaudiomanager_scan_ports(&jack_port_input_ht, JackPortIsOutput);
   jackaudiomanager_scan_ports(&jack_port_output_ht, JackPortIsInput);
+
+  /*
+    create non connected jMax jack port 
+  */
+  fts_set_int(at, JackPortIsOutput);
+  fts_set_symbol(at + 1, s_jmax_jack_input);
+  o = fts_object_create(jackaudioport_type, 2, at);
+  if (NULL != o)
+  {
+    fts_object_refer(o);
+    fts_audiomanager_put_port(s_jmax_jack_input, (fts_audioport_t*)o);
+  }
+  fts_set_int(at, JackPortIsInput);
+  fts_set_symbol(at + 1, s_jmax_jack_output);
+  o = fts_object_create(jackaudioport_type, 2, at);
+  if (NULL != o)
+  {
+    fts_object_refer(o);
+    fts_audiomanager_put_port(s_jmax_jack_output, (fts_audioport_t*)o);
+  }
 
   jackaudiomanager_thread_type = fts_class_install(fts_new_symbol("jackaudiomanager_thread"), 
 							   jackaudiomanager_thread_instantiate);
