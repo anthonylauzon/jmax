@@ -33,6 +33,8 @@ fts_symbol_t ivec_symbol = 0;
 fts_type_t ivec_type = 0;
 fts_class_t *ivec_class = 0;
 
+static fts_symbol_t sym_local = 0;
+
 static fts_symbol_t sym_openEditor = 0;
 static fts_symbol_t sym_destroyEditor = 0;
 static fts_symbol_t sym_set = 0;
@@ -147,8 +149,6 @@ ivec_set_from_atom_list(ivec_t *vec, int offset, int ac, const fts_atom_t *at)
 {
   int size = ivec_get_size(vec);
   int i;
- 
-  post("size %d ac %d \n", size, ac);
  
   if(offset + ac > size)
     ac = size - offset;
@@ -562,11 +562,12 @@ ivec_save_bmax(ivec_t *vec, fts_bmax_file_t *f)
 }
 
 static void
-ivec_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+ivec_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ivec_t *this = (ivec_t *)obj;
-
-  ivec_atom_set(value, this);
+  ivec_t *this = (ivec_t *)o;  
+  fts_bmax_file_t *f = (fts_bmax_file_t *)fts_get_ptr(at);
+      
+  /*ivec_save_bmax(this, f);*/
 }
 
 static void
@@ -587,6 +588,27 @@ ivec_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	  break;
 	}
     }
+}
+
+static void
+ivec_set_file(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  ivec_t *this = (ivec_t *)obj;
+
+  if(fts_is_symbol(value))
+    {
+      fts_symbol_t name = fts_get_symbol(value);
+
+      this->file = name;
+    }
+}
+
+static void
+ivec_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  ivec_t *this = (ivec_t *)obj;
+
+  ivec_atom_set(value, this);
 }
 
 /*********************************************************
@@ -676,8 +698,15 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, ivec_print); 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), ivec_assist); 
 
+      /* save and restore to/from bmax file */
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, ivec_bmax); 
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, ivec_set);
+
       /* define variable */
       fts_class_add_daemon(cl, obj_property_get, fts_s_state, ivec_get_state);
+
+      /* set file property */
+      fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("file"), ivec_set_file);
 
       fts_method_define_varargs(cl, 0, fts_s_bang, ivec_output);
 
@@ -723,6 +752,8 @@ ivec_config(void)
   ivec_symbol = fts_new_symbol("ivec");
   ivec_type = ivec_symbol;
 
+  sym_local = fts_new_symbol("local");
+
   sym_openEditor = fts_new_symbol("openEditor");
   sym_destroyEditor = fts_new_symbol("destroyEditor");
   sym_set = fts_new_symbol("set");
@@ -734,8 +765,3 @@ ivec_config(void)
 
   fts_atom_type_register(ivec_symbol, ivec_class);
 }
-
-
-
-
-

@@ -32,10 +32,11 @@
 typedef struct _ivec_
 {
   fts_object_t o;
-  int opened; /* non zero if editor open */
   int *values;
   int size;
   int alloc;
+  int opened; /* non zero if editor open */
+  fts_symbol_t file;
 } ivec_t;
 
 extern fts_class_t *ivec_class;
