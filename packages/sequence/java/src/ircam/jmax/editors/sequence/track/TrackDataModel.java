@@ -71,10 +71,15 @@ public interface TrackDataModel {
     public abstract TrackEvent getEventAt(int index);
     
     /**
+     * returns the next in time event 
+     */
+    public abstract TrackEvent getNextEvent(Event evt);
+
+    /**
      * return the index of the given event, if it exists, or the error constants
      * NO_SUCH_EVENT, EMPTY_COLLECTION 
      */
-    public abstract int indexOf(TrackEvent event);
+    public abstract int indexOf(Event event);
     
     public abstract Enumeration intersectionSearch(double start, double end);
     

@@ -86,7 +86,7 @@ class TrackContainer extends JPanel {
 	      b.setSelected(active);
 	  }
       else 
-	  if(name.equals("maximumPitch") || name.equals("minimumPitch")|| name.equals("viewMode"))
+	  if(name.equals("maximumPitch") || name.equals("minimumPitch"))
 	      {
 		  int height = ((PartitionAdapter)trackEditor.getGraphicContext().getAdapter()).getRangeHeight();
 		  setSize(getSize().width, height);
@@ -94,8 +94,21 @@ class TrackContainer extends JPanel {
 		  setMaximumSize(new Dimension(getMaximumSize().width, height));
 		  trackEditor.getGraphicContext().getFtsSequenceObject().changeTrack(track);	  
 	      }
-	  else if(name.equals("maximumValue") || name.equals("minimumValue"))
-	      trackEditor.getGraphicContext().getFtsSequenceObject().changeTrack(track);
+	  else 
+	      if(name.equals("viewMode"))
+		 {
+		     if(((Integer)evt.getNewValue()).intValue() < 2)//MidiTrack only
+			 {
+			     int height = ((PartitionAdapter)trackEditor.getGraphicContext().getAdapter()).getRangeHeight();
+			     setSize(getSize().width, height);
+			     setPreferredSize(new Dimension(getPreferredSize().width, height));
+			     setMaximumSize(new Dimension(getMaximumSize().width, height));
+			     trackEditor.getGraphicContext().getFtsSequenceObject().changeTrack(track);	  
+			 }
+		 }
+	      else 
+		  if(name.equals("maximumValue") || name.equals("minimumValue"))
+		      trackEditor.getGraphicContext().getFtsSequenceObject().changeTrack(track);
     }
     
     AbstractButton b;

@@ -51,7 +51,8 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 	    track.setProperty("maximumValue", new Integer(IntegerValue.DEFAULT_MAX_VALUE));
 	if(track.getProperty("minimumValue")==null)
 	    track.setProperty("minimumValue", new Integer(IntegerValue.DEFAULT_MIN_VALUE));
-
+	if(track.getProperty("viewMode")==null)
+	    track.setProperty("viewMode", new Integer(viewMode));
 
 	this.geometry = g;
 	this.track = track;
@@ -155,6 +156,22 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 	repaint();
     }
     
+    public void setViewMode(int viewType)
+    {
+	if(viewMode!=viewType)
+	    {
+		viewMode=viewType;
+		//renderer.setViewMode(viewMode);//??????
+		track.setProperty("viewMode", new Integer(viewType));
+		repaint();
+	    }    
+    }
+
+    public int getViewMode()
+    {
+      return viewMode;
+    }
+
 
     /**
      * Track editor interface */
@@ -196,5 +213,9 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     MonoTrackRenderer renderer;
 
     Track track;
+
+    int viewMode = PEAKS_VIEW;
+    static public final int PEAKS_VIEW = 2;
+    static public final int STEPS_VIEW = 3;
 }
 

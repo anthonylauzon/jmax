@@ -79,9 +79,21 @@ public class MonoTrackPopupMenu extends JPopupMenu
 	}
     });
     add(item);
-    
+
     addSeparator();
     
+    JMenu viewMenu = new JMenu("Change View");
+    item = new JMenuItem("Peaks view");
+    item.addActionListener(new SetViewAction(MonoTrackEditor.PEAKS_VIEW));
+    viewMenu.add(item);    
+    item = new JMenuItem("Steps view");
+    item.addActionListener(new SetViewAction(MonoTrackEditor.STEPS_VIEW));
+    viewMenu.add(item);
+
+    add(viewMenu);
+
+    addSeparator();
+        
     item = new JMenuItem("Remove Track");
     item.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
@@ -148,6 +160,21 @@ public class MonoTrackPopupMenu extends JPopupMenu
 		trackCount = count;
 	    }
     }
+
+    class SetViewAction extends AbstractAction {
+	SetViewAction(int viewType)
+	{
+	    super("Set View");
+	    this.viewType = viewType;
+	}
+    
+	public void actionPerformed(ActionEvent e)
+	{
+	    MonoTrackPopupMenu.getPopupTarget().setViewMode(viewType);
+	}
+	
+	int viewType;    
+    }  
 }
 
 

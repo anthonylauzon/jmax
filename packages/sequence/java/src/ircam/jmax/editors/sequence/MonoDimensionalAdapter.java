@@ -28,6 +28,7 @@ package ircam.jmax.editors.sequence;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.sequence.track.*;
+import ircam.jmax.editors.sequence.track.Event;
 import ircam.jmax.editors.sequence.renderers.*;
 
 import java.beans.*;
@@ -43,6 +44,7 @@ public class MonoDimensionalAdapter extends PartitionAdapter {
 	
 	YMapper = IntegerMapper.getMapper();
 	LabelMapper = IntegerMapper.getMapper();
+	viewMode = MonoTrackEditor.PEAKS_VIEW;
     }
 
     /**
@@ -99,7 +101,17 @@ public class MonoDimensionalAdapter extends PartitionAdapter {
      */
     public int getLenght(Event e) 
     {
-	return IntegerEventRenderer.INTEGER_WIDTH;
+	if(viewMode == MonoTrackEditor.PEAKS_VIEW)
+	    return IntegerEventRenderer.INTEGER_WIDTH;
+	else
+	    {//STEP_VIEW
+		Event next = gc.getDataModel().getNextEvent(e);
+		
+		if(next != null)		    
+		    return (getX(next.getTime()) - getX(e.getTime()));
+		else
+		    return (gc.getGraphicDestination().getSize().width - getX(e.getTime()));
+	    }
     }
 
   /**
@@ -139,8 +151,11 @@ public class MonoDimensionalAdapter extends PartitionAdapter {
 	    maxValue = ((Integer)e.getNewValue()).intValue();
 	else if(e.getPropertyName().equals("minimumValue"))
 	    minValue = ((Integer)e.getNewValue()).intValue();
+	else 
+	    if(e.getPropertyName().equals("viewMode"))
+		setViewMode(((Integer)e.getNewValue()).intValue());
     }
-    
+
     //------------- Fields
     int constant;    
     int maxValue = 127;

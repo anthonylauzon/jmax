@@ -246,7 +246,6 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 	return (TrackEvent) clone();
     }
 
-
     //--- Fields
     private double time;
     private EventValue value;

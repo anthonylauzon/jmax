@@ -71,7 +71,7 @@ public class IntegerEventRenderer implements ObjectRenderer {
     int x = gc.getAdapter().getX(e);
     int y = gc.getAdapter().getY(e);    
     int heigth = gc.getAdapter().getHeigth(e);    
-    int lenght = gc.getAdapter().getLenght(e); //fixed length
+    int lenght = gc.getAdapter().getLenght(e);
 
     //negative value
     /*if(((Integer)e.getProperty("integer")).intValue() < 0) 
