@@ -15,7 +15,7 @@ LD_NONE_FLAG =
 CC_ALL_FLAG = 
 CC_NONE_FLAG = 
 
-ARCH_CFLAGS := -Wall -DGNU -traditional-cpp
+ARCH_CFLAGS := -Wall -DGNU 
 ARCH_LDFLAGS :=
 
 

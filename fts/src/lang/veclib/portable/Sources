@@ -1,8 +1,4 @@
-ifeq ($(ARCH), rhapsody)
-STRANGE_SOURCES = 
-else
 STRANGE_SOURCES = vecx_scl_cfmul.c vecx_scl_icmp.c vecx_sqrt.c vecx_trigon.c
-endif
 
 SOURCES = $(STRANGE_SOURCES)    \
 	cfft.c			\
