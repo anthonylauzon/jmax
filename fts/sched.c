@@ -298,6 +298,9 @@ sleep_init(void)
 void
 fts_sleep(void)
 {
+  if (fts_sched_is_running_under_callback())
+      return;
+
   if ( ++sleeper.count == 5) 
     {
       double ftstime = fts_get_time() - sleeper.ftsstart;
