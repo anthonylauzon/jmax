@@ -44,6 +44,8 @@ ACC := $(ACC) $(SOURCES)
 INCLUDE_PATH := $(IRCAM_JMAX_PATH)/utils
 include $(INCLUDE_PATH)/Sources2
 
+ACC := $(ACC) $(SOURCES)
+
 ############################### widgets
 INCLUDE_PATH := $(IRCAM_JMAX_PATH)/widgets
 include $(INCLUDE_PATH)/Sources2
