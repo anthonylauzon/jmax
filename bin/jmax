@@ -122,7 +122,7 @@ start_it ()
 
 # ---------------------------------------------------------------------------
 # Special version for SGI architecture:
-# for obscure reasons, starting java without -classpath option doesn't work
+# For obscure reasons, starting java without -classpath option doesn't work
 start_it_SGI ()
 {
     if [ $VERBOSE ]
@@ -168,8 +168,10 @@ JACL_CLASSPATH=${ROOTDIR}/java/lib/jacl1.0/jacl.jar
 CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${JACL_CLASSPATH}
 
 
-if [ `arch` = "sgi" ]
+if [ -r /usr/java/lib/rt.jar ]
 then
+    # Probably we are on a SGI. In this case, we must use Java option -classpath.
+    # Don't ask me why...
     CLASSPATH=/usr/java/lib/rt.jar:${CLASSPATH}
     start_it_SGI
 else
