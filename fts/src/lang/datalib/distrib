@@ -1,0 +1,9 @@
+all	all	atomlist.c
+all	all	atomlist.h
+all	all	datalib.c
+all	all	floatvector.c
+all	all	floatvector.h
+all	all	intvec.c
+all	all	intvec.h
+all	all	objectset.c
+all	all	objectset.h

@@ -1,3 +1,7 @@
-all	all    files.h
-all	all    post.h
-all	all    parser.h
+all	all	atomfiles.h
+all	all	directories.h
+all	all	files.h
+all	all	parser.h
+all	all	post.h
+all	all	soundfiles.h
+all	all	soundformats.h

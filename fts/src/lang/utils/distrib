@@ -1,3 +1,6 @@
-all	all	atomlist.h
+all	all	floatfuns.h
 all	all	hashtab.h
+all	all	ieeewrap.h
+all	all	ramps.h
 all	all	units.h
+all	all	wto.h

@@ -1,3 +1,4 @@
+all	all	hw.h
 all	all     mem.h
 all	all     modules.h
 all	all     platform.h
