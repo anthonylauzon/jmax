@@ -1,0 +1,6 @@
+SOURCES = \
+	Explode.java		\
+	ExplodeExtension.java	\
+	ExplodeFactory.java	\
+	ExplodeRemoteData.java	\
+

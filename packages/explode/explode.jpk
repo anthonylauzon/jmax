@@ -1,0 +1,15 @@
+## package declaration
+
+package provide explode
+
+## Load the explode class
+## The explode extension will install
+## the data type and handler
+##
+
+java::load -classpath "$dir/java/classes" ircam.jmax.editors.explode.ExplodeExtension
+
+puts "explode editor loaded"
+
+
+
