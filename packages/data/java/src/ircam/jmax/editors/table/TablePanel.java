@@ -339,8 +339,9 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
 	  {
 	      if(itsHorizontalControl.isVisible())
 		  {
+		      itsHorizontalControl.setValue(0);
 		      itsHorizontalControl.setEnabled(false);
-		      itsHorizontalControl.setVisible(false);
+		      itsHorizontalControl.setVisible(false);		      
 		  }
 	  }
       else
@@ -472,16 +473,16 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
   {
     int vsize, pixsize;
     int selsize = gc.getSelection().size();
-    int last = gc.getFtsObject().getSize()-selsize;
+    int sizeAfterCut = gc.getFtsObject().getSize()-selsize;
 
-    if(last >= gc.getLastVisibleIndex())
+    if((sizeAfterCut >= gc.getLastVisibleIndex(sizeAfterCut))&&(sizeAfterCut> gc.getWindowHorizontalScope()))
 	{
 	    vsize = gc.getWindowHorizontalScope();
 	    pixsize = gc.getGraphicDestination().getSize().width;
 	} 
     else
 	{
-	    vsize = last-gc.getFirstVisibleIndex();
+	    vsize = sizeAfterCut-gc.getFirstVisibleIndex();
 	    pixsize = gc.getAdapter().getX(vsize);
 	}
 
@@ -510,17 +511,19 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
     else first = gc.getSelection().getFirstSelected();
     
     int vsize, pixsize;
-    int last = gc.getFtsObject().getSize()+lastCopySize;
-    if(last >= /*gc.getLastVisibleIndex()*/ gc.getAdapter().getInvX(gc.getGraphicDestination().getSize().width))
+    int sizeAfterInsert = gc.getFtsObject().getSize()+lastCopySize;
+    
+    if((sizeAfterInsert >= gc.getLastVisibleIndex(sizeAfterInsert))&&(sizeAfterInsert > gc.getWindowHorizontalScope()))
 	{
 	    vsize = gc.getWindowHorizontalScope();
 	    pixsize = gc.getGraphicDestination().getSize().width;
 	} 
     else
 	{
-	    vsize = last-gc.getFirstVisibleIndex();
+	    vsize = sizeAfterInsert-gc.getFirstVisibleIndex();
 	    pixsize = gc.getAdapter().getX(vsize);
 	}
+
     gc.getFtsObject().requestInsert(first, vsize, pixsize);
     gc.getSelection().deselectAll();
   }

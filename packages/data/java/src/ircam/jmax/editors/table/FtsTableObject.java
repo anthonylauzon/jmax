@@ -114,7 +114,8 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
     lastIndex = i;
     
     notifySizeChanged(size);
-    if(size <= lastIndex)
+
+    if((size <= lastIndex)||(visibleSize <= lastIndex))
 	notifySet();
 
     setDirty();
@@ -141,7 +142,6 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
     
     if(startIndex+i > lastIndex)
 	lastIndex = startIndex+i;
-
     notifySet();
     setDirty();
   }  

@@ -130,11 +130,9 @@ public class TableRenderer extends AbstractRenderer implements Layer{
   {    
       //g.setColor(Color.white);
       //g.fillRect(r.x, r.y, r.width, r.height);
-
       if(gc.getAdapter().getXZoom()>0.5)
 	  {
 	      if((gc.getFtsObject().getVisibleSize()==0)||(gc.getFtsObject().getLastUpdatedIndex()==0)) return;
-
 	      int index = gc.getFirstVisibleIndex();
 	      int visibleSize = gc.getVisibleHorizontalScope();
 	      int tableSize = gc.getFtsObject().getSize();

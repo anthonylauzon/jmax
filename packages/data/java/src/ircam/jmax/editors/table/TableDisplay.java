@@ -92,7 +92,7 @@ public class TableDisplay extends PopupToolbarPanel
    * paints all the points in a given (closed) range */
   public void rangePaint(int index1, int index2)
   {
-      Graphics g = getGraphics();
+     Graphics g = getGraphics();
 
       for (int i = index1; i<= index2; i++)
 	  tr.renderPoint(g, i);

@@ -152,6 +152,12 @@ public class TableGraphicContext extends GraphicContext{
       if((last > getFtsObject().getSize())&&( getFtsObject().getSize()!=0)) last = getFtsObject().getSize();
       return last;
   }
+  public int getLastVisibleIndex(int newSize)
+  {      
+      int last = itsAdapter.getInvX(getGraphicDestination().getSize().width);
+      if((last > newSize)&&( newSize!=0)) last = newSize;
+      return last;
+  } 
   public int getWindowHorizontalScope()
   {
       return (itsAdapter.getInvX(getGraphicDestination().getSize().width) - itsAdapter.getInvX(0));
