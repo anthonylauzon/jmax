@@ -97,6 +97,9 @@ public class Standard extends Editable implements FtsObjectErrorListener
   public void editContent()
   {
     itsSketchPad.waiting();
+
+    ftsObject.sendMessage(FtsObject.systemInlet, "open_editor", new MaxVector());
+
     ftsObject.getFts().editPropertyValue( ftsObject, new MaxDataEditorReadyListener() {
 	public void editorReady(MaxDataEditor editor)
 	{itsSketchPad.stopWaiting();}
