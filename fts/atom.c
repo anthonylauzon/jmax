@@ -98,7 +98,40 @@ int fts_atom_compare( const fts_atom_t *p1, const fts_atom_t *p2)
  *
  */
 
-static fts_class_t void_class = { type_id : FTS_TYPEID_VOID};
+/* static fts_class_t void_class = { type_id : FTS_TYPEID_VOID}; */
+static fts_class_t void_class = { 
+  {
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  },
+  0,
+  FTS_TYPEID_VOID,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+};
+
 fts_class_t *fts_void_class = &void_class;
 
 static fts_class_t int_class = { type_id : FTS_TYPEID_INT};
