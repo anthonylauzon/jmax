@@ -31,3 +31,6 @@ $(JARFILE): $(JAR_DEP)
 	else \
 		jar -cvf $(JARFILE) `find . -name "*.class"` `find . -name "*.gif"` ; \
 	fi
+
+install-data-hook:
+	cd $(DESTDIR)$(jardir); find . -name "*.class" -exec rm {} \;

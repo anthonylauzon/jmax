@@ -29,3 +29,5 @@ $(JARFILE): $(JAR_DEP)
 	fi
 
 
+install-data-hook:
+	cd $(DESTDIR)$(jardir); find . -name "*.class" -exec rm {} \;

@@ -32,3 +32,6 @@ $(JARFILE): $(JAR_DEP)
 		jar -cvf $(JARFILE) `find . -name "*.class"`; \
 	fi
 
+
+install-data-hook:
+	cd $(DESTDIR)$(jardir); find . -name "*.class" -exec rm {} \;
