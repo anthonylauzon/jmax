@@ -82,10 +82,21 @@ event_set_at_client(event_t *this)
       fts_set_pointer(&a, &event_client_array);
 
       (*method_append_properties)(obj, 0, 0, 1, &a);
-
-      size = fts_array_get_size(&event_client_array);
-      atoms = fts_array_get_atoms(&event_client_array);
     }
+    else /* not a score object but other object as fmat */ 
+    {
+      /* register value and send object id as value-property */
+      fts_object_t *valobj = fts_get_object( event_get_value( this));
+      
+      if(!fts_object_has_id(valobj))
+        fts_client_register_object(valobj, fts_object_get_client_id((fts_object_t *)this));	
+      
+      fts_array_append_symbol(&event_client_array, seqsym_objid);
+      fts_array_append_int(&event_client_array, fts_object_get_id(valobj));                  
+    }    
+
+    size = fts_array_get_size(&event_client_array);
+    atoms = fts_array_get_atoms(&event_client_array);
 
     /* send properties to client */
     if(size > 0)

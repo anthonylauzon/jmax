@@ -860,8 +860,8 @@ track_insert(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       double time = fts_get_number_float(at);
       event_t *event = (event_t *)fts_object_create(event_class, 1, at + 1);
       
-      /* add event to track */
-      track_add_event(this, time, event);
+      /* add event to track and upload it if editor is open */
+      track_add_event_and_upload(this, time, event);
     }
     else
       fts_object_error(o, "insert: event type missmatch");

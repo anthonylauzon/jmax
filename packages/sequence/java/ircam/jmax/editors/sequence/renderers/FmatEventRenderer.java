@@ -98,7 +98,7 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
       g.setColor(Color.green.brighter());
   }
   
-	g.fillRect(x, y, width, height);
+	g.fill3DRect(x+1, y+1, width-1, height-1, true);
     
 	switch(state)
   {
