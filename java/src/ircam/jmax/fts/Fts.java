@@ -557,20 +557,6 @@ public class Fts implements MaxContext
       ((FtsEditListener) editListeners.elementAt(i)).objectRemoved(object);
   }
 
-  // MDA SUpport
-
-  private static MaxDocumentType patcherType;
-
-  static void setPatcherDocumentType(MaxDocumentType type)
-  {
-    patcherType = type;
-  }
-
-  public static MaxDocumentType  getPatcherDocumentType()
-  {
-    return patcherType;
-  }
-
   /** Load a binary jmax file. @return its root patcher. */
 
   public FtsObject loadJMaxFile(File file)

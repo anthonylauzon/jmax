@@ -42,8 +42,7 @@ public class FtsModule
 
     // Not yet
     // Mda.installDocumentHandler( new FtsBmaxRemoteDocumentHandler());
-    Fts.setPatcherDocumentType(new FtsPatcherDocumentType());
-    Mda.installDocumentType(Fts.getPatcherDocumentType());
+    Mda.installDocumentType( new FtsPatcherDocumentType());
 
     // Install the FTS tcl commands
     /* ircam.jmax.fts.tcl.TclFtsPackage.installPackage(); Moved to ircam.jmax.script.tcl.TclInterpreter */

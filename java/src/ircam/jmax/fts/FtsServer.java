@@ -1460,7 +1460,6 @@ public class FtsServer  implements Runnable
 	break;
 
       case FtsClientProtocol.post_line_cmd:
-	// WHAT TO DO IF OUTPUT IS NOT DIRECTED TO CONSOLE ?
 	// append first argument (a complete line) to the console
 	ircam.jmax.editors.console.ConsoleWindow.append(stream.getNextStringArgument());
 	break;
