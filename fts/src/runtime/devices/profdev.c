@@ -176,7 +176,6 @@ prof_dac_put(fts_word_t *argv)
 	  if (prof_dac_data.done_vectors == prof_dac_data.profile_interval)
 	    {
 	      struct timeval last_time;
-	      fts_atom_t args[2];
 	      int samples_per_seconds = 0;
 	      long dsec, dusec;
 
@@ -218,8 +217,6 @@ prof_dac_put(fts_word_t *argv)
 	}
       else
 	{
-	  fts_atom_t args[2];
-
 	  prof_dac_data.one_done = 1;
 
 	  /* Set the current time of the day */

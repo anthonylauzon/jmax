@@ -152,6 +152,7 @@ static void oss_audio_set_parameters(void)
 static int oss_audiodev_update_device(void)
 {
   int fd;
+  int flags;
 
   if (oss_audio_data.device_opened)
     {
@@ -160,17 +161,13 @@ static int oss_audiodev_update_device(void)
     }
 
   if (oss_audio_data.dac_opened && oss_audio_data.adc_opened)
-    {
-      fd = open(oss_audio_data.device_name, O_RDWR, 0);
-    }
+    flags = O_RDWR;
   else if (oss_audio_data.dac_opened)
-    {
-      fd = open(oss_audio_data.device_name, O_WRONLY, 0);
-    }
+    flags = O_WRONLY;
   else if (oss_audio_data.adc_opened)
-    {
-      fd = open(oss_audio_data.device_name, O_RDONLY, 0);
-    }
+    flags = O_RDONLY;
+
+  fd = open( oss_audio_data.device_name, flags, 0);
 
   if ( fd >= 0 )
     {

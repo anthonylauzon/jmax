@@ -24,11 +24,10 @@ ARCH_LDFLAGS := -rdynamic
 
 #CC := pentium-gcc
 #LD := pentium-gcc
-#ARCH_CFLAGS := -B/usr/lib/gcc-lib/ -idirafter /usr/lib/gcc-lib/i586-pc-linux-gnu/pgcc-2.91.60/include/ -pipe -Wall -Wno-unused -DLINUX -DLINUXPC
-#ARCH_CFLAGS := -B/usr/lib/gcc-lib/i586-pc-linux-gnu/pgcc-2.91.60/ -pipe -Wall -Wno-unused -DLINUX -DLINUXPC
-#ARCH_OPT_CFLAGS := -O6 -mpentiumpro -funroll-all-loops  -mstack-align-double
-#ARCH_LDFLAGS := -rdynamic -B/usr/lib/gcc-lib/i586-pc-linux-gnu/pgcc-2.91.60/
-#ARCH_OPT_LDFLAGS := 
+ARCH_CFLAGS := -pipe -Wall -Wno-unused -DLINUX -DLINUXPC
+ARCH_OPT_CFLAGS := -O6 -mpentiumpro -funroll-all-loops  -mstack-align-double
+ARCH_LDFLAGS := -rdynamic
+ARCH_OPT_LDFLAGS := 
 
 
 # Common to gcc and Pentium gcc
