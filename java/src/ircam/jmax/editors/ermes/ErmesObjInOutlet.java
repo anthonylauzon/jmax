@@ -44,15 +44,7 @@ abstract public class ErmesObjInOutlet implements ErmesDrawable{
     updateAnchorPoint();
   }
 
-  public boolean getDirty() {
-    //return itsDirtyFlag;
-    return true;//for now, just for test
-  }
 
-  public void setDirty(boolean b) {
-    //itsDirtyFlag = b;
-  }
-  
   public void Paint(Graphics g) {
     if (g== null) return;
     if (itsCurrentDrawingMethod == DRAW) 

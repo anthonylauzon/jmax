@@ -28,7 +28,6 @@ public class ErmesConnection implements ErmesDrawable{
   boolean itsSelected;
   static int debug_count = 1;
   boolean mustSayToSketch = false;	//when it is ready
-  boolean itsDirtyFlag;
   
   final int DELTA = 6;
   
@@ -71,14 +70,6 @@ public class ErmesConnection implements ErmesDrawable{
     itsSelected = false;
   }
 
-  public boolean getDirty() {
-    //return itsDirtyFlag;
-    return true;//for now, just for test
-  }
-
-  public void setDirty(boolean b) {
-    itsDirtyFlag = b;
-  }
 
   //--------------------------------------------------------
   //	Repaint

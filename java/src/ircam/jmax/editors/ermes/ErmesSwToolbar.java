@@ -3,41 +3,82 @@ package ircam.jmax.editors.ermes;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.io.*;
 
-import ircam.jmax.utils.*;//probing...
-import ircam.jmax.*;
-import ircam.jmax.dialogs.*;
 import com.sun.java.swing.*;
 import com.sun.java.swing.plaf.*;
 import com.sun.java.swing.plaf.motif.*;
 
-public class ErmesSwToolbar extends JPanel implements  MouseListener{
+import ircam.jmax.utils.*;//probing...
+import ircam.jmax.*;
+import ircam.jmax.dialogs.*;
+
+
+public class ErmesSwToolbar extends JPanel implements  MouseListener
+{
   ErmesSketchPad itsSketchPad;
   int itsPressedButton = -1;
   boolean locked = false;
   boolean pressed = false;
   final static int NUM_BUTTONS = 11;  
+  CardLayout layout;
+  JPanel cards;
+  JPanel tools;
+  JPanel empty;
   JToolBar itsSwToolbar;
   JToggleButton itsLastPressed;
   // try to minimize the gif file loading...
   static Hashtable itsImages = new Hashtable();
 
-  public ErmesSwToolbar(ErmesSketchPad theSketchPad) {
+  /** This static method preload all the tipical images in the hashtable, and is called
+    during application startup; this will reduce the first patcher opening time,
+    while slowing down the application startup */
 
-    /* important note for (future) developers:
-       Swing uses a double buffer by default FOR EACH JComponent.
-       It dows not seem, however, to handle this buffer correctly.
-       It is very common to go low memory, so your component will
-       repaint partially, or will not show up at all.
-       Most of the time, you're forced to setDoubleBuffered(false).*/
+  static void loadToolBarImages()
+  {
+    String images[] = { "tool_ext.gif",     "tool_mess.gif", 
+			"tool_patcher.gif", "tool_in.gif", 
+			"tool_out.gif",     "tool_text.gif", 
+			"tool_bang.gif",    "tool_toggle.gif", 
+			"tool_slider.gif",  "tool_int.gif", 
+			"tool_float.gif" };
+
+    String fs = File.separator;
+    String path = MaxApplication.getProperty("root")+fs+"images"+fs;
+
+    for (int i = 0; i < images.length; i++)
+      {
+	String gifFilePath = path + images[i];
+
+	itsImages.put(gifFilePath, new ImageIcon(gifFilePath));
+      }
+  }
+
+  public ErmesSwToolbar(ErmesSketchPad theSketchPad) {
 
     setDoubleBuffered(false);
     itsSketchPad = theSketchPad;
     setLayout (new BorderLayout());    
+
+    cards = new JPanel();
+    add(cards,  BorderLayout.WEST);
+    layout = new CardLayout();    
+    cards.setLayout(layout);    
+
+    tools = new JPanel();
+    cards.add("edit", tools);
+    tools.setLayout (new BorderLayout());    
+
+    empty = new JPanel();
+    cards.add("run", empty);
+
     itsSwToolbar = new JToolBar();
     itsSwToolbar.setFloatable (false);   
     InsertButtons();
-    add (itsSwToolbar, BorderLayout.WEST);
+    tools.add(itsSwToolbar, BorderLayout.WEST);
+
+    // layout.first();// 
+
     validate();
   }
 
@@ -46,21 +87,22 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
    * gif files (case of multiple windows with same palette).
    */
 
-  public void AddButton(String name, String gifFilePath) {
+  void AddButton(Class theClass, String gifFilePath) {
     ErmesSwToggleButton aToggleButton;
-    ImageIcon aImageIcon = loadIcon(gifFilePath);
+    ImageIcon aImageIcon = getIcon(gifFilePath);
     
-    aToggleButton = new ErmesSwToggleButton(name, aImageIcon);
+    aToggleButton = new ErmesSwToggleButton(theClass, aImageIcon);
     itsSwToolbar.add(aToggleButton);
     aToggleButton.addMouseListener(this);
   }
 
-  public static ImageIcon loadIcon(String gifFilePath) {
+  static ImageIcon getIcon(String gifFilePath) {
     ImageIcon aImageIcon = (ImageIcon) itsImages.get(gifFilePath);
-    if (aImageIcon == null) {
-      aImageIcon =  new ImageIcon(gifFilePath);
-      itsImages.put(gifFilePath, aImageIcon);
-    }
+    if (aImageIcon == null)
+      {
+	aImageIcon =  new ImageIcon(gifFilePath);
+	itsImages.put(gifFilePath, aImageIcon);
+      }
     //else already loaded
     return aImageIcon;
   }
@@ -90,7 +132,7 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
       locked = false;
       itsLastPressed = aTButton;
       pressed = true;
-      itsSketchPad.startAdd(aTButton.getName()); //and tell to the sketch
+      itsSketchPad.startAdd(aTButton.getNewObjectClass()); //and tell to the sketch
     }
   }
 
@@ -103,7 +145,7 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
 	itsLastPressed.setSelected(false);
 	itsLastPressed = aTButton;   
       }
-      itsSketchPad.startAdd(aTButton.getName());
+      itsSketchPad.startAdd(aTButton.getNewObjectClass());
       aTButton.setSelected(true);
       locked = true;
       return;
@@ -128,9 +170,12 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
   }
 
   public void setRunMode(boolean theRunMode) {
-    if(pressed) Unlock();
-    //itsSwToolbar.setEnabled(!theRunMode);
-    itsSwToolbar.setVisible(!theRunMode);
+    if (pressed)
+      Unlock();
+
+    // itsSwToolbar.setVisible(!theRunMode);
+
+    layout.show(cards, theRunMode ? "run" : "edit");
   }
  
   public void Lock(){}//??
@@ -143,23 +188,22 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
   //--------------------------------------------------------
   //	InsertButton
   //--------------------------------------------------------
-  private void InsertButtons() {
-    //charge images if not already charged
-    String fs = MaxApplication.getProperty("file.separator");
-    String path = MaxApplication.getProperty("root")+fs+"images"+fs;
-    String p = new String("ircam.jmax.editors.ermes.");
 
-    AddButton(p+"ErmesObjExternal", path+"tool_ext.gif");
-    AddButton(p+"ErmesObjMessage", path+"tool_mess.gif");
-    AddButton(p+"ErmesObjPatcher", path+"tool_patcher.gif");
-    AddButton(p+"ErmesObjIn", path+"tool_in.gif");
-    AddButton(p+"ErmesObjOut", path+"tool_out.gif");
-    AddButton(p+"ErmesObjComment", path+"tool_text.gif");
-    AddButton(p+"ErmesObjBang", path+"tool_bang.gif");
-    AddButton(p+"ErmesObjToggle", path+"tool_toggle.gif");
-    AddButton(p+"ErmesObjSlider", path+"tool_slider.gif");
-    AddButton(p+"ErmesObjInt", path+"tool_int.gif");
-    AddButton(p+"ErmesObjFloat", path+"tool_float.gif");
+  private void InsertButtons() {
+    String fs = File.separator;
+    String path = MaxApplication.getProperty("root")+fs+"images"+fs;
+
+    AddButton(ircam.jmax.editors.ermes.ErmesObjExternal.class, path+"tool_ext.gif");
+    AddButton(ircam.jmax.editors.ermes.ErmesObjMessage.class, path+"tool_mess.gif");
+    AddButton(ircam.jmax.editors.ermes.ErmesObjPatcher.class, path+"tool_patcher.gif");
+    AddButton(ircam.jmax.editors.ermes.ErmesObjIn.class, path +"tool_in.gif");
+    AddButton(ircam.jmax.editors.ermes.ErmesObjOut.class, path +"tool_out.gif");
+    AddButton(ircam.jmax.editors.ermes.ErmesObjComment.class, path + "tool_text.gif");
+    AddButton(ircam.jmax.editors.ermes.ErmesObjBang.class, path+"tool_bang.gif");
+    AddButton(ircam.jmax.editors.ermes.ErmesObjToggle.class, path+"tool_toggle.gif");
+    AddButton(ircam.jmax.editors.ermes.ErmesObjSlider.class, path+"tool_slider.gif");
+    AddButton(ircam.jmax.editors.ermes.ErmesObjInt.class, path+"tool_int.gif");
+    AddButton(ircam.jmax.editors.ermes.ErmesObjFloat.class, path+"tool_float.gif");
   }
 
   public Dimension getMinimumSize(){

@@ -1,9 +1,7 @@
 SSOURCES = \
 	  ErmesModule.java \
           ErmesConnection.java \
-          ErmesRegion.java \
           ErmesScrollerView.java \
-          ErmesSketchHelper.java \
           ErmesSketchPad.java \
           ErmesSketchWindow.java \
 	  ErmesSwToolbar.java \
@@ -26,7 +24,6 @@ SSOURCES = \
           ErmesObjInletOutlet.java \
           ErmesObjInt.java \
           ErmesObjIntegerDialog.java \
-          ErmesObjMessThread.java \
           ErmesObjMessage.java \
           ErmesObjOut.java \
           ErmesObjOutInlet.java \
@@ -40,7 +37,6 @@ SSOURCES = \
           ErmesObject.java \
 	  ErmesDrawable.java \
           ErmesSelection.java \
-	  ErmesArea.java	\
 	FindPanel.java		\
 	FontCache.java		\
 

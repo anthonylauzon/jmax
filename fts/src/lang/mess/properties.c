@@ -809,7 +809,9 @@ struct changes
 
 static fts_heap_t *changes_heap;
 static struct changes *changes_queue_head = 0;
+
 static struct changes *urgent_changes_queue_head = 0;
+static struct changes *urgent_changes_last_in_queue = 0;
 
 /* return 1 if there are changes, zero otherwise */
 
@@ -850,6 +852,11 @@ fts_object_get_next_change_urgent(fts_symbol_t *property, fts_object_t **object)
       *object   = p->obj;
 
       urgent_changes_queue_head = p->next;
+
+      /* If the fifo is now empty, update the last pointer */
+
+      if (urgent_changes_queue_head == 0)
+	urgent_changes_last_in_queue = 0;
 
       fts_heap_free((char *)p, changes_heap);
 
@@ -896,11 +903,11 @@ fts_object_property_changed_urgent(fts_object_t *obj, fts_symbol_t property)
   struct changes *p;
   struct changes *last = 0;
 
-  /* check if the object is already in the evsched list */
+  /* Don't check if the object is already in the evsched list */
 
-  for (p = urgent_changes_queue_head; p; last = p, p = p->next)
-    if ((p->obj == obj) && p->property == property)
-      return;
+  /* for (p = urgent_changes_queue_head; p; last = p, p = p->next)
+     if ((p->obj == obj) && p->property == property)
+     return; */
 
   /* 
      Here, if last is not null, is the last element of the list;
@@ -915,10 +922,16 @@ fts_object_property_changed_urgent(fts_object_t *obj, fts_symbol_t property)
 
   /* add the new queue element to the end of the list */
 
-  if (last)
-    last->next = p;
+  if (urgent_changes_last_in_queue)
+    {
+      urgent_changes_last_in_queue->next = p;
+      urgent_changes_last_in_queue = p;
+    }
   else
-    urgent_changes_queue_head = p;
+    {
+      urgent_changes_queue_head = p;
+      urgent_changes_last_in_queue = p;
+    }
 }
 
 /* By using the fts_object_ui_property_changed function, an object declare

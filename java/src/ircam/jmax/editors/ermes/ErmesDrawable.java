@@ -7,7 +7,5 @@ import java.awt.Graphics;
  * It handles the dirty flag (is to repaint?)
  */
 public interface ErmesDrawable {
-  abstract public void setDirty(boolean b);
-  abstract public boolean getDirty();
   abstract public void Paint(Graphics g);
 }

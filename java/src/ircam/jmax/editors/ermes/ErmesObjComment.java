@@ -10,7 +10,7 @@ import ircam.jmax.fts.*;
  */
 class ErmesObjComment extends ErmesObject {
   Dimension preferredSize = new Dimension(100, 100); //hu-hu	
-  String itsArgs = " ";
+  String itsArgs;
   Vector itsParsedTextVector = new Vector();
   public String itsMaxString = "";
   int FIELD_HEIGHT;
@@ -68,10 +68,9 @@ class ErmesObjComment extends ErmesObject {
 	
 
   public void makeFtsObject(){
-
     try
       {
-	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "comment", itsArgs);
+	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "comment", (itsArgs == null ? "" : itsArgs));
       }
     catch (FtsException e)
       {
@@ -99,7 +98,12 @@ class ErmesObjComment extends ErmesObject {
   public void RestartEditing(){
     if (itsSketchPad.GetTextArea() != null) itsSketchPad.GetTextArea().setEditable(true);
     itsSketchPad.GetTextArea().setFont(getFont());
-    itsSketchPad.GetTextArea().setText(itsArgs);
+
+    if (itsArgs == null)
+      itsSketchPad.GetTextArea().setText("");
+    else
+      itsSketchPad.GetTextArea().setText(itsArgs);
+
     itsSketchPad.GetTextArea().itsOwner = this;
 
     if(itsParsedTextVector.size()==0)
@@ -195,11 +199,12 @@ class ErmesObjComment extends ErmesObject {
       }
     }
     //text
-    if(!itsArgs.equals(" ")){
-      g.setColor(Color.black);
-      g.setFont(getFont());
-      DrawParsedString(g);
-    }
+    if (itsArgs != null)
+      {
+	g.setColor(Color.black);
+	g.setFont(getFont());
+	DrawParsedString(g);
+      }
   }
 	
   private void DrawParsedString(Graphics theGraphics){

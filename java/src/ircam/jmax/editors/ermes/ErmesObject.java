@@ -20,7 +20,7 @@ import ircam.jmax.utils.GlobalProbe;
 // - handle the object with data and open the associated editor 
 //   (example: subpatchers, table, etc.)
 
-abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
+abstract public class ErmesObject implements ErmesDrawable {
   private int itsX, itsY;
   int itsInitX, itsInitY;
   public boolean itsSelected = false;
@@ -45,18 +45,11 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
   static Color itsUISelectedColor = new Color(51, 153, 204);
   static Color itsLangNormalColor = new Color(153, 204, 204);
   static Color itsLangSelectedColor = new Color(51, 153, 153);
-  Rectangle itsArea = new Rectangle();
-  boolean itsDirtyFlag = true;
 
   public ErmesObject() {
     super();
   }
 	
-  public Rectangle getArea() {
-    itsArea.setBounds(currentRect.x-3, currentRect.y-3, currentRect.width+6, currentRect.height+6);
-    return itsArea;
-  }
-
   public int getItsX() {
     return itsX;
   }
@@ -113,14 +106,6 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
     itsFtsObject.put( "fs", itsFont.getSize());
   }
   
-  public void setDirty(boolean b) {
-    itsDirtyFlag = b;
-  }
-
-  public boolean getDirty() {
-    return itsDirtyFlag;
-  }
-  
   void SaveTo(OutputStream stream) {
     String strArgs;
 
@@ -175,7 +160,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
     return itsJustification;
   }
 
-  void ResizeToNewFont(Font itsFont) {setDirty(false);}
+  void ResizeToNewFont(Font itsFont) {}
   
   public void UpdateOnly(Graphics g) {
     if(!itsSketchPad.itsGraphicsOn)return;
@@ -610,7 +595,6 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
     if(aWidth<getMinimumSize().width) aWidth = getMinimumSize().width;
     if(aHeight<getMinimumSize().height) aHeight = getMinimumSize().height;
     resizeBy(aWidth-currentRect.width, aHeight-currentRect.height);
-    setDirty(false);
   };
   
   public boolean canResizeBy(int theDeltaX, int theDeltaY){

@@ -15,16 +15,16 @@ public class ErmesModule
 
     Mda.installEditorFactory(new ErmesPatcherFactory());
 
-    // Install the module tcl commands.
-
-    ircam.jmax.editors.ermes.tcl.TclErmesPackage.installPackage();
-
     //List of persistent properties
 
     FtsPropertyDescriptor.setDefaultValue("autorouting", "off");
     FtsPropertyDescriptor.setDefaultValue("maxValue", new Integer(128));
     FtsPropertyDescriptor.setDefaultValue("minValue", new Integer(0));
     FtsPropertyDescriptor.setDefaultValue("resized", "off");
+
+    // Load the toolbar images
+
+    ErmesSwToolbar.loadToolBarImages();
   }
 }
 

@@ -15,8 +15,6 @@ import ircam.jmax.utils.*;
 
 public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandler
 {
-  String itsNameString = new String();
-
   public ErmesSketchWindow itsSubWindow = null;
   Dimension preferredSize = new Dimension(80,24);
  
@@ -86,12 +84,11 @@ public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsProper
   {
     try
       {
-	if (itsArgs.equals(""))
+	if (itsArgs == null)
 	  itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "jpatcher");
 	else
 	  itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "jpatcher", itsArgs);
 
-	if (itsFtsObject == null) System.err.println("AAAAAAAAAAAHHHHHHHHH");
 	((FtsContainerObject) itsFtsObject).setDownloaded();
       }
     catch (FtsException e)

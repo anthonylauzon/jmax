@@ -92,7 +92,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
   {
     try
       {
-	if (itsArgs.equals(""))
+	if (itsArgs == null) 
 	  itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "__void");
 	else
 	  itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, itsArgs);

@@ -20,7 +20,6 @@ include Sources
 
 all:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
-	(cd tcl; $(MAKE) all)
 .PHONY: all
 
 ErmesModule:
@@ -88,10 +87,6 @@ ErmesObjInt:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjInt.java)
 .PHONY: ErmesObjInt
 
-ErmesObjMessThread:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjMessThread.java)
-.PHONY: ErmesObjMessThread
-
 ErmesObjMessage:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjMessage.java)
 .PHONY: ErmesObjMessage
@@ -144,17 +139,9 @@ ErmesPatcherDoc:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesPatcherDoc.java)
 .PHONY: ErmesPatcherDoc
 
-ErmesRegion:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesRegion.java)
-.PHONY: ErmesRegion
-
 ErmesScrollerView:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesScrollerView.java)
 .PHONY: ErmesScrollerView
-
-ErmesSketchHelper:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesSketchHelper.java)
-.PHONY: ErmesSketchHelper
 
 ErmesSketchPad:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesSketchPad.java)
@@ -195,10 +182,6 @@ ErmesKeyAdapter:
 ErmesClipboardProvider:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesClipboardProvider.java)
 .PHONY: ErmesClipboardProvider
-
-ErmesArea:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesArea.java)
-.PHONY: ErmesArea
 
 ErmesDrawable:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesDrawable.java)

@@ -51,26 +51,17 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
       itsSketchPad.itsSketchWindow.requestFocus();
     }
-    String aTextString = getText();
+
+    String aTextString = getText().trim();
+
     /*if (aTextString.equals("") && !(itsOwner instanceof ErmesObjMessage)) {
       AbortEdit();
       return true; 
     }*/
 
-    if(aTextString.endsWith(" ")){
-      while(aTextString.endsWith(" ")){
-	aTextString = aTextString.substring(0, aTextString.length()-1);
-      }
-    }
-    if(aTextString.endsWith("\n")){
-      while(aTextString.endsWith("\n")){
-	aTextString = aTextString.substring(0, aTextString.length()-1);
-      }
-    }
-    
     if (itsOwner == null) return false; //this happens when the instatiation fails
     if (itsOwner.itsFtsObject != null){
-      if(itsOwner.itsArgs.equals(aTextString) && !aTextString.equals("")){
+      if(itsOwner.itsArgs != null && itsOwner.itsArgs.equals(aTextString) && !aTextString.equals("")){
 	itsOwner.ParseText(aTextString);
 	AbortEdit();
 	return true;

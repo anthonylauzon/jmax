@@ -18,9 +18,6 @@ class ErmesObjInletOutlet extends ErmesObjOutlet{
   public void Paint_specific(Graphics g){
     if(!itsOwner.itsSketchPad.itsGraphicsOn) return;
     debug_count += 1;
-    if (debug_count % ErmesSketchPad.DEBUG_COUNT == 0) {
-      /* System.out.println("uscito in ErmesObjOutlet.paint"); */
-    }
     g.setColor(Color.black);		
     if(selected){
       g.drawOval(itsX+1, itsY+4, getPreferredSize().width-2,getPreferredSize().height-4);

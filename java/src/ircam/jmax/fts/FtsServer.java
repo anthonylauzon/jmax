@@ -24,7 +24,7 @@ public class FtsServer
 {
   public static boolean debug = false;
 
-  boolean running;
+  boolean connected = false;
   boolean waiting = false;
 
   /** The FtsPort used to communicate with FTS */
@@ -57,7 +57,7 @@ public class FtsServer
 
     this.port.setServer(this);
 
-    running = true;
+    connected = true;
   }
 
   /** Give a string representation of the server */
@@ -114,6 +114,9 @@ public class FtsServer
 
   final void savePatcherBmax(FtsObject patcher, String filename)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("savePatcherBmax(" + patcher + "," + filename + ")");
 
@@ -133,6 +136,9 @@ public class FtsServer
 
   final void loadPatcherBmax(FtsObject parent, int id, String filename)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("loadPatcherBmax(" + parent + ", " + id + ", " + filename + ")");
 
@@ -153,6 +159,9 @@ public class FtsServer
 
   final void loadPatcherDpat(FtsObject parent, int id, String filename)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("loadPatcherDpat(" + parent + ", " + id + ", " + filename + ")");
 
@@ -173,6 +182,9 @@ public class FtsServer
 
   final public void sendAbstractionDeclare(String abstraction, String filename)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("sendAbstractionDeclare(" + abstraction + ", " + filename + ")");
 
@@ -193,6 +205,9 @@ public class FtsServer
 
   final public void sendAbstractionDeclarePath(String path)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("sendAbstractionDeclarePath(" + path + ")");
 
@@ -212,6 +227,9 @@ public class FtsServer
 
   final public void sendTemplateDeclare(String template, String filename)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("sendTemplateDeclare(" + template + ", " + filename + ")");
 
@@ -232,6 +250,9 @@ public class FtsServer
 
   final public void sendTemplateDeclarePath(String path)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("sendTemplateDeclarePath(" + path + ")");
 
@@ -251,6 +272,9 @@ public class FtsServer
 
   final void sendDownloadPatcherAndSync(FtsObject patcher)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("sendDownloadPatcher(" + patcher + ")");
 
@@ -272,6 +296,9 @@ public class FtsServer
 
   final void sendDownloadPatcherAndSync(int id)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("sendDownloadPatcher(" + id + ")");
 
@@ -293,6 +320,9 @@ public class FtsServer
 
   final void openPatcher(FtsObject patcher)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("openPatcher(" + patcher + ")");
 
@@ -311,6 +341,9 @@ public class FtsServer
 
   final void closePatcher(FtsObject patcher)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("closePatcher(" + patcher + ")");
 
@@ -330,6 +363,9 @@ public class FtsServer
 
   final void patcherLoaded(FtsObject patcher)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("patcherLoaded(" + patcher + ")");
 
@@ -352,6 +388,9 @@ public class FtsServer
 
   final  void newObject(FtsObject patcher, int id, String className, String description)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("newObject(" + patcher + ", " + id + ", " + className + ", " + description + ")");
 
@@ -376,6 +415,9 @@ public class FtsServer
 
   final  void newObject(FtsObject patcher, int id, String description)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("newObject(" + patcher + ", " + id + ", " + description + ")");
 
@@ -399,6 +441,9 @@ public class FtsServer
 
   final  void sendDownloadObject(int id)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("sendDownloadObject(" + id + ")");
 
@@ -419,6 +464,9 @@ public class FtsServer
 
   final void redefinePatcherObject(FtsObject obj, String description)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("redefinePatcherObject(" + description + ")");
 
@@ -439,6 +487,9 @@ public class FtsServer
 
   final void redefineObject(FtsObject obj, String description)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("redefineObject(" + description + ")");
 
@@ -459,6 +510,9 @@ public class FtsServer
 
   final void repositionInletObject(FtsObject obj, int pos)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("repositionInletObject(" + obj + ", " + pos + ")");
 
@@ -478,6 +532,9 @@ public class FtsServer
 
   final void repositionOutletObject(FtsObject obj, int pos)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("repositionOutletObject(" + obj + ", " + pos + ")");
 
@@ -498,6 +555,9 @@ public class FtsServer
 
   final void freeObject(FtsObject obj)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("freeObject(" + obj + ")");
 
@@ -520,6 +580,9 @@ public class FtsServer
 
   final void sendObjectMessage(FtsObject dst, int inlet, String selector, Vector args)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("sendObjectMessage(" + dst + ", " + inlet + ", " + selector + ", " + args + ")");
 
@@ -544,6 +607,9 @@ public class FtsServer
 
   final void sendObjectMessage(FtsObject dst, int inlet, String selector, FtsObject arg)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("sendObjectMessage(" + dst + ", " + inlet + ", " + selector + ", " + arg + ")");
 
@@ -565,6 +631,9 @@ public class FtsServer
 
   final void sendObjectMessage(FtsObject dst, int inlet, String selector, FtsConnection arg)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("sendObjectMessage(" + dst + ", " + inlet + ", " + selector + ", " + arg + ")");
 
@@ -589,6 +658,9 @@ public class FtsServer
 
   final void sendSetMessage(FtsObject dst, Vector values)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("sendSetMessage(" + dst + ", " + values  + ")");
 
@@ -615,6 +687,9 @@ public class FtsServer
 
   final void sendSetMessage(FtsObject obj, String description)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("sendSetMessage(" + obj + ", " + description + ")");
 
@@ -641,6 +716,9 @@ public class FtsServer
 
   final public void sendNamedObjectMessage(String dst, int inlet, String selector, Vector args)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("sendNamedObjectMessage(" + dst + ", " + inlet + ", " +
 			 selector + ", " + args + ")");
@@ -668,6 +746,9 @@ public class FtsServer
 
   final void newConnection(int id, FtsObject from, int outlet, FtsObject to, int inlet)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("newConnection(" + id + "," + from + ", " + outlet + ", " +
 			 to + ", " + inlet + ")");
@@ -692,6 +773,9 @@ public class FtsServer
 
   final  void sendDownloadConnection(int id)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("sendDownloadConnection(" + id + ")");
 
@@ -711,6 +795,9 @@ public class FtsServer
 
   final void deleteConnection(FtsConnection connection)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("deleteConnection(" + connection + ")");
 
@@ -730,6 +817,9 @@ public class FtsServer
 
   final void putObjectProperty(FtsObject object, String name, Object value)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("putObjectProperty(" + object + ", " + name + ", " +
 			 value + ")");
@@ -752,6 +842,9 @@ public class FtsServer
 
   final void askObjectProperty(FtsObject object, String name)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("askObjectProperty(" + object + ", " + name + ")");
 
@@ -772,6 +865,9 @@ public class FtsServer
 
   final void askAllObjectProperty(FtsObject object, String name)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("askAllObjectProperty(" + object + ", " + name + ")");
 
@@ -792,6 +888,9 @@ public class FtsServer
 
   final public void ucsMessage(Vector args)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("ucsMessage(" + args + ")");
 
@@ -810,6 +909,9 @@ public class FtsServer
 
   final void remoteCall( FtsRemoteData data, int key, Object args[])
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println( "remoteCall(" + data + ", " + key + "," + args + ")");
 
@@ -832,6 +934,9 @@ public class FtsServer
 
   final void remoteCall( FtsRemoteData data, int key, int offset, int size, int values[])
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println( "remoteCall(" + data +
 			  ", " + key + ", " + offset + ", " + size + ", " + values + ")");
@@ -854,6 +959,9 @@ public class FtsServer
 
   final void remoteCall( FtsRemoteData data, int  key, int id, String name, Object args[])
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println( "remoteCall(" + data + ", " + key + ", " + id + ", " + name + ", " + args + ")");
 
@@ -878,6 +986,9 @@ public class FtsServer
 
   final void remoteCall( FtsRemoteData data, int  key, FtsObject object, Object args[])
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println( "remoteCall(" + data + ", " + key + ", " + object + ", " + args + ")");
 
@@ -902,6 +1013,9 @@ public class FtsServer
 
   final void remoteCall( FtsRemoteData data, int  key, FtsObject object, Vector args)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println( "remoteCall(" + data + ", " + key + ", " + object + ", " + args + ")");
 
@@ -923,6 +1037,26 @@ public class FtsServer
       }
   }
 
+  final void sendShutdown()
+  {
+    if (! connected)
+      return;
+
+    if (FtsServer.debug)
+      System.err.println("shutdown");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_shutdown_cmd);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+	System.err.println("IOException in FtsServer.shutdown()");
+      }
+  }
+
+
   /**
    * Sync point with FTS.
    * Send a ping message, and sychroniuosly
@@ -935,6 +1069,9 @@ public class FtsServer
 
   final public synchronized void syncToFts()
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("syncToFts()");
 
@@ -956,6 +1093,9 @@ public class FtsServer
 
   final void sendMessage(FtsMessage msg)
   {
+    if (! connected)
+      return;
+
     if (FtsServer.debug)
       System.err.println("sendMessage(" + msg + ")");
 
@@ -1189,7 +1329,7 @@ public class FtsServer
   {
     // If FTS quitted, just return 
 
-    if (running)
+    if (connected)
       {
 	try
 	  {
@@ -1224,7 +1364,7 @@ public class FtsServer
 
   void ftsQuitted()
   {
-    running = false;
+    connected = false;
 
     if (waiting)
       deliverPong(); // Should we test if we are wa

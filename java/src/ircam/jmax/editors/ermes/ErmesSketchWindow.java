@@ -49,10 +49,10 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     else if (name.equals("deletedObject")) {
       // just an hack: remove the watch temporarly, add it just after
       // to avoid recursion
-      itsSketchPad.itsHelper.DeleteGraphicObject((ErmesObject)(((FtsObject)value).getRepresentation()), false);
+      itsSketchPad.DeleteGraphicObject((ErmesObject)(((FtsObject)value).getRepresentation()), false);
     }
     else if (name.equals("deletedConnection")) {
-      itsSketchPad.itsHelper.DeleteGraphicConnection((ErmesConnection) ((FtsConnection)value).getRepresentation(), false);
+      itsSketchPad.DeleteGraphicConnection((ErmesConnection) ((FtsConnection)value).getRepresentation(), false);
     }
 
     if (!pasting) itsSketchPad.paintDirtyList();
@@ -404,7 +404,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   protected void Cut(){
 
     Copy();
-    itsSketchPad.itsHelper.DeleteSelected();
+    itsSketchPad.DeleteSelected();
     
   }
 
@@ -419,7 +419,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   protected void Copy() {
     Cursor temp = getCursor();
 
-    Point tempPoint = itsSketchPad.itsHelper.selectionUpperLeft();
+    Point tempPoint = itsSketchPad.selectionUpperLeft();
     itsSketchPad.pasteDelta.setLocation(tempPoint.x-itsSketchPad.itsCurrentScrollingX, tempPoint.y - itsSketchPad.itsCurrentScrollingY);
     itsSketchPad.numberOfPaste = 0;
 
@@ -479,9 +479,9 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   class ResizeMenuAdapter implements ItemListener
   {
     CheckboxMenuItem item;
-    String resize;
+    int resize;
 
-    ResizeMenuAdapter( CheckboxMenuItem item, String resize)
+    ResizeMenuAdapter( CheckboxMenuItem item, int resize)
     {
       this.item = item;
       this.resize = resize;
@@ -500,16 +500,16 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     aCheckItem = new CheckboxMenuItem( "Both");
     resizeObjectMenu.add( aCheckItem);
     aCheckItem.setState( true);
-    aCheckItem.addItemListener( new ResizeMenuAdapter( aCheckItem, "Both"));
+    aCheckItem.addItemListener( new ResizeMenuAdapter( aCheckItem, ErmesSketchPad.BOTH_RESIZING));
     itsCurrentResizeMenu = aCheckItem;
 
     aCheckItem = new CheckboxMenuItem( "Horizontal");
     resizeObjectMenu.add( aCheckItem);
-    aCheckItem.addItemListener( new ResizeMenuAdapter( aCheckItem, "Both"));
+    aCheckItem.addItemListener( new ResizeMenuAdapter( aCheckItem, ErmesSketchPad.BOTH_RESIZING));
 
     aCheckItem = new CheckboxMenuItem( "Vertical");
     resizeObjectMenu.add( aCheckItem);
-    aCheckItem.addItemListener( new ResizeMenuAdapter( aCheckItem, "Both"));
+    aCheckItem.addItemListener( new ResizeMenuAdapter( aCheckItem, ErmesSketchPad.BOTH_RESIZING));
   }
   
   class AlignMenuAdapter implements ActionListener
@@ -850,7 +850,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 	if(itsSketchPad.GetEditField()!=null)
 	  {
 	    if(!itsSketchPad.GetEditField().HasFocus())
-	      itsSketchPad.itsHelper.DeleteSelected();
+	      itsSketchPad.DeleteSelected();
 	  }
       }
     // } (fd)
@@ -1152,9 +1152,9 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   }
 
 
-  private boolean ResizeObjectMenuAction(MenuItem theMenuItem, String  theString){
+  private boolean ResizeObjectMenuAction(MenuItem theMenuItem, int resize){
     itsCurrentResizeMenu.setState(false);
-    itsSketchPad.ChangeResizeMode(theString);
+    itsSketchPad.ChangeResizeMode(resize);
     itsCurrentResizeMenu = (CheckboxMenuItem)theMenuItem;
     itsCurrentResizeMenu.setState(true);
     return true;

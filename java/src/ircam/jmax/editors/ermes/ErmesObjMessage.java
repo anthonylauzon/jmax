@@ -53,7 +53,11 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
     try
       {
 	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "messbox");
-	((FtsMessageObject)itsFtsObject).setMessage(itsArgs);
+
+	if (itsArgs == null)
+	  ((FtsMessageObject)itsFtsObject).setMessage("");
+	else
+	  ((FtsMessageObject)itsFtsObject).setMessage(itsArgs);
       }
     catch (FtsException e)
       {

@@ -306,11 +306,6 @@ public class MaxApplication extends Object
     // start the MaxTclConsole from the standard input
 
 
-    //    if (ConsoleWindow.getConsoleWindow() == null)
-    //{
-    // MaxTclShell.start(itsInterp);
-    // }
-
     // Finally, run forever the notifier loop of the 
     // Tcl interpreter, so that the TCL event system work
     // (and in particular, tcl built panels; thanks to the
@@ -334,9 +329,6 @@ public class MaxApplication extends Object
     itsInterp = new tcl.lang.Interp(); 
 
     ircam.jmax.tcl.TclMaxPackage.installPackage();
-    
-    ircam.jmax.editors.ermes.tcl.TclErmesPackage.installPackage();
-
   }
 
   /**
@@ -467,8 +459,10 @@ public class MaxApplication extends Object
 	ConsoleWindow.getConsoleWindow().dispose();
       }
 
+
     if (Fts.getServer() != null)
       Fts.getServer().stop();
+
 
     Runtime.getRuntime().exit(0);
   }

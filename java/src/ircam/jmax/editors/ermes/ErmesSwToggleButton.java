@@ -7,21 +7,17 @@ import com.sun.java.swing.*;
 
 class ErmesSwToggleButton extends JToggleButton {
 
-  String itsName;//the name with which it is known (a *property*)
+  Class itsClass;
 
-  public ErmesSwToggleButton(String theName, ImageIcon theIcon) {
+  ErmesSwToggleButton(Class theClass, ImageIcon theIcon) {
     super(theIcon);
     setDoubleBuffered(false);
-    itsName = theName;
+    itsClass = theClass;
   }
   
-  public String getName() {
-    return itsName;
+  Class getNewObjectClass() {
+    return itsClass;
   }
-
-  public void setName(String theName) {
-    itsName = theName;
-  }  
 }
 
 

@@ -32,14 +32,16 @@ public class ErmesConnCircle{
     g.fillOval(itsX, itsY, 4, 4);
   }
 
+  static private final Dimension psize = new Dimension(4,4);
+
   public Dimension minimumSize() 
   {
-    return  preferredSize();
+    return  psize;
   }
 
   public Dimension preferredSize() 
   {
-    return new Dimension(4,4);
+    return psize;
   }
 	
   public void MoveBy(int theDeltaH, int theDeltaV) 

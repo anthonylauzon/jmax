@@ -19,7 +19,7 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
   protected int FIELD_WIDTH;
   Dimension preferredSize = new Dimension(100, 25);//hu-hu 
   Dimension currentMinimumSize = new Dimension();
-  String 	  itsArgs = new String();
+  String 	  itsArgs;
   public Vector itsParsedTextVector = new Vector();
   public String itsMaxString = "";
   int itsMaxStringWidth = 0; // (fd)
@@ -210,7 +210,6 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
   }
   
   public boolean canResizeBy(int theDeltaX, int theDeltaY){
-    String temp = itsArgs;
     if((getItsWidth()+theDeltaX <itsFontMetrics.stringWidth(itsMaxString) +TEXT_OFFSET+getWhiteOffset())||
        (getItsHeight()+theDeltaY<itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF))
       return false;
