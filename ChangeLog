@@ -1,3 +1,7 @@
+2004-02-12  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* fts/property.c: removed obsolete file (code moved to patcherobject.c).
+
 2004-02-05  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* packages/signal/c/src/playfvec.c (segment_set): Fixed bug "[ 891290 ] play~ with zero size vector".
