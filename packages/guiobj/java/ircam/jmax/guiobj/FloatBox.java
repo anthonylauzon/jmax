@@ -74,6 +74,7 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
   {
     String val = getValueAsText();
     int idx = val.indexOf('.');
+    if( idx == -1) idx = val.indexOf(',');
     if( idx != -1)
       {
 	val = val.substring(0, idx);
