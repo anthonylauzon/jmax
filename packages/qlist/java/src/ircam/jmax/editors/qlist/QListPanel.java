@@ -51,7 +51,7 @@ import ircam.jmax.editors.qlist.actions.*;
  * A panel that is able to show the content of a FtsAtomList (qlist).
  * This component does not handle the communication with FTS, but it offers
  * a simple API (fillContent, getText) in order to be used from outside. */
-public class QListPanel extends JPanel implements Editor, ClipboardOwner, DocumentListener{
+public class QListPanel extends JPanel implements Editor, ClipboardOwner/*, DocumentListener*/{
   
   JTextArea itsTextArea;
   int caretPosition;
@@ -61,16 +61,17 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner, Docume
   String textToFind;
   int lastFindIndex;
 
-  FtsAtomList itsData;
+  FtsQListObject itsData;
   boolean changed = false;
 
   /**
    * Constructor */
-  public QListPanel(EditorContainer container, FtsAtomList theContent) 
+  public QListPanel(EditorContainer container, FtsQListObject theContent) 
   { 
     super();
 
     itsEditorContainer = container;
+    itsData = theContent;
 
     // prepare the Set & Get buttons panel
     JPanel aPanel = new JPanel();
@@ -90,6 +91,11 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner, Docume
     itsTextArea = new JTextArea(40, 40);
     itsTextArea.addKeyListener(KeyConsumer.controlConsumer());
     // SGI's JTextArea bug. See utils.KeyConsumer class for details
+    itsTextArea.addKeyListener(new KeyListener(){
+	    public void keyTyped(KeyEvent e){}
+	    public void keyPressed(KeyEvent e){ changed = true;}
+	    public void keyReleased(KeyEvent e){}	    
+	});
 
     setLayout(new BorderLayout());
     add(BorderLayout.NORTH, aPanel);
@@ -105,17 +111,21 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner, Docume
     qListFindDialog = new QListFindDialog(itsEditorContainer.getFrame(), this);
 
     fillContent(theContent);
-    itsTextArea.getDocument().addDocumentListener(this);
+    theContent.getAtomList().addFtsAtomListListener(new FtsAtomListListener(){
+	    public void contentChanged(){
+		fillContent(itsData);
+	    }
+	});
+    /*itsTextArea.getDocument().addDocumentListener(this);*/
   }
 
   /**
    * Sets the content to the given FtsAtomList object */
-  public void fillContent(FtsAtomList theContent) 
+  public void fillContent(FtsQListObject theContent) 
   {
-    itsData = theContent;
-    if(!theContent.getValuesAsText().equals(itsTextArea.getText())){
+    if(!theContent.getAtomList().getValuesAsText().equals(itsTextArea.getText())){
       caretPosition = itsTextArea.getCaretPosition();
-      itsTextArea.setText( theContent.getValuesAsText());
+      itsTextArea.setText( theContent.getAtomList().getValuesAsText());
       itsTextArea.requestFocus();
       // (em) added a control to avoid setting impossible caret positions.
       // FtsAtomList.getValueAsText() can infact reformat the text,
@@ -217,21 +227,23 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner, Docume
 
 	      if(result == JOptionPane.YES_OPTION)
 		  {
-		      itsData.forceUpdate();
+		      itsData.getAtomList().forceUpdate();
 		      fillContent(itsData);
+		      changed = false;
 		  }
 	  }
       else
 	  {
-	      itsData.forceUpdate();
+	      itsData.getAtomList().forceUpdate();
 	      fillContent(itsData);
+	      changed = false;
 	  }
     }
 
   public void Set(){
-    itsData.setValuesAsText(getText());
+    itsData.getAtomList().setValuesAsText(getText());
     fillContent(itsData);
-    itsData.getDocument().setSaved(false);
+    itsData.setDirty();
     changed = false;
   }
 
@@ -258,7 +270,7 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner, Docume
 	      }
 
 	    itsTextArea.setText(buf.toString());
-	    itsData.setValuesAsText(itsTextArea.getText());
+	    itsData.getAtomList().setValuesAsText(itsTextArea.getText());
 	  }
 	catch (java.io.IOException e)
 	  {
@@ -313,25 +325,26 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner, Docume
   }
 
   public MaxDocument getDocument(){
-    return itsData.getDocument() ;
+    return itsData.getAtomList().getDocument() ;
   }
 
   public void Close(boolean doCancel){
     ((Component)itsEditorContainer).setVisible(false);
+    itsData.closeEditor();
     MaxWindowManager.getWindowManager().removeWindow((Frame)itsEditorContainer);
   }
   // ----------ClipboardOwner interface methods
   public void lostOwnership(Clipboard clipboard, Transferable contents) {}
   //-----------DocumentListener interface methods
-  public void changedUpdate(DocumentEvent e){
-    changed = true;
-  }
-  public void insertUpdate(DocumentEvent e){
-    changed = true;
-  }
-  public void removeUpdate(DocumentEvent e){
-    changed = true;
-  } 
+    /*public void changedUpdate(DocumentEvent e){
+      changed = true;
+      }
+      public void insertUpdate(DocumentEvent e){
+      changed = true;
+      }
+      public void removeUpdate(DocumentEvent e){
+      changed = true;
+      } */
 }
 
 

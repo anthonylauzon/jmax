@@ -49,15 +49,6 @@ public class FtsDspControl extends FtsObject
 
   protected PropertyChangeSupport listeners;
 
-  public final static int NUM_ARGS = 256;
-  public static FtsAtom[] sendArgs = new FtsAtom[NUM_ARGS];
-    
-  static
-  {
-      for(int i=0; i<NUM_ARGS; i++)
-	  sendArgs[i]= new FtsAtom();
-  }
-
   public FtsDspControl(Fts fts, FtsObject parent)
   {
     super(fts, parent, null, "__dspcontrol", "");
@@ -147,13 +138,8 @@ public class FtsDspControl extends FtsObject
 
   public void startFpeCollecting(FtsObjectSet set)
   {
-      /*Object args[] = new Object[1];
-
-	args[0] = set;
-	remoteCall(FPE_START_COLLECT, args);*/
-      /*sendArgs[0].setObject(set); 
-	sendMessage(FtsObject.systemInlet, "fpe_start_collect", 1, sendArgs);*/
-      //FOR THE MOMENT BECAUSE FtsObjectSet IS NOT AN FtsObject !!!!!!!!!!!!!!!!!!!!!!!!!!!
+      sendArgs[0].setObject(set); 
+      sendMessage(FtsObject.systemInlet, "fpe_start_collect", 1, sendArgs);
   }
 
   public void stopFpeCollecting()

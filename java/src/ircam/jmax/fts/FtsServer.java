@@ -492,7 +492,6 @@ public class FtsServer implements Runnable
     if (FtsServer.debug)
 	System.err.println("> sendObjectMessage(" + dst + ", " + inlet + ", " + selector + ", "+ args + ")");
 
-
     try
       {
 	stream.sendCmd(FtsClientProtocol.fts_message_cmd);
@@ -1465,6 +1464,7 @@ public class FtsServer implements Runnable
 	{
 	  FtsObject obj = stream.getNextObjectArgument();
 	  String selector = stream.getNextStringArgument();
+	  
 	  FtsAtom args[] = stream.getArgs();
 	  int nArgs = stream.getNumberOfArgs();
 

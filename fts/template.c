@@ -176,13 +176,17 @@ static void fts_template_recompute_instances(fts_template_t *template)
     {
       fts_objectset_t *old_instances;
       fts_iterator_t iterator;
+      fts_atom_t a[1];
 
       old_instances = template->instances;
 
-      template->instances = (fts_objectset_t *)fts_malloc( sizeof( fts_objectset_t));
-      fts_objectset_init( template->instances);
+      /*template->instances = (fts_objectset_t *)fts_malloc( sizeof( fts_objectset_t));
+	fts_objectset_init( template->instances);*/
+      template->instances = (fts_objectset_t *)fts_object_create(fts_class_get_by_name(objectset_symbol), 0, 0);
 
-      fts_objectset_get_objects( old_instances, &iterator);
+      /*fts_objectset_get_objects( old_instances, &iterator);*/
+      fts_set_data(&a[0], (fts_data_t *)&iterator);
+      fts_send_message((fts_object_t *) old_instances, fts_SystemInlet, sym_objectset_get_objects, 1, a);
 
       while ( fts_iterator_has_more( &iterator))
 	{
@@ -201,7 +205,8 @@ static void fts_template_recompute_instances(fts_template_t *template)
 	  fts_object_recompute(object);
 	}
 
-      fts_objectset_destroy(old_instances);
+      /*fts_objectset_destroy(old_instances);*/
+      fts_send_message((fts_object_t *)old_instances, fts_SystemInlet, fts_s_delete, 0, 0);
       fts_free( old_instances);
     }
 #ifdef TEMPLATE_DEBUG 
@@ -303,14 +308,18 @@ void fts_template_add_instance(fts_template_t *template, fts_object_t *object)
   fprintf_object(stderr, object);
   fprintf(stderr, "\n");
 #endif
+   fts_atom_t a[1];
 
-  if (template->instances == 0)
-    {
-      template->instances = (fts_objectset_t *)fts_malloc( sizeof( fts_objectset_t));
-      fts_objectset_init( template->instances);
-    }
-  
-  fts_objectset_add(template->instances, object);
+   if (template->instances == 0)
+     {
+       /*template->instances = (fts_objectset_t *)fts_malloc( sizeof( fts_objectset_t));
+	 fts_objectset_init( template->instances);*/
+       template->instances = (fts_objectset_t *)fts_object_create(fts_class_get_by_name(objectset_symbol), 0, 0);      
+     }
+   
+   /*fts_objectset_add(template->instances, object);*/
+   fts_set_object(&a[0], object);
+   fts_send_message((fts_object_t *)template->instances, fts_SystemInlet, sym_objectset_add, 1, a);
 }
 
 void fts_template_remove_instance(fts_template_t *template, fts_object_t *object)
@@ -322,7 +331,13 @@ void fts_template_remove_instance(fts_template_t *template, fts_object_t *object
 #endif
 
   if (template->instances != 0)
-    fts_objectset_remove(template->instances, object);
+    {
+      fts_atom_t a[1];
+
+      /*fts_objectset_remove(template->instances, object);*/
+      fts_set_object(&a[0], object);
+      fts_send_message((fts_object_t *) template->instances, fts_SystemInlet, sym_objectset_remove, 1, a);
+    }
 }
 
 

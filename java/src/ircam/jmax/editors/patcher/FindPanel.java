@@ -112,19 +112,25 @@ public class FindPanel extends JFrame
     findPanel.setLayout( new BorderLayout());
     findPanel.setBorder( new EmptyBorder( 5, 5, 5, 5) );
     findPanel.setAlignmentX( LEFT_ALIGNMENT);
-    //findPanel.setOpaque( false);
 
     findPanel.add( "North", labelPanel);
     findPanel.add( "Center", objectSetViewer);
 
-    //setSize( 300, 300);
     getContentPane().add( findPanel);
 
     pack();
     validate();
 
-    set = (FtsObjectSet) fts.newRemoteData( "object_set_data", null);
-    objectSetViewer.setModel( set.getListModel());
+    try
+	{
+	    set  = (FtsObjectSet) fts.makeFtsObject(fts.getRootObject(), "__objectset");
+	}
+    catch (FtsException e)
+	{
+	    System.out.println("System error: cannot get selection object");
+	}
+
+    objectSetViewer.setModel( set);
 
     objectSetViewer.setObjectSelectedListener(new ObjectSelectedListener() {
       public void objectSelected(FtsObject object)
@@ -140,9 +146,6 @@ public class FindPanel extends JFrame
 	  });
 	}
     });
-    
-    //setBounds( 100, 100, getPreferredSize().width, getPreferredSize().height);
-
   }
 
   public void find()
@@ -156,7 +159,10 @@ public class FindPanel extends JFrame
     query = textField.getText();
     args = new MaxVector();
     FtsParse.parseAtoms(query, args);
-    set.find(fts.getRootObject(), args);
+    
+    if(args.size()>0)
+      set.find(fts.getRootObject(), args);	
+    
     setCursor(temp);
   }
 

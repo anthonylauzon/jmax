@@ -42,7 +42,7 @@
 ; ISPW classes
 (require-package "ispw" "0.0.0")
 (require-package "ispwmath" "0.0.0")
-;(require-package "qlist" "0.0.0")
+(require-package "qlist" "0.0.0")
 ;(require-package "explode" "0.0.0")
 
 ; I/O package

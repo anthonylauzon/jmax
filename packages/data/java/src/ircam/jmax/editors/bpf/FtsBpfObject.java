@@ -76,17 +76,17 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
     {
 	disposeEditor();
     }
-
-  public void addPoint(int nArgs , FtsAtom args[])
-  {
-      int index = args[0].getInt();
-      
-      addPoint(index, new BpfPoint(args[1].getFloat(), args[2].getFloat()));
-
-      notifyPointAdded(index);
-
-      setDirty();
-  }
+    
+    public void addPoint(int nArgs , FtsAtom args[])
+    {
+	int index = args[0].getInt();
+	
+	addPoint(index, new BpfPoint(args[1].getFloat(), args[2].getFloat()));
+	
+	notifyPointAdded(index);
+	
+	setDirty();
+    }
   
   public void removePoints(int nArgs , FtsAtom args[])
   {

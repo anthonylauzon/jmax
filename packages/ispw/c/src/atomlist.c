@@ -30,8 +30,14 @@
 /* Heaps */
 
 static fts_heap_t *atom_list_cell_heap;
-static fts_heap_t *atom_list_heap;
 static fts_heap_t *atom_list_iterator_heap;
+
+fts_symbol_t atomlist_symbol     = 0;
+fts_symbol_t sym_setValues       = 0;
+fts_symbol_t sym_setName         = 0;
+fts_symbol_t sym_atomlist_set    = 0;  
+fts_symbol_t sym_atomlist_set_name    = 0;  
+fts_symbol_t sym_atomlist_update = 0;  
 
 /********************************************************************************/
 /*                                                                              */
@@ -85,34 +91,66 @@ static void fts_atom_list_cell_free( fts_atom_list_cell_t *cell)
 
 struct fts_atom_list
 {
+  fts_object_t ob;
+
   fts_symbol_t name;	       /* list name */
+  int size;
   fts_atom_list_cell_t *head;
   fts_atom_list_cell_t *tail;
 };
 
 
-fts_atom_list_t *fts_atom_list_new( void)
+static void fts_atom_list_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_atom_list_t *list;
+  fts_atom_list_t *this = (fts_atom_list_t *)o;
+  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
 
-  list = (fts_atom_list_t *) fts_heap_alloc(atom_list_heap);
+  if(name) 
+      this->name = name;
+  else
+      this->name = 0;
+  
+  this->size = 0;
+  this->head = 0;
+  this->tail = 0;
+}
 
-  if (list)
+static void fts_atom_list_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_atom_list_t *this = (fts_atom_list_t *)o;
+
+  fts_atom_list_clear(this);
+  fts_free((void *)this);
+}
+
+static void fts_atom_list_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_atom_list_t *this = (fts_atom_list_t *)o;
+  fts_atom_list_iterator_t *iterator;
+  fts_atom_t a[this->size+1];
+  int i =0;
+
+  if(!fts_object_has_id((fts_object_t *)this))
+    fts_client_upload((fts_object_t *)this, atomlist_symbol, 0, 0);
+
+  if (this->name)
     {
-      list->name = 0;
-      list->head = 0;
-      list->tail = 0;
+      fts_set_symbol(a, this->name);
+      fts_client_send_message((fts_object_t *)this, sym_setName, 1, a);
     }
 
-  return list;
-}
+  iterator = fts_atom_list_iterator_new(this);
 
-void fts_atom_list_free( fts_atom_list_t *list)
-{
-  fts_atom_list_clear( list);
-  fts_heap_free((char *)list, atom_list_heap);
-}
+  while (! fts_atom_list_iterator_end(iterator))
+    {
+      a[i] = *fts_atom_list_iterator_current(iterator);
+      fts_atom_list_iterator_next(iterator);
+      i++;
+    }
+  fts_client_send_message((fts_object_t *)this, sym_setValues, i, a);
 
+  fts_atom_list_iterator_free(iterator);
+}
 
 /* list manipulation */
 
@@ -128,6 +166,7 @@ void fts_atom_list_clear( fts_atom_list_t *list)
 
   list->head = 0;
   list->tail = 0;
+  list->size = 0;
 }
 
 static void fts_atom_list_append_one( fts_atom_list_t *list, const fts_atom_t *atom)
@@ -148,6 +187,7 @@ static void fts_atom_list_append_one( fts_atom_list_t *list, const fts_atom_t *a
     }
   tail->atoms[tail->n] = *atom;
   tail->n++;
+  list->size++;  
 }
 
 void fts_atom_list_append( fts_atom_list_t *list, int ac, const fts_atom_t *atom)
@@ -162,6 +202,42 @@ void fts_atom_list_set( fts_atom_list_t *list, int ac, const fts_atom_t *atom)
 {
   fts_atom_list_clear( list);
   fts_atom_list_append(list, ac, atom);
+}
+
+static void fts_atom_list_client_set( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_atom_list_t *this = (fts_atom_list_t *)o;
+
+  fts_atom_list_clear( this);
+  fts_atom_list_append(this, ac, at);
+}
+
+static void fts_atom_list_set_name( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_atom_list_t *this = (fts_atom_list_t *)o;
+  this->name = fts_get_symbol(at);
+}
+
+
+static void fts_atom_list_update( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+    fts_atom_list_t *this = (fts_atom_list_t *)o;
+    fts_atom_list_iterator_t *iterator;
+    fts_atom_t a[this->size]; 
+    int i =0;
+
+    iterator = fts_atom_list_iterator_new(this);
+
+    while (! fts_atom_list_iterator_end(iterator))
+      {
+	a[i] = *fts_atom_list_iterator_current(iterator);
+	fts_atom_list_iterator_next(iterator);
+	i++;
+      }
+
+    fts_client_send_message((fts_object_t *)this, sym_setValues, i, a);
+
+    fts_atom_list_iterator_free(iterator);
 }
 
 /* Check for subsequences */
@@ -181,7 +257,7 @@ fts_atom_list_is_subsequence( fts_atom_list_t *list, int ac, const fts_atom_t *a
 
   while (! fts_atom_list_iterator_end(iterator))
     {
-      if (fts_atom_are_equals(&at[0], fts_atom_list_iterator_current(iterator)))
+	if (fts_atom_are_equals(&at[0], fts_atom_list_iterator_current(iterator)))
 	{
 	  int i;
 
@@ -238,8 +314,6 @@ struct fts_atom_list_iterator
   fts_atom_t *last;
 };
 
-
-
 fts_atom_list_iterator_t *
 fts_atom_list_iterator_new( const fts_atom_list_t *list)
 {
@@ -253,12 +327,10 @@ fts_atom_list_iterator_new( const fts_atom_list_t *list)
   return iter;
 }
 
-
 void fts_atom_list_iterator_free(fts_atom_list_iterator_t *iter)
 {
   fts_heap_free((char *) iter, atom_list_iterator_heap);
 }
-
 
 void fts_atom_list_iterator_copy(fts_atom_list_iterator_t *iter, fts_atom_list_iterator_t *other)
 {
@@ -266,7 +338,6 @@ void fts_atom_list_iterator_copy(fts_atom_list_iterator_t *iter, fts_atom_list_i
   iter->atom = other->atom;
   iter->last = other->last;
 }
-
 
 void fts_atom_list_iterator_init( fts_atom_list_iterator_t *iter, const fts_atom_list_t *list)
 {
@@ -297,12 +368,10 @@ void fts_atom_list_iterator_next( fts_atom_list_iterator_t *iter)
     iter->atom++;
 }
 
-
 int fts_atom_list_iterator_end( const fts_atom_list_iterator_t *iter)
 {
   return iter->cell == 0;
 }
-
 
 fts_atom_t *fts_atom_list_iterator_current( const fts_atom_list_iterator_t *iter)
 {
@@ -380,18 +449,41 @@ void fts_atom_list_save_bmax(fts_atom_list_t *list, fts_bmax_file_t *f, fts_obje
   fts_atom_list_iterator_free(iterator);
 }
 
+static fts_status_t
+atom_list_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(fts_atom_list_t), 0, 0, 0); 
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fts_atom_list_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fts_atom_list_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, fts_atom_list_upload);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_atomlist_set, fts_atom_list_client_set);
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_atomlist_set_name, fts_atom_list_set_name);
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_atomlist_update, fts_atom_list_update);
+
+  return fts_Success;
+}
 
 /********************************************************************/
 /*                                                                  */
-/*            INIT_DATA functions on integer vectors                */
+/*            init functions on integer vectors                */
 /*                                                                  */
 /********************************************************************/
 
 void atom_list_config(void)
 {
   atom_list_cell_heap     = fts_heap_new(sizeof( fts_atom_list_cell_t));
-  atom_list_heap          = fts_heap_new(sizeof( fts_atom_list_t));
   atom_list_iterator_heap = fts_heap_new(sizeof( fts_atom_list_iterator_t));
+
+  atomlist_symbol = fts_new_symbol("__atomlist");
+  sym_setValues = fts_new_symbol("setValues");
+  sym_setName = fts_new_symbol("setName");
+  sym_atomlist_set_name = fts_new_symbol("atomlist_set_name");  
+  sym_atomlist_set = fts_new_symbol("atomlist_set");  
+  sym_atomlist_update = fts_new_symbol("atomlist_update");  
+
+  fts_class_install(atomlist_symbol, atom_list_instantiate);
 }
 
 

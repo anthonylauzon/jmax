@@ -83,7 +83,7 @@ extern "C" {
 #include <fts/iterator.h>
 #include <fts/hashtable.h>
 #include <fts/objectlist.h>
-#include <fts/objectset.h>
+  /*#include <fts/objectset.h>*/
 
 #include <fts/connection.h>
 #include <fts/property.h>
@@ -91,6 +91,7 @@ extern "C" {
 #include <fts/class.h>
 #include <fts/variable.h>
 #include <fts/object.h>
+#include <fts/objectset.h>/*???????????????*/
 #include <fts/patcher.h>
 #include <fts/message.h>
 #include <fts/doctor.h>
@@ -134,3 +135,10 @@ FTS_API fts_symbol_t fts_cmd_args_get( fts_symbol_t name);
 #endif
 
 #endif
+
+
+
+
+
+
+

@@ -27,8 +27,12 @@
 struct fts_atom_list;
 typedef struct fts_atom_list fts_atom_list_t;
 
-fts_atom_list_t *fts_atom_list_new( void);
-void fts_atom_list_free( fts_atom_list_t *list);
+/*fts_atom_list_t *fts_atom_list_new( void);
+  void fts_atom_list_free( fts_atom_list_t *list);*/
+
+extern fts_symbol_t atomlist_symbol;
+extern fts_symbol_t sym_atomlist_set_name;
+extern fts_symbol_t sym_atomlist_update;
 
 void fts_atom_list_clear( fts_atom_list_t *list);
 void fts_atom_list_append( fts_atom_list_t *list, int ac, const fts_atom_t *atom);

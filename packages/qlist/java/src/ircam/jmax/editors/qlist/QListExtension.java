@@ -29,7 +29,8 @@ package ircam.jmax.editors.qlist;
 import ircam.jmax.script.pkg.*;
 import ircam.jmax.script.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
+import ircam.jmax.*;
+/*import ircam.jmax.mda.*;*/
 
 /**
  * The qlist extension; install the qlist data type
@@ -40,13 +41,15 @@ public class QListExtension extends tcl.lang.Extension implements JavaExtension
 {
   public void init(Interpreter interp)
   {
-    Mda.installEditorFactory( new QListFactory());
+    /*Mda.installEditorFactory( new QListFactory());*/
+      ObjectCreatorManager.registerFtsClass("qlist", ircam.jmax.editors.qlist.FtsQListObject.class);
   }
 
     /* this method should be removed as soon as jacl is completely forgotten about */
   public void init(tcl.lang.Interp interp)
   {
-    Mda.installEditorFactory(new QListFactory());
+    /*Mda.installEditorFactory(new QListFactory());*/
+      ObjectCreatorManager.registerFtsClass("qlist", ircam.jmax.editors.qlist.FtsQListObject.class);
   }
 }
 

@@ -23,6 +23,8 @@
 #include <fts/fts.h>
 #include <ftsprivate/fpe.h>
 
+static fts_objectset_t *fpe_objects = 0;
+
 void fts_fpe_handler( int which)
 {
   fts_object_t *obj;
@@ -33,6 +35,39 @@ void fts_fpe_handler( int which)
     obj = fts_get_current_object();
 
   /* Do something with obj */
+  if (obj)
+      fts_fpe_add_object( obj);
+}
+
+void fts_fpe_add_object( fts_object_t *object)
+{
+  if (fpe_objects)
+    {
+      fts_atom_t a[1];
+      fts_set_object(&a[0], object);
+      fts_send_message((fts_object_t *)fpe_objects, fts_SystemInlet, sym_objectset_add, 1, a);
+    }
+}
+
+void fts_fpe_empty_collection(void)
+{
+  if (fpe_objects)
+    fts_send_message((fts_object_t *)fpe_objects, fts_SystemInlet, sym_objectset_clear, 0, 0);
+}
+
+void fts_fpe_start_collect(fts_objectset_t *set)
+{
+  if (fpe_objects)
+    return;
+
+  fpe_objects = set;
+  fts_enable_fpe_traps();
+}
+
+void fts_fpe_stop_collect(void)
+{
+  fts_disable_fpe_traps();
+  fpe_objects = 0;
 }
 
 

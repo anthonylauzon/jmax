@@ -150,7 +150,7 @@ static void fts_dsp_control_dsp_on_listener(void *listener, fts_symbol_t name,  
 
 static void fts_dsp_control_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_control_t *this = (fts_dsp_control_t *)fts_malloc(sizeof(fts_dsp_control_t));
+  fts_dsp_control_t *this = (fts_dsp_control_t *)o;
 
   if (ac > 0)
     this->poll_interval = fts_get_int(&at[0]);
@@ -192,24 +192,18 @@ static void fts_dsp_control_delete(fts_object_t *o, int winlet, fts_symbol_t s, 
 
 static void fts_dsp_control_fpe_start_collect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  /*if ((ac == 1) && fts_is_data(at))
-    {
-      fts_object_set_t *set;
-
-      set = (fts_object_set_t *) fts_get_data(at);
-      
-      fts_fpe_start_collect(set);
-      }*/
+  fts_objectset_t *set = (fts_objectset_t *) fts_get_object(at);      
+  fts_fpe_start_collect(set);
 }
 
 static void fts_dsp_control_fpe_stop_collect( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  /*fts_fpe_stop_collect();*/
+  fts_fpe_stop_collect();
 }
 
 static void fts_dsp_control_fpe_clear_collect( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  /*fts_fpe_empty_collection();*/
+  fts_fpe_empty_collection();
 }
 
 static void fts_dsp_control_remote_dsp_on( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -241,8 +235,8 @@ static void fts_dsp_control_set_check_nan( fts_object_t *d, int winlet, fts_symb
 {
   /*if ( (ac == 1) && fts_is_int( at))
     {
-      ftl_program_set_check_nan( dsp_get_current_dsp_chain(), fts_get_int( at));
-      }*/
+    ftl_program_set_check_nan( dsp_get_current_dsp_chain(), fts_get_int( at));
+    }*/
 }
 
 static fts_status_t

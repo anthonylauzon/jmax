@@ -178,8 +178,10 @@ public class ControlPanel extends JPanel
 
   public void init(Fts fts)
   {
-      control = fts.getDspController();
+      control = (FtsDspControl)fts.getDspController();
       
+      if(control == null) return;
+
       new DspControlAdapter("invalidFpe", control, fpeLed);
       new DspControlAdapter("divideByZeroFpe", control, fpeLed);
       new DspControlAdapter("overflowFpe", control, fpeLed);

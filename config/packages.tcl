@@ -44,7 +44,7 @@ package require signal
 package require ispw
 package require ispwmath
 # package require table
-#package require qlist
+package require qlist
 #package require explode
 
 # I/O package

@@ -52,10 +52,10 @@ public class FtsModule
     Fts.registerRemoteDataClass("fvec", ircam.jmax.fts.FtsIntegerVector.class);
 
     // Install the Object set class
-    Fts.registerRemoteDataClass("object_set_data", ircam.jmax.fts.FtsObjectSet.class);
+    /*Fts.registerRemoteDataClass("object_set_data", ircam.jmax.fts.FtsObjectSet.class);*/
 
     // Install the atom list class
-    Fts.registerRemoteDataClass("atom_list_data", ircam.jmax.fts.FtsAtomList.class);
+    /*Fts.registerRemoteDataClass("atom_list_data", ircam.jmax.fts.FtsAtomList.class);*/
 
     // Install the patcher data class
     Fts.registerRemoteDataClass("patcher_data", ircam.jmax.fts.FtsPatcherData.class);

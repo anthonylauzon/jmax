@@ -926,7 +926,7 @@ public class FtsParse
 
   /*  Unparse a description passed as a vector of values
       Used by atom list, available as a service for anybody. */
-  static String unparseDescription(MaxVector values)
+  public static String unparseDescription(MaxVector values)
   {
     boolean doNewLine = false;
     boolean addBlank = false;

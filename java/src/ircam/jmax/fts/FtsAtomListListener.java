@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -23,23 +23,15 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.qlist;
+package ircam.jmax.fts;
 
-import ircam.jmax.mda.*;
-import ircam.jmax.fts.*;
+/**
+  This interface define a listener of the changes
+  at the server level; for now, only objectRemoved is actually
+  implemented.
+  */
 
-
-public class QListFactory implements MaxDataEditorFactory {
-
-  public boolean canEdit(MaxData data)
-  {
-    return data instanceof FtsAtomList;
-  }
-  
-  public MaxDataEditor newEditor(MaxData theData) {
-    return new QListDataEditor((FtsAtomList) theData);
-  }
+public interface FtsAtomListListener
+{
+  public void contentChanged();
 }
-
-
-

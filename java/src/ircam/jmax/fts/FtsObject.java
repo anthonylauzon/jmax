@@ -146,6 +146,10 @@ public class FtsObject implements Serializable
 	      obj =  new FtsClipboard(fts, parent);
 	  else if (className == "__dspcontrol")
 	      obj =  new FtsDspControl(fts, parent);
+	  else if (className == "__objectset")
+	      obj =  new FtsObjectSet(fts, parent);
+	  else if (className == "__atomlist")
+	    obj =  new FtsAtomList(fts, parent);
 	  else
 	    {
 		String descrpt;
@@ -1054,10 +1058,11 @@ public class FtsObject implements Serializable
   }
 
   //----- Fields
-  static FtsAtom[] sendArgs = new FtsAtom[128];
+  public final static int NUM_ARGS = 256;
+  public static FtsAtom[] sendArgs = new FtsAtom[NUM_ARGS];
   static
   {
-    for(int i=0; i<128; i++)
+    for(int i=0; i<NUM_ARGS; i++)
 	sendArgs[i]= new FtsAtom();
   }
 }

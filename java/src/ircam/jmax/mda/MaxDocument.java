@@ -335,7 +335,7 @@ abstract public class MaxDocument
     toDispose = (Vector) editedData.clone();
 
     for (int i = 0; i < toDispose.size(); i++)
-      Mda.dispose((MaxData) toDispose.elementAt(i));
+	Mda.dispose((MaxData) toDispose.elementAt(i));
 
     type.disposeDocument(this);
     handler = null;

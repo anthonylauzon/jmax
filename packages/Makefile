@@ -47,7 +47,7 @@ endif
 C_PACKAGES= $(ARCH_PACKAGES) control io ispwmath lists math mess midi numeric signal sources system utils
 
 #MIXED_PACKAGES=guiobj data ispw explode qlist sequence
-MIXED_PACKAGES=guiobj data ispw sequence
+MIXED_PACKAGES=guiobj data ispw qlist sequence
 
 
 JAVA_PACKAGES=''

@@ -233,9 +233,14 @@ void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object)
 static void fts_binding_add_users_to_set(fts_binding_t *var, fts_objectset_t *set)
 {
   fts_mess_obj_list_t  *u;	
+  fts_atom_t a[1];
 
   for (u = var->users; u; u = u->next)
-    fts_objectset_add(set, u->obj);
+    {
+      /*fts_objectset_add(set, u->obj);*/
+      fts_set_object(&a[0], u->obj);
+      fts_send_message((fts_object_t *)set, fts_SystemInlet, sym_objectset_add, 1, a);
+    }
 }
 
 /* check if a binding is defined by a given object */
@@ -329,9 +334,14 @@ static void fts_binding_remove_definition(fts_binding_t *var, fts_object_t *obje
 static void fts_binding_add_definitions_to_set(fts_binding_t *var, fts_objectset_t *set)
 {
   fts_mess_obj_list_t  *u;	
+  fts_atom_t a[1];
 
   for (u = var->definitions; u; u = u->next)
-    fts_objectset_add(set, u->obj);
+    {
+      /*fts_objectset_add(set, u->obj);*/
+      fts_set_object(&a[0], u->obj);
+      fts_send_message((fts_object_t *)set, fts_SystemInlet, sym_objectset_add, 1, a);
+    }
 }
 
 /****************************************************************************

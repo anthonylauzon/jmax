@@ -108,7 +108,7 @@ class FpePanel extends JFrame implements WindowListener
     clearButton.addActionListener( new ActionListener() {
       public void actionPerformed( ActionEvent e)
 	{
-	  fts.getDspController().clearFpeCollecting();
+	    fts.getDspController().clearFpeCollecting();
 	}});
 
     p3.add( clearButton);
@@ -131,8 +131,17 @@ class FpePanel extends JFrame implements WindowListener
     pack();
     validate();
 
-    set = (FtsObjectSet) fts.newRemoteData( "object_set_data", null);
-    objectSetViewer.setModel( set.getListModel());
+    /*set = (FtsObjectSet) fts.newRemoteData( "object_set_data", null);*/
+    try
+	{
+	    set  = (FtsObjectSet) fts.makeFtsObject(fts.getRootObject(), "__objectset");
+	}
+    catch (FtsException e)
+	{
+	    System.out.println("System error: cannot get selection object");
+	}
+
+    objectSetViewer.setModel( set/*.getListModel()*/);
 
     fts.getDspController().startFpeCollecting(set);
 

@@ -23,10 +23,10 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
+package require ispw
+
 ## package declaration
 package provide qlist
-
-package require ispw
 
 # load server module
 global jmaxArch jmaxMode
@@ -39,3 +39,7 @@ java::load -classpath "$dir/java/classes" ircam.jmax.editors.qlist.QListExtensio
 helpPatch qlist $dir/help/qlist.help.jmax
 
 puts "package: qlist (ISPW queue file class with editor)"
+
+
+
+

@@ -25,7 +25,6 @@
 
 package ircam.jmax.widgets;
 
-import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -98,7 +97,10 @@ public class ObjectSetViewer extends JPanel {
 	  else if(ObjectCreatorManager.containsClass(className))
 	      {
 		  setText(((FtsObject) obj).getDescription());
-		  setIcon(SystemIcons.get(className));		  
+		  if(SystemIcons.get(className)!=null)
+		      setIcon(SystemIcons.get(className));
+		  else
+		      setIcon( objectIcon);
 	      }
 	  else
 	      {

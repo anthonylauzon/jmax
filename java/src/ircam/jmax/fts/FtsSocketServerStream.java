@@ -74,7 +74,7 @@ class FtsSocketServerStream extends FtsStream
 	  }
 
 	command += ftsDir + File.separator + ftsName;
-	command += " --socket --host=" + InetAddress.getLocalHost().getHostAddress() + " --port=" + port;
+	command += " --tcp --host=" + InetAddress.getLocalHost().getHostAddress() + " --port=" + port;
 	command += " " + ftsOptions;
       }
     catch (UnknownHostException e)

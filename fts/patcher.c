@@ -352,14 +352,19 @@ static void
 patcher_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *) o;
-  fts_objectset_t *set = (fts_objectset_t *)fts_get_data(at);
+  /*fts_objectset_t *set = (fts_objectset_t *)fts_get_data(at);*/
+  fts_objectset_t *set = (fts_objectset_t *)fts_get_object(at);
   fts_object_t *p;
   fts_status_t ret;
+  fts_atom_t a[1];
 
   /* see if this should be added */
   if (fts_atom_is_subsequence(ac - 1, at + 1, o->argc, o->argv))
-    fts_objectset_add(set, o);
-
+    {
+      /*fts_objectset_add(set, o);*/
+      fts_set_object(&a[0], o);
+      fts_send_message((fts_object_t *)set, fts_SystemInlet, sym_objectset_add, 1, a);
+    }
   /* look if the objects in the patchers are to be found */
   for (p = this->objects; p ; p = p->next_in_patcher)
     {
@@ -372,13 +377,21 @@ patcher_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      
 	      if (ret == &fts_MethodNotFound)
 	        if (fts_atom_is_subsequence(ac - 1, at + 1, p->argc, p->argv))
-		  fts_objectset_add(set, p);
+		  {
+		    /*fts_objectset_add(set, p);*/
+		    fts_set_object(&a[0], p);
+		    fts_send_message((fts_object_t *)set, fts_SystemInlet, sym_objectset_add, 1, a);
+		  }
 	    }
 	  else
 	    {
 	      /* for error objects do the check */
 	      if (fts_atom_is_subsequence(ac - 1, at + 1, p->argc, p->argv))
-		fts_objectset_add(set, p);
+		{
+		  /*fts_objectset_add(set, p);*/
+		  fts_set_object(&a[0], p);
+		  fts_send_message((fts_object_t *)set, fts_SystemInlet, sym_objectset_add, 1, a);
+		}
 	    }
 	}
     }
@@ -398,9 +411,11 @@ static void
 patcher_find_errors(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *) o;
-  fts_objectset_t *set = (fts_objectset_t *)fts_get_data(at);
+  /*fts_objectset_t *set = (fts_objectset_t *)fts_get_data(at);*/
+  fts_objectset_t *set = (fts_objectset_t *)fts_get_object(at);
   fts_object_t *p;
   fts_status_t ret;
+  fts_atom_t a[1];
 
   /* look if the objects in the patchers are to be found */
   for (p = this->objects; p ; p = p->next_in_patcher)
@@ -415,7 +430,11 @@ patcher_find_errors(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 	  int v = fts_get_int(&value);
 	  
 	  if (v)
-	    fts_objectset_add(set, p);
+	    {
+	      /*fts_objectset_add(set, p);*/
+	      fts_set_object(&a[0], p);
+	      fts_send_message((fts_object_t *)set, fts_SystemInlet, sym_objectset_add, 1, a);
+	    }
 	}
       }
 

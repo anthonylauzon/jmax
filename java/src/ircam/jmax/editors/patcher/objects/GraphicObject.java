@@ -194,7 +194,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 	  } 
 	catch (InvocationTargetException e) 
 	  {
-	    System.out.println(e);
+	      System.out.println(e);
 	  } 
       }
     else if (theName.equals( "inlet"))

@@ -579,7 +579,8 @@ static void messbox_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 {
   messbox_t *this = (messbox_t *) o;
 
-  this->atom_list = fts_atom_list_new();
+   this->atom_list = (fts_atom_list_t *)fts_object_create(fts_class_get_by_name(atomlist_symbol), 0, 0);
+
   fts_alarm_init(&(this->alarm), 0, messbox_tick, this);
   this->value = 0;
 }
@@ -589,7 +590,7 @@ static void messbox_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 {
   messbox_t *this = (messbox_t *) o;
 
-  fts_atom_list_free(this->atom_list);
+  fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, fts_s_delete, 0, 0);
   fts_alarm_reset(&(this->alarm));
 }
 
@@ -714,10 +715,17 @@ static void messbox_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
 static void messbox_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messbox_t *this = (messbox_t *) o;
-  fts_objectset_t *set = (fts_objectset_t *)fts_get_data(at);
+  fts_atom_t a[1];
+
+  /*fts_objectset_t *set = (fts_objectset_t *)fts_get_data(at);*/
+  fts_objectset_t *set = (fts_objectset_t *)fts_get_object(at);
 
   if (fts_atom_list_is_subsequence(this->atom_list, ac - 1, at + 1))
-    fts_objectset_add(set, o);
+    {
+      /*fts_objectset_add(set, o);*/
+      fts_set_object(&a[0], o);
+      fts_send_message((fts_object_t *)set, fts_SystemInlet, sym_objectset_add, 1, a);
+    }
 }
 
 /************************************************************

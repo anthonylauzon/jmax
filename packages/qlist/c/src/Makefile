@@ -28,6 +28,7 @@ PACKAGEROOT = ..
 PACKAGELIB=$(LIBDIR)/libqlist.so
 
 # for qlist's remote send naming
-MODULE_CFLAGS=-I../../../ispw/src/control/
+# MODULE_CFLAGS=-I../../../ispw/src/control/
+MODULE_CFLAGS=-I../../../ispw/c/src/
 
 include $(JMAXDISTDIR)/Makefiles/Makefile.package

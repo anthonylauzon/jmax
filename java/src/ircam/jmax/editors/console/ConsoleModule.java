@@ -37,7 +37,7 @@ public class ConsoleModule
   {    
     // Install the DspModule remote data
 
-    Fts.registerRemoteDataClass("dspcontrol_data", ircam.jmax.fts.FtsDspControl.class);
+      /*Fts.registerRemoteDataClass("dspcontrol_data", ircam.jmax.fts.FtsDspControl.class);*/
 
     Mda.installDocumentType( new ConsoleDocumentType());
   }
