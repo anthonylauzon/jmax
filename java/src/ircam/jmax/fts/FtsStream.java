@@ -688,7 +688,12 @@ abstract public class FtsStream
 
 
   private static FtsAtom args[];
+  private static int argsCount = 0;
 
+  public final int getNumberOfArgs()
+  {
+    return argsCount;
+  }
   /**
    * Returns the next arguments as an array of FtsAtom. This array is a static
    * member of class FtsStream.
@@ -701,8 +706,6 @@ abstract public class FtsStream
   public final FtsAtom[] getArgs()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
-    int argsCount = 0;
-
     if (args == null)
       args = new FtsAtom[128];
 

@@ -299,7 +299,7 @@ public class FtsServer implements Runnable
   /** Send a "new object" messages to FTS; receive a complete description as a string;
    *   Used for all the objects that have the class identity in the string description
    */
-  final void newObject(FtsObject patcher, int id, String className, String description)
+  final void newObject(FtsObject patcher, int id, String description)
   {
     if (! connected)
       return;
@@ -330,13 +330,13 @@ public class FtsServer implements Runnable
    * @param nArgs number of valid arguments in args array
    * @param args arguments of object creation
    */
-  final void newObject(FtsObject patcher, int id, int nArgs, FtsAtom args[])
+  final void newObject(FtsObject patcher, int id, String className, int nArgs, FtsAtom args[])
   {
     if (! connected)
       return;
 
     if (FtsServer.debug)
-      System.err.println("> newObject(" + patcher + ", " + id + ", " + className + ", " + description + ")");
+      System.err.println("> newObject(" + patcher + ", " + id + ", " + className + ", " + nArgs + "args)");
 
     try
       {
@@ -1346,7 +1346,7 @@ public class FtsServer implements Runnable
     // Build the root patcher, by mapping directly to object id 1 on FTS
     // (this is guaranteed)
 
-    root = new FtsPatcherObject(fts, null, null, "", 1);
+    root = new FtsPatcherObject(fts, null, 1, "");
     registerObject(root);
   }
 
@@ -1534,9 +1534,23 @@ public class FtsServer implements Runnable
 	    {
 	      FtsObject parent = stream.getNextObjectArgument();
 	      FtsPatcherData data = (FtsPatcherData) stream.getNextDataArgument();
-	      int objId stream.getNextIntArgument();
+	      int objId = stream.getNextIntArgument();
+	      String className = null;
+	      FtsAtom args[] = null;
+	      int nArgs = 0;
 
-	      newObj = FtsObject.makeFtsObjectFromMessage(fts, parent, data, objId, stream.getArgs(), false);
+	      /* class name? */
+	      if(stream.nextIsSymbol())
+		className = stream.getNextStringArgument();
+
+	      /* null description object? */
+	      if(!stream.endOfArguments())
+		{
+		  args = stream.getArgs();
+		  nArgs = stream.getNumberOfArgs();
+		}
+
+	      newObj = FtsObject.makeFtsObjectFromMessage(fts, parent, data, objId, null, className, stream);
 	      registerObject(newObj);
 
 	      if (FtsServer.debug)
@@ -1556,7 +1570,26 @@ public class FtsServer implements Runnable
 
 	  try
 	    {
-	      newObj = FtsObject.makeFtsObjectFromMessage(fts, stream.getArgs(), true);
+	      FtsObject parent = stream.getNextObjectArgument();
+	      FtsPatcherData data = (FtsPatcherData) stream.getNextDataArgument();
+	      int objId = stream.getNextIntArgument();
+	      String variable =  stream.getNextStringArgument();
+	      String className = null;
+	      FtsAtom args[] = null;
+	      int nArgs = 0;
+
+	      /* class name? */
+	      if(stream.nextIsSymbol())
+		className = stream.getNextStringArgument();
+
+	      /* null description object? */
+	      if(!stream.endOfArguments())
+		{
+		  args = stream.getArgs();
+		  nArgs = stream.getNumberOfArgs();
+		}
+
+	      newObj = FtsObject.makeFtsObjectFromMessage(fts, parent, data, objId, variable, className, stream);
 	      registerObject(newObj);
 
 	      if (FtsServer.debug)

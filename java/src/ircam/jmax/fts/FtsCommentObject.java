@@ -47,7 +47,7 @@ public class FtsCommentObject extends FtsObject
    * Create a FtsObject object;
    */
 
-  public FtsCommentObject(Fts fts, FtsObject parent, String description, int objId)
+  public FtsCommentObject(Fts fts, FtsObject parent, int objId, String description)
   {
     super(fts, parent, "jcomment", null, description, objId);
 

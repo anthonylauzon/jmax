@@ -71,97 +71,68 @@ public class FtsObject
    * @param nArgs number of valid arguments in args array
    * @param args arguments of object creation
    */
-  static FtsObject makeFtsObjectFromMessage(Fts fts, FtsObject parent, FtsPatcherData data, int objId, int nArgs, FtsAtom args[], boolean doVariable)
+
+  //static FtsObject makeFtsObjectFromMessage(Fts fts, FtsObject parent, FtsPatcherData data, 
+  //int objId, String variable, String className, int nArgs, FtsAtom args[])
+
+  static FtsObject makeFtsObjectFromMessage(Fts fts, FtsObject parent, FtsPatcherData data, 
+					    int objId, String variable, String className, FtsStream stream)
     throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException, FtsException
   {
     FtsObject obj;
-    String variable = null;
-    String className;
     StringBuffer description;
 
-    parent = stream.getNextObjectArgument();
-    data   = (FtsPatcherData) stream.getNextDataArgument();
-    objId  = stream.getNextIntArgument();
-
-    if (doVariable)
-      variable =  stream.getNextStringArgument();
-      
-    /* Check for null description object */
-
-    if (stream.endOfArguments())
-      return new FtsObject(fts, parent, "", null, "", objId);
-
-    /* Get the class name */
-
-    if (! stream.nextIsSymbol())
-      {
-	obj = new FtsObject(fts, parent, "", variable,
-			    FtsParse.unparseObjectDescription(stream), objId);
-      }
+    /* Note that we do the unparsing relative to ':' and variables
+       here; in the future, a dedicated API should be used ! */
+    
+    // Here we do the mapping between fts names and application layer classes
+    // Any addition of special classes should start by adding some lines
+    // of code here.
+    
+    if (className == null)
+      obj = new FtsObject(fts, parent, "", variable, "", objId);
+    else if (className == "inlet")
+      obj =  new FtsInletObject(fts, parent, objId, stream.getNextIntArgument());
+    else if (className == "outlet")
+      obj =  new FtsOutletObject(fts, parent, objId, stream.getNextIntArgument());
+    else if (className == "jpatcher")
+      /* jpatcher never has variable, yet */
+      obj =  new FtsPatcherObject(fts, parent, objId, FtsParse.unparseObjectDescription(stream));
+    else if (className == "messbox")
+      obj =  new FtsMessageObject(fts, parent, objId, FtsParse.unparseObjectDescription(stream));
+    else if (className == "jcomment")
+      obj =  new FtsCommentObject(fts, parent, objId, FtsParse.simpleUnparseObjectDescription(stream));
+    else if (className == "slider")
+      obj =  new FtsSliderObject(fts, parent, objId);
+    else if (className == "intbox")
+      obj =  new FtsIntValueObject(fts, parent, objId, className, "intbox");
+    else if (className == "toggle")
+      obj =  new FtsIntValueObject(fts, parent, objId, className, "toggle");
+    else if (className == "button")
+      obj =  new FtsIntValueObject(fts, parent, objId, className, "button");
+    else if (className == "floatbox")
+      obj =  new FtsFloatValueObject(fts, parent, objId, className, 0, null);
+    else if (className == "__selection")
+      obj =  new FtsSelection(fts, parent, objId);
+    else if (className == "__clipboard")
+      obj =  new FtsClipboard(fts, parent, objId);
     else
       {
-
-	className = stream.getNextSymbolArgument();
+	Object ctr = creators.get(className);
 	
-	/* Note that we do the unparsing relative to ':' and variables
-	   here; in the future, a dedicated API should be used ! */
-
-	// Here we do the mapping between fts names and application layer classes
-	// Any addition of special classes should start by adding some lines
-	// of code here.
-
-	if (className == "jpatcher")
+	if(ctr!=null)
 	  {
-	    if (doVariable)
-	      obj =  new FtsPatcherObject(fts, parent, variable,
-					  variable + " : " + FtsParse.unparseObjectDescription(stream), objId);
-	    else
-	      obj =  new FtsPatcherObject(fts, parent, variable,
-					  FtsParse.unparseObjectDescription(stream), objId);
+	    obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, objId, className, 0, null);
 	  }
-	else if (className == "inlet")
-	  obj =  new FtsInletObject(fts, parent, stream.getNextIntArgument(), objId);
-	else if (className == "outlet")
-	  obj =  new FtsOutletObject(fts, parent, stream.getNextIntArgument(), objId);
-	else if (className == "messbox")
-	  obj =  new FtsMessageObject(fts, parent, FtsParse.unparseObjectDescription(stream), objId);
-	else if (className == "jcomment")
-	  obj =  new FtsCommentObject(fts, parent, FtsParse.simpleUnparseObjectDescription(stream), objId);
-	else if (className == "intbox")
-	  obj =  new FtsIntValueObject(fts, parent, className, "intbox", objId);
-	else if (className == "toggle")
-	  obj =  new FtsIntValueObject(fts, parent, className, "toggle", objId);
-	else if (className == "button")
-	  obj =  new FtsIntValueObject(fts, parent, className, "button", objId);
-	else if (className == "slider")
-	  obj =  new FtsSliderObject(fts, parent, "slider", objId);
-	else if (className == "floatbox")
-	  obj =  new FtsFloatValueObject(fts, parent, className, "floatbox", objId);
-	else if (className == "__selection")
-	  obj =  new FtsSelection(fts, parent, className, "__selection", objId);
-	else if (className == "__clipboard")
-	  obj =  new FtsClipboard(fts, parent, className, "__clipboard", objId);
 	else
 	  {
-	    Object ctr = creators.get(className);
-
-	    if(ctr!=null)
-	      {
-		obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, className, objId);
-	      }
+	    if (variable != null)
+	      obj = new FtsObject(fts, parent, className, variable, variable + " : " + FtsParse.unparseObjectDescription(className, stream), objId);
 	    else
-	      {
-		if (doVariable)
-		  obj = new FtsObject(fts, parent, className, variable,
-				      variable + " : " + FtsParse.unparseObjectDescription(className, stream),
-				      objId);
-		else
-		  obj = new FtsObject(fts, parent, className, variable,
-				      FtsParse.unparseObjectDescription(className, stream), objId);
-	      }
+	      obj = new FtsObject(fts, parent, className, variable, FtsParse.unparseObjectDescription(className, stream), objId);
 	  }
-	     
       }
+    
     if (data != null)
       data.addObject(obj);
     
@@ -853,7 +824,7 @@ public class FtsObject
 
 	    Object[] methodArgs = new Object[2];
 	    methodArgs[1] = stream.getArgs();
-	    methodArgs[0] = stream.getNumberOfArgs();
+	    methodArgs[0] = new Integer(stream.getNumberOfArgs());
 
 	    method.invoke( this, methodArgs);
 	  }

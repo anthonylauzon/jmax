@@ -48,7 +48,7 @@ public class FtsInOutletObject  extends FtsObject
    * Create a FtsInOutletObject object.
    */
   
-  public FtsInOutletObject(Fts fts, FtsObject parent, String className, int position, int objId)
+  public FtsInOutletObject(Fts fts, FtsObject parent, int objId, String className, int position)
   {
     super(fts, parent, className, null, className + " " + position, objId);
 

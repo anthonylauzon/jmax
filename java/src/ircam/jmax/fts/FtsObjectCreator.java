@@ -34,5 +34,5 @@ package ircam.jmax.fts;
 
 public interface FtsObjectCreator
 {
-  public FtsObject createInstance(Fts fts, FtsObject parent, String description, int objId);
+  public FtsObject createInstance(Fts fts, FtsObject parent, int objId, String className, int nArgs, FtsAtom args[]);
 }

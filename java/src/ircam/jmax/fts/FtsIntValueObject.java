@@ -45,7 +45,7 @@ public class FtsIntValueObject extends FtsObject
 
   int value; 
 
-  public FtsIntValueObject(Fts fts, FtsObject parent, String className, String description, int objId)
+  public FtsIntValueObject(Fts fts, FtsObject parent, int objId, String className, String description)
   {
     super(fts, parent, className, null, description, objId);
   }
