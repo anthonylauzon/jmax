@@ -1,0 +1,10 @@
+SOURCES = \
+	$(INCLUDE_PATH)/IndicatorWithMemory.java		\
+	$(INCLUDE_PATH)/IncrementController.java		\
+	$(INCLUDE_PATH)/IncrementListener.java		\
+	$(INCLUDE_PATH)/Led.java		\
+	$(INCLUDE_PATH)/SimpleLed.java			\
+	$(INCLUDE_PATH)/MemoryLed.java			\
+	$(INCLUDE_PATH)/ObjectSelectedListener.java			\
+	$(INCLUDE_PATH)/ObjectSetViewer.java			\
+	$(INCLUDE_PATH)/BeanPanel.java			\
