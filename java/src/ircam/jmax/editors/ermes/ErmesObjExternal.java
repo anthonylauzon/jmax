@@ -21,8 +21,10 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
-  public ErmesObjExternal(){
-    super();
+
+  public  ErmesObjExternal(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  {
+    super(theSketchPad, theFtsObject);
   }
 	
   public boolean AreYouPatcher() {
@@ -39,11 +41,11 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
     // It is needed because ErmesObjExternal and ErmesObjMessage use different methods
     // to get the string from the object.
 
-    itsArgs = theFtsObject.getDescription().trim();
+    itsArgs = itsFtsObject.getDescription().trim();
 
     super.Init();
 
-    if ( theFtsObject instanceof FtsContainerObject)
+    if ( itsFtsObject instanceof FtsContainerObject)
       this.YouArePatcher( true);
 
     ParseText( itsArgs);

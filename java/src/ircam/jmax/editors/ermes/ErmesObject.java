@@ -74,8 +74,10 @@ abstract public class ErmesObject implements ErmesDrawable {
       aObject = new ErmesObjIn(sketch, object);
     else if (theName.equals("outlet"))
       aObject = new ErmesObjOut(sketch, object);
-    else
+    else if (theName.equals("jpatcher"))
       aObject = new ErmesObjPatcher(sketch, object);
+    else
+      aObject = new ErmesObjExternal(sketch, object);
 
     aObject.Init();
 
