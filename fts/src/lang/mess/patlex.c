@@ -198,61 +198,69 @@ void fts_patlex_next_token(fts_patlex_t *this)
 		
 	    case tt_in_var:
 
-	      if (fts_patlex_is_digit(c) && (this->env_argv != 0))
+	      if (fts_patlex_is_digit(c))
 		{
-		  int v = c - '0'; 
-
-		  if (v == 0)
+		  if (this->env_argv != 0)
 		    {
-		      sprintf(this->buf, "%d", this->unique_var);
-		      this->buf_fill = strlen(this->buf);
-		      status = tt_in_string;
-		    }
-		  else
-		    {
-		      /** Getting an env value. */
+		      int v = c - '0'; 
 
-		      if (v > this->env_argc)
+		      if (v == 0)
 			{
-			  this->buf[this->buf_fill++] = '0';
-			  status = tt_in_number;
+			  sprintf(this->buf, "%d", this->unique_var);
+			  this->buf_fill = strlen(this->buf);
+			  status = tt_in_string;
 			}
 		      else
 			{
-			  const fts_atom_t *value;
+			  /** Getting an env value. */
 
-			  value = &(this->env_argv[v - 1]);
-
-			  if (fts_is_int(value))
+			  if (v > this->env_argc)
 			    {
+			      this->buf[this->buf_fill++] = '0';
 			      status = tt_in_number;
-			      sprintf(this->buf, "%d", fts_get_int(value));
-			      this->buf_fill = strlen(this->buf);
-			    }
-			  else if (fts_is_float(value))
-			    {
-			      status = tt_in_float;
-			      sprintf(this->buf, "%f", fts_get_float(value));
-			      this->buf_fill = strlen(this->buf);
-			    }
-			  else if (fts_is_symbol(value))
-			    {
-			      status = tt_in_string;
-			      strcpy(this->buf, fts_symbol_name(fts_get_symbol(value)));
-			      this->buf_fill = strlen(this->buf);
 			    }
 			  else
-			    this->buf[this->buf_fill++] = '0';
+			    {
+			      const fts_atom_t *value;
+
+			      value = &(this->env_argv[v - 1]);
+			      
+			      if (fts_is_int(value))
+				{
+				  status = tt_in_number;
+				  sprintf(this->buf, "%d", fts_get_int(value));
+				  this->buf_fill = strlen(this->buf);
+				}
+			      else if (fts_is_float(value))
+				{
+				  status = tt_in_float;
+				  sprintf(this->buf, "%f", fts_get_float(value));
+				  this->buf_fill = strlen(this->buf);
+				}
+			      else if (fts_is_symbol(value))
+				{
+				  status = tt_in_string;
+				  strcpy(this->buf, fts_symbol_name(fts_get_symbol(value)));
+				  this->buf_fill = strlen(this->buf);
+				}
+			      else
+				this->buf[this->buf_fill++] = '0';
+			    }
 			}
+		    }
+		  else
+		    {
+		      this->buf[this->buf_fill++] = '#';
+		      this->buf[this->buf_fill++] = c;
+		      status = tt_in_string;
 		    }
 		}
 	      else
 		{
-		  this->buf[this->buf_fill++] = '#';
+		  this->buf[this->buf_fill++] = '$';
 		  this->buf[this->buf_fill++] = c;
 		  status = tt_in_string;
 		}
-	      
 	      break;
 
 	    case tt_in_string:
