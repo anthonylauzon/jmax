@@ -116,8 +116,10 @@ abstract class FtsPort implements Runnable
 	  {
 	    FtsMessage msg;
 	    msg = receiveMessage();
-	    if (msg != null)
+
+	    if (msg != null) {
 	      server.dispatchMessage(msg);
+	    }
 	  }
 	catch (java.io.InterruptedIOException e)
 	  {

@@ -14,7 +14,7 @@ import java.util.*;
  * reportToFile() calls.
  */
 
-public class Probe
+public class Probe implements OscillSource
 {
   int MAX_EVENTS = 10000; 
   long times[];
@@ -24,6 +24,7 @@ public class Probe
   int eventCounter = 0;
   int autoReport   = 0;
   boolean running=false;
+  long lastDelta = 0;
   
   public Probe(String theName, int max)
   {
@@ -31,6 +32,11 @@ public class Probe
     MAX_EVENTS = max;
     times = new long[MAX_EVENTS];
     labels = new String[MAX_EVENTS]; 
+  }
+
+  public int getValue() {    
+    System.err.println(lastDelta);
+    return (int) lastDelta/100;//for now, there's no scaling in the Oscilloscope
   }
 
   public Probe(String theName)
@@ -68,6 +74,7 @@ public class Probe
 	  {
 	    times[eventCounter] = System.currentTimeMillis();
 	    labels[eventCounter++] = markName;
+	    lastDelta = times[eventCounter-1] - times[eventCounter-2];
 	  }
 
 	if (autoReport != 0)

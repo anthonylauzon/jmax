@@ -1,7 +1,5 @@
 SOURCES = \
            ExtensionFilter.java \
-           TWOutputStream.java \
-           TWPrintStream.java \
            TextWindow.java    \
 	   IndentedPrintWriter.java \
 	   Platform.java \

@@ -61,7 +61,6 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
   }
 
   public void setItsX(int theX) {
-    
     itsX = theX;
     itsFtsObject.put("x", itsX);
   }

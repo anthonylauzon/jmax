@@ -9,6 +9,7 @@ import com.sun.java.swing.*;
   */
 
 import java.awt.*;
+import com.sun.java.swing.*;
 import java.awt.event.*;
 import tcl.lang.*;
 

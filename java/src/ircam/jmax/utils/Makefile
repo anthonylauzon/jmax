@@ -28,14 +28,6 @@ ExtensionFilter:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ExtensionFilter.java)
 .PHONY: ExtensionFilter
 
-TWOutputStream:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TWOutputStream.java)
-.PHONY: TWOutputStream
-
-TWPrintStream:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TWPrintStream.java)
-.PHONY: TWPrintStream
-
 TextWindow:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TextWindow.java)
 .PHONY: TextWindow

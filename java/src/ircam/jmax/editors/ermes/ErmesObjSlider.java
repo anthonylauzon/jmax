@@ -36,9 +36,10 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
 
 
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
+    super.Init(theSketchPad, x, y, theString);	////was not here (see later)    
     makeCurrentRect(x, y);
     itsThrottle = new ErmesObjThrottle(this, x, y);
-    super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
+    //super.Init(theSketchPad, x, y, theString);	////was here
     itsFtsObject.watch("value", this);
     return true;
   }
@@ -100,6 +101,7 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
       }
     catch (FtsException e)
       {
+	System.out.println("failed to build a FTS slider object");
 	// Enzo !!! Aiuto :-> (MDC)
       }
   }
