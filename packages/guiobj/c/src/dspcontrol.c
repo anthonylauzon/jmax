@@ -187,7 +187,6 @@ static void fts_dsp_control_delete(fts_object_t *o, int winlet, fts_symbol_t s, 
   fts_dsp_control_t *this = (fts_dsp_control_t *)o;
 
   fts_alarm_reset(&(this->poll_alarm));
-  fts_free((void *)this);
 }
 
 static void fts_dsp_control_fpe_start_collect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

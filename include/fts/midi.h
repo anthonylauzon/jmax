@@ -749,8 +749,7 @@ FTS_API void fts_midiport_output_system_exclusive_flush(fts_midiport_t *port, do
 
 FTS_API fts_midiport_t *fts_midiport_get_default(void);
 FTS_API void fts_midiport_set_default( int argc, const fts_atom_t *argv);
-
-
+FTS_API void fts_midiport_set_default_class( fts_symbol_t name);
 
 
 /*****************************************************
@@ -814,8 +813,6 @@ typedef struct _fts_midiparser_
 
 FTS_API void fts_midiparser_init(fts_midiparser_t *parser);
 FTS_API void fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte);
-
-
 
 
 #endif

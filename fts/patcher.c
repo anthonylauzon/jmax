@@ -761,11 +761,14 @@ patcher_load_jmax_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   const char *filename = fts_symbol_name( fts_get_symbol( at));
   fts_object_t *patcher;
 
+  fts_log("[patcher]: Load file %s\n", filename);
+
   patcher = fts_binary_file_load( filename, o, 0, 0, 0);
 
   if (patcher == 0)
     {
       post("Cannot read jmax file %s\n", filename);
+      fts_log("[patcher]: Cannot read file %s\n", filename);
       return;
     }
 

@@ -847,6 +847,7 @@ void fts_midiport_output_system_exclusive_flush(fts_midiport_t *port, double tim
  */
 
 static fts_midiport_t *default_midiport = 0;
+static fts_symbol_t default_midiport_class = 0;
 
 void fts_midiport_set_default( int argc, const fts_atom_t *argv)
 {
@@ -876,7 +877,18 @@ void fts_midiport_set_default( int argc, const fts_atom_t *argv)
 
 fts_midiport_t *fts_midiport_get_default(void)
 {
+  if ((default_midiport == 0) && (default_midiport_class != 0)) {
+    fts_atom_t a[1];
+    fts_log("[midiport]: No default midiport was installed, instanciating the default class %s\n", fts_symbol_name(default_midiport_class));
+    fts_set_symbol(a, default_midiport_class);
+    fts_midiport_set_default(1, a);
+  }
   return default_midiport;
+}
+
+void fts_midiport_set_default_class( fts_symbol_t name)
+{
+  default_midiport_class = name;
 }
 
 /************************************************************

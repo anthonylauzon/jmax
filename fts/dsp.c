@@ -321,8 +321,6 @@ void fts_kernel_dsp_init(void)
   fts_s_sample_rate = fts_new_symbol("sample_rate");
 
   /* init sample rate */
-  /* FIXME: pH07: sample rate and tick size where initialized AFTER 
-     fts_dsp_graph_init. */
   dsp_sample_rate = FTS_DSP_DEFAULT_SAMPLE_RATE;
   dsp_tick_size = FTS_DSP_DEFAULT_TICK_SIZE;
 
@@ -345,9 +343,6 @@ void fts_kernel_dsp_init(void)
    fts_dsp_declare_function( dsp_copy_fun_symbol, dsp_copy_fun);
 }
 
-void fts_kernel_dsp_shutdown(void)
-{
-  fts_param_set_int(fts_s_dsp_on, 0);
-}
+
 
 

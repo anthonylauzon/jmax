@@ -105,7 +105,7 @@ typedef struct _oldclient_t {
 
 static void oldclient_flush( oldclient_t *this);
 
-static oldclient_t *oldclient;
+static oldclient_t *oldclient = 0;
 
 int fts_client_is_up( void)
 {
@@ -2364,28 +2364,6 @@ fts_ucs_set_updates_period(int argc, const fts_atom_t *argv)
 
 #define MODULE_INIT_FUNCTION_SUFFIX "_config"
 
-/* FIXME: replaced by package management; should disappear [pH07] */
-/*  static fts_status_t fts_ucs_load_module(int argc, const fts_atom_t *argv) */
-/*  { */
-/*    if ((argc == 2) && fts_is_symbol(&argv[0]) && fts_is_symbol(&argv[1])) */
-/*      { */
-/*        fts_status_t ret; */
-/*        const char *module_name = fts_symbol_name(fts_get_symbol(argv + 0)); */
-/*        const char *file = fts_symbol_name(fts_get_symbol(argv + 1)); */
-/*        char *name = (char *)fts_malloc( strlen( module_name) + sizeof( MODULE_INIT_FUNCTION_SUFFIX) + 1); */
-
-/*        strcpy( name, module_name); */
-/*        strcat( name, MODULE_INIT_FUNCTION_SUFFIX); */
-
-/*        ret = fts_load_library( file, name); */
-/*        if (ret != fts_Success) */
-/*  	post("Error loading module %s: %s\n", module_name, ret->description); */
-
-/*        fts_free( name); */
-/*      } */
-/*    return fts_Success; */
-/*  } */
-
 /*
  * Message system commands 
  *
@@ -2593,6 +2571,7 @@ void fts_oldclient_config( void)
   fts_symbol_t s;
   fts_atom_t a[1];
 
+  s = fts_new_symbol( "oldclient");
   s_tcp = fts_new_symbol( "tcp");
   s_udp = fts_new_symbol( "udp");
 
@@ -2610,12 +2589,10 @@ void fts_oldclient_config( void)
   fts_object_new_to_patcher( fts_get_root_patcher(), 1, a, (fts_object_t **)&oldclient);
 }
 
-
-void fts_kernel_oldclient_shutdown(void)
+void fts_oldclient_shutdown( void)
 {
-/*    if (client_dev) */
-/*      { */
-/*        fts_dev_close(client_dev); */
-/*        client_dev = 0; */
-/*      } */
+  if (oldclient) {
+    fts_object_delete_from_patcher( (fts_object_t *)oldclient);
+  }
+  oldclient = 0;
 }

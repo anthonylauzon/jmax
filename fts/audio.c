@@ -47,7 +47,7 @@
 
 #define AUDIOPORT_DEFAULT_IDLE ((void (*)( struct _fts_audioport_t *port))-1)
 
-static fts_audioport_t *audioport_list;
+static fts_audioport_t *audioport_list = 0;
 
 static fts_symbol_t s_default_audio_port;
 static fts_symbol_t s__superclass;

@@ -26,7 +26,7 @@
 
 #include <fts/fts.h>
 
-#include "ftsconfig.h"
+#include <ftsconfig.h>
 
 #if HAVE_SYS_PARAM_H
 #include <sys/param.h>
@@ -167,8 +167,14 @@ fts_make_absolute_path(const char* parent, const char* file, char* buf, int len)
 {
   char path[MAXPATHLEN];
 
-  if (!fts_path_is_absolute(file) && (parent != NULL)) {
-    snprintf(path, len, "%s%c%s", parent, fts_file_separator, file);
+  if (!fts_path_is_absolute(file)) {
+    if (parent != NULL) {
+      snprintf(path, len, "%s%c%s", parent, fts_file_separator, file);
+    } else {
+      char buf[MAXPATHLEN];
+      getcwd(buf, MAXPATHLEN);
+      snprintf(path, len, "%s%c%s", buf, fts_file_separator, file);      
+    }
   } else {
     snprintf(path, len, "%s", file);
   }

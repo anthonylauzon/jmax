@@ -228,7 +228,7 @@ static void client_manager_init( fts_object_t *o, int winlet, fts_symbol_t s, in
 
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
 
-  fts_log( "client_manager: listening on port %d\n", port);
+  fts_log( "[client]: Listening on port %d\n", port);
 }
 
 static void client_manager_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -425,7 +425,7 @@ static void a_end_message( client_t *this)
   argc = fts_stack_get_size( &this->receive_args);
   argv = (fts_atom_t *)fts_stack_get_ptr( &this->receive_args);
 
-  fts_log( "[client] received message dest=0x%x selector=%s args=", this->dest_object, fts_symbol_name(this->selector));
+  fts_log( "[client]: Received message dest=0x%x selector=%s args=", this->dest_object, fts_symbol_name(this->selector));
   fts_log_atoms( argc, argv);
   fts_log( "\n");
 
@@ -454,14 +454,14 @@ static void client_receive( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 
   if ( size < 0)
     {
-      client_error( "[client] error in reading message, client stopped");
-      fts_log( "[client] error in reading message, client stopped\n");
+      client_error( "[client]: Error in reading message, client stopped");
+      fts_log( "[client]: Error in reading message, client stopped\n");
       fts_object_delete_from_patcher( (fts_object_t *)this);
       return;
     }
   else if (size == 0)
     {
-      fts_log( "[client] client stopped\n");
+      fts_log( "[client]: Client stopped\n");
       fts_object_delete_from_patcher( (fts_object_t *)this);
       return;
     }
@@ -660,7 +660,7 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
 
-  fts_log( "[client] accepted client connection on socket %d\n", this->socket);
+  fts_log( "[client]: Accepted client connection on socket %d\n", this->socket);
 }
 
 static void client_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -679,7 +679,7 @@ static void client_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   fts_sched_remove( (fts_object_t *)this);
   CLOSESOCKET( this->socket);
 
-  fts_log( "[client] released client connection on socket %d\n", this->socket);
+  fts_log( "[client]: Released client connection on socket %d\n", this->socket);
 }
 
 static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -794,7 +794,7 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
   fts_connection_new( FTS_NO_ID, from, 0, (fts_object_t *)this, 0);
   fts_connection_new( FTS_NO_ID, (fts_object_t *)this, 0, to, 0);
 
-  fts_log( "[client_controller] created controller on %s %s channel %d\n", fts_symbol_name( target_class_name), fts_symbol_name( fts_object_get_variable( target)), channel_number);
+  fts_log( "[client]: Created controller on %s %s channel %d\n", fts_symbol_name( target_class_name), fts_symbol_name( fts_object_get_variable( target)), channel_number);
 }
 
 static void client_controller_delete_dummy(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -814,7 +814,7 @@ static void client_controller_anything_fts(fts_object_t *o, int winlet, fts_symb
 
   if (client != NULL)
     {
-      fts_log( "[client_controller] sending to client \"%s ", fts_symbol_name(s));
+      fts_log( "[client]: Sending \"%s ", fts_symbol_name(s));
       fts_log_atoms( ac, at);
       fts_log( "\"\n");
 
@@ -832,7 +832,7 @@ static void client_controller_anything_client(fts_object_t *o, int winlet, fts_s
 
   this->gate = 1;
 
-  fts_log( "[client_controller] received from client %s \"", fts_symbol_name( s));
+  fts_log( "[client]: Received \"");
   fts_log_atoms( ac, at);
   fts_log( "\"\n");
 

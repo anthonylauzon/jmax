@@ -246,28 +246,48 @@ static void fts_kernel_classes_config( void)
 
 void fts_init( int argc, char **argv)
 {
-  fts_log("[init]: kernel initialization\n");
+  fts_log("[fts]: Kernel initialization\n");
 
   /* Initialization */
   fts_kernel_init();
 
-  fts_log("[init]: parsing command line arguements\n");
+  fts_log("[fts]: Parsing command line arguments\n");
 
   /* Must be here, since it can be used by further modules */
   fts_cmd_args_parse( argc, argv);
 
-  fts_log("[init]: platform initialization\n");
+  fts_log("[fts]: Platform initialization\n");
 
   /* Platform dependant initialization */
   fts_platform_init();
 
-  fts_log("[init]: initializing kernel classes\n");
+  fts_log("[fts]: Initializing kernel classes\n");
 
   /* Installation of kernel classes */
   fts_kernel_classes_config();
 
-  fts_log("[init]: loading project\n");
+  fts_log("[fts]: Loading project\n");
 
   /* Load the initial project */
   fts_load_project();
+}
+
+/***********************************************************************
+ *
+ * Global shutdown
+ *
+ */
+
+void fts_oldclient_shutdown( void);
+void fts_kernel_patcher_shutdown(void);
+
+void fts_shutdown( void)
+{
+  /* the old client is closed first, to avoid the sending of
+     fts_client_release_object() messages (see fts_object_unclient())
+     on a deadly dangling oldclient object.  */
+  fts_oldclient_shutdown();
+
+  fts_log("[fts]: Shutting down\n");
+  fts_kernel_patcher_shutdown();
 }

@@ -129,6 +129,11 @@ extern "C" {
 FTS_API void fts_init( int argc, char **argv);
 
 /*
+ * FTS global shutdown 
+ */
+FTS_API void fts_shutdown( void);
+
+/*
  * Command line arguments access
  */
 FTS_API fts_symbol_t fts_cmd_args_get( fts_symbol_t name);

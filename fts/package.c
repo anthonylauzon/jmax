@@ -214,6 +214,7 @@ fts_package_load(fts_symbol_t name)
 fts_package_t*
 fts_package_load_from_file(fts_symbol_t name, const char* filename)
 {
+  char path[MAXPATHLEN];
   char dir[MAXPATHLEN];
   fts_object_t* obj;
   fts_package_t* pkg = NULL;
@@ -222,10 +223,12 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
      of the system package. */
   fts_package_push(fts_system_package);
 
-  obj = fts_binary_file_load( filename, (fts_object_t *)fts_get_root_patcher(), 0, 0, 0);
+  fts_make_absolute_path(NULL, filename, path, MAXPATHLEN);
+
+  obj = fts_binary_file_load( path, (fts_object_t *)fts_get_root_patcher(), 0, 0, 0);
 
   if (!obj) {
-    fts_log("[package]: Failed to load package file %s\n", filename);
+    fts_log("[package]: Failed to load package file %s\n", path);
     pkg = fts_package_new(name);
     pkg->state = fts_package_corrupt;
     goto gracefull_exit;
@@ -234,7 +237,7 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
   /* check whether it's a package object */
   if (fts_object_get_class(obj) != fts_package_class) {
 /* FIXME: error corruption     fts_object_destroy(obj); */
-    fts_log("[package]: Invalid package file %s\n", filename);
+    fts_log("[package]: Invalid package file %s\n", path);
     pkg = fts_package_new(name);
     pkg->state = fts_package_corrupt;
     goto gracefull_exit;
@@ -247,7 +250,7 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
 
   pkg->name = name;
 
-  fts_dirname(filename, dir, MAXPATHLEN);
+  fts_dirname(path, dir, MAXPATHLEN);
   pkg->dir = fts_new_symbol_copy(dir);
 
   fts_package_pop(fts_system_package);

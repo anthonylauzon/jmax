@@ -241,7 +241,7 @@ void fts_log_init(void)
 
   /* truncate the file */
   log = fopen(log_file, "w");
-  fprintf(log, "\n[log]: started logging at %s\n", fts_log_date(buf, 1024));
+  fprintf(log, "[log]: Started logging at %s\n", fts_log_date(buf, 1024));
   fclose(log);
 }
 

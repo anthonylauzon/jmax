@@ -327,28 +327,6 @@ fts_ucs_set_updates_period(int argc, const fts_atom_t *argv)
 
 #define MODULE_INIT_FUNCTION_SUFFIX "_config"
 
-/* FIXME: replaced by package management; should disappear [pH07] */
-/*  static fts_status_t fts_ucs_load_module(int argc, const fts_atom_t *argv) */
-/*  { */
-/*    if ((argc == 2) && fts_is_symbol(&argv[0]) && fts_is_symbol(&argv[1])) */
-/*      { */
-/*        fts_status_t ret; */
-/*        const char *module_name = fts_symbol_name(fts_get_symbol(argv + 0)); */
-/*        const char *file = fts_symbol_name(fts_get_symbol(argv + 1)); */
-/*        char *name = (char *)fts_malloc( strlen( module_name) + sizeof( MODULE_INIT_FUNCTION_SUFFIX) + 1); */
-
-/*        strcpy( name, module_name); */
-/*        strcat( name, MODULE_INIT_FUNCTION_SUFFIX); */
-
-/*        ret = fts_load_library( file, name); */
-/*        if (ret != fts_Success) */
-/*  	post("Error loading module %s: %s\n", module_name, ret->description); */
-
-/*        fts_free( name); */
-/*      } */
-/*    return fts_Success; */
-/*  } */
-
 /*
  * Message system commands 
  *

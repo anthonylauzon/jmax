@@ -159,6 +159,9 @@ static void
 throw_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   access_t *this = (access_t *)o;
+
+  if(this->channel != BUS_NOWHERE)
+    fts_channel_remove_target(bus_get_channel(this->bus, this->channel), o);
   
   fts_object_release((fts_object_t *)this->bus);  
 }
@@ -276,6 +279,9 @@ static void
 catch_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   access_t *this = (access_t *)o;
+
+  if(this->channel != BUS_NOWHERE)
+    fts_channel_remove_target(bus_get_channel(this->bus, this->channel), o);
   
   fts_object_release((fts_object_t *)this->bus);  
 }
