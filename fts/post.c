@@ -134,9 +134,18 @@ void post( const char *format, ...)
       if (*p == '\n')
 	{
 	  *fill_p = '\0';
-	  fts_client_start_msg( POST_LINE_CODE);
-	  fts_client_add_string( post_buffer);
-	  fts_client_done_msg();
+
+	  if (fts_client_is_up())
+	    {
+	      fts_client_start_msg( POST_LINE_CODE);
+	      fts_client_add_string( post_buffer);
+	      fts_client_done_msg();
+	    }
+	  else
+	    {
+	      fprintf( stderr, "%s\n", post_buffer);
+	    }
+
 	  fill_p = post_buffer;
 	}
       else

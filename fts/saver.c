@@ -401,7 +401,7 @@ static void fts_bmax_write_float(fts_bmax_file_t *f, float value)
 
 /* One functions for each opcode (without considering the argument length) */
 
-static void fts_bmax_code_return(fts_bmax_file_t *f)
+void fts_bmax_code_return(fts_bmax_file_t *f)
 {
   /* RETURN */
 

@@ -116,6 +116,8 @@
  *
  */
 
+extern int fts_client_is_up( void);
+
 extern void fts_client_start_msg(int type);
 extern void fts_client_add_connection(fts_connection_t *c);
 extern void fts_client_add_data( fts_data_t *data);

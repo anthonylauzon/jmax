@@ -136,17 +136,6 @@ by a patch, and create classes, templates, abstractions in packages.
 
 <h2>Compilation issues</h2>
 
-<p>
-Move Makefiles to automake and autoconf (only packages now)
-
-<p>
-Create the fts binary in jmax/fts/bin/fts instead of $(ARCH)/$(MODE).
-This way, you no longer have to specify jmaxHostType to specify which
-executable to start.<br>
-Note: this is related to packages because it is still usefull to have
-ARCH in package's library path (to be able to share installations).
-The ARCH can be known from inside fts (defined at compile time).
-
 <P>
 Reintegrate compilation stuff for compilation date.
 

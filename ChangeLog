@@ -1,3 +1,9 @@
+2001-10-16  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* Fixed a bug in package saving: vm opcode return was missing
+
+	* Added --enable-electric-fence to configure
+
 2001-10-15  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* Changed kernel initialization: now splited into fts_kernel_*_init 

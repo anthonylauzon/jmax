@@ -44,6 +44,7 @@ FTS_API void fts_bmax_code_push_obj_table(fts_bmax_file_t *f, int value);
 FTS_API void fts_bmax_code_pop_obj_table(fts_bmax_file_t *f);
 FTS_API void fts_bmax_code_connect(fts_bmax_file_t *f);
 FTS_API void fts_bmax_code_push_atoms(fts_bmax_file_t *f, int ac, const fts_atom_t *at);
+FTS_API void fts_bmax_code_return(fts_bmax_file_t *f);
 
 FTS_API void fts_bmax_code_set_atom(fts_bmax_file_t *f, const fts_atom_t *a);
 

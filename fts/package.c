@@ -610,6 +610,8 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     fts_package_save_hashtable( &f, this->help, fts_s_help, NULL);
   }
 
+  fts_bmax_code_return( &f);
+
   fts_bmax_file_close( &f);
 }
 

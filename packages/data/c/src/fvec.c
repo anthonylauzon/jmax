@@ -24,6 +24,7 @@
 #include "fvec.h"
 
 #include <stdlib.h>
+#include <ctype.h>
 
 #define FVEC_NO_ALLOC -1
 

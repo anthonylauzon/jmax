@@ -438,9 +438,9 @@ static void a_end_message( client_t *this)
   post( "\n");
 #endif
 
-  /* on which inlet ???? */
+  /* Client messages are sent to the system inlet */
   if (this->dest_object)
-    fts_send_message( this->dest_object, 0, this->selector, this->argc, this->argv);
+    fts_send_message( this->dest_object, fts_SystemInlet, this->selector, this->argc, this->argv);
 
   this->argc = 0;
   this->dest_object = 0;
@@ -663,7 +663,6 @@ static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t
  */
 typedef struct {
   fts_object_t head;
-  fts_object_t *receive;
 } client_send_t;
 
 static void client_send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -692,8 +691,6 @@ static void client_send_delete(fts_object_t *o, int winlet, fts_symbol_t s, int 
 {
   client_send_t *this = (client_send_t *)o;
 
-  if (this->receive)
-    fts_object_delete_from_patcher( this->receive);
 }
 
 static void client_send_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -701,13 +698,15 @@ static void client_send_anything(fts_object_t *o, int winlet, fts_symbol_t s, in
   client_t *client;
 
   client = client_table[OBJECT_ID_CLIENT( fts_object_get_id( o))-1];
-  if (client != NULL) {
-    client_start_message( client);
-    client_put_object( client, o);
-    client_put_symbol( client, s);
-    client_put_atoms( client, ac, at);
-    client_end_message( client);
-  }
+
+  if (client != NULL)
+    {
+      client_start_message( client);
+      client_put_object( client, o);
+      client_put_symbol( client, s);
+      client_put_atoms( client, ac, at);
+      client_end_message( client);
+    }
 }
 
 static fts_status_t client_send_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -717,6 +716,109 @@ static fts_status_t client_send_instantiate(fts_class_t *cl, int ac, const fts_a
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, client_send_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, client_send_delete);
   fts_method_define_varargs(cl, 0, fts_s_anything, client_send_anything);
+
+  return fts_Success;
+}
+
+/***********************************************************************
+ *
+ *  client controler object
+ *
+ */
+
+typedef struct {
+  fts_object_t head;
+  fts_object_t *inlet;
+  fts_object_t *outlet;
+  int gate;
+  int echo;
+} client_cc_t;
+
+static void client_cc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  client_cc_t *this = (client_cc_t *)o;
+  fts_atom_t a[2];
+
+  ac--;
+  at++;
+
+  fts_set_symbol( a, fts_s_inlet);
+  fts_set_object( a+1, fts_get_object(at));
+  fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, &this->inlet);
+
+  fts_connection_new( FTS_NO_ID, this->inlet, 0, (fts_object_t *)this, 0);
+
+  fts_set_symbol( a, fts_s_outlet);
+  fts_set_object( a+1, fts_get_object(at));
+  fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, &this->outlet);
+
+  fts_connection_new( FTS_NO_ID, (fts_object_t *)this, 0, this->outlet, 0);
+
+  this->gate = 0;
+
+  /* By default, we don't echo the message coming from the client to the client */
+  this->echo = 0;
+}
+  
+static void client_cc_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  client_cc_t *this = (client_cc_t *)o;
+
+  fts_object_delete_from_patcher( this->inlet);
+  fts_object_delete_from_patcher( this->outlet);
+}
+
+static void client_cc_anything_fts(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  client_cc_t *this = (client_cc_t *)o;
+  client_t *client;
+
+  /* If we don't echo and the gate is set, do nothing */
+  if ( !this->echo && this->gate )
+    return;
+
+  client = client_table[OBJECT_ID_CLIENT( fts_object_get_id( o))-1];
+
+  if (client != NULL)
+    {
+      client_start_message( client);
+      client_put_object( client, o);
+      client_put_symbol( client, s);
+      client_put_atoms( client, ac, at);
+      client_end_message( client);
+    }
+}
+
+static void client_cc_anything_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  client_cc_t *this = (client_cc_t *)o;
+
+  this->gate = 1;
+
+  fts_outlet_send( o, 0, s, ac, at);
+
+  this->gate = 0;
+}
+
+static void
+client_cc_set_echo(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  client_cc_t *this = (client_cc_t *)obj;
+
+  if ( fts_is_symbol(value) )
+    this->echo = (fts_get_symbol(value) == fts_s_yes);
+}
+
+static fts_status_t client_cc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(client_cc_t), 1, 1, 0); 
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, client_cc_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, client_cc_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_anything, client_cc_anything_client);
+  fts_method_define_varargs(cl, fts_SystemInlet, 0, client_cc_anything_fts);
+
+  fts_class_add_daemon( cl, obj_property_put, fts_new_symbol("echo"), client_cc_set_echo);
 
   return fts_Success;
 }
@@ -739,6 +841,7 @@ void fts_client_config( void)
   fts_class_install( s_client_manager, client_manager_instantiate);
   fts_class_install( fts_new_symbol("client"), client_instantiate);
   fts_class_install( fts_new_symbol("client_send"), client_send_instantiate);
+  fts_class_install( fts_new_symbol("client_cc"), client_cc_instantiate);
 
   fts_set_symbol( at, s_client_manager);
   ac++;

@@ -107,6 +107,11 @@ static void oldclient_flush( oldclient_t *this);
 
 static oldclient_t *oldclient;
 
+int fts_client_is_up( void)
+{
+  return oldclient != 0;
+}
+
 static void
 oldclient_receive( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {

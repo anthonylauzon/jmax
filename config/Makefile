@@ -16,7 +16,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ..
-prefix = /u/worksta/dechelle/projects/jmax/3.0.0/jmax-install/
+prefix = /u/worksta/dechelle/projects/jmax/3.0.0/jmax-install
 exec_prefix = ${prefix}
 
 bindir = ${exec_prefix}/bin
@@ -63,6 +63,7 @@ AS = @AS@
 CC = gcc
 DLLTOOL = @DLLTOOL@
 FTSDIR = ${exec_prefix}/bin
+FTS_SYS_LIBS = -lefence -ldl -laudiofile -lpthread
 JAVACX = javac
 JMAX_VERSION = 3.0.0_latest_cvs
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
@@ -70,6 +71,7 @@ LN_S = ln -s
 MAKEINFO = makeinfo
 OBJDUMP = @OBJDUMP@
 PACKAGE = jmax
+PLATFORM_PACKAGES = alsa oss unixdtd
 RANLIB = ranlib
 ROOTDIR = ${prefix}/share/jmax
 VERSION = 3.0.0_latest_cvs

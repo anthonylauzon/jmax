@@ -62,6 +62,6 @@ vm.c
 
 bin_PROGRAMS=fts
 fts_SOURCES=main.c
-fts_LDADD=-L.libs -lfts -ldl -laudiofile -lm
+fts_LDADD=-L.libs -lfts @FTS_SYS_LIBS@ -lm
 
 INCLUDES=-I$(top_srcdir)/include
