@@ -81,7 +81,7 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
 
   public void redefine( String text) 
   {
-    text = ((this instanceof Inlet) ? "inlet" : "outlet") + text;
+    text = ((this instanceof Inlet) ? "inlet" : "outlet") +" "+text;
 
     ((FtsPatcherObject)ftsObject.getParent()).requestRedefineObject(ftsObject, text);
     itsSketchPad.getDisplayList().remove(this);
