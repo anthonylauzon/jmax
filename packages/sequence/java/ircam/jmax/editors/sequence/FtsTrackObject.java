@@ -449,7 +449,7 @@ public void requestNotifyGuiListeners( double time, TrackEvent evt)
 public void export()
 {
   try{
-    send( FtsSymbol.get("export_midifile_dialog"));
+    send( FtsSymbol.get("export"));
   }
   catch(IOException e)
 {
