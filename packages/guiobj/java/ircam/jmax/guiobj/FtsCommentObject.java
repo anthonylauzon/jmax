@@ -51,9 +51,8 @@ public class FtsCommentObject extends FtsGraphicObject
     public FtsCommentObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
     {
 	super(server, parent, id, args, offset, length);
-
-	ninlets = 0;
-	noutlets = 0;
+	setNumberOfInlets(0);
+	setNumberOfOutlets(0);
     }
 }
 

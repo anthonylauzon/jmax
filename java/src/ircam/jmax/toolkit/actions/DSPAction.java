@@ -41,7 +41,7 @@ public class DSPAction extends EditorAction
 {
   public void doAction(EditorContainer container)
   {
-      FtsDspControl control = ConsoleWindow.getInstance().getDspControl();
+      FtsDspControl control = JMaxApplication.getDspControl();
       control.requestSetDspOn(!control.getDspOn());
   }
 }

@@ -85,15 +85,15 @@ SUBDIRS = dialogs editors fts toolkit widgets
 
 packagedir = $(pkgdatadir)
 package_JAVA = \
-DefaultIcons.java				\
-JMaxObjectCreator.java				\
+JMaxApplication.java				\
 JMaxClassMap.java				\
+JMaxIcons.java					\
+JMaxObjectCreator.java				\
 JMaxPackage.java				\
 JMaxPackageLoader.java				\
 JMaxPackageLoadingException.java		\
 JMaxUtilities.java				\
 JMaxVersion.java				\
-MaxApplication.java				\
 MaxToolFinder.java				\
 MaxVector.java					\
 MaxWindowManager.java				\

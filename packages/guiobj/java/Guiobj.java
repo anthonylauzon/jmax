@@ -115,6 +115,6 @@ public class Guiobj implements JMaxPackage {
     JMaxClassMap.put( "vecdisplay", vecdisplayCreator, "/icons/vecdisplay.gif", "/icons/vecdisplay_cursor.gif", this);
     JMaxClassMap.put( "scope", scopeCreator, "/icons/scope.gif", "/icons/scope_cursor.gif", this);
 
-    ircam.jmax.editors.console.ConsoleWindow.append( "package Guiobj loaded (Java Classes)");
+    System.out.println( "package Guiobj loaded (Java Classes)");
   }
 }

@@ -240,9 +240,9 @@ public class JMaxApplication {
     return singleInstance.properties.getProperty(key, defaultValue);
   }
 
-
   private JMaxApplication()
   {
+    singleInstance = this;
     recentFileHistory = new RecentFileHistory(5);
     properties = new Properties( System.getProperties());
     toOpen = new MaxVector();
@@ -257,8 +257,7 @@ public class JMaxApplication {
     initModules();
     openConsole();
     openConnection();
-
-    // ircam.jmax.editors.console.ConsoleWindow.init();
+    initConsole();
 
     // This should be really here, right before we eventually open command line documents
     recentFileHistory.load();
@@ -269,8 +268,6 @@ public class JMaxApplication {
 
   private void parseCommandLineOptions( String[] args)
   {
-    properties = new Properties(System.getProperties());
-
     //start parsing arguments
     // don't check for valid options, so the user can set
     // command line arguments that can be accessed from tcl scripts
@@ -316,8 +313,7 @@ public class JMaxApplication {
 
   private void initModules()
   {
-    ircam.jmax.dialogs.DialogsModule.initModule();
-    ircam.jmax.editors.patcher.ErmesModule.initModule(true);
+    ircam.jmax.editors.patcher.ErmesModule.initModule();
   }
 
   private void openConsole()
@@ -349,10 +345,10 @@ public class JMaxApplication {
   private class PackageServerListener implements FtsServerListener {
     public void messageReceived( FtsServerEvent event, FtsArgs args)
     {
-      if ( args.isSymbol( 0) 
-	   && args.getSymbol( 0).equals( sPackageLoaded) 
-	   && args.isSymbol( 1) )
-	JMaxPackageLoader.load( args.getSymbol( 1).toString())
+      /*if ( args.isSymbol( 0) 
+	&& args.getSymbol( 0).equals( sPackageLoaded) 
+	&& args.isSymbol( 1) )
+	JMaxPackageLoader.load( args.getSymbol( 1).toString());*/
     }
   }
 

@@ -1,6 +1,5 @@
 packagedir=$(pkgdatadir)
 package_JAVA = \
-DialogsModule.java\
 HTMLDialog.java\
 InputDialog.java\
 MaxFileChooser.java\

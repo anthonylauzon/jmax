@@ -49,7 +49,7 @@ public class StatisticsDialog extends JDialog implements ActionListener, KeyList
 
     parent = (Frame)dw;
   
-    control = ConsoleWindow.getInstance().getDspControl();
+    control = JMaxApplication.getDspControl();
     
     // Do a gc before giving statistics (added by mdc).    
     System.gc();

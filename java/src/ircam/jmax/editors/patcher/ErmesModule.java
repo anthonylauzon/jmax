@@ -25,12 +25,7 @@
 
 package ircam.jmax.editors.patcher;
 
-import java.awt.*; 
 import javax.swing.*; 
-
-import ircam.jmax.*;
-import ircam.jmax.fts.*;
-import ircam.jmax.toolkit.*;
 
 /** The ermes module; the init function is called at init time
  *  by jmax, and install module related things
@@ -38,22 +33,10 @@ import ircam.jmax.toolkit.*;
 
 public class ErmesModule
 {
-  static public void initModule(boolean active)
+  static public void initModule()
   {
-    if (active)
-      {
-	MaxRepaintManager manager = new MaxRepaintManager();
-	// Install the customized Repaint Manager
-	RepaintManager.setCurrentManager(manager);
-	// Optionally set the syncPaint flag
-	if (JMaxApplication.getProperty("syncPaint") != null)
-	  ErmesSketchPad.setSyncPaint(true);
-	  //manager.setSyncPaint(true);
-	
-	//MaxApplication.getFts().addUpdateGroupListener(manager);
-
-	ToolsPanel.registerToolsPanel();
-      }
+    RepaintManager.setCurrentManager(new MaxRepaintManager());
+    ToolsPanel.registerToolsPanel();
   }
 }
 

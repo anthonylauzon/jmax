@@ -25,7 +25,7 @@
 
 package ircam.jmax.widgets;
 
-import ircam.jmax.MaxApplication;
+import ircam.jmax.JMaxApplication;
 
 import javax.swing.*;
 import java.awt.*;

@@ -79,13 +79,6 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   // --------------------------------------
   // FtsUpdateGroupListener interface
   // --------------------------------------  
-  static boolean syncPaint = false;
-  
-  static void setSyncPaint(boolean v)
-  {
-    syncPaint = v;
-  }
-
   public void updateGroupStart()
   {
       resetUpdate();
@@ -553,9 +546,6 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   // create a graphic Object
   // ---------------------------------------------------------------
 
-  /***************************************************************/
-  /*************** ASYNCRONOUS OBJECT CREATION *******************/
-    
   public void addNewObject(GraphicObject object, boolean doEdit)
   {
     displayList.add( object);	

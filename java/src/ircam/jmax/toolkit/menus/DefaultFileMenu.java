@@ -86,7 +86,7 @@ public class DefaultFileMenu extends EditorMenu
       {
 	dspMenuItem.setEnabled(true);
 
-	boolean dspOn = ConsoleWindow.getInstance().getDspControl().getDspOn();
+	boolean dspOn = JMaxApplication.getDspControl().getDspOn();
       
 	if(dspOn) 
 	  dspMenuItem.setText("Desactivate DSP");

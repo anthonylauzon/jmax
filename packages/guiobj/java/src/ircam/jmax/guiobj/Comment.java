@@ -31,6 +31,7 @@ import java.util.*;
 
 import javax.swing.*;
 
+import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.patcher.*;
@@ -76,7 +77,7 @@ public class Comment extends Editable
     // Change the renderer if needed
 
     if ((args != null) && (args.length() > 0)  && args.charAt(0) == '%')
-      icon = Icons.get(args);
+      icon = JMaxIcons.get(args);
 
     if (icon != null)
       renderer = new IconRenderer(this, icon);

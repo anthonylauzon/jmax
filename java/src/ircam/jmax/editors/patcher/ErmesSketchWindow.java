@@ -93,18 +93,6 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     return (! gotMessage);
   }
   
-  public static void touch(FtsServer server)
-  {	
-      /*MaxDocument doc = Mda.getDocumentTypeByName("patcher").newDocument(fts);
-	FtsPatcherObject patch = (FtsPatcherObject)doc.getRootData();
-	ErmesSketchWindow win = new ErmesSketchWindow(fts.getRootObject());
-	MaxWindowManager.getWindowManager().removeWindow(win);
-	win.itsSketchPad.Close(false);
-	win.dispose();*/
-  }
-
-  // -----------------------------------------------
-
   /****************************************************************************/
   /*                                                                          */
   /*           CONSTRUCTOR                                                    */
