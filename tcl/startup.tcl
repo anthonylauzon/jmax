@@ -108,20 +108,35 @@ if {$jmaxSplashScreen != "hide"} then {
   splash $jmaxRootDir/images/Splash.gif [getMaxVersion]
 }
 
-# boot jMax server
+# start jMax server
+set jmaxBinDir "$jmaxRootDir/fts/bin/$jmaxArch/$jmaxMode"
 
-set jmaxBinDir $jmaxRootDir/fts/bin/$jmaxArch/$jmaxMode
-puts "jMax starting server with parameters $jmaxBinDir $jmaxServerName $jmaxConnection $jmaxHost $jmaxPort" 
+if {$jmaxConnection == "client"} {
+  puts "jMax starting server on \"$jmaxHost\" via TCP/IP"
+} elseif {$jmaxConnection == "udp"} {
+  puts "jMax starting server on \"$jmaxHost\" via UDP"
+} elseif {$jmaxConnection == "socket"} {
+  puts "jMax connecting to server on \"$jmaxHost\" via TCP/IP port $jmaxPort"
+}
+
+if {$jmaxMode == "debug"} {
+  puts "jMax in DEBUG mode"
+}
+
 ftsconnect $jmaxBinDir $jmaxServerName $jmaxConnection $jmaxHost $jmaxPort
 
 # hello server
 ucs show welcome
 sync
 
-# loading installation default packages
+# load gui server side objects
+package require guiobj
+package require system
+
+# load installation default packages
 sourceFile $jmaxRootDir/config/packages.tcl
 
-# loading installation default audio configuration
+# load installation default audio configuration
 # if profiling is off
 if {[systemProperty "profile"] == "true"} {
   puts "running with pseudo audio device for profiling"
