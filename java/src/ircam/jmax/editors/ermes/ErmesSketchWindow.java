@@ -1209,8 +1209,8 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       System.err.println("sketchW.contentPane: "+getContentPane().getBounds());*/
     itsPatcher.put("wx", aRect.x);
     itsPatcher.put("wy", aRect.y);
-    itsPatcher.put("ww", aRect1.width);//e.m.1103
-    itsPatcher.put("wh", aRect1.height);//e.m.1103
+    itsPatcher.put("ww", aRect.width-horizontalOffset());//e.m.1103
+    itsPatcher.put("wh", aRect.height-verticalOffset());//e.m.1103
 
     if (itsSketchPad.doAutorouting) itsPatcher.put("autorouting", "on");
     else itsPatcher.put("autorouting", "off");
