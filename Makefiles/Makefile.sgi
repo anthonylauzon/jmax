@@ -47,7 +47,7 @@ INSTALL_LIB=$(INSTALL) -m 755
 INSTALL_DIR=$(INSTALL) -dir -m 755
 
 prefix=/usr
-doc_install_dir=$(prefix)/webdocs/jMax
+doc_install_dir=$(prefix)/webdocs/jMax-$(JMAX_VERSION)
 lib_install_dir=$(prefix)/lib/jmax
 include_install_dir=$(prefix)/include
 bin_install_dir=$(prefix)/bin

@@ -44,7 +44,7 @@ INSTALL_LIB=$(INSTALL) --mode=0755
 INSTALL_DIR=$(INSTALL) -d --mode=0755
 
 prefix=/usr
-doc_install_dir=$(prefix)/doc/jMax-$(version)
+doc_install_dir=$(prefix)/doc/jMax-$(JMAX_VERSION)
 lib_install_dir=$(prefix)/lib/jmax
 include_install_dir=$(prefix)/include
 bin_install_dir=$(prefix)/bin

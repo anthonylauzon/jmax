@@ -166,21 +166,6 @@ dist:
 	)
 .PHONY: dist
 
-old-dist:
-	( \
-		umask 22 ; \
-		mkdir .$$$$ ; \
-		cd .$$$$ ; \
-		TTT=V`echo $(VERSION) | sed 's/\./_/g'` ; \
-		cvs export -r$$TTT jmax ; \
-		mv jmax jmax-$(VERSION) ; \
-		tar cvf - jmax-$(VERSION) | gzip -c --best > ../../jmax-$(VERSION)-src.tar.gz ; \
-		chmod 644 ../../jmax-$(VERSION)-src.tar.gz ; \
-		cd .. ; \
-		/bin/rm -rf .$$$$ ; \
-	)
-.PHONY: old-dist
-
 
 #
 # install
