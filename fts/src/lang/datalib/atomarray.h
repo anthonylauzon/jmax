@@ -42,7 +42,7 @@ extern void fts_atom_array_set_size(fts_atom_array_t *array, int size);
 #define fts_atom_array_is_empty(array) ((array)->size == 0)
 
 #define fts_atom_array_get_element(array, index) ((array)->atoms[index])
-#define fts_atom_array_set_element(array, index, value) ((array)->atoms[index] = (value))
+#define fts_atom_array_set_element(array, index, value) (fts_assign((array)->atoms + index, (value)))
 
 extern void fts_atom_array_set_const(fts_atom_array_t *array, fts_atom_t constant);
 

@@ -14,6 +14,8 @@
 #ifndef _FTSDATA_H_
 #define _FTSDATA_H_
 
+#include "messages.h"
+
 extern void fts_data_module_init(void);
 
 /************************************************************************
@@ -46,17 +48,7 @@ extern int fts_data_get_atoms(fts_data_t *data, int ac, fts_atom_t *at);
 
 /* (incognito): oops, little journey to the message world */
 extern void fts_method_define_data(fts_class_t *class, int winlet, fts_method_t fun);
-#define fts_outlet_data(O, WOUTLET, DATA) \
-do { \
-  fts_connection_t *__conn; \
-  fts_atom_t __a; \
- \
-  fts_set_data(&__a, (DATA)); \
-  \
-  __conn = (O)->out_conn[(WOUTLET)]; \
- \
-  fts_send(__conn, fts_data_get_class_name(DATA), 1, &__a); \
-} while(0)
+extern void fts_outlet_data(fts_object_t *o, int woutlet, fts_data_t *data);
 
 /* (nos): "old" stuff */
 extern void fts_data_init( fts_data_t *data, fts_data_class_t *class);

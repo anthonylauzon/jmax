@@ -304,6 +304,24 @@ fts_method_define_data(fts_class_t *class, int winlet, fts_method_t fun)
   fts_method_define_optargs(class, winlet, fts_s_atom_array, fun, 1, &fts_s_data, 1);
 }
 
+void
+fts_outlet_data(fts_object_t *o, int woutlet, fts_data_t *data)
+{
+  fts_connection_t *conn;
+  fts_atom_t atom;
+
+  fts_set_data(&atom, data);
+
+  conn = o->out_conn[woutlet];
+
+  while(conn)
+    {
+      fts_send_message(conn->dst, conn->winlet, fts_data_get_class_name(data), 1, &atom); 
+
+      conn = conn->next_same_src;
+    }
+}
+
 /*******************************************************************
  *
  *  (nos): "old" stuff

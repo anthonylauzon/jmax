@@ -36,8 +36,10 @@ fts_data_class_t *fts_atom_array_data_class = 0;
 
 /* local */
 
-static void atom_array_set_size(fts_atom_array_t *array, int size)
+static void atom_array_realloc(fts_atom_array_t *array, int size)
 {
+  int i;
+
   if(size > array->alloc)
     {
       if(array->alloc)
@@ -47,7 +49,13 @@ static void atom_array_set_size(fts_atom_array_t *array, int size)
 
       array->alloc = size;
     }
-
+  else
+    {
+      /* if shorter, void atoms at the end (release references) */
+      for(i=size; i<array->size; i++)
+	fts_void(array->atoms + i);
+    }
+  
   array->size = size;
 }
 
@@ -128,7 +136,7 @@ void
 fts_atom_array_copy(fts_atom_array_t *in, fts_atom_array_t *out)
 {
   int i;
-  atom_array_set_size(out, in->size);
+  atom_array_realloc(out, in->size);
   
   for(i=0; i<in->size; i++)
     out->atoms[i] = in->atoms[i];
@@ -148,16 +156,13 @@ void
 fts_atom_array_set_size(fts_atom_array_t *array, int size)
 {
   int old_size = array->size;
-  int tail = size - old_size;
   int i;
 
-  atom_array_set_size(array, size);
+  atom_array_realloc(array, size);
 
-  if(tail > 0)
-    {
-      for(i=old_size; i<array->size; i++)
-	fts_void(array->atoms + i);
-    }
+  /* if longer, set new atoms at the end to void */
+  for(i=old_size; i<size; i++)
+    fts_set_void(array->atoms + i);
 }
 
 void

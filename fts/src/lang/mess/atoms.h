@@ -151,8 +151,7 @@ extern int fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const
 /* Atom printing function, usually for debug */
 void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at);
 
-extern void fts_xassign(fts_atom_t *atom, fts_atom_t *assign);
-extern void fts_reassign(fts_atom_t *atom, fts_atom_t *assign);
+extern void fts_assign(fts_atom_t *atom, fts_atom_t assign);
 extern void fts_void(fts_atom_t *atom);
 
 #endif

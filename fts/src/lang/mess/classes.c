@@ -200,7 +200,10 @@ fts_class_register(fts_metaclass_t *mcl, int ac, const fts_atom_t *at, fts_class
   cl->at = fts_malloc(ac * sizeof(fts_atom_t));
 
   for(i=0; i<ac; i++)
-    fts_assign((fts_atom_t *)cl->at + i, at + i);
+    {
+      fts_set_void((fts_atom_t *)cl->at);
+      fts_assign((fts_atom_t *)cl->at + i, at[i]);
+    }
 
   cl->next = mcl->inst_list;
   mcl->inst_list = cl;
