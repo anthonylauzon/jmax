@@ -22,7 +22,9 @@ value.c \
 vec.c \
 dumpfile.c
 
+# Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
 if MACOSX
+
 # This causes libtool to issue a warning and not to produce the .so 
 XLDFLAGS= -no-undefined -module
 XLIBADD= -L$(top_srcdir)/packages/utils/c/src/.libs -lutils -L$(top_srcdir)/fts/.libs -lfts 
@@ -31,7 +33,7 @@ XLIBADD= -L$(top_srcdir)/packages/utils/c/src/.libs -lutils -L$(top_srcdir)/fts/
 all-local: .libs/libdata.so
 
 .libs/libdata.so: $(libdata_la_OBJECTS) $(libdata_la_DEPENDENCIES)
-	cc -bundle -undefined error -o .libs/libdata.so $(libdata_la_OBJECTS) $(XLIBADD) -lm -lc 
+	cc -bundle -undefined error -o $@ $(libdata_la_OBJECTS) $(XLIBADD) -lm -lc 
 
 install-data-local: .libs/libdata.so
 	$(INSTALL_DATA) .libs/libdata.so $(DESTDIR)$(packagedir)/libdata.so
