@@ -141,6 +141,12 @@ private boolean staffIsDrawable(int numGroup, int maxPitch, int minPitch)
 			}
 }
 
+public static boolean isPitchInGrayStaff(int p)
+{		
+	return (p >=10 && p<=17) || (p >=34 && p<=43) || (p >=58 && p<=62) || 
+				 (p >=79 && p<=86) || (p >=103 && p<=110);
+}
+
 /* NOTE: draw always black staff after gray staff */
 private void drawBlackStaff(Graphics g, int startLine, int key)
 {
@@ -252,9 +258,6 @@ private void drawHorizontalGrid(Graphics g)
 	/********* Third Violin Line **********************************************/	
 	if(staffIsDrawable(11, maxPitch, minPitch))
 		drawBlackStaff( g, 34, VIOLIN_KEY);
-	/********* Vertical Lines at the end of keyboard **************************/
-	/*g.setColor(Color.gray);
-	g.drawLine(KEYEND, 0, KEYEND, d.height);*/
 }
 
 //???????????????????????????????
@@ -291,26 +294,7 @@ public void render( Graphics g, int order)
 	
 	if( gc.getGridMode() == MidiTrackEditor.TIME_GRID)
 		drawVerticalGrid(g);
-	/*else
-		drawMeasures(g);*/
 }
- 
-/*private void drawMeasures(Graphics g)
-{
-	FtsTrackObject markers = gc.getMarkersTrack();
-	if( markers!= null)
-	{
-		TrackEvent evt;
-		Dimension d = gc.getGraphicDestination().getSize();
-		
-    for (Enumeration e = markers.intersectionSearch( gc.getAdapter().getInvX(ScoreBackground.KEYEND), 
-																										 gc.getAdapter().getInvX(d.width-ScoreBackground.KEYEND)); e.hasMoreElements();) 
-		{
-			evt = (TrackEvent) e.nextElement();
-			evt.getRenderer().render( evt, g, false, gc);
-		}
-	}
-}*/
 
 private void drawVerticalGrid(Graphics g)
 {
@@ -386,7 +370,6 @@ boolean toRepaintBack = false;
 boolean locked = false;
 public static final Color horizontalGridLinesColor = new Color(220, 220, 220);   
 public static final Font gridSubdivisionFont = new Font("Serif", Font.PLAIN, 10);
-//public static final Font bracketFont = new Font("Palatino", Font.PLAIN, 90);
 
 public static final int KEYX = 27;
 public static final int KEYWIDTH = 28;

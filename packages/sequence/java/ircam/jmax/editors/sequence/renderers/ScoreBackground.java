@@ -35,20 +35,20 @@ import java.util.*;
 import javax.swing.*;
 
 /**
-* The background layer of a score. It builds the background Image for the 
+* The background layer of a score. It builds the background Image for the		
  * piano roll representation */
 public class ScoreBackground implements Layer{
-  
-  /** Constructor */
-  public ScoreBackground ( SequenceGraphicContext theGc)
-  {
-    super();
-    
-    gc = theGc; 
+	
+	/** Constructor */
+	public ScoreBackground ( SequenceGraphicContext theGc)
+	{   
+		super();
 		
-    gc.getTrack().getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
+		gc = theGc; 
+		
+		gc.getTrack().getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e)
-		  {		
+		{		
 				String name = e.getPropertyName();
 				if (name.equals("rangeMode") || name.equals("trackName"))
 				{
@@ -62,27 +62,24 @@ public class ScoreBackground implements Layer{
 						toRepaintBack = true;
 						gc.getGraphicDestination().repaint();
 					}
-			}
+		}
 		});
 		gc.getAdapter().getGeometry().getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e)
-		  {		
+		{		
 				String name = e.getPropertyName();
 				if( name.equals("gridMode"))
 				{
 					toRepaintBack = true;
 					gc.getGraphicDestination().repaint();
 				}
-			}
+		}
 		});
 		
-	}
+}
 
 public static int getMaxPitchInStaff(int max)
 {
-	/*int num = max % 12;
-	if(num < 10) return (num+1)*12;
-	else return 127;*/
 	if(max <= 11) return 11;
 	else if(max <= 23) return 23;
 	else if( max <= 35) return 35;
@@ -269,25 +266,6 @@ public void render( Graphics g, int order)
 	
 	if( gc.getGridMode() == TrackEditor.TIME_GRID)
 		drawVerticalGrid(g);
-	/*else
-		drawMeasures(g);*/
-}
-
-private void drawMeasures(Graphics g)
-{
-	FtsTrackObject markers = gc.getMarkersTrack();
-	if( markers!= null)
-	{
-		TrackEvent evt;
-		Dimension d = gc.getGraphicDestination().getSize();
-		
-    for (Enumeration e = markers.intersectionSearch( gc.getAdapter().getInvX(ScoreBackground.KEYEND), 
-																										 gc.getAdapter().getInvX(d.width-ScoreBackground.KEYEND)); e.hasMoreElements();) 
-		{
-			evt = (TrackEvent) e.nextElement();
-			evt.getRenderer().render( evt, g, false, gc);
-		}
-	}
 }
 
 private void drawVerticalGrid(Graphics g)

@@ -49,8 +49,6 @@ public class MonoTrackRenderer extends AbstractTrackRenderer{
   {  
     super(theGc);
 
-    tempList = new MaxVector();
-
     itsForegroundLayer = new MonoTrackForeground(gc);
 
     itsLayers.addElement(new MonoTrackBackground(gc));
@@ -116,8 +114,6 @@ public class MonoTrackRenderer extends AbstractTrackRenderer{
 
   //------------------  Fields
   MonoTrackForeground itsForegroundLayer;
-  
-  protected MaxVector tempList;
 }
 
 

@@ -93,7 +93,6 @@ public class MidiTrackEditor extends TrackBaseEditor
 		int pitch;
 		for(Enumeration e = track.getTrackDataModel().getEvents(); e.hasMoreElements();)
 		{
-			//pitch = ((Integer)((TrackEvent)e.nextElement()).getProperty("pitch")).intValue();
 			pitch = (int)((Double)((TrackEvent)e.nextElement()).getProperty("pitch")).doubleValue();
 			if(pitch > max) max = pitch;
 		}
@@ -109,7 +108,6 @@ public class MidiTrackEditor extends TrackBaseEditor
 		int pitch;
 		for(Enumeration e = track.getTrackDataModel().getEvents(); e.hasMoreElements();)
 		{
-			//pitch = ((Integer)((TrackEvent)e.nextElement()).getProperty("pitch")).intValue();
 			pitch = (int)((Double)((TrackEvent)e.nextElement()).getProperty("pitch")).doubleValue();
 			if(pitch < min) min = pitch;
 		}

@@ -129,6 +129,16 @@ public class MonoDimensionalAdapter extends PartitionAdapter {
 	return minValue;
     }
 
+	public int getMinScoreY()
+  { 
+	  return 0; 
+  }
+
+	public int getMaxScoreY()
+	{
+		return gc.getGraphicDestination().getSize().height; 
+	}
+	
     ////////////////// PropertyChangeListener interface
     public void propertyChange(PropertyChangeEvent e)
     {

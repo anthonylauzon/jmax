@@ -57,8 +57,6 @@ public class ScoreRenderer extends AbstractTrackRenderer{
       g.setYInvertion(true);
       g.setYTransposition(136);//??
     }
-    
-    tempList = new MaxVector();
 		
     scoreBackground = new ScoreBackground(gc);
     partitionBackground = new PartitionBackground(gc);
@@ -143,28 +141,6 @@ public Object firstObjectContaining(int x, int y)
   return last;
 }
 
-public Object firstMarkerContaining(int x, int y)
-{
-  TrackEvent aTrackEvent;
-  TrackEvent last = null;
-  
-  double startTime = gc.getAdapter().getInvX(x);
-  double endTime = gc.getAdapter().getInvX(x+AmbitusEventRenderer.CUE_WIDTH+2);
-
-	/* search for markers */
-	if(gc.getMarkersTrack() != null)
-	{
-		for (Enumeration e = gc.getMarkersTrack().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
-		{      
-			aTrackEvent = (TrackEvent) e.nextElement();
-			
-			if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
-				last = aTrackEvent;
-		}
-	}
-	
-  return last;
-}
 
 /**
 * returns an enumeration of all the events whose graphic representation
@@ -202,8 +178,6 @@ PartitionBackground partitionBackground;
 
 public static final int XINTERVAL = 10;
 public static final int YINTERVAL = 3;
-
-private MaxVector tempList;
 }
 
 

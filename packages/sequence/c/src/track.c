@@ -902,7 +902,7 @@ track_upload_markers(track_t *this)
     else
       fts_set_symbol(a + 1, fts_s_void);     		
 		
-		fts_client_send_message((fts_object_t *)this, seqsym_markers, 2, &a);
+		fts_client_send_message((fts_object_t *)this, seqsym_markers, 2, a);
 
 		fts_send_message((fts_object_t *)this->markers, fts_s_upload, 0, NULL);
 	}

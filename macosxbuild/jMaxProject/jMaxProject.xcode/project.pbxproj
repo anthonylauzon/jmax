@@ -3746,6 +3746,7 @@
 				INFOPLIST_FILE = "libfts-info.plist";
 				INSTALL_PATH = "@executable_path/../lib";
 				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
+				LIBRARY_STYLE = DYNAMIC;
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_LIBTOOL_FLAGS = "";

@@ -168,6 +168,8 @@ void selectArea(int x, int y, int w, int h)
 { 
 	SequenceGraphicContext egc = (SequenceGraphicContext)gc;
 	selectArea(egc.getRenderManager(), egc.getSelection(), x, y,  w,  h);
+	if( egc.getMarkersSelection() != null)
+		egc.getMarkersSelection().select( ((AbstractTrackRenderer)egc.getRenderManager()).markersIntersecting(x, y, w, h));
 }
 
 

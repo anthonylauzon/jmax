@@ -76,20 +76,32 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
 	Event e = (Event) obj;
 	SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 	
-	int x = ((PartitionAdapter)gc.getAdapter()).getX(e);
+	PartitionAdapter pa = (PartitionAdapter)(gc.getAdapter());
+	int maxY = pa.getMaxScoreY();
+	int minY = pa.getMinScoreY();
+	
+	int x = pa.getX(e);
+	Color col, lightCol;
 	switch(state)
 		{
 		case Event.SELECTED:
-			g.setColor( selectedColor);
-			break;
-		case Event.DESELECTED:
-			g.setColor( Color.darkGray);
+			col = selMarkColor;
+			lightCol = lightSelMarkColor;
 			break;
 		case Event.HIGHLIGHTED:
-			g.setColor( highlightColor);
+			col = highMarkColor;
+			lightCol = lightHighColor;
+			break;
+		default:
+		case Event.DESELECTED:
+			col = markColor;
+			lightCol = lightMarkColor;
 			break;
 		}
-	g.drawLine( x, 0, x, gc.getGraphicDestination().getSize().height-2);
+	g.setColor( col);
+	g.drawLine( x, minY, x, maxY);
+	g.setColor( lightCol);
+	g.drawLine(x, maxY, x, 0);
 }
 
 public void renderBounds(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
@@ -114,7 +126,6 @@ public boolean contains(Object obj, int x, int y, GraphicContext theGc)
 	int evtx = gc.getAdapter().getX(e);
 	return (x <= evtx+2 && x >= evtx-2);		
 }
-
 
 Rectangle eventRect = new Rectangle();
 Rectangle tempRect = new Rectangle();
@@ -154,9 +165,13 @@ final static int NOTE_DEFAULT_WIDTH = 5;
 public SequenceGraphicContext gc;
 public static MarkerEventRenderer staticInstance;
 
-Color deselectedColor = new Color( 0, 0, 0, 180);
-Color selectedColor = new Color(255, 0, 0, 180);
-Color highlightColor = new Color(0, 255, 0, 180);
+Color lightMarkColor = new Color(165, 165, 165, 100);
+Color lightSelMarkColor = new Color(255, 0, 0, 100);
+Color lightHighColor = new Color(0, 255, 0, 100);
+
+Color markColor = new Color( 0, 0, 0, 180);
+Color selMarkColor = new Color(255, 0, 0, 180);
+Color highMarkColor = new Color(0, 255, 0, 180);
 
 int oldX, oldY;
 }

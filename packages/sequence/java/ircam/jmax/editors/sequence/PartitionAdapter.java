@@ -341,6 +341,8 @@ public void setLabelType( String type)
 public void setViewMode(int mode)
 {
 	viewMode = mode;
+	setMaxScoreY();
+	setMinScoreY();
 }
 public int getViewMode()
 {
@@ -350,6 +352,8 @@ public int getViewMode()
 public void setRangeMode(int rangeMode)
 {
 	this.rangeMode = rangeMode;
+	setMaxScoreY();
+	setMinScoreY();
 }
 
 public int getRangeMode()
@@ -384,6 +388,74 @@ public int getMinPitch()
 	return minPitch;
 }
 
+/* Returns max and min Graphic Y corresponding to the score top and bottom */
+int minScoreY, maxScoreY;
+
+public void setMinScoreY()
+{
+	int minY;
+	if( getRangeMode() == MidiTrackEditor.WHOLE_RANGE)
+	{
+		if(getViewMode() == MidiTrackEditor.PIANOROLL_VIEW)
+			minY = getY(127)-2;		
+		else
+			minY = getY(125);
+	}
+	else
+	{
+		int maxPtc = ((MidiTrackEditor)gc.getTrackEditor()).getMaximumPitchInTrack();
+		minY = getY(maxPtc) - getVerticalTransp();
+		if(getViewMode() == MidiTrackEditor.PIANOROLL_VIEW)
+			minY -= 2;
+		else
+		{
+			if(maxPtc == 127)
+				minY = getY(125);
+			else
+				if( PartitionBackground.isPitchInGrayStaff(maxPtc))
+					minY -= 3;
+		}
+	}
+	minScoreY = minY;
+}
+
+public int getMinScoreY()
+{
+	return minScoreY;
+}
+
+public void setMaxScoreY()
+{
+	int maxY;
+	if( getRangeMode() == MidiTrackEditor.WHOLE_RANGE)
+	{
+		if(getViewMode() == MidiTrackEditor.PIANOROLL_VIEW)
+			maxY = getY(0)+2;		
+		else
+			maxY = getY(0)+(getY(0)-getY(5));
+	}
+	else
+	{
+		int minPtc = ((MidiTrackEditor)gc.getTrackEditor()).getMinimumPitchInTrack();
+		maxY = getY(minPtc) - getVerticalTransp();
+		if(getViewMode() == MidiTrackEditor.PIANOROLL_VIEW) 
+			maxY += 2;
+		else
+		{
+			if(minPtc == 0)
+				maxY = getY(0)+(getY(0)-getY(5));
+			else
+				if( PartitionBackground.isPitchInGrayStaff(minPtc))
+					maxY += 3;			
+		}
+	}
+	maxScoreY = maxY;
+}
+
+public int getMaxScoreY()
+{
+	return maxScoreY;
+}
 ////////////////// PropertyChangeListener interface
 public void propertyChange(PropertyChangeEvent e)
 {

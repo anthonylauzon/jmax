@@ -48,7 +48,6 @@ public class AnythingTrackRenderer extends AbstractTrackRenderer{
   public AnythingTrackRenderer(SequenceGraphicContext theGc) 
 {  
     super(theGc);
-    tempList = new MaxVector();
 		
     itsForegroundLayer = new AnythingTrackForeground(gc);
 		
@@ -105,8 +104,6 @@ public Enumeration objectsIntersecting(int x, int y, int w, int h)
 
 //------------------  Fields
 AnythingTrackForeground itsForegroundLayer;
-
-protected MaxVector tempList;
 }
 
 

@@ -49,16 +49,55 @@ public class AbstractTrackRenderer extends AbstractRenderer{
   {  
     super();
 		gc = theGc;
+		tempList = new MaxVector();
   }
   
 	public Object firstMarkerContaining(int x, int y)
   {
-    return null;
-  }
+		TrackEvent aTrackEvent;
+		TrackEvent last = null;
+  
+		double startTime = gc.getAdapter().getInvX(x);
+		double endTime = gc.getAdapter().getInvX(x+AmbitusEventRenderer.CUE_WIDTH+2);
+
+		/* search for markers */
+		if(gc.getMarkersTrack() != null)
+		{
+			for (Enumeration e = gc.getMarkersTrack().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
+			{      
+				aTrackEvent = (TrackEvent) e.nextElement();
+			
+				if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
+					last = aTrackEvent;
+			}
+		}	
+		return last;
+	}
+
+	public Enumeration markersIntersecting(int x, int y, int w, int h) 
+	{
+		TrackEvent aTrackEvent;
 	
-  //------------------  Fields
-  SequenceGraphicContext gc;
-  protected MaxVector tempList;
+		tempList.removeAllElements();
+		double startTime = gc.getAdapter().getInvX(x);
+		double endTime = gc.getAdapter().getInvX(x+w);
+  
+		/* search for markers */
+		if(gc.getMarkersTrack() != null)
+		{
+			for (Enumeration e = gc.getMarkersTrack().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
+			{
+				aTrackEvent = (TrackEvent) e.nextElement();
+		
+				if (aTrackEvent.getRenderer().touches(aTrackEvent, x, y, w, h, gc))
+					tempList.addElement(aTrackEvent);
+			}
+		}
+		return tempList.elements();
+	}
+//------------------  Fields
+SequenceGraphicContext gc;
+protected MaxVector tempList;
 }
 
 

@@ -154,11 +154,10 @@ public void paintMeasures(Graphics g)
 			else
 				g.setColor( Color.darkGray);
 
-			g.drawLine( x, 18, x, d.height);
 			if(type.equals("tempo"))
 			{
-				g.drawString("x", x - 8, 18);
-				g.drawString("y", x - 8, 26);
+				g.drawString("x", x - 2, 8);
+				g.drawString("y", x - 2, 16);
 			}
 		}
 	}
@@ -223,7 +222,7 @@ FontMetrics fm;
 PartitionAdapter utilityPartitionAdapter;
 Geometry geometry;
 SequenceGraphicContext gc;
-public final static int TEMPO_HEIGHT = 30/*15*/; 
+public final static int TEMPO_HEIGHT = 20; 
 JLabel displayLabel;
 Displayer oldDisplayer;
 }    
