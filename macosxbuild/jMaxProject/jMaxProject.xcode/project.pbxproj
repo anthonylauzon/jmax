@@ -623,6 +623,93 @@
 			settings = {
 			};
 		};
+		3BBF89C30769F7FF00EB776F = {
+			buildPhases = (
+			);
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = all;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+			};
+			dependencies = (
+				3BBF89C70769F7FF00EB776F,
+				3BBF89C80769F7FF00EB776F,
+				3BBF89CC0769F85600EB776F,
+				3BBF89CE0769F85600EB776F,
+				3BBF89D00769F85600EB776F,
+				3BBF89D20769F85600EB776F,
+				3BBF89CA0769F7FF00EB776F,
+			);
+			isa = PBXAggregateTarget;
+			name = all_JAVA;
+			productName = all;
+		};
+		3BBF89C70769F7FF00EB776F = {
+			isa = PBXTargetDependency;
+			target = 5C54289605AB0B960042B7A2;
+			targetProxy = 5C43B8DC05AB45E300E7FB5C;
+		};
+		3BBF89C80769F7FF00EB776F = {
+			isa = PBXTargetDependency;
+			target = 5C5428AB05AB0B970042B7A2;
+			targetProxy = 5C43B8DE05AB45E300E7FB5C;
+		};
+		3BBF89CA0769F7FF00EB776F = {
+			isa = PBXTargetDependency;
+			target = 5C54253A05AB0B8A0042B7A2;
+			targetProxy = 5C542B6805AB0BA30042B7A2;
+		};
+		3BBF89CB0769F85600EB776F = {
+			containerPortal = F880FCE90282F7CE01664092;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 5C5429C505AB0B990042B7A2;
+			remoteInfo = data.jar;
+		};
+		3BBF89CC0769F85600EB776F = {
+			isa = PBXTargetDependency;
+			target = 5C5429C505AB0B990042B7A2;
+			targetProxy = 3BBF89CB0769F85600EB776F;
+		};
+		3BBF89CD0769F85600EB776F = {
+			containerPortal = F880FCE90282F7CE01664092;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 5C542A4105AB0B9C0042B7A2;
+			remoteInfo = sequence.jar;
+		};
+		3BBF89CE0769F85600EB776F = {
+			isa = PBXTargetDependency;
+			target = 5C542A4105AB0B9C0042B7A2;
+			targetProxy = 3BBF89CD0769F85600EB776F;
+		};
+		3BBF89CF0769F85600EB776F = {
+			containerPortal = F880FCE90282F7CE01664092;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 5C542A0705AB0B9A0042B7A2;
+			remoteInfo = guiobj.jar;
+		};
+		3BBF89D00769F85600EB776F = {
+			isa = PBXTargetDependency;
+			target = 5C542A0705AB0B9A0042B7A2;
+			targetProxy = 3BBF89CF0769F85600EB776F;
+		};
+		3BBF89D10769F85600EB776F = {
+			containerPortal = F880FCE90282F7CE01664092;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 5C542ADD05AB0B9E0042B7A2;
+			remoteInfo = ispw.jar;
+		};
+		3BBF89D20769F85600EB776F = {
+			isa = PBXTargetDependency;
+			target = 5C542ADD05AB0B9E0042B7A2;
+			targetProxy = 3BBF89D10769F85600EB776F;
+		};
 		3BCA10F6062406F7008FC824 = {
 			buildPhases = (
 			);
@@ -21130,6 +21217,7 @@
 				5C542B3105AB0BA00042B7A2,
 				3BCA10F6062406F7008FC824,
 				3BA4061106A57AAD0097A99B,
+				3BBF89C30769F7FF00EB776F,
 			);
 		};
 		F880FCEA0282F7CE01664092 = {

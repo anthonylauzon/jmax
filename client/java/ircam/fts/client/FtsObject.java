@@ -204,6 +204,8 @@ public class FtsObject implements Serializable
     description = descr;
   }  
   
+	public static void requestResetGui(){}  
+  
   private int id;
   private transient FtsServer server;
   private transient BinaryProtocolEncoder encoder;

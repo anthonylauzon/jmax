@@ -137,6 +137,7 @@ public void openEditor(int argc, FtsAtom[] argv)
 {
   createEditor();
 	showEditor();
+  FtsObject.requestResetGui();
 }
 
 /**

@@ -77,6 +77,7 @@ public class FtsIvecObject extends FtsObjectWithEditor
   {
     createEditor();
     showEditor();
+    FtsObject.requestResetGui();
   }
   
   public void destroyEditor()

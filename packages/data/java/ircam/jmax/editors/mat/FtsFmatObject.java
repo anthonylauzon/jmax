@@ -107,6 +107,7 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
   {
     createEditor();  
     showEditor();
+    FtsObject.requestResetGui();
   }
   
   public void destroyEditor()

@@ -105,6 +105,7 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
   {
     createEditor();    
     showEditor();
+    FtsObject.requestResetGui();
   }
   
   public void destroyEditor()
