@@ -1,3 +1,11 @@
+2001-06-13  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* remove Fts standard error window and move FTS standard error to a
+	file ($HOME/.fts-stderr).
+
+	* fixed audioport bug (null audioport was not instanciated, resulting in
+	100% CPU)
+
 2001-06-05  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* fixed multichannel bug (all outlets of a dsp objects were allocated the

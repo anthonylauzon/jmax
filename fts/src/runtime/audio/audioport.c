@@ -732,6 +732,8 @@ void audioport_config( void)
 
   fts_set_symbol( &argv[0], fts_new_symbol("nullaudioport"));
   fts_object_new_to_patcher( fts_get_root_patcher(), 1, argv, (fts_object_t **)&null_audioport);
+  if (!null_audioport)
+    fprintf( stderr, "[FTS] audioport internal error (cannot create null audio port)\n");
 
   fts_set_symbol( &argv[0], fts_new_symbol("audioport_guard"));
   fts_object_new_to_patcher( fts_get_root_patcher(), 1, argv, (fts_object_t **)&audioport_guard);

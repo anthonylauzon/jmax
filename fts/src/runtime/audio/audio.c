@@ -31,7 +31,9 @@ extern void nullaudioport_config( void);
 
 static void audio_init( void)
 {
+  /* Must be ***before** audioport_config() */
   nullaudioport_config();
+
   audioport_config();
 }
 

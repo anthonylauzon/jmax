@@ -18,46 +18,32 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
-// Based on Max/ISPW by Miller Puckette.
-//
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-// 
+
 
 package ircam.jmax.fts;
 
 import java.io.*;
-import java.awt.event.*;
-
-import ircam.jmax.*;
-import ircam.jmax.utils.*;
+import java.util.*;
 
 /**
- * This class implement a listener on a stream. <br>
+ * This class is used to show the FTS standard error by listening on
+ * the FTS process error stream.<BR>
  * When instantiated with the startFtsErrorStream static method,
- * it listen an input stream, and pop up a window where the input 
- * stream is copied.<br>
- * The window is created only when at least one character has been
- * read; this class is used to show the FTS standard error. <p>
- * <b>bug:</b> The window use a constant title that prevent its
- * use in other situation; it should also go in a generic library.
+ * it listen an input stream, and writes the result in a file name .fts-stderr
+ * located in user's home directory
  */
 
 class FtsErrorStreamer implements Runnable
 {
-  InputStream in;
-  TextWindow window = null;
-  PrintStream out = null;
-  boolean running = true;
-  static FtsErrorStreamer errorStreamer;
+  private InputStream in;
+  private PrintStream out;
+  private boolean running;
 
+  private static FtsErrorStreamer errorStreamer;
+  
   static void startFtsErrorStreamer(InputStream in)
   {  
-    Thread streamer;
-
     errorStreamer = new FtsErrorStreamer(in);
-    streamer = new Thread(errorStreamer, "Error Streamer");
-    streamer.setDaemon(true);
-    streamer.start();
   }
 
   static void stopFtsErrorStreamer()
@@ -65,50 +51,31 @@ class FtsErrorStreamer implements Runnable
     errorStreamer.running = false;
   }
 
-  FtsErrorStreamer(InputStream in)
+  FtsErrorStreamer( InputStream in)
   {
     this.in = in;
-  }
+    running = true;
 
-  private PrintStream getOut()
-  {
-    if (out != null)
-      return out;
+    Properties p = System.getProperties();
+    OutputStream f = null;
 
-    if ( MaxApplication.getProperty("jmaxNoConsole").equals("true"))
+    try
       {
-	out = System.err;
-
-	return out;
+	f = new FileOutputStream( p.getProperty( "user.home") + p.getProperty( "file.separator") + ".fts-stderr");
+      }
+    catch ( FileNotFoundException e)
+      {
+	return;
       }
 
-    window = new TextWindow("FTS Standard Error");
-    MaxWindowManager.getWindowManager().addWindow(window);
-    out = window.getPrintStream();
-    window.pack();
-    window.setVisible(true);
-    window.addWindowListener(new WindowListener(){
-	    public void windowClosing(WindowEvent e){
-		out = null;
-		window = null;
-	    }
-	    public void windowOpened(WindowEvent e){}
-	    public void windowClosed(WindowEvent e){}
-	    public void windowIconified(WindowEvent e){}       
-	    public void windowDeiconified(WindowEvent e){}
-	    public void windowActivated(WindowEvent e){}
-	    public void windowDeactivated(WindowEvent e){}  
-	});
+    out = new PrintStream( f);
 
-    out.println("Output to this window come from the Fts Standard Error");
-    out.println("In general, it means that you just discovered a jMax bug");
-    out.println("Please, submit a bug report describing");
-    out.println("the situation that generated this output");
-    out.println("For information on how submit a bug for jMax");
-    out.println("please look at http://www.ircam.fr/Bugs/");
+    out.println("*** Fts Standard Error ***");
     out.println("");
 
-    return out;
+    Thread t = new Thread( this, "Error Streamer");
+    t.setDaemon(true);
+    t.start();
   }
 
   public void run()
@@ -117,9 +84,7 @@ class FtsErrorStreamer implements Runnable
       {
 	try
 	  {
-	    int c;
-
-	    c = in.read();
+	    int c = in.read();
 
 	    if ((c == -1) && (! running))
 	      return;
@@ -127,16 +92,18 @@ class FtsErrorStreamer implements Runnable
 	    if (c == -1)
 	      {
 		running = false;
-		getOut().println("FTS crashed.\n");
+		out.println("FTS crashed.\n");
+
+		System.out.println( "FTS crashed\n");
 	      }
 	    else
 	      {
-		getOut().write(c);
+		out.write(c);
 	      }
 	  }
 	catch (IOException e)
 	  {
-	    getOut().println("Exception in FTS I/O, giving up  !!!\n");
+	    out.println("Exception in FTS I/O, giving up  !!!\n");
 
 	    running = false;
 	  }
