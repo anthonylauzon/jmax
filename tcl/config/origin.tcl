@@ -23,7 +23,7 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-set jmaxArch irix65r10k
+set jmaxArch r10k-irix6.5
 
 defineDevice stereoIn  { SgiALIn ALdevice RAD1.AESIn channels 2 } "RAD 1.AES In"
 defineDevice stereoIn1 { SgiALIn ALdevice RAD1.AESIn channels 2 } "RAD 1.AES In"

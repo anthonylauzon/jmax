@@ -23,7 +23,7 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-set jmaxArch linuxpc
+set jmaxArch i686-linux
 
 defineDevice analogIn  { oss_adc } "OSS audio in"
 defineDevice analogOut { oss_dac } "OSS audio out"

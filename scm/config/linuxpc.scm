@@ -23,7 +23,7 @@
 ;; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;;
 
-(set! jmax-arch "linuxpc")
+(set! jmax-arch "i686-linux")
 
 (define-device "analogIn"  "oss_adc" "OSS audio in")
 (define-device "analogOut" "oss_dac" "OSS audio out")

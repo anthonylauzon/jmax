@@ -22,7 +22,7 @@
 ;; 
 ;; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;;
-(set! jmax-arch "irix65r10k")
+(set! jmax-arch "r10k-irix6.5")
 
 (define-device "stereoIn"  (list "SgiALIn" "ALdevice" "RAD1.AESIn" "channels" "2") "RAD 1.AES In")
 (define-device "stereoIn1" (list "SgiALIn" "ALdevice" "RAD1.AESIn" "channels" "2") "RAD 1.AES In")

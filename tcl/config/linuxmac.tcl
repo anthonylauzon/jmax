@@ -23,7 +23,7 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-set jmaxArch linuxppc
+set jmaxArch ppc-linux
 
 defineDevice analogIn  { oss_adc } "OSS audio in"
 defineDevice analogOut { oss_dac } "OSS audio out"

@@ -23,7 +23,7 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-set jmaxArch irix63r5k
+set jmaxArch r5k-irix6.5
 
 defineDevice analogIn   { SgiALIn ALdevice AnalogIn channels 2 }  "Analog In"
 defineDevice analogOut  { SgiALOut ALdevice AnalogOut channels 2 } "Analog Out"

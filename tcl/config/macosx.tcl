@@ -23,7 +23,7 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-set jmaxArch macosx
+set jmaxArch ppc-macosx
 
 when defaultStart {
 }

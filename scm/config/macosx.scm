@@ -23,7 +23,7 @@
 ;; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;;
 
-(set! jmax-arch "macosx")
+(set! jmax-arch "ppc-macosx")
 
 (define (default-start-hook)
 )

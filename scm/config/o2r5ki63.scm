@@ -22,7 +22,7 @@
 ;; 
 ;; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;;
-(set! jmax-arch "irix63r5k")
+(set! jmax-arch "r5k-irix6.5")
 
 (define-device "analogIn"   (list "SgiALIn" "ALdevice" "AnalogIn" "channels" "2")  "Analog In")
 (define-device "analogOut"  (list "SgiALOut" "ALdevice" "AnalogOut" "channels" "2") "Analog Out")
