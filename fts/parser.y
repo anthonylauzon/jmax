@@ -24,7 +24,7 @@
 #include <fts/fts.h>
 #include <ftsprivate/parser.h>
 
-#define YYDEBUG 0
+#define YYDEBUG 1
 
 #ifndef STANDALONE
 #define free fts_free
@@ -35,8 +35,8 @@ extern int yylex();
 extern void tokenizer_init( const char *s);
 #endif
 
-#define YYPARSE_PARAM data
-#define YYLEX_PARAM data
+/* #define YYPARSE_PARAM data */
+/* #define YYLEX_PARAM data */
 
 static int yyerror( const char *msg);
 
@@ -48,6 +48,8 @@ struct _parser_data {
   fts_parsetree_t *tree;
 };
 
+static struct _parser_data parser_data;
+
 static fts_status_description_t syntax_error_status_description = {
   "Syntax error"
 };
@@ -55,7 +57,7 @@ fts_status_t syntax_error_status = &syntax_error_status_description;
 
 %}
 
-%pure_parser
+/* %pure_parser */
 
 %union {
   fts_atom_t a;
@@ -129,7 +131,7 @@ fts_status_t syntax_error_status = &syntax_error_status_description;
  */
 
 expression: comma_tuple_list
-		{ ((struct _parser_data *)data)->tree = $1; }
+		{ parser_data.tree = $1; }
 ;
 
 comma_tuple_list: comma_tuple_list TK_COMMA tuple
@@ -340,40 +342,42 @@ static int yyerror( const char *msg)
   return 0;
 }
 
-static int yylex( YYSTYPE *lvalp, void *data)
+/*static int yylex( YYSTYPE *lvalp, void *data) */
+static int yylex()
 {
-  struct _parser_data *parser_data = (struct _parser_data *)data;
-  int token = -1;
+/* struct _parser_data *parser_data = (struct _parser_data *)data; */
 
-  if (parser_data->ac <= 0)
+  int token = -1;
+/*     parser_data = (struct _parser_data*)data; */
+  if (parser_data.ac <= 0)
     return 0; /* end of file */
 
-  if ( fts_is_symbol( parser_data->at))
+  if ( fts_is_symbol(parser_data.at))
     {
       fts_atom_t k, v;
 
-      k = *parser_data->at;
+      k = *parser_data.at;
       if (fts_hashtable_get( &fts_token_table, &k, &v))
 	token = fts_get_int( &v);
       else
 	{
 	  token = TK_SYMBOL;
-	  lvalp->a = *parser_data->at;
+	  yylval.a = *parser_data.at;
 	}
     }
-  else if (fts_is_int( parser_data->at))
+  else if (fts_is_int( parser_data.at))
     {
       token = TK_INT;
-      lvalp->a = *parser_data->at;
+      yylval.a = *parser_data.at;
     }
-  else if (fts_is_float( parser_data->at))
+  else if (fts_is_float( parser_data.at))
     {
       token = TK_FLOAT;
-      lvalp->a = *parser_data->at;
+      yylval.a = *parser_data.at;
     }
 
-  parser_data->at++;
-  parser_data->ac--;
+  parser_data.at++;
+  parser_data.ac--;
 
   return token;
 }
@@ -407,12 +411,13 @@ static fts_parsetree_t *fts_parsetree_new( int token, fts_atom_t *value, fts_par
 
 fts_status_t fts_parsetree_parse( int ac, const fts_atom_t *at, fts_parsetree_t **ptree)
 {
-  struct _parser_data parser_data;
+/*  struct _parser_data parser_data; */
 
   parser_data.ac = ac;
   parser_data.at = at;
 
-  if (yyparse( &parser_data))
+/*   if (yyparse( &parser_data)) */
+  if (yyparse())
     {
       *ptree = NULL;
       return syntax_error_status;
@@ -525,12 +530,13 @@ static fts_parsetree_t *fts_parsetree_new( int token, fts_atom_t *value, fts_par
 
 fts_status_t fts_parsetree_parse( int ac, const fts_atom_t *at, fts_parsetree_t **ptree)
 {
-  struct _parser_data parser_data;
+/*   struct _parser_data parser_data; */
 
   parser_data.ac = ac;
   parser_data.at = at;
 
-  if (yyparse( &parser_data))
+/*   if (yyparse( &parser_data)) */
+  if (yyparse())
     {
       *ptree = NULL;
       return syntax_error_status;

@@ -49,4 +49,6 @@ typedef union {
 # define	TK_COLON	294
 
 
+extern YYSTYPE yylval;
+
 #endif /* not BISON_Y_TAB_H */

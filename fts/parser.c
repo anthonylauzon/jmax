@@ -47,7 +47,7 @@
 #include <fts/fts.h>
 #include <ftsprivate/parser.h>
 
-#define YYDEBUG 0
+#define YYDEBUG 1
 
 #ifndef STANDALONE
 #define free fts_free
@@ -58,8 +58,8 @@ extern int yylex();
 extern void tokenizer_init( const char *s);
 #endif
 
-#define YYPARSE_PARAM data
-#define YYLEX_PARAM data
+/* #define YYPARSE_PARAM data */
+/* #define YYLEX_PARAM data */
 
 static int yyerror( const char *msg);
 
@@ -71,13 +71,15 @@ struct _parser_data {
   fts_parsetree_t *tree;
 };
 
+static struct _parser_data parser_data;
+
 static fts_status_description_t syntax_error_status_description = {
   "Syntax error"
 };
 fts_status_t syntax_error_status = &syntax_error_status_description;
 
 
-#line 60 "parser.y"
+#line 62 "parser.y"
 #ifndef YYSTYPE
 typedef union {
   fts_atom_t a;
@@ -171,12 +173,12 @@ static const short yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined. */
 static const short yyrline[] =
 {
-       0,   131,   135,   137,   139,   143,   145,   148,   149,   150,
-     151,   152,   153,   156,   158,   160,   164,   168,   170,   172,
-     176,   178,   180,   182,   184,   186,   188,   190,   192,   194,
-     196,   198,   200,   202,   204,   206,   210,   211,   214,   216,
-     220,   222,   226,   228,   234,   240,   246,   252,   258,   264,
-     270,   276,   282,   288,   294,   300,   306,   312,   318
+       0,   133,   137,   139,   141,   145,   147,   150,   151,   152,
+     153,   154,   155,   158,   160,   162,   166,   170,   172,   174,
+     178,   180,   182,   184,   186,   188,   190,   192,   194,   196,
+     198,   200,   202,   204,   206,   208,   212,   213,   216,   218,
+     222,   224,   228,   230,   236,   242,   248,   254,   260,   266,
+     272,   278,   284,   290,   296,   302,   308,   314,   320
 };
 #endif
 
@@ -314,8 +316,6 @@ static const short yycheck[] =
       -1,    36,    22,    23,    24,    25,    26,    27,    28,    29,
       30,    31,    32,    -1,    -1,    -1,    36
 };
-#define YYPURE 1
-
 /* -*-C-*-  Note some compilers choke on comments on `#line' lines.  */
 #line 3 "/usr/share/bison/bison.simple"
 
@@ -1024,139 +1024,139 @@ yyreduce:
   switch (yyn) {
 
 case 1:
-#line 132 "parser.y"
-{ ((struct _parser_data *)data)->tree = yyvsp[0].n; }
+#line 134 "parser.y"
+{ parser_data.tree = yyvsp[0].n; }
     break;
 case 2:
-#line 136 "parser.y"
+#line 138 "parser.y"
 { yyval.n = fts_parsetree_new( TK_COMMA, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
 case 3:
-#line 138 "parser.y"
+#line 140 "parser.y"
 { yyval.n = fts_parsetree_new( TK_COMMA, 0, 0, yyvsp[0].n); }
     break;
 case 4:
-#line 140 "parser.y"
+#line 142 "parser.y"
 { yyval.n = 0; }
     break;
 case 5:
-#line 144 "parser.y"
+#line 146 "parser.y"
 { yyval.n = fts_parsetree_new( TK_TUPLE, 0, yyvsp[-1].n, yyvsp[0].n); }
     break;
 case 13:
-#line 157 "parser.y"
+#line 159 "parser.y"
 { yyval.n = fts_parsetree_new( TK_INT, &(yyvsp[0].a), 0, 0); }
     break;
 case 14:
-#line 159 "parser.y"
+#line 161 "parser.y"
 { yyval.n = fts_parsetree_new( TK_FLOAT, &(yyvsp[0].a), 0, 0); }
     break;
 case 15:
-#line 161 "parser.y"
+#line 163 "parser.y"
 { yyval.n = fts_parsetree_new( TK_SYMBOL, &(yyvsp[0].a), 0, 0); }
     break;
 case 16:
-#line 165 "parser.y"
+#line 167 "parser.y"
 { yyval.n = fts_parsetree_new( TK_PAR, 0, 0, yyvsp[-1].n); }
     break;
 case 17:
-#line 169 "parser.y"
+#line 171 "parser.y"
 { yyval.n = fts_parsetree_new( TK_UPLUS, 0, yyvsp[0].n, 0); }
     break;
 case 18:
-#line 171 "parser.y"
+#line 173 "parser.y"
 { yyval.n = fts_parsetree_new( TK_UMINUS, 0, yyvsp[0].n, 0); }
     break;
 case 19:
-#line 173 "parser.y"
+#line 175 "parser.y"
 { yyval.n = fts_parsetree_new( TK_LOGICAL_NOT, 0, yyvsp[0].n, 0); }
     break;
 case 20:
-#line 177 "parser.y"
+#line 179 "parser.y"
 { yyval.n = fts_parsetree_new( TK_PLUS, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
 case 21:
-#line 179 "parser.y"
+#line 181 "parser.y"
 { yyval.n = fts_parsetree_new( TK_MINUS, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
 case 22:
-#line 181 "parser.y"
+#line 183 "parser.y"
 { yyval.n = fts_parsetree_new( TK_TIMES, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
 case 23:
-#line 183 "parser.y"
+#line 185 "parser.y"
 { yyval.n = fts_parsetree_new( TK_DIV, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
 case 24:
-#line 185 "parser.y"
+#line 187 "parser.y"
 { yyval.n = fts_parsetree_new( TK_POWER, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
 case 25:
-#line 187 "parser.y"
+#line 189 "parser.y"
 { yyval.n = fts_parsetree_new( TK_PERCENT, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
 case 26:
-#line 189 "parser.y"
+#line 191 "parser.y"
 { yyval.n = fts_parsetree_new( TK_SHIFT_LEFT, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
 case 27:
-#line 191 "parser.y"
+#line 193 "parser.y"
 { yyval.n = fts_parsetree_new( TK_SHIFT_RIGHT, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
 case 28:
-#line 193 "parser.y"
+#line 195 "parser.y"
 { yyval.n = fts_parsetree_new( TK_LOGICAL_AND, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
 case 29:
-#line 195 "parser.y"
+#line 197 "parser.y"
 { yyval.n = fts_parsetree_new( TK_LOGICAL_OR, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
 case 30:
-#line 197 "parser.y"
+#line 199 "parser.y"
 { yyval.n = fts_parsetree_new( TK_EQUAL_EQUAL, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
 case 31:
-#line 199 "parser.y"
+#line 201 "parser.y"
 { yyval.n = fts_parsetree_new( TK_NOT_EQUAL, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
 case 32:
-#line 201 "parser.y"
+#line 203 "parser.y"
 { yyval.n = fts_parsetree_new( TK_GREATER, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
 case 33:
-#line 203 "parser.y"
+#line 205 "parser.y"
 { yyval.n = fts_parsetree_new( TK_GREATER_EQUAL, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
 case 34:
-#line 205 "parser.y"
+#line 207 "parser.y"
 { yyval.n = fts_parsetree_new( TK_SMALLER, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
 case 35:
-#line 207 "parser.y"
+#line 209 "parser.y"
 { yyval.n = fts_parsetree_new( TK_SMALLER_EQUAL, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
 case 38:
-#line 215 "parser.y"
-{ yyval.n = fts_parsetree_new( TK_DOLLAR, &(yyvsp[0].a), 0, 0); }
-    break;
-case 39:
 #line 217 "parser.y"
 { yyval.n = fts_parsetree_new( TK_DOLLAR, &(yyvsp[0].a), 0, 0); }
     break;
+case 39:
+#line 219 "parser.y"
+{ yyval.n = fts_parsetree_new( TK_DOLLAR, &(yyvsp[0].a), 0, 0); }
+    break;
 case 40:
-#line 221 "parser.y"
+#line 223 "parser.y"
 { yyval.n = fts_parsetree_new( TK_COLON, 0, fts_parsetree_new( TK_SYMBOL, &(yyvsp[-2].a), 0, 0), yyvsp[0].n); }
     break;
 case 41:
-#line 223 "parser.y"
+#line 225 "parser.y"
 { yyval.n = fts_parsetree_new( TK_COLON, 0, 0, yyvsp[0].n); }
     break;
 case 42:
-#line 227 "parser.y"
+#line 229 "parser.y"
 { yyval.n = fts_parsetree_new( TK_SYMBOL, &(yyvsp[0].a), 0, 0); }
     break;
 case 43:
-#line 229 "parser.y"
+#line 231 "parser.y"
 { 
 		  fts_atom_t a;
 		  fts_set_symbol( &a, fts_s_plus);
@@ -1164,7 +1164,7 @@ case 43:
 		}
     break;
 case 44:
-#line 235 "parser.y"
+#line 237 "parser.y"
 { 
 		  fts_atom_t a;
 		  fts_set_symbol( &a, fts_s_minus);
@@ -1172,7 +1172,7 @@ case 44:
 		}
     break;
 case 45:
-#line 241 "parser.y"
+#line 243 "parser.y"
 { 
 		  fts_atom_t a;
 		  fts_set_symbol( &a, fts_s_times);
@@ -1180,7 +1180,7 @@ case 45:
 		}
     break;
 case 46:
-#line 247 "parser.y"
+#line 249 "parser.y"
 { 
 		  fts_atom_t a;
 		  fts_set_symbol( &a, fts_s_div);
@@ -1188,7 +1188,7 @@ case 46:
 		}
     break;
 case 47:
-#line 253 "parser.y"
+#line 255 "parser.y"
 { 
 		  fts_atom_t a;
 		  fts_set_symbol( &a, fts_s_percent);
@@ -1196,7 +1196,7 @@ case 47:
 		}
     break;
 case 48:
-#line 259 "parser.y"
+#line 261 "parser.y"
 { 
 		  fts_atom_t a;
 		  fts_set_symbol( &a, fts_s_shift_left);
@@ -1204,7 +1204,7 @@ case 48:
 		}
     break;
 case 49:
-#line 265 "parser.y"
+#line 267 "parser.y"
 { 
 		  fts_atom_t a;
 		  fts_set_symbol( &a, fts_s_shift_right);
@@ -1212,7 +1212,7 @@ case 49:
 		}
     break;
 case 50:
-#line 271 "parser.y"
+#line 273 "parser.y"
 { 
 		  fts_atom_t a;
 		  fts_set_symbol( &a, fts_s_greater);
@@ -1220,7 +1220,7 @@ case 50:
 		}
     break;
 case 51:
-#line 277 "parser.y"
+#line 279 "parser.y"
 { 
 		  fts_atom_t a;
 		  fts_set_symbol( &a, fts_s_greater_equal);
@@ -1228,7 +1228,7 @@ case 51:
 		}
     break;
 case 52:
-#line 283 "parser.y"
+#line 285 "parser.y"
 { 
 		  fts_atom_t a;
 		  fts_set_symbol( &a, fts_s_smaller);
@@ -1236,7 +1236,7 @@ case 52:
 		}
     break;
 case 53:
-#line 289 "parser.y"
+#line 291 "parser.y"
 { 
 		  fts_atom_t a;
 		  fts_set_symbol( &a, fts_s_smaller_equal);
@@ -1244,7 +1244,7 @@ case 53:
 		}
     break;
 case 54:
-#line 295 "parser.y"
+#line 297 "parser.y"
 { 
 		  fts_atom_t a;
 		  fts_set_symbol( &a, fts_s_equal_equal);
@@ -1252,7 +1252,7 @@ case 54:
 		}
     break;
 case 55:
-#line 301 "parser.y"
+#line 303 "parser.y"
 { 
 		  fts_atom_t a;
 		  fts_set_symbol( &a, fts_s_not_equal);
@@ -1260,7 +1260,7 @@ case 55:
 		}
     break;
 case 56:
-#line 307 "parser.y"
+#line 309 "parser.y"
 { 
 		  fts_atom_t a;
 		  fts_set_symbol( &a, fts_s_logical_not);
@@ -1268,7 +1268,7 @@ case 56:
 		}
     break;
 case 57:
-#line 313 "parser.y"
+#line 315 "parser.y"
 { 
 		  fts_atom_t a;
 		  fts_set_symbol( &a, fts_s_logical_or);
@@ -1276,7 +1276,7 @@ case 57:
 		}
     break;
 case 58:
-#line 319 "parser.y"
+#line 321 "parser.y"
 { 
 		  fts_atom_t a;
 		  fts_set_symbol( &a, fts_s_logical_and);
@@ -1516,7 +1516,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 326 "parser.y"
+#line 328 "parser.y"
 
 
 #ifndef STANDALONE
@@ -1534,40 +1534,42 @@ static int yyerror( const char *msg)
   return 0;
 }
 
-static int yylex( YYSTYPE *lvalp, void *data)
+/*static int yylex( YYSTYPE *lvalp, void *data) */
+static int yylex()
 {
-  struct _parser_data *parser_data = (struct _parser_data *)data;
-  int token = -1;
+/* struct _parser_data *parser_data = (struct _parser_data *)data; */
 
-  if (parser_data->ac <= 0)
+  int token = -1;
+/*     parser_data = (struct _parser_data*)data; */
+  if (parser_data.ac <= 0)
     return 0; /* end of file */
 
-  if ( fts_is_symbol( parser_data->at))
+  if ( fts_is_symbol(parser_data.at))
     {
       fts_atom_t k, v;
 
-      k = *parser_data->at;
+      k = *parser_data.at;
       if (fts_hashtable_get( &fts_token_table, &k, &v))
 	token = fts_get_int( &v);
       else
 	{
 	  token = TK_SYMBOL;
-	  lvalp->a = *parser_data->at;
+	  yylval.a = *parser_data.at;
 	}
     }
-  else if (fts_is_int( parser_data->at))
+  else if (fts_is_int( parser_data.at))
     {
       token = TK_INT;
-      lvalp->a = *parser_data->at;
+      yylval.a = *parser_data.at;
     }
-  else if (fts_is_float( parser_data->at))
+  else if (fts_is_float( parser_data.at))
     {
       token = TK_FLOAT;
-      lvalp->a = *parser_data->at;
+      yylval.a = *parser_data.at;
     }
 
-  parser_data->at++;
-  parser_data->ac--;
+  parser_data.at++;
+  parser_data.ac--;
 
   return token;
 }
@@ -1601,12 +1603,13 @@ static fts_parsetree_t *fts_parsetree_new( int token, fts_atom_t *value, fts_par
 
 fts_status_t fts_parsetree_parse( int ac, const fts_atom_t *at, fts_parsetree_t **ptree)
 {
-  struct _parser_data parser_data;
+/*  struct _parser_data parser_data; */
 
   parser_data.ac = ac;
   parser_data.at = at;
 
-  if (yyparse( &parser_data))
+/*   if (yyparse( &parser_data)) */
+  if (yyparse())
     {
       *ptree = NULL;
       return syntax_error_status;
@@ -1719,12 +1722,13 @@ static fts_parsetree_t *fts_parsetree_new( int token, fts_atom_t *value, fts_par
 
 fts_status_t fts_parsetree_parse( int ac, const fts_atom_t *at, fts_parsetree_t **ptree)
 {
-  struct _parser_data parser_data;
+/*   struct _parser_data parser_data; */
 
   parser_data.ac = ac;
   parser_data.at = at;
 
-  if (yyparse( &parser_data))
+/*   if (yyparse( &parser_data)) */
+  if (yyparse())
     {
       *ptree = NULL;
       return syntax_error_status;
