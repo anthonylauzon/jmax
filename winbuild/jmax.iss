@@ -12,7 +12,7 @@ DefaultDirName={pf}\jMax
 DefaultGroupName=jMax
 AllowNoIcons=yes
 ChangesAssociations=yes
-LicenseFile=..\LICENSE
+LicenseFile=..\COPYING
 
 [Tasks]
 Name: "desktopicon"; Description: "Create a &desktop icon"; GroupDescription: "Additional icons:"
@@ -24,8 +24,7 @@ Name: "quicklaunchicon"; Description: "Create a &Quick Launch icon"; GroupDescri
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Source: "..\README"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\ChangeLog"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\LICENCE.fr"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\COPYING"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\LISEZMOI"; DestDir: "{app}"; Flags: ignoreversion
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
