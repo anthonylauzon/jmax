@@ -3,7 +3,7 @@
 <TITLE> The jMax Language </TITLE>
 </HEAD>
 
-<BODY TEXT="#000000" BGCOLOR="#CCCCCC" LINK="#000000" VLINK="#000000">
+<BODY TEXT="#000000" BGCOLOR="#CCCCCC">
 
 <TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=0>
 <TR>
@@ -24,7 +24,12 @@
   </UL>
 </UL>
 
-<FONT COLOR=#FFFFFF SIZE=+3><b>The Language</b></FONT>
+<p>
+<font size=+3 color=#FFFFFF><b>The Language</b></font>
+
+<p>
+<hr noshade size=1>
+
 <UL>
   <LI><A HREF="#jmaxvsmax"><I>j</I>Max is not Max</A>
   <LI><A HREF="#objects">Objects and Patchers</A>
@@ -34,7 +39,9 @@
   <LI><A HREF="#lexical">Lexical Conventions</A>
 </UL>
 
-<HR NOSHADE SIZE=1>
+<p>
+<hr noshade size=1>
+
 <TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
 <TR><TD>
 
@@ -54,8 +61,9 @@ This first release of <I>j</I>Max introduce the set of basic mechanisms;
 these mechanisms will be used as the fundation for a new object library,
 and will be extended in future releases.
 
-<A NAME="objects">
-<h2>Objects and Patchers</h2></A>
+
+<p>
+<A NAME="objects"><HR><h2>Objects and Patchers</h2></A>
 
 <p>
 A <i>j</i>Max programm consists of objects, which appear in the context
@@ -71,8 +79,9 @@ The patcher context helps to modulize <i>j</i>Max programms.
 A patcher can have in- and outlets and can appear in form of a subpatcher 
 or a template just like an object inside another patcher.
 
-<A NAME="variables">
-<h2>Variables</h2></A>
+
+<p>
+<A NAME="variables"><hr><h2>Variables</h2></A>
 
 <P>
 A variable is a name associated to a value. 
@@ -131,8 +140,9 @@ A variable can also contains an array of values; an array can for example
 be defined by the object <tt>rates: const {32000 44100 48000}</tt>, 
 and accessed with the standard syntax <tt>$rates[1]</tt>.
 
-<A NAME="expressions">
-<h2>Expressions</h2>
+
+<p>
+<A NAME="expressions"><hr><h2>Expressions</h2></a>
 
 As we saw in the previous paragraph, we can use a variable in instantiating
 an object, by putting a <tt>$</TT> followed by the variable name in the object arguments.
@@ -181,8 +191,9 @@ A patcher can also have named parameters, i.e. define new variables explicitly,
 adding at the end of the arguments a list of assignement in the form 
 <tt>variable = value</tt>.
 
-<A NAME="templates">
-<h2>Templates</h2>
+
+<p>
+<A NAME="templates"><hr><h2>Templates</h2></a>
 
 <P>
 A template is the implementation of a new object in the <I>j</I>Max
@@ -253,8 +264,9 @@ ISPW Max.
 We use a different name to avoid confusion, since <I>j</I>Max is able
 to load and use also the older ISPW Max abstractions.
 
-<A NAME="lexical">
-<h2>Lexical Conventions </h2>
+
+<p>
+<A NAME="lexical"><hr><h2>Lexical Conventions </h2></a>
 
 <P>
 Some simple lexical conventions are applied to whatever one types to 
@@ -300,7 +312,7 @@ the operands and the operator).
 ones of ISPW Max! Objects loaded from original ISPW patches are converted 
 on the fly.)
 
-<P>
+
 </TABLE>
 <HR NOSHADE SIZE=1>
 

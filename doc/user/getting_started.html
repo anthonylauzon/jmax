@@ -3,7 +3,7 @@
 <TITLE> jMax documentation </TITLE>
 </HEAD>
 
-<BODY TEXT="#000000" BGCOLOR="#CCCCCC" LINK="#000000" VLINK="#000000">
+<BODY TEXT="#000000" BGCOLOR="#CCCCCC">
 
 <TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=0>
 <TR>
@@ -15,7 +15,6 @@
   </TD>
 </TR>
 </TABLE>
-<BR>
 
 <UL TYPE=SQUARE>
   <LI><A HREF=../index.html>Documentation</A>
@@ -24,15 +23,21 @@
   </UL>
 </UL>
 
+<p>
+<font size=+3 color=#FFFFFF><b>Getting Started</b></font>
 
-<FONT COLOR=#FFFFFF SIZE=+3><b>Getting Started</b></FONT>
+<p>
+<hr noshade size=1>
+
 <UL TYPE=DOT>
   <LI><A HREF="#running">Running jMax</A>
   <LI><A HREF="#arguments">Command Line Arguments</A>
   <LI><A HREF="#.jmaxrc">The file <TT>.jmaxrc</TT></A>
 </UL>
 
-<HR NOSHADE SIZE=1>
+<p>
+<hr noshade size=1>
+
 <TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
 <TR><TD>
   
@@ -52,9 +57,8 @@ that are either interpreted by the script or passed as command line arguments
 to the Java application.
 
 <p>
-<HR>
-
 <A NAME="arguments"> 
+<HR>
 <h2>Command Line Arguments</h2>
 
 <P>
@@ -102,9 +106,8 @@ For example in the following construct:
 </ul>
 
 <p>
-<HR>
-
 <A NAME=".jmaxrc">
+<HR>
 <h2>The file <B><TT>.jmaxrc</TT></B></h2>
 
 <P>
@@ -139,17 +142,43 @@ A template <TT>.jmaxrc</TT> file can be found in the distribution.<BR>
 An example is given the following:
 
 <PRE>
+# Lines starting with # are comments
 # --- beginning of .jmaxrc
 
-set jmaxHostType octane
+#set jmaxArch linuxpc
+#set jmaxArch irix65r10k
+#set jmaxArch irix63r5k
+
+#set jmaxHost "astor.ircam.fr"
+#set jmaxHost "amati.ircam.fr"
+#set jmaxHost "marimba.ircam.fr"
+
+set jmaxSplashScreen "hide"
+set jmaxFastFileBox "true"
 
 when start {
 
-    jmaxSetSampleRate 44100
-    jmaxSetAudioBuffer 1024
+if {$jmaxHost == "astor.ircam.fr"} {
+	jmaxSetSampleRate 44100
+	jmaxSetAudioBuffer 1024
 
-    openDefaultAudioIn AnalogIn
-    openDefaultMidi SerialPort2
+	openDefaultAudioIn stereoIn1
+	openDefaultAudioOut stereoOut1
+	openDefaultMidi midi1
+} elseif {$jmaxHost=="amati.ircam.fr"} {
+	jmaxSetSampleRate 44100
+	jmaxSetAudioBuffer 1024
+
+	openDefaultAudioIn adatIn
+	openDefaultAudioOut adatOut
+	openDefaultMidi midi
+}  elseif {$jmaxHost == "marimba.ircam.fr"} {
+	jmaxSetSampleRate 32000
+	jmaxSetAudioBuffer 2048
+
+	openDefaultAudioIn analogIn
+	openDefaultAudioOut analogOut
+}
 }
 
 # --- end of .jmaxrc
@@ -161,8 +190,9 @@ go in the file <A HREF=../user/installation.html#site><tt>config/site.tcl</tt></
 which is customized when <A HREF="../user/installation.html">installing</A> 
 <i>j</i>Max on a specific machine or several machines in a local network.
 
-<P>
+
 </TABLE>
+
 <HR NOSHADE SIZE=1>
 
 </BODY>
