@@ -1,3 +1,7 @@
+2003-09-22  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* fts/expression.c: added symbol concatenation
+
 2003-09-17  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* client/python/ircam/fts/client/Makefile.am: added missing FtsPipeConnection.py in list of files to install.

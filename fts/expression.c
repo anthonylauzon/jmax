@@ -22,7 +22,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
+
+#include <ftsconfig.h>
+#if HAVE_ALLOCA_H
+#include <alloca.h>
+#endif
 
 #include <fts/fts.h>
 #include <ftsprivate/class.h>
@@ -273,6 +279,56 @@ static void expression_stack_init( fts_expression_t *exp)
  *
  */
 
+/* Helper functions for symbol concatenation */
+static fts_symbol_t 
+concatenate_symbol( fts_atom_t *left, fts_atom_t *right)
+{
+  fts_symbol_t lsym, rsym;
+  char *buffer;
+
+  lsym = fts_get_symbol( left);
+  rsym = fts_get_symbol( right);
+  buffer = alloca( strlen( lsym) + strlen( rsym) + 1);
+
+  strcpy( buffer, lsym);
+  strcat( buffer, rsym);
+
+  return fts_new_symbol( buffer);
+}
+
+static fts_symbol_t 
+concatenate_symbol_int( fts_atom_t *left, fts_atom_t *right)
+{
+  fts_symbol_t sym;
+  int r, len;
+  char *buffer;
+
+  sym = fts_get_symbol( left);
+  len = strlen( sym);
+  buffer = alloca( len + 256);
+
+  strcpy( buffer, sym);
+  sprintf( buffer + len, "%d", fts_get_int( right));
+
+  return fts_new_symbol( buffer);
+}
+
+static fts_symbol_t 
+concatenate_int_symbol( fts_atom_t *left, fts_atom_t *right)
+{
+  fts_symbol_t sym;
+  int r;
+  char *buffer;
+
+  sym = fts_get_symbol( right);
+  buffer = alloca( strlen( sym) + 256);
+
+  sprintf( buffer, "%d", fts_get_int( left));
+  strcpy( buffer + strlen(buffer), sym);
+
+  return fts_new_symbol( buffer);
+}
+
 /*
  * Operators
  */
@@ -311,6 +367,30 @@ static void expression_stack_init( fts_expression_t *exp)
     fts_set_float( top-1, fts_get_float( top-1) OP fts_get_int( top));					  \
   else if (fts_is_float( top-1) && fts_is_float( top))							  \
     fts_set_float( top-1, fts_get_float( top-1) OP fts_get_float( top));				  \
+  else													  \
+    return operand_type_mismatch_error;									  \
+  expression_stack_pop( exp, 1);
+
+#define ABINOP_EVAL_PLUS										  \
+  if ((status = expression_eval_aux( tree->left, exp, scope, env_ac, env_at, callback, data)) != fts_ok)  \
+    return status;											  \
+  if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data)) != fts_ok) \
+    return status;											  \
+  top = expression_stack_top( exp);									  \
+  if (fts_is_int( top-1) && fts_is_int( top))								  \
+    fts_set_int( top-1, fts_get_int( top-1) + fts_get_int( top));					  \
+  else if (fts_is_int( top-1) && fts_is_float( top))							  \
+    fts_set_float( top-1, fts_get_int( top-1) + fts_get_float( top));					  \
+  else if (fts_is_float( top-1) && fts_is_int( top))							  \
+    fts_set_float( top-1, fts_get_float( top-1) + fts_get_int( top));					  \
+  else if (fts_is_float( top-1) && fts_is_float( top))							  \
+    fts_set_float( top-1, fts_get_float( top-1) + fts_get_float( top));					  \
+  else if (fts_is_symbol( top-1) && fts_is_symbol( top))						  \
+    fts_set_symbol( top-1, concatenate_symbol( top-1, top));						  \
+  else if (fts_is_symbol( top-1) && fts_is_int( top))							  \
+    fts_set_symbol( top-1, concatenate_symbol_int( top-1, top));					  \
+  else if (fts_is_int( top-1) && fts_is_symbol( top))							  \
+    fts_set_symbol( top-1, concatenate_int_symbol( top-1, top));					  \
   else													  \
     return operand_type_mismatch_error;									  \
   expression_stack_pop( exp, 1);
@@ -536,7 +616,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
       break;
 
   case TK_PLUS:
-    ABINOP_EVAL(+);
+    ABINOP_EVAL_PLUS;
     break;
 
   case TK_MINUS:
