@@ -40,4 +40,9 @@ clean_c:
 .PHONY: clean_c
 
 install-exec:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/data
+	for f in *.jpk ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/data ; done
+	$(INSTALL_DATA) data.jpk $(lib_install_dir)/packages/data
+	( cd c ; $(MAKE) $@)
+	( cd help; $(MAKE) $@)
 .PHONY: install-exec
