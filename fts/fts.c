@@ -322,12 +322,16 @@ void fts_init( int argc, char **argv)
 
   fts_log("[fts]: Initializing kernel classes\n");
 
-  /* check whether we should use a piped connection thru the stdio file handles */
-  if ( fts_cmd_args_get( fts_new_symbol( "stdio")) != NULL ) 
-    fts_client_manager_pipe_start();
-  else
-    fts_client_manager_tcp_start();
-  
+  /* if we have to start fts with a client */
+  if (fts_cmd_args_get(fts_new_symbol("no-client")) == NULL)
+  {
+    /* check whether we should use a piped connection thru the stdio file handles */
+    if ( fts_cmd_args_get( fts_new_symbol( "stdio")) != NULL ) 
+      fts_client_manager_pipe_start();
+    else
+      fts_client_manager_tcp_start();
+  }
+
   fts_log("[fts]: Loading project\n");
 
   /* Load the initial project */
