@@ -24,7 +24,6 @@
 #
 
 install-arch:
-	$(INSTALL_DIR) $(lib_install_dir)/fts/bin/$(ARCH)
 	$(INSTALL_DIR) $(lib_install_dir)/fts/bin/$(ARCH)/opt
 	( cd $(ARCH)/opt ; $(INSTALL_SETUID) fts $(lib_install_dir)/fts/bin/$(ARCH)/opt )
 .PHONY: install-arch
