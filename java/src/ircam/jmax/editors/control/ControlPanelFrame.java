@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1999 by IRCAM
 // 
@@ -21,10 +21,10 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
+package ircam.jmax.editors.control;
+
 // ^^^^ Probabily the Control Frame should add a field with the
 // ^^^^ name of the server
-
-package ircam.jmax.editors.control;
 
 import java.util.*;
 import java.awt.*;

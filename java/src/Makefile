@@ -20,6 +20,7 @@
 # 
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
+ROOTDIR = ../..
 PACKAGE_DIR = 
 
 include $(ROOTDIR)/java/Makefiles/Makefile.common

@@ -21,9 +21,6 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-/**
-  */
-
 package ircam.jmax;
 
 import tcl.lang.*;
@@ -31,6 +28,9 @@ import java.util.*;
 
 import ircam.jmax.utils.*;
 import ircam.jmax.*;
+
+/**
+  */
 
 class MaxWhenHookTable
 {

@@ -25,7 +25,7 @@
 #ifndef _RUNTIME_H_
 #define _RUNTIME_H_
 
-#include "runtime/STtools.h"
+/* #include "runtime/STtools.h" */
 #include "runtime/audio.h"
 #include "runtime/client.h"
 #include "runtime/devices.h"

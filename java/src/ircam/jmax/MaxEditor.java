@@ -21,9 +21,6 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-// ^^^^ This class, nested class New something, is not compatible
-// ^^^^ With the multiserver; anyway, this class should just go away.
-
 package ircam.jmax;
 
 import java.awt.*;
@@ -36,6 +33,9 @@ import ircam.jmax.utils.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
 import javax.swing.*;
+
+// ^^^^ This class, nested class New something, is not compatible
+// ^^^^ With the multiserver; anyway, this class should just go away.
 
 /**
  * The abstract base class for all the Ermes editors. It provides utility methods

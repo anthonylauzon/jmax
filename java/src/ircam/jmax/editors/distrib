@@ -2,4 +2,3 @@ src	all	Makefile
 src	all	Sources2
 src	all	console
 src	all	control
-src	all	ermes

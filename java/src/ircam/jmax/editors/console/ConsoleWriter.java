@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1999 by IRCAM
 // 
@@ -21,14 +21,15 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
+package ircam.jmax.editors.console;
+
+import java.io.*;
+
 /**
  * The Print Writer associated with the console
  * Changed to OutputStream by MDC, in order to work
  * with the System.out.
  */
-
-package ircam.jmax.editors.console;
-import java.io.*;
 
 class ConsoleWriter extends OutputStream
 {

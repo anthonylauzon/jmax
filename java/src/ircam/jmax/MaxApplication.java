@@ -21,9 +21,6 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-// MaxApplication.getProperty should disappear, and properties stored in the system
-// properties, that can *also* be loaded from a file.
-
 package ircam.jmax; 
 
 import java.awt.*;
@@ -41,6 +38,9 @@ import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
 import tcl.lang.*;
+
+// MaxApplication.getProperty should disappear, and properties stored in the system
+// properties, that can *also* be loaded from a file.
 
 /**
  * The main application class in jMax. Contains the global parameters 
