@@ -21,7 +21,7 @@ all: $(LIBDIR)/libsystem.a $(LIBDIR)/libsystem.so
 $(LIBDIR)/libsystem.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libsystem.a $(OBJECTS)
 
-TOCLEAN = $(LIBDIR)/libsystem.a
+TOCLEAN = $(LIBDIR)/libsystem.a $(LIBDIR)/libsystem.so
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

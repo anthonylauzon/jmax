@@ -24,7 +24,7 @@ all: $(LIBDIR)/libdata.a $(LIBDIR)/libdata.so
 $(LIBDIR)/libdata.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libdata.a $(OBJECTS)
 
-TOCLEAN = $(LIBDIR)/libdata.a
+TOCLEAN = $(LIBDIR)/libdata.a $(LIBDIR)/libdata.so
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

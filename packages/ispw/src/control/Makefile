@@ -23,7 +23,7 @@ all: $(LIBDIR)/libcontrol.a $(LIBDIR)/libcontrol.so
 $(LIBDIR)/libcontrol.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libcontrol.a $(OBJECTS)
 
-TOCLEAN = $(LIBDIR)/libcontrol.a
+TOCLEAN = $(LIBDIR)/libcontrol.a $(LIBDIR)/libcontrol.so
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

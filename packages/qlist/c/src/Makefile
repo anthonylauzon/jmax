@@ -24,7 +24,7 @@ all: $(LIBDIR)/libqlist.a $(LIBDIR)/libqlist.so
 $(LIBDIR)/libqlist.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libqlist.a $(OBJECTS)
 
-TOCLEAN = $(LIBDIR)/libqlist.a
+TOCLEAN = $(LIBDIR)/libqlist.a $(LIBDIR)/libqlist.so
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

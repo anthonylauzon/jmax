@@ -23,7 +23,7 @@ all: $(LIBDIR)/libpitch.a $(LIBDIR)/libpitch.so
 $(LIBDIR)/libpitch.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libpitch.a $(OBJECTS)
 
-TOCLEAN = $(LIBDIR)/libpitch.a
+TOCLEAN = $(LIBDIR)/libpitch.a $(LIBDIR)/libpitch.so
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

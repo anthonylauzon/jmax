@@ -24,7 +24,7 @@ all: $(LIBDIR)/libfilters.a $(LIBDIR)/libfilters.so
 $(LIBDIR)/libfilters.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libfilters.a $(OBJECTS)
 
-TOCLEAN = $(LIBDIR)/libfilters.a
+TOCLEAN = $(LIBDIR)/libfilters.a $(LIBDIR)/libfilters.so
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

@@ -28,7 +28,7 @@ all: $(LIBDIR)/libio.a $(LIBDIR)/libio.so
 $(LIBDIR)/libio.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libio.a $(OBJECTS)
 
-TOCLEAN = $(LIBDIR)/libio.a
+TOCLEAN = $(LIBDIR)/libio.a $(LIBDIR)/libio.so
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

@@ -23,7 +23,7 @@ all: $(LIBDIR)/libsignal.a $(LIBDIR)/libsignal.so
 $(LIBDIR)/libsignal.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libsignal.a $(OBJECTS)
 
-TOCLEAN = $(LIBDIR)/libsignal.a
+TOCLEAN = $(LIBDIR)/libsignal.a $(LIBDIR)/libsignal.so
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 
