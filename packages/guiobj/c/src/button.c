@@ -195,6 +195,8 @@ button_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl, fts_SystemInlet, fts_s_send_properties, button_send_properties, 0, 0); 
   fts_method_define(cl, fts_SystemInlet, fts_s_send_ui_properties, button_send_ui_properties, 0, 0); 
 
+  fts_method_define(cl, fts_SystemInlet, fts_s_bang, button_bang, 0, 0);
+
   /* user methods */
   fts_method_define_varargs(cl, 0, fts_s_anything, button_bang);
 

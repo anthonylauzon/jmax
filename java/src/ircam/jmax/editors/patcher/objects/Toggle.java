@@ -20,7 +20,7 @@ class Toggle extends GraphicObject implements FtsIntValueListener
 
   private static final Color itsCrossColor = new Color(0, 0, 128);
 
-  private boolean itsToggled = false;
+  private boolean isToggled = false;
 
   public Toggle( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
@@ -53,22 +53,14 @@ class Toggle extends GraphicObject implements FtsIntValueListener
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
     if (Squeack.isDown(squeack))
-      {
-	itsToggled = !itsToggled;
-	((FtsIntValueObject)ftsObject).setValue(itsToggled ? 1 : 0);
-      }
+      ftsObject.sendMessage( -1, "bang", null);
   }
 
   public void valueChanged(int value) 
   {
-    boolean temp = (value == 1);
+    isToggled = (value == 1);
 
-    if ( itsToggled != temp) 
-      {
-	itsToggled = temp;
-
-	updateRedraw();
-      }
+    updateRedraw();
   }
 
   public void paint(Graphics g) 
@@ -85,7 +77,7 @@ class Toggle extends GraphicObject implements FtsIntValueListener
 
     g.fill3DRect( x + 1, y + 1, w - 2, h - 2, true);
 
-    if (itsToggled) 
+    if (isToggled) 
       {
 	g.setColor( itsCrossColor);
 	g.drawLine( x + 4, y + 4, x + w - 6, y + h - 6);

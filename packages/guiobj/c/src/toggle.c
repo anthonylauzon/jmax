@@ -103,23 +103,6 @@ toggle_get_value(fts_daemon_action_t action, fts_object_t *obj,
   fts_set_int(value, this->n);
 }
 
-static void
-toggle_put_value(fts_daemon_action_t action, fts_object_t *obj,
-	       fts_symbol_t property, fts_atom_t *value)
-{
-  toggle_t *this = (toggle_t *)obj;
-  int v;
-
-  v = fts_get_number(value);
-
-  this->n = (v ? 1 : 0);
-
-  fts_outlet_int(obj, 0, this->n);
-
-  fts_object_ui_property_changed(obj, fts_s_value);
-}
-
-
 static fts_status_t
 toggle_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
@@ -129,6 +112,7 @@ toggle_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define(cl, fts_SystemInlet, fts_s_send_properties, toggle_send_properties, 0, 0); 
   fts_method_define(cl, fts_SystemInlet, fts_s_send_ui_properties, toggle_send_properties, 0, 0); 
+  fts_method_define(cl, fts_SystemInlet, fts_s_bang, toggle_bang, 0, a);
 
   fts_method_define(cl, 0, fts_s_bang, toggle_bang, 0, a);
 
@@ -145,7 +129,6 @@ toggle_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
    /* Add  the value daemon */
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, toggle_get_value);
-  fts_class_add_daemon(cl, obj_property_put, fts_s_value, toggle_put_value);
 
   a[0] = fts_s_int;
   fts_outlet_type_define(cl, 0, fts_s_int, 1, a);

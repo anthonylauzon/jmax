@@ -49,7 +49,7 @@ class Bang extends GraphicObject implements FtsIntValueListener
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
     if (Squeack.isDown(squeack))
-      ftsObject.sendMessage( 0, "bang", null);
+      ftsObject.sendMessage( -1, "bang", null);
   }
 
   static Color bangColors[] = 
