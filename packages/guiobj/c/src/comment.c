@@ -1,7 +1,18 @@
 /*
- *                      Copyright (c) 1993 by IRCAM
- *                          All rights reserved.
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
  *
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
+ */
+
+/*
  * The comment object is just a place holder for comment objects, but do nothing.
  */
 

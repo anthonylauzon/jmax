@@ -1,3 +1,16 @@
+/*
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
+ */
 #include "fts.h"
 
 static void profiler_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

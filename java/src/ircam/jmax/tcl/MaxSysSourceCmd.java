@@ -1,16 +1,15 @@
-/*
- *
- * Copyright (c) 1997 Cornell University.
- * Copyright (c) 1997 Sun Microsystems, Inc.
- * Copyright (c) 1998 Ircam
- *
- * See the file "license.terms" for information on usage and
- * redistribution of this file, and for a DISCLAIMER OF ALL
- * WARRANTIES.
- * 
- * SCCS: @(#) SourceCmd.java 1.9 97/10/09 18:32:05
- *
- */
+//
+// jMax
+// 
+// Copyright (C) 1999 by IRCAM
+// All rights reserved.
+// 
+// This program may be used and distributed under the terms of the 
+// accompanying LICENSE.
+//
+// This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+// for DISCLAIMER OF WARRANTY.
+// 
 
 package ircam.jmax.tcl;
 

@@ -1,13 +1,18 @@
 /*
- *                      Copyright (c) 1993 by IRCAM
- *                          All rights reserved.
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
  *
- *  For any information regarding this and other IRCAM software, please
- *  send email to:
- *                              manager@ircam.fr
- *
- *      $Revision: 1.3 $ IRCAM $Date: 1998/11/02 10:37:19 $
- *
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
+ */
+
+/*
  * vexp_func.c -- this file include all the functions for vexp.
  *		  the first two arguments to the function are the number
  *		  of argument and an array of arguments (argc, argv)

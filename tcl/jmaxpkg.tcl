@@ -1,4 +1,17 @@
-## Implementation of the Max pacakges
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+
+## Implementation of the Max packages
 ##
 ## The implementation use an extension of the standard TCL package
 ## mechanism, implemented by providing a special version of the

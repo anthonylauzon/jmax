@@ -1,16 +1,15 @@
 /*
- *                      Copyright (c) 1993 by IRCAM
- *                          All rights reserved.
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
  *
- *  For any information regarding this and other IRCAM software, please
- *  send email to:
- *                              manager@ircam.fr
- *
- *      $Revision: 1.8 $ IRCAM $Date: 1999/01/08 17:48:23 $
- *
- * Explode by Miller Puckette
- * Code ported and modified by MDC
- *
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
  */
 
 #include <stdio.h>

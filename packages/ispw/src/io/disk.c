@@ -1,14 +1,18 @@
 /*
- *                      Copyright (c) 1993 by IRCAM
- *                          All rights reserved.
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
  *
- *  For any information regarding this and other IRCAM software, please
- *  send email to:
- *                              manager@ircam.fr
- *
- *      $Revision: 1.6 $ IRCAM $Date: 1998/12/07 17:10:18 $
- *
- * writesf~, readsf~: disk recording and playback
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
+ */
+
+/* writesf~, readsf~: disk recording and playback
  *
  * Now supported on the following platforms :
  *  - SGI version : uses AIFF files and AF 1.0 library, should move to the new one.

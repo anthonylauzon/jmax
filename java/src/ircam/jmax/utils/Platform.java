@@ -1,17 +1,16 @@
-/**
- *  Name:               Platform.java
- *      
- *  Comment: A class that insulates the platform-specific
- *  constants.
- *      
- *  @version:   0.1
- *      @author         Peter Hanappe, IRCAM, France
- *
- *  Modifications:
- *
- */
-
-
+//
+// jMax
+// 
+// Copyright (C) 1999 by IRCAM
+// All rights reserved.
+// 
+// This program may be used and distributed under the terms of the 
+// accompanying LICENSE.
+//
+// This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+// for DISCLAIMER OF WARRANTY.
+// 
+//
 
 
 package ircam.jmax.utils;

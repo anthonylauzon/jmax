@@ -1,18 +1,17 @@
-
 /*
- *                      Copyright (c) 1993 by IRCAM
- *                          All rights reserved.
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
  *
- *  For any information regarding this and other IRCAM software, please
- *  send email to:
- *                              manager@ircam.fr
- *
- *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:25 $
- *
- * FTS by Miller Puckette
- * x_vexp.h -- an expression evaluator for MAX
- *
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
  */
+
 
 /*
  * Currently the maximum number of variables (inlets) that are supported

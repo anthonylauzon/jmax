@@ -1,3 +1,17 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+
+
 # TCL simple and naive Implementation of the package command.
 # it just completely ignore the version thing, and provide
 # minimal functionalities, so that we can immediately build

@@ -1,19 +1,16 @@
 /*
- *                      Copyright (c) 1993 by IRCAM
- *                          All rights reserved.
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
  *
- *  For any information regarding this and other IRCAM software, please
- *  send email to:
- *                              manager@ircam.fr
- *
- *      $Revision: 1.3 $ IRCAM $Date: 1998/11/16 13:53:32 $
- *
- * Explode by Miller Puckette
- * Porting and simplifications by MDC.
- * Now, this is only the FTS non graphic code.
- *
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
  */
-
 
 
 typedef struct _evt

@@ -1,4 +1,17 @@
-/* FTS by Miller Puckette -- copyright 1992 IRCAM */
+/*
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
+ */
+
 /* play from a settable instance of explode, set by name.  Messages:
    
    int: nonzero for start, zero for stop.
@@ -7,7 +20,6 @@
    int in right inlet: sets to "explode%d"
    "startat", "nth": same as for explode.
 
-   Ported to the new FTS by mdc.
    */
 
 #include "fts.h"
