@@ -1,3 +1,6 @@
 SUBDIRS=c java help images
 
 packagedir=$(pkgdatadir)/packages/sequence
+package_DATA=sequence.jmax
+
+EXTRA_DIST= $(package_DATA)

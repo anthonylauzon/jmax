@@ -57,23 +57,22 @@ public class AmbitusValue extends AbstractEventValue
   
   public void setProperty(String name, Object value)
   {
-  
-      if(name.equals("pitch"))
-	  {
-	      if(((Integer)value).intValue() > 127)
-		  value = new Integer(127);
-	      pitch = value;
-	  }
-      else if(name.equals("duration"))
-	  duration = value;
-      else if(name.equals("midi_velocity"))
-	  velocity = value;
-      else if(name.equals("midi_channel"))
-	  channel = value;
-       else if(name.equals("ambitus"))
-	  ambitus = value;
-      else
-	  super.setProperty(name, value);
+    if(name.equals("pitch"))
+      {
+	if(((Integer)value).intValue() > 127)
+	  value = new Integer(127);
+	pitch = value;
+      }
+    else if(name.equals("duration"))
+      duration = value;
+    else if(name.equals("midi_velocity"))
+      velocity = value;
+    else if(name.equals("midi_channel"))
+      channel = value;
+    else if(name.equals("ambitus"))
+      ambitus = value;
+    else
+      super.setProperty(name, value);
   }
   public Object getProperty(String name)
   {

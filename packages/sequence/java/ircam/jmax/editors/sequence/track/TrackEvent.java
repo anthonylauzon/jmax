@@ -46,11 +46,11 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
   {
     super(server, parent, objId);
 	
-    this.time = (double)args[0].floatValue;
+    this.time = (double)args[offset].floatValue;
     
-    EventValue evtValue = (EventValue)(ValueInfoTable.getValueInfo(args[1].stringValue).newInstance());
+    EventValue evtValue = (EventValue)(ValueInfoTable.getValueInfo(args[offset+1].symbolValue.toString()).newInstance());
     
-    for(int i = 0; i< length-2; i++)
+    for(int i = 0; i< length-2-offset; i++)
       {
 	Object obj = args[offset+2+i].getValue();
 	
@@ -59,45 +59,45 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 	
 	evtArgs[i] = obj;	  
       }
-	
-    evtValue.setPropertyValues(length-2, evtArgs);   
+    
+    evtValue.setPropertyValues(length-2-offset, evtArgs);   
     setValue(evtValue);
   }
 
-    /**
-     * Sets the data model this event belongs to */
-    public void setDataModel(TrackDataModel model)
-    {
-	itsTrackDataModel = model;
-    }
+  /**
+   * Sets the data model this event belongs to */
+  public void setDataModel(TrackDataModel model)
+  {
+    itsTrackDataModel = model;
+  }
 
-    /**
-     * Gets the data model this event belongs to */
-    public TrackDataModel getDataModel()
-    {
-	return itsTrackDataModel;
-    }
+  /**
+   * Gets the data model this event belongs to */
+  public TrackDataModel getDataModel()
+  {
+    return itsTrackDataModel;
+  }
+  
+  /**
+   * Get the initial time for this event */
+  public double getTime()
+  {
+    return time;
+  }
+  
+  /**
+   * Set the initial time for this event. Use move() when the event is into a 
+   * model (i.e. always for the editors, the exception are Events created on-the-fly 
+   * by specific intereaction modules), in order to keep the DB consistency. */
+  public void setTime(double time)   
+  {
+    this.time = time;
+  }
 
-    /**
-     * Get the initial time for this event */
-    public double getTime()
-    {
-	return time;
-    }
-    
-    /**
-     * Set the initial time for this event. Use move() when the event is into a 
-     * model (i.e. always for the editors, the exception are Events created on-the-fly 
-     * by specific intereaction modules), in order to keep the DB consistency. */
-    public void setTime(double time)   
-    {
-	this.time = time;
-    }
-
-    /**
-     * This is the method that must be called by the editors to
-     * change the initial time of an event. It takes care of
-     * keeping the data base consistency */
+  /**
+   * This is the method that must be called by the editors to
+   * change the initial time of an event. It takes care of
+   * keeping the data base consistency */
   public void move(double time)
   {
     ((FtsTrackObject)itsTrackDataModel).requestEventMove(this, time);
@@ -112,16 +112,16 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
   }
     
 
-    public boolean isHighlighted()
-    {
-	return highlighted;
-    }
-    public void setHighlighted(boolean hh)
-    {
-	highlighted = hh;
-    }
-    /**
-     * Set the named property */
+  public boolean isHighlighted()
+  {
+    return highlighted;
+  }
+  public void setHighlighted(boolean hh)
+  {
+    highlighted = hh;
+  }
+  /**
+   * Set the named property */
   public void setProperty(String name, Object theValue)
   {
     
@@ -235,14 +235,14 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
     public void endUpdate() 
     {
       //((UndoableData) itsTrackDataModel).endUpdate();
-	inGroup = false;
+      inGroup = false;
     }
 
     /**
      * Return true if an undoable section have been opened, and not closed yet*/
     public boolean isInGroup() 
     {
-	return inGroup;
+      return inGroup;
     }
 
     /**
@@ -260,34 +260,34 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
     /*--------------  Editable interface --------------------*/
     public ValueEditor getValueEditor()
     {
-	if (value != null)
-	    return value.getValueInfo().newValueEditor();
-	else return NullEditor.getInstance();
+      if (value != null)
+	return value.getValueInfo().newValueEditor();
+      else return NullEditor.getInstance();
     }
 
-    public Event duplicate () throws CloneNotSupportedException
-    {
-	UtilTrackEvent evt = new UtilTrackEvent();
-	evt.setTime(getTime());
-	EventValue evtValue = (EventValue)(getValue().getValueInfo().newInstance());
-	evtValue.setPropertyValues(getValue().getPropertyCount(), getValue().getPropertyValues());
-	evtValue.setLocalPropertyValues(getValue().getLocalPropertyCount(), getValue().getLocalPropertyValues());
-	evt.setValue(evtValue);
-	return evt;
-    }
+  public Event duplicate () throws CloneNotSupportedException
+  {
+    UtilTrackEvent evt = new UtilTrackEvent();
+    evt.setTime(getTime());
+    EventValue evtValue = (EventValue)(getValue().getValueInfo().newInstance());
+    evtValue.setPropertyValues(getValue().getPropertyCount(), getValue().getPropertyValues());
+    evtValue.setLocalPropertyValues(getValue().getLocalPropertyCount(), getValue().getLocalPropertyValues());
+    evt.setValue(evtValue);
+    return evt;
+  }
 
-    //--- Fields
-    private double time;
-    private EventValue value;
-    private boolean inGroup = false;
-    private boolean highlighted = false;
+  //--- Fields
+  private double time;
+  private EventValue value;
+  private boolean inGroup = false;
+  private boolean highlighted = false;
 
-    public static double DEFAULT_TIME = 0;
-
-    private TrackDataModel itsTrackDataModel;
-    static Object[] evtArgs = new Object[128];
-
-    protected FtsArgs args = new FtsArgs();
+  public static double DEFAULT_TIME = 0;
+  
+  private TrackDataModel itsTrackDataModel;
+  static Object[] evtArgs = new Object[128];
+  
+  protected FtsArgs args = new FtsArgs();
 }
 
 

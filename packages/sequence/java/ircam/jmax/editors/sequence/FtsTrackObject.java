@@ -120,10 +120,10 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
   {
     super(server, parent, objId, className, args, offset, length);
 
-    this.info = ValueInfoTable.getValueInfo(args[offset].stringValue);
+    this.info = ValueInfoTable.getValueInfo(args[offset].symbolValue.toString());
 
-    if(length > 1)
-      this.trackName = args[offset+1].stringValue;
+    if(length > offset+1)
+      this.trackName = args[offset+1].symbolValue.toString();
     else
       this.trackName  = "untitled";
 
@@ -161,14 +161,14 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
   }
   public void addEvents(int nArgs , FtsAtom args[])
   {
-    TrackEvent evt = null;
-    int evtTime;
-    int index = -1;
+    /*TrackEvent evt = null;
+      int evtTime;
+      int index = -1;
 
-    //begin update is called in adderTool 
-    for(int i=0; i<nArgs; i++)
-      addEvent((TrackEvent)(args[i].objectValue));
-
+      for(int i=0; i<nArgs; i++)
+      addEvent((TrackEvent)(args[i].objectValue));*/
+    addEvent( new TrackEvent(getServer(), this, args[0].intValue, "event", args, 1, nArgs));
+    
     // ends the undoable transition
     endUpdate();
   }

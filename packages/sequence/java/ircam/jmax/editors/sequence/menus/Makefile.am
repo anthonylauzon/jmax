@@ -13,5 +13,5 @@ TrackMenu.java
 JAVAC = @JAVACX@
 JAVACFLAGS=@JAVACFLAGSX@
 JAVAROOT=@top_srcdir@/packages/sequence/java
-CLASSPATH_ENV=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar:@top_srcdir@/packages/sequence/java
+CLASSPATH_ENV=CLASSPATH=$(JAVAROOT):@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar
 

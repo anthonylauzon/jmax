@@ -24,6 +24,7 @@
  *
  */
 #include <fts/fts.h>
+#include <ftsprivate/client.h>
 #include <ftsconfig.h>
 #include "seqsym.h"
 #include "event.h"
@@ -228,7 +229,8 @@ track_remove_event(track_t *track, event_t *event)
   cutout_event(track, event);
 
   event->next = event->prev = 0;
-
+  
+  ((fts_object_t *)event)->patcher = 0;
   fts_object_release(event);
 }
 
@@ -260,6 +262,7 @@ track_clear(track_t *track)
       event_t *next = event_get_next(event);
       
       event->next = event->prev = 0;
+      ((fts_object_t *)event)->patcher = 0;
       fts_object_release((fts_object_t *)event);
       
       event = next;
@@ -480,6 +483,15 @@ track_set_name_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, in
     }
 }
 
+static void
+track_add_event_at_client(track_t *this, event_t *event, int ac, const fts_atom_t *at)
+{
+  fts_client_start_message( (fts_object_t *)this, seqsym_addEvents);
+  fts_client_add_int( (fts_object_t *)this, fts_get_object_id((fts_object_t *)event));
+  fts_client_add_atoms( (fts_object_t *)this, ac, at);
+  fts_client_done_message( (fts_object_t *)this);
+}
+
 /* create new event and upload by client request */
 static void
 track_add_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -498,12 +510,9 @@ track_add_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, i
       /* add event to track */
       track_add_event(this, time, event);
       
-      /* create event at client (short cut: could also send upload message to event object) */
-      /*fts_client_upload((fts_object_t *)event, seqsym_event, ac, at);*/
-      
-      /* add event to track at client */
-      fts_set_object(a, (fts_object_t *)event);    
-      fts_client_send_message((fts_object_t *)this, seqsym_addEvents, 1, a);
+      ((fts_object_t *)event)->patcher = fts_object_get_patcher(o);
+      fts_client_register_object((fts_object_t *)event, -1);
+      track_add_event_at_client(this, event, ac, at);
     }
 }
 

@@ -10,7 +10,7 @@ CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):@top_srcdir@/java/src:@top_srcdir@/client/j
 
 jardir=$(pkgdatadir)/packages/sequence/java
 JAR = sequence.jar
-package_DATA= $(JAR)
+jar_DATA= $(JAR)
 
 JAR_DEP= \
 classpackage.stamp \
@@ -25,4 +25,5 @@ ircam/jmax/editors/sequence/track/classpackage.stamp
 $(JAR): $(JAR_DEP)	
 	-test -f $(JAR) || rm -f $(JAR)
 	jar -cvf $(JAR) *.class ircam/jmax/editors/sequence/*.class ircam/jmax/editors/sequence/actions/*.class ircam/jmax/editors/sequence/menus/*.class ircam/jmax/editors/sequence/renderers/*.class ircam/jmax/editors/sequence/tools/*.class ircam/jmax/editors/sequence/track/*.class
+
 

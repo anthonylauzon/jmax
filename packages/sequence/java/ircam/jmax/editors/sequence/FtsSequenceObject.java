@@ -123,21 +123,12 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
     int time;
     int trackTime = 0;
     
-    for(int i=0; i<nArgs; i++)
-      {
-	trackObj = (FtsTrackObject)(args[i].objectValue);
-	/*trackObj.setParent(this);*/
-	
-	track = new TrackBase(trackObj);
-	tracks.addElement(track);
-	
-	notifyTrackAdded(track);
-	
-	time = (int)trackObj.getMaximumTime();
-	if(time>trackTime) trackTime = time;	      
-      }
+    int id = args[0].intValue;
+    trackObj = new FtsTrackObject(getServer(), this, id, "track", args, 1, nArgs);
+    track = new TrackBase(trackObj);
+    tracks.addElement(track);
     
-    notifyTracksAdded(trackTime);
+    notifyTrackAdded(track);
   }
    
   public void removeTracks(int nArgs , FtsAtom args[])
@@ -324,6 +315,7 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 	e.printStackTrace(); 		
       }
   }
+  
   public void requestTrackRemove(Track track)
   {
     args.clear();
