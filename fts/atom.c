@@ -74,8 +74,6 @@ static const char float_metaclass_name[] = "__PRIMITIVE_FLOAT";
 static const char symbol_metaclass_name[] = "__PRIMITIVE_SYMBOL";
 static const char pointer_metaclass_name[] = "__PRIMITIVE_POINTER";
 static const char string_metaclass_name[] = "__PRIMITIVE_STRING";
-/* To be removed */
-static const char connection_metaclass_name[] = "__PRIMITIVE_CONNECTION";
 
 static fts_metaclass_t void_metaclass = { void_metaclass_name, NULL, NULL, NULL, NULL, NULL}; 
 static fts_metaclass_t int_metaclass = { int_metaclass_name, NULL, NULL, NULL, NULL, NULL}; 
@@ -83,8 +81,6 @@ static fts_metaclass_t float_metaclass = { float_metaclass_name, NULL, NULL, NUL
 static fts_metaclass_t symbol_metaclass = { symbol_metaclass_name, NULL, NULL, NULL, NULL, NULL}; 
 static fts_metaclass_t pointer_metaclass = { pointer_metaclass_name, NULL, NULL, NULL, NULL, NULL}; 
 static fts_metaclass_t string_metaclass = { string_metaclass_name, NULL, NULL, NULL, NULL, NULL}; 
-/* To be removed */
-static fts_metaclass_t connection_metaclass = { connection_metaclass_name, NULL, NULL, NULL, NULL, NULL}; 
 
 #define make_primitive_typeid(M) ((fts_metaclass_t *)UINT_TO_POINTER( POINTER_TO_UINT(M) + 1))
 
@@ -94,8 +90,6 @@ fts_metaclass_t *fts_t_float = make_primitive_typeid( &float_metaclass);
 fts_metaclass_t *fts_t_symbol = make_primitive_typeid( &symbol_metaclass);
 fts_metaclass_t *fts_t_pointer = make_primitive_typeid( &pointer_metaclass);
 fts_metaclass_t *fts_t_string = make_primitive_typeid( &string_metaclass);
-/* To be removed */
-fts_metaclass_t *fts_t_connection = make_primitive_typeid( &connection_metaclass);
 
 void fts_kernel_atom_init( void)
 {
@@ -105,15 +99,12 @@ void fts_kernel_atom_init( void)
   assert( fts_new_symbol( symbol_metaclass_name) == symbol_metaclass_name);
   assert( fts_new_symbol( pointer_metaclass_name) == pointer_metaclass_name);
   assert( fts_new_symbol( string_metaclass_name) == string_metaclass_name);
-/* To be removed */
-  assert( fts_new_symbol( connection_metaclass_name) == connection_metaclass_name);
 
   fts_metaclass_set_selector( &int_metaclass, fts_s_int);
   fts_metaclass_set_selector( &float_metaclass, fts_s_float);
   fts_metaclass_set_selector( &symbol_metaclass, fts_s_symbol);
   fts_metaclass_set_selector( &pointer_metaclass, fts_s_pointer);
   fts_metaclass_set_selector( &string_metaclass, fts_s_string);
-  fts_metaclass_set_selector( &connection_metaclass, fts_s_connection);
 
   fts_set_void( &__fts_null);
 }

@@ -239,7 +239,7 @@ public class FtsObject implements Serializable
 
   private int id;
   private transient FtsServer server;
-  private transient FtsProtocolEncoder encoder;
+  private transient BinaryProtocolEncoder encoder;
 
   private FtsObject parent;
 

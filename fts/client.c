@@ -30,6 +30,7 @@
 #include <ftsprivate/loader.h>
 #include <ftsprivate/patparser.h>
 #include <ftsprivate/package.h>
+#include <ftsprivate/tokenizer.h>
 
 #include <string.h>
 #include <stdlib.h>
@@ -291,22 +292,6 @@ static fts_status_t client_manager_instantiate(fts_class_t *cl, int ac, const ft
 #define DEFAULT_UPDATE_PERIOD 20
 #define DEFAULT_MAX_UPDATES 40
 
-typedef void (*transition_action_t)( unsigned char input, void *data);
-typedef struct _state_t state_t;
-
-typedef struct _transition_t {
-  unsigned char input;
-  state_t *target_state;
-  transition_action_t action;
-  struct _transition_t *next;
-} transition_t;
-
-struct _state_t {
-  const char *name;
-  transition_t *transition;
-  transition_t *default_transition;
-};
-
 #define SYMBOL_CACHE_SIZE 512
 
 typedef struct {
@@ -316,28 +301,6 @@ typedef struct {
   int naccess, nhit;
 #endif
 } symbol_cache_t;
-
-/* The protocol decoder state */
-typedef struct {
-  fts_object_t head;
-  /* Automata state */
-  state_t *state;
-  /* Input decoding */
-  int ival;
-  fts_stack_t args;
-  fts_stack_t buffer;
-  /* Symbol caches */
-  symbol_cache_t from_client_cache;
-  struct _client_t *client;
-} protocol_decoder_t;
-
-typedef struct {  
-  /* Output buffer */
-  fts_stack_t buffer;
-  /* Symbol caches */
-  symbol_cache_t to_client_cache;
-  fts_bytestream_t *stream;
-} protocol_encoder_t;
 
 typedef struct update_entry {
   fts_object_t *obj;
@@ -357,10 +320,23 @@ struct _client_t {
   fts_object_t *root_patcher;
   /* Protocol stream */
   fts_bytestream_t *stream;
+
   /* Input protocol decoder */
-  protocol_decoder_t decoder;
+  /* Automata state */
+  int state;
+  /* Input decoding */
+  int input_value;
+  fts_stack_t input_args;
+  fts_stack_t input_buffer;
+  /* Symbol caches */
+  symbol_cache_t input_cache;
+
   /* Output protocol encoder */
-  protocol_encoder_t encoder;
+  /* Output buffer */
+  fts_stack_t output_buffer;
+  /* Symbol caches */
+  symbol_cache_t output_cache;
+
   /* Updates */
   int update_period;
   int max_updates;
@@ -394,6 +370,7 @@ static fts_object_t *client_get_object( client_t *this, int id)
 static void client_release_object( client_t *this, fts_object_t *object)
 {
   fts_atom_t k;
+
   fts_set_int( &k, fts_get_object_id( object));
   fts_hashtable_remove( &this->object_table, &k);
 
@@ -403,8 +380,8 @@ static void client_release_object( client_t *this, fts_object_t *object)
 static void client_register_object( client_t *this, fts_object_t *object)
 {
   fts_atom_t k, v;
-
   int id = this->object_id_count;
+
   this->object_id_count += 2; 
   client_put_object( this, id, object);
   object->head.id = OBJECT_ID( id, this->client_id);
@@ -437,301 +414,129 @@ static void symbol_cache_put( symbol_cache_t *cache, fts_symbol_t s, int index)
   cache->symbols[index] = s;
 }
 
-/*----------------------------------------------------------------------
- * Binary protocol encoder
- */
-
-#define push_char(E,C) fts_stack_push( &(E)->buffer, unsigned char, (C))
-#define push_int(E,N) \
-	push_char(E, (unsigned char) (((N) >> 24) & 0xff)), \
-	push_char(E, (unsigned char) (((N) >> 16) & 0xff)), \
-	push_char(E, (unsigned char) (((N) >> 8) & 0xff)), \
-	push_char(E, (unsigned char) (((N) >> 0) & 0xff))
-
-static void protocol_encoder_write_int( protocol_encoder_t *encoder, int n)
-{
-  push_char( encoder, FTS_PROTOCOL_INT);
-  push_int( encoder, n);
-}
-
-static void protocol_encoder_write_float( protocol_encoder_t *encoder, float value)
-{
-  float f = value;
-
-  push_char( encoder, FTS_PROTOCOL_FLOAT);
-  push_int( encoder, *((unsigned int *)&f));
-}
-
-static void protocol_encoder_write_symbol( protocol_encoder_t *encoder, fts_symbol_t s)
-{
-  unsigned int index;
-  symbol_cache_t *cache = &encoder->to_client_cache;
-
-#ifdef CACHE_REPORT
-  cache->naccess++;
-#endif
-
-  index = (unsigned int)s % cache->length;
-
-  if (cache->symbols[index] == s)
-    {
-#ifdef CACHE_REPORT
-      cache->nhit++;
-#endif
-
-      /* just send the index */
-      push_char( encoder, FTS_PROTOCOL_SYMBOL_INDEX);
-      push_int( encoder, index);
-    }
-  else 
-    {
-      const char *p = s;
-
-      cache->symbols[index] = s;
-
-      /* send both the cache index and the symbol */
-      push_char( encoder, FTS_PROTOCOL_SYMBOL_CACHE);
-      push_int( encoder, index);
-
-      while (*p)
-	push_char( encoder, (unsigned char)*p++);
-
-      push_char( encoder, 0);
-    }
-
-#ifdef CACHE_REPORT
-  if (cache->naccess % 1024 == 0)
-    {
-      fts_log( "[client] output symbol cache hit: %6.2f%%\n", ((100.0 * cache->nhit) / cache->naccess));
-    }
-#endif
-}
-
-static void protocol_encoder_write_string( protocol_encoder_t *encoder, const char *s)
-{
-  push_char( encoder, FTS_PROTOCOL_STRING);
-
-  while (*s)
-    push_char( encoder, (unsigned char)*s++);
-
-  push_char( encoder, 0);
-}
-
-static void protocol_encoder_write_object( protocol_encoder_t *encoder, fts_object_t *obj)
-{
-  push_char( encoder, FTS_PROTOCOL_OBJECT);
-  push_int( encoder, OBJECT_ID_OBJ( fts_object_get_id( obj)));
-}
-
-static void protocol_encoder_write_atoms( protocol_encoder_t *encoder, int ac, const fts_atom_t *at)
-{
-  while (ac--)
-    {
-      if ( fts_is_int( at))
-	protocol_encoder_write_int( encoder, fts_get_int( at));
-      else if ( fts_is_float( at))
-	protocol_encoder_write_float( encoder, fts_get_float( at));
-      else if ( fts_is_symbol( at))
-	protocol_encoder_write_symbol( encoder, fts_get_symbol( at));
-      else if ( fts_is_string( at))
-	protocol_encoder_write_string( encoder, fts_get_string( at));
-      else if ( fts_is_object( at))
-	protocol_encoder_write_object( encoder, fts_get_object( at));
-
-      at++;
-    }
-}
-
-static void protocol_encoder_flush( protocol_encoder_t *encoder)
-{
-  push_char( encoder, FTS_PROTOCOL_END_OF_MESSAGE);
-  
-  fts_bytestream_output( encoder->stream, fts_stack_get_top( &encoder->buffer), fts_stack_get_base( &encoder->buffer));
-
-  fts_stack_clear( &encoder->buffer);
-}
-
-static void protocol_encoder_init( protocol_encoder_t *encoder, fts_bytestream_t *stream)
-{
-  fts_stack_init( &encoder->buffer, unsigned char);
-  symbol_cache_init( &encoder->to_client_cache);
-  encoder->stream = stream;
-}
-
-static void protocol_encoder_destroy( protocol_encoder_t *encoder)
-{
-  fts_stack_destroy( &encoder->buffer);
-  symbol_cache_destroy( &encoder->to_client_cache);
-}
 
 /*----------------------------------------------------------------------
  * Finite state automata for protocol decoding
  */
 
-static transition_t *transition_new( unsigned char input, state_t *target_state, transition_action_t action, transition_t *next)
-{
-  transition_t *t = (transition_t *)fts_malloc( sizeof( transition_t));
-  t->input = input;
-  t->target_state = target_state;
-  t->action = action;
-  t->next = next;
-  return t;
-}
-
-static state_t *state_new( const char *name)
-{
-  state_t *s = (state_t *)fts_malloc( sizeof( state_t));
-  s->name = name;
-  s->transition = 0;
-  s->default_transition = 0;
-  return s;
-}
-
-static void state_add_transition( state_t *state, unsigned char input, state_t *target_state, transition_action_t action)
-{
-  state->transition = transition_new( input, target_state, action, state->transition);
-}
-
-static void state_add_default_transition( state_t *state, state_t *target_state, transition_action_t action)
-{
-  state->default_transition = transition_new( 0, target_state, action, 0);
-}
-
-static state_t *state_next( state_t *state, unsigned char input, void *data)
-{
-  transition_t *transition = state->transition;
-
-  while (transition)
-    {
-      if (transition->input == input)
-	{
-	  (*transition->action)( input, data);
-	  return transition->target_state;
-	}
-
-      transition = transition->next;
-    }
-
-  if (state->default_transition)
-    {
-      (*state->default_transition->action)( input, data);
-      return state->default_transition->target_state;
-    }
-
-  return 0;
-}
-
-/*----------------------------------------------------------------------
- * Protocol decoding
- */
-
 /* Actions */
 
-static void clear_action( unsigned char input, void *data)
+static void null_action( unsigned char input, client_t *client)
 {
-  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
-
-  decoder->ival = 0;
-  fts_stack_clear( &decoder->buffer);
 }
 
-static void shift_action( unsigned char input, void *data)
+static void clear_action( unsigned char input, client_t *client)
 {
-  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
-
-  decoder->ival = decoder->ival << 8 | input;
+  client->input_value = 0;
+  fts_stack_clear( &client->input_buffer);
 }
 
-static void buffer_shift_action( unsigned char input, void *data)
+static void shift_action( unsigned char input, client_t *client)
 {
-  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
-
-  fts_stack_push( &decoder->buffer, unsigned char, input);
+  client->input_value = client->input_value << 8 | input;
 }
 
-static void end_int_action( unsigned char input, void *data)
+static void buffer_shift_action( unsigned char input, client_t *client)
 {
-  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
+  fts_stack_push( &client->input_buffer, unsigned char, input);
+}
+
+static void end_int_action( unsigned char input, client_t *client)
+{
   fts_atom_t a;
 
-  decoder->ival = (decoder->ival << 8) | input;
-  fts_set_int( &a, decoder->ival);
-  fts_stack_push( &decoder->args, fts_atom_t, a);
+  client->input_value = (client->input_value << 8) | input;
+  fts_set_int( &a, client->input_value);
+  fts_stack_push( &client->input_args, fts_atom_t, a);
 } 
 
-static void end_float_action( unsigned char input, void *data)
+static void end_float_action( unsigned char input, client_t *client)
 {
-  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
   fts_atom_t a;
 
-  decoder->ival = (decoder->ival << 8) | input;
-  fts_set_float( &a, *((float *)&decoder->ival));
-  fts_stack_push( &decoder->args, fts_atom_t, a);
+  client->input_value = (client->input_value << 8) | input;
+  fts_set_float( &a, *((float *)&client->input_value));
+  fts_stack_push( &client->input_args, fts_atom_t, a);
 }
 
-static void end_symbol_index_action( unsigned char input, void *data)
+static void end_symbol_index_action( unsigned char input, client_t *client)
 {
-  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
   fts_atom_t a;
 
-  decoder->ival = (decoder->ival << 8) | input;
-  fts_set_symbol( &a, decoder->from_client_cache.symbols[ decoder->ival]);
-  fts_stack_push( &decoder->args, fts_atom_t, a);
+  client->input_value = (client->input_value << 8) | input;
+  fts_set_symbol( &a, client->input_cache.symbols[ client->input_value]);
+  fts_stack_push( &client->input_args, fts_atom_t, a);
 }
 
-static void end_symbol_cache_action( unsigned char input, void *data)
+static void end_symbol_cache_action( unsigned char input, client_t *client)
 {
-  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
   fts_symbol_t s;
   fts_atom_t a;
 
-  fts_stack_push( &decoder->buffer, unsigned char, '\0');
-  s = fts_new_symbol_copy( fts_stack_get_base( &decoder->buffer));
-  symbol_cache_put( &decoder->from_client_cache, s, decoder->ival);
+  fts_stack_push( &client->input_buffer, unsigned char, '\0');
+  s = fts_new_symbol_copy( fts_stack_get_base( &client->input_buffer));
+  symbol_cache_put( &client->input_cache, s, client->input_value);
   fts_set_symbol( &a, s);
-  fts_stack_push( &decoder->args, fts_atom_t, a);
+  fts_stack_push( &client->input_args, fts_atom_t, a);
 }
 
-static void end_string_action( unsigned char input, void *data)
+static void end_string_action( unsigned char input, client_t *client)
 {
-  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
   fts_atom_t a;
 
-  fts_stack_push( &decoder->buffer, unsigned char, '\0');
-  fts_set_symbol( &a, fts_new_symbol_copy( fts_stack_get_base( &decoder->buffer)));
-  fts_stack_push( &decoder->args, fts_atom_t, a);
+  fts_stack_push( &client->input_buffer, unsigned char, '\0');
+  fts_set_string( &a, strdup( fts_stack_get_base( &client->input_buffer)));
+  fts_stack_push( &client->input_args, fts_atom_t, a);
 }
 
-static void end_object_action( unsigned char input, void *data)
+static void end_raw_string_action( unsigned char input, client_t *client)
 {
-  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
+  fts_atom_t a;
+  fts_tokenizer_t tokenizer;
+  char *p;
+  int l;
+
+  fts_stack_push( &client->input_buffer, unsigned char, '\0');
+  fts_stack_push( &client->input_buffer, unsigned char, '\0');
+
+  p = fts_stack_get_base( &client->input_buffer);
+  l = fts_stack_get_top( &client->input_buffer);
+  fts_tokenizer_init_buffer( &tokenizer, p, l);
+
+  while ( fts_tokenizer_next( &tokenizer, &a) != 0)
+    fts_stack_push( &client->input_args, fts_atom_t, a);
+
+  fts_tokenizer_destroy( &tokenizer);
+}
+
+static void end_object_action( unsigned char input, client_t *client)
+{
   fts_object_t *obj = 0;
   fts_atom_t v;
 
-  decoder->ival = (decoder->ival << 8) | input;
-  obj = client_get_object( decoder->client, decoder->ival);
+  client->input_value = (client->input_value << 8) | input;
+  obj = client_get_object( client, client->input_value);
 
   if (obj == NULL)
     {
-      fts_log( "[client] invalid object id: %d\n", decoder->ival);
+      fts_log( "[client] invalid object id: %d\n", client->input_value);
       fts_set_void( &v);
     }
   else
     fts_set_object( &v, obj);
 
-  fts_stack_push( &decoder->args, fts_atom_t, v);
+  fts_stack_push( &client->input_args, fts_atom_t, v);
 }
 
-static void end_message_action( unsigned char input, void *data)
+static void end_message_action( unsigned char input, client_t *client)
 {
-  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
   fts_object_t *target;
   fts_symbol_t selector;
   int argc;
   fts_atom_t *argv;
 
-  argc = fts_stack_get_top( &decoder->args);
-  argv = (fts_atom_t *)fts_stack_get_base( &decoder->args);
+  argc = fts_stack_get_top( &client->input_args);
+  argv = (fts_atom_t *)fts_stack_get_base( &client->input_args);
 
   selector = fts_get_symbol( argv+1);
 
@@ -756,156 +561,131 @@ static void end_message_action( unsigned char input, void *data)
     fts_send_message( target, fts_SystemInlet, selector, argc, argv);
 
  skipped:
-  fts_stack_clear( &decoder->args);
+  fts_stack_clear( &client->input_args);
 }
 
-static void protocol_error_action( unsigned char input, void *data)
+static int state_next( int state, unsigned char input, client_t *client)
 {
-  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
+  int newstate = 0;
 
-  fprintf( stderr, "Protocol error: state %s incoming %d\n", decoder->state->name, input);
-}
+#define q_initial            1
+#define q_int0               2
+#define q_int1               3
+#define q_int2               4
+#define q_int3               5
+#define q_float0             6
+#define q_float1             7
+#define q_float2             8
+#define q_float3   	     9
+#define q_string             10
+#define q_object0            11
+#define q_object1            12
+#define q_object2            13
+#define q_object3            14
+#define q_symbol_index0      15
+#define q_symbol_index1      16
+#define q_symbol_index2      17
+#define q_symbol_index3      18
+#define q_symbol_cache0      19
+#define q_symbol_cache1      20
+#define q_symbol_cache2      21
+#define q_symbol_cache3      22
+#define q_symbol_cache4      23
+#define q_raw_string         24
 
-static state_t *build_state_machine( void)
-{
-  static state_t *state_machine_single_instance = 0;
+#define state_add_transition( INPUT, NEWSTATE, ACTION) if (input == INPUT) { newstate = NEWSTATE; ACTION( input, client); }
+#define state_add_default_transition( NEWSTATE, ACTION) newstate = NEWSTATE; ACTION( input, client);
 
-  state_t *q_initial;
+  switch( state) {
+  case 0:
+    /* try to skip till end of message */
+    state_add_transition( FTS_PROTOCOL_END_OF_MESSAGE, q_initial, null_action);
+    break;
+  case q_initial:
+    state_add_transition( FTS_PROTOCOL_INT, q_int0, clear_action);
+    state_add_transition( FTS_PROTOCOL_FLOAT, q_float0, clear_action);
+    state_add_transition( FTS_PROTOCOL_SYMBOL_INDEX, q_symbol_index0, clear_action);
+    state_add_transition( FTS_PROTOCOL_SYMBOL_CACHE, q_symbol_cache0, clear_action);
+    state_add_transition( FTS_PROTOCOL_STRING, q_string, clear_action);
+    state_add_transition( FTS_PROTOCOL_RAW_STRING, q_raw_string, clear_action);
+    state_add_transition( FTS_PROTOCOL_OBJECT, q_object0, clear_action);
+    state_add_transition( FTS_PROTOCOL_END_OF_MESSAGE, q_initial, end_message_action);
+    break;
+  case q_int0:
+    state_add_default_transition( q_int1, shift_action);
+    break;
+  case q_int1:
+    state_add_default_transition( q_int2, shift_action);
+    break;
+  case q_int2:
+    state_add_default_transition( q_int3, shift_action);
+    break;
+  case q_int3:
+    state_add_default_transition( q_initial, end_int_action);
+    break;
+  case q_float0:
+    state_add_default_transition( q_float1, shift_action);
+    break;
+  case q_float1:
+    state_add_default_transition( q_float2, shift_action);
+    break;
+  case q_float2:
+    state_add_default_transition( q_float3, shift_action);
+    break;
+  case q_float3:
+    state_add_default_transition( q_initial, end_float_action);
+    break;
+  case q_symbol_index0:
+    state_add_default_transition( q_symbol_index1, shift_action);
+    break;
+  case q_symbol_index1:
+    state_add_default_transition( q_symbol_index2, shift_action);
+    break;
+  case q_symbol_index2:
+    state_add_default_transition( q_symbol_index3, shift_action);
+    break;
+  case q_symbol_index3:
+    state_add_default_transition( q_initial, end_symbol_index_action);
+    break;
+  case q_symbol_cache0:
+    state_add_default_transition( q_symbol_cache1, shift_action);
+    break;
+  case q_symbol_cache1:
+    state_add_default_transition( q_symbol_cache2, shift_action);
+    break;
+  case q_symbol_cache2:
+    state_add_default_transition( q_symbol_cache3, shift_action);
+    break;
+  case q_symbol_cache3:
+    state_add_default_transition( q_symbol_cache4, shift_action);
+    break;
+  case q_symbol_cache4:
+    state_add_transition( 0, q_initial, end_symbol_cache_action);
+    state_add_default_transition( q_symbol_cache4, buffer_shift_action);
+    break;
+  case q_string:
+    state_add_transition( 0, q_initial, end_string_action);
+    state_add_default_transition( q_string, buffer_shift_action);
+    break;
+  case q_raw_string:
+    state_add_transition( 0, q_initial, end_raw_string_action);
+    state_add_default_transition( q_raw_string, buffer_shift_action);
+    break;
+  case q_object0:
+    state_add_default_transition( q_object1, shift_action);
+    break;
+  case q_object1:
+    state_add_default_transition( q_object2, shift_action);
+    break;
+  case q_object2:
+    state_add_default_transition( q_object3, shift_action);
+    break;
+  case q_object3:
+    state_add_default_transition( q_initial, end_object_action);
+    break;
+  }
 
-  state_t *q_int0;
-  state_t *q_int1;
-  state_t *q_int2;
-  state_t *q_int3;
-
-  state_t *q_float0;
-  state_t *q_float1;
-  state_t *q_float2;
-  state_t *q_float3;
-
-  state_t *q_string;
-
-  state_t *q_object0;
-  state_t *q_object1;
-  state_t *q_object2;
-  state_t *q_object3;
-
-  state_t *q_symbol_index0;
-  state_t *q_symbol_index1;
-  state_t *q_symbol_index2;
-  state_t *q_symbol_index3;
-
-  state_t *q_symbol_cache0;
-  state_t *q_symbol_cache1;
-  state_t *q_symbol_cache2;
-  state_t *q_symbol_cache3;
-  state_t *q_symbol_cache4;
-
-  if (state_machine_single_instance)
-    return state_machine_single_instance;
-
-  q_initial = state_new( "Initial");
-
-  q_int0 = state_new( "Int0");
-  q_int1 = state_new( "Int1");
-  q_int2 = state_new( "Int2");
-  q_int3 = state_new( "Int3");
-
-  q_float0 = state_new( "Float0");
-  q_float1 = state_new( "Float1");
-  q_float2 = state_new( "Float2");
-  q_float3 = state_new( "Float3");
-
-  q_string = state_new( "String");
-
-  q_object0 = state_new( "Object0");
-  q_object1 = state_new( "Object1");
-  q_object2 = state_new( "Object2");
-  q_object3 = state_new( "Object3");
-
-  q_symbol_index0 = state_new( "SymbolIndex0");
-  q_symbol_index1 = state_new( "SymbolIndex1");
-  q_symbol_index2 = state_new( "SymbolIndex2");
-  q_symbol_index3 = state_new( "SymbolIndex3");
-
-  q_symbol_cache0 = state_new( "SymbolCache0");
-  q_symbol_cache1 = state_new( "SymbolCache1");
-  q_symbol_cache2 = state_new( "SymbolCache2");
-  q_symbol_cache3 = state_new( "SymbolCache3");
-  q_symbol_cache4 = state_new( "SymbolCache4");
-
-  state_add_transition( q_initial, FTS_PROTOCOL_INT, q_int0, clear_action);
-  state_add_transition( q_initial, FTS_PROTOCOL_FLOAT, q_float0, clear_action);
-  state_add_transition( q_initial, FTS_PROTOCOL_SYMBOL_INDEX, q_symbol_index0, clear_action);
-  state_add_transition( q_initial, FTS_PROTOCOL_SYMBOL_CACHE, q_symbol_cache0, clear_action);
-  state_add_transition( q_initial, FTS_PROTOCOL_STRING, q_string, clear_action);
-  state_add_transition( q_initial, FTS_PROTOCOL_OBJECT, q_object0, clear_action);
-  state_add_transition( q_initial, FTS_PROTOCOL_END_OF_MESSAGE, q_initial, end_message_action);
-
-  state_add_default_transition( q_int0, q_int1, shift_action);
-  state_add_default_transition( q_int1, q_int2, shift_action);
-  state_add_default_transition( q_int2, q_int3, shift_action);
-  state_add_default_transition( q_int3, q_initial, end_int_action);
-
-  state_add_default_transition( q_float0, q_float1, shift_action);
-  state_add_default_transition( q_float1, q_float2, shift_action);
-  state_add_default_transition( q_float2, q_float3, shift_action);
-  state_add_default_transition( q_float3, q_initial, end_float_action);
-
-  state_add_default_transition( q_symbol_index0, q_symbol_index1, shift_action);
-  state_add_default_transition( q_symbol_index1, q_symbol_index2, shift_action);
-  state_add_default_transition( q_symbol_index2, q_symbol_index3, shift_action);
-  state_add_default_transition( q_symbol_index3, q_initial, end_symbol_index_action);
-
-  state_add_default_transition( q_symbol_cache0, q_symbol_cache1, shift_action);
-  state_add_default_transition( q_symbol_cache1, q_symbol_cache2, shift_action);
-  state_add_default_transition( q_symbol_cache2, q_symbol_cache3, shift_action);
-  state_add_default_transition( q_symbol_cache3, q_symbol_cache4, shift_action);
-  state_add_transition( q_symbol_cache4, 0, q_initial, end_symbol_cache_action);
-  state_add_default_transition( q_symbol_cache4, q_symbol_cache4, buffer_shift_action);
-
-  state_add_transition( q_string, 0, q_initial, end_string_action);
-  state_add_default_transition( q_string, q_string, buffer_shift_action);
-
-  state_add_default_transition( q_object0, q_object1, shift_action);
-  state_add_default_transition( q_object1, q_object2, shift_action);
-  state_add_default_transition( q_object2, q_object3, shift_action);
-  state_add_default_transition( q_object3, q_initial, end_object_action);
-
-  state_machine_single_instance = q_initial;
-
-  return state_machine_single_instance;
-}
-
-static void protocol_decoder_run(  protocol_decoder_t *decoder, int size, const unsigned char *buffer)
-{
-  int i;
-
-  for ( i = 0; i < size; i++)
-    {
-      decoder->state = state_next( decoder->state, buffer[i], decoder);
-      if (decoder->state == 0)
-	fts_log( "[client] protocol error\n");
-    }
-}
-
-static void protocol_decoder_init( protocol_decoder_t *decoder, client_t *client)
-{
-  decoder->state = 0;
-  decoder->ival = 0;
-
-  fts_stack_init( &decoder->args, fts_atom_t);
-  fts_stack_init( &decoder->buffer, unsigned char);
-
-  symbol_cache_init( &decoder->from_client_cache);
-
-  decoder->client = client;
-  decoder->state = build_state_machine();
-}
-
-static void protocol_decoder_destroy( protocol_decoder_t *decoder)
-{
-  fts_stack_destroy( &decoder->args);
-  fts_stack_destroy( &decoder->buffer);
+  return newstate;
 }
 
 /*----------------------------------------------------------------------
@@ -916,6 +696,7 @@ static void protocol_decoder_destroy( protocol_decoder_t *decoder)
 static void client_receive( fts_object_t *o, int size, const unsigned char* buffer)
 {
   client_t *this = (client_t *)o;
+  int i;
 
   if ( size <= 0)
     {
@@ -927,7 +708,13 @@ static void client_receive( fts_object_t *o, int size, const unsigned char* buff
       return;
     }
 
-  protocol_decoder_run( &this->decoder, size, buffer);
+
+  for ( i = 0; i < size; i++)
+    {
+      this->state = state_next( this->state, buffer[i], this);
+      if (this->state == 0)
+	fts_log( "[client] protocol error\n");
+    }
 }
 
 static void client_new_object( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1063,7 +850,7 @@ fts_client_load_patcher(fts_symbol_t file_name, fts_object_t *parent, int id)
      fts_binary_file_load( filename, parent, 0, 0)
      else if is a dot_pat file do 
      fts_load_dotpat_patcher(parent, filename)
-   */
+  */
   
   type = ! fts_is_dotpat_file( file_name);
 
@@ -1083,7 +870,7 @@ fts_client_load_patcher(fts_symbol_t file_name, fts_object_t *parent, int id)
   /* Save the file name, for future autosaves and other services */
   fts_patcher_set_file_name(patcher, file_name);
 
-  /* activate the post-load init, like loadbangs */	  
+  /* activate the post-load init, like loadbangs */   
   fts_send_message( (fts_object_t *)patcher, fts_SystemInlet, fts_new_symbol("load_init"), 0, 0);
 
   fts_set_int(a, fts_get_object_id((fts_object_t *)patcher));
@@ -1203,8 +990,16 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   /* Set my client id */
   this->head.head.id = OBJECT_ID( 1, this->client_id);
 
-  protocol_encoder_init( &this->encoder, this->stream);
-  protocol_decoder_init( &this->decoder, this);
+  /* output protocol encoder */
+  fts_stack_init( &this->output_buffer, unsigned char);
+  symbol_cache_init( &this->output_cache);
+
+  /* input protocol decoder */
+  this->state = q_initial;
+  this->input_value = 0;
+  fts_stack_init( &this->input_args, fts_atom_t);
+  fts_stack_init( &this->input_buffer, unsigned char);
+  symbol_cache_init( &this->input_cache);
 
   fts_bytestream_add_listener( this->stream, (fts_object_t *) this, client_receive);
 
@@ -1239,16 +1034,16 @@ static void client_get_packages( fts_object_t *o, int winlet, fts_symbol_t s, in
       if( pkg != NULL && pkg->summaries !=NULL)
 	{
 	  fts_hashtable_get_keys( pkg->summaries, &j);
-	  dir = fts_package_get_dir( pkg);	  
+	  dir = fts_package_get_dir( pkg);   
 
 	  while (fts_iterator_has_more( &j))
 	    {
 	      fts_iterator_next( &j, a);
 	      fts_hashtable_get( pkg->summaries, a, &a[1]);
-	      
+       
 	      snprintf(path, 256, "%s%c%s%c%s", dir, fts_file_separator, "help", fts_file_separator, fts_get_symbol( a+1));
 	      filename = fts_new_symbol_copy(path);
-	      
+       
 	      fts_client_add_symbol( o, fts_get_symbol( a));
 	      fts_client_add_symbol( o, filename);
 	    }
@@ -1263,15 +1058,20 @@ static void client_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
 #ifndef HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
   fts_object_release( this->root_patcher);
-/*    fts_object_delete_from_patcher( this->root_patcher); */
+  /*    fts_object_delete_from_patcher( this->root_patcher); */
 #endif
 
   client_table_remove( this->client_id);
 
   fts_hashtable_destroy( &this->object_table);
 
-  protocol_encoder_destroy( &this->encoder);
-  protocol_decoder_destroy( &this->decoder);
+  /* output protocol encoder */
+  fts_stack_destroy( &this->output_buffer);
+  symbol_cache_destroy( &this->output_cache);
+
+  /* input protocol decoder */
+  fts_stack_destroy( &this->input_args);
+  fts_stack_destroy( &this->input_buffer);
 
   fts_log( "[client]: Released client connection on socket\n");
 }
@@ -1467,6 +1267,88 @@ static fts_status_t client_controller_instantiate(fts_class_t *cl, int ac, const
  *
  */
 
+#define write_char(C,N) fts_stack_push( &(C)->output_buffer, unsigned char, (N))
+#define write_int(C,N) \
+	write_char(C, (unsigned char) (((N) >> 24) & 0xff)), \
+	write_char(C, (unsigned char) (((N) >> 16) & 0xff)), \
+	write_char(C, (unsigned char) (((N) >> 8) & 0xff)), \
+	write_char(C, (unsigned char) (((N) >> 0) & 0xff))
+
+static void client_write_int( client_t *client, int v)
+{
+  write_char( client, FTS_PROTOCOL_INT);
+  write_int( client, v);
+}
+
+static void client_write_float( client_t *client, float v)
+{
+  float f = v;
+
+  write_char( client, FTS_PROTOCOL_FLOAT);
+  write_int( client, *((unsigned int *)&f));
+}
+
+static void client_write_symbol( client_t *client, fts_symbol_t s)
+{
+  unsigned int index;
+  symbol_cache_t *cache = &client->output_cache;
+
+#ifdef CACHE_REPORT
+  cache->naccess++;
+#endif
+
+  index = (unsigned int)s % cache->length;
+
+  if (cache->symbols[index] == s)
+    {
+#ifdef CACHE_REPORT
+      cache->nhit++;
+#endif
+
+      /* just send the index */
+      write_char( client, FTS_PROTOCOL_SYMBOL_INDEX);
+      write_int( client, index);
+    }
+  else 
+    {
+      const char *p = s;
+
+      cache->symbols[index] = s;
+
+      /* send both the cache index and the symbol */
+      write_char( client, FTS_PROTOCOL_SYMBOL_CACHE);
+      write_int( client, index);
+
+      while (*p)
+	write_char( client, (unsigned char)*p++);
+
+      write_char( client, 0);
+    }
+
+#ifdef CACHE_REPORT
+  if (cache->naccess % 1024 == 0)
+    {
+      fts_log( "[client] output symbol cache hit: %6.2f%%\n", ((100.0 * cache->nhit) / cache->naccess));
+    }
+#endif
+}
+
+static void client_write_string( client_t *client, const char *s)
+{
+  write_char( client, FTS_PROTOCOL_STRING);
+
+  while (*s)
+    write_char( client, (unsigned char)*s++);
+
+  write_char( client, 0);
+}
+
+static void client_write_object( client_t *client, fts_object_t *obj)
+{
+  write_char( client, FTS_PROTOCOL_OBJECT);
+  write_int( client, OBJECT_ID_OBJ( fts_object_get_id( obj)));
+}
+
 void fts_client_start_message( fts_object_t *obj, fts_symbol_t selector)
 {
   client_t *client = object_get_client( obj);
@@ -1474,8 +1356,8 @@ void fts_client_start_message( fts_object_t *obj, fts_symbol_t selector)
   if ( !client)
     return;
 
-  protocol_encoder_write_object( &client->encoder, obj);
-  protocol_encoder_write_symbol( &client->encoder, selector);
+  client_write_object( client, obj);
+  client_write_symbol( client, selector);
 }
 
 void fts_client_add_int( fts_object_t *obj, int v)
@@ -1485,7 +1367,7 @@ void fts_client_add_int( fts_object_t *obj, int v)
   if ( !client)
     return;
 
-  protocol_encoder_write_int( &client->encoder, v);
+  client_write_int( client, v);
 }
 
 void fts_client_add_float( fts_object_t *obj, float v)
@@ -1495,7 +1377,7 @@ void fts_client_add_float( fts_object_t *obj, float v)
   if ( !client)
     return;
 
-  protocol_encoder_write_float( &client->encoder, v);
+  client_write_float( client, v);
 }
 
 void fts_client_add_symbol( fts_object_t *obj, fts_symbol_t v)
@@ -1505,7 +1387,7 @@ void fts_client_add_symbol( fts_object_t *obj, fts_symbol_t v)
   if ( !client)
     return;
 
-  protocol_encoder_write_symbol( &client->encoder, v);
+  client_write_symbol( client, v);
 }
 
 void fts_client_add_string( fts_object_t *obj, const char *v)
@@ -1515,7 +1397,7 @@ void fts_client_add_string( fts_object_t *obj, const char *v)
   if ( !client)
     return;
 
-  protocol_encoder_write_string( &client->encoder, v);
+  client_write_string( client, v);
 }
 
 void fts_client_add_object( fts_object_t *obj, fts_object_t *v)
@@ -1525,7 +1407,7 @@ void fts_client_add_object( fts_object_t *obj, fts_object_t *v)
   if ( !client)
     return;
 
-  protocol_encoder_write_object( &client->encoder, v);
+  client_write_object( client, v);
 }
 
 void fts_client_add_atoms( fts_object_t *obj, int ac, const fts_atom_t *at)
@@ -1535,7 +1417,21 @@ void fts_client_add_atoms( fts_object_t *obj, int ac, const fts_atom_t *at)
   if ( !client)
     return;
 
-  protocol_encoder_write_atoms( &client->encoder, ac, at);
+  while (ac--)
+    {
+      if ( fts_is_int( at))
+	client_write_int( client, fts_get_int( at));
+      else if ( fts_is_float( at))
+	client_write_float( client, fts_get_float( at));
+      else if ( fts_is_symbol( at))
+	client_write_symbol( client, fts_get_symbol( at));
+      else if ( fts_is_string( at))
+	client_write_string( client, fts_get_string( at));
+      else if ( fts_is_object( at))
+	client_write_object( client, fts_get_object( at));
+
+      at++;
+    }
 }
 
 void fts_client_done_message( fts_object_t *obj)
@@ -1545,7 +1441,11 @@ void fts_client_done_message( fts_object_t *obj)
   if ( !client)
     return;
 
-  protocol_encoder_flush( &client->encoder);
+  write_char( client, FTS_PROTOCOL_END_OF_MESSAGE);
+  
+  fts_bytestream_output( client->stream, fts_stack_get_top( &client->output_buffer), fts_stack_get_base( &client->output_buffer));
+
+  fts_stack_clear( &client->output_buffer);
 }
 
 void fts_client_send_message( fts_object_t *obj, fts_symbol_t selector, int ac, const fts_atom_t *at)
@@ -1759,4 +1659,3 @@ void fts_client_config( void)
   else
     client_tcp_manager_install();
 }
-

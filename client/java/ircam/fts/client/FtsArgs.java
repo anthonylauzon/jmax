@@ -103,6 +103,12 @@ public class FtsArgs {
     array[current++].setString( s);
   }
 
+  public final void addRawString( String s)
+  {
+    ensureCapacity(1);
+    array[current++].setRawString( s);
+  }
+
   public final void addObject( FtsObject o)
   {
     ensureCapacity(1);
@@ -145,6 +151,11 @@ public class FtsArgs {
     return array[index].isString();
   }
 
+  public final boolean isRawString( int index)
+  {
+    return array[index].isRawString();
+  }
+
   public final boolean isObject( int index)
   {
     return array[index].isObject();
@@ -172,11 +183,15 @@ public class FtsArgs {
     return array[index].stringValue;
   }
 
+  public final String getRawString( int index)
+  {
+    return array[index].stringValue;
+  }
+
   public final FtsObject getObject( int index)
   {
     return array[index].objectValue;
   }
-
 
 
   public void clear()

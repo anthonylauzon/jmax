@@ -25,21 +25,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fts/fts.h>
-#define YYSTYPE fts_atom_t
-#include "parser.h"
 #include "ftsprivate/tokenizer.h"
 
-#define YY_DECL int yylex( YYSTYPE *lvalp)
-#define SET_INT(L,T) fts_set_int( (L), strtol( T, (char **)NULL, 10))
-#define SET_HEXINT(L,T) fts_set_int( (L), strtol( T, (char **)NULL, 16))
-#define SET_FLOAT(L,T) fts_set_float( (L), strtod( T, (char **)NULL))
-#define SET_SYMBOL(L,S) fts_set_symbol( (L), (S)) 
-#define SET_TOKEN(L,T) fts_set_token( (L), (T)) 
-#define SET_SYMBOL_COPY(L,T) fts_set_symbol( (L), fts_new_symbol_copy( T)) 
+#define YY_DECL int yylex( fts_atom_t *lvalp)
+#define SET_INT(T) fts_set_int( (lvalp), strtol( T, (char **)NULL, 10))
+#define SET_HEXINT(T) fts_set_int( (lvalp), strtol( T, (char **)NULL, 16))
+#define SET_FLOAT(T) fts_set_float( (lvalp), strtod( T, (char **)NULL))
+#define SET_SYMBOL(S) fts_set_symbol( (lvalp), (S)) 
+#define SET_SYMBOL_COPY(T) fts_set_symbol( (lvalp), fts_new_symbol_copy( T)) 
 
 %}
-
-%option noyywrap
 
 %option noyywrap
 
@@ -76,7 +71,6 @@ greater		\>
 greater_equal	\>=
 smaller		\<
 smaller_equal	\<=
-conditional	\?
 colon		:
 equal		=
 operator  	({plus})|({minus})|({times})|({div})|({percent})|({shift_left})|({shift_right})|({logical_and})|({logical_or})|({logical_not})|({equal_equal})|({not_equal})|({greater})|({greater_equal})|({smaller})|({smaller_equal})
@@ -87,47 +81,51 @@ symbol		({stdsymbol})|({opsymbol})
 %%
 
 {whites}+
-{decint}	{ SET_INT( lvalp, yytext); return FTS_TOKEN_INT; }
-{hexint} 	{ SET_HEXINT( lvalp, yytext+2); return FTS_TOKEN_INT; }
-{float} 	{ SET_FLOAT( lvalp, yytext); return FTS_TOKEN_FLOAT; }
-{dollar}	{ SET_SYMBOL( lvalp, fts_s_dollar); return FTS_TOKEN_SYMBOL; }
-{semi}		{ SET_SYMBOL( lvalp, fts_s_semi); return FTS_TOKEN_SYMBOL; }
-{plus}		{ SET_SYMBOL( lvalp, fts_s_plus); return FTS_TOKEN_SYMBOL; }
-{minus}		{ SET_SYMBOL( lvalp, fts_s_minus); return FTS_TOKEN_SYMBOL; }
-{times}		{ SET_SYMBOL( lvalp, fts_s_times); return FTS_TOKEN_SYMBOL; }
-{div}		{ SET_SYMBOL( lvalp, fts_s_div); return FTS_TOKEN_SYMBOL; }
-{open_par}	{ SET_SYMBOL( lvalp, fts_s_open_par); return FTS_TOKEN_SYMBOL; }
-{closed_par}	{ SET_SYMBOL( lvalp, fts_s_closed_par); return FTS_TOKEN_SYMBOL; }
-{open_sqpar}	{ SET_SYMBOL( lvalp, fts_s_open_sqpar); return FTS_TOKEN_SYMBOL; }
-{closed_sqpar}	{ SET_SYMBOL( lvalp, fts_s_closed_sqpar); return FTS_TOKEN_SYMBOL; }
-{open_cpar}	{ SET_SYMBOL( lvalp, fts_s_open_cpar); return FTS_TOKEN_SYMBOL; }
-{closed_cpar}	{ SET_SYMBOL( lvalp, fts_s_closed_cpar); return FTS_TOKEN_SYMBOL; }
-{dot}		{ SET_SYMBOL( lvalp, fts_s_dot); return FTS_TOKEN_SYMBOL; }
-{percent}	{ SET_SYMBOL( lvalp, fts_s_percent); return FTS_TOKEN_SYMBOL; }
-{shift_left}	{ SET_SYMBOL( lvalp, fts_s_shift_left); return FTS_TOKEN_SYMBOL; }
-{shift_right}	{ SET_SYMBOL( lvalp, fts_s_shift_right); return FTS_TOKEN_SYMBOL; }
-{logical_and}	{ SET_SYMBOL( lvalp, fts_s_logical_and); return FTS_TOKEN_SYMBOL; }
-{logical_or}	{ SET_SYMBOL( lvalp, fts_s_logical_or); return FTS_TOKEN_SYMBOL; }
-{logical_not}	{ SET_SYMBOL( lvalp, fts_s_logical_not); return FTS_TOKEN_SYMBOL; }
-{equal_equal}	{ SET_SYMBOL( lvalp, fts_s_equal_equal); return FTS_TOKEN_SYMBOL; }
-{not_equal}	{ SET_SYMBOL( lvalp, fts_s_not_equal); return FTS_TOKEN_SYMBOL; }
-{greater}	{ SET_SYMBOL( lvalp, fts_s_greater); return FTS_TOKEN_SYMBOL; }
-{greater_equal}	{ SET_SYMBOL( lvalp, fts_s_greater_equal); return FTS_TOKEN_SYMBOL; }
-{smaller}	{ SET_SYMBOL( lvalp, fts_s_smaller); return FTS_TOKEN_SYMBOL; }
-{smaller_equal}	{ SET_SYMBOL( lvalp, fts_s_smaller_equal); return FTS_TOKEN_SYMBOL; }
-{conditional}	{ SET_SYMBOL( lvalp, fts_s_conditional); return FTS_TOKEN_SYMBOL; }
-{colon}		{ SET_SYMBOL( lvalp, fts_s_colon); return FTS_TOKEN_SYMBOL; }
-{equal}		{ SET_SYMBOL( lvalp, fts_s_equal); return FTS_TOKEN_SYMBOL; }
-{symbol}	{ SET_SYMBOL( lvalp, yytext); return FTS_TOKEN_SYMBOL; }
+{decint}	{ SET_INT( yytext); return 1; }
+{hexint} 	{ SET_HEXINT( yytext+2); return 1; }
+{float} 	{ SET_FLOAT( yytext); return 1; }
+{dollar}	{ SET_SYMBOL( fts_s_dollar); return 1; }
+{semi}		{ SET_SYMBOL( fts_s_semi); return 1; }
+{plus}		{ SET_SYMBOL( fts_s_plus); return 1; }
+{minus}		{ SET_SYMBOL( fts_s_minus); return 1; }
+{times}		{ SET_SYMBOL( fts_s_times); return 1; }
+{div}		{ SET_SYMBOL( fts_s_div); return 1; }
+{open_par}	{ SET_SYMBOL( fts_s_open_par); return 1; }
+{closed_par}	{ SET_SYMBOL( fts_s_closed_par); return 1; }
+{open_sqpar}	{ SET_SYMBOL( fts_s_open_sqpar); return 1; }
+{closed_sqpar}	{ SET_SYMBOL( fts_s_closed_sqpar); return 1; }
+{open_cpar}	{ SET_SYMBOL( fts_s_open_cpar); return 1; }
+{closed_cpar}	{ SET_SYMBOL( fts_s_closed_cpar); return 1; }
+{dot}		{ SET_SYMBOL( fts_s_dot); return 1; }
+{percent}	{ SET_SYMBOL( fts_s_percent); return 1; }
+{shift_left}	{ SET_SYMBOL( fts_s_shift_left); return 1; }
+{shift_right}	{ SET_SYMBOL( fts_s_shift_right); return 1; }
+{logical_and}	{ SET_SYMBOL( fts_s_logical_and); return 1; }
+{logical_or}	{ SET_SYMBOL( fts_s_logical_or); return 1; }
+{logical_not}	{ SET_SYMBOL( fts_s_logical_not); return 1; }
+{equal_equal}	{ SET_SYMBOL( fts_s_equal_equal); return 1; }
+{not_equal}	{ SET_SYMBOL( fts_s_not_equal); return 1; }
+{greater}	{ SET_SYMBOL( fts_s_greater); return 1; }
+{greater_equal}	{ SET_SYMBOL( fts_s_greater_equal); return 1; }
+{smaller}	{ SET_SYMBOL( fts_s_smaller); return 1; }
+{smaller_equal}	{ SET_SYMBOL( fts_s_smaller_equal); return 1; }
+{colon}		{ SET_SYMBOL( fts_s_colon); return 1; }
+{equal}		{ SET_SYMBOL( fts_s_equal); return 1; }
+{symbol}	{ SET_SYMBOL_COPY( yytext); return 1; }
 
 %%
 
-void fts_tokenizer_init( fts_tokenizer_t *tokenizer, const char *s)
+void fts_tokenizer_init_string( fts_tokenizer_t *tokenizer, const char *s)
 {
   tokenizer->p = yy_scan_string( s);
 }
 
-int fts_tokenizer_run( fts_tokenizer_t *tokenizer, fts_atom_t *a)
+void fts_tokenizer_init_buffer( fts_tokenizer_t *tokenizer, char *s, int size)
+{
+  tokenizer->p = yy_scan_buffer( s, (yy_size_t)size);
+}
+
+int fts_tokenizer_next( fts_tokenizer_t *tokenizer, fts_atom_t *a)
 {
   yy_switch_to_buffer( (YY_BUFFER_STATE)tokenizer->p);
 

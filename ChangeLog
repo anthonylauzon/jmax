@@ -1,3 +1,12 @@
+2002-05-22  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* added raw strings in the protocol. A raw string is a string that is tokenized
+	into atoms on the FTS side by the new FLEX tokenizer (see fts/tokenizer.l)
+
+	* changed protocol decoding state machine in client/java and fts/client.c
+
+	* cleaned Java client library (removed non necessary classes)
+
 2002-05-21  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* removed connections from atoms.

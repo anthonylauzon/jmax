@@ -39,7 +39,7 @@ public class FtsAtom {
    */
   public FtsSymbol symbolValue;
   /**
-   * If the atom is a String, holds the String value
+   * If the atom is a String or a RawString, holds the String value
    */
   public String stringValue;
   /**
@@ -98,6 +98,16 @@ public class FtsAtom {
   }
 
   /**
+   * Tests if atom contains a raw String
+   * 
+   * @return true if atom type is RawString
+   */
+  public final boolean isRawString()
+  {
+    return type == RawString.class;
+  }
+
+  /**
    * Tests if atom contains a FtsObject or an instance of a derived class
    * 
    * @return true if atom type is FtsObject or a derived class of FtsObject
@@ -153,6 +163,17 @@ public class FtsAtom {
   }
 
   /**
+   * Set the raw String value
+   * 
+   * @param s the value
+   */
+  public final void setRawString( String s)
+  {
+    type = RawString.class;
+    stringValue = s;
+  }
+
+  /**
    * Set the FtsObject value
    * 
    * @param o the value
@@ -172,6 +193,8 @@ public class FtsAtom {
     else if ( isFloat())
       return new Float( floatValue);
     else if ( isString())
+      return stringValue;
+    else if ( isRawString())
       return stringValue;
     else if ( isSymbol())
       return symbolValue;

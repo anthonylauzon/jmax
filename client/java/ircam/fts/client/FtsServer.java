@@ -31,7 +31,7 @@ import java.util.*;
 public class FtsServer {
 
   class ReceiveThread extends Thread {
-    ReceiveThread( FtsProtocolDecoder decoder)
+    ReceiveThread( BinaryProtocolDecoder decoder)
     {
       this.decoder = decoder;
     }
@@ -56,7 +56,7 @@ public class FtsServer {
 	}
     }
 
-    private FtsProtocolDecoder decoder;
+    private BinaryProtocolDecoder decoder;
   }
 
   public FtsServer( FtsServerConnection connection, FtsClient client)
@@ -66,7 +66,7 @@ public class FtsServer {
     newObjectID = 16; // Ids 0 to 15 are reserved for pre-defined system objects
 
     objectTable = new HashMap();
-    encoder = new FtsBinaryProtocolEncoder( this);
+    encoder = new BinaryProtocolEncoder( this.connection);
 
     root = new FtsObject( this, null, 0);
     client.setServer( this);
@@ -74,7 +74,7 @@ public class FtsServer {
     putObject( 1, client);
     this.client = client;
 
-    receiveThread = new ReceiveThread( new FtsBinaryProtocolDecoder( this));
+    receiveThread = new ReceiveThread( new BinaryProtocolDecoder( this));
     receiveThread.start();
   }
 
@@ -127,7 +127,7 @@ public class FtsServer {
     objectTable.put( new Integer( id), object);
   }
 
-  FtsProtocolEncoder getEncoder()
+  BinaryProtocolEncoder getEncoder()
   {
     return encoder;
   }
@@ -149,7 +149,7 @@ public class FtsServer {
   private Thread receiveThread;
 
   // Output to FTS
-  private FtsProtocolEncoder encoder;
+  private BinaryProtocolEncoder encoder;
 
   // Proxies of remote root and client
   private FtsObject root;

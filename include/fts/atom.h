@@ -48,6 +48,15 @@
 #define fts_get_class(p) ((fts_metaclass_t *)UINT_TO_POINTER(POINTER_TO_UINT((p)->typeid) & ~1))
 
 /**
+ * Get the value of the atom as a fts_word_t
+ * 
+ * @fn fts_get_value( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @ingroup atom
+ */
+#define fts_get_value(p) ((p)->value)
+
+/**
  * Get the selector associated with the type of the atom.
  * This selector will be used when sending this atom in a message.
  * 
@@ -69,8 +78,6 @@ FTS_API fts_metaclass_t *fts_t_float;
 FTS_API fts_metaclass_t *fts_t_symbol;
 FTS_API fts_metaclass_t *fts_t_pointer;
 FTS_API fts_metaclass_t *fts_t_string;
-/* To be removed */
-FTS_API fts_metaclass_t *fts_t_connection;
 
 /*
  * fts_word_t accessors
@@ -89,10 +96,6 @@ FTS_API fts_metaclass_t *fts_t_connection;
 #define fts_word_get_object(p)         ((p)->fts_object)
 #define fts_word_get_pointer(p)        ((p)->fts_pointer)
 #define fts_word_get_string(p)         ((p)->fts_string)
-
-/* Word values to be removed */
-#define fts_word_set_connection(p, v)  ((p)->fts_connection = (v))
-#define fts_word_get_connection(p)     ((p)->fts_connection)
 
 
 /**

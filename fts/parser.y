@@ -23,7 +23,6 @@
 %{
 #include <stdio.h>
 #include <unistd.h>
-
 #include <fts/fts.h>
 
 #define YYSTYPE fts_atom_t
@@ -52,8 +51,11 @@ static void push_value( const fts_atom_t *yylval);
 %token FTS_TOKEN_SYMBOL
 
 %token FTS_TOKEN_SEMI
+%token FTS_TOKEN_COLON
 %token FTS_TOKEN_OPEN_PAR
 %token FTS_TOKEN_CLOSED_PAR
+%token FTS_TOKEN_OPEN_CPAR
+%token FTS_TOKEN_CLOSED_CPAR
 %token FTS_TOKEN_OPEN_SQPAR
 %token FTS_TOKEN_CLOSED_SQPAR
 
@@ -63,7 +65,7 @@ static void push_value( const fts_atom_t *yylval);
 
 /*
   Idea
-  add the +=, -= etc operators so that you can do soemthing like
+  add the +=, -= etc operators so that you can do something like
   x : fvec
   $x += 1
   (:fvec 1 2 3) += 3
@@ -240,6 +242,12 @@ static int yyerror( const char *msg)
  */
 
 static fts_hashtable_t token_table;
+static fts_metaclass_t *token_type;
+static fts_object_t *unique_token;
+
+#define is_token(at) fts_is_a( at, token_type)
+#define set_token(at,t) (fts_set_object( at, unique_token), fts_word_set_int( &fts_get_value( at), t))
+#define get_token(at) (fts_word_get_int( &fts_get_value( at)))
 
 typedef struct {
   int ac;
@@ -277,16 +285,12 @@ static int yylex( YYSTYPE *lvalp, void *data)
     }
   else if (fts_is_symbol( at))
     {
-      fts_atom_t k, v;
-
-      k = *at;
-      if (fts_hashtable_get( &token_table, &k, &v))
-	token = fts_get_int( &v);
-      else
-	{
-	  *lvalp = *at;
-	  token = FTS_TOKEN_SYMBOL;
-	}
+      *lvalp = *at;
+      token = FTS_TOKEN_SYMBOL;
+    }
+  else if (is_token( at))
+    {
+      token = get_token( at);
     }
 
   parser_data->at++;
@@ -295,21 +299,23 @@ static int yylex( YYSTYPE *lvalp, void *data)
   return token;
 }
 
-static void scanner_init( void)
+void fts_parser_init( /*fts_parser_t *parser,*/ int ac, fts_atom_t *at)
 {
-  fts_atom_t k, v;
+  int i;
 
-  fts_hashtable_init( &token_table, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_MEDIUM);
+  for ( i =0; i < ac; i++)
+    {
+      if ( fts_is_symbol( at+i))
+	{
+	  fts_atom_t k, v;
 
-#define PUT(S,T) fts_set_symbol( &k, S); fts_set_int( &v, T); fts_hashtable_put( &token_table, &k, &v);
-  PUT( fts_s_dollar, FTS_TOKEN_DOLLAR);
-  PUT( fts_s_semi, FTS_TOKEN_SEMI);
-  PUT( fts_s_open_par, FTS_TOKEN_OPEN_PAR);
-  PUT( fts_s_closed_par, FTS_TOKEN_CLOSED_PAR);
-  PUT( fts_s_open_sqpar, FTS_TOKEN_OPEN_SQPAR);
-  PUT( fts_s_closed_sqpar, FTS_TOKEN_CLOSED_SQPAR);
-  PUT( fts_s_dot, FTS_TOKEN_DOT);
+	  k = *at;
+	  if (fts_hashtable_get( &token_table, &k, &v))
+	    set_token( at+i, fts_get_int( &v));
+	}
+    }
 }
+
 
 /* **********************************************************************
  * 
@@ -389,9 +395,48 @@ static fts_status_t fts_stdoutstream_instantiate(fts_class_t *cl, int ac, const 
 
 void fts_kernel_parser_init( void)
 {
+  fts_atom_t k, v;
+
   fts_stack_init( &interpreter_stack, fts_atom_t);
 
-  scanner_init();
+  fts_hashtable_init( &token_table, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_MEDIUM);
+
+#define PUT(S,T) fts_set_symbol( &k, S); fts_set_int( &v, T); fts_hashtable_put( &token_table, &k, &v);
+  PUT( fts_s_dollar, FTS_TOKEN_DOLLAR);
+  PUT( fts_s_semi, FTS_TOKEN_SEMI);
+  PUT( fts_s_plus, FTS_TOKEN_PLUS);
+  PUT( fts_s_minus, FTS_TOKEN_MINUS);
+  PUT( fts_s_times, FTS_TOKEN_TIMES);
+  PUT( fts_s_div, FTS_TOKEN_DIV);
+  PUT( fts_s_open_par, FTS_TOKEN_OPEN_PAR);
+  PUT( fts_s_closed_par, FTS_TOKEN_CLOSED_PAR);
+  PUT( fts_s_open_sqpar, FTS_TOKEN_OPEN_SQPAR);
+  PUT( fts_s_closed_sqpar, FTS_TOKEN_CLOSED_SQPAR);
+  PUT( fts_s_open_cpar, FTS_TOKEN_OPEN_CPAR);
+  PUT( fts_s_closed_cpar, FTS_TOKEN_CLOSED_CPAR);
+  PUT( fts_s_dot, FTS_TOKEN_DOT);
+  PUT( fts_s_percent, FTS_TOKEN_PERCENT);
+  PUT( fts_s_shift_left, FTS_TOKEN_SHIFT_LEFT);
+  PUT( fts_s_shift_right, FTS_TOKEN_SHIFT_RIGHT);
+  PUT( fts_s_logical_and, FTS_TOKEN_LOGICAL_AND);
+  PUT( fts_s_logical_or, FTS_TOKEN_LOGICAL_OR);
+  PUT( fts_s_logical_not, FTS_TOKEN_LOGICAL_NOT);
+  PUT( fts_s_equal_equal, FTS_TOKEN_EQUAL_EQUAL);
+  PUT( fts_s_not_equal, FTS_TOKEN_NOT_EQUAL);
+  PUT( fts_s_greater, FTS_TOKEN_GREATER);
+  PUT( fts_s_greater_equal, FTS_TOKEN_GREATER_EQUAL);
+  PUT( fts_s_smaller, FTS_TOKEN_SMALLER);
+  PUT( fts_s_smaller_equal, FTS_TOKEN_SMALLER_EQUAL);
+  PUT( fts_s_colon, FTS_TOKEN_COLON);
+  PUT( fts_s_equal, FTS_TOKEN_EQUAL);
+}
+
+static fts_status_t
+token_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init( cl, sizeof(fts_object_t), 0, 0, 0);
+
+  return fts_Success;
 }
 
 void fts_parser_config( void)
@@ -408,4 +453,7 @@ void fts_parser_config( void)
     fts_sched_add( (fts_object_t *)stream, FTS_SCHED_ALWAYS);  
   }
 #endif
+
+  token_type = fts_class_install( fts_new_symbol( "_token"), token_instantiate);
+  unique_token = fts_object_create( token_type, 0, 0);
 }

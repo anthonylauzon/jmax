@@ -35,17 +35,24 @@ typedef struct {
   void *p;
 } fts_tokenizer_t;
 
-/* Initializes the tokenizer structures */
-extern void fts_tokenizer_init( fts_tokenizer_t *tokenizer, const char *s);
+/* Initializes the tokenizer structure
+ * creates a FLEX buffer state using yy_scan_string 
+ */
+extern void fts_tokenizer_init_string( fts_tokenizer_t *tokenizer, const char *s);
+
+/* Initializes the tokenizer structure
+ * creates a FLEX buffer state using yy_scan_buffer
+ * NOTE: the last 2 bytes must be 0, the size must include these 2 bytes
+ */
+extern void fts_tokenizer_init_buffer( fts_tokenizer_t *tokenizer, char *s, int size);
 
 /* Run the tokenizer and returns the next token.
    Token value is stored in atom pointed by a.
-   Returns 0 when end of input is reached.
+   Returns 0 when end of input is reached, 1 otherwise.
 */
-extern int fts_tokenizer_run( fts_tokenizer_t *tokenizer, fts_atom_t *a);
+extern int fts_tokenizer_next( fts_tokenizer_t *tokenizer, fts_atom_t *a);
 
 /* Deinitializes the tokenizer structure and reclaim allocated memory */
 extern void fts_tokenizer_destroy( fts_tokenizer_t *tokenizer);
-
 
 #endif
