@@ -1,14 +1,13 @@
 Name: jmax
-Summary: graphical programming environment for developing audio applications
-Version: 2.5.1
+Summary: a visual programming environment for real-time, interactive multimedia applications
+Version: 2.5.1-latest-cvs
 Release: 1
 Copyright: GPL
 Group: Applications/Multimedia
 Source: ftp://ftp.ircam.fr/pub/IRCAM/equipes/temps-reel/jmax/releases/jmax-%{version}-src.tar.gz
 BuildRoot: /var/tmp/jmax-%{version}-root
 %description
-jMax (``Java Max'') is a graphical programming environment 
-for developing real-time, interactive audio applications. 
+jMax is a visual programming environment for developing real-time, interactive multimedia applications. 
 
 %prep
 

@@ -29,6 +29,9 @@ ifdef ARCH
 include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 endif
 
+include VERSION
+JMAX_VERSION_TAG=V$(JMAX_MAJOR_VERSION)_$(JMAX_MINOR_VERSION)_$(JMAX_PATCH_VERSION)$(JMAX_VERSION_STATUS)
+
 all:
 	$(MAKE) -C fts $@
 	$(MAKE) -C java $@
@@ -131,9 +134,8 @@ cvs-tag: spec-files
 		exit 1 ; \
 	fi
 	( \
-		TTT=V`cut -f1 -d\  VERSION | sed 's/\./_/g'` ; \
-		echo "Tagging with tag $$TTT" ; \
-		cvs tag -F $$TTT ; \
+		echo "Tagging with tag $(JMAX_VERSION_TAG)" ; \
+		cvs tag -F $(JMAX_VERSION_TAG) ; \
 	)
 .PHONY: cvs-tag
 
@@ -143,7 +145,7 @@ cvs-tag: spec-files
 #
 spec-files:
 	$(MAKE) -C utils/rpm $@
-	$(MAKE) -C utils/sgi $@
+#	$(MAKE) -C utils/sgi $@
 .PHONY: spec-files
 
 #
@@ -153,14 +155,12 @@ spec-files:
 dist:
 	( \
 		umask 22 ; \
-		VVV=`cut -f1 -d\  VERSION` ; \
-		TTT=V`cut -f1 -d\  VERSION | sed 's/\./_/g'` ; \
 		mkdir .$$$$ ; \
 		cd .$$$$ ; \
-		cvs export -r$$TTT jmax ; \
-		mv jmax jmax-$${VVV} ; \
-		tar cvf - jmax-$${VVV} | gzip -c --best > ../../jmax-$${VVV}-src.tar.gz ; \
-		chmod 644 ../../jmax-$${VVV}-src.tar.gz ; \
+		cvs export -r$(JMAX_VERSION_TAG) jmax ; \
+		mv jmax jmax-$(JMAX_VERSION) ; \
+		tar cvf - jmax-$(JMAX_VERSION) | gzip -c --best > ../../jmax-$(VERSION)-src.tar.gz ; \
+		chmod 644 ../../jmax-$(JMAX_VERSION)-src.tar.gz ; \
 		cd .. ; \
 		/bin/rm -rf .$$$$ ; \
 	)
@@ -209,9 +209,8 @@ install-bin:
 	$(MAKE) -C tcl install 
 	$(MAKE) -C fts install
 	$(MAKE) -C packages install 
-# The following line is a hack that installs the <package>.jpk file on all platforms
-# (this is so that you can load the sgidev package even if you are running the GUI
-# on Linux
+# The following line is a hack that installs the <package>.jpk file on all platforms,
+# so that you can load the sgidev package even if you are running the GUI on Linux.
 	$(MAKE) -C packages install-noarch 
 .PHONY: install-bin
 
@@ -222,19 +221,39 @@ install-includes:
 
 #
 # new-patch, new-minor, new-major
-# version number manipulation ('make new-patch' is the most frequent...)
+# version number manipulation (new-patch is the most frequent, new-major the least...)
 #
+SNAPSHOT_STATUS=-latest-cvs
+
 new-patch:
-	awk '{ split( $$1, a, "."); printf( "%d.%d.%d\n", a[1], a[2], a[3]+1) }' VERSION > VERSION.out
+	awk -F= -v x="PATCH" -v y="$(SNAPSHOT_STATUS)" '\
+$$1 ~ x { printf( "%s=%d\n", $$1, $$2+1); }\
+$$1 ~ "STATUS" { printf( "%s=%s\n", $$1, y); }\
+$$1 !~ x && $$1 !~ "STATUS" { print; }' VERSION > VERSION.out
 	mv VERSION.out VERSION
 	$(MAKE) spec-files
 
 new-minor:
-	awk '{ split( $$1, a, "."); printf( "%d.%d.%d\n", a[1], a[2]+1, 0) }'  VERSION > VERSION.out
+	awk -F= -v x="MINOR" -v y="$(SNAPSHOT_STATUS)" '\
+$$1 ~ x { printf( "%s=%d\n", $$1, $$2+1); }\
+$$1 ~ "STATUS" { printf( "%s=%s\n", $$1, y); }\
+$$1 !~ x && $$1 !~ "STATUS" { print; }' VERSION > VERSION.out
 	mv VERSION.out VERSION
 	$(MAKE) spec-files
 
 new-major:
-	awk '{ split( $$1, a, "."); printf( "%d.%d.%d\n", a[1]+1, 0, 0) }'  VERSION > VERSION.out
+	awk -F= -v x="MAJOR" -v y="$(SNAPSHOT_STATUS)" '\
+$$1 ~ x { printf( "%s=%d\n", $$1, $$2+1); }\
+$$1 ~ "STATUS" { printf( "%s=%s\n", $$1, y); }\
+$$1 !~ x && $$1 !~ "STATUS" { print; }' VERSION > VERSION.out
 	mv VERSION.out VERSION
 	$(MAKE) spec-files
+
+final:
+	awk -F= '\
+$$1 ~ "STATUS" { printf( "%s=\n", $$1); }\
+$$1 !~ "STATUS" { print; }' VERSION > VERSION.out
+	mv VERSION.out VERSION
+	$(MAKE) spec-files
+
+

@@ -18,12 +18,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- */
-
-/*
- * This file's authors: Francois Dechelle.
  */
 
 /*
@@ -55,27 +49,19 @@
 
 /*
  * Define this if you want a lot of debug printout, in particular timing
- * The debug is then enabled by setting the environment variable DTDSERVER_DEBUG
  */
 #define DTD_SERVER_ENABLE_DEBUG
 
 #ifdef DTD_SERVER_ENABLE_DEBUG
-
 #include <stdarg.h>
 #include "libtime.h"
-
-static int __debug_value = 0;
-
 #define DTD_DEBUG(x) (x)
 
-static int __debug( const char *format, ...)
+static int _dbg( const char *format, ...)
 {
   va_list ap;
   char buf[1024];
   double now, elapsed;
-
-  if (!__debug_value)
-    return -1;
 
   va_start( ap, format);
   vsprintf( buf, format, ap);
@@ -87,7 +73,6 @@ static int __debug( const char *format, ...)
 
   return 0;
 }
-
 #else
 #define DTD_DEBUG(x)
 #endif
@@ -113,13 +98,14 @@ static void dtd_init_params( int argc, char **argv)
 typedef struct {
   dtdfifo_t *fifo;
   AFfilehandle file;
+  enum { handle_state_read, handle_state_write, handle_state_closed} state;
   int n_channels;
 } dtdhandle_t;
 
 static dtdhandle_t handle_table[DTD_MAX_FIFOS];
 
-/* One read block for all */
-static short *read_block;
+/* One block for all */
+static short *block;
 
 #define N 2048
 
@@ -183,7 +169,7 @@ static int dtd_write_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, i
   volatile float *src;
   short *p;
 
-  /* This should never happen because it is tested before the call to dtd_read_block() */
+  /* This should never happen because it is tested before the call to dtd_write_block() */
   if ( (unsigned int)dtdfifo_get_read_level( fifo) < n_frames * n_channels * sizeof( float))
     return -1;
 
@@ -234,29 +220,37 @@ static AFfilehandle dtd_open_file_read( const char *filename, const char *path, 
 
   if ( !fts_file_search_in_path( filename, path, full_path) )
     {
-      fprintf( stderr, "[dtdserver] cannot open sound file %s\n", filename);
+      printf( "[dtdserver] cannot open sound file %s\n", filename);
+      fflush( stdout);
+
       return AF_NULL_FILEHANDLE;
     }
 
   if ( (file = afOpenFile( full_path, "r", NULL)) == AF_NULL_FILEHANDLE)
     {
-      fprintf( stderr, "[dtdserver] cannot open sound file %s\n", filename);
+      printf( "[dtdserver] cannot open sound file %s\n", filename);
+      fflush( stdout);
+
       return AF_NULL_FILEHANDLE;
     }
 
-  DTD_DEBUG( __debug( "opened `%s'", full_path) );
+  DTD_DEBUG( _dbg( "opened `%s'", full_path) );
 
   file_channels = afGetChannels( file, AF_DEFAULT_TRACK);
   if ( file_channels != n_channels)
     {
-      fprintf( stderr, "[dtdserver] invalid number of channels (%d)\n", file_channels);
+      printf( "[dtdserver] invalid number of channels (%d)\n", file_channels);
+      fflush( stdout);
+
       return AF_NULL_FILEHANDLE;
     }
 
   afGetSampleFormat( file, AF_DEFAULT_TRACK, &sampfmt, &sampwidth);
   if ((sampfmt != AF_SAMPFMT_TWOSCOMP) || (sampwidth != 16))
     {
-      fprintf( stderr, "[dtdserver] invalid format\n");
+      printf( "[dtdserver] invalid format\n");
+      fflush( stdout);
+
       return AF_NULL_FILEHANDLE;
     }
 
@@ -287,9 +281,13 @@ static AFfilehandle dtd_open_file_write( const char *filename, const char *path,
 
   if ( (file = afOpenFile( full_path, "w", setup)) == AF_NULL_FILEHANDLE)
     {
-      fprintf( stderr, "[dtdserver] cannot open sound file %s\n", filename);
+      printf( "[dtdserver] cannot open sound file %s\n", filename);
+      fflush( stdout);
+
       return AF_NULL_FILEHANDLE;
     }
+
+  DTD_DEBUG( _dbg( "opened `%s'", full_path) );
 
   afFreeFileSetup(setup);
 
@@ -311,26 +309,20 @@ static void dtd_open_read( const char *line)
   
   dtdfifo_set_used( fifo, DTD_SIDE, 1);
 
-  /* This should not happen */
-  if ( handle->file != AF_NULL_FILEHANDLE)
-    {
-      afCloseFile( handle->file);
-      handle->file = AF_NULL_FILEHANDLE;
-    }
-
   if ((handle->file = dtd_open_file_read( filename, path, n_channels)) == AF_NULL_FILEHANDLE)
     return;
 
+  handle->state = handle_state_read;
   handle->n_channels = n_channels;
 
   for ( i = 0; i < _block_frames / _preload_frames; i++)
     {
       int ret;
 
-      ret = dtd_read_block( handle->file, fifo, read_block, _preload_frames, n_channels);
+      ret = dtd_read_block( handle->file, fifo, block, _preload_frames, n_channels);
     }
 
-  DTD_DEBUG( __debug( "preloaded `%s'", filename) );
+  DTD_DEBUG( _dbg( "preloaded `%s'", filename) );
 }
 
 static void dtd_open_write( const char *line)
@@ -350,27 +342,12 @@ static void dtd_open_write( const char *line)
   
   dtdfifo_set_used( fifo, DTD_SIDE, 1);
 
-  /* This should not happen */
-  if ( handle->file != AF_NULL_FILEHANDLE)
-    {
-      afCloseFile( handle->file);
-      handle->file = AF_NULL_FILEHANDLE;
-    }
-
   af_format = AF_FILE_AIFF;
 
-  extension = strrchr( filename, '.');
-  if (extension)
-    {
-      fts_atom_t *descr = fts_soundfile_format_get_descriptor( fts_new_symbol( extension+1));
- 
-      if (descr)
-	af_format = fts_get_int( descr);
-    }
-  
   if ((handle->file = dtd_open_file_write( filename, path, af_format, sr, n_channels)) == AF_NULL_FILEHANDLE)
     return;
 
+  handle->state = handle_state_write;
   handle->n_channels = n_channels;
 }
 
@@ -394,6 +371,7 @@ static void dtd_close( const char *line)
     {
       afCloseFile( handle->file);
       handle->file = AF_NULL_FILEHANDLE;
+      handle->state = handle_state_closed;
     }
 }
 
@@ -426,7 +404,7 @@ static void dtd_process_command( const char *line)
 {
   char command[N];
 
-  DTD_DEBUG( __debug( "got command `%s'",line) );
+  DTD_DEBUG( _dbg( "got command `%s'",line) );
 
   sscanf( line, "%s", command);
 
@@ -447,33 +425,31 @@ static void dtd_process_fifos( void)
   for ( id = 0; id < DTD_MAX_FIFOS; id++)
     {
       int n_channels, block_size;
-      dtdhandle_t *handle;
-      dtdfifo_t *fifo;
+      dtdhandle_t *h;
 
-      handle = &handle_table[id];
+      h = &handle_table[id];
 
-      if (!handle)
+      if ( !h || h->file==AF_NULL_FILEHANDLE || !dtdfifo_is_used( h->fifo, 0) || !dtdfifo_is_used( h->fifo, 1))
 	continue;
 
-      fifo = handle->fifo;
-      
-      if ( handle->file == AF_NULL_FILEHANDLE || !dtdfifo_is_used( fifo, 0) || !dtdfifo_is_used( fifo, 1) )
-	continue;
-
-      n_channels = handle->n_channels;
-
+      n_channels = h->n_channels;
       block_size = _block_frames * n_channels * sizeof( float);
 
-      DTD_DEBUG( __debug( "polling fifo %d channels=%d level=%d block_size=%d", id, n_channels, dtdfifo_get_write_level( fifo), block_size));
+      DTD_DEBUG( _dbg( "polling fifo %d channels=%d level=%d block_size=%d", id, n_channels, dtdfifo_get_write_level( h->fifo), block_size));
 
-      if ( dtdfifo_get_write_level( fifo) >= block_size )
+      if ( h->state == handle_state_read && dtdfifo_get_write_level( h->fifo) >= block_size )
 	{
-	  int ret = dtd_read_block( handle->file, fifo, read_block, _block_frames, n_channels);
-	  DTD_DEBUG( __debug("filled %d samples in fifo %d", ret, id));
+	  int ret = dtd_read_block( h->file, h->fifo, block, _block_frames, n_channels);
+	  DTD_DEBUG( _dbg("filled %d samples in fifo %d", ret, id));
+	}
+      else if ( h->state == handle_state_write && dtdfifo_get_read_level( h->fifo) >= block_size )
+	{
+	  int ret = dtd_write_block( h->file, h->fifo, block, _block_frames, n_channels);
+	  DTD_DEBUG( _dbg("writen %d samples from fifo %d", ret, id));
 	}
       else
 	{
-	  DTD_DEBUG( __debug( "fifo %d full", id));
+	  DTD_DEBUG( _dbg( "fifo %d full/empty", id));
 	}
     }
 }
@@ -495,7 +471,7 @@ static int dtd_get_line( int fd, char *line, int n)
 }
 static void dtd_main_loop( int fd)
 {
-  DTD_DEBUG( __debug( "DTD server running") );
+  DTD_DEBUG( _dbg( "DTD server running") );
 
   while (1)
     {
@@ -535,7 +511,7 @@ static void dtd_main_loop( int fd)
       dtd_process_fifos();
     }
 
-  DTD_DEBUG( __debug( "DTD server exiting") );
+  DTD_DEBUG( _dbg( "DTD server exiting") );
 }
 
 static int dtd_create_socket( int *pport)
@@ -598,24 +574,6 @@ static void dtd_no_real_time( void)
     }
 }
 
-static void signal_handler( int sig)
-{
-  int new_debug_value;
-
-  new_debug_value = !__debug_value;
-
-  if (new_debug_value)
-    {
-      __debug_value = new_debug_value;
-      DTD_DEBUG( __debug( "debug enabled") );
-    }
-  else
-    {
-      DTD_DEBUG( __debug( "debug disabled") );
-      __debug_value = new_debug_value;
-    }
-}
-
 int main( int argc, char **argv)
 {
   int socket, port;
@@ -631,16 +589,9 @@ int main( int argc, char **argv)
   /* Write the port number for FTS */
   write( 1, &port, 4);
 
-#ifdef DTD_SERVER_ENABLE_DEBUG
-  if (getenv( "DTDSERVER_DEBUG"))
-    __debug_value = 1;
-#endif
-
   dtd_no_real_time();
 
-  signal( SIGUSR1, signal_handler);
-
-  read_block = (short *)malloc( _block_frames * _max_channels * sizeof( short));
+  block = (short *)malloc( _block_frames * _max_channels * sizeof( short));
 
   dtd_main_loop( socket);
 

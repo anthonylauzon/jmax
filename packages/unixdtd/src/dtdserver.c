@@ -18,12 +18,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- */
-
-/*
- * This file's authors: Francois Dechelle.
  */
 
 #include <unistd.h>
@@ -62,13 +56,15 @@ struct _dtdserver_t {
   int server_socket;
   int server_port;
 
+  FILE *server_stdout;
+
   int block_frames;
   int max_channels;
   int fifo_blocks;
   int preload_frames;
   int loop_milliseconds;
 
-  char *base_dir;
+  char *base_name;
 
   int number_of_objects;
   int number_of_fifos;
@@ -136,8 +132,8 @@ void dtdserver_add_object( dtdserver_t *server, void *object)
       int fifo_size;
       dtdfifo_t *fifo;
 
-      strcpy( filename, server->base_dir);
-      sprintf( filename + strlen( server->base_dir), "%d", server->number_of_fifos);
+      strcpy( filename, server->base_name);
+      sprintf( filename + strlen( server->base_name), "-%d", server->number_of_fifos);
 
       fifo_size = server->block_frames * server->max_channels * server->fifo_blocks * sizeof( float);
       fifo = dtdfifo_new( filename, fifo_size);
@@ -241,11 +237,26 @@ void dtdserver_close( dtdserver_t *server, dtdfifo_t *fifo)
 /* Methods                                                                */
 /* ********************************************************************** */
 
+static void dtdserver_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+#define LEN 2048
+  dtdserver_t *this = (dtdserver_t *)o;
+  char buff[LEN];
+
+  if (fgets( buff, LEN, this->server_stdout) == NULL)
+    {
+      fprintf( stderr, "[fts] error reading DTD server stdout\n");
+      return;
+    }
+
+  post( "%s", buff);
+}
+
 static void dtdserver_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dtdserver_t *this = (dtdserver_t *)o;
   int from_child_pipe[2];
-  const char *base_dir;
+  const char *base_name;
   int len;
 
   this->block_frames = fts_get_int_arg( ac, at, 1, DEFAULT_BLOCK_FRAMES);
@@ -297,25 +308,22 @@ static void dtdserver_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   /* Read the port number from server */
   read( from_child_pipe[0], &this->server_port, 4);
 
+  fts_sched_add_fd( fts_sched_get_current(), from_child_pipe[0], 1, dtdserver_select, (fts_object_t *)this);
+
+  this->server_stdout = fdopen( from_child_pipe[0], "r");
+
   /* Open the socket */
   if ( (this->server_socket = socket( PF_INET, SOCK_DGRAM, 0)) < 0)
     post( "[dtdserver] cannot open socket (%s)\n", strerror( errno));
 
+  base_name = fts_symbol_name( fts_get_symbol_arg( ac, at, 3, fts_new_symbol( DEFAULT_BASE_DIR)));
+  len = strlen( base_name);
   /* 
-     append the process id of the server to the base directory, so that you can have
+     append the process id of the server to the base name, so that you can have
      several servers on the same machine
   */
-  base_dir = fts_symbol_name( fts_get_symbol_arg( ac, at, 3, fts_new_symbol( DEFAULT_BASE_DIR)));
-
-  len = strlen( base_dir);
-  this->base_dir = strcpy( malloc( len+32), base_dir);
-  sprintf( this->base_dir + len, "-%d", this->server_pid);
-
-  if ( mkdir( this->base_dir, 0777) < 0)
-    {
-      post( "Cannot create DTD fifo root directory %s (%s)\n", base_dir, strerror( errno));
-      return;
-    }
+  this->base_name = strcpy( malloc( len+32), base_name);
+  sprintf( this->base_name + len, "-%d", this->server_pid);
 
   this->number_of_objects = 0;
   this->number_of_fifos = 0;
@@ -336,9 +344,6 @@ static void dtdserver_delete( fts_object_t *o, int winlet, fts_symbol_t s, int a
       if (this->fifo_table[ id])
 	dtdfifo_delete( this->fifo_table[ id]);
     }
-
-  if ( rmdir( this->base_dir) < 0)
-    post( "Cannot remove directory %s (%d,%s)\n", this->base_dir, errno, strerror( errno));
 }
 
 static fts_status_t dtdserver_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)

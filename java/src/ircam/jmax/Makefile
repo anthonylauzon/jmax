@@ -27,6 +27,7 @@ ROOTDIR = ../../../..
 PACKAGE_DIR = ircam/jmax
 
 include $(ROOTDIR)/java/Makefiles/Makefile.common
+include $(ROOTDIR)/VERSION
 
 all: local_all
 	(cd editors ; $(MAKE) $@)
@@ -49,7 +50,7 @@ MaxVersion.java: $(ROOTDIR)/VERSION
 	echo 'public class MaxVersion {' >> MaxVersion.java
 	echo ' public static String getMaxVersion()' >> MaxVersion.java
 	echo ' {' >> MaxVersion.java
-	echo '  return "release' `cat $(ROOTDIR)/VERSION` '";' >> MaxVersion.java
+	echo '  return "version $(JMAX_VERSION)";' >> MaxVersion.java
 	echo ' }' >> MaxVersion.java
 	echo '}' >> MaxVersion.java
 
