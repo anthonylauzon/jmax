@@ -33,7 +33,7 @@
 ## the packages.
 ##
 
-set jmaxRootDir [systemProperty "root"]
+set jmaxRootDir [systemProperty "jmaxRoot"]
 
 ##
 ## Intrinsic functions

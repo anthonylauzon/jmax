@@ -276,11 +276,11 @@ public class MaxApplication extends Object
       }
 
     // Default values
-    if (jmaxProperties.get("root") == null)
+    if (jmaxProperties.get("jmaxRoot") == null)
       {
-	//user didn't specify the root. Take the /usr/local/max default directory.
+	//user didn't specify the root. Take the default directory.
 
-	jmaxProperties.put("root", "/usr/local/max");
+	jmaxProperties.put("jmaxRoot", "/usr/lib/jmax");
       }
 
     //the version number as a system property
@@ -332,7 +332,7 @@ public class MaxApplication extends Object
 	// create the startup configuration, included reading user files
 	// installing editors, data types and data handlers
 	
-	itsInterp.evalFile(getProperty("root") +
+	itsInterp.evalFile(getProperty("jmaxRoot") +
 			   getProperty("file.separator") + "tcl" +
 			   getProperty("file.separator") +  "jmaxboot.tcl");
       }
