@@ -467,8 +467,16 @@ alsaseqmidi_config(void)
     alsaseqmidi_symbol_alsaseq_midi_destination = fts_new_symbol("ALSA Destination");
     alsaseqmidi_symbol_alsaseq_midi_source = fts_new_symbol("ALSA Source");
     o = fts_object_create(mc, NULL, 0, 0);
-    if (0 == fts_object_get_error(o))
+    if ( (o != NULL) && (0 == fts_object_get_error(o)))
       {
 	fts_midiconfig_add_manager((fts_midimanager_t*)o);
       }
 }
+
+
+
+
+
+
+
+
