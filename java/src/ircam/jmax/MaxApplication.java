@@ -292,15 +292,7 @@ public class MaxApplication extends Object
     // then the builtin editors 
 
     ircam.jmax.editors.console.ConsoleModule.initModule();
-
-    if (getProperty("new") != null)
-     ircam.jmax.editors.patcher.ErmesModule.initModule(true);
-    else
-      {
-	ircam.jmax.editors.patcher.ErmesModule.initModule(false);
-	ircam.jmax.editors.ermes.ErmesModule.initModule();
-      }
-
+    ircam.jmax.editors.patcher.ErmesModule.initModule(true);
     ircam.jmax.editors.control.ControlModule.initModule();
 
     /* Show register dialog if not disabled by option */

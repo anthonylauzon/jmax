@@ -15,12 +15,6 @@
 EDITORS_PATH := $(INCLUDE_PATH)
 EDITORS_ACC:=
 
-############################### ermes
-INCLUDE_PATH := $(EDITORS_PATH)/ermes
-include $(INCLUDE_PATH)/Sources2
-
-EDITORS_ACC := $(EDITORS_ACC) $(SOURCES)
-
 ############################### patcher
 #INCLUDE_PATH := $(EDITORS_PATH)/patcher
 #include $(INCLUDE_PATH)/Sources2

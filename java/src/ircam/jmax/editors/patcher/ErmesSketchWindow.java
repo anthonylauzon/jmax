@@ -582,7 +582,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
 	if (aPrintGraphics != null)
 	  {
-	    itsSketchPad.printAll( aPrintGraphics);
+	    itsSketchPad.print( aPrintGraphics);
 	    aPrintGraphics.dispose();
 	  }
 	aPrintjob.end();

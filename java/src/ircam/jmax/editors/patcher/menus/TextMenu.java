@@ -19,6 +19,8 @@ import ircam.jmax.editors.patcher.objects.*;
 
 public class TextMenu extends JMenu
 {
+  JMenuItem biggerItem;
+  JMenuItem smallerItem;
   private JMenu itsSizesMenu;
   private ButtonGroup itsSizesMenuGroup;
   JRadioButtonMenuItem fakeSizeButton;
@@ -52,6 +54,29 @@ public class TextMenu extends JMenu
 
     JMenuItem item;
     editor = window;
+
+    biggerItem = new JMenuItem("Bigger");
+    biggerItem.addActionListener(new ActionListener()
+				 {
+				   public void actionPerformed(ActionEvent e)
+				     {
+				       ErmesSelection.patcherSelection.fontBigger();
+				     }
+				 });
+    biggerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, Event.CTRL_MASK));
+    add(biggerItem);
+
+    smallerItem = new JMenuItem("Smaller");
+    smallerItem.addActionListener(new ActionListener()
+				 {
+				   public void actionPerformed(ActionEvent e)
+				     {
+				       ErmesSelection.patcherSelection.fontSmaller();
+				     }
+				 });
+
+    smallerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, Event.CTRL_MASK));
+    add(smallerItem);
 
     itsSizesMenu = new JMenu( "Sizes");
     FillSizesMenu( itsSizesMenu);
@@ -181,11 +206,17 @@ public class TextMenu extends JMenu
 
     if (ErmesSelection.patcherSelection.isEmpty())
       {
+	biggerItem.setEnabled(false);
+	smallerItem.setEnabled(false);
+
 	fontName = editor.itsSketchPad.getDefaultFontName();
 	fontSize = editor.itsSketchPad.getDefaultFontSize();
       }
     else if (ErmesSelection.patcherSelection.isSingleton())
       {
+	biggerItem.setEnabled(true);
+	smallerItem.setEnabled(true);
+
 	GraphicObject object = ErmesSelection.patcherSelection.getSingleton();
 
 	fontName = object.getFontName();
@@ -193,6 +224,8 @@ public class TextMenu extends JMenu
       }
     else
       {
+	biggerItem.setEnabled(true);
+	smallerItem.setEnabled(true); 
 	fakeFontButton.setSelected(true);
 	fakeSizeButton.setSelected(true);
 
@@ -222,3 +255,4 @@ public class TextMenu extends JMenu
       }
   }
 }
+

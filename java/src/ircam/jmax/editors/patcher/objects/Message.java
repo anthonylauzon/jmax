@@ -12,9 +12,9 @@ import ircam.jmax.editors.patcher.interactions.*;
 // The "message box" graphic object.
 //
 
-class Message extends Editable implements FtsMessageListener {
-
-  boolean itsFlashing = false;
+class Message extends Editable implements FtsMessageListener, FtsIntValueListener
+{
+  boolean isFlashing = false;
 
   public Message(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
@@ -36,8 +36,6 @@ class Message extends Editable implements FtsMessageListener {
   // ----------------------------------------
   // Text area offset
   // ----------------------------------------
-//   private static final int TEXT_X_OFFSET = 4;
-//   private static final int TEXT_Y_OFFSET = 3;
   private static final int TEXT_X_OFFSET = 3;
   private static final int TEXT_Y_OFFSET = 2;
 
@@ -75,24 +73,20 @@ class Message extends Editable implements FtsMessageListener {
     updateRedraw();
   }
 
-
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
     if (Squeack.isDown(squeack))
-      {
-	ftsObject.sendMessage( 0, "bang", null);
-	itsFlashing = true;
-	redraw();
-      }
-    else if (Squeack.isUp(squeack))
-      {
-	if (itsFlashing) 
-	  {
-	    itsFlashing = false;
+      ((FtsIntValueObject)ftsObject).setValue(1);
+  }
 
-	    redraw();
-	  }
-      }
+  public void valueChanged(int value) 
+  {
+    if (value != 0)
+      isFlashing = true;
+    else
+      isFlashing = false;
+
+    updateRedraw();
   }
 
   // ----------------------------------------
@@ -103,7 +97,7 @@ class Message extends Editable implements FtsMessageListener {
   {
     if (! itsSketchPad.isLocked()) 
       {
-	if( itsFlashing) 
+	if( isFlashing) 
 	  return Settings.sharedInstance().getSelectedColor();
 	else
 	  {
@@ -115,7 +109,7 @@ class Message extends Editable implements FtsMessageListener {
       }
     else 
       {
-	if ( itsFlashing || isSelected())
+	if ( isFlashing || isSelected())
 	  return Settings.sharedInstance().getSelectedColor();
 	else 
 	  return Color.white;

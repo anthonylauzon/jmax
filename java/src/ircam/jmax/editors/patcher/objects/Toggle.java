@@ -12,8 +12,9 @@ import ircam.jmax.editors.patcher.interactions.*;
 //
 // The "toggle" graphic object.
 //
-class Toggle extends GraphicObject implements FtsIntValueListener {
 
+class Toggle extends GraphicObject implements FtsIntValueListener
+{
   private static final int DEFAULT_WIDTH = 20;
   private static final int MINIMUM_WIDTH = 15;
 
@@ -33,6 +34,7 @@ class Toggle extends GraphicObject implements FtsIntValueListener {
   }
 
   // redefined from base class
+
   public void setWidth( int theWidth)
   {
     if (theWidth < MINIMUM_WIDTH)
@@ -54,7 +56,6 @@ class Toggle extends GraphicObject implements FtsIntValueListener {
       {
 	itsToggled = !itsToggled;
 	((FtsIntValueObject)ftsObject).setValue(itsToggled ? 1 : 0);
-	redraw();
       }
   }
 

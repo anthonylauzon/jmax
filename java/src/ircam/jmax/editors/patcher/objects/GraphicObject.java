@@ -264,6 +264,21 @@ abstract public class GraphicObject implements DisplayObject
     setFont(FontCache.lookupFont(itsFont.getName(), size));
   }
 
+  public void fontSmaller()
+  {
+    int size;
+    
+    size = itsFont.getSize();
+
+    if (size > 8)
+      setFont(FontCache.lookupFont(itsFont.getName(), size - 2));
+  }
+
+  public void fontBigger()
+  {
+    setFont(FontCache.lookupFont(itsFont.getName(), itsFont.getSize() + 2));
+  }
+
   protected void setFont( Font theFont) 
   {
     itsFont = theFont;
@@ -272,6 +287,7 @@ abstract public class GraphicObject implements DisplayObject
     ftsObject.setFont(itsFont.getName());
     ftsObject.setFontSize(itsFont.getSize());;
   }
+
 
   public final int getOutletAnchorX(int outlet)
   {

@@ -22,8 +22,24 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
 
-public class MaxWindowJMenu extends JMenu implements WindowListener, ListDataListener 
+public class MaxWindowJMenu extends JMenu
 {
+  class WindowMenuListener implements MenuListener
+  {
+    public void menuSelected(MenuEvent e)
+    {
+      rebuildWindowMenuIfNeeded();
+    }
+
+    public void menuDeselected(MenuEvent e)
+    {
+    }
+
+    public void menuCanceled(MenuEvent e)
+    {
+    }
+  }
+
   Frame frame;
   int windowOperationCount = -1;
   boolean windowIsActive = false;
@@ -39,10 +55,7 @@ public class MaxWindowJMenu extends JMenu implements WindowListener, ListDataLis
     this.frame = frame;
     windowList = MaxWindowManager.getWindowManager().getWindowList();
 
-    windowList.addListDataListener(this);
-    frame.addWindowListener(this);
-
-    rebuildWindowMenu();
+    addMenuListener(new WindowMenuListener());
   }
 
   private void rebuildWindowMenuIfNeeded()
@@ -84,61 +97,6 @@ public class MaxWindowJMenu extends JMenu implements WindowListener, ListDataLis
 			     { public  void actionPerformed(ActionEvent e)
 			       { w.toFront();}});
       }
-  }
-
-  // WindowListener interface
-
-  public void windowClosing(WindowEvent e)
-  {
-  }
-
-  public void windowOpened(WindowEvent e)
-  {
-    rebuildWindowMenuIfNeeded();
-  }
-
-  public void windowClosed(WindowEvent e)
-  {
-  }
-
-  public void windowIconified(WindowEvent e)
-  {
-  }       
-
-  public void windowDeiconified(WindowEvent e)
-  {
-    rebuildWindowMenuIfNeeded();
-  }
-
-  public void windowActivated(WindowEvent e)
-  {
-    windowIsActive = true;
-    rebuildWindowMenuIfNeeded();
-  }
-
-  public void windowDeactivated(WindowEvent e)
-  {
-    windowIsActive = false;
-  }
-
-  // ListDataListener
-
-  public void contentsChanged(ListDataEvent e)
-  {
-    if (windowIsActive)
-      rebuildWindowMenu();
-  }
-
-  public void intervalAdded(ListDataEvent e)
-  {
-    if (windowIsActive)
-      rebuildWindowMenuIfNeeded();
-  }
-
-  public void intervalRemoved(ListDataEvent e) 
-  {
-    if (windowIsActive)
-      rebuildWindowMenuIfNeeded();
   }
 }
 

@@ -23,6 +23,8 @@
 
 #include "fts.h"
 
+#define DEFAULT_DURATION 125.0f
+
 static void init_eval(void);
 
 /********************* message ************************/
@@ -31,12 +33,16 @@ typedef struct
 {
   fts_object_t o;
   fts_atom_list_t *atom_list;
+  fts_alarm_t alarm;
+  int value;
 } message_t;
 
 static void fts_eval_atom_list(message_t *this,
 			       fts_atom_list_t *list,
 			       int env_ac, const fts_atom_t *env_at,
 			       fts_object_t *default_dst, int outlet);
+
+static void message_tick(fts_alarm_t *alarm, void *calldata);
 
 static void
 message_update(fts_object_t *o)
@@ -136,6 +142,8 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   message_t *this = (message_t *) o;
 
   this->atom_list = fts_atom_list_new();
+  fts_alarm_init(&(this->alarm), 0, message_tick, this);
+  this->value = 0;
 }
 
 
@@ -145,6 +153,7 @@ message_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   message_t *this = (message_t *) o;
 
   fts_atom_list_free(this->atom_list);
+  fts_alarm_unarm(&(this->alarm));
 }
 
 
@@ -166,6 +175,48 @@ message_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if (fts_atom_list_is_subsequence(this->atom_list, ac - 1, at + 1))
     fts_object_set_add(set, o);
+}
+
+
+/* daemon to get the "value" property: the value property is set to 
+ * one to actually bang the message, and reset to zero after a timer elapse;
+ * it is used to make the message box flash like the messages; java is not
+ * reialable for this kind of real time flashing.
+ */
+
+static void
+message_get_value(fts_daemon_action_t action, fts_object_t *obj,
+		 fts_symbol_t property, fts_atom_t *value)
+{
+  message_t *this = (message_t *)obj;
+
+  fts_set_int(value, this->value);
+}
+
+
+static void
+message_put_value(fts_daemon_action_t action, fts_object_t *obj,
+		 fts_symbol_t property, fts_atom_t *value)
+{
+  message_t *this = (message_t *)obj;
+
+  fts_outlet_bang(obj, 0);
+
+  this->value = 1;
+  fts_object_ui_property_changed(obj, fts_s_value);
+
+  fts_alarm_set_delay(&(this->alarm), DEFAULT_DURATION);
+  fts_alarm_arm(&(this->alarm));
+}
+
+
+static void 
+message_tick(fts_alarm_t *alarm, void *calldata)
+{
+  message_t *this = (message_t *)calldata;
+
+  this->value = 0;
+  fts_object_ui_property_changed((fts_object_t *)this, fts_s_value);
 }
 
 
@@ -213,6 +264,11 @@ message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_set, message_set);
 
   fts_method_define_varargs(cl, 0, fts_s_append,  message_append);
+
+  /* value daemons */
+
+  fts_class_add_daemon(cl, obj_property_get, fts_s_value, message_get_value);
+  fts_class_add_daemon(cl, obj_property_put, fts_s_value, message_put_value);
 
   return fts_Success;
 }

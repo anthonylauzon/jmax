@@ -25,7 +25,7 @@ import ircam.jmax.*;
  * FTS instantiation 
  */
 
-public class FtsMessageObject extends FtsObject
+public class FtsMessageObject extends FtsIntValueObject
 {
   /*****************************************************************************/
   /*                                                                           */
@@ -41,7 +41,7 @@ public class FtsMessageObject extends FtsObject
 
   public FtsMessageObject(FtsObject parent, String description, int objId)
   {
-    super(parent, "messbox", null, description, objId);
+    super(parent, "messbox", description, objId);
 
     ninlets = 1;
     noutlets = 1;
