@@ -46,11 +46,11 @@ static int yyerror( const char *msg);
 
 
 
-#define	YYFINAL		33
+#define	YYFINAL		35
 #define	YYFLAG		-32768
-#define	YYNTBASE	13
+#define	YYNTBASE	14
 
-#define YYTRANSLATE(x) ((unsigned)(x) <= 266 ? yytranslate[x] : 26)
+#define YYTRANSLATE(x) ((unsigned)(x) <= 267 ? yytranslate[x] : 27)
 
 static const char yytranslate[] = {     0,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -79,33 +79,33 @@ static const char yytranslate[] = {     0,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     1,     3,     4,     5,     6,
-     7,     8,     9,    10,    11,    12
+     7,     8,     9,    10,    11,    12,    13
 };
 
 #if YYDEBUG != 0
 static const short yyprhs[] = {     0,
      0,     2,     6,     8,    10,    13,    14,    16,    18,    22,
-    24,    26,    28,    30,    32,    35,    38,    39,    42,    45,
-    47,    49,    50,    54,    57
+    26,    28,    30,    32,    34,    36,    38,    41,    44,    45,
+    48,    51,    55,    58
 };
 
-static const short yyrhs[] = {    14,
-     0,    14,     7,    15,     0,    15,     0,    16,     0,    16,
-    17,     0,     0,    21,     0,    18,     0,     8,    15,     9,
-     0,     3,     0,     4,     0,     5,     0,    19,     0,    25,
-     0,     6,     5,     0,    20,    17,     0,     0,    22,    20,
-     0,    23,    24,     0,    19,     0,    25,     0,     0,    24,
-    10,     5,     0,    10,     5,     0,    19,    11,    17,    12,
-     0
+static const short yyrhs[] = {    15,
+     0,    15,     7,    16,     0,    16,     0,    17,     0,    17,
+    18,     0,     0,    19,     0,    23,     0,    18,    13,    18,
+     0,     8,    16,     9,     0,     3,     0,     4,     0,     5,
+     0,    20,     0,    21,     0,    26,     0,     6,     5,     0,
+    22,    18,     0,     0,    24,    22,     0,    20,    25,     0,
+    25,    10,     5,     0,    10,     5,     0,    21,    11,    18,
+    12,     0
 };
 
 #endif
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-    34,    36,    37,    39,    41,    42,    44,    45,    46,    48,
-    49,    50,    51,    52,    54,    56,    57,    59,    61,    63,
-    64,    65,    67,    68,    72
+    34,    36,    37,    39,    41,    42,    44,    45,    46,    47,
+    49,    50,    51,    52,    54,    55,    57,    59,    60,    62,
+    64,    66,    67,    71
 };
 #endif
 
@@ -114,61 +114,62 @@ static const short yyrline[] = { 0,
 
 static const char * const yytname[] = {   "$","error","$undefined.","FTS_TOKEN_INT",
 "FTS_TOKEN_FLOAT","FTS_TOKEN_SYMBOL","\"$\"","\";\"","\"(\"","\")\"","\".\"",
-"\"[\"","\"]\"","program","expression_list","expression","tuple","term","primitive",
-"variable","arguments","invocation","dot_expression","target","dot_list","array", NULL
+"\"[\"","\"]\"","\"+\"","program","expression_list","expression","tuple","term",
+"primitive","reference","variable","arguments","invocation","dot_expression",
+"dot_list","array", NULL
 };
 #endif
 
 static const short yyr1[] = {     0,
-    13,    14,    14,    15,    16,    16,    17,    17,    17,    18,
-    18,    18,    18,    18,    19,    20,    20,    21,    22,    23,
-    23,    23,    24,    24,    25
+    14,    15,    15,    16,    17,    17,    18,    18,    18,    18,
+    19,    19,    19,    19,    20,    20,    21,    22,    22,    23,
+    24,    25,    25,    26
 };
 
 static const short yyr2[] = {     0,
-     1,     3,     1,     1,     2,     0,     1,     1,     3,     1,
-     1,     1,     1,     1,     2,     2,     0,     2,     2,     1,
-     1,     0,     3,     2,     4
+     1,     3,     1,     1,     2,     0,     1,     1,     3,     3,
+     1,     1,     1,     1,     1,     1,     2,     2,     0,     2,
+     2,     3,     2,     4
 };
 
 static const short yydefact[] = {     6,
-     1,     3,     4,     6,    10,    11,    12,     0,     6,     5,
-     8,    13,     7,    17,     0,    14,     2,    15,     0,    22,
-    18,     0,    19,     9,     0,    16,    24,     0,    25,    23,
-     0,     0,     0
+     1,     3,     4,     6,    11,    12,    13,     0,     6,     5,
+     7,    14,    15,     8,    19,    16,     2,    17,     0,     0,
+     0,    21,     0,    20,    10,     9,    23,     0,     0,    18,
+    22,    24,     0,     0,     0
 };
 
-static const short yydefgoto[] = {    31,
-     1,     2,     3,    10,    11,    12,    21,    13,    14,    15,
-    23,    16
+static const short yydefgoto[] = {    33,
+     1,     2,     3,    10,    11,    12,    13,    24,    14,    15,
+    22,    16
 };
 
 static const short yypact[] = {-32768,
-    -1,-32768,    -3,-32768,-32768,-32768,-32768,    11,-32768,-32768,
--32768,    -7,-32768,-32768,     9,-32768,-32768,-32768,    12,     5,
-     5,    13,    10,-32768,    14,-32768,-32768,    17,-32768,-32768,
-    23,    24,-32768
+    -1,-32768,    -3,-32768,-32768,-32768,-32768,     3,-32768,     2,
+-32768,     6,     7,-32768,-32768,-32768,-32768,-32768,     8,    -3,
+    14,    10,    -3,    -3,-32768,     2,-32768,    16,     1,     2,
+-32768,-32768,    12,    22,-32768
 };
 
 static const short yypgoto[] = {-32768,
--32768,     8,-32768,    -6,-32768,-32768,-32768,-32768,-32768,-32768,
+-32768,     0,-32768,   -13,-32768,-32768,-32768,-32768,-32768,-32768,
 -32768,-32768
 };
 
 
-#define	YYLAST		26
+#define	YYLAST		22
 
 
 static const short yytable[] = {     5,
-     6,     7,     8,    20,     9,     4,   -22,     5,     6,     7,
-     8,    17,     9,    25,    26,    18,    19,    27,    22,    28,
-    24,    30,    32,    33,     0,    29
+     6,     7,     8,    17,     9,     4,    26,    18,    19,    29,
+    30,    34,    32,    20,    20,    21,    25,    23,    27,    28,
+    31,    35
 };
 
 static const short yycheck[] = {     3,
-     4,     5,     6,    11,     8,     7,    10,     3,     4,     5,
-     6,     4,     8,    20,    21,     5,     9,     5,    10,    10,
-     9,     5,     0,     0,    -1,    12
+     4,     5,     6,     4,     8,     7,    20,     5,     9,    23,
+    24,     0,    12,    13,    13,    10,     9,    11,     5,    10,
+     5,     0
 };
 #define YYPURE 1
 
@@ -715,28 +716,28 @@ yyreduce:
 
   switch (yyn) {
 
-case 10:
-#line 48 "parser.y"
-{;
+case 9:
+#line 46 "parser.y"
+{ /* *action_table[ FTS_TOKEN_CALL]( fts_s_add, $1, $3);*/ ;
     break;}
 case 11:
 #line 49 "parser.y"
-{;
+{ /* *action_table[ FTS_TOKEN_INT](); */ ;
     break;}
 case 12:
 #line 50 "parser.y"
 {;
     break;}
-case 15:
-#line 54 "parser.y"
+case 13:
+#line 51 "parser.y"
 {;
     break;}
-case 20:
-#line 63 "parser.y"
+case 17:
+#line 57 "parser.y"
 {;
     break;}
-case 25:
-#line 72 "parser.y"
+case 24:
+#line 71 "parser.y"
 {;
     break;}
 }
@@ -961,7 +962,7 @@ yyerrhandle:
     }
   return 1;
 }
-#line 74 "parser.y"
+#line 73 "parser.y"
 
 
 static int yyerror( const char *msg)

@@ -43,9 +43,10 @@ tuple: tuple term
 
 term: primitive
 	| invocation
+| term "+" term { /* *action_table[ FTS_TOKEN_CALL]( fts_s_add, $1, $3);*/ }
 	| "(" expression ")";
 
-primitive: FTS_TOKEN_INT {}
+primitive: FTS_TOKEN_INT { /* *action_table[ FTS_TOKEN_INT](); */ }
 	| FTS_TOKEN_FLOAT {}
 	| FTS_TOKEN_SYMBOL {}
 	| reference ;
