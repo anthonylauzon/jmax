@@ -22,7 +22,9 @@ import javax.swing.event.*;
 import javax.swing.*;
 
 /**
- * The panel containing the JTable representation of an Explode */
+ * The panel containing the JTable representation of an Explode.
+ * The editing of a generic entry is handled by a DefaultCellEditor object.
+ * See the setUpIntegerEditor method in this class for details. */
 class ExplodeTablePanel extends JPanel {
 
   ExplodeTablePanel(ExplodeTableModel model, ExplodeSelection s)
@@ -67,7 +69,7 @@ class ExplodeTablePanel extends JPanel {
   }
 
   private void setUpIntegerEditor() {
-    //Set up the editor for the integer cells.
+    // Set up the editor for the integer cells.
     final WholeNumberField integerField = new WholeNumberField(0, 5);
     integerField.setHorizontalAlignment(WholeNumberField.RIGHT);
     

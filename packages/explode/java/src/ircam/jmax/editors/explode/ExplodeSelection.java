@@ -61,6 +61,12 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
     addFlavor(ExplodeDataFlavor.getInstance());
   }
 
+
+  public void addSelectionInterval(int index1, int index2)
+  {
+    super.addSelectionInterval(index1, index2);
+  }
+
   /**
    * Ownership handling
    */
@@ -112,7 +118,9 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
   public void select(Object obj)
   {
     int index = itsModel.indexOf((ScrEvent) obj);
-    addSelectionInterval(index, index);
+
+    if (!isSelectedIndex(index)) 
+      addSelectionInterval(index, index);
   }
   
   /** Select the given enumeration of objects.
@@ -247,7 +255,10 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
  
     boolean wasSelected = isSelectedIndex(oldIndex);
 
-   if (oldIndex < newIndex)
+    if (oldIndex == newIndex) 
+	return; //no changes in the object's order
+
+    if (oldIndex < newIndex)
       {
 	for (int i = oldIndex; i<newIndex; i++)
 	  {
@@ -270,7 +281,7 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
 
       }
 
-    if (wasSelected) 
+    if (wasSelected && !isSelectedIndex(newIndex)) 
 	addSelectionInterval(newIndex, newIndex);
     
   }
