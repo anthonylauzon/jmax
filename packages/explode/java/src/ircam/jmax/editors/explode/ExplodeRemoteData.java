@@ -374,7 +374,6 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
     remoteCall(REMOTE_REMOVE, args);
 	    
     notifyObjectDeleted(event);
-    
   }
 
 
@@ -410,7 +409,6 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
     remoteCall(REMOTE_CHANGE, args);
     
     notifyObjectChanged(event);
-
   }
 
 
@@ -614,38 +612,6 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
   }
 
   
-  private void sort(ScrEvent[] elements)
-  {
-    sort(elements, 0, length()-1);
-  }
-
-  /**
-   * bubble sort, betweem two index of the given vector.
-   * This function is usefull when we know in advance that
-   * a subset of the vector is already ordered (es. in moveEvent) */
-  private void sort(ScrEvent[] elements, int first, int last)
-  {
-    int i;
-    boolean doneSomething = true;
-    ScrEvent temp;
-    
-    while(doneSomething)
-      {
-	doneSomething = false;
-	
-	for (i = first; i < last-1; i++, last -= 1)
-	  {
-	    if(elements[i] == null || elements[i].getTime() >   
-	       elements[i+1].getTime() )
-	      {
-		temp = elements[i];
-		elements[i] = elements[i+1];
-		elements[i+1] = temp;
-		doneSomething = true;
-	      }
-	  }
-      }
-  }
 
   //----- Fields
   /** Key for remote call add */
