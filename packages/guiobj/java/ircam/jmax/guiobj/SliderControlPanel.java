@@ -76,6 +76,7 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
     maxPanel.add(maxLabel);
     maxPanel.add(Box.createHorizontalGlue());    
     maxPanel.add( maxValueField);
+    maxPanel.add(Box.createRigidArea(new Dimension(3, 0)));    
 
     add(maxPanel);
 
@@ -92,6 +93,7 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
     minPanel.add(minLabel);
     minPanel.add(Box.createHorizontalGlue());    
     minPanel.add( minValueField);
+    minPanel.add(Box.createRigidArea(new Dimension(3, 0)));    
 
     add(minPanel);
 

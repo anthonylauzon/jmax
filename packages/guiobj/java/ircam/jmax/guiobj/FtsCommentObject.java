@@ -50,7 +50,7 @@ public class FtsCommentObject extends FtsGraphicObject
    */
   public FtsCommentObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom args[], int offset, int length)
   {
-    super(server, parent, id, className, args, offset, length);
+    super(server, parent, id, className, FtsParse.unparseArguments(args, offset+1, length-1));
     setNumberOfInlets(0);
     setNumberOfOutlets(0);
   }
