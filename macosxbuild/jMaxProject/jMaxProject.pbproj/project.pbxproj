@@ -2248,6 +2248,18 @@
 			settings = {
 			};
 		};
+		F746F84803F429B301664058 = {
+			isa = PBXFileReference;
+			name = default_config_macosx.jcfg;
+			path = ../../config/default_config_macosx.jcfg;
+			refType = 2;
+		};
+		F746F84A03F429C101664058 = {
+			fileRef = F746F84803F429B301664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F774414203F0114C01664058 = {
 			isa = PBXFileReference;
 			name = Finder.java;
@@ -11866,6 +11878,7 @@
 				F5F80BF203420AB201664092,
 				F594D066036557D601664092,
 				F7D8EEDE03F1326801664058,
+				F746F84803F429B301664058,
 			);
 			isa = PBXGroup;
 			name = Resources;
@@ -12523,6 +12536,7 @@
 			dstSubfolderSpec = 7;
 			files = (
 				F7D8EEE003F132B101664058,
+				F746F84A03F429C101664058,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -20469,7 +20483,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mv build/jMax.app/Contents/Resources/share/jmax/default_project.jprj build/jMax.app/Contents/Resources/share/jmax/default-project.jprj\nchmod a+r build/jMax.app/Contents/Resources/share/jmax/default-project.jprj";
+			shellScript = "mv build/jMax.app/Contents/Resources/share/jmax/default_project.jprj build/jMax.app/Contents/Resources/share/jmax/default-project.jprj\nchmod a+r build/jMax.app/Contents/Resources/share/jmax/default-project.jprj\nmv build/jMax.app/Contents/Resources/share/jmax/default_config_macosx.jcfg build/jMax.app/Contents/Resources/share/jmax/default-config.jcfg\nchmod a+r build/jMax.app/Contents/Resources/share/jmax/default-config.jcfg";
 		};
 		F8DC5EF40286A1FA01664092 = {
 			children = (
