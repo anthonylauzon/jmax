@@ -83,6 +83,19 @@ if [catch {set foo $jmaxSplashScreen}] then { set jmaxSplashScreen "show"}
 
 ##########################################################################
 #
+#  temporary fake of a possible future dataDirectory declaration command
+#
+
+proc dataDirectory {dir} {
+  global DataDirectory
+
+  lappend DataDirectory $dir
+  set path [join $DataDirectory ":"]
+  ucs set defaultpath $path
+}
+
+##########################################################################
+#
 #  startup actions
 #
 
