@@ -90,6 +90,13 @@ public class IntBox extends NumberBox implements FtsIntValueListener
     return 0;
   }
 
+  public void increment( boolean up, boolean shift)
+  {
+    int incr = shift ? 10 : 1;
+    itsInteger = up ? itsInteger + incr : itsInteger - incr;
+    ((FtsIntValueObject)ftsObject).setValue( itsInteger);
+  }
+
   //--------------------------------------------------------
   // mouse handlers
   //--------------------------------------------------------
@@ -98,23 +105,28 @@ public class IntBox extends NumberBox implements FtsIntValueListener
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
-    if (Squeack.isDown(squeack))
+    if ( Squeack.isDown(squeack))
       {
 	itsFirstY = mouse.y;
 	itsStartingValue = itsInteger;
 	dragged = false;
       }
-    else if (Squeack.isDrag(squeack))
+    else if ( Squeack.isDrag(squeack))
       {
 	((FtsIntValueObject)ftsObject).setValue(itsStartingValue + (itsFirstY - mouse.y));
 	dragged = true;
+	setEditMode( NumberBox.DRAG_MODE);
       }
-    else if (Squeack.isUp(squeack))
+    else if ( Squeack.isUp( squeack))
       {
 	if (! dragged)
 	  {
-	    itsSketchPad.setKeyEventClient( this);
-	    setValueValid(false);
+	    if( isOnArrow( mouse))
+	      setEditMode( NumberBox.INCR_MODE);
+	    else
+	      setEditMode( NumberBox.TEXT_MODE);
+
+	    itsSketchPad.setKeyEventClient( this);		
 	    return;
 	  }
       }

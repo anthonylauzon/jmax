@@ -6,6 +6,7 @@ Comment.java \
 CommentControlPanel.java \
 Display.java \
 FloatBox.java \
+FloatBoxControlPanel.java \
 Fork.java \
 FtsBangObject.java \
 FtsCommentObject.java \

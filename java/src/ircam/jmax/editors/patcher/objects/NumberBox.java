@@ -40,7 +40,6 @@ import ircam.jmax.editors.patcher.menus.*;
  */
 
 abstract public class NumberBox extends GraphicObject implements KeyEventClient {
-  boolean valueValid = true;
   private StringBuffer currentText;
   private int nDecimals = 0;
   private String filter;
@@ -48,6 +47,12 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
   public static final int DEFAULT_HEIGHT = 15;
   private static final int DEFAULT_VISIBLE_DIGIT = 3;
   private static Color floatColor = new Color(239, 239, 239); 
+
+  public final static int NOEDIT_MODE = 0;
+  public final static int DRAG_MODE   = 1;
+  public final static int TEXT_MODE   = 2;
+  public final static int INCR_MODE   = 3;
+  private int editMode = NOEDIT_MODE;
 
   public NumberBox(FtsGraphicObject theFtsObject, String filter) 
   {
@@ -129,19 +134,9 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
   abstract public void setValueAsText( String value);
   abstract public String getValueAsText();
 
-  public boolean isValueValid()
-  {
-      return valueValid;
-  }
-  public void setValueValid(boolean valid)
-  {
-      valueValid = valid;
-  }
-
   public void inspect() 
   {
   }
-
 
   public void paint( Graphics g) 
   {
@@ -155,7 +150,7 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
     int hm1 = h - 1;
     String aString;
 
-    // Fill the background
+    // Background
     if ( !isSelected())
       g.setColor( Color.white);
     else
@@ -163,37 +158,37 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
 
     g.fillRect( x+1, y+1, w-2 , h-2);
 
-    if ( valueValid) 
+    // Float area
+    if(( editMode != TEXT_MODE) && !isSelected() && (getIntZoneWidth() > 0) )
       {
-	// Fill float area
-	if( !isSelected() && (getIntZoneWidth() > 0) )
-	  {
-	    g.setColor( floatColor);
-	    g.fillRect( x+getIntZoneWidth()+1, y+1, w-getIntZoneWidth()-2, h-2);
-	  }
-
-	// Draw the triangle
-	g.setColor( Color.black);
-	g.drawLine( xp1, y, xp1 + hd2, y + hd2);
-	g.drawLine( xp1 + hd2, y + hd2, xp1, y + hm1);
-      
-	// Get the value
-	aString = getVisibleString(getValueAsText());
+	g.setColor( floatColor);
+	g.fillRect( x+getIntZoneWidth()+1, y+1, w-getIntZoneWidth()-2, h-2);
       }
-    else 
+
+    // Triangle
+    g.setColor( Color.black);
+    if( editMode == TEXT_MODE || editMode == INCR_MODE)
       {
-	// Fill the triangle
-	g.setColor( Color.black);
 	int xPoints[] = { xp1, xp1 + hd2, xp1};
 	int yPoints[] = { y, y + hd2, y + hm1};
 	g.fillPolygon( xPoints, yPoints, 3);
-	
-	// Get the value
-	aString = getVisibleString(currentText.toString());
-      } 
+      }
+    else
+      {
+	g.drawLine( xp1, y, xp1 + hd2, y + hd2);
+	g.drawLine( xp1 + hd2, y + hd2, xp1, y + hm1);
+      }
+    
+    // Text
+    if( editMode == TEXT_MODE)
+      aString = getVisibleString(currentText.toString());
+    else
+      aString = getVisibleString(getValueAsText());
 
-    // Draw the value
-    g.setColor( Color.black);
+    if( editMode == INCR_MODE)
+      g.setColor( Color.gray);
+    else
+      g.setColor( Color.black);
 
     g.setFont( getFont());
     g.drawString( aString, 
@@ -212,7 +207,7 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
     int hd2 = h / 2;
     String aString;
     
-    if( valueValid)
+    if( editMode != TEXT_MODE)
       {
 	// Fill the background
 	g.setColor( Color.white);
@@ -225,7 +220,7 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
 	  }
 	else
 	  g.fillRect( x+hd2+2, y+1, w-(hd2+2)-2, h-2);
-
+      
 	// Get the value
 	aString = getVisibleString(getValueAsText());
       }
@@ -233,12 +228,15 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
       {
 	g.setColor( Color.white);
 	g.fillRect( x+hd2+2, y+1, w-(hd2+2), h-2);
-
+      
 	aString = getVisibleString(currentText.toString());
       }
 
     // Draw the value
-    g.setColor( Color.black);
+    if( editMode == INCR_MODE)
+      g.setColor( Color.gray);
+    else
+      g.setColor( Color.black);
     g.setFont( getFont());
     g.drawString( aString, 
 		  x + hd2 + 5, 
@@ -277,7 +275,7 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
 
   public void keyPressed( KeyEvent e) 
   {
-    if ( !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown()) 
+    if ( !e.isControlDown() && !e.isMetaDown()) 
       {
 	if(e.getKeyCode()==109) return;//??????
 	// This stuff should be thrown away, and we should use
@@ -288,8 +286,16 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
 	  case KeyEvent.VK_ENTER:
 	    setValueAsText( currentText.toString());
 	    currentText.setLength(0);
-	    valueValid = true;
+	    setEditMode( NOEDIT_MODE);
 	    itsSketchPad.setKeyEventClient(null);
+	    break;
+	  case KeyEvent.VK_UP:
+	    if( getEditMode() == INCR_MODE)
+	      increment( true, e.isShiftDown());
+	    break;
+	  case KeyEvent.VK_DOWN:
+	    if( getEditMode() == INCR_MODE)
+	      increment( false, e.isShiftDown());
 	    break;
 	  case KeyEvent.VK_DELETE:
 	  case KeyEvent.VK_BACK_SPACE:
@@ -342,6 +348,8 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
       }
   }
 
+  abstract public void increment( boolean up, boolean shift);
+
   public void keyReleased( KeyEvent e) 
   {
      if ( !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown()) 
@@ -363,7 +371,8 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
 
   public void keyInputLost() 
   {
-    valueValid = true;
+    //valueValid = true;
+    setEditMode( NOEDIT_MODE);
     currentText.setLength(0);
     redraw();
   }
@@ -380,6 +389,25 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
     super.popUpReset();
     ObjectPopUp.removeMenu(TextPopUpMenu.getInstance());
     ObjectPopUp.removeSeparation();
+  }
+
+  public void setEditMode( int mode)
+  {
+    editMode = mode;
+  }
+  public int getEditMode()
+  {
+    return editMode;
+  }
+  
+  public boolean isOnArrow( Point p)
+  {
+    int x = getX();
+    int y = getY();
+    int h = getHeight();
+    int xPoints[] = { x, x + h/2, x};
+    int yPoints[] = { y, y + h/2, y + h};
+    return (new  Polygon( xPoints, yPoints, 3)).contains( p);
   }
 }
 

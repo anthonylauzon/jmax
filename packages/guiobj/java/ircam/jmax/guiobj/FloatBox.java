@@ -27,12 +27,14 @@ package ircam.jmax.guiobj;
 
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 import java.util.*;
 import java.text.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.menus.*;
 import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
@@ -49,6 +51,9 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
   private double valInc;  
   private int itsLastY;
   private int intZoneWidth = 0;
+  private double DECIMAL_INCR = 0.001;
+
+  public static FloatBoxControlPanel controlPanel = new FloatBoxControlPanel();
   
   public FloatBox(FtsGraphicObject theFtsObject) 
   {
@@ -124,6 +129,12 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
     updateIntegerZone();
   }
 
+  public void increment( boolean up, boolean shift)
+  {
+    double incr = shift ? 10. * getDecimalIncrement() : getDecimalIncrement();    
+    value = up ? value + incr : value - incr;
+    ((FtsFloatValueObject)ftsObject).setValue( value);
+  }
   //--------------------------------------------------------
   // mouse handlers
   //--------------------------------------------------------
@@ -144,12 +155,13 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
 	    if( isInIntegerZone( mouse.x))
 	      increment = 1.0;
 	    else
-	      increment = 0.001;
+	      increment = DECIMAL_INCR;
 	    
 	    ((FtsFloatValueObject)ftsObject).setValue( value);
 	    
 	    itsLastY = mouse.y;
 	    dragged = true;
+	    setEditMode( NumberBox.DRAG_MODE);
 	  }
 	else
 	  {
@@ -167,8 +179,12 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
       {
 	if(!dragged)
 	  {
+	    if( isOnArrow( mouse))
+	      setEditMode( NumberBox.INCR_MODE);
+	    else
+	      setEditMode( NumberBox.TEXT_MODE);
+
 	    itsSketchPad.setKeyEventClient(this);
-	    setValueValid(false);
 	    return;
 	  }
       }    
@@ -182,6 +198,42 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
   public int getIntZoneWidth()
   {
     return intZoneWidth;
+  }
+
+  public double getDecimalIncrement()
+  {
+    return DECIMAL_INCR;
+  }
+
+  public String getDecimalIncrementAsText()
+  {
+    return formatter.format( DECIMAL_INCR);
+  }
+  
+  public void setDecimalIncrement( double incr)
+  {
+    DECIMAL_INCR = incr; 
+  }
+
+  /**** Popup *************************************/
+  public ObjectControlPanel getControlPanel()
+  {
+    return this.controlPanel;
+  }
+
+  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
+  {
+    super.popUpUpdate(onInlet, onOutlet, area);
+    getControlPanel().update(this);
+    ObjectPopUp.getInstance().add((JPanel)getControlPanel());
+    ObjectPopUp.getInstance().revalidate();
+    ObjectPopUp.getInstance().pack();    
+  }
+  public void popUpReset()
+  {
+    super.popUpReset();    
+    getControlPanel().done();
+    ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
   }
 }
 
