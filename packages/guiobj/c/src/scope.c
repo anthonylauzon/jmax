@@ -130,7 +130,7 @@ scope_set_threshold(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 	}
       else if(s == sym_off)
 	{
-	  data->trigger = scope_threshold;
+	  data->trigger = scope_period;
 
 	  fts_set_symbol(a, sym_off);
 	}
