@@ -45,10 +45,12 @@ public class ControlPanel extends JPanel
   private JPanel debugPanel;
 
   private FtsDspControl control;
-  private IndicatorWithMemory dacSlipIndicator;
-  private IndicatorWithMemory fpeIndicator;
 
-  private IndicatorWithMemory denormalizedFpeIndicator;
+//    private IndicatorWithMemory dacSlipIndicator;
+//    private IndicatorWithMemory fpeIndicator;
+  private MemoryLed fpeLed;
+  private MemoryLed syncLed;
+
   private JToggleButton dspOnButton;
   private JButton  dspPrintButton;
 
@@ -60,12 +62,12 @@ public class ControlPanel extends JPanel
   class DspControlAdapter implements PropertyChangeListener
   {
     String prop;
-    IndicatorWithMemory ind;
+    MemoryLed led;
 
-    DspControlAdapter(String prop, FtsDspControl control, IndicatorWithMemory ind)
+    DspControlAdapter(String prop, FtsDspControl control, MemoryLed led)
     {
       this.prop = prop;
-      this.ind  = ind;
+      this.led  = led;
       control.addPropertyChangeListener(this);
     }
 
@@ -73,9 +75,9 @@ public class ControlPanel extends JPanel
     {
       if (prop.equals(event.getPropertyName()))
 	if (((Integer) event.getNewValue()).intValue() > 0)
-	  ind.setValue(true);
+	  led.setState(true);
 	else
-	  ind.setValue(false);
+	  led.setState(false);
     }
   }
 
@@ -110,25 +112,52 @@ public class ControlPanel extends JPanel
     setSize( 300, 300);
     setLayout( new BoxLayout( this, BoxLayout.X_AXIS));
 
-    JPanel indicatorsPanel = new JPanel();
-    indicatorsPanel.setBorder( BorderFactory.createEtchedBorder());
-    indicatorsPanel.setLayout( new BoxLayout( indicatorsPanel, BoxLayout.X_AXIS));
+    JLabel fpeLabel = new JLabel( "FPE");
+    fpeLabel.setAlignmentX( LEFT_ALIGNMENT);
+    fpeLabel.setAlignmentY( CENTER_ALIGNMENT);
 
-    fpeIndicator = new IndicatorWithMemory("FPE", "Floating Point Exceptions");
-    fpeIndicator.setAlignmentY(Component.CENTER_ALIGNMENT);
-    fpeIndicator.setPreferredSize(new Dimension(200, 23));    
-    fpeIndicator.setMaximumSize(new Dimension(200, 23));    
-    indicatorsPanel.add(fpeIndicator);
+    fpeLed = new MemoryLed();
+    fpeLed.setBorder( BorderFactory.createEtchedBorder());
+    fpeLed.setAlignmentX( RIGHT_ALIGNMENT);
+    fpeLed.setAlignmentY( CENTER_ALIGNMENT);
 
-    indicatorsPanel.add( Box.createRigidArea(new Dimension(10, 0)));
+    add( fpeLabel);
+    add( Box.createRigidArea(new Dimension(7,0)));
+    add( fpeLed);
 
-    dacSlipIndicator = new IndicatorWithMemory("Out of sync", "Dac Slip");
-    dacSlipIndicator.setAlignmentY(Component.CENTER_ALIGNMENT);    
-    dacSlipIndicator.setPreferredSize(new Dimension(100, 23));    
-    dacSlipIndicator.setMaximumSize(new Dimension(100, 23));    
-    indicatorsPanel.add(dacSlipIndicator);
+    add( Box.createRigidArea(new Dimension(10, 0)));
 
-    add( indicatorsPanel);
+    JLabel syncLabel = new JLabel( "Out of Sync");
+    syncLabel.setAlignmentX( LEFT_ALIGNMENT);
+    syncLabel.setAlignmentY( CENTER_ALIGNMENT);
+
+    syncLed = new MemoryLed();
+    syncLed.setBorder( BorderFactory.createEtchedBorder());
+    syncLed.setAlignmentX( RIGHT_ALIGNMENT);
+    syncLed.setAlignmentY( CENTER_ALIGNMENT);
+
+    add( syncLabel);
+    add( Box.createRigidArea(new Dimension(7,0)));
+    add( syncLed);
+
+//      fpeIndicator = new IndicatorWithMemory("FPE", "Floating Point Exceptions");
+//      fpeIndicator.setAlignmentY( Component.CENTER_ALIGNMENT);
+//      fpeIndicator.setPreferredSize(new Dimension(200, 23));    
+//      fpeIndicator.setMaximumSize(new Dimension(200, 23));    
+//  //      indicatorsPanel.add(fpeIndicator);
+//      add(fpeIndicator);
+
+//  //      indicatorsPanel.add( Box.createRigidArea(new Dimension(10, 0)));
+
+//      dacSlipIndicator = new IndicatorWithMemory("Out of sync", "Dac Slip");
+//      dacSlipIndicator.setAlignmentY(Component.CENTER_ALIGNMENT);    
+//      dacSlipIndicator.setPreferredSize(new Dimension(100, 23));    
+//      dacSlipIndicator.setMaximumSize(new Dimension(100, 23));    
+
+//  //      indicatorsPanel.add(dacSlipIndicator);
+//      add(dacSlipIndicator);
+
+//      add( indicatorsPanel);
 
     add( Box.createHorizontalGlue());
 
@@ -170,11 +199,11 @@ public class ControlPanel extends JPanel
   {
       control = fts.getDspController();
       
-      new DspControlAdapter("invalidFpe", control, fpeIndicator);
-      new DspControlAdapter("divideByZeroFpe", control, fpeIndicator);
-      new DspControlAdapter("overflowFpe", control, fpeIndicator);
+      new DspControlAdapter("invalidFpe", control, fpeLed);
+      new DspControlAdapter("divideByZeroFpe", control, fpeLed);
+      new DspControlAdapter("overflowFpe", control, fpeLed);
       
-      new DspControlAdapter("dacSlip", control, dacSlipIndicator);
+      new DspControlAdapter("dacSlip", control, syncLed);
       dspOnButton.setSelected(control.getDspOn().booleanValue());
       new DspOnControlAdapter("dspOn", control, dspOnButton);
 

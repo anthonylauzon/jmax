@@ -46,7 +46,7 @@ public class IndicatorWithMemory extends JPanel {
 
   public IndicatorWithMemory( String name, String toolTipText)
   {
-    setBorder( new EmptyBorder( 1, 1, 1, 1));
+    setBorder( new EmptyBorder( 0, 0, 0, 0));
     setLayout( new BoxLayout( this, BoxLayout.X_AXIS));
     setToolTipText( toolTipText);
 
@@ -55,29 +55,32 @@ public class IndicatorWithMemory extends JPanel {
     label.setAlignmentY( CENTER_ALIGNMENT);
 
     indicatorLed = new MemoryLed();
+
+    indicatorLed.setBorder( BorderFactory.createEtchedBorder());
+
     indicatorLed.setAlignmentX( RIGHT_ALIGNMENT);
     indicatorLed.setAlignmentY( CENTER_ALIGNMENT);
 
     add( label);
-    add( Box.createHorizontalGlue());
+//      add( Box.createHorizontalGlue());
     add( Box.createRigidArea(new Dimension(7,0)));
     add( indicatorLed);
   }
 
-  public Dimension getMinimumSize()
-  {
-    FontMetrics fm = label.getFontMetrics( label.getFont());
-    Dimension ldim = indicatorLed.getPreferredSize();
-    int width = fm.stringWidth( label.getText()) + ldim.width;
-    int height = Math.max( fm.getMaxAscent() + fm.getMaxDescent(), ldim.height);
+//    public Dimension getMinimumSize()
+//    {
+//      FontMetrics fm = label.getFontMetrics( label.getFont());
+//      Dimension ldim = indicatorLed.getPreferredSize();
+//      int width = fm.stringWidth( label.getText()) + ldim.width;
+//      int height = Math.max( fm.getMaxAscent() + fm.getMaxDescent(), ldim.height);
 
-    return new Dimension( width + 2 + 7, height + 2);
-  }
+//      return new Dimension( width + 2 + 7, height + 2);
+//    }
 
-  public Dimension getPreferredSize()
-  {
-    return getMinimumSize();
-  }
+//    public Dimension getPreferredSize()
+//    {
+//      return getMinimumSize();
+//    }
 
   public void setValue( boolean value)
   {

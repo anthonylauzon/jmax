@@ -68,30 +68,27 @@ public class MemoryLed extends Led {
       }
   }
 
-  public void paint( Graphics g)
+  public void paintComponent( Graphics g)
   {
-    g.setColor( getForeground());
-    g.drawRect( 0, 0, size - 1, size - 1);
+    Insets insets = getInsets();
+    int w = getWidth() - insets.left - insets.right;
+    int h = getHeight() - insets.top - insets.bottom;
 
+    g.setColor( getBackground());
+    g.fillRect( insets.left, insets.top, w, h);
+
+    g.setColor( onColor);
     if ( state == ON)
       {
-	int xState = (size - sizeState) / 2;
-
-	g.setColor( onColor);
-	g.fillRect( xState, xState, sizeState, sizeState);
+	g.fillRect( insets.left, insets.top, w, h);
       }
     else if ( memory == ON)
       {
-	int xMemory = (size - sizeMemory) / 2;
-
-	g.setColor( onColor);
-	g.fillRect( xMemory, xMemory, sizeMemory, sizeMemory);
+	g.fillRect( insets.left + 2, insets.top + 2, w - 4, h - 4);
       }
   }
 
   protected static final int size = 12;
-  protected static final int sizeState = 8;
-  protected static final int sizeMemory = 4;
 
   protected int memory;
 }
