@@ -130,9 +130,6 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
 		{
 			// Create TempoBar
 			tempoBar = new TempoBar(geometry, ftsTrackObject, this);
-			tempoBar.setSize(SequenceWindow.DEFAULT_WIDTH, TempoBar.TEMPO_HEIGHT);
-			tempoBar.setPreferredSize(TempoBar.tempoDimension);
-			tempoBar.setMinimumSize(TempoBar.tempoDimension);
 			
 			//------------------ prepares Center Section
 			centerSection = new JPanel();			

@@ -437,20 +437,31 @@ private void createListDialog()
 
 public void processKeyEvent(KeyEvent e)
 {
-	if(SequenceTextArea.isDeleteKey(e))
-	{
-		if(e.getID()==KeyEvent.KEY_PRESSED)
-	  {
-	    ((UndoableData)track.getTrackDataModel()).beginUpdate();
-	    getSelection().deleteAll();
-	  }	    
-	}
-	else if((e.getKeyCode() == KeyEvent.VK_TAB)&&(e.getID()==KeyEvent.KEY_PRESSED))
-		if(e.isControlDown())
-			getSelection().selectPrevious();
-		else
-			getSelection().selectNext();
-	
+  if(e.getID()==KeyEvent.KEY_PRESSED)
+  {
+    switch( e.getKeyCode())
+    {
+      case KeyEvent.VK_DELETE:
+      case KeyEvent.VK_BACK_SPACE:
+        ((UndoableData)track.getTrackDataModel()).beginUpdate();
+        getSelection().deleteAll();
+        break;
+      case KeyEvent.VK_LEFT:       
+        if(getSelection().size() == 0 && (currentSelMarkers != null && currentSelMarkers.size() > 0))
+          currentSelMarkers.selectPrevious();
+        else
+          getSelection().selectPrevious();
+        break;
+      case KeyEvent.VK_RIGHT:
+        if(getSelection().size() == 0 && (currentSelMarkers != null && currentSelMarkers.size() > 0))
+          currentSelMarkers.selectNext();
+        else
+          getSelection().selectNext();
+        break;
+      default:
+        break;
+    }  
+  }
 	super.processKeyEvent(e);
 	requestFocus();
 }

@@ -73,7 +73,12 @@ public class TempoBar extends PopupToolbarPanel implements TrackDataListener, Tr
 		});
 		
 		addMouseListener(this);		
-		validate();
+		
+    setSize(SequenceWindow.DEFAULT_WIDTH, TempoBar.TEMPO_HEIGHT);
+    setPreferredSize(TempoBar.tempoDimension);
+    setMinimumSize(TempoBar.tempoDimension);
+    
+    validate();
 	}
 
 public FtsTrackObject getMarkers()
@@ -130,21 +135,25 @@ public void setPropertyToDraw(String propName, boolean toDraw)
 	repaint();
 }
 
+boolean propInited = false;
 void initPropertiesToDraw()
 {
-	int i = 0;
-	int count = markersTrack.getPropertyCount();
-	propertyNames = new String[ count];
-	propertyToDraw = new boolean[ count];
-	for(Enumeration e = markersTrack.getPropertyNames(); e.hasMoreElements();)
-	{
-		propertyNames[i] = (String)e.nextElement();	
-		propertyToDraw[i] = (propertyNames[i].equals("tempo") || propertyNames[i].equals("meter"));
-		i++;
-	}
-	numPropToDraw = 2;
+  if( !propInited)
+  {
+    int i = 0;
+    int count = markersTrack.getPropertyCount();
+    propertyNames = new String[ count];
+    propertyToDraw = new boolean[ count];
+    for(Enumeration e = markersTrack.getPropertyNames(); e.hasMoreElements();)
+    {
+      propertyNames[i] = (String)e.nextElement();	
+      propertyToDraw[i] = (propertyNames[i].equals("tempo") || propertyNames[i].equals("meter"));
+      i++;
+    }
+    numPropToDraw = 2;
+    propInited = true;
+  }
 }
-
 void createPopup()
 {
 	popup = new TempoBarPopupMenu(this);
@@ -182,6 +191,7 @@ public void paintMeasures(Graphics g, Rectangle clip)
 		TrackEvent evt;		
 		int x;
 		String type;
+    Color color;
 		Dimension d = getSize();		
 		g.setFont( Displayer.displayFont);
 		
@@ -191,22 +201,22 @@ public void paintMeasures(Graphics g, Rectangle clip)
 			evt = (TrackEvent) e.nextElement();
 			type = (String)(evt.getProperty("type"));
 			x = pa.getX(evt)+getXIndentation();
-			
+			boolean selected = markersSelection.isInSelection(evt);
 			if(type.equals("tempo"))
 			{
-				if( markersSelection.isInSelection(evt))
-					g.setColor( selTempoColor);
+				if( selected)
+					color = selTempoColor;
 				else
-					g.setColor( tempoColor);	
+					color = tempoColor;	
 			}
 			else
 			{
-				if( markersSelection.isInSelection(evt))
-					g.setColor( Color.red);
-				else
-					g.setColor( Color.darkGray);	
+				if( selected)
+					color = Color.red;
+        else
+					color = Color.darkGray;	
 			}
-			
+      g.setColor( color);
 			int h = DELTA_H-1;
 			Object prop;
 			String str;
@@ -223,12 +233,61 @@ public void paintMeasures(Graphics g, Rectangle clip)
 						else
 							str = prop.toString();
 						strw = fm.stringWidth(str);
-						g.drawString( str, x - strw/2 + 1, h);
-					}
+						
+            g.drawString( str, x - strw/2 + 1, h);
+            drawPropertyBounds(g, propertyNames[i], selected, color, x - strw/2 + 1, h, strw, DELTA_H-/*2*/3);
+          }
 					h+=DELTA_H;
 				}
 		}
 	}
+}
+
+void drawPropertyBounds(Graphics g, String propName, boolean selected, Color oldColor, int x, int y, int strw, int strh)
+{
+  if(propName.equals("bar #"))
+  {
+    if(selected)
+      g.setColor(selBorderColor);
+    else
+      g.setColor(borderColor);
+    g.drawRect(x-1, y-strh-1, strw+1, strh+2);
+    g.setColor(oldColor);
+  }
+  else
+    if(propName.equals("label"))
+    {
+      if(selected)
+        g.setColor(selTempoColor);
+      else
+        g.setColor(tempoColor);
+      g.fillRect(x-1, y-strh-1, strw+1, strh+2);
+      
+      if(selected)
+        g.setColor(selBorderColor);
+      else
+        g.setColor(Color.gray);
+      
+      g.drawRect(x-1, y-strh-1, strw+1, strh+2);
+      g.setColor(oldColor);
+    }
+  else 
+    if(propName.equals("cue"))
+    {
+      if(selected)
+        g.setColor(selTempoColor);
+      else
+        g.setColor(cueColor);
+      g.fillRect(x-1, y-strh-1, strw+1, strh+2);
+      
+      if(selected)
+        g.setColor(selBorderColor);
+      else
+        g.setColor(cueBorderColor);
+      
+      g.drawRect(x-1, y-strh-1, strw+1, strh+2);
+      g.setColor(oldColor);
+    }  
 }
 
 int getXIndentation()
@@ -256,6 +315,28 @@ public TrackEvent firstMarkerContaining(int x, int y)
       currMark = mark;
   }
   return currMark;
+}
+
+public void processKeyEvent(KeyEvent e)
+{
+  if(e.getID()==KeyEvent.KEY_PRESSED)
+  {
+    switch( e.getKeyCode())
+    {
+      case KeyEvent.VK_LEFT:       
+        if(markersSelection != null && markersSelection.size() > 0)
+          markersSelection.selectPrevious();
+        break;
+      case KeyEvent.VK_RIGHT:
+        if(markersSelection != null && markersSelection.size() > 0)
+          markersSelection.selectNext();
+        break;
+      default:
+        break;
+    }  
+  }
+	super.processKeyEvent(e);
+	requestFocus();
 }
 
 //=================== MouseListener interface ===========================
@@ -326,7 +407,7 @@ public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelectio
 	markersTrack = markers;
 	markersTrack.addListener(this);
 	
-	initPropertiesToDraw();
+	//initPropertiesToDraw();
 }
 public void updateMarkers(FtsTrackObject marks, SequenceSelection markSel)
 {
@@ -339,7 +420,7 @@ public void updateMarkers(FtsTrackObject marks, SequenceSelection markSel)
 		markersSelection = null;
 		markersTrack = null;
 	}
-	initPropertiesToDraw();
+	//initPropertiesToDraw();
 	
 	repaint();
 	popup = null;
@@ -361,8 +442,8 @@ Geometry geometry;
 FtsGraphicObject ftsObj;
 PartitionAdapter pa;
 SequenceEditor container;
-public final static int TEMPO_HEIGHT = 23; 
-public final static int DELTA_H = 10; 
+public final static int TEMPO_HEIGHT = /*23*/25; 
+public final static int DELTA_H = /*10*/11; 
 public static Dimension tempoDimension = new Dimension(SequenceWindow.DEFAULT_WIDTH, TEMPO_HEIGHT);
 public boolean isInSequence;
 FtsTrackObject markersTrack = null;
@@ -375,6 +456,10 @@ TempoBarPopupMenu popup = null;
 Color tempoColor = new Color(165, 165, 165, 100);
 Color selTempoColor = new Color(255, 0, 0, 100);
 Color highTempoColor = new Color(0, 255, 0, 100);
+Color selBorderColor = new Color(255, 0, 0, 100);
+Color borderColor = new Color(165, 165, 165, 150);
+Color cueBorderColor = new Color(0, 0, 255, 150);
+Color cueColor = new Color(00, 0, 255, 50);
 }    
 
 

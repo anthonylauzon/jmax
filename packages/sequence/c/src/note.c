@@ -701,8 +701,8 @@ scomark_append_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   
   if(self->cue > 0)
   {
-    fts_array_append_symbol(array, seqsym_tempo);
-    fts_array_append_float(array, self->tempo);
+    fts_array_append_symbol(array, seqsym_cue);
+    fts_array_append_int(array, self->cue);
   }  
 
   if(self->tempo > 0.0)
