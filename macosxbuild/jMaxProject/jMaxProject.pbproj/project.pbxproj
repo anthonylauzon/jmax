@@ -2309,6 +2309,18 @@
 			settings = {
 			};
 		};
+		F75BA0A4040AAC4F01664058 = {
+			isa = PBXFileReference;
+			name = resizer.gif;
+			path = ../../packages/sequence/images/resizer.gif;
+			refType = 2;
+		};
+		F75BA0A6040AAC8001664058 = {
+			fileRef = F75BA0A4040AAC4F01664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F774414203F0114C01664058 = {
 			isa = PBXFileReference;
 			name = Finder.java;
@@ -9130,10 +9142,8 @@
 				F851247A028BEAB401664092,
 				F851247B028BEAB401664092,
 				F851247C028BEAB401664092,
-				F85124B7028BEBB301664092,
 				F85124B8028BEBB301664092,
 				F85124B9028BEBB301664092,
-				F85124BA028BEBB301664092,
 				F85124BB028BEBB301664092,
 				F85124BC028BEBB301664092,
 				F85124BD028BEBB301664092,
@@ -9498,10 +9508,8 @@
 				F85123D4028BEAB301664092,
 				F85123D5028BEAB301664092,
 				F85123D6028BEAB301664092,
-				F851247D028BEBB201664092,
 				F851247E028BEBB201664092,
 				F851247F028BEBB201664092,
-				F8512480028BEBB201664092,
 				F8512481028BEBB201664092,
 				F8512482028BEBB201664092,
 				F8512483028BEBB201664092,
@@ -10500,12 +10508,6 @@
 			settings = {
 			};
 		};
-		F851247D028BEBB201664092 = {
-			isa = PBXFileReference;
-			name = DeleteTool.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/tools/DeleteTool.java;
-			refType = 2;
-		};
 		F851247E028BEBB201664092 = {
 			isa = PBXFileReference;
 			name = LinerTool.java;
@@ -10516,12 +10518,6 @@
 			isa = PBXFileReference;
 			name = ResizerTool.java;
 			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/tools/ResizerTool.java;
-			refType = 2;
-		};
-		F8512480028BEBB201664092 = {
-			isa = PBXFileReference;
-			name = ScrollerTool.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/tools/ScrollerTool.java;
 			refType = 2;
 		};
 		F8512481028BEBB201664092 = {
@@ -10848,12 +10844,6 @@
 			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/ValueInfoTable.java;
 			refType = 2;
 		};
-		F85124B7028BEBB301664092 = {
-			fileRef = F851247D028BEBB201664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F85124B8028BEBB301664092 = {
 			fileRef = F851247E028BEBB201664092;
 			isa = PBXBuildFile;
@@ -10862,12 +10852,6 @@
 		};
 		F85124B9028BEBB301664092 = {
 			fileRef = F851247F028BEBB201664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F85124BA028BEBB301664092 = {
-			fileRef = F8512480028BEBB201664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -11215,13 +11199,12 @@
 				F8512500028BEC7D01664092,
 				F8512501028BEC7D01664092,
 				F8512502028BEC7D01664092,
-				F8512503028BEC7D01664092,
 				F8512504028BEC7D01664092,
 				F8512505028BEC7D01664092,
 				F8512506028BEC7D01664092,
 				F8512507028BEC7D01664092,
-				F8512508028BEC7D01664092,
 				F8512509028BEC7D01664092,
+				F75BA0A4040AAC4F01664058,
 			);
 			isa = PBXGroup;
 			name = images;
@@ -11329,12 +11312,6 @@
 			path = ../../packages/sequence/images/opened_track_arrow.gif;
 			refType = 2;
 		};
-		F8512503028BEC7D01664092 = {
-			isa = PBXFileReference;
-			name = scroller.gif;
-			path = ../../packages/sequence/images/scroller.gif;
-			refType = 2;
-		};
 		F8512504028BEC7D01664092 = {
 			isa = PBXFileReference;
 			name = selected_track.gif;
@@ -11357,12 +11334,6 @@
 			isa = PBXFileReference;
 			name = violinClef.gif;
 			path = ../../packages/sequence/images/violinClef.gif;
-			refType = 2;
-		};
-		F8512508028BEC7D01664092 = {
-			isa = PBXFileReference;
-			name = vresize.gif;
-			path = ../../packages/sequence/images/vresize.gif;
 			refType = 2;
 		};
 		F8512509028BEC7D01664092 = {
@@ -11425,12 +11396,11 @@
 				F8512524028BED1101664092,
 				F8512525028BED1101664092,
 				F8512526028BED1101664092,
-				F8512527028BED1101664092,
+				F75BA0A6040AAC8001664058,
 				F8512528028BED1101664092,
 				F8512529028BED1101664092,
 				F851252A028BED1101664092,
 				F851252B028BED1101664092,
-				F851252C028BED1101664092,
 				F851252D028BED1101664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
@@ -11538,12 +11508,6 @@
 			settings = {
 			};
 		};
-		F8512527028BED1101664092 = {
-			fileRef = F8512503028BEC7D01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F8512528028BED1101664092 = {
 			fileRef = F8512504028BEC7D01664092;
 			isa = PBXBuildFile;
@@ -11564,12 +11528,6 @@
 		};
 		F851252B028BED1101664092 = {
 			fileRef = F8512507028BEC7D01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F851252C028BED1101664092 = {
-			fileRef = F8512508028BEC7D01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
