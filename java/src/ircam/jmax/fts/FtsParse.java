@@ -80,10 +80,13 @@ public class FtsParse
   {
     // Number format for messages coming from FTS (to be cleaned up:
     // the text should be sent by FTS as text alread).
-    
-    formatter  = new DecimalFormat("0.######;-0.######");
+    formatter = new DecimalFormat("0.######;-0.######");
     formatter.setGroupingUsed(false);
     formatter.setDecimalSeparatorAlwaysShown(true);
+
+    DecimalFormatSymbols formsym = new DecimalFormatSymbols();
+    formsym.setDecimalSeparator('.');
+    formatter.setDecimalFormatSymbols(formsym);
   }
 
   /* Operating variables */
@@ -296,7 +299,8 @@ public class FtsParse
     String keywords[] = { "(", ")",
 			  "[", "]", "{", "}", ",", 
 			  "::", ":", "$", ".",
-			  ";", "'", "=" };
+			  ";", "'", 
+			  "==", "!=", "<=", ">=", "="};
 
     tryParse();
 
@@ -592,9 +596,9 @@ public class FtsParse
 	   if the parsing has been succesfull.
 	 */
 
-	if (! parser.tryKeywords())
-	  if (! parser.tryFloat())
-	    if (! parser.tryInt())
+	if (! parser.tryFloat())
+	  if (! parser.tryInt())
+	    if (! parser.tryKeywords())
 	      if (! parser.tryQString())
 		parser.tryString();
       }
@@ -638,9 +642,9 @@ public class FtsParse
 	       if the parsing has been succesfull.
 	       */
 
-	    if (! parser.tryKeywords())
-	      if (! parser.tryInt())
-		if (! parser.tryFloat())
+	    if (! parser.tryInt())
+	      if (! parser.tryFloat())
+		if (! parser.tryKeywords())
 		  if (! parser.tryQString())
 		    parser.tryString();
 
@@ -805,7 +809,8 @@ public class FtsParse
     String keywords[] = { "(", ")",
 			  "[", "]", "{", "}", ",", 
 			  "::", ":", "$", ".",
-			  ";", "'", "=" };
+			  ";", "'",
+			  "==", "!=", "<=", ">=", "="};
     
     for (int i = 0 ; i < keywords.length; i++)
       if (keywords[i].equals((String) value))
