@@ -517,7 +517,17 @@ fts_ucs_dev_open_device(int argc, const fts_atom_t *argv)
 
       pd_argc = argv + argc - pd_argv;
 
-      return fts_open_logical_device(logical_dev_name, ld_argc, ld_argv, class_name, pd_argc, pd_argv);
+      
+      ret = fts_open_logical_device(logical_dev_name, ld_argc, ld_argv, class_name, pd_argc, pd_argv);
+
+      if (ret != fts_Success)
+	{
+	  post("Error \"%s\" Opening Device", ret->description);
+	  post_atoms(pd_argc, pd_argv);
+	  post(": %s\n", ret->description);
+	}
+
+      return fts_Success;
     }
   else
     return &bad_command; /* bad set device command */

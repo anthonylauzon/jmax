@@ -10,7 +10,7 @@
 #  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
 #  for DISCLAIMER OF WARRANTY.
 #  
-C_TARGETS=ispw guiobj lists additive eric system
+C_TARGETS=ispw guiobj lists additive eric system io
 JAVA_TARGETS=table
 MIXED_TARGETS=qlist explode
 

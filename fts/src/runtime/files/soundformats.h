@@ -52,8 +52,14 @@ extern void fts_soundfile_format_add(fts_symbol_t name, fts_soundfile_format_t *
 extern void fts_soundfile_format_remove(fts_symbol_t name);
 extern int fts_soundfile_format_exists(fts_symbol_t name);
 
+
+
 /* get explain and platform dependend descriptor for a soundfile format by name */
+
 extern char *fts_soundfile_format_get_explain(fts_symbol_t name);
 extern fts_atom_t *fts_soundfile_format_get_descriptor(fts_symbol_t name);
+
+extern void fts_soundfile_format_set_default(fts_symbol_t name);
+extern fts_symbol_t fts_soundfile_format_get_default();
 
 #endif

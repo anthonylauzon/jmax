@@ -141,6 +141,14 @@ fts_kernel_config(void)
   fts_install_module( &fts_client_module);   /* the fts <--> client communication system */
   fts_install_module( &fts_files_module);   /* the fts file handling module */
 
+  /* Thread module
+     This is temporary: the thread module declares a scheduled function
+     that polls the file descriptors set of the thread.
+     Evolution: this function will become the only function called by the thread
+     and the current scheduler will disappear
+  */
+  fts_install_module( &fts_thread_module);   /* the "thread" module */
+
   /* TILES modules */
 
   fts_install_module( &fts_ucs_module);      /* the fts universal configuration  system */

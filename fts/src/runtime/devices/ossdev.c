@@ -385,24 +385,16 @@ static int oss_dac_get_nerrors(fts_dev_t *dev);
 static void oss_dac_init(void)
 {
   fts_dev_class_t *oss_dac_class;
-
     
   /* OSS DAC class  */
 
-  oss_dac_class = fts_dev_class_new(fts_sig_dev);
+  oss_dac_class = fts_dev_class_new(fts_sig_dev, fts_new_symbol("oss_dac"));
 
-  /* device functions */
-
-  set_open_fun(oss_dac_class, oss_dac_open);
-  set_close_fun(oss_dac_class, oss_dac_close);
-
-  set_sig_dev_put_fun(oss_dac_class, oss_dac_put);
-
-  set_sig_dev_get_nerrors_fun( oss_dac_class, oss_dac_get_nerrors);
-
-  set_sig_dev_get_nchans_fun(oss_dac_class, oss_dac_get_nchans);
-
-  fts_dev_class_register(fts_new_symbol("oss_dac"), oss_dac_class);
+  fts_dev_class_set_open_fun(oss_dac_class, oss_dac_open);
+  fts_dev_class_set_close_fun(oss_dac_class, oss_dac_close);
+  fts_dev_class_sig_set_put_fun(oss_dac_class, oss_dac_put);
+  fts_dev_class_sig_set_get_nerrors_fun( oss_dac_class, oss_dac_get_nerrors);
+  fts_dev_class_sig_set_get_nchans_fun(oss_dac_class, oss_dac_get_nchans);
 }
 
 /* OSS DAC control/options functions */
@@ -495,29 +487,29 @@ static int oss_dac_get_nerrors(fts_dev_t *dev)
 
 
 /* 
-   Arguments: fts_dev_t *dev, int n, float *buf1 ... bufm 
+   Arguments: fts_dev_t *dev, int nchans, int n, float *buf1 ... bufm 
 */
 static void oss_dac_put(fts_word_t *argv)
 {
   int n, i, nchannels, channel, j;
   audio_desc_t *aud;
 
-  aud = (audio_desc_t *)fts_dev_get_device_data( (fts_dev_t *)fts_word_get_ptr( argv) );
+  aud = (audio_desc_t *)fts_dev_get_device_data(*((fts_dev_t **)fts_word_get_ptr( argv) ));
 
   if (aud->fd < 0)
     return;
 
-  n = fts_word_get_long(argv + 1);
+  nchannels = fts_word_get_long(argv + 1);
+  n = fts_word_get_long(argv + 2);
 
-  nchannels = aud->nchannels;
   aud->bytes_count += (nchannels * n * sizeof(short));
 
   if ( nchannels == 2)
     {
       float *in0, *in1;
 
-      in0 = (float *) fts_word_get_ptr(argv + 2);
-      in1 = (float *) fts_word_get_ptr(argv + 3);
+      in0 = (float *) fts_word_get_ptr(argv + 3);
+      in1 = (float *) fts_word_get_ptr(argv + 4);
 
       j = 0;
       for ( i = 0; i < n; i++)
@@ -532,7 +524,7 @@ static void oss_dac_put(fts_word_t *argv)
 	{
 	  float *in;
 
-	  in = (float *) fts_word_get_ptr( argv + 2 + channel);
+	  in = (float *) fts_word_get_ptr( argv + 3 + channel);
 
 	  j = 0;
 	  for ( i = 0; i < n; i++)
@@ -570,17 +562,15 @@ static void oss_adc_init(void)
 
   /* OSS ADC class  */
 
-  oss_adc_class = fts_dev_class_new(fts_sig_dev);
+  oss_adc_class = fts_dev_class_new(fts_sig_dev, fts_new_symbol("oss_adc"));
 
   /* device functions */
 
-  set_open_fun(oss_adc_class, oss_adc_open);
-  set_close_fun(oss_adc_class, oss_adc_close);
-  set_sig_dev_get_fun(oss_adc_class, oss_adc_get);
+  fts_dev_class_set_open_fun(oss_adc_class, oss_adc_open);
+  fts_dev_class_set_close_fun(oss_adc_class, oss_adc_close);
+  fts_dev_class_sig_set_get_fun(oss_adc_class, oss_adc_get);
 
-  set_sig_dev_get_nchans_fun(oss_adc_class, oss_adc_get_nchans);
-
-  fts_dev_class_register(fts_new_symbol("oss_adc"), oss_adc_class);
+  fts_dev_class_sig_set_get_nchans_fun(oss_adc_class, oss_adc_get_nchans);
 }
 
 /* OSS ADC control/options functions: use the same parser as the dac */
@@ -637,23 +627,22 @@ static void oss_adc_get( fts_word_t *argv)
   int n, i, nchannels, channel, j;
   audio_desc_t *aud;
 
-  aud = (audio_desc_t *)fts_dev_get_device_data( (fts_dev_t *)fts_word_get_ptr( argv) );
+  aud = (audio_desc_t *)fts_dev_get_device_data(*((fts_dev_t **)fts_word_get_ptr( argv)));
 
   if (aud->fd < 0)
     return;
 
-  n = fts_word_get_long(argv + 1);
+  nchannels = fts_word_get_long(argv + 1);
+  n = fts_word_get_long(argv + 2);
 
-  nchannels = aud->nchannels;
-
-  read( aud->fd, aud->adc_fmtbuf, nchannels * n * sizeof( short));
+   read( aud->fd, aud->adc_fmtbuf, nchannels * n * sizeof( short));
 
   if ( nchannels == 2)
     {
       float *out0, *out1;
 
-      out0 = (float *) fts_word_get_ptr(argv + 2);
-      out1 = (float *) fts_word_get_ptr(argv + 3);
+      out0 = (float *) fts_word_get_ptr(argv + 3);
+      out1 = (float *) fts_word_get_ptr(argv + 4);
 
       j = 0;
       for ( i = 0; i < n; i++)
@@ -668,7 +657,7 @@ static void oss_adc_get( fts_word_t *argv)
 	{
 	  float *out;
 
-	  out = (float *) fts_word_get_ptr( argv + 2 + channel);
+	  out = (float *) fts_word_get_ptr( argv + 3 + channel);
 
 	  j = 0;
 	  for ( i = 0; i < n; i++)
@@ -739,14 +728,12 @@ static void oss_midi_init( void)
 {
   fts_dev_class_t *oss_midi_class;
 
-  oss_midi_class = fts_dev_class_new( fts_char_dev);
+  oss_midi_class = fts_dev_class_new( fts_char_dev, fts_new_symbol( "oss_midi"));
 
-  set_open_fun( oss_midi_class, oss_midi_open);
-  set_close_fun( oss_midi_class, oss_midi_close);
-  set_char_dev_get_fun( oss_midi_class, fd_dev_get);
-  set_char_dev_put_fun( oss_midi_class, oss_midi_put);
-
-  fts_dev_class_register( fts_new_symbol( "oss_midi"), oss_midi_class);
+  fts_dev_class_set_open_fun( oss_midi_class, oss_midi_open);
+  fts_dev_class_set_close_fun( oss_midi_class, oss_midi_close);
+  fts_dev_class_char_set_get_fun( oss_midi_class, fd_dev_get);
+  fts_dev_class_char_set_put_fun( oss_midi_class, oss_midi_put);
 }
 
 /******************************************************************************/

@@ -47,7 +47,7 @@
 #include <string.h>
 #include <dlfcn.h>
 
-
+#include <stdio.h>
 
 extern int fts_file_get_read_path(const char *path, char *full_path);
 
@@ -237,6 +237,7 @@ fts_module_load(const char *name, const char *filename)
 
   module->name = name;		/* overwrite user declared name */
   fts_install_module(module);
+
   (* module->init_f)();
 
   return fts_Success;

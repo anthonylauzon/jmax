@@ -15,7 +15,7 @@ AUDIO_SOURCES = sgidev.c
 endif
 
 ifeq ($(AUDIO_LIBRARY),sgial2)
-AUDIO_SOURCES = sgial2dev.c
+AUDIO_SOURCES = sgial2dev.c sfdev.c shmdev.c
 endif
 
 ifeq ($(AUDIO_LIBRARY),oss)

@@ -11,11 +11,13 @@
  * for DISCLAIMER OF WARRANTY.
  * 
  */
+#include <dmedia/audiofile.h>
+#include <string.h>
+
 #include "sys.h"
 #include "lang.h"
 #include "runtime/files/soundfiles.h"
 #include "runtime/files/soundformats.h"
-#include <dmedia/audiofile.h>
 
 /***************************************************************
  *
@@ -32,6 +34,8 @@ fts_soundfile_format_platform_init(void)
   fts_set_int(fts_soundfile_format_get_descriptor(fts_s_bicsf), AF_FILE_BICSF);
   fts_set_int(fts_soundfile_format_get_descriptor(fts_s_sdII), AF_FILE_SOUNDESIGNER2);
   fts_set_int(fts_soundfile_format_get_descriptor(fts_s_float), AF_FILE_RAWDATA);
+
+  fts_soundfile_format_set_default(fts_s_aiff);
 }
 
 /* converting the symbols for supported file formats into 

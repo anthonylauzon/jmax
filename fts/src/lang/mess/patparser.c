@@ -140,6 +140,7 @@ static void fts_patparse_set_range(fts_graphic_description_t *this, fts_patlex_t
 
 
 int fontIndexTable[8] = {9, 10, 12, 14, 16, 18, 20, 24};
+#define FONTINDEXTABLE_SIZE (sizeof(fontIndexTable)/sizeof(int))
 
 void fts_patparse_set_font_size_table(int ac, const fts_atom_t *at)
 {
@@ -155,8 +156,15 @@ void fts_patparse_set_font_size_table(int ac, const fts_atom_t *at)
 
 static void fts_patparse_set_font_index(fts_graphic_description_t *this, fts_patlex_t *in)
 {
+  int i;
+
   fts_patlex_next_token(in);
-  fts_set_int(&(this->fontSize), fontIndexTable[fts_get_int(&(in->val))]);
+
+  i = fts_get_int(&(in->val));
+  if ( i < 0 || i >= FONTINDEXTABLE_SIZE)
+    i = 2;
+
+  fts_set_int(&(this->fontSize), fontIndexTable[i]);
 }
 
 static void fts_patparse_set_text_graphic_properties(fts_graphic_description_t *this, fts_object_t *obj)

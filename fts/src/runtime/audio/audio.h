@@ -14,6 +14,8 @@
 #ifndef _FTSAUDIO_H_
 #define _FTSAUDIO_H_
 
+#include "runtime/devices.h"
+
 /* types */
 
 struct fts_audio_input_logical_device;
@@ -38,6 +40,9 @@ extern void fts_audio_set_pending_close(void);
 
 extern fts_dev_t *fts_audio_get_input_device(fts_audio_input_logical_device_t *ldev);
 extern fts_dev_t *fts_audio_get_output_device(fts_audio_output_logical_device_t *ldev);
+
+extern fts_dev_t **fts_audio_get_input_device_pointer(fts_audio_input_logical_device_t *ldev);
+extern fts_dev_t **fts_audio_get_output_device_pointer(fts_audio_output_logical_device_t *ldev);
 
 extern fts_symbol_t fts_audio_get_input_ftl_function(fts_audio_input_logical_device_t *ldev);
 extern fts_symbol_t fts_audio_get_output_ftl_function(fts_audio_output_logical_device_t *ldev);

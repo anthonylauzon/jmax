@@ -211,18 +211,14 @@ solaris_dac_init(void)
     
   /* SOLARIS DAC class  */
 
-  solaris_dac_class = fts_dev_class_new(fts_sig_dev);
+  solaris_dac_class = fts_dev_class_new(fts_sig_dev, fts_new_symbol("solaris_dac"));
 
   /* device functions */
 
-  set_open_fun(solaris_dac_class, solaris_dac_open);
-  set_close_fun(solaris_dac_class, solaris_dac_close);
-
-  set_sig_dev_put_fun(solaris_dac_class, solaris_dac_put);
-
-  set_sig_dev_get_nchans_fun(solaris_dac_class, solaris_dac_get_nchans);
-
-  return fts_dev_class_register(fts_new_symbol("solaris_dac"), solaris_dac_class);
+  fts_dev_class_set_open_fun(solaris_dac_class, solaris_dac_open);
+  fts_dev_class_set_close_fun(solaris_dac_class, solaris_dac_close);
+  fts_dev_class_sig_set_put_fun(solaris_dac_class, solaris_dac_put);
+  fts_dev_class_sig_set_get_nchans_fun(solaris_dac_class, solaris_dac_get_nchans);
 }
 
 /* SOLARIS DAC control/options functions */
@@ -596,8 +592,7 @@ static struct solaris_adc_data_struct
 
 /* Init and shutdown functions */
 
-static fts_status_t
-solaris_adc_init(void)
+static void solaris_adc_init(void)
 {
   fts_dev_class_t *solaris_adc_class;
 
@@ -608,17 +603,15 @@ solaris_adc_init(void)
     
   /* SOLARIS ADC class  */
 
-  solaris_adc_class = fts_dev_class_new(fts_sig_dev);
+  solaris_adc_class = fts_dev_class_new(fts_sig_dev, fts_new_symbol("solaris_adc"));
 
   /* device functions */
 
-  set_open_fun(solaris_adc_class, solaris_adc_open);
-  set_close_fun(solaris_adc_class, solaris_adc_close);
-  set_sig_dev_get_fun(solaris_adc_class, solaris_adc_get);
+  fts_dev_class_set_open_fun(solaris_adc_class, solaris_adc_open);
+  fts_dev_class_set_close_fun(solaris_adc_class, solaris_adc_close);
+  fts_dev_class_sig_set_get_fun(solaris_adc_class, solaris_adc_get);
 
-  set_sig_dev_get_nchans_fun(solaris_adc_class, solaris_adc_get_nchans);
-
-  return fts_dev_class_register(fts_new_symbol("solaris_adc"), solaris_adc_class);
+  fts_dev_class_sig_set_get_nchans_fun(solaris_adc_class, solaris_adc_get_nchans);
 }
 
 /* SOLARIS ADC control/options functions */
@@ -867,12 +860,12 @@ solaris_adc_get(fts_dev_t *dev, float **buf, int n)
 static void
 solaris_adc_get(fts_word_t *argv)
 {
-  long n = fts_word_get_long(argv + 1);
+  long n = fts_word_get_long(argv + 2);
   int i,j;
   int off2, off3, off4;
   int nchans, ch, inc;
 
-  nchans = solaris_adc_data.nch;
+  nchans = fts_word_get_long(argv + 1);
   off2 = nchans;
   off3 = 2 * nchans;
   off4 = 3 * nchans;
@@ -889,7 +882,7 @@ solaris_adc_get(fts_word_t *argv)
     {
       float *out;
       
-      out = (float *) fts_word_get_obj(argv + 2 + ch);
+      out = (float *) fts_word_get_obj(argv + 3 + ch);
 
       for (i = ch, j = 0; j < n; i = i + inc, j += 4)
 	{
@@ -925,8 +918,7 @@ static fts_status_t solaris_midi_close(fts_dev_t *dev);
 static fts_status_t solaris_midi_get(fts_dev_t *dev, unsigned char *cp);
 static fts_status_t solaris_midi_put(fts_dev_t *dev, unsigned char c);
 
-static fts_status_t 
-solaris_midi_init(void)
+static void solaris_midi_init(void)
 {
 #ifndef SOLARIS2_PORTAGE
   fts_dev_class_t *solaris_midi_dev_class;
@@ -937,18 +929,12 @@ solaris_midi_init(void)
   /* adding device functions: the device support only basic 
    character i/o; no callback functions, no sync functions */
 
-  solaris_midi_dev_class = fts_dev_class_new(fts_char_dev);
+  solaris_midi_dev_class = fts_dev_class_new(fts_char_dev, fts_new_symbol("solaris_midi"));
 
-  set_open_fun(solaris_midi_dev_class, solaris_midi_open);
-  set_close_fun(solaris_midi_dev_class, solaris_midi_close);
-  set_char_dev_get_fun(solaris_midi_dev_class, solaris_midi_get);
-  set_char_dev_put_fun(solaris_midi_dev_class, solaris_midi_put);
-
-  /* Installing the class */
-
-  return fts_dev_class_register(fts_new_symbol("solaris_midi"), solaris_midi_dev_class);
-#else
-  return fts_Success;
+  fts_dev_class_set_open_fun(solaris_midi_dev_class, solaris_midi_open);
+  fts_dev_class_set_close_fun(solaris_midi_dev_class, solaris_midi_close);
+  fts_dev_class_char_set_get_fun(solaris_midi_dev_class, solaris_midi_get);
+  fts_dev_class_char_set_put_fun(solaris_midi_dev_class, solaris_midi_put);
 #endif
 }
 
@@ -1355,23 +1341,15 @@ solaris_soundfile_init(void)
 
   /* dac file */
 
-  solaris_soundfile_class = fts_dev_class_new(fts_sig_dev);
+  solaris_soundfile_class = fts_dev_class_new(fts_sig_dev, fts_new_symbol("soundfile"));
 
-  /* Installation of all the device class functions */
-
-  set_open_fun(solaris_soundfile_class, solaris_soundfile_open);
-  set_close_fun(solaris_soundfile_class, solaris_soundfile_close);
-
-  set_sig_dev_put_fun(solaris_soundfile_class, solaris_soundfile_put);
-  set_sig_dev_get_fun(solaris_soundfile_class, solaris_soundfile_get);
-
-  set_sig_dev_activate_fun(solaris_soundfile_class, solaris_soundfile_activate);
-  set_sig_dev_deactivate_fun(solaris_soundfile_class, solaris_soundfile_deactivate);
-  set_sig_dev_get_nchans_fun(solaris_soundfile_class, solaris_soundfile_get_nchans);
-
-  /* Install the device class */
-
-  return fts_dev_class_register(fts_new_symbol("soundfile"), solaris_soundfile_class);
+  fts_dev_class_set_open_fun(solaris_soundfile_class, solaris_soundfile_open);
+  fts_dev_class_set_close_fun(solaris_soundfile_class, solaris_soundfile_close);
+  fts_dev_class_sig_set_put_fun(solaris_soundfile_class, solaris_soundfile_put);
+  fts_dev_class_sig_set_get_fun(solaris_soundfile_class, solaris_soundfile_get);
+  fts_dev_class_sig_set_activate_fun(solaris_soundfile_class, solaris_soundfile_activate);
+  fts_dev_class_sig_set_deactivate_fun(solaris_soundfile_class, solaris_soundfile_deactivate);
+  fts_dev_class_sig_set_get_nchans_fun(solaris_soundfile_class, solaris_soundfile_get_nchans);
 #endif
 }
 

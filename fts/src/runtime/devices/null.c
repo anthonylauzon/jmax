@@ -56,20 +56,16 @@ static void null_dev_init(void)
 {
   fts_dev_class_t *null_dev_class;
 
-  null_dev_class = fts_dev_class_new(fts_char_dev);
+  null_dev_class = fts_dev_class_new(fts_char_dev, fts_new_symbol("null"));
 
   /* adding device functions: the device support only basic 
    character i/o; no callback functions, no sync functions */
 
-  set_open_fun(null_dev_class, null_dev_open);
-  set_close_fun(null_dev_class, null_dev_close);
-  set_char_dev_get_fun(null_dev_class, null_dev_get);
-  set_char_dev_put_fun(null_dev_class, null_dev_put);
-  set_char_dev_seek_fun(null_dev_class, null_dev_seek);
-
-  /* Installing the class */
-
-  fts_dev_class_register(fts_new_symbol("null"), null_dev_class);
+  fts_dev_class_set_open_fun(null_dev_class, null_dev_open);
+  fts_dev_class_set_close_fun(null_dev_class, null_dev_close);
+  fts_dev_class_char_set_get_fun(null_dev_class, null_dev_get);
+  fts_dev_class_char_set_put_fun(null_dev_class, null_dev_put);
+  fts_dev_class_char_set_seek_fun(null_dev_class, null_dev_seek);
 }
 
 
@@ -144,19 +140,17 @@ static void signull_dac_init(void)
 
   /* Profiling DAC class  */
 
-  signull_dac_class = fts_dev_class_new(fts_sig_dev);
+  signull_dac_class = fts_dev_class_new(fts_sig_dev, fts_new_symbol("null~"));
 
   /* device functions */
 
-  set_open_fun(signull_dac_class, signull_dac_open);
-  set_close_fun(signull_dac_class, signull_dac_close);
-  set_sig_dev_put_fun(signull_dac_class, signull_dac_put);
+  fts_dev_class_set_open_fun(signull_dac_class, signull_dac_open);
+  fts_dev_class_set_close_fun(signull_dac_class, signull_dac_close);
+  fts_dev_class_sig_set_put_fun(signull_dac_class, signull_dac_put);
 
-  set_sig_dev_activate_fun(signull_dac_class, signull_dac_activate);
-  set_sig_dev_deactivate_fun(signull_dac_class, signull_dac_deactivate);
-  set_sig_dev_get_nchans_fun(signull_dac_class, signull_dac_get_nchans);
-
-  fts_dev_class_register(fts_new_symbol("null~"), signull_dac_class);
+  fts_dev_class_sig_set_activate_fun(signull_dac_class, signull_dac_activate);
+  fts_dev_class_sig_set_deactivate_fun(signull_dac_class, signull_dac_deactivate);
+  fts_dev_class_sig_set_get_nchans_fun(signull_dac_class, signull_dac_get_nchans);
 }
 
 

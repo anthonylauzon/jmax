@@ -11,17 +11,10 @@
  * for DISCLAIMER OF WARRANTY.
  * 
  */
-#ifndef _RUNTIME_H_
-#define _RUNTIME_H_
+#ifndef _RUNTIME_THREAD_H_
+#define _RUNTIME_THREAD_H_
 
-#include "runtime/STtools.h"
-#include "runtime/audio.h"
-#include "runtime/client.h"
-#include "runtime/devices.h"
-#include "runtime/files.h"
-#include "runtime/midi.h"
-#include "runtime/sched.h"
-#include "runtime/time.h"
-#include "runtime/thread.h"
+#include "thread/thread.h"
+#include "thread/threadmod.h"
 
 #endif

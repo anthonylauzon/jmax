@@ -51,6 +51,7 @@ static fts_soundfile_format_t format_signed32 = {"raw 32 bit twos complement int
  *
  */
 
+
 static fts_hash_table_t the_fts_soundfile_standard_formats_hashtable;
 
 static fts_soundfile_format_t *
@@ -89,7 +90,6 @@ fts_soundfile_format_remove(fts_symbol_t name)
   fts_hash_table_remove(&the_fts_soundfile_standard_formats_hashtable, name);
 }
 
-
 /************************************************************************
  *
  *  get standard format parameters from hash table
@@ -121,6 +121,27 @@ fts_soundfile_format_get_descriptor(fts_symbol_t name)
     return &format->descr;
   else
     return 0;
+}
+
+/************************************************************************
+ *
+ *  default format name
+ *
+ */
+
+static fts_symbol_t default_format_name;
+
+void
+fts_soundfile_format_set_default(fts_symbol_t name)
+{
+  default_format_name = name;
+}
+
+
+fts_symbol_t 
+fts_soundfile_format_get_default()
+{
+  return default_format_name;
 }
 
 

@@ -15,6 +15,10 @@
 #ifndef _PLATFORM_H
 #define _PLATFORM_H
 
+#ifndef M_PI
+#define M_PI		3.14159265358979323846
+#endif
+
 /*********************************************************************
  *
  *  linux/gnu (gcc) standard basic platform
@@ -25,6 +29,7 @@
 #define FTS_ARCH_NAME "linux"
 #define restrict
 #define HAS_UNIX
+#define HAS_PTHREADS
 #define HAS_OSS /* the OSS sound system */
 #define VECLIB_LOOP_UNROLL NO
 #define FTS_HAS_LITTLE_ENDIAN
@@ -40,6 +45,7 @@
 
 #define HAS_DTD /* direct to disk support */
 #define HAS_UNIX
+#define HAS_PTHREADS
 /* #define HAS_TTY_DEV */ /* don't commit with this on until ttydev is fixed */
 #define VECLIB_LOOP_UNROLL 4
 #define FTS_HAS_BIG_ENDIAN

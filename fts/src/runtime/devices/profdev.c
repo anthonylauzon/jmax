@@ -29,14 +29,13 @@
 
 /* Include files */
 
+#include <sys/time.h>
+#include <sys/resource.h>
 
 #include "sys.h"
 #include "lang.h"
 #include "runtime/files.h"
 #include "runtime/devices/devices.h"
-#include <sys/time.h>
-
-
 
 /* forward declarations */
 
@@ -106,19 +105,17 @@ static void prof_dac_init(void)
 
   /* Profiling DAC class  */
 
-  prof_dac_class = fts_dev_class_new(fts_sig_dev);
+  prof_dac_class = fts_dev_class_new(fts_sig_dev, fts_new_symbol("prof_dac"));
 
   /* device functions */
 
-  set_open_fun(prof_dac_class, prof_dac_open);
-  set_close_fun(prof_dac_class, prof_dac_close);
-  set_sig_dev_put_fun(prof_dac_class, prof_dac_put);
+  fts_dev_class_set_open_fun(prof_dac_class, prof_dac_open);
+  fts_dev_class_set_close_fun(prof_dac_class, prof_dac_close);
+  fts_dev_class_sig_set_put_fun(prof_dac_class, prof_dac_put);
 
-  set_sig_dev_activate_fun(prof_dac_class, prof_dac_activate);
-  set_sig_dev_deactivate_fun(prof_dac_class, prof_dac_deactivate);
-  set_sig_dev_get_nchans_fun(prof_dac_class, prof_dac_get_nchans);
-
-  fts_dev_class_register(fts_new_symbol("prof_dac"), prof_dac_class);
+  fts_dev_class_sig_set_activate_fun(prof_dac_class, prof_dac_activate);
+  fts_dev_class_sig_set_deactivate_fun(prof_dac_class, prof_dac_deactivate);
+  fts_dev_class_sig_set_get_nchans_fun(prof_dac_class, prof_dac_get_nchans);
 }
 
 /* Prof DAC control/options functions */
@@ -175,7 +172,7 @@ prof_dac_close(fts_dev_t *dev)
 static void
 prof_dac_put(fts_word_t *argv)
 {
-  long n = fts_word_get_long(argv + 1);
+  long n = fts_word_get_long(argv + 2);
 
   if (prof_dac_data.active)
     {

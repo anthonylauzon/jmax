@@ -35,10 +35,17 @@
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/resource.h>
+#include <sys/time.h> /* ? */
+/* should be: */
+#include <time.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+
+#if 0
+#include <sys/bsd_types.h> /* ? */
+#endif
 
 #ifdef HAS_TTY_DEV
 #include <termios.h> 
@@ -303,19 +310,13 @@ init_stdio(void)
 {
   fts_dev_class_t *stdio_class;
 
-  stdio_class = fts_dev_class_new(fts_char_dev);
+  stdio_class = fts_dev_class_new(fts_char_dev, fts_new_symbol("stdio"));
 
-  /* No class level function defined */
-
-  set_open_fun(stdio_class, open_stdio);
-  set_close_fun(stdio_class, close_stdio);
-  set_char_dev_get_fun(stdio_class, fd_dev_get);
-  set_char_dev_put_fun(stdio_class, fd_dev_put);
-  set_char_dev_flush_fun(stdio_class, fd_dev_flush);
-
-  /* Installing the class */
-
-  fts_dev_class_register(fts_new_symbol("stdio"), stdio_class);
+  fts_dev_class_set_open_fun(stdio_class, open_stdio);
+  fts_dev_class_set_close_fun(stdio_class, close_stdio);
+  fts_dev_class_char_set_get_fun(stdio_class, fd_dev_get);
+  fts_dev_class_char_set_put_fun(stdio_class, fd_dev_put);
+  fts_dev_class_char_set_flush_fun(stdio_class, fd_dev_flush);
 }
 
 
@@ -362,17 +363,13 @@ init_npipe(void)
 {
   fts_dev_class_t *npipe_class;
 
-  npipe_class = fts_dev_class_new(fts_char_dev);
+  npipe_class = fts_dev_class_new(fts_char_dev, fts_new_symbol("npipe"));
 
-  set_open_fun(npipe_class, open_npipe);
-  set_close_fun(npipe_class, close_npipe);
-  set_char_dev_get_fun(npipe_class, fd_dev_get);
-  set_char_dev_put_fun(npipe_class, fd_dev_put);
-  set_char_dev_flush_fun(npipe_class, fd_dev_flush);
-
-  /* Installing the class */
-
-  fts_dev_class_register(fts_new_symbol("npipe"), npipe_class);
+  fts_dev_class_set_open_fun(npipe_class, open_npipe);
+  fts_dev_class_set_close_fun(npipe_class, close_npipe);
+  fts_dev_class_char_set_get_fun(npipe_class, fd_dev_get);
+  fts_dev_class_char_set_put_fun(npipe_class, fd_dev_put);
+  fts_dev_class_char_set_flush_fun(npipe_class, fd_dev_flush);
 }
 
 
@@ -446,17 +443,13 @@ init_socket_server(void)
 {
   fts_dev_class_t *socket_server_class;
 
-  socket_server_class = fts_dev_class_new(fts_char_dev);
+  socket_server_class = fts_dev_class_new(fts_char_dev, fts_new_symbol("socket_server"));
 
-  set_open_fun(socket_server_class, open_socket_server);
-  set_close_fun(socket_server_class, close_socket_server);
-  set_char_dev_get_fun(socket_server_class, socket_server_get);
-  set_char_dev_put_fun(socket_server_class, socket_server_put);
-  set_char_dev_flush_fun(socket_server_class, fd_dev_flush);
-
-  /* Installing the class */
-
-  fts_dev_class_register(fts_new_symbol("socket_server"), socket_server_class);
+  fts_dev_class_set_open_fun(socket_server_class, open_socket_server);
+  fts_dev_class_set_close_fun(socket_server_class, close_socket_server);
+  fts_dev_class_char_set_get_fun(socket_server_class, socket_server_get);
+  fts_dev_class_char_set_put_fun(socket_server_class, socket_server_put);
+  fts_dev_class_char_set_flush_fun(socket_server_class, fd_dev_flush);
 }
 
 
@@ -478,7 +471,7 @@ open_socket_server(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   if (p->listener == -1)
     return &fts_dev_open_error;
 
-  bzero((char *)&serv_addr, sizeof(serv_addr));
+  memset((char *)&serv_addr, 0, sizeof(serv_addr));
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
   serv_addr.sin_port = htons(port);
@@ -776,17 +769,13 @@ init_socket_client(void)
 {
   fts_dev_class_t *socket_client_class;
 
-  socket_client_class = fts_dev_class_new(fts_char_dev);
+  socket_client_class = fts_dev_class_new(fts_char_dev, fts_new_symbol("socket"));
 
-  set_open_fun(socket_client_class, open_socket_client);
-  set_close_fun(socket_client_class, close_socket_client);
-  set_char_dev_get_fun(socket_client_class, fd_dev_get);
-  set_char_dev_put_fun(socket_client_class, fd_dev_put);
-  set_char_dev_flush_fun(socket_client_class, fd_dev_flush);
-
-  /* Installing the class */
-
-  fts_dev_class_register(fts_new_symbol("socket"), socket_client_class);
+  fts_dev_class_set_open_fun(socket_client_class, open_socket_client);
+  fts_dev_class_set_close_fun(socket_client_class, close_socket_client);
+  fts_dev_class_char_set_get_fun(socket_client_class, fd_dev_get);
+  fts_dev_class_char_set_put_fun(socket_client_class, fd_dev_put);
+  fts_dev_class_char_set_flush_fun(socket_client_class, fd_dev_flush);
 }
 
 
@@ -820,7 +809,7 @@ open_socket_client(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   /* Fill out address of server we want to connect to */
 
-  bzero((char *)&serv_addr, sizeof(serv_addr));
+  memset((char *)&serv_addr, 0, sizeof(serv_addr));
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_addr.s_addr = inet_addr(address);
   serv_addr.sin_port = htons(port);
@@ -906,21 +895,17 @@ tty_sys_initialize(int fd)
 static void
 init_tty(void)
 {
-  tty_class = fts_dev_class_new(fts_char_dev);
+  tty_class = fts_dev_class_new(fts_char_dev, fts_new_symbol("tty"));
 
   /* No class level function defined */
 
   /* adding device functions: the device support only basic 
    character i/o; no callback functions, no sync functions */
 
-  set_open_fun(tty_class, open_tty);
-  set_close_fun(tty_class, close_tty);
-  set_char_dev_get_fun(tty_class, tty_get);
-  set_char_dev_put_fun(tty_class, tty_put);
-
-  /* Installing the class */
-
-  fts_dev_class_register(fts_new_symbol("tty"), tty_class);
+  fts_dev_class_set_open_fun(tty_class, open_tty);
+  fts_dev_class_set_close_fun(tty_class, close_tty);
+  fts_dev_class_char_set_get_fun(tty_class, tty_get);
+  fts_dev_class_char_set_put_fun(tty_class, tty_put);
 }
 
 
@@ -988,22 +973,18 @@ file_dev_init(void)
 {
   fts_dev_class_t *file_dev_class;
 
-  file_dev_class = fts_dev_class_new(fts_char_dev);
+  file_dev_class = fts_dev_class_new(fts_char_dev, fts_new_symbol("file"));
 
   /* No class level function defined */
 
   /* adding device functions: the device support only basic 
    character i/o; no callback functions, no sync functions */
 
-  set_open_fun(file_dev_class, open_file_dev);
-  set_close_fun(file_dev_class, close_file_dev);
-  set_char_dev_get_fun(file_dev_class, file_dev_get);
-  set_char_dev_put_fun(file_dev_class, file_dev_put);
-  set_char_dev_seek_fun(file_dev_class, file_dev_seek);
-
-  /* Installing the class */
-
-  fts_dev_class_register(fts_new_symbol("file"), file_dev_class);
+  fts_dev_class_set_open_fun(file_dev_class, open_file_dev);
+  fts_dev_class_set_close_fun(file_dev_class, close_file_dev);
+  fts_dev_class_char_set_get_fun(file_dev_class, file_dev_get);
+  fts_dev_class_char_set_put_fun(file_dev_class, file_dev_put);
+  fts_dev_class_char_set_seek_fun(file_dev_class, file_dev_seek);
 }
 
 
@@ -1269,17 +1250,13 @@ init_udp_client(void)
 {
   fts_dev_class_t *udp_client_class;
 
-  udp_client_class = fts_dev_class_new(fts_char_dev);
+  udp_client_class = fts_dev_class_new(fts_char_dev, fts_new_symbol("udp"));
 
-  set_open_fun(udp_client_class, open_udp_client);
-  set_close_fun(udp_client_class, close_udp_client);
-  set_char_dev_get_fun(udp_client_class, udp_dev_get);
-  set_char_dev_put_fun(udp_client_class, udp_dev_put);
-  set_char_dev_flush_fun(udp_client_class, udp_dev_flush);
-
-  /* Installing the class */
-
-  fts_dev_class_register(fts_new_symbol("udp"), udp_client_class);
+  fts_dev_class_set_open_fun(udp_client_class, open_udp_client);
+  fts_dev_class_set_close_fun(udp_client_class, close_udp_client);
+  fts_dev_class_char_set_get_fun(udp_client_class, udp_dev_get);
+  fts_dev_class_char_set_put_fun(udp_client_class, udp_dev_put);
+  fts_dev_class_char_set_flush_fun(udp_client_class, udp_dev_flush);
 }
 
 
@@ -1318,7 +1295,7 @@ open_udp_client(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   if (bind(sock, &my_addr, sizeof(struct sockaddr_in)) == -1)
     return &fts_dev_open_error;
 
-  bzero((char *)&(p->client_addr), sizeof(p->client_addr));
+  memset((char *)&(p->client_addr), 0, sizeof(p->client_addr));
   p->client_addr.sin_family = AF_INET;
   p->client_addr.sin_addr.s_addr = inet_addr(address);
   p->client_addr.sin_port = htons(port);

@@ -38,10 +38,10 @@
 
 /* forward declarations */
 
-static fts_status_t sgi_dac_init(void);
-static fts_status_t sgi_adc_init(void);
-static fts_status_t sgi_midi_init(void); 
-static fts_status_t sgi_soundfile_init(void);
+static void sgi_dac_init(void);
+static void sgi_adc_init(void);
+static void sgi_midi_init(void); 
+static void sgi_soundfile_init(void);
 
 /******************************************************************************/
 /*                                                                            */
@@ -109,8 +109,7 @@ static struct sgi_dac_data_struct
 
 /* Init functions */
 
-static fts_status_t
-sgi_dac_init(void)
+static void sgi_dac_init(void)
 {
   fts_dev_class_t *sgi_dac_class;
 
@@ -121,18 +120,12 @@ sgi_dac_init(void)
     
   /* SGI DAC class  */
 
-  sgi_dac_class = fts_dev_class_new(fts_sig_dev);
+  sgi_dac_class = fts_dev_class_new(fts_sig_dev, fts_new_symbol("sgi_dac"));
 
-  /* device functions */
-
-  set_open_fun(sgi_dac_class, sgi_dac_open);
-  set_close_fun(sgi_dac_class, sgi_dac_close);
-
-  set_sig_dev_put_fun(sgi_dac_class, sgi_dac_put);
-
-  set_sig_dev_get_nchans_fun(sgi_dac_class, sgi_dac_get_nchans);
-
-  return fts_dev_class_register(fts_new_symbol("sgi_dac"), sgi_dac_class);
+  fts_dev_class_set_open_fun(sgi_dac_class, sgi_dac_open);
+  fts_dev_class_set_close_fun(sgi_dac_class, sgi_dac_close);
+  fts_dev_class_sig_set_put_fun(sgi_dac_class, sgi_dac_put);
+  fts_dev_class_sig_set_get_nchans_fun(sgi_dac_class, sgi_dac_get_nchans);
 }
 
 /* SGI DAC control/options functions */
@@ -247,12 +240,12 @@ sgi_dac_get_nchans(fts_dev_t *dev)
 static void
 sgi_dac_put(fts_word_t *argv)
 {
-  long n = fts_word_get_long(argv + 1);
+  long n = fts_word_get_long(argv + 2);
   int i,j;
   int off2, off3, off4;
   int nchans, ch, inc;
 
-  nchans = sgi_dac_data.nch;
+  nchans = fts_word_get_long(argv + 1);
   off2 = nchans;
   off3 = 2 * nchans;
   off4 = 3 * nchans;
@@ -264,7 +257,7 @@ sgi_dac_put(fts_word_t *argv)
     {
       float *in;
       
-      in = (float *) fts_word_get_ptr(argv + 2 + ch);
+      in = (float *) fts_word_get_ptr(argv + 3 + ch);
 
       for (i = ch, j = 0; j < n; i = i + inc, j += 4)
 	{
@@ -317,7 +310,7 @@ static struct sgi_adc_data_struct
 
 /* Init  function */
 
-static fts_status_t
+static void 
 sgi_adc_init(void)
 {
   fts_dev_class_t *sgi_adc_class;
@@ -329,17 +322,15 @@ sgi_adc_init(void)
     
   /* SGI ADC class  */
 
-  sgi_adc_class = fts_dev_class_new(fts_sig_dev);
+  sgi_adc_class = fts_dev_class_new(fts_sig_dev, fts_new_symbol("sgi_adc"));
 
   /* device functions */
 
-  set_open_fun(sgi_adc_class, sgi_adc_open);
-  set_close_fun(sgi_adc_class, sgi_adc_close);
-  set_sig_dev_get_fun(sgi_adc_class, sgi_adc_get);
+  fts_dev_class_set_open_fun(sgi_adc_class, sgi_adc_open);
+  fts_dev_class_set_close_fun(sgi_adc_class, sgi_adc_close);
+  fts_dev_class_sig_set_get_fun(sgi_adc_class, sgi_adc_get);
 
-  set_sig_dev_get_nchans_fun(sgi_adc_class, sgi_adc_get_nchans);
-
-  return fts_dev_class_register(fts_new_symbol("sgi_adc"), sgi_adc_class);
+  fts_dev_class_sig_set_get_nchans_fun(sgi_adc_class, sgi_adc_get_nchans);
 }
 
 /* SGI ADC control/options functions */
@@ -445,12 +436,12 @@ sgi_adc_get_nchans(fts_dev_t *dev)
 static void
 sgi_adc_get(fts_word_t *argv)
 {
-  long n = fts_word_get_long(argv + 1);
+  long n = fts_word_get_long(argv + 2);
   int i,j;
   int off2, off3, off4;
   int nchans, ch, inc;
 
-  nchans = sgi_adc_data.nch;
+  nchans = fts_word_get_long(argv + 1);
   off2 = nchans;
   off3 = 2 * nchans;
   off4 = 3 * nchans;
@@ -467,7 +458,7 @@ sgi_adc_get(fts_word_t *argv)
     {
       float *out;
       
-      out = (float *) fts_word_get_ptr(argv + 2 + ch);
+      out = (float *) fts_word_get_ptr(argv + 3 + ch);
 
       for (i = ch, j = 0; j < n; i = i + inc, j += 4)
 	{
@@ -514,16 +505,12 @@ sgi_midi_init(void)
   /* adding device functions: the device support only basic 
    character i/o; no callback functions, no sync functions */
 
-  sgi_midi_dev_class = fts_dev_class_new(fts_char_dev);
+  sgi_midi_dev_class = fts_dev_class_new(fts_char_dev, fts_new_symbol("sgi_midi"));
 
-  set_open_fun(sgi_midi_dev_class, sgi_midi_open);
-  set_close_fun(sgi_midi_dev_class, sgi_midi_close);
-  set_char_dev_get_fun(sgi_midi_dev_class, sgi_midi_get);
-  set_char_dev_put_fun(sgi_midi_dev_class, sgi_midi_put);
-
-  /* Installing the class */
-
-  return fts_dev_class_register(fts_new_symbol("sgi_midi"), sgi_midi_dev_class);
+  fts_dev_class_set_open_fun(sgi_midi_dev_class, sgi_midi_open);
+  fts_dev_class_set_close_fun(sgi_midi_dev_class, sgi_midi_close);
+  fts_dev_class_char_set_get_fun(sgi_midi_dev_class, sgi_midi_get);
+  fts_dev_class_char_set_put_fun(sgi_midi_dev_class, sgi_midi_put);
 }
 
 
@@ -916,23 +903,19 @@ sgi_soundfile_init(void)
 
   /* dac file */
 
-  sgi_soundfile_class = fts_dev_class_new(fts_sig_dev);
+  sgi_soundfile_class = fts_dev_class_new(fts_sig_dev, fts_new_symbol("soundfile"));
 
   /* Installation of all the device class functions */
 
-  set_open_fun(sgi_soundfile_class, sgi_soundfile_open);
-  set_close_fun(sgi_soundfile_class, sgi_soundfile_close);
+  fts_dev_class_set_open_fun(sgi_soundfile_class, sgi_soundfile_open);
+  fts_dev_class_set_close_fun(sgi_soundfile_class, sgi_soundfile_close);
 
-  set_sig_dev_put_fun(sgi_soundfile_class, sgi_soundfile_put);
-  set_sig_dev_get_fun(sgi_soundfile_class, sgi_soundfile_get);
+  fts_dev_class_sig_set_put_fun(sgi_soundfile_class, sgi_soundfile_put);
+  fts_dev_class_sig_set_get_fun(sgi_soundfile_class, sgi_soundfile_get);
 
-  set_sig_dev_activate_fun(sgi_soundfile_class, sgi_soundfile_activate);
-  set_sig_dev_deactivate_fun(sgi_soundfile_class, sgi_soundfile_deactivate);
-  set_sig_dev_get_nchans_fun(sgi_soundfile_class, sgi_soundfile_get_nchans);
-
-  /* Install the device class */
-
-  return fts_dev_class_register(fts_new_symbol("soundfile"), sgi_soundfile_class);
+  fts_dev_class_sig_set_activate_fun(sgi_soundfile_class, sgi_soundfile_activate);
+  fts_dev_class_sig_set_deactivate_fun(sgi_soundfile_class, sgi_soundfile_deactivate);
+  fts_dev_class_sig_set_get_nchans_fun(sgi_soundfile_class, sgi_soundfile_get_nchans);
 }
 
 
@@ -1093,8 +1076,8 @@ sgi_soundfile_get_nchans(fts_dev_t *dev)
 static void
 sgi_soundfile_put(fts_word_t *argv)
 {
-  fts_dev_t *dev = fts_word_get_ptr(argv);
-  long n = fts_word_get_long(argv + 1);
+  fts_dev_t *dev = *((fts_dev_t **) fts_word_get_ptr(argv));
+  long n = fts_word_get_long(argv + 2);
   struct soundfile_data *dev_data;
   short *out;
   int i,j;
@@ -1108,7 +1091,7 @@ sgi_soundfile_put(fts_word_t *argv)
   if ((! dev_data->active) || (dev_data->active != soundfile_write_only))
     return;
 
-  nchans = dev_data->nch;
+  nchans = fts_word_get_long(argv + 1);
   off2 = nchans;
   off3 = 2 * nchans;
   off4 = 3 * nchans;
@@ -1121,7 +1104,7 @@ sgi_soundfile_put(fts_word_t *argv)
     {
       float *in;
       
-      in = (float *) fts_word_get_ptr(argv + 2 + ch);
+      in = (float *) fts_word_get_ptr(argv + 3 + ch);
 
       for (i = ch, j = 0; j < n; i = i + inc, j += 4)
 	{
@@ -1149,8 +1132,8 @@ sgi_soundfile_put(fts_word_t *argv)
 static void
 sgi_soundfile_get(fts_word_t *argv)
 {
-  fts_dev_t *dev = fts_word_get_ptr(argv);
-  long n = fts_word_get_long(argv + 1);
+  fts_dev_t *dev = *((fts_dev_t **) fts_word_get_ptr(argv));
+  long n = fts_word_get_long(argv + 2);
   struct soundfile_data *dev_data;
 
   dev_data = fts_dev_get_device_data(dev);
@@ -1165,7 +1148,7 @@ sgi_soundfile_get(fts_word_t *argv)
       int nchans, ch, inc;
       int ret;
 
-      nchans = dev_data->nch;
+      nchans = fts_word_get_long(argv + 1);
       off2 = nchans;
       off3 = 2 * nchans;
       off4 = 3 * nchans;
@@ -1196,7 +1179,7 @@ sgi_soundfile_get(fts_word_t *argv)
 	{
 	  float *out;
 
-	  out = (float *) fts_word_get_ptr(argv + 2 + ch);
+	  out = (float *) fts_word_get_ptr(argv + 3 + ch);
 
 	  for (i = ch, j = 0; j < n; i = i + inc, j += 4)
 	    {
@@ -1226,7 +1209,7 @@ sgi_soundfile_get(fts_word_t *argv)
 	{
 	  float *out;
 
-	  out = (float *) fts_word_get_ptr(argv + 2 + ch);	  
+	  out = (float *) fts_word_get_ptr(argv + 3 + ch);	  
 
 	  for(i = 0; i < n; i++)
 	    out[i] = 0.0f;

@@ -124,7 +124,7 @@ fts_open_bmax_file_for_writing(const char *name, int dobackup)
 
   if (dobackup)
     {
-      char backup[PATH_MAX];
+      char backup[1024];	/* should use the correct posix constant */
 
       /* Get the backup file name */
 

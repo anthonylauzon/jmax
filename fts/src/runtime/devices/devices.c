@@ -62,6 +62,10 @@ static fts_status_description_t ctrl_syntax_error =
   "Syntax error in the requested CTRL operation"
 };
 
+static fts_status_description_t fts_no_such_devclass =
+{
+  "Unknown device class"
+};
 
 static fts_status_description_t open_device_syntax_error = 
 {
@@ -260,10 +264,29 @@ void_sig_get_nerrors_fun(fts_dev_t *dev)
    for all of the functions.
 */
 
-fts_dev_class_t *
-fts_dev_class_new(fts_dev_type_t type)
+/* local utility to find a class by name in the table (if the table become bigger
+ we can put an hash table) */
+
+fts_dev_class_t *fts_dev_class_get_by_name(fts_symbol_t  name)
+{
+  fts_dev_class_t *p;
+
+  for (p = dev_class_list; p; p = p->next)
+    if (p->class_name ==  name)
+      return p;
+  
+  return (fts_dev_class_t *)0;
+}
+
+
+fts_dev_class_t *fts_dev_class_new(fts_dev_type_t type, fts_symbol_t name)
 {
   fts_dev_class_t *dev_class;
+
+  /* Check to see if the class name was already installed (we give the same error :-<)*/
+
+  if (fts_dev_class_get_by_name(name))
+    return 0;
 
   dev_class = (fts_dev_class_t *) fts_malloc(sizeof(fts_dev_class_t));
 
@@ -292,58 +315,53 @@ fts_dev_class_new(fts_dev_type_t type)
       break;
     }
 
-  dev_class->next = 0;		/* put it in the list at register time */
 
-  return dev_class;
-}
-
-
-/* 
-   fts_dev_class_register install the device class in the device class table.
-
-   The device class table is actually only a list of classes, because the class itself
-   include a pointer to the name.
-*/
-
-/* local utility to find a class by name in the table (if the table become bigger
- we can put an hash table) */
-
-static fts_dev_class_t *
-fts_dev_class_get_by_name(fts_symbol_t  name)
-{
-  fts_dev_class_t *p;
-
-  for (p = dev_class_list; p; p = p->next)
-    if (p->class_name ==  name)
-      return p;
-  
-  return (fts_dev_class_t *)0;
-}
-
-fts_status_t
-fts_dev_class_register(fts_symbol_t name, fts_dev_class_t *dev_class)
-{
-  fts_dev_class_t *p;
-
-  /* Check to see if the class was already registered */
-
-  for (p = dev_class_list; p; p = p->next)
-    if (p == dev_class)
-      return &fts_devclass_already_installed;
-
-  /* Check to see if the class name was already installed (we give the same error :-<)*/
-
-  if (fts_dev_class_get_by_name(name))
-    return &fts_devclass_already_installed;
+  /* Add the device class in the class list */
 
   dev_class->class_name = name;
   dev_class->next = dev_class_list;
   dev_class_list  = dev_class;
 
-  return fts_Success;    
+  return dev_class;
+}
+
+/* Install the put and set function for signal devices.
+   The functions are standard FTL  functions, and they are
+   registered in the ftl function data base; a name is generated
+   for them, and stored in the device class structure */
+
+
+
+void fts_dev_class_sig_set_get_fun(fts_dev_class_t *dev_class,  void (* get_fun)(fts_word_t *))
+{
+  char buf[512];
+  fts_symbol_t get_fun_name;
+
+  dev_class->methods.sig_methods.get_fun = get_fun;
+
+  sprintf(buf, "%s_read", fts_symbol_name(fts_dev_class_get_name(dev_class)));
+  get_fun_name = fts_new_symbol_copy(buf);
+
+  dev_class->methods.sig_methods.get_fun_name = get_fun_name;
+  
+  dsp_declare_function(get_fun_name, get_fun);
 }
 
 
+void fts_dev_class_sig_set_put_fun(fts_dev_class_t *dev_class,  void (* put_fun)(fts_word_t *))
+{
+  char buf[512];
+  fts_symbol_t put_fun_name;
+
+  dev_class->methods.sig_methods.put_fun = put_fun;
+
+  sprintf(buf, "%s_read", fts_symbol_name(fts_dev_class_get_name(dev_class)));
+  put_fun_name = fts_new_symbol_copy(buf);
+
+  dev_class->methods.sig_methods.put_fun_name = put_fun_name;
+  
+  dsp_declare_function(put_fun_name, put_fun);
+}
 
 
 /******************************************************************************/
@@ -375,13 +393,12 @@ fts_dev_class_register(fts_symbol_t name, fts_dev_class_t *dev_class)
 /* Device level operations */
 
 
-fts_dev_t *
-fts_dev_open(fts_symbol_t class_name, int nargs, const fts_atom_t *args)
+
+fts_status_t fts_dev_open(fts_dev_t **dret, fts_symbol_t class_name, int nargs, const fts_atom_t *args)
 {
   fts_dev_class_t *dev_class;
 
   dev_class = fts_dev_class_get_by_name(class_name);
-
 
   if (dev_class)
     {
@@ -399,19 +416,23 @@ fts_dev_open(fts_symbol_t class_name, int nargs, const fts_atom_t *args)
 	{
 	  dev->next = open_dev_list;
 	  open_dev_list = dev;
-	  return dev;
+	  *dret = dev;
+
+	  return fts_Success;
 	}
       else
 	{
-	  post("Error Opening Device");
-	  post_atoms(nargs, args);
-	  post(": %s\n", ret->description);
+	  fts_free(dev);
+	  *dret = 0;
 
-	  return (fts_dev_t *)0;
+	  return ret;
 	}
     }
   else
-    return (fts_dev_t *)0;
+    {
+      *dret = 0;
+      return &fts_no_such_devclass;
+    }
 }
 
 fts_status_t
@@ -452,7 +473,6 @@ fts_dev_ctrl(fts_dev_t *dev, int nargs, fts_atom_t *args)
   else
     return fts_Success;
 }
-
 
 /******************************************************************************/
 /*                                                                            */
@@ -567,7 +587,10 @@ fts_status_t fts_open_logical_device(fts_symbol_t name, int lac, const fts_atom_
 
   /* Open the new one  */
 
-  dev = fts_dev_open(pname, pac, pat);
+  ret = fts_dev_open(&dev, pname, pac, pat);
+
+  if (ret != fts_Success)
+    return ret;
 
   /* And set it as the logical device  */
 

@@ -43,12 +43,10 @@ extern void fts_dsp_set_dac_slip_dev(fts_dev_t *dev);
 
 /* forward declarations */
 
-static fts_status_t sgi_dac_init(void);
-static fts_status_t sgi_adc_init(void);
-static fts_status_t sgi_midi_init(void); 
-static fts_status_t sgi_soundfile_init(void);
-static fts_status_t sgi_shmdac_init(void);
-static fts_status_t sgi_shmadc_init(void);
+static void sgi_dac_init(void);
+static void sgi_adc_init(void);
+static void sgi_midi_init(void); 
+static void sgi_soundfile_init(void);
 
 /******************************************************************************/
 /*                                                                            */
@@ -75,8 +73,6 @@ sgidev_init(void)
   sgi_adc_init();
   sgi_midi_init(); 
   sgi_soundfile_init();
-  sgi_shmdac_init();
-  sgi_shmadc_init();
 }
 
 
@@ -115,27 +111,24 @@ typedef struct
 
 /* Init functions */
 
-static fts_status_t
-sgi_dac_init(void)
+static void sgi_dac_init(void)
 {
   fts_dev_class_t *sgi_dac_class;
 
   /* SGI DAC class  */
 
-  sgi_dac_class = fts_dev_class_new(fts_sig_dev);
+  sgi_dac_class = fts_dev_class_new(fts_sig_dev, fts_new_symbol("SgiALOut"));
 
   /* device functions */
 
-  set_open_fun(sgi_dac_class, sgi_dac_open);
-  set_close_fun(sgi_dac_class, sgi_dac_close);
+  fts_dev_class_set_open_fun(sgi_dac_class, sgi_dac_open);
+  fts_dev_class_set_close_fun(sgi_dac_class, sgi_dac_close);
 
-  set_sig_dev_put_fun(sgi_dac_class, sgi_dac_put);
+  fts_dev_class_sig_set_put_fun(sgi_dac_class, sgi_dac_put);
 
-  set_sig_dev_get_nchans_fun(sgi_dac_class, sgi_dac_get_nchans);
+  fts_dev_class_sig_set_get_nchans_fun(sgi_dac_class, sgi_dac_get_nchans);
 
-  set_sig_dev_get_nerrors_fun(sgi_dac_class, sgi_dac_get_nerrors);
-
-  return fts_dev_class_register(fts_new_symbol("SgiALOut"), sgi_dac_class);
+  fts_dev_class_sig_set_get_nerrors_fun(sgi_dac_class, sgi_dac_get_nerrors);
 }
 
 /* SGI DAC control/options functions */
@@ -416,10 +409,10 @@ sgi_dac_get_nerrors(fts_dev_t *dev)
 static void
 sgi_dac_put(fts_word_t *argv)
 {
-  fts_dev_t *dev = (fts_dev_t *) fts_word_get_ptr(argv);
+  fts_dev_t *dev = *((fts_dev_t **) fts_word_get_ptr(argv));
   sgi_dac_data_t *dev_data;
 
-  long n = fts_word_get_long(argv + 1);
+  long n = fts_word_get_long(argv + 2);
   int i,j;
   int off2, off3, off4;
   int nchans, ch, inc;
@@ -428,7 +421,7 @@ sgi_dac_put(fts_word_t *argv)
 
   dev_data->fts_frames += n;	/* count for the slip detection */
 
-  nchans = dev_data->nch;
+  nchans = fts_word_get_long(argv + 1);
   off2 = nchans;
   off3 = 2 * nchans;
   off4 = 3 * nchans;
@@ -440,7 +433,7 @@ sgi_dac_put(fts_word_t *argv)
     {
       float *in;
       
-      in = (float *) fts_word_get_ptr(argv + 2 + ch);
+      in = (float *) fts_word_get_ptr(argv + 3 + ch);
 
       for (i = ch, j = 0; j < n; i = i + inc, j += 4)
 	{
@@ -493,24 +486,21 @@ typedef struct
 
 /* Init  functions */
 
-static fts_status_t
-sgi_adc_init(void)
+static void sgi_adc_init(void)
 {
   fts_dev_class_t *sgi_adc_class;
 
   /* SGI ADC class  */
 
-  sgi_adc_class = fts_dev_class_new(fts_sig_dev);
+  sgi_adc_class = fts_dev_class_new(fts_sig_dev, fts_new_symbol("SgiALIn"));
 
   /* device functions */
 
-  set_open_fun(sgi_adc_class, sgi_adc_open);
-  set_close_fun(sgi_adc_class, sgi_adc_close);
-  set_sig_dev_get_fun(sgi_adc_class, sgi_adc_get);
+  fts_dev_class_set_open_fun(sgi_adc_class, sgi_adc_open);
+  fts_dev_class_set_close_fun(sgi_adc_class, sgi_adc_close);
+  fts_dev_class_sig_set_get_fun(sgi_adc_class, sgi_adc_get);
 
-  set_sig_dev_get_nchans_fun(sgi_adc_class, sgi_adc_get_nchans);
-
-  return fts_dev_class_register(fts_new_symbol("SgiALIn"), sgi_adc_class);
+  fts_dev_class_sig_set_get_nchans_fun(sgi_adc_class, sgi_adc_get_nchans);
 }
 
 /* SGI ADC control/options functions */
@@ -718,17 +708,17 @@ sgi_adc_get_nchans(fts_dev_t *dev)
 static void
 sgi_adc_get(fts_word_t *argv)
 {
-  fts_dev_t *dev = (fts_dev_t *) fts_word_get_ptr(argv);
+  fts_dev_t *dev = *((fts_dev_t **) fts_word_get_ptr(argv));
   sgi_adc_data_t *dev_data;
 
-  long n = fts_word_get_long(argv + 1);
+  long n = fts_word_get_long(argv + 2);
   int i,j;
   int off2, off3, off4;
   int nchans, ch, inc;
 
   dev_data = fts_dev_get_device_data(dev);
 
-  nchans = dev_data->nch;
+  nchans = fts_word_get_long(argv + 1);
   off2 = nchans;
   off3 = 2 * nchans;
   off4 = 3 * nchans;
@@ -745,7 +735,7 @@ sgi_adc_get(fts_word_t *argv)
     {
       float *out;
       
-      out = (float *) fts_word_get_ptr(argv + 2 + ch);
+      out = (float *) fts_word_get_ptr(argv + 3 + ch);
 
       for (i = ch, j = 0; j < n; i = i + inc, j += 4)
 	{
@@ -781,27 +771,22 @@ static fts_status_t sgi_midi_close(fts_dev_t *dev);
 static fts_status_t sgi_midi_get(fts_dev_t *dev, unsigned char *cp);
 static fts_status_t sgi_midi_put(fts_dev_t *dev, unsigned char c);
 
-static fts_status_t 
-sgi_midi_init(void)
+static void sgi_midi_init(void)
 {
   fts_dev_class_t *sgi_midi_dev_class;
 
   if (mdInit() <= 0)
-    return & sgi_no_midi;
+    return;
 
   /* adding device functions: the device support only basic 
    character i/o; no callback functions, no sync functions */
 
-  sgi_midi_dev_class = fts_dev_class_new(fts_char_dev);
+  sgi_midi_dev_class = fts_dev_class_new(fts_char_dev, fts_new_symbol("sgi_midi"));
 
-  set_open_fun(sgi_midi_dev_class, sgi_midi_open);
-  set_close_fun(sgi_midi_dev_class, sgi_midi_close);
-  set_char_dev_get_fun(sgi_midi_dev_class, sgi_midi_get);
-  set_char_dev_put_fun(sgi_midi_dev_class, sgi_midi_put);
-
-  /* Installing the class */
-
-  return fts_dev_class_register(fts_new_symbol("sgi_midi"), sgi_midi_dev_class);
+  fts_dev_class_set_open_fun(sgi_midi_dev_class, sgi_midi_open);
+  fts_dev_class_set_close_fun(sgi_midi_dev_class, sgi_midi_close);
+  fts_dev_class_char_set_get_fun(sgi_midi_dev_class, sgi_midi_get);
+  fts_dev_class_char_set_put_fun(sgi_midi_dev_class, sgi_midi_put);
 }
 
 
@@ -1222,30 +1207,25 @@ static int          sgi_soundfile_get_nchans(fts_dev_t *dev);
 
 
 
-static fts_status_t
-sgi_soundfile_init(void)
+static void sgi_soundfile_init(void)
 {
   fts_dev_class_t *sgi_soundfile_class;
 
   /* dac file */
 
-  sgi_soundfile_class = fts_dev_class_new(fts_sig_dev);
+  sgi_soundfile_class = fts_dev_class_new(fts_sig_dev, fts_new_symbol("soundfile"));
 
   /* Installation of all the device class functions */
 
-  set_open_fun(sgi_soundfile_class, sgi_soundfile_open);
-  set_close_fun(sgi_soundfile_class, sgi_soundfile_close);
+  fts_dev_class_set_open_fun(sgi_soundfile_class, sgi_soundfile_open);
+  fts_dev_class_set_close_fun(sgi_soundfile_class, sgi_soundfile_close);
 
-  set_sig_dev_put_fun(sgi_soundfile_class, sgi_soundfile_put);
-  set_sig_dev_get_fun(sgi_soundfile_class, sgi_soundfile_get);
+  fts_dev_class_sig_set_put_fun(sgi_soundfile_class, sgi_soundfile_put);
+  fts_dev_class_sig_set_get_fun(sgi_soundfile_class, sgi_soundfile_get);
 
-  set_sig_dev_activate_fun(sgi_soundfile_class, sgi_soundfile_activate);
-  set_sig_dev_deactivate_fun(sgi_soundfile_class, sgi_soundfile_deactivate);
-  set_sig_dev_get_nchans_fun(sgi_soundfile_class, sgi_soundfile_get_nchans);
-
-  /* Install the device class */
-
-  return fts_dev_class_register(fts_new_symbol("soundfile"), sgi_soundfile_class);
+  fts_dev_class_sig_set_activate_fun(sgi_soundfile_class, sgi_soundfile_activate);
+  fts_dev_class_sig_set_deactivate_fun(sgi_soundfile_class, sgi_soundfile_deactivate);
+  fts_dev_class_sig_set_get_nchans_fun(sgi_soundfile_class, sgi_soundfile_get_nchans);
 }
 
 
@@ -1406,8 +1386,8 @@ sgi_soundfile_get_nchans(fts_dev_t *dev)
 static void
 sgi_soundfile_put(fts_word_t *argv)
 {
-  fts_dev_t *dev = fts_word_get_ptr(argv);
-  long n = fts_word_get_long(argv + 1);
+  fts_dev_t *dev = *((fts_dev_t **) fts_word_get_ptr(argv));
+  long n = fts_word_get_long(argv + 2);
   struct soundfile_data *dev_data;
   short *out;
   int i,j;
@@ -1421,7 +1401,7 @@ sgi_soundfile_put(fts_word_t *argv)
   if ((! dev_data->active) || (dev_data->active != soundfile_write_only))
     return;
 
-  nchans = dev_data->nch;
+  nchans = fts_word_get_long(argv + 1);
   off2 = nchans;
   off3 = 2 * nchans;
   off4 = 3 * nchans;
@@ -1434,7 +1414,7 @@ sgi_soundfile_put(fts_word_t *argv)
     {
       float *in;
       
-      in = (float *) fts_word_get_ptr(argv + 2 + ch);
+      in = (float *) fts_word_get_ptr(argv + 3 + ch);
 
       for (i = ch, j = 0; j < n; i = i + inc, j += 4)
 	{
@@ -1460,8 +1440,8 @@ sgi_soundfile_put(fts_word_t *argv)
 static void
 sgi_soundfile_get(fts_word_t *argv)
 {
-  fts_dev_t *dev = fts_word_get_ptr(argv);
-  long n = fts_word_get_long(argv + 1);
+  fts_dev_t *dev = *((fts_dev_t **) fts_word_get_ptr(argv));
+  long n = fts_word_get_long(argv + 2);
   struct soundfile_data *dev_data;
 
   dev_data = fts_dev_get_device_data(dev);
@@ -1476,7 +1456,7 @@ sgi_soundfile_get(fts_word_t *argv)
       int nchans, ch, inc;
       int ret;
 
-      nchans = dev_data->nch;
+      nchans = fts_word_get_long(argv + 1);
       off2 = nchans;
       off3 = 2 * nchans;
       off4 = 3 * nchans;
@@ -1507,7 +1487,7 @@ sgi_soundfile_get(fts_word_t *argv)
 	{
 	  float *out;
 
-	  out = (float *) fts_word_get_ptr(argv + 2 + ch);
+	  out = (float *) fts_word_get_ptr(argv + 3 + ch);
 
 	  for (i = ch, j = 0; j < n; i = i + inc, j += 4)
 	    {
@@ -1537,7 +1517,7 @@ sgi_soundfile_get(fts_word_t *argv)
 	{
 	  float *out;
 
-	  out = (float *) fts_word_get_ptr(argv + 2 + ch);	  
+	  out = (float *) fts_word_get_ptr(argv + 3 + ch);	  
 
 	  for(i = 0; i < n; i++)
 	    out[i] = 0.0f;
@@ -1546,307 +1526,3 @@ sgi_soundfile_get(fts_word_t *argv)
 }
 
 
-/******************************************************************************/
-/*                                                                            */
-/*                              Shared memory Devices                         */
-/*                                                                            */
-/******************************************************************************/
-
-/*----------------------------------------------------------------------------*/
-/* Shared memory devices implementation                                       */
-/*----------------------------------------------------------------------------*/
-
-#include <ulocks.h>
-#include <assert.h>
-
-typedef struct _shmdesc_t {
-  int block_size;
-  int n_blocks;
-  int read_block;
-  int write_block;
-  char *buffer;
-  usptr_t *handle;
-  usema_t *full_semaphore;
-  usema_t *empty_semaphore;
-} shmdesc_t;
-
-static shmdesc_t *shmdesc_allocate( usptr_t *handle, int n_blocks, int block_size)
-{
-  char *buffer;
-  int size, i;
-  usema_t *full_semaphore;
-  usema_t *empty_semaphore;
-  shmdesc_t *shmdesc;
-
-  size = n_blocks * block_size;
-
-  buffer = (char *)usmalloc( size, handle);
-  if ( !buffer)
-    return NULL;
-
-  full_semaphore = usnewsema( handle, n_blocks);
-  if (full_semaphore == NULL)
-    return NULL;
-
-  empty_semaphore = usnewsema( handle, n_blocks);
-  if (empty_semaphore == NULL)
-    return NULL;
-
-  for ( i = 0; i < n_blocks; i++)
-    uspsema( empty_semaphore);
-
-  shmdesc = (shmdesc_t *)usmalloc( sizeof( shmdesc_t), handle);
-  if ( !shmdesc)
-    return NULL;
-
-  shmdesc->block_size = block_size;
-  shmdesc->n_blocks = n_blocks;
-
-  shmdesc->read_block = 0;
-  shmdesc->write_block = 0;
-
-  shmdesc->buffer = buffer;
-
-  shmdesc->handle = handle;
-  shmdesc->full_semaphore = full_semaphore;
-  shmdesc->empty_semaphore = empty_semaphore;
-
-  return shmdesc;
-}
-
-static void shmdesc_free( shmdesc_t *shmdesc)
-{
-  usptr_t *handle;
-
-  handle = shmdesc->handle;
-
-  usfree( shmdesc->buffer, handle);
-
-  usfreesema( shmdesc->full_semaphore, handle);
-  usfreesema( shmdesc->empty_semaphore, handle);
-
-  usfree( shmdesc, handle);
-
-  usdetach( handle);
-}
-
-static shmdesc_t *shmdesc_new( const char *name, int n_blocks, int block_size)
-{
-  usptr_t *handle;
-  shmdesc_t *shmdesc;
-
-  handle = usinit( name);
-
-  if ( handle == NULL)
-    return NULL;
-
-  shmdesc = (shmdesc_t *)usgetinfo( handle);
-
-  while ( shmdesc == 0)
-    {
-      shmdesc = shmdesc_allocate( handle, n_blocks, block_size);
-      if (shmdesc == 0)
-	return NULL;
-
-      if ( uscasinfo( handle, 0, shmdesc) != 0)
-	break;
-
-      shmdesc_free( shmdesc);
-      sleep( 1);
-
-      shmdesc = (shmdesc_t *)usgetinfo( handle);
-    }
-
-  return shmdesc;
-}
-
-static int shm_write( shmdesc_t *shmdesc, const char *buff, int len)
-{
-  assert( len == shmdesc->block_size);
-
-  uspsema( shmdesc->full_semaphore);
-
-  memcpy( shmdesc->buffer + shmdesc->block_size * shmdesc->write_block, buff, len);
-
-  shmdesc->write_block++;
-  if ( shmdesc->write_block >= shmdesc->n_blocks)
-    shmdesc->write_block = 0;
-
-  usvsema( shmdesc->empty_semaphore);
-
-  return 1;
-}
-
-
-static int shm_read( shmdesc_t *shmdesc, char *buff, int len)
-{
-  assert( len == shmdesc->block_size);
-
-  uspsema( shmdesc->empty_semaphore);
-
-  memcpy( buff, shmdesc->buffer + shmdesc->block_size * shmdesc->read_block, len);
-
-  shmdesc->read_block++;
-  if ( shmdesc->read_block >= shmdesc->n_blocks)
-    shmdesc->read_block = 0;
-
-  usvsema( shmdesc->full_semaphore);
-
-  return 1;
-}
-
-/* Common to dac and adc */
-typedef struct 
-{
-  int nch;
-  float *fmtbuf;
-  shmdesc_t *shmdesc;
-} sgi_shm_data_t;
-
-
-/* Forward declarations of DAC/ADC dev and class static functions */
-
-static fts_status_t sgi_shm_open( fts_dev_t *dev, int nargs, const fts_atom_t *args);
-static fts_status_t sgi_shm_close( fts_dev_t *dev);
-
-static int          sgi_shm_get_nchans( fts_dev_t *dev);
-
-static void         sgi_shmdac_put( fts_word_t *args);
-static void         sgi_shmadc_get( fts_word_t *args);
-
-/* DAC class init */
-static fts_status_t sgi_shmdac_init(void)
-{
-  fts_dev_class_t *class;
-
-  class = fts_dev_class_new( fts_sig_dev);
-
-  set_open_fun( class, sgi_shm_open);
-  set_close_fun( class, sgi_shm_close);
-
-  set_sig_dev_put_fun( class, sgi_shmdac_put);
-
-  set_sig_dev_get_nchans_fun( class, sgi_shm_get_nchans);
-
-  return fts_dev_class_register( fts_new_symbol("shmOut"), class);
-}
-
-/* Common DAC/ADC open */
-static fts_status_t sgi_shm_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
-{
-  sgi_shm_data_t *dev_data;
-  fts_symbol_t name;
-  shmdesc_t *shmdesc;
-  int n_blocks, block_size;
-
-  dev_data = (sgi_shm_data_t *)fts_malloc( sizeof( sgi_shm_data_t));
-  fts_dev_set_device_data( dev, dev_data);
-
-  n_blocks = fts_param_get_int( fts_new_symbol( "blocks"), 32);
-  block_size = fts_param_get_int( fts_new_symbol( "block_size"), 512);
-
-  name = fts_get_symbol_by_name( nargs, args, fts_new_symbol( "name"), fts_new_symbol( "/tmp/shmdev.fts"));
-  
-  shmdesc = shmdesc_new( fts_symbol_name( name), n_blocks, block_size);
-  if (shmdesc == NULL)
-    return &fts_dev_open_error;
-
-  dev_data->nch = fts_get_int_by_name( nargs, args, fts_new_symbol("channels"), 2);
-  dev_data->fmtbuf = (float *) fts_malloc( MAXVS * dev_data->nch * sizeof(float));
-  dev_data->shmdesc = shmdesc;
-
-  return fts_Success;
-}
-
-/* Common DAC/ADC close */
-static fts_status_t sgi_shm_close( fts_dev_t *dev)
-{
-  sgi_shm_data_t *dev_data = (sgi_shm_data_t *) fts_dev_get_device_data(dev);
-
-  fts_free( dev_data->fmtbuf);
-  shmdesc_free( dev_data->shmdesc);
-
-  fts_free( dev_data);
-
-  return fts_Success;
-}
-
-/* Common DAC/ADC get_nchans */
-static int sgi_shm_get_nchans( fts_dev_t *dev)
-{
-  sgi_shm_data_t *dev_data = (sgi_shm_data_t *) fts_dev_get_device_data(dev);
-
-  return dev_data->nch;
-}
-
-
-/* DAC put (Arguments: fts_dev_t *dev, int n, float *buf1 ... *bufn) */
-static void sgi_shmdac_put(fts_word_t *argv)
-{
-  fts_dev_t *dev = (fts_dev_t *) fts_word_get_ptr(argv);
-  int n = fts_word_get_long(argv + 1);
-  sgi_shm_data_t *dev_data;
-  int i, j, nchans, chan;
-
-  dev_data = fts_dev_get_device_data(dev);
-
-  nchans = dev_data->nch;
-
-  for ( chan = 0; chan < nchans; chan++)
-    {
-      float *in = (float *) fts_word_get_ptr(argv + 2 + chan);
-
-      i = chan;
-      for ( j = 0; j < n; j++)
-	{
-	  dev_data->fmtbuf[i] = in[j];
-	  i += nchans;
-	}
-    }
-
-  shm_write( dev_data->shmdesc, (char *)dev_data->fmtbuf, n * sizeof(float) * nchans);
-}
-
-/* ADC class init */
-static fts_status_t sgi_shmadc_init(void)
-{
-  fts_dev_class_t *class;
-
-  class = fts_dev_class_new( fts_sig_dev);
-
-  set_open_fun( class, sgi_shm_open);
-  set_close_fun( class, sgi_shm_close);
-
-  set_sig_dev_get_fun( class, sgi_shmadc_get);
-
-  set_sig_dev_get_nchans_fun( class, sgi_shm_get_nchans);
-
-  return fts_dev_class_register( fts_new_symbol("shmIn"), class);
-}
-
-/* ADC get (Arguments: fts_dev_t *dev, int n, float *buf1 ... *bufn) */
-static void sgi_shmadc_get(fts_word_t *argv)
-{
-  fts_dev_t *dev = (fts_dev_t *) fts_word_get_ptr(argv);
-  int n = fts_word_get_long(argv + 1);
-  sgi_shm_data_t *dev_data;
-  int i, j, nchans, chan;
-
-  dev_data = fts_dev_get_device_data(dev);
-
-  nchans = dev_data->nch;
-
-  shm_read( dev_data->shmdesc, (char *)dev_data->fmtbuf, n * sizeof(float) * nchans);
-
-  for ( chan = 0; chan < nchans; chan++)
-    {
-      float *out = (float *) fts_word_get_ptr(argv + 2 + chan);
-
-      i = chan;
-      for ( j = 0; j < n; j++)
-	{
-	  out[j] = dev_data->fmtbuf[i];
-	  i += nchans;
-	}
-    }
-}

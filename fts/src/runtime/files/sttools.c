@@ -34,6 +34,8 @@ fts_soundfile_format_platform_init(void)
   fts_set_int(fts_soundfile_format_get_descriptor(fts_s_aiff), SF_AIFF);
   fts_set_int(fts_soundfile_format_get_descriptor(fts_s_wav), SF_WAV);
   fts_set_int(fts_soundfile_format_get_descriptor(fts_s_bicsf), SF_MACHINE);
+
+  fts_soundfile_format_set_default(fts_s_aiff);
 }
 
 /* converting the symbols for supported file formats into 

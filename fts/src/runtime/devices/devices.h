@@ -145,6 +145,14 @@ typedef struct _fts_dev_class
 	  void (* get_fun)(fts_word_t *argv);
 	  void (* put_fun)(fts_word_t *argv);
 
+	  /* This two are two names that will be used to register the
+	     two above function in the ftl engine; names are generated
+	     automatically at the creation of the device class,
+	     and accessed with macros defined below */
+
+	  fts_symbol_t get_fun_name;
+	  fts_symbol_t put_fun_name;
+
 	  /* the offset is in sample frames here */
 
 	  fts_status_t (* seek_fun)(fts_dev_t *dev, long offset, int whence);
@@ -181,43 +189,46 @@ typedef struct _fts_dev_class
    Device Classes are never freed.
 */
 
-extern fts_dev_class_t *fts_dev_class_new(fts_dev_type_t type);
+extern fts_dev_class_t *fts_dev_class_new(fts_dev_type_t type, fts_symbol_t name);
 
 /* Macro to access a fts_dev_class_t structure; you have to use these macros, and 
    you do not access the structure directly !!! */
 
-#define set_open_fun(dev_class, fun)          ((dev_class)->open_fun = (fun))
-#define set_ctrl_fun(dev_class, fun)          ((dev_class)->ctrl_fun = (fun))
-#define set_close_fun(dev_class, fun)         ((dev_class)->close_fun = (fun))
+#define fts_dev_class_set_open_fun(dev_class, fun)          ((dev_class)->open_fun = (fun))
+#define fts_dev_class_set_ctrl_fun(dev_class, fun)          ((dev_class)->ctrl_fun = (fun))
+#define fts_dev_class_set_close_fun(dev_class, fun)         ((dev_class)->close_fun = (fun))
 
-#define set_char_dev_get_fun(dev_class, fun)      ((dev_class)->methods.char_methods.get_fun = (fun))
-#define set_char_dev_put_fun(dev_class, fun)      ((dev_class)->methods.char_methods.put_fun = (fun))
-#define set_char_dev_flush_fun(dev_class, fun)      ((dev_class)->methods.char_methods.flush_fun = (fun))
-#define set_char_dev_seek_fun(dev_class, fun)     ((dev_class)->methods.char_methods.seek_fun = (fun))
+#define fts_dev_class_char_set_get_fun(dev_class, fun)      ((dev_class)->methods.char_methods.get_fun = (fun))
+#define fts_dev_class_char_set_put_fun(dev_class, fun)      ((dev_class)->methods.char_methods.put_fun = (fun))
 
-#define set_sig_dev_get_fun(dev_class, fun)      ((dev_class)->methods.sig_methods.get_fun = (fun))
-#define set_sig_dev_put_fun(dev_class, fun)      ((dev_class)->methods.sig_methods.put_fun = (fun))
-#define set_sig_dev_seek_fun(dev_class, fun)     ((dev_class)->methods.sig_methods.seek_fun = (fun))
+#define fts_dev_class_char_set_flush_fun(dev_class, fun)      ((dev_class)->methods.char_methods.flush_fun = (fun))
+#define fts_dev_class_char_set_seek_fun(dev_class, fun)     ((dev_class)->methods.char_methods.seek_fun = (fun))
 
-#define set_sig_dev_activate_fun(dev_class, fun)      ((dev_class)->methods.sig_methods.activate_fun = (fun))
-#define set_sig_dev_deactivate_fun(dev_class, fun)    ((dev_class)->methods.sig_methods.deactivate_fun = (fun))
+extern void fts_dev_class_sig_set_get_fun(fts_dev_class_t *dev_class,  void (* get_fun)(fts_word_t *));
+extern void fts_dev_class_sig_set_put_fun(fts_dev_class_t *dev_class,  void (* put_fun)(fts_word_t *));
+
+#define fts_dev_class_sig_set_seek_fun(dev_class, fun)     ((dev_class)->methods.sig_methods.seek_fun = (fun))
+
+#define fts_dev_class_sig_set_activate_fun(dev_class, fun)      ((dev_class)->methods.sig_methods.activate_fun = (fun))
+#define fts_dev_class_sig_set_deactivate_fun(dev_class, fun)    ((dev_class)->methods.sig_methods.deactivate_fun = (fun))
 
 
-#define set_sig_dev_get_nchans_fun(dev_class, fun)    ((dev_class)->methods.sig_methods.get_nchans_fun = (fun))
-#define set_sig_dev_get_nerrors_fun(dev_class, fun)    ((dev_class)->methods.sig_methods.get_nerrors_fun = (fun))
+#define fts_dev_class_sig_set_get_nchans_fun(dev_class, fun)    ((dev_class)->methods.sig_methods.get_nchans_fun = (fun))
+#define fts_dev_class_sig_set_get_nerrors_fun(dev_class, fun)    ((dev_class)->methods.sig_methods.get_nerrors_fun = (fun))
 
-/* Class installation and housekeeping; device classes are never un-registered */
-
-extern fts_status_t fts_dev_class_register(fts_symbol_t  name, fts_dev_class_t *dev_class);
 
 /* direct function access for direct FTL device access */
 
-#define get_sig_dev_get_fun(dev_class)      ((dev_class)->methods.sig_methods.get_fun)
-#define get_sig_dev_put_fun(dev_class)      ((dev_class)->methods.sig_methods.put_fun)
+#define fts_dev_class_get_sig_get_fun(dev_class)      ((dev_class)->methods.sig_methods.get_fun)
+#define fts_dev_class_get_sig_put_fun(dev_class)      ((dev_class)->methods.sig_methods.put_fun)
+
+#define fts_dev_class_get_sig_get_fun_name(dev_class)      ((dev_class)->methods.sig_methods.get_fun_name)
+#define fts_dev_class_get_sig_put_fun_name(dev_class)      ((dev_class)->methods.sig_methods.put_fun_name)
 
 /* device classquering */
 
 #define fts_dev_class_get_name(dev_class)   ((dev_class)->class_name)
+extern fts_dev_class_t *fts_dev_class_get_by_name(fts_symbol_t  name);
 
 /******************************************************************************/
 /*                                                                            */
@@ -244,7 +255,7 @@ extern fts_status_t fts_dev_class_register(fts_symbol_t  name, fts_dev_class_t *
 
 /* device functions */
 
-extern fts_dev_t *fts_dev_open(fts_symbol_t class_name, int nargs, const fts_atom_t *args);
+extern fts_status_t fts_dev_open(fts_dev_t **dret, fts_symbol_t class_name, int nargs, const fts_atom_t *args);
 extern fts_status_t fts_dev_close(fts_dev_t *dev);
 extern fts_status_t fts_dev_ctrl(fts_dev_t *dev, int nargs, fts_atom_t *args);
 
@@ -339,4 +350,12 @@ extern fts_status_t fts_close_logical_device(fts_symbol_t name, int ac, const ft
 extern fts_status_t fts_reset_logical_device(fts_symbol_t name);
 
 #endif
+
+
+
+
+
+
+
+
 

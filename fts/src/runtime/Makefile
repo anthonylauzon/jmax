@@ -20,6 +20,7 @@ all:
 	(cd audio; $(MAKE) all)
 	(cd client; $(MAKE) all)
 	(cd devices; $(MAKE) all)
+	(cd thread; $(MAKE) all)
 .PHONY: all
 
 clean:
@@ -31,4 +32,5 @@ clean:
 	(cd audio; $(MAKE) clean)
 	(cd client; $(MAKE) clean)
 	(cd devices; $(MAKE) clean)
+	(cd thread; $(MAKE) clean)
 .PHONY: all

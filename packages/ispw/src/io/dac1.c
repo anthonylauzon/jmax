@@ -153,10 +153,11 @@ dac_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 
       fts_atom_t *argv;
 
-      argv = (fts_atom_t *) fts_malloc(sizeof(fts_atom_t) * (2 + fts_audio_get_output_channels(this->ldev)));
+      argv = (fts_atom_t *) fts_malloc(sizeof(fts_atom_t) * (3 + fts_audio_get_output_channels(this->ldev)));
 
-      fts_set_ptr (argv + 0, fts_audio_get_output_device(this->ldev));
-      fts_set_long(argv + 1, fts_dsp_get_input_size(dsp, 0));
+      fts_set_ptr (argv + 0, fts_audio_get_output_device_pointer(this->ldev));
+      fts_set_long(argv + 1, fts_audio_get_output_channels(this->ldev));
+      fts_set_long(argv + 2, fts_dsp_get_input_size(dsp, 0));
 
       for (i = 0; i < fts_audio_get_output_channels(this->ldev); i++)
 	{
@@ -169,14 +170,14 @@ dac_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 	      input = j;
 
 	  if (input == -1)
-	    fts_set_symbol(argv + 2 + i, fts_s_sig_zero);
+	    fts_set_symbol(argv + 3 + i, fts_s_sig_zero);
 	  else
-	    fts_set_symbol(argv + 2 + i, fts_dsp_get_input_name(dsp, input));
+	    fts_set_symbol(argv + 3 + i, fts_dsp_get_input_name(dsp, input));
 		
 	}
 
       dsp_add_funcall(fts_audio_get_output_ftl_function(this->ldev),
-		      2 + fts_audio_get_output_channels(this->ldev),
+		      3 + fts_audio_get_output_channels(this->ldev),
 		      argv);	  
 
       fts_free(argv);
@@ -221,10 +222,11 @@ dac_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
       {
 	fts_atom_t *argv;
 
-	argv = (fts_atom_t *) fts_malloc(sizeof(fts_atom_t) * (2 + fts_audio_get_output_channels(this->ldev)));
+	argv = (fts_atom_t *) fts_malloc(sizeof(fts_atom_t) * (3 + fts_audio_get_output_channels(this->ldev)));
 
-	fts_set_ptr (argv + 0, fts_audio_get_output_device(this->ldev));
-	fts_set_long(argv + 1, fts_dsp_get_input_size(dsp, 0));
+	fts_set_ptr (argv + 0, fts_audio_get_output_device_pointer(this->ldev));
+	fts_set_long(argv + 1, fts_audio_get_output_channels(this->ldev));
+	fts_set_long(argv + 2, fts_dsp_get_input_size(dsp, 0));
 
 	for (i = 0; i < fts_audio_get_output_channels(this->ldev); i++)
 	  {
@@ -232,7 +234,7 @@ dac_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 	      {
 		/* stream used, take the ftsaudio buffer as argument */
 		
-		fts_set_ptr(argv + 2 + i, fts_audio_get_output_buffer(this->ldev, i));
+		fts_set_ptr(argv + 3 + i, fts_audio_get_output_buffer(this->ldev, i));
 	      }
 	    else
 	    {
@@ -250,14 +252,14 @@ dac_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 		  input = j;
 
 	      if (input == -1)
-		fts_set_symbol(argv + 2 + i, fts_s_sig_zero);
+		fts_set_symbol(argv + 3 + i, fts_s_sig_zero);
 	      else
-		fts_set_symbol(argv + 2 + i, fts_dsp_get_input_name(dsp, input));
+		fts_set_symbol(argv + 3 + i, fts_dsp_get_input_name(dsp, input));
 	    }
 	  }
 
 	dsp_add_funcall(fts_audio_get_output_ftl_function(this->ldev),
-			2 + fts_audio_get_output_channels(this->ldev), argv);
+			3 + fts_audio_get_output_channels(this->ldev), argv);
 
 	fts_free(argv);
       }
@@ -527,11 +529,11 @@ adc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 
       fts_audio_add_scheduled_input_object(this->ldev);
 
-
-      argv = (fts_atom_t *) fts_malloc(sizeof(fts_atom_t) * (2 + fts_audio_get_input_channels(this->ldev)));
+      argv = (fts_atom_t *) fts_malloc(sizeof(fts_atom_t) * (3 + fts_audio_get_input_channels(this->ldev)));
       
-      fts_set_ptr (argv + 0, fts_audio_get_input_device(this->ldev));
-      fts_set_long(argv + 1, fts_dsp_get_output_size(dsp, 0));
+      fts_set_ptr (argv + 0, fts_audio_get_input_device_pointer(this->ldev));
+      fts_set_long(argv + 1, fts_audio_get_input_channels(this->ldev));
+      fts_set_long(argv + 2, fts_dsp_get_output_size(dsp, 0));
 
       for (i = 0; i < fts_audio_get_input_channels(this->ldev); i++)
 	{
@@ -544,12 +546,14 @@ adc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 	      output = j;
 
 	  if (output == -1)
-	    fts_set_ptr(argv + 2 + i, fts_audio_get_input_buffer(this->ldev, i));
+	    fts_set_ptr(argv + 3 + i, fts_audio_get_input_buffer(this->ldev, i));
 	  else
-	    fts_set_symbol(argv + 2 + i, fts_dsp_get_output_name(dsp, output));
+	    fts_set_symbol(argv + 3 + i, fts_dsp_get_output_name(dsp, output));
 	}
 
-      dsp_add_funcall(fts_audio_get_input_ftl_function(this->ldev), 2 + fts_audio_get_input_channels(this->ldev), argv);
+      dsp_add_funcall(fts_audio_get_input_ftl_function(this->ldev),
+		      3 + fts_audio_get_input_channels(this->ldev),
+		      argv);
 
       fts_free(argv);
 
@@ -581,15 +585,18 @@ adc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 	     */
 	  fts_atom_t *argv;
 
-	  argv = (fts_atom_t *) fts_malloc(sizeof(fts_atom_t) * (2 + fts_audio_get_input_channels(this->ldev)));
+	  argv = (fts_atom_t *) fts_malloc(sizeof(fts_atom_t) * (3 + fts_audio_get_input_channels(this->ldev)));
 
-	  fts_set_ptr (argv + 0, fts_audio_get_input_device(this->ldev));
-	  fts_set_long(argv + 1, fts_dsp_get_output_size(dsp, 0));
+	  fts_set_ptr (argv + 0, fts_audio_get_input_device_pointer(this->ldev));
+	  fts_set_long(argv + 1, fts_audio_get_input_channels(this->ldev));
+	  fts_set_long(argv + 2, fts_dsp_get_output_size(dsp, 0));
 
 	  for (i = 0; i < fts_audio_get_input_channels(this->ldev); i++)
-	    fts_set_ptr(argv + 2 + i, fts_audio_get_input_buffer(this->ldev, i));
+	    fts_set_ptr(argv + 3 + i, fts_audio_get_input_buffer(this->ldev, i));
 
-	  dsp_add_funcall(fts_audio_get_input_ftl_function(this->ldev), 2 + fts_audio_get_input_channels(this->ldev), argv);	  
+	  dsp_add_funcall(fts_audio_get_input_ftl_function(this->ldev),
+			  3 + fts_audio_get_input_channels(this->ldev),
+			  argv);	  
 
 	  fts_free(argv);
 	}
