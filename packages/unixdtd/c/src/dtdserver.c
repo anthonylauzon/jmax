@@ -75,11 +75,38 @@ struct _dtdserver_t {
 static fts_metaclass_t *dtdserver_type;
 static dtdserver_t *default_instance;
 
+dtdserver_t* dtdserver_set_default_instance(int argc, const fts_atom_t* argv)
+{
+    fts_object_t* obj;
+    fts_atom_t a[1];
+
+    fts_object_new_to_patcher(fts_get_root_patcher(), argc, argv, &obj);
+    if (!obj)
+    {
+	return NULL;
+    }
+
+    fts_object_get_prop(obj, fts_s_state, a);
+    
+    if (!fts_is_object(a))
+    {
+	fts_object_delete_from_patcher(obj);
+	return NULL;
+    }
+    return (dtdserver_t*)(fts_get_object(a));
+}
+
 dtdserver_t *dtdserver_get_default_instance( void)
 {
   if (!default_instance)
-    default_instance = (dtdserver_t *)fts_object_create(dtdserver_type, 0, 0);
-
+  {
+      fts_atom_t a[1];
+      
+      fts_set_symbol(a, fts_new_symbol("dtdserver"));
+      default_instance = dtdserver_set_default_instance(1, a);
+/*    default_instance = (dtdserver_t *)fts_object_create(dtdserver_type, 0, 0); */
+  }
+  
   return default_instance;
 }
 
@@ -354,6 +381,13 @@ static void dtdserver_delete( fts_object_t *o, int winlet, fts_symbol_t s, int a
     }
 }
 
+static void
+dtdserver_get_state(fts_daemon_action_t action, fts_object_t* o, fts_symbol_t property, 
+		    fts_atom_t* value)
+{
+    fts_set_object(value, o);
+}
+
 static fts_status_t dtdserver_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init( cl, sizeof(dtdserver_t), 0, 0, 0);
@@ -361,6 +395,8 @@ static fts_status_t dtdserver_instantiate( fts_class_t *cl, int ac, const fts_at
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, dtdserver_init);
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_delete, dtdserver_delete);
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_sched_ready, dtdserver_select);
+
+  fts_class_add_daemon(cl, obj_property_get, fts_s_state, dtdserver_get_state);
 
   return fts_Success;
 }
