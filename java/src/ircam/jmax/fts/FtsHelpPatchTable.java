@@ -1,5 +1,7 @@
 package ircam.jmax.fts;
+
 import java.util.*;
+import java.io.*;
 
 /**
  * This class provide a registration service for help Patches.
@@ -27,4 +29,17 @@ public class FtsHelpPatchTable
   {
     return (String) helpTable.get(className);
   }
+
+  /** Access to the help patch for an object. */
+
+  public static File getHelpPatch(FtsObject obj)
+  {
+    if (exists(obj.getClassName()))
+      return new File(getHelpPatch(obj.getClassName()));
+    else
+      return null;
+  }
 }
+
+
+

@@ -11,6 +11,7 @@ import java.util.*;
  * It handle also variable substitution
  * for abstractions (in max, they are handled before the lexical
  * analisys: $0-foo is expanded to a single string). <p>
+ * Also, sval hold *always* a string representation of the good token.
  *
  *  @see FtsDotPatParser
  */
@@ -322,7 +323,8 @@ class FtsDotPatTokenizer
 	      case tt_in_number:
 		if (isSemi(c))
 		  {
-		    nval = Integer.parseInt(buf.toString());
+		    sval = buf.toString();
+		    nval = Integer.parseInt(sval);
 		    ttype = TT_NUMBER;
 		    lookahead = c;
 		    lookahead_valid = true;
@@ -330,7 +332,8 @@ class FtsDotPatTokenizer
 		  }
 		else if (isBlank(c) || isEof(c))
 		  {
-		    nval = Integer.parseInt(buf.toString());
+		    sval = buf.toString();
+		    nval = Integer.parseInt(sval);
 		    ttype = TT_NUMBER;
 		    return;
 		  }
@@ -387,7 +390,8 @@ class FtsDotPatTokenizer
 	      case tt_in_float:
 		if (isSemi(c))
 		  {
-		    fval = Float.valueOf(buf.toString()).floatValue();
+		    sval = buf.toString();
+		    fval = Float.valueOf(sval).floatValue();
 		    ttype = TT_FLOAT;
 		    lookahead = c;
 		    lookahead_valid = true;
@@ -395,7 +399,8 @@ class FtsDotPatTokenizer
 		  }
 		else if (isBlank(c) || isEof(c))
 		  {
-		    fval = Float.valueOf(buf.toString()).floatValue();
+		    sval = buf.toString();
+		    fval = Float.valueOf(sval).floatValue();
 		    ttype = TT_FLOAT;
 		    return;
 		  }

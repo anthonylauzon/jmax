@@ -537,6 +537,20 @@ public class FtsParse
 	values.addElement(parser.parsedToken);
       }
   }
+
+  // Extract the class name from a description (assume a blank as separator)
+
+  static String parseClassName(String description)
+  {
+    int idx;
+
+    idx = description.indexOf(' ');
+
+    if (idx == -1)
+      return description; // the description is made of a sigle word
+    else
+      return description.substring(0, description.indexOf(' '));
+  }
 }
 
 

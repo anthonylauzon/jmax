@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
+import ircam.jmax.utils.*;
 
 /**
  * Class implementing the proxy of an FTS object.
@@ -16,6 +17,38 @@ import ircam.jmax.*;
 
 public class FtsPatcherObject extends FtsContainerObject
 {
+  /**
+   * MOVE TO FtsPatcher
+   * Build the root object.
+   * The root object is the super patcher of everything;
+   * cannot be edited, can include only patchers.
+   */
+
+  // Should go to the patcher object
+
+  static FtsContainerObject makeRootObject(FtsServer server)
+  {
+    FtsPatcherObject obj;
+
+    // Build the arguments
+
+    obj = new FtsPatcherObject();
+
+    obj.className = "patcher";
+
+    obj.name = "root";
+    obj.ninlets = 0;
+    obj.noutlets = 0;
+
+    obj.parent = null;
+
+    // create it in FTS
+
+    server.newPatcherObject(null, obj, "root", 0, 0);
+
+    return obj;
+  }
+
   /*****************************************************************************/
   /*                                                                           */
   /*                               CONSTRUCTORS                                */
@@ -34,27 +67,50 @@ public class FtsPatcherObject extends FtsContainerObject
   }
 
   /**
+   * Create a FtsPatcherObject object: temporary constructor, should go away
+   * as soon as the graphic patcher object work !
+   */
+
+  public FtsPatcherObject(FtsContainerObject parent, String description)
+  {
+    String name;
+    Vector args;
+
+    args = new Vector();
+    
+    name = FtsParse.parseObject(description, args);
+
+    setName((String) args.elementAt(1));
+    setNumberOfInlets(((Integer) args.elementAt(2)).intValue());
+    setNumberOfOutlets(((Integer) args.elementAt(3)).intValue());
+
+    MaxApplication.getFtsServer().newPatcherObject(parent, this,
+						   name,
+						   ninlets,
+						   noutlets);
+    if (parent.isOpen())
+      updated = true;
+  }
+
+  /**
    * Create a FtsPatcherObject object.
    */
 
-  FtsPatcherObject(FtsContainerObject parent, Vector args)
+
+  public FtsPatcherObject(FtsContainerObject parent, String name, int ninlets, int noutlets)
   {
-    super(parent, "patcher", args);
+    super(parent, "patcher", "patcher " + name + " " + ninlets + " " + noutlets);
 
-    ninlets =  ((Integer)args.elementAt(1)).intValue();
-    noutlets = ((Integer)args.elementAt(2)).intValue();
+    setName(name);
+    setNumberOfInlets(ninlets);
+    setNumberOfOutlets(noutlets);
 
-    // This go to the FtsPatcherObject class
-
-    subPatcher = new FtsPatcher(this, (String) args.elementAt(0), ninlets, noutlets);
-
-    MaxApplication.getFtsServer().newObject(parent, this,  args);// create the fts object
-
+    MaxApplication.getFtsServer().newPatcherObject(parent, this,
+						   name,
+						   ninlets,
+						   noutlets);
     if (parent.isOpen())
-      {
-	updated = true;
-	MaxApplication.getFtsServer().syncToFts();
-      }
+      updated = true;
   }
 
 
@@ -64,60 +120,72 @@ public class FtsPatcherObject extends FtsContainerObject
   /*                                                                           */
   /*****************************************************************************/
 
-  /* Accessors and selectors. */
-
-  /**
-   * Set the arguments.
-   * This may require an object redefinition
-   * on the FTS side; this may then imply some comunication with FTS.
+  /** Save the object to a TCL stream. 
+   * We use object id to index local variables,
+   * because tcl variables are always hash table, not sequential
+   * arrays; so, it is not worth to spend time counting objects.
    */
 
-  public void setArguments(Vector args)
+  public void saveAsTcl(PrintWriter writer)
   {
-    this.args = args;
+    // Save as "patcher <properties> { <body> }
 
-    // Use fts class name, not user class name
+    // Save as "object ..."
 
-    MaxApplication.getFtsServer().redefineObject(this, getFtsClassName(), args);
+    writer.print("patcher ");
+    savePropertiesAsTcl(writer);
+    writer.println(" {");
 
-    ninlets =  ((Integer)args.elementAt(1)).intValue();
-    noutlets = ((Integer)args.elementAt(2)).intValue();
+    if (writer instanceof IndentedPrintWriter)
+      ((IndentedPrintWriter)writer).indentMore();
 
-    subPatcher.redefine(ninlets, noutlets);
-  }
+    // Write the body 
+    //
+    // First, store the declarations; declaration don't have
+    // connections, so we don't store them in variables.
 
-
-  /** Save the object to a TCL stream. */
-
-  void saveAsTcl(FtsSaveStream stream)
-  {
-    if (parent == MaxApplication.getFtsServer().getRootObject())
+    for (int i = 0; i < objects.size(); i++)
       {
-	stream.print("patcher ");
-
-	if (subPatcher.windowDescr != null)
-	  subPatcher.windowDescr.saveAsTcl(stream);
-
-	// This is a root patcher
+	FtsObject obj   =  (FtsObject) objects.elementAt(i);
+	
+	if (obj instanceof FtsDeclarationObject)
+	  {
+	    obj.saveAsTcl(writer);
+	    writer.println();
+	  }
       }
-    else
+
+    // Then store the objects
+
+    for (int i = 0; i < objects.size(); i++)
       {
-	// Save as "patcher ..."
+	FtsObject obj   =  (FtsObject) objects.elementAt(i);
+	
+	if (! (obj instanceof FtsDeclarationObject))
+	  {
+	    writer.print("set objs(" + obj.getObjId() + ")" + " [");
 
-	stream.print("patcher $objs(" + parent.idx + ") " +
-		     (String) args.elementAt(0) + " " +
-		     subPatcher.ninlets + " " + subPatcher.noutlets + " ");
+	    obj.saveAsTcl(writer);
 
-	if (graphicDescr != null)
-	  graphicDescr.saveAsTcl(stream);
-
-	stream.print(" ");
-
-	if (subPatcher.windowDescr != null)
-	  subPatcher.windowDescr.saveAsTcl(stream);
+	    writer.println("]");
+	  }
       }
-  }
 
+    // Then, store the connections
+
+    for (int i = 0; i < connections.size(); i++)
+      {
+	FtsConnection c   =  (FtsConnection) connections.elementAt(i);
+	
+	c.saveAsTcl(writer);
+	writer.println();
+      }
+
+    if (writer instanceof IndentedPrintWriter)
+      ((IndentedPrintWriter)writer).indentLess();
+    
+    writer.print("}");
+  }
 }
 
 

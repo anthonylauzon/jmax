@@ -682,8 +682,8 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 	
 	if (itsSketchPad.itsSelectedList.size() > 0){
 	  aObject = (ErmesObject) itsSketchPad.itsSelectedList.elementAt(0);
-	  
-	  urlToOpen = aObject.itsFtsObject.getReferenceURL();
+
+	  urlToOpen = FtsReferenceURLTable.getReferenceURL(aObject.itsFtsObject);
 	  
 	  if (urlToOpen != null){
 	    try
@@ -718,7 +718,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       for (Enumeration en = itsSketchPad.itsSelectedList.elements(); en.hasMoreElements();) {
 	aObject = (ErmesObject) en.nextElement();
 	
-	fileToOpen = aObject.itsFtsObject.getHelpPatch();
+	fileToOpen = FtsHelpPatchTable.getHelpPatch(aObject.itsFtsObject);
 	
 	if (fileToOpen != null)
 	  MaxApplication.itsProjectWindow.OpenFile(fileToOpen);

@@ -90,7 +90,14 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 
   public void makeFtsObject()
   {
-    itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, itsArgs);
+    try
+      {
+	itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, itsArgs);
+      }
+    catch (FtsException e)
+      {
+	// Enzo !!! Aiuto :-> (MDC)
+      }
 
     if (itsFtsObject instanceof FtsContainerObject)
       YouArePatcher(true);

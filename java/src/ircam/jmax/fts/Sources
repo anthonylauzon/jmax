@@ -1,4 +1,5 @@
 SOURCES = \
+	  FtsDotPatParser.java  \
           FtsAbstractionTable.java \
           FtsClientProtocol.java \
           FtsConnection.java \
@@ -15,14 +16,14 @@ SOURCES = \
 	  FtsAbstractionObject.java \
 	  FtsTemplateObject.java \
 	  FtsStandardObject.java \
+	  FtsMessageObject.java \
+	  FtsCommentObject.java \
           FtsDeclarationObject.java \
           FtsParse.java \
-          FtsPatcher.java \
           FtsPort.java \
           FtsPropertyHandler.java \
           FtsPropertyHandlerTable.java \
           FtsReferenceURLTable.java \
-          FtsSaveStream.java \
           FtsServer.java \
           FtsSocketClientServer.java \
           FtsSocketPort.java \
@@ -34,7 +35,6 @@ SOURCES = \
           FtsWindowDescription.java \
 	  FtsLocator.java  \
 	  FtsDotPatFileDataHandler.java  \
-	  FtsTpaFileDataHandler.java \
 	  FtsPatchData.java  \
 	  FtsPatchDataType.java
 

@@ -23,18 +23,15 @@ public class FtsDeclarationObject extends FtsObject
   /*****************************************************************************/
 
   /**
-   * Create a FtsObject object.
-   * Note that there is a small set of FTS primitive classes that are
-   * known to the application layer, and require special handling, in 
-   * particular "patcher", "inlet" and "outlet".
+   * Create a FtsObject declaration.
+   * Note that for declarations, we assume the description include the class name
    */
 
-  FtsDeclarationObject(FtsContainerObject parent, String className, Vector args)
+  FtsDeclarationObject(FtsContainerObject parent, String className, String description)
   {
-    super(parent, className, args);
+    super(parent, className, description);
 
-    MaxApplication.getFtsServer().newObject(parent, this, args);
-
+    MaxApplication.getFtsServer().newObject(parent, this, description);
   }
 
   /*****************************************************************************/
@@ -43,34 +40,16 @@ public class FtsDeclarationObject extends FtsObject
   /*                                                                           */
   /*****************************************************************************/
 
-
-
-  /**
-   * Set the arguments.
-   * You cannot change arguments in a declaration.
-   */
-
-  public void setArguments(Vector args)
-  {
-    return;
-  }
-
   /** Save the object to a TCL stream. */
 
-  void saveAsTcl(FtsSaveStream stream)
+  public void saveAsTcl(PrintWriter writer)
   {
     // Save as "declare ..."
 
-    stream.print("declare $objs(" + parent.idx + ") ");
+    writer.print("declare {" + description + "}");
 
-    saveArgsAsTcl(stream);
-
-    stream.print(" ");
-
-    if (graphicDescr != null)
-      graphicDescr.saveAsTcl(stream);
+    savePropertiesAsTcl(writer);
   }
-
 }
 
 

@@ -87,9 +87,9 @@ public class FtsGraphicDescription
 
   /** Save the graphic description to a TCL file. */
 
-  void saveAsTcl(FtsSaveStream stream)
+  void saveAsTcl(PrintWriter writer)
   {
-    stream.print("{ " + x + " " + y + " " + width + " " + height+"}");
+    writer.print("{ " + x + " " + y + " " + width + " " + height+"}");
   }
 
   public String toString()

@@ -37,13 +37,12 @@ class FtsDeclareCmd implements Command
 	parent = (FtsContainerObject) ReflectObject.get(interp, argv[1]);
 	description = new String(argv[2].toString());
 
-	if (argv.length == 4)
-	  object = FtsObject.makeFtsObject(parent, description,
-					   new FtsGraphicDescription(new String(argv[3].toString())));
-	else
-	  object = FtsObject.makeFtsObject(parent, description);
+	// object = FtsObject.makeFtsObject(parent, description);
 
-	interp.setResult(ReflectObject.newInstance(interp, object));
+// 	if (argv.length == 4)
+// 	  object.setGraphicDescription(new FtsGraphicDescription(argv[3].toString()));
+
+// 	interp.setResult(ReflectObject.newInstance(interp, object));
       }
     else
       {

@@ -51,9 +51,11 @@ public class SplashDialog extends Dialog implements KeyListener, MouseListener{
   public SplashDialog(Frame dw, String filename) {
     super(dw, "ermes",/* true*/false);
     
-    itsImage = Toolkit.getDefaultToolkit().getImage(filename).getScaledInstance(SPLASH_WIDTH,
-										SPLASH_HEIGHT,
-										Image.SCALE_DEFAULT);
+    // itsImage = Toolkit.getDefaultToolkit().getImage(filename).getScaledInstance(SPLASH_WIDTH,
+    // SPLASH_HEIGHT,
+    // Image.SCALE_DEFAULT);
+
+    itsImage = Toolkit.getDefaultToolkit().getImage(filename);
 
     //Initialize this dialog to its preferred size.
     addKeyListener(this);

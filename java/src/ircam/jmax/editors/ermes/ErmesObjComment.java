@@ -60,7 +60,7 @@ class ErmesObjComment extends ErmesObject {
     //itsFontMetrics = theSketchPad.GetTextArea().getFontMetrics(itsFont);
     FontMetrics temporaryFM = theSketchPad.getFontMetrics(theSketchPad.getFont());
     FIELD_HEIGHT = temporaryFM.getHeight();
-    itsArgs = theFtsObject.getArgumentsDescription().trim();
+    itsArgs = theFtsObject.getDescription();
     preferredSize = new Dimension(temporaryFM.stringWidth(itsArgs),FIELD_HEIGHT*5);
     super.Init(theSketchPad, theFtsGraphic, theFtsObject);
     itsSketchPad.GetTextArea().setBackground(Color.white);
@@ -75,11 +75,11 @@ class ErmesObjComment extends ErmesObject {
   // starting of the graphic/FTS mix
 
   public void makeFtsObject(){
-    itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "comment", itsArgs);    
+    itsFtsObject = new FtsCommentObject(itsFtsPatcher, itsArgs);    
   }
 
   public void redefineFtsObject(){
-    itsFtsObject.setArgumentsDescription(itsArgs);
+    ((FtsCommentObject)itsFtsObject).setComment(itsArgs);
   }
   
   //the 'ResizeToNewFont' method worked very well, so we're using it also in the shift-double_click  

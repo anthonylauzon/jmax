@@ -9,15 +9,14 @@ import ircam.jmax.fts.*;
 
 
 /**
- * This class define the TCL Command <b>patcher</b>,
- * that create a FTS patcher.<br>
+ * This class define the TCL Command <b>_patcher</b>,
+ * used by the tcl function patcher, that create a FTS patcher.<br>
  * This command is a part of the <i>.tpa</i> file format. <p>
  *
  * The Command Syntax is : <p>
  *
  * <code>
- *  patcher [<i>window_data</i>]
- *  patcher <i>patcher ninlets noutlets [graphic_data window_data]</i>
+ *  _patcher <i>patcher ninlets noutlets [graphic_data window_data]</i>
  * </code> <p>
  *
  * The first form (without inlets, patcher and graphic data) 
@@ -51,13 +50,14 @@ class FtsPatcherCmd implements Command
 	args.addElement(new Integer(0));
 	args.addElement(new Integer(0));
     
-	object = (FtsContainerObject) FtsObject.makeFtsObject(MaxApplication.getFtsServer().getRootObject(),
-							      "patcher", args);
+	// The Patcher command will change in the new file format
+	// object = (FtsContainerObject) FtsObject.makeFtsObject(MaxApplication.getFtsServer().getRootObject(),
+	// "patcher", args);
 	
-	if (windowDescription != null)
-	  object.setWindowDescription(new FtsWindowDescription(windowDescription));
+	//	if (windowDescription != null)
+	// object.setWindowDescription(new FtsWindowDescription(windowDescription));
 
-	interp.setResult(ReflectObject.newInstance(interp, object));
+	// interp.setResult(ReflectObject.newInstance(interp, object));
       }
     else if (argv.length >= 5) 
       {
@@ -89,17 +89,16 @@ class FtsPatcherCmd implements Command
 	args.addElement(name);
 	args.addElement(new Integer(ninlets));
 	args.addElement(new Integer(noutlets));
-    
-	if (graphicDescription != null)
-	  object = (FtsContainerObject) FtsObject.makeFtsObject(parent, "patcher", args,
-					   new FtsGraphicDescription(graphicDescription));
-	else
-	  object = (FtsContainerObject) FtsObject.makeFtsObject(parent, "patcher", args);
 
-	if (windowDescription != null)
-	  object.setWindowDescription(new FtsWindowDescription(windowDescription));
+	// object = (FtsContainerObject) FtsObject.makeFtsObject(parent, "patcher", args);    
 
-	interp.setResult(ReflectObject.newInstance(interp, object));
+	// if (graphicDescription != null)
+	// object.setGraphicDescription(new FtsGraphicDescription(graphicDescription));
+
+	// if (windowDescription != null)
+	// object.setWindowDescription(new FtsWindowDescription(windowDescription));
+
+	// interp.setResult(ReflectObject.newInstance(interp, object));
       }
     else
       {

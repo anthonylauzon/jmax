@@ -76,7 +76,7 @@ public class FtsServer
 
     // Build the root object and the root patcher
 
-    root = FtsObject.makeRootObject(this);
+    root = FtsPatcherObject.makeRootObject(this);
   }
 
   /** Stop the server. */
@@ -140,9 +140,73 @@ public class FtsServer
   }
 
 
-  /** Send a "new object" messages to FTS, extracting the arguments and class name from the object*/
+  /** Send a "new object" messages to FTS; receive the class Name and a description as a string;
+   *  It is actually used only for those objects that don't have the class name in the description,
+   *  i.e. messages and (temporarly) comments.
+   */
 
-  synchronized void newObject(FtsObject patcher, FtsObject obj, Vector args)
+  synchronized void newObject(FtsObject patcher, FtsObject obj, String className, String description)
+  {
+    Vector args;
+
+    args = new Vector();
+    
+    FtsParse.parseObjectArgs(description, args);
+
+    try
+      {
+	registerObject(obj);
+	connection.sendCmd(FtsClientProtocol.fts_new_object_cmd);
+	connection.sendObject(patcher);
+	connection.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
+	connection.sendString(className);
+
+	if (args != null)
+	  connection.sendVector(args);
+
+	connection.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+
+  /** Send a "new object" messages to FTS; receive a complete description as a string;
+   *   Used for all the objects that have the class identity in the string description
+   */
+
+  synchronized void newObject(FtsObject patcher, FtsObject obj, String description)
+  {
+    String className;
+    Vector args;
+
+    args = new Vector();
+    
+    className = FtsParse.parseObject(description, args);
+
+    try
+      {
+	registerObject(obj);
+	connection.sendCmd(FtsClientProtocol.fts_new_object_cmd);
+	connection.sendObject(patcher);
+	connection.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
+	connection.sendString(className);
+
+	if (args != null)
+	  connection.sendVector(args);
+
+	connection.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+  /** Send a "new object" messages to FTS,  specialized version to define a patcher
+   */
+
+  synchronized void newPatcherObject(FtsObject patcher, FtsObject obj, String name, int ninlets, int noutlets)
   {
     try
       {
@@ -150,12 +214,86 @@ public class FtsServer
 	connection.sendCmd(FtsClientProtocol.fts_new_object_cmd);
 	connection.sendObject(patcher);
 	connection.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
-	connection.sendString(obj.getFtsClassName());
+	connection.sendString("patcher");
+	connection.sendString(name);
+	connection.sendInt(ninlets);
+	connection.sendInt(noutlets);
+	connection.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
 
 
-	if (args != null)
-	  connection.sendVector(args);
+  /** Send a "new inlet object" messages to FTS, without the inlet number */
 
+  synchronized void newInletObject(FtsObject patcher, FtsInletObject obj)
+  {
+    try
+      {
+	registerObject(obj);
+	connection.sendCmd(FtsClientProtocol.fts_new_object_cmd);
+	connection.sendObject(patcher);
+	connection.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
+	connection.sendString("inlet");
+	connection.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+  /** Send a "new inlet object" messages to FTS, with the inlet number */
+
+  synchronized void newInletObject(FtsObject patcher, FtsInletObject obj, int pos)
+  {
+    try
+      {
+	registerObject(obj);
+	connection.sendCmd(FtsClientProtocol.fts_new_object_cmd);
+	connection.sendObject(patcher);
+	connection.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
+	connection.sendString("inlet");
+	connection.sendInt(pos);
+	connection.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+
+  /** Send a "new outlet object" messages to FTS, without the outlet number */
+
+  synchronized void newOutletObject(FtsObject patcher, FtsOutletObject obj)
+  {
+    try
+      {
+	registerObject(obj);
+	connection.sendCmd(FtsClientProtocol.fts_new_object_cmd);
+	connection.sendObject(patcher);
+	connection.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
+	connection.sendString("outlet");
+	connection.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+  /** Send a "new outlet object" messages to FTS, with the outlet number */
+
+  synchronized void newOutletObject(FtsObject patcher, FtsOutletObject obj, int pos)
+  {
+    try
+      {
+	registerObject(obj);
+	connection.sendCmd(FtsClientProtocol.fts_new_object_cmd);
+	connection.sendObject(patcher);
+	connection.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
+	connection.sendString("outlet");
+	connection.sendInt(pos);
 	connection.sendEom();
       }
     catch (java.io.IOException e)
@@ -173,6 +311,88 @@ public class FtsServer
 	connection.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
 	connection.sendObject(obj);
 	connection.sendString(className);
+
+	if (args != null)
+	  connection.sendVector(args);
+
+	connection.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+  /** Send a "redefine object" messages to a patcher in FTS.
+   *  Special optimized version for patcher loading/editing
+   */
+
+  synchronized void redefinePatcherObject(FtsObject obj, String name, int ninlets, int noutlets)
+  {
+    try
+      {
+	connection.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
+	connection.sendObject(obj);
+	connection.sendString("patcher");
+	connection.sendString(name);
+	connection.sendInt(ninlets);
+	connection.sendInt(noutlets);
+	connection.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+  /** Specialized version for inlets */
+
+  synchronized void redefineInletObject(FtsObject obj, int pos)
+  {
+    try
+      {
+	connection.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
+	connection.sendObject(obj);
+	connection.sendString("inlet");
+	connection.sendInt(pos);
+	connection.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+  /** Specialized version for outlets */
+
+  synchronized void redefineOutletObject(FtsObject obj, int pos)
+  {
+    try
+      {
+	connection.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
+	connection.sendObject(obj);
+	connection.sendString("outlet");
+	connection.sendInt(pos);
+	connection.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+
+  /** Specialized version for message objects */
+
+  synchronized void redefineMessageObject(FtsObject obj, String description)
+  {
+    Vector args;
+    
+    args = new Vector();
+    
+    FtsParse.parseObjectArgs(description, args);
+
+    try
+      {
+	connection.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
+	connection.sendObject(obj);
+	connection.sendString("message");
 
 	if (args != null)
 	  connection.sendVector(args);

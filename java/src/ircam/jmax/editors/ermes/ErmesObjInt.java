@@ -53,7 +53,15 @@ class ErmesObjInt extends ErmesObject {
 
   public void makeFtsObject()
   {
-    itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "intbox", (Vector) null);    
+    try
+      {
+	itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "intbox");
+      }
+    catch (FtsException e)
+      {
+	// Enzo !!! Aiuto :-> (MDC)
+      }
+
   }
 
   public void redefineFtsObject()

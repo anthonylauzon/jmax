@@ -1,3 +1,11 @@
+Wed Feb 11 18:07:21 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Changed the Application layer structure: delete FtsPatcher, and
+	  organized FtsObjects in a inheritance structure; simplified the handling
+	  of redefinition of patchers and inlets/outlets.
+
+	* Added the MDA architecture; still not completely functional.
+
 Mon Feb  2 14:59:19 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
 
 	* Completed the transition to everything static in MaxApplication; half

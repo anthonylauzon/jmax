@@ -35,7 +35,7 @@ public class FtsDotPatFileDataHandler extends MaxFileDataHandler
       {
 	throw new MaxDataException("I/O error loading from " + file);
       }
-    catch (FtsDotPatException e)
+    catch (FtsException e)
       {
 	throw new MaxDataException("Parsing error " + e + " loading " + file);
       }

@@ -17,14 +17,32 @@ public class FtsAbstractionTable
     abstractionTable.put(name, filename);
   }
 
-  static public boolean exists(String name)
+  static public boolean exists(String className)
   {
-    return abstractionTable.containsKey(name);
+    String realName;
+
+    if (className.endsWith(".pat"))
+      realName = className.substring(0, className.lastIndexOf(".pat"));
+    else if (className.endsWith(".abs"))
+      realName = className.substring(0, className.lastIndexOf(".abs"));
+    else
+      realName = className;
+
+    return abstractionTable.containsKey(realName);
   }
 
-  static String getFilename(String name)
+  static String getFilename(String className)
   {
-    return (String) abstractionTable.get(name);
+    String realName;
+
+    if (className.endsWith(".pat"))
+      realName = className.substring(0, className.lastIndexOf(".pat"));
+    else if (className.endsWith(".abs"))
+      realName = className.substring(0, className.lastIndexOf(".abs"));
+    else
+      realName = className;
+
+    return (String) abstractionTable.get(realName);
   }
 }
 

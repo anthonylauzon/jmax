@@ -18,24 +18,19 @@ public class FtsDotPatParser
    * 
    * @param server the server where the patcher is loaded.
    * @param inputFile the file to read.
-   * @exception ircam.jmax.fts.FtsDotPatException thown if a syntax error is found in the file,
+   * @exception ircam.jmax.fts.FtsException thown if a syntax error is found in the file,
    * or the file contains an unimplemented construct.
    */
     
-  static public FtsContainerObject importPatcher(FtsServer server, File inputFile) throws java.io.IOException, FtsDotPatException
+  static public FtsContainerObject importPatcher(FtsServer server, File inputFile) throws java.io.IOException, FtsException
   {
     FtsDotPatTokenizer in = null; 
 
     // Build a new FtsObject, a patcher 0 in 0 out
 
     FtsContainerObject obj;
-    Vector oargs = new Vector();
 
-    oargs.addElement("unnamed");
-    oargs.addElement(new Integer(0));
-    oargs.addElement(new Integer(0));
-
-    obj = (FtsContainerObject) FtsObject.makeFtsObject(server.getRootObject(), "patcher", oargs);
+    obj = new FtsPatcherObject(server.getRootObject(), "unnamed", 0, 0);
 
     try
       {
@@ -52,7 +47,8 @@ public class FtsDotPatParser
 
     readFromFtsDotPatTokenizer(obj, in);
 
-    obj.getSubPatcher().assignInOutletsAndName("unnamed");
+    obj.setName("unnamed");
+    obj.assignInOutlets();
 
     obj.loaded();	// activate the post-load init, like loadbangs
 
@@ -63,23 +59,23 @@ public class FtsDotPatParser
   /**
    * Method implementing the actual reading and parsing.
    *
-   * @exception ircam.jmax.fts.FtsDotPatException thown if a syntax error is found,
+   * @exception ircam.jmax.fts.FtsException thown if a syntax error is found,
    * or the file contains an unimplemented construct.
    */
   
-  static void readFromFtsDotPatTokenizer(FtsContainerObject parent, FtsDotPatTokenizer in) throws java.io.IOException, FtsDotPatException
+  static void readFromFtsDotPatTokenizer(FtsContainerObject parent, FtsDotPatTokenizer in) throws java.io.IOException, FtsException
   {
     // skip the header from the file,
 
     in.nextToken();
 	
     if ((in.ttype != FtsDotPatTokenizer.TT_STRING) && ! in.sval.equals("max"))
-      throw new FtsDotPatException("file not in .pat format (header error)");
+      syntaxError("file not in .pat format (header error)");
 
     in.nextToken(); 
 
     if ((in.ttype != FtsDotPatTokenizer.TT_STRING) && ! in.sval.equals("v2"))
-      throw new FtsDotPatException("file not in .pat format (header error)");
+      syntaxError("file not in .pat format (header error)");
 
     // Skip possible declarations
 
@@ -101,11 +97,11 @@ public class FtsDotPatParser
   /**
    * Parse a patcher.
    *
-   * @exception ircam.jmax.fts.FtsDotPatException thown if a syntax error is found,
+   * @exception ircam.jmax.fts.FtsException thown if a syntax error is found,
    * or the file contains an unimplemented construct.
    */
 
-  static void parsePatcher(FtsContainerObject parent, FtsDotPatTokenizer in) throws java.io.IOException, FtsDotPatException
+  static void parsePatcher(FtsContainerObject parent, FtsDotPatTokenizer in) throws java.io.IOException, FtsException
   {
     FtsObject lastNObject = null;
     String lastNObjectType = null;
@@ -134,7 +130,7 @@ public class FtsDotPatParser
 
 
 	    if (in.ttype != FtsDotPatTokenizer.TT_STRING)
-	      throw new FtsDotPatException("System Error parsing .pat file (" + (char) in.ttype + ")");
+	      syntaxError("System Error parsing .pat file (" + (char) in.ttype + ")");
 
 	    if (in.sval.equals("#N"))
 	      {
@@ -145,13 +141,7 @@ public class FtsDotPatParser
 		  {
 		    in.pushBack();
 
-		    Vector args = new Vector();
-
-		    args.addElement("unnamed");
-		    args.addElement(new Integer(0));
-		    args.addElement(new Integer(0));
-
-		    lastNObject = FtsObject.makeFtsObject(parent, "patcher", args);
+		    lastNObject = new FtsPatcherObject(parent, "unnamed", 0, 0);
 
 		    parsePatcher((FtsContainerObject) lastNObject, in);
 
@@ -159,7 +149,7 @@ public class FtsDotPatParser
 		  }
 		else if (in.sval.equals("qlist"))
 		  {
-		    lastNObject = FtsObject.makeFtsObject(parent, "qlist", (Vector) null);
+		    lastNObject = FtsObject.makeFtsObject(parent, "qlist");
 		    lastNObjectType = "qlist";
 
 		    // skip the rest of the command: #N qlist argument are ignored
@@ -169,29 +159,34 @@ public class FtsDotPatParser
 		  }
 		else if (in.sval.equals("vtable"))
 		  {
-		    Vector oargs = new Vector();
-		    Vector args = new Vector();
+		    Vector vargs = new Vector();
+		    StringBuffer description = new StringBuffer();
 
 		    // Get the size and the name,
 		    // ignore everything else (data
 		    // that regard the editor)
 
-		    readObjectArguments(oargs, in);
+		    readObjectArguments(vargs, in);
 
 		    // get the name
 
-		    if (oargs.size() >= 8)
-		      args.addElement(oargs.elementAt(7));
+		    description.append("table ");
+
+		    if (vargs.size() >= 8)
+		      {
+			description.append(vargs.elementAt(7));
+			description.append(" ");
+		      }
 		    else
-		      args.addElement("table");
+		      description.append("table ");
 
 		    // get the size
 
-		    args.addElement(oargs.elementAt(0));
+		    description.append(vargs.elementAt(0));
 
 		    // Make the table
 
-		    lastNObject = FtsObject.makeFtsObject(parent, "table", args);
+		    lastNObject = FtsObject.makeFtsObject(parent, description.toString());
 		    lastNObjectType = "table";
 
 		    // skip the ';'
@@ -200,7 +195,7 @@ public class FtsDotPatParser
 		  }
 		else if (in.sval.equals("explode"))
 		  {
-		    lastNObject = FtsObject.makeFtsObject(parent, "explode", (Vector) null);
+		    lastNObject = FtsObject.makeFtsObject(parent, "explode");
 		    lastNObjectType = "explode";
 
 		    // skip the rest of the command
@@ -216,7 +211,7 @@ public class FtsDotPatParser
 		in.nextToken(); 
 
 		if (in.ttype != FtsDotPatTokenizer.TT_STRING) 
-		  throw new FtsDotPatException("file not in .pat format (syntax error)");
+		  syntaxError("file not in .pat format (syntax error)");
 
 		if (in.sval.equals("connect"))
 		  {
@@ -260,7 +255,7 @@ public class FtsDotPatParser
 		    in.nextToken();//skip ';' ??
 		  }
 		else
-		  throw new FtsDotPatException("Syntax error in a #T (table content)");		  
+		  syntaxError("Syntax error in a #T (table content)");		  
 	      }
 	    else if (in.sval.equals("#X"))
 	      {
@@ -302,8 +297,7 @@ public class FtsDotPatParser
 		    in.nextToken();//skip ';' ??
 		  }
 		else 
-		  throw new FtsDotPatException("Syntax error: #X in a .pat file, " +
-					       "after something different from qlist or table");
+		  syntaxError("Syntax error: #X in a .pat file, after something different from qlist or table");
 	      }
 	    else
 	      {
@@ -326,11 +320,11 @@ public class FtsDotPatParser
   /**
    * Load an abstraction, substituing the arguments.
    * 
-   * @exception ircam.jmax.fts.FtsDotPatException thown if a syntax error is found in the file,
+   * @exception ircam.jmax.fts.FtsException thown if a syntax error is found in the file,
    * or the file contains an unimplemented construct.
    */
 
-  static public FtsObject importAbstraction(FtsContainerObject parent, File inputFile, Vector env) throws java.io.IOException, FtsDotPatException
+  static public FtsObject importAbstraction(FtsContainerObject parent, File inputFile, Vector env) throws java.io.IOException, FtsException
   {
     FtsDotPatTokenizer in = null; 
 
@@ -360,11 +354,11 @@ public class FtsDotPatParser
   /**
    * Parse a connection. 
    *
-   * @exception ircam.jmax.fts.FtsDotPatException thown if a syntax error is found,
+   * @exception ircam.jmax.fts.FtsException thown if a syntax error is found,
    * or the file contains an unimplemented construct.
    */
 
-  static FtsConnection parseConnection(FtsContainerObject parent, FtsDotPatTokenizer in) throws java.io.IOException, FtsDotPatException
+  static FtsConnection parseConnection(FtsContainerObject parent, FtsDotPatTokenizer in) throws java.io.IOException, FtsException
   {
 
     FtsObject from;
@@ -374,7 +368,7 @@ public class FtsDotPatParser
 
     Vector objects;
 
-    objects = parent.getContainedObjects();
+    objects = parent.getObjects();
 
     in.nextToken(); 
     from = (FtsObject) objects.elementAt(objects.size() - (int) in.nval - 1);
@@ -392,19 +386,18 @@ public class FtsDotPatParser
   }
 
   /**
-   * Read object description arguments.
+   * Read object description arguments in a vect.
    *
-   * @exception ircam.jmax.fts.FtsDotPatException thown if a syntax error is found,
+   * @exception ircam.jmax.fts.FtsException thown if a syntax error is found,
    * or the file contains an unimplemented construct.
    */
 
-  static void readObjectArguments(Vector args, FtsDotPatTokenizer in) throws java.io.IOException, FtsDotPatException
+  static void readObjectArguments(Vector args, FtsDotPatTokenizer in) throws java.io.IOException, FtsException
   {
     in.nextToken();
 
     while (in.ttype != FtsDotPatTokenizer.TT_EOC)
       {
-	int n;
 
 	switch (in.ttype)
 	  {
@@ -427,36 +420,76 @@ public class FtsDotPatParser
     in.pushBack();
   }
 
+
+  /**
+   * Read object description arguments in a String buffer, adding spaces between them,
+   * and a new line in case of a ';'.
+   *
+   * @exception ircam.jmax.fts.FtsException thown if a syntax error is found,
+   * or the file contains an unimplemented construct.
+   */
+
+  static void readObjectArguments(StringBuffer args, FtsDotPatTokenizer in)
+       throws java.io.IOException, FtsException
+  {
+    boolean addBlank = false ;
+    in.nextToken();
+
+    while (in.ttype != FtsDotPatTokenizer.TT_EOC)
+      {
+	int n;
+
+	if (addBlank)
+	  args.append(" ");
+	else
+	  addBlank = true;
+
+	args.append(in.sval);
+
+	if (in.sval.equals(";"))
+	  {
+	    args.append("\n");
+	    addBlank = false;
+	  }
+
+	in.nextToken();
+      }
+
+    in.pushBack();
+  }
+
   /**
    * Parse an object from the a tokenized stream.
    *
-   * @exception ircam.jmax.fts.FtsDotPatException thown if a syntax error is found,
+   * @exception ircam.jmax.fts.FtsException thown if a syntax error is found,
    * or the file contains an unimplemented construct.
    */
 
   static FtsObject parseObject(FtsContainerObject parent, FtsDotPatTokenizer in, FtsObject lastNObject, String lastNObjectType)
-       throws java.io.IOException, FtsDotPatException
+       throws java.io.IOException, FtsException
   {
+    FtsObject obj;
     String objclass = in.sval;
-    Vector args;
-    FtsGraphicDescription graphicDescr;
 
-    args = new Vector();
+    FtsGraphicDescription graphicDescr;
 
     // get the graphic information
 
     graphicDescr = parseGraphic(in, objclass);
 
-
     if (objclass.equals("slider"))
       {
+
 	in.nextToken();//skip 'unknown' (may be range)
 
-	return FtsObject.makeFtsObject(parent, "slider", args, graphicDescr);
+	obj = FtsObject.makeFtsObject(parent, "slider");
+	obj.setGraphicDescription(graphicDescr);
+	return obj;
       }
     else if (objclass.equals("newex"))
       {
-	String className;
+	StringBuffer description = new StringBuffer();
+
 
 	in.nextToken();//skip 'unknown'
 	in.nextToken();//get the object name
@@ -465,28 +498,31 @@ public class FtsDotPatParser
 	
 	if (in.ttype == FtsDotPatTokenizer.TT_STRING)
 	  {
-	    className = in.sval;
+	    description.append(in.sval);
+	    description.append(" ");
 	  }
 	else if (in.ttype ==  FtsDotPatTokenizer.TT_NUMBER)
 	  {
-	    className = "int";	// to accept objects with an INT as content
+	    description.append("int ");
 	    in.pushBack();
 	  }
 	else if (in.ttype ==  FtsDotPatTokenizer.TT_FLOAT)
 	  {
-	    className = "float";// to accept objects with a FLOAT as content
+	    description.append("float ");
 	    in.pushBack();
 	  }
-	else
-	  className = "";	// just for the compiler :-< 
 
-	readObjectArguments(args, in);
+	readObjectArguments(description, in);
 
-	return FtsObject.makeFtsObject(parent, className, args, graphicDescr); 
+	obj = FtsObject.makeFtsObject(parent, description.toString()); 
+	obj.setGraphicDescription(graphicDescr);
+	return obj;
       }
     else if (objclass.equals("newobj"))
       {
 	// Special handling for patchers, qlist, explode and table
+
+	Vector args = new Vector();
 
 	in.nextToken();//skip 'unknown'
 	readObjectArguments(args, in);
@@ -495,14 +531,20 @@ public class FtsDotPatParser
 
 	if (args.elementAt(0).equals("patcher") && lastNObjectType.equals("patcher"))
 	  {
-	    /* add the two ninlet and noutlet arguments to args */
+	    /* add the two ninlet and noutlet arguments to description */
 
 	    ((FtsContainerObject)lastNObject).setGraphicDescription(graphicDescr);
 
 	    if (args.size() > 1)
-	      ((FtsContainerObject)lastNObject).getSubPatcher().assignInOutletsAndName((String) args.elementAt(1));
+	      {
+		((FtsContainerObject)lastNObject).setName((String) args.elementAt(1));
+		((FtsContainerObject)lastNObject).assignInOutlets();
+	      }
 	    else
-	      ((FtsContainerObject)lastNObject).getSubPatcher().assignInOutletsAndName("unnamed");
+	      {
+		((FtsContainerObject)lastNObject).setName("unnamed");
+		((FtsContainerObject)lastNObject).assignInOutlets();
+	      }
 
 	    return lastNObject;
 	  }
@@ -540,7 +582,9 @@ public class FtsDotPatParser
 	if (in.ttype == FtsDotPatTokenizer.TT_EOC)
 	  in.pushBack();
 
-	return FtsObject.makeFtsObject(parent, "inlet", args, graphicDescr);
+	obj = new FtsInletObject(parent);
+	obj.setGraphicDescription(graphicDescr);
+	return obj;
       }
     else if (objclass.equals("outlet"))
       {
@@ -551,55 +595,76 @@ public class FtsDotPatParser
 	if (in.ttype == FtsDotPatTokenizer.TT_EOC)
 	  in.pushBack();
 
-	return FtsObject.makeFtsObject(parent, "outlet", args, graphicDescr);
+	obj = new FtsOutletObject(parent);
+	obj.setGraphicDescription(graphicDescr);
+	return obj;
       }
     else if (objclass.equals("number"))
       {
 	in.nextToken();//skip 'unknown'
 
-	return FtsObject.makeFtsObject(parent, "intbox", args, graphicDescr);
+	obj = FtsObject.makeFtsObject(parent, "intbox");
+	obj.setGraphicDescription(graphicDescr);
+	return obj;
       }
     else if (objclass.equals("flonum"))
       {
 	in.nextToken();//skip 'unknown'
 
-	return FtsObject.makeFtsObject(parent, "floatbox", args, graphicDescr);
+	obj = FtsObject.makeFtsObject(parent, "floatbox");
+	obj.setGraphicDescription(graphicDescr);
+	return obj;
       }
     else if (objclass.equals("button"))
       {
-	return FtsObject.makeFtsObject(parent, "button", args, graphicDescr);
+	obj = FtsObject.makeFtsObject(parent, "button");
+	obj.setGraphicDescription(graphicDescr);
+	return obj;
       }
     else if (objclass.equals("toggle"))
       {
-	return FtsObject.makeFtsObject(parent, "toggle", args, graphicDescr);
+	obj = FtsObject.makeFtsObject(parent, "toggle");
+	obj.setGraphicDescription(graphicDescr);
+	return obj;
       }
     else if (objclass.equals("message"))
       {
-	in.nextToken();//skip 'unknown'
-	readObjectArguments(args, in);
+	StringBuffer description = new StringBuffer();
 
-	return FtsObject.makeFtsObject(parent, "message", args, graphicDescr);
+	in.nextToken();//skip 'unknown'
+	readObjectArguments(description, in);
+
+	obj = new FtsMessageObject(parent, description.toString());
+	obj.setGraphicDescription(graphicDescr);
+	return obj;
       }
     else if (objclass.equals("comment"))
       {
-	in.nextToken();//skip 'unknown'
-	readObjectArguments(args, in);
+	StringBuffer description = new StringBuffer();
 
-	return FtsObject.makeFtsObject(parent, "comment", args, graphicDescr);
+	in.nextToken();//skip 'unknown'
+	readObjectArguments(description, in);
+
+	obj = new FtsCommentObject(parent, description.toString());
+	obj.setGraphicDescription(graphicDescr);
+	return obj;
       }
     else
-      throw new FtsDotPatException("unknown object type error");
+      {
+	syntaxError("unknown object type error");
+	return null;
+      }
   }
 
 	    
   /**
    * Parse a fts Graphic description.
    *
-   * @exception ircam.jmax.fts.FtsDotPatException thown if a syntax error is found,
+   * @exception ircam.jmax.fts.FtsException thown if a syntax error is found,
    * or the file contains an unimplemented construct.
    */
 
-  static FtsGraphicDescription parseGraphic(FtsDotPatTokenizer in, String name) throws java.io.IOException, FtsDotPatException
+  static FtsGraphicDescription parseGraphic(FtsDotPatTokenizer in, String name) throws java.io.IOException, FtsException
   {
 
     FtsGraphicDescription g = new FtsGraphicDescription();
@@ -640,11 +705,11 @@ public class FtsDotPatParser
 
   /**
    * Parse a window description.
-   * @exception ircam.jmax.fts.FtsDotPatException thown if a syntax error is found,
+   * @exception ircam.jmax.fts.FtsException thown if a syntax error is found,
    * or the file contains an unimplemented construct.
    */
 
-  static FtsWindowDescription parseWindow(FtsDotPatTokenizer in) throws java.io.IOException, FtsDotPatException
+  static FtsWindowDescription parseWindow(FtsDotPatTokenizer in) throws java.io.IOException, FtsException
   {
     FtsWindowDescription ret;
     int x2, y2;
@@ -671,9 +736,12 @@ public class FtsDotPatParser
 
     return ret;
   }
+
+  private static void syntaxError(String description) throws FtsException
+    {
+      throw new FtsException(new FtsError(FtsError.FTS_DOTPAT_ERROR, description));
+    }
 }
-
-
 
 
 

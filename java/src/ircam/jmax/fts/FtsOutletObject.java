@@ -22,66 +22,61 @@ public class FtsOutletObject  extends FtsObject
   /*                                                                           */
   /*****************************************************************************/
 
+  int position;
 
   /**
-   * Create a FtsOutletObject object.
+   * Create a FtsOutletObject object: support for .pat
    */
 
-  FtsOutletObject(FtsContainerObject parent, Vector args)
+  FtsOutletObject(FtsContainerObject parent)
   {
-    super(parent, "outlet", args);
+    super(parent, "outlet", "outlet");
 
-    // This go to the FtsOutletObject class
-    
-    if (args.size() >= 1)
-      parent.getSubPatcher().addOutlet(this, ((Integer)args.elementAt(0)).intValue());
-    else
-      parent.getSubPatcher().addOutlet(this); // support for .pat
+    parent.addOutlet(this); 
 
-    MaxApplication.getFtsServer().newObject(parent, this, args);// create the fts object
+    MaxApplication.getFtsServer().newOutletObject(parent, this); // create the fts outlet
 
     ninlets = 1;
     noutlets = 1;
   }
 
-  /**
-   * Set the arguments.
-   * An outlet can't be refined.
-   */
 
-  public void setArguments(Vector args)
+  public FtsOutletObject(FtsContainerObject parent, int position)
   {
-    return;
+    super(parent, "outlet", "outlet " + position);
+
+    this.position = position;
+
+    parent.addOutlet(this, position);
+
+    MaxApplication.getFtsServer().newOutletObject(parent, this, position);// create the fts inlet
+
+    ninlets = 1;
+    noutlets = 1;
   }
 
-  /** Get the number of inlets of the object (valid only if the patcher is open). */
 
-  public int getNumberOfInlets()
+  public void setPosition(int i)
   {
-    return 1;
+    position = i;
+    description = "outlet " + position;
+    MaxApplication.getFtsServer().redefineOutletObject(this, position);
   }
 
-  /** Get the number of outlets of the object (valid only if the patcher is open). */
-
-  public int getNumberOfOutlets()
+  public int getPosition()
   {
-    return 1;
+    return position;
   }
 
   /** Save the object to a TCL stream. */
 
-  void saveAsTcl(FtsSaveStream stream)
+  public void saveAsTcl(PrintWriter writer)
   {
-    // Save as "object ..."
+    // Save as "inlet ..."
 
-    stream.print("object $objs(" + parent.idx + ") ");
+    writer.print("outlet " + position);
 
-    saveArgsAsTcl(stream);
-
-    stream.print(" ");
-
-    if (graphicDescr != null)
-      graphicDescr.saveAsTcl(stream);
+    savePropertiesAsTcl(writer);
   }
 }
 

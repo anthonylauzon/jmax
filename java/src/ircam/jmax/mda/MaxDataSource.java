@@ -5,7 +5,7 @@ import java.io.*;
 
 import ircam.jmax.fts.*;
 
-class MaxDataSource
+public class MaxDataSource
 {
 
   /** This static method produce a MaxDataSource of the good
@@ -13,7 +13,7 @@ class MaxDataSource
     reconize http:, ftp: and file: as URL, and fts: as
     FTS, and anything else as file */
 
-  static MaxDataSource makeDataSource(String address) throws java.net.MalformedURLException
+  static public MaxDataSource makeDataSource(String address) throws java.net.MalformedURLException
   {
     if (address.startsWith("http:") ||
 	address.startsWith("ftp:") ||
@@ -30,7 +30,7 @@ class MaxDataSource
    * object
    */
 
-  static MaxDataSource makeDataSource(URL url)
+  public static MaxDataSource makeDataSource(URL url)
   {
     return new MaxURLDataSource(url);
   }
@@ -39,7 +39,7 @@ class MaxDataSource
    *
    */
 
-  static MaxDataSource makeDataSource(FtsLocator locator)
+  public static MaxDataSource makeDataSource(FtsLocator locator)
   {
     return new MaxFtsDataSource(locator);
   }
@@ -47,7 +47,7 @@ class MaxDataSource
   /** This static method produce a MaxDataSource from a File object
    */
 
-  static MaxDataSource makeDataSource(File file)
+  public static MaxDataSource makeDataSource(File file)
   {
     return new MaxFileDataSource(file);
   }

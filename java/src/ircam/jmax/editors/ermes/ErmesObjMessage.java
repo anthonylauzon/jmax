@@ -40,7 +40,7 @@ class ErmesObjMessage extends ErmesObjEditableObject {
     // It is needed because ErmesObjExternal and ErmesObjMessage use different methods
     // to get the string from the object.
 
-    itsArgs = theFtsObject.getArgumentsDescription().trim();
+    itsArgs = theFtsObject.getDescription();
     
     super.Init(theSketchPad, theFtsGraphic, theFtsObject);
     ParseText(itsArgs);
@@ -56,12 +56,12 @@ class ErmesObjMessage extends ErmesObjEditableObject {
 
   public void makeFtsObject()
   {
-    itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "message", itsArgs);    
+    itsFtsObject = new FtsMessageObject(itsFtsPatcher, itsArgs);    
   }
 
   public void redefineFtsObject()
   {
-    itsFtsObject.setArgumentsDescription(itsArgs);
+    ((FtsMessageObject)itsFtsObject).setMessage(itsArgs);
   }
   
   //--------------------------------------------------------
@@ -183,20 +183,4 @@ class ErmesObjMessage extends ErmesObjEditableObject {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

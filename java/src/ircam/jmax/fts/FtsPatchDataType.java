@@ -31,13 +31,8 @@ public class FtsPatchDataType extends MaxDataType
     // Build a new FtsObject, a patcher 0 in 0 out
 
     FtsObject patcher;
-    Vector args = new Vector();
 
-    args.addElement("unnamed");
-    args.addElement(new Integer(0));
-    args.addElement(new Integer(0));
-
-    patcher = FtsObject.makeFtsObject(MaxApplication.getFtsServer().getRootObject(), "patcher", args);
+    patcher = new FtsPatcherObject(MaxApplication.getFtsServer().getRootObject(), "unnamed", 0, 0);
 
     FtsPatchData obj = new FtsPatchData();
 

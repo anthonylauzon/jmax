@@ -30,7 +30,7 @@ public class FtsConnection
 
     MaxApplication.getFtsServer().connectObjects(from, outlet, to, inlet);
 
-    from.getParent().getSubPatcher().addConnection(this);
+    from.getParent().addConnection(this);
   }
 
   /** Undo the connection. */
@@ -39,7 +39,7 @@ public class FtsConnection
   {
     MaxApplication.getFtsServer().disconnectObjects(from, outlet, to, inlet);
 
-    from.getParent().getSubPatcher().removeConnection(this);
+    from.getParent().removeConnection(this);
   }
 
   /** Access the From. The From is the FtsObject origin of the connection. */
@@ -72,9 +72,9 @@ public class FtsConnection
 
   /** Save support. Save the connection as a TCL command. */
 
-  void saveAsTcl(FtsSaveStream stream)
+  void saveAsTcl(PrintWriter writer)
   {
-    stream.print("connection $objs(" + from.idx + ") " + outlet + " $objs(" + to.idx + ") " + inlet);
+    writer.print("connection $objs(" + from.getObjId() + ") " + outlet + " $objs(" + to.getObjId() + ") " + inlet);
   }
 
   /**

@@ -51,7 +51,6 @@ public class ErmesObject implements FtsPropertyHandler {
 	
   void SaveTo(OutputStream stream) {
     String strArgs;
-    Enumeration e = itsFtsObject.getArguments().elements();
 
     // Modified by MDC: use directly the getDescription,
     // that return the original string the user typed

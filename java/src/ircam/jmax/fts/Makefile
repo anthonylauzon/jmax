@@ -87,6 +87,14 @@ FtsStandardObject:
 	javac $(JFLAGS) FtsStandardObject.java
 .PHONY: FtsStandardObject
 
+FtsMessageObject:
+	javac $(JFLAGS) FtsMessageObject.java
+.PHONY: FtsMessageObject
+
+FtsCommentObject:
+	javac $(JFLAGS) FtsCommentObject.java
+.PHONY: FtsCommentObject
+
 FtsDeclarationObject:
 	javac $(JFLAGS) FtsDeclarationObject.java
 .PHONY: FtsDeclarationObject
@@ -95,10 +103,6 @@ FtsDeclarationObject:
 FtsParse:
 	javac $(JFLAGS) FtsParse.java
 .PHONY: FtsParse
-
-FtsPatcher:
-	javac $(JFLAGS) FtsPatcher.java
-.PHONY: FtsPatcher
 
 FtsPort:
 	javac $(JFLAGS) FtsPort.java
@@ -155,10 +159,6 @@ FtsTemplateTable:
 FtsWindowDescription:
 	javac $(JFLAGS) FtsWindowDescription.java
 .PHONY: FtsWindowDescription
-
-FtsDotPatException:
-	javac $(JFLAGS) FtsDotPatException.java
-.PHONY: FtsDotPatException
 
 FtsDotPatParser:
 	javac $(JFLAGS) FtsDotPatParser.java

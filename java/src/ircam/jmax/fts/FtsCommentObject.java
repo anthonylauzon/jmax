@@ -14,7 +14,7 @@ import ircam.jmax.*;
  * FTS instantiation 
  */
 
-public class FtsStandardObject extends FtsObject
+public class FtsCommentObject extends FtsObject
 {
   /*****************************************************************************/
   /*                                                                           */
@@ -26,22 +26,19 @@ public class FtsStandardObject extends FtsObject
    * Create a FtsObject object;
    */
 
-  FtsStandardObject(FtsContainerObject parent, String className, String description)
+  public FtsCommentObject(FtsContainerObject parent, String description)
   {
-    super(parent, className, description);
+    super(parent, "comment", description);
 
-    MaxApplication.getFtsServer().newObject(parent, this, description);
-
-    if (parent.isOpen())
-      {
-	updated = true;
-	getProperty("ninlets");
-	getProperty("noutlets");
-
-	MaxApplication.getFtsServer().syncToFts();
-      }
+    ninlets = 0;
+    noutlets = 0;
   }
 
+
+  public void setComment(String comment)
+  {
+    description = comment;
+  }
 
   /*****************************************************************************/
   /*                                                                           */
@@ -52,9 +49,9 @@ public class FtsStandardObject extends FtsObject
 
   public void saveAsTcl(PrintWriter writer)
   {
-    // Save as "object ..."
+    // Save as "declare ..."
 
-    writer.print("object {" + description + "}");
+    writer.print("comment {" + description + "}");
 
     savePropertiesAsTcl(writer);
   }

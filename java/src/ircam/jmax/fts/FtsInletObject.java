@@ -22,64 +22,61 @@ public class FtsInletObject  extends FtsObject
   /*                                                                           */
   /*****************************************************************************/
 
+  int position;
 
   /**
    * Create a FtsInletObject object.
    */
 
-  FtsInletObject(FtsContainerObject parent, Vector args)
+  FtsInletObject(FtsContainerObject parent)
   {
-    super(parent, "inlet", args);
-    
-    if (args.size() >= 1)
-      parent.getSubPatcher().addInlet(this, ((Integer)args.elementAt(0)).intValue());
-    else
-      parent.getSubPatcher().addInlet(this); // support for .pat
+    super(parent, "inlet", "inlet");
 
-    MaxApplication.getFtsServer().newObject(parent, this, args);// create the fts object
+    parent.addInlet(this); // support for .pat
+
+    MaxApplication.getFtsServer().newInletObject(parent, this); // create the fts inlet
 
     ninlets = 1;
     noutlets = 1;
   }
 
-  /**
-   * Set the arguments.
-   * An inlet can't be refined.
-   */
-
-  public void setArguments(Vector args)
+  
+  public FtsInletObject(FtsContainerObject parent, int position)
   {
-    return;
+    super(parent, "inlet", "inlet " + position);
+
+    this.position = position;
+
+    parent.addInlet(this, position);
+
+    MaxApplication.getFtsServer().newInletObject(parent, this, position);// create the fts inlet
+
+    ninlets = 1;
+    noutlets = 1;
   }
 
-  /** Get the number of inlets of the object (valid only if the patcher is open). */
-
-  public int getNumberOfInlets()
+  public void setPosition(int i)
   {
-    return 1;
+    position = i;
+    description = "inlet " + position;
+
+    MaxApplication.getFtsServer().redefineInletObject(this, position);
   }
 
-  /** Get the number of outlets of the object (valid only if the patcher is open). */
-
-  public int getNumberOfOutlets()
+  public int getPosition()
   {
-    return 1;
+    return position;
   }
 
   /** Save the object to a TCL stream. */
 
-  void saveAsTcl(FtsSaveStream stream)
+  public void saveAsTcl(PrintWriter writer)
   {
-    // Save as "object ..."
+    // Save as "inlet ..."
 
-    stream.print("object $objs(" + parent.idx + ") ");
+    writer.print("inlet " + position);
 
-    saveArgsAsTcl(stream);
-
-    stream.print(" ");
-
-    if (graphicDescr != null)
-      graphicDescr.saveAsTcl(stream);
+    savePropertiesAsTcl(writer);
   }
 }
 

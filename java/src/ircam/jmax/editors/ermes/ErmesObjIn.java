@@ -10,7 +10,7 @@ import ircam.jmax.fts.*;
  */
 class ErmesObjIn extends ErmesObject {
   static Dimension preferredSize = new Dimension(20, 20);
-  Integer itsId;
+  int itsId;
   //static ErmesObjInOutChoice inOutChoice = null;
   
   public ErmesObjIn(){
@@ -24,7 +24,7 @@ class ErmesObjIn extends ErmesObject {
     Dimension d = getPreferredSize();
     currentRect = new Rectangle(theFtsGraphic.x,theFtsGraphic.y,theFtsGraphic.width,theFtsGraphic.height);
 
-    itsId = (Integer) theFtsObject.getArguments().elementAt(0);
+    itsId = ((FtsInletObject) theFtsObject).getPosition();
 
     super.Init(theSketchPad, theFtsGraphic, theFtsObject); 
 
@@ -42,8 +42,10 @@ class ErmesObjIn extends ErmesObject {
 	int temp = ((ErmesSketchWindow)theSketchPad.itsSketchWindow).itsDocument.itsPatcher.getNumberOfInlets();
 
 	if (theSketchPad.inCount < temp)
-	    itsId = new Integer(theSketchPad.inCount++);   //for now no deleting handled
-	else itsId = new Integer(temp-1);
+	  itsId = theSketchPad.inCount++;   //for now no deleting handled
+	else
+	  itsId = temp - 1;
+
     super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
 
 
@@ -61,9 +63,9 @@ class ErmesObjIn extends ErmesObject {
   {
     Vector aVector = new Vector();
 
-    aVector.addElement(itsId);
+    aVector.addElement(new Integer(itsId));
 
-    itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "inlet", aVector);    
+    itsFtsObject = new FtsInletObject(itsFtsPatcher, itsId);
   }
 
   public void redefineFtsObject()
@@ -71,11 +73,7 @@ class ErmesObjIn extends ErmesObject {
     // Inlets may redefine the arguments, but not the whole description
     // i.e. they remains Inlets
 
-    Vector aVector = new Vector();
-
-    aVector.addElement(itsId);
-
-    itsFtsObject.setArguments(aVector);
+    ((FtsInletObject)itsFtsObject).setPosition(itsId);
   }
   
   public boolean ConnectionRequested(ErmesObjInOutlet theRequester)
@@ -97,7 +95,7 @@ class ErmesObjIn extends ErmesObject {
   
   public void Paint_specific(Graphics g) {
   	//you want to create a Dimension each Paint?
-  	Dimension textDimensions = new Dimension(itsFontMetrics.stringWidth(""+(itsId.intValue()+1)),
+  	Dimension textDimensions = new Dimension(itsFontMetrics.stringWidth(""+(itsId+1)),
   										 itsFontMetrics.getHeight());	
 	  	
     if(!itsSelected) g.setColor(itsLangNormalColor);
@@ -113,7 +111,7 @@ class ErmesObjIn extends ErmesObject {
 	//resize box
     //g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
 		
-	g.drawString(""+(itsId.intValue()+1), itsX + 7, itsY + 7+7);
+	g.drawString(""+(itsId+1), itsX + 7, itsY + 7+7);
   }
 	
   public boolean MouseDown_specific(MouseEvent evt, int x, int y) {
@@ -131,8 +129,8 @@ class ErmesObjIn extends ErmesObject {
   }
 
   void ChangeInletNo(int numberChoosen) {
-    if (itsId.intValue() != numberChoosen) {
-      itsId = new Integer(numberChoosen);
+    if (itsId != numberChoosen) {
+      itsId = numberChoosen;
       redefineFtsObject();
     }
     itsSketchPad.repaint();

@@ -44,4 +44,8 @@ Platform:
 	javac $(JFLAGS) Platform.java
 .PHONY: Platform
 
+IndentedPrintWriter:
+	javac $(JFLAGS) IndentedPrintWriter.java
+.PHONY: IndentedPrintWriter
+
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

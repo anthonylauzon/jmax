@@ -53,10 +53,10 @@ public class ErmesObjPatcher extends ErmesObject {
   public boolean Init(ErmesSketchPad theSketchPad, FtsGraphicDescription theFtsGraphic, FtsObject theFtsObject) {
     String theString;
 
-    // modified by MDC to get the name from the object.
-    // It get the arguments, excluding the "patcher" word
+    // modified by MDC to get the name of the patcher
+    // ???
 
-    theString = theFtsObject.getArgumentsDescription();
+    theString = theFtsObject.getName();
 
     if (theString.length() != 0)
       itsNameString = theString;
@@ -79,12 +79,22 @@ public class ErmesObjPatcher extends ErmesObject {
 
   public void makeFtsObject()
   {
-    itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "patcher", itsNameString);    
+    // This do not work; this object must be fixed.
+    try
+      {
+	itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "patcher " + itsNameString);    
+      }
+    catch (FtsException e)
+      {
+	// Enzo !!! Aiuto :-> (MDC)
+      }
   }
 
   public void redefineFtsObject()
   {
-    itsFtsObject.setArgumentsDescription(itsNameString);
+    // Not implemented anymore; here, use setName, setNumberOfInlet and setNumberOfOutlet
+    // to change the patcher characteristics.
+    // itsFtsObject.setArgumentsDescription(itsNameString);
   }
   
 	

@@ -4,6 +4,7 @@ import java.io.*;
 import tcl.lang.*;
 
 import ircam.jmax.*;
+import ircam.jmax.utils.*;
 
 
 /** An instance of this data handler can load MaxData from
@@ -74,16 +75,19 @@ public class MaxTclFileDataHandler extends MaxFileDataHandler
     try
       {
 	FileOutputStream stream  = new 	FileOutputStream(file);
-	PrintWriter pw = new PrintWriter(stream); // should be an "indent print writer"
+	IndentedPrintWriter pw = new IndentedPrintWriter(stream); // should be an "indent print writer"
 
 	pw.println("jmax " + instance.getDataType().getName() +
 		   " " + instance.getName() +
-		   " " + instance.getInfo() +
-		   "{");
+		   " {" + instance.getInfo() +
+		   "} {");
 	
+	pw.indentMore();
 	((MaxTclData) instance).saveContentAsTcl(pw);
-	
+	pw.indentLess();
+	pw.println();
 	pw.println("}");
+	pw.close();
       }
     catch (IOException e)
       {

@@ -57,9 +57,9 @@ public class FtsWindowDescription
 
   /** Save the description to a stream */
 
-  void saveAsTcl(FtsSaveStream stream)
+  void saveAsTcl(PrintWriter writer)
   {
-      stream.print("{" + x + " " + y + " " + width + " " + height + "}");
+    writer.print("{" + x + " " + y + " " + width + " " + height + "}");
   }
 }
 

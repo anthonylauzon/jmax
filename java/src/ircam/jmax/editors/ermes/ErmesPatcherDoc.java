@@ -5,13 +5,15 @@ import java.awt.*;
 import java.lang.*;
 import java.io.*;
 import java.util.*;
+import java.text.*; // tmp
+
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.project.*;// @@@@@@
 import ircam.jmax.editors.ermes.*;
-
+import ircam.jmax.mda.*; // temporary
 
 /**
  * The document associated with a patcher.
@@ -35,11 +37,8 @@ public class ErmesPatcherDoc implements MaxDocument {
   
   public ErmesPatcherDoc() {
     // create an empty ErmesPatcherDoc
-    Vector args = new Vector();
-    args.addElement("unnamed");
-    args.addElement(new Integer(0));
-    args.addElement(new Integer(0));
-    itsPatcher = (FtsContainerObject) FtsObject.makeFtsObject(MaxApplication.getFtsServer().getRootObject(), "patcher", args);
+
+    itsPatcher = new FtsPatcherObject(MaxApplication.getFtsServer().getRootObject(), "unnamed", 0, 0);
   }
 
   public ErmesPatcherDoc(FtsContainerObject theFtsPatcher) {
@@ -51,7 +50,7 @@ public class ErmesPatcherDoc implements MaxDocument {
       }
     else if (((FtsObject)theFtsPatcher).getClassName().equals("patcher"))
       {
-	itsTitle = (String) ((FtsObject) theFtsPatcher).getArguments().elementAt(0);
+	itsTitle = theFtsPatcher.getName();
       }
     else
       itsTitle  =  ((FtsObject) theFtsPatcher).getClassName();
@@ -66,11 +65,7 @@ public class ErmesPatcherDoc implements MaxDocument {
     itsTitle  = "untitled" + (untitledCounter++);
     itsDocumentType = "patcher";
     itsSketchWindow = theSketchWindow;
-    Vector args = new Vector();
-    args.addElement("unnamed");
-    args.addElement(new Integer(0));
-    args.addElement(new Integer(0));
-    itsPatcher = (FtsContainerObject) FtsObject.makeFtsObject(MaxApplication.getFtsServer().getRootObject(), "patcher", args);
+    itsPatcher = new FtsPatcherObject(MaxApplication.getFtsServer().getRootObject(), "unnamed", 0, 0);
   }
 
   FtsContainerObject GetFtsPatcher() {
@@ -110,9 +105,9 @@ public class ErmesPatcherDoc implements MaxDocument {
     return alreadySaved;
   }
 
-   public boolean GetNeverSavedFlag() {
+  public boolean GetNeverSavedFlag() {
     return neverSaved;
-   }
+  }
 
   public void SetFile(File theFile) {
     itsFile = theFile;
@@ -182,33 +177,30 @@ public class ErmesPatcherDoc implements MaxDocument {
     if (itsFile == null)
       return false;
     
-    // update its title  (but who tell the window ??)
-
     itsTitle = itsFile.getName();
-
-    try {
-      fs = new FileOutputStream(itsFile);
-    }
-
-    catch(IOException e) {
-      System.out.println("ERROR " + e + " while saving " + itsFile);
-      // e.printStackTrace(); // temporary, MDC
-      return false;
-    }
 
     CreateFtsGraphics(itsSketchWindow);
 
+    // This code is temporary, just to test the MDA
+    // save architecture; real code will substitute
+    // the whole thing.
 
-    PrintStream ps = new PrintStream(fs);
-    itsPatcher.saveTo(fs);
+    try
+      {
+	FtsPatchData data = new FtsPatchData();
+	data.setContent(itsPatcher);
+	data.setDataSource(MaxDataSource.makeDataSource(itsFile));
+	data.setInfo("Saved " + DateFormat.getDateInstance(DateFormat.FULL).format(new Date()));
+	data.setName(itsFile.getName());
+	data.save();
+      }
+    catch (MaxDataException e)
+      {
+	System.out.println("ERROR " + e + " while saving " + itsFile);
+	e.printStackTrace(); // temporary, MDC
+	return false;
+      }
 
-    try {
-      fs.close();
-    } catch (IOException e) {
-      System.out.println("ERROR while closing " + GetFile());
-      e.printStackTrace(); // temporary, MDC
-      return false;
-    }
     alreadySaved = true;
     neverSaved = false;
     

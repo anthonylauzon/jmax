@@ -16,6 +16,8 @@ import ircam.jmax.*;
 
 public class FtsAbstractionObject  extends FtsContainerObject
 {
+  static boolean  expandAbstractions = true;
+
   /*****************************************************************************/
   /*                                                                           */
   /*                               CONSTRUCTORS                                */
@@ -26,59 +28,29 @@ public class FtsAbstractionObject  extends FtsContainerObject
    * Create a FtsAbstractionObject object.
    */
 
-  FtsAbstractionObject(FtsContainerObject parent, String className, Vector args)
+  FtsAbstractionObject(FtsContainerObject parent, String className, String description)
   {
-    super(parent, className, args);
+    super(parent, className, description);
 
     // An abstraction is translated in its expansion (code from the FtsDotPat parser)
     // But, it is stored back as an object
 
     String patname;
-    String realName;
 
-    // If there is no description, generate one now, from the
-    // the arguments before the instantiation
-    // the call is fancy, but it actually generate and cache 
-    // a description if it does not exists; if it exists,
-    // it is a no-op.
-	
-    description = getDescription(); 
+    // Get the pathname (here, we are sure the abstraction exists, no tests)
 
-    // Then, reset the ftsClassName to "patcher"
-
-    this.ftsClassName = "patcher";
-
-    // First, remove the .pat or the .abs if present, and
-    // compute the real name
-
-    if (className.endsWith(".pat"))
-      realName = className.substring(0, className.lastIndexOf(".pat"));
-    else if (className.endsWith(".abs"))
-      realName = className.substring(0, className.lastIndexOf(".abs"));
-    else
-      realName = className;
-
-    if (FtsAbstractionTable.exists(realName))
-      {
-	patname = FtsAbstractionTable.getFilename(realName);
-      }
-    else
-      patname = realName;
+    patname = FtsAbstractionTable.getFilename(className);
     
     //create a 0 in 0 out patcher FtsObject
 
-    FtsObject obj;
-    Vector oargs = new Vector();
+    MaxApplication.getFtsServer().newPatcherObject(parent, this, "unnamed", 0, 0);
 
-    oargs.addElement("unnamed");
-    oargs.addElement(new Integer(0));
-    oargs.addElement(new Integer(0));
-
-    MaxApplication.getFtsServer().newObject(parent, this, oargs);
+    // Parse the description to get the argument for the abstraction expander
+    
+    Vector args = new Vector();
+    className = FtsParse.parseObject(description, args);
 
     // load the patcher content from the file
-
-    subPatcher = new FtsPatcher(this, "unnamed", 0, 0);
 
     // Should really do something better here in case of error !!!
     // raising exceptions ... 
@@ -87,18 +59,19 @@ public class FtsAbstractionObject  extends FtsContainerObject
       {
 	FtsDotPatParser.importAbstraction(this, new File(patname), args);
       }
-    catch (FtsDotPatException e)
+    catch (FtsException e)
       {
-	System.out.println("Error " + e + " in reading abstraction " + realName);
+	System.out.println("Error " + e + " in reading abstraction " + className);
       }
     catch (java.io.IOException e)
       {
-	System.out.println("I/O Error " + e + " in reading abstraction " + realName);
+	System.out.println("I/O Error " + e + " in reading abstraction " + className);
       }
 
-    subPatcher.assignInOutletsAndName("unnamed");
+    setName("unnamed");
+    assignInOutlets();
 
-    subPatcher.loaded();	// activate the post-load init, like loadbangs
+    loaded();	// activate the post-load init, like loadbangs
 
     if (parent.isOpen())
       {
@@ -118,39 +91,13 @@ public class FtsAbstractionObject  extends FtsContainerObject
   /*****************************************************************************/
 
 
-  /**
-   * Set the arguments.
-   * YOu cannot change the arguments in an abstraction
-   */
-
-  public void setArguments(Vector args)
-  {
-    this.args = args;
-
-    // Use fts class name, not user class name
-
-    MaxApplication.getFtsServer().redefineObject(this, getFtsClassName(), args);
-
-    ninlets =  ((Integer)args.elementAt(1)).intValue();
-    noutlets = ((Integer)args.elementAt(2)).intValue();
-
-    subPatcher.redefine(ninlets, noutlets);
-  }
-
-  /** Save the object to a TCL stream. */
-
-  void saveAsTcl(FtsSaveStream stream)
+  public void saveAsTcl(PrintWriter writer)
   {
     // Save as "object ..."
 
-    stream.print("object $objs(" + parent.idx + ") ");
+    writer.print("object {" + description + "}");
 
-    saveArgsAsTcl(stream);
-
-    stream.print(" ");
-
-    if (graphicDescr != null)
-      graphicDescr.saveAsTcl(stream);
+    savePropertiesAsTcl(writer);
   }
 }
 

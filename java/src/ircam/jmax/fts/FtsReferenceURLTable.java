@@ -28,4 +28,13 @@ public class FtsReferenceURLTable
   {
     return (String) ftsReferenceURLTable.get(className);
   }
+
+  public static String getReferenceURL(FtsObject obj)
+  {
+    if (exists(obj.getClassName()))
+      return getReferenceURL(obj.getClassName());
+    else
+      return null;
+  }
 }
+

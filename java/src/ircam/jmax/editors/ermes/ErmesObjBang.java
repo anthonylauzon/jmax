@@ -70,7 +70,15 @@ class ErmesObjBang extends ErmesObject {
   // starting of the graphic/FTS mix
   
   public void makeFtsObject() {
-    itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "button", (Vector) null);
+    try
+      {
+	itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "button");
+      }
+    catch (FtsException e)
+      {
+	// Enzo !!! Aiuto :-> (MDC)
+      }
+
   }
   
   public void redefineFtsObject() {

@@ -628,7 +628,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	
     FtsContainerObject aFtsPatcher = theDocument.GetFtsPatcher();
     // chiama tanti AddObject...
-    Vector objectVector = aFtsPatcher.getContainedObjects();	//usefull?
+    Vector objectVector = aFtsPatcher.getObjects();	//usefull?
     
     FtsGraphicDescription fg;
     FtsObject	fo;
@@ -653,7 +653,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     }
 		
     // chiama tanti AddConnection...
-    Vector connectionVector = aFtsPatcher.getContainedConnections();	//usefull?
+    Vector connectionVector = aFtsPatcher.getConnections();	//usefull?
     ErmesObject fromObj, toObj;
     ErmesConnection aConnection = null;
     
@@ -761,7 +761,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 
     nameTable = new Hashtable(16, (float) 0.5);
     nameTable.put("message", "ircam.jmax.editors.ermes.ErmesObjMessage");
-    nameTable.put("bang", "ircam.jmax.editors.ermes.ErmesObjBang");
+    nameTable.put("button", "ircam.jmax.editors.ermes.ErmesObjBang");
     nameTable.put("toggle", "ircam.jmax.editors.ermes.ErmesObjToggle");
     nameTable.put("intbox", "ircam.jmax.editors.ermes.ErmesObjInt");
     nameTable.put("floatbox", "ircam.jmax.editors.ermes.ErmesObjFloat");

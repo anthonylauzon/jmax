@@ -68,7 +68,14 @@ class ErmesObjSlider extends ErmesObject {
   
   public void makeFtsObject()
   {
-    itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "slider", (Vector) null);    
+    try
+      {
+	itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "slider");
+      }
+    catch (FtsException e)
+      {
+	// Enzo !!! Aiuto :-> (MDC)
+      }
   }
 
   public void redefineFtsObject()
