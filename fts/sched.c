@@ -141,7 +141,6 @@ int fts_sched_remove( fts_object_t *obj)
   return -1;
 }
 
-#if !defined(__POWERPC__) || (defined(__APPLE__) && defined(__MACH__))
 static int compute_fds( fts_sched_t *sched, fd_set *readfds, fd_set *writefds, fd_set *exceptfds)
 {
   sched_callback_t *callback;
@@ -213,7 +212,6 @@ static void run_select( fts_sched_t *sched, int n_fd, fd_set *readfds, fd_set *w
     }
   }
 }
-#endif
 
 static void run_always( fts_sched_t *sched)
 {
@@ -357,17 +355,14 @@ fts_sleep(void)
 
   now = fts_get_time();
   
-
   if (now - last_sleep >= (double)100.0)
   {
-#if !defined(__POWERPC__) || (defined(__APPLE__) && defined(__MACH__))
     struct timespec pause_time;
 
     pause_time.tv_sec = 0;
     pause_time.tv_nsec = 100000000L;
 
     nanosleep( &pause_time, 0);
-#endif
 
     last_sleep = now;
   }

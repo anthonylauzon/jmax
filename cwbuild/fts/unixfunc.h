@@ -85,4 +85,14 @@ extern int dup2 (int __fd, int __fd2);
 /***************************************/
 extern void fts_kernel_socketstream_init(void);
 
+/***************************************/
+/* from sched.c                 */
+/***************************************/
+extern void fts_sched_run(void);
+extern void fts_sched_halt(void);
+extern void fts_sleep(void);
+extern int fts_sched_remove( fts_object_t *obj);
+extern void fts_kernel_sched_init(void);
+extern int fts_sched_add( fts_object_t *obj, int flags, ...);
+
 #endif

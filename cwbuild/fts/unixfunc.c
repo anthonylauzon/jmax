@@ -98,3 +98,19 @@ int dup2 (int __fd, int __fd2)
 void fts_kernel_socketstream_init(void)
 {
 }
+
+/***************************************/
+/* from sched.c                 */
+/***************************************/
+void fts_sched_run(void){}
+void fts_sched_halt(void){}
+void fts_sleep(void){}
+int fts_sched_remove( fts_object_t *obj)
+{
+	return -1;
+}
+int fts_sched_add( fts_object_t *obj, int flags, ...)
+{
+	return 0;
+}
+void fts_kernel_sched_init(void){}

@@ -69,10 +69,6 @@ extern "C" {
 #define FTS_API extern
 #endif
 
-#if defined(__POWERPC__) && !(defined(__APPLE__) && defined(__MACH__))
-#include <unixfunc.h>
-#endif
-
 /* *** The inclusion order is important *** */
 #include <fts/types.h>
 #include <fts/status.h>
@@ -126,6 +122,10 @@ extern "C" {
 #include <fts/update.h>
 
 #include <fts/binaryprotocol.h>
+
+#if defined(__POWERPC__) && !(defined(__APPLE__) && defined(__MACH__))
+#include <unixfunc.h>
+#endif
 
 /*
  * FTS version 
