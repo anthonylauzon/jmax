@@ -165,6 +165,24 @@ class JMaxClient extends FtsObject {
     send( FtsSymbol.get("load_summary"), args);
   }
   
+  FtsArgs args = new FtsArgs();
+  void registerObject(int nArgs , FtsAtom argums[])
+  {            
+    if(nArgs > 1 && argums[0].isInt() && argums[1].isSymbol())
+    {
+      int id = argums[0].intValue;
+      String className = argums[1].symbolValue.toString();
+      
+      FtsObject obj = JMaxApplication.getFtsServer().getObject(id);
+      if(obj == null)
+      {
+        args.clear();
+        args.addString(className);
+        JMaxApplication.getObjectManager().makeFtsObject(id, className, args.getAtoms());
+      }
+    }  
+  }  
+  
   static
   {
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "patcher_loaded"), new LoadPatcherMessageHandler());
@@ -179,6 +197,12 @@ class JMaxClient extends FtsObject {
                                          args.getSymbol( 0).toString(), "Warning", JOptionPane.INFORMATION_MESSAGE);
     }
     });
+    FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get("register_object"), new FtsMessageHandler(){
+      public void invoke( FtsObject obj, FtsArgs args)
+    {
+        ((JMaxClient)obj).registerObject( args.getLength(), args.getAtoms());
+    }
+    });  
   }
 }
 

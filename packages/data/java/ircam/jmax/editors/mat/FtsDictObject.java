@@ -114,7 +114,7 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
     {
       int m = args[0].intValue;
       int n = args[1].intValue;
-            
+      
       for(int i = 2; i < nArgs; i++)
       {
         if(n >= n_cols)

@@ -1062,18 +1062,10 @@ track_upload_event(track_t *self, event_t *event, fts_array_t *temp_array)
       }
       else /* not a score object but other object as fmat */ 
       {
-        fts_atom_t b[2];
         /* register value and send object id as value-property */
         fts_object_t *valobj = fts_get_object( event_get_value( event));
-        
-        if(fts_object_has_client(valobj) == 0)
-          fts_client_register_object(valobj, fts_object_get_client_id((fts_object_t *)self));	
-        
-        /* register obj at client */
-        fts_set_int(b, fts_object_get_id(valobj));
-        fts_set_symbol(b+1, fts_object_get_class_name(valobj));
-        fts_client_send_message((fts_object_t *)self, fts_s_register_object, 2, b);
-        /*************************/
+
+        fts_client_upload_object(valobj, fts_object_get_client_id((fts_object_t *)self));
         
         fts_array_append_symbol(temp_array, seqsym_objid);
         fts_array_append_int(temp_array, fts_object_get_id(valobj));                  

@@ -259,21 +259,9 @@ dict_upload_data(dict_t *self)
       
       if(fts_is_object(d))
       {
-        fts_atom_t b[3];
         fts_object_t *dobj = fts_get_object(d);
-        
-        if(fts_object_has_client(dobj) == 0)
-          fts_client_register_object(dobj, fts_object_get_client_id((fts_object_t *)self));	
-        
-        fts_set_int(b, fts_object_get_id(dobj));
-        fts_set_symbol(b+1, fts_object_get_class_name(dobj));
-        
-        fts_memorystream_reset(stream);
-        fts_spost_object((fts_bytestream_t *)stream, dobj);
-        fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
-        fts_set_symbol(b+2,  fts_new_symbol((char *)fts_memorystream_get_bytes( stream)));
-        
-        fts_client_send_message((fts_object_t *)self, fts_s_register_object, 3, b);
+ 
+        fts_client_upload_object(dobj, fts_object_get_client_id((fts_object_t *)self));
         
         fts_send_message(dobj, fts_s_update_gui, 0, 0);
         

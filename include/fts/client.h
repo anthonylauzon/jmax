@@ -138,4 +138,5 @@ FTS_API void fts_client_done_message( fts_object_t *obj);
 FTS_API void fts_client_register_object( fts_object_t *obj, int client_id);
 FTS_API void fts_client_release_object( fts_object_t *obj);
 FTS_API void fts_client_unregister_object( fts_object_t *obj);
+FTS_API void fts_client_upload_object( fts_object_t *obj, int client_id);
 

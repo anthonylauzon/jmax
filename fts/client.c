@@ -1291,6 +1291,37 @@ void fts_client_unregister_object(fts_object_t *obj)
   }
 }
 
+/***************************************************************************/
+#define CLIENT_BLOCK_SIZE 128
+
+static fts_memorystream_t *client_memory_stream ;
+
+static fts_memorystream_t *client_get_memory_stream()
+{
+  if(!client_memory_stream)
+    client_memory_stream = (fts_memorystream_t *)fts_object_create(fts_memorystream_class, 0, 0);
+  
+  return client_memory_stream;
+}
+
+void fts_client_upload_object(fts_object_t *obj, int client_id)
+{
+  fts_atom_t b[3];
+  fts_memorystream_t *stream = client_get_memory_stream();
+  
+  if(fts_object_has_client(obj) == 0)
+    fts_client_register_object(obj, client_id);	
+  
+  fts_set_int(b, fts_object_get_id(obj));
+  fts_set_symbol(b+1, fts_object_get_class_name(obj));
+  
+  fts_memorystream_reset(stream);
+  fts_spost_object((fts_bytestream_t *)stream, obj);
+  fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
+  fts_set_symbol(b+2,  fts_new_symbol((char *)fts_memorystream_get_bytes( stream)));
+  
+  fts_client_send_message((fts_object_t *) client_get_object( client_table_get(client_id), FTS_OBJECT_ID_CLIENT), fts_s_register_object, 3, b);
+}
 /***********************************************************************
 *
 * Initialization
