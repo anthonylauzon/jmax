@@ -1570,8 +1570,6 @@ public void openEditor(int argc, FtsAtom[] argv)
   if(getEditorFrame() == null)
     setEditorFrame( new TrackWindow(this));
   
-  restoreEditorState();
-
   showEditor();
 }
 
@@ -1601,6 +1599,7 @@ void startUpload( int size)
 void endUpload()
 {
   uploading = false;
+  restoreEditorState();
   notifyUploadEnd();
 }
 
