@@ -30,7 +30,7 @@ PACKAGE_DIR = ircam/jmax/script
 include $(ROOTDIR)/java/Makefiles/Makefile.common
 
 all: local_all
-#	(cd tcl ; $(MAKE) $@)
+	(cd tcl ; $(MAKE) $@)
 	(cd scm ; $(MAKE) $@)
 	(cd pkg ; $(MAKE) $@)
 .PHONY: all
@@ -39,7 +39,7 @@ local_all: $(CLASSES)
 .PHONY: local_all
 
 clean: local_clean
-#	(cd tcl ; $(MAKE) $@)
+	(cd tcl ; $(MAKE) $@)
 	(cd scm ; $(MAKE) $@)
 	(cd pkg ; $(MAKE) $@)
 .PHONY: clean
