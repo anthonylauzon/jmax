@@ -17,6 +17,7 @@ img_DATA=\
  genericAdder.gif \
  note.gif \
  float.gif \
+ fmat.gif \
  integer.gif \
  message.gif \
  anything.gif \
