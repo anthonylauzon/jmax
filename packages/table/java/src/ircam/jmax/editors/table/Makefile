@@ -21,6 +21,10 @@ TableExtension:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TableExtension.java )
 .PHONY: TableExtension
 
+TablePanel:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TablePanel.java )
+.PHONY: TablePanel
+
 include $(ROOTDIR)/packages/table/java/Makefiles/Makefile.misc
 
 

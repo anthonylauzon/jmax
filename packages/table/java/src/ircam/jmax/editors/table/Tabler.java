@@ -125,7 +125,10 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
     GetEditMenu().add(itsRefreshMenuItem);
     itsRefreshMenuItem.addActionListener(new ActionListener() {
       public  void actionPerformed(ActionEvent e)
-	{ itsTablePanel.paint(itsTablePanel.getGraphics());}});
+	{ 
+	  ((FtsIntegerVector)(itsData.getContent())).forceUpdate();
+	  itsTablePanel.paint(itsTablePanel.getGraphics());
+	}});
   }
 
   public void setCoordinates(int x, int y){

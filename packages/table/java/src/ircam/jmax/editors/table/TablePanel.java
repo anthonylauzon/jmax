@@ -104,6 +104,7 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     values[x] = y;
     PaintSingle(x, getGraphics());
   }
+
   public void mouseReleased(MouseEvent e){
     ((FtsIntegerVector)(itsTabler.itsData.getContent())).changed();
     ((FtsIntegerVector)(itsTabler.itsData.getContent())).forceUpdate();
@@ -186,6 +187,7 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
 	itsTabler.itsFormula.setText(e1.toString());
 	return;
       }
+      ((FtsIntegerVector)(itsTabler.itsData.getContent())).changed();
       PaintSingle(i, getGraphics());
     }
   }
