@@ -1,3 +1,9 @@
+2003-07-10  Borghesi  <borghesi@mac-schnell3.ircam.fr>
+
+	* java/src/ircam/jmax/editors/console/ConsoleWindow.java
+	closed bug "[ 768934 ] Close Button in jMax Console".
+	 "Close Button" of ConsoleWindow mapped on "Quit Action" 
+	
 2003-07-10  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* packages/io/c/src/udpreceive.c, packages/io/c/src/udpsend.c, packages/io/c/src/jmax25_protocol.h:
