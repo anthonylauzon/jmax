@@ -30,6 +30,7 @@
 typedef struct {
   fts_dsp_object_t head;
   fts_audiolabel_t* label;
+  fts_symbol_t label_name;
 } in_tilda_t;
 
 static fts_symbol_t in_tilda_symbol = 0;
@@ -51,7 +52,14 @@ in_tilda_put(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom
   in_tilda_t* self = (in_tilda_t*)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t*)fts_get_pointer(at);
   fts_atom_t argv[3];
-  
+
+  self->label = fts_audiolabel_get(self->label_name);
+  if (NULL == self->label)
+  {
+    fts_object_error(o, "no audiolabel named: %s", self->label_name);
+    return;
+  }
+    
   fts_set_object(argv+0, self);
   fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
   fts_set_int(argv+2, fts_dsp_get_output_size(dsp, 0));
@@ -62,6 +70,7 @@ in_tilda_put(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void in_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   in_tilda_t *self = (in_tilda_t *)o;
+  fts_symbol_t label_name;
 
   fts_dsp_object_init((fts_dsp_object_t*)self);
 
@@ -69,20 +78,23 @@ static void in_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   {
     if (!fts_is_symbol(at))
     {
-      fts_object_error(o, "in~ need an audiolabel as first argument \n");
+      fts_object_error(o, "in~ need an audiolabel as first argument");
       return;
     }
+    label_name = fts_get_symbol(at);
 
-    self->label = fts_audiolabel_get(fts_get_symbol(at));
+    self->label = fts_audiolabel_get(label_name);
     if (NULL == self->label)
     {
-      fts_object_error(o, "no such audiolabel !!! \n");
+      fts_object_error(o, "no audiolabel named: %s", label_name);
       return;
     }
+    self->label_name = label_name;
   }
   else
   {
     self->label = fts_audiolabel_get(fts_s_default);
+    self->label_name = fts_s_default;
   }
 
 }
@@ -108,6 +120,7 @@ static void in_tilda_instantiate(fts_class_t *cl)
 typedef struct {
   fts_dsp_object_t head;
   fts_audiolabel_t *label;
+  fts_symbol_t label_name;
 } out_tilda_t;
 
 static fts_symbol_t out_tilda_symbol = 0;
@@ -130,6 +143,13 @@ out_tilda_put(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t*)fts_get_pointer(at);
   fts_atom_t argv[3];
 
+  self->label = fts_audiolabel_get(self->label_name);
+  if (NULL == self->label)
+  {
+    fts_object_error(o, "no audiolabel named: %s\n", self->label_name);
+    return;
+  }
+
   fts_set_object(argv+0, self);
   fts_set_symbol(argv+1, fts_dsp_get_input_name(dsp, 0));
   fts_set_int(argv+2, fts_dsp_get_input_size(dsp, 0));
@@ -140,6 +160,7 @@ out_tilda_put(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void out_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   out_tilda_t *self = (out_tilda_t *)o;
+  fts_symbol_t label_name;
 
   fts_dsp_object_init((fts_dsp_object_t*)self);
 
@@ -147,20 +168,22 @@ static void out_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   {
     if (!fts_is_symbol(at))
     {
-      fts_object_error(o, "out~ need an audiolabel as first argument \n");
+      fts_object_error(o, "out~ need an audiolabel as first argument");
       return;
     }
-
-    self->label = fts_audiolabel_get(fts_get_symbol(at));
+    label_name = fts_get_symbol(at);
+    self->label = fts_audiolabel_get(label_name);
     if (NULL == self->label)
     {
-      fts_object_error(o, "no such audiolabel !!! \n");
+      fts_object_error(o, "no audiolabel named: %s\n", label_name);
       return;
     }
+    self->label_name = label_name;
   }
   else
   {
     self->label = fts_audiolabel_get(fts_s_default);
+    self->label_name = fts_s_default;
   }
 
 }
