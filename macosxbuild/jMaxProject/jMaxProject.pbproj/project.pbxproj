@@ -20530,8 +20530,6 @@
 		};
 		F8DC5F0F0286BF2401664092 = {
 			children = (
-				F8DC5F110286BF2401664092,
-				F8DC5F140286BF2401664092,
 				F8DC5F150286BF2401664092,
 				F8DC5F160286BF2401664092,
 				F8DC5F190286BF2401664092,
@@ -20542,18 +20540,6 @@
 			isa = PBXGroup;
 			name = c;
 			refType = 4;
-		};
-		F8DC5F110286BF2401664092 = {
-			isa = PBXFileReference;
-			name = argument.c;
-			path = ../../packages/system/c/src/argument.c;
-			refType = 2;
-		};
-		F8DC5F140286BF2401664092 = {
-			isa = PBXFileReference;
-			name = const.c;
-			path = ../../packages/system/c/src/const.c;
-			refType = 2;
 		};
 		F8DC5F150286BF2401664092 = {
 			isa = PBXFileReference;
@@ -20666,8 +20652,6 @@
 		F8DC5F210286BF2501664092 = {
 			buildActionMask = 2147483647;
 			files = (
-				F8DC5F230286BF2501664092,
-				F8DC5F260286BF2501664092,
 				F8DC5F270286BF2501664092,
 				F8DC5F280286BF2501664092,
 				F8DC5F2A0286BF2501664092,
@@ -20676,18 +20660,6 @@
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F8DC5F230286BF2501664092 = {
-			fileRef = F8DC5F110286BF2401664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8DC5F260286BF2501664092 = {
-			fileRef = F8DC5F140286BF2401664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F8DC5F270286BF2501664092 = {
 			fileRef = F8DC5F150286BF2401664092;
