@@ -154,6 +154,10 @@ public class ErmesObject implements FtsPropertyHandler {
     
     Rectangle aRect = currentRect;
     int maxPads = (n_outlts > n_inlts) ? n_outlts : n_inlts;
+
+
+
+    itsFtsObject.setRepresentation(this);
     if (maxPads * PADS_DISTANCE > aRect.width) { //the pads are longer then the element
       Reshape(aRect.x, aRect.y, maxPads*PADS_DISTANCE, aRect.height);
 

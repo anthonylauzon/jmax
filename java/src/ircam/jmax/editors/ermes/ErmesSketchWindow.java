@@ -27,10 +27,29 @@ import com.sun.java.swing.*;
 public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPropertyHandler {
 
   public void propertyChanged(FtsObject object, String name, Object value) {
+    //    System.err.println("cambiata la proprieta' "+name);
     if (name.equals("newObject"))
       ftsObjectsPasted.addElement(value);
     else if (name.equals("newConnection"))
       ftsConnectionsPasted.addElement(value);
+    else if (name.equals("deletedObject")) {
+      // just an hack: remove the watch temporarly, add it just after.
+      //we should avoid the propagations of changing-property to the originator
+      //of the change itself
+      itsPatcher.removeWatch(this);
+      itsSketchPad.itsHelper.DeleteObject((ErmesObject)(((FtsObject)value).getRepresentation()));
+      itsPatcher.watch("deletedObject", this);
+      //another problem: allow the watch removing for single properties!
+itsPatcher.watch("deletedConnection", this);
+    }
+    else if (name.equals("deletedConnection")) {
+      //see previous comment..
+      System.err.println(value.getClass().getName());
+      /*itsPatcher.removeWatch(this);
+	itsSketchPad.itsHelper.DeleteConnectionByInOut(ErmesObject)(((FtsObject)value).getRepresentation()));
+	itsPatcher.watch("deletedObject", this);
+	itsPatcher.watch("deletedConnection", this);*/
+    }
   }
 
   FtsSelection itsSelection;

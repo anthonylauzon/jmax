@@ -84,7 +84,13 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 
   public void redefineFtsObject()
   {
-    ((FtsPatcherObject)itsFtsObject).redefinePatcher(itsArgs);  
+    //the parent patcher could destroy connections...
+    GetSketchWindow().itsPatcher.watch("deletedConnection",GetSketchWindow());
+    //the children could destroy connections AND objects
+    itsSubWindow.itsPatcher.watch("deletedObject", itsSubWindow);
+     itsSubWindow.itsPatcher.watch("deletedConnection", itsSubWindow);
+    ((FtsPatcherObject)itsFtsObject).redefinePatcher(itsArgs);
+    itsFtsObject.removeWatch(itsSubWindow);  
   }
   
 	
@@ -159,7 +165,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 	  
 
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
-     if (!itsSketchPad.itsRunMode) {
+    //if (!itsSketchPad.itsRunMode) {
        if(evt.getClickCount()>1) {
 	 {	
 	   if (itsSubWindow != null) {//show the subpatcher, it's there
@@ -176,8 +182,8 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
        }
        itsSketchPad.ClickOnObject(this, evt, x, y);
        return true;
-     }
-     else return true;	//run mode, no editing, no subpatcher opening (?)
+       //}
+       /*else return true;*/	//run mode, no editing, no subpatcher opening (?)
    }
 	
   //--------------------------------------------------------

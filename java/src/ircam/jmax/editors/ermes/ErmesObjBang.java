@@ -78,7 +78,6 @@ class ErmesObjBang extends ErmesObject {
       {
 	// Enzo !!! Aiuto :-> (MDC)
       }
-
   }
   
   public void redefineFtsObject() {

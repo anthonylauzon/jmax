@@ -90,6 +90,7 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       itsOwner.redefineFtsObject();
     }
     else {
+
       itsOwner.itsArgs = aTextString;
       
       itsOwner.ParseText(aTextString);
