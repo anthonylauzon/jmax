@@ -61,6 +61,7 @@ udpsend_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void udpsend_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   udpsend_t *self = (udpsend_t *)o;
+  fts_bytestream_t* udp_stream;
 
   /* create binary protocol */
   self->binary_protocol = (fts_binary_protocol_t*)fts_object_create(fts_binary_protocol_type, 0, NULL);
@@ -76,13 +77,13 @@ static void udpsend_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
       && fts_is_object(at)
       && (fts_get_class(at) == fts_udpstream_class))
   {
-    self->udp_stream = (fts_bytestream_t*)fts_get_object(at);
+    udp_stream = (fts_bytestream_t*)fts_get_object(at);
   }
   else
   {
     /* create udp stream */
-    self->udp_stream = (fts_bytestream_t*)fts_object_create(fts_udpstream_class, ac, at);
-    if (self->udp_stream == NULL)
+    udp_stream = (fts_bytestream_t*)fts_object_create(fts_udpstream_class, ac, at);
+    if (udp_stream == NULL)
     {
       fts_object_error(o, "Cannot create udp stream component (%s)", fts_get_error());
       return;
@@ -90,12 +91,13 @@ static void udpsend_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   }
   
   /* check if bytestream is an output one */
-  if (!fts_bytestream_is_output(self->udp_stream))
+  if (!fts_bytestream_is_output(udp_stream))
   {
     fts_object_error(o, "udpsend need an output udpstream");
     return;
   }
 
+  self->udp_stream = udp_stream;
   fts_object_refer((fts_object_t*)self->udp_stream);
 }
 

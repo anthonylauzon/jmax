@@ -98,22 +98,39 @@ static void
 udpin_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   udp_t *self = (udp_t *)o;
-
+  fts_bytestream_t* udp_stream;
   /* check number of argument */
   if ((ac == 1) 
       && fts_is_object(at)
       && (fts_get_class(at) == fts_udpstream_class))
   {
-    self->udp_stream = (fts_bytestream_t*)fts_get_object(at);
-    fts_object_refer((fts_object_t*)self->udp_stream);
+    udp_stream = (fts_bytestream_t*)fts_get_object(at);
+    if (!fts_bytestream_is_input(udp_stream))
+    {
+      fts_object_error(o, "udpin need an input udpstream as argument");
+      return;
+    }
+    else
+    {
+      self->udp_stream = udp_stream;
+      fts_object_refer((fts_object_t*)self->udp_stream);
+    }
   }
   else
   {
     /* create udp stream */
-    self->udp_stream = (fts_bytestream_t*)fts_object_create(fts_udpstream_class, ac, at);
-    if (self->udp_stream != NULL)
+    udp_stream = (fts_bytestream_t*)fts_object_create(fts_udpstream_class, ac, at);
+    if (udp_stream != NULL)
     {
-      fts_object_refer((fts_object_t*)self->udp_stream);
+      if (!fts_bytestream_is_input(udp_stream))
+      {
+	fts_object_error(o, "cannot create an input udpstream with given arguments");
+      }
+      else
+      {
+	self->udp_stream = udp_stream;
+	fts_object_refer((fts_object_t*)self->udp_stream);
+      }
     }
     else
     {
@@ -142,22 +159,40 @@ static void
 udpout_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   udp_t *self = (udp_t *)o;
+  fts_bytestream_t* udp_stream;
 
   /* check number of argument */
   if ((ac == 1) 
       && fts_is_object(at)
       && (fts_get_class(at) == fts_udpstream_class))
   {
-    self->udp_stream = (fts_bytestream_t*)fts_get_object(at);
-    fts_object_refer((fts_object_t*)self->udp_stream);
+    udp_stream = (fts_bytestream_t*)fts_get_object(at);
+    if (!fts_bytestream_is_output(udp_stream))
+    {
+      fts_object_error(o,"udpout need an output udpstream as arguments");
+      return;
+    }
+    else
+    {
+      self->udp_stream = udp_stream;
+      fts_object_refer((fts_object_t*)self->udp_stream);
+    }
   }
   else
   {
     /* create udp stream */
-    self->udp_stream = (fts_bytestream_t*)fts_object_create(fts_udpstream_class, ac, at);
-    if (self->udp_stream != NULL)
+    udp_stream = (fts_bytestream_t*)fts_object_create(fts_udpstream_class, ac, at);
+    if (udp_stream != NULL)
     {
-      fts_object_refer((fts_object_t*)self->udp_stream);
+      if (!fts_bytestream_is_output(udp_stream))
+      {
+	fts_object_error(o, "cannot create an output udpstream with given arguments");
+      }
+      else
+      {
+	self->udp_stream = udp_stream;
+	fts_object_refer((fts_object_t*)self->udp_stream);
+      }
     }
     else
     {
