@@ -1947,7 +1947,7 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   self->objects = NULL;
 
   /* delete arguments */
-  fts_tuple_destroy(self->args);
+  fts_object_release(self->args);
   
   /* delete the inlet and outlet tables */
   if (self->inlets)
