@@ -174,6 +174,9 @@ fts_atom_copy( const fts_atom_t *from, fts_atom_t *to)
   *to = *from;
 }
 
+
+
+
 /***********************************************************************
  *
  * Initialization
@@ -185,18 +188,17 @@ static fts_class_t VAR =                                        \
 {                                                               \
   /* class object header */                                     \
   {                                                             \
-    0, /* class */                                              \
-    {0,0,0}, /* flags */                                        \
-    0, /* reference counter */                                  \
-    0 /* patcher data */                                        \
+    0,         /* class */                                      \
+    {0, 0, 0}, /* flags */                                      \
+    0,         /* reference counter */                          \
+    0          /* patcher data */                               \
   },                                                            \
   /* class structure */                                         \
-  0, /*  */                                                     \
-  TYPEID, /*  */                                                \
+  0, /* name */                                                 \
+  TYPEID, /* type_id */                                         \
   0, /* hash_function */                                        \
   0, /* equals_function */                                      \
   0, /* copy_function */                                        \
-  0, /* post_function */                                        \
   0, /* array_function */                                       \
   0, /* description_function */                                 \
   { 0, 0, 0, 0 }, /* struct fts_array import_handlers */        \
