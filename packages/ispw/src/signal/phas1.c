@@ -17,86 +17,71 @@
 static fts_symbol_t phasor_function = 0;
 static fts_symbol_t phasor_inplace_function = 0;
 
+/******************************************************************
+ *
+ *  object
+ *
+ */
+
 typedef struct 
 {
-  double phase;
-  float fconv;
+  fts_wrapper_t phase;
+  double incr;
 } phasor_state_t;
-
-
-
-static void ftl_phasor(fts_word_t *argv)
-{
-  float * restrict freq = (float *)  fts_word_get_ptr(argv + 0);
-  float * restrict out  = (float *)  fts_word_get_ptr(argv + 1);
-  phasor_state_t * restrict x = (phasor_state_t *) fts_word_get_ptr(argv + 2);
-  int n = fts_word_get_long(argv + 3);
-  int phase;
-  float fconv;
-  int i;
-
-  phase = 0x7fffffffL * x->phase;
-  fconv = x->fconv * 0x7fffffffL;
-
-  for (i = 0; i < n ; i ++)
-    {
-      phase = (phase + (int)(fconv * freq[i])) & 0x7fffffffL;
-      out[i] = (1.0f/0x7fffffffL) * phase;
-    }
-
-  x->phase = (1.0f/0x7fffffffL) * phase;
-}
-
-static void ftl_inplace_phasor(fts_word_t *argv)
-{
-  float * restrict sig = (float *)  fts_word_get_ptr(argv + 0);
-  phasor_state_t * restrict x = (phasor_state_t *) fts_word_get_ptr(argv + 1);
-  long int n = fts_word_get_long(argv + 2);
-  int phase;
-  float fconv;
-  int i;
-
-  phase = 0x7fffffffL * x->phase;
-  fconv = x->fconv * 0x7fffffffL;
-
-  for (i = 0; i < n ; i ++)
-    {
-      phase = (phase + (int)(fconv * sig[i])) & 0x7fffffffL;
-      sig[i] = (1.0f/0x7fffffffL) * phase;
-    }
-
-  x->phase = (1.0f/0x7fffffffL) * phase;
-}
-
 
 typedef struct 
 {
   fts_object_t _o;
-
-  ftl_data_t phasor_ftl_data;
+  ftl_data_t state;
 } phasor_t;
 
+static void
+phasor_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  phasor_t *this = (phasor_t *)o;
+  phasor_state_t *state;
+
+  this->state = ftl_data_new(phasor_state_t);
+  state = ftl_data_get_ptr(this->state);
+
+  fts_wrapper_frac_set(&state->phase, 0.0);
+
+  dsp_list_insert(o);
+}
+
+static void
+phasor_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  phasor_t *this = (phasor_t *)o;
+
+  ftl_data_free(this->state);
+  dsp_list_remove(o);
+}
+
+/******************************************************************
+ *
+ *  dsp
+ *
+ */
 
 static void
 phasor_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   phasor_t *this = (phasor_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  phasor_state_t *state = ftl_data_get_ptr(this->state);
   fts_atom_t argv[4];
-  float fconv;
-  const double zero = 0.0f;
+  double incr;
 
-  fconv = 1.0f / fts_dsp_get_input_srate(dsp, 0);
-
-  ftl_data_set(phasor_state_t, this->phasor_ftl_data, fconv, &fconv);
+  state->incr = (double)1.0 / (double)fts_dsp_get_input_srate(dsp, 0);
 
   if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
     {
       /* Use the inplace version */
 
-      fts_set_symbol( argv, fts_dsp_get_input_name(dsp, 0));
-      fts_set_ftl_data( argv+1, this->phasor_ftl_data);
-      fts_set_long( argv+2, fts_dsp_get_input_size(dsp, 0));
+      fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
+      fts_set_ftl_data(argv+1, this->state);
+      fts_set_long(argv+2, fts_dsp_get_input_size(dsp, 0));
 
       dsp_add_funcall(phasor_inplace_function, 3, argv);
     }
@@ -105,26 +90,57 @@ phasor_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       /* standard code */
       fts_set_symbol( argv, fts_dsp_get_input_name(dsp, 0));
       fts_set_symbol( argv+1, fts_dsp_get_output_name(dsp, 0));
-      fts_set_ftl_data( argv+2, this->phasor_ftl_data);
+      fts_set_ftl_data( argv+2, this->state);
       fts_set_long( argv+3, fts_dsp_get_input_size(dsp, 0));
 
       dsp_add_funcall(phasor_function, 4, argv);
     }
 }
 
-
-static void
-phasor_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void ftl_phasor(fts_word_t *argv)
 {
-  phasor_t *this = (phasor_t *)o;
-  const double zero = 0.0f;
+  float * restrict freq = (float *)  fts_word_get_ptr(argv + 0);
+  float * restrict out  = (float *)  fts_word_get_ptr(argv + 1);
+  phasor_state_t * restrict state = (phasor_state_t *) fts_word_get_ptr(argv + 2);
+  int n = fts_word_get_long(argv + 3);
+  double incr = state->incr;
+  fts_wrapper_t phi = state->phase;
+  int i;
 
-  this->phasor_ftl_data = ftl_data_new(phasor_state_t);
-  ftl_data_set(phasor_state_t, this->phasor_ftl_data, phase, &zero);
+  for(i=0; i<n; i++)
+    {
+      float freq = freq[i];
+      out[i] = fts_wrapper_frac_get_wrap(&phi);
+      fts_wrapper_incr(&phi, freq * incr);
+    }
 
-  dsp_list_insert(o);		/* just put object in list */
+  state->phase = phi;
 }
 
+static void ftl_inplace_phasor(fts_word_t *argv)
+{
+  float * restrict sig = (float *)  fts_word_get_ptr(argv + 0);
+  phasor_state_t * restrict state = (phasor_state_t *) fts_word_get_ptr(argv + 1);
+  long int n = fts_word_get_long(argv + 2);
+  double incr = state->incr;
+  fts_wrapper_t phi = state->phase;
+  int i;
+
+  for(i=0; i<n; i++)
+    {
+      float freq = sig[i];
+      sig[i] = fts_wrapper_frac_get_wrap(&phi);
+      fts_wrapper_incr(&phi, freq * incr);
+    }
+
+  state->phase = phi;
+}
+
+/******************************************************************
+ *
+ *  user methods
+ *
+ */
 
 static void
 phasor_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -137,21 +153,17 @@ static void
 phasor_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   phasor_t *this = (phasor_t *)o;
+  phasor_state_t *state = ftl_data_get_ptr(this->state);
   double f = (double) fts_get_number(at);
 
-  ftl_data_set(phasor_state_t, this->phasor_ftl_data, phase, &f);
+  fts_wrapper_frac_set(&state->phase, f);
 }
 
-
-static void
-phasor_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  phasor_t *this = (phasor_t *)o;
-
-  ftl_data_free(this->phasor_ftl_data);
-  dsp_list_remove(o);
-}
-
+/******************************************************************
+ *
+ *  class
+ *
+ */
 
 static fts_status_t
 phasor_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -191,5 +203,5 @@ phasor_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 phasor_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("phasor~"),phasor_instantiate, fts_always_equiv);
+  fts_metaclass_create(fts_new_symbol("phasor~"), phasor_instantiate, fts_always_equiv);
 }

@@ -36,8 +36,6 @@ typedef struct
   ftl_data_t ftl_data;
 } sigline_t;
 
-
-
 static void ftl_line(fts_word_t *argv)
 {
   float * restrict fp = (float *)fts_word_get_ptr(argv);

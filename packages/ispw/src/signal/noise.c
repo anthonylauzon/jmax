@@ -107,5 +107,3 @@ noise_config(void)
 {
   fts_metaclass_create(fts_new_symbol("noise~"), noise_instantiate, fts_always_equiv);
 }
-
-
