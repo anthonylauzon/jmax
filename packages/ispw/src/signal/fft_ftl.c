@@ -152,8 +152,7 @@ ftl_fft_complex(fts_word_t *argv)
     /* fts_vecx_scl_cfmul(spec, (float)(1./size), spec, size); */
     in_idx = out_idx = 0;
     ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.01f);
-    fts_alarm_arm(&ctl->alarm);
+    fts_alarm_set_delay(&ctl->alarm, 0.0);
   }
   
   ctl->out_idx = out_idx;
@@ -193,8 +192,7 @@ ftl_ifft_complex(fts_word_t *argv)
     fts_cifft(spec, buf, size);
     in_idx = out_idx = 0;
     ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.01f);
-    fts_alarm_arm(&ctl->alarm);
+    fts_alarm_set_delay(&ctl->alarm, 0.0);
   }
   
   ctl->out_idx = out_idx;
@@ -237,8 +235,7 @@ ftl_fft_real(fts_word_t *argv)
     complete_symetric_spectrum_inplc_after_rfft(spec, size);
     in_idx = out_idx = 0;
     ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.01f);
-    fts_alarm_arm(&ctl->alarm);
+    fts_alarm_set_delay(&ctl->alarm, 0.0);
   }
   
   ctl->out_idx = out_idx;
@@ -265,8 +262,7 @@ ftl_ifft_real(fts_word_t *argv)
       fts_rifft(spec, buf, size);
       in_idx = out_idx = 0;
       ctl->gap_count = ctl->gap_size;
-      fts_alarm_set_delay(&ctl->alarm, 0.01f);
-      fts_alarm_arm(&ctl->alarm);
+      fts_alarm_set_delay(&ctl->alarm, 0.0);
     }
     fts_vecx_cmerge(in0, in1, spec + in_idx, n_tick);
     in_idx += n_tick;
@@ -318,8 +314,7 @@ ftl_fft_real_half(fts_word_t *argv)
     /* fts_vecx_scl_cfmul(spec, (float)(1./size), spec, spec_size); */
     in_idx = out_idx = 0;
     ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.01f);
-    fts_alarm_arm(&ctl->alarm);
+    fts_alarm_set_delay(&ctl->alarm, 0.0);
   }
   
   ctl->out_idx = out_idx;
@@ -359,8 +354,7 @@ ftl_ifft_real_half(fts_word_t *argv)
     fts_rifft(spec, buf, size);
     in_idx = out_idx = 0;
     ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.01f);
-    fts_alarm_arm(&ctl->alarm);
+    fts_alarm_set_delay(&ctl->alarm, 0.0);
   }
   
   ctl->out_idx = out_idx;
@@ -409,8 +403,7 @@ ftl_fft_tandem(fts_word_t *argv)
     shuffle_after_cfft_for_tandem(buf, spec, spec + size, size);
     in_idx = out_idx = 0;
     ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.01f);
-    fts_alarm_arm(&ctl->alarm);
+    fts_alarm_set_delay(&ctl->alarm, 0.0);
   }
   
   ctl->out_idx = out_idx;
@@ -454,8 +447,7 @@ ftl_ifft_tandem(fts_word_t *argv)
     fts_cifft_inplc(buf, size);
     in_idx = out_idx = 0;
     ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.01f);
-    fts_alarm_arm(&ctl->alarm);
+    fts_alarm_set_delay(&ctl->alarm, 0.0);
   }
   
   ctl->out_idx = out_idx;
@@ -504,8 +496,7 @@ ftl_fft_tandem_half(fts_word_t *argv)
     shuffle_after_cfft_for_tandem_half(buf, spec, spec + spec_size, size);
     in_idx = out_idx = 0;
     ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.01f);
-    fts_alarm_arm(&ctl->alarm);
+    fts_alarm_set_delay(&ctl->alarm, 0.0);
   }
   
   ctl->out_idx = out_idx;
@@ -551,8 +542,7 @@ ftl_ifft_tandem_half(fts_word_t *argv)
     fts_cifft_inplc(buf, size);
     in_idx = out_idx = 0;
     ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.01f);
-    fts_alarm_arm(&ctl->alarm);
+    fts_alarm_set_delay(&ctl->alarm, 0.0);
   }
   
   ctl->out_idx = out_idx;
@@ -597,8 +587,7 @@ ftl_fft_real_miller(fts_word_t *argv)
 _cfmul(spec, (float)(1./size), spec, spec_size); */
     in_idx = out_idx = 0;
     ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.01f);
-    fts_alarm_arm(&ctl->alarm);
+    fts_alarm_set_delay(&ctl->alarm, 0.0);
   }
   
   ctl->out_idx = out_idx;
@@ -638,8 +627,7 @@ ftl_ifft_real_miller(fts_word_t *argv)
     fts_rifft(spec, buf, size);
     in_idx = out_idx = 0;
     ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.01f);
-    fts_alarm_arm(&ctl->alarm);
+    fts_alarm_set_delay(&ctl->alarm, 0.0);
   }
   
   ctl->out_idx = out_idx;
@@ -687,8 +675,7 @@ ftl_fft_tandem_miller(fts_word_t *argv)
     shuffle_after_cfft_for_tandem_half(buf, spec, spec + spec_size, size);
     in_idx = out_idx = 0;
     ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.01f);
-    fts_alarm_arm(&ctl->alarm);
+    fts_alarm_set_delay(&ctl->alarm, 0.0);
   }
   
   ctl->out_idx = out_idx;
@@ -735,8 +722,7 @@ ftl_ifft_tandem_miller(fts_word_t *argv)
     fts_cifft_inplc(buf, size);
     in_idx = out_idx = 0;
     ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.01f);
-    fts_alarm_arm(&ctl->alarm);
+    fts_alarm_set_delay(&ctl->alarm, 0.0);
   }
   
   ctl->out_idx = out_idx;

@@ -39,10 +39,12 @@ extern void signal_matrix_config(void);
 
 extern void signal_cut_config(void);
 
+extern void signal_play_config(void);
 extern void signal_play_fvec_config(void);
+extern void signal_play_bpf_config(void);
+
 extern void signal_rec_fvec_config(void);
 
-/*extern void signal_play_bpf_config(void);*/
 
 
 static void
@@ -61,10 +63,11 @@ signal_init(void)
 
   signal_cut_config();
 
+  signal_play_config();
   signal_play_fvec_config();
-  signal_rec_fvec_config();
+  signal_play_bpf_config();
 
-  /*signal_play_bpf_config();*/
+  signal_rec_fvec_config();
 }
 
 fts_module_t signal_module = {"signal", "basic signal classes", signal_init, 0, 0};

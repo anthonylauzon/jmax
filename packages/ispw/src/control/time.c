@@ -25,11 +25,6 @@
  */
 
 /* 
-   The time class; return on outlet 0 the logical time of the
-   given clock, when it receive the bang.
-   Accept an optional argument, declaring the clock used; default
-   to ms.
-
    Don't call this object time_t: it conflict with system types
    in many platforms.
 */
@@ -39,7 +34,6 @@
 typedef struct 
 {
   fts_object_t ob;
-  fts_symbol_t clock_sym;
 } timeobj_t;
 
 static void
@@ -47,17 +41,14 @@ time_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   timeobj_t *x = (timeobj_t *)o;
 
-  fts_outlet_float(o, 0, fts_clock_get_time(x->clock_sym));
+  fts_outlet_float(o, 0, fts_get_time());
 }
 
 static void
 time_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   timeobj_t *x = (timeobj_t *)o;
-
-  x->clock_sym = fts_get_symbol_arg(ac, at, 1, 0);
 }
-
 
 static fts_status_t
 time_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -90,5 +81,5 @@ time_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 time_config(void)
 {
-  fts_class_install(fts_new_symbol("time"),time_instantiate);
+  fts_class_install(fts_new_symbol("time"), time_instantiate);
 }

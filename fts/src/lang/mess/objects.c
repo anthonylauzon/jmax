@@ -485,7 +485,7 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
  *    fts_object_free()
  *
  *    fts_object_destroy()
- *    fts_object_release() ... makro!
+ *    fts_object_release() ... macro!
  *    fts_object_delete_from_patcher()
  *
  */

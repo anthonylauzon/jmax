@@ -56,8 +56,6 @@ static void cut_output(fts_alarm_t *alarm, void *o)
   cut_ftl_t *data = (cut_ftl_t *)ftl_data_get_ptr(this->data);
   fts_atom_t a[1];
 
-  fts_alarm_unarm(alarm);
-
   fvec_atom_set(a, data->fvec);
   fts_outlet_send((fts_object_t *)o, 0, fvec_symbol, 1, a);
 }
@@ -122,8 +120,7 @@ cut_ftl(fts_word_t *argv)
     n = n_tick;
   else if(n)
     {
-      fts_alarm_set_delay(&(data->alarm), 0.01);
-      fts_alarm_arm(&(data->alarm));
+      fts_alarm_set_delay(&(data->alarm), 0.0);
     }
 
   for(i=0; i<n; i++)
@@ -173,6 +170,8 @@ cut_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   if(data->fvec)
     fts_object_release((fts_object_t *)data->fvec);    
+
+  fts_alarm_reset(&data->alarm);
 
   ftl_data_free(this->data);
 

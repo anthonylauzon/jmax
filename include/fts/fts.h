@@ -29,7 +29,11 @@
 
 /**
  * Global FTS include file. 
- * Object programmer just need to include this file.
+ * Object programmer just need to include this file as:
+ *
+ * @code
+ *   #include <fts/fts.h>
+ * @endcode
  *
  * @file fts.h
  */

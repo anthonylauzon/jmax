@@ -52,7 +52,6 @@ sigprint_tick(fts_alarm_t *alarm, void *o)
   post_vector(x->size, x->buf);
 
   x->n_print--;
-  fts_alarm_unarm(alarm);
 }
 
 
@@ -67,7 +66,7 @@ sigprint_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   x->size = 0;
   x->alloc = 0;
 
-  fts_alarm_init(&(x->alarm), fts_new_symbol("tick"), sigprint_tick, (void *)o);
+  fts_alarm_init(&(x->alarm), 0, sigprint_tick, (void *)o);
   dsp_list_insert(o);
 }
 
@@ -78,7 +77,7 @@ sigprint_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   if(x->buf) fts_free(x->buf);
 
-  fts_alarm_unarm(&(x->alarm));
+  fts_alarm_reset(&(x->alarm));
   dsp_list_remove(o);
 }
 
@@ -114,8 +113,7 @@ static void ftl_sigprint(fts_word_t *argv)
 
       if(x->n_print)
 	{
-	  fts_alarm_set_delay(&(x->alarm), 0.1f);
-	  fts_alarm_arm(&(x->alarm));
+	  fts_alarm_set_delay(&(x->alarm), 0.0);
 	}
     }
   else

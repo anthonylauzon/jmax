@@ -28,10 +28,8 @@
 
 extern void ispw_naming_init(void);
 
-extern void at_config(void);
 extern void bangbang_config(void);
 extern void change_config(void);
-extern void clock_config(void);
 extern void delay_config(void);
 extern void drunk_config(void);
 extern void gate_config(void);
@@ -70,10 +68,8 @@ ispw_control_module_init(void)
 {
   ispw_naming_init();
 
-  at_config();
   bangbang_config();
   change_config();
-  clock_config();
   delay_config();
   drunk_config();
   gate_config();

@@ -151,10 +151,10 @@ sigline_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   float f;
   int i;
 
-  this->vecsize = FTS_DEF_TICK_SIZE;
+  this->vecsize = fts_dsp_get_tick_size();
 
   this->set = 0;
-  this->srate = fts_param_get_float(fts_s_sampling_rate, 44100.); /* should go away !!! (mdc) */
+  this->srate = fts_dsp_get_sample_rate();
 
   this->ftl_data = ftl_data_new(line_control_t);
 

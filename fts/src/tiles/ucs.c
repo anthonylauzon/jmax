@@ -485,7 +485,6 @@ fts_ucs_set_param(int argc, const fts_atom_t *argv)
   return fts_Success;
 }
 
-
 /*
  * Command to set the index/font size translation table for .pat files 
  */

@@ -148,7 +148,6 @@ display_deliver(display_t *this)
 	  fts_client_send_message((fts_object_t *)this, fts_s_set, 1, &this->a);
 	  
 	  fts_alarm_set_delay(&this->alarm, this->period);
-	  fts_alarm_arm(&this->alarm);
 	}
       else
 	this->pending = 1;
@@ -183,7 +182,6 @@ display_alarm(fts_alarm_t *alarm, void *o)
 	      this->absmax = MIN_FLOAT;
 	      
 	      fts_alarm_set_delay(&this->alarm, this->period);
-	      fts_alarm_arm(&this->alarm);
 	    }
 	}
       else if(this->pending)
@@ -194,7 +192,6 @@ display_alarm(fts_alarm_t *alarm, void *o)
 	  fts_client_send_message(o, fts_s_set, 1, &this->a);
 	  
 	  fts_alarm_set_delay(&this->alarm, this->period);
-	  fts_alarm_arm(&this->alarm);
 	}
       else
 	this->gate = 1;
@@ -231,7 +228,6 @@ display_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       this->last = MIN_FLOAT;
       
       fts_alarm_set_delay(&this->alarm, this->period);
-      fts_alarm_arm(&this->alarm);
 
       fts_set_ptr(a + 0, this);
       fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
@@ -356,6 +352,7 @@ display_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   display_t * this = (display_t *)o;
 
+  fts_alarm_reset(&this->alarm);
   dsp_list_remove(o);
 }
 

@@ -571,7 +571,7 @@ static void messbox_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   messbox_t *this = (messbox_t *) o;
 
   fts_atom_list_free(this->atom_list);
-  fts_alarm_unarm(&(this->alarm));
+  fts_alarm_reset(&(this->alarm));
 }
 
 
@@ -743,7 +743,6 @@ static void messbox_eval_and_update(fts_object_t *o, int winlet, fts_symbol_t s,
   fts_object_ui_property_changed(o, fts_s_value);
 
   fts_alarm_set_delay(&(this->alarm), DEFAULT_DURATION);
-  fts_alarm_arm(&(this->alarm));
 
   fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
 }

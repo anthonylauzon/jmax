@@ -17,38 +17,10 @@
 
 <body bgcolor="white">
 
-<table width=100% border=0 cellspacing=0 cellpadding=0>
-<tr>
-  <td align=left valign=top>
-    <a href="http://www.ircam.fr/jmax/"><img src="images/jmax_logo_small_transp.gif" border=0 alt="jMax"></A>
-  </td>
-  <td align=right valign=top>
-    <a href="http://www.ircam.fr/"><img src="images/ircam_banner.gif" border=0 alt="IRCAM - Centre Georges Pompidou"></a>
-  </td>
-</tr>
-
-</table>
-
-
-<table width=75% border=0 cellspacing=0 cellpadding=0>
-
-<tr>
-<td><spacer type="block" height="1" width="1"></td>
-</tr>
-
-<tr>
-<td align=right><font size=+3><b>Compiling <i>j</i>Max</b></font></td>
-</tr>
-
-<tr>
-<td align=right valign=top><a href="index.html"><font size=-1><i>j</i>Max Documentation</font></a></td>
-</tr>
-
-<tr>
-<td><spacer type="block" height="1" width="1"></td>
-</tr>
-
-</table>
+<h4>
+  <a href="http://www.ircam.fr/jmax/"><img src="images/jmax_icon.gif" border=0 alt="jMax" ALIGN=MIDDLE></A>
+  jMax documentation
+</h4>
 
 <!-- ---------------------------------------------------------------------- -->
 <!-- ---------------------------------------------------------------------- -->

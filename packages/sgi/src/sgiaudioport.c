@@ -214,7 +214,7 @@ static void sgiaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 
   ac--;
   at++;
-  sr = fts_param_get_float( fts_s_sampling_rate, DEFAULT_SAMPLING_RATE);
+  sr = fts_dsp_get_sample_rate();
   sample_rate = (int)sr ;
   this->fifo_size = fts_param_get_int(fts_s_fifo_size, DEFAULT_FIFO_SIZE);
 
@@ -233,7 +233,7 @@ static void sgiaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 
       fts_audioport_set_input_channels( (fts_audioport_t *)this, input_channels);
       fts_audioport_set_input_function( (fts_audioport_t *)this, sgiaudioport_input);
-      this->adc_fmtbuf = (float *) fts_malloc(fts_get_tick_size() * input_channels * sizeof(float));
+      this->adc_fmtbuf = (float *) fts_malloc(fts_dsp_get_tick_size() * input_channels * sizeof(float));
     }
 
   if (output_channels)
@@ -246,7 +246,7 @@ static void sgiaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 
       fts_audioport_set_output_channels( (fts_audioport_t *)this, output_channels);
       fts_audioport_set_output_function( (fts_audioport_t *)this, sgiaudioport_output);
-      this->dac_fmtbuf = (float *) fts_malloc(fts_get_tick_size() * output_channels * sizeof(float));
+      this->dac_fmtbuf = (float *) fts_malloc(fts_dsp_get_tick_size() * output_channels * sizeof(float));
 
       alGetFrameTime( this->output_alport, &(this->frames), &al_time);
 

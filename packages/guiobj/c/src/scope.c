@@ -78,7 +78,7 @@ scope_reset(scope_ftl_t *data)
   data->max = MIN_FLOAT;
 
   data->send = 0;
-  fts_alarm_unarm(&data->alarm);
+  fts_alarm_reset(&data->alarm);
 }
 
 static void 
@@ -86,7 +86,7 @@ scope_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
-  double duration = 1000. * data->size / this->sr;
+  double duration = data->size / this->sr;
   double period_msec = fts_get_number_float(at);
   fts_atom_t a[1];
 
@@ -94,7 +94,7 @@ scope_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     period_msec = duration;
 
   this->period_msec = period_msec;
-  data->period = 0.001 * period_msec * this->sr;
+  data->period = period_msec * this->sr;
 
   scope_reset(data);
 
@@ -325,8 +325,7 @@ scope_ftl(fts_word_t *argv)
 	    {
 	      /* send recorded data */
 	      data->send = size;
-	      fts_alarm_set_delay(&(data->alarm), 0.01);
-	      fts_alarm_arm(&(data->alarm));	      
+	      fts_alarm_set_delay(&(data->alarm), 0.0);
 	    }
 
 	  count++;
@@ -369,8 +368,7 @@ scope_ftl(fts_word_t *argv)
 
 		      /* clear display */
 		      data->send = 0;
-		      fts_alarm_set_delay(&(data->alarm), 0.01);
-		      fts_alarm_arm(&(data->alarm));
+		      fts_alarm_set_delay(&(data->alarm), 0.0);
 
 		      /* reset threshold for auto trigger */
 		      if(data->trigger == scope_auto)
@@ -399,8 +397,7 @@ scope_ftl(fts_word_t *argv)
 		{
 		  /* send recorded data */
 		  data->send = size;
-		  fts_alarm_set_delay(&(data->alarm), 0.01);
-		  fts_alarm_arm(&(data->alarm));
+		  fts_alarm_set_delay(&(data->alarm), 0.0);
 		  
 		  count++;
 		}
@@ -472,7 +469,7 @@ scope_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   at++;
 
   this->data = 0;
-  this->sr = fts_get_sample_rate();
+  this->sr = 0.001 * fts_dsp_get_sample_rate();
   this->period_msec = 100.0;
 
   this->data = ftl_data_alloc(sizeof(scope_ftl_t));
@@ -504,6 +501,8 @@ scope_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       scope_ftl_t *data = ftl_data_get_ptr(this->data);
       
+      fts_alarm_reset(&data->alarm);
+
       ftl_data_free(this->data);
       
       fts_dsp_remove_object(o);

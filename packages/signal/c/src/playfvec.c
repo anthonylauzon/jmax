@@ -26,206 +26,24 @@
 
 #include <fts/fts.h>
 #include "fvec.h"
+#include "play.h"
 
-#define MAX_DOUBLE ((double)179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.0)
-
-/************************************************************
- *
- *  play
- *
- */
+static fts_symbol_t play_fvec_symbol = 0;
 
 typedef struct _play_fvec_
 {
-  fts_object_t o;
-
-  fvec_t *fvec;
-
-  double start; /* start pasition */
-  double target; /* target pasition */
-  double speed; /* play speed */
-  double position; /* current position */
-
-  double sr; /* sample rate (in kHz) */
-  double sp; /* sample period (in msec) */
-
-  enum play_mode {mode_stop, mode_pause, mode_play, mode_loop, mode_cycle} mode;
-  int cycle_direction;
-  
-  fts_alarm_t alarm;
+  signal_play_t play;
 } play_fvec_t;
 
-static fts_symbol_t sym_play = 0;
-
-/************************************************************
- *
- *  methods
- *
- */
-
-static void 
-play_fvec_bang_at_end(fts_alarm_t *alarm, void *o)
-{
-  fts_outlet_bang((fts_object_t *)o, 1);
-}
 
 static void
-play_fvec_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+play_fvec_set_period_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
 {
   play_fvec_t *this = (play_fvec_t *)o;
-  fvec_t *fvec = fvec_atom_get(at);
-  int size = fvec_get_size(fvec);
+  double period = fts_get_number_float(value);
 
-  if(this->fvec)
-    fts_object_release((fts_object_t *)this->fvec);
-
-  this->fvec = fvec;
-
-  fts_object_refer((fts_object_t *)fvec);
-}
-
-static void 
-play_fvec_set_speed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  play_fvec_t *this = (play_fvec_t *)o;
-  double value = fts_get_number_float(at);
-  
-  if(value < 0.0)
-    value = 0.0;
-
-  this->speed = value;
-}
-
-static void 
-play_fvec_set_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  play_fvec_t *this = (play_fvec_t *)o;
-  double value = fts_get_number_float(at);
-  
-  if(value < 0.0)
-    value = 0.0;
-
-  this->start = value;
-}
-
-static void 
-play_fvec_set_target(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  play_fvec_t *this = (play_fvec_t *)o;
-  double value = fts_get_number_float(at);
-  
-  if(value < 0.0)
-    value = 0.0;
-
-  this->target = value;
-}
-
-static void 
-play_fvec_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  play_fvec_t *this = (play_fvec_t *)o;
-  double value = fts_get_number_float(at);
-  double start = this->start;
-  double target = this->target;
-  
-  if(value < 0.0)
-    value = 0.0;
-
-  if(target > start)
-    this->speed = (target - start) / value;
-  else if(start > target)
-    this->speed = (target - start) / value;
-  else
-    this->speed = 0.0;
-}
-
-static void 
-play_fvec_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  play_fvec_t *this = (play_fvec_t *)o;
-
-  switch (ac)
-    {
-    default:
-    case 4:
-      play_fvec_set_speed(o, 0, 0, 1, at + 3);
-    case 3:
-      play_fvec_set_target(o, 0, 0, 1, at + 2);
-    case 2:
-      play_fvec_set_start(o, 0, 0, 1, at + 1);
-    case 1:
-      play_fvec_set_fvec(o, 0, 0, 1, at);
-      break;
-    case 0:
-      break;
-    }
-}
-
-static void 
-play_fvec_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  play_fvec_t *this = (play_fvec_t *)o;
-
-  this->position = this->start;
-  this->mode = mode_play;
-}
-
-static void 
-play_fvec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  play_fvec_t *this = (play_fvec_t *)o;
-
-  play_fvec_set(o, 0, 0, ac, at);
-  play_fvec_bang(o, 0, 0, 0, 0);
-}
-
-static void 
-play_fvec_play(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  play_fvec_t *this = (play_fvec_t *)o;
-
-  switch(this->mode)
-    {
-    case mode_stop:
-      this->position = this->start;
-    case mode_pause:
-      this->mode = mode_play;
-    default:
-      break;
-    }
-}
-
-static void 
-play_fvec_loop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  play_fvec_t *this = (play_fvec_t *)o;
-
-  this->mode = mode_loop;
-}
-
-static void 
-play_fvec_cycle(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  play_fvec_t *this = (play_fvec_t *)o;
-
-  this->mode = mode_cycle;
-  this->cycle_direction = 0;
-}
-
-static void
-play_fvec_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  play_fvec_t *this = (play_fvec_t *)o;
-
-  this->mode = mode_pause;
-}
-
-static void
-play_fvec_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  play_fvec_t *this = (play_fvec_t *)o;
-
-  this->mode = mode_stop;
+  signal_play_set_conv_position(&this->play, 1. / period);
+  signal_play_set_conv_step(&this->play, 1000.0 / (fts_dsp_get_sample_rate() * period));
 }
 
 /************************************************************
@@ -237,10 +55,7 @@ play_fvec_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void
 play_fvec_reset(play_fvec_t *this, int n_tick, double sr)
 {
-  double sp = 1000. / sr;
-
-  this->sp = sp;
-  this->sr = 0.001 * sr;
+  signal_play_set_conv_step(&this->play, 1000.0 * signal_play_get_conv_position(&this->play) / sr);
 }
 
 static void
@@ -254,75 +69,70 @@ play_fvec_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   play_fvec_reset(this, n_tick, sr);
 
-  fts_set_ptr(a + 0, this);
+  fts_set_ptr(a + 0, &this->play);
   fts_set_symbol(a + 1, fts_dsp_get_output_name(dsp, 0));
   fts_set_int(a + 2, n_tick);
   
-  dsp_add_funcall(sym_play, 3, a);
+  fts_dsp_add_function(play_fvec_symbol, 3, a);
 }
 
 static void
 play_fvec_ftl(fts_word_t *argv)
 {
-  play_fvec_t *this = (play_fvec_t *) fts_word_get_ptr(argv + 0);
+  signal_play_t *this = (signal_play_t *) fts_word_get_ptr(argv + 0);
   float *out = (float *) fts_word_get_ptr(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
-  fvec_t *fvec = this->fvec;
+  fvec_t *fvec = (fvec_t *)this->object;
   float *buf = fvec_get_ptr(fvec);
-  double duration = (double)fvec_get_size(fvec) * this->sp;
-  int invert = (this->mode == mode_cycle && this->cycle_direction);
-  double start = (invert)? this->target: this->start;
-  double target = (invert)? this->start: this->target;
   double position = this->position;
-  double speed = (target > start)? this->speed: -this->speed;
-  double incr = speed * this->sp;
-  fts_fourpoint_index_t frac, frac_incr;
-  double index_float;
-  int index;
-
-  /* clip start and target into size */
-  if(start >= duration)
-    start = duration;
-  if(target > duration)
-    target = duration;
-
-  /* turn movement into range */
-  if((target - position) * incr < 0.0)
-    position = target;
-  else if((position - start) * incr < 0.0)
-    position = start;
-
-  /* convert to integer representation */
-  index_float = position * this->sr;
-  index = (int)index_float;
-  frac = fts_fourpoint_index_scale(index_float - index);
-  frac_incr = fts_fourpoint_index_scale(incr * this->sr);
-
+  fts_idefix_t index;
+      
+  /* convert to idefix representation */
+  fts_idefix_set_float(&index, position);
+  
   if(this->mode <= mode_pause)
     {
       /* stop or pause */
+      float f;
       int i;
 
+      fts_cubic_interpolate(buf, index, &f);
+
       for(i=0; i<n_tick; i++)
-	out[i] = 0.0;
+	out[i] = f;
     }
   else
     {
-      double end_position = position + n_tick * incr;
+      double size = fvec_get_size(fvec);
+      int invert = (this->mode == mode_cycle && this->cycle_direction);
+      double begin = (invert)? this->end: this->begin;
+      double end = (invert)? this->begin: this->end;
+      double step = (end > begin)? this->step: -this->step;
+      double tick_end_position = position + n_tick * step;
+      fts_idefix_t incr;
 
-      if((target - end_position) * incr >= 0.0)
+      fts_idefix_set_float(&incr, step);
+
+      /* clip begin and end into size */
+      if(begin >= size)
+	begin = size;
+      if(end > size)
+	end = size;
+
+      /*if((tick_end_position - (end - this->pre)) * step >= 0))*/
+      /*fts_alarm_set_delay(&this->alarm, 0.0);*/
+  
+      if((end - tick_end_position) * step >= 0.0)
 	{
 	  int i;
 	  
 	  for(i=0; i<n_tick; i++)
 	    {
-	      fts_fourpoint_interpolate(buf + index, frac, out + i);
-	      frac += frac_incr;
-	      index += fts_fourpoint_index_get_int(frac);
-	      frac = fts_fourpoint_index_get_frac(frac);
+	      fts_cubic_interpolate(buf, index, out + i);
+	      fts_idefix_incr(&index, incr);
 	    }
 	  
-	  this->position = end_position;
+	  this->position = tick_end_position;
 	}
       else
 	{
@@ -330,86 +140,71 @@ play_fvec_ftl(fts_word_t *argv)
 	  
 	  for(i=0; i<n_tick; i++)
 	    {
-	      fts_fourpoint_interpolate(buf + index, frac, out + i);
+	      fts_cubic_interpolate(buf, index, out + i);
 	      
-	      if(incr != 0.0)
+	      if(step != 0.0)
 		{
 		  /* increment */
-		  frac += frac_incr;
-		  index += fts_fourpoint_index_get_int(frac);
-		  frac = fts_fourpoint_index_get_frac(frac);
-		  position += incr;
+		  fts_idefix_incr(&index, incr);
+		  position += step;
 		  
-		  if((position - target) * incr >= 0.0)
+		  if((position - end) * step >= 0.0)
 		    {
-		      /* target reached */
+		      /* end reached */
 		      switch (this->mode)
 			{
 			case mode_loop:
 			  {
-			    /* repeat from loop start */
-			    position += start - target;
+			    /* repeat from loop begin */
+			    position += begin - end;
 
-			    if((position - target) * incr >= 0.0)
+			    if((position - end) * step > 0.0)
 			      {
-				position = target;
-				incr = 0.0;
-				frac_incr = 0;
+				position = end;
+				step = 0.0;
 			      }
-
-			    index_float = position * this->sr;
-			    index = (int)index_float;
-			    frac = fts_fourpoint_index_scale(index_float - index);
+			    
+			    fts_idefix_set_float(&index, position);
 			  }
 			  break;
 			  
 			case mode_cycle:
 			  {
 			    /* turn and loop back */
-			    double old_start = start;
+			    double old_begin = begin;
 
-			    /* mirror position at target */ 
-			    position = 2.0 * target - position;
+			    /* mirror position at end */ 
+			    position = 2.0 * end - position;
 
-			    if((position - start) * incr <= 0.0)
+			    if((position - begin) * step < 0.0)
 			      {
-				position = start;
-				incr = 0.0;
-				frac_incr = 0;
+				position = begin;
+				step = 0.0;
 			      }
 			    else
 			      {
 				/* turn */
-				incr = -incr;
-				frac_incr = -frac_incr;
+				step = -step;
+				fts_idefix_negate(&incr);
 				
-				start = target;
-				target = old_start;
+				begin = end;
+				end = old_begin;
 			  
 				/* swap direction */
 				this->cycle_direction = 1 - this->cycle_direction;
 			      }
 			    
-			    index_float = position * this->sr;
-			    index = (int)index_float;
-			    frac = fts_fourpoint_index_scale(index_float - index);
+			    fts_idefix_set_float(&index, position);
 			  }
 			  break;
 			  
 			default:
 			  {
 			    /* reached end of playing */
-			    incr = 0.0;
-			    frac_incr = 0;
+			    position = end;
+			    step = 0.0;
 			    
-			    fts_alarm_set_delay(&this->alarm, 0.00001);
-			    fts_alarm_arm(&this->alarm);
-			    
-			    position = target;
-			    index_float = position * this->sr;
-			    index = (int)index_float;
-			    frac = fts_fourpoint_index_scale(index_float - index);
-
+			    fts_idefix_set_float(&index, position);
 			    this->mode = mode_stop;
 			  }
 			}
@@ -436,28 +231,9 @@ play_fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   ac--;
   at++;
 
-  dsp_list_insert(o);
+  signal_play_init(&this->play, ac, at);
 
-  this->position = 0.0;
-
-  this->mode = mode_stop;
-  this->cycle_direction = 0;
-
-  this->fvec = 0;
-  this->start = 0.0;
-  this->target = MAX_DOUBLE;
-  this->speed = 1.0;
-
-  this->sr = 0.001 * fts_get_sample_rate();
-  this->sp = 1000. / fts_get_sample_rate();
-
-  /* init output alarm */
-  fts_alarm_init(&this->alarm, 0, play_fvec_bang_at_end, this);    
-
-  if(ac > 0 && fvec_atom_is(at))
-    play_fvec_set(o, 0, 0, ac, at);
-  else
-    fts_object_set_error(o, "First argument of fvec required");
+  signal_play_set_conv_position(&this->play, 0.001 * fts_dsp_get_sample_rate());
 }
 
 static void
@@ -465,46 +241,19 @@ play_fvec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 { 
   play_fvec_t *this = (play_fvec_t *)o;
 
-  dsp_list_remove(o);
+  signal_play_reset(&this->play);
 }
 
 static fts_status_t
 play_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int i;
+  signal_play_class_init(cl, fvec_symbol);
 
-  fts_class_init(cl, sizeof(play_fvec_t), 4, 2, 0); 
-  
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, play_fvec_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, play_fvec_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, play_fvec_put);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, play_fvec_bang);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("play"), play_fvec_play);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("loop"), play_fvec_loop);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("cycle"), play_fvec_cycle);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), play_fvec_pause);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), play_fvec_stop);
-
-  fts_method_define_varargs(cl, 0, fts_new_symbol("start"), play_fvec_set_start);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("target"), play_fvec_set_target);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("speed"), play_fvec_set_speed);
-
-  fts_method_define_varargs(cl, 0, fts_s_set, play_fvec_set);
-  fts_method_define_varargs(cl, 0, fts_s_list, play_fvec_list);
-
-  fts_method_define_varargs(cl, 0, fvec_symbol, play_fvec_set_fvec);
-  
-  fts_method_define_varargs(cl, 1, fts_s_int, play_fvec_set_start);
-  fts_method_define_varargs(cl, 1, fts_s_float, play_fvec_set_start);
-
-  fts_method_define_varargs(cl, 2, fts_s_int, play_fvec_set_target);
-  fts_method_define_varargs(cl, 2, fts_s_float, play_fvec_set_target);
-
-  fts_method_define_varargs(cl, 3, fts_s_int, play_fvec_set_speed);
-  fts_method_define_varargs(cl, 3, fts_s_float, play_fvec_set_speed);
-
-  dsp_sig_outlet(cl, 0);
+  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("period"), play_fvec_set_period_prop);
   
   return fts_Success;
 }
@@ -512,9 +261,8 @@ play_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 signal_play_fvec_config(void)
 {
-  sym_play = fts_new_symbol("play~");
+  signal_play_class_register(fvec_symbol, play_fvec_instantiate);
 
-  fts_metaclass_install(sym_play, play_fvec_instantiate, fts_arg_type_equiv);
-
-  dsp_declare_function(sym_play, play_fvec_ftl);
+  play_fvec_symbol = fts_new_symbol("play~ <fvec>");
+  fts_dsp_declare_function(play_fvec_symbol, play_fvec_ftl);
 }

@@ -102,10 +102,7 @@ class FtsErrorStreamer implements Runnable
 	      {
 		  if(first)
 		      {
-			  System.out.println("************** An FTS error occurred ************");
-			  System.out.println("for more info see Fts Standard Error output");
-			  System.out.println("located in "+fileName);
-			  System.out.println("*************************************************");
+			  System.out.println("error log written to "+fileName);
 
 			  first = false;
 		      }

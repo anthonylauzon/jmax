@@ -210,7 +210,7 @@ void fts_audioport_idle( fts_word_t *args)
   float *sig_dummy, *sig_zero;
   int i, tick_size, at_least_one_io_fun_called;
 
-  tick_size = fts_get_tick_size();
+  tick_size = fts_dsp_get_tick_size();
   sig_dummy = (float *)alloca( tick_size * sizeof( float));
   sig_zero = (float *)alloca( tick_size * sizeof( float));
 

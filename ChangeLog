@@ -1,3 +1,34 @@
+2001-07-02  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* updated doc
+	   - simplified header with new icon
+	   - updated DSP object development page
+
+	* added doxygen doc to sched.h and dsp.h (updated doxygen config file)
+
+	* added dspgraph.h and audio.h
+
+	* updated dsp.c, dspgraph.c and audio.c
+	   - encapsulated dsp graph to a structure fts_dsp_graph_t and added corresponding API
+	   - added fts_dsp_get_time()
+
+	* updated sched.c
+	   - added clock and status to the scheduler
+	   - added fts_get_time()
+
+	* updated time.c 
+	   - removed named clocks
+	   - changed API for fts_clock_t
+	   - changed API for fts_alarm_t
+
+	* added sample pool to signal package (not yet used in an object)
+
+	* added play~ for fvec or bpf and rec~ for fvec to signal package
+
+	* removed classes clock and at (from ispw package)
+	
+	* added error posting to alsarawmidiport, alsaaudioport and ossaudioport
+
 2001-06-27  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* moved fts/src/runtime/client/protcodec.c code to udpsend and udpreceive objects.

@@ -105,7 +105,7 @@ seqrec_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(this->start_time == 0.0)
     {
-      double now = fts_get_time_in_msecs();    
+      double now = fts_get_time();
       
       if(!seqref_is_locked(o))
 	seqrec_locate(o, 0, 0, 0, 0);
@@ -119,7 +119,7 @@ static void
 seqrec_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqrec_t *this = (seqrec_t *)o;
-  double now = fts_get_time_in_msecs();
+  double now = fts_get_time();
       
   this->start_location += now - this->start_time;
 }
@@ -131,7 +131,7 @@ seqrec_record(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   if(this->start_time != 0.0)
     {
-      double time = fts_get_time_in_msecs() - this->start_time + this->start_location;
+      double time = fts_get_time() - this->start_time + this->start_location;
       event_t *event = 0;
 
       if(this->class)

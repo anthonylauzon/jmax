@@ -25,6 +25,7 @@
  */
 
 #include <fts/fts.h>
+#include "fourpoint.h"
 #include "sampbuf.h"
 #include "sampunit.h"
 
@@ -54,7 +55,7 @@ samppeek_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if (!unit)
     unit = samples_unit_get_default();
 
-  obj->conv = samples_unit_convert(unit, 1.0f, fts_param_get_float(fts_s_sampling_rate, 44100.));
+  obj->conv = samples_unit_convert(unit, 1.0f, fts_dsp_get_sample_rate());
 }
 
 /******************************************************************
@@ -68,7 +69,7 @@ samppeek_mess_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   samppeek_t *obj = (samppeek_t *)o;
 
-  obj->conv = samples_unit_convert(obj->unit, 1.0f, fts_param_get_float(fts_s_sampling_rate, 44100.));
+  obj->conv = samples_unit_convert(obj->unit, 1.0f, fts_dsp_get_sample_rate());
 }
 
 static void

@@ -74,7 +74,7 @@ button_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   button_t *this = (button_t *)o;
 
-  fts_alarm_unarm(&(this->alarm));
+  fts_alarm_reset(&(this->alarm));
 }
 
 /************************************************
@@ -95,7 +95,6 @@ button_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_object_ui_property_changed(o, fts_s_value);
 
   fts_alarm_set_delay(&this->alarm, this->flash);
-  fts_alarm_arm(&this->alarm);
 }
 
 /************************************************
@@ -141,7 +140,6 @@ button_put_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t pro
   fts_object_ui_property_changed(obj, fts_s_value);
 
   fts_alarm_set_delay(&(this->alarm), this->flash);
-  fts_alarm_arm(&(this->alarm));
 }
 
 /* Daemon for the color  propriety */

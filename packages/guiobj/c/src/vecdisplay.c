@@ -74,7 +74,6 @@ vecdisplay_deliver(vecdisplay_t *this)
 	  this->n = 0;
 	  
 	  fts_alarm_set_delay(&this->alarm, this->period);
-	  fts_alarm_arm(&this->alarm);
 	}
       else
 	this->pending = 1;
@@ -101,7 +100,6 @@ vecdisplay_alarm(fts_alarm_t *alarm, void *o)
       this->n = 0;
       
       fts_alarm_set_delay(&this->alarm, this->period);
-      fts_alarm_arm(&this->alarm);
     }
   else
     this->gate = 1;
@@ -398,6 +396,8 @@ static void
 vecdisplay_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
+
+  fts_alarm_reset(&this->alarm);
 }
 
 static fts_status_t 

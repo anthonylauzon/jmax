@@ -28,6 +28,7 @@ include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/guiobj/images
+	$(INSTALL_DIR) $(doc_install_dir)/images
 	for f in *.gif ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/guiobj/images/$$f ; done
 .PHONY: install
 

@@ -87,9 +87,6 @@ midiparser_compute_time_code(fts_midiparser_t *parser)
   new_time = total_secs * 1000.0 + 
     (((float) parser->mtc_frame + 2) * (1000.0 / (float) (parser->mtc_type == 0? 24: (parser->mtc_type == 1 ? 25 : 30))));
 
-  if (new_time < parser->mtc_time)
-    fts_clock_reset(fts_new_symbol("mtc"));
-
   parser->mtc_time = new_time;
 
   /* raise the midi action */

@@ -14,7 +14,7 @@
 #include <fts/fts.h>
 
 extern void messtab_config(void);
-extern message_table_config(void);
+extern void message_table_config(void);
 
 static void
 mess_init(void)

@@ -80,7 +80,7 @@ delread_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(!unit) 
     unit = samples_unit_get_default();
 
-  conv = samples_unit_convert(unit, 1.0f, fts_param_get_float(fts_s_sampling_rate, 44100.));
+  conv = samples_unit_convert(unit, 1.0f, fts_dsp_get_sample_rate());
   
   this->name = name;
   this->time = time;

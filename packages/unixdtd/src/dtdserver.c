@@ -211,7 +211,7 @@ dtdfifo_t *dtdserver_open_write( dtdserver_t *server, const char *filename, int 
     {
       double sr;
 
-      sr = (double)fts_param_get_float( fts_s_sampling_rate, 44100.);
+      sr = (double)fts_dsp_get_sample_rate();
 
       sprintf( buffer, "openwrite %d %s %s %f %d", id, filename, fts_symbol_name(fts_get_project_dir()), sr, n_channels);
       dtdserver_send_command( server, buffer);

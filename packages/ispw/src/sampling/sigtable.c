@@ -90,7 +90,7 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   if (size < 0)
     size = 0;
 
-  n_samps = samples_unit_convert(unit, size, fts_param_get_float(fts_s_sampling_rate, 44100.));
+  n_samps = samples_unit_convert(unit, size, fts_dsp_get_sample_rate());
   
   sampbuf_init(&this->buf, n_samps);
 
@@ -138,7 +138,7 @@ put_dsp_check_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     post("table~: dead object\n");
   else
     {
-      int n_samps = samples_unit_convert(this->unit, this->check_size, fts_param_get_float(fts_s_sampling_rate, 44100.));
+      int n_samps = samples_unit_convert(this->unit, this->check_size, fts_dsp_get_sample_rate());
 
       sampbuf_realloc(&this->buf, n_samps);
     }
@@ -231,7 +231,7 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
   header.dataLocation = sizeof(header);
   header.dataSize = 0x10000000;
   header.dataFormat = SND_FORMAT_LINEAR_16;
-  header.samplingRate = fts_param_get_float(fts_s_sampling_rate, 44100.f);
+  header.samplingRate = fts_dsp_get_sample_rate();
   header.channelCount = 1;
   header.info = 0x0;
 
@@ -292,7 +292,7 @@ sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
     return;
 
   if(onset > 0)
-    n_onset = samples_unit_convert(this->unit, onset, fts_param_get_float(fts_s_sampling_rate, 44100.));
+    n_onset = samples_unit_convert(this->unit, onset, fts_dsp_get_sample_rate());
   else
     n_onset = 0;
 
@@ -332,7 +332,7 @@ sigtable_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
     return;
 
   if(sr <= 0.0f)
-    sr = fts_param_get_float(fts_s_sampling_rate, 44100.0f);
+    sr = fts_dsp_get_sample_rate();
 
   if(save_size > 0)
     n_save = samples_unit_convert(this->unit, save_size, sr);
@@ -380,7 +380,7 @@ sigtable_realloc(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts
 
   if(this->name && size > 0)
     {
-      int n_samps = samples_unit_convert(this->unit, size, fts_param_get_float(fts_s_sampling_rate, 44100.));
+      int n_samps = samples_unit_convert(this->unit, size, fts_dsp_get_sample_rate());
       
       sampbuf_realloc(&this->buf, n_samps);
       

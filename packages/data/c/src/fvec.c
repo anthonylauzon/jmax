@@ -486,7 +486,7 @@ fvec_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t
       int size = 0;
       
       if(sr <= 0.0)
-	sr = fts_get_sample_rate();
+	sr = fts_dsp_get_sample_rate();
 
       sf = fts_soundfile_open_write_float(file_name, 0, sr);
 

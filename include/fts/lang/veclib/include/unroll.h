@@ -30,8 +30,8 @@
 #define _UNROLL_H_
 
 /*
- *  These are the unrolling makros used in the definition files: "define/?*.h".
- *  For each unroll factor VECLIB_LOOP_UNROLL (NO, 4, 8, 16) are defined the following makros.
+ *  These are the unrolling macros used in the definition files: "define/?*.h".
+ *  For each unroll factor VECLIB_LOOP_UNROLL (NO, 4, 8, 16) are defined the following macros.
  *  The posfixes "_H" and "_Q" mean a real unrolling by just half or a quarter of the unroll factor.
  *  This is done in order to use not too much of registers if there are many operators (registers) involved in the 
  *  computation.

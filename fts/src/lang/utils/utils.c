@@ -29,13 +29,13 @@
 #include <fts/lang/utils.h>
 
 extern void fts_ffuns_init(void);
-extern void fts_fourpoint_init(void);
+extern void fts_cubic_init(void);
 
 static void
 fts_utils_init(void)
 {
   fts_ffuns_init();
-  fts_fourpoint_init();
+  fts_cubic_init();
 }
 
 fts_module_t fts_utils_module = {"Utils", "Message system utilities", fts_utils_init, 0, 0};

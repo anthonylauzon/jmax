@@ -72,7 +72,7 @@ proc jmaxSetSampleRate {rate} {
   global JmaxSampleRate
 
   set JmaxSampleRate $rate
-  ucs set param sampling_rate $rate
+  ucs set param sample_rate $rate
 }
 
 proc jmaxGetSampleRate {} {

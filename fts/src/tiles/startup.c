@@ -45,6 +45,9 @@
 
 extern fts_module_t fts_files_module;
 extern fts_module_t fts_audio_module;
+extern fts_module_t fts_time_module;
+extern fts_module_t fts_sched_module;
+extern fts_module_t fts_dsp_module;
 
 static void fts_kernel_config(void);
 static void fts_assign_boot_devices(int argc, char **argv);
@@ -143,8 +146,8 @@ int main(int argc, char **argv)
   post( "%s\n", FTS_ARCH_NAME);
 #endif
 
-  /* Run the scheduler */
-  fts_sched_run();
+  /* Run the audio scheduler */
+  fts_sched_run(fts_sched_get_current());
 
   /* When and if the scheduler exit, run the shutdown functions and return */
   fts_modules_shutdown();

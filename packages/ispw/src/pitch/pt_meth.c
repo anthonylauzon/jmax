@@ -284,7 +284,7 @@ void pt_common_instantiate(fts_class_t *cl)
 
    if(!pt_common_debounce_timer_initialized){
       fts_timer_init(&pt_common_debounce_timer, 0);
-      fts_timer_zero(&pt_common_debounce_timer);
+      fts_timer_reset(&pt_common_debounce_timer);
       fts_timer_start(&pt_common_debounce_timer);
       pt_common_debounce_timer_initialized = 1;
    }
@@ -413,9 +413,9 @@ void pt_common_print_ctl(pt_common_obj_t *x)
  
 int pt_common_debounce_time_is_up(pt_common_obj_t *x, float *time)
 {
-   int times_up = fts_timer_elapsed_time(&pt_common_debounce_timer) > *time;
+   int times_up = fts_timer_get_time(&pt_common_debounce_timer) > *time;
    
-   *time = fts_timer_elapsed_time(&pt_common_debounce_timer) + x->ctl.debounce_time;
+   *time = fts_timer_get_time(&pt_common_debounce_timer) + x->ctl.debounce_time;
    return(times_up);
 }
 

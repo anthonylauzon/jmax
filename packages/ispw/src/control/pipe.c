@@ -42,7 +42,6 @@ struct qued_list_st{
 
 struct pipe_st{
   fts_object_t o;
-  fts_symbol_t clock;
   int ac;
   fts_atom_t *at;
   double del_time;
@@ -80,7 +79,7 @@ pipe_allocate_new_list(pipe_t *this)
   qued_list_t *new;
 
   new = (qued_list_t *)fts_malloc(sizeof(qued_list_t) + (this->ac-1)*sizeof(fts_atom_t));
-  fts_alarm_init(&(new->alarm), this->clock, pipe_tick, new);
+  fts_alarm_init(&(new->alarm), 0, pipe_tick, new);
   new->pipe = this;
 
   return new;
@@ -118,7 +117,7 @@ pipe_free_delayed_list(pipe_t *this, qued_list_t *free)
   free->next = this->free;
   this->free = free;
 
-  fts_alarm_unarm(&(free->alarm));
+  fts_alarm_reset(&(free->alarm));
 }
 
 static void
@@ -158,7 +157,6 @@ pipe_delay_list(pipe_t *this)
 
   /* set and fire alarm */
   fts_alarm_set_delay(&(new_list->alarm), this->del_time);
-  fts_alarm_arm(&(new_list->alarm));
 
   /* insert list as first of que of delayed list */
   new_list->next = this->delayed;
@@ -182,15 +180,6 @@ pipe_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fts_atom_t sat[2];
 
   ac--; at++; /* skip class name argument */
-
-  /* look for clock argument */
-  if(ac > 0 && fts_is_symbol(at))
-    {
-      this->clock = fts_get_symbol(at);
-      ac--; at++; /* skip clock argument */
-    }
-  else
-    this->clock = 0;
 
   /* fake default arguments */
   if(ac > 1)
@@ -322,9 +311,6 @@ pipe_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int i;
 
   ac--; at++; /* skip class name argument */
-
-  if(ac > 0 && fts_is_symbol(at))
-    ac--; at++; /* skip clock argument */
 
   if (ac == 0)
     {

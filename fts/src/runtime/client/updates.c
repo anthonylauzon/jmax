@@ -183,7 +183,6 @@ static void fts_client_updates_sched(fts_alarm_t *alarm, void *arg)
       update_group_end();
 
       fts_alarm_set_delay(&update_alarm, fts_update_period);
-      fts_alarm_arm(&update_alarm);
     }
 }
 
@@ -277,7 +276,6 @@ void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property)
   if (! fts_alarm_is_armed(&update_alarm))
     {
       fts_alarm_set_delay(&update_alarm, 0);
-      fts_alarm_arm(&update_alarm);
     }
 }
 

@@ -41,8 +41,8 @@ typedef struct _rec_fvec_
 
   fvec_t *fvec;
 
-  int start; /* start pasition */
-  int target; /* target pasition */
+  int begin; /* begin pasition */
+  int end; /* end pasition */
   int index; /* current index */
 
   double sr; /* sample rate (in kHz) */
@@ -83,7 +83,7 @@ rec_fvec_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void 
-rec_fvec_set_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+rec_fvec_set_begin(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   rec_fvec_t *this = (rec_fvec_t *)o;
   int value = fts_get_number_float(at) * this->sr;
@@ -91,11 +91,11 @@ rec_fvec_set_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   if(value < 0.0)
     value = 0.0;
 
-  this->start = value;
+  this->begin = value;
 }
 
 static void 
-rec_fvec_set_target(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+rec_fvec_set_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   rec_fvec_t *this = (rec_fvec_t *)o;
   int value = fts_get_number_float(at) * this->sr;
@@ -103,7 +103,7 @@ rec_fvec_set_target(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   if(value < 0.0)
     value = 0.0;
 
-  this->target = value;
+  this->end = value;
 }
 
 static void 
@@ -115,9 +115,9 @@ rec_fvec_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
     default:
     case 3:
-      rec_fvec_set_target(o, 0, 0, 1, at + 2);
+      rec_fvec_set_end(o, 0, 0, 1, at + 2);
     case 2:
-      rec_fvec_set_start(o, 0, 0, 1, at + 1);
+      rec_fvec_set_begin(o, 0, 0, 1, at + 1);
     case 1:
       rec_fvec_set_fvec(o, 0, 0, 1, at);
       break;
@@ -131,7 +131,7 @@ rec_fvec_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   rec_fvec_t *this = (rec_fvec_t *)o;
 
-  this->index = this->start;
+  this->index = this->begin;
   this->mode = mode_rec;
 }
 
@@ -152,7 +152,7 @@ rec_fvec_rec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   switch(this->mode)
     {
     case mode_stop:
-      this->index = this->start;
+      this->index = this->begin;
     case mode_pause:
       this->mode = mode_rec;
     default:
@@ -218,27 +218,27 @@ rec_fvec_ftl(fts_word_t *argv)
   fvec_t *fvec = this->fvec;
   float *buf = fvec_get_ptr(fvec);
   int size = fvec_get_size(fvec);
-  int start = this->start;
-  int target = this->target;
+  int begin = this->begin;
+  int end = this->end;
   int index = this->index;
 
-  /* clip start and target into size */
-  if(start >= size)
-    start = size;
-  if(target > size)
-    target = size;
+  /* clip begin and end into size */
+  if(begin >= size)
+    begin = size;
+  if(end > size)
+    end = size;
 
   /* turn movement into range */
-  if(index > target)
-    index = target;
-  else if(index  < start)
-    index = start;
+  if(index > end)
+    index = end;
+  else if(index  < begin)
+    index = begin;
 
   if(this->mode >= mode_rec)
     {
       int end_index = index + n_tick;
 
-      if(end_index <= target)
+      if(end_index <= end)
 	{
 	  int i;
 	  
@@ -262,13 +262,12 @@ rec_fvec_ftl(fts_word_t *argv)
 		  buf[index] = in[i];
 		  index++;
 		  
-		  if(index >= target)
+		  if(index >= end)
 		    {
-		      /* target reached */
-		      fts_alarm_set_delay(&this->alarm, 0.00001);
-		      fts_alarm_arm(&this->alarm);
+		      /* end reached */
+		      fts_alarm_set_delay(&this->alarm, 0.0);
 		      
-		      index = target;
+		      index = end;
 		      
 		      this->mode = mode_stop;
 		    }
@@ -301,11 +300,11 @@ rec_fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->mode = mode_stop;
 
   this->fvec = 0;
-  this->start = 0.0;
-  this->target = MAX_INT;
+  this->begin = 0.0;
+  this->end = MAX_INT;
 
-  this->sr = 0.001 * fts_get_sample_rate();
-  this->sp = 1000. / fts_get_sample_rate();
+  this->sr = 0.001 * fts_dsp_get_sample_rate();
+  this->sp = 1000. / fts_dsp_get_sample_rate();
 
   /* init output alarm */
   fts_alarm_init(&this->alarm, 0, rec_fvec_bang_at_end, this);    
@@ -321,6 +320,7 @@ rec_fvec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 { 
   rec_fvec_t *this = (rec_fvec_t *)o;
 
+  fts_alarm_reset(&this->alarm);
   dsp_list_remove(o);
 }
 
@@ -340,19 +340,19 @@ rec_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), rec_fvec_pause);
   fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), rec_fvec_stop);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("start"), rec_fvec_set_start);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("target"), rec_fvec_set_target);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("begin"), rec_fvec_set_begin);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("end"), rec_fvec_set_end);
 
   fts_method_define_varargs(cl, 0, fts_s_set, rec_fvec_set);
   fts_method_define_varargs(cl, 0, fts_s_list, rec_fvec_list);
 
   fts_method_define_varargs(cl, 0, fvec_symbol, rec_fvec_set_fvec);
   
-  fts_method_define_varargs(cl, 1, fts_s_int, rec_fvec_set_start);
-  fts_method_define_varargs(cl, 1, fts_s_float, rec_fvec_set_start);
+  fts_method_define_varargs(cl, 1, fts_s_int, rec_fvec_set_begin);
+  fts_method_define_varargs(cl, 1, fts_s_float, rec_fvec_set_begin);
 
-  fts_method_define_varargs(cl, 2, fts_s_int, rec_fvec_set_target);
-  fts_method_define_varargs(cl, 2, fts_s_float, rec_fvec_set_target);
+  fts_method_define_varargs(cl, 2, fts_s_int, rec_fvec_set_end);
+  fts_method_define_varargs(cl, 2, fts_s_float, rec_fvec_set_end);
 
   dsp_sig_inlet(cl, 0);
   

@@ -54,6 +54,6 @@ extern void wavetable_init(void);
 extern void wavetable_load(wavetab_t *wavetab);
 extern wavetab_t *wavetable_new(fts_symbol_t name, fts_symbol_t wrap_mode);
 extern void wavetable_delete(wavetab_t *wavetab);
-extern int make_cos_table(void);
+int wavetable_make_cos(void);
 
 #endif

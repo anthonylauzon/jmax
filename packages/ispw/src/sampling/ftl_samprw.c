@@ -25,6 +25,7 @@
  */
 
 #include <fts/fts.h>
+#include "fourpoint.h"
 #include "sampbuf.h"
 #include "sampwrite.h"
 #include "sampread.h"

@@ -311,8 +311,7 @@ analysis(pitch_t *x)
   x->out.micro_pitch = new_pitch;
   
   x->ctl.print_me = 0;
-  fts_alarm_set_delay(&x->clock, 0.01f); /* output that stuff */
-  fts_alarm_arm(&x->clock);
+  fts_alarm_set_delay(&x->clock, 0.0); /* output that stuff */
 }
 
 /*************************************************
@@ -395,8 +394,6 @@ pitch_tick(fts_alarm_t *alarm, void *p)
 {
   fts_object_t *o = (fts_object_t *)p;
   pitch_t *x = (pitch_t *)p;
-
-  fts_alarm_unarm(alarm);
 
   fts_outlet_float(o, OUTLET_micro_pitch, x->out.micro_pitch);
   fts_outlet_float(o, OUTLET_power, x->out.power + POWER_OUT_OFFSET);
@@ -491,9 +488,12 @@ pitch_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   pitch_t *x = (pitch_t *)o;
 
-  fts_alarm_unarm(&x->clock);  
+  fts_alarm_reset(&x->clock);  
   pt_common_delete(&x->pt);
-  if(x->wind) fts_free(x->wind);
+
+  if(x->wind) 
+    fts_free(x->wind);
+
   dsp_list_remove(o);
 }
 

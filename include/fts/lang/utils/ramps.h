@@ -141,7 +141,7 @@ extern void fts_ramp_vec_fill(fts_ramp_t * restrict ramp, float *out, int size);
 extern void fts_ramp_vec_mul(fts_ramp_t * restrict ramp, float *in, float *out, int size);
 extern void fts_ramp_vec_mul_add(fts_ramp_t * restrict ramp, float *in, float *out, int size);
 
-/* makro implementations */
+/* macro implementations */
 #define fts_ramp_jump(r) (fts_ramp_value_jump(&(r)->value), (r)->n_steps = 0)
 
 #define fts_ramp_freeze(r) (fts_ramp_value_freeze(&(r)->value), (r)->n_steps = 0)

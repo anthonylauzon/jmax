@@ -48,8 +48,6 @@ static void profileaudioport_output_alarm( fts_alarm_t *alarm, void *p)
 {
   profileaudioport_t *this = (profileaudioport_t *)p;
 
-  fts_alarm_unarm( alarm);
-
   fts_outlet_int( (fts_object_t *)this, 0, this->estimated_sample_rate);
 }
 
@@ -76,7 +74,6 @@ static void profileaudioport_output( fts_word_t *argv)
       this->last_time = now;
 
       fts_alarm_set_delay( &this->output_alarm, 0.0f);
-      fts_alarm_arm( &this->output_alarm);
 
       this->samples_count = 0;
     }
@@ -110,6 +107,7 @@ static void profileaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s,
 {
   profileaudioport_t *this = (profileaudioport_t *)o;
 
+  fts_alarm_reset(&this->output_alarm);	
   fts_audioport_delete( &this->head);
 }
 

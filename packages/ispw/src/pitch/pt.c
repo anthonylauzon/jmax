@@ -170,8 +170,7 @@ static void analysis(fts_object_t *o)
 	      x->stat.pitch_last_out = int_pitch;
 	      x->stat.peaked = 0;
 	      x->stat.reattack_slope = 0;
-	      fts_alarm_set_delay(&x->clock, 0.01f); /* output that stuff */
-	      fts_alarm_arm(&x->clock);
+	      fts_alarm_set_delay(&x->clock, 0.0); /* output that stuff */
 	    }
 	  x->out.pitch = int_pitch;
 	}
@@ -249,8 +248,6 @@ static void pt_tick(fts_alarm_t *alarm, void *p)
   fts_object_t *o = (fts_object_t *)p;
   pt_t *x = (pt_t *)p;
 
-  fts_alarm_unarm(alarm);
-
   fts_outlet_int(o, OUTLET_midi, x->out.pitch);
 }
 
@@ -310,8 +307,10 @@ static void pt_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 {
   pt_t *x = (pt_t *)o;
 
-  fts_alarm_unarm(&x->clock);	
+  fts_alarm_reset(&x->clock);	
+
   pt_common_delete(&x->pt);	
+
   dsp_list_remove(o);
 }
 

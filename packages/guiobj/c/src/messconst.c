@@ -86,7 +86,6 @@ messconst_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_object_ui_property_changed(o, fts_s_value);
 
   fts_alarm_set_delay(&this->alarm, MESSCONST_FLASH_TIME);
-  fts_alarm_arm(&this->alarm);
 
   fts_outlet_send(o, 0, this->s, this->ac, this->at);
 }
@@ -138,8 +137,6 @@ messconst_put_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t 
   fts_outlet_bang(obj, 0);
 
   fts_object_ui_property_changed(obj, fts_s_value);
-
-  fts_alarm_arm(&(this->alarm));
 }
 
 static void
@@ -280,7 +277,7 @@ messconst_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   if(this->ac)
     fts_free(this->at);
 
-  fts_alarm_unarm(&(this->alarm));
+  fts_alarm_reset(&(this->alarm));
 }
 
 static fts_status_t

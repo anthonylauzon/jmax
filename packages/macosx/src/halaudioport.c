@@ -232,7 +232,7 @@ static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
   fifo_size = fts_param_get_int( fts_s_fifo_size, DEFAULT_FIFO_SIZE);
 
   channels = fts_get_int_arg( ac, at, 1, DEFAULT_CHANNELS);
-  buffer_size = fts_get_int_arg( ac, at, 2, fts_get_tick_size());
+  buffer_size = fts_get_int_arg( ac, at, 2, fts_dsp_get_tick_size());
 
   count = sizeof( this->device);
   if ((err = AudioHardwareGetProperty( kAudioHardwarePropertyDefaultOutputDevice, &count, (void *)&this->device)) != noErr)

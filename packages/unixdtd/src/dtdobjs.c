@@ -212,16 +212,12 @@ static void readsf_eof_alarm( fts_alarm_t *alarm, void *p)
 {
   fts_object_t *o = (fts_object_t *)p;
 
-  fts_alarm_unarm( alarm);
-
   fts_outlet_bang( o, fts_object_get_outlets_number(o) - 1);
 }
 
 static void readsf_post_data_late_alarm( fts_alarm_t *alarm, void *p)
 {
   readsf_t *this = (readsf_t *)p;
-
-  fts_alarm_unarm( alarm);
 
   this->can_post_data_late = 1;
 }
@@ -285,8 +281,8 @@ static void readsf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 
   dtdserver_remove_object( this->server, this);
 
-  fts_alarm_unarm( &this->eof_alarm);	
-  fts_alarm_unarm( &this->post_data_late_alarm);	
+  fts_alarm_reset( &this->eof_alarm);	
+  fts_alarm_reset( &this->post_data_late_alarm);	
 
   dsp_list_remove(o);
 }
@@ -374,8 +370,7 @@ static void readsf_dsp( fts_word_t *argv)
 	if ( !dtdfifo_is_used( this->fifo, DTD_SIDE))
 	  {
 	    /* end of file */
-	    fts_alarm_set_delay( &this->eof_alarm, 0.01f);
-	    fts_alarm_arm( &this->eof_alarm);
+	    fts_alarm_set_delay( &this->eof_alarm, 0.0);
 
 	    dtdfifo_set_used( this->fifo, FTS_SIDE, 0);
 
@@ -388,8 +383,7 @@ static void readsf_dsp( fts_word_t *argv)
 
 	    this->can_post_data_late = 0;
 
-	    fts_alarm_set_delay( &this->post_data_late_alarm, 200.0f);
-	    fts_alarm_arm( &this->post_data_late_alarm);
+	    fts_alarm_set_delay( &this->post_data_late_alarm, 200.0);
 	  }
 
 	clear_outputs( n, n_channels, outputs);
@@ -628,8 +622,6 @@ static void writesf_post_fifo_overflow_alarm( fts_alarm_t *alarm, void *p)
 {
   writesf_t *this = (writesf_t *)p;
 
-  fts_alarm_unarm( alarm);
-
   this->can_post_fifo_overflow = 1;
 }
 
@@ -668,7 +660,7 @@ static void writesf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
   dtdserver_remove_object( this->server, this);
 
-  fts_alarm_unarm( &this->post_fifo_overflow_alarm);	
+  fts_alarm_reset( &this->post_fifo_overflow_alarm);	
 
   dsp_list_remove(o);
 }
@@ -731,8 +723,7 @@ static void writesf_dsp( fts_word_t *argv)
 
 	    this->can_post_fifo_overflow = 0;
 
-	    fts_alarm_set_delay( &this->post_fifo_overflow_alarm, 200.0f);
-	    fts_alarm_arm( &this->post_fifo_overflow_alarm);
+	    fts_alarm_set_delay( &this->post_fifo_overflow_alarm, 200.0);
 	  }
       }
   }

@@ -35,7 +35,8 @@ wave.c \
 wave_ieeewrap.c \
 cut.c \
 matrix.c \
+play.c \
 playfvec.c\
+playbpf.c \
 recfvec.c\
-
-#playbpf.c \
+samplepool.c \

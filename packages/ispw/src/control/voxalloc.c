@@ -67,8 +67,6 @@ voxalloc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   int i_dur = fts_get_int_arg(ac, at, 4, 0);
   int dur = fts_get_int_arg(ac, at, 5, 0);
   char rec_name[MAX_size_rec_name + 1];
-  float vs = fts_param_get_float(fts_s_tick_size, FTS_DEF_TICK_SIZE);
-  float sr = fts_param_get_float(fts_s_sampling_rate, 1.0);
   int i;
 
   this->sym_receive = (fts_symbol_t *) fts_malloc(sizeof(fts_symbol_t ) * n_vox);
@@ -96,7 +94,7 @@ voxalloc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   for(i = 0; i < n_args; i++)
     fts_set_int(&this->list_store[i], 0);
 
-  this->half_tick = 500.0f * vs / sr;
+  this->half_tick = 500.0 * fts_dsp_get_tick_size() / fts_dsp_get_sample_rate();
 }
 
 static void
@@ -125,7 +123,7 @@ voxalloc_used(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   float *time_over  = this->time_over;
   int idx = this->idx;
   int here = idx;
-  float now = fts_clock_get_time(0) - 2.0 * this->half_tick;
+  float now = fts_get_time() - 2.0 * this->half_tick;
 
   do {
     if(now < time_over[idx]) 
@@ -159,7 +157,7 @@ voxalloc_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   float *time_over  = this->time_over;
   int idx = this->idx;
   int here  = idx;
-  float now = fts_clock_get_time(0);
+  float now = fts_get_time();
   float dur;
 	
   if (i_dur == -1)

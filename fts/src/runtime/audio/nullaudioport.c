@@ -43,7 +43,7 @@ static void nullaudioport_output( fts_word_t *argv)
 {
   nullaudioport_t *port = (nullaudioport_t *)fts_word_get_ptr( argv+0);
 
-  if ( fts_timer_elapsed_time( &port->timer) >= (double)100.0)
+  if ( fts_timer_get_time( &port->timer) >= (double)100.0)
     {
       struct timespec pause_time;
 
@@ -52,7 +52,7 @@ static void nullaudioport_output( fts_word_t *argv)
 
       nanosleep( &pause_time, 0);
 
-      fts_timer_zero( &port->timer);
+      fts_timer_reset( &port->timer);
     }
 }
 

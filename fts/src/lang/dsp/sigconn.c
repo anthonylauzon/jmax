@@ -28,7 +28,6 @@
 #include <fts/lang/mess.h>
 #include <fts/lang/ftl.h>
 #include <fts/lang/dsp.h>
-#include "sigconn.h"
 
 #define BLOCK_SIZE 256
 

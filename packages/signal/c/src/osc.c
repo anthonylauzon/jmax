@@ -120,7 +120,7 @@ osc_put(osc_t *this, fts_dsp_descr_t *dsp, struct osc_ftl_symbols *sym)
       fts_set_symbol(a + 1, fts_dsp_get_output_name(dsp, 0));
       fts_set_int(a + 2, n_tick);
       
-      dsp_add_funcall(sym->control_input, 3, a);
+      fts_dsp_add_function(sym->control_input, 3, a);
     }
   else
     {
@@ -134,7 +134,7 @@ osc_put(osc_t *this, fts_dsp_descr_t *dsp, struct osc_ftl_symbols *sym)
 	  fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
 	  fts_set_symbol(a + 2, fts_dsp_get_output_name(dsp, 0));
 	  fts_set_int(a + 3, n_tick);
-	  dsp_add_funcall(sym->signal_input, 4, a);
+	  fts_dsp_add_function(sym->signal_input, 4, a);
 	}
       else /* inplace */
 	{
@@ -143,7 +143,7 @@ osc_put(osc_t *this, fts_dsp_descr_t *dsp, struct osc_ftl_symbols *sym)
 	  fts_set_ftl_data(a + 0, this->data);
 	  fts_set_symbol(a + 1, fts_dsp_get_output_name(dsp, 0));
 	  fts_set_int(a + 2, n_tick);
-	  dsp_add_funcall(sym->signal_input_inplace, 3, a);
+	  fts_dsp_add_function(sym->signal_input_inplace, 3, a);
 	}
     }
 }
@@ -177,7 +177,7 @@ osc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 { 
   osc_t *this = (osc_t *)o;
 
-  dsp_list_insert((fts_object_t *)this);
+  fts_dsp_add_object((fts_object_t *)this);
 
   /* init osc */
   this->freq = 0.0;
@@ -230,7 +230,7 @@ osc_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   ftl_data_free(this->data);
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static void
@@ -243,7 +243,7 @@ osc_delete_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   ftl_data_free(this->data);
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 /***************************************************************************************
@@ -272,9 +272,9 @@ osc_instantiate_cosine(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("freq"), osc_set_freq_prop);      
     }
   else
-    dsp_sig_inlet(cl, 0);
+    fts_dsp_declare_inlet(cl, 0);
 
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
     
   return fts_Success;
 }
@@ -301,10 +301,10 @@ osc_instantiate_fvec(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("freq"), osc_set_freq_prop);
     }
   else
-    dsp_sig_inlet(cl, 0);
+    fts_dsp_declare_inlet(cl, 0);
 
-  dsp_sig_outlet(cl, 0);
-    
+  fts_dsp_declare_outlet(cl, 0);
+
   return fts_Success;
 }
 

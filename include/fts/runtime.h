@@ -28,6 +28,7 @@
 #define _FTS_RUNTIME_H_
 
 /* Audio */
+#include <fts/runtime/audio/audio.h>
 #include <fts/runtime/audio/audioport.h>
 /* Client */
 #include <fts/runtime/client/protocol.h>

@@ -137,7 +137,8 @@ fts_get_client_logical_dev(int ac, const fts_atom_t *at)
 
 /* experimentally, we do the real polling every 3 ticks */
 
-void fts_client_poll(void)
+void 
+fts_client_poll(void)
 {
   static int poll_count = 0;
 
@@ -162,10 +163,9 @@ void fts_client_poll(void)
 
 	  if (ret == &fts_dev_eof)
 	    {
-	      /* End of file for client device;
-		 do a shutdown */
+	      /* End of file for client device (do a shutdown) */
 
-	      fts_halt();
+	      fts_sched_halt(fts_sched_get_current());
 
 	      return;
 	    }

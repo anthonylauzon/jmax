@@ -62,7 +62,7 @@ static void
 fts_signal_bus_put_prologue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_signal_bus_t *this = (fts_signal_bus_t *)o;
-  int n_tick = fts_get_tick_size();
+  int n_tick = fts_dsp_get_tick_size();
   fts_atom_t a[4];
   int i;
 
@@ -116,7 +116,7 @@ fts_signal_bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const 
   else
     n_channels = 1;
 
-  n = fts_get_tick_size() * n_channels;
+  n = fts_dsp_get_tick_size() * n_channels;
 
   this->buf[0] = ftl_data_alloc(n * sizeof(float));
   this->buf[1] = ftl_data_alloc(n * sizeof(float));

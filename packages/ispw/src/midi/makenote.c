@@ -51,7 +51,6 @@ typedef struct
   long vel;
   float dur;
 
-  fts_symbol_t clock;
   struct linknote *active_notes;
 } makenote_t;
 
@@ -61,8 +60,6 @@ linknote_send_off(fts_alarm_t *alarm, void *o)
 {
   struct linknote *l = o;
   makenote_t *x = (makenote_t *) l->who;
-
-  fts_alarm_unarm(alarm);	/* unarm the alarm, one shot only here */
 
   fts_outlet_int((fts_object_t *)x, 1, (long) 0);
   fts_outlet_int((fts_object_t *)x, 0, l->pitch);
@@ -112,9 +109,8 @@ makenote_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   /* activate the alarm */
 
-  fts_alarm_init(&newnote->alarm, x->clock, linknote_send_off, newnote);
+  fts_alarm_init(&newnote->alarm, 0, linknote_send_off, newnote);
   fts_alarm_set_delay(&newnote->alarm, x->dur);
-  fts_alarm_arm(&newnote->alarm);
 }
 
 static void
@@ -165,7 +161,8 @@ makenote_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       freeme = p;
       p = p->next;
 
-      fts_alarm_unarm(&(freeme->alarm));
+      fts_alarm_reset(&(freeme->alarm));
+
       fts_outlet_int(o, 0, (long) 0);
       fts_outlet_int(o, 1, freeme->pitch);
 
@@ -199,10 +196,6 @@ makenote_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   x->vel   = fts_get_int_arg(ac, at, 1, 0);
   x->dur   =  fts_get_float_arg(ac, at, 2, 0.0f);
-  x->clock = fts_get_symbol_arg(ac, at, 3, 0); /* if zero, means milliseconds */
-
-  if (x->clock && (! fts_clock_exists(x->clock)))
-    post("makenote: warning: clock %s do not yet exists\n", fts_symbol_name(x->clock));
 
   x->active_notes = 0;
 }

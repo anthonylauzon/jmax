@@ -24,26 +24,38 @@
  *
  */
 
-#include <fts/lang.h>
+/* cubic interpolation by 8 bit coefficient table lookup based on fixed-point fractinal index (idefix.h) */
 
-fts_fourpoint_t fts_fourpoint_table[FTS_FOURPOINT_TABLE_SIZE];
+#ifndef _FTS_CUBIC_H_
+#define _FTS_CUBIC_H_
 
-void
-fts_fourpoint_init(void)
+#include "idefix.h"
+
+#define FTS_CUBIC_TABLE_BITS 8
+#define FTS_CUBIC_TABLE_SHIFT_BITS 24
+#define FTS_CUBIC_TABLE_SIZE 256
+#define FTS_CUBIC_TABLE_BIT_MASK 0xff000000
+
+#define fts_cubic_get_table_index(i) \
+   ((int)(((i).frac & FTS_CUBIC_TABLE_BIT_MASK) >> FTS_CUBIC_TABLE_SHIFT_BITS))
+
+typedef struct
 {
-  int i;
-  float f;
-  fts_fourpoint_t *p;
+  float pm1;
+  float p0;
+  float p1;
+  float p2;
+} fts_cubic_coefs_t;
 
-  p = fts_fourpoint_table;
+extern fts_cubic_coefs_t fts_cubic_table[];
 
-  for( i = 0; i < FTS_FOURPOINT_TABLE_SIZE; i++)
-    {
-      f = i * (1.0f / FTS_FOURPOINT_TABLE_SIZE);
-      p->pm1 = -.1666667f * f * (1-f) * (2-f);
-      p->p0 = .5f * (1+f) * (1-f) * (2-f);
-      p->p1 = .5f * (1+f) * f * (2-f);
-      p->p2 = -.1666667f * (1+f) * f * (1-f);
-      p++;
-    }
-}
+#define fts_cubic_calc(x, p) \
+  ((x)[-1] * (p)->pm1 + (x)[0] * (p)->p0 + (x)[1] * (p)->p1 + (x)[2] * (p)->p2)
+
+#define fts_cubic_interpolate(p, i, y) \
+  do { \
+    fts_cubic_coefs_t *ft = fts_cubic_table + fts_cubic_get_table_index(i); \
+    *(y) = fts_cubic_calc(p + (i).index, ft); \
+  } while(0)
+
+#endif

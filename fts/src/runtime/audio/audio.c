@@ -29,11 +29,20 @@
 extern void audioport_config( void);
 extern void nullaudioport_config( void);
 
-static void audio_init( void)
-{
-  /* Must be ***before** audioport_config() */
-  nullaudioport_config();
+fts_symbol_t fts_s_fifo_size = 0;
 
+void
+fts_audio_idle(void)
+{
+  fts_audioport_idle(0);
+}
+
+static void 
+audio_init( void)
+{
+  fts_s_fifo_size = fts_new_symbol("fifo_size");
+
+  nullaudioport_config(); /* must be ***before** audioport_config()!!! */
   audioport_config();
 }
 

@@ -501,7 +501,7 @@ wacom_reset_buttons(fts_alarm_t *alarm, void *p)
 static void
 wacom_init_stop(wacom_t *this)
 {
-  fts_alarm_unarm(&this->alarm);
+  fts_alarm_reset(&this->alarm);
   fts_bytestream_remove_listener(this->stream, (fts_object_t *)this);
 }
 
@@ -696,7 +696,6 @@ wacom_init_start(wacom_t *this)
   /* wait for reset */
   this->init_wait = 1;
   fts_alarm_set_delay(&this->alarm, WACOM_WAIT_RESET);
-  fts_alarm_arm(&this->alarm);
 }
 
 static void
@@ -714,7 +713,6 @@ wacom_init_alarm(fts_alarm_t *alarm, void *o)
       
       /* set init timeout (all the rest is handled by the init callback) */
       fts_alarm_set_delay(&this->alarm, WACOM_REQUEST_TIMEOUT);
-      fts_alarm_arm(&this->alarm);
     }
   else
     {
@@ -818,7 +816,7 @@ wacom_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(this->stream)
     {
-      fts_alarm_unarm(&this->alarm);
+      fts_alarm_reset(&this->alarm);
       fts_bytestream_remove_listener(this->stream, o);
     }
 }

@@ -41,7 +41,6 @@ delay_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   delay_t *x = (delay_t *)o;
 
   fts_alarm_set_delay(&x->alarm, x->del);
-  fts_alarm_arm(&x->alarm);
 }
 
 static void
@@ -49,7 +48,7 @@ delay_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   delay_t *x = (delay_t *)o;
 
-  fts_alarm_unarm(&x->alarm);
+  fts_alarm_reset(&x->alarm);
 }
 
 static void
@@ -70,7 +69,6 @@ delay_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void
 delay_tick(fts_alarm_t *alarm, void *o)
 {
-  fts_alarm_unarm(alarm);	/* unarm the alarm, one shot only here */
   fts_outlet_bang((fts_object_t *)o, 0);
 }
 
@@ -78,19 +76,10 @@ static void
 delay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   delay_t *x = (delay_t *)o;
-  fts_symbol_t clock = 0;
   double n;
 
 
-  if(ac > 1 && fts_is_symbol(at + 1))
-    {
-      clock = fts_get_symbol(at + 1);
-      n =  fts_get_double_arg(ac, at, 2, 0.0);
-    }
-  else
-    {
-      n = fts_get_double_arg(ac, at, 1, 0.0);    
-    }
+  n = fts_get_double_arg(ac, at, 1, 0.0);    
 
   if (n == (double) 0.0)
     n = 0.001;
@@ -100,15 +89,7 @@ delay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   x->del = n;
 
-  if (clock)
-    {
-      if (! fts_clock_exists(clock))
-	post("delay: warning: clock %s does not exists, yet\n", fts_symbol_name(clock));
-
-      fts_alarm_init(&x->alarm, clock, delay_tick, x);
-    }
-  else
-    fts_alarm_init(&x->alarm, 0, delay_tick, x);
+  fts_alarm_init(&x->alarm, 0, delay_tick, x);
 }
 
 static void
@@ -116,7 +97,7 @@ delay_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   delay_t *x = (delay_t *)o;
 
-  fts_alarm_unarm(&x->alarm);
+  fts_alarm_reset(&x->alarm);
 }
 
 static fts_status_t

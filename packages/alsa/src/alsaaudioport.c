@@ -764,7 +764,8 @@ static void pcm_dump_post( snd_pcm_t *handle)
 
 static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  int sampling_rate, fifo_size, format, format_is_32, capture_channels, playback_channels, transfer_mode, err;
+  int sampling_rate, fifo_size, format, format_is_32, capture_channels, playback_channels, err;
+  int transfer_mode = 0;
   float sr;
   char pcm_name[256];
   const char *format_name;
@@ -776,7 +777,7 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
 
   ac--;
   at++;
-  sr = fts_param_get_float( fts_s_sampling_rate, DEFAULT_SAMPLING_RATE);
+  sr = fts_dsp_get_sample_rate();
   sampling_rate = (int)sr ;
   fifo_size = fts_param_get_int(fts_s_fifo_size, DEFAULT_FIFO_SIZE);
 
@@ -806,13 +807,14 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
       if ( (err = alsastream_open( &this->capture, pcm_name, SND_PCM_STREAM_CAPTURE, format, capture_channels, sampling_rate, fifo_size, transfer_mode)) < 0)
 	{
 	  fts_object_set_error(o, "Error opening ALSA device (%s)", snd_strerror( err));
+	  post("alsaaudioport: cannot open ALSA device %s (%s)\n", pcm_name, snd_strerror( err));
 	  return;
 	}
 
       fts_audioport_set_input_channels( (fts_audioport_t *)this, this->capture.channels);
       fts_audioport_set_input_function( (fts_audioport_t *)this, functions_table[transfer_mode][format_is_32][0]);
 
-      this->input_buffer = alsaaudioport_allocate_buffer( transfer_mode, this->capture.channels, fts_get_tick_size(), snd_pcm_format_physical_width(format)/8);
+      this->input_buffer = alsaaudioport_allocate_buffer( transfer_mode, this->capture.channels, fts_dsp_get_tick_size(), snd_pcm_format_physical_width(format)/8);
     }
 
   if ( playback_channels != 0)
@@ -820,13 +822,14 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
       if ( (err = alsastream_open( &this->playback, pcm_name, SND_PCM_STREAM_PLAYBACK, format, playback_channels, sampling_rate, fifo_size, transfer_mode)) < 0)
 	{
 	  fts_object_set_error(o, "Error opening ALSA device (%s)", snd_strerror( err));
+	  post("alsaaudioport: cannot open ALSA device %s (%s)\n", pcm_name, snd_strerror( err));
 	  return;
 	}
 
       fts_audioport_set_output_channels( (fts_audioport_t *)this, this->playback.channels);
       fts_audioport_set_output_function( (fts_audioport_t *)this, functions_table[transfer_mode][format_is_32][1]);
 
-      this->output_buffer = alsaaudioport_allocate_buffer( transfer_mode, this->playback.channels, fts_get_tick_size(), snd_pcm_format_physical_width(format)/8);
+      this->output_buffer = alsaaudioport_allocate_buffer( transfer_mode, this->playback.channels, fts_dsp_get_tick_size(), snd_pcm_format_physical_width(format)/8);
   }
 
   if (transfer_mode == MMAP_ARDOUR)

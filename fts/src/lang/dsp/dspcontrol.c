@@ -150,7 +150,6 @@ static void fts_dsp_control_poll(fts_alarm_t *alarm, void *data)
 /*      } */
 
   fts_alarm_set_delay(&(this->poll_alarm), this->poll_interval);
-  fts_alarm_arm(&(this->poll_alarm));
 }
 
 
@@ -181,7 +180,6 @@ static fts_data_t *fts_dsp_control_new(int ac, const fts_atom_t *at)
 
   fts_alarm_init(&(this->poll_alarm), 0, fts_dsp_control_poll, this);
   fts_alarm_set_delay(&(this->poll_alarm), this->poll_interval);
-  fts_alarm_arm(&(this->poll_alarm));
 
   fts_param_add_listener(fts_s_dsp_on, this, fts_dsp_control_dsp_on_listener);
 
@@ -198,7 +196,7 @@ static void fts_dsp_control_export_fun(fts_data_t *d)
   fts_set_int(&a, fts_param_get_int(fts_s_fifo_size, 0));
   fts_data_remote_call((fts_data_t *)this, DSP_CONTROL_FIFO_SIZE, 1, &a);
 
-  sr = fts_param_get_float(fts_s_sampling_rate, 44100.0f);
+  sr = fts_dsp_get_sample_rate();
   fts_set_int(&a, (int)sr );
   fts_data_remote_call((fts_data_t *)this, DSP_CONTROL_SAMPLING_RATE, 1, &a);
 }
@@ -210,7 +208,7 @@ fts_dsp_control_delete(fts_data_t *d)
 {
   fts_dsp_control_t *this = (fts_dsp_control_t *)d;
 
-  fts_alarm_unarm(&(this->poll_alarm));
+  fts_alarm_reset(&(this->poll_alarm));
   fts_free((void *)this);
 }
 

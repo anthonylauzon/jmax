@@ -54,7 +54,7 @@ seqplay_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(this->event)
     {
-      fts_alarm_unarm(&this->alarm);
+      fts_alarm_reset(&this->alarm);
 
       seqref_unlock(o);
 
@@ -100,7 +100,7 @@ seqplay_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   if(!fts_alarm_is_armed(&this->alarm))
     {
-      double now = fts_get_time_in_msecs();    
+      double now = fts_get_time();    
       
       if(!this->event)
 	seqplay_locate(o, 0, 0, 0, 0);
@@ -110,7 +110,6 @@ seqplay_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  this->start_time = now;
 	  
 	  fts_alarm_set_time(&this->alarm, now + event_get_time(this->event) - this->start_location);
-	  fts_alarm_arm(&this->alarm);
 	}
     }
 }
@@ -119,10 +118,10 @@ static void
 seqplay_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqplay_t *this = (seqplay_t *)o;
-  double now = fts_get_time_in_msecs();
+  double now = fts_get_time();
       
   this->start_location += now - this->start_time;
-  fts_alarm_unarm(&this->alarm);
+  fts_alarm_reset(&this->alarm);
 }
 
 static void 
@@ -148,11 +147,11 @@ seqplay_sync(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       if(event)
 	{
 	  this->event = event;
-	  this->start_time = fts_get_time_in_msecs();
+	  this->start_time = fts_get_time();
 	  this->start_location = time;
 
 	  if(fts_alarm_is_armed(&this->alarm))
-	    fts_alarm_set_time(&this->alarm, fts_get_time_in_msecs() + event_get_time(this->event) - time);
+	    fts_alarm_set_time(&this->alarm, fts_get_time() + event_get_time(this->event) - time);
 	}
       else
 	seqplay_stop(o, 0, 0, 0, 0);
@@ -178,7 +177,7 @@ static void
 seqplay_alarm_tick(fts_alarm_t *alarm, void *o)
 {
   seqplay_t *this = (seqplay_t *)o;
-  double current_location = fts_get_time_in_msecs() - this->start_time + this->start_location;
+  double current_location = fts_get_time() - this->start_time + this->start_location;
   event_t *event = this->event;
   event_t *next;
 
@@ -189,7 +188,6 @@ seqplay_alarm_tick(fts_alarm_t *alarm, void *o)
     {
       this->event = next;
       fts_alarm_set_time(alarm, this->start_time + event_get_time(next) - this->start_location);
-      fts_alarm_arm(alarm);
     }
   else
     seqplay_stop(o, 0, 0, 0, 0);
@@ -234,7 +232,7 @@ seqplay_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 { 
   seqplay_t *this = (seqplay_t *)o;
 
-  fts_alarm_unarm(&this->alarm);
+  fts_alarm_reset(&this->alarm);
 }
 
 static fts_status_t

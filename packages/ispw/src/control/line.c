@@ -38,8 +38,6 @@ typedef struct
   long inval;	/* last value sent to inlet */
 } line_t;
 
-/* Tick function */
-
 static void
 line_int_tick(fts_alarm_t *alarm, void *o)
 {
@@ -52,12 +50,10 @@ line_int_tick(fts_alarm_t *alarm, void *o)
     {
       this->cur += this->inc;
       fts_alarm_set_delay(alarm, this->grain);
-      fts_alarm_arm(alarm);
       fts_outlet_int((fts_object_t *)o, 0, this->cur);	
     }
   else
     {
-      fts_alarm_unarm(alarm);
       fts_outlet_int((fts_object_t *)o, 0, this->target);
     }
 }
@@ -75,15 +71,11 @@ line_float_tick(fts_alarm_t *alarm, void *o)
       this->cur += this->inc;
 
       fts_alarm_set_delay(alarm, this->grain);
-      fts_alarm_arm(alarm);
 
       fts_outlet_float((fts_object_t *)o, 0, this->cur);	
     }
   else
-    {
-      fts_alarm_unarm(alarm);
-      fts_outlet_float((fts_object_t *)o, 0, this->target);
-    }
+    fts_outlet_float((fts_object_t *)o, 0, this->target);
 }
 
 /* Methods */
@@ -96,7 +88,8 @@ line_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   this->steps = 0;
   this->target = this->cur;
-  fts_alarm_unarm(&this->alarm);
+
+  fts_alarm_reset(&this->alarm);
 }
 
 
@@ -129,14 +122,13 @@ line_int_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       this->cur   = old_target;
       this->target = target;
       this->inval = 0;
-      fts_alarm_arm(&this->alarm);
       line_int_tick(&this->alarm, this);
     }
   else
     {
       this->target = target;
       this->steps = 0;
-      fts_alarm_unarm(&this->alarm);
+
       fts_outlet_int(o, 0, this->target);
     }
 }
@@ -168,14 +160,13 @@ line_float_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       this->cur   = old_target;
       this->target = target;
       this->inval = 0;
-      fts_alarm_arm(&this->alarm);
       line_float_tick(&this->alarm, this);
     }
   else
     {
       this->target = target;
       this->steps = 0;
-      fts_alarm_unarm(&this->alarm);
+
       fts_outlet_float(o, 0, this->target);
     }
 }
@@ -191,7 +182,7 @@ line_int_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->target = target;
   this->steps = 0;
 
-  fts_alarm_unarm(&this->alarm);
+  fts_alarm_reset(&this->alarm);
 }
 
 static void
@@ -203,7 +194,7 @@ line_float_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   this->target = target;
   this->steps = 0;
 
-  fts_alarm_unarm(&this->alarm);
+  fts_alarm_reset(&this->alarm);
 }
 
 /* fix message into rite corner */
@@ -267,35 +258,18 @@ line_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   line_t *this   = (line_t *)o;
   void (* line_tick)(fts_alarm_t *, void *) = 0;
-  fts_symbol_t clock = 0;
   double target;
   double grain;
 
-  if(ac > 1 && fts_is_symbol(at + 1))
-    {
-      clock = fts_get_symbol(at + 1);
-      target = (double) fts_get_float_arg(ac, at, 2, 0.0f);
-      grain = fts_get_double_arg(ac, at, 3, 0);
-    }
+  target = (double) fts_get_float_arg(ac, at, 1, 0.0f);
+  grain =  fts_get_double_arg(ac, at, 2, 0);    
+  
+  if(ac < 1 || fts_is_long(at+1))
+    line_tick = line_int_tick;
   else
-    {
-      target = (double) fts_get_float_arg(ac, at, 1, 0.0f);
-      grain =  fts_get_double_arg(ac, at, 2, 0);    
-    }
-
-   if(ac < 1 || fts_is_long(at+1))
-     line_tick = line_int_tick;
-   else
-     line_tick = line_float_tick;
-
-  if(clock)
-    {
-      if(!fts_clock_exists(clock))
-	post("line: warning clock %s does not exists, yet\n", fts_symbol_name(clock));
-      fts_alarm_init(&this->alarm, clock, line_tick, this);
-    }
-  else
-    fts_alarm_init(&this->alarm, 0, line_tick, this);
+    line_tick = line_float_tick;
+  
+  fts_alarm_init(&this->alarm, 0, line_tick, this);
 
   this->target = target;
   this->steps  = 0;
@@ -312,7 +286,7 @@ line_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   line_t *this = (line_t *)o;
 
-  fts_alarm_unarm(&this->alarm);
+  fts_alarm_reset(&this->alarm);
 }
 
 

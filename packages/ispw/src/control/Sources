@@ -25,10 +25,8 @@
 
 SOURCES = \
 naming.c \
-at.c \
 bangbang.c \
 change.c \
-clock.c \
 control.c \
 delay.c \
 drunk.c \

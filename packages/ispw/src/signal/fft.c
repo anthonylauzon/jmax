@@ -68,7 +68,6 @@ enum{
 static void
 clock_bang(fts_alarm_t *alarm, void *o)
 {
-  fts_alarm_unarm(alarm);
   fts_outlet_bang((fts_object_t *)o, ((fft_t *)o)->bang_out);
 }
 
@@ -155,9 +154,13 @@ fft_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   fft_t *x = (fft_t *)o;
 
-  fts_alarm_unarm(&x->ctl.alarm);
-  if(x->ctl.buf) fts_free((void *)x->ctl.buf);
-  if(x->ctl.spec) fts_free((void *)x->ctl.spec);
+  fts_alarm_reset(&x->ctl.alarm);
+
+  if(x->ctl.buf) 
+    fts_free((void *)x->ctl.buf);
+
+  if(x->ctl.spec) 
+    fts_free((void *)x->ctl.spec);
 
   dsp_list_remove(o);
 }

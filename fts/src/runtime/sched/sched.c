@@ -31,55 +31,27 @@
 #include <fts/lang.h>
 #include <fts/runtime.h>
 
-double fts_sched_msecs = 0.0;
-double fts_sched_ticks = 0.0;
-int fts_sched_tick_size = FTS_DEF_TICK_SIZE;
-double fts_sched_sample_rate = (double)44100.0;
-double fts_sched_tick_duration = (double)(FTS_DEF_TICK_SIZE * 1000) / 44100.0;
-
 #define FD_NO_SELECT -1
 
+fts_sched_t main_sched;
 
-/* the pause length; it say how often (in scheduler ticks) 
-   we need to give the processor control back to the OS,
-   in order to don't overload the machine. */
+fts_sched_t *
+fts_sched_get_current(void)
+{
+  return &main_sched;
+}
 
-static int fts_pause_period = 12;
-
+double 
+fts_get_time(void)
+{
+  return main_sched.clock.time;
+}
 
 /*****************************************************************************
  *
  *  select and file descrpitors
  *
  */
-
-typedef struct _fd_callback_t 
-{
-  int fd;
-  int read; /* if 1, the file descriptor will be added to the read fdset, if not to the write fd set */
-  fts_method_t method;
-  fts_object_t *object;
-  struct _fd_callback_t *next;
-} fd_callback_t;
-
-struct _fts_sched 
-{
-  fd_callback_t *fd_callback_head;
-};
-
-static struct _fts_sched _mschd;
-static fts_sched_t *main_sched = 0;
-
-fts_sched_t *fts_sched_get_current( void)
-{
-  if (!main_sched)
-    {
-      _mschd.fd_callback_head = 0;
-      main_sched = &_mschd;
-    }
-
-  return main_sched;
-}
 
 static void fts_sched_add_fd_realize( fts_sched_t *sched, int fd, int read, fts_method_t method, fts_object_t *object)
 {
@@ -170,7 +142,8 @@ void fts_sched_remove( fts_sched_t *sched, fts_object_t *object)
     sched: the sched owning the file descriptor set
   Returns: nothing.
 */
-static void fts_sched_do_select( fts_sched_t *sched)
+static void 
+fts_sched_do_select(fts_sched_t *sched)
 {
   fd_set rfds, wfds;
   struct timeval tv;
@@ -225,21 +198,14 @@ static void fts_sched_do_select( fts_sched_t *sched)
 
 /*****************************************************************************
  *
- *  the scheduler loop
+ *  scheduler
  *
  */
 
-static enum {running, halted} fts_running_status;
-
-void fts_halt(void)
-{
-  fts_running_status = halted;
-}
-
+/* origial scheduler fuctions
 void fts_sched_run_one_tick( void)
 {
   fts_alarm_poll();
-  /* You are the next on the list. Keep cool!!! */
   fts_client_poll();
   fts_sched_do_select( fts_sched_get_current());
   fts_dsp_chain_poll();
@@ -248,53 +214,53 @@ void fts_sched_run_one_tick( void)
   fts_sched_msecs = fts_sched_ticks * fts_sched_tick_duration;
 }
 
-void fts_sched_run( void)
+void 
+fts_sched_run( void)
 {
-  int tick_counter = 0;
-
   fts_running_status = running;
 
   while(fts_running_status == running)
     {
-      fts_sched_run_one_tick();
-
-      tick_counter++;
+      fts_alarm_poll();
+      fts_client_poll();
+      fts_sched_do_select(fts_sched_get_current());
+      fts_dsp_chain_poll();
   
-      if (tick_counter > fts_pause_period)
-	{
-#if 0
-	  fts_pause(); /* call the OS dependent pause function */
-#endif
-	  tick_counter = 0;
-	}
+      fts_sched_ticks += 1.0;
+      fts_sched_msecs = fts_sched_ticks * fts_sched_tick_duration;
     }
 }
-
-
-/*****************************************************************************
- *
- *  tick and pause
- *
- */
-
-static void fts_sched_set_sampling_rate(void *listener, fts_symbol_t name, const fts_atom_t *value)
-{
-  if (fts_is_number(value))
-    {
-      float sr = fts_get_number_float(value);
-      fts_sched_tick_duration = fts_sched_tick_size * 1000. / sr;
-      fts_sched_sample_rate = sr;
-    }
-}
-
-
-/* Pause handling  */
-/* (fd)
-   Note: the pause mechanism does not work... (see non-portable/linux.../syssched.c) 
 */
-void fts_sched_set_pause(int p)
+
+void
+fts_sched_init(fts_sched_t *sched)
 {
-  fts_pause_period = p;
+  sched->fd_callback_head = 0;
+  fts_clock_init(&sched->clock);
+  sched->status = sched_ready;
+}
+
+/* run the scheduler in a loop (note that the clock time is set inside fts_dsp_run_tick() */
+void 
+fts_sched_run(fts_sched_t *sched)
+{
+  while(sched->status != sched_halted)
+    {
+      /* get client events */
+      fts_client_poll(); /* still buarghhh! */
+
+      /* poll file descriptors and run functions inserted to the scheduler */
+      fts_sched_do_select(sched);
+
+      /* run dsp subsustem */
+      fts_dsp_run_tick();
+    }
+}
+
+void 
+fts_sched_halt(fts_sched_t *sched)
+{
+  sched->status = sched_halted;
 }
 
 /*****************************************************************************
@@ -303,22 +269,10 @@ void fts_sched_set_pause(int p)
  *
  */
 
-static void fts_sched_init(void)
+static void fts_sched_module_init(void)
 {
-  /* define the scheduler clocks */
-  fts_clock_define_protected(fts_new_symbol("msec"), &fts_sched_msecs);
-  fts_clock_define_protected(fts_new_symbol("tick"), &fts_sched_ticks);
-
-  /* Install the "msec" clock as default */
-  fts_set_default_clock(fts_new_symbol("msec"));
-
-  /* Install the listener for the sampling rate parameter;
-   * the actual listener is a null pointer, no state to pass to the handler
-   * and we will not deinstall the listener.
-   */
-
-  fts_param_add_listener(fts_s_sampling_rate, 0, fts_sched_set_sampling_rate);
+  fts_sched_init(&main_sched);
 }
 
-fts_module_t fts_sched_module = { "sched", "the sched module", fts_sched_init, 0, 0};
+fts_module_t fts_sched_module = { "sched", "the sched module", fts_sched_module_init, 0, 0};
 

@@ -17,38 +17,10 @@
 
 <body bgcolor="white">
 
-<table width=100% border=0 cellspacing=0 cellpadding=0>
-<tr>
-  <td align=left valign=top>
-    <a href="http://www.ircam.fr/jmax/"><img src="images/jmax_logo_small_transp.gif" border=0 alt="jMax"></A>
-  </td>
-  <td align=right valign=top>
-    <a href="http://www.ircam.fr/"><img src="images/ircam_banner.gif" border=0 alt="IRCAM - Centre Georges Pompidou"></a>
-  </td>
-</tr>
-
-</table>
-
-
-<table width=75% border=0 cellspacing=0 cellpadding=0>
-
-<tr>
-<td><spacer type="block" height="1" width="1"></td>
-</tr>
-
-<tr>
-<td align=right><font size=+3><b>Developping jMax DSP objects</b></font></td>
-</tr>
-
-<tr>
-<td align=right valign=top><a href="index.html"><font size=-1>jMax Documentation</font></a></td>
-</tr>
-
-<tr>
-<td><spacer type="block" height="1" width="1"></td>
-</tr>
-
-</table>
+<h4>
+  <a href="http://www.ircam.fr/jmax/"><img src="images/jmax_icon.gif" border=0 alt="jMax" ALIGN=MIDDLE></A>
+  jMax documentation
+</h4>
 
 <!-- ---------------------------------------------------------------------- -->
 <!-- ---------------------------------------------------------------------- -->
@@ -56,6 +28,7 @@
 <!-- ---------------------------------------------------------------------- -->
 <!-- ---------------------------------------------------------------------- -->
 
+<h1>Developing jMax DSP objects</h1>
 
 <p>
 <ul type=dot>
@@ -65,7 +38,6 @@
   <li> <a href="#Init and delete methods for DSP objects">Init and delete methods for DSP objects</a>
   <li> <a href="#The DSP computation function">The DSP computation function</a>
   <li> <a href="#The put method">The put method</a>
-  <li> <a href="#A complete example">A complete example</a>
 </ul>
 
 <p>
@@ -90,7 +62,7 @@ Programming Guide</quote> and some inconsistancies may subsist.
 <p>
 This document describes the FTS DSP objects programming interface. DSP objects
 are objects that computes samples and are scheduled at a fixed rate synchonous
-to the sampling rate. DSP objects use the FTS message system, 
+to the sample rate. DSP objects use the FTS message system, 
 described in <a href="control_objects.html">Control Objects Developer's Guide</a>,
 but have special functions for sample computation and special methods
 for compilation of the <i>DSP program</i>.
@@ -144,7 +116,8 @@ for reasons explained later, using the private DSP data.<p>
  <li> <a href="#Example of DSP class instantiation function">Example of DSP class instantiation function</a>
  </ul>
 
-<a name="DSP inlets and outlets declaration"><h3>DSP inlets and outlets declaration</h3></a>
+<a name="DSP inlets and outlets declaration">
+<h3>DSP inlets and outlets declaration</h3></a>
 
 A DSP class must declare which inlets and outlets are
 DSP inlets and outlets. To these inlets and outlets will be associated
@@ -154,10 +127,10 @@ samples buffers to be used during samples computation.
 This is done using the 2 following functions :
 <p>
 
-<code>void dsp_sig_inlet( fts_class_t *<i>class</i>, int <i>winlet</i>)</code>
+<code>void fts_dsp_declare_inlet( fts_class_t *<i>class</i>, int <i>winlet</i>)</code>
 <p>
 
-<code>void dsp_sig_outlet( fts_class_t *<i>class</i>, int <i>woutlet</i>)</code>
+<code>void fts_dsp_declare_outlet( fts_class_t *<i>class</i>, int <i>woutlet</i>)</code>
 <p>
 
 The arguments of these functions have the following meaning :
@@ -171,7 +144,8 @@ The arguments of these functions have the following meaning :
 </dl>
 
 
-<a name="DSP function declaration"><h3>DSP function declaration</h3></a>
+<a name="DSP function declaration">
+<h3>DSP function declaration</h3></a>
 
 A DSP class must declare its DSP function. This function will be called
 during the execution of the DSP program.
@@ -189,7 +163,7 @@ DSP functions are discussed in details later.
 In a DSP class instantiation function, a DSP function is declared with the following function :
 <p>
 
-<code>void dsp_declare_function( fts_symbol_t *<i>name</i>, void (*<i>dsp_function</i>)(fts_word_t *))</code>
+<code>void fts_dsp_declare_function( fts_symbol_t *<i>name</i>, void (*<i>dsp_function</i>)(fts_word_t *))</code>
 <p>
 
 The arguments of this function have the following meaning :
@@ -206,7 +180,8 @@ defined. This is detailled in the example below.
 <p>
 
 
-<a name="DSP specific methods declaration"><h3>DSP specific methods declaration</h3></a>
+<a name="DSP specific methods declaration">
+<h3>DSP specific methods declaration</h3></a>
 
 A DSP class must declare 3 methods that are mandatory : init, delete and put methods.
 This is done using the <code>fts_method_define</code> function, which is described in 
@@ -216,17 +191,15 @@ These methods are associated with
 the <i>system inlet</i>, with the following selectors and arguments :
 <dl>
 <dt> <code>init</code>
-<dd> selector : <i>fts_s_init</i> corresponding to symbol name "$init" 
-arguments : object dependant
+<dd> selector : <i>fts_s_init</i>, arguments: object dependent
 <dt> <code>delete</code>
-<dd> selector : <i>fts_s_delete</i> corresponding to symbol name "$delete" 
-arguments : none
+<dd> selector : <i>fts_s_delete</i>, arguments: none
 <dt> <code>put</code>
-<dd> selector : <i>fts_s_put</i> corresponding to symbol name "put" 
-arguments : 1 argument of type fts_Object 
+<dd> selector : <i>fts_s_put</i>, arguments: 1 argument of type fts_ptr
 </dl>
 
-<a name="Example of DSP class instantiation function"><h3>Example of DSP class instantiation function</h3></a>
+<a name="Example of DSP class instantiation function">
+<h3>Example of DSP class instantiation function</h3></a>
 
 Below is the example of the instantiation function of a DSP object,
 doing scalar multiply then add, which can be usefull for instance for mixing.
@@ -241,50 +214,40 @@ typedef struct {
 static fts_symbol_t *sma_function = 0;
 
 /* Declaration of DSP function : content will be detailled later */
-static void sma_dsp_function( fts_word_t *args);
+static void 
+sma_dsp_function( fts_word_t *args);
 
-/* Declarations of methods : contents will be detailled later  */
-static void sma_init( fts_object_t *o, int winlet, fts_symbol_t *s, 
-           int ac, const fts_atom_t *at);
-static void sma_delete( fts_object_t *o, int winlet, fts_symbol_t *s, 
-           int ac, const fts_atom_t *at);
-static void sma_put( fts_object_t *o, int winlet, fts_symbol_t *s, 
-           int ac, const fts_atom_t *at);
-static void sma_set( fts_object_t *o, int winlet, fts_symbol_t *s, 
-           int ac, const fts_atom_t *at);
+/* Declarations of methods (will be detailled later) */
+static void sma_init( fts_object_t *o, int winlet, fts_symbol_t *s, int ac, const fts_atom_t *at);
+static void sma_delete( fts_object_t *o, int winlet, fts_symbol_t *s, int ac, const fts_atom_t *at);
+static void sma_put( fts_object_t *o, int winlet, fts_symbol_t *s, int ac, const fts_atom_t *at);
+static void sma_set( fts_object_t *o, int winlet, fts_symbol_t *s, int ac, const fts_atom_t *at);
 
 static fts_status_t
 sma_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[2];
 
-  /* Class initialization : 2 inlets, 1 outlet */
+  /* class initialization : 2 inlets, 1 outlet */
   fts_class_init(cl, sizeof(sma_t), 2, 1, 0);
 
-  /* Definition of DSP specific methods */
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_float;
-  fts_method_define( cl, fts_SystemInlet, fts_s_init, sma_init, 2, a);
+  /* definition of DSP specific methods */
+  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, sma_init);
+  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_delete, sma_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sma_put);
 
-  fts_method_define( cl, fts_SystemInlet, fts_s_delete, sma_delete, 0, 0);
+  /* definition of other methods */
+  fts_method_define_varargs(cl, 0, fts_s_int, sma_set);
+  fts_method_define_varargs(cl, 0, fts_s_float, sma_set);
 
-  a[0] = fts_s_ptr;
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, sma_put, 1, a);
+  /* declaration of DSP inlets and outlets */
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 1);
+  fts_dsp_declare_outlet(cl, 0);
 
-  /* Definition of other methods */
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, sma_set, 1, a);
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, sma_set, 1, a);
-
-  /* Definition of DSP inlets and outlets */
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_inlet(cl, 1);
-  dsp_sig_outlet(cl, 0);
-
-  /* Declare DSP function and keep the associated symbol */
+  /* declare DSP function and keep the associated symbol */
   sma_function = fts_new_symbol("sma");
-  dsp_declare_function( sma_function, sma_dsp_function);
+  fts_dsp_declare_function( sma_function, sma_dsp_function);
   
   return fts_Success;
 }
@@ -295,7 +258,8 @@ sma_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 <!-- ---------------------------------------------------------------------- -->
 <p>
 <hr>
-<a name="Init and delete methods for DSP objects"><h2>Init and delete methods for DSP objects</h2></a>
+<a name="Init and delete methods for DSP objects">
+<h2>Init and delete methods for DSP objects</h2></a>
 
  <ul>
  <li> <a href="#Init method">Init method</a>
@@ -306,7 +270,8 @@ sma_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
  <li> <a href="#Example of a method modifying ftl data">Example of a method modifying ftl data</a>
  </ul>
 
-<a name="Init method"><h3>Init method</h3></a>
+<a name="Init method">
+<h3>Init method</h3></a>
 
 The init methods of a DSP class have two tasks to perfom; first,
 to allocate in the FTL virtual machine any private data the DSP computation
@@ -316,7 +281,7 @@ has an object that can generate part of the DSP program.
 The private data is generated in this way:
 <pre>
 <code>
-  this->obj_ftl_data = ftl_data_new(dsp_data_t);
+  this->obj_ftl_data = ftl_data_alloc(sizeof(dsp_data_t));
 </code>
 </pre>
 
@@ -342,7 +307,7 @@ objects.  This list is maintained by the system for DSP program
 compilation.This is done by calling the following function :
 <p>
 
-<code>void dsp_list_insert( fts_object_t *<i>object</i>)</code>
+<code>void fts_dsp_add_object( fts_object_t *<i>object</i>)</code>
 <p>
 
 The argument of this function is a pointer to the object that is to be
@@ -350,7 +315,8 @@ inserted.
 <p>
 
 
-<a name="Delete method"><h3>Delete method</h3></a>
+<a name="Delete method">
+<h3>Delete method</h3></a>
 
 The <code>delete</code> method of a DSP class must free all the ftl data
 items allocated in the <code>init</code> method, by calling the <code>ftl_data_free</code>
@@ -365,15 +331,16 @@ The <code>delete</code> method of a DSP class must also call the following funct
 in order to remove the object being deleted from the list of DSP objects :
 <p>
 
-<code>void dsp_list_remove( fts_object_t *<i>object</i>)</code>
+<code>void fts_dsp_remove_object( fts_object_t *<i>object</i>)</code>
 <p>
 
 The argument of this function is a pointer to the object that is to be
 removed. It must point to an object that has been inserted using
-function <code>dsp_list_insert</code>.
+function <code>fts_dsp_add_object</code>.
 <p>
 
-<a name="Modifing The FTL Data"> <h3>Modifing The FTL Data</h3></a>
+<a name="Modifing The FTL Data">
+<h3>Modifing The FTL Data</h3></a>
 
 <p>
 The <code>init</code> method, or any other method can change the content
@@ -385,7 +352,8 @@ To get the pointer associated with a FTL data, the following macro is provided:
 contained in the FTL data handle.
 
 
-<a name="Limitations of FTL Data items"><h3>Limitations of FTL Data items</h3></a>
+<a name="Limitations of FTL Data items">
+<h3>Limitations of FTL Data items</h3></a>
 
 FTL data are not freely accessible C data structure; the type <code>ftl_data_t</code>
 is not a C pointer to the data structure; in general, there is no way for the DSP
@@ -407,68 +375,65 @@ cannot directly access the DSP program memory.
 Also, in architecture with small caches (like the ISPW), DSP data can
 be dynamically rearranged to maximize locality.
 
-<a name="Example of init and delete methods"><h3>Example of init and delete methods</h3></a>
+<a name="Example of init and delete methods">
+<h3>Example of init and delete methods</h3></a>
 
 Below is the example of the <code>init</code> and <code>delete</code> methods of
 the DSP object <code>sma</code> which has already been introduced.
 <p>
 
 <pre>
-static void sma_init( fts_object_t *o, int winlet, fts_symbol_t *s, 
-		int ac, const fts_atom_t *at)
+static void 
+sma_init( fts_object_t *o, int winlet, fts_symbol_t *s, int ac, const fts_atom_t *at)
 {
   sma_t *this = (sma_t *)o;
-  float *p;
+  float *ptr;
 
-  /* Allocate ftl data */
+  /* allocate ftl data */
+  this->sma_ftl_data = ftl_data_alloc(sizeof(float));
 
-  this->sma_ftl_data = ftl_data_new(float);
+  /* initializing the ftl data */
+  ptr = (float *)ftl_data_get_ptr( this->sma_ftl_data);
+  *ptr = fts_get_float_arg(at, ac, 1, 0.0);
 
-  /* initializing  ftl data */
-
-  p = (float *)ftl_data_get_ptr( this->sma_ftl_data);
-  *p = fts_get_float_arg( at, ac, 1, 0.0);
-
-  /* insert object in DSP objects list */
-
-  dsp_list_insert(o);
+  /* add object to the DSP graph */
+  fts_dsp_add_object(o);
 }
 
-static void sma_delete( fts_object_t *o, int winlet, fts_symbol_t *s, 
-             int ac, const fts_atom_t *at)
+static void 
+sma_delete( fts_object_t *o, int winlet, fts_symbol_t *s, int ac, const fts_atom_t *at)
 {
-  /* Freeing ftl data */
-
+  /* free ftl data */
   ftl_data_free(this->sma_ftl_data);
 
-  /* remove object from DSP objects list */
-
-  dsp_list_remove(o);
+  /* remove object from the DSP graph */
+  fts_dsp_remove_object(o);
 }
 </pre>
 
-<a name="Example of a method modifying ftl data"><h3>Example of a method modifying ftl data</h3></a>
+<a name="Example of a method modifying ftl data">
+<h3>Example of a method modifying ftl data</h3></a>
 
 Below is the example of the <code>set</code> method of
 the DSP object <code>sma</code> which need to change a parameter used
 by the object DSP function.
 
 <pre>
-static void sma_set( fts_object_t *o, int winlet, fts_symbol_t *s, 
-		int ac, const fts_atom_t *at)
+static void 
+sma_set( fts_object_t *o, int winlet, fts_symbol_t *s, int ac, const fts_atom_t *at)
 {
   sma_t *this = (sma_t *)o;
   float *p;
 
-  /* changing ftl data */
-
+  /* setting the ftl data */
   p = (float *)ftl_data_get_ptr( this->sma_ftl_data);
   *p = fts_get_float_arg( at, ac, 1, 0.0);
 }
 </pre>
 
 <hr>
-<a name="The DSP computation function"><h2>The DSP computation function</h2></a>
+<a name="The DSP computation function">
+<h2>The DSP computation function</h2></a>
 
  <ul>
  <li> <a href="#DSP function signature">DSP function signature</a>
@@ -476,7 +441,8 @@ static void sma_set( fts_object_t *o, int winlet, fts_symbol_t *s,
  <li> <a href="#Example of DSP function">Example of DSP function</a>
  </ul>
 
-<a name="DSP function signature"><h3>DSP function signature</h3></a>
+<a name="DSP function signature">
+<h3>DSP function signature</h3></a>
 
 A DSP function has a special signature, which is the following :
 <p>
@@ -493,7 +459,8 @@ FTS Kernel Reference Manual
 </a>.
 <p>
 
-<a name="DSP function arguments"><h3>DSP function arguments</h3></a>
+<a name="DSP function arguments">
+<h3>DSP function arguments</h3></a>
 
 The arguments of the DSP function are stored in an array of elements of type 
 <code>fts_word_t</code>.
@@ -520,7 +487,8 @@ Arguments are accessed using the following macros :
 </dl>
 
 
-<a name="Example of DSP function"><h3>Example of DSP function</h3></a>
+<a name="Example of DSP function">
+<h3>Example of DSP function</h3></a>
 
 Below is the example of the DSP function of the <code>sma</code> object already
 described.
@@ -549,7 +517,8 @@ that would be found in a usual DSP library :
 <p>
 
 <pre>
-static void sma( float *src1, float *src2, float *out, float *s, int n)
+static void 
+sma( float *src1, float *src2, float *out, float *s, int n)
 {
   float s;
   int i;
@@ -564,7 +533,8 @@ static void sma( float *src1, float *src2, float *out, float *s, int n)
 <!-- ---------------------------------------------------------------------- -->
 <p>
 <hr>
-<a name="The put method"><h2>The put method</h2></a>
+<a name="The put method">
+<h2>The put method</h2></a>
 
 
 The <code>put</code> method is a method specific to DSP objects, that
@@ -588,7 +558,8 @@ information for DSP program building.
  <li> <a href="#Example of a put method">Example of a put method</a>
  </ul>
 
-<a name="The fts_dsp_descr_t structure"><h3>The <code>fts_dsp_descr_t</code> structure</h3></a>
+<a name="The fts_dsp_descr_t structure">
+<h3>The <code>fts_dsp_descr_t</code> structure</h3></a>
 
 The <code>fts_dsp_descr_t</code> structure is a opaque structure used by the
 DSP compiler to pass information about the code to be generated to the 
@@ -613,11 +584,8 @@ symbol generated by the DSP compiler; they must be passed to the dsp
 function as name, the dsp compiler will then convert them to the
 correct <code>float *</code> pointer.
 
-In this release of FTS, all the inputs have the same size and sampling rate;
-also all the outputs have the same size and sampling rate, but the input 
-size and sampling rate can be different from the output sampling rate;
-see <a ref="Up/Down Sampling objects">Up/Down Sampling objects</a>
-for details.
+In this release of FTS, all the inputs have the same size and sample rate;
+also all the inputs and outputs have the same size and sample rate.
 <p>
 The macros are:
 <dl>
@@ -626,7 +594,7 @@ The macros are:
 <dt> <code> int fts_dsp_get_input_size(fts_dsp_descr_t *desc, int in); </code><p>
 <dd> Return the size in sample of the input sample buffer connected the input <code>in</code>. <p>
 <dt> <code>   int fts_dsp_get_input_srate(fts_dsp_descr_t *desc, int in); </code><p>
-<dd> Return the sampling rate in sample per seconds of the input
+<dd> Return the sample rate in sample per seconds of the input
      sample buffer connected the input <code>in</code>.<p>
 <dt> <code> int fts_dsp_get_is_input_null(fts_dsp_descr_t *desc, int in);</code><p>
 <dd> Return true iff the sample buffer connected the input <code>in</code>
@@ -636,26 +604,27 @@ The macros are:
 <dt> <code> int fts_dsp_get_output_size(fts_dsp_descr_t *desc, int out); </code><p>
 <dd> Return the size in sample of the output sample buffer connected the output <code>out</code>.<p>
 <dt> <code> int fts_dsp_get_output_srate(fts_dsp_descr_t *desc, int out);</code><p>
-<dd> Return the sampling rate in sample per seconds of the output
+<dd> Return the sample rate in sample per seconds of the output
      sample buffer connected the output <code>out</code>.<p>
 </dl>
 
 </pre>
 
-<a name="Inserting a call in the DSP program"><h3>Inserting a call in the DSP program</h3></a>
+<a name="Inserting a call in the DSP program">
+<h3>Inserting a call in the DSP program</h3></a>
 
 After declaring buffers for its outputs, a DSP object must insert a call to its
 DSP function in the DSP program. This is done using the following function :
 <p>
 
-<code>void dsp_add_funcall( fts_symbol_t *<i>name</i>, int <i>argc</i>, fts_atom_t *<i>argv</i>)</code>
+<code>void fts_dsp_add_function( fts_symbol_t *<i>name</i>, int <i>argc</i>, fts_atom_t *<i>argv</i>)</code>
 <p>
 
 The arguments of this function have the following meaning :
 <dl>
 <dt> <i>name</i>
 <dd> the name of the DSP function. This name must have been registered using
-the function <code>dsp_declare_function</code> which have already been described.
+the function <code>fts_dsp_declare_function</code> which have already been described.
 <dt> <i>argc</i>
 <dd> the count of arguments of the call
 <dt> <i>argv</i>
@@ -670,22 +639,21 @@ The FTS Kernel Reference Manual</a>.
 The content of the atom is set by using the proper macro depending on argument type.
 <p>
 
-To pass to the DSP function samples buffers allocated using the <code>dsp_gen_outputs</code> function,
-the corresponding atom of the arguments array must be filled using the macros described above, 
+The corresponding atom of the arguments array must be filled using the macros described above, 
 according to the following rules :
 <ul>
 <li> to pass the length of the buffer, the atom must be set to a <code>int</code> and its value to the 
 <code>length</code> member of the <code>dsp_signal</code> structure. For example, to set
 the fourth argument to the size of the first input buffer :
 <pre>
-  fts_set_int( args+1, fts_dsp_get_input_size(dsp, 0);
+  fts_set_int(args + 3, fts_dsp_get_input_size(dsp, 0);
 </pre>
 <p>
 <li> to pass the float array, the atom must be set to a symbol and its value 
 to the <code>name</code> member of the <code>dsp_signal</code> structure. For example, to set
 the first argument to the float array of the first input buffer :
 <pre>
-  fts_set_symbol (args, fts_dsp_get_input_name(dsp, 0);
+  fts_set_symbol(args, fts_dsp_get_input_name(dsp, 0);
 </pre>
 <p>
 The reason for this is that the buffers are not allocated during DSP
@@ -695,12 +663,13 @@ interpreter, which keeps its internal symbol tables.
 <p>
 <li> to pass a ftl data item, the <code>fts_set_ftl_data</code> macro must be used, like in:
 <pre>
-  fts_set_ftl_data (args, this->sma_ftl_data);
+  fts_set_ftl_data(args, this->sma_ftl_data);
 </pre>
 </ul>
 <p>
 
-<a name="Example of a put method"><h3>Example of a put method</h3></a>
+<a name="Example of a put method">
+<h3>Example of a put method</h3></a>
 
 Below is the code of the <code>put</code> method of the <code>sma</code> object
 already mentionned. The code of the DSP function of this object is given again
@@ -709,92 +678,35 @@ in order to make reading easier.
 
 <pre>
 static void
-sma_dsp_function( fts_word_t *args)
+sma_put(fts_object_t *o, int winlet, fts_symbol_t *s, int ac, const fts_atom_t *at)
 {
-  float *in1 = (float *) fts_word_get_obj(args);     /* first input buffer */
-  float *in2 = (float *) fts_word_get_obj(args + 1); /* second input buffer */
-  float *out = (float *) fts_word_get_obj(args + 2); /* output buffer */
-  float *ps = (float *) fts_word_get_obj(args + 3);  /* pointer to scalar */
-  int n = fts_word_get_int(args + 4);              /* size of buffers */
-  float s;
-  int i;
+  sma_t *this = (sma_t *)o;
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_obj_arg(at, ac, 0, 0);
+  fts_atom_t args[5];
 
-  s = *ps;
-  for ( i = 0; i < n; i++)
-    out[i] = s * in1[i] + in2[i];
+  fts_set_ftl_data(args + 0, this->sma_ftl_data);
+  fts_set_symbol(args + 1, fts_dsp_get_input_name(dsp, 0));
+  fts_set_symbol(args + 2, fts_dsp_get_input_name(dsp, 1));
+  fts_set_symbol(args + 3, fts_dsp_get_output_name(dsp, 0))
+  fts_set_int(args + 4, fts_dsp_get_input_size(dsp, 0));
+
+  fts_dsp_add_function(sma_function, 5, args);
 }
 
 static void
-sma_put(fts_object_t *o, int winlet, fts_symbol_t *s, int ac, const fts_atom_t *at)
+sma_dsp_function( fts_word_t *args)
 {
-  fts_atom_t args[5];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_obj_arg(at, ac, 0, 0);
-  sma_t *this = (sma_t *)o;
+  float *ptr = (float *) fts_word_get_obj(args + 0); /* pointer to scalar */
+  float *in1 = (float *) fts_word_get_obj(args + 1); /* first input buffer */
+  float *in2 = (float *) fts_word_get_obj(args + 2); /* second input buffer */
+  float *out = (float *) fts_word_get_obj(args + 3); /* output buffer */
+  int n = fts_word_get_int(args + 4); /* size of buffers */
+  int i;
 
-  fts_set_symbol  (args,   fts_dsp_get_input_name(dsp, 0));
-  fts_set_symbol  (args+1, fts_dsp_get_input_name(dsp, 1));
-  fts_set_symbol  (args+2, fts_dsp_get_output_name(dsp, 0))
-  fts_set_ftl_data(args+3, this->sma_ftl_data);
-  fts_set_int    (args+4, fts_dsp_get_input_size(dsp, 0));
-
-
-  dsp_add_funcall( sma_function, 5, args);
+  for(i=0; i&lt;n; i++)
+    out[i] = *ptr * in1[i] + in2[i];
 }
 </pre>
-
-
-<!-- ---------------------------------------------------------------------- -->
-<p>
-<hr>
-<a name="Up/Down Sampling objects"><h2>Up/Down Sampling objects</h2></a>
-
-It is possible to declare that an object is down or up sampling, and then that
-the compiler should allocate sample buffers of different dimension
-in input or output; in order to do that, it is necessary to declare the
-property <code>fts_s_dsp_upsampling</code> or <code>fts_s_dsp_downsampling</code>,
-with a value corresponding to the up/downsampling factor, in the object.
-<p>
-The are various way to declare such a property (for complete documentation
-look at <a href="../Kernel_Reference_Manual/Kernel_Reference_Manual.html">
-The FTS Kernel Reference Manual</a>.
-<p>
-The most simple case is when all the object of the same class have the
-same upsampling or downsampling factor as the <b>up~</b> or <b>down~</b>
-classes; in this case, you can declare the property at the class
-level, by calling the following function in the instantiate method of
-the class:
-<pre>
-<code> fts_class_put_int_prop(cl, fts_s_dsp_upsampling, up_sampling_factor);</code>
-</pre>
-Or
-<pre>
-<code> fts_class_put_int_prop(cl, fts_s_dsp_downsampling, down_sampling_factor);</code>
-</pre>
-<p>
-The other simple case is when the up/down sampling factor is known for each object, depending
-for example on its argument, as the <b>sig~</b> object;
-in this case you can decide the up/down sampling factor in the <code>init</code> method
-by calling one of the two following function:
-<pre>
-<code> fts_object_put_int_prop(o, fts_s_dsp_upsampling, up_sampling_factor);</code>
-</pre>
-Or
-<pre>
-<code> fts_object_put_int_prop(o, fts_s_dsp_downsampling, down_sampling_factor);</code>
-</pre>
-
-<p>
-Most complex cases can be handled with class and global property daemons; this
-API is not documented yet.
-
-
-<!-- ---------------------------------------------------------------------- -->
-<p>
-<hr>
-<a name="A complete example"><h2>A complete example</h2></a>
-
-<p>
-<a href="../../packages/sources/c/src/sma.c">Source of the <code>sma</code> object</a>
 
 
 <!-- ---------------------------------------------------------------------- -->

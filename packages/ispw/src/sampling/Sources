@@ -28,17 +28,18 @@ delbuf.c \
 delread.c \
 deltable.c \
 delwrite.c \
+fourpoint.c \
 ftl_delay.c \
 ftl_samprw.c \
 sampbuf.c \
 sampling.c \
 samppeek.c \
 sampread.c \
+sampunit.c \
 sampwrite.c \
 sigtable.c \
 tabcycle.c \
 tabpeek.c \
 tabpoke.c \
 vd.c \
-sampunit.c \
 

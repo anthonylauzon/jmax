@@ -26,10 +26,6 @@
 
 /* "timer"  bang to save current time &
    bang rite corner to send elapsed time message 
-
-   Don't call timer_t this object, it conflict with
-   system types in many platforms.
-
 */
 
 
@@ -48,7 +44,7 @@ timer_zero(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   timer_obj_t *x = (timer_obj_t *)o;
 
-  fts_timer_zero(&x->timer);
+  fts_timer_reset(&x->timer);
 }
 
 static void
@@ -74,7 +70,7 @@ timer_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   timer_obj_t *x = (timer_obj_t *)o;
 
-  fts_timer_zero(&x->timer);
+  fts_timer_reset(&x->timer);
   fts_timer_start(&x->timer);
 }
 
@@ -85,17 +81,16 @@ timer_send_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   timer_obj_t *x = (timer_obj_t *)o;
 
-  fts_outlet_float(o, 0, fts_timer_elapsed_time(&x->timer));
+  fts_outlet_float(o, 0, fts_timer_get_time(&x->timer));
 }
 
 static void
 timer_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   timer_obj_t *x = (timer_obj_t *)o;
-  fts_symbol_t clock = fts_get_symbol_arg(ac, at, 1, 0);
 
-  fts_timer_init(&x->timer, clock);
-  fts_timer_zero(&x->timer);
+  fts_timer_init(&x->timer, 0);
+  fts_timer_reset(&x->timer);
   fts_timer_start(&x->timer);
 }
 

@@ -32,139 +32,94 @@ typedef struct
 
   fts_atom_t atom;
   double time;
+  int gate;
 
   fts_alarm_t alarm;
 } speedlim_t;
 
+static void
+speedlim_tick(fts_alarm_t *alarm, void *o)
+{
+  speedlim_t *this = (speedlim_t *)o;
+
+  if(!fts_is_void(&this->atom))
+    {
+      /* copy atom to stack (allows correct recursion behaviour) */
+      fts_atom_t atom = this->atom;
+      
+      fts_set_void(&this->atom);
+
+      fts_outlet_send((fts_object_t *)o, 0, fts_get_selector(&atom), 1, &atom);
+    }
+
+  /* open gate */
+  this->gate = 1;
+}
 
 static void
 speedlim_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  speedlim_t *x = (speedlim_t *)o;
+  speedlim_t *this = (speedlim_t *)o;
 
-  if (fts_alarm_is_armed(&x->alarm))
+  if(this->gate)
     {
-      x->atom = at[0];
-    }
-  else if (fts_alarm_is_in_future(&x->alarm))
-    {
-      x->atom = at[0];      
-      fts_alarm_arm(&x->alarm);      
+      this->gate = 0;
+      fts_alarm_set_delay(&this->alarm, this->time);
+      fts_outlet_send(o, 0, fts_get_selector(at), 1, at);      
     }
   else
     {
-      fts_outlet_send(o, 0, fts_get_type(at), 1, at);
-      fts_alarm_set_delay(&x->alarm, x->time);      
+      /* store incoming atom  */
+      this->atom = at[0];
     }
 }
 
 static void
-speedlim_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+speedlim_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  speedlim_t *x = (speedlim_t *)o;
+  speedlim_t *this = (speedlim_t *)o;
 
-  x->time = fts_get_double_arg(ac, at, 0, 0);
+  this->time = fts_get_double_arg(ac, at, 0, 0);
 }
-
-static void
-speedlim_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  speedlim_t *x = (speedlim_t *)o;
-
-  
-  x->time = fts_get_double_arg(ac, at, 0, 0);
-}
-
-static void
-speedlim_tick(fts_alarm_t *alarm, void *o)
-{
-  speedlim_t *x = (speedlim_t *)o;
-  fts_atom_t *at = &(x->atom);
-
-  if (fts_is_long(at))
-    fts_outlet_int((fts_object_t *)o, 0, fts_get_long(at));
-  else if (fts_is_float(at))
-    fts_outlet_float((fts_object_t *)o, 0, fts_get_float(at));
-  else
-    fts_outlet_symbol((fts_object_t *)o, 0, fts_get_symbol(at));
-
-  fts_alarm_unarm(alarm);
-  fts_alarm_set_delay(alarm, x->time);
-}
-
 
 static void
 speedlim_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  speedlim_t *x = (speedlim_t *)o;
-  fts_symbol_t clock = 0;
+  speedlim_t *this = (speedlim_t *)o;
 
-  if(ac > 1 && fts_is_symbol(at + 1))
-    {
-      clock = fts_get_symbol(at + 1);
-      x->time = fts_get_double_arg(ac, at, 2, 0);
-    }
-  else
-    {
-      x->time = fts_get_double_arg(ac, at, 1, 0);    
-    }
+  /* open gate */
+  this->gate = 1;
+  this->time = fts_get_double_arg(ac, at, 1, 0);    
 
-  if (clock)
-    {
-      if (!fts_clock_exists(clock))
-	post("speedlim: warning: clock %s do not yet exists\n", fts_symbol_name(clock));
-
-      fts_alarm_init(&x->alarm, clock, speedlim_tick, x);
-    }
-  else
-    fts_alarm_init(&x->alarm, 0, speedlim_tick, x);
+  fts_alarm_init(&this->alarm, 0, speedlim_tick, this);
 }
 
 static void
 speedlim_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  speedlim_t *x = (speedlim_t *)o;
+  speedlim_t *this = (speedlim_t *)o;
 
-  fts_alarm_unarm(&x->alarm);
+  fts_alarm_reset(&this->alarm);
 }
-
 
 static fts_status_t
 speedlim_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[10];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(speedlim_t), 2, 1, 0); 
 
   /* define the system methods */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, speedlim_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, speedlim_delete);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_anything;
-  a[2] = fts_s_number;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, speedlim_init, 3, a, 1);
+  fts_method_define_varargs(cl, 0, fts_s_int, speedlim_atom);
+  fts_method_define_varargs(cl, 0, fts_s_float, speedlim_atom);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, speedlim_atom);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, speedlim_delete, 0, 0);
-
-  /* Speedlim args */
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, speedlim_atom, 1, a);
-  fts_method_define(cl, 1, fts_s_int, speedlim_number_1, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, speedlim_atom, 1, a);
-  fts_method_define(cl, 1, fts_s_float, speedlim_number_1, 1, a);
-
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_s_symbol, speedlim_atom, 1, a);
-
-  fts_method_define_varargs(cl, 0, fts_s_list, speedlim_list);
+  fts_method_define_varargs(cl, 1, fts_s_int, speedlim_set_time);
+  fts_method_define_varargs(cl, 1, fts_s_float, speedlim_set_time);
 
   return fts_Success;
 }
-
 
 void
 speedlim_config(void)

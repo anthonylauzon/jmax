@@ -112,7 +112,7 @@ sigthres_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   sigthres_t *this = (sigthres_t *)o;
 
-  fts_alarm_unarm(&(this->ctl.alarm));
+  fts_alarm_reset(&(this->ctl.alarm));
   dsp_list_remove(o);
 }
 
@@ -126,8 +126,6 @@ static void
 alarm_tick(fts_alarm_t *alarm, void *o)
 {
   sigthres_t *this = (sigthres_t *)o;
-
-  fts_alarm_unarm(alarm);
 
   if (this->ctl.status)
     fts_outlet_bang((fts_object_t *)o, OUTLET_hi_bang);
@@ -268,16 +266,14 @@ sigthres_dsp(fts_word_t *argv)
 	{
 	  ctl->status = 0;
 	  ctl->wait = ctl->lo_dead_samples;
-	  fts_alarm_set_delay(&ctl->alarm, 0.01f);
-	  fts_alarm_arm(&ctl->alarm);
+	  fts_alarm_set_delay(&ctl->alarm, 0.0);
 	}
     }
   else if (in0[n_tick-1] >= ctl->hi_thresh)
     {
       ctl->status = 1;
       ctl->wait = ctl->hi_dead_samples;
-      fts_alarm_set_delay(&ctl->alarm, 0.01f);
-      fts_alarm_arm(&ctl->alarm);
+      fts_alarm_set_delay(&ctl->alarm, 0.0);
     }
 }
 

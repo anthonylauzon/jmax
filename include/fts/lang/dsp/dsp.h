@@ -28,50 +28,382 @@
 #define _FTS_DSP_H_
 
 #include <fts/lang/ftl.h>
+#include <fts/lang/dsp/dspgraph.h>
 
-extern fts_module_t fts_dsp_module;
+/**
+ * The FTS DSP subsystem
+ *
+ * The DSP subsystem consits of a compiler and a virtual machine.
+ * The graph of DSP objects (connected DSP objects) is serialized by the DSP compiler and the
+ * resulting program is run by the virtual machine once for each block of samples (tick size).
+ *
+ * The global sample rate and tick size of the DSP subsystem can be obtained by the functions 
+ * fts_dsp_get_sample_rate() and fts_dsp_get_tick_size(). Although the sample rate and tick size 
+ * of an objects inputs or outputs can be differ from the global parameters due to up or 
+ * downsampling instructions of the DSP compiler (not part of the general API).
+ *
+ * An object can be declared as DSP object in its init method using the function fts_dsp_add_object().
+ * By convention a DSP object has a name ending with '~'.
+ *
+ * A DSP object will be send a message \e put when it is scheduled by the compiler of the DSP subsystem 
+ * during the serialization of the DSP graph. In the \e put method the object can check the parameter
+ * values of its inputs and outputs and insert (fts_dsp_add_function()) its DSP function to the program 
+ * of the virtual machine.
+ *
+ * The \e put method is called with a DSP descriptor as its only argument.
+ * From this descriptor the local DSP parameters (vector size and sample rate) for each DSP input and output
+ * can be extracted using the functions fts_dsp_get_input_size(), fts_dsp_get_output_size(), 
+ * fts_dsp_get_input_srate() and fts_dsp_get_output_srate().
+ * 
+ * Code example of a typical \e put method:
+ *
+ * @code
+ * static void
+ * my_dsp_object_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ * { 
+ *    my_dsp_object_t *this = (my_dsp_object_t *)o;
+ *    fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+ *    double sr = fts_dsp_get_output_srate(dsp, 0);
+ *    int n_tick = fts_dsp_get_output_size(dsp, 0);
+ *    fts_atom_t a[4];
+ *
+ *    my_dsp_object_reset(this, n_tick, sr);
+ *
+ *    fts_set_ptr(a + 0, this->params);
+ *    fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
+ *    fts_set_symbol(a + 2, fts_dsp_get_output_name(dsp, 0));
+ *    fts_set_int(a + 3, n_tick);
+ *    fts_dsp_add_function(my_dsp_object_dsp_function, 4, a);
+ * }
+ * @endcode
+ *
+ * Note that in the current implementation all DSP inputs and outputs have the same vector size and sample rate.
+ *
+ * Code example of a typical DSP function (matching the \e put example above):
+ *
+ * @code
+ * static void
+ * my_dsp_object_dsp_function(fts_word_t *argv)
+ * {
+ *   my_dsp_params_t *params = (my_dsp_params_t *)fts_word_get_ptr(argv + 0);
+ *   float *in = (float *)fts_word_get_ptr(argv + 1);
+ *   float *out = (float *)fts_word_get_ptr(argv + 2);
+ *   int n_tick = fts_word_get_int(argv + 3);
+ *   int i;
+ *
+ *   for(i=0; i<n_tick; i++)
+ *     out[i] = my_dsp_transformation(in[i], params);
+ * }
+ * @endcode
+ *
+ * @defgroup dsp DSP subsystem
+ */
 
-typedef struct 
-{
-  int ninputs;
-  int noutputs;
-  fts_dsp_signal_t **in;
-  fts_dsp_signal_t **out;
-} fts_dsp_descr_t;
+/* Kernel Parameter names */ 
+extern fts_symbol_t fts_s_dsp_on;
+extern fts_symbol_t fts_s_sample_rate;
 
-/* Macro to access the input and output characteristics
-   from a dsp descriptor
-   This macros are official part of the object DSP API, and their definition
-   depend on the actual dsp structure.
-*/
+extern void fts_dsp_run_tick(void);
+extern int fts_dsp_is_running(void);
 
-#define fts_dsp_get_signal_name(s) ((s)->name)
+/** 
+ * @name Runtime parameters
+ */
+/*@{*/
 
-/* get input properties */
+/**
+ * Get the global sample rate of the DSP subsystem
+ *
+ * Note that the actual values for sample rate and tick size can be different from
+ * the parameter values returned by fts_dsp_get_sample_rate() and fts_get_tick_size().
+ * Use the functions fts_dsp_get_input_size(), fts_dsp_get_output_size(), 
+ * fts_dsp_get_input_srate() or fts_dsp_get_output_srate() in order 
+ * to get the correct local values for a particular object inside the put method.
+ *
+ * @fn double fts_dsp_get_sample_rate(void)
+ * @return the sample rate
+ *
+ * @see fts_get_tick_size()
+ *
+ * @ingroup dsp
+ */
+extern double fts_dsp_get_sample_rate(void);
+
+/**
+ * Get the global tick size of the DSP subsystem
+ *
+ * The \e tick \e size is the size block size of the DSP calculations performed by the
+ * DSP subsystem.
+ *
+ * @fn double fts_dsp_get_tick_size(void)
+ * @return the sample rate
+ *
+ * @see fts_get_sample_rate()
+ *
+ * @ingroup dsp
+ */
+extern int fts_dsp_get_tick_size(void);
+
+/**
+ * Get current time of DSP susystem in milliseconds
+ *
+ * While fts_get_time() returns the logical time of a thread
+ * fts_dsp_get_time() gives the time of the DSP subsystem, which
+ * is advancing in steps of the time equivalent to the tick size.
+ * (This step size (in msecs) can be calculated as 0.001 * fts_dsp_get_tick_size() / fts_dsp_get_sample_rate().)
+ *
+ * A DSP object can compare the scheduler time from fts_get_time() and the current time of the DSP subsystem
+ * in order to get for a starting DSP calculation a delay within the tick: fts_get_time() - fts_dsp_get_time().
+ *
+ * @fn double fts_dsp_get_time(void)
+ * @return DSP time in msecs
+ *
+ * @see fts_get_time()
+ *
+ * @ingroup dsp
+ */
+extern double fts_dsp_get_time(void);
+
+/*@}*/ /* runtime parameters */
+
+/** 
+ * @name Class declarations
+ */
+/*@{*/
+
+/**
+ * Declare a DSP function by name
+ *
+ * @fn void fts_dsp_declare_function(fts_symbol_t name, void (*fun)(fts_word_t *))
+ * @param name name of the DSP function
+ * @param the DSP function
+ *
+ * @see fts_dsp_add_function()
+ *
+ * @ingroup dsp
+ */
+extern void fts_dsp_declare_function(fts_symbol_t name, void (*w)(fts_word_t *));
+
+/**
+ * Declare a DSP inlet for a class
+ *
+ * @fn fts_dsp_declare_inlet(fts_class_t *class, int number)
+ * @param class the class
+ * @param number number of the inlet
+ *
+ * @see fts_dsp_declare_outlet()
+ *
+ * @ingroup dsp
+ */
+extern void fts_dsp_declare_inlet(fts_class_t *class, int number);
+
+/**
+ * Declare a DSP outlet for a class
+ *
+ * @fn fts_dsp_declare_outlet(fts_class_t *class, int number)
+ * @param class the class
+ * @param number number of the outlet
+ *
+ * @see fts_dsp_declare_inlet()
+ *
+ * @ingroup dsp
+ */
+extern void fts_dsp_declare_outlet(fts_class_t *class, int number);
+
+/*@}*/ /* Class declarations */
+
+/** 
+ * @name Object declarations
+ */
+/*@{*/
+
+/**
+ * Add object to the DSP graph (set of DSP objects).
+ *
+ * This function declares an object as DSP object and add it to the DSP graph.
+ * Typically it is called in the objects init method.
+ *
+ * @fn void fts_dsp_add_object(fts_object_t *o)
+ * @param object
+ *
+ * @see fts_dsp_remove_object()
+ *
+ * @ingroup dsp
+ */
+extern void fts_dsp_add_object(fts_object_t *object);
+
+/** 
+ * Remove object from the DSP graph.
+ *
+ * This function removes the object from the DSP graph which is added with fts_dsp_add_object().
+ * Typically it is called in the objects delete method.
+ *
+ * @fn void fts_dsp_remove_object(fts_object_t *o)
+ * @param object
+ *
+ * @see fts_dsp_add_object()
+ *
+ * @ingroup dsp
+ */
+extern void fts_dsp_remove_object(fts_object_t *object);
+
+/* test inputs */
+extern int fts_dsp_is_sig_inlet(fts_object_t *object, int number);
+extern int fts_dsp_is_input_null(fts_dsp_descr_t *descriptor, int in);
+
+/*@}*/ /* Object declarations */
+
+/** 
+ * @name Functions of the put method
+ */
+/*@{*/
+
+/**
+ * Get name of input
+ *
+ * Returns a symbol associated to the specified input. Using this symbol inputs and outputs can be
+ * compared and given as arguments fts_dsp_add_function().
+ *
+ * @fn int fts_dsp_get_input_name(fts_dsp_descr_t *descriptor, int number)
+ * @param descriptor the DSP descriptor (argument of the put method)
+ * @param number number of the input (must be declared as DSP inlet)
+ * @return name of input
+ *
+ * @see fts_dsp_add_function()
+ *
+ * @ingroup dsp
+ */
+extern fts_symbol_t fts_dsp_get_input_name(fts_dsp_descr_t *descriptor, int number);
+
+/**
+ * Get input vector size
+ *
+ * Returns size of an input signal associated to the specified input.
+ *
+ * Note that in the current implementation all DSP inlets have the same vector size and sample rate.
+ *
+ * @fn int fts_dsp_get_input_size(fts_dsp_descr_t *descriptor, int number)
+ * @param descriptor the DSP descriptor (argument of the put method)
+ * @param number number of the input (must be declared as DSP inlet)
+ * @return size of input signal vector
+ *
+ * @see fts_dsp_declare_inlet()
+ * @see fts_dsp_get_tick_size()
+ *
+ * @ingroup dsp
+ */
+/* see macros down */
+extern int fts_dsp_get_input_size(fts_dsp_descr_t *descriptor, int number);
+
+/**
+ * Get input sample rate
+ *
+ * Returns the sample rate of the input signal associated to the specified input.
+ *
+ * Note that in the current implementation all DSP inlets have the same vector size and sample rate.
+ *
+ * @fn int fts_dsp_get_input_srate(fts_dsp_descr_t *descriptor, int number)
+ * @param descriptor the DSP descriptor (argument of the put method)
+ * @param number number of the input (must be declared as DSP inlet)
+ * @return size of input sample rate
+ *
+ * @see fts_dsp_declare_inlet()
+ * @see fts_dsp_get_sample_rate()
+ *
+ * @ingroup dsp
+ */
+extern int fts_dsp_get_input_srate(fts_dsp_descr_t *descriptor, int number);
+
+/**
+ * Get name of output
+ *
+ * Returns a symbol associated to the specified output. Using this symbol inputs and outputs can be
+ * compared and given as arguments fts_dsp_add_function().
+ *
+ * @fn int fts_dsp_get_output_name(fts_dsp_descr_t *descriptor, int number)
+ * @param descriptor the DSP descriptor (argument of the put method)
+ * @param number number of the input (must be declared as DSP inlet)
+ * @return name of output
+ *
+ * @see fts_dsp_add_function()
+ *
+ * @ingroup dsp
+ */
+extern fts_symbol_t fts_dsp_get_output_name(fts_dsp_descr_t *descriptor, int number);
+
+/**
+ * Get output vector size
+ *
+ * Returns size of an output signal associated to the specified output.
+ *
+ * Note that in the current implementation all DSP inlets have the same vector size and sample rate.
+ *
+ * @fn int fts_dsp_get_output_size(fts_dsp_descr_t *descriptor, int number)
+ * @param descriptor the DSP descriptor (argument of the put method)
+ * @param number number of the output (must be declared as DSP outlet)
+ * @return size of output signal vector
+ *
+ * @see fts_dsp_declare_outlet()
+ * @see fts_dsp_get_tick_size()
+ *
+ * @ingroup dsp
+ */
+extern int fts_dsp_get_output_size(fts_dsp_descr_t *descriptor, int number);
+
+/**
+ * Get output sample rate
+ *
+ * Returns the sample rate of the output signal associated to the specified output.
+ *
+ * Note that in the current implementation all DSP inlets have the same vector size and sample rate.
+ *
+ * @fn int fts_dsp_get_output_srate(fts_dsp_descr_t *descriptor, int number)
+ * @param descriptor the DSP descriptor (argument of the put method)
+ * @param number number of the output (must be declared as DSP outlet)
+ * @return size of output sample rate
+ *
+ * @see fts_dsp_declare_outlet()
+ * @see fts_dsp_get_sample_rate()
+ *
+ * @ingroup dsp
+ */
+extern int fts_dsp_get_output_srate(fts_dsp_descr_t *descriptor, int number);
+
+/**
+ * Insert DSP function to DSP chain
+ *
+ * @fn void fts_dsp_add_function(fts_symbol_t name, int ac, fts_atom_t *av)
+ * @param name the function name declared by fts_dsp_declare_function()
+ * @param number of arguments of the DSP function
+ * @param array of arguments of the DSP function
+ *
+ * @see fts_dsp_declare_function()
+ * @see fts_dsp_add_object()
+ *
+ * @ingroup dsp
+ */
+extern void fts_dsp_add_function(fts_symbol_t name, int ac, fts_atom_t *av);
+
+/*@}*/ /* Functions of the put method */
+
+/* macros to get input properties */
 #define fts_dsp_get_input_name(DESC, IN) ((DESC)->in[(IN)]->name)
 #define fts_dsp_get_input_size(DESC, IN) ((DESC)->in[(IN)]->length)
 #define fts_dsp_get_input_srate(DESC, IN) ((DESC)->in[(IN)]->srate)
 
-/* test if inlet is signal inlet */
-extern int fts_dsp_is_sig_inlet(fts_object_t *o, int num);
-
-/* get output properties */
+/* macros to get output properties */
 #define fts_dsp_get_output_name(DESC, OUT) ((DESC)->out[(OUT)]->name)
 #define fts_dsp_get_output_size(DESC, OUT) ((DESC)->out[(OUT)]->length)
 #define fts_dsp_get_output_srate(DESC, OUT) ((DESC)->out[(OUT)]->srate)
 
-/* test for the null input special case */
-extern int fts_dsp_is_input_null( fts_dsp_descr_t *descr, int in);
-
-/* object declarations */
-extern void fts_dsp_add_object(fts_object_t *o);
-extern void fts_dsp_remove_object(fts_object_t *o);
-
-extern void fts_dsp_declare_inlet(fts_class_t *cl, int num);
-extern void fts_dsp_declare_outlet(fts_class_t *cl, int num);
-
-extern void fts_dsp_declare_function(fts_symbol_t name, ftl_wrapper_t fun);
-extern void fts_dsp_add_function(fts_symbol_t name, int ac, fts_atom_t *at);
+/* internal misc */
+extern fts_object_t *dsp_get_current_object(void);
+extern void dsp_add_signal(fts_symbol_t name, int size);
+extern void dsp_chain_post(void);
+extern void dsp_chain_post_signals(void);
+extern void dsp_chain_fprint(FILE *f);
+extern void dsp_chain_fprint_signals(FILE *f);
+extern ftl_program_t *dsp_get_current_dsp_chain( void);
 
 /* old names of user API */
 #define dsp_list_insert(o) fts_dsp_add_object(o)
@@ -80,35 +412,5 @@ extern void fts_dsp_add_function(fts_symbol_t name, int ac, fts_atom_t *at);
 #define dsp_sig_outlet(c, i) fts_dsp_declare_outlet((c), (i))
 #define dsp_declare_function(n, f) fts_dsp_declare_function((n), (f))
 #define dsp_add_funcall(s, n, a) fts_dsp_add_function((s), (n), (a))
-
-extern void fts_dsp_auto_stop(void);
-extern void fts_dsp_auto_restart(void);
-extern void fts_dsp_auto_update(void);
-
-/* internal API */
-extern void dsp_add_signal(fts_symbol_t name, int vs);
-
-extern void dsp_chain_create(int vs);
-extern void dsp_chain_delete(void);
-
-extern void dsp_chain_post(void);
-extern void dsp_chain_post_signals(void);
-
-extern void dsp_chain_fprint(FILE *f);
-extern void dsp_chain_fprint_signals(FILE *f);
-
-extern fts_object_t *dsp_get_current_object(void);
-
-extern int fts_dsp_is_running( void);
-extern ftl_program_t *dsp_get_current_dsp_chain( void);
-
-extern fts_symbol_t fts_s_sig_zero;
-extern fts_symbol_t fts_s_dsp_upsampling;
-extern fts_symbol_t fts_s_dsp_downsampling;
-extern fts_symbol_t fts_s_dsp_outputsize;
-extern fts_symbol_t fts_s_dsp_descr;
-
-/* the function that is called by the scheduler */
-extern void fts_dsp_chain_poll( void);
 
 #endif

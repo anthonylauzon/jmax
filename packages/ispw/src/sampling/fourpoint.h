@@ -47,12 +47,9 @@ typedef struct
 
 extern fts_fourpoint_t fts_fourpoint_table[];
 
-extern int fts_fourpoint_table_make(void);
-
 #define fts_fourpoint_index_scale(f) ((f) * FTS_FOURPOINT_FRAC_SIZE)
 #define fts_fourpoint_index_get_int(i) ((i) >> FTS_FOURPOINT_FRAC_BITS)
 #define fts_fourpoint_index_get_frac(i) ((i) & (FTS_FOURPOINT_FRAC_SIZE - 1))
-
 
 #define fts_fourpoint_calc(x, p) \
   ((x)[-1] * (p)->pm1 + (x)[0] * (p)->p0 + (x)[1] * (p)->p1 + (x)[2] * (p)->p2)

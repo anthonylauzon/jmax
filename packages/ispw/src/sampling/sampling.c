@@ -26,7 +26,9 @@
 
 #include <fts/fts.h>
 
+extern void fts_fourpoint_init(void);
 extern void sampbuf_table_init(void);
+
 extern void sigtable_config(void);
 extern void sampread_config(void);
 extern void sampwrite_config(void);
@@ -44,6 +46,7 @@ extern void samples_unit_init(void);
 
 static void ispw_sampling_module_init(void)
 {
+  fts_fourpoint_init();
   sampbuf_table_init();
   
   sigtable_config();
