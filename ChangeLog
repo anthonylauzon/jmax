@@ -1,3 +1,9 @@
+2003-07-17  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* fts/message.c (unfold_atom, unfold_varargs): fixed atom assignment.
+
+	* fixed bug "[ 772302 ] messtup doesn't work"
+
 2003-07-15  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* include/fts/audiofile.h : added missing function fts_audiofile_get_file_format.
