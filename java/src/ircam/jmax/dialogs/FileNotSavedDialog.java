@@ -74,25 +74,6 @@ public class FileNotSavedDialog extends Dialog implements ActionListener, KeyLis
     }
   }
 
-  /*public boolean action(Event event, Object arg) {
-    if (event.target == itsSaveButton){
-    itsToSave = true;
-    itsNothingToDo = false;
-    hide();
-    }
-    else if(event.target == itsCancelButton){
-    itsToSave = false;
-    itsNothingToDo = true;
-    hide();
-    }
-    else if(event.target == itsNoButton){
-    itsToSave = false;
-    itsNothingToDo = false;
-    hide();
-    }
-    return true;
-    }*/
-
   public boolean GetToSaveFlag(){
     return itsToSave;
   }
@@ -101,15 +82,6 @@ public class FileNotSavedDialog extends Dialog implements ActionListener, KeyLis
     return itsNothingToDo;
   }
   
-  /*public boolean keyDown(Event evt,int key) {
-    if (key == ircam.jmax.utils.Platform.RETURN_KEY){
-    itsToSave = true;
-    hide();
-    return true;
-    }
-    return false;
-    }*/
-
   //////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////keyListener--inizio
   public void keyTyped(KeyEvent e){}

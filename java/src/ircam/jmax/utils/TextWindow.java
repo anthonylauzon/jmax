@@ -72,29 +72,6 @@ public class TextWindow extends Frame implements KeyListener, WindowListener{
 
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////WindowListener --fine
-
-
-  /*public boolean handleEvent(Event event) {
-    if (event.id == Event.WINDOW_DESTROY) {
-    dispose();
-    }
-    return super.handleEvent(event);
-    }*/
- 
-  /*public boolean keyDown(Event e, int k){
-
-    if(k == Platform.DELETE_KEY || k == Platform.BACKSPACE_KEY) {
-    if (buffer.length() != 0) buffer = buffer.substring(0,buffer.length()-1);
-    }
-    else if (k == Platform.NEWLINECHAR) {
-    if (buffer != "") {
-    buffer = "";
-    }
-    }
-    else buffer += (char) k;
-    return false;
-    }*/
-  
   public PrintStream getPrintStream() {
     return itsPrintStream;
   }

@@ -33,7 +33,6 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   ProjectEntry itsProjectEntry = null;
   static String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
 
-  //public ErmesKeyAdapter itsKeyAdapter;
 
   // Menus are public beacause enabled/disabled from MaxApplication !!!
   // should be done locally
@@ -75,9 +74,6 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       //}
 
       addKeyListener(this);
-
-      //itsKeyAdapter = new ErmesKeyAdapter(this);
-      //addKeyListener(itsKeyAdapter);
       addFocusListener(this);
       addWindowListener(this);
 
@@ -179,8 +175,6 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     c.fill = GridBagConstraints.BOTH;
     gridbag.setConstraints(itsScrollerView, c);
     add(itsScrollerView);
-    //itsScrollerView.addKeyListener(this);
-    //itsSketchPad.addKeyListener(this);
   }
 	
   private Menu CreateFileMenu() {
@@ -572,11 +566,6 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   public ProjectEntry GetProjectEntry(){
     return itsProjectEntry;
   }
-   	
-  //--------------------------------------------------------
-  //	keyDown
-  //--------------------------------------------------------
-
   /////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////keyListener --inizio  
   public void keyTyped(KeyEvent e){}
@@ -718,28 +707,6 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// actionListener --fine
-
-
-    //--------------------------------------------------------
-    //	action
-    //	high-level events handler
-    //--------------------------------------------------------
-  /* public boolean action(Event event, Object arg) {
-     if (event.target instanceof MenuItem) {
-     MenuItem aMenuItem = (MenuItem) event.target;
-     String itemName = aMenuItem.getLabel();
-     
-     if (IsInFileMenu(itemName)) return FileMenuAction(aMenuItem, itemName);
-     if (IsInEditMenu(itemName)) return EditMenuAction(aMenuItem, itemName);
-     if (IsInFontMenu(itemName)) return FontMenuAction(aMenuItem, itemName);
-     if (IsInProjectMenu(itemName)) return ProjectMenuAction(aMenuItem, itemName);
-     if (IsInWindowsMenu(itemName)) return WindowsMenuAction(aMenuItem, itemName);
-     if (IsInSizesMenu(itemName)) return SizesMenuAction(aMenuItem, itemName);
-     }
-     return true;
-    }
-    */
-  
   private void FileMenuAction(MenuItem theMenuItem, String theString) {
     if (theString.equals("Save  Ctrl+S")) {
       itsDocument.Save();
@@ -948,44 +915,6 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     itsSketchPad.ChangeFont(new Font(itsSketchPad.sketchFont.getName(), itsSketchPad.sketchFont.getStyle(), fontSize));
     return true;
   }
-	
-    //--------------------------------------------------------
-    //	handleEvent
-    //	low-level events handler
-    //--------------------------------------------------------
-  /* public boolean handleEvent(Event event) {
-     // If it's a subpatcher, just hide it 
-     if (event.id == Event.WINDOW_DESTROY) {
-     if (inAnApplet) {
-     dispose();
-     } else {
-     if (isSubPatcher) {
-     hide();
-     //itsSketchPad.offScreenPresent = false;
-     }
-     else {MaxApplication.getApplication().ObeyCommand(MaxApplication.CLOSE_WINDOW);
-     dispose();
-     }
-     }
-     }
-     else 
-     if (event.id == Event.GOT_FOCUS) {
-     if(!itsClosing){
-     MaxApplication.getApplication().SetCurrentWindow(this);
-     ErmesSketchPad.RequestOffScreen(itsSketchPad);
-     if(itsSketchPad.getGraphics()!= null)
-     itsSketchPad.update(itsSketchPad.getGraphics());
-     }
-     }
-     else if(event.id == Event.LOST_FOCUS){
-     itsSketchPad.itsFirstClick = true;
-     itsSketchPad.itsScrolled = false;
-     }
-     else if(event.id == Event.WINDOW_EXPOSE){
-     }
-     return super.handleEvent(event);
-    }
-    */
 	
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////focusListener --inizio

@@ -385,24 +385,6 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
 
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// actionListener --fine
-
-
-  //--------------------------------------------------------
-  //	action
-  //	high-level events handler
-  //--------------------------------------------------------
-  /* public boolean action(Event event, Object arg) {
-     if (event.target instanceof MenuItem) {
-     MenuItem aMenuItem = (MenuItem) event.target;
-     String itemName = aMenuItem.getLabel();
-     
-     if (IsInFileMenu(itemName)) return FileMenuAction(aMenuItem, itemName);
-     if (IsInEditMenu(itemName)) return EditMenuAction(aMenuItem, itemName);
-     if (IsInProjectMenu(itemName)) return ProjectMenuAction(aMenuItem, itemName);
-     if (IsInWindowsMenu(itemName)) return WindowsMenuAction(aMenuItem, itemName);
-     }
-     return true;
-     }*/
   
   public void New(){
      String aNewFileType;
@@ -702,47 +684,6 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// keyListener --fine
 
-  /*public boolean keyDown(Event evt,int key){
-
-    if (evt.controlDown()){
-    if(key == 14) New();
-    else if(key == 15) Open();
-    else if(key == 16) MaxApplication.getApplication().ObeyCommand(MaxApplication.PRINT_WINDOW);
-    else if(key == 19){
-    if(MaxApplication.getApplication().itsWindow != null) 
-    MaxApplication.getApplication().itsSketchWindow.GetDocument().Save();
-    }
-    else if(key == 23) MaxApplication.getApplication().ObeyCommand(MaxApplication.CLOSE_WINDOW);
-    else if(key == 17) MaxApplication.getApplication().ObeyCommand(MaxApplication.QUIT_APPLICATION);
-    }
-    else{
-    if(key == ircam.jmax.utils.Platform.RETURN_KEY) {
-    if(itsProject.itsCurrentEntry.itsDocument==null)
-    if(itsProject.itsCurrentEntry.OpenEntryDocument()) return true;
-    }
-    else if(key == Event.UP) itsProject.SelectPreviousEntry();
-    else if(key == Event.DOWN) itsProject.SelectNextEntry();
-    }
-    return true;
-    }*/
-	
-  //--------------------------------------------------------
-  //	handleEvent
-  //	low-level events handler
-  //--------------------------------------------------------
-  /* public boolean handleEvent(Event event) {
-    if (event.id == Event.WINDOW_DESTROY) {
-      if (inAnApplet) {
-	dispose();
-      } else {
-	dispose();
-	Runtime.getRuntime().exit(0);
-      }
-    }
-    return super.handleEvent(event);
-  }*/
-	
-
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////WindowListener --inizio  
   public void windowClosing(WindowEvent e){
@@ -804,5 +745,11 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
     return getMinimumSize();
   }
 }
+
+
+
+
+
+
 
 

@@ -66,11 +66,6 @@ public class SplashDialog extends Dialog implements KeyListener, MouseListener{
     to = new SplashDialogTimeout(2000);
   }
 	
-  /*public boolean mouseDown(Event evt, int x, int y) {
-    hide();
-    return true;
-    }*/
-  
   /////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////mouseListener--inizio
   public void mouseClicked(MouseEvent e){}
@@ -83,15 +78,6 @@ public class SplashDialog extends Dialog implements KeyListener, MouseListener{
   public void mouseExited(MouseEvent e){}
   /////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////mouseListener--fine
-
-  /*public boolean keyDown(Event evt,int key) {
-    if (key == ircam.jmax.utils.Platform.RETURN_KEY){	
-    hide();
-    return true;
-    }
-    return false;
-    }*/
-  
   //////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////keyListener--inizio
   public void keyTyped(KeyEvent e){}

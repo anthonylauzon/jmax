@@ -63,7 +63,6 @@ public class MaxApplication extends Object {
   String	pathForLoading;
   public FtsServer     itsServer = null;
   public boolean doAutorouting = true; // Should become a static in the Patcher editor
-  //e.m.public static ConsShell itsShell;
   public static Properties ermesProperties;
 
   public Vector resourceVector = new Vector();
@@ -377,7 +376,6 @@ public class MaxApplication extends Object {
     ErmesPatcherDoc aPatcherDoc = new ErmesPatcherDoc(theFtsPatcher);
     aPatcherDoc.alreadySaved = true;
     itsSketchWindow = new ErmesSketchWindow(false, itsSketchWindow);
-    //itsSketchWindow.addKeyListener(itsSketchWindow);
     theFtsPatcher.open();
     itsSketchWindow.repaint();
     itsWindow = itsSketchWindow;
@@ -400,12 +398,10 @@ public class MaxApplication extends Object {
     aPatcherDoc.alreadySaved = true;
     boolean temp = itsSketchWindow.itsSketchPad.doAutorouting;
     itsSketchWindow = new ErmesSketchWindow(true, itsSketchWindow);
-    //itsSketchWindow.addKeyListener(itsSketchWindow);
     itsSketchWindow.itsSketchPad.doAutorouting = temp;
     theFtsPatcher.open();
     itsSketchWindow.repaint();
     itsWindow = itsSketchWindow;
-    //ErmesSketchWindow aSketch = (ErmesSketchWindow)itsSketchWindow;
     itsSketchWindow.InitFromDocument(aPatcherDoc);
     itsSketchWindowList.addElement(itsSketchWindow);
     itsSketchWindow.inAnApplet = false;
@@ -435,8 +431,7 @@ public class MaxApplication extends Object {
     case NEW_COMMAND:
 
       itsSketchWindow = new ErmesSketchWindow(false, null);
-      itsWindow = itsSketchWindow;//???????
-      //itsSketchWindow.addKeyListener(itsSketchWindow);
+      itsWindow = itsSketchWindow;
 
       itsSketchWindowList.addElement(itsSketchWindow);
       itsSketchWindow.inAnApplet = false;
@@ -460,7 +455,6 @@ public class MaxApplication extends Object {
       // create the new SketchWindow based on the Document created....
       itsSketchWindow = new ErmesSketchWindow(false, null);
       itsWindow = itsSketchWindow;
-      //itsSketchWindow.addKeyListener(itsSketchWindow);
       itsSketchWindow.itsSketchPad.GetOffGraphics();
       try {
 	itsSketchWindow.InitFromDocument(aPatcherDoc);
@@ -493,7 +487,6 @@ public class MaxApplication extends Object {
       itsProjectWindow.setLocation(0, 0);//start in the upper left position
       itsProjectWindow.pack();
       itsProjectWindow.setVisible(true);
-      //itsProjectWindow.addKeyListener(itsProjectWindow);
       break;
       
     case REQUIRE_CONNECTION:
@@ -580,13 +573,6 @@ public class MaxApplication extends Object {
 	  itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(false);
 	}
       } 
-      //if (itsSketchWindow == null)
-	//System.out.println("internal error: null SketchWindow");
-      //else if (itsSketchWindow.itsDocument == null)
-	//System.out.println("internal error: null document");
-      //else if (((ErmesPatcherDoc)itsSketchWindow.itsDocument).itsPatcher == null)
-	//System.out.println("internal error: null root object");
-      //else ((ErmesPatcherDoc)itsSketchWindow.itsDocument).itsPatcher.delete();
       break;
     case QUIT_APPLICATION:
       MaxWindow aWindow;
@@ -620,10 +606,6 @@ public class MaxApplication extends Object {
       itsSketchWindow.itsSketchPad.paint(aPrintGraphics);
       aPrintGraphics.dispose();
       aPrintJob.end();
-      /* aPrintJob.finalize(); */
-      /*      ErrorDialog aErr = new ErrorDialog(itsProjectWindow, "Printing not implemented yet.");
-      aErr.move(100, 100);
-      aErr.show(); */
       break;
     case ADD_WINDOW:
       itsProjectWindow.itsProject.AddToProject((ErmesPatcherDoc)itsSketchWindow.GetDocument(), itsSketchWindow);
@@ -771,7 +753,6 @@ public class MaxApplication extends Object {
 
 
 
-  // public void SetCurrentWindow(ErmesSketchWindow theSketchWindow){
   public void SetCurrentWindow(MaxWindow theWindow){
     if(theWindow instanceof ErmesSketchWindow)itsSketchWindow = (ErmesSketchWindow)theWindow;
     itsWindow = theWindow;
@@ -897,6 +878,10 @@ public class MaxApplication extends Object {
 
   }
 }
+
+
+
+
 
 
 

@@ -125,30 +125,6 @@ public class ConnectionDialog extends Dialog implements KeyListener, ActionListe
     pack();
   }
 
-  /*public boolean action(Event event, Object arg) {
-    if ( event.target == okButton) {
-    hostName = host.getText();
-    portNo = port.getText();
-    MaxApplication.getApplication().ObeyCommand(MaxApplication.CONNECTION_CHOOSEN);
-    setVisible(false);
-    }
-    else if ( event.target == cancelButton) {
-    setVisible(false);
-    }
-    else if ( event.target == connectionType) {
-    connectionLine = connectionType.getSelectedIndex();
-    }
-    else if ( event.target == host) {
-    hostName = host.getText();
-    //	Connection choose action
-    }
-    else if ( event.target == port) {
-    portNo = port.getText();
-    //	Connection choose action
-    }
-    return true;
-    }*/
-
   ////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////actionListener--inizio
 
@@ -172,18 +148,6 @@ public class ConnectionDialog extends Dialog implements KeyListener, ActionListe
   ////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////actionListener--fine
 
-  /* public boolean keyDown(Event evt,int key) {
-     if (key == ircam.jmax.utils.Platform.RETURN_KEY){	
-     hostName = host.getText();
-     portNo = port.getText();
-     MaxApplication.getApplication().ObeyCommand(MaxApplication.CONNECTION_CHOOSEN);
-     setVisible(false);
-     return true;
-     }
-     return false;
-     }*/
-
-
   /////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////keyListener--inizio
   public void keyTyped(KeyEvent e){}
@@ -200,3 +164,8 @@ public class ConnectionDialog extends Dialog implements KeyListener, ActionListe
   ///////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////keyListener--fine
 }
+
+
+
+
+

@@ -64,7 +64,6 @@ public class ProjectEntry extends Panel implements MouseListener/*, KeyListener*
     Font newFont = new Font(aFontName, fontStyle, 10);
     setFont(newFont);
 
-    // addKeyListener(this);
     addMouseListener(this);
   }
 
@@ -119,30 +118,6 @@ public class ProjectEntry extends Panel implements MouseListener/*, KeyListener*
     repaint();
   }
   
-  //--------------------------------------------------------
-  // mouseDown
-  //--------------------------------------------------------
-  /* public boolean mouseDown(Event evt,int x, int y) {
-     if(evt.clickCount>1){
-     if(itsDocument!=null) {
-     if(itsDocument.GetWindow()!=null)
-     itsDocument.GetWindow().ToFront();
-     }
-     else if(OpenEntryDocument()) return true;
-     }
-     else{
-     if(itsDocument!=null){
-     if(itsDocument.GetWindow()!=null){
-     itsDocument.GetWindow().ToFront();
-     MaxApplication.getApplication().SetCurrentWindow(itsDocument.GetWindow());
-     }
-     }
-     else
-     itsProject.SetCurrentEntry(this);
-     }
-     return true;
-     }*/
-
   public void mousePressed(MouseEvent e){
     itsProject.itsProjectWindow.requestFocus();
     if(e.getClickCount()>1){
@@ -233,6 +208,7 @@ public class ProjectEntry extends Panel implements MouseListener/*, KeyListener*
     return getMinimumSize();
   }
 }
+
 
 
 

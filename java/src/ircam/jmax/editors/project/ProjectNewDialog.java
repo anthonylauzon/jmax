@@ -67,21 +67,6 @@ class ProjectNewDialog extends Dialog implements ItemListener, ActionListener, K
   public void itemStateChanged(ItemEvent e){
     if(e.getStateChange() == ItemEvent.SELECTED) itsCurrentItem = (itsList.getSelectedItems())[0];
   }
-
-  /*public boolean action(Event event, Object arg) {
-    if ( event.target == okButton) {
-    //	Ok action
-    setVisible(false);
-    }
-    else if ( event.target == cancelButton) {
-    //	Cancel action
-    itsCurrentItem = "";
-    setVisible(false);
-    }
-    return true;
-    }*/
-  
-
   //////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////keyListener--inizio
   public void actionPerformed(ActionEvent e){    
@@ -98,15 +83,7 @@ class ProjectNewDialog extends Dialog implements ItemListener, ActionListener, K
   public String GetNewFileType(){
     return itsCurrentItem;
   }
-    
-  /*public boolean keyDown(Event evt,int key) {
-    Float aFloat = null;
-    if (key == ircam.jmax.utils.Platform.RETURN_KEY){
-    hide();
-    return true;
-    }
-    return false;
-    }*/
+
   //////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////keyListener--inizio
   public void keyTyped(KeyEvent e){}
@@ -121,4 +98,7 @@ class ProjectNewDialog extends Dialog implements ItemListener, ActionListener, K
   ///////////////////////////////////////////////////keyListener--fine
 
 }
+
+
+
 

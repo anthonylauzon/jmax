@@ -35,14 +35,13 @@ public class ErrorDialog extends Dialog implements ActionListener{
     pack();
   }
 
-  /*public boolean action(Event event, Object arg) {
-    if (event.target == b) {
-    //parent.setText(field.getText());
-    }
-    hide();
-    return true;
-    }*/
   public void actionPerformed(ActionEvent e){    
-    if (e.getSource() == okButton) setVisible(false);
+    setVisible(false);
+    dispose();
   }
 }
+
+
+
+
+

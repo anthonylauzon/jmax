@@ -254,21 +254,6 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
   } 
   
 
-  //--------------------------------------------------------
-  //	action
-  //	high-level events handler
-  //--------------------------------------------------------
-  /*public boolean action(Event event, Object arg) {
-    if (event.target instanceof MenuItem) {
-    MenuItem aMenuItem = (MenuItem) event.target;
-    String itemName = aMenuItem.getLabel();
-    if (IsInFileMenu(itemName)) return FileMenuAction(aMenuItem, itemName);
-    if (IsInProjectMenu(itemName)) return ProjectMenuAction(aMenuItem, itemName);
-    if (IsInWindowsMenu(itemName)) return WindowsMenuAction(aMenuItem, itemName);
-    }
-    return true;
-  }*/
-  
   public void actionPerformed(ActionEvent e){
     if(e.getSource() instanceof MenuItem ){
       MenuItem aMenuItem = (MenuItem)e.getSource();
@@ -401,16 +386,6 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////WindowListener --fine
   
-  /*public boolean handleEvent(Event event) {
-    if (event.id == Event.WINDOW_DESTROY) {
-    itsProject.CloseThisWindow();
-    }
-    else 
-    if (event.id == Event.GOT_FOCUS)
-    itsProject.SetThisWindow(this);
-    return super.handleEvent(event);
-    }*/
-  
   public void InitFromDocument(MaxDocument theDocument){}  
   
   public boolean Open(){
@@ -437,18 +412,7 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
     toFront();
   }
 
-  /* public boolean keyDown(Event evt,int key){
-     if (evt.controlDown()){
-     if(key == 13) itsProject.itsProjectWindow.toFront();
-     else if(key == 15) Open();
-     //else if(key == 16) MaxApplication.getApplication().ObeyCommand(MaxApplication.PRINT_WINDOW);
-     else if(key == 19) GetDocument().Save();
-     else if(key == 23) itsProject.CloseThisWindow();
-     }
-     return true;
-     }*/
-
-   /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////keyListener --inizio  
   public void keyTyped(KeyEvent e){}
   public void keyReleased(KeyEvent e){}

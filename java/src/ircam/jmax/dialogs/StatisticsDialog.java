@@ -63,18 +63,10 @@ public class StatisticsDialog extends Dialog implements ActionListener, KeyListe
     //Initialize this dialog to its preferred size.
     pack();  
   }
-	
-  /*public boolean action(Event event, Object arg) {
-    hide();
-    dispose();
-    return true;
-    }*/
 
   public void actionPerformed(ActionEvent e){    
-    if(e.getSource() == okButton){
-      setVisible(false);
-      dispose();      
-    }
+    setVisible(false);
+    dispose();      
   }
   
   //////////////////////////////////////////////////////////////////////
@@ -91,6 +83,9 @@ public class StatisticsDialog extends Dialog implements ActionListener, KeyListe
   /////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////keyListener--fine
 }
+
+
+
 
 
 

@@ -78,33 +78,6 @@ class ErmesObjSliderDialog extends Dialog implements KeyListener, ActionListener
   }
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// actionListener --fine
-
-  /*public boolean action(Event event, Object arg) {
-    
-    Integer aInt = null;
-    if ( event.target == okButton) {
-    //	Ok action
-    itsValue = value.getText();
-    try{
-    aInt = new Integer(itsValue);
-    }
-    catch (NumberFormatException e){
-    hide();
-    return false;
-    }
-    itsSliderObject.FromDialogValueChanged(aInt);
-    hide();
-    }
-    else if ( event.target == cancelButton) {
-    //	Cancel action
-    hide();
-    }
-    else if ( event.target == value) {
-    itsValue = value.getText();
-    //	Connection choose action
-    }
-    return true;
-    }*/
     
   public void ReInit(String theValue, ErmesObjSlider theSlider, Frame theFrame){
     itsValue = theValue;
@@ -113,23 +86,6 @@ class ErmesObjSliderDialog extends Dialog implements KeyListener, ActionListener
     itsParent = theFrame;
   }
     
-  /*public boolean keyDown(Event evt,int key) {
-    Integer aInteger = null;
-    if (key == ircam.jmax.utils.Platform.RETURN_KEY){	
-    itsValue = value.getText();
-    try{
-    aInteger = new Integer(itsValue);
-    }
-    catch (NumberFormatException e){
-    hide();
-    return false;
-    }
-    itsSliderObject.FromDialogValueChanged(aInteger);
-    hide();
-    return true;
-    }
-    return false;
-    }*/
 
  /////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////keyListener --inizio

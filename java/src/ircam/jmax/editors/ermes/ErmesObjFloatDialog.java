@@ -80,34 +80,6 @@ class ErmesObjFloatDialog extends Dialog implements KeyListener, ActionListener{
   }
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// actionListener --fine
-
-
-
-  /*public boolean action(Event event, Object arg) {
-    
-    Float aFloat = null;
-    if ( event.target == okButton) {
-    //	Ok action
-    itsValue = value.getText();
-    try{
-    aFloat = new Float(itsValue);
-    }
-    catch (NumberFormatException e){
-    hide();
-    return false;
-    }
-    itsFloatObject.FromDialogValueChanged(aFloat);
-    hide();
-    }
-    else if ( event.target == cancelButton) {
-    //	Cancel action
-    hide();
-    }
-    else if ( event.target == value) {
-    itsValue = value.getText();
-    }
-    return true;
-    }*/
     
   public void ReInit(String theValue, ErmesObjFloat theFloat, Frame theFrame){
     itsValue = theValue;
@@ -139,24 +111,6 @@ class ErmesObjFloatDialog extends Dialog implements KeyListener, ActionListener{
   }
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// keyListener --fine
-   
-  /*public boolean keyDown(Event evt,int key) {
-    Float aFloat = null;
-    if (key == ircam.jmax.utils.Platform.RETURN_KEY){	
-    itsValue = value.getText();
-    try{
-    aFloat = new Float(itsValue);
-    }
-    catch (NumberFormatException e){
-    hide();
-    return false;
-    }
-    itsFloatObject.FromDialogValueChanged(aFloat);
-    hide();
-    return true;
-    }
-    return false;
-    }*/
 }
 
 
