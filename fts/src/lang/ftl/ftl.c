@@ -8,6 +8,39 @@
 #include "lang/veclib/include/veclib.h"
 #include "runtime/files/post.h"
 
+
+/* --------------------------------------------------------------------------- */
+/*                                                                             */
+/* FTL module and module functions                                             */
+/*                                                                             */
+/* --------------------------------------------------------------------------- */
+
+static void ftl_module_init( void);
+static void ftl_module_restart( void);
+static void ftl_module_shutdown( void);
+
+fts_module_t fts_ftl_module = {"FTL", "FTL engine", ftl_module_init, ftl_module_restart, ftl_module_shutdown};
+
+static void ftl_module_init(void)
+{
+}
+
+static void ftl_module_restart(void)
+{
+}
+
+static void ftl_module_shutdown(void)
+{
+}
+
+
+/* --------------------------------------------------------------------------- */
+/*                                                                             */
+/* Actual FTL code                                                             */
+/*                                                                             */
+/* --------------------------------------------------------------------------- */
+
+
 #define ASSERT(e) if (!(e)) { fprintf( stderr, "Assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}
 
 /* FTL opcodes */

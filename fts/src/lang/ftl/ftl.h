@@ -1,6 +1,8 @@
 #ifndef _FTL_H_
 #define _FTL_H_
 
+extern fts_module_t fts_ftl_module;
+
 typedef void (*ftl_wrapper_t)(fts_word_t *);
 
 typedef struct _ftl_program_t ftl_program_t;
