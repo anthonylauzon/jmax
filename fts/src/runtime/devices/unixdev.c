@@ -222,6 +222,8 @@ static void fts_socket_parse(fts_symbol_t addr, char **host, unsigned short *por
 typedef struct udp_dev_data
 {
   pthread_t thread;
+  pthread_mutex_t mutex;
+
   fts_fifo_t fifo;
   unsigned char get_buf[UDP_FIFO_SIZE];
 
@@ -254,12 +256,20 @@ static fts_status_t udp_dev_get(fts_dev_t *dev, unsigned char *cp)
 {
   udp_dev_data_t *dev_data = (udp_dev_data_t *) fts_dev_get_device_data(dev);
 
+  pthread_mutex_lock( &dev_data->mutex);
+
   if (fts_fifo_get_read_level( &dev_data->fifo) < 1)
-    return &fts_data_not_ready;
+    {
+      pthread_mutex_unlock( &dev_data->mutex);
+
+      return &fts_data_not_ready;
+    }
     
   *cp = *fts_fifo_get_read_pointer( &dev_data->fifo);
 
   fts_fifo_incr_read_index( &dev_data->fifo, 1);
+
+  pthread_mutex_unlock( &dev_data->mutex);
 
   return fts_Success;
 }
@@ -417,6 +427,8 @@ open_udp_client(fts_dev_t *dev, int nargs, const fts_atom_t *args)
     pthread_attr_init( &attr);
     pthread_create( &dev_data->thread, &attr, udp_thread_run, dev_data);
     pthread_attr_destroy( &attr);
+
+    pthread_mutex_init( &dev_data->mutex, NULL);
   }
 
   return fts_Success;
