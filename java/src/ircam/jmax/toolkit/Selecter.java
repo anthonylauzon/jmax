@@ -60,8 +60,8 @@ public class Selecter extends InteractionModule implements XORPainter {
     if (e.getClickCount() > 1) itsListener.selectionPointDoubleClicked(x, y, e.getModifiers());
     interactionBeginAt(x, y);
     itsListener.selectionPointChoosen(x, y, e.getModifiers());
-    InteractionSemaphore.lock();
-
+    /*active = true;*/
+    InteractionSemaphore.lock();    
   } 
 
 
@@ -92,7 +92,11 @@ public class Selecter extends InteractionModule implements XORPainter {
    */
   public void mouseReleased(MouseEvent e) 
   {
-    if (!active) return; //abnormal condition
+    if (!active) 
+      {
+	InteractionSemaphore.unlock();
+	return; //abnormal condition
+      }
     int x = e.getX();
     int y = e.getY();
 
@@ -100,8 +104,7 @@ public class Selecter extends InteractionModule implements XORPainter {
 
     tempRect.setBounds(startSelection.x, startSelection.y, x-startSelection.x, y-startSelection.y);
     normalizeRectangle(tempRect);
-    
-    
+        
     itsListener.selectionChoosen(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
     active = false;
     itsRunningG.dispose();

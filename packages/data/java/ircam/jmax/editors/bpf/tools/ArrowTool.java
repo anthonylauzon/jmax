@@ -82,23 +82,23 @@ public class ArrowTool extends SelecterTool implements DragListener{
      */
   public void controlAction(int x, int y, int modifiers)
   {
-      mountIModule(itsSelectionMover);
-      
-      BpfGraphicContext bgc = (BpfGraphicContext) gc;
-      FtsBpfObject ftsObj = bgc.getFtsObject();
+    mountIModule(itsSelectionMover);
+    
+    BpfGraphicContext bgc = (BpfGraphicContext) gc;
+    FtsBpfObject ftsObj = bgc.getFtsObject();
 
-      ((UndoableData) ftsObj).beginUpdate();
-
-      //with Shift add to selection
-      if((modifiers & InputEvent.SHIFT_MASK) == 0) bgc.getSelection().deselectAll();
-	       
-      float time = bgc.getAdapter().getInvX(x);
-      float value = bgc.getAdapter().getInvY(y);
-      int index = ftsObj.getNextPointIndex(time);
-
-      ftsObj.requestPointCreation(index, time, value); 
+    ((UndoableData) ftsObj).beginUpdate();
+    
+    //with Shift add to selection
+    if((modifiers & InputEvent.SHIFT_MASK) == 0) bgc.getSelection().deselectAll();
+    
+    float time = bgc.getAdapter().getInvX(x);
+    float value = bgc.getAdapter().getInvY(y);
+    int index = ftsObj.getNextPointIndex(time);
+    
+    ftsObj.requestPointCreation(index, time, value); 
   
-      mountIModule(itsSelecter);
+    mountIModule(itsSelecter);
   }
   /**
    * drag listener called by the SelectionMover UI module,
@@ -131,7 +131,7 @@ public class ArrowTool extends SelecterTool implements DragListener{
 
   public void edit(int x, int y, int modifiers)
   {
-      ((BpfEditor)gc.getGraphicDestination()).showListDialog();
+    ((BpfEditor)gc.getGraphicDestination()).showListDialog();
   }
   //---Fields
   BpfSelectionMover itsSelectionMover;
