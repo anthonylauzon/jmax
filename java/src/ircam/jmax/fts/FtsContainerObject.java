@@ -2,6 +2,7 @@ package ircam.jmax.fts;
 
 import java.io.*;
 import java.util.*;
+import tcl.lang.*;
 
 import ircam.jmax.*;
 
@@ -111,7 +112,7 @@ abstract public class FtsContainerObject extends FtsObject
   final void addConnection(FtsConnection obj)
   {
     connections.addElement(obj);
-    put("newConnection", obj); // the newObject property keep the last connection created
+    put("newConnection", obj); // the newConnection property keep the last connection created
   }
 
   /** Remove an connection from this container. */
@@ -252,6 +253,19 @@ abstract public class FtsContainerObject extends FtsObject
   {
     if (containerPropertyHandlerTable != null)
       containerPropertyHandlerTable.callHandlers(property, value);
+  }
+
+  /** The Tcl eval for an object; just eval the script, but handle
+   *  a globally available container stack.
+   */
+
+  public static Stack containerStack = new Stack(); // should not be public !
+
+  public void eval(Interp interp, TclObject script) throws tcl.lang.TclException
+  {
+    containerStack.push(this);
+    interp.eval(script, 0);
+    containerStack.pop();
   }
 
   /*****************************************************************************/

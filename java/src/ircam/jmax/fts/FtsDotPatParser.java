@@ -92,7 +92,7 @@ public class FtsDotPatParser
 
     try
       {
-	in  = new FtsDotPatTokenizer(new FileInputStream(inputFile));
+	in  = new FtsDotPatTokenizer(new BufferedInputStream(new FileInputStream(inputFile), 1024));
       }
     catch (FileNotFoundException e)
       {
@@ -390,7 +390,7 @@ public class FtsDotPatParser
     
     try
       {
-	in  = new FtsDotPatTokenizer(new FileInputStream(inputFile), env);
+	in  = new FtsDotPatTokenizer(new BufferedInputStream(new FileInputStream(inputFile), 1024), env);
 
 	readFromFtsDotPatTokenizer(parent, in);
 

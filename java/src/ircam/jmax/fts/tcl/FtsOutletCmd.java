@@ -36,7 +36,7 @@ class FtsOutletCmd implements Command
 	  {
 	    // Retrieve the arguments
 
-	    parent = (FtsContainerObject) FtsPatcherCmd.patcherStack.peek();
+	    parent = (FtsContainerObject) FtsContainerObject.containerStack.peek();
 	    position    = TclInteger.get(interp, argv[1]);
 	    properties = argv[2];
 

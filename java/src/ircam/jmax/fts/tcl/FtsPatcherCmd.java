@@ -27,8 +27,6 @@ import ircam.jmax.fts.*;
 
 class FtsPatcherCmd implements Command
 {
-  static Stack patcherStack = new Stack();
-
   /** Method implementing the TCL command */
 
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
@@ -41,13 +39,13 @@ class FtsPatcherCmd implements Command
 	TclObject properties;
 	TclObject body;
 
-	if (patcherStack.empty())
+	if (FtsContainerObject.containerStack.empty())
 	  {
 	    parent     = MaxApplication.getFtsServer().getRootObject();
 	    MaxApplication.getFtsServer().setFlushing(false);
 	  }
 	else
-	  parent     = (FtsContainerObject) patcherStack.peek();
+	  parent     = (FtsContainerObject) FtsContainerObject.containerStack.peek();
 
 	properties = argv[1];
 	body       = argv[2];
@@ -58,10 +56,7 @@ class FtsPatcherCmd implements Command
 
 	    object.parseTclProperties(interp, properties);
 	    object.updateFtsObject(); //neede to update ins/outs and name
-
-	    patcherStack.push(object);
 	    object.eval(interp, body);
-	    patcherStack.pop();
 
 	    // Run the after load init of the patcher
 
@@ -70,7 +65,7 @@ class FtsPatcherCmd implements Command
 	    // Set back the server to flushing if we are at the top of 
 	    // the stack
 
-	    if (patcherStack.empty())
+	    if (FtsContainerObject.containerStack.empty())
 	      MaxApplication.getFtsServer().setFlushing(true);
 
 	    interp.setResult(ReflectObject.newInstance(interp, object));

@@ -35,7 +35,7 @@ class FtsObjectCmd implements Command
 
 	// Retrieve the arguments
 
-	parent = (FtsContainerObject) FtsPatcherCmd.patcherStack.peek();
+	parent = (FtsContainerObject) FtsContainerObject.containerStack.peek();
 	description = argv[1].toString();
 	properties = argv[2];
 

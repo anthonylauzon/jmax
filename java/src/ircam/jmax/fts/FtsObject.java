@@ -912,8 +912,7 @@ abstract public class FtsObject implements MaxTclInterpreter
       }
   }
 
-  /** The Tcl eval for an object; just eval the script defining
-   *  a local variable "this" pointing to this object
+  /** The Tcl eval for an object; just eval the script, for the basic case
    */
 
 
@@ -926,16 +925,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   public void eval(Interp interp, TclObject script) throws tcl.lang.TclException
   {
-    // Call the tcl function maxTclDataEval, with this as first argument,
-    // and the script as second
-
-    TclObject list = TclList.newInstance();
-
-    TclList.append(interp, list, TclString.newInstance("_BasicThisWrapper"));
-    TclList.append(interp, list, ReflectObject.newInstance(interp, this));
-    TclList.append(interp, list, script);
-
-    interp.eval(list, 0);
+    interp.eval(script, 0);
   }
 }
 
