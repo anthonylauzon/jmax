@@ -5,6 +5,7 @@ midi.c \
 midiin.c \
 midiout.c \
 midiparse.c \
+midiroute.c \
 mtof.c \
 noteoff.c \
 sysex.c 
