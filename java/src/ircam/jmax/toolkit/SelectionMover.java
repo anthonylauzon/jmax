@@ -51,15 +51,6 @@ abstract public class SelectionMover extends InteractionModule implements XORPai
    */
   public void mouseDragged(MouseEvent e) 
   {
-    /*int deltaX = gc.getAdapter().getInvX(e.getX()) - gc.getAdapter().getInvX(itsStartingPoint.x);
-      int deltaY = gc.getAdapter().getInvY(e.getY()) - gc.getAdapter().getInvY(itsStartingPoint.y);
-      
-      if ((itsMovements & HORIZONTAL_MOVEMENT) != 0)
-      gc.getStatusBar().post(ScrToolbar.getTool(), " dx "+(deltaX));
-      else if ((itsMovements & VERTICAL_MOVEMENT) != 0)
-      gc.getStatusBar().post(ScrToolbar.getTool(), " dy "+deltaY);
-      else gc.getStatusBar().post(ScrToolbar.getTool(), " dx "+(deltaX)+", dy "+(deltaY));
-      */
     itsXORHandler.moveTo(e.getX(), e.getY());
   }
 
