@@ -40,6 +40,8 @@
 #define DEFAULT_FIFO_SIZE 256
 #define DEFAULT_CHANNELS 2
 
+#define COUNTDOWN 512
+
 typedef struct {
   fts_audioport_t head;
   AudioDeviceID device;
@@ -119,7 +121,28 @@ static int halaudioport_xrun( fts_audioport_t *port)
 static void hal_halt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fd_set rfds;
+  halaudioport_t *this = (halaudioport_t *)o;
 
+  this->countdown--;
+
+  if (this->countdown > 0)
+    return;
+
+  err = AudioDeviceAddIOProc( this->device, halaudioport_ioproc, this);
+  if (err != noErr)
+    {
+      fts_object_set_error( o, "Cannot set IO proc");
+      return;
+    }
+  
+  err = AudioDeviceStart( this->device, halaudioport_ioproc);
+  if (err != noErr)
+    {
+      fts_object_set_error( o, "Cannot start device");
+      return;
+    }
+
+  /* halt scheduler main loop */
   FD_ZERO( &rfds);
   FD_SET( 0, &rfds);
 
@@ -168,19 +191,7 @@ static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
   this->buffer = (float *)fts_malloc( bufferSizeProperty);
   this->buffer_size = bufferSizeProperty / sizeof( float);
 
-  err = AudioDeviceAddIOProc( this->device, halaudioport_ioproc, this);
-  if (err != noErr)
-    {
-      fts_object_set_error( o, "Cannot set IO proc");
-      return;
-    }
-  
-  err = AudioDeviceStart( this->device, halaudioport_ioproc);
-  if (err != noErr)
-    {
-      fts_object_set_error( o, "Cannot start device");
-      return;
-    }
+  this->countdown = COUNTDOWN;
 
   fts_sched_add_fd( fts_sched_get_current(), 0, 1, hal_halt, o);
 }
