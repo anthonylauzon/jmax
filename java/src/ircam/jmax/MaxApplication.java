@@ -74,7 +74,7 @@ public class MaxApplication extends Object {
 
     MaxData ourData;
     MaxDataEditor ourEditor;
-
+    
     try
       {
     	ourData = MaxDataType.getTypeByName(theFileType).newInstance();

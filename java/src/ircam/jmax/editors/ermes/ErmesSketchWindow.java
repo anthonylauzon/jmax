@@ -750,6 +750,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 	  }
 	}   
       }
+      else super.keyPressed(e);
     } 
     else if((aInt==ircam.jmax.utils.Platform.DELETE_KEY)||(aInt==ircam.jmax.utils.Platform.BACKSPACE_KEY)){
       if(itsSketchPad.GetEditField()!=null){
