@@ -35,6 +35,7 @@ param.h \
 patcher.h \
 post.h \
 predefsymbols.h \
+preset.h \
 project.h \
 property.h \
 sched.h \
