@@ -163,7 +163,7 @@ fts_ramp_set_slope(fts_ramp_t *ramp, float slope, float time, float rate)
 void 
 fts_ramp_set_incr_clip(fts_ramp_t *ramp, double incr, float clip)
 {
-  int n_steps = (clip - fts_ramp_value_get(&ramp->value)) / incr;
+  int n_steps = (int)((clip - fts_ramp_value_get(&ramp->value)) / incr);
 
   if(n_steps < 0)
     n_steps *= -1;
