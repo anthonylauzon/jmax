@@ -54,7 +54,15 @@ static fts_status_t
 fork_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[1];
-  int n_outs = fts_get_int(at + 1);
+  int n_outs;
+  
+  ac--;
+  at++;
+
+  if(ac > 0)
+    n_outs = fts_get_int(at);
+  else
+    n_outs = 2;
 
   fts_class_init(cl, sizeof(fts_object_t), 1, n_outs, 0);
   fts_method_define_varargs(cl, 0, fts_s_anything, fork_input);

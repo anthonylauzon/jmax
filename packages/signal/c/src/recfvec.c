@@ -206,7 +206,7 @@ rec_fvec_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
   fts_set_int(a + 2, n_tick);
   
-  dsp_add_funcall(sym_rec, 3, a);
+  fts_dsp_add_function(sym_rec, 3, a);
 }
 
 static void
@@ -293,7 +293,7 @@ rec_fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   ac--;
   at++;
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 
   this->index = 0.0;
 
@@ -321,7 +321,7 @@ rec_fvec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   rec_fvec_t *this = (rec_fvec_t *)o;
 
   fts_alarm_reset(&this->alarm);
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static fts_status_t
@@ -354,7 +354,7 @@ rec_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 2, fts_s_int, rec_fvec_set_end);
   fts_method_define_varargs(cl, 2, fts_s_float, rec_fvec_set_end);
 
-  dsp_sig_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
   
   return fts_Success;
 }
@@ -366,5 +366,5 @@ signal_rec_fvec_config(void)
 
   fts_metaclass_install(sym_rec, rec_fvec_instantiate, fts_arg_type_equiv);
 
-  dsp_declare_function(sym_rec, rec_fvec_ftl);
+  fts_dsp_declare_function(sym_rec, rec_fvec_ftl);
 }

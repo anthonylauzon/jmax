@@ -18,20 +18,14 @@
 <!--                                                                      -->
 </head>
 <body bgcolor=white>
-&nbsp;
-<table BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
-<tr>
-<td ALIGN=LEFT><a href="http://www.ircam.fr/jmax/"><img SRC="images/jmax_logo_tiny.gif" ALT="jMax" NOSAVE BORDER=0 height=30 width=76 align=CENTER></a></td>
 
-<td ALIGN=RIGHT><a href="http://www.ircam.fr/"><img SRC="images/ircam.gif" ALT="IRCAM - Centre Georges Pompidou" BORDER=0 height=23 width=370></a></td>
-</tr>
-</table>
-
-<hr>
 <h1>
-<i>j</i>Max Release Notes</h1>
+  <a href="http://www.ircam.fr/jmax/"><img src="images/jmax_icon.gif" border=0 alt="jMax" ALIGN=MIDDLE></A>
+  jMax Release Notes
+</h1>
 
 <ul>
+<li><a href="#2.5.1">Release notes for <i>j</i>Max 2.5.1</a></li>
 <li><a href="#2.5.0">Release notes for <i>j</i>Max 2.5.0</a></li>
 <li><a href="#2.4.16">Release notes for <i>j</i>Max 2.4.16</a></li>
 <li><a href="#2.4.15">Release notes for <i>j</i>Max 2.4.15</a></li>
@@ -47,6 +41,44 @@
 <li><a href="#2.3.11">Release notes for <i>j</i>Max 2.3.11</a></li>
 </ul>
 
+<p>
+<!------------------------------------------------------------------------------->
+<br>
+<hr>
+<a NAME="2.5.1"><h1>Release notes for <i>j</i>Max 2.5.1</h1></a>
+
+<h3>Java</h3>
+
+<p>
+<h3>GUI</h3>
+
+The DSP
+
+<p>
+<h3>audio and MIDI configuration</h3>
+
+<p>
+<h3>Scheduling, Clocks and Alarms</h3>
+
+The FTS scheduling as well as the clock and alarm abstractions have changed.
+Before this version 
+
+<p>
+<h3>Object Set</h3>
+
+The classes "clock" and "at" of the ISPW packages where removed. 
+It is no more possible to give a clock as first argument of some of the timing objects 
+such as metro or delay.
+
+The object "at dsp_msec 0", or "at dsp_tick 0", which is used in some patches in order 
+to obtain a trigger at the instant of the DSP calculation being switched on must be 
+replaced by an object "dsp" connected to an object "select 1".
+
+In the signal package the classes play~ and rec~ where introduced (see the help patches).
+
+The toolbar has 
+
+<p>
 <!------------------------------------------------------------------------------->
 <br>
 <hr>
