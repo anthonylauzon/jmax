@@ -106,5 +106,5 @@ public class SelectionResizer extends InteractionModule implements XORPainter {
   Point itsStartingPoint;
   int itsMovements;
 
-  ScrEvent tempEvent = new ScrEvent();
+  ScrEvent tempEvent = new ScrEvent(null);
 }

@@ -10,8 +10,9 @@ public class ScrEvent {
    * default constructor.
    * It provides an event with a default set of parameters
    */
-  public ScrEvent() 
+  public ScrEvent(ExplodeDataModel explodeData) 
   {
+    itsExplodeDataModel = explodeData;
     itsTime = DEFAULT_TIME;
     itsPitch = DEFAULT_PITCH;
     itsVelocity = DEFAULT_VELOCITY;
@@ -23,14 +24,15 @@ public class ScrEvent {
   /**
    * constructor with all the parameters
    */
-  public ScrEvent(int theTime, int thePitch, int theVelocity, int theDuration, int theChannel) 
+  public ScrEvent(ExplodeDataModel explodeDb, 
+		  int theTime, int thePitch, int theVelocity, int theDuration, int theChannel) 
   {
+    itsExplodeDataModel = explodeDb;
     itsTime = theTime;
     itsPitch = thePitch;
     itsVelocity = theVelocity;
     itsDuration = theDuration;
     itsChannel = theChannel;
-    
   }
 
   /**
@@ -75,29 +77,45 @@ public class ScrEvent {
 
   
   /* the corresponding set functions.. */
+
   public final void setTime(int time) 
   {
     itsTime = time;
+
+    if (itsExplodeDataModel != null)
+      itsExplodeDataModel.moveEvent(this);
   }
 
   public final void setPitch(int pitch) 
   {
     itsPitch = pitch;
+
+    if (itsExplodeDataModel != null)
+      itsExplodeDataModel.changeEvent(this);
   }
 
   public final void setDuration(int duration) 
   {
     itsDuration = duration;
+
+    if (itsExplodeDataModel != null)
+      itsExplodeDataModel.changeEvent(this);
   }
 
   public final void setVelocity(int theVelocity) 
   {
     itsVelocity = theVelocity;
+
+    if (itsExplodeDataModel != null)
+      itsExplodeDataModel.changeEvent(this);
   }
 
   public final void setChannel(int theChannel) 
   {
     itsChannel = theChannel;
+
+    if (itsExplodeDataModel != null)
+      itsExplodeDataModel.changeEvent(this);
   }
 
   //------------ Fields
@@ -108,12 +126,18 @@ public class ScrEvent {
   int itsDuration;
   int itsChannel;
 
+  /** Back pointer to the data base; if not null,
+   *  all the change are reported to the data base
+   */
+
+  ExplodeDataModel itsExplodeDataModel; 
+
+
   public static int DEFAULT_TIME = 0;
   public static int DEFAULT_PITCH = 64;
   public static int DEFAULT_VELOCITY = 64;
   public static int DEFAULT_DURATION = 100;
   public static int DEFAULT_CHANNEL = 0;
-
 }
 
 

@@ -58,12 +58,12 @@ if {$jmaxArch == "irix6.2"} {
 #    ucs open device in~ multi as SgiALIn ALdevice ADATIn channels 8 fifo_size $jmaxAudioBuffer
 #    ucs open device out~ multi as SgiALOut ALdevice ADATOut channels 8 fifo_size $jmaxAudioBuffer
 
-    puts "    stereo: 2/2"
-    ucs open device in~ stereo as SgiALIn ALdevice AESIn channels 2 fifo_size $jmaxAudioBuffer
-    ucs open device out~ stereo as SgiALOut ALdevice AESOut channels 2 fifo_size $jmaxAudioBuffer
-
-    ucs default in~ multi
-    ucs default out~ multi
+#    puts "    stereo: 2/2"
+#    ucs open device in~ stereo as SgiALIn ALdevice AESIn channels 2 fifo_size $jmaxAudioBuffer
+#    ucs open device out~ stereo as SgiALOut ALdevice AESOut channels 2 fifo_size $jmaxAudioBuffer
+#
+#    ucs default in~ multi
+#    ucs default out~ multi
 #     two ADAT cards
 
 

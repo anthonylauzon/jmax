@@ -96,6 +96,7 @@ class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
     if(!itsSketchPad.itsRunMode) 
       g.fillRect(getItsX()+getItsWidth()-DRAG_DIMENSION,getItsY()+getItsHeight()-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
   }
+
 	
   
   //--------------------------------------------------------

@@ -88,10 +88,10 @@ public class ScoreRenderer implements Renderer, ImageObserver{
     if (startEvent <0 || endEvent < 0) return; //error (or initial) condition
     for (int i = startEvent; i<= endEvent; i++) 
       {
-      
+	ScrEvent temp;
+
 	temp = gc.getDataModel().getEventAt(i);
 	itsEventRenderer.render(temp, g, ExplodeSelection.getSelection().isInSelection(temp));
-	
       }
 
     firstIndexDisplayed = startEvent;
@@ -214,7 +214,6 @@ public class ScoreRenderer implements Renderer, ImageObserver{
   static boolean imageReady = false; //all of them depend on the same load
   public EventRenderer itsEventRenderer;
   
-  ScrEvent temp = new ScrEvent();
   public static final int XINTERVAL = 10;
   public static final int YINTERVAL = 3;
 
@@ -222,7 +221,6 @@ public class ScoreRenderer implements Renderer, ImageObserver{
   int lastIndexDisplayed = 0;
 
   private Vector tempList;
-
 }
 
 

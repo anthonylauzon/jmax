@@ -34,6 +34,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
   // it is not implemented as a nested class to try to reduce to the minimum
   // every indirection in its use.
 
+  static Toolkit theToolkit = Toolkit.getDefaultToolkit();
+
   ErmesObject itsElements[] = new ErmesObject[32];
   int itsElementsNextFree = 0;
 
@@ -117,6 +119,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
     }
     drawPending = false;
     copyPending = false;
+
+    theToolkit.sync();
   }
 
   //end of ErmesDrawable
@@ -385,7 +389,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
 
   void ChangeFont(Font theFont){
     try {
-      FontMetrics aFontMetrics = Toolkit.getDefaultToolkit().getFontMetrics(theFont);
+      FontMetrics aFontMetrics = theToolkit.getFontMetrics(theFont);
       setFont(theFont);   
     }
     catch (Exception e) {
@@ -406,7 +410,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
 	 (aObject instanceof ErmesObjIn)||(aObject instanceof ErmesObjOut)){
 	aFont = new Font(theFontName, sketchFont.getStyle(), aObject.getFont().getSize());
 	try {
-	  FontMetrics aFontMetrics = Toolkit.getDefaultToolkit().getFontMetrics(aFont);
+	  FontMetrics aFontMetrics = theToolkit.getFontMetrics(aFont);
 	  setFont(aFont);   
 	}
 	catch (Exception exc) {
@@ -432,7 +436,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
 	 (aObject instanceof ErmesObjIn)||(aObject instanceof ErmesObjOut)){
 	aFont = new Font(aObject.getFont().getName(), sketchFont.getStyle(), fontSize);
 	try {
-	  FontMetrics aFontMetrics = Toolkit.getDefaultToolkit().getFontMetrics(aFont);
+	  FontMetrics aFontMetrics = theToolkit.getFontMetrics(aFont);
 	  setFont(aFont);   
 	}
 	catch (Exception exc) {

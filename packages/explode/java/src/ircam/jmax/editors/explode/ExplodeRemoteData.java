@@ -108,6 +108,7 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
   /**
    * how many events in the data base?
    */
+
   public int length()
   {
     return events_fill_p;
@@ -117,6 +118,7 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
    * an utility class to efficiently implement the getEvents()
    * call
    */
+
   private class ExplodeEnumeration implements Enumeration
   {
     int p;
@@ -151,8 +153,11 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 
     index = getIndexAfter(event.getTime());
 
-    if (index == EMPTY_COLLECTION) index = 0;
-    else if (index == NO_SUCH_EVENT) index = events_fill_p;
+    if (index == EMPTY_COLLECTION)
+      index = 0;
+    else if (index == NO_SUCH_EVENT)
+      index = events_fill_p;
+
     makeRoomAt(index);
     events[index] = event;
     
@@ -205,6 +210,10 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
   /**
    *  Signal FTS that an object is changed 
    *  but that the time is still the same
+   * Note that FTS will decide on its own
+   * if an object should be moved or not;
+   * i.e. the remote call for this function
+   * and the next is the same.
    */
 
   public void changeEvent(ScrEvent event)
@@ -243,6 +252,65 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 
   public void moveEvent(ScrEvent event)
   {
+    // Find the object
+    
+    int index;
+
+    for (index = 0 ; index < events_fill_p; index++)
+      {
+	if (events[index] == event)
+	  {
+	    // First, send the message to FTS
+
+	    Object args[] = new Object[6];
+
+	    args[0] = new Integer(index);
+	    args[1] = new Integer(event.getTime());
+	    args[2] = new Integer(event.getPitch());
+	    args[3] = new Integer(event.getVelocity());
+	    args[4] = new Integer(event.getDuration());
+	    args[5] = new Integer(event.getSomething());
+
+	    remoteCall(REMOTE_CHANGE, args);
+
+	    // Now, move the object with one step of bubble 
+	    // sorting
+    
+	    if ((index < (events_fill_p - 1)) && (events[index].getTime() > events[index+1].getTime()))
+	      {
+		// Move the object up
+
+		for (int i = index; i < (events_fill_p - 1); i++)
+		  if (events[i].getTime() > events[i+1].getTime())
+		    {
+		      ScrEvent e;
+
+		      e = events[i + 1];
+		      events[i + 1] = events[i];
+		      events[i] = e;
+		    }
+	      }
+	    else if ((index > 0) && events[index].getTime() < events[index-1].getTime())
+	      {
+		// Move the object down
+
+		for (int i = index; i > 0; i--)
+		  if (events[i].getTime() < events[i-1].getTime())
+		    {
+		      ScrEvent e;
+
+		      e = events[i - 1];
+		      events[i - 1] = events[i];
+		      events[i] = e;
+		    }
+	      }
+
+	    notifyObjectChanged(event);
+
+	    return;
+	  }
+      }
+
   }
 
 
@@ -415,11 +483,12 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 
 	if (events_fill_p >= events_size)
 	  reallocateEvents();
-	events[events_fill_p++] = new ScrEvent( ((Integer) msg.getArgument(2)).intValue(), 
-						((Integer) msg.getArgument(3)).intValue(), 
-						((Integer) msg.getArgument(4)).intValue(), 
-						((Integer) msg.getArgument(5)).intValue(), 
-						((Integer) msg.getArgument(6)).intValue());
+	events[events_fill_p++] = new ScrEvent(this,
+					       ((Integer) msg.getArgument(2)).intValue(), 
+					       ((Integer) msg.getArgument(3)).intValue(), 
+					       ((Integer) msg.getArgument(4)).intValue(), 
+					       ((Integer) msg.getArgument(5)).intValue(), 
+					       ((Integer) msg.getArgument(6)).intValue());
 	break;
       default:
 	break;
@@ -439,14 +508,15 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
     return "explode";
   }
 
+
   //----- Fields
   /** Key for remote call add */
 
   static final int REMOTE_CLEAN  = 1;
   static final int REMOTE_APPEND = 2;
-  static final int REMOTE_ADD    = 1;
-  static final int REMOTE_REMOVE = 2;
-  static final int REMOTE_CHANGE = 3;
+  static final int REMOTE_ADD    = 3;
+  static final int REMOTE_REMOVE = 4;
+  static final int REMOTE_CHANGE = 5;
 
   static final int EMPTY_COLLECTION = -1;
   static final int NO_SUCH_EVENT = -2;

@@ -66,6 +66,15 @@ public interface ExplodeDataModel {
    */
   public abstract void addEvent(ScrEvent theEvent);
 
+  /**
+   * change an event in the database
+   */
+  public abstract void changeEvent(ScrEvent event);
+
+  /**
+   * move an event in the database
+   */
+  public abstract void moveEvent(ScrEvent event);
 
   /**
    * deletes an event from the database
