@@ -181,8 +181,13 @@ void fts_platform_init( void)
   }
   closesocket(sock);
 
-  /* load audio packages */
-  fts_package_load(fts_new_symbol("dsdev"));
+  /*  if we want to have audio
+   we load audio packages */
+  if (NULL == fts_cmd_args_get(fts_s_noaudio))
+  { 
+    fts_package_load(fts_new_symbol("dsdev"));
+  }
+
   /* boost the priority of the fts thread */
 /*    SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS); */
   SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
