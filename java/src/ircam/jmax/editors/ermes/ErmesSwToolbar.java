@@ -5,8 +5,10 @@ import java.awt.event.*;
 import java.util.*;
 
 import ircam.jmax.*;
+import ircam.jmax.dialogs.*;
 import com.sun.java.swing.*;
 import com.sun.java.swing.plaf.*;
+import com.sun.java.swing.plaf.motif.*;
 
 public class ErmesSwToolbar extends JPanel implements /*ActionListener,*/ MouseListener{
   ErmesSketchPad itsSketchPad;
@@ -20,6 +22,13 @@ public class ErmesSwToolbar extends JPanel implements /*ActionListener,*/ MouseL
 
   public ErmesSwToolbar(ErmesSketchPad theSketchPad) {
 
+    try{
+      UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+    }catch (Exception exc) {
+      ErrorDialog aErr = new ErrorDialog(theSketchPad.itsSketchWindow, "Could not load MotifLookAndFeel");
+      aErr.setLocation(100, 100);
+      aErr.show();  
+    }
     setDoubleBuffered(true);
     itsSketchPad = theSketchPad;
     setLayout (new BorderLayout());    
