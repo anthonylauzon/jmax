@@ -63,6 +63,14 @@ static void fts_cmd_args_parse( int argc, char **argv)
   char filevar[32];
   fts_symbol_t name, value, s_yes;
 
+  {
+    int i;
+
+    fts_log("[fts]: Command line arguments:\n");
+    for ( i = 0; i < argc; i++)
+      fts_log( "[fts]: argument %d = \"%s\"\n", i, argv[i]);
+  }
+
   fts_hashtable_init( &cmd_args, FTS_HASHTABLE_SMALL);
 
   s_yes = fts_new_symbol( "yes");

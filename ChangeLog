@@ -1,3 +1,7 @@
+2003-01-13  Francois Dechelle  <dechelle@ircam.fr>
+
+	* fixed audio on Mac OS X. Works with input and output.
+
 2003-01-09  François Déchelle  <dechelle@mac-dechelle.ircam.fr>
 
 	* audio output works on Mac OS X (tested with builtin audio and MOTU 828)

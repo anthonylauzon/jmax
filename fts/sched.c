@@ -28,6 +28,8 @@
 #include <errno.h>
 #include <sys/types.h>
 
+#include <stdio.h>
+
 #if HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
@@ -65,14 +67,36 @@ typedef struct fts_sched
 static fts_sched_t main_sched;
 
 
-static int sched_run_under_callback = 0;
-
-#define fts_sched_is_running_under_callback() (1 == sched_run_under_callback)
-
 static fts_sched_t *
 fts_sched_get_current(void)
 {
   return &main_sched;
+}
+
+static void
+sched_debug_aux( fts_sched_t *sched)
+{
+  sched_callback_t *callback;
+
+  fprintf( stderr, "Scheduler\n");
+  for ( callback = sched->callback_head; callback; callback = callback->next)
+    {
+      fprintf( stderr, " %p: object %p (%s) flag %s fd %d ready %p error %p next %p\n",
+	       callback,
+	       callback->object,
+	       fts_object_get_class_name( callback->object),
+	       (callback->flags == FTS_SCHED_ALWAYS) ? "ALWAYS" : "READY",
+	       callback->fd,
+	       callback->ready_mth,
+	       callback->error_mth,
+	       callback->next);
+    }
+}
+
+void
+sched_debug(void)
+{
+  sched_debug_aux( &main_sched);
 }
 
 /*****************************************************************************
@@ -214,10 +238,12 @@ static void run_select( fts_sched_t *sched, int n_fd, fd_set *readfds, fd_set *w
 
 static void run_always( fts_sched_t *sched)
 {
-  sched_callback_t *callback;
+  sched_callback_t *callback, *next;
 
-  for ( callback = sched->callback_head; callback; callback = callback->next)
+  for ( callback = sched->callback_head; callback; callback = next)
     {
+      next = callback->next;
+
       if ( callback->flags == FTS_SCHED_ALWAYS)
 	(*callback->ready_mth)( callback->object, fts_system_inlet, fts_s_sched_ready, 0, 0);
     }
@@ -297,9 +323,6 @@ sleep_init(void)
 void
 fts_sleep(void)
 {
-  if (fts_sched_is_running_under_callback())
-      return;
-
   if ( ++sleeper.count == 5) 
     {
       double ftstime = fts_get_time() - sleeper.ftsstart;
@@ -333,8 +356,6 @@ void
 fts_sleep(void)
 {
   double now;
-  if (fts_sched_is_running_under_callback())
-      return;
 
   now = fts_get_time();
   
@@ -353,21 +374,10 @@ fts_sleep(void)
 }
 #endif
 
-void 
-fts_sched_set_run_under_callback()
-{
-    sched_run_under_callback = 1;
-}
-
-void 
-fts_sched_unset_run_under_callback()
-{
-    sched_run_under_callback = 0;
-}
 
 /*****************************************************************************
  *
- *  Initialization of the scheduler module
+ *  Initialization
  *
  */
 

@@ -69,20 +69,37 @@ static void macosxaudioport_input_copy( fts_audioport_t *port, float *buff, int 
   src = macosx_port->input_buffer_info[channel].buffer;
   src_jump = macosx_port->input_buffer_info[channel].jump;
 
-  for ( i = 0; i < buffsize; i += 4)
+  if (src)
     {
-      *buff = *src;
-      src += src_jump;
-      buff++;
-      *buff = *src;
-      src += src_jump;
-      buff++;
-      *buff = *src;
-      src += src_jump;
-      buff++;
-      *buff = *src;
-      src += src_jump;
-      buff++;
+      for ( i = 0; i < buffsize; i += 4)
+	{
+	  *buff = *src;
+	  src += src_jump;
+	  buff++;
+	  *buff = *src;
+	  src += src_jump;
+	  buff++;
+	  *buff = *src;
+	  src += src_jump;
+	  buff++;
+	  *buff = *src;
+	  src += src_jump;
+	  buff++;
+	}
+    }
+  else
+    {
+      for ( i = 0; i < buffsize; i += 4)
+	{
+	  *buff = 0.0;
+	  buff++;
+	  *buff = 0.0;
+	  buff++;
+	  *buff = 0.0;
+	  buff++;
+	  *buff = 0.0;
+	  buff++;
+	}
     }
 
   macosx_port->input_buffer_info[channel].buffer = src;
@@ -95,6 +112,9 @@ static void macosxaudioport_output_copy( fts_audioport_t *port, float *buff, int
   int i, dst_jump;
 
   dst = macosx_port->output_buffer_info[channel].buffer;
+  if (!dst)
+    return;
+
   dst_jump = macosx_port->output_buffer_info[channel].jump;
 
   for ( i = 0; i < buffsize; i += 4)
@@ -155,7 +175,6 @@ OSStatus macosxaudioport_ioproc( AudioDeviceID inDevice,
 
 static void macosxaudioport_halt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fd_set rfds;
   macosxaudioport_t *self = (macosxaudioport_t *)o;
   OSStatus err;
 
@@ -183,10 +202,7 @@ static void macosxaudioport_halt(fts_object_t *o, int winlet, fts_symbol_t s, in
     }
 
   /* halt scheduler main loop */
-  FD_ZERO( &rfds);
-  FD_SET( 0, &rfds);
-
-  if (select( 1, &rfds, NULL, NULL, NULL) < 0)
+  if (select( 0, NULL, NULL, NULL, NULL) < 0)
     fts_log( "select() failed\n");
 
   fts_log( "After select() ????????\n");
@@ -214,17 +230,17 @@ static void macosxaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, i
 }
 
 static void
-dump_buffer_info( macosxaudioport_t *self, int channels, int direction)
+log_buffer_info( macosxaudioport_t *self, int channels, int direction)
 {
   struct _buffer_info *info;
   int ch;
 
   info = (direction == FTS_AUDIO_INPUT) ? self->input_buffer_info : self->output_buffer_info;
-  post( "%s %s buffer info:\n", self->name, (direction == FTS_AUDIO_INPUT) ? "input" : "output");
-  post( "      %-8s %-8s %-8s\n", "buffer", "offset", "jump");
+  fts_log( "%s %s buffer info:\n", self->name, (direction == FTS_AUDIO_INPUT) ? "input" : "output");
+  fts_log( "      %-8s %-8s %-8s %-8s\n", "buffer", "offset", "jump", "buffer");
   for ( ch = 0; ch < channels; ch++)
     {
-      post( " [%2d] %-8d %-8d %-8d\n", ch, info[ch].buffer_number, info[ch].offset, info[ch].jump);
+      fts_log( " [%2d] %-8d %-8d %-8d %-8p\n", ch, info[ch].buffer_number, info[ch].offset, info[ch].jump, info[ch].buffer);
     }
 }
 
@@ -281,8 +297,8 @@ get_channels( macosxaudioport_t *self, int direction)
       info[ch].buffer = NULL;
     }
 
-#if 0
-  dump_buffer_info( self, channels, direction);
+#if 1
+  log_buffer_info( self, channels, direction);
 #endif
 
   return channels;
