@@ -117,6 +117,22 @@ linuxpc:
 .PHONY: linuxpc
 
 #
+# linuxppc
+# target for Linux/PowerPC
+#
+linuxppc:
+	$(MAKE) ARCH=linuxppc all
+.PHONY: linuxppc
+
+#
+# macosx
+# target for Mac OS/X
+#
+macosx:
+	$(MAKE) ARCH=macosx all
+.PHONY: macosx
+
+#
 # sgi
 # target for SGI Irix 6.5 processors R5000 and R10000
 #
@@ -213,7 +229,7 @@ bin-rpm:
 
 # For redhat 6
 bin-rpm6:
-	( cd pkg/rpm ; rpm --rcfile /usr/lib/rpm/rpmrc:rpmrc6 -bb jmax-local.spec)
+	( cd pkg/rpm ; rpm -bb --rcfile /usr/lib/rpm/rpmrc:rpmrc6 jmax-local.spec)
 .PHONY: bin-rpm6
 
 
