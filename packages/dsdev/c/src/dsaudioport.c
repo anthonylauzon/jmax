@@ -173,7 +173,7 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   }
 
   /* create and initialize the buffer format */
-  this->format = (WAVEFORMATEX*) malloc(sizeof(WAVEFORMATEX));
+  this->format = (WAVEFORMATEX*) fts_malloc(sizeof(WAVEFORMATEX));
   ZeroMemory(this->format, sizeof(WAVEFORMATEX));
   this->format->wFormatTag = WAVE_FORMAT_PCM;
   this->format->nChannels = (unsigned short) channels;
@@ -205,11 +205,11 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   }
 
   /* allocate an array for the notification events */
-  this->event = (HANDLE*) malloc(this->num_buffers * sizeof(HANDLE));
+  this->event = (HANDLE*) fts_malloc(this->num_buffers * sizeof(HANDLE));
   ZeroMemory(this->event, this->num_buffers * sizeof(HANDLE));
 
   /* allocate an array for the notification positions */
-  this->position = (DSBPOSITIONNOTIFY*) malloc(this->num_buffers * sizeof(DSBPOSITIONNOTIFY));
+  this->position = (DSBPOSITIONNOTIFY*) fts_malloc(this->num_buffers * sizeof(DSBPOSITIONNOTIFY));
 
   /* create and initialize the notification events and positions */
   ZeroMemory(this->position, this->num_buffers * sizeof(DSBPOSITIONNOTIFY));
@@ -271,15 +271,15 @@ dsaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 	CloseHandle(dev->event[i]);
       }
     }
-    free(dev->event);
+    fts_free(dev->event);
   }
 
   if (dev->position != NULL) {
-    free(dev->position);
+    fts_free(dev->position);
   }
 
   if (dev->format != NULL) {
-    free(dev->format);
+    fts_free(dev->format);
   }
 
   if (dev->notify != NULL) {
@@ -289,6 +289,8 @@ dsaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   if (dev->dsBuffer != NULL) {
     IDirectSoundBuffer_Release(dev->dsBuffer);
   }
+
+  fts_audioport_delete( (fts_audioport_t *) dev);
 }
 
 static void 
@@ -434,12 +436,26 @@ fts_win32_create_window()
 static int 
 fts_win32_destroy_window() 
 {
+  if (fts_wnd != NULL) {
+    DestroyWindow(fts_wnd);
+    fts_wnd = NULL;
+  }
   return 0;
 }
 
-BOOL WINAPI DllMain(HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
+BOOL WINAPI DllMain(HANDLE hModule, DWORD reason, LPVOID lpReserved)
 {
-  dsdev_instance = (HINSTANCE) hModule;
+  switch (reason) {
+  case DLL_PROCESS_ATTACH:
+  case DLL_THREAD_ATTACH:
+      dsdev_instance = (HINSTANCE) hModule;
+      break;
+
+  case DLL_THREAD_DETACH:
+  case DLL_PROCESS_DETACH:
+    fts_win32_destroy_window();
+    fts_close_direct_sound();
+  }
   return TRUE;
 }
 
