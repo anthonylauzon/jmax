@@ -50,7 +50,8 @@ AC_CHECK_FUNCS(sinf cosf tanf asinf acosf atanf expf logf log10f)
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS( sys/param.h unistd.h alloca.h sys/time.h time.h sys/socket.h netinet/in.h netinet/tcp.h arpa/inet.h netdb.h sys/signal.h sys/types.h pthread.h)
+AC_CHECK_HEADERS( sys/param.h unistd.h alloca.h sys/time.h time.h sys/socket.h netinet/in.h netinet/tcp.h arpa/inet.h netdb.h sys/signal.h sys/types.h pthread.h dirent.h)
+
 
 dnl Checks for library functions.
 AC_CHECK_FUNCS(socket)
@@ -534,6 +535,7 @@ java/src/ircam/jmax/widgets/Makefile
 macosxbuild/Makefile
 macosxbuild/jMaxProject/Makefile
 macosxbuild/jMaxProject/jMaxProject.pbproj/Makefile
+macosxbuild/jMaxProject/jMaxProject.xcode/Makefile
 packages/Makefile
 packages/alsa/Makefile
 packages/alsa/c/Makefile
