@@ -1317,7 +1317,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       }
 
     int x = e.getX();
-
     int y = e.getY();
 
     cleanAnnotations(); // MDC    
@@ -1429,6 +1428,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	    resetFocus();
 	    currentSelection.setOwner(this); 
 	    currentSelection.deselectAll(); // @@@
+	    paintDirtyList();
 	  }
 
 	editStatus = AREA_SELECT;
