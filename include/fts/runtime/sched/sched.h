@@ -96,6 +96,9 @@ typedef struct fts_sched
  */
 extern double fts_get_time(void);
 
+/* make alias */
+#define fts_get_time_in_msec() (fts_get_time())
+
 /**
  * Get a pointer to the scheduler (fts_sched_t) of the current thread
  *

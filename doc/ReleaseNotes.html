@@ -65,30 +65,58 @@ was introduced for the MIDI configuartion on the ALSA/Linux platform.
 The DSP calculation can be switched on an of by the keyboard short cut Control/SpaceBar.
 
 <p>
+In the case of a jMax server fault an error message is written to a log file.
+A short messsage indicating the log file is printed to the console window.
+The error window has been removed.
+
+<p>
 <h3>Object set</h3>
 
-The classes "clock" and "at" of the ISPW packages where removed. 
+The classes <tt><b>clock</b></tt> and <tt><b>at</b></tt> of the ISPW packages where removed. 
 It is no more possible to give a clock as first argument of the timing objects 
 such as metro or delay as it was before.
 
-The object "at dsp_msec 0", or "at dsp_tick 0", which is used in some patches in order 
+<p>
+The object <tt><b>at dsp_msec 0</b></tt>, or <tt><b>at dsp_tick 0</b></tt>, which is used in some patches in order 
 to obtain a trigger at the instant of the DSP calculation being switched on must be 
-replaced by an object "dsp" connected to an object "select 1" or "sel 1".
+replaced by an object <tt><b>dsp</b></tt> connected to an object <tt><b>select 1</b></tt> or <tt><b>sel 1</b></tt>.
 
+<p>
 In the signal package the classes play~ and rec~ where add (see the help patches).
 
+<p>
 Two new objects have been introduced to the toolbar: 
 an oscilloscope and an object to display numerical values or vectors of values in a scrolling display.
 
 <p>
-<h3>API</h3>
-The API for FTS clocks 
+<h3>API changes</h3>
 
+The API for clocks (<tt>fts_clock_t</tt>) alarms (<tt>fts_alarm_t</tt>) and (<tt>fts_timer_t</tt>) timers has changed.
+Only the deprecated alarm functions as <tt>fts_alarm_arm()</tt> (removed) are emulated by a set of macros.
 
 <p>
-<h3>Scheduling</h3>
-The scheduling 
+The API of the DSP subsystem has changed. Deprecated functions as <tt>dsp_sig_inlet()</tt> (now <tt>fts_dsp_declare_inlet()</tt>)
+are emulated by a set of macros.
 
+<p>
+The function <tt>fts_get_time()</tt> (sched.h) was introduced to obtain the FTS system time (in msecs).
+
+Three <i>modules</i> have been added to the doxygen generated API documentation (see doc/api/html/index.html):
+<ul>
+<li>scheduler (from sched.h)
+<li>clocks, alarms and timers
+<li>DSP subsystem
+</ul>
+
+<p>
+<h3>Bug fixes</h3>
+
+A major bug for DSP objects with multiple outlets (all outlets had the same signal) are fixed.
+
+<p>
+The classes <tt><b>==</b></tt>, <tt><b>!=</b></tt>, etc. can be instantiated without double-quotes.
+The problems with decimal points and commas for some non-english Linux/Java
+installations are fixed.
 
 <p>
 <!------------------------------------------------------------------------------->
