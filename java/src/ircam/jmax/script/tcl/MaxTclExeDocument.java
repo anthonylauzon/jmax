@@ -32,9 +32,9 @@ import ircam.jmax.mda.*;
  * can execute .tcl files with "Open".
  */
 
-public class MaxTclExecutedDocument extends MaxExecutedScriptDocument 
+public class MaxTclExeDocument extends MaxExecutedScriptDocument 
 {
-  public MaxTclExecutedDocument(MaxContext context)
+  public MaxTclExeDocument(MaxContext context)
   {
     super(context, ".tcl");
   }

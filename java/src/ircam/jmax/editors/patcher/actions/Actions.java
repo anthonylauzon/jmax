@@ -107,14 +107,14 @@ public class Actions
   public static EditorAction bringToFrontObjectAction = new BringToFrontObjectAction();
   public static EditorAction sendToBackObjectAction = new SendToBackObjectAction();
   public static EditorAction setObjectColorAction = new SetObjectColorAction();
-  public static EditorAction removeConnectionsAction = new RemoveInOutletConnectionsAction();
+  public static EditorAction removeConnectionsAction = new RemoveInOutletConnection();
   public static EditorAction fitToTextPopUpAction = new FitToTextPopUpAction();
   public static EditorAction fontBiggerPopUpAction = new FontBiggerPopUpAction();
   public static EditorAction fontSmallerPopUpAction = new FontSmallerPopUpAction();
   public static EditorAction fontSizesPopUpAction = new FontSizesPopUpAction();
   public static EditorAction fontPopUpAction = new FontPopUpAction();
   public static EditorAction inspectObjectAction = new InspectObjectAction();
-  public static EditorAction changeSliderOrientationAction = new ChangeSliderOrientationAction();
+  public static EditorAction changeSliderOrientationAction = new ChangeSliderOrientation();
 }
 
 

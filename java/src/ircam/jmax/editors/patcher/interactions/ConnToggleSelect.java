@@ -23,33 +23,39 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.actions;
+package ircam.jmax.editors.patcher.interactions;
 
 import java.awt.*;
-import java.awt.event.*;
 
-import javax.swing.*;
-import javax.swing.event.*;
+import ircam.jmax.fts.*;
+import ircam.jmax.dialogs.*;
 
-import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-import ircam.jmax.toolkit.*;
-import ircam.jmax.toolkit.actions.*;
+/** The interaction handling shift click toggle select of a single connection.
+  */
 
-public class RemoveInOutletConnectionsAction extends EditorAction
+
+class ConnToggleSelect extends Interaction
 {
-  public void doAction(EditorContainer container)
+  void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
-    ErmesSketchPad sketch = (ErmesSketchPad) container.getEditor();
-    int where = ObjectPopUp.getPopUpTarget().wherePopup();
-    if(where == GraphicObject.ON_INLET)
-      sketch.getDisplayList().deleteConnectionsForInlet(ObjectPopUp.getPopUpTarget(), 
-							sketch.getHighlightedInlet());
-    else
-      if(where==GraphicObject.ON_OUTLET)
-	sketch.getDisplayList().deleteConnectionsForOutlet(ObjectPopUp.getPopUpTarget(),
-							   sketch.getHighlightedOutlet());
+    if (squeack == (Squeack.SHIFT | Squeack.DOWN | Squeack.CONNECTION))
+	{
+	  GraphicConnection connection = (GraphicConnection) area.getTarget();
+
+	  if (connection.isSelected())
+	    ErmesSelection.patcherSelection.deselect(connection);
+	  else
+	    ErmesSelection.patcherSelection.select(connection);
+
+	  connection.redraw();
+	  editor.endInteraction();
+	}
   }
 }
+
+
+
+

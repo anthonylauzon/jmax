@@ -38,7 +38,7 @@ import ircam.jmax.editors.patcher.objects.*;
   */
 
 
-class DragToggleSelectInteraction extends Interaction
+class DragToggleSelect extends Interaction
 {
   Point dragStart = new Point();
   boolean dragged = false;

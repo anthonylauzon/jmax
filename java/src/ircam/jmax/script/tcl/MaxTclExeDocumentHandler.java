@@ -39,9 +39,9 @@ import ircam.jmax.mda.*;
  * ^^^^ As other tcl scripting related code, does not work with multiservers.
  */
 
-public class MaxTclExecutedDocumentHandler extends MaxDocumentHandler
+public class MaxTclExeDocumentHandler extends MaxDocumentHandler
 {
-  public MaxTclExecutedDocumentHandler()
+  public MaxTclExeDocumentHandler()
   {
     super();
   }

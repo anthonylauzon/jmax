@@ -66,7 +66,7 @@ class EditModeInteraction extends Interaction
 	  case (Squeack.POP_UP | Squeack.BACKGROUND):
 	    // Drag Select
 	    editor.resetHighlighted();
-	    return Interactions.backgroundPopUpInteraction;
+	    return Interactions.bgPopUpInteraction;
 
 	  case (Squeack.DOWN | Squeack.BACKGROUND):
 	    // Drag Select
@@ -78,7 +78,7 @@ class EditModeInteraction extends Interaction
 	  case (Squeack.SHIFT | Squeack.DOWN | Squeack.BACKGROUND):
 	    // Drag Select
 	    editor.resetHighlighted();
-	    return Interactions.dragToggleSelectInteraction;
+	    return Interactions.dragToggleSelect;
 
 	  case (Squeack.DOWN | Squeack.OBJECT):
 	    // Drag Select
@@ -101,12 +101,12 @@ class EditModeInteraction extends Interaction
 	  case (Squeack.DOWN | Squeack.CONNECTION):
 	    // Drag Select
 	    editor.resetHighlighted();
-	    return Interactions.connectionSelectInteraction;
+	    return Interactions.connSelectInteraction;
 
 	  case (Squeack.SHIFT | Squeack.DOWN | Squeack.CONNECTION):
 	    // Drag Select
 	    editor.resetHighlighted();
-	    return Interactions.connectionToggleSelectInteraction;
+	    return Interactions.connToggleSelectInteraction;
 
 	  case (Squeack.DOWN  | Squeack.OUTLET):
 	  case (Squeack.SHIFT | Squeack.DOWN | Squeack.OUTLET):
@@ -116,7 +116,7 @@ class EditModeInteraction extends Interaction
 	  case (Squeack.DOWN  | Squeack.INLET):
 	  case (Squeack.SHIFT | Squeack.DOWN | Squeack.INLET):
 	    // Drag connect
-	    return Interactions.dragReverseConnectInteraction;
+	    return Interactions.dragReverseConnect;
 
 	  case (Squeack.CTRL | Squeack.DOWN | Squeack.OBJECT):
 	  case (Squeack.CTRL | Squeack.DOWN | Squeack.TEXT):
@@ -144,7 +144,7 @@ class EditModeInteraction extends Interaction
 	  case (Squeack.CTRL | Squeack.DOUBLE_CLICK | Squeack.OBJECT):
 	    // Edit Content
 	    editor.resetHighlighted();
-	    return Interactions.doubleClickEditInteraction;
+	    return Interactions.doubleClickEdit;
 
 	  default :
 	    return null;

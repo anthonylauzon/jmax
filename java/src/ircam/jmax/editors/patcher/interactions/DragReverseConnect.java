@@ -33,7 +33,7 @@ import ircam.jmax.editors.patcher.objects.*;
 
 /** Make a connection from an inlet to an outlet */
 
-class DragReverseConnectInteraction extends Interaction
+class DragReverseConnect extends Interaction
 {
   boolean dragged = false;
   Point dragStart = new Point();
@@ -138,15 +138,15 @@ class DragReverseConnectInteraction extends Interaction
 	      editor.endInteraction();
 	    }
 	    else if(Squeack.isShift(squeack)){//shift pressed: moveReverseInteraction setting to do multiconnect 
-	      editor.getEngine().setInteraction(Interactions.moveReverseConnectInteraction);
-	      ((MoveReverseConnectInteraction)editor.getEngine().getCurrentInteraction()).setDest(dst, inlet);
+	      editor.getEngine().setInteraction(Interactions.moveReverseConnect);
+	      ((MoveReverseConnect)editor.getEngine().getCurrentInteraction()).setDest(dst, inlet);
 	      editor.getEngine().getCurrentInteraction().gotSqueack(editor, squeack, area, mouse, oldMouse);
 	    }
 	  }
 	else
 	  {
 	    // Not dragged, start a moveReverseConnection interaction
-	    editor.getEngine().setInteraction(Interactions.moveReverseConnectInteraction);    
+	    editor.getEngine().setInteraction(Interactions.moveReverseConnect);    
 	    editor.getEngine().getCurrentInteraction().gotSqueack(editor, squeack, area, mouse, oldMouse);
 	  }
       }

@@ -33,21 +33,34 @@ import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-/** The interaction handling help patches; 
+/** The interaction handling DoubleClick Edit in objects;
   started, and completed, by a AltClick on an object.
   */
 
 
-class BackgroundPopUpInteraction extends Interaction
+class  DoubleClickEdit extends Interaction
 {
   void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
-    //Warning: the order is important, because the AddPopUp
-    // menu will indirectly invoke an other top level
-    // interaction mode.
+    GraphicObject object = (GraphicObject) area.getTarget();
+
+    if (object.hasContent())
+      {
+	object.editContent();
+      }
+    else
+      {
+	// Otherwise, 
+	// Convert the squeack a  standard click
+	// and give it to the object
+
+	squeack &= (~ Squeack.MOUSE_MASK);
+	squeack |= Squeack.DOWN;
+
+	object.gotSqueack(squeack, mouse, oldMouse);    
+      }
 
     editor.endInteraction();
-    editor.showAddPopUp(mouse);
   }
 }
 

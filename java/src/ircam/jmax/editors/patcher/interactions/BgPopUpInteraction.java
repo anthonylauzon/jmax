@@ -33,26 +33,21 @@ import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-/** The interaction handling shift click toggle select of a single connection.
+/** The interaction handling help patches; 
+  started, and completed, by a AltClick on an object.
   */
 
 
-class ConnectionToggleSelectInteraction extends Interaction
+class BgPopUpInteraction extends Interaction
 {
   void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
-    if (squeack == (Squeack.SHIFT | Squeack.DOWN | Squeack.CONNECTION))
-	{
-	  GraphicConnection connection = (GraphicConnection) area.getTarget();
+    //Warning: the order is important, because the AddPopUp
+    // menu will indirectly invoke an other top level
+    // interaction mode.
 
-	  if (connection.isSelected())
-	    ErmesSelection.patcherSelection.deselect(connection);
-	  else
-	    ErmesSelection.patcherSelection.select(connection);
-
-	  connection.redraw();
-	  editor.endInteraction();
-	}
+    editor.endInteraction();
+    editor.showAddPopUp(mouse);
   }
 }
 

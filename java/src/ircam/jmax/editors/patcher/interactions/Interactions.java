@@ -46,26 +46,26 @@ public class Interactions
   // Run Mode interactions 
 
   public static Interaction runCtrlInteraction = new RunCtrlInteraction();
-  public static Interaction doubleClickEditInteraction = new DoubleClickEditInteraction();
+  public static Interaction doubleClickEdit = new DoubleClickEdit();
  
   // Edit mode interactions
 
   public static Interaction dragSelectInteraction = new DragSelectInteraction();
-  public static Interaction dragToggleSelectInteraction = new DragToggleSelectInteraction();
+  public static Interaction dragToggleSelect = new DragToggleSelect();
    public static Interaction editCtrlInteraction    = new EditCtrlInteraction();
   public static Interaction hResizeInteraction     = new HResizeInteraction();
   public static Interaction vResizeInteraction     = new VResizeInteraction();
   public static Interaction moveEditInteraction    = new MoveEditInteraction();
   public static Interaction moveInteraction        = new MoveInteraction();
   public static Interaction dragConnectInteraction = new DragConnectInteraction();
-  public static Interaction dragReverseConnectInteraction = new DragReverseConnectInteraction();
+  public static Interaction dragReverseConnect = new DragReverseConnect();
   public static Interaction moveConnectInteraction = new MoveConnectInteraction();
-  public static Interaction moveReverseConnectInteraction = new MoveReverseConnectInteraction();
+  public static Interaction moveReverseConnect = new MoveReverseConnect();
   public static Interaction followInteraction      = new FollowInteraction();
-  public static Interaction connectionSelectInteraction       = new ConnectionSelectInteraction();
-  public static Interaction connectionToggleSelectInteraction = new ConnectionToggleSelectInteraction();
+  public static Interaction connSelectInteraction       = new ConnSelectInteraction();
+  public static Interaction connToggleSelectInteraction = new ConnToggleSelect();
   public static Interaction popUpInteraction = new PopUpInteraction();
-  public static Interaction backgroundPopUpInteraction = new BackgroundPopUpInteraction();
+  public static Interaction bgPopUpInteraction = new BgPopUpInteraction();
 }
 
 

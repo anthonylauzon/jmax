@@ -65,10 +65,10 @@ class RunModeInteraction extends Interaction
 	return Interactions.runCtrlInteraction;
       case (Squeack.DOUBLE_CLICK | Squeack.OBJECT):
 	// Edit Content
-	return Interactions.doubleClickEditInteraction;
+	return Interactions.doubleClickEdit;
       case (Squeack.DOUBLE_CLICK | Squeack.TEXT):
 	// Edit Content
-	return Interactions.doubleClickEditInteraction;
+	return Interactions.doubleClickEdit;
       default :
 	return null;
       }

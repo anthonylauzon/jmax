@@ -23,47 +23,33 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.interactions;
+package ircam.jmax.editors.patcher.actions;
 
 import java.awt.*;
+import java.awt.event.*;
 
-import ircam.jmax.fts.*;
-import ircam.jmax.dialogs.*;
+import javax.swing.*;
+import javax.swing.event.*;
 
+import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-/** The interaction handling DoubleClick Edit in objects;
-  started, and completed, by a AltClick on an object.
-  */
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
 
-
-class  DoubleClickEditInteraction extends Interaction
+public class RemoveInOutletConnection extends EditorAction
 {
-  void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
+  public void doAction(EditorContainer container)
   {
-    GraphicObject object = (GraphicObject) area.getTarget();
-
-    if (object.hasContent())
-      {
-	object.editContent();
-      }
+    ErmesSketchPad sketch = (ErmesSketchPad) container.getEditor();
+    int where = ObjectPopUp.getPopUpTarget().wherePopup();
+    if(where == GraphicObject.ON_INLET)
+      sketch.getDisplayList().deleteConnectionsForInlet(ObjectPopUp.getPopUpTarget(), 
+							sketch.getHighlightedInlet());
     else
-      {
-	// Otherwise, 
-	// Convert the squeack a  standard click
-	// and give it to the object
-
-	squeack &= (~ Squeack.MOUSE_MASK);
-	squeack |= Squeack.DOWN;
-
-	object.gotSqueack(squeack, mouse, oldMouse);    
-      }
-
-    editor.endInteraction();
+      if(where==GraphicObject.ON_OUTLET)
+	sketch.getDisplayList().deleteConnectionsForOutlet(ObjectPopUp.getPopUpTarget(),
+							   sketch.getHighlightedOutlet());
   }
 }
-
-
-
-

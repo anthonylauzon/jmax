@@ -38,7 +38,7 @@ import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
-public class ChangeSliderOrientationAction extends EditorAction
+public class ChangeSliderOrientation extends EditorAction
 {
   public void doAction(EditorContainer container)
   {

@@ -37,7 +37,7 @@ import ircam.jmax.editors.patcher.objects.*;
   */
 
 
-class ConnectionSelectInteraction extends Interaction
+class ConnSelectInteraction extends Interaction
 {
   void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {

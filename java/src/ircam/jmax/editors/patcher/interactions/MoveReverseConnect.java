@@ -33,7 +33,7 @@ import ircam.jmax.editors.patcher.objects.*;
 
 /** Make a connection from an inlet to an outlet */
 
-class MoveReverseConnectInteraction extends Interaction
+class MoveReverseConnect extends Interaction
 {
   Point moveStart = new Point();
   GraphicObject src;

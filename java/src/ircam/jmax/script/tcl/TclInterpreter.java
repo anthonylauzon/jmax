@@ -58,8 +58,8 @@ public class TclInterpreter implements ircam.jmax.script.Interpreter
 	itsInterp = new tcl.lang.Interp(); 	
 
 	// moved from MdaModule to here
-	Mda.installDocumentHandler(new MaxTclExecutedDocumentHandler());
-	Mda.installDocumentType(new MaxTclExecutedDocumentType());
+	Mda.installDocumentHandler(new MaxTclExeDocumentHandler());
+	Mda.installDocumentType(new MaxTclExeDocumentType());
 
 	TclMaxPackage.installPackage(this);
 

@@ -1,3 +1,7 @@
+2000-04-07  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* Changed files names for too long names (MacOS porting)
+
 2000-03-30  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* Removed registration panel and the related code.
