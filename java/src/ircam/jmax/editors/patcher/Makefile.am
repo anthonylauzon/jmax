@@ -6,7 +6,6 @@ AddPopUp.java\
 ConnectionAction.java\
 DisplayList.java\
 EditField.java\
-ErmesModule.java\
 ErmesSelection.java\
 ErmesSketchPad.java\
 ErmesSketchWindow.java\

@@ -64,6 +64,13 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   private TextMenu itsTextMenu;
   private JMenu itsHelpMenu;
   private JMenuBar mb; 
+
+  static public void initModule()
+  {
+    RepaintManager.setCurrentManager( new MaxRepaintManager());
+    ToolsPanel.registerToolsPanel();
+  }
+
   // ------ editorContainer interface ---------------
 
   public Editor getEditor(){
