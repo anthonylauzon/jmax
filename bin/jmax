@@ -52,7 +52,7 @@ Options and arguments:
     Defines an option that is to be passed directly to the Java interpreter.
     Several [-javaopt java-option] can appear in the command line, in which
     case they will be concatenated.
-    Example: -javaopt -verbosegc
+    Example: -javaopt -verbose:gc
 
   -nofork
     Do not go into the background.  By default, jMax forks itself to give control 
@@ -169,15 +169,6 @@ build_classpath ()
 	CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${ROOTDIR}/java/lib/jacl/jacl.jar:${ROOTDIR}/java/lib/jacl/tcljava.jar
     else
 	CLASSPATH=${JMAX_CLASSPATH}:${ROOTDIR}/java/lib/jacl/jacl.jar:${ROOTDIR}/java/lib/jacl/tcljava.jar
-    fi
-
-    if echo $CLASSPATH | grep swing > /dev/null 2>&1 ;
-    then
-	# Swing found in CLASSPATH. Use it
-	echo > /dev/null
-    elif [ -f ${ROOTDIR}/java/lib/swing/swingall.jar ]
-    then
-	CLASSPATH=${CLASSPATH}:${ROOTDIR}/java/lib/swing/swingall.jar
     fi
 }
 

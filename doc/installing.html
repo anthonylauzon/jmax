@@ -59,33 +59,11 @@
 
 <p>
 <ul type=dot>
-  <li><a href="#installation">Installation</A>
   <li><a href="#directories">Installation directories</A>
 </ul>
 
 <p>
 <hr size=1>
-
-<p>
-This documentation does not apply if you installed <i>j</i>Max from a 
-package (rpm for example), the installer will take care of all installation
-settings. If you compiled <i>j</i>Max from a source distribution, you
-can either install it by 1) building a package (rpm on Linux) or 2) use
-the makefile <code>install</code> target. The first method is preferable.
-
-
-<a name="installation"> <H2>Installation</H2> </a>
-
-<p>
-<i>j</i>Max can be installed under make control, by using the <code>install</code>
-target and specifying the architecture by the make variable <code>ARCH</code>, as in:
-<pre>
-make install ARCH=i686-linux
-</pre>
-
-<p>
-This will copy the necessary files to the standard installation directories.
-
 
 <a name="directories"><h2>Installation directories</h2></A>
 
@@ -93,8 +71,6 @@ This will copy the necessary files to the standard installation directories.
 <i>j</i>Max installation uses the following directories:
 <ul>
 <li> <code>/usr/bin</code> for the <code>jmax</code> script
-<li> <code>/usr/lib/jmax</code> for the root directory (containing Java classes libraries, 
-server executable, configuration scripts, standard packages, ...)
 <li> <code>/usr/lib/jmax</code> for the root directory (containing Java classes libraries, 
 server executable, configuration scripts, standard packages, ...)
 </ul>

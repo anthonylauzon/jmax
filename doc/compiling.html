@@ -62,6 +62,7 @@
   <li><a href="#introduction">Introduction</A>
   <li><a href="#prerequisites">Prerequisites</A>
   <li><a href="#compilation">Compilation</A>
+  <li><a href="#ALSA support">ALSA support</A>
   <li><a href="#rpm">Building rpms</A>
 </ul>
 
@@ -85,32 +86,10 @@ to this document.
 <p>
 The following elements are needed to recompile jMax:
 <ul>
-<li> the Java Development Kit (JDK) version 1.1.6 or higher.
-<li> the Swing classes library
+<li> the Java Development Kit (JDK) version 1.2 or higher.
 <li> the C compiler
 <li> GNU make
-<li> audiofile library on Linux
 </ul>
-
-
-<h4>Using JDK 1.2</h4>
-
-<p>
-<strong>Note:</strong> <i>j</i>Max cannot yet be compiled with JDK 1.2, because 1) of a class name
-conflict and 2) of Jacl which does not loads. This will be solved in future <i>j</i>Max releases.
-
-
-<h4>Swing classes library</h4>
-
-<p>
-The Swing classes are part of the Java Foundation Classes.
-Swing is included in the JDK version 1.2, but it must be downloaded
-if you use a JDK version 1.1.x.
-
-<p>
-Swing can be downloaded at: 
-<a href="http://java.sun.com/products/jfc/download.html">http://java.sun.com/products/jfc/download.html</a>.
-Be sure to get the standard .zip or .tar and <b>not</b> a Win9x/Max/Solaris executable.
 
 
 <h4>SGI platform</h4>
@@ -183,105 +162,6 @@ need to rename the Kaffe files to prevent their use:
 <p>
 <strong>Note:</strong> it has been reported that Kaffee does not currently run jMax. We recommend
 that you use JDK instead.
-
-<p>
-<i>j</i>Max can be compiled using standard gcc, egcs or Pentium gcc. 
-However, Pentium gcc is recommended for performance.
-Check <a href="http://www.goof.com/pcg/binaries-linux.html">http://www.goof.com/pcg/binaries-linux.html</a>
-for downloading Pentium gcc (file for latest version is pgcc-1.1.3-linux-x86-glibc.tar.gz).
-
-<p>
-<strong>Note:</strong> some erratic arithmetic problems have also been reported when 
-compiling with gcc 2.7.x and some versions of egcs or Pentium gcc. If you experience
-erratic behavior (object <code>osc1~</code> changes its output frequency
-from one octave without external intervention, midi objects (<code>pgmin</code>,
-<code>mtof</code>, ...) always output zero, ...), then try with another compiler
-version, or change compiler options (-mpentiumpro instead of -mpentium, ...).
-
-<p>
-You can check the compiler version you are using by command: <br>
-<code>gcc -v</code>. This will output for example (for Pentium gcc version 1.1.1):
-<pre>
-Reading specs from /usr/local/pgcc/lib/gcc-lib/i586-pc-linux-gnu/pgcc-2.91.60/specs
-gcc version pgcc-2.91.60 19981201 (egcs-1.1.1 release)
-</pre>
-
-<p>
-jMax uses the <i>Audio File Library</i>,
-by Michael Pruett, available under the GNU Library General Public
-License. This library must be installed before recompiling jMax
-and can be obtained from the following sources:
-<ul>
-<li> various rpms available in standard distributions or on rpm sites 
-(<a href="http://rufus.w3.org/linux/RPM/ByName.html">http://rufus.w3.org/linux/RPM/ByName.html</a>
-for example)
-<li> sources from cvs server at <a href="http://www.gnome.org">http://www.gnome.org</a>
-<li><a href="http://www.68k.org/~michael/audiofile/">http://www.68k.org/~michael/audiofile/</a>
-</ul>
-
-<p>
-<strong>Note:</strong> the <i>Audio File Library</i> version must be 0.1.7 or higher
-
-
-<h4>Swing installation</h4>
-
-<p>
-You can install the Swing classes in the directory of your choice,
-as long as the Swing directory is defined in environment variables.
-The following place can be used for example: <code>/usr/local</code>.
-If you untar file swing1_1_1.tar.Z (that you have downloaded from
-Sun's site) in /usr/local, you will end up with a directory
-named /usr/local/swing-1.1.1fcs.
-
-<p>
-Once you have defined installation directory, you must add environment 
-variables definition. This can be done by adding the following lines
-(modify <code>SWING_HOME</code> to reflect the current settings of your system):
-<pre>
-SWING_HOME="/usr/local/swing-1.1.1fcs"
-CLASSPATH="$SWING_HOME/swingall.jar"
-export CLASSPATH
-</pre>
-to your <code>.bashrc</code> or <code>.cshrc</code> file in your home directory (modify
-accordingly if you are using another shell).
-
-<p>
-Once this is done, you can compile a small Java program that uses Swing:
-<pre>
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-
-class Test extends JFrame {
-
-  Test()
-  {
-    addWindowListener( new WindowAdapter() {
-      public void windowClosing(WindowEvent e) 
-	{
-	  System.exit(0);
-	}
-    });
-
-    setSize( 200, 200);
-
-    getContentPane().add( new JButton( "I'm a Swing button"));
-
-    setVisible( true);
-  }
-
-  public static void main( String args[])
-  {
-    new Test();
-  }
-}
-</pre>
-
-<p>
-Save this in a file named <code>Test.java</code>, compile it with <code>javac 
-Test.java</code> and run it with <code>java Test</code>. It should 
-open a window containing a button.
-
 
 <!-- ---------------------------------------------------------------------- -->
 <p>
@@ -364,7 +244,11 @@ make clean ARCH=i686-linux
 </pre>
 
 
-<h4>Compiling with ALSA support</h4>
+
+<!-- ---------------------------------------------------------------------- -->
+<p>
+<hr>
+<a name="ALSA support"><h3>ALSA support</h3></a>
 
 <p>
 As ALSA is not installed on every Linux platform, the compilation 
