@@ -321,7 +321,9 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
 
     public void deleteAll()
     {
-	MaxVector v = new MaxVector();		    
+	if(isSelectedIndex(0)) removeSelectionInterval(0, 0);
+	
+	MaxVector v = new MaxVector();		           
 	for (Enumeration en = getSelected(); en.hasMoreElements();)
 	    v.addElement(en.nextElement());
 	deselectAll();
