@@ -1565,6 +1565,7 @@ track_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	content_dumper_set_dumper(content_dumper, dumper);
   content_dumper_set_dump_mess(content_dumper, seqsym_dump_mess);
 		
+  /* save events */
   while(event)
   {
     fts_atom_t *value = event_get_value(event);
@@ -1599,6 +1600,30 @@ track_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     
     event = event_get_next(event);
   }
+
+  /* save markers */
+  if(track_get_markers(this) != NULL)
+  {
+    track_t *markers = track_get_markers(this);
+    event_t *marker_event = track_get_first(markers);
+    
+    while(marker_event)
+    {
+      fts_atom_t *value = event_get_value(marker_event);      
+      fts_object_t *obj = fts_get_object(value);
+      fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_add_marker);
+      
+      /* save event time and class name */
+      fts_message_append_float(mess, event_get_time(marker_event));
+      fts_message_append_symbol(mess, seqsym_scomark);
+      fts_dumper_message_send(dumper, mess);
+      
+      /* dump object messages */
+      fts_send_message_varargs(obj, fts_s_dump_state, 1, &dumper_atom);
+      
+      marker_event = event_get_next(marker_event);
+    }
+  }
 }
 
 static void
@@ -1620,37 +1645,7 @@ track_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     content_dumper_set_dump_mess(content_dumper, seqsym_editor);
     
 		track_editor_dump_gui(this->editor, (fts_dumper_t *)content_dumper);
-  }
-  
-  if(track_get_markers(this) != NULL)
-  {
-    track_t *markers = track_get_markers(this);
-    event_t *marker_event = track_get_first(markers);
-    fts_atom_t dumper_atom;
-    
-    content_dumper_set_dumper(content_dumper, dumper);
-    content_dumper_set_dump_mess(content_dumper, seqsym_dump_mess);
-    
-    /* to be sent to marker event */
-    fts_set_object(&dumper_atom, (fts_object_t *)content_dumper);
-    
-    while(marker_event)
-    {
-      fts_atom_t *value = event_get_value(marker_event);      
-      fts_object_t *obj = fts_get_object(value);
-      fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_add_marker);
-      
-      /* save event time and class name */
-      fts_message_append_float(mess, event_get_time(marker_event));
-      fts_message_append_symbol(mess, seqsym_scomark);
-      fts_dumper_message_send(dumper, mess);
-      
-      /* dump object messages */
-      fts_send_message_varargs(obj, fts_s_dump_state, 1, &dumper_atom);
-      
-      marker_event = event_get_next(marker_event);
-    }
-  }
+  }  
 }
 
 static void

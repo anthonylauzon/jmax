@@ -81,7 +81,7 @@ sequence_context_get(fts_object_t *obj)
     context->container = NULL;
     context->next = NULL;
     
-    obj->context = context;
+    obj->context = (fts_context_t *)context;
   }
   
   return context;
