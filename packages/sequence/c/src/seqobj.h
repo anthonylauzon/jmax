@@ -23,25 +23,13 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
-#ifndef _SEQNOTE_H_
-#define _SEQNOTE_H_
-
 #include "fts.h"
 #include "sequence.h"
 
-extern fts_symbol_t seqnote_symbol;
+#ifndef _SEQOBJ_H_
+#define _SEQOBJ_H_
 
-typedef struct _seqnote_
-{
-  sequence_event_t head;
-  int pitch;
-  double duration;
-} seqnote_t;
-
-#define seqnote_set_pitch(n, p) ((n)->pitch = (p))
-#define seqnote_get_pitch(n) ((n)->pitch)
-
-#define seqnote_set_duration(n, d) ((n)->duration = (d))
-#define seqnote_get_duration(n) ((n)->duration)
+extern fts_symbol_t seqevent_symbol;
+extern fts_symbol_t seqtrack_symbol;
 
 #endif

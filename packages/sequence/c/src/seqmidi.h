@@ -24,4 +24,9 @@
  *
  */
 
+#ifndef _SEQMIDI_H_
+#define _SEQMIDI_H_
+
 extern int sequence_read_midifile(sequence_t *sequence, fts_symbol_t name);
+
+#endif

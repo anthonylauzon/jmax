@@ -25,13 +25,13 @@
  */
 #include "fts.h"
 #include "sequence.h"
+#include "seqobj.h"
 #include "seqnote.h"
 
 #define SEQNOTE_DEF_PITCH 64
 #define SEQNOTE_DEF_DURATION 400
 
 fts_symbol_t seqnote_symbol = 0;
-static fts_symbol_t sym_seqevent = 0;
 
 static void
 seqnote_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -63,7 +63,7 @@ seqnote_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_set_int(a + 3, (int)(1000.0 * this->duration));
   /*  fts_set_float(a + 3, this->duration); @@@@*/
 
-  fts_client_upload(o, sym_seqevent, 4, a);
+  fts_client_upload(o, seqevent_symbol, 4, a);
 }
 
 static void
@@ -146,7 +146,6 @@ void
 seqnote_config(void)
 {
   seqnote_symbol = fts_new_symbol("ambitus");
-  sym_seqevent = fts_new_symbol("seqevent");
 
   fts_class_install(seqnote_symbol, seqnote_instantiate);
 }

@@ -28,6 +28,49 @@
 
 /*********************************************************
  *
+ *  sequence
+ *
+ */
+
+void
+sequence_init(sequence_t *sequence)
+{
+  sequence->begin = sequence->end = 0;
+  sequence->size = 0;
+  sequence->n_tracks = 0;
+  sequence->tracks = 0;
+}
+
+/*********************************************************
+ *
+ *  sequence track
+ *
+ */
+
+void
+sequence_track_init(sequence_track_t *track, fts_type_t type, fts_symbol_t name)
+{
+  track->next = 0;
+  track->sequence = 0;
+
+  track->name = name;
+  track->type = type;
+  track->active = 1;
+  track->field_tracks = 0;
+}
+
+void 
+sequence_track_post(sequence_track_t *track)
+{
+  fts_symbol_t name = sequence_track_get_name(track);
+  fts_type_t type = sequence_track_get_type(track);
+  fts_symbol_t type_name = fts_type_get_selector(type);
+  
+  post("track: %s (%s)\n", fts_symbol_name(name), fts_symbol_name(type_name));
+}
+
+/*********************************************************
+ *
  *  sequence event
  *
  */
@@ -40,44 +83,6 @@ sequence_event_init(sequence_event_t *event)
   event->track = 0;
   event->time = 0.0;
   event->fields = 0;
-}
-
-/*********************************************************
- *
- *  local new/delete sequence tracks
- *
- */
-
-static sequence_track_t *
-sequence_track_new(fts_symbol_t name, fts_type_t type)
-{
-  sequence_track_t *track = (sequence_track_t *)fts_block_zalloc(sizeof(sequence_track_t));
-
-  track->next = 0;
-  track->sequence = 0;
-
-  track->name = name;
-  track->type = type;
-  track->active = 1;
-  track->field_tracks = 0;
-
-  return track;
-}
-
-static void
-sequence_track_delete(sequence_track_t *track)
-{
-  fts_block_free(track, sizeof(sequence_track_t));
-}
-
-void 
-sequence_track_post(sequence_track_t *track)
-{
-  fts_symbol_t name = sequence_track_get_name(track);
-  fts_type_t type = sequence_track_get_type(track);
-  fts_symbol_t type_name = fts_type_get_selector(type);
-  
-  post("track: %s (%s)\n", fts_symbol_name(name), fts_symbol_name(type_name));
 }
 
 /*********************************************************
@@ -250,37 +255,9 @@ sequence_insert_event_behind(sequence_t *sequence, sequence_event_t *here, seque
  *
  */
 
-sequence_track_t *
-sequence_get_track_by_index(sequence_t *sequence, int index)
+void
+sequence_add_track(sequence_t *sequence, sequence_track_t *track)
 {
-  sequence_track_t *track = sequence->tracks;
-  int i = 0;
-
-  while(track && i < index)
-    {
-      track = track->next;
-      i++;
-    }
-
-  return track;
-}
-
-sequence_track_t *
-sequence_get_track_by_name(sequence_t *sequence, fts_symbol_t name)
-{
-  sequence_track_t *track = sequence->tracks;
-  
-  while(track && track->name != name)
-    track = track->next;
-
-  return track;
-}
-
-sequence_track_t *
-sequence_add_track(sequence_t *sequence, fts_symbol_t name, fts_type_t type)
-{
-  sequence_track_t *track = sequence_track_new(name, type);
-
   if(!sequence->tracks)
     {
       /* first track */
@@ -301,36 +278,33 @@ sequence_add_track(sequence_t *sequence, fts_symbol_t name, fts_type_t type)
   
   track->sequence = sequence;
   track->next = 0;
-  
-  return track;
 }
 
 void
-sequence_remove_track(sequence_t *sequence, fts_symbol_t name)
+sequence_remove_track(sequence_track_t *track)
 {
-  sequence_track_t *track = sequence->tracks;
+  sequence_t *sequence = sequence_track_get_sequence(track);
 
-  if(track && sequence_track_get_name(track) == name)
+  if(track == sequence->tracks)
     {
+      /* first track */
       sequence->tracks = track->next;
-      sequence_track_delete(track);
       sequence->n_tracks--;
     }
   else
     {
-      sequence_track_t *prev = track;
-      track = track->next;
-      
-      while(track && sequence_track_get_name(track) != name)
+      sequence_track_t *prev = sequence->tracks;
+      sequence_track_t *this = sequence->tracks->next;
+
+      while(this && this != track)
 	{
-	  prev = track;
-	  track = track->next;
+	  prev = this;
+	  this = this->next;
 	}
 
-      if(track)
+      if(this)
 	{
-	  prev->next = track->next;
-	  sequence_track_delete(track);
+	  prev->next = this->next;
 	  sequence->n_tracks--;	  
 	}
     }
@@ -386,42 +360,6 @@ sequence_move_event(sequence_event_t *event, double time)
     }
   else
     sequence_event_set_time(event, time);
-}
-
-/*********************************************************
- *
- *  new/delete sequence
- *
- */
-
-void
-sequence_init(sequence_t *sequence)
-{
-  sequence->begin = sequence->end = 0;
-  sequence->size = 0;
-  sequence->n_tracks = 0;
-  sequence->tracks = 0;
-}
-
-void
-sequence_empty(sequence_t *sequence)
-{
-  /* delete all events */
-  while(sequence->size)
-    {
-      sequence_event_t *event = sequence_cut_begin_event(sequence);
-      fts_object_delete((fts_object_t *)event);
-    }
-  
-  /* delete all tracks */
-  while(sequence->tracks)
-    {
-      sequence_track_t *track = sequence->tracks;
-      
-      sequence->tracks = track->next;
-      sequence_track_delete(track);
-      sequence->n_tracks--;
-    }
 }
 
 /*********************************************************

@@ -98,9 +98,13 @@ struct _sequence_track
   sequence_field_track_t *field_tracks; /* list of field_tracks */
 };
 
+extern void sequence_track_init(sequence_track_t *track, fts_symbol_t name, fts_type_t type);
+extern void sequence_track_post(sequence_track_t *track);
+
 #define sequence_track_get_sequence(t) ((t)->sequence)
 #define sequence_track_get_name(t) ((t)->name)
 #define sequence_track_get_type(t) ((t)->type)
+#define sequence_track_get_next(t) ((t)->next)
 
 extern void sequence_track_post(sequence_track_t *track);
 
@@ -175,16 +179,14 @@ struct _sequence
 
 #define sequence_get_size(s) ((s)->size)
 #define sequence_get_n_tracks(s) ((s)->n_tracks)
+#define sequence_get_first_track(s) ((s)->tracks)
 
 /* new/delete sequence */
 extern void sequence_init(sequence_t *sequence);
-extern void sequence_empty(sequence_t *sequence);
 
 /* tracks */
-extern sequence_track_t *sequence_add_track(sequence_t *sequence, fts_symbol_t name, fts_type_t type);
-extern void sequence_remove_track(sequence_t *sequence, fts_symbol_t name);
-extern sequence_track_t *sequence_get_track_by_index(sequence_t *sequence, int index);
-extern sequence_track_t *sequence_get_track_by_name(sequence_t *sequence, fts_symbol_t name);
+extern void sequence_add_track(sequence_t *sequence, sequence_track_t *track);
+extern void sequence_remove_track(sequence_track_t *track);
 
 /* events */
 extern void sequence_add_event(sequence_t *sequence, sequence_track_t *track, double time, sequence_event_t *event);
