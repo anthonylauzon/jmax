@@ -1,3 +1,30 @@
+Tue Jan 27 20:51:32 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* dialogs/StatisticsDialog.java: changed "freeMemory" to "UsedMemory".
+	  Free memory doesn't really means a lot, after all.
+
+Tue Jan 27 19:44:30 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Changed the way Ermes map the fts objects to the graphic representation.
+	  The assumption that the Max names where uniques for the graphic representation
+	  did not hold anymore with table, explode and qlist (all newobj, like
+	  patcher).
+	  Now Ermes have an explicit mapping of className to ErmesObject subclasses 
+	  names, implemented using an hashtable.
+	  The Graphic Representation do not hold the object name any more; an
+	  alternative non default graphic representation will be specifiable
+	  with FtsObject properties; same thing for the value stored in
+	  the field ermesInfo, for which an explicit API will be provided.
+	  As a consequence, new "i_*" names are not dropped.
+	  The file format has changed accordingly, but will change again
+	  during the week.
+	  For the same reason, all the object names have been disambiguated
+	  now, in FTS, slider and intbox are two different objects.
+	  
+
+	* Implemented parsers for table, qlist and explode in the
+	  .pat files.
+
 Tue Jan 27 17:27:38 1998  Enzo Maggi  <maggi@astor.ircam.fr>
 
 	* added a "requestFocus()" in ErmesSketchWindow, when "windowActivate".
@@ -38,3 +65,6 @@ Mon Jan 26 16:27:46 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
 	has not yet been converted to printwriter in 1.1. !!
 	The tcl 
 
+
+
+	

@@ -66,7 +66,7 @@ public class ErmesObject implements FtsPropertyHandler {
     try {
       stream.write(array);
     } catch (java.io.IOException IOe) {
-      MaxApplication.GetPrintStream().println("error in saving");
+      System.out.println("error in saving");
       IOe.printStackTrace(); // temporary, MDC
     }
   }

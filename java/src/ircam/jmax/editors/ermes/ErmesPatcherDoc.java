@@ -130,7 +130,7 @@ public class ErmesPatcherDoc implements MaxDocument {
     try {
       MaxApplication.getTclInterp().evalFile(theName);
     } catch (tcl.lang.TclException e) {
-      MaxApplication.GetPrintStream().println("error reading .tpa "+ theName + e);
+      System.out.println("error reading .tpa "+ theName + e);
       e.printStackTrace();// proviamo ...
     }
     return true;  //change this!
@@ -143,7 +143,7 @@ public class ErmesPatcherDoc implements MaxDocument {
       itsPatcher = FtsDotPatParser.importPatcher(MaxApplication.getFtsServer(), new File(FMiller));
       itsPatcher.open();
     } catch (Exception e) {
-      MaxApplication.GetPrintStream().println(e.toString() + " can't import "+ theWholeName);
+      System.out.println(e.toString() + " can't import "+ theWholeName);
       e.printStackTrace(); // temporary, MDC
       return false;
     }
@@ -159,7 +159,7 @@ public class ErmesPatcherDoc implements MaxDocument {
       temp = itsSketchWindow.itsSketchPad.SaveTo(o);
     }
     catch (IOException e) {
-      MaxApplication.GetPrintStream().println("ERROR while writing " + GetWholeName());
+      System.out.println("ERROR while writing " + GetWholeName());
       e.printStackTrace(); // temporary, MDC
       return false;
     }
@@ -193,7 +193,7 @@ public class ErmesPatcherDoc implements MaxDocument {
       fs = new FileOutputStream(GetWholeName());
     }
     catch(IOException e) {
-      MaxApplication.GetPrintStream().println("ERROR while opening " + GetWholeName());
+      System.out.println("ERROR while opening " + GetWholeName());
       e.printStackTrace(); // temporary, MDC
       return false;
     }
@@ -205,7 +205,7 @@ public class ErmesPatcherDoc implements MaxDocument {
     try {
       fs.close();
     } catch (IOException e) {
-      MaxApplication.GetPrintStream().println("ERROR while closing " + GetWholeName());
+      System.out.println("ERROR while closing " + GetWholeName());
       e.printStackTrace(); // temporary, MDC
       return false;
     }
@@ -240,7 +240,11 @@ public class ErmesPatcherDoc implements MaxDocument {
 	  ( aErmesObject.itsFont.getSize() != aErmesObject.itsSketchPad.sketchFont.getSize()))
 	ermesInfo = "(font:"+aErmesObject.itsFont.getName()+", "+aErmesObject.itsFont.getSize()+")";
 
-      aGDescription = new FtsGraphicDescription(""+ErmesSketchHelper.SearchErmesName(aErmesObject.getClass().getName())+" "+aErmesObject.itsX+" "+aErmesObject.itsY+" "+aErmesObject.currentRect.width+" "+aErmesObject.currentRect.height+" "+"\""+ermesInfo+"\"");
+      // Note that ermesInfo is not used anymore; a new function will come soon !! MDC
+
+      aGDescription = new FtsGraphicDescription(aErmesObject.itsX, aErmesObject.itsY,
+						aErmesObject.currentRect.width,
+						aErmesObject.currentRect.height);
 
       aFObject.setGraphicDescription(aGDescription);
       if (aErmesObject instanceof ircam.jmax.editors.ermes.ErmesObjExternal && ((ErmesObjExternal)aErmesObject).itsSubWindow != null) CreateFtsGraphics(((ErmesObjExternal)aErmesObject).itsSubWindow); //recursive call

@@ -111,6 +111,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   Vector itsConnectingLetList;
 
   int editStatus = DOING_NOTHING;
+
   static String objectNames[] ={ "ircam.jmax.editors.ermes.ErmesObjExternal",
 				 "ircam.jmax.editors.ermes.ErmesObjMessage",
 				 "ircam.jmax.editors.ermes.ErmesObjBang",
@@ -123,29 +124,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 				 "ircam.jmax.editors.ermes.ErmesObjOut",
 				 "ircam.jmax.editors.ermes.ErmesObjPatcher"};
 
-  static String newFtsNames[]= { "i_object",
-				 "i_message",
-				 "i_bang",
-				 "i_toggle",
-				 "i_intbox",
-				 "i_floatbox",
-				 "i_textbox",
-				 "i_slider",
-				 "i_inlet",
-				 "i_outlet",
-				 "i_newobj"};
-
-  static String ftsNames[] = {    "newex",
-				  "message",
-				  "button",
-				  "toggle",
-				  "number",
-				  "flonum",
-				  "comment",
-				  "slider",
-				  "inlet",
-				  "outlet",
-				  "newobj"};
+  Hashtable nameTable; // substitute name lists, initialized in the constructor.
   int itsAddObject;
   Rectangle resizeRect = new Rectangle();
   public ErmesSketchHelper itsHelper;
@@ -642,7 +621,12 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       fo = (FtsObject)e.nextElement();
       fg = (FtsGraphicDescription) fo.getGraphicDescription();
 
-      String objectName = itsHelper.SearchFtsName(fg.name);
+      // Note that the representation is now found from the fts className,
+      // made unique; the new file format will allow for specifing
+      // additional information, like a non default graphic representation
+      // the code will need a small change here
+
+      String objectName = itsHelper.SearchFtsName(fo.getClassName());
 
       aObject = itsHelper.AddObject(fg, objectName, fo);
       //resizes the object to the dimensions 
@@ -751,6 +735,20 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     addMouseMotionListener(this);
     addMouseListener(this);
     addKeyListener((ErmesSketchWindow)itsSketchWindow);
+
+    // Initialization of the "fts class"  to "graphic object" table
+
+    nameTable = new Hashtable(16, (float) 0.5);
+    nameTable.put("message", "ircam.jmax.editors.ermes.ErmesObjMessage");
+    nameTable.put("bang", "ircam.jmax.editors.ermes.ErmesObjBang");
+    nameTable.put("toggle", "ircam.jmax.editors.ermes.ErmesObjToggle");
+    nameTable.put("intbox", "ircam.jmax.editors.ermes.ErmesObjInt");
+    nameTable.put("floatbox", "ircam.jmax.editors.ermes.ErmesObjFloat");
+    nameTable.put("comment", "ircam.jmax.editors.ermes.ErmesObjComment");
+    nameTable.put("slider", "ircam.jmax.editors.ermes.ErmesObjSlider");
+    nameTable.put("inlet", "ircam.jmax.editors.ermes.ErmesObjIn");
+    nameTable.put("outlet", "ircam.jmax.editors.ermes.ErmesObjOut");
+    nameTable.put("patcher", "ircam.jmax.editors.ermes.ErmesObjPatcher");
   }
 	
   //--------------------------------------------------------

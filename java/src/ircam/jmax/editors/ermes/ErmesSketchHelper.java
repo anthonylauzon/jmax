@@ -15,7 +15,7 @@ import ircam.jmax.editors.project.*;
  */
 class ErmesSketchHelper extends Object{
   ErmesSketchPad itsSketchPad;
-  
+
   public ErmesSketchHelper(ErmesSketchPad theSketchPad) {
     itsSketchPad = theSketchPad;
   }
@@ -43,7 +43,6 @@ class ErmesSketchHelper extends Object{
     ErmesObject aObject = null;	//wasting time...
     Rectangle aRect;
     ErmesObjOutlet aOutlet;
-    int i;
     
     if(itsSketchPad.doSnapToGrid){
       Point aPoint = SnapToGrid(theFtsDescription.x, theFtsDescription.y);
@@ -53,10 +52,10 @@ class ErmesSketchHelper extends Object{
     try {
       //there was an error "aObject may not have been initialized"
       aObject = (ErmesObject) Class.forName(theName).newInstance();
-      aObject.Init(itsSketchPad,/* x, y, width, height*/theFtsDescription, theFtsObject);
-    } catch(ClassNotFoundException e) {i = 0;}
-    catch(IllegalAccessException e) {i = 1;}
-    catch(InstantiationException e) {i = 2;}
+      aObject.Init(itsSketchPad, theFtsDescription, theFtsObject);
+    } catch(ClassNotFoundException e) {}
+    catch(IllegalAccessException e) {}
+    catch(InstantiationException e) {}
     finally {
       itsSketchPad.itsElements.addElement(aObject);
       if (!itsSketchPad.itsToolBar.locked) itsSketchPad.editStatus = itsSketchPad.DOING_NOTHING;	
@@ -888,27 +887,14 @@ class ErmesSketchHelper extends Object{
   //	SearchFtsName
   //  corrispondence between fts names and ermes names (new and old format...)
   //--------------------------------------------------------
-  public String SearchFtsName(String theName) {
-    if (theName.startsWith("i_")) {	//a new name
-      for (int i=0; i<ErmesToolBar.NUM_BUTTONS; i++)
-	if (itsSketchPad.newFtsNames[i].equals(theName)) return itsSketchPad.objectNames[i];
-    }
-    else { //an old name, probably coming from an import...
-      for (int i=0; i<ErmesToolBar.NUM_BUTTONS; i++)
-	if (itsSketchPad.ftsNames[i].equals(theName)) return itsSketchPad.objectNames[i];
-    }		
-    ErrorDialog aErr = new ErrorDialog(itsSketchPad.itsSketchWindow, theName + " Not known in ermes");
-    aErr.setLocation(50, 50);
-    aErr.setVisible(true);
-    
-    return ("ermes.ErmesObjComment");
+  public String SearchFtsName(String theName)
+  {
+    if (itsSketchPad.nameTable.containsKey(theName))
+      return (String) itsSketchPad.nameTable.get(theName);
+    else
+      return "ircam.jmax.editors.ermes.ErmesObjExternal";
   }
   
-  public static String SearchErmesName(String theName) {	//returns the name (new format) 
-    for (int i=0; i<ErmesToolBar.NUM_BUTTONS; i++)
-      if (ErmesSketchPad.objectNames[i].equals(theName)) return ErmesSketchPad.newFtsNames[i];
-    return ("i_object"); //generic object: actually this is an error, we didn't find the name
-  }
   //??	public void SetSelectedSegment(ErmesConnSegment theSegment)
   //--------------------------------------------------------
   //	SetSnapToGrid

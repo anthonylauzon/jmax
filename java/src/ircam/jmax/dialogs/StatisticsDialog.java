@@ -45,7 +45,7 @@ public class StatisticsDialog extends Dialog implements ActionListener, KeyListe
     p1.add(label7);
     Label label8 = new Label("Total memory " + Runtime.getRuntime().totalMemory());
     p1.add(label8);
-    Label label9 = new Label("Free memory " + Runtime.getRuntime().freeMemory());
+    Label label9 = new Label("Used memory " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
     p1.add(label9);
 
     add("Center", p1);

@@ -151,11 +151,12 @@ public class ErmesObjEditField extends TextField implements KeyListener, FocusLi
     FontMetrics fm = getFontMetrics(getFont());
     int aWidth;
     
-    System.out.println("tasto "+e.getKeyCode());
-    System.out.println("freccia sx "+Event.LEFT);
-    System.out.println("oppure "+KeyEvent.LEFT);
-    System.out.println("freccia dx "+Event.RIGHT);    
-    System.out.println("oppure dx "+KeyEvent.RIGHT);
+    // System.out.println("tasto "+e.getKeyCode());
+    // System.out.println("freccia sx "+Event.LEFT);
+    //    System.out.println("oppure "+KeyEvent.LEFT);
+    // System.out.println("freccia dx "+Event.RIGHT);    
+    // System.out.println("oppure dx "+KeyEvent.RIGHT);
+
     if (isEditable()) {
       //if(e.getKeyCode()==ircam.jmax.utils.Platform.ENTER_KEY||e.getKeyCode()==ircam.jmax.utils.Platform.RETURN_KEY){//return
 	//Dimension d2 = itsOwner.size();

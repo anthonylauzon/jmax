@@ -66,7 +66,6 @@ public class MaxApplication extends Object {
   //e.m.public static ConsShell itsShell;
   public static Properties ermesProperties;
 
-  public static PrintStream itsPrintStream;
   public Vector resourceVector = new Vector();
   int MAX_RESOURCE_FILE_LENGHT = 1024;
   public ErmesSketchWindow itsSketchWindow;
@@ -141,19 +140,19 @@ public class MaxApplication extends Object {
       fis = new FileInputStream(pathForResources);
     }
     catch(FileNotFoundException e) {
-      itsPrintStream.println("ERROR: can't find resource configuration file in "+pathForResources);
+      System.out.println("ERROR: can't find resource configuration file in "+pathForResources);
       return;
     }
     try {
       nOfBytes = fis.read(buffer, 0, MAX_RESOURCE_FILE_LENGHT);
     }
     catch(IOException e) {
-      itsPrintStream.println("ERROR: can't read resource configuration file");
+      System.out.println("ERROR: can't read resource configuration file");
       return;
     }
     aST = new StringTokenizer(new String(buffer, 0));
     if (!Start_resource_type_list(aST)) {
-      itsPrintStream.println("wrong resources.erm file");
+      System.out.println("wrong resources.erm file");
       return;
     }
 
@@ -165,12 +164,12 @@ public class MaxApplication extends Object {
       else if (aTempString.equals("***new_resource")){
 	aResId = Resource(aST);
 	if (aResId == null) {
-	  itsPrintStream.println("failed to successfull parse resource");
+	  System.out.println("failed to successfull parse resource");
 	  break;
 	}
 	else resourceVector.addElement(aResId); 
       } else {
-	itsPrintStream.println("wrong resources.erm file");
+	System.out.println("wrong resources.erm file");
 	return;
       }
     }
@@ -179,12 +178,12 @@ public class MaxApplication extends Object {
     
     /*for(Enumeration e = resourceVector.elements(); e.hasMoreElements();) {
       aResId = (MaxResourceId) e.nextElement();
-      itsPrintWrite.println("RESOURCE TYPE "+aResId.resourceName);
-      itsPrintStream.println("associated extensions: ");
+      System.out.println("RESOURCE TYPE "+aResId.resourceName);
+      System.out.println("associated extensions: ");
       for (Enumeration e1 = aResId.resourceExtensions.elements(); e1.hasMoreElements();) {
-      itsPrintStream.println("\""+e1.nextElement()+"\"");
+      System.out.println("\""+e1.nextElement()+"\"");
       }
-      itsPrintStream.println("associated handler: "+aResId.preferred_resource_handler);
+      System.out.println("associated handler: "+aResId.preferred_resource_handler);
       }*/
   }
   
@@ -237,7 +236,6 @@ public class MaxApplication extends Object {
     else if (mode.equals("local"))
       itsServer = new FtsSubProcessServer();
 
-    itsServer.setPostStream(itsPrintStream);
     itsServer.setParameter("ftsdir", theFtsdir);
     itsServer.setParameter("ftsname", theFtsname);
     itsServer.start();
@@ -512,8 +510,6 @@ public class MaxApplication extends Object {
 	int port = Integer.parseInt(itsConnDialog.portNo);
 	itsServer = new FtsSocketServer(itsConnDialog.hostName, port);
 
-	itsServer.setPostStream(GetPrintStream());
-
 	itsServer.setParameter("ftsdir", "/u/worksta/dececco/projects/imax/fts/bin/origin/debug");
 
 	itsServer.setParameter("ftsname", "fts");
@@ -522,7 +518,6 @@ public class MaxApplication extends Object {
       }
       else if (itsConnDialog.connectionLine == itsConnDialog.LOCAL_CONNECTION) {
 	itsServer = new FtsSubProcessServer();
-	itsServer.setPostStream(itsPrintStream);
 	itsServer.setParameter("ftsdir", "/u/worksta/maggi/projects/fts");
 	itsServer.setParameter("ftsname", "fts");
 	itsServer.start();	//?
@@ -586,11 +581,11 @@ public class MaxApplication extends Object {
 	}
       } 
       //if (itsSketchWindow == null)
-	//itsPrintStream.println("internal error: null SketchWindow");
+	//System.out.println("internal error: null SketchWindow");
       //else if (itsSketchWindow.itsDocument == null)
-	//itsPrintStream.println("internal error: null document");
+	//System.out.println("internal error: null document");
       //else if (((ErmesPatcherDoc)itsSketchWindow.itsDocument).itsPatcher == null)
-	//itsPrintStream.println("internal error: null root object");
+	//System.out.println("internal error: null root object");
       //else ((ErmesPatcherDoc)itsSketchWindow.itsDocument).itsPatcher.delete();
       break;
     case QUIT_APPLICATION:
@@ -799,10 +794,6 @@ public class MaxApplication extends Object {
     return itsProjectWindow.itsProject;
   }
 	
-  public static PrintStream GetPrintStream(){
-	return itsPrintStream;	
-  }
-	
   public void UpdateProjectMenu(){
     ErmesSketchWindow aSketchWindow;
     if(itsProjectWindow.itsProject.GetItems().size()==1){
@@ -849,10 +840,6 @@ public class MaxApplication extends Object {
       ermesProperties.put("root", "/usr/local/max");
     }
 
-    //Install as default print stream the system output
-
-    itsPrintStream = System.out;
-
     new MaxApplication();
   }
 
@@ -893,7 +880,7 @@ public class MaxApplication extends Object {
       }
     catch (TclException e)
       {
-	itsPrintStream.println("TCL error in initialization " + e);
+	System.out.println("TCL error in initialization " + e);
       }
   }
 
@@ -908,9 +895,7 @@ public class MaxApplication extends Object {
     itsConsole = new Console(itsInterp);
     itsConsole.Start();
 
-
-    itsPrintStream = itsConsole.getPrintStream();
-    System.setOut(itsPrintStream);
+    System.setOut(itsConsole.getPrintStream());
 
     itsConsoleWindow = new ConsoleWindow(itsConsole, "jMax Console");
     itsConsoleWindow.Init(itsProjectWindow.itsProject);

@@ -8,15 +8,14 @@ import java.io.*;
  * is not being edited.
  * Graphic description will be soon splitted in multiple 
  * object properties
+ * CHANGING: Drop name and ermesInfo.
+ * both will be implemented to optional property of the FtsObject,
+ * in the new file format.
  */
 
 
 public class FtsGraphicDescription
 {
-  /** Name of the graphic class. */
-
-  public String name;
-
   /** X coordinate of the object. */
 
   public int x = 0;
@@ -37,7 +36,15 @@ public class FtsGraphicDescription
 
   public String ermesInfo = null;
 
-  FtsGraphicDescription()
+  public FtsGraphicDescription(int x, int y, int width, int height)
+  {
+    this.x = x;
+    this.y = y;
+    this.height = height;
+    this.width = width;
+  }
+
+  public FtsGraphicDescription()
   {
   }
 
@@ -54,7 +61,7 @@ public class FtsGraphicDescription
     // it should really parse by need when the value
     // is accessed; also, the parser can be smarter
 
-    //The format *must* be "<name> <x> <y> <width> <height> [<ermesInfo>]"
+    //The format *must* be " <x> <y> <width> <height> [<ermesInfo>]"
 
     //the ermesInfo string has the format \"whatever\""
     //whatever, for now (8 dec. 1997), is a string composed of arguments,
@@ -69,17 +76,12 @@ public class FtsGraphicDescription
 
     StringTokenizer st = new StringTokenizer(descr);
 
-    name = st.nextToken();
     x  = Integer.parseInt(st.nextToken());
     y  = Integer.parseInt(st.nextToken());
     width  = Integer.parseInt(st.nextToken());
     height = Integer.parseInt(st.nextToken());
-    //width  = Integer.parseInt(st.nextToken());
 
-    if (descr.indexOf('"') != -1)
-      ermesInfo = descr.substring(descr.indexOf('"')+1, descr.lastIndexOf('"'));
-    else
-      ermesInfo = null;//old format..
+    ermesInfo = null;//obsolete, moving away
 
   }
 
@@ -87,15 +89,12 @@ public class FtsGraphicDescription
 
   void saveAsTcl(FtsSaveStream stream)
   {
-    if (ermesInfo != null)
-      stream.print("{" + name + " " + x + " " + y + " " + width + " " + height + " \""+ermesInfo+"\""+"}");
-    else
-      stream.print("{" + name + " " + x + " " + y + " " + width + " " + height+"}");
+    stream.print("{ " + x + " " + y + " " + width + " " + height+"}");
   }
 
   public String toString()
   {
-    return "FtsGraphicDescription{" + name + " " + x + " " + y + " " + width + " " + height + ermesInfo+"}";
+    return "FtsGraphicDescription{  " + x + " " + y + " " + width + " " + height + "}";
   }
 }
 

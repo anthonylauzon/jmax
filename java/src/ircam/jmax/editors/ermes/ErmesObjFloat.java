@@ -55,7 +55,7 @@ class ErmesObjFloat extends ErmesObject {
 
   public void makeFtsObject()
   {
-    itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "gfloat", (Vector) null);    
+    itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "floatbox", (Vector) null);    
   }
 
   public void redefineFtsObject()

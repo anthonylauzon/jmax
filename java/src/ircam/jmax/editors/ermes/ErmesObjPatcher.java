@@ -58,11 +58,11 @@ public class ErmesObjPatcher extends ErmesObject {
 
     theString = theFtsObject.getArgumentsDescription();
 
-    // If you want the "patcher", uncomment this line,
-    // and comment the previous
+    if (theString.length() != 0)
+      itsNameString = theString;
+    else
+      itsNameString = "patcher...";
 
-    if (theString.length() != 0) itsNameString = theString;
-    else itsNameString = "patcher...";
     // preferredSize = new Dimension(80, 20);	//vergogna
     super.Init(theSketchPad, theFtsGraphic, theFtsObject);
     if((theFtsGraphic.width<10)||(theFtsGraphic.height<10)){

@@ -53,7 +53,7 @@ class ErmesObjMessage extends ErmesObjEditableObject {
 
   public void makeFtsObject()
   {
-    itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "vmessage", itsArgs);    
+    itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "message", itsArgs);    
   }
 
   public void redefineFtsObject()

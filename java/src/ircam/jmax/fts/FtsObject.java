@@ -316,17 +316,16 @@ public class FtsObject
   /**
    * True if this object is a declaration.
    * Declaration objects must be loaded before the others in the same container.
+   *
+   * Note that a newly created declaration on the FTS side should send
+   * the declaration property as soon as it known to be a declaration,
+   * inside the "init" method; this field will be valid at the first
+   * "sync" after the object creation.
+   * The "declaration" property must be sent also if the window is
+   * not open.
    */
 
-  boolean declaration; 
-
-  /**
-   * True if the declaration field is valid.
-   * Loading from a .pat, we don't know (yet)
-   * If an object is a declaration or not until we don't ask the server.
-   */
-
-  boolean declaration_valid = false; // 
+  boolean declaration = false; 
 
   /** True is the object is an .abs abstraction */
 
@@ -487,7 +486,7 @@ public class FtsObject
 	  }
  	catch (tcl.lang.TclException e)
 	  {
-	    MaxApplication.GetPrintStream().println("TCL Error in template " + className + ":" + e);
+	    System.out.println("TCL Error in template " + className + ":" + e);
 	  }
 
 	loaded();	// activate the post-load init, like loadbangs
@@ -610,21 +609,6 @@ public class FtsObject
 
 	MaxApplication.getFtsServer().syncToFts();
       }
-
-    /* If at this point we don't know if a declaration is valid
-       or not, we must ask FTS; we ask without sync, since the
-       declaration field is used only here to save the file.
-       The saveto method will have to sync to fts to be sure
-       to save correctly; note that declaration_valid is false
-       in two situation: when loading .pat files, and we don't care
-       about the overhead, and when creating a new object interactively.
-
-       This will phased out by introducing special java classes
-       in the application layer for special objects.
-       */
-      
-    if (! declaration_valid)
-      getProperty("declaration");
   }
 
 
@@ -804,7 +788,6 @@ public class FtsObject
       {
 	getProperty("ninlets");
 	getProperty("noutlets");
-	getProperty("declaration");
 	MaxApplication.getFtsServer().syncToFts();
       }
   }
@@ -988,7 +971,6 @@ public class FtsObject
 
   public void setDeclaration(boolean v)
   {
-    declaration_valid = true;
     declaration = v;
   }
 
@@ -996,10 +978,7 @@ public class FtsObject
 
   public boolean isDeclaration()
   {
-    if (declaration_valid)
-      return declaration;
-    else
-      return false;
+    return declaration;
   }
 
   /** Set the abstraction property. */

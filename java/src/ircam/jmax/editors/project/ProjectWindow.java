@@ -475,7 +475,7 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
 	      MaxApplication.getTclInterp().evalFile(theDirectory+theFileName);
 	}
 	catch (Exception e) {
-	MaxApplication.GetPrintStream().println("error while opening .tpa"+theDirectory+theFileName+" "+e.toString());
+	System.out.println("error while opening .tpa"+theDirectory+theFileName+" "+e.toString());
 	e.printStackTrace();
 	return false;
 	}
@@ -496,15 +496,15 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
       try {
 	placeHolder = Class.forName("editors." + aResId.resourceName +"." + aResId.preferred_resource_handler).newInstance();
       }catch(ClassNotFoundException k) {
-	MaxApplication.GetPrintStream().println("editor not found:" + aResId.preferred_resource_handler); 
+	System.out.println("editor not found:" + aResId.preferred_resource_handler); 
 	return false;
       }
       catch(IllegalAccessException k) {
-	MaxApplication.GetPrintStream().println("cannot execute " + aResId.preferred_resource_handler + " illegal access - is this \"public\"?");
+	System.out.println("cannot execute " + aResId.preferred_resource_handler + " illegal access - is this \"public\"?");
 	return false;
       }
       catch(InstantiationException k) {
-	MaxApplication.GetPrintStream().println("cannot execute " + aResId.preferred_resource_handler + ": instantiation error");
+	System.out.println("cannot execute " + aResId.preferred_resource_handler + ": instantiation error");
 	return false;
       }     
       if(placeHolder instanceof MaxDocument){

@@ -28,10 +28,6 @@ public class FtsServer
 
   int connCount = 0;
 
-  /** The stream used for post operations */
-
-  PrintStream postStream;
-
   /** The FtsPort used to communicate with FTS */
 
   FtsPort connection;
@@ -50,38 +46,9 @@ public class FtsServer
   {
     this.name = name;
     this.connection = connection;
-    this.postStream = System.err;
 
     this.connection.setServer(this);
   }
-
-  /**
-   * Create an FTS Server.
-   * With a given connection, and a given print stream
-   * for the post output.
-   */
-
-  FtsServer(String name, FtsPort connection, PrintStream stream)
-  {
-    this.name = name;
-    this.connection = connection;
-    this.postStream = stream;
-
-    this.connection.setServer(this);
-  }
-
-
-  /**
-   * Set the server post stream.
-   * The post stream is used to send all the user messages 
-   * posted from FTS (print object).
-   */
-
-  public void setPostStream(PrintStream stream)
-  {
-    this.postStream = stream;
-  }
-
 
   /** Give a string representation of the server */
 
@@ -437,7 +404,7 @@ public class FtsServer
       break;
 
       case FtsClientProtocol.post_cmd:
-	postStream.print(msg.getArguments().elementAt(0)); // print the first argument
+	System.out.print(msg.getArguments().elementAt(0)); // print the first argument
 	break;
 
       case FtsClientProtocol.sync_done_cmd:

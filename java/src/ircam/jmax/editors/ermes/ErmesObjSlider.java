@@ -68,7 +68,7 @@ class ErmesObjSlider extends ErmesObject {
   
   public void makeFtsObject()
   {
-    itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "gint", (Vector) null);    
+    itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "slider", (Vector) null);    
   }
 
   public void redefineFtsObject()
@@ -92,7 +92,7 @@ class ErmesObjSlider extends ErmesObject {
     int clippedValue = (temp<0)?0:((temp>=itsRange)?itsRange:temp);
 
     last_value = temp;
-    if (!itsMovingThrottle) {
+    if ((itsThrottle != null) && (!itsMovingThrottle)) {
       itsThrottle.Move(itsThrottle.itsX, (int)(itsY+currentRect.height - BOTTOM_OFFSET -clippedValue/itsStep));
       DoublePaint();
     }
@@ -189,7 +189,7 @@ class ErmesObjSlider extends ErmesObject {
   public void Paint_specific(Graphics g) {
     
     if (g==null) {
-      MaxApplication.GetPrintStream().println("Error in graphic update: null graphic contest");
+      System.out.println("Error in graphic update: null graphic contest");
       return;
     }
     if(!itsSelected) g.setColor(itsUINormalColor);

@@ -123,5 +123,21 @@ FtsWindowDescription:
 	javac $(JFLAGS) FtsWindowDescription.java
 .PHONY: FtsWindowDescription
 
+FtsDotPatException:
+	javac $(JFLAGS) FtsDotPatException.java
+.PHONY: FtsDotPatException
+
+FtsDotPatParser:
+	javac $(JFLAGS) FtsDotPatParser.java
+.PHONY: FtsDotPatParser
+
+FtsDotPatTokenizer:
+	javac $(JFLAGS) FtsDotPatTokenizer.java
+.PHONY: FtsDotPatTokenizer
+
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
+
+
+
+

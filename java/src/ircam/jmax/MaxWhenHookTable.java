@@ -30,7 +30,7 @@ class MaxWhenHookTable
 	  interp.eval(code);
 	}
       catch (TclException e) {
-	MaxApplication.GetPrintStream().println("TCL error running hook " + name + " : " + e);
+	System.out.println("TCL error running hook " + name + " : " + e);
       }
     }
   }
