@@ -387,8 +387,18 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 
   void DeleteGraphicConnection( FtsConnection c)
   {
-    itsSketchPad.DeleteGraphicConnection( itsSketchPad.getErmesConnectionFor(c), false);
-    itsSketchPad.paintDirtyList(); // SHould be a repaint
+    ErmesConnection conn;
+
+    conn = itsSketchPad.getErmesConnectionFor(c);
+
+    // conn may be null if the connection has been delete by Ermes
+    // first; a little hack, the whole deleting business should be cleaned up.
+    
+    if (conn != null)
+      {
+	itsSketchPad.DeleteGraphicConnection( itsSketchPad.getErmesConnectionFor(c), false);
+	itsSketchPad.paintDirtyList(); // SHould be a repaint
+      }
   }
 
 

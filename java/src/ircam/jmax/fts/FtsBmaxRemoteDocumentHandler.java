@@ -16,11 +16,15 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
 
   public FtsBmaxRemoteDocumentHandler()
   {
-    jMaxDocumentIcon = new ImageIcon(MaxApplication.getProperty( "root" ) +
-				     File.separator +
-				     "images" + 
-				     File.separator +
-				     "tool_ext.gif");
+    String iconName;
+
+    iconName = (MaxApplication.getProperty( "root" ) +
+		File.separator +
+		"images" + 
+		File.separator +
+		"tool_ext.gif");
+
+    jMaxDocumentIcon = new ImageIcon(iconName);
   }
 
   /** We can load from a file start with the "bmax" or the "mbxa" string (??) */

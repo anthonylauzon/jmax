@@ -12,7 +12,7 @@ import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.widgets.*;
 
-class FpePanel extends JFrame
+class FpePanel extends JFrame implements WindowListener
 {
   private static FpePanel fpePanel = null;
   private ObjectSetViewer objectSetViewer;
@@ -39,6 +39,8 @@ class FpePanel extends JFrame
   protected FpePanel()
   {
     super( "Fpe Panel");
+
+    addWindowListener(this);
 
     JLabel label = new JLabel("Objects With Floating Point Exceptions");
     label.setHorizontalTextPosition(label.RIGHT);
@@ -81,6 +83,38 @@ class FpePanel extends JFrame
     });
     
     //setBounds( 100, 100, getPreferredSize().width, getPreferredSize().height);
+  }
+
+  public void windowClosing(WindowEvent e)
+  {
+  }
+
+  public void windowOpened(WindowEvent e)
+  {
+    Fts.getDspController().startFpeCollecting(set);
+  }
+
+  public void windowClosed(WindowEvent e)
+  {
+    Fts.getDspController().stopFpeCollecting();
+  }
+
+  public void windowIconified(WindowEvent e)
+  {
+    Fts.getDspController().stopFpeCollecting();
+  }
+
+  public void windowDeiconified(WindowEvent e)
+  {
+    Fts.getDspController().startFpeCollecting(set);
+  }
+
+  public void windowActivated(WindowEvent e)
+  {
+  }
+
+  public void windowDeactivated(WindowEvent e)
+  {
   }
 }
 

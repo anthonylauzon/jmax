@@ -378,14 +378,19 @@ table_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* system methods */
 
-  a[0] = fts_s_symbol; /* class */
-  a[1] = fts_s_anything; /* opt: name or size */
-  a[2] = fts_s_int; /* opt: size */
+  a[0] = fts_s_symbol;		/* class */
+  a[1] = fts_s_anything;	/* opt: name or size */
+  a[2] = fts_s_int;		/* opt: size */
   fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, table_init, 3, a, 1);
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, table_delete, 0, 0);
 
   a[0] = fts_s_ptr;
   fts_method_define(cl, fts_SystemInlet, fts_s_save_bmax, table_save_bmax, 1, a);
+
+  /* the method set is also installed on the system inlet, and is used
+     for .bmax loading */
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, table_set);
 
   /* user methods */
 
@@ -405,7 +410,7 @@ table_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl, 0, fts_s_clear, table_clear, 0, 0);
 
   fts_method_define_varargs(cl, 0, fts_s_list, table_list);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("set"), table_set);
+  fts_method_define_varargs(cl, 0, fts_s_set, table_set);
 
   a[0] = fts_s_int;
   fts_method_define(cl, 1, fts_s_int, table_value, 1, a);

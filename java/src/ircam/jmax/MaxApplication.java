@@ -177,7 +177,6 @@ public class MaxApplication extends Object
 
       }
 
-
     // Default values
     if (jmaxProperties.get("root") == null)
       {
@@ -216,7 +215,6 @@ public class MaxApplication extends Object
 
     ircam.jmax.mda.MdaModule.initModule();
     ircam.jmax.fts.FtsModule.initModule();
-
     // Initialize dialogs
 
     ircam.jmax.dialogs.DialogsModule.initModule();
@@ -302,6 +300,7 @@ public class MaxApplication extends Object
 	    // handler !!
 	  }
       }
+
 
     /* Report the loading time if needed */
 

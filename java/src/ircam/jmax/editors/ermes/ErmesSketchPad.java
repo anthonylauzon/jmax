@@ -1724,6 +1724,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   public void showObject( Object obj)
   {
     // Should select or highlight obj if it is an FtsObject
+
     if (obj instanceof FtsObject) 
       {
 	ErmesObject aObject = getErmesObjectFor((FtsObject) obj);
@@ -1768,6 +1769,9 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
   public void paint( Graphics g)
   {
+
+    // System.err.println("Painting " + this);
+
     if (deleted) //should be kept?
       return;    // introduced by cvs update
 
@@ -1797,6 +1801,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       {
 	DrawOffScreen( g);
       }
+
+    //    System.err.println("Painting Done for " + this);
   }		
   
   void SetResizeState( ErmesObject theResizingObject, int newStatus)
@@ -2116,10 +2122,16 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   //	DeleteConnection
   //	delete one connection routine
   //--------------------------------------------------------
+
   void DeleteConnection( ErmesConnection theConnection)
   {
     if (theConnection.itsFtsConnection != null)
       theConnection.itsFtsConnection.delete();
+
+    currentSelection.removeConnection( theConnection);
+    itsConnections.removeElement( theConnection);
+
+    markSketchAsDirty();
   }
 
   //--------------------------------------------------------
@@ -2177,23 +2189,19 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
   void DeleteSelected()
   {
-    ErmesObject aObject;
-    ErmesConnection aConnection;
-
-    while (! currentSelection.itsObjects.isEmpty()) 
-      {
-	aObject = (ErmesObject) currentSelection.itsObjects.elementAt( 0);
-	DeleteObject( aObject, false);
-      }
-      
     while (! currentSelection.itsConnections.isEmpty())
       {
-	aConnection = (ErmesConnection) currentSelection.itsConnections.elementAt( 0);
-	currentSelection.removeConnection( aConnection);
-
+	ErmesConnection aConnection = (ErmesConnection) currentSelection.itsConnections.elementAt( 0);
 	DeleteConnection( aConnection);
       }
     
+    while (! currentSelection.itsObjects.isEmpty()) 
+      {
+	ErmesObject aObject = (ErmesObject) currentSelection.itsObjects.elementAt( 0);
+	DeleteObject( aObject, false);
+      }
+      
+
     GetSketchWindow().DeselectionUpdateMenu();
     paintDirtyList();
   }
