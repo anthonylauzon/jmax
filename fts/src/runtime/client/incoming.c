@@ -36,7 +36,7 @@
  * Defining INCOMING_DEBUG_TRACE will produce a trace
  * of the incoming messages on the standard error
  */
-#undef INCOMING_DEBUG_TRACE
+#undef INCOMING_DEBUG_TRACE 
 
 #ifdef INCOMING_DEBUG_TRACE
 extern const char *protocol_printable_cmd( int cmd);

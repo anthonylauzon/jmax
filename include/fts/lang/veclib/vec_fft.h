@@ -29,8 +29,6 @@
 #ifndef _VECFFT_H_
 #define _VECFFT_H_
 
-#include <fts/lang/veclib/complex.h>
-
 #define FTS_FFT_MIN_SIZE 16
 
 #define FTS_FFT_MAX_SIZE_LOG2 16

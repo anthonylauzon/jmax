@@ -45,10 +45,19 @@
 (define jmax-scm-root (string-append jmax-root slash "scm"))
 (define jmax-image-root (string-append jmax-root slash "images" slash))
 
+(display "1 ---------------------------------------")(newline)
+
 ;;
 ;; Load the intrinsic Scheme functions. 
 ;;
 (load (string-append jmax-scm-root slash "scheme_interface.scm"))
+
+(display "2 ---------------------------------------")(newline)
+
+;;
+;; FIXME testing only
+;;
+(define start-time (system-current-time-millis))
 
 ;;
 ;; Intrinsic functions for the Sgi platform

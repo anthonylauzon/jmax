@@ -26,8 +26,7 @@
 
 #include <math.h>
 #include <fts/sys.h>
-#include <fts/lang/veclib/complex.h>
-#include <fts/lang/veclib/portable/cfft.h>
+#include <fts/lang/veclib.h>
 
 /***************************************************************************
  *

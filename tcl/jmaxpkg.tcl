@@ -111,6 +111,7 @@ proc jmaxPkgUnknown {name version {exact {}}} {
 		tclLog "error reading system jMax package $file: $msg"
 		return;
 	    } else {
+
 		setSystemProperty "$name\PackageDir" $packageDir
 		set package_loaded "yes"
 	    }

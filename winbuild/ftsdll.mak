@@ -71,13 +71,12 @@ CLEAN :
 	-@erase "$(INTDIR)\floatfuns.obj"
 	-@erase "$(INTDIR)\fpe.obj"
 	-@erase "$(INTDIR)\ftl.obj"
-	-@erase "$(INTDIR)\ftlfun.obj"
 	-@erase "$(INTDIR)\ftlmem.obj"
 	-@erase "$(INTDIR)\ftlutils.obj"
 	-@erase "$(INTDIR)\ftsdata.obj"
 	-@erase "$(INTDIR)\ftsdataid.obj"
 	-@erase "$(INTDIR)\gphiter.obj"
-	-@erase "$(INTDIR)\hashtab.obj"
+	-@erase "$(INTDIR)\hashtable.obj"
 	-@erase "$(INTDIR)\incoming.obj"
 	-@erase "$(INTDIR)\inout.obj"
 	-@erase "$(INTDIR)\label.obj"
@@ -132,82 +131,11 @@ CLEAN :
 	-@erase "$(INTDIR)\utils.obj"
 	-@erase "$(INTDIR)\variables.obj"
 	-@erase "$(INTDIR)\vc60.idb"
-	-@erase "$(INTDIR)\vec_bit.obj"
-	-@erase "$(INTDIR)\vec_carith.obj"
-	-@erase "$(INTDIR)\vec_cfmul.obj"
-	-@erase "$(INTDIR)\vec_cmerge.obj"
-	-@erase "$(INTDIR)\vec_cplx.obj"
-	-@erase "$(INTDIR)\vec_cpy.obj"
-	-@erase "$(INTDIR)\vec_csplit.obj"
-	-@erase "$(INTDIR)\vec_csum.obj"
-	-@erase "$(INTDIR)\vec_explog.obj"
-	-@erase "$(INTDIR)\vec_fabs.obj"
-	-@erase "$(INTDIR)\vec_farith.obj"
-	-@erase "$(INTDIR)\vec_fclip.obj"
-	-@erase "$(INTDIR)\vec_fcmp.obj"
-	-@erase "$(INTDIR)\vec_fdot.obj"
 	-@erase "$(INTDIR)\vec_fft.obj"
-	-@erase "$(INTDIR)\vec_fmax.obj"
-	-@erase "$(INTDIR)\vec_fmin.obj"
-	-@erase "$(INTDIR)\vec_fsum.obj"
-	-@erase "$(INTDIR)\vec_iabs.obj"
-	-@erase "$(INTDIR)\vec_iarith.obj"
-	-@erase "$(INTDIR)\vec_iclip.obj"
-	-@erase "$(INTDIR)\vec_icmp.obj"
-	-@erase "$(INTDIR)\vec_imax.obj"
-	-@erase "$(INTDIR)\vec_imin.obj"
-	-@erase "$(INTDIR)\vec_isum.obj"
-	-@erase "$(INTDIR)\vec_round.obj"
-	-@erase "$(INTDIR)\vec_rsqrt.obj"
-	-@erase "$(INTDIR)\vec_scl_bit.obj"
-	-@erase "$(INTDIR)\vec_scl_carith.obj"
-	-@erase "$(INTDIR)\vec_scl_cfmul.obj"
-	-@erase "$(INTDIR)\vec_scl_farith.obj"
-	-@erase "$(INTDIR)\vec_scl_fcmp.obj"
-	-@erase "$(INTDIR)\vec_scl_iarith.obj"
-	-@erase "$(INTDIR)\vec_scl_icmp.obj"
-	-@erase "$(INTDIR)\vec_sqrt.obj"
-	-@erase "$(INTDIR)\vec_trigon.obj"
-	-@erase "$(INTDIR)\vecmod.obj"
-	-@erase "$(INTDIR)\vecstat.obj"
-	-@erase "$(INTDIR)\vecx_bit.obj"
-	-@erase "$(INTDIR)\vecx_carith.obj"
-	-@erase "$(INTDIR)\vecx_cfmul.obj"
-	-@erase "$(INTDIR)\vecx_cmerge.obj"
-	-@erase "$(INTDIR)\vecx_cplx.obj"
-	-@erase "$(INTDIR)\vecx_cpy.obj"
-	-@erase "$(INTDIR)\vecx_csplit.obj"
-	-@erase "$(INTDIR)\vecx_csum.obj"
-	-@erase "$(INTDIR)\vecx_explog.obj"
-	-@erase "$(INTDIR)\vecx_fabs.obj"
-	-@erase "$(INTDIR)\vecx_farith.obj"
-	-@erase "$(INTDIR)\vecx_fclip.obj"
-	-@erase "$(INTDIR)\vecx_fcmp.obj"
-	-@erase "$(INTDIR)\vecx_fdot.obj"
-	-@erase "$(INTDIR)\vecx_fmax.obj"
-	-@erase "$(INTDIR)\vecx_fmin.obj"
-	-@erase "$(INTDIR)\vecx_fsum.obj"
-	-@erase "$(INTDIR)\vecx_iabs.obj"
-	-@erase "$(INTDIR)\vecx_iarith.obj"
-	-@erase "$(INTDIR)\vecx_iclip.obj"
-	-@erase "$(INTDIR)\vecx_icmp.obj"
-	-@erase "$(INTDIR)\vecx_imax.obj"
-	-@erase "$(INTDIR)\vecx_imin.obj"
-	-@erase "$(INTDIR)\vecx_isum.obj"
-	-@erase "$(INTDIR)\vecx_round.obj"
-	-@erase "$(INTDIR)\vecx_rsqrt.obj"
-	-@erase "$(INTDIR)\vecx_scl_bit.obj"
-	-@erase "$(INTDIR)\vecx_scl_carith.obj"
-	-@erase "$(INTDIR)\vecx_scl_cfmul.obj"
-	-@erase "$(INTDIR)\vecx_scl_farith.obj"
-	-@erase "$(INTDIR)\vecx_scl_fcmp.obj"
-	-@erase "$(INTDIR)\vecx_scl_iarith.obj"
-	-@erase "$(INTDIR)\vecx_scl_icmp.obj"
-	-@erase "$(INTDIR)\vecx_sqrt.obj"
-	-@erase "$(INTDIR)\vecx_trigon.obj"
 	-@erase "$(INTDIR)\version.obj"
 	-@erase "$(INTDIR)\vm.obj"
 	-@erase "$(INTDIR)\win32.obj"
+	-@erase "$(INTDIR)\windev.obj"
 	-@erase "$(OUTDIR)\fts.dll"
 	-@erase "$(OUTDIR)\fts.exp"
 	-@erase "$(OUTDIR)\fts.lib"
@@ -254,13 +182,12 @@ LINK32_OBJS= \
 	"$(INTDIR)\floatfuns.obj" \
 	"$(INTDIR)\fpe.obj" \
 	"$(INTDIR)\ftl.obj" \
-	"$(INTDIR)\ftlfun.obj" \
 	"$(INTDIR)\ftlmem.obj" \
 	"$(INTDIR)\ftlutils.obj" \
 	"$(INTDIR)\ftsdata.obj" \
 	"$(INTDIR)\ftsdataid.obj" \
 	"$(INTDIR)\gphiter.obj" \
-	"$(INTDIR)\hashtab.obj" \
+	"$(INTDIR)\hashtable.obj" \
 	"$(INTDIR)\incoming.obj" \
 	"$(INTDIR)\inout.obj" \
 	"$(INTDIR)\label.obj" \
@@ -314,82 +241,11 @@ LINK32_OBJS= \
 	"$(INTDIR)\updates.obj" \
 	"$(INTDIR)\utils.obj" \
 	"$(INTDIR)\variables.obj" \
-	"$(INTDIR)\vec_bit.obj" \
-	"$(INTDIR)\vec_carith.obj" \
-	"$(INTDIR)\vec_cfmul.obj" \
-	"$(INTDIR)\vec_cmerge.obj" \
-	"$(INTDIR)\vec_cplx.obj" \
-	"$(INTDIR)\vec_cpy.obj" \
-	"$(INTDIR)\vec_csplit.obj" \
-	"$(INTDIR)\vec_csum.obj" \
-	"$(INTDIR)\vec_explog.obj" \
-	"$(INTDIR)\vec_fabs.obj" \
-	"$(INTDIR)\vec_farith.obj" \
-	"$(INTDIR)\vec_fclip.obj" \
-	"$(INTDIR)\vec_fcmp.obj" \
-	"$(INTDIR)\vec_fdot.obj" \
-	"$(INTDIR)\vec_fft.obj" \
-	"$(INTDIR)\vec_fmax.obj" \
-	"$(INTDIR)\vec_fmin.obj" \
-	"$(INTDIR)\vec_fsum.obj" \
-	"$(INTDIR)\vec_iabs.obj" \
-	"$(INTDIR)\vec_iarith.obj" \
-	"$(INTDIR)\vec_iclip.obj" \
-	"$(INTDIR)\vec_icmp.obj" \
-	"$(INTDIR)\vec_imax.obj" \
-	"$(INTDIR)\vec_imin.obj" \
-	"$(INTDIR)\vec_isum.obj" \
-	"$(INTDIR)\vec_round.obj" \
-	"$(INTDIR)\vec_rsqrt.obj" \
-	"$(INTDIR)\vec_scl_bit.obj" \
-	"$(INTDIR)\vec_scl_carith.obj" \
-	"$(INTDIR)\vec_scl_cfmul.obj" \
-	"$(INTDIR)\vec_scl_farith.obj" \
-	"$(INTDIR)\vec_scl_fcmp.obj" \
-	"$(INTDIR)\vec_scl_iarith.obj" \
-	"$(INTDIR)\vec_scl_icmp.obj" \
-	"$(INTDIR)\vec_sqrt.obj" \
-	"$(INTDIR)\vec_trigon.obj" \
-	"$(INTDIR)\vecmod.obj" \
-	"$(INTDIR)\vecstat.obj" \
-	"$(INTDIR)\vecx_bit.obj" \
-	"$(INTDIR)\vecx_carith.obj" \
-	"$(INTDIR)\vecx_cfmul.obj" \
-	"$(INTDIR)\vecx_cmerge.obj" \
-	"$(INTDIR)\vecx_cplx.obj" \
-	"$(INTDIR)\vecx_cpy.obj" \
-	"$(INTDIR)\vecx_csplit.obj" \
-	"$(INTDIR)\vecx_csum.obj" \
-	"$(INTDIR)\vecx_explog.obj" \
-	"$(INTDIR)\vecx_fabs.obj" \
-	"$(INTDIR)\vecx_farith.obj" \
-	"$(INTDIR)\vecx_fclip.obj" \
-	"$(INTDIR)\vecx_fcmp.obj" \
-	"$(INTDIR)\vecx_fdot.obj" \
-	"$(INTDIR)\vecx_fmax.obj" \
-	"$(INTDIR)\vecx_fmin.obj" \
-	"$(INTDIR)\vecx_fsum.obj" \
-	"$(INTDIR)\vecx_iabs.obj" \
-	"$(INTDIR)\vecx_iarith.obj" \
-	"$(INTDIR)\vecx_iclip.obj" \
-	"$(INTDIR)\vecx_icmp.obj" \
-	"$(INTDIR)\vecx_imax.obj" \
-	"$(INTDIR)\vecx_imin.obj" \
-	"$(INTDIR)\vecx_isum.obj" \
-	"$(INTDIR)\vecx_round.obj" \
-	"$(INTDIR)\vecx_rsqrt.obj" \
-	"$(INTDIR)\vecx_scl_bit.obj" \
-	"$(INTDIR)\vecx_scl_carith.obj" \
-	"$(INTDIR)\vecx_scl_cfmul.obj" \
-	"$(INTDIR)\vecx_scl_farith.obj" \
-	"$(INTDIR)\vecx_scl_fcmp.obj" \
-	"$(INTDIR)\vecx_scl_iarith.obj" \
-	"$(INTDIR)\vecx_scl_icmp.obj" \
-	"$(INTDIR)\vecx_sqrt.obj" \
-	"$(INTDIR)\vecx_trigon.obj" \
 	"$(INTDIR)\version.obj" \
 	"$(INTDIR)\vm.obj" \
-	"$(INTDIR)\win32.obj"
+	"$(INTDIR)\win32.obj" \
+	"$(INTDIR)\windev.obj" \
+	"$(INTDIR)\vec_fft.obj"
 
 "$(OUTDIR)\fts.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -398,10 +254,10 @@ LINK32_OBJS= \
 
 !ELSEIF  "$(CFG)" == "ftsdll - Win32 Debug"
 
-OUTDIR=.\DllDebug
+OUTDIR=.\..\fts\lib
 INTDIR=.\DllDebug
 
-ALL : ".\FtsDebug\fts.dll"
+ALL : "..\fts\bin\fts.dll"
 
 
 CLEAN :
@@ -435,13 +291,12 @@ CLEAN :
 	-@erase "$(INTDIR)\floatfuns.obj"
 	-@erase "$(INTDIR)\fpe.obj"
 	-@erase "$(INTDIR)\ftl.obj"
-	-@erase "$(INTDIR)\ftlfun.obj"
 	-@erase "$(INTDIR)\ftlmem.obj"
 	-@erase "$(INTDIR)\ftlutils.obj"
 	-@erase "$(INTDIR)\ftsdata.obj"
 	-@erase "$(INTDIR)\ftsdataid.obj"
 	-@erase "$(INTDIR)\gphiter.obj"
-	-@erase "$(INTDIR)\hashtab.obj"
+	-@erase "$(INTDIR)\hashtable.obj"
 	-@erase "$(INTDIR)\incoming.obj"
 	-@erase "$(INTDIR)\inout.obj"
 	-@erase "$(INTDIR)\label.obj"
@@ -497,90 +352,22 @@ CLEAN :
 	-@erase "$(INTDIR)\variables.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\vc60.pdb"
-	-@erase "$(INTDIR)\vec_bit.obj"
-	-@erase "$(INTDIR)\vec_carith.obj"
-	-@erase "$(INTDIR)\vec_cfmul.obj"
-	-@erase "$(INTDIR)\vec_cmerge.obj"
-	-@erase "$(INTDIR)\vec_cplx.obj"
-	-@erase "$(INTDIR)\vec_cpy.obj"
-	-@erase "$(INTDIR)\vec_csplit.obj"
-	-@erase "$(INTDIR)\vec_csum.obj"
-	-@erase "$(INTDIR)\vec_explog.obj"
-	-@erase "$(INTDIR)\vec_fabs.obj"
-	-@erase "$(INTDIR)\vec_farith.obj"
-	-@erase "$(INTDIR)\vec_fclip.obj"
-	-@erase "$(INTDIR)\vec_fcmp.obj"
-	-@erase "$(INTDIR)\vec_fdot.obj"
 	-@erase "$(INTDIR)\vec_fft.obj"
-	-@erase "$(INTDIR)\vec_fmax.obj"
-	-@erase "$(INTDIR)\vec_fmin.obj"
-	-@erase "$(INTDIR)\vec_fsum.obj"
-	-@erase "$(INTDIR)\vec_iabs.obj"
-	-@erase "$(INTDIR)\vec_iarith.obj"
-	-@erase "$(INTDIR)\vec_iclip.obj"
-	-@erase "$(INTDIR)\vec_icmp.obj"
-	-@erase "$(INTDIR)\vec_imax.obj"
-	-@erase "$(INTDIR)\vec_imin.obj"
-	-@erase "$(INTDIR)\vec_isum.obj"
-	-@erase "$(INTDIR)\vec_round.obj"
-	-@erase "$(INTDIR)\vec_rsqrt.obj"
-	-@erase "$(INTDIR)\vec_scl_bit.obj"
-	-@erase "$(INTDIR)\vec_scl_carith.obj"
-	-@erase "$(INTDIR)\vec_scl_cfmul.obj"
-	-@erase "$(INTDIR)\vec_scl_farith.obj"
-	-@erase "$(INTDIR)\vec_scl_fcmp.obj"
-	-@erase "$(INTDIR)\vec_scl_iarith.obj"
-	-@erase "$(INTDIR)\vec_scl_icmp.obj"
-	-@erase "$(INTDIR)\vec_sqrt.obj"
-	-@erase "$(INTDIR)\vec_trigon.obj"
-	-@erase "$(INTDIR)\vecmod.obj"
-	-@erase "$(INTDIR)\vecstat.obj"
-	-@erase "$(INTDIR)\vecx_bit.obj"
-	-@erase "$(INTDIR)\vecx_carith.obj"
-	-@erase "$(INTDIR)\vecx_cfmul.obj"
-	-@erase "$(INTDIR)\vecx_cmerge.obj"
-	-@erase "$(INTDIR)\vecx_cplx.obj"
-	-@erase "$(INTDIR)\vecx_cpy.obj"
-	-@erase "$(INTDIR)\vecx_csplit.obj"
-	-@erase "$(INTDIR)\vecx_csum.obj"
-	-@erase "$(INTDIR)\vecx_explog.obj"
-	-@erase "$(INTDIR)\vecx_fabs.obj"
-	-@erase "$(INTDIR)\vecx_farith.obj"
-	-@erase "$(INTDIR)\vecx_fclip.obj"
-	-@erase "$(INTDIR)\vecx_fcmp.obj"
-	-@erase "$(INTDIR)\vecx_fdot.obj"
-	-@erase "$(INTDIR)\vecx_fmax.obj"
-	-@erase "$(INTDIR)\vecx_fmin.obj"
-	-@erase "$(INTDIR)\vecx_fsum.obj"
-	-@erase "$(INTDIR)\vecx_iabs.obj"
-	-@erase "$(INTDIR)\vecx_iarith.obj"
-	-@erase "$(INTDIR)\vecx_iclip.obj"
-	-@erase "$(INTDIR)\vecx_icmp.obj"
-	-@erase "$(INTDIR)\vecx_imax.obj"
-	-@erase "$(INTDIR)\vecx_imin.obj"
-	-@erase "$(INTDIR)\vecx_isum.obj"
-	-@erase "$(INTDIR)\vecx_round.obj"
-	-@erase "$(INTDIR)\vecx_rsqrt.obj"
-	-@erase "$(INTDIR)\vecx_scl_bit.obj"
-	-@erase "$(INTDIR)\vecx_scl_carith.obj"
-	-@erase "$(INTDIR)\vecx_scl_cfmul.obj"
-	-@erase "$(INTDIR)\vecx_scl_farith.obj"
-	-@erase "$(INTDIR)\vecx_scl_fcmp.obj"
-	-@erase "$(INTDIR)\vecx_scl_iarith.obj"
-	-@erase "$(INTDIR)\vecx_scl_icmp.obj"
-	-@erase "$(INTDIR)\vecx_sqrt.obj"
-	-@erase "$(INTDIR)\vecx_trigon.obj"
 	-@erase "$(INTDIR)\version.obj"
 	-@erase "$(INTDIR)\vm.obj"
 	-@erase "$(INTDIR)\win32.obj"
+	-@erase "$(INTDIR)\windev.obj"
 	-@erase "$(OUTDIR)\fts.exp"
 	-@erase "$(OUTDIR)\fts.lib"
 	-@erase "$(OUTDIR)\fts.pdb"
-	-@erase ".\FtsDebug\fts.dll"
-	-@erase ".\FtsDebug\fts.ilk"
+	-@erase "..\fts\bin\fts.dll"
+	-@erase "..\fts\bin\fts.ilk"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
+
+"$(INTDIR)" :
+    if not exist "$(INTDIR)/$(NULL)" mkdir "$(INTDIR)"
 
 CPP_PROJ=/nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "FTSDLL_EXPORTS" /Fp"$(INTDIR)\ftsdll.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /win32 
@@ -589,7 +376,7 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\ftsdll.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib winmm.lib /nologo /dll /incremental:yes /pdb:"$(OUTDIR)\fts.pdb" /debug /machine:I386 /out:".\FtsDebug\fts.dll" /implib:"$(OUTDIR)\fts.lib" /pdbtype:sept 
+LINK32_FLAGS=ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib winmm.lib /nologo /dll /incremental:yes /pdb:"$(OUTDIR)\fts.pdb" /debug /machine:I386 /out:"..\fts\bin\fts.dll" /implib:"$(OUTDIR)\fts.lib" /pdbtype:sept 
 LINK32_OBJS= \
 	"$(INTDIR)\atomarray.obj" \
 	"$(INTDIR)\atomfiles.obj" \
@@ -621,13 +408,12 @@ LINK32_OBJS= \
 	"$(INTDIR)\floatfuns.obj" \
 	"$(INTDIR)\fpe.obj" \
 	"$(INTDIR)\ftl.obj" \
-	"$(INTDIR)\ftlfun.obj" \
 	"$(INTDIR)\ftlmem.obj" \
 	"$(INTDIR)\ftlutils.obj" \
 	"$(INTDIR)\ftsdata.obj" \
 	"$(INTDIR)\ftsdataid.obj" \
 	"$(INTDIR)\gphiter.obj" \
-	"$(INTDIR)\hashtab.obj" \
+	"$(INTDIR)\hashtable.obj" \
 	"$(INTDIR)\incoming.obj" \
 	"$(INTDIR)\inout.obj" \
 	"$(INTDIR)\label.obj" \
@@ -681,84 +467,13 @@ LINK32_OBJS= \
 	"$(INTDIR)\updates.obj" \
 	"$(INTDIR)\utils.obj" \
 	"$(INTDIR)\variables.obj" \
-	"$(INTDIR)\vec_bit.obj" \
-	"$(INTDIR)\vec_carith.obj" \
-	"$(INTDIR)\vec_cfmul.obj" \
-	"$(INTDIR)\vec_cmerge.obj" \
-	"$(INTDIR)\vec_cplx.obj" \
-	"$(INTDIR)\vec_cpy.obj" \
-	"$(INTDIR)\vec_csplit.obj" \
-	"$(INTDIR)\vec_csum.obj" \
-	"$(INTDIR)\vec_explog.obj" \
-	"$(INTDIR)\vec_fabs.obj" \
-	"$(INTDIR)\vec_farith.obj" \
-	"$(INTDIR)\vec_fclip.obj" \
-	"$(INTDIR)\vec_fcmp.obj" \
-	"$(INTDIR)\vec_fdot.obj" \
-	"$(INTDIR)\vec_fft.obj" \
-	"$(INTDIR)\vec_fmax.obj" \
-	"$(INTDIR)\vec_fmin.obj" \
-	"$(INTDIR)\vec_fsum.obj" \
-	"$(INTDIR)\vec_iabs.obj" \
-	"$(INTDIR)\vec_iarith.obj" \
-	"$(INTDIR)\vec_iclip.obj" \
-	"$(INTDIR)\vec_icmp.obj" \
-	"$(INTDIR)\vec_imax.obj" \
-	"$(INTDIR)\vec_imin.obj" \
-	"$(INTDIR)\vec_isum.obj" \
-	"$(INTDIR)\vec_round.obj" \
-	"$(INTDIR)\vec_rsqrt.obj" \
-	"$(INTDIR)\vec_scl_bit.obj" \
-	"$(INTDIR)\vec_scl_carith.obj" \
-	"$(INTDIR)\vec_scl_cfmul.obj" \
-	"$(INTDIR)\vec_scl_farith.obj" \
-	"$(INTDIR)\vec_scl_fcmp.obj" \
-	"$(INTDIR)\vec_scl_iarith.obj" \
-	"$(INTDIR)\vec_scl_icmp.obj" \
-	"$(INTDIR)\vec_sqrt.obj" \
-	"$(INTDIR)\vec_trigon.obj" \
-	"$(INTDIR)\vecmod.obj" \
-	"$(INTDIR)\vecstat.obj" \
-	"$(INTDIR)\vecx_bit.obj" \
-	"$(INTDIR)\vecx_carith.obj" \
-	"$(INTDIR)\vecx_cfmul.obj" \
-	"$(INTDIR)\vecx_cmerge.obj" \
-	"$(INTDIR)\vecx_cplx.obj" \
-	"$(INTDIR)\vecx_cpy.obj" \
-	"$(INTDIR)\vecx_csplit.obj" \
-	"$(INTDIR)\vecx_csum.obj" \
-	"$(INTDIR)\vecx_explog.obj" \
-	"$(INTDIR)\vecx_fabs.obj" \
-	"$(INTDIR)\vecx_farith.obj" \
-	"$(INTDIR)\vecx_fclip.obj" \
-	"$(INTDIR)\vecx_fcmp.obj" \
-	"$(INTDIR)\vecx_fdot.obj" \
-	"$(INTDIR)\vecx_fmax.obj" \
-	"$(INTDIR)\vecx_fmin.obj" \
-	"$(INTDIR)\vecx_fsum.obj" \
-	"$(INTDIR)\vecx_iabs.obj" \
-	"$(INTDIR)\vecx_iarith.obj" \
-	"$(INTDIR)\vecx_iclip.obj" \
-	"$(INTDIR)\vecx_icmp.obj" \
-	"$(INTDIR)\vecx_imax.obj" \
-	"$(INTDIR)\vecx_imin.obj" \
-	"$(INTDIR)\vecx_isum.obj" \
-	"$(INTDIR)\vecx_round.obj" \
-	"$(INTDIR)\vecx_rsqrt.obj" \
-	"$(INTDIR)\vecx_scl_bit.obj" \
-	"$(INTDIR)\vecx_scl_carith.obj" \
-	"$(INTDIR)\vecx_scl_cfmul.obj" \
-	"$(INTDIR)\vecx_scl_farith.obj" \
-	"$(INTDIR)\vecx_scl_fcmp.obj" \
-	"$(INTDIR)\vecx_scl_iarith.obj" \
-	"$(INTDIR)\vecx_scl_icmp.obj" \
-	"$(INTDIR)\vecx_sqrt.obj" \
-	"$(INTDIR)\vecx_trigon.obj" \
 	"$(INTDIR)\version.obj" \
 	"$(INTDIR)\vm.obj" \
-	"$(INTDIR)\win32.obj"
+	"$(INTDIR)\win32.obj" \
+	"$(INTDIR)\windev.obj" \
+	"$(INTDIR)\vec_fft.obj"
 
-".\FtsDebug\fts.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"..\fts\bin\fts.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -854,7 +569,7 @@ SOURCE=..\fts\src\runtime\devices\bytestream.c
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=..\fts\src\lang\veclib\portable\cfft.c
+SOURCE=..\fts\src\lang\veclib\cfft.c
 
 "$(INTDIR)\cfft.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
@@ -986,12 +701,6 @@ SOURCE=..\fts\src\lang\ftl\ftl.c
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=..\fts\src\lang\veclib\ftlfun.c
-
-"$(INTDIR)\ftlfun.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
 SOURCE=..\fts\src\lang\ftl\ftlmem.c
 
 "$(INTDIR)\ftlmem.obj" : $(SOURCE) "$(INTDIR)"
@@ -1022,9 +731,9 @@ SOURCE=..\fts\src\lang\dsp\gphiter.c
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=..\fts\src\lang\utils\hashtab.c
+SOURCE=..\fts\src\lang\utils\hashtable.c
 
-"$(INTDIR)\hashtab.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\hashtable.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1220,7 +929,7 @@ SOURCE=..\fts\src\lang\utils\random.c
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=..\fts\src\lang\veclib\portable\rfft_shuffle.c
+SOURCE=..\fts\src\lang\veclib\rfft_shuffle.c
 
 "$(INTDIR)\rfft_shuffle.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
@@ -1346,441 +1055,9 @@ SOURCE=..\fts\src\lang\mess\variables.c
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=..\fts\src\lang\veclib\portable\vec_bit.c
-
-"$(INTDIR)\vec_bit.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_carith.c
-
-"$(INTDIR)\vec_carith.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_cfmul.c
-
-"$(INTDIR)\vec_cfmul.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_cmerge.c
-
-"$(INTDIR)\vec_cmerge.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_cplx.c
-
-"$(INTDIR)\vec_cplx.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_cpy.c
-
-"$(INTDIR)\vec_cpy.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_csplit.c
-
-"$(INTDIR)\vec_csplit.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_csum.c
-
-"$(INTDIR)\vec_csum.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_explog.c
-
-"$(INTDIR)\vec_explog.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_fabs.c
-
-"$(INTDIR)\vec_fabs.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_farith.c
-
-"$(INTDIR)\vec_farith.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_fclip.c
-
-"$(INTDIR)\vec_fclip.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_fcmp.c
-
-"$(INTDIR)\vec_fcmp.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_fdot.c
-
-"$(INTDIR)\vec_fdot.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_fft.c
+SOURCE=..\fts\src\lang\veclib\vec_fft.c
 
 "$(INTDIR)\vec_fft.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_fmax.c
-
-"$(INTDIR)\vec_fmax.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_fmin.c
-
-"$(INTDIR)\vec_fmin.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_fsum.c
-
-"$(INTDIR)\vec_fsum.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_iabs.c
-
-"$(INTDIR)\vec_iabs.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_iarith.c
-
-"$(INTDIR)\vec_iarith.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_iclip.c
-
-"$(INTDIR)\vec_iclip.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_icmp.c
-
-"$(INTDIR)\vec_icmp.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_imax.c
-
-"$(INTDIR)\vec_imax.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_imin.c
-
-"$(INTDIR)\vec_imin.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_isum.c
-
-"$(INTDIR)\vec_isum.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_round.c
-
-"$(INTDIR)\vec_round.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_rsqrt.c
-
-"$(INTDIR)\vec_rsqrt.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_scl_bit.c
-
-"$(INTDIR)\vec_scl_bit.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_scl_carith.c
-
-"$(INTDIR)\vec_scl_carith.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_scl_cfmul.c
-
-"$(INTDIR)\vec_scl_cfmul.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_scl_farith.c
-
-"$(INTDIR)\vec_scl_farith.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_scl_fcmp.c
-
-"$(INTDIR)\vec_scl_fcmp.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_scl_iarith.c
-
-"$(INTDIR)\vec_scl_iarith.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_scl_icmp.c
-
-"$(INTDIR)\vec_scl_icmp.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_sqrt.c
-
-"$(INTDIR)\vec_sqrt.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_trigon.c
-
-"$(INTDIR)\vec_trigon.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\vecmod.c
-
-"$(INTDIR)\vecmod.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\vecstat.c
-
-"$(INTDIR)\vecstat.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_bit.c
-
-"$(INTDIR)\vecx_bit.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_carith.c
-
-"$(INTDIR)\vecx_carith.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_cfmul.c
-
-"$(INTDIR)\vecx_cfmul.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_cmerge.c
-
-"$(INTDIR)\vecx_cmerge.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_cplx.c
-
-"$(INTDIR)\vecx_cplx.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_cpy.c
-
-"$(INTDIR)\vecx_cpy.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_csplit.c
-
-"$(INTDIR)\vecx_csplit.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_csum.c
-
-"$(INTDIR)\vecx_csum.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_explog.c
-
-"$(INTDIR)\vecx_explog.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_fabs.c
-
-"$(INTDIR)\vecx_fabs.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_farith.c
-
-"$(INTDIR)\vecx_farith.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_fclip.c
-
-"$(INTDIR)\vecx_fclip.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_fcmp.c
-
-"$(INTDIR)\vecx_fcmp.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_fdot.c
-
-"$(INTDIR)\vecx_fdot.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_fmax.c
-
-"$(INTDIR)\vecx_fmax.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_fmin.c
-
-"$(INTDIR)\vecx_fmin.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_fsum.c
-
-"$(INTDIR)\vecx_fsum.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_iabs.c
-
-"$(INTDIR)\vecx_iabs.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_iarith.c
-
-"$(INTDIR)\vecx_iarith.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_iclip.c
-
-"$(INTDIR)\vecx_iclip.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_icmp.c
-
-"$(INTDIR)\vecx_icmp.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_imax.c
-
-"$(INTDIR)\vecx_imax.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_imin.c
-
-"$(INTDIR)\vecx_imin.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_isum.c
-
-"$(INTDIR)\vecx_isum.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_round.c
-
-"$(INTDIR)\vecx_round.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_rsqrt.c
-
-"$(INTDIR)\vecx_rsqrt.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_scl_bit.c
-
-"$(INTDIR)\vecx_scl_bit.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_scl_carith.c
-
-"$(INTDIR)\vecx_scl_carith.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_scl_cfmul.c
-
-"$(INTDIR)\vecx_scl_cfmul.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_scl_farith.c
-
-"$(INTDIR)\vecx_scl_farith.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_scl_fcmp.c
-
-"$(INTDIR)\vecx_scl_fcmp.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_scl_iarith.c
-
-"$(INTDIR)\vecx_scl_iarith.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_scl_icmp.c
-
-"$(INTDIR)\vecx_scl_icmp.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_sqrt.c
-
-"$(INTDIR)\vecx_sqrt.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_trigon.c
-
-"$(INTDIR)\vecx_trigon.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1799,6 +1076,12 @@ SOURCE=..\fts\src\lang\mess\vm.c
 SOURCE="..\fts\src\non-portable\win32.c"
 
 "$(INTDIR)\win32.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\fts\src\runtime\devices\windev.c
+
+"$(INTDIR)\windev.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

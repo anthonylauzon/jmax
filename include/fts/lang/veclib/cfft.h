@@ -29,8 +29,6 @@
 #ifndef _CFFT_H_
 #define _CFFT_H_
 
-#include <fts/lang/veclib/complex.h>
-
 /*********************************************************************************
  *
  *    complex FFT computation and utillities

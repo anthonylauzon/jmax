@@ -78,17 +78,14 @@ LINK32_OBJS= \
 
 OUTDIR=.\FtsDebug
 INTDIR=.\FtsDebug
-# Begin Custom Macros
-OutDir=.\FtsDebug
-# End Custom Macros
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "$(OUTDIR)\fts.exe"
+ALL : "..\fts\bin\fts.exe"
 
 !ELSE 
 
-ALL : "ftsdll - Win32 Debug" "$(OUTDIR)\fts.exe"
+ALL : "ftsdll - Win32 Debug" "..\fts\bin\fts.exe"
 
 !ENDIF 
 
@@ -100,9 +97,9 @@ CLEAN :
 	-@erase "$(INTDIR)\main.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\vc60.pdb"
-	-@erase "$(OUTDIR)\fts.exe"
-	-@erase "$(OUTDIR)\fts.ilk"
 	-@erase "$(OUTDIR)\fts.pdb"
+	-@erase "..\fts\bin\fts.exe"
+	-@erase "..\fts\bin\fts.ilk"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -113,12 +110,12 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\fts.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:yes /pdb:"$(OUTDIR)\fts.pdb" /debug /machine:I386 /out:"$(OUTDIR)\fts.exe" /pdbtype:sept 
+LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:yes /pdb:"$(OUTDIR)\fts.pdb" /debug /machine:I386 /out:"..\fts\bin\fts.exe" /pdbtype:sept 
 LINK32_OBJS= \
 	"$(INTDIR)\main.obj" \
-	".\DllDebug\fts.lib"
+	"..\fts\lib\fts.lib"
 
-"$(OUTDIR)\fts.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"..\fts\bin\fts.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<

@@ -26,6 +26,7 @@
 package provide data
 
 global jmaxArch jmaxMode
+
 ucs load module data $dir/c/lib/$jmaxArch/$jmaxMode/libdata.so
 
 # load client java class

@@ -25,10 +25,13 @@
  */
 
 #include <sys/types.h>
-#include <unistd.h>
 #include <string.h>
-
 #include <fts/fts.h>
+
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 #include "sampbuf.h"
 #include "sampunit.h"
 #include "naming.h"

@@ -27,7 +27,9 @@
 #ifndef _LANG_VECLIB_H
 #define _LANG_VECLIB_H
 
-#include <fts/lang/veclib/ftlfun.h>
-#include <fts/lang/veclib/include/veclib.h>
+#include <fts/lang/veclib/complex.h>
+#include <fts/lang/veclib/cfft.h>
+#include <fts/lang/veclib/rfft_shuffle.h>
+#include <fts/lang/veclib/vec_fft.h>
 
 #endif

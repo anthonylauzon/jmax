@@ -47,7 +47,6 @@ extern fts_module_t fts_audio_module;
 extern fts_module_t fts_time_module;
 extern fts_module_t fts_sched_module;
 extern fts_module_t fts_dsp_module;
-extern fts_module_t fts_veclib_module;
 
 static void fts_kernel_config(void);
 static void fts_assign_boot_devices(int argc, char **argv);
@@ -157,7 +156,6 @@ static void fts_kernel_config(void)
   fts_install_module( &fts_mess_module);      /* Install the MAX interpreter module */
   fts_install_module( &fts_utils_module);     /* Install the FTS utils */
   fts_install_module( &fts_datalib_module);   /* Install the FTS data lib */
-  fts_install_module( &fts_veclib_module);    /* Install the FTS vector function*/
   fts_install_module( &fts_ftl_module);       /* Install the FTL engine ***MUST BE BEFORE DSP*** */
 
   /* RUNTIME modules */

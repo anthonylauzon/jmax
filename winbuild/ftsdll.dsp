@@ -79,7 +79,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib winmm.lib /nologo /dll /debug /machine:I386 /out:"..\fts\lib\fts.dll" /pdbtype:sept
+# ADD LINK32 ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib winmm.lib /nologo /dll /debug /machine:I386 /out:"..\fts\bin\fts.dll" /pdbtype:sept
 
 !ENDIF 
 
@@ -121,7 +121,7 @@ SOURCE=..\fts\src\runtime\devices\bytestream.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\veclib\portable\cfft.c
+SOURCE=..\fts\src\lang\veclib\cfft.c
 # End Source File
 # Begin Source File
 
@@ -218,10 +218,6 @@ SOURCE=..\fts\src\lang\mess\fpe.h
 # Begin Source File
 
 SOURCE=..\fts\src\lang\ftl\ftl.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\ftlfun.c
 # End Source File
 # Begin Source File
 
@@ -389,7 +385,7 @@ SOURCE=..\fts\src\lang\utils\random.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\veclib\portable\rfft_shuffle.c
+SOURCE=..\fts\src\lang\veclib\rfft_shuffle.c
 # End Source File
 # Begin Source File
 
@@ -485,299 +481,7 @@ SOURCE=..\fts\src\lang\mess\variables.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\veclib\portable\vec_bit.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_carith.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_cfmul.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_cmerge.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_cplx.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_cpy.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_csplit.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_csum.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_explog.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_fabs.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_farith.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_fclip.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_fcmp.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_fdot.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_fft.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_fmax.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_fmin.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_fsum.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_iabs.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_iarith.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_iclip.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_icmp.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_imax.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_imin.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_isum.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_round.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_rsqrt.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_scl_bit.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_scl_carith.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_scl_cfmul.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_scl_farith.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_scl_fcmp.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_scl_iarith.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_scl_icmp.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_sqrt.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vec_trigon.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\vecmod.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\vecmod.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\vecstat.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_bit.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_carith.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_cfmul.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_cmerge.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_cplx.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_cpy.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_csplit.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_csum.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_explog.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_fabs.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_farith.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_fclip.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_fcmp.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_fdot.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_fmax.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_fmin.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_fsum.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_iabs.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_iarith.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_iclip.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_icmp.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_imax.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_imin.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_isum.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_round.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_rsqrt.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_scl_bit.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_scl_carith.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_scl_cfmul.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_scl_farith.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_scl_fcmp.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_scl_iarith.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_scl_icmp.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_sqrt.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\portable\vecx_trigon.c
+SOURCE=..\fts\src\lang\veclib\vec_fft.c
 # End Source File
 # Begin Source File
 
@@ -790,6 +494,10 @@ SOURCE=..\fts\src\lang\mess\vm.c
 # Begin Source File
 
 SOURCE="..\fts\src\non-portable\win32.c"
+# End Source File
+# Begin Source File
+
+SOURCE=..\fts\src\runtime\devices\windev.c
 # End Source File
 # End Target
 # End Project

@@ -23,8 +23,8 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
-
-#include <fts/lang/veclib/complex.h>
+#ifndef _RFFT_SHUFFLE_H_
+#define _RFFT_SHUFFLE_H_
 
 /*****************************************************************************************
  *
@@ -61,3 +61,5 @@ FTS_API void rfft_shuffle_after_fft_outplc(complex *in, complex *out, float *coe
 
 FTS_API void rfft_shuffle_before_ifft_inplc(complex *buf, float *coef_re, float *coef_im, int size);
 FTS_API void rfft_shuffle_before_ifft_outplc(complex *in, complex *out, float *coef_re, float *coef_im, int size);
+
+#endif  /* _RFFT_SHUFFLE_H_ */

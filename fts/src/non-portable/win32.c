@@ -155,7 +155,6 @@ char* win32_realpath(const char* path, char* resolved_path)
   return strcpy(resolved_path, path);
 }
 
-
 /* *************************************************************************** */
 /*                                                                             */
 /* Platform specific initialization                                            */
@@ -164,4 +163,22 @@ char* win32_realpath(const char* path, char* resolved_path)
 
 void fts_platform_init( int argc, char **argv)
 {
+  WORD wVersionRequested;
+  WSADATA wsaData;
+  int result;
+  
+  wVersionRequested = MAKEWORD(2, 2);
+  
+  result = WSAStartup( wVersionRequested, &wsaData );
+  if (result != 0) {
+    /* Couldn't initiate WinSock */
+    return /* FIXME */;
+  }
+  
+  if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
+    WSACleanup();
+    /* Bad WinSock version */
+    return /* FIXME */;
+  }
+
 }

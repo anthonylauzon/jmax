@@ -29,8 +29,6 @@
 #include <fts/lang/mess.h>
 #include <fts/lang/utils.h>
 #include <fts/lang/veclib.h>
-#include <fts/lang/veclib/portable/cfft.h>
-#include <fts/lang/veclib/portable/rfft_shuffle.h>
 
 /**************************************************************************************
  *

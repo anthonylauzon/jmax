@@ -37,9 +37,17 @@
 #include <fts/runtime/devices/unixdev.h>
 #endif
 
+#ifdef WIN32
+#include <fts/runtime/devices/windev.h>
+#endif
+
 void fts_dev_configure(void)
 {
 #ifdef HAS_UNIX
   unixdev_init();
+#endif
+
+#ifdef WIN32
+  windev_init();
 #endif
 }

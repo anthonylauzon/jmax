@@ -41,5 +41,5 @@ typedef struct{
 
 FTS_API complex CZERO;
 
-#endif /* _MATHTYPES_H_ */
+#endif /* _FTS_COMPLEX_H_ */
 

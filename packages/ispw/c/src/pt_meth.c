@@ -31,7 +31,7 @@
 #include <math.h>
 
 #define MAXIMUM(a, b) ((a)>=(b))?(a):(b)
-#define HALF_TONES(f) (17.312340491f * log(f))
+#define HALF_TONES(x) (17.312340491f * log(x))
 #define FREQ(ht) exp(0.057762265f * (ht))
 #define LD(x) (1.442695041f * log(x))
 
@@ -371,7 +371,6 @@ void pt_common_dsp_function(fts_word_t *a)
 
       for(i=0; i<x->n_overlap; i++)
 	x->buf.main[i] = x->buf.main[x->n_points - x->n_overlap + i];
-
       x->buf.fill = x->buf.main + x->n_overlap;
     }
 }

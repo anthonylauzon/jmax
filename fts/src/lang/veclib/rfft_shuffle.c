@@ -24,8 +24,7 @@
  *
  */
 
-#include <fts/sys.h>
-#include <fts/lang/veclib/portable/rfft_shuffle.h>
+#include <fts/fts.h>
 
 void rfft_shuffle_after_fft_inplc(complex * restrict buf, float *coef_re, float *coef_im, int size)
 {

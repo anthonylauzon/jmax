@@ -65,14 +65,14 @@ static int file_exists( const char *filename)
 
 int fts_file_search_in_path( const char *filename, const char *search_path, char *full_path)
 {
-  if (*filename == '/')
+  if (fts_path_is_absolute(filename))
     {
       strcpy( full_path, filename);
 
       return file_exists( full_path);
     }
 
-  while ( (search_path = splitpath( search_path, full_path, ':')) )
+  while ( (search_path = splitpath( search_path, full_path, fts_path_separator)) )
     {
       strcat( full_path, "/");
       strcat( full_path, filename);
@@ -86,7 +86,7 @@ int fts_file_search_in_path( const char *filename, const char *search_path, char
 
 int fts_file_get_read_path(const char *path, char *full_path)
 {
-  if (path[0] == '/')
+  if (fts_path_is_absolute(path))
     {
       if (file_exists(path))
 	{
@@ -106,7 +106,7 @@ int fts_file_get_read_path(const char *path, char *full_path)
 	  
 	  begin = next;
 	  
-	  if ((end = strchr(begin, ':')) || (end = strchr(begin, ','))) /* path followed by separator */
+	  if ((end = strchr(begin, fts_path_separator)) || (end = strchr(begin, ','))) /* path followed by separator */
 	    next = end + 1; /* skip seperator */
 	  else
 	    {
@@ -114,7 +114,7 @@ int fts_file_get_read_path(const char *path, char *full_path)
 	      next = 0; /* end of string */
 	    }	  
 	  
-	  if (begin[0] == '/') /* absolute default path */
+	  if (fts_path_is_absolute(begin)) /* absolute default path */
 	    buf[0] = '\0';
 	  else if (fts_get_project_dir())
 	    strcpy(buf, fts_symbol_name(fts_get_project_dir()));
@@ -166,7 +166,7 @@ void fts_file_get_write_path(const char *path, char *full_path)
 {
   if (full_path)
     {
-      if (path[0] == '/')
+      if (fts_path_is_absolute(path))
 	strcpy(full_path, path); /* path is absolute (just copied) */
       else
 	{

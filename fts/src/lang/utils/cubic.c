@@ -26,7 +26,7 @@
 
 /* coefficient atable for cubic interpolation */
 
-#include <fts/lang.h>
+#include <fts/fts.h>
 
 fts_cubic_coefs_t fts_cubic_table[FTS_CUBIC_TABLE_SIZE];
 

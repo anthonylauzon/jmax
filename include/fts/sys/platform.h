@@ -55,6 +55,8 @@
 #undef HAVE_PROCESS_H
 #undef HAVE_IO_H 
 #define FTS_API extern
+#define fts_path_separator      ':'
+#define fts_path_is_absolute(_p) (_p[0] == '/')
 
 #elif defined(LINUXPPC)
 
@@ -72,6 +74,8 @@
 #undef HAVE_PROCESS_H
 #undef HAVE_IO_H 
 #define FTS_API extern
+#define fts_path_separator      ':'
+#define fts_path_is_absolute(_p) (_p[0] == '/')
 
 #elif defined(MACOSX)
 
@@ -89,6 +93,8 @@
 #undef HAVE_PROCESS_H
 #undef HAVE_IO_H 
 #define FTS_API extern
+#define fts_path_separator      ':'
+#define fts_path_is_absolute(_p) (_p[0] == '/')
 
 
 /*********************************************************************
@@ -114,6 +120,8 @@
 #undef HAVE_PROCESS_H
 #undef HAVE_IO_H 
 #define FTS_API extern
+#define fts_path_separator      ':'
+#define fts_path_is_absolute(_p) (_p[0] == '/')
 
 /*********************************************************************
  *
@@ -134,6 +142,8 @@
 #undef HAVE_PROCESS_H
 #undef HAVE_IO_H 
 #define FTS_API extern
+#define fts_path_separator      ':'
+#define fts_path_is_absolute(_p) (_p[0] == '/')
 
 /*********************************************************************
  *
@@ -192,6 +202,18 @@
 
 #define realpath  win32_realpath
 FTS_API char* win32_realpath(const char* path, char* resolved_path);
+
+
+#define fts_path_separator      ';'
+
+/*
+ *  Valid absolute paths are:  /c/jmax, c:/jmax, c:\jmax
+ */
+#define fts_path_is_absolute(_p) \
+ ((_p[0] == '/') || \
+  ((_p[1] == ':') && (_p[2] == '/')) || \
+  ((_p[1] == ':') && (_p[2] == '\\')))
+
 
 #else
 
