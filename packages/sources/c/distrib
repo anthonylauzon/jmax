@@ -1,0 +1,3 @@
+all	all	Makefile
+all	all	lib
+all	all	src

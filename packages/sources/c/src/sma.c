@@ -1,0 +1,154 @@
+/*
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
+ */
+
+#include "fts.h"
+
+typedef struct
+{
+  fts_object_t obj;
+
+  ftl_data_t data;
+} sma_t;
+
+static fts_symbol_t sma_function = 0;
+
+static void sma_dsp_function( fts_word_t *args)
+{
+  float *in1 = (float *) fts_word_get_ptr(args);
+  float *in2 = (float *) fts_word_get_ptr(args + 1);
+  float *out = (float *) fts_word_get_ptr(args + 2);
+  float *ps = (float *) fts_word_get_ptr(args + 3);
+  long n = fts_word_get_int(args + 4);
+  float s;
+  long i;
+
+  s = *ps;
+  for ( i = 0; i < n; i++)
+    out[i] = s * in1[i] + in2[i];
+}
+
+static void sma_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sma_t *this = (sma_t *)o;
+  float *p;
+
+  /* Allocate ftl data */
+
+  this->data = ftl_data_new(float);
+
+  /* initializing  ftl data */
+  p = ftl_data_get_ptr( this->data);
+
+  if (fts_is_int( &(at[1])))
+    *p = (float) fts_get_int_arg( ac, at, 1, 0);
+  else
+    *p = fts_get_float_arg( ac, at, 1, 0.0);
+
+  /* insert object in DSP objects list */
+
+  dsp_list_insert(o);
+}
+
+static void sma_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sma_t *this = (sma_t *)o;
+
+  /* Freeing ftl data */
+
+  ftl_data_free( this->data);
+
+  /* remove object from DSP objects list */
+
+  dsp_list_remove(o);
+}
+
+
+static void sma_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_atom_t args[5];
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg( ac, at, 0, 0);
+  sma_t *this = (sma_t *)o;
+
+  fts_set_symbol  (args,   fts_dsp_get_input_name(dsp, 0));
+  fts_set_symbol  (args+1, fts_dsp_get_input_name(dsp, 1));
+  fts_set_symbol  (args+2, fts_dsp_get_output_name(dsp, 0));
+  fts_set_ftl_data(args+3, this->data);
+  fts_set_long    (args+4, fts_dsp_get_input_size(dsp, 0));
+
+  dsp_add_funcall( sma_function, 5, args);
+}
+
+static void sma_set( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sma_t *this = (sma_t *)o;
+  float *p;
+
+  p = ftl_data_get_ptr( this->data);
+
+  /* changing ftl data */
+  if (fts_is_int( &(at[0])))
+    *p = (float) fts_get_int_arg( ac, at, 0, 0);
+  else
+    *p = fts_get_float_arg( ac, at, 0, 0.0);
+}
+
+static fts_status_t sma_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_symbol_t a[2];
+
+  post( "Instantiating class `.*+~' of package `sources'\n");
+
+  /* Class initialization : 2 inlets, 1 outlet */
+
+  fts_class_init( cl, sizeof(sma_t), 2, 1, 0);
+
+  /* Definition of DSP specific methods */
+  a[0] = fts_s_symbol;
+  a[1] = fts_s_float;
+  fts_method_define_optargs( cl, fts_SystemInlet, fts_s_init, sma_init, 2, a, 1);
+
+  fts_method_define( cl, fts_SystemInlet, fts_s_delete, sma_delete, 0, 0);
+
+  a[0] = fts_s_ptr;
+  fts_method_define(cl, fts_SystemInlet, fts_s_put, sma_put, 1, a);
+
+  /* Definition of other methods */
+
+  a[0] = fts_s_int;
+  fts_method_define(cl, 0, fts_s_int, sma_set, 1, a);
+
+  a[0] = fts_s_float;
+  fts_method_define(cl, 0, fts_s_float, sma_set, 1, a);
+
+
+  /* Definition of DSP inlets and outlets */
+  dsp_sig_inlet(cl, 0);
+  dsp_sig_inlet(cl, 1);
+  dsp_sig_outlet(cl, 0);
+
+  /* Declare DSP function and keep the associated symbol */
+
+  sma_function = fts_new_symbol("sma");
+  dsp_declare_function( sma_function, sma_dsp_function);
+  
+  return fts_Success;
+}
+
+void sma_config( void)
+{
+  post( "Installing class `.*+~' of package `sources'\n");
+
+  fts_metaclass_create( fts_new_symbol( ".*+~"), sma_instantiate, fts_always_equiv);
+}
+

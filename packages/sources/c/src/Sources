@@ -1,0 +1,9 @@
+SOURCES= \
+	sources.c	\
+	integer.c	\
+	bangbang.c	\
+	sma.c		\
+
+
+
+
