@@ -100,6 +100,13 @@ public class TableSelection extends DefaultListSelectionModel implements Transfe
 
   }
 
+    /**
+     * A method to inform the selection that an owner does not
+     * exist anymore */
+    public static void ownerDied(SelectionOwner s)
+    {
+	if (current == s) current = null;
+    }
 
   /** select the given object 
    */

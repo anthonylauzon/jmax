@@ -256,9 +256,9 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 	}
 
       // the tolbar is going to be unanchored
-      public void remove(Component c)
+      public void remove(Component c1)
 	{
-	  super.remove(c);
+	  super.remove(c1);
 	  TablePanel.toolbarAnchored = false;
 	  doLayout();
 	}

@@ -54,6 +54,15 @@ public class TableGraphicContext extends GraphicContext{
       TableSelection.setCurrent(itsSelection);
   }
 
+
+    /*
+     * redefined to handle selection ownership when
+     * the owner is closed (bug #171) */
+    public void destroy()
+    {
+	TableSelection.ownerDied(itsSelection.getOwner());
+    }
+
   //--- Fields & accessors ---//
 
   TableDataModel itsModel;

@@ -45,6 +45,10 @@ public class SelectionLayer extends AbstractLayer{
       public void selectionDisactivated()
 	{
 	  Graphics g = tgc.getGraphicDestination().getGraphics();
+
+	  if (g == null) return; /*this can happen since the selection is created
+				   BEFORE the graphic destinations & source */
+
 	  eraseSelection(g);
 	  render(g, 1);
 	  g.dispose();
