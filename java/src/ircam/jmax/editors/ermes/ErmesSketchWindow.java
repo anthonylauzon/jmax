@@ -377,16 +377,14 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener, C
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
     Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
-    if (clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor))
+    if (clipboardContent != null && itsSketchPad.canPasteText()  && clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor))
       {
-	if (itsSketchPad.canPasteText())
-	  {
-	    try {
-	      textClipboard = (String) clipboardContent.getTransferData(DataFlavor.stringFlavor);
-	      itsSketchPad.pasteText(textClipboard);
-	    }
-	    catch (Exception e) {System.err.println("error while pasting text: "+e);}
-	  }
+	try {
+	  textClipboard = (String) clipboardContent.getTransferData(DataFlavor.stringFlavor);
+	  itsSketchPad.pasteText(textClipboard);
+	}
+	catch (Exception e) {System.err.println("error while pasting text: "+e);}
+      
       }
     else 
       {
