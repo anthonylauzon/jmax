@@ -1,7 +1,7 @@
-SUBDIRS= src
+SUBDIRS= src lib
 
 packagedir=$(pkgdatadir)/java
-package_DATA = jacl.jar tcljava.jar jmax.jar
+package_DATA = jmax.jar
 
 JAR_DEP=$(shell find src -name "*.class")
 
