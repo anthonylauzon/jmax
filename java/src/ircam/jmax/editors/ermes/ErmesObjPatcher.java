@@ -79,6 +79,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
       //itsSubWindow = null;
       //itsSubWindow.setVisible(false);
     }
+
     super.RestartEditing();
   }
 

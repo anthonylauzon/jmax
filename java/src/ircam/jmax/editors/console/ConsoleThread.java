@@ -11,7 +11,7 @@ import java.awt.*;
 import java.awt.event.*;
 import tcl.lang.*;
 
-public class ConsoleThread extends Thread {
+class ConsoleThread extends Thread {
   Console itsConsole;
 
   public ConsoleThread(Console theConsole) {

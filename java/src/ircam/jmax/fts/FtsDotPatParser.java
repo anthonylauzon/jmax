@@ -107,7 +107,7 @@ public class FtsDotPatParser
 
     obj.setObjectName("unnamed");
     obj.assignInOutlets();
-
+    obj.put("autorouting", "off"); // compatibility with old stuff
     obj.loaded();	// activate the post-load init, like loadbangs
 
     return obj;
@@ -200,7 +200,7 @@ public class FtsDotPatParser
 		    in.pushBack();
 
 		    lastNObject = new FtsPatcherObject(parent);
-
+		    lastNObject.put("autorouting", "off"); // compatibility with old stuff
 		    parsePatcher((FtsContainerObject) lastNObject, in);
 
 		    lastNObjectType = "patcher";

@@ -97,7 +97,6 @@ itsPatcher.watch("deletedConnection", this);
   Vector itsWindowMenuList;
   public boolean alreadySaved =true;
   boolean neverSaved =true;
-  public File itsFile;
   //public String itsTitle;
   public MaxData itsData;
   static int untitledCounter = 1;
@@ -212,7 +211,6 @@ itsPatcher.watch("deletedConnection", this);
     //repaint();
     MaxApplication.itsWindow = this;
     InitFromContainer(itsPatcher);
-    //InitFromDocument(aPatcherDoc);
     inAnApplet = false;
     //aPatcherDoc.SetWindow(itsSketchWindow);
     setVisible(true);
@@ -247,6 +245,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     
     //SetupMenu();
   }
+
 
 
     public void InitFromContainer(FtsContainerObject patcher) {
@@ -628,13 +627,6 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   }
 
   //--------------------------------------------------------
-  //	GetDocument
-  //	returns the associated ErmesPatcherDoc
-  //--------------------------------------------------------
-  public MaxDocument GetDocument(){
-    return itsDocument;
-  }
-  //--------------------------------------------------------
   //	GetFrame
   //--------------------------------------------------------
   public Frame GetFrame(){
@@ -730,7 +722,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 	fileToOpen = FtsHelpPatchTable.getHelpPatch(aObject.itsFtsObject);
 	
 	if (fileToOpen != null)
-	  MaxApplication.OpenFile(fileToOpen);
+	  MaxApplication.OpenFile(MaxDataSource.makeDataSource(fileToOpen));
       }
     }
   }
@@ -780,7 +772,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   }
 
   private boolean SaveBody(){
-    setTitle(itsFile.getName());
+    setTitle(itsData.getName());
 
     CreateFtsGraphics(this);
 
@@ -790,16 +782,12 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 
     try
       {
-	FtsPatchData data = new FtsPatchData();
-	data.setContent(itsPatcher);
-	data.setDataSource(MaxDataSource.makeDataSource(itsFile));
-	data.setInfo("Saved " + DateFormat.getDateInstance(DateFormat.FULL).format(new Date()));
-	data.setName(itsFile.getName());
-	data.save();
+	itsData.setInfo("Saved " + DateFormat.getDateInstance(DateFormat.FULL).format(new Date()));
+	itsData.save();
       }
     catch (MaxDataException e)
       {
-	System.out.println("ERROR " + e + " while saving " + itsFile);
+	System.out.println("ERROR " + e + " while saving " + itsData.getDataSource());
 	e.printStackTrace(); // temporary, MDC
 	return false;
       }
@@ -815,14 +803,17 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     // we should RECEIVE this FILE, or contruct it when we load this document
     String oldTitle = getTitle();
 		
-    if (itsData.getDataSource() != null) {//already loaded from somewhere (we assume a file for now)
-      if (itsFile == null) //The file is not assigned yet
-	itsFile = ((MaxFileDataSource) itsData.getDataSource()).getFile();    
-    }
-    else { //no saved yet
-      itsFile = MaxFileChooser.chooseFileToSave(this, "Save Patcher");
-      if (itsFile == null) return false; //user cancelled the dialog
-    }      
+    if (itsData.getDataSource() == null)
+      {
+	MaxDataSource source;
+
+	source = MaxFileChooser.chooseFileToSave(this, "Save Patcher");
+
+	if (source == null)
+	  return false; //user cancelled the dialog
+	else
+	  itsData.setDataSource(source);
+      } 
 
     if(!SaveBody()) return false;
     alreadySaved = true;
@@ -832,11 +823,14 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 
   public boolean SaveAs() {
     String oldTitle = getTitle();
-		
-    itsFile = null;
-    itsFile = MaxFileChooser.chooseFileToSave(this, "Save As");
+    MaxDataSource source;
 
-    if (itsFile == null) return false;
+    source  = MaxFileChooser.chooseFileToSave(this, "Save As", itsData.getDataSource());
+
+    if (source == null)
+      return false;
+    else
+      itsData.setDataSource(source);
     
     if(!SaveBody()) return false;
     MaxApplication.ChangeWinNameMenus(oldTitle, getTitle());

@@ -56,7 +56,12 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
 	FtsObject obj;
 
 	obj = (FtsObject) inlets.elementAt(i);
-	obj.delete();
+
+	if (obj != null)
+	  {
+	    inlets.setElementAt(null, i);
+	    obj.delete();
+	  }
       }
 
     super.setNumberOfInlets(ninlets);
@@ -74,7 +79,12 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
 	FtsObject obj;
 
 	obj = (FtsObject) outlets.elementAt(i);
-	obj.delete();
+
+	if (obj != null)
+	  {
+	    outlets.setElementAt(null, i);
+	    obj.delete();
+	  }
       }
 
     super.setNumberOfOutlets(noutlets);

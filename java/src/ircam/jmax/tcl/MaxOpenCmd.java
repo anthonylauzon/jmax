@@ -14,7 +14,7 @@ import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
-import ircam.jmax.editors.console.*;
+import ircam.jmax.mda.*;
 
 
 /**
@@ -39,7 +39,15 @@ class MaxOpenCmd implements Command {
 
 	// Should call MaxApplication.Open, not the project !!!
 
-	MaxApplication.OpenFile(new File(argv[1].toString()));
+	try
+	  {
+	    MaxApplication.OpenFile(MaxDataSource.makeDataSource(argv[1].toString()));
+	  }
+	catch (java.net.MalformedURLException e)
+	  {
+	    throw new TclException(interp, "Malformed URL " + argv[1].toString());
+	  }
+
 	// Should return the document produced !!!
       }
     else

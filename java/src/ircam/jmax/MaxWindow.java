@@ -8,10 +8,8 @@ import java.awt.*;
  * list (for example, the editors)
  */
 public interface MaxWindow {
-  public abstract MaxDocument GetDocument();
   public abstract String GetTitle();
   public abstract Frame GetFrame();
-  public abstract void InitFromDocument(MaxDocument theDocument);
   public abstract void ToFront();
   public abstract boolean Close();
   public abstract void AddWindowToMenu(String theName);

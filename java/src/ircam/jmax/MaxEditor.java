@@ -7,8 +7,8 @@ import java.util.*;
 import java.io.*;
 
 import ircam.jmax.*;
-import ircam.jmax.dialogs.*;
 import ircam.jmax.mda.*;
+import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.ermes.*; // @@@ !!
 import com.sun.java.swing.*;
 
@@ -485,22 +485,18 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////WindowListener --fine
   
-  public void InitFromDocument(MaxDocument theDocument){}  
-  
   public boolean Open(){
-    File file = MaxFileChooser.chooseFileToOpen(this, "Open File");
+    MaxDataSource source = MaxFileChooser.chooseFileToOpen(this, "Open File");
 
-    if (file != null)
+    if (source != null)
       {
-	MaxApplication.OpenFile(file);
+	MaxApplication.OpenFile(source);
 	return true;
       }
     else
       return false;
   }
 
-
-  public abstract MaxDocument GetDocument();
 
   public Frame GetFrame(){
     return this;

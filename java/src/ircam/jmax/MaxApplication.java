@@ -140,14 +140,14 @@ public class MaxApplication extends Object {
    * On the base of the filename (for now)
    */
 
-  public static MaxData OpenFile(File file)
+  public static MaxData OpenFile(MaxDataSource source)
   {
     MaxData ourData;
     MaxDataEditor ourEditor; 
 
     try
       {
-	ourData = MaxDataHandler.loadDataInstance(MaxDataSource.makeDataSource(file));
+	ourData = MaxDataHandler.loadDataInstance(source);
 
 	try
 	  {
@@ -164,7 +164,7 @@ public class MaxApplication extends Object {
       }
     catch (MaxDataException e)
       {
-	ErrorDialog aErr = new ErrorDialog(GetConsoleWindow(), "Error " + e + "while opening "+ file);
+	ErrorDialog aErr = new ErrorDialog(GetConsoleWindow(), "Error " + e + "while opening "+ source);
 	aErr.setLocation(100, 100);
 	aErr.setVisible(true);
 	return null;
@@ -202,7 +202,7 @@ public class MaxApplication extends Object {
     }
     for(int i=0;i<itsEditorsFrameList.size();i++){
       aWindow = (MaxWindow)itsEditorsFrameList.elementAt(i);
-	if(!theName.equals(aWindow.GetDocument().GetTitle()))
+	if(!theName.equals(aWindow.GetTitle()))
 	  aWindow.AddWindowToMenu(theName);
     }
 
@@ -280,37 +280,7 @@ public class MaxApplication extends Object {
       itsConsoleWindow.ChangeWinNameMenu(theOldName, theNewName);
   }
   
-  public static ErmesSketchWindow NewSubPatcherWindow(FtsContainerObject theFtsPatcher) {
-    ErmesPatcherDoc aPatcherDoc = new ErmesPatcherDoc(theFtsPatcher);
-    ErmesSketchWindow aSketchWindow;
-    aPatcherDoc.alreadySaved = true;
-    boolean temp = itsSketchWindow.itsSketchPad.doAutorouting;
-    aSketchWindow = new ErmesSketchWindow(true, itsSketchWindow, false);
-    aSketchWindow.Init();
-    aSketchWindow.itsSketchPad.doAutorouting = temp;
-    theFtsPatcher.open();
-    aSketchWindow.InitFromDocument(aPatcherDoc);
-    aSketchWindow.inAnApplet = false;
-    aSketchWindow.setTitle(aSketchWindow.GetDocument().GetTitle());
-    aPatcherDoc.SetWindow(aSketchWindow);
-    aSketchWindow.pack();
-    aSketchWindow.setVisible(false);
-    return aSketchWindow;
-  }
-  
 
-  public static ErmesSketchWindow NewDefaultSubPatcher( FtsContainerObject theFtsPatcher) {//to use just for 'patcher' externals
-
-    theFtsPatcher.put("wx", 100);
-    theFtsPatcher.put("wy", 100);
-    theFtsPatcher.put("ww", 300);
-    theFtsPatcher.put("wh", 300);
-
-    ErmesSketchWindow aSketchWindow = NewSubPatcherWindow(theFtsPatcher);
-    aSketchWindow.isSubPatcher = true;
-    return aSketchWindow;
-  }
-  
   public static void ObeyCommand(int command) {
     ErmesSketchWindow aSketchWindow;
     switch (command) {

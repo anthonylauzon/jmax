@@ -20,7 +20,7 @@ import java.awt.event.*;
  * This MouseListener widget voids user mouse activity.
  */
 
-public class ConsoleMouseListener implements MouseListener {
+class ConsoleMouseListener implements MouseListener {
   Console itsConsole;
   
   public ConsoleMouseListener(Console theConsole) {

@@ -58,15 +58,15 @@ class FtsPatcherCmd implements Command
 	    object.updateFtsObject(); //neede to update ins/outs and name
 	    object.eval(interp, body);
 
-	    // Run the after load init of the patcher
-
-	    object.loaded();
-
 	    // Set back the server to flushing if we are at the top of 
 	    // the stack
 
 	    if (FtsContainerObject.containerStack.empty())
-	      FtsServer.getServer().setFlushing(true);
+	      {
+		// Run the after load init of the top level patcher 
+		object.loaded();
+		FtsServer.getServer().setFlushing(true);
+	      }
 
 	    interp.setResult(ReflectObject.newInstance(interp, object));
 	  }

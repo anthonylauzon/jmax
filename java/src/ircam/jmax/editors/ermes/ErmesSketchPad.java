@@ -707,57 +707,6 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     return itsMessThread;
   }
 
-  //--------------------------------------------------------
-  //	InitFromDocument
-  //  create a sketchpad with data coming from a file
-  // N.B. the Document argument is maybe unneeded, 
-  // since it can be read in itsSketchWindow
-  //--------------------------------------------------------
-  public void InitFromDocument(ErmesPatcherDoc theDocument){
-	
-    FtsContainerObject aFtsPatcher = theDocument.GetFtsPatcher();
-    // chiama tanti AddObject...
-    Vector objectVector = aFtsPatcher.getObjects();	//usefull?
-    
-    FtsObject	fo;
-    FtsConnection fc;
-    ErmesObject aObject;
-    for (Enumeration e = objectVector.elements(); e.hasMoreElements();) {
-      fo = (FtsObject)e.nextElement();
-      // Note that the representation is now found from the fts className,
-      // made unique; the new file format will allow for specifing
-      // additional information, like a non default graphic representation
-      // the code will need a small change here
-
-      Class objectClass = itsHelper.SearchFtsName(fo.getClassName());
-      if (objectClass==null) continue; 
-      aObject = itsHelper.AddObject(objectClass, fo);
-
-      if (objectClass == ircam.jmax.editors.ermes.ErmesObjPatcher.class)
-	itsPatcherElements.addElement(aObject);
-
-      if (aObject != null) fo.setRepresentation(aObject);
-    }
-		
-    // chiama tanti AddConnection...
-    Vector connectionVector = aFtsPatcher.getConnections();	//usefull?
-    ErmesObject fromObj, toObj;
-    ErmesConnection aConnection = null;
-    
-    for (Enumeration e2 = connectionVector.elements(); e2.hasMoreElements();) {
-      fc = (FtsConnection)e2.nextElement();
-
-      // MDC: this test has been added to allow loading patches with errors
-      // in connections, so the debug can be done :->
-
-      if (fc.checkConsistency()){
-	fromObj = (ErmesObject) fc.getFrom().getRepresentation();
-	toObj = (ErmesObject) fc.getTo().getRepresentation();
-	aConnection = itsHelper.AddConnection(fromObj, toObj, fc.getFromOutlet(), fc.getToInlet(), fc);
-      }
-    }
-  }
-
   // note: the following function is a reduced version of InitFromFtsContainer.
   // better organization urges
   void PasteObjects(Vector objectVector, Vector connectionVector) {

@@ -25,7 +25,7 @@ import java.awt.event.*;
  * in the main Tcl interpreter.
  */
 
-public class ConsoleKeyListener implements KeyListener {
+class ConsoleKeyListener implements KeyListener {
   public static final int DELETE = 177;
   public static final int BACK_SPACE = 8;
   public StringBuffer sbuf;

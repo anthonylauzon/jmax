@@ -16,7 +16,6 @@ import tcl.lang.*;
 public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transferable{
   StringBuffer itsSbuf = new StringBuffer();
   Console itsConsole;
-  ConsoleDocument itsConsoleDocument = new ConsoleDocument(this);
   String itsCopiedText;
 
   public ConsoleWindow(Console theConsole, String theTitle) {
@@ -38,10 +37,6 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
   }
   
 
-  public MaxDocument GetDocument(){
-    return itsConsoleDocument;
-  }
-  
   public void SetupMenu(){
     GetCloseMenu().setEnabled(false);
     GetSaveMenu().setEnabled(false);

@@ -1,3 +1,13 @@
+Tue Mar 10 11:38:04 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Removed the MaxDocument interface, and removed the related functions
+	  and methods from ErmesPatcherDoc; remove the useless ConsoleDocument
+	  class.
+
+	* Removed sources of the old Project Manager, to simplify working
+	  with tag search and so on; added file project.save.tar to keep
+	  them for the moment.
+
 Thu Mar  5 12:37:19 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
 
 	* Added the FtsAsbstractContainer class and the FtsSelection class

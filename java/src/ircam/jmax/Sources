@@ -1,5 +1,4 @@
 SOURCES = MaxApplication.java \
-	  MaxDocument.java    \
           MaxEditor.java      \
           MaxWindow.java
 
