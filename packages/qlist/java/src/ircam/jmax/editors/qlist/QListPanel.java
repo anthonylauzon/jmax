@@ -221,6 +221,7 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner, Docume
   public void Set(){
     itsData.setValuesAsText(getText());
     fillContent(itsData);
+    itsData.getDocument().setSaved(false);
     changed = false;
   }
 
