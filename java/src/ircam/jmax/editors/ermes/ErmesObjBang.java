@@ -11,10 +11,11 @@ import ircam.jmax.utils.*;
 /**
  * The "bang" graphic object.
  */
-class ErmesObjBang extends ErmesObject /*implements ActionListener */{
+class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
 
   boolean itsFlashing = false;
   static Dimension preferredSize = new Dimension(20,20);
+  static Dimension minimumSize = new Dimension(15, 15);
   public MetaList itsDebugVariable;
 
   public ErmesObjBang(){
@@ -47,8 +48,20 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
     return true;
   }
 
+  
+  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
+    super.Init(theSketchPad, x, y, theString);
+    itsFtsObject.watch("value", this);
+    return true;
+  }
+  
+  public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
+    super.Init(theSketchPad, theFtsObject);
+    itsFtsObject.watch("value", this);
+    return true;
+  }
 
-  protected void FtsValueChanged(Object value) {
+  public void propertyChanged(FtsObject obj, String name, Object value) {
     int on_off = ((Integer) value).intValue();
     
     if (on_off == 1) {
@@ -60,15 +73,13 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
     Paint_specific(itsSketchPad.getGraphics());
   }
 	
-  public boolean NeedPropertyHandler(){
-    return true;
-  }
 
   public boolean isUIController() {
     return true;
   }
 
   public void Paint_specific(Graphics g) {
+    
     if (g == null) return;
     if(!itsFlashing){
       if(!itsSelected) g.setColor(itsUINormalColor);
@@ -88,28 +99,28 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
       g.fillRect(getItsX()+getItsWidth()-DRAG_DIMENSION,getItsY()+getItsHeight()-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
   }
 	
-  public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
-    if((getItsWidth()+theDeltaX < getMinimumSize().width)||
-       (getItsHeight()+theDeltaY < getMinimumSize().height))
-      return false;
-    else return true;
-  }
-  //resize to preferredSize()
   
   //--------------------------------------------------------
-  // minimumSize()
+  // minimum and preferred sizes
   //--------------------------------------------------------
   public Dimension getMinimumSize() {
-    return new Dimension(15,15); //(depending on the layout manager).
+    return minimumSize; 
   }
   
-  //If we don't specify this, the canvas might not show up at all
-  //(depending on the layout manager).
   public Dimension getPreferredSize() {
     return preferredSize;
   }
   
 }
+
+
+
+
+
+
+
+
+
 
 
 

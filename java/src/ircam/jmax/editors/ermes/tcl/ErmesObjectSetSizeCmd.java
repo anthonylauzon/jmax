@@ -35,7 +35,7 @@ class ErmesObjectSetSizeCmd implements Command
 	int width  = TclInteger.get(interp, argv[2]);
 	int height = TclInteger.get(interp, argv[3]);
 	
-	if(aObject.IsResizeTextCompat(width, height)) 
+	if(aObject.canResizeBy(width, height)) 
 	  aObject.Resize(width - aObject.getItsWidth(), height - aObject.getItsHeight());
 	else 
 	  aObject.ResizeToText(width - aObject.getItsWidth(), height - aObject.getItsHeight());

@@ -1233,7 +1233,7 @@ Rectangle previousResizeRect = new Rectangle();
     ErmesObject aObject;
     for (Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
       aObject = (ErmesObject) e.nextElement();
-      if(aObject.IsResizeTextCompat(x_amount, y_amount)) aObject.Resize(x_amount, y_amount);
+      if(aObject.canResizeBy(x_amount, y_amount)) aObject.Resize(x_amount, y_amount);
       else aObject.ResizeToText(x_amount, y_amount);
     }
     repaint();

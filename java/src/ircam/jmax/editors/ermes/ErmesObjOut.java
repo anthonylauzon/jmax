@@ -11,11 +11,11 @@ import ircam.jmax.fts.*;
 class ErmesObjOut extends ErmesObject {
 
   static Dimension preferredSize = new Dimension(20, 20);
+  static Dimension minimumSize = new Dimension(15,15); 
   int itsId;
 
   public ErmesObjOut(){
     super();
-    //setLayout(null);
   }
 	
   //--------------------------------------------------------
@@ -24,27 +24,16 @@ class ErmesObjOut extends ErmesObject {
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
     Dimension d = getPreferredSize();
 
-    // warning.. it seems that when the height is 0, 
-    // the value is null, instead of new Integer(0)
 
-    /*Integer aInteger = ((Integer)theFtsObject.get("h"));
-      currentRect = new Rectangle(((Integer)theFtsObject.get("x")).intValue(),
-      ((Integer)theFtsObject.get("y")).intValue(),
-      ((Integer)theFtsObject.get("w")).intValue(),
-      (aInteger == null)?preferredSize.height:
-      ((Integer)theFtsObject.get("h")).intValue());*/
-    
-    //currentRect = new Rectangle(x, y, d.width, d.height);
     itsId = ((FtsOutletObject) theFtsObject).getPosition();
 
     super.Init(theSketchPad, theFtsObject); 
-    //theSketchPad.PrepareOutChoice();
 	
     return true;
   }
 
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-    //the sketchPad represents a subpatcher. 
+
     //We need here the information about the maximum number of inlets
   	
     itsSketchPad = theSketchPad;
@@ -57,12 +46,10 @@ class ErmesObjOut extends ErmesObject {
     else itsId = temp-1;
     super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
 
-    //theSketchPad.PrepareOutChoice();
 	
     return true;
   }
 	
-  // starting of the graphic/FTS mix
 
   public void makeFtsObject()
   {
@@ -130,20 +117,11 @@ class ErmesObjOut extends ErmesObject {
   // minimumSize()
   //--------------------------------------------------------
   public Dimension getMinimumSize() {
-    return new Dimension(15,15); //(depending on the layout manager).
+    return minimumSize;
   }
 
-  //If we don't specify this, the canvas might not show up at all
-  //(depending on the layout manager).
   public Dimension getPreferredSize() {
     return preferredSize;
-  }
-  
-  public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
-    if((getItsWidth()+theDeltaX < getMinimumSize().width)||
-       (getItsHeight()+theDeltaY < getMinimumSize().height))
-      return false;
-    else return true;
   }
   
   public void ResizeToText(int theDeltaX, int theDeltaY){

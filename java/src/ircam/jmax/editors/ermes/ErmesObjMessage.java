@@ -8,7 +8,7 @@ import ircam.jmax.fts.*;
 /**
  * The "message box" graphic object.
  */
-class ErmesObjMessage extends ErmesObjEditableObject {
+class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandler{
   boolean itsFlashing = false;
   //--------------------------------------------------------
   // CONSTRUCTOR
@@ -18,6 +18,12 @@ class ErmesObjMessage extends ErmesObjEditableObject {
   }
 	
 	
+  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
+    super.Init(theSketchPad, x, y, theString);
+    itsFtsObject.watch("value", this);
+    return true;
+  }
+
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
     // Added by MDC; get the correct String from the object, and then call super
     // It is needed because ErmesObjExternal and ErmesObjMessage use different methods
@@ -25,8 +31,9 @@ class ErmesObjMessage extends ErmesObjEditableObject {
 
     itsArgs = (String) theFtsObject.get("value");
     super.Init(theSketchPad,  theFtsObject);
+    itsFtsObject.watch("value", this);
     ParseText(itsArgs);
-    if(!IsResizeTextCompat(0,0)) RestoreDimensions(false);
+    if(!canResizeBy(0,0)) RestoreDimensions(false);
     return true;  
   }
 
@@ -34,7 +41,6 @@ class ErmesObjMessage extends ErmesObjEditableObject {
 	
   //--------------------------------------------------------
   // makeFtsObject, redefineFtsObject
-  // starting of the graphic/FTS mix
   //--------------------------------------------------------
 
   public void makeFtsObject()
@@ -60,18 +66,14 @@ class ErmesObjMessage extends ErmesObjEditableObject {
   // application layer take care of converting the message text to the
   // "value" property; it is an hack, should be done more cleanly.
 
-  protected void FtsValueChanged(Object value) {
+  public void propertyChanged(FtsObject obj, String name, Object value) {
     itsArgs = (String) value;
     ParseText(itsArgs);
-    if (!IsResizeTextCompat(0, 0)) {
+    if (!canResizeBy(0, 0)) {
       ResizeToText(0,0);
       itsSketchPad.repaint();
     }
     else Paint(itsSketchPad.getGraphics());
-  }
-
-  public boolean NeedPropertyHandler(){
-    return true;
   }
 
   public boolean isUIController() {
@@ -143,7 +145,6 @@ class ErmesObjMessage extends ErmesObjEditableObject {
     g.setFont(getFont());
     DrawParsedString(g);
   }
-
 }
 
 

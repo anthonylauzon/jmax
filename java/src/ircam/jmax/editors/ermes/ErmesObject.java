@@ -17,10 +17,10 @@ import ircam.jmax.utils.GlobalProbe;
  * - create fos objects, change the value when the FTS value
  *   has changed (services to FTS), redefine itself.
  * - sending values when the user interact with the object
- * - calling the project manager to open the associated editor 
+ * - handle the object with data and open the associated editor 
  *   (example: subpatchers, table, etc.)
  */
-public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable {
+abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
 
   private int itsX, itsY;
   int itsInitX, itsInitY;
@@ -34,12 +34,12 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
   final static int PADS_DISTANCE = 12;
   static final int DRAG_DIMENSION = 4;
   boolean	absolutePainting = false;
-  boolean updated = false; ///////////////fast & furious synchronization
+  boolean updated = false;
   boolean itsDragging = false;
   private Font itsFont = null;
   FontMetrics itsFontMetrics = null;
   private int itsJustification = ErmesSketchPad.CENTER_JUSTIFICATION;
-  //#@!boolean itsResized = false;
+
   static Color itsUINormalColor = new Color(153, 204, 255);
   static Color itsUISelectedColor = new Color(51, 153, 204);
   static Color itsLangNormalColor = new Color(153, 204, 204);
@@ -61,7 +61,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
   }
 
   public void setItsX(int theX) {
-    if (theX == 0) (new Throwable()).printStackTrace();
+    
     itsX = theX;
     itsFtsObject.put("x", itsX);
   }
@@ -139,24 +139,16 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     }
   }
 
-  Dimension getPreferredSize() {return new Dimension(0,0);};
-  Dimension getMinimumSize() {return new Dimension(0,0);};
+  abstract Dimension getPreferredSize();
+  abstract Dimension getMinimumSize();
   
   final ErmesSketchWindow GetSketchWindow() {
 
     return (ErmesSketchWindow)(itsSketchPad.itsSketchWindow);
   }
-  //
-  public void propertyChanged(FtsObject obj, String name, Object value) {
-    //the ipothesys is that value is of the correct type...
-    FtsValueChanged(value);
-  }
 
-  protected void FtsValueChanged(Object value) {
-    // do nothing
-  }
-  
-  protected void Paint_specific(Graphics g) {}  
+  abstract protected void Paint_specific(Graphics g);
+
   public boolean MouseDown_specific(MouseEvent e, int x, int y) {return true;};  
   public void setJustification(int theJustification) {
     itsJustification = theJustification;
@@ -169,41 +161,10 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
 
   void ResizeToNewFont(Font itsFont) {setDirty(false);}
   
-  public void Repaint()
-  {
-    Update(itsSketchPad.GetOffGraphics());
-  }
-  
-  public void Update(Graphics g) {
-    if(!itsSketchPad.itsGraphicsOn)return;
-    g.setColor(itsSketchPad.getBackground());
-    g.fillRect(itsX, itsY, currentRect.width, currentRect.height);
-    Paint(g);
-  }
-  
   public void UpdateOnly(Graphics g) {
     if(!itsSketchPad.itsGraphicsOn)return;
     g.setColor(itsSketchPad.getBackground());
     g.fillRect(itsX, itsY, currentRect.width, currentRect.height);
-  }
-
-
-  /**
-   * a method to paint the object AND its inlet/outlet
-   * on and off screen
-   */
-  public void PaintComplete() {
-    DoublePaint();
-    ErmesObjInlet aInlet;
-    ErmesObjOutlet aOutlet;
-    for (int i=0; i<itsInletList.size();i++) {
-      aInlet = (ErmesObjInlet) itsInletList.elementAt(i);
-      aInlet.DoublePaint();
-    }
-    for (int i=0; i<itsOutletList.size();i++) {
-      aOutlet = (ErmesObjOutlet) itsOutletList.elementAt(i);
-      aOutlet.DoublePaint();
-    }
   }
 
   public  void Paint(Graphics g)
@@ -215,10 +176,6 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
       itsSketchPad.drawPending = true;
     }
     else Paint_specific(g);
-    /*old code
-      if(!itsSketchPad.itsGraphicsOn)return;
-      else Paint_specific(g);
-      */
   }
 
 
@@ -340,18 +297,8 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
       }
     }
    
-    //prepare to be waked up when values change
-    if(NeedPropertyHandler()){
-      itsFtsObject.watch("value", this);
-    }
-
-    //if (offGraphics!=null) PaintComplete();
   }
   
-  public boolean NeedPropertyHandler(){
-    return false;
-  }
-
   public boolean isUIController() {
     return false;
   }
@@ -380,7 +327,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     return true;
   }
 
-  public void makeFtsObject() {  }
+  abstract public void makeFtsObject();
   public void redefineFtsObject() {  }
   
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
@@ -580,11 +527,11 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
 	
       }
       else if(itsSketchPad.itsResizeMode == itsSketchPad.HORIZONTAL_RESIZING){
-	if(IsResizeTextCompat(x-itsInitX, 0)) Resize(x-itsInitX, 0);
+	if(canResizeBy(x-itsInitX, 0)) Resize(x-itsInitX, 0);
 	else ResizeToText(x-itsInitX, 0);
       }
       else if(itsSketchPad.itsResizeMode == itsSketchPad.VERTICAL_RESIZING){
-	if(IsResizeTextCompat(0, y-itsInitY)) Resize(0, y-itsInitY);
+	if(canResizeBy(0, y-itsInitY)) Resize(0, y-itsInitY);
 	else ResizeToText(0, y-itsInitY);
       }
       itsDragging = false;
@@ -609,9 +556,11 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     setDirty(false);
   };
   
-  public boolean IsResizeTextCompat(int x, int y){
-    return true;
+  public boolean canResizeBy(int theDeltaX, int theDeltaY){
+    return ((getItsWidth()+theDeltaX >= getMinimumSize().width) &&
+	    (getItsHeight()+theDeltaY >= getMinimumSize().height));
   }
+  
 	
   public void SetInitDrag(int theX, int theY){
     itsInitX = currentRect.x+currentRect.width;//favanga n.s.
@@ -692,9 +641,6 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
 	
   public Dimension Size() {
     return (new Dimension(currentRect.width, currentRect.height));
-  }
-
-  void RunModeSetted(){
   }
 
 }

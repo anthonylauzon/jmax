@@ -10,22 +10,16 @@ import ircam.jmax.utils.*;
 /**
  * The "toggle" graphic object.
  */
-class ErmesObjToggle extends ErmesObject {
+class ErmesObjToggle extends ErmesObject implements FtsPropertyHandler{
   boolean itsToggled = false;
   static Dimension preferredSize = new Dimension(20,20);
+  static Dimension minimumSize = new Dimension(15, 15);
   static Color itsCrossColor = new Color(0, 0, 128);
 
   public ErmesObjToggle(){
     super();
   }
   
-  
-  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-    super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
-    return true;
-  }
-  
-  // starting of the graphic/FTS mix
   
   public void makeFtsObject()
   {
@@ -48,26 +42,33 @@ class ErmesObjToggle extends ErmesObject {
     if (itsSketchPad.itsRunMode || evt.isControlDown()) {
       itsToggled = !itsToggled;
       itsFtsObject.put("value", (itsToggled?1:0));
-      //((FtsInteger) itsFtsActive).setValue(itsToggled?1:0);	//ENZOOOOO
-      DoublePaint();
+
+      DoublePaint(); //!@#
     }
     else 
       itsSketchPad.ClickOnObject(this, evt, x, y);
     return true;
   }
 
-  protected void FtsValueChanged(Object value) {
+  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
+    super.Init(theSketchPad, x, y, theString);
+    itsFtsObject.watch("value", this);
+    return true;
+  }
+  
+  public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
+    super.Init(theSketchPad, theFtsObject);
+    itsFtsObject.watch("value", this);
+    return true;
+  }
+
+  public void propertyChanged(FtsObject obj, String name, Object value) {
     // toggle the toggle
     boolean temp = (((Integer)value).intValue() == 1);
     if (itsToggled != temp) {
       itsToggled = temp;	
-      //DoublePaint();
       Paint_specific(itsSketchPad.getGraphics());
     }
-  }
-
-  public boolean NeedPropertyHandler(){
-    return true;
   }
 
   public boolean isUIController() {
@@ -76,8 +77,8 @@ class ErmesObjToggle extends ErmesObject {
 
   public void Paint_specific(Graphics g) {
     if (g == null) return;
-    if(!itsSelected) g.setColor(itsUINormalColor/*Color.lightGray*/);
-    else g.setColor(itsUISelectedColor/*Color.gray*/);
+    if(!itsSelected) g.setColor(itsUINormalColor);
+    else g.setColor(itsUISelectedColor);
     g.fillRect(getItsX()+1,getItsY()+1, getItsWidth()-2,  getItsHeight()-2);
     g.fill3DRect(getItsX()+2,getItsY()+2, getItsWidth()-4,  getItsHeight()-4, true);
     g.setColor(Color.black);
@@ -92,23 +93,19 @@ class ErmesObjToggle extends ErmesObject {
        g.fillRect(getItsX()+getItsWidth()-DRAG_DIMENSION,getItsY()+getItsHeight()-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
   }
 
-  public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
-    if((getItsWidth()+theDeltaX < getMinimumSize().width)||
-       (getItsHeight()+theDeltaY < getMinimumSize().height))
-      return false;
-    else return true;
-  }
-  
   //--------------------------------------------------------
-  // minimumSize()
+  // minimum & preferred sizes
   //--------------------------------------------------------
   public Dimension getMinimumSize() {
-    return new Dimension(15,15); //(depending on the layout manager).
+    return minimumSize; 
   }
 
-  //If we don't specify this, the canvas might not show up at all
-  //(depending on the layout manager).
   public Dimension getPreferredSize() {
     return preferredSize;
   }
 }
+
+
+
+
+

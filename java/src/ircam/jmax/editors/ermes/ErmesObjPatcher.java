@@ -14,7 +14,6 @@ import ircam.jmax.editors.ermes.*;
 
 public class ErmesObjPatcher extends ErmesObjEditableObject {
 
-  //old variable set 
   String itsNameString = new String();
   public ErmesSketchWindow itsSubWindow = null;
   Dimension preferredSize = new Dimension(80,24);
@@ -39,11 +38,9 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
     Resize(0, itsFontMetrics.getHeight()+2*HEIGHT_DIFF-getItsHeight());
     ParseText(itsArgs);
     
-    //#@!if(!itsResized){
-      if(!IsResizeTextCompat(0,0)) RestoreDimensions();
-      //#@!}
+    if(!canResizeBy(0,0)) RestoreDimensions();
     
-    return true;		// Why this method return a value ????
+    return true;
   }
 
   public boolean IsResizedObject(int theWidth){
@@ -51,7 +48,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 			    (itsInletList.size())*12, (itsOutletList.size())*12));
   }
 
-  // starting of the graphic/FTS mix
+
   // temporary, should probabily change
 
   public void makeFtsObject()
@@ -71,17 +68,6 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 	// ENZO !!!! AIUTO :->
 	System.out.println("Error in Object Instantiation");
       }
-  }
-
-  public void RestartEditing() { //extends ErmesObjEditableObject.RestartEditing()
-    //    if(itsSubWindow != null){
-    // GetSketchWindow().CreateFtsGraphics(itsSubWindow);
-      //itsSubWindow.dispose();
-      //itsSubWindow = null;
-      //itsSubWindow.setVisible(false);
-    // }
-
-    super.RestartEditing();
   }
 
   public void redefineFtsObject()
@@ -114,22 +100,6 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   public String GetPath(){
     return pathForLoading;
   }
-	
-  //--------------------------------------------------------
-  // SetDimension
-  //--------------------------------------------------------
-  /* private Dimension SetDimension(String theString){
-    int lenght = itsFontMetrics.stringWidth(theString);
-    Dimension d1 = getMinimumSize();
-    d1.width = MaxWidth(itsFontMetrics.stringWidth(theString)+32,
-			    (itsInletList.size())*12, (itsOutletList.size())*12, d1.width);
-    int height = itsFontMetrics.getHeight();
-    if(d1.height< height+10) d1.height = height+10;
-    
-    Resize1(d1.width, d1.height);
-    itsSketchPad.validate();
-    return d1;
-  }*/
 	
   public int MaxWidth(int uno, int due, int tre, int quattro){
     int MaxInt = uno;
@@ -200,7 +170,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 
 
     g.setFont(getFont());
-    g.drawString(itsArgs, getItsX()+getItsHeight()/2+5/*(currentRect.width-itsFontMetrics.stringWidth(itsArgs))/2*/,getItsY()+itsFontMetrics.getAscent()+(getItsHeight()-itsFontMetrics.getHeight())/2);		
+    g.drawString(itsArgs, getItsX()+getItsHeight()/2+5,getItsY()+itsFontMetrics.getAscent()+(getItsHeight()-itsFontMetrics.getHeight())/2);		
     
     g.setColor(Color.black);
     if(!itsSketchPad.itsRunMode) 
@@ -208,11 +178,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   }
 	
   void ResizeToNewFont(Font theFont) {
-    //#@!if(!itsResized){
-    //#@!Resize(itsFontMetrics.stringWidth(itsMaxString)/*+32*/+(itsFontMetrics.getHeight()+10)/2+5+5 - currentRect.width,
-    //#@!    itsFontMetrics.getHeight() + 10 - currentRect.height);
-      //#@!}
-    /*#@!else*/ ResizeToText(0,0);
+    ResizeToText(0,0);
   }
 	
   public void ResizeToText(int theDeltaX, int theDeltaY){
@@ -220,37 +186,24 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
     int aHeight = getItsHeight()+theDeltaY;
     if(aHeight<itsFontMetrics.getHeight() + 10) 
       aHeight = itsFontMetrics.getHeight() + 10;
-    if(aWidth<itsFontMetrics.stringWidth(itsMaxString) + /*32*/aHeight/2+5+5) 
-      aWidth = itsFontMetrics.stringWidth(itsMaxString) + /*32*/aHeight/2+5+5;
+    if(aWidth<itsFontMetrics.stringWidth(itsMaxString) + aHeight/2+5+5) 
+      aWidth = itsFontMetrics.stringWidth(itsMaxString) + aHeight/2+5+5;
     Resize(aWidth-getItsWidth(), aHeight-getItsHeight());
   }
   
-  public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
-    if((getItsWidth()+theDeltaX < itsFontMetrics.stringWidth(itsMaxString)/*+32*/+getItsHeight()/2+5+5)||(getItsHeight()+theDeltaY<itsFontMetrics.getHeight() + 10))
+  public boolean canResizeBy(int theDeltaX, int theDeltaY){
+    if((getItsWidth()+theDeltaX < itsFontMetrics.stringWidth(itsMaxString)+getItsHeight()/2+5+5)||(getItsHeight()+theDeltaY<itsFontMetrics.getHeight() + 10))
       return false;
     else return true;
   }
 
   public void RestoreDimensions(){
 
-    int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsMaxString)+/*2*WIDTH_DIFF+10*/(itsFontMetrics.getHeight()+10)/2+5+5,(itsInletList.size())*12, (itsOutletList.size())*12);
+    int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsMaxString)+(itsFontMetrics.getHeight()+10)/2+5+5,(itsInletList.size())*12, (itsOutletList.size())*12);
     Resize(aMaxWidth-getItsWidth(), itsFontMetrics.getHeight() + 10 - getItsHeight());
     itsSketchPad.repaint();
   }
 
-    //--------------------------------------------------------
-  // resize
-  //--------------------------------------------------------
-  /*public void setSize(int theH, int theV) {
-    
-    Resize1(theH, theV);
-    if (itsSketchPad != null) itsSketchPad.repaint();
-  }
-  
-  public void setSize(Dimension d) {
-    setSize(d.width, d.height);
-  }*/
- 
 }
 
 

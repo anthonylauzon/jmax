@@ -40,9 +40,9 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     if (theFtsObject instanceof FtsContainerObject)
       this.YouArePatcher(true);
     ParseText(itsArgs);
-    if(!IsResizeTextCompat(0,0)) RestoreDimensions(false);
+    if(!canResizeBy(0,0)) RestoreDimensions(false);
 
-    return true;		// Why this method return a value ????
+    return true;
   }
 
   public void YouArePatcher(boolean what) {
@@ -56,7 +56,6 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 
   //--------------------------------------------------------
   // makeFtsObject and redefineFtsObject() 
-  // starting of the graphic/FTS mix
   //--------------------------------------------------------
 
   public void makeFtsObject()

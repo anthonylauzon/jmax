@@ -9,9 +9,10 @@ import ircam.jmax.fts.*;
  * The graphic inlet contained in subpatchers
  */
 class ErmesObjIn extends ErmesObject {
+  static Dimension minimumSize = new Dimension(15, 15);
   static Dimension preferredSize = new Dimension(20, 20);
+  Dimension textDimensions = new Dimension();
   int itsId;
-  //static ErmesObjInOutChoice inOutChoice = null;
   
   public ErmesObjIn(){
     super();
@@ -23,27 +24,14 @@ class ErmesObjIn extends ErmesObject {
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
     Dimension d = getPreferredSize();
 
-    // warning.. it seems that when the height is 0, 
-    // the value is null, instead of new Integer(0)
-    /*Integer aInteger = ((Integer)theFtsObject.get("h"));
-      currentRect = new Rectangle(((Integer)theFtsObject.get("x")).intValue(),
-      ((Integer)theFtsObject.get("y")).intValue(),
-      ((Integer)theFtsObject.get("w")).intValue(),
-      (aInteger == null)?preferredSize.height:
-      ((Integer)theFtsObject.get("h")).intValue());*/
-    
-    //currentRect = new Rectangle(x, y, d.width, d.height);
     itsId = ((FtsInletObject) theFtsObject).getPosition();
 
     super.Init(theSketchPad, theFtsObject); 
 
-    //theSketchPad.PrepareInChoice();
-	
     return true;
   }
 
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-  //the sketchPad represents a subpatcher. 
   //We need here the information about the maximum number of inlets
   	
     itsSketchPad = theSketchPad;
@@ -66,12 +54,10 @@ class ErmesObjIn extends ErmesObject {
     super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
 
 
-    //theSketchPad.PrepareInChoice();
     
     return true;
   }
 	
-  // starting of the graphic/FTS mix
 
   public void makeFtsObject()
   {
@@ -96,9 +82,8 @@ class ErmesObjIn extends ErmesObject {
   
   
   public void Paint_specific(Graphics g) {
-  	//you want to create a Dimension each Paint?
-  	Dimension textDimensions = new Dimension(itsFontMetrics.stringWidth(""+(itsId+1)),
-  										 itsFontMetrics.getHeight());	
+  	
+  	textDimensions.setSize(itsFontMetrics.stringWidth(""+(itsId+1)), itsFontMetrics.getHeight());	
 	  	
     if(!itsSelected) g.setColor(itsLangNormalColor);
     else g.setColor(itsLangSelectedColor);
@@ -140,24 +125,15 @@ class ErmesObjIn extends ErmesObject {
   }
 	
     //--------------------------------------------------------
-	// minimumSize()
+    //minimum and preferred sizes
     //--------------------------------------------------------
     public Dimension getMinimumSize() {
-      return new Dimension(15,15); //(depending on the layout manager).
+      return minimumSize;
     }
 
-    //If we don't specify this, the canvas might not show up at all
-    //(depending on the layout manager).
     public Dimension getPreferredSize() {
         return preferredSize;
     }
-
-  public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
-    if((getItsWidth()+theDeltaX < getMinimumSize().width)||
-       (getItsHeight()+theDeltaY < getMinimumSize().height))
-      return false;
-    else return true;
-  }
 
   public void ResizeToText(int theDeltaX, int theDeltaY){
     int aWidth = getItsWidth()+theDeltaX;
@@ -168,6 +144,10 @@ class ErmesObjIn extends ErmesObject {
   }
   
 }
+
+
+
+
 
 
 

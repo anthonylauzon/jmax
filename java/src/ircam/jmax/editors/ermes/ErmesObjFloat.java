@@ -9,7 +9,7 @@ import ircam.jmax.fts.*;
 /**
  * The graphic "float box" object.
  */
-class ErmesObjFloat extends ErmesObject {
+class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler{
 	
   float itsFloat =  (float) 0.;
   static ErmesObjFloatDialog itsFloatDialog = null;
@@ -25,9 +25,6 @@ class ErmesObjFloat extends ErmesObject {
   float velocity;
   float previousVelocity;
   int previousY;
-
-  /* single-digit positioning */
-  int digit=2;
 
   int itsFirstY;
   boolean firstClick = true;
@@ -51,23 +48,29 @@ class ErmesObjFloat extends ErmesObject {
     preferredSize.height = DEFAULT_HEIGHT+4;
     preferredSize.width = DEFAULT_WIDTH+17;
     super.Init(theSketchPad, x, y, theString);
+    itsFtsObject.watch("value", this);
     return true;
   }
   
   public boolean Init(ErmesSketchPad theSketchPad,FtsObject theFtsObject) {
     super.Init(theSketchPad, theFtsObject);
-    
+    itsFtsObject.watch("value", this);
+
     itsFloat = ((Float)theFtsObject.get("value")).floatValue();
+
     DEFAULT_HEIGHT = itsFontMetrics.getHeight();
     DEFAULT_WIDTH = itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("...");
+
     if(getItsHeight()<DEFAULT_HEIGHT+4) {
       preferredSize.height = DEFAULT_HEIGHT+4;
       Resize(0, getPreferredSize().height - getItsHeight());
     }
+
     if(getItsWidth()<DEFAULT_WIDTH+17){
       preferredSize.width = DEFAULT_WIDTH+17;
       setItsWidth(preferredSize.width);
     }
+
     return true;
   }
   
@@ -94,13 +97,13 @@ class ErmesObjFloat extends ErmesObject {
   }
   
   //--------------------------------------------------------
-  // FtsValueChanged
+  // propertyChanged
   // callback function from the associated FtsObject in FTS
   //--------------------------------------------------------
-  protected void FtsValueChanged(Object value) {
+  public void propertyChanged(FtsObject obj, String name, Object value) {
     
     itsFloat = ((Float) value).floatValue();
-    //DoublePaint();
+
     Paint_specific(itsSketchPad.getGraphics());
   }
 	
@@ -135,7 +138,7 @@ class ErmesObjFloat extends ErmesObject {
     Resize(aWidth-getItsWidth(), aHeight-getItsHeight());
   }
 	
-  public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
+  public boolean canResizeBy(int theDeltaX, int theDeltaY){
     if((getItsWidth()+theDeltaX < getItsHeight()/2+17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("..."))||(getItsHeight()+theDeltaY<itsFontMetrics.getHeight()+4))
       return false;
     else return true;
@@ -225,10 +228,6 @@ class ErmesObjFloat extends ErmesObject {
     else return false;
   }
 
-  public boolean NeedPropertyHandler(){
-    return true;
-  }
-
   public boolean isUIController() {
     return true;
   }
@@ -274,19 +273,6 @@ class ErmesObjFloat extends ErmesObject {
     g.setColor(Color.black);
     
     g.drawString(aString, getItsX()+getItsHeight()/2+5,getItsY()+itsFontMetrics.getAscent()+(getItsHeight()-itsFontMetrics.getHeight())/2+1);
-
-    /*----------------------                                     */
-    /* draw the "underline"                                      */ 
-    /* just erase what follows in order to get the old situation */
-    //int v = itsY+itsFontMetrics.getAscent()+(currentRect.height-itsFontMetrics.getHeight())/2+3;
-    //vai col mango: cerchiamo di mettere un underline sotto la "digit" cifra.
-    //una alternativa: scrivere in bold quella cifra (spezzare la stringa da scrivere in tre: pre, bold, post. Problem:
-    //Salterebbero tutti i calcoli basati sul fontMetrics... no
-    
-    //int h =; 
-
-    //g.drawLine(itsX+currentRect.height/2+5+itsFontMetrics.stringWidth("0")*digit, v, itsX+currentRect.height/2+5+itsFontMetrics.stringWidth("0")*(digit+1), v);
-    /*----------------------*/
 
     if(!itsSketchPad.itsRunMode)
       g.fillRect(getItsX()+getItsWidth()-DRAG_DIMENSION,getItsY()+getItsHeight()-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);

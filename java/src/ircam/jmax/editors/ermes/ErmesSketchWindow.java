@@ -26,7 +26,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
   public void propertyChanged(FtsObject object, String name, Object value)
   {
-    //    System.err.println("cambiata la proprieta' "+name);
+
     if (name.equals("ins"))
       {
 	// A patcher has been redefined
@@ -120,18 +120,14 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   //public String itsTitle;
   public MaxDocument itsDocument;
 
-  // the MaxDataEditor interface: Please implement me :->
-
 
   public void reEdit() {
     setVisible(true);
     toFront();
-    //ErmesSketchPad.RequestOffScreen(itsSketchPad);
   }
 
 
   public void quitEdit() {
-    /* No confirmation should be asked here !!! */
 
     itsPatcher.close();
     Destroy();
@@ -145,7 +141,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
   public void syncData()
   {
-    //2705 CreateFtsGraphics(this);
   }
 
   /** Tell the editor the data has changed; it pass a sigle Java
@@ -227,7 +222,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   }
 
   int horizontalOffset() {
-    //sketchPad is not there yet, and we have no time for the release.
     //    return 20+itsSketchPad.getLocation().x; //the size of the sketch
     return 40;
   }
@@ -1093,10 +1087,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     else setBackground(ErmesSketchPad.sketchColor);
     
     itsSketchPad.SetRunMode(theRunMode);
-    for(Enumeration en1 = itsSketchPad.itsElements.elements(); en1.hasMoreElements();) {
-      aObject = (ErmesObject)en1.nextElement();
-      aObject.RunModeSetted();
-    }
+    
     itsToolBar.setRunMode(theRunMode);
     aSelectAllItem.setEnabled(!theRunMode);
 
@@ -1117,45 +1108,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   public Dimension getPreferredSize() {
       return preferredsize;
   }
-
-  /*2705 public void CreateFtsGraphics(ErmesSketchWindow theSketchWindow)
-    {
-    //create the graphic descriptions for the FtsObjects, before saving them
-    ErmesObject aErmesObject = null;
-    FtsObject aFObject = null;
-    Rectangle aRect = theSketchWindow.getBounds();
-    Rectangle aRect1 = theSketchWindow.getContentPane().getBounds();//e.m.1103
-    //String ermesInfo = new String();
-    theSketchWindow.itsPatcher.put("wx", aRect.x);
-    theSketchWindow.itsPatcher.put("wy", aRect.y);
-    theSketchWindow.itsPatcher.put("ww", aRect.width-horizontalOffset());//e.m.1103
-    theSketchWindow.itsPatcher.put("wh", aRect.height-verticalOffset());//e.m.1103
-      
-    for (Enumeration e=theSketchWindow.itsSketchPad.itsElements.elements(); e.hasMoreElements();) {
-    aErmesObject = (ErmesObject) e.nextElement();
-    aFObject = aErmesObject.itsFtsObject;
-    if (aFObject == null) continue; //security check!           
-    // Set geometrical properties
-    
-    aFObject.put("x", aErmesObject.getItsX());
-    aFObject.put("y", aErmesObject.getItsY());
-    aFObject.put("w", aErmesObject.getItsWidth());
-    aFObject.put("h", aErmesObject.getItsHeight());
-    
-    // Set the font properties
-    if (!aErmesObject.getFont().getName().equals(theSketchWindow.itsSketchPad.sketchFont.getName()))
-    aFObject.put("font", aErmesObject.getFont().getName());
-    
-    if (aErmesObject.getFont().getSize() != theSketchWindow.itsSketchPad.sketchFont.getSize())
-      aFObject.put("fs", aErmesObject.getFont().getSize());
-      
-      
-      // if (aErmesObject.itsJustification != itsSketchPad.itsJustificationMode)
-      //aFObject.put("jsf", aErmesObject.itsJustification);
-      //moved to putOtherProperties
-      
-      aErmesObject.putOtherProperties(aFObject);
-      }*/
 }
 
 

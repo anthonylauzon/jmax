@@ -9,7 +9,7 @@ import ircam.jmax.*;
 /**
  * The "integer box" graphic object.
  */
-class ErmesObjInt extends ErmesObject {
+class ErmesObjInt extends ErmesObject implements FtsPropertyHandler{
   
   ErmesObjInlet itsInlet;
   ErmesObjOutlet itsOutlet;
@@ -35,10 +35,8 @@ class ErmesObjInt extends ErmesObject {
   public ErmesObjInt(){
     super();
     transmission_buffer = new int[TRUST];
-    //setLayout(null);
   }
 	
-  // WARNING!! this Init must set the integer value coming in theString?
   //--------------------------------------------------------
   // init
   //--------------------------------------------------------
@@ -49,11 +47,13 @@ class ErmesObjInt extends ErmesObject {
     preferredSize.height = DEFAULT_HEIGHT+4;
     preferredSize.width = DEFAULT_WIDTH+17;
     super.Init(theSketchPad, x, y, theString);
+    itsFtsObject.watch("value", this);
     return true;
   }
 
    public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
      super.Init(theSketchPad,  theFtsObject);
+     itsFtsObject.watch("value", this);
 
      itsInteger = ((Integer)theFtsObject.get("value")).intValue();
      DEFAULT_HEIGHT = itsFontMetrics.getHeight();
@@ -92,10 +92,10 @@ class ErmesObjInt extends ErmesObject {
   }
   
   //--------------------------------------------------------
-  // FtsValueChanged
+  // propertyChanged
   // callback function from the associated FtsObject in FTS
   //--------------------------------------------------------
-  protected void FtsValueChanged(Object value) {
+  public void propertyChanged(FtsObject obj, String name, Object value) {
     
     int temp = ((Integer) value).intValue();
     
@@ -128,10 +128,7 @@ class ErmesObjInt extends ErmesObject {
   }
   
   void ResizeToNewFont(Font theFont){
-    //#@!if(!itsResized){
       Resize(17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("..")-getItsWidth(),itsFontMetrics.getHeight()+4-getItsHeight());
-      //#@!}
-      //#@!else ResizeToText(0,0);
   }
   
   public void ResizeToText(int theDeltaX, int theDeltaY){
@@ -150,7 +147,7 @@ class ErmesObjInt extends ErmesObject {
     Resize(aWidth-getItsWidth(), aHeight-getItsHeight());
   }
 
-  public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
+  public boolean canResizeBy(int theDeltaX, int theDeltaY){
     if((getItsWidth()+theDeltaX < getItsHeight()/2 +17+itsFontMetrics.stringWidth("0"))||(getItsHeight()+theDeltaY<itsFontMetrics.getHeight() + 4))
       return false;
     else return true;
@@ -211,7 +208,7 @@ class ErmesObjInt extends ErmesObject {
   public boolean MouseUp(MouseEvent evt,int x, int y) {
     if(itsSketchPad.itsRunMode || evt.isControlDown()){
       Fts.getServer().syncToFts();
-      //itsMovingThrottle = false;
+
       DoublePaint();
       return true;
     }

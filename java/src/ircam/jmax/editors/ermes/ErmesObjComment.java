@@ -62,11 +62,10 @@ class ErmesObjComment extends ErmesObject {
     itsSketchPad.GetTextArea().setBackground(Color.white);
     
     ParseText(itsArgs);
-    /*#@!if(!itsResized)*/ RestoreDimensions();    
+    RestoreDimensions();    
     return true;
   }
 	
-  // starting of the graphic/FTS mix
 
   public void makeFtsObject(){
     try
@@ -84,15 +83,10 @@ class ErmesObjComment extends ErmesObject {
     ((FtsCommentObject)itsFtsObject).setComment(itsArgs);
   }
   
-  //the 'ResizeToNewFont' method worked very well, so we're using it also in the shift-double_click  
   public void RestoreDimensions(){
 
     Resize(itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET-getItsWidth(), itsFontMetrics.getHeight()*itsParsedTextVector.size()-getItsHeight());
     itsSketchPad.repaint();
-  }
-
-  public boolean MouseUp(MouseEvent evt,int x,int y){
-    return super.MouseUp(evt, x, y);
   }
 
   public boolean MouseDown_specific(MouseEvent evt, int x, int y) {
@@ -130,12 +124,6 @@ class ErmesObjComment extends ErmesObject {
   }
 
   
-  /*void ResizeToNewFont(Font theFont) {
-    ResizeToText(0,0);
-    }
-    */
-
-
   public void ResizeToText(int theDeltaX, int theDeltaY){
     int aWidth = getItsWidth()+theDeltaX;
     int aHeight = getItsHeight()+theDeltaY;
@@ -144,7 +132,7 @@ class ErmesObjComment extends ErmesObject {
     Resize(aWidth-getItsWidth(), aHeight-getItsHeight());
   }
   
-  public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
+  public boolean canResizeBy(int theDeltaX, int theDeltaY){
     String temp = itsArgs;
     if((getItsWidth()+theDeltaX <itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET)||
        (getItsHeight()+theDeltaY<itsFontMetrics.getHeight()*itsParsedTextVector.size()))
@@ -233,8 +221,6 @@ class ErmesObjComment extends ErmesObject {
 			   itsFontMetrics.getHeight()*itsParsedTextVector.size());
   }
 
-  //If we don't specify this, the canvas might not show up at all
-  //(depending on the layout manager).
   public Dimension getPreferredSize() {
     return preferredSize;
   }

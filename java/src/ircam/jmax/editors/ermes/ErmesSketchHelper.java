@@ -175,7 +175,7 @@ class ErmesSketchHelper extends Object{
   public void DeleteGraphicObject(ErmesObject theObject, boolean paintNow) {
     DeleteObjectConnections(theObject, false);
     //removes theObject from the selected elements list	
-    if(theObject.NeedPropertyHandler())
+    if(theObject instanceof FtsPropertyHandler)
       if(theObject.GetFtsObject()!=null) theObject.GetFtsObject().removeWatch(theObject);
     ErmesSketchPad.currentSelection.removeObject(theObject);
     //removes theObject from the element list (delete)

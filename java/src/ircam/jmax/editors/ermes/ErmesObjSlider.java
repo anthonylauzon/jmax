@@ -11,14 +11,10 @@ import ircam.jmax.utils.*;
 /**
  * The "slider" graphic object
  */
-class ErmesObjSlider extends ErmesObject {
+class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
   ErmesObjThrottle itsThrottle;
   int itsInteger = 0;
 
-  static final int TRUST=10;	     //how many transmitted values we trust?
-  int transmission_buffer[];
-  int transmission_index = 0;
-  int receiving_index = 0;
   int last_value = 0;
 
 
@@ -39,7 +35,6 @@ class ErmesObjSlider extends ErmesObject {
 
   public ErmesObjSlider(){
     super();
-    transmission_buffer = new int[TRUST];
   }
 
 
@@ -47,15 +42,17 @@ class ErmesObjSlider extends ErmesObject {
     makeCurrentRect(x, y);
     itsThrottle = new ErmesObjThrottle(this, x, y);
     super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
+    itsFtsObject.watch("value", this);
     return true;
   }
 
 
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
     super.Init(theSketchPad,  theFtsObject); //new
+    itsFtsObject.watch("value", this);
     makeCurrentRect(theFtsObject);
     itsThrottle = new ErmesObjThrottle(this, getItsX(), getItsY());   
-    //oldsuper.Init(theSketchPad,  theFtsObject); 
+
     {
       Integer aInteger = (Integer)theFtsObject.get("minValue");
       setMinValue(aInteger.intValue());
@@ -135,39 +132,23 @@ class ErmesObjSlider extends ErmesObject {
   // FtsValueChanged
   // callback function from the associated FtsObject in FTS
   //--------------------------------------------------------
-  protected void FtsValueChanged(Object value) {
+  public void propertyChanged(FtsObject obj, String name, Object value) {
     
     if (itsMovingThrottle) return;
     int temp = ((Integer) value).intValue();
     
-    /*last_value = temp;
-    if (receiving_index < transmission_index && temp == transmission_buffer[receiving_index]) {
-      //Ok, the buffer is working, the value is the one we sent...
-      receiving_index += 1;
-      if (receiving_index == transmission_index) {
-	
-	receiving_index = 0;
-	transmission_index = 0;
-      }
-      return;
-    }
-    else {
-      // we're receiving other values, discard the buffer
+    if (itsInteger != temp) {
+      itsInteger = temp;
+      int clippedValue = (temp<itsRangeMin)?itsRangeMin:((temp>=itsRangeMax)?itsRangeMax:temp);
+      clippedValue-=itsRangeMin;
       
-      transmission_index = 0;
-      receiving_index = 0;*/
-      if (itsInteger != temp) {
-	itsInteger = temp;
-	int clippedValue = (temp<itsRangeMin)?itsRangeMin:((temp>=itsRangeMax)?itsRangeMax:temp);
-	clippedValue-=itsRangeMin;
-	
-	if (itsThrottle != null) {
-	  itsThrottle.Move(itsThrottle.itsX, (int)(getItsY()+getItsHeight()-BOTTOM_OFFSET-2-clippedValue/itsStep));
-	}
-	if (itsSketchPad.itsRunMode) Paint_movedThrottle(itsSketchPad.getGraphics());
-	else Paint_specific(itsSketchPad.getGraphics());
+      if (itsThrottle != null) {
+	itsThrottle.Move(itsThrottle.itsX, (int)(getItsY()+getItsHeight()-BOTTOM_OFFSET-2-clippedValue/itsStep));
       }
-      //}		
+      if (itsSketchPad.itsRunMode) Paint_movedThrottle(itsSketchPad.getGraphics());
+      else Paint_specific(itsSketchPad.getGraphics());
+    }
+    
   }
 
 
@@ -284,13 +265,6 @@ class ErmesObjSlider extends ErmesObject {
     else return super.MouseUp(evt, x, y);
   }
 
-  public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY) {
-    if((getItsWidth()+theDeltaX < getMinimumSize().width)||
-       (getItsHeight()+theDeltaY < getMinimumSize().height))
-      return false;
-    else return true;
-  }
-  
   public boolean IsInThrottle(int theX, int theY){
     Rectangle aRect = itsThrottle.Bounds();
     return aRect.contains(theX,theY);
@@ -334,7 +308,7 @@ class ErmesObjSlider extends ErmesObject {
   // minimumSize()
   //--------------------------------------------------------
   public Dimension getMinimumSize() {
-    currentMinimumSize.width =15;/*20;*/
+    currentMinimumSize.width =15;
     currentMinimumSize.height = 30;
     return currentMinimumSize;
   }
@@ -343,16 +317,4 @@ class ErmesObjSlider extends ErmesObject {
     return preferredSize;
   }
 
-  /*  void Trust (int theInt) {
-    if (transmission_index == TRUST) {
-      //we sent more then TRUST values without acknowledge...
-      //write a message? FTS, are you there?
-      
-      itsInteger = last_value;
-      DoublePaint();
-    }
-    else {
-      transmission_buffer[transmission_index++] = theInt;
-    }
-  }*/
 }

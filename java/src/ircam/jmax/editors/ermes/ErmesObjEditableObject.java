@@ -7,12 +7,12 @@ import java.util.*;
 import ircam.jmax.fts.*;
 
 /**
- * The base class of the ermes objects which are user-editable (ErmesObjMessage, ErmesObjExternal).
+ * The base class of the ermes objects which are user-editable (ErmesObjMessage, ErmesObjExternal, ErmesObjPatcher).
  */
-/*abstract*/ class ErmesObjEditableObject extends ErmesObject {
+abstract class ErmesObjEditableObject extends ErmesObject {
 	
 	
-  int WIDTH_DIFF = 10/*14*/;
+  int WIDTH_DIFF = 10;
   int HEIGHT_DIFF = 2;
 	
   protected int FIELD_HEIGHT;
@@ -22,7 +22,7 @@ import ircam.jmax.fts.*;
   String 	  itsArgs = new String();
   public Vector itsParsedTextVector = new Vector();
   public String itsMaxString = "";
-  //public void setSize(int theH, int theV) {}; 
+
   public boolean resized = false;
   public boolean itsInEdit = true;
   String itsBackupText = new String();;
@@ -51,8 +51,8 @@ import ircam.jmax.fts.*;
       setJustification(itsSketchPad.itsJustificationMode);
       makeCurrentRect(x,y); //redo it..
       
-      itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight() + 20);
-      //DoublePaint();
+      itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-(WIDTH_DIFF-2), itsFontMetrics.getHeight() + 20);
+
       itsSketchPad.editStatus = itsSketchPad.EDITING_OBJECT;
       
       itsSketchPad.GetEditField().setVisible(true);
@@ -81,7 +81,7 @@ import ircam.jmax.fts.*;
     else setJustification(aJustification.intValue());
 
     itsInEdit = false;
-    //ChangeJustification(itsSketchPad.LEFT_JUSTIFICATION);
+
     return true;
   }
 
@@ -110,9 +110,9 @@ import ircam.jmax.fts.*;
 
 
     if(itsParsedTextVector.size()==0)
-      itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight()*2);
+      itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-(WIDTH_DIFF-2), itsFontMetrics.getHeight()*2);
     else
-      itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
+      itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-(WIDTH_DIFF-2), itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
     
 
     itsMaxString = "";
@@ -169,7 +169,7 @@ import ircam.jmax.fts.*;
   protected void SetFieldText(String theString){
     FontMetrics fm = itsSketchPad.GetEditField().getFontMetrics(itsSketchPad.getFont());
     int lenght = fm.stringWidth(theString);
-    Dimension d1 = preferredSize;/*minimumSize();*/
+    Dimension d1 = preferredSize;
     while(lenght > d1.width-20)
       d1.width += 20;
     preferredSize = d1;	
@@ -193,7 +193,7 @@ import ircam.jmax.fts.*;
     Resize(aWidth-getItsWidth(), aHeight-getItsHeight());
   }
   
-  public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
+  public boolean canResizeBy(int theDeltaX, int theDeltaY){
     String temp = itsArgs;
     if((getItsWidth()+theDeltaX <itsFontMetrics.stringWidth(itsMaxString) +2*WIDTH_DIFF)||
        (getItsHeight()+theDeltaY<itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF))
@@ -229,13 +229,6 @@ import ircam.jmax.fts.*;
   }
 
   //--------------------------------------------------------
-  // RunModeSetted
-  //--------------------------------------------------------
-  void RunModeSetted(){
-    //if (itsEditField != null) itsEditField.setEditable(false);
-  }
-	
-  //--------------------------------------------------------
   // MoveBy
   //--------------------------------------------------------
   public void MoveBy(int theDeltaH, int theDeltaV) {
@@ -247,11 +240,11 @@ import ircam.jmax.fts.*;
     for (Enumeration e=itsOutletList.elements(); e.hasMoreElements();) {
       aOutlet = (ErmesObjOutlet) e.nextElement();
       aOutlet.MoveTo(aOutlet.itsX, getItsY()+getItsHeight());
-      //ReroutingConnections(aOutlet);
     }
   }
 
 
+  abstract protected void Paint_specific(Graphics g);
   protected void DrawParsedString(Graphics theGraphics){
     String aString;
     int i=0;
