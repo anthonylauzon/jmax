@@ -46,6 +46,7 @@ typedef struct _sequence_
   track_t *tracks; /* list of tracks */ 
   int size; /* # of tracks */ 
   int open; /* flag: is 1 if sequence editor is open */
+  track_t *last_loaded_track; /* hack to fix loading */
 } sequence_t;
 
 #include <fts/packages/sequence/seqsym.h>

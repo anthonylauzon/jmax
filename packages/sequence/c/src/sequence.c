@@ -488,6 +488,7 @@ sequence_add_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int a
         fts_send_message((fts_object_t *)track, seqsym_set_editor, 0, 0);
         fts_object_set_state_dirty(o);
       }
+      this->last_loaded_track = track;/* hack to fix loading */
     }
   }
 }
@@ -546,6 +547,15 @@ sequence_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   }
 }
 
+/* hack to fix loading */
+static void
+sequence_append_event_at_last_loaded_track(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+
+  if(this->last_loaded_track!=NULL)
+    fts_send_message((fts_object_t *)this->last_loaded_track, fts_s_append, ac, at); 
+}
 /******************************************************
 *
 *  class
@@ -560,6 +570,8 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->tracks = 0;
   this->size = 0;
   this->open = 0;
+  
+  this->last_loaded_track = NULL;/* hack to fix loading */
   
   if(ac == 1 && fts_is_number(at))
   {
@@ -633,6 +645,8 @@ sequence_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_add_track, sequence_add_track_and_update);
   fts_class_message_varargs(cl, seqsym_remove_track, sequence_remove_track_and_update);
   fts_class_message_varargs(cl, seqsym_move_track, sequence_move_track_and_update);
+  
+  fts_class_message_varargs(cl, fts_s_append, sequence_append_event_at_last_loaded_track);  
 
   fts_class_message_varargs(cl, fts_s_print, sequence_print);
 
