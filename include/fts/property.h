@@ -52,17 +52,6 @@
 
 typedef struct fts_plist fts_plist_t;
 
-/* the non underscored functions will run the daemon (look to the .c file for comments) */
-/* also included are shortcuts to avoid type conversions to atoms */
-
-FTS_API void  fts_object_put_prop(fts_object_t *obj, fts_symbol_t property, const fts_atom_t *value);
-FTS_API void _fts_object_put_prop(fts_object_t *obj, fts_symbol_t property, const fts_atom_t *value);
-
-FTS_API void  fts_object_remove_prop(fts_object_t *obj, fts_symbol_t property);
-FTS_API void _fts_object_remove_prop(fts_object_t *obj, fts_symbol_t property);
-
-FTS_API void _fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
-FTS_API void  fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
 
 /* Class version
 
