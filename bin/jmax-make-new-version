@@ -37,7 +37,7 @@ do
 	\-type )
 	    OPT=$ARG ;;
 	\-nomail )
-	    MAIL=
+	    MAIL= ;;
 	\-help | \-h | \-\? )
 	    help ;
 	    exit 2 ;;
