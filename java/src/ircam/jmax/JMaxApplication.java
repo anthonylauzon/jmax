@@ -335,23 +335,36 @@ public class JMaxApplication extends FtsClient {
 
   private void guessDirectories()
   {
-    if (properties.get( "jmaxRoot") == null)
+     if (properties.get( "jmaxRoot") == null)
       {
 	URL url = ClassLoader.getSystemResource( "jmax.jar.root");
-	String u = url.toString();
-	String root;
 
-	if ( u.endsWith( "/Contents/Resources/Java/jmax.jar!/jmax.jar.root"))
+	String root, u;
+	if(url != null)
 	  {
-	    // Mac OS X MRJAppBuilder case
+	    u = url.toString();
+
+	    if ( u.endsWith( "/Contents/Resources/Java/jmax.jar!/jmax.jar.root"))
+	      {
+		// Mac OS X MRJAppBuilder case
 	    
-	    root = u.substring( u.indexOf( '/'), u.lastIndexOf( "/Java/jmax.jar!/jmax.jar.root"));
-	    properties.put( "jmaxServerName", "fts.wrapper");
+		root = u.substring( u.indexOf( '/'), u.lastIndexOf( "/Java/jmax.jar!/jmax.jar.root"));
+		properties.put( "jmaxServerName", "fts.wrapper");
+	      }
+	    else
+	      {
+		// Linux case, Mac OS X shell script case
+		root = u.substring( u.indexOf( '/'), u.lastIndexOf( "/share/jmax/java/jmax.jar!/jmax.jar.root"));
+	      }
 	  }
 	else
 	  {
-	    // Linux case, Mac OS X shell script case
-	    root = u.substring( u.indexOf( '/'), u.lastIndexOf( "/share/jmax/java/jmax.jar!/jmax.jar.root"));
+	    // Mac OS X Project Builder case
+	    
+	    url = ClassLoader.getSystemResource( "jmax.jar");
+	    u = url.toString();
+	    root = u.substring( u.indexOf( '/'), u.lastIndexOf( "/Java/jmax.jar"));
+	    properties.put( "jmaxServerName", "fts.wrapper");
 	  }
 
 	properties.put( "jmaxRoot", root + "/share/jmax");
