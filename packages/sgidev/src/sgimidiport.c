@@ -29,6 +29,14 @@
 #include "fts.h"
 
 #define MAX_MIDI_EVENTS 512
+#define SYSEX_BLOCK_SIZE 512
+
+#define SYSEX_REALTIME 0x7f
+
+#define mdGetStatus(msg) (msg[0] & MD_STATUSMASK)
+#define mdGetChannel(msg) (msg[0] & MD_CHANNELMASK)
+#define mdGetByte1(msg) (msg[1])
+#define mdGetByte2(msg)(msg[2])
 
 typedef struct _sgimidiport_
 {
@@ -36,6 +44,8 @@ typedef struct _sgimidiport_
   MDport in;
   MDport out;
   fts_symbol_t name;
+  char sysex_buf[SYSEX_BLOCK_SIZE];
+  int sysex_size;
 } sgimidiport_t;
 
 int
@@ -95,38 +105,41 @@ sgimidiport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     switch(status)
       {
 	case MD_NOTEOFF:
-	  fts_midiport_channel_message(&port->head, fts_midi_status_note, mdGetChannel(msg) + 1, mdGetByte1(msg), 0, 0.0);
+	  fts_midiport_input_note(&port->head, mdGetChannel(msg) + 1, mdGetByte1(msg), 0, 0.0);
 	  break;
 	case MD_NOTEON:
-	  fts_midiport_channel_message(&port->head, fts_midi_status_note, mdGetChannel(msg) + 1, mdGetByte1(msg), mdGetByte2(msg), 0.0);
+	  fts_midiport_input_note(&port->head, mdGetChannel(msg) + 1, mdGetByte1(msg), mdGetByte2(msg), 0.0);
 	  break;
 	case MD_POLYKEYPRESSURE:
-	  fts_midiport_channel_message(&port->head, fts_midi_status_poly_pressure, mdGetChannel(msg) + 1, mdGetByte1(msg), mdGetByte2(msg), 0.0);
+	  fts_midiport_input_poly_pressure(&port->head, mdGetChannel(msg) + 1, mdGetByte1(msg), mdGetByte2(msg), 0.0);
 	  break;
 	case MD_CONTROLCHANGE:
-	  fts_midiport_channel_message(&port->head, fts_midi_status_control_change, mdGetChannel(msg) + 1, mdGetByte1(msg), mdGetByte2(msg), 0.0);
+	  fts_midiport_input_control_change(&port->head, mdGetChannel(msg) + 1, mdGetByte1(msg), mdGetByte2(msg), 0.0);
 	  break;
 	case MD_PROGRAMCHANGE:
-	  fts_midiport_channel_message(&port->head, fts_midi_status_program_change, mdGetChannel(msg) + 1, mdGetByte1(msg), 0, 0.0);
+	  fts_midiport_input_program_change(&port->head, mdGetChannel(msg) + 1, mdGetByte1(msg), 0.0);
 	  break;
 	case MD_CHANNELPRESSURE:
-	  fts_midiport_channel_message(&port->head, fts_midi_status_channel_pressure, mdGetChannel(msg) + 1, mdGetByte1(msg), mdGetByte2(msg), 0.0);
+	  fts_midiport_input_channel_pressure(&port->head, mdGetChannel(msg) + 1, mdGetByte1(msg), 0.0);
 	  break;
 	case MD_PITCHBENDCHANGE:
-	  fts_midiport_channel_message(&port->head, fts_midi_status_pitch_bend, mdGetChannel(msg) + 1, mdGetByte1(msg) + (mdGetByte2(msg) << 7), 0, 0.0);
+	  fts_midiport_input_pitch_bend(&port->head, mdGetChannel(msg) + 1, mdGetByte1(msg) + (mdGetByte2(msg) << 7), 0.0);
 	  break;
 	case MD_SYSEX:
 	  {
 	    int size = midi_events[i].msglen;
 	    int j;
 
-	    for(j=0; j<size - 2; j++)
-	      fts_midiport_system_exclusive_add_byte(&port->head, midi_events[i].sysexmsg[j + 1]);
-
-	  fts_midiport_system_exclusive(&port->head, 0.0);
-
-	  if(midi_events[i].msglen > 0)
-	    mdFree(midi_events[i].sysexmsg);
+	    if(midi_events[i].sysexmsg[1] == SYSEX_REALTIME)
+	      {
+		for(j=2; j<size-1; j++)
+		  fts_midiport_input_system_exclusive_byte(&port->head, midi_events[i].sysexmsg[j]);
+		
+		fts_midiport_input_system_exclusive_call(&port->head, 0.0);
+		
+		if(midi_events[i].msglen > 0)
+		  mdFree(midi_events[i].sysexmsg);
+	      }
 	  }
 
 	  break;
@@ -141,119 +154,143 @@ sgimidiport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
  */
 
 static void
-sgimidiport_send_channel_message(fts_midiport_t *port, int status, int channel, int x, int y, double time)
+sgimidiport_send_note(fts_object_t *o, int channel, int number, int value, double time)
 {
-  sgimidiport_t *this = (sgimidiport_t *)port;
+  sgimidiport_t *this = (sgimidiport_t *)o;
+  MDevent event;
+  
+  event.msg[0] = MD_NOTEON | ((channel - 1) & 0x0F);
+  event.msg[1] = (char)(number & 127); /* note number */
+  event.msg[2] = (char)(value & 127); /* velocity */
+  event.msglen = 3;
+  
+  mdSend(this->out, &event, 1);
+}
 
-  channel--; /* 1 to 16 -> 0 to 15 */
+static void
+sgimidiport_send_poly_pressure(fts_object_t *o, int channel, int number, int value, double time)
+{
+  sgimidiport_t *this = (sgimidiport_t *)o;
+  MDevent event;
+  
+  event.msg[0] = MD_POLYKEYPRESSURE | ((channel - 1) & 0x0F);
+  event.msg[1] = (char)(number & 127); /* note number */
+  event.msg[2] = (char)(value & 127); /* pressure value */
+  event.msglen = 3;
+  
+  mdSend(this->out, &event, 1);
+}
 
-  switch(status)
+static void
+sgimidiport_send_control_change(fts_object_t *o, int channel, int number, int value, double time)
+{
+  sgimidiport_t *this = (sgimidiport_t *)o;
+  MDevent event;
+
+  event.msg[0] = MD_CONTROLCHANGE | ((channel - 1) & 0x0F);
+  event.msg[1] = (char)(number & 127); /* controller number */
+  event.msg[2] = (char)(value & 127); /* controller value */
+  event.msglen = 3;
+	
+  mdSend(this->out, &event, 1);
+}
+
+static void
+sgimidiport_send_program_change(fts_object_t *o, int channel, int value, double time)
+{
+  sgimidiport_t *this = (sgimidiport_t *)o;
+  MDevent event;
+
+  event.msg[0] = MD_PROGRAMCHANGE | ((channel - 1) & 0x0F);
+  event.msg[1] = (char)(value & 127); /* programm number */
+  event.msg[2] = 0;
+  event.msglen = 2;
+	
+  mdSend(this->out, &event, 1);
+}
+
+static void
+sgimidiport_send_channel_pressure(fts_object_t *o, int channel, int value, double time)
+{
+  sgimidiport_t *this = (sgimidiport_t *)o;
+  MDevent event;
+
+  event.msg[0] = MD_CHANNELPRESSURE | ((channel - 1) & 0x0F);
+  event.msg[1] = (char)(value & 127); /* pressure value */
+  event.msg[2] = 0;
+  event.msglen = 2;
+	
+  mdSend(this->out, &event, 1);
+}
+
+static void
+sgimidiport_send_pitch_bend(fts_object_t *o, int channel, int value, double time)
+{
+  sgimidiport_t *this = (sgimidiport_t *)o;
+  MDevent event;
+
+  event.msg[0] = MD_PITCHBENDCHANGE | ((channel - 1) & 0x0F);
+  event.msg[1] = (char)(value & 127); /* LSB */
+  event.msg[2] = (char)((value >> 7) & 127); /* MSB */
+  event.msglen = 3;
+
+  mdSend(this->out, &event, 1);
+}
+
+static void
+sgimidiport_send_system_exclusive_byte(fts_object_t *o, int value)
+{
+  sgimidiport_t *this = (sgimidiport_t *)o;
+
+  this->sysex_buf[this->sysex_size] = (char)(value & 127);
+  this->sysex_size++;
+
+  if(this->sysex_size >= SYSEX_BLOCK_SIZE - 1)
     {
-    case fts_midi_status_note:
-      {
-	MDevent event;
+      MDevent event;
 
-	event.msg[0] = MD_NOTEON | (channel & 0x0F);
-	event.msg[1] = (char)(x & 127); /* note number */
-	event.msg[2] = (char)(y & 127); /* velocity */
-	event.msglen = 3;
-	
-	mdSend(this->out, &event, 1);
-	
-	break;
-      }
-    case fts_midi_status_poly_pressure:
-      {
-	MDevent event;
+      event.msg[0] = MD_SYSEX;
+      event.sysexmsg = this->sysex_buf;
+      event.msglen = this->sysex_size;
+      
+      mdSend(this->out, &event, 1);
 
-	event.msg[0] = MD_POLYKEYPRESSURE | (channel & 0x0F);
-	event.msg[1] = (char)(x & 127); /* note number */
-	event.msg[2] = (char)(y & 127); /* pressure value */
-	event.msglen = 3;
-	
-	mdSend(this->out, &event, 1);
-	
-	break;
-      }
-    case fts_midi_status_control_change:
-      {
-	MDevent event;
-
-	event.msg[0] = MD_CONTROLCHANGE | (channel & 0x0F);
-	event.msg[1] = (char)(x & 127); /* controller number */
-	event.msg[2] = (char)(y & 127); /* controller value */
-	event.msglen = 3;
-	
-	mdSend(this->out, &event, 1);
-		
-	break;
-      }
-    case fts_midi_status_program_change:
-      {
-	MDevent event;
-
-	event.msg[0] = MD_PROGRAMCHANGE | (channel & 0x0F);
-	event.msg[1] = (char)(x & 127); /* programm number */
-	event.msg[2] = 0;
-	event.msglen = 2;
-	
-	mdSend(this->out, &event, 1);
-	
-	break;
-      }
-    case fts_midi_status_channel_pressure:
-      {
-	MDevent event;
-
-	event.msg[0] = MD_CHANNELPRESSURE | (channel & 0x0F);
-	event.msg[1] = (char)(x & 127); /* pressure value */
-	event.msg[2] = 0;
-	event.msglen = 2;
-	
-	mdSend(this->out, &event, 1);
-	
-	break;
-      }
-    case fts_midi_status_pitch_bend:
-      {
-	MDevent event;
-
-	event.msg[0] = MD_PITCHBENDCHANGE | (channel & 0x0F);
-	event.msg[1] = (char)(x & 127); /* LSB */
-	event.msg[2] = (char)((x >> 7) & 127); /* MSB */
-	event.msglen = 3;
-
-	mdSend(this->out, &event, 1);
-
-	break;
-      }
+      this->sysex_size = 0;
     }
 }
 
 static void
-sgimidiport_send_system_exclusive(fts_midiport_t *port, int ac, const fts_atom_t *at, double time)
+sgimidiport_send_system_exclusive_flush(fts_object_t *o, double time)
 {
-  sgimidiport_t *this = (sgimidiport_t *)port;
+  sgimidiport_t *this = (sgimidiport_t *)o;
   MDevent event;
-  char c[1024];
-  int i;
 
-  c[0] = 0xF0;
-
-  if(ac > 1022)
-    ac = 1022;
-
-  for(i=0; i<ac; i++)
-    c[i + 1] = (char)(fts_get_int(at + i) & 0x7F);
-  
-  c[i + 1] = 0xF7; /* end of sysex EOX */
+  this->sysex_buf[this->sysex_size] = MD_EOX;
+  this->sysex_size++;
 
   event.msg[0] = MD_SYSEX;
-  event.sysexmsg = c;
-  event.msglen = ac + 2;
+  event.sysexmsg = this->sysex_buf;
+  event.msglen = this->sysex_size;
   
   mdSend(this->out, &event, 1);
+  
+  /* reset sysex buffer */
+  this->sysex_buf[0] = MD_SYSEX;
+  this->sysex_buf[1] = SYSEX_REALTIME;
+  this->sysex_size = 2;
 }
+
+static fts_midiport_output_functions_t sgimidiport_output_functions =
+{
+  sgimidiport_send_note,
+  sgimidiport_send_poly_pressure,
+  sgimidiport_send_control_change,
+  sgimidiport_send_program_change,
+  sgimidiport_send_channel_pressure,
+  sgimidiport_send_pitch_bend,
+  sgimidiport_send_system_exclusive_byte,
+  sgimidiport_send_system_exclusive_flush,
+};
 
 /************************************************************
  *
@@ -268,8 +305,6 @@ sgimidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
   int open = 0;
 
-  fts_midiport_init(&this->head, sgimidiport_send_channel_message, sgimidiport_send_system_exclusive);
-
   this->in = 0;
   this->out = 0;
   this->name = 0;
@@ -280,8 +315,20 @@ sgimidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       this->name = name;
     }
 
+  fts_midiport_init(&this->head);
+
   if(open)
-    fts_sched_add_fd(fts_sched_get_current(), mdGetFd(this->in), 1, sgimidiport_dispatch, o);
+    {
+      fts_midiport_set_input(&this->head);
+      fts_midiport_set_output(&this->head, &sgimidiport_output_functions);
+
+      fts_sched_add_fd(fts_sched_get_current(), mdGetFd(this->in), 1, sgimidiport_dispatch, o);
+    }
+
+  /* init sysex buffer */
+  this->sysex_buf[0] = MD_SYSEX;
+  this->sysex_buf[1] = SYSEX_REALTIME;
+  this->sysex_size = 2;
 }
 
 static void 
@@ -328,17 +375,22 @@ sgimidiport_t *sgimidiport_default = 0;
 fts_midiport_t *
 sgimidiport_get_default(void)
 {
+  fts_status_t ret;
+
   if(!sgimidiport_default && fts_midi_hack_default_device_name)
     {
       fts_atom_t a[2];
       
       post("create SGI default MIDI port: %s\n", fts_symbol_name(fts_midi_hack_default_device_name));
-
+      
       fts_set_symbol(a + 0, fts_new_symbol("sgimidiport"));
       fts_set_symbol(a + 1, fts_midi_hack_default_device_name);
-      fts_object_new(0, 2, a, (fts_object_t **)&sgimidiport_default);
+      ret = fts_object_new(0, 2, a, (fts_object_t **)&sgimidiport_default);
+      
+      if(ret != fts_Success)
+	sgimidiport_default = 0;
     }
-
+  
   return (fts_midiport_t *)sgimidiport_default;
 }
 
