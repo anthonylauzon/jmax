@@ -26,15 +26,13 @@
 
 #include "fts.h"
 
-extern void seq_play_config(void);
 extern void sequence_config(void);
 
 static void
 fts_sequence_init(void)
 {
-  seq_play_config();
   sequence_config();
 }
 
-fts_module_t sequence_module = {"sequence", "sequence and seq_play scorfollowing/sequencing classes", fts_sequence_init};
+fts_module_t sequence_module = {"sequence", "sequence and score following classes", fts_sequence_init};
 

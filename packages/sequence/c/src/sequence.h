@@ -1,117 +1,205 @@
 /*
  * jMax
- * Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
  * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
  * 
- * See file LICENSE for further informations on licensing terms.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
- * Based on Max/ISPW by Miller Puckette.
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell, Miller Puckette.
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
+ */
+#ifndef _SEQUENCE_H_
+#define _SEQUENCE_H_
+
+#include "fts.h"
+
+/*****************************************************************
+ *
+ *  forward structures
  *
  */
 
+typedef struct _sequence_event sequence_event_t;
+typedef struct _sequence_track sequence_track_t;
+
+typedef struct _sequence_event_field sequence_event_field_t;
+typedef struct _sequence_field_track sequence_field_track_t;
+
+typedef struct _sequence_marker sequence_marker_t;
+
+typedef struct _sequence sequence_t;
+typedef struct _sequence_ptr sequence_ptr_t;
 
 
-typedef struct _evt
+/*****************************************************************
+ *
+ *  event
+ *
+ */
+
+struct _sequence_event
 {
-  struct _evt *next;
-  long time;
-  long pit;
-  long vel;
-  long dur;
-  long chan;
-} evt_t;
+  /* list of events in sequence */
+  sequence_event_t *prev;
+  sequence_event_t *next;
 
-#define NPARAM 5	/* max number of parameters */
+  sequence_track_t *track; /* track of event */
 
-/* definitions for score follower */
+  double time; /* time tag */
+  sequence_event_field_t *fields; /* list of fields of field_tracks */
 
-typedef struct _skip
+  fts_atom_t value;
+};
+
+#define sequence_element_get_track
+
+extern void sequence_event_set(sequence_event_t *event, fts_atom_t value);
+extern void sequence_event_free(sequence_event_t *event);
+extern sequence_event_t *sequence_event_new(fts_atom_t value);
+extern void sequence_event_delete(sequence_event_t *event);
+
+/*****************************************************************
+ *
+ *  track
+ *
+ */
+
+struct _sequence_track
+{ 
+  /* list of tracks in sequence */
+  sequence_track_t *next;
+
+  sequence_t *sequence; /* sequence of track */
+
+  fts_symbol_t name;
+  fts_type_t type; /* type of track */
+  int active; /* active flag */
+  sequence_field_track_t *field_tracks; /* list of field_tracks */
+};
+
+#define sequence_track_get_name(t) ((t)->name)
+#define sequence_track_get_type(t) ((t)->type)
+
+
+/*****************************************************************
+ *
+ *  field
+ *
+ */
+
+struct _sequence_event_field
 {
-  evt_t *evt;
-  struct _skip *next;
+  /* list of fields in event */
+  struct _sequence_event_field_t *next;
 
-} skip_t;
+  struct _sequence_field_track_t *track; /* field_track of the field */
+  struct _sequence_event_t *event; /* event the field is associated to */
 
-#define NFWD 2		/* default values for f_nfwd and f_ftime */
-#define FTIME 150
-#define MAXFOLLOWHANG 16
+  fts_atom_t value; /* fields value */
+};
 
-/* note-off matching for record */
 
-typedef struct _hang
+/*****************************************************************
+ *
+ *  field track
+ *
+ */
+
+struct _sequence_field_track
+{ 
+  /* list of field_tracks in track */
+  sequence_track_t *next; /* next field_track of track */
+  fts_symbol_t name; /* name of track */
+
+  sequence_track_t *track; /* track of field_track */
+
+  fts_type_t type; /* type of field_track */
+  int active; /* active flag */
+};
+
+
+/*****************************************************************
+ *
+ *  marker
+ *
+ */
+
+struct _sequence_marker
 {
-  evt_t *evt;
-  struct _hang *next;
-} hang_t;
+  double time;
+  sequence_event_t *event;
+};
 
-/* WARNING -- the "sequence" structure will probably change to allow
-parameters to be added to the "event" structure.  I'll keep x_serial,
-x_evt, x_sym, and x_next constant, though.  */
 
-typedef struct sequence_data
+/*****************************************************************
+ *
+ *  sequence
+ *
+ */
+
+struct _sequence
+{ 
+  sequence_event_t *begin; /* first event in sequence */
+  sequence_event_t *end; /* last even in sequence */
+
+  int size; /* # of events */
+
+  sequence_track_t *tracks; /* list of tracks */ 
+  int n_tracks; /* # of tracks */ 
+};
+
+#define sequence_get_size(s) ((s)->size)
+#define sequence_get_n_tracks(s) ((s)->n_tracks)
+
+/* new/delete sequence */
+extern void sequence_init(sequence_t *sequence);
+extern void sequence_empty(sequence_t *sequence);
+extern sequence_t *sequence_create(void);
+extern void sequence_destroy(sequence_t *sequence);
+
+/* tracks */
+extern sequence_track_t *sequence_add_track(sequence_t *sequence, fts_symbol_t name, fts_type_t type);
+extern void sequence_remove_track(sequence_t *sequence, int index);
+extern sequence_track_t *sequence_get_track_by_index(sequence_t *sequence, int index);
+extern sequence_track_t *sequence_get_track_by_name(sequence_t *sequence, fts_symbol_t name);
+
+
+/* events */
+void sequence_add_event(sequence_t *sequence, sequence_track_t *track, double time, sequence_event_t *event);
+void sequence_remove_event(sequence_event_t *event);
+
+/* locate events */
+extern sequence_event_t *sequence_get_event_by_time(sequence_t *sequence, double time);
+extern sequence_event_t *sequence_get_event_in_track_by_time(sequence_t *sequence, sequence_track_t *track, double time);
+
+#define sequence_get_size(sequence) ((sequence)->size)
+#define sequence_get_duration(sequence) ((sequence)->end->time - (sequence)->begin->time)
+#define sequence_get_begin(sequence) ((sequence)->begin)
+#define sequence_get_end(sequence) ((sequence)->end)
+
+/*****************************************************************
+ *
+ *  sequence pointer
+ *
+ */
+/*
+struct _sequence_ptr
 {
-  fts_data_t dataobj;
-  fts_symbol_t name;		/* sequence's name */
-  evt_t *evt;			/* list of events */
-} sequence_data_t;
+  sequence_t *sequence;
+  sequence_event_t *ptr;
+};
 
+extern void sequence_ptr_init(sequence_ptr_t *ptr, sequence_t *sequence);
+extern void sequence_ptr_free(sequence_ptr_t *ptr, sequence_t *sequence);
 
-typedef struct 
-{
-  fts_object_t obj;
+extern void sequence_ptr_set_to_begin(sequence_ptr_t *ptr);
+extern void sequence_ptr_set_to_end(sequence_ptr_t *ptr);
+extern void sequence_ptr_set_by_time(sequence_ptr_t *ptr, double time);
 
-  sequence_data_t data;
+extern fts_sequence_event_t *sequence_ptr_get_event(sequence_ptr_t *ptr);
+*/
 
-  long serial;			/* support for explay class */
-
-  long n1;			/* values of inlets */
-  long n2;
-  long n3;
-  long n4;
-
-  char set1;
-  char set2;
-  char set3;
-  long rectime;		/* logical time at which recording started */
-
-
-  evt_t *current;
-
-  /* score follower state */
-
-  long matchscoretime;
-  char oct;
-  int nfwd;
-  int ftime;
-  int nhang;			/* number of hanging notes during score-follow */
-  skip_t *skip;
-  hang_t *hang;
-  char mode;			/* defs below */
-} sequence_t;
-
-#define MINIT           0
-#define MPLAY           1
-#define MRECORD         2
-#define MFOLLOW         3
-
-
-/* finding an sequence by name */
-
-extern sequence_t *sequence_get_by_name(fts_symbol_t name);
-
-
+#endif
