@@ -223,6 +223,7 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
 	itsInteger = (int)(((getItsY()+getItsHeight())-y-BOTTOM_OFFSET)*itsStep);
 	//Trust(itsInteger+itsRangeMin);
 	sendValue(new Integer(itsInteger+itsRangeMin));
+	
 	itsThrottle.Move(itsThrottle.itsX, y-2);
 	Paint_specific(itsSketchPad.getGraphics());
       }
@@ -255,7 +256,7 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
     if(itsSketchPad.itsRunMode || evt.isControlDown() || itsMovingThrottle){
 
       itsMovingThrottle = false;
-      itsFtsObject.put("value", itsInteger);
+      itsFtsObject.put("value", itsInteger+itsRangeMin);
       Fts.getServer().syncToFts();
 
       return true;
