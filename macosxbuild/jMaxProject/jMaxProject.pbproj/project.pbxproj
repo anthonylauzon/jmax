@@ -444,6 +444,7 @@
 				F526F3FD03EA8F47016640F1,
 				F526F3FF03EA8FA3016640F1,
 				F567FA7703FC1B4B016640F1,
+				F7E5D349043B319501664058,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2339,6 +2340,79 @@
 			settings = {
 			};
 		};
+		F75A0F7B043AFF8301664058 = {
+			buildPhases = (
+				F75A0F7F043AFFC201664058,
+			);
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = "parser-tokenizer";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+				WRAPPER_EXTENSION = bundle;
+			};
+			dependencies = (
+			);
+			isa = PBXBundleTarget;
+			name = "parser-tokenizer";
+			productInstallPath = "$(USER_LIBRARY_DIR)/Bundles";
+			productName = "parser-tokenizer";
+			productReference = F75A0F7C043AFF8301664058;
+			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string></string>
+	<key>CFBundleGetInfoString</key>
+	<string></string>
+	<key>CFBundleIconFile</key>
+	<string></string>
+	<key>CFBundleIdentifier</key>
+	<string></string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string></string>
+	<key>CFBundlePackageType</key>
+	<string>BNDL</string>
+	<key>CFBundleShortVersionString</key>
+	<string></string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>0.0.1d1</string>
+</dict>
+</plist>
+";
+			shouldUseHeadermap = 0;
+		};
+		F75A0F7C043AFF8301664058 = {
+			isa = PBXBundleReference;
+			path = "parser-tokenizer.bundle";
+			refType = 3;
+		};
+		F75A0F7F043AFFC201664058 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			generatedFileNames = (
+			);
+			isa = PBXShellScriptBuildPhase;
+			neededFileNames = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "bison -y ../../fts/parser.y >> /dev/null 2>&1 \nmv y.tab.c ../../fts/parser.c\nflex -olex.yy.c ../../fts/tokenizer.l \nmv lex.yy.c ../../fts/tokenizer.c\nexit 0";
+		};
+		F75A0F80043AFFDF01664058 = {
+			isa = PBXTargetDependency;
+			target = F75A0F7B043AFF8301664058;
+		};
 		F75BA0A4040AAC4F01664058 = {
 			isa = PBXFileReference;
 			name = resizer.gif;
@@ -2419,6 +2493,18 @@
 		};
 		F7DC468004273D6C01664058 = {
 			fileRef = F7DC467C04273D3501664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F7E5D348043B319501664058 = {
+			isa = PBXFileReference;
+			name = socketstream.c;
+			path = ../../fts/socketstream.c;
+			refType = 2;
+		};
+		F7E5D349043B319501664058 = {
+			fileRef = F7E5D348043B319501664058;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -2528,6 +2614,7 @@
 			};
 			dependencies = (
 				F534894C03D57287016640F1,
+				F75A0F80043AFFDF01664058,
 				F534894F03D57287016640F1,
 				F534895003D57287016640F1,
 				F534895103D57287016640F1,
@@ -12920,6 +13007,7 @@
 				F80A5F42028FD44C01664092,
 				F880FFF80283022401664092,
 				F85C87900290238D01664092,
+				F75A0F7B043AFF8301664058,
 				F880FD830282FA3901664092,
 				F880FFEE028301DA01664092,
 				F880007B0283072101664092,
@@ -13044,6 +13132,7 @@
 				F823078502916C7401664092,
 				F527AE1D03D30629016640F1,
 				F5126A7F03D58378016640F1,
+				F75A0F7C043AFF8301664058,
 			);
 			isa = PBXGroup;
 			name = Products;
@@ -13329,6 +13418,7 @@
 				F880FD770282FA3901664092,
 				F880FD780282FA3901664092,
 				F880FD790282FA3901664092,
+				F7E5D348043B319501664058,
 				F880FD7A0282FA3901664092,
 				F880FD7B0282FA3901664092,
 				F880FD7C0282FA3901664092,

@@ -62,6 +62,9 @@
 /* Define if you have the logf function.  */
 /* #undef HAVE_LOGF */
 
+/* Define if you have the realpath function.  */
+#define HAVE_REALPATH 1
+
 /* Define if you have the signal function.  */
 #define HAVE_SIGNAL 1
 
