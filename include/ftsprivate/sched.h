@@ -30,7 +30,7 @@
  *
  * @ingroup sched
  */
-extern void fts_sched_run(void);
+FTS_API void fts_sched_run(void);
 
 /**
  * Halt the scheduler 
@@ -39,11 +39,10 @@ extern void fts_sched_run(void);
  *
  * @ingroup sched
  */
-extern void fts_sched_halt(void);
+FTS_API void fts_sched_halt(void);
 
 
-extern void fts_sleep(void);
-
+FTS_API void fts_sleep(void);
 
 #endif
 
