@@ -48,14 +48,14 @@ typedef struct fts_object_patcher_data {
 
 struct fts_object {
   fts_class_t *cl;
-
-  struct {
-    unsigned long status:FTS_OBJECT_BITS_STATUS;
+  
+  struct { 
+    unsigned int status:FTS_OBJECT_BITS_STATUS;
 
     /* IDs for the client communication */
-    long client_id:FTS_OBJECT_BITS_CLIENT;
-    long id:FTS_OBJECT_BITS_ID;
-  } flag;
+    int client_id:FTS_OBJECT_BITS_CLIENT;
+    int id:FTS_OBJECT_BITS_ID;
+  } flag; 
   
   /* reference counter */
   int refcnt;
