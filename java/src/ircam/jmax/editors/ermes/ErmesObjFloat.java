@@ -53,7 +53,7 @@ class ErmesObjFloat extends ErmesObject {
     DEFAULT_WIDTH = itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("...");
     if(currentRect.height<DEFAULT_HEIGHT+4) {
       preferredSize.height = DEFAULT_HEIGHT+4;
-      currentRect.height = preferredSize.height;
+      Resize(0, getPreferredSize().height - currentRect.height);
     }
     if(currentRect.width<DEFAULT_WIDTH+17){
       preferredSize.width = DEFAULT_WIDTH+17;
