@@ -118,6 +118,11 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
   {
     return (document instanceof FtsPatcherDocument);
   }
+
+  public String getDescription()
+  {
+    return "jMax patches";
+  }
 }
 
 

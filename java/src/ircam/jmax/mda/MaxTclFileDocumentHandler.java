@@ -138,6 +138,11 @@ public class MaxTclFileDocumentHandler extends MaxDocumentHandler
     // (document instanceof MaxTclDocument) &&
     // super.canSaveTo(document, file));
   }
+
+  public String getDescription()
+  {
+    return "Tcl Documents";
+  }
 }
 
 

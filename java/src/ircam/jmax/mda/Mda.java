@@ -4,6 +4,10 @@ import java.util.*;
 import java.io.*;
 import com.sun.java.swing.*;
 
+// Tmp packages
+import com.sun.java.swing.preview.*;
+import com.sun.java.swing.preview.filechooser.*;
+
 /** This class provide central registration services
  * and methods that are not tied to specific classes 
  * All MDA wide global public services are accessed thru this class.
@@ -243,6 +247,76 @@ public class Mda
       }
 
     throw new MaxDocumentException("Cannot create document for " + data);
+  }
+
+
+  /** Produce a FileFilter suitable for a File Box, for all the
+   * jMax document
+   */
+
+  static private class MaxAllDocumentFileFilter extends FileFilter
+  {
+    public boolean accept(File f)
+    {
+      if (f.isDirectory()) 
+	return true;
+      else
+	return Mda.canLoadDocument(f);
+    }
+    
+    public String getDescription()
+    {
+	return "jMax Documents";
+    }
+  }
+
+  static public FileFilter getAllDocumentsFileFilter()
+  {
+    return new MaxAllDocumentFileFilter();
+  }
+
+
+  static private class MaxDocumentFileFilter extends FileFilter
+  {
+    MaxDocumentHandler documentHandler;
+
+    MaxDocumentFileFilter(MaxDocumentHandler documentHandler)
+    {
+      this.documentHandler = documentHandler;
+    }
+
+    public boolean accept(File f)
+    {
+      if (f.isDirectory()) 
+	return true;
+      else
+	return documentHandler.canLoadFrom(f);
+    }
+    
+    public String getDescription()
+    {
+      return documentHandler.getDescription();
+    }
+  }
+
+  static class FileFilterEnumeration implements Enumeration
+  {
+    int i = 0;
+
+    public boolean hasMoreElements()
+    {
+      return (i < allHandlers.size());
+    }
+
+    public Object nextElement()
+    {
+      return new MaxDocumentFileFilter((MaxDocumentHandler) allHandlers.elementAt(i++));
+    }
+  }
+
+  static public Enumeration getDocumentFileFilters()
+  {
+    return new FileFilterEnumeration();
   }
 }
 

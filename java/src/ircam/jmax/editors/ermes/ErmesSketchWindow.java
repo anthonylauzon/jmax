@@ -929,7 +929,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 	return;
       }
 
-    file = MaxFileChooser.chooseFileToSave(this, "Save As", itsDocument.getDocumentFile());
+    file = MaxFileChooser.chooseFileToSave(this, itsDocument.getDocumentFile());
 
     if (file == null)
       return;
@@ -954,7 +954,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   {
     File file;
 
-    file = MaxFileChooser.chooseFileToSave(this, "Save As", itsDocument.getDocumentFile());
+    file = MaxFileChooser.chooseFileToSave(this, itsDocument.getDocumentFile());
 
     if (file == null)
       return;

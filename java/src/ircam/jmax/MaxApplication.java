@@ -235,6 +235,10 @@ public class MaxApplication extends Object
     ircam.jmax.mda.MdaModule.initModule();
     ircam.jmax.fts.FtsModule.initModule();
 
+    // Initialize dialogs
+
+    ircam.jmax.dialogs.DialogsModule.initModule();
+
     // than the builtin editors 
 
     ircam.jmax.editors.console.ConsoleModule.initModule();
@@ -386,9 +390,7 @@ public class MaxApplication extends Object
 		    if (! document.canSave())
 		      {
 			File file;
-			file= MaxFileChooser.chooseFileToSave(null,
-							      "Save As",
-							      document.getDocumentFile());
+			file= MaxFileChooser.chooseFileToSave(null, document.getDocumentFile());
 
 			if (file != null)
 			  document.bindToDocumentFile(file);

@@ -1,10 +1,13 @@
 package ircam.jmax.dialogs;
 
 import java.io.*;
+import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 
 import com.sun.java.swing.*;
+
+// Tmp packages
 import com.sun.java.swing.preview.*;
 import com.sun.java.swing.preview.filechooser.*;
 
@@ -21,95 +24,75 @@ import ircam.jmax.mda.*;
 
 public class MaxFileChooser
 {
-  static class MaxFileFilter extends FileFilter
+
+  static private JFileChooser fd;
+
+  static void makeFileChooser()
   {
-    public boolean accept(File f)
-    {
-      if (f.isDirectory()) 
-	return true;
-      else
-	return Mda.canLoadDocument(f);
-    }
-    
-    public String getDescription()
-    {
-	return "jMax documents";
-    }
+    fd = new JFileChooser(MaxApplication.getProperty("user.dir"));
+
+    fd.setFileFilter(Mda.getAllDocumentsFileFilter());
+
+    Enumeration e = Mda.getDocumentFileFilters();
+    while (e.hasMoreElements())
+      fd.addChoosableFileFilter((FileFilter) e.nextElement());
+
+    fd.addChoosableFileFilter(fd.getAcceptAllFileFilter());
   }
-
-
-  static private String currentOpenDirectory = null; 
 
   /** New Loading structure (beginning): global "Open" FileDialog that handle current directory */
 
   /** CHoose a file for opening, in the current directory, with a given f ilename filter */
 
-  public static File chooseFileToOpen(Frame frame, String title)
+  public static File chooseFileToOpen(Frame frame)
   {
-    JFileChooser fd;
+    File dir;
 
-    if (currentOpenDirectory == null)
-      currentOpenDirectory = MaxApplication.getProperty("user.dir");
+    if (fd == null)
+      makeFileChooser();
 
-    fd = new JFileChooser(currentOpenDirectory);
-
+    dir = fd.getCurrentDirectory();
     fd.setDialogTitle("Open"); 
-    fd.setFileFilter(new MaxFileFilter());
-    fd.addChoosableFileFilter(fd.getAcceptAllFileFilter());
-
-    // fd.setFileView(new MyFileView());
-
 
     if (fd.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION)
-      {
-	File file;
-
-	file = fd.getSelectedFile();
-	
-	if (file != null)
-	  currentOpenDirectory = file.getParent();
-
-	return file;
-      }
+      return fd.getSelectedFile();
     else
-      return null;
-  }
+      {
+	/* We backup to the old directory in case of cancel;
+	   Anyway, the directory will be in the history */
 
-  /* CHoose a file to save */
+	fd.setCurrentDirectory(dir);
 
-  public static File chooseFileToSave(Frame frame, String title)
-  {
-    return chooseFileToSave(frame, title, null);
+	return null;
+      }
   }
 
   /* CHoose a file to save, having an old File as initial content of the dialog box */
 
-  public static File chooseFileToSave(Frame frame, String title, File oldFile)
+  public static File chooseFileToSave(Frame frame, File oldFile)
   {
-    JFileChooser fd;
+    File dir;
 
-    if (currentOpenDirectory == null)
-      currentOpenDirectory = MaxApplication.getProperty("user.dir");
+    if (fd == null)
+      makeFileChooser();
 
-    fd = new JFileChooser(currentOpenDirectory);
+    dir = fd.getCurrentDirectory();
+    fd.setDialogTitle("Save As");
 
-    fd.setDialogTitle("Save"); 
-    fd.setFileFilter(new MaxFileFilter());
-    fd.addChoosableFileFilter(fd.getAcceptAllFileFilter());
+    if (oldFile != null)
+      fd.setSelectedFile(oldFile);
 
-    if (fd.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION)
-      {
-	File file;
-	
-	file = fd.getSelectedFile();    
-
-	if ((oldFile == null) && (file != null))
-	  currentOpenDirectory = file.getParent();
-
-	return file;
-      }
+    if (fd.showDialog(frame, "Save As") == JFileChooser.APPROVE_OPTION)
+      return fd.getSelectedFile();
     else
-      return null;
+      {
+	/* We backup to the old directory in case of cancel;
+	   Anyway, the directory will be in the history */
+
+	fd.setCurrentDirectory(dir);
+
+	return null;
+      }
   }
 }
 

@@ -59,6 +59,12 @@ abstract public class MaxDocumentHandler
   {
     throw new MaxDocumentException("SYSTEM ERROR: Cannot save subdocuments !");
   }
+
+  /** Return a string describing the kind of files this handler can load 
+    It is used for the file chooser dialog
+    */
+
+  abstract public String getDescription();
 }
 
 

@@ -69,6 +69,11 @@ public class MaxTclExecutedDocumentHandler extends MaxDocumentHandler
   {
     return false;
   }
+
+  public String getDescription()
+  {
+    return "Tcl Scripts";
+  }
 }
 
 

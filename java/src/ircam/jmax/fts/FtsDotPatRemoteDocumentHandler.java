@@ -105,6 +105,11 @@ public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
   {
     return false;
   }
+
+  public String getDescription()
+  {
+    return "Max Patches";
+  }
 }
 
 
