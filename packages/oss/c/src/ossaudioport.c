@@ -25,6 +25,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <signal.h>
 #include <errno.h>
 #include <string.h>
 #include <linux/soundcard.h>
@@ -98,53 +99,69 @@ ossaudiomanager_scan_devices()
  * of samples in the native format.
  * Its argument is the audioport. Buffers are allocated by the port.
  */
-static void ossaudioport_input_fun(fts_audioport_t* port)
+static void ossaudioport_input_fun(fts_audioport_t* port, float** buffers, int buffsize)
 {
   ossaudioport_t* oss_port = (ossaudioport_t*)port;
-  
+  int channels = fts_audioport_get_channels( port, FTS_AUDIO_INPUT);
+  int i;
+  int j; 
+  int ch;
+
   read(oss_port->fd, oss_port->adc_fmtbuf, oss_port->buff_size);
+  
+  for (ch = 0; ch < channels; ++ch)
+  {
+    j = ch;
+    if (fts_audioport_is_channel_used(port, FTS_AUDIO_INPUT, ch))
+    {
+      for (i = 0; i < buffsize; ++i)
+      {
+	short s0 = oss_port->adc_fmtbuf[j];
+	buffers[ch][i] = (float)s0/32767.0f;
+	j += channels;
+      }
+    }
+    else
+    {
+      for (i = 0; i < buffsize; ++i)
+      {
+	buffers[ch][i] = 0.0f;
+      }
+    }
+  }
 }
 
 
-static void ossaudioport_output_fun(fts_audioport_t* port)
+static void ossaudioport_output_fun(fts_audioport_t* port, float** buffers, int buffsize)
 {
   ossaudioport_t* oss_port = (ossaudioport_t*)port;
+  int channels = fts_audioport_get_channels( port, FTS_AUDIO_OUTPUT);
+  int i;
+  int j;
+  int ch;
 
+  for (ch = 0; ch < channels; ++ch)
+  {
+    j = ch;
+    if (fts_audioport_is_channel_used(port, FTS_AUDIO_OUTPUT, ch))
+    {
+      for (i = 0; i < buffsize; ++i)
+      {
+	short s0 = (short)(32767.0f * buffers[ch][i]);
+	oss_port->dac_fmtbuf[j] = s0;
+	j += channels;
+      }
+    }
+    else
+    {
+      for (i = 0; i < buffsize; ++i)
+      {
+	oss_port->dac_fmtbuf[j] = 0;
+	j += channels;
+      }
+    }
+  }
   write(oss_port->fd, oss_port->dac_fmtbuf, oss_port->buff_size);
-}
-
-/** 
- * The audioport copy function copies the samples in the native format to a float buffer
- * for a given channel.
- */
-static void ossaudioport_input_copy_fun( fts_audioport_t *port, float *buff, int buffsize, int channel)
-{
-  ossaudioport_t* oss_port = (ossaudioport_t*)port;
-  int channels = fts_audioport_get_max_channels( port, FTS_AUDIO_INPUT);
-  int i;
-  int j = channel;
-
-  for (i = 0; i < buffsize; ++i)
-  {
-    short s0 = oss_port->adc_fmtbuf[j];
-    buff[i] = (float)s0/32767.0f;
-    j += channels;
-  }
-}
-
-static void ossaudioport_output_copy_fun( fts_audioport_t *port, float *buff, int buffsize, int channel)
-{
-  ossaudioport_t* oss_port = (ossaudioport_t*)port;
-  int channels = fts_audioport_get_max_channels( port, FTS_AUDIO_OUTPUT);
-  int i;
-  int j = channel;
-
-  for (i = 0; i < buffsize; ++i)
-  {
-    short s0 = (short)(32767.0f * buff[i]);
-    oss_port->dac_fmtbuf[j] = s0;
-    j += channels;
-  }
 }
 
 static int ossaudioport_xrun( fts_audioport_t *port)
@@ -189,6 +206,8 @@ static void ossaudioport_debug( int fd)
   post( "bytes: %d\n", info.bytes);
 }
 #endif
+
+
 
 static void ossaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -315,14 +334,11 @@ static void ossaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
   fts_audioport_set_io_fun((fts_audioport_t*)self, FTS_AUDIO_INPUT, ossaudioport_input_fun);
   fts_audioport_set_io_fun((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, ossaudioport_output_fun);
 
-  fts_audioport_set_copy_fun((fts_audioport_t*)self, FTS_AUDIO_INPUT, ossaudioport_input_copy_fun);
-  fts_audioport_set_copy_fun((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, ossaudioport_output_copy_fun);
-
   fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_INPUT);
   fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
 
-  fts_audioport_set_max_channels((fts_audioport_t*)self, FTS_AUDIO_INPUT, channels);
-  fts_audioport_set_max_channels((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, channels);
+  fts_audioport_set_channels((fts_audioport_t*)self, FTS_AUDIO_INPUT, channels);
+  fts_audioport_set_channels((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, channels);
 
 /*   fts_audioport_set_xrun_function( (fts_audioport_t *)self, ossaudioport_xrun); */
 
