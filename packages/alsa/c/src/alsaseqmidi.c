@@ -246,7 +246,7 @@ alsaseqmidi_create_midiport(alsaseqmidi_t* this, fts_class_t* cl, fts_symbol_t d
     
     port = fts_object_create(cl, NULL, 4, args);
 
-    return NULL;
+    return (fts_midiport_t*)port;
 }
 
 
@@ -275,12 +275,16 @@ alsaseqmidi_get_io(alsaseqmidi_t* this, fts_class_t* alsaseqmidiport_type, const
 	}
 	else if (fts_is_symbol(&a))
 	{
+	    fts_midiport_t* port;
 	    fts_log("[alsaseqmidi] create alsaseqmidiport \n");
 	    port_address = fts_get_symbol(&a);
 	    /* Create midiport */
-	    *ptr = alsaseqmidi_create_midiport(this, alsaseqmidiport_type, device_name,
+	    port = alsaseqmidi_create_midiport(this, alsaseqmidiport_type, device_name,
 					       label_name, port_address);
-
+	    if (port)
+	    {
+		*ptr = port;
+	    }	    
 	}
 	
     }
