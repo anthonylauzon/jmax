@@ -48,18 +48,28 @@ class MaxFtsConnectCmd implements Command
 
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
+    int port = 0;
+
+    try
+      {
+	port = Integer.parseInt( argv[5].toString());
+      }
+    catch( NumberFormatException excp)
+      {
+      }
+
     if (argv.length == 6)
       MaxApplication.setFts(new Fts(new String(argv[1].toString()),
 				    new String(argv[2].toString()),
 				    new String(argv[3].toString()),
 				    new String(argv[4].toString()),
-				    new String(argv[5].toString())));
+				    port));
     else if (argv.length == 5)
       MaxApplication.setFts(new Fts(new String(argv[1].toString()),
 						 new String(argv[2].toString()),
 						 new String(argv[3].toString()),
 						 new String(argv[4].toString()),
-						 null));
+						 0));
     else
       throw new TclNumArgsException(interp, 1, argv, "<type> <ftsdir> <ftsname> <socket> <server> <port>");
   }
