@@ -92,6 +92,8 @@ extern "C" {
 #include <fts/ftlmem.h>
 /*  #include <fts/dsp.h> */
 
+#include <fts/fpe.h>
+
 #ifdef __cplusplus
 }
 #endif
