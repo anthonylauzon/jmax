@@ -40,9 +40,6 @@ static fts_symbol_t s_play;
 static fts_symbol_t s_pause;
 static fts_symbol_t s_record;
 
-static int number_of_dtdobjs = 0;
-static int dtdserver_started = 0;
-
 /* ********************************************************************** */
 /* ********************************************************************** */
 /*                                                                        */
@@ -63,7 +60,7 @@ typedef struct {
   fts_object_t _o;
   int n_channels;
   readsf_state_t state;
-  int id;
+  dtdserver_t *server;
   dtdfifo_t *fifo;
   fts_alarm_t eof_alarm;
   int can_post_data_late;
@@ -74,34 +71,24 @@ static fts_symbol_t readsf_dsp_function;
 
 static void readsf_open_realize( readsf_t *this, const char *filename)
 {
-  int id;
+  this->fifo = dtdserver_open_read( this->server, filename, this->n_channels);
 
-  id = dtdfifo_allocate( FTS_SIDE);
-
-  if (id < 0)
+  if ( !this->fifo)
     {
       post( "readsf~: error: cannot allocate fifo for DTD server\n");
       return;
     }
-
-  this->id = id;
-  this->fifo = dtdfifo_get( this->id);
-
-  dtdserver_open( id, filename, fts_symbol_name(fts_get_search_path()), this->n_channels);
 
   this->state = readsf_opened;
 }
 
 static void readsf_close_realize( readsf_t *this)
 {
-  if (this->id >= 0)
+  if (this->fifo)
     {
-      dtdfifo_set_used( this->fifo, FTS_SIDE, 0);
-
-      dtdserver_close( this->id);
+      dtdserver_close( this->server, this->fifo);
     }
 
-  this->id = -1;
   this->fifo = 0;
   this->state = readsf_closed;
 }
@@ -209,22 +196,12 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   readsf_t *this = (readsf_t *)o;
   int n_channels;
 
-  number_of_dtdobjs++;
-
   n_channels = fts_get_long_arg(ac, at, 1, 1);
   this->n_channels = (n_channels < 1) ? 1 : n_channels;
 
-  /* 
-   * Create enough fifos so that there is at least X*number_of_objects fifos
-   * so that, when you open a file, you don't need to create the fifo, i.e.
-   * create the file and mmap it, which would block FTS
-   */
-#define X 2.0
+  this->server = (dtdserver_t *)fts_get_ptr_arg(ac, at, 2, dtdserver_get_default_instance());
 
-  while ( dtdfifo_get_number_of_fifos() < (int) (ceil( X * number_of_dtdobjs)) )
-    {
-      dtdserver_new_fifo();
-    }
+  dtdserver_add_object( this->server, this);
 
   this->state = readsf_closed;
   this->can_post_data_late = 1;
@@ -239,12 +216,12 @@ static void readsf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 {
   readsf_t *this = (readsf_t *)o;
 
+  dtdserver_remove_object( this->server, this);
+
   fts_alarm_unarm( &this->eof_alarm);	
   fts_alarm_unarm( &this->post_data_late_alarm);	
 
   dsp_list_remove(o);
-
-  number_of_dtdobjs--;
 }
 
 static void clear_outputs( int n, int n_channels, fts_word_t *outputs)
@@ -335,7 +312,6 @@ static void readsf_dsp( fts_word_t *argv)
 
 	    dtdfifo_set_used( this->fifo, FTS_SIDE, 0);
 
-	    this->id = -1;
 	    this->fifo = 0;
 	    this->state = readsf_closed;
 	  }
@@ -447,12 +423,6 @@ static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   readsf_dsp_function = fts_new_symbol( "readsf~");
   dsp_declare_function( readsf_dsp_function, readsf_dsp);
 
-  if ( !dtdserver_started)
-    {
-      dtdserver_start();
-      dtdserver_started = 1;
-    }
-
   return fts_Success;
 }
 
@@ -466,8 +436,6 @@ static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t
 /* ********************************************************************** */
 /* ********************************************************************** */
 
-#if 0
-
 typedef enum { 
   writesf_closed, 
   writesf_opened, 
@@ -479,7 +447,7 @@ typedef struct {
   fts_object_t _o;
   int n_channels;
   writesf_state_t state;
-  int id;
+  dtdserver_t *server;
   dtdfifo_t *fifo;
   int can_post_fifo_overflow;
   fts_alarm_t post_fifo_overflow_alarm;
@@ -490,25 +458,24 @@ static fts_symbol_t writesf_dsp_function;
 
 static void writesf_open_realize( writesf_t *this, const char *filename)
 {
-  this->id = dtdserver_open( filename, fts_symbol_name(fts_get_search_path()), this->n_channels);
+  this->fifo = dtdserver_open_write( this->server, filename, this->n_channels);
 
-  if ( this->id < 0)
+  if ( !this->fifo)
     {
       post( "writesf~: error: cannot allocate fifo for DTD server\n");
       return;
     }
-
-  this->fifo = dtdfifo_get( this->id);
 
   this->state = writesf_opened;
 }
 
 static void writesf_close_realize( writesf_t *this)
 {
-  if (this->id >= 0)
-    dtdserver_close( this->id);
+  if (this->fifo)
+    {
+      dtdserver_close( this->server, this->fifo);
+    }
 
-  this->id = -1;
   this->fifo = 0;
   this->state = writesf_closed;
 }
@@ -590,10 +557,12 @@ static void writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   writesf_t *this = (writesf_t *)o;
   int n_channels;
 
-  number_of_dtdobjs++;
-
   n_channels = fts_get_long_arg(ac, at, 1, 1);
   this->n_channels = (n_channels < 1) ? 1 : n_channels;
+
+  this->server = (dtdserver_t *)fts_get_ptr_arg(ac, at, 2, dtdserver_get_default_instance());
+
+  dtdserver_add_object( this->server, this);
 
   this->state = writesf_closed;
   this->can_post_fifo_overflow = 1;
@@ -607,11 +576,11 @@ static void writesf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 {
   writesf_t *this = (writesf_t *)o;
 
+  dtdserver_remove_object( this->server, this);
+
   fts_alarm_unarm( &this->post_fifo_overflow_alarm);	
 
   dsp_list_remove(o);
-
-  number_of_dtdobjs--;
 }
 
 static void write_fifo( int n, int n_channels, dtdfifo_t *fifo, fts_word_t *inputs)
@@ -772,16 +741,9 @@ static fts_status_t writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_
   writesf_dsp_function = fts_new_symbol( "writesf~");
   dsp_declare_function( writesf_dsp_function, writesf_dsp);
 
-  if ( !dtdserver_started)
-    {
-      dtdserver_start();
-      dtdserver_started = 1;
-    }
-
   return fts_Success;
 }
 
-#endif
 /* ********************************************************************** */
 /* ********************************************************************** */
 /*                                                                        */

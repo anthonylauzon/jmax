@@ -26,6 +26,7 @@
 
 
 #include <stdio.h>
+#include <string.h>
 
 #include <fts/fts.h>
 #include "vexp.h"

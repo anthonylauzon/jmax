@@ -41,7 +41,7 @@
 #include <fts/sys.h>
 #include <fts/lang.h>
 #include <fts/runtime/devices/devices.h>
-#include <fts/runtime/devices/devconf.h>
+#include "devconf.h"
 
 /******************************************************************************/
 /*                                                                            */

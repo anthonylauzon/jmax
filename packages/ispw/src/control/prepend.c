@@ -29,6 +29,7 @@
 
 #include <fts/fts.h>
 #include <math.h>
+#include <string.h>
 
 enum {
   ilow = 0,

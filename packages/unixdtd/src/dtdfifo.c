@@ -38,177 +38,23 @@
 #include <sys/stat.h>
 #include <assert.h>
 
-/*  #include "dtddefs.h" */
 #include "dtdfifo.h"
-
-typedef struct {
-  dtdfifo_t *fifo;
-  char *full_path;
-  void *user_data;
-} dtdfifo_entry_t;
-
-static dtdfifo_entry_t *table = 0;
-static int table_size = 0;
-
-/* ********************************************************************** */
-/* Table handling for mapping ids to pointers                             */
-/* ********************************************************************** */
-
-static void grow_table( int id)
-{
-  int i, old_size;
-
-  old_size = table_size;
-
-  if (table_size == 0)
-    table_size = 32;
-
-  while ( table_size <= id )
-    table_size *= 2;
-
-  table = realloc( table, table_size * sizeof( dtdfifo_entry_t ));
-
-  for ( i = old_size; i < table_size; i ++)
-    {
-      table[i].fifo = 0;
-      table[i].user_data = 0;
-    }
-}
-
-dtdfifo_t *dtdfifo_get( int id)
-{
-  if ( id < 0 || id >= table_size)
-    return 0;
-
-  return table[id].fifo;
-}
-
-static void dtdfifo_put( int id, dtdfifo_t *fifo)
-{
-  if (id < 0)
-    return;
-
-  if (id >= table_size)
-    grow_table( id);
-    
-  table[id].fifo = fifo;
-}
-
-void *dtdfifo_get_user_data( int id)
-{
-  if ( id < 0 || id >= table_size)
-    return 0;
-
-  return table[id].user_data;
-}
-
-void dtdfifo_put_user_data( int id, void *user_data)
-{
-  if (id < 0)
-    return;
-
-  if (id >= table_size)
-    grow_table( id);
-    
-  table[id].user_data = user_data;
-}
-
-
-/* ********************************************************************** */
-/* Allocation/Deallocation                                                */
-/* ********************************************************************** */
-
-int dtdfifo_get_number_of_fifos( void)
-{
-  int id, n;
-
-  n = 0;
-
-  for ( id = 0; id < table_size; id++)
-    {
-      if ( table[id].fifo)
-	n++;
-    }
-
-  return n;
-}
-
-int dtdfifo_allocate( int side)
-{
-  int id;
-
-  for ( id = 0; id < table_size; id++)
-    {
-      if ( table[id].fifo 
-	   && ! dtdfifo_is_used( table[id].fifo, 0)
-	   && ! dtdfifo_is_used( table[id].fifo, 1))
-	{
-	  dtdfifo_set_read_index( table[id].fifo, 0);
-	  dtdfifo_set_write_index( table[id].fifo, 0);
-
-	  dtdfifo_set_used( table[id].fifo, side, 1);
-
-	  return id;
-	}
-    }
-
-  return -1;
-}
 
 /* ********************************************************************** */
 /* Creation                                                               */
 /* ********************************************************************** */
 
-static int create_base_dir( const char *dirname)
+dtdfifo_t *dtdfifo_mmap( const char *filename, int buffer_size)
 {
-  struct stat buf;
-
-  if ( stat( dirname, &buf) < 0)
-    {
-      if ( errno != ENOENT)
-	{
-	  fprintf( stderr, "Cannot stat DTD fifo root directory %s (%s)\n", dirname, strerror( errno));
-	  return -1;
-	}
-      else
-	{
-	  if ( mkdir( dirname, 0777) < 0)
-	    {
-	      fprintf( stderr, "Cannot create DTD fifo root directory %s (%s)\n", dirname, strerror( errno));
-	      return -1;
-	    }
-	}
-    }
-
-  return 1;
-}
-
-int dtdfifo_new( int id, const char *dirname, int buffer_size)
-{
-  static int new_id = 0;
   dtdfifo_t *fifo;
   int fd, size;
-  char *full_path;
-  char tmp[32];
 
-  if ( id == 0 )
-    id = ++new_id;
-
-  if ( create_base_dir( dirname) < 0 )
-    return -1;
-
-  full_path = (char *)malloc( strlen( dirname) + 32);
-  strcpy( full_path, dirname);
-  strcat( full_path, "/");
-  sprintf( tmp, "%d", id);
-  strcat( full_path, tmp);
-
-  fd = open( full_path, O_RDWR | O_CREAT, 0666);
+  fd = open( filename, O_RDWR | O_CREAT, 0666);
 
   if ( fd < 0)
     {
-      fprintf( stderr, "Cannot open file %s (%s)\n", full_path, strerror( errno));
-      return -1;
+      fprintf( stderr, "Cannot open file %s (%s)\n", filename, strerror( errno));
+      return 0;
     }
 
   size = DTDFIFO_SIZE( buffer_size);
@@ -219,47 +65,44 @@ int dtdfifo_new( int id, const char *dirname, int buffer_size)
 
   if ( (void *)fifo == MAP_FAILED)
     {
-      fprintf( stderr, "Cannot map file %s (%d,%s)\n", full_path, errno, strerror( errno));
-      return -1;
+      fprintf( stderr, "Cannot map file %s (%d,%s)\n", filename, errno, strerror( errno));
+      return 0;
     }
 
   close(fd);
 
-  fifo->buffer_size = buffer_size;
-  fifo->used[ 0] = 0;
-  fifo->used[ 1] = 0;
-  fifo->read_index = 0;
-  fifo->write_index = 0;
-
-  dtdfifo_put( id, fifo);
-
-  table[id].full_path = full_path;
-
-  return id;
+  return fifo;
 }
 
-static void dtdfifo_apply_delete( int id, dtdfifo_t *fifo, void *user_data)
+dtdfifo_t *dtdfifo_new( const char *filename, int buffer_size)
+{
+  dtdfifo_t *fifo;
+
+  fifo = dtdfifo_mmap( filename, buffer_size);
+
+  if (!fifo)
+    return 0;
+
+  fifo->buffer_size = buffer_size;
+  fifo->used[0] = 0;
+  fifo->used[1] = 0;
+  fifo->read_index = 0;
+  fifo->write_index = 0;
+  strcpy( fifo->filename, filename);
+
+  return fifo;
+}
+
+
+void dtdfifo_delete( dtdfifo_t *fifo)
 {
   int size;
 
-  if (unlink( table[id].full_path) < 0)
-    fprintf( stderr, "Cannot unlink %s (%d,%s)\n", table[id].full_path, errno, strerror( errno));
+  if (unlink( fifo->filename) < 0)
+    fprintf( stderr, "Cannot unlink %s (%d,%s)\n", fifo->filename, errno, strerror( errno));
 
-  free( table[id].full_path);
-  table[id].full_path = 0;
-
-  size = DTDFIFO_SIZE( fifo->buffer_size);
-
-  if ( munmap( fifo, size) < 0)
-    fprintf( stderr, "Cannot unmap fifo %d (%d,%s)\n", id, errno, strerror( errno));
-
-  table[id].fifo = 0;
-  table[id].user_data = 0;
-}
-
-void dtdfifo_delete_all( void)
-{
-  dtdfifo_apply( dtdfifo_apply_delete);
+  if ( munmap( fifo, DTDFIFO_SIZE( fifo->buffer_size)) < 0)
+    fprintf( stderr, "Cannot unmap fifo (%d,%s)\n", errno, strerror( errno));
 }
 
 /* ********************************************************************** */
@@ -322,24 +165,6 @@ void dtdfifo_incr_write_index( dtdfifo_t *fifo, int incr)
   fifo->write_index = write_index;
 }
 
-
-/* ********************************************************************** */
-/* Apply to all registered fifos                                          */
-/* ********************************************************************** */
-
-void dtdfifo_apply( void (*fun)( int id, dtdfifo_t *, void *))
-{
-  int id;
-
-  if ( !table)
-    return;
-
-  for ( id = 0; id < table_size; id++)
-    {
-      if (table[id].fifo)
-	(*fun)( id, table[id].fifo, table[id].user_data);
-    }
-}
 
 /* ********************************************************************** */
 /* Debug code                                                             */

@@ -29,8 +29,9 @@
 /*
  * Implementation of Direct-To-Disk handling by a separate server process.
  *
- * The Posix thread implementation has prooved real-time problems due to IRIX Posix thread
- * implementation that interacts strangely with isolated processors management.
+ * On Irix, the Posix thread implementation has prooved real-time problems due to 
+ * IRIX Posix thread implementation that interacts strangely with isolated processors 
+ * management.
  */
 
 #include <stdlib.h>
@@ -94,18 +95,24 @@ static int __debug( const char *format, ...)
 /*
  * Constants used by the server
  */
-static int block_frames;
-static int preload_block_frames;
-static int block_max_channels;
-static int fifo_blocks;
-static int loop_milliseconds;
-static int base_dir;
+static int _block_frames;
+static int _preload_block_frames;
+static int _loop_milliseconds;
 
+static void dtd_init_params( int argc, char **argv)
+{
+  sscanf( argv[1], "%d", &_block_frames);
+  sscanf( argv[2], "%d", &_preload_block_frames);
+  sscanf( argv[3], "%d", &_loop_milliseconds);
+}
 
 typedef struct {
+  dtdfifo_t *fifo;
   AFfilehandle file;
   int n_channels;
 } dtdhandle_t;
+
+static dtdhandle_t handle_table[DTD_MAX_FIFOS];
 
 /* One read block for all */
 static short *read_block;
@@ -278,25 +285,18 @@ static AFfilehandle dtd_open_file_write( const char *filename, const char *path,
   return file;
 }
 
-static void dtd_open( const char *line)
+static void dtd_open_read( const char *line)
 {
   AFfilehandle file;
-  dtdfifo_t *fifo;
   int id, n_channels, i;
   char filename[N], path[N];
   dtdhandle_t *handle;
+  dtdfifo_t *fifo;
 
   sscanf( line, "%*s%d%s%s%d", &id, filename, path, &n_channels);
 
-  fifo = dtdfifo_get( id);
-
-  if (fifo == 0)
-    {
-      fprintf( stderr, "[dtdserver] fifo == 0 in open !!! \n");
-      return;
-    }
-
-  handle = (dtdhandle_t *)dtdfifo_get_user_data( id);
+  handle = &handle_table[id];
+  fifo = handle->fifo;
   
   dtdfifo_set_used( fifo, DTD_SIDE, 1);
 
@@ -312,32 +312,60 @@ static void dtd_open( const char *line)
 
   handle->n_channels = n_channels;
 
-  for ( i = 0; i < DEFAULT_BLOCK_FRAMES/DEFAULT_PRELOAD_BLOCK_FRAMES; i++)
+  for ( i = 0; i < _block_frames / _preload_block_frames; i++)
     {
       int ret;
 
-      ret = dtd_read_block( handle->file, fifo, read_block, DEFAULT_PRELOAD_BLOCK_FRAMES, n_channels);
+      ret = dtd_read_block( handle->file, fifo, read_block, _preload_block_frames, n_channels);
     }
 
   DTD_DEBUG( __debug( "preloaded `%s'", filename) );
 }
 
+static void dtd_open_write( const char *line)
+{
+  AFfilehandle file;
+  int id, n_channels, i;
+  char filename[N];
+  dtdhandle_t *handle;
+  dtdfifo_t *fifo;
+
+  sscanf( line, "%*s%d%s%d", &id, filename, &n_channels);
+
+  handle = &handle_table[id];
+  fifo = handle->fifo;
+  
+  dtdfifo_set_used( fifo, DTD_SIDE, 1);
+
+  /* This should not happen */
+  if ( handle->file != AF_NULL_FILEHANDLE)
+    {
+      afCloseFile( handle->file);
+      handle->file = AF_NULL_FILEHANDLE;
+    }
+
+  /* Where to get the format and the sampling rate ????????? */
+  if ((handle->file = dtd_open_file_write( filename, 0, 0, 0, n_channels)) == AF_NULL_FILEHANDLE)
+    return;
+
+  handle->n_channels = n_channels;
+}
+
 static void dtd_close( const char *line)
 {
   int id;
-  dtdfifo_t *fifo;
   dtdhandle_t *handle;
+  dtdfifo_t *fifo;
 
   sscanf( line, "%*s%d", &id);
 
-  fifo = dtdfifo_get( id);
+  handle = &handle_table[id];
+  fifo = handle->fifo;
 
   if ( !dtdfifo_is_used( fifo, DTD_SIDE) )
     return;
 
   dtdfifo_set_used( fifo, DTD_SIDE, 0);
-
-  handle = (dtdhandle_t *)dtdfifo_get_user_data( id);
 
   if ( handle->file != AF_NULL_FILEHANDLE)
     {
@@ -346,40 +374,29 @@ static void dtd_close( const char *line)
     }
 }
 
-static void dtd_new( const char *line)
+static void dtd_mmap( const char *line)
 {
   int id, buffer_size;
-  char dirname[N];
-  dtdhandle_t *handle;
+  char filename[N];
+  dtdfifo_t *fifo;
 
-  sscanf( line, "%*s%d%s%d", &id, dirname, &buffer_size);
+  sscanf( line, "%*s%d%s%d", &id, filename, &buffer_size);
 
-  dtdfifo_new( id, dirname, buffer_size);
+  fifo = dtdfifo_mmap( filename, buffer_size);
 
-  handle = (dtdhandle_t *)malloc( sizeof( dtdhandle_t));
-  handle->file = AF_NULL_FILEHANDLE;
-
-  dtdfifo_put_user_data( id, handle);
-}
-
-static void dtd_init( const char *line)
-{
-  sscanf( line, "%*s%d%d%d%d%d%d", 
-	  &block_frames,
-	  &preload_block_frames,
-	  &block_max_channels,
-	  &fifo_blocks,
-	  &loop_milliseconds,
-	  &base_dir);
+  if (fifo)
+    {
+      handle_table[ id ].fifo = fifo;
+      handle_table[ id ].file = AF_NULL_FILEHANDLE;
+    }
 }
 
 /*
  * Commands are:
- * init <block_frames> <preload_block_frames> <block_max_channels> <fifo_blocks> <loop_milliseconds> <base_dir>
- * new <id> <dirname> <filename> <buffer_size>
- * open <id> <sound_file_name> <search_path> <n_channels>
+ * mmap <id> <filename> <buffer_size>
+ * openr <id> <sound_file_name> <search_path> <n_channels>
+ * openw <id> <sound_file_name> <n_channels>
  * close <id>
- * quit
  */
 static void dtd_process_command( const char *line)
 {
@@ -389,43 +406,45 @@ static void dtd_process_command( const char *line)
 
   sscanf( line, "%s", command);
 
-  if ( !strcmp( "init", command))
-    dtd_init( line);
-  else if ( !strcmp( "open", command))
-    dtd_open( line);
+  if ( !strcmp( "openr", command))
+    dtd_open_read( line);
+  else if ( !strcmp( "openw", command))
+    dtd_open_write( line);
   else if ( !strcmp( "close", command))
     dtd_close( line);
-  else if ( !strcmp( "new", command))
-    dtd_new( line);
-  else if ( !strcmp( "quit", command))
-    exit( 0);
+  else if ( !strcmp( "mmap", command))
+    dtd_mmap( line);
 }
 
-static void dtd_process_fifo( int id, dtdfifo_t *fifo, void *user_data)
+static void dtd_process_fifos( void)
 {
-  AFfilehandle file;
-  dtdhandle_t *handle;
+  int id;
 
-  handle = (dtdhandle_t *)user_data;
-
-  if ( handle->file != AF_NULL_FILEHANDLE 
-       && dtdfifo_is_used( fifo, 0) 
-       && dtdfifo_is_used( fifo, 1) )
+  for ( id = 0; id < DTD_MAX_FIFOS; id++)
     {
       int n_channels, block_size;
+      dtdhandle_t *handle;
+      dtdfifo_t *fifo;
+
+      handle = &handle_table[id];
+
+      if (!handle)
+	continue;
+
+      fifo = handle->fifo;
+      
+      if ( handle->file == AF_NULL_FILEHANDLE || !dtdfifo_is_used( fifo, 0) || !dtdfifo_is_used( fifo, 1) )
+	continue;
 
       n_channels = handle->n_channels;
 
-      block_size = DEFAULT_BLOCK_FRAMES * n_channels * sizeof( float);
+      block_size = _block_frames * n_channels * sizeof( float);
 
       DTD_DEBUG( __debug( "polling fifo %d channels=%d level=%d block_size=%d", id, n_channels, dtdfifo_get_write_level( fifo), block_size));
 
       if ( dtdfifo_get_write_level( fifo) >= block_size )
 	{
-	  int ret;
-
-	  ret = dtd_read_block( handle->file, fifo, read_block, DEFAULT_BLOCK_FRAMES, n_channels);
-
+	  int ret = dtd_read_block( handle->file, fifo, read_block, _block_frames, n_channels);
 	  DTD_DEBUG( __debug("filled %d samples in fifo %d", ret, id));
 	}
       else
@@ -462,7 +481,7 @@ static void dtd_main_loop( int fd)
       char line[N];
       
       tv.tv_sec = 0;
-      tv.tv_usec = DEFAULT_LOOP_MILLISECONDS * 1000;
+      tv.tv_usec = _loop_milliseconds * 1000;
 
       FD_ZERO( &rfds);
 
@@ -489,7 +508,7 @@ static void dtd_main_loop( int fd)
 	    }
 	}
       
-      dtdfifo_apply( dtd_process_fifo);
+      dtd_process_fifos();
     }
 
   DTD_DEBUG( __debug( "DTD server exiting") );
@@ -576,6 +595,8 @@ static void signal_handler( int sig)
 int main( int argc, char **argv)
 {
   int socket, port;
+
+  dtd_init_params( argc, argv);
 
   if ((socket = dtd_create_socket( &port)) < 0)
     {

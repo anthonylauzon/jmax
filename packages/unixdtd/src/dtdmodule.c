@@ -46,7 +46,7 @@ static void unixdtd_init( void)
 
 static void unixdtd_shutdown( void)
 {
-  dtdserver_quit();
+  dtdserver_stop();
 }
 
 fts_module_t unixdtd_module = { "unixdtd", "Direct-To-Disk objects (Unix version)", unixdtd_init, unixdtd_shutdown, 0};

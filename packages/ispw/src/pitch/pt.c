@@ -24,7 +24,7 @@
  *
  */
 
-
+#include <math.h>
 #include <fts/fts.h>
 
 

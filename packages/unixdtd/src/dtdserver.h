@@ -31,12 +31,18 @@
 
 #include "dtdfifo.h"
 
-extern void dtdserver_init( void);
-extern void dtdserver_quit( void);
+typedef struct _dtdserver_t dtdserver_t;
 
-extern void dtdserver_new( int id, const char *dirname, int buffer_size);
-extern void dtdserver_open( int id, const char *filename, const char *path, int n_channels);
-extern void dtdserver_close( int id);
-extern void dtdserver_delete( int id);
+extern dtdserver_t *dtdserver_get_default_instance( void);
+
+extern void dtdserver_add_object( dtdserver_t *server, void *object);
+extern void dtdserver_remove_object( dtdserver_t *server, void *object);
+
+extern dtdfifo_t *dtdserver_read( dtdserver_t *server, const char *filename, int n_channels);
+extern dtdfifo_t *dtdserver_write( dtdserver_t *server, const char *filename, int n_channels);
+
+extern void dtdserver_close( dtdserver_t *server, dtdfifo_t *fifo);
+
+extern void dtdserver_stop( void);
 
 #endif

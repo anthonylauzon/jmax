@@ -27,6 +27,7 @@
  */
 
 #include <unistd.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,8 +42,9 @@
 #include <fts/fts.h>
 #include "dtddefs.h"
 #include "dtdfifo.h"
+#include "dtdserver.h"
 
-typedef struct {
+struct _dtdserver_t {
   fts_object_t head;
 
   int server_pid;
@@ -55,35 +57,48 @@ typedef struct {
   int loop_milliseconds;
 
   const char *base_dir;
-} dtdserver_t;
+
+  int number_of_objects;
+  int number_of_fifos;
+
+  dtdfifo_t *fifo_table[DTD_MAX_FIFOS];
+};
 
 static fts_class_t *dtdserver_class;
-static dtdserver_t *single_instance;
+static dtdserver_t *default_instance;
 
-void dtdserver_start( void)
+dtdserver_t *dtdserver_get_default_instance( void)
 {
-  single_instance = (dtdserver_t *)fts_object_create( dtdserver_class, 0, 0);
+  if (!default_instance)
+    default_instance = (dtdserver_t *)fts_object_create( dtdserver_class, 0, 0);
+
+  return default_instance;
 }
 
-void dtdserver_exit( void)
+void dtdserver_stop( void)
 {
-  fts_object_destroy( (fts_object_t *)single_instance);
+  if ( default_instance)
+    fts_object_destroy( (fts_object_t *)default_instance);
 }
 
-static void dtdserver_send_command( const char *command)
+/* ********************************************************************** */
+/* Functions called by the DTD objects                                    */
+/* ********************************************************************** */
+
+static void dtdserver_send_command( dtdserver_t *server, const char *command)
 {
   int r;
   struct sockaddr_in my_addr;
 
-  if ( single_instance->server_socket <= 0)
+  if ( server->server_socket <= 0)
     return;
 
   memset( &my_addr, 0, sizeof( my_addr));
   my_addr.sin_family = AF_INET;
   my_addr.sin_addr.s_addr = htonl(INADDR_ANY); 
-  my_addr.sin_port = htons( single_instance->server_port);
+  my_addr.sin_port = htons( server->server_port);
 
-  r = sendto( single_instance->server_socket, command, strlen( command)+1, 0, &my_addr, sizeof(my_addr));
+  r = sendto( server->server_socket, command, strlen( command)+1, 0, &my_addr, sizeof(my_addr));
 
   if ( r < 0)
     {
@@ -91,37 +106,161 @@ static void dtdserver_send_command( const char *command)
     }
 }
 
-void dtdserver_new_fifo( void)
+void dtdserver_add_object( dtdserver_t *server, void *object)
+{
+  server->number_of_objects++;
+
+#define X 2
+  /* 
+   * Create enough fifos in order that there is at least X*number_of_objects 
+   * fifos, so that, when you open a file, you don't need to create the fifo, 
+   * i.e. create the file and mmap it, which would block FTS
+   */
+
+  while ( server->number_of_fifos < X * server->number_of_objects )
+    {
+      char filename[1024];
+      char buffer[1024];
+      dtdfifo_t *fifo;
+
+      strcpy( filename, server->base_dir);
+      sprintf( filename + strlen( server->base_dir), "%d", server->number_of_fifos);
+
+      fifo = dtdfifo_new( filename, server->fifo_size);
+      if ( !fifo)
+	return;
+
+      sprintf( buffer, "mmap %d %s %d", server->number_of_fifos, filename, server->fifo_size);
+      dtdserver_send_command( server, buffer);
+
+      server->fifo_table[ server->number_of_fifos ] = fifo;
+
+      server->number_of_fifos++;
+    }
+}
+
+void dtdserver_remove_object( dtdserver_t *server, void *object)
+{
+  server->number_of_objects--;
+}
+
+static dtdfifo_t *dtdserver_allocate_fifo( dtdserver_t *server, int *pid)
 {
   int id;
-  char buffer[1024];
 
-  id = dtdfifo_new( 0, single_instance->base_dir, single_instance->fifo_size);
+  for ( id = 0; id < DTD_MAX_FIFOS; id++)
+    {
+      dtdfifo_t *fifo = server->fifo_table[id];
 
-  sprintf( buffer, "new %d %s %d", id, single_instance->base_dir, single_instance->fifo_size);
-  dtdserver_send_command( buffer);
+      if ( fifo && ! dtdfifo_is_used( fifo, 0) && ! dtdfifo_is_used( fifo, 1))
+	{
+	  dtdfifo_set_read_index( fifo, 0);
+	  dtdfifo_set_write_index( fifo, 0);
+
+	  dtdfifo_set_used( fifo, FTS_SIDE, 1);
+
+	  *pid = id;
+	  return fifo;
+	}
+
+    }
+
+  return 0;
 }
 
-void dtdserver_open( int id, const char *filename, const char *path, int n_channels)
+dtdfifo_t *dtdserver_open_read( dtdserver_t *server, const char *filename, int n_channels)
 {
   char buffer[1024];
+  int id;
+  dtdfifo_t *fifo;
 
-  sprintf( buffer, "open %d %s %s %d", id, filename, path, n_channels);
-  dtdserver_send_command( buffer);
+  fifo = dtdserver_allocate_fifo( server, &id);
+
+  if (fifo)
+    {
+      sprintf( buffer, "openr %d %s %s %d", id, filename, fts_symbol_name(fts_get_search_path()), n_channels);
+      dtdserver_send_command( server, buffer);
+    }
+
+  return fifo;
 }
 
-void dtdserver_close( int id)
+dtdfifo_t *dtdserver_open_write( dtdserver_t *server, const char *filename, int n_channels)
+{
+  char buffer[1024];
+  int id;
+  dtdfifo_t *fifo;
+
+  fifo = dtdserver_allocate_fifo( server, &id);
+
+  if (fifo)
+    {
+      sprintf( buffer, "openw %d %s %d", id, filename, n_channels);
+      dtdserver_send_command( server, buffer);
+    }
+
+  return fifo;
+}
+
+
+void dtdserver_close( dtdserver_t *server, dtdfifo_t *fifo)
 {
   char buffer[128];
+  int id;
 
-  sprintf( buffer, "close %d", id);
-  dtdserver_send_command( buffer);
+  dtdfifo_set_used( fifo, FTS_SIDE, 0);
+
+  for ( id = 0; id < DTD_MAX_FIFOS; id++)
+    if (server->fifo_table[ id] == fifo)
+      {
+	sprintf( buffer, "close %d", id);
+	dtdserver_send_command( server, buffer);
+      }
 }
 
-void dtdserver_quit( void)
+
+/* ********************************************************************** */
+/* Methods                                                                */
+/* ********************************************************************** */
+
+static int create_base_dir( const char *base_dir)
 {
-  dtdserver_send_command( "quit");
+  struct stat buf;
+  char *p;
+
+  p = index( base_dir, '/') + 1;
+
+  do
+    {
+      p = index( p, '/');
+
+      if (!p)
+	break;
+
+      *p = '\0';
+      if ( stat( base_dir, &buf) < 0)
+	{
+	  if ( errno != ENOENT)
+	    {
+	      fprintf( stderr, "Cannot stat DTD fifo root directory %s (%s)\n", base_dir, strerror( errno));
+	      return -1;
+	    }
+
+	  if ( mkdir( base_dir, 0777) < 0)
+	    {
+	      fprintf( stderr, "Cannot create DTD fifo root directory %s (%s)\n", base_dir, strerror( errno));
+	      return -1;
+	    }
+	}
+      *p = '/';
+
+      p++;
+    }
+  while (*p);
+
+  return 1;
 }
+
 
 static void dtdserver_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -129,15 +268,11 @@ static void dtdserver_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   int from_child_pipe[2];
   const char *base_dir;
   char *d;
+  int len, fifo_size;
 
-  if (single_instance)
-    {
-      post( "Internal error: instanciating second DTD object");
-      return;
-    }
-
-  this->fifo_size = fts_get_int_arg( ac, at, 0, DEFAULT_BLOCK_FRAMES);
-  this->loop_milliseconds = fts_get_int_arg( ac, at, 1, DEFAULT_LOOP_MILLISECONDS);
+  fifo_size = DEFAULT_BLOCK_FRAMES * DEFAULT_BLOCK_MAX_CHANNELS * DEFAULT_FIFO_BLOCKS * sizeof( float);
+  this->fifo_size = fts_get_int_arg( ac, at, 1, fifo_size);
+  this->loop_milliseconds = fts_get_int_arg( ac, at, 2, DEFAULT_LOOP_MILLISECONDS);
 
   /* fork the server */
   if ( pipe( from_child_pipe) < 0)
@@ -184,43 +319,45 @@ static void dtdserver_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
      append the process id of the server to the base directory, so that you can have
      several servers on the same machine
   */
-  base_dir = fts_symbol_name( fts_get_symbol_arg( ac, at, 2, fts_new_symbol( DEFAULT_BASE_DIR)));
+  base_dir = fts_symbol_name( fts_get_symbol_arg( ac, at, 3, fts_new_symbol( DEFAULT_BASE_DIR)));
 
-  d = strcpy( malloc( strlen( base_dir+1+10)), base_dir);
-  sprintf( d  + strlen( d), "/%d", this->server_pid);
+  len = strlen( base_dir);
+  d = strcpy( malloc( len+32), base_dir);
+  sprintf( d + len, "/%d/", this->server_pid);
 
   this->base_dir = d;
 
-  single_instance = this;
+  create_base_dir( this->base_dir);
+
+  this->number_of_objects = 0;
+  this->number_of_fifos = 0;
 }
 
 static void dtdserver_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dtdserver_t *this = (dtdserver_t *)o;
+  int id;
 
 /*    fprintf( stderr, "Killing DTD server (pid = %d)\n", this->server_pid); */
 
   /* stop the server */
   kill( this->server_pid, SIGKILL);
 
-  dtdfifo_delete_all();
+  for ( id = 0; id < DTD_MAX_FIFOS; id++)
+    {
+      if (this->fifo_table[ id])
+	dtdfifo_delete( this->fifo_table[ id]);
+    }
 
   if ( rmdir( this->base_dir) < 0)
     fprintf( stderr, "Cannot remove directory %s (%d,%s)\n", this->base_dir, errno, strerror( errno));
-
-  single_instance = 0;
 }
 
 static fts_status_t dtdserver_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_type_t a[3];
-
   fts_class_init( cl, sizeof(dtdserver_t), 0, 0, 0);
 
-  a[0] = fts_t_int;
-  a[1] = fts_t_int;
-  a[2] = fts_t_int;
-  fts_method_define( cl, fts_SystemInlet, fts_s_init, dtdserver_init, 3, a);
+  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, dtdserver_init);
 
   fts_method_define( cl, fts_SystemInlet, fts_s_delete, dtdserver_delete, 0, 0);
 

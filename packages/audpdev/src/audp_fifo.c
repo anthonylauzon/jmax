@@ -1,3 +1,4 @@
+#include <string.h>
 #include <stdlib.h>
 #include <fts/fts.h>
 #include "audp_fifo.h"

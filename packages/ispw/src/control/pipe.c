@@ -24,6 +24,7 @@
  *
  */
 
+#include <string.h>
 #include <fts/fts.h>
 
 static fts_symbol_t fts_s_clear, fts_s_flush;

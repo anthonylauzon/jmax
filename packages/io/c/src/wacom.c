@@ -24,6 +24,7 @@
  *
  */
 
+#include <string.h>
 #include <fts/fts.h>
 
 #define WACOM_REQUEST_TIMEOUT 500

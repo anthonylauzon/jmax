@@ -211,7 +211,7 @@ install-bin:
 .PHONY: install-bin
 
 install-includes:
-	$(MAKE) -C fts/src install
+	$(MAKE) -C include install
 .PHONY: install-includes
 
 

@@ -24,8 +24,9 @@
  *
  */
 
+#include <string.h>
 #include <math.h>
-#include <stdio.h>		/* for sprintf */
+#include <stdio.h>
 #include <fts/fts.h>
 #include "Rsend.h"
 
