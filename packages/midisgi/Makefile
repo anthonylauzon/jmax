@@ -24,40 +24,29 @@
 #
 
 all:
-	(cd java ; $(MAKE) all)
 	(cd c ; $(MAKE) all)
 .PHONY: all
 
 clean:
-	(cd java ; $(MAKE) clean)
 	(cd c ; $(MAKE) clean)
 .PHONY: clean
 
 all_c:
 	(cd c ; $(MAKE) all)
-.PHONY: all
+.PHONY: all_c
 
 clean_c:
 	(cd c ; $(MAKE) clean)
-.PHONY: clean
+.PHONY: clean_c
 
 all_java:
-	(cd java ; $(MAKE) all)
-.PHONY: all
+.PHONY: all_java
 
 clean_java:
-	(cd java ; $(MAKE) clean)
-.PHONY: clean
+.PHONY: clean_java
 
-
-install-exec:
+install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/midisgi
 	$(INSTALL_DATA) midisgi.jpk $(lib_install_dir)/packages/midisgi
 	( cd c ; $(MAKE) $@)
-	( cd help; $(MAKE) $@)
-	( cd java; $(MAKE) $@)
-.PHONY: install-noarch
-
-install-arch:
-	( cd c; $(MAKE) $@)
-.PHONY: install-arch
+.PHONY: install

@@ -55,8 +55,6 @@ static int file_exists(const char *path)
   return (stat(path, &statbuf) == 0) && (statbuf.st_mode & S_IFREG);
 }
 
-
-
 int fts_file_get_read_path(const char *path, char *full_path)
 {
   if (path[0] == '/')

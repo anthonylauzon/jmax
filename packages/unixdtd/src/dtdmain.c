@@ -20,6 +20,9 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
+ */
+
+/*
  * Authors: Francois Dechelle.
  *
  */
@@ -38,6 +41,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <sched.h>
+#include <sys/stat.h>
 #include <audiofile.h>
 
 #include "dtddefs.h"
@@ -119,23 +123,78 @@ static int dtd_read_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, in
   return n_read;
 }
 
-static void dtd_new( int fifo_number, const char *arg)
+static void dtd_new( const char *line)
 {
-  int n_channels;
+  int fifo_number, n_channels;
+  char command[N];
 
-  sscanf( arg, "%d", &n_channels);
+  sscanf( line, "%s%d%d", command, &fifo_number, &n_channels);
+
   dtd_handle_table[fifo_number].n_channels = n_channels;
 }
 
-static void dtd_open( int fifo_number, const char *arg)
+static const char *splitpath( const char *path, char *result, char sep)
+{
+  if ( *path == '\0')
+    return 0;
+
+  while ( *path != sep && *path != '\0')
+    {
+      *result++ = *path++;
+    }
+
+  *result = '\0';
+
+  if ( *path)
+    return path+1;
+
+  return path;
+}
+
+static int file_exists( const char *filename)
+{
+  struct stat statbuf;
+
+  return ( stat( filename, &statbuf) == 0) && (statbuf.st_mode & S_IFREG);
+}
+
+static char *search_file_in_path( const char *filename, const char *path, char *full_path)
+{
+  char pathelem[N];
+
+  if (*filename == '/')
+    {
+      strcpy( full_path, filename);
+      return full_path;
+    }
+
+  while ( (path = splitpath( path, pathelem, ':')) )
+    {
+      strcpy( full_path, pathelem);
+      strcat( full_path, "/");
+      strcat( full_path, filename);
+
+      if (file_exists( full_path))
+	  return full_path;
+    }
+
+  return 0;
+}
+
+static void dtd_open( const char *line)
 {
   AFfilehandle file;
   dtdfifo_t *fifo;
-  int file_channels, sampfmt, sampwidth, i;
+  int fifo_number, file_channels, sampfmt, sampwidth, i;
+  char command[N], filename[N], path[N];
+  char full_path[N+N];;
+  
+  sscanf( line, "%s%d%s%s", command, &fifo_number, filename, path);
 
   fifo = dtd_handle_table[fifo_number].fifo;
 
   file = dtd_handle_table[fifo_number].file;
+
   if ( file != AF_NULL_FILEHANDLE)
     {
       afCloseFile( file);
@@ -144,11 +203,17 @@ static void dtd_open( int fifo_number, const char *arg)
 
   dtdfifo_set_state( fifo, FIFO_INACTIVE);
 
-  file = afOpenFile( arg, "r", 0);
+  if ( !search_file_in_path( filename, path, full_path) )
+    {
+      fprintf( stderr, "[dtdserver] cannot open sound file %s\n", filename);
+      return;
+    }
+
+  file = afOpenFile( filename, "r", 0);
 
   if (file == AF_NULL_FILEHANDLE)
     {
-      fprintf( stderr, "[dtdserver] cannot open sound file %s\n", arg);
+      fprintf( stderr, "[dtdserver] cannot open sound file %s\n", filename);
       return;
     }
 
@@ -181,8 +246,13 @@ static void dtd_open( int fifo_number, const char *arg)
     }
 }
 
-static void dtd_close( int fifo_number)
+static void dtd_close( const char *line)
 {
+  int fifo_number;
+  char command[N];
+
+  sscanf( line, "%s%d", command, &fifo_number);
+
   dtdfifo_set_state( dtd_handle_table[fifo_number].fifo, FIFO_INACTIVE);
 
   if ( dtd_handle_table[fifo_number].file != AF_NULL_FILEHANDLE)
@@ -194,23 +264,22 @@ static void dtd_close( int fifo_number)
 
 /*
  * Commands are:
- * <fifo_number> new <number_of_channels>
- * <fifo_number> open <sound_file_name>
- * <fifo_number> close
+ * new <fifo_number> <number_of_channels>
+ * open <fifo_number> <sound_file_name> <search_path>
+ * close <fifo_number>
  */
 static void dtd_process_command( const char *line)
 {
-  int fifo_number;
-  char command[N], arg[N];
+  char command[N];
 
-  sscanf( line, "%d%s%s", &fifo_number, command, arg);
+  sscanf( line, "%s", command);
 
   if ( !strcmp( "new", command))
-    dtd_new( fifo_number, arg);
+    dtd_new( line);
   else if ( !strcmp( "open", command))
-    dtd_open( fifo_number, arg);
+    dtd_open( line);
   else if ( !strcmp( "close", command))
-    dtd_close( fifo_number);
+    dtd_close( line);
 }
 
 static void dtd_process_fifos( void)

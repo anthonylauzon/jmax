@@ -31,10 +31,12 @@ clean:
 	(cd src; $(MAKE) clean)
 .PHONY: clean
 
-install-arch:
-	$(INSTALL_DIR) $(lib_install_dir)/packages/mymodule/c
-	$(INSTALL_DIR) $(lib_install_dir)/packages/mymodule/c/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libmymodule.so $(lib_install_dir)/packages/mymodule/c/lib/$(ARCH)/opt )
-.PHONY: install-arch
+install:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/midisgi/c/lib/$(ARCH)/opt
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libmidisgi.so $(lib_install_dir)/packages/midisgi/c/lib/$(ARCH)/opt ; \
+	)
+.PHONY: install
 
 

@@ -35,7 +35,7 @@ extern dtdfifo_t *dtdserver_new( int n_channels);
 
 extern void dtdserver_free( dtdfifo_t *fifo);
 
-extern void dtdserver_open( dtdfifo_t *fifo, const char *filename);
+extern void dtdserver_open( dtdfifo_t *fifo, const char *filename, const char *path);
 
 extern void dtdserver_close( dtdfifo_t *fifo);
 

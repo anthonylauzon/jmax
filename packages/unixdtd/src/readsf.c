@@ -178,19 +178,18 @@ static void readsf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 {
   readsf_t *this = (readsf_t *)o;
   const char *filename;
-  char filepath[1024];
 
   filename = fts_symbol_name( fts_get_symbol_arg( ac, at, 0, 0));
 
-  if ( !fts_file_get_read_path( filename, filepath))
-    {
-      post("readsf~: cannot open file '%s' for reading\n", filename);
-      return;
-    }
+/*    if ( !fts_file_get_read_path( filename, filepath)) */
+/*      { */
+/*        post("readsf~: cannot open file '%s' for reading\n", filename); */
+/*        return; */
+/*      } */
 
   this->state = dtd_pause;
 
-  dtdserver_open( this->fifo, filepath);
+  dtdserver_open( this->fifo, filename, fts_symbol_name(fts_get_search_path()) );
 }
 
 static void readsf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

@@ -30,6 +30,7 @@
 #include <errno.h>
 #include <assert.h>
 
+#include "fts.h"
 #include "dtddefs.h"
 #include "dtdfifo.h"
 
@@ -135,12 +136,6 @@ void dtdserver_init( void)
   dtdserver_fork();
 }
 
-static void dtdserver_send_command( const char *command)
-{
-  fprintf( server_stdin, "%s\n", command);
-  fflush( server_stdin);
-}
-
 dtdfifo_t *dtdserver_new( int n_channels)
 {
   int n;
@@ -153,8 +148,8 @@ dtdfifo_t *dtdserver_new( int n_channels)
 
 	  dtd_handle_table[n].used = 1;
 
-	  sprintf( buffer, "%d new %d", n, n_channels);
-	  dtdserver_send_command( buffer);
+	  fprintf( server_stdin, "new %d %d\n", n, n_channels);
+	  fflush( server_stdin);
 
 	  return dtd_handle_table[n].fifo;
 	}
@@ -189,15 +184,15 @@ void dtdserver_free( dtdfifo_t *fifo)
   /* Server command ? */
 }
 
-void dtdserver_open( dtdfifo_t *fifo, const char *filename)
+void dtdserver_open( dtdfifo_t *fifo, const char *filename, const char *path)
 {
   int n;
-  char buffer[256];
+  char buffer[1024];
 
   n = dtdserver_fifo_get( fifo);
 
-  sprintf( buffer, "%d open %s", n, filename);
-  dtdserver_send_command( buffer);
+  fprintf( server_stdin, "open %d %s %s\n", n, filename, path);
+  fflush( server_stdin);
 }
 
 void dtdserver_close( dtdfifo_t *fifo)
@@ -207,8 +202,8 @@ void dtdserver_close( dtdfifo_t *fifo)
 
   n = dtdserver_fifo_get( fifo);
 
-  sprintf( buffer, "%d close", n);
-  dtdserver_send_command( buffer);
+  fprintf( server_stdin, "close %d\n", n);
+  fflush( server_stdin);
 }
 
 
