@@ -32,12 +32,7 @@ clean:
 	(cd src ; $(MAKE) clean)
 .PHONY: clean
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/table/java/classes
 	( cd classes ; $(INSTALL_DATA) table.jar $(lib_install_dir)/packages/table/java/classes )
-.PHONY: install-exec
-
-# remove the files copied by make install ?
-uninstall:
-.PHONY: uninstall
-
+.PHONY: install-noarch

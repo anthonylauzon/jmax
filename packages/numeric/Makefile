@@ -39,12 +39,10 @@ clean_c:
 	(cd c ; $(MAKE) clean)
 .PHONY: clean_c
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/numeric
 	$(INSTALL_DATA) numeric.jpk $(lib_install_dir)/packages/numeric
 	( cd c ; $(MAKE) $@)
 	( cd help; $(MAKE) $@)
-.PHONY: install-exec
+.PHONY: install-noarch
 
-uninstall:
-.PHONY: uninstall

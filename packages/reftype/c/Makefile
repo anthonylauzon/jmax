@@ -31,8 +31,7 @@ clean:
 	(cd src; $(MAKE) clean)
 .PHONY: clean
 
-install-exec:
-	$(INSTALL_DIR) $(lib_install_dir)/packages/reftype/c
-	for d in $(SUB_ARCHS) ; do $(INSTALL_DIR) $(lib_install_dir)/packages/reftype/c/lib/$$d/opt ; done
-	for d in $(SUB_ARCHS) ; do ( cd lib/$$d/opt ; $(INSTALL_LIB) libreftype.so $(lib_install_dir)/packages/reftype/c/lib/$$d/opt ) ; done
-.PHONY: install-exec
+install-arch:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/reftype/c/lib/$(ARCH)/opt
+	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libreftype.so $(lib_install_dir)/packages/reftype/c/lib/$(ARCH)/opt )
+.PHONY: install-arch

@@ -31,12 +31,10 @@ clean:
 	(cd c; $(MAKE) clean)
 .PHONY: clean
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/guiobj
 	$(INSTALL_DATA) guiobj.jpk $(lib_install_dir)/packages/guiobj
 	( cd c ; $(MAKE) $@)
 	( cd help; $(MAKE) $@)
-.PHONY: install-exec
+.PHONY: install-noarch
 
-uninstall:
-.PHONY: uninstall

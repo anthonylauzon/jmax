@@ -39,8 +39,8 @@ clean_c:
 	(cd c ; $(MAKE) clean)
 .PHONY: clean_c
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/reftype
 	for f in *.jpk *.scm ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/reftype ; done
 	( cd c ; $(MAKE) $@)
-.PHONY: install-exec
+.PHONY: install-noarch

@@ -23,11 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/numeric/help
-	for f in *.tcl *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/numeric/help ; done
-.PHONY: install-exec
+	for f in *.tcl *.scm *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/numeric/help ; done
+.PHONY: install-noarch
 
-uninstall:
-.PHONY: uninstall
 

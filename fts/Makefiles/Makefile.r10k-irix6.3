@@ -21,27 +21,39 @@
 # Based on Max/ISPW by Miller Puckette.
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-#
 
-all:
-	(cd c ; $(MAKE) all)
-.PHONY: all
+##
+## Flags for an O2 with r10k
+##
 
-clean:
-	(cd c ; $(MAKE) clean)
-.PHONY: clean
+VENDOR := sgi
+OS_TYPE := unix
 
-all_c:
-	(cd c ; $(MAKE) all)
-.PHONY: all_c
+SYS_PACKAGES=sgidev pdtddev
 
-clean_c:
-	(cd c ; $(MAKE) clean)
-.PHONY: clean_c
+SYSTEM_CFLAGS := -mips4 -n32 -r10000 -LANG:restrict
+SYSTEM_LDFLAGS := -mips4 -n32 
+SYSTEM_SOFLAGS := -mips4 -n32
 
-install-noarch:
-	$(INSTALL_DIR) $(lib_install_dir)/packages/math
-	for f in *.jpk ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/math ; done
-	( cd c ; $(MAKE) $@)
-	( cd help; $(MAKE) $@)
-.PHONY: install-noarch
+SYSTEM_OPT_CFLAGS := -O3 -OPT:roundoff=3:IEEE_arithmetic=3:alias=typed:fast_io=ON:Olimit=0 -TARG:platform=ip32_10k:processor=r10000 -float_const -INLINE:=ON:dfe=ON  -LNO:opt=1 
+
+SYSTEM_OPT_LDFLAGS = -O3
+
+SYSTEM_OPT_SOFLAGS = 
+
+ARCH_CFLAGS := $(SYSTEM_CFLAGS) -DSGI -DIRIX6_3
+ARCH_LDFLAGS = $(SYSTEM_LDFLAGS)
+ARCH_SOFLAGS = $(SYSTEM_SOFLAGS)
+
+ARCH_OPT_CFLAGS := $(SYSTEM_OPT_CFLAGS)
+ARCH_OPT_LDFLAGS = $(SYSTEM_OPT_LDFLAGS)
+ARCH_OPT_SOFLAGS = $(SYSTEM_OPT_SOFLAGS)
+
+##
+## FTS specific declarations
+##
+
+FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm -lfpe -lpthread
+FTS_ARCH_LIBS = $(LIBDIR)/libPortableVecLib.a
+
+FTS_USER_LIBS_FLAGS = -all

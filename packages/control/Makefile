@@ -39,13 +39,14 @@ clean_c:
 	(cd c ; $(MAKE) clean)
 .PHONY: clean_c
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/control
-	for f in *.jpk *.scm ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/control ; done
 	$(INSTALL_DATA) control.jpk $(lib_install_dir)/packages/control
-	( cd c ; $(MAKE) $@)
+	$(INSTALL_DATA) control.smc $(lib_install_dir)/packages/control
 	( cd help; $(MAKE) $@)
-.PHONY: install-exec
+.PHONY: install-noarch
 
-uninstall:
-.PHONY: uninstall
+install-arch:
+	( cd c; $(MAKE) $@)
+.PHONY: install-arch
+

@@ -23,29 +23,10 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-ifeq ($(ARCH),sgi)
+install-arch:
+	$(INSTALL_DIR) $(lib_install_dir)/fts/bin/$(ARCH)
+	$(INSTALL_DIR) $(lib_install_dir)/fts/bin/$(ARCH)/opt
+	( cd $(ARCH)/opt ; $(INSTALL_SETUID) fts $(lib_install_dir)/fts/bin/$(ARCH)/opt )
+.PHONY: install-arch
 
-install-exec:
-	$(INSTALL_DIR) $(lib_install_dir)/fts/bin/irix65r5k/opt
-	$(INSTALL_DIR) $(lib_install_dir)/fts/bin/irix65r10k/opt
-	( cd irix65r5k/opt ; $(INSTALL_SETUID) fts $(lib_install_dir)/fts/bin/irix65r5k/opt )
-	( cd irix65r10k/opt ; $(INSTALL_SETUID) fts $(lib_install_dir)/fts/bin/irix65r10k/opt )
-	( cd irix65r10k/opt ; $(INSTALL_SETUID) fts.on1 $(lib_install_dir)/fts/bin/irix65r10k/opt )
-.PHONY: install-exec
-
-else
-ifeq ($(ARCH),linuxpc)
-
-install-exec:
-	$(INSTALL_DIR) $(lib_install_dir)/fts/bin/linuxpc/opt
-	( cd linuxpc/opt ; $(INSTALL_SETUID) fts $(lib_install_dir)/fts/bin/linuxpc/opt )
-.PHONY: install-exec
-
-endif
-endif
-
-
-# remove the files copied by make install ?
-uninstall:
-.PHONY: uninstall
-
+#	( cd irix65r10k/opt ; $(INSTALL_SETUID) fts.on1 $(lib_install_dir)/fts/bin/irix65r10k/opt )

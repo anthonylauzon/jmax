@@ -31,26 +31,26 @@ clean:
 	(cd src; $(MAKE) clean)
 .PHONY: clean
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw
 	$(INSTALL_DATA) ispw.jpk $(lib_install_dir)/packages/ispw
-	for d in $(SUB_ARCHS) ; do $(INSTALL_DIR) $(lib_install_dir)/packages/ispw/lib/$$d/opt ; done
-	for d in $(SUB_ARCHS) ; do \
-		( cd lib/$$d/opt ; \
-			$(INSTALL_LIB) libcontrol.so $(lib_install_dir)/packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_LIB) libdata.so $(lib_install_dir)/packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_LIB) libfilters.so $(lib_install_dir)/packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_LIB) libio.so $(lib_install_dir)/packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_LIB) libmidi.so $(lib_install_dir)/packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_LIB) libpitch.so $(lib_install_dir)/packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_LIB) libsampling.so $(lib_install_dir)/packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_LIB) libsignal.so $(lib_install_dir)/packages/ispw/lib/$$d/opt ; \
-		) ; done
+	$(INSTALL_DATA) ispw.smc $(lib_install_dir)/packages/ispw
 	( cd abs ; $(MAKE) $@)
 	( cd help; $(MAKE) $@)
 	( cd sounds; $(MAKE) $@)
 	( cd templates; $(MAKE) $@)
-.PHONY: install-exec
+.PHONY: install-noarch
 
-uninstall:
-.PHONY: uninstall
+install-arch:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt
+	( cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libcontrol.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libdata.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libfilters.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libio.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libmidi.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libpitch.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libsampling.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libsignal.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt ; \
+	)
+.PHONY: install-arch

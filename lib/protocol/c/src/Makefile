@@ -23,14 +23,20 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-ROOTDIR= ..
+ROOTDIR=../../../../fts
 
 include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
+# Must overwrite them because otherwise they are defined as
+# $(ROOTDIR)/lib/$(ARCH)/$(MODE)
+
+LIBDIR=../lib/$(ARCH)
+OBJDIR=../obj/$(ARCH)
+
 LIB=$(LIBDIR)/libProtocol.a
 
-all: $(LIB)
+all: $(LIBDIR) $(OBJDIR) $(LIB)
 
 TOCLEAN= $(LIB)
 

@@ -32,11 +32,9 @@ clean:
 	(cd src ; $(MAKE) clean)
 .PHONY: clean
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/explode/java/classes
 	( cd classes ; $(INSTALL_DATA) explode.jar $(lib_install_dir)/packages/explode/java/classes )
-.PHONY: install-exec
+.PHONY: install-noarch
 
-uninstall:
-.PHONY: uninstall
 

@@ -31,11 +31,9 @@ clean:
 	(cd c; $(MAKE) clean)
 .PHONY: clean
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/io
 	$(INSTALL_DATA) io.jpk $(lib_install_dir)/packages/io
 	( cd c ; $(MAKE) $@)
-.PHONY: install-exec
+.PHONY: install-noarch
 
-uninstall:
-.PHONY: uninstall

@@ -1,6 +1,6 @@
 Summary: graphical programming environment for developing audio applications
 Name: jMax
-Version: 2.4.8
+Version: 2.4.9c
 Release: 1
 Copyright: GPL
 Group: Development/Languages
@@ -16,11 +16,21 @@ for developing real-time, interactive audio applications.
 %setup -n jmax-%{version}
 
 %build
-make all ARCH=linuxpc
+%ifarch i386
+make all ARCH=i386-linux
+%endif
+%ifarch i686
+make all ARCH=i686-linux
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make install ARCH=linuxpc prefix=$RPM_BUILD_ROOT/usr
+%ifarch i386
+make install ARCH=i386-linux prefix=$RPM_BUILD_ROOT/usr
+%endif
+%ifarch i686
+make install ARCH=i686-linux prefix=$RPM_BUILD_ROOT/usr
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT

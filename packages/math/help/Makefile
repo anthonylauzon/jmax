@@ -23,11 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/math/help
 	for f in *.tcl *.scm *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/math/help ; done
-.PHONY: install-exec
+.PHONY: install-noarch
 
-uninstall:
-.PHONY: uninstall
 

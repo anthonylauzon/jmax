@@ -1,3 +1,4 @@
+#!/bin/sh
 # 
 # jMax
 # Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
@@ -23,25 +24,5 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-all:
-	(cd c ; $(MAKE) all)
-.PHONY: all
-
-clean:
-	(cd c ; $(MAKE) clean)
-.PHONY: clean
-
-all_c:
-	(cd c ; $(MAKE) all)
-.PHONY: all_c
-
-clean_c:
-	(cd c ; $(MAKE) clean)
-.PHONY: clean_c
-
-install-noarch:
-	$(INSTALL_DIR) $(lib_install_dir)/packages/math
-	for f in *.jpk ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/math ; done
-	( cd c ; $(MAKE) $@)
-	( cd help; $(MAKE) $@)
-.PHONY: install-noarch
+DIR=`dirname $0`
+runon 1 ${DIR}/fts $*

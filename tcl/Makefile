@@ -23,13 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/tcl
 	for f in *.tcl ; do $(INSTALL_DATA) $$f $(lib_install_dir)/tcl ; done
 	(cd config ; $(MAKE) $@ )
-.PHONY: install-exec
-
-# remove the files copied by make install ?
-uninstall:
-.PHONY: uninstall
+.PHONY: install-noarch
 

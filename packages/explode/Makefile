@@ -49,14 +49,12 @@ clean_java:
 	(cd java ; $(MAKE) clean)
 .PHONY: clean
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/explode
 	$(INSTALL_DATA) explode.jpk $(lib_install_dir)/packages/explode
 	( cd c ; $(MAKE) $@)
 	( cd help; $(MAKE) $@)
 	( cd images; $(MAKE) $@)
 	( cd java; $(MAKE) $@)
-.PHONY: install-exec
+.PHONY: install-noarch
 
-uninstall:
-.PHONY: uninstall

@@ -23,11 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/system/help
 	for f in *.jmax *.tcl ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/system/help ; done
-.PHONY: install-exec
+.PHONY: install-noarch
 
-uninstall:
-.PHONY: uninstall
 

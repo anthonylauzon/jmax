@@ -31,14 +31,16 @@ clean:
 	(cd src; $(MAKE) clean)
 .PHONY: clean
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/lists
 	$(INSTALL_DATA) lists.jpk $(lib_install_dir)/packages/lists
-	for d in $(SUB_ARCHS) ; do $(INSTALL_DIR) $(lib_install_dir)/packages/lists/lib/$$d/opt ; done
-	for d in $(SUB_ARCHS) ; do ( cd lib/$$d/opt ; $(INSTALL_LIB) liblists.so $(lib_install_dir)/packages/lists/lib/$$d/opt ) ; done
+	$(INSTALL_DATA) lists.smc $(lib_install_dir)/packages/lists
 	( cd help; $(MAKE) $@)
 	( cd templates; $(MAKE) $@)
-.PHONY: install-exec
+.PHONY: install-noarch
 
-uninstall:
-.PHONY: uninstall
+install-arch:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/lists/lib/$(ARCH)/opt
+	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) liblists.so $(lib_install_dir)/packages/lists/lib/$(ARCH)/opt )
+.PHONY: install-arch
+

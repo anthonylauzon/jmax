@@ -33,9 +33,9 @@ clean:
 	-/bin/rm -f classes/jmax.jar
 .PHONY: clean
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/java
 	$(INSTALL_DIR) $(lib_install_dir)/java/classes
 	( cd classes ; $(INSTALL_DATA) jmax.jar $(lib_install_dir)/java/classes )
 	( cd lib ; $(MAKE) $@ )
-.PHONY: install-exec
+.PHONY: install-noarch

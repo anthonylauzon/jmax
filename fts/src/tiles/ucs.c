@@ -322,14 +322,6 @@ ucs_post(const char *str)
   post(str);
 }
 
-static fts_status_t
-fts_ucs_lib_show_welcome(int argc, const fts_atom_t *argv)
-{
-  fts_welcome_apply(ucs_post);
-
-  return fts_Success;
-}
-
 /*
  * SYSTEM COMMANDS 
  *
@@ -628,10 +620,6 @@ fts_ucs_install_commands()
 
   fts_ucs_define_command(fts_new_symbol("help"), 0,  fts_ucs_lib_help,
 			 "help", "print a description of the available UCS commands");
-
-  fts_ucs_define_command(fts_new_symbol("show"), fts_new_symbol("welcome"), fts_ucs_lib_show_welcome,
-			 "show welcome", "print the welcome message");
-
 
   /* System commands */
 

@@ -30,31 +30,12 @@ PLATFORM := linux-intel
 
 SYS_PACKAGES=ossdev alsadev pdtddev
 
-# Standard compiler for FTS is Pentium-gcc (see http://www.goof.com/pcg/)
-# It differs from gcc by compilation options (-mpentiumpro)
-# To override this, compile with 
-# make ARCH_OPT_CFLAGS="-O2 -mpentium"
-#
-# ************************************************************
-# NOTE (francois, dechelle@ircam.fr):
-# It seems there is a problem in the actual (1.1.1) distribution
-# of pgcc: the builtin specs are not coherent with the distributed
-# tar file. The builtin specs read specs from:
-# /usr/local/pgcc/lib/gcc-lib/i586-pc-linux-gnu/pgcc-2.91.60/specs
-# and the tar file contains usr/lib/gcc-lib/i586-pc-linux....
-# So I did the following:
-# $ mkdir /usr/local/pgcc
-# $ cd /usr/local/pgcc
-# $ tar xvzf <SOMEWHERE>/pgcc-1.1.1-linux-x86-glibc.tar.gz 
-# $ mv usr/* .
-# and it worked.
-# ************************************************************
-#
-# 
+
 CC := gcc
 LD := gcc
 ARCH_CFLAGS :=  -pipe -Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wstrict-prototypes -Wno-unused -DLINUX -DLINUXPC
-ARCH_OPT_CFLAGS := -O6 -mpentiumpro -funroll-all-loops
+# Compiling for a pentium (what about a i486 ? :-)))
+ARCH_OPT_CFLAGS := -O2 -mpentium -funroll-all-loops
 ARCH_LDFLAGS := -rdynamic
 
 LD_ALL_FLAG := --whole-archive

@@ -49,13 +49,11 @@ clean_java:
 	(cd java ; $(MAKE) clean)
 .PHONY: clean
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/qlist
 	$(INSTALL_DATA) qlist.jpk $(lib_install_dir)/packages/qlist
 	( cd c ; $(MAKE) $@)
 	( cd help; $(MAKE) $@)
 	( cd java; $(MAKE) $@)
-.PHONY: install-exec
+.PHONY: install-noarch
 
-uninstall:
-.PHONY: uninstall

@@ -36,12 +36,10 @@ clean_java:
 	(cd java ; $(MAKE) clean)
 .PHONY: clean
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/mess
 	$(INSTALL_DATA) mess.jpk $(lib_install_dir)/packages/mess
 	( cd c ; $(MAKE) $@)
 	( cd help; $(MAKE) $@)
-.PHONY: install-exec
+.PHONY: install-noarch
 
-uninstall:
-.PHONY: uninstall

@@ -39,9 +39,9 @@ clean_c:
 	(cd c ; $(MAKE) clean)
 .PHONY: clean_c
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispwmath
 	for f in *.jpk ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/ispwmath ; done
 	( cd c ; $(MAKE) $@)
 	( cd help; $(MAKE) $@)
-.PHONY: install-exec
+.PHONY: install-noarch

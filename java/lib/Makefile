@@ -23,7 +23,7 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-install-exec:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/java/lib
 	if test -d swing ; then \
 		$(INSTALL_DIR) $(lib_install_dir)/java/lib/swing ; \
@@ -31,10 +31,5 @@ install-exec:
 	fi
 	$(INSTALL_DIR) $(lib_install_dir)/java/lib/jacl
 	( cd jacl ; for f in jacl.jar README license.terms ; do $(INSTALL_DATA) $$f $(lib_install_dir)/java/lib/jacl ; done )
-.PHONY: install-exec
-
-# remove the files copied by make install ?
-uninstall:
-.PHONY: uninstall
-
+.PHONY: install-noarch
 
