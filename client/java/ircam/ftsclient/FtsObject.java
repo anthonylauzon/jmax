@@ -24,8 +24,8 @@ package ircam.ftsclient;
 import java.io.*;
 import java.util.*;
 
-class CallbackEntry {
-  CallbackEntry( Class cl, String selector)
+class MessageHandlerEntry {
+  MessageHandlerEntry( Class cl, FtsSymbol selector)
   {
     this.cl = cl;
     this.selector = selector;
@@ -38,138 +38,142 @@ class CallbackEntry {
 
   public boolean equals( Object obj)
   {
-    if ( ! (obj instanceof CallbackEntry))
+    if ( ! (obj instanceof MessageHandlerEntry))
       return false;
 
-    return ((CallbackEntry)obj).cl.equals(cl) && ((CallbackEntry)obj).selector.equals( selector);
+    return ((MessageHandlerEntry)obj).cl.equals(cl) && ((MessageHandlerEntry)obj).selector == selector;
   }
 
   Class cl;
-  String selector;
+  FtsSymbol selector;
 }
 
 public class FtsObject {
 
-  public FtsObject( FtsServer server, FtsObject parent, String ftsClassName) throws IOException
+  public FtsObject( FtsServer server, FtsObject parent, FtsSymbol ftsClassName) throws IOException
   {
     this.server = server;
+    encoder = server.getEncoder();
 
     id = server.getNewObjectID();
     server.putObject( id, this);
 
-    server.write( server.remote);
-    server.write( "new_object");
-    server.write( parent);
-    server.write( id);
-    server.write( ftsClassName);
-    server.flush();
+    encoder.writeObject( server.remote);
+    encoder.writeSymbol( FtsSymbol.get( "new_object"));
+    encoder.writeObject( parent);
+    encoder.writeInt( id);
+    encoder.writeSymbol( ftsClassName);
+    encoder.flush();
   }
 
-  public FtsObject( FtsServer server, FtsObject parent, String ftsClassName, FtsArgs args) throws IOException
+  public FtsObject( FtsServer server, FtsObject parent, FtsSymbol ftsClassName, FtsArgs args) throws IOException
   {
     this.server = server;
+    encoder = server.getEncoder();
 
     id = server.getNewObjectID();
     server.putObject( id, this);
 
-    server.write( server.remote);
-    server.write( "new_object");
-    server.write( parent);
-    server.write( id);
-    server.write( ftsClassName);
-    server.write( args);
-    server.flush();
+    encoder.writeObject( server.remote);
+    encoder.writeSymbol( FtsSymbol.get("new_object"));
+    encoder.writeObject( parent);
+    encoder.writeInt( id);
+    encoder.writeSymbol( ftsClassName);
+    encoder.writeArgs( args);
+    encoder.flush();
   }
 
-  FtsObject( FtsServer server, int id)
+  public FtsObject( FtsServer server, int id)
   {
     this.server = server;
+    encoder = server.getEncoder();
+
     this.id = id;
 
     server.putObject( id, this);
   }
 
-  public void send( String selector, FtsArgs args) throws IOException
+  public void send( FtsSymbol selector, FtsArgs args) throws IOException
   {
-    server.write( this);
-    server.write( selector);
-    server.write( args);
-    server.flush();
+    encoder.writeObject( this);
+    encoder.writeSymbol( selector);
+    encoder.writeArgs( args);
+    encoder.flush();
   }
 
-  public void send( String selector) throws IOException
+  public void send( FtsSymbol selector) throws IOException
   {
-    server.write( this);
-    server.write( selector);
-    server.flush();
+    encoder.writeObject( this);
+    encoder.writeSymbol( selector);
+    encoder.flush();
   }
 
   public void send( FtsArgs args) throws IOException
   {
-    server.write( this);
-    server.write( "list");
-    server.write( args);
-    server.flush();
+    encoder.writeObject( this);
+    encoder.writeSymbol( FtsSymbol.get("list"));
+    encoder.writeArgs( args);
+    encoder.flush();
   }
 
   public void send( int n) throws IOException
   {
-    server.write( this);
-    server.write( "int");
-    server.write( n);
-    server.flush();
+    encoder.writeObject( this);
+    encoder.writeSymbol( FtsSymbol.get("int"));
+    encoder.writeInt( n);
+    encoder.flush();
   }
 
   public void send( float f) throws IOException
   {
-    server.write( this);
-    server.write( "float");
-    server.write( f);
-    server.flush();
+    encoder.writeObject( this);
+    encoder.writeSymbol( FtsSymbol.get("float"));
+    encoder.writeFloat( f);
+    encoder.flush();
   }
 
-  public static void registerCallback( Class cl, String selector, FtsCallback callback)
+  public static void registerMessageHandler( Class cl, FtsSymbol selector, FtsMessageHandler messageHandler)
   {
     if (selector == null)
       throw new NullPointerException();
 
-    callbacksTable.put( new CallbackEntry( cl, selector), callback);
+    messageHandlersTable.put( new MessageHandlerEntry( cl, selector), messageHandler);
   }
 
-  public static void registerCallback( Class cl, FtsCallback callback)
+  public static void registerMessageHandler( Class cl, FtsMessageHandler messageHandler)
   {
-    callbacksTable.put( new CallbackEntry( cl, "*"), callback);
+    messageHandlersTable.put( new MessageHandlerEntry( cl, FtsSymbol.get("*")), messageHandler);
   }
 
-  static void invokeCallback( FtsObject obj, String selector, FtsArgs args)
+  static void invokeMessageHandler( FtsObject obj, FtsSymbol selector, FtsArgs args)
   {
     if (selector == obj.selectorCache)
       {
-	// Since we never cache the "catchAll" callback, we are sure here that 
-	// the cached callback is associated with a valid selector, hence we
-	// must call the first method of the callback interface 
-	obj.callbackCache.invoke( obj, args.getLength(), args.getAtoms());
+	// Since we never cache the "catchAll" messageHandler, we are sure here that 
+	// the cached messageHandler is associated with a valid selector, hence we
+	// must call the first method of the messageHandler interface 
+	obj.messageHandlerCache.invoke( obj, args.getLength(), args.getAtoms());
 	return;
       }
 
     lookupEntry.cl = obj.getClass();
     lookupEntry.selector = selector;
 
-    FtsCallback callback = (FtsCallback)callbacksTable.get( lookupEntry);
+    FtsMessageHandler messageHandler = (FtsMessageHandler)messageHandlersTable.get( lookupEntry);
 
-    if (callback != null)
+    if (messageHandler != null)
       {
 	obj.selectorCache = selector;
-	obj.callbackCache = callback;
-	obj.callbackCache.invoke( obj, args.getLength(), args.getAtoms());
+	obj.messageHandlerCache = messageHandler;
+	obj.messageHandlerCache.invoke( obj, args.getLength(), args.getAtoms());
 	return;
       }
 
-    lookupEntry.selector = "*";
-    callback = (FtsCallback)callbacksTable.get( lookupEntry);
+    lookupEntry.selector = FtsSymbol.get("*");
+    messageHandler = (FtsMessageHandler)messageHandlersTable.get( lookupEntry);
 
-    if (callback != null)
-      callback.invoke( obj, selector, args.getLength(), args.getAtoms());
+    if (messageHandler != null)
+      messageHandler.invoke( obj, selector, args.getLength(), args.getAtoms());
   }
 
   int getID()
@@ -179,10 +183,11 @@ public class FtsObject {
 
   private int id;
   private FtsServer server;
+  private FtsProtocolEncoder encoder;
 
-  String selectorCache;
-  FtsCallback callbackCache;
+  private FtsSymbol selectorCache;
+  private FtsMessageHandler messageHandlerCache;
 
-  private static Hashtable callbacksTable = new Hashtable();
-  private static CallbackEntry lookupEntry = new CallbackEntry( null, null);
+  private static HashMap messageHandlersTable = new HashMap();
+  private static MessageHandlerEntry lookupEntry = new MessageHandlerEntry( null, null);
 }

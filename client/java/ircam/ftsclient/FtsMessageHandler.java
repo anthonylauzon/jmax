@@ -25,8 +25,8 @@ package ircam.ftsclient;
  *
  */
 
-public interface FtsCallback {
+public interface FtsMessageHandler {
   public void invoke( FtsObject obj, int argc, FtsAtom[] argv);
-  public void invoke( FtsObject obj, String selector, int argc, FtsAtom[] argv);
+  public void invoke( FtsObject obj, FtsSymbol selector, int argc, FtsAtom[] argv);
 }
 

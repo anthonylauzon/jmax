@@ -68,6 +68,12 @@ public class FtsArgs {
     array[current++].set( f);
   }
 
+  public void add( FtsSymbol s)
+  {
+    ensureCapacity(1);
+    array[current++].set( s);
+  }
+
   public void add( String s)
   {
     ensureCapacity(1);

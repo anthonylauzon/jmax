@@ -21,43 +21,37 @@
 
 package ircam.ftsclient;
 
-abstract class FtsProtocolDecoder {
+import java.io.*;
 
-  FtsProtocolDecoder( FtsServer server)
+abstract class FtsProtocolEncoder {
+  abstract void writeInt( int v) throws IOException;
+  abstract void writeFloat( float v) throws IOException;
+  abstract void writeSymbol( FtsSymbol v) throws IOException;
+  abstract void writeString( String v) throws IOException;
+  abstract void writeObject( FtsObject v) throws IOException;
+
+  void writeAtoms( FtsAtom[] atoms, int offset, int length) throws IOException
   {
-    this.server = server;
-    connection = server.getConnection();
-
-    inputBuffer = new byte[0x10000];
-  }
-
-  /**
-   * Receive messages from FTS.
-   *
-   * This method does a blocking read on the connection to read bytes
-   * and then calls the protocol decoder.
-   * This will in turn call the installed message handlers on the objects.
-   */
-  void run()
-  {
-    try
+    for ( int i = offset; i < length; i++)
       {
-	while ( true)
-	  {
-	    int len = connection.read( inputBuffer, 0, inputBuffer.length);
-	    decode( inputBuffer, 0, len);
-	  }
-      }
-    catch (Exception e)
-      {
-	return;
+	if ( atoms[i].isInt())
+	  writeInt( atoms[i].intValue);
+	else if ( atoms[i].isFloat())
+	  writeFloat( atoms[i].floatValue);
+	else if ( atoms[i].isSymbol())
+	  writeSymbol( atoms[i].symbolValue);
+	else if ( atoms[i].isString())
+	  writeString( atoms[i].stringValue);
+	else if ( atoms[i].isObject())
+	  writeObject( atoms[i].objectValue);
       }
   }
 
-  abstract void decode( byte[] data, int offset, int length) throws FtsClientException;
+  void writeArgs( FtsArgs v) throws IOException
+  {
+    writeAtoms( v.getAtoms(), 0, v.getLength());
+  }
 
-  protected FtsServer server;
-
-  private FtsServerConnection connection;
-  private byte[] inputBuffer;
+  abstract void flush() throws IOException;
 }
+

@@ -21,43 +21,34 @@
 
 package ircam.ftsclient;
 
-abstract class FtsProtocolDecoder {
+import java.util.*;
 
-  FtsProtocolDecoder( FtsServer server)
+public class FtsSymbol {
+
+  public static FtsSymbol get( String s)
   {
-    this.server = server;
-    connection = server.getConnection();
+    FtsSymbol symbol = (FtsSymbol)symbolTable.get( s);
 
-    inputBuffer = new byte[0x10000];
+    if (symbol != null)
+      return symbol;
+
+    symbol = new FtsSymbol( s);
+    symbolTable.put( s, symbol);
+
+    return symbol;
   }
 
-  /**
-   * Receive messages from FTS.
-   *
-   * This method does a blocking read on the connection to read bytes
-   * and then calls the protocol decoder.
-   * This will in turn call the installed message handlers on the objects.
-   */
-  void run()
+  private FtsSymbol( String s)
   {
-    try
-      {
-	while ( true)
-	  {
-	    int len = connection.read( inputBuffer, 0, inputBuffer.length);
-	    decode( inputBuffer, 0, len);
-	  }
-      }
-    catch (Exception e)
-      {
-	return;
-      }
+    this.s = s;
   }
 
-  abstract void decode( byte[] data, int offset, int length) throws FtsClientException;
+  public String toString()
+  {
+    return s;
+  }
 
-  protected FtsServer server;
+  private static HashMap symbolTable = new HashMap();
 
-  private FtsServerConnection connection;
-  private byte[] inputBuffer;
+  private String s;
 }

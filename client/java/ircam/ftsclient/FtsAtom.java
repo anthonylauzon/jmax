@@ -35,6 +35,10 @@ public class FtsAtom {
    */
   public float floatValue;
   /**
+   * If the atom is a Symbol, holds the Symbol value
+   */
+  public FtsSymbol symbolValue;
+  /**
    * If the atom is a String, holds the String value
    */
   public String stringValue;
@@ -71,6 +75,16 @@ public class FtsAtom {
   public final boolean isFloat()
   {
     return type == Float.TYPE;
+  }
+
+  /**
+   * Tests if atom contains a FtsSymbol
+   * 
+   * @return true if atom type is FtsSymbol
+   */
+  public final boolean isSymbol()
+  {
+    return type == FtsSymbol.class;
   }
 
   /**
@@ -113,6 +127,17 @@ public class FtsAtom {
   {
     type = Float.TYPE;
     floatValue = f;
+  }
+
+  /**
+   * Set the FtsSymbol value
+   * 
+   * @param s the value
+   */
+  public final void set( FtsSymbol s)
+  {
+    type = FtsSymbol.class;
+    symbolValue = s;
   }
 
   /**

@@ -2,16 +2,20 @@ noinst_PROGRAMS = package
 package_SOURCES = \
 FtsArgs.java \
 FtsAtom.java \
-FtsCallback.java \
+FtsBinaryProtocolDecoder.java \
+FtsBinaryProtocolEncoder.java \
 FtsClientException.java \
+FtsMessageHandler.java \
 FtsObject.java \
 FtsPipeConnection.java \
 FtsProcess.java \
 FtsProtocol.java \
 FtsProtocolDecoder.java \
+FtsProtocolEncoder.java \
 FtsServer.java \
 FtsServerConnection.java \
-FtsSocketConnection.java
+FtsSocketConnection.java \
+FtsSymbol.java 
 
 JAVACX = @JAVACX@
 JAVACFLAGSX=@JAVACFLAGSX@
