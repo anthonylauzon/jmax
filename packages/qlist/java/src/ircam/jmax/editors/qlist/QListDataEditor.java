@@ -27,7 +27,7 @@ package ircam.jmax.editors.qlist;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
-
+import ircam.jmax.*;
 /*
  * The QList Data Editor; represent the QList editor in the Mda system.
  */
@@ -62,8 +62,10 @@ public class QListDataEditor extends AbstractMaxDataEditor
     // do the work here.
 
     if (! window.isVisible())
-      window.setVisible(true);
-
+	{
+	    window.setVisible(true);
+	    MaxWindowManager.getWindowManager().addWindow(window);
+	}
     window.toFront();
   }
 

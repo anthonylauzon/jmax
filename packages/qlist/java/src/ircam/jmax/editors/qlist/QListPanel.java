@@ -303,6 +303,7 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner, Docume
 
   public void Close(boolean doCancel){
     ((Component)itsEditorContainer).setVisible(false);
+    MaxWindowManager.getWindowManager().removeWindow((Frame)itsEditorContainer);
   }
   // ----------ClipboardOwner interface methods
   public void lostOwnership(Clipboard clipboard, Transferable contents) {}
