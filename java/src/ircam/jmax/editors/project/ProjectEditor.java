@@ -193,6 +193,9 @@ public class ProjectEditor extends JFrame implements EditorContainer
   {
     File pkg = MaxFileChooser.chooseFileToOpen( frame);
     String name = pkg.getName();
+
+    if(name == null) return;
+
     if(name.endsWith(".jmax"))
       {
 	int idx = name.indexOf(".jmax"); 
