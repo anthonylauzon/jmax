@@ -91,6 +91,37 @@ fts_midievent_channel_message_new(enum midi_type type, int channel, int byte1, i
   return event;
 }
 
+static void
+fts_midievent_song_position_pointer_message_init(fts_midievent_t *event, int byte1, int byte2)
+{
+  event->type = midi_song_position_pointer;
+  fts_midievent_song_position_pointer_set_first(event,byte1);
+  fts_midievent_song_position_pointer_set_second(event,byte2);
+}
+
+fts_midievent_t *
+fts_midievent_song_position_pointer_message_new(int byte1, int byte2)
+{
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
+  fts_midievent_song_position_pointer_message_init(event, byte1, byte2);
+  return event;
+}
+
+static void
+fts_midievent_song_select_message_init(fts_midievent_t *event, int byte1)
+{
+  event->type = midi_song_select;
+  event->data.song_select = byte1;
+}
+
+fts_midievent_t *
+fts_midievent_song_select_message_new(int byte1)
+{
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
+  fts_midievent_song_select_message_init(event, byte1);
+  return event;
+}
+
 fts_midievent_t *
 fts_midievent_note_new(int channel, int note, int velocity)
 {
@@ -243,6 +274,15 @@ midievent_copy(fts_midievent_t *org, fts_midievent_t *copy)
       fts_midievent_time_code_set_frame(copy, fts_midievent_time_code_get_frame(org));
       break;
       
+    case midi_song_position_pointer:
+      fts_midievent_song_position_pointer_set_first(copy, fts_midievent_song_position_pointer_get_first(org));
+      fts_midievent_song_position_pointer_set_second(copy, fts_midievent_song_position_pointer_get_second(org));
+      break;
+      
+    case midi_song_select:
+      fts_midievent_song_select_set(copy, fts_midievent_song_select_get(org));
+      break;
+      
     case midi_real_time:
       fts_midievent_real_time_set(copy, fts_midievent_real_time_get(org));
       break;
@@ -352,6 +392,24 @@ midievent_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
         }
         break;
         
+      case midi_song_position_pointer:
+        switch(ac)
+        {
+          default:
+          case 2:
+            fts_midievent_song_position_pointer_set_second(this, fts_get_number_int(at + 2));
+          case 1:
+            fts_midievent_song_position_pointer_set_first(this, fts_get_number_int(at + 1));
+          case 0:
+            break;
+        }
+        break;
+        
+      case midi_song_select:
+        if(fts_is_number(at + 1))
+          fts_midievent_song_select_set(this, fts_get_number_int(at + 1));
+        break;
+
       case midi_real_time:
         if(fts_is_number(at + 1))
           fts_midievent_real_time_set(this, fts_get_number_int(at + 1));
@@ -394,6 +452,13 @@ midievent_get_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
     fts_tuple_append_int(tuple, fts_midievent_time_code_get_second(this));
     fts_tuple_append_int(tuple, fts_midievent_time_code_get_frame(this));
   }
+  else if(fts_midievent_is_song_position_pointer(this))
+  {
+    fts_tuple_append_int(tuple,fts_midievent_song_position_pointer_get_first(this));
+    fts_tuple_append_int(tuple,fts_midievent_song_position_pointer_get_second(this));
+  }
+  else if(fts_midievent_is_song_select(this))
+    fts_tuple_append_int(tuple, fts_midievent_song_select_get(this));
   else if(fts_midievent_is_real_time(this))
     fts_tuple_append_int(tuple, fts_midievent_real_time_get(this));
 
@@ -424,6 +489,26 @@ _midievent_set_first(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     else
       fts_midievent_channel_message_set_first(this, byte);
   }
+  else if(fts_midievent_is_song_position_pointer(this)){
+    int byte = fts_get_number_int(at);
+    
+    if(byte < 0)
+      fts_midievent_song_position_pointer_set_first(this, 0);
+    else if(byte > 127)
+      fts_midievent_song_position_pointer_set_first(this, 127);
+    else
+      fts_midievent_song_position_pointer_set_first(this, byte);
+  }
+  else if(fts_midievent_is_song_select(this)){
+    int byte = fts_get_number_int(at);
+    
+    if(byte < 0)
+      fts_midievent_song_select_set(this, 0);
+    else if(byte > 127)
+      fts_midievent_song_select_set(this, 127);
+    else
+      fts_midievent_song_select_set(this, byte);
+  }
 }
 
 static void
@@ -433,6 +518,12 @@ _midievent_get_first(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 
   if(fts_midievent_is_channel_message(this))
     fts_return_int(fts_midievent_channel_message_get_first(this));
+  
+  else if(fts_midievent_is_song_position_pointer(this))
+    fts_return_int(fts_midievent_song_position_pointer_get_first(this));
+  
+  else if(fts_midievent_is_song_select(this))
+    fts_return_int(fts_midievent_song_select_get(this));
 }
 
 static void
@@ -451,6 +542,17 @@ _midievent_set_second(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     else
       fts_midievent_channel_message_set_second(this, byte);
   }
+  else if(fts_midievent_is_song_position_pointer(this))
+  {
+    int byte = fts_get_number_int(at);
+    
+    if(byte < 0)
+      fts_midievent_song_position_pointer_set_second(this, 0);
+    else if(byte > 127)
+      fts_midievent_song_position_pointer_set_second(this, 127);
+    else
+      fts_midievent_song_position_pointer_set_second(this, byte);
+  }
 }
 
 static void
@@ -460,6 +562,9 @@ _midievent_get_second(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
   if(fts_midievent_is_channel_message(this) && fts_midievent_channel_message_has_second_byte(this))
     fts_return_int(fts_midievent_channel_message_get_second(this));
+  
+  else if(fts_midievent_is_song_position_pointer(this))
+    fts_return_int(fts_midievent_song_position_pointer_get_second(this));
 }
 
 static void
@@ -496,6 +601,10 @@ _midievent_get_status(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
   if(fts_midievent_is_channel_message(this))
     fts_return_int(fts_midievent_channel_message_get_status_byte(this));
+  else if(fts_midievent_is_song_position_pointer(this))
+    fts_return_int(fts_midievent_song_position_pointer_status_byte);
+  else if(fts_midievent_is_song_select(this))
+    fts_return_int(fts_midievent_song_select_status_byte);
   else if(fts_midievent_is_real_time(this))
     fts_return_int(fts_midievent_real_time_get_status_byte(this));
 }
@@ -544,6 +653,15 @@ midievent_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
       fts_message_append_int(mess, fts_midievent_time_code_get_frame(this));
       break;
 
+    case midi_song_position_pointer:
+      fts_message_append_int(mess, fts_midievent_song_position_pointer_get_first(this));
+      fts_message_append_int(mess, fts_midievent_song_position_pointer_get_second(this));
+      break;
+      
+    case midi_song_select:
+      fts_message_append_int(mess, fts_midievent_song_select_get(this));
+      break;
+      
     case midi_real_time:
       fts_message_append_int(mess, fts_midievent_real_time_get(this));
       break;
@@ -596,6 +714,16 @@ midievent_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
                 fts_midievent_time_code_get_frame(this));
       break;
       
+    case midi_song_position_pointer:
+      fts_spost(stream, "%d %d",
+                fts_midievent_song_position_pointer_get_first(this),
+                fts_midievent_song_position_pointer_get_second(this));
+      break;
+      
+    case midi_song_select:
+      fts_spost(stream, "%d", fts_midievent_song_select_get(this));
+      break;
+
     case midi_real_time:
       fts_spost(stream, "%d", fts_midievent_real_time_get(this));
       break;
@@ -657,7 +785,7 @@ midievent_instantiate(fts_class_t *cl)
   fts_class_set_copy_function(cl, midievent_copy_function);
 
   /* class doc */
-  fts_class_doc(cl, fts_s_midievent, "<'note'|'poly'|'ctl'|'prg'|'touch'|'bend'|'sysex'|'mtc'|'rt': type> [<num: MIDI bytes (see message 'set')> ...]", "MIDI message");
+  fts_class_doc(cl, fts_s_midievent, "<'note'|'poly'|'ctl'|'prg'|'touch'|'bend'|'sysex'|'mtc'|'spos'|'ssel'|'rt': type> [<num: MIDI bytes (see message 'set')> ...]", "MIDI message");
   fts_class_doc(cl, fts_s_set, "<'note'> <num: note #> <num: velocity> [<num: channel>]", "set to note on/off message (velocity is 0 for note off)");
   fts_class_doc(cl, fts_s_set, "<'poly'> <num: note #> <num: pressure value> [<num: channel>]", "set to poly pressure message");
   fts_class_doc(cl, fts_s_set, "<'ctl'> <num: controller #> <num: value> [<num: channel>]", "set to control change message");
@@ -666,6 +794,8 @@ midievent_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_s_set, "<'bend'> <num: LSB> <num: MSB> [<num: channel>]", "set to pitch bend message");
   fts_class_doc(cl, fts_s_set, "<'sysex'> [<num: byte> ...]", "set to system exclusive message");
   fts_class_doc(cl, fts_s_set, "<'mtc'> <num: type> <num: hour> <num: minute> <num: second> <num: frame>", "set to MIDI time code message");
+  fts_class_doc(cl, fts_s_set, "<'spos'> <num: first byte> <num: second byte>", "set to song position pointer message");
+  fts_class_doc(cl, fts_s_set, "<'ssel'> <num: song #>", "set to song select message");
   fts_class_doc(cl, fts_s_set, "<'rt'> <num: real time message byte>", "set to real time message");
   fts_class_doc(cl, fts_s_set, "<midievent: other>", "set from midievent instance");
   fts_class_doc(cl, fts_s_type, NULL, "get MIDI event type");
@@ -795,6 +925,7 @@ fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte)
 	  
     case midi_status_song_position_pointer:
       parser->status = midiparser_status_song_position_pointer;
+      parser->store = MIDI_EMPTY_BYTE;
       break;
 	  
     case midi_status_song_select:
@@ -917,6 +1048,26 @@ fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte)
       }
       break;
 
+    case midiparser_status_song_position_pointer:
+      
+      if (parser->store == MIDI_EMPTY_BYTE)
+        parser->store = byte;
+      else
+      {
+        fts_midievent_song_position_pointer_message_init(event, parser->store, byte);
+        parser->store = MIDI_EMPTY_BYTE; /* reset for running status */
+        parser->event = NULL;
+        return event;
+      }
+      break;
+      
+    case midiparser_status_song_select:
+      
+      fts_midievent_song_select_message_init(event,byte);
+      parser->event = NULL;
+      return event;
+      break;
+      
     case midiparser_status_system_exclusive:
 	  
       switch (byte)
@@ -1088,6 +1239,8 @@ fts_kernel_midievent_init(void)
   fts_midi_types[midi_pitch_bend] = fts_new_symbol("bend");
   fts_midi_types[midi_system_exclusive] = fts_new_symbol("sysex");
   fts_midi_types[midi_time_code] = fts_new_symbol("mtc");
+  fts_midi_types[midi_song_position_pointer] = fts_new_symbol("spos");
+  fts_midi_types[midi_song_select] = fts_new_symbol("ssel");
   fts_midi_types[midi_real_time] = fts_new_symbol("rt");
 
   fts_hashtable_init( &midi_type_hash, FTS_HASHTABLE_SMALL);
