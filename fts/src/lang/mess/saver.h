@@ -6,6 +6,7 @@ struct fts_bmax_file;
 typedef struct fts_bmax_file fts_bmax_file_t;
 
 extern void fts_save_patcher_as_bmax(fts_symbol_t file, fts_object_t *patcher);
+extern void fts_save_selection_as_bmax(fts_symbol_t file, fts_object_t *selection);
 
 /* Functions for objects data saving; not yet documented */
 

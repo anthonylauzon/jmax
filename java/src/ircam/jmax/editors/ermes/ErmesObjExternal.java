@@ -98,7 +98,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 
     try
       {
-	itsFtsObject = FtsObject.redefineFtsObject(itsFtsObject, itsArgs);
+	itsFtsObject = Fts.redefineFtsObject(itsFtsObject, itsArgs);
       }
     catch (FtsException e)
       {

@@ -863,7 +863,10 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 	    fprintf(stderr, "RETURN\n");
 #endif
 
-	    return *object_tos;
+	    if (object_tos == object_stack + OBJECT_STACK_DEPTH)
+	      return 0;
+	    else
+	      return *object_tos;
 	  }
 	}
     }

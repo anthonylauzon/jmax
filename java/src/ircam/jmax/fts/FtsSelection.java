@@ -15,7 +15,7 @@ import ircam.jmax.utils.*;
  * 
  */
 
-public class FtsSelection 
+public class FtsSelection  extends FtsObject
 {
   /*****************************************************************************/
   /*                                                                           */
@@ -31,13 +31,17 @@ public class FtsSelection
 
   private Vector connections = new Vector();
 
+  /** vector for message arguments */
+
+  private Vector args = new Vector();
 
   /**
-   * Create a FtsObject object;
+   * Create a Fts selection;
    */
 
-  FtsSelection()
+  protected  FtsSelection(FtsContainerObject parent, String className, String description, int objId)
   {
+    super(parent, className, description, objId);
   }
 
   /** Add an object to this container  */
@@ -45,6 +49,10 @@ public class FtsSelection
   final public void addObject(FtsObject obj)
   {
     objects.addElement(obj);
+
+    args.removeAllElements();
+    args.addElement(obj);
+    sendMessage(-1, "add_object", args);
   }
 
   /** Remove an object from this container. */
@@ -52,6 +60,10 @@ public class FtsSelection
   final public void removeObject(FtsObject obj)
   {
     objects.removeElement(obj);
+
+    args.removeAllElements();
+    args.addElement(obj);
+    sendMessage(-1, "remove_object", args);
   }
 
   /** Get the objects */
@@ -66,6 +78,10 @@ public class FtsSelection
   final public void addConnection(FtsConnection obj)
   {
     connections.addElement(obj);
+
+    args.removeAllElements();
+    args.addElement(obj);
+    sendMessage(-1, "add_connection", args);
   }
 
   /** Remove an connection from this container. */
@@ -73,6 +89,10 @@ public class FtsSelection
   final void removeConnection(FtsConnection obj)
   {
     connections.removeElement(obj);
+
+    args.removeAllElements();
+    args.addElement(obj);
+    sendMessage(-1, "remove_connection", args);
   }
 
   /** Get the connections */
@@ -86,6 +106,8 @@ public class FtsSelection
 
   final public void clean()
   {
+    sendMessage(-1, "clear", null);
+
     objects.removeAllElements();
     connections.removeAllElements();
   }

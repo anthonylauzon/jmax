@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.6 $ IRCAM $Date: 1998/04/21 12:05:43 $
+ *      $Revision: 1.7 $ IRCAM $Date: 1998/04/22 20:27:45 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -18,8 +18,10 @@
 
 static void  fts_mess_init(void);
 static void  fts_mess_restart(void);
+static void  fts_mess_shutdown(void);
 
-fts_module_t fts_mess_module = {"Mess", "The new Mess module", fts_mess_init, fts_mess_restart, 0};
+fts_module_t fts_mess_module = {"Mess", "The new Mess module", fts_mess_init,
+				fts_mess_restart, fts_mess_shutdown};
 
 
 
@@ -68,15 +70,27 @@ fts_mess_init(void)
 
   fts_voidobj_config();
 
+  /* Create the selection class */
+
+  fts_selection_config();
+
   /* Initialize the .pat abstraction subsystem */
   
   fts_abstraction_init();
+
 }
 
 
 static void
 fts_mess_restart(void)
 {
+  fts_object_table_delete_all();
+}
+
+static void
+fts_mess_shutdown(void)
+{
+  fts_patcher_shutdown();
   fts_object_table_delete_all();
 }
 

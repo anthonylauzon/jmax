@@ -78,19 +78,12 @@ public class FtsServer
   {
     port.start();
 
-    // Build the root object and the root patcher
+    // Build the root patcher, by mapping directly to object id 1 on FTS
+    // (this is guaranteed)
 
     // root = FtsPatcherObject.makeRootObject(this);
 
-    try
-      {
-	root = (FtsContainerObject) Fts.makeFtsObject(null, "patcher", "root 0 0");
-      }
-    catch (FtsException e)
-      {
-	// Deep shit 
-	System.out.println("System Error: Unable to create the root object");
-      }
+    root = new FtsPatcherObject(null, "root", 0, 0, 1);
   }
 
   /** Stop the server. */
@@ -932,12 +925,18 @@ public class FtsServer
 
   /**
    * The server Object ID Counter.
+   * 
+   * NOTE: IDs must start from 3:
+   *      0 is reserved as null object
+   *      1 is reserved for the root object
+   *      even numbers are used by the server
+   * 
    *
-   * Used to generate IDs for FTS objects; skip zero, 
+   * Used to generate IDs for FTS objects; skip zero and one
    * and continue by increments
    */
 
-  private int ftsObjectIDCounter = 1;	// skip zero
+  private int ftsObjectIDCounter = 3;	// skip zero and one
 
   /** The object table. Used to map back Ids to objects. */
 
@@ -1056,11 +1055,11 @@ public class FtsServer
   /**
    * The server Connection ID Counter.
    *
-   * Used to generate IDs for FTS connections; skip zero, 
-   * and continue by increments
+   * Used to generate IDs for FTS connections; skip zero, and one
+   * and continue by two increments
    */
 
-  private int ftsConnectionIDCounter = 1;	// skip zero
+  private int ftsConnectionIDCounter = 3;	// skip zero and one
 
   /** The connection table. Used to map back Ids to connections. */
 

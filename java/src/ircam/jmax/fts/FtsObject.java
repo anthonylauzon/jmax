@@ -68,77 +68,6 @@ abstract public class FtsObject implements MaxTclInterpreter
   /*                                                                            */
   /******************************************************************************/
 
-  /** makeFtsObject do not create an object, but just assign an
-     ID and ask FTS to create it; fts will create back the object with a message
-     with the good ID, and we get the object thru the ID; if the object
-     is not there, we got an instantiation error, and we throw a exception.
-     Here, we just use a className/description pair of arguments.
-     Version to use for those objects where className and description
-     are available separately.
-     */
-
-  static public FtsObject makeFtsObject(FtsContainerObject parent, String className, String description)
-       throws FtsException
-  {
-    FtsServer server;
-    FtsObject obj;
-    int id;
-
-    server = Fts.getServer();
-
-    id = server.getNewObjectId();
-
-    server.newObject(parent, id, className, description);
-    
-    // Wait for FTS to do his work
-
-    server.syncToFts();
-
-    obj = server.getObjectByFtsId(id);
-    
-    if (obj != null)
-      {
-	if (parent != null)
-	  parent.setDirty();
-
-	return obj;
-      }
-    else
-      throw new FtsException( new FtsError(FtsError.INSTANTIATION_ERROR, className + " " + description));
-  }
-  
-
-  /* 
-     Version to use for those objects where className and description
-     are available separately.
-     */
-
-  static public FtsObject makeFtsObject(FtsContainerObject parent, String description) throws FtsException
-  {
-    FtsServer server;
-    FtsObject obj;
-    int id;
-
-    server = Fts.getServer();
-
-    id = server.getNewObjectId();
-    server.newObject(parent, id, description);
-    
-    // Wait for FTS to do his work
-
-    server.syncToFts();
-    obj = server.getObjectByFtsId(id);
-    
-    if (obj != null)
-      {
-	obj.setDirty();
-	return obj;
-      }
-    else
-      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, description));
-  }
-  
-
   /** This version create an application layer object for an already existing
    *  object in FTS; take directly the FtsMessage as argument.
    *  Used also in the message box.
@@ -233,6 +162,8 @@ abstract public class FtsObject implements MaxTclInterpreter
       obj = new FtsValueObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("param"))
       obj = new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+    else if (className.equals("__selection"))
+      obj = new FtsSelection(parent, className, "__selection", objId);
     else
       obj = new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
 
@@ -257,81 +188,6 @@ abstract public class FtsObject implements MaxTclInterpreter
     obj = new FtsAbstractionObject(parent, className, makeDescription(2, msg), objId);
 
     return obj;
-  }
-
-  /**
-   * Static function to redefine a FtsObject.
-   * It is static, for
-   * similarity with the constructors, because it can produce 
-   * a different Java object from the argument, so logically they are not method of the object.
-   *
-   * It just produce a new object (calling makeFtsObject), and replace the old with it in the 
-   * container of the old, and in FTS.
-   *
-   *  In case of errors, i.e. if the new object do not exists, we just throw an exception
-   *  and do nothing.
-   *
-   * @@@@: can we just throw away the FTS part of it and do everything here ?
-   * @@@@: including moving the connections ? It would be more consistent,
-   * @@@@: expecially for property handling
-   *
-   * @param obj the object to redefine.
-   * @param description  a string containing the description.
-   * @return a new object, conforming to the new definition, but with the same FTS
-   * identity, and connections; it always create a new object, also if the description
-   * is the same
-   */
-
-  public static FtsObject redefineFtsObject(FtsObject oldObject, String description) throws FtsException
-  {
-    FtsObject newObject;
-    FtsContainerObject parent;
-
-    parent = oldObject.getParent();
-
-    // makeFtsObject can throw a connection if the
-    // object do not exists.
-
-    newObject = makeFtsObject(parent, description);
-
-    // replaceInConnections should delete the connections
-    // not existing any more
-
-    parent.replaceInConnections(oldObject, newObject);
-    oldObject.delete();
-
-    return newObject;
-  }
-
-
-  /** Static function to get an object by name; it get the 
-   *  object by searching it starting from the roots patchers;
-   *  the first object with the good name is returned.
-   */
-
-  public static FtsObject getObject(String name)
-  {
-    if (Fts.getServer() != null)
-      {
-	FtsContainerObject root = Fts.getServer().getRootObject();
-	Vector objects = root.getObjects();
-
-	for (int i = 0; i < objects.size(); i++)
-	  {
-	    FtsObject ret;
-	    FtsObject obj   =  (FtsObject) objects.elementAt(i);
-
-	    if (obj instanceof FtsContainerObject)
-	      {
-		ret = ((FtsContainerObject) obj).getObjectByName(name);
-
-		if (ret != null)
-		  return ret;
-	      }
-	  }
-      }
-
-    return null;
   }
 
   /******************************************************************************/

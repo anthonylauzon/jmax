@@ -212,13 +212,23 @@ fts_mess_client_load_patcher_bmax(int ac, const fts_atom_t *av)
 	{
 	  fts_object_t *patcher;
 
-	  patcher = fts_binary_file_load(fts_symbol_name(filename), parent, id);
+	  patcher = fts_binary_file_load(fts_symbol_name(filename), parent);
 
 	  if (patcher == 0)
 	    {
 	      post("Cannot read bmax file %s\n", fts_symbol_name(filename));
 	      return;
 	    }
+
+	  if (id != FTS_NO_ID)
+	    {
+	      patcher->id = id;
+	      fts_object_table_put(id, patcher);
+	    }
+
+	  /* activate the post-load init, like loadbangs */
+	  
+	  fts_message_send(patcher, fts_SystemInlet, fts_new_symbol("load_init"), 0, 0);
 
 	  fts_client_upload_object(patcher);
 	}

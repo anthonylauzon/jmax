@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.7 $ IRCAM $Date: 1998/05/11 14:46:27 $
+ *      $Revision: 1.8 $ IRCAM $Date: 1998/05/12 16:46:25 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -44,6 +44,8 @@ typedef struct fts_outlet_decl		 fts_outlet_decl_t;
 typedef struct fts_patcher		 fts_patcher_t;
 typedef struct fts_inlet		 fts_inlet_t;
 typedef struct fts_outlet		 fts_outlet_t;
+
+typedef struct fts_selection		 fts_selection_t;
 
 
 /*
@@ -306,6 +308,23 @@ struct fts_outlet
   fts_object_t o;		
 
   int          position;	/* outlet position */
+};
+
+
+/* Selection */
+
+struct fts_selection
+{
+  fts_object_t ob;
+
+  fts_object_t **objects;
+  int objects_size;
+  int objects_count;
+
+  fts_connection_t **connections;
+  int connections_size;
+  int connections_count;
+
 };
 
 #endif

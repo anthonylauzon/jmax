@@ -12,12 +12,15 @@
 extern void fts_symbols_init(void);
 extern void fts_classes_init(void);
 extern void fts_patcher_init(void);
+extern void fts_patcher_shutdown(void);
 extern void fts_events_init(void);
 extern void class_config(void);
 extern void send_config(void);
 extern void fts_patparser_init(void);
 extern void fts_mess_naming_init(void);
 extern void fts_voidobj_config(void);
+extern void fts_selection_config(void);
+extern void fts_clipboard_config(void);
 
 /*
  * private class functions exported for the objects.c file

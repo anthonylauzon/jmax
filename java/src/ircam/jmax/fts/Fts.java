@@ -1,5 +1,7 @@
 package ircam.jmax.fts;
 
+import java.util.*;
+
 /**
  * This class export a number of global functionalities
  * implemented by the application layer, as static methods.
@@ -126,6 +128,85 @@ public class Fts
       throw new FtsException( new FtsError(FtsError.CONNECTION_ERROR, "Connection error"));
   }
 
+
+
+  /**
+   * Static function to redefine a FtsObject.
+   * It is static, for
+   * similarity with the constructors, because it can produce 
+   * a different Java object from the argument, so logically they are not method of the object.
+   *
+   * It just produce a new object (calling makeFtsObject), and replace the old with it in the 
+   * container of the old, and in FTS.
+   *
+   *  In case of errors, i.e. if the new object do not exists, we just throw an exception
+   *  and do nothing.
+   *
+   * @@@@: can we just throw away the FTS part of it and do everything here ?
+   * @@@@: including moving the connections ? It would be more consistent,
+   * @@@@: expecially for property handling
+   *
+   * @param obj the object to redefine.
+   * @param description  a string containing the description.
+   * @return a new object, conforming to the new definition, but with the same FTS
+   * identity, and connections; it always create a new object, also if the description
+   * is the same
+   */
+
+  public static FtsObject redefineFtsObject(FtsObject oldObject, String description) throws FtsException
+  {
+    FtsObject newObject;
+    FtsContainerObject parent;
+
+    parent = oldObject.getParent();
+
+    // makeFtsObject can throw a connection if the
+    // object do not exists.
+
+    newObject = makeFtsObject(parent, description);
+
+    // replaceInConnections should delete the connections
+    // not existing any more
+
+    parent.replaceInConnections(oldObject, newObject);
+    oldObject.delete();
+
+    return newObject;
+  }
+
+
+  /** Static function to get an object by name; it get the 
+   *  object by searching it starting from the roots patchers;
+   *  the first object with the good name is returned.
+   */
+
+  public static FtsObject getObject(String name)
+  {
+    if (Fts.getServer() != null)
+      {
+	FtsContainerObject root = Fts.getServer().getRootObject();
+	Vector objects = root.getObjects();
+
+	for (int i = 0; i < objects.size(); i++)
+	  {
+	    FtsObject ret;
+	    FtsObject obj   =  (FtsObject) objects.elementAt(i);
+
+	    if (obj instanceof FtsContainerObject)
+	      {
+		ret = ((FtsContainerObject) obj).getObjectByName(name);
+
+		if (ret != null)
+		  return ret;
+	      }
+	  }
+      }
+
+    return null;
+  }
+
+
+
   /** Selection handling */
 
   /** Selection
@@ -136,8 +217,18 @@ public class Fts
 
   static public FtsSelection getSelection()
   {
+    
     if (selection == null)
-      selection = new FtsSelection();
+      {
+	try
+	  {
+	    selection = (FtsSelection) makeFtsObject(server.getRootObject(), "__selection");
+	  }
+	catch (FtsException e)
+	  {
+	    System.out.println("System error: cannot get selection object");
+	  }
+      }
     
     return selection;
   }

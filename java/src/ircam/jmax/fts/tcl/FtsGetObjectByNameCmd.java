@@ -33,7 +33,7 @@ class FtsGetObjectByNameCmd implements Command
 
 	name = argv[1].toString();
 
-	obj = FtsObject.getObject(name);
+	obj = Fts.getObject(name);
 
 	if (obj != null)
 	  interp.setResult(ReflectObject.newInstance(interp, obj));

@@ -118,6 +118,37 @@ fts_close_bmax_file(fts_bmax_file_t *f)
 /* Aux functions  for file building */
 
 static int
+fts_bmax_find_objidx_from_selection(fts_object_t *obj, fts_selection_t *sel)
+{
+  /* As object idx, i.e. the location where to store
+     the object in the object frame, we compute the
+     position of the object in the object list for the selection,
+     without counting null pointers.
+     */
+
+  int i, idx;
+  fts_patcher_t *patcher = fts_object_get_patcher(obj);
+  fts_object_t  *p;
+
+  idx = 0;
+
+  for (i = 0; i < sel->objects_size; i++)
+    {
+      if (obj == p)
+	return idx;
+      
+      if (obj)
+	idx++;
+    }
+
+  /* If we exit from here, a big coding error have been done,
+     or a message system inconsistency discovered !!! */
+
+  return -1;
+}
+
+
+static int
 fts_bmax_find_objidx(fts_object_t *obj)
 {
   /* As object idx, i.e. the location where to store
@@ -684,6 +715,13 @@ fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
    * the top of the stack for properties (use set instead of push)
    */
 
+#ifdef SAVER_DEBUG
+  fprintf(stderr, "Saving Object %: ", obj->id);
+  fprintf_atoms(stderr, obj->argc, obj->argv);
+  fprintf(stderr, "\n");
+#endif
+
+
   fts_bmax_code_push_atoms(f, obj->argc, obj->argv);
   fts_bmax_code_make_obj(f, obj->argc);
 
@@ -726,6 +764,12 @@ fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
 static void
 fts_bmax_code_new_connection(fts_bmax_file_t *f, fts_connection_t *conn, int fromidx)
 {
+#ifdef SAVER_DEBUG
+  fprintf(stderr, "Saving Connection (%d.%d -> %d.%d)\n",
+	  conn->src->id, conn->woutlet, conn->dst->id, conn->winlet);
+#endif
+
+
   /* Push the inlet and outlet (this order) in the evaluation stack */
 
   fts_bmax_code_push_int(f, conn->winlet);
@@ -735,6 +779,38 @@ fts_bmax_code_new_connection(fts_bmax_file_t *f, fts_connection_t *conn, int fro
 
   fts_bmax_code_push_obj(f, fts_bmax_find_objidx(conn->dst));
   fts_bmax_code_push_obj(f, fromidx);
+
+  /* code the connect command */
+
+  fts_bmax_code_connect(f);
+
+  /* Pop 2 values from the evaluation stack */
+
+  fts_bmax_code_pop_args(f, 2);
+
+  /* Pop 2 object from the object stack */
+
+  fts_bmax_code_pop_objs(f, 2);
+}
+
+
+static void
+fts_bmax_code_new_connection_in_selection(fts_bmax_file_t *f, fts_connection_t *conn, fts_selection_t *sel)
+{
+#ifdef SAVER_DEBUG
+  fprintf(stderr, "Saving Connection in selection(%d.%d -> %d.%d)\n",
+	  conn->src->id, conn->woutlet, conn->dst->id, conn->winlet);
+#endif
+
+  /* Push the inlet and outlet (this order) in the evaluation stack */
+
+  fts_bmax_code_push_int(f, conn->winlet);
+  fts_bmax_code_push_int(f, conn->woutlet);
+
+  /* Push the to object, push the from object in the object stack */
+
+  fts_bmax_code_push_obj(f, fts_bmax_find_objidx_in_selection(conn->dst, sel));
+  fts_bmax_code_push_obj(f, fts_bmax_find_objidx_in_selection(conn->dst, sel));
 
   /* code the connect command */
 
@@ -780,21 +856,12 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx)
 	{
 	  /* Save the object recursively as a patcher, and then pop it from the stack */
 
-#ifdef SAVER_DEBUG
-	  fprintf(stderr, "Saving Patcher %d\n", p->id);
-#endif
 
 	  fts_bmax_code_new_patcher(f, p,i);
 	  fts_bmax_code_pop_objs(f, 1);
 	}
       else
 	{
-#ifdef SAVER_DEBUG
-	  fprintf(stderr, "Saving Object %: ", p->id);
-	  fprintf_atoms(stderr, p->argc, p->argv);
-	  fprintf(stderr, "\n");
-#endif
-
 	  /* Code a new object and pop it from the object stack */
 	  fts_bmax_code_new_object(f, p, i);
 	  fts_bmax_code_pop_objs(f, 1);
@@ -815,14 +882,7 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx)
 	  fts_connection_t *c;
 
 	  for (c = p->out_conn[outlet]; c ; c = c->next_same_src)
-	    {
-#ifdef SAVER_DEBUG
-	      fprintf(stderr, "Saving Connection (%d.%d -> %d.%d)\n",
-		      c->src->id, c->woutlet, c->dst->id, c->winlet);
-#endif
-
-	      fts_bmax_code_new_connection(f, c, i);
-	    }
+	    fts_bmax_code_new_connection(f, c, i);
 	}
 
       i++;
@@ -835,8 +895,7 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx)
 
 
 
-void
-fts_save_patcher_as_bmax(fts_symbol_t file, fts_object_t *patcher)
+void fts_save_patcher_as_bmax(fts_symbol_t file, fts_object_t *patcher)
 {
   fts_bmax_file_t *f;
 
@@ -852,3 +911,90 @@ fts_save_patcher_as_bmax(fts_symbol_t file, fts_object_t *patcher)
       fts_close_bmax_file(f);
     }
 }
+
+
+static void
+fts_bmax_code_new_selection(fts_bmax_file_t *f, fts_object_t *obj)
+{
+  int i, objidx;
+  fts_selection_t *selection = (fts_selection_t *) obj;
+
+#ifdef SAVER_DEBUG
+  fprintf(stderr, "Saving Selection %d\n", obj->id);
+#endif
+
+  /* Allocate a new object table frame of the right dimension */
+
+  fts_bmax_code_push_obj_table(f, selection->objects_count);
+
+  /* Code all the objects */
+
+  objidx = 0;
+  for (i = 0; i < selection->objects_size; i++)
+    {
+      if (selection->objects[i])
+	{
+	  fts_object_t *p;
+
+	  p = selection->objects[i];
+
+	  if (fts_object_is_patcher(p) && (! fts_object_is_abstraction(p)))
+	    {
+	      /* Save the object recursively as a patcher, and then pop it from the stack */
+	      
+	      fts_bmax_code_new_patcher(f, p, objidx);
+	      fts_bmax_code_pop_objs(f, 1);
+	    }
+	  else
+	    {
+	      /* Code a new object and pop it from the object stack */
+
+	      fts_bmax_code_new_object(f, p, objidx);
+	      fts_bmax_code_pop_objs(f, 1);
+	    }
+
+	  objidx++;
+	}
+    }
+
+  /* For each object, for each outlet, code all the connections */
+
+  for (i = 0; i < selection->connections_size; i++)
+    {
+      if (selection->connections[i])
+	{
+	  fts_connection_t *c;
+
+	  c = selection->connections[i];
+
+	  fts_bmax_code_new_connection_in_selection(f, c, selection);
+	}
+    }
+
+  /* Finally, pop the object table */
+
+  fts_bmax_code_pop_obj_table(f);
+}
+
+void fts_save_selection_as_bmax(fts_symbol_t file, fts_object_t *selection)
+{
+  fts_bmax_file_t *f;
+
+  f = fts_open_bmax_file_for_writing(fts_symbol_name(file));
+
+  if (f)
+    {
+      fts_bmax_code_new_selection(f, selection);
+
+      /* code the return command */
+
+      fts_bmax_code_return(f);
+      fts_close_bmax_file(f);
+    }
+}
+
+
+
+
+
+

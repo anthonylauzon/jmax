@@ -128,9 +128,12 @@ static void fts_binary_file_dispose( fts_binary_file_desc_t *desc)
   fts_free( desc->symbols);
 }
 
+/* Return the top of the object stack, usually the last object created
+   at top level (again, usually the top level patcher, but can be different
+   for clipboards).
+   */
 
-
-fts_object_t *fts_binary_file_load( const char *name, fts_object_t *parent, int id)
+fts_object_t *fts_binary_file_load( const char *name, fts_object_t *parent)
 {
   fts_object_t *obj;
   fts_binary_file_desc_t desc;
@@ -147,16 +150,6 @@ fts_object_t *fts_binary_file_load( const char *name, fts_object_t *parent, int 
     post("fts_binary_file_load: VM return null for %s\n", name);
 
   fts_binary_file_dispose( &desc);
-
-  if (id != FTS_NO_ID)
-    {
-      obj->id = id;
-      fts_object_table_put(id, obj);
-    }
-
-  /* activate the post-load init, like loadbangs */
-
-  fts_message_send(obj, fts_SystemInlet, fts_new_symbol("load_init"), 0, 0);
 
   return obj;
 }

@@ -885,18 +885,58 @@ internal_patcher_config(void)
   patcher_metaclass = fts_metaclass_get_by_name(fts_s_patcher);
 }
 
+
+/* The root patcher: it created here, and accessed thru the function
+   fts_get_root_patcher(); the root patcher have by definition an ID 
+   of 1 !!!
+   */
+
+fts_object_t *fts_root_patcher;
+
+static void fts_create_root_patcher()
+{
+  fts_atom_t description[4];
+  fts_object_t *patcher;
+
+  fts_set_symbol(&description[0], fts_s_patcher);
+  fts_set_symbol(&description[1], fts_new_symbol("root"));
+  fts_set_int(&description[2], 0);
+  fts_set_int(&description[3], 0);
+
+  fts_root_patcher = fts_object_new((fts_patcher_t *)0, 1, 4, description);
+}
+
+static void fts_delete_root_patcher()
+{
+  fts_object_delete(fts_root_patcher);
+}
+
+fts_object_t *fts_get_root_patcher()
+{
+  return fts_root_patcher;
+}
+
+
+
 /* Global configuration function; it call the configuration 
    function of each class */
 
-void
-fts_patcher_init(void)
+
+void fts_patcher_init(void)
 {
   internal_patcher_config();
   internal_inlet_config();
   internal_outlet_config();
+
+  fts_create_root_patcher();
 }
 
 
+void
+fts_patcher_shutdown(void)
+{
+  fts_delete_root_patcher();
+}
 
 
 

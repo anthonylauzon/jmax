@@ -16,7 +16,7 @@ send.c          \
 voidobj.c       \
 patlex.c        \
 patabs.c        \
-patparser.c 
-
+patparser.c     \
+selection.c
 
 
