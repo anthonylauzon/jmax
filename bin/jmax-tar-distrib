@@ -83,7 +83,12 @@ PATCH_LEVEL=`awk '$1=="PATCH_LEVEL" { print $2; }' VERSION`
 VERSION=$MAJOR.$MINOR.$PATCH_LEVEL
 
 # 
-DEST_DIR=/tmp/max-${VERSION}
+if [ _${TMP}_ = __ ]
+then
+    TMP=/tmp
+fi
+
+DEST_DIR=${TMP}/max-${VERSION}
 if [ -d ${DEST_DIR} ]
 then
     /bin/rm -rf ${DEST_DIR}
@@ -140,11 +145,13 @@ echo Copying files
 copy_files $ARCH $TYPE . ${DEST_DIR}
 
 # Create the tar file
-if [ ! -d /u/worksta/jmaxdev/releases/${TYPE}/${ARCH} ]
+TARDIR=/u/worksta/jmaxdev/releases/${TYPE}/${ARCH}/${VERSION}
+if [ ! -d ${TARDIR} ]
 then
-    mkdir -p /u/worksta/jmaxdev/releases/${TYPE}/${ARCH}
+    mkdir -p ${TARDIR}
 fi
-TARFILE=/u/worksta/jmaxdev/releases/${TYPE}/${ARCH}/jmax.${TYPE}.${ARCH}.${VERSION}.tar.gz
+TARFILE=${TARDIR}/jmax.${TYPE}.${ARCH}.${VERSION}.tar.gz
 echo "Creating tar file $TARFILE"
-(cd /tmp ; tar cvf - max-${VERSION} ) | gzip -9 > $TARFILE
-chmod 644 $TARFILE
+(cd ${TMP} ; tar cvf - max-${VERSION} ) | gzip -9 > $TARFILE
+chmod 444 ${TARFILE}
+chmod 555 ${TARDIR}
