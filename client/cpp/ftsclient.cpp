@@ -68,19 +68,66 @@
  */
 
 // [RS]: TODO: remove the __stdcall and find a better way to make this **** work.
-FTSCLIENT_API void __stdcall ftsclient_init(const char *clientName) 
+FTSCLIENT_API void __stdcall ftsclient_init(const char *vendorName, const char *appName) 
 {
-  
-  // One may need this debug code again, someday, in a desperate cases...
-  //FILE *f;
-  //f=fopen("c:\\ftsnet_log.txt", "w");
-  //if(f!=NULL) {
-  //  fprintf(f, "I'm alive!!!\n");
-  //  fflush(f);
-  //  fclose(f);
-  //}
-  fts_config_init(clientName, ftsclient_log);
-  fts_config_log_info();
+    // The following code retrieves the application version
+    // from a file called "appver.cfg" in the same directory
+    // as ftsclient.dll
+    char appVersion[1024];
+    char cfgPath[1024];
+
+    // Get the current executable file path.
+    GetModuleFileName(NULL, cfgPath, sizeof(cfgPath)-1);
+    int i = strlen(cfgPath);
+    while( (--i >= 0) && (cfgPath[i]!='\\') );
+    cfgPath[i] = 0;
+
+    // Open the config file.
+    strcat(cfgPath, "\\appver.cfg");
+    config_file_t *cfgfile;
+
+    cfgfile = config_file_open(cfgPath);
+    if(cfgfile) {
+        if(config_file_get_string(cfgfile, "version",
+                                  appVersion, sizeof(appVersion)-1
+                                 )
+          )
+        {
+           // If there is no version information
+           strcpy(appVersion, "<unspecified: 'appver.cfg' missing or invalid>");
+        }
+    }
+
+    // We can now initialize the FTS low level config system
+    fts_config_init(vendorName, appName, appVersion, ftsclient_log);
+    fts_config_log_info();
+}
+
+/***************************************************
+ * ftsclient getdir
+ *
+ * Get a "standard" directory.
+ */
+
+FTSCLIENT_API const char * __stdcall ftsclient_getdir(const char *dirid)
+{
+  const char *path = NULL; 
+
+    /* get the path of the directory */
+  if(!strcmp(dirid,"userfiles")) {
+      path = fts_config_get_user_files_dir();
+  }
+  else if(!strcmp(dirid, "userconfig")) {
+      path = fts_config_get_user_config_dir();
+  }
+  else if(!strcmp(dirid, "userlocalconfig")) {
+      path = fts_config_get_user_local_config_dir();
+  }
+  else if(!strcmp(dirid, "localconfig")) {
+      path = fts_config_get_local_config_dir();
+  }
+
+  return path;
 }
 
 /***************************************************
@@ -136,7 +183,7 @@ void ftsclient_init_log()
   struct timeval now;
   if (home) {
     char buf[1024];
-    snprintf(buf, 1024, "%s/.ftsclient_log", home);
+    snprintf(buf, sizeof(buf)-1, "%s/.ftsclient_log", home);
     log_file = strdup(buf);
   } else {
     log_file = "/tmp/ftsclient_log";
@@ -453,7 +500,7 @@ void FtsSocketConnection::close() throw( FtsClientException)
     /* call WSAAsyncSelect ??? */
     ::shutdown(_socket, 0x02);
     while (1) {
-      r = ::recv(_socket, buf, 1024, 0);
+      r = ::recv(_socket, buf, sizeof(buf)-1, 0);
       if ((r == 0) || (r == SOCKET_ERROR)) {
 	break;
       }
@@ -1137,7 +1184,7 @@ void FtsObject::install( FtsCallback *callback)
  */
 
 #if WIN32
-void FtsProcess::init( const char *path, FtsArgs &args, const char *appName) throw( FtsClientException)
+void FtsProcess::init( const char *path, FtsArgs &args, const char *vendorName, const char *appName) throw( FtsClientException)
 {
   BOOL result;
   char cmdLine[2048];
@@ -1146,7 +1193,6 @@ void FtsProcess::init( const char *path, FtsArgs &args, const char *appName) thr
   pipe_t new_stdin, new_stdout, tmp_in, tmp_out; 
   SECURITY_ATTRIBUTES attr; 
   int i;
-  int bAppNameSpecified = 0;
     
   _path = (path)? strdup(path) : 0;
   _in = INVALID_PIPE;
@@ -1156,18 +1202,20 @@ void FtsProcess::init( const char *path, FtsArgs &args, const char *appName) thr
     findDefaultPath();
   }
 
-  ftsclient_log("[ftsclient]: debug \n", _path);
-  ftsclient_log("[ftsclient]: path %s\n", _path);
+  ftsclient_log("[ftsclient]: FTS path is '%s'\n", _path);
 
   cmdLine[0] = 0;
   strcat(cmdLine, _path);
   strcat(cmdLine, " ");
   for (i = 0; i < args.length(); i++) {
-    if ( args.isString(i))
-      {
-	    strcat( cmdLine, args.getString( i));
+    
+    if ( args.isString(i)) {
+        ftsclient_log("[ftsclient]: adding cmdline arg: '%s'\n", args.getString(i));
+	    strcat(cmdLine, args.getString(i));
 	    strcat(cmdLine, " ");
-      }
+    }
+    else
+        ftsclient_log("[ftsclient]: NOT adding cmdline arg #%d\n", i);
   }
 
   if(appName) {
@@ -1177,6 +1225,16 @@ void FtsProcess::init( const char *path, FtsArgs &args, const char *appName) thr
       strcat(cmdLine, " -appname ");
       strcat(cmdLine, fts_config_get_app_name());
   }
+
+  if(vendorName) {
+      strcat(cmdLine, " -vendorname ");
+      strcat(cmdLine, vendorName);
+  } else {
+      strcat(cmdLine, " -vendorname ");
+      strcat(cmdLine, fts_config_get_vendor_name());
+  }
+
+  ftsclient_log("[ftsclient]: command line: '%s'\n", cmdLine);
 
   /* 
      create two pipes and set the stdin and stdout of FTS to the pipes 
@@ -1258,7 +1316,7 @@ void FtsProcess::init( const char *path, FtsArgs &args, const char *appName) thr
 
 }
 #else
-void FtsProcess::init( const char *path, FtsArgs &args, const char *appName) throw( FtsClientException)
+void FtsProcess::init( const char *path, FtsArgs &args, const char *vendorName, const char *appName) throw( FtsClientException)
 {
   int from_fts_pipe[2];
   int to_fts_pipe[2];
@@ -1325,78 +1383,14 @@ void FtsProcess::init( const char *path, FtsArgs &args, const char *appName) thr
 
 
 
-// [RS]: OK, this file IS a mess, but I didn't start it!!
-#if WIN32
-
-// pHostName may be NULL. pShareName may be NULL, too.
-// If they are not null, they are filled so that the path matches:
-// "\\<pHostName>\<pShareName>..."
-static int isNetworkShare(const char *path, char *pHostName, char *pShareName)
-{
-    if(strlen(path)>=2)
-    {
-        // If the path starts with \\, it must be a network share
-        if (path[0]=='\\' && path[1]=='\\') 
-        {
-            if((pHostName != NULL) || (pShareName != NULL)) {
-                int i, j;
-                i = 0;
-                j = 2; 
-                while( (path[j] != '\\') && (path[j] != 0) ) {
-                    if(pHostName != NULL)
-                        pHostName[i] = path[j];
-                    i++;
-                    j++;                    
-                }
-                if(pHostName != NULL)
-                    pHostName[i] = 0;
-                
-                if ((pShareName != NULL) && (path[j] == '\\')) {
-                    i = 0;
-                    j++;
-                    while( (path[j] != '\\') && (path[j] != 0) ) {
-                        pShareName[i] = path[j];
-                        i++;
-                        j++;
-                    }
-                    pShareName[i] = 0;
-                }
-            }
-
-            return 1;
-        }
-        // If the path starts with a letter followed by a ':'
-        else if(isalpha(path[0]) && path[1]==':')
-        {
-            char rootPath[4];
-			UINT type;
-            rootPath[0] = path[0];
-            rootPath[1] = path[1];
-            rootPath[2] = '\\';
-            rootPath[3] = 0;
-
-            type = GetDriveType(rootPath);
-            if(type == DRIVE_REMOTE) {
-                //if ((pHostName != NULL)) {
-                //}
-                return 1;
-            }
-        }
-    }
-
-    return 0;
-}
+// [RS]: OK, this file IS a mess, but I didn't start it!! ;o)
+#ifdef WIN32
 
 /// Find the path of the FTS executable from ftsclient's 
 /// config file ("ftsclient.cfg").
 void FtsProcess::findDefaultPath() throw( FtsClientException)
 {
-    // [RS]: 1024 is cool, isn't it ?
-    // 64KBytes should be enough for everybody :)
-    // I don't use std::string... it's a shame,
-    // even if other parts of this file use char* too.
-    // But the client is half C++/half C, anyway...
-    // TODO: refactor OR secure all this !!!
+    // TODO: find a better name/refactor this function
 
     char exeDirPath[1024]; // The current exe's file path
     char ftspath[1024];    // The FTS path that the function will return
@@ -1404,10 +1398,11 @@ void FtsProcess::findDefaultPath() throw( FtsClientException)
     char path[1024];       // The path to FTS as specified in the cfg file.
     char shareName[1024];  // The share name we may be run from.
     char hostName[1024];   // The host name we may be run from.
+    char shareRoot[1024];  // The root path to access the share
     int i;
 
     // Get the current executable file path.
-    GetModuleFileName(NULL, exeDirPath, 1023);
+    GetModuleFileName(NULL, exeDirPath, sizeof(exeDirPath)-1);
     i = strlen(exeDirPath);
     while( (--i >= 0) && (exeDirPath[i]!='\\'));
     exeDirPath[i] = 0;
@@ -1416,70 +1411,137 @@ void FtsProcess::findDefaultPath() throw( FtsClientException)
     strcpy(cfgPath, exeDirPath);
     strcat(cfgPath, "\\ftsclient.cfg");
     config_file_t *cfgfile;
+
+    int bGotFtsPath = 0;
+
     cfgfile = config_file_open(cfgPath);
     if(cfgfile) {
 
-        // If we are run from a network share...
-        if(isNetworkShare(cfgPath, hostName, shareName)) {
-
-            int bShareNameSpecified = 0;
-            char shareNameFromConfig[1024];
-            int bLeadingSlash;
-
-            ftsclient_log("[ftsclient] runned on another computer from network share\n");
-            ftsclient_log("[ftsclient] exe file was accessed through host:'%s', share:'%s'\n", hostName, shareName);
-
-            // Read options from config file.
-            config_file_get_string(cfgfile, "FtsRemoteExePath",
-                                   path, sizeof(path)-1
-                                  );
-            if(config_file_get_string(cfgfile, "ShareName",
-                                      shareNameFromConfig, 
-                                      sizeof(shareNameFromConfig)-1
-                                     ) >= 0
-              ) 
-                bShareNameSpecified = 1;
-            
-            bLeadingSlash = (path[0] == '\\');
-
-            snprintf(ftspath, sizeof(ftspath)-1,
-                     "\\\\%s\\%s%s%s",
-                     hostName,
-                     bShareNameSpecified ? shareNameFromConfig : shareName,
+        if(config_file_get_string(cfgfile, "FtsExePath", path, sizeof(path)-1)>=0)
+        {
+            ftsclient_log("[ftsclient] FtsExePath specified, so we will use this path to access fts.exe\n");
+            ftsclient_log("[ftsclient] This path is relative to the directory where the executable"
+                          " using ftsclient.dll resides.\n"
+                         );
+            ftsclient_log("[ftsclient] FtsExePath = '%s'\n", path);
+            int bLeadingSlash = (path[0] == '\\');
+            snprintf(ftspath, sizeof(ftspath)-1, 
+                     "%s%s%s",
+                     exeDirPath,
                      bLeadingSlash ? "" : "\\",
                      path
                     );
+
+            bGotFtsPath = 1;
         }
-        // Else if we are run from the local machine...
-        else {
-            int bRelative = 1;
 
-            ftsclient_log("[ftsclient] run on the local computer directly\n");
+        // If we are run from a network share...
+        switch(fts_detect_network_path(cfgPath, hostName, shareName, shareRoot, sizeof(shareRoot)-1)) 
+        {
+            case fts_net_path_type_mounted_drive:
+            {
+                ftsclient_log("[ftsclient] We are runned through a mounted network drive (%s)\n", shareRoot);
 
-            config_file_get_bool(cfgfile, "Relative", &bRelative);
-          
-            if(bRelative) {
-                int bLeadingSlash;
+                if(!bGotFtsPath) {
+                    // Read option from config file.
+                    config_file_get_string(cfgfile, "FtsRemoteExePath",
+                                           path, sizeof(path)-1
+                                          );
 
-                if( config_file_get_string(cfgfile, "FtsLocalExePath", path, sizeof(path)-1) < 0) {
-                    ftsclient_log("[ftsclient] FATAL: 'FtsLocalExePath' not found in config file\n");
-                    throw new FtsClientException("'FtsLocalExePath' missing in ftsclient.cfg");
+                    int bLeadingSlash;
+                    if(strlen(path)>0)
+                        bLeadingSlash = (path[0] == '\\');
+                    else
+                        bLeadingSlash = 0;
+
+                    snprintf(ftspath, sizeof(ftspath)-1,
+                             "%s%s",
+                             shareRoot,
+                             bLeadingSlash ? path+1 : path
+                            );
                 }
-                bLeadingSlash = (path[0] == '\\');
+                
+            }
+            break;
+            case fts_net_path_type_unc:
+            {
+                ftsclient_log("[ftsclient] We are runned through a UNC network path (server: '%s', host: '%s')\n",
+                              hostName, shareName
+                             );
 
-                ftsclient_log("[ftsclient] FtsLocalExePath (relative) = '%s'\n",path);
-                snprintf(ftspath, sizeof(ftspath)-1, "%s%s%s",
-                         exeDirPath, bLeadingSlash ? "" : "\\", path
-                        );
-                ftsclient_log("[ftsclient] FtsLocalExePath (absolute derived from relative) ='%s'\n",ftspath);
-            }
-            else {
-                if( config_file_get_string(cfgfile, "FtsLocalExePath", ftspath, sizeof(ftspath)-1) < 0) {
-                    ftsclient_log("[ftsclient] FATAL: 'FtsLocalExePath' not found in config file\n");
-                    throw new FtsClientException("'FtsLocalExePath' missing in ftsclient.cfg");
+                if(!bGotFtsPath) {
+                    // Read options from config file.
+                    config_file_get_string(cfgfile, "FtsRemoteExePath",
+                                           path, sizeof(path)-1
+                                          );
+
+                    int bLeadingSlash = (path[0] == '\\');
+                    char shareNameFromConfig[1024];
+
+                    if(config_file_get_string(cfgfile, "ShareName",
+                                              shareNameFromConfig, 
+                                              sizeof(shareNameFromConfig)-1
+                                             ) >= 0
+                      ) // If "ShareName" is specified we rebuild the path...
+                    {
+                        ftsclient_log("[ftsclient] Using specified share '%s' to access FTS on the same host\n", shareNameFromConfig);
+                        snprintf(ftspath, sizeof(ftspath)-1,
+                                 "\\\\%s\\%s%s%s",
+                                 hostName,
+                                 shareNameFromConfig,
+                                 bLeadingSlash ? "" : "\\",
+                                 path
+                                );
+                    }
+                    else // ...else we simply use the share root 
+                         // returned by fts_detect_network_path()
+                    {
+                        snprintf(ftspath, sizeof(ftspath)-1,
+                                 "%s%s%s",
+                                 shareRoot,
+                                 bLeadingSlash ? "" : "\\",
+                                 path
+                                );
+                    }
                 }
-                ftsclient_log("[ftsclient] FtsLocalExePath (absolute) = '%s'\n",ftspath);
+                
             }
+            break;
+            default: // Not a network path - we are run from the machine
+                     // where the app. is installed
+            {
+                int bRelative = 1;
+
+                ftsclient_log("[ftsclient] We are running on the local computer directly.\n");
+
+                if(!bGotFtsPath) {
+                    config_file_get_bool(cfgfile, "Relative", &bRelative);
+      
+                    if(bRelative) {
+                        int bLeadingSlash;
+
+                        if( config_file_get_string(cfgfile, "FtsLocalExePath", path, sizeof(path)-1) < 0) {
+                            ftsclient_log("[ftsclient] FATAL: 'FtsLocalExePath' not found in config file\n");
+                            throw new FtsClientException("'FtsLocalExePath' missing in ftsclient.cfg");
+                        }
+                        bLeadingSlash = (path[0] == '\\');
+
+                        ftsclient_log("[ftsclient] FtsLocalExePath (relative) = '%s'\n",path);
+                        snprintf(ftspath, sizeof(ftspath)-1, "%s%s%s",
+                                 exeDirPath, bLeadingSlash ? "" : "\\", path
+                                );
+                        ftsclient_log("[ftsclient] FtsLocalExePath (absolute derived from relative) ='%s'\n",ftspath);
+                    }
+                    else {
+                        if( config_file_get_string(cfgfile, "FtsLocalExePath", ftspath, sizeof(ftspath)-1) < 0) {
+                            ftsclient_log("[ftsclient] FATAL: 'FtsLocalExePath' not found in config file\n");
+                            throw new FtsClientException("'FtsLocalExePath' missing in ftsclient.cfg");
+                        }
+                        ftsclient_log("[ftsclient] FtsLocalExePath (absolute) = '%s'\n",ftspath);
+                    }
+                }
+            }
+            break;
         }
 
         config_file_close(cfgfile);
@@ -1494,6 +1556,8 @@ void FtsProcess::findDefaultPath() throw( FtsClientException)
 }
 
 #else
+
+#error "Unix port of findDefaultPath() is messy!"
 
 void FtsProcess::findDefaultPath() throw( FtsClientException)
 {
