@@ -282,15 +282,6 @@ abstract public class MaxDocument
 
   public void dispose()
   {
-    for (int i = 0; i < editors.size() ; i++)
-      {
-	MaxDataEditor editor;
-
-	editor = (MaxDataEditor) editors.elementAt(i);
-
-	editor.quitEdit();
-      }
-
     type.disposeDocument(this);
     handler = null;
     type = null;

@@ -117,8 +117,8 @@ public class Mda
 
     if (editor != null)
       {
+        data.getDocument().removeEditor(editor);
 	editor.quitEdit();
-
 	dataEditorTable.remove(data);
       }
   }
