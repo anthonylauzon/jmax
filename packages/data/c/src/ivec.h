@@ -35,15 +35,20 @@ typedef struct _ivec_
   int *values;
   int size;
   int alloc;
-  int opened; /* non zero if editor open */
   fts_symbol_t file;
+  int opened; /* non zero if editor open */
   int vsize; /* visible points */
   int vindex; /* first visible point */
+  float zoom; /* current zoom */
+  int pixsize; /* visible pixels size */
+  struct _ivec_ *copy;
 } ivec_t;
 
 extern fts_class_t *ivec_class;
 extern fts_symbol_t ivec_symbol;
 extern fts_type_t ivec_type;
+
+extern void ivec_set_from_atom_list(ivec_t *vector, int offset, int ac, const fts_atom_t *at);
 
 #define ivec_get_size(v) ((v)->size)
 extern void ivec_set_size(ivec_t *vector, int size);

@@ -21,23 +21,32 @@
 # Based on Max/ISPW by Miller Puckette.
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-#
 
-JMAXROOTDIR = ../../../../../../..
-PACKAGE_ROOT = ../../../../..
-PACKAGE_DIR = ircam/jmax/editors
+
+JMAXROOTDIR = ../../../../../../../..
+PACKAGE_ROOT = ../../../../../..
+PACKAGE_DIR = ircam/jmax/editors/table
 
 include $(JMAXROOTDIR)/java/Makefiles/Makefile.package
 
-all: 
-	(cd bpf ; $(MAKE) all)
-	(cd table ; $(MAKE) all)
+all: local_all
+	(cd actions ; $(MAKE) all)
+	(cd menus ; $(MAKE) all)
+	(cd renderers ; $(MAKE) all)
+	(cd tools ; $(MAKE) all)
 .PHONY: all
 
-clean: 
-	(cd bpf ; $(MAKE) clean)
-	(cd table ; $(MAKE) clean)
+local_all: $(CLASSES)
+.PHONY: local_all
+
+clean: local_clean
+	(cd actions ; $(MAKE) clean)
+	(cd menus ; $(MAKE) clean)
+	(cd renderers ; $(MAKE) clean)
+	(cd tools ; $(MAKE) clean)
 .PHONY: clean
 
 include $(JMAXROOTDIR)/java/Makefiles/Makefile.package.misc
+
+
 
