@@ -20,16 +20,8 @@
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
 </TD>
 
-<TD ALIGN=LEFT VALIGN=MIDDLE>
-<DL>
-<DT> <IMG SRC="../images/dot.gif"> <A HREF="../index.html"> Documentation </A>
-<DL>
-<DT> <IMG SRC="../images/dot.gif"> <A HREF="index.html"> User documentation </A>
-<DL>
-<DT> <IMG SRC="../images/dot.gif"> <B><FONT SIZE=+2>The <I>j</I>Max language</FONT></B>
-</DL>
-</DL>
-</DL>
+<TD ALIGN=CENTER VALIGN=MIDDLE>
+<B><FONT SIZE=+2> The <I>j</I>Max Language </FONT></B>
 </TD>
 
 </TR>
@@ -106,9 +98,13 @@ with variables.
 
 <I>j</I>Max use local scoping for variables; this means that a variable
 defined in a patcher will be visible in all its subpatchers, but it
-will not be visible outside the patcher of definition; this avoid
-conflicts and errors in reusing variables names and simplify writing
-reusable patches; variables will be the preferred way to handle reference
+will not be visible outside the patcher of definition; a patcher see all the variables
+defined in its parent and ancestor patchers.
+<p>
+The flexibility given by this scoping rule avoid conflicts and errors
+in reusing variables names and simplify writing reusable patches.
+<p>
+Variables will be the preferred way to handle reference
 to any kind of data in the future (like table and table~ objects), so that
 locality of scoping will be available to all the form of data referencing.
 In a future version, local variables will be accessible from the outside of
@@ -125,8 +121,7 @@ object reinstantiation.
 
 A variable can also contains an array of values; an array can for example
 be defined by the object "srs: const { 32000, 44100, 48000 }", and accessed
-with the standard syntax "$srs[1]" (see     <A HREF="#expressions"> Expressions </A>
-below).
+with the standard syntax "$srs[1]".
 
 <P>
 <A NAME="expressions">
@@ -153,7 +148,9 @@ functions thru a <B>C</B> API.
 <A NAME="example">
 <H2>An Example</H2>
 
-Here is an example; have fun.
+In this example, we define three variables to parametrize a table object size
+with respect to the sampling frequency; note that the variable <I>sr</I> will 
+be a system defined variable in a real patch programming case.
 <P>
 
 <IMG SRC="../images/variable.gif" ALT="variables in patcher" BORDER=0>
@@ -171,9 +168,14 @@ in abstraction in other Max.
 Actually, this <strong>is</strong> the mechanism that is used
 to pass arguments in <I>j</I>Max; the difference is that an argument can be passed not
 only in abstractions, that in <I>j</I>Max are called <i>templates</i>, but in every
-patcher; also, a patcher can pass named argument, i.e. define new variables explicitly,
-adding at the end of the arguments a list of assignement in the form <code>variable = value</code>.
-
+patcher.
+<P>
+The arguments passed thru the <code>args</code> variable are
+positional parameters, i.e. they are assigned to positions in the
+<code>args</code> corresponding to their position in the patcher
+object text; a patcher can also have named parameters, i.e. define new
+variables explicitly, adding at the end of the arguments a list of
+assignement in the form <code>variable = value</code>.
 
 <P>
 
@@ -184,22 +186,71 @@ A template is the <I>j</I>Max version of other Max abstraction; we use
 a different name mostly to avoid confusion, since <I>j</I>Max is able
 to load and use also the older Max 0.26 abstractions.
 <P>
-A template is the implementation of a new object in the <I>j</I>Max language
-itself; 
 
-     subpatchers and templates
+A template is the implementation of a new object in the <I>j</I>Max
+language itself; a template <I>definition</I> is the content that will
+be used to produce new objects; in <I>j</I>Max, any patch can be used
+as template definition, because, as we saw in the previous paragraph,
+the language itself provide a generic mechanisms to pass arguments to
+subpatchers, there is not need to make a distinction between a
+standard patcher file and a template definition file.
 
+<P>
 
-        + unification of subpatcher and abstraction mechanisms
-          (programming by example)
+Since Templates use the same argument passing paradigm than all the
+subpatchers, positional and named arguments can be used.
 
-        + arguments define (local) variables
+<H3>Defining/Redefining a Templates</H3>
 
-        + positional and named arguments
-            subpatcher: "pho one 2.0 3 coucou = 42" --> local
-          variables: $args[], $coucou
+<P>
+There are several way to define templates, depending on your configuration,
+and on the project you are working on; please refer to the document 
+<A HREF="./projects.html"> Projects Configuration </A> for more powerfull
+project configuration; here we describe the simplest way, usefull for small
+or personal developements.
 
+The easiest way to define a template in <I>j</I>Max is the following:
+define a directory to hold your templates, by using the templateDirectory command
+in your .jmaxrc file, like this:
 
+<pre>
+
+templateDirectory  /usr/joeMax/templates
+
+</pre>
+
+Any file <I>foo.jmax</I> saved to this directory will automatically define a
+template called <I>foo</I>; you can simply edit a patch and save it to this directory
+to define your first template.
+<p>
+This method have a problem, common to the Max 0.26 environment; since
+you are editing a template body, the variables (arguments or variables
+inherited from the outside scope) used by the template are not
+defined, so you cannot complete the editing, and you cannot either
+test the template body.
+<p>
+A better way is to create the template you want to define within the
+context where you want to use it (or in a similar, ad hoc test
+oriented context).  For example, in an empty patcher, create a
+subpatcher object with some example arguments that you would give to
+the template, create the template body, test it, and when it work
+reasonably well, and save the subpatcher it to your template directory
+using the "Save To" menu item in the patcher editor; once saved, you
+can instantiate it as many time you want.
+<p>
+What we said about a new subpatcher apply as well to any template
+instance; you can modify a template instance and save it as the new
+definition for a template; this is possible because the object text in
+the template instance is not changed (as in Max0.26), but stay exactly
+the same as in the template definition; i.e. the definition of a
+template is one example instance.
+<p>
+This means that the editing of a template definition can always be done
+in the template real working conditions, a major advantage toward the
+old Max 0.26 abstractions.
+<p>
+Please note that saving a new template definition will automatically
+redefine all the existing instances to conform to the new definition.
 <P>
 <HR>
 
