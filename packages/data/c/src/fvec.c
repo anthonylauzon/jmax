@@ -277,7 +277,7 @@ fvec_file_is_text( fts_symbol_t file_name)
   char buff[256];
   FILE* fd;
 
-  if (!fts_file_get_read_path(file_name, full_path))
+  if (fts_file_find(file_name, full_path, 256) == NULL)
      return 0;
 
   if ( (fd = fopen( full_path, "rb")) == NULL)
