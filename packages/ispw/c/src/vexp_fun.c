@@ -567,7 +567,7 @@ ex_size(long int argc, struct ex_ex *argv, struct ex_ex *optr)
     {
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
-      post("expr: size: no such table %s\n", fts_symbol_name(s));
+      post("expr: size: no such table %s\n", s);
     }
 }
 
@@ -602,7 +602,7 @@ ex_sum(long int argc, struct ex_ex *argv, struct ex_ex *optr)
     {
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
-      post("expr: sum: no such table %s\n", fts_symbol_name(s));
+      post("expr: sum: no such table %s\n", s);
     }
 }
 
@@ -632,7 +632,7 @@ ex_Sum(long int argc, struct ex_ex *argv, struct ex_ex *optr)
     {
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
-      post("expr: Sum: no such table %s\n", fts_symbol_name(s));
+      post("expr: Sum: no such table %s\n", s);
       return;
     }
 
@@ -683,7 +683,7 @@ ex_avg(long int argc, struct ex_ex *argv, struct ex_ex *optr)
     {
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
-      post("expr: avg: no such table %s\n", fts_symbol_name(s));
+      post("expr: avg: no such table %s\n", s);
     }
 }
 
@@ -713,7 +713,7 @@ ex_Avg(long int argc, struct ex_ex *argv, struct ex_ex *optr)
     {
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
-      post("expr: Avg: no such table %s\n", fts_symbol_name(s));
+      post("expr: Avg: no such table %s\n", s);
       return;
     }
 
@@ -759,7 +759,7 @@ ex_store(long int argc, struct ex_ex *argv, struct ex_ex *optr)
     {
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
-      post("expr: store: no such table %s\n", fts_symbol_name(s));
+      post("expr: store: no such table %s\n", s);
       return;
     }
 

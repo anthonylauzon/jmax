@@ -83,7 +83,7 @@ voxalloc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->list_store  = (fts_atom_t *) fts_malloc(sizeof(fts_atom_t) * n_args);
 	
   for(i = 0; i < n_vox; i++){
-    sprintf(rec_name,"%d-%s", i, fts_symbol_name(name));
+    sprintf(rec_name,"%d-%s", i, name);
     rec_name[MAX_size_rec_name] = '\0';
     this->sym_receive[i] = fts_new_symbol_copy(rec_name);
   }

@@ -127,7 +127,7 @@ delread_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   buf = delay_table_get_delbuf(this->name);
   if(!buf){
-    post("delread~: can't find delay line: %s\n", fts_symbol_name(this->name));
+    post("delread~: can't find delay line: %s\n", this->name);
     return;
   }
    
@@ -139,7 +139,7 @@ delread_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   if(delbuf_is_init(buf))
     {
       if(delbuf_get_tick_size(buf) != n_tick){ /* check if n_tick of delread and delwrite matches */
-	post("error: delread~: %s: sample rate does not match with delay line\n", fts_symbol_name(this->name));
+	post("error: delread~: %s: sample rate does not match with delay line\n", this->name);
 	return;
       }
     }

@@ -61,7 +61,7 @@ max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *op
     {
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
-      fts_object_signal_runtime_error((fts_object_t *) exp, "expr: %s: can't find table\n", fts_symbol_name(s));
+      fts_object_signal_runtime_error((fts_object_t *) exp, "expr: %s: can't find table\n", s);
       return 1;
     }
 
@@ -95,7 +95,7 @@ max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *op
     break;
 
   default:	/* do something with strings */
-    fts_object_signal_runtime_error((fts_object_t *) exp, "expr: bad argument for table '%s'\n", fts_symbol_name(s));
+    fts_object_signal_runtime_error((fts_object_t *) exp, "expr: bad argument for table '%s'\n", s);
     return (1);
   }
   return (0);
@@ -121,7 +121,7 @@ int ex_getsym(char *p, fts_symbol_t *s)
 const char *
 ex_symname(fts_symbol_t s)
 {
-  return (fts_symbol_name(s));
+  return (s);
 }
 
 
@@ -189,7 +189,7 @@ argstostr(int argc, const fts_atom_t *argv, char *buf, int size)
 	  char c;
 	  int quoted = 0;
 
-	  s = fts_symbol_name(fts_get_symbol(argv));
+	  s = fts_get_symbol(argv);
 
 	  while ((c = *s++))
 	    {

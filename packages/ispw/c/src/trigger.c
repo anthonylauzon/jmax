@@ -317,7 +317,7 @@ trigger_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	  }
 	else if (fts_is_symbol(at))
 	  {
-	    const char *s = fts_symbol_name(fts_get_symbol(at));
+	    const char *s = fts_get_symbol(at);
 
 	    switch(s[0])
 	      {
@@ -426,17 +426,17 @@ static int
 trigger_atoms_conforms(const fts_atom_t *a1, const fts_atom_t *a2)
 {
   if (fts_is_float(a1))
-    return (fts_is_float(a2) || (fts_is_symbol(a2) && (fts_symbol_name(fts_get_symbol(a2))[0] == 'f')));
+    return (fts_is_float(a2) || (fts_is_symbol(a2) && (fts_get_symbol(a2)[0] == 'f')));
   else if (fts_is_int(a1))
-    return (fts_is_int(a2) || (fts_is_symbol(a2) && (fts_symbol_name(fts_get_symbol(a2))[0] == 'i')));
+    return (fts_is_int(a2) || (fts_is_symbol(a2) && (fts_get_symbol(a2)[0] == 'i')));
   else if (fts_is_symbol(a1))
     {
       if  (fts_is_symbol(a2))
-	return ((fts_symbol_name(fts_get_symbol(a1)))[0] == (fts_symbol_name(fts_get_symbol(a2)))[0]);
+	return ((fts_get_symbol(a1))[0] == (fts_get_symbol(a2))[0]);
       else if (fts_is_float(a2))
-	return ((fts_symbol_name(fts_get_symbol(a1)))[0] == 'f');
+	return ((fts_get_symbol(a1))[0] == 'f');
       else if (fts_is_int(a2))
-	return ((fts_symbol_name(fts_get_symbol(a1)))[0] == 'i');
+	return ((fts_get_symbol(a1))[0] == 'i');
     }
 
   return 1;		/* should not be reached */

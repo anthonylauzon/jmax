@@ -83,14 +83,14 @@ explay_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   if (! explode)
     {
-      post("explay: %s: can't find explode\n", fts_symbol_name(this->explode_name));
+      post("explay: %s: can't find explode\n", this->explode_name);
       this->current = 0;
     }
   else if (! this->current)
     post("explay: not playing\n");
   else if (this->serial != explode->serial)
     {
-      post("explay: %s: has been modified while playing\n", fts_symbol_name(this->explode_name));
+      post("explay: %s: has been modified while playing\n", this->explode_name);
       this->current = 0;
     }
   else
@@ -127,7 +127,7 @@ explay_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  
 	  if (! explode)
 	    {
-	      post("explay: %s: can't find explode\n", fts_symbol_name(this->explode_name));
+	      post("explay: %s: can't find explode\n", this->explode_name);
 	      this->current = 0;
 	    }
 	  else
@@ -136,7 +136,7 @@ explay_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      
 	      if (! this->serial)
 		{
-		  post("explay: %s: recording\n", fts_symbol_name(this->explode_name));
+		  post("explay: %s: recording\n", this->explode_name);
 		  this->current = 0;
 		}
 	      else
@@ -146,7 +146,7 @@ explay_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 		  if (this->current)
 		    fts_outlet_int(o, 0, this->current->time);
 		  else
-		    post("explay: %s: empty\n", fts_symbol_name(this->explode_name));
+		    post("explay: %s: empty\n", this->explode_name);
 		}
 	    }
 	}
@@ -171,7 +171,7 @@ explay_startat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       
       if (! explode)
 	{
-	  post("explay: %s: can't find explode\n", fts_symbol_name(this->explode_name));
+	  post("explay: %s: can't find explode\n", this->explode_name);
 	  this->current = 0;
 	}
       else
@@ -180,7 +180,7 @@ explay_startat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	  
 	  if (! this->serial)
 	    {
-	      post("explay: %s: recording\n", fts_symbol_name(this->explode_name));
+	      post("explay: %s: recording\n", this->explode_name);
 	      this->current = 0;
 	    }
 	  else
@@ -219,7 +219,7 @@ explay_nth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   if (! explode)
     {
-      post("explay: %s: no such explode\n", fts_symbol_name(this->explode_name));
+      post("explay: %s: no such explode\n", this->explode_name);
       this->current = 0;
     }
   else
@@ -272,7 +272,7 @@ explay_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   explay_t *this = (explay_t *)o;
   fts_symbol_t sym = fts_get_symbol_arg(ac, at, 0, 0);
 
-  post("explay: %s: %s\n", (sym ? fts_symbol_name(s) : "explay"), fts_symbol_name(this->explode_name));
+  post("explay: %s: %s\n", (sym ? s : "explay"), this->explode_name);
 }
 
 

@@ -299,7 +299,7 @@ static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_a
 		    }
 		  else
 		    {
-		      post("messbox: undefined variable %s\n", fts_symbol_name(fts_get_symbol(rd_out)));
+		      post("messbox: undefined variable %s\n", fts_get_symbol(rd_out));
 		      lex_out_type = lex_type_error;		  
 		    }
 		}
@@ -378,7 +378,7 @@ static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_a
 		      target = ispw_get_target(fts_object_get_patcher((fts_object_t *)this), target_name);
 
 		      if (!target)
-			post("messbox: invalid message destination \"%s\"\n", fts_symbol_name(target_name));
+			post("messbox: invalid message destination \"%s\"\n", target_name);
 		    }
 		  else
 		    {
@@ -514,7 +514,7 @@ static int messbox_list_is_primitive(int ac, const fts_atom_t *at)
     {
       if(fts_is_object(at + i))
 	{
-	  post("messbox: can't set value of type <%s>\n", fts_symbol_name(fts_get_selector(at + i)));
+	  post("messbox: can't set value of type <%s>\n", fts_get_selector(at + i));
 	  return 0;
 	}
     }
@@ -649,11 +649,11 @@ static void messbox_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
 	    fts_symbol_t s = fts_get_symbol( p);
 
 	    if (s == fts_s_semi || s == fts_s_comma)
-	      fprintf( file, " \\%s", fts_symbol_name( s));
+	      fprintf( file, " \\%s", s);
 	    else if (s == fts_s_dollar)
 	      state = 1;
 	    else
-	      fprintf( file, " %s", fts_symbol_name( s));
+	      fprintf( file, " %s",  s);
 	  }
 
 	break;
@@ -670,9 +670,9 @@ static void messbox_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
 	    fts_symbol_t s = fts_get_symbol( p);
 
 	    if (s == fts_s_semi || s == fts_s_comma)
-	      fprintf( file, " $ \\%s", fts_symbol_name( s));
+	      fprintf( file, " $ \\%s", s);
 	    else
-	      fprintf( file, " $ %s", fts_symbol_name( s));
+	      fprintf( file, " $ %s", s);
 	    }
 
 	break;

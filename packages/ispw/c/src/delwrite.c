@@ -67,7 +67,7 @@ delwrite_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->name = 0;
   
   if(delay_table_get_delbuf(name)){
-    post("delwrite~: %s: multiply defined (last ignored)\n", fts_symbol_name(name));
+    post("delwrite~: %s: multiply defined (last ignored)\n", name);
     return;
   }
 
@@ -117,7 +117,7 @@ delwrite_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(delbuf_is_init(this->buf))
     {
       if(delbuf_get_tick_size(this->buf) != n_tick){
-	post("error: delwrite~: %s: sample rate does not match with delay line\n", fts_symbol_name(this->name));
+	post("error: delwrite~: %s: sample rate does not match with delay line\n", this->name);
 	return;
       }
     }

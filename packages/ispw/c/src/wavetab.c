@@ -35,7 +35,7 @@ wavetab_samp_t *cos_table = 0;
 void
 wavetable_load(wavetab_t *wavetab)
 {
-  const char *file_name = fts_symbol_name(wavetab->sym);
+  const char *file_name = wavetab->sym;
   float buf[WAVE_TAB_SIZE];
 
     if(file_name)
