@@ -39,6 +39,13 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
 {
   static
   {
+    FtsObject.registerMessageHandler( FtsMatObject.class, FtsSymbol.get("append"), new FtsMessageHandler(){
+      public void invoke( FtsObject obj, FtsArgs args)
+    {
+        System.err.println("FtsMatObject append !!!!");
+        ((FtsMatObject)obj).appendRow(args.getLength(), args.getAtoms());
+    }
+    });
     FtsObject.registerMessageHandler( FtsMatObject.class, FtsSymbol.get("clear"), new FtsMessageHandler(){
       public void invoke( FtsObject obj, FtsArgs args)
       {
@@ -133,6 +140,21 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
       
       notifySizeChanged(n_rows, n_cols);
     }
+  }
+  
+  public void appendRow(int nArgs, FtsAtom args[])
+  {
+    Object[][] temp = new Object[n_rows+1][n_cols];
+    for(int i = 0; i < n_rows; i++)
+      for(int j = 0;j<n_cols; j++)
+        temp[i][j] = values[i][j];
+    for(int j = 0; j< n_cols && j<nArgs; j++)
+      temp[n_rows+1][j] = args[j].getValue();
+    
+    values = temp;
+    n_rows++;
+    
+    notifySizeChanged(n_rows, n_cols);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////
