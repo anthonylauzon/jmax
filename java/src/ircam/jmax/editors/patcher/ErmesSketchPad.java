@@ -105,6 +105,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 	gr = getGraphics();
 	if(gr!=null)
 	    {
+		((Graphics2D)gr).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		SwingUtilities.computeIntersection(rect.x, rect.y, rect.width, rect.height, invalid);
 		gr.setClip(invalid);
 		displayList.updatePaint(gr);
