@@ -140,7 +140,7 @@ class ErmesObjIn extends ErmesObject {
     int aHeight = getItsHeight()+theDeltaY;
     if(aWidth<getMinimumSize().width) aWidth = getMinimumSize().width;
     if(aHeight<getMinimumSize().height) aHeight = getMinimumSize().height;
-    Resize(aWidth-getItsWidth(), aHeight-getItsHeight());
+    resizeBy(aWidth-getItsWidth(), aHeight-getItsHeight());
   }
   
 }

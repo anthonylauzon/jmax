@@ -141,7 +141,7 @@ abstract class ErmesObjEditableObject extends ErmesObject {
     int aHeightDiff = itsFontMetrics.getHeight()*itsParsedTextVector.size()+2*HEIGHT_DIFF-getItsHeight();
     int aWidthDiff = aMaxWidth-getItsWidth();
     if (aHeightDiff == 0 && aWidthDiff == 0) return;
-    Resize(aWidthDiff, aHeightDiff);
+    resizeBy(aWidthDiff, aHeightDiff);
     if (paintNow) {
       if (aHeightDiff < 0 || aWidthDiff <0)
 	itsSketchPad.repaint();
@@ -173,7 +173,7 @@ abstract class ErmesObjEditableObject extends ErmesObject {
     while(lenght > d1.width-20)
       d1.width += 20;
     preferredSize = d1;	
-    Resize1(d1.width, d1.height);	
+    resize(d1.width, d1.height);	
     itsSketchPad.GetEditField().setText(theString);
     itsSketchPad.GetEditField().setSize(d1.width-WIDTH_DIFF, d1.height-HEIGHT_DIFF);
     itsSketchPad.GetEditField().repaint();
@@ -190,7 +190,7 @@ abstract class ErmesObjEditableObject extends ErmesObject {
     int aHeight = getItsHeight()+theDeltaY;
     if(aWidth<itsFontMetrics.stringWidth(itsMaxString) + 2*WIDTH_DIFF) aWidth = itsFontMetrics.stringWidth(itsMaxString) + 2*WIDTH_DIFF;
     if(aHeight<itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF) aHeight = itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF;
-    Resize(aWidth-getItsWidth(), aHeight-getItsHeight());
+    resizeBy(aWidth-getItsWidth(), aHeight-getItsHeight());
   }
   
   public boolean canResizeBy(int theDeltaX, int theDeltaY){

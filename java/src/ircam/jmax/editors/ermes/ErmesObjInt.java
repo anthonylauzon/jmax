@@ -60,7 +60,7 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler{
      DEFAULT_WIDTH = itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("..");
      if(getItsHeight()<DEFAULT_HEIGHT+4) {
        preferredSize.height = DEFAULT_HEIGHT+4;
-       Resize(0, getPreferredSize().height - getItsHeight());
+       resizeBy(0, getPreferredSize().height - getItsHeight());
      }
      if(getItsWidth()<DEFAULT_WIDTH+17){
        preferredSize.width = DEFAULT_WIDTH+17;
@@ -128,7 +128,7 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler{
   }
   
   void ResizeToNewFont(Font theFont){
-      Resize(17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("..")-getItsWidth(),itsFontMetrics.getHeight()+4-getItsHeight());
+      resizeBy(17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("..")-getItsWidth(),itsFontMetrics.getHeight()+4-getItsHeight());
   }
   
   public void ResizeToText(int theDeltaX, int theDeltaY){
@@ -144,7 +144,7 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler{
       
       if(aHeight<itsFontMetrics.getHeight()+4) aHeight = itsFontMetrics.getHeight()+4;
     }
-    Resize(aWidth-getItsWidth(), aHeight-getItsHeight());
+    resizeBy(aWidth-getItsWidth(), aHeight-getItsHeight());
   }
 
   public boolean canResizeBy(int theDeltaX, int theDeltaY){
@@ -158,7 +158,7 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler{
     aHeight = itsFontMetrics.getHeight()+4;
     aWidth = 17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("..");
 
-    Resize(aWidth-getItsWidth(), aHeight-getItsHeight());
+    resizeBy(aWidth-getItsWidth(), aHeight-getItsHeight());
     itsSketchPad.repaint();
   }
 	

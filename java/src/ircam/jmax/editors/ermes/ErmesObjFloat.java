@@ -63,7 +63,7 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler{
 
     if(getItsHeight()<DEFAULT_HEIGHT+4) {
       preferredSize.height = DEFAULT_HEIGHT+4;
-      Resize(0, getPreferredSize().height - getItsHeight());
+      resizeBy(0, getPreferredSize().height - getItsHeight());
     }
 
     if(getItsWidth()<DEFAULT_WIDTH+17){
@@ -135,7 +135,7 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler{
 	aWidth=aHeight/2+17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("...");
       if(aHeight<itsFontMetrics.getHeight()+4) aHeight = itsFontMetrics.getHeight()+4;
     }
-    Resize(aWidth-getItsWidth(), aHeight-getItsHeight());
+    resizeBy(aWidth-getItsWidth(), aHeight-getItsHeight());
   }
 	
   public boolean canResizeBy(int theDeltaX, int theDeltaY){
@@ -149,7 +149,7 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler{
 
     int tempWidth = 17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("...");
     int tempHeight = itsFontMetrics.getHeight()+4;
-    Resize(tempWidth - getItsWidth(), tempHeight - getItsHeight());		
+    resizeBy(tempWidth - getItsWidth(), tempHeight - getItsHeight());		
     itsSketchPad.repaint();
   }
   

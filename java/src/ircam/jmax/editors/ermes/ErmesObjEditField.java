@@ -98,7 +98,7 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     d1.width = lenght+2*itsOwner.WIDTH_DIFF+10;
     d1.height = height+2*itsOwner.HEIGHT_DIFF;    
 
-    itsOwner.Resize1(d1.width, d1.height); 
+    itsOwner.resize(d1.width, d1.height); 
     
     if(itsOwner.itsOutletList.size()>0)
       itsOwner.MoveOutlets();
@@ -158,7 +158,7 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       if(e.getKeyCode()==ircam.jmax.utils.Platform.ENTER_KEY||e.getKeyCode()==ircam.jmax.utils.Platform.RETURN_KEY){//return
 	setRows(getRows()+1);
 	Dimension d2 = itsOwner.Size();
-	itsOwner.Resize1(d2.width, d2.height+fm.getHeight());
+	itsOwner.resize(d2.width, d2.height+fm.getHeight());
 	itsSketchPad.repaint();
 	if(itsOwner.itsOutletList.size()>0)
 	  itsOwner.MoveOutlets();
@@ -197,7 +197,7 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
 	  if(aWidth>20) step = aWidth;
 	  else step = 30;
   
-	  itsOwner.Resize1(itsOwner.Size().width+step, itsOwner.Size().height);
+	  itsOwner.resize(itsOwner.Size().width+step, itsOwner.Size().height);
 	  itsSketchPad.repaint();
 	  setSize(getSize().width+step, getSize().height);
 	  requestFocus();

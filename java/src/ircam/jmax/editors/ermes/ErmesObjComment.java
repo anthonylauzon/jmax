@@ -85,7 +85,7 @@ class ErmesObjComment extends ErmesObject {
   
   public void RestoreDimensions(){
 
-    Resize(itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET-getItsWidth(), itsFontMetrics.getHeight()*itsParsedTextVector.size()-getItsHeight());
+    resizeBy(itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET-getItsWidth(), itsFontMetrics.getHeight()*itsParsedTextVector.size()-getItsHeight());
     itsSketchPad.repaint();
   }
 
@@ -115,7 +115,7 @@ class ErmesObjComment extends ErmesObject {
   }
 
   public void setSize(int theH, int theV) {
-    Resize1(theH, theV);
+    resize(theH, theV);
     if (itsSketchPad != null) itsSketchPad.repaint();
   }
   
@@ -129,7 +129,7 @@ class ErmesObjComment extends ErmesObject {
     int aHeight = getItsHeight()+theDeltaY;
     if(aWidth<itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET) aWidth = itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET;
     if(aHeight<itsFontMetrics.getHeight()*itsParsedTextVector.size()) aHeight = itsFontMetrics.getHeight()*itsParsedTextVector.size();
-    Resize(aWidth-getItsWidth(), aHeight-getItsHeight());
+    resizeBy(aWidth-getItsWidth(), aHeight-getItsHeight());
   }
   
   public boolean canResizeBy(int theDeltaX, int theDeltaY){

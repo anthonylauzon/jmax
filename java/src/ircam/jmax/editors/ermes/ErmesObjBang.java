@@ -16,7 +16,6 @@ class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
   boolean itsFlashing = false;
   static Dimension preferredSize = new Dimension(20,20);
   static Dimension minimumSize = new Dimension(15, 15);
-  public MetaList itsDebugVariable;
 
   public ErmesObjBang(){
     super();

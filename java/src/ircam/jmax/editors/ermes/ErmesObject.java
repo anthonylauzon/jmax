@@ -220,7 +220,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
     itsFtsObject.setRepresentation(this);
     if (maxPads * PADS_DISTANCE > aRect.width) { //the pads are longer then the element
       
-      Reshape(aRect.x, aRect.y, maxPads*PADS_DISTANCE, aRect.height);
+      reshape(aRect.x, aRect.y, maxPads*PADS_DISTANCE, aRect.height);
     }
     if (n_inlts > 1) in_local_distance = (aRect.width-10)/(n_inlts-1) ;
     if (n_outlts > 1) out_local_distance = (aRect.width-10)/(n_outlts-1) ;
@@ -318,7 +318,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
 		
     makeCurrentRect(x, y);
 
-    Reshape(itsX, itsY, getPreferredSize().width, getPreferredSize().height);
+    reshape(itsX, itsY, getPreferredSize().width, getPreferredSize().height);
     
     if (itsFtsObject == null) return false;
     else update(itsFtsObject);
@@ -513,25 +513,25 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
 	if (wrongWidth && wrongHeight) RestoreDimensions(true);
 	else if(wrongWidth) {
 
-	  Resize(getMinimumSize().width - currentRect.width, y-itsInitY);
+	  resizeBy(getMinimumSize().width - currentRect.width, y-itsInitY);
 	  itsSketchPad.repaint();
 
 	}
 	else if( wrongHeight) {
-	  Resize(x-itsInitX, getMinimumSize().height-currentRect.height);
+	  resizeBy(x-itsInitX, getMinimumSize().height-currentRect.height);
 	  itsSketchPad.repaint();
 	}
 	else {
-	  Resize(x-itsInitX+1, y-itsInitY+1);
+	  resizeBy(x-itsInitX+1, y-itsInitY+1);
 	}
 	
       }
       else if(itsSketchPad.itsResizeMode == itsSketchPad.HORIZONTAL_RESIZING){
-	if(canResizeBy(x-itsInitX, 0)) Resize(x-itsInitX, 0);
+	if(canResizeBy(x-itsInitX, 0)) resizeBy(x-itsInitX, 0);
 	else ResizeToText(x-itsInitX, 0);
       }
       else if(itsSketchPad.itsResizeMode == itsSketchPad.VERTICAL_RESIZING){
-	if(canResizeBy(0, y-itsInitY)) Resize(0, y-itsInitY);
+	if(canResizeBy(0, y-itsInitY)) resizeBy(0, y-itsInitY);
 	else ResizeToText(0, y-itsInitY);
       }
       itsDragging = false;
@@ -542,7 +542,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
   
   public void RestoreDimensions(boolean paintNow){
     //possible optimization: don't repaint if nothing changes
-    Resize(getMinimumSize().width - currentRect.width, getMinimumSize().height-currentRect.height);
+    resizeBy(getMinimumSize().width - currentRect.width, getMinimumSize().height-currentRect.height);
      if (paintNow) itsSketchPad.repaint();
      else itsSketchPad.addToDirtyObjects(this);
   }
@@ -552,7 +552,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
     int aHeight = currentRect.height+theDeltaY;
     if(aWidth<getMinimumSize().width) aWidth = getMinimumSize().width;
     if(aHeight<getMinimumSize().height) aHeight = getMinimumSize().height;
-    Resize(aWidth-currentRect.width, aHeight-currentRect.height);
+    resizeBy(aWidth-currentRect.width, aHeight-currentRect.height);
     setDirty(false);
   };
   
@@ -590,7 +590,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
     }
   }
 
-  public void Resize(int theDeltaH, int theDeltaV)
+  public void resizeBy(int theDeltaH, int theDeltaV)
   {
     if (theDeltaH ==0 && theDeltaV ==0) return;
     if (-theDeltaH > currentRect.width || -theDeltaV > currentRect.height) return;
@@ -619,19 +619,18 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
     }
   }
   
-  public void Resize1(int w, int h) {
+  public void resize(int w, int h) {
     if (currentRect.width == w && currentRect.height == h) return;
     setItsWidth(w);
     setItsHeight(h);
   }
   
-  public void Reshape(int x, int y, int width, int height) {
+  public void reshape(int x, int y, int width, int height) {
     setItsX(x);
     setItsY(y);
     currentRect.x = itsX;
     currentRect.y = itsY;
-    setItsWidth(width);
-    setItsHeight(height);
+    resize(width, height);
   }
   
   public Rectangle Bounds() {

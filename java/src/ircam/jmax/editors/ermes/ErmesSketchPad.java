@@ -1233,7 +1233,7 @@ Rectangle previousResizeRect = new Rectangle();
     ErmesObject aObject;
     for (Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
       aObject = (ErmesObject) e.nextElement();
-      if(aObject.canResizeBy(x_amount, y_amount)) aObject.Resize(x_amount, y_amount);
+      if(aObject.canResizeBy(x_amount, y_amount)) aObject.resizeBy(x_amount, y_amount);
       else aObject.ResizeToText(x_amount, y_amount);
     }
     repaint();
@@ -1249,7 +1249,7 @@ Rectangle previousResizeRect = new Rectangle();
     if (direction == Platform.LEFT_KEY) { //we're resetting the selection to the minimum (hor.) size
       for (Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject) e.nextElement();
-	aObject.Resize(aObject.getMinimumSize().width-aObject.getItsWidth(), 0);
+	aObject.resizeBy(aObject.getMinimumSize().width-aObject.getItsWidth(), 0);
       }
       repaint();
     }    
@@ -1260,14 +1260,14 @@ Rectangle previousResizeRect = new Rectangle();
       }
       for (Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject) e.nextElement();
-	aObject.Resize(max-aObject.getItsWidth(), 0);
+	aObject.resizeBy(max-aObject.getItsWidth(), 0);
       }
       repaint();
     }
     else if (direction == Platform.UP_KEY) {
       for (Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject) e.nextElement();
-	aObject.Resize(0, aObject.getMinimumSize().height-aObject.getItsHeight());
+	aObject.resizeBy(0, aObject.getMinimumSize().height-aObject.getItsHeight());
       }
       repaint();
     }
@@ -1278,7 +1278,7 @@ Rectangle previousResizeRect = new Rectangle();
       }
       for (Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject) e.nextElement();
-	aObject.Resize(0, max-aObject.getItsHeight());
+	aObject.resizeBy(0, max-aObject.getItsHeight());
       }
       repaint();
     }

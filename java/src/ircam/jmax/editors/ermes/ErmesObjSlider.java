@@ -15,9 +15,6 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
   ErmesObjThrottle itsThrottle;
   int itsInteger = 0;
 
-  int last_value = 0;
-
-
   static ErmesObjSliderDialog itsSliderDialog = null;
   final static int BOTTOM_OFFSET = /*10*/5;
   final static int UP_OFFSET = /*10*/5;
@@ -63,7 +60,7 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
       aInteger = (Integer)theFtsObject.get("value");
       itsInteger = aInteger.intValue();
     }
-    Resize(0,0);
+    resizeBy(0,0);
     return true;
   }
 
@@ -85,8 +82,8 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
     return itsRangeMax;
   }
 
-  public void Resize(int theDeltaH, int theDeltaV){
-    super.Resize(theDeltaH, theDeltaV);
+  public void resizeBy(int theDeltaH, int theDeltaV){
+    super.resizeBy(theDeltaH, theDeltaV);
     itsPixelRange = getItsHeight()-(UP_OFFSET+BOTTOM_OFFSET);
     
     itsStep = (float)itsRange/itsPixelRange;

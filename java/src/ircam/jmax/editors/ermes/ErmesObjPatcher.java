@@ -35,7 +35,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 
     super.Init(theSketchPad, theFtsObject);
 
-    Resize(0, itsFontMetrics.getHeight()+2*HEIGHT_DIFF-getItsHeight());
+    resizeBy(0, itsFontMetrics.getHeight()+2*HEIGHT_DIFF-getItsHeight());
     ParseText(itsArgs);
     
     if(!canResizeBy(0,0)) RestoreDimensions();
@@ -188,7 +188,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
       aHeight = itsFontMetrics.getHeight() + 10;
     if(aWidth<itsFontMetrics.stringWidth(itsMaxString) + aHeight/2+5+5) 
       aWidth = itsFontMetrics.stringWidth(itsMaxString) + aHeight/2+5+5;
-    Resize(aWidth-getItsWidth(), aHeight-getItsHeight());
+    resizeBy(aWidth-getItsWidth(), aHeight-getItsHeight());
   }
   
   public boolean canResizeBy(int theDeltaX, int theDeltaY){
@@ -200,7 +200,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   public void RestoreDimensions(){
 
     int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsMaxString)+(itsFontMetrics.getHeight()+10)/2+5+5,(itsInletList.size())*12, (itsOutletList.size())*12);
-    Resize(aMaxWidth-getItsWidth(), itsFontMetrics.getHeight() + 10 - getItsHeight());
+    resizeBy(aMaxWidth-getItsWidth(), itsFontMetrics.getHeight() + 10 - getItsHeight());
     itsSketchPad.repaint();
   }
 
