@@ -37,4 +37,6 @@ FTS_API void fts_project_set(fts_package_t *project);
 
 FTS_API fts_symbol_t fts_project_get_dir(void);
 
+FTS_API fts_symbol_t fts_project_get_data_file(fts_symbol_t filename);
+
 #endif /* _FTS_PROJECT_H_ */

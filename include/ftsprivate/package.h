@@ -314,18 +314,6 @@ char* fts_package_get_help(fts_package_t* pkg, fts_symbol_t name);
  * @ingroup package */
 void fts_package_add_data_path(fts_package_t* pkg, fts_symbol_t path);
 
-/**
- * Returns the full path of specified file name. 
- *
- * @fn int fts_package_get_file(fts_package_t* pkg, fts_symbol_t filename)
- * @param pkg the package
- * @param filename the name of the file
- * @param buf the buffer to store the file name
- * @param len the size of the buffer
- * @return 1 if the file was found, 0 if it was not found
- * @ingroup package */
-int fts_package_get_data_file(fts_package_t* pkg, fts_symbol_t filename, char *buf, int len);
-
 
 /********************************************************************
  *

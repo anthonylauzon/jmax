@@ -234,6 +234,11 @@ fts_find_file(const char* root, fts_list_t* paths, const char* filename, char* b
     return 0;
   }
 
+  if (fts_path_is_absolute(filename)) {
+    snprintf(buf, len, "%s", filename);
+    return 1;
+  }
+
   while (paths) {
     path = fts_symbol_name(fts_get_symbol(fts_list_get(paths)));
     if (fts_find_file_aux(root, path, filename, buf, len)) {

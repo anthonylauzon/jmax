@@ -283,6 +283,7 @@ void FtsSocketConnection::initializeSocketLayer()
 
   WORD wVersionRequested;
   WSADATA wsaData;
+  SOCKET sock;
   int result;
 
   wVersionRequested = MAKEWORD(2, 2);
@@ -296,6 +297,13 @@ void FtsSocketConnection::initializeSocketLayer()
     WSACleanup();
     throw FtsClientException( "Bad WinSock version");
   }
+
+  if ((sock = socket(AF_INET, SOCK_STREAM, 0) ) == INVALID_SOCKET)	{
+    WSACleanup();
+    throw FtsClientException( "Couldn't create a socket: make sure the TCP/IP layer is installed?");
+  }
+  closesocket(sock);
+
 #endif
 }
 
@@ -1263,12 +1271,21 @@ void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientExceptio
 #endif
 
 
+
 #if WIN32
 void FtsProcess::findDefaultPath() throw( FtsClientException)
 {
+  char fullpath[1024];
+
+  Fts::defaultRoot(fullpath, 1024);
+  snprintf(fullpath, 1024, "%s\\bin\\%s", fullpath, "fts.exe");
+  _path = strdup(fullpath);
+}
+
+void Fts::defaultRoot(char* path, int len) throw( FtsClientException)
+{
   unsigned char buf[1024];
   unsigned char version[256];
-  char fullpath[1024];
   HKEY key, version_key;
   DWORD type, size;
   char* jmax_key = "Software\\Ircam\\jMax";
@@ -1304,14 +1321,19 @@ void FtsProcess::findDefaultPath() throw( FtsClientException)
   RegCloseKey(key);
   RegCloseKey(version_key);
   
-  snprintf(fullpath, 1024, "%s\\bin\\%s", buf, "fts.exe");
-  _path = strdup(fullpath);
+  snprintf(path, len, "%s", buf);
 }
 #else
 void FtsProcess::findDefaultPath() throw( FtsClientException)
 {
   // We hope that the executable will be in PATH, as we use execvp
   _path = "fts";
+}
+
+void Fts::defaultRoot(char* path, int len) throw( FtsClientException)
+{
+  // FIXME!!!!
+  snprintf(path, len, "/usr/share/jmax");
 }
 #endif
 

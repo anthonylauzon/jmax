@@ -8,6 +8,7 @@ array.c \
 atom.c \
 atomfile.c \
 audio.c \
+audiofile.c \
 autosave.c \
 bytestream.c \
 class.c \

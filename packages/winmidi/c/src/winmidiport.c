@@ -109,6 +109,8 @@ static void winmidiport_output(fts_object_t *o, fts_midievent_t *event, double t
 static char* winmidiport_output_error(int no);
 static char* winmidiport_input_error(int no);
 void CALLBACK winmidiport_callback_in(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2);
+void CALLBACK winmidiport_callback_out(HMIDIOUT hmo, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2);
+static unsigned char* winmidiport_realloc_sysex_buffer(MIDIHDR* hdr, int size);
 
 
 void CALLBACK 
@@ -146,6 +148,11 @@ winmidiport_callback_in(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD dwParam1
   case MIM_MOREDATA:
     break;
   }
+}
+
+void CALLBACK 
+winmidiport_callback_out(HMIDIOUT hmo, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
+{
 }
 
 void
@@ -328,24 +335,21 @@ winmidiport_output(fts_object_t *o, fts_midievent_t *event, double time)
 	int n = this->outhdr[cur].dwBytesRecorded;
 
 	buffer[n++] = SYSEX;
-	/* FIXME: test buffer length */
+	if (n == len) {
+	  buffer = winmidiport_realloc_sysex_buffer(&this->outhdr[cur], len + SYSEX_BUFFER_SIZE);
+	}
   	
 	for (i = 0; i < size; i++) {
 	  buffer[n++] = fts_get_int(atoms + i) & 0x7f;
-	  
 	  if (n == len) {
-	    int newlen = len + SYSEX_BUFFER_SIZE;
-	    unsigned char* newbuf = fts_malloc(newlen);
-	    memcpy(newbuf, this->outhdr[cur].lpData, newlen);
-	    fts_free(this->outhdr[cur].lpData);
-	    this->outhdr[cur].lpData = newbuf;
-	    this->outhdr[cur].dwBufferLength = newlen;
-	    buffer = newbuf;
+	    buffer = winmidiport_realloc_sysex_buffer(&this->outhdr[cur], len + SYSEX_BUFFER_SIZE);
 	  }
 	}
 	
 	buffer[n++] = SYSEX_END;
-	/* FIXME: test buffer length */
+	if (n == len) {
+	  buffer = winmidiport_realloc_sysex_buffer(&this->outhdr[cur], len + SYSEX_BUFFER_SIZE);
+	}
 	
 	this->outhdr[cur].dwBytesRecorded = n;	
       }
@@ -366,6 +370,21 @@ winmidiport_output(fts_object_t *o, fts_midievent_t *event, double time)
     post("Error: winmidiport: Couldn't send MIDI message: %s\n", msg);
     fts_log("Error: winmidiport: Couldn't send MIDI message: %s\n", msg);
   }
+}
+
+static unsigned char* 
+winmidiport_realloc_sysex_buffer(MIDIHDR* hdr, int newlen)
+{
+  unsigned char* newbuf;
+
+  newbuf = fts_malloc(newlen);
+  memcpy(newbuf, hdr->lpData, newlen);
+  fts_free(hdr->lpData);
+
+  hdr->lpData = newbuf;
+  hdr->dwBufferLength = newlen;
+
+  return newbuf;
 }
 
 /************************************************************

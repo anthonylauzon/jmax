@@ -427,3 +427,16 @@ void fts_platform_init( void)
   fts_disable_fpe_traps();
 }
 
+/* *************************************************************************** */
+/*                                                                             */
+/* System time                                                                   */
+/*                                                                             */
+/* *************************************************************************** */
+
+double fts_systime()
+{
+  struct timeval now;
+  gettimeofday(&now, NULL);
+  return (double) now.tv_sec * 1000.0 + (double) now.tv_usec / 1000.0;
+}
+

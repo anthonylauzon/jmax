@@ -111,3 +111,44 @@ fts_project_get_dir(void)
     return fts_new_symbol_copy(getcwd(buf, 1024));
   }
 }
+
+fts_symbol_t
+fts_project_get_data_file(fts_symbol_t filename)
+{
+  fts_symbol_t path;
+  fts_package_t *pkg;
+  fts_iterator_t pkg_iter;
+  fts_atom_t pkg_name;
+
+  if (fts_project == NULL ) {
+    return filename;
+  }
+
+  /* first try to find the file in the current project */
+  path = fts_package_get_data_file(fts_project, filename);
+  if (path != NULL) {
+    return path;
+  }
+
+  /* if it's not in the project, try to find it in the required
+     packages */
+  fts_package_get_required_packages(fts_project, &pkg_iter);
+
+  while (fts_iterator_has_more(&pkg_iter)) {
+    
+    fts_iterator_next(&pkg_iter, &pkg_name);
+    pkg = fts_package_get(fts_get_symbol(&pkg_name));
+    
+    if (pkg == NULL) {
+      continue;
+    }
+
+    path = fts_package_get_data_file(pkg, filename);
+    
+    if (path != NULL) {
+      return path;
+    }
+  }
+
+  return filename;
+}

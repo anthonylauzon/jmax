@@ -254,7 +254,7 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       
       memset( &this->client_addr, 0, sizeof(this->client_addr));
       this->client_addr.sin_family = AF_INET;
-      this->client_addr.sin_addr = *(struct in_addr *)hostptr->h_addr_list[0];
+      this->client_addr.sin_addr = addr;
       this->client_addr.sin_port = htons(port);
       
       /* Send an init packet: empty content, just the packet */

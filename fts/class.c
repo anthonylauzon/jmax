@@ -139,9 +139,7 @@ fts_metaclass_get_by_name(fts_symbol_t name)
   fts_atom_t pkg_name;
 
   /* ask the kernel package before any other package. The kernel
-     classes should not be redefined anyway. If we search the kernel
-     package before the required packages, we avoid the loading of all
-     (required) packages to find the patcher class.  */
+     classes should not be redefined anyway.  */
   pkg = fts_get_system_package();
 
   mcl = fts_package_get_metaclass(pkg, name);

@@ -258,7 +258,7 @@ readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   n_channels = fts_get_int_arg(ac, at, 0, 1);
   this->n_channels = (n_channels < 1) ? 1 : n_channels;
 
-  if (ac == 2 && fts_is_symbol( at + 1)) {
+  if ((ac == 2) && fts_is_symbol(at + 1)) {
     this->filename = fts_get_symbol( at + 1);
   }
 
@@ -308,12 +308,19 @@ readsf_do_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   readsf_t *this = (readsf_t *)o;
   int i;
+  int next_state;
 
   fts_mutex_lock(this->mutex);
 
   if (this->audiofile) {
     fts_audiofile_delete(this->audiofile);
     this->audiofile = NULL;
+  }
+
+  next_state = (ac > 1)? fts_get_int(at) : readsf_opened;
+
+  if ((ac > 1) && fts_is_symbol(at + 1)) {
+    this->filename = fts_get_symbol(at + 1);
   }
 
   if (this->filename) {
@@ -341,25 +348,7 @@ readsf_do_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     }
 
     /* switch to the new state */
-    if (ac > 0) {
-      switch (fts_get_int(at)) {
-      case readsf_opened:
-	this->state = readsf_opened;
-	break;
-	
-      case readsf_playing:
-	this->state = readsf_playing;
-	break;
-	
-      case readsf_paused:
-	this->state = readsf_paused;
-	break;
-	
-      case readsf_closed:
-	this->state = readsf_opened;      /* FIXME */
-	break;
-      }
-    }
+    this->state = next_state;
 
   } else {
     this->state = readsf_closed; 
@@ -433,14 +422,19 @@ static void
 readsf_change_state(fts_object_t *o, int winlet, fts_symbol_t message, int ac, const fts_atom_t *at)
 {
   readsf_t *this = (readsf_t *)o;
-  fts_atom_t a[1];
+  fts_atom_t a[2];
 
   switch( this->state) {
   case readsf_closed:
     if (message == s_open)
       {
 	fts_set_int(a, readsf_opened);
-	fts_task_manager_add_task(manager, o, 0, s_do_open, 1, &a[0]);
+	if ((ac == 1) && fts_is_symbol(at)) {
+	  a[1] = at[0];	  
+	  fts_task_manager_add_task(manager, o, 0, s_do_open, 2, a);
+	} else {
+	  fts_task_manager_add_task(manager, o, 0, s_do_open, 1, a);
+	}
       }
     else if ((message == s_close) || (message == fts_s_stop))
       {
@@ -460,6 +454,11 @@ readsf_change_state(fts_object_t *o, int winlet, fts_symbol_t message, int ac, c
   case readsf_opened:
     if (message == s_open)
       {
+	fts_set_int(a, readsf_opened);
+	if ((ac == 1) && fts_is_symbol(at)) {
+	  a[1] = at[0];	  
+	  fts_task_manager_add_task(manager, o, 0, s_do_open, 2, a);
+	}
       }
     else if ((message == s_close) || (message == fts_s_stop))
       {
@@ -482,7 +481,12 @@ readsf_change_state(fts_object_t *o, int winlet, fts_symbol_t message, int ac, c
            read while they are being refilled */
 	this->state = readsf_paused;
 	fts_set_int(a, readsf_playing);
-	fts_task_manager_add_task(manager, o, 0, s_do_open, 1, &a[0]);
+	if ((ac == 1) && fts_is_symbol(at)) {
+	  a[1] = at[0];	  
+	  fts_task_manager_add_task(manager, o, 0, s_do_open, 2, a);
+	} else {
+	  fts_task_manager_add_task(manager, o, 0, s_do_open, 1, a);
+	}
       }
     else if ((message == s_close) || (message == fts_s_stop))
       {
@@ -501,7 +505,12 @@ readsf_change_state(fts_object_t *o, int winlet, fts_symbol_t message, int ac, c
     if (message == s_open)
       {
 	fts_set_int(a, readsf_opened);
-	fts_task_manager_add_task(manager, o, 0, s_do_open, 1, &a[0]);
+	if ((ac == 1) && fts_is_symbol(at)) {
+	  a[1] = at[0];	  
+	  fts_task_manager_add_task(manager, o, 0, s_do_open, 2, a);
+	} else {
+	  fts_task_manager_add_task(manager, o, 0, s_do_open, 1, a);
+	}
       }
     else if ((message == s_close) || (message == fts_s_stop))
       {

@@ -181,6 +181,7 @@ extern void fts_kernel_patparser_init( void);
 extern void fts_kernel_time_init( void);
 extern void fts_kernel_soundfile_init( void);
 extern void fts_kernel_sched_init( void);
+extern void fts_kernel_audiofile_init( void);
 
 static void fts_kernel_init( void)
 {
@@ -211,6 +212,7 @@ static void fts_kernel_init( void)
   fts_kernel_time_init();
   fts_kernel_soundfile_init();
   fts_kernel_sched_init();
+  fts_kernel_audiofile_init();
 }
 
 extern void fts_array_config( void);

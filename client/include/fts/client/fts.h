@@ -36,7 +36,11 @@
 class FTSCLIENT_API Fts {
  public:
   virtual ~Fts() {}
+
+  static void defaultRoot(char* buf, int len) throw( FtsClientException);
 };
+
+FTSCLIENT_API static void Fts::defaultRoot(char* buf, int len) throw( FtsClientException);
 
 class FTSCLIENT_API FtsProcess : public Fts {
  public:

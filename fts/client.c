@@ -1111,19 +1111,18 @@ fts_pipestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
     return;
   }
 
+#if 0
   /* close the stdin */
-/*    _stdin = GetStdHandle(STD_INPUT_HANDLE);  */
-/*    if (!DuplicateHandle(GetCurrentProcess(), _stdin, */
-/*  		       GetCurrentProcess(), &this->in, 0, */
-/*  		       FALSE, DUPLICATE_SAME_ACCESS)) { */
-/*      LPVOID msg; */
-/*      FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, */
-/*  		  NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &msg, 0, NULL); */
-/*      fts_log("[client] Failed to duplicate stdin: (%s)\n", msg); */
-/*      fts_object_set_error( (fts_object_t *)this, "Failed to duplicate stdin"); */
-/*      LocalFree(msg); */
-/*    } */
-/*    CloseHandle(_stdin); */
+  if (!DuplicateHandle(GetCurrentProcess(), _stdin,
+		       GetCurrentProcess(), &this->in, 0,
+		       FALSE, DUPLICATE_SAME_ACCESS)) {
+    fts_log("Failed to duplicate stdin.\n");    
+    fts_object_set_error( (fts_object_t *)this, "Failed to duplicate stdin");
+  }
+  CloseHandle(_stdin);
+#else
+  this->in = GetStdHandle(STD_INPUT_HANDLE); 
+#endif
 
   /* redirect stdout to a file */
   _stdout = CreateFile("C:\\fts_stdout.txt", 

@@ -128,6 +128,17 @@ FTS_API char* fts_package_get_error(fts_package_t* pkg);
  * @ingroup package */
 FTS_API void fts_package_get_required_packages(fts_package_t* pkg, fts_iterator_t* iter);
 
+
+/**
+ * Returns the absolute path of a data file.
+ *
+ * @fn fts_symbol_t fts_package_get_data_file(fts_package_t* pkg, fts_symbol_t filename)
+ * @param pkg the package
+ * @param filename the file we're looking for
+ * @ingroup package */
+FTS_API fts_symbol_t fts_package_get_data_file(fts_package_t* pkg, fts_symbol_t filename);
+
+
 #endif /* _FTS_PACKAGE_H_ */
 
 

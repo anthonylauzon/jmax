@@ -42,9 +42,46 @@ HINSTANCE fts_get_hinstance()
   return fts_hinstance;
 }
 
-BOOL WINAPI DllMain(HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
+/*  void  */
+/*  fts_create_pid_file(void) */
+/*  { */
+/*    HANDLE file; */
+/*    DWORD count; */
+/*    char path[_MAX_PATH]; */
+/*    char pid[64]; */
+
+/*    snprintf(path, _MAX_PATH, "%s\\%s", fts_symbol_name(fts_get_root_directory()), "pid"); */
+/*    snprintf(pid, 64, "%u", GetCurrentProcessId()); */
+
+/*    file = CreateFile(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL); */
+/*    if (file == INVALID_HANDLE_VALUE) { */
+/*      fts_log("[win32] Failed to create the pid file\n"); */
+/*      return; */
+/*    } */
+/*    WriteFile(file, pid, strlen(pid), &count, NULL); */
+/*    CloseHandle(file); */
+/*  } */
+
+/*  void  */
+/*  fts_delete_pid_file(void) */
+/*  { */
+/*    char path[_MAX_PATH]; */
+/*    snprintf(path, _MAX_PATH, "%s\\%s", fts_symbol_name(fts_get_root_directory()), "pid"); */
+/*    DeleteFile(path); */
+/*  } */
+
+BOOL WINAPI DllMain(HANDLE hModule, DWORD reason, LPVOID lpReserved)
 {
   fts_set_hinstance((HINSTANCE) hModule);
+
+  switch (reason) {
+  case DLL_PROCESS_ATTACH:
+    break;
+
+  case DLL_PROCESS_DETACH:
+/*      fts_delete_pid_file(); */
+    break;
+  }
   return TRUE;
 }
 
@@ -139,6 +176,18 @@ char* win32_realpath(const char* path, char* resolved_path)
   return NULL;
 }
 
+
+/* *************************************************************************** */
+/*                                                                             */
+/* System time                                                                   */
+/*                                                                             */
+/* *************************************************************************** */
+
+double fts_systime()
+{
+  return (double) GetTickCount();
+}
+
 /* *************************************************************************** */
 /*                                                                             */
 /* Platform specific initialization                                            */
@@ -179,6 +228,8 @@ void fts_platform_init( int argc, char **argv)
   /* boost the priority of the fts thread */
 /*    SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS); */
   SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
+
+/*    fts_create_pid_file(); */
 }
 
 
@@ -264,7 +315,7 @@ fts_get_default_root_directory( void)
     }
   }
 
-  fts_log("[win32]: Using '%s' as document root\n", root);
+  fts_log("[win32]: Using '%s' as fts root directory\n", root);
 
   return fts_new_symbol_copy( root);
 }

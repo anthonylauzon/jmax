@@ -648,16 +648,22 @@ fts_package_add_alias(fts_package_t* pkg, fts_symbol_t alias, fts_symbol_t name)
   fts_metaclass_t *mcl;
   fts_atom_t data, k;
 
-  mcl = fts_package_get_metaclass(pkg, name);
+  /* search the meta class in the context of the current package. the
+     search will include the system package and the packages required
+     by the current package. */
+  fts_package_push(pkg);
+  mcl = fts_metaclass_get_by_name(name);
+  fts_package_pop(pkg);
   
   fts_set_symbol( &k, alias);
-  if (fts_hashtable_get(pkg->classes, &k, &data))
+  
+  /* make sure the class is not already defined in this package */
+  if (fts_hashtable_get(pkg->classes, &k, &data)) {
     return &fts_DuplicatedMetaclass;
-  else
-    {
-      fts_set_ptr(&data, mcl);
-      fts_hashtable_put(pkg->classes, &k, &data);
-    }
+  } else {
+    fts_set_ptr(&data, mcl);
+    fts_hashtable_put(pkg->classes, &k, &data);
+  }
   
   return fts_Success;
 }
@@ -676,12 +682,17 @@ fts_package_add_data_path(fts_package_t* pkg, fts_symbol_t path)
   pkg->data_paths = fts_list_append(pkg->data_paths, &n);
 }
 
-int 
-fts_package_get_data_file(fts_package_t* pkg, fts_symbol_t filename, char *buf, int len)
+fts_symbol_t 
+fts_package_get_data_file(fts_package_t* pkg, fts_symbol_t filename)
 {
+  char path[MAXPATHLEN];
   const char* root = (pkg->dir != NULL)? fts_symbol_name(pkg->dir) : NULL;
 
-  return fts_find_file(root, pkg->data_paths, fts_symbol_name(filename), buf, len);
+  if (fts_find_file(root, pkg->data_paths, fts_symbol_name(filename), path, MAXPATHLEN)) {
+    return fts_new_symbol_copy(path);
+  } else {
+    return NULL;
+  }
 }
 
 /********************************************************************
