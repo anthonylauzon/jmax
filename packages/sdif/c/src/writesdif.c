@@ -1,7 +1,7 @@
-/* $Id: writesdif.c,v 1.1 2002/08/30 14:07:13 schwarz Exp $
+/* $Id: writesdif.c,v 1.2 2002/09/02 10:37:13 schwarz Exp $
  *
  * jMax
- * Copyright (C) 1994, 1995, 1998, 1999, 2002 by IRCAM-Centre Georges Pompidou, Paris, France.
+ * Copyright (C) 1994-2002 by IRCAM-Centre Georges Pompidou, Paris, France.
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,23 +26,47 @@
  
   Message Interface:
   - INIT [str]:		str = filename::selection, store filename and 
-			matrix selection
+			matrix selection.  
+			Selected matrices determines number and type of inlets.
+  - DELETE:		close the file if still open
+
   - DEFINE typedef	add sdif description types in string typedef 
   - OPEN [name]:	store filename and matrix selection for output data,
 			open the file
   - START/RECORD/bang:	set start time,
 			rewind and truncate file and write the header
   - STOP/CLOSE:		stop writing and close the file
-  - DELETE:		close the file if still open
   - PAUSE, toggle:	todo: pause recording
 
+  - data messages:	each inlet receives any type of data and writes it 
+			to an SDIF frame
   - float/int:		write singleton matrix
   - list:		write matrix with list in one row
   - matrix:		todo: write matrix
 
   TODO: 
-  - how to write multiple matrices in one frame?
-  - how to write multiple frames in one file? --> multi inputs
+  - How to write multiple matrices in one frame?
+    How to write multiple frames in one file? --> multi inputs
+
+    writesdif "filename" framespec(1) ... framespec(n)  
+	--> n inlets, each one receiving data for the specified SDIF frame
+
+    framespec =
+	(framesig [streamid] matrixsig1 ... matrixsigm)	
+		--> this inlet expects a tuple of m matrices or numbers
+		    and writes them with the given matrix signatures in a frame 
+		    with given frame signature and stream id
+	| framesig [streamid]
+		--> this inlet expects one matrix or number and writes it to a 
+		    matrix with the given signature in a frame with the same 
+		    signature on the given stream
+
+    one-shot frame writing message:
+        write framesig [streamid] matrixsig1 data1 ... matrixsign datan
+		--> write one frame with given signature and streamid 
+		    and n matrices with given signatures and data (matrices 
+		    or scalar numbers or strings)
+
 
   DONE:
   - remove mem leaks with selection/filename
@@ -51,6 +75,9 @@
 
 /* 
  * $Log: writesdif.c,v $
+ * Revision 1.2  2002/09/02 10:37:13  schwarz
+ * Working list input (first line of matrix).
+ *
  * Revision 1.1  2002/08/30 14:07:13  schwarz
  * First working version of sdif package.
  * In/out of scalars (singleton matrices).
@@ -72,7 +99,7 @@
 
 
 /* NOT const, since changed in putNVTgeneral by strtoNV */
-static char CVSID [] = "$Id: writesdif.c,v 1.1 2002/08/30 14:07:13 schwarz Exp $";
+static char CVSID [] = "$Id: writesdif.c,v 1.2 2002/09/02 10:37:13 schwarz Exp $";
 
 
 typedef struct
