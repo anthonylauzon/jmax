@@ -28,6 +28,7 @@
 #include "ftsprivate/tokenizer.h"
 
 #define YY_DECL int yylex( fts_atom_t *lvalp)
+
 #define SET_INT(T) fts_set_int( (lvalp), strtol( T, (char **)NULL, 10))
 #define SET_HEXINT(T) fts_set_int( (lvalp), strtol( T, (char **)NULL, 16))
 #define SET_FLOAT(T) fts_set_float( (lvalp), strtod( T, (char **)NULL))
@@ -109,7 +110,7 @@ quoted_symbol	\"[^\"]+\"
 {smaller_equal}	{ SET_SYMBOL( fts_s_smaller_equal); return 1; }
 {colon}		{ SET_SYMBOL( fts_s_colon); return 1; }
 {equal}		{ SET_SYMBOL( fts_s_equal); return 1; }
-{quoted_symbol}	{ SET_SYMBOL_COPY( yytext); return 1; }
+{quoted_symbol}	{ yytext[yyleng-1] = '\0'; SET_SYMBOL_COPY( yytext+1); return 1; }
 {symbol}	{ SET_SYMBOL_COPY( yytext); return 1; }
 
 %%
