@@ -54,7 +54,7 @@ public class ErmesObjInOutPop extends PopupMenu
 	
 	for (int i = getItemCount(); i < numbers; i++)
 	  {
-	    aMenuItem = new MenuItem( Integer.toString( i + 1));
+	    aMenuItem = new MenuItem( Integer.toString( i));
 
 	    add(aMenuItem);
 	    aMenuItem.addActionListener(new ErmesInOutPopActionListener(aMenuItem, i));
@@ -87,7 +87,7 @@ public class ErmesObjInOutPop extends PopupMenu
       {
 	MenuItem aMenuItem;
 
-	aMenuItem = new MenuItem( Integer.toString( i+1 ));
+	aMenuItem = new MenuItem( Integer.toString( i ));
 	add( aMenuItem);
 
 	aMenuItem.addActionListener( new ErmesInOutPopActionListener(aMenuItem, i));

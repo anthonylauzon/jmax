@@ -2124,14 +2124,14 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   void DeleteGraphicObject( ErmesObject theObject, boolean paintNow) 
   {
     //removes theObject from the selected elements list	
-    if (theObject instanceof FtsPropertyHandler)
-      if (theObject.GetFtsObject()!=null)
-	theObject.GetFtsObject().removeWatch( theObject);
 
     currentSelection.removeObject( theObject);
 
     //removes theObject from the element list (delete)
     itsElements.removeElement( theObject);
+
+    theObject.cleanAll();
+
     markSketchAsDirty();
     
     if (paintNow)
@@ -2181,9 +2181,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       {
 	ErmesObject object = (ErmesObject) objects[i];
 
-	if (object instanceof FtsPropertyHandler)
-	  if (object.GetFtsObject()!=null)
-	    object.GetFtsObject().removeWatch( object);
+	object.cleanAll();
       }
 
     Fts.getServer().removeUpdateGroupListener( this);
@@ -2493,7 +2491,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     annotating = true;
   }
 
-  void showAnnotations( String property)
+  void showErrorDescriptions()
   {
     if (! annotating)
       {
@@ -2505,13 +2503,13 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	    int size = itsElements.size();
 
 	    for ( int i = 0; i < size; i++)
-	      ((ErmesObject) objects[i]).showAnnotation( property);
+	      ((ErmesObject) objects[i]).showErrorDescription();
 	  }
 	else
 	  for ( Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();)
 	    {
 	      aObject = (ErmesObject) e.nextElement();
-	      aObject.showAnnotation( property);
+	      aObject.showErrorDescription();
 	    }
       }
   }

@@ -15,7 +15,6 @@ public class MaxWindowMenu extends Menu implements WindowListener, ListDataListe
   int windowOperationCount = -1;
   boolean windowIsActive = false;
   ListModel windowList;
-  ListModel toolFinders;
   private MaxVector toDispose = new MaxVector();
 
   abstract class WindowActionListener implements ActionListener
@@ -44,10 +43,8 @@ public class MaxWindowMenu extends Menu implements WindowListener, ListDataListe
     
     this.frame = frame;
     windowList = MaxWindowManager.getWindowManager().getWindowList();
-    toolFinders = MaxWindowManager.getWindowManager().getToolFinderList();
 
     windowList.addListDataListener(this);
-    toolFinders.addListDataListener(this);
     frame.addWindowListener(this);
 
     rebuildWindowMenu();
@@ -65,8 +62,8 @@ public class MaxWindowMenu extends Menu implements WindowListener, ListDataListe
   public void removeNotify()
   {
     disposeActionListeners();
+    removeAll();
     windowList.removeListDataListener(this);
-    toolFinders.removeListDataListener(this);
     frame.removeWindowListener(this);
     frame = null;
     super.removeNotify();
@@ -101,21 +98,6 @@ public class MaxWindowMenu extends Menu implements WindowListener, ListDataListe
 				{public  void actionPerformed(ActionEvent e)
 				    { MaxWindowManager.getWindowManager().TileWindows();}});
 
-    addSeparator();
-
-    // Built the tool menu
-
-    for (int i = 0; i < toolFinders.getSize(); i++)
-      {
-	final MaxToolFinder toolFinder = (MaxToolFinder) toolFinders.getElementAt(i);
-
-	mi = new MenuItem(toolFinder.getToolName());
-	add(mi);
-	mi.addActionListener(new WindowActionListener(mi)
-			     { public  void actionPerformed(ActionEvent e)
-			       { toolFinder.open();}});
-      }
-    
     addSeparator();
 
     for (int i = 0; i < windowList.getSize(); i++)

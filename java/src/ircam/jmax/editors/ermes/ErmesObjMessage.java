@@ -8,24 +8,25 @@ import ircam.jmax.fts.*;
 //
 // The "message box" graphic object.
 //
-class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandler {
+
+class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListener {
 
   boolean itsFlashing = false;
 
   public ErmesObjMessage(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
     super(theSketchPad, theFtsObject);
-
-    itsFtsObject.watch( "value", this);
   }
 
   // ----------------------------------------
   // ``Args'' property
   // ----------------------------------------
+
   String getArgs()
   {
-    // Get the correct String from the object's "value" property, that may change
-    return (String)itsFtsObject.get( "value");
+    // Get the correct String from the object's "Message" property, that may change
+
+    return ((FtsMessageObject)itsFtsObject).getMessage();
   }
 
   // ----------------------------------------
@@ -71,29 +72,21 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
 
     // (em) set the text and adjust the size
     setText( text);
-
   }
 
-  // Set the text; it is a try; the message box object in the
-  // application layer take care of converting the message text to the
-  // "value" property; it is an hack, should be done more cleanly.
+  // Set the text when FTS change the message content
 
-  public void propertyChanged(FtsObject obj, String name, Object value) 
+  public void messageChanged(String message)
   {
-    if (name == "value")
-      {
-	// (fd) To be redone
-	// Should be a nice repaint ??
+    // (fd) To be redone
+    // Should be a nice repaint ??
+    // (em) set the text and adjust the size
 
-	// (em) set the text and adjust the size
-	setText( (String) value);
+    setText( message);
 
-	Graphics g = itsSketchPad.getGraphics();
-	Paint_specific(g);
-	g.dispose();
-      }
-    else
-      super.propertyChanged( obj, name, value);
+    Graphics g = itsSketchPad.getGraphics();
+    Paint_specific(g);
+    g.dispose();
   }
 
   public boolean isUIController() 

@@ -267,7 +267,8 @@ void fts_data_call( fts_data_t *d, int key, int ac, const fts_atom_t *at)
 
   if (! function)
     {
-      fprintf( stderr, "%d: no function for this key\n", key);
+      fprintf( stderr, "%d: no function for this key, data %lx, class %s\n", key, d,
+	       fts_symbol_name(d->class->data_class_name));
       return;
     }
 

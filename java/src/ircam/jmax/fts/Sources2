@@ -24,19 +24,26 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/FtsObjectSet.java               \
 	$(INCLUDE_PATH)/FtsMessage.java			\
 	$(INCLUDE_PATH)/FtsMessageObject.java		\
+	$(INCLUDE_PATH)/FtsMessageListener.java		\
 	$(INCLUDE_PATH)/FtsModule.java			\
 	$(INCLUDE_PATH)/FtsObject.java			\
+	$(INCLUDE_PATH)/FtsIntValueObject.java          \
+	$(INCLUDE_PATH)/FtsIntValueListener.java        \
+	$(INCLUDE_PATH)/FtsFloatValueObject.java        \
+	$(INCLUDE_PATH)/FtsFloatValueListener.java      \
+	$(INCLUDE_PATH)/FtsInletsListener.java          \
+	$(INCLUDE_PATH)/FtsOutletsListener.java         \
+	$(INCLUDE_PATH)/FtsNewDataListener.java         \
+	$(INCLUDE_PATH)/FtsSliderObject.java            \
 	$(INCLUDE_PATH)/FtsOutletObject.java		\
 	$(INCLUDE_PATH)/FtsParse.java			\
 	$(INCLUDE_PATH)/FtsPatcherDocument.java		\
 	$(INCLUDE_PATH)/FtsPatcherDocumentType.java	\
 	$(INCLUDE_PATH)/FtsPatcherObject.java		\
 	$(INCLUDE_PATH)/FtsPort.java			\
-	$(INCLUDE_PATH)/FtsPropertyDescriptor.java	\
-	$(INCLUDE_PATH)/FtsPropertyHandler.java		\
 	$(INCLUDE_PATH)/FtsReferenceURLTable.java	\
 	$(INCLUDE_PATH)/FtsRemoteData.java		\
-	$(INCLUDE_PATH)/FtsRemoteUndoableData.java		\
+	$(INCLUDE_PATH)/FtsRemoteUndoableData.java	\
 	$(INCLUDE_PATH)/FtsRemoteDataID.java		\
 	$(INCLUDE_PATH)/FtsRemoteMetaData.java		\
 	$(INCLUDE_PATH)/FtsRexecDatagramPort.java	\
@@ -46,7 +53,6 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/FtsSocketServerPort.java	\
 	$(INCLUDE_PATH)/FtsSubProcessPort.java		\
 	$(INCLUDE_PATH)/FtsUpdateGroupListener.java    \
-	$(INCLUDE_PATH)/FtsVoid.java                   \
 	$(INCLUDE_PATH)/FtsDspControl.java
 
 

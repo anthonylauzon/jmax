@@ -104,6 +104,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   private Menu itsNewFileMenu;
   private Menu itsEditMenu;	
   private Menu itsWindowsMenu;
+  private Menu itsToolsMenu;
 
 
   public MaxEditor(String title, MaxDocumentType type, boolean register)
@@ -153,6 +154,11 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     addWindowListener(this);
     SetupMenu();
 
+    // New Tool menu 
+
+    itsToolsMenu = new ircam.jmax.toolkit.MaxToolsMenu("Tools"); 
+    mb.add(itsToolsMenu);
+
     // New Window Manager based Menu
 
     itsWindowsMenu = new ircam.jmax.toolkit.MaxWindowMenu("Windows", this); 
@@ -161,10 +167,15 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
   public void Destroy()
   {
+    itsFileMenu.remove(itsNewFileMenu);
+    getMenuBar().remove(itsFileMenu);
+    getMenuBar().remove(itsEditMenu);	
+    getMenuBar().remove(itsWindowsMenu);
+    getMenuBar().remove(itsToolsMenu);
+
     removeKeyListener(this);
     removeWindowListener(this);
     doDestroyDispose();
-    setVisible(false);
     dispose();
   }
 

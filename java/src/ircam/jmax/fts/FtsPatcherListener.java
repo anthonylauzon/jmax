@@ -14,5 +14,7 @@ public interface FtsPatcherListener
   public void connectionAdded(FtsPatcherData data, FtsConnection connection);
   public void connectionRemoved(FtsPatcherData data, FtsConnection connection);
 
+  public void patcherChangedNumberOfInlets(FtsPatcherData data, int nins);
+  public void patcherChangedNumberOfOutlets(FtsPatcherData data, int nouts);
   public void patcherChanged(FtsPatcherData data);
 }

@@ -11,8 +11,8 @@ import ircam.jmax.editors.ermes.*;
 // The "bang" graphic object.
 //
 
-class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
-
+class ErmesObjBang extends ErmesObject implements FtsIntValueListener
+{
   private boolean itsFlashing = false;
   private Color itsFlashColor = Color.yellow;
   private static final int DEFAULT_WIDTH = 20;
@@ -21,8 +21,6 @@ class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
   public ErmesObjBang( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject);
-
-    itsFtsObject.watch( "value", this);
 
     int width = getWidth();
     if (width == -1)
@@ -70,9 +68,9 @@ class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
     Color.black
   };
 
-  public void propertyChanged(FtsObject obj, String name, Object value) 
+  public void valueChanged(int value) 
   {
-    int flash = ((Integer) value).intValue();
+    int flash = value;
 
     if (flash <= 0)
       itsFlashing = false;

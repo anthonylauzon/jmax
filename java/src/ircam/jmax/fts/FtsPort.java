@@ -328,11 +328,6 @@ abstract class FtsPort implements Runnable
       write(s.charAt(i));
   }
 
-  final void sendVoid(int value) throws java.io.IOException 
-  {
-    write(FtsClientProtocol.void_type_code);
-  }
-
   final void sendRemoteData( FtsRemoteData data) throws java.io.IOException 
   {
     int value;
@@ -436,7 +431,6 @@ abstract class FtsPort implements Runnable
   private static final int float_token   = 3;
   private static final int object_token  = 4;
   private static final int connection_token  = 5;
-  private static final int void_token  = 6;
   private static final int data_token  = 7;
   private static final int string_token  = 8;
   private static final int end_token     = 9;
@@ -451,8 +445,6 @@ abstract class FtsPort implements Runnable
       return object_token;
     else if (c == FtsClientProtocol.connection_type_code)
       return connection_token;
-    else if (c == FtsClientProtocol.void_type_code)
-      return void_token;
     else if (c == FtsClientProtocol.data_type_code)
       return data_token;
     else if (c == FtsClientProtocol.string_start_code)
@@ -581,19 +573,6 @@ abstract class FtsPort implements Runnable
 	    break;
 
 	    /* ----------------- */
-	  case void_token:
-
-	    if (FtsClientProtocol.tokenStartingChar(c))
-	      {
-		status = tokenCode(c);
-		portMsg.addArgument(FtsVoid.voidValue);
-		s.setLength(0);
-	      }
-	    else
-	      s.append((char)c);
-	    break;
-
-	    /*------------------*/
 
 	  case data_token:
 

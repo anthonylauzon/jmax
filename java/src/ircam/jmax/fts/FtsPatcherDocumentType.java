@@ -30,29 +30,25 @@ public class FtsPatcherDocumentType extends MaxDocumentType
       {
 	patcher = Fts.makeFtsObject(Fts.getServer().getRootObject(), "jpatcher");
 
-	// Put some geometrical property for the window, so we can see it.
-	// Do both a put and a localPut but it should be a series of put/ask
-	// pair.
-
-	patcher.put("wx", 100);
-	patcher.localPut("wx", 100);
-	patcher.put("wy", 100);
-	patcher.localPut("wy", 100);
-	patcher.put("ww", 500);
-	patcher.localPut("ww", 500);
-	patcher.put("wh", 480);
-	patcher.localPut("wh", 480);
 
 	// Put a new empty patch in edit mode
 
-	patcher.put("initialMode", "edit");
-	patcher.localPut("initialMode", "edit");
-
 	FtsPatcherDocument document = new FtsPatcherDocument();
 
-	patcher.ask("data");
+	patcher.updateData();
 	Fts.sync();
-	document.setRootData(patcher.getData());
+
+	// Put some default geometrical property for the window.
+
+	FtsPatcherData data = (FtsPatcherData) 	patcher.getData();
+
+	data.setWindowX(100);
+	data.setWindowY(100);
+	data.setWindowWidth(500);
+	data.setWindowHeight(480);
+	data.setEditMode(FtsPatcherData.EDIT_MODE);
+
+	document.setRootData(data);
 	document.setName(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("untitled")); // temp name
 
 	return document;

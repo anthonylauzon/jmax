@@ -284,7 +284,16 @@ public class MaxApplication extends Object
 	    /* Special Support for load/unload benchmark  */
 
 	    if (getProperty("jmaxLoadUnloadBenchmark") != null)
-	      document.dispose();
+	      {
+		final MaxDocument documentToKill = document;
+
+		/* Use a invoke Later to close, so that we destroy 
+		   the editor after the first paint completed, otherwise
+		   the AWT will try to pain an inconsistent editor */
+		
+		SwingUtilities.invokeLater(new Runnable() {
+		  public void run() {documentToKill.dispose();}});
+	      }
 	  }
 	catch (MaxDocumentException e)
 	  {

@@ -16,7 +16,6 @@ class FtsClientProtocol
   static final int float_type_code    = 'z';
   static final int object_type_code   = 'o';
   static final int connection_type_code   = 'x';
-  static final int void_type_code     = 'v';
   static final int data_type_code     = 0x05;
   static final int string_start_code  = 0x01;
   static final int string_end_code    = 0x02;
@@ -31,7 +30,6 @@ class FtsClientProtocol
 	    (c == float_type_code)   ||
 	    (c == object_type_code)   ||
 	    (c == connection_type_code) || 
-	    (c == void_type_code) || 
 	    (c == data_type_code)   ||
 	    (c == string_start_code) ||
 	    (c == end_of_message_code) ||

@@ -38,10 +38,8 @@ class ErmesPatcherInspector extends Frame {
       public void actionPerformed(ActionEvent e) {
 	try
 	  {
-	    itsPatcherObject.put("ins", Integer.parseInt(itsInsField.getText()));
-	    itsPatcherObject.put("outs", Integer.parseInt(itsOutsField.getText()));
-	    itsPatcherObject.ask("ins");
-	    itsPatcherObject.ask("outs");
+	    itsPatcherObject.setNumberOfInlets(Integer.parseInt(itsInsField.getText()));
+	    itsPatcherObject.setNumberOfOutlets(Integer.parseInt(itsOutsField.getText()));
 
 	    // Put isPatcherObject to null,
 	    // otherwise the GC will not get it if 

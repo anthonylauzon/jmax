@@ -2,6 +2,7 @@ SOURCES = \
 	$(INCLUDE_PATH)/AbstractSelection.java	\
 	$(INCLUDE_PATH)/AbstractUndoableObject.java	\
 	$(INCLUDE_PATH)/MaxWindowMenu.java	\
+	$(INCLUDE_PATH)/MaxToolsMenu.java	\
 	$(INCLUDE_PATH)/DirectionChooser.java	\
 	$(INCLUDE_PATH)/DirectionListener.java		\
 	$(INCLUDE_PATH)/DragListener.java		\

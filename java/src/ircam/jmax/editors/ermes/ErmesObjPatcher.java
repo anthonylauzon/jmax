@@ -12,17 +12,14 @@ import ircam.jmax.utils.*;
 // The "patcher" graphic object.
 //
 
-class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandler {
-
+class ErmesObjPatcher extends ErmesObjEditableObject
+{
   // ----------------------------------------
   // Constructor
   // ----------------------------------------
   ErmesObjPatcher( ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
     super( theSketchPad, theFtsObject);
-
-    itsFtsObject.watch( "ins", this);
-    itsFtsObject.watch( "outs", this);    
   }
 
   // ----------------------------------------
@@ -36,9 +33,6 @@ class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandl
 
   void redefine( String text) 
   {
-    //the parent patcher could destroy connections...
-    GetSketchWindow().itsPatcher.watch( "deletedConnection", GetSketchWindow());
-
     ( (FtsPatcherObject)itsFtsObject).redefinePatcher( text);
     
     // (em) set the text and adjust the size
@@ -53,7 +47,7 @@ class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandl
     if ( evt.getClickCount() > 1)
       {
 	itsSketchPad.waiting();
-	Fts.editPropertyValue(itsFtsObject, "data",
+	Fts.editPropertyValue(itsFtsObject,
 			      new MaxDataEditorReadyListener() {
 				public void editorReady(MaxDataEditor editor)
 				  {itsSketchPad.stopWaiting();}

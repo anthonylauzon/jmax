@@ -9,7 +9,7 @@ import ircam.jmax.utils.*;
 //
 // The "toggle" graphic object.
 //
-class ErmesObjToggle extends ErmesObject implements FtsPropertyHandler {
+class ErmesObjToggle extends ErmesObject implements FtsIntValueListener {
 
   private static final int DEFAULT_WIDTH = 20;
   private static final int MINIMUM_WIDTH = 15;
@@ -21,8 +21,6 @@ class ErmesObjToggle extends ErmesObject implements FtsPropertyHandler {
   public ErmesObjToggle( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject);
-
-    itsFtsObject.watch( "value", this);
 
     int width = getWidth();
     if (width == -1)
@@ -57,7 +55,8 @@ class ErmesObjToggle extends ErmesObject implements FtsPropertyHandler {
     if ( itsSketchPad.itsRunMode || evt.isControlDown()) 
       {
 	itsToggled = !itsToggled;
-	itsFtsObject.put( "value", (itsToggled ? 1 : 0) );
+
+	((FtsIntValueObject)itsFtsObject).setValue(itsToggled ? 1 : 0);
 
 	DoublePaint();
       } 
@@ -65,9 +64,9 @@ class ErmesObjToggle extends ErmesObject implements FtsPropertyHandler {
       itsSketchPad.ClickOnObject( this, evt, x, y);
   }
 
-  public void propertyChanged( FtsObject obj, String name, Object value) 
+  public void valueChanged(int value) 
   {
-    boolean temp = (((Integer)value).intValue() == 1);
+    boolean temp = (value == 1);
 
     if ( itsToggled != temp) 
       {

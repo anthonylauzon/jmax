@@ -702,7 +702,7 @@ public class FtsServer
   }
 
 
-  /** Send a "put property" messages to FTS. */
+  /** Send a "put property" messages to FTS; version with a generic value */
 
   final void putObjectProperty(FtsObject object, String name, Object value)
   {
@@ -719,6 +719,56 @@ public class FtsServer
 	port.sendObject(object);
 	port.sendString(name);
 	port.sendValue(value);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+
+  /** Send a "put property" messages to FTS; version with an int value */
+
+  final void putObjectProperty(FtsObject object, String name, int value)
+  {
+    if (! connected)
+      return;
+
+    if (FtsServer.debug)
+      System.err.println("putObjectProperty(" + object + ", " + name + ", " +
+			 value + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_put_property_cmd);
+	port.sendObject(object);
+	port.sendString(name);
+	port.sendInt(value);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+
+  /** Send a "put property" messages to FTS; version with a float*/
+
+  final void putObjectProperty(FtsObject object, String name, float value)
+  {
+    if (! connected)
+      return;
+
+    if (FtsServer.debug)
+      System.err.println("putObjectProperty(" + object + ", " + name + ", " +
+			 value + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_put_property_cmd);
+	port.sendObject(object);
+	port.sendString(name);
+	port.sendFloat(value);
 	port.sendEom();
       }
     catch (java.io.IOException e)
@@ -768,6 +818,74 @@ public class FtsServer
       }
     catch (java.io.IOException e)
       {
+      }
+  }
+
+  /** Send a single argument "remote call" message to FTS. */
+
+  final void remoteCall( FtsRemoteData data, int key, int arg)
+  {
+    if (! connected)
+      return;
+
+    if (FtsServer.debug)
+      System.err.println( "remoteCall(" + data + ", " + key + "," + arg + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.remote_call_code);
+	port.sendRemoteData(data);
+	port.sendInt(key);
+	port.sendInt(arg);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+	System.err.println("IOException in FtsServer:remoteCall(data, key, args)");
+      }
+  }
+
+  final void remoteCall( FtsRemoteData data, int key, float arg)
+  {
+    if (! connected)
+      return;
+
+    if (FtsServer.debug)
+      System.err.println( "remoteCall(" + data + ", " + key + "," + arg + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.remote_call_code);
+	port.sendRemoteData(data);
+	port.sendInt(key);
+	port.sendFloat(arg);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+	System.err.println("IOException in FtsServer:remoteCall(data, key, args)");
+      }
+  }
+
+  final void remoteCall( FtsRemoteData data, int key, Object arg)
+  {
+    if (! connected)
+      return;
+
+    if (FtsServer.debug)
+      System.err.println( "remoteCall(" + data + ", " + key + "," + arg + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.remote_call_code);
+	port.sendRemoteData(data);
+	port.sendInt(key);
+	port.sendValue(arg);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+	System.err.println("IOException in FtsServer:remoteCall(data, key, args)");
       }
   }
 
@@ -1049,10 +1167,14 @@ public class FtsServer
 
 	  if ((obj == null) || (prop == null) || (value == null))
  	    System.err.println("Wrong property value message " + msg);
-	  else
+	  else 
 	    {
- 	      if (obj != null)
- 		obj.localPut(prop, value);
+	      if (value instanceof Integer)
+		obj.localPut(prop, ((Integer) value).intValue());
+	      else if (value instanceof Float)
+		obj.localPut(prop, ((Float) value).floatValue());
+	      else
+		obj.localPut(prop, value);
 	      
 	      if (FtsServer.debug)
  		System.err.println("SetPropertyValue " + obj + " " + prop + " " + value);

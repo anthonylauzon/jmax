@@ -11,6 +11,13 @@
  *
  */
 
+/*
+ * Uncommenting OUTGOING_DEBUG_TRACE will produce a trace
+ * of the outgoing messages on the standard error
+ */
+
+/* #define OUTGOING_DEBUG_TRACE   */
+
 #include <string.h>
 
 #include "protocol.h"
@@ -46,6 +53,10 @@ static void fts_client_send_string(char *msg)
 
   if (client_dev)
     {
+#ifdef OUTGOING_DEBUG_TRACE      
+      fprintf(stderr, "%s", msg); 
+#endif
+
       for (i = 0; msg[i] != '\0' ; i++)
 	{
 	  if (i >= 1024)
@@ -60,6 +71,11 @@ void fts_client_mess_start_msg(int type)
 {
   if (client_dev)
     fts_char_dev_put(client_dev, (char) type);
+
+#ifdef OUTGOING_DEBUG_TRACE      
+  fprintf(stderr, "MSG: %c", type);
+#endif
+
 }
 
 void fts_client_mess_add_int(int value)
@@ -103,11 +119,6 @@ void fts_client_mess_add_symbol(fts_symbol_t s)
     fts_client_mess_add_string("(null)");
 }
 
-void fts_client_mess_add_void()
-{
-  fts_client_send_string("v");
-}
-
 void fts_client_mess_add_string(const char *sp)
 {
   sprintf(outbuf, "%c%s%c", STRING_START_CODE, sp, STRING_END_CODE);
@@ -135,8 +146,6 @@ void fts_client_mess_add_atoms(int ac, const fts_atom_t *args)
 	fts_client_mess_add_object(fts_get_object(&args[i]));
       else  if (fts_is_data(&args[i]))
 	fts_client_mess_add_data( fts_get_data( &args[i]) );
-      else  if (fts_is_void(&args[i]))
-	fts_client_mess_add_void();
       else
 	fprintf(stderr, "Wrong atom type in fts_client_mess_add_atoms: %lx\n",
 		(unsigned long) fts_get_type(&args[i]));
@@ -150,6 +159,10 @@ void fts_client_mess_send_msg(void)
 
   if (client_dev)
     fts_char_dev_put(client_dev, (char) EOM_CODE);
+
+#ifdef OUTGOING_DEBUG_TRACE      
+  fprintf(stderr, "<EOM>\n");
+#endif
 }
 
 /* 

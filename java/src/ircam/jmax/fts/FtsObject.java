@@ -17,7 +17,6 @@ import ircam.jmax.mda.*;
 
 public class FtsObject 
 {
-  /* code to set generic properties meta-properties */
 
   /******************************************************************************/
   /*                                                                            */
@@ -77,6 +76,16 @@ public class FtsObject
       obj =  new FtsMessageObject(parent, FtsParse.unparseObjectDescription(msg), objId);
     else if (className == "comment")
       obj =  new FtsCommentObject(parent, FtsParse.simpleUnparseObjectDescription(msg), objId);
+    else if (className == "intbox")
+      obj =  new FtsIntValueObject(parent, className, "intbox", objId);
+    else if (className == "toggle")
+      obj =  new FtsIntValueObject(parent, className, "toggle", objId);
+    else if (className == "button")
+      obj =  new FtsIntValueObject(parent, className, "button", objId);
+    else if (className == "slider")
+      obj =  new FtsSliderObject(parent, "slider", objId);
+    else if (className == "floatbox")
+      obj =  new FtsFloatValueObject(parent, className, "floatbox", objId);
     else if (className == "__selection")
       obj =  new FtsSelection(parent, className, "__selection", objId);
     else if (className == "__clipboard")
@@ -104,321 +113,101 @@ public class FtsObject
   /******************************************************************************/
 
 
-  /* The class PropertyTable handle properties and handlers; it is installed
-     only by need, and is an inner class of FtsObject
-     */
-
-  class PropertyHandlerTable
-  {
-    MaxVector table = new MaxVector();
-
-    class PropertyHandlerEntry
-    {
-      String name;
-      FtsPropertyHandler handler;
-      Object owner;
-
-      PropertyHandlerEntry(String name, FtsPropertyHandler handler, Object owner)
-      {
-	this.name    = name;
-	this.handler = handler;
-	this.owner = owner;
-	table.addElement(this);
-      }
-
-      void callHandler(String name, Object value, Object author)
-      {
-	if (name == this.name)
-	  if ((author == null) || (author != owner))
-	    handler.propertyChanged(FtsObject.this, name, value);
-      }
-
-      public String toString()
-      {
-	return "PropertyHandlerEntry for " + name + " handler " + handler + " owner " + owner;
-      }
-    }
-
-    public void removeWatch(Object owner)
-    {
-      // Shitty code; actually, the handler table should 
-      // not be a vector ... may be a linked list
-
-      MaxVector toRemove = new MaxVector();
-
-       for (int i = 0; i < table.size(); i++)
-	{
-	  PropertyHandlerEntry ph = (PropertyHandlerEntry) table.elementAt(i);
-
-	  if (ph.owner == owner)
-	    toRemove.addElement(ph);
-	}
-
-      for (int i = 0; i < toRemove.size(); i++)
-	table.removeElement((PropertyHandlerEntry)toRemove.elementAt(i));
-    }
-
-    public void removeWatch(String name, Object owner)
-    {
-      // Shitty code; actually, the handler table should 
-      // not be a vector ... may be a linked list
-
-      MaxVector toRemove = new MaxVector();
-
-      for (int i = 0; i < table.size(); i++)
-	{
-	  PropertyHandlerEntry ph = (PropertyHandlerEntry) table.elementAt(i);
-
-	  if ((ph.owner == owner) && (ph.name == name))
-	    toRemove.addElement(ph);
-	}
-
-      for (int i = 0; i < toRemove.size(); i++)
-	table.removeElement((PropertyHandlerEntry)toRemove.elementAt(i));
-    }
-
-    public void watch(String property, FtsPropertyHandler handler, Object owner)
-    {
-      new PropertyHandlerEntry(property, handler, owner);
-    }
-
-    synchronized void callHandlers(String name, Object value, Object author)
-    {
-      for (int i = 0; i < table.size(); i++)
-	((PropertyHandlerEntry) table.elementAt(i)).callHandler(name, value, author);
-    }
-  }
-
-  PropertyHandlerTable propertyHandlerTable = null;
-
-  class Property
-  {
-    String name;
-    Object value;
-
-    Property(String name, Object value)
-    {
-      this.name = name;
-      this.value = value;
-    }
-  }
-
-
-  /**
-   * "put" send the property to fts; localPut 
-   * store and access the properties, activating
-   * watchers here and in the container if needed.
-   * Also "catch" and locally process properties
-   * valid for all the objects.
-   *
-   *
-   * Values here have been already parsed from the Tcl
-   * command.
-   * 
-   */
-
-  MaxVector properties = null;
-
-  public void put(String name, int value)
-  {
-    put(name, new Integer(value));
-  }
-
-  public void put(String name, float value)
-  {
-    put(name, new Float(value));
-  }
-
-  public void put(String name, Object value)
-  {
-    Fts.getServer().putObjectProperty(this, name, value);
-  }
-
-
-  /* ask fts to send back the value property (and so indirectly call the handlers) */
-     
-  public void ask(String name)
-  {
-    Fts.getServer().askObjectProperty(this, name);
-  }
-  
   /** Local put is a version of put that do not send
     values to FTS.
     */
 
-  public void localPut(String name, int value)
+  protected void localPut(String name, int value)
   {
-    localPut(name, new Integer(value), null);
+    if (name == "ins")
+      {
+	ninlets = value;
+
+	if ((data != null) && (data instanceof FtsPatcherData))
+	  ((FtsPatcherData) data).firePatcherChangedNumberOfInlets(ninlets);
+
+	if (listener instanceof FtsInletsListener)
+	  ((FtsInletsListener)listener).inletsChanged(ninlets);
+      }
+    else if (name == "outs")
+      {
+	noutlets = value;
+
+	if ((data != null) && (data instanceof FtsPatcherData))
+	  ((FtsPatcherData) data).firePatcherChangedNumberOfOutlets(noutlets);
+
+	if (listener instanceof FtsOutletsListener)
+	  ((FtsOutletsListener)listener).outletsChanged(noutlets);
+      }
+    else if (name == "x")
+      {
+	x = value;
+      }
+    else if (name == "y")
+      {
+	y = value;
+      }
+    else if (name == "w")
+      {
+	width = value;
+      }
+    else if (name == "h")
+      {
+	height = value;
+      }
+    else if (name == "error")
+      {
+	if (value == 0)
+	  isError = false;
+	else
+	  isError = true;
+
+	if (listener instanceof FtsObjectErrorListener)
+	  ((FtsObjectErrorListener)listener).errorChanged(isError);
+      }
+    else if (name == "fs")
+      {
+	fontSize = value;
+      }
   }
 
-  public void localPut(String name, float value)
+  protected void localPut(String name, float value)
   {
-    localPut(name, new Float(value), null);
-  }
-
-  public void localPut(String name, Object value)
-  {
-    localPut(name, value, null);
-  }
-
-  public void localPut(String name, int value, Object author)
-  {
-    localPut(name, new Integer(value), author);
-  }
-
-  public void localPut(String name, float value, Object author)
-  {
-    localPut(name, new Float(value), author);
+    // No float property at this level
   }
 
 
-  void localPut(String name, Object value, Object author)
+  protected void localPut(String name, Object value)
   {
     // check first hardcoded properties
 
-    if (name == "ins")
+    if ((name == "errdesc") && (value instanceof String))
       {
-	if (! (value instanceof FtsVoid))
-	  this.ninlets = ((Integer)value).intValue();
+	errorDescription = (String) value;
       }
-    else if (name == "outs")
+    else if ((name == "font") && (value instanceof String))
       {
-	if (! (value instanceof FtsVoid))
-	  this.noutlets = ((Integer)value).intValue();
+	font = (String) value;
       }
-    else if (name == "x")
+    else if ((name == "name") && (value instanceof String))
       {
-	if (! (value instanceof FtsVoid))
-	  x = ((Integer)value).intValue();
+	setObjectName((String) value);
       }
-    else if (name == "y")
+    else if ((name == "data") && (value instanceof MaxData))
       {
-	if (! (value instanceof FtsVoid))
-	  y = ((Integer)value).intValue();
+	data = (MaxData) value;
+	Fts.fireNewDataListenerOn(this, data);
       }
-    else if (name == "w")
-      {
-	if (! (value instanceof FtsVoid))
-	  width = ((Integer)value).intValue();
-      }
-    else if (name == "h")
-      {
-	if (! (value instanceof FtsVoid))
-	  height = ((Integer)value).intValue();
-      }
-    else if (name == "name")
-      {
-	if (! (value instanceof FtsVoid))
-	  setObjectName(value.toString());
-      }
-    else if (name == "data")
-      {
-	if (! (value instanceof FtsVoid))
-	  data = (MaxData) value;
-      }
-    else
-      {
-	// local properties
-
-	if (properties == null)
-	  properties = new MaxVector();
-
-	search :
-	  {
-	    for (int i = 0; i < properties.size(); i++)
-	      {
-		Property p = (Property)(properties.elementAt(i));
-
-		if (p.name == name)
-		  {
-		    // property found, change the value
-
-		    p.value = value;
-
-		    break search;
-		  }
-	      }
-
-	    // Nothing found, make a new one
-
-	    properties.addElement(new Property(name, value));
-	  }
-      }
-
-    // Call the handlers 
-
-    if (propertyHandlerTable != null)
-      propertyHandlerTable.callHandlers(name, value, author);
   }
 
-  /** Get a propery value; subclasses may specialize it */
 
-  public Object get(String name)
+  // New simplified beanified system
+
+  protected Object listener;
+
+  public void setObjectListener(Object obj)
   {
-    Object v = null;
-
-    if (name == "ins")
-      return new Integer(getNumberOfInlets());
-    else if (name == "outs")
-      return new Integer(getNumberOfOutlets());
-    else if (name == "x")
-      return new Integer(x);
-    else if (name == "y")
-      return new Integer(y);
-    else if (name == "w")
-      return new Integer(width);
-    else if (name == "h")
-      return new Integer(height);
-    else if (name == "name")
-      return getObjectName();
-    else if (name == "data")
-      return data;
-
-    if (properties != null)
-      {
-      search: for (int i = 0; i < properties.size(); i++)
-	{
-	  Property p = (Property)(properties.elementAt(i));
-	    
-	  if (p.name == name)
-	    {
-	      v = p.value;
-	      break search;
-	    }
-	}
-      }
-    else
-      v = FtsPropertyDescriptor.getDefaultValue(name);
-
-    if (v == null)
-      return FtsVoid.voidValue;
-    else
-      return v;
-  }
-
-  public void watch(String property, FtsPropertyHandler handler)
-  {
-    watch(property, handler, handler);
-  }
-
-  public void watch(String property, FtsPropertyHandler handler, Object owner)
-  {
-    if (propertyHandlerTable == null)
-      propertyHandlerTable = new PropertyHandlerTable();
-    
-    propertyHandlerTable.watch(property, handler, owner);
-  }
-
-  public void removeWatch(Object owner)
-  {
-    if (propertyHandlerTable != null)
-      propertyHandlerTable.removeWatch(owner);
-  }
-
-  public void removeWatch(String name, Object owner)
-  {
-    if (propertyHandlerTable != null)
-      propertyHandlerTable.removeWatch(name, owner);
+    listener = obj;
   }
 
   /******************************************************************************/
@@ -462,22 +251,6 @@ public class FtsObject
 
   String description = null;
 
-  /**
-   * The editable data this object represent and implement
-   * It is also the value of the data property.
-   */
-
-  MaxData data;
-
-  MaxData getData()
-  {
-    return data;
-  }
-
-  // Property and message handlers (to be converted to Beans style)
-  // Should go in a structure create by need
-
-  /** The property Handler Table for this object */
 
   /** x, y, width and height cache locally the geometrical properties, to speed
     up access; also, to prepare transition to beans model */
@@ -486,10 +259,15 @@ public class FtsObject
   protected int y = -1 ;
   protected int width = -1;
   protected int height = -1;
+  protected boolean isError = false;
+  protected String  errorDescription;
+  protected String font = null;
+  protected int fontSize = -1;
+  protected MaxData data;
 
-  /** Direct access to geometric properties; USE only this for geometric properties;
-   * other properties will "Beanified soon".
-   */
+  //
+  //  Handling of properties
+  //
 
   public final int getX()
   {
@@ -498,7 +276,7 @@ public class FtsObject
 
   public final void setX(int x)
   {
-    put("x", new Integer(x));
+    Fts.getServer().putObjectProperty(this, "x", x);
     this.x = x;
     setDirty();
   }
@@ -510,7 +288,7 @@ public class FtsObject
 
   public final void setY(int y)
   {
-    put("y", new Integer(y));
+    Fts.getServer().putObjectProperty(this, "y", y);
     this.y = y;
     setDirty();
   }
@@ -522,7 +300,7 @@ public class FtsObject
 
   public final void setWidth(int w)
   {
-    put("w", new Integer(w));
+    Fts.getServer().putObjectProperty(this, "w", w);
     this.width = w;
     setDirty();
   }
@@ -534,10 +312,63 @@ public class FtsObject
 
   public final void setHeight(int h)
   {
-    put("h", new Integer(h));
+    Fts.getServer().putObjectProperty(this, "h", h);
     this.height = h;
     setDirty();
   }
+
+  // Is Error is read only
+
+  public final boolean isError()
+  {
+    return isError;
+  }
+
+
+  public final String getErrorDescription()
+  {
+    return errorDescription;
+  }
+
+  public final void updateErrorDescription()
+  {
+    Fts.getServer().askObjectProperty(this, "errdesc");
+  }
+
+  public final String getFont()
+  {
+    return font;
+  }
+
+  public final void setFont(String font)
+  {
+    Fts.getServer().putObjectProperty(this, "font", font);
+    this.font = font;
+    setDirty();
+  }
+
+  public final int getFontSize()
+  {
+    return fontSize;
+  }
+
+  public final void setFontSize(int fontSize)
+  {
+    Fts.getServer().putObjectProperty(this, "fs", fontSize);
+    this.fontSize = fontSize;
+    setDirty();
+  }
+
+  public MaxData getData()
+  {
+    return data;
+  }
+
+  public void updateData()
+  {
+    Fts.getServer().askObjectProperty(this, "data");
+  }
+
 
   /*****************************************************************************/
   /*                                                                           */
@@ -663,6 +494,16 @@ public class FtsObject
     return ninlets;
   }
 
+  /** Set the number of inlets; it is the application
+    responsability that it is actually possible to change
+    the number of inlets of the object */
+
+  public void setNumberOfInlets(int n)
+  {
+    ninlets = n;
+    Fts.getServer().putObjectProperty(this, "ins", n);
+  }
+
   /** Get the number of outlets of the object */
 
   public int getNumberOfOutlets()
@@ -670,6 +511,15 @@ public class FtsObject
     return noutlets;
   }
 
+  /** Set the number of outlets; it is the application
+    responsability that it is actually possible to change
+    the number of outlets of the object */
+
+  public void setNumberOfOutlets(int n)
+  {
+    noutlets = n;
+    Fts.getServer().putObjectProperty(this, "outs", n);
+  }
 
   /** Utility function Get the patcher data contaning the object if any */
 
@@ -736,8 +586,6 @@ public class FtsObject
     // non functioning, so to catch use of the object
     // after the release/delete.
 
-    propertyHandlerTable = null;
-    properties = null;
     parent = null;
     className = null;
     objectName = null;

@@ -10,7 +10,7 @@ import ircam.jmax.*;
  * The "number box" graphic object base class
  */
 
-abstract class ErmesObjNumberBox extends ErmesObject implements FtsPropertyHandler, KeyEventClient {
+abstract class ErmesObjNumberBox extends ErmesObject implements KeyEventClient {
 
   protected int state;
   private StringBuffer currentText;
@@ -25,8 +25,6 @@ abstract class ErmesObjNumberBox extends ErmesObject implements FtsPropertyHandl
 
     state = 0;
     currentText = new StringBuffer();
-
-    itsFtsObject.watch( "value", this);
 
     int minWidth = getMinWidth();
     if (getWidth() < minWidth)

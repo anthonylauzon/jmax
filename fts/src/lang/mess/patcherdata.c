@@ -2,6 +2,7 @@
 #include "lang/mess.h"
 #include "lang/datalib.h"
 
+extern void fts_client_updates_sync(void);
 
 /* Remote call codes */
 
@@ -13,6 +14,10 @@
 #define REMOTE_START_UPDATES     5
 #define REMOTE_STOP_UPDATES      6
 #define REMOTE_UPDATE            7
+#define REMOTE_SET_WX            8
+#define REMOTE_SET_WY            9
+#define REMOTE_SET_WW            10
+#define REMOTE_SET_WH            11
 
 static fts_heap_t *patcher_data_heap;
 
@@ -55,16 +60,37 @@ void fts_patcher_data_redefine(fts_patcher_data_t *d)
 {
   fts_patcher_data_t *this = (fts_patcher_data_t *)d;
   fts_object_t *p;
+  fts_atom_t a;
 
   /* First, reset the container */
 
   fts_data_remote_call((fts_data_t *)d, REMOTE_REDEFINE_START, 0, 0);
 
+  /* Send the window geometric property if any */
+
+  fts_object_get_prop((fts_object_t *)this->patcher, fts_s_wx, &a);
+  if (fts_is_int(&a))
+    fts_data_remote_call((fts_data_t *)d, REMOTE_SET_WX, 1, &a);
+
+  fts_object_get_prop((fts_object_t *)this->patcher, fts_s_wy, &a);
+  if (fts_is_int(&a))
+    fts_data_remote_call((fts_data_t *)d, REMOTE_SET_WY, 1, &a);
+
+  fts_object_get_prop((fts_object_t *)this->patcher, fts_s_ww, &a);
+  if (fts_is_int(&a))
+    fts_data_remote_call((fts_data_t *)d, REMOTE_SET_WW, 1, &a);
+
+  fts_object_get_prop((fts_object_t *)this->patcher, fts_s_wh, &a);
+  if (fts_is_int(&a))
+    fts_data_remote_call((fts_data_t *)d, REMOTE_SET_WH, 1, &a);
+
+  /* Then set the container */
+
   fts_data_start_remote_call((fts_data_t *)d, REMOTE_SET_CONTAINER);
   fts_client_mess_add_object((fts_object_t *) this->patcher);
   fts_data_end_remote_call();
 
-  /* Second, for each object and each connection,
+  /* For each object and each connection,
      if they are already uploaded (like by a find operation),
      then add the manually  to the container, otherwise just
      upload them (they will be added in the client); this is done
@@ -101,6 +127,12 @@ void fts_patcher_data_redefine(fts_patcher_data_t *d)
 	}
     }
 
+  /* Third, empty the update list (i.e. do the effect of an FTS sync
+     without the handshacking), otherwise the editor will open before
+     all the uploaded property are sent ! */
+
+  fts_client_updates_sync();
+
   /*
    * Then tell the patcher data the redefinition is completed, and can call
    * the various listeners
@@ -136,6 +168,36 @@ static void fts_patcher_data_stop_updates( fts_data_t *d, int ac, const fts_atom
   fts_message_send((fts_object_t *) this->patcher, fts_SystemInlet, fts_s_close, 0, 0);  
 }
 
+/* Handle geometric properties */
+
+static void fts_patcher_data_set_wx( fts_data_t *d, int ac, const fts_atom_t *at)
+{
+  fts_patcher_data_t *this = (fts_patcher_data_t *)d;
+
+  fts_object_put_prop((fts_object_t *)this->patcher, fts_s_wx, at);
+}
+
+static void fts_patcher_data_set_wy( fts_data_t *d, int ac, const fts_atom_t *at)
+{
+  fts_patcher_data_t *this = (fts_patcher_data_t *)d;
+
+  fts_object_put_prop((fts_object_t *)this->patcher, fts_s_wy, at);
+}
+
+
+static void fts_patcher_data_set_wh( fts_data_t *d, int ac, const fts_atom_t *at)
+{
+  fts_patcher_data_t *this = (fts_patcher_data_t *)d;
+
+  fts_object_put_prop((fts_object_t *)this->patcher, fts_s_wh, at);
+}
+
+static void fts_patcher_data_set_ww( fts_data_t *d, int ac, const fts_atom_t *at)
+{
+  fts_patcher_data_t *this = (fts_patcher_data_t *)d;
+
+  fts_object_put_prop((fts_object_t *)this->patcher, fts_s_ww, at);
+}
 
 /**
  * This function send all the objects and connections in the patcher that have not
@@ -187,8 +249,12 @@ void fts_patcher_data_config(void)
   fts_data_class_define_function(fts_patcher_data_class, REMOTE_START_UPDATES, fts_patcher_data_start_updates);
   fts_data_class_define_function(fts_patcher_data_class, REMOTE_STOP_UPDATES, fts_patcher_data_stop_updates);
   fts_data_class_define_function(fts_patcher_data_class, REMOTE_UPDATE, fts_patcher_data_update);
-}
 
+  fts_data_class_define_function(fts_patcher_data_class, REMOTE_SET_WX, fts_patcher_data_set_wx);
+  fts_data_class_define_function(fts_patcher_data_class, REMOTE_SET_WY, fts_patcher_data_set_wy);
+  fts_data_class_define_function(fts_patcher_data_class, REMOTE_SET_WW, fts_patcher_data_set_ww);
+  fts_data_class_define_function(fts_patcher_data_class, REMOTE_SET_WH, fts_patcher_data_set_wh);
+}
 
 
 

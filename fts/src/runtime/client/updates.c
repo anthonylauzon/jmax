@@ -42,14 +42,18 @@ fts_client_updates_init(void)
   fts_sched_declare(fts_client_updates_sched, provide, fts_new_symbol("control"), "fts_client_updates_sched");
 }
 
-static  void
-fts_client_send_prop(fts_object_t *obj, fts_symbol_t name)
+void fts_client_send_property(fts_object_t *obj, fts_symbol_t name)
 {
   fts_atom_t a;
 
   if (obj && name)
     {
       fts_object_get_prop(obj, name, &a);
+
+      /* Don't send a void, non existing property */
+
+      if (fts_is_void(&a))
+	return;
 
       if (fts_is_data(&a))
 	{
@@ -123,7 +127,7 @@ fts_client_updates_sched(void)
 	  one_done = 1;
 	}
 
-      fts_client_send_prop(obj, property);
+      fts_client_send_property(obj, property);
     }
 
   /* Then do the normal updates, with the limited algorithm */
@@ -145,7 +149,7 @@ fts_client_updates_sched(void)
 	    }
 
 
-	  fts_client_send_prop(obj, property);
+	  fts_client_send_property(obj, property);
 	}
     }
   else
@@ -180,7 +184,7 @@ fts_client_updates_sync(void)
 	  one_done = 1;
 	}
 
-      fts_client_send_prop(obj, property);
+      fts_client_send_property(obj, property);
     }
 
 
@@ -192,7 +196,7 @@ fts_client_updates_sync(void)
 	  one_done = 1;
 	}
 
-      fts_client_send_prop(obj, property);
+      fts_client_send_property(obj, property);
     }
 
   if (one_done)

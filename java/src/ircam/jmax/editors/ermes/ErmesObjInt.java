@@ -10,7 +10,8 @@ import ircam.jmax.*;
 // The "integer box" graphic object.
 //
 
-class ErmesObjInt extends ErmesObjNumberBox {
+class ErmesObjInt extends ErmesObjNumberBox implements FtsIntValueListener
+{
   private int itsInteger = 0;
 
   private int itsStartingY, itsFirstY;
@@ -19,19 +20,14 @@ class ErmesObjInt extends ErmesObjNumberBox {
   {
     super( theSketchPad, theFtsObject);
 
-    Object value  = (Integer)itsFtsObject.get("value");
-
-    if (value instanceof Integer)
-      itsInteger = ((Integer)value).intValue();
+    itsInteger = ((FtsIntValueObject)itsFtsObject).getValue();
   }
 
-  public void propertyChanged(FtsObject obj, String name, Object value) 
+  public void valueChanged(int value) 
   {
-    int temp = ((Integer) value).intValue();
-
-    if (itsInteger != temp) 
+    if (itsInteger != value) 
       {
-	itsInteger = temp;
+	itsInteger = value;
 
 	Graphics g = itsSketchPad.getGraphics();
 	Paint_specific(g);
@@ -53,7 +49,7 @@ class ErmesObjInt extends ErmesObjNumberBox {
 	return;
       }
 
-    itsFtsObject.put("value", itsInteger);
+    ((FtsIntValueObject)itsFtsObject).setValue(itsInteger);
     DoublePaint();
   }
 
@@ -79,7 +75,7 @@ class ErmesObjInt extends ErmesObjNumberBox {
 
 	itsStartingY = itsInteger;
 
-	itsFtsObject.put( "value", new Integer(itsInteger));
+	((FtsIntValueObject)itsFtsObject).setValue(itsInteger);
       } 
     else
       itsSketchPad.ClickOnObject(this, evt, x, y);
@@ -104,7 +100,7 @@ class ErmesObjInt extends ErmesObjNumberBox {
 	  state = 2;
 
 	itsInteger = itsStartingY + (itsFirstY - y);
-	itsFtsObject.put( "value", new Integer(itsInteger));
+	((FtsIntValueObject)itsFtsObject).setValue(itsInteger);
 	DoublePaint();
       } 
   }

@@ -57,6 +57,18 @@ class ErmesPatcherListener implements FtsPatcherListener
     window.DeleteGraphicConnection(connection);
   }
 
+  public void patcherChangedNumberOfInlets(FtsPatcherData data, int nins)
+  {
+    window.itsSketchPad.RedefineInChoice();
+    window.itsSketchPad.paintDirtyList();
+  }
+
+  public void patcherChangedNumberOfOutlets(FtsPatcherData data, int nouts)
+  {
+    window.itsSketchPad.RedefineOutChoice();
+    window.itsSketchPad.paintDirtyList();
+  }
+
   public void patcherChanged(FtsPatcherData data)
   {
     // not implemented yet; it should redo the sketch content.

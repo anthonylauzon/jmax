@@ -11,7 +11,7 @@ import ircam.jmax.mda.*;
 //
 // The generic "extern" object in ermes. (example: adc1~)
 //
-class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHandler {
+class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjectErrorListener {
 
   private int isError = -1; // cache of the error property, to speed up paint
 
@@ -21,8 +21,6 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
   ErmesObjExternal( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject);
-
-    itsFtsObject.watch("error", this);
   }
 
   // ----------------------------------------
@@ -34,22 +32,17 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
     return itsFtsObject.getDescription().trim();
   }
 
-  public void propertyChanged( FtsObject obj, String name, Object value) 
+  public void errorChanged(boolean value) 
   {
     // Handle the "error" property, the only one we're listening at.
-    // Call super for the others
 
-    if (name == "error") 
-      {
-	if ((value != null) && (value instanceof Integer)) 
-	  {
-	    isError = ((Integer)value).intValue();
-	    DoublePaint();
-	    itsSketchPad.repaint();// ??? 
-	  }
-      } 
+    if (value)
+      isError = 1;
     else
-	super.propertyChanged( obj, name, value);
+      isError = 0;
+
+    DoublePaint();
+    itsSketchPad.repaint();// ??? 
   }
 
   /* Inspector */
@@ -63,10 +56,6 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
     try 
       {
 	itsFtsObject = Fts.redefineFtsObject( itsFtsObject, text);
-
-	itsFtsObject.watch("ins", this);
-	itsFtsObject.watch("outs", this);
-	itsFtsObject.watch("error", this);
 	isError = -1;
       } 
     catch (FtsException e) 
@@ -83,7 +72,7 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
     if ( evt.getClickCount() > 1 ) 
       {
 	itsSketchPad.waiting();
-	Fts.editPropertyValue( itsFtsObject, "data", new MaxDataEditorReadyListener() {
+	Fts.editPropertyValue( itsFtsObject, new MaxDataEditorReadyListener() {
 	  public void editorReady(MaxDataEditor editor)
 	    {itsSketchPad.stopWaiting();}
 	});
@@ -144,7 +133,12 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
   public void Paint_specific(Graphics g) 
   {
     if (isError == -1)
-      isError = ((Integer)itsFtsObject.get( "error")).intValue();
+      {
+	if (itsFtsObject.isError())
+	  isError = 1;
+	else
+	  isError = 0;
+      }
 
     if (isError == 0) 
       {

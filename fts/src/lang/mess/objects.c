@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.49 $ IRCAM $Date: 1998/10/23 16:37:08 $
+ *      $Revision: 1.50 $ IRCAM $Date: 1998/10/28 15:50:32 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -20,6 +20,7 @@
 #include "lang/mess/messP.h"
 
 extern void fts_client_release_object(fts_object_t *c);
+extern void fts_client_send_property(fts_object_t *obj, fts_symbol_t name);
 
 /* forward declarations  */
 
@@ -962,25 +963,25 @@ fts_object_send_properties(fts_object_t *obj)
 
   if (obj->id != FTS_NO_ID) 
     { 
-      fts_object_property_changed_urgent(obj, fts_s_x);
-      fts_object_property_changed_urgent(obj, fts_s_y);
-      fts_object_property_changed_urgent(obj, fts_s_height);
-      fts_object_property_changed_urgent(obj, fts_s_width);
+      fts_client_send_property(obj, fts_s_x);
+      fts_client_send_property(obj, fts_s_y);
+      fts_client_send_property(obj, fts_s_height);
+      fts_client_send_property(obj, fts_s_width);
 
-      fts_object_property_changed_urgent(obj, fts_s_font);
-      fts_object_property_changed_urgent(obj, fts_s_fontSize);
+      fts_client_send_property(obj, fts_s_font);
+      fts_client_send_property(obj, fts_s_fontSize);
 
       if (fts_object_is_patcher(obj) && (! fts_object_is_error(obj)))
 	{
-	  fts_object_property_changed_urgent(obj, fts_s_wx);
-	  fts_object_property_changed_urgent(obj, fts_s_wy);
-	  fts_object_property_changed_urgent(obj, fts_s_wh);
-	  fts_object_property_changed_urgent(obj, fts_s_ww);
+	  fts_client_send_property(obj, fts_s_wx);
+	  fts_client_send_property(obj, fts_s_wy);
+	  fts_client_send_property(obj, fts_s_wh);
+	  fts_client_send_property(obj, fts_s_ww);
 	}
 
-      fts_object_property_changed_urgent(obj, fts_s_ninlets);
-      fts_object_property_changed_urgent(obj, fts_s_noutlets);
-      fts_object_property_changed_urgent(obj, fts_s_error);
+      fts_client_send_property(obj, fts_s_ninlets);
+      fts_client_send_property(obj, fts_s_noutlets);
+      fts_client_send_property(obj, fts_s_error);
 
       /* Ask the object to send to the client object specific properties */
 
@@ -1015,9 +1016,9 @@ fts_object_send_kernel_properties(fts_object_t *obj)
 
   if (obj->id != FTS_NO_ID) 
     { 
-      fts_object_property_changed_urgent(obj, fts_s_ninlets);
-      fts_object_property_changed_urgent(obj, fts_s_noutlets);
-      fts_object_property_changed_urgent(obj, fts_s_error);
+      fts_client_send_property(obj, fts_s_ninlets);
+      fts_client_send_property(obj, fts_s_noutlets);
+      fts_client_send_property(obj, fts_s_error);
 
       /* Ask the object to send to the client object specific properties */
 
@@ -1094,17 +1095,13 @@ void post_object(fts_object_t *obj)
 {
   if (! obj)
     {
-      post("<NULL OBJ>");
+      post("{NULL OBJ}");
     }
   else if (obj->argv)
     {
-      if (fts_object_is_error(obj))
-	post("<ERROR {");
-      else
-	post("<{");
-
+      post("{");
       post_atoms(obj->argc, obj->argv);
-      post("} #%d>", obj->id);
+      post("}");
     }
   else
     post("<\"%s\" #%d>", fts_symbol_name(fts_object_get_class_name(obj)), obj->id);

@@ -12,8 +12,8 @@ import ircam.jmax.utils.*;
 // The "slider" graphic object
 //
 
-class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
-
+class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
+{
   private ErmesObjThrottle itsThrottle;
   private int itsInteger = 0;
 
@@ -37,23 +37,14 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
   {
     super( theSketchPad, theFtsObject);
 
-    itsFtsObject.watch( "value", this);
+    itsRangeMin = ((FtsSliderObject)itsFtsObject).getMinValue();
+    itsRangeMax = ((FtsSliderObject)itsFtsObject).getMaxValue();
 
-    Object value;
-
-    value = itsFtsObject.get( "minValue");
-
-    if (value instanceof Integer)
-      itsRangeMin = ((Integer) value).intValue();
-    else
-      itsRangeMin = 0;
-
-    value = itsFtsObject.get( "maxValue");
-
-    if (value instanceof Integer)
-      itsRangeMax = ((Integer) value).intValue();
-    else
-      itsRangeMax = 128;
+    if (itsRangeMax == 0)
+      {
+	itsRangeMax = 128;
+	((FtsSliderObject)itsFtsObject).setMaxValue(itsRangeMax);
+      }
 
     itsRange = itsRangeMax - itsRangeMin;
     itsStep = ( float)itsRange/itsPixelRange;
@@ -71,7 +62,7 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
   public void setMinValue( int theValue) 
   {
     itsRangeMin = theValue;
-    itsFtsObject.put( "minValue", itsRangeMin);
+    ((FtsSliderObject)itsFtsObject).setMinValue(itsRangeMin);
   }
 
   public int getMinValue() 
@@ -82,7 +73,7 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
   public void setMaxValue( int theValue) 
   {
     itsRangeMax = theValue;
-    itsFtsObject.put( "maxValue", itsRangeMax);
+    ((FtsSliderObject)itsFtsObject).setMaxValue(itsRangeMax);
   }
 
   public int getMaxValue() 
@@ -92,6 +83,14 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
 
   public void resizeBy( int theDeltaH, int theDeltaV)
   {
+    // Added minimum size for the slider, otherwise
+    // you can resize and loose it :-< ..
+    // Maurizio & Enzo
+
+    if ((-theDeltaH > (getWidth() - 10))  ||
+	(-theDeltaV > (getHeight() - 20)))
+      return;
+
     super.resizeBy( theDeltaH, theDeltaV);
     itsPixelRange = getHeight() - (UP_OFFSET + BOTTOM_OFFSET);
     
@@ -109,20 +108,18 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
     itsStep = (float)itsRange / itsPixelRange;
 
     itsInteger = (theCurrentInt < itsRangeMin) ? itsRangeMin:( (theCurrentInt >= itsRangeMax) ? itsRangeMax:theCurrentInt);
-    sendValue( new Integer( itsInteger));
+    ((FtsSliderObject)itsFtsObject).setValue(itsInteger);
   }
 
-  public void propertyChanged( FtsObject obj, String name, Object value) 
+  public void valueChanged( int value) 
   {
     if ( itsMovingThrottle) 
       return;
 
-    int temp = ((Integer) value).intValue();
-    
-    if ( itsInteger != temp) 
+    if ( itsInteger != value) 
       {
-	itsInteger = temp;
-	int clippedValue = ( temp < itsRangeMin) ? itsRangeMin: ((temp >= itsRangeMax) ? itsRangeMax : temp);
+	itsInteger = value;
+	int clippedValue = ( value < itsRangeMin) ? itsRangeMin: ((value >= itsRangeMax) ? itsRangeMax : value);
 	clippedValue -= itsRangeMin;
       
 	if ( itsThrottle != null) 
@@ -179,8 +176,8 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
 	    itsInteger = itsRangeMax;
 	    itsThrottle.Move( itsThrottle.itsX, getY() + UP_OFFSET - 2);
 	  }
-	
-	sendValue( new Integer( itsInteger));
+
+	((FtsSliderObject)itsFtsObject).setValue(itsInteger);	
 
 	Graphics g = itsSketchPad.getGraphics();
 	Paint_specific( g);
@@ -188,11 +185,6 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
       }
     else 
       itsSketchPad.ClickOnObject( this, evt, x, y);
-  }
-
-  private void sendValue( Integer theValue) 
-  {
-    itsFtsObject.put( "value", theValue);
   }
 
   public void MouseDrag_specific( MouseEvent evt,int x, int y)
@@ -207,7 +199,7 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
 	
 	    itsInteger = (int)(((getY() + getHeight()) - y - BOTTOM_OFFSET) * itsStep);
 
-	    sendValue( new Integer( itsInteger + itsRangeMin));
+	    ((FtsSliderObject)itsFtsObject).setValue(itsInteger + itsRangeMin);
 	
 	    itsThrottle.Move( itsThrottle.itsX, y - 2);
 
@@ -217,8 +209,9 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
 	  }
 	else if( getY() + getHeight() - BOTTOM_OFFSET < y)
 	  {
-	    sendValue( new Integer( itsRangeMin));
 	    itsInteger = itsRangeMin;
+	    ((FtsSliderObject)itsFtsObject).setValue(itsInteger);
+
 	    itsThrottle.Move( itsThrottle.itsX, getY() + getHeight() - BOTTOM_OFFSET - 2);
 
 	    Graphics g = itsSketchPad.getGraphics();
@@ -227,8 +220,9 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
 	  }
 	else if( getY() + UP_OFFSET > y)
 	  {
-	    sendValue( new Integer( itsRangeMax));
 	    itsInteger = itsRangeMax;
+	    ((FtsSliderObject)itsFtsObject).setValue(itsInteger);
+
 	    itsThrottle.Move( itsThrottle.itsX, getY() + UP_OFFSET - 2);
 
 	    Graphics g = itsSketchPad.getGraphics();
@@ -243,7 +237,7 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
     if( itsSketchPad.itsRunMode || evt.isControlDown() || itsMovingThrottle)
       {
 	itsMovingThrottle = false;
-	itsFtsObject.put( "value", itsInteger+itsRangeMin);
+	((FtsSliderObject)itsFtsObject).updateValue();
 	Fts.sync();
       }
     else 

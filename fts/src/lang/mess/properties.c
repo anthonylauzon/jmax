@@ -866,8 +866,14 @@ fts_object_get_next_change_urgent(fts_symbol_t *property, fts_object_t **object)
     return 0;
 }
 
-void
-fts_object_property_changed(fts_object_t *obj, fts_symbol_t property)
+
+/* This function send a property value asynchroniously to the client,
+   when some bandwith is available; please note that the function
+   fts_client_send_property can be used to send the property
+   sychroniusly, in  contexts like uploading */
+
+
+void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property)
 {
   struct changes *p;
   struct changes *last = 0;
@@ -898,8 +904,7 @@ fts_object_property_changed(fts_object_t *obj, fts_symbol_t property)
 }
 
 
-void
-fts_object_property_changed_urgent(fts_object_t *obj, fts_symbol_t property)
+void fts_object_property_changed_urgent(fts_object_t *obj, fts_symbol_t property)
 {
   struct changes *p;
   struct changes *last = 0;
@@ -945,15 +950,13 @@ fts_object_property_changed_urgent(fts_object_t *obj, fts_symbol_t property)
 
 
 
-void
-fts_object_ui_property_changed(fts_object_t *obj, fts_symbol_t property)
+void fts_object_ui_property_changed(fts_object_t *obj, fts_symbol_t property)
 {
   if (fts_object_patcher_is_open(obj))
       fts_object_property_changed(obj, property);
 }
 
-void
-fts_object_ui_property_changed_urgent(fts_object_t *obj, fts_symbol_t property)
+void fts_object_ui_property_changed_urgent(fts_object_t *obj, fts_symbol_t property)
 {
   if (fts_object_patcher_is_open(obj))
       fts_object_property_changed_urgent(obj, property);
@@ -966,8 +969,7 @@ fts_object_ui_property_changed_urgent(fts_object_t *obj, fts_symbol_t property)
    consistent.
 */
 
-void
-fts_object_reset_changed(fts_object_t *obj)
+void fts_object_reset_changed(fts_object_t *obj)
 {
   struct changes **pp;		/* indirect precursor  */
   struct changes *p;		/* found element */
@@ -1008,6 +1010,9 @@ fts_object_reset_changed(fts_object_t *obj)
 	pp = &((*pp)->next);
     }
 }
+
+
+
 
 /* init function for the whole thing */
 

@@ -192,8 +192,6 @@ get_status_for(char c)
     return in_data;
   else if (c == CONNECTION_CODE)
     return in_connection;
-  else if (c == VOID_CODE)
-    return in_void;
   else if (c == STRING_START_CODE)
     return in_string;
   else if (c == EOM_CODE)
@@ -210,7 +208,6 @@ is_token_char(char c)
 	  (c == OBJECT_CODE)   ||
 	  (c == DATA_CODE)     ||
 	  (c == CONNECTION_CODE) ||
-	  (c == VOID_CODE) ||
 	  (c == STRING_START_CODE) ||
 	  (c == EOM_CODE));
 }
@@ -351,24 +348,6 @@ fts_client_parse_char(char c)
 
 	  add_char('\0');
 	  fts_set_connection(&a, fts_connection_table_get(dtol(parser.buf)));
-	  add_arg(&a);
-
-	  parser.buf_fill_p = 0;
-	}
-      else
-	add_char(c);
-      break;
-
-    case in_void:
-      if (is_token_char(c))
-	{
-	  /* compute next state  */
-
-	  parser.status = get_status_for(c);
-
-	  /* parse the  value  */
-
-	  fts_set_void(&a);
 	  add_arg(&a);
 
 	  parser.buf_fill_p = 0;

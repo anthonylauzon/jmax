@@ -58,7 +58,9 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
   fd = open( name, O_RDONLY);
   if ( fd < 0)
     {
+#ifdef LOAD_DEBUG
       perror( "fts_binary_file_map");
+#endif
       return fd;
     }
 
@@ -68,7 +70,9 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
 
     if ( fstat(fd, &buf) < 0)
       {
+#ifdef LOAD_DEBUG
 	perror( "fts_binary_file_map");
+#endif
 	close(fd);
 	return -1;
       }
@@ -78,7 +82,9 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
   /* read the header */
   if (read( fd, &header, sizeof( header)) < sizeof( header))
     {
+#ifdef LOAD_DEBUG
       perror( "fts_binary_file_map");
+#endif
       close(fd);
       return -1;
     }
@@ -113,7 +119,9 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
 
   if (read( fd, desc->code, header.code_size) < header.code_size)
     {
+#ifdef LOAD_DEBUG
       perror( "fts_binary_file_map");
+#endif
       close(fd);
       return -1;
     }
@@ -147,7 +155,9 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
       /* read the symbol table */
       if (read( fd, symbuf, symbols_size) < symbols_size)
 	{
+#ifdef LOAD_DEBUG
 	  perror( "fts_binary_file_map");
+#endif
 	  close(fd);
 	  return -1;
 	}

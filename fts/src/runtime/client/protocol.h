@@ -108,7 +108,6 @@
 #define STRING_END_CODE   0x02
 #define OBJECT_CODE 'o'
 #define CONNECTION_CODE 'x'
-#define VOID_CODE 'v'
 #define DATA_CODE 0x05
 
 /*

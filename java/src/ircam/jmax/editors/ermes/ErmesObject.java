@@ -56,51 +56,54 @@ abstract class ErmesObject implements ErmesDrawable {
 
   static ErmesObject makeErmesObject( ErmesSketchPad sketch, FtsObject object) 
   {
+    ErmesObject eobj;
     String theName = object.getClassName();
 
     if (theName.equals( "messbox"))
-      return new ErmesObjMessage( sketch, object);
+      eobj = new ErmesObjMessage( sketch, object);
     else if (theName.equals( "button"))
-      return new ErmesObjBang( sketch, object);
+      eobj = new ErmesObjBang( sketch, object);
     else if (theName.equals( "toggle"))
-      return new ErmesObjToggle( sketch, object);
+      eobj = new ErmesObjToggle( sketch, object);
     else if (theName.equals( "intbox"))
-      return new ErmesObjInt( sketch, object);
+      eobj = new ErmesObjInt( sketch, object);
     else if (theName.equals( "floatbox"))
-      return new ErmesObjFloat( sketch, object);
+      eobj = new ErmesObjFloat( sketch, object);
     else if (theName.equals( "comment"))
-      return new ErmesObjComment( sketch, object);
+      eobj = new ErmesObjComment( sketch, object);
     else if ( theName.equals( "slider"))
-      return new ErmesObjSlider( sketch, object);
+      eobj = new ErmesObjSlider( sketch, object);
     else if (theName.equals( "inlet"))
-      return new ErmesObjIn( sketch, object);
+      eobj = new ErmesObjIn( sketch, object);
     else if (theName.equals( "outlet"))
-      return new ErmesObjOut( sketch, object);
+      eobj = new ErmesObjOut( sketch, object);
     else if (theName.equals( "jpatcher"))
-      return new ErmesObjPatcher( sketch, object);
+      eobj = new ErmesObjPatcher( sketch, object);
     else
-      return new ErmesObjExternal( sketch, object);
+      eobj = new ErmesObjExternal( sketch, object);
+
+    object.setObjectListener(eobj);
+
+    return eobj;
   }
 
   ErmesObject( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
-    itsSketchPad = theSketchPad;
+    int fontSize;
 
+    itsSketchPad = theSketchPad;
     itsFtsObject = theFtsObject;
 
     itsSelected = false;
 
-    Object value = itsFtsObject.get( "font");
+    String aFont = itsFtsObject.getFont();
 
-    Object aFont = itsFtsObject.get( "font");
-    Object aSize = itsFtsObject.get( "fs");
+    fontSize = itsFtsObject.getFontSize();
 
-    if (aFont instanceof FtsVoid)
+    if (aFont == null)
       {
-	if (aSize instanceof Integer)
+	if (fontSize > 0)
 	  {
-	    int fontSize = ((Integer) aSize).intValue();
-
 	    itsFont = FontCache.lookupFont( fontSize );
 	    itsFontMetrics = FontCache.lookupFontMetrics( fontSize);
 	  }
@@ -109,17 +112,14 @@ abstract class ErmesObject implements ErmesDrawable {
       } 
     else 
       {
-	int aIntSize;
+	if (fontSize <= 0)
+	  fontSize = itsSketchPad.sketchFont.getSize();
 
-	if (aSize instanceof FtsVoid)
-	  aIntSize = itsSketchPad.sketchFont.getSize();
-	else
-	  aIntSize = ((Integer)aSize).intValue();
-
-	setFont( new Font( (String) aFont, itsSketchPad.sketchFont.getStyle(), aIntSize));
+	setFont( new Font( aFont, itsSketchPad.sketchFont.getStyle(), fontSize));
       }
 
-    itsRectangle = new Rectangle( theFtsObject.getX(), theFtsObject.getY(), theFtsObject.getWidth(), theFtsObject.getHeight());
+    itsRectangle = new Rectangle( theFtsObject.getX(), theFtsObject.getY(),
+				  theFtsObject.getWidth(), theFtsObject.getHeight());
   }
 
   protected final int getX() 
@@ -176,14 +176,8 @@ abstract class ErmesObject implements ErmesDrawable {
     itsFont = theFont;
     itsFontMetrics = itsSketchPad.getFontMetrics( theFont);
 
-    itsFtsObject.put( "font", itsFont.getName());
-    itsFtsObject.put( "fs", itsFont.getSize());
-
-    // (fd) Maurizio told me that it may be enough to tell
-    // that the patcher is changed if you changed only the fonts.
-    // So I believe him...
-    itsFtsObject.localPut( "font", itsFont.getName());
-    itsFtsObject.localPut( "fs", itsFont.getSize());
+    itsFtsObject.setFont(itsFont.getName());
+    itsFtsObject.setFontSize(itsFont.getSize());;
   }
 
   final ErmesSketchWindow GetSketchWindow() 
@@ -500,13 +494,18 @@ abstract class ErmesObject implements ErmesDrawable {
 
   void MoveBy( int theDeltaH, int theDeltaV) 
   {
+    // Added check for negative positions (mdc)
+
+    if ( -theDeltaH > itsRectangle.x || -theDeltaV > itsRectangle.y)
+      return;
+
     if ( theDeltaH == 0 && theDeltaV == 0)
       return;
 
     setX( itsRectangle.x + theDeltaH);
     setY( itsRectangle.y + theDeltaV);
-    itsRectangle.x = itsRectangle.x;
-    itsRectangle.y = itsRectangle.y;
+    itsRectangle.x = itsRectangle.x; // ?????
+    itsRectangle.y = itsRectangle.y; // ?????
   }
 
   void resizeBy( int theDeltaW, int theDeltaH) 
@@ -540,8 +539,10 @@ abstract class ErmesObject implements ErmesDrawable {
   }
 
   // Called at ErmesObject disposal
+
   void cleanAll()
   {
+    itsFtsObject.setObjectListener(null);
     itsSketchPad = null;
     itsFtsObject = null;
     itsFont = null;
@@ -549,38 +550,34 @@ abstract class ErmesObject implements ErmesDrawable {
   }
 
   // Experimental MDC
-  void showAnnotation( String property) 
+  void showErrorDescription()
   {
     if ( itsFtsObject != null) 
       {
 	int ax, ay, ah, aw;
 	String annotation;
-	Object value;
+	String value;
 	Graphics g;
 
 	itsSketchPad.setAnnotating();
 
-	itsFtsObject.ask( property);
+	itsFtsObject.updateErrorDescription();
 	Fts.sync();
-	value = itsFtsObject.get( property);
+	annotation = itsFtsObject.getErrorDescription();
 
-	if (! (value instanceof FtsVoid))
-	  {
-	    annotation = value.toString();
-	    ax = itsRectangle.x + itsRectangle.width / 2;
-	    ay = itsRectangle.y + itsRectangle.height / 2;
-	    aw = itsFontMetrics.stringWidth( annotation);
-	    ah = itsFontMetrics.getHeight();
+	ax = itsRectangle.x + itsRectangle.width / 2;
+	ay = itsRectangle.y + itsRectangle.height / 2;
+	aw = itsFontMetrics.stringWidth( annotation);
+	ah = itsFontMetrics.getHeight();
 
-	    g = itsSketchPad.getGraphics();
+	g = itsSketchPad.getGraphics();
 
-	    g.setColor( Color.white);
-	    g.fillRect( ax - 1 , ay - ah - 1, aw + 2, ah + 2);
+	g.setColor( Color.white);
+	g.fillRect( ax - 1 , ay - ah - 1, aw + 2, ah + 2);
 
-	    g.setColor( Color.black);
-	    g.drawRect( ax - 1, ay - ah - 1, aw + 2, ah + 2);
-	    g.drawString( annotation, ax, ay);
-	  }
+	g.setColor( Color.black);
+	g.drawRect( ax - 1, ay - ah - 1, aw + 2, ah + 2);
+	g.drawString( annotation, ax, ay);
       }
   }
 }

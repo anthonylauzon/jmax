@@ -21,34 +21,16 @@ import com.sun.java.swing.*;
 // The window that contains the sketchpad. It knows the ftspatcher it is editing.
 // It handles all the sketch menus, it knows how to load from a ftspatcher.
 //
-public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, ComponentListener {
+public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 
   protected KeyEventClient keyEventClient;
-
-  public void propertyChanged( FtsObject object, String name, Object value)
-  {
-    if (name == "ins")
-      {
-	// A patcher has been redefined
-	
-	itsSketchPad.RedefineInChoice();
-      }
-    else if (name == "outs")
-      {
-	// A patcher has been redefined
-	
-	itsSketchPad.RedefineOutChoice();
-      }
-
-    itsSketchPad.paintDirtyList();
-  }
 
   public void componentResized( ComponentEvent e) 
   {
     if (itsPatcher != null) 
       {
-	itsPatcher.put( "ww", getSize().width - horizontalOffset());
-	itsPatcher.put( "wh", getSize().height - verticalOffset());
+	itsPatcherData.setWindowWidth(getSize().width - horizontalOffset());
+	itsPatcherData.setWindowHeight(getSize().height - verticalOffset());
       }
   }
 
@@ -56,8 +38,8 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
   {
     if (itsPatcher != null)
       {
-	itsPatcher.put( "wx", getLocation().x);
-	itsPatcher.put( "wy", getLocation().y);
+	itsPatcherData.setWindowX(getLocation().x);
+	itsPatcherData.setWindowY(getLocation().y);
       }
   }
 
@@ -97,7 +79,7 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
   public FtsPatcherData itsPatcherData;
 
   private Menu itsAlignObjectMenu;
-  private Menu itsSizesMenu;	
+  private Menu itsSizesMenu;
   private Menu itsFontsMenu;
   private Menu itsExecutionMenu;
   private Menu itsTextMenu;
@@ -168,28 +150,16 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 
     setVisible( true);
 
-    itsPatcher.watch( "ins", this);
-    itsPatcher.watch( "outs", this);
     addComponentListener( this); 
     
     // To set the initial state: set to edit mode only if the
     // initialMode property of a patcher is set and it is set
     // to something different than "run" (usually, "edit" :)
 
-    FtsObject p = itsPatcher;
-    Object mode;
-
-    mode = p.get("initialMode");
-
-    p = p.getParent();
-
-    while ((mode instanceof FtsVoid) && (p != null))
-      {
-	mode = p.get("editMode");
-	p = p.getParent();
-      }
-
-    setRunMode((mode instanceof FtsVoid) || mode.equals("run"));
+    if (itsPatcherData.getRecursiveEditMode() == FtsPatcherData.EDIT_MODE)
+      setRunMode(false);
+    else
+      setRunMode(true);
 
     // Finally, activate the updates
 
@@ -223,45 +193,24 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
   
   private void InitFromContainer( FtsObject patcher)
   {
-    Object aObject;
-    int x = 0;
-    int y = 0;
-    int width = 500;
-    int height = 480;
-    Object value;
+    int x;
+    int y;
+    int width;
+    int height;
 
     //Double check the existence of the window properties. If there aren't, use defaults
       
-    value = patcher.get( "wx");
+    x = itsPatcherData.getWindowX();
+    y = itsPatcherData.getWindowY();
+    width = itsPatcherData.getWindowWidth();
+    height = itsPatcherData.getWindowHeight();
 
-    if (value instanceof FtsVoid) 
-      patcher.put( "wx", new Integer(x));
-    else  
-      x = ((Integer) value).intValue();
+    if (width <= 0)
+      width = 480;
 
-    value = patcher.get( "wy");
+    if (height <= 0)
+      height = 500;
 
-    if (value instanceof FtsVoid) 
-      patcher.put( "wy", new Integer(y));
-    else  
-      y = ((Integer) value).intValue();
-
-
-    value = patcher.get( "ww");
-
-    if (value instanceof FtsVoid) 
-      patcher.put( "ww", new Integer (width));
-    else 
-      width = ((Integer) value).intValue();
-
-
-    value = patcher.get( "wh");
-
-    if (value instanceof FtsVoid) 
-      patcher.put( "wh", new Integer(height));
-    else
-      height = ((Integer) value).intValue();
-      
     setBounds( x, y, width + horizontalOffset(), height + verticalOffset());
   }
 
@@ -693,7 +642,7 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 	      ErmesSketchPad.inspectSelection();
 	  }
 	else if (aInt == 90)
-	  itsSketchPad.showAnnotations( "errdesc"); // z ??
+	  itsSketchPad.showErrorDescriptions();
 	else if (aInt == 65)
 	  itsSketchPad.SelectAll();//a
 	else if (aInt == 69)
@@ -809,13 +758,20 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 
   public void Destroy()
   {
+    setVisible(false);
     itsPatcherData.resetPatcherListener();
     removeComponentListener( this);
+
+    itsGraphicsMenu.remove(itsAlignObjectMenu);
+    itsTextMenu.remove(itsSizesMenu);
+    itsTextMenu.remove(itsFontsMenu);
+    getMenuBar().remove(itsExecutionMenu);
+    getMenuBar().remove(itsTextMenu);
+    getMenuBar().remove(itsGraphicsMenu);
 
     itsScrollerView.getHAdjustable().removeAdjustmentListener( itsSketchPad);
     itsScrollerView.getVAdjustable().removeAdjustmentListener( itsSketchPad);
 
-    itsPatcher.removeWatch( this);
     itsSketchPad.cleanAll();
 
     itsSketchPad = null;
@@ -1085,8 +1041,12 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 
     // Store the mode in a non persistent, property of 
     // the patch, so that subpatcher can use it as their initial mode
-    
-    itsPatcher.localPut( "editMode", (theRunMode ? "run" : "edit"));
+
+    if (theRunMode)
+      itsPatcherData.setEditMode(FtsPatcherData.RUN_MODE);
+    else
+      itsPatcherData.setEditMode(FtsPatcherData.EDIT_MODE);
+
 
     itsChangingRunEditMode = true;
 

@@ -324,6 +324,32 @@ public class Fts
     server.sendRecomputeErrorObjects();
   }
 
+  /* New Data listener support: listeners are installed on an object;
+     only one listener for object.
+   */
+
+  static private Hashtable newDataListeners = new Hashtable();
+
+
+  static public void addNewDataListenerOn(FtsNewDataListener listener, FtsObject obj)
+  {
+    newDataListeners.put(obj, listener);
+  }
+
+  static public void removeNewDataListenerOn(FtsObject obj)
+  {
+    newDataListeners.remove(obj);
+  }
+
+  static void fireNewDataListenerOn(FtsObject obj, MaxData data)
+  {
+    FtsNewDataListener listener;
+
+    listener = (FtsNewDataListener) newDataListeners.get(obj);
+
+    if (listener != null)
+      listener.newDataFor(obj, data);
+  }
 
   /* Utility function: get a Data that is a value of an object property,
      and call and editor on it; but do it asynchroniously;
@@ -335,7 +361,7 @@ public class Fts
 	executed in the AWT thread.
     */
 
-  static class DelayedEditPropertyHandler implements FtsPropertyHandler
+  static class DelayedEditPropertyHandler implements FtsNewDataListener
   {
     MaxDataEditorReadyListener listener;
     Object where;
@@ -351,58 +377,48 @@ public class Fts
       this(listener, null);
     }
 
-    public void propertyChanged(FtsObject object, String name, Object value)
+    public void newDataFor(FtsObject obj, MaxData newData)
     {
-      if (value instanceof MaxData)
-	{
-	  final MaxData data = (MaxData) value;
+      final MaxData data = (MaxData) newData;
 
-	  // Set the document; when documents will be remote data,
-	  // it will be handled in FTS.
+      // Set the document; when documents will be remote data,
+      // it will be handled in FTS.
 
-	  if (data instanceof FtsRemoteData)
-	    ((FtsRemoteData) data).setDocument(object.getDocument());
+      if (data instanceof FtsRemoteData)
+	((FtsRemoteData) data).setDocument(obj.getDocument());
 
-	  SwingUtilities.invokeLater(new Runnable() {
-	    public void run() {
-	      MaxDataEditor editor;
+      SwingUtilities.invokeLater(new Runnable() {
+	public void run() {
+	  MaxDataEditor editor;
 
-	      try
-		{
-		  editor = Mda.edit(data, where);
-		  editor.addEditorReadyListener(listener);
-		}
-	      catch (MaxDocumentException e)
-		{
-		  // Error; we should do an
-		  listener.editorReady(null); 
-		}
+	  try
+	    {
+	      editor = Mda.edit(data, where);
+	      editor.addEditorReadyListener(listener);
+	    }
+	  catch (MaxDocumentException e)
+	    {
+	      // Error; we should do an
+	      listener.editorReady(null); 
+	    }
+	}});
 
-	    }});
-	}
-      else
-	{
-	  // If there is nothing to edit, we anyway call the listener
-	  // with a null editor, to tell him about the failure
-
-	  listener.editorReady(null); 
-	}
-
-      object.removeWatch(this);
+      Fts.removeNewDataListenerOn(obj);
     }
   }
 
-  public static void editPropertyValue(FtsObject obj, String property, MaxDataEditorReadyListener listener)
+  public static void editPropertyValue(FtsObject obj, MaxDataEditorReadyListener listener)
   {
-    obj.watch(property, new DelayedEditPropertyHandler(listener));
-    obj.ask(property);
+    Fts.addNewDataListenerOn(new DelayedEditPropertyHandler(listener), obj);
+    obj.updateData();
   }
 
-  public static void editPropertyValue(FtsObject obj, Object where, String property,
+
+  public static void editPropertyValue(FtsObject obj, Object where,
 				       MaxDataEditorReadyListener listener)
   {
-    obj.watch(property, new DelayedEditPropertyHandler(listener, where));
-    obj.ask(property);
+    Fts.addNewDataListenerOn(new DelayedEditPropertyHandler(listener, where), obj);
+    obj.updateData();
   }
 
   /* Get the Fts Dsp Controller */ 

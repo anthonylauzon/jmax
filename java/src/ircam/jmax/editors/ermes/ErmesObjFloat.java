@@ -9,7 +9,8 @@ import ircam.jmax.fts.*;
 //
 // The graphic "float box" object.
 //
-class ErmesObjFloat extends ErmesObjNumberBox {
+class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueListener
+{
   private float itsFloat = (float) 0.0;
 
   private float itsStartingValue;
@@ -24,12 +25,12 @@ class ErmesObjFloat extends ErmesObjNumberBox {
   {
     super( theSketchPad, theFtsObject);
 
-    itsFloat = ((Float)itsFtsObject.get( "value")).floatValue();
+    itsFloat = ((FtsFloatValueObject)itsFtsObject).getValue();
   }
 
-  public void propertyChanged(FtsObject obj, String name, Object value) 
+  public void valueChanged(float value) 
   {
-    itsFloat = ((Float) value).floatValue();
+    itsFloat = value;
 
     Graphics g = itsSketchPad.getGraphics();
     Paint_specific(g);
@@ -37,6 +38,7 @@ class ErmesObjFloat extends ErmesObjNumberBox {
   }
 
   // ValueAsText property
+
   void setValueAsText( String value)
   {
     try
@@ -48,7 +50,8 @@ class ErmesObjFloat extends ErmesObjNumberBox {
 	return;
       }
 
-    itsFtsObject.put("value", itsFloat);
+    ((FtsFloatValueObject)itsFtsObject).setValue(itsFloat);
+
     DoublePaint();
   }
 
@@ -77,7 +80,7 @@ class ErmesObjFloat extends ErmesObjNumberBox {
 
 	itsStartingValue = itsFloat;
 
-	itsFtsObject.put( "value", itsFloat);
+	((FtsFloatValueObject)itsFtsObject).setValue(itsFloat);
 
 	DoublePaint();
       } 
@@ -93,7 +96,7 @@ class ErmesObjFloat extends ErmesObjNumberBox {
 
     if (itsSketchPad.itsRunMode) 
       {
-	itsFtsObject.ask("value");
+	((FtsFloatValueObject)itsFtsObject).updateValue();
 	Fts.sync();
 	DoublePaint();
 	return;
@@ -125,7 +128,7 @@ class ErmesObjFloat extends ErmesObjNumberBox {
 
 	itsFloat += increment;
 
-	itsFtsObject.put("value", new Float(itsFloat));
+	((FtsFloatValueObject)itsFtsObject).setValue(itsFloat);
 	DoublePaint();
       } 
   }

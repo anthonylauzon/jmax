@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:24 $
+ *      $Revision: 1.2 $ IRCAM $Date: 1998/09/25 17:36:24 $
  *
  * 
  * The value object it is stilllonger implemented using through,
@@ -67,7 +67,7 @@ free_keeper(struct value_keeper *v)
 /*                                                                            */
 /******************************************************************************/
 
-/* "value". remember a value. Use a private hash table, so  a
+/* remember a value. Use a private hash table, so  a
  private name space for values; in MP versions, the values
  are local to a processor.*/
 

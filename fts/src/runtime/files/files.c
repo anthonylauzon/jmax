@@ -354,10 +354,7 @@ fts_atom_file_open(const char *name, fts_symbol_t dir, const char *mode)
     }
 
   if (f->fd == -1)
-    {
-      perror(name);
-      return 0;
-    }
+    return 0;
   else
     return f;
 }

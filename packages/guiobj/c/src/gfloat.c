@@ -7,7 +7,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1998/09/18 12:12:25 $
+ *      $Revision: 1.2 $ IRCAM $Date: 1998/09/30 17:24:47 $
  *
  */
 
@@ -24,7 +24,7 @@ typedef struct {
 static void
 gfloat_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_property_changed_urgent(o, fts_s_value);
+  fts_client_send_property(o, fts_s_value);
 }
 
 

@@ -11,7 +11,6 @@ extern void fts_client_mess_add_float(float value);
 extern void fts_client_mess_add_symbol(fts_symbol_t s);
 extern void fts_client_mess_add_object(fts_object_t *obj);
 extern void fts_client_mess_add_connection(fts_connection_t *c);
-extern void fts_client_mess_add_void(void);
 extern void fts_client_mess_add_data( fts_data_t *data);
 extern void fts_client_mess_add_string(const char *sp);
 extern void fts_client_mess_add_atoms(int ac, const fts_atom_t *args);

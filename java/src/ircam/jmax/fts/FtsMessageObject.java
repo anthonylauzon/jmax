@@ -20,6 +20,8 @@ public class FtsMessageObject extends FtsObject
   /*                                                                           */
   /*****************************************************************************/
 
+  String message; // the message content
+
   /**
    * Create a FtsObject object;
    */
@@ -31,30 +33,29 @@ public class FtsMessageObject extends FtsObject
     ninlets = 1;
     noutlets = 1;
 
-    localPut("value", description);
+    message = description;
   }
-
-  /**
-   * redefine the message
-   */
 
   public void setMessage(String message)
   {
-    description = message;
-
-    localPut("value", description);
-
-    Fts.getServer().sendSetMessage(this, description);
+    this.message = message;
+    Fts.getServer().sendSetMessage(this, message);
     setDirty();
   }
 
+  public String getMessage()
+  {
+    return message;
+  }
+       
   /* Over write the handle message to handle message box changes */
 
-  public void handleMessage(FtsMessage msg)
+  void handleMessage(FtsMessage msg)
   {
-    description = FtsParse.unparseObjectDescription(msg);
+    setMessage(FtsParse.unparseObjectDescription(msg));
 
-    localPut("value", description);
+    if (listener instanceof FtsMessageListener)
+      ((FtsMessageListener) listener).messageChanged(message);
   }
 }
 

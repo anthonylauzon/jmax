@@ -62,11 +62,33 @@ public abstract class FtsRemoteData implements MaxData
      that can have vector related arguments.
      */
    
+  // No argument remoteCall
+
   public void remoteCall( int key)
   {
     Fts.getServer().remoteCall( this, key, (MaxVector) null);
   }
   
+  // Single argument remote call
+
+  public void remoteCall( int key, int arg)
+  {
+    Fts.getServer().remoteCall( this, key, arg);
+  }
+
+  public void remoteCall( int key, float arg)
+  {
+    Fts.getServer().remoteCall( this, key, arg);
+  }
+
+  public void remoteCall( int key, Object arg)
+  {
+    Fts.getServer().remoteCall( this, key, arg);
+  }
+
+
+  // Multiple arguments remote call
+
   public void remoteCall( int key, Object args[])
   {
     Fts.getServer().remoteCall( this, key, args);
@@ -76,6 +98,8 @@ public abstract class FtsRemoteData implements MaxData
   {
     Fts.getServer().remoteCall( this, key, args);
   }
+
+  // Special  remote calls
 
   public void remoteCall( int key, int offset, int size, int values[])
   {

@@ -90,7 +90,7 @@ class FindPanel extends JFrame {
 
 	  FindPanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
-	  Fts.editPropertyValue(object.getParent(), object,  "data",
+	  Fts.editPropertyValue(object.getParent(), object,
 				new MaxDataEditorReadyListener() {
 	    public void editorReady(MaxDataEditor editor)
 	      {	  FindPanel.this.setCursor(temp);}

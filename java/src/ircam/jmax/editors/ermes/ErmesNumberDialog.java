@@ -23,7 +23,6 @@ class ErmesNumberDialog extends Dialog implements ActionListener {
     //Create north section.
     Panel p1 = new Panel();
     p1.setLayout( new FlowLayout(FlowLayout.LEFT));
-    
     p1.add( new Label( "Value"));
     valueField = new TextField( "", 20);
     valueField.addActionListener( this);

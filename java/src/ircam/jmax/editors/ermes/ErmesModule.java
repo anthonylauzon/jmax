@@ -15,13 +15,6 @@ public class ErmesModule
 
     Mda.installEditorFactory(new ErmesPatcherFactory());
 
-    //List of persistent properties
-
-    FtsPropertyDescriptor.setDefaultValue("fs", new Integer(10));
-    FtsPropertyDescriptor.setDefaultValue("maxValue", new Integer(128));
-    FtsPropertyDescriptor.setDefaultValue("minValue", new Integer(0));
-    FtsPropertyDescriptor.setDefaultValue("resized", "off");
-
     // Load the toolbar images
 
     ErmesSwToolbar.loadToolBarImages();

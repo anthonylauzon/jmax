@@ -34,9 +34,34 @@ public class FtsPatcherData extends FtsRemoteData
   static final int REMOTE_STOP_UPDATES   = 6;
   static final int REMOTE_UPDATE         = 7;
 
+  static final int REMOTE_SET_WX         = 8;
+  static final int REMOTE_SET_WY         = 9;
+  static final int REMOTE_SET_WW         = 10;
+  static final int REMOTE_SET_WH         = 11;
+
   /** Patcher content: the container object  */
 
   FtsObject container;
+
+  /** Patcher content: the window size and position */
+
+  int windowX = 0;
+  int windowY = 0;
+  int windowHeight = 0;
+  int windowWidth  = 0;
+
+  /**
+    Patcher content: the edit mode;
+    temporary hack, local, not propagated to fts,
+    should disappear with the toolbar instead of the mode
+    in the patcher editor.
+   */
+
+  final public static int UNKNOWN_MODE = 0;
+  final public static int EDIT_MODE = 1;
+  final public static int RUN_MODE  = 2;
+
+  int editMode = UNKNOWN_MODE;
 
   /** Patcher content: objects */
 
@@ -75,7 +100,84 @@ public class FtsPatcherData extends FtsRemoteData
     return container.getDocument();
   }
 
+
+  public final int getWindowX()
+  {
+    return windowX;
+  }
+
+  public final void setWindowX(int value)
+  {
+    windowX = value;
+    remoteCall(REMOTE_SET_WX, value);
+  }
+
+  public final int getWindowY()
+  {
+    return windowY;
+  }
+
   
+  public final void setWindowY(int value)
+  {
+    // Not that changing the position do
+    // not mark the file as dirty.
+
+    windowY = value;
+    remoteCall(REMOTE_SET_WY, value);
+  }
+
+  public final int getWindowHeight()
+  {
+    return windowHeight;
+  }
+
+  public final void setWindowHeight(int value)
+  {
+    windowHeight = value;
+    remoteCall(REMOTE_SET_WH, value);
+    container.setDirty();
+  }
+
+
+  public final int getWindowWidth()
+  {
+    return windowWidth;
+  }
+
+  public final void setWindowWidth(int value)
+  {
+    windowWidth = value;
+    remoteCall(REMOTE_SET_WW, value);
+    container.setDirty();
+  }
+
+  public final int getEditMode()
+  {
+    return editMode;
+  }
+
+  public final int getRecursiveEditMode()
+  {
+    if (editMode == UNKNOWN_MODE)
+      {
+	if (container.getParent() != null)
+	  if (container.getParent().getData() != null)
+	    if (container.getParent().getData() instanceof FtsPatcherData)
+	      return ((FtsPatcherData) container.getParent().getData()).getRecursiveEditMode();
+
+	return UNKNOWN_MODE;
+      }
+    else
+      return editMode;
+  }
+
+  public final void setEditMode(int value)
+  {
+    editMode = value;
+  }
+
+
   final void addObject(FtsObject obj)
   {
     objects.addElement(obj);
@@ -169,6 +271,18 @@ public class FtsPatcherData extends FtsRemoteData
       listener.connectionRemoved(this, connection);
   }
 
+  final void firePatcherChangedNumberOfInlets(int ins)
+  {
+    if (listener != null)
+      listener.patcherChangedNumberOfInlets(this, ins);
+  }
+
+  final void firePatcherChangedNumberOfOutlets(int outs)
+  {
+    if (listener != null)
+      listener.patcherChangedNumberOfOutlets(this, outs);
+  }
+
   private final void firePatcherChanged()
   {
     if (listener != null)
@@ -212,6 +326,18 @@ public class FtsPatcherData extends FtsRemoteData
 	addConnection((FtsConnection) msg.getNextArgument());
 	break;
 
+      case REMOTE_SET_WX:
+	windowX = ((Integer) msg.getNextArgument()).intValue();
+	break;
+      case REMOTE_SET_WY:
+	windowY = ((Integer) msg.getNextArgument()).intValue();
+	break;
+      case REMOTE_SET_WW:
+	windowWidth = ((Integer) msg.getNextArgument()).intValue();
+	break;
+      case REMOTE_SET_WH:
+	windowHeight = ((Integer) msg.getNextArgument()).intValue();
+	break;
       default:
 	break;
       }

@@ -72,7 +72,7 @@ class FpePanel extends JFrame
 
 	  FpePanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
-	  Fts.editPropertyValue(object.getParent(), object,  "data",
+	  Fts.editPropertyValue(object.getParent(), object,
 				new MaxDataEditorReadyListener() {
 	    public void editorReady(MaxDataEditor editor)
 	      {	  FpePanel.this.setCursor(temp);}
