@@ -1,5 +1,7 @@
 2001-07-10  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
+	* fixed bug introduced in fts_dsp_declare_inlet by fts_class_get_method
+
 	* changed the scheduler API (fts_sched_add, fts_sched_remove). Changed
 	all the objects using it.
 

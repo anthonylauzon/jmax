@@ -211,10 +211,14 @@ fts_dsp_declare_function(fts_symbol_t name, void (*w)(fts_word_t *))
   ftl_declare_function( name, w);
 }
 
+static void sig_dummy( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+}
+
 void 
 fts_dsp_declare_inlet(fts_class_t *cl, int num)
 {
-  fts_method_define(cl, num, fts_s_sig, 0, 0, 0);
+  fts_method_define(cl, num, fts_s_sig, sig_dummy, 0, 0);
 }
 
 void 
