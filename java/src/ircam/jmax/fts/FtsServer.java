@@ -39,7 +39,7 @@ public class FtsServer
 
   /** The root object of this server */
 
-  FtsContainerObject root;
+  FtsObject root;
 
   /** The list of listener of update groups */
   
@@ -75,7 +75,7 @@ public class FtsServer
    * is not editable, and represent the global scope for FTS.
    */ 
 
-  public FtsContainerObject getRootObject()
+  public FtsObject getRootObject()
   {
     return root;
   }
@@ -89,7 +89,7 @@ public class FtsServer
     // Build the root patcher, by mapping directly to object id 1 on FTS
     // (this is guaranteed)
 
-    root = new FtsPatcherObject(null, "root 0 0", 1);
+    root = new FtsPatcherObject(null, "", 1);
     registerObject(root);
   }
 
@@ -262,94 +262,6 @@ public class FtsServer
       {
 	port.sendCmd(FtsClientProtocol.fts_declare_template_path_cmd);
 	port.sendString(path);
-	port.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
-
-  /** Send a "download patcher" messages to FTS and do a sync */
-
-  final void sendDownloadPatcher(FtsObject patcher)
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug)
-      System.err.println("sendDownloadPatcher(" + patcher + ")");
-
-    try
-      {
-	port.sendCmd(FtsClientProtocol.fts_download_patcher_cmd);
-	port.sendObject(patcher);
-	port.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
-
-  /** Send a "download patcher" messages to FTS.*/
-
-  final void sendDownloadPatcher(int id)
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug)
-      System.err.println("sendDownloadPatcher(" + id + ")");
-
-    try
-      {
-	port.sendCmd(FtsClientProtocol.fts_download_patcher_cmd);
-	port.sendObject(id);
-	port.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
-
-  /** Send a "open patcher" messages to FTS.*/
-
-  final void openPatcher(FtsObject patcher)
-  {
-    if (! connected)
-      return;
-
-
-    if (FtsServer.debug)
-      System.err.println("openPatcher(" + patcher + ")");
-
-    try
-      {
-	port.sendCmd(FtsClientProtocol.fts_open_patcher_cmd);
-	port.sendObject(patcher);
-	port.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
-  /** Send a "close patcher" messages to FTS.*/
-
-  final void closePatcher(FtsObject patcher)
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug) 
-      System.err.println("closePatcher(" + patcher + ")");
-
-    try
-      {
-	port.sendCmd(FtsClientProtocol.fts_close_patcher_cmd);
-	port.sendObject(patcher);
 	port.sendEom();
       }
     catch (java.io.IOException e)
@@ -1123,9 +1035,6 @@ public class FtsServer
 
   void dispatchMessage(FtsMessage msg)
   {
-    if (FtsServer.debug)
-      System.err.println("Received message " + msg);
-
     switch (msg.getCommand())
       {
       case FtsClientProtocol.fts_property_value_cmd:
@@ -1210,40 +1119,22 @@ public class FtsServer
 	  break;
 	}
 
-      case FtsClientProtocol.fts_new_abstraction_cmd:
-	{
-	  FtsObject newObj;
-
-	  try
-	    {
-	      newObj = FtsObject.makeFtsAbstractionFromMessage(msg);
-	      registerObject(newObj);
-
-	      if (FtsServer.debug)
-		System.err.println("NewAbstractionMessage " + newObj + " " + msg);
-	    }
-	  catch (FtsException e)
-	    {
-	      System.err.println("System error, cannot instantiate from message " + msg);
-	    }
-
-	  break;
-	}
-
       case FtsClientProtocol.fts_new_connection_cmd:
 	{
+	  FtsPatcherData data;
 	  int id;
 	  FtsObject from, to;
 	  int outlet, inlet;
 	  FtsConnection c;
 
+	  data   = (FtsPatcherData) msg.getNextArgument();
 	  id     = ((Integer)  msg.getNextArgument()).intValue();
 	  from   = (FtsObject) msg.getNextArgument();
 	  outlet = ((Integer)  msg.getNextArgument()).intValue();
 	  to     = (FtsObject) msg.getNextArgument();
 	  inlet  = ((Integer)  msg.getNextArgument()).intValue();
 
-	  c = new FtsConnection(id, from, outlet, to, inlet);
+	  c = new FtsConnection(data, id, from, outlet, to, inlet);
 
 	  registerConnection(c);
 
@@ -1321,7 +1212,9 @@ public class FtsServer
 	  if ((data != null) && (value != null))
 	    {
 	      int key = value.intValue();
-	      
+
+	      if (FtsServer.debug) 
+		System.err.println("remote Call msg: " + data + " key " + key + " Message "  + msg);
 	      data.call(key, msg);
 	    }
 	  else

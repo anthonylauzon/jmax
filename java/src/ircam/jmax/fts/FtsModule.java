@@ -40,5 +40,9 @@ public class FtsModule
     // Install the atom list class
 
     Fts.registerRemoteDataClass("atom_list_data", ircam.jmax.fts.FtsAtomList.class);
+
+    // Install the patcher data class
+
+    Fts.registerRemoteDataClass("patcher_data", ircam.jmax.fts.FtsPatcherData.class);
   }
 }

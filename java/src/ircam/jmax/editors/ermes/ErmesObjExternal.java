@@ -56,8 +56,6 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
 
   public void inspect() 
   {
-    if ( itsFtsObject instanceof FtsContainerObject)
-      ErmesPatcherInspector.inspect( (FtsContainerObject) itsFtsObject);
   }
 
   void redefine( String text) 

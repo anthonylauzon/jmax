@@ -26,7 +26,7 @@ public class Fts
 				  String serverName, String port)
   {
     if (mode.equals("socket")) 
-      server = new FtsServer(serverName, new FtsSocketServerPort(serverName));
+      server = new FtsServer(serverName, new FtsSocketPort(serverName, Integer.parseInt(port)));
     else if (mode.equals("udp")) 
       server = new FtsServer(serverName, new FtsDatagramPort(serverName));
     else if (mode.equals("udprx")) 
@@ -56,7 +56,7 @@ public class Fts
      are available separately.
      */
 
-  static public FtsObject makeFtsObject(FtsContainerObject parent, String className, String description)
+  static public FtsObject makeFtsObject(FtsObject parent, String className, String description)
        throws FtsException
   {
     FtsObject obj;
@@ -89,7 +89,7 @@ public class Fts
      are available separately.
      */
 
-  static public FtsObject makeFtsObject(FtsContainerObject parent, String description) throws FtsException
+  static public FtsObject makeFtsObject(FtsObject parent, String description) throws FtsException
   {
     FtsObject obj;
     int id;
@@ -165,13 +165,13 @@ public class Fts
   public static FtsObject redefineFtsObject(FtsObject oldObject, String description) throws FtsException
   {
     FtsObject newObject;
-    FtsContainerObject parent;
+    FtsObject parent;
     int oldInlets, oldOutlets;
     Object data;
 
     // Get the data, and quit the editors connected to the data
 
-    data = oldObject.get("data");	
+    data = oldObject.getData();	
 
     if (data instanceof MaxData)
       Mda.dispose((MaxData) data);

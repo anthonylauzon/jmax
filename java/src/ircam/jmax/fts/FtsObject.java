@@ -15,7 +15,7 @@ import ircam.jmax.mda.*;
  * FTS instantiation 
  */
 
-abstract public class FtsObject 
+public class FtsObject 
 {
   /* code to set generic properties meta-properties */
 
@@ -32,12 +32,16 @@ abstract public class FtsObject
 
   static FtsObject makeFtsObjectFromMessage(FtsMessage msg) throws FtsException
   {
+    FtsPatcherData data;
+    FtsObject parent;
+    FtsObject obj;
     String className;
     StringBuffer description;
-    FtsContainerObject parent;
     int objId;
 
-    parent = (FtsContainerObject) msg.getNextArgument();
+
+    parent = (FtsObject) msg.getNextArgument();
+    data   = (FtsPatcherData) msg.getNextArgument();
     objId = ((Integer) msg.getNextArgument()).intValue();
 
     /* Check for null description object */
@@ -45,43 +49,31 @@ abstract public class FtsObject
     className = (String) msg.getNextArgument();
 
     if (className == null)
-      return new FtsStandardObject(parent, "", "", objId);
+      return new FtsObject(parent, "", "", objId);
     else
       className = className.intern();
 
     if (className == "jpatcher")
-      return new FtsPatcherObject(parent, FtsParse.unparseObjectDescription(msg), objId);
+      obj =  new FtsPatcherObject(parent, FtsParse.unparseObjectDescription(msg), objId);
     else if (className == "inlet")
-      return new FtsInletObject(parent, ((Integer) msg.getNextArgument()).intValue(), objId);
+      obj =  new FtsInletObject(parent, ((Integer) msg.getNextArgument()).intValue(), objId);
     else if (className == "outlet")
-      return new FtsOutletObject(parent, ((Integer) msg.getNextArgument()).intValue(), objId);
+      obj =  new FtsOutletObject(parent, ((Integer) msg.getNextArgument()).intValue(), objId);
     else if (className == "messbox")
-      return new FtsMessageObject(parent, FtsParse.unparseObjectDescription(msg), objId);
+      obj =  new FtsMessageObject(parent, FtsParse.unparseObjectDescription(msg), objId);
     else if (className == "comment")
-      return new FtsCommentObject(parent, FtsParse.simpleUnparseObjectDescription(msg), objId);
+      obj =  new FtsCommentObject(parent, FtsParse.simpleUnparseObjectDescription(msg), objId);
     else if (className == "__selection")
-      return new FtsSelection(parent, className, "__selection", objId);
+      obj =  new FtsSelection(parent, className, "__selection", objId);
     else if (className == "__clipboard")
-      return new FtsClipboard(parent, className, "__clipboard", objId);
+      obj =  new FtsClipboard(parent, className, "__clipboard", objId);
     else
-      return new FtsStandardObject(parent, className, FtsParse.unparseObjectDescription(className, msg), objId);
-  }
+      obj = new FtsObject(parent, className, FtsParse.unparseObjectDescription(className, msg), objId);
 
+    if (data != null)
+      data.addObject(obj);
 
-  static FtsObject makeFtsAbstractionFromMessage(FtsMessage msg) throws FtsException
-  {
-    String className;
-    StringBuffer description;
-    FtsContainerObject parent;
-    int objId;
-
-    parent    = (FtsContainerObject) msg.getNextArgument();
-    objId     = ((Integer) msg.getNextArgument()).intValue();
-    className = (String) msg.getNextArgument();
-
-    /* if the object has been succesfully created, set the parent dirty */
-
-    return new FtsAbstractionObject(parent, className, FtsParse.unparseObjectDescription(className, msg), objId);
+    return obj;
   }
 
   /******************************************************************************/
@@ -313,6 +305,11 @@ abstract public class FtsObject
 	if (! (value instanceof FtsVoid))
 	  setObjectName(value.toString());
       }
+    else if (name == "data")
+      {
+	if (! (value instanceof FtsVoid))
+	  data = (MaxData) value;
+      }
     else
       {
 	// local properties
@@ -368,6 +365,8 @@ abstract public class FtsObject
       return new Integer(height);
     else if (name == "name")
       return getObjectName();
+    else if (name == "data")
+      return data;
 
     if (properties != null)
       {
@@ -428,7 +427,7 @@ abstract public class FtsObject
 
   /** The parent object. Usually the container patcher or abstraction or template */
 
-  FtsContainerObject parent;
+  FtsObject parent;
 
   /** The Fts class Name */
 
@@ -453,11 +452,22 @@ abstract public class FtsObject
 
   String description = null;
 
+  /**
+   * The editable data this object represent and implement
+   * It is also the value of the data property.
+   */
+
+  MaxData data;
+
+  MaxData getData()
+  {
+    return data;
+  }
+
   // Property and message handlers (to be converted to Beans style)
   // Should go in a structure create by need
 
   /** The property Handler Table for this object */
-
 
   /** x, y, width and height cache locally the geometrical properties, to speed
     up access; also, to prepare transition to beans model */
@@ -501,7 +511,7 @@ abstract public class FtsObject
    * Create a FtsObject object.
    */
 
-  protected FtsObject(FtsContainerObject parent, String className, String description, int objId)
+  protected FtsObject(FtsObject parent, String className, String description, int objId)
   {
     super();
 
@@ -511,11 +521,6 @@ abstract public class FtsObject
 
     if (objId != -1)
       setObjectId(objId);
-
-    // this test make sense only for the root patcher
-
-    if (parent != null)
-      parent.addObjectToContainer(this);
   }
 
 
@@ -536,17 +541,12 @@ abstract public class FtsObject
     return "<" + name.substring(name.lastIndexOf('.') + 1) + " " + "{" + description + "}" + " #" + ftsId + ">";
   }
 
-  /*****************************************************************************/
-  /*                                                                           */
-  /*                      CLIENT API and  PROPERTIES                           */
-  /*                                                                           */
-  /*****************************************************************************/
 
   /* Accessors and selectors. */
 
   /** Get the object including patcher. */
 
-  public final FtsContainerObject getParent()
+  public final FtsObject getParent()
   {
     return parent;
   }
@@ -594,6 +594,7 @@ abstract public class FtsObject
     this.document = (FtsPatcherDocument) document;
   }
 
+
   /** Tell the document this object is changed, 
    *  and do not represent the state of the original file (if any)
    *  anymore
@@ -630,6 +631,20 @@ abstract public class FtsObject
     return noutlets;
   }
 
+
+  /** Utility function Get the patcher data contaning the object if any */
+
+  FtsPatcherData getPatcherData()
+  {
+    if ((parent != null) &&
+	(parent.getData() != null) &&
+	(parent.getData() instanceof FtsPatcherData))
+      return (FtsPatcherData) parent.getData();
+    else
+      return null;
+  }
+
+
   /**
    * Ask FTS to Delete the object. 
    * Fts object should be delete explicitely, the finalizer will not delete them.
@@ -651,8 +666,6 @@ abstract public class FtsObject
 
   void releaseData()
   {
-    Object data = get("data");
-
     if ((data != null) && (data instanceof MaxData))
       Mda.dispose((MaxData) data);
   }
@@ -666,13 +679,15 @@ abstract public class FtsObject
   {
     // If we have data, dispose it, so that all
     // the editors will be closed.
-
     
     releaseData();
 
     parent.setDirty();
 
-    parent.removeObjectFromContainer(this); 
+    // Take away the object from the container, if any
+
+    if (getPatcherData() != null)
+      getPatcherData().removeObject(this);
 
     // clean up to help the gc, and make the object
     // non functioning, so to catch use of the object

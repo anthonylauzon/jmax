@@ -21,10 +21,6 @@
    selector is a command, as before.
    The accepted messages are 
 
-   OPEN_PATCHER   (obj)p
-   CLOSE_PATCHER  (obj)p
-   PATCHER_LOADED (obj)p
-
    not yet implemented, but soon !!!
 
    NEW  (obj) p (int)id [<args>]*
@@ -339,35 +335,6 @@ fts_mess_client_declare_template_path(int ac, const fts_atom_t *av)
 }
 
 
-/*    DOWNLOAD_PATCHER   (obj)p
-
-      Send to the patcher the message "download". (system inlet)
- */
-
-static void
-fts_mess_client_download_patcher(int ac, const fts_atom_t *av)
-{
-  trace_mess("Received download patcher ", ac, av);
-
-  if (ac == 1 && fts_is_object(&av[0]))
-    {
-      fts_patcher_t *patcher;
-      fts_object_t *p;
-
-      patcher = (fts_patcher_t *) fts_get_object(&av[0]);
-
-      if (! patcher)
-	{
-	  post_mess("System Error in FOS message DOWNLOAD PATCHER: null patcher", ac, av);
-	  return;
-	}
-
-      fts_client_upload_patcher_content(patcher);
-    }
-  else
-    post_mess("System Error in FOS message DOWNLOAD PATCHER: bad args", ac, av);
-}
-
 
 /*    DOWNLOAD_OBJECT   (obj)p
 
@@ -429,87 +396,6 @@ fts_mess_client_download_connection(int ac, const fts_atom_t *av)
   else
     post_mess("System Error in FOS message DOWNLOAD CONNECTION: bad args", ac, av);
 }
-
-/*    OPEN_PATCHER   (obj)p
-
-      Send to the patcher the message "open". (system inlet)
- */
-
-static void
-fts_mess_client_open_patcher(int ac, const fts_atom_t *av)
-{
-  trace_mess("Received open patcher ", ac, av);
-
-  if (ac == 1 && fts_is_object(&av[0]))
-    {
-      fts_object_t *patcher;
-
-      patcher = (fts_object_t *) fts_get_object(&av[0]);
-
-      if (patcher)
-	{
-	  fts_message_send(patcher, fts_SystemInlet, fts_s_open, 0, 0);
-	}
-      else
-	post_mess("System Error in FOS message OPEN PATCHER: null patcher", ac, av);
-    }
-  else
-    post_mess("System Error in FOS message OPEN PATCHER: bad args", ac, av);
-}
-
-
-/*    CLOSE_PATCHER  (obj)p
-      Send to the patcher the message "close".(system inlet)
- */
-
-
-static void
-fts_mess_client_close_patcher(int ac, const fts_atom_t *av)
-{
-  trace_mess("Received close patcher ", ac, av);
-
-  if (ac == 1 && fts_is_object(&av[0]))
-    {
-      fts_object_t *patcher;
-
-      patcher = (fts_object_t *) fts_get_object(&av[0]);
-
-      if (patcher)
-	fts_message_send(patcher, fts_SystemInlet, fts_s_close, 0, 0);
-      else
-	post_mess("System Error in FOS message CLOSE PATCHER: null patcher ", ac, av);
-    }
-  else
-    post_mess("System Error in FOS message CLOSE PATCHER: bad args", ac, av);
-}
-
-
-/*
-    PATCHER_LOADED (obj)p
-      Send to the patcher the message "load_init".(system inlet)
-    */
-
-
-static void
-fts_mess_client_patcher_loaded(int ac, const fts_atom_t *av)
-{
-  trace_mess("Received patcher loaded", ac, av);
-
-  if (ac == 1 && fts_is_object(&av[0]))
-    {
-      fts_object_t *patcher;
-
-      patcher = (fts_object_t *) fts_get_object(&av[0]);
-
-      if (patcher)
-	fts_message_send(patcher, fts_SystemInlet, fts_s_load_init, 0, 0);
-      else
-	post_mess("System Error in FOS message PATCHER LOADED: null patcher", ac, av);
-    }
-  else
-    post_mess("System Error in FOS message PATCHER LOADED: bad args", ac, av);
-}
-
 
 
 /*    NEW  (obj)pid (int)new-id [<args>]*
@@ -909,21 +795,6 @@ fts_mess_client_get_prop(int ac, const fts_atom_t *av)
       obj  = fts_get_object(&av[0]);
       name = fts_get_symbol(&av[1]);
 
-      /* Temporary "hack"; if the object is a patcher,  cause
-	 the patcher itself and its content to be uploaded; this
-	 hack will be thrown away when the patcher will become an 
-	 ftsdata */
-
-      if ((name == fts_s_data) &&
-	  fts_object_is_patcher(obj) &&
-	  (! fts_object_is_error(obj)))
-	{
-	  if (obj->id == FTS_NO_ID)
-	    fts_client_upload_object(obj);
-
-	  fts_client_upload_patcher_content((fts_patcher_t *) obj);
-	}
-
       fts_object_property_changed(obj, name);
     }
   else
@@ -1031,13 +902,9 @@ fts_messtile_install_all()
   fts_client_mess_install(DECLARE_TEMPLATE_CODE, fts_mess_client_declare_template);
   fts_client_mess_install(DECLARE_TEMPLATE_PATH_CODE, fts_mess_client_declare_template_path);
 
-  fts_client_mess_install(DOWNLOAD_PATCHER_CODE, fts_mess_client_download_patcher);
   fts_client_mess_install(DOWNLOAD_OBJECT_CODE, fts_mess_client_download_object);
   fts_client_mess_install(DOWNLOAD_CONNECTION_CODE, fts_mess_client_download_connection);
 
-  fts_client_mess_install(OPEN_PATCHER_CODE, fts_mess_client_open_patcher);
-  fts_client_mess_install(CLOSE_PATCHER_CODE, fts_mess_client_close_patcher);
-  fts_client_mess_install(PATCHER_LOADED_CODE,  fts_mess_client_patcher_loaded);
   fts_client_mess_install(NEW_OBJECT_CODE,  fts_mess_client_new);
   fts_client_mess_install(REDEFINE_PATCHER_CODE,  fts_mess_client_redefine_patcher);
   fts_client_mess_install(REDEFINE_OBJECT_CODE,  fts_mess_client_redefine_object);

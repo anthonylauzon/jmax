@@ -19,6 +19,7 @@ messages.c      \
 objtable.c	\
 patabs.c	\
 patcher.c	\
+patcherdata.c   \
 patlex.c	\
 patparser.c	\
 properties.c	\

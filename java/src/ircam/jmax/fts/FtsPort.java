@@ -116,8 +116,8 @@ abstract class FtsPort implements Runnable
 	  {
 	    // Try to survive an exception
 	    
-	    System.err.println("System exception " + e);
-	    e.printStackTrace();
+	    // System.err.println("System exception " + e);
+	    // e.printStackTrace();
 	  }
       }
 

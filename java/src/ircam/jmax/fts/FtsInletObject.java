@@ -26,7 +26,7 @@ public class FtsInletObject  extends FtsObject
    * Create a FtsInletObject object.
    */
   
-  public FtsInletObject(FtsContainerObject parent, int position, int objId)
+  public FtsInletObject(FtsObject parent, int position, int objId)
   {
     super(parent, "inlet", "inlet " + position, objId);
 

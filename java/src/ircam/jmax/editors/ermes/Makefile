@@ -181,6 +181,10 @@ ErmesPatcherFactory:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesPatcherFactory.java)
 .PHONY: ErmesPatcherFactory
 
+ErmesPatcherListener:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesPatcherListener.java)
+.PHONY: ErmesPatcherListener
+
 FontCache:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FontCache.java)
 .PHONY: FontCache

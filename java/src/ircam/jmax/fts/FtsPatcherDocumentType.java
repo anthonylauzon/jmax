@@ -24,11 +24,11 @@ public class FtsPatcherDocumentType extends MaxDocumentType
   {
     // Build a new FtsObject, a patcher 0 in 0 out
 
-    FtsContainerObject patcher;
+    FtsObject patcher;
 
     try
       {
-	patcher = (FtsContainerObject) Fts.makeFtsObject(Fts.getServer().getRootObject(), "jpatcher");
+	patcher = Fts.makeFtsObject(Fts.getServer().getRootObject(), "jpatcher");
 
 	// Put some geometrical property for the window, so we can see it.
 	// Do both a put and a localPut but it should be a series of put/ask
@@ -50,7 +50,9 @@ public class FtsPatcherDocumentType extends MaxDocumentType
 
 	FtsPatcherDocument document = new FtsPatcherDocument();
 
-	document.setRootData(patcher);
+	patcher.ask("data");
+	Fts.sync();
+	document.setRootData(patcher.getData());
 	document.setName(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("untitled")); // temp name
 
 	return document;

@@ -24,7 +24,7 @@ public class FtsClipboard  extends FtsObject
    * Create a Fts clipboard;
    */
 
-  protected  FtsClipboard(FtsContainerObject parent, String className, String description, int objId)
+  protected  FtsClipboard(FtsObject parent, String className, String description, int objId)
   {
     super(parent, className, description, objId);
   }
@@ -34,11 +34,9 @@ public class FtsClipboard  extends FtsObject
     Fts.getServer().sendObjectMessage(this, -1, "copy", sel);
   }
 
-  public void paste(FtsContainerObject patcher)
+  public void paste(FtsObject patcher)
   {
     Fts.getServer().sendObjectMessage(this, -1, "paste", patcher);
-
-    patcher.redownload();
   }
 }
 

@@ -90,17 +90,12 @@ class FtsClientProtocol
   static final int fts_declare_template_cmd      = 'y';
   static final int fts_declare_template_path_cmd = 'w';
 
-  static final int fts_download_patcher_cmd = 'D';
   static final int fts_download_object_cmd = 'G';
   static final int fts_download_connection_cmd = 'H';
-
-  static final int fts_open_patcher_cmd = 'O';
-  static final int fts_close_patcher_cmd = 'C';
 
   static final int fts_new_object_cmd = 'n';
   static final int fts_delete_object_cmd = 'f';
 
-  static final int fts_new_abstraction_cmd = 'A';
   static final int fts_redefine_patcher_cmd = 'Q';
   static final int fts_redefine_object_cmd = 'R';
   static final int fts_redefine_connection_cmd = 'V';
@@ -156,22 +151,12 @@ class FtsClientProtocol
 	return "fts_declare_template";
       case 'w':
 	return "fts_declare_template_path";
-      case 'D':
-	return "fts_download_patcher";
       case 'G':
 	return "fts_download_object";
       case 'H':
 	return "fts_download_connection";
-      case 'O':
-	return "fts_open_patcher";
-      case 'C':
-	return "fts_close_patcher";
-      case 'L':
-	return "fts_patcher_loaded";
       case 'n':
 	return "fts_new_object";
-      case 'A':
- 	return "fts_new_abstraction";
       case 'Q':
 	return "fts_redefine_patcher";
       case 'R':
@@ -213,7 +198,7 @@ class FtsClientProtocol
       case '!':
 	return "fts_remote_call";
       default:
-	return "(unknown command: " + (char) command + " )";
+	return "(unknown command: " + String.valueOf((char) command) + " )";
       }
   }
 }

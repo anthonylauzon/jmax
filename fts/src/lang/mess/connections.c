@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.3 $ IRCAM $Date: 1998/10/06 18:34:41 $
+ *      $Revision: 1.4 $ IRCAM $Date: 1998/10/12 17:13:15 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -44,7 +44,7 @@ fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts
   fts_outlet_decl_t *outlet;
   fts_inlet_decl_t *inlet;
   fts_class_mess_t *mess = 0;
-  fts_connection_t *outconn;
+  fts_connection_t *conn;
   int anything;
 
   /* first of all, if one of the two object is an error object,
@@ -127,16 +127,16 @@ fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts
 	}
     }
 
-  outconn = (fts_connection_t *) fts_heap_alloc(connection_heap);
+  conn = (fts_connection_t *) fts_heap_alloc(connection_heap);
 
-  outconn->id  = id;
-  outconn->src = out;
-  outconn->woutlet = woutlet;
-  outconn->dst = in;
-  outconn->winlet = winlet;
+  conn->id  = id;
+  conn->src = out;
+  conn->woutlet = woutlet;
+  conn->dst = in;
+  conn->winlet = winlet;
 
   if (id != FTS_NO_ID)
-    fts_connection_table_put(id, outconn);
+    fts_connection_table_put(id, conn);
 
   /* pre-initialize the cache, if possible */
 
@@ -144,8 +144,8 @@ fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts
     {
       if (fts_mess_get_run_time_check())
 	{
-	  outconn->symb = 0;
-	  outconn->mth  = 0;
+	  conn->symb = 0;
+	  conn->mth  = 0;
 	}
       else if (anything)
 	{
@@ -153,46 +153,46 @@ fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts
 	   outlet is typed, we are sure we will always call the anything method
 	   for this type */
 
-	  outconn->symb = 0;
-	  outconn->mth  = mess->mth;
+	  conn->symb = 0;
+	  conn->mth  = mess->mth;
 	}
       else
 	{
-	  outconn->symb = mess->tmess.symb;
-	  outconn->mth  = mess->mth;
+	  conn->symb = mess->tmess.symb;
+	  conn->mth  = mess->mth;
 	}
     }
   else
     {
-      outconn->symb = 0;
-      outconn->mth  = 0;
+      conn->symb = 0;
+      conn->mth  = 0;
     }
 
   /* add the connection to the outlet list and to the inlet list  */
 
   if (! out->out_conn[woutlet])
     {
-      outconn->next_same_src = 0;
-      out->out_conn[woutlet] = outconn;
+      conn->next_same_src = 0;
+      out->out_conn[woutlet] = conn;
     }
   else
     {
-      outconn->next_same_src = out->out_conn[woutlet];
-      out->out_conn[woutlet] = outconn;
+      conn->next_same_src = out->out_conn[woutlet];
+      out->out_conn[woutlet] = conn;
     }
 
   if (! in->in_conn[winlet])
     {
-      outconn->next_same_dst = 0;
-      in->in_conn[winlet] = outconn;
+      conn->next_same_dst = 0;
+      in->in_conn[winlet] = conn;
     }
   else
     {
-      outconn->next_same_dst = in->in_conn[winlet];
-      in->in_conn[winlet] = outconn;
+      conn->next_same_dst = in->in_conn[winlet];
+      in->in_conn[winlet] = conn;
     }
 
-  return outconn;
+  return conn;
 }
 
 
@@ -200,7 +200,7 @@ fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts
    @@@ client that the connection has been deleted,
    */
 
-static void fts_object_do_disconnect(fts_connection_t *conn, int do_id)
+static void fts_object_do_disconnect(fts_connection_t *conn, int do_client)
 { 
   fts_object_t *src;
   fts_object_t *dst;
@@ -210,8 +210,11 @@ static void fts_object_do_disconnect(fts_connection_t *conn, int do_id)
   /* First, release the client representation of the connection,
      if any */
   
-  if (do_id && conn->id != FTS_NO_ID)
-    fts_client_release_connection(conn);
+  if (do_client)
+    {
+      if (conn->id != FTS_NO_ID)
+	fts_client_release_connection(conn);
+    }
 
   src = conn->src;
   dst  = conn->dst;
@@ -238,7 +241,7 @@ static void fts_object_do_disconnect(fts_connection_t *conn, int do_id)
 
   /* Unregister the connection */
 
-  if (do_id && conn->id != FTS_NO_ID)
+  if (do_client && conn->id != FTS_NO_ID)
     fts_connection_table_remove(conn->id);
 
   /* Free the connection, and return */
@@ -288,12 +291,23 @@ void fts_object_move_connections(fts_object_t *old, fts_object_t *new, int do_cl
 	      fts_connection_t *new_c;
 
 	      new_c = fts_connection_new(p->id, new, p->woutlet, p->dst, p->winlet);
-	      fts_connection_delete_ignore_id(p);
 
-	      /* Redefine the connection on the client side if needed*/
+	      if (new_c)
+		{
+		  fts_connection_delete_ignore_id(p);
 
-	      if (do_client && (new_c->id != FTS_NO_ID))
-		fts_client_redefine_connection(new_c);
+		  /* Redefine the connection on the client side if needed*/
+		  
+		  if (do_client && (new_c->id != FTS_NO_ID))
+		    fts_client_redefine_connection(new_c);
+		}
+	      else
+		{
+		  /* we got an error in redoing the connection,
+		     simply throw the old one away */
+
+		  fts_connection_delete(p);
+		}
 	    }
 	}
       else
@@ -319,12 +333,23 @@ void fts_object_move_connections(fts_object_t *old, fts_object_t *new, int do_cl
 	      fts_connection_t *new_c;
 
 	      new_c = fts_connection_new(p->id, p->src, p->woutlet, new, p->winlet);
-	      fts_connection_delete_ignore_id(p);
+	      
+	      if (new_c)
+		{
+		  fts_connection_delete_ignore_id(p);
 
-	      /* Redefine the connection on the client side if needed */
+		  /* Redefine the connection on the client side if needed */
 
-	      if (do_client && (new_c->id != FTS_NO_ID))
-		fts_client_redefine_connection(new_c);
+		  if (do_client && (new_c->id != FTS_NO_ID))
+		    fts_client_redefine_connection(new_c);
+		}
+	      else
+		{
+		  /* we got an error in redoing the connection,
+		     simply throw the old one away */
+
+		  fts_connection_delete(p);
+		}
 	    }
 	}
       else

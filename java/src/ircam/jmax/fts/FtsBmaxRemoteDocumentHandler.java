@@ -87,12 +87,12 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
 	FtsPatcherDocument obj = new FtsPatcherDocument();
 
 	// Temporary hack to force the patcher uploading; really, MDA should allow for 
-	// async edit of documents ...
+	// async edit of documents ... @@@@@@@@@@@@@@@
 
 	patcher.ask("data");
 	server.syncToFts();
 
-	obj.setRootData((MaxData) patcher);
+	obj.setRootData((MaxData) patcher.getData());
 	obj.setDocumentFile(file);
 	obj.setDocumentHandler(this);
 
@@ -106,7 +106,8 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
   {
     if (document instanceof FtsPatcherDocument) 
       {
-	Fts.getServer().savePatcherBmax((FtsObject) document.getRootData(), file.getAbsolutePath());
+	Fts.getServer().savePatcherBmax(((FtsPatcherData) document.getRootData()).getContainerObject(),
+					file.getAbsolutePath());
       }
     else
       throw new MaxDocumentException("Cannot save a " + document.getDocumentType() + " as Bmax file");
@@ -114,9 +115,10 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
 
   protected void saveSubDocument(MaxDocument document, MaxData data, File file) throws MaxDocumentException
   {
-    if ((document instanceof FtsPatcherDocument) && (data instanceof FtsObject))
+    if ((document instanceof FtsPatcherDocument) && (data instanceof FtsPatcherData))
       {
-	Fts.getServer().savePatcherBmax((FtsObject) data, file.getAbsolutePath());
+	Fts.getServer().savePatcherBmax(((FtsPatcherData) data).getContainerObject(),
+					file.getAbsolutePath());
       }
     else
       throw new MaxDocumentException("Cannot save a " + document.getDocumentType() + " as Bmax file");

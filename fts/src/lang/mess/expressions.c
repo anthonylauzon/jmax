@@ -76,7 +76,7 @@
 
 #define FTS_EXPR_MAX_SYMBOL_LENGTH 2048
 
-#define FTS_EXPR_MAX_DEPTH 256
+#define FTS_EXPR_MAX_DEPTH 32
 
 /* Operator priority */
 
@@ -306,33 +306,14 @@ static int fts_op_eval(fts_expression_state_t *e);
 static void fts_expression_add_assignement(fts_expression_state_t *e, fts_symbol_t name, fts_atom_t *value);
 static void fts_expression_add_var_ref(fts_expression_state_t *e, fts_symbol_t name);
 
+static fts_heap_t *expr_state_heap;
 
-static fts_expression_state_t *expr_state = 0;
-
-static fts_expression_state_t *fts_get_expression_state(fts_patcher_t *scope,
+static fts_expression_state_t *fts_expression_state_new(fts_patcher_t *scope,
 							int expr_size, const fts_atom_t *expr)
 {
-  if (expr_state == NULL)
-    {
-      expr_state = (fts_expression_state_t *) fts_malloc(sizeof(struct fts_expression_state));
-    }
-  else
-    {
-      /* Free the assignement list if still there */
+  fts_expression_state_t *expr_state;
 
-      fts_expression_assignement_t *p;
-
-      p = expr_state->assignements;
-
-      while (p)
-	{
-	  fts_expression_assignement_t *p2;
-      
-	  p2 = p;
-	  p = p->next;
-	  fts_heap_free((char *) p2, expr_prop_heap);
-	}
-    }
+  expr_state = (fts_expression_state_t *) fts_heap_alloc(expr_state_heap);
 
   value_stack_set_empty(expr_state);
   op_stack_set_empty(expr_state);
@@ -348,6 +329,45 @@ static fts_expression_state_t *fts_get_expression_state(fts_patcher_t *scope,
   return expr_state;
 }
 
+/* Must be called to free the expression state */
+
+void fts_expression_state_free(fts_expression_state_t *e)
+{
+  fts_expression_assignement_t *p;
+  fts_expr_var_ref_t *v;
+
+  /* Free the assignement list  */
+
+  p = e->assignements;
+
+  while (p)
+    {
+      fts_expression_assignement_t *p2;
+      
+      p2 = p;
+      p = p->next;
+      fts_heap_free((char *) p2, expr_prop_heap);
+    }
+
+  /* Free the used variable list */
+
+  v = e->var_refs;
+
+  while (v)
+    {
+      fts_expr_var_ref_t *v2;
+      
+      v2 = v;
+      v = v->next;
+      fts_heap_free((char *) v2, expr_var_ref_heap);
+    }
+
+  /* Free the expression state */
+
+  fts_heap_free((char *) e, expr_state_heap);
+}
+
+
 /*
   Evaluate a single expression.
   Put the result in the top of the value stack
@@ -356,7 +376,6 @@ static fts_expression_state_t *fts_get_expression_state(fts_patcher_t *scope,
 
   For the moment, due the '=' operator, may not return a value.
   */
-
 
 
 /* Macro to wrap around calls to fts_expression_eval_one and fts_op_eval *only* */
@@ -646,7 +665,7 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
  * substituted by one argument and some check more added to the basic parser.
  */
 
-/*static*/ int fts_expression_eval_simple(fts_expression_state_t *e)
+static int fts_expression_eval_simple(fts_expression_state_t *e)
 {
   int ret;
   int i;
@@ -1328,31 +1347,6 @@ const char *fts_expression_get_err_arg(fts_expression_state_t *e)
  *
  */
 
-/* Can be called once for each expression ! */
-
-fts_expression_assignement_t *fts_expression_get_assignements(fts_expression_state_t *e)
-{
-  fts_expression_assignement_t *p;
-
-  p = e->assignements;
-  e->assignements = 0;
-
-  return p;
-}
-
-void fts_expression_free_assignements(fts_expression_assignement_t *p)
-{
-  fts_expression_assignement_t *next;
-
-  while (p)
-    {
-      next = p->next;
-      fts_heap_free((char *) p, expr_prop_heap);
-      p = next;
-    }
-}
-
-
 static void fts_expression_add_assignement(fts_expression_state_t *e, fts_symbol_t name, fts_atom_t *value)
 {
   fts_expression_assignement_t *p;
@@ -1368,11 +1362,14 @@ static void fts_expression_add_assignement(fts_expression_state_t *e, fts_symbol
 
 /* return the number of assignements found */
 
-int fts_expression_map_to_assignements(fts_expression_assignement_t *p,
+int fts_expression_map_to_assignements(fts_expression_state_t *e, 
 				       void (* f)(fts_symbol_t name, fts_atom_t *value, void *data),
 				       void *data)
 {
+  fts_expression_assignement_t *p;
   int i;
+
+  p = e->assignements;
 
   i = 0;
   while (p)
@@ -1416,7 +1413,6 @@ void fts_expression_add_variables_user(fts_expression_state_t *e, fts_object_t *
       fts_variable_add_user(obj->patcher, p->name, obj);
 
       p = p->next;
-      fts_heap_free((char *) p2, expr_var_ref_heap);
     }
 
   e->var_refs = 0;
@@ -1453,7 +1449,9 @@ fts_expression_state_t *fts_expression_eval(fts_patcher_t *scope,
   fprintf(stderr, "\n");
 #endif
 
-  e = fts_get_expression_state(scope, expr_size, expr);
+  /* Calles of fts_expression_eval should free the resulting structure */
+
+  e = fts_expression_state_new(scope, expr_size, expr);
 
   while ((e->count < result_size) && (e->in < expr_size))
     {
@@ -1507,6 +1505,7 @@ fts_expressions_init(void)
 {
   expr_prop_heap    = fts_heap_new(sizeof(fts_expression_assignement_t));
   expr_var_ref_heap = fts_heap_new(sizeof(fts_expr_var_ref_t));
+  expr_state_heap = fts_heap_new(sizeof(fts_expression_state_t));
 
   fts_hash_table_init(&fts_expression_fun_table);
 

@@ -603,13 +603,16 @@ void fts_patcher_set_template(fts_patcher_t *this, fts_template_t *template)
 
 /* Methods: init put the pointers to zero */
 
-static void
-patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   int i;
   int ninlets, noutlets;
   fts_atom_t va;
   fts_patcher_t *this = (fts_patcher_t *) o;
+
+  /* allocate the data */
+
+  this->data = fts_patcher_data_new(this);
 
   fts_env_init(&(this->env), (fts_object_t *) this);
   fts_patcher_set_standard(this);
@@ -676,6 +679,11 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   fts_patcher_t *this = (fts_patcher_t *) o;
   fts_object_t *p;
+
+  /* If the data is still there, delete it */
+
+  if (this->data)
+    fts_patcher_data_free(this->data);
 
   /* If it is a template, remove it from the template instance list */
 
@@ -763,7 +771,9 @@ patcher_put_noutlets(fts_daemon_action_t action, fts_object_t *obj,
 static void patcher_get_data(fts_daemon_action_t action, fts_object_t *obj,
 			     int idx, fts_symbol_t property, fts_atom_t *value)
 {
-  fts_set_object(value, (fts_object_t *) obj);
+  fts_patcher_t *this = (fts_patcher_t *) obj;
+
+  fts_set_data(value, (fts_data_t *) (this->data));
 }
 
 /* Class instantiation */
@@ -862,17 +872,18 @@ fts_patcher_t *fts_patcher_redefine_description(fts_patcher_t *this, int aoc, co
 
   fts_set_atom_array(&va, this->args);
 
-  {
-    fts_expression_assignement_t *p = fts_expression_get_assignements(e);
-    fts_expression_map_to_assignements(p, fts_patcher_assign_variable, (void *) this);
-    fts_expression_free_assignements(p);
-  }
+  fts_expression_map_to_assignements(e, fts_patcher_assign_variable, (void *) this);
 
   fts_variable_restore(this, fts_s_args, &va, (fts_object_t *)this);
 
   /* 4- register the patcher as user of the used variables */
 
   fts_expression_add_variables_user(e, (fts_object_t *)this);
+
+  /* Free the expression state structure */
+
+  if (e)
+    fts_expression_state_free(e);
 
   /* 5- undefine all the locals that are still suspended  */
 
@@ -1153,7 +1164,7 @@ static int fts_patcher_count_outlet_objects(fts_patcher_t *this)
 {
   int i = 0;
   fts_object_t *p;
-
+  
   for (p = this->objects; p ; p = p->next_in_patcher)
     if (fts_object_is_outlet(p))
       i++;

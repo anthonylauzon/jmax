@@ -1,11 +1,9 @@
 SOURCES = \
 	Fts.java			\
-	FtsAbstractionObject.java	\
 	FtsBmaxRemoteDocumentHandler.java		\
 	FtsClientProtocol.java		\
 	FtsCommentObject.java		\
 	FtsConnection.java		\
-	FtsContainerObject.java		\
 	FtsDatagramClientPort.java	\
 	FtsDatagramPort.java		\
 	FtsDotPatRemoteDocumentHandler.java		\
@@ -37,7 +35,6 @@ SOURCES = \
 	FtsServer.java			\
 	FtsSocketPort.java		\
 	FtsSocketServerPort.java	\
-	FtsStandardObject.java		\
 	FtsSubProcessPort.java		\
 	FtsUpdateGroupListener.java    \
 	FtsVoid.java

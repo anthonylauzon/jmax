@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.46 $ IRCAM $Date: 1998/10/15 12:36:41 $
+ *      $Revision: 1.47 $ IRCAM $Date: 1998/10/15 16:59:36 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -469,15 +469,16 @@ fts_object_t *fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *
 
   if (e && (! fts_object_is_error(obj)) && (! fts_object_is_template(obj)))
     {
-      fts_expression_assignement_t *p = fts_expression_get_assignements(e);
-
       if (fts_object_is_patcher(obj))
-	fts_expression_map_to_assignements(p, fts_patcher_assign_variable, (void *) obj);
+	fts_expression_map_to_assignements(e, fts_patcher_assign_variable, (void *) obj);
       else
-	fts_expression_map_to_assignements(p, fts_object_assign_property, (void *) obj);
-
-      fts_expression_free_assignements(p);
+	fts_expression_map_to_assignements(e, fts_object_assign_property, (void *) obj);
     }
+
+  /* Free the expression state structure if any */
+
+  if (e)
+    fts_expression_state_free(e);
 
   /* then, assign it to the variable if any */
 
@@ -486,6 +487,7 @@ fts_object_t *fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *
       fts_variable_restore(patcher, var, &state, obj);
       obj->varname = var;
     }
+
 
   /* Finally, assign the error property;
      Always present, and always explicit for the moment,
@@ -803,18 +805,19 @@ static void fts_object_do_delete(fts_object_t *obj, int release)
 	fts_connection_delete(p);
     }
 
-  /* Now Tell the client to release the Java part */
 
-  if (release && (obj->id != FTS_NO_ID))
-    fts_client_release_object(obj);
-
-  /* Delete the object from the patcher */
+  /* Delete the object from the patcher and the patcher data !*/
 
   /* Some internal object don't necessarly have a patcher,
      (they should be put in the root patcher ??) */
 
   if (obj->patcher)
     fts_patcher_remove_object(obj->patcher, obj);
+
+  /* Now Tell the client to release the Java part */
+
+  if (release && (obj->id != FTS_NO_ID))
+    fts_client_release_object(obj);
 
   /* remove the object from the object table */
 

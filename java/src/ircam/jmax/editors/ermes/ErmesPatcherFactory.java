@@ -12,7 +12,7 @@ public class ErmesPatcherFactory implements MaxDataEditorFactory {
 
   public boolean canEdit(MaxData data)
   {
-    return data instanceof FtsContainerObject;
+    return data instanceof FtsPatcherData;
   }
 
   //
@@ -21,6 +21,6 @@ public class ErmesPatcherFactory implements MaxDataEditorFactory {
 
   public MaxDataEditor newEditor(MaxData theData) 
   {
-    return new ErmesDataEditor( (FtsContainerObject)theData);
+    return new ErmesDataEditor( (FtsPatcherData)theData);
   }
 }

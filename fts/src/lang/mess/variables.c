@@ -141,7 +141,7 @@ static void fts_binding_suspend(fts_binding_t *var)
       fprintf(stderr, "Suspend Binding for variable %s\n", fts_symbol_name(var->name));
     }
 
-  fprintf(stderr, "Suspending users variables :\n");
+  fprintf(stderr, "Suspending variable users:\n");
 #endif
 
   var->suspended = 1;

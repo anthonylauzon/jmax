@@ -1,5 +1,5 @@
-
 package ircam.jmax.utils;
+
 import java.util.*;
 
 public class List {

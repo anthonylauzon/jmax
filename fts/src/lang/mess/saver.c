@@ -944,7 +944,9 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx, int to
   i = 0;
   for (p = patcher->objects; p ; p = p->next_in_patcher)
     {
-      if (fts_object_is_patcher(p) && (! fts_object_is_abstraction(p)))
+      if (fts_object_is_patcher(p) &&
+	  (! fts_object_is_abstraction(p)) &&
+	  (! fts_object_is_template(p)))
 	{
 	  /* Save the object recursively as a patcher, and then pop it from the stack */
 

@@ -183,34 +183,19 @@ void fts_client_upload_object(fts_object_t *obj)
   if (obj->patcher && ((fts_object_t *)obj->patcher)->id == FTS_NO_ID)
     fts_client_upload_object((fts_object_t *) obj->patcher);
 
-  if (fts_object_is_abstraction(obj) || fts_object_is_template(obj))
-    {
-      /* Send the abstraction object */
+  /* NEW  (obj)pid (int)new-id [<args>]+ */
 
-      /* NEW_ABSTRACTION  (obj)pid (int)new-id [<args>]+ */
-
-      fts_client_mess_start_msg(NEW_ABSTRACTION_CODE);
-      fts_client_mess_add_object((fts_object_t *) obj->patcher);
-      fts_client_mess_add_long(obj->id);
-      fts_client_mess_add_atoms(obj->argc, obj->argv);
-      fts_client_mess_send_msg();
-    }
+  fts_client_mess_start_msg(NEW_OBJECT_CODE);
+  fts_client_mess_add_object((fts_object_t *) obj->patcher);
+  
+  if (obj->patcher)
+    fts_client_mess_add_data((fts_data_t *) obj->patcher->data);
   else
-    {
-      /* Send the object */
+    fts_client_mess_add_data((fts_data_t *) 0);
 
-      /* NEW  (obj)pid (int)new-id [<args>]+ */
-
-      fts_client_mess_start_msg(NEW_OBJECT_CODE);
-      fts_client_mess_add_object((fts_object_t *) obj->patcher);
-      fts_client_mess_add_long(obj->id);
-      fts_client_mess_add_atoms(obj->argc, obj->argv);
-      fts_client_mess_send_msg();
-    }
-
-  /* if (fts_object_get_patcher(obj) && fts_patcher_is_open(fts_object_get_patcher(obj)))
-     fts_object_send_properties(obj);
-     */
+  fts_client_mess_add_long(obj->id);
+  fts_client_mess_add_atoms(obj->argc, obj->argv);
+  fts_client_mess_send_msg();
 
   fts_object_send_properties(obj);
 
@@ -229,6 +214,12 @@ void fts_client_upload_connection(fts_connection_t *c)
     fts_connection_table_register(c);
 
   fts_client_mess_start_msg(NEW_CONNECTION_CODE);
+
+  if (c->src->patcher)
+    fts_client_mess_add_data((fts_data_t *) c->src->patcher->data);
+  else
+    fts_client_mess_add_data((fts_data_t *) 0);
+
   fts_client_mess_add_long(c->id);
   fts_client_mess_add_object(c->src);
   fts_client_mess_add_long(c->woutlet);
@@ -237,36 +228,6 @@ void fts_client_upload_connection(fts_connection_t *c)
   fts_client_mess_send_msg();
 }
 
-
-void fts_client_upload_patcher_content(fts_patcher_t *patcher)
-{
-  fts_object_t *p;
-
-  /* When uploading a patcher content, we upload only the objects
-     and connections that don't have yet an ID */
-
-  /* upload all the objects */
-
-  for (p = patcher->objects; p ; p = p->next_in_patcher)
-    if (p->id == FTS_NO_ID)
-      fts_client_upload_object(p);
-
-  /* For each object, for each outlet, upload all the connections */
-
-  for (p = patcher->objects; p ; p = p->next_in_patcher)
-    {
-      int outlet;
-
-      for (outlet = 0; outlet < fts_object_get_outlets_number(p); outlet++)
-	{
-	  fts_connection_t *c;
-
-	  for (c = p->out_conn[outlet]; c ; c = c->next_same_src)
-	    if (c->id == FTS_NO_ID)
-	      fts_client_upload_connection(c);
-	}
-    }
-}
 
 /* Handling of connections and object release and refine */
 

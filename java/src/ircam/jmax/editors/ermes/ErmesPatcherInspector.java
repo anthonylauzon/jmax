@@ -14,7 +14,7 @@ class ErmesPatcherInspector extends Frame {
   // The only function actually needed: a static call to create (or re-assign) an inspector, given a patcher
   //
 
-  public static void inspect( FtsContainerObject thePatcher) 
+  public static void inspect( FtsObject thePatcher) 
   {
     if (itsInspector == null) 
       itsInspector = new ErmesPatcherInspector( thePatcher);
@@ -23,10 +23,10 @@ class ErmesPatcherInspector extends Frame {
   }
 
   TextField itsInsField, itsOutsField;
-  FtsContainerObject itsPatcherObject = null;
+  FtsObject itsPatcherObject = null;
 
 
-  public ErmesPatcherInspector(FtsContainerObject thePatcher) 
+  public ErmesPatcherInspector(FtsObject thePatcher) 
   {
     super("Inspector for patcher " + thePatcher.getObjectName());
     
@@ -114,7 +114,7 @@ class ErmesPatcherInspector extends Frame {
     reInit(thePatcher);
   }
 
-  public void reInit( FtsContainerObject thePatcher)
+  public void reInit( FtsObject thePatcher)
   {
     itsInsField.setText( String.valueOf(thePatcher.getNumberOfInlets()));
     itsOutsField.setText( String.valueOf(thePatcher.getNumberOfOutlets()));

@@ -11,7 +11,7 @@ public class ErmesDataEditor extends AbstractMaxDataEditor
 {
   private ErmesSketchWindow window = null;
   
-  public ErmesDataEditor(FtsContainerObject p)
+  public ErmesDataEditor(FtsPatcherData p)
   {
     super(p);
 
@@ -37,7 +37,7 @@ public class ErmesDataEditor extends AbstractMaxDataEditor
       {
 	window.setVisible(true);
 	window.toFront();
-	window.itsPatcher.startUpdates();
+	window.itsPatcherData.startUpdates();
       }
   }
 

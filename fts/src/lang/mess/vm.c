@@ -84,11 +84,11 @@
                       // with inlet (Top - 1 of evaluation stack) of object (top - 1 of obejct stack)
 
    RETURN            // Return from the current VM execution
-                     // the current top of the object stack is return 
-		     // by the C function
+                     // the current top of the object stack is returned
+		     // by the C function; the stack is popped by one.
    */
 
-/* #define  VM_DEBUG */
+/* #define  VM_DEBUG  */
 
 #ifdef DEBUG
 #define  VM_SAFE
@@ -203,11 +203,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 
 
   if (e)
-    {
-      fts_expression_assignement_t *p = fts_expression_get_assignements(e);
-      lambda = fts_expression_map_to_assignements(p, fts_object_push_assignement, 0);
-      fts_expression_free_assignements(p);
-    }
+    lambda = fts_expression_map_to_assignements(e, fts_object_push_assignement, 0);
   else
     lambda = 0;
 
@@ -987,7 +983,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    if (object_tos == OBJECT_STACK_DEPTH)
 	      return 0;
 	    else
-	      return object_stack[object_tos];
+	      return object_stack[object_tos++];
 	  }
 	}
 

@@ -16,19 +16,19 @@ public class FtsPatcherDocument extends MaxDocument
     super(Mda.getDocumentTypeByName("patcher"));
   }
 
-  public void setRootData(MaxData patcher)
+  public void setRootData(MaxData data)
   {
-    super.setRootData(patcher);
-    ((FtsContainerObject) patcher).setDocument(this);
+    super.setRootData(data);
+    ((FtsPatcherData) data).getContainerObject().setDocument(this);
   }
 
   public void dispose()
   {
     super.dispose();
 
-    FtsContainerObject patcher;
+    FtsObject patcher;
 
-    patcher = (FtsContainerObject) getRootData();
+    patcher = ((FtsPatcherData) getRootData()).getContainerObject();
     patcher.delete();
   }
 }

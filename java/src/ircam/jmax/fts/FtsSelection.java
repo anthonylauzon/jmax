@@ -32,7 +32,7 @@ public class FtsSelection  extends FtsObject
    * Create a Fts selection;
    */
 
-  protected  FtsSelection(FtsContainerObject parent, String className, String description, int objId)
+  protected  FtsSelection(FtsObject parent, String className, String description, int objId)
   {
     super(parent, className, description, objId);
   }

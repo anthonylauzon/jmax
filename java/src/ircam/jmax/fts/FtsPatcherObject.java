@@ -14,7 +14,7 @@ import ircam.jmax.utils.*;
  * FTS instantiation 
  */
 
-public class FtsPatcherObject extends FtsContainerObject
+public class FtsPatcherObject extends FtsObject
 {
   /*****************************************************************************/
   /*                                                                           */
@@ -27,7 +27,7 @@ public class FtsPatcherObject extends FtsContainerObject
    */
 
 
-  public FtsPatcherObject(FtsContainerObject parent, String description, int objId)
+  public FtsPatcherObject(FtsObject parent, String description, int objId)
   {
     super(parent, "jpatcher", description, objId);
   }

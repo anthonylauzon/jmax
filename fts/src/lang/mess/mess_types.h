@@ -47,6 +47,7 @@ typedef struct fts_class_mess   fts_class_mess_t;
 typedef struct fts_connection   fts_connection_t;
 typedef struct fts_inlet_decl   fts_inlet_decl_t;
 typedef struct fts_outlet_decl  fts_outlet_decl_t;
+typedef struct fts_patcher_data fts_patcher_data_t;
 typedef struct fts_patcher      fts_patcher_t;
 typedef struct fts_inlet        fts_inlet_t;
 typedef struct fts_outlet       fts_outlet_t;
@@ -394,6 +395,10 @@ struct fts_patcher
   /* If this patcher is a template, point to the template definition */
 
   fts_template_t *template;
+
+  /* The pointer to the patcher data  */
+
+  fts_patcher_data_t *data;
 
   /* Variables */
 

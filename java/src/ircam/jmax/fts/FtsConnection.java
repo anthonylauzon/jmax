@@ -26,7 +26,7 @@ public class FtsConnection
 
   /** Create a FTS connection.  */
 
-  FtsConnection(int id, FtsObject from, int outlet, FtsObject to, int inlet)
+  FtsConnection(FtsPatcherData data, int id, FtsObject from, int outlet, FtsObject to, int inlet)
   {
     super();
    
@@ -36,7 +36,8 @@ public class FtsConnection
     this.to     = to;
     this.inlet  = inlet;
 
-    from.getParent().addConnectionToContainer(this);
+    if (data != null)
+      data.addConnection(this);
   }
 
   void redefine(FtsObject from, int outlet, FtsObject to, int inlet)
@@ -92,11 +93,11 @@ public class FtsConnection
 
     deleted = true;
 
-    from.setDirty();
-    to.setDirty();
+    from.setDirty(); // from and to must be in the same document !!
+
+    if (from.getPatcherData() != null)
+      from.getPatcherData().removeConnection(this);
 	
-    from.getParent().removeConnectionFromContainer(this);
-    
     // Clean up
 
     from = null;

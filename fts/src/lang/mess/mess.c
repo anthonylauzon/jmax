@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.16 $ IRCAM $Date: 1998/08/25 12:52:19 $
+ *      $Revision: 1.17 $ IRCAM $Date: 1998/09/16 20:48:59 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -73,6 +73,10 @@ fts_mess_init(void)
   /* Initialize the message event/error system */
 
   fts_events_init();
+
+  /* Create the patcher data */
+
+  fts_patcher_data_config();
 
   /* Create the patcher class */
 

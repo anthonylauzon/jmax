@@ -119,7 +119,7 @@ class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandl
   // ----------------------------------------
   public void inspect() 
   {
-    ErmesPatcherInspector.inspect( (FtsContainerObject) itsFtsObject);
+    // ErmesPatcherInspector.inspect( (FtsContainerObject) itsFtsObject);
   }
 
   //--------------------------------------------------------

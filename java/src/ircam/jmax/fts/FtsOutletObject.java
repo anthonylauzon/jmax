@@ -22,7 +22,7 @@ public class FtsOutletObject  extends FtsObject
 
   int position;
 
-  public FtsOutletObject(FtsContainerObject parent, int position, int objId)
+  public FtsOutletObject(FtsObject parent, int position, int objId)
   {
     super(parent, "outlet", "outlet " + position, objId);
 

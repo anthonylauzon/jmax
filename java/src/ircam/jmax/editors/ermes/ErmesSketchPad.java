@@ -78,7 +78,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   }
 
   ErmesSketchWindow itsSketchWindow;
-  FtsContainerObject itsPatcher;
+  FtsObject itsPatcher;
+  FtsPatcherData itsPatcherData;
 
   private final static int SKETCH_WIDTH = 1200;
   private final static int SKETCH_HEIGHT = 1200;
@@ -776,10 +777,10 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     paintDirtyList();
   }
   
-  void InitFromFtsContainer( FtsContainerObject theContainerObject)
+  void InitFromFtsContainer( FtsPatcherData theContainerObject)
   {
-    FtsContainerObject aFtsPatcher = theContainerObject;
-    MaxVector objectVector = aFtsPatcher.getObjects();	//usefull?
+    FtsPatcherData aFtsPatcherData = theContainerObject;
+    MaxVector objectVector = aFtsPatcherData.getObjects();	//usefull?
     FtsObject	fo;
     FtsConnection fc;
 
@@ -787,7 +788,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       AddObject( (FtsObject)e.nextElement());
 		
     // chiama tanti AddConnection...
-    MaxVector connectionVector = aFtsPatcher.getConnections();	//usefull?
+    MaxVector connectionVector = aFtsPatcherData.getConnections();	//usefull?
     ErmesObject fromObj, toObj;
     ErmesConnection aConnection = null;
     
@@ -867,11 +868,13 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   //--------------------------------------------------------
   //	CONSTRUCTOR
   //--------------------------------------------------------
-  ErmesSketchPad( ErmesSketchWindow theSketchWindow, FtsContainerObject thePatcher) 
+  ErmesSketchPad( ErmesSketchWindow theSketchWindow, FtsPatcherData thePatcherData) 
   {
     super();
 
-    itsPatcher = thePatcher;
+    itsPatcherData = thePatcherData;
+    itsPatcher = thePatcherData.getContainerObject(); // ???
+
     Fts.getServer().addUpdateGroupListener( this);
 
     setLayout( null);
@@ -906,7 +909,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 		       Font.PLAIN, 
 		       ircam.jmax.utils.Platform.FONT_SIZE));
 
-    InitFromFtsContainer( itsPatcher);
+    InitFromFtsContainer( itsPatcherData);
     PrepareInChoice(); 
     PrepareOutChoice();
   }
@@ -2962,11 +2965,5 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
     if (waiting <= 0)
       setCursor( Cursor.getDefaultCursor());
-  }
-
-  // @@@@ TEMPORARY !!!!
-  public void finalize()
-  {
-    System.err.println("ErmesSketchPad say goodby");
   }
 }

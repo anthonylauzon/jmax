@@ -24,7 +24,7 @@ public class FtsMessageObject extends FtsObject
    * Create a FtsObject object;
    */
 
-  public FtsMessageObject(FtsContainerObject parent, String description, int objId)
+  public FtsMessageObject(FtsObject parent, String description, int objId)
   {
     super(parent, "messbox", description, objId);
 
