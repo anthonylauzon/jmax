@@ -105,7 +105,7 @@ dnl Set platform specifics
 case "$host" in
 
 dnl GNU/Linux on an Intel or compatible
-i*86-pc-linux-gnu)
+i*86-*-linux*)
 PLATFORM=linux
 CFLAGS="$CFLAGS -Wall -Wno-unused -mpentiumpro"
 if test "$with_debug" != "yes"
