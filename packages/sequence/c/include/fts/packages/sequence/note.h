@@ -50,6 +50,9 @@ enum scoob_type_enum
 extern fts_class_t *scoob_class;
 extern enumeration_t *scoob_type_enumeration;
 
+#define scoob_set_type(s, x) ((s)->type = (x))
+#define scoob_get_type(s) ((s)->type)
+
 #define scoob_set_pitch(s, x) ((s)->pitch = (x))
 #define scoob_get_pitch(s) ((s)->pitch)
 
