@@ -372,7 +372,7 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
   int n_rows = 0;
   int n_cols = 0;
 
-  public final static int DICT_DEFAULT_WIDTH  = 200;
+  public final static int DICT_DEFAULT_WIDTH  = 300;
   public final static int DICT_DEFAULT_HEIGHT = 200;
   static Dimension defaultSize = new Dimension(DICT_DEFAULT_WIDTH, DICT_DEFAULT_HEIGHT);  
 }
