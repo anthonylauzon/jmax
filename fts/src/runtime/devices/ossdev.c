@@ -26,7 +26,7 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <linux/soundcard.h>
-
+#include <errno.h>
 
 #include "sys.h"
 #include "lang.h"

@@ -96,4 +96,4 @@ proc openDefaultMidi  { device } {
 ## Builtin  devices
 ## 
 
-defineDevice profile {prof_out as prof_dac channels 2} "Profile Dac"
+defineDevice profile {prof_dac channels 2} "Profile Dac"

@@ -181,6 +181,19 @@ fts_assign_boot_devices(int argc, char **argv)
 
   fts_open_logical_device(fts_new_symbol("client"), 0, 0,
 			  class_name, pd_argc, pd_argv);
+
+  /* Open the null~ device as audio out; this
+     will prevent fts taking 100% CPU time by running
+     unsyncronized */
+
+  {
+    fts_atom_t ld_argv[1];
+
+    fts_set_symbol(&ld_argv[0], fts_new_symbol("foo"));
+
+    fts_open_logical_device(fts_new_symbol("out~"), 1, ld_argv,
+			    fts_new_symbol("null~"), 0, 0);
+  }
 }
 
 

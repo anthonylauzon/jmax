@@ -10,6 +10,8 @@ import javax.swing.border.*;
 import javax.swing.plaf.*;
 
 import ircam.jmax.*;
+import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.toolkit.*;
@@ -24,6 +26,7 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
   CardLayout cardLayout;
   JPanel cards;
   JToggleButton lockEditButton;
+  JButton upButton;
 
   JToggleButton itsLastPressed;
 
@@ -52,6 +55,27 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
     });
 
     add( lockEditButton, BorderLayout.WEST);
+
+
+    upButton = new JButton(IconCache.getIcon( path + "tool_up.gif"));
+    upButton.setDoubleBuffered( false);
+    upButton.setMargin( new Insets(0,0,0,0));
+    upButton.addActionListener( new ActionListener() {
+      public void actionPerformed( ActionEvent e)
+	{
+	  if (itsSketchPad.itsPatcher.getParent() != null)
+	    {
+	      itsSketchPad.waiting();
+	      Fts.editPropertyValue(itsSketchPad.itsPatcher.getParent(), itsSketchPad.itsPatcher, 
+				    new MaxDataEditorReadyListener()
+				    {
+				      public void editorReady(MaxDataEditor editor)
+					{itsSketchPad.stopWaiting();}
+				    });
+	    }
+	}});
+
+    add( upButton, BorderLayout.EAST);
 
     cards = new JPanel();
     cards.setBorder( new EmptyBorder( 0, 0, 0, 0));
