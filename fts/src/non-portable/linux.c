@@ -39,7 +39,7 @@
 #include <sys/types.h>
 #include <errno.h>
 
-#include <fts/sys/hw.h>
+#include <fts/sys.h>
 
 
 /* *************************************************************************** */
