@@ -201,15 +201,17 @@ fts_status_t fts_bmax_file_load( const char *name, fts_object_t *parent, int ac,
 {
   FILE *f;
   fts_binary_file_descr_t descr;
+  fts_status_t result;
 
   if ( !(f = fopen( name, "rb")))
     return fts_cannot_open_file_error;
 
-  if ((status = fts_binary_file_map(f, &descr)) != fts_ok)
+  result = fts_binary_file_map(f, &descr);
+  if (result != fts_ok)
     {
       fclose(f);
       post("fts_bmax_file_load: Cannot load jMax max file %s\n", name);
-      return status;
+      return result;
     }
 
   fclose(f);
@@ -230,14 +232,16 @@ fts_status_t fts_bmax_file_load( const char *name, fts_object_t *parent, int ac,
 fts_status_t fts_bmax_filedesc_load( FILE *f, fts_object_t *parent, int ac, const fts_atom_t *at, fts_object_t **ret)
 {
   fts_binary_file_descr_t descr;
+  fts_status_t result;
 
   /* Rewind the file */
 
   fseek(f, 0, SEEK_SET);
 
   /* Read it */
-  if (fts_binary_file_map(f, &descr) < 0)
-    return 0;
+  result = fts_binary_file_map(f, &descr);
+  if (result != fts_ok)
+    return result;
 
   /* Eval it */
   *ret = fts_run_mess_vm(parent, &descr, ac, at);
