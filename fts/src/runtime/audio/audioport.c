@@ -211,7 +211,7 @@ static void audioportin_init( fts_object_t *o, int winlet, fts_symbol_t s, int a
   ac--;
   at++;
 
-  post( "Creating object audioportin for audioport \"%s\"\n", fts_object_get_class_name( o));
+  post( "Creating object audioportin for audioport \"%s\"\n", fts_symbol_name(fts_object_get_class_name( o)));
   
   if ( ac == 1 && fts_is_ptr( at))
     this->port = (fts_audioport_t *)fts_get_ptr( at);
@@ -221,7 +221,7 @@ static void audioportin_init( fts_object_t *o, int winlet, fts_symbol_t s, int a
 
 static void audioportin_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  post( "Deleting object audioportin for audioport \"%s\"\n", fts_object_get_class_name( o));
+  post( "Deleting object audioportin for audioport \"%s\"\n", fts_symbol_name(fts_object_get_class_name( o)));
 
   fts_dsp_remove_object(o);
 }
@@ -291,7 +291,7 @@ static void audioportout_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 {
   fts_audioportout_t *this = (fts_audioportout_t *)o;
 
-  post( "Creating object audioportout for audioport \"%s\"\n", fts_object_get_class_name( o));
+  post( "Creating object audioportout for audioport \"%s\"\n", fts_symbol_name( fts_object_get_class_name( o)));
 
   ac--;
   at++;
@@ -304,7 +304,7 @@ static void audioportout_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 
 static void audioportout_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  post( "Deleting object audioportout for audioport \"%s\"\n", fts_object_get_class_name( o));
+  post( "Deleting object audioportout for audioport \"%s\"\n", fts_symbol_name( fts_object_get_class_name( o)));
 
   fts_dsp_remove_object(o);
 }
