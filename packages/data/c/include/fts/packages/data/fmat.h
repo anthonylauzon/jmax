@@ -98,7 +98,10 @@ DATA_API fts_class_t *fmat_type;
 /**
 * @ingroup fmat
  */
+DATA_API void fmat_reshape(fmat_t *fmat, int m, int n);
 DATA_API void fmat_set_size(fmat_t *fmat, int m, int n);
+DATA_API void fmat_set_m(fmat_t *fmat, int m);
+DATA_API void fmat_set_n(fmat_t *fmat, int n);
 
 /**
 * @fn float *fmat_get_ptr(fmat_t *x)

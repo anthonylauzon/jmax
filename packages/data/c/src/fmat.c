@@ -95,70 +95,286 @@ fmat_format_get_by_name(fts_symbol_t name)
   return NULL;
 }
 
+/* correct fmat format (if needed) */
+static void
+fmat_adapt_format(fmat_t *self)
+{
+  int n = self->n;
+  
+  if(n == 1)
+    self->format = fmat_format_vec;
+  else 
+  {
+    int format_n = fmat_format_get_n(self->format);
+    
+    switch(fmat_format_get_id(self->format))
+    {
+      case fmat_format_id_vec:
+        if(n > 1)
+          self->format = fmat_format_real;
+        break;        
+        
+      case fmat_format_id_rect:
+      case fmat_format_id_polar:        
+        if(n != 2)
+          self->format = fmat_format_real;
+        break;
+        
+      default:
+        if(n < format_n)
+          self->format = fmat_format_real;
+        break;
+    }    
+  }
+}
+
 /********************************************************
 *
 *  utility functions
 *
 */
 
-#define HEAD_POINTS 2
-#define TAIL_POINTS 2
+#define HEAD_ROWS 2 /* extra points for interpolation at start of vector */
+#define TAIL_ROWS 2 /* extra points for interpolation at end of vector */
+#define HEAD_TAIL_COLS 2 /* interpolation head and tail for 1 or 2 column vectors only */
+#define HEAD_POINTS (HEAD_TAIL_COLS * HEAD_ROWS)
+#define TAIL_POINTS (HEAD_TAIL_COLS * TAIL_ROWS)
 
 void
-fmat_set_size(fmat_t *mat, int m, int n)
+fmat_reshape(fmat_t *self, int m, int n)
 {
   int size, i;
-
+  
   if(n <= 0)
     n = 1;
   
   size = m * n;
   
-  if(size > mat->alloc)
+  if(size > self->alloc)
   {
-    if(mat->values == NULL)
-      mat->values = (float *)fts_malloc(n * (m + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
-    else
-      mat->values = (float *)fts_realloc((mat->values - mat->n * HEAD_POINTS), n * (m + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
-  
-    mat->values += n * HEAD_POINTS;
-    mat->alloc = size;
-
-    /* zero head and tail for cubic interpolation */
-    for(i=1; i<=n*HEAD_POINTS; i++)
-      mat->values[-i] = 0.0;
-
-    for(i=0; i<n*TAIL_POINTS; i++)
-      mat->values[size + i] = 0.0;
-  }
-
-  mat->m = m;
-  mat->n = n;
-  
-  if(n == 1)
-    mat->format = fmat_format_vec;
-  else 
-  {
-    int format_n = fmat_format_get_n(mat->format);
-    
-    switch(fmat_format_get_id(mat->format))
+    if(self->values == NULL)
     {
-      case fmat_format_id_vec:
-        if(n > 1)
-          mat->format = fmat_format_real;
-        break;        
+      self->values = (float *)fts_malloc((size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
+      
+      /* zero head */
+      /* for(i=0; i<HEAD_POINTS; i++)
+      self->values[i] = 0.0; */
+      self->values[0] = self->values[1] = self->values[2] = self->values[3] = 0.0;
+    }
+    else
+      self->values = (float *)fts_realloc(self->values - HEAD_POINTS, (size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
         
-      case fmat_format_id_rect:
-      case fmat_format_id_polar:        
-        if(n != 2)
-          mat->format = fmat_format_real;
-        break;
+    self->values += HEAD_POINTS;
+    self->alloc = size;
+  }
+  
+  /* zero tail */
+  /* for(i=0; i<TAIL_POINTS; i++) self->values[size + i] = 0.0; */
+  self->values[size + 0] = self->values[size + 1] = self->values[size + 2] = self->values[size + 3] = 0.0;
+  
+  self->m = m;
+  self->n = n;
+  
+  fmat_adapt_format(self);
+}
+
+void
+fmat_set_m(fmat_t *self, int m)
+{
+  int size = m * self->n;
+  int i;
+  
+  if(m > self->m)
+  {
+    if(self->values == NULL)
+    {
+      self->values = (float *)fts_malloc((size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
+
+      /* zero head */
+      /* for(i=0; i<HEAD_POINTS; i++) self->values[i] = 0.0; */
+      self->values[0] = self->values[1] = self->values[2] = self->values[3] = 0.0;    
+    }
+    else
+      self->values = (float *)fts_realloc(self->values - HEAD_POINTS, (size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
+    
+    self->values += HEAD_POINTS;
+    self->alloc = size;
+  }
+  
+  /* zero new rows at end (if any) */
+  for(i=self->m*self->n; i<size; i++)
+    self->values[i] = 0.0;
+    
+  /* zero tail */
+  /* for(i=0; i<TAIL_POINTS; i++) self->values[size + i] = 0.0; */
+  self->values[size + 0] = self->values[size + 1] = self->values[size + 2] = self->values[size + 3] = 0.0;    
+  
+  self->m = m;
+}
+
+void
+fmat_set_n(fmat_t *self, int n)
+{
+  int m = self->m;
+  int old_n = self->n;
+  
+  if(n <= 0)
+    n = 1;
+  
+  if(n != old_n)
+  {
+    int size = m * n;
+    int i, j;
+  
+    if(n > old_n)
+    {
+      if(self->values == NULL)
+      {
+        self->values = (float *)fts_malloc((size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
         
-      default:
-        if(n < format_n)
-          mat->format = fmat_format_real;
-        break;
-    }    
+        /* zero head */
+        /* for(i=0; i<HEAD_POINTS; i++) self->values[i] = 0.0; */
+        self->values[0] = self->values[1] = self->values[2] = self->values[3] = 0.0;    
+      }
+      else
+        self->values = (float *)fts_realloc(self->values - HEAD_POINTS, (size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
+      
+      self->values += HEAD_POINTS;
+      self->alloc = size;
+
+      /* copy values (from last to first row) */
+      for(i=m-1; i>=1; i--)
+      {
+        float *old_row = self->values + i * old_n;
+        float *new_row = self->values + i * n;
+        
+        /* copy old rows */
+        for(j=old_n-1; j>=0; j--)
+          new_row[j] = old_row[j];
+      }
+      
+      /* complete rows by zeros */
+      for(i=0; i<m; i++)
+      {
+        float *row = self->values + i * n;
+        
+        /* zero end of new rows */
+        for(j=old_n; j<n; j++)
+          row[j] = 0.0;
+      }
+    }
+    else /* if(n < old_n) */
+    {
+      /* copy and shorten rows */
+      for(i=1; i<m; i++)
+      {
+        float *old_row = self->values + i * old_n;
+        float *new_row = self->values + i * n;
+        
+        /* copy beginning of old rows */
+        for(j=0; j<n; j++)
+          new_row[j] = old_row[j];
+      }
+    }
+    
+    /* zero tail */
+    /* for(i=0; i<TAIL_POINTS; i++) self->values[size + i] = 0.0; */
+    self->values[size + 0] = self->values[size + 1] = self->values[size + 2] = self->values[size + 3] = 0.0;    
+    self->n = n;
+    
+    fmat_adapt_format(self);
+  }
+}
+
+void
+fmat_set_size(fmat_t *self, int m, int n)
+{
+  int old_m = self->m;
+  int old_n = self->n;
+  int min_m, min_n;
+  
+  if(n <= 0)
+    n = 1;
+  
+  if(n == old_n)
+    fmat_set_m(self, m);
+  else if(m == old_m)
+    fmat_set_n(self, n);
+  else
+  {
+    int size, i, j;
+    
+    size = m * n;
+
+    min_m = (m < old_m)? m: old_m;
+    min_n = (n < old_n)? n: old_n;
+    
+    if(size > self->alloc)
+    {
+      if(self->values == NULL)
+      {
+        self->values = (float *)fts_malloc((size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
+        
+        /* zero head */
+        /* for(i=0; i<HEAD_POINTS; i++) self->values[i] = 0.0; */
+        self->values[0] = self->values[1] = self->values[2] = self->values[3] = 0.0;    
+      }
+      else
+        self->values = (float *)fts_realloc(self->values - HEAD_POINTS, (size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
+        
+      self->values += HEAD_POINTS;
+      self->alloc = size;
+    }
+        
+    if(n > old_n)
+    {
+      /* copy values (from last to first row) */
+      for(i=min_m-1; i>=1; i--)
+      {
+        float *old_row = self->values + i * old_n;
+        float *new_row = self->values + i * n;
+        
+        /* copy old rows */
+        for(j=old_n-1; j>=0; j--)
+          new_row[j] = old_row[j];
+      }
+      
+      /* complete rows by zeros */
+      for(i=0; i<min_m; i++)
+      {
+        float *row = self->values + i * n;
+        
+        /* zero end of new rows */
+        for(j=old_n; j<n; j++)
+          row[j] = 0.0;
+      }
+    }
+    else /* if(n < old_n) */
+    {
+      /* copy and shorten rows */
+      for(i=1; i<min_m; i++)
+      {
+        float *old_row = self->values + i * old_n;
+        float *new_row = self->values + i * n;
+        
+        /* copy beginning of old rows */
+        for(j=0; j<n; j++)
+          new_row[j] = old_row[j];
+      }
+    }
+
+    /* zero new rows at end (if any) */
+    for(i=min_m*n; i<size; i++)
+      self->values[i] = 0.0;
+    
+    /* zero tail */
+    /* for(i=0; i<TAIL_POINTS; i++) self->values[size + i] = 0.0; */
+    self->values[size + 0] = self->values[size + 1] = self->values[size + 2] = self->values[size + 3] = 0.0;    
+    
+    self->m = m;
+    self->n = n;
+    
+    fmat_adapt_format(self);
   }
 }
 
@@ -225,7 +441,7 @@ fmat_copy(fmat_t *org, fmat_t *copy)
   int n = fmat_get_n(org);
   int i;
 
-  fmat_set_size(copy, org->m, org->n);
+  fmat_realloc(copy, org->m, org->n);
 
   for(i=0; i<m*n; i++)
     copy->values[i] = org->values[i];
@@ -253,7 +469,7 @@ fmat_grow(fmat_t *fmat, int size)
   while(size > alloc)
     alloc += FMAT_BLOCK_SIZE;
 
-  fmat_set_size(fmat, alloc, 1);
+  fmat_realloc(fmat, alloc, 1);
 }
 
 int
@@ -488,18 +704,15 @@ static void
 _fmat_set_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  int old_size = fmat_get_m(self) * fmat_get_n(self);
   int m = 0;
   int n = 0;
-  int i;
   
   if(ac == 1 && fts_is_number(at))
   {
     m = fts_get_number_int(at);
-    n = fmat_get_n(self);
     
-    if(m >= 0 && n >= 0)
-      fmat_set_size(self, m, n);
+    if(m >= 0)
+      fmat_set_m(self, m);
   }
   else if(ac > 1 && fts_is_number(at) && fts_is_number(at + 1))
   {
@@ -509,42 +722,26 @@ _fmat_set_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     if(m >= 0 && n >= 0)
       fmat_set_size(self, m, n);
   }
-  
-  /* set newly allocated region to void */
-  for(i=old_size; i<m*n; i++)
-    self->values[i] = 0.0;
 }
 
 static void
 _fmat_set_m(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  int old_size = fmat_get_m(self) * fmat_get_n(self);
   int m = fts_get_number_int(at);
-  int n = fmat_get_n(self);
-  int i;
-  
-  fmat_set_size(self, m, n);
-  
-  /* set newly allocated region to void */
-  for(i=old_size; i<m*n; i++)
-    self->values[i] = 0.0;
+
+  if(m >= 0)
+    fmat_set_m(self, m);
 }
 
 static void
 _fmat_set_n(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  int old_size = fmat_get_m(self) * fmat_get_n(self);
-  int m = fmat_get_m(self);
   int n = fts_get_number_int(at);
-  int i;
   
-  fmat_set_size(self, m, n);
-  
-  /* set newly allocated region to void */
-  for(i=old_size; i<m*n; i++)
-    self->values[i] = 0.0;
+  if(n >= 0)
+    fmat_set_n(self, n);
 }
 
 /* called by get element message */
@@ -1169,7 +1366,7 @@ fmat_convert_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     for(i=0, j=0; i<m; i++, j+=n)
       ptr[i] = ptr[j];
       
-    fmat_set_size(self, m, 1);
+    fmat_realloc(self, m, 1);
   }
 }
 
@@ -1186,7 +1383,7 @@ fmat_convert_rect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   switch(id)
   {
     case fmat_format_id_vec:
-      fmat_set_size(self, m, 2);
+      fmat_realloc(self, m, 2);
       
       for(i=2*(m-1), j=m-1; i>=0; i-=2, j--)
       {
@@ -1217,7 +1414,7 @@ fmat_convert_rect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       }
       break;
           
-      fmat_set_size(self, m, 2);
+      fmat_realloc(self, m, 2);
       break;
   }
   
@@ -1237,7 +1434,7 @@ fmat_convert_polar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   switch(id)
   {
     case fmat_format_id_vec:
-      fmat_set_size(self, m, 2);
+      fmat_realloc(self, m, 2);
       
       for(i=2*(m-1), j=m-1; i>=0; i-=2, j--)
       {
@@ -1268,7 +1465,7 @@ fmat_convert_polar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       }
       break;
           
-      fmat_set_size(self, m, 2);
+      fmat_realloc(self, m, 2);
       break;
   }
   
@@ -1301,14 +1498,14 @@ fmat_abs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
         ptr[i] = sqrtf(re * re + im * im);
       }
       
-      fmat_set_size(self, m, 1);
+      fmat_realloc(self, m, 1);
       break;
     
     case fmat_format_id_polar:
       for(i=0, j=0; i<m; i++, j+=2)
         ptr[i] = ptr[j];
 
-      fmat_set_size(self, m, 1);
+      fmat_realloc(self, m, 1);
       break;
     
     default:
@@ -1346,14 +1543,14 @@ fmat_logabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
         ptr[i] = 0.5 * logf(re * re + im * im);
       }
       
-      fmat_set_size(self, m, 1);
+      fmat_realloc(self, m, 1);
       break;
     
     case fmat_format_id_polar:
       for(i=0, j=0; i<m; i++, j+=2)
         ptr[i] = logf(ptr[j]);
 
-      fmat_set_size(self, m, 1);
+      fmat_realloc(self, m, 1);
       break;
     
     default:
@@ -1361,8 +1558,6 @@ fmat_logabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
         ptr[i] = logf(fabsf(ptr[i]));
       break;
   }
-  
-  fmat_set_format(self, fmat_format_rect);
 }
 
 static void
@@ -1409,8 +1604,6 @@ fmat_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
         ptr[i] = logf(ptr[i]);
       break;
   }
-  
-  fmat_set_format(self, fmat_format_rect);
 }
 
 static void
@@ -1457,8 +1650,6 @@ fmat_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
         ptr[i] = expf(ptr[i]);
       break;
   }
-  
-  fmat_set_format(self, fmat_format_rect);
 }
 
 static void
@@ -1477,7 +1668,7 @@ fmat_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       float *fft_ptr;
       int i;
 
-      fmat_set_size(self, fft_size/2, 2);
+      fmat_realloc(self, fft_size/2, 2);
       
       fft_ptr = fmat_get_ptr(self);
 
@@ -1500,7 +1691,7 @@ fmat_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       complex *fft_ptr;
       int i;
 
-      fmat_set_size(self, fft_size, 2);
+      fmat_realloc(self, fft_size, 2);
       fft_ptr = (complex *)fmat_get_ptr(self);
 
       /* zero padding */      
@@ -1718,7 +1909,7 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   self->values = NULL;
   self->m = 0;
   self->n = 0;
-  self->alloc = 0;
+  self->alloc = -1;
   self->onset = 0.0;
   self->sr = fts_dsp_get_sample_rate();
   self->format = fmat_format_real;
@@ -1749,8 +1940,7 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fts_object_error(o, "bad column argument");
   }
   
-  fmat_set_size(self, m, n);
-  fmat_set_const(self, 0.0);
+  fmat_realloc(self, m, n);
   
   /* init from arguments */
   if(ac > 2)
@@ -1772,7 +1962,7 @@ fmat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fmat_t *self = (fmat_t *)o;
 
   if(self->values != NULL)
-    fts_free(self->values - self->n * HEAD_POINTS);
+    fts_free(self->values - HEAD_POINTS);
 }
 
 static void

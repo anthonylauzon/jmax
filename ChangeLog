@@ -1,3 +1,8 @@
+2004-03-01  Norbert Schnell  <schnell@mac-portable-schnell.ircam.fr>
+
+	* added fmat_set_m(), fmat_set_n(), et fmat_reshape() to fmat API
+	* redefined fmat_set_size()
+
 2004-02-25  Norbert Schnell  <schnell@mac-portable-schnell.ircam.fr>
 
 	* added several methods to fmat class (fmat.c in package data)

@@ -50,12 +50,12 @@ hexint		0x[0-9a-fA-F]+
 float		[\-\+]?[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?
 
 /* $;,(){}[] cannot appear inside a symbol (unless quoted) */
-symbol		[^\$\;\,\(\)\{\}\[\] \t\n]+
+symbol		[^\$\;\,\(\)\{\}\[\] \t\n\r]+
 quoted_symbol	\'[^\']+\'
 
 %%
 
-[ \t\n]+
+[ \t\n\r]+
 {decint}		{ SET_INT( yytext); return 1; }
 {hexint} 		{ SET_HEXINT( yytext+2); return 1; }
 {float}		 	{ SET_FLOAT( yytext); return 1; }
