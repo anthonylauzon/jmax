@@ -887,8 +887,12 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     if(isTemplate)
       newObj = new Standard( new FtsTemplateObject( getServer(), this, objId, className, args, 11, nArgs-11));
     else
-      newObj = makeGraphicObjectFromServer( getServer(), this, objId, className, args, 11, nArgs-11);
-
+      {
+	if( className.equals("error") && ( nArgs > 10) && ( args[11].isString()))
+	  className =  args[11].stringValue;
+	
+	newObj = makeGraphicObjectFromServer( getServer(), this, objId, className, args, 11, nArgs-11);
+      }
     newObj.getFtsObject().setCurrentLayer( layer);
 
     newObj.setCurrentBounds( x, y, width, height);
