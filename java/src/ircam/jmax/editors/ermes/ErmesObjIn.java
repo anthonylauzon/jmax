@@ -36,6 +36,7 @@ class ErmesObjIn extends ErmesObject {
   	
     itsSketchPad = theSketchPad;
         
+    super.Init(theSketchPad, x, y, theString);	//this was not here...
     makeCurrentRect(x, y);
 
     int temp = GetSketchWindow().itsPatcher.getNumberOfInlets();
@@ -51,8 +52,7 @@ class ErmesObjIn extends ErmesObject {
       itsId = temp - 1;
     
 
-    super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
-
+    //it was here super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
 
     
     return true;

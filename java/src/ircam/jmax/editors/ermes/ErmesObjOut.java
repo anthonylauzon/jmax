@@ -22,7 +22,7 @@ class ErmesObjOut extends ErmesObject {
   // Init
   //--------------------------------------------------------
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
-    Dimension d = getPreferredSize();
+    //Dimension d = getPreferredSize();
 
 
     itsId = ((FtsOutletObject) theFtsObject).getPosition();
@@ -37,6 +37,7 @@ class ErmesObjOut extends ErmesObject {
     //We need here the information about the maximum number of inlets
   	
     itsSketchPad = theSketchPad;
+    super.Init(theSketchPad, x, y, theString);	//it was not here...
 
     makeCurrentRect(x, y);
     int temp = GetSketchWindow().itsPatcher.getNumberOfOutlets();
@@ -44,7 +45,7 @@ class ErmesObjOut extends ErmesObject {
     if (theSketchPad.outCount < temp)
       itsId = theSketchPad.outCount++;   //for now no deleting handled
     else itsId = temp-1;
-    super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
+    //it was here super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
 
 	
     return true;
