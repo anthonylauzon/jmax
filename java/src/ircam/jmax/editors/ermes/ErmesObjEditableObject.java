@@ -19,7 +19,7 @@ import ircam.jmax.fts.*;
   protected int FIELD_HEIGHT;
   Dimension preferredSize = null;
   String 	  itsArgs;
-  public void resize(int theH, int theV) {}; 
+  public void setSize(int theH, int theV) {}; 
   public boolean resized = false;
   public boolean itsInEdit = true;
   

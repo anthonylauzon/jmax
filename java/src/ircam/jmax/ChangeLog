@@ -1,3 +1,13 @@
+Tue Jan 27 17:27:38 1998  Enzo Maggi  <maggi@astor.ircam.fr>
+
+	* added a "requestFocus()" in ErmesSketchWindow, when "windowActivate".
+	In the 1.1.3 JDK, the "gotFocus" and "lostFocus" are not sent 
+	directly to the window when the mouse enters (or when the window is
+	clicked, depending on the WManager configuration). A request is needed
+	when the window is activated. This is likely to be a JDK bug.
+	
+	* did the same thing on the ProjectWindow
+
 Mon Jan 26 16:27:46 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
 
 	* Added the "splash" tcl command, to pop up a splash screen;
