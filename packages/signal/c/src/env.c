@@ -356,15 +356,20 @@ env_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   this->status = status_hold;
 }
 
-static void 
-env_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void
+env_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   env_t *this = (env_t *)o;
 
-  if(this->mode == mode_sustain && this->status != status_hold)
-    env_continue(this);  
-  else
-    env_start(this);
+  env_start(this);
+}
+
+static void
+env_release(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  env_t *this = (env_t *)o;
+
+  env_continue(this);
 }
 
 static void
@@ -546,23 +551,19 @@ env_ftl(fts_word_t *argv)
  */
 
 static void
-env_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_set_mode_sustain(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   env_t *this = (env_t *)o;
-  
-  if(fts_is_symbol(at))
-    {
-      fts_symbol_t mode = fts_get_symbol(at);
-      
-      if(mode == sym_sustain)
-	this->mode = mode_sustain;
-      else if(mode == sym_continue)
-	this->mode = mode_continue;
-      else
-	fts_object_error(o, "cannot understand mode %s", mode);
-    }
-  else
-    fts_object_error(o, "bad argument for message mode");    
+
+  this->mode = mode_sustain;
+}
+
+static void
+env_set_mode_continue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  env_t *this = (env_t *)o;
+
+  this->mode = mode_continue;
 }
 
 static void
@@ -615,15 +616,17 @@ env_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_put, env_put);
 
-  fts_class_inlet_bang(cl, 0, env_bang);
   fts_class_message_varargs(cl, fts_s_stop, env_stop);
   fts_class_message_varargs(cl, fts_new_symbol("adsr"), env_adsr);
   fts_class_message_varargs(cl, fts_new_symbol("speed"), env_set_speed);
   fts_class_message_varargs(cl, fts_new_symbol("duration"), env_set_duration);
-  fts_class_message_varargs(cl, fts_new_symbol("mode"), env_set_mode);
+  fts_class_message_varargs(cl, sym_sustain, env_set_mode_sustain);
+  fts_class_message_varargs(cl, sym_continue, env_set_mode_continue);
 
-  fts_class_inlet_int(cl, 0, env_number);
-  fts_class_inlet_float(cl, 0, env_number);
+  fts_class_inlet_bang(cl, 0, env_go);
+  fts_class_inlet_bang(cl, 1, env_release);
+
+  fts_class_inlet_number(cl, 0, env_number);
   fts_class_inlet(cl, 0, bpf_type, env_bpf);
   fts_class_inlet_varargs(cl, 0, env_array);
 
