@@ -48,6 +48,7 @@ sigconn.c \
 stack.c \
 symbol.c \
 template.c \
+thread.c \
 time.c \
 tuple.c \
 update.c \
@@ -56,7 +57,6 @@ version.c \
 parser.y \
 tokenizer.l
 
-# TODO add thread.c when platform specific source code is remove from thread.c
 
 noinst_HEADERS= parser.h
 
