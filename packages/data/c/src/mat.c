@@ -37,6 +37,9 @@ static fts_symbol_t sym_mat_insert_rows = 0;
 static fts_symbol_t sym_insert_cols = 0;
 static fts_symbol_t sym_delete_cols = 0;
 
+
+
+
 /********************************************************
 *
 *  utility functions
@@ -68,7 +71,7 @@ mat_set_size(mat_t *mat, int m, int n)
   }
   else
   {    
-    if (newsize < 0)	/* size can be 0, but n or m nonzero */
+    if (newsize < 0)    /* size can be 0, but n or m nonzero */
       m = n = newsize = 0;
   }
   
@@ -130,6 +133,7 @@ mat_set_size(mat_t *mat, int m, int n)
   mat->n = n;
 }
 
+
 void
 mat_set_element(mat_t *mat, int i, int j, const fts_atom_t *value)
 {
@@ -162,10 +166,10 @@ mat_set_with_onset_from_atoms(mat_t *mat, int onset, int ac, const fts_atom_t *a
   int size = m * n;
   int i;
   
-  if(onset + ac > size)
+  if (onset + ac > size)
     ac = size - onset;
   
-  for(i=0; i<ac; i++)
+  for (i = 0; i < ac; i++)
     fts_atom_assign(ap + i, at + i);
 }
 
@@ -186,12 +190,12 @@ mat_set_from_tuples(mat_t *mat, int ac, const fts_atom_t *at)
         size = n;
       
       for(j=0; j<size; j++)
-	    {
-	      fts_atom_t *matp = mat->data + i * n + j;
-	      fts_atom_t *ap = fts_tuple_get_element(tup, j);
+            {
+              fts_atom_t *matp = mat->data + i * n + j;
+              fts_atom_t *ap = fts_tuple_get_element(tup, j);
         
-	      fts_atom_assign(matp, ap);
-	    }
+              fts_atom_assign(matp, ap);
+            }
     }
     else
       break;
@@ -246,7 +250,7 @@ mat_grow(mat_t *mat, int size)
   while(size > alloc)
     alloc += MAT_BLOCK_SIZE;
   
-  mat_set_size(mat, alloc, 1);	/* initialises added atoms */
+  mat_set_size(mat, alloc, 1);  /* initialises added atoms */
 }
 
 
@@ -283,11 +287,11 @@ mat_read_atom_file_newline(mat_t *mat, fts_symbol_t file_name)
       j++;
       
       if(c == '\n')
-	    {
-	      /* reset to beginning of next row */
-	      i++;
-	      j = 0;
-	    }
+            {
+              /* reset to beginning of next row */
+              i++;
+              j = 0;
+            }
     }
     else if(c == '\n')
     {
@@ -330,7 +334,7 @@ mat_write_atom_file_newline(mat_t *mat, fts_symbol_t file_name)
   {
     fts_atom_t *row = mat->data + i * n;
     
-    for(j=0; j<n-1; j++)	
+    for(j=0; j<n-1; j++)        
       fts_atom_file_write(file, row + j, ' ');
     
     fts_atom_file_write(file, row + n - 1, '\n');
@@ -369,10 +373,10 @@ mat_read_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t se
     {
       /* ooops! */
       if(fts_atom_same_type(&a, &at[k]) && fts_get_int(&a) == fts_get_int(&at[k]))
-	    {
-	      skip = 1;
-	      break;
-	    }
+            {
+              skip = 1;
+              break;
+            }
     }
     
     if(!skip)
@@ -380,30 +384,30 @@ mat_read_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t se
       m = i + 1;
       
       if(fts_get_symbol(&a) == separator)
-	    {
-	      /* reset to beginning of next row */
-	      i++;
-	      j = 0;
-	    }
+            {
+              /* reset to beginning of next row */
+              i++;
+              j = 0;
+            }
       else if(i == 0)
-	    {
-	      /* first row determines # of columns */    
-	      n = j + 1;
-	      
-	      if(n > mat->alloc)
+            {
+              /* first row determines # of columns */    
+              n = j + 1;
+              
+              if(n > mat->alloc)
           mat_grow(mat, n);
-	      
-	      mat->data[i * n + j] = a;
-	      j++;
-	    }
+              
+              mat->data[i * n + j] = a;
+              j++;
+            }
       else if(j < n)
-	    {
-	      if(m * n > mat->alloc)
+            {
+              if(m * n > mat->alloc)
           mat_grow(mat, m * n);
-	      
-	      mat->data[i * n + j] = a;
-	      j++;
-	    }
+              
+              mat->data[i * n + j] = a;
+              j++;
+            }
     }
   }
   
@@ -451,7 +455,7 @@ mat_write_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t s
   {
     fts_atom_t *row = mat->data + i * n;
     
-    for(j=0; j<n; j++)	
+    for(j=0; j<n; j++)  
       fts_atom_file_write(file, row + j, ' ');
     
     fts_atom_file_write(file, &sep, '\n');
@@ -517,7 +521,7 @@ mat_upload_from_index(mat_t *self, int row_id, int col_id, int size)
     int i = 0;
     int n = (data_size > MAT_CLIENT_BLOCK_SIZE-2)? MAT_CLIENT_BLOCK_SIZE-2: data_size;
     
-    /* starting row and column index */
+    /* starting row and column index */
     if( sent)
     {
       ms = sent/n_cols;
@@ -566,6 +570,11 @@ mat_upload(mat_t *self)
   mat_upload_data(self);
 }
 
+
+
+
+
+
 /********************************************************************
 *
 *   user methods
@@ -612,6 +621,7 @@ mat_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   }
 }
 
+
 static void
 mat_set_row_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -642,13 +652,15 @@ mat_set_row_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   }
 }
 
+
 /** append a row of atoms, augment m, clip row to n 
  * 
  * @method append
- * @param  atoms	row of atoms to append, will be clipped to width of matrix
+ * @param  atoms        row of atoms to append, will be clipped to width of matrix
  */
 static void
-mat_append_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+mat_append_row(fts_object_t *o, int winlet, fts_symbol_t s, 
+               int ac, const fts_atom_t *at)
 {
   mat_t *self = (mat_t *) o;
   int m = mat_get_m(self);
@@ -682,48 +694,49 @@ mat_append_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  * @method insert
  * @param  int: pos    index of row where to insert
  * @param  tuples: atoms  list of tuples of rows of atoms to append, 
- *		       will be clipped to width of matrix
+ *                     will be clipped to width of matrix
  */
 static void
-mat_insert_rows (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+mat_insert_rows (fts_object_t *o, int winlet, fts_symbol_t s, 
+                 int ac, const fts_atom_t *at)
 {
-  mat_t	*self = (mat_t *) o;
+  mat_t      *self    = (mat_t *) o;
   fts_atom_t *newptr;
-  int m = mat_get_m(self);
-  int	n = mat_get_n(self);
-  int	pos = 0;	/* row position at which to insert */
-  int numrows = 1;	/* number of rows to insert */
-  int num, tomove, i;
+  int         m       = mat_get_m(self);
+  int         n       = mat_get_n(self);
+  int         pos     = 0;      /* row position at which to insert */
+  int         numrows = 1;      /* number of rows to insert */
+  int         num, tomove, i;
 
   /* check and test args */
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
 
-  if(pos < 0)	pos = 0;
-  else if(pos > m) pos = m;
+  if      (pos < 0)        pos = 0;
+  else if (pos > m)        pos = m;
 
   if (ac > 1  &&  fts_is_number(at+1))
     numrows = fts_get_number_int(at+1) ;
   
-  if(numrows <= 0)	return;	/* nothing to append */
+  if      (numrows <= 0)   return; /* nothing to append */
 
   /* make space, may change ptr, sets new atoms at the end to void */
   mat_set_size(self, m + numrows, n);
 
   /* move rows */
   newptr = mat_get_ptr(self) + n * pos;
-  num    = n * numrows;		/* atoms to insert */
-  tomove = n * (m - pos);	/* atoms to move */
+  num    = n * numrows;         /* atoms to insert */
+  tomove = n * (m - pos);       /* atoms to move */
 
-  if(pos < m)	/* don't move when appending behind last row */
+  if (pos < m)  /* don't move when appending behind last row */
     memmove(newptr + num, newptr, tomove * sizeof(fts_atom_t));
 
   /* initialise inserted atoms (don't leave void atoms around) */
-  for(i = 0; i < num; i++)
+  for (i = 0; i < num; i++)
     fts_set_int(newptr + i, 0);
 
   /* update editor if open */
-  if(mat_editor_is_open(self))
+  if (mat_editor_is_open(self))
     mat_upload(self);
   
   fts_object_set_state_dirty(o);
@@ -837,32 +850,33 @@ mat_delete_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
  * @param  int: num    number of rows to delete, default 1
  */
 static void
-mat_delete_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+mat_delete_rows (fts_object_t *o, int winlet, fts_symbol_t s, 
+                 int ac, const fts_atom_t *at)
 {
-  mat_t	*self = (mat_t *) o;
+  mat_t      *self    = (mat_t *) o;
   fts_atom_t *killptr;
-  int m = mat_get_m(self);
-  int	n = mat_get_n(self);
-  int	pos = 0;
-  int numrows = 1;
-  int num, tomove, i;
+  int         m       = mat_get_m(self);
+  int         n       = mat_get_n(self);
+  int         pos     = 0;
+  int         numrows = 1;
+  int         num, tomove, i;
   
   /* get and check args */
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
     
-  if(pos <  0) pos = 0;
-  else if (pos >= m) return;	/* nothing to delete */
+  if      (pos <  0)            pos = 0;
+  else if (pos >= m)            return; /* nothing to delete */
 
   if (ac > 1  &&  fts_is_number(at+1))
     numrows = fts_get_number_int(at+1);
 
-  if(numrows <= 0) return;	/* nothing to delete */
-  else if (numrows >  m - pos) numrows = m - pos;
+  if      (numrows <= 0)        return; /* nothing to delete */
+  else if (numrows >  m - pos)  numrows = m - pos;
   
   killptr = mat_get_ptr(self) + n * pos;
-  num     = n * numrows;	/* number of atoms to insert */
-  tomove  = n * (m - pos);	/* number of atoms to move */
+  num     = n * numrows;        /* number of atoms to insert */
+  tomove  = n * (m - pos);      /* number of atoms to move */
 
   /* release atoms to delete */
   for (i = 0; i < num; i++)
@@ -878,6 +892,8 @@ mat_delete_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   fts_object_set_state_dirty(o);
 }
+
+
 
 static void
 mat_return_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -914,7 +930,7 @@ mat_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     
     if (m >= 0  &&  n >= 0)
     {
-      mat_set_size(self, m, n);		/* initialises added atoms */
+      mat_set_size(self, m, n);         /* initialises added atoms */
       
       if(mat_editor_is_open(self))
         mat_upload(self);
@@ -929,7 +945,7 @@ mat_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     
     if (m >= 0  &&  n >= 0)
     {
-      mat_set_size(self, m, n); 	/* initialises added atoms */
+      mat_set_size(self, m, n);         /* initialises added atoms */
   
       if(mat_editor_is_open(self))
         mat_upload(self);
@@ -1066,7 +1082,7 @@ mat_element_compare_descending (const void *a, const void *b)
 			  (const fts_atom_t *) a);
 }
 
-#endif
+#endif /* HAVE_QSORT_R */
 
 
 static void
@@ -1077,17 +1093,21 @@ mat_sort(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   int m = mat_get_m(self);
   int n = mat_get_n(self); 
   int col = 0;
+  int (*compare) (const void *, const void *);	/* comparison function */
+
+  if (s == fts_s_sort)
+    compare = mat_element_compare_ascending;
+  else
+    compare = mat_element_compare_descending;
   
   if (ac > 0)
     col = fts_get_number_int(at);
 
-#ifdef HAVE_QSORT_R
-  qsort_r((void *) ptr, m, n * sizeof(fts_atom_t), (void *) col,
-	  mat_element_compare_ascending);
+#if HAVE_QSORT_R
+  qsort_r((void *) ptr, m, n * sizeof(fts_atom_t), (void *) col, compare);
 #else
   if (col == 0)
-    qsort((void *) ptr, m, n * sizeof(fts_atom_t), 
-	  mat_element_compare_ascending);
+    qsort((void *) ptr, m, n * sizeof(fts_atom_t), compare);
   else if (col > 0  &&  col < n)
   {
     int i;
@@ -1101,8 +1121,7 @@ mat_sort(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       ptr[i + col] = a;
     }
     
-    qsort((void *) ptr, m, n * sizeof(fts_atom_t), 
-	  mat_element_compare_ascending);
+    qsort((void *) ptr, m, n * sizeof(fts_atom_t), compare);
 
     /* swap column back */
     for (i = 0; i < m * n; i += n)
@@ -1113,7 +1132,7 @@ mat_sort(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       ptr[i + col] = a;
     }    
   }
-#endif
+#endif /* HAVE_QSORT_R */
   
   if (mat_editor_is_open(self))
     mat_upload_data(self);
@@ -1237,11 +1256,17 @@ mat_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   mat_set_editor_close(this);
 }
 
+
+
+
+
+
 /********************************************************************
 *
 *   class
 *
 */
+
 static void
 mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1270,16 +1295,16 @@ mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if (fts_is_tuple(at + i))
       {
-	      fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at + i);
-	      int size = fts_tuple_get_size(tup);
-	      
-	      if(size > n)
+              fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at + i);
+              int size = fts_tuple_get_size(tup);
+              
+              if(size > n)
           n = size;
-	      
-	      m++;
+              
+              m++;
       }
       else
-	      break;
+              break;
     }
     
     mat_set_size(self, m, n);
@@ -1332,8 +1357,10 @@ mat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_delete, mat_delete_rows);
   fts_class_message_varargs(cl, sym_insert_cols, mat_insert_columns);
   fts_class_message_varargs(cl, sym_delete_cols, mat_delete_columns);
-  fts_class_message_void   (cl, fts_s_sort,   mat_sort);
-  fts_class_message_number (cl, fts_s_sort,   mat_sort);
+  fts_class_message_void   (cl, fts_s_sort,      mat_sort);
+  fts_class_message_number (cl, fts_s_sort,    	 mat_sort);
+  fts_class_message_void   (cl, fts_s_sortrev, 	 mat_sort);
+  fts_class_message_number (cl, fts_s_sortrev, 	 mat_sort);
   
   fts_class_message_varargs(cl, fts_s_import, mat_import); 
   fts_class_message_varargs(cl, fts_s_export, mat_export);
