@@ -147,7 +147,7 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
   }
 
   public void setSize(int m, int n)
-  {
+  {    
     if(n_rows != m || n_cols != n)
     {
       Object[][] temp = new Object[m][n];
@@ -353,9 +353,13 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
     setSize(n_rows, n);
   }
   
+  Float prut = new Float(0.0); 
   public Object getValueAt(int m, int n)
   {
-    return values[m][n];
+    if((m < n_rows) && (n < n_cols))
+      return values[m][n];
+    else
+      return prut;/* to avoid out_of_range access */
   }
   public void setValueAt(int m, int n, Object value)
   {
