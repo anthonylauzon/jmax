@@ -534,10 +534,11 @@ void fts_platform_init( void)
   /*  if we want to have audio
    we load audio packages */
   if (NULL == fts_cmd_args_get(fts_s_noaudio))
-  {    
+  { 
+#ifdef USE_ALSA   
     /* load alsa package */
     fts_package_load(fts_new_symbol("alsa"));
-    
+#endif
 /* USE_JACK is defined in configure if jack support is enabled */
 #ifdef USE_JACK
     /* load jack package */
