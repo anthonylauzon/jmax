@@ -114,16 +114,6 @@ fts_object_create( fts_class_t *cl, fts_patcher_t *patcher, int ac, const fts_at
 
   fts_object_set_patcher(obj, patcher);
 
-  /* this would be even more elegant!
-  if (parent)
-    {
-      fts_atom_t a;
-
-      fts_set_object( &a, obj);
-      fts_class_get_add_child( fts_object_get_class( parent))( parent, fts_system_inlet, 1, &a);
-    }
-  */
-
   fts_class_get_constructor(cl)(obj, fts_system_inlet, fts_s_init, ac, at); 
 
   if(fts_object_get_error(obj) != NULL)

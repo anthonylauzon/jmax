@@ -28,6 +28,17 @@
 #define fts_object_set_definition(o, d) ((o)->definition = (d))
 #define fts_object_get_definition(o) ((o)->definition)
 
+#define fts_object_is_abstraction(o) (fts_object_is_patcher((o)) &&  \
+				      fts_patcher_is_abstraction((fts_patcher_t *) (o)))
+
+#define fts_object_is_standard_patcher(o) (fts_object_is_patcher((o)) &&  \
+				      fts_patcher_is_standard((fts_patcher_t *) (o)))
+
+#define fts_object_is_error(o) (fts_object_get_class(o) == fts_error_object_class)
+
+#define fts_object_is_template(o) (fts_object_is_patcher((o)) &&  \
+				      fts_patcher_is_template((fts_patcher_t *) (o)))
+
 extern void fts_object_unpatch(fts_object_t *obj);
 
 /* support for redefinition */

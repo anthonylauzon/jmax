@@ -1199,6 +1199,7 @@ patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 	  fts_client_add_symbol( o, fts_error_object_get_description((fts_error_object_t *)obj));
 	  
 	  class = fts_error_object_get_class((fts_error_object_t *)obj);
+	  /* ??? */
 	  fts_class_instantiate(class);
 	}
       else

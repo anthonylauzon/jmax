@@ -46,17 +46,6 @@ extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *tem
 
 #define fts_patcher_get_env(p)           (&((p)->env))
 
-#define fts_object_is_abstraction(o) (fts_object_is_patcher((o)) &&  \
-				      fts_patcher_is_abstraction((fts_patcher_t *) (o)))
-
-#define fts_object_is_standard_patcher(o) (fts_object_is_patcher((o)) &&  \
-				      fts_patcher_is_standard((fts_patcher_t *) (o)))
-
-#define fts_object_is_error(o) (fts_object_get_class(o) == fts_error_object_class)
-
-#define fts_object_is_template(o) (fts_object_is_patcher((o)) &&  \
-				      fts_patcher_is_template((fts_patcher_t *) (o)))
-
 #define fts_patcher_set_save_id(p, i) ((p)->save_id == (i))
 #define fts_patcher_get_save_id(p, i) ((p)->save_id)
 
