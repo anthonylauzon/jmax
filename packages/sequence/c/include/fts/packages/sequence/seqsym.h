@@ -57,6 +57,7 @@ extern fts_symbol_t seqsym_tempo;
 extern fts_symbol_t seqsym_meter;
 extern fts_symbol_t seqsym_cue;
 extern fts_symbol_t seqsym_section;
+extern fts_symbol_t seqsym_offset;
 
 /* messages */
 extern fts_symbol_t seqsym_insert;

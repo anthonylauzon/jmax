@@ -1092,6 +1092,8 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     /* create event at client */
     if(!fts_object_has_id((fts_object_t *)event))
       track_upload_event(this, event, &temp_array);
+    else
+      event_set_at_client(event);/*?????????*/
     
     event = event_get_next(event);
   }

@@ -321,6 +321,16 @@ public int getCue(Event e)
 	return -1;
 }
 
+public double getOffset(Event e)
+{
+	Object offset = e.getProperty("offset");
+	if(offset != null && offset instanceof Double) 
+		return ((Double)offset).doubleValue();
+	
+	return -1;
+}
+
+
 public void setCue(Event e, int cue)
 {
 	e.setProperty("cue", new Integer(cue));

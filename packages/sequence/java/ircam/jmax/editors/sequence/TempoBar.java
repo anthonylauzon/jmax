@@ -184,8 +184,16 @@ public void paintLegend(Graphics g, Rectangle clip)
 		for(int i = 0; i < propertyNames.length; i++)
 			if(propertyToDraw[i])
 			{
-				g.drawString( propertyNames[i], clip.x + 3, clip.y+h);
-				h+=DELTA_H;
+        /*if(propertyNames[i].equals("cue"))
+        {
+        g.setColor( cueBorderColor);
+        g.drawString( propertyNames[i], clip.x + 3, clip.y+h);
+        g.setColor( Color.lightGray);
+				}
+        else*/
+        g.drawString( propertyNames[i], clip.x + 3, clip.y+h);
+        
+        h+=DELTA_H;
 			}
 	}
 }
@@ -226,7 +234,7 @@ public void paintMeasures(Graphics g, Rectangle clip)
         else
 					color = Color.darkGray;	
 			}
-      g.setColor( color);
+      //g.setColor( color);
 			int h = DELTA_H-1;
 			Object prop;
 			String str;
@@ -243,8 +251,6 @@ public void paintMeasures(Graphics g, Rectangle clip)
 						else
 							str = prop.toString();
 						strw = fm.stringWidth(str);
-						
-            //g.drawString( str, x - strw/2 + 1, h);
             drawProperty(g, propertyNames[i], str, selected, color, x - strw/2 + 1, h, strw, DELTA_H-3);
           }
 					h+=DELTA_H;
@@ -269,7 +275,7 @@ void drawProperty(Graphics g, String propName, String propVal, boolean selected,
     if(propName.equals("label"))
     {
       if(selected)
-        g.setColor(/*selTempoColor*/ selLabelColor);
+        g.setColor(selLabelColor);
       else
         g.setColor(tempoColor);
       g.fillRect(x-1, y-strh-1, strw+1, strh+2);
@@ -288,7 +294,7 @@ void drawProperty(Graphics g, String propName, String propVal, boolean selected,
     if(propName.equals("cue"))
     {
       if(selected)
-        g.setColor( /*selTempoColor*/ selLabelColor);
+        g.setColor( selLabelColor);
       else
         g.setColor(cueColor);
       g.fillRect(x-1, y-strh-1, strw+1, strh+2);
@@ -300,7 +306,6 @@ void drawProperty(Graphics g, String propName, String propVal, boolean selected,
       
       g.drawRect(x-1, y-strh-1, strw+1, strh+2);
       
-      //g.setColor(oldColor);
       g.drawString( propVal, x, y);
       g.setColor(oldColor);
     }  

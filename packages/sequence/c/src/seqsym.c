@@ -54,6 +54,7 @@ fts_symbol_t seqsym_tempo = 0;
 fts_symbol_t seqsym_meter = 0;
 fts_symbol_t seqsym_cue = 0;
 fts_symbol_t seqsym_section = 0;
+fts_symbol_t seqsym_offset = 0;
 
 /* messages */
 fts_symbol_t seqsym_insert = 0;
@@ -138,6 +139,7 @@ seqsym_config(void)
   seqsym_meter = fts_new_symbol("meter");
   seqsym_cue = fts_new_symbol("cue");
   seqsym_section = fts_new_symbol("section");
+  seqsym_offset = fts_new_symbol("offset");
   
   /* messages */
   seqsym_insert = fts_new_symbol("insert");

@@ -84,6 +84,7 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
 	int height = pa.getHeigth(e);
 	String type = pa.getType(e);
 	int cue = pa.getCue(e);
+  double offset = pa.getOffset(e);
 		
 	if( type.equals("note"))
 	{
@@ -110,33 +111,45 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
 	}	
 	if( type.equals("rest"))
 	{		
-		Color col, bordCol;
+		Color col, bordCol, offsetCol;
 		switch(state)
 		{
 			default:
 			case Event.SELECTED:
 				col = restSelColor;
 				bordCol = Color.red;
+        offsetCol = offSelColor;
 				break;
 			case Event.DESELECTED:
 				col = restColor;
 				bordCol = Color.black;
+        offsetCol = offsetColor;
 				break;
 			case Event.HIGHLIGHTED:
 				col = restHighlightColor;
 				bordCol = Color.green;
-				break;
+				offsetCol = offHighlightColor;
+        break;
 		}
 		
 		g.setColor( col);
 		g.fillRect(x, y, length, height);
-		g.setColor( bordCol);
+    
+    if(offset > 0 && offset < pa.getInvLenght(e))
+    {
+      int off_w = pa.getWidth(offset);
+      g.fillRect(x , y, off_w, height);
+      g.setColor( offsetCol);
+      g.drawLine(x+off_w, y, x+off_w, y + height - 1);
+    }
+    
+    g.setColor( bordCol);
 		g.drawLine(x, y, x, y + height - 1);
 		g.drawLine(x + 1, y, x + 1, y + height - 1);
 		g.drawLine(x + length, y, x + length, y + height - 1);
 		g.drawLine(x + length - 1, y, x + length - 1, y + height - 1);
-		g.fillRect(x , y + height/2 - 1, length, /*2*/ 3);
-		}
+		g.fillRect(x , y + height/2 - 1, length, 3);
+  }
 	else
 		if(type.equals("note") && height > Adapter.NOTE_DEFAULT_HEIGTH) // note with Ambitus 
 		{
@@ -404,6 +417,10 @@ final static int CUE_HEIGHT = 13;
 Color restColor = new Color(165, 165, 165, 60);
 Color restSelColor = new Color(255, 0, 0, 60);
 Color restHighlightColor = new Color(0, 255, 0, 60);
+
+Color offsetColor = new Color(165, 165, 165, 150);
+Color offSelColor = new Color(255, 0, 0, 150);
+Color offHighlightColor = new Color(0, 255, 0, 150);
 
 Color noteColor = new Color(165, 165, 165, 100);
 Color noteSelColor = new Color(255, 0, 0, 100);

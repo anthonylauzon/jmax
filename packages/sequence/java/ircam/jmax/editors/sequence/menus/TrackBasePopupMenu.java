@@ -135,12 +135,13 @@ public class TrackBasePopupMenu extends JPopupMenu
 			
       add( Actions.undoAction);
       add( Actions.redoAction);
-			
+      
       addSeparator();
 			
-      cutAction = new Actions.CutAction();
+      cutAction = new Actions.CutAction();      
       copyAction = new Actions.CopyAction();
       duplicateAction = new Actions.DuplicateAction();
+     
       add(cutAction);
       add(copyAction);
       add(Actions.pasteAction);
@@ -179,7 +180,7 @@ public class TrackBasePopupMenu extends JPopupMenu
     		
     pack();
   }
-	
+  
   void addAddTrackMenu()
   {
     JMenu menu = new JMenu("Add Track");

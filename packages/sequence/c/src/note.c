@@ -375,6 +375,7 @@ scoob_instantiate(fts_class_t *cl)
   propobj_class_add_int_property(cl, seqsym_velocity);
   propobj_class_add_int_property(cl, seqsym_channel);
   propobj_class_add_int_property(cl, seqsym_cue);
+  propobj_class_add_float_property(cl, seqsym_offset);
   
   fts_class_message_symbol(cl, fts_s_remove, propobj_remove_property);
   
