@@ -195,6 +195,9 @@ public class FtsXYPadObject extends FtsGraphicObject
   void setCurrentXMaxValue( int value)
   {
     xMaxValue = value;
+
+
+
     ((XYPad)getObjectListener()).setCurrentXMaxValue( value);
   }
   

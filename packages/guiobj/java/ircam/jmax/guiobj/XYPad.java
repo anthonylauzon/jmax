@@ -81,14 +81,14 @@ public class XYPad extends GraphicObject
     xValue = ((FtsXYPadObject)ftsObject).getXValue();
     yValue = ((FtsXYPadObject)ftsObject).getYValue();
 
-    if(xValue<xRangeMin) 
+    if(xValue < xRangeMin) 
       xValue = xRangeMin;
-    else if(xValue>xRangeMax) 
+    else if(xValue > xRangeMax) 
       xValue = xRangeMax;
     
-    if(yValue<yRangeMin) 
+    if(yValue < yRangeMin) 
       yValue = yRangeMin;
-    else if(yValue>yRangeMax) 
+    else if(yValue > yRangeMax) 
       yValue = yRangeMax;
   }
 
@@ -104,7 +104,18 @@ public class XYPad extends GraphicObject
   public void setCurrentXYValues(int x, int y)
   {
     xValue = x;   
-    yValue = y;   
+    yValue = y;
+
+    if(xValue < xRangeMin) 
+      xValue = xRangeMin;
+    else if(xValue > xRangeMax) 
+      xValue = xRangeMax;
+    
+    if(yValue < yRangeMin) 
+      yValue = yRangeMin;
+    else if(yValue > yRangeMax) 
+      yValue = yRangeMax;
+
     redraw();
   }
 
@@ -124,16 +135,16 @@ public class XYPad extends GraphicObject
   {
     xRangeMin = value;
 
-    if( value < xRangeMin)
-      value = xRangeMin;
+    if( xValue < xRangeMin)
+      xValue = xRangeMin;
   }
 
   public void setCurrentYMinValue( int value)
   {
     yRangeMin = value;
 
-    if( value < yRangeMin)
-      value = yRangeMin;
+    if( yValue < yRangeMin)
+      yValue = yRangeMin;
   }
 
   public int getXMinValue() 
@@ -162,8 +173,8 @@ public class XYPad extends GraphicObject
   {
     xRangeMax = value;
     
-    if( value > xRangeMax) 
-      value = xRangeMax;
+    if( xValue > xRangeMax) 
+      xValue = xRangeMax;
 
     redraw();
   }
@@ -172,8 +183,8 @@ public class XYPad extends GraphicObject
   {
     yRangeMax = value;
     
-    if( value > yRangeMax) 
-      value = yRangeMax;
+    if( yValue > yRangeMax) 
+      yValue = yRangeMax;
 
     redraw();
   }

@@ -591,37 +591,6 @@ patcher_load_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
 }
 
-/* open a patch;
- * Set the open flag to 1, so that all the "updating" objects can be active.
- * A "OPEN" message is sent to all the objects (but not the patchers) in the patch
- */
-static void
-patcher_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_patcher_t *this = (fts_patcher_t *) o;
-  fts_object_t *p;
-
-  this->open = 1;
-
-  for(p = this->objects; p ; p = p->next_in_patcher)
-    {
-      if(fts_class_has_method( fts_object_get_class(p), fts_system_inlet, fts_s_update_real_time))
-	fts_update_request(p);
-    }
-}
-
-/* close a patch;
- * Set the open flag to 0, so that all the "updating" objects can be inactive.
- * A "close" message is sent to all the objects (but not the patchers) in the patch
- */
-static void
-patcher_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_patcher_t *this = (fts_patcher_t *) o;
-
-  this->open = 0;
-}
-
 static void
 patcher_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1210,12 +1179,23 @@ patcher_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
  */
 static void fts_patcher_start_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  patcher_open(o, fts_system_inlet, fts_s_open, 0, 0);
+  fts_patcher_t *this = (fts_patcher_t *) o;
+  fts_object_t *p;
+
+  this->open = 1;
+
+  for(p = this->objects; p ; p = p->next_in_patcher)
+    {
+      if(fts_class_has_method( fts_object_get_class(p), fts_system_inlet, fts_s_update_real_time))
+	fts_update_request(p);
+    }
 }
 
 static void fts_patcher_stop_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  patcher_close(o, fts_system_inlet, fts_s_close, 0, 0);
+  fts_patcher_t *this = (fts_patcher_t *) o;
+
+  this->open = 0;
 }
 
 /**
@@ -1744,9 +1724,7 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     fts_method_define_varargs(cl, i, fts_s_anything, patcher_anything);
 
   fts_method_define_varargs(cl,fts_system_inlet, fts_new_symbol("load_init"), patcher_load_init); 
-  fts_method_define_varargs(cl,fts_system_inlet, fts_s_open, patcher_open); 
-  fts_method_define_varargs(cl,fts_system_inlet, fts_s_close, patcher_close); 
-
+ 
   fts_method_define_varargs(cl,fts_system_inlet, fts_new_symbol("open_help_patch"), fts_patcher_open_help_patch); 
 
   fts_method_define_varargs(cl,fts_system_inlet, fts_s_save, fts_patcher_save_from_client); 
