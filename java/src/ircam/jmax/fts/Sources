@@ -38,7 +38,7 @@ SOURCES = \
           FtsSubProcessPort.java \
           FtsSubProcessServer.java \
           FtsTemplateTable.java \
-	  FtsLocator.java  \
+	  FtsLocation.java  \
 	  FtsDotPatFileDataHandler.java  \
 	  FtsPatchData.java  \
 	  FtsIntegerVectorData.java  \

@@ -2,6 +2,7 @@
 package ircam.jmax.editors.table;
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
+import ircam.jmax.fts.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.AWTEvent.*;
@@ -21,46 +22,31 @@ public class Tabler extends MaxEditor implements MaxDataEditor,  MouseMotionList
  
   TextField itsFormula = new TextField("", 40);
   Label itsCoordinates;
-  //Graphics holdGraph;
-  //Graphics offGraphics = null;
-  //Dimension offDimension;	   
-  //Image offImage;			 
-  public MaxData itsData;
+  public FtsIntegerVectorData itsData;
   static int untitledCounter = 1;
 
   public Tabler(MaxData theData) {
     super(MaxDataType.getTypeByName("Table"));
+
     if (theData.getName()==null) setTitle(GetNewUntitledName());
     else {
       setTitle(theData.getDataSource().toString()); 
     }
 
-    //if ( (offGraphics == null)){					  
-    //Dimension d = preferredSize();
-    //offDimension = preferredSize();
-    //offImage = createImage(preferredSize().width, preferredSize().height);
-    //offGraphics = offImage.getGraphics();
-    //  }
-
-    itsData = theData;
+    itsData = (FtsIntegerVectorData) theData;
     getContentPane().setLayout(new BorderLayout());
     setBackground(Color.white);
     values = new int[N_POINTS];
     itsFormula.resize(300, 20);
     getContentPane().add("South", itsFormula);
     
-    //Panel aPanel = new Panel();
-    //aPanel.resize(300, 20);
-    //Label aLabel = new Label("Coordinates: ");
-    //aPanel.add(aLabel);
     itsCoordinates = new Label();
-    //aPanel.add(itsCoordinates);
-    //aPanel.validate();
     itsCoordinates.resize(100,20);
     itsCoordinates.setBackground(Color.white);
     getContentPane().add("North", itsCoordinates);
     
     Init();
+    fillTable();
 
     validate();
     //holdGraph = getGraphics();
@@ -72,6 +58,10 @@ public class Tabler extends MaxEditor implements MaxDataEditor,  MouseMotionList
   }
 
  
+  void fillTable() {
+    //fill the internal vector with the data contained in itsData
+    values = ((FtsIntegerVector)(itsData.getContent())).values();
+  }
 
   public Tabler() {
     super();

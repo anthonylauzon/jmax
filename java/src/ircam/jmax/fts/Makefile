@@ -176,9 +176,9 @@ FtsDotPatTokenizer:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDotPatTokenizer.java)
 .PHONY: FtsDotPatTokenizer
 
-FtsLocator:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsLocator.java)
-.PHONY: FtsLocator
+FtsLocation:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsLocation.java)
+.PHONY: FtsLocation
 
 FtsDotPatFileDataHandler:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDotPatFileDataHandler.java )

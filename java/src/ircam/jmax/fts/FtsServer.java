@@ -645,7 +645,7 @@ public class FtsServer
 
   /** Handle adding an update group listener */
 
-  void addUpdateGroupListener(FtsUpdateGroupListener listener)
+  public void addUpdateGroupListener(FtsUpdateGroupListener listener)
   {
     if (updateGroupListeners == null)
       updateGroupListeners = new Vector();
@@ -655,7 +655,7 @@ public class FtsServer
 
   /** Handle removing an update group listener */
 
-  void removeUpdateGroupListener(FtsUpdateGroupListener listener)
+  public void removeUpdateGroupListener(FtsUpdateGroupListener listener)
   {
     if (updateGroupListeners == null)
       return;

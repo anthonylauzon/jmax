@@ -95,11 +95,12 @@ public class FtsIntegerVectorData extends MaxData implements MaxTclData, MaxFtsD
 	FtsObject object = ((MaxFtsDataSource) newSource).getFtsLocation().getObject();
 
 	if (object instanceof FtsIntegerVectorObject)
-	  oldObject = (FtsIntegerVectorObject) object;
+	  //e.m.oldObject = (FtsIntegerVectorObject) object;
+	  newObject = (FtsIntegerVectorObject) object;
       }
-
+    
     /** If the new Object is the same good old one, nothing to do */
-
+    
     if (newObject == oldObject)
       return;
 
