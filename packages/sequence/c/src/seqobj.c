@@ -50,8 +50,8 @@ void
 seqtrack_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_track_t *this = (sequence_track_t *)o;
-  fts_symbol_t type = fts_get_symbol(at + 0);
-  fts_symbol_t name = fts_get_symbol(at + 1);
+  fts_symbol_t type = fts_get_symbol(at + 1);
+  fts_symbol_t name = fts_get_symbol(at + 2);
 
   sequence_track_init(this, type, name);
 }
@@ -225,14 +225,14 @@ seqobj_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   sequence_t *this = (sequence_t *)o;
   sequence_track_t *track = sequence_get_first_track(this);
   sequence_event_t *event = sequence_get_begin(this);
-
+  
   while(track)
     {
       if(!fts_object_has_id((fts_object_t *)track))
 	{
 	  sequence_t *sequence = sequence_track_get_sequence(track);
 	  fts_atom_t a[2];
-
+	  
 	  /* create track at client */
 	  fts_set_symbol(a + 0, sequence_track_get_type(track));	    
 	  fts_set_symbol(a + 1, sequence_track_get_name(track));
@@ -242,17 +242,17 @@ seqobj_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  fts_set_object(a + 0, (fts_object_t *)track);	    
 	  fts_client_send_message((fts_object_t *)sequence, sym_addTrack, 1, a);
 	}
-
+      
       track = sequence_track_get_next(track);
     }
-
+  
   while(event)
     {
       if(!fts_object_has_id((fts_object_t *)event))
 	{
 	  sequence_track_t *track = sequence_event_get_track(event);
 	  fts_atom_t a[1];
-	    
+	  
 	  /* create event at client */
 	  fts_send_message((fts_object_t *)event, fts_SystemInlet, fts_s_upload, 0, 0);
 	  
@@ -260,7 +260,7 @@ seqobj_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  fts_set_object(a, (fts_object_t *)event);
 	  fts_client_send_message((fts_object_t *)track, sym_addEvent, 1, a);
 	}
-
+      
       event = sequence_event_get_next(event);
     }
 }
@@ -270,8 +270,9 @@ seqobj_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   sequence_t *this = (sequence_t *)o;
 
-  seqobj_update(o, 0, 0, 0, 0);
+  sequence_set_editor_open(this);
   fts_client_send_message(o, sym_openEditor, 0, 0);
+  seqobj_update(o, 0, 0, 0, 0);
 }
 
 void
@@ -283,8 +284,10 @@ seqobj_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if(name)
     sequence_read_midifile(this, name);
 
-  seqobj_update(o, 0, 0, 0, 0);
+  if(sequence_editor_open(this))
+    seqobj_update(o, 0, 0, 0, 0);
 }
+
 void
 seqobj_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -296,6 +299,7 @@ seqobj_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   while(track)
     {
+      post("  ");
       sequence_track_post(track);
       track = sequence_track_get_next(track);      
     }    
@@ -308,7 +312,7 @@ seqobj_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_symbol_t track_name = sequence_track_get_name(track);
       fts_symbol_t class_name = fts_object_get_class_name((fts_object_t *)event);
       
-      post("@%lf (%s): <%s> ", sequence_event_get_time(event), fts_symbol_name(track_name), fts_symbol_name(class_name));
+      post("  @%lf (%s): <%s> ", sequence_event_get_time(event), fts_symbol_name(track_name), fts_symbol_name(class_name));
       fts_send_message((fts_object_t *)event, fts_SystemInlet, fts_s_print, 0, 0);
       post("\n");	
       event = sequence_event_get_next(event);

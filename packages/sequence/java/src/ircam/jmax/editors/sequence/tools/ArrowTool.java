@@ -127,7 +127,7 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
     int deltaX = x-startingPoint.x;
 
     // starts a serie of undoable moves	
-    ((UndoableData) egc.getDataModel()).beginUpdate();
+    //((UndoableData) egc.getDataModel()).beginUpdate();
     
     for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
 	{
@@ -139,7 +139,7 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 	      egc.getAdapter().setY(aEvent, egc.getAdapter().getY(aEvent)+deltaY);
 	}
     
-    ((UndoableData) egc.getDataModel()).endUpdate();
+    //((UndoableData) egc.getDataModel()).endUpdate();
 	
     mountIModule(itsSelecter);
     gc.getGraphicDestination().repaint();    

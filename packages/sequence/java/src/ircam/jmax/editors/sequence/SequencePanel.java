@@ -382,7 +382,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
   {
     try 
       {
-	((UndoableData) sequenceData).undo();
+	//((UndoableData) sequenceData).undo();
       } catch (CannotUndoException e1) {
 	System.out.println("can't undo");
       }
@@ -392,7 +392,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
   {
     try 
       {
-	((UndoableData) sequenceData).redo();
+	//((UndoableData) sequenceData).redo();
       } catch (CannotRedoException e1) {
 	System.out.println("can't redo");
       }

@@ -175,11 +175,16 @@ struct _sequence
 
   sequence_track_t *tracks; /* list of tracks */ 
   int n_tracks; /* # of tracks */ 
+
+  int open; /* flag: is 1 if sequence editor is open */
 };
 
 #define sequence_get_size(s) ((s)->size)
 #define sequence_get_n_tracks(s) ((s)->n_tracks)
 #define sequence_get_first_track(s) ((s)->tracks)
+
+#define sequence_set_editor_open(s) ((s)->open = 1)
+#define sequence_editor_open(s) ((s)->open == 1)
 
 /* new/delete sequence */
 extern void sequence_init(sequence_t *sequence);

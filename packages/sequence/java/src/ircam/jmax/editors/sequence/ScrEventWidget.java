@@ -173,7 +173,7 @@ public class ScrEventWidget extends Box implements ListSelectionListener, TrackD
       return;
     }
 
-    ((UndoableData) gc.getDataModel()).beginUpdate();
+    //((UndoableData) gc.getDataModel()).beginUpdate();
 
 
     Enumeration en;
@@ -220,7 +220,7 @@ public class ScrEventWidget extends Box implements ListSelectionListener, TrackD
 	  }
       }
 
-    ((UndoableData) gc.getDataModel()).endUpdate();
+    //((UndoableData) gc.getDataModel()).endUpdate();
 
   }
 

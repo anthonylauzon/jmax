@@ -39,6 +39,7 @@ sequence_init(sequence_t *sequence)
   sequence->size = 0;
   sequence->n_tracks = 0;
   sequence->tracks = 0;
+  sequence->open = 0;  
 }
 
 /*********************************************************
@@ -66,7 +67,7 @@ sequence_track_post(sequence_track_t *track)
   fts_type_t type = sequence_track_get_type(track);
   fts_symbol_t type_name = fts_type_get_selector(type);
   
-  post("track: %s (%s)\n", fts_symbol_name(name), fts_symbol_name(type_name));
+  post("%s (%s)\n", fts_symbol_name(name), fts_symbol_name(type_name));
 }
 
 /*********************************************************

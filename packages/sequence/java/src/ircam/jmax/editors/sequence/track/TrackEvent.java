@@ -87,9 +87,9 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
     {
 	if (time < 0) time = 0;
 	if (itsTrackDataModel != null)
-	    {
-		if (((UndoableData) itsTrackDataModel).isInGroup())
-		    ((UndoableData) itsTrackDataModel).postEdit(new UndoableMove(this));
+	  {
+	    //if (((UndoableData) itsTrackDataModel).isInGroup())
+	    //((UndoableData) itsTrackDataModel).postEdit(new UndoableMove(this));
 		
 		itsTrackDataModel.moveEvent(this, time);
 		
@@ -108,11 +108,13 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 	//int intVal;
 	double doubleVal;
 
+	/*
 	if (itsTrackDataModel != null)
 	    {
 		if (((UndoableData) itsTrackDataModel).isInGroup())
 		    ((UndoableData) itsTrackDataModel).postEdit(new UndoableEventTransformation(this));
 	    }
+	*/
 	
 	if (theValue instanceof Double) 
 	    {
@@ -194,7 +196,7 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
      * Tells the model to start an undo section */
     public  void beginUpdate()  
     {
-	((UndoableData) itsTrackDataModel).beginUpdate();
+      //((UndoableData) itsTrackDataModel).beginUpdate();
 	inGroup = true;
     }
     
@@ -208,7 +210,7 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
      * Signal that the undoable section ended */
     public void endUpdate() 
     {
-	((UndoableData) itsTrackDataModel).endUpdate();
+      //((UndoableData) itsTrackDataModel).endUpdate();
 	inGroup = false;
     }
 

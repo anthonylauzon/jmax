@@ -258,14 +258,16 @@ seqmidi_read_track_start(fts_midifile_t *file)
   sprintf(s, "track%d", sequence_get_n_tracks(sequence));
   name = fts_new_symbol_copy(s);
 
+  /* create new track */
   fts_set_symbol(a + 0, seqtrack_symbol);
   fts_set_symbol(a + 1, seqnote_symbol);
   fts_set_symbol(a + 2, name);
-  /* fts_object_new(0, 3, a, &note); */
+  fts_object_new(0, 3, a, &track);
 
-  /* track = sequence_add_track(sequence, track); @@@@*/
-  track = sequence_get_first_track(sequence);
+  /* add track to sequence */
+  sequence_add_track(sequence, track);
 
+  /* store track as current */
   data->track = track;
 
   return 1;
