@@ -362,7 +362,6 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
 	MaxVector v = new MaxVector();		    
 	for (Enumeration en = getSelected(); en.hasMoreElements();)
 	    v.addElement(en.nextElement());
-
 	deselectAll();
 
 	((FtsBpfObject)itsModel).requestPointsRemove(v.elements());
@@ -408,47 +407,6 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
 		    }
 	    }
     }
-  /**
-   * An usefull (and fast) class to traverse the selection, to be used
-   * when the objects are not changed in the loop (read only) */
-    /*class ReadOnlyEnum implements Enumeration
-      {
-      
-      ReadOnlyEnum()
-      {
-      current = getMinSelectionIndex();
-      }
-      
-      public boolean hasMoreElements()
-      {
-      next = findNext();
-      return next != NO_MORE;
-      }
-
-      public Object nextElement()
-      {
-      return itsModel.getEventAt(next);
-      }
-
-      int findNext()
-      {
-      while (current <= getMaxSelectionIndex())
-      {
-      if (isSelectedIndex(current))
-      {
-      current++;
-      return current-1;
-      }
-      else current++;
-      }
-      return NO_MORE;
-      }
-
-      //--- Fields
-      int current;
-      int next;
-      final int NO_MORE = -1;
-      }*/
 }
 
 

@@ -102,38 +102,16 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
   public void removePoints(int nArgs , FtsAtom args[])
   {
       int[] indxs = new int[nArgs];
-      
-      for(int i = 0; i<nArgs;i++)
-	  indxs[i] = args[i].getInt();
-
-      if(nArgs>1)
-	  bubbleSort(indxs);
 
       for(int i=0; i<nArgs; i++)
-	  removePoint(indxs[i]);	
-
+	  {
+	      indxs[i] = args[i].getInt();
+	      removePoint(indxs[i]);	
+	  }
       notifyPointsDeleted(indxs);
       setDirty();
   }
  
-    void bubbleSort(int a[])
-    {
-	boolean flag = true;
-	int temp;
-
-	while(flag) {
-	    flag = false;
-	    for (int i = 0; i<a.length-1; i++)
-		if (a[i] < a[i+1])
-		    {
-			temp = a[i];
-			a[i] = a[i+1];
-			a[i+1] = temp;
-			flag = true;
-		    }
-	} 
-    }
-
   public void setPoint(int nArgs , FtsAtom args[])
   {
       int oldIndex = args[0].getInt();
@@ -169,6 +147,7 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
 	notifyPointAdded(j);
 	setDirty();
     }
+
   public void append(int nArgs , FtsAtom args[])
     {
 	int j=0;
@@ -211,7 +190,27 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
 	    {
 		sendArgs[i++].setInt(indexOf((BpfPoint)e.nextElement())); 
 	    }
+	bubbleSort(sendArgs, i);
+	
 	sendMessage(FtsObject.systemInlet, "remove_points", i, sendArgs);
+    }
+
+    void bubbleSort(FtsAtom a[], int nArgs)
+    {
+	boolean flag = true;
+	FtsAtom temp;
+
+	while(flag) {
+	    flag = false;
+	    for (int i = 0; i<nArgs-1; i++)
+		if (a[i].getInt() < a[i+1].getInt())
+		    {
+			temp = a[i];
+			a[i] = a[i+1];
+			a[i+1] = temp;
+			flag = true;
+		    }
+	} 
     }
 
     public void closeEditor()
