@@ -61,11 +61,17 @@ fts_symbol_t fts_get_user_project( int create)
 
   home = getenv("HOME");
   fts_make_absolute_path(home, ".jmax.jprj", path, MAXPATHLEN);
-  if (fts_file_exists(path) && fts_is_file(path)) {
-    return fts_new_symbol(path);
+  if (!create)
+  {
+    if (fts_file_exists(path) && fts_is_file(path)) {
+      return fts_new_symbol(path);
+    }
+    
+    return NULL;
   }
-
-  return NULL;
+  
+  /* if we want to create, here we suppose that home directory always exists */
+  return fts_new_symbol(path);
 }
 
 fts_symbol_t 
@@ -91,11 +97,17 @@ fts_get_user_configuration( int create)
   home = getenv("HOME");
   /* @@@@@ Change default configuration file name here @@@@@ */
   fts_make_absolute_path(home, ".jmax.jcfg", path, MAXPATHLEN);
-  if (fts_file_exists(path) && fts_is_file(path)) {
-    return fts_new_symbol(path);
+  if (! create)
+  {
+    if (fts_file_exists(path) && fts_is_file(path)) {
+      return fts_new_symbol(path);
+    }
+    
+    return NULL;  
   }
-
-  return NULL;  
+  
+  /* if we want to create, here we suppose that home directory always exits */
+  return fts_new_symbol(path);
 }
 
 fts_symbol_t 
