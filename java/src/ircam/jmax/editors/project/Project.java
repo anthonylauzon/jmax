@@ -38,11 +38,13 @@ public class Project extends Panel implements AdjustmentListener{
     for(int i=0; i<35; i++){
       aPanel = new Panel();
       aPanel.addKeyListener(itsProjectWindow);
+      aPanel.addMouseListener(itsProjectWindow);
       add(aPanel);
       itsPanelList.addElement(aPanel);
     }
     validate();
     addKeyListener(itsProjectWindow);
+    addMouseListener(itsProjectWindow);
   }
 	
   //--------------------------------------------------------
@@ -264,7 +266,8 @@ public class Project extends Panel implements AdjustmentListener{
     Panel aPanel = new Panel();
     add(aPanel);
     itsPanelList.addElement(aPanel);
-    /////
+    aPanel.addMouseListener(itsProjectWindow);
+    aPanel.addKeyListener(itsProjectWindow);
     doLayout();
     validate();
     repaint();
@@ -278,7 +281,8 @@ public class Project extends Panel implements AdjustmentListener{
     Panel aPanel = new Panel();
     add(aPanel);
     itsPanelList.addElement(aPanel);
-    /////
+    aPanel.addMouseListener(itsProjectWindow);
+    aPanel.addKeyListener(itsProjectWindow);
     doLayout();//???
     validate();
     repaint();
@@ -292,7 +296,8 @@ public class Project extends Panel implements AdjustmentListener{
     Panel aPanel = new Panel();
     add(aPanel);
     itsPanelList.addElement(aPanel);
-    /////
+    aPanel.addMouseListener(itsProjectWindow);
+    aPanel.addKeyListener(itsProjectWindow);
     doLayout();//???
     validate();
     repaint();

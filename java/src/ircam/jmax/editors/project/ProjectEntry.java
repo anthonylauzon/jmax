@@ -144,6 +144,7 @@ public class ProjectEntry extends Panel implements MouseListener/*, KeyListener*
      }*/
 
   public void mousePressed(MouseEvent e){
+    itsProject.itsProjectWindow.requestFocus();
     if(e.getClickCount()>1){
       if(itsDocument!=null) {
 	if(itsDocument.GetWindow()!=null)

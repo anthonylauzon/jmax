@@ -384,7 +384,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   }
 
   private boolean IsInWindowsMenu(String theName) {
-    return(theName.equals("Edit mode Ctrl+E")||theName.equals("Run mode Ctrl+E")||theName.equals("Project Manager Ctrl+M")||theName.equals("Ermes Console")||IsAWindowName(theName)|| IsAnEditorFrameName(theName));
+    return(theName.equals("Edit mode Ctrl+E")||theName.equals("Run mode Ctrl+E")||theName.equals("Project Manager Ctrl+M")||theName.equals("jMax Console")||IsAWindowName(theName)|| IsAnEditorFrameName(theName));
   }
 	
   private boolean IsAWindowName(String theName){
@@ -991,7 +991,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     else if (theString.equals("Project Manager Ctrl+M")) {
       MaxApplication.getApplication().GetProjectWindow().toFront();
     }
-    else if (theString.equals("Ermes Console")) {
+    else if (theString.equals("jMax Console")) {
       MaxApplication.getApplication().GetConsoleWindow().ToFront();
     }
     else BringToFront(theString);

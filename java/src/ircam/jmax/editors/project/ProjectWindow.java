@@ -21,7 +21,7 @@ import ircam.jmax.editors.ermes.*;
  * of entries, and all the documents associated. It knows how to
  * associate a file to an editor and then to a java package.
  */
-public class ProjectWindow extends Frame implements KeyListener, WindowListener, ActionListener, ItemListener, FocusListener {
+public class ProjectWindow extends Frame implements KeyListener, WindowListener, ActionListener, ItemListener, FocusListener, MouseListener {
   
   private static int untitledTxtCounter = 1;
   private static int untitledTabCounter = 1;
@@ -98,6 +98,7 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
 
     addKeyListener(this);
     addWindowListener(this);
+    addMouseListener(this);
   }
     
   private Menu CreateNewFileMenu(){
@@ -324,7 +325,7 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
   }
 
   private boolean IsInWindowsMenu(String theName) {
-    return(theName.equals("Stack") || theName.equals("Tile") || theName.equals("Tile Vertical")||theName.equals("Ermes Console")||theName.equals("Jacl Console")||IsAWindowName(theName) || IsAnEditorFrameName(theName));
+    return(theName.equals("Stack") || theName.equals("Tile") || theName.equals("Tile Vertical")||theName.equals("jMax Console")||IsAWindowName(theName) || IsAnEditorFrameName(theName));
   }
   
   private boolean IsAWindowName(String theName){
@@ -765,9 +766,19 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////WindowListener --fine
 
+  ///////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////MouseListener --inizio
+  public void mousePressed(MouseEvent e){
+    requestFocus();
+  }
+  public void mouseClicked(MouseEvent e){}
+  public void mouseReleased(MouseEvent e){}
+  public void mouseEntered(MouseEvent e){}
+  public void mouseExited(MouseEvent e){}
+  
 
-
-
+  ///////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////MouseListener --fine
   //--------------------------------------------------------
   //	paint
   //--------------------------------------------------------

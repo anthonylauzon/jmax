@@ -46,11 +46,10 @@ public class ConsoleKeyListener implements KeyListener {
     public void keyTyped(KeyEvent evt) {
       intercept = console.getTextArea().getText().length();
       if(evt.isControlDown()){
-	console.itsContainer.keyPressed(evt);
+	//console.itsContainer.keyPressed(evt);
 	return;
       }
       char key = evt.getKeyChar();
-      
       if ((key == '\r') || (key == '\n')) {
 	/*
 	 * Enter and return notify the console that there is a new

@@ -790,6 +790,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   public void mouseClicked(MouseEvent e){}
 
   public void mousePressed(MouseEvent e){
+    itsSketchWindow.requestFocus();//???
     //create the object whose name is objectNames[addObject] in coord x, y
     int x = e.getX();
     int y = e.getY();
@@ -895,7 +896,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   }
        
   public void mouseReleased(MouseEvent e){
-    
+
     int x = e.getX();
     int y = e.getY();
     

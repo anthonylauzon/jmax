@@ -232,7 +232,7 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
   }
 
   private boolean IsInWindowsMenu(String theName) {
-    return(theName.equals("Project Manager Ctrl+M")||theName.equals("Ermes Console")||theName.equals("Jacl Console")||IsAWindowName(theName)|| IsAnEditorFrameName(theName));
+    return(theName.equals("Project Manager Ctrl+M")||theName.equals("jMax Console")||IsAWindowName(theName)|| IsAnEditorFrameName(theName));
   }
   
   private boolean IsAWindowName(String theName){
@@ -393,7 +393,9 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
   public void windowClosed(WindowEvent e){}
   public void windowIconified(WindowEvent e){}       
   public void windowDeiconified(WindowEvent e){}
-  public void windowActivated(WindowEvent e){}
+  public void windowActivated(WindowEvent e){
+    requestFocus();
+  }
   public void windowDeactivated(WindowEvent e){}  
 
   ///////////////////////////////////////////////////////////////////////////
