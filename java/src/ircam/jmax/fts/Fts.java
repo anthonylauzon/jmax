@@ -104,7 +104,6 @@ public class Fts implements MaxContext
     if ( project != null)
       {
 	ftsOptions = ftsOptions + " --project=" + project;
-	System.err.println( "ftsOptions" + ftsOptions);
       }
 
     if (connectionType.equals("socket")) 
