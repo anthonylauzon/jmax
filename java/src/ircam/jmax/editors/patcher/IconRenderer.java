@@ -75,6 +75,10 @@ public class IconRenderer implements ObjectRenderer
     return icon.getIconWidth();
   }
 
+  public void setForeground(Color color)
+  {
+  }
+
   public void setBackground(Color color)
   {
   }

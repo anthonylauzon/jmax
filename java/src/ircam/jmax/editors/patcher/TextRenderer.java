@@ -180,6 +180,11 @@ public class TextRenderer implements ObjectRenderer
     area.setBackground(color);
   }
 
+    public void setForeground(Color color)
+    {
+	area.setForeground(color);
+    }
+
   static Container ic = new Panel();
 
   public void render(Graphics g, int x, int y, int w, int h)
@@ -187,8 +192,3 @@ public class TextRenderer implements ObjectRenderer
     SwingUtilities.paintComponent(g, area, ic, x, y, w, h);
   }
 }
-
-
-
-
-

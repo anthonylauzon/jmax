@@ -1,4 +1,4 @@
- //
+//
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -42,8 +42,8 @@ import ircam.jmax.utils.*;
 //
 public class Standard extends Editable implements FtsObjectErrorListener
 {
-  boolean ignoreError = false;
-
+  //boolean ignoreError = false;
+    
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
@@ -51,7 +51,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
   {
     super( theSketchPad, theFtsObject);
   }
-
+    
   // ----------------------------------------
   // ``Args'' property
   // ----------------------------------------
@@ -60,15 +60,15 @@ public class Standard extends Editable implements FtsObjectErrorListener
     // get the correct String from the object
     return ftsObject.getDescription();
   }
-
+    
   public void errorChanged(boolean value) 
   {
-    ignoreError = false;
+    //ignoreError = false;
     redraw();
   }
-
+    
   /* Inspector */
-
+    
   public void inspect() 
   {
   }
@@ -77,7 +77,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
   {
     try 
       {
-	ignoreError = false;
+	//ignoreError = false;
 	ftsObject = ftsObject.getFts().redefineFtsObject( ftsObject, text);
 
 	if (ftsObject.isError())
@@ -97,13 +97,10 @@ public class Standard extends Editable implements FtsObjectErrorListener
   public void editContent()
   {
     itsSketchPad.waiting();
-    
-    ftsObject.sendMessage(FtsObject.systemInlet, "open_editor", new MaxVector());
-    
     ftsObject.getFts().editPropertyValue( ftsObject, new MaxDataEditorReadyListener() {
-      public void editorReady(MaxDataEditor editor)
+	public void editorReady(MaxDataEditor editor)
 	{itsSketchPad.stopWaiting();}
-    });
+      });
   }
 
   public boolean hasContent()
@@ -111,10 +108,10 @@ public class Standard extends Editable implements FtsObjectErrorListener
     return true;
   }
 
-  public void setIgnoreError(boolean v)
-  {
-    ignoreError = v;
-  }
+  //public void setIgnoreError(boolean v)
+  //{
+  //ignoreError = v;
+  //}
 
   // ----------------------------------------
   // Text area offset
@@ -142,11 +139,24 @@ public class Standard extends Editable implements FtsObjectErrorListener
   {
     return 5;
   }
+    
+  public Color getTextForeground()
+  {
+    if (ftsObject.isError())
+      return Color.gray;
+    else
+      return Color.black;
+  }
 
   public Color getTextBackground()
   {
     if (isSelected())
-      return Settings.sharedInstance().getSelectedColor();
+      if (ftsObject.isError())
+	return Color.lightGray;
+      else if(ftsObject.hasErrorsInside())
+	return Color.pink;
+      else
+	return Settings.sharedInstance().getObjColor();
     else
       return Color.white;
   }
@@ -157,22 +167,28 @@ public class Standard extends Editable implements FtsObjectErrorListener
 
   public void paint(Graphics g) 
   {
-    if ((! ignoreError) && ftsObject.isError())
-      g.setColor( Color.red);
+    if (ftsObject.isError())
+      {
+	if (isSelected())
+	  g.setColor( Color.gray);
+	else
+	  g.setColor( Color.lightGray);
+      }
+    else if(ftsObject.hasErrorsInside())
+      {
+	if (isSelected())
+	  g.setColor( Color.pink.darker());
+	else
+	  g.setColor( Color.pink);
+      }
     else
       {
-	if(ftsObject.hasErrorsInside())
-	    if (isSelected())
-		g.setColor( Color.orange.darker());
-	    else
-		g.setColor( Color.orange);
+	if (isSelected())
+	  g.setColor( Settings.sharedInstance().getObjColor().darker());
 	else
-	    if (isSelected())
-		g.setColor( Settings.sharedInstance().getSelectedColor());
-	    else
-		g.setColor( Settings.sharedInstance().getObjColor());
-      } 
-
+	  g.setColor( Settings.sharedInstance().getObjColor());
+      }
+	
     int x = getX();
     int y = getY();
     int w = getWidth();
@@ -185,10 +201,3 @@ public class Standard extends Editable implements FtsObjectErrorListener
     super.paint( g);
   }
 }
-
-
-
-
-
-
-

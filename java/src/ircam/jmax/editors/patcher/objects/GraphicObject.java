@@ -1,4 +1,4 @@
- //
+//
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -56,13 +56,13 @@ abstract public class GraphicObject implements DisplayObject
   {
     // All this parameters can be changed without changing the geometry
     // of the patch, i.e. the connection positions, unless stated otherwise
-
+	
     static final int INOUTLET_WIDTH = 5;
     static final int INOUTLET_HEIGHT = 3;
-
+	
     static final int HIGHLIGHTED_INOUTLET_HEIGHT = 6;
     static final int HIGHLIGHTED_INOUTLET_WIDTH = 7;
-
+	
     // The part of the highlight that go inside the 
     // Rectangle 
 
@@ -121,6 +121,9 @@ abstract public class GraphicObject implements DisplayObject
   private static boolean followingInOutletLocations = false;
   private static boolean followingInletLocations = false;
   private static boolean followingOutletLocations = false;
+
+  static final int ERROR_MESSAGE_DISPLAY_PAD = ObjectGeometry.INOUTLET_PAD + ObjectGeometry.INOUTLET_WIDTH + 1;
+  private static Font errorFont = new Font(ircam.jmax.utils.Platform.FONT_NAME, Font.BOLD, ircam.jmax.utils.Platform.FONT_SIZE);
 
   final public static void setFollowingInOutletLocations(boolean v)
   {
@@ -434,11 +437,14 @@ abstract public class GraphicObject implements DisplayObject
 
   public void paint( Graphics g)
   {
-    g.setColor( Color.black);
+    if(ftsObject.isError())
+      g.setColor( Color.gray);
+    else
+      g.setColor( Color.black);	  
 
     paintInlets(g);
     paintOutlets(g);
-    
+
     g.drawRect( getX(), getY(), getWidth()-1, getHeight()-1);
   }
 
@@ -453,7 +459,7 @@ abstract public class GraphicObject implements DisplayObject
   public void redraw()
   {
     itsSketchPad.repaint(ftsObject.getX(),
-			    ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
+			 ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
 			 ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP - 1,
 			 ftsObject.getWidth(),
 			 ftsObject.getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
@@ -463,13 +469,13 @@ abstract public class GraphicObject implements DisplayObject
 
   public void updateRedraw()
   {
-      itsSketchPad.paintAtUpdateEnd(this, ftsObject.getX(),
-				    ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
-				    ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP,
-				    ftsObject.getWidth(),
-				    ftsObject.getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
-				    ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
-				    ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
+    itsSketchPad.paintAtUpdateEnd(this, ftsObject.getX(),
+				  ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
+				  ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP,
+				  ftsObject.getWidth(),
+				  ftsObject.getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
+				  ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
+				  ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
   }
 
   public void redrawConnections()
@@ -539,7 +545,7 @@ abstract public class GraphicObject implements DisplayObject
     SensibilityArea area = SensibilityArea.get(this, Squeack.OUTLET);
 
     if ((mouseY > outletsAnchorY) || (mouseX < getX()) ||
-	 (mouseY < getY()-1) || (mouseX > getX()+getWidth()))
+	(mouseY < getY()-1) || (mouseX > getX()+getWidth()))
       {
 	area.setTransparent(true);
 	area.setCost(xcost + Math.abs(mouseY - outletsAnchorY));
@@ -1003,7 +1009,6 @@ abstract public class GraphicObject implements DisplayObject
       ftsObject.setObjectListener(null);
   }
 
-
   public void showErrorDescription()
   {
     if ( ftsObject != null) 
@@ -1015,22 +1020,33 @@ abstract public class GraphicObject implements DisplayObject
 
 	annotation = ftsObject.getErrorDescription();
 
-	if (annotation != null)
+	if (ftsObject.isError() && annotation != null)
 	  {
-	    ax = ftsObject.getX() + ftsObject.getWidth() / 2;
-	    ay = ftsObject.getY() + ftsObject.getHeight() / 2;
-	    aw = itsFontMetrics.stringWidth( annotation);
-	    ah = itsFontMetrics.getHeight();
+            g = itsSketchPad.getGraphics();   
 
-	    g = itsSketchPad.getGraphics();
-
+	    g.setColor( Color.red);
+	      
+	    paintInlets(g);
+	    paintOutlets(g);
+	      
+	    g.drawRect( getX(), getY(), getWidth() - 1, getHeight() - 1);
+	      
+	    aw = itsSketchPad.getFontMetrics(errorFont).stringWidth( annotation) + 1;
+	    ah = itsSketchPad.getFontMetrics(errorFont).getHeight();
+	    ax = ftsObject.getX() + ERROR_MESSAGE_DISPLAY_PAD;
+	    ay = ftsObject.getY() + ah / 4;
+	      
+	    g.setFont(errorFont);
+	      
 	    g.setColor( Color.white);
-	    g.fillRect( ax - 1 , ay - ah - 1, aw + 2, ah + 2);
-
-	    g.setColor( Color.black);
-	    g.drawRect( ax - 1, ay - ah - 1, aw + 2, ah + 2);
-	    g.setFont(itsFont);
-	    g.drawString( annotation, ax, ay);
+	    g.drawString( annotation, ax + 0, ay - 1);
+	    g.drawString( annotation, ax + 0, ay + 1);
+	    g.drawString( annotation, ax + -1, ay + 0);
+	    g.drawString( annotation, ax + 1, ay + 0);
+	      
+	    g.setColor( Color.red);
+	    g.drawString( annotation, ax + 0, ay + 0);
+	      
 	    g.dispose();
 	  }
       }
@@ -1111,13 +1127,3 @@ abstract public class GraphicObject implements DisplayObject
     return "GraphicObject<" + ftsObject.toString() + ">";
   }
 }
-
-
-
-
-
-
-
-
-
-

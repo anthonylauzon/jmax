@@ -98,7 +98,7 @@ class Toggle extends GraphicObject implements FtsIntValueListener
     if ( !isSelected())
       g.setColor( Settings.sharedInstance().getUIColor());
     else
-      g.setColor( Settings.sharedInstance().getSelectedColor());
+      g.setColor( Settings.sharedInstance().getUIColor().darker());
 
     g.fill3DRect( x + 1, y + 1, w - 2, h - 2, true);
 

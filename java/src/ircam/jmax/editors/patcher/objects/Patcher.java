@@ -117,16 +117,21 @@ class Patcher extends Editable implements FtsObjectErrorListener
     return 7;
   }
 
+  public Color getTextForeground()
+  {
+      return Color.black;
+  }
+
   public Color getTextBackground()
   {
     if (errorsInside)
 	if (isSelected()) 
-	    return Color.orange.darker();
+	    return Color.pink.darker();
 	else
-	    return Color.orange;
+	    return Color.pink;
     else
 	if (isSelected()) 
-	    return Settings.sharedInstance().getSelectedColor();
+	    return Settings.sharedInstance().getObjColor().darker();
 	else 
 	    return Settings.sharedInstance().getObjColor();
   }
@@ -147,12 +152,12 @@ class Patcher extends Editable implements FtsObjectErrorListener
   {
       if (errorsInside)
 	  if (isSelected())
-	      g.setColor( Color.orange.darker());
+	      g.setColor( Color.pink.darker());
 	  else
-	      g.setColor( Color.orange);
+	      g.setColor( Color.pink);
       else
 	  if (isSelected())
-	      g.setColor( Settings.sharedInstance().getSelectedColor());
+	      g.setColor( Settings.sharedInstance().getObjColor().darker());
 	  else 
 	      g.setColor( Settings.sharedInstance().getObjColor());
       

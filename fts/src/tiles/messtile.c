@@ -508,8 +508,7 @@ fts_mess_client_redefine_patcher(int ac, const fts_atom_t *av)
 	  return;
 	}
 
-      if ((ac >= 3) && fts_is_symbol(&av[1]) && fts_is_symbol(&av[2]) &&
-	  (fts_get_symbol(&av[2]) == fts_s_column))
+      if (fts_object_description_defines_variable(ac - 1, av + 1))
 	{
 	  /* Variable syntax */
 

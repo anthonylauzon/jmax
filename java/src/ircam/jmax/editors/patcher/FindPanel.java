@@ -65,6 +65,14 @@ public class FindPanel extends JFrame
     return findPanel;
   }
 
+  public static FindPanel getInstance(Fts fts)
+  {
+    if (findPanel == null)
+      findPanel = new FindPanel(fts);
+
+    return findPanel;
+  }
+
   protected FindPanel(Fts f)
   {
     super( "Find Panel");

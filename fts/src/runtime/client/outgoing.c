@@ -307,10 +307,9 @@ void fts_client_upload_object(fts_object_t *obj)
      NEW_OBJECT_CODE (obj)parent (dta) data (int)new-id [<args>]+
      */
 
-  if ((obj->argc >= 3) && fts_is_symbol(&(obj->argv[0])) && fts_is_symbol(&(obj->argv[1])) &&
-      (fts_get_symbol(&(obj->argv[1])) == fts_s_column))
+  if(fts_object_description_defines_variable(obj->argc, obj->argv))
     do_var = 1;
-
+  
   if (do_var)
     fts_client_mess_start_msg(NEW_OBJECT_VAR_CODE);
   else

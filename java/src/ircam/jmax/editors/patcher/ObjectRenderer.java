@@ -42,6 +42,7 @@ public interface ObjectRenderer
   public int getWidth();
 
   public void setBackground(Color color);
+  public void setForeground(Color color);
 
   public void render(Graphics g, int x, int y, int w, int h);
 }

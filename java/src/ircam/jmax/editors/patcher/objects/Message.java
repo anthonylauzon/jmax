@@ -124,27 +124,22 @@ class Message extends Editable implements FtsMessageListener, FtsIntValueListene
   // ``TextBackground'' property
   // ----------------------------------------
 
+  public Color getTextForeground()
+  {
+      return Color.black;
+  }
+
   public Color getTextBackground()
   {
-    if (! itsSketchPad.isLocked()) 
-      {
-	if( isFlashing) 
-	  return Settings.sharedInstance().getSelectedColor();
-	else
+      if( isFlashing) 
+	  return Settings.sharedInstance().getUIColor();
+      else
 	  {
-	    if (isSelected()) 
-	      return Settings.sharedInstance().getSelectedColor();
-	    else
-	      return Color.white;
+	      if (isSelected()) 
+		  return Settings.sharedInstance().getUIColor().darker();
+	      else
+		  return Color.white;
 	  }
-      }
-    else 
-      {
-	if ( isFlashing || isSelected())
-	  return Settings.sharedInstance().getSelectedColor();
-	else 
-	  return Color.white;
-      }
   }
 
   public void paint(Graphics g) 
@@ -164,5 +159,4 @@ class Message extends Editable implements FtsMessageListener, FtsIntValueListene
     
     drawContent( g);
   }
-
 }

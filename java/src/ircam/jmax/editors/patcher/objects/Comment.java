@@ -111,6 +111,11 @@ public class Comment extends Editable
     return 4;
   }
 
+  public Color getTextForeground()
+  {
+      return Color.black;
+  }
+
   public Color getTextBackground()
   {
     if (itsSketchPad.isLocked())

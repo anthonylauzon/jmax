@@ -146,12 +146,13 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
       //g.setColor( Settings.sharedInstance().getUIColor());
       g.setColor( Color.white);
     else
-      g.setColor( Settings.sharedInstance().getSelectedColor());
+      g.setColor( Settings.sharedInstance().getUIColor().darker());
 
     //g.fill3DRect( x+1, y+1, w-2 , h-2, true);
     g.fillRect( x+1, y+1, w-2 , h-2);
 
     g.setColor( Color.black);
+
     // Draw or fill the triangle
 
     if ( valueValid) 
@@ -176,6 +177,7 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
       aString = getVisibleString(currentText.toString());
     
     g.setColor( Color.black);
+
     g.setFont( getFont());
     g.drawString( aString, 
 		  x + hd2 + 5, 

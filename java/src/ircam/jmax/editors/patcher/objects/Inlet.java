@@ -50,7 +50,7 @@ public class Inlet extends InOutlet {
   public void paint(Graphics g) 
   {
     if (isSelected())
-      g.setColor( Settings.sharedInstance().getSelectedColor());
+      g.setColor( Settings.sharedInstance().getObjColor().darker());
     else
       g.setColor( Settings.sharedInstance().getObjColor());
 

@@ -329,7 +329,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     s = MaxApplication.getProperty("jmaxDefaultFontSize");
     
     if (s == null)
-      defaultFontSize = ircam.jmax.utils.Platform.FONT_SIZE;
+	defaultFontSize = ircam.jmax.utils.Platform.FONT_SIZE;
     else
       defaultFontSize = Integer.parseInt(s);
 
@@ -928,8 +928,8 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   {
     GraphicObject object = makeObject(newObjectDescription, x, y);
 
-    if (object instanceof Standard)
-      ((Standard)object).setIgnoreError(true);
+    //if (object instanceof Standard)
+    //((Standard)object).setIgnoreError(true);
 
     if (edit && newObjectEdit && (object instanceof Editable))
       {
@@ -1089,7 +1089,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   // -----------------------------------------------------------------
   MessageDisplayer itsMessageDisplayer;
   public void setMessageDisplayer(MessageDisplayer displayer){
-    itsMessageDisplayer = displayer;
+      itsMessageDisplayer = displayer;
   }
   public MessageDisplayer getMessageDisplayer(){
     return itsMessageDisplayer;

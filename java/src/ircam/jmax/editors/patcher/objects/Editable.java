@@ -186,6 +186,7 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   // ----------------------------------------
 
   abstract public Color getTextBackground();
+  abstract public Color getTextForeground();
 
   // Properties to position correctly the text editor
 
@@ -226,6 +227,7 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
       return;
 
     renderer.setBackground(getTextBackground());
+    renderer.setForeground(getTextForeground());
 
     renderer.render(g, 
 		    getX() + getTextXOffset(),
@@ -269,13 +271,3 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     ObjectPopUp.removeMenu(TextPopUpMenu.getInstance());
   }
 }
-
-
-
-
-
-
-
-
-
-

@@ -100,7 +100,7 @@ public class Bang extends GraphicObject implements FtsIntValueListener
     int h = getHeight();
 
     if ( isSelected())
-      g.setColor( Settings.sharedInstance().getSelectedColor());
+      g.setColor( Settings.sharedInstance().getUIColor().darker());
     else
       g.setColor( Settings.sharedInstance().getUIColor());
 
