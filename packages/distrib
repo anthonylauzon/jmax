@@ -1,0 +1,14 @@
+all		all	explode
+all		all	guiobj
+all		all	ispw
+all		all	lists
+all		all	qlist
+all		all	system
+all		all	table
+all		all	io
+src		all	Makefile
+additive	all	additive
+data		all	data
+ircam		all	eric
+ircam		all	jimmies
+ircam		all	manoury
