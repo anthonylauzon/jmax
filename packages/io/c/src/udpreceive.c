@@ -42,28 +42,24 @@
 
 typedef struct {
   fts_object_t o;
-  int socket;
-  char buffer[UDP_PACKET_SIZE];
+  fts_bytestream_t* udp_stream;
   fts_binary_protocol_t* binary_protocol;
 } udpreceive_t;
 
 #define MAXATOMS 1024
 
-static void udpreceive_receive( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void udpreceive_receive( fts_object_t *o, int size, const unsigned char* buffer)
 {
   udpreceive_t *self = (udpreceive_t *)o;
   fts_symbol_t selector = NULL;
   int argc;
   fts_atom_t *argv;
   fts_binary_protocol_t* binary_protocol = self->binary_protocol;
-  int size;
-
-  size = recvfrom( self->socket, self->buffer, UDP_PACKET_SIZE, 0, NULL, NULL);
 
   if ( size <= 0)
     return;
 
-  if (fts_binary_protocol_decode(binary_protocol, size, self->buffer) != size)
+  if (fts_binary_protocol_decode(binary_protocol, size, buffer) != size)
   {
     fts_log("[udpreceive] error in protocol decoding \n");
     fts_object_error(o, "error in protocol decoding");
@@ -85,54 +81,38 @@ static void udpreceive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 {
   udpreceive_t *self = (udpreceive_t *)o;
   int port = fts_get_int_arg( ac, at, 0, 0);
-  struct sockaddr_in addr;
 
+  /* create binary protocol decoder */
   self->binary_protocol = (fts_binary_protocol_t*)fts_object_create(fts_binary_protocol_type, 0, NULL);
   fts_object_refer((fts_object_t*)self->binary_protocol);
 
-  self->socket = socket(AF_INET, SOCK_DGRAM, 0);
-
-  if (self->socket == -1)
-    {
-      post( "Cannot open socket\n");
-      return;
-    }
-
-  memset( &addr, 0, sizeof(addr));
-  addr.sin_family = AF_INET;
-  addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  addr.sin_port = htons(port);
-
-  if ( bind( self->socket, (const struct sockaddr*)&addr, sizeof(struct sockaddr_in)) == -1)
-    {
-      post( "Cannot bind socket\n");
-      close( self->socket);
-      return;
-    }
+  /* create udp stream */
+  self->udp_stream = (fts_bytestream_t*)fts_object_create(fts_udpstream_class, ac, at);
+  if (self->udp_stream != NULL)
+  {
+    fts_object_refer((fts_object_t*)self->udp_stream);
+  }
+  else
+  {
+    fts_object_error(o, "Cannot create udp stream component");
+  }
 
   /* 1 outlet for sending received message */
   fts_object_set_outlets_number(o, 1);
 
-  fts_sched_add( (fts_object_t *)self, FTS_SCHED_READ, self->socket);
+  fts_bytestream_add_listener(self->udp_stream, (fts_object_t*)self, udpreceive_receive);
 }
 
 static void udpreceive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   udpreceive_t *self = (udpreceive_t *)o;
   fts_object_release((fts_object_t*)self->binary_protocol);
-
-  if ( self->socket >= 0)
-    {
-      fts_sched_remove( (fts_object_t *)self);
-      close( self->socket);
-    }
+  fts_object_release((fts_object_t*)self->udp_stream);
 }
 
 static void udpreceive_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof( udpreceive_t), udpreceive_init, udpreceive_delete);
-
-  fts_class_message_varargs(cl, fts_s_sched_ready, udpreceive_receive);
 }
 
 void udpreceive_config( void)
