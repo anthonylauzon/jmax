@@ -1,2 +1,4 @@
 all	all      table.jpk
-all	all      java
+all	all      java/classes/table.jar
+
+
