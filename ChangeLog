@@ -1,3 +1,7 @@
+2004-03-05  Alexandre Pages  <Alexandre.Pages@ircam.fr>
+    
+      * added file floatfuns.h in 'packages/data/c/src/fmat.c', which contains the definitions for the float versions of the math functions.
+
 2004-03-01  Norbert Schnell  <schnell@mac-portable-schnell.ircam.fr>
 
 	* added \r in parallel to \n to tokenizer.l
