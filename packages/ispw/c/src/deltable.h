@@ -39,7 +39,7 @@ extern int delay_table_is_delwrite_scheduled(fts_symbol_t delay_name);
 
 typedef struct
 {
-  fts_object_t  obj;
+  fts_dsp_object_t  obj;
   fts_symbol_t name;
   fts_object_t *next; /* pointer to the other delread for the same delay line */
 } delay_table_delreader_t;
