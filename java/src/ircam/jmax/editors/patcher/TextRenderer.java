@@ -196,6 +196,7 @@ public class TextRenderer implements ObjectRenderer
 
   public void render(Graphics g, int x, int y, int w, int h)
   {
+    area.setSize( w, h);
     SwingUtilities.paintComponent(g, area, ic, x, y, w, h);
   }
 }
