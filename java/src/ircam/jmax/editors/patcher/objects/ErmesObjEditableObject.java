@@ -176,7 +176,7 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
 
   private static SensibilityArea textArea = new TextSensibilityArea();
 
-  public SensibilityArea findSensibilityArea( int mouseX, int mouseY)
+  protected DisplayObject findSensibilityArea( int mouseX, int mouseY)
   {
     int dx = mouseX - (getX() + getTextXOffset());
     int dy = mouseY - (getY() + getTextYOffset());

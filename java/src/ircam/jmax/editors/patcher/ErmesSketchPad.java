@@ -25,7 +25,8 @@ import ircam.jmax.editors.patcher.interactions.*;
  * offscreen and much, much more...
  */
 
-public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
+public class ErmesSketchPad extends JPanel
+{
 
   private DisplayList displayList;
 
@@ -41,39 +42,6 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     return keyMap;
   }
 
-  private long lastUpdateGroupStartTime = 0;
-  private long updateGroupStartTime = 0;
-  private long lastUpdateGroupEndTime = 0;
-  private long updateGroupEndTime = 0;
-  private int count = 0;
-
-  public void updateGroupStart() 
-  {
-    // (fd)
-    // Measurement code
-    lastUpdateGroupStartTime = updateGroupStartTime;
-    updateGroupStartTime = System.currentTimeMillis();
-  }
-  
-  public void updateGroupEnd() 
-  {
-    Toolkit.getDefaultToolkit().sync();
-
-    // (fd)
-    // Measurement code
-    lastUpdateGroupEndTime = updateGroupEndTime;
-    updateGroupEndTime = System.currentTimeMillis();
-
-    count++;
-
-    if (count % 20 == 0)
-      {
-	double p = (100.0 * (lastUpdateGroupEndTime - lastUpdateGroupStartTime)) / (updateGroupStartTime - lastUpdateGroupStartTime);
-
-	//System.err.println( "update load " + p + "%");
-      }
-  }
-
   ErmesSketchWindow itsSketchWindow;
   FtsObject itsPatcher;
   FtsPatcherData itsPatcherData;
@@ -84,7 +52,6 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
   public ErmesObjInOutPop itsInPop = null;
   public ErmesObjInOutPop itsOutPop = null;
   private EditField itsEditField;
-  private TextRenderer textRenderer;
 
   // FONT HANDLING
 
@@ -285,7 +252,13 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 
     // Next two temporary (mdc)
 
-    if (MaxApplication.getProperty("nodb") != null)
+    if (MaxApplication.getProperty("dg") != null)
+      {
+	RepaintManager.currentManager(this).setDoubleBufferingEnabled(false);
+	setDoubleBuffered(false);
+	setDebugGraphicsOptions(DebugGraphics.FLASH_OPTION);
+      }
+    else if (MaxApplication.getProperty("nodb") != null)
       {
 	RepaintManager.currentManager(this).setDoubleBufferingEnabled(false);
 	setDoubleBuffered(false);
@@ -293,20 +266,10 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 
     setOpaque(true);
 
-    Fts.getServer().addUpdateGroupListener( this);
-
     setLayout( null);
 
     itsEditField = new EditField( this);
     add( itsEditField);
-
-    // TEST
-    // textRenderer = new TextRenderer(this);
-
-    itsEditField.setVisible( false);
-    
-    setBackground( Settings.sharedInstance().getEditBackgroundColor());
-
 
     InitFromFtsContainer( itsPatcherData);
 
@@ -501,11 +464,6 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     return itsEditField;
   }
 
-  final public TextRenderer getTextRenderer()
-  {
-    return textRenderer;
-  }
-
   final public boolean isTextEditingObject()
   {
     return editedObject != null;
@@ -584,6 +542,7 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 
   public void paintComponent( Graphics g)
   {
+
     displayList.paint(g);
   }		
 
@@ -591,6 +550,7 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
   {
     repaint();
   }
+
 
   private ErmesToolBar toolBar;
 
@@ -618,8 +578,6 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
       ErmesSelection.patcherSelection.deselectAll();
 
     displayList.disposeAllObjects();
-
-    Fts.getServer().removeUpdateGroupListener( this);
 
     remove( itsInPop);
     remove( itsOutPop);
@@ -666,25 +624,26 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 
   void setLocked( boolean locked)
   {
-    this.locked = locked;
-
-    if (isLocked())
-      setRunModeInteraction();
-    else
-      setEditModeInteraction();
-
-    if (isLocked())
+    if (locked != this.locked)
       {
-	if (isTextEditingObject())
-	  stopTextEditing();
+	this.locked = locked;
 
-	setBackground( Settings.sharedInstance().getLockBackgroundColor());
+	if (isLocked())
+	  setRunModeInteraction();
+	else
+	  setEditModeInteraction();
 
-	if (ErmesSelection.patcherSelection.ownedBy(this))
-	  ErmesSelection.patcherSelection.deselectAll();
+	if (isLocked())
+	  {
+	    if (isTextEditingObject())
+	      stopTextEditing();
+
+	    if (ErmesSelection.patcherSelection.ownedBy(this))
+	      ErmesSelection.patcherSelection.deselectAll();
+	  }
+
+	redraw();
       }
-    else
-      setBackground( Settings.sharedInstance().getEditBackgroundColor());
   }
 
   final public boolean isLocked()

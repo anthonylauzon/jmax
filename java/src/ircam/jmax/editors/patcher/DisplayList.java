@@ -293,16 +293,10 @@ public class DisplayList
 	if (values[i] instanceof ErmesObject)
 	  {
 	    ErmesObject object = (ErmesObject) values[i];
+	    DisplayObject dobject = object.getDisplayObjectAt( x, y);
 
-	    if (object.contains( x,y))
-	      {
-		SensibilityArea area = object.findSensibilityArea( x, y);
-
-		if (area == null)
-		  return object;
-		else
-		  return area;
-	      }
+	    if (dobject != null)
+	      return dobject;
 	  }
 	else if (values[i] instanceof ErmesConnection)
 	  {
@@ -368,7 +362,10 @@ public class DisplayList
     
     clip = g.getClipBounds();
 
-    g.setColor(sketch.getBackground());
+    g.setColor(sketch.isLocked() ?
+	       Settings.sharedInstance().getLockBackgroundColor() : 
+	       Settings.sharedInstance().getEditBackgroundColor());
+
     g.fillRect(clip.x, clip.y, clip.width, clip.height);
 
     // Second, paint the display objects in the right order
@@ -555,6 +552,9 @@ public class DisplayList
 
   Rectangle getBounds(Rectangle r)
   {
+    // Note that the bounds always include the 0.0 corner
+    // this is done on purpose, it is not a bug.
+
     r.x = 0;
     r.y = 0;
     r.height = 0;

@@ -108,7 +108,6 @@ public class Squeack
     return (squeack & LOCATION_MASK) == CONNECTION;
   }
 
-
   static final public boolean onHResizeHandle(int squeack)
   {
     return (squeack & LOCATION_MASK) == HRESIZE_HANDLE;
@@ -134,6 +133,10 @@ public class Squeack
     return (squeack & LOCATION_MASK) == TEXT;
   }
 }
+
+
+
+
 
 
 

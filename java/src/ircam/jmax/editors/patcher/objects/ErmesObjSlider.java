@@ -250,7 +250,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
     updateThrottle();
   }
 
-  public void FromDialogValueChanged( int theCurrentInt, int theMaxInt, int theMinInt)
+  public void fromDialogValueChanged( int theCurrentInt, int theMaxInt, int theMinInt)
   {
     setMaxValue( theMaxInt);
     setMinValue( theMinInt);
@@ -425,7 +425,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
   private static VResizeSensibilityArea vResizeArea = new VResizeSensibilityArea();
 
-  public SensibilityArea findSensibilityArea( int mouseX, int mouseY)
+  protected DisplayObject findSensibilityArea( int mouseX, int mouseY)
   {
     if (mouseY >= getY() + getHeight() - VResizeSensibilityArea.height
 	 && mouseX >= getX() + getWidth() / 2)
@@ -435,5 +435,6 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
       }
     else
       return super.findSensibilityArea( mouseX, mouseY);
+
   }
 }

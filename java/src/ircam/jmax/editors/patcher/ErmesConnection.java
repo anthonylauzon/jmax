@@ -55,8 +55,10 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
 
   public void updateDimensions()
   {
-    from.getOutletAnchor(outlet, start);
-    to.getInletAnchor(inlet, end);
+    start.x = from.getOutletAnchorX(outlet);
+    start.y = from.getOutletAnchorY(outlet);
+    end.x   = to.getInletAnchorX(inlet);
+    end.y   = to.getInletAnchorY(inlet);
 
     down  = (start.x <= end.x);
     right = (start.y <= end.y);

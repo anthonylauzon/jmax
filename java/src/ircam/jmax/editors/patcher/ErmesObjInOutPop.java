@@ -29,11 +29,11 @@ public class ErmesObjInOutPop extends JPopupMenu
 
     public void actionPerformed( ActionEvent e)
     { 
-      itsOwner.ChangeNo( idx);
+      itsOwner.changeNo( idx);
     }
   };
     
-  public void SetNewOwner( ErmesObjInOut object) 
+  public void setOwner( ErmesObjInOut object) 
   {
     itsOwner = object;
   }

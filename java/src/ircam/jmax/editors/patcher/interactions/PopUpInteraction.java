@@ -24,7 +24,7 @@ class PopUpInteraction extends Interaction
     if ((! locked) && Squeack.isPopUp(squeack))
       {
 	locked = true;
-	object = (ErmesObject) dobject;
+	object = ((SensibilityArea) dobject).getObject();
 
 	object.popUpEdit(mouse);
 	locked = false;

@@ -46,7 +46,7 @@ abstract public class ErmesObjInOut extends ErmesObject {
   {
   }
 
-  public void ChangeNo( int n) 
+  public void changeNo( int n) 
   {
     if (itsId != n) 
       {

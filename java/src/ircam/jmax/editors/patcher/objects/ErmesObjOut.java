@@ -21,6 +21,8 @@ public class ErmesObjOut extends ErmesObjInOut
   public void redefine( String text) 
   {
     ((FtsOutletObject)ftsObject).setPosition( itsId);
+
+    super.redefine(text);
   }
   
   public void paint(Graphics g) 
@@ -64,7 +66,7 @@ public class ErmesObjOut extends ErmesObjInOut
   {
     //we want to choose among the different Outlet number
 
-    itsSketchPad.itsOutPop.SetNewOwner( this); //make the Choice pointing to this
+    itsSketchPad.itsOutPop.setOwner( this); //make the Choice pointing to this
     itsSketchPad.itsOutPop.show( itsSketchPad, p.x, p.y);
   }
 }

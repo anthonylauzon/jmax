@@ -36,7 +36,7 @@ class EditCtrlInteraction extends Interaction
     switch (squeack)
       {
       case Squeack.DOWN:
-	this.object = (ErmesObject) dobject;
+	object = ((SensibilityArea) dobject).getObject();
 	object.gotSqueack(squeack, mouse, oldMouse);
 	break;
 

@@ -99,7 +99,7 @@ class ErmesObjSliderDialog extends Frame implements ActionListener {
 	    setVisible(false);
 	    return;
 	  }
-	itsSliderObject.FromDialogValueChanged( aCurrentInt, aMaxInt, aMinInt);
+	itsSliderObject.fromDialogValueChanged( aCurrentInt, aMaxInt, aMinInt);
 	itsSliderObject = null; // make the gc happy.
 	setVisible( false);
       }

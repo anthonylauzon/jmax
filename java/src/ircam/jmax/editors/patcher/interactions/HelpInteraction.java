@@ -32,6 +32,7 @@ class HelpInteraction extends Interaction
     if ((! locked) && Squeack.isDown(squeack))
       {
 	locked = true;
+
 	if (Squeack.onObject(squeack))
 	  object = (ErmesObject) dobject;
 	else if (Squeack.onText(squeack))

@@ -21,6 +21,8 @@ public class ErmesObjIn extends ErmesObjInOut {
   public void redefine( String text) 
   {
     ((FtsInletObject)ftsObject).setPosition( itsId);
+
+    super.redefine(text);
   }
 
   public void paint(Graphics g) 
@@ -70,7 +72,7 @@ public class ErmesObjIn extends ErmesObjInOut {
 
   public void popUpEdit(Point p)
   {
-    itsSketchPad.itsInPop.SetNewOwner(this);
+    itsSketchPad.itsInPop.setOwner(this);
     itsSketchPad.itsInPop.show(itsSketchPad, p.x, p.y);
   }
 }

@@ -67,7 +67,8 @@ class DragReverseConnectInteraction extends Interaction
 	dst   = area.getObject();
 	inlet = area.getNumber();
 
-	dst.getInletAnchor(inlet, dragStart);
+	dragStart.x = dst.getInletAnchorX(inlet);
+	dragStart.y = dst.getInletAnchorY(inlet);
 	editor.resetHighlightedInlet();
 	dragged = false;
       }

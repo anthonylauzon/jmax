@@ -602,7 +602,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     else
       itsPatcherData.setEditMode(FtsPatcherData.EDIT_MODE);
 
-    itsSketchPad.setLocked( locked);
+    itsSketchPad.setLocked( locked); 
 
     itsToolBar.setLocked( locked);
 

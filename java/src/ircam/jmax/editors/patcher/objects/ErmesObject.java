@@ -28,10 +28,38 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 
   static class ErmesObjInOutlet
   {
-    protected static final int VISIBLE_WIDTH = 5;
-    protected static final int VISIBLE_HEIGHT = 3;
-    protected static final int VISIBLE_HIGHLIGHTED_HEIGHT = 8;
-    protected static final int PAD = 2;
+    // All this parameters can be changed without changing the geometry
+    // of the patch, i.e. the connection positions, unless stated otherwise
+
+    protected static final int WIDTH = 5;
+    protected static final int HEIGHT = 3;
+    protected static final int HIGHLIGHTED_HEIGHT = 6;
+    protected static final int HIGHLIGHTED_WIDTH = 6;
+
+    // PAD is the distance between the object border and the 
+    // center of the inlet/outlet; CHANGE the Connection geometry
+
+    protected static final int PAD = 4;
+
+    // INLET_OVERLAP is the part of the inlet rectangle that
+    // go inside the object
+
+    protected static final int INLET_OVERLAP = 2;
+
+    // INLET_OFFSET is the vertical distance between the anchor point
+    // and the object; CHANGE the Connection geometry
+
+    protected static final int INLET_OFFSET = 1;
+
+    // OUTLET_OVERLAP is the part of the inlet rectangle that
+    // go inside the object
+
+    protected static final int OUTLET_OVERLAP = 2;
+
+    // OUTLET_OFFSET is the vertical distance between the anchor point
+    // and the object; CHANGE the Connection geometry
+
+    protected static final int OUTLET_OFFSET = 0;
   }
 
   protected ErmesSketchPad itsSketchPad;
@@ -40,12 +68,14 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 
   private boolean selected = false;
 
+  int inletDistance; // the distance between two inlets anchor point
+  int outletDistance; // the distance between two outlets anchor point
+
   protected Font itsFont = null;
   protected FontMetrics itsFontMetrics = null;
 
-  private Rectangle bounds;
-
   // Sensibility areas
+
   private static InletSensibilityArea inletArea = new InletSensibilityArea();
   private static OutletSensibilityArea outletArea = new OutletSensibilityArea();
   private static HResizeSensibilityArea hResizeArea = new HResizeSensibilityArea();
@@ -97,9 +127,6 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 
     selected = false;
 
-    bounds = new Rectangle( theFtsObject.getX(), theFtsObject.getY(),
-				  theFtsObject.getWidth(), theFtsObject.getHeight());
-
     fontName = ftsObject.getFont();
     fontSize = ftsObject.getFontSize();
 
@@ -111,6 +138,8 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 
     itsFont = FontCache.lookupFont(fontName, fontSize);
     itsFontMetrics = FontCache.lookupFontMetrics(fontName, fontSize);
+
+    updateInOutlets();
   }
 
   // Destructor 
@@ -129,54 +158,51 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
   
   public final int getX() 
   {
-    return bounds.x;
+    return ftsObject.getX();
   }
 
-  protected void setX( int theX) 
+  protected void setX( int x) 
   {
-    bounds.x = theX;
-    ftsObject.setX( bounds.x);
+    ftsObject.setX(x);
     itsSketchPad.getDisplayList().updateConnectionsFor(this);
   }
 
   public final int getY() 
   {
-    return bounds.y;
+    return ftsObject.getY();
   }
 
-  protected void setY( int theY) 
+  protected void setY( int y) 
   {
-    bounds.y = theY;
-    ftsObject.setY( bounds.y);
+    ftsObject.setY(y);
     itsSketchPad.getDisplayList().updateConnectionsFor(this);
   }
 
   public final int getWidth() 
   {
-    return bounds.width;
+    return ftsObject.getWidth();
   }
 
   public void setWidth( int w) 
   {
     if (w > 0)
       {
-	bounds.width = w;
-	ftsObject.setWidth( w);
+	ftsObject.setWidth(w);
+	updateInOutlets();
 	itsSketchPad.getDisplayList().updateConnectionsFor(this);
       }
   }
 
   public final int getHeight() 
   {
-    return bounds.height;
+    return ftsObject.getHeight();
   }
 
   public void setHeight( int h) 
   {
     if (h > 0)
       {
-	bounds.height = h;
-	ftsObject.setHeight( h);
+	ftsObject.setHeight(h);
 	itsSketchPad.getDisplayList().updateConnectionsFor(this);
       }
   }
@@ -187,8 +213,7 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
   {
     if (h > 0)
       {
-	bounds.height = h;
-	ftsObject.setHeight( h);
+	ftsObject.setHeight(h);
       }
   }
 
@@ -231,82 +256,77 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
     ftsObject.setFontSize(itsFont.getSize());;
   }
 
-  public Point getOutletAnchor(int outlet, Point p)
+  public final int getOutletAnchorX(int outlet)
   {
-    int n = ftsObject.getNumberOfOutlets();
-    int distance = 0;
-
-    if (n > 1)
-      distance = (getWidth() - 2*ErmesObjInOutlet.PAD - ErmesObjInOutlet.VISIBLE_WIDTH) / (n-1);
-      
-    p.x = getX() + ErmesObjInOutlet.PAD + outlet*distance + ErmesObjInOutlet.VISIBLE_WIDTH/2;
-    p.y = getY() + getHeight();
-
-    return p;
+    return getX() + ErmesObjInOutlet.PAD + outlet * outletDistance;
   }
 
-  public Point getInletAnchor(int inlet, Point p)
+  public final int getOutletAnchorY(int outlet)
   {
-    int n = ftsObject.getNumberOfInlets();
-    int distance = 0;
+    return getY() + getHeight();
+  }
 
-    if (n > 1)
-      distance = (getWidth() - 2*ErmesObjInOutlet.PAD - ErmesObjInOutlet.VISIBLE_WIDTH) / (n-1);
-      
-    p.x = getX() + ErmesObjInOutlet.PAD + inlet*distance + ErmesObjInOutlet.VISIBLE_WIDTH/2;
-    p.y = getY() - 1;
+  public int getInletAnchorX(int inlet)
+  {
+    return getX() + ErmesObjInOutlet.PAD + inlet * inletDistance;
+  }
 
-    return p;
+  public int getInletAnchorY(int inlet)
+  {
+    return getY() - 1;
   }
 
   private void paintInlets(Graphics g)
   {
     int n = ftsObject.getNumberOfInlets();
-    int x = getX() + ErmesObjInOutlet.PAD;
-    int distance = 0;
-
-    // Optimisation: distance could be recomputed when inlet/outlet
-    // number changes and stored in instance variable
-
-    if (n > 1)
-      distance = (getWidth() - 2*ErmesObjInOutlet.PAD - ErmesObjInOutlet.VISIBLE_WIDTH) / (n-1); 
 
     for ( int i = 0; i < n; i++)
       {
-	if (itsSketchPad.isHighlightedInlet(this, i))
-	  g.fillRect( x, getY() - 6, ErmesObjInOutlet.VISIBLE_WIDTH,
-		      ErmesObjInOutlet.VISIBLE_HIGHLIGHTED_HEIGHT);
-	else
-	  g.fillRect( x, getY() - 1, ErmesObjInOutlet.VISIBLE_WIDTH, ErmesObjInOutlet.VISIBLE_HEIGHT);
+	int x, y, w, h;
 
-	x += distance;
+	x = getInletAnchorX(i);
+	y = getInletAnchorY(i);
+
+	if (itsSketchPad.isHighlightedInlet(this, i))
+	  {
+	    w = ErmesObjInOutlet.HIGHLIGHTED_WIDTH;
+	    h = ErmesObjInOutlet.HIGHLIGHTED_HEIGHT;
+	  }
+	else
+	  {
+	    w = ErmesObjInOutlet.WIDTH;
+	    h = ErmesObjInOutlet.HEIGHT;
+	  }
+	
+	g.fillRect( x - w / 2, y - h + ErmesObjInOutlet.INLET_OVERLAP + ErmesObjInOutlet.INLET_OFFSET, w, h);
       }
   }
 
   private void paintOutlets(Graphics g)
   {
     int n = ftsObject.getNumberOfOutlets();
-    int x = getX() + ErmesObjInOutlet.PAD;
-    int y = getY() + getHeight() - 1;
-    int distance = 0;
-
-    // Optimisation: distance could be recomputed when inlet/outlet
-    // number changes and stored in instance variable
-
-    if (n > 1)
-      distance = (getWidth() - 2*ErmesObjInOutlet.PAD - ErmesObjInOutlet.VISIBLE_WIDTH) / (n-1); 
 
     for ( int i = 0; i < n; i++)
       {
-	if (itsSketchPad.isHighlightedOutlet(this, i))
-	  g.fillRect( x, y, ErmesObjInOutlet.VISIBLE_WIDTH, ErmesObjInOutlet.VISIBLE_HIGHLIGHTED_HEIGHT);
-	else
-	  g.fillRect( x, y, ErmesObjInOutlet.VISIBLE_WIDTH, ErmesObjInOutlet.VISIBLE_HEIGHT);
+	int x, y, w, h;
 
-	x += distance;
+	x = getOutletAnchorX(i);
+	y = getOutletAnchorY(i);
+
+	if (itsSketchPad.isHighlightedOutlet(this, i))
+	  {
+	    w = ErmesObjInOutlet.HIGHLIGHTED_WIDTH;
+	    h = ErmesObjInOutlet.HIGHLIGHTED_HEIGHT;
+	  }
+	else
+	  {
+	    w = ErmesObjInOutlet.WIDTH;
+	    h = ErmesObjInOutlet.HEIGHT;
+	  }
+	
+	g.fillRect( x - w / 2, y - ErmesObjInOutlet.OUTLET_OVERLAP - ErmesObjInOutlet.OUTLET_OFFSET, w, h);
       }
   }
-
 
   public void paint( Graphics g)
   {
@@ -326,7 +346,14 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 
   public void redraw()
   {
-    itsSketchPad.repaint( bounds.x, bounds.y - 1, bounds.width, bounds.height + 2 );
+    itsSketchPad.repaint(ftsObject.getX(),
+			 ftsObject.getY() - ErmesObjInOutlet.HIGHLIGHTED_HEIGHT +
+			 ErmesObjInOutlet.INLET_OFFSET + ErmesObjInOutlet.INLET_OVERLAP,
+			 ftsObject.getWidth(),
+			 ftsObject.getHeight() + 2 * ErmesObjInOutlet.HIGHLIGHTED_HEIGHT  -
+			 ErmesObjInOutlet.INLET_OFFSET - ErmesObjInOutlet.INLET_OVERLAP -
+			 ErmesObjInOutlet.OUTLET_OFFSET - ErmesObjInOutlet.OUTLET_OVERLAP);
+
     itsSketchPad.getDisplayList().redrawConnectionsFor(this); // experimental
   }
 
@@ -335,11 +362,25 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
     itsSketchPad.getDisplayList().redrawConnectionsFor(this);
   }
 
+  private void updateInOutlets()
+  {
+    if (ftsObject.getNumberOfInlets() > 1)
+      inletDistance = (getWidth() - 2 * ErmesObjInOutlet.PAD) / (ftsObject.getNumberOfInlets() - 1);
+    else
+      inletDistance = 0; // not used in this case
+
+    if (ftsObject.getNumberOfOutlets() > 1)
+      outletDistance = (getWidth() - 2 * ErmesObjInOutlet.PAD) / (ftsObject.getNumberOfOutlets() - 1);
+    else
+      outletDistance = 0; // not used in this case
+  }
+
   // redefine provide a default empty implementation
   // for the object that do not redefine themselves
 
   public void redefine( String text) 
   {
+    updateInOutlets();
   }
 
   final public void setSelected(boolean v) 
@@ -375,8 +416,8 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 
     int io = -1;
 
-    int firstLetPosition =  ErmesObjInOutlet.PAD;
-    int distance = (getWidth() - 2*ErmesObjInOutlet.PAD - ErmesObjInOutlet.VISIBLE_WIDTH) / (n-1); 
+    int firstLetPosition =  ErmesObjInOutlet.PAD  - ErmesObjInOutlet.WIDTH/2;;
+    int distance = (getWidth() - 2*ErmesObjInOutlet.PAD) / (n-1); 
     int lastLetPosition = firstLetPosition + (n-1)*distance;
     
 
@@ -394,7 +435,7 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 	int sensibilityStartX = firstLetPosition + estimatedLet*distance - slice;
 	
 	if (x > sensibilityStartX &&
-	    x < sensibilityStartX + 2*slice + ErmesObjInOutlet.VISIBLE_WIDTH)
+	    x < sensibilityStartX + 2*slice + ErmesObjInOutlet.WIDTH)
 	  io = estimatedLet;
 
       }
@@ -402,49 +443,61 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
     return io;
   }
 
-  public SensibilityArea findSensibilityArea( int mouseX, int mouseY)
-    {
-      int x = getX();
-      int y = getY();
-      int w = getWidth();
-      int h = getHeight();
+  public DisplayObject getDisplayObjectAt( int mouseX, int mouseY)
+  {
+    int x = ftsObject.getX();
+    int y = ftsObject.getY();
+    int w = ftsObject.getWidth();
+    int h = ftsObject.getHeight();
 
-      if ( mouseX >= x + w - HResizeSensibilityArea.width 
-	   && mouseY > y + InletOutletSensibilityArea.height
-	   && mouseY < y + h - InletOutletSensibilityArea.height)
-	{
-	  hResizeArea.setObject(this);
-	  return hResizeArea;
-	}
-      else if ( mouseY < y + InletOutletSensibilityArea.height)
-	{
-	  int inlet = findNearestInOutlet( mouseX, ftsObject.getNumberOfInlets());
-
-	  if (inlet >= 0)
-	    {
-	      inletArea.setNumber( inlet);
-	      inletArea.setObject(this);
-	      return inletArea;
-	    }
-
-	  return null;
-	}
-      else if (mouseY >= y + h - InletOutletSensibilityArea.height)
-	{
-	  int outlet = findNearestInOutlet( mouseX, ftsObject.getNumberOfOutlets());
-
-	  if ( outlet >= 0)
-	    {
-	      outletArea.setNumber( outlet);
-	      outletArea.setObject(this);
-	      return outletArea;
-	    }
-
-	  return null;
-	}
-
+    if (! ((mouseX >= x) && (mouseX <= x + w) &&
+	   (mouseY >= y) && (mouseY <= y + h)))
       return null;
-    }
+
+    if ( mouseX >= x + w - HResizeSensibilityArea.width 
+	 && mouseY > y + InletOutletSensibilityArea.height
+	 && mouseY < y + h - InletOutletSensibilityArea.height)
+      {
+	hResizeArea.setObject(this);
+	return hResizeArea;
+      }
+    else if ( mouseY < y + InletOutletSensibilityArea.height)
+      {
+	int inlet = findNearestInOutlet( mouseX, ftsObject.getNumberOfInlets());
+
+	if (inlet >= 0)
+	  {
+	    inletArea.setNumber( inlet);
+	    inletArea.setObject(this);
+	    return inletArea;
+	  }
+      }
+    else if (mouseY >= y + h - InletOutletSensibilityArea.height)
+      {
+	int outlet = findNearestInOutlet( mouseX, ftsObject.getNumberOfOutlets());
+
+	if ( outlet >= 0)
+	  {
+	    outletArea.setNumber( outlet);
+	    outletArea.setObject(this);
+	    return outletArea;
+	  }
+      }
+
+    // Try subclass specialized methods
+
+    DisplayObject dobject = findSensibilityArea(mouseX, mouseY);
+
+    if (dobject == null)
+      return this;
+    else
+      return dobject;
+  }
+
+  protected DisplayObject findSensibilityArea( int mouseX, int mouseY)
+  {
+    return null;
+  }
 
   // This method is called to edit the object by means of a popup
   // structure
@@ -481,40 +534,43 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
   {
   }
 
-  public void moveBy( int theDeltaH, int theDeltaV) 
+  public void moveBy( int dx, int dy) 
   {
-    if ( theDeltaH == 0 && theDeltaV == 0)
-      return;
+    if (dx != 0)
+      setX( ftsObject.getX() + dx);
 
-    setX( bounds.x + theDeltaH);
-    setY( bounds.y + theDeltaV);
+    if (dy != 0)
+      setY( ftsObject.getY() + dy);
   }
 
-  public Rectangle getBounds() 
+  // Get the bounds in a rectangle
+
+  public void getBounds(Rectangle bounds) 
   {
-    // (fd, mdc) Bounds don't copy the bound rectangle any more
-    // and nobody is allowed to modify it.
-    return bounds;
+    bounds.x = ftsObject.getX();
+    bounds.y = (ftsObject.getY() - ErmesObjInOutlet.HIGHLIGHTED_HEIGHT +
+		ErmesObjInOutlet.INLET_OFFSET + ErmesObjInOutlet.INLET_OVERLAP);
+    bounds.width  = ftsObject.getWidth();
+    bounds.height = (ftsObject.getHeight() + 2 * ErmesObjInOutlet.HIGHLIGHTED_HEIGHT  -
+		     ErmesObjInOutlet.INLET_OFFSET - ErmesObjInOutlet.INLET_OVERLAP -
+		     ErmesObjInOutlet.OUTLET_OFFSET - ErmesObjInOutlet.OUTLET_OVERLAP);
   }
 
-  public boolean intersects(Rectangle rect)
+  public final boolean intersects(Rectangle r)
   {
-    return bounds.intersects(rect);
+    return !((r.x + r.width <= ftsObject.getX()) ||
+	     (r.y + r.height <= (ftsObject.getY() - ErmesObjInOutlet.HIGHLIGHTED_HEIGHT +
+				 ErmesObjInOutlet.INLET_OFFSET + ErmesObjInOutlet.INLET_OVERLAP)) ||
+	     (r.x >= ftsObject.getX() + ftsObject.getWidth()) ||
+	     (r.y >= (ftsObject.getY() + ftsObject.getHeight() + ErmesObjInOutlet.HIGHLIGHTED_HEIGHT -
+		      ErmesObjInOutlet.OUTLET_OFFSET - ErmesObjInOutlet.OUTLET_OVERLAP)));
   }
 
-  public boolean contains(Point point)
-  {
-    return bounds.contains(point);
-  }
 
-  public boolean contains(int x, int y)
+  public void rectangleUnion(Rectangle r)
   {
-    return bounds.contains(x, y);
-  }
-
-  public void rectangleUnion(Rectangle rect)
-  {
-    SwingUtilities.computeUnion(bounds.x, bounds.y, bounds.width, bounds.height, rect);
+    SwingUtilities.computeUnion(ftsObject.getX(), ftsObject.getY(),
+				ftsObject.getWidth(), ftsObject.getHeight(), r);
   }
 
   /* SUpport for graphic ordering; temporarly, it is not
@@ -530,11 +586,6 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
   final public int getLayer()
   {
     return layer;
-  }
-
-  public Dimension Size() 
-  {
-    return ( new Dimension( bounds.width, bounds.height));
   }
 
   // Called at ErmesObject disposal
@@ -560,8 +611,8 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 
 	if (annotation != null)
 	  {
-	    ax = bounds.x + bounds.width / 2;
-	    ay = bounds.y + bounds.height / 2;
+	    ax = ftsObject.getX() + ftsObject.getWidth() / 2;
+	    ay = ftsObject.getY() + ftsObject.getHeight() / 2;
 	    aw = itsFontMetrics.stringWidth( annotation);
 	    ah = itsFontMetrics.getHeight();
 

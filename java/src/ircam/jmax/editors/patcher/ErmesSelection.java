@@ -470,15 +470,11 @@ public class ErmesSelection implements Transferable
   {
     if (hasObjects())
       {
-	bounds.setBounds(((ErmesObject) objects.elementAt(0)).getBounds());
+	((ErmesObject) objects.elementAt(0)).getBounds(bounds);
 
 	for( int i = 1; i < objects.size(); i++)
-	  {
-	    Rectangle r;
+	  ((ErmesObject) objects.elementAt(i)).rectangleUnion(bounds);
 
-	    r = ((ErmesObject) objects.elementAt(i)).getBounds();
-	    SwingUtilities.computeUnion(r.x, r.y, r.width, r.height, bounds);
-	  }
 	return bounds;
       }
     else

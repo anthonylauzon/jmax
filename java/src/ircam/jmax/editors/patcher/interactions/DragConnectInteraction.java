@@ -68,7 +68,8 @@ class DragConnectInteraction extends Interaction
 	src    = area.getObject();
 	outlet = area.getNumber();
 
-	src.getOutletAnchor(outlet, dragStart);
+	dragStart.x = src.getOutletAnchorX(outlet);
+	dragStart.y = src.getOutletAnchorY(outlet);
 	editor.resetHighlightedOutlet();
 	dragged = false;
       }
