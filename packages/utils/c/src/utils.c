@@ -23,21 +23,15 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
-#ifndef _DATA_H
-#define _DATA_H
 
-#include <fts/fts.h>
+#include "utils.h"
 
-#ifdef WIN32
-#if defined(DATA_EXPORTS)
-#define DATA_API __declspec(dllexport)
-#else
-#define DATA_API __declspec(dllimport)
-#endif
-#else
-#define DATA_API extern
-#endif
+extern void fts_ffuns_init(void);
+extern void fts_cubic_init(void);
 
-#define restrict
-
-#endif /* _DATA_H */
+void
+utils_config(void)
+{
+  fts_ffuns_init();
+  fts_cubic_init();
+}

@@ -20,24 +20,33 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Francois Dechelle, Norbert Schnell.
  *
  */
-#ifndef _DATA_H
-#define _DATA_H
 
-#include <fts/fts.h>
+/* coefficient atable for cubic interpolation */
 
-#ifdef WIN32
-#if defined(DATA_EXPORTS)
-#define DATA_API __declspec(dllexport)
-#else
-#define DATA_API __declspec(dllimport)
-#endif
-#else
-#define DATA_API extern
-#endif
+#include "utils.h"
+#include "idefix.h"
 
-#define restrict
+fts_cubic_coefs_t fts_cubic_table[FTS_CUBIC_TABLE_SIZE];
 
-#endif /* _DATA_H */
+void
+fts_cubic_init(void)
+{
+  int i;
+  float f;
+  fts_cubic_coefs_t *p;
+
+  p = fts_cubic_table;
+
+  for( i = 0; i < FTS_CUBIC_TABLE_SIZE; i++)
+    {
+      f = i * (1.0 / FTS_CUBIC_TABLE_SIZE);
+      p->pm1 = -0.1666667 * f * (1 - f) * (2 - f);
+      p->p0 = 0.5 * (1 + f) * (1 - f) * (2 - f);
+      p->p1 = 0.5 * (1 + f) * f * (2 - f);
+      p->p2 = -0.1666667 * (1 + f) * f * (1 - f);
+      p++;
+    }
+}
