@@ -66,6 +66,14 @@ static void updmessage_fd_fun( int fd, void *data)
 	  fts_set_int( &(at[ac]), protodecode_get_int( &pr));
 	  ac++;
 	}
+      else if ( t == FLOAT_TOKEN)
+	{
+	  if (first_token == 0)
+	    first_token = 1;
+
+	  fts_set_float( &(at[ac]), protodecode_get_float( &pr));
+	  ac++;
+	}
       else if ( t == STRING_TOKEN)
 	{
 	  if (first_token == 0)
@@ -95,7 +103,7 @@ static void updmessage_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 
     port = fts_get_int( &at[1]);
 
-    post( "Created UDP object on port %d\n", port);
+    post( "Created UDPmessage object on port %d\n", port);
 
     this->socket = socket(AF_INET, SOCK_DGRAM, 0);
 
