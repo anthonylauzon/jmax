@@ -215,7 +215,13 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   /**
    * called when the database is changed
    */
-  public void dataChanged(Object spec) 
+
+  public void objectChanged(Object spec) 
+  {
+    repaint();
+  }
+
+  public void objectAdded(Object spec) 
   {
     repaint();
   }

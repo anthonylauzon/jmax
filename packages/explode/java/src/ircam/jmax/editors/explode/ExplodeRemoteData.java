@@ -13,7 +13,6 @@ import java.util.*;
  */
 public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 {
-
   /* Events are stored in an array; the array is larger than
      needed to allow insertions, and reallocated by need.
      Search is done with a binary search, while insertion/deleting
@@ -36,7 +35,6 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 
   private final int getIndexAfter(int time)
   {
-
     if (events_fill_p == 0) 
       return EMPTY_COLLECTION;
     
@@ -146,6 +144,7 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
   /**
    * adds an event in the data base
    */
+
   public void addEvent(ScrEvent event)
   {
     int index;
@@ -167,13 +166,14 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 
     remoteCall(REMOTE_ADD, args);
 
-    notifyListeners(GENERIC_CHANGE, event);
+    notifyObjectAdded(event);
   }
 
 
   /**
    * remove an event from the data base
    */
+
   public void removeEvent(ScrEvent event)
   {
     int removeIndex;
@@ -194,27 +194,26 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 	    args[0] = new Integer(removeIndex);
 	    remoteCall(REMOTE_REMOVE, args);
 
+	    notifyObjectDeleted(event);
 
-	    notifyListeners(OBJECT_DELETED, event);
+	    return;
 	  }
       }
   }
 
+
   /**
    *  Signal FTS that an object is changed 
+   *  but that the time is still the same
    */
 
   public void changeEvent(ScrEvent event)
   {
     int index;
 
-    // Linear search: a binary search would not
-    // work because we can have multiple events
-    // with the same key (time).
-
     for (index = 0 ; index < events_fill_p; index++)
       {
-	if (events[removeIndex] == event)
+	if (events[index] == event)
 	  {
 	    // Send the change command to fts
 
@@ -229,9 +228,12 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 
 	    remoteCall(REMOTE_CHANGE, args);
 
-	    notifyListeners(OBJECT_DELETED, event);
+	    notifyObjectChanged(event);
+
+	    return;
 	  }
       }
+  }
 
   /**
    *  Signal FTS that an object is moved, and move it
@@ -244,22 +246,29 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
   }
 
 
+
   /**
    * utility to notify the data base change to all the listeners
    */
 
- private void notifyListeners(int cause, Object spec)
+  private void notifyObjectAdded(Object spec)
   {
-    ExplodeDataListener el;
-    
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
-      {
-	el = (ExplodeDataListener) e.nextElement();
-	if (cause == OBJECT_DELETED) 
-	  el.objectDeleted(spec);
-	else el.dataChanged(spec);
-      }
+      ((ExplodeDataListener) e.nextElement()).objectAdded(spec);
   }
+
+  private void notifyObjectDeleted(Object spec)
+  {
+    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+      ((ExplodeDataListener) e.nextElement()).objectDeleted(spec);
+  }
+
+  private void notifyObjectChanged(Object spec)
+  {
+    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+      ((ExplodeDataListener) e.nextElement()).objectChanged(spec);
+  }
+
 
   /**
    * require to be notified when data change
@@ -424,6 +433,7 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
   /** 
    * Get the a name for this data, for UI purposes only 
    */
+
   public String getName()
   {
     return "explode";
@@ -436,9 +446,7 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
   static final int REMOTE_APPEND = 2;
   static final int REMOTE_ADD    = 1;
   static final int REMOTE_REMOVE = 2;
-
-  static final int GENERIC_CHANGE = 10;
-  static final int OBJECT_DELETED = 11;
+  static final int REMOTE_CHANGE = 3;
 
   static final int EMPTY_COLLECTION = -1;
   static final int NO_SUCH_EVENT = -2;
@@ -447,7 +455,6 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
   int events_fill_p  = 0;	// next available position
   ScrEvent events[] = new ScrEvent[256];
   private Vector listeners;
-
 }
 
 

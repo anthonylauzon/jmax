@@ -9,8 +9,9 @@ public interface ExplodeDataListener {
   /**
    * callbacks
    */
-  abstract public void dataChanged(Object spec);
 
   abstract public void objectDeleted(Object whichObject);
+  abstract public void objectAdded(Object whichObject);
+  abstract public void objectChanged(Object whichObject);
 }
 

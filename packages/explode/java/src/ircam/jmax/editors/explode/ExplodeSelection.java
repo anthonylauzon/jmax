@@ -133,7 +133,12 @@ public class ExplodeSelection implements SelectionHandler, ExplodeDataListener {
 
 
   /** ExplodeDataListener interface*/
-  public void dataChanged(Object spec) 
+
+  public void objectChanged(Object spec) 
+  {
+  }
+
+  public void objectAdded(Object spec) 
   {
   }
 
