@@ -38,10 +38,10 @@ typedef struct _bp_
 typedef struct _bpf_
 {
   fts_object_t o;
-  int opened; /* non zero if editor open */
   bp_t *points; /* break points */
   int alloc;
   int size;
+  int opened; /* non zero if editor open */
 } bpf_t;
 
 extern fts_data_class_t *bpf_data_class;
@@ -53,8 +53,8 @@ extern void bpf_set_size(bpf_t *bpf, int size);
 
 #define bpf_clear(b) (bpf_set_size(b, 0))
 
-#define bpf_get_time(b, index) ((b)->points[index].time)
-#define bpf_get_value(b, index) ((b)->points[index].value)
+#define bpf_get_time(b, i) ((b)->points[i].time)
+#define bpf_get_value(b, i) ((b)->points[i].value)
 #define bpf_set_point(b, i, t, v) ((b)->points[i].time = (t), (b)->points[i].value = (v))
 
 /* bpf atoms */

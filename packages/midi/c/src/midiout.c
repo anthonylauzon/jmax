@@ -32,7 +32,7 @@ static void midiout_set_number(fts_object_t *o, int winlet, fts_symbol_t s, int 
 static fts_symbol_t sym_omni = 0;
 
 static int 
-midiout_check(int ac, const fts_atom_t *at, fts_midiport_t **port, int *channel, int *number)
+midiout_check(fts_object_t *o, int ac, const fts_atom_t *at, fts_midiport_t **port, int *channel, int *number)
 {
   *port = 0;
   *channel = 1;
@@ -88,12 +88,18 @@ midiout_check(int ac, const fts_atom_t *at, fts_midiport_t **port, int *channel,
 	}
     }
   
-  /* if there is still no port just get default */
-  if(!*port)
-    *port = fts_midiport_get_default();
-  
-  if(!*port)
-    return 0;
+  if(o)
+    {
+      /* if there is still no port just get default */
+      if(!*port)
+	*port = fts_midiport_get_default();
+      
+      if(!*port)
+	{
+	  fts_object_set_error(o, "Default MIDI port is not defined");
+	  return 0;
+	}
+    }
 
   return 1;
 }
@@ -118,7 +124,7 @@ midiout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   midiout_t *this = (midiout_t *)o;
   fts_midiport_t *port = 0;
 
-  midiout_check(ac - 1, at + 1, &this->port, &this->channel, &this->number);
+  midiout_check(o, ac - 1, at + 1, &this->port, &this->channel, &this->number);
 }
 
 static void
@@ -336,7 +342,7 @@ noteout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int channel;
   int number;
 
-  if(!midiout_check(ac - 1, at + 1, &port, &channel, &number))
+  if(!midiout_check(0, ac - 1, at + 1, &port, &channel, &number))
     return &fts_CannotInstantiate;    
 
   fts_class_init(cl, sizeof(midiout_t), 3, 0, 0);
@@ -363,7 +369,7 @@ polyout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int channel;
   int number;
 
-  if(!midiout_check(ac - 1, at + 1, &port, &channel, &number))
+  if(!midiout_check(0, ac - 1, at + 1, &port, &channel, &number))
     return &fts_CannotInstantiate;    
 
   fts_class_init(cl, sizeof(midiout_t), 3, 0, 0);
@@ -390,7 +396,7 @@ ctlout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int channel;
   int number;
 
-  if(!midiout_check(ac - 1, at + 1, &port, &channel, &number))
+  if(!midiout_check(0, ac - 1, at + 1, &port, &channel, &number))
     return &fts_CannotInstantiate;    
 
   fts_class_init(cl, sizeof(midiout_t), 3, 0, 0);
@@ -417,7 +423,7 @@ pgmout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int channel;
   int number;
 
-  if(!midiout_check(ac - 1, at + 1, &port, &channel, &number))
+  if(!midiout_check(0, ac - 1, at + 1, &port, &channel, &number))
     return &fts_CannotInstantiate;    
 
   fts_class_init(cl, sizeof(midiout_t), 2, 0, 0);
@@ -441,7 +447,7 @@ touchout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int channel;
   int number;
 
-  if(!midiout_check(ac - 1, at + 1, &port, &channel, &number))
+  if(!midiout_check(0, ac - 1, at + 1, &port, &channel, &number))
     return &fts_CannotInstantiate;    
 
   fts_class_init(cl, sizeof(midiout_t), 2, 0, 0);
@@ -466,7 +472,7 @@ bendout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int channel;
   int number;
 
-  if(!midiout_check(ac - 1, at + 1, &port, &channel, &number))
+  if(!midiout_check(0, ac - 1, at + 1, &port, &channel, &number))
     return &fts_CannotInstantiate;    
 
   fts_class_init(cl, sizeof(midiout_t), 2, 0, 0);
@@ -492,7 +498,7 @@ midiout_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
   int channel;
   int number;
 
-  return midiout_check(ac1 - 1, at1 + 1, &port, &channel, &number);
+  return midiout_check(0, ac1 - 1, at1 + 1, &port, &channel, &number);
 }
 
 void

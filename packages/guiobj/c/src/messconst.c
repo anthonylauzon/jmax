@@ -29,59 +29,16 @@
 
 #define MESSCONST_FLASH_TIME 125.0f
 
-static fts_symbol_t sym_semi = 0;
-static fts_symbol_t sym_comma = 0;
-
-#define messconst_symbol_is_separator(s) ((s) == sym_semi || (s) == sym_comma)
-
-/************************************************
- *
- *  single message
- *
- */
- 
-typedef struct _mess_
+static int 
+is_token(fts_symbol_t s)
 {
-  fts_symbol_t s;
-  int ac;
-  fts_atom_t *at;
-  struct _mess_ *next;
-} mess_t;
-
-static mess_t *
-mess_new(fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  mess_t *mess = fts_malloc(sizeof(mess_t));
-  int i;
-  
-  mess->s = s;
-  
-  if(ac > 0)
-    {
-      mess->ac = ac;
-      mess->at = fts_malloc(sizeof(fts_atom_t) * ac);
-    }
-  else
-    {
-      mess->ac = 0;
-      mess->at = 0;
-    }
-
-  for(i=0; i<ac; i++)
-    mess->at[i] = at[i];
-
-  mess->next = 0;
-
-  return mess;
-}
-
-static void
-mess_delete(mess_t * mess)
-{
-  if(mess->ac)
-    fts_free(mess->at);
-
-  fts_free(mess);
+  return ((s == fts_s_dot) ||
+	  (s == fts_s_comma) ||
+	  (s == fts_s_semi) ||
+	  (s == fts_s_column) ||
+	  (s == fts_s_double_colon) ||
+	  (s == fts_s_quote) ||
+	  (s == fts_s_comma));
 }
 
 /************************************************
@@ -94,12 +51,25 @@ typedef struct
 {
   fts_object_t o;
 
-  mess_t *mess; /* list of messages */
+  fts_symbol_t s;
+  int ac;
+  fts_atom_t *at;
   
   /* blink when click */
   int value; 
   fts_alarm_t alarm;
 } messconst_t;
+
+/************************************************
+ *
+ *  single message
+ *
+ */
+ 
+static void
+messconst_set(messconst_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+}
 
 /************************************************
  *
@@ -111,7 +81,6 @@ static void
 messconst_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messconst_t *this = (messconst_t *)o;
-  mess_t *mess = this->mess;
 
   this->value = 1;
   fts_object_ui_property_changed(o, fts_s_value);
@@ -119,24 +88,15 @@ messconst_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_alarm_set_delay(&this->alarm, MESSCONST_FLASH_TIME);
   fts_alarm_arm(&this->alarm);
 
-  while(mess)
-    {
-      fts_outlet_send(o, 0, mess->s, mess->ac, mess->at);
-      mess = mess->next;
-    }
+  fts_outlet_send(o, 0, this->s, this->ac, this->at);
 }
 
 static void
 messconst_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messconst_t *this = (messconst_t *)o;
-  mess_t *mess = this->mess;
 
-  while(mess)
-    {
-      fts_outlet_send(o, 0, mess->s, mess->ac, mess->at);
-      mess = mess->next;
-    }
+  fts_outlet_send(o, 0, this->s, this->ac, this->at);
 }
 
 /************************************************
@@ -205,6 +165,16 @@ messconst_check_message(int ac, const fts_atom_t *at, fts_symbol_t *mess_s, int 
 {
   if(ac > 0)
     {
+      int i;
+
+      for(i=0; i<ac; i++)
+	{
+	  fts_symbol_t s = fts_get_symbol(at + i);
+
+	  if(is_token(s))
+	    return 0;
+	}
+
       if(ac == 1)
 	{
 	  if(fts_is_list(at))
@@ -228,6 +198,14 @@ messconst_check_message(int ac, const fts_atom_t *at, fts_symbol_t *mess_s, int 
 	      
 	      return 1;
 	    }
+	}
+      else if(fts_is_int(at) || fts_is_float(at))
+	{
+	  *mess_s = fts_s_list;
+	  *mess_ac = ac;
+	  *mess_at = at;
+	    
+	  return 1;
 	}
       else if(!fts_is_symbol(at))
 	return 0;
@@ -253,90 +231,54 @@ messconst_check_message(int ac, const fts_atom_t *at, fts_symbol_t *mess_s, int 
   return 0;
 }
 
-static int
-messconst_check(int ac, const fts_atom_t *at)
-{
-  if(ac > 0)
-    {
-      fts_symbol_t mess_s;
-      int mess_ac;
-      const fts_atom_t *mess_at;
-      int begin = 0;
-      int i;
-      
-      for(i=0; i<ac; i++)
-	{
-	  if(fts_is_symbol(at + i) && messconst_symbol_is_separator(fts_get_symbol(at + i)))
-	    {
-	      if(!messconst_check_message(i - begin, at + begin, &mess_s, &mess_ac, &mess_at))
-		return 0;
-	      
-	      begin = i + 1;
-	    }
-	}
-      
-      if(i > begin)
-	{
-	  if(!messconst_check_message(i - begin, at + begin, &mess_s, &mess_ac, &mess_at))
-	    return 0;
-	}
-      
-      return 1;
-    }
-  
-  return 0;
-}
-
 static void
 messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messconst_t *this = (messconst_t *)o;
-  mess_t **append = &this->mess;
-  mess_t *mess;
   fts_symbol_t mess_s;
   int mess_ac;
   const fts_atom_t *mess_at;
-  int begin = 1;
-  int i;
 
-  this->mess = 0;
+  ac--;
+  at++;
+
+  this->s = 0;
+  this->ac = 0;
+  this->at = 0;
   this->value = 0;
   fts_alarm_init(&(this->alarm), 0, messconst_tick, this);
 
-  for(i=1; i<ac; i++)
+  if(messconst_check_message(ac, at, &mess_s, &mess_ac, &mess_at))
     {
-      if(fts_is_symbol(at + i) && messconst_symbol_is_separator(fts_get_symbol(at + i)))
+      int i;
+      
+      this->s = mess_s;
+      
+      if(ac > 0)
 	{
-	  messconst_check_message(i - begin, at + begin, &mess_s, &mess_ac, &mess_at);
-
-	  *append = mess_new(mess_s, mess_ac, mess_at);
-	  append = &((*append)->next);
-
-	  begin = i + 1;
+	  this->ac = mess_ac;
+	  this->at = fts_malloc(sizeof(fts_atom_t) * mess_ac);
 	}
+      else
+	{
+	  this->ac = 0;
+	  this->at = 0;
+	}
+      
+      for(i=0; i<mess_ac; i++)
+	this->at[i] = mess_at[i];
     }
-
-  if(i > begin)
-    {
-      messconst_check_message(i - begin, at + begin, &mess_s, &mess_ac, &mess_at);
-      *append = mess_new(mess_s, mess_ac, mess_at);
-    }  
+  else
+    fts_object_set_error(o, "Syntax error in message or constant");
 }
 
 static void
 messconst_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messconst_t *this = (messconst_t *)o;
-  mess_t *mess = this->mess;
 
-  while(mess)
-    {
-      mess_t *next = mess->next;
-
-      mess_delete(mess);
-
-      mess = next;
-    }
+  if(this->ac)
+    fts_free(this->at);
 
   fts_alarm_unarm(&(this->alarm));
 }
@@ -344,41 +286,27 @@ messconst_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static fts_status_t
 messconst_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(messconst_check(ac - 1, at + 1))
-    {
-      fts_class_init(cl, sizeof(messconst_t), 1, 1, 0);
-      
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, messconst_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, messconst_delete);
-      
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, messconst_send_properties); 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, messconst_send_ui_properties); 
-      
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_bang, messconst_send);
-      
-      fts_method_define_varargs(cl, 0, fts_s_bang, messconst_bang);
-      
-      /* value daemons */
-      fts_class_add_daemon(cl, obj_property_get, fts_s_value, messconst_get_value);
-      fts_class_add_daemon(cl, obj_property_put, fts_s_value, messconst_put_value);
-
-      return fts_Success;
-  }
+  fts_class_init(cl, sizeof(messconst_t), 1, 1, 0);
   
-  return &fts_CannotInstantiate;;
-}
-
-int
-messconst_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
-{
-  return messconst_check(ac1 - 1, at1 + 1);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, messconst_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, messconst_delete);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, messconst_send_properties); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, messconst_send_ui_properties); 
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_bang, messconst_send);
+  
+  fts_method_define_varargs(cl, 0, fts_s_bang, messconst_bang);
+  
+  /* value daemons */
+  fts_class_add_daemon(cl, obj_property_get, fts_s_value, messconst_get_value);
+  fts_class_add_daemon(cl, obj_property_put, fts_s_value, messconst_put_value);
+  
+  return fts_Success;
 }
 
 void
 messconst_config(void)
 {
-  sym_semi = fts_new_symbol(";");
-  sym_comma = fts_new_symbol(",");
-  
-  fts_metaclass_install(fts_new_symbol("messconst"), messconst_instantiate, messconst_equiv);
+  fts_class_install(fts_new_symbol("messconst"), messconst_instantiate);
 }

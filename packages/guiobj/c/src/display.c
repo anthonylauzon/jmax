@@ -47,6 +47,43 @@ typedef struct {
 
 static fts_symbol_t sym_display = 0;
 
+static int
+symbol_contains_blank(fts_symbol_t s)
+{
+  const char *str = fts_symbol_name(s);
+  int n = strlen(str);
+  int i;
+
+  for(i=0; i<n; i++)
+    {
+      if(str[i] == ' ')
+	return 1;
+    }
+
+  return 0;
+}
+
+static void
+append_string(char *str, const char *append)
+{
+  int n = strlen(str);
+  char *s = str + n;
+
+  snprintf(s, STRING_SIZE - n, "%s", append);
+}
+
+static void
+append_char(char *str, const char c)
+{
+  int n = strlen(str);
+
+  if(n < STRING_SIZE - 1)
+    {
+      str[n] = c;
+      str[n + 1] = '\0';
+    }
+}
+
 static void
 append_blank_and_atom(char *str, const fts_atom_t *a)
 {
@@ -58,9 +95,16 @@ append_blank_and_atom(char *str, const fts_atom_t *a)
   else if(fts_is_float(a))
     snprintf(s, STRING_SIZE - n, " %g", fts_get_float(a));
   else if(fts_is_symbol(a))
-    snprintf(s, STRING_SIZE - n, " %s", fts_symbol_name(fts_get_symbol(a)));
+    {
+      fts_symbol_t sym = fts_get_symbol(a);
+
+      if(symbol_contains_blank(sym))
+	snprintf(s, STRING_SIZE - n, " \"%s\"", fts_symbol_name(sym));
+      else
+	snprintf(s, STRING_SIZE - n, " %s", fts_symbol_name(sym));
+    }
   else
-    snprintf(s, STRING_SIZE - n, " %s", "?");
+    snprintf(s, STRING_SIZE - n, " <%s>", fts_symbol_name(fts_get_type(a)));
 }
 
 static void
@@ -74,9 +118,16 @@ append_atom(char *str, const fts_atom_t *a)
   else if(fts_is_float(a))
     snprintf(s, STRING_SIZE - n, "%g", fts_get_float(a));
   else if(fts_is_symbol(a))
-    snprintf(s, STRING_SIZE - n, "%s", fts_symbol_name(fts_get_symbol(a)));
+    {
+      fts_symbol_t sym = fts_get_symbol(a);
+
+      if(symbol_contains_blank(sym))
+	snprintf(s, STRING_SIZE - n, "\"%s\"", fts_symbol_name(sym));
+      else
+	snprintf(s, STRING_SIZE - n, "%s", fts_symbol_name(sym));
+    }
   else
-    snprintf(s, STRING_SIZE - n, "%s", "?");
+    snprintf(s, STRING_SIZE - n, "<%s>", fts_symbol_name(fts_get_type(a)));
 }
 
 /************************************************************
@@ -226,7 +277,7 @@ display_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   display_t * this = (display_t *)o;
 
-  sprintf(this->string, "%s", fts_symbol_name(fts_get_symbol(at)));
+  sprintf(this->string, "'%s\'", fts_symbol_name(fts_get_symbol(at)));
 
   display_deliver(this);
 }
@@ -237,11 +288,14 @@ display_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   display_t * this = (display_t *)o;
   int i;
 
-  this->string[0] = '\0';
+  this->string[0] = '{';
+  this->string[1] = '\0';
   append_atom(this->string, at);
 
   for(i=1; i<ac; i++)
     append_blank_and_atom(this->string, at + i);
+
+  append_char(this->string, '}');
 
   display_deliver(this);
 }
@@ -252,7 +306,10 @@ display_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   display_t * this = (display_t *)o;
   int i;
 
-  sprintf(this->string, "<%s>", fts_symbol_name(s));
+  if(symbol_contains_blank(s))
+    sprintf(this->string, "\"%s\"", fts_symbol_name(s));
+  else
+    sprintf(this->string, "%s", fts_symbol_name(s));
 
   for(i=0; i<ac; i++)
     append_blank_and_atom(this->string, at + i);

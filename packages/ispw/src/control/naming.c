@@ -25,7 +25,6 @@
  */
 
 #include <fts/fts.h>
-#include "send.h"
 
 /*
  * Basic naming services; for now, just provide global names,
