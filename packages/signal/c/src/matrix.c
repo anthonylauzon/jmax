@@ -1,0 +1,392 @@
+/*
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ *
+ * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
+ */
+#include <fts/fts.h>
+
+static fts_symbol_t matrix_copy_in_ftl_symbol = 0;
+static fts_symbol_t matrix_copy_out_ftl_symbol = 0;
+
+typedef struct _matrix
+{
+  fts_object_t _o;
+  fts_atom_t *ftl_args;
+  int n_ins;
+  int n_outs;
+  ftl_data_t ramps;
+  float def_time;
+  float cr; /* control rate */
+  int n_tick;
+  float **bufs;
+} matrix_t;
+
+/**************************************************************
+ *
+ *  object
+ *
+ */
+
+static void
+matrix_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  matrix_t *this = (matrix_t *)o;
+  int n_ins = fts_get_int(at + 1); /* # of ins */
+  int n_outs = fts_get_int(at + 2); /* # of outs */
+  float def_time = fts_get_float_arg(ac, at, 3, 0.0f);
+  fts_ramp_t *ramps;
+  int n, in, out, i;
+
+  /* buffer for FTL arguments */
+  this->ftl_args = (fts_atom_t *)fts_malloc(sizeof(fts_atom_t) * (5 + n_ins + n_outs));
+
+  /* get minimum of n_ins/n_outs */
+  n = (n_ins < n_outs)? n_ins: n_outs;
+  
+  /* allocate array of buffer pointers */
+  this->bufs = (float **)fts_malloc(sizeof(float *) * n);
+  for(i=0; i<n; i++)
+    this->bufs[i] = 0;
+
+  /* allocate ramps */
+  this->ramps = ftl_data_alloc(sizeof(fts_ramp_t) * n_outs * n_ins);
+  ramps = (fts_ramp_t *)ftl_data_get_ptr(this->ramps);
+
+  /* initialize ramps */
+  for(out=0; out<n_outs; out++)
+    {
+      for(in=0; in<n_ins; in++)
+	{
+	  fts_ramp_t *ramp = ramps + out * n_ins + in;
+	  fts_ramp_init(ramp, 0.0);
+	}
+    }
+  
+  this->n_ins = n_ins;
+  this->n_outs = n_outs;
+  this->def_time = def_time;
+  this->cr = 1.0f; /* will be properly set in the put routine */
+  this->n_tick = 0;
+
+  dsp_list_insert(o);
+}
+
+static void matrix_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  matrix_t *this = (matrix_t *)o;
+  
+  ftl_data_free((void *)this->ramps);
+
+  dsp_list_remove(o);
+}
+
+/**************************************************************
+ *
+ *  dsp
+ *
+ */
+
+static void 
+matrix_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  matrix_t *this = (matrix_t *)o;
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  float sr = fts_dsp_get_input_srate(dsp, 0);
+  int n_tick = fts_dsp_get_input_size(dsp, 0);
+  fts_ramp_t *ramps = (fts_ramp_t *)ftl_data_get_ptr(this->ramps);
+  fts_atom_t *a = this->ftl_args;
+  int n_ins = this->n_ins;
+  int n_outs = this->n_outs;
+  int in, out;
+
+  this->cr = sr / (float)n_tick;
+
+  /* reset ramps to target */
+  for(out=0; out<n_outs; out++)
+    for(in=0; in<n_ins; in++)
+      fts_ramp_jump(ramps + out * n_ins + in);
+      
+  /* allocate input or output buffers */
+  if(n_tick > this->n_tick)
+    {
+      int n = (n_ins < n_outs)? n_ins: n_outs;
+      int i;
+
+      for(i=0; i<n; i++)
+	{
+	  if(this->bufs[i])
+	    fts_free(this->bufs[i]);
+
+	  this->bufs[i] = fts_malloc(sizeof(float) * n_tick);
+	}
+    }
+
+  this->n_tick = n_tick;
+
+  fts_set_int(a + 0, n_ins);
+  fts_set_int(a + 1, n_outs);
+  fts_set_ptr(a + 2, this->bufs);
+  fts_set_ftl_data(a + 3, this->ramps);
+  fts_set_int(a + 4, n_tick);
+
+  /* put inputs */
+  for(in=0; in<n_ins; in++)
+    fts_set_symbol(a + 5 + in, fts_dsp_get_input_name(dsp, in));
+
+  /* put outputs */
+  for(out=0; out<n_outs; out++)
+    fts_set_symbol(a + 5 + n_ins + out, fts_dsp_get_output_name(dsp, out));
+
+  if(n_ins < n_outs)
+    dsp_add_funcall(matrix_copy_in_ftl_symbol, 5 + n_ins + n_outs, a);
+  else
+    dsp_add_funcall(matrix_copy_out_ftl_symbol, 5 + n_ins + n_outs, a);    
+}
+
+static void 
+ftl_matrix_copy_out(fts_word_t *a)
+{
+  int n_ins = fts_word_get_int(a + 0);
+  int n_outs = fts_word_get_int(a + 1);
+  float ** restrict bufs = (float **)fts_word_get_ptr(a + 2);
+  fts_ramp_t * restrict ramps = (fts_ramp_t *)fts_word_get_ptr(a + 3);
+  int n_tick = fts_word_get_int(a + 4);
+  int in, out;
+  int i;
+
+  for(out=0; out<n_outs; out++)
+    {
+      float * restrict out_buf = bufs[out];
+      fts_ramp_t * restrict out_ramps = ramps + out * n_ins;
+      
+      for(i=0; i<n_tick; i++)
+	out_buf[i] = 0.0f;
+      
+      for(in=0; in<n_ins; in++)
+	{
+	  float * restrict input = (float *)fts_word_get_ptr(a + 5 + in);
+	  fts_ramp_t * restrict ramp = out_ramps + in;
+	  
+	  fts_ramp_vec_mul_add(ramp, input, out_buf, n_tick);
+	}
+    }
+  
+  for(out=0; out<n_outs; out++)
+    {
+      float * restrict out_buf = bufs[out];
+      float * restrict out_sig = (float *)fts_word_get_ptr(a + 5 + n_ins + out);
+      
+      for(i=0; i<n_tick; i++)
+	out_sig[i] = out_buf[i];
+    }
+}
+
+static void 
+ftl_matrix_copy_in(fts_word_t *a)
+{
+  int n_ins = fts_word_get_int(a + 0);
+  int n_outs = fts_word_get_int(a + 1);
+  float ** restrict bufs = (float **)fts_word_get_ptr(a + 2);
+  fts_ramp_t * restrict ramps = (fts_ramp_t *)fts_word_get_ptr(a + 3);
+  int n_tick = fts_word_get_int(a + 4);
+  int in, out;
+  int i;
+
+  for(in=0; in<n_ins; in++)
+    {
+      float * restrict in_buf = bufs[in];
+      float * restrict in_sig = (float *)fts_word_get_ptr(a + 5 + in);
+      
+      for(i=0; i<n_tick; i++)
+	in_buf[i] = in_sig[i];
+    }
+
+  for(out=0; out<n_outs; out++)
+    {
+      float * restrict output = (float *)fts_word_get_ptr(a + 5 + n_ins + out);
+      fts_ramp_t * restrict out_ramps = ramps + out * n_ins;
+      
+      for(i=0; i<n_tick; i++)
+	output[i] = 0.0f;
+      
+      for(in=0; in<n_ins; in++)
+	{
+	  float * restrict in_buf = bufs[in];
+	  fts_ramp_t * restrict ramp = out_ramps + in;
+	  
+	  fts_ramp_vec_mul_add(ramp, in_buf, output, n_tick);
+	}
+    }
+}
+
+/**************************************************************
+ *
+ *  user methods
+ *
+ */
+
+static void
+matrix_node(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  matrix_t *this = (matrix_t *)o;
+  fts_ramp_t *ramps = (fts_ramp_t *)ftl_data_get_ptr(this->ramps);
+  int in = fts_get_int(at + 0);
+  int out = fts_get_int(at + 1);
+  
+  if(in >= 0 && in < this->n_ins && out >= 0 && out < this->n_outs)
+    {
+      float value = fts_get_number_float(at + 2);
+      float time = fts_get_float_arg(ac, at, 3, this->def_time);
+      fts_ramp_t *ramp = ramps + out * this->n_ins + in;
+
+      fts_ramp_set_target(ramp, value, time, this->cr);
+    }
+}
+
+static void
+matrix_in(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  matrix_t *this = (matrix_t *)o;
+  int in = fts_get_int(at + 0);
+  float value = fts_get_number_float(at + 1);
+  float time = fts_get_float_arg(ac, at, 2, this->def_time);
+  fts_ramp_t *ramps = (fts_ramp_t *)ftl_data_get_ptr(this->ramps);
+  fts_ramp_t *in_ramps = ramps + in;
+  int out;
+
+  if(in >= 0 && in < this->n_ins)
+    {
+      for(out=0; out<this->n_outs; out++)
+	{
+	  fts_ramp_t *ramp = in_ramps + out * this->n_ins;
+	  fts_ramp_set_target(ramp, value, time, this->cr);
+	}
+    }
+}
+
+static void
+matrix_out(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  matrix_t *this = (matrix_t *)o;
+  int out = fts_get_int(at + 0);
+  float value = fts_get_number_float(at + 1);
+  float time = fts_get_float_arg(ac, at, 2, this->def_time);
+  fts_ramp_t *ramps = (fts_ramp_t *)ftl_data_get_ptr(this->ramps);
+  fts_ramp_t *out_ramps = ramps + out * this->n_ins;
+  int in;
+
+  if(out >= 0 && out < this->n_outs)
+    {
+      for(in=0; in<this->n_ins; in++)
+	{
+	  fts_ramp_t *ramp = out_ramps + in;
+	  fts_ramp_set_target(ramp, value, time, this->cr);
+	}
+    }
+}
+
+static void
+matrix_all(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  matrix_t *this = (matrix_t *)o;
+  float value = fts_get_number_float(at + 0);
+  float time = fts_get_float_arg(ac, at, 1, this->def_time);
+  fts_ramp_t *ramps = (fts_ramp_t *)ftl_data_get_ptr(this->ramps);
+
+  int in, out;
+  
+  for(out=0; out<this->n_outs; out++)
+    {
+      fts_ramp_t *out_ramps = ramps + out * this->n_ins;
+      
+      for(in=0; in<this->n_ins; in++)
+	{
+	  fts_ramp_t *ramp = out_ramps + in;
+	  fts_ramp_set_target(ramp, value, time, this->cr);      
+	}
+    }
+}
+
+/**************************************************************
+ *
+ *  class
+ *
+ */
+
+static fts_status_t 
+matrix_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_symbol_t a[6];
+  int n_ins = fts_get_int_arg(ac, at, 1, 0);
+  int n_outs = fts_get_int_arg(ac, at, 2, 0);
+  int i, j;
+
+  if(n_ins < 1 || n_outs < 1)
+    return &fts_CannotInstantiate;
+
+  fts_class_init(cl, sizeof(matrix_t), n_ins + 1, n_outs, 0);
+  
+  /* system methods */
+  a[0] = fts_s_symbol; /* class */
+  a[1] = fts_s_int; /* # of ins */
+  a[2] = fts_s_int; /* # of outs */
+  a[3] = fts_s_number; /* opt: default fade time */
+  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, matrix_init, 4, a, 3);
+  fts_method_define(cl, fts_SystemInlet, fts_s_delete, matrix_delete, 0, 0);
+  
+  a[0] = fts_s_ptr;  
+  fts_method_define(cl, fts_SystemInlet, fts_new_symbol("put"), matrix_put, 1, a);
+
+  /* user methods */
+
+  a[0] = fts_s_int; /* in */
+  a[1] = fts_s_int; /* out */
+  a[2] = fts_s_number; /* level */
+  a[3] = fts_s_number; /* opt: fade time */
+  fts_method_define_optargs(cl, n_ins, fts_s_list, matrix_node, 4, a, 3);
+
+  a[0] = fts_s_int; /* in */
+  a[1] = fts_s_number; /* level */
+  a[2] = fts_s_number; /* opt: fade time */
+  fts_method_define_optargs(cl, n_ins, fts_new_symbol("in"), matrix_in, 3, a, 2);
+
+  a[0] = fts_s_int; /* out */
+  a[1] = fts_s_number; /* level */
+  a[2] = fts_s_number; /* opt: fade time */
+  fts_method_define_optargs(cl, n_ins, fts_new_symbol("out"), matrix_out, 3, a, 2);
+
+  a[0] = fts_s_number; /* level */
+  a[1] = fts_s_number; /* opt: fade time */
+  fts_method_define_optargs(cl, n_ins, fts_new_symbol("all"), matrix_all, 2, a, 1);
+    
+  /* dsp in/outlets */
+  for(i=0; i<n_ins; i++)
+    dsp_sig_inlet(cl, i);
+
+  for(j=0; j<n_outs; j++)
+    dsp_sig_outlet(cl, j);
+  
+  matrix_copy_in_ftl_symbol = fts_new_symbol("matrix_in_copy");
+  matrix_copy_out_ftl_symbol = fts_new_symbol("matrix_out_copy");
+
+  dsp_declare_function(matrix_copy_in_ftl_symbol, ftl_matrix_copy_in);
+  dsp_declare_function(matrix_copy_out_ftl_symbol, ftl_matrix_copy_out);
+
+  return fts_Success;
+}
+
+void 
+signal_matrix_config(void)
+{
+  fts_metaclass_install(fts_new_symbol("matrix~"), matrix_instantiate, fts_never_equiv);
+}
