@@ -1,4 +1,4 @@
-/*#define PTHREADS*/ /* MDC @@@ */
+#define PTHREADS /* MDC @@@ */
 
 #ifdef PTHREADS
 #include <pthread.h>

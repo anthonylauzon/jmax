@@ -192,22 +192,26 @@ fts_object_new(fts_patcher_t *patcher, long id, int aoc, const fts_atom_t *aot)
 	  /* foo : <obj> syntax; extract the variable name */
       
 	  var = fts_get_symbol(&aot[0]);
+	  /* If the variable already exists, make an error object  */
 
+	  if (fts_variable_get_value(patcher, var))
+	    obj = fts_error_object_new(patcher, id, aoc, aot);
+	}
+      else
+	var = 0;
+
+      if (! obj)
+	{
 	  /* Compute the expressions with the correct offset */
 
-	  e = fts_expression_eval((fts_object_t *)patcher, aoc - 2, aot + 2, 1024, at);
+	  e = fts_expression_eval((fts_object_t *)patcher, (var ? aoc - 2 : aoc),
+			      (var ? aot + 2 : aot), 1024, at);
+	  
+	  if (fts_expression_get_status(e) == FTS_EXPRESSION_OK)
+	    ac = fts_expression_get_count(e);
+	  else
+	    obj = fts_error_object_new(patcher, id, aoc, aot);
 	}
-      else
-	{
-	  /* variable less syntax, consider everything as expressions */
-	  var = 0;
-	  e = fts_expression_eval((fts_object_t *)patcher, aoc, aot, 1024, at);
-	}
-
-      if (fts_expression_get_status(e) == FTS_EXPRESSION_OK)
-	ac = fts_expression_get_count(e);
-      else
-	obj = fts_error_object_new(patcher, id, aoc, aot);
 
     }
 #endif
