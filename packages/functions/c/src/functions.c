@@ -91,6 +91,20 @@ pow_function (int ac, const fts_atom_t *at, fts_atom_t *ret)
   return fts_ok;
 }
 
+/**  modulo function according to fmod
+ *   @fn float mod (float a, float b) 
+ */
+
+static fts_status_t 
+mod_function (int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+    if (ac > 1  &&  fts_is_number(at)  &&  fts_is_number(at+1))
+	fts_set_float(ret, fmod(fts_get_number_float(at), 
+				fts_get_number_float(at+1)));
+    
+    return fts_ok;
+}
+
 
 
 /**********************************************************************
@@ -242,6 +256,8 @@ functions_config(void)
   fts_function_install( fts_new_symbol("abs"), abs_function);
   fts_function_install( fts_new_symbol("pow"), pow_function);
   fts_function_install( fts_new_symbol("random"), random_function);
+  fts_function_install( fts_new_symbol("mod"), mod_function);
+
   fts_function_install( fts_new_symbol("cat"), cat_function);
   fts_function_install( fts_new_symbol("typeof"), typeof_function);
 }
