@@ -66,7 +66,7 @@ public class FtsMessageObject extends FtsObject
   void handleMessage(FtsStream stream)
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
-    this.message = message;
+    this.message = FtsParse.unparseObjectDescription(stream);
     setDirty();
 
     if (listener instanceof FtsMessageListener)
