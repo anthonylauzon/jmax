@@ -174,11 +174,13 @@ void fts_load_project( void)
       const char *path, *name;
       char *prjname;
       char tempname[1024];
+      char originaldir[1024];
       const char *local_dir, *user_local_dir;
       
       // Retrieve the file name from the file path.
       path = fts_symbol_name(project_file);
       name = fts_get_basename(path);
+      fts_dirname(path, originaldir, 1023);
                   
       local_dir = fts_config_get_local_config_dir();
       user_local_dir = fts_config_get_user_local_config_dir();
@@ -215,9 +217,9 @@ void fts_load_project( void)
               fts_log("[fts] using '%s' as project file.\n", prjname);
           }
       }
+      fts_project_set(fts_project_open(prjname, originaldir));
 #endif
-      
-      fts_project_set(fts_project_open(prjname));
+
   }
 }
 
@@ -328,14 +330,32 @@ static void fts_kernel_classes_config( void)
 void fts_init( int argc, char **argv)
 {
   int i;
+  char cmdline[2048];
 
   strcpy(l_appName, "fts");
 
+  /* PREPARING further log of command line args */
+  strcpy(cmdline, "");
+  for (i = 0; i < argc; i++) {
+    if(i!=0)
+        strcat(cmdline, " ");
+    strcat(cmdline, argv[i]);
+  }
+
   /* 1st pass */
-  fts_cmd_args_parse( argc, argv, 1);
+  fts_cmd_args_parse(argc, argv, 1);
 
   /* config.c initialization */
   fts_config_init(l_appName, fts_log);
+
+  /* WARNING - WARNING - WARNING - WARNING - WARNING - WARNING */
+  /* WARNING - WARNING - WARNING - WARNING - WARNING - WARNING */
+
+  /* DO NOT LOG ANYTHING WITH fts_log() BEFORE THIS POINT */
+
+  /* WARNING - WARNING - WARNING - WARNING - WARNING - WARNING */
+  /* WARNING - WARNING - WARNING - WARNING - WARNING - WARNING */
+
   fts_config_log_info();
  
   fts_log("[fts]: Kernel initialization\n");
@@ -349,15 +369,11 @@ void fts_init( int argc, char **argv)
   /* 2nd pass */
   fts_cmd_args_parse( argc, argv, 2);
 
-  fts_log("[fts]: FTS Command line: ");
-  for (i = 0; i < argc; i++) {
-    fts_log("%s ", argv[i]);
-  }
-  fts_log("\n");
-
-  fts_log("[fts]: Platform initialization\n");
+  /* Logging command line */
+  fts_log("[fts]: FTS Command line (rebuilt from argc/argv): '%s'\n", cmdline);
 
   /* Platform dependant initialization */
+  fts_log("[fts]: Platform initialization\n");
   fts_platform_init();
 
   fts_log("[fts]: Configure DSP timebase\n");
