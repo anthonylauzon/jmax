@@ -7,6 +7,8 @@
    the implementation is very limited, and include a *readonly* java part.
    */
 
+extern void fts_variable_find_users(fts_patcher_t *scope, fts_symbol_t name, fts_objectset_t *set);
+
 /* Structure definitions */
 
 static fts_data_class_t *fts_objectset_data_class = 0;
@@ -346,12 +348,23 @@ static void fts_objectset_find_friends( fts_data_t *d, int ac, const fts_atom_t 
 {
   fts_objectset_t *this = (fts_objectset_t *)d;
   fts_object_t *target = fts_get_object(at);
-  fts_atom_t a[1];
 
   fts_objectset_remove_all(this);
 
-  fts_set_data(&a[0], (fts_data_t *) this);
-  fts_send_message(target, fts_SystemInlet, fts_s_find_friends, 1, a);
+  if (fts_object_get_variable(target))
+    {
+      fprintf(stderr, "Looking for friends of variable %s\n", fts_symbol_name(fts_object_get_variable(target)));
+      fts_variable_find_users(target->patcher, fts_object_get_variable(target), this);
+    }
+  else
+    {
+      fts_atom_t a[1];
+
+      fprintf(stderr, "Looking for standard friends\n");
+
+      fts_set_data(&a[0], (fts_data_t *) this);
+      fts_send_message(target, fts_SystemInlet, fts_s_find_friends, 1, a);
+    }
 }
 
 
