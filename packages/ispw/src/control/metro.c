@@ -130,7 +130,7 @@ metro_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if (clock)
     {
       if (! fts_clock_exists(clock))
-	post("metro: warning: clock %s does not exists, yet\n", fts_symbol_name(x->clock));
+	post("metro: warning: clock %s does not exists, yet\n", fts_symbol_name(clock));
 
       fts_alarm_init(&x->alarm, clock, metro_tick, x);
     }
