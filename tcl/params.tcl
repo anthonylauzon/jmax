@@ -40,6 +40,7 @@ if {[systemProperty "jmaxServerName"] != ""} then { set jmaxServerName [systemPr
 if {[systemProperty "jmaxPkgPath"] != ""} then { set jmaxPkgPath [systemProperty "jmaxPkgPath"]}
 if {[systemProperty "jmaxSplashScreen"] != ""} then { set jmaxSplashScreen [systemProperty jmaxSplashScreen]}
 if {[systemProperty "jmaxFastFileBox"] != ""} then { set jmaxFastFileBox [systemProperty "jmaxFastFileBox"]}
+if {[systemProperty "jmaxServerOptions"] != ""} then { set jmaxServerOptions [systemProperty "jmaxServerOptions"]}
 
 
 # the following is done so properties it can be accessed from Java

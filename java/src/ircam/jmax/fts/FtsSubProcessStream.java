@@ -36,20 +36,15 @@ import java.net.*;
 
 class FtsSubProcessStream extends FtsStream
 {
-  String path;
-  String ftsName;
   Process proc;
   InputStream in_stream = null;
   OutputStream out_stream = null;
 
-  FtsSubProcessStream(String path, String ftsName)
+  FtsSubProcessStream( String ftsDir, String ftsName, String ftsOptions)
   {
-    this.path = path;
-    this.ftsName = ftsName;
-
     try
       {
-	proc = Runtime.getRuntime().exec(path+"/"+ftsName);
+	proc = Runtime.getRuntime().exec( ftsDir + "/" + ftsName + " " + ftsOptions);
 	out_stream = proc.getOutputStream();
 	in_stream  = proc.getInputStream();
 
@@ -57,7 +52,7 @@ class FtsSubProcessStream extends FtsStream
       }
     catch (IOException e)
       {
-	System.out.println("Don't know about command " + path);
+	System.out.println("Don't know about command ");
       }    
   }
 
@@ -75,7 +70,7 @@ class FtsSubProcessStream extends FtsStream
       } 
     catch (IOException e)
       {
-	System.out.println("Cannot quit " + path);
+	System.out.println("Cannot quit ");
       }
   }
 

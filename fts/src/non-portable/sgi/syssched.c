@@ -30,12 +30,8 @@
  */
 
 #include <sched.h>
-/* For sysmp(2) function */
-#include <sys/types.h>
-#include <sys/sysmp.h>
-#include <sys/sysinfo.h>
-#include <sys/pda.h>
 #include <errno.h>
+#include <string.h>
 
 /* (fd) HACK !!! */
 extern void post( const char *format, ...);
@@ -52,7 +48,7 @@ static int running_real_time = 0;
    Returns: none
 */
 
-static void run_real_time_scheduling( void)
+void fts_real_time_on()
 {
   struct sched_param param;
   
@@ -75,45 +71,6 @@ static void run_real_time_scheduling( void)
     }
 }
 
-/*
- * Returns: -1 if an error occured, 
- *           0 if no isolated processor was found,
- *           1 if isolated processor was found and process succeeded in requesting to run on it
- */
-static int run_on_isolated_cpu( void)
-{
-  struct pda_stat *p;
-  int n_processors, n;
-
-  n_processors = sysmp( MP_NPROCS);
-  if ( n_processors < 0)
-    return -1;
-
-  p = (struct pda_stat *)malloc( n_processors * sizeof( struct pda_stat));
-  if ( sysmp( MP_STAT, p) < 0)
-    return -1;
-
-  for ( n = 0; n < n_processors; n++)
-    {
-      if (p[n].p_flags & PDAF_ISOLATED)
-	{
-	  if (sysmp( MP_MUSTRUN, n) < 0)
-	    return -1;
-
-	  post( "Running on isolated processor %d\n", n);
-
-	  return 1;
-	}
-    }
-
-  return 0;
-}
-
-void fts_real_time_on()
-{
-  run_real_time_scheduling();
-  run_on_isolated_cpu();
-}
 
 /*
    Function: fts_real_time_off

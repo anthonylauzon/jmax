@@ -1,3 +1,16 @@
+2000-09-25  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* fixed with Norbert remaining bug in DTD (strange pauses in readsf~)
+
+2000-09-23  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* fixed SGI multi-processor related issues: fts' options are
+	passed to plaform_init(argc,argv), and option --cpu=N means that
+	fts will run on processor N. If this option is absent, then it will
+	run on first found isolated processor. This has been used because
+	if you run 2 fts on the same machine, they would both choose the same
+	processor to run on.
+
 2000-09-19  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* fts/src/runtime/sched/sched.[ch]: added fts_sched_add and fts_sched_remove

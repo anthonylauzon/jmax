@@ -39,61 +39,49 @@ import ircam.jmax.*;
 
 class FtsSocketServerStream extends FtsStream
 {
-  String host;
-  int port;
   Socket socket;
   ServerSocket serverSocket;
-  String path;
-  String ftsName;
   Process proc;
   InputStream in_stream = null;
   OutputStream out_stream = null;
 
-  FtsSocketServerStream(String host, String path, String ftsName)
+  FtsSocketServerStream( String host, String ftsDir, String ftsName, String ftsOptions)
   {
-    boolean realtime = false;
-
-    if (MaxApplication.getProperty("jmaxNoRealTime") != null)
-      realtime = MaxApplication.getProperty("jmaxNoRealTime").equals("true");
-
-    this.host = host;
-    this.path = path;
-    this.ftsName = ftsName;
+    int port = 0;
+    String command;
 
     // Create the server socket on the first free port
 
     try
       {
-	this.serverSocket = new ServerSocket(0);// look for a free port
-	this.port = serverSocket.getLocalPort();
+	serverSocket = new ServerSocket(0);// look for a free port
+	port = serverSocket.getLocalPort();
       }
     catch (java.io.IOException e)
       {
 	System.out.println("Error while opening server socket " + e);
       }
 
-    String command;
-
     try
       {
-	if (host.equals(InetAddress.getLocalHost().getHostName()))
+	if ( host.equals( "local") || host.equals( InetAddress.getLocalHost().getHostName()))
 	  {
-	    command = (path + "/" + ftsName + ( realtime ? " -norealtime" : "")
-		       + " socket " + InetAddress.getLocalHost().getHostAddress() + ":" + port) ;
+	    command = "";
 	  }
 	else
 	  {
-	    command = ("rsh " + host + " " + path + "/" + ftsName + ( realtime ? " -norealtime" : "")
-		       + " socket " + InetAddress.getLocalHost().getHostAddress() + ":" + port) ;
+	    command = "rsh " + host + " ";
 	  }
 
+	command += ftsDir + "/" + ftsName;
+	command += " socket " + InetAddress.getLocalHost().getHostAddress() + ":" + port;
+	command += " " + ftsOptions;
       }
     catch (UnknownHostException e)
       {
 	System.out.println("Cannot find local host");
 	return;
       }
-
 
     // Run FTS remotely
 
@@ -107,7 +95,7 @@ class FtsSocketServerStream extends FtsStream
 	return;
       }
 
-	// Wait the connection
+    // Wait the connection
 
     try
       {
@@ -161,7 +149,7 @@ class FtsSocketServerStream extends FtsStream
       } 
     catch (IOException e)
       {
-	System.out.println("I/O failed on closing the serverSocket connection to " + host);
+	System.out.println("I/O failed on closing the serverSocket connection");
       }
   }
 

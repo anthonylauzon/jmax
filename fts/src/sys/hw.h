@@ -49,7 +49,7 @@ extern int fts_memory_is_locked( void);
 extern int fts_lock_memory( void);
 extern void fts_unlock_memory( void);
 
-extern void fts_platform_init( void);
+extern void fts_platform_init( int argc, char **argv);
 
 extern void fts_real_time_on( void);
 extern void fts_real_time_off( void);

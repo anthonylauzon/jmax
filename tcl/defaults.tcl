@@ -64,3 +64,5 @@ set jmaxSysPkgPath "$jmaxRootDir/packages"
 
 ## Splash screen setting
 set jmaxSplashScreen "show"
+
+set jmaxServerOptions ""

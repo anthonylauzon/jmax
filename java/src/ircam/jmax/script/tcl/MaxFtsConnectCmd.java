@@ -48,30 +48,29 @@ class MaxFtsConnectCmd implements Command
 
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
+    if (argv.length != 6 && argv.length != 7)
+      throw new TclNumArgsException(interp, 1, argv, "<type> <ftsdir> <ftsname> <socket> <server> <options> [<port>]");
+
+    String serverDir = argv[1].toString();
+    String serverName = argv[2].toString();
+    String connection = argv[3].toString();
+    String host = argv[4].toString();
+    String serverOptions = argv[5].toString();
+
     int port = 0;
 
-    try
+    if (argv.length == 7)
       {
-	port = Integer.parseInt( argv[5].toString());
-      }
-    catch( NumberFormatException excp)
-      {
+	try
+	  {
+	    port = Integer.parseInt( argv[6].toString());
+	  }
+	catch( NumberFormatException excp)
+	  {
+	  }
       }
 
-    if (argv.length == 6)
-      MaxApplication.setFts(new Fts(new String(argv[1].toString()),
-				    new String(argv[2].toString()),
-				    new String(argv[3].toString()),
-				    new String(argv[4].toString()),
-				    port));
-    else if (argv.length == 5)
-      MaxApplication.setFts(new Fts(new String(argv[1].toString()),
-				    new String(argv[2].toString()),
-				    new String(argv[3].toString()),
-				    new String(argv[4].toString()),
-				    0));
-    else
-      throw new TclNumArgsException(interp, 1, argv, "<type> <ftsdir> <ftsname> <socket> <server> <port>");
+    MaxApplication.setFts(new Fts( serverDir, serverName, connection, host, serverOptions, 0));
   }
 }
 

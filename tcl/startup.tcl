@@ -43,7 +43,10 @@ if {$jmaxSplashScreen != "hide"} then {
 if {[systemProperty "jmaxServerDir"] != ""} then { 
     set jmaxServerDir [systemProperty "jmaxServerDir"]
 } else { 
-    set jmaxServerDir "$jmaxRootDir/fts/bin/$jmaxArch/$jmaxMode"
+    if [catch {set foo $jmaxServerDir}] then {
+	## set directory for jMax server executable
+	set jmaxServerDir "$jmaxRootDir/fts/bin/$jmaxArch/$jmaxMode"
+    }
 }
 
 puts "jMax copyright (C) 1994, 1995, 1998, 1999 IRCAM - Centre Georges Pompidou"
@@ -58,7 +61,7 @@ if {$jmaxConnection == "tcl"} {
   puts "jMax connecting to server on $jmaxHost ($jmaxHostType) via TCP/IP port $jmaxPort"
 }
 
-ftsconnect $jmaxServerDir $jmaxServerName $jmaxConnection $jmaxHost $jmaxPort
+ftsconnect $jmaxServerDir $jmaxServerName $jmaxConnection $jmaxHost $jmaxServerOptions $jmaxPort
 
 # hello server
 sync

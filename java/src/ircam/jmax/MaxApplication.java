@@ -189,46 +189,21 @@ public class MaxApplication extends Object
     boolean inOpt = false;
     String option = null;
 
-    for (int i = 0; i <= args.length; i++)
+    for (int i = 0; i < args.length; i++)
       {
 	if (inOpt)
 	  {
-	    // Waiting for a value
+	    // Waiting for an option's value
 
-	    if (i == args.length)
-	      {
-		// End of arguments
+	    jmaxProperties.put(option.substring(1), args[i]);
 
-		jmaxProperties.put(option.substring(1), "true");
-		inOpt  = false;
-	      }
-	    else if (args[i].startsWith("-"))
-	      {
-		// Got another option
-
-		jmaxProperties.put(option.substring(1), "true");
-		option = args[i];
-		inOpt  = true;
-	      }
-	    else
-	      {
-		// Got a value
-
-		jmaxProperties.put(option.substring(1), args[i]);
-
-		inOpt  = false;
-	      }
+	    inOpt  = false;
 	  }
 	else
 	  {
 	    // Waiting for a option
 
-	    if (i == args.length)
-	      {
-		// do nothing
-		inOpt  = false;
-	      }
-	    else if (args[i].startsWith("-"))
+	    if (args[i].startsWith("-"))
 	      {
 		// Got option
 
@@ -237,10 +212,8 @@ public class MaxApplication extends Object
 	      }
 	    else
 	      {
-		// Got a value, i.e. a argument to open
-
+		// Got an argument
 		toOpen.addElement(args[i]);
-		inOpt  = false;
 	      }
 	  }
 
@@ -445,7 +418,7 @@ public class MaxApplication extends Object
 	{
 	  MaxDocument document = (MaxDocument) documents.getElementAt(j);
 	
-	  if (! document.isSaved())
+	  if (document.getName() != null && ! document.isSaved())
 	    {
 	      someOneNeedSave = true;
 	      break search;

@@ -140,29 +140,29 @@ static int dtd_read_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, in
 
   dst = (volatile float *)dtdfifo_get_write_pointer( fifo);
 
-  index = dtdfifo_get_write_index( fifo);
-  buffer_size = dtdfifo_get_buffer_size( fifo);
-  size = n_read * n_channels * sizeof( float);
+  index = dtdfifo_get_write_index( fifo)/sizeof( float);
+  buffer_size = dtdfifo_get_buffer_size( fifo)/sizeof( float);
+  size = n_read * n_channels;
 
   if ( index + size < buffer_size )
     {
-      for ( n = 0; n < (int)(size/sizeof(float)); n++)
+      for ( n = 0; n < size; n++)
 	{
-	  *dst++ = ((float)(*buffer++)) / 32767.0f;
+	  *dst++ = *buffer++ / 32767.0f;
 	}
     }
   else
     {
-      for ( n = 0; n < (int)(buffer_size/sizeof(float)) - index; n++)
+      for ( n = 0; n < buffer_size - index; n++)
 	{
-	  *dst++ = ((float)(*buffer++)) / 32767.0f;
+	  *dst++ = *buffer++ / 32767.0f;
 	}
 
       dst = (volatile float *)dtdfifo_get_buffer( fifo);
 
-      for ( ; n < (int)(size/sizeof(float)); n++)
+      for ( ; n < size; n++)
 	{
-	  *dst++ = ((float)(*buffer++)) / 32767.0f;
+	  *dst++ = *buffer++ / 32767.0f;
 	}
     }
 
@@ -171,7 +171,7 @@ static int dtd_read_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, in
       dtdfifo_set_eof( fifo, 1);
     }
 
-  dtdfifo_incr_write_index( fifo, size);
+  dtdfifo_incr_write_index( fifo, size * sizeof( float));
 
   return n_read;
 }
@@ -452,7 +452,9 @@ static void dtd_main_loop( int fd)
 
       FD_ZERO( &rfds);
 
+      FD_SET( 0, &rfds);
       FD_SET( fd, &rfds);
+      
       retval = select( fd+1, &rfds, NULL, NULL, &tv);
 
       if (retval < 0)
@@ -465,10 +467,13 @@ static void dtd_main_loop( int fd)
 	}
       else if (retval)
 	{
-	  if (dtd_get_line( fd, line, N) < 0)
-	    break;
+	  if (FD_ISSET( fd, &rfds))
+	    {
+	      if (dtd_get_line( fd, line, N) < 0)
+		break;
 
-	  dtd_process_command( line);
+	      dtd_process_command( line);
+	    }
 	}
       
       dtd_process_fifos();

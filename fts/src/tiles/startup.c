@@ -113,7 +113,7 @@ int main(int argc, char **argv)
     }
 
   /* platform specific initialization */
-  fts_platform_init();
+  fts_platform_init( argc+1, argv-1);
 
   /* kernel modules configure */
   fts_kernel_config();

@@ -48,11 +48,6 @@ class FtsDatagramClientStream extends FtsStream
   DatagramPacket out_packet = new DatagramPacket(out_data, out_data.length);
   DatagramPacket in_packet;
 
-  String host;
-  String path;
-  String ftsName;
-  int port;
-
   /** Instantiate the connection.
    * Actually, the fts server must be started by hand, and the good port passed
    * as argument; this constructor establish the communication.
@@ -62,18 +57,11 @@ class FtsDatagramClientStream extends FtsStream
    * and port is the port passed as argument to this constructor.
    */
 
-  FtsDatagramClientStream(String host, String path, String ftsName, int port)
+  FtsDatagramClientStream( int port)
   {
-    String command;
-
-    this.host = host;
-    this.port = port;
-    this.path = path;
-    this.ftsName = ftsName;
-
     try
       {
-	this.socket = new DatagramSocket(port);// look for a free port
+	this.socket = new DatagramSocket(port);
       }
     catch (java.io.IOException e)
       {

@@ -100,8 +100,7 @@ public class Fts implements MaxContext
    * <code>udpclient</code> connections.
    */
 
-  public Fts(String ftsDir, String ftsName, String connectionType,
-	     String host, int port)
+  public Fts(String ftsDir, String ftsName, String connectionType, String host, String ftsOptions, int port)
   {
     if (MaxApplication.getProperty("ssrun") != null)
       ftsName = ftsName + ".ss";
@@ -109,13 +108,13 @@ public class Fts implements MaxContext
     if (connectionType.equals("socket")) 
       server = new FtsServer(this, host, new FtsSocketStream( host, port));
     else if (connectionType.equals("udp")) 
-      server = new FtsServer(this, host, new FtsDatagramStream( host, ftsDir, ftsName));
+      server = new FtsServer(this, host, new FtsDatagramStream( host, ftsDir, ftsName, ftsOptions));
     else if (connectionType.equals("udpclient")) 
-      server = new FtsServer(this, host+":"+port, new FtsDatagramClientStream( host, ftsDir, ftsName, port));
+      server = new FtsServer(this, host+":"+port, new FtsDatagramClientStream( port));
     else if (connectionType.equals("client") || connectionType.equals("tcp"))
-      server = new FtsServer(this, host, new FtsSocketServerStream( host, ftsDir, ftsName));
+      server = new FtsServer(this, host, new FtsSocketServerStream( host, ftsDir, ftsName, ftsOptions));
     else if (connectionType.equals("local"))
-      server = new FtsServer(this, "fts", new FtsSubProcessStream( ftsDir, ftsName));
+      server = new FtsServer(this, "fts", new FtsSubProcessStream( ftsDir, ftsName, ftsOptions));
     else
       System.out.println("unknown FTS connection type "+ connectionType +": can't connect to FTS");
 

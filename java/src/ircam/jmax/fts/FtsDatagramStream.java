@@ -50,9 +50,6 @@ class FtsDatagramStream extends FtsStream
   DatagramPacket out_packet = new DatagramPacket(out_data, out_data.length);
   DatagramPacket in_packet;
 
-  String host;
-  String ftsDir;
-  String ftsName;
   Process proc;
 
   /** Instantiate the connection.
@@ -61,19 +58,13 @@ class FtsDatagramStream extends FtsStream
    */
 
 
-  FtsDatagramStream(String host, String ftsDir, String ftsName)
+  FtsDatagramStream( String host, String ftsDir, String ftsName, String ftsOptions)
   {
     String command;
 
-    boolean realtime = false;
-
-    this.host = host;
-    this.ftsDir = ftsDir;
-    this.ftsName = ftsName;
-
     try
       {
-	this.socket = new DatagramSocket();// look for a free port
+	socket = new DatagramSocket();// look for a free port
       }
     catch (java.io.IOException e)
       {
@@ -82,16 +73,18 @@ class FtsDatagramStream extends FtsStream
 
     try
       {
-	if (host.equals( "local") || host.equals( InetAddress.getLocalHost().getHostName()))
+	if ( host.equals( "local") || host.equals( InetAddress.getLocalHost().getHostName()))
 	  {
-	    command = (ftsDir + "/" + ftsName 
-		       + " udp " + InetAddress.getLocalHost().getHostAddress() + ":" + socket.getLocalPort()) ;
+	    command = "";
 	  }
 	else
 	  {
-	    command = ("rsh " + host + " " + ftsDir + "/" + ftsName 
-		       + " udp " + InetAddress.getLocalHost().getHostAddress() + ":" + socket.getLocalPort()) ;
+	    command = "rsh " + host + " ";
 	  }
+
+	command +=  ftsDir + "/" + ftsName;
+	command += " udp " + InetAddress.getLocalHost().getHostAddress() + ":" + socket.getLocalPort();
+	command += " " + ftsOptions;
       }
     catch (UnknownHostException e)
       {
