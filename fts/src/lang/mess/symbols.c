@@ -449,3 +449,10 @@ void fts_symbol_reserve_cache(fts_symbol_t s)
   if (first_unused_symbol_cache_index < MAX_CACHE_INDEX)
     fts_symbol_set_cache_index(s, (-1) * first_unused_symbol_cache_index++);
 }
+
+
+
+
+
+
+

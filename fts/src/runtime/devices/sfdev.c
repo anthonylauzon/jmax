@@ -800,7 +800,8 @@ static void *fts_readsf_worker(void *data)
 #else
 
       /* If we dont have the virtual format translation, we do a check
-	 on a the actual number of channels we got, and give do an eof if
+	 on a the actual number of channels we got, and the bit size and format,
+	 and give do an eof if
 	 they do not match; we currently have no way to signal the error
 	 from this thread.
       */
@@ -810,6 +811,16 @@ static void *fts_readsf_worker(void *data)
 	  eof = 1;
 	  fts_sample_fifo_writer_eof(fifo);
 	}
+      
+      {
+	int sampfmt;
+	int sampwidth;
+
+	afGetSampleFormat(file, AF_DEFAULT_TRACK, &sampfmt, &sampwidth);
+
+	if ((sampfmt != AF_SAMPFMT_TWOSCOMP) || (sampwidth != 16))
+	  fts_sample_fifo_writer_eof(fifo);
+      }
 #endif
     }
 
@@ -1201,6 +1212,8 @@ static void fts_writesf_forker(void *data)
 
 void sfdev_init(void)
 {
+  afSetErrorHandler(NULL);	/* avoid stupid error printing in the af library */
+
   fts_sample_fifo_init();
   fts_cmd_fifo_init();
   fts_async_init();

@@ -44,6 +44,8 @@
 void
 fts_soundfile_format_platform_init(void)
 {
+  afSetErrorHandler(NULL);	/* avoid stupid error printing in the af library */
+
   fts_set_int(fts_soundfile_format_get_descriptor(fts_s_aiffc), AF_FILE_AIFFC); 
   fts_set_int(fts_soundfile_format_get_descriptor(fts_s_aiff), AF_FILE_AIFF);
   fts_set_int(fts_soundfile_format_get_descriptor(fts_s_next), AF_FILE_NEXTSND);
