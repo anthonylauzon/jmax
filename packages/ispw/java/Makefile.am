@@ -22,4 +22,4 @@ CLEANFILES=${JAR}
 $(JAR): $(JAR_DEP)	
 	-test -f $(JAR) || rm -f $(JAR)
 	jar -cvf $(JAR) *.class icons/*.gif ircam/jmax/ispw/*.class
-
+	jar -cvf $(JAR) *.class ircam/jmax/editors/qlist/*.class ircam/jmax/editors/qlist/actions/*.class ircam/jmax/editors/qlist/menus/*.class

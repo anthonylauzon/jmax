@@ -71,6 +71,7 @@ prepend.c \
 pt.c \
 pt_meth.c \
 pt_tools.c \
+qlist.c \
 random.c \
 resample.c \
 route.c \
@@ -143,6 +144,7 @@ phasor.h \
 pt_meth.h \
 pt_obj.h \
 pt_tools.h \
+qlist.h \
 sampbuf.h \
 sampread.h \
 sampunit.h \

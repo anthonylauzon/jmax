@@ -23,6 +23,7 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.ispw.*;
+import ircam.jmax.editors.qlist.*;
 import ircam.fts.client.*;
 
 public class Ispw implements JMaxPackage {
@@ -36,6 +37,14 @@ public class Ispw implements JMaxPackage {
 	}
       }; 
 
+    JMaxObjectCreator qlistCreator = new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+	{
+	  return new Standard( new FtsQListObject( server, parent, objId, className, args, offset, length));
+	}
+      }; 
+
     JMaxClassMap.put( "messbox", messageCreator, "/icons/messbox.gif", "/icons/messbox_cursor.gif", this);
+    JMaxClassMap.put( "qlist", qlistCreator, null, null, this);
   }
 }

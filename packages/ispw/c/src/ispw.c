@@ -65,6 +65,7 @@ extern void float_config(void);
 extern void symbol_obj_config(void);
 extern void funbuff_config(void);
 extern void pbank_config(void);
+extern void qlist_config(void);
 extern void table_config(void);
 extern void ispw_value_config(void);
 extern void expr_config(void);
@@ -185,6 +186,7 @@ ispw_config(void)
   symbol_obj_config();
   funbuff_config();
   pbank_config();
+  qlist_config();
   table_config();
   ispw_value_config();
 
