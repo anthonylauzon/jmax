@@ -256,10 +256,20 @@ public class JMaxApplication {
     closeAllWindows( doTheSave);
 
     //Look if current project needs to be saved
-    if( getProject().isDirty())
-      getProject().save( null);	
+    if( getProject().isDirty() && (getProject().getFileName() != null))
+      {
+	Object[] options = { "Save", "Don't save"};
+	int result = JOptionPane.showOptionDialog( getConsoleWindow(), 
+						   "Project File is not saved.\nDo you want to save it now?", 
+						   "Project Not Saved", 
+						   JOptionPane.YES_NO_CANCEL_OPTION,
+						   JOptionPane.QUESTION_MESSAGE,
+						   null, options, options[0]);
+	if( result == JOptionPane.YES_OPTION)
+	  getProject().save( getProject().getFileName());		  
+      }
 
-    //Look if current midi configuration needs to be saved
+    //Look if current audio/midi configuration needs to be saved
     if( getConfig().isDirty() && ( getConfig().getFileName() != null))
       {
 	Object[] options = { "Save", "Don't save"};
