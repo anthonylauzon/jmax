@@ -1,3 +1,9 @@
+2003-11-14  Riccardo Borghesi  <borghesi@livorno.ircam.fr>
+
+	* macosxbuild/jMaxProject/jMaxProject.xcode: added a new xcode project for jMax compilation
+	  on OSX 10.3 (where xcode substitutes projectBuilder as main development tool, and where
+	  projectBuilder is no more supported). 
+
 2003-10-31  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* packages/control/help/change.help.jmax: updated the help patch.
