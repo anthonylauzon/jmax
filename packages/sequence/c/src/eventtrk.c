@@ -318,8 +318,6 @@ eventtrk_event_remove_by_client_request(fts_object_t *o, int winlet, fts_symbol_
   fts_object_delete(event);
 }
 
-extern void noteevt_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-
 void
 eventtrk_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -367,13 +365,13 @@ static void
 eventtrk_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   eventtrk_t *this = (eventtrk_t *)o;
+  fts_symbol_t track_name = track_get_name(&this->head);
   event_t *event = eventtrk_get_first(this);  
   
-  post("%d event(s)\n", eventtrk_get_size(this));
+  post("track %s: %d event(s)\n", fts_symbol_name(track_name), eventtrk_get_size(this));
 
   while(event)
     {
-      fts_symbol_t track_name = track_get_name(&this->head);
       fts_symbol_t class_name = fts_object_get_class_name((fts_object_t *)event);
       
       post("  @%lf: <%s> ", event_get_time(event), fts_symbol_name(class_name));
@@ -381,6 +379,43 @@ eventtrk_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       event = event_get_next(event);
     }  
 }
+
+/*
+static void 
+eventtrk_export_to_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  eventtrk_t *this = (eventtrk_t *)o;
+  fts_symbol_t file_name = fts_get_symbol(at);
+  fts_symbol_t track_name = track_get_name(&this->head);
+  note_off_fake_evt_t note_offs[128];
+  event_t *event;
+  fts_midifile_t *file;
+
+  event = eventtrk_get_first(this);
+
+  if(event)
+    {
+      file = fts_midifile_open_write(name);;
+
+      if(file)
+	{
+	  fts_midifile_write_header(file, 0, 1, 96);
+	  fts_midifile_write_tempo(file, 500000);
+	}
+      else
+	{
+	  post("sequence track %s: cannot open file %s\n", fts_symbol_name(track_name), fts_symbol_name(file_name));
+	  return;
+	}
+    }
+      
+  while(event)
+    {
+      sequence_write_midi_event(file, event);
+      event = event_get_next(event);
+    }  
+}
+*/
 
 static fts_status_t
 eventtrk_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -392,11 +427,13 @@ eventtrk_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, eventtrk_upload);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, eventtrk_print);
-  
+
+  /*fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("export_midi"), eventtrk_export_to_midifile);*/
+    
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("event_new"), eventtrk_event_new_by_client_request);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("event_add"), eventtrk_event_add_by_client_request);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("event_remove"), eventtrk_event_remove_by_client_request);
-  
+
   return fts_Success;
 }
 
@@ -408,16 +445,3 @@ eventtrk_config(void)
 
   fts_class_install(fts_new_symbol("eventtrk"), eventtrk_instantiate);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,3 +1,9 @@
+2000-07-12  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* packages/midisgi/c/src/sgimidiport.c: fts_midiport_t implementation for SGI
+
+	* packages/midi/*: added package midi (ISPW like midi objects based on fts_midiport_t)
+
 2000-06-23  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* fixed ambiguous class name FileFilter in java/src/ircam/jmax/dialogs/MaxFileChooser.java,

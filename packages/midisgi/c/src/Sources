@@ -24,6 +24,4 @@
 #
 
 SOURCES = \
-midisgi.c \
 sgimidiport.c \
-midiobj.c \

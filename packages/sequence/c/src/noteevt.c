@@ -136,6 +136,7 @@ noteevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("pitch"), noteevt_pitch);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("duration"), noteevt_duration);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("print"), noteevt_print);
+  /*fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("export_midi"), noteevt_export_midi);*/
 
   return fts_Success;
 }
@@ -148,5 +149,16 @@ noteevt_config(void)
   fts_class_install(noteevt_symbol, noteevt_instantiate);
 }
 
+/**************************************************************
+ *
+ *  class
+ *
+ */
+void 
+noteevt_export_midi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  noteevt_t *this = (noteevt_t *)o;
+  fts_midifile_t *file = (fts_midifile_t *)fts_get_ptr(at);
 
-
+  /*sequence_write_midi_event(*/
+}

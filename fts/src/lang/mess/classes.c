@@ -289,6 +289,7 @@ fts_class_t *fts_class_instantiate( int ac, const fts_atom_t *at)
 
       cl->properties  = 0;
       cl->daemons = 0;
+      cl->user_data = 0;
 
       cl->mcl = mcl;
       s = mcl->instantiate_fun(cl, ac, at);

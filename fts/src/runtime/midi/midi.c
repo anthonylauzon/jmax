@@ -52,6 +52,8 @@
 #include "lang.h"
 #include "runtime/devices.h"
 #include "runtime/sched.h"
+#include "runtime/time.h"
+#include "runtime/midi/midiport.h"
 #include "runtime/midi/midi.h"
 
 /* @@@@@@@@@@@@@@@@@@@@@@@@@@@ */
@@ -87,6 +89,8 @@ static void         fts_midi_close_all(void);
 
 fts_module_t fts_midi_module = {"Midi", "Midi communication", midi_init, midi_shutdown, 0};
 
+extern void fts_midiport_config(void);
+
 static void midi_init(void)
 {
   fts_declare_logical_dev(fts_new_symbol("midi"),
@@ -96,6 +100,8 @@ static void midi_init(void)
 			  fts_unset_midi_logical_dev,
 			  fts_reset_midi_logical_dev
 			  );
+
+  fts_midiport_config();
 }
 
 
@@ -772,14 +778,3 @@ fts_run_midi_parser(fts_midi_port_t *port, int nextbyte)
 	}
     }
 }
-
-
-
-
-
-
-
-
-
-
-

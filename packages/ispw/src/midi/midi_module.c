@@ -26,28 +26,28 @@
 
 #include "fts.h"
 
-extern void Rreceive_config(void);
-extern void Rsend_config(void);
+/*extern void midi_config(void);*/
+/*extern void midiformat_config(void);*/
+/*extern void midiparse_config(void);*/
 extern void makenote_config(void);
-extern void midi_config(void);
-extern void midiformat_config(void);
-extern void midiparse_config(void);
 extern void stripnote_config(void);
 extern void sustain_config(void);
+extern void Rreceive_config(void);
+extern void Rsend_config(void);
 extern void mididecrypt_config( void);
 
 static void
 ispw_midi_module_init(void)
 {
-  Rreceive_config();
-  Rsend_config();
-  makenote_config();
-  midi_config();
-  mididecrypt_config();
+  /*midi_config();*/
   /*midiformat_config();*/
-  midiparse_config();
+  /*midiparse_config();*/
+  makenote_config();
   stripnote_config();
   sustain_config();
+  Rreceive_config();
+  Rsend_config();
+  mididecrypt_config();
 }
 
 fts_module_t ispw_midi_module = {"ISPW midi", "ISPW midi classes", ispw_midi_module_init, 0, 0};

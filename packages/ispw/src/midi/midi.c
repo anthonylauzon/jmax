@@ -57,15 +57,15 @@
 static int
 midi_ch_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
-  long a1_0, a1_1;
+  int a1_0, a1_1;
 
   if (ac0 >= 2)
-    a1_0 = fts_get_long(&at0[1]);
+    a1_0 = fts_get_int(&at0[1]);
   else
     a1_0 = 0;
 
   if (ac1 >= 2)
-    a1_1 = fts_get_long(&at1[1]);
+    a1_1 = fts_get_int(&at1[1]);
   else
     a1_1 = 0;
 
@@ -83,25 +83,25 @@ midi_ch_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 static int
 midi_ch_arg_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
-  long a1_0, a1_1, a2_0, a2_1;
+  int a1_0, a1_1, a2_0, a2_1;
 
   if (ac0 >= 2)
-    a1_0 = fts_get_long(&at0[1]);
+    a1_0 = fts_get_int(&at0[1]);
   else
     a1_0 = 0;
 
   if (ac1 >= 2)
-    a1_1 = fts_get_long(&at1[1]);
+    a1_1 = fts_get_int(&at1[1]);
   else
     a1_1 = 0;
 
   if (ac0 >= 3)
-    a2_0 = fts_get_long(&at0[2]);
+    a2_0 = fts_get_int(&at0[2]);
   else
     a2_0 = 0;
 
   if (ac1 >= 3)
-    a2_1 = fts_get_long(&at1[2]);
+    a2_1 = fts_get_int(&at1[2]);
   else
     a2_1 = 0;
 
@@ -126,7 +126,7 @@ midi_ch_arg_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1
 typedef struct 
 {
   fts_object_t ob;
-  long status;		/* status byte to send */
+  int status;		/* status byte to send */
   fts_midi_port_t *port;
 } pgmout_t;
 
@@ -134,7 +134,7 @@ static void
 pgmout_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pgmout_t *x = (pgmout_t *)o;
-  long int n = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
   fts_midi_send(x->port, x->status);
   fts_midi_send(x->port, RANGE_VALUE(n));
@@ -144,7 +144,7 @@ static void
 pgmout_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pgmout_t *x = (pgmout_t *)o;
-  long int n = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
   x->status = (SPGM + RANGE_CH(n) - 1);
 }
@@ -163,8 +163,8 @@ static void
 pgmout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pgmout_t *x = (pgmout_t *)o;
-  long int ch   = fts_get_long_arg(ac, at, 1, 0);
-  long int idx = fts_get_long_arg(ac, at, 2, 0);
+  int ch   = fts_get_int_arg(ac, at, 1, 0);
+  int idx = fts_get_int_arg(ac, at, 2, 0);
 
   x->port = fts_midi_get_port(idx);
   x->status = (SPGM + RANGE_CH(ch) - 1);
@@ -236,8 +236,8 @@ static void
 pgmin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pgmin_t *x = (pgmin_t *)o;
-  long int n   = fts_get_long_arg(ac, at, 1, 0);
-  long int idx = fts_get_long_arg(ac, at, 2, 0);
+  int n   = fts_get_int_arg(ac, at, 1, 0);
+  int idx = fts_get_int_arg(ac, at, 2, 0);
 
   x->port = fts_midi_get_port(idx);
   
@@ -273,7 +273,7 @@ pgmin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* initialize the class */
 
-  if ((ac == 1) || (fts_get_long(&at[1]) == 0))
+  if ((ac == 1) || (fts_get_int(&at[1]) == 0))
     fts_class_init(cl, sizeof(pgmin_t), 0, 2, 0);
   else
     fts_class_init(cl, sizeof(pgmin_t), 0, 1, 0);
@@ -292,7 +292,7 @@ pgmin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[0] = fts_s_int;
   fts_outlet_type_define(cl, 0,  fts_s_int, 1, a);
 
-  if ((ac == 1) || (fts_get_long(&at[1]) == 0))
+  if ((ac == 1) || (fts_get_int(&at[1]) == 0))
     fts_outlet_type_define(cl, 1,  fts_s_int, 1, a);
 
   return fts_Success;
@@ -309,7 +309,7 @@ pgmin_config(void)
 typedef struct 
 {
   fts_object_t ob;
-  long status;		/* status byte to send */
+  int status;		/* status byte to send */
   fts_midi_port_t *port;
 } bendout_t;
 
@@ -317,7 +317,7 @@ static void
 bendout_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bendout_t *x = (bendout_t *)o;
-  long int n = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
   n = RANGE_VALUE(n);
 
@@ -330,7 +330,7 @@ static void
 bendout_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bendout_t *x = (bendout_t *)o;
-  long int n = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
   x->status = (SBEND + RANGE_CH(n) - 1);
 }
@@ -349,8 +349,8 @@ static void
 bendout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bendout_t *x = (bendout_t *)o;
-  long int ch   = fts_get_long_arg(ac, at, 1, 0);
-  long int idx = fts_get_long_arg(ac, at, 2, 0);
+  int ch   = fts_get_int_arg(ac, at, 1, 0);
+  int idx = fts_get_int_arg(ac, at, 2, 0);
 
   x->port = fts_midi_get_port(idx);
   x->status = (SBEND + RANGE_CH(ch) - 1);
@@ -423,8 +423,8 @@ static void
 bendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pgmin_t *x = (pgmin_t *)o;
-  long int n   = fts_get_long_arg(ac, at, 1, 0);
-  long int idx = fts_get_long_arg(ac, at, 2, 0);
+  int n   = fts_get_int_arg(ac, at, 1, 0);
+  int idx = fts_get_int_arg(ac, at, 2, 0);
 
   x->port = fts_midi_get_port(idx);
   
@@ -459,7 +459,7 @@ bendin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* initialize the class */
 
-  if ((ac == 1) || (fts_get_long(&at[1]) == 0))
+  if ((ac == 1) || (fts_get_int(&at[1]) == 0))
     fts_class_init(cl, sizeof(bendin_t), 0, 2, 0);
   else
     fts_class_init(cl, sizeof(bendin_t), 0, 1, 0);
@@ -478,7 +478,7 @@ bendin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[0] = fts_s_int;
   fts_outlet_type_define(cl, 0,  fts_s_int, 1, a);
 
-  if ((ac == 1) || (fts_get_long(&at[1]) == 0))
+  if ((ac == 1) || (fts_get_int(&at[1]) == 0))
     fts_outlet_type_define(cl, 1,  fts_s_int, 1, a);
 
   return fts_Success;
@@ -495,7 +495,7 @@ bendin_config(void)
 typedef struct touchout
 {
   fts_object_t ob;
-  long status;		/* status byte to send */
+  int status;		/* status byte to send */
   fts_midi_port_t *port;
 } touchout_t;
 
@@ -503,7 +503,7 @@ static void
 touchout_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   touchout_t *x = (touchout_t *)o;
-  long int n = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
   fts_midi_send(x->port, x->status);
   fts_midi_send(x->port, RANGE_VALUE(n));
@@ -513,7 +513,7 @@ static void
 touchout_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   touchout_t *x = (touchout_t *)o;
-  long int n = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
   x->status = (STCH + RANGE_CH(n) - 1);
 }
@@ -533,8 +533,8 @@ static void
 touchout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   touchout_t *x = (touchout_t *)o;
-  long int ch   = fts_get_long_arg(ac, at, 1, 0);
-  long int idx = fts_get_long_arg(ac, at, 2, 0);
+  int ch   = fts_get_int_arg(ac, at, 1, 0);
+  int idx = fts_get_int_arg(ac, at, 2, 0);
 
   x->port = fts_midi_get_port(idx);
   x->status = (STCH + RANGE_CH(ch) - 1);
@@ -607,8 +607,8 @@ static void
 touchin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   touchin_t *x = (touchin_t *)o;
-  long int n   = fts_get_long_arg(ac, at, 1, 0);
-  long int idx = fts_get_long_arg(ac, at, 2, 0);
+  int n   = fts_get_int_arg(ac, at, 1, 0);
+  int idx = fts_get_int_arg(ac, at, 2, 0);
 
   x->port = fts_midi_get_port(idx);
   
@@ -643,7 +643,7 @@ touchin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* initialize the class */
 
-  if ((ac == 1) || (fts_get_long(&at[1]) == 0))
+  if ((ac == 1) || (fts_get_int(&at[1]) == 0))
     fts_class_init(cl, sizeof(touchin_t), 0, 2, 0);
   else
     fts_class_init(cl, sizeof(touchin_t), 0, 1, 0);
@@ -662,7 +662,7 @@ touchin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[0] = fts_s_int;
   fts_outlet_type_define(cl, 0,  fts_s_int, 1, a);
 
-  if ((ac == 1) || (fts_get_long(&at[1]) == 0))
+  if ((ac == 1) || (fts_get_int(&at[1]) == 0))
     fts_outlet_type_define(cl, 1,  fts_s_int, 1, a);
 
   return fts_Success;
@@ -681,8 +681,8 @@ touchin_config(void)
 typedef struct ctlout
 {
   fts_object_t ob;
-  long status;			/* status byte to send */
-  long ctlno;			/* control number */
+  int status;			/* status byte to send */
+  int ctlno;			/* control number */
   fts_midi_port_t *port;	/* the midi port */
 } ctlout_t;
 
@@ -691,7 +691,7 @@ static void
 ctlout_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ctlout_t *x = (ctlout_t *)o;
-  long int n = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
   fts_midi_send(x->port, x->status);
   fts_midi_send(x->port, x->ctlno);
@@ -702,7 +702,7 @@ static void
 ctlout_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ctlout_t *x = (ctlout_t *)o;
-  long int n = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
   x->ctlno = RANGE_VALUE(n);
 }
@@ -712,7 +712,7 @@ static void
 ctlout_number_2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ctlout_t *x = (ctlout_t *)o;
-  long int n = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
   x->status = (SCTL + RANGE_CH(n) - 1);
 }
@@ -734,9 +734,9 @@ static void
 ctlout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ctlout_t *x = (ctlout_t *)o;
-  long int ctlno = fts_get_long_arg(ac, at, 1, 0);
-  long int ch    = fts_get_long_arg(ac, at, 2, 0);
-  long int idx  = fts_get_long_arg(ac, at, 3, 0);
+  int ctlno = fts_get_int_arg(ac, at, 1, 0);
+  int ch    = fts_get_int_arg(ac, at, 2, 0);
+  int idx  = fts_get_int_arg(ac, at, 3, 0);
 
   x->port = fts_midi_get_port(idx);
   x->ctlno = RANGE_VALUE(ctlno);
@@ -797,7 +797,7 @@ typedef struct
 {
   fts_object_t obj;
   int chanout;			/* MIDI channel if any (zero otherwise) */
-  long ctlno;			/* ctl number  */
+  int ctlno;			/* ctl number  */
   fts_midi_port_t *port;
 } ctlin_t;
 
@@ -814,7 +814,7 @@ ctlin_midi_action(fts_midi_port_t *p, int midi_ev, void *user_data, int argc, ft
       fts_outlet_send((fts_object_t *) x, 1, fts_s_int, 1, at + 1);
       fts_outlet_send((fts_object_t *) x, 0, fts_s_int, 1, at + 2);
     }
-  else if (x->ctlno == fts_get_long(at + 1))
+  else if (x->ctlno == fts_get_int(at + 1))
     {
       if (! x->chanout)
 	fts_outlet_send((fts_object_t *) x, 1, fts_s_int, 1, at);
@@ -828,9 +828,9 @@ static void
 ctlin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ctlin_t *x   = (ctlin_t *)o;
-  long int ctl = fts_get_long_arg(ac, at, 1, 0);
-  long int n   = fts_get_long_arg(ac, at, 2, 0);
-  long int idx = fts_get_long_arg(ac, at, 3, 0);
+  int ctl = fts_get_int_arg(ac, at, 1, 0);
+  int n   = fts_get_int_arg(ac, at, 2, 0);
+  int idx = fts_get_int_arg(ac, at, 3, 0);
 
   /* controller range from 1 to 128 in this object;
      0 means send out the number */
@@ -878,14 +878,16 @@ ctlin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* computes how many outlets */
 
   if ((ac == 1) ||
-      ((ac == 2) && (fts_get_long(&at[1]) == 0)) ||
-      ((ac >= 3) && (fts_get_long(&at[1]) == 0) && (fts_get_long(&at[2]) == 0)))
+      ((ac == 2) && (fts_get_int(&at[1]) == 0)) ||
+      ((ac >= 3) && (fts_get_int(&at[1]) == 0) && (fts_get_int(&at[2]) == 0)))
     outlets = 3;
   else if ((ac == 2) ||
-	   ((ac >= 3) && (fts_get_long(&at[2]) == 0)))
+	   ((ac >= 3) && (fts_get_int(&at[2]) == 0)))
     outlets = 2;
   else if (ac >= 3)
     outlets = 1;
+  else
+    outlets = 0;
 
   /* initialize the class */
 
@@ -923,8 +925,8 @@ ctlin_config(void)
 typedef struct 
 {
   fts_object_t ob;
-  long status;			/* status byte to send */
-  long vel;			/* velocity */
+  int status;			/* status byte to send */
+  int vel;			/* velocity */
   fts_midi_port_t *port;	/* the midi port */
 } noteout_t;
 
@@ -933,7 +935,7 @@ static void
 noteout_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   noteout_t *x = (noteout_t *)o;
-  long int n = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
   fts_midi_send(x->port, x->status);
   fts_midi_send(x->port, RANGE_VALUE(n));
@@ -944,7 +946,7 @@ static void
 noteout_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   noteout_t *x = (noteout_t *)o;
-  long int n = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
   x->vel = RANGE_VALUE(n);
 }
@@ -954,7 +956,7 @@ static void
 noteout_number_2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   noteout_t *x = (noteout_t *)o;
-  long int n = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
   x->status = (SNOTE + RANGE_CH(n) - 1);
 }
@@ -977,8 +979,8 @@ static void
 noteout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   noteout_t *x = (noteout_t *)o;
-  long int ch    = fts_get_long_arg(ac, at, 1, 0);
-  long int idx  = fts_get_long_arg(ac, at, 2, 0);
+  int ch    = fts_get_int_arg(ac, at, 1, 0);
+  int idx  = fts_get_int_arg(ac, at, 2, 0);
 
   x->port = fts_midi_get_port(idx);
   x->status = (SNOTE + RANGE_CH(ch) - 1);
@@ -1057,8 +1059,8 @@ static void
 notein_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   notein_t *x = (notein_t *)o;
-  long int n   = fts_get_long_arg(ac, at, 1, 0);
-  long int idx = fts_get_long_arg(ac, at, 2, 0);
+  int n   = fts_get_int_arg(ac, at, 1, 0);
+  int idx = fts_get_int_arg(ac, at, 2, 0);
 
   x->port = fts_midi_get_port(idx);
   
@@ -1094,7 +1096,7 @@ notein_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* initialize the class */
 
-  if ((ac == 1) || (fts_get_long(&at[1]) == 0))
+  if ((ac == 1) || (fts_get_int(&at[1]) == 0))
     fts_class_init(cl, sizeof(notein_t), 0, 3, 0);
   else
     fts_class_init(cl, sizeof(notein_t), 0, 2, 0);
@@ -1114,7 +1116,7 @@ notein_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_outlet_type_define(cl, 0,  fts_s_int, 1, a);
   fts_outlet_type_define(cl, 1,  fts_s_int, 1, a);
 
-  if ((ac == 1) || (fts_get_long(&at[1]) == 0))
+  if ((ac == 1) || (fts_get_int(&at[1]) == 0))
     fts_outlet_type_define(cl, 2,  fts_s_int, 1, a);
 
   return fts_Success;
@@ -1131,8 +1133,8 @@ notein_config(void)
 typedef struct 
 {
   fts_object_t ob;
-  long status;			/* status byte to send */
-  long keyno;			/* pressure value */
+  int status;			/* status byte to send */
+  int keyno;			/* pressure value */
   fts_midi_port_t *port;	/* the midi port */
 } polyout_t;
 
@@ -1141,7 +1143,7 @@ static void
 polyout_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   polyout_t *x = (polyout_t *)o;
-  long int n = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
   fts_midi_send(x->port, x->status);
   fts_midi_send(x->port, x->keyno);
@@ -1152,7 +1154,7 @@ static void
 polyout_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   polyout_t *x = (polyout_t *)o;
-  long int n = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
   x->keyno = RANGE_VALUE(n);
 }
@@ -1162,7 +1164,7 @@ static void
 polyout_number_2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   polyout_t *x = (polyout_t *)o;
-  long int n = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
   x->status = (SPOLY + RANGE_CH(n) - 1);
 }
@@ -1184,9 +1186,9 @@ static void
 polyout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   polyout_t *x = (polyout_t *)o;
-  long int keyno = fts_get_long_arg(ac, at, 1, 0);
-  long int ch    = fts_get_long_arg(ac, at, 2, 0);
-  long int idx  = fts_get_long_arg(ac, at, 3, 0);
+  int keyno = fts_get_int_arg(ac, at, 1, 0);
+  int ch    = fts_get_int_arg(ac, at, 2, 0);
+  int idx  = fts_get_int_arg(ac, at, 3, 0);
 
   x->port = fts_midi_get_port(idx);
   x->keyno = RANGE_VALUE(keyno);
@@ -1249,7 +1251,7 @@ typedef struct
 {
   fts_object_t obj;
   int chanout;			/* MIDI channel if any (zero otherwise) */
-  long keyno;			/* key number  */
+  int keyno;			/* key number  */
   fts_midi_port_t *port;
 } polyin_t;
 
@@ -1266,7 +1268,7 @@ polyin_midi_action(fts_midi_port_t *p, int midi_ev, void *user_data, int argc, f
       fts_outlet_send((fts_object_t *) x, 1, fts_s_int, 1, at + 1);
       fts_outlet_send((fts_object_t *) x, 0, fts_s_int, 1, at + 2);
     }
-  else if (x->keyno == fts_get_long(at + 1))
+  else if (x->keyno == fts_get_int(at + 1))
     {
       if (! x->chanout)
 	fts_outlet_send((fts_object_t *) x, 1, fts_s_int, 1, at);
@@ -1280,9 +1282,9 @@ static void
 polyin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   polyin_t *x   = (polyin_t *)o;
-  long int key = fts_get_long_arg(ac, at, 1, 0);
-  long int n   = fts_get_long_arg(ac, at, 2, 0);
-  long int idx = fts_get_long_arg(ac, at, 3, 0);
+  int key = fts_get_int_arg(ac, at, 1, 0);
+  int n   = fts_get_int_arg(ac, at, 2, 0);
+  int idx = fts_get_int_arg(ac, at, 3, 0);
 
   /* controller range from 1 to 128 in this object;
      0 means send out the number */
@@ -1330,14 +1332,16 @@ polyin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* computes how many outlets */
 
   if ((ac == 1) ||
-      ((ac == 2) && (fts_get_long(&at[1]) == 0)) ||
-      ((ac >= 3) && (fts_get_long(&at[1]) == 0) && (fts_get_long(&at[2]) == 0)))
+      ((ac == 2) && (fts_get_int(&at[1]) == 0)) ||
+      ((ac >= 3) && (fts_get_int(&at[1]) == 0) && (fts_get_int(&at[2]) == 0)))
     outlets = 3;
   else if ((ac == 2) ||
-	   ((ac >= 3) && (fts_get_long(&at[2]) == 0)))
+	   ((ac >= 3) && (fts_get_int(&at[2]) == 0)))
     outlets = 2;
   else if (ac >= 3)
     outlets = 1;
+  else
+    outlets = 0;
 
   /* initialize the class */
 
@@ -1384,7 +1388,7 @@ static void
 midiout_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   midiout_t *x = (midiout_t *)o;
-  long int n = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
   fts_midi_send(x->port, n);
 }
@@ -1393,7 +1397,7 @@ static void
 midiout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   midiout_t *x = (midiout_t *)o;
-  long int idx  = fts_get_long_arg(ac, at, 1, 0);
+  int idx  = fts_get_int_arg(ac, at, 1, 0);
 
   x->port = fts_midi_get_port(idx);
 }
@@ -1449,7 +1453,7 @@ static void
 midiin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   midiin_t *x = (midiin_t *)o;
-  long int idx = fts_get_long_arg(ac, at, 1, 0);
+  int idx = fts_get_int_arg(ac, at, 1, 0);
 
   x->port = fts_midi_get_port(idx);
   
@@ -1518,7 +1522,7 @@ static void
 sysexin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sysexin_t *x = (sysexin_t *)o;
-  long int idx = fts_get_long_arg(ac, at, 1, 0);
+  int idx = fts_get_int_arg(ac, at, 1, 0);
 
   x->port = fts_midi_get_port(idx);
   
@@ -1586,7 +1590,7 @@ static void
 rtin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   rtin_t *x = (rtin_t *)o;
-  long int idx = fts_get_long_arg(ac, at, 1, 0);
+  int idx = fts_get_int_arg(ac, at, 1, 0);
 
   x->port = fts_midi_get_port(idx);
   
@@ -1658,7 +1662,7 @@ static void
 mtc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mtc_t *x = (mtc_t *)o;
-  long int idx = fts_get_long_arg(ac, at, 1, 0);
+  int idx = fts_get_int_arg(ac, at, 1, 0);
 
   x->port = fts_midi_get_port(idx);
   
@@ -1729,7 +1733,7 @@ midi_config(void)
   polyin_config();
   rtin_config();
   mtc_config();
-  /*sysexin_config();*/
-  /*midiout_config();*/
-  /*midiin_config();*/
+  sysexin_config();
+  midiout_config();
+  midiin_config();
 }

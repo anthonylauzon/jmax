@@ -103,6 +103,9 @@ extern fts_status_t fts_outlet_type_define_optargs(fts_class_t *cl, int woutlet,
 
 extern fts_symbol_t fts_get_class_name(fts_class_t *cl);
 
+#define fts_class_get_user_data(c) ((cl)->user_data)
+#define fts_class_set_user_data(c, d) ((cl)->user_data = (d))
+
 extern const int fts_SystemInlet;
 
 extern int fts_arg_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);

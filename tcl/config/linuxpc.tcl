@@ -33,7 +33,7 @@ defineDevice stereoIn1 { oss_adc } "OSS audio in"
 
 # This is kept for compatibility, but ADAT configurations must use adatIn/Out
 defineDevice studioOutA { oss_dac device /dev/dsp1 channels 8 } "StudI/O output ADAT port A"
-defineDevice studioInA { oss_adc device /dev/dsp11 channels 2 } "StudI/O input ADAT port A"
+defineDevice studioInA { oss_adc device /dev/dsp11 channels 8 } "StudI/O input ADAT port A"
 
 # ADAT devices
 defineDevice adatOut  { oss_dac device /dev/dsp1 channels 8 } "StudI/O output ADAT port A"
@@ -47,7 +47,8 @@ defineDevice midi { oss_midi } "OSS MIDI"
 
 when platformStart {
     package require ossdev
-    package require unixdtd
+#    package require unixdtd
+    package require pdtddev
 }
 
 when defaultStart {

@@ -201,7 +201,6 @@ seqobj_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       track_t *track = sequence_get_track_by_name(this, track_name);
 
-      post("track: \"%s\" ", fts_symbol_name(track_name));
       fts_send_message((fts_object_t *)track, fts_SystemInlet, fts_s_print, 0, 0);
     }
   else
@@ -210,10 +209,7 @@ seqobj_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
       while(track)
 	{
-	  fts_symbol_t track_name = track_get_name(track);
-	  fts_symbol_t class_name = fts_object_get_class_name((fts_object_t *)track);
-	  
-	  post("track %d: \"%s\"\n", i, fts_symbol_name(track_name));
+	  fts_send_message((fts_object_t *)track, fts_SystemInlet, fts_s_print, 0, 0);
 	  track = track_get_next(track);
 	  i++;
 	}
