@@ -1228,6 +1228,8 @@ void FtsProcess::run( FtsArgs &args) throw( FtsClientException)
     findDefaultPath();
   }
 
+  ftsclient_log("[fts]: path %s\n", _path);
+
   cmdLine[0] = 0;
   strcat(cmdLine, _path);
   strcat(cmdLine, " ");
