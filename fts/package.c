@@ -31,6 +31,7 @@
 #endif
 
 #include <ftsprivate/package.h>
+#include <ftsprivate/patcher.h>
 #include <ftsprivate/template.h>
 #include <ftsprivate/abstraction.h>
 #include <ftsprivate/errobj.h>
@@ -74,8 +75,26 @@ static fts_status_description_t fts_DuplicatedMetaclass = {"Duplicated metaclass
 
 static void fts_package_load_default_files(fts_package_t* pkg);
 static void fts_package_upload_requires(fts_package_t* pkg);
-static void fts_package_upload_template_paths(fts_package_t* pkg);
-static void fts_package_upload_data_paths(fts_package_t* pkg);
+static void fts_package_upload_template_paths( fts_package_t* pkg);
+static void fts_package_upload_data_paths( fts_package_t* pkg);
+static fts_symbol_t fts_package_make_relative_path( fts_package_t* pkg, fts_symbol_t path);
+
+static fts_symbol_t fts_package_make_relative_path( fts_package_t* pkg, fts_symbol_t file)
+{
+  fts_symbol_t rel_file;
+  int dirlen;
+
+  if( pkg->dir == NULL) return file;
+  
+  if ( strstr( file, pkg->dir) != NULL)
+    {
+      dirlen = strlen( pkg->dir) + 1;
+      rel_file = fts_new_symbol_copy( file + dirlen);
+      return rel_file;
+    }  
+  else
+    return file;
+}
 
 /***********************************************
  *
@@ -902,12 +921,14 @@ __fts_package_template_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 {
   fts_package_t* pkg = (fts_package_t *)o;
   int i;
+  fts_symbol_t path;
 
   pkg->template_paths = NULL;  
 
   for (i = 0; i < ac; i++) {
     if (fts_is_symbol(&at[i])) {
-      fts_package_add_template_path(pkg, fts_get_symbol(&at[i]));
+      path = fts_package_make_relative_path(pkg, fts_get_symbol(&at[i]));
+      fts_package_add_template_path(pkg, path);
     }
   }
 
@@ -932,7 +953,7 @@ __fts_package_abstraction_path(fts_object_t *o, int winlet, fts_symbol_t s, int 
   int i;
 
   for (i = 0; i < ac; i++) {
-    if (fts_is_symbol(&at[i])) {
+    if (fts_is_symbol(&at[i])) {      
       fts_package_add_abstraction_path(pkg, fts_get_symbol(&at[i]));
     }
   }
@@ -943,12 +964,14 @@ __fts_package_data_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 {
   fts_package_t* pkg = (fts_package_t *)o;
   int i;
+  fts_symbol_t path;
 
   pkg->data_paths = NULL;  
 
   for (i = 0; i < ac; i++) {
     if (fts_is_symbol(&at[i])) {
-      fts_package_add_data_path(pkg, fts_get_symbol(&at[i]));
+      path = fts_package_make_relative_path(pkg, fts_get_symbol(&at[i]));
+      fts_package_add_data_path(pkg, path);
     }
   }
 

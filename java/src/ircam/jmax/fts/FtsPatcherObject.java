@@ -890,7 +890,8 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     GraphicObject newObj;
     
     if(isTemplate)
-      newObj = new Standard( new FtsTemplateObject( getServer(), this, objId, className, args, offset-1, nArgs-offset+1));
+      newObj = new Standard( new FtsTemplateObject( getServer(), this, objId, className, args, /*offset-1, nArgs-offset+1*/
+						    offset, nArgs-offset));
     else
       newObj = makeGraphicObjectFromServer( getServer(), this, objId, className, args, offset, nArgs-offset);
 
@@ -913,10 +914,13 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     if( ((FtsGraphicObject)newObj.getFtsObject()).getClassName() == null)
       doEdit = true;
     else
-      if( ((FtsGraphicObject)newObj.getFtsObject()).getDescription().equals(""))
-	doEdit = true;
+      {
+	String descr = ((FtsGraphicObject)newObj.getFtsObject()).getDescription();
+	if((descr!=null) && descr.equals(""))
+	  doEdit = true;
+      }
     newObj.getSketchPad().addNewObject(newObj, doEdit);
-  
+
     if( pasting)
       ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.addPastedObject( newObj);
   }

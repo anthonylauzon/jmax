@@ -75,7 +75,8 @@ public class FtsPackage extends FtsObjectWithEditor
     FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("updateDone"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsPackage)obj).listener.ftsActionDone();
+	  if(((FtsPackage)obj).listener != null)
+	    ((FtsPackage)obj).listener.updateDone();
 	}
       });
     FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("uploadDone"), new FtsMessageHandler(){
@@ -106,7 +107,7 @@ public class FtsPackage extends FtsObjectWithEditor
     dataPaths = new Vector();
   }
 
-  public void setFtsActionListener(FtsActionListener listener)
+  public void setPackageListener(ircam.jmax.editors.project.ConfigPackagePanel listener)
   {
     this.listener = listener;
   }
@@ -218,8 +219,11 @@ public class FtsPackage extends FtsObjectWithEditor
 
     for(int i = 0; i<nArgs; i++)
       templatePaths.addElement( args[i].symbolValue.toString());
+  
+    if( listener != null)
+      listener.templatePathChanged();
   }
-
+  
   void addAbstractionPath(int nArgs, FtsAtom[] args)
   {
     absPaths.removeAllElements();
@@ -234,6 +238,9 @@ public class FtsPackage extends FtsObjectWithEditor
 
     for(int i = 0; i<nArgs; i++)
       dataPaths.addElement( args[i].symbolValue.toString());
+
+    if( listener != null)
+      listener.dataPathChanged();
   }
 
   public void setName( String name)
@@ -309,7 +316,8 @@ public class FtsPackage extends FtsObjectWithEditor
   private String name;
   private String fileName;
   private String dir;
-  private FtsActionListener listener;
+  //private FtsActionListener listener;
+  private ircam.jmax.editors.project.ConfigPackagePanel listener;
   private boolean hasSummaryHelp = true;
 }
 

@@ -47,13 +47,8 @@ public class ConfigPackagePanel extends JPanel implements Editor
     window = win;
     ftsPkg = pkg;
 
-    ftsPkg.setFtsActionListener( new FtsActionListener(){
-	public void ftsActionDone()
-	{
-	  update();
-	  window.setVisible( true);
-	}
-      });
+    ftsPkg.setPackageListener( this);
+
     initDataModels( ftsPkg);
 
     setLayout( new BoxLayout( this, BoxLayout.Y_AXIS));
@@ -151,16 +146,10 @@ public class ConfigPackagePanel extends JPanel implements Editor
 
     ftsPkg = pkg;
     
-    ftsPkg.setFtsActionListener( new FtsActionListener(){
-	public void ftsActionDone()
-	{
-	  update();
-	  window.setVisible( true);
-	}
-      });
+    ftsPkg.setPackageListener( this);
   }
 
-  void update()
+  public void update()
   {    
     initDataModels( ftsPkg);
     requiresTable.setModel( requiresModel);
@@ -177,6 +166,30 @@ public class ConfigPackagePanel extends JPanel implements Editor
     revalidate();    
 
     window.pack();
+  }
+
+  public void dataPathChanged()
+  {
+    dataPathModel = new DefaultListModel();
+
+    for(Enumeration e = ftsPkg.getDataPaths(); e.hasMoreElements();)
+      dataPathModel.addElement(e.nextElement());   
+
+    dataPathList.setModel( dataPathModel);
+    dataPathList.revalidate();
+    revalidate();    
+  }
+
+  public void templatePathChanged()
+  {
+    templPathModel = new DefaultListModel();
+
+    for(Enumeration e = ftsPkg.getTemplatePaths(); e.hasMoreElements();)
+      templPathModel.addElement(e.nextElement());   
+
+    templPathList.setModel( templPathModel);
+    templPathList.revalidate();
+    revalidate();    
   }
 
   void chooseAndAddPath( DefaultListModel model, String message, int index)
@@ -378,6 +391,12 @@ public class ConfigPackagePanel extends JPanel implements Editor
     int rows = 0;
     Object data[][];
     FtsPackage ftsPackage;
+  }
+
+  public void updateDone()
+  {
+    update();
+    window.setVisible( true);
   }
 
   /************* interface Editor ************************/
