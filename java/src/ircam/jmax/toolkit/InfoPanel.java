@@ -46,7 +46,6 @@ public class InfoPanel extends JPanel implements StatusBar{
 
     setLayout(null);
 
-    setBackground(Color.lightGray);
     setBorder(new BevelBorder(BevelBorder.RAISED));
     
     itsHeaderFont = new Font(getFont().getName(), Font.BOLD, getFont().getSize());
