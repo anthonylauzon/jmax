@@ -1,3 +1,20 @@
+2003-01-23  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* rename default project files:
+	    config.jprj -> default_project.jprj
+	    config_linux_alsa.jprj -> default_project_linux_alsa.jprj
+	    config_linux_oss.jprj  -> default_project_linux_oss.jprj
+	    config_macosx.jprj     -> default_project_macosx.jprj
+	    config_win32.jprj      -> default_project_win32.jprj
+
+	* add default project file for jack audio connection kit
+	default_project_linux_jack.jprj
+	
+	* default project name is now: default-project.jprj
+
+	* use predefined symbol fts_s_default_project in linux.c/macosx.c/sgi.c/win32.c
+	instead of old hardcoded "config.jprj"
+
 2003-01-23  François Déchelle  <dechelle@mac-dechelle.ircam.fr>
 
 	* update Mac OS X audio port for default device.
