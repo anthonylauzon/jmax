@@ -70,6 +70,7 @@ FTSDIR = @FTSDIR@
 FTS_SYS_LIBS = @FTS_SYS_LIBS@
 JAVACFLAGSX = @JAVACFLAGSX@
 JAVACX = @JAVACX@
+LEX = @LEX@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
@@ -82,11 +83,12 @@ RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
 STRIP = @STRIP@
 VERSION = @VERSION@
+YACC = @YACC@
 
 SUBDIRS = c help
 
 packagedir = $(pkgdatadir)/packages/system
-package_DATA = system.jmax system.jpk 
+package_DATA = system.jmax 
 
 EXTRA_DIST = $(package_DATA)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs

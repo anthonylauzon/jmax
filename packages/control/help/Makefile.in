@@ -70,6 +70,7 @@ FTSDIR = @FTSDIR@
 FTS_SYS_LIBS = @FTS_SYS_LIBS@
 JAVACFLAGSX = @JAVACFLAGSX@
 JAVACX = @JAVACX@
+LEX = @LEX@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
@@ -82,10 +83,10 @@ RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
 STRIP = @STRIP@
 VERSION = @VERSION@
+YACC = @YACC@
 
 helpdir = $(pkgdatadir)/packages/control/help
 help_DATA = \
- control.help.index.tcl \
  control.summary.jmax \
  count.help.jmax \
  demux.help.jmax \

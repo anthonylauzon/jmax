@@ -70,6 +70,7 @@ FTSDIR = @FTSDIR@
 FTS_SYS_LIBS = @FTS_SYS_LIBS@
 JAVACFLAGSX = @JAVACFLAGSX@
 JAVACX = @JAVACX@
+LEX = @LEX@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
@@ -82,13 +83,13 @@ RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
 STRIP = @STRIP@
 VERSION = @VERSION@
+YACC = @YACC@
 
 helpdir = $(pkgdatadir)/packages/guiobj/help
 help_DATA = \
  button.help.jmax \
  display.help.jmax \
  floatbox.help.jmax \
- guiobj.help.index.tcl \
  guiobj.summary.jmax \
  intbox.help.jmax \
  key.help.jmax \

@@ -74,6 +74,7 @@ FTSDIR = @FTSDIR@
 FTS_SYS_LIBS = @FTS_SYS_LIBS@
 JAVACFLAGSX = @JAVACFLAGSX@
 JAVACX = @JAVACX@
+LEX = @LEX@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
@@ -86,8 +87,9 @@ RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
 STRIP = @STRIP@
 VERSION = @VERSION@
+YACC = @YACC@
 
-SUBDIRS = utils control data guiobj io ispw ispwmath lists midi numeric qlist signal system @PLATFORM_PACKAGES@
+SUBDIRS = utils control data guiobj io ispw ispwmath midi numeric sequence signal system @PLATFORM_PACKAGES@
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
@@ -296,9 +298,6 @@ uninstall-am uninstall all-redirect all-am all installdirs-am \
 installdirs mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
-
-# Not compiled yet
-# explode sequence
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

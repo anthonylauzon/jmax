@@ -16,7 +16,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ../..
-prefix = /net/lichtung/u.lichtung/worksta/borghesi/projects/jmax-install
+prefix = /u/worksta/borghesi/projects/jmax-install
 exec_prefix = ${prefix}
 
 bindir = ${exec_prefix}/bin
@@ -67,9 +67,10 @@ DOT_LIBS =
 ECHO = echo
 EXEEXT = 
 FTSDIR = ${exec_prefix}/bin
-FTS_SYS_LIBS = -ldl -lpthread  -laudiofile
+FTS_SYS_LIBS = -ldl -lpthread 
 JAVACFLAGSX = 
 JAVACX = javac
+LEX = flex
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LN_S = ln -s
 MAKEINFO = makeinfo
@@ -82,6 +83,7 @@ RANLIB = ranlib
 ROOTDIR = ${prefix}/share/jmax
 STRIP = strip
 VERSION = 3.1.0_latest_cvs
+YACC = bison -y
 
 tutorialdir = $(pkgdatadir)/tutorials/basics
 tutorial_DATA = \

@@ -20,7 +20,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ..
-prefix = /net/lichtung/u.lichtung/worksta/borghesi/projects/jmax-install
+prefix = /u/worksta/borghesi/projects/jmax-install
 exec_prefix = ${prefix}
 
 bindir = ${exec_prefix}/bin
@@ -71,9 +71,10 @@ DOT_LIBS =
 ECHO = echo
 EXEEXT = 
 FTSDIR = ${exec_prefix}/bin
-FTS_SYS_LIBS = -ldl -lpthread  -laudiofile
+FTS_SYS_LIBS = -ldl -lpthread 
 JAVACFLAGSX = 
 JAVACX = javac
+LEX = flex
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LN_S = ln -s
 MAKEINFO = makeinfo
@@ -86,8 +87,9 @@ RANLIB = ranlib
 ROOTDIR = ${prefix}/share/jmax
 STRIP = strip
 VERSION = 3.1.0_latest_cvs
+YACC = bison -y
 
-SUBDIRS = utils control data guiobj io ispw ispwmath lists midi numeric qlist signal system oss unixdtd aflib
+SUBDIRS = utils control data guiobj io ispw ispwmath midi numeric sequence signal system oss unixdtd aflib
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
@@ -296,9 +298,6 @@ uninstall-am uninstall all-redirect all-am all installdirs-am \
 installdirs mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
-
-# Not compiled yet
-# explode sequence
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
