@@ -1,6 +1,0 @@
-SOURCES = Project.java \
-          ProjectBar.java \
-          ProjectEntry.java \
-          ProjectNewDialog.java \
-          ProjectWindow.java
-

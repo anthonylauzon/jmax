@@ -1,7 +1,0 @@
-#
-# Makefile.opt
-#
-
-JAVAC_FLAGS = -O
-
-
