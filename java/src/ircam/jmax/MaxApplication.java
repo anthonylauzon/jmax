@@ -264,7 +264,7 @@ public class MaxApplication extends Object
 	File file = new File((String) toOpen.elementAt(i));
 	
 	try
-	  { 
+	  {
 	    document = Mda.loadDocument(file);
 	  }
 	catch (MaxDocumentException e)

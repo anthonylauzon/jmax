@@ -1194,7 +1194,11 @@ void fts_patcher_reassign_inlets_outlets(fts_patcher_t *this)
 
   for (p = this->objects; p ; p = p->next_in_patcher)
     if (fts_object_is_inlet(p))
-      this->inlets[i++] = (fts_inlet_t *) p;
+      {
+	((fts_inlet_t *) p)->position = i;
+	this->inlets[i] = (fts_inlet_t *) p;
+	i++;
+      }
 
   /* Store the outlets in the oulet arrays */
 
@@ -1202,7 +1206,11 @@ void fts_patcher_reassign_inlets_outlets(fts_patcher_t *this)
 
   for (p = this->objects; p ; p = p->next_in_patcher)
     if (fts_object_is_outlet(p))
-	this->outlets[i++] = (fts_outlet_t *) p;
+      {
+	((fts_outlet_t *) p)->position = i;
+	this->outlets[i] = (fts_outlet_t *) p;
+	i++;
+      }
 
   /* Sort the inlets  based on their x property*/
 
@@ -1255,12 +1263,18 @@ void fts_patcher_reassign_inlets_outlets(fts_patcher_t *this)
   /* redefine all the inlets */
 
   for (i = 0; i < ninlets; i++)
-    fts_inlet_reposition((fts_object_t *) this->inlets[i], i);
+    {
+      this->inlets[i]->position = i; /* important for reposition */
+      fts_inlet_reposition((fts_object_t *) this->inlets[i], i);
+    }
 
   /* redefine all the outlets */
 
   for (i = 0; i < noutlets; i++)
-    fts_outlet_reposition((fts_object_t *) this->outlets[i], i);
+    {
+      this->outlets[i]->position = i; /* important for reposition */
+      fts_outlet_reposition((fts_object_t *) this->outlets[i], i);
+    }
 }
 
 /*
