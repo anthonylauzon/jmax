@@ -44,7 +44,7 @@ void phasor_ftl_data_init(ftl_data_t ftl_data, float sr)
   phasor_ftl_t *state = (phasor_ftl_t *)ftl_data_get_ptr(ftl_data);
 
   state->phase = 0;
-  state->incr = (double)FTS_INTPHASE_RANGE / (double)fts_dsp_get_input_srate(dsp, 0);
+  state->incr = (double)FTS_INTPHASE_RANGE / (double)sr;
 }
 
 void phasor_ftl(fts_word_t *argv)
