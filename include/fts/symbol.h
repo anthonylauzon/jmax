@@ -106,7 +106,7 @@ FTS_API fts_symbol_t fts_new_symbol_copy( const char *name);
 #define fts_t_connection fts_s_connection
 #define fts_t_true fts_s_true
 #define fts_t_false fts_s_false
-#define fts_t_data fts_s_data
+/*#define fts_t_data fts_s_data*/
 #define fts_t_list fts_s_list
 
 #endif

@@ -979,13 +979,13 @@ public class FtsParse
 
 	    if (value1.equals("'"))
 	      noNewLine = true;
-	    else if (value1.equals(";"))
+	    /*else if (value1.equals(";"))
 	      {
-		if (noNewLine)
-		  noNewLine = false;
-		else
-		  doNewLine = true;
-	      }
+	      if (noNewLine)
+	      noNewLine = false;
+	      else
+	      doNewLine = true;
+	      }*/
 	    else
 	      noNewLine = false;
 	  }
@@ -1071,13 +1071,13 @@ public class FtsParse
 
 		if (s.equals("'"))
 		  noNewLine = true;
-		else if (s.equals(";"))
+		/*else if (s.equals(";"))
 		  {
-		    if (noNewLine)
-		      noNewLine = false;
-		    else
-		      doNewLine = true;
-		  }
+		  if (noNewLine)
+		  noNewLine = false;
+		  else
+		  doNewLine = true;
+		  }*/
 		else
 		  noNewLine = false;
 

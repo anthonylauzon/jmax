@@ -25,7 +25,8 @@
 
 fts_symbol_t objectset_symbol = 0;
 fts_symbol_t sym_objectset_append = 0;
-
+fts_symbol_t sym_objectset_clear = 0;
+fts_symbol_t sym_objectset_remove = 0;
 
 /***********************************************************************
  *
@@ -48,7 +49,8 @@ fts_objectset_destroy( fts_objectset_t *set)
 void 
 fts_objectset_clear( fts_objectset_t *set)
 {
-  fts_hashtable_clear( &set->hashtable);
+  fts_hashtable_clear( &set->hashtable);  
+  fts_client_send_message((fts_object_t *)set, sym_objectset_clear, 0, 0);
 }
 
 void 
@@ -56,10 +58,10 @@ fts_objectset_add( fts_objectset_t *set, fts_object_t *object)
 {
   fts_atom_t k, v;
   int exits_already;
+  fts_atom_t a[1];
 
   fts_set_ptr( &k, object);
   fts_set_void( &v);
-
   exits_already = fts_hashtable_put( &set->hashtable, &k, &v);
 
   /* inform the client if necessary */
@@ -68,7 +70,8 @@ fts_objectset_add( fts_objectset_t *set, fts_object_t *object)
     if (!fts_object_has_id(object))
       fts_client_upload_object(object);
     
-    fts_client_send_message((fts_object_t *) set, sym_objectset_append, 1, &k);
+    fts_set_object(&a[0], object);
+    fts_client_send_message((fts_object_t *) set, sym_objectset_append, 1, a);
   }
 }
 
@@ -76,22 +79,19 @@ void
 fts_objectset_remove( fts_objectset_t *set, fts_object_t *object)
 {
   fts_atom_t k;
+  fts_atom_t a[1];
 
   fts_set_ptr( &k, object);
   fts_hashtable_remove( &set->hashtable, &k);
+  
+  fts_set_object(&a[0], object);
+  fts_client_send_message((fts_object_t *)set, sym_objectset_remove, 1, a);
 }
 
-void 
-fts_objectset_get_objects( const fts_objectset_t *set, fts_iterator_t *i)
+void fts_objectset_get_objects( const fts_objectset_t *set, fts_iterator_t *i)
 {
-  fts_hashtable_get_keys( &set->hashtable, i);
+  fts_hashtable_get_keys(&set->hashtable, i);
 }
-
-/***********************************************************************
- *
- * Fts class/object interface
- *
- */
 
 static void 
 fts_objectset_method_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -111,7 +111,7 @@ static fts_status_t
 objectset_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(fts_objectset_t), 0, 0, 0); 
-
+  
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fts_objectset_method_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fts_objectset_method_destroy);
 
@@ -128,5 +128,7 @@ void fts_objectset_config( void)
 {
   objectset_symbol = fts_new_symbol("__objectset");
   sym_objectset_append = fts_new_symbol("append");
-  fts_class_install( objectset_symbol, objectset_instantiate);
+  sym_objectset_clear = fts_new_symbol("clear");
+  sym_objectset_remove = fts_new_symbol("remove");
+  fts_class_install(objectset_symbol, objectset_instantiate);
 }

@@ -7,9 +7,7 @@ AddPopUp.java\
 ConnectionAction.java\
 DisplayList.java\
 EditField.java\
-ErmesDataEditor.java\
 ErmesModule.java\
-ErmesPatcherFactory.java\
 ErmesPatcherListener.java\
 ErmesSelection.java\
 ErmesSketchPad.java\
@@ -17,6 +15,9 @@ ErmesSketchWindow.java\
 ErmesToolBar.java\
 ErmesToolButton.java\
 FindPanel.java\
+ErrorPanel.java\
+ErrorTableModel.java\
+ErrorTablePanel.java\
 FontCache.java\
 FpePanel.java\
 IconRenderer.java\
@@ -32,12 +33,15 @@ PatcherClipboardManager.java\
 PatcherFontManager.java\
 PatcherPrintManager.java\
 PatcherSaveManager.java\
+RuntimeErrorsPanel.java\
+RuntimeError.java\
 ScaleDialog.java\
 ScaleTransform.java\
 Settings.java\
 TextRenderer.java
 
 JAVACX=@JAVACX@
+JAVACFLAGSX=@JAVACFLAGSX@
 JAVAROOTX=@top_srcdir@/java/src
 CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/java/lib/jacl/jacl.jar:@top_srcdir@/java/lib/jacl/tcljava.jar
 

@@ -91,6 +91,27 @@ selection_connection_size_to_fit(fts_selection_t *this)
   this->connections = new_connections;
 }
 
+int
+fts_selection_contains_object(fts_selection_t *sel, fts_object_t *o)
+{
+  int i;
+  for (i = 0; i < sel->objects_size; i++)
+    if (sel->objects[i] == o)
+      {
+	return 1;
+      }
+  return 0;
+}
+
+int
+fts_selection_connection_ends_selected(fts_selection_t *sel, fts_connection_t *c)
+{
+  if(fts_selection_contains_object(sel, c->src) && fts_selection_contains_object(sel, c->dst))
+    return 1;
+  else
+    return 0;
+}
+
 static void
 selection_add_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {

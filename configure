@@ -2455,6 +2455,13 @@ ROOTDIR="${datadir}/jmax"
 
 JAVACX=javac
 
+JAVACFLAGSX=
+case "$debug" in
+ yes)
+  JAVACFLAGSX="-g"
+  ;;
+esac
+
 
 trap '' 1 2 15
 cat > confcache <<\EOF
@@ -2794,6 +2801,7 @@ s%@FTS_SYS_LIBS@%$FTS_SYS_LIBS%g
 s%@FTSDIR@%$FTSDIR%g
 s%@ROOTDIR@%$ROOTDIR%g
 s%@JAVACX@%$JAVACX%g
+s%@JAVACFLAGSX@%$JAVACFLAGSX%g
 
 CEOF
 EOF

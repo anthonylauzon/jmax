@@ -89,72 +89,69 @@ public class FtsObject implements Serializable
    * @param args arguments of object creation
    */
 
-  //static FtsObject makeFtsObjectFromMessage(Fts fts, FtsObject parent, FtsPatcherData data, 
-  //int objId, String variable, String className, int nArgs, FtsAtom args[])
+    static FtsObject makeFtsObjectFromMessage(Fts fts, FtsObject parent, int objId, String variableName,
+					      String className, int nArgs, FtsAtom args[])
+	throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException, FtsException
+    {
+	FtsObject obj = null;
 
-  static FtsObject makeFtsObjectFromMessage(Fts fts, FtsObject parent, FtsPatcherData data, 
-					    int objId, String variableName, String className, int nArgs, FtsAtom args[])
-    throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException, FtsException
-  {
-    FtsObject obj = null;
-
-    /* Note that we do the unparsing relative to ':' and variables
-       here; in the future, a dedicated API should be used ! */
+	/* Note that we do the unparsing relative to ':' and variables
+	   here; in the future, a dedicated API should be used ! */
     
-    // Here we do the mapping between fts names and application layer classes
-    // Any addition of special classes should start by adding some lines
-    // of code here.
-    
-    if (className != null)
-      {
-	  Class theClass = ObjectCreatorManager.getFtsClass(className);
-	  if(theClass != null)
-	      {
-		  Object[] arg = new Object[] {fts, parent, variableName, className, new Integer(nArgs), args};
-		  Class[] cls = new Class[] { ircam.jmax.fts.Fts.class, ircam.jmax.fts.FtsObject.class, 
-					      java.lang.String.class, java.lang.String.class , 
-					      java.lang.Integer.TYPE, ircam.jmax.fts.FtsAtom[].class};
-		  try{
-		      Constructor constr = theClass.getConstructor(cls);
+	// Here we do the mapping between fts names and application layer classes
+	// Any addition of special classes should start by adding some lines
+	// of code here.
 
-		      if(constr != null)
-			  obj = (FtsObject)(constr.newInstance(arg));
-
-		  } catch (NoSuchMethodException e) {
-		      System.out.println(e);
-		  } catch (InstantiationException e) {
-		      System.out.println(e);
-		  } catch (IllegalAccessException e) {
-		      System.out.println(e);
-		  } catch (InvocationTargetException e) {
-		      System.out.println(e);
-		      e.printStackTrace();
-		  } 
-	      }
-	  else if (className == "jpatcher")
-	      obj =  new FtsPatcherObject(fts, parent, variableName, FtsParse.unparseArguments(nArgs, args));
-	  else if (className == "inlet")
-	      obj =  new FtsInletObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
-	  else if (className == "outlet")
-	      obj =  new FtsOutletObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
-	  else
+	if (className != null)
 	    {
-		String descrpt;
-		if(nArgs==0) 
-		  descrpt = className;
-		else 
-		  descrpt = className + " " + FtsParse.unparseArguments(nArgs, args);
-		    
-		obj = new FtsObject(fts, parent, variableName, className, descrpt);
+		Class theClass = ObjectCreatorManager.getFtsClass(className);
+		if(theClass != null)
+		    {
+			Object[] arg = new Object[] {fts, parent, variableName, className, new Integer(nArgs), args};
+			Class[] cls = new Class[] { ircam.jmax.fts.Fts.class, ircam.jmax.fts.FtsObject.class, 
+						    java.lang.String.class, java.lang.String.class , 
+						    java.lang.Integer.TYPE, ircam.jmax.fts.FtsAtom[].class};
+			try{
+			    Constructor constr = theClass.getConstructor(cls);
+
+			    if(constr != null)
+				obj = (FtsObject)(constr.newInstance(arg));
+
+			} catch (NoSuchMethodException e) {
+			    System.out.println(e);
+			} catch (InstantiationException e) {
+			    System.out.println(e);
+			} catch (IllegalAccessException e) {
+			    System.out.println(e);
+			} catch (InvocationTargetException e) {
+			    System.out.println(e);
+			    e.printStackTrace();
+			} 
+		    }
+		else if (className == "jpatcher")
+		    obj =  new FtsPatcherObject(fts, parent, className, variableName, FtsParse.unparseArguments(nArgs, args));
+		else if (className == "inlet")
+		    obj =  new FtsInletObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
+		else if (className == "outlet")
+		    obj =  new FtsOutletObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
+		else
+		    {
+			String descrpt;
+			if(nArgs==0) 
+			    descrpt = className;
+			else 
+			    descrpt = className + " " + FtsParse.unparseArguments(nArgs, args);
+			
+			obj = new FtsObject(fts, parent, variableName, className, descrpt);
+		    }
 	    }
-      }
-    else
-      obj = new FtsObject(fts, parent, null, null, "");
+	else
+	    obj = new FtsObject(fts, parent, null, null, "");
     
-    obj.setObjectId(objId);
+	obj.setObjectId(objId);
     
-    if (data != null)
-      data.addObject(obj);
+	if((parent !=null)&&(parent instanceof FtsPatcherObject))
+	    ((FtsPatcherObject)parent).addObject(obj);
 
     return obj;
   }
@@ -186,8 +183,8 @@ public class FtsObject implements Serializable
       {
 	ninlets = value;
 
-	if ((data != null) && (data instanceof FtsPatcherData))
-	  ((FtsPatcherData) data).firePatcherChangedNumberOfInlets(ninlets);
+	if ((parent != null) && (parent instanceof FtsPatcherObject))
+	  ((FtsPatcherObject) parent).firePatcherChangedNumberOfInlets(ninlets);
 
 	if (listener instanceof FtsInletsListener)
 	  ((FtsInletsListener)listener).inletsChanged(ninlets);
@@ -196,8 +193,9 @@ public class FtsObject implements Serializable
       {
 	noutlets = value;
 
-	if ((data != null) && (data instanceof FtsPatcherData))
-	  ((FtsPatcherData) data).firePatcherChangedNumberOfOutlets(noutlets);
+	if ((parent != null) && (parent instanceof FtsPatcherObject))
+	    ((FtsPatcherObject) parent).firePatcherChangedNumberOfOutlets(noutlets);
+
 
 	if (listener instanceof FtsOutletsListener)
 	  ((FtsOutletsListener)listener).outletsChanged(noutlets);
@@ -226,8 +224,8 @@ public class FtsObject implements Serializable
 	  }
 	else
 	  {
-	    isError = true;
-	    parent.addErrorObject(this);
+	      isError = true;
+	      parent.addErrorObject(this);
 	  }
 
 	if (listener instanceof FtsObjectErrorListener)
@@ -246,7 +244,6 @@ public class FtsObject implements Serializable
 	layer = value;
       }
   }
-
 
   /** Set an integer property coming from the server.
    * Currently, no property have a float type.
@@ -273,11 +270,6 @@ public class FtsObject implements Serializable
     else if (name == "font")
       {
 	font = (String) value;
-      }
-    else if (name == "data")
-      {
-	data = (MaxData) value;
-	fts.fireNewDataListenerOn(this, data);
       }
     else if (name == "comment")
       {
@@ -360,7 +352,6 @@ public class FtsObject implements Serializable
   protected int fontSize = -1;
   protected int fontStyle = -1;
   protected int layer = -1;
-  protected MaxData data;
   protected String comment = "";
 
   //
@@ -555,16 +546,20 @@ public class FtsObject implements Serializable
 
   /** Get the data property of this object.*/
 
-  public MaxData getData()
-  {
-    return data;
-  }
+    public MaxData getData()
+    {
+	if(parent instanceof MaxData)
+	    return (MaxData)parent;
+	else
+	    return null;
+    }
 
   /** Ask the server to update the data property of this object.*/
 
   public void updateData()
   {
-      fts.getServer().askObjectProperty(this, "data");
+      if(parent instanceof FtsPatcherObject)
+	  ((FtsPatcherObject)parent).update();
   }
 
   /** Get the comment property of this object.*/
@@ -616,7 +611,7 @@ public class FtsObject implements Serializable
 
   /*****************************************************************************/
   /*                                                                           */
-  /*                               SERVICE LOCA LFUNCTIONS                     */
+  /*                               SERVICE LOCAL FUNCTIONS                     */
   /*                                                                           */
   /*****************************************************************************/
 
@@ -667,7 +662,7 @@ public class FtsObject implements Serializable
   {
     if (document != null)
       return (MaxDocument) document;
-    else if (parent != null)
+    else if ((parent != null)&&(parent != fts.getServer().getRootObject()))
       return parent.getDocument();
     else
       return null;
@@ -721,19 +716,6 @@ public class FtsObject implements Serializable
     return noutlets;
   }
 
-  /** Utility function Get the patcher data contaning the object if any */
-
-  public FtsPatcherData getPatcherData()
-  {
-    if ((parent != null) &&
-	(parent.getData() != null) &&
-	(parent.getData() instanceof FtsPatcherData))
-      return (FtsPatcherData) parent.getData();
-    else
-      return null;
-  }
-
-
   /**
    * Ask FTS to Delete the object. 
    * Fts object should be delete explicitely, the finalizer will not delete them.
@@ -758,11 +740,7 @@ public class FtsObject implements Serializable
    * can be called more than once.
    */
 
-  void releaseData()
-  {
-    if ((data != null) && (data instanceof MaxData))
-      Mda.dispose((MaxData) data);
-  }
+   void releaseData(){}
 
   /**
    * Delete the Java object, without touching the FTS object represented.
@@ -775,7 +753,7 @@ public class FtsObject implements Serializable
     // the editors will be closed.
     deleted = true;
     
-    releaseData();
+    //releaseData();
 
     if(parent != null)
       {
@@ -783,15 +761,18 @@ public class FtsObject implements Serializable
 
 	if((isError())||(hasErrorsInside()))
 	  parent.removeErrorObject(this);
-      }
-    // Take away the object from the container, if any
 
-    if (getPatcherData() != null)
-	getPatcherData().removeObject(this);
+	// Take away the object from the container, if any
+	if(parent instanceof FtsPatcherObject)
+	    ((FtsPatcherObject)parent).removeObject(this);
+      }
 
     // Fire also the global edit listeners
 
     fts.fireObjectRemoved(this);
+
+    if(isARootPatcher()) 
+	fts.fireAtomicAction(false);
 
     // clean up to help the gc, and make the object
     // non functioning, so to catch use of the object
@@ -927,7 +908,7 @@ public class FtsObject implements Serializable
       }
     catch( NoSuchMethodException exc)
       {
-	System.err.println( exc);
+	  System.err.println( exc);
       }
     catch (SecurityException exc)
       {
@@ -962,7 +943,7 @@ public class FtsObject implements Serializable
 
   public void addErrorObject(FtsObject obj)
   {
-    if(!isARootPatcher())
+      if(!isARootPatcher())
       {
 	errcount++;
 	if(errcount==1)
@@ -982,9 +963,26 @@ public class FtsObject implements Serializable
     
   public boolean isARootPatcher()
   {
-    return (getParent() == getFts().getRootObject());
+      return (getParent() == getFts().getRootObject());
   }
 
+  public Enumeration getGenealogy()
+  {
+      Vector gen = new Vector();
+      FtsObject current = this;
+      gen.addElement(current);
+      
+      if(!isARootPatcher())
+	  while(!current.getParent().isARootPatcher())
+	      {
+		  gen.add(0, current.getParent());
+		  current = current.getParent();
+	      }
+      if(current.getParent().isARootPatcher())
+	  gen.add(0, current.getParent());
+
+      return gen.elements();
+  }
     //////////////////////////////////////////////////////////////////////////////////////
     //// MESSAGES called from fts.
     //////////////////////////////////////////////////////////////////////////////////////
@@ -992,6 +990,12 @@ public class FtsObject implements Serializable
   /**
    * Fts callback: open the FileSave dialog and initialize it with default directory and fileName.
    */
+
+   public void requestStopWaiting(FtsActionListener l)
+   {
+       if(getParent() instanceof FtsPatcherObject)
+	   getParent().sendMessage(FtsObject.systemInlet, "stop_waiting", 0, null);
+   }
 
   //final variables used by invokeLater method
   private transient JFileChooser fd;

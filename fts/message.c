@@ -216,8 +216,10 @@ fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
     }
   else
     {
-      post("Unknown message %s for object of class %s, inlet %d\n", 
-	   fts_symbol_name(s), fts_symbol_name(fts_object_get_class_name(o)), winlet);
+      /*post("Unknown message %s for object of class %s, inlet %d\n", 
+	fts_symbol_name(s), fts_symbol_name(fts_object_get_class_name(o)), winlet);*/
+      fts_object_signal_runtime_error(o, "Unknown message %s for object of class %s, inlet %d", 
+				      fts_symbol_name(s), fts_symbol_name(fts_object_get_class_name(o)), winlet);
 
       return &fts_MethodNotFound;
     }

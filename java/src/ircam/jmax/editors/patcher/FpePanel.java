@@ -39,7 +39,7 @@ import ircam.jmax.widgets.*;
 // ^^^^ Same thing as for the other panels; how we find the server ?
 // ^^^^ The panel itself is ready, the binding is missing.
 
-class FpePanel extends JFrame implements WindowListener
+class FpePanel extends JFrame implements WindowListener, FtsActionListener
 {
   private static FpePanel fpePanel = null;
   private ObjectSetViewer objectSetViewer;
@@ -130,7 +130,6 @@ class FpePanel extends JFrame implements WindowListener
     pack();
     validate();
 
-    /*set = (FtsObjectSet) fts.newRemoteData( "object_set_data", null);*/
     try
 	{
 	    set  = (FtsObjectSet) fts.makeFtsObject(fts.getRootObject(), "__objectset");
@@ -140,22 +139,16 @@ class FpePanel extends JFrame implements WindowListener
 	    System.out.println("System error: cannot get selection object");
 	}
 
-    objectSetViewer.setModel( set/*.getListModel()*/);
+    objectSetViewer.setModel( set);
 
     fts.getDspController().startFpeCollecting(set);
 
     objectSetViewer.setObjectSelectedListener(new ObjectSelectedListener() {
       public void objectSelected(FtsObject object)
 	{
-	  final Cursor temp = FpePanel.this.getCursor();
-
-	  FpePanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-
-	  fts.editPropertyValue(object.getParent(), object,
-				new MaxDataEditorReadyListener() {
-	    public void editorReady(MaxDataEditor editor)
-	      {	  FpePanel.this.setCursor(temp);}
-	  });
+	    FpePanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+	    ((FtsPatcherObject)object.getParent()).requestShowObject(object);
+	    ((FtsPatcherObject)object.getParent()).requestStopWaiting(FpePanel.fpePanel);
 	}
     });
     
@@ -191,6 +184,11 @@ class FpePanel extends JFrame implements WindowListener
 
   public void windowDeactivated(WindowEvent e)
   {
+  }
+
+  public void ftsActionDone()
+  {
+    setCursor(Cursor.getDefaultCursor());
   }
 }
 

@@ -50,7 +50,6 @@
 
 #include <fts/fts.h>
 #include <ftsprivate/OLDclient.h>
-#include <ftsprivate/OLDftsdata.h>
 #include <ftsprivate/objtable.h>
 #include <ftsprivate/abstraction.h>
 #include <ftsprivate/connection.h>
@@ -75,7 +74,6 @@ static fts_symbol_t s_tcp, s_udp;
  */
 
 static void fts_client_parse_char( char c);
-
 
 /***********************************************************************
  *
@@ -618,15 +616,15 @@ static void fts_client_parse_char( char c)
       }
     break;
 
-  case DATA_CODE:
-    ivalue += ((int)c & 0xff) << shift_table[ count++ ];
-    if ( count == 4)
+    /*case DATA_CODE:
+      ivalue += ((int)c & 0xff) << shift_table[ count++ ];
+      if ( count == 4)
       {
-	fts_set_data( &a, fts_data_id_get( ivalue));
-	add_arg( &a);
-	state = S_ARG;
+      fts_set_data( &a, fts_data_id_get( ivalue));
+      add_arg( &a);
+      state = S_ARG;
       }
-    break;
+      break;*/
 
   default:
     protocol_error( c, state);
@@ -705,15 +703,15 @@ void fts_client_add_int(int value)
 }
 
 
-void fts_client_add_data( fts_data_t *data)
-{
-#ifdef OUTGOING_DEBUG_TRACE      
+/*void fts_client_add_data( fts_data_t *data)
+  {
+  #ifdef OUTGOING_DEBUG_TRACE      
   fprintf_data( stderr, data);
-#endif
+  #endif
 
   oldclient_put_char( oldclient, DATA_CODE);
   fts_client_send_int( data ? fts_data_get_id(data) : 0);
-}
+  }*/
 
 void fts_client_add_object(fts_object_t *obj)
 {  
@@ -825,8 +823,8 @@ fts_client_add_atom(const fts_atom_t *atom)
     fts_client_add_string( fts_get_string(atom));
   else  if (fts_is_object( atom))
     fts_client_add_object( fts_get_object(atom));
-  else  if (fts_is_data( atom))
-    fts_client_add_data( fts_get_data( atom) );
+  /*else  if (fts_is_data( atom))
+    fts_client_add_data( fts_get_data( atom) );*/
   else
     fprintf(stderr, "Wrong atom type in fts_client_add_atoms: %lx\n", (unsigned long) fts_get_type(atom));
 }
@@ -883,14 +881,13 @@ void fts_client_upload(fts_object_t *obj, fts_symbol_t classname, int ac, const 
 
   /* this is to be compatible with the NEW_OBJECT_CODE */
   fts_client_add_object((fts_object_t *)0);
-  fts_client_add_data((fts_data_t *)0);
 
   fts_client_add_int(fts_object_get_id(obj));
   fts_client_add_symbol(classname);
   fts_client_add_atoms(ac, at);
   fts_client_done_msg();
 
-  /*fts_object_send_properties(obj);*/
+  fts_object_send_properties(obj);
 }
 
 void fts_client_upload_object(fts_object_t *obj)
@@ -898,18 +895,18 @@ void fts_client_upload_object(fts_object_t *obj)
   int do_var = 0;
 
   if (!fts_object_has_id(obj))
-    fts_object_table_register(obj);
+      fts_object_table_register(obj);
 
   /* First, check if the parent has been uploaded; if it is not,
      upload it; recursively, this will upload all the chain up
      to the root */
 
   if (obj->patcher && !fts_object_has_id((fts_object_t *)obj->patcher))
-    fts_client_upload_object((fts_object_t *) obj->patcher);
+      fts_client_upload_object((fts_object_t *) obj->patcher);
 
   /* 
-     NEW_OBJECT_VAR_CODE (obj)parent (dta) data (int)new-id (symbol) var [<args>]+
-     NEW_OBJECT_CODE (obj)parent (dta) data (int)new-id [<args>]+
+     NEW_OBJECT_VAR_CODE (obj)parent (int)new-id (symbol) var [<args>]+
+     NEW_OBJECT_CODE (obj)parent (int)new-id [<args>]+
      */
 
   if(fts_object_description_defines_variable(obj->argc, obj->argv))
@@ -918,17 +915,16 @@ void fts_client_upload_object(fts_object_t *obj)
   if (do_var)
     fts_client_start_msg(NEW_OBJECT_VAR_CODE);
   else
-    fts_client_start_msg(NEW_OBJECT_CODE);
-
+    {
+      if(fts_object_is_template(obj))
+	fts_client_start_msg(NEW_TEMPLATE_INSTANCE_CODE);
+      else
+	fts_client_start_msg(NEW_OBJECT_CODE);
+    }
   fts_client_add_object((fts_object_t *) obj->patcher);
   
-  if (obj->patcher)
-    fts_client_add_data((fts_data_t *) obj->patcher->data);
-  else
-    fts_client_add_data((fts_data_t *) 0);
-
   fts_client_add_int(fts_object_get_id(obj));
-  
+
   if (do_var)
     {
       fts_client_add_symbol(fts_get_symbol(&obj->argv[0]));
@@ -956,10 +952,16 @@ void fts_client_upload_connection(fts_connection_t *c)
 
   fts_client_start_msg(NEW_CONNECTION_CODE);
 
+  /*if (c->src->patcher)
+    fts_client_add_object((fts_object_t *) c->src->patcher->data);
+    else
+    fts_client_add_object((fts_object_t *) 0);*/
   if (c->src->patcher)
-    fts_client_add_data((fts_data_t *) c->src->patcher->data);
+    fts_client_add_object((fts_object_t *) c->src->patcher);
   else
-    fts_client_add_data((fts_data_t *) 0);
+    fts_client_add_object((fts_object_t *) 0);
+  
+  /****************************************/
 
   fts_client_add_int(c->id);
   fts_client_add_object(c->src);
@@ -996,16 +998,16 @@ void fts_client_redefine_connection(fts_connection_t *c)
 void fts_client_release_object(fts_object_t *obj)
 {
   fts_client_start_msg(OBJECT_RELEASE_CODE);
-  fts_client_add_object(obj);;
+  fts_client_add_object(obj);
   fts_client_done_msg();
 }
 
-void fts_client_release_object_data(fts_object_t *obj)
-{
+/*void fts_client_release_object_data(fts_object_t *obj)
+  {
   fts_client_start_msg(OBJECT_RELEASE_DATA_CODE);
   fts_client_add_object(obj);;
   fts_client_done_msg();
-}
+  }*/
 
 /***********************************************************************
  *
@@ -1096,19 +1098,20 @@ static void fts_client_send_property(fts_object_t *obj, fts_symbol_t name)
     {
       fts_object_get_prop(obj, name, &a);
 
-      if (fts_is_data(&a))
+      /*if (fts_is_data(&a))
 	{
-	  /* If the property value is an fts_data, we
-	     export the data needed  */
+	  // If the property value is an fts_data, we
+	  //  export the data needed 
 
 	  fts_data_t *d;
 	  
 	  d = fts_get_data(&a);
 
 	  if (! fts_data_is_exported(d))
-	    fts_data_export(d);
+	  fts_data_export(d);
 	}
-      else if (fts_is_object(&a))
+	else*/
+      if (fts_is_object(&a))
 	{
 	  /* If the property is an fts_object and is not 
 	     uploaded, upload it; note that this will shortly
@@ -1129,10 +1132,10 @@ static void fts_client_send_property(fts_object_t *obj, fts_symbol_t name)
 
       if (fts_is_void(&a))
 	{
-	  if (name == fts_s_data)
+	  /*if (name == fts_s_data)
 	    fts_set_data(&a, (fts_data_t *) 0);
-	  else
-	    return;
+	    else*/
+	  return;
 	}
 
 #ifdef UPDATE_TRACE 
@@ -1584,7 +1587,7 @@ fts_mess_client_download_object(int ac, const fts_atom_t *av)
 	  return;
 	}
 
-      fts_client_upload_object(object);
+      fts_client_upload_object(object);    
     }
   else
     printf_mess("System Error in FOS message DOWNLOAD OBJECT: bad args", ac, av);
@@ -1644,8 +1647,7 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
 	{
 	  /* new object in patcher */
 	  int id = fts_get_int(&av[1]);
-	  fts_object_t *obj = fts_eval_object_description((fts_patcher_t *)parent, ac - 2, av + 2);
-	  
+	  fts_object_t *obj = fts_eval_object_description((fts_patcher_t *)parent, ac - 2, av + 2);	  	  
 	  fts_object_set_id(obj, id);
 	}
       else
@@ -1732,6 +1734,7 @@ fts_mess_client_redefine_object(int ac, const fts_atom_t *av)
       object = fts_get_object(&av[0]);
       new_id = fts_get_int(&av[1]);
       fts_object_redefine(object, new_id, ac - 2, av + 2);
+    
     }
   else
     printf_mess("System Error in FOS message REDEFINE OBJECT: bad args", ac, av);
@@ -1767,8 +1770,6 @@ fts_mess_client_delete_object(int ac, const fts_atom_t *av)
   else
     printf_mess("System Error in FOS message DELETE_OBJECT: bad args", ac, av);
 }
-
-
 
 
 
@@ -1975,26 +1976,26 @@ fts_mess_client_get_all_prop(int ac, const fts_atom_t *av)
    */
 
 
-static void 
-fts_mess_client_remote_call(int ac, const fts_atom_t *av)
-{
+/*static void 
+  fts_mess_client_remote_call(int ac, const fts_atom_t *av)
+  {
   trace_mess("Received remote call", ac, av);
 
   if ((ac >= 2) &&
-      fts_is_data(&av[0]) &&
-      fts_is_int(&av[1]))
+    fts_is_data(&av[0]) &&
+    fts_is_int(&av[1]))
     {
-      fts_data_t *data;
-      int key;
-
-      data = fts_get_data(&av[0]);
-      key  = fts_get_int(&av[1]);
-
-      fts_data_call(data, key, ac - 2, av + 2);
+    fts_data_t *data;
+    int key;
+    
+    data = fts_get_data(&av[0]);
+    key  = fts_get_int(&av[1]);
+    
+    fts_data_call(data, key, ac - 2, av + 2);
     }
-  else
+    else
     printf_mess("System Error in FOS message REMOTE_CALL: bad args", ac, av);
-}
+    }*/
 
 /*
   RECOMPUTE_ERRORS
@@ -2044,7 +2045,7 @@ static void fts_messtile_init(void)
   fts_client_install(DOWNLOAD_OBJECT_CODE, fts_mess_client_download_object);
   fts_client_install(DOWNLOAD_CONNECTION_CODE, fts_mess_client_download_connection);
 
-  fts_client_install(NEW_OBJECT_CODE,  fts_mess_client_new);
+  fts_client_install(NEW_OBJECT_CODE,  fts_mess_client_new);  
   fts_client_install(REDEFINE_PATCHER_CODE,  fts_mess_client_redefine_patcher);
   fts_client_install(REDEFINE_OBJECT_CODE,  fts_mess_client_redefine_object);
   fts_client_install(DELETE_OBJECT_CODE,  fts_mess_client_delete_object);
@@ -2056,7 +2057,7 @@ static void fts_messtile_init(void)
   fts_client_install(PUTPROP_CODE,  fts_mess_client_put_prop);
   fts_client_install(GETPROP_CODE,  fts_mess_client_get_prop);
   fts_client_install(GETALLPROP_CODE,  fts_mess_client_get_all_prop);
-  fts_client_install(REMOTE_CALL_CODE,  fts_mess_client_remote_call);
+  /*fts_client_install(REMOTE_CALL_CODE,  fts_mess_client_remote_call);*/
   fts_client_install(RECOMPUTE_ERRORS_CODE, fts_mess_client_recompute_errors);
   fts_client_install(FTS_SHUTDOWN_CODE,  fts_mess_client_shutdown);
 }
@@ -2596,3 +2597,4 @@ void fts_oldclient_shutdown( void)
   }
   oldclient = 0;
 }
+

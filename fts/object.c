@@ -54,6 +54,8 @@ static fts_symbol_t fts_object_description_get_variable_name(int ac, const fts_a
 static void fts_object_unbind(fts_object_t *obj);
 static void fts_object_free(fts_object_t *obj);
 
+/*extern void fts_error_finder_recompute(void);*/
+
 
 /******************************************************************************
  *
@@ -640,8 +642,8 @@ fts_object_recompute(fts_object_t *old)
     {
       /* If we have an object with data, data must be released,
 	 because the object will be deleted */
-      if (old->head.id != FTS_NO_ID)
-	fts_client_release_object_data(old);
+	/*if (old->head.id != FTS_NO_ID)
+	  fts_client_release_object_data(old);*/
 
       obj = fts_object_redefine(old, old->head.id, old->argc, old->argv);
 
@@ -732,6 +734,8 @@ fts_object_redefine(fts_object_t *old, int new_id, int ac, const fts_atom_t *at)
 
   fts_object_reset_changed(old);
   fts_object_free(old);
+
+  /*fts_error_finder_recompute();*/
 
   return new;
 }

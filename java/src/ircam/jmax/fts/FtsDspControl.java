@@ -49,6 +49,8 @@ public class FtsDspControl extends FtsObject
 
   protected PropertyChangeSupport listeners;
 
+  boolean atomic = false;
+
   public FtsDspControl(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
   {
     super(fts, parent, variableName, classname, "");
@@ -63,6 +65,24 @@ public class FtsDspControl extends FtsObject
     dspOn           = new Boolean(false);
 
     listeners = new PropertyChangeSupport(this);
+
+    fts.addEditListener(new FtsEditListener(){	    
+	    public void objectAdded(FtsObject object)
+	    {
+		if((!atomic)&&(dspOn.booleanValue())) restart();
+	    };
+	    public void objectRemoved(FtsObject object){};
+	    public void connectionAdded(FtsConnection connection)
+	    {
+		if((!atomic)&&(dspOn.booleanValue())) restart();
+	    };
+	    public void connectionRemoved(FtsConnection connection){};
+	    public void atomicAction(boolean active)
+	    {
+		atomic = active;
+		if((!atomic)&&(dspOn.booleanValue())) restart();
+	    };
+	});
   }
 
   /* Accessors for fields */
@@ -132,6 +152,11 @@ public class FtsDspControl extends FtsObject
   public void dspPrint()
   {
       sendMessage(FtsObject.systemInlet, "dsp_print", 0, null);
+  }
+
+  public void restart()
+  {
+      sendMessage(FtsObject.systemInlet, "dsp_restart", 0, null);
   }
 
   /* Fpe support */

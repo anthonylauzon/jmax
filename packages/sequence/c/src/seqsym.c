@@ -59,6 +59,7 @@ fts_symbol_t seqsym_bmax_add_event = 0;
 
 /* messages to client */
 fts_symbol_t seqsym_createEditor = 0;
+fts_symbol_t seqsym_closeEditor = 0;
 fts_symbol_t seqsym_destroyEditor = 0;
 fts_symbol_t seqsym_addTracks = 0;
 fts_symbol_t seqsym_deleteTracks = 0;
@@ -108,6 +109,7 @@ seqsym_config(void)
 
   /* messages to client */
   seqsym_createEditor = fts_new_symbol("createEditor");
+  seqsym_closeEditor = fts_new_symbol("closeEditor");
   seqsym_destroyEditor = fts_new_symbol("destroyEditor");
   seqsym_addTracks = fts_new_symbol("addTracks");
   seqsym_deleteTracks = fts_new_symbol("deleteTracks");

@@ -28,8 +28,12 @@ package ircam.jmax.editors.patcher;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.tree.*;
+import javax.swing.event.*;
+
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
@@ -42,10 +46,24 @@ import ircam.jmax.widgets.*;
 // ^^^^ The is a big user environment question to be solved before the technical one.
 
 
-public class FindPanel extends JFrame
+public class FindPanel extends JFrame implements FtsActionListener
 {
   Fts fts;
 
+  class FtsMutableTreeNode extends DefaultMutableTreeNode
+  { 
+      FtsObject ftsObj;
+      public FtsMutableTreeNode(FtsObject obj, String name)
+      {
+	  super(name);
+	  ftsObj = obj;
+      }
+      public FtsObject getFtsObject()
+      {
+	  return ftsObj;
+      }
+  }
+  
   static void registerFindPanel()
   {
     MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
@@ -77,6 +95,15 @@ public class FindPanel extends JFrame
     super( "Find Panel");
 
     this.fts = f;
+
+    try
+	{
+	    set  = (FtsObjectSet) fts.makeFtsObject(fts.getRootObject(), "__objectset");
+	}
+    catch (FtsException e)
+	{
+	    System.out.println("System error: cannot get objectSet object");
+	}
     
     JPanel labelPanel = new JPanel();
 
@@ -106,45 +133,143 @@ public class FindPanel extends JFrame
     labelPanel.add( textField);
 
     objectSetViewer = new ObjectSetViewer();
+    objectSetViewer.setModel( set);
+
+    objectSetViewer.setObjectSelectedListener(new ObjectSelectedListener() {
+	public void objectSelected(FtsObject object)
+	{
+	  FindPanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+	  ((FtsPatcherObject)object.getParent()).requestShowObject(object);
+	  ((FtsPatcherObject)object.getParent()).requestStopWaiting(FindPanel.findPanel);
+	}
+      });
 
     JPanel findPanel = new JPanel();
     findPanel.setLayout( new BorderLayout());
     findPanel.setBorder( new EmptyBorder( 5, 5, 5, 5) );
     findPanel.setAlignmentX( LEFT_ALIGNMENT);
 
+    ////////////////////////////////////////////////////////////////////////
+    objectSetViewer.setSelectionListener(new ListSelectionListener() {
+       public void valueChanged(ListSelectionEvent e) {
+
+	   if (e.getValueIsAdjusting()) return;
+	    
+	   JList lsm = (JList)e.getSource();
+	   if (lsm.isSelectionEmpty()) 
+	       {
+		   ((DefaultTreeCellRenderer)tree.getCellRenderer()).setLeafIcon(null);
+		   tree.setModel(emptyTreeModel);
+	       } 
+	   else 
+	       {
+		   int selRow = lsm.getMinSelectionIndex();
+		   DefaultMutableTreeNode top, node, start;
+		   top = start = node = null;
+		   FtsObject obj;
+		   for(Enumeration enum =((FtsObject)set.getElementAt(selRow)).getGenealogy(); 
+		       enum.hasMoreElements(); )
+		       {
+			   obj = (FtsObject)enum.nextElement();
+			   if(top==null)
+			       {
+				   top = new FtsMutableTreeNode(obj, (obj.getDocument()!=null) ? 
+								obj.getDocument().getName() : obj.getDescription());
+				   start = top;
+			       }				
+			   else
+			       {
+				   node = new FtsMutableTreeNode(obj, (!obj.getDescription().equals("")) ? 
+								 obj.getDescription() : obj.getComment());
+				   top.add(node);
+				   top = node;
+			       }
+		       }
+		   ((DefaultTreeCellRenderer)tree.getCellRenderer()).
+		       setLeafIcon(ObjectSetViewer.getObjectIcon(((FtsMutableTreeNode)node).getFtsObject()));
+
+		   DefaultTreeModel treeModel = new DefaultTreeModel(start);
+		   tree.setModel(treeModel);
+		    
+		   if(node!=null)
+		       tree.setSelectionPath(new TreePath(node.getPath()));
+	       }
+       }
+    });
+    set.addListDataListener(new ListDataListener(){
+	    public void contentsChanged(ListDataEvent e)
+	    {
+		((DefaultTreeCellRenderer)tree.getCellRenderer()).setLeafIcon(null);
+		tree.setModel(emptyTreeModel);
+	    }
+	    public void intervalRemoved(ListDataEvent e){}
+	    public void intervalAdded(ListDataEvent e){}
+	});
+
+
+    emptyTreeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
+
+    tree = new JTree(emptyTreeModel);
+    tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+    tree.setExpandsSelectedPaths(true);
+    tree.setToggleClickCount(10);
+    
+    DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+    renderer.setOpenIcon(ErrorTablePanel.patcherIcon);    
+    renderer.setClosedIcon(ErrorTablePanel.patcherIcon);    
+    renderer.setLeafIcon(null);
+    tree.setCellRenderer(renderer);
+
+    tree.addMouseListener(new MouseListener(){
+	    public void mouseEntered(MouseEvent e) {} 
+	    public void mouseExited(MouseEvent e) {}
+	    public void mousePressed(MouseEvent e) {}
+	    public void mouseReleased(MouseEvent e) {}
+	    public void mouseClicked(MouseEvent e)
+	    {
+		if (e.getClickCount() == 2)
+		    {
+			TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+			FtsObject obj = (FtsObject)((FtsMutableTreeNode)path.getLastPathComponent()).getFtsObject();
+
+			FindPanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+
+			if(obj instanceof FtsPatcherObject)
+			    {
+				obj.sendMessage(FtsObject.systemInlet, "open_editor");
+				((FtsPatcherObject)obj).requestStopWaiting(FindPanel.findPanel);
+			    }
+			else
+			    {
+				((FtsPatcherObject)obj.getParent()).requestShowObject(obj);
+				((FtsPatcherObject)obj.getParent()).requestStopWaiting(FindPanel.findPanel);
+			    }
+		    }
+	    }
+	});
+
+    //Create the scroll pane and add the tree to it. 
+    JScrollPane treeView = new JScrollPane(tree);
+    treeView.setPreferredSize(new Dimension(400, 100));
+    treeView.setMinimumSize(new Dimension(100, 50));
+    /////////////////////////////
+    
+    //Add the scroll panes to a split pane.
+    JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+    splitPane.setTopComponent(objectSetViewer);
+    splitPane.setBottomComponent(treeView);
+    splitPane.setDividerLocation(100); 
+    splitPane.setPreferredSize(new Dimension(400, 200));
+
+    ///////////////////////////////////////////////////////////////////////
+
     findPanel.add( "North", labelPanel);
-    findPanel.add( "Center", objectSetViewer);
+    findPanel.add( "Center", splitPane);
 
     getContentPane().add( findPanel);
 
     pack();
     validate();
-
-    try
-	{
-	    set  = (FtsObjectSet) fts.makeFtsObject(fts.getRootObject(), "__objectset");
-	}
-    catch (FtsException e)
-	{
-	    System.out.println("System error: cannot get selection object");
-	}
-
-    objectSetViewer.setModel( set);
-
-    objectSetViewer.setObjectSelectedListener(new ObjectSelectedListener() {
-      public void objectSelected(FtsObject object)
-	{
-	  final Cursor temp = FindPanel.this.getCursor();
-
-	  FindPanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-
-	  fts.editPropertyValue(object.getParent(), object,
-				new MaxDataEditorReadyListener() {
-	    public void editorReady(MaxDataEditor editor)
-	      {	  FindPanel.this.setCursor(temp);}
-	  });
-	}
-    });
   }
 
   public void find()
@@ -160,39 +285,34 @@ public class FindPanel extends JFrame
     FtsParse.parseAtoms(query, args);
     
     if(args.size()>0)
-      set.find(fts.getRootObject(), args);	
-    
-    setCursor(temp);
-  }
+	fts.getFinder().find(fts.getRootObject(), set, args);
 
-  public void findErrors()
-  {
-    Cursor temp = getCursor();
-
-    setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-    textField.setText("<find errors>");
-    set.findErrors(fts.getRootObject());
     setCursor(temp);
   }
 
   public void findFriends(FtsObject object)
   {
+    if(object.isError()) return;
+
     Cursor temp = getCursor();
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
     textField.setText("");
 
-    //waiting for a bug fix (findfriends doasen't work
-    set.find(fts.getRootObject(), object.getClassName());
-    //set.findFriends( object);
+    fts.getFinder().findFriends(object, set);    
 
     setCursor(temp);
   }
 
-
+  public void ftsActionDone()
+  {
+      setCursor(Cursor.getDefaultCursor());
+  }
   private static FindPanel findPanel = null;
 
   private ObjectSetViewer objectSetViewer;
   private JTextField textField;
   private FtsObjectSet set;
+  private JTree tree;
+  private DefaultTreeModel emptyTreeModel; 
 }
 

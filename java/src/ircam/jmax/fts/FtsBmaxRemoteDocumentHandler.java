@@ -140,7 +140,8 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
 
     if (document instanceof FtsPatcherDocument) 
       {
-	fts.saveJMaxFile(((FtsPatcherData) document.getRootData()).getContainerObject(), file);
+	  //fts.saveJMaxFile(((FtsPatcherData) document.getRootData()).getContainerObject(), file);
+	  fts.saveJMaxFile((FtsPatcherObject) document.getRootData(), file);
       }
     else
       throw new MaxDocumentException("Cannot save a " + document.getDocumentType() + " as Bmax file");
@@ -155,9 +156,10 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
 
     Fts fts = (Fts) context;
 
-    if ((document instanceof FtsPatcherDocument) && (data instanceof FtsPatcherData))
+    if ((document instanceof FtsPatcherDocument) && (data instanceof /*FtsPatcherData*/FtsPatcherObject))
       {
-	fts.saveJMaxFile(((FtsPatcherData) data).getContainerObject(), file);
+	  //fts.saveJMaxFile(((FtsPatcherData) data).getContainerObject(), file);
+	  fts.saveJMaxFile((FtsPatcherObject) data, file);
       }
     else
       throw new MaxDocumentException("Cannot save a " + document.getDocumentType() + " as Bmax file");

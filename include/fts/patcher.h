@@ -32,6 +32,7 @@ struct fts_patcher
   fts_object_t *objects;	/* the patcher content, organized as a list */
 
   int open;			/* the open flag */
+  int editor_open;			/* the open editor flag */
   int load_init_fired;		/* the multiple load init protection flag*/
   int deleted;			/* set to one during content deleting */
 
@@ -43,7 +44,7 @@ struct fts_patcher
   fts_template_t *template;
 
   /* The pointer to the patcher data  */
-  fts_patcher_data_t *data;
+  /*fts_patcher_data_t *data;*/
 
   /* Variables */
   fts_env_t env;
@@ -55,3 +56,4 @@ struct fts_patcher
 FTS_API fts_patcher_t *fts_get_root_patcher(void);
 
 #endif
+

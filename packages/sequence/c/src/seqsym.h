@@ -61,6 +61,7 @@ extern fts_symbol_t seqsym_bmax_add_event;
 
 /* messages to client */
 extern fts_symbol_t seqsym_createEditor;
+extern fts_symbol_t seqsym_closeEditor;
 extern fts_symbol_t seqsym_destroyEditor;
 extern fts_symbol_t seqsym_addTracks;
 extern fts_symbol_t seqsym_deleteTracks;

@@ -37,6 +37,7 @@ static fts_heap_t *explode_skip_heap;
 
 static fts_symbol_t explode_symbol    = 0;
 static fts_symbol_t sym_openEditor    = 0;
+static fts_symbol_t sym_closeEditor    = 0;
 static fts_symbol_t sym_destroyEditor = 0;
 static fts_symbol_t sym_loadStart     = 0;
 static fts_symbol_t sym_loadAppend    = 0;
@@ -1224,7 +1225,16 @@ explode_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   explode_t *this = (explode_t *)o;
   explode_set_editor_close(this);
 }
-
+static void
+explode_hide_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  explode_t *this = (explode_t *)o;
+  if(explode_editor_is_open(this))
+    {
+      explode_set_editor_close(this);
+      fts_client_send_message((fts_object_t *)this, sym_closeEditor, 0, 0);  
+    }
+}
 /*
  * Two fts_data_t functions to add and remove elements from a sequence.
  * No consistency checks in these two functions, we assume the UI
@@ -1529,6 +1539,7 @@ explode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* graphical editor */
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), explode_open_editor);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("close_editor"), explode_close_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("hide"), explode_hide_editor);
   
   fts_method_define_varargs(cl, fts_SystemInlet, sym_add_event, explode_add);
   fts_method_define_varargs(cl, fts_SystemInlet, sym_remove_event, explode_remove);
@@ -1564,6 +1575,7 @@ explode_config(void)
 
   explode_symbol = fts_new_symbol("explode");
   sym_openEditor = fts_new_symbol("openEditor");
+  sym_closeEditor = fts_new_symbol("closeEditor");
   sym_destroyEditor = fts_new_symbol("destroyEditor");
   sym_loadStart = fts_new_symbol("loadStart");
   sym_loadAppend = fts_new_symbol("loadAppend");

@@ -63,7 +63,7 @@ public class FtsConnection implements Serializable
    * @see ircam.jmax.fts.Fts#makeFtsConnection
    */
 
-  FtsConnection(Fts fts, FtsPatcherData data, int id, FtsObject from, int outlet, FtsObject to, int inlet, int type)
+  FtsConnection(Fts fts, /*FtsPatcherData data*/FtsPatcherObject patcher, int id, FtsObject from, int outlet, FtsObject to, int inlet, int type)
   {
     this.fts    = fts;
     this.id     = id;
@@ -73,19 +73,21 @@ public class FtsConnection implements Serializable
     this.inlet  = inlet;
     this.type   = type;
 
-    if (data != null)
-      data.addConnection(this);
+    /*if (data != null)
+      data.addConnection(this);*/
+    if (patcher != null)
+      patcher.addConnection(this);
   }
 
-  FtsConnection(Fts fts, FtsPatcherData data, int id, FtsObject from, int outlet, FtsObject to, int inlet)
+  FtsConnection(Fts fts, /*FtsPatcherData data*/FtsPatcherObject patcher, int id, FtsObject from, int outlet, FtsObject to, int inlet)
   {
-    this(fts, data, id, from, outlet, to, inlet, fts_connection_anything);
+      this(fts, /*data*/patcher, id, from, outlet, to, inlet, fts_connection_anything);
   }
 
   /** Set the unique object listener */
   public void setConnectionListener(FtsConnectionListener obj)
   {
-    listener = obj;
+      listener = obj;
   }
 
   /** Get the current object listener */
@@ -102,7 +104,8 @@ public class FtsConnection implements Serializable
     this.inlet  = inlet;
     this.type   = type;
 
-    listener.typeChanged(type);
+    if(listener!=null)
+	listener.typeChanged(type);
   }
 
   /**
@@ -148,8 +151,10 @@ public class FtsConnection implements Serializable
 
     from.setDirty(); // from and to must be in the same document !!
 
-    if (from.getPatcherData() != null)
-      from.getPatcherData().removeConnection(this);
+    /*if (from.getPatcherData() != null)
+      from.getPatcherData().removeConnection(this);*/
+    if ((from.getParent() != null)&&(from.getParent() instanceof FtsPatcherObject))
+	((FtsPatcherObject)from.getParent()).removeConnection(this);
 
     // Clean up
 

@@ -223,18 +223,18 @@ abstract public class FtsStream
 
 
   /** Send a remote data id */
-  final void sendRemoteData( FtsRemoteData data) throws java.io.IOException 
-  {
-    int id;
+    /*final void sendRemoteData( FtsRemoteData data) throws java.io.IOException 
+      {
+      int id;
 
-    if ( data != null)
+      if ( data != null)
       id = data.getId();
-    else
+      else
       id = 0;
 
-    write( FtsClientProtocol.data_code);
-    writeInt( id);
-  }
+      write( FtsClientProtocol.data_code);
+      writeInt( id);
+      }*/
 
   /** Send a value */
   final void sendValue(Object o) throws java.io.IOException 
@@ -251,14 +251,18 @@ abstract public class FtsStream
       {
 	sendObject((FtsObject) o);
       }
+    else if (o instanceof FtsConnection)
+      {
+	sendConnection((FtsConnection) o);
+      }
     else if (o instanceof String)
       {
 	sendString((String)o);
       }
-    else if (o instanceof FtsRemoteData)
+    /*else if (o instanceof FtsRemoteData)
       {
-	sendRemoteData((FtsRemoteData) o);
-      }
+      sendRemoteData((FtsRemoteData) o);
+      }*/
     else
       {
 	// (fd) May be should say something ???
@@ -280,6 +284,10 @@ abstract public class FtsStream
 	
       case FtsAtom.OBJECT:
 	sendObject(a.objectValue);
+	break;
+
+      case FtsAtom.CONNECTION:
+	sendConnection(a.connectionValue);
 	break;
 	
       case FtsAtom.STRING:
@@ -448,10 +456,10 @@ abstract public class FtsStream
   }
 
   /** Check if the next arguments in the current message  is a remote data   */
-  public final boolean nextIsData()
-  {
-    return status == FtsClientProtocol.data_code;
-  }
+    /*public final boolean nextIsData()
+      {
+      return status == FtsClientProtocol.data_code;
+      }*/
 
   /** Get the command code of the next message */
   public final int getCommand()
@@ -530,11 +538,11 @@ abstract public class FtsStream
   /** Get the next argument of the current message as a remote data
      The caller is responsable to check that the next argument
      have the good type before calling this method */
-  public final FtsRemoteData getNextDataArgument()
-       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
-  {
-    return server.getRemoteTable().get(getNextIntArgument());
-  }
+    /*public final FtsRemoteData getNextDataArgument()
+      throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
+      {
+      return server.getRemoteTable().get(getNextIntArgument());
+      }*/
 
 
   private final String readString()
@@ -646,8 +654,8 @@ abstract public class FtsStream
       case FtsClientProtocol.connection_code:
 	return getNextConnectionArgument();
 
-      case FtsClientProtocol.data_code:
-	return getNextDataArgument();
+	/*case FtsClientProtocol.data_code:
+	  return getNextDataArgument();*/
 
       case FtsClientProtocol.string_code:
 	return getNextStringArgument();

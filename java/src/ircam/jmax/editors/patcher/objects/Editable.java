@@ -46,6 +46,7 @@ import ircam.jmax.editors.patcher.interactions.*;
 abstract public class Editable extends GraphicObject implements FtsInletsListener, FtsOutletsListener
 {
   boolean editing = false;
+  int defaultWidth = -1;
   public ircam.jmax.editors.patcher.ObjectRenderer renderer; // don't ask me why here we need the whole path
 
   public Editable( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
@@ -57,7 +58,7 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     if ((renderer instanceof TextRenderer) && (getWidth() == -1))
       {
 	renderer.update();
-	setWidth( getFontMetrics().stringWidth( "pack 1 2 3") + 2*getTextXOffset());
+	setWidth(getDefaultWidth());
       }
     else
       updateDimensions();
@@ -116,8 +117,20 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
 	  return renderer.getWidth();
   }
 
-  // redefined from base class
+  public int getDefaultWidth()
+  {
+      if(defaultWidth==-1)
+	  defaultWidth = getFontMetrics().stringWidth( "pack 1 2 3") + 2*getTextXOffset();
+      
+      return defaultWidth;      
+  }
 
+  public void setDefaultWidth(int w)
+  {
+      defaultWidth = w;
+  }
+
+  // redefined from base class
   public  void setWidth(int w) 
   {
     // renderer.update();
@@ -176,6 +189,14 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     redraw();
   }
 
+  public void setWidthToText(String text)
+  {
+      int tLength = SwingUtilities.computeStringWidth(getFontMetrics(), text)+ getTextWidthOffset() + 2; 	
+      if(tLength < getDefaultWidth()) tLength = getDefaultWidth();
+	
+      super.setWidth(tLength);
+  }
+
   // ----------------------------------------
   // ``Args'' property
   // ----------------------------------------
@@ -196,6 +217,8 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   abstract public int getTextWidthOffset();
   abstract public int getTextHeightOffset();
 
+  abstract public boolean isMultiline();
+  
   public void setEditing(boolean v)
   {
     editing = v;

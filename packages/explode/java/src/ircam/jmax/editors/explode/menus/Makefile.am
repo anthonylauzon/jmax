@@ -5,6 +5,7 @@ EditMenu.java \
 OptionsMenu.java 
 
 JAVACX = @JAVACX@
+JAVACFLAGSX=@JAVACFLAGSX@
 JAVAROOTX=@top_srcdir@/packages/explode/java/src
 CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/packages/explode/java/src:@top_srcdir@/java/lib/jacl/jacl.jar:@top_srcdir@/java/lib/jacl/tcljava.jar
 

@@ -199,7 +199,8 @@ public class Slider extends GraphicObject implements FtsIntValueListener
       int y = getY();
       int w = getWidth();
       int h = getHeight();
-    
+      int range = (rangeMax - rangeMin)/*!=0 ? rangeMax - rangeMin : 1*/;
+      
       ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 
       // Paint the box 
@@ -217,15 +218,15 @@ public class Slider extends GraphicObject implements FtsIntValueListener
       if(orientation==VERTICAL_OR)
       {
 	  pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
-	  pos = y + BOTTOM_OFFSET + pixels  - (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
-	  //pos = y + h - BOTTOM_OFFSET - (value-rangeMin) * (h - BOTTOM_OFFSET - UP_OFFSET)/(rangeMax - rangeMin);
+	  pos = y + BOTTOM_OFFSET + pixels  - (pixels * (value-rangeMin)) / range;
+	  //pos = y + h - BOTTOM_OFFSET - (value-rangeMin) * (h - BOTTOM_OFFSET - UP_OFFSET)/range;
       
 	  g.drawRect(x + THROTTLE_LATERAL_OFFSET, pos, w - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
       }
       else
 	  {
 	      pixels = w - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
-	      pos = x + UP_OFFSET + (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
+	      pos = x + UP_OFFSET + (pixels * (value-rangeMin)) / range;
 	      g.drawRect(pos, y + THROTTLE_LATERAL_OFFSET, THROTTLE_HEIGHT - 1, h - 2*THROTTLE_LATERAL_OFFSET - 1); 
 	  }
       super.paint(g);
@@ -239,6 +240,7 @@ public class Slider extends GraphicObject implements FtsIntValueListener
       int y = getY();
       int w = getWidth();
       int h = getHeight();
+      int range = (rangeMax - rangeMin)/*!= 0 ? rangeMax - rangeMin : 1*/;
 
       ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
       
@@ -252,13 +254,13 @@ public class Slider extends GraphicObject implements FtsIntValueListener
       if(orientation==VERTICAL_OR)
 	  {
 	      pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
-	      pos = y + BOTTOM_OFFSET + pixels - (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
+	      pos = y + BOTTOM_OFFSET + pixels - (pixels * (value-rangeMin)) / range;
 	      g.drawRect(x + THROTTLE_LATERAL_OFFSET, pos, w - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
 	  }
       else
 	  {
 	      pixels = w - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
-	      pos = x + UP_OFFSET + (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
+	      pos = x + UP_OFFSET + (pixels * (value-rangeMin)) / range;
 	      g.drawRect(pos, y + THROTTLE_LATERAL_OFFSET, THROTTLE_HEIGHT - 1, h - 2*THROTTLE_LATERAL_OFFSET - 1); 
 	  }
       
@@ -293,6 +295,7 @@ public class Slider extends GraphicObject implements FtsIntValueListener
   public void popUpReset()
   {
     super.popUpReset();
+    controlPanel.setRange();
     ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
     ObjectPopUp.removeSeparation();
   }

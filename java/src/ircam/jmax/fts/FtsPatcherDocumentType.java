@@ -55,42 +55,35 @@ public class FtsPatcherDocumentType extends MaxDocumentType
     Fts fts = (Fts) context;
 
     // Build a new FtsObject, a patcher 0 in 0 out
-    FtsObject patcher;
+    FtsPatcherObject patcher;
 
     try
-      {
-	patcher = fts.makeFtsObject(fts.getServer().getRootObject(), "jpatcher");
+	{
+	    patcher = (FtsPatcherObject)(fts.makeFtsObject(fts.getServer().getRootObject(), "jpatcher"));
 
-	//hack to avoid null pointer exception 
-	//(in case of new patcher action during the jmax startup)
-	if(!(patcher instanceof FtsPatcherObject)) return null;
+	    //hack to avoid null pointer exception 
+	    //(in case of new patcher action during the jmax startup)
+	    if(!(patcher instanceof FtsPatcherObject)) return null;
 
-	// Put a new empty patch in edit mode
-	FtsPatcherDocument document = new FtsPatcherDocument(context);
+	    // Put a new empty patch in edit mode
+	    FtsPatcherDocument document = new FtsPatcherDocument(context);
 
-	patcher.updateData();
-	fts.sync();
+	    // Put some default geometrical property for the window.
+	    patcher.setWindowX(100);
+	    patcher.setWindowY(100);
+	    patcher.setWindowWidth(500);
+	    patcher.setWindowHeight(480);
+	    patcher.setEditMode(FtsPatcherObject.EDIT_MODE);
 
-	// Put some default geometrical property for the window.
-	
-	FtsPatcherData data = (FtsPatcherData) 	patcher.getData();
-
-	data.setWindowX(100);
-	data.setWindowY(100);
-	data.setWindowWidth(500);
-	data.setWindowHeight(480);
-	data.setEditMode(FtsPatcherData.EDIT_MODE);
-
-	document.setRootData(data);
-	document.setName(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("untitled")); // temp name
-
-	return document;
-      }
+	    document.setRootData(patcher);
+	    document.setName(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("untitled")); // temp name
+	    return document;
+	}
     catch (FtsException e)
-      {
-	System.err.println("Fts Exception " + e + " creating Patcher Document ?? ");
-	return null;
-      }
+	{
+	    System.err.println("Fts Exception " + e + " creating Patcher Document ?? ");
+	    return null;
+	}
   }
 
   public boolean canMakeNewDocument()

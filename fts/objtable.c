@@ -44,7 +44,6 @@ void fts_object_table_register(fts_object_t *obj)
 {
   obj->head.id = object_id_count;
   object_id_count += 2;
-
   fts_object_table_put(obj->head.id, obj);
 }
 

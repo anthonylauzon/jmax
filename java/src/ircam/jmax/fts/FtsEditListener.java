@@ -48,4 +48,7 @@ public interface FtsEditListener
   /** Called when a connection is removed in the listened server */
 
   public void connectionRemoved(FtsConnection connection);
+
+  /** Called starting/ending an atomic edition (like opening a patch) */
+  public void atomicAction(boolean active);  
 }

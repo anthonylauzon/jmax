@@ -23,24 +23,36 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.mda;
+package ircam.jmax.fts;
+
+import java.io.*;
+import java.util.*;
+
+import ircam.jmax.*;
+import ircam.jmax.mda.*;
+import ircam.jmax.editors.patcher.*;
 
 /**
- * Factory for editors.
- * A MaxDataEditorFactory is an object able to generate an empty, unbound editor
- * for a given type; each data type have its own default editor 
- * factory, but editors can be also instantiated in other ways.
+ * Proxy of an FTS patcher.
  */
 
-public interface MaxDataEditorFactory
-{
-  /** Check if this factory can produce a editor for the given data */
+public class FtsTemplateObject extends FtsPatcherObject
+{  
 
-  abstract public boolean       canEdit(MaxData data);
+  /*****************************************************************************/
+  /*                                                                           */
+  /*                               CONSTRUCTORS                                */
+  /*                                                                           */
+  /*****************************************************************************/
 
-  /** Ask the factory to  produce a new editor for the given data */
+  /**
+   * Create a FtsTemplateObject object
+   */
 
-  abstract public MaxDataEditor newEditor(MaxData data);
+  public FtsTemplateObject(Fts fts, FtsObject parent, String className, String variableName, String description)
+  {
+      super(fts, parent, className, variableName, description);
+  }
 }
 
-  
+

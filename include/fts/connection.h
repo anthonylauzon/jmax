@@ -57,3 +57,6 @@ FTS_API fts_connection_t *fts_connection_new(int id, fts_object_t *, int woutlet
 FTS_API void fts_connection_delete(fts_connection_t *conn);
 
 #endif
+
+
+

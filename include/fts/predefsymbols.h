@@ -183,7 +183,7 @@ PREDEF_SYMBOL( fts_s_colon, ":")
 PREDEF_SYMBOL( fts_s_equal, "=")
 
 /* FTS Data  */
-PREDEF_SYMBOL( fts_s_data, "data")
+/*PREDEF_SYMBOL( fts_s_data, "data")*/
 
 /* Predefined variable names */
 PREDEF_SYMBOL( fts_s_args, "args")

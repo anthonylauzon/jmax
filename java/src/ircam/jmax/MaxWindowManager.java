@@ -107,8 +107,8 @@ public class MaxWindowManager implements WindowListener
 
     windowOperationCount++;
 
-    if (windows.size() > 0)
-      windows.setElementAt(window, windows.indexOf(window));
+    if(/*(windows.size() > 0)&&(*/windows.contains(window))/*)*/
+	windows.setElementAt(window, windows.indexOf(window));
   }
 
 

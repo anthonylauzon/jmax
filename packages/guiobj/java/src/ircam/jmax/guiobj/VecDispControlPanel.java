@@ -100,9 +100,9 @@ public class VecDispControlPanel extends JPanel implements ActionListener, Objec
   {
     target = obj;
     float min = ((FtsVectorDisplayObject)obj.getFtsObject()).getMinimum();
-    minValueField.setText(""+(int)min);    
+    minValueField.setText(""+min);    
     float max = ((FtsVectorDisplayObject)obj.getFtsObject()).getMaximum();
-    maxValueField.setText(""+(int)max);    
+    maxValueField.setText(""+max);    
   }
 
   public void actionPerformed( ActionEvent e)

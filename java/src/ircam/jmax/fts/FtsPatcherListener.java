@@ -31,15 +31,24 @@ package ircam.jmax.fts;
 
 public interface FtsPatcherListener
 {
-  public void objectAdded(FtsPatcherData data, FtsObject object);
-  public void objectRemoved(FtsPatcherData data, FtsObject object);
+    /*public void objectAdded(FtsPatcherData data, FtsObject object);
+      public void objectRemoved(FtsPatcherData data, FtsObject object);
+      
+      public void connectionAdded(FtsPatcherData data, FtsConnection connection);
+      public void connectionRemoved(FtsPatcherData data, FtsConnection connection);
 
-  public void connectionAdded(FtsPatcherData data, FtsConnection connection);
-  public void connectionRemoved(FtsPatcherData data, FtsConnection connection);
+      public void patcherChangedNumberOfInlets(FtsPatcherData data, int nins);
+      public void patcherChangedNumberOfOutlets(FtsPatcherData data, int nouts);
+      public void patcherChanged(FtsPatcherData data);*/
+    public void objectAdded(FtsPatcherObject patch, FtsObject object);
+    public void objectRemoved(FtsPatcherObject patch, FtsObject object);
+      
+    public void connectionAdded(FtsPatcherObject patch, FtsConnection connection);
+    public void connectionRemoved(FtsPatcherObject patch, FtsConnection connection);
 
-  public void patcherChangedNumberOfInlets(FtsPatcherData data, int nins);
-  public void patcherChangedNumberOfOutlets(FtsPatcherData data, int nouts);
-  public void patcherChanged(FtsPatcherData data);
+    public void patcherChangedNumberOfInlets(FtsPatcherObject patch, int nins);
+    public void patcherChangedNumberOfOutlets(FtsPatcherObject patch, int nouts);
+    public void patcherChanged(FtsPatcherObject patch);
 
-  public void patcherHaveMessage(String msg);
+    public void patcherHaveMessage(String msg);
 }

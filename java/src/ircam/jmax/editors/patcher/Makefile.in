@@ -79,10 +79,11 @@ SUBDIRS = actions interactions menus objects
 
 EXTRA_DIST = package.html
 noinst_PROGRAMS = package
-package_SOURCES =  AddPopUp.java ConnectionAction.java DisplayList.java EditField.java ErmesDataEditor.java ErmesModule.java ErmesPatcherFactory.java ErmesPatcherListener.java ErmesSelection.java ErmesSketchPad.java ErmesSketchWindow.java ErmesToolBar.java ErmesToolButton.java FindPanel.java FontCache.java FpePanel.java IconRenderer.java KeyEventClient.java KeyEventsManager.java KeyMap.java MaxRepaintManager.java MessageDisplayer.java MoreObjectsButton.java ObjectAction.java ObjectRenderer.java PatcherClipboardManager.java PatcherFontManager.java PatcherPrintManager.java PatcherSaveManager.java ScaleDialog.java ScaleTransform.java Settings.java TextRenderer.java
+package_SOURCES =  AddPopUp.java ConnectionAction.java DisplayList.java EditField.java ErmesModule.java ErmesPatcherListener.java ErmesSelection.java ErmesSketchPad.java ErmesSketchWindow.java ErmesToolBar.java ErmesToolButton.java FindPanel.java ErrorPanel.java ErrorTableModel.java ErrorTablePanel.java FontCache.java FpePanel.java IconRenderer.java KeyEventClient.java KeyEventsManager.java KeyMap.java MaxRepaintManager.java MessageDisplayer.java MoreObjectsButton.java ObjectAction.java ObjectRenderer.java PatcherClipboardManager.java PatcherFontManager.java PatcherPrintManager.java PatcherSaveManager.java RuntimeErrorsPanel.java RuntimeError.java ScaleDialog.java ScaleTransform.java Settings.java TextRenderer.java
 
 
 JAVACX = @JAVACX@
+JAVACFLAGSX = @JAVACFLAGSX@
 JAVAROOTX = @top_srcdir@/java/src
 CLASSPATH_ENVX = CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/java/lib/jacl/jacl.jar:@top_srcdir@/java/lib/jacl/tcljava.jar
 
@@ -98,17 +99,18 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 package_OBJECTS =  AddPopUp.class ConnectionAction.class \
-DisplayList.class EditField.class ErmesDataEditor.class \
-ErmesModule.class ErmesPatcherFactory.class ErmesPatcherListener.class \
-ErmesSelection.class ErmesSketchPad.class ErmesSketchWindow.class \
-ErmesToolBar.class ErmesToolButton.class FindPanel.class \
-FontCache.class FpePanel.class IconRenderer.class KeyEventClient.class \
-KeyEventsManager.class KeyMap.class MaxRepaintManager.class \
-MessageDisplayer.class MoreObjectsButton.class ObjectAction.class \
-ObjectRenderer.class PatcherClipboardManager.class \
+DisplayList.class EditField.class ErmesModule.class \
+ErmesPatcherListener.class ErmesSelection.class ErmesSketchPad.class \
+ErmesSketchWindow.class ErmesToolBar.class ErmesToolButton.class \
+FindPanel.class ErrorPanel.class ErrorTableModel.class \
+ErrorTablePanel.class FontCache.class FpePanel.class IconRenderer.class \
+KeyEventClient.class KeyEventsManager.class KeyMap.class \
+MaxRepaintManager.class MessageDisplayer.class MoreObjectsButton.class \
+ObjectAction.class ObjectRenderer.class PatcherClipboardManager.class \
 PatcherFontManager.class PatcherPrintManager.class \
-PatcherSaveManager.class ScaleDialog.class ScaleTransform.class \
-Settings.class TextRenderer.class
+PatcherSaveManager.class RuntimeErrorsPanel.class RuntimeError.class \
+ScaleDialog.class ScaleTransform.class Settings.class \
+TextRenderer.class
 package_LDADD = $(LDADD)
 package_DEPENDENCIES = 
 package_LDFLAGS = 

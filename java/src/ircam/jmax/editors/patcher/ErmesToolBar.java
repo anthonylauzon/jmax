@@ -104,7 +104,7 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener, Compone
     toSaveButton.addActionListener( new ActionListener() {
       public void actionPerformed( ActionEvent e)
 	{
-	  PatcherSaveManager.save(sketch.getEditorContainer());
+	    PatcherSaveManager.save(sketch.getEditorContainer());
 	}
     });
     toSaveButton.setToolTipText("save file");
@@ -124,13 +124,9 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener, Compone
 	upButton.addActionListener( new ActionListener() {
 	  public void actionPerformed( ActionEvent e)
 	    {
-	      sketch.waiting();
-	      sketch.getFts().editPropertyValue(sketch.getFtsPatcher().getParent(), sketch.getFtsPatcher(), 
-						new MaxDataEditorReadyListener()
-						{
-						  public void editorReady(MaxDataEditor editor)
-						    {sketch.stopWaiting();}
-						});
+		sketch.waiting();
+		sketch.getFtsPatcher().getParent().sendMessage(FtsObject.systemInlet, "open_editor");
+		sketch.getFtsPatcher().requestStopWaiting(null);
 	    }});
 
 	widgets.add( upButton);

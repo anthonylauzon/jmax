@@ -201,11 +201,8 @@ abstract public class MaxDocument
    * an editor on a document , but it may be convenient.
    */
 
-  public MaxDataEditor edit() throws MaxDocumentException
+  public void edit() throws MaxDocumentException
   {
-    if (rootData != null)
-      return Mda.edit(rootData);
-    else
       throw new MaxDocumentException("No data to edit");
   }
 
@@ -331,11 +328,6 @@ abstract public class MaxDocument
   public void dispose()
   {
     Vector toDispose;
-
-    toDispose = (Vector) editedData.clone();
-
-    for (int i = 0; i < toDispose.size(); i++)
-	Mda.dispose((MaxData) toDispose.elementAt(i));
 
     type.disposeDocument(this);
     handler = null;

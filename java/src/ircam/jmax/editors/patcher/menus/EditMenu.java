@@ -83,7 +83,6 @@ public class EditMenu extends EditorMenu
     addSeparator();
 
     add(Actions.findAction, "Find", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_F);
-    add(Actions.findErrorsAction, "Find Errors");
 
     addSeparator();
 

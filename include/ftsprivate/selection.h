@@ -38,4 +38,7 @@ typedef struct _fts_selection_t
   int connections_count;
 } fts_selection_t;
 
+FTS_API int fts_selection_contains_object(fts_selection_t *sel, fts_object_t *o);
+FTS_API int fts_selection_connection_ends_selected(fts_selection_t *sel, fts_connection_t *c); 
+
 #endif

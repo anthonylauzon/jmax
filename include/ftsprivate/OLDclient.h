@@ -72,6 +72,7 @@
 #define NEW_CONNECTION_CODE                'c'
 #define NEW_OBJECT_CODE                    'n'
 #define NEW_OBJECT_VAR_CODE                'N'
+#define NEW_TEMPLATE_INSTANCE_CODE         'T'
 #define OBJECT_RELEASE_CODE                'l'
 #define OBJECT_RELEASE_DATA_CODE           'b'
 #define POST_CODE                          'h' /* a post request for the server */
@@ -81,7 +82,6 @@
 #define REDEFINE_CONNECTION_CODE           'V'
 #define REDEFINE_OBJECT_CODE               'R'
 #define REDEFINE_PATCHER_CODE              'Q'
-#define REMOTE_CALL_CODE                   '!'
 #define SAVE_PATCHER_BMAX_CODE             'S'
 #define SYNC_CODE                          '>'
 #define SYNC_DONE_CODE                     '<'
@@ -106,7 +106,6 @@
 #define SYMBOL_CODE         0x07
 #define OBJECT_CODE         0x08
 #define CONNECTION_CODE     0x09
-#define DATA_CODE           0x0a
 #define EOM_CODE            0x0b
 
 
@@ -120,7 +119,6 @@ extern int fts_client_is_up( void);
 
 extern void fts_client_start_msg(int type);
 extern void fts_client_add_connection(fts_connection_t *c);
-extern void fts_client_add_data( fts_data_t *data);
 extern void fts_client_add_string(const char *sp);
 
 extern void fts_client_upload_object(fts_object_t *obj);

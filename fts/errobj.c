@@ -34,11 +34,14 @@
 #include <ftsprivate/object.h>
 #include <ftsprivate/patcher.h>
 
+fts_object_t *runtime_error_handler = 0;
+fts_symbol_t sym_runtime_error_post = 0;
 /*
  * The error object; actually, error object are patchers, marked as errors,
  * because they can change dinamically their number of inlets and outs.
  *
  */
+
 
 /* Make an error object, with a description given as an array of atoms, 
    and a textual error description given in the printf format (format string
@@ -161,6 +164,45 @@ void fts_object_set_error(fts_object_t *obj, const char *format, ...)
   fts_object_put_prop(obj, fts_s_error_description, &a);
 }
 
+void 
+fts_runtime_error_handler_set(fts_object_t *obj)
+{
+  runtime_error_handler = obj;
+  
+  if(!sym_runtime_error_post) 
+    sym_runtime_error_post = fts_new_symbol("postError");
+}
+
+void 
+fts_runtime_error_handler_remove(fts_object_t *obj)
+{
+  runtime_error_handler = 0;
+}
+
+void 
+fts_object_signal_runtime_error(fts_object_t *obj, const char *format, ...)
+{
+  va_list ap;
+  char buf[1024];
+  fts_atom_t a[2];
+
+  va_start(ap, format);
+  vsprintf(buf, format, ap);
+  va_end(ap);
+
+  if(runtime_error_handler)
+    {
+      fts_set_object(a + 0, obj);
+      fts_set_symbol(a + 1, fts_new_symbol_copy(buf));
+      /* fts_set_string(a + 1, buf); ??? */
+      
+      fts_client_send_message(runtime_error_handler, sym_runtime_error_post, 2, a);
+    }
+  else
+    post("error: %s\n", buf);
+}
+
+/* ERASE ME!!! */
 void fts_object_set_runtime_error(fts_object_t *obj, const char *format, ...)
 {
   va_list ap;
@@ -191,4 +233,3 @@ fts_object_get_error(fts_object_t *obj)
 
   return 0;
 }
-	  

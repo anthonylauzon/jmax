@@ -238,6 +238,11 @@ static void fts_dsp_control_set_check_nan( fts_object_t *d, int winlet, fts_symb
     }*/
 }
 
+static void fts_dsp_control_restart( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_dsp_restart();
+}
+
 static fts_status_t
 dsp_control_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
@@ -253,6 +258,7 @@ dsp_control_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, sym_stop_collect, fts_dsp_control_fpe_stop_collect);
   fts_method_define_varargs(cl, fts_SystemInlet, sym_clear_collect, fts_dsp_control_fpe_clear_collect);
   fts_method_define_varargs(cl, fts_SystemInlet, sym_check_nan, fts_dsp_control_set_check_nan);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("dsp_restart"), fts_dsp_control_restart);
 
   return fts_Success;
 }

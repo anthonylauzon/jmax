@@ -336,17 +336,81 @@ public class MaxApplication extends Object
     // Before booting the server, check if it is asked to run in real-time mode,
     // and if yes, inform the application layer
     try
-	{
-	    itsInterp.boot(MaxApplication.getProperty("jmaxRoot"));
-	}
+      {
+	itsInterp.boot(MaxApplication.getProperty("jmaxRoot"));
+      }
     catch (ScriptException e)
-	{
-	    System.out.println("Interpreter error in initialization: " + e.getMessage());
-	}
+      {
+	System.out.println("Interpreter error in initialization: " + e.getMessage());
+      }
+    //##########################################################
+    //##########################################################
+    /*
+      ///source $jmaxRootDir/tcl/icons.tcl
+      String jmaxRoot = MaxApplication.getProperty("jmaxRoot");
+      /// for declareSystemIcon cmd
+      SystemIcons.loadIcon("_max_patcher_file_", jmaxRoot+"/images/mini_icon_pat.gif");
+      /// for declareIcon cmd
+      Icons.loadIcon("%jmax", jmaxRoot+"/images/jmax_logo_tiny.gif");
+
+      ///if(systemProperty new == "true")source $jmaxRootDir/tcl/menu.tcl
+      if(MaxApplication.getProperty("new").equals("true"))
+      {
+      AddPopUp.addAbbreviation("_object_", " ", "Adding New Object", true);
+      AddPopUp.addAbbreviation("_message_box_", "messbox", "Adding New Message Box", true);
+      AddPopUp.addAbbreviation("_inlet_", "inlet -1", "Adding New Inlet", false);
+      }
+      ///package provide jMax 2.0.2
+      ///source .jmaxrc ?????????????????????????????
+      //if {[file exists $jmaxRootDir/tcl/$jmaxHost.tcl]} then {
+      //source $jmaxRootDir/tcl/$jmaxHost.tcl
+      //}
+      ///
+      ///if {[file exists $jmaxRootDir/tcl/$jmaxHostType.tcl]} then {
+      ///source $jmaxRootDir/tcl/$jmaxHostType.tcl
+      ///} else {
+      ///puts "Host Type $jmaxHostType do not exists"
+      ///exit
+      ///}
+      ///source $jmaxRootDir/tcl/startup.tcl
+      ftsconnect $jmaxServerDir $jmaxServerName $jmaxConnection $jmaxHost $jmaxServerOptions $jmaxPort
+
+      sync
+
+      package require system
+      package require guiobj
+      
+      sourceFile $jmaxRootDir/tutorials/basics/project.env
+      package require utils
+      package require data
+      package require control
+      package require mess
+      package require numeric
+      package require math
+      package require lists
+      package require midi
+      package require sequence
+      package require signal
+      package require ispw
+      package require ispwmath
+      package require qlist
+      package require explode      
+      package require io
+
+      jmaxSetSampleRate $jmaxSampleRate
+      jmaxSetAudioBuffer $jmaxAudioBuffer
+
+      runHooks "platformStart"
+
+      if {[runHooks "start"] != "true"} {
+      runHooks "defaultStart"
+
+    */
+    //##########################################################
+    //##########################################################
 
     log("main 13\n");
 
-    
     ircam.jmax.editors.console.ConsoleWindow.init();
     ircam.jmax.editors.patcher.ErmesSketchWindow.touch(fts);
     //if there were no connection statements in startup.tcl, ask the user
@@ -622,15 +686,7 @@ public class MaxApplication extends Object
 	//MaxApplication.addHook(name, code);
     }
 
-    // Methods to install new data editors, document handlers, and
-    // types.
-
-    /** Install an editor factory in Mda */
-
-    public void installEditorFactory(MaxDataEditorFactory factory)
-    {
-	Mda.installEditorFactory(factory);
-    }
+    // Methods to install new document handlers and types.
 
     /** Install a document handler in Mda */
 

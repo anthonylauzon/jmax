@@ -268,34 +268,6 @@ public class FtsServer implements Runnable
       }
   }
 
-
-  /** Send a "new object" messages to FTS; receive the class Name and a description as a string;
-   *  It is actually used only for those objects that don't have the class name in the description,
-   *  i.e. messages.
-   */
-  final  void newObject(FtsObject patcher, int id, String className, String description)
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug)
-      System.err.println("> newObject(" + patcher + ", " + id + ", " + className + ", " + description + ")");
-
-    try
-      {
-	stream.sendCmd(FtsClientProtocol.fts_new_object_cmd);
-	stream.sendObject(patcher);
-	stream.sendInt(id);
-	stream.sendString(className);
-	FtsParse.parseAndSendObject(description, stream);
-	stream.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
-
   /** Send a "new object" messages to FTS; receive a complete description as a string;
    *   Used for all the objects that have the class identity in the string description
    */
@@ -313,69 +285,6 @@ public class FtsServer implements Runnable
 	stream.sendObject(patcher);
 	stream.sendInt(id);
 	FtsParse.parseAndSendObject(description, stream);
-	stream.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
-
-  /**
-   * Send a "new object" messages to the server with arguments in form of an array of FtsAtom
-   * used for objects created 
-   *
-   * @param patcher the parent patcher (can be null)
-   * @param id the object id (object dosn't exist yet on server)
-   * @param className the object class name
-   * @param nArgs number of valid arguments in args array
-   * @param args arguments of object creation
-   */
-  final void newObject(FtsObject patcher, int id, String className, int nArgs, FtsAtom args[])
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug)
-      System.err.println("> newObject(" + patcher + ", " + id + ", " + className + ", " + nArgs + "args)");
-
-    try
-      {
-	stream.sendCmd(FtsClientProtocol.fts_new_object_cmd);
-	stream.sendObject(patcher);
-	stream.sendInt(id);
-	stream.sendString(className);
-	stream.sendArray(args, 0, nArgs);
-	stream.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
-  /**
-   * Send a "new object" messages to the server with arguments in form of an array of FtsAtom
-   * used for objects created 
-   *
-   * @param id the object id (object dosn't exist yet on server)
-   * @param className the object class name
-   * @param nArgs number of valid arguments in args array
-   * @param args arguments of object creation
-   */
-  final void newObject(int id, String className, int nArgs, FtsAtom args[])
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug)
-      System.err.println("> newObject(" + id + ", " + className + ", " + nArgs + "args)");
-
-    try
-      {
-	stream.sendCmd(FtsClientProtocol.fts_new_object_cmd);
-	stream.sendInt(id);
-	stream.sendString(className);
-	stream.sendArray(args, 0, nArgs);
 	stream.sendEom();
       }
     catch (java.io.IOException e)
@@ -507,30 +416,30 @@ public class FtsServer implements Runnable
   }
 
   /** Send an "object message" to the server */
-  final void sendObjectMessage(FtsObject dst, int inlet, String selector, MaxVector args)
-  {
-    if (! connected)
-      return;
+    final void sendObjectMessage(FtsObject dst, int inlet, String selector, MaxVector args)
+    {
+	if (! connected)
+	    return;
 
-    if (FtsServer.debug)
-      System.err.println("> sendObjectMessage(" + dst + ", " + inlet + ", " + selector + ", " + args + ")");
+	if (FtsServer.debug)
+	    System.err.println("> sendObjectMessage(" + dst + ", " + inlet + ", " + selector + ", " + args + ")");
 
-    try
-      {
-	stream.sendCmd(FtsClientProtocol.fts_message_cmd);
-	stream.sendObject(dst);
-	stream.sendInt(inlet);
-	stream.sendString(selector);
+	try
+	    {
+		stream.sendCmd(FtsClientProtocol.fts_message_cmd);
+		stream.sendObject(dst);
+		stream.sendInt(inlet);
+		stream.sendString(selector);
 
-	if (args != null)
-	  stream.sendVector(args);
+		if (args != null)
+		    stream.sendVector(args);
 
-	stream.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
+		stream.sendEom();
+	    }
+	catch (java.io.IOException e)
+	    {
+	    }
+    }
 
   /** Send an "object message" with a unique FtsObject argument  to FTS.*/
   final void sendObjectMessage(FtsObject dst, int inlet, String selector, FtsObject arg)
@@ -816,370 +725,6 @@ public class FtsServer implements Runnable
       }
   }
 
-  /** Start a remote call */
-  final void remoteCallStart(FtsRemoteData data, int key)
-  {
-    if (! connected)
-      return;
-
-    try
-      {
-	stream.sendCmd(FtsClientProtocol.remote_call);
-	stream.sendRemoteData(data);
-	stream.sendInt(key);
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println("IOException in FtsServer:remoteCallStart()");
-      }
-  }
-
-  final void remoteCallAddArg(int arg)
-  {
-    if (! connected)
-      return;
-
-    try
-      {
-	stream.sendInt(arg);
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println("IOException in FtsServer:remoteCallStart()");
-      }
-  }
-
-  final void remoteCallAddArg(Integer arg)
-  {
-    if (! connected)
-      return;
-
-    try
-      {
-	stream.sendInt(arg);
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println("IOException in FtsServer:remoteCallStart()");
-      }
-  }
-
-  final void remoteCallAddArg(float arg)
-  {
-    if (! connected)
-      return;
-
-    try
-      {
-	stream.sendFloat(arg);
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println("IOException in FtsServer:remoteCallStart()");
-      }
-  }
-
-  final void remoteCallAddArg(Float arg)
-  {
-    if (! connected)
-      return;
-
-    try
-      {
-	stream.sendFloat(arg);
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println("IOException in FtsServer:remoteCallStart()");
-      }
-  }
-
-  final void remoteCallAddArg(FtsObject arg)
-  {
-    if (! connected)
-      return;
-
-    try
-      {
-	stream.sendObject(arg);
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println("IOException in FtsServer:remoteCallStart()");
-      }
-  }
-
-  final void remoteCallAddArg(String arg)
-  {
-    if (! connected)
-      return;
-
-    try
-      {
-	stream.sendString(arg);
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println("IOException in FtsServer:remoteCallStart()");
-      }
-  }
-
-  final void remoteCallAddArg(FtsRemoteData arg)
-  {
-    if (! connected)
-      return;
-
-    try
-      {
-	stream.sendRemoteData(arg);
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println("IOException in FtsServer:remoteCallStart()");
-      }
-  }
-
-
-  final void remoteCallEnd()
-  {
-    if (! connected)
-      return;
-
-    try
-      {
-	stream.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println("IOException in FtsServer:remoteCallStart()");
-      }
-  }
-
-
-  /** Send a single argument "remote call" message to FTS. */
-  final void remoteCall( FtsRemoteData data, int key, int arg)
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug)
-      System.err.println( "> remoteCall(" + data + ", " + key + "," + arg + ")");
-
-    try
-      {
-	stream.sendCmd(FtsClientProtocol.remote_call);
-	stream.sendRemoteData(data);
-	stream.sendInt(key);
-	stream.sendInt(arg);
-	stream.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println("IOException in FtsServer:remoteCall(data, key, args)");
-      }
-  }
-
-  final void remoteCall( FtsRemoteData data, int key, float arg)
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug)
-      System.err.println( "> remoteCall(" + data + ", " + key + "," + arg + ")");
-
-    try
-      {
-	stream.sendCmd(FtsClientProtocol.remote_call);
-	stream.sendRemoteData(data);
-	stream.sendInt(key);
-	stream.sendFloat(arg);
-	stream.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println("IOException in FtsServer:remoteCall(data, key, args)");
-      }
-  }
-
-  final void remoteCall( FtsRemoteData data, int key, Object arg)
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug) 
-      System.err.println( "> remoteCall(" + data + ", " + key + "," + arg + ")");
-
-    try
-      {
-	stream.sendCmd(FtsClientProtocol.remote_call);
-	stream.sendRemoteData(data);
-	stream.sendInt(key);
-	stream.sendValue(arg);
-	stream.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println("IOException in FtsServer:remoteCall(data, key, args)");
-      }
-  }
-
-  /** Send a "remote call" message to FTS. */
-  final void remoteCall( FtsRemoteData data, int key, Object args[])
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug) 
-      System.err.println( "> remoteCall(" + data + ", " + key + "," + args + ")");
-
-    try
-      {
-	stream.sendCmd(FtsClientProtocol.remote_call);
-	stream.sendRemoteData(data);
-	stream.sendInt(key);
-
-	if (args != null)
-	  stream.sendArray( args); // we may have zero args call
-
-	stream.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println("IOException in FtsServer:remoteCall(data, key, args)");
-      }
-  }
-
-  final void remoteCall( FtsRemoteData data, int key, MaxVector args)
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug)
-      System.err.println( "> remoteCall(" + data + ", " + key + "," + args + ")");
-
-    try
-      {
-	stream.sendCmd(FtsClientProtocol.remote_call);
-	stream.sendRemoteData(data);
-	stream.sendInt(key);
-
-	if (args != null)
-	  stream.sendVector( args); // we may have zero args call
-
-	stream.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println("IOException in FtsServer:remoteCall(data, key, args)");
-      }
-  }
-
-  final void remoteCall( FtsRemoteData data, int key, int offset, int size, int values[])
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug)
-      System.err.println( "> remoteCall(" + data +
-			  ", " + key + ", " + offset + ", " + size + ", " + values 
-			  + "[" + values.length + "]" + ")");
-
-    try
-      {
-	stream.sendCmd(FtsClientProtocol.remote_call);
-	stream.sendRemoteData(data);
-	stream.sendInt(key);
-	stream.sendInt(offset);
-	stream.sendInt(size);
-	stream.sendArray(values, offset, size);
-	stream.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println("IOException in FtsServer:remoteCall(data, key, offset, size , values)");
-      }
-  }
-
-  final void remoteCall( FtsRemoteData data, int  key, int id, String name, Object args[])
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug)
-      System.err.println( "> remoteCall(" + data + ", " + key + ", " + id + ", " + name + ", " + args + ")");
-
-    try
-      {
-	stream.sendCmd(FtsClientProtocol.remote_call);
-	stream.sendRemoteData(data);
-	stream.sendInt(key);
-	stream.sendInt(id);
-	stream.sendString(name);
-
-	if (args != null)
-	  stream.sendArray( args); // we may have zero args call
-
-	stream.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println("IOException in FtsServer:remoteCall(data, key, id, name, args)");
-      }
-  }
-
-  final void remoteCall( FtsRemoteData data, int  key, FtsObject object, Object args[])
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug)
-      System.err.println( "> remoteCall(" + data + ", " + key + ", " + object + ", " + args + ")");
-
-    try
-      {
-	stream.sendCmd(FtsClientProtocol.remote_call);
-	stream.sendRemoteData(data);
-	stream.sendInt(key);
-	stream.sendObject(object);
-
-	if (args != null)
-	  stream.sendArray( args); // we may have zero args call
-
-	stream.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println("IOException in FtsServer:remoteCall(data, key, object, args)");
-      }
-  }
-
-
-  final void remoteCall( FtsRemoteData data, int  key, FtsObject object, MaxVector args)
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug)
-      System.err.println( "> remoteCall(" + data + ", " + key + ", " + object + ", " + args + ")");
-
-    try
-      {
-	stream.sendCmd(FtsClientProtocol.remote_call);
-	stream.sendRemoteData(data);
-	stream.sendInt(key);
-	stream.sendObject(object);
-
-	if (args != null)
-	  stream.sendVector( args); // we may have zero args call
-
-	stream.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println("IOException in FtsServer:remoteCall(data, key, object, args)");
-      }
-  }
-
   final void sendRecomputeErrorObjects()
   {
     if (! connected)
@@ -1334,7 +879,7 @@ public class FtsServer implements Runnable
     // Build the root patcher, by mapping directly to object id 1 on FTS
     // (this is guaranteed)
 
-    root = new FtsPatcherObject(fts, null, null, "");
+    root = new FtsPatcherObject(fts, null, "jpatcher", null, "");
     root.setObjectId(1);
 
     registerObject(root);
@@ -1362,9 +907,6 @@ public class FtsServer implements Runnable
 	    /* open a dialog to quit jmax */
 	    ftsQuitted();
 	    running = false;
-	    /*JOptionPane.showMessageDialog(null, "jMax server connection lost! \n Quit user interface.", 
-	      "Fatal Error", JOptionPane.ERROR_MESSAGE); 
-	      Runtime.getRuntime().exit(0);*/
 	    MaxApplication.ftsQuitted();
 	  }
 	catch (java.io.InterruptedIOException e)
@@ -1485,7 +1027,6 @@ public class FtsServer implements Runnable
 
       case FtsClientProtocol.sync_done_cmd:
 
-
 	if (FtsServer.debug)
 	  System.err.println("< Pong Message");
 
@@ -1536,7 +1077,7 @@ public class FtsServer implements Runnable
 	  try
 	    {
 	      FtsObject parent = stream.getNextObjectArgument();
-	      FtsPatcherData data = (FtsPatcherData) stream.getNextDataArgument();
+
 	      int objId = stream.getNextIntArgument();
 	      String className = null;
 	      FtsAtom args[] = null;
@@ -1553,7 +1094,7 @@ public class FtsServer implements Runnable
 		  nArgs = stream.getNumberOfArgs();
 		}
 
-	      newObj = FtsObject.makeFtsObjectFromMessage(fts, parent, data, objId, null, className, nArgs, args);
+	      newObj = FtsObject.makeFtsObjectFromMessage(fts, parent, objId, null, className, nArgs, args);
 	      registerObject(newObj);
 
 	      if (FtsServer.debug)
@@ -1574,7 +1115,6 @@ public class FtsServer implements Runnable
 	  try
 	    {
 	      FtsObject parent = stream.getNextObjectArgument();
-	      FtsPatcherData data = (FtsPatcherData) stream.getNextDataArgument();
 	      int objId = stream.getNextIntArgument();
 	      String variable =  stream.getNextStringArgument();
 	      String className = null;
@@ -1592,7 +1132,7 @@ public class FtsServer implements Runnable
 		  nArgs = stream.getNumberOfArgs();
 		}
 
-	      newObj = FtsObject.makeFtsObjectFromMessage(fts, parent, data, objId, variable, className, nArgs, args);
+	      newObj = FtsObject.makeFtsObjectFromMessage(fts, parent, objId, variable, className, nArgs, args);
 	      registerObject(newObj);
 
 	      if (FtsServer.debug)
@@ -1606,16 +1146,65 @@ public class FtsServer implements Runnable
 	  break;
 	}
 
+      case FtsClientProtocol.fts_new_template_instance_cmd:
+	{
+	  FtsObject newObj;
+
+	  /*try
+	    {*/
+	  FtsObject parent = stream.getNextObjectArgument();
+
+	  int objId = stream.getNextIntArgument();
+	  String className = null;
+	  FtsAtom args[] = null;
+	  int nArgs = 0;
+
+	  /* class name? */
+	  if(stream.nextIsSymbol())
+	      className = stream.getNextStringArgument();
+
+	  /* null description object? */
+	  if(!stream.endOfArguments())
+	      {
+		  args = stream.getArgs();
+		  nArgs = stream.getNumberOfArgs();
+	      }
+	  ////////////////////////////////////
+	  String descrpt;
+	  if(nArgs==0) 
+	      descrpt = className;
+	  else 
+	      descrpt = className + " " + FtsParse.unparseArguments(nArgs, args);
+
+	  newObj = new FtsTemplateObject(fts, parent, className, null, descrpt);
+	  newObj.setObjectId(objId);
+	  if((parent !=null)&&(parent instanceof FtsPatcherObject))
+	      ((FtsPatcherObject)parent).addObject(newObj);
+	  ///////////////////////////////////
+
+	  registerObject(newObj);
+	  
+	  if (FtsServer.debug)
+	      System.err.println("< NewObjectMessage " + newObj + " in " + stream);
+	  /*}
+	    catch (FtsException e)
+	    {
+	    System.err.println("System error, cannot instantiate from stream " + stream);
+	    }*/
+
+	  break;
+	}
+
       case FtsClientProtocol.fts_new_connection_cmd:
 	{
-	  FtsPatcherData data;
+	  FtsPatcherObject patcher;
 	  int id;
 	  FtsObject from, to;
 	  int outlet, inlet;
 	  int type;
 	  FtsConnection c;
 
-	  data   = (FtsPatcherData) stream.getNextDataArgument();
+	  patcher   = (FtsPatcherObject) stream.getNextObjectArgument();	  
 	  id     = stream.getNextIntArgument();
 	  from   = stream.getNextObjectArgument();
 	  outlet = stream.getNextIntArgument();
@@ -1623,7 +1212,7 @@ public class FtsServer implements Runnable
 	  inlet  = stream.getNextIntArgument();
 	  type  = stream.getNextIntArgument();
 
-	  c = new FtsConnection(fts, data, id, from, outlet, to, inlet, type);
+	  c = new FtsConnection(fts, patcher, id, from, outlet, to, inlet, type);
 
 	  registerConnection(c);
 
@@ -1678,32 +1267,6 @@ public class FtsServer implements Runnable
 	    System.err.println("< Object Release" + obj);
 
 	  obj.release();
-	  break;
-	}
-
-      case FtsClientProtocol.fts_release_object_data_cmd:
-	{
-	  FtsObject obj;
-
-	  obj = stream.getNextObjectArgument();
-
-	  if (FtsServer.debug) 
-	    System.err.println("< Object Release Data" + obj);
-
-	  obj.releaseData();
-	  break;
-	}
-
-      case FtsClientProtocol.remote_call:
-	{
-	  FtsRemoteData data = stream.getNextDataArgument();
-	  int key = stream.getNextIntArgument();
-
-	  if (FtsServer.debug) 
-	    System.err.println("< remote Call stream: " + data + " key " + key + " stream "  + stream);
-
-	  data.call(key, stream);
-
 	  break;
 	}
 
@@ -1873,10 +1436,8 @@ public class FtsServer implements Runnable
   {
     if (id == 0)
       {
-	// This is usually the case at the creation of the root patcher
-
-	  System.out.println("** getObjectByFtsId: id=0");
-
+	// This is usually the case at the creation of the root patcher or fts objects not in a patcher 
+	//System.out.println("** getObjectByFtsId: id=0");
 	return null;
       }
     else if (id == -1)
@@ -1890,7 +1451,6 @@ public class FtsServer implements Runnable
 	FtsObject object = (FtsObject) objectTable.elementAt(id);
 
 	// Returned obj can be null here !!
-
 	if (object == null)
 	  System.out.println("** getObjectByFtsId: object=null");
 
@@ -1924,7 +1484,7 @@ public class FtsServer implements Runnable
    * only even IDs; on the server, IDs are assigned by need,
    * not to all the connections.
    */
-  private void registerConnection(FtsConnection connection)
+  void registerConnection(FtsConnection connection)
   {
     if (connection == null)
       System.err.println("registerConnection got a null connection");
@@ -2011,15 +1571,6 @@ public class FtsServer implements Runnable
 
 	return connection;
       }
-  }
-
-  // Handle the remote table ID
-
-  FtsRemoteDataID remoteTable = new FtsRemoteDataID();
-
-  FtsRemoteDataID getRemoteTable()
-  {
-    return remoteTable;
   }
 }
 

@@ -44,8 +44,8 @@ public class FtsPatcherDocument extends MaxDocument
 
   public void setRootData(MaxData data)
   {
-    super.setRootData(data);
-    ((FtsPatcherData) data).getContainerObject().setDocument(this);
+      super.setRootData(data);
+      ((FtsPatcherObject) data).setDocument(this);
   }
 
   public void dispose()
@@ -54,8 +54,16 @@ public class FtsPatcherDocument extends MaxDocument
 
     FtsObject patcher;
 
-    patcher = ((FtsPatcherData) getRootData()).getContainerObject();
+    patcher = (FtsPatcherObject) getRootData();
     patcher.delete();
+  }
+    
+  public void edit() throws MaxDocumentException
+  {
+    if (rootData != null)
+	((FtsPatcherObject) getRootData()).sendMessage(FtsObject.systemInlet, "open_editor");
+    else
+	super.edit();
   }
 }
 

@@ -122,11 +122,6 @@ public class Fts implements MaxContext
       System.out.println("unknown FTS connection type "+ connectionType +": can't connect to FTS");
 
     server.start();
-
-    // Install the meta data object
-
-    FtsRemoteMetaData.install(this);
-
   }
 
   /** Create an FTS object. makeFtsObject do not actually create an
@@ -138,135 +133,60 @@ public class Fts implements MaxContext
      those objects where className and description are available
      separately.  */
 
-  public FtsObject makeFtsObject(FtsObject parent, String className, String description)
-       throws FtsException
-  {
-    FtsObject obj;
-    int id;
-
-    id = server.getNewObjectId();
-
-    server.newObject(parent, id, className, description);
-    server.sendDownloadObject(id);
-    
-    // Wait for FTS to do his work
-
-    sync();
-
-    obj = server.getObjectByFtsId(id);
-    
-    if (obj != null)
-      {
-	if (parent != null)
-	  parent.setDirty();
-
-	return obj;
-      }
-    else
-      throw new FtsException("Instantiation error for " + className + " " + description);
-  }
-  
-  public FtsObject makeFtsObject(FtsObject parent, String className, int nArgs, FtsAtom args[])
-       throws FtsException
-  {
-    FtsObject obj;
-    int id;
-
-    id = server.getNewObjectId();
-
-    server.newObject(parent, id, className, nArgs, args);
-    server.sendDownloadObject(id);
-    
-    // Wait for FTS to do his work
-
-    sync();
-
-    obj = server.getObjectByFtsId(id);
-    
-    if (obj != null)
-      {
-	if (parent != null)
-	  parent.setDirty();
-
-	return obj;
-      }
-    else
-      throw new FtsException("Instantiation error for " + className + "args: " + nArgs + " (" + args + ")");
-  }
-  
-  /** Create an FTS object. 
-     Version to use for those objects where the class name is not avaiable
-     directly.
-     */
-
   public FtsObject makeFtsObject(FtsObject parent, String description) throws FtsException
   {
     FtsObject obj;
     int id;
 
     id = server.getNewObjectId();
+
     server.newObject(parent, id, description);
     server.sendDownloadObject(id);
 
     // Wait for FTS to do his work
     sync();
-
+    
     obj = server.getObjectByFtsId(id);
 
     if (obj != null)
-      {
-	obj.setDirty();
-	return obj;
-      }
+	{
+	    obj.setDirty();
+	    return obj;
+	}
     else
-      throw new FtsException("Instantiation error : " + description);
+	throw new FtsException("Instantiation error : " + description);
   }
   
-  /** 
-   * Start creation of an FtsObject. Create an Id and then request Fts to create an FtsObject. 
-   * there is not a Sync point. Will receive the created object in asynchronous way with a message.
-   * (used in Sequence editor)
-   */
-    /*public void makeFtsObjectAsync(String className, int nArgs, FtsAtom args[])
-      {
-      int id;
-	
-      id = server.getNewObjectId();
-	
-      server.newObject( id, className, nArgs, args);
-      }*/
-    
-
   /** Make a Connection.
     It ask FTS to create the connection, and then upload it
     */
 
-  public FtsConnection makeFtsConnection(FtsObject from, int outlet, FtsObject to, int inlet)
-    throws FtsException
-  {
-    FtsConnection conn;
-    int id;
+    public FtsConnection makeFtsConnection(FtsObject from, int outlet, FtsObject to, int inlet)
+	throws FtsException
+    {
+	FtsConnection conn;
+	int id;
+      
+	id = server.getNewConnectionId();
+	
+	server.newConnection(id, from, outlet, to, inlet);
+	server.sendDownloadConnection(id);
 
-    id = server.getNewConnectionId();
+	// Wait for FTS to do his work
+	sync();
 
-    server.newConnection(id, from, outlet, to, inlet);
-    server.sendDownloadConnection(id);
+	conn = server.getConnectionByFtsId(id);
+	
+	if (conn != null)
+	    {
+		if (from.getParent() != null)
+		    from.getParent().setDirty();
 
-    // Wait for FTS to do his work
-    sync();
-
-    conn = server.getConnectionByFtsId(id);
-    
-    if (conn != null)
-      {
-	if (from.getParent() != null)
-	  from.getParent().setDirty();
-
-	return conn;
+		return conn;
+	    }
+	else
+	    throw new FtsException("Connection error");
       }
-    else
-      throw new FtsException("Connection error");
-  }
 
 
   /**
@@ -296,10 +216,7 @@ public class Fts implements MaxContext
 
     // Get the data, and quit the editors connected to the data
 
-    data = oldObject.getData();	
-
-    if (data instanceof MaxData)
-      Mda.dispose((MaxData) data);
+    oldObject.releaseData();
 
     // Remove the object from the selection if there
 
@@ -341,16 +258,6 @@ public class Fts implements MaxContext
   }
 
 
-  /** Create a new Instance of a remote data class.
-   * @param name the remote data class name
-   * @param args the instantiation arguments for the remote data.
-   */
-
-  public  FtsRemoteData newRemoteData(String name, Object args[])
-  {
-    return FtsRemoteMetaData.getRemoteMetaData().newInstance(name, args);
-  }
-
   /** Selection handling */
 
   /** Get the Selection.
@@ -377,8 +284,6 @@ public class Fts implements MaxContext
     return selection;
   }
 
-  
-
 
   /** Syncronize with FTS.
    * Implement a syncronization point with FTS; when returning
@@ -401,28 +306,6 @@ public class Fts implements MaxContext
     server.stop();
   }
 
-  /** The RemoteMetaData class data base */
-
-  private static Hashtable remoteDataClassTable = new Hashtable();
-
-  /** Register a new remote data class. Note that the remote data class is global
-   * to all running fts servers.
-   */
-
-  public static void registerRemoteDataClass(String name, Class dataClass)
-  {
-    remoteDataClassTable.put(name, dataClass);
-  }
-
-  /** Get the Java Class corresponding to a remote data class. note
-   * that the remote data class is global to all running fts servers.
-   */
-
-  static Class getRemoteDataClass(String name)
-  {
-    return (Class) remoteDataClassTable.get(name);
-  }
-
   /** Get the root object for this server. */
 
   public  FtsObject getRootObject()
@@ -430,128 +313,8 @@ public class Fts implements MaxContext
     return server.getRootObject();
   }
 
-
-  /* Support for async editing: New Data listener support: listeners
-     are installed on an object; only one listener for object.  */
-
-  private Hashtable newDataListeners = new Hashtable();
-
-
-  private void addNewDataListenerOn(FtsNewDataListener listener, FtsObject obj)
-  {
-    newDataListeners.put(obj, listener);
-  }
-
-  private void removeNewDataListenerOn(FtsObject obj)
-  {
-    newDataListeners.remove(obj);
-  }
-
-  void fireNewDataListenerOn(FtsObject obj, MaxData data)
-  {
-    FtsNewDataListener listener;
-
-    listener = (FtsNewDataListener) newDataListeners.get(obj);
-
-    if (listener != null)
-      listener.newDataFor(obj, data);
-  }
-
-  class DelayedEditPropertyHandler implements FtsNewDataListener
-  {
-    MaxDataEditorReadyListener listener;
-    Object where;
-
-    DelayedEditPropertyHandler(MaxDataEditorReadyListener listener, Object where)
-    {
-      this.listener = listener;
-      this.where    = where;
-    }
-
-    DelayedEditPropertyHandler(MaxDataEditorReadyListener listener)
-    {
-      this(listener, null);
-    }
-
-    public void newDataFor(FtsObject obj, MaxData newData)
-    {
-      final MaxData data = (MaxData) newData;
-
-      if (data != null)
-	{
-	  // Set the document; when documents will be remote data,
-	  // it will be handled in FTS.
-
-	  if (data instanceof FtsRemoteData)
-	    ((FtsRemoteData) data).setDocument(obj.getDocument());
-
-	  SwingUtilities.invokeLater(new Runnable() {
-	    public void run() {
-	      MaxDataEditor editor;
-
-	      try
-		{
-		  editor = Mda.edit(data, where);
-
-		  if (listener != null)
-		    editor.addEditorReadyListener(listener);
-		}
-	      catch (MaxDocumentException e)
-		{
-		  // Error; we should do an
-
-		  if (listener != null)
-		    listener.editorReady(null); 
-		}
-	    }});
-	}
-      else
-	{
-	  if (listener != null)
-	    listener.editorReady(null);
-	}
-
-      removeNewDataListenerOn(obj);
-    }
-  }
-
-
-  /** Asynchroniously edit the data property of an object.
-   * Get a Data that is a value of a <code>data</code> object property,
-   * and call and editor on it, using mda; but do it asynchroniously.
-   * the asynchronicity is actually in two places:
-   * <ol>
-   * <li> to avoid calling sync, put a property handler on the wished property.
-   * <li> Once the property handler will be called by the input thread, a Runnable
-   *      starting the editor will be posted using invokeLater, so it will be
-   *      executed in the AWT thread, without blocking the input thread, and without
-   * 	  risking inconsistencies with the Swing toolkit.
-   * </ol>
-   */
-
-  public  void editPropertyValue(FtsObject obj, MaxDataEditorReadyListener listener)
-  {
-    addNewDataListenerOn(new DelayedEditPropertyHandler(listener), obj);
-    obj.updateData();
-  }
-
-
-  /** Asynchroniously edit the data property of an object.
-   * As the previous one, but it pass a location to the editor
-   * to where start the edition; used for find and similar thing.
-   */
-
-  public  void editPropertyValue(FtsObject obj, Object where,
-				 MaxDataEditorReadyListener listener)
-  {
-    addNewDataListenerOn(new DelayedEditPropertyHandler(listener, where), obj);
-    obj.updateData();
-  }
-
-
-    FtsDspControl dspController = null;
-
   /** Get the Dsp Controller for this server. */ 
+  FtsDspControl dspController = null;
 
   public FtsDspControl getDspController()
   {
@@ -569,6 +332,46 @@ public class Fts implements MaxContext
   
     return dspController;
   }
+
+  /** Get the Finder Object for this server. */ 
+  FtsFinderObject finder = null;
+
+  public FtsFinderObject getFinder()
+  {
+      if (finder == null)
+      {
+	try
+	  {
+	      finder  = (FtsFinderObject) makeFtsObject(server.getRootObject(), "__finder");
+	  }
+	catch (FtsException e)
+	  {
+	      System.out.println("System error: cannot get dsp control object");
+	  }
+      } 
+  
+    return finder;
+  } 
+
+  /** Get the Finder Object for this server. */ 
+  FtsErrorFinderObject errorFinder = null;
+
+  public FtsErrorFinderObject getErrorFinder()
+  {
+      if (errorFinder == null)
+      {
+	try
+	  {
+	      errorFinder = (FtsErrorFinderObject) makeFtsObject(server.getRootObject(), "__errorfinder");
+	  }
+	catch (FtsException e)
+	  {
+	      System.out.println("System error: cannot get dsp control object");
+	  }
+      } 
+  
+    return errorFinder;
+  } 
 
   /*
    * The Delete object listeners; for the moment, only the object delete callback is really
@@ -591,12 +394,26 @@ public class Fts implements MaxContext
     editListeners.removeElement(listener);
   }
 
-  void fireObjectRemoved(FtsObject object)
+  public void fireObjectRemoved(FtsObject object)
   {
     for (int i = 0; i < editListeners.size(); i++)
       ((FtsEditListener) editListeners.elementAt(i)).objectRemoved(object);
   }
-
+  public void fireObjectAdded(FtsObject object)
+  {
+    for (int i = 0; i < editListeners.size(); i++)
+      ((FtsEditListener) editListeners.elementAt(i)).objectAdded(object);
+  }
+  public void fireConnectionAdded(FtsConnection connection)
+  {
+    for (int i = 0; i < editListeners.size(); i++)
+      ((FtsEditListener) editListeners.elementAt(i)).connectionAdded(connection);
+  }
+  public void fireAtomicAction(boolean active)
+  {
+    for (int i = 0; i < editListeners.size(); i++)
+      ((FtsEditListener) editListeners.elementAt(i)).atomicAction(active);
+  }
   /** Load a binary jmax file. @return its root patcher. */
 
   public FtsObject loadJMaxFile(File file)
@@ -697,6 +514,8 @@ public class Fts implements MaxContext
     server.removeUpdateGroupListener(listener);
   }
 }
+
+
 
 
 

@@ -20,4 +20,10 @@
  * 
  */
 
-static const char *version = "version 3.0.0_latest_cvs";
+static const char *version_string = "3.0.0_latest_cvs";
+static const char *full_version_string = "version 3.0.0_latest_cvs";
+
+const char *fts_get_version( void)
+{
+  return version_string;
+}

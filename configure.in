@@ -103,6 +103,13 @@ dnl Check for Java compiler
 dnl AC_PROG_JAVAC
 JAVACX=javac
 AC_SUBST(JAVACX)
+JAVACFLAGSX=
+case "$debug" in
+ yes)
+  JAVACFLAGSX="-g"
+  ;;
+esac
+AC_SUBST(JAVACFLAGSX)
 
 AC_OUTPUT(
 Makefile

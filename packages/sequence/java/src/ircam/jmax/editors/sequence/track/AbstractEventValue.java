@@ -32,17 +32,17 @@ import ircam.jmax.editors.sequence.renderers.*;
 /**
  * A basic implementation of the EventValue interface, with a default property handling (no actions). 
  */
-public class AbstractEventValue extends FtsRemoteData implements EventValue 
+public class AbstractEventValue /*extends FtsRemoteData*/ implements EventValue 
 {
 
     public AbstractEventValue()
     {
     }
 
-    public void call(int id, FtsStream stream)
-    {
-	// to be implemented
-    }
+    /*public void call(int id, FtsStream stream)
+      {
+      // to be implemented
+      }*/
 
     /**
      * Set the named property */

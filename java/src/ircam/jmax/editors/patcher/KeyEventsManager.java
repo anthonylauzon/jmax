@@ -30,7 +30,7 @@ import ircam.jmax.fts.*;
 
 public class KeyEventsManager implements KeyListener
 {
-  public static KeyEventsManager keyEventsManager = new KeyEventsManager();  
+  public static KeyEventsManager keyEventsManager = null;  
   private FtsObject ftsKeyServer;
   private boolean noserver = false;
 
@@ -39,6 +39,12 @@ public class KeyEventsManager implements KeyListener
   {
     for(int i=0; i<3; i++)
       sendArgs[i]= new FtsAtom();
+  }
+
+  public static void createManager()
+  {
+      if(keyEventsManager == null)
+	  keyEventsManager = new KeyEventsManager();  
   }
 
   public KeyEventsManager()
@@ -57,7 +63,9 @@ public class KeyEventsManager implements KeyListener
     
   static public KeyEventsManager getManager()
   {
-    return keyEventsManager;
+      if(keyEventsManager == null)
+	  createManager();
+      return keyEventsManager;
   }
 
   private int getCode(KeyEvent e)
@@ -172,11 +180,11 @@ public class KeyEventsManager implements KeyListener
   ////////////// Producers /////////////////////
   static public void addProducer(Component producer)
   {
-    producer.addKeyListener(keyEventsManager);
+    producer.addKeyListener(getManager());
   }
   static public void removeProducer(Component producer)
   {
-    producer.removeKeyListener(keyEventsManager);
+    producer.removeKeyListener(getManager());
   }
 
   //////////////////////////////// key codes ////////////////

@@ -6,6 +6,9 @@ comment.c \
 comment_doctor.c \
 display.c \
 dspcontrol.c \
+errorfinder.c \
+runtimeerrors.c \
+finder.c \
 fork.c \
 gfloat.c \
 gint.c \
@@ -17,6 +20,6 @@ panel.c \
 scope.c \
 slider.c \
 toggle.c \
-vecdisplay.c 
+vecdisplay.c
 
 INCLUDES=-I@top_srcdir@/packages/data/c/src

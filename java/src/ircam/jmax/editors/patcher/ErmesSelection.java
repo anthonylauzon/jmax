@@ -183,6 +183,11 @@ public class ErmesSelection implements Transferable
     return objects.isEmpty() && connections.isEmpty();
   }
 
+  public boolean isObjectsEmpty() 
+  {
+    return objects.isEmpty();
+  }
+
   public boolean hasObjects() 
   {
     return (! objects.isEmpty());

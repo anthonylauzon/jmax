@@ -87,7 +87,6 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
       sequence = null;
       disposeEditor();
   }
-
   public void addTracks(int nArgs , FtsAtom args[])
   {
       FtsTrackObject trackObj;

@@ -33,6 +33,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import ircam.jmax.*;
+import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.toolkit.*;
@@ -40,38 +41,48 @@ import ircam.jmax.toolkit.actions.*;
 
 public class OpenAction extends EditorAction
 {
+  Frame frame;
+    Fts fts;
+  
   public void doAction(EditorContainer container)
   {
     File file = MaxFileChooser.chooseFileToOpen(container.getFrame());
+    frame = container.getFrame();
+    fts = container.getEditor().getFts();
 
     if (file != null)
       {
-	Cursor temp = container.getFrame().getCursor();
-
 	try
 	  {
-	    MaxDocument document;
+	    fts.fireAtomicAction(true);
 
-	    container.getFrame().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-	    document = Mda.loadDocument(container.getEditor().getFts(), file);
-	
+	    MaxDocument document = Mda.loadDocument(fts, file);
 	    try
-	      {
-		if (document.getDocumentType().isEditable())
-		  document.edit();
+	      {		
+		  frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));  
+
+		  if (document.getDocumentType().isEditable())
+		      document.edit();
+
+		  ((FtsPatcherObject)document.getRootData()).requestStopWaiting(new FtsActionListener(){
+			  public void ftsActionDone()
+			  {
+			      frame.setCursor(Cursor.getDefaultCursor());
+			      fts.fireAtomicAction(false);
+			  }
+		    });
 	      }
 	    catch (MaxDocumentException ex)
 	      {
-		// Ignore MaxDocumentException exception in running the editor
-		// May be an hack, may be is ok; move this stuff to an action
-		// handler !!
+		  frame.setCursor(Cursor.getDefaultCursor());
+		  // Ignore MaxDocumentException exception in running the editor
+		  // May be an hack, may be is ok; move this stuff to an action
+		  // handler !!
 	      }
-
-	    container.getFrame().setCursor(temp);
- 	  }
+	  }
 	catch (MaxDocumentException e)
 	  {
-	    container.getFrame().setCursor(temp);
+	    frame.setCursor(Cursor.getDefaultCursor());
 	    JOptionPane.showMessageDialog(container.getFrame(), e.toString(), 
 					  "Error", JOptionPane.ERROR_MESSAGE);
 	  }

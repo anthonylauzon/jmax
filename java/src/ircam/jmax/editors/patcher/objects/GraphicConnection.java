@@ -72,13 +72,13 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
 			   FtsConnection theFtsConnection) 
   {
     ftsConnection = theFtsConnection;
-    from    = fromObj;
-    to      = toObj;
-    sketch     = theSketchPad;
-    inlet      = theInlet;
-    outlet     = theOutlet;
-    type = theType;
-    selected         = false;
+    from          = fromObj;
+    to            = toObj;
+    sketch        = theSketchPad;
+    inlet         = theInlet;
+    outlet        = theOutlet;
+    type          = theType;
+    selected      = false;
 
     ftsConnection.setConnectionListener(this);
   }

@@ -2,8 +2,6 @@ lib_LTLIBRARIES= libfts.la
 
 libfts_la_SOURCES= \
 OLDclient.c \
-OLDftsdata.c \
-OLDpatcherdata.c \
 abstraction.c \
 array.c \
 atom.c \
@@ -65,3 +63,7 @@ fts_SOURCES=main.c
 fts_LDADD=-L.libs -lfts @FTS_SYS_LIBS@ -lm
 
 INCLUDES=-I$(top_srcdir)/include
+
+
+
+

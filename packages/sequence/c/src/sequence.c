@@ -337,6 +337,19 @@ sequence_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
+sequence_hide_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+  
+  if(sequence_editor_is_open(this))
+    {
+      sequence_set_editor_close(this);
+      fts_client_send_message((fts_object_t *)this, seqsym_closeEditor, 0, 0);  
+    }
+  /* here we could as well un-upload the objects (and the client would have to destroy the proxies) */
+}
+
+static void
 sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -563,6 +576,7 @@ sequence_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       /* graphical editor */
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), sequence_open_editor);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("close_editor"), sequence_close_editor);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("hide"), sequence_hide_editor);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_track"), sequence_add_track_by_client_request);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("remove_track"), sequence_remove_track_by_client_request);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("move_track"), sequence_move_track_by_client_request);

@@ -40,8 +40,6 @@ public class FtsModule
     Mda.installDocumentHandler( new FtsDotPatRemoteDocumentHandler());
     Mda.installDocumentHandler( new FtsBmaxRemoteDocumentHandler());
 
-    // Not yet
-    // Mda.installDocumentHandler( new FtsBmaxRemoteDocumentHandler());
     Mda.installDocumentType( new FtsPatcherDocumentType());
 
     ObjectCreatorManager.registerFtsClass("__selection", ircam.jmax.fts.FtsSelection.class);
@@ -49,9 +47,9 @@ public class FtsModule
     ObjectCreatorManager.registerFtsClass("__objectset", ircam.jmax.fts.FtsObjectSet.class);
     ObjectCreatorManager.registerFtsClass("__atomlist", ircam.jmax.fts.FtsAtomList.class);
     ObjectCreatorManager.registerFtsClass("__dspcontrol", ircam.jmax.fts.FtsDspControl.class);
-
-    // Install the patcher data class
-    Fts.registerRemoteDataClass("patcher_data", ircam.jmax.fts.FtsPatcherData.class);
+    ObjectCreatorManager.registerFtsClass("__finder", ircam.jmax.fts.FtsFinderObject.class);
+    ObjectCreatorManager.registerFtsClass("__errorfinder", ircam.jmax.fts.FtsErrorFinderObject.class);
+    ObjectCreatorManager.registerFtsClass("__runtimeerrors", ircam.jmax.fts.FtsRuntimeErrors.class);
   }
 }
 

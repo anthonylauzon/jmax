@@ -29,7 +29,7 @@
 
 #include <fts/fts.h>
 #include <ftsprivate/connection.h>
-#include <ftsprivate/OLDftsdata.h>
+/*#include <ftsprivate/OLDftsdata.h>*/
 
 static fts_hashtable_t fts_atom_type_table;
 
@@ -73,16 +73,16 @@ void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
 	  fprintf_connection(f, c);
 	  fprintf(f,"%s", ps);
 	}
-      else if (fts_is_data(&at[i]))
+      /*else if (fts_is_data(&at[i]))
 	{
-	  fts_data_t *obj;
-
-	  obj = fts_get_data(&at[i]);
-
-	  fprintf_data(f, obj);
-	  fprintf(f,"%s", ps);
+	fts_data_t *obj;
+	
+	obj = fts_get_data(&at[i]);
+	
+	fprintf_data(f, obj);
+	fprintf(f,"%s", ps);
 	}
-      else if (fts_is_void(&at[i]))
+	else*/ if (fts_is_void(&at[i]))
 	fprintf(f,"<void>%s", ps);
       else if (fts_is_error(&at[i]))
 	fprintf(f,"<error>%s", ps);
@@ -157,8 +157,10 @@ int fts_atom_are_equals(const fts_atom_t *a1, const fts_atom_t *a2)
 	return fts_get_float(a1) == fts_get_float(a2);
       else if (fts_is_object(a1))
 	return fts_get_object(a1) == fts_get_object(a2);
-      else if (fts_is_data(a1))
-	return fts_get_data(a1) == fts_get_data(a2);
+      else if (fts_is_connection(a1))
+	return fts_get_connection(a1) == fts_get_connection(a2);
+      /*else if (fts_is_data(a1))
+	return fts_get_data(a1) == fts_get_data(a2);*/
       else
 	return 0;
     }
@@ -182,6 +184,8 @@ int fts_atom_is_null(const fts_atom_t *a)
     return fts_get_float(a) == 0.0;
   else if (fts_is_object(a))
     return fts_get_object(a) == 0;
+  else if (fts_is_connection(a))
+    return fts_get_connection(a) == 0;
   else
     return 0;
 }

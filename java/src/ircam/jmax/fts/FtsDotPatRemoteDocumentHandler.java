@@ -132,7 +132,8 @@ public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
 
   public void saveDocument(MaxDocument document, File file) throws MaxDocumentException
   {
-    FtsObject patcher = ((FtsPatcherData) document.getRootData()).getContainerObject();
+      //FtsObject patcher = ((FtsPatcherData) document.getRootData()).getContainerObject();
+      FtsObject patcher = (FtsPatcherObject) document.getRootData();
 
     FtsAtom at[] = new FtsAtom[1];
     at[0] = new FtsAtom();
@@ -143,9 +144,10 @@ public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
 
     protected void saveSubDocument(MaxDocument document, MaxData data, File file) throws MaxDocumentException
     {
-	if ((document instanceof FtsPatcherDocument) && (data instanceof FtsPatcherData))
+	if ((document instanceof FtsPatcherDocument) && (data instanceof /*FtsPatcherData*/FtsPatcherObject))
 	    {
-		FtsObject patcher = ((FtsPatcherData) data).getContainerObject();
+		//FtsObject patcher = ((FtsPatcherData) data).getContainerObject();
+		FtsObject patcher = (FtsPatcherObject) data;
 		FtsAtom at[] = new FtsAtom[1];
 		at[0] = new FtsAtom();
 		at[0].setString( file.getAbsolutePath() );

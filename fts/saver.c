@@ -1124,7 +1124,8 @@ fts_bmax_code_new_selection(fts_bmax_file_t *f, fts_object_t *obj)
 
 	  c = selection->connections[i];
 
-	  fts_bmax_code_new_connection_in_selection(f, c, selection);
+	  if(fts_selection_connection_ends_selected(selection, c))
+	    fts_bmax_code_new_connection_in_selection(f, c, selection);
 	}
     }
 

@@ -53,13 +53,11 @@ public class ErmesModule
 	
 	//MaxApplication.getFts().addUpdateGroupListener(manager);
 
-	// Install the local mda entities
-
-	Mda.installEditorFactory(new ErmesPatcherFactory());
-
 	// Register the find panel and the fpe panel
 	FindPanel.registerFindPanel();
 	FpePanel.registerFpePanel();
+	ErrorPanel.registerErrorPanel();
+	RuntimeErrorsPanel.registerRuntimeErrorsPanel();
       }
 
     // Install the tcl commands

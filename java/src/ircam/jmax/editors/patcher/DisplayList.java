@@ -261,7 +261,7 @@ public class DisplayList
 	  GraphicConnection connection = (GraphicConnection) values[i];
 
 	  if ((connection.getSourceObject() == obj) || (connection.getDestObject() == obj))
-	    connection.updateDimensions();
+	      connection.updateDimensions();
 	}
   }
 

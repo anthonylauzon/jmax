@@ -128,6 +128,11 @@ public class Comment extends Editable
       }
   }
 
+  public boolean isMultiline()
+  {
+    return true;
+  }
+
   public void paint(Graphics g) 
   {
     if ( !itsSketchPad.isLocked())

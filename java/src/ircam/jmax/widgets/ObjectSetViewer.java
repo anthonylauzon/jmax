@@ -29,6 +29,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.event.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
@@ -36,77 +37,24 @@ import ircam.jmax.toolkit.*;
 
 public class ObjectSetViewer extends JPanel {
 
-  static class ObjectCellRenderer extends JLabel implements ListCellRenderer
+  private final static ImageIcon patcherIcon = SystemIcons.get("_patcher_");
+  private final static ImageIcon objectIcon = SystemIcons.get("_object_");
+  private final static ImageIcon inletIcon = SystemIcons.get("_inlet_");
+  private final static ImageIcon outletIcon =  SystemIcons.get("_outlet_");
+
+  static class ObjectCellRenderer extends DefaultListCellRenderer
   {
-    private static ImageIcon patcherIcon = null;
-    private static ImageIcon objectIcon = null;
-    private static ImageIcon errorIcon = null;
-    private static ImageIcon inletIcon = null;
-    private static ImageIcon outletIcon = null;
-
-    private final static Color selectedColor = new Color( 51, 153, 204);
-
-    private static void loadImages()
-    {
-      patcherIcon = SystemIcons.get("_patcher_");
-      objectIcon  = SystemIcons.get("_object_");
-      errorIcon   = SystemIcons.get("_error_object_");
-      inletIcon   = SystemIcons.get("_inlet_");
-      outletIcon  = SystemIcons.get("_outlet_");
-    }
-
-    public ObjectCellRenderer() 
-    {
-      if (patcherIcon == null)
-	loadImages();
-      
-      setOpaque(true);
-    }
-
     public Component getListCellRendererComponent( JList jlist, Object obj, int i, boolean selected, boolean hasFocus)
     {
+      super.getListCellRendererComponent(jlist, obj, i, selected, hasFocus);
+
       if (obj != null)
 	{
-	  if ( selected)
-	    setBackground( selectedColor);
-	  else
-	    setBackground( jlist.getBackground());
-
-	  String className = ((FtsObject)obj).getClassName();
-
-	  if (((FtsObject) obj).isError())
-	      {
-		  setText( ((FtsObject) obj).getDescription());
-		  setIcon( errorIcon);
-	      }
-	  else if (obj instanceof FtsPatcherObject)
-	      {
-		  setText( ((FtsObject) obj).getDescription());
-		  setIcon( patcherIcon);
-	      }
-	  else if (obj instanceof FtsInletObject)
-	      {
-		  setText( ((FtsObject) obj).getDescription());
-		  setIcon( inletIcon);
-	      }
-	  else if (obj instanceof FtsOutletObject)
-	      {
-		  setText( ((FtsObject) obj).getDescription());
-		  setIcon( outletIcon);
-	      }
-	  else if(ObjectCreatorManager.containsClass(className))
-	      {
-		  setText(((FtsObject) obj).getDescription());
-		  if(SystemIcons.get(className)!=null)
-		      setIcon(SystemIcons.get(className));
-		  else
-		      setIcon( objectIcon);
-	      }
-	  else
-	      {
-		  setText( ((FtsObject) obj).getDescription());
-		  setIcon( objectIcon);
-	      }
+	  String text = ((FtsObject)obj).getDescription();	   
+	  if(text.equals(""))
+	      text = ((FtsObject)obj).getComment();
+	  setText( text);
+	  setIcon(ObjectSetViewer.getObjectIcon((FtsObject)obj));
 	}
       
       return this;
@@ -124,9 +72,9 @@ public class ObjectSetViewer extends JPanel {
     {
       if (e.getClickCount() == 2)
 	{
-	  int index = jList.locationToIndex(e.getPoint());
+	    int index = jList.locationToIndex(e.getPoint());
 	  
-	  if ((index >= 0) && (index < jList.getModel().getSize()))
+	    if ((index >= 0) && (index < jList.getModel().getSize()))
 	    {
 	      if (objectSelectedListener != null)
 		{
@@ -165,13 +113,48 @@ public class ObjectSetViewer extends JPanel {
   {
       jList.setModel( model);
       repaint();  // sometimes, it seems that setModel() does not force a refresh ???
+      model.addListDataListener(new ListDataListener(){
+	      public void contentsChanged(ListDataEvent e)
+	      {
+		  jList.clearSelection();
+	      }
+	      public void intervalRemoved(ListDataEvent e){}
+	      public void intervalAdded(ListDataEvent e){}
+	  });
   }
 
   public void setObjectSelectedListener(ObjectSelectedListener objectSelectedListener)
   {
     this.objectSelectedListener = objectSelectedListener;
   }
+  
+  public void setSelectionListener(ListSelectionListener l)
+  {
+      jList.addListSelectionListener(l);
+  }
 
+  public static ImageIcon getObjectIcon(FtsObject obj)
+  {
+      ImageIcon icon;
+      String className = ((FtsObject)obj).getClassName();
+
+      if (obj instanceof FtsTemplateObject)
+	  icon = objectIcon;
+      else if (obj instanceof FtsPatcherObject)
+	  icon = patcherIcon;
+      else if (obj instanceof FtsInletObject)
+	  icon = inletIcon;
+      else if (obj instanceof FtsOutletObject)
+	  icon = outletIcon;
+      else if(ObjectCreatorManager.containsClass(className))
+	  if(SystemIcons.get(className)!=null)
+	      icon = SystemIcons.get(className);
+	  else
+	      icon = objectIcon;
+      else
+	  icon = objectIcon;
+      return icon;
+  }  
   protected JList jList;
   private ObjectSelectedListener objectSelectedListener;
 }

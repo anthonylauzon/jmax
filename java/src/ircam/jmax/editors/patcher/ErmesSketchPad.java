@@ -58,11 +58,9 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   private boolean somethingToUpdate = false;
   private Rectangle invalid = new Rectangle();
   
-  //GlassPanel glass;
   public void paintAtUpdateEnd(GraphicObject object, int x, int y, int w, int h)
   {
     displayList.addToUpdate(object);
-    //glass.addToUpdate(object);
 
     if(!somethingToUpdate){
       somethingToUpdate = true;
@@ -73,7 +71,6 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   }
   public void resetUpdate(){
     displayList.resetUpdateObjects();
-    //glass.resetUpdateObjects();
     somethingToUpdate = false;
   }
   public Rectangle getUpdateRect(){
@@ -99,7 +96,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     Rectangle rect = getEditorContainer().getViewRectangle();
     Graphics gr;
 
-    if (isLocked()/* && syncPaint*/){
+    if (isLocked()){
 	gr = getGraphics();
 	if(gr!=null)
 	    {
@@ -108,9 +105,6 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 		gr.setClip(invalid);
 		displayList.updatePaint(gr);
 	    }
-	/*if(!glass.isVisible())
-	  glass.setVisible(true);
-	  glass.repaint();*/
     }    
     else
 	repaint(invalid); 
@@ -145,9 +139,9 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     return fts;
   }
 
-  private FtsObject itsPatcher;
+  private FtsPatcherObject itsPatcher;
 
-  public FtsObject getFtsPatcher()
+  public FtsPatcherObject getFtsPatcher()
   {
     return itsPatcher;
   }
@@ -159,18 +153,11 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
   public boolean isASubPatcher()
   {
-    return ((!itsDocument.isRootData(itsPatcherData))&&(itsPatcher instanceof FtsPatcherObject));
+    return ((!itsDocument.isRootData(itsPatcher))&&(itsPatcher instanceof FtsPatcherObject));
   }
   public boolean isATemplate()
   {
-    return ((!itsDocument.isRootData(itsPatcherData))&&!(itsPatcher instanceof FtsPatcherObject));
-  }
-
-  private FtsPatcherData itsPatcherData;
-
-  public FtsPatcherData getFtsPatcherData()
-  {
-    return itsPatcherData;
+    return ((!itsDocument.isRootData(itsPatcher))&&!(itsPatcher instanceof FtsPatcherObject));
   }
 
   MaxDocument itsDocument;
@@ -286,9 +273,9 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   // init
   // --------------------------------------------------------------
 
-  void InitFromFtsContainer( FtsPatcherData theContainerObject)
+  void InitFromFtsContainer(FtsPatcherObject theContainerObject)
   {    
-    FtsPatcherData aFtsPatcherData = theContainerObject;
+    FtsPatcherObject aFtsPatcherData = theContainerObject;
     Object[] objects = aFtsPatcherData.getObjects().getObjectArray();
     int osize = aFtsPatcherData.getObjects().size();
     boolean doLayers = false;
@@ -346,7 +333,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   //--------------------------------------------------------
   //	CONSTRUCTOR
   //--------------------------------------------------------
-  ErmesSketchPad(EditorContainer container, FtsPatcherData thePatcherData) 
+  ErmesSketchPad(EditorContainer container, FtsPatcherObject thePatcher) 
   {
     super();
 
@@ -355,17 +342,13 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     // Setting the local variables
     itsEditorContainer = container;
 
-    itsPatcherData  = thePatcherData;
-    fts = itsPatcherData.getFts();
-    itsPatcher      = thePatcherData.getContainerObject(); // ???
-
+    itsPatcher      = thePatcher;
+    fts = itsPatcher.getFts();
     itsDocument     = itsPatcher.getDocument();
 
     // Initialize state
-    itsPatcherData.setPatcherListener(new ErmesPatcherListener(this));
+    itsPatcher.setPatcherListener(new ErmesPatcherListener(this));
 
-    //fts.addUpdateGroupListener( this);//bug fix 11/5 
-    
     // Get the defaultFontName and Size
     defaultFontName = MaxApplication.getProperty("jmaxDefaultFont");
 
@@ -381,7 +364,6 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
 
     defaultFontStyle = ircam.jmax.Platform.FONT_STYLE;
-
 
     // Install the display List object
 
@@ -405,12 +387,12 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
       }
 
     setOpaque(true);
-    setLayout( null);
+    setLayout(null);
 
     itsEditField = new EditField( this);
     add( itsEditField);
 
-    InitFromFtsContainer( itsPatcherData);
+    InitFromFtsContainer( itsPatcher);
 
     fixSize();
 
@@ -506,7 +488,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   String getTitle(){
     String name;
 
-    if (itsDocument.isRootData(itsPatcherData))
+    if (itsDocument.isRootData(itsPatcher))
       name = itsDocument.getName();
     else if (itsPatcher instanceof FtsPatcherObject)
       {
@@ -623,8 +605,8 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     //debug utility 
     private void printObjectsDescription()
     {
-	Object[] objects = itsPatcherData.getObjects().getObjectArray();
-	int osize = itsPatcherData.getObjects().size();
+	Object[] objects = itsPatcher.getObjects().getObjectArray();
+	int osize = itsPatcher.getObjects().size();
 
 	for ( int i = 0; i < osize; i++)
 	    System.err.println("obj "+(FtsObject)objects[i]+" "+((FtsObject)objects[i]).getDescription());
@@ -680,6 +662,9 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
     if (obj instanceof FtsObject) 
       {
+	if(isLocked())
+	    setLocked(false);
+
 	GraphicObject object = displayList.getGraphicObjectFor((FtsObject) obj);
 
 	if (object != null)
@@ -699,8 +684,8 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 		object.redraw();
 	      }
 
-	    showSelection();
-	  }
+	    showSelection();	  
+	  }	
       }
   }
 
@@ -762,7 +747,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
   void cleanAll()
   {
-    itsPatcherData.resetPatcherListener();
+    itsPatcher.resetPatcherListener();
     
     fts.removeUpdateGroupListener( this);
 
@@ -779,7 +764,6 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     itsEditorContainer = null;// should not be needed, here to get the grabber !!
 
     itsPatcher = null;
-    itsPatcherData = null;
     itsEditField = null;
     anOldPastedObject = null;
     itsDocument = null;
@@ -792,19 +776,20 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
   public void Close(boolean doCancel)
   {
-      if (! itsDocument.isRootData(itsPatcherData))
-	  {
-	      itsPatcherData.stopUpdates();
-	      Mda.dispose(itsPatcherData); 
-	  }
-      else 
+      if (itsDocument.isRootData(itsPatcher))
 	  {
 	      if(PatcherSaveManager.saveClosing(getEditorContainer(), doCancel))
-		  itsDocument.dispose();
-	      // Just call dispose on the document
-	      // Mda will indirectly call Destroy, and will close all the other editors
+		  {
+		      itsPatcher.stopUpdates();		      
+		      itsPatcher.sendMessage(FtsObject.systemInlet, "close_editor", 0, null);
+		      if(itsPatcher.isARootPatcher()) fts.fireAtomicAction(true); 
+		      itsPatcher.delete();
+		      ((ErmesSketchWindow)itsEditorContainer).Destroy();
+		  }
 	  }
-    
+      else 
+	  itsPatcher.sendMessage(FtsObject.systemInlet, "hide", 0, null);
+
       KeyEventsManager.removeProducer(this);
   }
 
@@ -814,7 +799,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   // -----------------------------------------------------------------------
 
   private int waiting = 0;
-
+  
   public void waiting()
   {
     if (waiting >= 0)
@@ -840,7 +825,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   // initialMode property of a patcher is set and it is set
   // to something different than "run" (usually, "edit" :)
   void InitLock(){
-    if (itsPatcherData.getRecursiveEditMode() == FtsPatcherData.EDIT_MODE)
+    if (itsPatcher.getRecursiveEditMode() == FtsPatcherObject.EDIT_MODE)
       setLocked( false);
     else
       setLocked( true);
@@ -855,7 +840,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     // the patch, so that subpatcher can use it as their initial mode
     if (locked)
       {
-	itsPatcherData.setEditMode(FtsPatcherData.RUN_MODE);
+	itsPatcher.setEditMode(FtsPatcherObject.RUN_MODE);
 	setRunModeInteraction();
 
 	if (isTextEditingObject())
@@ -867,7 +852,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     else
     {
       setEditModeInteraction();
-      itsPatcherData.setEditMode(FtsPatcherData.EDIT_MODE);
+      itsPatcher.setEditMode(FtsPatcherObject.EDIT_MODE);
     }
     redraw();
     
@@ -1219,29 +1204,27 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
   public void resizeToWindow(int width, int height){
     if (itsPatcher != null) {
-      itsPatcherData.setWindowWidth(Math.round(ScaleTransform.getInstance().invScaleX(width)));
-      itsPatcherData.setWindowHeight(Math.round(ScaleTransform.getInstance().invScaleY(height)));
+      itsPatcher.setWindowWidth(Math.round(ScaleTransform.getInstance().invScaleX(width)));
+      itsPatcher.setWindowHeight(Math.round(ScaleTransform.getInstance().invScaleY(height)));
       fixSize();
     }
   }
   public void relocateToWindow(int x, int y){
     if (itsPatcher != null) {
-	//itsPatcherData.setWindowX(Math.round(ScaleTransform.getInstance().invScaleX(x)));
-	//itsPatcherData.setWindowY(Math.round(ScaleTransform.getInstance().invScaleY(y)));
-	itsPatcherData.setWindowX(x);
-	itsPatcherData.setWindowY(y);
+	itsPatcher.setWindowX(x);
+	itsPatcher.setWindowY(y);
     }
   }
 
   void stopUpdates(){
     // Do the test because the awt can call this before itsPatcher is ready
-    if (itsPatcherData != null)
-      itsPatcherData.stopUpdates();
+    if (itsPatcher != null)
+      itsPatcher.stopUpdates();
   }
   void startUpdates(){
     // Do the test because the awt can call this before itsPatcher is ready
-    if (itsPatcherData != null)
-      itsPatcherData.startUpdates();
+    if (itsPatcher != null)
+      itsPatcher.startUpdates();
   }
 }
 

@@ -42,6 +42,9 @@ extern void display_config(void);
 extern void vecdisplay_config(void);
 extern void scope_config(void);
 extern void dspcontrol_config(void);
+extern void finder_config(void);
+extern void error_finder_config(void);
+extern void runtime_errors_config(void);
 
 void
 guiobj_config(void)
@@ -62,4 +65,7 @@ guiobj_config(void)
   vecdisplay_config();
   scope_config();
   dspcontrol_config();
+  finder_config();
+  error_finder_config();
+  runtime_errors_config();
 }

@@ -32,6 +32,8 @@ import javax.swing.event.*;
 import java.awt.*;
 import javax.swing.*;
 
+import java.lang.*;
+
 /**
  * An fts remote data that offers a built-in undo support.
  * 
@@ -57,14 +59,14 @@ public class FtsObjectWithEditor extends FtsUndoableObject {
   {
       if(editorFrame!= null)
 	  {
-	      editorFrame.setVisible(false);
+	      hideEditor();
 	      SwingUtilities.invokeLater(new Runnable() {
 			public void run()
 			{ 
 			    editorFrame.dispose();
 			    editorFrame = null;
 			}
-		    });
+		    }); 
 	    }
   }
   public void showEditor()
@@ -79,6 +81,24 @@ public class FtsObjectWithEditor extends FtsUndoableObject {
       if(editorFrame.getState()==Frame.ICONIFIED) editorFrame.setState(Frame.NORMAL);
       editorFrame.toFront();
   }
+
+  public void hideEditor()
+  {
+      editorFrame.setVisible(false);
+      MaxWindowManager.getWindowManager().removeWindow(editorFrame);
+  }
+
+  public void closeEditor(int nArgs, FtsAtom args[])
+  {
+      if(getEditorFrame() != null)	    
+	  hideEditor();
+  }
+
+  void releaseData()
+    {
+	sendMessage(FtsObject.systemInlet, "close_editor", 0, null);
+	super.releaseData();
+    }
 
   private Frame editorFrame = null;
 }

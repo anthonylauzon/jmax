@@ -55,7 +55,8 @@ public class PatcherSaveManager
     ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
 
     MaxDocument document = sketch.getDocument();
-    FtsPatcherData patcherData = sketch.getFtsPatcherData();
+    //FtsPatcherData patcherData = sketch.getFtsPatcherData();
+    FtsPatcherObject patcherData = (FtsPatcherObject)sketch.getFtsPatcher();
     boolean saved = false;
     
     if (! document.isRootData(patcherData))
@@ -88,17 +89,19 @@ public class PatcherSaveManager
     ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
 
     MaxDocument document = sketch.getDocument();
-    FtsPatcherData patcherData = sketch.getFtsPatcherData();
+    //FtsPatcherData patcherData = sketch.getFtsPatcherData();
+    FtsPatcherObject patcherData = (FtsPatcherObject)sketch.getFtsPatcher();
+
     boolean saved = false;
     int saveType;
  
+    if (! document.isRootData(patcherData))
+	return saveAsFromSubPatcher(container , document);
+
     if ( document.getDocumentHandler() instanceof FtsDotPatRemoteDocumentHandler)
       saveType = MaxFileChooser.SAVE_PAT_TYPE;
     else
       saveType = MaxFileChooser.SAVE_JMAX_TYPE;
-
-    if (! document.isRootData(patcherData))
-	return saveAsFromSubPatcher(container , document);
 
     file = MaxFileChooser.chooseFileToSave( container.getFrame(), 
 					    document.getDocumentFile(), 
@@ -140,6 +143,7 @@ public class PatcherSaveManager
     document.setSaved( false );
 
     container.getFrame().setTitle( file.toString()); 
+    MaxWindowManager.getWindowManager().windowChanged(container.getFrame());
 
     try
       {
@@ -148,7 +152,6 @@ public class PatcherSaveManager
       }
     catch ( MaxDocumentException e)
       {
-	  /*new ErrorDialog( container.getFrame(), e.getMessage());*/
 	  JOptionPane.showMessageDialog(container.getFrame(), e.getMessage(), 
 					"Error", JOptionPane.ERROR_MESSAGE); 
       }
@@ -164,20 +167,19 @@ public class PatcherSaveManager
     boolean saved = false;
     sketch = (ErmesSketchPad)ec.getEditor();
 
-    FtsObject containerObj = ((FtsPatcherData)document.getRootData()).getContainerObject();
+    //FtsObject containerObj = ((FtsPatcherData)document.getRootData()).getContainerObject();
+    FtsObject containerObj = (FtsPatcherObject)document.getRootData();
+    window = (ErmesSketchWindow)((FtsPatcherObject)containerObj).getEditorFrame();
 
-    sketch.waiting();
-    containerObj.getFts().editPropertyValue( containerObj ,  
-					    new MaxDataEditorReadyListener()
-					    {
-					      public void editorReady(MaxDataEditor editor)
-						{
-						  window = ((ErmesDataEditor)editor).getSketchWindow();
-						  sketch.stopWaiting();
-						}
-					    });  
+    int saveType;
+ 
+    if ( document.getDocumentHandler() instanceof FtsDotPatRemoteDocumentHandler)
+      saveType = MaxFileChooser.SAVE_PAT_TYPE;
+    else
+      saveType = MaxFileChooser.SAVE_JMAX_TYPE;
 
-    file = MaxFileChooser.chooseFileToSave( window, document.getDocumentFile(), "Save As");
+    file = MaxFileChooser.chooseFileToSave( window, document.getDocumentFile(), 
+					    "Save As", saveType);
 
     if (file == null)
       return false;
@@ -195,9 +197,24 @@ public class PatcherSaveManager
 	  return false;
       }
 
-    document.bindToDocumentFile( file);
+    /////////////////////////////
+    /*document.bindToDocumentFile( file);*/
+    document.setDocumentFile( file );
+
+    MaxDocumentHandler documentHandler = null;
+
+    if ( MaxFileChooser.getSaveType() == MaxFileChooser.SAVE_PAT_TYPE)
+      documentHandler = FtsDotPatRemoteDocumentHandler.getInstance();
+    else
+      documentHandler = FtsBmaxRemoteDocumentHandler.getInstance();
+
+    document.setDocumentHandler( documentHandler);
+
+    document.setSaved( false );
+    /////////////////////////////
 
     window.setTitle( file.toString()); 
+    MaxWindowManager.getWindowManager().windowChanged(window);
 
     try
       {
@@ -206,7 +223,6 @@ public class PatcherSaveManager
       }
     catch ( MaxDocumentException e)
       {
-	  /*new ErrorDialog( window , e.getMessage());*/
 	  JOptionPane.showMessageDialog( window, e.getMessage(), 
 					"Error", JOptionPane.ERROR_MESSAGE); 
       }
@@ -216,7 +232,7 @@ public class PatcherSaveManager
   static boolean saveFromSubPatcher(EditorContainer container, MaxDocument document)
   {
     boolean saved = false;
-    
+
     if (document.canSave())
       {
 	try
@@ -226,7 +242,6 @@ public class PatcherSaveManager
 	  }
 	catch ( MaxDocumentException e)
 	  {
-	      /*new ErrorDialog( container.getFrame(), e.getMessage());*/
 	      JOptionPane.showMessageDialog(container.getFrame(), e.getMessage(), 
 					    "Error", JOptionPane.ERROR_MESSAGE); 
 	  }
@@ -248,7 +263,9 @@ public class PatcherSaveManager
     ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
 
     MaxDocument document = sketch.getDocument();
-    FtsPatcherData patcherData = sketch.getFtsPatcherData();
+    //FtsPatcherData patcherData = sketch.getFtsPatcherData();
+    FtsPatcherObject patcherData = (FtsPatcherObject)sketch.getFtsPatcher();
+    
     int saveType;
  
     if ( document.getDocumentHandler() instanceof FtsDotPatRemoteDocumentHandler)
@@ -310,7 +327,8 @@ public class PatcherSaveManager
     ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
 
     MaxDocument document = sketch.getDocument();
-    FtsPatcherData patcherData = sketch.getFtsPatcherData();
+    //FtsPatcherData patcherData = sketch.getFtsPatcherData();
+    FtsPatcherObject patcherData = (FtsPatcherObject)sketch.getFtsPatcher();
     boolean toClose=true;
 
     if(document.isRootData(patcherData) && (!document.isSaved()))
@@ -336,6 +354,7 @@ public class PatcherSaveManager
 	  if(result == JOptionPane.YES_OPTION)
 	      toClose = save(container);	  
       }
+    
     return toClose;
   }
 }

@@ -1,4 +1,4 @@
- //
+//
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -23,24 +23,35 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.actions;
+package ircam.jmax.fts;
 
-import java.awt.*;
-import java.awt.event.*;
-
+import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
 import ircam.jmax.*;
-import ircam.jmax.editors.patcher.*;
 
-import ircam.jmax.toolkit.*;
-import ircam.jmax.toolkit.actions.*;
+/** Object set class.
+ *  
+ */
 
-public class FindErrorsAction extends EditorAction
+public class FtsErrorFinderObject extends FtsObject
 {
-  public void doAction(EditorContainer container)
+  public FtsErrorFinderObject(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
   {
-    FindPanel.open(container.getEditor().getFts()).findErrors();
+      super(fts, parent, variableName, classname, "");
+  }
+  
+  public void findErrors(FtsObject context, FtsObjectSet set)
+  {
+      sendArgs[0].setObject(set);
+      sendArgs[1].setObject(context);
+      sendMessage(FtsObject.systemInlet, "error_finder_find", 2, sendArgs);
   }
 }
+
+
+
+
+
+

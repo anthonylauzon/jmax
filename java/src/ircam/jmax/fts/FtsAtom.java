@@ -37,6 +37,7 @@ public class FtsAtom {
   public static final int SYMBOL = 4;
   public static final int OBJECT = 5;
   public static final int DOUBLE = 6;
+  public static final int CONNECTION = 7;
   
   public final boolean isVoid()
   {
@@ -71,6 +72,11 @@ public class FtsAtom {
   public final boolean isObject()
   {
     return type == OBJECT;
+  }
+
+  public final boolean isConnection()
+  {
+    return type == CONNECTION;
   }
 
   public final void setVoid()
@@ -144,6 +150,17 @@ public class FtsAtom {
     objectValue = o;
   }
 
+  public final FtsConnection getConnection()
+  {
+    return connectionValue;
+  }
+
+  public final void setConnection(FtsConnection o)
+  {
+    type = CONNECTION;
+    connectionValue = o;
+  }
+
   public final Object getValue()
   {
     switch( type) {
@@ -161,6 +178,8 @@ public class FtsAtom {
       return symbolValue;
     case OBJECT:
       return objectValue;
+    case CONNECTION:
+      return connectionValue;
     }
 
     return null;
@@ -179,7 +198,13 @@ public class FtsAtom {
 		if(value instanceof String)
 		    setString((String)value);
 		else
-		    setVoid();
+		    if(value instanceof FtsObject)
+			setObject((FtsObject)value);
+		    else
+			if(value instanceof FtsConnection)
+			    setConnection((FtsConnection)value);
+			else
+			    setVoid();
     }
 
   public final float getNumberAsFloat()
@@ -192,13 +217,14 @@ public class FtsAtom {
       return (float)0.0;
   }
 
-  public int type;
-  public int intValue;
-  public float floatValue;
-  public double doubleValue;
-  public String stringValue;
-  public FtsSymbol symbolValue;
-  public FtsObject objectValue;
+    public int type;
+    public int intValue;
+    public float floatValue;
+    public double doubleValue;
+    public String stringValue;
+    public FtsSymbol symbolValue;
+    public FtsObject objectValue;
+    public FtsConnection connectionValue;
 }
 
 

@@ -41,19 +41,30 @@ import ircam.jmax.toolkit.actions.*;
 
 public class NewAction extends EditorAction
 {
+  Frame frame;
   public void doAction(EditorContainer container)
   {
-    Cursor temp = container.getFrame().getCursor();
     try
       {
-	container.getFrame().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 	MaxDocument doc = Mda.getDocumentTypeByName( "patcher").newDocument( container.getEditor().getFts());
-	if(doc!=null) doc.edit();
-	container.getFrame().setCursor(temp);
+	frame = container.getFrame();
+	if(doc!=null) 
+	    {
+		frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		doc.edit();
+		//((FtsPatcherData)doc.getRootData()).getContainerObject().requestStopWaiting(new FtsActionListener(){
+		((FtsPatcherObject)doc.getRootData()).requestStopWaiting(new FtsActionListener(){
+			public void ftsActionDone()
+			{
+			  frame.setCursor(Cursor.getDefaultCursor());
+			}
+		    });
+	    }
+	//container.getFrame().setCursor(temp);	
       }
     catch (MaxDocumentException ex)
       {
-	container.getFrame().setCursor(temp);
+	container.getFrame().setCursor(Cursor.getDefaultCursor());
 	JOptionPane.showMessageDialog(container.getFrame(), ex.toString(), 
 				      "Error", JOptionPane.ERROR_MESSAGE); 
       }

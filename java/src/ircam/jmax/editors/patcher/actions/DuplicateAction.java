@@ -41,6 +41,6 @@ public class DuplicateAction extends EditorAction
 {
   public void doAction(EditorContainer container)
   {
-    PatcherClipboardManager.clipboardManager.Duplicate(container);   
+    PatcherClipboardManager.getManager().Duplicate(container);   
   }
 }

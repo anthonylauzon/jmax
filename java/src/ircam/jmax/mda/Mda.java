@@ -46,122 +46,6 @@ import ircam.jmax.*;
 public class Mda
 {
   /*
-   * Editor factory handling
-   */
-
-  /**
-   * Store all the registered factory; the type checking is done
-   * by the factory itself, using the method "canEdit"
-   */
-     
-  private static MaxVector editorFactoryTable = new MaxVector();
-
-  /**
-   * Store all the pair data/editor; used for house keeping:
-   * avoiding double editors, closing editors when the data
-   * is destroyed and so on.
-   */
-
-  private static Hashtable dataEditorTable = new Hashtable();
-  
-  /** Register an editor factory for a given class */
- 
-  public static void installEditorFactory(MaxDataEditorFactory factory)
-  {
-    editorFactoryTable.addElement(factory);
-  }
-
-  /** Unregister an editor factory for a given class */
-
-  public static void uninstallEditorFactory(MaxDataEditorFactory factory)
-  {
-    editorFactoryTable.removeElement(factory);
-  }
-
-  /** Start an editor for a data */
-
-  public static MaxDataEditor edit(MaxData data) throws MaxDocumentException
-  {
-    return edit(data, null);
-  }
-
-  /** Start an editor for a data, specifing an editor relative "focus" point 
-   * for the editor; something to show, select highlight, center in the screen,
-   * whatever; use the method "showObject" of the MaxDataEditor interface
-   */
-
-  public static MaxDataEditor edit(MaxData data, Object where) throws MaxDocumentException
-  {
-    MaxDataEditor editor;
-
-    /* First, check if there is already an editor for the data */
-
-    editor = (MaxDataEditor) dataEditorTable.get(data);
-
-    if (editor != null)
-      {
-	editor.reEdit();
-
-	if (where != null)
-	  editor.showObject(where);
-
-	return editor;
-      }
-    
-
-    /* Not found, create a new one */
-
-    for (int i = 0; i < editorFactoryTable.size() ; i++)
-      {
-	MaxDataEditorFactory factory;
-
-	factory = (MaxDataEditorFactory) editorFactoryTable.elementAt(i);
-	
-	if (factory.canEdit(data))
-	  {
-	    editor = factory.newEditor(data);
-
-	    if (where != null)
-	      editor.showObject(where);
-
-	    // In case of document less data 
-
-	    if (data.getDocument() != null)
-	      data.getDocument().addEditedData(data);
-
-	    dataEditorTable.put(data, editor);
-
-	    editor = (MaxDataEditor) dataEditorTable.get(data);
-
-
-	    return editor;
-	  }
-      }
-
-    throw new MaxDocumentException("No editor for " + data);
-  }
-
-  /** dispose a data. Signal Mda that the data should not be used
-     anymore; for the moment, just close the associated editor.
-     */
-
-  public static void dispose(MaxData data)
-  {
-    MaxDataEditor editor;
-
-    /* First, check if there is  an editor for the data */
-
-    editor = (MaxDataEditor) dataEditorTable.get(data);
-
-    if (editor != null)
-      {
-        data.getDocument().removeEditedData(data);
-	editor.quitEdit();
-	dataEditorTable.remove(data);
-      }
-  }
-
-  /*
    * Document handlers registration service 
    */
 
@@ -214,6 +98,7 @@ public class Mda
 	    // to properly set the file and handler in the document
 
 	    newDocument = documentHandler.loadDocument(context, file);
+
 	    newDocument.setSaved(true);
 
 	    return newDocument;

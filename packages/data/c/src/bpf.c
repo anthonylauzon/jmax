@@ -32,6 +32,7 @@ fts_type_t bpf_type = 0;
 fts_class_t *bpf_class = 0;
 
 static fts_symbol_t sym_openEditor = 0;
+static fts_symbol_t sym_closeEditor = 0;
 static fts_symbol_t sym_destroyEditor = 0;
 static fts_symbol_t sym_set = 0;
 static fts_symbol_t sym_append = 0;
@@ -439,6 +440,18 @@ bpf_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   bpf_set_editor_close(this);
 }
 
+static void 
+bpf_hide_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  bpf_t *this = (bpf_t *) o;
+
+  if(bpf_editor_is_open(this))
+    {
+      bpf_set_editor_close(this);
+      fts_client_send_message((fts_object_t *)this, sym_closeEditor, 0, 0);  
+    }
+}
+
 /************************************************************
  *
  *  system methods
@@ -624,7 +637,8 @@ bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       /* graphical editor */
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), bpf_open_editor);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("close_editor"), bpf_close_editor);
-      
+      fts_method_define_varargs(cl,fts_SystemInlet, fts_new_symbol("hide"), bpf_hide_editor); 
+
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_point"), bpf_add_point_by_client_request);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("remove_points"), bpf_remove_points_by_client_request);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_points"), bpf_set_points_by_client_request);
@@ -654,6 +668,7 @@ bpf_config(void)
   bpf_type = bpf_symbol;
 
   sym_openEditor = fts_new_symbol("openEditor");
+  sym_closeEditor = fts_new_symbol("closeEditor");
   sym_destroyEditor = fts_new_symbol("destroyEditor");
   sym_set = fts_new_symbol("set");
   sym_append = fts_new_symbol("append");

@@ -47,10 +47,12 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
 
     int width = getWidth();
 
+    setDefaultWidth(MINIMUM_WIDTH);
+
     if (width == -1)
 	setWidth( DEFAULT_WIDTH);
     else if (width <= MINIMUM_WIDTH)
-	setWidth( width);
+	setWidth( MINIMUM_WIDTH);
 
     updateDimensions();
   }
@@ -155,7 +157,12 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
 	  return Settings.sharedInstance().getObjColor();
   }
 
- public void paint(Graphics g) 
+  public boolean isMultiline()
+  {
+      return false;
+  }
+
+  public void paint(Graphics g) 
   {
     int x = getX();
     int y = getY();

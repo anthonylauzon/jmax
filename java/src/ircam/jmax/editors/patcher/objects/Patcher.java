@@ -63,7 +63,7 @@ public class Patcher extends Editable implements FtsObjectErrorListener
   public void errorChanged(boolean value) 
   {
     errorsInside = value;
-    redraw();
+    //redraw();
   }
 
   public void redefine( String text) 
@@ -77,11 +77,8 @@ public class Patcher extends Editable implements FtsObjectErrorListener
   public void editContent()
   {
     itsSketchPad.waiting();
-
-    ftsObject.getFts().editPropertyValue(ftsObject, new MaxDataEditorReadyListener() {
-      public void editorReady(MaxDataEditor editor)
-	{itsSketchPad.stopWaiting();}
-    });
+    ftsObject.sendMessage(FtsObject.systemInlet, "open_editor");
+    ftsObject.getParent().requestStopWaiting(null);
   }
 
   public boolean hasContent()
@@ -123,16 +120,21 @@ public class Patcher extends Editable implements FtsObjectErrorListener
 
   public Color getTextBackground()
   {
-    if (errorsInside)
+      /*if (errorsInside)
 	if (isSelected()) 
-	    return Color.pink.darker();
+	return Color.pink.darker();
 	else
-	    return Color.pink;
-    else
-	if (isSelected()) 
-	    return Settings.sharedInstance().getObjColor().darker();
-	else 
-	    return Settings.sharedInstance().getObjColor();
+	return Color.pink;
+	else*/
+      if (isSelected()) 
+	  return Settings.sharedInstance().getObjColor().darker();
+      else 
+	  return Settings.sharedInstance().getObjColor();
+  }
+
+  public boolean isMultiline()
+  {
+    return true;
   }
 
   // ----------------------------------------
@@ -149,16 +151,16 @@ public class Patcher extends Editable implements FtsObjectErrorListener
 
   public void paint( Graphics g) 
   {
-      if (errorsInside)
-	  if (isSelected())
-	      g.setColor( Color.pink.darker());
-	  else
-	      g.setColor( Color.pink);
-      else
-	  if (isSelected())
-	      g.setColor( Settings.sharedInstance().getObjColor().darker());
-	  else 
-	      g.setColor( Settings.sharedInstance().getObjColor());
+      /*if (errorsInside)
+	if (isSelected())
+	g.setColor( Color.pink.darker());
+	else
+	g.setColor( Color.pink);
+	else*/
+      if (isSelected())
+	  g.setColor( Settings.sharedInstance().getObjColor().darker());
+      else 
+	  g.setColor( Settings.sharedInstance().getObjColor());
 
       g.fill3DRect( getX() + 1, getY() + 1, getWidth() - 2, getHeight() - 2, true);
       g.draw3DRect( getX() + 2, getY() + 2, getWidth() - 5, getHeight() - 5, false);

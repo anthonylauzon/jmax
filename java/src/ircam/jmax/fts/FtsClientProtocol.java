@@ -46,7 +46,7 @@ class FtsClientProtocol
   static final int symbol_code          = 0x07;
   static final int object_code          = 0x08;
   static final int connection_code      = 0x09;
-  static final int data_code            = 0x0a;
+    /*static final int data_code            = 0x0a;*/
   static final int end_of_message       = 0x0b;
   
   // predicated coding protocol character sets
@@ -60,7 +60,7 @@ class FtsClientProtocol
 	    (c == symbol_and_def_code)   ||
 	    (c == object_code)   ||
 	    (c == connection_code) || 
-	    (c == data_code)   ||
+	    /*(c == data_code)   ||*/
 	    (c == string_code) ||
 	    (c == end_of_message)
 	     );
@@ -100,7 +100,7 @@ class FtsClientProtocol
   static final int post_cmd = 'h';
   static final int post_line_cmd = 'L';
 
-  static final int remote_call = '!';
+    /*static final int remote_call = '!';*/
 
   static final int fts_save_patcher_bmax_cmd = 'S';
 
@@ -118,6 +118,7 @@ class FtsClientProtocol
 
   static final int fts_new_object_cmd = 'n';
   static final int fts_new_object_var_cmd = 'N';
+  static final int fts_new_template_instance_cmd = 'T';
   static final int fts_delete_object_cmd = 'f';
 
   static final int fts_redefine_patcher_cmd = 'Q';
@@ -129,7 +130,7 @@ class FtsClientProtocol
 
   static final int fts_release_connection_cmd = 'd';
   static final int fts_release_object_cmd = 'l';
-  static final int fts_release_object_data_cmd = 'b';
+    /*static final int fts_release_object_data_cmd = 'b';*/
 
   static final int fts_message_cmd = 'm';
 
@@ -181,6 +182,8 @@ class FtsClientProtocol
 	return "fts_new_object";
       case 'N':
 	return "fts_new_object_var";
+      case 'T':
+	return "fts_new_template_instance";
       case 'Q':
 	return "fts_redefine_patcher";
       case 'R':
@@ -197,8 +200,8 @@ class FtsClientProtocol
 	return "fts_release_connection";
       case 'l':
 	return "fts_release_object";
-      case 'b':
-	return "fts_release_object_data_cmd";
+	/*case 'b':
+	  return "fts_release_object_data_cmd";*/
       case 'm':
 	return "fts_message";
       case 'q':
@@ -215,8 +218,8 @@ class FtsClientProtocol
 	return "fts_update_group_start";
       case '}':
 	return "fts_update_group_end";
-      case '!':
-	return "fts_remote_call";
+	/*case '!':
+	  return "fts_remote_call";*/
       default:
 	return "(unknown command: " + String.valueOf((char) command) + " )";
       }

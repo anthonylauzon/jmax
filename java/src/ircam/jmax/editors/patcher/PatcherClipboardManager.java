@@ -46,7 +46,7 @@ import javax.swing.*;
 
 public class PatcherClipboardManager implements ClipboardOwner
 {
-  public static PatcherClipboardManager clipboardManager;
+  public static PatcherClipboardManager clipboardManager = null;
   
   private static FtsClipboard ftsClipboard;
   
@@ -78,6 +78,13 @@ public class PatcherClipboardManager implements ClipboardOwner
       clipboardManager = new PatcherClipboardManager();
   }
 
+  public static PatcherClipboardManager getManager()
+  {
+      if(clipboardManager == null)
+	  createManager();
+      return clipboardManager;
+  }
+
   /****************************************************************************/
   /*                                                                          */
   /*   ACTIONS                                                                */
@@ -96,11 +103,14 @@ public class PatcherClipboardManager implements ClipboardOwner
 	Cursor temp = container.getFrame().getCursor();
 	container.getFrame().setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
-	MaxApplication.systemClipboard.setContents(ErmesSelection.patcherSelection, this);
+	if(!ErmesSelection.patcherSelection.isObjectsEmpty())
+	  {
+	    MaxApplication.systemClipboard.setContents(ErmesSelection.patcherSelection, this);
 
-	ftsClipboard.copy(sketch.getFts().getSelection());
-	sketch.setLastCopyCount(ftsClipboard.getCopyCount());
-	sketch.resetPaste(-1);
+	    ftsClipboard.copy(sketch.getFts().getSelection());
+	    sketch.setLastCopyCount(ftsClipboard.getCopyCount());
+	    sketch.resetPaste(-1);
+	  }
 	ErmesSelection.patcherSelection.redraw();
 	ErmesSelection.patcherSelection.deleteAll();
 
@@ -116,7 +126,7 @@ public class PatcherClipboardManager implements ClipboardOwner
 	sketch.copyText();
       }
     else 
-      if (ErmesSelection.patcherSelection.ownedBy(sketch)&&!ErmesSelection.patcherSelection.isEmpty())
+      if (ErmesSelection.patcherSelection.ownedBy(sketch)&&!ErmesSelection.patcherSelection.isObjectsEmpty())
 	{
 	  Cursor temp = container.getFrame().getCursor();
 	  container.getFrame().setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
@@ -183,7 +193,7 @@ public class PatcherClipboardManager implements ClipboardOwner
 
 	    ftsClipboard.paste( sketch.getFtsPatcher());
 	    
-	    sketch.getFtsPatcherData().update();
+	    sketch.getFtsPatcher().update();
     
 	    sketch.getFts().sync();
 
@@ -295,7 +305,7 @@ public class PatcherClipboardManager implements ClipboardOwner
   {
     sketch = (ErmesSketchPad)container.getEditor();
 
-    if((!ErmesSelection.patcherSelection.ownedBy(sketch))||(ErmesSelection.patcherSelection.isEmpty()))
+    if((!ErmesSelection.patcherSelection.ownedBy(sketch))||(ErmesSelection.patcherSelection.isObjectsEmpty()))
       return;
 
     Copy(container); 

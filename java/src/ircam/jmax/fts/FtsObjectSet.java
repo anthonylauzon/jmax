@@ -42,23 +42,15 @@ public class FtsObjectSet extends FtsObject implements ListModel
 
   class ObjectSetEditListener implements FtsEditListener
   {
-    public void objectAdded(FtsObject object)
-    {
-    }
-
+    public void objectAdded(FtsObject object){}
     public void objectRemoved(FtsObject object)
     {
       list.removeElement(object);
       fireListChanged();
     }
-
-    public void connectionAdded(FtsConnection connection)
-    {
-    }
-
-    public void connectionRemoved(FtsConnection connection)
-    {
-    }
+    public void connectionAdded(FtsConnection connection){}
+    public void connectionRemoved(FtsConnection connection){}
+    public void atomicAction(boolean active){}      
   }
 
   public FtsObjectSet(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
@@ -97,10 +89,10 @@ public class FtsObjectSet extends FtsObject implements ListModel
   }
   private void fireListChanged()
   {
-      ListDataEvent evt = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, getSize());
-      for(Enumeration e = dataListeners.elements(); e.hasMoreElements();)
-	  ((ListDataListener)e.nextElement()).contentsChanged(evt);
-  }
+	ListDataEvent evt = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, getSize());
+	for(Enumeration e = dataListeners.elements(); e.hasMoreElements();)
+	    ((ListDataListener)e.nextElement()).contentsChanged(evt);
+    }
 
   /* SERVER CALLBACK */
   public void clear(int nArgs , FtsAtom args[])
@@ -118,51 +110,6 @@ public class FtsObjectSet extends FtsObject implements ListModel
   public void remove(int nArgs , FtsAtom args[])
   {
       list.removeElement((FtsObject)args[0].getObject());
-  }
-
-  /* Client to server queries */
-
-  public void find(FtsObject context, String name)
-  {
-      sendArgs[0].setObject(context);
-      sendArgs[1].setString(name);
-      sendMessage(FtsObject.systemInlet, "objectset_find", 2, sendArgs);
-  }
-
-  public void find(FtsObject context, Object values[])
-  {
-      sendArgs[0].setObject(context);
-      int i=0;
-      for(i=0; i<values.length && i<sendArgs.length-1; i++)
-	  sendArgs[i+1].setString((String)values[i]);
-      
-      sendMessage(FtsObject.systemInlet, "objectset_find", i+1, sendArgs);
-  }
-
-
-  public void find(FtsObject context, MaxVector values)
-  {
-      sendArgs[0].setObject(context);
-      int i=0;
-   
-      for(i=0; i<values.size() && i<sendArgs.length-1; i++)
-	  sendArgs[i+1].setString((String)values.elementAt(i));
-      
-      sendMessage(FtsObject.systemInlet, "objectset_find", i+1, sendArgs);
-  }
-
-
-  public void findErrors(FtsObject context)
-  {
-      sendArgs[0].setObject(context);
-      sendMessage(FtsObject.systemInlet, "objectset_find_errors", 1, sendArgs);
-  }
-
-
-  public void findFriends(FtsObject target)
-  {
-      sendArgs[0].setObject(target);
-      sendMessage(FtsObject.systemInlet, "objectset_find_friends", 1, sendArgs);
   }
 }
 

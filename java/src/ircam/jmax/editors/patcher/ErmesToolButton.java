@@ -134,7 +134,12 @@ class ErmesToolButton extends JToggleButton
 		Dimension bestSize = Toolkit.getDefaultToolkit().getBestCursorSize(image.getWidth(this), image.getHeight(this));
 		BufferedImage bi = new BufferedImage(bestSize.width, bestSize.height, BufferedImage.TYPE_INT_ARGB);
 		bi.createGraphics().drawImage(image, 0, 0, this);
-		Cursor cursor = Toolkit.getDefaultToolkit().createCustomCursor(bi, new Point(0,1), description+" cursor");    
+		
+		Point hs;
+		if(bi.getHeight(this)<1) hs = new Point(0,0);
+		else hs = new Point(0, 1);
+		
+		Cursor cursor = Toolkit.getDefaultToolkit().createCustomCursor(bi, /*new Point(0,1)*/hs, description+" cursor");    
 		Cursors.loadCursor(description, cursor);        
 	    }
 	addMouseListener(ErmesToolButton.mListener);

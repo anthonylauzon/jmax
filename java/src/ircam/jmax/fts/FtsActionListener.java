@@ -20,26 +20,12 @@
 // 
 // Based on Max/ISPW by Miller Puckette.
 //
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+// Authors: Riccardo Borghesi, Francois Dechelle, Norbert Schnell.
 // 
 
-package ircam.jmax.mda;
+package ircam.jmax.fts;
 
-/** 
- * Listener for an editor to be ready.
- * An Editor may be create asynchoniously; what happen
- * is that an MaxDataEditor is created immediately, and the 
- * real editor can be created later; a MaxDataEditorReadyListener
- * is an object that want to be informed when the editor is ready.
- * Usually of limited use, tipically to show a "wait" mouse cursor
- * while the editor is built.
- */
-
-public interface MaxDataEditorReadyListener
+public interface FtsActionListener
 {
-  public abstract void editorReady(MaxDataEditor editor);
+  public void ftsActionDone();
 }
-
-
-
-

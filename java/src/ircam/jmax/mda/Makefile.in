@@ -77,10 +77,11 @@ VERSION = @VERSION@
 
 EXTRA_DIST = package.html
 noinst_PROGRAMS = package
-package_SOURCES =  AbstractMaxDataEditor.java MaxContext.java MaxData.java MaxDataEditor.java MaxDataEditorFactory.java MaxDataEditorReadyListener.java MaxDocument.java MaxDocumentException.java MaxDocumentHandler.java MaxDocumentListener.java MaxDocumentType.java MaxEnv.java MaxExecutedScriptDocument.java MaxScriptDocument.java Mda.java
+package_SOURCES =  MaxContext.java MaxData.java MaxDocument.java MaxDocumentException.java MaxDocumentHandler.java MaxDocumentListener.java MaxDocumentType.java MaxEnv.java MaxExecutedScriptDocument.java MaxScriptDocument.java Mda.java
 
 
 JAVACX = @JAVACX@
+JAVACFLAGSX = @JAVACFLAGSX@
 JAVAROOTX = @top_srcdir@/java/src
 CLASSPATH_ENVX = CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/java/lib/jacl/jacl.jar:@top_srcdir@/java/lib/jacl/tcljava.jar
 
@@ -95,9 +96,7 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../../../../include
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-package_OBJECTS =  AbstractMaxDataEditor.class MaxContext.class \
-MaxData.class MaxDataEditor.class MaxDataEditorFactory.class \
-MaxDataEditorReadyListener.class MaxDocument.class \
+package_OBJECTS =  MaxContext.class MaxData.class MaxDocument.class \
 MaxDocumentException.class MaxDocumentHandler.class \
 MaxDocumentListener.class MaxDocumentType.class MaxEnv.class \
 MaxExecutedScriptDocument.class MaxScriptDocument.class Mda.class

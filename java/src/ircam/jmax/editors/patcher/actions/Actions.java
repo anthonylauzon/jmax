@@ -92,7 +92,6 @@ public class Actions
   public static EditorAction duplicateAction = new DuplicateAction();
   public static EditorAction selectAllAction = new SelectAllAction();
   public static EditorAction findAction      = new FindAction();
-  public static EditorAction findErrorsAction= new FindErrorsAction();
   public static EditorAction inspectAction   = new InspectAction();
   public static EditorAction lockAction      = new LockAction();
 

@@ -53,7 +53,7 @@ fts_symbol_t fts_cmd_args_get( fts_symbol_t name)
   fts_set_symbol( &k, name);
   if (fts_hashtable_get( &cmd_args, &k, &v))
     return fts_get_symbol( &v);
-
+  
   return 0;
 }
 
@@ -167,8 +167,8 @@ extern void fts_kernel_property_init( void);
 extern void fts_kernel_package_init( void);
 extern void fts_kernel_doctor_init( void);
 extern void fts_kernel_connection_init( void);
-extern void fts_kernel_oldftsdata_init( void);
-extern void fts_kernel_oldpatcherdata_init( void);
+/*extern void fts_kernel_oldftsdata_init( void);
+  extern void fts_kernel_oldpatcherdata_init( void);*/
 extern void fts_kernel_variable_init( void);
 extern void fts_kernel_patcher_init( void);
 extern void fts_kernel_expression_init( void);
@@ -199,8 +199,8 @@ static void fts_kernel_init( void)
   fts_kernel_package_init();
   fts_kernel_doctor_init();
   fts_kernel_connection_init();
-  fts_kernel_oldftsdata_init();
-  fts_kernel_oldpatcherdata_init();
+  /*fts_kernel_oldftsdata_init();*/
+  /*fts_kernel_oldpatcherdata_init();*/
   fts_kernel_variable_init();
   fts_kernel_patcher_init();
   fts_kernel_expression_init();
