@@ -64,6 +64,16 @@ public class TableRenderer extends AbstractRenderer implements Layer{
     g.fillRect( x, startY, width, height);
   }
 
+  public void drawPixSolidPoint( Graphics g, int x, int topy, int bottomy)
+  {
+    int width = (int)( gc.getAdapter().getXZoom());
+    int height = topy-bottomy;
+    
+    if (width < 1) width = 1;
+    
+    g.fillRect( x, topy, width, height);
+  }
+
   public void drawHollowPoint( Graphics g, int x, int y)
   {
     int width = (int)( gc.getAdapter().getXZoom());
@@ -73,6 +83,18 @@ public class TableRenderer extends AbstractRenderer implements Layer{
     if (height == 0) height = 1;
 
     g.fillRect(x,  y, width, height);
+  }
+
+  public void drawPixHollowPoint( Graphics g, int x, int topy, int bottomy)
+  {
+    int width = (int)( gc.getAdapter().getXZoom());
+    int height = (int) gc.getAdapter().getYZoom();
+    
+    if (width < 1) width = 1;    
+    if (height == 0) height = 1;
+
+    g.fillRect(x,  topy, width, height);
+    g.fillRect(x,  bottomy, width, height);
   }
   /**
    * From the Layer interface: renders the content of the table (except the
@@ -123,13 +145,22 @@ public class TableRenderer extends AbstractRenderer implements Layer{
       }
     else
       {
+	/*int pixSize = gc.getFtsObject().getPixelsSize();	      
+	  if( itsMode == SOLID)
+	  for (int i = 0 ; i < pixSize; i++)
+	  drawSolidPoint( g, i, gc.getAdapter().getY(gc.getFtsObject().getPixel(i)), zero);
+	  else
+	  for (int i = 0; i < pixSize; i++)
+	  drawHollowPoint( g, i, gc.getAdapter().getY(gc.getFtsObject().getPixel(i)));*/	
 	int pixSize = gc.getFtsObject().getPixelsSize();	      
 	if( itsMode == SOLID)
-	  for (int i = 0 ; i < pixSize; i++)
-	    drawSolidPoint( g, i, gc.getAdapter().getY(gc.getFtsObject().getPixel(i)), zero);
+	  for (int i = 0 ; i < pixSize-1; i+=2)
+	    drawPixSolidPoint( g, i, gc.getAdapter().getY(gc.getFtsObject().getPixel(i)), 
+			       gc.getAdapter().getY(gc.getFtsObject().getPixel(i+1)));
 	else
-	  for (int i = 0; i < pixSize; i++)
-	    drawHollowPoint( g, i, gc.getAdapter().getY(gc.getFtsObject().getPixel(i)));	
+	  for (int i = 0; i < pixSize-1; i+=2)
+	    drawPixHollowPoint( g, i, gc.getAdapter().getY(gc.getFtsObject().getPixel(i)), 
+				gc.getAdapter().getY(gc.getFtsObject().getPixel(i+1)));
       }
     
     g.setColor( Color.red);
