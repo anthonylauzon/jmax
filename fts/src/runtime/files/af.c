@@ -347,6 +347,7 @@ int fts_soundfile_read_float(fts_soundfile_t *soundfile, float *buffer, int size
 
       if ((sampfmt == AF_SAMPFMT_TWOSCOMP) && (sampwidth == 16))
 	{
+	  int read_size;
 	  short buf[READ_BLOCK_SIZE];
 
 	  read = 0;
@@ -355,10 +356,13 @@ int fts_soundfile_read_float(fts_soundfile_t *soundfile, float *buffer, int size
 	    {
 	      int i, n;
 
-	      n = afReadFrames(soundfile->af_handle, AF_DEFAULT_TRACK, (void *)buf,
-			       (size > READ_BLOCK_SIZE ? READ_BLOCK_SIZE : size));
+	      read_size = size > READ_BLOCK_SIZE ? READ_BLOCK_SIZE : size;
 
-	      if (n < 0)
+	      n = afReadFrames(soundfile->af_handle, AF_DEFAULT_TRACK, (void *)buf, read_size);
+
+	      /* Exit in errors */
+
+	      if (n <= 0)
 		return read;
 		
 	      /* Convert to float */
@@ -366,9 +370,15 @@ int fts_soundfile_read_float(fts_soundfile_t *soundfile, float *buffer, int size
 	      for (i = 0; i < n; i++)
 		buffer[read++] =  ((float) buf[i] / 32768.0f);
 
+
+	      /* Exit in eofs */
+
+	      if (n < read_size)
+		return read;
+
 	      /* Update the counter */
 
-	      size -=n;
+	      size -= n;
 	    }
 
 	  return read;
@@ -416,7 +426,7 @@ int fts_soundfile_write_float(fts_soundfile_t *soundfile, float *buffer, int siz
 
 	      n = afWriteFrames(soundfile->af_handle, AF_DEFAULT_TRACK, (void *)buf, frames);
 
-	      if (n < 0)
+	      if (n <= 0)
 		return wrote;
 
 	      /* Update the counter */
