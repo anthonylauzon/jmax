@@ -30,7 +30,7 @@ ucs load module data $dir/c/lib/$jmaxArch/$jmaxMode/libdata.so
 
 # load client java class
 java::load -classpath "$dir/java/classes" ircam.jmax.editors.bpf.BpfExtension
-java::load -classpath "$dir/java/classes" ircam.jmax.editors.table.TableExtension
+# java::load -classpath "$dir/java/classes" ircam.jmax.editors.table.TableExtension
 
 # load the help patch data base
 sourceFile $dir/help/data.help.index.tcl
