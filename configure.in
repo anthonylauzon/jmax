@@ -22,6 +22,11 @@ fi
 AC_ISC_POSIX
 AC_PROG_INSTALL
 
+dnl Check for libtool
+AC_LIBTOOL_DLOPEN
+AM_PROG_LIBTOOL
+
+dnl should go in platform (or at least to compiler) conditionned places
 CFLAGS="-Wall -Wno-unused"
 
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -46,6 +51,15 @@ case "$check_memory" in
   ;;
 esac
 
+dnl Check for libtool version
+dnl Carefull: the character set of the shell is eaten by m4, so we must change quoting
+dnl (autoconf manual, section 7.3 quoting)
+changequote(<<,>>)dnl
+libtool_minor_version=`$SHELL ./ltconfig --version | sed 's/.* 1\.\([0-9]\)\..*/\1/'`
+changequote([,])dnl
+if test "$libtool_minor_version" -lt 4 ; then DOT_LIBS=-L.libs; fi
+AC_SUBST(DOT_LIBS)
+
 dnl Check for platform
 AC_CANONICAL_HOST
 case "$host" in
@@ -59,14 +73,12 @@ i*86-pc-linux-gnu)
 mips-sgi-irix6.5)
     PLATFORM=sgi ;
     PLATFORM_PACKAGES="sgi unixdtd" ;
-    DOT_LIBS=-L.libs
     FTS_SYS_LIBS="-ldl -laudiofile";
     ;;
 powerpc-apple-darwin*)
     PLATFORM=macosx ;
     dnl Hack for problem of restrict finding (cc makes an error but does not return correct error code)
     AC_DEFINE(restrict,)
-    DOT_LIBS=-L.libs
     PLATFORM_PACKAGES="macosx"  ;;
 esac
 
@@ -94,16 +106,11 @@ dnl Checks for library functions.
 AC_FUNC_ALLOCA
 AC_CHECK_FUNCS(socket)
 
-dnl Check for libtool
-AC_LIBTOOL_DLOPEN
-AM_PROG_LIBTOOL
-
 AM_CONDITIONAL(MACOSX, echo "$host" | grep powerpc-apple-darwin)
 
 AC_SUBST(PLATFORM)
 AC_SUBST(PLATFORM_PACKAGES)
 AC_SUBST(FTS_SYS_LIBS)
-AC_SUBST(DOT_LIBS)
 
 dnl Check installation directories
 if test "x${prefix}" = "xNONE"; then
