@@ -364,6 +364,12 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 	  }
       }
   }
+
+  /** TrackDataListener interface */
+  public void trackCleared() 
+  {
+      deselectAll();
+  }
     public void trackNameChanged(String oldName, String newName){}
 
   /** Transferable interface */
@@ -407,24 +413,22 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 
     public void deleteAll()
     {
-	/*if(size()==itsModel.length())
-	  {			
-	  deselectAll();
-	  itsModel.removeAllEvents();			    
-	  }
-	  else
-	  {*/
-	MaxVector v = new MaxVector();		    
-	for (Enumeration en = getSelected(); en.hasMoreElements();)
-	    v.addElement(en.nextElement());
+	if(size()==itsModel.length())
+	    {			
+		deselectAll();
+		((FtsTrackObject)itsModel).requestClearTrack();			    
+	    }
+	else
+	    {
+		MaxVector v = new MaxVector();		    
+		for (Enumeration en = getSelected(); en.hasMoreElements();)
+		    v.addElement(en.nextElement());
 
-	deselectAll();
+		deselectAll();
 
-	/*for (int i = 0; i< v.size(); i++)
-	  itsModel.removeEvent((TrackEvent)(v.elementAt(i)));*/
-	itsModel.removeEvents(v.elements());
-	v = null;
-	// }
+		itsModel.removeEvents(v.elements());
+		v = null;
+	    }
     }
 
     public void selectNext()

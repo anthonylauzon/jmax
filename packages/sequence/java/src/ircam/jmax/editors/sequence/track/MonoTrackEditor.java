@@ -27,6 +27,7 @@
 package ircam.jmax.editors.sequence.track;
 
 import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.PopupToolbarPanel;
 import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.menus.*;
 import ircam.jmax.toolkit.*;
@@ -55,6 +56,7 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 
 	itsTrack.getTrackDataModel().addListener(new TrackDataListener() {
 	    public void objectDeleted(Object whichObject, int oldIndex) {MonoTrackEditor.this.repaint();}
+	    public void trackCleared() {MonoTrackEditor.this.repaint();}
 	    public void objectAdded(Object whichObject, int index) {
 		updateNewObject(whichObject);
 		updateRange(whichObject);

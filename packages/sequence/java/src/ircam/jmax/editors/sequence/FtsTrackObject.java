@@ -129,21 +129,76 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     setDirty();
   }
 
+  public void clear(int nArgs , FtsAtom args[])
+  {
+    while(events_fill_p != 0)
+	{
+	    if (isInGroup())
+		postEdit(new UndoableDelete(events[0]));
+	    
+	    deleteRoomAt(0);	    
+	}
+    notifyTrackCleared();
+
+    endUpdate();
+    setDirty();
+  }
+
   public void moveEvents(int nArgs , FtsAtom args[])
   {
-     TrackEvent evt;
-     double time;
+      /*TrackEvent evt;
+	double time;
 
-     for(int i=0; i<nArgs; i+=2)
-      {
+	for(int i=0; i<nArgs; i+=2)
+	{
 	evt  = (TrackEvent)(args[i].getObject());
 	time = (double)(args[i+1].getFloat());
 	evt.moveTo(time);
-      }     
+	}
+	endUpdate();      
+	setDirty();
+      */     
 
-     endUpdate();
-     
-     setDirty();
+      TrackEvent evt;
+      int oldIndex, newIndex;
+      double time;
+      double maxTime = 0.0;
+      TrackEvent maxEvent = null;
+      int maxOldIndex = 0; int maxNewIndex = 0;
+      for(int i=0; i<nArgs; i+=2)
+	  {
+	      evt  = (TrackEvent)(args[i].getObject());
+	      oldIndex = indexOf(evt);
+	      deleteRoomAt(oldIndex);
+	      time = (double)(args[i+1].getFloat());
+
+	      if (isInGroup())
+		  postEdit(new UndoableMove(evt, time));
+	      
+	      evt.setTime(time);
+	      
+	      newIndex = getIndexAfter(time);	
+	      if (newIndex == EMPTY_COLLECTION)
+		  newIndex = 0;
+	      else if (newIndex == NO_SUCH_EVENT)
+		  newIndex = events_fill_p;
+	
+	      makeRoomAt(newIndex);
+	      events[newIndex] = evt;
+
+	      if(time >maxTime)
+		  { 
+		      maxTime = time;
+		      maxEvent = evt;
+		      maxOldIndex = oldIndex;
+		      maxNewIndex = newIndex;
+		  }
+	  }
+      if(nArgs>0)
+	  notifyObjectMoved(maxEvent, maxOldIndex, maxNewIndex);
+
+      endUpdate();      
+      setDirty();
   }  
 
   public void setName(int nArgs , FtsAtom args[])
@@ -264,6 +319,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 		      i=0;
 		      sendArgs[i].setObject(aEvent);
 		      sendArgs[i+1].setDouble(a.getInvX(a.getX(aEvent)+deltaX));		      
+		      i+=2;
 		  }
 	  }
       
@@ -275,6 +331,11 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
   {
     sendArgs[0].setString(newName); 
     sendMessage(FtsObject.systemInlet, "set_name", 1, sendArgs);
+  }    
+
+  public void requestClearTrack()
+  {
+    sendMessage(FtsObject.systemInlet, "clear_track", 0, null);
   }    
 
   public void export()
@@ -601,7 +662,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     public void removeAllEvents()
     {
 	while(events_fill_p != 0)
-	    removeEvent(events[0]);
+	  removeEvent(events[0]);
     }
 
     private void removeEventAt(int removeIndex)
@@ -651,6 +712,11 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     {
 	for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
 	    ((TrackDataListener) e.nextElement()).trackNameChanged(oldName, newName);
+    }
+    private void notifyTrackCleared()
+    {
+	for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+	    ((TrackDataListener) e.nextElement()).trackCleared();
     }
     private void notifyObjectMoved(Object spec, int oldIndex, int newIndex)
     {
@@ -947,8 +1013,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	}
 	
 	public Object nextElement()
-	{
-	    
+	{	    
 	    return nextObject;
 	}
 	

@@ -122,7 +122,7 @@ public class ScoreBackground implements Layer{
       g.drawString(""+127, 10, SC_TOP+3-delta);
       
       // the track name
-      g.setFont(ToggleBar.toggleBarFont);
+      g.setFont(backFont);
       g.drawString(gc.getTrack().getName(), /*10*/2, 10);
 
       // the piano keys...
@@ -311,6 +311,7 @@ public class ScoreBackground implements Layer{
     public static final int SC_TOP = 28;
 
     public static final Color OUT_RANGE_COLOR = new Color(230, 230, 230);
+    public static Font backFont = new Font("monospaced", Font.PLAIN, 10);
 }
 
 

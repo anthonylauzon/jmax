@@ -72,6 +72,7 @@ public class ToggleBar extends PopupToolbarPanel
 		public void objectAdded(Object spec, int index){}
 		public void objectsAdded(int maxTime){}
 		public void objectDeleted(Object whichObject, int index){}
+		public void trackCleared(){}
 		public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
 		public void trackNameChanged(String oldName, String newName)
 		{

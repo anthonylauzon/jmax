@@ -69,6 +69,14 @@ class SequenceTableDialog extends JDialog implements TrackDataListener/*, TrackL
 	validate();
 	pack();
     }
+
+    public void trackCleared() 
+    {
+	getContentPane().validate();
+	tabPanel.validate();
+	validate();
+	pack();
+    }
     
     public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
     public void trackNameChanged(String oldName, String newName){};

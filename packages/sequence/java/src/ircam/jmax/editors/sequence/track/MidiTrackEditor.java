@@ -42,7 +42,7 @@ import javax.swing.event.*;
 /**
  * A view for a Midi sequence (sequence composed of events whose Value field is
  * a Midi value) */
-public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSelectionListener, PopupProvider, TrackEditor
+public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSelectionListener, ircam.jmax.toolkit.PopupProvider, TrackEditor
 {
     public MidiTrackEditor(Geometry geometry, Track track)
     {
@@ -217,6 +217,11 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     {
 	repaint();
     }
+
+    public void trackCleared() 
+    {
+	repaint();
+    }
     
     public void objectMoved(Object whichObject, int oldIndex, int newIndex) 
     {
@@ -355,7 +360,7 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	itsScore.repaint();
     }
 
-    class ScorePanel extends PopupToolbarPanel
+    class ScorePanel extends ircam.jmax.toolkit.PopupToolbarPanel
     {
 	MidiTrackEditor editor;
 	ScorePanel(MidiTrackEditor editor)

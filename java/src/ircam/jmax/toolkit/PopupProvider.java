@@ -1,5 +1,5 @@
 
-package ircam.jmax.editors.sequence;
+package ircam.jmax.toolkit;
 
 import javax.swing.*;
 

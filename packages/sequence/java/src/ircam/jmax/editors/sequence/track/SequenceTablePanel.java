@@ -112,6 +112,10 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 	{
 	    table.revalidate();
 	}
+      public void trackCleared()
+	{
+	    table.revalidate();
+	}
       public void trackNameChanged(String oldName, String newName) {}
     });
   }

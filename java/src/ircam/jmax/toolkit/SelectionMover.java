@@ -133,5 +133,4 @@ abstract public class SelectionMover extends InteractionModule implements XORPai
   public static final int GROUP_DRAG = 1;
   public static final int HORIZONTAL_MOVEMENT = 1;
   public static final int VERTICAL_MOVEMENT = 2;
-
 }
