@@ -135,6 +135,13 @@ static void dtd_open( int fifo_number, const char *arg)
 
   fifo = dtd_handle_table[fifo_number].fifo;
 
+  file = dtd_handle_table[fifo_number].file;
+  if ( file != AF_NULL_FILEHANDLE)
+    {
+      afCloseFile( file);
+      dtd_handle_table[fifo_number].file = AF_NULL_FILEHANDLE;
+    }
+
   dtdfifo_set_state( fifo, FIFO_INACTIVE);
 
   file = afOpenFile( arg, "r", 0);

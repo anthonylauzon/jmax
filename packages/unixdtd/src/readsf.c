@@ -188,9 +188,9 @@ static void readsf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
       return;
     }
 
-  dtdserver_open( this->fifo, filepath);
-
   this->state = dtd_pause;
+
+  dtdserver_open( this->fifo, filepath);
 }
 
 static void readsf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -258,7 +258,10 @@ static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   fts_method_define_optargs(cl, 0, fts_new_symbol("open"),  readsf_open, 3, a, 0);
 
   fts_method_define( cl, 0, fts_new_symbol("play"), readsf_play, 0, 0);
+  fts_method_define( cl, 0, fts_new_symbol("start"), readsf_play, 0, 0);
+
   fts_method_define( cl, 0, fts_new_symbol("pause"), readsf_pause, 0, 0);
+
   fts_method_define( cl, 0, fts_new_symbol("close"), readsf_close, 0, 0);
 
   a[0] = fts_s_int;
