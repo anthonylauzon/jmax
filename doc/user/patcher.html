@@ -181,39 +181,55 @@ of object which can be instantiated in the patcher window:
 
 <P>
 Adding an object is done by clicking on a toolbar button: this selects the corresponding 
-object for insertion in the patch. A subsequent click in the patch area adds it. 
+object for insertion in the patch. When in "Adding ..." mode, mouse clicks are
+interpreted the following way:
+<ul>
+<li> CLICK adds the object at the chosen location and returns the patch editor to normal mode
+<li> SHIFT-CLICK adds the object and leaves the patch editor in "Adding ..." mode, allowing
+to add easily multiple instances of the same object without reselecting the toolbar
+</ul>
+
+<p>
 A difference with Max/ISPW is that there is no need to drag the object from the palette.
 
-<P>
-A double click on a button of the toolbar
-&quot;locks&quot; it, so multiple instances can be added without
-reselecting. Another click in the toolbar deselect the locked one, as well
-as a click on an object and/or connection in the patch.
 
 <P>
 <A NAME="connecting">
 <HR>
 <h2>Connecting Objects</h2>
 
-<P>
-Connecting two objects is done by clicking on an outlet, then dragging
-to an inlet and releasing it. Note that the mouse changes its
-shape when moved over a starting outlet or (dragged over) a destination
-inlet, and that the sensible area where to start (or end) a connection
-is always inside the objects itself, spanning over a greater surface.</LI>
+
+<p>
+Connecting two objects can be is done by clicking on an outlet (resp. an outlet), 
+then dragging or moving the mouse to an inlet (resp. outlet). The connection is
+done when releasing (if dragging) or clicking (if moving) on an inlet (resp. an outlet).
+
+<p>
+<strong>Note:</strong> connection can be done from an outlet to an inlet (the "classical"
+way) or from an inlet to an outlet. It can be done by dragging or by clicking.
+
+<p>
+Multiple connections can be done by clicking on an outlet (resp. an inlet). Subsequent
+mouse clicks will be interpreted this way:
+<ul>
+<li> SHIFT-clicking on an inlet (resp. an outlet) will do the connection
+and leave the patch editor in connection mode
+<li> clicking on an inlet (resp. an outlet) will do the connection
+and return the patch editor to its normal mode
+</ul>
+
 
 <P>
-<A NAME="selecting">
+<A NAME="editing">
 <HR>
-<h2>Selecting object</h2>
+<h2>Editing object</h2>
 
-<P>
-Clicking on an object selects it. Selection
-can be extended or reduced by SHIFT modifier: SHIFT-click on an already selected object deselects
-it, on a non selected object selects it and add it to the selection.
+<p>
+Editing text inside objects is done by clicking inside the text area of the object.
+The text cursor will be positionned at the click's position. Selecting one word 
+can be done by double-click in text, selecting whole text can be done by triple-click
+in text.
 
-<P>
-Area selection is obtained by mouse drag outside objects.
 
 <P>
 <A NAME="moving">
@@ -221,7 +237,26 @@ Area selection is obtained by mouse drag outside objects.
 <h2>Moving object</h2>
 
 <P>
-Moving a selection is obtained with the usual click-and-drag behavior
+Moving a selection is obtained with the usual click-and-drag behavior. One moved, an object
+will remain selected.
+
+<P>
+<A NAME="selecting">
+<HR>
+<h2>Selecting object</h2>
+
+<P>
+Area selection is obtained by mouse drag outside objects.
+
+<P>
+An object can be selected either by area selection or by clicking in its frame (outside
+text area and in/outlets sensibility area).
+
+<p>
+Selection can be extended or reduced by SHIFT modifier: SHIFT-selecting (either by click or
+area select) an already selected object deselects
+it, SHIFT-selecting a not selected object selects it.
+
 
 <P>
 <A NAME="resizing">
@@ -236,6 +271,7 @@ and number/float boxes; both direction together for the &quot;squared&quot;
 objects like bang, toggle, inlet and outlet; 
 horizontal OR vertical for the slider, depending on the chosen area.</LI>
 
+
 <P>
 <A NAME="copy_cut_paste">
 <HR>
@@ -245,16 +281,6 @@ horizontal OR vertical for the slider, depending on the chosen area.</LI>
 Copy/cut/paste is obtained either via the "Edit" menu, or via menu shortcuts.
 The position of the pasted object(s) is always offsetted down and right from the 
 original copied object(s).
-
-<P>
-<A NAME="editing">
-<HR>
-<h2>Editing object</h2>
-
-<P>
-Editing text inside objects is done by first selecting the object, 
-then clicking on it (<I>Warning</I>: not a double click). 
-This opens a text edit field that will be dynamically enlarged to contain the text.
 
 
 <p>
@@ -306,7 +332,7 @@ the same connection connected to the patcher object.
 
 <P>
 The index of an inlet (outlet) index can be changed via a pop-up menu obtained 
-by double-clicking and dragging (argh...) on the object.
+by right-clicking on the object.
 The inlet (outlet) object with the greatest index determines the number
 of inlets (outlets) of the patcher (which is it's index plus one).
 
@@ -319,13 +345,15 @@ ISPW Max)
 Please refer to the <A HREF="language.html">language</A> section of this 
 documentation for further information about patchers, variables and templates.
 
+
 <P>
 <A NAME="editor">
 <HR>
 <h2>Opening an editor</h2>
 
 <P>
-Opening the editor associated to an object is done by double-clicking on the object.
+Opening the editor associated to an object is done by a double-click on the object
+in lock mode, or CTRL-double-click in edit mode.
 The object class determines what editor will be loaded (i.e. the patcher editor
 for a patcher or a template instance, the table editor for a table, the explode
 editor for an explode, etc.)
@@ -407,6 +435,10 @@ The following key bindings are currently available:
   <TD> save current patcher (if patcher was loaded from file) </TD>
 </TR>
 <TR>
+  <TD> CTRL-p </TD>
+  <TD> print current patcher </TD>
+</TR>
+<TR>
   <TD> CTRL-q </TD>
   <TD> quit <I>j</I>Max </TD>
 </TR>
@@ -431,7 +463,7 @@ Objects loaded from original ISPW patches are converted on the fly to the <i>j</
 syntax.
 
 <p>
-Following ISPW Max objects have been modified in order to provide a compatible behavior:
+The following ISPW Max objects have been modified in order to provide a compatible behavior:
 
 <p>
 <CENTER>
