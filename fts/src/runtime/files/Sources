@@ -23,12 +23,20 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-ifeq ($(VENDOR),sgi)
+ifeq ($(PLATFORM),sgi)
   ARCH_SOURCES = af.c
 endif
 
-ifeq ($(VENDOR),gnu)
+ifeq ($(PLATFORM),linux-intel)
   ARCH_SOURCES = af.c
+endif
+
+ifeq ($(PLATFORM),linux-ppc)
+  ARCH_SOURCES = af.c
+endif
+
+ifeq ($(PLATFORM),macosx)
+  ARCH_SOURCES = soundfiles.c
 endif
 
 ifeq ($(VENDOR),solaris2)

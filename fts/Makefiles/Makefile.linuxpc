@@ -27,6 +27,7 @@
 VENDOR := gnu
 AUDIO_LIBRARY := oss
 OS_TYPE := unix
+PLATFORM := linux-intel
 
 # Standard compiler for FTS is Pentium-gcc (see http://www.goof.com/pcg/)
 # It differs from gcc by compilation options (-mpentiumpro)

@@ -67,19 +67,6 @@ extern void post( const char *format, ...);
 
 /******************************************************************************/
 /*                                                                            */
-/*          Memory Initialization                                             */
-/*                                                                            */
-/******************************************************************************/
-
-static void fts_heaps_init(void);
-
-void mem_init(void)
-{
-  fts_heaps_init();
-}
-
-/******************************************************************************/
-/*                                                                            */
 /*          The real official FTS memory manager                              */
 /*                                                                            */
 /******************************************************************************/
@@ -164,19 +151,7 @@ struct fts_heap
 
 static fts_heap_t *fts_heaps[SHARED_HEAP_MAX_SIZE / sizeof(long)];
 
-static void
-fts_heaps_init(void)
-{
-  unsigned int i;
-
-  for (i = 0; i < (SHARED_HEAP_MAX_SIZE / sizeof(long)); i++)
-    fts_heaps[i] = 0;
-}
-
-
-
-static void
-fts_heap_grow(fts_heap_t *p)
+static void fts_heap_grow(fts_heap_t *p)
 {
   char *mem;
   unsigned int i;

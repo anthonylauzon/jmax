@@ -57,8 +57,7 @@ struct fts_soundfile
  *
  */
 
-fts_soundfile_t *
-fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbol_t format, float sr, int onset)
+fts_soundfile_t *fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbol_t format, double sr, int onset)
 {
   char full_path[1024];
   const char *path = fts_symbol_name(file_name);
@@ -107,8 +106,7 @@ fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbol_t format, float
     return 0;
 }
 
-fts_soundfile_t *
-fts_soundfile_open_write_float(fts_symbol_t file_name, fts_symbol_t format_name, float sr)
+fts_soundfile_t *fts_soundfile_open_write_float(fts_symbol_t file_name, fts_symbol_t format_name, double sr)
 {
   char full_path[1024];
   const char *path = fts_symbol_name(file_name);
@@ -188,6 +186,16 @@ fts_soundfile_write_float(fts_soundfile_t *soundfile, float *buffer, int size)
     return 0;
 }
 
+/* (fd) HACK !!!!!!!!!!!!!! */
+int fts_soundfile_get_size(fts_soundfile_t *soundfile)
+{
+  return 1024;
+}
+
+double fts_soundfile_get_samplerate(fts_soundfile_t *soundfile)
+{
+  return 44.1;
+}
 
 
 

@@ -29,20 +29,15 @@ ROOTDIR = ../../..
 include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libDatalib.a
+MODULE_LIB=$(LIBDIR)/libDatalib.a
 
-$(LIBDIR)/libDatalib.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libDatalib.a $(OBJECTS)
+all: $(LIBDIR) $(OBJDIR) $(MODULE_LIB)
 
 install-includes:
 	$(INSTALL_DIR) $(include_install_dir)/fts/lang/datalib
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/lang/datalib ; done
 .PHONY: install-includes
 
-# remove the files copied by make install ?
-uninstall:
-.PHONY: uninstall
-
-TOCLEAN = $(LIBDIR)/libDatalib.a
+TOCLEAN = $(MODULE_LIB)
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

@@ -23,6 +23,15 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
+ifdef RANLIB
+$(LIB): $(OBJDIR) $(LIBDIR) $(OBJECTS)
+	$(AR) $(ARFLAGS) $(LIB) $(OBJECTS)
+	$(RANLIB) $(LIB)
+else
+$(LIB): $(OBJDIR) $(LIBDIR) $(OBJECTS)
+	$(AR) $(ARFLAGS) $(LIB) $(OBJECTS)
+endif
+
 cleanobjs:
 	rm -f $(OBJECTS)
 

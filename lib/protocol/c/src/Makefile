@@ -32,9 +32,6 @@ LIB=$(LIBDIR)/libProtocol.a
 
 all: $(LIB)
 
-$(LIB): $(OBJDIR) $(LIBDIR) $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIB) $(OBJECTS)
-
 TOCLEAN= $(LIB)
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

@@ -35,7 +35,7 @@ extern void sigapass3_config(void);
 extern void wahwah_config(void);
 
 static void
-filters_module_init(void)
+ispw_filters_module_init(void)
 {
   biquad_config();
   sigcoef_bpass2_config();
@@ -45,4 +45,4 @@ filters_module_init(void)
   wahwah_config();
 }
 
-fts_module_t filters_module = {"filters", "ISPW signal filter classes", filters_module_init};
+fts_module_t ispw_filters_module = {"filters", "ISPW signal filter classes", ispw_filters_module_init};

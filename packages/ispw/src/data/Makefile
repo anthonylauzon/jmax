@@ -29,7 +29,7 @@ PACKAGEROOT = ../..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
-PACKAGELIB=$(LIBDIR)/libdata.so
+PACKAGELIB=$(LIBDIR)/libispwdata.so
 MODULE_CFLAGS=-I$(PACKAGEROOT)/../reftype/c/src
 
 all: $(LIBDIR) $(OBJDIR) $(PACKAGELIB)

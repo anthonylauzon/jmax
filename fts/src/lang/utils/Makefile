@@ -29,10 +29,9 @@ ROOTDIR = ../../..
 include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libUtils.a
+MODULE_LIB=$(LIBDIR)/libUtils.a
 
-$(LIBDIR)/libUtils.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libUtils.a $(OBJECTS)
+all: $(LIBDIR) $(OBJDIR) $(MODULE_LIB)
 
 install-includes:
 	$(INSTALL_DIR) $(include_install_dir)/fts/lang/utils
@@ -43,6 +42,6 @@ install-includes:
 uninstall:
 .PHONY: uninstall
 
-TOCLEAN = $(LIBDIR)/libUtils.a
+TOCLEAN = $(MODULE_LIB)
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

@@ -28,10 +28,9 @@ ROOTDIR = ../../..
 include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libDsp.a
+MODULE_LIB=$(LIBDIR)/libDsp.a
 
-$(LIBDIR)/libDsp.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libDsp.a $(OBJECTS)
+all: $(LIBDIR) $(OBJDIR) $(MODULE_LIB)
 
 install-includes:
 	$(INSTALL_DIR) $(include_install_dir)/fts/lang/dsp
@@ -42,6 +41,6 @@ install-includes:
 uninstall:
 .PHONY: uninstall
 
-TOCLEAN = $(LIBDIR)/libDsp.a
+TOCLEAN = $(MODULE_LIB)
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

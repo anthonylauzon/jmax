@@ -29,25 +29,30 @@
 
 /* generic include with the prototypes of HW dependent functions. */
 
-extern void fts_platform_init(void);
-extern void fts_set_no_real_time(void);
-extern void fts_pause(void);
-extern int fts_memory_is_locked(void);
-extern void fts_unlock_memory(void);
-extern unsigned int fts_check_fpe(void);
+extern void *fts_dl_open( const char *filename, char *error);
+extern int fts_dl_lookup( void *handle, const char *symbol, void **address, char *error);
 
-typedef void (* fts_fpe_handler)(int which);
-extern void fts_set_fpe_handler(fts_fpe_handler fh);
-extern void fts_reset_fpe_handler(void);
-
-/* bit masks to be used with fts_check_fpe;
- * 
+extern void fts_enable_fpe_traps( void);
+extern unsigned int fts_check_fpe( void);
+extern void fts_disable_fpe_traps( void);
+/* 
+ * Bit masks returned with fts_check_fpe;
  */
-
 #define FTS_INVALID_FPE  0x01
 #define FTS_DIVIDE0_FPE  0x02
 #define FTS_OVERFLOW_FPE 0x04
 #define FTS_INEXACT_FPE  0x08
 #define FTS_UNDERFLOW_FPE 0x10
+
+extern int fts_memory_is_locked( void);
+extern int fts_lock_memory( void);
+extern void fts_unlock_memory( void);
+
+extern void fts_platform_init( void);
+
+extern void fts_real_time_on( void);
+extern void fts_real_time_off( void);
+
+
 
 #endif

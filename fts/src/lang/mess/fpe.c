@@ -53,7 +53,7 @@ void fts_fpe_add_object( fts_object_t *object)
 
 /* Current version ignore exception type and count */
 
-static void fpe_handler( int which)
+void fts_fpe_handler( int which)
 {
   fts_object_t *obj;
 
@@ -79,14 +79,14 @@ void fts_fpe_start_collect(fts_object_set_t *set)
     return;
 
   fpe_objects = set;
-  fts_set_fpe_handler(fpe_handler);
+  fts_enable_fpe_traps();
 }
 
 
 
 void fts_fpe_stop_collect(void)
 {
-  fts_reset_fpe_handler();
+  fts_disable_fpe_traps();
   fpe_objects = 0;
 }
 

@@ -33,14 +33,18 @@ void
 fts_fourpoint_init(void)
 {
   int i;
+  float f;
+  fts_fourpoint_t *p;
 
-  for(i=0; i<FTS_FOURPOINT_TABLE_SIZE; i++)
+  p = fts_fourpoint_table;
+
+  for( i = 0; i < FTS_FOURPOINT_TABLE_SIZE; i++)
     {
-      float f = i * (1.0f / FTS_FOURPOINT_TABLE_SIZE);
-
-      fts_fourpoint_table[i].pm1 = -.1666667f * f * (1-f) * (2-f);
-      fts_fourpoint_table[i].p0 = .5f * (1+f) * (1-f) * (2-f);
-      fts_fourpoint_table[i].p1 = .5f * (1+f) * f * (2-f);
-      fts_fourpoint_table[i].p2 = -.1666667f * (1+f) * f * (1-f);
+      f = i * (1.0f / FTS_FOURPOINT_TABLE_SIZE);
+      p->pm1 = -.1666667f * f * (1-f) * (2-f);
+      p->p0 = .5f * (1+f) * (1-f) * (2-f);
+      p->p1 = .5f * (1+f) * f * (2-f);
+      p->p2 = -.1666667f * (1+f) * f * (1-f);
+      p++;
     }
 }

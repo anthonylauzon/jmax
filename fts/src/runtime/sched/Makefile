@@ -27,20 +27,15 @@ ROOTDIR = ../../..
 include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libSched.a
+MODULE_LIB=$(LIBDIR)/libSched.a
 
-$(LIBDIR)/libSched.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libSched.a $(OBJECTS)
+all: $(LIBDIR) $(OBJDIR) $(MODULE_LIB)
 
 install-includes:
 	$(INSTALL_DIR) $(include_install_dir)/fts/runtime/sched
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/runtime/sched ; done
 .PHONY: install-includes
 
-# remove the files copied by make install ?
-uninstall:
-.PHONY: uninstall
-
-TOCLEAN = $(LIBDIR)/libSched.a
+TOCLEAN = $(MODULE_LIB)
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

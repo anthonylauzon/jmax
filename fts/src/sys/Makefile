@@ -27,10 +27,9 @@ ROOTDIR = ../..
 include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libSys.a
+MODULE_LIB=$(LIBDIR)/libSys.a
 
-$(LIBDIR)/libSys.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libSys.a $(OBJECTS)
+all: $(LIBDIR) $(OBJDIR) $(MODULE_LIB)
 
 $(OBJDIR)/version.o: version.h
 
@@ -54,6 +53,6 @@ install-includes:
 uninstall:
 .PHONY: uninstall
 
-TOCLEAN = $(LIBDIR)/libSys.a
+TOCLEAN = $(MODULE_LIB)
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

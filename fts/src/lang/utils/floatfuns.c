@@ -169,22 +169,23 @@ fts_float_function_t fts_ffun_get_ptr( fts_symbol_t name)
     return 0;
 }
 
-#ifdef LINUXPC
-static float fts_ffun_sin(float f)
-{
-  return (float)sin(f);
-}
-
-static float cosf( float f)
-{
-  return (float)cos(f);
-}
-#endif
-
 static float hanning( float f)
 {
   return (0.5 - 0.5 * cos(f));
 }
+
+#ifdef MACOSX
+static float sinf( float f)
+{
+  return (float)sin( f);
+}
+
+static float cosf( float f)
+{
+  return (float)cos( f);
+}
+
+#endif
 
 void
 fts_ffuns_init( void)
@@ -202,6 +203,9 @@ fts_ffuns_init( void)
   fts_ffun_new( fts_new_symbol( "log"), logf);
   fts_ffun_new( fts_new_symbol( "log10"), log10f);
 #elif (defined( LINUXPC) || defined( LINUXPPC))
+  fts_ffun_new( fts_new_symbol( "sin"), sinf);
+  fts_ffun_new( fts_new_symbol( "cos"), cosf);
+#elif (defined( MACOSX))
   fts_ffun_new( fts_new_symbol( "sin"), sinf);
   fts_ffun_new( fts_new_symbol( "cos"), cosf);
 #else

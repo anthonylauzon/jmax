@@ -97,7 +97,6 @@ void fts_autosave_init( void)
   signal(SIGBUS, autosave_signal_handler);
   signal(SIGSEGV, autosave_signal_handler);
   signal(SIGTERM, autosave_signal_handler);
-  signal(SIGPWR, autosave_signal_handler);
 #endif
 }
 

@@ -27,14 +27,14 @@
 (require-package "reftype" "0.0.0")
  
 ; load the dynamic libraries in FTS
-(ucs "load" "module" "control" (file-cat dir "lib" jmax-arch jmax-mode "libcontrol.so"))
-(ucs "load" "module" "data" (file-cat dir "lib" jmax-arch jmax-mode "libdata.so"))
-(ucs "load" "module" "filters" (file-cat dir "lib" jmax-arch jmax-mode "libfilters.so"))
-(ucs "load" "module" "io" (file-cat dir "lib" jmax-arch jmax-mode "libio.so"))
-(ucs "load" "module" "midi" (file-cat dir "lib" jmax-arch jmax-mode "libmidi.so"))
-(ucs "load" "module" "sampling" (file-cat dir "lib" jmax-arch jmax-mode "libsampling.so"))
-(ucs "load" "module" "pitch" (file-cat dir "lib" jmax-arch jmax-mode "libpitch.so"))
-(ucs "load" "module" "signal" (file-cat dir "lib" jmax-arch jmax-mode "libsignal.so"))
+(ucs "load" "module" "ispw_control" (file-cat dir "lib" jmax-arch jmax-mode "libispwcontrol.so"))
+(ucs "load" "module" "ispw_data" (file-cat dir "lib" jmax-arch jmax-mode "libispwdata.so"))
+(ucs "load" "module" "ispw_filters" (file-cat dir "lib" jmax-arch jmax-mode "libfilters.so"))
+(ucs "load" "module" "ispw_io" (file-cat dir "lib" jmax-arch jmax-mode "libispwio.so"))
+(ucs "load" "module" "ispw_midi" (file-cat dir "lib" jmax-arch jmax-mode "libmidi.so"))
+(ucs "load" "module" "ispw_sampling" (file-cat dir "lib" jmax-arch jmax-mode "libsampling.so"))
+(ucs "load" "module" "ispw_pitch" (file-cat dir "lib" jmax-arch jmax-mode "libpitch.so"))
+(ucs "load" "module" "ispw_signal" (file-cat dir "lib" jmax-arch jmax-mode "libsignal.so"))
 
 ;; set path for abstractions
 (abstraction-directory (file-cat dir "abs" "compatibility"))

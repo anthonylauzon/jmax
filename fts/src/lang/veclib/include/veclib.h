@@ -41,7 +41,7 @@
 #include "lang/veclib/include/declare_fts.h"
 #include "lang/veclib/include/vec_fft.h"
 
-#ifndef RHAPSODY
+#ifndef MACOSX
 
 #include "lang/veclib/include/vec_fun.h"
 #include "lang/veclib/include/vec_arith.h"

@@ -31,7 +31,7 @@
 
 #include "lang/mess.h"
 
-#ifndef RHAPSODY
+#ifndef MACOSX
 
 #include "lang/veclib/include/declare_ftl.h"
 #include "lang/veclib/include/vec_fun.h"

@@ -32,10 +32,13 @@
 VENDOR := gnu
 AUDIO_LIBRARY := oss
 OS_TYPE := unix
-CC := gcc
 
-ARCH_CFLAGS := -Wall -DLINUX -DLINUXPPC
-ARCH_LDFLAGS :=
+CC := gcc
+LD := gcc
+
+ARCH_CFLAGS := -pipe -Wall -DLINUX -DLINUXPPC
+ARCH_LDFLAGS := -rdynamic
+
 LD_ALL_FLAG := --whole-archive
 LD_NONE_FLAG := --no-whole-archive
 CC_ALL_FLAG := -Xlinker --whole-archive

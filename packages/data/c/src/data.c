@@ -48,6 +48,8 @@ data_init(void)
   getlist_config();  
 
   fill_config();
+
+  fprintf( stderr, "data::data_config()\n");
 }
 
 fts_module_t data_module = {"data", "data structures", data_init};

@@ -27,20 +27,15 @@ ROOTDIR = ../../..
 include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libMidi.a
+MODULE_LIB=$(LIBDIR)/libMidi.a
 
-$(LIBDIR)/libMidi.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libMidi.a $(OBJECTS)
+all: $(LIBDIR) $(OBJDIR) $(MODULE_LIB)
 
 install-includes:
 	$(INSTALL_DIR) $(include_install_dir)/fts/runtime/midi
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/runtime/midi ; done
 .PHONY: install-includes
 
-# remove the files copied by make install ?
-uninstall:
-.PHONY: uninstall
-
-TOCLEAN = $(LIBDIR)/libMidi.a
+TOCLEAN = $(MODULE_LIB)
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

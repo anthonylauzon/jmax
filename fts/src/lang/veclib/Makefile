@@ -29,7 +29,9 @@ include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
 
-all: $(LIBDIR) $(OBJDIR) portable $(LIBDIR)/libVecLib.a
+MODULE_LIB=$(LIBDIR)/libVecLib.a
+
+all: $(LIBDIR) $(OBJDIR) portable $(MODULE_LIB)
 
 clean : portable_clean
 
@@ -40,9 +42,6 @@ portable:
 portable_clean:
 	(cd portable; $(MAKE) clean)	
 .PHONY: portable_clean
-
-$(LIBDIR)/libVecLib.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libVecLib.a $(OBJECTS)
 
 install-includes:
 	$(INSTALL_DIR) $(include_install_dir)/fts/lang/veclib
@@ -55,6 +54,6 @@ install-includes:
 uninstall:
 .PHONY: uninstall
 
-TOCLEAN = $(LIBDIR)/libVecLib.a
+TOCLEAN = $(MODULE_LIB)
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

@@ -28,10 +28,9 @@ ROOTDIR = ../../..
 include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libAudio.a
+MODULE_LIB=$(LIBDIR)/libAudio.a
 
-$(LIBDIR)/libAudio.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libAudio.a $(OBJECTS)
+all: $(LIBDIR) $(OBJDIR) $(MODULE_LIB)
 
 install-includes:
 	$(INSTALL_DIR) $(include_install_dir)/fts/runtime/audio
@@ -42,6 +41,6 @@ install-includes:
 uninstall:
 .PHONY: uninstall
 
-TOCLEAN = $(LIBDIR)/libAudio.a
+TOCLEAN = $(MODULE_LIB)
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

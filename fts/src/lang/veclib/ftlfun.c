@@ -129,8 +129,10 @@ void ftl_functions_init(void)
   DSP_DECLARE_ALL_TYPE_FUN(abs, "abs")
 
 #ifndef LINUX
+#ifndef MACOSX
   DSP_DECLARE_ONE_TYPE_FUN(cabsf, "cabsf");
   DSP_DECLARE_ONE_TYPE_FUN(csqrf, "csqrf");
+#endif
 #endif
 
   DSP_DECLARE_ONE_TYPE_FUN(ffillre, "ffillre");

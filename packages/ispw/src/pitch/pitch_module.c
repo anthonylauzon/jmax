@@ -30,11 +30,11 @@ extern void pitch_config(void);
 extern void pt_config(void);
 
 static void
-pitch_module_init(void)
+ispw_pitch_module_init(void)
 {
   pitch_config();
   pt_config();
 }
 
-fts_module_t pitch_module = {"pitch", "ISPW pitch analysis classes", pitch_module_init};
+fts_module_t ispw_pitch_module = {"ISPW pitch", "ISPW pitch analysis classes", ispw_pitch_module_init};
 

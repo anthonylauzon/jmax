@@ -37,7 +37,7 @@ extern void sustain_config(void);
 extern void mididecrypt_config( void);
 
 static void
-midi_module_init(void)
+ispw_midi_module_init(void)
 {
   Rreceive_config();
   Rsend_config();
@@ -50,4 +50,4 @@ midi_module_init(void)
   sustain_config();
 }
 
-fts_module_t midi_module = {"midi", "ISPW midi classes", midi_module_init};
+fts_module_t ispw_midi_module = {"ISPW midi", "ISPW midi classes", ispw_midi_module_init};

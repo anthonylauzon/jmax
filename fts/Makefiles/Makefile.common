@@ -87,19 +87,6 @@
 #
 
 
-##
-## Default names for system programs; some architecture may change these names
-## so we define them before loading other architecture dependent makefile
-
-CC = cc
-AR = ar
-AS = as
-LD = cc
-LD_ALL_FLAG = -all
-LD_NONE_FLAG = -none
-CC_ALL_FLAG = -all
-CC_NONE_FLAG = -none
-
 ## includes
 
 include $(ROOTDIR)/Makefiles/Makefile.$(ARCH)
@@ -159,7 +146,8 @@ FTS_LIBS = $(LIBDIR)/libAudio.a  \
 	   $(LIBDIR)/libUtils.a  \
 	   $(LIBDIR)/libDatalib.a  \
 	   $(LIBDIR)/libMess.a   \
-	   $(LIBDIR)/libSys.a
+	   $(LIBDIR)/libSys.a	\
+	   $(LIBDIR)/libhw.a
 
 #	   $(LIBDIR)/libSTtools.a  \
 

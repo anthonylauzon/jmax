@@ -29,6 +29,14 @@
 VENDOR := sgi
 AUDIO_LIBRARY := sgial2
 OS_TYPE := unix
+PLATFORM := sgi
+
+CC := cc
+LD := cc
+CC_ALL_FLAG := -all
+CC_NONE_FLAG := -none
+LD_ALL_FLAG := -all
+LD_NONE_FLAG := -none
 
 SYSTEM_CFLAGS := -mips4 -n32 -r5000 -LANG:restrict
 SYSTEM_LDFLAGS :=  -mips4 -n32
@@ -39,7 +47,8 @@ SYSTEM_SOFLAGS := -mips4 -n32
 
 # 7.2 compiler, no -IPA for the moment (but get 10% better anyway)
 
-SYSTEM_OPT_CFLAGS := -O3 -OPT:roundoff=3:IEEE_arithmetic=3:alias=typed:fast_io=ON:Olimit=0 -TARG:platform=ip27:processor=r5000 -float_const -INLINE:=ON:dfe=ON  -LNO:opt=1 
+#SYSTEM_OPT_CFLAGS := -O3 -OPT:roundoff=3:IEEE_arithmetic=3:alias=typed:fast_io=ON:Olimit=0 -TARG:platform=ip27:processor=r5000 -float_const -INLINE:=ON:dfe=ON  -LNO:opt=1 
+SYSTEM_OPT_CFLAGS := -O3 -OPT:roundoff=3:IEEE_arithmetic=3:alias=typed:Olimit=0 -TARG:platform=ip27:processor=r5000 -float_const -INLINE:=ON:dfe=ON  -LNO:opt=1 
 SYSTEM_OPT_LDFLAGS = -O3  
 SYSTEM_OPT_SOFLAGS = 
 

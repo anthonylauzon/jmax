@@ -62,7 +62,7 @@ extern void scale_config(void);
 
 
 static void
-control_module_init(void)
+ispw_control_module_init(void)
 {
   at_config();
   bangbang_config();
@@ -99,5 +99,5 @@ control_module_init(void)
   scale_config();
 }
 
-fts_module_t control_module = {"control", "ISPW miscellaneous control classes", control_module_init};
+fts_module_t ispw_control_module = {"ISPW control", "ISPW miscellaneous control classes", ispw_control_module_init};
 

@@ -29,21 +29,16 @@ ROOTDIR = ../../..
 include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libDevices.a
+MODULE_LIB=$(LIBDIR)/libDevices.a
 
-$(LIBDIR)/libDevices.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libDevices.a $(OBJECTS)
+all: $(LIBDIR) $(OBJDIR) $(MODULE_LIB)
 
 install-includes:
 	$(INSTALL_DIR) $(include_install_dir)/fts/runtime/devices
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/runtime/devices ; done
 .PHONY: install-includes
 
-# remove the files copied by make install ?
-uninstall:
-.PHONY: uninstall
-
-TOCLEAN = $(LIBDIR)/libDevices.a
+TOCLEAN = $(MODULE_LIB)
 
 include $(ROOTDIR)/Makefiles/Makefile.misc
 

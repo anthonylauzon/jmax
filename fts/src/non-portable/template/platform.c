@@ -20,22 +20,30 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Author: Francois Dechelle.
  *
  */
 
 /*
-  Sys level initialization 
-  */
+ * This file contains hardware dependent initialization function.
+ * 
+ * FTS call fts_platform_init at startup time.
+ */
 
-#include "sys.h"
+/*
+ * This file contains templates for hardware dependent initialization function.
+ */
 
-extern void fts_platform_init(void);
+#include "sys/hw.h"
 
-void
-fts_sys_init(void)
+/*
+  Function: fts_platform_init
+  Description:
+   performs platform specific initializations
+  Arguments: none
+  Returns: none
+*/
+void fts_platform_init( void)
 {
-  fts_platform_init();
-
-  mem_init();
 }
+

@@ -37,7 +37,7 @@ extern void disk_config(void);
 #endif
 
 static void
-io_module_init(void)
+ispw_io_module_init(void)
 {
   dac_config();
   adc_config();
@@ -48,4 +48,4 @@ io_module_init(void)
 #endif
 }
 
-fts_module_t io_module = {"io", "ISPW signal i/o classes", io_module_init};
+fts_module_t ispw_io_module = {"io", "ISPW signal i/o classes", ispw_io_module_init};

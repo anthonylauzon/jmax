@@ -26,17 +26,19 @@ all_c: all
 clean_c: clean
 
 all:
-	(cd sys; $(MAKE) all)
-	(cd lang; $(MAKE) all)
-	(cd runtime; $(MAKE) all)
-	(cd tiles; $(MAKE) all)
+	(cd non-portable ; $(MAKE) $@)
+	(cd sys; $(MAKE) $@)
+	(cd lang; $(MAKE) $@)
+	(cd runtime; $(MAKE) $@)
+	(cd tiles; $(MAKE) $@)
 .PHONY: all
 
 clean:
-	(cd sys; $(MAKE) clean)
-	(cd lang; $(MAKE) clean)
-	(cd runtime; $(MAKE) clean)
-	(cd tiles; $(MAKE) clean)
+	(cd non-portable ; $(MAKE) $@)
+	(cd sys; $(MAKE) $@)
+	(cd lang; $(MAKE) $@)
+	(cd runtime; $(MAKE) $@)
+	(cd tiles; $(MAKE) $@)
 .PHONY: all
 
 install-includes:
@@ -45,6 +47,3 @@ install-includes:
 	for d in lang runtime sys ; do (cd $$d ; $(MAKE) $@ ) ; done
 .PHONY: install-includes
 
-# remove the files copied by make install ?
-uninstall:
-.PHONY: uninstall

@@ -39,7 +39,7 @@ extern void expr_config(void);
 extern void expr_doctor_init(void);
 
 static void
-data_module_init(void)
+ispw_data_module_init(void)
 {
   accum_config();
   bag_config();
@@ -59,6 +59,8 @@ data_module_init(void)
 
   expr_config();
   expr_doctor_init();
+
+  fprintf( stderr, "ispw::data_config()\n");
 }
 
-fts_module_t data_module = {"data", "ISPW data classes", data_module_init};
+fts_module_t ispw_data_module = {"ISPW data", "ISPW data classes", ispw_data_module_init};

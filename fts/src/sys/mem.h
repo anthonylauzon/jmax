@@ -29,12 +29,7 @@
 /* 
    This file include all the memory allocation 
    tools provided by FTS.
-
-   A unique memory initizialization function is provided; should be called
-   as soon as possible at the FTS kernel startup.
 */
-
-extern void  mem_init(void);
 
 /* allocation routines */
 

@@ -51,7 +51,7 @@
 */
 
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 /* Uncomment the following define to get a print for each malloc/free operation.
    Usefull to understand what's going on; only for small tests, of course */

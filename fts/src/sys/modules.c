@@ -58,8 +58,6 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <string.h>
-#include <dlfcn.h>
-
 #include <stdio.h>
 
 extern int fts_file_get_read_path(const char *path, char *full_path);
@@ -142,9 +140,7 @@ static fts_status_description_t  module_not_found = { "Module Not Found."};
 /* for architecuture with dynamic loading, load the module;
    the module variable name *must* be called <name>_module;
    the filename default to lib<name>.so if not specified;
-   if the filename start with a "/" in the path, it is used
-   like it is, otherwise we look use fts_file_get_read_path to look
-   for it.
+   The file is looked for using fts_file_get_read_path.
 
    Note that this function overwrite the module name
    to be sure that correspond to the name passed;
@@ -152,99 +148,57 @@ static fts_status_description_t  module_not_found = { "Module Not Found."};
  */
 
 
-fts_status_t
-fts_module_load(const char *name, const char *filename)
+fts_status_t fts_module_load(const char *name, const char *filename)
 {
-  char namebuf[1024], pathbuf[1024];
-  const char *loadpath, *libname;
-  fts_module_t  *module, *s;
+  char namebuf[1024], full_path[1024], errorbuf[1024];
+  const char *libname;
+  char module_name[512];
+  fts_module_t *module, *s;
   void *handle;
-  int fd;
 
-  /* test if the module is statically linked */
-#if 0
-  /* Doesn't work yet :-< ... */
-  {
-    char module_name[512];
-    sprintf(module_name, "%s_module", name);
-    
-    if (dlsym(NULL, module_name))
-      {
-	fprintf(stderr, "Module %s statically linked\n", name);
-	return fts_Success;
-      }
-    else
-      fprintf(stderr, "Module %s NOT statically linked, error %s\n", name, dlerror());
-  }
-#endif
+  fprintf( stderr, "fts_module_load( \"%s\", \"%s\")\n", name, (filename) ? filename : "null");
+
   /* test if the module has been already loaded  */
 
-  /* Temporarly commenter @@@ */
-
-  /*
   for (s = fts_installed_modules; s; s = s->next)
     {
       if (s->name && (! strcmp(s->name, name)))
 	{
-	  fprintf(stderr, "Library %s already loaded\n", name);
+	  fprintf(stderr, "Module %s already loaded\n", name);
 	  return &module_loaded;
 	}
     }
-    */
 
   if (! filename)
     {
-      sprintf(namebuf, "lib%s.so", name);
+      sprintf( namebuf, "lib%s.so", name);
       libname = namebuf;
     }
   else
     libname = filename;
       
-  if (*libname == '/')
+  if ( !fts_file_get_read_path( libname, full_path))
     {
-      /* test if the file exists and is readable  */
-
-      fd = open(libname, O_RDONLY);
-
-      if (fd < 0)
-	{
-	  return &library_not_found;
-	}
-      else
-	close(fd);
-
-      loadpath = libname;
-    }
-  else
-    {
-      if (fts_file_get_read_path(libname, pathbuf))
-	loadpath = pathbuf;
-      else
-	{
-	  return &library_not_found;
-	}
+      return &library_not_found;
     }
 
-  handle = dlopen(loadpath, RTLD_NOW | RTLD_GLOBAL);	
+  handle = fts_dl_open( full_path, errorbuf);
 
   if (! handle)
     {
-      fprintf(stderr, "Error: %s\n",dlerror());
+      fprintf(stderr, "Error: %s\n", errorbuf);
       return &error_loading;
     }
 
-  {
-    char module_name[512];
-    sprintf(module_name, "%s_module", name);
-    
-    module  = (fts_module_t *) dlsym(handle, module_name);
-  }
+  sprintf( module_name, "%s_module", name);
 
-  if (! module)
+  if ( !fts_dl_lookup( handle, module_name, (void **)&module, errorbuf))
     {
-      fprintf(stderr, "Looking for module: %s\n",dlerror());
+      fprintf(stderr, "Looking for module: %s\n", errorbuf);
       return &module_not_found;
     }
+
+  fprintf( stderr, "%s = 0x%08x\n", module_name, (unsigned int)module);
 
   /* add */
 

@@ -31,6 +31,10 @@ ifeq ($(VENDOR),gnu)
   ARCH_SOURCES = osc_ieeewrap.c phasor_ieeewrap.c
 endif
 
+ifeq ($(VENDOR),apple)
+  ARCH_SOURCES = osc_ieeewrap.c phasor_ieeewrap.c
+endif
+
 SOURCES = \
   $(ARCH_SOURCES) \
 fft.c \

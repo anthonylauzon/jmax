@@ -56,16 +56,15 @@ static fts_welcome_t compilation_info_welcome = {COMPILATION_INFO_STRING};
 
 #ifdef DEBUG
 static fts_welcome_t debug_welcome = {"compiled for DEBUG\n"};
+static char platform_name[256];
+static fts_welcome_t platform_welcome = { platform_name};
 #endif
 
 
 
-int
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-  /* Argument parsing
-     To be done
-     */
+  /* Argument parsing */
 
   argv++;			/* skip the command name */
   argc--;
@@ -76,8 +75,10 @@ main(int argc, char **argv)
 	fprintf(stderr, "Usage: fts [-help] [-s] -norealtime <client dev description>\n");
       else if (! strcmp(*argv, "-s"))
 	set_restart_on_eof(1);
-      else if (! strcmp( *argv, "-norealtime"))
-	fts_set_no_real_time();
+      /* (fd) This option is disabled and will disappear soon. I think it is useless,
+	 but you never know... */
+/*        else if (! strcmp( *argv, "-norealtime")) */
+/*  	should_run_real_time = 0; */
 
       /* others ???  */
 
@@ -91,10 +92,13 @@ main(int argc, char **argv)
 
 #ifdef DEBUG
   fts_add_welcome(&debug_welcome);
+
+  sprintf( platform_name, "%s\n", FTS_ARCH_NAME);
+  fts_add_welcome( &platform_welcome);
 #endif
 
-  /* sys level initialization */
-  fts_sys_init();
+  /* platform specific initialization */
+  fts_platform_init();
 
   /* kernel modules configure */
   fts_kernel_config();
@@ -108,7 +112,7 @@ main(int argc, char **argv)
   fts_assign_boot_devices(argc, argv);
 
   /* After module initialization, compile the scheduler list */
-  fts_sched_compile(); /* compile the scheduler function list  */
+  fts_sched_compile();
 
   /* Run the scheduler */
   fts_sched_run();
@@ -120,8 +124,7 @@ main(int argc, char **argv)
 }
 
 
-static void
-fts_kernel_config(void)
+static void fts_kernel_config(void)
 {
   /* LANG modules */
 

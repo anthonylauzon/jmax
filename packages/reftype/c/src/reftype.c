@@ -81,6 +81,8 @@ reftype_init(void)
   float_vector_config();
   vector_config();
   matrix_config();
+
+  fprintf( stderr, "reftype::reftype_init()\n");
 }
 
 fts_module_t reftype_module = {"reftype", "reftype classes", reftype_init};

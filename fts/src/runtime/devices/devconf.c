@@ -67,18 +67,16 @@ void fts_dev_configure(void)
 
 #ifdef SGI
   sgidev_init();
+  sfdev_init();
+  shmdev_init();
 #endif
 
 #ifdef HAS_OSS
   ossdev_init();
+  sfdev_init();
 #endif
 
   null_init();
-  sfdev_init();
-
-#ifdef SGI
-  shmdev_init();
-#endif
 }
 
 

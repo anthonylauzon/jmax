@@ -23,29 +23,13 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-ifeq ($(VENDOR),sgi)
-	ARCH_SOURCES = sgihw.c
-endif
-
-ifeq ($(ARCH),linuxpc)
-	ARCH_SOURCES = linuxpchw.c
-endif
-
-ifeq ($(ARCH),linuxppc)
-	ARCH_SOURCES = linuxppchw.c
-endif
-
-ifeq ($(VENDOR),solaris2)
-	ARCH_SOURCES = solaris2hw.c
-endif
-
-SOURCES = $(ARCH_SOURCES) \
-	smem.c	          \
-	mem.c	          \
-	modules.c         \
-	sys.c             \
+SOURCES = \
+	mem.c		\
+	modules.c	\
+	smem.c		\
 	version.c	\
-	welcome.c
+	welcome.c	\
+
 
 
 

@@ -27,20 +27,15 @@ ROOTDIR = ../../..
 include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libThread.a
+MODULE_LIB=$(LIBDIR)/libThread.a
 
-$(LIBDIR)/libThread.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libThread.a $(OBJECTS)
+all: $(LIBDIR) $(OBJDIR) $(MODULE_LIB)
 
 install-includes:
 	$(INSTALL_DIR) $(include_install_dir)/fts/runtime/thread
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/runtime/thread ; done
 .PHONY: install-includes
 
-# remove the files copied by make install ?
-uninstall:
-.PHONY: uninstall
-
-TOCLEAN = $(LIBDIR)/libThread.a
+TOCLEAN = $(MODULE_LIB)
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

@@ -53,8 +53,7 @@ extern void sigabs_config(void);
 extern void fft_config(void);
 extern void sigsamphold_config(void);
 
-static void
-signal_module_init(void)
+static void ispw_signal_module_init(void)
 {
   zerocross_config();
   sigthru_config();
@@ -84,4 +83,4 @@ signal_module_init(void)
   sigsamphold_config();
 }
 
-fts_module_t signal_module = {"signal", "ISPW miscellaneous signal classes", signal_module_init};
+fts_module_t ispw_signal_module = {"ISPW signal", "ISPW miscellaneous signal classes", ispw_signal_module_init};

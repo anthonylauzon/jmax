@@ -29,7 +29,7 @@ PACKAGEROOT = ../..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
-PACKAGELIB=$(LIBDIR)/libcontrol.so
+PACKAGELIB=$(LIBDIR)/libispwcontrol.so
 
 all: $(LIBDIR) $(OBJDIR) $(PACKAGELIB)
 

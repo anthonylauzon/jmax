@@ -29,10 +29,9 @@ ROOTDIR = ../../..
 include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libMess.a
+MODULE_LIB=$(LIBDIR)/libMess.a
 
-$(LIBDIR)/libMess.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libMess.a $(OBJECTS)
+all: $(LIBDIR) $(OBJDIR) $(MODULE_LIB)
 
 install-includes:
 	$(INSTALL_DIR) $(include_install_dir)/fts/lang/mess
@@ -43,6 +42,6 @@ install-includes:
 uninstall:
 .PHONY: uninstall
 
-TOCLEAN = $(LIBDIR)/libMess.a
+TOCLEAN = $(MODULE_LIB)
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

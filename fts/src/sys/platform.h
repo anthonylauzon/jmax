@@ -39,7 +39,7 @@
  */
 #if defined(LINUXPC)
 
-#define FTS_ARCH_NAME "linux"
+#define FTS_ARCH_NAME "Linux (Intel and compatible processors)"
 #define restrict
 #define HAS_UNIX
 #define HAS_DTD /* direct to disk support */
@@ -58,12 +58,28 @@
 
 #elif defined(LINUXPPC)
 
-#define FTS_ARCH_NAME "linux"
+#define FTS_ARCH_NAME "Linux (Power-PC processor)"
 #define restrict
 #define HAS_UNIX
 #define HAS_DTD /* direct to disk support */
 #define HAS_PTHREADS
 #define HAS_OSS /* the OSS sound system */
+#define VECLIB_LOOP_UNROLL NO
+#define FTS_HAS_BIG_ENDIAN
+
+/* This macro is defined here because not all platforms have a isnanf macro (or function */
+
+#define fts_isnanf(x) (((*(long *)&(x) & 0x7f800000L)==0x7f800000L)&& \
+			 ((*(long *)&(x) & 0x007fffffL)!=0x00000000L) )
+
+
+#elif defined(MACOSX)
+
+#define FTS_ARCH_NAME "MacOS-X"
+#define restrict
+#define HAS_UNIX
+#undef HAS_DTD /* direct to disk support */
+#undef HAS_PTHREADS
 #define VECLIB_LOOP_UNROLL NO
 #define FTS_HAS_BIG_ENDIAN
 
@@ -80,7 +96,7 @@
  */
 #elif defined(SGI)
 
-#define FTS_ARCH_NAME "sgi"
+#define FTS_ARCH_NAME "SGI"
 
 #define HAVE_AF_VIRTUAL_PARAMETERS
 #define HAS_DTD /* direct to disk support */
@@ -103,7 +119,7 @@
  */
 #elif defined(SOLARIS2)
 
-#define FTS_ARCH_NAME "solaris2"
+#define FTS_ARCH_NAME "Solaris-2"
 #define restrict /* needed for compatibility with the newer restrict keyword */
 #define HAS_DTD
 #define HAS_UNIX

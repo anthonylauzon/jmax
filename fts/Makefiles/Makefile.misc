@@ -22,16 +22,18 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
-
-
-##
-## Generic rule to make an fts executable; here to simplify makefiles.
-##
-
-ifneq ($(ARCH),rhapsody)
-$(FTS_BIN) : $(OBJECTS) $(FTS_LIBS) $(ARCH_LIBS) $(FTS_ARCH_LIBS)
-	rm -f $(FTS_BIN)
-	$(LD) $(FTS_LDFLAGS) -o $@ $(OBJECTS) $(CC_ALL_FLAG) $(FTS_LIBS) $(FTS_ARCH_LIBS) $(CC_NONE_FLAG)   $(FTS_SYS_LIBS) $(FTS_USER_LIBS_FLAGS) $(FTS_USER_LIBS)
+# 
+# Generic rule to make a libray
+#
+ifdef RANLIB
+$(LIBDIR)/%.a: $(OBJECTS)
+	$(AR) $(ARFLAGS) $(LIBDIR)/$*.a $?
+	$(RANLIB) $(LIBDIR)/$*.a
+.PRECIOUS: $(OBJECTS)
+else
+$(LIBDIR)/%.a: $(OBJECTS)
+	$(AR) $(ARFLAGS) $(LIBDIR)/$*.a $?
+.PRECIOUS: $(OBJECTS)
 endif
 
 
@@ -54,43 +56,12 @@ cleanall:
 	rm -f $(TOCLEAN)
 	rm -f $(OBJECTS)
 
-
-
 ##
 ## Compilation rules for all architectures, not worth separatings.
 ## 
 
 $(OBJDIR)/%.o : %.c
 	$(CC) -c  $(CFLAGS) $< -o $@
-
-.SUFFIXES: .so
-
-
-#$(OBJDIR)/%.o : %.c $(OBJDIR)
-#	$(CC) -c  $(CFLAGS) $< -o $@
-
-#$(OBJDIR)/%.u : %.c $(OBJDIR)
-#	$(CC) -j  $(CFLAGS) $< -o $@
-
-#.SUFFIXES: .so  .sc
-
-#$(OBJDIR)/%.so : %.o $(OBJDIR)
-#	ld -o $@ $< > /dev/null 2>&1
-
-#$(OBJDIR)/%.o : %.m $(OBJDIR)
-#	$(CC) $(CFLAGS) $(OBJCFLAGS) -c $< -o $@
-
-#$(OBJDIR)/%.o : %.psw $(OBJDIR)
-#	$(PSWRAP) $(PSWFLAGS) -h $*.h -o $*.c $<
-#	$(CC) $(CFLAGS) -c $*.c -o $@
-
-#$(OBJDIR)/%.o : %.sc $(OBJDIR)
-#	/lib/cpp -P $< > $*_x.s
-#	$(AS) -o $@  $*_x.s
-#	/bin/rm -f $*_x.s
-
-#$(OBJDIR)/%.o : %.s $(OBJDIR)
-#	$(AS) -o $@  $<
 
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
