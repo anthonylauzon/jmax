@@ -5,6 +5,41 @@
 	};
 	objectVersion = 38;
 	objects = {
+		F5A37B8F0327C67501664092 = {
+			fileRef = F8F010EB028D890E01664092;
+			isa = PBXBuildFile;
+			settings = {
+				JAVA_ARCHIVE_SUBDIR = "";
+			};
+		};
+		F5A37B900327C67801664092 = {
+			fileRef = F8F010EC028D890E01664092;
+			isa = PBXBuildFile;
+			settings = {
+				JAVA_ARCHIVE_SUBDIR = "";
+			};
+		};
+		F5FDEF8D0328BD2801664092 = {
+			isa = PBXFileReference;
+			path = JMaxWrapper.java;
+			refType = 4;
+		};
+		F5FDEF8E0328BD2801664092 = {
+			fileRef = F5FDEF8D0328BD2801664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+//F50
+//F51
+//F52
+//F53
+//F54
+//F70
+//F71
+//F72
+//F73
+//F74
 		F78563BF02BA3BCE016640F1 = {
 			isa = PBXFileReference;
 			name = macosxmidi.c;
@@ -301,6 +336,7 @@
 			isa = PBXShellScriptBuildPhase;
 			neededFileNames = (
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "cd ../../packages/ispw/java\njar -uvf ../../../macosxbuild/jMaxProject/build/ispw.jar icons/*.gif";
 		};
@@ -313,6 +349,7 @@
 			isa = PBXShellScriptBuildPhase;
 			neededFileNames = (
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "cd ../../packages/guiobj/java\njar -uvf ../../../macosxbuild/jMaxProject/build/guiobj.jar icons/*.gif";
 		};
@@ -325,6 +362,7 @@
 			isa = PBXShellScriptBuildPhase;
 			neededFileNames = (
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "echo \"root\" > jmax.jar.root\njar -uvf build/jmax.jar jmax.jar.root";
 		};
@@ -801,8 +839,8 @@
 			productName = libsignal;
 			productReference = F8446931028BCAD101664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
-<plist version=\"0.9\">
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -844,12 +882,14 @@
 				F8EE4B6C031CE6C301664092,
 			);
 			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8446934028BCAD101664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8446935028BCAD101664092 = {
 			buildActionMask = 2147483647;
@@ -885,18 +925,21 @@
 				F8EE4B74031CE6C301664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8446936028BCAD101664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8446937028BCAD101664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8446938028BCB2301664092 = {
 			isa = PBXFileReference;
@@ -2095,8 +2138,8 @@
 			productName = libispw;
 			productReference = F8446A09028BCC2301664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
-<plist version=\"0.9\">
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -2154,6 +2197,7 @@
 				F8446A27028BCC2401664092,
 			);
 			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8446A0D028BCC2401664092 = {
 			fileRef = F8446970028BCC2301664092;
@@ -2304,6 +2348,7 @@
 			files = (
 			);
 			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8446A2D028BCC2401664092 = {
 			buildActionMask = 2147483647;
@@ -2396,6 +2441,7 @@
 				F8446AA2028BCC2401664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8446A2F028BCC2401664092 = {
 			fileRef = F844696D028BCC2301664092;
@@ -2918,12 +2964,14 @@
 			files = (
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8446AA5028BCC2401664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8446AA6028BCC2401664092 = {
 			buildPhases = (
@@ -3044,18 +3092,21 @@
 				F848668102A273D401664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8446AA8028BCC2401664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXJavaArchiveBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8446AA9028BCC2401664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8448E4E0286C0A901664092 = {
 			buildActionMask = 2147483647;
@@ -3065,6 +3116,7 @@
 				F8F010E1028D870301664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8448E500286C23601664092 = {
 			children = (
@@ -3120,6 +3172,7 @@
 				F8448E5E0286C23601664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8448E590286C23601664092 = {
 			fileRef = F8448E510286C23601664092;
@@ -3159,6 +3212,7 @@
 				F85494FF02D2511801664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8448E630286DC0201664092 = {
 			fileRef = F880FCFA0282F8A501664092;
@@ -4908,6 +4962,7 @@
 				F8F010E2028D870301664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512205028BDC3701664092 = {
 			buildActionMask = 2147483647;
@@ -4917,6 +4972,7 @@
 				F8F010FA028D890E01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512207028BDC3701664092 = {
 			buildActionMask = 2147483647;
@@ -4932,6 +4988,7 @@
 				F851220E028BDC3701664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512208028BDC3701664092 = {
 			fileRef = F851215D028BD7EA01664092;
@@ -5046,6 +5103,7 @@
 				F854BE7602B7CA2F01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512210028BDC3701664092 = {
 			fileRef = F8512178028BD7EA01664092;
@@ -5446,6 +5504,7 @@
 				F8512272028BDEE401664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512265028BDEE401664092 = {
 			fileRef = F85121F3028BD86101664092;
@@ -5539,6 +5598,7 @@
 				F85494ED02D2502E01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512275028BDF6901664092 = {
 			buildActionMask = 2147483647;
@@ -5548,6 +5608,7 @@
 				F8F010E3028D870301664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512277028BDF6901664092 = {
 			buildActionMask = 2147483647;
@@ -5571,6 +5632,7 @@
 				F8EE4B54031CE67801664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512278028BDF6901664092 = {
 			fileRef = F8446A03028BCC2301664092;
@@ -5609,6 +5671,7 @@
 			files = (
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F851227F028BDFF301664092 = {
 			children = (
@@ -5776,8 +5839,8 @@
 			productName = libcontrol;
 			productReference = F8512291028BDFF301664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
-<plist version=\"0.9\">
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -5812,6 +5875,7 @@
 				F8512294028BDFF401664092,
 			);
 			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512294028BDFF401664092 = {
 			fileRef = F8512282028BDFF301664092;
@@ -5824,6 +5888,7 @@
 			files = (
 			);
 			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512296028BDFF401664092 = {
 			buildActionMask = 2147483647;
@@ -5851,6 +5916,7 @@
 				F8EE4BB7031CEE7001664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512297028BDFF401664092 = {
 			fileRef = F8512281028BDFF301664092;
@@ -5929,12 +5995,14 @@
 			files = (
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F85122A6028BDFF401664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F85122A7028BE08901664092 = {
 			isa = PBXFileReference;
@@ -5986,6 +6054,7 @@
 				F8F010E4028D870301664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F85122B1028BE0F601664092 = {
 			buildActionMask = 2147483647;
@@ -6005,6 +6074,7 @@
 				F8EE4BC3031CEEAD01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F85122B2028BE0F601664092 = {
 			fileRef = F85122A7028BE08901664092;
@@ -6056,6 +6126,7 @@
 				F85494E102D24F7101664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F85122BB028BE16601664092 = {
 			children = (
@@ -6196,8 +6267,8 @@
 			productName = libio;
 			productReference = F85122CC028BE16601664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
-<plist version=\"0.9\">
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -6232,6 +6303,7 @@
 				F85122CF028BE16701664092,
 			);
 			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F85122CF028BE16701664092 = {
 			fileRef = F85122C2028BE16601664092;
@@ -6244,6 +6316,7 @@
 			files = (
 			);
 			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F85122D1028BE16701664092 = {
 			buildActionMask = 2147483647;
@@ -6260,6 +6333,7 @@
 				F85122DB028BE16701664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F85122D2028BE16701664092 = {
 			fileRef = F85122BD028BE16601664092;
@@ -6326,12 +6400,14 @@
 			files = (
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F85122E0028BE16701664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F85122E1028BE2AA01664092 = {
 			isa = PBXFileReference;
@@ -6383,6 +6459,7 @@
 				F8F010E5028D870301664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F85122EB028BE2AB01664092 = {
 			buildActionMask = 2147483647;
@@ -6398,6 +6475,7 @@
 				F85122F2028BE2AB01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F85122EC028BE2AB01664092 = {
 			fileRef = F85122E1028BE2AA01664092;
@@ -6449,6 +6527,7 @@
 				F85494EA02D2500601664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F85122F5028BE32B01664092 = {
 			children = (
@@ -6531,8 +6610,8 @@
 			productName = libispwmath;
 			productReference = F85122FB028BE32B01664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
-<plist version=\"0.9\">
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -6567,6 +6646,7 @@
 				F85122FE028BE32C01664092,
 			);
 			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F85122FE028BE32C01664092 = {
 			fileRef = F85122F9028BE32B01664092;
@@ -6579,6 +6659,7 @@
 			files = (
 			);
 			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512300028BE32C01664092 = {
 			buildActionMask = 2147483647;
@@ -6587,6 +6668,7 @@
 				F8512302028BE32C01664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512301028BE32C01664092 = {
 			fileRef = F85122F7028BE32B01664092;
@@ -6605,12 +6687,14 @@
 			files = (
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512304028BE32C01664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512305028BE3E901664092 = {
 			isa = PBXFileReference;
@@ -6650,6 +6734,7 @@
 				F8F010E6028D870301664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F851230D028BE3EA01664092 = {
 			buildActionMask = 2147483647;
@@ -6663,6 +6748,7 @@
 				F8512312028BE3EA01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F851230E028BE3EA01664092 = {
 			fileRef = F8512305028BE3E901664092;
@@ -6702,6 +6788,7 @@
 				F85494F002D2505401664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512315028BE41301664092 = {
 			isa = PBXBundleReference;
@@ -6734,8 +6821,8 @@
 			productName = libmidi;
 			productReference = F8512315028BE41301664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
-<plist version=\"0.9\">
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -6770,12 +6857,14 @@
 				F8512326028BE48001664092,
 			);
 			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512318028BE41401664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512319028BE41401664092 = {
 			buildActionMask = 2147483647;
@@ -6789,18 +6878,21 @@
 				F8EE4B9A031CECB201664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F851231A028BE41401664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F851231B028BE41401664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F851231C028BE47F01664092 = {
 			children = (
@@ -6974,6 +7066,7 @@
 				F8F010E7028D870401664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F851233B028BE55901664092 = {
 			buildActionMask = 2147483647;
@@ -6994,6 +7087,7 @@
 				F8EE4B94031CEC6A01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F851233C028BE55901664092 = {
 			fileRef = F851232D028BE55901664092;
@@ -7063,6 +7157,7 @@
 				F85494F302D2507601664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512349028BE5EC01664092 = {
 			children = (
@@ -7162,8 +7257,8 @@
 			productName = libnumeric;
 			productReference = F8512351028BE5ED01664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
-<plist version=\"0.9\">
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -7198,6 +7293,7 @@
 				F8512354028BE5ED01664092,
 			);
 			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512354028BE5ED01664092 = {
 			fileRef = F851234D028BE5EC01664092;
@@ -7210,6 +7306,7 @@
 			files = (
 			);
 			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512356028BE5ED01664092 = {
 			buildActionMask = 2147483647;
@@ -7227,6 +7324,7 @@
 				F8EE4B8E031CE77C01664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512358028BE5ED01664092 = {
 			fileRef = F851234C028BE5EC01664092;
@@ -7251,12 +7349,14 @@
 			files = (
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F851235C028BE5ED01664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F851235D028BE68701664092 = {
 			isa = PBXFileReference;
@@ -7284,6 +7384,7 @@
 				F8F010E8028D870401664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512363028BE68701664092 = {
 			buildActionMask = 2147483647;
@@ -7299,6 +7400,7 @@
 				F8EE4B80031CE75501664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512364028BE68701664092 = {
 			fileRef = F851235D028BE68701664092;
@@ -7326,6 +7428,7 @@
 				F85494F602D2509701664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512369028BE77C01664092 = {
 			children = (
@@ -7618,8 +7721,8 @@
 			productName = libsequence;
 			productReference = F8512383028BE77C01664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
-<plist version=\"0.9\">
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -7660,6 +7763,7 @@
 				F851238D028BE77D01664092,
 			);
 			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512387028BE77D01664092 = {
 			fileRef = F851236C028BE77C01664092;
@@ -7708,6 +7812,7 @@
 			files = (
 			);
 			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F851238F028BE77D01664092 = {
 			buildActionMask = 2147483647;
@@ -7728,6 +7833,7 @@
 				F851239D028BE77D01664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512390028BE77D01664092 = {
 			fileRef = F851236B028BE77C01664092;
@@ -7818,12 +7924,14 @@
 			files = (
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F851239F028BE77D01664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F85123A0028BE77D01664092 = {
 			buildPhases = (
@@ -8028,18 +8136,21 @@
 				F85124F0028BEBB301664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F85123A2028BE77D01664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXJavaArchiveBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F85123A3028BE77D01664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F85123A4028BE7EB01664092 = {
 			isa = PBXFileReference;
@@ -10353,6 +10464,7 @@
 				F8F010E9028D870401664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512513028BED1101664092 = {
 			buildActionMask = 2147483647;
@@ -10362,6 +10474,7 @@
 				F8F010FB028D890E01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512515028BED1101664092 = {
 			buildActionMask = 2147483647;
@@ -10394,6 +10507,7 @@
 				F851252D028BED1101664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8512516028BED1101664092 = {
 			fileRef = F85124F2028BEC7D01664092;
@@ -10552,6 +10666,7 @@
 				F8512534028BED1101664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F851252F028BED1101664092 = {
 			fileRef = F851250A028BEC7D01664092;
@@ -10597,6 +10712,7 @@
 				F85494F902D250D001664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F85494DD02D1E4F301664092 = {
 			fileRef = F8F010C7028D829E01664092;
@@ -10804,8 +10920,8 @@
 			productName = "file-generation";
 			productReference = F85C878F0290238D01664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
-<plist version=\"0.9\">
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -10843,6 +10959,7 @@
 			isa = PBXShellScriptBuildPhase;
 			neededFileNames = (
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = ". ../../JMAX-VERSION \nJMAX_VERSION=${JMAX_MAJOR_VERSION}.${JMAX_MINOR_VERSION}.${JMAX_PATCH_VERSION}${JMAX_VERSION_STATUS}\nsed -e 's/@VERSION@/'${JMAX_VERSION}/ < ../../fts/version.c.in > ../../fts/version.c\nsed -e 's/@VERSION@/'${JMAX_VERSION}/ < ../../java/src/ircam/jmax/jMaxVersion.java.in > ../../java/src/ircam/jmax/JMaxVersion.java";
 		};
@@ -10975,7 +11092,6 @@
 				F8A9635302D36AC001664092,
 				F88000010283043C01664092,
 				F880002F0283043C01664092,
-				F8F01109028D91E301664092,
 				F854950002D2514001664092,
 			);
 			isa = PBXGroup;
@@ -11303,16 +11419,6 @@
 			settings = {
 			};
 		};
-		F88000320283043C01664092 = {
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 15;
-			files = (
-				F8F010F5028D890E01664092,
-				F8F010F6028D890E01664092,
-			);
-			isa = PBXCopyFilesBuildPhase;
-		};
 		F88000350283043C01664092 = {
 			buildActionMask = 12;
 			dstPath = bin;
@@ -11321,6 +11427,7 @@
 				F8F010F7028D890E01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F88000370283043C01664092 = {
 			buildActionMask = 2147483647;
@@ -11373,6 +11480,7 @@
 				F86A050102B4AE0201664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F88000390283051101664092 = {
 			fileRef = F88000020283043C01664092;
@@ -11640,6 +11748,7 @@
 				F8F010DC028D870301664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F88000680283056E01664092 = {
 			buildActionMask = 2147483647;
@@ -11649,6 +11758,7 @@
 				F854950202D2515501664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880006A0283072001664092 = {
 			children = (
@@ -11808,8 +11918,8 @@
 			productName = libutils;
 			productReference = F880007A0283072001664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
-<plist version=\"0.9\">
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -11846,6 +11956,7 @@
 				F880007F0283072101664092,
 			);
 			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880007D0283072101664092 = {
 			fileRef = F880006E0283072001664092;
@@ -11870,6 +11981,7 @@
 			files = (
 			);
 			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F88000810283072101664092 = {
 			buildActionMask = 2147483647;
@@ -11886,6 +11998,7 @@
 				F880008B0283072101664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F88000820283072101664092 = {
 			fileRef = F880006D0283072001664092;
@@ -11954,6 +12067,7 @@
 				F8F01108028D8B1701664092,
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880008F0283072101664092 = {
 			fileRef = F880FCFA0282F8A501664092;
@@ -11966,6 +12080,7 @@
 			files = (
 			);
 			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F88000910283076201664092 = {
 			buildActionMask = 2147483647;
@@ -11975,6 +12090,7 @@
 				F8F010DD028D870301664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F88000950283082801664092 = {
 			isa = PBXFileReference;
@@ -12207,18 +12323,21 @@
 				F848669302A2756401664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880FD210282F90B01664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXJavaArchiveBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880FD220282F90B01664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880FD230282F99101664092 = {
 			isa = PBXFileReference;
@@ -12743,8 +12862,8 @@
 			productName = libfts;
 			productReference = F880FD820282FA3901664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
-<plist version=\"0.9\">
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -12779,12 +12898,14 @@
 				F8386E97028D3F9101664092,
 			);
 			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880FD860282FA3901664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880FD870282FA3901664092 = {
 			buildActionMask = 2147483647;
@@ -12846,6 +12967,7 @@
 				F889510A02ED989301664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880FDC20282FA3901664092 = {
 			buildActionMask = 2147483647;
@@ -12854,12 +12976,14 @@
 				F8448E670286DD3701664092,
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880FDC30282FA3901664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880FDC50283013E01664092 = {
 			children = (
@@ -12884,6 +13008,7 @@
 				F880FEDA0283013E01664092,
 				F880FEDB0283013E01664092,
 				F880FEDC0283013E01664092,
+				F5FDEF8D0328BD2801664092,
 			);
 			isa = PBXGroup;
 			name = java;
@@ -15065,6 +15190,7 @@
 				F8B73FC702C0DF1A01664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880FEE00283013E01664092 = {
 			fileRef = F880FECD0283013E01664092;
@@ -16595,12 +16721,14 @@
 			files = (
 			);
 			isa = PBXJavaArchiveBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880FFEB0283013F01664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880FFED028301DA01664092 = {
 			isa = PBXExecutableFileReference;
@@ -16640,6 +16768,7 @@
 			files = (
 			);
 			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880FFF0028301DA01664092 = {
 			buildActionMask = 2147483647;
@@ -16647,6 +16776,7 @@
 				F8D6E22C02CE2D9701664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880FFF2028301DA01664092 = {
 			buildActionMask = 2147483647;
@@ -16654,12 +16784,14 @@
 				F85494DD02D1E4F301664092,
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880FFF5028301DA01664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880FFF70283022401664092 = {
 			isa = PBXApplicationReference;
@@ -16672,7 +16804,6 @@
 				F880FFFA0283022401664092,
 				F880FFFB0283022401664092,
 				F880FFFC0283022401664092,
-				F88000320283043C01664092,
 				F88000350283043C01664092,
 				F88000680283056E01664092,
 				F8DC5EF30286949201664092,
@@ -16724,11 +16855,14 @@
 				F8512535028BED1101664092,
 			);
 			buildSettings = {
-				INSTALL_PATH = "";
+				DEBUGGING_SYMBOLS = NO;
 				JAVA_ARCHIVE_CLASSES = NO;
+				JAVA_CLASS_SEARCH_PATHS = "build/jmax.jar build/ftsclient.jar";
 				JAVA_COMPILER = /usr/bin/javac;
+				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
 				JAVA_ONLY = YES;
 				JAVA_SOURCE_SUBDIR = .;
+				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
@@ -16741,19 +16875,18 @@
 			);
 			isa = PBXApplicationTarget;
 			name = jMax;
-			productInstallPath = "";
 			productName = jMax;
 			productReference = F880FFF70283022401664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
-<plist version=\"0.9\">
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDocumentTypes</key>
 	<array/>
 	<key>CFBundleExecutable</key>
-	<string></string>
+	<string>jMax</string>
 	<key>CFBundleGetInfoString</key>
 	<string></string>
 	<key>CFBundleIconFile</key>
@@ -16763,7 +16896,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string></string>
+	<string>jMax</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -16772,6 +16905,18 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>0.0.1d1</string>
+	<key>Java</key>
+	<dict>
+		<key>ClassPath</key>
+		<string>$JAVAROOT:$JAVAROOT/jmax.jar:$JAVAROOT/ftsclient.jar</string>
+		<key>MainClass</key>
+		<string>JMaxWrapper</string>
+		<key>Properties</key>
+		<dict>
+			<key>com.apple.macos.useScreenMenuBar</key>
+			<string>true</string>
+		</dict>
+	</dict>
 </dict>
 </plist>
 ";
@@ -16780,30 +16925,34 @@
 		F880FFF90283022401664092 = {
 			buildActionMask = 2147483647;
 			files = (
+				F5FDEF8E0328BD2801664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880FFFA0283022401664092 = {
 			buildActionMask = 2147483647;
 			files = (
 				F88000300283043C01664092,
-				F8F0110A028D91E301664092,
 			);
 			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880FFFB0283022401664092 = {
 			buildActionMask = 2147483647;
 			files = (
-				F8F010F3028D890E01664092,
-				F8F010F4028D890E01664092,
+				F5A37B8F0327C67501664092,
+				F5A37B900327C67801664092,
 			);
 			isa = PBXJavaArchiveBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F880FFFC0283022401664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F889510702ED932301664092 = {
 			isa = PBXFileReference;
@@ -16883,6 +17032,7 @@
 				F8A9635A02D36BA301664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8A9635902D36BA001664092 = {
 			fileRef = F8A9635402D36AE201664092;
@@ -17231,8 +17381,8 @@
 			productName = libdata;
 			productReference = F8B8E4AE02867E1C01664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
-<plist version=\"0.9\">
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -17279,6 +17429,7 @@
 				F8EE4BA6031CEE1701664092,
 			);
 			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8B8E4B302867E1C01664092 = {
 			fileRef = F8B8E48D02867E1C01664092;
@@ -17352,6 +17503,7 @@
 				F8F01105028D8AD001664092,
 			);
 			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8B8E4C002867E1C01664092 = {
 			buildActionMask = 2147483647;
@@ -17376,6 +17528,7 @@
 				F8EE4BA5031CEE1701664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8B8E4C102867E1C01664092 = {
 			fileRef = F8B8E48A02867E1C01664092;
@@ -17485,12 +17638,14 @@
 				F8F01106028D8AD001664092,
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8B8E4D702867E1C01664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8B8E4D802867E1C01664092 = {
 			buildPhases = (
@@ -17600,18 +17755,21 @@
 				F8B8E572028680BC01664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8B8E4DA02867E1C01664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXJavaArchiveBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8B8E4DB02867E1C01664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8B8E4DE028680BB01664092 = {
 			children = (
@@ -18946,8 +19104,8 @@
 			productName = libguiobj;
 			productReference = F8B8E5A30286822501664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
-<plist version=\"0.9\">
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -18983,6 +19141,7 @@
 				F8B8E5A80286822601664092,
 			);
 			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8B8E5A70286822601664092 = {
 			fileRef = F8B8E5830286822501664092;
@@ -19003,6 +19162,7 @@
 				F8F01102028D8A9401664092,
 			);
 			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8B8E5AC0286822601664092 = {
 			buildActionMask = 2147483647;
@@ -19032,6 +19192,7 @@
 				F820646002AE147B01664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8B8E5AD0286822601664092 = {
 			fileRef = F8B8E5770286822501664092;
@@ -19165,12 +19326,14 @@
 				F8F01104028D8A9401664092,
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8B8E5C60286822601664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8B8E5C70286822601664092 = {
 			buildPhases = (
@@ -19260,18 +19423,21 @@
 				F889510C02ED9ACD01664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8B8E5C90286822601664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXJavaArchiveBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8B8E5CA0286822601664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8BB0B2402E7389801664092 = {
 			isa = PBXFileReference;
@@ -19910,6 +20076,7 @@
 				F8F010DE028D870301664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8DC5ECB028685AF01664092 = {
 			buildActionMask = 2147483647;
@@ -19919,6 +20086,7 @@
 				F8F010F8028D890E01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8DC5ECD028685AF01664092 = {
 			buildActionMask = 2147483647;
@@ -19933,6 +20101,7 @@
 				F8DC5ED3028685AF01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8DC5ECE028685AF01664092 = {
 			fileRef = F8B8E5920286822501664092;
@@ -19987,6 +20156,7 @@
 				F8DC5EDE028685AF01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8DC5ED5028685AF01664092 = {
 			fileRef = F8B8E5980286822501664092;
@@ -20056,6 +20226,7 @@
 				F85494E402D24FB101664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8DC5EE1028685AF01664092 = {
 			buildActionMask = 2147483647;
@@ -20065,6 +20236,7 @@
 				F8F010DF028D870301664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8DC5EE3028685AF01664092 = {
 			buildActionMask = 2147483647;
@@ -20074,6 +20246,7 @@
 				F8F010F9028D890E01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8DC5EE5028685AF01664092 = {
 			buildActionMask = 2147483647;
@@ -20097,6 +20270,7 @@
 				F8EE4B9D031CEDD401664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8DC5EE6028685AF01664092 = {
 			fileRef = F8DC5EBD0286845701664092;
@@ -20166,6 +20340,7 @@
 				F85494E702D24FDA01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8DC5EF30286949201664092 = {
 			buildActionMask = 12;
@@ -20176,6 +20351,7 @@
 			isa = PBXShellScriptBuildPhase;
 			neededFileNames = (
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "mv build/jMax.app/Contents/Resources/share/jmax/config_macosx.jprj build/jMax.app/Contents/Resources/share/jmax/config.jprj\nchmod a+r build/jMax.app/Contents/Resources/share/jmax/config.jprj";
 		};
@@ -20255,8 +20431,8 @@
 			productName = libmacosx;
 			productReference = F8DC5EFA0286A1FB01664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
-<plist version=\"0.9\">
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -20291,12 +20467,14 @@
 				F889510802ED932301664092,
 			);
 			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8DC5EFD0286A1FB01664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8DC5EFE0286A1FB01664092 = {
 			buildActionMask = 2147483647;
@@ -20308,6 +20486,7 @@
 				F800EB9002CB316F01664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8DC5EFF0286A1FB01664092 = {
 			fileRef = F8DC5EF60286A1FA01664092;
@@ -20335,12 +20514,14 @@
 				F8F01100028D8A2801664092,
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8DC5F040286A1FB01664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8DC5F080286A23801664092 = {
 			fileRef = F880FCFA0282F8A501664092;
@@ -20356,6 +20537,7 @@
 				F8F010E0028D870301664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8DC5F0E0286BF2401664092 = {
 			children = (
@@ -20476,8 +20658,8 @@
 			productName = libsystem;
 			productReference = F8DC5F1B0286BF2501664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
-<plist version=\"0.9\">
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -20513,6 +20695,7 @@
 				F8DC5F1F0286BF2501664092,
 			);
 			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8DC5F1E0286BF2501664092 = {
 			fileRef = F8DC5F180286BF2401664092;
@@ -20531,6 +20714,7 @@
 			files = (
 			);
 			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8DC5F210286BF2501664092 = {
 			buildActionMask = 2147483647;
@@ -20546,6 +20730,7 @@
 				F820646C02AE1F0801664092,
 			);
 			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8DC5F230286BF2501664092 = {
 			fileRef = F8DC5F110286BF2401664092;
@@ -20601,12 +20786,14 @@
 				F8F010FC028D899C01664092,
 			);
 			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8DC5F2C0286BF2501664092 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8EE4B37031CE61C01664092 = {
 			isa = PBXFileReference;
@@ -21517,30 +21704,6 @@
 			path = build/fts;
 			refType = 4;
 		};
-		F8F010F3028D890E01664092 = {
-			fileRef = F8F010EC028D890E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8F010F4028D890E01664092 = {
-			fileRef = F8F010EB028D890E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8F010F5028D890E01664092 = {
-			fileRef = F8F010EC028D890E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8F010F6028D890E01664092 = {
-			fileRef = F8F010EB028D890E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F8F010F7028D890E01664092 = {
 			fileRef = F8F010F2028D890E01664092;
 			isa = PBXBuildFile;
@@ -21633,18 +21796,6 @@
 		};
 		F8F01108028D8B1701664092 = {
 			fileRef = F8F010C7028D829E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8F01109028D91E301664092 = {
-			isa = PBXFileReference;
-			name = MRJApp.properties;
-			path = ../MRJApp.properties;
-			refType = 2;
-		};
-		F8F0110A028D91E301664092 = {
-			fileRef = F8F01109028D91E301664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
