@@ -251,3 +251,7 @@ PREDEF_SYMBOL( fts_s_equal, "=")
 
 /* Predefined variable names */
 PREDEF_SYMBOL( fts_s_args, "args")
+
+/* Default filename */
+PREDEF_SYMBOL( fts_s_default_project, "default-project.jprj")
+PREDEF_SYMBOL( fts_s_default_config, "default-configuration.jcfg")
