@@ -147,14 +147,6 @@ public class FtsObject implements Serializable
     encoder.flush();
   }
   
-  public void delete() throws IOException
-  {
-    encoder.writeObject( parent);
-    encoder.writeSymbol( sDelObject);
-    encoder.writeObject( this);
-    encoder.flush();
-  }
-
   public static void registerMessageHandler( Class cl, FtsSymbol selector, FtsMessageHandler messageHandler)
   {
     if (selector == null)

@@ -27,6 +27,7 @@
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
+#include <ftsprivate/OLDexpression.h>
 #include <ftsprivate/loader.h>
 #include <ftsprivate/patparser.h>
 #include <ftsprivate/package.h>
@@ -131,12 +132,12 @@ static int client_table_add( client_t *client)
 {
   fts_stack_push( &client_table, client_t *, client);
 
-  return fts_stack_get_top( &client_table);
+  return fts_stack_top( &client_table);
 }
 
 static void client_table_remove( int id)
 {
-  ((client_t **)fts_stack_get_base( &client_table))[id] = 0;
+  ((client_t **)fts_stack_base( &client_table))[id] = 0;
 }
 
 static void client_table_init( void)
@@ -146,7 +147,7 @@ static void client_table_init( void)
   client_table_add( 0); /* so that first client will have id 1 */
 }
 
-#define client_table_get(I) ((client_t **)fts_stack_get_base( &client_table))[(I)]
+#define client_table_get(I) ((client_t **)fts_stack_base( &client_table))[(I)]
 
 client_t *object_get_client( fts_object_t *obj)
 {
@@ -159,7 +160,7 @@ client_t *object_get_client( fts_object_t *obj)
 
   index = OBJECT_ID_CLIENT( id );
 
-  if (index < 0 || index >= fts_stack_get_size( &client_table))
+  if (index < 0 || index >= fts_stack_size( &client_table))
     return NULL;
 
   return client_table_get(index);
@@ -456,7 +457,7 @@ static void end_symbol_cache_action( unsigned char input, client_t *client)
   fts_atom_t a;
 
   fts_stack_push( &client->input_buffer, unsigned char, '\0');
-  s = fts_new_symbol_copy( fts_stack_get_base( &client->input_buffer));
+  s = fts_new_symbol_copy( fts_stack_base( &client->input_buffer));
   symbol_cache_put( &client->input_cache, s, client->input_value);
   fts_set_symbol( &a, s);
   fts_stack_push( &client->input_args, fts_atom_t, a);
@@ -467,7 +468,7 @@ static void end_string_action( unsigned char input, client_t *client)
   fts_atom_t a;
 
   fts_stack_push( &client->input_buffer, unsigned char, '\0');
-  fts_set_string( &a, strdup( fts_stack_get_base( &client->input_buffer)));
+  fts_set_string( &a, strdup( fts_stack_base( &client->input_buffer)));
   fts_stack_push( &client->input_args, fts_atom_t, a);
 }
 
@@ -481,8 +482,8 @@ static void end_raw_string_action( unsigned char input, client_t *client)
   fts_stack_push( &client->input_buffer, unsigned char, '\0');
   fts_stack_push( &client->input_buffer, unsigned char, '\0');
 
-  p = fts_stack_get_base( &client->input_buffer);
-  l = fts_stack_get_size( &client->input_buffer);
+  p = fts_stack_base( &client->input_buffer);
+  l = fts_stack_size( &client->input_buffer);
   fts_tokenizer_init_buffer( &tokenizer, p, l);
 
   while ( fts_tokenizer_next( &tokenizer, &a) != 0)
@@ -517,8 +518,8 @@ static void end_message_action( unsigned char input, client_t *client)
   int argc;
   fts_atom_t *argv;
 
-  argc = fts_stack_get_size( &client->input_args);
-  argv = (fts_atom_t *)fts_stack_get_base( &client->input_args);
+  argc = fts_stack_size( &client->input_args);
+  argv = (fts_atom_t *)fts_stack_base( &client->input_args);
 
   selector = fts_get_symbol( argv+1);
 
@@ -774,23 +775,6 @@ static void client_connect_object( fts_object_t *o, int winlet, fts_symbol_t s, 
     return;
 
   fts_connection_new( FTS_NO_ID, src, src_outlet, dst, dst_inlet);
-}
-
-static void client_delete_object( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  client_t *this = (client_t *)o;
-  fts_object_t *obj;
-  fts_atom_t k;
-
-  obj = fts_get_object( at);
-
-  if (!obj)
-    return;
-
-  fts_object_delete_from_patcher( obj);
-
-  fts_set_int( &k, OBJECT_ID_OBJ( fts_object_get_id( obj)) );
-  fts_hashtable_remove( &this->object_table, &k);
 }
 
 static void client_load_patcher_file( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1076,7 +1060,6 @@ static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "new_object"), client_new_object);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "set_object_property"), client_set_object_property);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "connect_object"), client_connect_object);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "delete_object"), client_delete_object);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "load"), client_load_patcher_file);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "load_project"), client_load_project);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "load_package"), client_load_package);
@@ -1430,7 +1413,7 @@ void fts_client_done_message( fts_object_t *obj)
 
   write_char( client, FTS_PROTOCOL_END_OF_MESSAGE);
   
-  fts_bytestream_output( client->stream, fts_stack_get_size( &client->output_buffer), fts_stack_get_base( &client->output_buffer));
+  fts_bytestream_output( client->stream, fts_stack_size( &client->output_buffer), fts_stack_base( &client->output_buffer));
 
   fts_stack_clear( &client->output_buffer);
 }
