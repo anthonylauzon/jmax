@@ -100,8 +100,8 @@ AC_PROG_JAR_UPDATE
 if test "$ac_cv_prog_jar_update" = "yes"; then
    JAR_SUPPORT_UPDATE="yes"
 else
-   AC_MSG_WARN("$JAR doesn't support update flag")
-   JAR_SUPPORT_UPDATE="no"
+   AC_MSG_WARN($JAR doesn't support update flag)
+  JAR_SUPPORT_UPDATE="no"
 fi
 
 AC_SUBST(JAR_SUPPORT_UPDATE)
