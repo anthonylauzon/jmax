@@ -147,7 +147,7 @@ public class JMaxMatTable extends JTable
       setHorizontalTextPosition( SwingConstants.CENTER);
       return this;
     }
-  }  
+  }    
 }
 
 

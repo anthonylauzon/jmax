@@ -555,11 +555,6 @@ mat_upload(mat_t *self)
   mat_upload_data(self);
 }
 
-
-
-
-
-
 /********************************************************************
 *
 *   user methods
@@ -887,8 +882,13 @@ _mat_delete_rows (fts_object_t *o, int winlet, fts_symbol_t s,
 
   /* update editor if open */
   if (mat_editor_is_open(self))
+  {
+    fts_atom_t a;
     mat_upload(self);
-
+    
+    fts_set_int(&a, (pos>0) ? pos-1 : pos);
+    fts_client_send_message(o, sym_select_row, 1, &a);
+  }
   fts_object_set_state_dirty(o);
 }
 

@@ -192,17 +192,17 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
   {
     if(! uploading)
     {
-      table.revalidate();
+      /*table.revalidate();*/
       repaint();
     }
   }
   public void matSizeChanged(int n_rows, int n_cols)
   {
     updateTableModel();
-    updateTableToSize( itsContainer.getFrame().getSize().width);
+    /*updateTableToSize( itsContainer.getFrame().getSize().width);
     table.revalidate();
     scrollPane.validate();
-    repaint();
+    repaint();*/
   }
   
   boolean uploading = false;
@@ -221,6 +221,7 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
   {
     table.getSelectionModel().setSelectionInterval(  row_id, row_id);
   }
+  
   //------------------- Editor interface ---------------
 
   public EditorContainer getEditorContainer(){
