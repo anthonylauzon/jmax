@@ -171,7 +171,9 @@ term: primitive
 	| binary
 ;
 
-reference: variable TK_OPEN_SQPAR term_list TK_CLOSED_SQPAR
+/* original:
+reference: variable  TK_OPEN_SQPAR term_list TK_CLOSED_SQPAR */
+reference: reference TK_OPEN_SQPAR term_list TK_CLOSED_SQPAR
 		{ $$ = fts_parsetree_new( TK_ELEMENT, 0, $1, $3); }
 	| variable
 ;
