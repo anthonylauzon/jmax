@@ -38,6 +38,9 @@ public class JMaxIcons {
   public static final ImageIcon dspOff = loadIcon( "dsp_off.gif");
   public static final ImageIcon dspUndef = loadIcon( "dsp_undef.gif");
   public static final ImageIcon moreObjects = loadIcon( "more_objects.gif");
+  public static final ImageIcon audioin_on = loadIcon( "audioin_on.gif");
+  public static final ImageIcon audioin_off = loadIcon( "audioin_off.gif");
+  public static final ImageIcon no_audioin = loadIcon( "no_audioin.gif");
 
   // These are used from ErrorTablePanel ???
   public static final ImageIcon patcher = loadIcon( "tool_patcher.gif");

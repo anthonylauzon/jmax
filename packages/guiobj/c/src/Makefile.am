@@ -14,6 +14,7 @@ gint.c \
 guiobj.c \
 key.c \
 keyserver.c \
+input.c \
 messconst.c \
 monitor.c \
 panel.c \

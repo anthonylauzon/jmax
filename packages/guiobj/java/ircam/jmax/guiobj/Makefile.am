@@ -17,6 +17,7 @@ FtsFloatValueListener.java \
 FtsFloatValueObject.java \
 FtsForkObject.java \
 FtsInletObject.java \
+FtsInputObject.java \
 FtsMessConstObject.java \
 FtsMonitorObject.java \
 FtsOutletObject.java \
@@ -28,6 +29,7 @@ FtsMatDisplayObject.java \
 FtsXYPadObject.java \
 Inlet.java \
 InOutlet.java \
+Input.java \
 IntBox.java \
 MessConst.java \
 Monitor.java \

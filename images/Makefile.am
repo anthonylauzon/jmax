@@ -7,6 +7,8 @@ arrow_left.gif \
 arrow_right.gif \
 arrow_up.gif \
 at_work.gif \
+audioin_on.gif \
+audioin_off.gif \
 cursor_bang_mini.gif \
 cursor_in.gif \
 cursor_out.gif \
@@ -33,6 +35,7 @@ mini_icon_jmax.gif \
 mini_icon_pat.gif \
 more_objects.gif \
 new.gif \
+no_audioin.gif \
 project_root.gif \
 question.gif \
 stop.gif \

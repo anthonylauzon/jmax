@@ -13,6 +13,8 @@ intbox.gif					\
 intbox_cursor.gif				\
 inlet.gif					\
 inlet_cursor.gif				\
+input.gif					\
+input_cursor.gif				\
 jcomment.gif					\
 jcomment_cursor.gif				\
 jpatcher.gif					\
