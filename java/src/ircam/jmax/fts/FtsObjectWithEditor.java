@@ -26,6 +26,7 @@
 package ircam.jmax.fts;
 
 import ircam.jmax.toolkit.*;
+import ircam.jmax.*;
 import javax.swing.undo.*;
 import javax.swing.event.*;
 import java.awt.*;
@@ -50,6 +51,31 @@ public class FtsObjectWithEditor extends FtsUndoableObject {
   public void setEditorFrame(Frame frame)
   {
       editorFrame = frame;
+  }
+
+  public void disposeEditor()
+  {
+      if(editorFrame!= null)
+	  {
+	      editorFrame.setVisible(false);
+	      SwingUtilities.invokeLater(new Runnable() {
+			public void run()
+			{ 
+			    editorFrame.dispose();
+			    editorFrame = null;
+			}
+		    });
+	    }
+  }
+  public void showEditor()
+  {
+      if(editorFrame!=null)
+	  if (! editorFrame.isVisible())
+	  {
+	      editorFrame.setVisible(true);
+	      MaxWindowManager.getWindowManager().addWindow(editorFrame);
+	  }   
+      editorFrame.toFront();
   }
 
   private Frame editorFrame = null;

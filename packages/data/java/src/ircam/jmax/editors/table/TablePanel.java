@@ -473,6 +473,7 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
     int vsize, pixsize;
     int selsize = gc.getSelection().size();
     int last = gc.getFtsObject().getSize()-selsize;
+
     if(last >= gc.getLastVisibleIndex())
 	{
 	    vsize = gc.getWindowHorizontalScope();
@@ -510,7 +511,7 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
     
     int vsize, pixsize;
     int last = gc.getFtsObject().getSize()+lastCopySize;
-    if(last >= gc.getLastVisibleIndex())
+    if(last >= /*gc.getLastVisibleIndex()*/ gc.getAdapter().getInvX(gc.getGraphicDestination().getSize().width))
 	{
 	    vsize = gc.getWindowHorizontalScope();
 	    pixsize = gc.getGraphicDestination().getSize().width;
@@ -520,7 +521,6 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
 	    vsize = last-gc.getFirstVisibleIndex();
 	    pixsize = gc.getAdapter().getX(vsize);
 	}
-
     gc.getFtsObject().requestInsert(first, vsize, pixsize);
     gc.getSelection().deselectAll();
   }

@@ -78,16 +78,23 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
    */
   public void createEditor(int nArgs, FtsAtom args[])
   {
-      if(sequence == null){
-	  sequence = new Sequence(this);
-	  setEditorFrame(sequence);
-      }
-    if (! sequence.isVisible())
+      /*if(sequence == null){
+	sequence = new Sequence(this);
+	setEditorFrame(sequence);
+	}
+	if (! sequence.isVisible())
 	{
-	    sequence.setVisible(true);
-	    MaxWindowManager.getWindowManager().addWindow(sequence);
+	sequence.setVisible(true);
+	MaxWindowManager.getWindowManager().addWindow(sequence);
 	}   
-    sequence.toFront();
+	sequence.toFront();*/
+    
+    if(sequence == null)
+	{
+	    sequence = new Sequence(this);
+	    setEditorFrame(sequence);
+	}
+    showEditor();
   }
 
   /**
@@ -95,12 +102,14 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
    */
   public void destroyEditor(int nArgs, FtsAtom args[])
   {
-    if(sequence != null)
-    {
-      sequence.dispose();
+      /*if(sequence != null)
+	{
+	sequence.dispose();
+	sequence = null;
+	setEditorFrame(null);
+	}*/
       sequence = null;
-      setEditorFrame(null);
-    }
+      disposeEditor();
   }
 
   public void addTracks(int nArgs , FtsAtom args[])

@@ -81,7 +81,9 @@ public class TableSelecter extends TableTool implements GraphicSelectionListener
     if (w==0) return;
 
     getGc().getSelection().setCaretPosition(TableSelection.NO_CARET);
-    getGc().getSelection().select(a.getInvX(x), a.getInvX(x+w));
+    int start = (a.getInvX(x)>0) ? a.getInvX(x) : 0;
+    int end = (a.getInvX(x+w) < getGc().getFtsObject().getSize()) ? a.getInvX(x+w) : (getGc().getFtsObject().getSize());
+    getGc().getSelection().select(start, end);
   }
 
     /**

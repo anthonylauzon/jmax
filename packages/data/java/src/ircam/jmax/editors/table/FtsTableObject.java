@@ -63,29 +63,17 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
      */
     public void openEditor(int nArgs, FtsAtom args[])
     {
-      if(table == null){
-	table = new Tabler(this);
-	setEditorFrame(table);
-      }
-      if (! table.isVisible())
-	{
-	  table.setVisible(true);
-	  MaxWindowManager.getWindowManager().addWindow(table);
-	}   
-      table.toFront();
-    }
+	if(getEditorFrame() == null)
+	    setEditorFrame( new Tabler(this));
 
+	showEditor();
+    }
     /**
      * Fts callback: destroy the editor associated with this FtsSequenceObject.
      */
   public void destroyEditor(int nArgs, FtsAtom args[])
   {
-    if(table != null)
-      {
-	table.dispose();
-	table = null;
-	setEditorFrame(null);
-      }
+      disposeEditor();
   }
 
   public void setSize(int nArgs, FtsAtom args[])
@@ -100,7 +88,7 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
 	temp[i] = visibles[i];
 
       visibles = temp;
-      
+
       notifySizeChanged(size);
     }
   }
@@ -124,8 +112,11 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
 	    visibles[i] = args[i+2].getInt();
     
     lastIndex = i;
-
+    
     notifySizeChanged(size);
+    if(size <= lastIndex)
+	notifySet();
+
     setDirty();
   }
   public int getLastUpdatedIndex()
@@ -329,7 +320,6 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
     }
     public void requestInsert(int startIndex, int vsize, int pixsize)
     {
-	System.err.println("request insert startIndex "+startIndex+" vsize "+vsize+" pixsize "+pixsize);
 	sendArgs[0].setInt(vsize); 
 	sendArgs[1].setInt(pixsize); 
 	sendArgs[2].setInt(startIndex); 
@@ -502,9 +492,6 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
   }
     
   ///////////////////////////////////////////////////////////
-    
-  Tabler table = null;  
-  
   private Vector points = new Vector();
   MaxVector listeners = new MaxVector();
   
