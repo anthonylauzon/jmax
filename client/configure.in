@@ -120,4 +120,5 @@ python/Makefile
 python/ircam/Makefile
 python/ircam/fts/Makefile
 python/ircam/fts/client/Makefile
+winbuild/Makefile
 )

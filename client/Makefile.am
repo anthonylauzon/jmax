@@ -11,6 +11,7 @@ endif
 
 PYTHON_SRC_DIR = python
 
-SUBDIRS= $(JAVA_SRC_DIR) cpp $(PYTHON_SRC_DIR)
+SUBDIRS= $(JAVA_SRC_DIR) cpp $(PYTHON_SRC_DIR) winbuild
+
 
 
