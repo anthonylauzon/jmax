@@ -455,7 +455,7 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
     // Send the change command to fts
     
     Object args[] = new Object[6];
-    
+
     args[0] = new Integer(index);
     args[1] = new Integer(event.getTime());
     args[2] = new Integer(event.getPitch());
@@ -483,7 +483,6 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
     if (newIndex == NO_SUCH_EVENT) newIndex = events_fill_p-1;
     else if (event.getTime() <= newTime) newIndex -=1;
     
-
     if (index == NO_SUCH_EVENT)
       {
 	System.err.println("no such event error");
@@ -500,16 +499,12 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
     
     // inform FTS
     
-    Object args[] = new Object[6];
-    
+    Object args[] = new Object[2];
+
     args[0] = new Integer(index);
     args[1] = new Integer(event.getTime());
-    args[2] = new Integer(event.getPitch());
-    args[3] = new Integer(event.getVelocity());
-    args[4] = new Integer(event.getDuration());
-    args[5] = new Integer(event.getChannel());
     
-    remoteCall(REMOTE_CHANGE, args);
+    remoteCall(REMOTE_CHANGE_TIME, args);
     
     // rearranges the events in the DB 
     if (index < newIndex) 
@@ -775,7 +770,8 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
   static final int REMOTE_ADD    = 6;
   static final int REMOTE_REMOVE = 7;
   static final int REMOTE_CHANGE = 8;
-  static final int REMOTE_NAME   = 9;
+  static final int REMOTE_CHANGE_TIME = 9;
+  static final int REMOTE_NAME   = 10;
 
   static final int EMPTY_COLLECTION = -1;
   static final int NO_SUCH_EVENT = -2;

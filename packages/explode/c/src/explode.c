@@ -39,8 +39,8 @@
 #define EXPLODE_REMOTE_ADD    6
 #define EXPLODE_REMOTE_REMOVE 7
 #define EXPLODE_REMOTE_CHANGE 8
-#define EXPLODE_REMOTE_NAME   9
-
+#define EXPLODE_REMOTE_CHANGE_TIME 9
+#define EXPLODE_REMOTE_NAME   10
 
 static long explode_nextserial;
 
@@ -1069,7 +1069,6 @@ static void explode_remote_change( fts_data_t *d, int ac, const fts_atom_t *at)
     }
 
   e = *pe;
-  (*pe)  = (*pe)->next;
 
   /* Change the event  */
 
@@ -1079,10 +1078,50 @@ static void explode_remote_change( fts_data_t *d, int ac, const fts_atom_t *at)
   e->dur  = fts_get_long(&at[4]);
   e->chan = fts_get_long(&at[5]);
 
+  return;
+}
+
+static void explode_remote_change_time( fts_data_t *d, int ac, const fts_atom_t *at)
+{
+  /* Arguments: 
+   * the zero based index
+   * the event paramter in order <time> <pit> <vel> <dur> <chan>
+   *
+   * The zero based index is used because there may be multiple
+   * events at the same time, so the editor can use the index
+   * as event id.
+   *
+   * The function may need to move the event.
+   */
+
+  explode_data_t *data = (explode_data_t *)d;
+  int change = fts_get_long(&at[0]);	/* change index */
+  evt_t **pe, *e;			/* indirect precursor */
+
+  /* First, found the event and remote it from the list */
+
+  pe = &(data->evt);
+  while (change > 0)
+    {
+      pe = &( (*pe)->next);
+      change--;
+    }
+
+  e = *pe;
+  (*pe)  = (*pe)->next;
+
+  /* Change the event  */
+
+  e->time = fts_get_long(&at[1]);
+  /*e->pit  = fts_get_long(&at[2]);
+    e->vel  = fts_get_long(&at[3]);
+    e->dur  = fts_get_long(&at[4]);
+    e->chan = fts_get_long(&at[5]);*/
+
   /* Find the correct new position */
 
   pe = &(data->evt); 
-  while (*pe && ((*pe)->time < e->time))
+  while (*pe && ((*pe)->time <= e->time))/*ho messo l'uguale*/
     pe = &( (*pe)->next);
 
   /* Insert it */
@@ -1288,5 +1327,6 @@ explode_config(void)
   fts_data_class_define_function(explode_data_class, EXPLODE_REMOTE_ADD, explode_remote_add);
   fts_data_class_define_function(explode_data_class, EXPLODE_REMOTE_REMOVE, explode_remote_remove);
   fts_data_class_define_function(explode_data_class, EXPLODE_REMOTE_CHANGE, explode_remote_change);
+  fts_data_class_define_function(explode_data_class, EXPLODE_REMOTE_CHANGE_TIME, explode_remote_change_time);
   init_explode_register();
 }
