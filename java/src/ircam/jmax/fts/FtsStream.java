@@ -716,11 +716,18 @@ abstract public class FtsStream
       }
   }
 
-  /**
-   * Get the arguments as an array of FtsAtom.
-   */
+
   private static FtsAtom args[];
 
+  /**
+   * Returns the next arguments as an array of FtsAtom. This array is a static
+   * member of class FtsStream.
+   *
+   * @return   the message arguments as an array of FtsAtom
+   * @exception java.io.IOException if an error occured during reading
+   * @exception FtsQuittedException if the server has quitted
+   * @exception java.io.InterruptedIOException if the read thread was interrupted
+   */
   public final FtsAtom[] getArgs()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {

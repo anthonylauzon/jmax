@@ -785,15 +785,21 @@ public class FtsObject
   }
 
 
-  /** Handle a direct message from an FTS object. 
-   * Empty by default, subclassed by special objects
-   */
-
   // (francois)
   // This is what I have found to get a class object representing the type of an array
   private static Class ftsAtomArrayClass = (new FtsAtom[1]).getClass();
 
-  void handleMessage( FtsStream stream)
+  /** 
+   * Handle a direct message from an FTS object.
+   * Implementation based on Core Reflection API.
+   *
+   * @param  stream    a FtsStream on which to read the selector and the arguments
+   * @exception java.io.IOException if an error occured during reading
+   * @exception FtsQuittedException if the server has quitted
+   * @exception java.io.InterruptedIOException if the read thread was interrupted
+   */
+
+  public void handleMessage( FtsStream stream)
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     if ( stream.nextIsSymbol() )
