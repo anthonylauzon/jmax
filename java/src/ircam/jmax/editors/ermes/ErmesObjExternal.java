@@ -153,9 +153,9 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 	 try{
 	   FtsLocation aFtsLocation = new FtsLocation(itsFtsObject);
 	   if (aFtsLocation == null) 
-	     System.err.println("ftslocation null per "+itsFtsObject);
+	     System.err.println("ftslocation null for "+itsFtsObject);
 	   MaxData aData = MaxDataHandler.loadDataInstance(MaxDataSource.makeDataSource(aFtsLocation));
-	   if (aData == null) System.err.println("MaxData nullo ");
+	   if (aData == null) System.err.println("null MaxData ");
 	   aData.edit();
 	   } catch (MaxDataException e){System.err.println("Max Data Exception: " + e);}
        }

@@ -1094,9 +1094,11 @@ Rectangle previousResizeRect = new Rectangle();
     
     if(editStatus == EDITING_OBJECT){
       itsEditField.LostFocus();
+      requestFocus();
     }
     if(editStatus == EDITING_COMMENT){
       itsTextArea.LostFocus();
+      requestFocus();
     }
     ///if we are in a InOutLet
     if(itsHelper.IsInInOutLet(x,y)){

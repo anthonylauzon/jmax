@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.utils.*;
 
 /**
  * The "toggle" graphic object.
@@ -13,10 +14,9 @@ class ErmesObjToggle extends ErmesObject {
   boolean itsToggled = false;
   static Dimension preferredSize = new Dimension(20,20);
   static Color itsCrossColor = new Color(0, 0, 128);
-  
+
   public ErmesObjToggle(){
     super();
-    //setLayout(null);
   }
   
   
