@@ -28,7 +28,6 @@ public class ControlPanelFrame extends JFrame
   private FtsDspControl control;
   private IndicatorWithMemory dacSlipIndicator;
   private IndicatorWithMemory invalidFpeIndicator;
-  private IndicatorWithMemory inexactFpeIndicator;
   private IndicatorWithMemory divideByZeroFpeIndicator;
   private IndicatorWithMemory overflowFpeIndicator;
 
@@ -73,10 +72,6 @@ public class ControlPanelFrame extends JFrame
     invalidFpeIndicator = new IndicatorWithMemory("Invalid Operand");
     panel.add(invalidFpeIndicator);
     new DspControlAdapter("invalidFpe", control, invalidFpeIndicator);
-
-//     inexactFpeIndicator = new IndicatorWithMemory("Inexact Operand");
-//     panel.add(inexactFpeIndicator);
-//     new DspControlAdapter("inexactFpe", control, inexactFpeIndicator);
 
     divideByZeroFpeIndicator = new IndicatorWithMemory("Division By Zero");
     panel.add(divideByZeroFpeIndicator);

@@ -11,19 +11,17 @@ public class FtsDspControl extends FtsRemoteData
   static final int INVALID_FPE_STATE  = 2;
   static final int DIVIDE_BY_ZERO_FPE_STATE  = 3;
   static final int OVERFLOW_FPE_STATE = 4;
-  static final int INEXACT_FPE_STATE = 5;
-  static final int SAMPLING_RATE = 6;
-  static final int FIFO_SIZE     = 7;
-  static final int DSP_ON        = 8;
+  static final int SAMPLING_RATE = 5;
+  static final int FIFO_SIZE     = 6;
+  static final int DSP_ON        = 7;
 
   /* Outgoing calls */
 
-  static final int FPE_START_COLLECT = 9;
-  static final int FPE_STOP_COLLECT  = 10;
+  static final int FPE_START_COLLECT = 8;
+  static final int FPE_STOP_COLLECT  = 9;
 
   protected Integer dacSlip;
   protected Integer invalidFpe;
-  protected Integer inexactFpe;
   protected Integer divideByZeroFpe;
   protected Integer overflowFpe;
   protected Integer samplingRate;
@@ -38,7 +36,6 @@ public class FtsDspControl extends FtsRemoteData
 
     dacSlip         = new Integer(0);
     invalidFpe      = new Integer(0);
-    inexactFpe      = new Integer(0);
     divideByZeroFpe = new Integer(0);
     overflowFpe     = new Integer(0);
     samplingRate    = new Integer(0);
@@ -58,11 +55,6 @@ public class FtsDspControl extends FtsRemoteData
   public Integer getInvalidFpe()
   {
     return invalidFpe;
-  }
-
-  public Integer getInexactFpe()
-  {
-    return inexactFpe;
   }
 
   public Integer getDivideByZeroFpe()
@@ -161,11 +153,6 @@ public class FtsDspControl extends FtsRemoteData
 	oldValue = invalidFpe;
 	invalidFpe = (Integer) newValue;
 	prop     = "invalidFpe";
-	break;
-      case INEXACT_FPE_STATE:
-	oldValue = invalidFpe;
-	invalidFpe = (Integer) newValue;
-	prop     = "inexactFpe";
 	break;
       case DIVIDE_BY_ZERO_FPE_STATE:
 	oldValue = divideByZeroFpe;

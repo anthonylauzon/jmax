@@ -72,59 +72,84 @@ void fts_client_mess_start_msg(int type)
 
 static void fts_client_mess_send_int(int value)
 {
-  fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value >> 24) & 0xff));
-  fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value >> 16) & 0xff));
-  fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value >> 8) & 0xff));
-  fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value >> 0) & 0xff));
+  if (client_dev)
+    {
+      fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value >> 24) & 0xff));
+      fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value >> 16) & 0xff));
+      fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value >> 8) & 0xff));
+      fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value >> 0) & 0xff));
+    }
+
 }
 
 static void fts_client_mess_send_float(float fvalue)
 {
-  float fv = fvalue;
-  unsigned int value = *((unsigned int *)&fv);
+  if (client_dev)
+    {
+      float fv = fvalue;
+      unsigned int value = *((unsigned int *)&fv);
 
-  fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value >> 24) & 0xff));
-  fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value >> 16) & 0xff));
-  fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value >> 8) & 0xff));
-  fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value >> 0) & 0xff));
+      fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value >> 24) & 0xff));
+      fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value >> 16) & 0xff));
+      fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value >> 8) & 0xff));
+      fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value >> 0) & 0xff));
+    }
 }
 
 void fts_client_mess_add_int(int value)
 {
-  fts_char_dev_put(client_dev, INT_CODE);
-  fts_client_mess_send_int(value);
+  if (client_dev)
+    {
+      fts_char_dev_put(client_dev, INT_CODE);
+      fts_client_mess_send_int(value);
+    }
 }
 
 
 void fts_client_mess_add_data( fts_data_t *data)
 {
-  fts_char_dev_put(client_dev, DATA_CODE);
-  fts_client_mess_send_int(data ? fts_data_get_id(data) : 0);
+  if (client_dev)
+    {
+      fts_char_dev_put(client_dev, DATA_CODE);
+      fts_client_mess_send_int(data ? fts_data_get_id(data) : 0);
+    }
 }
 
 void fts_client_mess_add_object(fts_object_t *obj)
 {  
-  fts_char_dev_put(client_dev, OBJECT_CODE);
-  fts_client_mess_send_int(obj ? fts_object_get_id(obj) : 0);
+  if (client_dev)
+    {
+      fts_char_dev_put(client_dev, OBJECT_CODE);
+      fts_client_mess_send_int(obj ? fts_object_get_id(obj) : 0);
+    }
 }
 
 
 void fts_client_mess_add_connection(fts_connection_t *c)
 {
-  fts_char_dev_put(client_dev, CONNECTION_CODE);
-  fts_client_mess_send_int(c ? fts_connection_get_id(c) : 0);
+  if (client_dev)
+    {
+      fts_char_dev_put(client_dev, CONNECTION_CODE);
+      fts_client_mess_send_int(c ? fts_connection_get_id(c) : 0);
+    }
 }
 
 
 void fts_client_mess_add_float(float value)
 {
-  fts_char_dev_put(client_dev, FLOAT_CODE);
-  fts_client_mess_send_float(value);
+  if (client_dev)
+    {
+      fts_char_dev_put(client_dev, FLOAT_CODE);
+      fts_client_mess_send_float(value);
+    }
 }
 
 
 void fts_client_mess_add_symbol(fts_symbol_t s)
 {
+  if (! client_dev)
+    return;
+
   if (fts_symbol_is_reserve_cached(s))
     {
       fts_symbol_cache(s);
@@ -144,7 +169,7 @@ void fts_client_mess_add_symbol(fts_symbol_t s)
       /* Not cached, don't define the symbol cached,
 	 and send a symbol and definition with a good index;
 	 */
-
+	  
       fts_char_dev_put(client_dev, SYMBOL_CODE);
       fts_char_dev_put(client_dev, STRING_START_CODE);
       fts_client_send_string(fts_symbol_name(s));
@@ -154,6 +179,9 @@ void fts_client_mess_add_symbol(fts_symbol_t s)
 
 void fts_client_mess_add_symbol_as_string(fts_symbol_t s)
 {
+  if (! client_dev)
+    return;
+
   if (fts_symbol_is_reserve_cached(s))
     {
       fts_symbol_cache(s);
@@ -178,9 +206,12 @@ void fts_client_mess_add_symbol_as_string(fts_symbol_t s)
 
 void fts_client_mess_add_string(const char *s)
 {
-  fts_char_dev_put(client_dev, STRING_START_CODE);
-  fts_client_send_string(s);
-  fts_char_dev_put(client_dev, STRING_END_CODE);
+  if (client_dev)
+    {
+      fts_char_dev_put(client_dev, STRING_START_CODE);
+      fts_client_send_string(s);
+      fts_char_dev_put(client_dev, STRING_END_CODE);
+    }
 }
 
 
@@ -257,7 +288,7 @@ void fts_client_upload_object(fts_object_t *obj)
   /* 
      NEW_OBJECT_VAR_CODE (obj)parent (dta) data (int)new-id (symbol) var [<args>]+
      NEW_OBJECT_CODE (obj)parent (dta) data (int)new-id [<args>]+
-   */
+     */
 
   if ((obj->argc >= 3) && fts_is_symbol(&(obj->argv[0])) && fts_is_symbol(&(obj->argv[1])) &&
       (fts_get_symbol(&(obj->argv[1])) == fts_s_column))

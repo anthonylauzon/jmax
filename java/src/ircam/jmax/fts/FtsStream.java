@@ -443,6 +443,7 @@ abstract public class FtsStream
 
     c = read();
     status = read();
+
     return c;
   }
 

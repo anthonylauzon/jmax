@@ -74,20 +74,20 @@ static void fts_inlet_remove_from_patcher(fts_inlet_t *this, fts_patcher_t *patc
 	    break;
 	  }
 
-      /* If we removed the outlet with the highest number,
-	 remove the last outlets without objects from the patcher */
+      /* If we removed the inlet with the highest number,
+	 remove the last inlets without objects from the patcher */
 
       if ((this->position + 1) == fts_object_get_inlets_number((fts_object_t *)patcher))
 	if (patcher->inlets[this->position] == 0)
 	  {
-	    int i;
+	    int new_inlets;
 
-	    i = this->position;
+	    new_inlets = this->position + 1;
 
-	    while (patcher->inlets[i] == 0)
-	      i--;
+	    while ((new_inlets > 0) && (patcher->inlets[new_inlets - 1] == 0))
+	      new_inlets--;
 
-	    fts_patcher_redefine_number_of_inlets(patcher, i + 1);
+	    fts_patcher_redefine_number_of_inlets(patcher, new_inlets);
 	  }
     }
 }
@@ -289,14 +289,14 @@ static void fts_outlet_remove_from_patcher(fts_outlet_t *this, fts_patcher_t *pa
       if ((this->position + 1) == fts_object_get_outlets_number((fts_object_t *)patcher))
 	if (patcher->outlets[this->position] == 0)
 	  {
-	    int i;
+	    int new_outlets;
 
-	    i = this->position;
+	    new_outlets = this->position + 1;
 
-	    while (patcher->outlets[i] == 0)
-	      i--;
+	    while ((new_outlets > 0) && (patcher->outlets[new_outlets - 1] == 0))
+	      new_outlets--;
 
-	    fts_patcher_redefine_number_of_outlets(patcher, i + 1);
+	    fts_patcher_redefine_number_of_outlets(patcher, new_outlets);
 	  }
     }
 }
@@ -1190,7 +1190,9 @@ void fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets)
 	fts_inlet_reposition(p, ((fts_inlet_t *)p)->position);
   }
 
-  fts_object_property_changed((fts_object_t *)this, fts_s_ninlets);
+
+  if (((fts_object_t *)this)->id != FTS_NO_ID)
+    fts_object_property_changed((fts_object_t *)this, fts_s_ninlets);
 }
 
 void fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets)
@@ -1287,7 +1289,8 @@ void fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlet
 	fts_outlet_reposition(p, ((fts_outlet_t *)p)->position);
   }
 
-  fts_object_property_changed((fts_object_t *)this, fts_s_noutlets);
+  if (((fts_object_t *)this)->id != FTS_NO_ID)
+    fts_object_property_changed((fts_object_t *)this, fts_s_noutlets);
 }
 
 /* Functions for object management; register and remove  an object in a patcher.

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.54 $ IRCAM $Date: 1998/11/23 18:01:35 $
+ *      $Revision: 1.55 $ IRCAM $Date: 1998/11/24 15:50:57 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -621,11 +621,18 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
       fts_error_object_fit_outlet(new, old->cl->noutlets - 1);
     }
 
+  /* Good order: first, move the properties, then upload the object
+     (so the properties will be known to the client), then move
+     the connections (because the object need to be uploaded in
+     order to move the connections) */
+     
+  fts_object_move_properties(old, new);
+
   if (do_client)
     fts_client_upload_object(new);
 
   fts_object_move_connections(old, new, do_client);
-  fts_object_move_properties(old, new);
+
 
   fts_object_free(old, do_client);
 

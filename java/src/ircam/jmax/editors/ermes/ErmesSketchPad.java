@@ -1713,24 +1713,24 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   
   void PrepareInChoice() 
   {
-    itsInPop = new ErmesObjInOutPop( itsSketchWindow, itsPatcher.getNumberOfInlets());
+    itsInPop = new ErmesObjInOutPop( itsSketchWindow, itsPatcher.getNumberOfInlets() + 4);
     add( itsInPop);
   }
 
   final void RedefineInChoice()
   {
-    itsInPop.Redefine( itsPatcher.getNumberOfInlets());
+    itsInPop.Redefine(itsPatcher.getNumberOfInlets() + 4);
   }
 
   void PrepareOutChoice()
   {
-    itsOutPop = new ErmesObjInOutPop( itsSketchWindow, itsPatcher.getNumberOfOutlets());
+    itsOutPop = new ErmesObjInOutPop( itsSketchWindow, itsPatcher.getNumberOfOutlets() + 4);
     add( itsOutPop);
   }
   
   void RedefineOutChoice()
   {
-    itsOutPop.Redefine( itsPatcher.getNumberOfOutlets());
+    itsOutPop.Redefine( itsPatcher.getNumberOfOutlets() + 4);
   }
 
   public void paint( Graphics g)
