@@ -101,6 +101,8 @@ public class Actions
   public static EditorAction saveToAction   = new SaveToAction();
   public static EditorAction saveTemplateAction = new SaveToAction();
 
+  public static EditorAction scalePatcherAction = new ScalePatcherAction();
+
   public static EditorAction printAction    = new PrintAction();
 
 

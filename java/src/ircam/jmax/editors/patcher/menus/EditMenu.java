@@ -91,6 +91,10 @@ public class EditMenu extends EditorMenu
 
     addSeparator();
 
+    JMenuItem scaleItem = add(Actions.scalePatcherAction, "Rescale Window");
+
+    addSeparator();
+
     selectAllItem = add(Actions.selectAllAction, "SelectAll", Event.CTRL_MASK, KeyEvent.VK_A);
 
     addSeparator();

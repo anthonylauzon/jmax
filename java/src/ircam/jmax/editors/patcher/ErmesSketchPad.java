@@ -406,6 +406,22 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
     //glass = ((GlassPanel)((JFrame)itsEditorContainer.getFrame()).getGlassPane());
   }
+  
+  float sx, sy;
+  public void scale(float scaleX, float scaleY)
+  {
+      sx = scaleX;
+      sy = scaleY;
+      getDisplayList().applyToObjects(new ObjectAction() {
+	      public void processObject(GraphicObject object)
+	      {
+		  object.redraw();
+		  object.redrawConnections();
+		  object.scale(sx, sy);
+		  object.redraw();
+		  object.redrawConnections();
+	      }});
+  }
 	
 
   /* To be called to fix the sketchpad size after some changes (move

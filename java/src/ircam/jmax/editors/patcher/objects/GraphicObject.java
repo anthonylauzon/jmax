@@ -311,6 +311,15 @@ abstract public class GraphicObject implements DisplayObject
     return false;
   }
 
+
+  public void scale(float scaleX, float scaleY)
+  {
+      setX(Math.round(getX()*scaleX));
+      setY(Math.round(getY()*scaleY));
+      setWidth(Math.round(getWidth()*scaleX));
+      setHeight(Math.round(getHeight()*scaleY));
+  }
+
   // Special version that do not update the connections.
 
   protected void setHeightNoConnections( int h) 

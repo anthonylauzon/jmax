@@ -271,7 +271,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
      itsSketchPad.scale(scaleX, scaleY);
 
      width =  Math.round(getSize().width*scaleX);
-     height = Math.round(getSize().width*scaleY);
+     height = Math.round(getSize().height*scaleY);
   
      setSize( width + horizontalOffset(), height + verticalOffset()); 
   }
