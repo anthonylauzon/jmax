@@ -61,6 +61,20 @@ default_copy_function (const fts_atom_t * p1, fts_atom_t * p2)
   fts_set_object(p2, fts_get_object(p1));
 }
 
+static void
+default_post_function(fts_object_t *obj, fts_bytestream_t *stream)
+{
+  if(fts_object_get_class_name(obj) != NULL)
+    fts_spost(stream, "<%s>", fts_symbol_name(fts_object_get_class_name(obj)));
+  else
+    fts_spost(stream, "<\?\?\?>");
+}
+
+static void
+default_array_function(fts_object_t *obj, fts_array_t *array)
+{
+}
+
 fts_class_t *
 fts_class_install (fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 {
@@ -73,6 +87,8 @@ fts_class_install (fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
   fts_class_set_hash_function (cl, default_hash_function);
   fts_class_set_equals_function (cl, default_equals_function);
   fts_class_set_copy_function (cl, default_copy_function);
+  fts_class_set_post_function (cl, default_post_function);
+  fts_class_set_array_function (cl, default_array_function);
 
   if (name != NULL)
     {

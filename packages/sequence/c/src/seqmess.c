@@ -32,6 +32,14 @@
  *
  */
 
+void 
+seqmess_post(fts_object_t *o, fts_bytestream_t *stream)
+{
+  seqmess_t *this = (seqmess_t *)o;
+  
+  fts_spost(stream, "<seqmess %s>", fts_symbol_name(this->s));
+}
+
 static void
 seqmess_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -48,15 +56,6 @@ seqmess_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     case 0:
       break;
     }
-}
-
-void 
-seqmess_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  seqmess_t *this = (seqmess_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-
-  fts_spost(stream, "<seqmess %s>", fts_symbol_name(this->s));
 }
 
 static void
@@ -96,9 +95,10 @@ seqmess_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(seqmess_t), seqmess_init, 0);
 
   fts_class_message_varargs(cl, fts_s_dump_state, seqmess_dump_state);
-  fts_class_message_varargs(cl, fts_s_post, seqmess_post);
 
   fts_class_message_varargs(cl, fts_s_set, seqmess_set);
+
+  fts_class_set_post_function(cl, seqmess_post);
 }
 
 void

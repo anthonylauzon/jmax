@@ -238,6 +238,26 @@ bpf_copy(bpf_t *org, bpf_t *copy)
     copy->points[i] = org->points[i];
 }
 
+static void
+bpf_post(fts_object_t *o, fts_bytestream_t *stream)
+{
+  bpf_t *this = (bpf_t *)o;
+  
+  if(this->size <= FTS_POST_MAX_ELEMENTS/2)
+  {
+    int i;
+    
+    fts_spost(stream, "<bpf");
+    
+    for(i=0; i<this->size; i++)
+      fts_spost(stream, " %.7g %.7g", this->points[i].time, this->points[i].value);
+    
+    fts_spost(stream, ">");
+  }
+  else
+    fts_spost(stream, "<bpf>");
+}
+
 double
 bpf_get_interpolated(bpf_t *this, double time)
 {
@@ -440,33 +460,15 @@ bpf_set_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-bpf_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  bpf_t *this = (bpf_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-
-  if(this->size <= FTS_POST_MAX_ELEMENTS/2)
-  {
-    int i;
-
-    fts_spost(stream, "<bpf");
-      
-    for(i=0; i<this->size; i++)
-      fts_spost(stream, " %.7g %.7g", this->points[i].time, this->points[i].value);
-      
-    fts_spost(stream, ">");
-  }
-  else
-    fts_spost(stream, "<bpf>");
-}
-
-static void
 bpf_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int size = this->size;
-
+  fts_bytestream_t* stream = fts_get_default_console_stream();
+  
+  if(ac > 0 && fts_is_object(at))
+    stream = (fts_bytestream_t *)fts_get_object(at);
+    
   if(size == 0)
     fts_spost(stream, "<empty bpf>\n", size);
   else if (size == 1)
@@ -747,7 +749,6 @@ bpf_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_get_tuple, bpf_get_tuple);
   
-  fts_class_message_varargs(cl, fts_s_post, bpf_post);
   fts_class_message_varargs(cl, fts_s_print, bpf_print);
   
   fts_class_message_varargs(cl, fts_s_openEditor, bpf_open_editor);
@@ -766,6 +767,8 @@ bpf_instantiate(fts_class_t *cl)
 
   fts_class_message_void(cl, fts_new_symbol("duration"), bpf_return_duration);
   fts_class_message_number(cl, fts_new_symbol("duration"), bpf_change_duration);
+  
+  fts_class_set_post_function(cl, bpf_post);
   
   fts_class_inlet_bang(cl, 0, data_object_output);
 

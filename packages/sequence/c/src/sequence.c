@@ -295,6 +295,39 @@ sequence_set_editor_close(sequence_t *sequence)
 }
 
 static void
+sequence_post_function(fts_object_t *o, fts_bytestream_t *stream)
+{
+  sequence_t *this = (sequence_t *)o;
+  int size = sequence_get_size(this);
+  
+  if(size == 0)
+    fts_spost(stream, "<sequence>");
+  else
+  {
+    track_t *track = sequence_get_first_track(this);
+    
+    fts_spost(stream, "<sequence");
+    
+    while(track != NULL)
+    {
+      fts_class_t *track_type = track_get_type(track);
+      
+      if(track_type != NULL)
+      {
+        fts_spost(stream, " ");
+        fts_spost_symbol(stream, fts_class_get_name(track_type));
+      }
+      else
+        fts_spost(stream, " -");
+      
+      track = sequence_track_get_next(track);
+    }
+    
+    fts_spost(stream, ">");
+  }
+}
+
+static void
 sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -394,48 +427,17 @@ sequence_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
   
 static void
-sequence_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  sequence_t *this = (sequence_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  int size = sequence_get_size(this);
-
-  if(size == 0)
-    fts_spost(stream, "<sequence>");
-  else
-  {
-    track_t *track = sequence_get_first_track(this);
-
-    fts_spost(stream, "<sequence");
-
-    while(track != NULL)
-    {
-      fts_class_t *track_type = track_get_type(track);
-
-      if(track_type != NULL)
-      {
-        fts_spost(stream, " ");
-        fts_spost_symbol(stream, fts_class_get_name(track_type));
-      }
-      else
-        fts_spost(stream, " -");
-
-      track = sequence_track_get_next(track);
-    }
-
-    fts_spost(stream, ">");
-  }
-}
-
-static void
 sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   track_t *track = sequence_get_first_track(this);
   int size = sequence_get_size(this);
+  fts_bytestream_t* stream = fts_get_default_console_stream();
   int i;
-
+  
+  if(ac > 0 && fts_is_object(at))
+    stream = (fts_bytestream_t *)fts_get_object(at);
+  
   if(size == 0)
     fts_spost(stream, "<empty sequence>\n");
   else
@@ -673,7 +675,6 @@ sequence_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_add_event, sequence_add_event_from_file);
   fts_class_message_varargs(cl, seqsym_dump_mess, sequence_event_dump_mess);
 
-  fts_class_message_varargs(cl, fts_s_post, sequence_post);
   fts_class_message_varargs(cl, fts_s_print, sequence_print);
 
   fts_class_message_varargs(cl, fts_s_get_element, sequence_get_element);
@@ -689,6 +690,8 @@ sequence_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_clear, sequence_clear);
   fts_class_message_varargs(cl, fts_s_import, sequence_import);
+
+  fts_class_set_post_function(cl, sequence_post_function);
 
   fts_class_inlet_thru(cl, 0);
 }

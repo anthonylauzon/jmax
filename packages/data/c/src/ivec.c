@@ -204,6 +204,27 @@ ivec_copy(ivec_t *org, ivec_t *copy)
     copy->values[i] = org->values[i];
 }
 
+static void
+ivec_post(fts_object_t *o, fts_bytestream_t *stream)
+{
+  ivec_t *this = (ivec_t *)o;
+  int size = ivec_get_size(this);
+  
+  if(size != 1 && size <= FTS_POST_MAX_ELEMENTS)
+  {
+    int i;
+    
+    fts_spost(stream, "<ivec");
+    
+    for(i=0; i<size; i++)
+      fts_spost(stream, " %d", ivec_get_element(this, i));
+    
+    fts_spost(stream, ">");
+  }
+  else
+    fts_spost(stream, "<ivec %d>", size);
+}
+
 /********************************************************
  *
  *  file utils
@@ -645,34 +666,15 @@ ivec_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
  */
 
 static void
-ivec_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ivec_t *this = (ivec_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  int size = ivec_get_size(this);
-
-  if(size != 1 && size <= FTS_POST_MAX_ELEMENTS)
-    {
-      int i;
-      
-      fts_spost(stream, "<ivec");
-      
-      for(i=0; i<size; i++)
-	fts_spost(stream, " %d", ivec_get_element(this, i));
-
-      fts_spost(stream, ">");
-    }
-  else
-    fts_spost(stream, "<ivec %d>", size);
-}
-
-static void
 ivec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *this = (ivec_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int size = ivec_get_size(this);
-
+  fts_bytestream_t* stream = fts_get_default_console_stream();
+  
+  if(ac > 0 && fts_is_object(at))
+    stream = (fts_bytestream_t *)fts_get_object(at);
+  
   if(size == 0)
     fts_spost(stream, "<empty ivec>\n");
   else if(size == 1)
@@ -873,10 +875,10 @@ ivec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_closeEditor, ivec_close_editor);
   fts_class_message_varargs(cl, fts_s_destroyEditor, ivec_destroy_editor);
 
-  fts_class_message_varargs(cl, fts_s_post, ivec_post); 
   fts_class_message_varargs(cl, fts_s_print, ivec_print); 
 
   fts_class_set_equals_function(cl, ivec_equals);
+  fts_class_set_post_function(cl, ivec_post);
   
   fts_class_message_varargs(cl, fts_s_set_from_instance, ivec_set_from_instance);
 

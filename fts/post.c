@@ -67,16 +67,16 @@ static int vmempost( char **pp, int *psize, int offset, const char *format, va_l
 
       /* If that worked, exit the loop. */
       if (n > -1 && n < *psize-offset)
-	break;
+        break;
 
       /* Else try again with more space. */
       if (n > -1)    /* glibc 2.1 */
-	*psize = offset + n + 1; /* precisely what is needed */
+        *psize = offset + n + 1; /* precisely what is needed */
       else           /* glibc 2.0 */
-	*psize *= 2;  /* twice the old size */
+        *psize *= 2;  /* twice the old size */
 
       if ((*pp = fts_realloc( *pp, *psize)) == NULL)
-	return -1;
+        return -1;
     }
 
   return n;
@@ -104,30 +104,30 @@ static int mempost_float( char **pp, int *psize, int offset, double f)
       int n = 0;
       
       if(f < 0.0)
-	{
-	  f = -f;
-	  mempost( pp, psize, offset, "-");
-	  n++;
-	}
+        {
+          f = -f;
+          mempost( pp, psize, offset, "-");
+          n++;
+        }
 
       frac = modf(f, &intr);
 
       if(frac == 0.0)
-	{
-	  if(f < 10000000.0)
-	    n += mempost( pp, psize, offset + n, "%.7g.", f);
-	  else
-	    n += mempost( pp, psize, offset + n, "%.7g", f);	    
-	}
+        {
+          if(f < 10000000.0)
+            n += mempost( pp, psize, offset + n, "%.7g.", f);
+          else
+            n += mempost( pp, psize, offset + n, "%.7g", f);            
+        }
       else
-	{
-	  if(f >= 0.0001)
-	    n += mempost( pp, psize, offset + n, "%.7g", f);
-	  else if(f >= 0.0000001)
-	    n += mempost( pp, psize, offset + n, "%.7f", f);
-	  else
-	    n += mempost( pp, psize, offset + n, "%.6e", f);
-	}
+        {
+          if(f >= 0.0001)
+            n += mempost( pp, psize, offset + n, "%.7g", f);
+          else if(f >= 0.0000001)
+            n += mempost( pp, psize, offset + n, "%.7f", f);
+          else
+            n += mempost( pp, psize, offset + n, "%.6e", f);
+        }
 
       return n;
     }
@@ -155,11 +155,11 @@ mempost_object( char **pp, int *psize, int offset, fts_object_t *obj)
     {
       if (ac > 1)
       {
-	if(fts_is_symbol(at + 1) && fts_get_symbol(at + 1) == fts_s_colon)
-	{
-	  ac -= 2;
-	  at += 2;
-	}
+        if(fts_is_symbol(at + 1) && fts_get_symbol(at + 1) == fts_s_colon)
+        {
+          ac -= 2;
+          at += 2;
+        }
       }
       
       n = mempost( pp, psize, offset, "<");
@@ -198,26 +198,26 @@ mempost_atoms( char **pp, int *psize, int offset, int ac, const fts_atom_t *at)
   for ( i = 0; i < ac; i++, at++)
     {
       if ( fts_is_void( at))
-	n += mempost( pp, psize, offset+n, "<void>");
+        n += mempost( pp, psize, offset+n, "<void>");
       else if ( fts_is_int( at))
-	n += mempost( pp, psize, offset+n, "%d", fts_get_int( at));
+        n += mempost( pp, psize, offset+n, "%d", fts_get_int( at));
       else if ( fts_is_float( at))
-	n += mempost_float( pp, psize, offset+n, fts_get_float( at));
+        n += mempost_float( pp, psize, offset+n, fts_get_float( at));
       else if ( fts_is_symbol( at))
-	n += mempost_symbol( pp, psize, offset+n, fts_get_symbol( at));
+        n += mempost_symbol( pp, psize, offset+n, fts_get_symbol( at));
       else if ( fts_is_tuple( at))
-	n += mempost_tuple( pp, psize, offset+n, (fts_tuple_t *)fts_get_object( at));
+        n += mempost_tuple( pp, psize, offset+n, (fts_tuple_t *)fts_get_object( at));
       else if ( fts_is_object( at))
-	n += mempost_object( pp, psize, offset+n, fts_get_object( at));
+        n += mempost_object( pp, psize, offset+n, fts_get_object( at));
       else if ( fts_is_pointer( at) )
-	n += mempost( pp, psize, offset+n, "%p", fts_get_pointer( at));
+        n += mempost( pp, psize, offset+n, "%p", fts_get_pointer( at));
       else if ( fts_is_string( at))
-	n += mempost( pp, psize, offset+n, "%s", fts_get_string( at));
+        n += mempost( pp, psize, offset+n, "%s", fts_get_string( at));
       else
-	n += mempost( pp, psize, offset+n, "<unknown 0x%x>", fts_get_int( at));
+        n += mempost( pp, psize, offset+n, "<unknown 0x%x>", fts_get_int( at));
 
       if ( i != ac-1)
-	n += mempost( pp, psize, offset+n, " ");
+        n += mempost( pp, psize, offset+n, " ");
     }
 
   return n;
@@ -238,7 +238,7 @@ check_symbol_in( fts_symbol_t s, fts_symbol_t *symbols)
   while (*symbols != NULL)
     {
       if ( *symbols == s)
-	return 1;
+        return 1;
 
       symbols++;
     }
@@ -259,15 +259,15 @@ DECLARE_PUNCTUATION_ARRAY( want_a_space_after)
 DECLARE_PUNCTUATION_ARRAY( dont_want_a_space_after)
 DECLARE_PUNCTUATION_ARRAY( operator)
 
-#define INIT_PUNCTUATION_ARRAY( A)						\
-{										\
-  int i, size = sizeof(A##_strings) / sizeof( const char *);			\
-										\
-  for ( i = 0; i < size; i++)							\
-    A##_symbols[i] = fts_new_symbol( A##_strings[i]);				\
-										\
-  /* Must add one NULL element at the end; see function check_symbol_in() */	\
-  A##_symbols[ size] = NULL;							\
+#define INIT_PUNCTUATION_ARRAY( A)                                                \
+{                                                                                \
+  int i, size = sizeof(A##_strings) / sizeof( const char *);                        \
+                                                                                \
+  for ( i = 0; i < size; i++)                                                        \
+    A##_symbols[i] = fts_new_symbol( A##_strings[i]);                                \
+                                                                                \
+  /* Must add one NULL element at the end; see function check_symbol_in() */        \
+  A##_symbols[ size] = NULL;                                                        \
 }
 
 static void 
@@ -294,7 +294,7 @@ needs_quote( fts_symbol_t s)
     return 0;
 
   while( *c != '\0')
-    {	    
+    {            
       switch (*c) {
       case '$':
       case ';':
@@ -309,7 +309,7 @@ needs_quote( fts_symbol_t s)
       case '\n':
       case '\t':
       case '\'':
-	return 1;
+        return 1;
       }
 
       c++;
@@ -376,41 +376,19 @@ fts_spost_complex(fts_bytestream_t *stream, double re, double im)
 void 
 fts_spost_object(fts_bytestream_t *stream, fts_object_t *obj)
 {
-  int n = 0;
-
-  if(obj)
-    {
-      fts_method_t meth_post = fts_class_get_method_varargs(fts_object_get_class(obj), fts_s_post);
-
-      if(meth_post)
-	{
-	  fts_atom_t a;
-
-	  fts_set_object(&a, stream);
-	  meth_post(obj, fts_system_inlet, fts_s_post, 1, &a);
-	}
-      else
-	{
-	  int ac = fts_object_get_description_size( obj);
-	  const fts_atom_t *at = fts_object_get_description_atoms( obj);
-	  
-	  if(ac > 0)
-	    {
-	      n += mempost( &post_buffer, &post_buffer_size, 0, "(");
-	      n += mempost_atoms( &post_buffer, &post_buffer_size, n, ac, at);
-	      n += mempost( &post_buffer, &post_buffer_size, n, ")");
-	    }
-	  else if(fts_object_get_class_name(obj) != NULL)
-	    n += mempost( &post_buffer, &post_buffer_size, 0, "<%s>", fts_symbol_name(fts_object_get_class_name(obj)));
-	  else
-	    n += mempost( &post_buffer, &post_buffer_size, 0, "<\?\?\?>");
-	}
-    }
+  if(obj != NULL)
+  {
+    fts_post_function_t fun = fts_class_get_post_function(fts_object_get_class(obj));
+    
+    (*fun)(obj, stream);
+  }
   else
-    n =  mempost( &post_buffer, &post_buffer_size, 0, "<null object>");
-
-  fts_bytestream_output( stream, n, (unsigned char *)post_buffer);
-  fts_bytestream_flush( stream);
+  {
+    int n =  mempost( &post_buffer, &post_buffer_size, 0, "<null object>");
+    
+    fts_bytestream_output( stream, n, (unsigned char *)post_buffer);
+    fts_bytestream_flush( stream);
+  }
 }
 
 void 
@@ -421,24 +399,24 @@ fts_spost_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t *at)
   for ( i = 0; i < ac; i++, at++)
     {
       if ( fts_is_void( at))
-	fts_spost(stream, "<void>");
+        fts_spost(stream, "<void>");
       else if ( fts_is_int( at))
-	fts_spost(stream, "%d", fts_get_int( at));
+        fts_spost(stream, "%d", fts_get_int( at));
       else if ( fts_is_float( at))
-	fts_spost_float(stream, fts_get_float( at));
+        fts_spost_float(stream, fts_get_float( at));
       else if ( fts_is_symbol( at))
-	fts_spost_symbol(stream, fts_get_symbol( at));
+        fts_spost_symbol(stream, fts_get_symbol( at));
       else if ( fts_is_object( at))
-	fts_spost_object(stream, fts_get_object( at));
+        fts_spost_object(stream, fts_get_object( at));
       else if ( fts_is_pointer( at) )
-	fts_spost(stream, "%p", fts_get_pointer( at));
+        fts_spost(stream, "%p", fts_get_pointer( at));
       else if ( fts_is_string( at))
-	fts_spost(stream, "\"%p\"", fts_get_string( at));
+        fts_spost(stream, "\"%p\"", fts_get_string( at));
       else
-	fts_spost(stream, "<unknown 0x%x>", fts_get_int( at));
+        fts_spost(stream, "<unknown 0x%x>", fts_get_int( at));
 
-      if ( i != ac-1)	
-	fts_spost(stream, " ");
+      if ( i != ac-1)        
+        fts_spost(stream, " ");
     }
 }
 
@@ -481,40 +459,40 @@ fts_spost_object_description_args( fts_bytestream_t *stream, int ac, fts_atom_t 
   while (value1)
     {
       if (do_new_line)
-	fts_spost( stream, "\n"); 
+        fts_spost( stream, "\n"); 
       else if ( add_blank)
-	fts_spost( stream, " ");
+        fts_spost( stream, " ");
 
       do_new_line = 0;
 
       if (i >= ac)
-	value2 = 0;
+        value2 = 0;
       else
-	value2 = at + i;
+        value2 = at + i;
 
       if ( fts_is_int( value1))
-	fts_spost( stream, "%d", fts_get_int( value1));
+        fts_spost( stream, "%d", fts_get_int( value1));
       else if ( fts_is_float( value1))
-	fts_spost_float( stream, fts_get_float( value1));
+        fts_spost_float( stream, fts_get_float( value1));
       else if ( fts_is_symbol( value1))
-	fts_spost_symbol( stream, fts_get_symbol( value1));
+        fts_spost_symbol( stream, fts_get_symbol( value1));
       else 
-	fts_spost( stream, "\?\?\?");
+        fts_spost( stream, "\?\?\?");
 
       /* decide to put or not a blank between the two */
       if (want_a_space_after( value1))
-	add_blank = 1;
+        add_blank = 1;
       else if (dont_want_a_space_after( value1))
-	add_blank = 0;
+        add_blank = 0;
       else if (value2)
-	{
-	  if (want_a_space_before( value2))
-	    add_blank = 1;
-	  else if (dont_want_a_space_before( value2))
-	    add_blank = 0;
-	  else
-	    add_blank = 1;	/* if no body care, do a blank*/
-	}
+        {
+          if (want_a_space_before( value2))
+            add_blank = 1;
+          else if (dont_want_a_space_before( value2))
+            add_blank = 0;
+          else
+            add_blank = 1;        /* if no body care, do a blank*/
+        }
 
       value1 = value2;
       i++;
@@ -531,20 +509,6 @@ fts_spost_object_description_args( fts_bytestream_t *stream, int ac, fts_atom_t 
 
 static fts_stack_t *post_stack = NULL;
 
-fts_bytestream_t *
-fts_post_get_stream( int ac, const fts_atom_t *at)
-{
-  if(ac > 0 && fts_is_object(at))
-    {
-      fts_object_t *obj = fts_get_object(at);
-
-      if(fts_bytestream_check(obj))
-	return (fts_bytestream_t *)obj;
-    }
-
-  return fts_get_default_console_stream();
-}
-
 static void post_output_chars( char *buffer, int n)
 {
   if (fts_get_default_console_stream())
@@ -558,13 +522,13 @@ static void post_output_chars( char *buffer, int n)
       int i;
 
       if (post_stack == NULL)
-	{
-	  post_stack = (fts_stack_t *)fts_malloc( sizeof( fts_stack_t));
-	  fts_stack_init( post_stack, char);
-	}
+        {
+          post_stack = (fts_stack_t *)fts_malloc( sizeof( fts_stack_t));
+          fts_stack_init( post_stack, char);
+        }
 
       for ( i = 0; i < n; i++)
-	fts_stack_push( post_stack, char, post_buffer[i]);
+        fts_stack_push( post_stack, char, post_buffer[i]);
     }    
 }
 

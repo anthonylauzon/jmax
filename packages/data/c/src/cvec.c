@@ -99,6 +99,33 @@ cvec_copy(cvec_t *org, cvec_t *copy)
     copy->values[i] = org->values[i];  
 }
 
+static void
+cvec_post(fts_object_t *o, fts_bytestream_t *stream)
+{
+  cvec_t *this = (cvec_t *)o;
+  int size = cvec_get_size(this);
+  complex *p = cvec_get_ptr(this);
+  
+  if(size == 0)
+    fts_spost(stream, "<cvec>");
+  else if(size <= FTS_POST_MAX_ELEMENTS)
+  {
+    int i;
+    
+    fts_spost(stream, "<cvec");
+    
+    for(i=0; i<size; i++)
+    {
+      fts_spost(stream, " ");
+      fts_spost_complex(stream, p[i].re, p[i].im);
+    }
+    
+    fts_spost(stream, ">");
+  }
+  else
+    fts_spost(stream, "<cvec %d>", size);
+}
+
 /********************************************************************
  *
  *   user methods
@@ -467,41 +494,16 @@ cvec_ifft_cvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  */
 
 static void
-cvec_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  cvec_t *this = (cvec_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  int size = cvec_get_size(this);
-  complex *p = cvec_get_ptr(this);
-
-  if(size == 0)
-    fts_spost(stream, "<cvec>");
-  else if(size <= FTS_POST_MAX_ELEMENTS)
-    {
-      int i;
-      
-      fts_spost(stream, "<cvec");
-      
-      for(i=0; i<size; i++)
-      {
-        fts_spost(stream, " ");
-        fts_spost_complex(stream, p[i].re, p[i].im);
-      }
-      
-      fts_spost(stream, ">");
-    }
-  else
-    fts_spost(stream, "<cvec %d>", size);
-}
-
-static void
 cvec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   cvec_t *this = (cvec_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int size = cvec_get_size(this);
   complex *p = cvec_get_ptr(this);
-
+  fts_bytestream_t* stream = fts_get_default_console_stream();
+  
+  if(ac > 0 && fts_is_object(at))
+    stream = (fts_bytestream_t *)fts_get_object(at);
+  
   if(size == 0)
     fts_spost(stream, "<empty cvec>\n");
   else if(size == 1)
@@ -647,7 +649,6 @@ cvec_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   
-  fts_class_message_varargs(cl, fts_s_post, cvec_post); 
   fts_class_message_varargs(cl, fts_s_print, cvec_print); 
   fts_class_message_varargs(cl, fts_s_set_from_instance, cvec_set_from_instance);
 
@@ -678,6 +679,8 @@ cvec_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_s_size, cvec_return_size);
   fts_class_message_number(cl, fts_s_size, cvec_change_size);
   
+  fts_class_set_post_function(cl, cvec_post);
+
   fts_class_inlet_bang(cl, 0, data_object_output);
 
   fts_class_inlet_thru(cl, 0);

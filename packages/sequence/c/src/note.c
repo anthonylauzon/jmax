@@ -30,6 +30,38 @@ static fts_symbol_t sym_meter_4_4 = NULL;
 fts_class_t *scoob_class = 0;
 enumeration_t *scoob_type_enumeration = NULL;
 
+static void 
+scoob_post(fts_object_t *o, fts_bytestream_t *stream)
+{
+  scoob_t *self = (scoob_t *)o;
+  
+  switch(enumeration_get_index(scoob_type_enumeration, self->type))
+  {
+    case scoob_note:
+      if(self->interval > 0)
+        fts_spost(stream, "<scoob note %g (±%g) %g", self->pitch, self->interval, self->duration);
+      else
+        fts_spost(stream, "<scoob note %g %g", self->pitch, self->duration);
+      break;
+    case scoob_interval:
+      fts_spost(stream, "<scoob interval %g %s%g %g", self->pitch, (self->interval >= 0)? "+": "", self->interval, self->duration);
+      break;
+    case scoob_rest:
+      fts_spost(stream, "<scoob rest %g", self->duration);
+      break;
+    case scoob_trill:
+      fts_spost(stream, "<scoob trill %g %g %g", self->pitch, self->interval, self->duration);
+      break;
+    default:
+      fts_spost(stream, "<scoob %s %g %g %g", fts_symbol_name(self->type), self->pitch, self->interval, self->duration);
+      break;
+  }  
+  
+  propobj_post_properties((propobj_t *)self, stream);
+  
+  fts_spost(stream, ">");
+}
+
 static void
 _scoob_set_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -206,42 +238,14 @@ scoob_get_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void 
-scoob_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  scoob_t *self = (scoob_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  
-  switch(enumeration_get_index(scoob_type_enumeration, self->type))
-  {
-    case scoob_note:
-      if(self->interval > 0)
-        fts_spost(stream, "<scoob note %g (±%g) %g", self->pitch, self->interval, self->duration);
-      else
-        fts_spost(stream, "<scoob note %g %g", self->pitch, self->duration);
-      break;
-    case scoob_interval:
-      fts_spost(stream, "<scoob interval %g %s%g %g", self->pitch, (self->interval >= 0)? "+": "", self->interval, self->duration);
-      break;
-    case scoob_rest:
-      fts_spost(stream, "<scoob rest %g", self->duration);
-      break;
-    case scoob_trill:
-      fts_spost(stream, "<scoob trill %g %g %g", self->pitch, self->interval, self->duration);
-      break;
-    default:
-      fts_spost(stream, "<scoob %s %g %g %g", fts_symbol_name(self->type), self->pitch, self->interval, self->duration);
-      break;
-  }  
-  
-  propobj_post_properties((propobj_t *)self, stream);
-  
-  fts_spost(stream, ">");
-}
-
-static void 
 scoob_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  scoob_post(o, 0, NULL, 0, NULL);
+  fts_bytestream_t* stream = fts_get_default_console_stream();
+  
+  if(ac > 0 && fts_is_object(at))
+    stream = (fts_bytestream_t *)fts_get_object(at);
+
+  scoob_post(o, stream);
   fts_post("\n");
 }  
 
@@ -379,13 +383,13 @@ scoob_instantiate(fts_class_t *cl)
   
   fts_class_set_copy_function(cl, propobj_copy_function);
   fts_class_set_equals_function(cl, propobj_equals);
+  fts_class_set_post_function(cl, scoob_post);
   
   fts_class_message_varargs(cl, seqsym_get_property_list, scoob_get_property_list);
   fts_class_message_varargs(cl, seqsym_append_properties, scoob_append_properties);
   
   fts_class_message_varargs(cl, fts_s_get_tuple, scoob_get_tuple);
   fts_class_message_varargs(cl, fts_s_dump_state, scoob_dump_state);
-  fts_class_message_varargs(cl, fts_s_post, scoob_post);
   fts_class_message_varargs(cl, fts_s_print, scoob_print);
   
   fts_class_message_symbol(cl, seqsym_type, _scoob_set_type);
@@ -425,6 +429,24 @@ scoob_instantiate(fts_class_t *cl)
  */
 fts_class_t *scomark_class = 0;
 enumeration_t *scomark_type_enumeration = NULL;
+
+void 
+scomark_post(fts_object_t *o, fts_bytestream_t *stream)
+{
+  scomark_t *self = (scomark_t *)o;
+  
+  fts_spost(stream, "<scoomark %s", fts_symbol_name(self->type));
+  
+  if(self->meter_num > 0)
+    fts_spost(stream, " %d/%d", self->meter_num, self->meter_den);
+  
+  if(self->tempo > 0.0)
+    fts_spost(stream, " (MM 1/4 = %g)", self->tempo);
+  
+  propobj_post_properties((propobj_t *)self, stream);
+  
+  fts_spost(stream, ">");  
+}
 
 static void
 _scomark_set_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -659,25 +681,6 @@ scomark_append_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   propobj_append_properties((propobj_t *)self, array);
 }
 
-void 
-scomark_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  scomark_t *self = (scomark_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  
-  fts_spost(stream, "<scoomark %s", fts_symbol_name(self->type));
-
-  if(self->meter_num > 0)
-    fts_spost(stream, " %d/%d", self->meter_num, self->meter_den);
-    
-  if(self->tempo > 0.0)
-    fts_spost(stream, " (MM 1/4 = %g)", self->tempo);
-  
-  propobj_post_properties((propobj_t *)self, stream);
-  
-  fts_spost(stream, ">");  
-}
-
 static void
 scomark_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -716,7 +719,6 @@ scomark_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_get_property_list, scomark_get_property_list);
   fts_class_message_varargs(cl, seqsym_append_properties, scomark_append_properties);
   
-  fts_class_message_varargs(cl, fts_s_post, scomark_post);
   fts_class_message_varargs(cl, fts_s_dump_state, scomark_dump_state);
   
   fts_class_message_symbol(cl, seqsym_type, _scomark_set_type);
@@ -727,6 +729,8 @@ scomark_instantiate(fts_class_t *cl)
   
   fts_class_message_symbol(cl, seqsym_meter, _scomark_set_meter);
   fts_class_message_void(cl, seqsym_meter, _scomark_get_meter);
+
+  fts_class_set_post_function(cl, scoob_post);
 }
 
 void

@@ -83,12 +83,12 @@ extern "C" {
 #include <fts/objectlist.h>
 #include <fts/variable.h>
 #include <fts/atom.h>
+#include <fts/array.h>
 #include <fts/patcherobject.h>
 #include <fts/object.h>
 #include <fts/class.h>
 #include <fts/function.h>
 #include <fts/connection.h>
-#include <fts/array.h>
 #include <fts/tokenizer.h>
 #include <fts/expression.h>
 #include <fts/objectset.h>

@@ -154,6 +154,20 @@ mat_copy(mat_t *org, mat_t *copy)
     copy->data[i] = org->data[i];
 }
 
+static void
+mat_post(fts_object_t *o, fts_bytestream_t *stream)
+{
+  mat_t *self = (mat_t *) o;
+  int m = mat_get_m(self);
+  int n = mat_get_n(self);
+  int size = m * n;
+  
+  if(size == 0)
+    fts_spost(stream, "<mat>");
+  else
+    fts_spost(stream, "<mat %d %d>", m, n);
+}
+
 /********************************************************
  *
  *  files
@@ -618,28 +632,16 @@ mat_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-mat_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  mat_t *self = (mat_t *) o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  int m = mat_get_m(self);
-  int n = mat_get_n(self);
-  int size = m * n;
-  
-  if(size == 0)
-    fts_spost(stream, "<mat>");
-  else
-    fts_spost(stream, "<mat %d %d>", m, n);
-}
-
-static void
 mat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *self = (mat_t *) o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int m = mat_get_m(self);
   int n = mat_get_n(self);
   int size = m * n;
+  fts_bytestream_t* stream = fts_get_default_console_stream();
+  
+  if(ac > 0 && fts_is_object(at))
+    stream = (fts_bytestream_t *)fts_get_object(at);
   
   if(size == 0)
     fts_spost(stream, "<empty mat>\n");
@@ -754,10 +756,10 @@ mat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, mat_dump_state);
 
-  fts_class_message_varargs(cl, fts_s_post, mat_post); 
   fts_class_message_varargs(cl, fts_s_print, mat_print); 
 
   fts_class_set_equals_function(cl, mat_equals);
+  fts_class_set_post_function(cl, mat_post);
   
   fts_class_message_varargs(cl, fts_s_set_from_instance, mat_set_from_instance);
   

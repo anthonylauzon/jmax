@@ -48,13 +48,13 @@
  *
  * @ingroup array
  */
-typedef struct _fts_array_t 
+struct fts_array
 {
   fts_atom_t *atoms;
   int size;
   int alloc_increment;
   int alloc;
-} fts_array_t;
+};
 
 /*@}*/
 

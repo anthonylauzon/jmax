@@ -46,42 +46,39 @@ print_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     }
 
   if (ac == 1 && !fts_is_symbol(at))
+  {
+    /* single argument */
+    if (fts_is_object(at))
     {
-      /* single argument */
-      if (fts_is_object(at))
-	{
-	  fts_object_t *obj = fts_get_object(at);
-	  fts_method_t meth = fts_class_get_method_varargs(fts_object_get_class(obj), fts_s_print);
-	  fts_atom_t a;
-
-	  if (meth)
-	    {
-	      fts_set_object(&a, this->stream);
-	      meth(obj, 0, 0, 1, &a);
-	      return;
-	    }
-
-	  meth = fts_class_get_method_varargs(fts_object_get_class(obj), fts_s_post);
-
-	  if (meth)
-	    {
-	      fts_set_object(&a, this->stream);
-	      meth(obj, 0, 0, 1, &a);
-	      fts_spost(this->stream, "\n");
-	      return;
-	    }
-	}
-
-      /* simple value or object without print method */
-      fts_spost_atoms(this->stream, 1, at);
-      fts_spost(this->stream, "\n");
+      fts_object_t *obj = fts_get_object(at);
+      fts_class_t *cl = fts_object_get_class(obj);
+      fts_method_t meth = fts_class_get_method_varargs(cl, fts_s_print);
+      
+      if(meth != NULL)
+      {
+        fts_atom_t a;
+        fts_set_object(&a, this->stream);
+        (*meth)(obj, 0, 0, 1, &a);
+        return;
+      }
+      else
+      {
+        fts_post_function_t fun = fts_class_get_post_function(cl);
+        
+        (*fun)(obj, this->stream);
+        return;
+      }        
     }
+    
+    /* simple value or object without print method */
+    fts_spost_atoms(this->stream, 1, at);
+    fts_spost(this->stream, "\n");
+  }
   else if (ac > 0)
-    {
-      fts_spost_atoms(this->stream, ac, at);
-
-      fts_spost(this->stream, "\n");
-    }
+  {
+    fts_spost_atoms(this->stream, ac, at);
+    fts_spost(this->stream, "\n");
+  }
   else if (s == NULL)
     fts_spost(this->stream, "<bang>\n");
   else

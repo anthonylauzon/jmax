@@ -683,8 +683,11 @@ static void
 audioconfig_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   fts_audioconfig_t* self = (fts_audioconfig_t*)o;
-  fts_bytestream_t* stream = fts_post_get_stream(ac, at);
   fts_audiolabel_t* label = self->labels;
+  fts_bytestream_t* stream = fts_get_default_console_stream();
+  
+  if(ac > 0 && fts_is_object(at))
+    stream = (fts_bytestream_t *)fts_get_object(at);
 
   fts_spost(stream, "[audioconfig] sampling rate: %d\t buffer size: %d\n", 
 	    self->sample_rate, 

@@ -57,8 +57,6 @@
  * @defgroup bytestream byte stream
  */
 
-typedef struct fts_bytestream fts_bytestream_t;
-
 /**
  * Call back function declared by an object listening to a byte stream.
  *

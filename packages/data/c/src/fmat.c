@@ -445,6 +445,45 @@ fmat_copy_function(const fts_atom_t *from, fts_atom_t *to)
   fmat_copy((fmat_t *)fts_get_object(from), (fmat_t *)fts_get_object(to));
 }
 
+static int
+fmat_equals_function(const fts_atom_t *a, const fts_atom_t *b)
+{
+  fmat_t *o = (fmat_t *)fts_get_object(a);
+  fmat_t *p = (fmat_t *)fts_get_object(b);
+  
+  if(fmat_get_m(o) == fmat_get_m(p) && fmat_get_n(o) == fmat_get_n(p))
+  {
+    int size = fmat_get_m(o) * fmat_get_n(o);
+    float *o_ptr = fmat_get_ptr(o);
+    float *p_ptr = fmat_get_ptr(p);
+    int i;
+    
+    for(i=0; i<size; i++)
+      if(!data_float_equals(o_ptr[i], p_ptr[i]))
+        return 0;
+    
+    return 1;
+  }
+  
+  return 0;
+}
+
+
+static void
+fmat_post_function(fts_object_t *o, fts_bytestream_t *stream)
+{
+  fmat_t *self = (fmat_t *)o;
+  fmat_format_t *format = fmat_get_format(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  int size = n * m;
+  
+  if(size == 0)
+    fts_spost(stream, "<fmat>");
+  else
+    fts_spost(stream, "<fmat %d x %d of %s>", m, n, fts_symbol_name(fmat_format_get_name(format)));
+}
+
 float
 fmat_get_max_abs_value_in_range(fmat_t *mat, int a, int b)
 {
@@ -3447,36 +3486,24 @@ fmat_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
  */
 
 static void
-fmat_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *self = (fmat_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  int m = fmat_get_m(self);
-  int n = fmat_get_n(self);
-  int size = n * m;
-
-  if(size == 0)
-    fts_spost(stream, "<fmat>");
-  else
-    fts_spost(stream, "<fmat %dx%d>", m, n);
-}
-
-static void
 fmat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
   fmat_format_t *format = fmat_get_format(self);
   int size = m * n;
+  fts_bytestream_t* stream = fts_get_default_console_stream();
   int i, j;
-
+  
+  if(ac > 0 && fts_is_object(at))
+    stream = (fts_bytestream_t *)fts_get_object(at);
+  
   if(size == 0)
     fts_spost(stream, "<empty fmat of %s>\n", fts_symbol_name(fmat_format_get_name(format)));
   else
   {
-    fts_spost(stream, "<fmat %dx%d of %s>\n", m, n, fts_symbol_name(fmat_format_get_name(format)));
+    fts_spost(stream, "<fmat %d x %d of %s>\n", m, n, fts_symbol_name(fmat_format_get_name(format)));
     fts_spost(stream, "{\n");
 
     for(i=0; i<m; i++)
@@ -3528,31 +3555,6 @@ fmat_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     fts_dumper_message_send(dumper, mess);
   }
 }
-
-static int
-fmat_equals(const fts_atom_t *a, const fts_atom_t *b)
-{
-  fmat_t *o = (fmat_t *)fts_get_object(a);
-  fmat_t *p = (fmat_t *)fts_get_object(b);
-
-  if(fmat_get_m(o) == fmat_get_m(p) && fmat_get_n(o) == fmat_get_n(p))
-  {
-    int size = fmat_get_m(o) * fmat_get_n(o);
-    float *o_ptr = fmat_get_ptr(o);
-    float *p_ptr = fmat_get_ptr(p);
-    int i;
-
-    for(i=0; i<size; i++)
-      if(!data_float_equals(o_ptr[i], p_ptr[i]))
-        return 0;
-
-    return 1;
-  }
-
-  return 0;
-}
-
-
 
 
 /*********************************************************
@@ -3699,7 +3701,6 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, fmat_dump_state);
   
-  fts_class_message_varargs(cl, fts_s_post, fmat_post);
   fts_class_message_varargs(cl, fts_s_print, fmat_print);
   
   fts_class_message_varargs(cl, fts_s_get_element, _fmat_get_element);
@@ -3796,7 +3797,8 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_s_export, fmat_export_dialog);
   
   fts_class_set_copy_function(cl, fmat_copy_function);
-  fts_class_set_equals_function(cl, fmat_equals);
+  fts_class_set_equals_function(cl, fmat_equals_function);
+  fts_class_set_post_function(cl, fmat_post_function);
 
   fts_class_inlet_bang(cl, 0, data_object_output);
   

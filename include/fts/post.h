@@ -95,7 +95,6 @@ FTS_API void fts_spost_object_description_args( fts_bytestream_t *stream, int ac
  */
 #define FTS_POST_MAX_ELEMENTS 8
 
-FTS_API fts_bytestream_t *fts_post_get_stream( int ac, const fts_atom_t *at);
 FTS_API void fts_post( const char *format, ...);
 FTS_API void fts_post_atoms( int ac, const fts_atom_t *at);
 

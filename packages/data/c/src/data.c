@@ -60,6 +60,16 @@ data_object_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 fts_class_t *expr_class = NULL;
 
 static void
+expr_post(fts_object_t *o, fts_bytestream_t *stream)
+{
+  expr_t *self = (expr_t *)o;
+  
+  fts_spost(stream, "<expr '");
+  fts_spost_atoms(stream, fts_array_get_size(&self->descr), fts_array_get_atoms(&self->descr));
+  fts_spost(stream, "'>");
+}
+
+static void
 expr_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   expr_t *self = (expr_t *) o;
@@ -181,20 +191,14 @@ expr_evaluate(expr_t *self, fts_hashtable_t *locals, int ac, const fts_atom_t *a
 }
 
 static void
-expr_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  expr_t *self = (expr_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  
-  fts_spost(stream, "<expr '");
-  fts_spost_atoms(stream, fts_array_get_size(&self->descr), fts_array_get_atoms(&self->descr));
-  fts_spost(stream, "'>");
-}
-
-static void
 expr_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  expr_post(o, 0, NULL, 0, NULL);
+  fts_bytestream_t* stream = fts_get_default_console_stream();
+  
+  if(ac > 0 && fts_is_object(at))
+    stream = (fts_bytestream_t *)fts_get_object(at);
+
+  expr_post(o, stream);
   fts_post("\n");
 }
 
@@ -231,13 +235,14 @@ expr_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(expr_t), expr_init, expr_delete);
   
-  fts_class_message_varargs(cl, fts_s_post, expr_post);
   fts_class_message_varargs(cl, fts_s_print, expr_print);
   
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   
   fts_class_message_varargs(cl, fts_new_symbol("eval"), _expr_evaluate);
   /*fts_class_message_symbol(cl, fts_new_symbol("set"), expr_set);*/
+  
+  fts_class_set_post_function(cl, expr_post);
   
   fts_class_doc(cl, fts_s_print, NULL, "print expression");
 }

@@ -73,6 +73,16 @@ tuple_copy_function(const fts_atom_t *from, fts_atom_t *to)
 }
 
 static void
+tuple_post(fts_object_t *o, fts_bytestream_t *stream)
+{
+  fts_tuple_t *this = (fts_tuple_t *)o;
+  
+  fts_spost(stream, "{");
+  fts_spost_atoms(stream, fts_tuple_get_size(this), fts_tuple_get_atoms(this));
+  fts_spost(stream, "}");
+}
+
+static void
 tuple_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_tuple_t *this = (fts_tuple_t *)o;
@@ -131,20 +141,14 @@ tuple_third(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-tuple_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_tuple_t *this = (fts_tuple_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  
-  fts_spost(stream, "{");
-  fts_spost_atoms(stream, fts_tuple_get_size(this), fts_tuple_get_atoms(this));
-  fts_spost(stream, "}");
-}
-
-static void
 tuple_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  tuple_post(o, 0, NULL, 0, NULL);
+  fts_bytestream_t* stream = fts_get_default_console_stream();
+  
+  if(ac > 0 && fts_is_object(at))
+    stream = (fts_bytestream_t *)fts_get_object(at);
+
+  tuple_post(o, stream);
   fts_post("\n");
 }
 
@@ -170,7 +174,6 @@ tuple_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(fts_tuple_t), tuple_init, tuple_delete);
 
   fts_class_message_varargs(cl, fts_s_dump_state, tuple_dump_state);  
-  fts_class_message_varargs(cl, fts_s_post, tuple_post);
   fts_class_message_varargs(cl, fts_s_print, tuple_print);
   
   fts_class_message_varargs(cl, fts_s_get_element, tuple_element);
@@ -182,6 +185,7 @@ tuple_instantiate(fts_class_t *cl)
 
   fts_class_set_equals_function(cl, tuple_equals_function);
   fts_class_set_copy_function(cl, tuple_copy_function);
+  fts_class_set_post_function(cl, tuple_post);
 
   fts_class_doc(cl, fts_s_tuple, "[<any: value> ...]", "immutable array of any values");
   fts_class_doc(cl, fts_new_symbol("first"), NULL, "get first value");

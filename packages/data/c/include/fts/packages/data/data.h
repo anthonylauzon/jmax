@@ -89,6 +89,8 @@ typedef struct
 } propobj_property_t;
 
 #define propobj_property_get_index(p) ((p)->index)
+#define propobj_property_get_name(p) ((p)->name)
+#define propobj_property_get_type(p) ((p)->type)
 
 typedef struct
 {

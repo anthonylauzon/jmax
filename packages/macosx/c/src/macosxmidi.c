@@ -417,9 +417,12 @@ static void
 macosxmidi_print( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
+  fts_bytestream_t* stream = fts_get_default_console_stream();
   int i, n;
-
+  
+  if(ac > 0 && fts_is_object(at))
+    stream = (fts_bytestream_t *)fts_get_object(at);
+  
   n = MIDIGetNumberOfSources();
   fts_spost(stream, "\n");
   fts_spost(stream, "Mac OS X proposes %d sources(s)\n", n);

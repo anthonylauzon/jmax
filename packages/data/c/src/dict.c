@@ -163,6 +163,12 @@ dict_copy_function(const fts_atom_t *from, fts_atom_t *to)
   dict_copy((dict_t *)fts_get_object(from), (dict_t *)fts_get_object(to));
 }
 
+static void
+dict_post(fts_object_t *o, fts_bytestream_t *stream)
+{
+  fts_spost(stream, "<dict>");
+}
+
 /**********************************************************
  *
  *  user methods
@@ -548,20 +554,15 @@ dict_get_keys(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-dict_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-
-  fts_spost(stream, "<dict>");
-}
-
-static void
 dict_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dict_t *self = (dict_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int size = fts_hashtable_get_size(&self->hash);
-
+  fts_bytestream_t* stream = fts_get_default_console_stream();
+  
+  if(ac > 0 && fts_is_object(at))
+    stream = (fts_bytestream_t *)fts_get_object(at);
+  
   if(size == 0)
     fts_spost(stream, "<empty dictionary>\n");
   else
@@ -653,7 +654,6 @@ dict_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_set_from_instance, dict_set_from_dict);
   fts_class_message_varargs(cl, fts_s_get_tuple, dict_get_keys);
 
-  fts_class_message_varargs(cl, fts_s_post, dict_post);
   fts_class_message_varargs(cl, fts_s_print, dict_print);
   
   fts_class_message_varargs(cl, fts_s_import, dict_import);
@@ -677,6 +677,7 @@ dict_instantiate(fts_class_t *cl)
   fts_class_outlet_thru(cl, 0);
 
   fts_class_set_copy_function(cl, dict_copy_function);
+  fts_class_set_post_function(cl, dict_post);
 
   fts_class_doc(cl, dict_symbol, "[<sym|int: key> <any: value> ...]", "dictionary");
   fts_class_doc(cl, fts_s_clear, NULL, "erase all entries");

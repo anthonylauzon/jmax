@@ -28,6 +28,26 @@ fts_class_t *vec_type = 0;
 
 static fts_symbol_t sym_text = 0;
 
+static void
+vec_post(fts_object_t *o, fts_bytestream_t *stream)
+{
+  vec_t *this = (vec_t *)o;
+  int size = vec_get_size(this);
+  
+  if(size == 0)
+    fts_spost(stream, "<vec>");
+  else if(size <= FTS_POST_MAX_ELEMENTS)
+  {
+    fts_atom_t *p = vec_get_ptr(this);
+    
+    fts_spost(stream, "<vec ", size);
+    fts_spost_atoms(stream, size, p);
+    fts_spost(stream, ">");
+  }
+  else
+    fts_spost(stream, "<vec %d>", size);
+}
+
 /********************************************************************
  *
  *   user methods
@@ -284,34 +304,17 @@ vec_write_atom_file(vec_t *vec, fts_symbol_t file_name)
  */
 
 static void
-vec_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  vec_t *this = (vec_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  int size = vec_get_size(this);
-
-  if(size == 0)
-    fts_spost(stream, "<vec>");
-  else if(size <= FTS_POST_MAX_ELEMENTS)
-    {
-      fts_atom_t *p = vec_get_ptr(this);
-      
-      fts_spost(stream, "<vec ", size);
-      fts_spost_atoms(stream, size, p);
-      fts_spost(stream, ">");
-    }
-  else
-    fts_spost(stream, "<vec %d>", size);
-}
-
-static void
 vec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vec_t *this = (vec_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int size = vec_get_size(this);
   fts_atom_t *p = vec_get_ptr(this);
-
+  fts_bytestream_t* stream = fts_get_default_console_stream();
+  
+  if(ac > 0 && fts_is_object(at))
+    stream = (fts_bytestream_t *)fts_get_object(at);
+  
+  
   if(size == 0)
     fts_spost(stream, "<empty vec>\n");
   else if(size == 1)
@@ -424,12 +427,10 @@ vec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_dump_state, vec_dump_state);
 
   fts_class_set_equals_function(cl, vec_equals);
+  fts_class_set_post_function(cl, vec_post);
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, vec_set_from_instance);
-
-  fts_class_message_varargs(cl, fts_s_get_tuple, vec_get_tuple);
-  
-  fts_class_message_varargs(cl, fts_s_post, vec_post); 
+  fts_class_message_varargs(cl, fts_s_get_tuple, vec_get_tuple);  
   fts_class_message_varargs(cl, fts_s_print, vec_print); 
     
   fts_class_message_varargs(cl, fts_s_fill, vec_fill);      

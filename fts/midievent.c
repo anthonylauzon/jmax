@@ -299,6 +299,64 @@ midievent_copy_function(const fts_atom_t *from, fts_atom_t *to)
 }
 
 static void
+midievent_post(fts_object_t *o, fts_bytestream_t *stream)
+{
+  fts_midievent_t *this = (fts_midievent_t *)o;
+  int type = fts_midievent_get_type(this);
+  
+  fts_spost(stream, "<midievent %s ", fts_symbol_name(fts_midi_types[type]));
+  
+  switch (type)
+  {
+    case midi_note:
+    case midi_poly_pressure:
+    case midi_control_change:
+    case midi_pitch_bend:
+      fts_spost(stream, "%d %d %d", 
+                fts_midievent_channel_message_get_first(this), 
+                fts_midievent_channel_message_get_second(this),
+                fts_midievent_channel_message_get_channel(this));
+      break;
+      
+    case midi_program_change:
+    case midi_channel_pressure:		
+      fts_spost(stream, "%d %d",
+                fts_midievent_channel_message_get_first(this), 
+                fts_midievent_channel_message_get_channel(this));
+      break;
+      
+    case midi_system_exclusive:
+      fts_post_atoms(fts_midievent_system_exclusive_get_size(this), fts_midievent_system_exclusive_get_atoms(this));
+      break;
+      
+    case midi_time_code:
+      fts_spost(stream, "%d %d %d %d %d",
+                fts_midievent_time_code_get_type(this),
+                fts_midievent_time_code_get_hour(this),
+                fts_midievent_time_code_get_minute(this),
+                fts_midievent_time_code_get_second(this),
+                fts_midievent_time_code_get_frame(this));
+      break;
+      
+    case midi_song_position_pointer:
+      fts_spost(stream, "%d %d",
+                fts_midievent_song_position_pointer_get_first(this),
+                fts_midievent_song_position_pointer_get_second(this));
+      break;
+      
+    case midi_song_select:
+      fts_spost(stream, "%d", fts_midievent_song_select_get(this));
+      break;
+      
+    case midi_real_time:
+      fts_spost(stream, "%d", fts_midievent_real_time_get(this));
+      break;
+  }
+  
+  fts_spost(stream, ">");  
+}
+
+static void
 midievent_set_from_midievent(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
@@ -674,65 +732,6 @@ midievent_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-midievent_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_midievent_t *this = (fts_midievent_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  int type = fts_midievent_get_type(this);
-
-  fts_spost(stream, "<midievent %s ", fts_symbol_name(fts_midi_types[type]));
-
-  switch (type)
-  {
-    case midi_note:
-    case midi_poly_pressure:
-    case midi_control_change:
-    case midi_pitch_bend:
-      fts_spost(stream, "%d %d %d", 
-                fts_midievent_channel_message_get_first(this), 
-                fts_midievent_channel_message_get_second(this),
-                fts_midievent_channel_message_get_channel(this));
-      break;
-      
-    case midi_program_change:
-    case midi_channel_pressure:		
-      fts_spost(stream, "%d %d",
-                fts_midievent_channel_message_get_first(this), 
-                fts_midievent_channel_message_get_channel(this));
-      break;
-      
-    case midi_system_exclusive:
-      fts_post_atoms(fts_midievent_system_exclusive_get_size(this), fts_midievent_system_exclusive_get_atoms(this));
-      break;
-      
-    case midi_time_code:
-      fts_spost(stream, "%d %d %d %d %d",
-                fts_midievent_time_code_get_type(this),
-                fts_midievent_time_code_get_hour(this),
-                fts_midievent_time_code_get_minute(this),
-                fts_midievent_time_code_get_second(this),
-                fts_midievent_time_code_get_frame(this));
-      break;
-      
-    case midi_song_position_pointer:
-      fts_spost(stream, "%d %d",
-                fts_midievent_song_position_pointer_get_first(this),
-                fts_midievent_song_position_pointer_get_second(this));
-      break;
-      
-    case midi_song_select:
-      fts_spost(stream, "%d", fts_midievent_song_select_get(this));
-      break;
-
-    case midi_real_time:
-      fts_spost(stream, "%d", fts_midievent_real_time_get(this));
-      break;
-  }
-
-  fts_spost(stream, ">");  
-}
-
-static void
 midievent_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   if(ac > 0)
@@ -742,7 +741,12 @@ midievent_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void 
 midievent_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  midievent_post(o, 0, NULL, 0, NULL);
+  fts_bytestream_t* stream = fts_get_default_console_stream();
+  
+  if(ac > 0 && fts_is_object(at))
+    stream = (fts_bytestream_t *)fts_get_object(at);
+
+  midievent_post(o, stream);
   fts_post("\n");
 }  
 
@@ -760,7 +764,6 @@ midievent_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_midievent_t), midievent_init, midievent_delete);
 
-  fts_class_message_varargs(cl, fts_s_post, midievent_post);
   fts_class_message_varargs(cl, fts_s_print, midievent_print);
 
   fts_class_message_varargs(cl, fts_s_get_tuple, midievent_get_tuple);
@@ -783,6 +786,7 @@ midievent_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_new_symbol("status"), _midievent_get_status);
   
   fts_class_set_copy_function(cl, midievent_copy_function);
+  fts_class_set_post_function(cl, midievent_post);
 
   /* class doc */
   fts_class_doc(cl, fts_s_midievent, "<'note'|'poly'|'ctl'|'prg'|'touch'|'bend'|'sysex'|'mtc'|'spos'|'ssel'|'rt': type> [<num: MIDI bytes (see message 'set')> ...]", "MIDI message");

@@ -125,6 +125,6 @@ extern enumeration_t *scomark_type_enumeration;
 #define scomark_get_meter_den(s) ((s)->meter_den)
 #define scomark_set_meter_den(s, b) ((s)->meter_den = (b))
 
-void scomark_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+void scomark_post(fts_object_t *o, fts_bytestream_t *stream);
 
 #endif

@@ -1279,10 +1279,13 @@ static void
 midiconfig_print( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_midiconfig_t *this = (fts_midiconfig_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);  
   fts_midilabel_t *label = this->labels;
+  fts_bytestream_t* stream = fts_get_default_console_stream();
   fts_midimanager_t *mm;
-
+  
+  if(ac > 0 && fts_is_object(at))
+    stream = (fts_bytestream_t *)fts_get_object(at);
+  
   fts_spost(stream, "labels\n");
   for(label = this->labels; label != NULL; label = label->next) 
     fts_spost(stream, "  %s: '%s' '%s'\n", label->name, label->input_name, label->output_name);

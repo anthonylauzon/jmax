@@ -199,17 +199,6 @@ param_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-param_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_param_t *this = (fts_param_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-
-  fts_spost(stream, "<param ");
-  fts_spost_atoms(stream, 1, &this->value);
-  fts_spost(stream, ">");
-}
-
-static void
 param_get_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_param_t *this = (fts_param_t *)o;
@@ -233,6 +222,16 @@ param_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     }
   else if(!fts_is_void(&this->value))
     fts_dumper_send(dumper, fts_s_set, 1, &this->value);    
+}
+
+static void
+param_post(fts_object_t *o, fts_bytestream_t *stream)
+{
+  fts_param_t *this = (fts_param_t *)o;
+  
+  fts_spost(stream, "<param ");
+  fts_spost_atoms(stream, 1, &this->value);
+  fts_spost(stream, ">");
 }
 
 /********************************************************************
@@ -276,8 +275,6 @@ param_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, param_set_from_instance);
 
-  fts_class_message_varargs(cl, fts_s_post, param_post);
-
   fts_class_message_varargs(cl, fts_s_get_tuple, param_get_value);
 
   fts_class_message_varargs(cl, fts_new_symbol("load_init"), param_update);
@@ -289,7 +286,9 @@ param_instantiate(fts_class_t *cl)
   fts_class_message_atom(cl, fts_s_send, param_input_atom);
 
   fts_class_message_atom(cl, fts_s_set, param_set);
-  
+
+  fts_class_set_post_function(cl, param_post);
+
   fts_class_inlet_bang(cl, 0, param_update);
   fts_class_inlet_atom(cl, 0, param_input_atom);
   fts_class_inlet_atom(cl, 1, param_set);
