@@ -33,6 +33,7 @@ static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_comma = 0;
 static fts_symbol_t sym_mat_append_row  = 0;
 static fts_symbol_t sym_mat_insert_rows = 0;
+static fts_symbol_t sym_insert_cols = 0;
 static fts_symbol_t sym_mat_delete_rows = 0;
 
 /********************************************************
@@ -576,11 +577,6 @@ mat_upload(mat_t *self)
   mat_upload_data(self);
 }
 
-
-
-
-
-
 /********************************************************************
 *
 *   user methods
@@ -627,7 +623,6 @@ mat_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   }
 }
 
-
 static void
 mat_set_row_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -657,7 +652,6 @@ mat_set_row_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     }
   }
 }
-
 
 /** append a row of atoms, augment m, clip row to n 
  * 
@@ -746,6 +740,74 @@ mat_insert_rows (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_object_set_state_dirty(o);
 }
 
+/** insert @p num rows of atoms at row @p pos
+*  may insert num rows behind last row m --> append num rows
+*
+* @method insert
+* @param  int: pos    index of row where to insert @p num empty rows, default 0
+* @param  int: num    number of rows to insert, default 1
+* 
+* TODO: give data, clip rows to n, you can use mat_set_row_elements for now
+* @method insert
+* @param  int: pos    index of row where to insert
+* @param  tuples: atoms  list of tuples of rows of atoms to append, 
+*		       will be clipped to width of matrix
+*/
+static void
+mat_insert_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  mat_t	*self = (mat_t *) o;
+  int m = mat_get_m(self);
+  int	n = mat_get_n(self);
+  int	pos = 0;	/* col position at which to insert */
+  int numcols = 1;	/* number of rows to insert */
+  int num, tomove, i, j, start, new_n;
+  
+  /* check and test args */
+  if (ac > 0  &&  fts_is_number(at))
+    pos = fts_get_number_int(at);
+  
+  if(pos < 0)	pos = 0;
+  else if(pos > n) pos = n;
+  
+  if (ac > 1  &&  fts_is_number(at+1))
+    numcols = fts_get_number_int(at+1) ;
+  
+  if(numcols <= 0)	return;	/* nothing to append */
+  
+  /* make space, may change ptr, sets new atoms at the end to void */
+  mat_set_size(self, m, n + numcols);
+  new_n = n+numcols;
+  /* move rows */
+  start = (m-1)*new_n + pos;
+  tomove = new_n-pos-numcols;
+  
+  fts_post("start %d pos %d tomove %d numcols %d\n", start, pos, tomove, numcols);
+  fts_post("start %d val[start] %d\n", start, fts_get_int(&self->data[start]));
+  
+  for(i = 0; i < m; i++)
+  {
+    for(j=tomove-1; j >= 0; j--)
+    {
+      self->data[start+j+numcols] = self->data[start+j];
+      fts_post("-------- move line --------------%d\n", i);
+      fts_post("copyto %d copyfrom %d val %d\n", start+j+numcols, start+j, fts_get_int(&self->data[start+j]));
+    }
+    for(j = 0; j < numcols; j++)
+    {
+      fts_post("-------- zero line --------------%d\n", j);
+      fts_post("zeroto %d  oldval %d\n", start+j, fts_get_int(&self->data[start+j]));
+      fts_set_int(&self->data[start + j], 0);
+    }
+    start = start - new_n;
+  }
+  
+  /* update editor if open */
+  if(mat_editor_is_open(self))
+    mat_upload(self);
+  
+  fts_object_set_state_dirty(o);
+}
 
 /** delete @p num rows of atoms 
  * 
@@ -1146,6 +1208,7 @@ mat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_row, mat_set_row_elements);
   fts_class_message_varargs(cl, fts_s_append, mat_append_row);
   fts_class_message_varargs(cl, fts_s_insert, mat_insert_rows);
+  fts_class_message_varargs(cl, sym_insert_cols, mat_insert_columns);
   fts_class_message_varargs(cl, fts_s_delete, mat_delete_rows);
   
   fts_class_message_varargs(cl, fts_s_import, mat_import); 
@@ -1196,6 +1259,7 @@ mat_config(void)
   sym_comma = fts_new_symbol(",");
   sym_mat_append_row  = fts_new_symbol("mat_append_row");
   sym_mat_insert_rows = fts_new_symbol("mat_insert_rows");
+  sym_insert_cols = fts_new_symbol("insert_cols");
   sym_mat_delete_rows = fts_new_symbol("mat_delete_rows");
   mat_symbol = fts_new_symbol("mat");
   
