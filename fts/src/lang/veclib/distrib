@@ -1,4 +1,4 @@
-all 	complex.h
-all	vecmod.h
-all	ftlfun.h
-all	include
+all	all 	complex.h
+all	all	vecmod.h
+all	all	ftlfun.h
+all	all	include

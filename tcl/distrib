@@ -1,7 +1,7 @@
-all	intrinsics.tcl
-all	jmaxboot.tcl
-all	jmaxpkg.tcl
-all	packages.tcl
-all	config.tcl
-all	wrappers.tcl
-all	startup.tcl
+all	all	intrinsics.tcl
+all	all	jmaxboot.tcl
+all	all	jmaxpkg.tcl
+all	all	packages.tcl
+all	all	config.tcl
+all	all	wrappers.tcl
+all	all	startup.tcl

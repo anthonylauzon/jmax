@@ -1,3 +1,8 @@
+Tue May 12 12:08:13 1998  Francois Dechelle  <dechelle@astor.ircam.fr>
+
+	* Changed: lang/dsp/dspgraph.c and lang/ftl/ftl.[ch] to incorporate
+	debug information in the DSP chain.
+
 Thu Apr 30 14:22:10 1998  Francois Dechelle  <dechelle@astor.ircam.fr>
 
 	*  Changed: lang/dsp/dspgraph.c

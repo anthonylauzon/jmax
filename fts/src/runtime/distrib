@@ -1,14 +1,14 @@
-all    audio
-all    audio.h
-all    client
-all    client.h
-all    devices
-all    devices.h
-all    files
-all    files.h
-all    midi
-all    midi.h
-all    sched
-all    sched.h
-all    time
-all    time.h
+all	all    audio
+all	all    audio.h
+all	all    client
+all	all    client.h
+all	all    devices
+all	all    devices.h
+all	all    files
+all	all    files.h
+all	all    midi
+all	all    midi.h
+all	all    sched
+all	all    sched.h
+all	all    time
+all	all    time.h
