@@ -73,8 +73,8 @@ if {$jmaxArch == "irix6.2" || $jmaxArch == "irix5.3" || $jmaxArch == "mips1"} {
 
     # two ADAT cards
 
-    puts "    multi1: 8/8 (default)"
-    ucs open device in~ multi1 as SgiALIn ALdevice RAD1.ADATIn channels 8 fifo_size $jmaxAudioBuffer
+    puts "    multi1: 0/8 (default)"
+    #ucs open device in~ multi1 as SgiALIn ALdevice RAD1.ADATIn channels 8 fifo_size $jmaxAudioBuffer
     ucs open device out~ multi1 as SgiALOut ALdevice RAD1.ADATOut channels 8 fifo_size $jmaxAudioBuffer
 
     #puts "    stereo1: 2/2"

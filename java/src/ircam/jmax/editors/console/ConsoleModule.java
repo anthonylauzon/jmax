@@ -12,7 +12,6 @@ public class ConsoleModule
   static public void initModule()
   {
     // Install the module tcl commands.
-
     ircam.jmax.editors.console.tcl.TclConsolePackage.installPackage();
   }
 }

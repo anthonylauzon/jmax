@@ -14,7 +14,7 @@ import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
-import ircam.jmax.editors.console.*;
+import ircam.jmax.editors.console.*; 
 import ircam.jmax.editors.ermes.*;
 import tcl.lang.*;
 
@@ -254,13 +254,13 @@ public class MaxApplication extends Object {
 
     ircam.jmax.editors.console.ConsoleModule.initModule();
     ircam.jmax.editors.ermes.ErmesModule.initModule();
-
+    
     try
       {
 	// Load the "jmaxboot.tcl" file that will do whatever is needed to
 	// create the startup configuration, included reading user files
 	// installing editors, data types and data handlers
-
+	
 	itsInterp.evalFile(jmaxProperties.getProperty("root") +
 			   jmaxProperties.getProperty("file.separator") + "tcl" +
 			   jmaxProperties.getProperty("file.separator") +  "jmaxboot.tcl");
@@ -269,22 +269,22 @@ public class MaxApplication extends Object {
       {
 	System.out.println("TCL error in initialization " + e + " : " + itsInterp.getResult());
       }
-
+    
     // Splash screen moved to a tcl command
-
+    
     //if there were no connection statements in startup.tcl, ask the user
-
+    
     if (FtsServer.getServer() == null)
       {
 	new ConnectionDialog();
 	MaxApplication.runHooks("start");
       }
-
+    
     // Finally, run forever the notifier loop of the 
     // Tcl interpreter, so that the TCL event system work
     // (and in particular, tcl built panels; thanks to the
     // jacl doc, that make this absolutely unclear.
-
+    
     Notifier notifier = itsInterp.getNotifier();
 
     while (true)

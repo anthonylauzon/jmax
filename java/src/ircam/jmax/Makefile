@@ -43,5 +43,10 @@ MaxWindowManager:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxWindowManager.java)
 .PHONY: MaxWindowManager
 
+MaxVersion:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxVersion.java)
+.PHONY: MaxVersion
+
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
+
 

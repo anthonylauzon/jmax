@@ -60,9 +60,9 @@ if [catch {set foo $jmax_pkgPath}] then { set jmax_pkgPath [list $jmaxUserDir $j
 ## feel free to use the splash command in user packages
 ##
 
-splash   $ftsRootDir/ermes/images/Splash.gif
+#splash   $ftsRootDir/ermes/images/Splash.gif
 
-#splash   /u/worksta/dececco/./lib/images/kitchen1.gif
+splash   /u/worksta/dececco/./lib/images/kitchen1.gif
 
 ## Open the console; for a console less application
 ## comment the next line
@@ -97,6 +97,9 @@ sourceFile $dir/midi.tcl
 #
 
 runHooks start
+
+
+
 
 
 

@@ -8,3 +8,4 @@ public class MaxVersion
     return "jMax version 2.1.3";
   } 
 }
+
