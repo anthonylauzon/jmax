@@ -20,6 +20,8 @@ public class FtsDspControl extends FtsRemoteData
   static final int FPE_START_COLLECT = 8;
   static final int FPE_STOP_COLLECT  = 9;
 
+  static final int DSP_PRINT  = 10;
+
   protected Integer dacSlip;
   protected Integer invalidFpe;
   protected Integer divideByZeroFpe;
@@ -103,6 +105,11 @@ public class FtsDspControl extends FtsRemoteData
     dspOn = value;
 
     remoteCall( DSP_ON, (dspOn.booleanValue() ? 1 : 0));
+  }
+
+  public void dspPrint()
+  {
+    remoteCall( DSP_PRINT);
   }
 
   /* Fpe support */

@@ -7,7 +7,7 @@ import java.beans.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
-
+import ircam.jmax.*;
 import ircam.jmax.widgets.*;
 import ircam.jmax.fts.*;
 
@@ -140,7 +140,9 @@ public class ControlPanelFrame extends JFrame
     panel.add(fifoSizePanel);
 
     dspOnButton = new JCheckBox("Dsp On");
+    dspOnButton.setHorizontalTextPosition(JCheckBox.LEFT);
     dspOnButton.setSelected(control.getDspOn().booleanValue());
+
     new DspOnControlAdapter("dspOn", control, dspOnButton);
 
     dspOnButton.addItemListener(new ItemListener() {
@@ -152,6 +154,21 @@ public class ControlPanelFrame extends JFrame
       }});
 
     panel.add(dspOnButton);
+
+    if (MaxApplication.getProperty("debug") != null)
+      {
+	JButton  dspPrintButton;
+
+	dspPrintButton = new JButton("Print Dsp Chain");
+	dspPrintButton.addActionListener( new ActionListener() {
+	  public  void actionPerformed( ActionEvent e)
+	    {
+	      control.dspPrint();
+	    }
+	});
+
+	panel.add(dspPrintButton);
+      }
 
     getContentPane().add( panel);
 

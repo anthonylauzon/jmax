@@ -30,6 +30,8 @@
 #define DSP_CONTROL_FPE_START_COLLECT   8
 #define DSP_CONTROL_FPE_STOP_COLLECT    9
 
+#define DSP_CONTROL_DSP_PRINT          10
+
 
 extern fts_dev_t * fts_dsp_get_dac_slip_dev();
 
@@ -199,6 +201,12 @@ static void fts_dsp_control_remote_dsp_on( fts_data_t *d, int ac, const fts_atom
 }
 
 
+static void fts_dsp_control_remote_dsp_print( fts_data_t *d, int ac, const fts_atom_t *at)
+{
+  dsp_chain_post();
+}
+
+
 void fts_dsp_control_config(void)
 {
   fts_dsp_control_data_class = fts_data_class_new( fts_new_symbol( "dspcontrol_data"));
@@ -212,6 +220,8 @@ void fts_dsp_control_config(void)
 				 fts_dsp_control_fpe_stop_collect);
   fts_data_class_define_function(fts_dsp_control_data_class, DSP_CONTROL_DSP_ON,
 				 fts_dsp_control_remote_dsp_on);
+  fts_data_class_define_function(fts_dsp_control_data_class, DSP_CONTROL_DSP_PRINT,
+				 fts_dsp_control_remote_dsp_print);
 }
 
 
