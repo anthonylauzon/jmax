@@ -29,7 +29,7 @@
   before while and after evalutating an expression
   */
 
-/* #define EXPRESSION_TRACE_DEBUG */
+/* #define EXPRESSION_TRACE_DEBUG  */
 
 #include "sys.h"
 #include "lang/mess.h"
@@ -314,7 +314,7 @@ fts_expression_state_t *fts_expression_eval(fts_object_t *object,
 
 #define TRY(call)             {int ret; ret = call; if (ret != FTS_EXPRESSION_OK) return ret;}
 
-static int fts_do_expression_eval(fts_expression_state_t *e, fts_object_t *object, fts_atom_t *result)
+/*static*/ int fts_do_expression_eval(fts_expression_state_t *e, fts_object_t *object, fts_atom_t *result)
 {
   int ret;
   int i;
@@ -377,7 +377,6 @@ static int fts_do_expression_eval(fts_expression_state_t *e, fts_object_t *objec
 	      if (op_stack_is_empty(e) && value_stack_is_deep(e, 1))
 		{
 		  *result = * value_stack_top(e);
-		  e->in --;
 		  return FTS_EXPRESSION_OK;
 		}
 	      else
@@ -433,7 +432,6 @@ static int fts_do_expression_eval(fts_expression_state_t *e, fts_object_t *objec
 		  if (op_stack_is_empty(e) && value_stack_is_deep(e, 1))
 		    {
 		      *result = *value_stack_top(e);
-		      e->in --;
 		      return FTS_EXPRESSION_OK;
 		    }
 		  else
@@ -454,7 +452,6 @@ static int fts_do_expression_eval(fts_expression_state_t *e, fts_object_t *objec
 	      if (op_stack_is_empty(e) && value_stack_is_deep(e, 1))
 		{
 		  *result = *value_stack_top(e);
-		  e->in --;
 		  return FTS_EXPRESSION_OK;
 		}
 	      else
@@ -462,6 +459,8 @@ static int fts_do_expression_eval(fts_expression_state_t *e, fts_object_t *objec
 					"Syntax error in expression (3)");
 	    }
 	}
+
+      e->in++; 
     }
 
   while ((! op_stack_is_empty(e)) && (op_stack_top(e) != FTS_OP_OPEN_PAR))
