@@ -100,6 +100,7 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     JPanel container_panel = new JPanel();
     container_panel.setLayout(new BorderLayout());
     container_panel.setPreferredSize(new Dimension(Bpf.DEFAULT_WIDTH, Bpf.DEFAULT_HEIGHT-30));
+    container_panel.setSize(Bpf.DEFAULT_WIDTH, Bpf.DEFAULT_HEIGHT-30);
 
     editor = new BpfEditor(geometry, bpfData, manager);
     editor.setBorder(new EtchedBorder());

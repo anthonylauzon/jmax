@@ -49,8 +49,8 @@ public class Bpf extends JFrame implements EditorContainer{
     BpfPanel itsBpfPanel;
     FtsBpfObject bpfData;
 
-    public final static int DEFAULT_WIDTH  = 312;
-    public final static int DEFAULT_HEIGHT = 239;
+    public final static int DEFAULT_WIDTH  = 300;
+    public final static int DEFAULT_HEIGHT = 210;
     public final static int MAX_HEIGHT     = 800;
     public final static int EMPTY_HEIGHT   = 78;
   /**
@@ -89,7 +89,7 @@ public class Bpf extends JFrame implements EditorContainer{
 	    });
 	
 	validate();
-	//pack();
+	pack();
 	setVisible(true);
     }
 
@@ -109,12 +109,6 @@ public class Bpf extends JFrame implements EditorContainer{
 	
 	// Build the file menu	
 	mb.add( new DefaultFileMenu());
-	
-	// Build the edit menu
-	//mb.add(new EditMenu(this)); 
-	
-	// New Tool menu 
-	//mb.add(new ircam.jmax.toolkit.menus.MaxToolsJMenu("Tools")); 
 	
 	// New Window Manager based Menu
 	mb.add(new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this)); 

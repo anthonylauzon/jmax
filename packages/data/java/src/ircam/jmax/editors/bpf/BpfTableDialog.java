@@ -27,7 +27,7 @@ class BpfTableDialog extends JDialog implements BpfDataListener {
 
 	relocate();
 
-	setSize(300, 208);
+	setSize(300, 160);
 
 	getContentPane().validate();
 	tabPanel.validate();

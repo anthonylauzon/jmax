@@ -43,13 +43,13 @@ class BpfTablePanel extends JPanel implements ListSelectionListener {
     this.tmodel = model;
     this.gc = gc;
     table = new JTable(tmodel);
-    table.setPreferredScrollableViewportSize(new Dimension(Bpf.DEFAULT_WIDTH - 16, Bpf.DEFAULT_HEIGHT-86));
+    table.setPreferredScrollableViewportSize(new Dimension(Bpf.DEFAULT_WIDTH, Bpf.DEFAULT_HEIGHT-55));
     table.setRowHeight(17);
     table.getColumnModel().getColumn(0).setPreferredWidth(50);
     table.getColumnModel().getColumn(0).setMaxWidth(50);
 
     scrollPane = new JScrollPane(table);
-    scrollPane.setPreferredSize(new Dimension(Bpf.DEFAULT_WIDTH - 12, Bpf.DEFAULT_HEIGHT-85));
+    scrollPane.setPreferredSize(new Dimension(Bpf.DEFAULT_WIDTH, Bpf.DEFAULT_HEIGHT-55));
 
     setUpEditors();
     

@@ -61,20 +61,18 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
     return itsSelecter;
   }
 
-
-    /**
-     * Called at double-click. Interested tools will derive this method
-     * with the specific semantic */
-    public void edit(int x, int y, int modifiers)
-    {
-    }
+  /**
+   * Called at double-click. Interested tools will derive this method
+   * with the specific semantic */
+  public void edit(int x, int y, int modifiers)
+  {
+  }
 
   /**
    * called by the Selecter UI module at mouse down
    */
   public void selectionPointChoosen(int x, int y, int modifiers) 
   {
-      //if((modifiers & InputEvent.CTRL_MASK)!=0)
       if((modifiers & SHORTCUT)!=0)
 	  controlAction(x, y, modifiers);
       else
@@ -123,14 +121,14 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
   }
 
   public void selectionPointDoubleClicked(int x, int y, int modifiers) 
-    {
-	edit(x, y, modifiers);
-    }
+  {
+    edit(x, y, modifiers);
+  }
 
   public void controlAction(int x, int y, int modifiers) 
-    {
-	//
-    }
+  {
+      //
+  }
 
   /**
    * called by the selecter UI module
