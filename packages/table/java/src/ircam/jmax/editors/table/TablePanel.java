@@ -56,7 +56,7 @@ public class TablePanel extends JPanel implements ToolProvider, ToolListener, St
 
   InfoPanel itsStatusBar;
 
-  Scrollbar itsPositionControl;
+  JScrollBar itsPositionControl;
 
   static Tool itsDefaultTool;
   Dimension size = new Dimension(PANEL_WIDTH, PANEL_HEIGHT);
@@ -544,7 +544,7 @@ public class TablePanel extends JPanel implements ToolProvider, ToolListener, St
 
   private void prepareVerticalScrollbar()
   {
-    itsPositionControl = new Scrollbar(Scrollbar.VERTICAL, 128, 100, -2000, 2000);
+    itsPositionControl = new JScrollBar(Scrollbar.VERTICAL, 128, 100, -2000, 2000);
 
     itsPositionControl.addAdjustmentListener( new AdjustmentListener() {
       public void adjustmentValueChanged( AdjustmentEvent e)

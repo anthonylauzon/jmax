@@ -521,6 +521,7 @@ sequence_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 0, seqsym_clear, sequence_clear);
       fts_method_define_varargs(cl, 0, seqsym_print, sequence_print);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("add_track"), sequence_add_track_by_client_request);
 
       fts_method_define_varargs(cl, 0, fts_new_symbol("open"), sequence_open_editor);
 
@@ -541,3 +542,5 @@ sequence_config(void)
 {
   fts_class_install(seqsym_sequence, sequence_instantiate);
 }
+
+

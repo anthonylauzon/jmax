@@ -76,7 +76,6 @@ static void
 client_init(void)
 {
   /* Initialization of sub modules */
-
   fts_client_sync_init();
   fts_client_updates_init();
 

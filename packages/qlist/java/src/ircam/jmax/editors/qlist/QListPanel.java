@@ -124,7 +124,7 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner, Docume
 	itsTextArea.setCaretPosition( caretPosition);
       else itsTextArea.setCaretPosition(itsTextArea.getText().length());
     }
-}
+  }
  
   public Dimension getPreferredSize() 
   {

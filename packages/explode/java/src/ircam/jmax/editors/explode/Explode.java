@@ -75,6 +75,20 @@ public class Explode extends JFrame implements EditorContainer, AAAReadme {
     // Build The Menus and Menu Bar
     makeMenuBar();
 
+    addWindowListener(new WindowListener(){
+        public void windowOpened(WindowEvent e){}
+	public void windowClosed(WindowEvent e){}
+	public void windowClosing(WindowEvent e)
+	{
+	    MaxWindowManager.getWindowManager().removeWindow(getFrame());
+	    System.err.println("meo "+getFrame());
+	}
+	public void windowDeiconified(WindowEvent e){}
+	public void windowIconified(WindowEvent e){}
+	public void windowActivated(WindowEvent e){}
+	public void windowDeactivated(WindowEvent e){}
+    });
+
     itsExplodePanel = new ExplodePanel(this, maxData);
     getContentPane().add(itsExplodePanel);
     pack();
@@ -128,20 +142,7 @@ public class Explode extends JFrame implements EditorContainer, AAAReadme {
     itsWindowsMenu = new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this); 
     mb.add(itsWindowsMenu);
 
-    setJMenuBar(mb);
-  
-    addWindowListener(new WindowListener(){
-	    public void windowOpened(WindowEvent e){}
-	    public void windowClosed(WindowEvent e){}
-	    public void windowClosing(WindowEvent e)
-	    {
-		MaxWindowManager.getWindowManager().removeWindow(getFrame());
-	    }
-	    public void windowDeiconified(WindowEvent e){}
-	    public void windowIconified(WindowEvent e){}
-	    public void windowActivated(WindowEvent e){}
-	    public void windowDeactivated(WindowEvent e){}
-	});
+    setJMenuBar(mb);  
   }
 
   // ------ editorContainer interface ---------------

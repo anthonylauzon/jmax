@@ -29,9 +29,9 @@ PACKAGE_DIR =
 
 include $(JMAXROOTDIR)/java/Makefiles/Makefile.package
 
-DOC_PACKAGES =  ircam.jmax.editors.sequence
+DOC_PACKAGES =  ircam.jmax.editors.control
 
-JAR_FILE= sequence.jar
+JAR_FILE= control.jar
 
 ALL_CLASSES=$(shell find $(JAVA_CLASSES_ROOT)/ircam -name '*.class')
 
@@ -58,3 +58,6 @@ $(JAVA_CLASSES_ROOT)/$(JAR_FILE): $(ALL_CLASSES)
 	(cd $(JAVA_CLASSES_ROOT) ; /bin/rm -f $(JAR_FILE) ; jar -cvf $(JAR_FILE) ircam )
 
 include $(JMAXROOTDIR)/java/Makefiles/Makefile.package.misc
+
+
+

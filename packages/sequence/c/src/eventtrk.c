@@ -474,30 +474,8 @@ eventtrk_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     {
       eventtrk_t *this = (eventtrk_t *)o;
       event_t *event = eventtrk_get_first(this);
-      fts_atom_t a[EVENTTRK_BLOCK_SIZE];
-      int n = 0;
-      
-      while(event)
-	{
-	  event_t *next = event_get_next(event);
 
-	  if(fts_object_has_id((fts_object_t *)event))
-	    {
-	      fts_set_object(a + n, (fts_object_t *)event);
-	      n++;
-	      
-	      if(n == EVENTTRK_BLOCK_SIZE)
-		{
-		  fts_client_send_message((fts_object_t *)this, seqsym_deleteEvents, n, a);
-		  n = 0;
-		}
-	    }
-	  
-	  event = next;
-	}
-      
-      if(n > 0)
-	fts_client_send_message((fts_object_t *)this, seqsym_deleteEvents, n, a);
+      fts_client_send_message((fts_object_t *)this, seqsym_clear, 0, 0);
 
       event = eventtrk_get_first(this);
       while(event)
@@ -680,6 +658,7 @@ eventtrk_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("make_event"), eventtrk_make_event_by_client_request);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("remove_events"), eventtrk_remove_events_by_client_request);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("move_events"), eventtrk_move_events_by_client_request);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("clear_track"), eventtrk_clear);
 
   return fts_Success;
 }

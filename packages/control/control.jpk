@@ -23,15 +23,17 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
+## package declaration
 package provide control
 
+# load server module
 global jmaxArch jmaxMode
 ucs load module control $dir/c/lib/$jmaxArch/$jmaxMode/libcontrol.so
 
-puts "package: control (control classes)"
-
-# help
+## load the help patch data base
 sourceFile $dir/help/control.help.index.tcl
 helpSummary "Control" $dir/help/control.summary.jmax
+
+puts "package: control (control classes)"
 
 

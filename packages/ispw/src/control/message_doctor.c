@@ -23,50 +23,41 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
+
+
+/*
+  Messbox doctor.
+
+  Fix messbox boxes created with as argument the content of the messbox.
+  Message box like that are present in some binary and tcl patches
+  around, saved before 20/5/1998.
+ */
+
 #include "fts.h"
-#include "seqsym.h"
-#include "track.h"
 
-void
-track_init(track_t *track)
+static fts_object_t *messbox_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
-  track->next = 0;
-  track->sequence = 0;
+  if (ac >= 1)
+    {
+      fts_object_t *obj;
 
-  track->name = 0;
-  track->lock = 0;
-  track->active = 1;
-}
+      fts_object_new_to_patcher(patcher, 1, at, &obj);
 
-void
-track_lock(track_t *track)
-{
-  track->lock++;
+      if (ac > 1)
+	{
+	  fts_message_send(obj, fts_SystemInlet, fts_s_clear, 0, 0);
+	  fts_message_send(obj, fts_SystemInlet, fts_s_append, ac - 1, at + 1);
+	}
 
-  if(fts_object_has_id((fts_object_t *)track))
-    fts_client_send_message((fts_object_t *)track, seqsym_lock, 0, 0);
-}
-
-void
-track_unlock(track_t *track)
-{
-  track->lock--;
-
-  if(fts_object_has_id((fts_object_t *)track))
-    fts_client_send_message((fts_object_t *)track, seqsym_unlock, 0, 0);
+      return obj;
+    }
+  else
+    return 0;
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+void messbox_doctor_init(void)
+{
+  fts_register_object_doctor(fts_new_symbol("messbox"), messbox_doctor);
+}
+    

@@ -23,50 +23,14 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
-#include "fts.h"
-#include "seqsym.h"
-#include "track.h"
 
-void
-track_init(track_t *track)
-{
-  track->next = 0;
-  track->sequence = 0;
+#ifndef _NAMING_H_
+#define _NAMING_H_
 
-  track->name = 0;
-  track->lock = 0;
-  track->active = 1;
-}
+extern fts_object_t *ispw_get_object_by_name(fts_symbol_t name);
+extern void ispw_register_named_object(fts_object_t *obj, fts_symbol_t name);
+extern void ispw_unregister_named_object(fts_object_t *obj, fts_symbol_t name);
+extern int ispw_named_object_exists(fts_symbol_t name);
+extern void ispw_named_object_send(fts_symbol_t name, fts_symbol_t s, int argc, const fts_atom_t *argv);
 
-void
-track_lock(track_t *track)
-{
-  track->lock++;
-
-  if(fts_object_has_id((fts_object_t *)track))
-    fts_client_send_message((fts_object_t *)track, seqsym_lock, 0, 0);
-}
-
-void
-track_unlock(track_t *track)
-{
-  track->lock--;
-
-  if(fts_object_has_id((fts_object_t *)track))
-    fts_client_send_message((fts_object_t *)track, seqsym_unlock, 0, 0);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif

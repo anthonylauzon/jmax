@@ -123,7 +123,7 @@ typedef struct
 {
   fts_object_t o;
   int code;
-} key_t;
+} fts_key_t;
 
 static void
 key_multi_action(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -152,7 +152,7 @@ key_action(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 key_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  key_t *this = (key_t *)o;
+  fts_key_t *this = (fts_key_t *)o;
 
   if(ac == 1)
     {
@@ -179,7 +179,7 @@ key_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 static void
 key_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  key_t *this = (key_t *)o;
+  fts_key_t *this = (fts_key_t *)o;
 
   keyserver_remove_listener(this->code, o);
 }
@@ -189,7 +189,7 @@ key_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   if(ac == 1)
     {
-      fts_class_init(cl, sizeof(key_t), 0, 2, 0);
+      fts_class_init(cl, sizeof(fts_key_t), 0, 2, 0);
       
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, key_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, key_delete);
@@ -197,7 +197,7 @@ key_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   else if(ac == 2)
     {
-      fts_class_init(cl, sizeof(key_t), 0, 2, 0);
+      fts_class_init(cl, sizeof(fts_key_t), 0, 2, 0);
       
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, key_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, key_delete);
@@ -236,7 +236,7 @@ keystat_action(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void
 keystat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  key_t *this = (key_t *)o;
+  fts_key_t *this = (fts_key_t *)o;
 
   if(ac == 1)
     {
@@ -263,7 +263,7 @@ keystat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void
 keystat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  key_t *this = (key_t *)o;
+  fts_key_t *this = (fts_key_t *)o;
 
   keyserver_remove_listener(this->code, o);
 }
@@ -273,7 +273,7 @@ keystat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   if(ac == 1)
     {
-      fts_class_init(cl, sizeof(key_t), 0, 2, 0);
+      fts_class_init(cl, sizeof(fts_key_t), 0, 2, 0);
       
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, keystat_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, keystat_delete);
@@ -281,7 +281,7 @@ keystat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   else if(ac == 2)
     {
-      fts_class_init(cl, sizeof(key_t), 0, 1, 0);
+      fts_class_init(cl, sizeof(fts_key_t), 0, 1, 0);
       
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, keystat_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, keystat_delete);
