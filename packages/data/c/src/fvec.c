@@ -1279,7 +1279,7 @@ fvec_ifft_cvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   int in_size = cvec_get_size(in);
   unsigned int fft_size = fts_get_fft_size(2 * in_size);
   float *fft_ptr;
-  int i;
+  unsigned int i;
 
   fvec_set_size(this, fft_size);
   fft_ptr = fvec_get_ptr(this);
