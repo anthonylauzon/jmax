@@ -169,6 +169,7 @@ extern void fts_kernel_autosave_init( void);
 extern void fts_kernel_bytestream_init( void);
 extern void fts_kernel_class_init( void);
 extern void fts_kernel_clipboard_init( void);
+extern void fts_kernel_connection_init( void);
 extern void fts_kernel_doctor_init( void);
 extern void fts_kernel_dsp_graph_init( void);
 extern void fts_kernel_dsp_init( void);
@@ -205,6 +206,7 @@ void fts_init( int argc, char **argv)
   fts_kernel_objtable_init();
   fts_kernel_class_init();
   fts_kernel_doctor_init();
+  fts_kernel_connection_init();
   fts_kernel_property_init();
   fts_kernel_oldftsdata_init();
   fts_kernel_oldpatcherdata_init();
@@ -224,7 +226,6 @@ void fts_init( int argc, char **argv)
   fts_kernel_autosave_init();
   fts_kernel_clipboard_init();
   fts_kernel_midi_init();
-  fts_kernel_objtable_init();
   fts_kernel_patparser_init();
   fts_kernel_sched_init();
   fts_kernel_selection_init();

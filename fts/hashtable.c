@@ -337,6 +337,35 @@ void fts_hashtable_stats( fts_hashtable_t *h)
   printf( "minimum %d maximum %d\n", min_keys, max_keys);
 }
 
+#ifdef DEBUG
+void fts_hashtable_fprintf( fts_hashtable_t *h, FILE *f)
+{
+  int i;
+
+  fprintf( f, "Hashtable: length = %d count = %d rehash = %d\n", h->length, h->count, h->rehash_count);
+
+  for ( i = 0; i < h->length; i++)
+    {
+      fts_hashtable_cell_t *c;
+
+      if (!h->table[i])
+	continue;
+
+      fprintf( f, "[%d] ", i);
+
+      for ( c = h->table[i]; c; c = c->next)
+	{
+	  fprintf( f, "(");
+	  fprintf_atoms( f, 1, &c->key);
+	  fprintf( f, ",");
+	  fprintf_atoms( f, 1, &c->value);
+	  fprintf( f, ") ");
+	}
+
+      fprintf( f, "\n");
+    }
+}
+#endif
 
 /* **********************************************************************
  * Iterator

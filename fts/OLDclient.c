@@ -2087,6 +2087,7 @@ void fts_kernel_oldclient_init( void)
 {
   fts_client_sync_init();
   fts_client_updates_init();
+  fts_messtile_init();
 }
 
 void fts_kernel_oldclient_shutdown(void)
