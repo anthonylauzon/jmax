@@ -164,6 +164,8 @@ class MoveConnectInteraction extends Interaction
 	    else
 	      {
 		destinationChoosen = false;
+		editor.resetHighlightedInlet();
+		dst = null;
 
 		editor.getDisplayList().dragLine();
 		editor.getDisplayList().redrawDragLine();

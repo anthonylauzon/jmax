@@ -170,7 +170,9 @@ class DragConnectInteraction extends Interaction
 	      }
 	    else 
 	      {
-		destinationChoosen = false;		
+		destinationChoosen = false;
+		editor.resetHighlightedInlet();
+		dst = null;
 
 		editor.getDisplayList().dragLine();
 		editor.getDisplayList().redrawDragLine();
