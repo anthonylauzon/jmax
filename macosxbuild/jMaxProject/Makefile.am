@@ -1,4 +1,4 @@
-SUBDIRS= jMaxProject.pbproj
+SUBDIRS= jMaxProject.pbproj jMaxProject.xcode
 
 EXTRA_DIST= \
 	background.gif \
