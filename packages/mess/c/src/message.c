@@ -23,6 +23,7 @@
  * Authors: Francois Dechelle, Norbert Schnell.
  *
  */
+#include <fts/fts.h>
 #include "message.h"
 
 fts_symbol_t message_symbol = 0;
@@ -60,7 +61,7 @@ message_clear(message_t *mess)
       for(i=0; i<mess->ac; i++)
 	fts_atom_void(mess->at + i);
 
-      fts_free( mess->at);
+      fts_free(mess->at);
   
       mess->ac = 0;
       mess->at = 0;
@@ -138,39 +139,8 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  fts_symbol_t name = fts_get_symbol(at);
 	  fts_class_t *cl;
 
-	  if(name == fts_s_list)
-	    message_set(this, fts_s_list, ac - 1, at + 1); /* list constructor: "list" [<value> ...] */
-	  else if(fts_atom_type_lookup(name, &cl))
-	    {
-	      /* value constructor: <class name> [<value> ...] (construct object or primitive type) */
-	      
-	      /* skip class name */
-	      ac--;
-	      at++;
-
-	      if(cl)
-		{
-		  fts_object_t *obj = fts_object_create(cl, ac, at);
-		  fts_symbol_t error = fts_object_get_error(obj);
-		  
-		  if(!error)
-		    {
-		      fts_atom_t a;
-		      
-		      fts_set_object_with_type(&a, obj, name);
-		      message_set(this, name, 1, &a);
-		    }
-		  else
-		    {
-		      fts_object_set_error(o, "%s", fts_symbol_name(error));
-		      return;
-		    }
-		}
-	      else if(ac == 1 && fts_get_selector(at) == name)
-		message_set(this, name, 1, at);
-	      else
-		fts_object_set_error(o, "Wrong arguments for %s constructor", fts_symbol_name(name));
-	    }
+	  if(fts_atom_type_lookup(name, &cl))
+	    fts_object_set_error(o, "Symbol %s cannot be used as message", fts_symbol_name(name));
 	  else
 	    message_set(this, name, ac - 1, at + 1); /* message format: <selector> [<value> ...] (any message) */
 	}

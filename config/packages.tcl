@@ -49,17 +49,3 @@ package require explode
 
 # I/O package
 package require io
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -364,7 +364,7 @@ inlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       if(ac == 0 || fts_is_int(at))
 	{
 	  /* initialize the class */
-	  fts_class_init(cl, sizeof(fts_inlet_t),  1, 1, 0);
+	  fts_class_init(cl, sizeof(fts_inlet_t), 1, 1, 0);
 	  
 	  /* define the system methods */
 	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, inlet_init);

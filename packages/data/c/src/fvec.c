@@ -728,6 +728,32 @@ fvec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
+fvec_get_state_as_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *this = (fvec_t *)o;
+  float *values = fvec_get_ptr(this);
+  int size = fvec_get_size(this);
+  fts_list_t *array = fts_get_list(at);
+  fts_atom_t a;
+  int i;
+  
+  for(i=0; i<size; i++)
+    {
+      fts_set_float(&a, values[i]);
+  
+      fts_array_append(array, 1, &a);
+    }
+}
+
+static void
+fvec_restore_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *this = (fvec_t *)o;
+
+  fvec_set_from_atom_list(this, 0, ac, at);
+}
+
+static void
 fvec_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
@@ -916,6 +942,8 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fvec_delete);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, fvec_print); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_state_as_array"), fvec_get_state_as_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("restore_state_from_array"), fvec_restore_state_from_array);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), fvec_assist); 
 
   /* save and restore to/from bmax file */

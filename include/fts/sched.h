@@ -96,10 +96,9 @@ FTS_API double fts_get_time(void);
  * fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, socket);
  * </TT>
  *
- * @fn int fts_sched_add( fts_object_t *object, int flags, int fd)
- * @param object the object that will be notified
+ * @fn int fts_sched_add( fts_object_t *obj, int flags, ...)
+ * @param obj the object that will be notified
  * @param flags is one of FTS_SCHED_ALWAYS, FTS_SCHED_READ or FTS_SCHED_WRITE
- * @param fd the file descriptor if flags specified FTS_SCHED_READ or FTS_SCHED_WRITE
  * @return -1 if an error occured, 0 if not
  *
  * @ingroup sched

@@ -1538,9 +1538,9 @@ binop_ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_add_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_add_ivec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_add_ivec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_add_ivec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_add_ivec);
@@ -1554,9 +1554,9 @@ binop_ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_sub_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_sub_ivec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_sub_ivec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_sub_ivec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_sub_ivec);
@@ -1570,9 +1570,9 @@ binop_ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_mul_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_mul_ivec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_mul_ivec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_mul_ivec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_mul_ivec);
@@ -1586,9 +1586,9 @@ binop_ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_div_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_div_ivec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_div_ivec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_div_ivec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_div_ivec);
@@ -1602,9 +1602,9 @@ binop_ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_bus_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_bus_ivec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_bus_ivec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_bus_ivec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_bus_ivec);
@@ -1618,7 +1618,8 @@ binop_ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_vid_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_vid_ivec_inplace);
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_vid_ivec_inplace);
 	  
 	  if(ac > 2)
 	    {
@@ -1634,9 +1635,9 @@ binop_ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ee_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ee_ivec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ee_ivec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ee_ivec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_ee_ivec);
@@ -1650,9 +1651,9 @@ binop_ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ne_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ne_ivec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ne_ivec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ne_ivec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_ne_ivec);
@@ -1666,9 +1667,9 @@ binop_ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_gt_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_gt_ivec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_gt_ivec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_gt_ivec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_gt_ivec);
@@ -1682,9 +1683,9 @@ binop_ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ge_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ge_ivec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ge_ivec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ge_ivec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_ge_ivec);
@@ -1698,9 +1699,9 @@ binop_ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_lt_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_lt_ivec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_lt_ivec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_lt_ivec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_lt_ivec);
@@ -1714,9 +1715,9 @@ binop_ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_le_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_le_ivec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_le_ivec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_le_ivec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_le_ivec);
@@ -1730,9 +1731,9 @@ binop_ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_min_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_min_ivec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_min_ivec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_min_ivec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_min_ivec);
@@ -1746,9 +1747,9 @@ binop_ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_max_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_max_ivec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_max_ivec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_max_ivec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_max_ivec);

@@ -39,6 +39,9 @@ void fts_array_destroy( fts_array_t *array)
 {
   fts_array_clear( array);
   fts_free( array->atoms);
+  array->atoms = 0;
+  array->size = 0;
+  array->alloc = 0;
 }
 
 void fts_array_clear( fts_array_t *array)

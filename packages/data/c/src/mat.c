@@ -150,7 +150,6 @@ void
 mat_set_const(mat_t *mat, fts_atom_t value)
 {
   int size = mat->m * mat->n;
-  int refer = fts_is_object(&value);
 
   int i;
 

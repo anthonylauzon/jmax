@@ -1500,9 +1500,9 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_add_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_add_fvec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_add_fvec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_add_fvec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_add_fvec);
@@ -1516,9 +1516,9 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_sub_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_sub_fvec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_sub_fvec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_sub_fvec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_sub_fvec);
@@ -1532,9 +1532,9 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_mul_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_mul_fvec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_mul_fvec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_mul_fvec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_mul_fvec);
@@ -1548,9 +1548,9 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_div_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_div_fvec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_div_fvec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_div_fvec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_div_fvec);
@@ -1564,9 +1564,9 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_bus_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_bus_fvec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_bus_fvec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_bus_fvec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_bus_fvec);
@@ -1580,7 +1580,8 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_vid_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_vid_fvec_inplace);
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_vid_fvec_inplace);
 	  
 	  if(ac > 2)
 	    {
@@ -1596,9 +1597,9 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_ee_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_ee_fvec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_ee_fvec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_ee_fvec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_ee_fvec);
@@ -1612,9 +1613,9 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_ne_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_ne_fvec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_ne_fvec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_ne_fvec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_ne_fvec);
@@ -1628,9 +1629,9 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_gt_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_gt_fvec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_gt_fvec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_gt_fvec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_gt_fvec);
@@ -1644,9 +1645,9 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_ge_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_ge_fvec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_ge_fvec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_ge_fvec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_ge_fvec);
@@ -1660,9 +1661,9 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_lt_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_lt_fvec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_lt_fvec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_lt_fvec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_lt_fvec);
@@ -1676,9 +1677,9 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_le_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_le_fvec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_le_fvec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_le_fvec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_le_fvec);
@@ -1692,9 +1693,9 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_min_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_min_fvec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_min_fvec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_min_fvec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_min_fvec);
@@ -1708,9 +1709,9 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_max_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_max_fvec_inplace);
-
-	  if(ac > 2)
+	  if(ac <= 2)
+	    fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_max_fvec_inplace);
+	  else
 	    {
 	      fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_max_fvec);
 	      fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_max_fvec);

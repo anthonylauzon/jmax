@@ -28,16 +28,21 @@ extern void fvec_config(void);
 extern void fmat_config(void);
 extern void vec_config(void);
 extern void mat_config(void);
+extern void col_config(void);
+extern void row_config(void);
+extern void bpf_config(void);
 
 extern void getval_config(void);
+extern void getinter_config(void);
+
 extern void getsize_config(void);
 extern void getrange_config(void);
 extern void getlist_config(void);
 
+extern void preset_config(void);
+
 extern void fill_config(void);
 extern void copy_config(void);
-
-extern void bpf_config(void);
 
 DATA_API void
 data_config(void)
@@ -49,15 +54,20 @@ data_config(void)
   fmat_config();
   vec_config();
   mat_config();
+  col_config();
+  row_config();
+  bpf_config();
 
   getval_config();  
+  getinter_config();
+
   getsize_config();  
   getrange_config();  
   getlist_config();  
 
+  preset_config();
+
   fill_config();
   copy_config();
-
-  bpf_config();
 }
 
