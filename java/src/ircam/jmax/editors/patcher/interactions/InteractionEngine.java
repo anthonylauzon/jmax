@@ -107,6 +107,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   private boolean followingInletLocations = false;
   private boolean followingOutletLocations = false;
   private boolean keyListening = false;
+  private boolean followingAlsoConnectionLocations = false;
 
   final void setFollowingMoves(boolean v)
   {
@@ -146,6 +147,13 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
 
   final boolean isKeyListening(){
     return keyListening;
+  }
+
+  final void setFollowingAlsoConnectionLocations(boolean v){
+    followingAlsoConnectionLocations = v;
+  }
+  final boolean isFollowingAlsoConnectionLocations(){
+    return followingAlsoConnectionLocations;
   }
 
   final void setFollowingLocations(boolean v)
@@ -232,32 +240,42 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     
     squeack |= getModifiersBits(e);
 
-    if (followingLocations || followingInOutletLocations){
-
-      if(Squeack.isDown(squeack))//only in this case we are looking for the connections also
-	area = displayList.getSensibilityAreaAt(mouse.x, mouse.y);
-      else
-	area = displayList.getObjectSensibilityAreaAt(mouse.x, mouse.y);
-
-      squeack |= getLocationBits(area);
-    }
+    if (followingLocations || followingInOutletLocations)
+      {
+	
+	if ( !isFollowingAlsoConnectionLocations() || isCtrlEditInteraction(squeack))
+	  {
+	    area = displayList.getObjectSensibilityAreaAt(mouse.x, mouse.y);
+	  }      
+	else
+	  {
+	    area = displayList.getSensibilityAreaAt(mouse.x, mouse.y);
+	  }
+	
+	squeack |= getLocationBits(area);
+      }
     
     autoScrollIfNeeded(editor, squeack, mouse, oldMouse);
 
     if (! scrollTimer.isRunning())
       sendSqueack(editor, squeack, area, mouse, oldMouse);
 
-    if (area != null)
+    if ( area != null)
       area.dispose();
   }
 
-  final private void processKeyEvent(int squeack, KeyEvent e)
+  final private void processKeyEvent( int squeack, KeyEvent e)
   {
     ErmesSketchPad editor = (ErmesSketchPad) e.getSource();
     editor.cleanAnnotations();
 
     if (! scrollTimer.isRunning())
       sendSqueack(editor, squeack, null, null, null);
+  }
+
+  private boolean isCtrlEditInteraction( int squeack)
+  {
+    return ( Squeack.isDown(squeack) && Squeack.isCtrl(squeack));
   }
 
   // Scroll handling
@@ -385,6 +403,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     setFollowingInOutletLocations(false);
     setFollowingInletLocations(false);
     setFollowingOutletLocations(false);
+    setFollowingAlsoConnectionLocations(false);
     setKeyListening(false);
     setAutoScrolling(false);
 
@@ -404,6 +423,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     setFollowingInOutletLocations(false);
     setFollowingInletLocations(false);
     setFollowingOutletLocations(false);
+    setFollowingAlsoConnectionLocations(false);
     setKeyListening(false);
     setAutoScrolling(false);
 
@@ -498,12 +518,18 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     // sketch.stopTextEditing();
   }
 
-  public void keyTyped(KeyEvent e){}
-  public void keyPressed(KeyEvent e){}
-  public void keyReleased(KeyEvent e){
-    if(e.getKeyCode()==KeyEvent.VK_SHIFT){
-      processKeyEvent(Squeack.SHIFT_UP, e);
-    }
+  public void keyTyped(KeyEvent e)
+  {
+  }
+  public void keyPressed(KeyEvent e)
+  {
+  }
+  public void keyReleased(KeyEvent e)
+  {
+    if( e.getKeyCode() == KeyEvent.VK_SHIFT)
+      {
+	processKeyEvent( Squeack.SHIFT_UP, e);
+      }
   }
 }
 

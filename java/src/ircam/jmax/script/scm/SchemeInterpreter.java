@@ -42,14 +42,6 @@ import java.awt.*;
  */
 public abstract class SchemeInterpreter implements Interpreter
 { 
-    /** The package handler. */
-    PackageHandler itsPackageHandler;
-
-    public SchemeInterpreter() 
-    {
-	itsPackageHandler = new PackageHandler();
-    }
-
     public void addScriptMenu(String type, Script script, String name, Object key)
     {
 	KeyStroke stroke = (KeyStroke) key;
@@ -160,11 +152,6 @@ public abstract class SchemeInterpreter implements Interpreter
     public static boolean isNull(Object obj) 
     {
 	return obj == null;
-    }
-
-    public PackageHandler getPackageHandler() 
-    {
-	return itsPackageHandler;
     }
 
     /**

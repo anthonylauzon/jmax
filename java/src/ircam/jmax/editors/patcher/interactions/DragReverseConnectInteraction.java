@@ -47,6 +47,7 @@ class DragReverseConnectInteraction extends Interaction
     filter.setFollowingMoves(true); // need the drag
     filter.setFollowingInOutletLocations(true);
     filter.setFollowingOutletLocations(true);
+    filter.setFollowingAlsoConnectionLocations(false);
     filter.setAutoScrolling(true);
   }
 

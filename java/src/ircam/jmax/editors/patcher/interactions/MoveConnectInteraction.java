@@ -47,6 +47,7 @@ class MoveConnectInteraction extends Interaction
     filter.setFollowingMoves(true); // need the drag
     filter.setFollowingInOutletLocations(true);
     filter.setFollowingInletLocations(true);
+    filter.setFollowingAlsoConnectionLocations(false);
     filter.setAutoScrolling(true);
     filter.setKeyListening(true);  
   }

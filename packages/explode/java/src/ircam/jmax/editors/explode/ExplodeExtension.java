@@ -37,7 +37,7 @@ import ircam.jmax.script.*;
  */
 public class ExplodeExtension extends tcl.lang.Extension implements JavaExtension
 {
-  public void init(Interpreter interp)
+  public void init(ircam.jmax.script.Interpreter interp)
   {
     Mda.installEditorFactory( new ExplodeFactory());
 

@@ -252,8 +252,7 @@
 ;;
 ;; get-package-handler
 ;;
-(define (get-package-handler)
-  (interpreter-get-package-handler jmax-interp))
+(define get-package-handler max-application-get-package-handler)
 
 ;;
 ;; append-local-path
@@ -403,10 +402,10 @@
   (lambda (label proc . arg)
     (max-application-add-hook label (make-script proc arg))))
 
+
 (define when
   (lambda (label proc . arg)
     (println "Hello! when is no longer used. Please use define-hook instead.")
     (println "(We defined " label "-hook for you anyway.)")
     (apply define-hook (append (list label proc) arg))))
-
 
