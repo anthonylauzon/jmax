@@ -44,7 +44,8 @@ typedef struct fts_package fts_package_t;
 union fts_word
 {
   int                 fts_int;
-  double              fts_float;
+  float               fts_float;
+  double              fts_double;
   fts_symbol_t        fts_symbol;
   fts_object_t        *fts_object;
   void                *fts_pointer;
@@ -62,3 +63,9 @@ struct fts_atom {
 
 
 
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
