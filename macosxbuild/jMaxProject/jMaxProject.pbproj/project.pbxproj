@@ -11428,6 +11428,18 @@
 			settings = {
 			};
 		};
+		F858D1C202B8DCC801664092 = {
+			isa = PBXFileReference;
+			name = DefaultProjectMenu.java;
+			path = ../../java/src/ircam/jmax/toolkit/menus/DefaultProjectMenu.java;
+			refType = 2;
+		};
+		F858D1C302B8DCC801664092 = {
+			fileRef = F858D1C202B8DCC801664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F85C878F0290238D01664092 = {
 			isa = PBXBundleReference;
 			path = "file-generation.bundle";
@@ -14955,6 +14967,7 @@
 				F880FE880283013E01664092,
 				F880FE890283013E01664092,
 				F880FE8A0283013E01664092,
+				F858D1C202B8DCC801664092,
 			);
 			isa = PBXGroup;
 			name = menus;
@@ -15795,6 +15808,7 @@
 				F80902C302B762B101664092,
 				F80902C402B762B101664092,
 				F854BE7302B7C9BC01664092,
+				F858D1C302B8DCC801664092,
 			);
 			isa = PBXSourcesBuildPhase;
 		};
