@@ -82,8 +82,8 @@ public class AmbitusEventRenderer implements ObjectRenderer {
 
     if (selected) 
       {
-	g.setColor(Color.red);
-	//g.setColor(selectionColor);
+	  g.setColor(Color.red);
+	  //g.setColor(selectionColor);
 	  if (SequenceSelection.getCurrent().getModel() != gc.getDataModel()) g.drawRect(x, y, lenght, heigth);
 	else g.fillRect(x, y, lenght, heigth);
       }
@@ -182,6 +182,6 @@ public class AmbitusEventRenderer implements ObjectRenderer {
   static public Font altFont = new Font("SansSerif", Font.BOLD, 12);
     
     int oldX, oldY;
-    //static public Color selectionColor = new Color(102,102,/*153*/253);
+    //static public Color selectionColor = new Color(150,90,/*153*/253);
 }
 

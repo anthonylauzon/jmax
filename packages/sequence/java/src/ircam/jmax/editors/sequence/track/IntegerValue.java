@@ -31,7 +31,7 @@ import ircam.jmax.toolkit.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.*;
-import java.io.File.*;
+import java.io.*;
 import javax.swing.*;
 import java.util.*;
 import java.awt.datatransfer.*;
@@ -78,6 +78,11 @@ public class IntegerValue extends AbstractEventValue
 	public String getPublicName()
 	{
 	    return INTEGER_PUBLIC_NAME;
+	}
+
+	public ImageIcon getIcon()
+	{
+	    return INTEGER_ICON;
 	}
 
 	public Object newInstance()
@@ -147,8 +152,10 @@ public class IntegerValue extends AbstractEventValue
     }
 
     //--- Fields
-
+    public static final String fs = File.separator;
     public static final String INTEGER_NAME = "intevt";
+    public static ImageIcon INTEGER_ICON; 
+    static String path;
     public static final String INTEGER_PUBLIC_NAME = "integer";
     public static IntegerValueInfo info = new IntegerValueInfo();
     public static final int DEFAULT_MAX_VALUE = 127;
@@ -157,6 +164,19 @@ public class IntegerValue extends AbstractEventValue
     static String nameArray[] = {"integer"};
     static int propertyTypes[] = {INTEGER_TYPE};
     static int propertyCount = 1;
+
+    static 
+    {
+	try
+	    {
+		path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
+	    }
+	catch(FileNotFoundException e){
+	    //System.err.println("Couldn't locate sequence images");
+	    path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
+	}
+	INTEGER_ICON = new ImageIcon(path+"integer.gif");
+    }
 }
 
 

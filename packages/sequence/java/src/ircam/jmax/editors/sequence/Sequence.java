@@ -161,3 +161,9 @@ public class Sequence extends JFrame implements EditorContainer{
 }
 
 
+
+
+
+
+
+

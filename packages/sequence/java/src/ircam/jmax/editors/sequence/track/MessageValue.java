@@ -336,7 +336,7 @@ public class MessageValue extends AbstractEventValue
 	    path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
 	}
 	MESSAGE_ICON = new ImageIcon(path+"message.gif");
-  }
+    }
 }
 
 

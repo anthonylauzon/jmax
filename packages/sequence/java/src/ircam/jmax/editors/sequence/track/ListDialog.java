@@ -22,13 +22,13 @@ class ListDialog extends JDialog implements TrackDataListener, TrackListListener
 
 	JPanel panel = new JPanel();
 	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-	
-	panel.add(initLabelsPanel());
-	
+		
 	list = new ListPanel(track, this, this, gc);
 	scroll = new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
 					     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	scroll.setBackground(Color.white);
+
+	panel.add(initLabelsPanel());
 	panel.add(scroll);
 
 	getContentPane().add(panel);
@@ -70,6 +70,22 @@ class ListDialog extends JDialog implements TrackDataListener, TrackListListener
 		labelPanel.add(aLabel);
 	    }
 	labelPanel.add(Box.createHorizontalGlue());
+	
+	applyButton = new JButton("apply");
+	applyButton.setPreferredSize(new Dimension(60, 20));
+	applyButton.setMaximumSize(new Dimension(60, 20));
+	applyButton.setMargin(new Insets(0, 0, 0, 0));
+	applyButton.setVisible(false);
+	applyButton.addActionListener(new ActionListener(){
+	    public void actionPerformed(ActionEvent e)
+		{
+		    list.setEventValue();
+		}
+	});
+
+	labelPanel.add(applyButton);
+	labelPanel.add(Box.createRigidArea(new Dimension(3, 10)));
+
 	return labelPanel;
     }
 
@@ -133,10 +149,16 @@ class ListDialog extends JDialog implements TrackDataListener, TrackListListener
     {
       return scroll.getViewport().getViewRect();
     }
+    public void setEdit(boolean isEdit)
+    {
+	//applyButton.setEnabled(isEdit);
+	applyButton.setVisible(isEdit);
+    }
 
     Track track;
     ListPanel list;
     JScrollPane scroll;
+    JButton applyButton;
     Frame frame;
 }
 

@@ -181,7 +181,7 @@ public class AmbitusValue extends AbstractEventValue
 	//System.err.println("Couldn't locate sequence images");
 	path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
     }
-    AMBITUS_ICON = new ImageIcon(path+"ambitusAdder.gif");
+    AMBITUS_ICON = new ImageIcon(path+"note.gif");
   }
 
     static String nameArray[] = {"pitch", "duration"};

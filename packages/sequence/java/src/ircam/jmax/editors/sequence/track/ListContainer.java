@@ -31,5 +31,6 @@ import java.awt.*;
 public interface ListContainer {
     abstract public boolean isVisible(int y);
     abstract public Rectangle getVisibleRect();
+    abstract public void setEdit(boolean isedit);
 }
 

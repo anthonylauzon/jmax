@@ -412,6 +412,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	if(height < ystep-4) height = ystep-4;
 
 	area.doEdit(text, xstep*param+1, index*ystep+2-1, width, height);
+	container.setEdit(true);
     }
 
     void endEdit()
@@ -420,6 +421,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	area.setVisible(false);
 	requestFocus();
 	isEditing = false;
+	container.setEdit(false);
     }
 
     String getPropNameByIndex(int index)
