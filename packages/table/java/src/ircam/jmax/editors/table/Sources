@@ -1,6 +1,0 @@
-SOURCES = \
-	  Tabler.java \
-	  TableExtension.java \
-	  TableFactory.java \
-	  TablePanel.java
-
