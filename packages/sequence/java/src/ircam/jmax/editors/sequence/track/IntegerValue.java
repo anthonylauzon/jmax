@@ -99,7 +99,7 @@ public class IntegerValue extends AbstractEventValue
    
     //--- Fields
 
-    public static final String INTEGER_NAME = "atomevt";
+    public static final String INTEGER_NAME = "intevt";
     public static IntegerValueInfo info = new IntegerValueInfo();
 
     static String nameArray[] = {"integer"};

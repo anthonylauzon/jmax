@@ -30,7 +30,7 @@
 #include "track.h"
 #include "eventtrk.h"
 #include "noteevt.h"
-#include "atomevt.h"
+#include "intevt.h"
 
 #define MAX_MIDI_CHANNELS 16
 #define MAX_MIDI_PITCHES 128
@@ -351,7 +351,7 @@ seqmidi_read_controller(fts_midifile_t *file, int chan, int ctrl_num, int value)
   seqmidi_data_t *data = (seqmidi_data_t *)fts_midifile_get_user_data(file);
   eventtrk_t *track = data->controller_tracks[ctrl_num];
   double time = fts_midifile_get_current_time_in_seconds(file);
-  fts_object_t *atomevt;
+  fts_object_t *intevt;
   fts_atom_t a[3];
   
   if(!track)
@@ -366,7 +366,7 @@ seqmidi_read_controller(fts_midifile_t *file, int chan, int ctrl_num, int value)
       /* create new track */
       fts_set_symbol(a + 0, eventtrk_symbol);
       fts_set_symbol(a + 1, name);
-      fts_set_symbol(a + 2, atomevt_symbol);
+      fts_set_symbol(a + 2, intevt_symbol);
       fts_object_new(0, 3, a, (fts_object_t **)&track);
 
       /* add track to sequence */
@@ -376,12 +376,12 @@ seqmidi_read_controller(fts_midifile_t *file, int chan, int ctrl_num, int value)
       data->controller_tracks[ctrl_num] = track;
     }
   
-  fts_set_symbol(a + 0, atomevt_symbol);
+  fts_set_symbol(a + 0, intevt_symbol);
   fts_set_int(a + 1, value);
-  fts_object_new(0, 2, a, &atomevt);
+  fts_object_new(0, 2, a, &intevt);
   
   /* add event to track */
-  eventtrk_add_event(track, time, (event_t *)atomevt);
+  eventtrk_add_event(track, time, (event_t *)intevt);
   
   return 1;
 }

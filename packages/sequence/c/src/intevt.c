@@ -26,14 +26,14 @@
 #include "fts.h"
 #include "sequence.h"
 #include "eventtrk.h"
-#include "atomevt.h"
+#include "intevt.h"
 
-fts_symbol_t atomevt_symbol = 0;
+fts_symbol_t intevt_symbol = 0;
 
 static void
-atomevt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+intevt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  atomevt_t *this = (atomevt_t *)o;
+  intevt_t *this = (intevt_t *)o;
   
   event_init(&this->head);
 
@@ -47,20 +47,20 @@ atomevt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  */
 
 void
-atomevt_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+intevt_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  atomevt_t *this = (atomevt_t *)o;
+  intevt_t *this = (intevt_t *)o;
   fts_atom_t a[3];
 
   fts_set_float(a + 0, 1000.0 * event_get_time(&this->head));
-  fts_set_symbol(a + 1, atomevt_symbol);
+  fts_set_symbol(a + 1, intevt_symbol);
   a[2] = this->value;
 
   fts_client_upload(o, event_symbol, 3, a);
 }
 
 static void
-atomevt_move(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+intevt_move(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   /* generic event "super class" */
   event_t *this = (event_t *)o;
@@ -70,18 +70,18 @@ atomevt_move(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-atomevt_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+intevt_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  atomevt_t *this = (atomevt_t *)o;
+  intevt_t *this = (intevt_t *)o;
 
   if(ac > 0)
     this->value = at[0];
 }
 
 void 
-atomevt_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+intevt_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  atomevt_t *this = (atomevt_t *)o;
+  intevt_t *this = (intevt_t *)o;
 
   post_atoms(1, &this->value);
   post("\n");
@@ -99,24 +99,24 @@ atomevt_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
  *
  */
 static fts_status_t
-atomevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+intevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(atomevt_t), 0, 0, 0); 
+  fts_class_init(cl, sizeof(intevt_t), 0, 0, 0); 
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, atomevt_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, intevt_init);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("upload"), atomevt_upload);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("move"), atomevt_move);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set"), atomevt_set);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("print"), atomevt_print);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("upload"), intevt_upload);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("move"), intevt_move);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set"), intevt_set);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("print"), intevt_print);
 
   return fts_Success;
 }
 
 void
-atomevt_config(void)
+intevt_config(void)
 {
-  atomevt_symbol = fts_new_symbol("atomevt");
+  intevt_symbol = fts_new_symbol("intevt");
 
-  fts_class_install(atomevt_symbol, atomevt_instantiate);
+  fts_class_install(intevt_symbol, intevt_instantiate);
 }

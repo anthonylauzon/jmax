@@ -31,5 +31,5 @@ event.c \
 seqmidi.c \
 seqobj.c \
 eventtrk.c \
-atomevt.c \
+intevt.c \
 noteevt.c \

@@ -23,21 +23,21 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
-#ifndef _ATOMEVT_H_
-#define _ATOMEVT_H_
+#ifndef _INTEVT_H_
+#define _INTEVT_H_
 
 #include "fts.h"
 #include "event.h"
 
-extern fts_symbol_t atomevt_symbol;
+extern fts_symbol_t intevt_symbol;
 
-typedef struct _atomevt_
+typedef struct _intevt_
 {
   event_t head;
   fts_atom_t value;
-} atomevt_t;
+} intevt_t;
 
-#define atomevt_set_value(n, v) ((n)->value = (v))
-#define atomevt_get_value(n) ((n)->value)
+#define intevt_set_value(n, v) ((n)->value = (v))
+#define intevt_get_value(n) ((n)->value)
 
 #endif

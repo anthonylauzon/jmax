@@ -30,7 +30,7 @@ extern void track_setup(void);
 extern void event_setup(void);
 extern void seqobj_config(void);
 extern void eventtrk_config(void);
-extern void atomevt_config(void);
+extern void intevt_config(void);
 extern void noteevt_config(void);
 
 static void
@@ -40,7 +40,7 @@ sequence_module_init(void)
   event_setup();
   seqobj_config();
   eventtrk_config();
-  atomevt_config();
+  intevt_config();
   noteevt_config();
 }
 
