@@ -1,3 +1,12 @@
+2002-11-14  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* commited first version of Python FTS client client/python
+	This is a port of C++ code into Python. It will need a refactoring to be more "python" and less "C++"
+
+	* python client can send message to FTS
+
+	* python client can receive message from FTS and correct handler is called (see client/python/testClient.py)
+	
 2002-11-13  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* Fix a race condition in FtsSocketConnection (cpp client)
