@@ -354,6 +354,9 @@ method_check(fts_class_t *cl, const void *selector, fts_class_t *type)
 {
   fts_atom_t a;
 
+  /* make sure the class is instantiated */
+  fts_class_instantiate(cl);	
+
   method_key->selector = selector;
   method_key->type = type;
 
@@ -561,7 +564,7 @@ fts_class_get_method_varargs(fts_class_t *cl, fts_symbol_t s)
   int varargs = 0;
   fts_method_t method = method_get(cl, (const void *)s, NULL, &varargs);
 
-  if (varargs)
+  if(varargs != 0)
     return method;
 
   return NULL;
