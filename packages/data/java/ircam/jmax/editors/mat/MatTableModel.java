@@ -41,11 +41,13 @@ class MatTableModel extends AbstractTableModel
 
 public int getColumnCount() 
 { 
-  return model.getColumns();
+  return model.getColumns() + 1;
 }
 
 public void setValueAt(Object aValue, int rowIndex, int columnIndex) 
 {	
+  if(columnIndex == 0) return;
+  
   if( aValue != null)
   {
     Object obj;
@@ -62,18 +64,21 @@ public void setValueAt(Object aValue, int rowIndex, int columnIndex)
         obj = aValue;
       }
     } 
-    model.requestSetValue( obj, rowIndex, columnIndex);
+    model.requestSetValue( obj, rowIndex, columnIndex-1);
   }
 }
 
 public boolean isCellEditable(int row, int col)
 {
-	return true;
+	return col != 0;
 }
 
 public String getColumnName(int col)
 {
-  return model.getColumnName(col);
+	if(col == 0)
+		return "Row Id";
+	else     
+    return model.getColumnName(col-1);
 }
 
 public int getRowCount() { 
@@ -82,7 +87,10 @@ public int getRowCount() {
 
 public Object getValueAt(int row, int col) 
 { 
-	return model.getValueAt(row, col);
+  if(col == 0)
+		return new Integer(row);
+	else 
+    return model.getValueAt(row, col-1);
 }
 
 public MatDataModel getMatDataModel()

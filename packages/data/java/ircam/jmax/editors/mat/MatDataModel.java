@@ -51,6 +51,7 @@ public interface MatDataModel {
     public abstract void removeMatListener(MatDataListener theListener);    
     
     public abstract void requestSetValue( java.lang.Object aValue, int rowIndex, int columnIndex);
+    public abstract void requestAppendRow();
 }
 
 

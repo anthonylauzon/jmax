@@ -24,6 +24,7 @@ package ircam.jmax.editors.mat;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
+import javax.swing.table.*;
 import javax.swing.undo.*;
 
 import java.awt.*;
@@ -43,10 +44,12 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
   FtsMatObject matData;
   EditorContainer itsContainer;
   MatTableModel tableModel;
-
+  DefaultTableCellRenderer rowsIdRenderer;
+  
   transient JScrollPane scrollPane; 
   transient JTable table;
   public static final Color matGridColor = new Color(220, 220, 220);
+  public static final Color rowsIdColor = new Color(245, 245, 245);
   public static final int COLUMN_MIN_WIDTH = 70;
   
   public MatPanel(EditorContainer container, FtsMatObject data) 
@@ -81,8 +84,20 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
     table.setPreferredScrollableViewportSize(new Dimension( MatWindow.DEFAULT_WIDTH, MatWindow.DEFAULT_HEIGHT));
     table.setRowHeight(17);
     table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF);
+    table.getColumnModel().getColumn(0).setMinWidth(40);
+    table.getColumnModel().getColumn(0).setMaxWidth(40);
     scrollPane = new JScrollPane(table);
     add(BorderLayout.CENTER, scrollPane);
+    
+    rowsIdRenderer = new DefaultTableCellRenderer();
+    rowsIdRenderer.setBackground(rowsIdColor);
+    table.addKeyListener(new KeyAdapter(){
+      public void keyPressed(KeyEvent e)
+      {
+        if(e.getKeyCode() == KeyEvent.VK_ENTER)
+          matData.requestAppendRow();
+      }
+    });
   }
   
   void updateTableModel()
@@ -90,8 +105,13 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
     tableModel = new MatTableModel(matData);
     table.setModel(tableModel);
     
-    for (int i = 0; i < matData.getColumns(); i++) 
+    for (int i = 1; i < matData.getColumns(); i++) 
       table.getColumnModel().getColumn(i).setMinWidth(COLUMN_MIN_WIDTH);
+    
+    table.getColumnModel().getColumn(0).setMaxWidth(40);
+    table.getColumnModel().getColumn(0).setMinWidth(40);
+    
+    table.getColumnModel().getColumn(0).setCellRenderer(rowsIdRenderer);
   }
   
   void updateTableToSize(int width)

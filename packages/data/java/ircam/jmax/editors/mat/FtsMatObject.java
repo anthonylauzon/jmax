@@ -180,6 +180,17 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
     }    
   }
   
+  public void requestAppendRow()
+  {
+    try{
+      send( FtsSymbol.get("append"));
+    }
+    catch(IOException e)
+    {
+      System.err.println("FtsMatObject: I/O Error sending append Message!");
+      e.printStackTrace(); 
+    }    
+  }
   /************************************************************************************
   ** MatDataModel interface
   *************************************************************************************/
