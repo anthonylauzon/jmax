@@ -1,7 +1,7 @@
 package ircam.jmax.editors.explode;
 
 import ircam.jmax.toolkit.*;
-
+import java.util.*;
 import java.awt.Component;
 
 import com.sun.java.swing.ImageIcon;
@@ -52,7 +52,16 @@ public class DeleteTool extends Tool implements PositionListener {
 	// starts an undoable transition
 	egc.getDataModel().beginUpdate();
 
-	egc.getDataModel().removeEvent(aEvent);
+	if (ExplodeSelection.getSelection().isInSelection(aEvent))
+	  {
+	    for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
+	      {
+		aEvent = (ScrEvent) e.nextElement();
+		egc.getDataModel().removeEvent(aEvent);
+	      }
+	  }
+	else
+	  egc.getDataModel().removeEvent(aEvent);
 
 	egc.getDataModel().endUpdate();
       }

@@ -124,6 +124,7 @@ public class ScoreRenderer extends AbstractRenderer{
     int startTime = gc.getAdapter().getInvX(x);
     int endTime = gc.getAdapter().getInvX(x+w);
 
+
     for (int i=gc.getDataModel().indexOfFirstEventEndingAfter(startTime); i<=gc.getDataModel().indexOfLastEventStartingBefore(endTime); i++) 
       {
 	aScrEvent = gc.getDataModel().getEventAt(i);

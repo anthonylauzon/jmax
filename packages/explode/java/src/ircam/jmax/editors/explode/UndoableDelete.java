@@ -13,12 +13,12 @@ class UndoableDelete extends AbstractUndoableEdit {
 
   public UndoableDelete(ScrEvent theDeletedEvent)
   {
-      itsEvent = theDeletedEvent;
+    itsEvent = theDeletedEvent;
   }
   
   public boolean addEdit(UndoableEdit anEdit)
   {
-    return true; 
+    return false; 
   }
   
   public String getPresentationName()
