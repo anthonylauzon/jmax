@@ -50,12 +50,13 @@
     <A HREF="#patchers">Patchers and Variables</A>
   <LI>
     <A HREF="#templates"> Templates </A>
+  <LI>
+    <A HREF="#lexical"> Lexical Conventions </A>
 </UL>
 
 <HR>
 
-<A NAME="jmaxvsmax">
-<H2><I>j</I>Max is not Max</H2>
+<A NAME="jmaxvsmax"> <H2><I>j</I>Max is not Max</H2> </A>
 
 <P>
 <I>j</I>Max is based on the same programming paradigm as the other
@@ -73,8 +74,7 @@ and will be extended in future releases.
 
 <P>
 
-<A NAME="variables">
-<H2>Variables</H2>
+<A NAME="variables"><H2>Variables</H2></A>
 <P>
 A variable is a name associated to a value; the association between a value
 and a name is made by instantiating an object, so the value of a variable
@@ -132,8 +132,7 @@ be defined by the object "srs: const { 32000, 44100, 48000 }", and accessed
 with the standard syntax "$srs[1]".
 
 <P>
-<A NAME="expressions">
-<H2>Expressions</H2>
+<A NAME="expressions"> <H2>Expressions</H2> </A>
 
 As we saw in the previous paragraph, we can use a variable in instantiating
 an object, by putting a "$" followed by the variable name in the object arguments.
@@ -152,9 +151,16 @@ function, <code>unique()</code> that return a unique number each time is evaluat
 future releases will include a complete function library, and the possibility to define
 functions thru a <B>C</B> API.
 
+<H4>Simple Expressions</H4>
+
+To avoid syntactical ambiguities with the current object set, the following restriction
+apply: the arguments of an object must be <code> simple expressions </code>; a simple
+expression is either a variable access operation, an array access operation, or a expression
+between parentesys; in other word, an expression used as object argument should be enclosed
+in parentesys.
+
 <P>
-<A NAME="example">
-<H2>An Example</H2>
+<A NAME="example"> <H2>An Example</H2> </A>
 
 In this example, we define three variables to parametrize a table object size
 with respect to the sampling frequency; note that the variable <I>sr</I> will 
@@ -165,8 +171,7 @@ be a system defined variable in a real patch programming case.
 
 
 <P>
-<A NAME="patchers">
-<H2>Patchers and Variables</H2>
+<A NAME="patchers"> <H2>Patchers and Variables</H2> </A>
 <P>
 <I>j</I>Max support another way to define variables; any patcher implicitly define
 a variable, called "args", whose value is an array with all the patcher argument,
@@ -187,8 +192,7 @@ assignement in the form <code>variable = value</code>.
 
 <P>
 
-<A NAME="templates">
-<H2>Templates</H2>
+<A NAME="templates"> <H2>Templates</H2> </A>
 <P>
 A template is the <I>j</I>Max version of other Max abstraction; we use
 a different name mostly to avoid confusion, since <I>j</I>Max is able
@@ -260,6 +264,33 @@ old Max 0.26 abstractions.
 Please note that saving a new template definition will automatically
 redefine all the existing instances to conform to the new definition.
 <P>
+<A NAME="lexical"><H2>Lexical Conventions </H2></A>
+<P>
+In order to handle the complex expression introduced, <i>j</i>Max use
+different lexical conventions than Max 0.26.
+<DL>
+<DT> Integers
+<p>
+<DD> A string of an optional sign followed by decimal digits and terminated by a terminating token is
+interpreted as an integer.
+<p>
+<DT> Integers
+<p>
+<DD> A string of an optional sign followed by decimal digits, followed by a decimal dot, followed
+by some more optional decimal digits and terminated by a terminating token is intepreted as a floating point number.
+<p>
+<DT> Symbols<p>
+<DD> A string of characters included between double quotes is interpreted as a symbol.
+A string of characters others than an int or a float terminated by a terminating token is considered 
+as a symbol; a backslash followed by a terminating token is considered as a standard character and
+do not terminate the symbol.
+<p>
+<DT> Terminating Tokens<p>
+<DD> The following characters are terminating tokens: <code>blank $ , ( ) [ ] { } : . ; ' </code><br>
+Note that the binary operators are not considered terminating tokens, so you need to put blanks
+around them in expressions.
+<p>
+</DL>
 <HR>
 
 </BODY>

@@ -86,8 +86,10 @@ Additional system properties can be defined by using the same syntax
 <H2> <B><TT>.jmaxrc</TT></B> file </H2>
 
 <P>
-The <B><TT>.jmaxrc</TT></B> file is a <code>tcl</code> script that is loaded at <I>j</I>Max startup.
-It can contain any <code>tcl</code> code, though the following is probably of main interest:
+At the startup <i>j</i>Max load the <B><TT>.jmaxrc</TT></B> file in
+the user home directory; it is <code>tcl</code> script that is loaded
+at <I>j</I>Max startup.  It can contain any <code>tcl</code> code,
+though the following is probably of main interest:
 <UL>
 <LI> <A HREF="configuration/system.html"> set system properties to customize system environment </A>
 <LI> <A HREF="configuration/ioconf.html"> set the <i>j</i>Max configuration </A>
@@ -119,7 +121,17 @@ ucs open device out~ default as SgiALOut ALdevice ADATOut channels 8
 }
 # --- end of .jmaxrc
 </PRE>
+<P>
+<A NAME="config/site.tcl">
+<H2> <B><TT>.jmaxrc</TT></B> file </H2>
 
+<P>
+At the startup <i>j</i>Max load also the <B><TT>config/site.tcl</TT></B> file in
+the <i>j</i>Max installation directory; it also can contain any <code>tcl</code> code,
+but its main interests is to put define site specific tcl functions to simplify 
+user installation; tipically, a tcl function for each kind of installation you have
+in your site, functions that can be called in the user <B><TT>.jmaxrc</TT></B> file.
+See the file for an example of such a function.
 <P>
 <HR>
 

@@ -66,6 +66,10 @@
   <A HREF="#using key bindings">using key bindings</A>
 <LI> 
   <A HREF="#changing patcher in/outlets">changing patcher in/outlets</A>
+<LI> 
+  <A HREF="#specific objects changes">specific objects changes</A>
+<LI> 
+  <A HREF="#lexical conventions">lexical conventions</A>
 </UL>
 
 
@@ -310,6 +314,41 @@ on the object.
 A patcher may contain several inlets/outlets having same number. In this case,
 they are considered (from the connected objects point of view) as being one
 single inlet/outlet.
+
+<A NAME="specific objects changes"><H2>Specific objects changes</H2></A>
+<p>
+A couple of objects have local changes; they are converted automatically
+when loading a Max 0.26 file.
+<p>
+<TABLE BORDER=2>
+<TR>
+ <TH> Object </TH>
+ <TH> Changes </TH>
+</TR>
+
+<TR>
+ <TD> <code>expr</code> <p>
+ <TD> The <code>expr</code> object now accept only one argument, a symbol,
+that include the complete text of the expression.
+</TR>
+
+<TR>
+ <TD> <code> Message Box </code> <p>
+ <TD> The <code> Message Box </code> now use the single quote instead of the backslash.
+It also accept <code>$name</code> that is evaluated to the value of a variable;
+see <A HREF="language.html#variables"> the languages documentation for details</A>.
+</TR>
+</TABLE>
+
+<p>
+
+
+
+<A NAME="lexical conventions"><H2>Lexical Conventions</H2></A>
+<p>
+The lexical conventions, i.e. the quoting rules, for the object text are
+changed; see <A HREF="language.html#lexical"> the languages documentation for details</A>.
+<p>
 
 </BODY>
 </HTML>

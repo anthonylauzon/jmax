@@ -44,9 +44,9 @@
   <LI>
     <A HREF="#disclamier"> Disclamier </A>
   <LI>
-    <A HREF="#introduction"> System Configuration </A>
+    <A HREF="#introduction"> Introduction </A>
   <LI>
-    <A HREF="#commands"> System Configuration Commands</A>
+    <A HREF="#commands"> Commands</A>
 </UL>
 
 <HR>
@@ -63,14 +63,71 @@ syntax, or will simply vanish.
 <P>
 
 <A NAME="introduction">
-<H2> System Configuration  </H2>
+<H2> Introduction </H2>
 <P>
-
+The system configuration is based on <A HREF="getting_started.html#System properties"> system 
+properties</A>  that are configuration options that can be set either by setting a <code>tcl</code>
+variable or passing a command line option.<br>
+These options allow the setting of the host where the server will run, the architecture of
+the host, the kind of connections and a number of miscellaneous settings and options.
 
 <A NAME="commands">
-<H2> System Configuration Commands </H2>
+<H2> Commands </H2>
+Not all the options of the <code>jmax</code> script are documented here;
+to see script specific options, run the <code>jmax -help</code> command.
 <P>
-
+<DL>
+<DT> <code>tcl:</code>  <code> set jmaxArch</code>  <i>arch</i> 
+<DT> <code>CLI:</code>  <code> jmax </code> ... <code> -jmaxArch</code>  <i>arch</i>  <p>
+<DD> Set the architecture where the server will run; used to choose the proper 
+executable of the server; consult the release notes in order to know the architecture
+supported in this release; in this release, this comand is mandatory; if you don't specify
+the good architecture, <i>j</i>Max will not run.
+<p>
+<DT> <code>tcl:</code>  <code> set jmaxConnection </code>  <i>connection</i> 
+<DT> <code>CLI:</code>  <code> jmax </code> ... <code> -jmaxConnection</code>  <i>connection</i> <p>
+<DD>
+Choose the kind of connection between the <code>Java</code> client and the server;
+Supported values are currently <code>udp</code> for an UDP based connection, and <code>client</code> for a TCP
+based connection; UDP will give a better real time response for controllers; use TCP
+only if you network is complex and you need the reialability of a TCP connection. <br>
+Default to <code>udp</code>.
+<p>
+<DT> <code>tcl:</code>  <code> set jmaxHost </code>  <i>host</i> 
+<DT> <code>CLI:</code>  <code> jmax </code> ... <code> -jmaxHost</code>  <i>host</i> <p>
+<DD>
+Specify the host where to run the server; value can be either </code>local</code>
+to specify the host where the client run, or a complete canonical
+internet name for an other host, like
+<code>mymachine.mycompany.com</code>; beware that <i>j</i>Max
+currently use the <code>rsh</code> Unix command to run the server
+remotely, so in order to work you must set your <code>.rhosts</code>
+file correctly; see the <code>rsh</code> and <code>rhosts</code> man
+page for details.<br>
+Defaults to <code>local</code>.
+<p>
+<DT> <code>tcl:</code>  <code> set jmaxSplashScreen </code>  <i>command</i> 
+<DT> <code>CLI:</code>  <code> jmax </code> ... <code> -jmaxSplashScreen</code>  <i>command</i> <p>
+<dd>
+If <i>command</i> is <code>hide</code> the splash screen will not be shown during startup.<br>
+Default to <code>show</code>.
+<p>
+<DT> <code>tcl:</code>  <code> set jmaxFastFileBox </code>  <i>command</i> 
+<DT> <code>CLI:</code>  <code> jmax </code> ... <code> -jmaxFastFileBox</code>  <i>command</i> <p>
+<dd>
+If <i>command</i> is <code>true</code>, the file selection box used by
+<i>j</i>Max will not shown specific icons for known file types, and
+will always show all the files in a directory, and not only the files
+of a known file type, so it's use will be substantially faster. <br>
+Depending on your installation, the default speed can be ok, or you
+may need to specify this option.
+<p>
+<DT> <code>tcl:</code>  <code> set jmaxDefaultFont </code>  <i>command</i> 
+<DT> <code>CLI:</code>  <code> jmax </code> ... <code> -jmaxDefaultFont</code>  <i>command</i> <p>
+<DD> 
+Specify the default font used in the patch editor. <br>
+Default to <code>SansSerif</code>.
+</DL>
 <P>
 <HR>
 </BODY>

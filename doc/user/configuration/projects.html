@@ -118,20 +118,24 @@ The project file is currently a <code>tcl</code> file; the <code>tcl</code> comm
 are evaluated in an environment where the <code>dir</code> variable is defined to have
 the value of the project directory, so it can be used to build filename relative to the
 project directory, so that no dependency on the absolute path need to be coded in the
-
 <P>
 The project file can contains a number of <code>tcl</code> commands that load or
 install the different kind of components in <I>j</I>Max; for this release, the commands
 needed to install user developed libraries (<code>C</code> or <code>Java</code>) are
-not documented.
+not documented; the project file can also, in special case, contains <A HREF="ioconf.html">
+I/O configuration commands</A>, when you want to be sure that a project run 
+in a specific configuration.
 <P>
 The currently <I>j</I>Max is not able to properly undo all the action in
 a project file; we suggest, for the moment, to restart before changing project.
 <p>
-Note that in some sense you can consider your <A HREF="./getting_started.html#.jmaxrc"><code>.jmaxrc</code> </A> file as a default
-project file; all the commands available in the project file can be put in the
-<code>when start</code> hook, and thus apply to all the patches loaded in all the session;
-this is usefull while developping small applications that do not require a project organization.
+Note that in some sense you can consider your <A
+HREF="../getting_started.html#.jmaxrc"><code>.jmaxrc</code> </A> file
+as a default project file; all the commands available in the project
+file can be put in the <code>when start</code> hook, and thus apply to
+all the patches loaded in all the session; this is usefull while
+developping small applications that do not require a project
+organization.
 <P>
 
 <A NAME="commands">
