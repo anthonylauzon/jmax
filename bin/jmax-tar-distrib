@@ -126,8 +126,22 @@ remove_dest_dir()
     /bin/rm -rf ${DEST_DIR}
 }
 
+
 # ---------------------------------------------------------------------------
-# args: ARCH TYPE DIR DEST
+# args: DIR
+chmod_dir ()
+{
+    i=$DEST_DIR
+    for d in `echo $1 | sed 's/\// /g'`
+    do
+	i="$i/$d"
+	echo chmod 755 "$i"
+	chmod 755 $i
+    done
+}
+
+# ---------------------------------------------------------------------------
+# args: ARCH TYPE DIR
 copy_files ()
 {
     if [ \! -f $3/distrib ] ;  then echo "File $3/distrib missing" >&2 ; exit 1 ; fi
@@ -142,28 +156,41 @@ copy_files ()
 	    then
 		if [ -f "$3/$NAME" ]
 		then
-		    D=`dirname $4/$NAME`
-		    if [ ! -d $D ] ; then mkdir -p $D ; chmod 755 $D ; echo "Created $D" ; fi
 
-		    cp $3/$NAME $4/$NAME
-
-		    if ls -l $3/$NAME | awk '{ exit ( !(substr($1,4,1)=="x") ); }'
+		    F=`echo $3/$NAME | sed 's/^\.\///'`
+		    D=`dirname $F`
+		    if [ ! -d $DEST_DIR/$D ]
 		    then
-			chmod 755 $4/$NAME
-		    else
-			chmod 644 $4/$NAME
+			mkdir -p $DEST_DIR/$D
+			echo "Created $DEST_DIR/$D"
+			chmod_dir $D
 		    fi
-		    echo Copyied $4/$NAME
+
+		    cp $F $DEST_DIR/$F
+		    echo "Copyied $DEST_DIR/$F"
+
+		    if ls -l $F | awk '{ exit(!(substr($1,4,1)=="x")); }'
+		    then
+			chmod 755 $DEST_DIR/$F
+		    else
+			chmod 644 $DEST_DIR/$F
+		    fi
 
 		elif [ -d "$3/$NAME" ]
 		then
-		    mkdir -p $4/$NAME
-		    chmod 755 $4/$NAME
-		    echo Created $4/$NAME
-		    copy_files $1 $2 $3/$NAME $4/$NAME
+
+		    D=`echo $3/$NAME | sed 's/^\.\///'`
+		    mkdir -p $DEST_DIR/$D
+		    echo "Created $DEST_DIR/$D"
+#		    chmod 755 $4/$NAME
+		    chmod_dir $D
+		    copy_files $1 $2 $D
+
 		else
+
 		    echo "File or directory $3/$NAME not found" >&2
 		    exit 2
+
 		fi
 	    fi
 	    read TYPE_F ARCH_F NAME OTHERS
@@ -210,7 +237,7 @@ compute_version_number
 
 create_dest_dir
 
-copy_files $ARCH $TYPE . ${DEST_DIR}
+copy_files $ARCH $TYPE .
 
 create_tar
 

@@ -158,6 +158,8 @@ EOF
 generate_file /tmp/$$ VERSION
 
 # ---------------------------------------------------------------------------
+( cd doc/release_notes ; touch release_notes.${NEW_VERSION}.html; cvs add release_notes.${NEW_VERSION}.html )
+
 cat <<EOF >/tmp/$$
 <HTML>
 <HEAD>
@@ -187,12 +189,11 @@ bug report submission.
 
 </HTML>
 EOF
-( cd doc/release_notes ; touch release_notes.${NEW_VERSION}.html; cvs add release_notes.${NEW_VERSION}.html )
+generate_file /tmp/$$ doc/release_notes/release_notes.${NEW_VERSION}.html
 cat <<EOF >> doc/release_notes/distrib
 all	all	release_notes.${NEW_VERSION}.html
 EOF
-( cd doc/release_notes ; cvs commit distrib )
-generate_file /tmp/$$ doc/release_notes/release_notes.${NEW_VERSION}.html
+( cd doc/release_notes ; cvs commit -l -m "$CVS_MESSAGE" distrib )
 
 # ---------------------------------------------------------------------------
 cat <<EOF >/tmp/$$
