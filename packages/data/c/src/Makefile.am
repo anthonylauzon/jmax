@@ -22,8 +22,18 @@ value.c \
 vec.c \
 dumpfile.c
 
-libdata_la_LDFLAGS= -no-undefined -module
-libdata_la_LIBADD= -L$(top_srcdir)/fts/.libs -lfts -L$(top_srcdir)/packages/utils/c/src/.libs -lutils
+if MACOSX
+LINK=cc -bundle -undefined error -o $@
+# This should be normal use (twolevel_namespace, explicit library dependencies), but it does not work with libtool
+#XLDFLAGS= -no-undefined -module
+XLIBADD= -L$(top_srcdir)/fts/.libs -lfts -L$(top_srcdir)/packages/utils/c/src/.libs -lutils
+
+# So we try flat_namespace 
+#XLDFLAGS= -module
+#XLIBADD= 
+endif
+libdata_la_LDFLAGS=$(XLDFLAGS)
+libdata_la_LIBADD=$(XLIBADD)
 
 INCLUDES=-I$(top_srcdir)/packages/utils/c/src
 

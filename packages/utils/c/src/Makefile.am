@@ -12,8 +12,12 @@ rfft_shuffle.c \
 utils.c \
 vec_fft.c 
 
-libutils_la_LDFLAGS= -no-undefined -module
-libutils_la_LIBADD= -L$(top_srcdir)/fts/.libs -lfts
+if MACOSX
+XLDFLAGS=  -no-undefined -module
+XLIBADD= -L$(top_srcdir)/fts/.libs -lfts
+endif
+libutils_la_LDFLAGS=$(XLDFLAGS)
+libutils_la_LIBADD=$(XLIBADD)
 
 noinst_HEADERS= \
 cfft.h \
