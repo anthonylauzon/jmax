@@ -62,22 +62,6 @@
 			path = build/libdtd.bundle;
 			refType = 2;
 		};
-		F544CDCB0338862A01664092 = {
-			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/dtd/c;
-			dstSubfolderSpec = 7;
-			files = (
-				F544CDCC0338864C01664092,
-			);
-			isa = PBXCopyFilesBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F544CDCC0338864C01664092 = {
-			fileRef = F544CDC10338861901664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F56C3E180338D3DC01664092 = {
 			isa = PBXFileReference;
 			name = Actions.java;
@@ -17065,7 +17049,6 @@
 				F8512515028BED1101664092,
 				F851252E028BED1101664092,
 				F8512535028BED1101664092,
-				F544CDCB0338862A01664092,
 			);
 			buildSettings = {
 				DEBUGGING_SYMBOLS = NO;
