@@ -146,8 +146,14 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
     makeContent();
     makeMenuBar();
     MaxWindowManager.setTopFrame( this);
-    addWindowListener( MaxWindowManager.getWindowManager());
+    addWindowListener( MaxWindowManager.getWindowManager());    
     setDefaultCloseOperation( JFrame.DO_NOTHING_ON_CLOSE);
+    addWindowListener( new WindowAdapter(){
+      public void windowClosing(WindowEvent e)
+      {
+        JMaxApplication.Quit();
+      }
+    });
     validate();
     pack();
     setVisible( true);
