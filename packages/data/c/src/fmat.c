@@ -515,6 +515,54 @@ fmat_return_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   }
 }
 
+/******************************************************************************
+ *
+ * functions, i.e. methods that return a value but don't change the object
+ *
+ * todo: to be called in functional syntax, e.g. (.max $myfvec)
+ */
+
+static void
+fmat_getmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+    const fvec_t *this = (fvec_t *) o;
+    const int	  size = this->m * this->n;
+    const float  *p    = fmat_get_ptr(this);
+    float	  max  = p[0];	/* start with first element */
+    int		  i;
+
+    if (size == 0)
+	return;			/* no output (void) for empty vector */
+
+    for (i = 1; i < size; i++)
+	if (p[i] > max)
+	    max = p[i];
+
+    fts_return_float(max);
+}
+
+
+static void
+fmat_getmin(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+    const fvec_t *this = (fvec_t *) o;
+    const int	  size = this->m * this->n;
+    const float  *p    = fvec_get_ptr(this);
+    float	  min  = p[0];	/* start with first element */
+    int		  i;
+
+    if (size == 0)
+	return;			/* no output (void) for empty vector */
+
+    for (i = 1; i < size; i++)
+	if (p[i] < min)
+	    min = p[i];
+
+    fts_return_float(min);
+}
+
+
+
 
 /* copy a slice (a row or column, given in the first arg) from the
    matrix into an fvec (created here or given as second argument) */
@@ -1369,6 +1417,9 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_get_element, fmat_return_element);
   fts_class_message_varargs(cl, sym_getcol, fmat_get_slice);
   fts_class_message_varargs(cl, sym_getrow, fmat_get_slice);
+
+  fts_class_message_void(cl, fts_new_symbol("getmax"), fmat_getmax);
+  fts_class_message_void(cl, fts_new_symbol("getmin"), fmat_getmin);
 
   fts_class_inlet_bang(cl, 0, data_object_output);
 
