@@ -1,0 +1,187 @@
+<HTML>
+<!--                                                                      -->
+<!-- jMax                                                                 -->
+<!--                                                                      -->
+<!-- Copyright (C) 1999 by IRCAM                                          -->
+<!-- All rights reserved.                                                 -->
+<!--                                                                      -->
+<!-- This program may be used and distributed under the terms of the      -->
+<!-- accompanying LICENSE.                                                -->
+<!--                                                                      -->
+<!-- This program is distributed WITHOUT ANY WARRANTY. See the LICENSE    -->
+<!-- for DISCLAIMER OF WARRANTY.                                          -->
+<!--                                                                      -->
+<HEAD>
+<TITLE>The FTS Language Layer: Objects </TITLE>
+</HEAD>
+
+<BODY TEXT="#000000" BGCOLOR="#CCCCCC">
+
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=0>
+<TR>
+  <TD ALIGN=LEFT>
+    <A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../../../../../images/jmax_logo_tiny.gif" BORDER=0 ALT="jMax"></A>
+  </TD>
+  <TD ALIGN=RIGHT>
+    <A HREF="http://www.ircam.fr/"><IMG SRC="../../../../../images/ircam_banner.gif" BORDER=0 ALT="IRCAM - Centre Georges Pompidou"></A>
+  </TD>
+</TR>
+</TABLE>
+<BR>
+<UL TYPE=SQUARE>
+  <LI><A HREF=../../../../index.html>Documentation</A>
+  <UL TYPE=SQUARE>
+    <LI><A HREF=../../../index.html><b>The <i>j</i>Max Architecture</b></a>
+      <UL TYPE=SQUARE>
+      <LI><A HREF=../../index.html><b>The FTS Computational Engine</b></a>
+        <UL TYPE=SQUARE>
+        <LI><A HREF=../index.html><b>The Language Layer</b></a>
+	  <UL TYPE=SQUARE>
+          <LI><A HREF=index.html><b>The Message System</b></a>
+          </UL>
+        </UL>
+      </UL>
+  </UL>
+</UL>
+
+<p>
+<font size=+3 color=#FFFFFF><b>Objects</b></font>
+
+<p>
+<hr noshade size=1>
+
+<UL TYPE=DOT>
+  <LI><A HREF="#objects"> Objects </A>
+  <LI><A HREF="#patchers"> Patchers</A>
+  <LI><A HREF="#properties"> Properties</A>
+  <LI><A HREF="#objects"> Error Objects </A>
+</UL>
+
+<p>
+<hr noshade size=1>
+
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
+<TR><TD>
+  
+<A NAME="Objects"> 
+<H2> Objects </H2> 
+
+An object: a statement, with a state; describe in a syntax (implemented as a list
+of atoms), corresponding to a number of language features.
+Extending this syntax and semantic is one of the big changes in <i>j</i>Max
+with respect to other implementation of the Max family of languages.
+
+<H3> Creating an Object</H3> 
+
+Creating an object.
+
+Two levels: fts_make_object, real object construction.
+- Finding the correct class
+- Object allocation, and initialization
+- init method
+- Supported by the set description, in order to build more complex language layers.
+
+fts_object_new: language level, because it include:
+- error checking (like 0 arguments)
+- variable definition
+- Doctor (object C macro) (before and after the doctor thing)
+- explicitly declared templates
+- explicitly declared abstractions
+- Standard C objects
+- path declared pathnames
+- path declared abstractions
+- expression evaluation 
+- assignement of properties or internal variables
+
+templates, doctors, expression evaluations and so on.
+With error detection for all these
+
+<H3> Deleting an Object </H3> 
+
+Deleting an object.
+- Reset,
+- calling the delete method
+- calling 
+Object redefinition and recomputing
+
+<H3> Redefining an Object </H3> 
+Recompute: redefine with the same description, taking care
+of communicating with the client, because the recomputing is always
+a server initiative, tied to variable propagation.
+
+Redefinitions: an object is substituted with a new one in the patcher,
+without telling the other objects or the client; connections are
+moved, id are kept.
+Handle: - variable suspend and rebind
+        - ID removing if needed
+	- reset the old object, i.e. detach it from the system
+	- make the new one
+	- fix the tables in the loading vm, in case we are loading
+	- if the new one is an error fix the nins and nouts to the
+	  old one.
+	- move properties
+	- <i> Could do: move data </i>
+	- move connections
+	- complete the deleting of the old object.
+
+No way to move data when redefining an object.
+
+
+Special strategy for patchers: they are not copied to new objects.
+
+<P>
+
+<A NAME="patchers"> 
+<H2> Patchers </H2> 
+Patchers change dynamically class (not meta-class),because they can
+change number of inlets and outlets; they have a completely separate
+support; special support also in fts_make_object.
+<P>
+
+<A NAME="doctors"> 
+<H2> Doctors</H2> 
+What a doctor is.
+Invisible doctors (reset_description).
+Visible doctor (macro expansion).set_description.
+Special purpose (example: expressions and fts_make_object)
+<P>
+
+<A NAME="chapter"> 
+<H2> Chapter </H2> 
+
+<P>
+
+<A NAME="chapter"> 
+<H2> Chapter </H2> 
+
+<P>
+
+Blah Blah.
+<p>
+
+<p>
+<A NAME="files"> 
+<H2> Related Files</H2> 
+<P>
+
+<ul> 
+<li> <code>objects.c</code>
+<li> <code>objects.h</code>
+<li> <code>doctor.c</code>
+<li> <code>doctor.h</code>
+<li> <code>patcher.c</code>
+<li> <code>patcher.h</code>
+<li> <code>properties.c</code>
+<li> <code>properties.h</code>
+<li> <code>errobj.c</code>
+<li> <code>errobj.h</code>
+</ul>
+
+</TABLE>
+
+<HR NOSHADE SIZE=1>
+
+</BODY>
+</HTML>
+
+

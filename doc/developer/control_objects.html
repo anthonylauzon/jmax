@@ -596,6 +596,7 @@ identical to standard methods.
 <ul>
 <li> <a href="#The init Method">The <code>init</code> Method</a>
 <li> <a href="#The delete Method">The <code>delete</code> Method</a>
+<li> <a href="#release">The <code>release</code> and <code>redefining</code> Method</a>
 <li> <a href="#The assist Method">The <code>assist</code> Method</a>
 </ul>
 
@@ -687,13 +688,46 @@ fts_status_t integer_instantiate( fts_class_t *class, int ac, fts_atom_t *at)
 }
 </pre>
 
-<a name="The assist Method"><h3>The <code>assist</code> Method</h3></a>
+<a name="release"><h3>The <code>release</code> and the <code>redefining</code> Methods</h3></a>
+<p>
+An object can be redefined by an other one as the result of two kind
+of actions: the direct editing of the object in the user interface, or
+an implicit change of arguments to the change of a patcher variable
+value.
+<p>
+In both case, the object is substited with a newly instantiated one;
+before deleting the old one, the system give an opportunity to copy
+some of the state of the old object to the new one; this can be very
+convenient if this state is a set of persistent data, like a table,
+that we don't want to loose just because one secondary parameter of
+the object changed; or for example, to allow reusing an edited data
+set on a slightly different object.
+<p>
+This opportunity is implemented by a modified deleting sequence; if
+the object being substitued implement a "release" method, then this is
+called; in this method the object should free global resources, like a
+global name, but it should not free internal resources, like a table
+content; then the system send to the newly created object a
+"redefining" (the <code>fts_s_redefining</code> C variable is defined)
+message to the system inlet, with as only argument the old object; the
+message is sent after the init message; it is the responsability of
+the method implementation to check that the old object is of a
+meaningful type; finally, the "delete" message is sent to the old
+object.<br> If the old object do not define a method for the
+"release", just the standard "delete" message is sent, and no
+"redefining" is tryed.
+<p>
+The "redefining" method should not send messages, either from the old or from
+the new object, because there is no guarantee that the connections structure
+are consistent  at this point in time for either of two objects.
+<p>
 
+<a name="The assist Method"><h3>The <code>assist</code> Method</h3></a>
 <p>
 The assist method allow an object to define a short help describing
-itself, and its inlet and outlet roles; this help will be shown
-in the status line when the mouse pass over the object or the object
-inlets and outlets.
+itself, and its inlet and outlet roles; this help will be shown in the
+status line when the mouse pass over the object or the object inlets
+and outlets.
 <p>
 The assist method receive either one or two arguments describing the
 help requested; the first is always a symbol between "object", "inlet"
@@ -1239,4 +1273,3 @@ Copyright &copy; 1995,1999 <a href="http://www.ircam.fr/">IRCAM</a>.
 
 </body>
 </html>
-

@@ -1,0 +1,225 @@
+<HTML>
+<!--                                                                      -->
+<!-- jMax                                                                 -->
+<!--                                                                      -->
+<!-- Copyright (C) 1999 by IRCAM                                          -->
+<!-- All rights reserved.                                                 -->
+<!--                                                                      -->
+<!-- This program may be used and distributed under the terms of the      -->
+<!-- accompanying LICENSE.                                                -->
+<!--                                                                      -->
+<!-- This program is distributed WITHOUT ANY WARRANTY. See the LICENSE    -->
+<!-- for DISCLAIMER OF WARRANTY.                                          -->
+<!--                                                                      -->
+<HEAD>
+<TITLE>The FTS Computational Engine: System Services </TITLE>
+</HEAD>
+
+<BODY TEXT="#000000" BGCOLOR="#CCCCCC">
+
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=0>
+<TR>
+  <TD ALIGN=LEFT>
+    <A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../../../images/jmax_logo_tiny.gif" BORDER=0 ALT="jMax"></A>
+  </TD>
+  <TD ALIGN=RIGHT>
+    <A HREF="http://www.ircam.fr/"><IMG SRC="../../../images/ircam_banner.gif" BORDER=0 ALT="IRCAM - Centre Georges Pompidou"></A>
+  </TD>
+</TR>
+</TABLE>
+<BR>
+<UL TYPE=SQUARE>
+  <LI><A HREF=../../index.html>Documentation</A>
+  <UL TYPE=SQUARE>
+    <LI><A HREF=../index.html><b>The <i>j</i>Max Architecture</b></a>
+      <UL TYPE=SQUARE>
+      <LI><A HREF=index.html><b>The FTS Computational Engine</b></a>
+      </UL>
+  </UL>
+</UL>
+
+<p>
+<font size=+3 color=#FFFFFF><b>System Services</b></font>
+
+<p>
+<hr noshade size=1>
+
+<UL TYPE=DOT>
+  <LI><A HREF="#hardware"> Hardware related services </A>
+  <LI><A HREF="#memory"> Memory Allocation </A>
+  <LI><A HREF="#modules"> Modules </A>
+  <LI><A HREF="#welcome"> Welcome Service</A>
+  <LI><A HREF="#version"> Version</A>
+  <LI><A HREF="#status"> Status </A>
+</UL>
+
+<p>
+<hr noshade size=1>
+
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
+<TR><TD>
+<p>  
+<A NAME="#hardware"> 
+<H2> Hardware related services </H2> 
+<p>
+This module provide a number of abstraction to access low level hardware
+related functionalities in a platform independent way; note that this do no
+include I/O, that is covered by the device architecture, in the runtime layer.
+<p>
+The area covered by this module include: 
+
+<dl>
+<dd> <b>Scheduling and memory locking</b><p>
+<dt> Setting high priority for FTS when running in real time mode,
+locking virtual memory in physical memory to avoid swapping, possibly
+interaction with the SMP programming model of the underlaying OS; the work
+is usually done during system startup.<p>
+<dd> <b>Floating Point Exception Handling</b><p>
+<dt> Abstractions to access floating point enabling/disabling and handling
+in an hardware/OS independent way.<p>
+<dd> <b>Configuration</b><p>
+<dt> The <code>platform.h</code> include a few constant defined to
+help configure the system, at compile time, for different platforms.<p>
+</dl>
+The module include a file for each supported platform.
+<P>
+Related Files:
+<ul>
+<li> <code> hw.h </code>
+<li> <code> gnuhw.c </code>
+<li> <code> sgihw.c </code>
+<li> <code> solaris2hw.c </code>
+<li> <code> platform.h </code>
+</ul>
+<p>
+
+<A NAME="#memory"> 
+<H2> Memory Allocation </H2> 
+<p>
+This module provide a basic set of memory allocation functions;
+standard system <code>malloc/free</code> functions are substituted
+by equivalent ones (<code>fts_malloc/fts_free</code>) to give
+a way to intercept and trace memory allocation in debug. <br>
+To reduce the space and time overhead of the standard malloc for
+small blocks, fts provide the heap and the block mechanism.
+See the Kernel Reference Manual for details and the API.
+<p>
+The block mechanism is based on the use of a set of heaps of
+different sizes; all the heap of the same size share the free
+block list, to reduce memory fragmentation; note that anyway
+this method is not optimal in term of memory locality.
+<p>
+In order to debug memory corruption problems with heap analysis
+tools, like <i>Purify</i>, you may want to remap all the FTS 
+memory allocation functions to the standard system <code>malloc/free</code>;
+this can be done by uncommenting the <code>#define HELP_PURIFY</code> line
+of code that you will find at the beginning of the <code>mem.c</code> file.
+<p>
+This module provide also a very primitive memory check functionality,
+trying to detect simple case of memory corruption; this can enabled by
+uncommenting the <code>#include "smem.h"</code> at the beginning of
+the <code>mem.c</code> file; enabling memory check will radically slow
+down the system, expecially during patch loading, so it is usefull
+<strong>only</strong> in debug situations; if a memory corruption
+problem is found, a segmentation fault is immediately generated, so
+that the situation can be analized using a debugger.
+<P>
+Related Files:
+<ul>
+<li> <code> mem.c </code>
+<li> <code> mem.h </code>
+<li> <code> smem.c </code>
+<li> <code> smem.h </code>
+</ul>
+<p>
+
+<A NAME="#modules"> 
+<H2> Modules </H2> 
+<p>
+A module, in the fts meaning, is a code organizational unit; 
+a module have a start up function, a restart function and a shutdown
+functions; the rest of the FTS code, i.e. all the code that do not belong
+to the sys layer, is organized as a set of modules, including all the FST object 
+libraries.
+<p>
+Modules can either be statically linked and initialized during system startup
+(like all the kernel modules) or dynamically linked; the sys layer can use the
+system dynamic loader to load modules at run time.
+<p>
+The module init function is called either at system startup, for statically linked
+time, or at loading time; the shutdown function is called just before system shutdown;
+the restart function should clean up the module, and bring it in the same state
+as after the loading; currently, is never called, but a system reset functionality
+(warm boot) is planned.
+<p>
+All the user libraries must be organized as modules, provide a
+<code>fts_module_t</code> structure which respect the module naming
+convention: the structure should be a non static variable named
+<i>name</i><code>_module</code>, where <i>name</i> is the name of the
+module.
+<p>
+This layer provide a C API to access module loading and installing;
+module loading is then exported to the user environment by means of
+an UCS command (see the <a href="tiles.html">tiles layer</a>).
+<P>
+Related Files:
+<ul>
+<li> <code> modules.c </code>
+<li> <code> modules.h </code>
+</ul>
+<p>
+
+<A NAME="#status"> 
+<H2> Status </H2> 
+
+<p>
+The sys layer provide a simple type to represent
+functions return status; the type is just a structure
+including a string description of the error; this type
+is used in the FTS kernel and in some object related
+function to return error values.
+<P>
+Related Files:
+<ul>
+<li> <code> status.h </code>
+</ul>
+<p>
+
+<A NAME="#version"> 
+<H2> Version </H2> 
+<p>
+Provide one or more set of <code>#define</code>s that define
+the current FTS version; it is automatically generated by the
+release handling script.
+<P>
+Related Files:
+<ul>
+<li> <code> version.h </code>
+</ul>
+<p>
+
+<A NAME="#welcome"> 
+<H2> Welcome </H2> 
+<p>
+Since statically linked modules are initialized before the connection
+with the user interface exists, modules init functions cannot call any
+kind of <code>print/post</code> function; in order to allow a module
+to print a startup message to the console, the sys layer define the
+<code>welcome</code> abstraction; a <code>welcome</code> is a message
+a module can register, and that will be shown when the user interface
+is ready to accept console messages.
+<P>
+Related Files:
+<ul>
+<li> <code> welcome.c </code>
+<li> <code> welcome.h </code>
+</ul>
+<p>
+
+<P>
+</TABLE>
+<HR NOSHADE SIZE=1>
+
+</BODY>
+
+</HTML>
