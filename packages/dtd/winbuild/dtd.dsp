@@ -115,5 +115,9 @@ SOURCE=..\c\src\thread.h
 
 SOURCE=..\c\src\thread_win32.c
 # End Source File
+# Begin Source File
+
+SOURCE=..\c\src\worker.c
+# End Source File
 # End Target
 # End Project
