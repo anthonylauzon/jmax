@@ -95,7 +95,6 @@ typedef struct
   double domain; /* fractional size (rows) */
   fmat_format_t *format;
   int opened;
-  fts_object_t *editor;
 } fmat_t;
 
 /** */
@@ -121,8 +120,8 @@ DATA_API fts_class_t *fmat_class;
 #define fmat_set_format(x, f) ((x)->format = (f))
 
 #define fmat_editor_is_open(m) ((m)->opened == 1)
-#define fmat_editor_set_open(m) ((m)->opened = 1)
-#define fmat_editor_set_close(m) ((m)->opened = 0)
+#define fmat_set_editor_open(m) ((m)->opened = 1)
+#define fmat_set_editor_close(m) ((m)->opened = 0)
 
 /** create fmat with m rows and n columns. */
 DATA_API fmat_t *fmat_create(int m, int n);

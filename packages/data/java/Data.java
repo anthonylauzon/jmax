@@ -67,6 +67,12 @@ public class Data implements JMaxPackage
     {
         return new Standard( new FtsDictObject( server, parent, objId, className, args, offset, length));
     }
+    }; 
+    JMaxObjectCreator fmatCreator = new JMaxObjectCreator() {
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Standard( new FtsFmatObject( server, parent, objId, className, args, offset, length));
+    }
     };  
     
     JMaxClassMap.put( "bpf", bpfCreator, null, null, "bpf", this);
@@ -74,5 +80,6 @@ public class Data implements JMaxPackage
     JMaxClassMap.put( "fvec", fvecCreator, null, null, "fvec", this);
     JMaxClassMap.put( "mat", matCreator, null, null, "mat", this);
     JMaxClassMap.put( "dict", dictCreator, null, null, "dict", this);
+    JMaxClassMap.put( "fmat", fmatCreator, null, null, "fmat", this);
 }
 }

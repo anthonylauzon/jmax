@@ -837,7 +837,72 @@ fmat_error_format_and_dimensions(fmat_t *fmat, fmat_t *op, const char *prefix)
 }
 
 
+/********************************************************************
+*
+*   upload methods
+*
+*/
+#define FMAT_CLIENT_BLOCK_SIZE 128
 
+static void 
+fmat_upload_size(fmat_t *self)
+{
+  fts_atom_t a[2];
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  
+  fts_set_int(a, m);
+  fts_set_int(a+1, n);
+  fts_client_send_message((fts_object_t *)self, fts_s_size, 2, a);
+}
+
+static void 
+fmat_upload_from_index(fmat_t *self, int row_id, int col_id, int size)
+{
+  fts_atom_t a[FMAT_CLIENT_BLOCK_SIZE];  
+  int n_cols = fmat_get_n(self);
+  int sent = 0;
+  int data_size = size;
+  int ms = row_id;
+  int ns = col_id;
+  int start_id = (ms*n_cols + ns);
+  
+  while( data_size > 0)
+  {
+    int i = 0;
+    int n = (data_size > FMAT_CLIENT_BLOCK_SIZE-2)? FMAT_CLIENT_BLOCK_SIZE-2: data_size;
+    
+    /* starting row and column index */
+    if( sent)
+    {
+      ms = sent/n_cols;
+      ns = sent - ms*n_cols;
+    }
+    fts_set_int(a, ms);
+    fts_set_int(a+1, ns);
+    
+    for(i=0; i < n ; i++)
+      fts_set_float(&a[2+i], self->values[start_id  + sent + i]);      
+    
+    fts_client_send_message((fts_object_t *)self, fts_s_set, n+2, a);
+    
+    sent += n;
+    data_size -= n;
+  }    
+}
+
+static void 
+fmat_upload_data(fmat_t *self)
+{  
+  fmat_upload_from_index(self, 0, 0, fmat_get_m(self) * fmat_get_n(self));
+}
+
+static void
+fmat_upload(fmat_t *self)
+{
+  fmat_upload_size(self);
+  fmat_upload_data(self);
+}
 
 /********************************************************************
  *
@@ -850,6 +915,9 @@ fmat_set_from_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fmat_t *self = (fmat_t *)o;
   
   fmat_copy((fmat_t *)fts_get_object(at), self);
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload(self);
   
   fts_return_object(o);
 }
@@ -871,6 +939,9 @@ fmat_set_from_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   for(i=0; i<size; i++)
     ptr[i] = (float)iptr[i];
 
+  if(fmat_editor_is_open(self))
+    fmat_upload(self);
+  
   fts_return_object(o);
 }
 
@@ -895,8 +966,12 @@ fmat_set_from_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       ac = size - onset;
     
     if(i >= 0 && i < m && j >= 0 && j < n)
+    {
       fmat_set_from_atoms(self, onset, 1, ac, at);
-
+      
+      if(fmat_editor_is_open(self))
+        fmat_upload_from_index(self, i, j, ac);
+    }
     fts_return_object(o);
   }
 }
@@ -925,6 +1000,9 @@ fmat_set_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
           ac = n;
         
         fmat_set_from_atoms(self, row * n, 1, ac, at);
+        
+        if(fmat_editor_is_open(self))
+          fmat_upload_from_index(self, row, 0, ac);
       }
       else if(fts_is_object(at))
       {
@@ -942,6 +1020,9 @@ fmat_set_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
           
           for(i=0, j=0; i<vec_size; i++, j+=vec_stride)
             ptr[i] = vec[j];
+          
+          if(fmat_editor_is_open(self))
+            fmat_upload_from_index(self, row, 0, vec_size);/*?????*/
         }
       }    
     }
@@ -1007,6 +1088,9 @@ fmat_fill_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   if(ac > 0 && fts_is_number(at))
     fmat_set_const(self, (float)fts_get_number_float(at));
 
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
+  
   fts_return_object(o);
 }
 
@@ -1107,6 +1191,9 @@ fmat_zero(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   for(i=onset; i<range+onset; i++)
     ptr[i] = 0.0;
   
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
+  
   fts_return_object(o);
 }
 
@@ -1159,7 +1246,12 @@ _fmat_set_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     n = fts_get_number_int(at + 1);
     
     if(m >= 0 && n >= 0)
+    {
       fmat_set_size(self, m, n);
+      
+      if(fmat_editor_is_open(self))
+        fmat_upload(self);
+    }
   }
   
   fts_return_object(o);
@@ -1172,7 +1264,12 @@ _fmat_set_m(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   int m = fts_get_number_int(at);
 
   if(m >= 0)
+  {
     fmat_set_m(self, m);
+  
+    if(fmat_editor_is_open(self))
+      fmat_upload(self);
+  }
   
   fts_return_object(o);
 }
@@ -1184,8 +1281,12 @@ _fmat_set_n(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   int n = fts_get_number_int(at);
   
   if(n >= 0)
+  {
     fmat_set_n(self, n);
   
+    if(fmat_editor_is_open(self))
+      fmat_upload(self);
+  }
   fts_return_object(o);
 }
 
@@ -3509,27 +3610,11 @@ static void
 fmat_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  fts_atom_t a;
   
-  if(self->editor == NULL)
-  {
-    fts_set_object(&a, o);
-    /* self->editor = fts_object_create(tabeditor_type, 1, &a); */
-    fts_object_refer( self->editor);
-  }
-  
-  if(!fts_object_has_id( self->editor))
-  {
-    fts_client_register_object( self->editor, fts_object_get_client_id( o));
-	  
-    fts_set_int(&a, fts_object_get_id( self->editor));
-    fts_client_send_message( o, fts_s_editor, 1, &a);
-    
-    /* fts_send_message( (fts_object_t *)self->editor, fts_s_upload, 0, 0); */
-  }
-  
-  fmat_editor_set_open( self);
+  fmat_set_editor_open( self);
   fts_client_send_message(o, fts_s_openEditor, 0, 0);
+  
+  fmat_upload(self);
 }
 
 static void
@@ -3537,7 +3622,7 @@ fmat_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 {
   fmat_t *self = (fmat_t *)o;
   
-  fmat_editor_set_close( self);
+  fmat_set_editor_close( self);
 }
 
 static void 
@@ -3547,13 +3632,10 @@ fmat_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   
   if(fmat_editor_is_open(self))
   {
-    fmat_editor_set_close(self);
-    fts_client_send_message((fts_object_t *)self, fts_s_closeEditor, 0, 0);  
+    fmat_set_editor_close(self);
+    fts_client_send_message(o, fts_s_closeEditor, 0, 0);  
   }
 }
-
-
-
 
 /********************************************************************
  *
@@ -3651,7 +3733,6 @@ fmat_initialize(fmat_t *self)
   self->sr = fts_dsp_get_sample_rate();
   self->format = fmat_format_real;
   self->opened = 0;
-  self->editor = NULL;  
 }
 
 static void
@@ -3879,11 +3960,15 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_s_export, fmat_export_dialog);
   
   fts_class_inlet_bang(cl, 0, data_object_output);
+
+  fts_class_message_varargs(cl, fts_s_openEditor, fmat_open_editor);
+  fts_class_message_varargs(cl, fts_s_closeEditor, fmat_close_editor); 
+  fts_class_message_varargs(cl, fts_s_destroyEditor, fmat_destroy_editor);    
+
   
   fts_class_inlet_thru(cl, 0);
   fts_class_outlet_thru(cl, 0);
   
-
   /* 
    * fmat class documentation 
    */
