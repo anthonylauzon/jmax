@@ -14,6 +14,7 @@ FloatMapper.java \
 FloatValueDataFlavor.java \
 FtsSequenceObject.java \
 FtsTrackObject.java \
+FtsTrackEditorObject.java \
 HighlightListener.java \
 IntEnumeration.java \
 IntegerAdapter.java \

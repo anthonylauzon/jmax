@@ -1160,14 +1160,17 @@ void
 track_editor_dump_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
+  fts_symbol_t selector;
+
   if(this->editor == NULL)
-	{
-		fts_atom_t a;
-		fts_set_object(&a, o);
-		this->editor = (track_editor_t *)fts_object_create(track_editor_class, 1, &a);
-	}
-	fts_symbol_t selector = fts_get_symbol(at);
-	fts_send_message((fts_object_t *)this->editor, selector, ac - 1, at + 1);
+    {
+      fts_atom_t a;
+      fts_set_object(&a, o);
+      this->editor = (track_editor_t *)fts_object_create(track_editor_class, 1, &a);
+    }
+ 
+  selector = fts_get_symbol(at);
+  fts_send_message((fts_object_t *)this->editor, selector, ac - 1, at + 1);
 }
 
 void

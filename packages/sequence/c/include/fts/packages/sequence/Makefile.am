@@ -4,7 +4,8 @@ package_HEADERS= \
  event.h \
  note.h \
  seqsym.h \
- track.h
+ track.h \
+ trackeditor.h
 
 
 

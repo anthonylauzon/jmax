@@ -1,8 +1,11 @@
-# $Id: Makefile.am,v 1.20 2004/02/13 09:41:52 p_tisserand Exp $
+# $Id: Makefile.am,v 1.21 2004/03/18 19:11:31 p_tisserand Exp $
 #
 # sequence package source Makefile.am
 #
 # $Log: Makefile.am,v $
+# Revision 1.21  2004/03/18 19:11:31  p_tisserand
+# Added missing directory to include winced sequence.h include data.h need utils.h
+#
 # Revision 1.20  2004/02/13 09:41:52  p_tisserand
 # Added -release version libtool flag.
 #
@@ -67,7 +70,8 @@ seqrec.c \
 seqstep.c \
 seqsym.c \
 sequence.c \
-track.c
+track.c \
+trackeditor.c
 
 
 # HOW TO INCLUDE:
