@@ -312,7 +312,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     windowsMenu.add(new MenuItem("-"));
     windowsMenu.add(aMenuItem = new MenuItem("Project Manager Ctrl+M"));
     aMenuItem.addActionListener(this);
-    windowsMenu.add(aMenuItem = new MenuItem("jMax Console"));
+    windowsMenu.add(aMenuItem = new MenuItem("jMax Console  Ctrl+J"));
     aMenuItem.addActionListener(this);
     AddWindowItems(windowsMenu);
     return windowsMenu;
@@ -385,7 +385,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   }
 
   private boolean IsInWindowsMenu(String theName) {
-    return(theName.equals("Edit mode Ctrl+E")||theName.equals("Run mode Ctrl+E")||theName.equals("Project Manager Ctrl+M")||theName.equals("jMax Console")||IsAWindowName(theName)|| IsAnEditorFrameName(theName));
+    return(theName.equals("Edit mode Ctrl+E")||theName.equals("Run mode Ctrl+E")||theName.equals("Project Manager Ctrl+M")||theName.equals("jMax Console  Ctrl+J")||IsAWindowName(theName)|| IsAnEditorFrameName(theName));
   }
 	
   private boolean IsAWindowName(String theName){
@@ -584,7 +584,8 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   public void keyPressed(KeyEvent e){
     int aInt = e.getKeyCode();
     if(e.isControlDown()){
-      if(aInt == 77) MaxApplication.GetProjectWindow().toFront();//m
+      if(aInt == 74) MaxApplication.GetConsoleWindow().ToFront();//j
+      else if(aInt == 77) MaxApplication.GetProjectWindow().toFront();//m
       else if(aInt == 78) MaxApplication.itsProjectWindow.New();//n
       else if(aInt == 79) MaxApplication.itsProjectWindow.Open();//o
       else if(aInt == 80) MaxApplication.ObeyCommand(MaxApplication.PRINT_WINDOW);//p
@@ -900,7 +901,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     else if (theString.equals("Project Manager Ctrl+M")) {
       MaxApplication.GetProjectWindow().toFront();
     }
-    else if (theString.equals("jMax Console")) {
+    else if (theString.equals("jMax Console  Ctrl+J")) {
       MaxApplication.GetConsoleWindow().ToFront();
     }
     else BringToFront(theString);

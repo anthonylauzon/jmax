@@ -45,8 +45,10 @@ public class ConsoleKeyListener implements KeyListener {
 
     public void keyTyped(KeyEvent evt) {
       intercept = console.getTextArea().getText().length();
+      
       if(evt.isControlDown()){
 	//console.itsContainer.keyPressed(evt);
+	System.out.println("il control e' pigiato!");
 	return;
       }
       char key = evt.getKeyChar();

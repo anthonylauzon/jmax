@@ -8,7 +8,7 @@ import ircam.jmax.utils.*;
 /**
  * The dialog used during a menu-new operation.
  */
-class ProjectNewDialog extends Dialog implements ItemListener, ActionListener, KeyListener{
+public class ProjectNewDialog extends Dialog implements ItemListener, ActionListener, KeyListener{
   Frame itsParent;
   Button okButton;
   Button cancelButton;

@@ -228,7 +228,7 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
     windowsMenu.add(aMenuItem = new MenuItem("Tile Vertical"));
     aMenuItem.addActionListener(this);
     windowsMenu.add(new MenuItem("-"));
-    windowsMenu.add(aMenuItem = new MenuItem("jMax Console"));
+    windowsMenu.add(aMenuItem = new MenuItem("jMax Console  Ctrl+J"));
     aMenuItem.addActionListener(this);
     return windowsMenu;
   }
@@ -334,7 +334,7 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
   }
 
   private boolean IsInWindowsMenu(String theName) {
-    return(theName.equals("Stack") || theName.equals("Tile") || theName.equals("Tile Vertical")||theName.equals("jMax Console")||IsAWindowName(theName) || IsAnEditorFrameName(theName));
+    return(theName.equals("Stack") || theName.equals("Tile") || theName.equals("Tile Vertical")||theName.equals("jMax Console  Ctrl+J")||IsAWindowName(theName) || IsAnEditorFrameName(theName));
   }
   
   private boolean IsAWindowName(String theName){
@@ -400,7 +400,7 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
      ProjectNewDialog aNewDialog = new ProjectNewDialog(this);
      Point aPoint = getLocation();
      aNewDialog.setLocation(aPoint.x+100, aPoint.y+100);
-     aNewDialog.show();
+     aNewDialog.setVisible(true);
      aNewFileType = aNewDialog.GetNewFileType();
      NewFile(aNewFileType);
   }
@@ -560,7 +560,7 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
     else if (theString.equals("System statistics...")) {
       StatisticsDialog aDialog = new StatisticsDialog(this);
 	aDialog.setLocation(100, 100);
-	aDialog.show();
+	aDialog.setVisible(true);
     }
     else{//qui siamo nel caso di New...
       NewFile(theString);
@@ -602,7 +602,7 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
     else if (theString.equals("Tile Vertical")) {
       MaxApplication.TileVerticalWindows();
     }
-    else if (theString.equals("jMax Console")) {
+    else if (theString.equals("jMax Console  Ctrl+J")) {
       MaxApplication.GetConsoleWindow().ToFront();
     }
     else BringToFront(theString);
@@ -645,8 +645,10 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
 
   public void keyPressed(KeyEvent e){
     int aInt = e.getKeyCode();
+    System.out.println(aInt);
     if (e.isControlDown()){
-      if(aInt == 78) New();//n
+      if(aInt == 74) MaxApplication.GetConsoleWindow().ToFront();//j
+      else if(aInt == 78) New();//n
       else if(aInt == 79) Open();//o
       else if(aInt == 80) MaxApplication.ObeyCommand(MaxApplication.PRINT_WINDOW);//p
       else if(aInt == 81) MaxApplication.Quit(); //q

@@ -38,7 +38,7 @@ public class Console extends Panel{
     add(itsTextArea);
 
     itsKeyListener = new ConsoleKeyListener(this);
-    itsTextArea.addKeyListener(itsKeyListener);  
+    itsTextArea.addKeyListener(itsKeyListener);
     itsTextArea.addMouseListener(new ConsoleMouseListener(this));
     itsConsoleThread = new ConsoleThread(this);
     /*
@@ -54,6 +54,7 @@ public class Console extends Panel{
 
   public void SetContainer(KeyListener theContainer){
     itsContainer = theContainer;
+    itsTextArea.addKeyListener(itsContainer);
   }
 
   public PrintStream getPrintStream() {
@@ -121,6 +122,9 @@ public class Console extends Panel{
     }
   }
 }
+
+
+
 
 
 
