@@ -121,6 +121,8 @@ public class MaxApplication extends Object
 
   public static void main(String args[])
   {
+    Vector toOpen = new Vector();
+
     // Temporary: the look and feel must be metal, in order to use
     // the nice file chooser !!!
 
@@ -147,9 +149,71 @@ public class MaxApplication extends Object
     // don't check for valid options, so the user can set
     // command line arguments that can be accessed from tcl scripts
     // and we don't know yet
+    // The parsing is done with a finite state automata; any option
+    // that don't have a value (i.e. followed by nothing or another value)
+    // get "true" as value, any value that is *not* a option value
+    // is interpreted as a file name and opened by jMax.
 
-    for (int i=0; i<args.length &&args[i].startsWith("-"); i++)
-      jmaxProperties.put(args[i].substring(1), args[++i]);
+    boolean inOpt = false;
+    String option = null;
+
+    for (int i = 0; i <= args.length; i++)
+      {
+	if (inOpt)
+	  {
+	    // Waiting for a value
+
+	    if (i == args.length)
+	      {
+		// End of arguments
+
+		jmaxProperties.put(option.substring(1), "true");
+		inOpt  = false;
+	      }
+	    else if (args[i].startsWith("-"))
+	      {
+		// Got another option
+
+		jmaxProperties.put(option.substring(1), "true");
+		option = args[i];
+		inOpt  = true;
+	      }
+	    else
+	      {
+		// Got a value
+
+		jmaxProperties.put(option.substring(1), args[i]);
+
+		inOpt  = false;
+	      }
+	  }
+	else
+	  {
+	    // Waiting for a option
+
+	    if (i == args.length)
+	      {
+		// do nothing
+		inOpt  = false;
+	      }
+	    else if (args[i].startsWith("-"))
+	      {
+		// Got option
+
+		option = args[i];
+		inOpt  = true;
+	      }
+	    else
+	      {
+		// Got a value, i.e. a argument to open
+
+		toOpen.addElement(args[i]);
+		inOpt  = false;
+	      }
+	  }
+
+      }
+
 
     // Default values
     if (jmaxProperties.get("root") == null) {
@@ -207,7 +271,41 @@ public class MaxApplication extends Object
 	new ConnectionDialog();
 	MaxApplication.runHooks("start");
       }
-    
+
+
+    // Look if there are documents to open in the 
+    // command line.
+
+    for (int i = 0 ; i < toOpen.size(); i++)
+      {
+	MaxDocument document = null;
+	File file = new File((String) toOpen.elementAt(i));
+
+	try
+	  { 
+	    document = Mda.loadDocument(file);
+	  }
+	catch (MaxDocumentException e)
+	  {
+	    System.out.println("Cannot load " + file);
+	  }
+
+	try
+	  { 
+	    if ((document != null) && document.getDocumentType().isEditable())
+	      document.edit();
+	  }
+	catch (MaxDocumentException e)
+	  {
+	    // Ignore MaxDocumentException exception in running the editor
+	    // May be an hack, may be is ok; move this stuff to an action
+	    // handler !!
+	  }
+      }
+
+    // If there is no console up and running,
+    // start the MaxTclConsole from the standard input
+
     // Finally, run forever the notifier loop of the 
     // Tcl interpreter, so that the TCL event system work
     // (and in particular, tcl built panels; thanks to the
@@ -326,13 +424,13 @@ public class MaxApplication extends Object
 		  {
 		    if (! document.canSave())
 		      {
-			MaxDocumentSource source;
-			source  = MaxFileChooser.chooseFileToSave(null,
-								  "Save As",
-								  document.getDocumentSource());
+			File file;
+			file= MaxFileChooser.chooseFileToSave(null,
+							      "Save As",
+							      document.getDocumentFile());
 
-			if (source != null)
-			  document.bindToDocumentSource(source);
+			if (file != null)
+			  document.bindToDocumentFile(file);
 		      }
 
 		    if (document.canSave())

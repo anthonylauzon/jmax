@@ -24,7 +24,7 @@ public class MaxFileChooser {
 
   /** CHoose a file for opening, in the current directory */
 
-  public static MaxDocumentSource chooseFileToOpen(Frame frame, String title)
+  public static File chooseFileToOpen(Frame frame, String title)
   {
     FileDialog fd = new FileDialog(((frame != null) ? frame : MaxWindowManager.getWindowManager().getAFrame()),
 				   title);
@@ -45,30 +45,30 @@ public class MaxFileChooser {
     if ((file == null) || file.equals(""))
       return null;
     else
-      return MaxDocumentSource.makeDocumentSource(new File(currentOpenDirectory, file));
+      return new File(currentOpenDirectory, file);
   }
 
   /* CHoose a file to save */
 
-  public static MaxDocumentSource chooseFileToSave(Frame frame, String title)
+  public static File chooseFileToSave(Frame frame, String title)
   {
     return chooseFileToSave(frame, title, null);
   }
 
   /* CHoose a file to save, having an old File as initial content of the dialog box */
 
-  public static MaxDocumentSource chooseFileToSave(Frame frame, String title, MaxDocumentSource source)
+  public static File chooseFileToSave(Frame frame, String title, File file)
   {
     FileDialog fd = new FileDialog(((frame != null) ? frame : MaxWindowManager.getWindowManager().getAFrame()),
 				   title);
 
-    String file;
+    String newfile;
     String dir;
     String oldDir = null;
     File oldFile = null;
 
-    if ((source != null) && (source instanceof MaxFileDocumentSource))
-      oldFile = ((MaxFileDocumentSource) source).getFile();
+    if (file != null)
+      oldFile = file;
 
     if (oldFile != null)
       {
@@ -90,7 +90,7 @@ public class MaxFileChooser {
     fd.setMode(FileDialog.SAVE);
     fd.show();
 
-    file = fd.getFile();    
+    newfile = fd.getFile();    
     dir  = fd.getDirectory();
 
     // Patch for the Motif file box  ???
@@ -101,13 +101,13 @@ public class MaxFileChooser {
 	  dir = oldDir;
     }
       
-    if ((file == null) || file.equals(""))
+    if ((newfile == null) || newfile.equals(""))
       return null;
 
     if (oldFile == null)
       currentOpenDirectory = dir;
 
-    return MaxDocumentSource.makeDocumentSource(new File(dir, file));
+    return new File(dir, newfile);
   }
 }
 

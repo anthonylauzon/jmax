@@ -314,15 +314,15 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
   public void Open()
   {
-    MaxDocumentSource source = MaxFileChooser.chooseFileToOpen(this, "Open File");
+    File file = MaxFileChooser.chooseFileToOpen(this, "Open File");
 
-    if (source != null)
+    if (file != null)
       {
 	try
 	  {
 	    MaxDocument document;
 
-	    document = Mda.loadDocument(source);
+	    document = Mda.loadDocument(file);
 	
 	    try
 	      {

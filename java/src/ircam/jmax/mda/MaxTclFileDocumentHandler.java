@@ -24,12 +24,10 @@ public class MaxTclFileDocumentHandler extends MaxDocumentHandler
 
   /** We can load from a file start with the "jmax " string*/
 
-  public boolean canLoadFrom(MaxDocumentSource source)
+  public boolean canLoadFrom(File file)
   {
-    if ((source instanceof MaxFileDocumentSource) && super.canLoadFrom(source))
+    if (super.canLoadFrom(file))
       {
-	File file = ((MaxFileDocumentSource) source).getFile();
-
 	try
 	  {
 	    FileReader fr = new FileReader(file);
@@ -59,9 +57,8 @@ public class MaxTclFileDocumentHandler extends MaxDocumentHandler
 
   /** Make the real document */
 
-   protected MaxDocument loadDocument(MaxDocumentSource source) throws MaxDocumentException
+   protected MaxDocument loadDocument(File file) throws MaxDocumentException
   {
-    File file = ((MaxFileDocumentSource) source).getFile();
     Interp interp = MaxApplication.getTclInterp();
 
     try
@@ -77,7 +74,7 @@ public class MaxTclFileDocumentHandler extends MaxDocumentHandler
       {
 	MaxDocument document = (MaxDocument) ReflectObject.get(interp, interp.getResult());
 
-	document.setDocumentSource(source);
+	document.setDocumentFile(file);
 	document.setDocumentHandler(this);
 
 	return document;
@@ -96,15 +93,13 @@ public class MaxTclFileDocumentHandler extends MaxDocumentHandler
    * For the moment (??), we only know how to save TCL to files.
    */
 
-  public void saveDocument(MaxDocument document, MaxDocumentSource source) throws MaxDocumentException
+  public void saveDocument(MaxDocument document, File file) throws MaxDocumentException
   {
-    if ((document instanceof MaxTclDocument) && (source instanceof MaxFileDocumentSource))
+    if (document instanceof MaxTclDocument)
       {
 	/* Open the stream, put the "jmax" header, and then save
 	   the patcher inside
 	   */
-
-	File file = ((MaxFileDocumentSource) source).getFile();
 
 	try
 	  {
@@ -133,16 +128,16 @@ public class MaxTclFileDocumentHandler extends MaxDocumentHandler
   }
 
   /** Return true if this Document Handler can save a given document
-    to the given source.
+    to the given file.
     */
 
-  public boolean canSaveTo(MaxDocument document, MaxDocumentSource source)
+  public boolean canSaveTo(MaxDocument document, File file)
   {
     return false;
 
-    // return ((source instanceof MaxFileDocumentSource) &&
+    // return (
     // (document instanceof MaxTclDocument) &&
-    // super.canSaveTo(document, source));
+    // super.canSaveTo(document, file));
   }
 }
 

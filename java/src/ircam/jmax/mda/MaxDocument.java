@@ -1,12 +1,13 @@
 package ircam.jmax.mda;
 
 import java.util.*;
+import java.io.*;
 import com.sun.java.swing.*;
 
 /**
  * Superclass for all the Max Document
  * provide basic services, like tracing 
- * the document source and the document handler,
+ * the document file and the document handler,
  * registering and disposing
  *
  * TO ADD: very important: a generic naming scheme for data within documents
@@ -16,7 +17,7 @@ abstract public class MaxDocument
 {
   protected MaxData  rootData; // the "prefferred" or top level data to edit
   protected MaxDocumentHandler handler = null;
-  protected MaxDocumentSource  source  = null;
+  protected File file                  = null;
   protected MaxDocumentType    type    = null;
   private   DefaultListModel editors = new DefaultListModel();
   protected String name = null; // name of the document, for UI purposes
@@ -79,33 +80,33 @@ abstract public class MaxDocument
     this.handler = handler;
   }
 
-  /** Getting the document source */
+  /** Getting the document file  */
 
-  public MaxDocumentSource getDocumentSource()
+  public File getDocumentFile()
   {
-    return source;
+    return file;
   }
 
   /**
-   * Bind this document to a new document the source; implicitly get a new Document Handler
-   * it is the public method to call to set a document source.
+   * Bind this document to a new document file; implicitly get a new Document Handler
+   * it is the public method to call to set a document file.
    */
 
-  public void bindToDocumentSource(MaxDocumentSource source)
+  public void bindToDocumentFile(File file)
   {
-    setDocumentSource(source);
-    setDocumentHandler(Mda.findDocumentHandlerFor(source, this));
+    setDocumentFile(file);
+    setDocumentHandler(Mda.findDocumentHandlerFor(file, this));
     setSaved(false);
   }
 
-  /** To set both the handler and the source at the same time;
+  /** To set both the handler and the file at the same time;
     used in initialization
     */
 
-  public void setDocumentSource(MaxDocumentSource source)
+  public void setDocumentFile(File file)
   {
-    this.source = source;
-    this.name = source.getName();
+    this.file = file;
+    this.name = file.getName();
   }
 
   /** Getting the type */
@@ -180,25 +181,25 @@ abstract public class MaxDocument
   }
 
   /** return true if the document can be saved to its current
-   * document source
+   * document file
    */
 
   public boolean canSave()
   {
-    if (source == null)
+    if (file == null)
       return false;
     else if (handler == null)
       return false;
     else
-      return handler.canSaveTo(this, source);
+      return handler.canSaveTo(this, file);
   }
     
-  /** Save the document to its document source */
+  /** Save the document to its document file */
 
   public void save() throws MaxDocumentException
   {
     if (! canSave())
-      throw new MaxDocumentException("Cannot save to " + source);
+      throw new MaxDocumentException("Cannot save to " + file);
 
     for (int i = 0; i < editors.size() ; i++)
       {
@@ -210,23 +211,23 @@ abstract public class MaxDocument
       }
 
     if (handler == null)
-      throw new MaxDocumentException("No document handler for " + source);
+      throw new MaxDocumentException("No document handler for " + file);
 
-    handler.saveDocument(this, source);
+    handler.saveDocument(this, file);
     setSaved(true);
   }
 
 
-  /** Save the document to a given source, without changing the
+  /** Save the document to a given file, without changing the
    *  original binding of the document 
    */
 
-  public void saveTo(MaxDocumentSource source) throws MaxDocumentException
+  public void saveTo(File file) throws MaxDocumentException
   {
-    MaxDocumentHandler handler = Mda.findDocumentHandlerFor(source, this);
+    MaxDocumentHandler handler = Mda.findDocumentHandlerFor(file, this);
 
     if (handler == null)
-      throw new MaxDocumentException("Cannot save to " + source);
+      throw new MaxDocumentException("Cannot save to " + file);
 
     for (int i = 0; i < editors.size() ; i++)
       {
@@ -237,11 +238,11 @@ abstract public class MaxDocument
 	editor.syncData();
       }
 
-    handler.saveDocument(this, source);
+    handler.saveDocument(this, file);
   }
 
   /** Saved flag query: true if the document have been saved to its current
-      source.
+      file.
       */
 
   public boolean isSaved()
@@ -274,7 +275,7 @@ abstract public class MaxDocument
     type.disposeDocument(this);
     handler = null;
     type = null;
-    source = null;
+    file = null;
   }
 }
 

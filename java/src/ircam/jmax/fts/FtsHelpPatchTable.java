@@ -38,17 +38,13 @@ public class FtsHelpPatchTable
       {
 	try
 	  {
-	    MaxDocumentSource source = MaxDocumentSource.makeDocumentSource(getHelpPatch(obj.getClassName()));
+	    File file = new File(getHelpPatch(obj.getClassName()));
 	    MaxDocument document;
 
-	    document = Mda.loadDocument(source);
+	    document = Mda.loadDocument(file);
 	    document.edit();
 	  }
 	catch (MaxDocumentException e)
-	  {
-	    return false;
-	  }
-	catch (java.net.MalformedURLException e)
 	  {
 	    return false;
 	  }

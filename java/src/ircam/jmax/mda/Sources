@@ -5,12 +5,9 @@ SOURCES = \
 	  MaxDocument.java \
 	  MaxDocumentException.java \
 	  MaxDocumentHandler.java \
-	  MaxDocumentSource.java \
 	  MaxDocumentType.java \
-	  MaxFileDocumentSource.java \
 	  MaxTclDocument.java \
 	  MaxTclFileDocumentHandler.java \
 	  MaxTclInterpreter.java \
-	  MaxURLDocumentSource.java \
 	  Mda.java \
 	  MdaModule.java

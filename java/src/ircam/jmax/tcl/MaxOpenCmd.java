@@ -34,35 +34,25 @@ class MaxOpenCmd implements Command {
   
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    try
+    if (argv.length == 2)
       {
-	if (argv.length == 2)
+	File file = new File(argv[1].toString());
+
+	try
 	  {
-	    MaxDocumentSource source = MaxDocumentSource.makeDocumentSource(argv[1].toString());
-
-	    if (source != null)
-	      {
-		try
-		  {
-		    MaxDocument document;
-
-		    document = Mda.loadDocument(source);
-		    document.edit();
-		  }
-		catch (MaxDocumentException e)
-		  {
-		    throw new TclException(interp, e.toString());
-		  }
-	      }
+	    MaxDocument document;
+	    
+	    document = Mda.loadDocument(file);
+	    document.edit();
 	  }
-	else
-	  {	
-	    throw new TclNumArgsException(interp, 1, argv, "<filename>");
+	catch (MaxDocumentException e)
+	  {
+	    throw new TclException(interp, e.toString());
 	  }
       }
-    catch (java.net.MalformedURLException e)
-      {
-	throw new TclException(interp, "Malformed URL " + argv[1].toString());
+    else
+      {	
+	throw new TclNumArgsException(interp, 1, argv, "<filename>");
       }
   }
 }

@@ -1,9 +1,10 @@
 package ircam.jmax.mda; 
 
 import java.util.*;
+import java.io.*;
 
 /** A Document Handler is an object able to load a Max Document 
- *  from a document source; the class also handle the document base of all
+ *  from a document file; the class also handle the document base of all
  *  the existing MaxDocumentHandler, and provide a static function
  *  to find the document handler can reconize an address, and another
  *  to directly load the document.
@@ -12,47 +13,47 @@ import java.util.*;
 abstract public class MaxDocumentHandler
 {
   /** Return true if this Document Handler can load a new instance
-    from the given address; by default return true if the source
+    from the given address; by default return true if the file
     exists and it is readable */
 
-  public boolean canLoadFrom(MaxDocumentSource source)
+  public boolean canLoadFrom(File file)
   {
-    return source.exists() && source.canRead();
+    return file.exists() && file.canRead();
   }
 
 
   /** Return true if this document handler can save 
-    to the given address; by default return true if the source
+    to the given address; by default return true if the file
     exists, if it writable, and if we can load from it.
     */
 
-  public boolean canSaveTo(MaxDocumentSource source)
+  public boolean canSaveTo(File file)
   {
-    if (source.exists() && source.canRead())
-      return source.canWrite() && canLoadFrom(source);
+    if (file.exists() && file.canRead())
+      return file.canWrite() && canLoadFrom(file);
     else
-      return source.canWrite();
+      return file.canWrite();
   }
 
   /** Return true if this document handler can save a given instance
     to the given address; by default return false */
 
-  public boolean canSaveTo(MaxDocument document, MaxDocumentSource source)
+  public boolean canSaveTo(MaxDocument document, File file)
   {
-    if (source.exists())
-      return source.canWrite() && canLoadFrom(source);
+    if (file.exists())
+      return file.canWrite() && canLoadFrom(file);
     else
-      return source.canWrite();
+      return file.canWrite();
   }
 
-  /** Load an document from a document source.
+  /** Load an document from a document file.
     If you want to call this, probabily you really want to call
     the static loadDocument.
     */
 
-  abstract protected MaxDocument loadDocument(MaxDocumentSource source) throws MaxDocumentException;
+  abstract protected MaxDocument loadDocument(File file) throws MaxDocumentException;
 
-  abstract public void saveDocument(MaxDocument document, MaxDocumentSource source) throws MaxDocumentException;
+  abstract public void saveDocument(MaxDocument document, File file) throws MaxDocumentException;
 }
 
 

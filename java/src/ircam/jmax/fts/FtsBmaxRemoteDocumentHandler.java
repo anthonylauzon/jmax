@@ -6,10 +6,7 @@ import ircam.jmax.*;
 import ircam.jmax.mda.*;
 
 /** An instance of this document handler can load MaxDocument from
- *  a tcl source obeyng the "jmax" command conventions.
- * This version actually ask FTS to load the file, using the new
- * incremental Application Layer architecture; the result
- * is a speed improvement of a factor of 40 (minimum).
+ *  a  remote binary file.
  */
 
 public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
@@ -20,12 +17,10 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
 
   /** We can load from a file start with the "bmax" or the "mbxa" string (??) */
 
-  public boolean canLoadFrom(MaxDocumentSource source)
+  public boolean canLoadFrom(File file)
   {
-    if ((source instanceof MaxFileDocumentSource) && super.canLoadFrom(source))
+    if (super.canLoadFrom(file))
       {
-	File file = ((MaxFileDocumentSource) source).getFile();
-
 	try
 	  {
 	    FileReader fr = new FileReader(file);
@@ -57,10 +52,9 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
 
   /** Make the real document */
 
-  protected MaxDocument loadDocument(MaxDocumentSource source)
+  protected MaxDocument loadDocument(File file)
   {
     FtsServer server;
-    File file = ((MaxFileDocumentSource) source).getFile();
     FtsObject patcher;
     int id;
     
@@ -84,7 +78,7 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
 	FtsPatcherDocument obj = new FtsPatcherDocument();
 
 	obj.setRootData((MaxData) patcher);
-	obj.setDocumentSource(source);
+	obj.setDocumentFile(file);
 	obj.setDocumentHandler(this);
 
 	return obj;
@@ -93,26 +87,24 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
       return null;
   }
 
-  public void saveDocument(MaxDocument document, MaxDocumentSource source) throws MaxDocumentException
+  public void saveDocument(MaxDocument document, File file) throws MaxDocumentException
   {
-    if ((document instanceof FtsPatcherDocument) && (source instanceof MaxFileDocumentSource))
+    if (document instanceof FtsPatcherDocument) 
       {
-	File file = ((MaxFileDocumentSource) source).getFile();
-
 	Fts.getServer().savePatcherBmax((FtsObject) document.getRootData(), file.getAbsolutePath());
       }
     else
       throw new MaxDocumentException("Cannot save a " + document.getDocumentType() + " as Bmax file");
   }
 
-  public boolean canSaveTo(MaxDocumentSource source)
+  public boolean canSaveTo(File file)
   {
-    return (source instanceof MaxFileDocumentSource);
+    return true;
   }
 
-  public boolean canSaveTo(MaxDocument document, MaxDocumentSource source)
+  public boolean canSaveTo(MaxDocument document, File file)
   {
-    return ((document instanceof FtsPatcherDocument) && (source instanceof MaxFileDocumentSource));
+    return (document instanceof FtsPatcherDocument);
   }
 }
 

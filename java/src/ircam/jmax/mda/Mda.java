@@ -1,6 +1,7 @@
 package ircam.jmax.mda;
 
 import java.util.*;
+import java.io.*;
 import com.sun.java.swing.*;
 
 /** This class provide central registration services
@@ -122,9 +123,9 @@ public class Mda
     allHandlers.addElement(handler);
   }
 
-  /** Load an document from a given source) */
+  /** Load an document from a given file) */
 
-  public static MaxDocument loadDocument(MaxDocumentSource source) throws MaxDocumentException
+  public static MaxDocument loadDocument(File file) throws MaxDocumentException
   {
     MaxDocument newDocument;
     
@@ -134,25 +135,25 @@ public class Mda
 
 	documentHandler = (MaxDocumentHandler) allHandlers.elementAt(i);
 
-	if (documentHandler.canLoadFrom(source))
+	if (documentHandler.canLoadFrom(file))
 	  {
 	    // It is the responsability of the document Handler
-	    // to properly set the source and handler in the document
+	    // to properly set the file and handler in the document
 
-	    newDocument = documentHandler.loadDocument(source);
+	    newDocument = documentHandler.loadDocument(file);
 	    newDocument.setSaved(true);
 
 	    return newDocument;
 	  }
       }
 
-    throw new MaxDocumentException("Internal error: cannot load from " + source);
+    throw new MaxDocumentException("Internal error: cannot load from " + file);
   }
 
-  /** Static method to find a Document Handler for a given Document Source/document pair;
+  /** Static method to find a Document Handler for a given Document file/document pair;
    */
 
-  public static MaxDocumentHandler findDocumentHandlerFor(MaxDocumentSource source, MaxDocument document)
+  public static MaxDocumentHandler findDocumentHandlerFor(File file, MaxDocument document)
   {
     for (int i = 0; i < allHandlers.size() ; i++)
       {
@@ -160,7 +161,7 @@ public class Mda
 
 	documentHandler = (MaxDocumentHandler) allHandlers.elementAt(i);
 
-	if (documentHandler.canSaveTo(document, source))
+	if (documentHandler.canSaveTo(document, file))
 	  return documentHandler;
       }
 

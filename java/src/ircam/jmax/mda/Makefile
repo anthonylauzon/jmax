@@ -46,17 +46,9 @@ MaxDocumentHandler:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDocumentHandler.java)
 .PHONY: MaxDocumentHandler
 
-MaxDocumentSource:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDocumentSource.java)
-.PHONY: MaxDocumentSource
-
 MaxDocumentType:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDocumentType.java)
 .PHONY: MaxDocumentType
-
-MaxFileDocumentSource:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxFileDocumentSource.java)
-.PHONY: MaxFileDocumentSource
 
 MaxTclDocument:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxTclDocument.java)
@@ -69,10 +61,6 @@ MaxTclFileDocumentHandler:
 MaxTclInterpreter:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxTclInterpreter.java)
 .PHONY: MaxTclInterpreter
-
-MaxURLDocumentSource:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxURLDocumentSource.java)
-.PHONY: MaxURLDocumentSource
 
 Mda:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) Mda.java)

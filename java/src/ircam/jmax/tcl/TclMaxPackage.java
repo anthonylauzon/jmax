@@ -55,7 +55,6 @@ public class TclMaxPackage
     interp.createCommand("systemProperty", new MaxSystemPropertyCmd());
     interp.createCommand("getMaxVersion", new MaxGetMaxVersionCmd());
     interp.createCommand("quit", new MaxQuitCmd());
-    //interp.createCommand("source", new MaxProvaSource());
   }
 }
 

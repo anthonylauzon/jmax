@@ -15,6 +15,7 @@ import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
 import com.sun.java.swing.*;
+
 //import com.sun.java.swing.jlf.*;
 
 /**
@@ -795,7 +796,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
   private boolean SaveBody(){
     setVisible(false);
-    setTitle(itsDocument.getDocumentSource().toString()); 
+    setTitle(itsDocument.getDocumentFile().toString()); 
     setVisible(true);
     CreateFtsGraphics(this);
 
@@ -819,7 +820,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     // we should RECEIVE this FILE, or contruct it when we load this document
 		
     // The "canSave" method of a data tell if it can be saved
-    // i.e. if it have a data source, and if we can write to its data source
+    // i.e. if it have a document , and if we can write to its document file
 
     if (itsDocument.canSave())
       SaveBody();
@@ -829,14 +830,14 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
   public void SaveAs() {
     String oldTitle = getTitle();
-    MaxDocumentSource source;
+    File file;
 
-    source  = MaxFileChooser.chooseFileToSave(this, "Save As", itsDocument.getDocumentSource());
+    file = MaxFileChooser.chooseFileToSave(this, "Save As", itsDocument.getDocumentFile());
 
-    if (source == null)
+    if (file == null)
       return;
     else
-      itsDocument.bindToDocumentSource(source);
+      itsDocument.bindToDocumentFile(file);
     
     SaveBody();
   }
