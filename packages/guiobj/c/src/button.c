@@ -24,7 +24,7 @@
 #include <fts/fts.h>
 #include <ftsprivate/patcher.h>
 
-#define DEFAULT_FLASH 125.0
+#define DEFAULT_FLASH 125
 
 fts_symbol_t sym_setColor = 0;
 fts_symbol_t sym_setFlash = 0;
@@ -33,7 +33,7 @@ typedef struct
 {
   fts_object_t o;
   int value;
-  float flash;
+  int flash;
   int color;
 } button_t;
 
@@ -97,7 +97,7 @@ button_on(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fts_update_request(o);
 
       /* schedule button off */
-      fts_timebase_add_call(fts_get_timebase(), o, button_off, 0, this->flash);
+      fts_timebase_add_call(fts_get_timebase(), o, button_off, 0, (double)this->flash);
     }
 
   fts_outlet_bang(o, 0);
