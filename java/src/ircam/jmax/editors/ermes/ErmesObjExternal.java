@@ -49,10 +49,6 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     iAmPatcher = what;
   }
 	
-  public void update(FtsObject theFtsObject) {
-    super.update(theFtsObject);
-  }
-
 
   //--------------------------------------------------------
   // makeFtsObject and redefineFtsObject() 

@@ -98,7 +98,7 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     d1.width = lenght+2*itsOwner.WIDTH_DIFF+10;
     d1.height = height+2*itsOwner.HEIGHT_DIFF;    
 
-    itsOwner.resize(d1.width, d1.height); 
+    //itsOwner.resize(d1.width, d1.height); 
     
     if(itsOwner.itsOutletList.size()>0)
       itsOwner.MoveOutlets();

@@ -81,6 +81,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
   }
 
   public void setItsWidth(int theWidth) {
+    
     currentRect.width = theWidth;
     itsFtsObject.put("w", theWidth);
   }
@@ -92,6 +93,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
   }
 
   public void setItsHeight(int theHeight) {
+    
     currentRect.height = theHeight;
     itsFtsObject.put("h", theHeight);
   }
@@ -200,8 +202,6 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
 
     // retrieve the inlet, outlet informations
     if (theFtsObject == null) {
-      //this case have been seen during the instantiation of an external
-      //"patcher <name> <nin> <nout>"
       return;
     }
     itsFtsObject = theFtsObject;
@@ -213,11 +213,12 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
     int old_ninlts = itsInletList.size();//used in case of redefines
     int old_noutlts = itsOutletList.size();//used in case of redefines
     
-    
     Rectangle aRect = currentRect;
+
     int maxPads = (n_outlts > n_inlts) ? n_outlts : n_inlts;
 
     itsFtsObject.setRepresentation(this);
+    
     if (maxPads * PADS_DISTANCE > aRect.width) { //the pads are longer then the element
       
       reshape(aRect.x, aRect.y, maxPads*PADS_DISTANCE, aRect.height);
@@ -313,8 +314,8 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
     setFont(itsSketchPad.sketchFont);
     itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
     
-    setItsX(x);
-    setItsY(y);
+    //setItsX(x);
+    //setItsY(y);
 		
     makeCurrentRect(x, y);
 
@@ -340,6 +341,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
     int aIntSize;
     
     itsFtsObject = theFtsObject;
+    makeCurrentRect(theFtsObject);//0406
     if((aFont == null)&&(aSize == null)) setFont(itsSketchPad.sketchFont);
     else{
       if(aFont == null) aFont = itsSketchPad.sketchFont.getName();
@@ -349,9 +351,9 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
     }
     itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
     
-    makeCurrentRect(theFtsObject);
+    //0406makeCurrentRect(theFtsObject);
         
-    itsFtsObject = theFtsObject;
+    //0406itsFtsObject = theFtsObject;
     update(itsFtsObject);
     itsFtsPatcher = GetSketchWindow().itsPatcher;
     return true;
@@ -360,9 +362,11 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
   protected void makeCurrentRect(int x, int y) {
     Dimension d = getPreferredSize();
     currentRect = new Rectangle(x, y, d.width, d.height);
+    setItsX(x); setItsY(y); setItsWidth(d.width); setItsHeight(d.height);
   }
 
   protected void makeCurrentRect(FtsObject theFtsObject) {
+    
     int width=0;
     int  height=0;
 
@@ -370,12 +374,14 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
     setItsY(((Integer)theFtsObject.get("y")).intValue());
     {
       Integer widthInt = (Integer) theFtsObject.get("w");
+    
       if (widthInt != null)
 	width  = widthInt.intValue();
     }
     
     {
       Integer heightInt = (Integer)theFtsObject.get("h");
+      
       if (heightInt != null)
 	height = heightInt.intValue();
     }
@@ -387,6 +393,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
       height  = getMinimumSize().height;
     }
     currentRect = new Rectangle(itsX, itsY, width, height);
+    setItsWidth(width);setItsHeight(height);//0406
   }
 
   public boolean Select(boolean paintNow)

@@ -188,8 +188,10 @@ abstract class ErmesObjEditableObject extends ErmesObject {
   public void ResizeToText(int theDeltaX, int theDeltaY){
     int aWidth = getItsWidth()+theDeltaX;
     int aHeight = getItsHeight()+theDeltaY;
+    
     if(aWidth<itsFontMetrics.stringWidth(itsMaxString) + 2*WIDTH_DIFF) aWidth = itsFontMetrics.stringWidth(itsMaxString) + 2*WIDTH_DIFF;
     if(aHeight<itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF) aHeight = itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF;
+
     resizeBy(aWidth-getItsWidth(), aHeight-getItsHeight());
   }
   
