@@ -490,7 +490,6 @@ public class Fts
       ((FtsEditListener) editListeners.elementAt(i)).objectRemoved(object);
   }
 
-
   // MDA SUpport
 
   private static MaxDocumentType patcherType;
@@ -503,19 +502,5 @@ public class Fts
   static public MaxDocumentType  getPatcherDocumentType()
   {
     return patcherType;
-  }
-
-  // Support for auto-syncinc the awt toolkit after updates.
-
-  private static boolean syncToolkitOnUpdates = false;
-
-  static public void setSyncToolkitOnUpdates(boolean v)
-  {
-    syncToolkitOnUpdates = v;
-  }
-
-  static public boolean getSyncToolkitOnUpdates()
-  {
-    return syncToolkitOnUpdates;
   }
 }

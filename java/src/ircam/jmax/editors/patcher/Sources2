@@ -40,8 +40,8 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/FpePanel.java  \
 	$(INCLUDE_PATH)/KeyMap.java      \
 	$(INCLUDE_PATH)/KeyEventClient.java  \
-	$(INCLUDE_PATH)/Settings.java
-
+	$(INCLUDE_PATH)/Settings.java \
+	$(INCLUDE_PATH)/MaxRepaintManager.java 
 
 
 

@@ -27,6 +27,13 @@ import ircam.jmax.editors.patcher.interactions.*;
 
 public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
 {
+  static boolean syncPaint = false;
+
+  static void setSyncPaint(boolean v)
+  {
+    syncPaint = v;
+  }
+
   Rectangle invalid = new Rectangle();
   boolean somethingToDraw = false;
 
@@ -37,8 +44,13 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
 
   public void updateGroupEnd()
   {
-    if (somethingToDraw)
-      paintImmediately(invalid);
+    if (somethingToDraw);
+      {
+	if (isLocked() && syncPaint)
+	  paintImmediately(invalid);
+	else
+	  repaint(invalid);
+      }
   }
 
   public void paintAtUpdateEnd(int x, int y, int w, int h)
@@ -924,13 +936,5 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
   public void resetMessage()
   {
     itsSketchWindow.resetMessage();
-  }
-
-  public void repaint(int x, int y, int h, int w)
-  {
-    //System.err.println("Repaint " + x + " " + y + " " + h + " " + w);
-    //Thread.dumpStack();
-
-    super.repaint(x, y, h, w);
   }
 }

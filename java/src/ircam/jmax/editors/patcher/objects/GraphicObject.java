@@ -374,16 +374,13 @@ abstract public class GraphicObject implements DisplayObject
 
   public void updateRedraw()
   {
-    if (itsSketchPad.isLocked())
-      itsSketchPad.paintAtUpdateEnd(ftsObject.getX(),
-				    ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
-				    ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP,
-				    ftsObject.getWidth(),
-				    ftsObject.getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
-				    ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
-				    ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
-    else
-      redraw();
+    itsSketchPad.paintAtUpdateEnd(ftsObject.getX(),
+				  ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
+				  ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP,
+				  ftsObject.getWidth(),
+				  ftsObject.getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
+				  ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
+				  ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
   }
 
   public void redrawConnections()

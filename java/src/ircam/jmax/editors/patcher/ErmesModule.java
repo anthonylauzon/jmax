@@ -1,7 +1,9 @@
 package ircam.jmax.editors.patcher;
 
 import java.awt.*; 
+import javax.swing.*; 
 
+import ircam.jmax.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
@@ -16,6 +18,15 @@ public class ErmesModule
 {
   static public void initModule()
   {
+    // Optionally set the syncPaint flag
+
+    if (MaxApplication.getProperty("syncPaint") != null)
+      ErmesSketchPad.setSyncPaint(true);
+
+    // Install the customized Repaint Manager
+
+    RepaintManager.setCurrentManager(new MaxRepaintManager());
+
     // Install the local mda entities
 
     Mda.installEditorFactory(new ErmesPatcherFactory());
@@ -28,8 +39,6 @@ public class ErmesModule
     // Install the tcl commands
 
     TclErmesPackage.installPackage();
-
-    Fts.setSyncToolkitOnUpdates(true);
   }
 }
 

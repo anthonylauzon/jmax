@@ -15,7 +15,7 @@ package ircam.jmax.fts;
 
 import java.util.*;
 import java.io.*;
-import java.awt.*;
+
 
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
@@ -1438,9 +1438,6 @@ public class FtsServer  implements Runnable
 	if (updateGroupListeners != null)
 	  for (int i = 0; i < updateGroupListeners.size(); i++)
 	    ((FtsUpdateGroupListener) updateGroupListeners.elementAt(i)).updateGroupEnd();
-
-	if (Fts.getSyncToolkitOnUpdates())
-	  Toolkit.getDefaultToolkit().sync();
 	break;
 
 	// Messages add to support creation on demand of FtsObject 
