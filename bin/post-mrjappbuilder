@@ -1,8 +1,28 @@
 #!/bin/sh
-if [ ! -d $HOME/jMax.app/Contents/Resources/share/jmax ] ; then mkdir -p $HOME/jMax.app/Contents/Resources/share/jmax ; fi
-cp -r $HOME/projects/jmax-install/bin $HOME/jMax.app/Contents/Resources/bin
-cp -r $HOME/projects/jmax-install/lib $HOME/jMax.app/Contents/Resources/lib
-cp -r $HOME/projects/jmax-install/share/jmax/images $HOME/jMax.app/Contents/Resources/share/jmax/images
-cp -r $HOME/projects/jmax-install/share/jmax/packages $HOME/jMax.app/Contents/Resources/share/jmax/packages
-cp -r $HOME/projects/jmax-install/share/jmax/config.jmax $HOME/jMax.app/Contents/Resources/share/jmax/config.jmax
+APPDIR=$HOME/jMax.app
+
+if [ ! -d $APPDIR/Contents/Resources/share/jmax ]
+then
+    mkdir -p $APPDIR/Contents/Resources/share/jmax
+fi
+/bin/rm -rf $APPDIR/Contents/Resources/share/jmax/*
+
+if [ ! -d $APPDIR/Contents/Resources/bin ]
+then
+    mkdir -p $APPDIR/Contents/Resources/bin
+fi
+/bin/rm -rf $APPDIR/Contents/Resources/bin/*
+
+if [ ! -d $APPDIR/Contents/Resources/lib ]
+then
+    mkdir -p $APPDIR/Contents/Resources/lib
+fi
+/bin/rm -rf $APPDIR/Contents/Resources/lib/*
+
+
+cp -r $HOME/projects/jmax-install/bin $APPDIR/Contents/Resources
+cp -r $HOME/projects/jmax-install/lib $APPDIR/Contents/Resources
+cp -r $HOME/projects/jmax-install/share/jmax/images $APPDIR/Contents/Resources/share/jmax
+cp -r $HOME/projects/jmax-install/share/jmax/packages $APPDIR/Contents/Resources/share/jmax
+cp -r $HOME/projects/jmax-install/share/jmax/config.jmax $APPDIR/Contents/Resources/share/jmax
 
