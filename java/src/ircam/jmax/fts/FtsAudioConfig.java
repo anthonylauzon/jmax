@@ -79,7 +79,7 @@ public class FtsAudioConfig extends FtsObject
     FtsObject.registerMessageHandler( FtsAudioConfig.class, FtsSymbol.get("remove"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsAudioConfig)obj).removeLabel( (FtsAudioLabel)args.getObject( 0));
+	  ((FtsAudioConfig)obj).removeLabel( args.getInt( 0));
 	}
       });
     FtsObject.registerMessageHandler( FtsAudioConfig.class, FtsSymbol.get("clear"), new FtsMessageHandler(){
@@ -319,9 +319,10 @@ public class FtsAudioConfig extends FtsObject
       listener.labelInserted( index, label);
   }
 
-  void removeLabel( FtsAudioLabel label)
+  void removeLabel( int index)
   {
-    labels.remove( label);	
+    if( index >= 0 && index < labels.size())
+      labels.remove( index);
   }
 
   public Enumeration getLabels()
