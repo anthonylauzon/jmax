@@ -20,8 +20,20 @@
  * 
  */
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <string.h>
 #include <stdio.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <errno.h>
+#include <string.h>
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 
 #include <fts/fts.h>
 #include <fts/private/OLDclient.h>
@@ -39,6 +51,14 @@
 #include <fts/private/template.h>
 
 
+/*
+ * TODO:
+ * - when to flush the output buffer ?
+ * - arguments passing to oldclient_init
+ * - instantiation of old client object
+ */
+
+
 /***********************************************************************
  *
  * Forward declarations
@@ -47,89 +67,138 @@
 
 static void fts_client_parse_char( char c);
 
-static int client_dev = 0;
-#define fts_char_dev_get(D, P) (0)
-#define fts_char_dev_put(D,C) (C)
-#define fts_char_dev_flush(D) (0)
-
-static fts_status_description_t fts_dev_eof =
-{
-  "eof for device"
-};
-
 
 /***********************************************************************
- * 
- * client.c
+ *
+ * Emulation of old client behaviour, using scheduler callback
  *
  */
 
-/*
- *  Communication with the client: this file define the client logical
- *  device, the client module including the client poll function
- * 
- *
- */
+#define UDP_PACKET_SIZE 2048
 
-/******************************************************************************/
-/*                                                                            */
-/*             Client SubSystem Declaration                                   */
-/*                                                                            */
-/******************************************************************************/
+typedef struct _oldclient_t {
+  fts_object_t head;
+  /* Socket */
+  int socket;
+  struct sockaddr_in client_addr;
+  /* Input */
+  char input_buffer[UDP_PACKET_SIZE];
+  /* Output */
+  char sequence;
+  fts_buffer_t output_buffer;
+} oldclient_t;
 
-/******************************************************************************/
-/*                                                                            */
-/*             CLIENT  polling function                                       */
-/*                                                                            */
-/******************************************************************************/
+static oldclient_t *oldclient;
 
-/* experimentally, we do the real polling every 3 ticks */
-
-void 
-fts_client_poll(void)
+static void
+oldclient_receive( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  static int poll_count = 0;
+  oldclient_t *this = (oldclient_t *)o;
+  int r, i;
 
-  poll_count++;
-
-  if (poll_count >= 3)
+  if ((r = recvfrom( this->socket, this->input_buffer, UDP_PACKET_SIZE, 0, 0, 0)) < 0)
     {
-      poll_count = 0;
+      post( "[client] error in reading message (%s)\n", strerror( errno));
       return;
     }
 
-  if (client_dev)
-    {
-      /* then, loop until there are data */
-
-      while (1)
-	{
-	  unsigned char c;
-	  fts_status_t ret;
-
-	  ret = fts_char_dev_get(client_dev, &c);
-
-	  if (ret == &fts_dev_eof)
-	    {
-	      /* End of file for client device (do a shutdown) */
-
-	      fts_sched_halt();
-
-	      return;
-	    }
-	  else if (ret != fts_Success)
-	    {
-	      /* flush the output and return */
-
-	      fts_char_dev_flush(client_dev);
-	      return;
-	    }
-
-	  fts_client_parse_char((char) c);
-	}
-    }
+  for ( i = 0; i < r; i++)
+    fts_client_parse_char( this->input_buffer[i]);
 }
 
+
+static void
+oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  oldclient_t *this = (oldclient_t *)o;
+  struct sockaddr_in my_addr;
+  char *address;
+  unsigned short port;
+
+/*    ac--; */
+/*    at++; */
+/*    fts_socket_parse( fts_get_symbol_arg( ac, at, 0, 0), &address, &port); */
+
+/*    if (address == NULL) */
+/*      { */
+/*        post( "[client] error parsing argument\n"); */
+/*        return; */
+/*      } */
+
+  if ( (this->socket = socket( AF_INET, SOCK_DGRAM, 0) ) == -1)
+    {
+      post( "[oldclient] error opening socket (%s)\n", strerror( errno));
+      return;
+    }
+
+  /* Bind the socket to an arbitrary available port  */
+  memset( &my_addr, 0, sizeof(struct sockaddr_in));
+  my_addr.sin_family = AF_INET;
+  my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  my_addr.sin_port = 0;
+
+  if (bind( this->socket, &my_addr, sizeof(struct sockaddr_in)) == -1)
+    {
+      post( "[oldclient] cannot bind socket (%s)\n", strerror( errno));
+      return;
+    }
+
+  memset( &this->client_addr, 0, sizeof(this->client_addr));
+  this->client_addr.sin_family = AF_INET;
+  this->client_addr.sin_addr.s_addr = inet_addr(address);
+  this->client_addr.sin_port = htons(port);
+
+  /* Send an init package: empty content, just the packet */
+  sendto( this->socket, "init", 4, 0, &this->client_addr, sizeof( this->client_addr));
+
+  fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
+
+  fts_buffer_init( &this->output_buffer, unsigned char);
+
+  oldclient = this;
+}
+
+static void
+oldclient_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  oldclient_t *this = (oldclient_t *)o;
+
+  fts_sched_remove( (fts_object_t *)this);
+  close( this->socket);
+}
+
+static void oldclient_put_char( oldclient_t *this, unsigned char c)
+{
+  if (!this)
+    return;
+
+  fts_buffer_append( &this->output_buffer, unsigned char, c);
+}
+
+static void oldclient_flush( oldclient_t *this)
+{
+  int r, len;
+  unsigned char *p;
+
+  if (!this)
+    return;
+
+  p = fts_buffer_get_ptr( &this->output_buffer);
+  len = fts_buffer_get_length( &this->output_buffer);
+
+  p[0] = this->sequence;
+  this->sequence = (this->sequence + 1) %128;
+
+  p[1] = len / 256;
+  p[2] = len % 256;
+
+  r = sendto( this->socket, p, len, 0, &this->client_addr, sizeof( this->client_addr));
+
+  if ( r != len)
+    fprintf( stderr, "[this] error sending (%s)\n", strerror( errno));
+
+  fts_buffer_clear( &this->output_buffer);
+}
 
 
 /***********************************************************************
@@ -402,23 +471,20 @@ static void fts_client_send_string(const char *msg)
   int i;
 
   for (i = 0; msg[i] != '\0' ; i++)
-    fts_char_dev_put(client_dev, msg[i]);
+    oldclient_put_char( oldclient, msg[i]);
 }
 
 static void fts_client_send_int(int value)
 {
-  fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value >> 24) & 0xff));
-  fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value >> 16) & 0xff));
-  fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value >> 8) & 0xff));
-  fts_char_dev_put(client_dev, (unsigned char) (((unsigned int) value) & 0xff));
+  oldclient_put_char( oldclient, (unsigned char) (((unsigned int) value >> 24) & 0xff));
+  oldclient_put_char( oldclient, (unsigned char) (((unsigned int) value >> 16) & 0xff));
+  oldclient_put_char( oldclient, (unsigned char) (((unsigned int) value >> 8) & 0xff));
+  oldclient_put_char( oldclient, (unsigned char) (((unsigned int) value) & 0xff));
 }
 
 void fts_client_start_msg( int type)
 {
-  if ( !client_dev )
-    return;
-
-  fts_char_dev_put( client_dev, (char)type);
+  oldclient_put_char( oldclient, (char)type);
 
 #ifdef OUTGOING_DEBUG_TRACE      
   fprintf(stderr, "Sending '%d' ", type);
@@ -428,51 +494,39 @@ void fts_client_start_msg( int type)
 
 void fts_client_add_int(int value)
 {
-  if ( !client_dev )
-    return;
-
 #ifdef OUTGOING_DEBUG_TRACE      
   fprintf( stderr, "%d ", value);
 #endif
 
-  fts_char_dev_put(client_dev, INT_CODE);
+  oldclient_put_char( oldclient, INT_CODE);
   fts_client_send_int(value);
 }
 
 
 void fts_client_add_data( fts_data_t *data)
 {
-  if ( !client_dev )
-    return;
-
 #ifdef OUTGOING_DEBUG_TRACE      
   fprintf_data( stderr, data);
 #endif
 
-  fts_char_dev_put( client_dev, DATA_CODE);
+  oldclient_put_char( oldclient, DATA_CODE);
   fts_client_send_int( data ? fts_data_get_id(data) : 0);
 }
 
 void fts_client_add_object(fts_object_t *obj)
 {  
-  if ( !client_dev )
-    return;
-
 #ifdef OUTGOING_DEBUG_TRACE      
   fprintf_object( stderr, obj);
 #endif
 
-  fts_char_dev_put(client_dev, OBJECT_CODE);
+  oldclient_put_char( oldclient, OBJECT_CODE);
   fts_client_send_int( obj ? fts_object_get_id(obj) : 0);
 }
 
 
 void fts_client_add_connection(fts_connection_t *c)
 {
-  if ( !client_dev )
-    return;
-
-  fts_char_dev_put(client_dev, CONNECTION_CODE);
+  oldclient_put_char( oldclient, CONNECTION_CODE);
   fts_client_send_int(c ? fts_connection_get_id(c) : 0);
 
 }
@@ -480,10 +534,7 @@ void fts_client_add_connection(fts_connection_t *c)
 
 void fts_client_add_float(float value)
 {
-  if ( !client_dev )
-    return;
-
-  fts_char_dev_put(client_dev, FLOAT_CODE);
+  oldclient_put_char( oldclient, FLOAT_CODE);
   fts_client_send_int( *((unsigned int *)&value) );
 }
 
@@ -523,37 +574,31 @@ static int cache_symbol( fts_symbol_t s)
 
 void fts_client_add_symbol(fts_symbol_t s)
 {
-  if (! client_dev)
-    return;
-
   if ( fts_symbol_get_cache_index(s) >= 0 )   /* Is symbol cached ? */
     {
-      fts_char_dev_put( client_dev, SYMBOL_CACHED_CODE);
+      oldclient_put_char( oldclient, SYMBOL_CACHED_CODE);
       fts_client_send_int( fts_symbol_get_cache_index(s));
     }
   else if (cache_symbol(s))   /* Try to cache it and if succeeded, send a cache definition */
     {
-      fts_char_dev_put(client_dev, SYMBOL_AND_DEF_CODE);
+      oldclient_put_char( oldclient, SYMBOL_AND_DEF_CODE);
       fts_client_send_int( fts_symbol_get_cache_index(s));
       fts_client_send_string( fts_symbol_name(s));
-      fts_char_dev_put(client_dev, STRING_END_CODE);
+      oldclient_put_char( oldclient, STRING_END_CODE);
     }
   else   /* Send it as string, but with a SYMBOL_CODE */
     {
-      fts_char_dev_put(client_dev, SYMBOL_CODE);
+      oldclient_put_char( oldclient, SYMBOL_CODE);
       fts_client_send_string(fts_symbol_name(s));
-      fts_char_dev_put(client_dev, STRING_END_CODE);
+      oldclient_put_char( oldclient, STRING_END_CODE);
     }
 }
 
 void fts_client_add_string(const char *s)
 {
-  if (!client_dev)
-    return;
-
-  fts_char_dev_put(client_dev, STRING_CODE);
+  oldclient_put_char( oldclient, STRING_CODE);
   fts_client_send_string(s);
-  fts_char_dev_put(client_dev, STRING_END_CODE);
+  oldclient_put_char( oldclient, STRING_END_CODE);
 }
 
 
@@ -589,12 +634,9 @@ fts_client_add_atoms(int ac, const fts_atom_t *args)
 void 
 fts_client_done_msg(void)
 {
-  if ( !client_dev )
-    return;
-
   /*  Add the eom code  */
 
-  fts_char_dev_put(client_dev, (char) EOM_CODE);
+  oldclient_put_char( oldclient, (char) EOM_CODE);
 
 #ifdef OUTGOING_DEBUG_TRACE      
   fprintf(stderr, "<EOM>\n");

@@ -13,6 +13,7 @@ atomfile.c \
 audio.c \
 autosave.c \
 buffer.c \
+bytestream.c \
 class.c \
 clipboard.c \
 connection.c \

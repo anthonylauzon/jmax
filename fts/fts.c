@@ -30,6 +30,7 @@ extern void fts_kernel_class_init( void);
 extern void fts_kernel_doctor_init( void);
 extern void fts_kernel_patcher_init( void);
 extern void fts_kernel_audio_init( void);
+extern void fts_kernel_bytestream_init( void);
 extern void fts_kernel_autosave_init( void);
 extern void fts_kernel_clipboard_init( void);
 extern void fts_kernel_dsp_graph_init( void);
@@ -61,8 +62,9 @@ void fts_init( void)
   fts_kernel_doctor_init();
   fts_kernel_patcher_init();
 
-  /* From now on, the order is no longer important */
+  /* For the rest, the order is no longer important */
   fts_kernel_audio_init();
+  fts_kernel_bytestream_init();
   fts_kernel_autosave_init();
   fts_kernel_clipboard_init();
   fts_kernel_dsp_graph_init();

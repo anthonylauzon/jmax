@@ -273,8 +273,6 @@ fts_sched_init(fts_sched_t *sched)
   sched->status = sched_ready;
 }
 
-extern void fts_client_poll(void);
-
 /* run the scheduler in a loop (note that the clock time is set inside fts_dsp_run_tick() */
 void fts_sched_run( void)
 {
@@ -282,9 +280,6 @@ void fts_sched_run( void)
 
   while(sched->status != sched_halted)
     {
-      /* get client events */
-      fts_client_poll(); /* still buarghhh! */
-
       /* poll file descriptors and run functions inserted to the scheduler */
       fts_sched_do_select(sched);
 
