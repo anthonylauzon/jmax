@@ -121,21 +121,13 @@ static void fts_kernel_config(void)
 
   /* RUNTIME modules */
 
-  fts_install_module( &fts_sched_module);    /* the fts scheduler module */
+  fts_sched_setup();  /* the fts scheduler module */
   fts_install_module( &fts_dev_module);      /* the device support  system */
   fts_install_module( &fts_midi_module);     /* the fts MIDI system */
   fts_install_module( &fts_time_module);     /* the time handling module */
   fts_install_module( &fts_client_module);   /* the fts <--> client communication system */
   fts_install_module( &fts_audio_module);    /* the fts AUDIO I/O  system */
   fts_install_module( &fts_files_module);   /* the fts file handling module */
-
-  /* Thread module
-     This is temporary: the thread module declares a scheduled function
-     that polls the file descriptors set of the thread.
-     Evolution: this function will become the only function called by the thread
-     and the current scheduler will disappear
-  */
-  fts_install_module( &fts_thread_module);   /* the "thread" module */
 
   /* TILES modules */
 

@@ -832,21 +832,21 @@ static void patcher_save_dotpat_description( fts_object_t *object, FILE *file, c
 
 static void patcher_save_dotpat_content( fts_patcher_t *patcher, FILE *file)
 {
-  int x_top_left, y_top_left, x_bottom_right, y_bottom_right;
+  int x_left, y_top, x_right, y_bottom;
   fts_atom_t a;
   fts_object_t *object;
 
   fts_object_get_prop( (fts_object_t *)patcher, fts_s_wx, &a);
-  x_top_left = fts_get_int( &a);
+  x_left = fts_get_int( &a);
   fts_object_get_prop( (fts_object_t *)patcher, fts_s_wy, &a);
-  y_top_left = fts_get_int( &a);
+  y_top = fts_get_int( &a);
   fts_object_get_prop( (fts_object_t *)patcher, fts_s_ww, &a);
-  x_bottom_right = x_top_left + fts_get_int( &a);
+  x_right = x_left + fts_get_int( &a);
   fts_object_get_prop( (fts_object_t *)patcher, fts_s_wh, &a);
-  y_bottom_right = y_top_left + fts_get_int( &a);
+  y_bottom = y_top + fts_get_int( &a);
 
   /* Save window properties */
-  fprintf( file, "#N vpatcher %d %d %d %d;\n", x_top_left, y_top_left, x_bottom_right, y_bottom_right);
+  fprintf( file, "#N vpatcher %d %d %d %d;\n", x_left, y_top, x_right, y_bottom);
 
   /* Save objects */
   for ( object = patcher->objects; object ; object = object->next_in_patcher)

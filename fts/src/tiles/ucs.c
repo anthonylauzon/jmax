@@ -387,30 +387,6 @@ fts_ucs_load_module(int argc, const fts_atom_t *argv)
 }
 
 /*
- * Scheduler debug commands
- */
-
-#ifdef DEBUG
-
-static fts_status_t
-fts_ucs_sched_describe_order(int argc, const fts_atom_t *argv)
-{
-  fts_sched_describe_order();
-
-  return fts_Success;
-}
-
-static fts_status_t
-fts_ucs_sched_describe_declarations(int argc, const fts_atom_t *argv)
-{
-  fts_sched_describe_declarations();
-
-  return fts_Success;
-}
-
-#endif
-
-/*
  * Message system commands 
  *
  */
@@ -613,18 +589,6 @@ fts_ucs_install_commands()
   fts_ucs_define_command(fts_new_symbol("load"), fts_new_symbol("module"), fts_ucs_load_module,
 			 "load module <name> <filename>",
 			 "dynamically load a module");
-
-  /* scheduler debug functions  */
-
-#ifdef DEBUG
-  fts_ucs_define_command(fts_new_symbol("show"), fts_new_symbol("scheduling"), fts_ucs_sched_describe_order,
-			 "show scheduling",
-			 "show the computed scheduling loop");
-
-  fts_ucs_define_command(fts_new_symbol("show"), fts_new_symbol("schedinfo"), fts_ucs_sched_describe_declarations,
-			 "show schedinfo",
-			 "show the scheduler declarations");
-#endif
 
   /* Message system function  */
 

@@ -1,3 +1,9 @@
+2000-03-30  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* runtime/sched/* and runtime/thread/*: removing the thread directory
+	and integrating it in sched.c. Removed the fts_sched_declare stuff,
+	that was uselessly complicated. Moving to the single select() scheduler.
+
 2000-03-27  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* Changed patcher.c: moving to save .pat files. This is not complete yet...

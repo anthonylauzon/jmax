@@ -35,6 +35,5 @@
 #include "runtime/midi.h"
 #include "runtime/sched.h"
 #include "runtime/time.h"
-#include "runtime/thread.h"
 
 #endif

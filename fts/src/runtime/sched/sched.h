@@ -27,31 +27,75 @@
 #ifndef _SCHED_H_
 #define _SCHED_H_
 
-/*Scheduler  Pubblic functions */
+#include "lang.h"
 
-extern fts_module_t fts_sched_module;
+/* 
+   Description:
+     The fts_sched_t abstraction contains all the data that are relevant for the
+     scheduling.
+     The first implementation keeps only the file descriptor set.
+
+     Basically, each thread has its own fts_sched_t instance. As there is yet
+     only one thread, there is one fts_sched_t instance.
+*/
+typedef struct _fts_sched fts_sched_t;
+
+/*
+   Function: fts_sched_get_current
+   Description:
+     Returns a pointer to the fts_sched_t that was running the calling function.
+   Returns: a fts_sched_t instance that identifies the sched calling this function 
+   NOTE:
+     The current implementation returns a pointer to a static structure.
+*/
+extern fts_sched_t *fts_sched_get_current( void);
+
+typedef void (*fts_sched_fd_fun_t)( int fd, void *data);
+
+/*
+  Function: fts_sched_add_fd
+  Description:
+    Add a file descriptor to the file descriptor set of the sched and declare a method
+    that will be called when the file descriptor is set (i.e. a read() or write() call will not
+    block).
+  Arguments:
+    sched: the sched owning the file descriptor set to which the file descriptor will be added
+    fd: the file descriptor
+    read: if one, the file descriptor is added to the read set, else to the write set
+    method: the method to call when file descriptor is set
+    obj: the object on which to call the method
+  Returns: nothing.
+*/
+extern void fts_sched_add_fd( fts_sched_t *sched, int fd, int read, fts_method_t method, fts_object_t *obj);
+
+/*
+  Function: fts_sched_remove_fd
+  Description:
+    Remove a file descriptor from the file descriptor set of the sched.
+  Arguments:
+    sched: the sched owning the file descriptor set to which the file descriptor will be removed
+    fd: the file descriptor
+  Returns: nothing.
+*/
+extern void fts_sched_remove_fd( fts_sched_t sched, int fd);
+
+
+/*
+  Function: fts_sched_do_select
+  Description:
+    Do a single select() on all the files in the file descriptor set of the sched.
+  Arguments:
+    sched: the sched owning the file descriptor set
+  Returns: nothing.
+*/
+extern void fts_sched_do_select( fts_sched_t sched);
 
 /* run time */
-
 extern void fts_sched_run(void);
 extern void fts_halt(void);
 
-/* declarations Scheduler */
-
-enum declaration_verb {provide, require, freerun};
-extern void fts_sched_declare(void (* fun)(void), enum declaration_verb decl, fts_symbol_t state, const char *name);
-
-extern void fts_sched_compile(void);
-
-/* Debug functions */
-
-extern void fts_sched_describe_order(void); 
-extern void fts_sched_describe_declarations(void);
-
 /* Tick length handling */
-
 extern float fts_sched_get_tick_length(void);
-
 
 extern void fts_sched_set_pause(int p);
 
