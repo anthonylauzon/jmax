@@ -1,9 +1,0 @@
-
-ROOTDIR := ..
-
-include Makefile.common
-
-exports_file:
-	cc -E $(CFLAGS) $(ROOTDIR)/Makefiles/exports.c | fgrep extern  > exports_file.tmp
-.PHONY: exports_file
-

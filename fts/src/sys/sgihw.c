@@ -20,7 +20,7 @@
 
 #include "sys.h"
 
-#ifdef IRIX6_4
+#if (defined(IRIX6_4) || defined(IRIX6_5))
 #include <sched.h>
 #endif
 
@@ -89,7 +89,7 @@ fts_platform_init(void)
 
   init_fpe();
 
-#ifdef IRIX6_4
+#if (defined(IRIX6_4) || defined(IRIX6_5))
   if (running_real_time)
     {
       struct sched_param param;

@@ -60,7 +60,7 @@
 
 #define FTS_ARCH_NAME "sgi"
 
-#if (!defined(IRIX6_4))
+#if ((! defined(IRIX6_4)) || (! defined(IRIX6_5)))
 #define restrict /* needed for compatibility with the newer restrict keyword */
 #endif
 

@@ -301,23 +301,16 @@ oss_dac_put(fts_word_t *argv)
 {
   long n = fts_word_get_long(argv + 1);
   int i,j, ch;
-  float *in;
+  float *in1;
+  float *in2;
 
-  /* do the data transfer: unrolled pipelined loop */
+  in1 = (float *) fts_word_get_ptr(argv + 2);
+  in2 = (float *) fts_word_get_ptr(argv + 3);
 
-  for (ch = 0; ch < 2; ch++)
+  for (i = 0, j = 0; i < n; i++, j += 2)
     {
-      in = (float *) fts_word_get_ptr(argv + 2 + ch);
-
-      j = ch;
-      for ( i = 0; i < n; i += 4)
-	{
-	  oss_audio_data.dac_fmtbuf[j + 0] = (short) ( 32767.0f * in[i+0]);
-	  oss_audio_data.dac_fmtbuf[j + 2] = (short) ( 32767.0f * in[i+1]);
-	  oss_audio_data.dac_fmtbuf[j + 4] = (short) ( 32767.0f * in[i+2]);
-	  oss_audio_data.dac_fmtbuf[j + 6] = (short) ( 32767.0f * in[i+3]);
-	  j += 8;
-	}
+      oss_audio_data.dac_fmtbuf[j + 0] = (short) ( 32767.0f * in1[i]);
+      oss_audio_data.dac_fmtbuf[j + 1] = (short) ( 32767.0f * in2[i]);
     }
 
   write(oss_audio_data.fd, oss_audio_data.dac_fmtbuf, 2 * n * sizeof(short));
