@@ -74,7 +74,7 @@ ARCH_DEBUG_CFLAGS := -LANG:restrict
 
 ifeq ($(ENABLE_PURIFY),yes)
 ARCH_CFLAGS := $(ARCH_CFLAGS) -DHELP_PURIFY
-FTS_SYS_LIBS = -laudio -laudiofile -laudioutil -lmalloc  -lm -lfpe
+FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm -lfpe
 else
 FTS_SYS_LIBS = -laudio -laudiofile -laudioutil -lmalloc  -lm -lfpe -lpthread
 endif
