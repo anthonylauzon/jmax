@@ -163,7 +163,7 @@ sample_pool_run(sample_pool_t *pool, float *out, int n_tick)
 	  float f;
 	  int wi = fts_intphase_get_index(wind_index, SAMPLE_WINDOW_BITS);
 	  
-	  fts_cubic_interpolate_with_idefix(buf, index, &f);
+	  fts_cubic_idefix_interpolate(buf, index, &f);
 
 	  output[i] += f * sample_window[wi] * amp;
 

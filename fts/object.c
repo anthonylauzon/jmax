@@ -663,14 +663,7 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
   else
     var = 0;
 
-  /* if the old object define a variable, and the new definition
-     do not define  the same variable, delete the variable;
-     if the new object define the same variable,  just suspend it,
-     but unregister the old object as definition
-  */
-  if (old->varname && (old->varname == var))
-    fts_variable_suspend(old->patcher, old->varname);
-
+  /* unbind variables */
   fts_object_unbind(old);
 
   /* unreference by hand */

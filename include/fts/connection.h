@@ -25,7 +25,8 @@ FTS_API fts_metaclass_t *fts_connection_type;
 
 typedef enum fts_connection_type
 {
-  fts_c_hidden = -1, /* hidden (order forcing) connection */
+  fts_c_order_forcing = -2, /* order forcing */
+  fts_c_hidden = -1, /* hidden connection */
   fts_c_invalid = 0, /* from error object or type missmatch */
   fts_c_anything = 1, /* message which is not one of the following */
   fts_c_atom = 2, /* single atom (value) */
@@ -55,8 +56,9 @@ struct fts_connection
 };
 
 
-FTS_API fts_connection_t *fts_connection_new(int id, fts_object_t *, int woutlet, fts_object_t *, int winlet);
+FTS_API fts_connection_t *fts_connection_new(int id, fts_object_t *src, int out, fts_object_t *dst, int in, fts_connection_type_t type);
 FTS_API void fts_connection_delete(fts_connection_t *conn);
+FTS_API fts_connection_t *fts_connection_get(fts_object_t *src, int out, fts_object_t *dst, int in);
 
 #define fts_is_connection(p) (fts_object_get_metaclass(p) == fts_connection_type)
 

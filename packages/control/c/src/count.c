@@ -574,7 +574,7 @@ count_float_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 int
 count_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
-  return count_is_int(ac0 - 1, at0 + 1) == count_is_int(ac1 - 1, at1 + 1);
+  return count_is_int(ac0, at0) == count_is_int(ac1, at1);
 }
 
 void

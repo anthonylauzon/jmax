@@ -29,10 +29,9 @@
 
 typedef struct messtab
 {
-  fts_object_t o;
+  data_object_t o;
   fts_hashtable_t table_symbol;
   fts_hashtable_t table_int;
-  fts_symbol_t keep;
 } messtab_t;
 
 DATA_API fts_symbol_t messtab_symbol;

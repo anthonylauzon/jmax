@@ -29,6 +29,9 @@
 extern void sync_config(void);
 extern void tup_config(void);
 
+extern void fifo_config(void);
+extern void stack_config(void);
+
 extern void switch_config(void);
 extern void oneshot_config(void);
 extern void demux_config(void);
@@ -47,6 +50,9 @@ control_config(void)
 {
   sync_config();
   tup_config();
+
+  fifo_config(),
+  stack_config(),
 
   switch_config();
   oneshot_config();

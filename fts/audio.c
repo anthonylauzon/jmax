@@ -481,7 +481,7 @@ static void fts_audioport_create_in_objects( fts_audioport_t *port)
     }
 
   for ( i = 0; i < channels; i++)
-    fts_connection_new( FTS_NO_ID, port->input.dsp_object, i, port->input.dispatcher, i);
+    fts_connection_new( FTS_NO_ID, port->input.dsp_object, i, port->input.dispatcher, i, fts_c_anything);
 }
 
 
@@ -607,7 +607,7 @@ static void fts_audioport_create_out_objects( fts_audioport_t *port)
     }
 
   for ( i = 0; i < channels; i++)
-    fts_connection_new( FTS_NO_ID, port->output.dispatcher, i, port->output.dsp_object, i);
+    fts_connection_new( FTS_NO_ID, port->output.dispatcher, i, port->output.dsp_object, i, fts_c_anything);
 }
 
 void fts_audioport_set_output_channels( fts_audioport_t *port, int channels)

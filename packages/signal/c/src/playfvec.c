@@ -302,7 +302,7 @@ play_fvec_ftl(fts_word_t *argv)
       float f;
       int i;
 
-      fts_cubic_interpolate_with_idefix(buf, index, &f);
+      fts_cubic_idefix_interpolate(buf, index, &f);
 
       for(i=0; i<n_tick; i++)
 	out[i] = f;
@@ -331,7 +331,7 @@ play_fvec_ftl(fts_word_t *argv)
 	  
 	  for(i=0; i<n_tick; i++)
 	    {
-	      fts_cubic_interpolate_with_idefix(buf, index, out + i);
+	      fts_cubic_idefix_interpolate(buf, index, out + i);
 	      fts_idefix_incr(&index, incr);
 	    }
 	  
@@ -343,7 +343,7 @@ play_fvec_ftl(fts_word_t *argv)
 	  
 	  for(i=0; i<n_tick; i++)
 	    {
-	      fts_cubic_interpolate_with_idefix(buf, index, out + i);
+	      fts_cubic_idefix_interpolate(buf, index, out + i);
 	      
 	      if(step != 0.0)
 		{

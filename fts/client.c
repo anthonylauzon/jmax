@@ -770,7 +770,7 @@ static void client_connect_object( fts_object_t *o, int winlet, fts_symbol_t s, 
   if ( !src || src_outlet < 0 || !dst || dst_inlet < 0)
     return;
 
-  fts_connection_new( FTS_NO_ID, src, src_outlet, dst, dst_inlet);
+  fts_connection_new( FTS_NO_ID, src, src_outlet, dst, dst_inlet, fts_c_anything);
 }
 
 static void client_load_patcher_file( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1164,8 +1164,8 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
       return;
     }
 
-  fts_connection_new( FTS_NO_ID, from, 0, (fts_object_t *)this, 0);
-  fts_connection_new( FTS_NO_ID, (fts_object_t *)this, 0, to, 0);
+  fts_connection_new( FTS_NO_ID, from, 0, (fts_object_t *)this, 0, fts_c_anything);
+  fts_connection_new( FTS_NO_ID, (fts_object_t *)this, 0, to, 0, fts_c_anything);
 }
 
 static void client_controller_delete_dummy(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

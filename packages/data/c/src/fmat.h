@@ -29,12 +29,11 @@
 
 typedef struct _fmat_
 {
-  fts_object_t o;
+  data_object_t o;
   float *values;
   int m;
   int n;
   int alloc;
-  fts_symbol_t keep;
 } fmat_t;
 
 DATA_API fts_symbol_t fmat_symbol;

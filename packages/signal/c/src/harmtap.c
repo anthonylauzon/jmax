@@ -28,7 +28,6 @@
 #include <fts/fts.h>
 #include <utils.h>
 #include "delay.h"
-#include "fourpoint.h"
 
 #define random_get(min, max) ((min) + (((max) - (min)) * rand() / RAND_MAX))
 #define cent_to_linear(x) (exp(0.00057762265047 * (x)))
@@ -286,19 +285,19 @@ ftl_harmtap(fts_word_t *argv)
       primary_index = del_phase + i - primary_int_delay;
       secondary_index = del_phase + i - secondary_int_delay;
       
-      primary_frac = fts_fourpoint_index_scale(primary_int_delay - primary_delay);
-      secondary_frac = fts_fourpoint_index_scale(secondary_int_delay - secondary_delay);
+      primary_frac = fts_cubic_intphase_scale(primary_int_delay - primary_delay);
+      secondary_frac = fts_cubic_intphase_scale(secondary_int_delay - secondary_delay);
       
       if(primary_index < 1)
-	primary_index += delayline_get_ring_size(dl);
+	primary_index += delayline_get_size(dl);
       if(secondary_index < 1)
-	secondary_index += delayline_get_ring_size(dl);
+	secondary_index += delayline_get_size(dl);
       
       wp = harmtap_window[fts_intphase_get_index(phi, WINDOW_BITS)];
       ws = harmtap_window[fts_intphase_get_index(pho, WINDOW_BITS)];
       
-      fts_fourpoint_interpolate(del_ptr + primary_index, primary_frac, &fp);
-      fts_fourpoint_interpolate(del_ptr + secondary_index, secondary_frac, &fs);
+      fts_cubic_intphase_interpolate(del_ptr + primary_index, primary_frac, &fp);
+      fts_cubic_intphase_interpolate(del_ptr + secondary_index, secondary_frac, &fs);
       
       out[i] = fp * wp + fs * ws;
     }

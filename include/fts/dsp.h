@@ -407,7 +407,7 @@ FTS_API double fts_dsp_get_time(void);
 #define fts_dsp_get_output_size(DESC, OUT) ((DESC)->out[(OUT)]->length)
 #define fts_dsp_get_output_srate(DESC, OUT) ((DESC)->out[(OUT)]->srate)
 
-
+FTS_API void fts_dsp_force_order(fts_object_t *first, fts_object_t *second);
 
 
 /* internal misc */

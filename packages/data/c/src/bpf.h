@@ -46,13 +46,11 @@ typedef struct _bp_
  */
 typedef struct _bpf_
 {
-  fts_object_t o;
+  data_object_t o;
   bp_t *points; /* break points */
   int alloc;
   int size;
-  fts_symbol_t keep;
   int opened; /* non zero if editor open */
-  int editid; /* index of changes */
 } bpf_t;
 
 DATA_API fts_symbol_t bpf_symbol;
@@ -66,8 +64,6 @@ DATA_API fts_metaclass_t *bpf_type;
 
 #define bpf_get_duration(b) ((b)->size > 0? (b)->points[(b)->size - 1].time: 0.0)
 #define bpf_get_target(b) ((b)->size > 0? (b)->points[(b)->size - 1].value: 0.0)
-
-#define bpf_get_editid(b) ((b)->editid)
 
 /* bpf atoms */
 #define bpf_atom_get(ap) ((bpf_t *)fts_get_object(ap))

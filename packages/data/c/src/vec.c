@@ -311,23 +311,6 @@ vec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-vec_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  vec_t *this = (vec_t *)obj;
-
-  if(this->keep != fts_s_args && fts_is_symbol(value))
-    this->keep = fts_get_symbol(value);
-}
-
-static void
-vec_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  vec_t *this = (vec_t *)obj;
-
-  fts_set_symbol(value, this->keep);
-}
-
-static void
 vec_get_vec(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   fts_set_object(value, obj);
@@ -347,7 +330,7 @@ vec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   ac--;
   at++;
 
-  this->keep = fts_s_no;
+  data_object_set_keep((data_object_t *)o, fts_s_no);
 
   if(ac == 0)
     mat_set_size((mat_t *)this, 0, 0);
@@ -361,14 +344,14 @@ vec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       mat_set_size((mat_t *)this, size, 1);
       vec_set_with_onset_from_atoms(this, 0, size, fts_tuple_get_atoms(tup));
 
-      this->keep = fts_s_args;
+      data_object_set_keep((data_object_t *)o, fts_s_args);
     }
   else if(ac > 1)
     {
       mat_set_size((mat_t *)this, ac, 1);
       vec_set_with_onset_from_atoms(this, 0, ac, at);
 
-      this->keep = fts_s_args;
+      data_object_set_keep((data_object_t *)o, fts_s_args);
     }
   else
     fts_object_set_error(o, "Wrong arguments");
@@ -402,8 +385,8 @@ vec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, vec_print); 
   
-  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, vec_set_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, vec_get_keep);
+  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, vec_get_vec);
   
   /* user methods */

@@ -49,7 +49,7 @@ static void
 biquad_state_clear(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   biquad_t *this = (biquad_t *)o;
-  biquad_state_t *state = (biquad_state_t *)ftl_data_get_ptr(this->biquad_coefs);
+  biquad_state_t *state = (biquad_state_t *)ftl_data_get_ptr(this->biquad_state);
 
   state->xnm1 = 0.0;
   state->xnm2 = 0.0;

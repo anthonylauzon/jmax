@@ -305,6 +305,12 @@ tup_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  this->reset = 0;
 	  this->require = 0;
 	}
+      else if(mode == sym_none)
+	{
+	  this->trigger = 0;
+	  this->reset = 0;
+	  this->require = 0;
+	}
 
       this->wait = this->require;
     }
@@ -334,7 +340,7 @@ tup_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   /* void state */
   for(i=0; i<TUP_MAX_SIZE; i++)
-    fts_set_void(this->a + i);
+    fts_set_int(this->a + i, 0);
 
   switch(ac)
     {
@@ -414,8 +420,8 @@ tup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int n = 0;
   int i;
 
-  if(ac == 1 && fts_is_int(at))
-    n = fts_get_int(at);
+  if(ac == 1 && fts_is_number(at))
+    n = fts_get_number_int(at);
   else
     n = ac;
 
@@ -477,12 +483,6 @@ untup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static int
 tup_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
-  ac0--;
-  at0++;
-
-  ac1--;
-  at1++;
-
   if(ac0 == 1 && ac1 == 1 && fts_is_number(at0) && fts_is_number(at1))
     return (fts_get_number_int(at0) == fts_get_number_int(at1));
   else

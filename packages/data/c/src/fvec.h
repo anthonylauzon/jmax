@@ -29,11 +29,10 @@
 
 typedef struct _fvec_
 {
-  fts_object_t o;
+  data_object_t o;
   float *values;
   int size;
   int alloc;
-  fts_symbol_t keep;
   float sr; /* sr > 0: force sample rate when loading sample files, sr <= 0: sample rate of current file */
 } fvec_t;
 

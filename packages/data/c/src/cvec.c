@@ -565,12 +565,13 @@ cvec_set_keep(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property
 	fts_object_signal_runtime_error(o, "no persistence for cvec");
     }
 }
+
 static void
 cvec_get_keep(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
 {
   cvec_t *this = (cvec_t *)o;
 
-  fts_set_symbol(value, this->keep);
+  fts_set_symbol(value, data_object_get_keep((data_object_t *)o));
 }
 
 static void
@@ -596,7 +597,7 @@ cvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   this->values = 0;
   this->size = 0;
   this->alloc = 0;
-  this->keep = fts_s_no;
+  data_object_set_keep((data_object_t *)o, fts_s_no);
 
 
   if(ac == 0)
@@ -613,14 +614,14 @@ cvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       
       cvec_set_size(this, size);
       cvec_set_with_onset_from_atoms(this, 0, size, fts_tuple_get_atoms(tup));
-      this->keep = fts_s_args;
+      data_object_set_keep((data_object_t *)o, fts_s_args);
     }
   else if(ac > 1)
     {
       cvec_set_size(this, ac);
       cvec_set_with_onset_from_atoms(this, 0, ac, at);
 
-      this->keep = fts_s_args;
+      data_object_set_keep((data_object_t *)o, fts_s_args);
     }
   else
     fts_object_set_error(o, "Wrong arguments for cvec constructor");

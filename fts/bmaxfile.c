@@ -859,7 +859,7 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, unsigned char *progr
 	    fts_log( "CONNECT\n");
 #endif
 	    fts_connection_new(FTS_NO_ID, object_stack[object_tos], fts_get_int(&eval_stack[eval_tos]),
-			       object_stack[object_tos + 1], fts_get_int(&eval_stack[eval_tos + 1]));
+			       object_stack[object_tos + 1], fts_get_int(&eval_stack[eval_tos + 1]), fts_c_anything);
 	  }
 	break;
 
@@ -1876,43 +1876,49 @@ fts_bmax_code_new_top_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
 static void
 fts_bmax_code_new_connection(fts_bmax_file_t *f, fts_connection_t *conn, int fromidx)
 {
-  /* Push the inlet and outlet (this order) in the evaluation stack */
-  fts_bmax_code_push_int(f, conn->winlet);
-  fts_bmax_code_push_int(f, conn->woutlet);
-
-  /* Push the to object, push the from object in the object stack */
-  fts_bmax_code_push_obj(f, fts_bmax_find_objidx(conn->dst));
-  fts_bmax_code_push_obj(f, fromidx);
-
-  /* code the connect command */
-  fts_bmax_code_connect(f);
-
-  /* Pop 2 values from the evaluation stack */
-  fts_bmax_code_pop_args(f, 2);
-
-  /* Pop 2 object from the object stack */
-  fts_bmax_code_pop_objs(f, 2);
+  if(fts_connection_get_type(conn) > fts_c_hidden)
+    {
+      /* Push the inlet and outlet (this order) in the evaluation stack */
+      fts_bmax_code_push_int(f, conn->winlet);
+      fts_bmax_code_push_int(f, conn->woutlet);
+      
+      /* Push the to object, push the from object in the object stack */
+      fts_bmax_code_push_obj(f, fts_bmax_find_objidx(conn->dst));
+      fts_bmax_code_push_obj(f, fromidx);
+      
+      /* code the connect command */
+      fts_bmax_code_connect(f);
+      
+      /* Pop 2 values from the evaluation stack */
+      fts_bmax_code_pop_args(f, 2);
+      
+      /* Pop 2 object from the object stack */
+      fts_bmax_code_pop_objs(f, 2);
+    }
 }
 
 static void
 fts_bmax_code_new_connection_in_selection(fts_bmax_file_t *f, fts_connection_t *conn, fts_selection_t *sel)
 {
-  /* Push the inlet and outlet (this order) in the evaluation stack */
-  fts_bmax_code_push_int(f, conn->winlet);
-  fts_bmax_code_push_int(f, conn->woutlet);
-
-  /* Push the to object, push the from object in the object stack */
-  fts_bmax_code_push_obj(f, fts_bmax_find_objidx_in_selection(conn->dst, sel));
-  fts_bmax_code_push_obj(f, fts_bmax_find_objidx_in_selection(conn->src, sel));
-
-  /* code the connect command */
-  fts_bmax_code_connect(f);
-
-  /* Pop 2 values from the evaluation stack */
-  fts_bmax_code_pop_args(f, 2);
-
-  /* Pop 2 object from the object stack */
-  fts_bmax_code_pop_objs(f, 2);
+  if(fts_connection_get_type(conn) > fts_c_hidden)
+    {
+      /* Push the inlet and outlet (this order) in the evaluation stack */
+      fts_bmax_code_push_int(f, conn->winlet);
+      fts_bmax_code_push_int(f, conn->woutlet);
+      
+      /* Push the to object, push the from object in the object stack */
+      fts_bmax_code_push_obj(f, fts_bmax_find_objidx_in_selection(conn->dst, sel));
+      fts_bmax_code_push_obj(f, fts_bmax_find_objidx_in_selection(conn->src, sel));
+      
+      /* code the connect command */
+      fts_bmax_code_connect(f);
+      
+      /* Pop 2 values from the evaluation stack */
+      fts_bmax_code_pop_args(f, 2);
+      
+      /* Pop 2 object from the object stack */
+      fts_bmax_code_pop_objs(f, 2);
+    }
 }
 
 /* Code a new patcher, and leave it in the top of the stack !!! */
@@ -2061,8 +2067,10 @@ fts_bmax_code_new_selection(fts_bmax_file_t *f, fts_object_t *obj)
 	    {
 	      if(fts_is_connection(p))
 		{
-		  if(fts_selection_connection_ends_selected(selection, (fts_connection_t *)p))
-		    fts_bmax_code_new_connection_in_selection(f, (fts_connection_t *)p, selection);
+		  fts_connection_t *c =(fts_connection_t *)p ;
+
+		  if(fts_selection_connection_ends_selected(selection, c))
+		    fts_bmax_code_new_connection_in_selection(f, c, selection);
 		}
 	      else
 		{

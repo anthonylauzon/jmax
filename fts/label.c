@@ -113,45 +113,36 @@ static fts_label_t *
 label_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
 {
   fts_atom_t *value = fts_variable_get_value_or_void(scope, name);
-  fts_label_t *label = 0;
+  fts_label_t *label = NULL;
   fts_atom_t key, a;
   
   fts_set_symbol(&key, name);
 
-  if(value && !fts_is_void(value))
+  if(value && fts_is_object(value))
     {
-      if(fts_is_object(value))
-	{
-	  fts_object_t *obj = fts_get_object(value);
-	  
-	  if(fts_object_get_metaclass(obj) == fts_label_type)
-	    label = (fts_label_t *)obj;
-	  else
-	    return 0; /* variable is not a label */
-	}
-      else
-	return 0; /* variable is even not an object */
+      fts_object_t *obj = fts_get_object(value);
+      
+      if(fts_object_get_metaclass(obj) == fts_label_type)
+	return (fts_label_t *)obj;
     }
-  else if(default_labels == 0)
+
+  if(default_labels == 0)
     {
       /* create hashtable if not existing yet */
       default_labels = (fts_hashtable_t *) fts_malloc(sizeof(fts_hashtable_t));
       fts_hashtable_init( default_labels, 0, FTS_HASHTABLE_MEDIUM);
     }
   else if(fts_hashtable_get(default_labels, &key, &a))
-    label = (fts_label_t *)fts_get_object(&a);
+    return (fts_label_t *)fts_get_object(&a);
 
-  if(!label)
-    {
-      /* if there wasn't a variable nor a default, make a default */
-      fts_set_void(&a);
-      label = (fts_label_t *)fts_object_create(fts_label_type, 1, &a);
-      
-      fts_set_object(&a, (fts_object_t *)label);
-      fts_hashtable_put(default_labels, &key, &a);
-      
-      fts_object_refer((fts_object_t *)label);
-    }
+  /* if there wasn't a variable nor a default, make a default */
+  fts_set_void(&a);
+  label = (fts_label_t *)fts_object_create(fts_label_type, 1, &a);
+  
+  fts_set_object(&a, (fts_object_t *)label);
+  fts_hashtable_put(default_labels, &key, &a);
+  
+  fts_object_refer((fts_object_t *)label);
 
   return label;
 }
@@ -296,12 +287,6 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       
       label = label_get_or_create(fts_object_get_patcher(o), name);
       fts_variable_add_user(fts_object_get_patcher(o), name, o);
-
-      if(!label)
-	{
-	  fts_object_set_error(o, "Variable %s is not a label", name);
-	  return;
-	}
     }
   else if(fts_is_label(at))
     label = (fts_label_t *)fts_get_object(at);
@@ -311,7 +296,7 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       return;
     }
 
-  fts_channel_add_origin(fts_label_get_channel(label), (fts_object_t *)this);  
+  fts_channel_add_origin(fts_label_get_channel(label), o);  
   this->channel = fts_label_get_channel(label);
 }
 
@@ -384,12 +369,6 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       
       label = label_get_or_create(fts_object_get_patcher(o), name);
       fts_variable_add_user(fts_object_get_patcher(o), name, o);
-
-      if(!label)
-	{
-	  fts_object_set_error(o, "Variable %s is not a label", name);
-	  return;
-	}
     }
   else if(fts_is_label(at))
     label = (fts_label_t *)fts_get_object(at);

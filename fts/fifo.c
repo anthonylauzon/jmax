@@ -21,6 +21,7 @@
  */
 
 #include <fts/fts.h>
+#include <string.h>
 #include <assert.h>
 
 void fts_fifo_init( fts_fifo_t *fifo, void *buffer, int size)
@@ -29,6 +30,52 @@ void fts_fifo_init( fts_fifo_t *fifo, void *buffer, int size)
   fifo->write_index = 0;
   fifo->buffer = buffer;
   fifo->size = size;
+}
+
+void fts_fifo_reinit( fts_fifo_t *fifo, void *buffer, int size)
+{
+  if(buffer != NULL)
+    {
+      if(fifo->write_index >= fifo->read_index)
+	{
+	  int fill = fifo->write_index - fifo->read_index;
+
+	  if(fill > size)
+	    fill = size;
+
+	  memcpy(buffer, (void *)fifo->buffer, fill);
+
+	  fifo->read_index = 0;
+	  fifo->write_index = fill;
+	}
+      else
+	{
+	  int head = fifo->size - fifo->read_index;
+	  int tail;
+
+	  if(head > size)
+	    head = size;
+
+	  memcpy(buffer, (void *)fifo->buffer + fifo->read_index, head);
+
+	  tail = fifo->write_index;
+	  if(head + tail > size)
+	    tail = size - head;
+
+	  memcpy(buffer + head, (void *)fifo->buffer, tail);
+
+	  fifo->read_index = 0;
+	  fifo->write_index = head + tail;
+	}
+
+      fifo->buffer = buffer;
+      fifo->size = size;
+    }    
+  else
+    { 
+      fifo->read_index = 0;
+      fifo->write_index = 0;
+    }
 }
 
 int fts_fifo_read_level( fts_fifo_t *fifo)
@@ -85,70 +132,5 @@ void fts_fifo_incr_write( fts_fifo_t *fifo, int incr)
     write_index -= fifo->size;
 
   fifo->write_index = write_index;
-}
-
-/***************************************************
- *
- *  event fifo
- *
- */
-void
-fts_eventfifo_init(fts_eventfifo_t *eventfifo, int size)
-{
-  int bytes = sizeof(fts_fifoevent_t) * size;
-
-  fts_fifo_init(&eventfifo->fifo, fts_malloc(bytes), bytes);
-
-  eventfifo->size = size;
-  eventfifo->delta = 0.0;
-}
-
-void
-fts_eventfifo_destroy(fts_eventfifo_t *eventfifo, int size)
-{
-  fts_free((void *)eventfifo->fifo.buffer);
-}
-
-fts_fifoevent_t *
-fts_eventfifo_get_read(fts_eventfifo_t *eventfifo)
-{
-  if(fts_fifo_read_level(&eventfifo->fifo) >= sizeof(fts_fifoevent_t)) {
-    fts_fifoevent_t *event = (fts_fifoevent_t *)fts_fifo_read_pointer(&eventfifo->fifo);
-    double time = event->time - eventfifo->delta;
-    double now = fts_get_time();
-
-    /* resync fifo */
-    if(time < now)
-      eventfifo->delta = event->time - now;
-
-    /* adjust event time and return (void value can serve for sync) */
-    if(!fts_is_void(&event->atom)) {
-      event->time = time;
-      return event;
-    }
-  }
-
-  return NULL;
-}
-
-fts_fifoevent_t *
-fts_eventfifo_get_write(fts_eventfifo_t *eventfifo)
-{
-  if(fts_fifo_write_level(&eventfifo->fifo) >= sizeof(fts_fifoevent_t *))
-    return *((fts_fifoevent_t **)fts_fifo_write_pointer(&eventfifo->fifo));
-  else
-    return NULL;
-}
-
-void
-fts_eventfifo_incr_read(fts_eventfifo_t *eventfifo)
-{
-  fts_fifo_incr_read(&eventfifo->fifo, sizeof(fts_fifoevent_t *));
-}
-
-void
-fts_eventfifo_incr_write(fts_eventfifo_t *eventfifo)
-{
-  fts_fifo_incr_write(&eventfifo->fifo, sizeof(fts_fifoevent_t *));
 }
 

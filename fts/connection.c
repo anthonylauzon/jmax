@@ -45,90 +45,95 @@
 fts_metaclass_t *fts_connection_type = 0;
 
 fts_connection_t *
-fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
+fts_connection_new(int id, fts_object_t *src, int woutlet, fts_object_t *dst, int winlet, fts_connection_type_t type)
 {
   fts_outlet_decl_t *outlet;
   fts_inlet_decl_t *inlet;
   fts_class_mess_t *mess = 0;
   fts_connection_t *conn;
   int invalid = 0;
-  int hidden = (id == FTS_HIDDEN);
   int anything;
 
   /* first of all, if one of the two object is an error object, add the required inlets/outlets to it */
-  if (fts_object_is_error(out))
+  if (fts_object_is_error(src))
     {
-      fts_error_object_fit_outlet(out, woutlet);
+      /* don't create hidden connections between error objects */
+      if(type <= fts_c_hidden)
+	return NULL;
+
+      fts_error_object_fit_outlet(src, woutlet);
       invalid = 1;
     }
   
-  if (fts_object_is_error(in))
+  if (fts_object_is_error(dst))
     {
-      fts_error_object_fit_inlet(in, winlet);
+      /* don't create hidden connections between error objects */
+      if(type <= fts_c_hidden)
+	return NULL;
+
+      fts_error_object_fit_inlet(dst, winlet);
       invalid = 1;
     }
 
   /* check the outlet range (should never happen, a part from loading) */
-  if (woutlet >= out->head.cl->noutlets || woutlet < 0)
+  if (woutlet >= src->head.cl->noutlets || woutlet < 0)
     {
-      fts_object_blip(out, "Outlet out of range");
-      return 0;
+      fts_object_blip(src, "Outlet out of range");
+      return NULL;
     }
 
   /* check againsts double connections */
   { 
     fts_connection_t *p;
     
-    for (p = out->out_conn[woutlet]; p ; p = p->next_same_src)
+    for (p = src->out_conn[woutlet]; p ; p = p->next_same_src)
       {
-	if ((p->dst == in) && (p->winlet == winlet))
+	if ((p->dst == dst) && (p->winlet == winlet))
 	  {
 	    /* Found, return error message */
 	    
-	    fts_object_blip(out, "Double connection, cannot connect.");
-	    return 0;
+	    fts_object_blip(src, "Double connection, cannot connect.");
+	    return NULL;
 	  }
       }
   }
   
   /* find the outlet and the inlet in the class structure */
-  outlet = &out->head.cl->outlets[woutlet];
+  outlet = &src->head.cl->outlets[woutlet];
 
   if (winlet == fts_SystemInlet)
-    inlet = in->head.cl->sysinlet;
-  else if (winlet < in->head.cl->ninlets && winlet >= 0)
-    inlet = &in->head.cl->inlets[winlet];
+    inlet = dst->head.cl->sysinlet;
+  else if (winlet < dst->head.cl->ninlets && winlet >= 0)
+    inlet = &dst->head.cl->inlets[winlet];
   else
     {
-      fts_object_blip(out, "Inlet out of range, cannot connect.");
-      return 0;
+      fts_object_blip(src, "Inlet out of range, cannot connect.");
+      return NULL;
     }
 
   if(outlet->tmess.symb)
     {
       mess = fts_class_mess_inlet_get(inlet, outlet->tmess.symb, &anything);
 
-      if(!mess || (anything && outlet->tmess.symb == fts_s_sig && !fts_object_is_thru(in)))
+      if(!mess || (anything && outlet->tmess.symb == fts_s_sig && !fts_object_is_thru(dst)))
 	{
-	  fts_object_blip(out, "Type mismatch, cannot connect");
-	  return 0;
+	  fts_object_blip(src, "Type mismatch, cannot connect");
+	  return NULL;
 	}
     }
 
   conn = (fts_connection_t *) fts_object_create(fts_connection_type, 0, 0);
 
   conn->id = id;
-  conn->src = out;
+  conn->src = src;
   conn->woutlet = woutlet;
-  conn->dst = in;
+  conn->dst = dst;
   conn->winlet = winlet;
 
-  if(hidden)
-    conn->type = fts_c_hidden;
-  else if(invalid)
+  if(invalid && type > fts_c_hidden)
     conn->type = fts_c_invalid;
   else
-    conn->type = fts_c_anything;
+    conn->type = type;
 
   ((fts_object_t *)conn)->patcher = conn->src->patcher;
 
@@ -158,26 +163,26 @@ fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int
     }
 
   /* add the connection to the outlet list and to the inlet list  */
-  if (! out->out_conn[woutlet])
+  if (! src->out_conn[woutlet])
     {
       conn->next_same_src = 0;
-      out->out_conn[woutlet] = conn;
+      src->out_conn[woutlet] = conn;
     }
   else
     {
-      conn->next_same_src = out->out_conn[woutlet];
-      out->out_conn[woutlet] = conn;
+      conn->next_same_src = src->out_conn[woutlet];
+      src->out_conn[woutlet] = conn;
     }
 
-  if (! in->in_conn[winlet])
+  if (! dst->in_conn[winlet])
     {
       conn->next_same_dst = 0;
-      in->in_conn[winlet] = conn;
+      dst->in_conn[winlet] = conn;
     }
   else
     {
-      conn->next_same_dst = in->in_conn[winlet];
-      in->in_conn[winlet] = conn;
+      conn->next_same_dst = dst->in_conn[winlet];
+      dst->in_conn[winlet] = conn;
     }
 
   return conn;
@@ -192,7 +197,7 @@ fts_connection_delete(fts_connection_t *conn)
   fts_connection_t *prev = 0;
 
   /* First, release the client representation of the connection, if any */
-  if ( fts_object_has_id( (fts_object_t *)conn))
+  if ( fts_object_has_id( (fts_object_t *)conn) && conn->type > fts_c_hidden)
     fts_patcher_release_connection((fts_object_t *)conn->src->patcher, conn);
 
   src = conn->src;
@@ -215,6 +220,20 @@ fts_connection_delete(fts_connection_t *conn)
 	*p = (*p)->next_same_dst;
 	break;
       }
+}
+
+fts_connection_t *
+fts_connection_get(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet)
+{
+  fts_connection_t *c;
+
+  for(c=src->out_conn[woutlet]; c; c=c->next_same_src)
+    {
+      if(c->dst == dst && c->winlet == winlet)
+	return c;
+    }
+
+  return NULL;
 }
 
 /*   
@@ -243,9 +262,7 @@ fts_object_move_connections(fts_object_t *old, fts_object_t *new)
 	{	
 	  for (p = old->out_conn[outlet]; p ;  p = old->out_conn[outlet])
 	    {
-	      fts_connection_t *new_c;
-
-	      new_c = fts_connection_new(p->id, new, p->woutlet, p->dst, p->winlet);
+	      fts_connection_new(p->id, new, p->woutlet, p->dst, p->winlet, p->type);
 	      fts_connection_delete(p);
 	    }
 	}
@@ -267,9 +284,7 @@ fts_object_move_connections(fts_object_t *old, fts_object_t *new)
 	{
 	  for (p = old->in_conn[inlet]; p; p = old->in_conn[inlet])
 	    {
-	      fts_connection_t *new_c;
-
-	      new_c = fts_connection_new(p->id, p->src, p->woutlet, new, p->winlet);
+	      fts_connection_new(p->id, p->src, p->woutlet, new, p->winlet, p->type);
 	      fts_connection_delete(p);
 	    }
 	}
@@ -288,17 +303,13 @@ fts_object_upload_connections(fts_object_t *obj)
   for (outlet = 0; outlet < obj->head.cl->noutlets; outlet++)
     {
       for (p = obj->out_conn[outlet]; p ; p = p->next_same_src)
-	{
-	  if(fts_connection_get_type(p) != fts_c_hidden)
-	    fts_client_upload_object((fts_object_t *)p, -1);
-	}
+	fts_client_upload_object((fts_object_t *)p, -1);
     }
 
   for (inlet = 0; inlet < obj->head.cl->ninlets; inlet++)
     {
       for (p = obj->in_conn[inlet]; p; p = p->next_same_dst)
-	if(fts_connection_get_type(p) != fts_c_hidden)
-	  fts_client_upload_object((fts_object_t *)p, -1);
+	fts_client_upload_object((fts_object_t *)p, -1);
     }
 }
 

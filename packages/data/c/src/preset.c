@@ -376,23 +376,6 @@ preset_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-preset_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  preset_t *this = (preset_t *)obj;
-
-  if(fts_is_symbol(value))
-    this->keep = fts_get_symbol(value);
-}
-
-static void
-preset_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  preset_t *this = (preset_t *)obj;
-
-  fts_set_symbol(value, this->keep);
-}
-
-static void
 preset_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   fts_set_object(value, obj);
@@ -448,7 +431,7 @@ preset_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     }
 
   this->n_objects = ac;
-  this->keep = fts_s_no;
+  data_object_set_keep((data_object_t *)o, fts_s_no);
   this->current = 0;
 }
 
@@ -478,8 +461,8 @@ preset_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, sym_dump_mess, preset_dump_mess);
 
   /* persistency */
-  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, preset_set_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, preset_get_keep);
+  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, preset_get_state);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("store"), preset_store);

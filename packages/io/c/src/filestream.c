@@ -26,9 +26,11 @@
 #include <fts/fts.h>
 
 #include <string.h>
+#include <unistd.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <errno.h>
-
 
 static fts_symbol_t sym_in = 0;
 static fts_symbol_t sym_out = 0;
@@ -37,7 +39,7 @@ typedef struct _filestream_
 {
   fts_bytestream_t head;
   fts_symbol_t name;
-  FILE* fd;
+  int fd;
   unsigned char *in_buf; /* input buffer */
   int in_size;
   unsigned char *out_buf; /* output buffer */
@@ -52,13 +54,14 @@ filestream_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   int size = this->in_size;
   int n_read;
 
-  do
-    {
-      n_read = fread(this->in_buf, 1, size, this->fd);
+  n_read = read(this->fd, this->in_buf, size);
+  fts_bytestream_input((fts_bytestream_t *)o, n_read, this->in_buf);
 
+  while(n_read == size)
+    {
+      n_read = read(this->fd, this->in_buf, size);
       fts_bytestream_input((fts_bytestream_t *)o, n_read, this->in_buf);
-    }      
-  while(n_read == size);
+    }
 }
 
 /************************************************************************
@@ -80,10 +83,10 @@ static void
 filestream_output(fts_bytestream_t *stream, int n, const unsigned char *c)
 {
   filestream_t *this = (filestream_t *)stream;
-  int n_wrote = fwrite(&c, 1, n, this->fd);
+  int n_wrote = write(this->fd, c, n);
 
   if(n_wrote != n)
-    post("filestream %s: write error (%s)\n", this->name, strerror(errno));
+    fts_object_signal_runtime_error((fts_object_t *)stream, "Write error for file %s", this->name);
 }
 
 static void
@@ -91,10 +94,10 @@ filestream_output_char(fts_bytestream_t *stream, unsigned char c)
 {
   filestream_t *this = (filestream_t *)stream;
   /* un-buffered output */
-  int n_wrote = fwrite(&c, 1, 1, this->fd);
+  int n_wrote = write(this->fd, &c, 1);
   
   if(n_wrote != 1)
-    post("filestream %s: write error (%s)\n", this->name, strerror(errno));
+    fts_object_signal_runtime_error((fts_object_t *)stream, "Write error for file %s", this->name);
 }
 
 static void
@@ -109,7 +112,7 @@ filestream_output_buffered(fts_bytestream_t *stream, int n, const unsigned char 
   if(n_over > 0)
     {
       bcopy(c, this->out_buf + this->out_fill, n - n_over);
-      n_wrote = fwrite(this->out_buf, 1, this->out_size, this->fd);
+      n_wrote = write(this->fd, this->out_buf, this->out_size);
       
       bcopy(c, this->out_buf, n_over);
       this->out_fill = n_over;
@@ -117,7 +120,7 @@ filestream_output_buffered(fts_bytestream_t *stream, int n, const unsigned char 
   else if(n_over == 0)
     {
       bcopy(c, this->out_buf + this->out_fill, n);
-      n_wrote = fwrite(this->out_buf, 1, this->out_size, this->fd);
+      n_wrote = write(this->fd, this->out_buf, this->out_size);
       
       this->out_fill = 0;
     }
@@ -130,7 +133,7 @@ filestream_output_buffered(fts_bytestream_t *stream, int n, const unsigned char 
     }
   
   if(n_wrote != n)
-    post("filestream %s: write error (%s)\n", this->name, strerror(errno));
+    fts_object_signal_runtime_error((fts_object_t *)stream, "Write error for file %s", this->name);
 }
 
 static void
@@ -144,10 +147,10 @@ filestream_output_char_buffered(fts_bytestream_t *stream, unsigned char c)
   
   if(this->out_fill >= out_size)
     {
-      n_wrote = fwrite(this->out_buf, 1, this->out_size, this->fd);
+      n_wrote = write(this->fd, this->out_buf, this->out_size);
       
       if(n_wrote != out_size)
-	post("filestream %s: write error (%s)\n", this->name, strerror(errno));
+	fts_object_signal_runtime_error((fts_object_t *)stream, "Write error for file %s", this->name);
 
       this->out_fill = 0;
     }
@@ -162,10 +165,10 @@ filestream_flush(fts_bytestream_t *stream)
   
   if(n > 0)
     {
-      int n_wrote = fwrite(this->out_buf, 1, n, this->fd);
+      int n_wrote = write(this->fd, this->out_buf, n);
       
       if(n_wrote != n)
-	post("filestream %s: write error (%s)\n", this->name, strerror(errno));
+	fts_object_signal_runtime_error((fts_object_t *)stream, "Write error for file %s", this->name);
     }
 
   this->out_fill = 0;
@@ -210,6 +213,92 @@ filestream_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   filestream_flush(&this->head);
 }
 
+static void
+filestream_start(filestream_t *this)
+{ 
+  fts_bytestream_t *stream = (fts_bytestream_t *)this;
+
+  /* open file */
+  if(this->in_size > 0 && this->out_size > 0)
+    this->fd = open(this->name, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+  else if(this->in_size > 0)
+    this->fd = open(this->name, O_RDONLY);
+  else if(this->out_size > 0)
+    this->fd = open(this->name, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+  
+  if(this->fd >= 0)
+    {
+      if(this->in_size > 0)
+	{
+	  /* add file descriptor for input select */
+	  fts_sched_add((fts_object_t *)this, FTS_SCHED_READ, this->fd);
+	  
+	  /* set byte input */
+	  fts_bytestream_set_input(stream);
+	  
+	  /* install default input callback */
+	  fts_bytestream_add_listener(stream, (fts_object_t *)this, filestream_default_input);
+	}
+      
+      if(this->out_size > 0)
+	{
+	  if(this->out_buf != NULL)
+	    /* install buffered output functions */
+	    fts_bytestream_set_output(stream, filestream_output_buffered, filestream_output_char_buffered, filestream_flush);
+	  else
+	    /* install un-buffered output functions */
+	    fts_bytestream_set_output(stream, filestream_output, filestream_output_char, 0);
+	}
+    }
+  else
+    fts_object_signal_runtime_error((fts_object_t *)this, "Can't open file \"%s\" (%s)", this->name, strerror(errno));
+}
+  
+static void
+filestream_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  filestream_t *this = (filestream_t *)o;
+
+  if(ac > 0 && fts_is_symbol(at))
+    this->name = fts_get_symbol(at);
+      
+  if(this->name != NULL)
+    {
+      if(ac > 1)
+	{
+	  if(fts_is_number(at + 1))
+	    this->in_size = fts_get_number_int(at + 1);
+	  
+	  if(ac > 2 && fts_is_number(at + 2))
+	    this->out_size = fts_get_number_int(at + 2);
+	}
+      else
+	this->in_size = this->out_size = 1;
+      
+      if(this->in_size > 0)
+	this->in_buf = (unsigned char *)fts_malloc(this->in_size);
+      
+      if(this->out_size > 1)
+	this->out_buf = (unsigned char *)fts_malloc(this->out_size);
+      
+      fts_bytestream_init((fts_bytestream_t *)this);
+      filestream_start(this);
+    }
+}
+
+static void
+filestream_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  filestream_t *this = (filestream_t *)o;
+
+  if(this->fd >= 0)
+    {
+      close(this->fd);
+      fts_bytestream_remove_listener((fts_bytestream_t *)this, o);
+      fts_sched_remove( (fts_object_t *)this);
+    }  
+}
+
 /************************************************************
  *
  *  class
@@ -220,145 +309,34 @@ static void
 filestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   filestream_t *this = (filestream_t *)o;
-  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-      
-  if(name)
+
+  ac--;
+  at++;
+
+  this->name = NULL;
+  this->fd = -1;
+  this->in_buf = NULL;
+  this->in_size = 0;
+  this->out_buf = NULL;
+  this->out_size = 0;
+  this->out_fill = 0;
+
+  if(ac > 0)
     {
-      int in = 0;
-      int out = 0;
-      int in_size = 0;
-      int out_size = 0;
-      FILE* fd = NULL;
-
-      this->fd = NULL;
-      this->in_buf = 0;
-      this->in_size = 0;
-      this->out_buf = 0;
-      this->out_size = 0;
-      this->out_fill = 0;
-
-      if(ac == 2)
+      if(ac > 1)
 	{
-	  in = 1;
-	  out = 1;
+	  /* syntax: filestream name [<in buffer size> [<out buffer size>]] */
+	  if(fts_is_number(at + 1))
+	    this->in_size = fts_get_number_int(at + 1);
+	  
+	  if(ac > 2 && fts_is_number(at + 2))
+	    this->out_size = fts_get_number_int(at + 2);
 	}
       else
-	{
-	  int i = 2;
-
-	  /* syntax: filestream [in [<in buffer size>]] [out [<out buffer size>]] */
-	  while(i < ac && fts_is_symbol(at + i))
-	    {
-	      fts_symbol_t sym = fts_get_symbol(at + i);
-	      i++;
-	      
-	      if(sym == sym_in)
-		{
-		  in = 1;
-		  
-		  if(fts_is_number(at + i))
-		    {
-		      in_size = fts_get_number_int(at + i);
-		      i++;
-		    }
-		}
-	      else if(sym == sym_out)
-		{
-		  out = 1;
-		  
-		  if(fts_is_number(at + i))
-		    {
-		      out_size = fts_get_number_int(at + i);
-		      i++;
-		    }
-		}
-	      else
-		return;
-	    }
-	  
-	  /* syntax: filestream [<in buffer size> [<out buffer size>]] */
-	  if(!in && !out && fts_is_number(at + i))
-	    {
-	      in = 1;
-	      out = 1;
-	      
-	      in_size = fts_get_number_int(at + i);
-	      i++;
-	      
-	      if(fts_is_number(at + i))
-		out_size = fts_get_number_int(at + i);
-	    }
-	}
-
-      /* allocate buffers */
-      if(in_size <= 0)
-	in_size = 1;
-
-      if(in)
-	{
-	  this->in_buf = (unsigned char *)fts_malloc(in_size);
-	  this->in_size = in_size;
-	}
-
-      if(out && out_size)
-	{
-	  this->out_buf = (unsigned char *)fts_malloc(out_size);
-	  this->out_size = out_size;
-	}
-
-      /* open file */
-      if(in && out)
-	fd = fopen(name, "w+b");
-      else if(in)
-	fd = fopen(name, "rb");
-      else if(out)
-	fd = fopen(name, "wb");
+	this->in_size = this->out_size = 1;
       
-      if(fd == NULL)
-	{
-	  fts_object_set_error(o, "filestream: Can't open file \"%s\" (%s)\n", name, strerror(errno));
-	  return;
-	}
-
-      fts_bytestream_init(&this->head);
-	  
-      if(in)
-	{
-	  /* add file descriptor for input select */
-	  fts_sched_add( o, FTS_SCHED_READ, fd);
-
-	  /* set byte input */
-	  fts_bytestream_set_input(&this->head);
-
-	  /* install default input callback */
-	  fts_bytestream_add_listener(&this->head, o, filestream_default_input);
-	}
-
-      if(out)
-	{
-	  if(this->out_buf)
-	    {
-	      /* install buffered output functions */
-	      fts_bytestream_set_output(&this->head, filestream_output_buffered, filestream_output_char_buffered, filestream_flush);
-	    }
-	  else
-	    {
-	      /* install un-buffered output functions */
-	      fts_bytestream_set_output(&this->head, filestream_output, filestream_output_char, 0);
-	    }
-	}
-      
-      this->fd = fd;
-      this->name = name;
+      filestream_open(o, 0, 0, ac, at);
     }
-  else
-    {
-      this->fd = NULL;
-      this->name = 0;
-
-      this->in_buf = 0;
-      this->out_buf = 0;
-   }
 }
 
 static void 
@@ -366,12 +344,7 @@ filestream_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 { 
   filestream_t *this = (filestream_t *)o;
 
-  if(this->fd != NULL)
-    {
-      fclose(this->fd);
-      fts_bytestream_remove_listener(&this->head, o);
-      fts_sched_remove( (fts_object_t *)this);
-    }
+  filestream_close(o, 0, 0, 0, 0);
 }
 
 /************************************************************
@@ -384,10 +357,8 @@ filestream_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t p
 {
   filestream_t *this = (filestream_t *)o;
 
-  if(this->fd != NULL)
+  if(this->fd >= 0)
     fts_set_object(value, o);
-  else
-    fts_set_void(value);
 }
 
 /************************************************************
@@ -408,6 +379,9 @@ filestream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, filestream_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, filestream_read);
 
+  
+  fts_method_define_varargs(cl, 0, fts_s_open, filestream_open);
+  fts_method_define_varargs(cl, 0, fts_s_close, filestream_close);
   fts_method_define_varargs(cl, 0, fts_s_bang, filestream_bang);
   fts_method_define_varargs(cl, 0, fts_s_int, filestream_int);
   fts_method_define_varargs(cl, 0, fts_s_list, filestream_list);

@@ -51,6 +51,8 @@ struct fts_patcher
 #define fts_patcher_get_args(p)    ((p)->args)
 #define fts_patcher_is_open(p)     ((p)->open)
 
+FTS_API void fts_patcher_set_dirty(fts_patcher_t *this, int is_dirty);
+
 FTS_API fts_patcher_t *fts_get_root_patcher(void);
 
 

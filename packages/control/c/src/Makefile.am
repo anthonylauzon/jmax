@@ -5,12 +5,14 @@ control.c \
 count.c \
 demux.c \
 dispatch.c \
+fifo.c \
 for.c \
 invoke.c \
 make.c \
 mess.c \
 oneshot.c \
 range.c \
+stack.c \
 switch.c \
 sync.c \
 tup.c

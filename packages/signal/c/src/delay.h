@@ -32,10 +32,10 @@ typedef struct
   fts_object_t o;
   float *samples; /* pointer to delay line */
   int phase; /* current ring buffer phase */
-  int ring_size; /* size of ring buffer in samples */
   int size; /* virtual delay line size in samples */
-  int alloc_size; /* size of allocation (NOT real size) */
+  int alloc; /* size of biggest allocation */
   double length; /* delay line size given in msec */
+  fts_object_t *stage; /* DSP stage */
   double sr;
   int n_tick;
 } delayline_t;
@@ -43,7 +43,7 @@ typedef struct
 #define delayline_get_samples(d) ((d)->samples)
 #define delayline_get_phase(d) ((d)->phase)
 #define delayline_get_size(d) ((d)->size)
-#define delayline_get_ring_size(d) ((d)->ring_size)
+#define delayline_get_stage(d) ((d)->stage)
 #define delayline_get_sr(d) ((d)->sr)
 #define delayline_get_n_tick(d) ((d)->n_tick)
 

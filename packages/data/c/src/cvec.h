@@ -30,11 +30,10 @@
 
 typedef struct _cvec_
 {
-  fts_object_t o;
+  data_object_t o;
   complex *values;
   int size;
   int alloc;
-  fts_symbol_t keep;
 } cvec_t;
 
 DATA_API fts_symbol_t cvec_symbol;

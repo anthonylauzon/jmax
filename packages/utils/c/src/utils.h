@@ -120,12 +120,21 @@ UTILS_API float *fts_fftab_get_hanning(int size); /* hanning (offset cosine) win
  */
 
 #define FTS_CUBIC_TABLE_BITS 8
-#define FTS_CUBIC_TABLE_SHIFT_BITS 24
 #define FTS_CUBIC_TABLE_SIZE 256
-#define FTS_CUBIC_TABLE_BIT_MASK 0xff000000
+
+#define FTS_CUBIC_INTPHASE_LOST_BITS 8
+#define FTS_CUBIC_INTPHASE_FRAC_BITS (FTS_CUBIC_TABLE_BITS + FTS_CUBIC_INTPHASE_LOST_BITS)
+#define FTS_CUBIC_INTPHASE_FRAC_SIZE (1 << FTS_CUBIC_INTPHASE_FRAC_BITS)
 
 #define fts_cubic_get_table_index(i) \
-   ((int)(((i).frac & FTS_CUBIC_TABLE_BIT_MASK) >> FTS_CUBIC_TABLE_SHIFT_BITS))
+   ((int)(((i).frac & FTS_CUBIC_IDEFIX_BIT_MASK) >> FTS_CUBIC_IDEFIX_SHIFT_BITS))
+
+#define FTS_CUBIC_IDEFIX_SHIFT_BITS 24
+#define FTS_CUBIC_IDEFIX_BIT_MASK 0xff000000
+
+#define fts_cubic_intphase_scale(f) ((f) * FTS_CUBIC_INTPHASE_FRAC_SIZE)
+#define fts_cubic_intphase_get_int(i) ((i) >> FTS_CUBIC_INTPHASE_FRAC_BITS)
+#define fts_cubic_intphase_get_frac(i) ((i) & (FTS_CUBIC_INTPHASE_FRAC_SIZE - 1))
 
 typedef struct
 {
@@ -140,10 +149,17 @@ UTILS_API fts_cubic_coefs_t *fts_cubic_table;
 #define fts_cubic_calc(x, p) \
   ((x)[-1] * (p)->pm1 + (x)[0] * (p)->p0 + (x)[1] * (p)->p1 + (x)[2] * (p)->p2)
 
-#define fts_cubic_interpolate_with_idefix(p, i, y) \
+#define fts_cubic_idefix_interpolate(p, i, y) \
   do { \
     fts_cubic_coefs_t *ft = fts_cubic_table + fts_cubic_get_table_index(i); \
     *(y) = fts_cubic_calc((p) + (i).index, ft); \
+  } while(0)
+
+#define fts_cubic_intphase_interpolate(p, i, y) \
+  do { \
+    float* q = (p) + ((i) >> FTS_CUBIC_INTPHASE_FRAC_BITS); \
+    fts_cubic_coefs_t *ft = fts_cubic_table + (((i) >> FTS_CUBIC_INTPHASE_LOST_BITS) & (FTS_CUBIC_TABLE_SIZE - 1)); \
+    *(y) = fts_cubic_calc(q, ft); \
   } while(0)
 
 #define fts_cubic_interpolate(p, i, f, y) \
@@ -151,8 +167,6 @@ UTILS_API fts_cubic_coefs_t *fts_cubic_table;
     fts_cubic_coefs_t *ft = fts_cubic_table + ((unsigned int)((f) * (double)FTS_CUBIC_TABLE_SIZE) & (FTS_CUBIC_TABLE_SIZE - 1)); \
     *(y) = fts_cubic_calc((p) + (i), ft); \
   } while(0)
-
-
 
 /*****************************************
  *

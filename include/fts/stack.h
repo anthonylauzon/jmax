@@ -142,3 +142,6 @@ FTS_API int __fts_stack_realloc( fts_stack_t *b);
  * @ingroup stack
  */
 #define fts_stack_size(S) ((S)->top + 1)
+
+
+

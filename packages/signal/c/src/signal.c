@@ -35,6 +35,8 @@ extern void signal_white_config(void);
 extern void signal_osc_config(void);
 extern void signal_wave_config(void);
 
+extern void signal_env_config(void);
+
 extern void signal_matrix_config(void);
 extern void signal_delay_config(void);
 extern void signal_harmtap_config(void);
@@ -56,6 +58,8 @@ signal_config(void)
   signal_white_config();
   signal_osc_config();
   signal_wave_config();
+
+  signal_env_config();
 
   signal_matrix_config();
   signal_delay_config();

@@ -1220,7 +1220,7 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   ac--;
   at++;
 
-  this->keep = fts_s_no;
+  data_object_set_keep((data_object_t *)o, fts_s_no);
 
   if(ac == 0)
     fmat_set_size(this, 0, 0);
@@ -1254,7 +1254,7 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fmat_set_size(this, m, n);
       fmat_set_from_tuples(this, ac, at);
 
-      this->keep = fts_s_args;
+      data_object_set_keep((data_object_t *)o, fts_s_args);
     }
   else
     fts_object_set_error(o, "Wrong arguments");
@@ -1266,23 +1266,6 @@ fmat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fmat_t *this = (fmat_t *)o;
   
   fts_free(this->values);
-}
-
-static void
-fmat_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fmat_t *this = (fmat_t *)obj;
-
-  if(this->keep != fts_s_args && fts_is_symbol(value))
-    this->keep = fts_get_symbol(value);
-}
-
-static void
-fmat_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fmat_t *this = (fmat_t *)obj;
-
-  fts_set_symbol(value, this->keep);
 }
 
 static void
@@ -1302,8 +1285,8 @@ fmat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, fmat_print); 
 
-  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, fmat_set_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, fmat_get_keep);
+  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, fmat_get_fmat);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_instance, fmat_set_from_instance);

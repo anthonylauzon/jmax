@@ -32,12 +32,11 @@ DATA_API fts_symbol_t mat_symbol;
 
 typedef struct
 {
-  fts_object_t head;
+  data_object_t head;
   fts_atom_t *data; /* mat data */
   int m; /* # of rows */
   int n; /* # of columns */
   int alloc; /* current alloc size for lazy allocation */
-  fts_symbol_t keep;
 } mat_t;
 
 DATA_API void mat_set_size(mat_t *mat, int m, int n);

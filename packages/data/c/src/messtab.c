@@ -648,23 +648,6 @@ getmess_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-messtab_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  messtab_t *this = (messtab_t *)obj;
-
-  if(this->keep != fts_s_args && fts_is_symbol(value))
-    this->keep = fts_get_symbol(value);
-}
-
-static void
-messtab_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  messtab_t *this = (messtab_t *)obj;
-
-  fts_set_symbol(value, this->keep);
-}
-
-static void
 messtab_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   fts_set_object(value, obj);
@@ -736,7 +719,7 @@ messtab_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_hashtable_init(&this->table_int, FTS_HASHTABLE_INT, FTS_HASHTABLE_SMALL);
   fts_hashtable_init(&this->table_symbol, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
 
-  this->keep = fts_s_no;
+  data_object_set_keep((data_object_t *)o, fts_s_no);
 
   for(i=0; i<ac; i++)
     {
@@ -779,7 +762,7 @@ messtab_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  fts_object_set_error(o, "Wrong arguments");
 	}
 
-      this->keep = fts_s_args;
+      data_object_set_keep((data_object_t *)o, fts_s_args);
     }
 }
 
@@ -807,8 +790,8 @@ messtab_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, messtab_dump);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, messtab_print);
 
-  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, messtab_set_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, messtab_get_keep);
+  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, messtab_get_state);
   
   fts_method_define_varargs(cl, 0, fts_s_import, messtab_import);

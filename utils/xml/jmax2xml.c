@@ -802,7 +802,7 @@ static int run_vm( unsigned char *program, fts_symbol_t symbol_table[], FILE *ou
 	    outlet = fts_get_int(&eval_stack[eval_tos]);
 	    inlet = fts_get_int(&eval_stack[eval_tos + 1]);
 /*  	    fts_connection_new(FTS_NO_ID, object_stack[object_tos], fts_get_int(&eval_stack[eval_tos]), */
-/*  			       object_stack[object_tos + 1], fts_get_int(&eval_stack[eval_tos + 1])); */
+/*  			       object_stack[object_tos + 1], fts_get_int(&eval_stack[eval_tos + 1]), fts_c_anything); */
 	    xml_connect( out, &indent, src, outlet, dst, inlet);
 	  }
 	break;

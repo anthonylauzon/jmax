@@ -1092,11 +1092,14 @@ static void patcher_save_connections( FILE *file, fts_object_t *object, int patc
 
 	  for ( c = object->out_conn[outlet]; c ; c = c->next_same_src)
 	    {
-	      fprintf( file, "#P connect %d %d %d %d;\n", 
-		       patcher_object_count - 1 - object_index,
-		       outlet, 
-		       patcher_object_count - 1 - find_object_index_in_patcher( c->dst),
-		       c->winlet);
+	      if(fts_connection_get_type(c) > fts_c_hidden) /* don't save hidden connections */
+		{
+		  fprintf( file, "#P connect %d %d %d %d;\n", 
+			   patcher_object_count - 1 - object_index,
+			   outlet, 
+			   patcher_object_count - 1 - find_object_index_in_patcher( c->dst),
+			   c->winlet);
+		}
 	    }
 	}
 
@@ -1359,11 +1362,15 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
   fts_atom_t b[1];
   fts_memorystream_t *stream;
   fts_status_t stat;
-
+  
   if(fts_object_get_class_name(obj) == fts_s_connection)
     {
       fts_connection_t *conn = (fts_connection_t *)obj;
 
+      /* don't upload hidden connections */
+      if(fts_connection_get_type(conn) <= fts_c_hidden)
+	return;
+      
       fts_client_start_message( this, sym_addConnection);
       fts_client_add_int( this, fts_get_object_id(obj));
       fts_client_add_object( this, conn->src);
@@ -1404,7 +1411,7 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
 	fts_client_add_symbol( this, fts_object_get_class_name( obj));
       
       fts_client_add_int( this, fts_object_is_template(obj));
-
+      
       stream = patcher_get_memory_stream();
       fts_memorystream_reset( stream);
       
@@ -1416,18 +1423,18 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
 	}
       fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
       fts_client_add_string( this, fts_memorystream_get_bytes( stream));
-
+      
       fts_client_done_message( this);
-
+      
       fts_object_get_prop(obj, fts_s_font, a);
-
+      
       if( fts_get_symbol(a))
 	{
 	  fts_object_get_prop(obj, fts_s_fontSize, a+1);
 	  fts_object_get_prop(obj, fts_s_fontStyle, a+2);
 	  fts_client_send_message(obj, fts_s_setFont, 3, a);
 	}
-
+      
       fts_send_message(obj, fts_SystemInlet, fts_s_send_properties, 0, 0);
     }
 }
@@ -1570,7 +1577,7 @@ fts_patcher_add_connection_from_client( fts_object_t *o, int winlet, fts_symbol_
 
       if (to && from)
 	{
-	  connection = fts_connection_new( -1, from, outlet, to, inlet);
+	  connection = fts_connection_new( -1, from, outlet, to, inlet, fts_c_anything);
 		  
 	  if (! connection)
 	    {
@@ -1639,11 +1646,10 @@ static void fts_patcher_paste( fts_object_t *o, int winlet, fts_symbol_t s, int 
 	  fts_connection_t *c;
 
 	  for (c = p->out_conn[outlet]; c ; c = c->next_same_src)
-	    if (!fts_object_has_id((fts_object_t *)c))
-	      {
-		((fts_object_t *)c)->patcher = this;
-		fts_client_upload_object((fts_object_t *)c, -1);
-	      }
+	    {
+	      ((fts_object_t *)c)->patcher = this;
+	      fts_client_upload_object((fts_object_t *)c, -1);
+	    }
 	}
     }
   

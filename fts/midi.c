@@ -2266,12 +2266,12 @@ fts_midi_config(void)
   fts_array_init(&midiconfig_outputs, 0, 0);
 
   /* midi manager interface messages */
-  fts_midimanager_s_get_default_input = fts_new_symbol("get_default_input");
-  fts_midimanager_s_get_default_output = fts_new_symbol("get_default_output");
-  fts_midimanager_s_append_input_names = fts_new_symbol("append_input_names");
-  fts_midimanager_s_append_output_names = fts_new_symbol("append_output_names");
-  fts_midimanager_s_get_input = fts_new_symbol("get_input");
-  fts_midimanager_s_get_output = fts_new_symbol("get_output");
+  fts_midimanager_s_get_default_input = fts_new_symbol("_midimanager_get_default_input");
+  fts_midimanager_s_get_default_output = fts_new_symbol("_midimanager_get_default_output");
+  fts_midimanager_s_append_input_names = fts_new_symbol("_midimanager_append_input_names");
+  fts_midimanager_s_append_output_names = fts_new_symbol("_midimanager_append_output_names");
+  fts_midimanager_s_get_input = fts_new_symbol("_midimanager_get_input");
+  fts_midimanager_s_get_output = fts_new_symbol("_midimanager_get_output");
 
   /* MIDI configuration class */
   midiconfig_type = fts_class_install(midiconfig_s_name, midiconfig_instantiate);

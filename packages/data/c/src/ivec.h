@@ -29,11 +29,10 @@
 
 typedef struct _ivec_
 {
-  fts_object_t o;
+  data_object_t o;
   int *values;
   int size;
   int alloc;
-  fts_symbol_t keep;
   int opened; /* non zero if editor open */
   int vsize; /* visible points */
   int vindex; /* first visible point */

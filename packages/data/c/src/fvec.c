@@ -1433,23 +1433,6 @@ fvec_assign(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-fvec_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fvec_t *this = (fvec_t *)obj;
-
-  if(this->keep != fts_s_args && fts_is_symbol(value))
-    this->keep = fts_get_symbol(value);
-}
-
-static void
-fvec_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fvec_t *this = (fvec_t *)obj;
-
-  fts_set_symbol(value, this->keep);
-}
-
-static void
 fvec_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   fts_set_object(value, obj);
@@ -1486,7 +1469,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   this->values = NULL;
   this->size = 0;
   this->alloc = FVEC_NO_ALLOC;
-  this->keep = fts_s_no;
+  data_object_set_keep((data_object_t *)o, fts_s_no);
 
   this->sr = 0.0;
 
@@ -1504,7 +1487,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       
       fvec_set_size(this, size);
       fvec_set_with_onset_from_atoms(this, 0, size, fts_tuple_get_atoms(tup));
-      this->keep = fts_s_args;
+      data_object_set_keep((data_object_t *)o, fts_s_args);
     }
   else if(ac == 1 && fts_is_symbol(at))
     {
@@ -1519,14 +1502,14 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       if(size == 0)
 	fts_object_set_error(o, "Cannot load fvec from file \"%s\"", file_name);
 
-      this->keep = fts_s_args;
+      data_object_set_keep((data_object_t *)o, fts_s_args);
     }
   else if(ac > 1)
     {
       fvec_set_size(this, ac);
       fvec_set_with_onset_from_atoms(this, 0, ac, at);
 
-      this->keep = fts_s_args;
+      data_object_set_keep((data_object_t *)o, fts_s_args);
     }
   else
     fts_object_set_error(o, "Wrong arguments for fvec constructor");
@@ -1565,8 +1548,8 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_load, fvec_load);
 
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("sr"), fvec_set_sr);
-  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, fvec_set_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, fvec_get_keep);
+  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, fvec_get_state);
   
   fts_method_define_varargs(cl, 0, fts_s_bang, fvec_output);

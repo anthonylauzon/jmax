@@ -690,7 +690,8 @@ dsp_graph_succ_realize(fts_dsp_graph_t *graph, fts_dsp_node_t *node, edge_fun_t 
 		      graph_iterator_apply_to_connection_stack(&iter, mark_signal_connection, (void *)&(graph->signal_connection_table));
 		    }
 
-		  (*fun)( graph, node, woutlet, succ_node, winlet, *sig);
+		  if(sig)
+		    (*fun)( graph, node, woutlet, succ_node, winlet, *sig);
 		}
 
 	      graph_iterator_next( &iter);
@@ -735,9 +736,10 @@ dsp_graph_dec_pred_inc_refcnt(fts_dsp_graph_t *graph, fts_dsp_node_t *src, int w
 
   if (ninputs)
     {
-      int nin;
+      fts_connection_t *conn = fts_connection_get(src->o, woutlet, dest->o, winlet);
       fts_dsp_signal_t *previous_sig;
-
+      int nin;
+      
       if (! dest->descr->in)
 	{
 	  /* (fd) to avoid writing past the end of the dsp_descr... */
@@ -747,36 +749,41 @@ dsp_graph_dec_pred_inc_refcnt(fts_dsp_graph_t *graph, fts_dsp_node_t *src, int w
       nin = dsp_input_get(dest->o, winlet);
 
       previous_sig = dest->descr->in[nin];
-
-      if ( previous_sig && previous_sig != sig_zero /*&& fts_dsp_is_order_forced( dest->o)*/)
+      
+      /* ignore hidden connections */
+      if(conn == NULL || fts_connection_get_type(conn) != fts_c_order_forcing)
 	{
-	  fts_atom_t argv[4];
-	  fts_dsp_signal_t *new_sig;
-
-	  fts_dsp_signal_unreference( previous_sig);
-	  fts_dsp_signal_reference( sig);
-
-	  /* Should verify that inputs length match */
-	  new_sig = fts_dsp_signal_new( sig->length, sig->srate);
-
-	  fts_set_symbol(argv + 0, previous_sig->name);
-	  fts_set_symbol(argv + 1, sig->name);
-	  fts_set_symbol(argv + 2, new_sig->name);
-	  fts_set_int(argv + 3, new_sig->length);
-
-	  ftl_program_add_call(graph->chain, sym_builtin_add, 4, argv);
-
-	  fts_dsp_signal_unreference( sig);
-	  fts_dsp_signal_reference( new_sig);
-
-	  dest->descr->in[nin] = new_sig;
-	}
-      else
-	{
-	  if (sig)
-	    fts_dsp_signal_reference(sig);
-	  
-	  dest->descr->in[nin] = sig;
+	  /* insert builtin add for double connections */
+	  if(previous_sig && previous_sig != sig_zero)
+	    {
+	      fts_atom_t argv[4];
+	      fts_dsp_signal_t *new_sig;
+	      
+	      fts_dsp_signal_unreference( previous_sig);
+	      fts_dsp_signal_reference( sig);
+	      
+	      /* Should verify that inputs length match */
+	      new_sig = fts_dsp_signal_new( sig->length, sig->srate);
+	      
+	      fts_set_symbol(argv + 0, previous_sig->name);
+	      fts_set_symbol(argv + 1, sig->name);
+	      fts_set_symbol(argv + 2, new_sig->name);
+	      fts_set_int(argv + 3, new_sig->length);
+	      
+	      ftl_program_add_call(graph->chain, sym_builtin_add, 4, argv);
+	      
+	      fts_dsp_signal_unreference( sig);
+	      fts_dsp_signal_reference( new_sig);
+	      
+	      dest->descr->in[nin] = new_sig;
+	    }
+	  else
+	    {
+	      if (sig)
+		fts_dsp_signal_reference(sig);
+	      
+	      dest->descr->in[nin] = sig;
+	    }
 	}
     }
 }

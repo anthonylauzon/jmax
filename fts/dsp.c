@@ -246,6 +246,13 @@ fts_dsp_remove_object(fts_object_t *o)
   fts_dsp_graph_remove_object(&main_dsp_graph, o);
 }
 
+void
+fts_dsp_force_order(fts_object_t *first, fts_object_t *second)
+{
+  /* create hidden order forcing connection between the two objects */
+  fts_connection_new(FTS_NO_ID, first, 0, second, 0, fts_c_order_forcing);
+}
+
 void 
 fts_dsp_add_function(fts_symbol_t symb, int ac, fts_atom_t *av)
 {

@@ -69,39 +69,30 @@ bus_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
   
   fts_set_symbol(&key, name);
 
-  if(value && !fts_is_void(value))
+  if(value && fts_is_object(value))
     {
-      if(fts_is_object(value))
-	{
-	  fts_object_t *obj = fts_get_object(value);
-	  
-	  if(fts_object_get_metaclass(obj) == fts_signal_bus_type)
-	    bus = (fts_signal_bus_t *)obj;
-	  else
-	    return 0; /* variable is not a bus */
-	}
-      else
-	return 0; /* variable is even not an object */
+      fts_object_t *obj = fts_get_object(value);
+      
+      if(fts_object_get_metaclass(obj) == fts_signal_bus_type)
+	return bus = (fts_signal_bus_t *)obj;
     }
-  else if(default_busses == 0)
+  
+  if(default_busses == 0)
     {
       /* create hashtable if not existing yet */
       default_busses = (fts_hashtable_t *) fts_malloc(sizeof(fts_hashtable_t));
       fts_hashtable_init( default_busses, 0, FTS_HASHTABLE_MEDIUM);
     }
   else if(fts_hashtable_get(default_busses, &key, &a))
-    bus = (fts_signal_bus_t *)fts_get_object(&a);
+    return (fts_signal_bus_t *)fts_get_object(&a);
 
-  if(!bus)
-    {
-      /* if there wasn't a variable nor a default, make a default */
-      bus = (fts_signal_bus_t *)fts_object_create(fts_signal_bus_type, 0, 0);
-      
-      fts_set_object(&a, (fts_object_t *)bus);
-      fts_hashtable_put(default_busses, &key, &a);
-      
-      fts_object_refer((fts_object_t *)bus);
-    }
+  /* if there wasn't a variable nor a default, make a default */
+  bus = (fts_signal_bus_t *)fts_object_create(fts_signal_bus_type, 0, 0);
+  
+  fts_set_object(&a, (fts_object_t *)bus);
+  fts_hashtable_put(default_busses, &key, &a);
+  
+  fts_object_refer((fts_object_t *)bus);
 
   return bus;
 }

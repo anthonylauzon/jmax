@@ -321,7 +321,7 @@ bpf_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	  bpf_append_point(this, time, value);
 	}      
 
-      this->editid++;
+      data_object_set_dirty(o);
     }
 }
 
@@ -375,7 +375,7 @@ bpf_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
   if(bpf_editor_is_open(this))
     bpf_set_client(this);
 
-  this->editid++;
+  data_object_set_dirty(o);
 }
 
 static void
@@ -428,7 +428,7 @@ bpf_add_point_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int
   bpf_insert_point(this, time, value);
   fts_client_send_message(o, sym_addPoint, ac, at);
 
-  this->editid++;
+  data_object_set_dirty(o);
 }
 
 static void
@@ -441,7 +441,7 @@ bpf_remove_points_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s,
   bpf_remove_points(this, index, size);
   fts_client_send_message(o, sym_removePoints, ac, at);
 
-  this->editid++;
+  data_object_set_dirty(o);
 }
 
 static void
@@ -462,7 +462,7 @@ bpf_set_points_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, in
   
   fts_client_send_message(o, sym_setPoints, ac, at);
 
-  this->editid++;
+  data_object_set_dirty(o);
 }
 
 static void
@@ -539,23 +539,6 @@ bpf_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-bpf_set_keep(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  bpf_t *this = (bpf_t *)o;
-
-  if(this->keep != fts_s_args && fts_is_symbol(value))
-    this->keep = fts_get_symbol(value);
-}
-
-static void
-bpf_get_keep(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  bpf_t *this = (bpf_t *)o;
-
-  fts_set_symbol(value, this->keep);
-}
-
-static void
 bpf_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
 {
   fts_set_object(value, o);
@@ -583,7 +566,7 @@ bpf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   if(ac)
     {
       bpf_set(o, 0, 0, ac, at);
-      this->keep = fts_s_args;
+      data_object_set_keep((data_object_t *)o, fts_s_args);
     }
   else
     {
@@ -592,10 +575,8 @@ bpf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       this->points[0].time = 0.0;
       this->points[0].value = 0.0;
 
-      this->keep = fts_s_no;
+      data_object_set_keep((data_object_t *)o, fts_s_no);
     }
-
-  this->editid = 0;
 }
 
 static void
@@ -626,8 +607,8 @@ bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, bpf_print);
   
-  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, bpf_set_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, bpf_get_keep);
+  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, bpf_get_state);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, bpf_set);

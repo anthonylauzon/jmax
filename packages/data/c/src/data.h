@@ -33,6 +33,19 @@
 #define DATA_API extern
 #endif
 
+typedef struct _data_object
+{
+  fts_object_t o;
+  fts_symbol_t keep;
+} data_object_t;
+
+#define data_object_set_keep(o, k) ((o)->keep = (k))
+#define data_object_get_keep(o) ((o)->keep)
+
+DATA_API void data_object_daemon_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
+DATA_API void data_object_daemon_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
+DATA_API void data_object_set_dirty(fts_object_t *o);
+
 DATA_API void
 data_config(void);
 
