@@ -25,9 +25,6 @@
 #define ERRBUF_SIZE 1024
 #define MMIO_BUF_SIZE 65536
 
-/* FIXME: USE_WAVE_BUFFER */
-#define USE_WAVE_BUFFER 0
-
 char mmio_loader_errbuf[ERRBUF_SIZE];
 
 char* 
@@ -61,23 +58,17 @@ mmio_loader_open_read(fts_audiofile_t* aufile)
   file = (char*) fts_symbol_name(fts_audiofile_get_filename(aufile));
 
   /* open the file */
-#if USE_WAVE_BUFFER
   wave->hmmio = mmioOpen(file, NULL, MMIO_READ | MMIO_DENYWRITE);
-#else
-  wave->hmmio = mmioOpen(file, NULL, MMIO_ALLOCBUF | MMIO_READ | MMIO_DENYWRITE);
-#endif
   if (wave->hmmio == NULL) {
     mmio_loader_log("Failed to open the file (%s)", file);
     goto error_recovery;
   }
 
-#if !USE_WAVE_BUFFER
   res = mmioSetBuffer(wave->hmmio, NULL, MMIO_BUF_SIZE, 0);
   if (res != 0) {
     mmio_loader_log("Failed to set the internal buffer size (%s)", file);
     goto error_recovery;
   }
-#endif
 
   /* create the internal buffer */
   if (wave_realloc(wave, 8192) != 0) {
@@ -202,23 +193,17 @@ mmio_loader_open_write(fts_audiofile_t* aufile)
   file = (char*) fts_symbol_name(fts_audiofile_get_filename(aufile));
 
   /* open the file */
-#if USE_WAVE_BUFFER
-  wave->hmmio = mmioOpen(file, NULL, MMIO_WRITE | MMIO_CREATE | MMIO_EXCLUSIVE);
-#else
   wave->hmmio = mmioOpen(file, NULL, MMIO_ALLOCBUF | MMIO_WRITE | MMIO_CREATE | MMIO_EXCLUSIVE);
-#endif
   if (wave->hmmio == NULL) {
     mmio_loader_log("Failed to open the file (%s)", file);
     goto error_recovery;
   }
 
-#if !USE_WAVE_BUFFER
   res = mmioSetBuffer(wave->hmmio, NULL, MMIO_BUF_SIZE, 0);
   if (res != 0) {
     mmio_loader_log("Failed to set the internal buffer size (%s)", file);
     goto error_recovery;
   }
-#endif
 
   /* create the internal buffer */
   if (wave_realloc(wave, 8192) != 0) {
@@ -320,6 +305,27 @@ mmio_loader_write(fts_audiofile_t* aufile, float** buf, int nbuf, unsigned int b
   }
   
   return err;
+}
+
+int 
+mmio_loader_seek(fts_audiofile_t* aufile, unsigned int offset)
+{
+  wave_t* wave = (wave_t*) fts_audiofile_get_handle(aufile);
+  unsigned int pos;
+
+  if ((wave != NULL) && (wave->hmmio != NULL)) {
+
+    offset = wave->riff_chunk.dwDataOffset + sizeof(FOURCC) + offset * wave->format.nBlockAlign;
+    pos = mmioSeek(wave->hmmio, offset, SEEK_SET);
+
+    if (pos < 0) {
+      mmio_loader_log("Read to set the seek the position");
+      return -1;
+    }
+    
+    return 0;
+  }
+  return -1;
 }
 
 int 
@@ -492,12 +498,13 @@ wave_write_8bits(wave_t* wave, float** buf, int nbuf, unsigned int buflen)
 
   nchan = wave->format.nChannels;
   size = wave->format.nBlockAlign * buflen;
-  cbuf = wave->buffer;
 
   if ((size > wave->buf_size) && (wave_realloc(wave, size) != 0)) {
     mmio_loader_log("Out of memory");
     return -1;
   }
+
+  cbuf = wave->buffer;
 
   /* copy the samples in to the buffer. if there are more channels
      requested than available in the file, fill the remaining
@@ -538,12 +545,13 @@ wave_write_16bits(wave_t* wave, float** buf, int nbuf, unsigned int buflen)
 
   nchan = wave->format.nChannels;
   size = wave->format.nBlockAlign * buflen;
-  sbuf = (short*) wave->buffer;
 
   if ((size > wave->buf_size) && (wave_realloc(wave, size) != 0)) {
     mmio_loader_log("Out of memory");
     return -1;
   }
+
+  sbuf = (short*) wave->buffer;
 
   /* copy the samples in to the buffer. if there are more channels
      requested than available in the file, fill the remaining
@@ -591,11 +599,6 @@ wave_realloc(wave_t* wave, unsigned int size)
     return -1;
   }
 
-#if USE_WAVE_BUFFER
-  res = mmioSetBuffer(wave->hmmio, wave->buffer, size, 0);
- 
+  res = mmioSetBuffer(wave->hmmio, NULL, size, 0);
   return (res == 0)? 0 : -1;
-#else
-  return 0;
-#endif
 }

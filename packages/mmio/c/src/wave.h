@@ -48,6 +48,7 @@ int mmio_loader_open_read(fts_audiofile_t* aufile);
 int mmio_loader_open_write(fts_audiofile_t* aufile);
 int mmio_loader_read(fts_audiofile_t* aufile, float** buf, int nbuf, unsigned int buflen);
 int mmio_loader_write(fts_audiofile_t* aufile, float** buf, int nbuf, unsigned int buflen);
+int mmio_loader_seek(fts_audiofile_t* aufile, unsigned int offset);
 int mmio_loader_close(fts_audiofile_t* aufile);
 char* mmio_loader_error(fts_audiofile_t* aufile);
 
