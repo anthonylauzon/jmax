@@ -31,6 +31,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.datatransfer.*;
 import javax.swing.*;
+import javax.swing.event.*;
 
 import ircam.jmax.script.*;
 
@@ -115,9 +116,25 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor {
     toolbarPanel.setLayout(new BorderLayout());
     toolbarPanel.setPreferredSize(new Dimension(500, 23));
 
-    JToolBar toolbar = new JToolBar(JToolBar.HORIZONTAL);
+    JToolBar toolbar = new JToolBar("Control Panel", JToolBar.HORIZONTAL);
     toolbar.setPreferredSize(new Dimension(250, 23));
     toolbar.add(controlPanel = new ControlPanel(MaxApplication.getFts()));
+    toolbar.addAncestorListener(new AncestorListener(){
+	    public void ancestorAdded(AncestorEvent event)
+	    {
+		Frame frame = (Frame)SwingUtilities.getWindowAncestor(event.getAncestor());
+		if(!(frame instanceof ConsoleWindow))
+		    MaxWindowManager.getWindowManager().addWindow(frame);
+	    }
+	    public void ancestorRemoved(AncestorEvent event)
+	    {
+		Frame frame = (Frame)SwingUtilities.getWindowAncestor(event.getAncestor());
+		if(!(frame instanceof ConsoleWindow))
+		    MaxWindowManager.getWindowManager().removeWindow(frame);
+	    }
+	    public void ancestorMoved(AncestorEvent event){}
+	});
+
     toolbarPanel.add( BorderLayout.NORTH, toolbar);
     getContentPane().add( BorderLayout.NORTH, toolbarPanel);
 

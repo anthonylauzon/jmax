@@ -37,6 +37,11 @@ public class ConsoleDocument extends MaxDocument
   public ConsoleDocument(MaxContext context)
   {
     super(context, Mda.getDocumentTypeByName("console"));
+  }  
+    
+  public boolean isSaved()
+  {
+    return true;
   }
 }
 
