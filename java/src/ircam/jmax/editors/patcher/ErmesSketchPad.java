@@ -322,7 +322,11 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
   {
     boolean redraw = false;
 
-    totalBounds.setBounds(0, 0, 0, 0);
+    totalBounds.x = 0;
+    totalBounds.y = 0;
+    totalBounds.width = 0;
+    totalBounds.height = 0;
+
     displayList.getBounds(totalBounds);
 
     if ((totalBounds.x < 0) || (totalBounds.y < 0))
@@ -455,9 +459,6 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
 	object = GraphicObject.makeGraphicObject( this, fo);
 	displayList.add( object);
 	displayList.reassignLayers();
-
-	if (object instanceof Standard)
-	  ((Standard)object).errorChanged(false);
 
 	object.redraw();
       }
@@ -770,6 +771,9 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
   public void makeAddModeObject(int x, int y, boolean edit)
   {
     GraphicObject object = makeObject(newObjectDescription, x, y);
+
+    if (object instanceof Standard)
+      ((Standard)object).setIgnoreError(true);
 
     if (edit && newObjectEdit && (object instanceof Editable))
       {

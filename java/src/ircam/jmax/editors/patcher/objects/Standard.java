@@ -16,7 +16,7 @@ import ircam.jmax.editors.patcher.*;
 //
 public class Standard extends Editable implements FtsObjectErrorListener
 {
-  boolean fresh = true;
+  boolean ignoreError = false;
 
   //--------------------------------------------------------
   // CONSTRUCTOR
@@ -37,6 +37,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
 
   public void errorChanged(boolean value) 
   {
+    ignoreError = false;
     redraw();
   }
 
@@ -50,8 +51,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
   {
     try 
       {
-	fresh = false;
-
+	ignoreError = false;
 	ftsObject = Fts.redefineFtsObject( ftsObject, text);
 
 	if (ftsObject.isError())
@@ -77,7 +77,10 @@ public class Standard extends Editable implements FtsObjectErrorListener
     });
   }
 
-
+  public void setIgnoreError(boolean v)
+  {
+    ignoreError = v;
+  }
 
   // ----------------------------------------
   // Text area offset
@@ -120,7 +123,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
 
   public void paint(Graphics g) 
   {
-    if ((! fresh) && ftsObject.isError())
+    if ((! ignoreError) && ftsObject.isError())
       g.setColor( Color.red);
     else
       {
