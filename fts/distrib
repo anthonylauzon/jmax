@@ -1,5 +1,2 @@
-ircam	all	Makefiles
-ircam	all	src
-ircam	all	scripts
 all	all	bin
 

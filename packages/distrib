@@ -1,6 +1,6 @@
-all	ircam	additive
-all	ircam	eric
-all	ircam	manoury
+ircam	all	additive
+ircam	all	eric
+ircam	all	manoury
 all	all	explode
 all	all	guiobj
 all	all	ispw
