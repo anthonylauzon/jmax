@@ -8,18 +8,19 @@ import ircam.jmax.utils.*;
 /**
  * The edit field contained in the editable objects (ErmesObjMessage, ErmesObjExternal).
  */
-public class ErmesObjEditField extends TextField implements KeyListener, FocusListener {
+public class ErmesObjEditField extends TextArea implements KeyListener, FocusListener {
   boolean laidOut = false;
   boolean focused = false;    
   ErmesObjEditableObject itsOwner= null;
   ErmesSketchPad itsSketchPad = null;
-	
+  int itsOldLineWidth = 0;
+  int itsOldLineChars = 0;
 	
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
   ErmesObjEditField(ErmesSketchPad theSketchPad) {
-    super(" ", 20);
+    super(" ", 1, 20, TextArea.SCROLLBARS_NONE);
     setFont(new Font(ircam.jmax.utils.Platform.FONT_NAME, Font.PLAIN, ircam.jmax.utils.Platform.FONT_SIZE));		   
     setEditable(true); 
     selectAll();
@@ -61,20 +62,30 @@ public class ErmesObjEditField extends TextField implements KeyListener, FocusLi
 	aTextString = aTextString.substring(0, aTextString.length()-1);
       }
     }
+    if(aTextString.endsWith("\n")){
+      aTextString = aTextString.substring(0, aTextString.length()-1);
+    }
     
     if (itsOwner == null) return false; //this happens when the instatiation fails
     if (itsOwner.itsFtsObject != null){
       itsOwner.itsArgs = aTextString;
+
+      ParseText(aTextString);
+
       itsOwner.redefineFtsObject();
     }
     else {
       itsOwner.itsArgs = aTextString;
-      //System.out.println("making FtsObject with args:"+itsOwner.itsArgs);
+      
+      ParseText(aTextString);
+
       itsOwner.makeFtsObject();
     }
+    ///qui accorcia se il testo e' piu' corto dell'oggetto
+    //dovrebbe farlo anche per l'altezza...
 
     int lenght = getFontMetrics(getFont()).stringWidth(aTextString);
-    
+  
     if((lenght< getSize().width-20)&&(!itsOwner.itsResized)){
       Dimension d1 = itsOwner.Size();
       d1.width = lenght+itsOwner.WIDTH_DIFF+10;
@@ -83,7 +94,7 @@ public class ErmesObjEditField extends TextField implements KeyListener, FocusLi
     itsOwner.update(itsOwner.itsFtsObject);
     
     itsOwner.itsInEdit = false;
-
+    
     setVisible(false);
     setLocation(-200,-200);
     focused = false;
@@ -91,10 +102,37 @@ public class ErmesObjEditField extends TextField implements KeyListener, FocusLi
     
     if (itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
     itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());//end bug 12
-    itsOwner = null; 
+    itsOwner = null;
+
+    setRows(1);
+    setColumns(20);
     return true;       
   }
 	
+  private void ParseText(String theString){
+    int aIndex = theString.indexOf("\n");
+    int aOldIndex = -1;
+    int aLastIndex = theString.lastIndexOf("\n");
+    String aString;
+    int length = 0;
+    int i = 0;
+    while(aIndex!=-1){
+      aString = theString.substring(aOldIndex+1, aIndex);
+      length = getFontMetrics(getFont()).stringWidth(aString);
+      if(length> getFontMetrics(getFont()).stringWidth(itsOwner.itsMaxString)) 
+	itsOwner.itsMaxString = aString;
+      itsOwner.itsParsedTextVector.addElement(aString);
+      aOldIndex = aIndex;
+      aIndex = theString.indexOf("\n", aOldIndex+1);
+      i++;
+    }
+    aString = theString.substring(aOldIndex+1);
+    length = getFontMetrics(getFont()).stringWidth(aString);
+    if(length> getFontMetrics(getFont()).stringWidth(itsOwner.itsMaxString)) 
+      itsOwner.itsMaxString = aString;
+    itsOwner.itsParsedTextVector.addElement(aString);
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////focusListener --inizio
   public void focusGained(FocusEvent e){
@@ -133,88 +171,94 @@ public class ErmesObjEditField extends TextField implements KeyListener, FocusLi
     int end = getSelectionEnd();
     String s = getText();
     FontMetrics fm = getFontMetrics(getFont());
-    int aWidth;
+    int aWidth = 0;
+    int aCurrentLineWidth = 0;
+    int aCurrentLineChars = 0;
     
     if (isEditable()) {
-      //if(e.getKeyCode()==ircam.jmax.utils.Platform.ENTER_KEY||e.getKeyCode()==ircam.jmax.utils.Platform.RETURN_KEY){//return
-	//Dimension d2 = itsOwner.size();
-	//d2.height += fm.getHeight();
-	// itsOwner.ResizeTo(d2);
-	//itsOwner.validate();
+      if(e.getKeyCode()==ircam.jmax.utils.Platform.ENTER_KEY||e.getKeyCode()==ircam.jmax.utils.Platform.RETURN_KEY){//return
+	setRows(getRows()+1);
+	itsOldLineWidth = fm.stringWidth(s);
+	itsOldLineChars = s.length(); 
+	Dimension d2 = itsOwner.Size();
+	itsOwner.setSize(d2.width, d2.height+fm.getHeight());
+	setSize(getSize().width, getSize().height + fm.getHeight());//non sposta le outlet se ci sono
+	requestFocus();
+	return;
+      }
+      //else if(e.getKeyCode() == Event.LEFT){//freccia a sinistra
+      //if(start==end){
+      //if(start>0){
+      //if(e.isShiftDown())
+      //select(start-1, start);
+      //    else
+      //    select(start-1,start-1);
+      // }
+      //	}
+      //else{
+      //if(e.isShiftDown())
+      //  select(start-1, end);
+      //else
+      // select(start,start);
+      //}
+      // return;
+      //}
+      //else if(e.getKeyCode() == Event.RIGHT){//freccia a destra
+      //if(start==end){
+      //if(start < s.length()){
+      //if(e.isShiftDown())
+      //select(start, end+1);
+      //	    else
+      //      select(start+1,start+1);
+      //}
+      //}
+      //else{
+      //if(e.isShiftDown())
+      //select(start, end+1);
+      // else
+      // select(end,end);
+      //}
       //return;
       //}
-      //else 
-      //  if(e.getKeyCode()==Event.ALT_MASK||e.getKeyCode()==Event.CTRL_MASK /*||e.getKeyCode()==Event.SHIFT_MASK*/) 
-      //return;
-      if(e.getKeyCode() == Event.LEFT){//freccia a sinistra
-	/*if(start==end){
-	  if(start>0){
-	    if(e.isShiftDown())
-	      select(start-1, start);
-	    else
-	      select(start-1,start-1);
-	  }
-	}
-	else{
-	  if(e.isShiftDown())
-	    select(start-1, end);
-	  else
-	    select(start,start);
-	}*/
-	return;
-      }
-      else if(e.getKeyCode() == Event.RIGHT){//freccia a destra
-	/*if(start==end){
-	  if(start < s.length()){
-	    if(e.isShiftDown())
-	      select(start, end+1);
-	    else
-	      select(start+1,start+1);
-	  }
-	}
-	else{
-	  if(e.isShiftDown())
-	    select(start, end+1);
-	  else
-	    select(end,end);
-	}*/
-	return;
-      }
-      else if((e.getKeyCode()==Event.UP)||(e.getKeyCode()== Event.DOWN))
-	return;
-      else if (e.getKeyCode()==ircam.jmax.utils.Platform.DELETE_KEY || e.getKeyCode()==ircam.jmax.utils.Platform.BACKSPACE_KEY) {//cancellazione
-	if(start==end){//se non c' testo selezionato
-	  /* if(start>0){
-	     if(start < s.length()){//cancella intermedio
-	     s1 = s.substring(0, start-1);
-	     s2 = s.substring(start, s.length());
-	     s = s1+s2;
-	     }
-	     else//cancella in coda
-	     s = s.substring(0, s.length()-1);
-	     
-	     setText(s);
-	     select(start-1,start-1);
-	     }*/
-	}
-	else{//se c' testo selezionato
-	  s1 = s.substring(0, start+1);
-	  s2 = s.substring(end, s.length());
-	  s = s1+s2;
-	  setText(s);
-	  select(start+1,start+1);
-	}
-	itsOwner.itsArgs = s;
-      }
+      //else if((e.getKeyCode()==Event.UP)||(e.getKeyCode()== Event.DOWN))
+      //	return;
+      //else if (e.getKeyCode()==ircam.jmax.utils.Platform.DELETE_KEY || e.getKeyCode()==ircam.jmax.utils.Platform.BACKSPACE_KEY) {//cancellazione
+      //if(start==end){//se non c' testo selezionato
+      // if(start>0){
+      // if(start < s.length()){//cancella intermedio
+      // s1 = s.substring(0, start-1);
+      // s2 = s.substring(start, s.length());
+      // s = s1+s2;
+      // }
+      // else//cancella in coda
+      // s = s.substring(0, s.length()-1);
+      
+      //setText(s);
+      //select(start-1,start-1);
+      // }
+      //}
+      //else{//se c' testo selezionato
+      //s1 = s.substring(0, start+1);
+      //  s2 = s.substring(end, s.length());
+      //  s = s1+s2;
+      //  setText(s);
+      //  select(start+1,start+1);
+      //}
+      //itsOwner.itsArgs = s;
+      //}
       else{//scrittura
+	aCurrentLineChars = s.length() - itsOldLineChars;
+	if(aCurrentLineChars+5 > getColumns())
+	  setColumns(getColumns()+20);
+
 	char k = e.getKeyChar();
 	if(start!=end){//cancella selezione
 	  if(!e.isShiftDown()){
 	    s1 = s.substring(0, start);
 	    s2 = s.substring(end, s.length());
 	    s = s1+s2;
-	    setText(s);
-	    select(start,start);
+	    // setText(s);
+	    //select(start,start);
 	  }
 	}
 	if(start < s.length()){//inserisce testo intermedio
@@ -226,17 +270,22 @@ public class ErmesObjEditField extends TextField implements KeyListener, FocusLi
 	else//inserisce testo in coda
 	  s = s+k;
 	
-	lenght = fm.stringWidth(s);
+	aCurrentLineWidth = fm.stringWidth(s)-itsOldLineWidth;
 	aWidth = itsOwner.itsFontMetrics.getMaxAdvance();
-	if (lenght >= getSize().width-5) {
-	  Dimension d = itsOwner.Size();
-	  if(aWidth>20) d.width += aWidth;
-	  else d.width += 30;
-	  itsOwner.setSize(d.width, d.height);
+	//System.out.println("fm.stringWidth(s) = "+fm.stringWidth(s));
+	//System.out.println("itsOldLineWidth = "+aOldLineWidth);
+	//System.out.println("aCurrentLineWidth = "+aCurrentLineWidth);
+	//if (lenght >= getSize().width-5) {
+	if (aCurrentLineWidth >= getSize().width-5) {  
+	  int step;
+	  if(aWidth>20) step = aWidth;
+	  else step = 30;
+  
+	  itsOwner.setSize(itsOwner.Size().width+step, itsOwner.Size().height);
+	  setSize(getSize().width+step, getSize().height);
 	  requestFocus();
-	}
-	//e.e.setText(s);
-	select(start/*+1*/,start/*+1*/);
+	} 
+	//select(start,start);
       }
     }
   }

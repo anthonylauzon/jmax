@@ -966,7 +966,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     //	SetSnapToGrid
     //--------------------------------------------------------
     public void SetSnapToGrid(){
-    	itsSketchPad.SetSnapToGrid();
+      itsSketchPad.SetSnapToGrid();
     }
     
     //--------------------------------------------------------

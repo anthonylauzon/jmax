@@ -19,10 +19,12 @@ import ircam.jmax.fts.*;
   protected int FIELD_HEIGHT;
   Dimension preferredSize = null;
   String 	  itsArgs;
+  public Vector itsParsedTextVector = new Vector();
+  //public int itsLineMaxWidth = 0;
+  public String itsMaxString = "";
   public void setSize(int theH, int theV) {}; 
   public boolean resized = false;
   public boolean itsInEdit = true;
-  
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
@@ -125,6 +127,7 @@ import ircam.jmax.fts.*;
     if(evt.getClickCount()>1) {
       if (itsSketchPad.GetEditField() != null) {
 	itsSketchPad.GetEditField().setEditable(true);
+	//itsParsedTextVector.removeAllElements();//??????????????????
 	itsInEdit = true;
       }
     }
@@ -140,9 +143,12 @@ import ircam.jmax.fts.*;
   public void RestoreDimensions(){
     itsResized = false;
     itsSketchPad.RemoveElementRgn(this);
-    int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsArgs)+WIDTH_DIFF,
+    int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsMaxString)+WIDTH_DIFF,
 			    (itsInletList.size())*12, (itsOutletList.size())*12);
-    Resize(aMaxWidth-currentRect.width, itsFontMetrics.getHeight() + HEIGHT_DIFF - currentRect.height);
+   
+    int aHeight = itsFontMetrics.getHeight()*itsParsedTextVector.size()+HEIGHT_DIFF-currentRect.height;
+
+    Resize(aMaxWidth-currentRect.width, aHeight);
     itsSketchPad.SaveOneElementRgn(this);
     itsSketchPad.repaint();
   }
@@ -179,8 +185,8 @@ import ircam.jmax.fts.*;
 	
   void ResizeToNewFont(Font theFont) {
     if(!itsResized){
-      Resize(itsFontMetrics.stringWidth(itsArgs) + WIDTH_DIFF - currentRect.width,
-	     itsFontMetrics.getHeight() + HEIGHT_DIFF - currentRect.height);
+      Resize(itsFontMetrics.stringWidth(itsMaxString) + WIDTH_DIFF - currentRect.width,
+	     itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF - currentRect.height);
     }
     else ResizeToText(0,0);
   }
@@ -188,15 +194,15 @@ import ircam.jmax.fts.*;
   public void ResizeToText(int theDeltaX, int theDeltaY){
     int aWidth = currentRect.width+theDeltaX;
     int aHeight = currentRect.height+theDeltaY;
-    if(aWidth<itsFontMetrics.stringWidth(itsArgs) + WIDTH_DIFF) aWidth = itsFontMetrics.stringWidth(itsArgs) + WIDTH_DIFF;
-    if(aHeight<itsFontMetrics.getHeight() + HEIGHT_DIFF) aHeight = itsFontMetrics.getHeight() + HEIGHT_DIFF;
+    if(aWidth<itsFontMetrics.stringWidth(itsMaxString) + WIDTH_DIFF) aWidth = itsFontMetrics.stringWidth(itsMaxString) + WIDTH_DIFF;
+    if(aHeight<itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF) aHeight = itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF;
     Resize(aWidth-currentRect.width, aHeight-currentRect.height);
   }
   
   public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
     String temp = itsArgs;
-    if((currentRect.width+theDeltaX < itsFontMetrics.stringWidth(temp/*itsArgs*/)+WIDTH_DIFF)||
-       (currentRect.height+theDeltaY<itsFontMetrics.getHeight() + HEIGHT_DIFF))
+    if((currentRect.width+theDeltaX <itsFontMetrics.stringWidth(itsMaxString) +WIDTH_DIFF)||
+       (currentRect.height+theDeltaY<itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF))
       return false;
     else return true;
   }

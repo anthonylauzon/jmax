@@ -18,7 +18,7 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
   // CONSTRUCTOR
   //--------------------------------------------------------
   ErmesObjTextArea(int lines, int rows, ErmesObjComment theOwner) {
-    super(" ", lines, rows);
+    super(" ", lines, rows, TextArea.SCROLLBARS_NONE);
     preferredRCSize = new Dimension(lines, rows);
     itsOwner = theOwner;
     setFont(new Font(ircam.jmax.utils.Platform.FONT_NAME,Font.PLAIN, ircam.jmax.utils.Platform.FONT_SIZE));

@@ -173,11 +173,22 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
     
     g.setFont(itsFont);
-    if (itsArgs != null)
-      g.drawString(itsArgs, itsX+(currentRect.width-itsFontMetrics.stringWidth(itsArgs))/2,
-		   itsY+itsFontMetrics.getAscent()+(currentRect.height-itsFontMetrics.getHeight())/2);
+    // if (itsArgs != null)
+    // g.drawString(itsArgs, itsX+(currentRect.width-itsFontMetrics.stringWidth(itsArgs))/2,itsY+itsFontMetrics.getAscent()+(currentRect.height-itsFontMetrics.getHeight())/2);
+    DrawParsedString(g);
   }
 	
+  private void DrawParsedString(Graphics theGraphics){
+    String aString;
+    int i=0;
+    int insetY =(currentRect.height-itsFontMetrics.getHeight()*itsParsedTextVector.size())/2;//2
+    for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
+      aString = (String)e.nextElement();
+      theGraphics.drawString(aString, itsX+(currentRect.width-itsFontMetrics.stringWidth(aString))/2,itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+      i++;
+    }
+  }
+
   //--------------------------------------------------------
   // resize
   //--------------------------------------------------------
@@ -189,7 +200,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     currentRect.setSize(d.width, d.height);
     d.width -= WIDTH_DIFF;		
     d.height -= HEIGHT_DIFF;
-    itsSketchPad.GetEditField().setBounds(itsX+10, itsY+1, d.width,itsSketchPad.GetEditField().getFontMetrics(itsSketchPad.GetEditField().getFont()).getHeight()+20 );
+    // itsSketchPad.GetEditField().setBounds(itsX+10, itsY+1, d.width,itsSketchPad.GetEditField().getFontMetrics(itsSketchPad.GetEditField().getFont()).getHeight()+20 );
     if (itsSketchPad != null) itsSketchPad.repaint();
   }
   

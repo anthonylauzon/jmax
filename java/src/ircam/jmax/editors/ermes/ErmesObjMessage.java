@@ -76,8 +76,8 @@ class ErmesObjMessage extends ErmesObjEditableObject {
     }
     else if(evt.getClickCount()>1) {
       if (itsSketchPad.GetEditField() != null) itsSketchPad.GetEditField().setEditable(true);
-      //return true;
-      //starting from here the bug 55 additions
+      itsParsedTextVector.removeAllElements();
+
       itsSketchPad.GetEditField().setFont(itsFont);
       itsSketchPad.GetEditField().setText(itsArgs);//warning: what will it happen if itsArgs is not here yet?
       itsSketchPad.GetEditField().itsOwner = this; //redirect the only editable field to point here...
@@ -85,7 +85,6 @@ class ErmesObjMessage extends ErmesObjEditableObject {
 	       	
       itsSketchPad.GetEditField().setVisible(true);
       itsSketchPad.GetEditField().requestFocus();
-      // until here bug 55
     }
     else itsSketchPad.ClickOnObject(this, evt, x, y);
     return true;
@@ -103,9 +102,7 @@ class ErmesObjMessage extends ErmesObjEditableObject {
     currentRect.setSize(d.width, d.height);
     d.width -= (WIDTH_DIFF-6);		
     d.height -= HEIGHT_DIFF;
-    itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, d.width, itsSketchPad.GetEditField().getFontMetrics(itsSketchPad.GetEditField().getFont()).getHeight()+20);
     if (itsSketchPad != null) itsSketchPad.repaint();
-    
   }
   
   public void setSize(Dimension d) {
@@ -151,8 +148,18 @@ class ErmesObjMessage extends ErmesObjEditableObject {
     g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
     
     g.setFont(itsFont);
-    g.drawString(itsArgs, itsX+(currentRect.width-itsFontMetrics.stringWidth(itsArgs))/2,
-		 itsY+itsFontMetrics.getAscent()+(currentRect.height-itsFontMetrics.getHeight())/2);
+    DrawParsedString(g);
+  }
+
+  private void DrawParsedString(Graphics theGraphics){
+    String aString;
+    int i=0;
+    int insetY =(currentRect.height-itsFontMetrics.getHeight()*itsParsedTextVector.size())/2;//2
+    for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
+      aString = (String)e.nextElement();
+      theGraphics.drawString(aString, itsX+(currentRect.width-itsFontMetrics.stringWidth(aString))/2,itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+      i++;
+    }
   }
 }
 
