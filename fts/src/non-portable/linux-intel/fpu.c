@@ -139,7 +139,7 @@ void fts_enable_fpe_traps( void)
 
   signal( SIGFPE, linux_fpe_signal_handler);
 
-  cw = 0x1000 + _FPU_CONTROL_EP + _FPU_CONTROL_NR
+  cw = 0x1000 + _FPU_CONTROL_EP + _FPU_CONTROL_NR /* extended precision + round to nearest */
     + _FPU_CONTROL_DM /* disable denormalized */
     + _FPU_CONTROL_UM /* disable underflow */
     + _FPU_CONTROL_PM; /* disable precision */
