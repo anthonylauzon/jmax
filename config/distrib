@@ -1,3 +1,4 @@
+all	defaults.tcl
 all	packages.tcl
 all	audio.tcl
 all	midi.tcl

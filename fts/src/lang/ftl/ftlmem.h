@@ -16,7 +16,13 @@ extern void ftl_data_copy(TYPE, PTR, void *src)
 extern void ftl_data_vector_element_copy(TYPE, PTR, ELEMENT, void *src)
 
 extern void ftl_data_set(TYPE, PTR, FIELD, ptr_to_value)
-extern void ftl_data_vector_set(TYPE, PTR, ELEMENT, FIELD, ptr_to_value)
+extern void ftl_data_vector_element_set_field(TYPE, PTR, ELEMENT, FIELD, ptr_to_value)
+
+extern void ftl_data_recopy(TYPE, PTR, void *src)
+extern void ftl_data_vector_element_recopy(TYPE, PTR, ELEMENT, void *src)
+
+extern void ftl_data_get(TYPE, PTR, FIELD, ptr_to_value)
+extern void ftl_data_vector_element_get_field(TYPE, PTR, ELEMENT, FIELD, ptr_to_value)
 
  
 Don't use this one, is for system use:
@@ -56,11 +62,27 @@ extern void ftl_data_free(ftl_data_t obj);
          } while(0)
 
 
+#define ftl_data_recopy(TYPE, OBJ, SRC) \
+        do \
+        {         \
+          if (OBJ) \
+              *((TYPE *) (SRC)) = *((TYPE *) ((OBJ)->ptr)); \
+         } while(0)
+
+
 #define ftl_data_vector_element_copy(TYPE, OBJ, IDX, SRC) \
         do \
         {         \
           if (OBJ) \
-	     ((TYPE *) ((OBJ)->ptr))[IDX] = *((TYPE *) (SRC)); \
+	     ( (TYPE *) ((OBJ)->ptr) )[IDX] = *((TYPE *) (SRC)); \
+         } while(0)
+
+
+#define ftl_data_vector_element_recopy(TYPE, OBJ, IDX, SRC) \
+        do \
+        {         \
+          if (OBJ) \
+	     *((TYPE *) (SRC)) = ( (TYPE *) ((OBJ)->ptr) )[IDX]; \
          } while(0)
 
 
@@ -68,15 +90,32 @@ extern void ftl_data_free(ftl_data_t obj);
         do \
         {         \
           if (OBJ) \
-	    ((TYPE *) ((OBJ)->ptr))->FIELD = *(SRC);  \
+	    ( (TYPE *) ((OBJ)->ptr) )->FIELD = *(SRC);  \
          } while(0)
 
 
-#define ftl_data_vector_set(TYPE, OBJ, IDX, FIELD, SRC)  \
+#define ftl_data_get(TYPE, OBJ, FIELD, DEST)  \
         do \
         {         \
           if (OBJ) \
-	    ((((TYPE *) ((OBJ)->ptr)))[IDX].FIELD) = *(SRC);  \
+	     *(DEST) = ( (TYPE *) ((OBJ)->ptr) )->FIELD;  \
+         } while(0)
+
+
+#define ftl_data_vector_element_set_field(TYPE, OBJ, IDX, FIELD, SRC)  \
+        do \
+        {         \
+          if (OBJ) \
+	    ( (TYPE *) ((OBJ)->ptr) )[IDX].FIELD = *(SRC);  \
+         } while(0)
+
+
+
+#define ftl_data_vector_element_get_field(TYPE, OBJ, IDX, FIELD, DEST)  \
+        do \
+        {         \
+          if (OBJ) \
+	    *(DEST) = ( (TYPE *) ((OBJ)->ptr) )[IDX].FIELD;  \
          } while(0)
 
 

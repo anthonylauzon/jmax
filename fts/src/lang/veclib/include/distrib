@@ -1,3 +1,4 @@
+all	declare_ftl.h
 all	declare_fts.h
 all	def_cfun.h
 all	def_cop.h
@@ -23,4 +24,5 @@ all	vec_fft.h
 all	vec_fun.h
 all	vec_misc.h
 all	vecdef.h
+all	vecftl.h
 all	veclib.h

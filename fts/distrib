@@ -1,3 +1,4 @@
+all	Makefiles
 all	bin
 all     src
 

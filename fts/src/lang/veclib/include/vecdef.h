@@ -3,6 +3,7 @@
 #ifndef _VECDEF_H_
 #define _VECDEF_H_
 
+#include <math.h>
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/veclib/complex.h"

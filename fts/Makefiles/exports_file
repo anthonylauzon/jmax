@@ -671,6 +671,7 @@ fts_vecx_fadd
 fts_vecx_fcpyre
 fts_vecx_ffillim
 fts_binary_file_load
+fts_patcher_get_full_name_string
 fts_get_object_by_name
 fts_register_named_object
 fts_unregister_named_object
