@@ -136,21 +136,12 @@ static int fts_binary_file_map( FILE *f, fts_binary_file_desc_t *desc)
 
 	  if (buf[i] == 0)
 	    {
-	      if (i == 0)
-		{
-		  /* End of symbols, can return */
-
-		  return 1;
-		}
-	      else	  
-		{
-		  desc->symbols[symbolIndex]= fts_new_symbol_copy(buf);
+	      desc->symbols[symbolIndex]= fts_new_symbol_copy(buf);
 #ifdef LOAD_DEBUG
-		  fprintf(stderr, "Reading symbol %s\n", fts_symbol_name(desc->symbols[symbolIndex]));
+	      fprintf(stderr, "Reading symbol %s\n", fts_symbol_name(desc->symbols[symbolIndex]));
 #endif
-		  symbolIndex++;
-		  i = 0;
-		}
+	      symbolIndex++;
+	      i = 0;
 	    }
 	  else
 	    i++;
