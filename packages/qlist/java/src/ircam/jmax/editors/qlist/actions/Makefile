@@ -21,25 +21,21 @@
 # Based on Max/ISPW by Miller Puckette.
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-#
 
-ROOTDIR = ../../../../../../../..
-PACKAGE_DIR = ircam/jmax/editors/qlist
+
+
+ROOTDIR = ../../../../../../../../..
+PACKAGE_DIR = ircam/jmax/editors/qlist/actions
 
 include $(ROOTDIR)/packages/qlist/java/Makefiles/Makefile.common
 
-all: local_all
-	(cd actions ; $(MAKE) all)
-	(cd menus ; $(MAKE) all)
+all: $(CLASSES)
 .PHONY: all
 
 local_all: $(CLASSES)
 .PHONY: local_all
 
-clean: local_clean
-	(cd actions ; $(MAKE) clean)
-	(cd menus ; $(MAKE) clean)
-
 include $(ROOTDIR)/packages/qlist/java/Makefiles/Makefile.misc
+
 
 

@@ -21,13 +21,21 @@
 # Based on Max/ISPW by Miller Puckette.
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-#
 
-SOURCES = \
-	QList.java		\
-	QListExtension.java	\
-	QListFactory.java	\
-	QListDataEditor.java    \
-	QListPanel.java		\
-	QListFindDialog.java	\
+
+
+ROOTDIR = ../../../../../../../../..
+PACKAGE_DIR = ircam/jmax/editors/qlist/menus
+
+include $(ROOTDIR)/packages/qlist/java/Makefiles/Makefile.common
+
+all: $(CLASSES)
+.PHONY: all
+
+local_all: $(CLASSES)
+.PHONY: local_all
+
+include $(ROOTDIR)/packages/qlist/java/Makefiles/Makefile.misc
+
+
 

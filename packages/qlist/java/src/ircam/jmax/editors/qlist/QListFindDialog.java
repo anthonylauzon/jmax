@@ -31,13 +31,13 @@ import java.awt.event.*;
 import java.io.*;
 
 class QListFindDialog extends Dialog {
-  public QListFindDialog( QList qList, QListPanel qListPanel)
+  public QListFindDialog(Frame frame, QListPanel qListPanel)
   {
-    super( (Frame)qList, "Qlist: Find", false);
+    super(frame, "Qlist: Find", false);
 
     this.qListPanel = qListPanel;
 
-    continueDialog = new QListContinueDialog( (Frame)qList, this);
+    continueDialog = new QListContinueDialog(frame, this);
 
     Panel p1 = new Panel();
     p1.setLayout( new FlowLayout( FlowLayout.LEFT));

@@ -30,36 +30,67 @@ import ircam.jmax.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.fts.*;
 import java.awt.*;
+import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.awt.AWTEvent.*;
 import java.io.*;
 import tcl.lang.*;
+
 import javax.swing.*;
+import javax.swing.event.*;
+//import javax.swing.text.*;
+
+import ircam.jmax.toolkit.*;
+import ircam.jmax.dialogs.*;
+
+import ircam.jmax.editors.qlist.actions.*;
 
 /**
  * A panel that is able to show the content of a FtsAtomList (qlist).
  * This component does not handle the communication with FTS, but it offers
  * a simple API (fillContent, getText) in order to be used from outside. */
-public class QListPanel extends JPanel {
+public class QListPanel extends JPanel implements Editor, ClipboardOwner, DocumentListener{
   
   JTextArea itsTextArea;
   int caretPosition;
   Dimension preferred = new Dimension(512, 412);
+  QListFindDialog qListFindDialog;
 
   String textToFind;
   int lastFindIndex;
 
+  FtsAtomList itsData;
+  boolean changed = false;
+
   /**
    * Constructor */
-  public QListPanel() 
+  public QListPanel(EditorContainer container, FtsAtomList theContent) 
   { 
     super();
+
+    itsEditorContainer = container;
+
+    // prepare the Set & Get buttons panel
+    JPanel aPanel = new JPanel();
+    aPanel.setLayout(new GridLayout(1, 2));
+    
+    JButton setButton = new JButton("Set");
+    setButton.addActionListener(Actions.setAction);
+
+    JButton getButton = new JButton("Get");
+    getButton.addActionListener(Actions.getAction);
+
+    aPanel.add(setButton);
+    aPanel.add(getButton);
+    aPanel.validate();
+    ///////////////////////////////////////////
 
     itsTextArea = new JTextArea(40, 40);
     itsTextArea.addKeyListener(KeyConsumer.controlConsumer());
     // SGI's JTextArea bug. See utils.KeyConsumer class for details
 
     setLayout(new BorderLayout());
+    add(BorderLayout.NORTH, aPanel);
     add(BorderLayout.CENTER, new JScrollPane(itsTextArea));
     
     caretPosition = 0;
@@ -68,23 +99,30 @@ public class QListPanel extends JPanel {
     textToFind = "";
     lastFindIndex = 0;
 
-    setBackground(Color.white);
+    // prepare the find dialog 
+    qListFindDialog = new QListFindDialog(itsEditorContainer.getFrame(), this);
+
+    fillContent(theContent);
+    itsTextArea.getDocument().addDocumentListener(this);
   }
 
   /**
    * Sets the content to the given FtsAtomList object */
   public void fillContent(FtsAtomList theContent) 
   {
-    caretPosition = itsTextArea.getCaretPosition();
-    itsTextArea.setText( theContent.getValuesAsText());
-    itsTextArea.requestFocus();
-    // (em) added a control to avoid setting impossible caret positions.
-    // FtsAtomList.getValueAsText() can infact reformat the text,
-    // removing CR's and then shortening its length
-    if (caretPosition <= itsTextArea.getText().length())
-      itsTextArea.setCaretPosition( caretPosition);
-    else itsTextArea.setCaretPosition(itsTextArea.getText().length());
-  }
+    itsData = theContent;
+    if(!theContent.getValuesAsText().equals(itsTextArea.getText())){
+      caretPosition = itsTextArea.getCaretPosition();
+      itsTextArea.setText( theContent.getValuesAsText());
+      itsTextArea.requestFocus();
+      // (em) added a control to avoid setting impossible caret positions.
+      // FtsAtomList.getValueAsText() can infact reformat the text,
+      // removing CR's and then shortening its length
+      if (caretPosition <= itsTextArea.getText().length())
+	itsTextArea.setCaretPosition( caretPosition);
+      else itsTextArea.setCaretPosition(itsTextArea.getText().length());
+    }
+}
  
   public Dimension getPreferredSize() 
   {
@@ -110,6 +148,17 @@ public class QListPanel extends JPanel {
     return itsTextArea.getText();
   }
 
+  public JTextArea getTextArea(){
+    return itsTextArea;
+  }
+
+  public boolean isSelectedText(){
+    String text = itsTextArea.getSelectedText();
+    if(text==null) return false;
+    if(text.equals("")) return false;
+    else return true;
+  }
+
   /**
    * part of API offered to the findDialog */
   int find( String textToFind, int fromIndex)
@@ -123,6 +172,135 @@ public class QListPanel extends JPanel {
 
     return index;
   }
+  /////////////////////////////////////////
+  public void Cut(){
+    if(itsTextArea.getSelectedText() != null){
+      Copy();
+      String s = itsTextArea.getText();
+   
+      itsTextArea.setText(s.substring(0, itsTextArea.getSelectionStart()) +  s.substring(itsTextArea.getSelectionEnd(), s.length()));
+    }
+  }
+
+  public void Copy(){
+    if (itsTextArea.getSelectedText() != null){
+      String toCopy = itsTextArea.getSelectedText();
+      MaxApplication.systemClipboard.setContents(new StringSelection(toCopy), this);
+    }
+  }
+
+  public void Paste(){
+    Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
+    if (clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor)){
+      try{
+	String toPaste = (String) clipboardContent.getTransferData(DataFlavor.stringFlavor);
+	
+	itsTextArea.insert(toPaste, itsTextArea.getCaretPosition());
+	itsTextArea.requestFocus();
+	
+      } catch (Exception e) { System.err.println("error in paste: "+e);}
+    }
+  }
+
+  public void Get(){
+    if(changed){
+      boolean risposta = YesOrNo.ask(itsEditorContainer.getFrame(), "Do you want really discard changes in QList text?", "Discard changes", "Cancel");
+      
+      if(risposta){
+	itsData.forceUpdate();
+	fillContent(itsData);
+      }
+    }else{
+      itsData.forceUpdate();
+      fillContent(itsData);
+    }
+  }
+
+  public void Set(){
+    itsData.setValuesAsText(getText());
+    fillContent(itsData);
+    changed = false;
+  }
+
+  public void Find(){
+    qListFindDialog.open();
+  }
+  public void FindAgain(){
+    qListFindDialog.find();
+  }
+  public void Import(){
+    File file = MaxFileChooser.chooseFileToOpen(itsEditorContainer.getFrame(), "Import");
+
+    if (file != null)
+      {
+	try
+	  {
+	    StringBuffer buf = new StringBuffer();
+	    BufferedReader in = new BufferedReader(new FileReader(file));
+
+	    while (in.ready())
+	      {
+		buf.append(in.readLine());
+		buf.append("\n");
+	      }
+
+	    itsTextArea.setText(buf.toString());
+	    itsData.setValuesAsText(itsTextArea.getText());
+	  }
+	catch (java.io.IOException e)
+	  {
+	    new ErrorDialog(itsEditorContainer.getFrame(), "Cannot open qlist: " + e);
+	  }
+      }
+  }
+
+  public void Export()
+  {
+    File file;
+    Writer w;
+
+    file = MaxFileChooser.chooseFileToSave(itsEditorContainer.getFrame(), new File("qlist.txt"),  "Export");
+
+    if (file == null)
+      return;
+
+    try
+      {
+	w = new FileWriter(file);
+
+	w.write(itsTextArea.getText());
+	w.close();
+      }
+    catch (java.io.IOException e)
+      {
+	new ErrorDialog(itsEditorContainer.getFrame(), "Cannot save qlist: " + e);
+      }
+  }
+  //------------------- Editor interface ---------------
+  final public Fts getFts()
+  {
+    return MaxApplication.getFts();
+  }
+  EditorContainer itsEditorContainer;
+
+  public EditorContainer getEditorContainer(){
+    return itsEditorContainer;
+  }
+  public void Close(boolean doCancel){
+    ((Component)itsEditorContainer).setVisible(false);
+  }
+  // ----------ClipboardOwner interface methods
+  public void lostOwnership(Clipboard clipboard, Transferable contents) {}
+  //-----------DocumentListener interface methods
+  public void changedUpdate(DocumentEvent e){
+    changed = true;
+  }
+  public void insertUpdate(DocumentEvent e){
+    changed = true;
+  }
+  public void removeUpdate(DocumentEvent e){
+    changed = true;
+  } 
 }
 
 
