@@ -180,6 +180,7 @@ static dtdfifo_t *dtdserver_allocate_fifo( dtdserver_t *server, int *pid)
 
 dtdfifo_t *dtdserver_open_read( dtdserver_t *server, const char *filename, int n_channels)
 {
+    char path[512];
   char buffer[1024];
   int id;
   dtdfifo_t *fifo;
@@ -188,7 +189,10 @@ dtdfifo_t *dtdserver_open_read( dtdserver_t *server, const char *filename, int n
 
   if (fifo)
     {
-      sprintf( buffer, "openread %d %s %s %d", id, filename, fts_get_search_path(), n_channels);
+      sprintf( buffer, "openread %d %s %s %d", id, 
+	       filename, 
+	       fts_make_absolute_path(NULL,filename, path, 512), 
+	       n_channels);
       dtdserver_send_command( server, buffer);
     }
 
