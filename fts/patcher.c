@@ -638,7 +638,7 @@ patcher_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   if(editor_is_open(this))
     {
       set_editor_close(this);
-      fts_client_send_message((fts_object_t *)this, fts_s_closeEditor, 0, 0);  
+      fts_client_send_message((fts_object_t *)this, fts_s_destroyEditor, 0, 0);  
     }
   
   p = this->objects;
@@ -1543,7 +1543,9 @@ fts_patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_
 	      if (fts_object_has_id(obj))
 		{
 		  fts_object_reset_changed(obj);
-		    
+		  
+		  fts_send_message( obj, fts_SystemInlet, fts_s_closeEditor, 0, 0);   
+
 		  fts_client_release_object(obj);
 		  fts_object_set_id(obj, FTS_DELETE);
 		}

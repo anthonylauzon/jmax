@@ -51,6 +51,12 @@ public abstract class FtsObjectWithEditor extends FtsUndoableObject {
 	  ((FtsObjectWithEditor)obj).destroyEditor();
 	}
       });  
+    FtsObject.registerMessageHandler( FtsObjectWithEditor.class, FtsSymbol.get("closeEditor"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsObjectWithEditor)obj).destroyEditor();
+	}
+      });  
   }
   
   public FtsObjectWithEditor(FtsServer server, FtsObject parent, int id, String className, FtsAtom[] args, int offset, int length)
@@ -91,8 +97,9 @@ public abstract class FtsObjectWithEditor extends FtsUndoableObject {
 	SwingUtilities.invokeLater(new Runnable() {
 	    public void run()
 	    { 
-	      editorFrame.dispose();
-	      editorFrame = null;
+	       if(editorFrame!= null)
+		 editorFrame.dispose();
+	       editorFrame = null;
 	    }
 	  }); 
       }
@@ -116,7 +123,7 @@ public abstract class FtsObjectWithEditor extends FtsUndoableObject {
     MaxWindowManager.getWindowManager().removeWindow(editorFrame);
   }
 
-  public void closeEditor(int nArgs, FtsAtom args[])
+  public void closeEditor()
   {
     if(getEditorFrame() != null)	    
       hideEditor();

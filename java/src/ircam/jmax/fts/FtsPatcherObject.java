@@ -905,8 +905,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     GraphicObject newObj;
     
     if(isTemplate)
-      newObj = new Standard( new FtsTemplateObject( getServer(), this, objId, className, args, /*offset-1, nArgs-offset+1*/
-						    offset, nArgs-offset));
+      newObj = new Standard( new FtsTemplateObject( getServer(), this, objId, className, args, offset, nArgs-offset));
     else
       newObj = makeGraphicObjectFromServer( getServer(), this, objId, className, args, offset, nArgs-offset);
 
