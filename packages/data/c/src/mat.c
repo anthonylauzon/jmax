@@ -740,7 +740,7 @@ mat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   mat_t *self = (mat_t *) o;
   
-  if (self->m * self->n)
+  if (self->data != NULL)
     fts_free(self->data);
 }
 
