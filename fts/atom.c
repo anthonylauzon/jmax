@@ -29,8 +29,13 @@
 #include <ftsprivate/class.h>
 #include <ftsprivate/message.h>
 
+
 static fts_atom_t __fts_null;
 const fts_atom_t *fts_null = &__fts_null;
+
+
+void fts_kernel_atom_init (void);
+
 
 int fts_atom_identical( const fts_atom_t *first, const fts_atom_t *second)
 {
@@ -97,6 +102,55 @@ fts_atom_equals( const fts_atom_t *first, const fts_atom_t *second)
   
   return 0;
 }
+
+
+static int
+fts_atom_compare_classes (const fts_atom_t *a, const fts_atom_t *b)
+{
+    if (fts_is_number(a)  &&  fts_is_number(b))
+	/* special case: numbers are comparable */
+	return 1;
+    else		
+	/* return arbitrary class distance (is type_id better?) */
+	return ((int) fts_get_class(a) - (int) fts_get_class(b));
+}
+
+
+int
+fts_atom_compare (const fts_atom_t *a, const fts_atom_t *b)
+{
+    int res = fts_atom_compare_classes(a, b);
+
+    if (res != 0)
+	/* return arbitrary class distance */
+	return res;
+    else
+    {    /* comparable classes */
+	switch (fts_class_get_typeid(fts_get_class(a))) 
+	{
+	case FTS_TYPEID_VOID:
+	    return (1);
+
+	case FTS_TYPEID_INT:
+	case FTS_TYPEID_FLOAT:
+	    return (fts_get_number_float(a) - fts_get_number_float(b));
+
+	case FTS_TYPEID_SYMBOL:
+	    return (strcmp(fts_symbol_name(fts_get_symbol(a)),
+			   fts_symbol_name(fts_get_symbol(b))));
+
+	case FTS_TYPEID_POINTER:
+	    return ((char *) fts_get_pointer(a) - (char *) fts_get_pointer(b));
+
+	case FTS_TYPEID_STRING :
+	    return (strcmp(fts_get_string(a), fts_get_string(b)));
+
+	default:	/* TODO: call object comparison function */
+	    return fts_get_object(a) - fts_get_object(b);
+	}
+    }
+}
+
 
 void
 fts_atom_copy( const fts_atom_t *from, fts_atom_t *to)

@@ -443,6 +443,17 @@ FTS_API int fts_atom_identical(const fts_atom_t *p1, const fts_atom_t *p2);
 FTS_API int fts_atom_equals(const fts_atom_t *p1, const fts_atom_t *p2);
 
 /**
+ * Compares atoms of number, symbol, and objects (pointer!).
+ * For objects???
+ *
+ * @param a pointer to atom
+ * @param b pointer to atom
+ * @return a value < 0, 0, > 0 if a < b, a == b, a > b respectively
+ * @ingroup atom
+ */
+FTS_API int fts_atom_compare(const fts_atom_t *a, const fts_atom_t *b);
+
+/**
  * Copies an atom
  * For objects the copy function of the class is used
  *
