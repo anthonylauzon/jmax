@@ -402,6 +402,7 @@ typedef struct _fts_udpstream_t fts_udpstream_t;
 FTS_API int fts_udpstream_get_port(fts_udpstream_t* stream);
 FTS_API int fts_udpstream_get_connected_port(fts_udpstream_t* stream);
 FTS_API void fts_udpstream_connect( fts_udpstream_t* stream, int connected_port);
+FTS_API void fts_udpstream_disconnect( fts_udpstream_t* stream);
 
 /** 
  * @name memory stream
