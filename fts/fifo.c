@@ -43,7 +43,7 @@ void fts_fifo_reinit( fts_fifo_t *fifo, void *buffer, int size)
 	  if(fill > size)
 	    fill = size;
 
-	  memcpy(buffer, fifo->buffer, fill);
+	  memcpy(buffer, (void *)fifo->buffer, fill);
 
 	  fifo->read_index = 0;
 	  fifo->write_index = fill;
@@ -62,7 +62,7 @@ void fts_fifo_reinit( fts_fifo_t *fifo, void *buffer, int size)
 	  if(head + tail > size)
 	    tail = size - head;
 
-	  memcpy(buffer + head, fifo->buffer, tail);
+	  memcpy(buffer + head, (void *)fifo->buffer, tail);
 
 	  fifo->read_index = 0;
 	  fifo->write_index = head + tail;
