@@ -80,8 +80,14 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     return getLocation();
   }
   public Rectangle getViewRectangle(){
-    JViewport port = itsScrollerView.getViewport();
-    return port.getViewRect();
+      JViewport port;
+      if(itsScrollerView != null)
+      {
+	  port = itsScrollerView.getViewport();
+	  return port.getViewRect();
+      }
+      else
+	  return null;
   }
 
   // ------- messageDisplayer interface -------------\

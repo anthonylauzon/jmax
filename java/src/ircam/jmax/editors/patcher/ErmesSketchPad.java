@@ -103,6 +103,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
   public void updateGroupEnd()
   {
     Rectangle rect = getEditorContainer().getViewRectangle();
+    if( rect == null) return;
     Graphics gr;
 
     if (isLocked()){
