@@ -14,78 +14,35 @@ class ErmesObjOut extends ErmesObject {
   static Dimension minimumSize = new Dimension(15,15); 
   int itsId;
 
-  public ErmesObjOut(){
-    super();
+  public ErmesObjOut(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  {
+    super(theSketchPad, theFtsObject);
   }
 	
   //--------------------------------------------------------
   // Init
   //--------------------------------------------------------
-  public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
-    //Dimension d = getPreferredSize();
-
-
-    itsId = ((FtsOutletObject) theFtsObject).getPosition();
-
-    super.Init(theSketchPad, theFtsObject); 
-	
-    return true;
-  }
-
-  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-    //We need here the information about the maximum number of outlets
-  	
-    itsSketchPad = theSketchPad;  // (fd) itsSketchPad is set in ErmesObject::Init
-
-    // (fd) {
-    // See ErmesObjIn.java for comments.
-    int temp = theSketchPad.GetSketchWindow().itsPatcher.getNumberOfInlets();
-    
-    if (theSketchPad.outCount < temp)
-      itsId = theSketchPad.outCount++;   //for now no deleting handled
-    else
-      itsId = temp - 1;
-    // } (fd)
-
-    super.Init(theSketchPad, x, y, theString);	//it was not here...
-
-    makeCurrentRect(x, y);
-	
-    return true;
-  }
-	
-
-  public void makeFtsObject()
+  public void Init()
   {
-    try
-      {
-	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "outlet", Integer.toString(itsId));
-      }
-    catch (FtsException e)
-      {
-	// ENZO !!!! AIUTO :->
-	System.out.println("Error in Object Instantiation");
-      }
+    itsId = ((FtsOutletObject) itsFtsObject).getPosition();
+
+    super.Init();
   }
+
 
   public void redefineFtsObject()
   {
-    // Inlets may redefine the arguments, but not the whole description
-    // i.e. they remains Inlets
-
     ((FtsOutletObject)itsFtsObject).setPosition(itsId);
   }
   
-
-  public boolean MouseDown_specific(MouseEvent evt, int x, int y) {
+  public void MouseDown_specific(MouseEvent evt, int x, int y) {
     if (itsSketchPad.itsRunMode || evt.getClickCount() == 1) {
-      return itsSketchPad.ClickOnObject(this, evt, x, y);
+      itsSketchPad.ClickOnObject(this, evt, x, y);
     }
     else  {	//we want to choose among the different Outlet number
       itsSketchPad.itsOutPop.SetNewOwner(this); //make the Choice pointing to this
       itsSketchPad.itsOutPop.show(itsSketchPad, getItsX(), getItsY());
     }
-    return true;
   }
 
   void ChangeOutletNo(int numberChoosen) {

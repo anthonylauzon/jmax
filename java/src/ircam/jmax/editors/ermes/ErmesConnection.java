@@ -13,23 +13,17 @@ import java.lang.Math;
  * methods (mouseclick, move, doubleclick...).
  */ 
 
-public class ErmesConnection implements ErmesDrawable{
-	
+public class ErmesConnection implements ErmesDrawable
+{
   public ErmesObjInlet itsInlet;
   public ErmesObjOutlet itsOutlet;
   int itsInletNum;
   int itsOutletNum;
-  //Point itsStartPoint, itsEndPoint;
   ErmesSketchPad itsSketchPad;
   FtsConnection itsFtsConnection;
   ErmesObject	itsFromObject;
   ErmesObject	 itsToObject;
-  boolean itsErrorState;
   boolean itsSelected;
-  static int debug_count = 1;
-  boolean mustSayToSketch = false;	//when it is ready
-  
-  final int DELTA = 6;
   
   public Point getStartPoint() {return itsOutlet.GetAnchorPoint();}
   public Point getEndPoint() {return itsInlet.GetAnchorPoint();}
@@ -46,8 +40,8 @@ public class ErmesConnection implements ErmesDrawable{
   //	to be used from user-driven connections, unlike the second constructor, which receives
   //	the FtsConnection. This is going to change in a middle-term (4/03/97)
   //--------------------------------------------------------
-  public ErmesConnection(ErmesSketchPad theSketchPad, ErmesObjInlet theInlet, ErmesObjOutlet theOutlet) throws FtsException{
-		
+  public ErmesConnection(ErmesSketchPad theSketchPad, ErmesObjInlet theInlet, ErmesObjOutlet theOutlet) throws FtsException
+  {
     itsSketchPad = theSketchPad;
     itsInlet = theInlet;
     itsOutlet = theOutlet;
@@ -103,16 +97,6 @@ public class ErmesConnection implements ErmesDrawable{
     
   }
 
-  public ErmesConnection(ErmesSketchPad theSketchPad, ErmesObjInlet theInlet, ErmesObjOutlet theOutlet, FtsConnection theFtsConnection){
-		
-    itsSketchPad = theSketchPad;
-    itsInlet = theInlet;
-    itsOutlet = theOutlet;
-    itsFtsConnection = theFtsConnection;
-    itsSelected = false;
-    itsFtsConnection.setRepresentation(this);
-  }
-
   public ErmesConnection(ErmesObject fromObj, ErmesObject toObj, ErmesSketchPad theSketchPad, int theOutlet, int theInlet, FtsConnection theFtsConnection){
     itsFtsConnection = theFtsConnection;
     itsFromObject = fromObj;
@@ -143,51 +127,44 @@ public class ErmesConnection implements ErmesDrawable{
   //	Select
   //  select a connection
   //--------------------------------------------------------
-  public boolean Select(boolean paintNow){
+  public void Select(boolean paintNow){
     if (!itsSelected) {
       itsSelected = true;
       if (paintNow) DoublePaint();
       else itsSketchPad.addToDirtyConnections(this);
-      return true;
     }
-    return false;
   }
 	
   //--------------------------------------------------------
   //	Deselect
   //	deselect a connection
   //--------------------------------------------------------
-  public boolean Deselect(boolean paintNow){
+  public void Deselect(boolean paintNow){
     if (itsSelected) {
       itsSelected = false;
       itsSketchPad.markSketchAsDirty();
       if (paintNow) itsSketchPad.paintDirtyList();
-      return true;
     }
-    return false;
   }
 	
-  public boolean MouseDown(MouseEvent evt,int x, int y) {
+  public void MouseDown(MouseEvent evt,int x, int y) {
     if (!itsSketchPad.itsRunMode){
       itsSketchPad.ClickOnConnection(evt, x, y);
     }
-    return true;
   }
-	
-  ////////////////////////// codice rubato senza nessuno scrupolo
 	
   boolean IsNearToPoint(int x, int y){
 
     Point start = getStartPoint();
     Point end = getEndPoint();
 
-      int dx = java.lang.Math.abs(end.x - start.x);
-      int dy = java.lang.Math.abs(end.y - start.y);
+    int dx = java.lang.Math.abs(end.x - start.x);
+    int dy = java.lang.Math.abs(end.y - start.y);
       
-      if (dx > dy) return (SegmentIntersect(x, y-3, x, y+3, start.x,
-					    start.y,end.x, end.y));
-      else return (SegmentIntersect(x-3, y, x+3, y, start.x, start.y,
-				    end.x, end.y));
+    if (dx > dy)
+      return (SegmentIntersect(x, y-3, x, y+3, start.x, start.y, end.x, end.y));
+    else
+      return (SegmentIntersect(x-3, y, x+3, y, start.x, start.y, end.x, end.y));
   }
 
 
@@ -266,3 +243,5 @@ public class ErmesConnection implements ErmesDrawable{
       g.drawLine(start.x, start.y, end.x, end.y);
   }
 }
+
+

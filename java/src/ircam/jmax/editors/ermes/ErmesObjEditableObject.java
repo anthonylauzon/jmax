@@ -9,17 +9,15 @@ import ircam.jmax.fts.*;
 /**
  * The base class of the ermes objects which are user-editable (ErmesObjMessage, ErmesObjExternal, ErmesObjPatcher).
  */
-abstract class ErmesObjEditableObject extends ErmesObject implements FtsPropertyHandler {
-
-  int HEIGHT_DIFF = 3;
+abstract class ErmesObjEditableObject extends ErmesObject implements FtsPropertyHandler, ErmesObjEditable
+{
+  static final int HEIGHT_DIFF = 3;
   int TEXT_OFFSET;
-  final int TEXT_INSET = 2;
+  static final int TEXT_INSET = 2;
 	
-  protected int FIELD_HEIGHT;
-  protected int FIELD_WIDTH;
   Dimension preferredSize = new Dimension(100, 25);//hu-hu 
   Dimension currentMinimumSize = new Dimension();
-  String 	  itsArgs;
+  String        itsArgs;
   public Vector itsParsedTextVector = new Vector();
   public String itsMaxString = "";
   int itsMaxStringWidth = 0; // (fd)
@@ -31,57 +29,40 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
-  public ErmesObjEditableObject(){
-    super();
+
+  public ErmesObjEditableObject(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  {
+    super(theSketchPad, theFtsObject);
+
     TEXT_OFFSET = getWhiteOffset()+TEXT_INSET;
   }
 
   protected int getWhiteOffset() {return 0;}
 
   //--------------------------------------------------------
-  // Init from skratch
-  //--------------------------------------------------------
-
-  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-    super.Init(theSketchPad, x, y, theString);
-    
-    if (theString.equals("")) {
-      FIELD_HEIGHT = itsFontMetrics.getHeight();
-      FIELD_WIDTH = itsFontMetrics.stringWidth("0");
-      preferredSize = new Dimension(70, FIELD_HEIGHT+2*HEIGHT_DIFF);
-      itsSketchPad.GetEditField().setFont(getFont());
-      itsSketchPad.GetEditField().setText("");
-      itsSketchPad.GetEditField().itsOwner = this; //redirect the only editable field to point here...
-      setJustification(itsSketchPad.itsJustificationMode);
-      makeCurrentRect(x,y); //redo it..
-      
-      itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-8, itsFontMetrics.getHeight() + 20);
-
-      itsSketchPad.editStatus = itsSketchPad.EDITING_OBJECT;
-      
-      itsSketchPad.GetEditField().setVisible(true);
-      itsSketchPad.GetEditField().requestFocus();
-    }
-
-    return true;
-  }
-  
-
-  //--------------------------------------------------------
   // Init from ftsObjects
   //--------------------------------------------------------
-  public boolean Init(ErmesSketchPad theSketchPad,  FtsObject theFtsObject) {
 
-    // MDC: itsArgs is set by the Init methods of the subclasses
+  public void Init()
+  {
+    int FIELD_HEIGHT;
 
-    FontMetrics temporaryFM = theSketchPad.getFontMetrics(theSketchPad.getFont());
+    FontMetrics temporaryFM = itsSketchPad.getFontMetrics(itsSketchPad.getFont());
     FIELD_HEIGHT = temporaryFM.getHeight();
 
-    int lenght = temporaryFM.stringWidth(itsArgs);	//*
-    preferredSize = new Dimension(lenght+2*TEXT_OFFSET, FIELD_HEIGHT+2*HEIGHT_DIFF);	//*
-    super.Init(theSketchPad, theFtsObject);
+    if (itsArgs.equals(""))
+      {
+	preferredSize = new Dimension(70, FIELD_HEIGHT+2*HEIGHT_DIFF);
+      }
+    else
+      {
+	int lenght = temporaryFM.stringWidth(itsArgs);	//*
+	preferredSize = new Dimension(lenght+2*TEXT_OFFSET, FIELD_HEIGHT+2*HEIGHT_DIFF);	//*
+      }
+
+    super.Init();
     
-    Integer aJustification = (Integer)theFtsObject.get("jsf");
+    Integer aJustification = (Integer)itsFtsObject.get("jsf");
     if(aJustification == null) setJustification(itsSketchPad.itsJustificationMode);
     else setJustification(aJustification.intValue());
 
@@ -89,8 +70,6 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
 
     itsFtsObject.watch("ins", this);
     itsFtsObject.watch("outs", this);
-
-    return true;
   }
 
   /* Property handling */
@@ -107,9 +86,8 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
   //--------------------------------------------------------
   // mouseDown
   //--------------------------------------------------------
-  public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
+  public void MouseDown_specific(MouseEvent evt,int x, int y) {
     itsSketchPad.ClickOnObject(this, evt, x, y);
-    return true;
   }
 	
   void backupText() {
@@ -191,7 +169,8 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
     itsSketchPad.GetEditField().setText(theString);
     itsSketchPad.GetEditField().setSize(d1.width-TEXT_OFFSET, d1.height-HEIGHT_DIFF);
     itsSketchPad.GetEditField().repaint();
-    itsSketchPad.validate();//??
+    // @@@@ BARBOGIO
+    // itsSketchPad.validate();//??
     itsSketchPad.repaint();
   }
 	

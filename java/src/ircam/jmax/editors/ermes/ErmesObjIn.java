@@ -14,80 +14,29 @@ class ErmesObjIn extends ErmesObject {
   Dimension textDimensions = new Dimension();
   int itsId;
   
-  public ErmesObjIn(){
-    super();
+  public ErmesObjIn(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  {
+    super(theSketchPad, theFtsObject);
   }
 	
   //--------------------------------------------------------
   // Init
   //--------------------------------------------------------
-  public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
-    Dimension d = getPreferredSize();
-
-    itsId = ((FtsInletObject) theFtsObject).getPosition();
-
-    super.Init(theSketchPad, theFtsObject); 
-
-    return true;
-  }
-
-  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-  //We need here the information about the maximum number of inlets
-
-    itsSketchPad = theSketchPad;  // (fd) itsSketchPad is set in ErmesObject::Init
-
-    // (fd) {
-    // this piece of code which was after calling super.Init(),
-    // must be BEFORE it, because super.Init() calls makeFtsObject that uses member 
-    // variable itsId which was not initialized.
-    // i.e. 1) the constructor calls super()
-    // 2) the constructor of the super class calls an abstract function defined in the subclass
-    // 3) this function is called on a partially initialized object.
-    // May be this is a potential source of problems ?
-
-    /* (mdc): changed: the inlet number do not need to be 
-       less than the actual number of inlets; you may change the number later.
-       May be it should be the next unused value; in this way, each new
-       object get a new value, so "make an inlet" "delete it" and "make an inlet"
-       will produce inlet 2 instead of inlet 1.
-       */
-
-    itsId = theSketchPad.inCount++;   //for now no deleting handled
-
-    super.Init(theSketchPad, x, y, theString);	//this was not here...
-    makeCurrentRect(x, y);
-
-    //it was here super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
-
-    return true;
-  }
-	
-
-  public void makeFtsObject()
+  public void Init()
   {
-    try
-      {
-	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "inlet", Integer.toString(itsId));
-      }
-    catch (FtsException e)
-      {
-	// ENZO !!!! AIUTO :->
-	System.out.println("Error in Object Instantiation");
-      }
+    itsId = ((FtsInletObject) itsFtsObject).getPosition();
+    super.Init();
   }
+
 
   public void redefineFtsObject()
   {
-    // Inlets may redefine the arguments, but not the whole description
-    // i.e. they remains Inlets
-
     ((FtsInletObject)itsFtsObject).setPosition(itsId);
   }
   
-  
-  public void Paint_specific(Graphics g) {
-  	
-  	textDimensions.setSize(itsFontMetrics.stringWidth(""+(itsId+1)), itsFontMetrics.getHeight());	
+  public void Paint_specific(Graphics g)
+  {
+    textDimensions.setSize(itsFontMetrics.stringWidth(""+(itsId+1)), itsFontMetrics.getHeight());	
 	  	
     if(!itsSelected) g.setColor(itsLangNormalColor);
     else g.setColor(itsLangSelectedColor);
@@ -99,7 +48,7 @@ class ErmesObjIn extends ErmesObject {
     //the triangle
     g.drawLine(getItsX()+1,getItsY()+1, getItsX()+getItsWidth()/2, getItsY()+getItsHeight()/2);
     g.drawLine(getItsX()+getItsWidth()/2,getItsY()+getItsHeight()/2, getItsX()+getItsWidth()-1, getItsY()+1);
-    //g.drawString(""+(itsId+1), itsX + 7, itsY + 7+7);
+
     g.setFont(getFont());
     g.drawString(""+(itsId+1), getItsX()+2, getItsY()-2);
   }
@@ -108,16 +57,15 @@ class ErmesObjIn extends ErmesObject {
     itsSketchPad.repaint();
   }
 
-  public boolean MouseDown_specific(MouseEvent evt, int x, int y) {
+  public void MouseDown_specific(MouseEvent evt, int x, int y) {
     
     if (itsSketchPad.itsRunMode || evt.getClickCount() == 1) {
-      return itsSketchPad.ClickOnObject(this, evt, x, y);
+      itsSketchPad.ClickOnObject(this, evt, x, y);
     }
     else  {	//we want to choose among the different Inlet number
       itsSketchPad.itsInPop.SetNewOwner(this);
       itsSketchPad.itsInPop.show(itsSketchPad, getItsX(), getItsY());
     }
-    return true;
   }
 
   void ChangeInletNo(int numberChoosen) {

@@ -11,7 +11,6 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
   static String filler = " ";
   ErmesObjComment itsOwner = null;
   ErmesSketchPad itsSketchPad = null;
-  
   boolean focused = false;
   int DEFAULT_COLS = 20;
   
@@ -47,8 +46,8 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
   //--------------------------------------------------------
   // lostFocus
   //--------------------------------------------------------
-  public boolean LostFocus() {
-    if (!focused) return true;
+  public void LostFocus() {
+    if (!focused) return;
     else {
       focused = false;
       itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
@@ -67,34 +66,18 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
 	itsOwner = null;	//seems to be crazy but...
 	*/
       AbortEdit();
-      return true; 
+      return; 
     }
     //try to test if the object was already instantiated; in case, delete the object... (how?)
     
     //qui si prova a togliere gli spazi in fondo dalla parola....
-    if(aTextString.endsWith(" ")){
-      while(aTextString.endsWith(" ")){
-	aTextString = aTextString.substring(0, aTextString.length()-1);
-      }
-    }
-    if(aTextString.endsWith("\n")){
-      while(aTextString.endsWith("\n")){
-	aTextString = aTextString.substring(0, aTextString.length()-1);
-      }
-    }
+    aTextString = aTextString.trim();
     
-    if (itsOwner == null) return false; //this happens when the instatiation fails
+    if (itsOwner == null) return; //this happens when the instatiation fails
     
-    if (itsOwner.itsFtsObject != null){
-      itsOwner.itsArgs = aTextString;
-      itsOwner.ParseText(aTextString);
-      itsOwner.redefineFtsObject();
-    }
-    else {
-      itsOwner.itsArgs = aTextString;
-      itsOwner.ParseText(aTextString);
-      itsOwner.makeFtsObject();
-    }
+    itsOwner.itsArgs = aTextString;
+    itsOwner.ParseText(aTextString);
+    itsOwner.redefineFtsObject();
     
     itsOwner.UpdateOnly(itsSketchPad.GetOffGraphics());//
 
@@ -120,7 +103,6 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
 
     setRows(5);
     setColumns(20);
-    return true;       
   }
 	
   ///////////////////////////////////////////////////////////////////////////

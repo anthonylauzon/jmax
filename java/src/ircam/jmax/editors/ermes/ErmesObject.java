@@ -46,8 +46,48 @@ abstract public class ErmesObject implements ErmesDrawable {
   static Color itsLangNormalColor = new Color(153, 204, 204);
   static Color itsLangSelectedColor = new Color(51, 153, 153);
 
-  public ErmesObject() {
+
+  /* A Static method that work as a virtual constructor;
+     given an FTS object, build the proper FTS Object
+     */
+
+  static ErmesObject makeErmesObject(ErmesSketchPad sketch, FtsObject object)
+  {
+    ErmesObject aObject;
+    String theName = object.getClassName();
+
+    if (theName.equals("messbox"))
+      aObject = new ErmesObjMessage(sketch, object);
+    else if (theName.equals("button"))
+      aObject = new ErmesObjBang(sketch, object);
+    else if (theName.equals("toggle"))
+      aObject = new ErmesObjToggle(sketch, object);
+    else if (theName.equals("intbox"))
+      aObject = new ErmesObjInt(sketch, object);
+    else if (theName.equals("floatbox"))
+      aObject = new ErmesObjFloat(sketch, object);
+    else if (theName.equals("comment"))
+      aObject = new ErmesObjComment(sketch, object);
+    else if (theName.equals("slider"))
+      aObject = new ErmesObjSlider(sketch, object);
+    else if (theName.equals("inlet"))
+      aObject = new ErmesObjIn(sketch, object);
+    else if (theName.equals("outlet"))
+      aObject = new ErmesObjOut(sketch, object);
+    else
+      aObject = new ErmesObjPatcher(sketch, object);
+
+    aObject.Init();
+
+    return aObject;
+  }
+       
+
+  public ErmesObject(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  {
     super();
+    itsSketchPad = theSketchPad;
+    itsFtsObject = theFtsObject;
   }
 	
   public int getItsX() {
@@ -138,7 +178,8 @@ abstract public class ErmesObject implements ErmesDrawable {
 
   abstract protected void Paint_specific(Graphics g);
 
-  public boolean MouseDown_specific(MouseEvent e, int x, int y) {return true;};  
+  public void MouseDown_specific(MouseEvent e, int x, int y) {};  
+
   public void inspect() {
     if (inspectorAlreadyOpen()) return;
     else openInspector();
@@ -170,7 +211,9 @@ abstract public class ErmesObject implements ErmesDrawable {
 
   public  void Paint(Graphics g)
   {
-    if(!itsSketchPad.itsGraphicsOn)return;
+    if (! itsSketchPad.itsGraphicsOn)
+      return;
+
     if (itsSketchPad.isInGroup) {
       //emergency situation: ignore the Graphics and paint offScreen 
       Paint_specific(itsSketchPad.GetOffGraphics());
@@ -305,44 +348,18 @@ abstract public class ErmesObject implements ErmesDrawable {
     return false;
   }
 
+  /** redefineFtsObject provide a default empty implementation 
+    for the object that do not redefine themselves */
 
-// This init method is only called in "from skratch" initializations
-  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-    itsFtsPatcher = theSketchPad.GetSketchWindow().itsPatcher;//added
-    makeFtsObject();//added
-    itsSelected = false;
-    itsSketchPad = theSketchPad;
-    setFont(itsSketchPad.sketchFont);
-
-    // itsFontMetrics = itsSketchPad.getFontMetrics(itsFont); // (fd) already done in setFont() !!!
-    
-    //setItsX(x); (fd) also done in makeCurrentRect(x, y)
-    //setItsY(y); idem
-		
-    makeCurrentRect(x, y);
-
-    reshape(itsX, itsY, getPreferredSize().width, getPreferredSize().height);
-    
-    if (itsFtsObject == null) return false;
-    else update(itsFtsObject);
-    itsSketchPad.addToDirtyObjects(this);
-
-    return true;
-  }
-
-  abstract public void makeFtsObject();
   public void redefineFtsObject() {  }
   
-  public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  public void Init()
   {
-    String aFont = (String)theFtsObject.get( "font");
-    Integer  aSize = (Integer)theFtsObject.get( "fs");
+    String aFont = (String)itsFtsObject.get( "font");
+    Integer  aSize = (Integer)itsFtsObject.get( "fs");
     
     itsSelected = false;
-    itsSketchPad = theSketchPad;
-    itsFtsObject = theFtsObject;
-
-    makeCurrentRect(theFtsObject);
+    makeCurrentRect(itsFtsObject);
 
     // (fd) font mess !!! needs to be redone entirely.
     if ( (aFont == null) && (aSize != null))
@@ -351,13 +368,6 @@ abstract public class ErmesObject implements ErmesDrawable {
 
 	itsFont = FontCache.lookupFont( fontSize );
 	itsFontMetrics = FontCache.lookupFontMetrics( fontSize);
-
-	// (fd) et allez, on vire tout !!!
-	//ResizeToNewFont( itsFont);
-
-	// (fd) this case is the default, which should not be resent to FTS
-	//itsFtsObject.put( "font", itsFont.getName());
-	//itsFtsObject.put( "fs", itsFont.getSize());
       }
     else if( (aFont == null) && (aSize == null))
       {
@@ -380,19 +390,8 @@ abstract public class ErmesObject implements ErmesDrawable {
     update(itsFtsObject);
 
     itsFtsPatcher = GetSketchWindow().itsPatcher;
-
-    return true;
   }
   
-  protected void makeCurrentRect( int x, int y) 
-  {
-    Dimension d = getPreferredSize();
-    currentRect = new Rectangle(x, y, d.width, d.height);
-    setItsX(x);
-    setItsY(y);
-    setItsWidth(d.width);
-    setItsHeight(d.height);
-  }
 
   protected void makeCurrentRect(FtsObject theFtsObject) 
   {
@@ -417,44 +416,45 @@ abstract public class ErmesObject implements ErmesDrawable {
     
     if ( width < 10)
       {
-	width = getMinimumSize().width;
+	width = getPreferredSize().width;
 	theFtsObject.put( "w", width);
       }
 
     if ( height < 10)
       {
-	height = getMinimumSize().height;
+	height = getPreferredSize().height;
 	theFtsObject.put( "h", height);
       }
 
+
     currentRect = new Rectangle(itsX, itsY, width, height);
-    
+
     // apart from setting again width (first line of setItsWidth: currentRect.width = theWidth;)
     // this propagates back the property value to the application layer and then may be to FTS
     //setItsWidth(width);
     //setItsHeight(height);
   }
 
-  public boolean Select(boolean paintNow)
+  void Select(boolean paintNow)
   {
-    if (!itsSelected) {
-      itsSelected = true;
-      if (paintNow) DoublePaint();
-      else itsSketchPad.addToDirtyObjects(this);
-      return true;
+    if (!itsSelected)
+      {
+	itsSelected = true;
+
+	if (paintNow)
+	  DoublePaint();
+	else
+	  itsSketchPad.addToDirtyObjects(this);
     }
-    return false;
   }
 
-  public boolean Deselect(boolean PaintNow)
+  public void Deselect(boolean PaintNow)
   {
     if (itsSelected) {
       itsSelected = false;
       if (PaintNow) DoublePaint();
       else itsSketchPad.addToDirtyObjects(this);
-      return true;
     }
-    return false;
   }
   
   public FtsObject GetFtsObject(){
@@ -477,12 +477,13 @@ abstract public class ErmesObject implements ErmesDrawable {
     return itsSketchPad;
   }
 	
-  public boolean ConnectionRequested(ErmesObjInOutlet theRequester)
+  public void ConnectionRequested(ErmesObjInOutlet theRequester)
   {
     // HERE the checking: is the type of connection requested allowed?
     if (!theRequester.IsInlet())	//if is an outlet...
-      return (itsSketchPad.OutletConnect(this, theRequester));
-    else return (itsSketchPad.InletConnect(this, theRequester)); // then, is it's an inlet
+      itsSketchPad.OutletConnect(this, theRequester);
+    else
+      itsSketchPad.InletConnect(this, theRequester); // then, is it's an inlet
   }
 
   
@@ -521,22 +522,22 @@ abstract public class ErmesObject implements ErmesDrawable {
 	    y < (currentRect.y+currentRect.height) );    
   }
 
-  public boolean MouseDown(MouseEvent e,int x, int y) {
+  public void MouseDown(MouseEvent e,int x, int y) {
     if (!itsSketchPad.itsRunMode && !e.isControlDown()){
       if((e.getClickCount()>1)&&(e.isShiftDown())) {
 	RestoreDimensions(true);
-	return true;
       }
       else 
 	if (itsSelected) itsSketchPad.clickHappenedOnAnAlreadySelected =true;
 	else itsSketchPad.clickHappenedOnAnAlreadySelected =false;
 	if(IsInDragBox(x,y)) {
 	  SetInitDrag(x,y);
-	  return true;
 	}
-	else return MouseDown_specific(e, x, y);
+	else
+	  MouseDown_specific(e, x, y);
     }
-    else return MouseDown_specific(e, x, y);
+    else
+      MouseDown_specific(e, x, y);
   }
 	
   public boolean MouseUp_specific(MouseEvent e, int x, int y){return false;}

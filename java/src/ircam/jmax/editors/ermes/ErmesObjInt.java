@@ -20,11 +20,6 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
   int itsInteger = 0;
   
   static ErmesObjIntegerDialog itsIntegerDialog = null;
-  static final int TRUST=10;		//how many transmitted values we trust?
-  int transmission_buffer[];
-  int transmission_index = 0;
-  int receiving_index = 0;
-  int last_value = 0;
   
   int DEFAULT_WIDTH = 40;
   int DEFAULT_HEIGHT = 15;
@@ -33,74 +28,44 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
   boolean firstClick = true;
   Dimension preferredSize = new Dimension(DEFAULT_WIDTH,DEFAULT_HEIGHT);
   Dimension minimumSize = new Dimension(DEFAULT_WIDTH,DEFAULT_HEIGHT);
+
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
-  public ErmesObjInt(){
-    super();
+
+  public ErmesObjInt(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  {
+    super(theSketchPad, theFtsObject);
 
     // (fd) {
     state = 0;
     currentText = new StringBuffer();
     // } (fd)
-
-    transmission_buffer = new int[TRUST];
   }
 	
   //--------------------------------------------------------
   // init
   //--------------------------------------------------------
-  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-    
-    DEFAULT_HEIGHT = theSketchPad.getFontMetrics(theSketchPad.sketchFont).getHeight();
-    DEFAULT_WIDTH = theSketchPad.getFontMetrics(theSketchPad.sketchFont).stringWidth("0")*DEFAULT_VISIBLE_DIGIT+theSketchPad.getFontMetrics(theSketchPad.sketchFont).stringWidth("..");
-    preferredSize.height = DEFAULT_HEIGHT+4;
-    preferredSize.width = DEFAULT_WIDTH+17;
-    super.Init(theSketchPad, x, y, theString);
+
+  public void Init()
+  {
+    super.Init();
     itsFtsObject.watch("value", this);
-    return true;
-  }
 
-   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
-     super.Init(theSketchPad,  theFtsObject);
-     itsFtsObject.watch("value", this);
+    itsInteger = ((Integer)itsFtsObject.get("value")).intValue();
+    DEFAULT_HEIGHT = itsFontMetrics.getHeight();
+    DEFAULT_WIDTH = itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("..");
 
-     itsInteger = ((Integer)theFtsObject.get("value")).intValue();
-     DEFAULT_HEIGHT = itsFontMetrics.getHeight();
-     DEFAULT_WIDTH = itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("..");
-     if(getItsHeight()<DEFAULT_HEIGHT+4) {
-       preferredSize.height = DEFAULT_HEIGHT+4;
-       resizeBy(0, getPreferredSize().height - getItsHeight());
-     }
-     if(getItsWidth()<DEFAULT_WIDTH+17){
-       preferredSize.width = DEFAULT_WIDTH+17;
-       setItsWidth(preferredSize.width);
-     }
-     return true;
+    if(getItsHeight()<DEFAULT_HEIGHT+4) {
+      preferredSize.height = DEFAULT_HEIGHT+4;
+      resizeBy(0, getPreferredSize().height - getItsHeight());
+    }
+    if(getItsWidth()<DEFAULT_WIDTH+17){
+      preferredSize.width = DEFAULT_WIDTH+17;
+      setItsWidth(preferredSize.width);
+    }
    }
 	
-  //--------------------------------------------------------
-  // makeFtsObject, redefineFtsObject
-  //--------------------------------------------------------
-  
-  public void makeFtsObject()
-  {
-    try
-      {
-	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "intbox");
-      }
-    catch (FtsException e)
-      {
-	// Enzo !!! Aiuto :-> (MDC)
-      }
-
-  }
-
-  public void redefineFtsObject()
-  {
-    // gint do not redefine themselves
-  }
-  
   //--------------------------------------------------------
   // propertyChanged
   // callback function from the associated FtsObject in FTS
@@ -155,13 +120,13 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
     aWidth = 17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("..");
 
     resizeBy(aWidth-getItsWidth(), aHeight-getItsHeight());
-    itsSketchPad.repaint();
+    // itsSketchPad.repaint(); // BARBOGIO
   }
 	
   //--------------------------------------------------------
   //  mouseDown
   //--------------------------------------------------------
-  public boolean MouseDown_specific(MouseEvent evt,int x, int y) 
+  public void MouseDown_specific(MouseEvent evt,int x, int y) 
   {
     if ( itsSketchPad.itsRunMode || evt.isControlDown())
       {
@@ -188,8 +153,6 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
       }
     else 
       itsSketchPad.ClickOnObject(this, evt, x, y);
-
-    return true; // (fd) Is returned value used ????? Seems not ...
   }
   
   public boolean inspectorAlreadyOpen() {

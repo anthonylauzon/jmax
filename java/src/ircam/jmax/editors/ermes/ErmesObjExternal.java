@@ -33,7 +33,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
     return WHITE_OFFSET;
   }
 
-  public boolean Init( ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  public void Init()
   {
     // Added by MDC; get the correct String from the object, and then call super
     // It is needed because ErmesObjExternal and ErmesObjMessage use different methods
@@ -41,16 +41,15 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
 
     itsArgs = theFtsObject.getDescription().trim();
 
-    super.Init( theSketchPad, theFtsObject);
+    super.Init();
 
     if ( theFtsObject instanceof FtsContainerObject)
       this.YouArePatcher( true);
 
     ParseText( itsArgs);
-    if ( !canResizeBy( 0, 0))
-      RestoreDimensions( false);
 
-    return true;
+    if ((! itsArgs.equals("")) &&(! canResizeBy( 0, 0)))
+      RestoreDimensions( false);
   }
 
   public void propertyChanged(FtsObject obj, String name, Object value) {
@@ -85,29 +84,8 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
   }
 
   //--------------------------------------------------------
-  // makeFtsObject and redefineFtsObject() 
+  // redefineFtsObject() 
   //--------------------------------------------------------
-
-  public void makeFtsObject()
-  {
-    try
-      {
-	if (itsArgs == null) 
-	  itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "__void");
-	else
-	  itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, itsArgs);
-
-	itsFtsObject.watch("error", this);
-	isError = -1;
-      }
-    catch (FtsException e)
-      {
-	System.out.println("Cannot create object: " + itsArgs);
-      }
-
-    if (itsFtsObject instanceof FtsContainerObject)
-      YouArePatcher(true);
-  }
 
   public void redefineFtsObject()
   {
@@ -134,7 +112,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
   // mouseDown
   //--------------------------------------------------------
   
-  public boolean MouseDown_specific(MouseEvent evt,int x, int y) 
+  public void MouseDown_specific(MouseEvent evt,int x, int y) 
   {
     if ( evt.getClickCount() > 1 ) 
       {
@@ -189,11 +167,10 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
       }
     else if ( !itsSketchPad.itsRunMode) 
       itsSketchPad.ClickOnObject( this, evt, x, y);
-
-    return true;
   }
 
   public void RestartEditing() {
+    isError = 0; // to get the edited object green
     super.RestartEditing();
   }
   
@@ -201,7 +178,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
   //--------------------------------------------------------
   // paint
   //--------------------------------------------------------
-  int paintCount = 0;
+
   public void Paint_specific(Graphics g)
   {
     if (isError == -1)

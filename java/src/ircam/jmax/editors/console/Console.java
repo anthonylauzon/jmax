@@ -43,7 +43,8 @@ public class Console extends JPanel{
   }
 
   public void Start(){
-    itsConsoleThread.start();
+    if (MaxApplication.getProperty("jmaxNoConsoleThread") == null)
+      itsConsoleThread.start();
   }
 
   public void SetContainer(KeyListener theContainer){

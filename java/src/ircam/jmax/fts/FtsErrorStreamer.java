@@ -25,7 +25,11 @@ class FtsErrorStreamer implements Runnable
 
   static void startFtsErrorStreamer(InputStream in, FtsServer server)
   {
-    (new Thread(new FtsErrorStreamer(in, server), "Error Streamer")).start();
+    Thread streamer;
+
+    streamer = new Thread(new FtsErrorStreamer(in, server), "Error Streamer");
+    streamer.setDaemon(true);
+    streamer.start();
   }
 
   FtsErrorStreamer(InputStream in, FtsServer server)

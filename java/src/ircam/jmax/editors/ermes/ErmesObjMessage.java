@@ -15,28 +15,23 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
-  public ErmesObjMessage(){
-    super();
-  }
-	
-	
-  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-    super.Init(theSketchPad, x, y, theString);
-    itsFtsObject.watch("value", this);
-    return true;
+
+  public ErmesObjMessage(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  {
+    super(theSketchPad, theFtsObject);
   }
 
-  public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
+  public void Init()
+  {
     // Added by MDC; get the correct String from the object, and then call super
     // It is needed because ErmesObjExternal and ErmesObjMessage use different methods
     // to get the string from the object.
 
-    itsArgs = (String) theFtsObject.get("value");
-    super.Init(theSketchPad,  theFtsObject);
+    itsArgs = (String) itsFtsObject.get("value");
+    super.Init();
     itsFtsObject.watch("value", this);
     ParseText(itsArgs);
     if(!canResizeBy(0,0)) RestoreDimensions(false);
-    return true;  
   }
 
 
@@ -45,26 +40,8 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
   }
 
   //--------------------------------------------------------
-  // makeFtsObject, redefineFtsObject
+  //  redefineFtsObject
   //--------------------------------------------------------
-
-  public void makeFtsObject()
-  {
-    try
-      {
-	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "messbox");
-
-	if (itsArgs == null)
-	  ((FtsMessageObject)itsFtsObject).setMessage("");
-	else
-	  ((FtsMessageObject)itsFtsObject).setMessage(itsArgs);
-      }
-    catch (FtsException e)
-      {
-	// ENZO !!!! AIUTO :->
-	System.out.println("Error in Object Instantiation");
-      }
-  }
 
   public void redefineFtsObject()
   {
@@ -109,7 +86,7 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
   //--------------------------------------------------------
   // mouseDown
   //--------------------------------------------------------
-  public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
+  public void MouseDown_specific(MouseEvent evt,int x, int y) {
     if (itsSketchPad.itsRunMode || evt.isControlDown()) {
       if (itsFtsObject != null){
 	itsFtsObject.sendMessage(0, "bang", null);
@@ -118,8 +95,6 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
       }
     }
     else itsSketchPad.ClickOnObject(this, evt, x, y);
-    return true;
-    
   }
 
   //--------------------------------------------------------

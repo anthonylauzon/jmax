@@ -8,91 +8,72 @@ import ircam.jmax.fts.*;
 /**
  * The "comment" graphic object
  */
-class ErmesObjComment extends ErmesObject {
-  Dimension preferredSize = new Dimension(100, 100); //hu-hu	
+class ErmesObjComment extends ErmesObject implements ErmesObjEditable {
+  Dimension preferredSize;
   String itsArgs;
   Vector itsParsedTextVector = new Vector();
   public String itsMaxString = "";
-  int FIELD_HEIGHT;
-  final int TEXT_INSET = 10;
-  int itsTextRowNumber = 1;
+  int itsTextRowNumber = 0;  
+  final static int TEXT_INSET = 10;
 
-  public ErmesObjComment(){
-    super();
+  public ErmesObjComment(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  {
+    super(theSketchPad, theFtsObject);
   }
 	
-  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-    super.Init(theSketchPad, x, y, theString);
-
-    FIELD_HEIGHT = itsFontMetrics.getHeight();
-    preferredSize = new Dimension(70,FIELD_HEIGHT*5);
-
-    itsSketchPad.GetTextArea().setFont(getFont());
-    itsSketchPad.GetTextArea().setBackground(Color.white);
-    itsSketchPad.GetTextArea().setText("");
-    setJustification(itsSketchPad.itsJustificationMode);
-    
-    itsSketchPad.GetTextArea().itsOwner = this; //redirect the only editable field to point here...
-    makeCurrentRect(x, y);
-    
-    itsSketchPad.GetTextArea().setBounds(getItsX(),getItsY(),getItsWidth(),getItsHeight());
-    itsSketchPad.validate();
-    itsSketchPad.editStatus = itsSketchPad.EDITING_COMMENT;
-    itsSketchPad.GetTextArea().setVisible(true);
-    itsSketchPad.GetTextArea().requestFocus();
-    return true;
-  }
 
   //--------------------------------------------------------
   // Init
   //--------------------------------------------------------
-  public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
-    FontMetrics temporaryFM = theSketchPad.getFontMetrics(theSketchPad.getFont());
+  public void Init()
+  {
+    int FIELD_HEIGHT;
+
+    FontMetrics temporaryFM = itsSketchPad.getFontMetrics(itsSketchPad.getFont());
     FIELD_HEIGHT = temporaryFM.getHeight();
 
-    itsArgs = theFtsObject.getDescription();
-    preferredSize = new Dimension(temporaryFM.stringWidth(itsArgs),FIELD_HEIGHT*5);
+    itsArgs = itsFtsObject.getDescription();
 
-    super.Init(theSketchPad,  theFtsObject);
+    if (itsArgs.equals(""))
+      // preferredSize = new Dimension(70,FIELD_HEIGHT*5);
+      // Since the comments are currently single lines, we initialize it to a single line.
+      preferredSize = new Dimension(70,FIELD_HEIGHT + 3);
+    else
+      preferredSize = new Dimension(temporaryFM.stringWidth(itsArgs),FIELD_HEIGHT*5);
+
+    super.Init();
     
-    Integer aJustification = (Integer)theFtsObject.get("jsf");
-    if(aJustification == null) setJustification(itsSketchPad.itsJustificationMode);
-      else setJustification(aJustification.intValue());
+    Integer aJustification = (Integer)itsFtsObject.get("jsf");
+
+    if (aJustification == null)
+      setJustification(itsSketchPad.itsJustificationMode);
+    else
+      setJustification(aJustification.intValue());
 
     itsSketchPad.GetTextArea().setBackground(Color.white);
     
     ParseText(itsArgs);
     RestoreDimensions();    
-    return true;
   }
 	
 
-  public void makeFtsObject(){
-    try
-      {
-	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "comment", (itsArgs == null ? "" : itsArgs));
-      }
-    catch (FtsException e)
-      {
-	// ENZO !!!! AIUTO :->
-	System.out.println("Error in Object Instantiation");
-      }
-  }
-
-  public void redefineFtsObject(){
+  public void redefineFtsObject()
+  {
     ((FtsCommentObject)itsFtsObject).setComment(itsArgs);
   }
   
-  public void RestoreDimensions(){
+  public void RestoreDimensions()
+  {
+    if (! itsMaxString.equals(""))
+      resizeBy(itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET-getItsWidth(), itsFontMetrics.getHeight()*itsParsedTextVector.size()-getItsHeight());
 
-    resizeBy(itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET-getItsWidth(), itsFontMetrics.getHeight()*itsParsedTextVector.size()-getItsHeight());
-    itsSketchPad.repaint();
+    // itsSketchPad.repaint(); // BARBOGIO
   }
 
-  public boolean MouseDown_specific(MouseEvent evt, int x, int y) {
-    if (itsSketchPad.itsRunMode) return true; 
+
+  public void MouseDown_specific(MouseEvent evt, int x, int y) {
+    if (itsSketchPad.itsRunMode) return; 
     itsSketchPad.ClickOnObject(this, evt, x, y);
-    return true;
   }
   
   public void RestartEditing(){
@@ -121,7 +102,7 @@ class ErmesObjComment extends ErmesObject {
 
   public void setSize(int theH, int theV) {
     resize(theH, theV);
-    if (itsSketchPad != null) itsSketchPad.repaint();
+    itsSketchPad.repaint();
   }
   
   public void setSize(Dimension d) {

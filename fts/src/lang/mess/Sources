@@ -27,6 +27,5 @@ selection.c	\
 send.c		\
 symbols.c	\
 variables.c	\
-vm.c		\
-voidobject.c	\
+vm.c		
 

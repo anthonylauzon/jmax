@@ -34,29 +34,22 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler{
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
-  public ErmesObjFloat(){
-    super();
+
+  public ErmesObjFloat(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  {
+    super(theSketchPad, theFtsObject);
   }
 	
   //--------------------------------------------------------
   // init
   //--------------------------------------------------------
-  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-    
-    DEFAULT_HEIGHT = theSketchPad.getFontMetrics(theSketchPad.sketchFont).getHeight();
-    DEFAULT_WIDTH = theSketchPad.getFontMetrics(theSketchPad.sketchFont).stringWidth("0")*DEFAULT_VISIBLE_DIGIT+theSketchPad.getFontMetrics(theSketchPad.sketchFont).stringWidth("...");
-    preferredSize.height = DEFAULT_HEIGHT+4;
-    preferredSize.width = DEFAULT_WIDTH+17;
-    super.Init(theSketchPad, x, y, theString);
-    itsFtsObject.watch("value", this);
-    return true;
-  }
   
-  public boolean Init(ErmesSketchPad theSketchPad,FtsObject theFtsObject) {
-    super.Init(theSketchPad, theFtsObject);
+  public void Init()
+  {
+    super.Init();
     itsFtsObject.watch("value", this);
 
-    itsFloat = ((Float)theFtsObject.get("value")).floatValue();
+    itsFloat = ((Float)itsFtsObject.get("value")).floatValue();
 
     DEFAULT_HEIGHT = itsFontMetrics.getHeight();
     DEFAULT_WIDTH = itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("...");
@@ -70,38 +63,15 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler{
       preferredSize.width = DEFAULT_WIDTH+17;
       setItsWidth(preferredSize.width);
     }
-
-    return true;
-  }
-  
-  //--------------------------------------------------------
-  // GetArgs
-  //--------------------------------------------------------
-
-  public void makeFtsObject()
-  {
-    try
-      {
-	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "floatbox");
-      }
-    catch (FtsException e)
-      {
-	// Enzo !!! Aiuto :-> (MDC)
-      }
-
-  }
-
-  public void redefineFtsObject()
-  {
-    // ErmesObjFloat do not redefine itself
   }
   
   //--------------------------------------------------------
   // propertyChanged
   // callback function from the associated FtsObject in FTS
   //--------------------------------------------------------
-  public void propertyChanged(FtsObject obj, String name, Object value) {
-    
+
+  public void propertyChanged(FtsObject obj, String name, Object value)
+  {
     itsFloat = ((Float) value).floatValue();
 
     Paint_specific(itsSketchPad.getGraphics());
@@ -150,13 +120,13 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler{
     int tempWidth = 17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("...");
     int tempHeight = itsFontMetrics.getHeight()+4;
     resizeBy(tempWidth - getItsWidth(), tempHeight - getItsHeight());		
-    itsSketchPad.repaint();
+    // itsSketchPad.repaint(); // @@@ BARBOGIO
   }
   
   //--------------------------------------------------------
   //  mouseDown
   //--------------------------------------------------------
-  public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
+  public void MouseDown_specific(MouseEvent evt,int x, int y) {
     velocity = 0;
     previousVelocity = 0;
     acceleration = 0;
@@ -177,8 +147,8 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler{
 
       DoublePaint();
     }
-    else itsSketchPad.ClickOnObject(this, evt, x, y);
-    return true;
+    else
+      itsSketchPad.ClickOnObject(this, evt, x, y);
   }
 	
   public boolean inspectorAlreadyOpen() {

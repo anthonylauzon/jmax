@@ -139,10 +139,6 @@ ErmesPatcherDoc:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesPatcherDoc.java)
 .PHONY: ErmesPatcherDoc
 
-ErmesScrollerView:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesScrollerView.java)
-.PHONY: ErmesScrollerView
-
 ErmesSketchPad:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesSketchPad.java)
 .PHONY: ErmesSketchPad
@@ -166,10 +162,6 @@ ErmesSwToolbar:
 ErmesSwVarEdit:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesSwVarEdit.java)
 .PHONY: ErmesSwVarEdit
-
-ErmesToolBarLayout:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesToolBarLayout.java)
-.PHONY: ErmesToolBarLayout
 
 ErmesSwToggleButton:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesSwToggleButton.java)

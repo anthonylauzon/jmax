@@ -16,29 +16,12 @@ class ErmesObjToggle extends ErmesObject implements FtsPropertyHandler{
   static Dimension minimumSize = new Dimension(15, 15);
   static Color itsCrossColor = new Color(0, 0, 128);
 
-  public ErmesObjToggle(){
-    super();
+  public ErmesObjToggle(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  {
+    super(theSketchPad, theFtsObject);
   }
   
-  
-  public void makeFtsObject()
-  {
-    try
-      {
-	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "toggle");
-      }
-    catch (FtsException e)
-      {
-	// Enzo !!! Aiuto :-> (MDC)
-      }
-  }
-
-  public void redefineFtsObject()
-  {
-    // vtoggle do not redefine themselves
-  }
-
-  public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
+  public void MouseDown_specific(MouseEvent evt,int x, int y) {
     if (itsSketchPad.itsRunMode || evt.isControlDown()) {
       itsToggled = !itsToggled;
       itsFtsObject.put("value", (itsToggled?1:0));
@@ -47,19 +30,12 @@ class ErmesObjToggle extends ErmesObject implements FtsPropertyHandler{
     }
     else 
       itsSketchPad.ClickOnObject(this, evt, x, y);
-    return true;
   }
 
-  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-    super.Init(theSketchPad, x, y, theString);
+  public void Init()
+  {
+    super.Init();
     itsFtsObject.watch("value", this);
-    return true;
-  }
-  
-  public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
-    super.Init(theSketchPad, theFtsObject);
-    itsFtsObject.watch("value", this);
-    return true;
   }
 
   public void propertyChanged(FtsObject obj, String name, Object value) {

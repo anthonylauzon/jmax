@@ -1,11 +1,9 @@
 SSOURCES = \
 	  ErmesModule.java \
           ErmesConnection.java \
-          ErmesScrollerView.java \
           ErmesSketchPad.java \
           ErmesSketchWindow.java \
 	  ErmesSwToolbar.java \
-	  ErmesToolBarLayout.java \
 	  ErmesSwToggleButton.java \
 	  ErmesPatcherFactory.java \
 	  ErmesClipboardProvider.java \

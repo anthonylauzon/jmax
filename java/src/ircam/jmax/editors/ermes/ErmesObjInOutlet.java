@@ -207,16 +207,14 @@ abstract public class ErmesObjInOutlet implements ErmesDrawable{
   //--------------------------------------------------------
   //	MoveBy
   //--------------------------------------------------------
-  public boolean MoveBy(int theDeltaX, int theDeltaY) {
+  public void MoveBy(int theDeltaX, int theDeltaY) {
     MoveTo(itsX+theDeltaX, itsY+=theDeltaY);
-    return true;
   }
   
-  public boolean MoveTo(int theX, int theY) {
+  public void MoveTo(int theX, int theY) {
     itsX=theX; itsY=theY;
     updateAnchorPoint();
     itsCurrentDrawingMethod = DRAW;
-    return true;
   }
   
   //--------------------------------------------------------

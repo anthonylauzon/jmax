@@ -78,7 +78,7 @@ inlet_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_inlet_t *this  = (fts_inlet_t *) o;
   fts_patcher_t  *patcher = fts_object_get_patcher(o);
 
-  if (fts_is_long(at+1))
+  if ((ac > 1) && fts_is_long(at+1))
     {
       this->position = fts_get_long_arg(ac, at, 1, 0);
 
@@ -112,18 +112,13 @@ inlet_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t
 inlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[4];
-  int argc;
-
   /* initialize the class */
 
   fts_class_init(cl, sizeof(fts_inlet_t),  1, 1, 0);
 
   /* define the system methods */
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_anything;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init,   inlet_init, 2, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init,   inlet_init);
 
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, inlet_delete, 0, 0);
 
@@ -180,7 +175,7 @@ outlet_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_outlet_t *this = (fts_outlet_t *) o;
   fts_patcher_t  *patcher = fts_object_get_patcher(o);
 
-  if (fts_is_long(at+1))
+  if ((ac > 1) && fts_is_long(at+1))
     {
       this->position = fts_get_long_arg(ac, at, 1, 0);
 
@@ -214,18 +209,13 @@ outlet_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static fts_status_t
 outlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[5];
-  int argc;
-
   /* initialize the class */
 
   fts_class_init(cl, sizeof(fts_outlet_t), 1, 1, 0);
 
   /* define the init system method */
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_anything;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, outlet_init, 2, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, outlet_init);
 
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, outlet_delete, 0, 0);
 

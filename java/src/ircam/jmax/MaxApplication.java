@@ -15,7 +15,6 @@ import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.console.*; 
-import ircam.jmax.editors.ermes.*;
 import tcl.lang.*;
 
 /**
@@ -34,6 +33,8 @@ import tcl.lang.*;
 
 public class MaxApplication extends Object
 {
+  public static Clipboard systemClipboard = new Clipboard("system"); // ??
+
   // (fd) changed because FtsServer uses MaxApplication.getProperty for timeOut
   // This is not clean because you cannot use the application layer without calling
   // MaxApplication.main !!! 
@@ -75,13 +76,6 @@ public class MaxApplication extends Object
     return itsInterp;
   }
 
-  public static Clipboard systemClipboard = new Clipboard("system");
-
-
-
-
-  private static ErmesSketchWindow itsSketchWindow;
-
   static MaxWhenHookTable  itsHookTable = null;
 
   /** Functions to add application hooks */
@@ -114,7 +108,8 @@ public class MaxApplication extends Object
     // Temporary: the look and feel must be metal, in order to use
     // the nice file chooser !!!
 
-    try
+    /*
+      try
       {
 	UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
       }
@@ -122,6 +117,7 @@ public class MaxApplication extends Object
       {
 	System.err.println("Cannot load MotifLookAndFeel");
       }
+      */
 
     // Initialize swing to use heavyweight components for
     // Menus'
@@ -264,13 +260,11 @@ public class MaxApplication extends Object
     
     //if there were no connection statements in startup.tcl, ask the user
     
-    
     if (Fts.getServer() == null)
       {
-	new ConnectionDialog();
-	MaxApplication.runHooks("start");
+	System.err.println("No Fts Server Specified");
+	return;
       }
-
     
     // Look if there are documents to open in the 
     // command line.
@@ -301,21 +295,6 @@ public class MaxApplication extends Object
 	    // handler !!
 	  }
       }
-
-    // If there is no console up and running,
-    // start the MaxTclConsole from the standard input
-
-
-    // Finally, run forever the notifier loop of the 
-    // Tcl interpreter, so that the TCL event system work
-    // (and in particular, tcl built panels; thanks to the
-    // jacl doc, that make this absolutely unclear.
-    // NO MORE TCL Notification
-
-    //Notifier notifier = itsInterp.getNotifier();
-      
-    // while (true)
-    //notifier.doOneEvent(TCL.ALL_EVENTS);
   }
   
   /** This private method build the tcl interpreter, 
@@ -338,17 +317,6 @@ public class MaxApplication extends Object
    * are MaxEditor, we do the check;
    * In reality, we should look in the MDA document data base
    * to do the work.
-   */
-
-  /* @@@@@@@@@@@
-   * Should be rewritten using the new MDA.
-   * 1- the test if there is anything to save
-   * can be done on all the MaxDocument (isSaved()).
-   * 2- the saving can be done here directly with the
-   * mda primitives (no save as, just panels).
-   * 3- the closing can be done here aswell, with the
-   * dispose call on the document
-   * no need to use MaxEditor !!!
    */
 
   public static void Quit()

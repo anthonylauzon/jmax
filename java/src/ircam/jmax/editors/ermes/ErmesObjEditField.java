@@ -44,8 +44,9 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
   //--------------------------------------------------------
   // lostFocus
   //--------------------------------------------------------
-  public boolean LostFocus() {
-    if (!focused) return true;
+  public void LostFocus() {
+    if (! focused)
+      return ;
     else {
       focused = false;
       itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
@@ -59,29 +60,21 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       return true; 
     }*/
 
-    if (itsOwner == null) return false; //this happens when the instatiation fails
-    if (itsOwner.itsFtsObject != null){
-      if(itsOwner.itsArgs != null && itsOwner.itsArgs.equals(aTextString) && !aTextString.equals("")){
+    if (itsOwner == null)
+      return; //this happens when the instatiation fails
+
+    if(itsOwner.itsArgs != null && itsOwner.itsArgs.equals(aTextString) && !aTextString.equals(""))
+      {
 	itsOwner.ParseText(aTextString);
 	AbortEdit();
-	return true;
+	return;
       }
-      else {
+    else
+      {
 	itsOwner.itsArgs = aTextString;
-	
 	itsOwner.ParseText(aTextString);
-	
 	itsOwner.redefineFtsObject();
       }
-    }
-    else {
-
-      itsOwner.itsArgs = aTextString;
-      
-      itsOwner.ParseText(aTextString);
-
-      itsOwner.makeFtsObject();
-    }
         
     if(itsOwner.itsOutletList.size()>0)
       itsOwner.MoveOutlets();
@@ -94,8 +87,6 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     setColumns(20);
 
     AbortEdit(); //after this, itsOwner = null.
-
-    return true;       
   }
 	
   ///////////////////////////////////////////////////////////////////////////

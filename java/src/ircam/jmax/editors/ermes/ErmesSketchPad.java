@@ -167,8 +167,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
   int itsJustificationMode = LEFT_JUSTIFICATION;
   int itsResizeMode = BOTH_RESIZING;
 
-  int inCount = 0;   //ref count of ErmesObjIn objects (used if this is a subpatcher)
-  int outCount = 0;  //the same for ErmesObjOut objects
   ErmesObjInOutPop itsInPop = null;
   ErmesObjInOutPop itsOutPop = null;
 		
@@ -230,27 +228,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
   int editStatus = DOING_NOTHING;
   private int oldEditStatus = DOING_NOTHING;
 
-  static private Hashtable nameTable = new Hashtable(16, (float) 0.5); // substitute name lists
-
-  // Static initializer for the hashTable
-  static
-  {
-    // Initialization of the "fts class"  to "graphic object" table
-
-    nameTable.put("messbox", ircam.jmax.editors.ermes.ErmesObjMessage.class);
-    nameTable.put("button", ircam.jmax.editors.ermes.ErmesObjBang.class);
-    nameTable.put("toggle", ircam.jmax.editors.ermes.ErmesObjToggle.class);
-    nameTable.put("intbox", ircam.jmax.editors.ermes.ErmesObjInt.class);
-    nameTable.put("floatbox", ircam.jmax.editors.ermes.ErmesObjFloat.class);
-    nameTable.put("comment", ircam.jmax.editors.ermes.ErmesObjComment.class);
-    nameTable.put("slider", ircam.jmax.editors.ermes.ErmesObjSlider.class);
-    nameTable.put("inlet", ircam.jmax.editors.ermes.ErmesObjIn.class);
-    nameTable.put("outlet", ircam.jmax.editors.ermes.ErmesObjOut.class);
-    nameTable.put("jpatcher", ircam.jmax.editors.ermes.ErmesObjPatcher.class);
-  }
-
-  private Class itsAddObjectClass;
-
+  private String itsAddObjectDescription;
   boolean itsScrolled = false;
   private Vector dirtyInOutlets;
   private Vector dirtyConnections;
@@ -485,7 +463,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
   //	ClickOnConnection
   //--------------------------------------------------------
 
-  boolean ClickOnConnection(MouseEvent evt,int x, int y){
+  void ClickOnConnection(MouseEvent evt,int x, int y)
+  {
     switch(editStatus) {
     case START_ADD:
       break;
@@ -522,7 +501,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
       }	
       break;	
     }
-    return true;
   }
 
 	
@@ -530,7 +508,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
   //	ClickOnObject
   //--------------------------------------------------------
 
-  boolean ClickOnObject(ErmesObject theObject, MouseEvent evt, int theX, int theY){
+  void ClickOnObject(ErmesObject theObject, MouseEvent evt, int theX, int theY){
     
     if(!itsRunMode){
       switch(editStatus) {
@@ -572,7 +550,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
       }
       ChangeObjectPrecedence(theObject);
     }
-    return true;
   }
   
   static int noOfCopy = 0;
@@ -754,13 +731,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
 
     for (Enumeration e = objectVector.elements(); e.hasMoreElements();) {
       fo = (FtsObject)e.nextElement();
-      // Note that the representation is now found from the fts className,
-      // made unique; the new file format will allow for specifing
-      // additional information, like a non default graphic representation
-      // the code will need a small change here
-      
-      Class objectClass = SearchFtsName(fo);
-      if (objectClass==null) continue;
 
       objectX = ((Integer)fo.get("x")).intValue();
       objectY = ((Integer)fo.get("y")).intValue();
@@ -768,7 +738,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
       fo.put("x", objectX-minX+itsCurrentScrollingX+pasteDelta.x+numberOfPaste*incrementalPasteOffsetX);     
       fo.put("y", objectY-minY+itsCurrentScrollingY+pasteDelta.y+numberOfPaste*incrementalPasteOffsetY);
        
-      aObject = AddObject(objectClass, fo);
+      aObject = AddObject(fo);
       currentSelection.addObject(aObject);
       aObject.Select(false);
        
@@ -793,55 +763,38 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
   }
   
   
-  void InitFromFtsContainer(FtsContainerObject theContainerObject){
-
+  void InitFromFtsContainer(FtsContainerObject theContainerObject)
+  {
     FtsContainerObject aFtsPatcher = theContainerObject;
-    // chiama tanti AddObject...
     Vector objectVector = aFtsPatcher.getObjects();	//usefull?
-
     FtsObject	fo;
     FtsConnection fc;
-    ErmesObject aObject;
 
-    for (Enumeration e = objectVector.elements(); e.hasMoreElements();) {
-
-      fo = (FtsObject)e.nextElement();
-      // Note that the representation is now found from the fts className,
-      // made unique; the new file format will allow for specifing
-      // additional information, like a non default graphic representation
-      // the code will need a small change here
-
-      Class objectClass = SearchFtsName(fo);
-
-      if (objectClass==null) continue;
-
-      aObject = AddObject(objectClass, fo);
-    
-      if (aObject != null) fo.setRepresentation(aObject);
-    }
+    for (Enumeration e = objectVector.elements(); e.hasMoreElements();)
+      AddObject((FtsObject)e.nextElement());
 		
     // chiama tanti AddConnection...
     Vector connectionVector = aFtsPatcher.getConnections();	//usefull?
     ErmesObject fromObj, toObj;
     ErmesConnection aConnection = null;
     
-    for (Enumeration e2 = connectionVector.elements(); e2.hasMoreElements();) {
-      fc = (FtsConnection)e2.nextElement();
+    for (Enumeration e2 = connectionVector.elements(); e2.hasMoreElements();)
+      {
+	fc = (FtsConnection)e2.nextElement();
 
-      fromObj = (ErmesObject) fc.getFrom().getRepresentation();
-      toObj = (ErmesObject) fc.getTo().getRepresentation();
-      aConnection = AddConnection(fromObj, toObj, fc.getFromOutlet(), fc.getToInlet(), fc);
-    }
+	fromObj = (ErmesObject) fc.getFrom().getRepresentation();
+	toObj = (ErmesObject) fc.getTo().getRepresentation();
+	aConnection = AddConnection(fromObj, toObj, fc.getFromOutlet(), fc.getToInlet(), fc);
+      }
 
     repaint();
-    
   }
 
   //--------------------------------------------------------
   //	InletConnect
   //--------------------------------------------------------
   
-  boolean InletConnect(ErmesObject theObject, ErmesObjInOutlet theRequester) {	
+  void InletConnect(ErmesObject theObject, ErmesObjInOutlet theRequester) {	
     ErmesObjInlet aInlet;
     if (itsDirection == NoDirections) {
       itsConnectingObj = theObject;
@@ -885,7 +838,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
 
     editStatus = DOING_NOTHING;
     paintDirtyList();
-    return true;
   }
   
   //--------------------------------------------------------
@@ -914,13 +866,13 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
         
     itsEditField = new ErmesObjEditField(this);
     add(itsEditField);
-    validate();
+
     itsEditField.setVisible(false);
     itsEditField.setLocation(-200,-200);
     
     itsTextArea = new ErmesObjTextArea(this);
     add(itsTextArea);
-    validate();
+
     itsTextArea.setVisible(false);
     itsTextArea.setLocation(-200,-200);
 
@@ -992,42 +944,39 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
     return minSize;
   }
 	
-  void AddingObject(int x, int y){
-    Rectangle aRect = null;
-    ErmesObject aObject = null;
-    ErmesObjOutlet aOutlet;
+  void AddingObject(int x, int y)
+  {
+    FtsObject fo;
+    ErmesObject aObject;
 
-    if(doSnapToGrid){
-      Point aPoint = SnapToGrid(x, y);
-      x = aPoint.x;
-      y = aPoint.y;
-    }
-
-    // Code to prevent inlets/outlets in a top level patcher deleted,
-    // as discussed a while ago (we actually may want to edit a subpatcher
-    // as a single file).
+    if (doSnapToGrid)
+      {
+	Point aPoint = SnapToGrid(x, y);
+	x = aPoint.x;
+	y = aPoint.y;
+      }
 
     try
       {
-	aObject = (ErmesObject) itsAddObjectClass.newInstance();
-      }
-    catch (IllegalAccessException e2)
-      {
-	System.err.println("ErmesSketchPad:mousePressed: INTERNAL ERROR: Illegal Access: " + e2);
-	return;
-      }
-    catch (InstantiationException e3)
-      {
-	System.err.println("ErmesSketchPad:mousePressed: INTERNAL ERROR: Instantiation Error: " + e3);
-	return;
-      }
-    
-    aObject.Init(this, x, y, "");
-    addElement(aObject);
-    paintDirtyList();
-    if (!itsToolBar.locked && editStatus != EDITING_OBJECT) editStatus = DOING_NOTHING;	
-  }
+	fo = Fts.makeFtsObject(itsSketchWindow.itsPatcher, itsAddObjectDescription);
 
+	fo.put("x", x);
+	fo.put("y", y);
+	fo.localPut("x", x);
+	fo.localPut("y", y);
+
+	aObject = AddObject(fo);
+
+	repaint(); // ??
+
+	if (aObject instanceof ErmesObjEditable)
+	  ((ErmesObjEditable)aObject).RestartEditing();
+      }
+    catch (FtsException ftse)
+      {
+	System.err.println("ErmesSketchPad:mousePressed: INTERNAL ERROR: FTS Instantiation Error: " + ftse);
+      }
+  }
 
 
   /////////////////////////////////////////////////////////////////////////////
@@ -1130,9 +1079,12 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
     if (!itsToolBar.locked)
       itsToolBar.Deselect();
     
-    if(editStatus == START_ADD)
+    if (editStatus == START_ADD)
       {
 	AddingObject(x,y);
+
+	if (!itsToolBar.locked)
+	  editStatus = DOING_NOTHING;	
       }
     else
       { //DOING_NOTHING, START_SELECT
@@ -1390,26 +1342,21 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
 
 
 
-  boolean DynamicScrolling(int theX, int theY){
+  void DynamicScrolling(int theX, int theY){
     Adjustable aHAdjustable =itsSketchWindow.itsScrollerView.getHAdjustable();
     Adjustable aVAdjustable =itsSketchWindow.itsScrollerView.getVAdjustable();
     if(theX>=aHAdjustable.getVisibleAmount()+aHAdjustable.getValue()){
       aHAdjustable.setValue(aHAdjustable.getValue()+aHAdjustable.getUnitIncrement());
-      return true;
     }
     if(theY>=aVAdjustable.getVisibleAmount()+aVAdjustable.getValue()){
       aVAdjustable.setValue(aVAdjustable.getValue()+aVAdjustable.getUnitIncrement());
-      return true;
     }
     if(theX<=aHAdjustable.getValue()){
       aHAdjustable.setValue(aHAdjustable.getValue()-aHAdjustable.getUnitIncrement());
-      return true;
     }
     if(theY<=aVAdjustable.getValue()){
       aVAdjustable.setValue(aVAdjustable.getValue()-aVAdjustable.getUnitIncrement());
-      return true;
     }
-    else return false;
   }
   //////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////mouseMotionListener--inizio
@@ -1592,7 +1539,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
   //	OutletConnect
   //--------------------------------------------------------
   
-  boolean OutletConnect(ErmesObject theObject/**/, ErmesObjInOutlet theRequester) {	
+  void OutletConnect(ErmesObject theObject/**/, ErmesObjInOutlet theRequester) {	
     ErmesObjOutlet aOutlet;	
     if (itsDirection == NoDirections) {
       itsConnectingLet = theRequester;
@@ -1635,7 +1582,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
     }
 
     editStatus = DOING_NOTHING;
-    return true;
   }
   
 
@@ -1830,10 +1776,10 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
   }
   
 
-  final void startAdd(Class theClass) {
+  final void startAdd(String theDescription) {
     deselectAll(true);
     editStatus = START_ADD;
-    itsAddObjectClass = theClass;
+    itsAddObjectDescription = theDescription;
   }
 
   final void AddInlet(ErmesObjInlet theInlet){
@@ -2073,52 +2019,17 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
   //  adding an object of the given class name in the given location
   //--------------------------------------------------------
 
-  ErmesObject AddObject(Class theClass, FtsObject theFtsObject) {
+  ErmesObject AddObject(FtsObject theFtsObject)
+  {
+    ErmesObject aObject;
 
-    ErmesObject aObject = null;	//wasting time...
-    Rectangle aRect;
-    ErmesObjOutlet aOutlet;
-    
-    //GlobalProbe.enterMethod( this, "AddObject");
-
-    if(doSnapToGrid){
-      int x, y;
-
-      x = ((Integer)theFtsObject.get("x")).intValue();
-      y = ((Integer)theFtsObject.get("y")).intValue();
-      //Point aPoint = SnapToGrid(x, y);
-      //theFtsObject.put("x", x);
-      //theFtsObject.put("y", y);
-    }
-
-    try
-      {
-	aObject = (ErmesObject) theClass.newInstance();
-
- 	aObject.Init(this, theFtsObject);
-      }
-    catch(IllegalAccessException e)
-      {
-	System.out.println("Internal Error: ErmesSketchPad.AddObject(" +
-			   theClass.getName() + "," + theFtsObject +
-			   ") : illegal access" + e);
-	return null;
-      }
-    catch(InstantiationException e) 
-      {
-	System.out.println("Internal Error: ErmesSketchPad.AddObject(" +
-			   theClass.getName() + "," + theFtsObject +
-			   ") : instantiation exception " + e);
-	return null;
-      }
-
+    aObject = ErmesObject.makeErmesObject(this, theFtsObject);
     addElement(aObject);
 
-    if (!itsToolBar.locked) editStatus = DOING_NOTHING;	
-
-    //GlobalProbe.exitMethod();
+    theFtsObject.setRepresentation(aObject);
 
     return aObject;
+
   }
   
   //--------------------------------------------------------
@@ -2473,23 +2384,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
     }
   }
 
-
-
-  //--------------------------------------------------------
-  //	SearchFtsName
-  //  corrispondence between fts names and ermes names (new and old format...)
-  //--------------------------------------------------------
-  Class SearchFtsName(FtsObject fo)
-  {
-    String theName = fo.getClassName();
-
-    if (nameTable.containsKey(theName))
-      return (Class) nameTable.get(theName);
-    else {
-      return ircam.jmax.editors.ermes.ErmesObjExternal.class;
-    }
-  }
-  
   //--------------------------------------------------------
   //	SnapToGrid
   //--------------------------------------------------------

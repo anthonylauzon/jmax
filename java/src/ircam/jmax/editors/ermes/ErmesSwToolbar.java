@@ -75,11 +75,8 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener
     itsSwToolbar = new JToolBar();
     itsSwToolbar.setFloatable (false);   
     InsertButtons();
+    itsSwToolbar.addSeparator();
     tools.add(itsSwToolbar, BorderLayout.WEST);
-
-    // layout.first();// 
-
-    validate();
   }
 
   /**
@@ -87,11 +84,11 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener
    * gif files (case of multiple windows with same palette).
    */
 
-  void AddButton(Class theClass, String gifFilePath) {
+  void AddButton(String descr, String gifFilePath) {
     ErmesSwToggleButton aToggleButton;
     ImageIcon aImageIcon = getIcon(gifFilePath);
     
-    aToggleButton = new ErmesSwToggleButton(theClass, aImageIcon);
+    aToggleButton = new ErmesSwToggleButton(descr, aImageIcon);
     itsSwToolbar.add(aToggleButton);
     aToggleButton.addMouseListener(this);
   }
@@ -132,7 +129,8 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener
       locked = false;
       itsLastPressed = aTButton;
       pressed = true;
-      itsSketchPad.startAdd(aTButton.getNewObjectClass()); //and tell to the sketch
+
+      itsSketchPad.startAdd(aTButton.getNewObjectDescription());
     }
   }
 
@@ -145,7 +143,7 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener
 	itsLastPressed.setSelected(false);
 	itsLastPressed = aTButton;   
       }
-      itsSketchPad.startAdd(aTButton.getNewObjectClass());
+      itsSketchPad.startAdd(aTButton.getNewObjectDescription());
       aTButton.setSelected(true);
       locked = true;
       return;
@@ -193,26 +191,31 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener
     String fs = File.separator;
     String path = MaxApplication.getProperty("root")+fs+"images"+fs;
 
-    AddButton(ircam.jmax.editors.ermes.ErmesObjExternal.class, path+"tool_ext.gif");
-    AddButton(ircam.jmax.editors.ermes.ErmesObjMessage.class, path+"tool_mess.gif");
-    AddButton(ircam.jmax.editors.ermes.ErmesObjPatcher.class, path+"tool_patcher.gif");
-    AddButton(ircam.jmax.editors.ermes.ErmesObjIn.class, path +"tool_in.gif");
-    AddButton(ircam.jmax.editors.ermes.ErmesObjOut.class, path +"tool_out.gif");
-    AddButton(ircam.jmax.editors.ermes.ErmesObjComment.class, path + "tool_text.gif");
-    AddButton(ircam.jmax.editors.ermes.ErmesObjBang.class, path+"tool_bang.gif");
-    AddButton(ircam.jmax.editors.ermes.ErmesObjToggle.class, path+"tool_toggle.gif");
-    AddButton(ircam.jmax.editors.ermes.ErmesObjSlider.class, path+"tool_slider.gif");
-    AddButton(ircam.jmax.editors.ermes.ErmesObjInt.class, path+"tool_int.gif");
-    AddButton(ircam.jmax.editors.ermes.ErmesObjFloat.class, path+"tool_float.gif");
+    AddButton("", path+"tool_ext.gif");
+    AddButton("messbox", path+"tool_mess.gif");
+    AddButton("jpatcher",  path+"tool_patcher.gif");
+    AddButton("inlet -1", path +"tool_in.gif");
+    AddButton("outlet -1", path +"tool_out.gif");
+    AddButton("comment", path + "tool_text.gif");
+    AddButton("button", path+"tool_bang.gif");
+    AddButton("toggle", path+"tool_toggle.gif");
+    AddButton("slider", path+"tool_slider.gif");
+    AddButton("intbox", path+"tool_int.gif");
+    AddButton("floatbox", path+"tool_float.gif");
   }
 
+
   public Dimension getMinimumSize(){
-    return new Dimension(600, /*150630*/25);
+    return new Dimension(200, /*150630*/25);
+  }
+
+  public Dimension getMaximumSize(){
+    return new Dimension(300, /*150630*/25);
   }
   public Dimension getPreferredSize(){
-    return new Dimension(600, /*150630*/25);
+    return new Dimension(200, /*150630*/25);
   }
-  
+
   /*public Dimension minimumSize(){
     return new Dimension(500, 50);
     }

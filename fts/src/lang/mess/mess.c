@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.15 $ IRCAM $Date: 1998/08/19 15:15:45 $
+ *      $Revision: 1.16 $ IRCAM $Date: 1998/08/25 12:52:19 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -110,10 +110,6 @@ fts_mess_init(void)
   /* Initialize the template subsystem */
   
   fts_template_init();
-
-  /* Do the void object */
-
-  fts_void_object_config();
 
   /* Now that everything is up and running, create the root patcher */
 

@@ -18,56 +18,34 @@ public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsProper
   public ErmesSketchWindow itsSubWindow = null;
   Dimension preferredSize = new Dimension(80,24);
  
-  /* Note: propertyChanged moved to the upper class, because inlets and outlets
-     can change for standard objects also (if they are abstractions that we are
-     editing); if you need to handle some property here, use the following example code:
+  final static int PATCHER_HEIGHT_DIFF = 5;
 
-  public void propertyChanged(FtsObject obj, String name, Object value)
-  {
-    if (name.equals(<MY_PROPERY>))
-      {
-	// Handle MY PROPERTY
-      }
-    else
-      super.propertyChanged(obj, name, value);
-  }
-
- */
-
-  
   //--------------------------------------------------------
   // Constructor
   //--------------------------------------------------------
-  public ErmesObjPatcher(){
-    super();
-    HEIGHT_DIFF = 5;
-    //WIDTH_DIFF = 11;
+  public ErmesObjPatcher(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  {
+    super(theSketchPad, theFtsObject);
   }
 	
   protected int getWhiteOffset() {
     return 10;
   }
 
-  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-    super.Init(theSketchPad, x, y, theString);
-    itsFtsObject.watch("ins", this);
-    itsFtsObject.watch("outs", this);
 
-    return true;
-  }
+  public void Init()
+  {
+    itsArgs = itsFtsObject.getDescription().trim();
 
-  public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
-    // Added by MDC; get the correct String from the object, and then call super
-
-    itsArgs = theFtsObject.getDescription().trim();
-
-    super.Init(theSketchPad, theFtsObject);
-    resizeBy(0, itsFontMetrics.getHeight()+2*HEIGHT_DIFF-getItsHeight());
+    super.Init();
+    resizeBy(0, itsFontMetrics.getHeight()+2*PATCHER_HEIGHT_DIFF-getItsHeight());
     ParseText(itsArgs);
     
-    if(!canResizeBy(0,0)) RestoreDimensions();
-    
-    return true;
+    if ((! itsArgs.equals("")) &&(! canResizeBy( 0, 0)))
+      RestoreDimensions();
+
+    itsFtsObject.watch("ins", this);
+    itsFtsObject.watch("outs", this);    
   }
 
   public boolean inspectorAlreadyOpen() {
@@ -76,26 +54,6 @@ public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsProper
 
   public void openInspector() {
     ErmesPatcherInspector.inspect((FtsContainerObject) itsFtsObject);
-  }
-
-  // temporary, should probabily change
-
-  public void makeFtsObject()
-  {
-    try
-      {
-	if (itsArgs == null)
-	  itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "jpatcher");
-	else
-	  itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "jpatcher", itsArgs);
-
-	((FtsContainerObject) itsFtsObject).setDownloaded();
-      }
-    catch (FtsException e)
-      {
-	
-	System.out.println("Error in Object Instantiation");
-      }
   }
 
   public void redefineFtsObject()
@@ -127,7 +85,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsProper
   //--------------------------------------------------------
 	  
 
-  public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
+  public void MouseDown_specific(MouseEvent evt,int x, int y) {
     if (evt.getClickCount()>1)
       {
 	try
@@ -150,8 +108,6 @@ public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsProper
       }
     else
       itsSketchPad.ClickOnObject(this, evt, x, y);
-
-    return true;
   }
 	
   //--------------------------------------------------------
@@ -202,7 +158,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsProper
 
     int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsMaxString)+(itsFontMetrics.getHeight()+10)/2+5+5,(itsInletList.size())*12, (itsOutletList.size())*12);
     resizeBy(aMaxWidth-getItsWidth(), itsFontMetrics.getHeight() + 10 - getItsHeight());
-    itsSketchPad.repaint();
+    // itsSketchPad.repaint(); // @@@@ BARBOGIO
   }
 
 }

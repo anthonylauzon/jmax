@@ -30,39 +30,34 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
   int itsDelta = 0;
   float itsStep =  itsRange/itsPixelRange;
 
-  public ErmesObjSlider(){
-    super();
+  public ErmesObjSlider(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  {
+    super(theSketchPad, theFtsObject);
   }
 
 
-  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-    super.Init(theSketchPad, x, y, theString);	////was not here (see later)    
-    makeCurrentRect(x, y);
-    itsThrottle = new ErmesObjThrottle(this, x, y);
-    //super.Init(theSketchPad, x, y, theString);	////was here
+  public void Init()
+  {
+    super.Init();
     itsFtsObject.watch("value", this);
-    return true;
-  }
-
-
-  public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
-    super.Init(theSketchPad,  theFtsObject); //new
-    itsFtsObject.watch("value", this);
-    makeCurrentRect(theFtsObject);
+    makeCurrentRect(itsFtsObject);
     itsThrottle = new ErmesObjThrottle(this, getItsX(), getItsY());   
 
     {
-      Integer aInteger = (Integer)theFtsObject.get("minValue");
-      setMinValue(aInteger.intValue());
-      aInteger = (Integer)theFtsObject.get("maxValue");
-      setMaxValue(aInteger.intValue());
+      Integer aInteger = (Integer)itsFtsObject.get("minValue");
+      itsRangeMin = aInteger.intValue();
+
+      aInteger = (Integer)itsFtsObject.get("maxValue");
+      itsRangeMax = aInteger.intValue();
+
       itsRange = itsRangeMax-itsRangeMin;
       itsStep = (float)itsRange/itsPixelRange;
-      aInteger = (Integer)theFtsObject.get("value");
+
+      aInteger = (Integer)itsFtsObject.get("value");
       itsInteger = aInteger.intValue();
     }
+
     resizeBy(0,0);
-    return true;
   }
 
   public void setMinValue(int theValue) {
@@ -91,26 +86,6 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
     itsThrottle.Resize(itsThrottle.getPreferredSize().width+theDeltaH, itsThrottle.getPreferredSize().height);
     itsThrottle.MoveAbsolute(itsThrottle.itsX, (int)(getItsY()+getItsHeight() - BOTTOM_OFFSET-2 -itsInteger/itsStep));
   }
-
-
-  public void makeFtsObject()
-  {
-    try
-      {
-	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "slider");
-      }
-    catch (FtsException e)
-      {
-	System.out.println("failed to build a FTS slider object");
-	// Enzo !!! Aiuto :-> (MDC)
-      }
-  }
-
-  public void redefineFtsObject()
-  {
-    // sliders do not redefine themselves
-  }
-
 
   public void FromDialogValueChanged(int theCurrentInt, int theMaxInt, int theMinInt){
     setMaxValue(theMaxInt);
@@ -164,16 +139,16 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
 
 
 
-  public boolean MouseDown_specific(MouseEvent evt, int x, int y){
+  public void MouseDown_specific(MouseEvent evt, int x, int y){
     /*if(evt.getClickCount()>1) {
       inspect();
-      return true;
+      return
     }*/
     if(itsSketchPad.itsRunMode || evt.isControlDown()){
       
       if(IsInThrottle(x,y)){
 	itsMovingThrottle = true;
-	return true;
+	return;
       }
       else{
 	if(getItsY()+getItsHeight()-BOTTOM_OFFSET>=y && getItsY()+UP_OFFSET<y) {
@@ -203,11 +178,10 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
 
 	  Paint_specific(itsSketchPad.getGraphics());
 	}
-	return true;
+	return ;
       }
     }
     else itsSketchPad.ClickOnObject(this, evt, x, y);
-    return false;
   }
 
   private void sendValue(Integer theValue) {

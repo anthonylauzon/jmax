@@ -5,18 +5,18 @@ import java.awt.event.*;
 
 import com.sun.java.swing.*;
 
-class ErmesSwToggleButton extends JToggleButton {
+class ErmesSwToggleButton extends JToggleButton
+{
+  String itsObjectDescription;
 
-  Class itsClass;
-
-  ErmesSwToggleButton(Class theClass, ImageIcon theIcon) {
+  ErmesSwToggleButton(String description, ImageIcon theIcon) {
     super(theIcon);
     setDoubleBuffered(false);
-    itsClass = theClass;
+    itsObjectDescription = description;
   }
-  
-  Class getNewObjectClass() {
-    return itsClass;
+    
+  String getNewObjectDescription() {
+    return itsObjectDescription;
   }
 }
 

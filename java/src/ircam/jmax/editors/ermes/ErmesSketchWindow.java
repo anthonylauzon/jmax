@@ -84,16 +84,16 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   Vector ftsObjectsPasted = new Vector();
   Vector ftsConnectionsPasted = new Vector();
   boolean pasting = false;
-  public static ErmesClipboardProvider itsClipboardProvider = new ErmesClipboardProvider();
+
   //  public ErmesObject itsOwner;//in case this is a subpatcher
 
   final String FILEDIALOGMENUITEM = "File dialog...";
   public static int preferredWidth = 490;
   public static int preferredHeight = 450;
   Dimension preferredsize = new Dimension(preferredWidth,preferredHeight);
-  public ErmesSketchPad itsSketchPad = new ErmesSketchPad(this);
-  ErmesScrollerView itsScrollerView = new ErmesScrollerView(this, itsSketchPad);
-  ErmesSwToolbar itsToolBar = new ErmesSwToolbar(itsSketchPad);
+  public ErmesSketchPad itsSketchPad;
+  ScrollPane itsScrollerView;
+  ErmesSwToolbar itsToolBar;
   static String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
   public FtsContainerObject itsPatcher;
   private Menu itsJustificationMenu;
@@ -166,8 +166,8 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     super(Mda.getDocumentTypeByName("patcher"));
 
     // (fd)
-    keyEventClient = null;
 
+    keyEventClient = null;
     itsDocument = patcher.getDocument();
     itsPatcher = patcher;
 
@@ -183,16 +183,36 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     else
       setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle(chooseWindowName(patcher)));
 
+    itsSketchPad    = new ErmesSketchPad(this);
+    itsToolBar      = new ErmesSwToolbar(itsSketchPad);
+
+    itsScrollerView = new ScrollPane();
+    itsScrollerView.add(itsSketchPad, 0);
+    itsScrollerView.getHAdjustable().setUnitIncrement(10);
+    itsScrollerView.getVAdjustable().setUnitIncrement(10);
+    itsScrollerView.getHAdjustable().addAdjustmentListener(itsSketchPad);
+    itsScrollerView.getVAdjustable().addAdjustmentListener(itsSketchPad);
+    itsScrollerView.addKeyListener(this);
+    
+
     itsSketchPad.setFont(new Font(ircam.jmax.utils.Platform.FONT_NAME, Font.PLAIN, ircam.jmax.utils.Platform.FONT_SIZE));						// communicate with
     Init(); //MaxEditor base class init (standard menu handling)
 
     itsSketchPad.SetToolBar(itsToolBar);	// inform the Sketch of the ToolBar to 
 
-    InitSketchWin();
-    validate();
-    itsPatcher.open();
+    getContentPane().setLayout(new BorderLayout());
+    
+    itsSelection = Fts.getSelection();
+    itsSelection.clean();
 
+    setSize(new Dimension(600, 300));
+    getContentPane().add("North", itsToolBar);
+    getContentPane().add("Center", itsScrollerView);
+
+    itsPatcher.open();
     InitFromContainer(itsPatcher);
+
+    validate();
 
     setVisible(true);
 
@@ -234,7 +254,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     return 130;
   }
   
-  public void InitFromContainer(FtsContainerObject patcher) {
+  private void InitFromContainer(FtsContainerObject patcher) {
     
     Object aObject;
     int x=0;
@@ -272,44 +292,9 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       
     setBounds(x, y, width+horizontalOffset(), height+verticalOffset());
 
-    validate();
-
     itsSketchPad.InitFromFtsContainer(patcher);
-      
-    validate();
-
   }
 
-  //--------------------------------------------------------
-  // InitSketchWin
-  //--------------------------------------------------------
-  protected void InitSketchWin(){ 
-    
-    getContentPane().setLayout(new ErmesToolBarLayout(ErmesToolBarLayout.VERTICAL));
-    
-    itsSelection = Fts.getSelection();
-    itsSelection.clean();
-    setSize(new Dimension(600, 300));
-    itsToolBar.setSize(600, /*150630*/25);    
-    getContentPane().add(itsToolBar);
-
-    /*{//1506
-      JPanel aPanel = new JPanel();
-
-      aPanel.setLayout(new ErmesToolBarLayout(ErmesToolBarLayout.HORIZONTAL));
-      Button aButton = new Button("RUN");
-      aButton.setSize(60, 28);
-      aPanel.add(aButton);
-      
-      aPanel.add(itsToolbarTextField);
-      aPanel.setSize(600, 30);
-      aPanel.validate();
-      getContentPane().add(aPanel, "stick_both");
-    }*/
-    getContentPane().add(itsScrollerView, "fill");
-    validate();
-  }
-  
   public void SetupMenu()
   {
     MenuBar menuBar = getMenuBar();
@@ -426,15 +411,12 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     
     itsSketchPad.ftsClipboard.copy(Fts.getSelection());
-    MaxApplication.systemClipboard.setContents(itsClipboardProvider, itsClipboardProvider);
     setCursor(temp);
   }
 
 
 
   protected void Paste() {
-    //it does no more use ErmesClipboardProvider
-
     if(itsSketchPad.itsRunMode) return;
 
     Cursor temp = getCursor();
