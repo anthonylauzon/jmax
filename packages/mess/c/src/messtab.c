@@ -164,7 +164,7 @@ messtab_get(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
       if(mess)
 	{
-	  this->locked = 1;
+	  this->locked = 1; /* lock messtab */
 	  fts_outlet_send(o, 1, fts_get_selector(at), 1, at);
 	  message_output(o, 0, mess);
 	  this->locked = 0;
