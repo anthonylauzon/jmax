@@ -68,7 +68,6 @@
 ;;
 ;; hello server
 ;;
-(ucs "show" "welcome")
 (sync)
 
 ;;

@@ -63,7 +63,6 @@ if {$jmaxConnection == "tcl"} {
 ftsconnect $jmaxServerDir $jmaxServerName $jmaxConnection $jmaxHost $jmaxPort
 
 # hello server
-ucs show welcome
 sync
 
 # load gui server side objects
