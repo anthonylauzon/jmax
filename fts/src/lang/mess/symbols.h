@@ -15,11 +15,16 @@ extern const char *fts_symbol_name(fts_symbol_t sym)
 
  */
 
-#define fts_symbol_name(sym)      ((sym)->name)
+#define fts_symbol_name(sym)                 ((sym)->name)
 
-#define fts_symbol_get_operator(sym)       ((sym)->operator)
-#define fts_symbol_set_operator(sym, op)   (((struct fts_symbol_descr *) sym)->operator = (op))
-#define fts_symbol_is_operator(sym)        ((sym)->operator != (-1))
+#define fts_symbol_get_operator(sym)         ((sym)->operator)
+#define fts_symbol_set_operator(sym, op)     (((struct fts_symbol_descr *) sym)->operator = (op))
+#define fts_symbol_is_operator(sym)          ((sym)->operator != (-1))
+
+#define fts_symbol_get_cache_index(sym)      ((sym)->cache_index)
+#define fts_symbol_set_cache_index(sym, idx) (((struct fts_symbol_descr *) sym)->cache_index = (idx))
+#define fts_symbol_is_cached(sym)            ((sym)->cache_index != (-1))
+
 
 
 /* Predefined symbols used in the lang module */

@@ -71,7 +71,7 @@ typedef struct fts_template		fts_template_t;
 struct fts_symbol_descr
 {
   const char *name;		/* name */
-
+  int cache_index;		/* index in the client cache if any */
   int operator;			/* index in the operator table, for the expression eval */
   struct fts_symbol_descr *next_in_table; /* next in hash table for fts_new_symbol */
 };

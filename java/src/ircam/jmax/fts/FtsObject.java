@@ -54,7 +54,7 @@ public class FtsObject
 
     /* Get the class name */
 
-    if (stream.getNextType() == FtsStream.stringValue)
+    if (stream.nextIsString())
       {
 	className = stream.getNextStringArgument();
 	className = className.intern();

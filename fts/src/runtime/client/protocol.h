@@ -102,22 +102,17 @@
    Objects are represented as a positive number corresponding to its ID.
 */
    
-#define LONG_POS_CODE 'i'
-#define FLOAT_CODE 'z'
-#define STRING_START_CODE 0x01
-#define STRING_END_CODE   0x02
-#define OBJECT_CODE 'o'
-#define CONNECTION_CODE 'x'
-#define DATA_CODE 0x05
+#define STRING_START_CODE   0x01
+#define STRING_END_CODE     0x02
 
-/*
-   End of message: this character cannot be changed, and cannot
-   appear inside the message itself; strings do not support
-   control character below 0x08. (temporary situation, waiting for
-   the binary protocol).
- */
-
-#define EOM_CODE  0x03
+#define INT_CODE            0x03
+#define FLOAT_CODE          0x04
+#define SYMBOL_CODE         0x05
+#define SYMBOL_AND_DEF_CODE 0x06
+#define OBJECT_CODE         0x07
+#define CONNECTION_CODE     0x08
+#define DATA_CODE           0x09
+#define EOM_CODE            0x0a
 
 
 #endif

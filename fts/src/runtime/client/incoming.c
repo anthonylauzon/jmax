@@ -182,7 +182,7 @@ dtol(char *s)
 static enum parser_state
 get_status_for(char c)
 {
-  if (c == LONG_POS_CODE)
+  if (c == INT_CODE)
     return in_long;
   else if (c == FLOAT_CODE)
     return  in_float;
@@ -203,7 +203,7 @@ get_status_for(char c)
 static int
 is_token_char(char c)
 {
-  return ((c == LONG_POS_CODE) ||
+  return ((c == INT_CODE) ||
 	  (c == FLOAT_CODE)    ||
 	  (c == OBJECT_CODE)   ||
 	  (c == DATA_CODE)     ||

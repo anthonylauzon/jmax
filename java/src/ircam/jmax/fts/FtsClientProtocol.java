@@ -12,27 +12,31 @@ class FtsClientProtocol
 {
   // Protocol type coding Special chars
 
-  static final int int_type_code      = 'i';
-  static final int float_type_code    = 'z';
-  static final int object_type_code   = 'o';
-  static final int connection_type_code   = 'x';
-  static final int data_type_code     = 0x05;
-  static final int string_start_code  = 0x01;
-  static final int string_end_code    = 0x02;
-  static final int end_of_message_code = 0x03;
+  static final int string_start         = 0x01;
+  static final int string_end           = 0x02;
+  static final int int_type             = 0x03;
+  static final int float_type           = 0x04;
+  static final int symbol_type          = 0x05;
+  static final int symbol_and_def_type  = 0x06;
+  static final int object_type          = 0x07;
+  static final int connection_type      = 0x08;
+  static final int data_type            = 0x09;
+  static final int end_of_message       = 0x0a;
   
   // predicated coding protocol character sets
 
   static boolean tokenStartingChar(int c)
   {
     return (
-	    (c == int_type_code) ||
-	    (c == float_type_code)   ||
-	    (c == object_type_code)   ||
-	    (c == connection_type_code) || 
-	    (c == data_type_code)   ||
-	    (c == string_start_code) ||
-	    (c == end_of_message_code)
+	    (c == int_type) ||
+	    (c == float_type)   ||
+	    (c == symbol_type)   ||
+	    (c == symbol_and_def_type)   ||
+	    (c == object_type)   ||
+	    (c == connection_type) || 
+	    (c == data_type)   ||
+	    (c == string_start) ||
+	    (c == end_of_message)
 	     );
   }
 
@@ -59,7 +63,7 @@ class FtsClientProtocol
 
   static boolean isEom(int c)
   {
-    return c == end_of_message_code;
+    return c == end_of_message;
   }
 
   // Protocol defined commands code
@@ -69,7 +73,7 @@ class FtsClientProtocol
   static final int sync_done_cmd = '<';
   static final int post_cmd = 'h';
 
-  static final int remote_call_code = '!';
+  static final int remote_call = '!';
 
   static final int fts_save_patcher_bmax_cmd = 'S';
 

@@ -811,7 +811,7 @@ public class FtsServer  implements Runnable
 
     try
       {
-	stream.sendCmd(FtsClientProtocol.remote_call_code);
+	stream.sendCmd(FtsClientProtocol.remote_call);
 	stream.sendRemoteData(data);
 	stream.sendInt(key);
 	stream.sendInt(arg);
@@ -833,7 +833,7 @@ public class FtsServer  implements Runnable
 
     try
       {
-	stream.sendCmd(FtsClientProtocol.remote_call_code);
+	stream.sendCmd(FtsClientProtocol.remote_call);
 	stream.sendRemoteData(data);
 	stream.sendInt(key);
 	stream.sendFloat(arg);
@@ -855,7 +855,7 @@ public class FtsServer  implements Runnable
 
     try
       {
-	stream.sendCmd(FtsClientProtocol.remote_call_code);
+	stream.sendCmd(FtsClientProtocol.remote_call);
 	stream.sendRemoteData(data);
 	stream.sendInt(key);
 	stream.sendValue(arg);
@@ -879,7 +879,7 @@ public class FtsServer  implements Runnable
 
     try
       {
-	stream.sendCmd(FtsClientProtocol.remote_call_code);
+	stream.sendCmd(FtsClientProtocol.remote_call);
 	stream.sendRemoteData(data);
 	stream.sendInt(key);
 
@@ -904,7 +904,7 @@ public class FtsServer  implements Runnable
 
     try
       {
-	stream.sendCmd(FtsClientProtocol.remote_call_code);
+	stream.sendCmd(FtsClientProtocol.remote_call);
 	stream.sendRemoteData(data);
 	stream.sendInt(key);
 
@@ -931,7 +931,7 @@ public class FtsServer  implements Runnable
 
     try
       {
-	stream.sendCmd(FtsClientProtocol.remote_call_code);
+	stream.sendCmd(FtsClientProtocol.remote_call);
 	stream.sendRemoteData(data);
 	stream.sendInt(key);
 	stream.sendInt(offset);
@@ -955,7 +955,7 @@ public class FtsServer  implements Runnable
 
     try
       {
-	stream.sendCmd(FtsClientProtocol.remote_call_code);
+	stream.sendCmd(FtsClientProtocol.remote_call);
 	stream.sendRemoteData(data);
 	stream.sendInt(key);
 	stream.sendInt(id);
@@ -982,7 +982,7 @@ public class FtsServer  implements Runnable
 
     try
       {
-	stream.sendCmd(FtsClientProtocol.remote_call_code);
+	stream.sendCmd(FtsClientProtocol.remote_call);
 	stream.sendRemoteData(data);
 	stream.sendInt(key);
 	stream.sendObject(object);
@@ -1009,7 +1009,7 @@ public class FtsServer  implements Runnable
 
     try
       {
-	stream.sendCmd(FtsClientProtocol.remote_call_code);
+	stream.sendCmd(FtsClientProtocol.remote_call);
 	stream.sendRemoteData(data);
 	stream.sendInt(key);
 	stream.sendObject(object);
@@ -1255,11 +1255,11 @@ public class FtsServer  implements Runnable
 	  Object value;
 	  
 	  obj = stream.getNextObjectArgument();
-	  prop = (stream.getNextStringArgument()).intern();
+	  prop = stream.getNextSymbolArgument();
 
-	  if (stream.getNextType() == FtsStream.intValue)
+	  if (stream.nextIsInt())
 	    obj.localPut(prop, stream.getNextIntArgument());
-	  if (stream.getNextType() == FtsStream.floatValue)
+	  if (stream.nextIsFloat())
 	    obj.localPut(prop, stream.getNextFloatArgument());
 	  else
 	    obj.localPut(prop, stream.getNextArgument());
@@ -1431,7 +1431,7 @@ public class FtsServer  implements Runnable
 	  break;
 	}
 
-      case FtsClientProtocol.remote_call_code:
+      case FtsClientProtocol.remote_call:
 	{
 	  FtsRemoteData data = stream.getNextDataArgument();
 	  int key = stream.getNextIntArgument();

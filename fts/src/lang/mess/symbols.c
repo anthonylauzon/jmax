@@ -352,8 +352,9 @@ fts_new_symbol(const char *name)
      and make a new one */
 
   sp = (struct fts_symbol_descr *) fts_heap_alloc(symbol_heap);
-  sp->name = name;
-  sp->operator = -1;
+  sp->name        = name;
+  sp->operator    = -1;
+  sp->cache_index = -1;
 
   /* third, add the new symbol in the hash table */
 
@@ -395,6 +396,7 @@ fts_new_symbol_copy(const char *name)
 
   sp->name = s;
   sp->operator = -1;
+  sp->cache_index = -1;
 
   /* third, add the new symbol in the has table */
 

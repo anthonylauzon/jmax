@@ -91,7 +91,7 @@ abstract public class FtsStream
   {
     String s;
 	
-    write(FtsClientProtocol.int_type_code);
+    write(FtsClientProtocol.int_type);
     s = Integer.toString(value);
 	
     for (int i = 0; i < s.length(); i++)
@@ -102,7 +102,7 @@ abstract public class FtsStream
 
   final void sendInt(String s) throws java.io.IOException 
   {
-    write(FtsClientProtocol.int_type_code);
+    write(FtsClientProtocol.int_type);
     
     for (int i = 0; i < s.length(); i++)
       write(s.charAt(i));
@@ -113,7 +113,7 @@ abstract public class FtsStream
 
   final void sendInt(StringBuffer s) throws java.io.IOException 
   {
-    write(FtsClientProtocol.int_type_code);
+    write(FtsClientProtocol.int_type);
     
     for (int i = 0; i < s.length(); i++)
       write(s.charAt(i));
@@ -124,7 +124,7 @@ abstract public class FtsStream
   {
     String s;
 
-    write(FtsClientProtocol.float_type_code);
+    write(FtsClientProtocol.float_type);
     s = fo.toString();
 
     for (int i = 0; i < s.length(); i++)
@@ -135,7 +135,7 @@ abstract public class FtsStream
   {
     String s;
 
-    write(FtsClientProtocol.float_type_code);
+    write(FtsClientProtocol.float_type);
     s = String.valueOf(value);
 
     for (int i = 0; i < s.length(); i++)
@@ -146,7 +146,7 @@ abstract public class FtsStream
 
   final void sendFloat(String s) throws java.io.IOException 
   {
-    write(FtsClientProtocol.float_type_code);
+    write(FtsClientProtocol.float_type);
 
     for (int i = 0; i < s.length(); i++)
       write(s.charAt(i));
@@ -156,7 +156,7 @@ abstract public class FtsStream
 
   final void sendFloat(StringBuffer s) throws java.io.IOException 
   {
-    write(FtsClientProtocol.float_type_code);
+    write(FtsClientProtocol.float_type);
 
     for (int i = 0; i < s.length(); i++)
       write(s.charAt(i));
@@ -166,22 +166,22 @@ abstract public class FtsStream
 
   final void sendString(String s) throws java.io.IOException 
   {
-    write(FtsClientProtocol.string_start_code);
+    write(FtsClientProtocol.string_start);
 
     for (int i = 0; i < s.length(); i++)
       write(s.charAt(i));
 
-    write(FtsClientProtocol.string_end_code);
+    write(FtsClientProtocol.string_end);
   }
 
   final void sendString(StringBuffer s) throws java.io.IOException 
   {
-    write(FtsClientProtocol.string_start_code);
+    write(FtsClientProtocol.string_start);
 
     for (int i = 0; i < s.length(); i++)
       write(s.charAt(i));
 
-    write(FtsClientProtocol.string_end_code);
+    write(FtsClientProtocol.string_end);
   }
   
   final void sendObject(FtsObject obj) throws java.io.IOException 
@@ -194,7 +194,7 @@ abstract public class FtsStream
     else
       value = 0;
 
-    write(FtsClientProtocol.object_type_code);
+    write(FtsClientProtocol.object_type);
     s = Integer.toString(value);
 		
     for (int i = 0; i < s.length(); i++)
@@ -209,7 +209,7 @@ abstract public class FtsStream
 
     value = id;
 
-    write(FtsClientProtocol.object_type_code);
+    write(FtsClientProtocol.object_type);
     s = Integer.toString(value);
 		
     for (int i = 0; i < s.length(); i++)
@@ -227,7 +227,7 @@ abstract public class FtsStream
     else
       value = 0;
 
-    write(FtsClientProtocol.connection_type_code);
+    write(FtsClientProtocol.connection_type);
     s = Integer.toString(value);
 		
     for (int i = 0; i < s.length(); i++)
@@ -242,7 +242,7 @@ abstract public class FtsStream
 
     value = id;
 
-    write(FtsClientProtocol.connection_type_code);
+    write(FtsClientProtocol.connection_type);
     s = Integer.toString(value);
 		
     for (int i = 0; i < s.length(); i++)
@@ -259,7 +259,7 @@ abstract public class FtsStream
     else
       value = 0;
 
-    write( FtsClientProtocol.data_type_code);
+    write( FtsClientProtocol.data_type);
     s = Integer.toString(value);
 		
     for (int i = 0; i < s.length(); i++)
@@ -334,7 +334,7 @@ abstract public class FtsStream
 
   final void sendEom() throws java.io.IOException 
   {
-    write(FtsClientProtocol.end_of_message_code);
+    write(FtsClientProtocol.end_of_message);
     flush();
   }
 
@@ -345,36 +345,6 @@ abstract public class FtsStream
   /*                                                                            */
   /******************************************************************************/
 
-  // Token types for the parser
-
-  public static final int intValue     = 1;
-  public static final int floatValue   = 2;
-  public static final int objectValue  = 3;
-  public static final int connectionValue  = 4;
-  public static final int dataValue    = 5;
-  public static final int stringValue  = 6;
-  public static final int endOfMessage = 7;
-
-  final int nextStatus(int c) throws FtsQuittedException
-  {
-    if (c == FtsClientProtocol.int_type_code)
-      return intValue;
-    else if (c == FtsClientProtocol.float_type_code)
-      return floatValue;
-    else if (c == FtsClientProtocol.object_type_code)
-      return objectValue;
-    else if (c == FtsClientProtocol.connection_type_code)
-      return connectionValue;
-    else if (c == FtsClientProtocol.data_type_code)
-      return dataValue;
-    else if (c == FtsClientProtocol.string_start_code)
-      return stringValue;
-    else if (FtsClientProtocol.isEom(c))
-      return endOfMessage;
-    else 
-      return endOfMessage;
-  }
-
   /**
    * Parse the messages from FTS.
    * It produces a FtsMessage object that represent the received message. <p>
@@ -383,44 +353,79 @@ abstract public class FtsStream
    * @exception ircam.jmax.fts.FtsQuittedExcepetion For some reason the FTS server quitted.
    */
 
-  StringBuffer s = new StringBuffer();
-  int status = endOfMessage; // the parser status, usually next arg type
+  final private int symbolCacheSize = 512;
+  private String[] symbolCache = new String[symbolCacheSize];
+  private StringBuffer s = new StringBuffer();
+  private int status = FtsClientProtocol.end_of_message; // the parser status, usually next arg type
 
   private final void skipToEnd()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     int c;
 
-    while (status != endOfMessage)
+    while (status != FtsClientProtocol.end_of_message)
       {
 	c = read();
 
 	if (FtsClientProtocol.tokenStartingChar(c))
-	  status = nextStatus(c);
+	  status = c;
       }
   }
 
 
   public final boolean endOfArguments()
   {
-    return status == endOfMessage;
+    return status == FtsClientProtocol.end_of_message;
   }
 
-  public final int getNextType()
+  
+  public final boolean nextIsInt()
   {
-    return status;
+    return status == FtsClientProtocol.int_type;
   }
+
+  public final boolean nextIsFloat()
+  {
+    return status == FtsClientProtocol.float_type;
+  }
+
+  public final boolean nextIsSymbol()
+  {
+    return ((status == FtsClientProtocol.symbol_type) ||
+	    (status == FtsClientProtocol.symbol_and_def_type));
+  }
+
+  public final boolean nextIsString()
+  {
+    return status == FtsClientProtocol.string_start;
+  }
+
+  public final boolean nextIsObject()
+  {
+    return status == FtsClientProtocol.object_type;
+  }
+
+  public final boolean nextIsConnection()
+  {
+    return status == FtsClientProtocol.connection_type;
+  }
+
+  public final boolean nextIsData()
+  {
+    return status == FtsClientProtocol.data_type;
+  }
+
 
   public final int getCommand()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     int c;
 
-    if (status != endOfMessage)
+    if (status != FtsClientProtocol.end_of_message)
       skipToEnd();
 
     c = read();
-    status = nextStatus(read());
+    status = read();
     return c;
   }
 
@@ -429,70 +434,31 @@ abstract public class FtsStream
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     int r = 0;
-    int sign = 1;
-    int c;
 
-    c = read();
+    r = r | ((read() & 0xff) << 24);
+    r = r | ((read() & 0xff) << 16);
+    r = r | ((read() & 0xff) << 8);
+    r = r | ((read() & 0xff) << 0);
 
-    if (c == '-')
-      {
-	sign = -1;
-	c = read();
-      }
+    status = read();
 
-    while (! FtsClientProtocol.tokenStartingChar(c))
-      {
-	r = r * 10 + (c - '0');
-	c = read();
-      }
-    status = nextStatus(c);
-
-    return r * sign;
+    return r;
   }
-
 
   public final float getNextFloatArgument()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
-    boolean pointDone = false;
-    int divider = 1;
-    int sign = 1;
-    int intPart = 0;
-    int decimalPart = 0;
-    int c;
+    int r = 0;
 
-    c = read();
+    r = r | ((read() & 0xff) << 24);
+    r = r | ((read() & 0xff) << 16);
+    r = r | ((read() & 0xff) << 8);
+    r = r | ((read() & 0xff) << 0);
 
-    if (c == '-')
-      {
-	sign = -1;
-	c = read();
-      }
+    status = read();
 
-    while (! FtsClientProtocol.tokenStartingChar(c))
-      {
-	if (c == '.')
-	  {
-	    pointDone = true;
-	  }
-	else if (pointDone)
-	  {
-	    decimalPart = decimalPart * 10 + (c - '0');
-	    divider = divider * 10;
-	  }
-	else
-	  {
-	    intPart = intPart * 10 + (c - '0');
-	  }
-
-	c = read();
-      }
-
-    status = nextStatus(c);
-
-    return (float) (sign * ((double) intPart + ((double) decimalPart / (double) divider)));
+    return Float.intBitsToFloat(r);
   }
-
 
   public final FtsObject getNextObjectArgument()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
@@ -515,6 +481,33 @@ abstract public class FtsStream
   }
 
 
+  /* a symbol is an interned string, send by fts using the symbol cache;
+     strings are generally not sent as symbol, unless we want the interned/cached
+     version */
+
+
+  public final String getNextSymbolArgument()
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
+  {
+    if (status == FtsClientProtocol.symbol_type)
+      {
+	int idx;
+	idx = getNextIntArgument();
+
+	return symbolCache[idx];
+      }
+    else
+      {
+	int idx = getNextIntArgument();
+	String str = getNextStringArgument().intern();
+
+	if ((idx >= 0) && (idx < symbolCacheSize))
+	  symbolCache[idx] = str;
+
+	return str;
+      }
+  }
+
   public final String getNextStringArgument()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
@@ -527,7 +520,7 @@ abstract public class FtsStream
 
     c = read();
 
-    while (c != FtsClientProtocol.string_end_code)
+    while (c != FtsClientProtocol.string_end)
       {
 	s.append((char)c);
 	c = read();
@@ -538,8 +531,7 @@ abstract public class FtsStream
     // Skip the end of string token
     // and read the next type token
 
-    c =  read();
-    status = nextStatus(c);
+    status = read();
 
     return str;    
   }
@@ -550,22 +542,22 @@ abstract public class FtsStream
   {
     switch (status)
       {
-      case intValue:
+      case FtsClientProtocol.int_type:
 	return new Integer(getNextIntArgument());
 
-      case floatValue:
+      case FtsClientProtocol.float_type:
 	return new Float(getNextFloatArgument());
 
-      case objectValue:
+      case FtsClientProtocol.object_type:
 	return getNextObjectArgument();
 
-      case connectionValue:
+      case FtsClientProtocol.connection_type:
 	return getNextConnectionArgument();
 
-      case dataValue:
+      case FtsClientProtocol.data_type:
 	return getNextDataArgument();
 
-      case stringValue:
+      case FtsClientProtocol.string_start:
 	return getNextStringArgument();
 
       default:
