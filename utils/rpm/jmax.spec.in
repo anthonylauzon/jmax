@@ -1,3 +1,4 @@
+# -*-rpm-spec-*-
 # These macros doesn't seems to be defined on RedHat 9
 %define ifdef() %if %{expand:%%{?%{1}:1}%%{!?%{1}:0}}
 %define ifndef() %if %{expand:%%{?%{1}:0}%%{!?%{1}:1}}
@@ -144,6 +145,7 @@ Contains C++ and Python client for jMax
 Summary: Jack Audio Connection Kit support for jMax
 Group: Applications/Multimedia
 Requires: jack-audio-connection-kit, %{name}-common = %{version}
+BuildRequires: jack-audio-connection-kit-devel
 %if %{agnula} == 1
 Provides: %{jmax_name}-jack = %{version}
 %endif
