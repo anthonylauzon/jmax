@@ -237,6 +237,10 @@ ftl_program_print_bytecode
 ftl_program_compile
 ftl_program_run
 ftl_program_call_subr
+ftl_program_start_profiler
+ftl_program_stop_profiler
+ftl_program_clear_profile_data
+ftl_program_show_profile_by_class
 _ftl_data_new
 ftl_data_free
 ftl_mem_start_memory_relocation
@@ -270,10 +274,10 @@ dsp_chain_delete
 dsp_chain_print
 dsp_chain_print_signals
 dsp_chain_print_bytecode
-dsp_chain_generate_C_code
 dsp_is_running
 dsp_chain_poll
 dsp_make_dsp_off_chain
+dsp_get_current_dsp_chain
 fts_s_put
 fts_s_sig
 fts_s_sig_zero
