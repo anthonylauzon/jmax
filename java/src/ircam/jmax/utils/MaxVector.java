@@ -5,7 +5,7 @@ import java.util.*;
 public class MaxVector
 {
   protected Object objects[];
-  protected int fillPointer;
+  protected int fillPointer; // point to the next not used element 
 
   public MaxVector()
   {
@@ -97,7 +97,7 @@ public class MaxVector
 
   public final Object elementAt(int index)
   {
-    if (index > fillPointer)	//@@@
+    if (index >= fillPointer)
       {
 	System.err.println("MaxVector: index " + index + " out of bounds ");
 	Thread.dumpStack();
@@ -113,13 +113,13 @@ public class MaxVector
 
   public final void removeElementAt(int index)
   {
-    int j = fillPointer - index - 1;
+    int l = fillPointer - index - 1;
 
-    if (j > 0)
-      System.arraycopy(objects, index + 1, objects, index, j);
+    if (l > 0)
+      System.arraycopy(objects, index + 1, objects, index, l);
 
-    objects[fillPointer] = null; /* to let gc do its work */
     fillPointer--;
+    objects[fillPointer] = null; /* to let gc do its work */
   }
 
   public final void addElement(Object obj)
@@ -136,7 +136,7 @@ public class MaxVector
 	System.arraycopy(objects, index, objects, index + 1, fillPointer - index);
 	objects[index] = obj;
 	fillPointer++;
-    }
+      }
   }
 
 
@@ -166,17 +166,19 @@ public class MaxVector
     StringBuffer buf = new StringBuffer();
     buf.append("[");
 
-    for (int i = 0 ; i < fillPointer ; i++) {
-      if (objects[i] != null)
-	buf.append(objects[i].toString());
-      else
-	buf.append("(null)");
+    for (int i = 0 ; i < fillPointer ; i++)
+      {
+	if (objects[i] != null)
+	  buf.append(objects[i].toString());
+	else
+	  buf.append("(null)");
 
-      if (i < max) {
-	buf.append(", ");
+	if (i < max) 
+	  buf.append(", ");
       }
-    }
+
     buf.append("]");
+
     return buf.toString();
   }
 }
