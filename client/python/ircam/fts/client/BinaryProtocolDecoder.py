@@ -42,7 +42,6 @@ class BinaryProtocolDecoder:
     """
     This class decode message using FTS cliet-server protocol
     """
-    symbolTable = HashTable()
     
     def __init__(self, serverConnection):
         self.__serverConnection = serverConnection
@@ -85,7 +84,7 @@ class BinaryProtocolDecoder:
     def endFloatAction(self, input):
         self.__lval = self.__lval << 8 | input
         if self.__argsCount >= 2:
-            self.__args.append(3.14)
+            self.__args.append(self.__lval)
         self.__argsCount += 1
     
     def endSymbolIndexAction(self, input):
@@ -98,14 +97,7 @@ class BinaryProtocolDecoder:
         self.__argsCount += 1
     
     def endSymbolCacheAction(self, input):
-        p = self.__buffer
-        status, symbol = BinaryProtocolDecoder.symbolTable.get(p)
-        if status == 0:
-            symbol = p
-            BinaryProtocolDecoder.symbolTable.put(symbol, symbol)
-        
-        BinaryProtocolDecoder.symbolTable.put(symbol, symbol)
-
+        symbol = self.__buffer
         self.__symbolCache.put(self.__lval, symbol)
 
         if self.__argsCount == 1:
