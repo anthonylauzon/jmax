@@ -257,7 +257,7 @@ void fts_object_import (fts_object_t *o, int winlet, fts_symbol_t s,
     fts_list_t *handlers = fts_object_get_class(o)->import_handlers;
 
     if (!fts_object_try_handlers(handlers, o, winlet, s, ac, at))
-	fts_object_error(o, "import: cannot import file to %s", 
+	fts_object_error(o, "import: no handler to import file to %s", 
 			 fts_symbol_name(fts_object_get_class_name(o)));
 }
 
@@ -269,7 +269,7 @@ void fts_object_export (fts_object_t *o, int winlet, fts_symbol_t s,
     fts_list_t *handlers = fts_object_get_class(o)->export_handlers;
 
     if (!fts_object_try_handlers(handlers, o, winlet, s, ac, at))
-	fts_object_error(o, "import: cannot export file to %s", 
+	fts_object_error(o, "import: no handler to export file from %s", 
 			 fts_symbol_name(fts_object_get_class_name(o)));
 }
 
