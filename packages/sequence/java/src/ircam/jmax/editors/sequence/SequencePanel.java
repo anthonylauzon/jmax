@@ -348,6 +348,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     public void objectsAdded(int maxTime) 
     {
 	resizePanelToTime(maxTime);	
+	System.err.println("sequencePanel objectAdded");
     }
     public void objectDeleted(Object whichObject, int index){}
     public void objectMoved(Object whichObject, int oldIndex, int newIndex) 

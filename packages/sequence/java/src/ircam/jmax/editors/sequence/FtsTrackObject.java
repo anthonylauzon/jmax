@@ -129,7 +129,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	int index = -1;
 
 	//begin update is called in adderTool 
-
 	for(int i=0; i<nArgs; i++)
 	    addEvent((TrackEvent)(args[i].getObject()));
 
@@ -494,7 +493,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	events[index] = event;
 
 	notifyObjectAdded(event, index);
-	
+
 	if (isInGroup())     
 	    {
 		postEdit(new UndoableAdd(event));

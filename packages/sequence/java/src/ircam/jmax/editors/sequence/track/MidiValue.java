@@ -46,6 +46,7 @@ public class MidiValue extends AbstractEventValue
 	setProperty("integer", new Integer(0));
 	setProperty("number", new Integer(0));
 	setProperty("channel", new Integer(1));
+	setProperty("duration", new Double(64.0));
     }
 
   Object intValue, channel, number;
@@ -196,7 +197,7 @@ public class MidiValue extends AbstractEventValue
 	    //System.err.println("Couldn't locate sequence images");
 	    path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
 	}
-	MIDI_ICON = new ImageIcon(path+"integer.gif");
+	MIDI_ICON = new ImageIcon(path+"midi.gif");
     }
 }
 

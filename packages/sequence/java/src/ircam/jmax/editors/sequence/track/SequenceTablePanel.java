@@ -66,16 +66,25 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 	public void highlight(Enumeration hhElements, double time)
 	  {
 	      TrackEvent evt;
-	      int index;
+	      int index;	      
+	      Rectangle rect = null;
+	      //Component component = ((Component)table.getCellRenderer(0, 0));
 	      for (Enumeration e = hhElements; e.hasMoreElements();) 
 		{
 		    evt = (TrackEvent) e.nextElement();			  
 		    index = tmodel.getTrackDataModel().indexOf(evt);
-		    //table.setRowSelectionInterval(index, index);
-		    /*selRect.setBounds(xstep, index*ystep, xstep, ystep);
-		      scrollRectToVisible(selRect);
-		      notifySelection(index, 0, evt);*/
+		    
+		    if(rect!=null)
+			rect = rect.union(table.getCellRect(index, 0, true));
+		    else
+			rect = table.getCellRect(index, 0, true);
+		    //component.setBackground(Color.green);
+		    //Rectangle rect = table.getCellRect(index, 0, true);
+		    //table.repaint(rect.x, rect.y, rect.width, rect.height);
+		    //component.setBackground(Color.white);
 		}
+	      if(rect != null)
+		  table.scrollRectToVisible(rect);
 	  }
 	});
 
