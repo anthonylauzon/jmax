@@ -71,7 +71,7 @@ clean_c:
 .PHONY: clean_c
 
 clean_java:
-	for i in $(JAVA_PACKAGES) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) clean ; fi ) ; done
+	if [ _$(JAVA_PACKAGES)_ != __ ] ; then for i in $(JAVA_PACKAGES) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) -k all ; fi ) ; done ; fi
 	for i in $(MIXED_PACKAGES) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) clean_java ; fi ) ; done
 .PHONY: clean_java
 
