@@ -109,21 +109,38 @@ class ErmesObjSlider extends ErmesObject {
     }
   }
   
-
+  private void SetSliderDialog(){
+    Point aPoint = GetSketchWindow().getLocation();
+    itsSketchPad.GetSliderDialog().setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
+    itsSketchPad.GetSliderDialog().ReInit(String.valueOf(itsRangeMax), String.valueOf(itsRangeMin),
+				   String.valueOf(itsInteger), this, itsSketchPad.GetSketchWindow());
+    itsSketchPad.GetSliderDialog().setVisible(true);
+  }
   
   public boolean MouseDown_specific(MouseEvent evt, int x, int y){
     if(evt.getClickCount()>1) {
-      Point aPoint = GetSketchWindow().getLocation();
-      itsSketchPad.GetSliderDialog().setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
-      itsSketchPad.GetSliderDialog().ReInit(String.valueOf(itsRangeMax), String.valueOf(itsRangeMin),
-			     String.valueOf(itsInteger), this);
-      itsSketchPad.GetSliderDialog().setVisible(true);
+      SetSliderDialog();
       return true;
     }
     if(itsSketchPad.itsRunMode){
       if(IsInThrottle(x,y)){
 	itsMovingThrottle = true;
 	return true;
+      }
+      else{
+	//qui sposta il Throttle nel punto del click
+	if(itsY+currentRect.height-BOTTOM_OFFSET>=y && itsY+UP_OFFSET<y) {
+	  //compute the value and send to FTS
+	  itsInteger = (int)(((itsY+currentRect.height)-y-BOTTOM_OFFSET)*itsStep);
+	  itsFtsObject.put("value", new Integer(itsInteger+itsRangeMin));
+	  itsThrottle.Move(itsThrottle.itsX, y);
+	  DoublePaint();
+	  return true;
+	}
+	else if(evt.getClickCount()>1){
+	  SetSliderDialog();
+	  return true;
+	}
       }
     }
     else itsSketchPad.ClickOnObject(this, evt, x, y);

@@ -80,10 +80,11 @@ class ErmesObjFloatDialog extends Dialog implements KeyListener, ActionListener{
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// actionListener --fine
     
-  public void ReInit(String theValue, ErmesObjFloat theFloat){
+  public void ReInit(String theValue, ErmesObjFloat theFloat, Frame theParent){
     itsValue = theValue;
     value.setText(theValue);
     itsFloatObject = theFloat;
+    itsParent = theParent;
   }
  
   /////////////////////////////////////////////////////////////////////////////

@@ -80,10 +80,11 @@ class ErmesObjIntegerDialog extends Dialog implements KeyListener, ActionListene
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// actionListener --fine
     
-  public void ReInit(String theValue, ErmesObjInt theInt){
+  public void ReInit(String theValue, ErmesObjInt theInt, Frame theParent){
     itsValue = theValue;
     value.setText(theValue);
     itsIntObject = theInt;
+    itsParent = theParent;
   }
  
   /////////////////////////////////////////////////////////////////////////////

@@ -106,7 +106,7 @@ class ErmesObjSliderDialog extends Dialog implements KeyListener, ActionListener
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// actionListener --fine
     
-  public void ReInit(String theMaxValue, String theMinValue, String theCurrentValue,ErmesObjSlider theSlider){
+  public void ReInit(String theMaxValue, String theMinValue, String theCurrentValue,ErmesObjSlider theSlider, Frame theParent){
     itsMaxValue = theMaxValue;
     itsMinValue = theMinValue;
     itsCurrentValue = theCurrentValue;
@@ -114,6 +114,7 @@ class ErmesObjSliderDialog extends Dialog implements KeyListener, ActionListener
     itsMinValueField.setText(theMinValue);
     itsCurrentValueField.setText(theCurrentValue);
     itsSliderObject = theSlider;
+    itsParent = theParent;
   }
     
 
