@@ -89,26 +89,26 @@ fts_object_get_patcher_data(fts_object_t *obj)
   fts_class_t *cl = obj->cl;
   
   if(obj->patcher_data == NULL)
-  {
-    fts_object_patcher_data_t *data;
+    {
+      fts_object_patcher_data_t *data;
     
-    if(patcher_data_heap == NULL)
-      patcher_data_heap = fts_heap_new(sizeof(fts_object_patcher_data_t));
+      if(patcher_data_heap == NULL)
+	patcher_data_heap = fts_heap_new(sizeof(fts_object_patcher_data_t));
 
-    data = fts_heap_zalloc(patcher_data_heap);
+      data = fts_heap_zalloc(patcher_data_heap);
 
-    /* allocate inlet connections */
-    data->n_inlets = cl->ninlets;
-    if(cl->ninlets > 0)
-      data->in_conn = (fts_connection_t **) fts_zalloc(cl->ninlets * sizeof(fts_connection_t *));
+      /* allocate inlet connections */
+      data->n_inlets = cl->ninlets;
+      if(cl->ninlets > 0)
+	data->in_conn = (fts_connection_t **) fts_zalloc(cl->ninlets * sizeof(fts_connection_t *));
 
-    /* allocate outlet connections */
-    data->n_outlets = cl->noutlets;
-    if(cl->noutlets > 0)
-      data->out_conn = (fts_connection_t **) fts_zalloc(cl->noutlets * sizeof(fts_connection_t *));
+      /* allocate outlet connections */
+      data->n_outlets = cl->noutlets;
+      if(cl->noutlets > 0)
+	data->out_conn = (fts_connection_t **) fts_zalloc(cl->noutlets * sizeof(fts_connection_t *));
 
-    obj->patcher_data = data;
-  }
+      obj->patcher_data = data;
+    }
 
   return obj->patcher_data;
 }
@@ -119,16 +119,16 @@ fts_object_remove_patcher_data(fts_object_t *obj)
   fts_object_patcher_data_t *data = obj->patcher_data;
   
   if(data != NULL)
-  {
-    fts_object_remove_description(obj);
-    fts_object_remove_inoutlets(obj);
+    {
+      fts_object_remove_description(obj);
+      fts_object_remove_inoutlets(obj);
 
-    /* remove binding to variables */
-    fts_object_remove_bindings(obj);
+      /* remove binding to variables */
+      fts_object_remove_bindings(obj);
     
-    fts_heap_free((void *)data, patcher_data_heap);
-    obj->patcher_data = NULL;
-  }
+      fts_heap_free((void *)data, patcher_data_heap);
+      obj->patcher_data = NULL;
+    }
 }
 
 void
@@ -179,13 +179,13 @@ fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_get_constructor(cl)(obj, fts_system_inlet, NULL, ac, at);
 
   if( fts_object_get_status( obj) == FTS_OBJECT_STATUS_INVALID)
-  {
-    /* destroy invalid object */
-    fts_class_get_deconstructor(cl)(obj, fts_system_inlet, NULL, 0, 0);
-    fts_object_free(obj);
+    {
+      /* destroy invalid object */
+      fts_class_get_deconstructor(cl)(obj, fts_system_inlet, NULL, 0, 0);
+      fts_object_free(obj);
 
-    return NULL;
-  }
+      return NULL;
+    }
 
   fts_object_set_status( obj, 0);
 
@@ -209,13 +209,13 @@ fts_object_create_in_patcher(fts_class_t *cl, fts_patcher_t *patcher, int ac, co
   fts_class_get_constructor(cl)(obj, fts_system_inlet, NULL, ac, at);
 
   if ( fts_object_get_status( obj) == FTS_OBJECT_STATUS_INVALID)
-  {
-    /* destroy invalid object */
-    fts_class_get_deconstructor(cl)(obj, fts_system_inlet, NULL, 0, 0);
-    fts_object_free(obj);
+    {
+      /* destroy invalid object */
+      fts_class_get_deconstructor(cl)(obj, fts_system_inlet, NULL, 0, 0);
+      fts_object_free(obj);
 
-    return NULL;
-  }
+      return NULL;
+    }
 
   fts_object_set_status( obj, 0);
 
@@ -267,7 +267,6 @@ create_instance_in_package( fts_package_t *package, fts_patcher_t *patcher, int 
 	  return NULL;
 	}
 
-      fts_object_set_description(obj, ac, at);
       return obj;
     }
 
@@ -290,7 +289,6 @@ create_instance_in_package( fts_package_t *package, fts_patcher_t *patcher, int 
 	  return NULL;
 	}
 
-      fts_object_set_description(obj, ac, at);
       return obj;
     }
 
@@ -485,7 +483,7 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
      the object, if one of this variables have been redefined. */
   fts_expression_add_variables_user( expression, patcher, obj);
 
-  if (obj && fts_object_get_description_size(obj) == 0)
+  if (obj && (fts_object_get_description_size(obj) == 0 || fts_object_is_template(obj)))
     fts_object_set_description( obj, ac, at);
 
   fts_expression_delete(expression);
@@ -505,22 +503,22 @@ fts_object_trim_inlets_connections(fts_object_t *obj, int inlets)
   fts_object_patcher_data_t *data = obj->patcher_data;
 
   if(data != NULL)
-  {
-    int inlet;
-
-    for (inlet = inlets; inlet < data->n_inlets; inlet++)
     {
-      fts_connection_t *p;
+      int inlet;
 
-      /* must call the real disconnect function, so that all the daemons
-      and methods  can fire correctly */
+      for (inlet = inlets; inlet < data->n_inlets; inlet++)
+	{
+	  fts_connection_t *p;
 
-      for (p = data->in_conn[inlet]; p; p = data->in_conn[inlet])
-        fts_connection_delete(p);
+	  /* must call the real disconnect function, so that all the daemons
+	     and methods  can fire correctly */
 
-      data->in_conn[inlet] = NULL;
+	  for (p = data->in_conn[inlet]; p; p = data->in_conn[inlet])
+	    fts_connection_delete(p);
+
+	  data->in_conn[inlet] = NULL;
+	}
     }
-  }
 }
 
 
@@ -530,24 +528,24 @@ fts_object_trim_outlets_connections(fts_object_t *obj, int outlets)
   fts_object_patcher_data_t *data = obj->patcher_data;
 
   if(data != NULL)
-  {
-    int outlet;
-
-    for (outlet = outlets; outlet < data->n_outlets; outlet++)
     {
-      fts_connection_t *p;
+      int outlet;
 
-      /* The loop work by iterating on the first connection;
-      this work because the loop destroy one connection at a time.
-      */
+      for (outlet = outlets; outlet < data->n_outlets; outlet++)
+	{
+	  fts_connection_t *p;
 
-      for (p = data->out_conn[outlet]; p ;  p = data->out_conn[outlet])
-        fts_connection_delete(p);
+	  /* The loop work by iterating on the first connection;
+	     this work because the loop destroy one connection at a time.
+	  */
+
+	  for (p = data->out_conn[outlet]; p ;  p = data->out_conn[outlet])
+	    fts_connection_delete(p);
 
       
-    data->out_conn[outlet] = NULL;
+	  data->out_conn[outlet] = NULL;
+	}
     }
-  }
 }
 
 void
@@ -596,28 +594,28 @@ fts_object_remove_inoutlets(fts_object_t *obj)
   fts_object_patcher_data_t *data = obj->patcher_data;
   
   if(data != NULL)
-  {
-    fts_object_remove_connections(obj);
+    {
+      fts_object_remove_connections(obj);
     
-    if(data->in_conn)
-      fts_free(data->in_conn);
+      if(data->in_conn)
+	fts_free(data->in_conn);
 
-    if(data->out_conn)
-      fts_free(data->out_conn);
+      if(data->out_conn)
+	fts_free(data->out_conn);
 
-    data->in_conn = NULL;
-    data->out_conn = NULL;
+      data->in_conn = NULL;
+      data->out_conn = NULL;
 
-    data->n_inlets = 0;
-    data->n_outlets = 0;
-  }
+      data->n_inlets = 0;
+      data->n_outlets = 0;
+    }
 }
 
 /*****************************************************************************
-*
-*  connection handling
-*
-*/
+ *
+ *  connection handling
+ *
+ */
 
 static void
 fts_object_move_connections(fts_object_t *old, fts_object_t *new)
@@ -625,34 +623,34 @@ fts_object_move_connections(fts_object_t *old, fts_object_t *new)
   fts_object_patcher_data_t *data = old->patcher_data;
 
   if(data != NULL)
-  {
-    fts_connection_t *p;
-    int i;
-
-    for (i=0; i<fts_object_get_outlets_number(old); i++)
     {
       fts_connection_t *p;
+      int i;
 
-      for (p=data->out_conn[i]; p;  p=data->out_conn[i])
-      {
-        if(i < fts_object_get_outlets_number(new) && p->type > fts_c_hidden)
-          fts_connection_new(new, p->woutlet, p->dst, p->winlet, p->type);
+      for (i=0; i<fts_object_get_outlets_number(old); i++)
+	{
+	  fts_connection_t *p;
 
-        fts_connection_delete(p);
-      }
+	  for (p=data->out_conn[i]; p;  p=data->out_conn[i])
+	    {
+	      if(i < fts_object_get_outlets_number(new) && p->type > fts_c_hidden)
+		fts_connection_new(new, p->woutlet, p->dst, p->winlet, p->type);
+
+	      fts_connection_delete(p);
+	    }
+	}
+
+      for (i=0; i<fts_object_get_inlets_number(old); i++)
+	{
+	  for (p=data->in_conn[i]; p; p=data->in_conn[i])
+	    {
+	      if(i < fts_object_get_inlets_number(new) && p->type > fts_c_hidden)
+		fts_connection_new(p->src, p->woutlet, new, p->winlet, p->type);
+
+	      fts_connection_delete(p);
+	    }
+	}
     }
-
-    for (i=0; i<fts_object_get_inlets_number(old); i++)
-    {
-      for (p=data->in_conn[i]; p; p=data->in_conn[i])
-      {
-        if(i < fts_object_get_inlets_number(new) && p->type > fts_c_hidden)
-          fts_connection_new(p->src, p->woutlet, new, p->winlet, p->type);
-
-        fts_connection_delete(p);
-      }
-    }
-  }
 }
 
 /* remove all connections from the object (done when unplugged from the patcher) */
@@ -662,76 +660,76 @@ fts_object_remove_connections(fts_object_t *obj)
   fts_object_patcher_data_t *data = obj->patcher_data;
 
   if(data != NULL)
-  {
-    int outlet, inlet;
-
-    /* delete all the survived connections starting in the object */
-    for (outlet=0; outlet<data->n_outlets; outlet++)
     {
-      fts_connection_t *p;
+      int outlet, inlet;
 
-      /* must call the real disconnect function, so that all the daemons and methods can fire correctly */
-      while ((p = data->out_conn[outlet]))
-        fts_connection_delete(p);
+      /* delete all the survived connections starting in the object */
+      for (outlet=0; outlet<data->n_outlets; outlet++)
+	{
+	  fts_connection_t *p;
+
+	  /* must call the real disconnect function, so that all the daemons and methods can fire correctly */
+	  while ((p = data->out_conn[outlet]))
+	    fts_connection_delete(p);
+	}
+
+      /* Delete all the survived connections ending in the object */
+      for (inlet=0; inlet<data->n_inlets; inlet++)
+	{
+	  fts_connection_t *p;
+
+	  /* must call the real disconnect function, so that all the daemons and methods  can fire correctly */
+	  while ((p = data->in_conn[inlet]))
+	    fts_connection_delete(p);
+	}
     }
-
-    /* Delete all the survived connections ending in the object */
-    for (inlet=0; inlet<data->n_inlets; inlet++)
-    {
-      fts_connection_t *p;
-
-      /* must call the real disconnect function, so that all the daemons and methods  can fire correctly */
-      while ((p = data->in_conn[inlet]))
-        fts_connection_delete(p);
-    }
-  }
 }
 
 /*********************************************************************************
-*
-*  object naming and bindings
-*
-*/
+ *
+ *  object naming and bindings
+ *
+ */
 void
 fts_object_set_name(fts_object_t *obj, fts_symbol_t sym)
 {
   fts_patcher_t *patcher = fts_object_get_patcher(obj);
 
   if(patcher != NULL)
-  {
-    /* reset current definition */
-    if(fts_object_get_definition(obj) != NULL)
-      fts_definition_update(fts_object_get_definition(obj), fts_null);
-
-    if(sym != fts_s_empty_string)
     {
-      fts_patcher_t *scope = fts_patcher_get_scope(patcher);
-      fts_symbol_t name = fts_name_get_unused(scope, sym);
-      fts_definition_t *def = fts_definition_get(scope, name);
-      fts_atom_t a;
+      /* reset current definition */
+      if(fts_object_get_definition(obj) != NULL)
+	fts_definition_update(fts_object_get_definition(obj), fts_null);
 
-      /* set new definiton */
-      fts_set_object(&a, obj);
-      fts_definition_update(def, &a);
+      if(sym != fts_s_empty_string)
+	{
+	  fts_patcher_t *scope = fts_patcher_get_scope(patcher);
+	  fts_symbol_t name = fts_name_get_unused(scope, sym);
+	  fts_definition_t *def = fts_definition_get(scope, name);
+	  fts_atom_t a;
 
-      /* store definition in object */
-      fts_object_set_definition(obj, def);
+	  /* set new definiton */
+	  fts_set_object(&a, obj);
+	  fts_definition_update(def, &a);
 
-      /* set name of object */
-      if(fts_object_has_id(obj))
-      {
-        fts_set_symbol(&a, name);
-        fts_client_send_message(obj, fts_s_name, 1, &a);
-      }
+	  /* store definition in object */
+	  fts_object_set_definition(obj, def);
+
+	  /* set name of object */
+	  if(fts_object_has_id(obj))
+	    {
+	      fts_set_symbol(&a, name);
+	      fts_client_send_message(obj, fts_s_name, 1, &a);
+	    }
+	}
+      else if(fts_object_has_id(obj))
+	{
+	  fts_atom_t a;
+
+	  fts_set_symbol(&a, fts_s_empty_string);
+	  fts_client_send_message(obj, fts_s_name, 1, &a);
+	}
     }
-    else if(fts_object_has_id(obj))
-    {
-      fts_atom_t a;
-
-      fts_set_symbol(&a, fts_s_empty_string);
-      fts_client_send_message(obj, fts_s_name, 1, &a);
-    }
-  }
 }
 
 void
@@ -759,10 +757,10 @@ fts_object_remove_name(fts_object_t *obj)
 {
   /* remove definition of named object */
   if(obj->definition != NULL)
-  {
-    fts_definition_update(obj->definition, fts_null);
-    obj->definition = NULL;
-  }
+    {
+      fts_definition_update(obj->definition, fts_null);
+      obj->definition = NULL;
+    }
 }
 
 void
@@ -779,26 +777,26 @@ static void
 fts_object_remove_bindings(fts_object_t *obj)
 {
   if(obj->patcher_data != NULL)
-  {
-    fts_list_t *list = obj->patcher_data->name_refs;
-
-    /* remove object as listener from the variables */
-    while(list != NULL)
     {
-      fts_definition_t *def = (fts_definition_t *)fts_get_pointer(fts_list_get(list));
+      fts_list_t *list = obj->patcher_data->name_refs;
 
-      fts_definition_remove_listener(def, obj);
+      /* remove object as listener from the variables */
+      while(list != NULL)
+	{
+	  fts_definition_t *def = (fts_definition_t *)fts_get_pointer(fts_list_get(list));
 
-      list = fts_list_next(list);
+	  fts_definition_remove_listener(def, obj);
+
+	  list = fts_list_next(list);
+	}
     }
-  }
 }
 
 /*****************************************************************************
-*
-*  object access
-*
-*/
+ *
+ *  object access
+ *
+ */
 
 fts_symbol_t
 fts_object_get_class_name(fts_object_t *obj)
@@ -819,10 +817,10 @@ fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher)
 }
 
 /*****************************************************************************
-*
-*  client
-*
-*/
+ *
+ *  client
+ *
+ */
 
 void
 fts_object_upload(fts_object_t *obj)
@@ -830,24 +828,24 @@ fts_object_upload(fts_object_t *obj)
   fts_object_t *parent = (fts_object_t *)fts_object_get_patcher(obj);
 
   if(parent != NULL)
-  {
-    fts_atom_t a;
+    {
+      fts_atom_t a;
 
-    fts_client_register_object(obj, -1);
+      fts_client_register_object(obj, -1);
 
-    fts_set_object(&a, obj);
-    fts_send_message(parent, fts_s_upload_child, 1, &a);
-  }
+      fts_set_object(&a, obj);
+      fts_send_message(parent, fts_s_upload_child, 1, &a);
+    }
 }
 
 static void
 fts_object_reset_client(fts_object_t *obj)
 {
   if(fts_object_has_id( obj))
-  {
-    fts_send_message(obj, fts_s_closeEditor, 0, 0);
-    fts_client_release_object(obj);
-  }
+    {
+      fts_send_message(obj, fts_s_closeEditor, 0, 0);
+      fts_client_release_object(obj);
+    }
 }
 
 static void
@@ -856,24 +854,24 @@ fts_object_upload_connections(fts_object_t *obj)
   fts_object_patcher_data_t *data = obj->patcher_data;
 
   if(data != NULL)
-  {
-    fts_connection_t *p;
-    int i;
-
-    for(i=0; i<fts_object_get_outlets_number(obj); i++)
     {
-      for (p = data->out_conn[i]; p ; p = p->next_same_src)
-        if(p->type > fts_c_hidden)
-          fts_object_upload((fts_object_t *)p);
-    }
+      fts_connection_t *p;
+      int i;
 
-    for (i=0; i<fts_object_get_inlets_number(obj); i++)
-    {
-      for (p=data->in_conn[i]; p; p=p->next_same_dst)
-        if(p->type > fts_c_hidden)
-          fts_object_upload((fts_object_t *)p);
+      for(i=0; i<fts_object_get_outlets_number(obj); i++)
+	{
+	  for (p = data->out_conn[i]; p ; p = p->next_same_src)
+	    if(p->type > fts_c_hidden)
+	      fts_object_upload((fts_object_t *)p);
+	}
+
+      for (i=0; i<fts_object_get_inlets_number(obj); i++)
+	{
+	  for (p=data->in_conn[i]; p; p=p->next_same_dst)
+	    if(p->type > fts_c_hidden)
+	      fts_object_upload((fts_object_t *)p);
+	}
     }
-  }
 }
 
 /*********************************************************************************
@@ -929,14 +927,14 @@ fts_object_remove_description(fts_object_t *obj)
   fts_object_patcher_data_t *data = obj->patcher_data;
 
   if(data != NULL)
-  {
-    /* free object description */
-    if(data->argv != NULL)
-      fts_free(data->argv);
+    {
+      /* free object description */
+      if(data->argv != NULL)
+	fts_free(data->argv);
 
-    data->argc = 0;
-    data->argv = NULL;
-  }
+      data->argc = 0;
+      data->argv = NULL;
+    }
 }
 
 /*****************************************************************************
@@ -992,16 +990,16 @@ fts_object_get_package(fts_object_t *obj)
 }
 
 /*********************************************************************************
-*
-* object redefinition
-*
-* fts_object_redefine replace an object with a new
-* one whose definition is passed as argument, leaving the same
-* connections, properties and id.
-*
-* If the object is a patcher (either standard patcher or abstraction/template)
-* the patcher redefine function is called instead, look in the patcher.c file.
-*/
+ *
+ * object redefinition
+ *
+ * fts_object_redefine replace an object with a new
+ * one whose definition is passed as argument, leaving the same
+ * connections, properties and id.
+ *
+ * If the object is a patcher (either standard patcher or abstraction/template)
+ * the patcher redefine function is called instead, look in the patcher.c file.
+ */
 
 fts_object_t *
 fts_object_recompute(fts_object_t *old)
@@ -1016,72 +1014,72 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
 
   /* redefine object if not scheduled for deletion */
   if(fts_object_get_status(old) != FTS_OBJECT_STATUS_PENDING_DELETE)
-  {
-    fts_patcher_t *patcher = fts_object_get_patcher(old);
-    fts_symbol_t name = fts_object_get_name(old);
-    fts_object_t *new;
-    fts_atom_t a;
-
-    /* unbind variables from old object */
-    fts_object_remove_name(old);
-    fts_object_remove_bindings(old);
-
-    /* create new object */
-    new = fts_eval_object_description(patcher, ac, at);
-
-    /* update the loading vm */
-    fts_vm_substitute_object(old, new);
-
-    /* remove old from client and update list */
-    fts_object_reset_client(old);
-    fts_update_reset(old);
-
-    /* if old is an error object, get its name */
-    if(fts_object_is_error(old))
-      name = fts_error_object_get_name((fts_error_object_t *)old);
-    
-      /* if new is an error object, assure that there are enough inlets and outlets for the connections */
-    if (fts_object_is_error(new))
     {
-      fts_error_object_fit_inlet(new, fts_object_get_inlets_number(old) - 1);
-      fts_error_object_fit_outlet(new, fts_object_get_outlets_number(old) - 1);
-    }
-
-    /* move graphic properties and connections from old to new object */
-    fts_object_move_properties(old, new);
-    fts_object_move_connections(old, new);
-
-    /* set name of new object */
-    if(name != NULL && name != fts_s_empty_string)
-    {
+      fts_patcher_t *patcher = fts_object_get_patcher(old);
+      fts_symbol_t name = fts_object_get_name(old);
+      fts_object_t *new;
       fts_atom_t a;
 
-      fts_set_symbol(&a, name);
-      fts_send_message_varargs(new, fts_s_name, 1, &a);
+      /* unbind variables from old object */
+      fts_object_remove_name(old);
+      fts_object_remove_bindings(old);
+
+      /* create new object */
+      new = fts_eval_object_description(patcher, ac, at);
+
+      /* update the loading vm */
+      fts_vm_substitute_object(old, new);
+
+      /* remove old from client and update list */
+      fts_object_reset_client(old);
+      fts_update_reset(old);
+
+      /* if old is an error object, get its name */
+      if(fts_object_is_error(old))
+	name = fts_error_object_get_name((fts_error_object_t *)old);
+    
+      /* if new is an error object, assure that there are enough inlets and outlets for the connections */
+      if (fts_object_is_error(new))
+	{
+	  fts_error_object_fit_inlet(new, fts_object_get_inlets_number(old) - 1);
+	  fts_error_object_fit_outlet(new, fts_object_get_outlets_number(old) - 1);
+	}
+
+      /* move graphic properties and connections from old to new object */
+      fts_object_move_properties(old, new);
+      fts_object_move_connections(old, new);
+
+      /* set name of new object */
+      if(name != NULL && name != fts_s_empty_string)
+	{
+	  fts_atom_t a;
+
+	  fts_set_symbol(&a, name);
+	  fts_send_message_varargs(new, fts_s_name, 1, &a);
+	}
+
+      /* try to rescue the old object state to the new one */
+      fts_set_object(&a, old);
+      fts_send_message_varargs(new, fts_s_redefine, 1, &a);
+
+      /* remove the old object from the patcher */
+      fts_patcher_remove_object(fts_object_get_patcher(old), old);
+
+      /* upload new object if old object was uploaded */
+      if(old_id > FTS_NO_ID)
+	{
+	  fts_object_upload(new);
+	  fts_object_upload_connections(new);
+	}
+
+      return new;
     }
-
-    /* try to rescue the old object state to the new one */
-    fts_set_object(&a, old);
-    fts_send_message_varargs(new, fts_s_redefine, 1, &a);
-
-    /* remove the old object from the patcher */
-    fts_patcher_remove_object(fts_object_get_patcher(old), old);
-
-    /* upload new object if old object was uploaded */
-    if(old_id > FTS_NO_ID)
-    {
-      fts_object_upload(new);
-      fts_object_upload_connections(new);
-    }
-
-    return new;
-  }
   else
-  {
-    /* unbind variables */
-    fts_object_remove_name(old);
-    fts_object_remove_bindings(old);
-  }
+    {
+      /* unbind variables */
+      fts_object_remove_name(old);
+      fts_object_remove_bindings(old);
+    }
 
   return NULL;
 }

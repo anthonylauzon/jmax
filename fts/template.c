@@ -93,31 +93,44 @@ fts_template_make_instance(fts_template_t *template, fts_patcher_t *patcher, int
   fts_set_symbol(&key, template->filename);
   fts_set_symbol(&value, template->filename);
   if (1 == fts_hashtable_put(&template_file_to_load, &key, &value))
-  {
-    /* cyclic dependency in template definition */
-    fts_log("[template] cyclic definition for template %s \n", template->name);
-    fts_post("[template] cyclic definition for template %s \n", template->name);
-  }
+    {
+      /* cyclic dependency in template definition */
+      fts_log("[template] cyclic definition for template %s \n", template->name);
+      fts_post("[template] cyclic definition for template %s \n", template->name);
+    }
   else
-  {
-    fts_file_load( template->filename, (fts_object_t *)patcher, ac, at, (fts_object_t **)&instance);
-  }
+    {
+      fts_file_load( template->filename, (fts_object_t *)patcher, ac, at, (fts_object_t **)&instance);
+    }
   
   /* remove filename in file to load */
   if (0 == fts_hashtable_remove(&template_file_to_load, &key))
-  {
-    /* not reachable case */
-    fts_log("[template] file to load %s wasn't in file_to_load hashtable \n", template->filename);
-  }
+    {
+      /* not reachable case */
+      fts_log("[template] file to load %s wasn't in file_to_load hashtable \n", template->filename);
+    }
 
   fts_package_pop(template->package);
   
   if (instance)
-  {
-    fts_template_add_instance( template, (fts_object_t *)instance);
-    fts_patcher_set_template( instance, template);
-  }
-  
+    {
+      fts_template_add_instance( template, (fts_object_t *)instance);
+
+      fts_patcher_set_template( instance, template);
+
+      if(ac > 0)
+	{
+	  fts_atom_t va;
+   
+	  /* define the "args" name */
+	  instance->args = (fts_tuple_t *)fts_object_create(fts_tuple_class, ac, at);
+	  fts_object_refer(instance->args);
+   
+	  fts_set_object( &va, (fts_object_t *)instance->args);
+	  fts_name_set_value( instance, fts_s_args, &va);
+	}
+    }
+
   return (fts_object_t *)instance;
 }
 
@@ -169,21 +182,21 @@ fts_template_file_modified(fts_symbol_t filename)
   fts_set_symbol(&key, filename);
   /* look into hashtable to know if this file is associated to a template */
   if (1 == fts_hashtable_get(&template_file_loaded, &key, &value))
-  {
-    /* get template poijter and recompute instances */
-    template = fts_get_pointer(&value);
-    if (template)
     {
-      /* template can't be null here but it could be better to check */
-      fts_template_recompute_instances(template);
+      /* get template poijter and recompute instances */
+      template = fts_get_pointer(&value);
+      if (template)
+	{
+	  /* template can't be null here but it could be better to check */
+	  fts_template_recompute_instances(template);
+	}
+      else
+	{
+	  /* if we are here it's really bad news ..... */
+	  fts_log("[template] a null template is associated with file %s\n",filename);
+	  fts_post("[template] a null template is associated with file %s\n",filename);
+	}
     }
-    else
-    {
-      /* if we are here it's really bad news ..... */
-      fts_log("[template] a null template is associated with file %s\n",filename);
-      fts_post("[template] a null template is associated with file %s\n",filename);
-    }
-  }
 }
 
 

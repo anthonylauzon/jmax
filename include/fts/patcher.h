@@ -43,7 +43,7 @@ struct fts_patcher
   int deleted; /* set to one during content deleting */
   int dirty; /* set to one if patcher's content is not saved */
 
-  fts_array_t args; /* the arguments used for the "args" variable */
+  fts_tuple_t *args; /* the arguments used for the "args" variable */
 
   enum {fts_p_standard, fts_p_abstraction, fts_p_template} type;
 

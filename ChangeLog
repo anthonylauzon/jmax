@@ -1,3 +1,8 @@
+2003-08-07  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* fts/object.c, fts/template.c, include/fts/patcher.h: fixed wrong object description 
+	for template, fixed template arguments passing with $args variable.
+
 2003-08-06  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* fts/parser.y,fts/expression.c,fts/tokenizer.l: changed parser and tokenizer
