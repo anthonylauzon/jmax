@@ -1,9 +1,9 @@
 product jmax
     id "jMax, Java MAX"
     image sw
-        id "Software"
-        version 2.3.8a
-        order 9999
+        id "jMax execution and compilation environment"
+        version "2.4.8a"
+        order 1
         subsys exec default
             id "jMax executables and libraries"
             replaces self
@@ -17,8 +17,8 @@ product jmax
     endimage
     image doc
         id "jMax doc"
-        version 2.4.8a
-        order 1
+        version "2.4.8a"
+        order 2
         subsys documentation default
             id "jMax Documentation"
             replaces self
