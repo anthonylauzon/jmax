@@ -217,12 +217,16 @@ abstract public class ErmesObject implements ErmesDrawable {
     if (! itsSketchPad.itsGraphicsOn)
       return;
 
+    Graphics actualGraphic = g;
+
     if (itsSketchPad.isInGroup) {
       //emergency situation: ignore the Graphics and paint offScreen 
-      Paint_specific(itsSketchPad.GetOffGraphics());
+      actualGraphic = itsSketchPad.GetOffGraphics();
       itsSketchPad.drawPending = true;
     }
-    else Paint_specific(g);
+
+    Paint_specific(actualGraphic);
+
   }
 
 
@@ -456,6 +460,7 @@ abstract public class ErmesObject implements ErmesDrawable {
     }
   }
   
+
   public FtsObject GetFtsObject(){
     return itsFtsObject;
   }

@@ -126,6 +126,14 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
   {
     // Should select or highlight obj if it is an
     // FtsObject
+    if (obj instanceof FtsObject) 
+      {
+	ErmesObject aObject = (ErmesObject) (((FtsObject) obj).getRepresentation());
+	itsSketchPad.deselectAll(true);
+	itsSketchPad.currentSelection.addObject(aObject);
+	aObject.Select(true);
+	itsSketchPad.CheckCurrentFont();
+      }
   }
 
   //----------alternative contructors:

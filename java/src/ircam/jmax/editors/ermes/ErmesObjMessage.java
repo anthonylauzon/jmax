@@ -113,26 +113,30 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
   public void Paint_specific(Graphics g) {
     
     if (g == null) return;
-    if (!itsSketchPad.itsRunMode) {
-      if((!itsSelected)&&(!itsFlashing)) g.setColor(itsLangNormalColor);
-      else g.setColor(itsLangSelectedColor);
-    }
+    if (!itsSketchPad.itsRunMode) 
+      {
+	if(itsSelected || itsFlashing) g.setColor(itsLangSelectedColor);
+	else g.setColor(itsLangNormalColor);
+      }
     else g.setColor(itsUINormalColor);
  
     g.fillRect(getItsX()+1,getItsY()+1,getItsWidth()-2, getItsHeight()-2);
-    //g.fill3DRect(getItsX()+2, getItsY()+2, getItsWidth()-4, getItsHeight()-4, true);
     
-    if (!itsSketchPad.itsRunMode) {
-      if(itsFlashing) g.setColor(itsLangSelectedColor);
-      else{
-	if(!itsSelected) g.setColor(Color.white);
-	else g.setColor(itsLangNormalColor);
+    
+    if (!itsSketchPad.itsRunMode) 
+      {
+	if(itsFlashing) g.setColor(itsLangSelectedColor);
+	else
+	  {
+	    if(!itsSelected) g.setColor(Color.white);
+	    else g.setColor(itsLangNormalColor);
+	  }
       }
-    }
-    else {
-      if(itsFlashing) g.setColor(itsUISelectedColor);
-      else g.setColor(Color.white);
-    }
+    else 
+      {
+	if(itsFlashing || itsSelected) g.setColor(itsUISelectedColor);
+	else g.setColor(Color.white);
+      }
   
     g.fillRect(getItsX()+getWhiteOffset(), getItsY()+1, getItsWidth()-(getWhiteOffset()*2), getItsHeight()-HEIGHT_DIFF);
     
