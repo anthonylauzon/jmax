@@ -163,13 +163,13 @@ mmio_loader_open_write(fts_audiofile_t* aufile)
   MMCKINFO chunk;
   char* file;
   int bytes_per_sample;
-  fts_symbol_t sample_format;
+  int sample_format;
   MMRESULT res;
 
   sample_format = fts_audiofile_get_sample_format(aufile);
-  if (sample_format == fts_s_int8) {
+  if (sample_format == audiofile_int8) {
     bytes_per_sample = 1;
-  } else if (sample_format == fts_s_int16) {
+  } else if (sample_format == audiofile_int16) {
     bytes_per_sample = 2;
   } else {
     mmio_loader_error(aufile, "Only the int8 and int16 formats are supported");
@@ -254,6 +254,19 @@ mmio_loader_open_write(fts_audiofile_t* aufile)
   return -1;
 }
 
+int
+mmio_loader_buffer_length(fts_audiofile_t* audiofile, unsigned int length)
+{
+  wave_t* wave = (wave_t*)fts_audiofile_get_handle(audiofile);
+  unsigned int size;
+
+  if (length <= 0)
+    length = 1024; /* default buffer size */
+
+  size = length * fts_audiofile_get_bytes_per_sample(audiofile) * fts_audiofile_get_num_channels(audiofile);
+
+  return wave_realloc(wave, size);
+}
 int 
 mmio_loader_read(fts_audiofile_t* aufile, float** buf, int nbuf, unsigned int buflen)
 {

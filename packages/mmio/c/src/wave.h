@@ -48,6 +48,7 @@ int wave_realloc(wave_t* wave, unsigned int size);
 
 int mmio_loader_open_read(fts_audiofile_t* aufile);
 int mmio_loader_open_write(fts_audiofile_t* aufile);
+int mmio_loader_buffer_length(fts_audiofile_t* aufile, unsigned int length);
 int mmio_loader_read(fts_audiofile_t* aufile, float** buf, int nbuf, unsigned int buflen);
 int mmio_loader_write(fts_audiofile_t* aufile, float** buf, int nbuf, unsigned int buflen);
 int mmio_loader_seek(fts_audiofile_t* aufile, unsigned int offset);

@@ -37,6 +37,7 @@ mmio_config(void);
 fts_audiofile_loader_t mmio_loader = { 
   mmio_loader_open_write,
   mmio_loader_open_read,
+  mmio_loader_buffer_length,
   mmio_loader_write,
   mmio_loader_read,
   mmio_loader_seek,
