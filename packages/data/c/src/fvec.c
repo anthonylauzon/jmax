@@ -848,6 +848,7 @@ _fvec_set_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_object_refer((fts_object_t *)self->fmat);
   
   self->type = fvec_type_vector;
+  self->size = size;
   
   fts_return_object(o);
 }
@@ -1472,18 +1473,22 @@ fvec_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   
   if(self->type != fvec_type_vector)
   {
-    fts_message_t *mess = fts_dumper_message_new(dumper, sym_vec);
-    fts_message_append_int(mess, self->size);
-    fts_dumper_message_send(dumper, mess);
-  }
-  else if(self->fmat != fmat_null)
-  {
     fts_message_t *mess = fts_dumper_message_new(dumper, sym_refer);
     fts_message_append_object(mess, (fts_object_t *)self->fmat);
     fts_message_append_symbol(mess, fvec_type_names[self->type]);
     fts_message_append_int(mess, self->index);
     fts_message_append_int(mess, self->onset);
     fts_message_append_int(mess, self->size);
+    fts_dumper_message_send(dumper, mess);
+  }
+  else if(self->fmat != fmat_null)
+  {
+    fts_message_t *mess = fts_dumper_message_new(dumper, sym_vec);
+    fts_message_append_int(mess, self->size);
+    fts_dumper_message_send(dumper, mess);
+    
+    mess = fts_dumper_message_new(dumper, fts_s_set);
+    fts_message_append_object(mess, (fts_object_t *)self->fmat);
     fts_dumper_message_send(dumper, mess);
   }
 }
@@ -1641,9 +1646,9 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_get_element, _fvec_get_element);
   fts_class_message_varargs(cl, fts_s_get, _fvec_get_element);
 
-  fts_class_message_varargs(cl, fts_new_symbol("set"), fvec_set);
-  fts_class_message(cl, fts_new_symbol("set"), fmat_class, fvec_set_from_fmat_or_fvec);
-  fts_class_message(cl, fts_new_symbol("set"), fvec_class, fvec_set_from_fmat_or_fvec);
+  fts_class_message_varargs(cl, fts_s_set, fvec_set);
+  fts_class_message(cl, fts_s_set, fmat_class, fvec_set_from_fmat_or_fvec);
+  fts_class_message(cl, fts_s_set, fvec_class, fvec_set_from_fmat_or_fvec);
 
   fts_class_message(cl, sym_refer, fmat_class, _fvec_set_fmat);
   fts_class_message_varargs(cl, sym_refer, _fvec_set_fmat_and_dimensions);
