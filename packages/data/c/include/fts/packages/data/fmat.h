@@ -129,7 +129,7 @@ DATA_API fmat_t *fmat_create(int m, int n);
 /** change matrix "form", leaving underlying data vector untouched. */
 DATA_API void fmat_reshape(fmat_t *fmat, int m, int n);
 
-/** change matrix size, copying data around */
+/** change matrix size, COPYING.LIB data around */
 DATA_API void fmat_set_size(fmat_t *fmat, int m, int n);
 DATA_API void fmat_set_m(fmat_t *fmat, int m);
 DATA_API void fmat_set_n(fmat_t *fmat, int n);

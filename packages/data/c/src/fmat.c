@@ -282,7 +282,7 @@ fmat_set_n(fmat_t *self, int n)
 }
 
 
-/* change matrix size, copying data around */
+/* change matrix size, COPYING.LIB data around */
 void
 fmat_set_size(fmat_t *self, int m, int n)
 {
