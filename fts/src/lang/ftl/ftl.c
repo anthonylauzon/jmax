@@ -815,3 +815,21 @@ void ftl_program_run( ftl_program_t *prog )
   ftl_program_call_subr( prog, prog->main);
 }
 
+/* --------------------------------------------------------------------------- */
+/*                                                                             */
+/* Auxiliary function for profiling                                            */
+/*                                                                             */
+/* --------------------------------------------------------------------------- */
+
+fts_object_t *ftl_program_pc_sample( ftl_program_t *prog)
+{
+  ftl_subroutine_t *subr;
+  int pc;
+
+  subr = prog->subroutine_tos;
+  pc = prog->pc;
+  if (subr && pc >= 0)
+    return subr->debug_info_table.info[pc].object;
+  else
+    return 0;
+}
