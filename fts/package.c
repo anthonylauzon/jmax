@@ -221,7 +221,6 @@ fts_package_load(fts_symbol_t name)
       || !fts_is_directory(path))
     {
       fts_log("[package]: Couldn't find package %s\n", name);
-
       return NULL;
     }
   
@@ -387,17 +386,22 @@ static void fts_package_load_default_files(fts_package_t* pkg)
  *   - required packages 
  */
 
-void 
+int 
 fts_package_require(fts_package_t* pkg, fts_symbol_t required_pkg)
 {
   fts_atom_t n;
-
+  int status = 0;
   /* provoke the loading the package */
   if(NULL != fts_package_load(required_pkg))
-    {
-      fts_set_symbol(&n, required_pkg);
-      pkg->packages = fts_list_append(pkg->packages, &n);    
-    }
+  {
+    fts_set_symbol(&n, required_pkg);
+    pkg->packages = fts_list_append(pkg->packages, &n);    
+  }
+  else
+  {
+    status = -1;
+  }
+  return status;
 }
 
 void 
@@ -792,18 +796,31 @@ __fts_package_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 {
   fts_package_t* pkg = (fts_package_t *)o;
   int i;
+  int result;
 
   pkg->packages = NULL; 
 
   for (i = 0; i < ac; i++)
+  {
+    if (fts_is_symbol(&at[i]))
     {
-      if (fts_is_symbol(&at[i]))
-	fts_package_require(pkg, fts_get_symbol(&at[i]));
+      result = fts_package_require(pkg, fts_get_symbol(&at[i]));
+      if (result != 0)
+      {
+	post("[package] error with package %s\n", fts_get_symbol(&at[i]));
+	if (fts_object_has_id(o))
+	{
+	  fts_atom_t a[1];
+	  fts_set_int(a, i);
+	  fts_client_send_message(o, fts_new_symbol("requireError"), 1, a);
+	}
+      }
     }
+  }
   
   if( fts_object_has_id( o) && pkg->packages)
     fts_package_upload_requires( pkg);
-
+  
   fts_package_set_dirty( pkg, 1);
 }
 
