@@ -84,6 +84,8 @@ The following platforms are supported:
 <p>
 The following bugs were fixed:
 <ul>
+<li> incorrect handling of "local" host name for connexion, which resulted
+in rsh problems, hostname setting and co...
 </ul>
 
 <p>
@@ -91,10 +93,67 @@ For a complete list of fixed and remaining bugs, please refer to the
 IRCAM's <a href="http://www.ircam.fr/bugs">bug tracking system</a>.
 
 
+
 <h3>Features</h3>
 
+
+<h4>Save in .pat format</h4>
+
 <p>
-Building packages
+For better MAX/MSP compatibility, jMax can now save in .pat format.
+To use it, select "Save as" menu item, and in the file open box,
+change "Format" to ".pat". 
+
+<p>
+<strong>Attention!!!</strong> This is first release of .pat save format.
+It has not been fully debugged.
+
+
+<h4>MIDI file reading</h4>
+
+<p>
+A MIDI file reading library has been added, based on the code of Tim Thompson.
+
+
+<h4>Changes in kernel</h4>
+
+<p>
+The protocol is now binary in both directions, with a symbol cache on
+each side of the connection.
+
+
+<h4>ALSA devices</h4>
+
+<p>
+jMax now uses the 0.5.x version of ALSA (build was done with a 0.5.6).
+
+<p>
+A ALSA raw MIDI device has been added. It is named alsaMidi and requires
+the package alsadev ("package require alsadev").
+
+
+<h4>Objects</h4>
+
+<p>
+Thanks to Winfried Ritsch, the "serial" object is back. It has been changed
+to take advantage of the scheduler single select() call.
+
+
+<h3>Notes</h3>
+
+<h4>Building rpms</h4>
+
+<p>
+Building rpms (and SGI packages) is now moved to scripts located in ./utils,
+named buildrpm and buildsgipkg. These scripts are quite self explanatory.
+
+
+<h4>syspackages</h4>
+
+<p>
+Directory <code>syspackages/</code> has disappeared. All packages (including
+devices) are now in <code>packages/</code>
+
 
 
 <!------------------------------------------------------------------------------->

@@ -1,5 +1,10 @@
 #!/bin/sh
-# builds a SGI package
+
+# This script builds a SGI package.
+# It requires that the sources are located in ../..
+#
+# The optional argument is the directory where the package is build
+#
 
 BUILD_DIR=/data/jmax-build/src
 if [ $# -ge 1 ]

@@ -1,4 +1,13 @@
 #!/bin/sh
+
+#
+# This scripts builds a rpm for jMax. 
+# It requires that the sources are located in ../..
+# 
+# The mandatory argument is the architecture of the rpm
+# (i386, i686, ppc)
+#
+
 ARCH=$1
 
 VERSION=`cat ../VERSION`
