@@ -88,10 +88,18 @@ public class MaxVector
     
   public final boolean contains(Object elem)
   {
-    for (int i = 0 ; i < fillPointer ; i++)
-      if (elem.equals(objects[i]))
-	return true;
-
+    if (elem == null) //look for a null element:
+      {
+	for (int i = 0 ; i < fillPointer ; i++)
+	  if (objects[i] == null)
+	    return true;
+      }
+    else 
+      {
+	for (int i = 0 ; i < fillPointer ; i++)
+	  if (elem.equals(objects[i]))
+	    return true;
+      }
     return false;
   }
 
@@ -142,6 +150,7 @@ public class MaxVector
 
   public final boolean removeElement(Object obj)
   {
+    if (obj == null) return false;
     for (int i = 0 ; i < fillPointer ; i++)
       if (obj.equals(objects[i]))
 	{

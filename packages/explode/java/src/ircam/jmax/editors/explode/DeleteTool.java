@@ -58,7 +58,8 @@ public class DeleteTool extends Tool implements PositionListener {
 	    Enumeration e;
 	    MaxVector v = new MaxVector();
 
-	    // copy the selected elements in another MaxVector (why?)
+	    // copy the selected elements in another MaxVector (cannot remove
+	    // elements of a Vector inside a loop based on an enumeration of this vector, it simply does'nt work...)
 	    for ( e = ExplodeSelection.getSelection().getSelected();
 		  e.hasMoreElements();)
 	      {

@@ -2,6 +2,7 @@
 package ircam.jmax.editors.explode;
 
 import javax.swing.*;
+import javax.swing.event.*;
 import ircam.jmax.toolkit.*;
 import java.awt.*;
 import java.util.*;
@@ -11,7 +12,7 @@ import java.awt.event.*;
  * A panel that edits the fields of a ScrEvent.
  * It uses the NumericPropertyEditor class.
  * It is used in the Explode statusBar */
-class ScrEventWidget extends Box implements SelectionListener, ExplodeDataListener, ActionListener{
+class ScrEventWidget extends Box implements ListSelectionListener, ExplodeDataListener, ActionListener{
 
   /**
    * Constructor. It builds up the single widgets corresponding to
@@ -67,51 +68,43 @@ class ScrEventWidget extends Box implements SelectionListener, ExplodeDataListen
 
     setSize(dim.width, dim.height);
 
-    ExplodeSelection.getSelection().addSelectionListener(this);
+    ExplodeSelection.getSelection().addListSelectionListener(this);
     gc.getDataModel().addListener(this);
   }
   
   /**
-   * selection listener interface */
-  public void objectSelected()
+   * List selection listener interface */
+  public void valueChanged(ListSelectionEvent e) 
   {
-    setTarget(identifyTarget());
+    if (ExplodeSelection.getSelection().isSelectionEmpty())
+      setTarget(null);
+    else setTarget(identifyTarget(e));
   }
 
-  public void objectDeselected()
+  private ScrEvent identifyTarget(ListSelectionEvent e)
   {
-    setTarget(identifyTarget());
-  }
+    int count = 0;
+    for (int i = ExplodeSelection.getSelection().getMinSelectionIndex(); i <= ExplodeSelection.getSelection().getMaxSelectionIndex(); i++)
+      if (ExplodeSelection.getSelection().isSelectedIndex(i))
+	count += 1;
 
-  public void groupSelected()
-  {
-    setTarget(null);
-  }
-
-  public void groupDeselected()
-  {
-    setTarget(identifyTarget());
-  }
-  
-  private ScrEvent identifyTarget()
-  {
-    if (ExplodeSelection.getSelection().size() == 1) 
-      {
-	ScrEvent aEvent = (ScrEvent) ExplodeSelection.getSelection().getSelected().nextElement();
-	return aEvent;
-      }
+    if (count == 1)
+      return (gc.getDataModel().getEventAt(ExplodeSelection.getSelection().getMinSelectionIndex()));
     else return null;
   }
   
   /**
    * ExplodeDataListener interface */
-  public void objectDeleted(Object whichObject)
+  public void objectDeleted(Object whichObject, int oldIndex)
   {
     if (target == whichObject) setTarget(null);
   }
-  public void objectAdded(Object whichObject){}
+  public void objectAdded(Object whichObject, int index){}
   public void objectChanged(Object whichObject){
     if (target == whichObject) refresh();
+  }
+  public void objectMoved(Object whichObject, int oldIndex, int newIndex){
+    objectChanged(whichObject);
   }
 
   /** set the target ScrEvent to edit.
@@ -151,7 +144,7 @@ class ScrEventWidget extends Box implements SelectionListener, ExplodeDataListen
    * all the events in a selection*/
   public void actionPerformed(ActionEvent e)
   {
-    if (ExplodeSelection.getSelection().size() == 0) return;
+    if (ExplodeSelection.getSelection().isSelectionEmpty()) return;
     
     int value;
     ScrEvent temp;

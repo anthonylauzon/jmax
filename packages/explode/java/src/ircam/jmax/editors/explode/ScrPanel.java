@@ -1,6 +1,7 @@
 package ircam.jmax.editors.explode;
 
 import javax.swing.*;
+import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -10,7 +11,7 @@ import ircam.jmax.*;
 import ircam.jmax.toolkit.*;
 
   /**
-   * The actual panel of a score editor. It contains the "sensible" part.
+   * The piano roll panel of an explode editor. 
    * The graphic representation is handled by 
    * a RendererManager that has the responsability to actually draw the score.
    * The simplest renderer is "ScoreRenderer", a piano-roll component.
@@ -18,7 +19,7 @@ import ircam.jmax.toolkit.*;
    * The panel builds also the Graphic context to be used during edit, 
    * and the Toolbar. 
    */
-public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProvider, ToolListener, SelectionListener, StatusBarClient{
+public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProvider, ToolListener, ListSelectionListener, StatusBarClient{
   
   /**
    * Constructor based on a ExplodeDataModel. 
@@ -79,14 +80,14 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
       gc.setGraphicDestination(itsScore);
 
       gc.setDataModel(ep);
-      ExplodeSelection.createSelection(ep);
+
       gc.setRenderManager(new ScoreRenderer(gc));
       gc.setLogicalTime(0);
       gc.setStatusBar(itsStatusBar);
       
     }
 
-    ExplodeSelection.getSelection().addSelectionListener(this);
+    ExplodeSelection.getSelection().addListSelectionListener(this);
     gc.getDataModel().addListener(this);
 
     itsStatusBar.addWidget(new ScrEventWidget(gc));
@@ -165,10 +166,12 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   }
   
   /**
-   * note: can't create the toolbar in the constructor,
+   * note: can't create the toolbar in the constructor of this class,
    * because the Frame is not available yet.
    * The EditorToolbar class uses the Frame information
    * in order to correctly map graphic contexts on windows.
+   * This function must be delayed to the moment in which the window
+   * will be really visible.
    */
   public EditorToolbar prepareToolbar() 
   {
@@ -302,37 +305,27 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     repaint();
   }
 
-  public void objectAdded(Object spec) 
+  public void objectAdded(Object spec, int index) 
   {
     repaint();
   }
 
-  public void objectDeleted(Object whichObject) 
+  public void objectDeleted(Object whichObject, int index) 
+  {
+    repaint();
+  }
+
+  public void objectMoved(Object whichObject, int oldIndex, int newIndex) 
   {
     repaint();
   }
 
   /**
-   * SelectionListener interface
+   * ListSelectionListener interface
    */
 
-  public void objectSelected()
-  {  
-    repaint();
-  }
-
-  public void objectDeselected()
-  {  
-    repaint();
-  }
-
-  public void groupSelected()
-  {  
-    repaint();
-  }
-
-  public void groupDeselected()
-  {  
+  public void valueChanged(ListSelectionEvent e)
+  {
     repaint();
   }
 

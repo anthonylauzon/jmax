@@ -7,8 +7,7 @@ import ircam.jmax.toolkit.*;
 import java.util.Enumeration;
 
 /**
- * the functionalities of the model for the explode data, with support 
- * for undo and clipboard (StandardData interface) 
+ * the functionalities of the model for the explode data.
  * ExplodeRemoteData implements it.
  */
 public interface ExplodeDataModel {
@@ -30,6 +29,10 @@ public interface ExplodeDataModel {
    */
   public abstract ScrEvent getEventAt(int index);
 
+  /**
+   * return the index of the given event, if it exists, or the error constants
+   * NO_SUCH_EVENT, EMPTY_COLLECTION */
+  public abstract int indexOf(ScrEvent event);
 
   public abstract Enumeration intersectionSearch(int start, int end);
 

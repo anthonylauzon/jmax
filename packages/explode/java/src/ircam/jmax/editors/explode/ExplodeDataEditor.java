@@ -8,17 +8,20 @@ import ircam.jmax.mda.*;
  */
 
 
-public class ExplodeDataEditor extends AbstractMaxDataEditor
+public class ExplodeDataEditor extends AbstractMaxDataEditor 
 {
   private Explode window = null;
   
+
   public ExplodeDataEditor(ExplodeRemoteData data)
   {
     super(data);
 
     setExplodeWindow(new Explode(data));
+
     fireEditorReadyListeners();
   }
+
 
   public void setExplodeWindow(Explode window)
   {

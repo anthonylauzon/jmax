@@ -46,7 +46,6 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
     
     if (aScrEvent != null) 
       { //click on event
-
 	startingPoint.setLocation(x,y);
 
 	if (!ExplodeSelection.getSelection().isInSelection(aScrEvent)) 
@@ -64,10 +63,9 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
       {
       if ((modifiers & InputEvent.SHIFT_MASK) == 0)
 	{
-	  if (ExplodeSelection.getSelection().size() != 0)
-	    {
+	  if (!ExplodeSelection.getSelection().isSelectionEmpty())
 	      ExplodeSelection.getSelection().deselectAll(); 
-	    }
+	  
 	}
       
     }
@@ -100,7 +98,7 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
    * Graphically selects all the objects in a given rectangle, given a Render
    * and a Selection
    */
-  public static void selectArea(RenderManager r, SelectionHandler s, int x, int y, int w, int h) 
+  public static void selectArea(RenderManager r, ExplodeSelection s, int x, int y, int w, int h) 
   {
     ScrEvent aScrEvent;
 

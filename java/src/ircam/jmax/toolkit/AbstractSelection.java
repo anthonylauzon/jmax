@@ -198,7 +198,7 @@ public abstract class AbstractSelection implements SelectionHandler, Transferabl
 
   //--- Fields
 
-  protected MaxVector selected;
+  public MaxVector selected;
   protected MaxVector listeners;
   protected MaxVector dataFlavors;
 

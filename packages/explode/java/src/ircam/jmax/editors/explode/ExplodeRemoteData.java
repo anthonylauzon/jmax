@@ -4,6 +4,7 @@ import ircam.jmax.MaxApplication;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
+import ircam.jmax.toolkit.*;
 
 import java.lang.*;
 import java.awt.datatransfer.*;
@@ -16,7 +17,7 @@ import java.util.*;
  * It handles the datas coming from a remote explode in FTS.
  * ExplodeRemoteData offers support for undo and clipboard operations.
  */
-public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeDataModel, ircam.jmax.toolkit.ClipableData, ClipboardOwner
+public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeDataModel, ClipableData, ClipboardOwner
 {
   /* Events are stored in an array; the array is larger than
      needed to allow insertions, and reallocated by need.
@@ -28,7 +29,8 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
   // in FTS.
   // A better structure for look-up (ex. TDTree) would require the use of a
   // mean of communicate the identity of an event between the editor 
-  // and FTS that is not based on indexes.
+  // and FTS that is not based on indexes. See also the implementation notes
+  // in ExplodeSelection.java
   
 
   /**
@@ -329,7 +331,7 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
 
     remoteCall(REMOTE_ADD, args);
 
-    notifyObjectAdded(event);
+    notifyObjectAdded(event, index);
     
     if (isInGroup())     
       postEdit(new UndoableAdd(event));
@@ -345,7 +347,7 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
     return NO_SUCH_EVENT;
   }
 
-  private int binarySearch(ScrEvent e)
+  public int indexOf(ScrEvent e)
   {
     int index = getFirstEventAt(e.getTime());
     if (index == NO_SUCH_EVENT || index == EMPTY_COLLECTION)
@@ -362,14 +364,20 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
   }
   
   /**
-   * remove an event from the data base
+   * remove an event from the data base. It searches for it with a binary search.
    */
-
   public void removeEvent(ScrEvent event)
   {
     int removeIndex;
 
-    removeIndex = binarySearch(event);
+    removeIndex = indexOf(event);
+    removeEventAt(removeIndex);
+  }
+
+
+  private void removeEventAt(int removeIndex)
+  {
+    ScrEvent event = getEventAt(removeIndex);
     if (removeIndex == NO_SUCH_EVENT || removeIndex == EMPTY_COLLECTION)
       return;
     
@@ -384,9 +392,17 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
     args[0] = new Integer(removeIndex);
     remoteCall(REMOTE_REMOVE, args);
 	    
-    notifyObjectDeleted(event);
+    notifyObjectDeleted(event, removeIndex);
   }
 
+  /** The simplest (and slowest) implementation */
+  private void removeInterval(int first, int last)
+  {
+    for (int i = first; i<= last; i++)
+      {
+	removeEventAt(first);
+      }
+  }
 
   /**
    *  Signal FTS that an object is changed 
@@ -401,7 +417,7 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
   {
     int index;
 
-    index = binarySearch(event);
+    index = indexOf(event);
 
     if (index == NO_SUCH_EVENT || index == EMPTY_COLLECTION)
       return;
@@ -431,11 +447,11 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
 
   public void moveEvent(ScrEvent event, int newTime)
   {
-    int index = binarySearch(event);     // Find the event
+    int index = indexOf(event);     // Find the event
     int newIndex = getIndexAfter(newTime); //Find where to place it
     
     if (newIndex == NO_SUCH_EVENT) newIndex = events_fill_p-1;
-    else if (event.getTime() < newTime) newIndex -=1;
+    else if (event.getTime() <= newTime) newIndex -=1;
     
 
     if (index == NO_SUCH_EVENT)
@@ -483,7 +499,7 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
       }
     
     events[newIndex] = event;
-    notifyObjectChanged(event);
+    notifyObjectMoved(event, index, newIndex);
     
   }
 
@@ -493,22 +509,28 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
    * utility to notify the data base change to all the listeners
    */
 
-  private void notifyObjectAdded(Object spec)
+  private void notifyObjectAdded(Object spec, int index)
   {
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
-      ((ExplodeDataListener) e.nextElement()).objectAdded(spec);
+      ((ExplodeDataListener) e.nextElement()).objectAdded(spec, index);
   }
 
-  private void notifyObjectDeleted(Object spec)
+  private void notifyObjectDeleted(Object spec, int oldIndex)
   {
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
-      ((ExplodeDataListener) e.nextElement()).objectDeleted(spec);
+      ((ExplodeDataListener) e.nextElement()).objectDeleted(spec, oldIndex);
   }
 
   private void notifyObjectChanged(Object spec)
   {
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
       ((ExplodeDataListener) e.nextElement()).objectChanged(spec);
+  }
+
+  private void notifyObjectMoved(Object spec, int oldIndex, int newIndex)
+  {
+    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+      ((ExplodeDataListener) e.nextElement()).objectMoved(spec, oldIndex, newIndex);
   }
 
 
@@ -585,7 +607,7 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
 	for (int i = 0; i < events_fill_p; i++)
 	  {
 	    postEdit(new UndoableDelete(events[i]));
-	    notifyObjectDeleted( events[i]);
+	    notifyObjectDeleted( events[i], i);
 	    events[i] = null;
 	  }
 	
@@ -613,7 +635,7 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
 	
 	postEdit(new UndoableAdd(events[index]));
 	endUpdate();
-	notifyObjectAdded(events[index]);
+	notifyObjectAdded(events[index], index);
       }
     break;
 
@@ -630,27 +652,35 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
   public void cut()
   {
     copy();
-    // remove them
     
+    // ... and remove 
+
+    beginUpdate(); //cut is undoable
+
     for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
-      removeEvent((ScrEvent)(e.nextElement()));
-  }  
+      {
+	removeEvent((ScrEvent) e.nextElement());
+      }
+
+    endUpdate();
+  }
 
   public void copy()
   {
-    MaxApplication.systemClipboard.setContents(ExplodeSelection.getSelection().getACopy(), this);
+    ExplodeSelection.getSelection().prepareACopy();
+    MaxApplication.systemClipboard.setContents(ExplodeSelection.getSelection(), this);
   }  
 
 
   public void paste()
   {
     Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
-    ExplodeSelection objectsToPaste = null;
+    Enumeration objectsToPaste = null;
 
     if (clipboardContent != null && clipboardContent.isDataFlavorSupported(ExplodeDataFlavor.getInstance()))
       {
 	try {
-	  objectsToPaste = (ExplodeSelection) clipboardContent.getTransferData(ExplodeDataFlavor.getInstance());
+	  objectsToPaste = (Enumeration) clipboardContent.getTransferData(ExplodeDataFlavor.getInstance());
 	} catch (UnsupportedFlavorException ufe)
 	  {
 	    // this should never happen, but...
@@ -668,19 +698,25 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
 	ScrEvent event;
 	
 	beginUpdate();  //the paste is undoable
-	for (Enumeration e = objectsToPaste.getSelected(); e.hasMoreElements();)
-	  {
-	    event = (ScrEvent) e.nextElement();
-	    addEvent(event);
-	  }
-	endUpdate();
+
+	try {
+	  while (objectsToPaste.hasMoreElements())
+	    {
+	      event = (ScrEvent) objectsToPaste.nextElement();
+	      addEvent(event.duplicate());
+	    }
+	  endUpdate();
+	
+	}
+      
+	catch (Exception e) {}
       }
-    
-  }  
+  }
 
   public void lostOwnership(Clipboard clipboard,
 			    Transferable contents)
   {
+    ExplodeSelection.discardTheCopy();
   }
 
   //----- Fields

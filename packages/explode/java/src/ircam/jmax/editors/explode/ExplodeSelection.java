@@ -2,31 +2,131 @@
 package ircam.jmax.editors.explode;
 
 import java.util.*;
+import javax.swing.*;
 import java.awt.datatransfer.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.utils.*;
 
 /**
- * A selection of explode events. Use the static constructor to create the
- * (unique) explode selection of the system.
- */ 
-public class ExplodeSelection extends AbstractSelection implements ExplodeDataListener{
+ * The Explode selection. This class is implemented on the base of the
+ * Swing's ListSelectionModel, so that it can be used unchanged in
+ * the JTable representation of the score.
+ * @see ExplodeTablePanel */
+public class ExplodeSelection extends DefaultListSelectionModel implements ExplodeDataListener, Transferable, Cloneable{
 
-  /**
-   * constructor
-   */
-  private ExplodeSelection(ExplodeDataModel theModel) 
+  // Implementation notes: 
+  // The ListSelectionModel, and then the ExplodeSelection, 
+  // are based on indexes, while the identity
+  // of an explode event is only partially related to its index 
+  // (infact, it can be moved around in the DB).
+  // This imposes some extra-care while dealing with moving and deleting 
+  // operation.
+  // See also the notes in the objectMoved call.
+  private ExplodeSelection(ExplodeDataModel model) 
   {
-    super();
-    itsModel = theModel;
+    this.model = model;
+    setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION) ;
+    dataFlavors = new MaxVector();
     addFlavor(ExplodeDataFlavor.getInstance());
   }
-
-  /**
-   * selects all the objects of the data model
+   
+  /** select the given object 
    */
-  public void selectAll() 
+  public void select(Object obj)
   {
-    select(itsModel.getEvents());
+    int index = model.indexOf((ScrEvent) obj);
+
+    addSelectionInterval(index, index);
+  }
+  
+  /** select the given enumeration of objects.
+   * When possible, use this method instead of
+   * selecting single objects. 
+   */
+  public void select(Enumeration e)
+  {
+    while (e.hasMoreElements())
+      {
+	select(e.nextElement());
+      }
+  }
+
+  /** remove the given object from the selection
+   */
+  public void deSelect(Object obj)
+  {
+    int index = model.indexOf((ScrEvent) obj);
+
+    removeSelectionInterval(index, index);
+  }
+
+
+  /** remove the given enumeration of objects from the selection
+   * When possible, use this method instead of
+   * deselecting single objects.    */
+  public void deSelect(Enumeration e)
+  {
+    while(e.hasMoreElements())
+      {
+	deSelect(e.nextElement());
+      }
+  }
+
+
+  /** returns true if the object is currently selected
+   */
+  public boolean isInSelection(Object obj)
+  {
+    int index = model.indexOf((ScrEvent) obj);
+    
+    return isSelectedIndex(index);
+  }
+
+
+  /** Returns an enumeration of all the selected OBJECTS (not indexes).
+   * The enumeration is "delete tollerant": one can remove objects
+   * in a loop based on the result of this method.
+   */
+  public Enumeration getSelected()
+  {
+    // NOTE: a copy must be made because the caller can use the result
+    // to perform operations that delete or move events
+    temp.removeAllElements();
+    for (int i = getMinSelectionIndex(); i <= getMaxSelectionIndex(); i++)
+      if (isSelectedIndex(i)) temp.addElement(model.getEventAt(i));
+    return temp.elements(); 
+  }
+  
+
+  /** returns the number of objects in the selection
+   */
+  public  int size()
+  {
+    // unefficient! Alternative solutions welcome.
+    int count = 0;
+    
+    for (int i = getMinSelectionIndex(); i <= getMaxSelectionIndex(); i++) 
+      {
+	if (isSelectedIndex(i))
+	  count++;
+      }
+
+    return count;
+  }
+
+
+  /** selects all the objects. 
+   */
+  public  void selectAll()
+  {
+    addSelectionInterval(0, model.length()-1);
+  }
+
+  /** deselects all the objects currently selected
+   */
+  public  void deselectAll()
+  {
+    clearSelection();
   }
 
   /**
@@ -49,8 +149,7 @@ public class ExplodeSelection extends AbstractSelection implements ExplodeDataLi
   public static ExplodeSelection getSelection()
   {
     return itsSelection;
-  }
-
+  }  
 
   /** ExplodeDataListener interface*/
 
@@ -58,53 +157,178 @@ public class ExplodeSelection extends AbstractSelection implements ExplodeDataLi
   {
   }
 
-  public void objectAdded(Object spec) 
+  public void objectAdded(Object spec, int index) 
   {
+    insertIndexInterval(1, index, true); 
+  }
+
+  /**
+   * ExplodeDataListener interface: keep the index-based selection consistent. */
+  public void objectMoved(Object o, int oldIndex, int newIndex)
+  {
+    // NOTE: oldIndex is the index where the object WAS before moving,
+    // newIndex is the index where the object IS (after rearranging the vector).
+    // When such a movement occurs, also all the objects whose indexes are 
+    // between oldIndex and newIndex are shifted by one.
+    // The purpose of this routine is to keep the selected/unselected 
+    // status of these indexes coherent with the shifts.
+ 
+    boolean wasSelected = isSelectedIndex(oldIndex);
+
+    if (oldIndex < newIndex)
+      {
+	for (int i = oldIndex; i<newIndex; i++)
+	  {
+	    if (isSelectedIndex(i+1))
+		addSelectionInterval(i, i);
+	    else
+		removeSelectionInterval(i,i);
+	  }
+
+      }
+    else 
+      {
+	for (int i=oldIndex; i>newIndex; i--)
+	  {
+	    if (isSelectedIndex(i-1))
+		addSelectionInterval(i, i);
+	    else
+		removeSelectionInterval(i,i);
+	  } 
+
+      }
+
+    if (wasSelected) 
+      addSelectionInterval(newIndex, newIndex);
+    
   }
 
   /** ExplodeDataListener interface */
-  public void objectDeleted(Object whichObject) 
+  public void objectDeleted(Object whichObject, int oldIndex) 
   {
-    if (isInSelection(whichObject))
-      deSelect(whichObject);
+    // The implementation is very conservative. It does not make the 
+    // assumption that a deleted object was selected... 
+    // It could also be implemented with a simple clearSelection() call
+    
+    for (int i = oldIndex; i<=getMaxSelectionIndex(); i++)
+      {
+	if (isSelectedIndex(i+1))
+	  {
+	    addSelectionInterval(i, i);
+	  }
+	else
+	  {
+	    removeSelectionInterval(i,i);
+	  }
+      }
+    
+    
   }
-
+  
   /** Transferable interface */
   public Object getTransferData(DataFlavor flavor) 
   {
-    return itsCopy; 
+    return itsCopy.elements(); 
+  }
+
+  /** Transferable interface */
+  public boolean isDataFlavorSupported(DataFlavor flavor)
+  {
+    for (int i = 0; i < dataFlavors.size(); i++)
+      {
+	if (flavor.equals(dataFlavors.getObjectArray()[i]))
+	  return true;
+      }
+    return false;
+  }
+
+
+  /** Transferable interface */
+  public DataFlavor[] getTransferDataFlavors()
+  {
+    return (DataFlavor[]) dataFlavors.getObjectArray();
+  }
+
+  /** utility function */
+  protected void addFlavor(DataFlavor flavor)
+  {
+    dataFlavors.addElement(flavor);
+  }
+  
+  /**
+   * An usefull (and fast) class to traverse the selection, to be used
+   * when the objects are not changed in the loop (read only) */
+  class ReadOnlyEnum implements Enumeration
+  {
+
+    ReadOnlyEnum()
+    {
+      current = getMinSelectionIndex();
+    }
+
+    public boolean hasMoreElements()
+    {
+      next = findNext();
+      return next != NO_MORE;
+    }
+
+    public Object nextElement()
+    {
+      return model.getEventAt(next);
+    }
+
+    int findNext()
+    {
+      while (current <= getMaxSelectionIndex())
+	{
+	  if (isSelectedIndex(current))
+	    {
+	      current++;
+	      return current-1;
+	    }
+	  else current++;
+	}
+      return NO_MORE;
+    }
+
+    //--- Fields
+    int current;
+    int next;
+    final int NO_MORE = -1;
   }
 
   /**
    * Function used by clipboard operations.
+   * This method makes a clone of the objects currently selected.
    */ 
-  ExplodeSelection getACopy()
+  void prepareACopy()
   {
-    if (itsCopy == null) itsCopy = new ExplodeSelection(itsModel);
-    else itsCopy.deselectAll();
-    
-    ScrEvent aEvent;
+    itsCopy.removeAllElements();
 
-    for (Enumeration e = getSelected(); e.hasMoreElements();)
-      {
-	aEvent = (ScrEvent) e.nextElement();
-	
-	itsCopy.select(new ScrEvent(aEvent.getDataModel(),
-				    aEvent.getTime(),
-				    aEvent.getPitch(),
-				    aEvent.getVelocity(),
-				    aEvent.getDuration(),
-				    aEvent.getChannel()));
-      }
+    ScrEvent s;
+    try {
 
-    return itsCopy;
+      for (Enumeration e= new ReadOnlyEnum(); e.hasMoreElements();)
+	{
+	  s = (ScrEvent) e.nextElement();
+	  itsCopy.addElement(s.duplicate());
+	  
+	}
+
+    } catch (Exception ex) {System.err.println("error while cloning events");}
+  }
+
+  static void discardTheCopy()
+  {
+    itsCopy.removeAllElements();
   }
 
   //--- Fields
-  private static ExplodeSelection itsSelection; 
-  private static ExplodeSelection itsCopy; // for clipboard use
-  ExplodeDataModel itsModel;
+  ExplodeDataModel model;
+  private static ExplodeSelection itsSelection;
+  private static MaxVector itsCopy = new MaxVector();
+  protected MaxVector dataFlavors;
+  private MaxVector temp = new MaxVector();
 
 }
-
 
