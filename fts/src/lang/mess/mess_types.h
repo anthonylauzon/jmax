@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.27 $ IRCAM $Date: 1997/07/11 14:37:40 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:50:42 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -277,6 +277,7 @@ struct fts_patcher
 {
   fts_object_t o;
 
+  fts_symbol_t   name;		/* the patcher name */
   fts_inlet_t  **inlets;	/* the patcher inlet array */
   fts_outlet_t **outlets;	/* the patcher outlet array */
 

@@ -16,7 +16,7 @@
 #include "sys.h"
 #include "lang/mess.h"
 
-#define TABLE_INIT_SIZE (16*1024)
+#define TABLE_INIT_SIZE (32*1024)
 #define TABLE_GROW  2
 
 static int table_size = 0;

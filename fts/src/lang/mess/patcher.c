@@ -435,6 +435,10 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   fts_patcher_t *this = (fts_patcher_t *) o;
 
+  /* get the name */
+
+  this->name = fts_get_symbol_arg(ac, at, 1, 0);
+
   /* should use block allocation ?? */
 
   ninlets = fts_object_get_inlets_number(o);
@@ -498,8 +502,8 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int noutlets;
   int i;
 
-  ninlets  = fts_get_long(at + 1);
-  noutlets = fts_get_long(at + 2);
+  ninlets  = fts_get_long(at + 2);
+  noutlets = fts_get_long(at + 3);
 
   /* initialize the class */
 
@@ -508,9 +512,10 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* define the init system method */
 
   a[0] = fts_s_symbol;
-  a[1] = fts_s_int;
+  a[1] = fts_s_symbol;
   a[2] = fts_s_int;
-  fts_method_define(cl,fts_SystemInlet, fts_s_init, patcher_init, 3, a);
+  a[3] = fts_s_int;
+  fts_method_define(cl,fts_SystemInlet, fts_s_init, patcher_init, 4, a);
 
   fts_method_define(cl,fts_SystemInlet, fts_s_delete, patcher_delete, 0, 0);
 
@@ -579,13 +584,19 @@ fts_patcher_get_outlet(fts_object_t *patcher, int outlet)
 
 /* Class/metaclass installation  */
 
-/* takes no arguments, returns a status; it is a static function,
-   then called by the file config function */
+static int
+fts_patcher_equiv(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_t *at1)
+{
+
+  return ((fts_get_int(&at0[2]) == fts_get_int(&at1[2])) &&
+	  (fts_get_int(&at0[3]) == fts_get_int(&at1[3])));
+}
+
 
 static void
 internal_patcher_config(void)
 {
-  patcher_metaclass = fts_metaclass_create(fts_new_symbol("patcher"), patcher_instantiate, fts_arg_equiv);
+  patcher_metaclass = fts_metaclass_create(fts_new_symbol("patcher"), patcher_instantiate, fts_patcher_equiv);
 }
 
 /* Global configuration function; it call the configuration 
