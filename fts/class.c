@@ -32,7 +32,7 @@
 
 fts_class_t *fts_class_class;
 
-const int fts_system_inlet = -1;
+/* const int fts_system_inlet = -1;  */
 static int type_id = FTS_FIRST_OBJECT_TYPEID;
 
 #define CLASS_INLET_MAX 255
