@@ -19,6 +19,7 @@ care of maintaining it in a state where it is usefull. <BR>
 <LI> <A HREF="#Release"> Release process </A>
 <LI> <A HREF="#Beta-test"> Beta-test </A>
 <LI> <A HREF="#Misc"> Misc </A>
+<LI> <A HREF="#Linux"> Linux </A>
 </UL>
 
 
@@ -106,53 +107,8 @@ Do an installation on marimba (O2 R5k).
 Handle better RELEASE_NOTES (bugs, move file to save directory).
 
 <P>
-Fix script jmax-tar-distrib: make file name from release, check existence of tar file, copy the files,
-change their mode absolutely
-
-<P>
 Fix jmax-make-release: do compile automatic, other stuff ??? (NB: jmax-make-release has never been used,
 it is probably a good tentative, but too complex)
-
-
-
-<H3> <A NAME="Beta-test"> Beta-test </A> </H3>
-
-<P>
-Target: 27 november
-
-<P>
-Remove Swing from tar file. (DONE)
-
-<P>
-Remove .h from external distribs. (DONE)
-
-<P>
-Fix CLASSPATH and other relative to removal of Swing from distrib. (DONE)
-
-<P>
-Installation documentation: where to unpack, java, .jmaxrc (see first homepage).
-
-<P>
-User documentation: not help menu for now, only html document.
-
-<P>
-Fix patcher in/outlet mess. (DONE)
-
-<P>
-Take care of copyright.
-
-<P>
-Problem JDK 1.1.5/1.1.6 SGI. (SEEMS OK)
-
-
-
-<H3> <A NAME="CD Forum"> CD Forum </A> </H3>
-
-<P>
-Missing : help patches, additive
-
-<P>
-Documentation: idem beta-test.
 
 
 
@@ -162,6 +118,23 @@ Documentation: idem beta-test.
 Check for stack overflow.
 
 
+
+<H3> <A NAME="Linux"> Linux </A> </H3>
+
+<P>
+MIDI: find cable for testing.
+
+<P>
+Performance ! Profiling & co.
+
+<P>
+Read .snd files for table~ and tab1~
+
+<P>
+Use of SCHED_FIFO priority.
+
+<P>
+Write Tcl functions for audio config
 
 
 
