@@ -26,6 +26,7 @@
 package ircam.jmax.editors.sequence;
 
 import ircam.jmax.editors.sequence.track.*; 
+import ircam.jmax.editors.sequence.renderers.*; 
 import ircam.jmax.toolkit.*;
 
 import java.awt.*;
@@ -109,6 +110,11 @@ public class SequenceGraphicContext extends GraphicContext {
   public int getLogicalTime() 
   {
     return -itsAdapter.getGeometry().getXTransposition();
+  }
+
+  public Rectangle getTrackClip()
+  {
+      return new Rectangle(ScoreBackground.KEYEND, 0, ((Sequence)getFrame()).getViewRectangle().width-ScoreBackground.KEYEND - TrackContainer.BUTTON_WIDTH - 2, getGraphicDestination().getSize().height);
   }
 
   public void setToolManager(ToolManager t)

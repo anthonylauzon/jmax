@@ -161,7 +161,6 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 	if(viewMode!=viewType)
 	    {
 		viewMode=viewType;
-		//renderer.setViewMode(viewMode);//??????
 		track.setProperty("viewMode", new Integer(viewType));
 		repaint();
 	    }    
@@ -233,5 +232,6 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     int viewMode = PEAKS_VIEW;
     static public final int PEAKS_VIEW = 2;
     static public final int STEPS_VIEW = 3;
+    static public final int BREAK_POINTS_VIEW = 4;
 }
 

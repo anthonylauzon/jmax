@@ -65,32 +65,52 @@ public class IntegerEventRenderer implements ObjectRenderer {
    */
   public void render(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
   {
-    Event e = (Event) obj;
-    SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
+      Event e = (Event) obj;
+      MonoDimensionalAdapter adapter = (MonoDimensionalAdapter)((SequenceGraphicContext) theGc).getAdapter();
 
-    int x = gc.getAdapter().getX(e);
-    int y = gc.getAdapter().getY(e);    
-    int heigth = gc.getAdapter().getHeigth(e);    
-    int lenght = gc.getAdapter().getLenght(e);
+      int x = adapter.getX(e);
+      int y = adapter.getY(e);    
 
-    //negative value
-    /*if(((Integer)e.getProperty("integer")).intValue() < 0) 
-      y -= heigth;*/
+      if (selected) 
+	  g.setColor(Color.red);
+      else 
+	  g.setColor(Color.black);
 
-    /* for now the height can be negative for the negative values (to speed the render)*/
-    if(heigth<0)
-	{
-	    y += heigth;
-	    heigth -= heigth;
-	}
+      if(adapter.getViewMode() == MonoTrackEditor.BREAK_POINTS_VIEW)
+	  {
+	      g.fillOval(x-2, y-2, 5, 5);
+	      if(selected)
+		  g.drawOval(x-4, y-4, 9, 9);
+	
+	      Event next = ((SequenceGraphicContext) theGc).getDataModel().getNextEvent(e);		
 
-    if (selected) 
-	g.setColor(Color.red);
-    else 
-	g.setColor(Color.black);
+	      if(e instanceof UtilTrackEvent)//during the XOR draw
+		  {
+		      Event prev = ((SequenceGraphicContext)theGc).
+			  getDataModel().getPreviousEvent(e.getTime());
+		      if(prev != null)
+			  g.drawLine(adapter.getX(prev), adapter.getY(prev), x, y);
+		  }
+	      else //normal paint
+		  if(selected)
+		      g.setColor(Color.black);
 
-    //event's Rectangle
-    g.fillRect(x, y, lenght, heigth);
+	      if(next != null)
+		  g.drawLine(x, y, adapter.getX(next), adapter.getY(next)); 
+	  }
+      else
+	  {
+	      int heigth = adapter.getHeigth(e);    
+	      int lenght = adapter.getLenght(e);
+
+	      if(heigth<0)
+		  {
+		      y += heigth;
+		      heigth = -heigth;
+		  }
+
+	      g.fillRect(x, y, lenght, heigth);
+	  }
   }
   
   /**
@@ -107,25 +127,29 @@ public class IntegerEventRenderer implements ObjectRenderer {
   public boolean contains(Object obj, int x, int y, GraphicContext theGc) 
   {
     Event e = (Event) obj;
-    SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
+    MonoDimensionalAdapter adapter = (MonoDimensionalAdapter)((SequenceGraphicContext) theGc).getAdapter();
 
-    int evtx = gc.getAdapter().getX(e);
-    int evty = gc.getAdapter().getY(e);    
-    int evtheigth = gc.getAdapter().getHeigth(e);
-    int evtlenght = gc.getAdapter().getLenght(e);
+    int evtx = adapter.getX(e);
+    int evty = adapter.getY(e);    
 
-    //negative value
-    /*if(((Integer)e.getProperty("integer")).intValue() < 0) 
-      evty -= evtheigth;*/
-
-    /* for now the height can eb negatiev for the negative values (to speed the search)*/
-    if(evtheigth<0)
+    /* for now the height can be negative for the negative values (to speed the search)*/
+    if(adapter.getViewMode() == MonoTrackEditor.BREAK_POINTS_VIEW)
 	{
-	    evty += evtheigth;
-	    evtheigth -= evtheigth;
+	    return ((evtx-POINT_RADIUS <= x) && (evtx+POINT_RADIUS >= x) &&
+		    (evty-POINT_RADIUS <= y ) && (evty+POINT_RADIUS >= y));
 	}
+    else
+	{
+	    int evtheigth = adapter.getHeigth(e);
+	    int evtlenght = adapter.getLenght(e);
+	    if(evtheigth<0)
+		{
+		    evty += evtheigth;
+		    evtheigth = -evtheigth;
+		}
 
-    return  (evtx<=x && (evtx+evtlenght >= x) && evty<=y && (evty+evtheigth) >= y);
+	    return (evtx<=x && (evtx+evtlenght >= x) && evty<=y && (evty+evtheigth) >= y);
+	}
   }
 
 
@@ -146,25 +170,29 @@ public class IntegerEventRenderer implements ObjectRenderer {
   public boolean touches(Object obj, int x, int y, int w, int h, GraphicContext theGc) 
   {
     Event e = (Event) obj;
-    SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
+    MonoDimensionalAdapter adapter = (MonoDimensionalAdapter)((SequenceGraphicContext) theGc).getAdapter();
 
-    int evtx = gc.getAdapter().getX(e);
-    int evty = gc.getAdapter().getY(e);    
-    int evtheigth = gc.getAdapter().getHeigth(e);
-    int evtlenght = gc.getAdapter().getLenght(e);
-
-    //negative value
-    /*if(((Integer)e.getProperty("integer")).intValue() < 0) 
-      evty -= evtheigth;*/
-
-    /* for now the height can eb negatiev for the negative values (to speed the search)*/
-    if(evtheigth<0)
+    int evtx = adapter.getX(e);
+    int evty = adapter.getY(e);    
+    
+    if(adapter.getViewMode() == MonoTrackEditor.BREAK_POINTS_VIEW)
 	{
-	    evty += evtheigth;
-	    evtheigth -= evtheigth;
+	    eventRect.setBounds(evtx-POINT_RADIUS, evty-POINT_RADIUS, 2*POINT_RADIUS+1, 2*POINT_RADIUS+1);
+	}
+    else
+	{
+	    int evtheigth = adapter.getHeigth(e);
+	    int evtlenght = adapter.getLenght(e);
+
+	    if(evtheigth<0)
+		{
+		    evty += evtheigth;
+		    evtheigth = -evtheigth;
+		}
+
+	    eventRect.setBounds(evtx, evty, evtlenght, evtheigth);	    
 	}
 
-    eventRect.setBounds(evtx, evty, evtlenght, evtheigth);
     tempRect.setBounds(x, y, w, h);
 
     return  eventRect.intersects(tempRect);
@@ -185,4 +213,5 @@ public class IntegerEventRenderer implements ObjectRenderer {
     SequenceGraphicContext gc;
     public static IntegerEventRenderer staticInstance;
     public final static int INTEGER_WIDTH = 2;
+    public final static int POINT_RADIUS = /*4*/5;
 }

@@ -59,22 +59,35 @@ public class MonoTrackForeground implements Layer {
     TrackEvent temp;
     Dimension d = gc.getGraphicDestination().getSize();
     Rectangle tempr = (Rectangle) g.getClip();
-    
+
     g.clipRect(ScoreBackground.KEYEND, 0, gc.getGraphicDestination().getSize().width-ScoreBackground.KEYEND, gc.getGraphicDestination().getSize().height);
 
-    for (Enumeration e = gc.getRenderManager().objectsIntersecting( r.x, r.y, r.width, r.height); e.hasMoreElements();) 
-      {
-	temp = (TrackEvent) e.nextElement();
-	temp.getRenderer().render( temp, g, gc.getSelection().isInSelection(temp), gc);
-      }
-
-    //draw the first object out of left bound  
-    if(((MonoDimensionalAdapter)gc.getAdapter()).getViewMode() == MonoTrackEditor.STEPS_VIEW)
+    //if(((MonoDimensionalAdapter)gc.getAdapter()).getViewMode() == MonoTrackEditor.BREAK_POINTS_VIEW)
+    //{
+    for (Enumeration e = gc.getRenderManager().
+	     objectsIntersecting( r.x, 0, r.width, d.height); e.hasMoreElements();) 
 	{
-	    temp = ((FtsTrackObject)gc.getDataModel()).getPreviousEvent(gc.getLogicalTime());
+	    temp = (TrackEvent) e.nextElement();
+	    temp.getRenderer().render( temp, g, gc.getSelection().isInSelection(temp), gc);
+	}
+    /*}
+      else
+      {
+      for (Enumeration e = gc.getRenderManager().
+      objectsIntersecting( r.x, r.y, r.width, r.height); e.hasMoreElements();) 
+      {
+      temp = (TrackEvent) e.nextElement();
+      temp.getRenderer().render( temp, g, gc.getSelection().isInSelection(temp), gc);
+      }
+      }*/
+    //draw the first object out of rectangle left bound  
+    if(((MonoDimensionalAdapter)gc.getAdapter()).getViewMode() != MonoTrackEditor.PEAKS_VIEW)
+	{
+	    temp = ((FtsTrackObject)gc.getDataModel()).getPreviousEvent(gc.getAdapter().getInvX(r.x));
 	    if(temp != null) 
 		temp.getRenderer().render( temp, g, gc.getSelection().isInSelection(temp), gc);
 	}
+	
     g.setClip(tempr);
   }
 

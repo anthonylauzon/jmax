@@ -89,6 +89,9 @@ public class MonoTrackPopupMenu extends JPopupMenu
     item = new JMenuItem("Steps view");
     item.addActionListener(new SetViewAction(MonoTrackEditor.STEPS_VIEW));
     viewMenu.add(item);
+    item = new JMenuItem("BreakPoints view");
+    item.addActionListener(new SetViewAction(MonoTrackEditor.BREAK_POINTS_VIEW));
+    viewMenu.add(item);
 
     add(viewMenu);
 

@@ -214,9 +214,12 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
   {
     TrackEvent movTrackEvent;
     Graphics g = gc.getGraphicDestination().getGraphics();
-    Rectangle tempr = (Rectangle) g.getClip();
     
-    g.clipRect(ScoreBackground.KEYEND, 0, ((Sequence)gc.getFrame()).getViewRectangle().width-ScoreBackground.KEYEND - TrackContainer.BUTTON_WIDTH - 2, gc.getGraphicDestination().getSize().height);
+    Rectangle tempr, clip; 
+    tempr = (Rectangle) g.getClip();
+    clip = ((SequenceGraphicContext)gc).getTrackClip();
+
+    g.clipRect(clip.x, clip.y, clip.width, clip.height);
     
     g.setColor(Color.gray);
     g.setXORMode(Color.white); 

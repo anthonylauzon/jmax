@@ -39,10 +39,14 @@ public class SequenceSelecter extends Selecter {
 
     public void XORDraw(int dx, int dy) 
     {
-	Rectangle tempr = (Rectangle) itsRunningG.getClip();
+	
+	Rectangle tempr, clip;
+	    
+	tempr = (Rectangle) itsRunningG.getClip();
+	clip = ((SequenceGraphicContext)gc).getTrackClip();
+	
+	itsRunningG.clipRect(clip.x, clip.y, clip.width, clip.height);
 
-	itsRunningG.clipRect(ScoreBackground.KEYEND, 0, ((Sequence)gc.getFrame()).getViewRectangle().width-ScoreBackground.KEYEND - TrackContainer.BUTTON_WIDTH - 2, gc.getGraphicDestination().getSize().height);
-   
 	super.XORDraw(dx, dy);
 
 	itsRunningG.setClip(tempr);
