@@ -252,7 +252,7 @@ public class ScrEvent extends AbstractUndoableObject implements TwoOrderObject, 
 
   ScrEvent duplicate () throws CloneNotSupportedException
   {
-    return  (ScrEvent) clone(); 
+    return (ScrEvent) clone();
   }
 
   //------------ Fields

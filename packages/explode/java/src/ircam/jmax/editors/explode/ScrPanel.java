@@ -35,9 +35,9 @@ import ircam.jmax.toolkit.*;
 public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProvider, ToolListener, ListSelectionListener, StatusBarClient{
   
   /**
-   * Constructor based on a ExplodeDataModel. 
+   * Constructor based on a ExplodeDataModel and a selection model
    */
-  public ScrPanel(ExplodeDataModel ep) 
+  public ScrPanel(ExplodeDataModel ep, ExplodeSelection s) 
   {  
     setSize(PANEL_WIDTH, PANEL_HEIGHT);
     setLayout(new BorderLayout());
@@ -63,7 +63,6 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     // being a MouseListener for this panel does not prevent the panel
     // itself (and then the current tool) to receive the same events.
     itsScore = new JPanel() {
-      //public void update(Graphics g) {}
 
       public void paint(Graphics g) 
 	{
@@ -88,19 +87,31 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     add(itsScore, BorderLayout.CENTER);
 
     { //-- prepares the graphic context
-      gc = new ExplodeGraphicContext();
+      gc = new ExplodeGraphicContext(ep, s);
       gc.setGraphicSource(itsScore);
       gc.setGraphicDestination(itsScore);
 
-      gc.setDataModel(ep);
-
       gc.setRenderManager(new ScoreRenderer(gc));
+
       gc.setLogicalTime(0);
       gc.setStatusBar(itsStatusBar);
       
     }
 
-    ExplodeSelection.getSelection().addListSelectionListener(this);
+    // make this panel repaint when the selection status change
+    // either in content or in ownership.
+    s.addListSelectionListener(this);
+    s.setOwner(new SelectionOwner() {
+      public void selectionDisactivated()
+	{
+	  itsScore.repaint();
+	}
+      public void selectionActivated()
+	{
+	  itsScore.repaint();
+	}
+    });
+
     gc.getDataModel().addListener(this);
 
     itsStatusBar.addWidget(new ScrEventWidget(gc));

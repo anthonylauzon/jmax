@@ -45,10 +45,18 @@ public class PartitionEventRenderer implements ObjectRenderer {
     int lenght = gc.getAdapter().getLenght(e);
     int label = gc.getAdapter().getLabel(e);
 
-    if (selected) g.setColor(Color.red);
-    else g.setColor(Color.black);
+    if (selected) 
+      {
+	g.setColor(Color.red);
+	if (ExplodeSelection.getCurrent().getModel() != gc.getDataModel()) g.drawRect(x, y, lenght, NOTE_DEFAULT_HEIGHT);
+	else g.fillRect(x, y, lenght, NOTE_DEFAULT_HEIGHT);
+      }
+    else 
+      {
+	g.setColor(Color.black);
+	g.fillRect(x, y, lenght, NOTE_DEFAULT_HEIGHT);
+      }
 
-    g.fillRect(x, y, lenght, NOTE_DEFAULT_HEIGHT);
     g.drawString(""+label, x, y-5);
   
   }

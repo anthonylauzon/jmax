@@ -81,7 +81,7 @@ class ScrEventWidget extends Box implements ListSelectionListener, ExplodeDataLi
 
     setSize(dim.width, dim.height);
 
-    ExplodeSelection.getSelection().addListSelectionListener(this);
+    gc.getSelection().addListSelectionListener(this);
     gc.getDataModel().addListener(this);
   }
   
@@ -89,7 +89,7 @@ class ScrEventWidget extends Box implements ListSelectionListener, ExplodeDataLi
    * List selection listener interface */
   public void valueChanged(ListSelectionEvent e) 
   {
-    if (ExplodeSelection.getSelection().isSelectionEmpty())
+    if (gc.getSelection().isSelectionEmpty())
       setTarget(null);
     else setTarget(identifyTarget(e));
   }
@@ -97,12 +97,12 @@ class ScrEventWidget extends Box implements ListSelectionListener, ExplodeDataLi
   private ScrEvent identifyTarget(ListSelectionEvent e)
   {
     int count = 0;
-    for (int i = ExplodeSelection.getSelection().getMinSelectionIndex(); i <= ExplodeSelection.getSelection().getMaxSelectionIndex(); i++)
-      if (ExplodeSelection.getSelection().isSelectedIndex(i))
+    for (int i = gc.getSelection().getMinSelectionIndex(); i <= gc.getSelection().getMaxSelectionIndex(); i++)
+      if (gc.getSelection().isSelectedIndex(i))
 	count += 1;
 
     if (count == 1)
-      return (gc.getDataModel().getEventAt(ExplodeSelection.getSelection().getMinSelectionIndex()));
+      return (gc.getDataModel().getEventAt(gc.getSelection().getMinSelectionIndex()));
     else return null;
   }
   
@@ -157,7 +157,7 @@ class ScrEventWidget extends Box implements ListSelectionListener, ExplodeDataLi
    * all the events in a selection*/
   public void actionPerformed(ActionEvent e)
   {
-    if (ExplodeSelection.getSelection().isSelectionEmpty()) return;
+    if (gc.getSelection().isSelectionEmpty()) return;
     
     int value;
     ScrEvent temp;
@@ -175,7 +175,7 @@ class ScrEventWidget extends Box implements ListSelectionListener, ExplodeDataLi
 
     if (e.getSource() == timeEditor.getCustomComponent()) 
       {  // modify the time of a selection
-	for (en = ExplodeSelection.getSelection().getSelected(); en.hasMoreElements();)
+	for (en = gc.getSelection().getSelected(); en.hasMoreElements();)
 	  {
 	    temp = (ScrEvent) en.nextElement();
 	    temp.move(value);
@@ -183,7 +183,7 @@ class ScrEventWidget extends Box implements ListSelectionListener, ExplodeDataLi
       }
     else if (e.getSource() == pitchEditor.getCustomComponent()) 
       {  // modify the pitch of a selection
-	for (en = ExplodeSelection.getSelection().getSelected(); en.hasMoreElements();)
+	for (en = gc.getSelection().getSelected(); en.hasMoreElements();)
 	  {
 	    temp = (ScrEvent) en.nextElement();
 	    temp.setPitch(value);
@@ -191,7 +191,7 @@ class ScrEventWidget extends Box implements ListSelectionListener, ExplodeDataLi
       }
     else if (e.getSource() == durationEditor.getCustomComponent()) 
       {  // modify the duration of a selection
-	for (en = ExplodeSelection.getSelection().getSelected(); en.hasMoreElements();)
+	for (en = gc.getSelection().getSelected(); en.hasMoreElements();)
 	  {
 	    temp = (ScrEvent) en.nextElement();
 	    temp.setDuration(value);
@@ -199,7 +199,7 @@ class ScrEventWidget extends Box implements ListSelectionListener, ExplodeDataLi
       }
     else if (e.getSource() == velocityEditor.getCustomComponent()) 
       {  // modify the velocity of a selection
-	for (en = ExplodeSelection.getSelection().getSelected(); en.hasMoreElements();)
+	for (en = gc.getSelection().getSelected(); en.hasMoreElements();)
 	  {
 	    temp = (ScrEvent) en.nextElement();
 	    temp.setVelocity(value);
@@ -207,7 +207,7 @@ class ScrEventWidget extends Box implements ListSelectionListener, ExplodeDataLi
       }
     else if (e.getSource() == channelEditor.getCustomComponent()) 
       {  // modify the channel of a selection
-	for (en = ExplodeSelection.getSelection().getSelected(); en.hasMoreElements();)
+	for (en = gc.getSelection().getSelected(); en.hasMoreElements();)
 	  {
 	    temp = (ScrEvent) en.nextElement();
 	    temp.setChannel(value);

@@ -24,6 +24,12 @@ import ircam.jmax.utils.*;
  * The Explode selection. This class is implemented on the base of the
  * Swing's ListSelectionModel, so that it can be used unchanged in
  * the JTable representation of the score.
+ * Even if every Explode editor have its own selection, just one of them
+ * is active at a time. The active selection is set via the setCurrent method.
+ * An ExplodeSelection has an owner (a SelectionOwner implementor): this 
+ * Owner will be called back when the selection become active or disactive.
+ * The PartitionEventRenderer objects use the ownership information to draw
+ * the selected event differently (selected-active / selected-non active).
  * @see ExplodeTablePanel */
 public class ExplodeSelection extends DefaultListSelectionModel implements ExplodeDataListener, Transferable, Cloneable{
 
@@ -35,23 +41,81 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
   // This imposes some extra-care while dealing with moving and deleting 
   // operation.
   // See also the notes in the objectMoved call.
-  private ExplodeSelection(ExplodeDataModel model) 
+  ExplodeSelection(ExplodeDataModel model) 
   {
-    this.model = model;
+    setModel(model);
     setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION) ;
+    if (dataFlavors == null) 
+      {
+	dataFlavors = new MaxVector();
+	addFlavor(ExplodeDataFlavor.getInstance());
+      }
+
+    // make this selection a listener of its own data model
+    model.addListener(this);
+  }
+   
+  ExplodeSelection()
+  {
     dataFlavors = new MaxVector();
     addFlavor(ExplodeDataFlavor.getInstance());
   }
-   
+
+  /**
+   * Ownership handling
+   */
+  public void setOwner(SelectionOwner so)
+  {
+    itsOwner = so;
+  }
+
+  /**
+   * Ownership handling
+   */
+  public SelectionOwner getOwner()
+  {
+    return itsOwner;
+  }
+
+  /**
+   * Returns the ExplodeDataModel this selection refers to */
+  public ExplodeDataModel getModel()
+  {
+    return itsModel;
+  }
+
+  /**
+   * Sets the ExplodeDataModel this selection refers to */
+  public void setModel(ExplodeDataModel m)
+  {
+    itsModel = m;
+  }
+
+  /**
+   * Sets the current active selection. This will send a 
+   * selectionActivated message to that selection's owner, and a 
+   * selectionDisactivated to the old selection's owner */
+  public static void setCurrent(ExplodeSelection s)
+  {
+    if (current != null && current.itsOwner != null)
+      current.itsOwner.selectionDisactivated();
+
+    current = s;
+
+    if (s != null && s.itsOwner != null)
+      s.itsOwner.selectionActivated();
+
+  }
+
   /** select the given object 
    */
   public void select(Object obj)
   {
-    int index = model.indexOf((ScrEvent) obj);
+    int index = itsModel.indexOf((ScrEvent) obj);
     addSelectionInterval(index, index);
   }
   
-  /** select the given enumeration of objects.
+  /** Select the given enumeration of objects.
    * When possible, use this method instead of
    * selecting single objects. 
    */
@@ -67,7 +131,7 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
    */
   public void deSelect(Object obj)
   {
-    int index = model.indexOf((ScrEvent) obj);
+    int index = itsModel.indexOf((ScrEvent) obj);
     removeSelectionInterval(index, index);
   }
 
@@ -88,7 +152,7 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
    */
   public boolean isInSelection(Object obj)
   {
-    int index = model.indexOf((ScrEvent) obj);
+    int index = itsModel.indexOf((ScrEvent) obj);
     
     return isSelectedIndex(index);
   }
@@ -104,19 +168,12 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
     // to perform operations that delete or move events
     temp.removeAllElements();
     for (int i = getMinSelectionIndex(); i <= getMaxSelectionIndex(); i++)
-      if (isSelectedIndex(i)) temp.addElement(model.getEventAt(i));
+      if (isSelectedIndex(i)) temp.addElement(itsModel.getEventAt(i));
     return temp.elements(); 
   }
   
 
-  private void debug(String s)
-  {
-    System.err.println("**** "+s+" MIN="+getMinSelectionIndex()+" MAX="+getMaxSelectionIndex()+" current:");
-    for (int i = getMinSelectionIndex(); i <= getMaxSelectionIndex(); i++)
-      if (isSelectedIndex(i)) System.err.println("-- "+i);
-  }
-
-  /** returns the number of objects in the selection
+  /** Returns the number of objects in the selection
    */
   public  int size()
   {
@@ -137,7 +194,7 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
    */
   public  void selectAll()
   {
-    addSelectionInterval(0, model.length()-1);
+    addSelectionInterval(0, itsModel.length()-1);
   }
 
   /** deselects all the objects currently selected
@@ -148,26 +205,13 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
     clearSelection();
   }
 
-  /**
-   * static constructor
-   */
-  static public ExplodeSelection createSelection(ExplodeDataModel ep) 
-  {
-    if (itsSelection == null) 
-      {
-	itsSelection = new ExplodeSelection(ep);
-	ep.addListener(itsSelection);
-      }
-
-    return itsSelection;
-  }
 
   /**
    * returns the (unique) selection
    */
-  public static ExplodeSelection getSelection()
+  public static ExplodeSelection getCurrent()
   {
-    return itsSelection;
+    return current;
   }  
 
   /** ExplodeDataListener interface*/
@@ -203,7 +247,7 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
  
     boolean wasSelected = isSelectedIndex(oldIndex);
 
-    if (oldIndex < newIndex)
+   if (oldIndex < newIndex)
       {
 	for (int i = oldIndex; i<newIndex; i++)
 	  {
@@ -227,7 +271,7 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
       }
 
     if (wasSelected) 
-      addSelectionInterval(newIndex, newIndex);
+	addSelectionInterval(newIndex, newIndex);
     
   }
 
@@ -302,7 +346,7 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
 
     public Object nextElement()
     {
-      return model.getEventAt(next);
+      return itsModel.getEventAt(next);
     }
 
     int findNext()
@@ -340,7 +384,6 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
 	{
 	  s = (ScrEvent) e.nextElement();
 	  itsCopy.addElement(s.duplicate());
-	  
 	}
 
     } catch (Exception ex) {System.err.println("error while cloning events");}
@@ -352,11 +395,12 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
   }
 
   //--- Fields
-  ExplodeDataModel model;
-  private static ExplodeSelection itsSelection;
+  private static ExplodeSelection current;
   private static MaxVector itsCopy = new MaxVector();
-  protected MaxVector dataFlavors;
+  protected static MaxVector dataFlavors;
   private MaxVector temp = new MaxVector();
 
+  private SelectionOwner itsOwner;  
+  protected  ExplodeDataModel itsModel;
 }
 

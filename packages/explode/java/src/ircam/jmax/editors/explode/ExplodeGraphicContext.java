@@ -24,9 +24,20 @@ import javax.swing.event.*;
  */
 public class ExplodeGraphicContext extends GraphicContext {
 
-  public ExplodeGraphicContext()
+  /**
+   * Constructor */
+  public ExplodeGraphicContext(ExplodeDataModel model, ExplodeSelection s)
   {
     super();
+    setDataModel(model);
+    itsSelection = s;
+  }
+
+  /**
+   * Change the selection ownership when this graphic context become active */
+  public void activate()
+  {
+    ExplodeSelection.setCurrent(itsSelection);
   }
 
   /**
@@ -94,10 +105,22 @@ public class ExplodeGraphicContext extends GraphicContext {
   {
     return toolbar;
   }
+
+  public void setSelection(ExplodeSelection s)
+  {
+    itsSelection = s;
+  }
+
+  public ExplodeSelection getSelection()
+  {
+    return itsSelection;
+  }
+
   //---- Fields 
 
-
   ExplodeDataModel itsDataModel;
+
+  ExplodeSelection itsSelection;
 
   Adapter itsAdapter;
 

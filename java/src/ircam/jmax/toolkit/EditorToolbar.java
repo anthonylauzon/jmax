@@ -185,6 +185,7 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
   public void windowActivated(WindowEvent e)
   {
 
+    itsClientGc.activate();
     currentTool.reActivate(itsClientGc);
 
   }

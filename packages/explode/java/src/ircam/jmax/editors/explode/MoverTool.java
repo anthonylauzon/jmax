@@ -64,7 +64,7 @@ public class MoverTool extends Tool implements PositionListener, DragListener {
   {
     ScrEvent aScrEvent = (ScrEvent) gc.getRenderManager().firstObjectContaining(x, y);
     
-    if (aScrEvent != null && ExplodeSelection.getSelection().isInSelection(aScrEvent)) 
+    if (aScrEvent != null && ((ExplodeGraphicContext)gc).getSelection().isInSelection(aScrEvent)) 
       {
 
 	startingPoint.setLocation(x, y);
@@ -92,7 +92,7 @@ public class MoverTool extends Tool implements PositionListener, DragListener {
     // starts a serie of undoable transitions
     ((UndoableData) egc.getDataModel()).beginUpdate();
 
-    for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
+    for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
       {
 	aEvent = (ScrEvent) e.nextElement();
 	

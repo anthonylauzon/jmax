@@ -37,7 +37,10 @@ public class ExplodeSelectionMover extends SelectionMover  implements XORPainter
   {
     super.interactionBeginAt(x, y);
 
-    if (ExplodeSelection.getSelection().size() > 20) 
+    if (gc == null)
+      System.err.println("-------------- GC NULL");
+
+    if (((ExplodeGraphicContext)gc).getSelection().size() > 20) 
       {
 	dragMode = RECT_DRAG;
 	computeEnclosure(enclosingRect);
@@ -59,7 +62,7 @@ public class ExplodeSelectionMover extends SelectionMover  implements XORPainter
     
     ScrEvent aEvent;
     
-    Enumeration e=ExplodeSelection.getSelection().getSelected();
+    Enumeration e=((ExplodeGraphicContext)gc).getSelection().getSelected();
     aEvent = (ScrEvent) e.nextElement();    
     
     if (aEvent == null) return; //empty selection...
@@ -139,8 +142,8 @@ public class ExplodeSelectionMover extends SelectionMover  implements XORPainter
 	ScrEvent aScrEvent;
 	Adapter a = ((ExplodeGraphicContext) gc).getAdapter();
 	ObjectRenderer er = gc.getRenderManager().getObjectRenderer();
-	boolean singleObject = ExplodeSelection.getSelection().size()==1;
-	for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
+	boolean singleObject = ((ExplodeGraphicContext)gc).getSelection().size()==1;
+	for (Enumeration e = ((ExplodeGraphicContext)gc).getSelection().getSelected(); e.hasMoreElements();)
 	  {
 	    aScrEvent = (ScrEvent) e.nextElement();
 

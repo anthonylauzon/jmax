@@ -43,6 +43,7 @@ SOURCES = \
 	$(INCLUDE_PATH)/SelectionListener.java		\
 	$(INCLUDE_PATH)/SelectionMover.java		\
 	$(INCLUDE_PATH)/SelectionResizer.java		\
+	$(INCLUDE_PATH)/SelectionOwner.java		\
 	$(INCLUDE_PATH)/StatusBar.java			\
 	$(INCLUDE_PATH)/StatusBarClient.java		\
 	$(INCLUDE_PATH)/Tool.java			\

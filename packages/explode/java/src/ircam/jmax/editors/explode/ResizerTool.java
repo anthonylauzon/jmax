@@ -78,7 +78,7 @@ public class ResizerTool extends SelecterTool implements DragListener {
     // starts a serie of undoable transitions
     ((UndoableData) egc.getDataModel()).beginUpdate();
     
-    for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
+    for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
       {
 	aEvent = (ScrEvent) e.nextElement();
 

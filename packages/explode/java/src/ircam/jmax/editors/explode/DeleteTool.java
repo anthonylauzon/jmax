@@ -66,14 +66,14 @@ public class DeleteTool extends Tool implements PositionListener {
 	// starts an undoable transition
 	((UndoableData) egc.getDataModel()).beginUpdate();
 
-	if (ExplodeSelection.getSelection().isInSelection(aEvent))
+	if (egc.getSelection().isInSelection(aEvent))
 	  {
 	    Enumeration e;
 	    MaxVector v = new MaxVector();
 
 	    // copy the selected elements in another MaxVector (cannot remove
 	    // elements of a Vector inside a loop based on an enumeration of this vector, it simply does'nt work...)
-	    for ( e = ExplodeSelection.getSelection().getSelected();
+	    for ( e = egc.getSelection().getSelected();
 		  e.hasMoreElements();)
 	      {
 		v.addElement(e.nextElement());
@@ -88,7 +88,7 @@ public class DeleteTool extends Tool implements PositionListener {
 	else
 	  {
 	    egc.getDataModel().removeEvent(aEvent);
-	    ExplodeSelection.getSelection().deselectAll();
+	    egc.getSelection().deselectAll();
 	  }
 
 	((UndoableData) egc.getDataModel()).endUpdate();

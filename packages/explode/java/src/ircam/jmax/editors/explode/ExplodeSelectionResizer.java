@@ -69,7 +69,7 @@ public class ExplodeSelectionResizer extends SelectionResizer {
     ObjectRenderer er = egc.getRenderManager().getObjectRenderer();
     
     ScrEvent aScrEvent;
-    for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
+    for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
       {
 	aScrEvent = (ScrEvent) e.nextElement();
 	a.setX(tempEvent, a.getX(aScrEvent));

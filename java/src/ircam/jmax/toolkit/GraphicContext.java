@@ -111,6 +111,13 @@ public class GraphicContext {
     else return getFrame(itsGraphicDestination);
   }
 
+  /**
+   * Called when this context become the current one.
+   * Override to do special actions like change Selection ownerships
+   * and so on. */
+  public void activate()
+  {
+  }
 
   /**
    * utility static function:

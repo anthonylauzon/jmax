@@ -57,17 +57,19 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
   {
     ScrEvent aScrEvent = (ScrEvent) gc.getRenderManager().firstObjectContaining(x, y);
     
+    ExplodeGraphicContext egc = (ExplodeGraphicContext)gc;
+
     if (aScrEvent != null) 
       { //click on event
 	startingPoint.setLocation(x,y);
 
-	if (!ExplodeSelection.getSelection().isInSelection(aScrEvent)) 
+	if (!egc.getSelection().isInSelection(aScrEvent)) 
 	  {
 	    if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
 	      {
-		ExplodeSelection.getSelection().deselectAll();
+		egc.getSelection().deselectAll();
 	      } 
-	    ExplodeSelection.getSelection().select(aScrEvent);
+	    egc.getSelection().select(aScrEvent);
 	  }
 
 	singleObjectSelected(x, y, modifiers);
@@ -76,8 +78,8 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
       {
       if ((modifiers & InputEvent.SHIFT_MASK) == 0)
 	{
-	  if (!ExplodeSelection.getSelection().isSelectionEmpty())
-	      ExplodeSelection.getSelection().deselectAll(); 
+	  if (!egc.getSelection().isSelectionEmpty())
+	      egc.getSelection().deselectAll(); 
 	  
 	}
       
@@ -103,7 +105,7 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
    */
   void selectArea(int x, int y, int w, int h) 
   { 
-    selectArea(gc.getRenderManager(), ExplodeSelection.getSelection(), x, y,  w,  h);
+    selectArea(gc.getRenderManager(), ((ExplodeGraphicContext)gc).getSelection(), x, y,  w,  h);
   }
 
   

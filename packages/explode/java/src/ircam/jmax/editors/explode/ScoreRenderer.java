@@ -36,6 +36,7 @@ public class ScoreRenderer extends AbstractRenderer{
    */
   public ScoreRenderer(ExplodeGraphicContext theGc) 
   {  
+    super();
     gc = theGc;
     gc.setAdapter(new PartitionAdapter(gc));
     {//-- prepares the parameters for the adapter
@@ -47,29 +48,13 @@ public class ScoreRenderer extends AbstractRenderer{
 
     tempList = new MaxVector();
 
-    itsLayers = new MaxVector();
-
     itsForegroundLayer = new ScoreForeground(gc);
 
     itsLayers.addElement(new ScoreBackground(gc));
-    //itsLayers.addElement(new TestBackground(gc));
     itsLayers.addElement(itsForegroundLayer);
   }
   
 
-
-  /**
-   * render all the objects in the given rectangle */
-  public void render(Graphics g, Rectangle r)
-  {
-    Layer aLayer;
-
-    for (int i = 0; i< itsLayers.size(); i++)
-      {
-	aLayer = (Layer) itsLayers.elementAt(i);
-	aLayer.render(g, r, i);
-      }
-  }
 
   /**
    * returns its (current) event renderer

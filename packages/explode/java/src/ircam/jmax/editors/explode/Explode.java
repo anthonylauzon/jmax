@@ -30,7 +30,7 @@ import javax.swing.undo.*;
 /**
  * the main class of the explode package.
  * It inherits from MaxEditor, and implements the MaxDataEditor Interface.
- * This implementation builds a ScrPanel to represent the score.
+ * This implementation builds a ScrPanel and a ExplodeTablePanel to represent the data.
  */
 public class Explode extends MaxEditor implements AAAReadme {
 
@@ -49,15 +49,17 @@ public class Explode extends MaxEditor implements AAAReadme {
     // get the data
     explodeData = (ExplodeRemoteData) maxData;
 
-    // creates the ExplodeSelection 
-    ExplodeSelection.createSelection(explodeData);
+    // create the Selection model, that will be in common between
+    // the different views
 
-    // creates the table view
+    ExplodeSelection s = new ExplodeSelection(explodeData);
+
+    // creates the Table view
     ExplodeTableModel model = new ExplodeTableModel(explodeData);
-    itsTablePanel = new ExplodeTablePanel(model);
+    itsTablePanel = new ExplodeTablePanel(model, s);
 
     // creates the Piano roll view
-    itsScrPanel = new ScrPanel(explodeData);
+    itsScrPanel = new ScrPanel(explodeData, s);
 
     setView(defaultView);
 

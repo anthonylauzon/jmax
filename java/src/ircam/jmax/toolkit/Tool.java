@@ -70,8 +70,8 @@ abstract public class Tool implements StatusBarClient{
    */
   static public void mountIModule(InteractionModule im, int x, int y) 
   {
-    im.interactionBeginAt(x, y);
     mountIModule(im);
+    im.interactionBeginAt(x, y);
 
   }
 

@@ -669,13 +669,16 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
   // ClipableData functionalities
   public void cut()
   {
+
+    if (ExplodeSelection.getCurrent().getModel() != this) return;
+
     copy();
     
     // ... and remove 
 
     beginUpdate(); //cut is undoable
 
-    for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
+    for (Enumeration e = ExplodeSelection.getCurrent().getSelected(); e.hasMoreElements();)
       {
 	removeEvent((ScrEvent) e.nextElement());
       }
@@ -685,13 +688,19 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
 
   public void copy()
   {
-    ExplodeSelection.getSelection().prepareACopy();
-    MaxApplication.systemClipboard.setContents(ExplodeSelection.getSelection(), this);
+    if (ExplodeSelection.getCurrent().getModel() != this) 
+      return;
+
+    ExplodeSelection.getCurrent().prepareACopy();
+    MaxApplication.systemClipboard.setContents(ExplodeSelection.getCurrent(), this);
   }  
 
 
   public void paste()
   {
+    if (ExplodeSelection.getCurrent().getModel() != this) 
+      return;
+
     Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
     Enumeration objectsToPaste = null;
 
@@ -717,27 +726,31 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
 	ScrEvent event1;
 	
 	beginUpdate();  //the paste is undoable
-	ExplodeSelection.getSelection().deselectAll();
+	ExplodeSelection.getCurrent().deselectAll();
+	
 	try {
 	  while (objectsToPaste.hasMoreElements())
 	    {
 	      event = (ScrEvent) objectsToPaste.nextElement();
 	      event1 = event.duplicate();
 	      addEvent(event1);
-	      ExplodeSelection.getSelection().select(event1);
+	      ExplodeSelection.getCurrent().select(event1);
 	    }
-	  endUpdate();
 	
 	}
-      
 	catch (Exception e) {}
+
+	endUpdate();
+
       }
   }
+
+  /** ClipboardOwner interface */
 
   public void lostOwnership(Clipboard clipboard,
 			    Transferable contents)
   {
-    ExplodeSelection.discardTheCopy();
+    //ExplodeSelection.discardTheCopy();
   }
 
   //----- Fields

@@ -107,7 +107,7 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
       {
 	// starts a serie of undoable add transition
 	((UndoableData)egc.getDataModel()).beginUpdate();
-	for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
+	for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
 	  {
 	    aEvent = (ScrEvent) e.nextElement();
 	    newEvent = new ScrEvent(aEvent.getDataModel(),
@@ -133,7 +133,7 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 	
 	((UndoableData) egc.getDataModel()).beginUpdate();
 	
-	for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
+	for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
 	  {
 	    aEvent = (ScrEvent) e.nextElement();
 	    

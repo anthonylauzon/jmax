@@ -25,18 +25,20 @@ import javax.swing.*;
  * The panel containing the JTable representation of an Explode */
 class ExplodeTablePanel extends JPanel {
 
-  ExplodeTablePanel(ExplodeTableModel model)
+  ExplodeTablePanel(ExplodeTableModel model, ExplodeSelection s)
   {
     this.tmodel = model;
     table = new JTable(tmodel);
     JScrollPane scrollpane = new JScrollPane(table);
+
+    ExplodeSelection.setCurrent(s);
 
     setUpIntegerEditor();
 
     setLayout(new BorderLayout());
     add(BorderLayout.CENTER, scrollpane);
 
-    table.setSelectionModel(ExplodeSelection.getSelection());
+    table.setSelectionModel(s);
 
     ExplodeDataModel explodeModel = tmodel.getExplodeDataModel();
 
@@ -59,7 +61,6 @@ class ExplodeTablePanel extends JPanel {
 
       public void objectDeleted(Object whichObject, int oldIndex)
 	{
-	  //table.removeRowSelectionInterval(oldIndex, oldIndex);
 	  repaint(); //test
 	}
     });
