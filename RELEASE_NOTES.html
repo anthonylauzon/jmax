@@ -10,7 +10,13 @@
 
 The following bugs have been fixed:
 <UL>
-<LI> 
+<LI> #110: Deleting an outlet in a template crashes jMax
+<LI> #111: + doesn't work in expressions
+<LI> #115: fast graphic updates with dsp on
+<LI> #116: typing in objects
+<LI> #117: downsampled line~ 
+<LI> #118: inputs don't match crash
+<LI> #123: float and int box don't keep size on copy/paste and save/open
 </UL>
 
 For bugs reported via the bug report system
@@ -18,24 +24,38 @@ For bugs reported via the bug report system
 please refer to this page for information.
 
 
+<H2> Changed features </H2>
+
+<UL>
+<LI> the jmax ``-install'' option has been removed. The root directory (i.e.
+the directory where jMax takes the Java classes, the server, the libraries, etc)
+is given by the directory from which the script jmax is started. As a consequence,
+to start:
+<UL>
+<LI> the standard installation (in /usr/local/max): start /usr/local/max/bin/jmax
+<LI> the snapshot installation (usually in /usr/local/max-snapshot): 
+start /usr/local/max-snapshot/bin/jmax
+</UL>
+</UL>
+
 <H2> New features </H2>
 
 <UL>
-<LI> 
+<LI> the system property "FastFileBox" is now exported as a Tcl variable, so that you
+can set it in your .jmaxrc file:
+<PRE>
+set jmaxFastFileBox "true"
+</PRE>
+as well as by the command line:
+<PRE>
+jmax -jmaxFastFileBox
+</PRE>
+By default, this variable is set to "false".
+<LI> 24 bits audio I/O
+<LI> improved patch opening time up to 40 %
+<LI> detection of ADAT input not connected. Instead of FTS being blocked, an error message 
+"No Carrier On Audio Input" is issued.
 </UL>
 
-
-<H2> Known bugs </H2>
-
-<UL>
-<LI> 
-</UL>
-
-
-<H2> Outstanding bugs and features </H2>
-
-<UL>
-<LI> 
-</UL>
 
 </HTML>
