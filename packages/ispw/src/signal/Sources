@@ -12,11 +12,11 @@
 #  
 
 ifeq ($(VENDOR),sgi)
-  ARCH_SOURCES = osc_ftl.sgi.c
+  ARCH_SOURCES = osc_ftl_sgi.c
 endif
 
 ifeq ($(VENDOR),gnu)
-  ARCH_SOURCES = osc_ftl.linuxpc.c
+  ARCH_SOURCES = osc_ftl_linuxpc.c
 endif
 
 SOURCES = \

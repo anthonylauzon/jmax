@@ -13,7 +13,6 @@
  */
 #include "fts.h"
 
-
 static fts_symbol_t phasor_function = 0;
 static fts_symbol_t phasor_inplace_function = 0;
 
@@ -23,11 +22,23 @@ static fts_symbol_t phasor_inplace_function = 0;
  *
  */
 
+#if defined(SGI)
+
+typedef struct 
+{
+  fts_intphase_t phase;
+  double incr;
+} phasor_state_t;
+
+#elif defined(LINUXPC)
+
 typedef struct 
 {
   fts_wrapper_t phase;
   double incr;
 } phasor_state_t;
+
+#endif
 
 typedef struct 
 {
@@ -43,8 +54,6 @@ phasor_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   this->state = ftl_data_new(phasor_state_t);
   state = ftl_data_get_ptr(this->state);
-
-  fts_wrapper_frac_set(&state->phase, 0.0);
 
   dsp_list_insert(o);
 }
@@ -64,6 +73,14 @@ phasor_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
  *
  */
 
+#if defined(SGI)
+
+/********************************************************
+ *
+ * DSP implementaion for SGI
+ *
+ */
+
 static void
 phasor_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -73,6 +90,91 @@ phasor_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_atom_t argv[4];
   double incr;
 
+  state->phase = 0;
+  state->incr = (double)FTS_INTPHASE_RANGE / (double)fts_dsp_get_input_srate(dsp, 0);
+
+  if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
+    {
+      /* Use the inplace version */
+
+      fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
+      fts_set_ftl_data(argv+1, this->state);
+      fts_set_long(argv+2, fts_dsp_get_input_size(dsp, 0));
+
+      dsp_add_funcall(phasor_inplace_function, 3, argv);
+    }
+  else
+    {
+      /* standard code */
+      fts_set_symbol( argv, fts_dsp_get_input_name(dsp, 0));
+      fts_set_symbol( argv+1, fts_dsp_get_output_name(dsp, 0));
+      fts_set_ftl_data( argv+2, this->state);
+      fts_set_long( argv+3, fts_dsp_get_input_size(dsp, 0));
+
+      dsp_add_funcall(phasor_function, 4, argv);
+    }
+}
+
+static void ftl_phasor(fts_word_t *argv)
+{
+  float * restrict freq = (float *)  fts_word_get_ptr(argv + 0);
+  float * restrict out  = (float *)  fts_word_get_ptr(argv + 1);
+  phasor_state_t * restrict state = (phasor_state_t *) fts_word_get_ptr(argv + 2);
+  int n = fts_word_get_long(argv + 3);
+  double incr = state->incr;
+  fts_intphase_t phi = state->phase;
+  int i;
+
+  for(i=0; i<n; i++)
+    {
+      fts_intphase_t this_incr = (fts_intphase_t)(incr * freq[i]);
+
+      phi = fts_intphase_wrap(phi + this_incr);
+      out[i] = fts_intphase_float(phi);
+    }
+
+  state->phase = phi;
+}
+
+static void ftl_inplace_phasor(fts_word_t *argv)
+{
+  float * restrict sig = (float *)  fts_word_get_ptr(argv + 0);
+  phasor_state_t * restrict state = (phasor_state_t *) fts_word_get_ptr(argv + 1);
+  long int n = fts_word_get_long(argv + 2);
+  double incr = state->incr;
+  fts_intphase_t phi = state->phase;
+  int i;
+
+  for(i=0; i<n; i++)
+    {
+      float this_freq = sig[i];
+      fts_intphase_t this_incr = (fts_intphase_t)(incr * this_freq);
+
+      phi = fts_intphase_wrap(phi + this_incr);
+      sig[i] = fts_intphase_float(phi);
+    }
+
+  state->phase = phi;
+}
+
+#elif defined(LINUXPC)
+
+/********************************************************
+ *
+ * DSP implementaion for Linux PC
+ *
+ */
+
+static void
+phasor_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  phasor_t *this = (phasor_t *)o;
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  phasor_state_t *state = ftl_data_get_ptr(this->state);
+  fts_atom_t argv[4];
+  double incr;
+
+  fts_wrapper_frac_set(&state->phase, 0.0);
   state->incr = (double)1.0 / (double)fts_dsp_get_input_srate(dsp, 0);
 
   if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
@@ -136,18 +238,27 @@ static void ftl_inplace_phasor(fts_word_t *argv)
   state->phase = phi;
 }
 
+#endif
+
 /******************************************************************
  *
  *  user methods
  *
  */
 
+#if defined(SGI)
+
 static void
-phasor_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+phasor_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  post("phasor: phase print not implemented\n");
+  phasor_t *this = (phasor_t *)o;
+  phasor_state_t *state = ftl_data_get_ptr(this->state);
+  double phase = (double)fts_get_number(at);
+  
+  state->phase = (fts_intphase_t)(phase * FTS_INTPHASE_RANGE);
 }
 
+#elif defined(LINUXPC)
 
 static void
 phasor_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -158,6 +269,8 @@ phasor_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   fts_wrapper_frac_set(&state->phase, f);
 }
+
+#endif
 
 /******************************************************************
  *
@@ -185,8 +298,6 @@ phasor_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   a[0] = fts_s_float;
   fts_method_define(cl, 0, fts_s_float, phasor_number, 1, a);
-
-  fts_method_define(cl, 0, fts_s_print, phasor_print, 0, a);
 
   dsp_sig_inlet(cl, 0);
   dsp_sig_outlet(cl, 0);
