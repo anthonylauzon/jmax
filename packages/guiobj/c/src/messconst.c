@@ -26,7 +26,6 @@
 
 
 #include "fts.h"
-#include "reftype.h"
 
 #define MESSCONST_FLASH_TIME 125.0f
 
@@ -34,17 +33,6 @@ static fts_symbol_t sym_semi = 0;
 static fts_symbol_t sym_comma = 0;
 
 #define messconst_symbol_is_separator(s) ((s) == sym_semi || (s) == sym_comma)
-
-#define messconst_symbol_is_atom_type_selector(s) \
-( \
-  (s) == fts_s_int || \
-  (s) == fts_s_float || \
-  (s) == fts_s_symbol || \
-  (s) == fts_s_object || \
-  (s) == fts_s_ptr || \
-  (s) == fts_s_atom_array || \
-  reftype_get_by_symbol(s) != 0 \
-)
 
 /************************************************
  *
@@ -217,18 +205,16 @@ messconst_check_message(int ac, const fts_atom_t *at, fts_symbol_t *mess_s, int 
 {
   if(ac > 0)
     {
-      fts_symbol_t s;
-
       if(ac == 1)
 	{
-	  if(fts_is_atom_array(at))
+	  if(fts_is_list(at))
 	    {
 	      /* list format: "{" [<value> ...] "}" (mandatory braces!) */
-	      fts_atom_array_t *aa = fts_get_atom_array(at);
+	      fts_list_t *aa = fts_get_list(at);
 
 	      *mess_s = fts_s_list;
-	      *mess_ac = fts_atom_array_get_size(aa);
-	      *mess_at = fts_atom_array_get_ptr(aa);
+	      *mess_ac = fts_list_get_size(aa);
+	      *mess_at = fts_list_get_ptr(aa);
 
 	      return 1;
 	    }
@@ -243,38 +229,25 @@ messconst_check_message(int ac, const fts_atom_t *at, fts_symbol_t *mess_s, int 
 	      return 1;
 	    }
 	}
-      else if(ac == 2 && fts_is_symbol(at))
-	{
-	  /* value format: <type specifyer> <value> (type specifyer must match atom type) */
-	  s = fts_get_symbol(at);
-	  
-	  if(s == fts_s_atom_array || s == fts_s_object || s == fts_s_ptr) /* forbiddden type indentifiers */
-	    return 0;
-	  else if(s == fts_get_selector(at + 1))
-	    {
-	      *mess_s = s;
-	      *mess_ac = 1;
-	      *mess_at = at + 1;
-
-	      return 1;
-	    }
-	}
       else if(!fts_is_symbol(at))
 	return 0;
 
       /* message format: <selector> [<value> ...] (any message - type specifyers are not allowed as selectors) */
-      s = fts_get_symbol(at);
-
-      if(messconst_symbol_is_atom_type_selector(s) || s == fts_s_list)
-	return 0;
-      else
-	{
-	  *mess_s = s;
-	  *mess_ac = ac - 1;
-	  *mess_at = at + 1;
-	  
-	  return 1;
-	}
+      {
+	fts_symbol_t s = fts_get_symbol(at);
+	fts_class_t *cl;
+	
+	if(fts_atom_type_lookup(s, &cl))
+	  return 0;
+	else
+	  {
+	    *mess_s = s;
+	    *mess_ac = ac - 1;
+	    *mess_at = at + 1;
+	    
+	    return 1;
+	  }
+      }
     }
   
   return 0;

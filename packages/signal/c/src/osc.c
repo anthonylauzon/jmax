@@ -84,11 +84,11 @@ static void
 osc_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   osc_t *this = (osc_t *)o;
-  float_vector_t *fvec = float_vector_atom_get(at);
+  fvec_t *fvec = fvec_atom_get(at);
 
   /* check float vector size */
-  if(float_vector_get_size(fvec) < OSC_TABLE_SIZE + 1)
-    float_vector_set_size(fvec, OSC_TABLE_SIZE + 1);
+  if(fvec_get_size(fvec) < OSC_TABLE_SIZE + 1)
+    fvec_set_size(fvec, OSC_TABLE_SIZE + 1);
 
   osc_data_set_fvec(this->data, fvec);
 }
@@ -204,7 +204,7 @@ static void
 osc_init_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   osc_t *this = (osc_t *)o;
-  float_vector_t *fvec;
+  fvec_t *fvec;
 
   osc_init(o, 0, 0, 0, 0);
 
@@ -292,7 +292,7 @@ osc_instantiate_fvec(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_new_symbol("phase"), osc_set_phase);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("phase"), osc_set_phase_prop);
   
-  fts_method_define_varargs(cl, 1, float_vector_symbol, osc_set_fvec);
+  fts_method_define_varargs(cl, 1, fvec_symbol, osc_set_fvec);
 
   if(ac == 3)
     {
@@ -313,7 +313,7 @@ osc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   if(ac == 1 || (ac == 2 && fts_is_number(at + 1)))
     return osc_instantiate_cosine(cl, ac, at);
-  else if ((ac == 2 && float_vector_atom_is(at + 1)) || (ac == 3 && fts_is_number(at + 1) && float_vector_atom_is(at + 2)))
+  else if ((ac == 2 && fvec_atom_is(at + 1)) || (ac == 3 && fts_is_number(at + 1) && fvec_atom_is(at + 2)))
     return osc_instantiate_fvec(cl, ac, at);
   else
     return &fts_CannotInstantiate;

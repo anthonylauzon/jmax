@@ -37,7 +37,6 @@ typedef struct
 {
   fts_object_t o;
   fts_atom_t right;
-  fts_atom_t res;
 } binop_number_t;
 
 static void
@@ -46,16 +45,6 @@ binop_number_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   binop_number_t *this = (binop_number_t *)o;
 
   this->right = at[1];
-
-  if(ac > 2)
-    {
-      this->res = at[2];
-
-      if(float_vector_atom_is(at + 2))
-	float_vector_refer(float_vector_atom_get(at + 2));
-      else if(int_vector_atom_is(at + 2))
-	int_vector_refer(int_vector_atom_get(at + 2));
-    }
 }
 
 /**************************************************************************************
@@ -119,9 +108,23 @@ binop_number_div_left_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   binop_number_t *this = (binop_number_t *)o;
 
   if(fts_is_int(&this->right))
-    fts_outlet_int(o, 0, fts_get_int(at) / fts_get_int(&this->right));
+    {
+      int right = fts_get_int(&this->right);
+      
+      if(right != 0)
+	fts_outlet_int(o, 0, fts_get_int(at) / right);
+      else
+	fts_outlet_int(o, 0, 0);
+    }
   else
-    fts_outlet_float(o, 0, (float)fts_get_int(at) / fts_get_float(&this->right));
+    {
+      float right = fts_get_float(&this->right);
+      
+      if(right != 0.0)
+	fts_outlet_float(o, 0, fts_get_int(at) / right);
+      else
+	fts_outlet_float(o, 0, 0.0);
+    }
 }
 
 static void
@@ -139,11 +142,26 @@ static void
 binop_number_vid_left_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_number_t *this = (binop_number_t *)o;
+  int right = fts_get_int(at);
 
   if(fts_is_int(&this->right))
-    fts_outlet_int(o, 0, fts_get_int(&this->right) / fts_get_int(at));
+    {
+      int right = fts_get_int(at);
+      
+      if(right != 0)
+	fts_outlet_int(o, 0, fts_get_int(&this->right) / right);
+      else
+	fts_outlet_int(o, 0, 0);
+    }
   else
-    fts_outlet_float(o, 0, fts_get_float(&this->right) / (float)fts_get_int(at));
+    {
+      float right = (float)fts_get_int(at);
+      
+      if(right != 0)
+	fts_outlet_float(o, 0, fts_get_float(&this->right) / right);
+      else
+	fts_outlet_float(o, 0, 0.0);
+    }
 }
 
 /* int (o) number comparison  */
@@ -306,8 +324,12 @@ static void
 binop_number_div_left_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_number_t *this = (binop_number_t *)o;
+  float right = fts_get_number_float(&this->right);
 
-  fts_outlet_float(o, 0, fts_get_float(at) / fts_get_number_float(&this->right));
+  if(right != 0.0)
+    fts_outlet_float(o, 0, fts_get_float(at) / right);
+  else
+    fts_outlet_float(o, 0, 0.0);
 }
 
 static void
@@ -322,8 +344,12 @@ static void
 binop_number_vid_left_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_number_t *this = (binop_number_t *)o;
+  float right = fts_get_number_float(at);
 
-  fts_outlet_float(o, 0, fts_get_number_float(&this->right) / fts_get_float(at));
+  if(right != 0.0)
+    fts_outlet_float(o, 0, fts_get_float(&this->right) / right);
+  else
+    fts_outlet_float(o, 0, 0.0);
 }
 
 /* float (o) number comparison  */

@@ -1,7 +1,0 @@
-all	sgi		lib/irix63r10k/opt/libnumeric.so
-all	sgi		lib/irix63r5k/opt/libnumeric.so
-all	sgi		lib/irix65r10k/opt/libnumeric.so
-all	sgi		lib/irix65r4k/opt/libnumeric.so
-all	sgi		lib/irix65r5k/opt/libnumeric.so
-all	linuxpc		lib/linuxp/opt/libnumeric.so
-all	linuxppc	lib/linuxpp/opt/libnumeric.so

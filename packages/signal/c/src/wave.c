@@ -48,17 +48,17 @@ wave_data_new(void)
 }
 
 void
-wave_data_set_fvec(ftl_data_t ftl_data, float_vector_t *fvec)
+wave_data_set_fvec(ftl_data_t ftl_data, fvec_t *fvec)
 {
   wave_data_t *data = (wave_data_t *)ftl_data_get_ptr(ftl_data);
 
   if(data->table.fvec)
-    float_vector_release(data->table.fvec);
+    fts_object_release((fts_object_t *)data->table.fvec);
   
   data->table.fvec = fvec;
   
   if(fvec)
-    float_vector_refer(fvec);
+    fts_object_refer((fts_object_t *)fvec);
 }
 
 void
@@ -79,11 +79,11 @@ static void
 wave_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   wave_t *this = (wave_t *)o;
-  float_vector_t *fvec = float_vector_atom_get(at);
+  fvec_t *fvec = fvec_atom_get(at);
 
   /* check float vector size */
-  if(float_vector_get_size(fvec) < WAVE_TABLE_SIZE + 1)
-    float_vector_set_size(fvec, WAVE_TABLE_SIZE + 1);
+  if(fvec_get_size(fvec) < WAVE_TABLE_SIZE + 1)
+    fvec_set_size(fvec, WAVE_TABLE_SIZE + 1);
 
   wave_data_set_fvec(this->data, fvec);
 }
@@ -237,7 +237,7 @@ wave_instantiate_fvec(fts_class_t *cl, int ac, const fts_atom_t *at)
       
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("put"), wave_put_fvec);
   
-  fts_method_define_varargs(cl, 1, float_vector_symbol, wave_set_fvec);
+  fts_method_define_varargs(cl, 1, fvec_symbol, wave_set_fvec);
 
   dsp_sig_inlet(cl, 0);
   dsp_sig_outlet(cl, 0);
@@ -250,7 +250,7 @@ wave_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   if(ac == 1)
     return wave_instantiate_cosine(cl, ac, at);
-  else if (ac == 2 && float_vector_atom_is(at + 1))
+  else if (ac == 2 && fvec_atom_is(at + 1))
     return wave_instantiate_fvec(cl, ac, at);
   else
     return &fts_CannotInstantiate;

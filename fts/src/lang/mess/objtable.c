@@ -133,7 +133,7 @@ fts_object_table_delete_all(void)
 
   for (i = 1; i < object_table_size; i++)
     if (object_table[i])
-      fts_object_delete(object_table[i]);
+      fts_object_delete_from_patcher(object_table[i]);
 }
 
 

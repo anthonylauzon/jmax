@@ -31,7 +31,7 @@
 #define WAVE_TABLE_SIZE 512
 
 #include "fts.h"
-#include "floatvec.h"
+#include "fvec.h"
 
 struct wave_ftl_symbols
 {
@@ -48,7 +48,7 @@ typedef struct wave_data
   union
   {
     float *ptr;
-    float_vector_t *fvec;
+    fvec_t *fvec;
   } table;
 } wave_data_t;
 

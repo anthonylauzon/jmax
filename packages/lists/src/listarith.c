@@ -47,24 +47,24 @@ typedef struct
 static void
 atom_add(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
-  if(fts_is_a(left, fts_s_int))
+  if(fts_is_int(left))
     {
       long l = fts_get_int(left);
       
-      if(fts_is_a(right, fts_s_int))
+      if(fts_is_int(right))
 	fts_set_int(result, l + fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
+      else if(fts_is_float(right))
 	fts_set_float(result, l + fts_get_float(right));
       else
 	fts_set_int(result, 0);
     }
-  else if(fts_is_a(left, fts_s_float))
+  else if(fts_is_float(left))
     {
       float l = fts_get_float(left);
       
-      if(fts_is_a(right, fts_s_int))
+      if(fts_is_int(right))
 	fts_set_float(result, l + fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
+      else if(fts_is_float(right))
 	fts_set_float(result, l + fts_get_float(right));
       else
 	fts_set_int(result, 0);
@@ -76,24 +76,24 @@ atom_add(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 static void
 atom_sub(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
-  if(fts_is_a(left, fts_s_int))
+  if(fts_is_int(left))
     {
       long l = fts_get_int(left);
       
-      if(fts_is_a(right, fts_s_int))
+      if(fts_is_int(right))
 	fts_set_int(result, l - fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
+      else if(fts_is_float(right))
 	fts_set_float(result, l - fts_get_float(right));
       else
 	fts_set_int(result, 0);
     }
-  else if(fts_is_a(left, fts_s_float))
+  else if(fts_is_float(left))
     {
       float l = fts_get_float(left);
       
-      if(fts_is_a(right, fts_s_int))
+      if(fts_is_int(right))
 	fts_set_float(result, l - fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
+      else if(fts_is_float(right))
 	fts_set_float(result, l - fts_get_float(right));
       else
 	fts_set_int(result, 0);
@@ -105,24 +105,24 @@ atom_sub(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 static void
 atom_mul(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
-  if(fts_is_a(left, fts_s_int))
+  if(fts_is_int(left))
     {
       long l = fts_get_int(left);
       
-      if(fts_is_a(right, fts_s_int))
+      if(fts_is_int(right))
 	fts_set_int(result, l * fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
+      else if(fts_is_float(right))
 	fts_set_float(result, l * fts_get_float(right));
       else
 	fts_set_int(result, 0);
     }
-  else if(fts_is_a(left, fts_s_float))
+  else if(fts_is_float(left))
     {
       float l = fts_get_float(left);
       
-      if(fts_is_a(right, fts_s_int))
+      if(fts_is_int(right))
 	fts_set_float(result, l * fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
+      else if(fts_is_float(right))
 	fts_set_float(result, l * fts_get_float(right));
       else
 	fts_set_int(result, 0);
@@ -134,25 +134,54 @@ atom_mul(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 static void
 atom_div(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
-  if(fts_is_a(left, fts_s_int))
+  if(fts_is_int(left))
     {
       long l = fts_get_int(left);
       
-      if(fts_is_a(right, fts_s_int))
-	fts_set_int(result, l / fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
-	fts_set_float(result, l / fts_get_float(right));
+      if(fts_is_int(right))
+	{
+	  int r = fts_get_int(right);
+
+	  if(r != 0)
+	    fts_set_int(result, l / r);
+	  else
+	    fts_set_int(result, 0);
+	}
+      else if(fts_is_float(right))
+	{
+	  float r = fts_get_float(right);
+
+	  if(right != 0)
+	    fts_set_float(result, l / r);
+	  else
+	    fts_set_float(result, 0);
+	}
       else
 	fts_set_int(result, 0);
     }
-  else if(fts_is_a(left, fts_s_float))
+  else if(fts_is_float(left))
     {
       float l = fts_get_float(left);
       
-      if(fts_is_a(right, fts_s_int))
-	fts_set_float(result, l / fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
-	fts_set_float(result, l / fts_get_float(right));
+      if(fts_is_int(right))
+	{
+	  float r = (float)fts_get_int(right);
+
+	  if(r != 0)
+	    fts_set_float(result, l / r);
+	  else
+	    fts_set_float(result, 0.0);
+	}
+      else if(fts_is_float(right))
+	{
+	  float r = fts_get_float(right);	  
+
+	  if(r != 0.0)
+	    fts_set_float(result, l / r);
+	  else
+	    fts_set_float(result, 0.0);
+
+	}
       else
 	fts_set_int(result, 0);
     }
@@ -163,24 +192,24 @@ atom_div(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 static void
 atom_gt(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
-  if(fts_is_a(left, fts_s_int))
+  if(fts_is_int(left))
     {
       long l = fts_get_int(left);
       
-      if(fts_is_a(right, fts_s_int))
+      if(fts_is_int(right))
 	fts_set_int(result, l > fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
+      else if(fts_is_float(right))
 	fts_set_int(result, l > fts_get_float(right));
       else
 	fts_set_int(result, 0);
     }
-  else if(fts_is_a(left, fts_s_float))
+  else if(fts_is_float(left))
     {
       float l = fts_get_float(left);
       
-      if(fts_is_a(right, fts_s_int))
+      if(fts_is_int(right))
 	fts_set_int(result, l > fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
+      else if(fts_is_float(right))
 	fts_set_int(result, l > fts_get_float(right));
       else
 	fts_set_int(result, 0);
@@ -192,24 +221,24 @@ atom_gt(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 static void
 atom_ge(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
-  if(fts_is_a(left, fts_s_int))
+  if(fts_is_int(left))
     {
       long l = fts_get_int(left);
       
-      if(fts_is_a(right, fts_s_int))
+      if(fts_is_int(right))
 	fts_set_int(result, l >= fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
+      else if(fts_is_float(right))
 	fts_set_int(result, l >= fts_get_float(right));
       else
 	fts_set_int(result, 0);
     }
-  else if(fts_is_a(left, fts_s_float))
+  else if(fts_is_float(left))
     {
       float l = fts_get_float(left);
       
-      if(fts_is_a(right, fts_s_int))
+      if(fts_is_int(right))
 	fts_set_int(result, l >= fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
+      else if(fts_is_float(right))
 	fts_set_int(result, l >= fts_get_float(right));
       else
 	fts_set_int(result, 0);
@@ -221,24 +250,24 @@ atom_ge(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 static void
 atom_lt(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
-  if(fts_is_a(left, fts_s_int))
+  if(fts_is_int(left))
     {
       long l = fts_get_int(left);
       
-      if(fts_is_a(right, fts_s_int))
+      if(fts_is_int(right))
 	fts_set_int(result, l < fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
+      else if(fts_is_float(right))
 	fts_set_int(result, l < fts_get_float(right));
       else
 	fts_set_int(result, 0);
     }
-  else if(fts_is_a(left, fts_s_float))
+  else if(fts_is_float(left))
     {
       float l = fts_get_float(left);
       
-      if(fts_is_a(right, fts_s_int))
+      if(fts_is_int(right))
 	fts_set_int(result, l < fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
+      else if(fts_is_float(right))
 	fts_set_int(result, l < fts_get_float(right));
       else
 	fts_set_int(result, 0);
@@ -250,24 +279,24 @@ atom_lt(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 static void
 atom_le(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
-  if(fts_is_a(left, fts_s_int))
+  if(fts_is_int(left))
     {
       long l = fts_get_int(left);
       
-      if(fts_is_a(right, fts_s_int))
+      if(fts_is_int(right))
 	fts_set_int(result, l <= fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
+      else if(fts_is_float(right))
 	fts_set_int(result, l <= fts_get_float(right));
       else
 	fts_set_int(result, 0);
     }
-  else if(fts_is_a(left, fts_s_float))
+  else if(fts_is_float(left))
     {
       float l = fts_get_float(left);
       
-      if(fts_is_a(right, fts_s_int))
+      if(fts_is_int(right))
 	fts_set_int(result, l <= fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
+      else if(fts_is_float(right))
 	fts_set_int(result, l <= fts_get_float(right));
       else
 	fts_set_int(result, 0);
@@ -279,24 +308,24 @@ atom_le(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 static void
 atom_ne(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
-  if(fts_is_a(left, fts_s_int))
+  if(fts_is_int(left))
     {
       long l = fts_get_int(left);
       
-      if(fts_is_a(right, fts_s_int))
+      if(fts_is_int(right))
 	fts_set_int(result, l != fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
+      else if(fts_is_float(right))
 	fts_set_int(result, l != fts_get_float(right));
       else
 	fts_set_int(result, 1);
     }
-  else if(fts_is_a(left, fts_s_float))
+  else if(fts_is_float(left))
     {
       float l = fts_get_float(left);
       
-      if(fts_is_a(right, fts_s_int))
+      if(fts_is_int(right))
 	fts_set_int(result, l != fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
+      else if(fts_is_float(right))
 	fts_set_int(result, l != fts_get_float(right));
       else
 	fts_set_int(result, 1);
@@ -308,24 +337,24 @@ atom_ne(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 static void
 atom_ee(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
-  if(fts_is_a(left, fts_s_int))
+  if(fts_is_int(left))
     {
       long l = fts_get_int(left);
       
-      if(fts_is_a(right, fts_s_int))
+      if(fts_is_int(right))
 	fts_set_int(result, l == fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
+      else if(fts_is_float(right))
 	fts_set_int(result, l == fts_get_float(right));
       else
 	fts_set_int(result, 0);
     }
-  else if(fts_is_a(left, fts_s_float))
+  else if(fts_is_float(left))
     {
       float l = fts_get_float(left);
       
-      if(fts_is_a(right, fts_s_int))
+      if(fts_is_int(right))
 	fts_set_int(result, l == fts_get_int(right));
-      else if(fts_is_a(right, fts_s_float))
+      else if(fts_is_float(right))
 	fts_set_int(result, l == fts_get_float(right));
       else
 	fts_set_int(result, 0);

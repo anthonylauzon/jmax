@@ -433,7 +433,7 @@ seqmidi_write_midifile_from_note_track(eventtrk_t *track, fts_symbol_t file_name
       if(eventtrk_get_size(data.note_off_track) > 0)
 	seqmidi_write_note_offs(file, event_get_time(eventtrk_get_last(data.note_off_track)));
 	
-      fts_object_delete((fts_object_t *)(data.note_off_track));
+      fts_object_destroy((fts_object_t *)(data.note_off_track));
 	
       fts_midifile_write_track_end(file);
 

@@ -48,7 +48,7 @@ static fts_object_t *expr_doctor(fts_patcher_t *patcher, int ac, const fts_atom_
 
       fts_set_symbol(&a[0], fts_new_symbol("expr"));
       fts_set_symbol(&a[1], get_expr_symbol(ac - 1, at + 1));
-      fts_object_new(patcher, 2, a, &obj);
+      fts_object_new_to_patcher(patcher, 2, a, &obj);
 
       if (obj == 0)
 	obj = fts_error_object_new(patcher, 2, a, "Error in expression");

@@ -64,7 +64,6 @@
 #include "runtime/client/outgoing.h"
 #include "runtime/client/updates.h"
 
-
 /* Default values are for 400 updates per seconds,
  */
 

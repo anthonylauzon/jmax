@@ -61,11 +61,11 @@ messtab_init_define(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 	{
 	  message_t *mess = &message_table_get_element(this->tab, i);
 
-	  if(fts_is_atom_array(at + 1 + i))
+	  if(fts_is_list(at + 1 + i))
 	    {
-	      fts_atom_array_t *aa = fts_get_atom_array(at + 1 + i);
-	      int aac = fts_atom_array_get_size(aa);
-	      fts_atom_t *aat = fts_atom_array_get_ptr(aa);
+	      fts_list_t *aa = fts_get_list(at + 1 + i);
+	      int aac = fts_list_get_size(aa);
+	      fts_atom_t *aat = fts_list_get_ptr(aa);
 	      
 	      if(fts_is_symbol(aat))
 		message_set(mess, fts_get_symbol(aat), aac - 1, aat + 1);
@@ -268,13 +268,13 @@ messtab_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 1, fts_s_anything, messtab_set_reference);
     }
-  else if(ac == 1 || (ac > 1 && (fts_is_int(at + 1) || fts_is_atom_array(at + 1))))
+  else if(ac == 1 || (ac > 1 && (fts_is_int(at + 1) || fts_is_list(at + 1))))
     {
       int i;
 
       for(i=2; i<ac; i++)
 	{
-	  if(!fts_is_atom_array(at + i))
+	  if(!fts_is_list(at + i))
 	    return &fts_CannotInstantiate;	    
 	}
 

@@ -335,7 +335,12 @@ fts_class_get_by_name(fts_symbol_t name)
       cl = mcl->inst_list;
       
       if(!cl)
-	cl = fts_class_new(mcl, 0, 0);
+	{
+	  fts_atom_t a[1];
+
+	  fts_set_symbol(a, name);
+	  cl = fts_class_new(mcl, 1, a);
+	}
     }
 
   return cl;

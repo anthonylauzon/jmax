@@ -632,7 +632,7 @@ fts_mess_client_delete_object(int ac, const fts_atom_t *av)
 	  return;
 	}
 
-      fts_object_delete(obj);
+      fts_object_delete_from_patcher(obj);
     }
   else
     printf_mess("System Error in FOS message DELETE_OBJECT: bad args", ac, av);

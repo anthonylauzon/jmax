@@ -56,7 +56,7 @@ static fts_object_t *sigin_doctor(fts_patcher_t *patcher, int ac, const fts_atom
       for (i = 0; i < nchans; i++)
 	fts_set_int(&(args[i + 2]), i + 1);
 
-      fts_object_new(patcher, 2 + nchans, args, &obj);
+      fts_object_new_to_patcher(patcher, 2 + nchans, args, &obj);
       fts_object_set_description(obj, 2 + nchans, args);
 
       fts_free(args);
@@ -86,7 +86,7 @@ static fts_object_t *sigout_doctor(fts_patcher_t *patcher, int ac, const fts_ato
       for (i = 0; i < nchans; i++)
 	fts_set_int(&(args[i + 2]), i + 1);
 
-      fts_object_new(patcher, 2 + nchans, args, &obj);
+      fts_object_new_to_patcher(patcher, 2 + nchans, args, &obj);
       fts_object_set_description(obj, 2 + nchans, args);
 
       fts_free(args);

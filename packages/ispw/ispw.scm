@@ -24,8 +24,6 @@
 ;; package declaration
 (provide-package "ispw" "0.0.0")
 
-(require-package "reftype" "0.0.0")
- 
 ; load the dynamic libraries in FTS
 (ucs "load" "module" "ispw_control" (file-cat dir "lib" jmax-arch jmax-mode "libcontrol.so"))
 (ucs "load" "module" "ispw_data" (file-cat dir "lib" jmax-arch jmax-mode "libdata.so"))

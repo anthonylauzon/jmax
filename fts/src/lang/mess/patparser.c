@@ -249,6 +249,7 @@ fts_object_t *fts_load_dotpat_patcher(fts_object_t *parent, fts_symbol_t filenam
 
       fts_set_symbol(&description[0], fts_s_patcher);
       patcher = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
+
       fts_patparse_parse_patlex(patcher, in);
       fts_patlex_close(in);
       fts_patcher_reassign_inlets_outlets((fts_patcher_t *) patcher);

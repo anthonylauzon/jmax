@@ -31,14 +31,14 @@
 
 #include "sys.h"
 #include "lang/mess.h"
+#include "lang/utils/hashtab.h"
+
+static fts_hash_table_t fts_atom_type_table;
 
 /* An empty atom */
-
 const fts_atom_t fts_null = FTS_NULL;
 
-/* Currently, there is no way to extend this function when adding
-   new atom types */
-
+/* Currently, there is no way to extend this function when adding  new atom types */
 void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
 {
   int i;
@@ -224,11 +224,70 @@ int fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const fts_at
   return 0;
 }
 
+/* this function is declared by each  */
+static int
+fts_atom_type_function(int ac, const fts_atom_t *at, fts_atom_t *result)
+{
+  fts_symbol_t name = fts_get_symbol(at);
+  fts_class_t *cl = 0;
 
+  if(fts_atom_type_lookup(name, &cl))
+    {
+      if(cl)
+	{
+	  fts_object_t *obj = fts_object_create(cl, ac - 1, at + 1);
+	  
+	  if(obj)
+	    {
+	      fts_set_object_with_type(result, obj, name);
+	      return FTS_EXPRESSION_OK;
+	    }
+	  else
+	    return FTS_EXPRESSION_SYNTAX_ERROR;
+	}
+      else
+	{
+	  if(ac == 2 && name == fts_get_selector(at + 1))
+	    {
+	      *result = at[1];
+	      return FTS_EXPRESSION_OK;
+	    }
+	  else
+	    return FTS_EXPRESSION_SYNTAX_ERROR;
+	}
+    }
 
+  return FTS_EXPRESSION_UNDEFINED_FUNCTION;
+}
 
+void
+fts_atom_type_register(fts_symbol_t name, fts_class_t *cl)
+{
+  fts_atom_t a;
 
+  fts_set_ptr(&a, cl);
+  fts_hash_table_insert(&fts_atom_type_table, name, &a);
 
+  fts_expression_declare_fun(name, fts_atom_type_function);
+}
 
+int
+fts_atom_type_lookup(fts_symbol_t name, fts_class_t **cl)
+{
+  fts_atom_t a;
 
+  if(fts_hash_table_lookup(&fts_atom_type_table, name, &a))
+    {
+      *cl = (fts_class_t *)fts_get_ptr(&a);
+      
+      return 1;
+    }
 
+  return 0;
+}
+
+void
+fts_atoms_init(void)
+{
+  fts_hash_table_init(&fts_atom_type_table);
+}

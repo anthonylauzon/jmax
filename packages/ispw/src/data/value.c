@@ -130,7 +130,7 @@ value_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   x->name = sym;
 
-  /*if (x->name) fts_register_named_object(o, x->name);*/
+  /*if (x->name) ispw_register_named_object(o, x->name);*/
 }
 
 static void
@@ -140,7 +140,7 @@ value_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   free_keeper(x->v);
 
-  /*if (x->name) fts_unregister_named_object(o, x->name);*/
+  /*if (x->name) ispw_unregister_named_object(o, x->name);*/
 }
 
 static fts_status_t

@@ -25,8 +25,8 @@
  */
 
 #include "fts.h"
-#include "intvec.h"
-#include "floatvec.h"
+#include "ivec.h"
+#include "fvec.h"
 
 fts_symbol_t math_sym_add = 0;
 fts_symbol_t math_sym_sub = 0;
@@ -54,9 +54,9 @@ binop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   if(ac == 2 && fts_is_number(at + 1))
     return binop_number_instantiate(cl, ac, at);
-  else if(ac == 3 && (fts_is_number(at + 1) || int_vector_atom_is(at + 1)) && int_vector_atom_is(at + 2)) 
+  else if(ac == 3 && (fts_is_number(at + 1) || ivec_atom_is(at + 1)) && ivec_atom_is(at + 2)) 
     return binop_ivec_instantiate(cl, ac, at);
-  else if(ac == 3 && (fts_is_number(at + 1) || float_vector_atom_is(at + 1)) && float_vector_atom_is(at + 2)) 
+  else if(ac == 3 && (fts_is_number(at + 1) || fvec_atom_is(at + 1)) && fvec_atom_is(at + 2)) 
     return binop_fvec_instantiate(cl, ac, at);
   else
     return &fts_CannotInstantiate;

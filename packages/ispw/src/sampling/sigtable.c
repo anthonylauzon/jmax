@@ -31,7 +31,7 @@
 #include "fts.h"
 #include "sampbuf.h"
 #include "sampunit.h"
-
+#include "naming.h"
 
 typedef struct{
   long magic;          /* must be equal to SND_MAGIC */
@@ -97,7 +97,7 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   this->name = name;
 
   if (this->name)
-    fts_register_named_object(o, this->name);
+    ispw_register_named_object(o, this->name);
 
   this->check_size = size;
   this->unit = unit;
@@ -111,7 +111,7 @@ sigtable_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_
   sigtable_t *this = (sigtable_t *)o;
 
   if (this->name)
-    fts_unregister_named_object(o, this->name);
+    ispw_unregister_named_object(o, this->name);
 
   if (this->name)
     sampbuf_remove(this->name);

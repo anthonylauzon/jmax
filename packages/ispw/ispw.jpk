@@ -26,7 +26,7 @@
 ## package declaration
 package provide ispw
 
-package require reftype
+package require data
 
 # load the dynamic libraries in FTS
 global jmaxArch jmaxMode

@@ -25,7 +25,6 @@
  */
 
 #include "fts.h"
-#include "refdata.h"
 
 static fts_symbol_t sym_const = 0;
 
@@ -49,8 +48,8 @@ const_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if(ac > 1)
     this->a = at[1];
   
-  if(refdata_atom_is(&this->a))
-    refdata_atom_refer(&this->a);
+  if(fts_is_object(&this->a))
+    fts_refer(&this->a);
 }
 
 static void
@@ -58,8 +57,8 @@ const_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   const_t *this = (const_t *) o;
 
-  if(refdata_atom_is(&this->a))
-    refdata_atom_release(&this->a);
+  if(fts_is_object(&this->a))
+    fts_release(&this->a);
 }
 
 static void
@@ -90,7 +89,7 @@ const_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   if(ac == 2)
     {
-      if(fts_is_atom_array(at + 1))
+      if(fts_is_list(at + 1))
 	{
 	  fts_class_init(cl, sizeof(const_t), 0, 0, 0);
 	  
@@ -103,13 +102,15 @@ const_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	}
       else
 	{
+	  fts_type_t t = fts_get_selector(at + 1);
+
 	  fts_class_init(cl, sizeof(const_t), 1, 1, 0);
 	  
 	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, const_init);
 	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, const_delete);
 	  
 	  fts_method_define_varargs(cl, 0, fts_s_bang, const_bang);
-	  fts_outlet_type_define(cl, 0, fts_get_selector(at + 1), 1, &fts_get_selector(at + 1));
+	  fts_outlet_type_define(cl, 0, fts_get_selector(at + 1), 1, &t);
 	  
 	  fts_class_add_daemon(cl, obj_property_get, fts_s_state, const_get_state);
       

@@ -24,6 +24,7 @@
 #
 
 SOURCES = \
+naming.c \
 at.c \
 bangbang.c \
 change.c \
@@ -35,6 +36,8 @@ gate.c \
 line.c \
 loadbang.c \
 metro.c \
+message.c \
+message_doctor.c \
 nbangs.c \
 pack.c \
 pipe.c \

@@ -25,7 +25,7 @@
 
 SOURCES = $(ARCH_SOURCES) \
 atoms.c		\
-atomarray.c		\
+atomarray.c     \
 classes.c	\
 clipboard.c	\
 doctor.c	\
@@ -36,7 +36,6 @@ ftsdata.c	\
 ftsdataid.c	\
 loader.c	\
 mess.c		\
-naming.c	\
 objects.c	\
 connections.c   \
 messages.c      \

@@ -131,7 +131,7 @@ extern void fprintf_symbol( FILE *file, fts_symbol_t symbol);
 #define fts_t_true fts_s_true
 #define fts_t_false fts_s_false
 #define fts_t_data fts_s_data
-#define fts_t_atom_array fts_s_atom_array
+#define fts_t_list fts_s_list
 
 #endif
 

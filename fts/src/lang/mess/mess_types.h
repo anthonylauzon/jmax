@@ -307,7 +307,10 @@ struct fts_object
   fts_connection_t **out_conn;
 
   /* object dynamic properties */
-  fts_plist_t *properties;	
+  fts_plist_t *properties;
+
+  /* reference counter */
+  int refcnt;
 };
 
 /* Commodity structure to keep a list of objects */
@@ -379,18 +382,15 @@ struct fts_patcher
 struct fts_inlet
 {
   fts_object_t o;
-
-  int          position;	/* inlet position */
-  struct fts_inlet *next;	/* next inlet in the same position */
+  int position; /* inlet position */
+  struct fts_inlet *next; /* next inlet in the same position */
 };
 
-   
 struct fts_outlet
 {
   fts_object_t o;		
-
-  int          position;	/* outlet position */
-  struct fts_outlet *next;	/* next outlet in the same position */
+  int position; /* outlet position */
+  struct fts_outlet *next; /* next outlet in the same position */
 };
 
 

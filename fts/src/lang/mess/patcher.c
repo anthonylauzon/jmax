@@ -55,10 +55,12 @@ rewritten, i am afraid :-< ).
 #include "sys.h"
 #include "lang.h"
 #include "lang/mess/messP.h"
+#include "lang/mess/objects.h"
 #include "runtime/client.h"
 #include "runtime/files.h"
 
 fts_metaclass_t *patcher_metaclass;
+fts_class_t *patcher_class;
 fts_metaclass_t *inlet_metaclass;
 fts_metaclass_t *outlet_metaclass;
 
@@ -212,9 +214,7 @@ static void inlet_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
   if (pos == -2)
     {
-      /* OFF inlets: inlet will be
-	 redefined later (.pat parsing).
-       */
+      /* OFF inlets: inlet will be redefined later (.pat parsing) */
       return;
     }
   else if (pos == -1)
@@ -686,6 +686,9 @@ static void patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   fts_atom_t va;
   fts_patcher_t *this = (fts_patcher_t *) o;
   
+  ac--;
+  at++;
+
   /* allocate the data */
   this->data = fts_patcher_data_new(this);
 
@@ -693,10 +696,10 @@ static void patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   fts_patcher_set_standard(this);
 
   /* Define the "args" variable */
-  this->args = (fts_data_t *)fts_atom_array_new(ac - 1, at + 1);
+  this->args = (fts_data_t *)fts_list_new(ac, at);
 
   fts_variable_define(this, fts_s_args);
-  fts_set_atom_array(&va, this->args);
+  fts_set_list(&va, this->args);
   fts_variable_restore(this, fts_s_args, &va, o);
 
   /* should use block allocation ?? */
@@ -705,9 +708,9 @@ static void patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   if (ninlets > 0)
     {
-      this->inlets  = (fts_inlet_t **)  fts_block_alloc(sizeof(fts_inlet_t *) * ninlets);
+      this->inlets = (fts_inlet_t **)fts_block_alloc(sizeof(fts_inlet_t *) * ninlets);
 
-      for (i = 0; i < ninlets; i++)
+      for (i=0; i<ninlets; i++)
 	this->inlets[i] = 0;
     }
   else
@@ -717,14 +720,14 @@ static void patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
     {
       this->outlets = (fts_outlet_t **) fts_block_alloc(sizeof(fts_outlet_t *) * noutlets);
 
-      for (i = 0; i < noutlets; i++)
+      for (i=0; i<noutlets; i++)
 	this->outlets[i] = 0;
     }
   else
     this->outlets = 0;
 
   this->objects = (fts_object_t *) 0;
-  this->open    = 0;		/* start as closed */
+  this->open = 0; /* start as closed */
   this->deleted = 0;
 }
 
@@ -758,31 +761,20 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   /* Set the deleted and reset the open flag */
   this->deleted = 1;
-  this->open    = 0;
-
-  /*
-   * delete its content; each destroied object will take away himself
-   * from the list, including inlets and outlets; this will undo the
-   * connections also to the inlets and outlets.
-   */
+  this->open = 0;
 
   while (this->objects)
     {
-      /* find last */
+      /* find last object in patcher */
       p = this->objects;
-
       while (p->next_in_patcher)
 	p = p->next_in_patcher;
 
-      /* Delete it */
-      fts_object_delete(p);
-
-      /* Restart all over again; slow
-	 but needed, see comment before the function */
+      fts_object_delete_from_patcher(p);
     }
 
-  /* Delete all the variables */
-  fts_atom_array_delete((fts_atom_array_t *)this->args);
+  /* delete all the variables */
+  fts_list_delete((fts_list_t *)this->args);
   fts_variables_undefine(this, (fts_object_t *)this);
 
   /* delete the inlets and inlets tables */
@@ -1246,14 +1238,14 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
       fts_object_put_prop(obj, fts_s_error, &a);
 
       /* reallocate the atom array */
-      fts_atom_array_delete((fts_atom_array_t *)this->args);
+      fts_list_delete((fts_list_t *)this->args);
 
-      this->args = (fts_data_t *)fts_atom_array_new(ac - 1, at + 1);
+      this->args = (fts_data_t *)fts_list_new(ac - 1, at + 1);
 
       /* set the new variables */
       fts_expression_map_to_assignements(e, fts_patcher_assign_variable, (void *) this);
 
-      fts_set_atom_array(&a, this->args);
+      fts_set_list(&a, this->args);
       fts_variable_restore(this, fts_s_args, &a, obj);
 
       /* register the patcher as user of the used variables */
@@ -1507,8 +1499,6 @@ void fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj)
 {
   fts_object_t **p; /* indirect precursor */
 
-  obj->patcher = this;
-
   for (p = &(this->objects); *p; p = &((*p)->next_in_patcher))
     {
     }
@@ -1518,13 +1508,12 @@ void fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj)
 
 void fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj)
 {
-  fts_object_t **p;		/* indirect precursor */
+  fts_object_t **p; /* indirect precursor */
 
   for (p = &(this->objects); *p; p = &((*p)->next_in_patcher))
     if (*p == obj)
       {
 	*p = obj->next_in_patcher;
-	obj->patcher = 0;
 	return;
       }
 }
@@ -1730,6 +1719,7 @@ static void internal_patcher_config(void)
 {
   fts_metaclass_install(fts_s_patcher, patcher_instantiate, fts_arg_equiv);
   patcher_metaclass = fts_metaclass_get_by_name(fts_s_patcher);
+  patcher_class = fts_class_get_by_name(fts_s_patcher);
 }
 
 
@@ -1741,20 +1731,20 @@ static fts_patcher_t *fts_root_patcher;
 
 void fts_create_root_patcher()
 {
-  fts_atom_t description[2];
+  fts_atom_t a[1];
   fts_object_t *patcher;
 
-  fts_set_symbol(&description[0], fts_s_patcher);
-  fts_set_symbol(&description[1], fts_new_symbol("root"));
+  fts_set_symbol(a, fts_new_symbol("root"));
 
-  fts_root_patcher = (fts_patcher_t *) fts_eval_object_description((fts_patcher_t *)0, 2, description);
+  fts_root_patcher = (fts_patcher_t *)fts_object_create(patcher_class, 1, a);
+  /*fts_eval_object_description((fts_patcher_t *)0, 2, description);*/
 
   fts_object_set_id((fts_object_t *)fts_root_patcher, 1);
 }
 
 static void fts_delete_root_patcher(void)
 {
-  fts_object_delete((fts_object_t *) fts_root_patcher);
+  fts_object_destroy((fts_object_t *)fts_root_patcher);
 }
 
 fts_patcher_t *fts_get_root_patcher(void)
@@ -1773,7 +1763,7 @@ static fts_object_t *patcher_doctor(fts_patcher_t *patcher, int ac, const fts_at
   if (ac >= 2)
     {
       a[1] = at[1];
-      fts_object_new(patcher, 2, a, &obj);
+      fts_object_new_to_patcher(patcher, 2, a, &obj);
       fts_object_set_description(obj, 2, a);
 
       if (ac >= 3)
@@ -1783,7 +1773,7 @@ static fts_object_t *patcher_doctor(fts_patcher_t *patcher, int ac, const fts_at
 	fts_object_put_prop(obj, fts_s_noutlets, &at[3]);
     }
   else
-    fts_object_new(patcher, 1, at , &obj);
+    fts_object_new_to_patcher(patcher, 1, at , &obj);
 
   return obj;
 }
@@ -1805,7 +1795,3 @@ fts_patcher_shutdown(void)
 {
   fts_delete_root_patcher();
 }
-
-
-
-

@@ -27,6 +27,7 @@ JMAXDISTDIR = ../../../..
 PACKAGEROOT = ..
 PACKAGELIB=$(LIBDIR)/libguiobj.so
 
-MODULE_CFLAGS=-I$(PACKAGEROOT)/../../reftype/c/src
+# for the message box' remote send naming
+MODULE_CFLAGS=-I../../../ispw/src/control/
 
 include $(JMAXDISTDIR)/Makefiles/Makefile.package

@@ -27,4 +27,6 @@ JMAXDISTDIR = ../../../..
 PACKAGEROOT = ../..
 PACKAGELIB=$(LIBDIR)/libsampling.so
 
+MODULE_CFLAGS=-I../../../ispw/src/control/
+
 include $(JMAXDISTDIR)/Makefiles/Makefile.package

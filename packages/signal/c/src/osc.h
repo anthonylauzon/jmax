@@ -31,7 +31,7 @@
 #define OSC_TABLE_SIZE 512
 
 #include "fts.h"
-#include "floatvec.h"
+#include "fvec.h"
 
 struct osc_ftl_symbols
 {
@@ -58,7 +58,7 @@ extern void osc_data_set_factor(ftl_data_t ftl_data, double factor);
 extern void osc_data_set_incr(ftl_data_t ftl_data, double freq);
 extern void osc_data_set_phase(ftl_data_t ftl_data, double phase);
 
-extern void osc_data_set_fvec(ftl_data_t ftl_data, float_vector_t *fvec);
+extern void osc_data_set_fvec(ftl_data_t ftl_data, fvec_t *fvec);
 extern void osc_data_set_ptr(ftl_data_t ftl_data, float *ptr);
 
 extern void osc_declare_functions(void);

@@ -24,8 +24,6 @@
 ;; package declaration
 (provide-package "system" "0.0.0")
 
-(require-package "reftype" "0.0.0")
-
 ; load dynamic libraries into the server
 (ucs "load" "module" "system" (file-cat dir "c" "lib" jmax-arch jmax-mode "libsystem.so"))
 

@@ -29,8 +29,7 @@
 #include "fts.h"
 #include "vexp.h"
 #include "vexp_util.h"
-
-#include "table.h"	
+#include "ivec.h"
 
 #define	MAXBUF	256
 
@@ -49,11 +48,13 @@
 int
 max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *optr)
 {
-  int_vector_t *tw = 0;
+  fts_object_t *obj = ispw_get_object_by_name(s);
+  ivec_t *tw = 0;
   long i;
   float rest;
   
-  tw = table_int_vector_get_by_name(s);
+  if(obj && (fts_object_get_class_name(obj) == ivec_symbol))
+    tw = (ivec_t *)obj;
 
   if (! tw)
     {
@@ -65,7 +66,7 @@ max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *op
 
   optr->ex_type = ET_INT;
 
-  if (! int_vector_get_size(tw)) {
+  if (! ivec_get_size(tw)) {
     optr->ex_int = 0;
     return (0);
   } 
@@ -73,15 +74,15 @@ max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *op
   switch (arg->ex_type) {
   case ET_INT:
 
-    optr->ex_int =  int_vector_get_element(tw, arg->ex_int % int_vector_get_size(tw)); 
+    optr->ex_int =  ivec_get_element(tw, arg->ex_int % ivec_get_size(tw)); 
     break;
   case ET_FLT:
     /* CHANGE are we zero based or one based? */
 
-    i = (int)arg->ex_flt % int_vector_get_size(tw); 
+    i = (int)arg->ex_flt % ivec_get_size(tw); 
 
-    optr->ex_int =  int_vector_get_element(tw,i);
-    if (i  == int_vector_get_size(tw) - 1)
+    optr->ex_int =  ivec_get_element(tw,i);
+    if (i  == ivec_get_size(tw) - 1)
       break;
 
     /*
@@ -89,7 +90,7 @@ max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *op
      * the table do a interpolation with the fraction 
      */
     rest = arg->ex_flt - (int)arg->ex_flt;
-    optr->ex_int+=(int) ((float)(int_vector_get_element(tw,i)- int_vector_get_element(tw,i+1))*rest);
+    optr->ex_int+=(int) ((float)(ivec_get_element(tw,i)- ivec_get_element(tw,i+1))*rest);
     break;
 
   default:	/* do something with strings */
@@ -99,6 +100,16 @@ max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *op
   return (0);
 }
 
+ivec_t *
+ex_get_ivec_by_name(fts_symbol_t name)
+{  
+  fts_object_t *obj = ispw_get_object_by_name(name);
+
+  if(obj && (fts_object_get_class_name(obj) == ivec_symbol))
+    return (ivec_t *)obj;
+  else
+    return 0;
+}
 
 int ex_getsym(char *p, fts_symbol_t *s)
 {
@@ -215,10 +226,3 @@ argstostr(int argc, const fts_atom_t *argv, char *buf, int size)
       argv++;
     }
 }
-
-
-
-
-
-
-

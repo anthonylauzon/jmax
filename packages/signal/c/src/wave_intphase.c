@@ -61,7 +61,7 @@ wave_ftl_outplace_fvec(fts_word_t *argv)
   float * restrict in = (float *) fts_word_get_ptr(argv + 1);
   float * restrict out = (float *) fts_word_get_ptr(argv + 2);
   int n_tick = fts_word_get_int(argv + 3);
-  float *buf = float_vector_get_ptr(data->table.fvec);
+  float *buf = fvec_get_ptr(data->table.fvec);
   int i;
 
   for(i=0; i<n_tick; i++)
@@ -99,7 +99,7 @@ wave_ftl_inplace_fvec(fts_word_t *argv)
   wave_data_t *data = (wave_data_t *)fts_word_get_ptr(argv + 0);
   float * restrict sig = (float *) fts_word_get_ptr(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
-  float *buf = float_vector_get_ptr(data->table.fvec);
+  float *buf = fvec_get_ptr(data->table.fvec);
   int i;
 
   for(i=0; i<n_tick; i++)

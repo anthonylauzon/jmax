@@ -29,12 +29,11 @@
 ##
 
 # new classes
-# load gui server side objects
 package require data
-
 package require control
 package require mess
 package require numeric
+package require math
 package require lists
 package require midi
 package require sequence
@@ -46,7 +45,6 @@ package require ispwmath
 package require table
 package require qlist
 package require explode
-
 
 # I/O package
 package require io

@@ -1103,7 +1103,7 @@ public class FtsParse
   
   
   /*  Unparse a description passed as a array of FtsAtom */
-  static String unparseArguments(int nArgs, FtsAtom args[])
+  static public String unparseArguments(int nArgs, FtsAtom args[])
   {
     if (nArgs > 0)
       {

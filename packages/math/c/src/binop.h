@@ -2,26 +2,8 @@
 #define _BINOP_H_
 
 #include "fts.h"
-#include "intvec.h"
-#include "floatvec.h"
-
-typedef struct
-{
-  fts_object_t o;
-  fts_symbol_t right;
-} binop_symbol_t;
-
-typedef struct
-{
-  fts_object_t o;
-  int_vector_t *right;
-} binop_int_vector_t;
-
-typedef struct
-{
-  fts_object_t o;
-  float_vector_t *right;
-} binop_float_vector_t;
+#include "ivec.h"
+#include "fvec.h"
 
 extern fts_symbol_t math_sym_add;
 extern fts_symbol_t math_sym_sub;

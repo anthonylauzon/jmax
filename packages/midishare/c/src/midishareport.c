@@ -31,6 +31,8 @@
 #define SYSEX_REALTIME 0x7f
 
 static union magic{char word[4]; void *ptr;} jmax_magic = {{'j', 'm', 'a', 'x'}};
+static fts_symbol_t midishareport_symbol = 0;
+static fts_class_t *midishareport_class = 0;
 
 /*************************************************
  *
@@ -414,13 +416,10 @@ midishareport_get_default(void)
 {
   if(!midishareport_default && fts_midi_hack_default_device_name)
     {
-      fts_atom_t a[2];
+      fts_atom_t a[1];
       
-      post("create SGI default MIDI port: %s\n", fts_symbol_name(fts_midi_hack_default_device_name));
-
-      fts_set_symbol(a + 0, fts_new_symbol("midishareport"));
-      fts_set_symbol(a + 1, fts_midi_hack_default_device_name);
-      fts_object_new(0, 2, a, (fts_object_t **)&midishareport_default);
+      fts_set_symbol(a, fts_midi_hack_default_device_name);
+      midishareport_default = (fts_midiport_t *)fts_object_create(midishareport_class, 1, a);
     }
 
   return (fts_midiport_t *)midishareport_default;
@@ -533,11 +532,14 @@ midishareport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 midishareport_config(void)
 {
+  midishareport_symbol = fts_new_symbol("midishareport");
+
   fts_midiport_set_default_function(midishareport_get_default);
 
   fts_hash_table_init(&midishare_reference_table);
 
-  fts_metaclass_install(fts_new_symbol("midishareport"), midishareport_instantiate, midishareport_equiv);
+  fts_metaclass_install(midishareport_symbol, midishareport_instantiate, midishareport_equiv);
+  midishareport_class = fts_class_get_by_name(midishareport_symbol);
 }
 
 void

@@ -384,7 +384,7 @@ eventtrk_remove_events_by_client_request(fts_object_t *o, int winlet, fts_symbol
 	  fts_object_t *event = fts_get_object(at + i);
 	  
 	  eventtrk_remove_event(this, (event_t *)event);
-	  fts_object_delete((fts_object_t *)event);
+	  fts_object_release((fts_object_t *)event);
 	}
     }
 }
@@ -505,7 +505,7 @@ eventtrk_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	  event_t *next = event_get_next(event);
 	  
 	  eventtrk_remove_event(this, event);
-	  fts_object_delete((fts_object_t *)event);
+	  fts_object_release((fts_object_t *)event);
 	  
 	  event = next;
 	}      
@@ -650,7 +650,7 @@ eventtrk_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     {
       event_t *next = event_get_next(event);
 
-      fts_object_delete((fts_object_t *)event);
+      fts_object_release((fts_object_t *)event);
       
       event = next;
     }

@@ -27,7 +27,8 @@
 #include <math.h>
 
 #include "fts.h"
-#include "table.h"
+#include "naming.h"
+#include "ivec.h"
 
 #define funbuff_first(FB) (FB)->head.next
   
@@ -794,17 +795,19 @@ static void
 funbuff_interptab(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   funbuff_t *this = (funbuff_t *)o;
+  int xn  = fts_get_long(at + 0);
+  fts_symbol_t sym = fts_get_symbol(at + 1);
   struct zll *z;
-  fts_symbol_t sym;
-  long xn, x1, x2, tab_domain, tab_range, tab_x, tab_y;
+  long x1, x2, tab_domain, tab_range, tab_x, tab_y;
   long  low = 0, high = 0;
-  int_vector_t *tab = 0;
+  ivec_t *tab = 0;
+  fts_object_t *obj;
   
-  xn  = fts_get_long(at);
-  sym = fts_get_symbol(at + 1);
+  obj = ispw_get_object_by_name(sym);
 
-  tab = table_int_vector_get_by_name(sym);
-
+  if(obj && (fts_object_get_class_name(obj) == ivec_symbol))
+    tab = (ivec_t *)obj;
+  
   if (! tab)
     {
       post("funbuff interptab: %s is not a known table\n", fts_symbol_name(sym));
@@ -828,9 +831,9 @@ funbuff_interptab(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       return;
     }
 
-  tab_domain = int_vector_get_size(tab);
-  low  = int_vector_get_min_value(tab);
-  high = int_vector_get_max_value(tab);
+  tab_domain = ivec_get_size(tab);
+  low  = ivec_get_min_value(tab);
+  high = ivec_get_max_value(tab);
   tab_range = high - low;
 
   if (tab_range == 0)
@@ -843,7 +846,7 @@ funbuff_interptab(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   x2 = z->next->x;
 
   tab_x = tab_domain * ((xn - x1) / (float)(x2 - x1));
-  tab_y = int_vector_get_element(tab, tab_x) - low;
+  tab_y = ivec_get_element(tab, tab_x) - low;
   xn = z->y + (z->next->y - z->y) * (float)tab_y / tab_range;
 
   fts_outlet_int((fts_object_t *)this, 0, xn);			
@@ -1201,12 +1204,3 @@ funbuff_config(void)
 {
   fts_class_install(fts_new_symbol("funbuff"),funbuff_instantiate);
 }
-
-
-
-
-
-
-
-
-

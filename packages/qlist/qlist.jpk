@@ -26,6 +26,8 @@
 ## package declaration
 package provide qlist
 
+package require ispw
+
 # load server module
 global jmaxArch jmaxMode
 ucs load module qlist $dir/c/lib/$jmaxArch/$jmaxMode/libqlist.so

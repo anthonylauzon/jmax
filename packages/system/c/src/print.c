@@ -26,10 +26,6 @@
 
 #include <string.h>
 #include "fts.h"
-#include "vector.h"
-#include "intvec.h"
-#include "floatvec.h"
-#include "matrix.h"
 
 typedef struct {
   fts_object_t o;
@@ -84,141 +80,40 @@ print_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   print_t *this = (print_t *)o;
 
   post("%s: ", fts_symbol_name(this->prompt));
-
+  
   if(ac == 0)
-    post("<%s>\n", fts_symbol_name(s));
+    {
+      post("<%s>\n", fts_symbol_name(s));
+      
+      return;
+    }
+  else if(ac == 1 && fts_is_object(at))
+    {
+      fts_object_t *obj = fts_get_object(at);
+
+      if(s == fts_object_get_class_name(obj))
+	{
+	  post("<%s>", fts_symbol_name(s));
+
+	  if(fts_send_message(obj, fts_SystemInlet, fts_s_print, 0, 0) != fts_Success)
+	    post("?");
+      
+	  post("\n");
+
+	  return;
+	}
+    }
   else if(ac == 1 && s == fts_get_selector(at))
     {
       post_atoms(1, at);
       post("\n");
-    }
-  else
-    {
-      post("<%s> ", fts_symbol_name(s));
-      post_atoms(ac, at);
-      post("\n");
-    }
-}
 
-static void
-print_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  print_t *this = (print_t *)o;
-  vector_t *vec = vector_atom_get(at);
-
-  post("%s: <vec> {", fts_symbol_name(this->prompt));
-  post_atoms(vector_get_size(vec), vector_get_ptr(vec));
-  post("}\n");
-}
-
-static void
-print_int_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  print_t *this = (print_t *)o;
-  int_vector_t *ivec = int_vector_atom_get(at);
-  int size = int_vector_get_size(ivec);
-
-  post("%s: <ivec> {", fts_symbol_name(this->prompt));
-
-  if(size > 8)
-    {
-      int size8 = (size / 8) * 8;
-      int i, j;
-
-      for(i=0; i<size8; i+=8)
-	{
-	  /* print one line of 8 with indent */
-	  post("\n  ");
-	  for(j=0; j<8; j++)
-	    post("%d ", int_vector_get_element(ivec, i + j));
-	}
-	  
-      /* print last line with indent */
-      if(i < size)
-	{
-	  post("\n  ");
-	  for(; i<size; i++)
-	    post("%d ", int_vector_get_element(ivec, i));
-	}
-
-      post("\n}\n");
-    }
-  else if(size > 0)
-    {
-      int i;
-      
-      for(i=0; i<size-1; i++)
-	post("%d ", int_vector_get_element(ivec, i));
-
-      post("%d}\n", int_vector_get_element(ivec, size - 1));
-    }
-  else
-    post("}\n");
-}
-
-static void
-print_float_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  print_t *this = (print_t *)o;
-  float_vector_t *fvec = float_vector_atom_get(at);
-  int size = float_vector_get_size(fvec);
-  int i;
-
-  post("%s: <fvec> {", fts_symbol_name(this->prompt));
-
-  if(size > 8)
-    {
-      int size8 = (size / 8) * 8;
-      int i, j;
-
-      for(i=0; i<size8; i+=8)
-	{
-	  /* print one line of 8 with indent */
-	  post("\n  ");
-	  for(j=0; j<8; j++)
-	    post("%f ", float_vector_get_element(fvec, i + j));
-	}
-	  
-      /* print last line with indent */
-      if(i < size)
-	{
-	  post("\n  ");
-	  for(; i<size; i++)
-	    post("%f ", float_vector_get_element(fvec, i));
-	}
-
-      post("\n}\n");
-    }
-  else if(size)
-    {
-      for(i=0; i<size-1; i++)
-	post("%f ", float_vector_get_element(fvec, i));
-
-      post("%f}\n", float_vector_get_element(fvec, size - 1));
-    }
-  else
-    post("}\n");
-}
-
-static void
-print_matrix(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  print_t *this = (print_t *)o;
-  matrix_t *mat = matrix_atom_get(at);
-  int m = matrix_get_m(mat);
-  int n = matrix_get_n(mat);
-  int i;
-  
-  post("%s: <mat> {", fts_symbol_name(this->prompt));
-
-  for(i=0; i<m; i++)
-    {
-      post("{");
-      post_atoms(n, matrix_get_row(mat, i));
-      post("}");
+      return;
     }
 
-  post("}\n");
+  post("<%s> ", fts_symbol_name(s));
+  post_atoms(ac, at);
+  post("\n");
 }
 
 /**********************************************************************
@@ -241,11 +136,6 @@ print_instantiate(fts_class_t *cl, int ac, const fts_atom_t *aat)
   fts_method_define_varargs(cl, 0, fts_s_bang, print_bang);
   fts_method_define_varargs(cl, 0, fts_s_list, print_list);
   fts_method_define_varargs(cl, 0, fts_s_anything, print_anything);
-
-  fts_method_define_varargs(cl, 0, vector_symbol, print_vector);
-  fts_method_define_varargs(cl, 0, int_vector_symbol, print_int_vector);
-  fts_method_define_varargs(cl, 0, float_vector_symbol, print_float_vector);
-  fts_method_define_varargs(cl, 0, matrix_symbol, print_matrix);
 
   return fts_Success;
 }

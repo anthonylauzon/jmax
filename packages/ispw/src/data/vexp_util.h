@@ -25,7 +25,7 @@
  */
 
 
-/* #include "binbuf.h" */
+#include "ivec.h"
 
 #define	MAXBUF	256
 
@@ -33,6 +33,7 @@ extern void *tabwind_class;
 extern int max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *optr);
 extern int ex_getsym(char *p, fts_symbol_t *s);
 extern const char *ex_symname(fts_symbol_t s);
+extern ivec_t *ex_get_ivec_by_name(fts_symbol_t name);
 
 extern void argstostr(int argc, const fts_atom_t *argv, char *buf, int size);
 

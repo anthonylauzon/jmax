@@ -26,6 +26,8 @@
 
 #include "fts.h"
 
+extern void ispw_naming_init(void);
+
 extern void at_config(void);
 extern void bangbang_config(void);
 extern void change_config(void);
@@ -35,6 +37,8 @@ extern void drunk_config(void);
 extern void gate_config(void);
 extern void line_config(void);
 extern void loadbang_config(void);
+extern void messbox_config(void);
+extern void messbox_doctor_init(void);
 extern void metro_config(void);
 extern void nbangs_config(void);
 extern void pack_config(void);
@@ -60,10 +64,11 @@ extern void logscale_config(void);
 extern void mtof_config(void);
 extern void scale_config(void);
 
-
 static void
 ispw_control_module_init(void)
 {
+  ispw_naming_init();
+
   at_config();
   bangbang_config();
   change_config();
@@ -73,6 +78,8 @@ ispw_control_module_init(void)
   gate_config();
   line_config();
   loadbang_config();
+  messbox_config();
+  messbox_doctor_init();
   metro_config();
   nbangs_config();
   pack_config();

@@ -608,10 +608,10 @@ public class FtsObject
    * @param className the class name or null
    * @param description the object description
    */
-    protected FtsObject(Fts fts, FtsObject parent, String variableName, String className, String description)
+  protected FtsObject(Fts fts, FtsObject parent, String variableName, String className, String description)
   {
     //super();
-
+    
     this.fts = fts;
     this.parent = parent;
 

@@ -59,7 +59,7 @@ fts_object_t *fts_error_object_new(fts_patcher_t *parent, int ac, const fts_atom
 
   fts_set_symbol(&description[0], fts_s_patcher);
 
-  fts_object_new(parent, 1, description, &obj);
+  fts_object_new_to_patcher(parent, 1, description, &obj);
 
   /* flag the patcher as error */
 

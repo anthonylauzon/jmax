@@ -11,6 +11,6 @@ public class FtsBpfObjectCreator implements FtsObjectCreator
 {
   public FtsObject createInstance(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
   {
-    return new FtsBpfObject(fts, parent, variable, className);
+    return new FtsBpfObject(fts, parent, variable, className, nArgs, args);
   }
 }

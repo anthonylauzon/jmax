@@ -55,7 +55,6 @@ extern fts_module_t fts_mess_module;
 #include "mess/patparser.h"
 #include "mess/patlex.h"
 #include "mess/patabs.h"
-#include "mess/naming.h"
 #include "mess/doctor.h"
 #include "mess/expressions.h"
 #include "mess/templates.h"

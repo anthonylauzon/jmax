@@ -26,8 +26,8 @@
 
 #include "fts.h"
 #include "binop.h"
-#include "intvec.h"
-#include "floatvec.h"
+#include "ivec.h"
+#include "fvec.h"
 
 /**************************************************************************************
  *
@@ -38,9 +38,9 @@
 typedef struct
 {
   fts_object_t o;
-  float_vector_t *right;
+  fvec_t *right;
   float number;
-  float_vector_t *res;
+  fvec_t *res;
   fts_atom_t out;
 } binop_fvec_t;
 
@@ -50,10 +50,10 @@ binop_fvec_init_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   binop_fvec_t *this = (binop_fvec_t *)o;
 
   this->number = fts_get_number_float(at + 1);
-  this->res = float_vector_atom_get(at + 2);
-  float_vector_refer(this->res);
+  this->res = fvec_atom_get(at + 2);
+  fts_object_refer((fts_object_t *)this->res);
 
-  float_vector_atom_set(&this->out, this->res);
+  fvec_atom_set(&this->out, this->res);
 }
 
 static void
@@ -61,12 +61,12 @@ binop_fvec_init_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
 
-  this->right = float_vector_atom_get(at + 1);
-  this->res = float_vector_atom_get(at + 2);
-  float_vector_refer(this->right);
-  float_vector_refer(this->res);
+  this->right = fvec_atom_get(at + 1);
+  this->res = fvec_atom_get(at + 2);
+  fts_object_refer((fts_object_t *)this->right);
+  fts_object_refer((fts_object_t *)this->res);
 
-  float_vector_atom_set(&this->out, this->res);
+  fvec_atom_set(&this->out, this->res);
 }
 
 static void
@@ -74,7 +74,7 @@ binop_fvec_delete_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
 
-  float_vector_release(this->res);
+  fts_object_release((fts_object_t *)this->res);
 }
 
 static void
@@ -82,8 +82,8 @@ binop_fvec_delete_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
 
-  float_vector_release(this->right);
-  float_vector_release(this->res);
+  fts_object_release((fts_object_t *)this->right);
+  fts_object_release((fts_object_t *)this->res);
 }
 
 /**************************************************************************************
@@ -104,25 +104,25 @@ static void
 binop_fvec_set_right_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *right = float_vector_atom_get(at);
+  fvec_t *right = fvec_atom_get(at);
 
-  float_vector_release(this->right);
+  fts_object_release((fts_object_t *)this->right);
   this->right = right;
-  float_vector_refer(right);
+  fts_object_refer((fts_object_t *)right);
 }
 
 static void
 binop_fvec_set_result(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *res = float_vector_atom_get(at);
+  fvec_t *res = fvec_atom_get(at);
 
-  float_vector_release(this->res);
+  fts_object_release((fts_object_t *)this->res);
 
   this->res = res;
-  float_vector_refer(res);
+  fts_object_refer((fts_object_t *)res);
 
-  float_vector_atom_set(&this->out, res);
+  fvec_atom_set(&this->out, res);
 }
 
 /**************************************************************************************
@@ -137,298 +137,338 @@ static void
 binop_fvec_add_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *vec = float_vector_atom_get(at);
+  fvec_t *vec = fvec_atom_get(at);
   float right = this->number;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float left = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left + right);
+      float left = fvec_get_element(vec, i);
+      fvec_set_element(res, i, left + right);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_sub_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *vec = float_vector_atom_get(at);
+  fvec_t *vec = fvec_atom_get(at);
   float right = this->number;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float left = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left - right);
+      float left = fvec_get_element(vec, i);
+      fvec_set_element(res, i, left - right);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_mul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *vec = float_vector_atom_get(at);
+  fvec_t *vec = fvec_atom_get(at);
   float right = this->number;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float left = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left * right);
+      float left = fvec_get_element(vec, i);
+      fvec_set_element(res, i, left * right);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_div_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *vec = float_vector_atom_get(at);
+  fvec_t *vec = fvec_atom_get(at);
   float right = this->number;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
 
-  for(i=0; i<size; i++)
+  if(res_size < size)
+    fvec_set_size(res, size);
+
+  if(right != 0.0)
     {
-      float left = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left / right);
+      for(i=0; i<size; i++)
+	{
+	  float left = fvec_get_element(vec, i);
+	  fvec_set_element(res, i, left / right);
+	}
+    }
+  else
+    {
+      for(i=0; i<size; i++)
+	fvec_set_element(res, i, 0.0);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_bus_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *vec = float_vector_atom_get(at);
+  fvec_t *vec = fvec_atom_get(at);
   float right = this->number;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float left = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, right - left);
+      float left = fvec_get_element(vec, i);
+      fvec_set_element(res, i, right - left);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_vid_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *vec = float_vector_atom_get(at);
+  fvec_t *vec = fvec_atom_get(at);
   float right = this->number;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float left = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, right / left);
+      float left = fvec_get_element(vec, i);
+      
+      if(left != 0.0)
+	fvec_set_element(res, i, right / left);
+      else
+	fvec_set_element(res, i, 0.0);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
-/* float_vector x number comparison */
+/* fvec x number comparison */
 
 static void
 binop_fvec_ee_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *vec = float_vector_atom_get(at);
+  fvec_t *vec = fvec_atom_get(at);
   float right = this->number;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float left = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left == right);
+      float left = fvec_get_element(vec, i);
+      fvec_set_element(res, i, left == right);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_ne_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *vec = float_vector_atom_get(at);
+  fvec_t *vec = fvec_atom_get(at);
   float right = this->number;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float left = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left != right);
+      float left = fvec_get_element(vec, i);
+      fvec_set_element(res, i, left != right);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_gt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *vec = float_vector_atom_get(at);
+  fvec_t *vec = fvec_atom_get(at);
   float right = this->number;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float left = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left > right);
+      float left = fvec_get_element(vec, i);
+      fvec_set_element(res, i, left > right);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_ge_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *vec = float_vector_atom_get(at);
+  fvec_t *vec = fvec_atom_get(at);
   float right = this->number;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float left = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left >= right);
+      float left = fvec_get_element(vec, i);
+      fvec_set_element(res, i, left >= right);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_lt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *vec = float_vector_atom_get(at);
+  fvec_t *vec = fvec_atom_get(at);
   float right = this->number;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float left = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left < right);
+      float left = fvec_get_element(vec, i);
+      fvec_set_element(res, i, left < right);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_le_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *vec = float_vector_atom_get(at);
+  fvec_t *vec = fvec_atom_get(at);
   float right = this->number;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float left = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left <= right);
+      float left = fvec_get_element(vec, i);
+      fvec_set_element(res, i, left <= right);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
-/* float_vector x number min/max */
+/* fvec x number min/max */
 
 static void
 binop_fvec_min_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *vec = float_vector_atom_get(at);
+  fvec_t *vec = fvec_atom_get(at);
   float right = this->number;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
       
+  if(res_size < size)
+    fvec_set_size(res, size);
+
   for(i=0; i<size; i++)
     {
-      float left = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, (right <= left)? right: left);
+      float left = fvec_get_element(vec, i);
+      fvec_set_element(res, i, (right <= left)? right: left);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_max_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *vec = float_vector_atom_get(at);
+  fvec_t *vec = fvec_atom_get(at);
   float right = this->number;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
       
+  if(res_size < size)
+    fvec_set_size(res, size);
+
   for(i=0; i<size; i++)
     {
-      float left = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, (right >= left)? right: left);
+      float left = fvec_get_element(vec, i);
+      fvec_set_element(res, i, (right >= left)? right: left);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 /**************************************************************************************
@@ -442,132 +482,160 @@ void
 binop_fvec_add_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *left = float_vector_atom_get(at);
-  float_vector_t *right = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(left);
-  int right_size = float_vector_get_size(right);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= right_size)? ((left_size <= res_size)? left_size: res_size): ((right_size <= res_size)? right_size: res_size);
-  float *l = float_vector_get_ptr(left);
-  float *r = float_vector_get_ptr(right);
-  float *x = float_vector_get_ptr(res);
+  fvec_t *left = fvec_atom_get(at);
+  fvec_t *right = this->right;
+  fvec_t *res = this->res;
+  int left_size = fvec_get_size(left);
+  int right_size = fvec_get_size(right);
+  int res_size = fvec_get_size(res);
+  int size = (left_size <= right_size)? left_size: right_size;
+  float *l = fvec_get_ptr(left);
+  float *r = fvec_get_ptr(right);
+  float *x = fvec_get_ptr(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     x[i] = l[i] + r[i];
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_sub_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *left = float_vector_atom_get(at);
-  float_vector_t *right = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(left);
-  int right_size = float_vector_get_size(right);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= right_size)? ((left_size <= res_size)? left_size: res_size): ((right_size <= res_size)? right_size: res_size);
-  float *l = float_vector_get_ptr(left);
-  float *r = float_vector_get_ptr(right);
-  float *x = float_vector_get_ptr(res);
+  fvec_t *left = fvec_atom_get(at);
+  fvec_t *right = this->right;
+  fvec_t *res = this->res;
+  int left_size = fvec_get_size(left);
+  int right_size = fvec_get_size(right);
+  int res_size = fvec_get_size(res);
+  int size = (left_size <= right_size)? left_size: right_size;
+  float *l = fvec_get_ptr(left);
+  float *r = fvec_get_ptr(right);
+  float *x = fvec_get_ptr(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     x[i] = l[i] - r[i];
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_mul_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *left = float_vector_atom_get(at);
-  float_vector_t *right = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(left);
-  int right_size = float_vector_get_size(right);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= right_size)? ((left_size <= res_size)? left_size: res_size): ((right_size <= res_size)? right_size: res_size);
-  float *l = float_vector_get_ptr(left);
-  float *r = float_vector_get_ptr(right);
-  float *x = float_vector_get_ptr(res);
+  fvec_t *left = fvec_atom_get(at);
+  fvec_t *right = this->right;
+  fvec_t *res = this->res;
+  int left_size = fvec_get_size(left);
+  int right_size = fvec_get_size(right);
+  int res_size = fvec_get_size(res);
+  int size = (left_size <= right_size)? left_size: right_size;
+  float *l = fvec_get_ptr(left);
+  float *r = fvec_get_ptr(right);
+  float *x = fvec_get_ptr(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     x[i] = l[i] * r[i];
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_div_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *left = float_vector_atom_get(at);
-  float_vector_t *right = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(left);
-  int right_size = float_vector_get_size(right);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= right_size)? ((left_size <= res_size)? left_size: res_size): ((right_size <= res_size)? right_size: res_size);
-  float *l = float_vector_get_ptr(left);
-  float *r = float_vector_get_ptr(right);
-  float *x = float_vector_get_ptr(res);
+  fvec_t *left = fvec_atom_get(at);
+  fvec_t *right = this->right;
+  fvec_t *res = this->res;
+  int left_size = fvec_get_size(left);
+  int right_size = fvec_get_size(right);
+  int res_size = fvec_get_size(res);
+  int size = (left_size <= right_size)? left_size: right_size;
+  float *l = fvec_get_ptr(left);
+  float *r = fvec_get_ptr(right);
+  float *x = fvec_get_ptr(res);
   int i;
 
-  for(i=0; i<size; i++)
-    x[i] = l[i] / r[i];
+  if(res_size < size)
+    fvec_set_size(res, size);
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  for(i=0; i<size; i++)
+    {
+      if(r[i] != 0.0)
+	x[i] = l[i] / r[i];
+      else
+	x[i] = 0.0;
+    }
+
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_bus_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *left = float_vector_atom_get(at);
-  float_vector_t *right = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(left);
-  int right_size = float_vector_get_size(right);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= right_size)? ((left_size <= res_size)? left_size: res_size): ((right_size <= res_size)? right_size: res_size);
-  float *l = float_vector_get_ptr(left);
-  float *r = float_vector_get_ptr(right);
-  float *x = float_vector_get_ptr(res);
+  fvec_t *left = fvec_atom_get(at);
+  fvec_t *right = this->right;
+  fvec_t *res = this->res;
+  int left_size = fvec_get_size(left);
+  int right_size = fvec_get_size(right);
+  int res_size = fvec_get_size(res);
+  int size = (left_size <= right_size)? left_size: right_size;
+  float *l = fvec_get_ptr(left);
+  float *r = fvec_get_ptr(right);
+  float *x = fvec_get_ptr(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     x[i] = r[i] - l[i];
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_vid_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *left = float_vector_atom_get(at);
-  float_vector_t *right = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(left);
-  int right_size = float_vector_get_size(right);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= right_size)? ((left_size <= res_size)? left_size: res_size): ((right_size <= res_size)? right_size: res_size);
-  float *l = float_vector_get_ptr(left);
-  float *r = float_vector_get_ptr(right);
-  float *x = float_vector_get_ptr(res);
+  fvec_t *left = fvec_atom_get(at);
+  fvec_t *right = this->right;
+  fvec_t *res = this->res;
+  int left_size = fvec_get_size(left);
+  int right_size = fvec_get_size(right);
+  int res_size = fvec_get_size(res);
+  int size = (left_size <= right_size)? left_size: right_size;
+  float *l = fvec_get_ptr(left);
+  float *r = fvec_get_ptr(right);
+  float *x = fvec_get_ptr(res);
   int i;
 
-  for(i=0; i<size; i++)
-    x[i] = r[i] / l[i];
+  if(res_size < size)
+    fvec_set_size(res, size);
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  for(i=0; i<size; i++)
+    {
+      if(l[i] != 0.0)
+	x[i] = r[i] / l[i];
+      else
+	x[i] = 0.0;
+    }
+
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 /* fvec x fvec comparison  */
@@ -576,132 +644,150 @@ static void
 binop_fvec_ee_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *left = float_vector_atom_get(at);
-  float_vector_t *right = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(left);
-  int right_size = float_vector_get_size(right);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= right_size)? ((left_size <= res_size)? left_size: res_size): ((right_size <= res_size)? right_size: res_size);
-  float *l = float_vector_get_ptr(left);
-  float *r = float_vector_get_ptr(right);
-  float *x = float_vector_get_ptr(res);
+  fvec_t *left = fvec_atom_get(at);
+  fvec_t *right = this->right;
+  fvec_t *res = this->res;
+  int left_size = fvec_get_size(left);
+  int right_size = fvec_get_size(right);
+  int res_size = fvec_get_size(res);
+  int size = (left_size <= right_size)? left_size: right_size;
+  float *l = fvec_get_ptr(left);
+  float *r = fvec_get_ptr(right);
+  float *x = fvec_get_ptr(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     x[i] = l[i] == r[i];
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_ne_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *left = float_vector_atom_get(at);
-  float_vector_t *right = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(left);
-  int right_size = float_vector_get_size(right);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= right_size)? ((left_size <= res_size)? left_size: res_size): ((right_size <= res_size)? right_size: res_size);
-  float *l = float_vector_get_ptr(left);
-  float *r = float_vector_get_ptr(right);
-  float *x = float_vector_get_ptr(res);
+  fvec_t *left = fvec_atom_get(at);
+  fvec_t *right = this->right;
+  fvec_t *res = this->res;
+  int left_size = fvec_get_size(left);
+  int right_size = fvec_get_size(right);
+  int res_size = fvec_get_size(res);
+  int size = (left_size <= right_size)? left_size: right_size;
+  float *l = fvec_get_ptr(left);
+  float *r = fvec_get_ptr(right);
+  float *x = fvec_get_ptr(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     x[i] = l[i] != r[i];
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_gt_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *left = float_vector_atom_get(at);
-  float_vector_t *right = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(left);
-  int right_size = float_vector_get_size(right);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= right_size)? ((left_size <= res_size)? left_size: res_size): ((right_size <= res_size)? right_size: res_size);
-  float *l = float_vector_get_ptr(left);
-  float *r = float_vector_get_ptr(right);
-  float *x = float_vector_get_ptr(res);
+  fvec_t *left = fvec_atom_get(at);
+  fvec_t *right = this->right;
+  fvec_t *res = this->res;
+  int left_size = fvec_get_size(left);
+  int right_size = fvec_get_size(right);
+  int res_size = fvec_get_size(res);
+  int size = (left_size <= right_size)? left_size: right_size;
+  float *l = fvec_get_ptr(left);
+  float *r = fvec_get_ptr(right);
+  float *x = fvec_get_ptr(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     x[i] = l[i] > r[i];
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_ge_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *left = float_vector_atom_get(at);
-  float_vector_t *right = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(left);
-  int right_size = float_vector_get_size(right);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= right_size)? ((left_size <= res_size)? left_size: res_size): ((right_size <= res_size)? right_size: res_size);
-  float *l = float_vector_get_ptr(left);
-  float *r = float_vector_get_ptr(right);
-  float *x = float_vector_get_ptr(res);
+  fvec_t *left = fvec_atom_get(at);
+  fvec_t *right = this->right;
+  fvec_t *res = this->res;
+  int left_size = fvec_get_size(left);
+  int right_size = fvec_get_size(right);
+  int res_size = fvec_get_size(res);
+  int size = (left_size <= right_size)? left_size: right_size;
+  float *l = fvec_get_ptr(left);
+  float *r = fvec_get_ptr(right);
+  float *x = fvec_get_ptr(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     x[i] = l[i] >= r[i];
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_lt_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *left = float_vector_atom_get(at);
-  float_vector_t *right = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(left);
-  int right_size = float_vector_get_size(right);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= right_size)? ((left_size <= res_size)? left_size: res_size): ((right_size <= res_size)? right_size: res_size);
-  float *l = float_vector_get_ptr(left);
-  float *r = float_vector_get_ptr(right);
-  float *x = float_vector_get_ptr(res);
+  fvec_t *left = fvec_atom_get(at);
+  fvec_t *right = this->right;
+  fvec_t *res = this->res;
+  int left_size = fvec_get_size(left);
+  int right_size = fvec_get_size(right);
+  int res_size = fvec_get_size(res);
+  int size = (left_size <= right_size)? left_size: right_size;
+  float *l = fvec_get_ptr(left);
+  float *r = fvec_get_ptr(right);
+  float *x = fvec_get_ptr(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     x[i] = l[i] < r[i];
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_le_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *left = float_vector_atom_get(at);
-  float_vector_t *right = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(left);
-  int right_size = float_vector_get_size(right);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= right_size)? ((left_size <= res_size)? left_size: res_size): ((right_size <= res_size)? right_size: res_size);
-  float *l = float_vector_get_ptr(left);
-  float *r = float_vector_get_ptr(right);
-  float *x = float_vector_get_ptr(res);
+  fvec_t *left = fvec_atom_get(at);
+  fvec_t *right = this->right;
+  fvec_t *res = this->res;
+  int left_size = fvec_get_size(left);
+  int right_size = fvec_get_size(right);
+  int res_size = fvec_get_size(res);
+  int size = (left_size <= right_size)? left_size: right_size;
+  float *l = fvec_get_ptr(left);
+  float *r = fvec_get_ptr(right);
+  float *x = fvec_get_ptr(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     x[i] = l[i] <= r[i];
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 /* fvec x fvec min/max */
@@ -710,44 +796,50 @@ static void
 binop_fvec_min_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *left = float_vector_atom_get(at);
-  float_vector_t *right = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(left);
-  int right_size = float_vector_get_size(right);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= right_size)? ((left_size <= res_size)? left_size: res_size): ((right_size <= res_size)? right_size: res_size);
-  float *l = float_vector_get_ptr(left);
-  float *r = float_vector_get_ptr(right);
-  float *x = float_vector_get_ptr(res);
+  fvec_t *left = fvec_atom_get(at);
+  fvec_t *right = this->right;
+  fvec_t *res = this->res;
+  int left_size = fvec_get_size(left);
+  int right_size = fvec_get_size(right);
+  int res_size = fvec_get_size(res);
+  int size = (left_size <= right_size)? left_size: right_size;
+  float *l = fvec_get_ptr(left);
+  float *r = fvec_get_ptr(right);
+  float *x = fvec_get_ptr(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     x[i] = (r[i] <= l[i])? r[i]: l[i];
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
 binop_fvec_max_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *left = float_vector_atom_get(at);
-  float_vector_t *right = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(left);
-  int right_size = float_vector_get_size(right);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= right_size)? ((left_size <= res_size)? left_size: res_size): ((right_size <= res_size)? right_size: res_size);
-  float *l = float_vector_get_ptr(left);
-  float *r = float_vector_get_ptr(right);
-  float *x = float_vector_get_ptr(res);
+  fvec_t *left = fvec_atom_get(at);
+  fvec_t *right = this->right;
+  fvec_t *res = this->res;
+  int left_size = fvec_get_size(left);
+  int right_size = fvec_get_size(right);
+  int res_size = fvec_get_size(res);
+  int size = (left_size <= right_size)? left_size: right_size;
+  float *l = fvec_get_ptr(left);
+  float *r = fvec_get_ptr(right);
+  float *x = fvec_get_ptr(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     x[i] = (r[i] >= l[i])? r[i]: l[i];
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 /**************************************************************************************
@@ -763,20 +855,22 @@ binop_fvec_number_add_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
   float left = fts_get_number_float(at);
-  float_vector_t *vec = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *vec = this->right;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float right = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left + right);
+      float right = fvec_get_element(vec, i);
+      fvec_set_element(res, i, left + right);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
@@ -784,20 +878,22 @@ binop_fvec_number_sub_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
   float left = fts_get_number_float(at);
-  float_vector_t *vec = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *vec = this->right;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float right = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left - right);
+      float right = fvec_get_element(vec, i);
+      fvec_set_element(res, i, left - right);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
@@ -805,20 +901,22 @@ binop_fvec_number_mul_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
   float left = fts_get_number_float(at);
-  float_vector_t *vec = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *vec = this->right;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float right = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left * right);
+      float right = fvec_get_element(vec, i);
+      fvec_set_element(res, i, left * right);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
@@ -826,20 +924,26 @@ binop_fvec_number_div_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
   float left = fts_get_number_float(at);
-  float_vector_t *vec = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *vec = this->right;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float right = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left / right);
+      float right = fvec_get_element(vec, i);
+
+      if(right != 0.0)
+	fvec_set_element(res, i, left / right);
+      else
+	fvec_set_element(res, i, 0.0);	
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
@@ -847,20 +951,22 @@ binop_fvec_number_bus_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
   float left = fts_get_number_float(at);
-  float_vector_t *vec = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *vec = this->right;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float right = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, right - left);
+      float right = fvec_get_element(vec, i);
+      fvec_set_element(res, i, right - left);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
@@ -868,43 +974,55 @@ binop_fvec_number_vid_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
   float left = fts_get_number_float(at);
-  float_vector_t *vec = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *vec = this->right;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
 
-  for(i=0; i<size; i++)
+  if(res_size < size)
+    fvec_set_size(res, size);
+
+  if(left != 0.0)
     {
-      float right = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, right / left);
+      for(i=0; i<size; i++)
+	{
+	  float right = fvec_get_element(vec, i);
+	  fvec_set_element(res, i, right / left);
+	}
+    }
+  else
+    {
+      for(i=0; i<size; i++)
+	fvec_set_element(res, i, 0.0);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
-/* float_vector x number comparison */
+/* fvec x number comparison */
 
 static void
 binop_fvec_number_ee_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
   float left = fts_get_number_float(at);
-  float_vector_t *vec = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *vec = this->right;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float right = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left == right);
+      float right = fvec_get_element(vec, i);
+      fvec_set_element(res, i, left == right);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
@@ -912,20 +1030,22 @@ binop_fvec_number_ne_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
   float left = fts_get_number_float(at);
-  float_vector_t *vec = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *vec = this->right;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float right = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left != right);
+      float right = fvec_get_element(vec, i);
+      fvec_set_element(res, i, left != right);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
@@ -933,20 +1053,22 @@ binop_fvec_number_gt_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
   float left = fts_get_number_float(at);
-  float_vector_t *vec = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *vec = this->right;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float right = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left > right);
+      float right = fvec_get_element(vec, i);
+      fvec_set_element(res, i, left > right);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
@@ -954,20 +1076,22 @@ binop_fvec_number_ge_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
   float left = fts_get_number_float(at);
-  float_vector_t *vec = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *vec = this->right;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float right = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left >= right);
+      float right = fvec_get_element(vec, i);
+      fvec_set_element(res, i, left >= right);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
@@ -975,20 +1099,22 @@ binop_fvec_number_lt_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
   float left = fts_get_number_float(at);
-  float_vector_t *vec = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *vec = this->right;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float right = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left < right);
+      float right = fvec_get_element(vec, i);
+      fvec_set_element(res, i, left < right);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
@@ -996,43 +1122,47 @@ binop_fvec_number_le_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
   float left = fts_get_number_float(at);
-  float_vector_t *vec = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *vec = this->right;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
+
+  if(res_size < size)
+    fvec_set_size(res, size);
 
   for(i=0; i<size; i++)
     {
-      float right = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, left <= right);
+      float right = fvec_get_element(vec, i);
+      fvec_set_element(res, i, left <= right);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
-/* float_vector x number min/max */
+/* fvec x number min/max */
 
 static void
 binop_fvec_number_min_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
   float left = fts_get_number_float(at);
-  float_vector_t *vec = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *vec = this->right;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
       
+  if(res_size < size)
+    fvec_set_size(res, size);
+
   for(i=0; i<size; i++)
     {
-      float right = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, (right <= left)? right: left);
+      float right = fvec_get_element(vec, i);
+      fvec_set_element(res, i, (right <= left)? right: left);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 static void
@@ -1040,20 +1170,22 @@ binop_fvec_number_max_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
   float left = fts_get_number_float(at);
-  float_vector_t *vec = this->right;
-  float_vector_t *res = this->res;
-  int left_size = float_vector_get_size(vec);
-  int res_size = float_vector_get_size(res);
-  int size = (left_size <= res_size)? left_size: res_size;
+  fvec_t *vec = this->right;
+  fvec_t *res = this->res;
+  int size = fvec_get_size(vec);
+  int res_size = fvec_get_size(res);
   int i;
       
+  if(res_size < size)
+    fvec_set_size(res, size);
+
   for(i=0; i<size; i++)
     {
-      float right = float_vector_get_element(vec, i);
-      float_vector_set_element(res, i, (right >= left)? right: left);
+      float right = fvec_get_element(vec, i);
+      fvec_set_element(res, i, (right >= left)? right: left);
     }
 
-  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+  fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
 /**************************************************************************************
@@ -1072,10 +1204,10 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   if(name == math_sym_add)
     {
       if(fts_is_number(at + 1))
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_add_number);
+	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_add_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_add_fvec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_add_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_add_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_add_fvec);
 	}
@@ -1083,10 +1215,10 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else if(name == math_sym_sub)
     {
       if(fts_is_number(at + 1))
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_sub_number);
+	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_sub_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_sub_fvec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_sub_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_sub_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_sub_fvec);
 	}
@@ -1094,10 +1226,10 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else if(name == math_sym_mul)
     {
       if(fts_is_number(at + 1))
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_mul_number);
+	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_mul_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_mul_fvec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_mul_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_mul_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_mul_fvec);
 	}
@@ -1105,10 +1237,10 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else if(name == math_sym_div)
     {
       if(fts_is_number(at + 1))
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_div_number);
+	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_div_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_div_fvec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_div_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_div_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_div_fvec);
 	}
@@ -1116,10 +1248,10 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else if(name == math_sym_bus)
     {
       if(fts_is_number(at + 1))
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_bus_number);
+	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_bus_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_bus_fvec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_bus_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_bus_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_bus_fvec);
 	}
@@ -1127,10 +1259,10 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else if(name == math_sym_vid)
     {
       if(fts_is_number(at + 1))
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_vid_number);
+	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_vid_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_vid_fvec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_vid_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_vid_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_vid_fvec);
 	}
@@ -1138,10 +1270,10 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else if(name == math_sym_ee)
     {
       if(fts_is_number(at + 1))
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_ee_number);
+	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_ee_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_ee_fvec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_ee_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_ee_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_ee_fvec);
 	}
@@ -1149,10 +1281,10 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else if(name == math_sym_ne)
     {
       if(fts_is_number(at + 1))
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_ne_number);
+	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_ne_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_ne_fvec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_ne_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_ee_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_ee_fvec);
 	}
@@ -1160,10 +1292,10 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else if(name == math_sym_gt)
     {
       if(fts_is_number(at + 1))
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_gt_number);
+	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_gt_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_gt_fvec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_gt_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_gt_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_gt_fvec);
 	}
@@ -1171,10 +1303,10 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else if(name == math_sym_ge)
     {
       if(fts_is_number(at + 1))
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_ge_number);
+	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_ge_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_ge_fvec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_ge_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_ge_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_ge_fvec);
 	}
@@ -1182,10 +1314,10 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else if(name == math_sym_lt)
     {
       if(fts_is_number(at + 1))
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_lt_number);
+	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_lt_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_lt_fvec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_lt_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_lt_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_lt_fvec);
 	}
@@ -1193,10 +1325,10 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else if(name == math_sym_le)
     {
       if(fts_is_number(at + 1))
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_le_number);
+	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_le_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_le_fvec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_le_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_le_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_le_fvec);
 	}
@@ -1204,10 +1336,10 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else if(name == math_sym_min)
     {
       if(fts_is_number(at + 1))
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_min_number);
+	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_min_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_min_fvec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_min_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_min_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_min_fvec);
 	}
@@ -1215,10 +1347,10 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else if(name == math_sym_max)
     {
       if(fts_is_number(at + 1))
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_max_number);
+	fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_max_number);
       else
 	{
-	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_max_fvec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, binop_fvec_max_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_max_fvec);
 	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_max_fvec);
 	}
@@ -1235,10 +1367,10 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, binop_fvec_init_vector);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, binop_fvec_delete_vector);
-      fts_method_define_varargs(cl, 1, float_vector_symbol, binop_fvec_set_right_vector);
+      fts_method_define_varargs(cl, 1, fvec_symbol, binop_fvec_set_right_vector);
     }
 
-  fts_method_define_varargs(cl, 2, float_vector_symbol, binop_fvec_set_result);
+  fts_method_define_varargs(cl, 2, fvec_symbol, binop_fvec_set_result);
 
   return fts_Success;
 }

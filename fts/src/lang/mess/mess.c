@@ -51,6 +51,9 @@ static void fts_mess_init( void )
   /* Initialize the objects module  */
   fts_objects_init();
 
+  /* Initialize the objects module  */
+  fts_atoms_init();
+
   /* Initialize the object doctor housekeeping */
   fts_doctor_init();
 

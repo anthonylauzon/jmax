@@ -59,21 +59,33 @@
    
  */
 
+/* init function */
+extern void fts_atoms_init(void);
+
 /* An initializer for empty atoms */
 #define FTS_NULL {(fts_symbol_t)0, {0}}
 
 /* A variable initialized to an empty atom */
 extern const fts_atom_t fts_null;
 
-/* Macros to deal with any type */
-#define fts_set_type(ap, ttype) (((ap)->type) = (ttype))
-#define fts_get_type(ap) ((ap)->type)
-#define fts_is_a(ap, ttype) (((ap)->type) == (ttype))
+extern void fts_atom_type_register(fts_symbol_t name, fts_class_t *cl);
+extern int fts_atom_type_lookup(fts_symbol_t name, fts_class_t **cl);
 
-#define fts_get_selector(ap) (fts_type_get_selector((ap)->type))
+/* Macros to deal with any type */
+#define fts_set_type(ap, t) (((ap)->type) = (t))
+#define fts_set_object_type(ap, t) (((ap)->type) = ((fts_symbol_t)((unsigned int)(t) | 1)))
+
+#define fts_get_type(ap) ((fts_type_t)((unsigned int)((ap)->type) & ~1))
+#define fts_is_a(ap, t) (fts_get_type(ap) == (t))
+
+#define fts_get_selector(ap) (fts_type_get_selector(fts_get_type(ap)))
 
 /* Return a pointer; i.e. you can write "*(fts_atom_value(a)).fts_symbol = fts_s_int;" for example */
-#define fts_atom_value(ap)          (&((ap)->value))
+#define fts_atom_value(ap) (&((ap)->value))
+
+/* set object of any type */
+#define fts_set_object_with_type(ap, x, t) \
+     do {fts_set_object_type(ap, t); fts_word_set_object(fts_atom_value(ap), ((fts_object_t *)x));} while (0)
 
 /* set atoms of predefined types */
 #define fts_set_symbol(ap, x) \
@@ -89,15 +101,14 @@ extern const fts_atom_t fts_null;
 #define fts_set_long(ap, x) fts_set_int(ap, x)
 #define fts_set_float(ap, x) \
      do {fts_set_type(ap, fts_s_float); fts_word_set_float(fts_atom_value(ap), (x));} while (0)
-#define fts_set_object(ap, x) \
-     do {fts_set_type(ap, fts_s_object); fts_word_set_object(fts_atom_value(ap), (x));} while (0)
 #define fts_set_connection(ap, x)       \
      do {fts_set_type(ap, fts_s_connection); fts_word_set_connection(fts_atom_value(ap), (x));} while (0)
 #define fts_set_data(ap, x) \
      do {fts_set_type(ap, fts_s_data); fts_word_set_data( fts_atom_value(ap), (x));} while (0)
-/* atom_array atoms */
-#define fts_set_atom_array(ap, x) \
-     do {fts_set_type(ap, fts_s_atom_array); fts_word_set_data(fts_atom_value(ap), ((fts_data_t *)x));} while (0)
+#define fts_set_list(ap, x) \
+     do {fts_set_type(ap, fts_s_list); fts_word_set_data(fts_atom_value(ap), ((fts_data_t *)x));} while (0)
+#define fts_set_object(ap, x) \
+     do {fts_set_object_type(ap, fts_s_object); fts_word_set_object(fts_atom_value(ap), (x));} while (0)
 
 #define fts_set_void(ap) (fts_set_type(ap, fts_s_void))
 #define fts_set_error(ap) (fts_set_type(ap, fts_s_error))
@@ -115,10 +126,10 @@ extern const fts_atom_t fts_null;
 #define fts_get_string(ap) (fts_word_get_string(fts_atom_value(ap)))
 #define fts_get_ptr(ap) (fts_word_get_ptr(fts_atom_value(ap)))
 #define fts_get_fun(ap) (fts_word_get_fun(fts_atom_value(ap)))
-#define fts_get_object(ap) (fts_word_get_object(fts_atom_value(ap)))
 #define fts_get_connection(ap) (fts_word_get_connection(fts_atom_value(ap)))
 #define fts_get_data(ap) (fts_word_get_data(fts_atom_value(ap)))
-#define fts_get_atom_array(ap) ((fts_atom_array_t *)fts_word_get_data(fts_atom_value(ap)))
+#define fts_get_list(ap) ((fts_list_t *)fts_word_get_data(fts_atom_value(ap)))
+#define fts_get_object(ap) (fts_word_get_object(fts_atom_value(ap)))
 
 /* check atoms for predefined types */
 #define fts_is_int(ap) fts_is_a(ap, fts_s_int)
@@ -131,14 +142,15 @@ extern const fts_atom_t fts_null;
 #define fts_is_fun(ap) fts_is_a(ap, fts_s_fun)
 #define fts_is_void(ap) fts_is_a(ap, fts_s_void)
 #define fts_is_error(ap) fts_is_a(ap, fts_s_error)
-#define fts_is_object(ap) fts_is_a(ap, fts_s_object)
 #define fts_is_connection(ap) fts_is_a(ap, fts_s_connection)
 #define fts_is_true(ap) fts_is_a(ap, fts_s_true)
 #define fts_is_false(ap) fts_is_a(ap, fts_s_false)
 #define fts_is_data(ap) (fts_is_a(ap, fts_s_data))
-#define fts_is_atom_array(ap) (fts_is_a(ap, fts_s_atom_array))
+#define fts_is_list(ap) (fts_is_a(ap, fts_s_list))
+#define fts_is_object(ap) ((unsigned int)((ap)->type) & 1)
 
-#define fts_is_primitive(ap) (fts_is_int(ap) || fts_is_float(ap) || fts_is_symbol(ap))
+#define fts_refer(ap) (fts_object_refer(fts_get_object(ap)))
+#define fts_release(ap) (fts_object_release(fts_get_object(ap)))
 
 /* Convenience macros to deal with type and atom algebra */
 #define fts_same_types(ap1, ap2) (((ap1)->type) == (ap2)->type)
@@ -157,8 +169,3 @@ void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at);
 void sprintf_atoms(char *s, int ac, const fts_atom_t *at);
 
 #endif
-
-
-
-
-

@@ -176,7 +176,7 @@ event_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(fts_is_object(&this->value))
     {
       fts_object_t *obj = (fts_object_t *)fts_get_object(&this->value);
-      fts_object_delete(obj);
+      fts_object_release(obj);
     }
 }
 

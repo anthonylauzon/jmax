@@ -35,7 +35,7 @@
 
 
 #include "fts.h"
-
+#include "naming.h"
 
 typedef struct
 {
@@ -154,7 +154,7 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 	      (fts_get_symbol(av) != fts_s_semi) &&
 	      (fts_get_symbol(av) != fts_s_comma))
 	    {
-	      if (! fts_named_object_exists(fts_get_symbol(av)))
+	      if (! ispw_named_object_exists(fts_get_symbol(av)))
 		{
 		  post("qlist: %s: no such object\n",
 		       fts_symbol_name(fts_get_symbol(av)));
@@ -180,21 +180,21 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 	  if (fts_is_long(ap))
 	    {
 	      if (ac > 1)
-		fts_named_object_send(who_name, fts_s_list, ac, ap);
+		ispw_named_object_send(who_name, fts_s_list, ac, ap);
 	      else 
-		fts_named_object_send(who_name, fts_s_int, ac, ap);
+		ispw_named_object_send(who_name, fts_s_int, ac, ap);
 	    }
 	  else if (fts_is_float(ap))
 	    {
 	      if (ac >1) 
-		fts_named_object_send(who_name, fts_s_list, ac, ap);
+		ispw_named_object_send(who_name, fts_s_list, ac, ap);
 	      else 
-		fts_named_object_send(who_name, fts_s_float, ac, ap);
+		ispw_named_object_send(who_name, fts_s_float, ac, ap);
 	    }
 	  else if (fts_is_symbol(ap)  && 
 		   (fts_get_symbol(ap) != fts_s_semi) &&
 		   (fts_get_symbol(ap) != fts_s_comma))
-	    fts_named_object_send(who_name, fts_get_symbol(ap), ac-1, ap+1);
+	    ispw_named_object_send(who_name, fts_get_symbol(ap), ac-1, ap+1);
 	}
 
       if (! is_comma)

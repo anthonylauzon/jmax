@@ -32,7 +32,6 @@ endif
 # Architecture dependant packages are supposed to be C...
 C_PACKAGES= $(ARCH_PACKAGES) \
 	control \
-	data \
 	guiobj \
 	io \
 	ispw \
@@ -42,14 +41,13 @@ C_PACKAGES= $(ARCH_PACKAGES) \
 	mess \
 	midi \
 	numeric \
-	reftype \
 	signal \
 	sources \
 	system
 
 JAVA_PACKAGES=table
 
-MIXED_PACKAGES=explode qlist sequence
+MIXED_PACKAGES=data explode qlist sequence
 
 all: all_c all_java
 .PHONY: all

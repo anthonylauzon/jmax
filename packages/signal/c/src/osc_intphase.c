@@ -34,7 +34,7 @@ typedef struct osc_data
   union
   {
     float *ptr;
-    float_vector_t *fvec;
+    fvec_t *fvec;
   } table;
 
   /* phase counter */
@@ -85,7 +85,7 @@ osc_ftl_control_input_fvec(fts_word_t *argv)
   osc_data_t *data = (osc_data_t *)fts_word_get_ptr(argv + 0);
   float * restrict out = (float *) fts_word_get_ptr(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
-  float *buf = float_vector_get_ptr(data->table.fvec);
+  float *buf = fvec_get_ptr(data->table.fvec);
   fts_intphase_t phi = data->phase;
   fts_intphase_t incr = data->incr.absolute;
   int i;
@@ -136,7 +136,7 @@ osc_ftl_signal_input_fvec(fts_word_t *argv)
   float * restrict in = (float *) fts_word_get_ptr(argv + 1);
   float * restrict out = (float *) fts_word_get_ptr(argv + 2);
   int n_tick = fts_word_get_int(argv + 3);
-  float *buf = float_vector_get_ptr(data->table.fvec);
+  float *buf = fvec_get_ptr(data->table.fvec);
   fts_intphase_t phi = data->phase;
   fts_intphase_t factor = data->incr.factor;
   int i;
@@ -186,7 +186,7 @@ osc_ftl_signal_input_inplace_fvec(fts_word_t *argv)
   osc_data_t *data = (osc_data_t *)fts_word_get_ptr(argv + 0);
   float * restrict sig = (float *) fts_word_get_ptr(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
-  float *buf = float_vector_get_ptr(data->table.fvec);
+  float *buf = fvec_get_ptr(data->table.fvec);
   fts_intphase_t phi = data->phase;
   fts_intphase_t factor = data->incr.factor;
   int i;
@@ -261,17 +261,17 @@ osc_data_set_phase(ftl_data_t ftl_data, double phase)
 }
 
 void
-osc_data_set_fvec(ftl_data_t ftl_data, float_vector_t *fvec)
+osc_data_set_fvec(ftl_data_t ftl_data, fvec_t *fvec)
 {
   osc_data_t *data = (osc_data_t *)ftl_data_get_ptr(ftl_data);
 
   if(data->table.fvec)
-    float_vector_release(data->table.fvec);
+    fts_object_release((fts_object_t *)data->table.fvec);
   
   data->table.fvec = fvec;
   
   if(fvec)
-    float_vector_refer(fvec);
+    fts_object_refer((fts_object_t *)fvec);
 }
 
 void

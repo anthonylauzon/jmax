@@ -492,7 +492,7 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 	      fts_atom_t *tos;
 	      int args;
 	      fts_atom_t result;
-	      fts_atom_array_t *array;
+	      fts_list_t *array;
 
 	      tos = value_stack_top(e);
 	      args = 0;
@@ -508,8 +508,8 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 		}
 
 	      /* Make the array */
-	      array = fts_atom_array_new(args, tos + 1);
-	      fts_set_atom_array(&result, array);
+	      array = fts_list_new(args, tos + 1);
+	      fts_set_list(&result, array);
 
 	      /* Pop the stack, and push the result */
 	      value_stack_pop(e, args);
@@ -760,7 +760,7 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 	      fts_atom_t *tos;
 	      int args;
 	      fts_atom_t result;
-	      fts_atom_array_t *array;
+	      fts_list_t *array;
 
 	      tos = value_stack_top(e);
 	      args = 0;
@@ -786,8 +786,8 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 		}
 
 	      /* Make the array */
-	      array = fts_atom_array_new(args, tos + 1);
-	      fts_set_atom_array(&result, array);
+	      array = fts_list_new(args, tos + 1);
+	      fts_set_list(&result, array);
 
 	      /* Pop the stack, and push the result */
 	      value_stack_pop(e, args);
@@ -1357,13 +1357,13 @@ static int fts_op_eval(fts_expression_state_t *e)
 	  break;
 
 	case FTS_OP_ARRAY_REF:
-	  if (fts_is_int(tos) && fts_is_atom_array(ptos))
+	  if (fts_is_int(tos) && fts_is_list(ptos))
 	    {
-	      fts_atom_array_t *aa = fts_get_atom_array(ptos);
+	      fts_list_t *aa = fts_get_list(ptos);
 	      int idx = fts_get_int(tos);
 	      
-	      if (fts_atom_array_check_index(aa, idx))
-		*value_stack_top(e) = fts_atom_array_get_element(aa, idx);
+	      if (fts_list_check_index(aa, idx))
+		*value_stack_top(e) = fts_list_get_element(aa, idx);
 	      else
 		return expression_error(e, FTS_EXPRESSION_ARRAY_ACCESS_ERROR, "Array index out of bound", 0);
 	    }
@@ -1567,13 +1567,13 @@ static int unique(int ac, const fts_atom_t *at, fts_atom_t *result)
 
 static int get_array_element(int ac, const fts_atom_t *at, fts_atom_t *result)
 {
-  if ((ac == 4) && fts_is_int(at + 2) && fts_is_atom_array(at + 1))
+  if ((ac == 4) && fts_is_int(at + 2) && fts_is_list(at + 1))
     {
-      fts_atom_array_t *array = fts_get_atom_array(at + 1);
+      fts_list_t *array = fts_get_list(at + 1);
       int idx = fts_get_int(&at[2]);
 
-      if (fts_atom_array_check_index(array, idx))
-	*result = fts_atom_array_get_element(array, idx);
+      if (fts_list_check_index(array, idx))
+	*result = fts_list_get_element(array, idx);
       else
 	*result = at[3];
   
@@ -1588,7 +1588,7 @@ static int get_array_element(int ac, const fts_atom_t *at, fts_atom_t *result)
 void
 fts_expressions_init(void)
 {
-  expr_prop_heap    = fts_heap_new(sizeof(fts_expression_assignement_t));
+  expr_prop_heap = fts_heap_new(sizeof(fts_expression_assignement_t));
   expr_var_ref_heap = fts_heap_new(sizeof(fts_expr_var_ref_t));
   expr_state_heap = fts_heap_new(sizeof(fts_expression_state_t));
 
@@ -1597,6 +1597,16 @@ fts_expressions_init(void)
   /* function installation */
   fts_expression_declare_fun(fts_new_symbol("unique"), unique);
   fts_expression_declare_fun(fts_new_symbol("_getElement"), get_array_element);
+
+  /* register pseudo constructors for primitive types */
+  fts_atom_type_register(fts_s_int, 0);
+  fts_atom_type_register(fts_s_float, 0);
+  fts_atom_type_register(fts_s_symbol, 0);
+  fts_atom_type_register(fts_s_ptr, 0);
+  fts_atom_type_register(fts_s_fun, 0);
+  fts_atom_type_register(fts_s_string, 0);
+  fts_atom_type_register(fts_s_object, 0);
+  fts_atom_type_register(fts_s_list, 0);
 
   /* operator declarations  */
   fts_symbol_set_operator(fts_s_plus,  FTS_OP_PLUS);
@@ -1707,8 +1717,3 @@ fts_expressions_init(void)
   op_binary[FTS_OP_ASSIGN] = 1;
   op_binary[FTS_OP_ARRAY_REF] = 1;
 }
-
-
-
-
-

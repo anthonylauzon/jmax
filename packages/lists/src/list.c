@@ -26,7 +26,6 @@
 
 #include "fts.h"
 #include "list.h"
-#include "refdata.h"
 
 /************************************************
  *
@@ -92,8 +91,8 @@ list_set_size(list_t *list, int size)
 	{
 	  fts_atom_t *ap = list->at + i;
 
-	  if(refdata_atom_is(ap))
-	    refdata_atom_release(ap);
+	  if(fts_is_object(ap))
+	    fts_release(ap);
 	  
 	  fts_set_void(ap);
 	}
@@ -113,13 +112,13 @@ list_set(list_t *list, int ac, const fts_atom_t *at)
     {
       fts_atom_t *ap = list->at + i;
       
-      if(refdata_atom_is(ap))
-	refdata_atom_release(ap);
+      if(fts_is_object(ap))
+	fts_release(ap);
       
       *ap = at[i];
       
-      if(refdata_atom_is(at + i))
-	refdata_atom_refer(at + i);	
+      if(fts_is_object(at + i))
+	fts_refer(at + i);	
     }
 }
 

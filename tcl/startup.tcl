@@ -68,7 +68,6 @@ sync
 
 # load gui server side objects
 package require system
-package require reftype
 package require guiobj
 
 #

@@ -46,9 +46,9 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
   /**
    * constructor.
    */
-    public FtsBpfObject(Fts fts, FtsObject parent, String variableName, String classname)
+    public FtsBpfObject(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
     {
-	super(fts, parent, variableName, "bpf", "bpf");
+	super(fts, parent, variableName, "bpf", "bpf " + FtsParse.unparseArguments(nArgs, args));
 	
 	listeners = new MaxVector();
     }

@@ -164,7 +164,7 @@ sequence_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   while(track)
     {
       sequence_remove_track(this, track);
-      fts_object_delete((fts_object_t *)track);
+      fts_object_release((fts_object_t *)track);
 
       track = sequence_get_first_track(this);
     }    
@@ -218,7 +218,7 @@ sequence_remove_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_
       if(fts_object_has_id((fts_object_t *)track))
 	fts_client_send_message(o, seqsym_deleteTracks, 1, at);
 
-      fts_object_delete((fts_object_t *)track);
+      fts_object_release((fts_object_t *)track);
     }
 }
 
@@ -369,7 +369,7 @@ sequence_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	    {
 	      sequence_remove_track(this, track);
 	      fts_client_send_message(o, seqsym_deleteTracks, 1, at);
-	      fts_object_delete((fts_object_t *)track);
+	      fts_object_release((fts_object_t *)track);
 	    }
 
 	  track = sequence_get_first_track(this);

@@ -27,4 +27,6 @@ JMAXDISTDIR = ../../../..
 PACKAGEROOT = ../..
 PACKAGELIB=$(LIBDIR)/libsignal.so
 
+MODULE_CFLAGS=-I../control
+
 include $(JMAXDISTDIR)/Makefiles/Makefile.package

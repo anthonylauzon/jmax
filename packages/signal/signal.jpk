@@ -25,6 +25,8 @@
 
 package provide signal
 
+package require data
+
 global jmaxArch jmaxMode
 ucs load module signal $dir/c/lib/$jmaxArch/$jmaxMode/libsignal.so
 

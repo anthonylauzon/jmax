@@ -27,30 +27,30 @@
 #ifndef _FTS_ATOMARRAY_H_
 #define _FTS_ATOMARRAY_H_
 
-typedef struct fts_atom_array
+typedef struct fts_list
 {
   fts_atom_t *atoms;
   int size;	
   int alloc;
-} fts_atom_array_t;
+} fts_list_t;
 
-extern fts_symbol_t fts_s_atom_array;
+extern fts_symbol_t fts_s_list;
 
-extern fts_atom_array_t *fts_atom_array_new(int ac, const fts_atom_t *at);
-extern void fts_atom_array_delete(fts_atom_array_t *this);
+extern fts_list_t *fts_list_new(int ac, const fts_atom_t *at);
+extern void fts_list_delete(fts_list_t *this);
 
-extern void fts_atom_array_copy(fts_atom_array_t *in, fts_atom_array_t *out);
-extern void fts_atom_array_void(fts_atom_array_t *array);
+extern void fts_list_copy(fts_list_t *in, fts_list_t *out);
+extern void fts_list_void(fts_list_t *array);
 
-extern void fts_atom_array_set_size(fts_atom_array_t *array, int size);
-#define fts_atom_array_get_size(array) ((array)->size)
+extern void fts_list_set_size(fts_list_t *array, int size);
+#define fts_list_get_size(array) ((array)->size)
 
-#define fts_atom_array_get_ptr(array) ((array)->atoms)
+#define fts_list_get_ptr(array) ((array)->atoms)
 
-#define fts_atom_array_check_index(array, i)  ((i >= 0) && (i < (array)->size))
-#define fts_atom_array_is_empty(array) ((array)->size == 0)
+#define fts_list_check_index(array, i)  ((i >= 0) && (i < (array)->size))
+#define fts_list_is_empty(array) ((array)->size == 0)
 
-#define fts_atom_array_get_element(array, index) ((array)->atoms[index])
-#define fts_atom_array_set_element(array, index, value) ((array)->atoms[(index)] = (value))
+#define fts_list_get_element(array, index) ((array)->atoms[index])
+#define fts_list_set_element(array, index, value) ((array)->atoms[(index)] = (value))
 
 #endif

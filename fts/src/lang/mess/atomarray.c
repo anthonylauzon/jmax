@@ -28,7 +28,7 @@
 #include "lang/mess.h"
 
 /* local */
-static void atom_array_realloc(fts_atom_array_t *array, int size)
+static void list_realloc(fts_list_t *array, int size)
 {
   int i;
 
@@ -57,13 +57,13 @@ static void atom_array_realloc(fts_atom_array_t *array, int size)
 
 /* new/delete */
 
-fts_atom_array_t *
-fts_atom_array_new(int ac, const fts_atom_t *at)
+fts_list_t *
+fts_list_new(int ac, const fts_atom_t *at)
 {
-  fts_atom_array_t *array;
+  fts_list_t *array;
   int i;
 
-  array = (fts_atom_array_t *)fts_malloc(sizeof(fts_atom_array_t));
+  array = (fts_list_t *)fts_malloc(sizeof(fts_list_t));
 
   if(ac > 0)
     {
@@ -90,9 +90,9 @@ fts_atom_array_new(int ac, const fts_atom_t *at)
 }
 
 void 
-fts_atom_array_delete(fts_atom_array_t *array)
+fts_list_delete(fts_list_t *array)
 {
-  fts_atom_array_void(array);
+  fts_list_void(array);
 
   if (array->atoms)
     fts_free((void *)array->atoms);
@@ -102,17 +102,17 @@ fts_atom_array_delete(fts_atom_array_t *array)
 
 /* copy & void */
 void
-fts_atom_array_copy(fts_atom_array_t *in, fts_atom_array_t *out)
+fts_list_copy(fts_list_t *in, fts_list_t *out)
 {
   int i;
-  atom_array_realloc(out, in->size);
+  list_realloc(out, in->size);
   
   for(i=0; i<in->size; i++)
     out->atoms[i] = in->atoms[i];
 }
 
 void
-fts_atom_array_void(fts_atom_array_t *array)
+fts_list_void(fts_list_t *array)
 {
   int i;
   
@@ -125,12 +125,12 @@ fts_atom_array_void(fts_atom_array_t *array)
 
 /* set the size of the array */
 void
-fts_atom_array_set_size(fts_atom_array_t *array, int size)
+fts_list_set_size(fts_list_t *array, int size)
 {
   int old_size = array->size;
   int i;
 
-  atom_array_realloc(array, size);
+  list_realloc(array, size);
 
   /* if longer, set new atoms at the end to void */
   for(i=old_size; i<size; i++)
