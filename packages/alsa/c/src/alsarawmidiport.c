@@ -27,8 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <sys/asoundlib.h>
-#include <linux/asound.h>
+#include <alsa/asoundlib.h>
 
 #include <fts/fts.h>
 

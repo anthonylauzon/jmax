@@ -33,14 +33,13 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <assert.h>
-#include <sys/asoundlib.h>
-#include <linux/asound.h>
+#include <alsa/asoundlib.h>
 
 #include <fts/fts.h>
 
 static fts_symbol_t s_plug_0_0;
 static fts_symbol_t s_s16_le, s_s32_le;
-static fts_symbol_t s_mmap_ardour, s_mmap_noninterleaved, s_mmap_interleaved, s_rw_noninterleaved, s_rw_interleaved;
+static fts_symbol_t s_mmap_noninterleaved, s_mmap_interleaved, s_rw_noninterleaved, s_rw_interleaved;
 
 #define GUESS_CHANNELS -1
 #define DEFAULT_PCM_NAME s_plug_0_0
@@ -48,7 +47,7 @@ static fts_symbol_t s_mmap_ardour, s_mmap_noninterleaved, s_mmap_interleaved, s_
 #define DEFAULT_FIFO_SIZE 256
 #define DEFAULT_CHANNELS 2
 
-enum transfer_mode_t { MMAP_ARDOUR, MMAP_NONINTERLEAVED, MMAP_INTERLEAVED, RW_NONINTERLEAVED, RW_INTERLEAVED};
+enum transfer_mode_t { MMAP_NONINTERLEAVED, MMAP_INTERLEAVED, RW_NONINTERLEAVED, RW_INTERLEAVED};
 
 /* ---------------------------------------------------------------------- */
 /* Structure used for both capture and playback                           */
@@ -59,11 +58,7 @@ typedef struct _alsastream_t {
   int periods;
   size_t bytes_per_sample, bytes_per_frame;
   int channels;
-  int current_period;
-  int count;
-  char ***addr;
   int fd;
-  struct _alsastream_t *link; /* link to playback stream for capture stream */
 } alsastream_t;
 
 /* ---------------------------------------------------------------------- */
@@ -115,10 +110,6 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
    * Set the access mode:
    */
   switch ( transfer_mode) {
-  case MMAP_ARDOUR:
-    if ((err = snd_pcm_hw_params_set_access( st->handle, hwparams, SND_PCM_ACCESS_MMAP_NONINTERLEAVED)) < 0)
-      return err;
-    break;
   case MMAP_NONINTERLEAVED:
     if ((err = snd_pcm_hw_params_set_access( st->handle, hwparams, SND_PCM_ACCESS_MMAP_NONINTERLEAVED)) < 0)
       return err;
@@ -195,17 +186,10 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
 
   snd_pcm_sw_params_current( st->handle, swparams);
 
+#if 0
   if ((err = snd_pcm_sw_params_set_period_step( st->handle, swparams, 1)) < 0)
     return err;
-
-  if ( transfer_mode == MMAP_ARDOUR)
-    {
-      if ((err = snd_pcm_sw_params_set_xrun_mode( st->handle, swparams, SND_PCM_XRUN_NONE)) < 0) 
-	return err;
-
-      if ((err = snd_pcm_sw_params_set_start_mode( st->handle, swparams, SND_PCM_START_EXPLICIT)) < 0)
-	return err;
-    }
+#endif
 
   if ((err = snd_pcm_sw_params_set_avail_min( st->handle, swparams, fifo_size / periods)) < 0) 
     return err;
@@ -219,233 +203,13 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
   st->bytes_per_sample = (snd_pcm_format_physical_width(format) / 8);
   st->bytes_per_frame = st->bytes_per_sample * st->channels;
 
-  st->link = 0;
-
   return 0;
 }
 
-
-/* ---------------------------------------------------------------------- */
-/* alsatream_ functions that are used only in ardour mode                 */
-/* ---------------------------------------------------------------------- */
-static int alsastream_get_addr( alsastream_t *st)
-{
-  const snd_pcm_channel_area_t *areas;
-  char ***addr;
-  int ch, per;
-  
-  areas = (snd_pcm_channel_area_t *)malloc( sizeof( snd_pcm_channel_area_t) * st->channels);
-	
-  if ((areas = snd_pcm_mmap_running_areas( st->handle)) == 0)
-    {
-      post( "Error: snd_pcm_mmap_get_areas() failed\n");
-      snd_pcm_close( st->handle );
-      st->handle = 0;
-      return -1;
-    }
-
-  addr = (char ***)malloc( st->channels * sizeof( char *));
-
-  for (ch = 0; ch < st->channels; ch++)
-    {
-      addr[ch] = (char **)fts_malloc( st->periods * sizeof( char *));
-      memset( addr[ch], 0, st->periods * sizeof( char *));
-
-      for ( per = 0; per < st->periods; per++) 
-	{
-	  int channel_fragment_bytes = st->bytes_per_sample * st->period_size;
-
-	  addr[ch][per] = (char *) areas[ch].addr 
-	    + (areas[ch].first / 8)    /* offset to first sample in bits */
-	    + per * channel_fragment_bytes;
-	}
-    }
-
-  st->addr = addr;
-  st->current_period = 0;
-  st->count = 0;
-
-  return 0;
-}
-
-static int alsastream_link( alsastream_t *capture, alsastream_t *playback)
-{
-  snd_pcm_link( capture->handle, playback->handle);
-
-  capture->link = playback;
-
-  return 0;
-}
-
-static int alsastream_start( alsastream_t *st)
-{
-  int err, ch, per;
-
-  if ( (err = snd_pcm_prepare( st->handle)) < 0)
-    return err;
-
-  for (ch = 0; ch < st->channels; ch++)
-    for ( per = 0; per < st->periods; per++) 
-      memset( st->addr[ch][per], 0, st->bytes_per_sample * st->period_size);
-
-  snd_pcm_mmap_forward( st->handle, st->periods * st->period_size);
-
-  if ( (err = snd_pcm_start( st->handle)) < 0)
-    return err;
-
-  return 0;
-}
-
-static void alsastream_stop( alsastream_t *st)
-{
-  if (st->handle)
-    snd_pcm_drop( st->handle);
-}
-
-static int alsastream_xrun_recovery_ardour( alsastream_t *capture)
-{
-  snd_pcm_sframes_t capture_delay;
-  int err;
-
-  if ((err = snd_pcm_delay( capture->handle, &capture_delay)) < 0)
-    return err;
-
-  post( "xrun of %d frames\n", capture_delay);
-	
-  alsastream_stop( capture->link);
-  alsastream_start( capture->link);
-
-  return 0;
-}
-
-static int alsastream_poll( alsastream_t *st)
-{
-  struct pollfd pfd;
-  int r, frames_avail, xrun;
-
-  if (!st->fd)
-    {
-      snd_pcm_poll_descriptors( st->handle, &pfd, 1);
-      st->fd = pfd.fd;
-    }
-
-  pfd.fd = st->fd;
-  pfd.events = POLLIN | POLLERR;
-
-  if ((r = poll ( &pfd, 1, 1000)) < 0)
-    {
-      if (errno == EINTR)
-	{
-	  /* this happens mostly when run */
-	  /* under gdb, or when exiting due to a signal */
-	}
-
-      return r;
-    }
-  else if (r == 0)
-    return 0;
-  else if (pfd.revents & POLLERR)
-    return -1;
-
-  xrun = 0;
-
-  if ((frames_avail = snd_pcm_avail_update( st->handle)) < 0)
-    {
-      if (frames_avail == -EPIPE)
-	xrun = 1;
-      else 
-	{
-	  return frames_avail;
-	}
-    }
-
-  if (st->link)
-    {
-      if ((frames_avail = snd_pcm_avail_update( st->link->handle)) < 0)
-	{
-	  if (frames_avail == -EPIPE)
-	    xrun = 1;
-	  else 
-	    {
-	      return frames_avail;
-	    }
-	}
-    }
-
-  if (xrun)
-    alsastream_xrun_recovery_ardour( st);
-
-  return 1;
-}
 
 /* ********************************************************************** */
 /* I/O functions                                                          */
 /* ********************************************************************** */
-
-/* ---------------------------------------------------------------------- */
-/* I/O functions for ardour mmap mode                                     */
-/* ---------------------------------------------------------------------- */
-static void alsastream_forward( alsastream_t *st, int n)
-{
-  st->count += n;
-
-  if ( st->count % st->period_size == 0)
-    {
-      st->current_period = (st->current_period + 1) % st->periods;
-      snd_pcm_mmap_forward( st->handle, st->period_size);
-      st->count = 0;
-    }
-}
-
-static void alsa_input_32_mmap_ardour( fts_word_t *argv)
-{
-  alsaaudioport_t *port;
-  int n, channels, ch, i;
-  
-  port = (alsaaudioport_t *)fts_word_get_ptr( argv+0);
-  n = fts_word_get_int(argv + 1);
-  channels = fts_audioport_get_input_channels( port);
-
-  if (port->capture.handle && port->capture.count == 0)
-    alsastream_poll( &port->capture);
-
-  for ( ch = 0; ch < channels; ch++)
-    {
-      float *out = (float *) fts_word_get_ptr( argv + 2 + ch);
-      long *mmap_buffer = (long *)port->capture.addr[ch][port->capture.current_period] + port->capture.count;
-
-#define DIV ((float)((1<<23) - 1))
-      for ( i = 0; i < n; i++)
-	out[i] = (float)(mmap_buffer[i] >> 8) / DIV;
-    }
-
-  alsastream_forward( &port->capture, n);
-}
-
-static void alsa_output_32_mmap_ardour( fts_word_t *argv)
-{
-  alsaaudioport_t *port;
-  int n, channels, ch, i;
-  
-  port = (alsaaudioport_t *)fts_word_get_ptr( argv+0);
-  n = fts_word_get_int(argv + 1);
-  channels = fts_audioport_get_output_channels( port);
-
-  if (!port->capture.handle && port->playback.handle && port->playback.count == 0)
-    alsastream_poll( &port->playback);
-
-  for ( ch = 0; ch < channels; ch++)
-    {
-      float *in = (float *) fts_word_get_ptr( argv + 2 + ch);
-      long *mmap_buffer = (long *)port->playback.addr[ch][port->playback.current_period] + port->playback.count;
-
-      for ( i = 0; i < n; i++)
-	mmap_buffer[i] = (long) (((1<<23) - 1) * in[i]) << 8;
-    }
-
-  alsastream_forward( &port->playback, n);
-}
-
 
 /* ---------------------------------------------------------------------- */
 /* I/O functions for mmap or rw mode                                      */
@@ -687,8 +451,7 @@ OUTPUT_FUN_NONINTERLEAVED( alsa_output_16_mmap_n, short, snd_pcm_mmap_writen, 0,
 OUTPUT_FUN_NONINTERLEAVED( alsa_output_32_mmap_n, long, snd_pcm_mmap_writen, 8, 8388607.0f)
 
 /* to access this table: functions_table[mode][format][inout] */
-static ftl_wrapper_t functions_table[5][2][2] = {
-  { { 0, 0}, { alsa_input_32_mmap_ardour, alsa_output_32_mmap_ardour} }, 
+static ftl_wrapper_t functions_table[4][2][2] = {
   { { alsa_input_16_mmap_n, alsa_output_16_mmap_n}, { alsa_input_32_mmap_n, alsa_output_32_mmap_n} }, 
   { { alsa_input_16_mmap_i, alsa_output_16_mmap_i}, { alsa_input_32_mmap_i, alsa_output_32_mmap_i} }, 
   { { alsa_input_16_rw_n, alsa_output_16_rw_n}, { alsa_input_32_rw_n, alsa_output_32_rw_n} }, 
@@ -791,9 +554,7 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
   format_is_32 = (format == SND_PCM_FORMAT_S32_LE);
 
   s_transfer_mode = fts_get_symbol_arg( ac, at, 4, s_rw_interleaved);
-  if (s_transfer_mode == s_mmap_ardour)
-    transfer_mode = MMAP_ARDOUR;
-  else if (s_transfer_mode == s_mmap_noninterleaved)
+  if (s_transfer_mode == s_mmap_noninterleaved)
     transfer_mode = MMAP_NONINTERLEAVED;
   else if (s_transfer_mode == s_mmap_interleaved)
     transfer_mode = MMAP_INTERLEAVED;
@@ -832,22 +593,6 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
       this->output_buffer = alsaaudioport_allocate_buffer( transfer_mode, this->playback.channels, fts_dsp_get_tick_size(), snd_pcm_format_physical_width(format)/8);
   }
 
-  if (transfer_mode == MMAP_ARDOUR)
-    {
-      if (this->capture.handle)
-	alsastream_get_addr( &this->capture);
-      if (this->playback.handle)
-	alsastream_get_addr( &this->playback);
-
-      alsastream_link( &this->capture, &this->playback);
-
-      if ( alsastream_start( &this->playback) < 0)
-	{
-	  alsastream_stop( &this->playback);
-	  fts_object_set_error(o, "Error opening ALSA device");
-	  return;
-	}
-    }
   fts_audioport_set_xrun_function( (fts_audioport_t *)this, alsaaudioport_xrun_function);
 
 #ifdef DEBUG
@@ -863,8 +608,6 @@ static void alsaaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, in
   alsaaudioport_t *this = (alsaaudioport_t *)o;
 
   fts_audioport_delete( &this->head);
-
-  alsastream_stop( &this->playback);
 
   if (this->input_buffer)
     fts_free( this->input_buffer);
@@ -901,7 +644,6 @@ void alsaaudioport_config( void)
   s_s32_le = fts_new_symbol( "S32_LE");
   s_s16_le = fts_new_symbol( "S16_LE");
 
-  s_mmap_ardour = fts_new_symbol( "mmap_ardour");
   s_mmap_noninterleaved = fts_new_symbol( "mmap_noninterleaved");
   s_mmap_interleaved = fts_new_symbol( "mmap_interleaved");
   s_rw_noninterleaved = fts_new_symbol( "rw_noninterleaved");
