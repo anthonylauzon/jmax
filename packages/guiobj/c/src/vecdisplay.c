@@ -52,6 +52,9 @@ static fts_symbol_t sym_display = 0;
 static fts_symbol_t sym_scroll = 0;
 static fts_symbol_t sym_bounds = 0;
 
+static void 
+vecdisplay_data_changed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+
 /************************************************************
  *
  *  send to client with time gate
@@ -79,7 +82,7 @@ vecdisplay_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	  
 	  this->n = 0;
 	  
-	  fts_timebase_add_call(fts_get_timebase(), o, vecdisplay_send, 0, this->period);
+	  fts_timebase_add_call(fts_get_timebase(), o, vecdisplay_data_changed, 0, this->period);
 	}
     }
   else
@@ -93,7 +96,13 @@ vecdisplay_deliver(vecdisplay_t *this)
   
   /* if gate is open send right away */
   if(this->gate)
-    vecdisplay_send((fts_object_t *)this, 0, 0, 0, 0);
+    fts_update_request( (fts_object_t *)this);
+}
+
+static void 
+vecdisplay_data_changed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_update_request(o);
 }
 
 /************************************************************
@@ -132,8 +141,8 @@ vecdisplay_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 	  fts_set_int(this->a + this->n, display);
 	  
 	  this->n++;
-	  
-	  fts_update_request(o);
+
+	  vecdisplay_deliver( this);
 	}
     }
 }
@@ -183,7 +192,7 @@ vecdisplay_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
       this->n = n;
       
-      fts_update_request(o);
+      vecdisplay_deliver( this);
     }
 }
 
@@ -226,7 +235,7 @@ vecdisplay_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
       this->n = n;
       
-      fts_update_request(o);
+      vecdisplay_deliver( this);
     }
 }
 
@@ -269,7 +278,7 @@ vecdisplay_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
       this->n = n;
       
-      fts_update_request(o);
+      vecdisplay_deliver( this);
     }
 }
 
@@ -312,7 +321,7 @@ vecdisplay_cvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
       this->n = n;
       
-      fts_update_request(o);
+      vecdisplay_deliver( this);
     }
 }
 
@@ -324,7 +333,7 @@ vecdisplay_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->scroll = 0;
   this->n = 0;
   
-  fts_update_request(o);
+  vecdisplay_deliver( this);
 }
 
 static void
@@ -390,8 +399,7 @@ vecdisplay_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 static void 
 vecdisplay_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vecdisplay_t *this = (vecdisplay_t *) o;
-  vecdisplay_deliver(this);  
+  vecdisplay_send( o, 0, 0, 0, 0);
 }
 
 static void 
