@@ -79,7 +79,7 @@ public class TempoBarPopupMenu extends JPopupMenu
 
 	public void update()
   {
-		for(int i = 0; i< tempoBar.propertyToDraw.length-1; i++)
+		for(int i = 0; i< tempoBar.propertyToDraw.length; i++)
 			((JMenuItem)getComponent(i)).setSelected( tempoBar.propertyToDraw[i]);
 	}
 
