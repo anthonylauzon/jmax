@@ -33,8 +33,8 @@ fts_class_t* dtd_thread_type;
 void dtd_thread_set_state(dtd_thread_t* self,
 			  fts_audiofile_t* sf, 
 			  dtd_buffer_t* com_buffer, 
-			  const int* const buffer_index,
-			  const int* const is_eof)
+			  const int* buffer_index,
+			  int* is_eof)
 {
     self->sf = sf;
     self->com_buffer = com_buffer;

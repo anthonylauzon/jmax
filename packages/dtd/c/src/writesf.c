@@ -62,8 +62,8 @@ static fts_symbol_t s_open_file;
 void writer_set_state(writesf_t* self,
 		      fts_audiofile_t* sf,
 		      dtd_buffer_t* com_buffer,
-		      const int* const buffer_index,
-		      const int* const is_eof)
+		      const int* buffer_index,
+		      int* is_eof)
 {
   dtd_thread_t* reader = (dtd_thread_t*)self->thread_worker->thread_function->object;
   dtd_thread_set_state(reader, sf, com_buffer, buffer_index, is_eof);

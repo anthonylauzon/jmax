@@ -41,9 +41,9 @@ typedef struct
     dtd_buffer_t* com_buffer;
 
     /* index of buffer write by FTS */
-    const int* const buffer_index;
+    const int* buffer_index;
     /* eof flags set by dtd_thread */
-    const int* const is_eof;
+    int* is_eof;
 
     /* delay for nanosleep (see fts_thread_manager) */
     int delay_ms;
@@ -53,8 +53,8 @@ typedef struct
 FTS_API void dtd_thread_set_state(dtd_thread_t* self,
 				  fts_audiofile_t* sf, 
 				  dtd_buffer_t* com_buffer, 
-				  const int* const buffer_index,
-				  const int* const is_eof);
+				  const int* buffer_index,
+				  int* is_eof);
 
 extern fts_class_t* dtd_thread_type;
 
