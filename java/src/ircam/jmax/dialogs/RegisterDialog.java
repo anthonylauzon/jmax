@@ -19,25 +19,42 @@ import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
+import ircam.jmax.toolkit.*;
 
 public class RegisterDialog {
-  public static int popup()
+
+  private static String text = 
+"\nWelcome to jMax !\n\nPlease consider registering yourself as jMax user. \nNote that:\n - it is not required\n - it is free\n - it will not add you to mailing distributions\n\nThis registration is only intended to support the jMax \nproject by giving us an approximate idea of the number \nof users, and particularly the number of users of the \nLinux version.\n\nTo register, simply send a mail to jmax-register@ircam.fr,\nand indicate the platform that you run jMax on.\n\nPlease visit jMax home page at: http://www.ircam.fr/jmax\nand subscribe to the jMax mailing list.\n\nPlease also consider subscribing to the Ircam Forum:\nhttp://www.ircam.fr/forum\n\nNOTE:\n This panel will be automatically disabled by adding a file\n named .jmaxregistered in your home directory. If this panel\n opens again, you can either create this file by hand, start\n jMax with the option '-jmaxNoRegister true' or put in your\n .jmaxrc file the command 'set jmaxNoRegister true'.";
+
+  public static void popup()
   {
-      JTextArea textArea = new JTextArea( 
-"Register as jMax user\n\nPlease consider registering as jMax user.\n\nTo register, send a mail to jmax-register@ircam.fr\nwith bla bla bla\n\nhttp://www.ircam.fr/jmax\n\n\n\n\n\n\n\n\n"
-);
+    JTextArea textArea = new JTextArea( text, 30, 60);
 
-      textArea.setEditable( false);
+    textArea.setEditable( false);
 
-      JScrollPane scrollPane = new JScrollPane( textArea);
-                
-      Object[] message = new Object[1];
+    JScrollPane scrollPane = new JScrollPane() {
+      public Dimension getPreferredSize()
+	{
+	  return new Dimension( 400, 300);
+	}
+    };
 
-      message[0] = scrollPane;
+    scrollPane.setViewportView( textArea);
+                     
+    Object[] message = new Object[1];
 
-      String[] options = { "OK", "Register later", "Cancel"};
+    message[0] = scrollPane;
 
-      return JOptionPane.showOptionDialog( MaxWindowManager.getTopFrame(), message, "Register", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+    String[] options = { "OK" };
+
+    JOptionPane.showOptionDialog( MaxWindowManager.getTopFrame(), 
+				  message, 
+				  "Register", 
+				  JOptionPane.DEFAULT_OPTION, 
+				  JOptionPane.INFORMATION_MESSAGE, 
+				  IconCache.getIcon( "jmax_logo_small.gif"), 
+				  options, 
+				  options[0]);
   }
 }
 

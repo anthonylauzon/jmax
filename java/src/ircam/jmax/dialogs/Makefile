@@ -37,6 +37,10 @@ QuitDialog:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) QuitDialog.java)
 .PHONY: QuitDialog
 
+RegisterDialog:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) RegisterDialog.java)
+.PHONY: RegisterDialog
+
 SplashDialog:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) SplashDialog.java)
 .PHONY: SplashDialog
