@@ -2,7 +2,7 @@ package ircam.jmax.editors.ermes;
 
 import java.awt.*;
 import java.util.*;
-
+import java.net.*;
 import ircam.jmax.*;
 
 /**
@@ -134,7 +134,8 @@ public class ErmesToolBar extends Panel {
   private void InsertButton() {
     //charge images if not already charged
     String fs = MaxApplication.ermesProperties.getProperty("file.separator");
-    String path = MaxApplication.ermesProperties.getProperty("root")+fs+"ermes"+fs+"images"+fs;
+    String path = MaxApplication.ermesProperties.getProperty("root")+fs+"images"+fs;
+
     if (aImage1 == null) {
       Toolkit toolkit = Toolkit.getDefaultToolkit();
       aImage1 = toolkit.getImage(path+"extUp.gif");
@@ -160,6 +161,7 @@ public class ErmesToolBar extends Panel {
       aImage21 = toolkit.getImage(path+"patcherUp.gif");
       aImage22 = toolkit.getImage(path+"patcherDown.gif");
     }
+
     //Put buttons 
        	
     add(new ErmesToggleButton(aImage1, aImage2, this, 0));

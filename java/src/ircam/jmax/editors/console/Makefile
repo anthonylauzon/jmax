@@ -22,13 +22,28 @@ all:
 	javac $(JFLAGS) $(SOURCES)
 .PHONY: all
 
-ConsShell:
-	javac $(JFLAGS) ConsShell.java
-.PHONY: ConsShell
-
 Console:
 	javac $(JFLAGS) Console.java
 .PHONY: Console
 
+ConsoleKeyListener:
+	  ConsoleKeyListener.java
+.PHONY: ConsoleKeyListener
+
+ConsoleWriter:
+	javac $(JFLAGS) ConsoleWriter.java
+.PHONY: ConsoleWriter
+
+ConsoleWindow:
+	javac $(JFLAGS) ConsoleWindow.java
+.PHONY: ConsoleWindow
+
+ConsoleThread:
+	javac $(JFLAGS) ConsoleThread.java
+.PHONY: ConsoleThread
+
+ConsoleDocument:
+	javac $(JFLAGS) ConsoleDocument.java
+.PHONY: ConsoleDocument
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

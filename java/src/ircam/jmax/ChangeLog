@@ -1,3 +1,31 @@
+Thu Jan 29 16:32:27 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Changed the site configuration file name to "jmax.cfg"
+	
+	* Changed the user configuration file name to ~/.jmaxrc.
+
+	* Changed the name of all the TCL configuration variables to
+	  have a "jmax" prefix instead of "fts".
+	  The variable ftsName is now called jmaxServerName.
+
+	* The ICE browser has been reintroduced as a separate package; to 
+	  load it, the command "package require icebrowser" is invoked; 
+	  since at the moment is the only browser we have, this command
+	  is by default added to the jmax.cfg site configuration file.
+
+	  All the invokation to the documentation in the code are done by
+	  evaluating the tcl script "browse <url>"; there is no more a direct
+	  JAVA Api to browse the documentation; at bootstrap, the browse command
+	  is empty (give an error message); loading a browser package (icebrowser
+	  by default, at the moment) redefine to run the loaded browser.
+
+        * Added the tcl command "help"; open the max/doc/help.html file.
+
+        * Delete the max/ermes directory has been deleted; 
+ 	  The max/ermes/images directory become max/images
+	  The ermes.zip file become jmax.jar, and will be located
+          in max/java.
+
 Tue Jan 27 20:51:32 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
 
 	* dialogs/StatisticsDialog.java: changed "freeMemory" to "UsedMemory".

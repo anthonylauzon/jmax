@@ -863,14 +863,6 @@ public class MaxApplication extends Object {
 
     try
       {
-	// Set the variables; only global variables that
-	// cannot be changed from ~/.ermesrc are fixed here.
-	// Global variables are jmaxRootDir, jmaxUserDir
-	//
-
-	itsInterp.setVar("jmaxRootDir", TclString.newInstance(ermesProperties.getProperty("root")), TCL.GLOBAL_ONLY);
-	itsInterp.setVar("jmaxUserDir", TclString.newInstance(ermesProperties.getProperty("user.home")), TCL.GLOBAL_ONLY);
-
 	// Load the "jmaxboot.tcl" file that will do whatever is needed to
 	// create the startup configuration, included reading user files
 
@@ -880,7 +872,7 @@ public class MaxApplication extends Object {
       }
     catch (TclException e)
       {
-	System.out.println("TCL error in initialization " + e);
+	System.out.println("TCL error in initialization " + e + " : " + itsInterp.getResult());
       }
   }
 

@@ -26,3 +26,23 @@ proc _doSourceFile {dir file} {
 }
 
 
+## 
+## A default implementation of the browse command
+## so that the kernel code can call it
+##
+
+proc browse { location } {
+    puts "No Browser installed !!!"
+}
+
+
+##
+## The basic help command, just call up the browser 
+## with a generic help html text.
+##
+
+proc help {} {
+    set root [systemProperty "root"]
+    browse "file:$root/doc/help.html"
+}
+

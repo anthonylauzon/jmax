@@ -7,6 +7,7 @@
 ## the packages.
 ##
 
+set jmaxRootDir [systemProperty "root"]
 ##
 ## Intrinsic functions
 ## Must be loaded with "source", and not sourceFile,
@@ -36,13 +37,13 @@ package provide jMax 2.0.2
 ## User Configuration (use source to get global variables)
 ##
 
-source $jmaxUserDir/.ermesrc
+source [systemProperty user.home]/.jmaxrc
 
 ##
 ## Standard config.
 ##
 
-sourceFile $jmaxRootDir/config/ermesrc.tcl
+sourceFile $jmaxRootDir/config/jmax.cfg
 
 
 

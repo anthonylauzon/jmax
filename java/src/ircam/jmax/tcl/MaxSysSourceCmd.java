@@ -38,7 +38,7 @@ class MaxSysSourceCmd implements Command
 	  }
 	catch (TclException e)
 	  {
-	    System.out.println("TCL Error in " + fileName + ":" + e);
+	    System.out.println("TCL Error " + e + " in " + fileName + " : " + interp.getResult());
 	  }
       }
     else

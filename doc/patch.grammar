@@ -33,7 +33,15 @@ font id is a number between 1 and 7.
 
 Tables are represented by three lines/commands:
 
-#N vtable 256 644 646 953 846 16 128 [name];
+#N vtable <size> <x1> <y1> <x2> <y2> <flags> <range> [<name>];
+
+Where: <size> size of the table
+       <x1> <y1> <x2> <y2>  dimension and position of the table editor
+       <flags>  Flags telling: If window is visible, if the display is signed
+	        if the editor should comply at closing, if the content is saved 
+		with the patcher.
+       <range>  editable range of the values.
+
 #N vtable 128 213 133 394 311 17 128;
 #T set <index> [ <values> ]*
 #P newobj 42 302 102 1 table [name];
@@ -112,7 +120,6 @@ Explode:
 #X stop;
 #P newobj 123 170 108 1 explode;
 
-#P newobj 197 77 109 2 explode;
 #N explode;
 #X restore;
 #X 0 125 0 30 2;
@@ -184,3 +191,6 @@ Explode:
 #X 50 51 64 1700 1;
 #X stop;
 #P newobj 499 77 106 2 explode;
+
+
+

@@ -109,11 +109,6 @@ public class ConnectionDialog extends Dialog implements KeyListener, ActionListe
     Panel p2 = new Panel();
     p2.setLayout(new BorderLayout());
 	        
-    Toolkit toolkit = Toolkit.getDefaultToolkit();
-    Image aImage1 = toolkit.getImage("images/OKButtonUp.gif");
-    Image aImage2 = toolkit.getImage("images/OKButtonDown.gif");
-    //okButton = new Button(aImage1, aImage2, this); nice try, Riccardo
-	        
     okButton = new Button("OK");
     okButton.setBackground(Color.white);
     okButton.addActionListener(this);

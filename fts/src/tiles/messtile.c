@@ -3,7 +3,7 @@
 */
 
 #ifdef DEBUG
-/*#define MESS_DEBUG */
+/*#define MESS_DEBUG*/
 #endif
 
 #include <string.h>
@@ -99,7 +99,7 @@ fts_messtile_init()
 static void
 post_mess(const char *msg, int ac, const fts_atom_t *av)
 {
-  post("%s: ", msg);
+  post("%s (%d args): ", msg, ac);
   postatoms(ac, av);
   post("\n");
 }
@@ -442,8 +442,10 @@ fts_mess_client_mess(int ac, const fts_atom_t *av)
       
       if (ret != fts_Success)
 	{
-	  post("Error in FOS message MESS: %s sending message to object of class %s\n",
-	       ret->description, fts_symbol_name(fts_object_get_class_name(obj)));
+	  post("Error in FOS message MESS: %s sending message %s to object of class %s\n",
+	       ret->description, fts_symbol_name(selector),
+	       fts_symbol_name(fts_object_get_class_name(obj)));
+
 	  post_mess("Message MESSAGE_CODE", ac, av);
 	}
     }

@@ -3,6 +3,9 @@ package ircam.jmax.editors.ermes;
 import java.awt.*;
 import java.util.*;
 import java.awt.event.*;
+
+import tcl.lang.*;
+
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
@@ -573,99 +576,6 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   //--------------------------------------------------------
   //	keyDown
   //--------------------------------------------------------
-  /* public boolean keyDown(Event evt,int key){
-     if (evt.controlDown()){
-     if(key == 13) MaxApplication.getApplication().GetProjectWindow().toFront();
-     else if(key == 14) MaxApplication.getApplication().itsProjectWindow.New();
-     else if(key == 15) MaxApplication.getApplication().itsProjectWindow.Open();
-     else if(key == 16) MaxApplication.getApplication().ObeyCommand(MaxApplication.PRINT_WINDOW);
-     else if(key == 17) MaxApplication.getApplication().ObeyCommand(MaxApplication.QUIT_APPLICATION);
-     else if(key == 19)itsDocument.Save();
-     else if(key == 23) {
-     if (isSubPatcher){
-     hide();
-     itsTopWindow.RemoveFromSubWindowList(this);
-     }
-     else {
-     MaxApplication.getApplication().ObeyCommand(MaxApplication.CLOSE_WINDOW);
-     dispose();
-     }
-     }       
-     else if(key == 5){//Control+E
-     ErmesObject aObject;
-     itsChangingRunEditMode = true;
-     MenuItem aRunEditItem = itsWindowsMenu.getItem(0);
-     MenuItem aSelectAllItem = itsEditMenu.getItem(5);
-     if(!itsSketchPad.GetRunMode()){  
-     setBackground(Color.white);
-     itsSketchPad.SetRunMode(true);
-     for(Enumeration e = itsSketchPad.itsElements.elements(); e.hasMoreElements();) {
-     aObject = (ErmesObject)e.nextElement();
-     aObject.RunModeSetted();
-     }
-     itsToolBar.RunModeSetted(true);
-     aRunEditItem.setLabel("Edit mode Ctrl+E");
-     aSelectAllItem.disable();
-     }
-     else {
-     itsChangingRunEditMode = true;
-     setBackground(ErmesSketchPad.sketchColor);
-     itsSketchPad.SetRunMode(false);
-     itsToolBar.RunModeSetted(false);
-     aRunEditItem.setLabel("Run mode Ctrl+E");
-     aSelectAllItem.enable();
-     }
-     }
-     else if (key == '?')
-     {
-     //ask help for the reference Manual for the selected element...
-     // open one url *only*, because we open only one browser.
-     
-     ErmesObject aObject;
-     String urlToOpen;
-     
-     if (itsSketchPad.itsSelectedList.size() > 0)
-     {
-     aObject = (ErmesObject) itsSketchPad.itsSelectedList.elementAt(0);
-     
-     urlToOpen = aObject.itsFtsObject.getReferenceURL();
-
-     if (urlToOpen != null)
-     {
-     // @@@@@@ the "browseLocation" should be a MaxApplication 
-     // command; the application provide an documentation service
-     // to *all* the editors.
-     // Better, it should provide an "OpenDocumentation" command
-     // that can be implemented in different ways
-     // ErmesBrowser.browseLocation(urlToOpen, itsMaxApplication);
-     }
-     }
-     }
-     }
-     else if(key == ircam.jmax.utils.Platform.DELETE_KEY||key==ircam.jmax.utils.Platform.BACKSPACE_KEY){
-     if(itsSketchPad.GetEditField()!=null){
-     if(!itsSketchPad.GetEditField().HasFocus())
-     itsSketchPad.itsHelper.DeleteSelected();
-     }
-     }
-     
-     else if (key == '?') {//this is a patch to trap the '?'
-     //ask help for the selected element...
-     ErmesObject aObject = null;
-     String fileToOpen;
-     for (Enumeration e = itsSketchPad.itsSelectedList.elements(); e.hasMoreElements();) {
-     aObject = (ErmesObject) e.nextElement();
-     
-     fileToOpen = aObject.itsFtsObject.getHelpPatch();
-     
-     if (fileToOpen != null)
-     MaxApplication.getApplication().Load(fileToOpen, "");
-     }
-     }
-     return true;
-     }
-     */
-
 
   /////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////keyListener --inizio  
@@ -724,6 +634,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       
 	ErmesObject aObject;
 	String urlToOpen;
+	Interp interp  = MaxApplication.getTclInterp();
 	
 	if (itsSketchPad.itsSelectedList.size() > 0){
 	  aObject = (ErmesObject) itsSketchPad.itsSelectedList.elementAt(0);
@@ -731,13 +642,22 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 	  urlToOpen = aObject.itsFtsObject.getReferenceURL();
 	  
 	  if (urlToOpen != null){
-	    // @@@@@@ the "browseLocation" should be a MaxApplication 
-	    // command; the application provide an documentation service
-	    // to *all* the editors.
-	    // Better, it should provide an "OpenDocumentation" command
-	    // that can be implemented in different ways
-	    // ErmesBrowser.browseLocation(urlToOpen, itsMaxApplication);
-	   }
+	    try
+	      {
+		// Call the tcl browse function, with the URL as argument
+		// By default, the tcl browse function do nothing.
+		// if a user installed a browser package, this will
+		// show the documentation.
+
+
+
+		interp.eval("browse " + urlToOpen);
+	      }
+	    catch (tcl.lang.TclException et)
+	      {
+		System.out.println("TCL error executing browse " + urlToOpen + " : " + interp.getResult());
+	      }
+	  }
 	}   
       }
     } 

@@ -40,13 +40,14 @@ class FtsAddListenerCmd implements Command
       // and the new value
       // No way, call with two arguments, property name and value
 
+      Interp interp = MaxApplication.getTclInterp();
       try
 	{
-	  MaxApplication.getTclInterp().eval(tclFunction + " " + name + value.toString());
+	  interp.eval(tclFunction + " " + name + value.toString());
 	}
       catch (TclException e1)
 	{
-	  System.err.println("TCL Error in proc " + tclFunction + ":" + e1);
+	  System.err.println("TCL Error in proc " + tclFunction + ":" + interp.getResult());
 	}
     }
   }

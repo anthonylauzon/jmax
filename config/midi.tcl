@@ -1,6 +1,6 @@
 ##################################################################
 #
-#  FTS default MIDI device configuration
+#  jMax default MIDI device configuration
 #
 #    mips1
 #    irix5.3
@@ -10,14 +10,14 @@
 #
 
 
-global ftsArch ftsMidiPort
+global jmaxArch jmaxMidiPort
 
-if {$ftsArch == "mips1" || $ftsArch == "irix5.3" || $ftsArch == "origin"} {
-    puts "FTS default MIDI configuration"
+if {$jmaxArch == "mips1" || $jmaxArch == "irix5.3" || $jmaxArch == "origin"} {
+    puts "jMax default MIDI configuration"
     puts "(make sure that you lauched the MIDI deamon using the startmidi command)"
-    puts "  port: $ftsMidiPort"
-    ucs open device midi 0 as sgi_midi port $ftsMidiPort
-} elseif {$ftsArch == "o2r5k" || $ftsArch == "o2r10k"} {
+    puts "  port: $jmaxMidiPort"
+    ucs open device midi 0 as sgi_midi port $jmaxMidiPort
+} elseif {$jmaxArch == "o2r5k" || $jmaxArch == "o2r10k"} {
     puts "(MIDI not configured)"
 }
 

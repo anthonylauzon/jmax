@@ -1,0 +1,4 @@
+all	intrinsics.tcl
+all	jmaxboot.tcl
+all	jmaxpkg.tcl
+all	packages.tcl

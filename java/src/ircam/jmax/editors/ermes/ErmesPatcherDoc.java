@@ -130,8 +130,7 @@ public class ErmesPatcherDoc implements MaxDocument {
     try {
       MaxApplication.getTclInterp().evalFile(theName);
     } catch (tcl.lang.TclException e) {
-      System.out.println("error reading .tpa "+ theName + e);
-      e.printStackTrace();// proviamo ...
+      System.out.println("TCL error reading file "+ theName + " : " + MaxApplication.getTclInterp().getResult());
     }
     return true;  //change this!
   }

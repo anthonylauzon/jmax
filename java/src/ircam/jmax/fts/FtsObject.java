@@ -457,12 +457,13 @@ public class FtsObject
 	// Should really do something better here in case of error !!!
 	// raising exceptions ... 
 
+	Interp interp  = MaxApplication.getTclInterp();
+
 	try
 	  {
 	    // Call the tcl template function, with the container (this) as 
 	    // first argument, and the other args following.
 
-	    Interp interp  = MaxApplication.getTclInterp();
 	    TclObject list = TclList.newInstance();
 
 	    TclList.append(interp, list, TclString.newInstance(FtsTemplateTable.getProc(className)));
@@ -486,7 +487,7 @@ public class FtsObject
 	  }
  	catch (tcl.lang.TclException e)
 	  {
-	    System.out.println("TCL Error in template " + className + ":" + e);
+	    System.out.println("TCL Error in template " + className + ":" + interp.getResult());
 	  }
 
 	loaded();	// activate the post-load init, like loadbangs
