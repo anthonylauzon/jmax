@@ -67,9 +67,9 @@ public class FtsParse
 
   /* Operating variables */
 
-  boolean toPort;
+  boolean toStream;
   Object parsedToken;
-  FtsPort port;
+  FtsStream stream;
   String str;
   StringBuffer token;
   int pos = 0; // counter for the string scan
@@ -79,14 +79,14 @@ public class FtsParse
   FtsParse(String str)
   {
     this.str = str;
-    toPort = false;
+    toStream = false;
   }
 
-  FtsParse(String str, FtsPort port)
+  FtsParse(String str, FtsStream stream)
   {
     this.str = str;
-    this.port = port;
-    toPort = true;
+    this.stream = stream;
+    toStream = true;
   }
 
   /** try/backtrack handling */
@@ -227,24 +227,24 @@ public class FtsParse
 
   final private void ParseLong() throws java.io.IOException
   {
-    if (toPort)
-      port.sendInt(token);
+    if (toStream)
+      stream.sendInt(token);
     else
       parsedToken = new Integer(token.toString());
   }
 
   final private void ParseFloat() throws java.io.IOException
   {
-    if (toPort)
-      port.sendFloat(token);
+    if (toStream)
+      stream.sendFloat(token);
     else
       parsedToken = new Float(token.toString());
   }
 
   final private void ParseString() throws java.io.IOException
   {
-    if (toPort)
-      port.sendString(token);
+    if (toStream)
+      stream.sendString(token);
     else
       parsedToken = token.toString();
   }
@@ -520,13 +520,13 @@ public class FtsParse
   }
 
   /** Parse an object argument description (without the class Name),
-   * and send it to an FtsPort (optimization to reduce object allocation
+   * and send it to an FtsStream (optimization to reduce object allocation
    * during editing).
    */
 
-  public static void parseAndSendObject(String str, FtsPort port) throws java.io.IOException
+  public static void parseAndSendObject(String str, FtsStream stream) throws java.io.IOException
   {
-    FtsParse parser = new FtsParse(str, port);
+    FtsParse parser = new FtsParse(str, stream);
 
     while (! parser.isEndOfString())
       {
@@ -723,12 +723,14 @@ public class FtsParse
   }
 
 
-  static String unparseObjectDescription(FtsMessage msg)
+  static String unparseObjectDescription(FtsStream stream)
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
-    return unparseObjectDescription(msg.getNextArgument(), msg);
+    return unparseObjectDescription(stream.getNextArgument(), stream);
   }
 
-  static String unparseObjectDescription(Object initValue, FtsMessage msg)
+  static String unparseObjectDescription(Object initValue, FtsStream stream)
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     boolean doNewLine = false;
     boolean addBlank = false;
@@ -750,7 +752,10 @@ public class FtsParse
 
 	doNewLine = false;
 
-	value2 = msg.getNextArgument();
+	if (stream.endOfArguments())
+	  value2 = null;
+	else
+	  value2 = stream.getNextArgument();
 
 	if (value1 instanceof Float)
 	  descr.append(numberFormat.format(value1));
@@ -810,7 +815,8 @@ public class FtsParse
   // Version used for the comments, to avoid introducing quotes
   // in comments
 
-  static String simpleUnparseObjectDescription(FtsMessage msg)
+  static String simpleUnparseObjectDescription(FtsStream stream)
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     boolean doNewLine = false;
     boolean addBlank = false;
@@ -820,7 +826,11 @@ public class FtsParse
 
     StringBuffer descr = new StringBuffer();
 
-    value2 = msg.getNextArgument();
+    if (stream.endOfArguments())
+      value2 = null;
+    else
+      value2 = stream.getNextArgument();
+
     value1 = value2;
 
     while (value1 != null)
@@ -832,7 +842,10 @@ public class FtsParse
 
 	doNewLine = false;
 
-	value2 = msg.getNextArgument();
+	if (stream.endOfArguments())
+	  value2 = null;
+	else
+	  value2 = stream.getNextArgument();
 
 	if (value1 instanceof Float)
 	  descr.append(numberFormat.format(value1));

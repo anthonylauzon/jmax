@@ -50,7 +50,6 @@ public class FtsSliderObject extends FtsIntValueObject
   }
 
   /* Over write the localPut message to handle value changes;
-     Should get the FtsMessage and do a receiveInt
      It does *not* call the listener on max and min values.
    */
 

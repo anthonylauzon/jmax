@@ -50,9 +50,10 @@ public class FtsMessageObject extends FtsObject
        
   /* Over write the handle message to handle message box changes */
 
-  void handleMessage(FtsMessage msg)
+  void handleMessage(FtsStream stream)
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
-    setMessage(FtsParse.unparseObjectDescription(msg));
+    setMessage(FtsParse.unparseObjectDescription(stream));
 
     if (listener instanceof FtsMessageListener)
       ((FtsMessageListener) listener).messageChanged(message);

@@ -4,44 +4,38 @@ import java.io.*;
 import java.net.*;
 
 /**
- * The socket connection.
- * Implement a specialed connection using a socket (client side)
- * for communicating with FTS
+ * The subProcess connection.
+ * Implement a specialed connection using pipes
+ * for communicating with FTS; start FTS as a subprocess.
  */
 
-class FtsSocketPort extends FtsPort
+class FtsSubProcessStream extends FtsStream
 {
-  String host;
-  int port;
-  Socket socket;
+  String path;
+  String ftsName;
+  Process proc;
   InputStream in_stream = null;
   OutputStream out_stream = null;
 
-  FtsSocketPort(String host, int port)
+  FtsSubProcessStream(String path, String ftsName)
   {
-    super(host+":"+port);
-
-    this.host = host;
-    this.port = port;
+    super("fts");
+    this.path = path;
+    this.ftsName = ftsName;
 
     try
       {
-	socket = new Socket(host, port);
-	out_stream = new BufferedOutputStream(socket.getOutputStream(), 1024);
-	in_stream  = new BufferedInputStream(socket.getInputStream(), 1024);
-      }
-    catch (UnknownHostException e)
-      {
-	System.out.println("Don't know about host " + host + ":" + port);
+	proc = Runtime.getRuntime().exec(path+"/"+ftsName);
+	out_stream = proc.getOutputStream();
+	in_stream  = proc.getInputStream();
+
+	FtsErrorStreamer.startFtsErrorStreamer(proc.getErrorStream());
       }
     catch (IOException e)
       {
-	System.out.println("Couldn't get I/O for the connection to " + host + ":" + port);
+	System.out.println("Don't know about command " + path);
       }    
   }
-
-  // New behaviour: stop the server when close connection: ok, because we
-  // say we are now monoclient .
 
   void close()
   {
@@ -49,11 +43,11 @@ class FtsSocketPort extends FtsPort
       {
 	in_stream.close();
 	out_stream.close();
-	socket.close();
+	proc.destroy();
       } 
     catch (IOException e)
       {
-	System.out.println("I/O failed on closing the connection to " + host + ":" + port);
+	System.out.println("Cannot quit " + path);
       }
   }
 
@@ -73,9 +67,16 @@ class FtsSocketPort extends FtsPort
   /** Method to receive a char; since we can use datagram sockets or other
     means I/O is not necessarly done thru streams */
 
-  protected int read() throws java.io.IOException
+  protected int read() throws java.io.IOException, FtsQuittedException
   {
-    return in_stream.read();
+    int c;
+
+    c = in_stream.read();
+
+    if (c == -1)
+      throw new FtsQuittedException();
+
+    return c;
   }
 
   /** Method to Ask for an explicit output flush ; since we
@@ -87,7 +88,4 @@ class FtsSocketPort extends FtsPort
     out_stream.flush();
   }
 }
-
-
-
 

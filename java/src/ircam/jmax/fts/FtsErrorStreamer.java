@@ -18,24 +18,22 @@ import ircam.jmax.utils.*;
 
 class FtsErrorStreamer implements Runnable
 {
-  FtsServer server;
   InputStream in;
   TextWindow window = null;
   PrintStream out = null;
 
-  static void startFtsErrorStreamer(InputStream in, FtsServer server)
+  static void startFtsErrorStreamer(InputStream in)
   {
     Thread streamer;
 
-    streamer = new Thread(new FtsErrorStreamer(in, server), "Error Streamer");
+    streamer = new Thread(new FtsErrorStreamer(in), "Error Streamer");
     streamer.setDaemon(true);
     streamer.start();
   }
 
-  FtsErrorStreamer(InputStream in, FtsServer server)
+  FtsErrorStreamer(InputStream in)
   {
     this.in = in;
-    this.server = server;
   }
 
   public void run()
@@ -63,7 +61,6 @@ class FtsErrorStreamer implements Runnable
 	    if (c == -1)
 	      {
 		running = false;
-		server.ftsQuitted();
 		out.println("FTS quitted/crashed !!!\n");
 	      }
 	    else

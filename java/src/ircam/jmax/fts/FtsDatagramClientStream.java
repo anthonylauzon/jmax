@@ -18,11 +18,11 @@ import java.net.*;
  * dati
  */
 
-class FtsDatagramPort extends FtsPort
+class FtsDatagramClientStream extends FtsStream
 {
   final static private int max_packet_size = 256;
   DatagramSocket socket = null;
-  byte in_data[] = new byte[max_packet_size];
+  byte in_data[]  = new byte[max_packet_size]; 
   byte out_data[] = new byte[max_packet_size];
   int in_fill_p = -1;           // point to the next char to read in in_data, -1 if no packet read yet.
   int out_fill_p = 0;		// point to the next free char in out_data
@@ -32,67 +32,36 @@ class FtsDatagramPort extends FtsPort
   String host;
   String path;
   String ftsName;
-  Process proc;
+  int port;
 
-  FtsDatagramPort(String host, String path, String ftsName)
+  FtsDatagramClientStream(String host, String path, String ftsName, int port)
   {
     super(host);
 
     String command;
 
     this.host = host;
+    this.port = port;
     this.path = path;
     this.ftsName = ftsName;
 
     try
       {
-	this.socket = new DatagramSocket();// look for a free port
+	this.socket = new DatagramSocket(port);// look for a free port
       }
     catch (java.io.IOException e)
       {
 	System.out.println("Error while opening server socket " + e);
       }
 
-    try
-      {
-	if (host.equals(InetAddress.getLocalHost().getHostName()))
-	  {
-	    command = (path + "/" + ftsName + ( Fts.getNoRealTime() ? " -norealtime" : "")
-		       + " udp " + InetAddress.getLocalHost().getHostAddress() + ":" + socket.getLocalPort()) ;
-	  }
-	else
-	  {
-	    command = ("rsh " + host + " " + path + "/" + ftsName + ( Fts.getNoRealTime() ? " -norealtime" : "")
-		       + " udp " + InetAddress.getLocalHost().getHostAddress() + ":" + socket.getLocalPort()) ;
-	  }
-      }
-    catch (UnknownHostException e)
-      {
-	System.out.println("Cannot find local host");
-	return;
-      }
-
-
-    // Run FTS remotely
-
-    try
-      {
-	proc = Runtime.getRuntime().exec(command);
-      }
-    catch (IOException e)
-      {
-	System.out.println("Cannot exec command: " + command);
-	return;
-      }
-
-
+    // FTS Must be started by hand in this case, *after* jmax
+    // with the command fts udp <host>:<port>
     // Wait a first answerback packet 
     // Its content is ignore, is used for startup syncronization
     // and to get the fts port number and address
 
     try
       {
-	FtsErrorStreamer.startFtsErrorStreamer(proc.getErrorStream(), server);
 	in_packet  = new DatagramPacket(in_data , in_data.length);
 	socket.receive(in_packet);
 	out_packet.setAddress(in_packet.getAddress());
@@ -110,8 +79,6 @@ class FtsDatagramPort extends FtsPort
     socket.close();
     in_packet = null;
     out_packet = null;
-
-    proc.destroy();
   }
 
   boolean isOpen()
@@ -172,6 +139,7 @@ class FtsDatagramPort extends FtsPort
       }
   }
 }
+
 
 
 

@@ -29,9 +29,9 @@ public class FtsServer  implements Runnable
   boolean connected = false;
   boolean waiting = false;
 
-  /** The FtsPort used to communicate with FTS */
+  /** The FtsStream used to communicate with FTS */
 
-  FtsPort port;
+  FtsStream stream;
 
   /** The name of this server, used for printouts only */
 
@@ -50,14 +50,14 @@ public class FtsServer  implements Runnable
 
   private boolean timeoutOnSync = false;
 
-  /** Create an FTS Server. With a given port. */
+  /** Create an FTS Server. With a given stream. */
 
-  FtsServer(String name, FtsPort port)
+  FtsServer(String name, FtsStream stream)
   {
     this.name = name;
-    this.port = port;
+    this.stream = stream;
 
-    this.port.setServer(this);
+    this.stream.setServer(this);
 
     connected = true;
   }
@@ -102,10 +102,10 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_save_patcher_bmax_cmd);
-	port.sendObject(patcher);
-	port.sendString(filename);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_save_patcher_bmax_cmd);
+	stream.sendObject(patcher);
+	stream.sendString(filename);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -124,11 +124,11 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_load_patcher_bmax_cmd);
-	port.sendObject(parent);
-	port.sendInt(id);
-	port.sendString(filename);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_load_patcher_bmax_cmd);
+	stream.sendObject(parent);
+	stream.sendInt(id);
+	stream.sendString(filename);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -147,11 +147,11 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_load_patcher_dpat_cmd);
-	port.sendObject(parent);
-	port.sendInt(id);
-	port.sendString(filename);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_load_patcher_dpat_cmd);
+	stream.sendObject(parent);
+	stream.sendInt(id);
+	stream.sendString(filename);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -170,10 +170,10 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_declare_abstraction_cmd);
-	port.sendString(abstraction);
-	port.sendString(filename);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_declare_abstraction_cmd);
+	stream.sendString(abstraction);
+	stream.sendString(filename);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -193,9 +193,9 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_declare_abstraction_path_cmd);
-	port.sendString(path);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_declare_abstraction_path_cmd);
+	stream.sendString(path);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -215,10 +215,10 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_declare_template_cmd);
-	port.sendString(template);
-	port.sendString(filename);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_declare_template_cmd);
+	stream.sendString(template);
+	stream.sendString(filename);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -238,9 +238,9 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_declare_template_path_cmd);
-	port.sendString(path);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_declare_template_path_cmd);
+	stream.sendString(path);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -263,12 +263,12 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_new_object_cmd);
-	port.sendObject(patcher);
-	port.sendInt(id);
-	port.sendString(className);
-	FtsParse.parseAndSendObject(description, port);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_new_object_cmd);
+	stream.sendObject(patcher);
+	stream.sendInt(id);
+	stream.sendString(className);
+	FtsParse.parseAndSendObject(description, stream);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -290,13 +290,13 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_new_object_cmd);
-	port.sendObject(patcher);
-	port.sendInt(id);// cannot send the object, do not exists (yet) on the FTS Side !!
+	stream.sendCmd(FtsClientProtocol.fts_new_object_cmd);
+	stream.sendObject(patcher);
+	stream.sendInt(id);// cannot send the object, do not exists (yet) on the FTS Side !!
 
-	FtsParse.parseAndSendObject(description, port);
+	FtsParse.parseAndSendObject(description, stream);
 
-	port.sendEom();
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -316,9 +316,9 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_download_object_cmd);
-	port.sendObject(id);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_download_object_cmd);
+	stream.sendObject(id);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -339,10 +339,10 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_redefine_patcher_cmd);
-	port.sendObject(obj);
-	FtsParse.parseAndSendObject(description, port);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_redefine_patcher_cmd);
+	stream.sendObject(obj);
+	FtsParse.parseAndSendObject(description, stream);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -362,11 +362,11 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
-	port.sendObject(obj);
-	port.sendInt(newId);
-	FtsParse.parseAndSendObject(description, port);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
+	stream.sendObject(obj);
+	stream.sendInt(newId);
+	FtsParse.parseAndSendObject(description, stream);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -386,10 +386,10 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_reposition_inlet_cmd);
-	port.sendObject(obj);
-	port.sendInt(pos);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_reposition_inlet_cmd);
+	stream.sendObject(obj);
+	stream.sendInt(pos);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -408,10 +408,10 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_reposition_outlet_cmd);
-	port.sendObject(obj);
-	port.sendInt(pos);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_reposition_outlet_cmd);
+	stream.sendObject(obj);
+	stream.sendInt(pos);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -433,9 +433,9 @@ public class FtsServer  implements Runnable
       {
 	try
 	  {
-	    port.sendCmd(FtsClientProtocol.fts_delete_object_cmd);
-	    port.sendObject(obj);
-	    port.sendEom();
+	    stream.sendCmd(FtsClientProtocol.fts_delete_object_cmd);
+	    stream.sendObject(obj);
+	    stream.sendEom();
 	  }
 	catch (java.io.IOException e)
 	  {
@@ -455,15 +455,15 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_message_cmd);
-	port.sendObject(dst);
-	port.sendInt(inlet);
-	port.sendString(selector);
+	stream.sendCmd(FtsClientProtocol.fts_message_cmd);
+	stream.sendObject(dst);
+	stream.sendInt(inlet);
+	stream.sendString(selector);
 
 	if (args != null)
-	  port.sendVector(args);
+	  stream.sendVector(args);
 
-	port.sendEom();
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -482,12 +482,12 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_message_cmd);
-	port.sendObject(dst);
-	port.sendInt(inlet);
-	port.sendString(selector);
-	port.sendObject(arg);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_message_cmd);
+	stream.sendObject(dst);
+	stream.sendInt(inlet);
+	stream.sendString(selector);
+	stream.sendObject(arg);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -506,12 +506,12 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_message_cmd);
-	port.sendObject(dst);
-	port.sendInt(inlet);
-	port.sendString(selector);
-	port.sendConnection(arg);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_message_cmd);
+	stream.sendObject(dst);
+	stream.sendInt(inlet);
+	stream.sendString(selector);
+	stream.sendConnection(arg);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -533,15 +533,15 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_message_cmd);
-	port.sendObject(dst);
-	port.sendInt(-1);
-	port.sendString("set");
+	stream.sendCmd(FtsClientProtocol.fts_message_cmd);
+	stream.sendObject(dst);
+	stream.sendInt(-1);
+	stream.sendString("set");
 
 	if (values != null)
-	  port.sendVector(values);
+	  stream.sendVector(values);
 
-	port.sendEom();
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -562,14 +562,14 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_message_cmd);
-	port.sendObject(obj);
-	port.sendInt(-1);
-	port.sendString("set");
+	stream.sendCmd(FtsClientProtocol.fts_message_cmd);
+	stream.sendObject(obj);
+	stream.sendInt(-1);
+	stream.sendString("set");
 
-	FtsParse.parseAndSendObject(description, port);
+	FtsParse.parseAndSendObject(description, stream);
 
-	port.sendEom();
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -592,16 +592,16 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_named_message_cmd);
+	stream.sendCmd(FtsClientProtocol.fts_named_message_cmd);
 
-	port.sendString(dst);
-	port.sendInt(inlet);
-	port.sendString(selector);
+	stream.sendString(dst);
+	stream.sendInt(inlet);
+	stream.sendString(selector);
 
 	if (args != null)
-	  port.sendVector(args);
+	  stream.sendVector(args);
 
-	port.sendEom();
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -622,13 +622,13 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_new_connection_cmd);
-	port.sendInt(id);
-	port.sendObject(from);
-	port.sendInt(outlet);
-	port.sendObject(to);
-	port.sendInt(inlet);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_new_connection_cmd);
+	stream.sendInt(id);
+	stream.sendObject(from);
+	stream.sendInt(outlet);
+	stream.sendObject(to);
+	stream.sendInt(inlet);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -648,9 +648,9 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_download_connection_cmd);
-	port.sendConnection(id);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_download_connection_cmd);
+	stream.sendConnection(id);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -670,9 +670,9 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_delete_connection_cmd);
-	port.sendConnection(connection);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_delete_connection_cmd);
+	stream.sendConnection(connection);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -693,11 +693,11 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_put_property_cmd);
-	port.sendObject(object);
-	port.sendString(name);
-	port.sendValue(value);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_put_property_cmd);
+	stream.sendObject(object);
+	stream.sendString(name);
+	stream.sendValue(value);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -718,11 +718,11 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_put_property_cmd);
-	port.sendObject(object);
-	port.sendString(name);
-	port.sendInt(value);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_put_property_cmd);
+	stream.sendObject(object);
+	stream.sendString(name);
+	stream.sendInt(value);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -743,11 +743,11 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_put_property_cmd);
-	port.sendObject(object);
-	port.sendString(name);
-	port.sendFloat(value);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_put_property_cmd);
+	stream.sendObject(object);
+	stream.sendString(name);
+	stream.sendFloat(value);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -767,10 +767,10 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_get_property_cmd);
-	port.sendObject(object);
-	port.sendString(name);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_get_property_cmd);
+	stream.sendObject(object);
+	stream.sendString(name);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -790,9 +790,9 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.ucs_cmd);
-	port.sendVector(args);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.ucs_cmd);
+	stream.sendVector(args);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -811,11 +811,11 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.remote_call_code);
-	port.sendRemoteData(data);
-	port.sendInt(key);
-	port.sendInt(arg);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.remote_call_code);
+	stream.sendRemoteData(data);
+	stream.sendInt(key);
+	stream.sendInt(arg);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -833,11 +833,11 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.remote_call_code);
-	port.sendRemoteData(data);
-	port.sendInt(key);
-	port.sendFloat(arg);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.remote_call_code);
+	stream.sendRemoteData(data);
+	stream.sendInt(key);
+	stream.sendFloat(arg);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -855,11 +855,11 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.remote_call_code);
-	port.sendRemoteData(data);
-	port.sendInt(key);
-	port.sendValue(arg);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.remote_call_code);
+	stream.sendRemoteData(data);
+	stream.sendInt(key);
+	stream.sendValue(arg);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -879,14 +879,14 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.remote_call_code);
-	port.sendRemoteData(data);
-	port.sendInt(key);
+	stream.sendCmd(FtsClientProtocol.remote_call_code);
+	stream.sendRemoteData(data);
+	stream.sendInt(key);
 
 	if (args != null)
-	  port.sendArray( args); // we may have zero args call
+	  stream.sendArray( args); // we may have zero args call
 
-	port.sendEom();
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -904,14 +904,14 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.remote_call_code);
-	port.sendRemoteData(data);
-	port.sendInt(key);
+	stream.sendCmd(FtsClientProtocol.remote_call_code);
+	stream.sendRemoteData(data);
+	stream.sendInt(key);
 
 	if (args != null)
-	  port.sendVector( args); // we may have zero args call
+	  stream.sendVector( args); // we may have zero args call
 
-	port.sendEom();
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -931,13 +931,13 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.remote_call_code);
-	port.sendRemoteData(data);
-	port.sendInt(key);
-	port.sendInt(offset);
-	port.sendInt(size);
-	port.sendArray(values, offset, size);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.remote_call_code);
+	stream.sendRemoteData(data);
+	stream.sendInt(key);
+	stream.sendInt(offset);
+	stream.sendInt(size);
+	stream.sendArray(values, offset, size);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -955,16 +955,16 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.remote_call_code);
-	port.sendRemoteData(data);
-	port.sendInt(key);
-	port.sendInt(id);
-	port.sendString(name);
+	stream.sendCmd(FtsClientProtocol.remote_call_code);
+	stream.sendRemoteData(data);
+	stream.sendInt(key);
+	stream.sendInt(id);
+	stream.sendString(name);
 
 	if (args != null)
-	  port.sendArray( args); // we may have zero args call
+	  stream.sendArray( args); // we may have zero args call
 
-	port.sendEom();
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -982,15 +982,15 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.remote_call_code);
-	port.sendRemoteData(data);
-	port.sendInt(key);
-	port.sendObject(object);
+	stream.sendCmd(FtsClientProtocol.remote_call_code);
+	stream.sendRemoteData(data);
+	stream.sendInt(key);
+	stream.sendObject(object);
 
 	if (args != null)
-	  port.sendArray( args); // we may have zero args call
+	  stream.sendArray( args); // we may have zero args call
 
-	port.sendEom();
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -1009,15 +1009,15 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.remote_call_code);
-	port.sendRemoteData(data);
-	port.sendInt(key);
-	port.sendObject(object);
+	stream.sendCmd(FtsClientProtocol.remote_call_code);
+	stream.sendRemoteData(data);
+	stream.sendInt(key);
+	stream.sendObject(object);
 
 	if (args != null)
-	  port.sendVector( args); // we may have zero args call
+	  stream.sendVector( args); // we may have zero args call
 
-	port.sendEom();
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -1035,8 +1035,8 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_recompute_error_objects_cmd);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_recompute_error_objects_cmd);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -1054,8 +1054,8 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_shutdown_cmd);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.fts_shutdown_cmd);
+	stream.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -1087,8 +1087,8 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.sync_cmd);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.sync_cmd);
+	stream.sendEom();
       }
 
     catch (java.io.IOException e)
@@ -1116,8 +1116,8 @@ public class FtsServer  implements Runnable
 
     try
       {
-	port.sendCmd(FtsClientProtocol.sync_cmd);
-	port.sendEom();
+	stream.sendCmd(FtsClientProtocol.sync_cmd);
+	stream.sendEom();
       }
 
     catch (java.io.IOException e)
@@ -1192,26 +1192,22 @@ public class FtsServer  implements Runnable
 
   public void run()
   {
-    while (running && port.isOpen())
+    while (running && stream.isOpen())
       {
 	try
 	  {
-	    FtsMessage msg;
-	    msg = port.receiveMessage();
-
-	    if (msg != null)
-	      dispatchMessage(msg);
+	    dispatchMessage(stream);
 	  }
 	catch (java.io.InterruptedIOException e)
 	  {
 	    /* Ignore, just retry */
 	  }
-	catch (FtsPort.FtsQuittedException e)
+	catch (FtsQuittedException e)
 	  {
 	    ftsQuitted();
 	    running = false;
 	  }
-	catch (Exception e)
+	catch (java.lang.Exception e)
 	  {
 	    // Try to survive an exception
 	    
@@ -1226,7 +1222,7 @@ public class FtsServer  implements Runnable
 
     // close the thread and the streams
 
-    port.close();
+    stream.close();
   }
 
   /**
@@ -1242,9 +1238,10 @@ public class FtsServer  implements Runnable
    * reason, messages with null  destinations are simply ignored
    */
 
-  void dispatchMessage(FtsMessage msg)
+  void dispatchMessage(FtsStream stream)
+       throws java.io.InterruptedIOException, FtsQuittedException, java.io.IOException
   {
-    switch (msg.getCommand())
+    switch (stream.getCommand())
       {
       case FtsClientProtocol.fts_property_value_cmd:
 	{
@@ -1257,24 +1254,18 @@ public class FtsServer  implements Runnable
 	  String prop;
 	  Object value;
 	  
-	  obj = (FtsObject) msg.getNextArgument();
-	  prop = ((String) msg.getNextArgument()).intern();
-	  value =  msg.getNextArgument();
+	  obj = stream.getNextObjectArgument();
+	  prop = (stream.getNextStringArgument()).intern();
 
-	  if ((obj == null) || (prop == null))
- 	    System.err.println("Wrong property value message " + msg);
-	  else 
-	    {
-	      if ((value != null) && (value instanceof Integer))
-		obj.localPut(prop, ((Integer) value).intValue());
-	      else if ((value != null) && (value instanceof Float))
-		obj.localPut(prop, ((Float) value).floatValue());
-	      else
-		obj.localPut(prop, value);
+	  if (stream.getNextType() == FtsStream.intValue)
+	    obj.localPut(prop, stream.getNextIntArgument());
+	  if (stream.getNextType() == FtsStream.floatValue)
+	    obj.localPut(prop, stream.getNextFloatArgument());
+	  else
+	    obj.localPut(prop, stream.getNextArgument());
 	      
-	      if (FtsServer.debug)
- 		System.err.println("SetPropertyValue " + obj + " " + prop + " " + value);
- 	    }
+	  if (FtsServer.debug)
+	    System.err.println("SetPropertyValue " + obj + " " + prop);
 	}
       break;
 
@@ -1282,18 +1273,17 @@ public class FtsServer  implements Runnable
 	{
 	  FtsObject obj;
 
-	  obj = (FtsObject) msg.getNextArgument();
+	  obj = stream.getNextObjectArgument();
 
-	  if (obj != null)
-	    obj.handleMessage(msg);
+	  obj.handleMessage(stream);
 
 	  if (FtsServer.debug)
-	    System.err.println("ObjectMessage " + obj + " " + msg);
+	    System.err.println("ObjectMessage for " + obj + " in " + stream);
 	}
       break;
 
       case FtsClientProtocol.post_cmd:
-	System.out.print(msg.getNextArgument()); // print the first argument
+	System.out.print(stream.getNextStringArgument()); // print the first argument
 	break;
 
       case FtsClientProtocol.sync_done_cmd:
@@ -1323,15 +1313,15 @@ public class FtsServer  implements Runnable
 
 	  try
 	    {
-	      newObj = FtsObject.makeFtsObjectFromMessage(msg, false);
+	      newObj = FtsObject.makeFtsObjectFromMessage(stream, false);
 	      registerObject(newObj);
 
 	      if (FtsServer.debug)
-		System.err.println("NewObjectMessage " + newObj + " " + msg);
+		System.err.println("NewObjectMessage " + newObj + " in " + stream);
 	    }
 	  catch (FtsException e)
 	    {
-	      System.err.println("System error, cannot instantiate from message " + msg);
+	      System.err.println("System error, cannot instantiate from stream " + stream);
 	    }
 
 	  break;
@@ -1343,15 +1333,15 @@ public class FtsServer  implements Runnable
 
 	  try
 	    {
-	      newObj = FtsObject.makeFtsObjectFromMessage(msg, true);
+	      newObj = FtsObject.makeFtsObjectFromMessage(stream, true);
 	      registerObject(newObj);
 
 	      if (FtsServer.debug)
-		System.err.println("NewObjectMessage " + newObj + " " + msg);
+		System.err.println("NewObjectMessage " + newObj + " in " + stream);
 	    }
 	  catch (FtsException e)
 	    {
-	      System.err.println("System error, cannot instantiate from message " + msg);
+	      System.err.println("System error, cannot instantiate from stream " + stream);
 	    }
 
 	  break;
@@ -1365,12 +1355,12 @@ public class FtsServer  implements Runnable
 	  int outlet, inlet;
 	  FtsConnection c;
 
-	  data   = (FtsPatcherData) msg.getNextArgument();
-	  id     = ((Integer)  msg.getNextArgument()).intValue();
-	  from   = (FtsObject) msg.getNextArgument();
-	  outlet = ((Integer)  msg.getNextArgument()).intValue();
-	  to     = (FtsObject) msg.getNextArgument();
-	  inlet  = ((Integer)  msg.getNextArgument()).intValue();
+	  data   = (FtsPatcherData) stream.getNextDataArgument();
+	  id     = stream.getNextIntArgument();
+	  from   = stream.getNextObjectArgument();
+	  outlet = stream.getNextIntArgument();
+	  to     = stream.getNextObjectArgument();
+	  inlet  = stream.getNextIntArgument();
 
 	  c = new FtsConnection(data, id, from, outlet, to, inlet);
 
@@ -1388,11 +1378,11 @@ public class FtsServer  implements Runnable
 	  int outlet, inlet;
 	  FtsConnection c;
 
-	  c      = (FtsConnection)  msg.getNextArgument();
-	  from   = (FtsObject) msg.getNextArgument();
-	  outlet = ((Integer)  msg.getNextArgument()).intValue();
-	  to     = (FtsObject) msg.getNextArgument();
-	  inlet  = ((Integer)  msg.getNextArgument()).intValue();
+	  c      = stream.getNextConnectionArgument();
+	  from   = stream.getNextObjectArgument();
+	  outlet = stream.getNextIntArgument();
+	  to     = stream.getNextObjectArgument();
+	  inlet  = stream.getNextIntArgument();
 
 	  c.redefine(from, outlet, to, inlet);
 
@@ -1405,7 +1395,7 @@ public class FtsServer  implements Runnable
 	{
 	  FtsConnection c;
 
-	  c = (FtsConnection)  msg.getNextArgument();
+	  c = stream.getNextConnectionArgument();
 
 	  if (FtsServer.debug) 
 	    System.err.println("Connection Release " + c);
@@ -1419,7 +1409,7 @@ public class FtsServer  implements Runnable
 	{
 	  FtsObject obj;
 
-	  obj = (FtsObject)  msg.getNextArgument();
+	  obj = stream.getNextObjectArgument();
 
 	  if (FtsServer.debug) 
 	    System.err.println("Object Release" + obj);
@@ -1432,7 +1422,7 @@ public class FtsServer  implements Runnable
 	{
 	  FtsObject obj;
 
-	  obj = (FtsObject)  msg.getNextArgument();
+	  obj = stream.getNextObjectArgument();
 
 	  if (FtsServer.debug) 
 	    System.err.println("Object Release Data" + obj);
@@ -1443,24 +1433,19 @@ public class FtsServer  implements Runnable
 
       case FtsClientProtocol.remote_call_code:
 	{
-	  FtsRemoteData data = (FtsRemoteData) msg.getNextArgument();
-	  Integer value = (Integer) msg.getNextArgument();
+	  FtsRemoteData data = stream.getNextDataArgument();
+	  int key = stream.getNextIntArgument();
 
-	  if ((data != null) && (value != null))
-	    {
-	      int key = value.intValue();
+	  if (FtsServer.debug) 
+	    System.err.println("remote Call stream: " + data + " key " + key + " stream "  + stream);
 
-	      if (FtsServer.debug) 
-		System.err.println("remote Call msg: " + data + " key " + key + " Message "  + msg);
-	      data.call(key, msg);
-	    }
-	  else
-	    System.err.println( "Wrong remote call message " + msg);
+	  data.call(key, stream);
+
 	  break;
 	}
 
       default:
-	System.err.println( "!!!!!!!!! Received unknown message from client " + msg);
+	System.err.println( "!!!!!!!!! Received unknown message from stream " + stream);
 	break;
       }
   }

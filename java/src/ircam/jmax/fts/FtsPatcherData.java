@@ -316,7 +316,8 @@ public class FtsPatcherData extends FtsRemoteData
     super.release();
   }
 
-  public final void call( int key, FtsMessage msg)
+  public final void call( int key, FtsStream msg)
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     switch( key)
       {
@@ -330,28 +331,28 @@ public class FtsPatcherData extends FtsRemoteData
 	break;
 
       case REMOTE_SET_CONTAINER:
-	container = (FtsObject) msg.getNextArgument();
+	container = msg.getNextObjectArgument();
 	break;
 
       case REMOTE_ADD_OBJECT:
-	addObject((FtsObject) msg.getNextArgument());
+	addObject(msg.getNextObjectArgument());
 	break;
 
       case REMOTE_ADD_CONNECTION:
-	addConnection((FtsConnection) msg.getNextArgument());
+	addConnection(msg.getNextConnectionArgument());
 	break;
 
       case REMOTE_SET_WX:
-	windowX = ((Integer) msg.getNextArgument()).intValue();
+	windowX = msg.getNextIntArgument();
 	break;
       case REMOTE_SET_WY:
-	windowY = ((Integer) msg.getNextArgument()).intValue();
+	windowY = msg.getNextIntArgument();
 	break;
       case REMOTE_SET_WW:
-	windowWidth = ((Integer) msg.getNextArgument()).intValue();
+	windowWidth = msg.getNextIntArgument();
 	break;
       case REMOTE_SET_WH:
-	windowHeight = ((Integer) msg.getNextArgument()).intValue();
+	windowHeight = msg.getNextIntArgument();
 	break;
       default:
 	break;

@@ -25,11 +25,12 @@ public class FtsObject
   /******************************************************************************/
 
   /** This version create an application layer object for an already existing
-   *  object in FTS; take directly the FtsMessage as argument.
+   *  object in FTS; take directly the FtsStream as argument.
    *  Used also in the message box.
    */
 
-  static FtsObject makeFtsObjectFromMessage(FtsMessage msg, boolean doVariable) throws FtsException
+  static FtsObject makeFtsObjectFromMessage(FtsStream stream, boolean doVariable)
+     throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException, FtsException
   {
     FtsPatcherData data;
     FtsObject parent;
@@ -39,22 +40,22 @@ public class FtsObject
     StringBuffer description;
     int objId;
 
-
-    parent = (FtsObject) msg.getNextArgument();
-    data   = (FtsPatcherData) msg.getNextArgument();
-    objId  = ((Integer) msg.getNextArgument()).intValue();
+    parent = stream.getNextObjectArgument();
+    data   = (FtsPatcherData) stream.getNextDataArgument();
+    objId  = stream.getNextIntArgument();
 
     if (doVariable)
-      variable =  (String) msg.getNextArgument();
+      variable =  stream.getNextStringArgument();
       
     /* Check for null description object */
 
-    className = (String) msg.getNextArgument();
-
-    if (className == null)
+    if (stream.endOfArguments())
       return new FtsObject(parent, "", null, "", objId);
-    else
-      className = className.intern();
+
+    /* Get the class name */
+
+    className = stream.getNextStringArgument();
+    className = className.intern();
 
     /* Note that we do the unparsing relative to ':' and variables
        here; in the future, a dedicated API should be used ! */
@@ -63,19 +64,19 @@ public class FtsObject
       {
 	if (doVariable)
 	  obj =  new FtsPatcherObject(parent, variable,
-				      variable + " : " + FtsParse.unparseObjectDescription(msg), objId);
+				      variable + " : " + FtsParse.unparseObjectDescription(stream), objId);
 	else
 	  obj =  new FtsPatcherObject(parent, variable,
-				      FtsParse.unparseObjectDescription(msg), objId);
+				      FtsParse.unparseObjectDescription(stream), objId);
       }
     else if (className == "inlet")
-      obj =  new FtsInletObject(parent, ((Integer) msg.getNextArgument()).intValue(), objId);
+      obj =  new FtsInletObject(parent, stream.getNextIntArgument(), objId);
     else if (className == "outlet")
-      obj =  new FtsOutletObject(parent, ((Integer) msg.getNextArgument()).intValue(), objId);
+      obj =  new FtsOutletObject(parent, stream.getNextIntArgument(), objId);
     else if (className == "messbox")
-      obj =  new FtsMessageObject(parent, FtsParse.unparseObjectDescription(msg), objId);
+      obj =  new FtsMessageObject(parent, FtsParse.unparseObjectDescription(stream), objId);
     else if (className == "comment")
-      obj =  new FtsCommentObject(parent, FtsParse.simpleUnparseObjectDescription(msg), objId);
+      obj =  new FtsCommentObject(parent, FtsParse.simpleUnparseObjectDescription(stream), objId);
     else if (className == "intbox")
       obj =  new FtsIntValueObject(parent, className, "intbox", objId);
     else if (className == "toggle")
@@ -94,10 +95,10 @@ public class FtsObject
       {
 	if (doVariable)
 	  obj = new FtsObject(parent, className, variable,
-			      variable + " : " + FtsParse.unparseObjectDescription(className, msg), objId);
+			      variable + " : " + FtsParse.unparseObjectDescription(className, stream), objId);
 	else
 	  obj = new FtsObject(parent, className, variable,
-			      FtsParse.unparseObjectDescription(className, msg), objId);
+			      FtsParse.unparseObjectDescription(className, stream), objId);
       }
 
     if (data != null)
@@ -652,7 +653,8 @@ public class FtsObject
    * Empty by default, subclassed by special objects
    */
 
-  void handleMessage(FtsMessage msg)
+  void handleMessage(FtsStream stream)
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
   }
 }

@@ -10,7 +10,7 @@ import java.net.*;
  * so it will work only on unix machines and the like.
  */
 
-class FtsSocketServerPort extends FtsPort
+class FtsSocketServerStream extends FtsStream
 {
   String host;
   int port;
@@ -22,7 +22,7 @@ class FtsSocketServerPort extends FtsPort
   InputStream in_stream = null;
   OutputStream out_stream = null;
 
-  FtsSocketServerPort(String host, String path, String ftsName)
+  FtsSocketServerStream(String host, String path, String ftsName)
   {
     super(host);
     this.host = host;
@@ -104,7 +104,7 @@ class FtsSocketServerPort extends FtsPort
 	out_stream = new BufferedOutputStream(socket.getOutputStream(), 1024);
 	in_stream  = new BufferedInputStream(socket.getInputStream(), 1024);
 
-	FtsErrorStreamer.startFtsErrorStreamer(proc.getErrorStream(), server);
+	FtsErrorStreamer.startFtsErrorStreamer(proc.getErrorStream());
       }
     catch (IOException e)
       {
@@ -146,9 +146,16 @@ class FtsSocketServerPort extends FtsPort
   /** Method to receive a char; since we can use datagram sockets or other
     means I/O is not necessarly done thru streams */
 
-  protected int read() throws java.io.IOException
+  protected int read() throws java.io.IOException,  FtsQuittedException
   {
-    return in_stream.read();
+    int c;
+
+    c = in_stream.read();
+
+    if (c == -1)
+      throw new FtsQuittedException();
+
+    return c;
   }
 
   /** Method to Ask for an explicit output flush ; since we

@@ -32,14 +32,8 @@ class FtsClientProtocol
 	    (c == connection_type_code) || 
 	    (c == data_type_code)   ||
 	    (c == string_start_code) ||
-	    (c == end_of_message_code) ||
-	    isBlank(c)
+	    (c == end_of_message_code)
 	     );
-  }
-
-  static boolean isBlank(int c)
-  {
-    return ((c == ' ') || (c == '\t'));
   }
 
   static boolean isHexDigit(int c)

@@ -93,7 +93,8 @@ public class FtsObjectSet extends FtsRemoteData
 
   /* a method inherited from FtsRemoteData */
 
-  public final void call( int key, FtsMessage msg)
+  public final void call( int key, FtsStream stream)
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     switch( key)
       {
@@ -103,21 +104,15 @@ public class FtsObjectSet extends FtsRemoteData
 	break;
 
       case REMOTE_APPEND:
-	Object value;
 
-	value = msg.getNextArgument();
-
-	while (value != null)
-	  {
-	    list.addElement(value);
-	    value = msg.getNextArgument();
-	  };
+	while (! stream.endOfArguments())
+	  list.addElement(stream.getNextObjectArgument());
 
 	model.listChanged();
 	break;
 
       case REMOTE_REMOVE_ONE:
-	list.removeElement(msg.getNextArgument());
+	list.removeElement(stream.getNextObjectArgument());
 
       default:
 	break;

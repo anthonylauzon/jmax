@@ -42,7 +42,6 @@ public class FtsFloatValueObject extends FtsObject
   }
        
   /* Over write the localPut message to handle value changes;
-     Should get the FtsMessage and do a receiveFloat
    */
 
   protected void localPut(String name, float newValue)

@@ -51,15 +51,16 @@ class FtsRemoteMetaData extends FtsRemoteData
 
   /* Remote Calls implementation   */
 
-  public final void call( int key, FtsMessage msg)
+  public final void call( int key, FtsStream stream)
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     switch( key)
       {
       case REMOTE_NEW:
-	newFtsRemoteData(msg);
+	newFtsRemoteData(stream);
 	break;
       case REMOTE_RELEASE:
-	releaseRemoteData(msg); 
+	releaseRemoteData(stream); 
       default:
 	break;
       }
@@ -70,10 +71,11 @@ class FtsRemoteMetaData extends FtsRemoteData
    * Remote calls implementation 
    */
 
-  private void newFtsRemoteData( FtsMessage msg)
+  private void newFtsRemoteData( FtsStream stream)
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
-    int newId        = ((Integer)msg.getNextArgument()).intValue();
-    String className = (String)msg.getNextArgument();
+    int newId        = stream.getNextIntArgument();
+    String className = stream.getNextStringArgument();
     Class dataJavaClass;
     FtsRemoteData newRemoteData;
 
@@ -105,9 +107,10 @@ class FtsRemoteMetaData extends FtsRemoteData
   }
 
 
-  private void releaseRemoteData( FtsMessage msg)
+  private void releaseRemoteData( FtsStream stream)
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
-    FtsRemoteData data = (FtsRemoteData) msg.getNextArgument();
+    FtsRemoteData data = (FtsRemoteData) stream.getNextDataArgument();
 
     data.release();
   }

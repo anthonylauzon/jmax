@@ -92,22 +92,18 @@ public class FtsAtomList extends FtsRemoteData
 
   /* a method inherited from FtsRemoteData */
 
-  public final void call( int key, FtsMessage msg)
+  public final void call( int key, FtsStream stream)
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     switch( key)
       {
       case REMOTE_SET:
-	Object obj;
 
 	values.removeAllElements();
 
-	obj = msg.getNextArgument();
+	while (! stream.endOfArguments())
+	  values.addElement(stream.getNextArgument());
 
-	while (obj != null)
-	  {
-	    values.addElement(obj);
-	    obj = msg.getNextArgument();
-	  }
 	break;
       default:
 	break;

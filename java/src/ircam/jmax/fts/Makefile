@@ -117,10 +117,6 @@ FtsParse:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsParse.java)
 .PHONY: FtsParse
 
-FtsParseToPort:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsParseToPort.java)
-.PHONY: FtsParseToPort
-
 FtsPatcherDocument:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPatcherDocument.java)
 .PHONY: FtsPatcherDocument
@@ -137,9 +133,9 @@ FtsPatcherObject:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPatcherObject.java)
 .PHONY: FtsPatcherObject
 
-FtsPort:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPort.java)
-.PHONY: FtsPort
+FtsStream:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsStream.java)
+.PHONY: FtsStream
 
 FtsPropertyDescriptor:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPropertyDescriptor.java)

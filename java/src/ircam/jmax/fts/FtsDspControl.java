@@ -134,12 +134,13 @@ public class FtsDspControl extends FtsRemoteData
 
   /* remote call support */
 
-  public final void call( int key, FtsMessage msg)
+  public final void call( int key, FtsStream stream)
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     Object oldValue, newValue;
     String prop;
 
-    newValue = (Integer) msg.getNextArgument();
+    newValue = (Integer) stream.getNextArgument();
 
     switch(key)
       {

@@ -17,19 +17,10 @@ import ircam.jmax.utils.*;
  *  @see FtsClientProtocol
  */
 
-abstract class FtsPort
+abstract public class FtsStream
 {
-  FtsMessage portMsg = new FtsMessage();
-
   /** Local Exception represeting a crash in the FTS server. */
 
-  class FtsQuittedException extends Exception
-  {
-    FtsQuittedException()
-    {
-      super("FTS Quitted");
-    }
-  }
 
   String name;
   FtsServer server;
@@ -39,7 +30,7 @@ abstract class FtsPort
    * The name will be used for the inputThread name.
    */
 
-  FtsPort(String name)
+  FtsStream(String name)
   {
     this.name = name;
   }
@@ -58,6 +49,23 @@ abstract class FtsPort
   /** Check if the connection is open. */
 
   abstract boolean isOpen();
+
+  /** Abstract method to send a char; since we can use datagram sockets or other
+    means I/O is not necessarly done thru streams */
+
+  abstract protected void write(int data) throws java.io.IOException;
+
+  /** Abstract method to receive a char; since we can use datagram sockets or other
+    means I/O is not necessarly done thru streams */
+
+  abstract protected int read() throws java.io.IOException, FtsQuittedException;
+
+  /** Abstract method to Ask for an explicit output flush ; since we
+    can use datagram sockets or other means I/O is not necessarly done
+    thru streams */
+
+  abstract void flush() throws java.io.IOException;
+
 
   /******************************************************************************/
   /*                                                                            */
@@ -339,210 +347,238 @@ abstract class FtsPort
 
   // Token types for the parser
 
-  private static final int blank_token   = 0;
-  private static final int int_token     = 1;
-  private static final int float_token   = 3;
-  private static final int object_token  = 4;
-  private static final int connection_token  = 5;
-  private static final int data_token  = 7;
-  private static final int string_token  = 8;
-  private static final int end_token     = 9;
+  public static final int intValue     = 1;
+  public static final int floatValue   = 2;
+  public static final int objectValue  = 3;
+  public static final int connectionValue  = 4;
+  public static final int dataValue    = 5;
+  public static final int stringValue  = 6;
+  public static final int endOfMessage = 7;
 
-  static int tokenCode(int c)
+  final int nextStatus(int c) throws FtsQuittedException
   {
     if (c == FtsClientProtocol.int_type_code)
-      return int_token;
+      return intValue;
     else if (c == FtsClientProtocol.float_type_code)
-      return float_token;
+      return floatValue;
     else if (c == FtsClientProtocol.object_type_code)
-      return object_token;
+      return objectValue;
     else if (c == FtsClientProtocol.connection_type_code)
-      return connection_token;
+      return connectionValue;
     else if (c == FtsClientProtocol.data_type_code)
-      return data_token;
+      return dataValue;
     else if (c == FtsClientProtocol.string_start_code)
-      return string_token;
-    else if (FtsClientProtocol.isBlank(c))
-      return blank_token;
+      return stringValue;
     else if (FtsClientProtocol.isEom(c))
-      return end_token;
+      return endOfMessage;
     else 
-      return blank_token;
+      return endOfMessage;
   }
 
   /**
    * Parse the messages from FTS.
    * It produces a FtsMessage object that represent the received message. <p>
+   * Return the command of the message.
    *
    * @exception ircam.jmax.fts.FtsQuittedExcepetion For some reason the FTS server quitted.
    */
 
   StringBuffer s = new StringBuffer();
+  int status = endOfMessage; // the parser status, usually next arg type
 
-  FtsMessage receiveMessage() throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
+  private final void skipToEnd()
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     int c;
-    int type;
-    int command;
 
-    s.setLength(0);
-    portMsg.reset();
-
-    // read command
-
-    command   = read();
-
-    if (command == -1)
-      throw new FtsQuittedException();
-
-    /* Parsing values fields;
-       A nice finite state automata.
-     
-       Blanks and tabs and newlines are allowed inside a message,
-       and considered as token terminators.
-       */
-
-    int status = blank_token;
-
-    c =  read();
-
-    if (c == -1)
-      throw new FtsQuittedException();
-
-    while (status != end_token)
+    while (status != endOfMessage)
       {
-	switch (status)
-	  {
+	c = read();
 
-	  case blank_token:
-	    if (FtsClientProtocol.tokenStartingChar(c))
-	      status = tokenCode(c);
-	    else
-	      return null;		// ERRORE
-	    break;
-
-	    /*------------------*/
-
-	  case int_token:
-
-	    if (FtsClientProtocol.tokenStartingChar(c))
-	      {
-		status = tokenCode(c);
-		portMsg.addArgument(new Integer(Integer.parseInt(s.toString())));
-		s.setLength(0);
-	      }
-	    else
-	      s.append((char)c);
-	    break;
-
-	    /*------------------*/
-
-	  case float_token:
-
-	    if (FtsClientProtocol.tokenStartingChar(c))
-	      {
-		status = tokenCode(c);
-		try
-		  {
-		    portMsg.addArgument(new Float(s.toString()));
-		  }
-		catch (java.lang.NumberFormatException e)
-		  {
-		    portMsg.addArgument(new Float(Float.NaN));
-		  }
-
-		s.setLength(0);
-	      }
-	    else
-	      s.append((char)c);
-	    break;
-
-	    /*------------------*/
-
-	  case object_token:
-
-	    if (FtsClientProtocol.tokenStartingChar(c))
-	      {
-		status = tokenCode(c);
-		portMsg.addArgument(server.getObjectByFtsId(Integer.parseInt(s.toString())));
-		s.setLength(0);
-	      }
-	    else
-	      s.append((char)c);
-	    break;
-
-	    /*------------------*/
-
-	  case connection_token:
-
-	    if (FtsClientProtocol.tokenStartingChar(c))
-	      {
-		status = tokenCode(c);
-		portMsg.addArgument(server.getConnectionByFtsId(Integer.parseInt(s.toString())));
-		s.setLength(0);
-	      }
-	    else
-	      s.append((char)c);
-	    break;
-
-	    /* ----------------- */
-
-	  case data_token:
-
-	    if (FtsClientProtocol.tokenStartingChar(c))
-	      {
-		status = tokenCode(c);
-		portMsg.addArgument(FtsRemoteDataID.get( Integer.parseInt(s.toString())));
-		s.setLength(0);
-	      }
-	    else
-	      s.append((char)c);
-	    break;
-
-	    /*------------------*/
-	  
-	  case string_token:
-	    if ((c == FtsClientProtocol.string_end_code)  || FtsClientProtocol.isEom(c))
-	      {
-		portMsg.addArgument(s.toString());
-		s.setLength(0);
-		status = blank_token;
-	      }
-	    else
-	      s.append((char)c);
-	  break;
-	  }
-
-	if (status != end_token)
-	  {
-	    c = read();
-
-	    if (c == -1)
-	      throw new FtsQuittedException();
-	  }
+	if (FtsClientProtocol.tokenStartingChar(c))
+	  status = nextStatus(c);
       }
-
-    portMsg.setCommand(command);
-
-    return portMsg;
   }
 
-  /** Abstract method to send a char; since we can use datagram sockets or other
-    means I/O is not necessarly done thru streams */
 
-  abstract protected void write(int data) throws java.io.IOException;
+  public final boolean endOfArguments()
+  {
+    return status == endOfMessage;
+  }
 
-  /** Abstract method to receive a char; since we can use datagram sockets or other
-    means I/O is not necessarly done thru streams */
+  public final int getNextType()
+  {
+    return status;
+  }
 
-  abstract protected int read() throws java.io.IOException;
+  public final int getCommand()
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
+  {
+    int c;
 
-  /** Abstract method to Ask for an explicit output flush ; since we
-    can use datagram sockets or other means I/O is not necessarly done
-    thru streams */
+    if (status != endOfMessage)
+      skipToEnd();
 
-  abstract void flush() throws java.io.IOException;
+    c = read();
+    status = nextStatus(read());
+    return c;
+  }
+
+
+  public final int getNextIntArgument()
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
+  {
+    int r = 0;
+    int sign = 1;
+    int c;
+
+    c = read();
+
+    if (c == '-')
+      {
+	sign = -1;
+	c = read();
+      }
+
+    while (! FtsClientProtocol.tokenStartingChar(c))
+      {
+	r = r * 10 + (c - '0');
+	c = read();
+      }
+    status = nextStatus(c);
+
+    return r * sign;
+  }
+
+
+  public final float getNextFloatArgument()
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
+  {
+    boolean pointDone = false;
+    int divider = 1;
+    int sign = 1;
+    int intPart = 0;
+    int decimalPart = 0;
+    int c;
+
+    c = read();
+
+    if (c == '-')
+      {
+	sign = -1;
+	c = read();
+      }
+
+    while (! FtsClientProtocol.tokenStartingChar(c))
+      {
+	if (c == '.')
+	  {
+	    pointDone = true;
+	  }
+	else if (pointDone)
+	  {
+	    decimalPart = decimalPart * 10 + (c - '0');
+	    divider = divider * 10;
+	  }
+	else
+	  {
+	    intPart = intPart * 10 + (c - '0');
+	  }
+
+	c = read();
+      }
+
+    status = nextStatus(c);
+
+    return (float) (sign * ((double) intPart + ((double) decimalPart / (double) divider)));
+  }
+
+
+  public final FtsObject getNextObjectArgument()
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
+  {
+    return server.getObjectByFtsId(getNextIntArgument());
+  }
+
+
+  public final FtsConnection getNextConnectionArgument()
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
+  {
+    return server.getConnectionByFtsId(getNextIntArgument());
+  }
+
+
+  public final FtsRemoteData getNextDataArgument()
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
+  {
+    return FtsRemoteDataID.get(getNextIntArgument());
+  }
+
+
+  public final String getNextStringArgument()
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
+  {
+    String str;
+    int c;
+
+    s.setLength(0);
+
+    /* The loop assume we have a valid status */
+
+    c = read();
+
+    while (c != FtsClientProtocol.string_end_code)
+      {
+	s.append((char)c);
+	c = read();
+      }
+
+    str = s.toString();
+
+    // Skip the end of string token
+    // and read the next type token
+
+    c =  read();
+    status = nextStatus(c);
+
+    return str;    
+  }
+
+
+  public final Object getNextArgument()
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
+  {
+    switch (status)
+      {
+      case intValue:
+	return new Integer(getNextIntArgument());
+
+      case floatValue:
+	return new Float(getNextFloatArgument());
+
+      case objectValue:
+	return getNextObjectArgument();
+
+      case connectionValue:
+	return getNextConnectionArgument();
+
+      case dataValue:
+	return getNextDataArgument();
+
+      case stringValue:
+	return getNextStringArgument();
+
+      default:
+	return null;
+      }
+  }
 }
+
+
+
+
+
+
 
 
 

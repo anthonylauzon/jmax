@@ -111,20 +111,21 @@ public class FtsIntegerVector extends FtsRemoteUndoableData
 
   /* a method inherited from FtsRemoteData */
 
-  public final void call( int key, FtsMessage msg)
+  public final void call( int key, FtsStream stream)
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     switch( key)
       {
       case REMOTE_SET:
 	int size;
 	
-	size = ((Integer) msg.getNextArgument()).intValue();
+	size = stream.getNextIntArgument();
 
 	if ((values == null) || size != values.length)
 	  values = new int[size];
 	
 	for (int i = 0 ; i < size; i++)
-	  values[i] = ((Integer) msg.getNextArgument()).intValue();
+	  values[i] = stream.getNextIntArgument();
 	break;
       default:
 	break;

@@ -1006,7 +1006,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 		if (fts_is_float(ptos))
 		  fts_set_float(ptos, fts_get_float(ptos) + ((float) fts_get_int(tos)));
 		else if (fts_is_int(ptos))
-		  fts_set_int(ptos, fts_get_int(ptos) - fts_get_int(tos));
+		  fts_set_int(ptos, fts_get_int(ptos) + fts_get_int(tos));
 		else
 		  return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator +", 0);
 	      else

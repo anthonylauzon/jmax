@@ -26,18 +26,18 @@ public class Fts
 				  String serverName, String port)
   {
     if (mode.equals("socket")) 
-      server = new FtsServer(serverName, new FtsSocketPort(serverName, Integer.parseInt(port)));
+      server = new FtsServer(serverName, new FtsSocketStream(serverName, Integer.parseInt(port)));
     else if (mode.equals("udp")) 
-      server = new FtsServer(serverName, new FtsDatagramPort(serverName, ftsDir, ftsName));
+      server = new FtsServer(serverName, new FtsDatagramStream(serverName, ftsDir, ftsName));
     else if (mode.equals("udprx")) 
-      server = new FtsServer(serverName, new FtsRexecDatagramPort(serverName, ftsDir, ftsName));
+      server = new FtsServer(serverName, new FtsRexecDatagramStream(serverName, ftsDir, ftsName));
     else if (mode.equals("udpclient")) 
       server = new FtsServer(serverName + ":" + port,
-			     new FtsDatagramClientPort(serverName, ftsDir, ftsName, Integer.parseInt(port)));
+			     new FtsDatagramClientStream(serverName, ftsDir, ftsName, Integer.parseInt(port)));
     else if (mode.equals("client"))
-      server = new FtsServer(serverName, new FtsSocketServerPort(serverName, ftsDir, ftsName));
+      server = new FtsServer(serverName, new FtsSocketServerStream(serverName, ftsDir, ftsName));
     else if (mode.equals("local"))
-      server = new FtsServer("fts", new FtsSubProcessPort(ftsDir, ftsName));
+      server = new FtsServer("fts", new FtsSubProcessStream(ftsDir, ftsName));
     else
       System.out.println("unknown FTS connection type "+mode+": can't connect to FTS");
 

@@ -12,7 +12,7 @@ import com.oroinc.net.bsd.*;
  */
 
 
-class FtsRexecDatagramPort extends FtsPort
+class FtsRexecDatagramStream extends FtsStream
 {
   final static private int max_packet_size = 256;
   RExecClient rexec;
@@ -28,7 +28,7 @@ class FtsRexecDatagramPort extends FtsPort
   String path;
   String ftsName;
 
-  FtsRexecDatagramPort(String host, String path, String ftsName)
+  FtsRexecDatagramStream(String host, String path, String ftsName)
   {
     super(host);
 
@@ -91,7 +91,7 @@ class FtsRexecDatagramPort extends FtsPort
 
     try
       {
-	FtsErrorStreamer.startFtsErrorStreamer(rexec.getErrorStream(), server);
+	FtsErrorStreamer.startFtsErrorStreamer(rexec.getErrorStream());
 	in_packet  = new DatagramPacket(in_data , in_data.length);
 	socket.receive(in_packet);
 	out_packet.setAddress(in_packet.getAddress());
