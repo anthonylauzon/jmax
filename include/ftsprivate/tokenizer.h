@@ -33,6 +33,7 @@
 
 typedef struct {
   void *p;
+  int par_level;
 } fts_tokenizer_t;
 
 /* Initializes the tokenizer structure

@@ -1,3 +1,12 @@
+2003-08-06  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* fts/parser.y,fts/expression.c,fts/tokenizer.l: changed parser and tokenizer
+	to re-introduce the {} syntax of 2.5; removed the use of () to denote tuples.
+	The . (dot) operator is temporarily disabled, as there is not yet a clear consensus
+	about its need. The quote character is now '.
+	* fts/post.c,fts/tuple.c,packages/system/c/src/print.c: changed the printing of
+	tuples and atom arrays to be consistent with new syntax.
+
 2003-08-05  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* fts/variable.c (define_evaluate): fixed bug "[ 783531 ] error in messconst: undefined variable".

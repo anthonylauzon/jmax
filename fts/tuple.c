@@ -30,9 +30,9 @@ tuple_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_tuple_t *this = (fts_tuple_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   
-  fts_spost(stream, "(");
+  fts_spost(stream, "{");
   fts_spost_atoms(stream, fts_tuple_get_size(this), fts_tuple_get_atoms(this));
-  fts_spost(stream, ")");
+  fts_spost(stream, "}");
 }
 
 static void

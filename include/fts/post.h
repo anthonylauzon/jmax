@@ -89,6 +89,36 @@ FTS_API void fts_spost_complex(fts_bytestream_t *stream, double re, double im);
  */
 FTS_API void fts_spost_object_description( fts_bytestream_t *stream, fts_object_t *obj);
 FTS_API void fts_spost_object_description_args( fts_bytestream_t *stream, int ac, fts_atom_t *at);
+
+/*
+ * Compatibility ???
+ */
+#define FTS_POST_MAX_ELEMENTS 8
+
+FTS_API fts_bytestream_t *fts_post_get_stream( int ac, const fts_atom_t *at);
+FTS_API void fts_post( const char *format, ...);
+FTS_API void fts_post_atoms( int ac, const fts_atom_t *at);
+
+/**
+ * Get the default console stream (the bytestream onto which fts_post()
+ * will output the chars)
+ *
+ * @fn fts_bytestream_t *fts_get_default_console_stream( void)
+ * @return the default console stream
+ * @ingroup post
+ */
+FTS_API fts_bytestream_t *fts_get_default_console_stream( void);
+
+/**
+ * Set the default console stream (the bytestream onto which fts_post()
+ * will output the chars)
+ *
+ * @fn void fts_set_default_console_stream( fts_bytestream_t *stream)
+ * @param stream the default console stream
+ * @ingroup post
+ */
+FTS_API void fts_set_default_console_stream( fts_bytestream_t *stream);
+
 /**
  * Print a log message.
  * Log messages are printed in a file, located in user's home directory
@@ -115,31 +145,3 @@ FTS_API void fts_log( char *format, ...);
  */
 FTS_API void fts_log_atoms( int ac, const fts_atom_t *at);
 
-/*
- * Compatibility ???
- */
-#define FTS_POST_MAX_ELEMENTS 8
-
-FTS_API fts_bytestream_t *fts_post_get_stream( int ac, const fts_atom_t *at);
-FTS_API void fts_post( const char *format, ...);
-FTS_API void fts_post_atoms( int ac, const fts_atom_t *at);
-
-/**
- * Get the default console stream (the bytestream onto which post()
- * will output the chars)
- *
- * @fn fts_bytestream_t *fts_get_default_console_stream( void)
- * @return the default console stream
- * @ingroup post
- */
-FTS_API fts_bytestream_t *fts_get_default_console_stream( void);
-
-/**
- * Set the default console stream (the bytestream onto which post()
- * will output the chars)
- *
- * @fn void fts_set_default_console_stream( fts_bytestream_t *stream)
- * @param stream the default console stream
- * @ingroup post
- */
-FTS_API void fts_set_default_console_stream( fts_bytestream_t *stream);

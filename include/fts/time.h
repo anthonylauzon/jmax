@@ -222,19 +222,4 @@ FTS_API double fts_get_time(void);
  */
 FTS_API fts_timebase_t *fts_get_timebase(void);
 
-/** 
- * @name system time
- */
-/*@{*/
-
-/**
- * Get system time in milliseconds
- *
- * @fn double fts_systime(void)
- * @return system time in msecs
- *
- * @ingroup time
- */
-FTS_API double fts_systime(void);
-
 /*@}*/ /* logical time */

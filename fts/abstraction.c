@@ -42,7 +42,6 @@
  */
 
 #include <string.h>
-#include <sys/stat.h>
 
 #include <fts/fts.h>
 #include <ftsprivate/errobj.h>

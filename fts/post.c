@@ -23,6 +23,7 @@
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
+#include <ftsprivate/platform.h> /* for fts_systime() */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -179,9 +180,9 @@ static int mempost_tuple( char **pp, int *psize, int offset, fts_tuple_t *tup)
   const fts_atom_t *at = fts_tuple_get_atoms(tup);
   int n = 0;
   
-  n += mempost( pp, psize, offset+n, "(");  
+  n += mempost( pp, psize, offset+n, "{");
   n += mempost_atoms( pp, psize, offset + n, ac, at);
-  n += mempost( pp, psize, offset + n, ")");
+  n += mempost( pp, psize, offset + n, "}");
 
   return n;
 }
@@ -242,11 +243,11 @@ check_symbol_in( fts_symbol_t s, fts_symbol_t *symbols)
   return 0;
 }
 
-static fts_symbol_t want_a_space_before_symbols[] = {"+", "-", "*", "/", "%", "&&", "&", "||", "|", "==", "=", "!=", "!", ">=", "^", ">>", ">", "<<", "<=", "<", "?", 0 };
-static fts_symbol_t dont_want_a_space_before_symbols[] = {")", "[", "]", "}", ",", ";", ".", "=", ":", 0};
+static fts_symbol_t want_a_space_before_symbols[] = {"+", "-", "*", "/", "**", "%", "<<", ">>", "&&", "||", "!", "==", "!=", ">", ">=", "<", "<=", 0};
+static fts_symbol_t dont_want_a_space_before_symbols[] = {")", "[", "]", "}", ",", ";", 0};
 static fts_symbol_t want_a_space_after_symbols[] = { "+", "-", "*", "/", "%", ",", "&&", "&", "||", "|", "==", "=", "!=", "!", ">=", ">>", ">", "<<", "<=", "<", "?", "^", ";", 0 };
-static fts_symbol_t dont_want_a_space_after_symbols[] = { "(", "[", "{", "$", "'", "." , "=", ":", 0 };
-static fts_symbol_t operators[] = { "$", ";", ",", "+", "-", "*", "/", "(", ")", "[", "]", "{", "}", ".", "%", "<<", ">>", "&&", "||", "!", "==", "!=", ">", ">=", "<", "<=", ":", "=", 0};
+static fts_symbol_t dont_want_a_space_after_symbols[] = { "(", "[", "{", "$", "'", 0 };
+static fts_symbol_t operators[] = { "$", ";", ",", "(", ")", "[", "]", "{", "}", "+", "-", "*", "/", "%", "<<", ">>", "&&", "||", "!", "==", "!=", ">", ">=", "<", "<=", 0};
 
 static void init_punctuation( void)
 {
@@ -272,22 +273,19 @@ needs_quote( fts_symbol_t s)
   while( *s != '\0')
     {	    
       switch (*s) {
-      case ' ':
-      case '\n':
-      case '\t':
       case '$':
+      case ';':
       case ',':
       case '(':
       case ')':
-      case '[':
-      case ']':
       case '{':
       case '}':
-      case ':':
-      case ';':
-      case '=':
+      case '[':
+      case ']':
+      case ' ':
+      case '\n':
+      case '\t':
       case '\'':
-      case '.':
 	return 1;
       }
 
@@ -327,7 +325,7 @@ void fts_spost_float( fts_bytestream_t *stream, double f)
 void fts_spost_symbol( fts_bytestream_t *stream, fts_symbol_t s)
 {
   if( needs_quote(s))
-    fts_spost( stream, "\"%s\"", s);
+    fts_spost( stream, "\'%s\'", s);
   else
     fts_spost( stream, "%s", s);
 }
@@ -412,7 +410,7 @@ fts_spost_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t *at)
       else if ( fts_is_pointer( at) )
 	fts_spost(stream, "%p", fts_get_pointer( at));
       else if ( fts_is_string( at))
-	fts_spost(stream, "\'%p\'", fts_get_string( at));
+	fts_spost(stream, "\"%p\"", fts_get_string( at));
       else
 	fts_spost(stream, "<unknown 0x%x>", fts_get_int( at));
 
@@ -430,6 +428,7 @@ fts_spost_object_description( fts_bytestream_t *stream, fts_object_t *obj)
   ac = fts_object_get_description_size( obj);
   at = fts_object_get_description_atoms( obj);
 
+  /* FIXME: :mess */
   /* skip the leading : only if it is the first atom */
   if ( ac > 0 && fts_is_symbol( at) && fts_get_symbol( at) == fts_s_colon) 
     {
