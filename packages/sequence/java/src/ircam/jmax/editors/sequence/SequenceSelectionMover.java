@@ -25,6 +25,7 @@
 
 package ircam.jmax.editors.sequence;
 import ircam.jmax.editors.sequence.track.*;
+import ircam.jmax.editors.sequence.renderers.*;
 
 import ircam.jmax.toolkit.*;
 
@@ -118,8 +119,8 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
   {
     SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 
-    int deltaX = egc.getAdapter().getInvX(e.getX()) - egc.getAdapter().getInvX(itsStartingPoint.x);
-    int deltaY = egc.getAdapter().getInvY(e.getY()) - egc.getAdapter().getInvY(itsStartingPoint.y);
+    int deltaX = (int) (egc.getAdapter().getInvX(e.getX()) - egc.getAdapter().getInvX(itsStartingPoint.x));
+    int deltaY = (int) (egc.getAdapter().getInvY(e.getY()) - egc.getAdapter().getInvY(itsStartingPoint.y));
     
     if ((itsMovements & HORIZONTAL_MOVEMENT) != 0)
       egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), " dx "+(deltaX));
@@ -153,7 +154,7 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
     else // move every element
       {
 	TrackEvent aTrackEvent;
-	Adapter a = ((SequenceGraphicContext) gc).getAdapter();
+	PartitionAdapter a = (PartitionAdapter)((SequenceGraphicContext) gc).getAdapter();
 	boolean singleObject = ((SequenceGraphicContext)gc).getSelection().size()==1;
 	for (Enumeration e = ((SequenceGraphicContext)gc).getSelection().getSelected(); e.hasMoreElements();)
 	  {
@@ -174,7 +175,7 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	    // e_m_ incorrect! instead, make this object communicate the new position to the listeners,
 	    // and make the keyboard in the MidiTrack a listener of such movements.
 	    // (something like using the ircam.jmax.toolkit.DynamicDragListener).
-	    if (singleObject) 
+	    if ((singleObject)&&(a.getViewMode()==MidiTrackEditor.PIANOROLL_VIEW)) 
 	      ScoreBackground.pressKey(((Integer)tempEvent.getProperty("pitch")).intValue(), gc);
 	  }
       }
@@ -193,3 +194,4 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
     // every event type would be OK, but we also need to handle the little keyboard in the
     // left side of the window... so we need an event that knows about the "pitch" property
 }
+

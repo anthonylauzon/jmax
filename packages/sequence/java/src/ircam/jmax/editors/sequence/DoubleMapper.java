@@ -25,34 +25,26 @@
 
 package ircam.jmax.editors.sequence;
 
-import ircam.jmax.toolkit.*;
-import java.awt.event.*;
 import ircam.jmax.editors.sequence.track.*;
-import ircam.jmax.editors.sequence.renderers.*;
-
-/** A simple extension of the mouse tracker that writes its position in
- * the status bar... and presses the key in the little keyboard*/
-public class MidiMouseTracker extends MouseTracker {
-
-  public MidiMouseTracker(PositionListener l)
-  {
-    super(l);
-  }
+/**
+ * The base class of mappings between score parameters and graphic
+ * parameters. A mapper (ex. TimeMapper) handles one and only one
+ * score parameter. Different mappers can be associated with
+ * different graphic parameters (example, x to time, y to pitch).
+ */
+public abstract class DoubleMapper {
 
   /**
-   * The only redefined method */
-  public void mouseMoved(MouseEvent e) 
-  {  
-    SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+   * set the given value in the given event
+   */
+  public abstract void set(TrackEvent e, double val);
 
-    egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), ""+
-			    ListPanel.numberFormat.format(egc.getAdapter().getInvX(e.getX()))+
-			    ", "+
-			    (egc.getAdapter().getInvY(e.getY())));
-    
-    //press keys in the pianoroll representation
-    if(((PartitionAdapter)egc.getAdapter()).getViewMode()==MidiTrackEditor.PIANOROLL_VIEW)
-	if (egc.getTrack().getTrackDataModel().containsType(AmbitusValue.info))
-	    ScoreBackground.pressKey(egc.getAdapter().getInvY(e.getY()), egc);
-  }
+
+  /**
+   * get the value from the given event
+   */
+  public abstract double get(TrackEvent e);
+
+
 }
+

@@ -4,6 +4,7 @@ package ircam.jmax.editors.sequence.track;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.editors.sequence.renderers.*;
 import java.io.*;
 import javax.swing.*;
 import java.util.*;
@@ -81,11 +82,12 @@ public class LogicValue extends AbstractEventValue
     try
       {
 	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-	LOGIC_ICON = new ImageIcon(path+"logic.gif");
       }
     catch(FileNotFoundException e){
-      System.err.println("Couldn't locate sequence images");
+	//System.err.println("Couldn't locate sequence images");
+      path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
     }
+    LOGIC_ICON = new ImageIcon(path+"logic.gif");
   }
 }
 

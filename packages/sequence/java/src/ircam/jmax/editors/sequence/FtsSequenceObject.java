@@ -44,18 +44,29 @@ import java.util.*;
  * this class represents a model of a set of tracks.
  * SequenceRemoteData offers support for undo and clipboard operations.
  */
-public class SequenceRemoteData extends FtsRemoteUndoableData implements SequenceDataModel
+public class FtsSequenceObject extends FtsObject implements SequenceDataModel
 {
 
   /**
    * constructor.
    */
-  public SequenceRemoteData()
+  public FtsSequenceObject(Fts fts, FtsObject parent, String description, int objId)
   {
-    super();
+    super(fts, parent, "sequence", null, description, objId);
       
     listeners = new MaxVector();
   }
+
+  Sequence sequence = null;
+  public void openEditor(FtsAtom[] args)
+  {
+      if(sequence==null)
+	  sequence = new Sequence(this);
+      if (! sequence.isVisible())
+	  sequence.setVisible(true);
+      sequence.toFront();
+  }
+
 
 
   /**
@@ -74,10 +85,23 @@ public class SequenceRemoteData extends FtsRemoteUndoableData implements Sequenc
     }
 
     /**
-     * Returns the i-th track */
+     * Returns the i-th track in the vector */
     public Track getTrackAt(int i)
     {
 	return (Track) tracks.elementAt(i);
+    }
+
+    /**
+     * Returns the track with this id */
+    public Track getTrackById(int id)
+    {
+	Track track;
+	for(Enumeration e = tracks.elements(); e.hasMoreElements();)
+	{
+	  track = (Track)e.nextElement();
+	  if(track.getId()==id) return track;
+	}
+	return null;
     }
 
   /**
@@ -85,11 +109,16 @@ public class SequenceRemoteData extends FtsRemoteUndoableData implements Sequenc
    */
   public void addTrack(Track track)
   {
+      track.setId(trackId++);
       tracks.addElement(track);
-      for (Enumeration e=listeners.elements(); e.hasMoreElements();)
-	  {
-	      ((TrackListener)(e.nextElement())).trackAdded(track);
-	  }
+  
+      MaxVector vect = new MaxVector();
+      vect.addElement("track"+track.getId());
+      vect.addElement("anything");
+      
+      sendMessage(FtsObject.systemInlet, "track_add", vect);
+
+      notifyTrackAdded(track);
   }
 
   /**
@@ -97,14 +126,11 @@ public class SequenceRemoteData extends FtsRemoteUndoableData implements Sequenc
    */
   public void removeTrack(Track track)
   {
+      if(track==null) return;
       tracks.removeElement(track);
-      for (Enumeration e=listeners.elements(); e.hasMoreElements();)
-	  {
-	      ((TrackListener)(e.nextElement())).trackRemoved(track);
-	  }      
+
+      notifyTrackRemoved(track);
   }
-
-
 
   /**
    * Require to be notified when database change
@@ -113,7 +139,6 @@ public class SequenceRemoteData extends FtsRemoteUndoableData implements Sequenc
   {
     listeners.addElement(theListener);
   }
-  
 
   /**
    * Remove the listener
@@ -121,6 +146,18 @@ public class SequenceRemoteData extends FtsRemoteUndoableData implements Sequenc
     public void removeTrackListener(TrackListener theListener) 
     {
 	listeners.removeElement(theListener);
+    }
+
+    private void notifyTrackAdded(Track track)
+    {
+	for (Enumeration e=listeners.elements(); e.hasMoreElements();)
+	    ((TrackListener)(e.nextElement())).trackAdded(track);
+    }
+
+    private void notifyTrackRemoved(Track track)
+    {
+	for (Enumeration e=listeners.elements(); e.hasMoreElements();)
+	    ((TrackListener)(e.nextElement())).trackRemoved(track);
     }
 
 
@@ -138,10 +175,12 @@ public class SequenceRemoteData extends FtsRemoteUndoableData implements Sequenc
   //----- Fields
   /** Key for remote call add */
   
-
     Vector tracks = new Vector();
     MaxVector listeners = new MaxVector();
     String name = new String("unnamed"); //to be assigned by FTS, usually via a specialized KEY
+    //unic id for a track, starting from zero;
+    private int trackId = 0; 
+    static final int REMOTE_TRACK_ADD = 0; 
 }
 
 

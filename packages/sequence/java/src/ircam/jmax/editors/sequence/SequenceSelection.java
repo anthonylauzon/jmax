@@ -210,6 +210,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
     temp.removeAllElements();
     for (int i = getMinSelectionIndex(); i <= getMaxSelectionIndex(); i++)
       if (isSelectedIndex(i)) temp.addElement(itsModel.getEventAt(i));
+    
     return temp.elements(); 
   }
   
@@ -263,16 +264,18 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 
   public void objectAdded(Object spec, int index) 
   {
-    int i;
+      /*int i;
 
-    if (index > getMaxSelectionIndex()) return;
-    for (i = index+1; i >  getMinSelectionIndex(); i--)
-      {
+	if (index > getMaxSelectionIndex()) return;
+	for (i = index+1; i >  getMinSelectionIndex(); i--)
+	{
 	if (isSelectedIndex(i-1))
-	  addSelectionInterval(i, i);
+	addSelectionInterval(i, i);
 	else removeSelectionInterval(i, i);
-      }
-  
+	}*/
+      deselectAll();
+      select(spec);
+    
   }
 
   /**

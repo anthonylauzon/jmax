@@ -50,7 +50,8 @@ public class SequenceTools implements ToolProvider{
 	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
       }
     catch(FileNotFoundException e){
-      System.err.println("Couldn't locate sequence images");
+	//System.err.println("Couldn't locate sequence images");
+	path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
     }
 
     tools[0] = new ArrowTool(new ImageIcon(path+"selecter.gif"));

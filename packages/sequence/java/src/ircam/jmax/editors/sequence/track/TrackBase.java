@@ -59,10 +59,20 @@ public class TrackBase implements Track{
 	return model;
     }
 
+    public void setId(int id)
+    {
+	this.id = id;
+    }
+    public int getId()
+    {
+	return id;
+    }
+
     //--- Fields
     Hashtable properties = new Hashtable();
     PropertyChangeSupport propertySupport = new PropertyChangeSupport(this);
     TrackDataModel model;
+    private int id;
 }
 
 

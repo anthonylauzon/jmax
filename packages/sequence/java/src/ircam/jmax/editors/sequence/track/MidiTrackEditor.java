@@ -27,6 +27,8 @@
 package ircam.jmax.editors.sequence.track;
 
 import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.renderers.*;
+import ircam.jmax.editors.sequence.menus.*;
 import ircam.jmax.toolkit.*;
 import java.awt.*;
 import java.beans.*;
@@ -56,16 +58,9 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	//-- prepares the CENTER panel (the score)
 	// a simple panel, that just uses a Renderer as its paint method...
 	// it takes care of the popup showing.
-	itsScore = new PopupToolbarPanel(this) {
-	    
-	    public void paint(Graphics g) 
-	    {
-		Rectangle r = g.getClipBounds();
-		renderer.render(g, r); //et c'est tout	
-	    }
 
-	};
-	
+	itsScore = new ScorePanel(this);
+
 	gc = prepareGraphicContext(geometry, track);
 
 	add(itsScore, BorderLayout.CENTER);
@@ -74,7 +69,7 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 
 	geometry.addTranspositionListener(new TranspositionListener() {
 	    public void transpositionChanged(int newTranspose)
-		{
+	{
 		    itsScore.repaint();
 		}
 	});
@@ -100,9 +95,20 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	component = this;
     }
 
+    public JMenu getToolsMenu()
+    {
+	return gc.getToolbar().itsMenu;
+    }
     public JPopupMenu getMenu()
     {
-	return gc.getToolbar().itsPopupMenu;
+	MidiTrackPopupMenu.getInstance().update(this);
+	return MidiTrackPopupMenu.getInstance();
+    }
+
+    public int trackCount()
+    {
+	//return gc.getSequenceRemoteData().trackCount();
+	return gc.getFtsSequenceObject().trackCount();
     }
 
     private SequenceGraphicContext prepareGraphicContext(Geometry geometry, Track track)
@@ -140,11 +146,10 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	  {
 	  itsStatusBar.post(e.getTool(), "");
 	  }*/
-	
     }
     
     /**
-     * called when the database is changed
+     * called when the database is changed: DataTrackListener interface
      */
     
     public void objectChanged(Object spec) 
@@ -184,9 +189,9 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     /**
      * get the lenght (in milliseconds) of the window
      */
-    int windowTimeWidth() 
+    public int windowTimeWidth() 
     {
-	return gc.getAdapter().getInvX(itsScore.getSize().width) - gc.getAdapter().getInvX(ScoreBackground.KEYEND) - 1;
+	return (int) (gc.getAdapter().getInvX(itsScore.getSize().width) - gc.getAdapter().getInvX(ScoreBackground.KEYEND)) - 1;
 	
     }
 
@@ -208,15 +213,27 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     return null;
   }
 
+    public SequenceSelection getSelection()
+    {
+	return selection;
+    }
+
+
+    public void dispose()
+    {
+	if(listDialog != null)
+	    listDialog.dispose();
+    }
+
 
     public Component getComponent()
     {
-	return component;
+      return component;
     }
 
     public void setComponent(Component c)
     {
-	component = c;
+      component = c;
     }
 
     public SequenceGraphicContext getGraphicContext()
@@ -228,14 +245,101 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 
     public Dimension getPreferredSize()
     {
-	return new Dimension(800, 450);
+	return new Dimension(800, /*450*/430);
+	//return new Dimension(800, 300);//for split
     }
 
     public Dimension getMinimumSize()
     {
 	return new Dimension(800, 250);
+	//return new Dimension(800, 100);//for split
     }
 
+    public Track getTrack()
+    {
+	return track;
+    }
+
+    public void setViewMode(int viewType)
+    {
+	if(viewMode!=viewType)
+	{
+	    viewMode=viewType;
+	    renderer.setViewMode(viewMode);
+	    ((PartitionAdapter)gc.getAdapter()).setViewMode(viewMode);
+	    repaint();
+	}    
+    }
+    public int getViewMode()
+    {
+      return viewMode;
+    }
+
+    public void showListDialog()
+    {
+	if(listDialog==null) 
+	    createListDialog();
+	listDialog.setVisible(true);
+    }
+
+    private void createListDialog()
+    {
+	listDialog = new ListDialog(track, gc.getFrame());
+    }
+
+    public boolean isDisplayLabels()
+    {
+	return ((PartitionAdapter)gc.getAdapter()).isDisplayLabels();
+    }
+    public void setDisplayLabels(boolean display)
+    {
+	((PartitionAdapter)gc.getAdapter()).setDisplayLabels(display);
+	itsScore.repaint();
+    }
+
+    class ScorePanel extends PopupToolbarPanel
+    {
+	MidiTrackEditor editor;
+	ScorePanel(MidiTrackEditor editor)
+	{
+	  super(editor);
+	  this.editor = editor; 
+	}
+
+	protected void processMouseEvent(MouseEvent e)
+	{
+	    if(e.isPopupTrigger())
+	    {
+		if(editor.renderer.getViewMode()==NMS_VIEW)
+		{
+		  TrackEvent event = null;
+		  int x = e.getX();
+		  int y = e.getY();
+		  event = (TrackEvent)editor.renderer.firstObjectContaining(x,y);
+		  if(event!=null)
+		    {
+		      MidiEventPopupMenu popup = (MidiEventPopupMenu)event.getValue().getPopupMenu();
+		      if(popup!=null)
+		      {
+			popup.update(event, editor.gc);
+			popup.show (e.getComponent(), x-10, y-10);
+		      }		      
+		      return;
+		    }
+		}
+	    }
+	    super.processMouseEvent(e);
+	}
+
+
+	public void paint(Graphics g) 
+	{
+	  Rectangle r = g.getClipBounds();
+	  renderer.render(g, r); //et c'est tout	
+	}
+    }
+
+   
     //--- MidiTrack fields
     Geometry geometry;
     SequenceGraphicContext gc;
@@ -244,5 +348,15 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     Component component;
     SequenceSelection selection;
     
-    JPanel itsScore;
+    ScorePanel itsScore;
+
+    ListDialog listDialog = null;
+
+    int viewMode = PIANOROLL_VIEW;
+    static public final int PIANOROLL_VIEW = 0;
+    static public final int NMS_VIEW = 1;
 }
+
+
+
+

@@ -36,7 +36,7 @@ public class DurationMapper extends Mapper {
    */
   public void set(TrackEvent e, int value) 
   {
-    e.setDuration(value);
+    e.setProperty("duration", new Integer(value));
   }
 
   /**
@@ -44,7 +44,7 @@ public class DurationMapper extends Mapper {
    */
   public int get(TrackEvent e) 
   {
-    return e.getDuration();
+      return ((Integer)e.getProperty("duration")).intValue();
   }
 
   /**

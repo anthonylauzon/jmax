@@ -50,38 +50,42 @@ public class Sequence extends JFrame implements EditorContainer{
 
     //------------------- fields
     SequencePanel itsSequencePanel;
-    SequenceRemoteData sequenceData;
- 
+    //SequenceRemoteData sequenceData;
+    FtsSequenceObject sequenceData;
+
     public final int DEFAULT_WIDTH = 800;
-    public final int DEFAULT_HEIGHT = 550;
+    public final int DEFAULT_HEIGHT = 565;
 
 
   /**
    * Constructor with the SequenceRemoteData
    * It creates the panels that will display the datas of the maxData
    */
-  public Sequence(SequenceRemoteData maxData)
-  {
+    public Sequence(/*SequenceRemoteData maxData*/FtsSequenceObject data)
+    {
     super();
 
     MaxWindowManager.getWindowManager().addWindow(this);
 
-    sequenceData = (SequenceRemoteData)maxData;
+    //sequenceData = (SequenceRemoteData)maxData;
+    sequenceData = data;
+
     TrackEditorFactoryTable.setFactoryFor(AmbitusValue.info, MidiTrackEditorFactory.instance);
     TrackEditorFactoryTable.setFactoryFor(FricativeValue.info, MonodimensionalTrackEditorFactory.instance);
     TrackEditorFactoryTable.setFactoryFor(LogicValue.info, MonodimensionalTrackEditorFactory.instance);
     TrackEditorFactoryTable.setFactoryFor(CueValue.info, MonodimensionalTrackEditorFactory.instance);
     TrackEditorFactoryTable.setFactoryFor(IntegerValue.info, MonodimensionalTrackEditorFactory.instance);
     
-    makeTitle(maxData);
+    //makeTitle(maxData);
+    makeTitle(data);
 
     // Build The Menus and Menu Bar
     makeMenuBar();
 
     //... then the SequencePanel
-    itsSequencePanel = new SequencePanel(this, maxData);
+    //itsSequencePanel = new SequencePanel(this, maxData);
+    itsSequencePanel = new SequencePanel(this, data);
 
-    
     getContentPane().add(itsSequencePanel);
     setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
@@ -105,7 +109,7 @@ public class Sequence extends JFrame implements EditorContainer{
       }*/
     
 
-  private final void makeTitle(SequenceRemoteData maxData){
+    private final void makeTitle(/*SequenceRemoteData*/FtsSequenceObject maxData){
     setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Sequence " + maxData.getName()));
     MaxWindowManager.getWindowManager().windowChanged(this);
   } 
@@ -150,4 +154,5 @@ public class Sequence extends JFrame implements EditorContainer{
 	return getContentPane().getBounds();
     }
 }
+
 

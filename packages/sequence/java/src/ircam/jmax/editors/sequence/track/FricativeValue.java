@@ -3,6 +3,7 @@ package ircam.jmax.editors.sequence.track;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.*;
 import java.io.*;
 import javax.swing.*;
@@ -14,6 +15,7 @@ public class FricativeValue extends AbstractEventValue
     public FricativeValue()
     {
 	super();
+	setDefaultProperties();
     }
 
 
@@ -45,6 +47,10 @@ public class FricativeValue extends AbstractEventValue
 
     }
 
+    private void setDefaultProperties()
+    {
+	properties.put("duration", new Integer(100));
+    }
 
     /**
      * Returns its specialized renderer (a FricativeEventRenderer) */
@@ -67,11 +73,14 @@ public class FricativeValue extends AbstractEventValue
      try
       {
 	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-	FRICATIVE_ICON = new ImageIcon(path+"fricative.gif");
       }
     catch(FileNotFoundException e){
-      System.err.println("Couldn't locate sequence images");
+	//System.err.println("Couldn't locate sequence images");
+	path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
     }
+    FRICATIVE_ICON = new ImageIcon(path+"fricative.gif");
   }
-
 }
+
+
+

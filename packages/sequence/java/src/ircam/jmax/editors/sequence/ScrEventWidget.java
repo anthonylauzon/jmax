@@ -134,9 +134,9 @@ public class ScrEventWidget extends Box implements ListSelectionListener, TrackD
 
     if (e!= null)
       {
-	timeEditor.setValue(e.getTime());
+	  timeEditor.setValue((int)e.getTime());//??
 	pitchEditor.setValue(((Integer)e.getProperty("pitch")).intValue());
-	durationEditor.setValue(e.getDuration());
+	durationEditor.setValue(((Integer)e.getProperty("duration")).intValue());
 	velocityEditor.setValue(((Integer)e.getProperty("velocity")).intValue());
 	channelEditor.setValue(((Integer)e.getProperty("channel")).intValue());
       }
@@ -183,7 +183,7 @@ public class ScrEventWidget extends Box implements ListSelectionListener, TrackD
 	for (en = gc.getSelection().getSelected(); en.hasMoreElements();)
 	  {
 	    temp = (TrackEvent) en.nextElement();
-	    temp.move(value);
+	    temp.move((double)value);
 	  }
       }
     else if (e.getSource() == pitchEditor.getCustomComponent()) 
@@ -199,7 +199,8 @@ public class ScrEventWidget extends Box implements ListSelectionListener, TrackD
 	for (en = gc.getSelection().getSelected(); en.hasMoreElements();)
 	  {
 	    temp = (TrackEvent) en.nextElement();
-	    temp.setDuration(value);
+
+	    temp.setProperty("duration", new Integer(value));
 	  }
       }
     else if (e.getSource() == velocityEditor.getCustomComponent()) 

@@ -65,11 +65,11 @@ public interface TrackDataModel {
      * NO_SUCH_EVENT, EMPTY_COLLECTION */
     public abstract int indexOf(TrackEvent event);
     
-    public abstract Enumeration intersectionSearch(int start, int end);
+    public abstract Enumeration intersectionSearch(/*int*/double start, /*int*/double end);
     
-    public abstract Enumeration inclusionSearch(int start, int end);
+    public abstract Enumeration inclusionSearch(/*int*/double start, /*int*/double end);
     
-    public abstract int getFirstEventAt(int time);
+    public abstract int getFirstEventAt(/*int*/double time);
     
     /**
      * adds an event in the database
@@ -86,7 +86,7 @@ public interface TrackDataModel {
     /**
      * move an event in the database
      */
-    public abstract void moveEvent(TrackEvent event, int time);
+    public abstract void moveEvent(TrackEvent event, /*int*/double time);
     
     
     /**

@@ -27,12 +27,14 @@
 package ircam.jmax.editors.sequence.track;
 
 import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.renderers.*;
+
 import ircam.jmax.fts.*;
 import javax.swing.undo.*;
 import ircam.jmax.toolkit.*;
 
 /**
- * The class representing an event in a track. These objects have a time and duration, 
+ * The class representing an event in a track. These objects have a time 
  * and a value (a FtsRemoteData).
  */
 
@@ -42,8 +44,6 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
     public TrackEvent()
     {
 	time = DEFAULT_TIME;
-	duration = DEFAULT_DURATION;
-
     }
 
 
@@ -55,8 +55,6 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
     public TrackEvent(TrackDataModel model, EventValue value)
     {
 	time = DEFAULT_TIME;
-	duration = DEFAULT_DURATION;
-
 	itsTrackDataModel = model;
     }
 
@@ -80,14 +78,13 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
     public TrackEvent(EventValue value)
     {
 	time = DEFAULT_TIME;
-	duration = DEFAULT_DURATION;
 
 	setValue(value);
     }
 
     /**
      * Get the initial time for this event */
-    public int getTime()
+    public /*int*/double getTime()
     {
 	return time;
     }
@@ -96,7 +93,7 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
      * Set the initial time for this event. Use move() when the event is into a 
      * model (i.e. always for the editors, the exception are Events created on-the-fly 
      * by specific intereaction modules), in order to keep the DB consistency. */
-    public void setTime(int time)
+    public void setTime(/*int*/double time)
     {
 	this.time = time;
     }
@@ -105,7 +102,7 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
      * This is the method that must be called by the editors to
      * change the initial time of an event. It takes care of
      * keeping the data base consistency */
-    public void move(int time)
+    public void move(/*int*/double time)
     {
 	if (time < 0) time = 0;
 	if (itsTrackDataModel != null)
@@ -119,39 +116,12 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
     }
 
     /**
-     * Get the duration of this event */
-    public int getDuration()
-    {
-	return duration;
-    }
-
-    /**
-     * Set the duration of this event */
-    public final void setDuration(int duration) 
-    {
-	
-	if (duration < 0) duration = 0;
-	if (itsTrackDataModel != null)
-	    {
-		if (((UndoableData) itsTrackDataModel).isInGroup())
-		    ((UndoableData) itsTrackDataModel).postEdit(new UndoableEventTransformation(this));
-	    }
-	
-	this.duration = duration;
-	
-	if (itsTrackDataModel != null)
-	    {
-		itsTrackDataModel.changeEvent(this);
-	    }
-    }
-    
-
-    /**
      * Set the named property */
     public void setProperty(String name, Object theValue)
     {
 
-	int intVal;
+	//int intVal;
+	double doubleVal;
 
 	if (itsTrackDataModel != null)
 	    {
@@ -159,19 +129,25 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
 		    ((UndoableData) itsTrackDataModel).postEdit(new UndoableEventTransformation(this));
 	    }
 	
-	
-	if (theValue instanceof Integer) 
+	if (theValue instanceof Double) 
 	    {
-		intVal = ((Integer)theValue).intValue();
-
+		doubleVal = ((Double)theValue).doubleValue();
 		if (name.equals("time"))
-		    setTime(intVal);
-		else if (name.equals("duration"))
-		    setDuration(intVal);
+		    setTime(doubleVal);
 		else  {
-		    if (value != null) value.setProperty(name, theValue); //unknown Integer property
+		    if (value != null) value.setProperty(name, theValue); //unknown Double property
 		}
 	    }
+	/*if (theValue instanceof Integer) 
+	  {
+	  intVal = ((Integer)theValue).intValue();
+	  
+	  if (name.equals("time"))
+	  setTime(intVal);
+	  else  {
+	  if (value != null) value.setProperty(name, theValue); //unknown Integer property
+	  }
+	  }*/
 	else if (value != null)
 	    value.setProperty(name, theValue); //unknow not-Integer property, delegate it to the value object
 	
@@ -186,16 +162,15 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
 
     /**
      * Get the given property.
-     * The property can be either a time, duration, or a
+     * The property can be either a time or a
      * property handled by this object's value field.
-     * Usually, the time and duration properties are not get with the getProperty method, 
-     * but via the direct methods getTime() and getDuration() */
+     * Usually, the time property is not get with the getProperty method, 
+     * but via the direct methods getTime() */
     public Object getProperty(String name)
     {
 	if (name.equals("time"))
-	    return new Integer(time);
-	else if (name.equals("duration"))
-	    return new Integer(duration);
+	    //return new Integer(time);
+	    return new Double(time);
 	else if (value != null && !value.getProperty(name).equals(EventValue.UNKNOWN_PROPERTY))
 	    return value.getProperty(name); //this is not a know property, ask to the value object
 	else return EventValue.DEFAULT_PROPERTY;
@@ -229,7 +204,7 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
 	// a renderer for this object of unknown type.
 	// AmbitusEventRenderer is choosen here because it is a renderer 
 	// that is able at least to correctly show
-	// a rectangle with the starting time and duration of an event.
+	// a rectangle with the starting time of an event.
     }
 
     /* --------- Undoable data interface ----------*/
@@ -292,13 +267,15 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
 
 
     //--- Fields
-    private int time;
-    private int duration;
+    //private int time;
+    private double time;
     private EventValue value;
     private boolean inGroup = false;
 
-    public static int DEFAULT_TIME = 0;
-    public static int DEFAULT_DURATION = 100;
+    //public static int DEFAULT_TIME = 0;
+    public static double DEFAULT_TIME = 0;
 
     private TrackDataModel itsTrackDataModel;
 }
+
+

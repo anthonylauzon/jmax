@@ -49,17 +49,17 @@ public class UndoableEventTransformation extends AbstractUndoableEdit {
   
   TrackEvent itsEvent;  
 
-  int undoTime;
+    /*int*/double undoTime;
   Integer undoPitch;
   Integer undoVelocity;
-  int undoDuration;
+  Integer undoDuration;
   Integer undoChannel;
   Integer undoAmbitus;
 
-  int redoTime;
+    /*int*/double redoTime;
   Integer redoPitch;
   Integer redoVelocity;
-  int redoDuration;
+  Integer redoDuration;
   Integer redoChannel;
   Integer redoAmbitus;
 
@@ -73,7 +73,7 @@ public class UndoableEventTransformation extends AbstractUndoableEdit {
     undoTime = theEvent.getTime();
     undoPitch = (Integer)theEvent.getProperty("pitch");
     undoVelocity = (Integer)theEvent.getProperty("velocity");
-    undoDuration = theEvent.getDuration();
+    undoDuration = (Integer)theEvent.getProperty("duration");
     undoChannel = (Integer)theEvent.getProperty("channel");
     undoAmbitus = (Integer)theEvent.getProperty("ambitus");
   }
@@ -96,14 +96,14 @@ public class UndoableEventTransformation extends AbstractUndoableEdit {
     redoTime = itsEvent.getTime();
     redoPitch = (Integer)itsEvent.getProperty("pitch");
     redoVelocity = (Integer)itsEvent.getProperty("velocity");
-    redoDuration = itsEvent.getDuration();
+    redoDuration = (Integer)itsEvent.getProperty("duration");
     redoChannel = (Integer)itsEvent.getProperty("channel");
     redoAmbitus = (Integer)itsEvent.getProperty("ambitus");
 
     itsEvent.setTime(undoTime);
     itsEvent.setProperty("pitch", undoPitch);
     itsEvent.setProperty("velocity", undoVelocity);
-    itsEvent.setDuration(undoDuration);
+    itsEvent.setProperty("duration", undoDuration);
     itsEvent.setProperty("channel", undoChannel);
     itsEvent.setProperty("ambitus", undoAmbitus);
   }
@@ -115,7 +115,7 @@ public class UndoableEventTransformation extends AbstractUndoableEdit {
     undoTime = itsEvent.getTime();
     undoPitch = (Integer)itsEvent.getProperty("pitch");
     undoVelocity = (Integer)itsEvent.getProperty("velocity");
-    undoDuration = itsEvent.getDuration();
+    undoDuration = (Integer)itsEvent.getProperty("duration");
     undoChannel = (Integer)itsEvent.getProperty("channel");
     undoAmbitus = (Integer)itsEvent.getProperty("ambitus");
 
@@ -123,9 +123,12 @@ public class UndoableEventTransformation extends AbstractUndoableEdit {
     itsEvent.setTime(redoTime);
     itsEvent.setProperty("pitch", redoPitch);
     itsEvent.setProperty("velocity", redoVelocity);
-    itsEvent.setDuration(redoDuration);
+    itsEvent.setProperty("duration", redoDuration);
     itsEvent.setProperty("channel", redoChannel);
     itsEvent.setProperty("ambitus", redoAmbitus);
   }
 
 }
+
+
+

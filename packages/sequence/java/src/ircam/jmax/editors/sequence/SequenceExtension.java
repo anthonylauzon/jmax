@@ -38,17 +38,21 @@ public class SequenceExtension extends tcl.lang.Extension implements JavaExtensi
 {
  public void init(ircam.jmax.script.Interpreter interp)
   {
-    Mda.installEditorFactory( new SequenceFactory());
+      //Mda.installEditorFactory( new SequenceFactory());
 
-    Fts.registerRemoteDataClass( "sequence_data", ircam.jmax.editors.sequence.SequenceRemoteData.class);
+      //Fts.registerRemoteDataClass( "sequence_data", ircam.jmax.editors.sequence.SequenceRemoteData.class);
+
+    FtsObject.registerFtsObjectCreator("sequence", new FtsSequenceObjectCreator());
   }
 
     /* this method should be removed as soon as jacl is completely forgotten about */
   public void init(tcl.lang.Interp interp)
   {
-    Mda.installEditorFactory( new SequenceFactory());
+      //Mda.installEditorFactory( new SequenceFactory());
 
-    Fts.registerRemoteDataClass( "sequence_data", ircam.jmax.editors.sequence.SequenceRemoteData.class);
+      //Fts.registerRemoteDataClass( "sequence_data", ircam.jmax.editors.sequence.SequenceRemoteData.class);
+
+    FtsObject.registerFtsObjectCreator("sequence", new FtsSequenceObjectCreator());
   }
 }
 

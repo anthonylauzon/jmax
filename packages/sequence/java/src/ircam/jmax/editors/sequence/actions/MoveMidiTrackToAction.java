@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -23,36 +23,34 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.sequence;
+package ircam.jmax.editors.sequence.actions;
+
+import java.awt.*;
+import java.awt.event.*;
+
+import javax.swing.*;
+import javax.swing.event.*;
+
+import ircam.jmax.*;
+import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.menus.*;
 
 import ircam.jmax.toolkit.*;
-import java.awt.event.*;
-import ircam.jmax.editors.sequence.track.*;
-import ircam.jmax.editors.sequence.renderers.*;
+import ircam.jmax.toolkit.actions.*;
 
-/** A simple extension of the mouse tracker that writes its position in
- * the status bar... and presses the key in the little keyboard*/
-public class MidiMouseTracker extends MouseTracker {
-
-  public MidiMouseTracker(PositionListener l)
+public class MoveMidiTrackToAction extends EditorAction
+{
+  int position;
+  public  void actionPerformed(ActionEvent e)
   {
-    super(l);
+    position = Integer.valueOf(((JMenuItem)e.getSource()).getText()).intValue()-1;
+    super.actionPerformed(e);
   }
 
-  /**
-   * The only redefined method */
-  public void mouseMoved(MouseEvent e) 
-  {  
-    SequenceGraphicContext egc = (SequenceGraphicContext) gc;
-
-    egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), ""+
-			    ListPanel.numberFormat.format(egc.getAdapter().getInvX(e.getX()))+
-			    ", "+
-			    (egc.getAdapter().getInvY(e.getY())));
-    
-    //press keys in the pianoroll representation
-    if(((PartitionAdapter)egc.getAdapter()).getViewMode()==MidiTrackEditor.PIANOROLL_VIEW)
-	if (egc.getTrack().getTrackDataModel().containsType(AmbitusValue.info))
-	    ScoreBackground.pressKey(egc.getAdapter().getInvY(e.getY()), egc);
+  public void doAction(EditorContainer container)
+  {
+    ((SequencePanel)container.getEditor()).moveTrackTo( MidiTrackPopupMenu.getPopupTarget(), position);    
   }
 }
+
+

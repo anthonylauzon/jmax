@@ -54,11 +54,12 @@ public class AbstractValueInfo implements ValueInfo {
      try
       {
 	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-	GENERIC_ICON = new ImageIcon(path+"genericAdder.gif");
       }
     catch(FileNotFoundException e){
-      System.err.println("Couldn't locate sequence images");
+	//System.err.println("Couldn't locate sequence images");
+	path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
     }
+    GENERIC_ICON = new ImageIcon(path+"genericAdder.gif");
   }
 
 }

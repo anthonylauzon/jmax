@@ -30,12 +30,12 @@ import ircam.jmax.editors.sequence.track.*;
 /**
  * a mapper into the time value of the TrackEvents
  */
-public class TimeMapper extends Mapper {
+public class TimeMapper extends DoubleMapper {
   
   /**
    * set the given starting time in the given event
    */
-  public void set(TrackEvent e, int value) 
+    public void set(TrackEvent e, /*int*/double value) 
   {
     e.move(value);
   }
@@ -43,12 +43,12 @@ public class TimeMapper extends Mapper {
   /**
    * get the starting time from the given event
    */
-  public int get(TrackEvent e) 
+    public /*int*/double get(TrackEvent e) 
   {
     return e.getTime();
   }
 
-  static public Mapper getMapper()
+  static public DoubleMapper getMapper()
   {
     return itsTimeMapper;
   }
@@ -57,5 +57,8 @@ public class TimeMapper extends Mapper {
 
   static TimeMapper itsTimeMapper = new TimeMapper();
 }
+
+
+
 
 

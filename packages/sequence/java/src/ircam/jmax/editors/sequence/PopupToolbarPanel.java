@@ -72,6 +72,11 @@ public class PopupToolbarPanel extends JPanel implements PopupProvider{
 	return null;
     }
 
+    public PopupProvider getProvider()
+    {
+	return provider;
+    }
+    
     //--- Fields
     PopupProvider provider;
 }

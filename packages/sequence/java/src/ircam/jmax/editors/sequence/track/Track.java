@@ -67,5 +67,17 @@ public interface Track {
      * Clients can add specific listeners for specific properties as in
      * track.getPropertySupport().addChangeListener(myChangeListener); .*/
     public PropertyChangeSupport getPropertySupport();
+
+    /**
+     * Set the unique identifier of this track.*/
+    public void setId(int id);
+    /**
+     * Returns the unique identifier of this track.*/
+    public int getId();
 }
+
+
+
+
+
 

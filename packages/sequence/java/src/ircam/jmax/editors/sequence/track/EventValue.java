@@ -4,6 +4,7 @@ package ircam.jmax.editors.sequence.track;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import java.util.*;
+import javax.swing.*;
 
 /**
  * The interface of the objects that can be values of events in a sequence.
@@ -24,6 +25,10 @@ public interface EventValue
     /**
      * Get the given property */
     public abstract Object getProperty(String name);
+
+    /**
+     * Get the popup for this EventValue */
+    public abstract JPopupMenu getPopupMenu();
 
     /** 
      * Returns the ValueInfo object for this EventValue */

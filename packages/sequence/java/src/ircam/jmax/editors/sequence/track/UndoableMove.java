@@ -39,8 +39,8 @@ public class UndoableMove extends AbstractUndoableEdit {
   
   TrackEvent itsEvent;  
 
-  int undoTime;
-  int redoTime;
+    /*int*/double undoTime;
+    /*int*/double redoTime;
 
 
   /**

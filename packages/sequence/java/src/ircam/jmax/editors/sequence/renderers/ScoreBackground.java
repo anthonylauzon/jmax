@@ -23,9 +23,10 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.sequence;
+package ircam.jmax.editors.sequence.renderers;
 
 import ircam.jmax.editors.sequence.track.*;
+import ircam.jmax.editors.sequence.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.MaxApplication;
 
@@ -65,7 +66,7 @@ public class ScoreBackground implements Layer{
     g.setColor(horizontalGridLinesColor);
     for (int i = 0; i < 381; i+=9)
       {
-	positionY = 409-i;
+	positionY = SC_BOTTOM-i;
 	g.drawLine(KEYX, positionY, d.width, positionY);
       }
 
@@ -73,33 +74,40 @@ public class ScoreBackground implements Layer{
     g.setColor(Color.black);
     for (int j = 0; j < 381; j+=36)
       {
-	positionY = 409-j;
-	g.drawLine(56, positionY, d.width, positionY);
+	positionY = SC_BOTTOM-j;
+	g.drawLine(KEYEND+1, positionY, d.width, positionY);
+      }
+    // the last (127) line
+    g.drawLine(KEYEND+1, SC_TOP, d.width, SC_TOP);
+    
+    g.setColor(Color.gray);
+    for (int j = 0; j < 381; j+=36)
+      {
+	positionY = SC_BOTTOM-j;
 	g.drawString(""+j/3, 10, positionY+3);
       }
-
-    // the last (127) line and number
-    g.drawLine(56, 28, d.width, 28);
-    g.drawString(""+127, 10, 31);
+    // the last (127) number
+    g.drawString(""+127, 10, SC_TOP+3);
 
     // the piano keys...
-    for (int i = 0; i < 127; i++)
+    for (int i = 0; i <= 127; i++)
       {
-	positionY = 409-(i*3)-1;
+	positionY = SC_BOTTOM-(i*3)-1;
 	if (isAlteration(i)) 
 	  {
 	    g.setColor(Color.darkGray);
-	    g.fillRect(KEYX, positionY, KEYWIDTH, 3);
+	    g.fillRect(KEYX, positionY, KEYWIDTH, KEYHEIGHT);
 	  }
 	else 
 	  {
 	    g.setColor(Color.lightGray);
-	    g.fillRect(KEYX, positionY, KEYWIDTH, 3);
+	    g.fillRect(KEYX, positionY, KEYWIDTH, KEYHEIGHT);
 	  }
       }
 
     // the vertical line at the end of keyboard
-    g.drawLine(KEYEND, 28, KEYEND, 409);
+    g.setColor(Color.black);
+    g.drawLine(KEYEND, SC_TOP, KEYEND, SC_BOTTOM);
   }
 
   public static boolean isAlteration(int note)
@@ -113,10 +121,10 @@ public class ScoreBackground implements Layer{
   {
     if (key < 0 || key > 127) return;
     if (currentPressedKey != -1 && currentPressedKey != key) releaseKey(sgc);
-    int positionY = 409-(key*3)-1;
+    int positionY = SC_BOTTOM-(key*KEYHEIGHT)-1;
     Graphics g = sgc.getGraphicDestination().getGraphics();
     g.setColor(Color.white);
-    g.fillRect(KEYX, positionY, 25, 3);
+    g.fillRect(KEYX, positionY, KEYWIDTH, KEYHEIGHT);
     g.dispose();
     currentPressedKey = key;
   }
@@ -124,12 +132,12 @@ public class ScoreBackground implements Layer{
   static public void releaseKey(GraphicContext sgc)
   {
     if (currentPressedKey == -1) return;
-    int positionY = 409-(currentPressedKey*3)-1;
+    int positionY = SC_BOTTOM-(currentPressedKey*KEYHEIGHT)-1;
     Graphics g = sgc.getGraphicDestination().getGraphics();
     if (isAlteration(currentPressedKey))
       g.setColor(Color.darkGray);
     else g.setColor(Color.lightGray);
-    g.fillRect(KEYX, positionY, 25, 3);
+    g.fillRect(KEYX, positionY, KEYWIDTH, KEYHEIGHT);
     g.dispose();
     currentPressedKey = -1;
   }
@@ -170,7 +178,8 @@ public class ScoreBackground implements Layer{
     {
 	AmbitusValue value = new AmbitusValue();
 	TrackEvent tempEvent = new TrackEvent(value);
-	int windowTime = gc.getAdapter().getInvX(gc.getGraphicDestination().getSize().width) - gc.getAdapter().getInvX(KEYEND)-1 ;
+	Dimension d = gc.getGraphicDestination().getSize();
+	int windowTime = (int) (gc.getAdapter().getInvX(d.width) - gc.getAdapter().getInvX(KEYEND))-1 ;
 	int timeStep;
 	
 	
@@ -187,7 +196,7 @@ public class ScoreBackground implements Layer{
 		tempEvent.setTime(snappedTime);
 		xPosition = gc.getAdapter().getX(tempEvent);
 		
-		g.drawLine(xPosition, 24, xPosition, 409);
+		g.drawLine(xPosition, 0, xPosition, d.height);
 	    }
     }
   
@@ -218,10 +227,11 @@ public class ScoreBackground implements Layer{
       
     while (windowTime/pow>0) 
       {
-	pow *= 10;
+	pow *= 10;	
       }
-
-    pow = pow/10;
+    
+    if(pow != 0)
+	pow = pow/10;
 
     if (windowTime/pow < 5) pow = pow/5;
     if (pow == 0) return 1;
@@ -234,11 +244,15 @@ public class ScoreBackground implements Layer{
   static Image itsImage;
   static boolean imageReady = true/*false*/;
   public static final Color horizontalGridLinesColor = new Color(187, 187, 187); 
-  public static final Font gridSubdivisionFont = new Font("Helvetica", Font.PLAIN, 10);
-
+    //  public static final Font gridSubdivisionFont = new Font("Helvetica", Font.PLAIN, 10);
+  public static final Font gridSubdivisionFont = new Font("Serif", Font.PLAIN, 10);
   public static final int KEYX = 31;
   public static final int KEYWIDTH = 24;
+  public static final int KEYHEIGHT = 3;
   public static final int KEYEND = KEYX + KEYWIDTH;
+
+  public static final int SC_BOTTOM = 409;
+  public static final int SC_TOP = 28;
 }
 
 

@@ -23,9 +23,10 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.sequence;
+package ircam.jmax.editors.sequence.renderers;
 
 import ircam.jmax.editors.sequence.track.*;
+import ircam.jmax.editors.sequence.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.utils.*;
@@ -37,23 +38,21 @@ import java.io.File;
 import ircam.jmax.MaxApplication;
 
 /**
- * The main class for a score representation.
- * It provides the support for piano-roll editing,
+ * The main class for a monodimensionalTrack representation.
+ * It provides the support for  editing,
  * using a background layer and a foreground.
- * The grid is rendered in the ScoreBackground
- * The events are painted by the ScoreForeground.
+ * The grid is rendered in the MonodimensionalTrackBackground
+ * The events are painted by the MonodimensionalTrackForeground.
  */
-public class ScoreRenderer extends AbstractRenderer{
+public class MonodimensionalTrackRenderer extends AbstractRenderer{
   
   /**
    * Constructor.
    */
-  public ScoreRenderer(SequenceGraphicContext theGc) 
+  public MonodimensionalTrackRenderer(SequenceGraphicContext theGc) 
   {  
     super();
     gc = theGc;
-    gc.setRenderManager(this);
-    //gc.setAdapter(new PartitionAdapter());
     {//-- prepares the parameters for the geometry object
 
 	Geometry g = gc.getAdapter().getGeometry();
@@ -65,13 +64,11 @@ public class ScoreRenderer extends AbstractRenderer{
 
     tempList = new MaxVector();
 
-    itsForegroundLayer = new ScoreForeground(gc);
+    itsForegroundLayer = new MonodimensionalTrackForeground(gc);
 
-    itsLayers.addElement(new ScoreBackground(gc));
+    itsLayers.addElement(new MonodimensionalTrackBackground(gc));
     itsLayers.addElement(itsForegroundLayer);
   }
-  
-
 
   /**
    * returns its (current) event renderer
@@ -82,54 +79,27 @@ public class ScoreRenderer extends AbstractRenderer{
       //the renderer depends from the object, here...
       //return itsForegroundLayer.getObjectRenderer();
   }
-
-
   
-  /**
-   * returns the events whose graphic representation contains
-   * the given point.
-   */
-  public Enumeration objectsContaining(int x, int y) 
-  {  
-    TrackEvent aTrackEvent;
-
-    tempList.removeAllElements();
-
-    int startTime = gc.getAdapter().getInvX(0);
-    int endTime = gc.getAdapter().getInvX(gc.getGraphicDestination().getSize().width);
-
-    for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();)
-      {      
-	aTrackEvent = (TrackEvent) e.nextElement();
-
-	if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
-	  tempList.addElement(aTrackEvent);
-      }
-
-    return tempList.elements();
-  }
-
   /**
    * Returns the first event containg the given point.
    * If there are more then two objects, it returns the
    * the topmost in the visual hyerarchy*/
   public Object firstObjectContaining(int x, int y)
   {
-    TrackEvent aTrackEvent;
-    TrackEvent last = null;
-
-    int time = gc.getAdapter().getInvX(x);
-
-    for (Enumeration e = gc.getDataModel().intersectionSearch(time, time +1); e.hasMoreElements();) 
-      
+      TrackEvent aTrackEvent;
+      TrackEvent last = null;
+		    
+      /*int*/double time = gc.getAdapter().getInvX(x);
+		    
+      for (Enumeration e = gc.getDataModel().intersectionSearch(time, time +1); e.hasMoreElements();) 
       {      
-	aTrackEvent = (TrackEvent) e.nextElement();
-
-	if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
-	  last = aTrackEvent;
+	  aTrackEvent = (TrackEvent) e.nextElement();
+	  
+	  if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
+	      last = aTrackEvent;
       }
-
-    return last;
+		    
+      return last;
   }
 
   /**
@@ -139,21 +109,21 @@ public class ScoreRenderer extends AbstractRenderer{
   public Enumeration objectsIntersecting(int x, int y, int w, int h) 
   {
     TrackEvent aTrackEvent;
+    
+    /*int*/double startTime = gc.getAdapter().getInvX(x);
+    /*int*/double endTime = gc.getAdapter().getInvX(x+w);
 
     tempList.removeAllElements();
-    int startTime = gc.getAdapter().getInvX(x);
-    int endTime = gc.getAdapter().getInvX(x+w);
-
 
     for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
-      {
+    {
 	aTrackEvent = (TrackEvent) e.nextElement();
-
+	
 	if (aTrackEvent.getRenderer().touches(aTrackEvent, x, y, w, h, gc))
-	  {
+	{
 	    tempList.addElement(aTrackEvent);
-	  }
-      }
+	}
+    }
     return tempList.elements();
   }
 
@@ -161,15 +131,11 @@ public class ScoreRenderer extends AbstractRenderer{
   //------------------  Fields
   SequenceGraphicContext gc;
 
-  TrackDataModel itsTrackDataModel;
-
-  ScoreForeground itsForegroundLayer;
+  MonodimensionalTrackForeground itsForegroundLayer;
   
-  public static final int XINTERVAL = 10;
-  public static final int YINTERVAL = 3;
-
   private MaxVector tempList;
 }
+
 
 
 

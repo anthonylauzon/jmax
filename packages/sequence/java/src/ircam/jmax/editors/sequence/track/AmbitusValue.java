@@ -5,6 +5,8 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.renderers.*;
+import ircam.jmax.editors.sequence.menus.*;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
@@ -27,7 +29,7 @@ public class AmbitusValue extends AbstractEventValue
       {
 	properties.put((String) e.nextElement(), DEFAULT_PROPERTY);
       }
-    
+    properties.put("duration", new Integer(100));
     properties.put("ambitus", new Integer(0));
   }
   
@@ -67,6 +69,12 @@ public class AmbitusValue extends AbstractEventValue
     
   }
 
+  public JPopupMenu getPopupMenu()
+  {
+      //return MidiEventPopupMenu.getInstance();
+      return null;
+  } 
+
   /**
    * Returns its specialized renderer (an AmbitusEventRenderer) */
   public ObjectRenderer getRenderer()
@@ -92,14 +100,15 @@ public class AmbitusValue extends AbstractEventValue
     try
       {
 	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-	AMBITUS_ICON = new ImageIcon(path+"ambitusAdder.gif");
       }
     catch(FileNotFoundException e){
-      System.err.println("Couldn't locate sequence images");
+	//System.err.println("Couldn't locate sequence images");
+	path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
     }
+    AMBITUS_ICON = new ImageIcon(path+"ambitusAdder.gif");
   }
 
-  static String nameArray[] = {"pitch", "velocity", "channel", "ambitus"};
+    static String nameArray[] = {"pitch", "duration","velocity", "channel", "ambitus"};
 }
 
 

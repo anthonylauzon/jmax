@@ -27,6 +27,7 @@ package ircam.jmax.editors.sequence;
 
 import ircam.jmax.editors.sequence.tools.*;
 import ircam.jmax.editors.sequence.track.*;
+import ircam.jmax.editors.sequence.renderers.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
@@ -45,15 +46,20 @@ import ircam.jmax.toolkit.*;
   /**
    * The graphic component containing the tracks of a Sequence.
    */
-public class SequencePanel extends JPanel implements Editor, TrackListener {
+public class SequencePanel extends JPanel implements Editor, TrackListener, TrackDataListener, ListSelectionListener {
     
-    SequenceRemoteData sequenceRemoteData;
+    //SequenceRemoteData sequenceRemoteData;
+    FtsSequenceObject ftsSequenceObject;
+
     EditorToolbar toolbar;
     SequenceDataModel sequenceData;
     EditorContainer itsContainer;
     public InfoPanel statusBar;
     public JPanel ruler;
+    
     Box trackPanel;
+    JScrollPane scrollTracks;
+
     Hashtable trackContainers = new Hashtable();
     MutexPropertyHandler mutex = new MutexPropertyHandler("active");
     //---
@@ -66,6 +72,13 @@ public class SequencePanel extends JPanel implements Editor, TrackListener {
 
     public final int INITIAL_ZOOM = 20;
     public static final int MINIMUM_TIME = 10000;
+
+    static public Color violetColor = new Color(102,102,153);
+    static public Font rulerFont = new Font("SansSerif", Font.PLAIN, 10);
+    static public Image violinClefImage;
+    static public Image faClefImage;
+    static String path;
+
   /**
    * Constructor based on a SequenceDataModel containing the tracks to edit.
    */
@@ -75,13 +88,30 @@ public class SequencePanel extends JPanel implements Editor, TrackListener {
     sequenceData = data;
 
     setDoubleBuffered(false);
-    sequenceRemoteData = (SequenceRemoteData)data;
-    sequenceRemoteData.addTrackListener(this);
+    //sequenceRemoteData = (SequenceRemoteData)data;
+    //sequenceRemoteData.addTrackListener(this);
+    ftsSequenceObject = (FtsSequenceObject)data;
+    ftsSequenceObject.addTrackListener(this);
+
 
     //Create a Geometry object for this sequencer
     geometry = new Geometry();
+
     utilityPartitionAdapter = new PartitionAdapter(geometry);
 
+    //Create the backgrounds images????
+    try{
+      path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+File.separator+"images"+File.separator;
+    }
+    catch(FileNotFoundException e){
+	path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
+    }
+
+    violinClefImage = Toolkit.getDefaultToolkit().getImage(path+"violinClef.gif");
+    faClefImage = Toolkit.getDefaultToolkit().getImage(path+"faClef.gif");
+    Toolkit.getDefaultToolkit().prepareImage(violinClefImage, /*25, 54*/20, 51, this);
+    Toolkit.getDefaultToolkit().prepareImage(faClefImage, 23, 30, this);
+   
     //------------------------------------------------
     // Create the ruler
     ruler = new Ruler();
@@ -111,13 +141,15 @@ public class SequencePanel extends JPanel implements Editor, TrackListener {
     //------------------- prepare the track panel:
 
     trackPanel = new Box(BoxLayout.Y_AXIS);
-
+    scrollTracks = new JScrollPane(trackPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
+				   JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
     /**********  DEBUG CODE: for now, sequenceRemoteData is Empty (the FTS counterpart does not exist yet)
      ********** so we insert some false track to test the track editors */
 
 
-    sequenceRemoteData.addTrack(new TrackBase(new AbstractSequence(AmbitusValue.info)));
+    //sequenceRemoteData.addTrack(new TrackBase(new AbstractSequence(AmbitusValue.info)));
+    ftsSequenceObject.addTrack(new TrackBase(new AbstractSequence(AmbitusValue.info)));
     //    sequenceRemoteData.addTrack(new TrackBase(new AbstractSequence(FricativeValue.info)));
     //    sequenceRemoteData.addTrack(new TrackBase(new AbstractSequence(CueValue.info)));
 
@@ -126,12 +158,13 @@ public class SequencePanel extends JPanel implements Editor, TrackListener {
     JPanel separate_tracks = new JPanel();
     separate_tracks.setLayout(new BorderLayout());
 
-
-    sequenceRemoteData.getTrackAt(0).setProperty("active", Boolean.TRUE);
+    //sequenceRemoteData.getTrackAt(0).setProperty("active", Boolean.TRUE);
+    ftsSequenceObject.getTrackAt(0).setProperty("active", Boolean.TRUE);
 
     trackPanel.setSize(500, 50);
-    separate_tracks.add(trackPanel, BorderLayout.CENTER);
 
+    //separate_tracks.add(trackPanel, BorderLayout.CENTER);
+    separate_tracks.add(scrollTracks, BorderLayout.CENTER);
     
     //-- prepares the Status bar
     
@@ -159,8 +192,6 @@ public class SequencePanel extends JPanel implements Editor, TrackListener {
     northSection.add(statusBar);
     northSection.add(ruler);	
     separate_tracks.add(northSection, BorderLayout.NORTH);
-
-
 
     itsContainer.getFrame().validate();
     itsContainer.getFrame().pack();
@@ -193,7 +224,6 @@ public class SequencePanel extends JPanel implements Editor, TrackListener {
 	    
 	    geometry.setXZoom(e.getValue());
 	    itsTimeScrollbar.setVisibleAmount(Geometry.sizeToMsec(geometry, SequencePanel.this.getSize().width)/2);
-	    //repaint();
 	}
 	
     });
@@ -214,8 +244,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener {
 	    
 	    int currentTime = e.getValue();
 	    
-	    geometry.setXTransposition(-currentTime);
-	    
+	    geometry.setXTransposition(-currentTime);	    
 	}
     });
     
@@ -234,8 +263,6 @@ public class SequencePanel extends JPanel implements Editor, TrackListener {
 
   }
 
-
-
     /**
      * Callback from the model. This is called when a new track is added, but also
      * as a result of a merge */
@@ -243,19 +270,26 @@ public class SequencePanel extends JPanel implements Editor, TrackListener {
     {
 	TrackEditor teditor = TrackEditorFactoryTable.newEditor(track, geometry);
 	teditor.getGraphicContext().setToolManager(manager);
+	teditor.getGraphicContext().setFrame(itsContainer.getFrame());
 	manager.addContextSwitcher(new ComponentContextSwitcher(teditor.getComponent(), teditor.getGraphicContext()));
 
-	TrackContainer editor = new TrackContainer(track, teditor);
+	TrackContainer trackContainer = new TrackContainer(track, teditor);
 	
-	editor.setBorder(new EtchedBorder()); 
-	trackPanel.add(editor);
+	trackContainer.setBorder(new EtchedBorder()); 
+	trackPanel.add(trackContainer);
 	
 	trackPanel.validate();
-	trackPanel.repaint();
+	scrollTracks.validate();
+	scrollTracks.getVerticalScrollBar().setValue(scrollTracks.getVerticalScrollBar().getMaximum());
 
 	mutex.add(track);
-	trackContainers.put(track, editor);
+	trackContainers.put(track, trackContainer);
 
+	teditor.getSelection().addListSelectionListener(this);//????
+	track.setProperty("active", Boolean.TRUE);
+
+	//added to update maximum time if needed
+	track.getTrackDataModel().addListener(this);
     }
 
 
@@ -263,18 +297,62 @@ public class SequencePanel extends JPanel implements Editor, TrackListener {
      * Callback from the model. It can be called when two tracks are merged into one */
     public void trackRemoved(Track track)
     {
-	TrackContainer editor = (TrackContainer) trackContainers.get(track);
+	TrackContainer trackContainer = (TrackContainer) trackContainers.get(track);
 	
-	trackPanel.remove(editor);
+	trackPanel.remove(trackContainer);
+	
+	trackContainer.getTrackEditor().dispose();
 
 	trackPanel.validate();
-	trackPanel.repaint();
+	scrollTracks.validate();
 
 	mutex.remove(track);
 
 	trackContainers.remove(track);
 
     }
+
+  public void moveTrackTo(TrackEditor editor, int pos)
+  {
+      TrackContainer trackContainer = (TrackContainer) trackContainers.get(editor.getTrack());
+
+      if(trackPanel.getComponent(pos)==trackContainer)
+	  return;
+      trackPanel.remove(trackContainer);
+      trackPanel.add(trackContainer, pos);
+      trackPanel.validate();
+      scrollTracks.validate();
+      scrollTracks.getVerticalScrollBar().setValue(trackContainer.getBounds().y);
+      editor.getTrack().setProperty("active", Boolean.TRUE);
+  }
+
+   /**
+     * called when the database is changed: DataTrackListener interface
+     */
+    
+    public void objectChanged(Object spec) {}
+    public void objectAdded(Object spec, int index) {}
+    public void objectDeleted(Object whichObject, int index){}
+    public void objectMoved(Object whichObject, int oldIndex, int newIndex) 
+    {
+	//controll if the object is in the actual scrollable area. if not extend the area
+	TrackEvent evt = (TrackEvent)whichObject;
+	int evtTime = (int)(evt.getTime()) + ((Integer)evt.getProperty("duration")).intValue();
+	int maxVisibleTime = getMaximumVisibleTime();
+
+	if(evtTime > getMaximumTime())
+	{
+	    itsTimeScrollbar.setMaximum(evtTime);
+	    itsTimeScrollbar.setValue(evtTime);
+	}
+	else 
+	    if( evtTime > maxVisibleTime)		
+		itsTimeScrollbar.setValue(evtTime-maxVisibleTime-geometry.getXTransposition()+10);
+	    else
+		if(evtTime < -geometry.getXTransposition())
+		    itsTimeScrollbar.setValue(evtTime);
+    }
+
 
   ////////////////////////////////////////////////////////////
   public void Copy()
@@ -342,54 +420,92 @@ public class SequencePanel extends JPanel implements Editor, TrackListener {
 
     public MaxDocument getDocument()
     {
-	return sequenceRemoteData.getDocument();
+	//return sequenceRemoteData.getDocument();
+	return ftsSequenceObject.getDocument();
     }
+
   public EditorContainer getEditorContainer(){
     return itsContainer;
   }
   public void Close(boolean doCancel){
     itsContainer.getFrame().setVisible(false);
   }
+    
+    /**
+     * ListSelectionListener interface
+     */    
+    public void valueChanged(ListSelectionEvent e)
+    {
+	if (SequenceSelection.getCurrent().size()==1)
+	    {
+		TrackEvent evt = (TrackEvent)SequenceSelection.getCurrent().getSelected().nextElement();
+		int time = (int)evt.getTime();
+		int dur = ((Integer)evt.getProperty("duration")).intValue();
+		int startTime = -geometry.getXTransposition(); 
+		int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
+		
+		if(time<startTime)
+		    itsTimeScrollbar.setValue(time);
+		else if(time>endTime)
+		    itsTimeScrollbar.setValue(time-endTime+startTime+dur+10);
+	    }
+    }
+    
+    public int getMaximumVisibleTime()
+    {
+	return geometry.sizeToMsec(geometry, getSize().width - TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
+    }
+    public int getMaximumTime()
+    {
+	int maxTransp = -(itsTimeScrollbar.getMaximum()-itsTimeScrollbar.getVisibleAmount());
+	int size = getSize().width - TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND;
 
-
+	if (geometry.getXInvertion()) 
+	    return (int) (maxTransp -(size)/geometry.getXZoom())-1;
+	
+	else return (int) ((size)/geometry.getXZoom() - maxTransp)-1;
+    }
 
 
     /**
      * A graphic JPanel that represents a ruler containing time indications */
     class Ruler extends JPanel {
-	
+
 	Ruler()
 	{
 	    super();
 	    setOpaque(false);
+	    setFont(rulerFont);
+	    fm = getFontMetrics(rulerFont);
 	}
 
 	public void paint(Graphics g)
 	{
-	    AmbitusValue value = new AmbitusValue();
-	    TrackEvent tempEvent = new TrackEvent(value);
-	    int windowTime = geometry.sizeToMsec(geometry, SequencePanel.this.getSize().width - ScoreBackground.KEYEND)-1 ;
-	    int timeStep;
-	    
-	    
-	    timeStep = ScoreBackground.findBestTimeStep(windowTime);
-	    
-	    g.setColor(Color.black);
-	    
 	    int xPosition;
 	    int snappedTime;
-	    
+	    AmbitusValue value = new AmbitusValue();
+	    TrackEvent tempEvent = new TrackEvent(value);
 	    int logicalTime = -geometry.getXTransposition();
-	    for (int i=logicalTime+timeStep; i<logicalTime+windowTime; i+=timeStep) 
+	    int windowTime = getMaximumVisibleTime();	    
+
+	    int timeStep = ScoreBackground.findBestTimeStep(windowTime-logicalTime);
+
+	    //controll if the time string is too long (in this case draw one string on two)
+	    int stringLenght = fm.stringWidth(""+(logicalTime+timeStep));
+	    int delta = utilityPartitionAdapter.getX(logicalTime+timeStep)-utilityPartitionAdapter.getX(logicalTime);
+	    int k;
+	    if(stringLenght>delta-10) k = 2;
+	    else k=1;
+
+	    g.setColor(SequencePanel.violetColor);
+	    for (int i=logicalTime+timeStep; i<windowTime; i+=timeStep*k) 
 		{
 		    snappedTime = (i/timeStep)*timeStep;
 		    tempEvent.setTime(snappedTime);
-		    xPosition = utilityPartitionAdapter.getX(tempEvent);
-		    
-		    g.drawString(""+snappedTime, xPosition-20, 15);
-		}
-	    
+		    xPosition = utilityPartitionAdapter.getX(tempEvent)+TrackContainer.BUTTON_WIDTH-10;
 
+		    g.drawString(""+snappedTime, xPosition, 15);
+		}
 	}
 	
 	
@@ -401,6 +517,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener {
     	
 	//--- Ruler fields
 	Dimension rulerDimension = new Dimension(200, 30);
+	FontMetrics fm;
     }
 
     

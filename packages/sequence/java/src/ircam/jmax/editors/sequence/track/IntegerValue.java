@@ -29,6 +29,7 @@ package ircam.jmax.editors.sequence.track;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.*;
+import ircam.jmax.editors.sequence.renderers.*;
 import java.io.File.*;
 import javax.swing.*;
 import java.util.*;

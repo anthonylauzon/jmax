@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -23,33 +23,34 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.sequence;
+package ircam.jmax.editors.sequence.actions;
 
-import ircam.jmax.mda.*;
-import ircam.jmax.fts.*;
+import java.awt.*;
+import java.awt.event.*;
 
-/**
- * the MaxDataEditorFactory specialized to build sequence editors
- */
-public class SequenceFactory implements MaxDataEditorFactory {
+import javax.swing.*;
+import javax.swing.event.*;
 
-  /**
-   * overrides MaxDataEditorFactory.canEdit()
-   */
-  public boolean canEdit( MaxData maxData)
+import ircam.jmax.*;
+import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.menus.*;
+
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
+
+public class MoveMonodimensionalTrackToAction extends EditorAction
+{
+  int position;
+  public  void actionPerformed(ActionEvent e)
   {
-    return maxData instanceof SequenceRemoteData;
+    position = Integer.valueOf(((JMenuItem)e.getSource()).getText()).intValue()-1;
+    super.actionPerformed(e);
   }
-  
-  /**
-   * overrides MaxDataEditorFactory.newEditor()
-   */
-  public MaxDataEditor newEditor( MaxData maxData) 
+
+  public void doAction(EditorContainer container)
   {
-    return new SequenceDataEditor((SequenceRemoteData) maxData);
+    ((SequencePanel)container.getEditor()).moveTrackTo( MonodimensionalTrackPopupMenu.getPopupTarget(), position);    
   }
 }
-
-
 
 

@@ -27,6 +27,7 @@
 package ircam.jmax.editors.sequence.track;
 
 import ircam.jmax.fts.*;
+import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.*;
 import java.io.*;
@@ -94,11 +95,12 @@ public class CueValue extends IntegerValue
     try
       {
 	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-	CUE_ICON = new ImageIcon(path+"cue.gif");
       }
     catch(FileNotFoundException e){
-      System.err.println("Couldn't locate sequence images");
+	//System.err.println("Couldn't locate sequence images");
+	path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
     }
+    CUE_ICON = new ImageIcon(path+"cue.gif");
   }
 }
 

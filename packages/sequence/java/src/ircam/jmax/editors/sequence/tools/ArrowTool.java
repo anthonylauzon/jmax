@@ -153,24 +153,24 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
       }
 
     else
-    */{
-	// starts a serie of undoable moves
+    {*/
+    // starts a serie of undoable moves
 	
-	((UndoableData) egc.getDataModel()).beginUpdate();
-	
-	for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
-	  {
+    ((UndoableData) egc.getDataModel()).beginUpdate();
+    
+    for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
+	{
 	    aEvent = (TrackEvent) e.nextElement();
-	    
+	
 	    if (deltaX != 0) 
-	      egc.getAdapter().setX(aEvent, egc.getAdapter().getX(aEvent)+deltaX);
+		egc.getAdapter().setX(aEvent, egc.getAdapter().getX(aEvent)+deltaX);
 	    if ( deltaY != 0)
 	      egc.getAdapter().setY(aEvent, egc.getAdapter().getY(aEvent)+deltaY);
-	  }
+	}
+    
+    ((UndoableData) egc.getDataModel()).endUpdate();
 	
-	((UndoableData) egc.getDataModel()).endUpdate();
-	
-      }
+    //}
     
     mountIModule(itsSelecter);
     gc.getGraphicDestination().repaint();    

@@ -125,7 +125,6 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
     
     selectArea(x, y, w, h);
     
-    
     multipleObjectSelected();
   }
 

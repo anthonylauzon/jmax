@@ -23,9 +23,10 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.sequence.track;
+package ircam.jmax.editors.sequence.renderers;
 
 import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.toolkit.*;
 
 import java.awt.*;
@@ -34,16 +35,16 @@ import java.awt.*;
  * The piano-roll event renderer in a Score with an ambitus: the line-based event, 
  * with a lenght , variable width, black color, a label.
  */
-public class FricativeEventRenderer implements ObjectRenderer {
+public class AmbitusEventRenderer implements ObjectRenderer {
 
-  public FricativeEventRenderer()
+  public AmbitusEventRenderer()
     {
     } 
 
   /**
    * constructor.
    */
-  public FricativeEventRenderer(SequenceGraphicContext theGc) 
+  public AmbitusEventRenderer(SequenceGraphicContext theGc) 
   {
     gc = theGc;
   }
@@ -65,34 +66,49 @@ public class FricativeEventRenderer implements ObjectRenderer {
   {
     TrackEvent e = (TrackEvent) obj;
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
+    PartitionAdapter pa = (PartitionAdapter)gc.getAdapter();
 
-    int x = gc.getAdapter().getX(e);
-    int y = gc.getAdapter().getY(e, gc);
-    int lenght = gc.getAdapter().getLenght(e);
-    int height;
+    int x = pa.getX(e);
+    int y = pa.getY(e);
+    int lenght = pa.getLenght(e);
+    int label = pa.getLabel(e);
+    int heigth = pa.getHeigth(e);
 
-    height = 2;
+    if (heigth == 0)
+	heigth = Adapter.NOTE_DEFAULT_HEIGTH;
 
-    //internal rectangle
-    g.setColor(Color.lightGray);
-    g.fillRect(x-6, y-6, lenght, 12);
+    y = y-heigth/2;
 
     if (selected) 
+      {
 	g.setColor(Color.red);
+	//g.setColor(selectionColor);
+	  if (SequenceSelection.getCurrent().getModel() != gc.getDataModel()) g.drawRect(x, y, lenght, heigth);
+	else g.fillRect(x, y, lenght, heigth);
+      }
     else 
-	g.setColor(Color.blue);
-
-    //external Rectangle
-    g.drawRect(x-7, y-7, lenght, 14);
-
-    // the little 'f'
-    backupFont = g.getFont();
-
-    g.setFont(fricativeFont);
-    g.drawString("f", x+1, y+8);
-
-    g.setFont(backupFont);
-
+      {
+	g.setColor(Color.black);
+	g.fillRect(x, y, lenght, heigth);
+      }
+    if(pa.getViewMode()==MidiTrackEditor.NMS_VIEW)
+    {
+	int alt = pa.getAlteration(e);
+	g.setFont(altFont);
+	switch(alt)
+	    {
+	    case PartitionAdapter.ALTERATION_DIESIS:
+		g.drawString("#", x-8, y+5);
+		break;
+	    case PartitionAdapter.ALTERATION_BEMOLLE:
+		g.drawString("b", x-8, y+5);
+	    }
+    }
+    if(pa.isDisplayLabels())
+	{
+	    g.setFont(SequencePanel.rulerFont);
+	    g.drawString(""+label, x, y-5);
+	}
   }
   
   /**
@@ -112,11 +128,11 @@ public class FricativeEventRenderer implements ObjectRenderer {
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 
     int evtx = gc.getAdapter().getX(e);
-    int evty = gc.getAdapter().getY(e, gc);
+    int evty = gc.getAdapter().getY(e);
     int evtlenght = gc.getAdapter().getLenght(e);
-    int evtheight = FRICATIVE_HEIGHT;
+    int evtheigth = gc.getAdapter().getHeigth(e);
 
-    return  (evtx-10<=x && (evtx+evtlenght-10 >= x) && evty-evtheight/2<=y && (evty+evtheight/2) >= y);
+    return  (evtx<=x && (evtx+evtlenght >= x) && evty-evtheigth/2<=y && (evty+evtheigth/2) >= y);
   }
 
 
@@ -140,25 +156,31 @@ public class FricativeEventRenderer implements ObjectRenderer {
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 
     int evtx = gc.getAdapter().getX(e);
+    int evty = gc.getAdapter().getY(e);
     int evtlenght = gc.getAdapter().getLenght(e);
+    int evtheigth = gc.getAdapter().getHeigth(e);
 
-    return  evtx > x-10 && evtx < (x+w+10);
+    tempRect.setBounds(x, y, w, h);
+    eventRect.setBounds(evtx, evty, evtlenght, evtheigth);
+    return  tempRect.intersects(eventRect);
   }
 
-    public static FricativeEventRenderer getRenderer()
+    public static AmbitusEventRenderer getRenderer()
     {
 	if (staticInstance == null)
-	    staticInstance = new FricativeEventRenderer();
+	    staticInstance = new AmbitusEventRenderer();
 
 	return staticInstance;
     }
 
   //------------Fields
-    final static int FRICATIVE_HEIGHT = 12;
-
-    SequenceGraphicContext gc;
-    public static FricativeEventRenderer staticInstance;
-    public static Font fricativeFont = new Font("helvetica", Font.PLAIN, 14); 
-    private Font backupFont;
- 
+  final static int NOTE_DEFAULT_WIDTH = 5;
+    //final static int NOTE_DEFAULT_HEIGHT = 3;
+  public SequenceGraphicContext gc;
+  public static AmbitusEventRenderer staticInstance;
+  static public Font altFont = new Font("SansSerif", Font.BOLD, 12);
+    
+    int oldX, oldY;
+    //static public Color selectionColor = new Color(102,102,/*153*/253);
 }
+

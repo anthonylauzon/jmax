@@ -4,6 +4,7 @@ package ircam.jmax.editors.sequence.track;
 import ircam.jmax.fts.*;
 import java.util.*;
 import ircam.jmax.toolkit.*;
+import javax.swing.*;
 
 /**
  * A basic implementation of the EventValue interface, with a default property handling (no actions). 
@@ -36,7 +37,10 @@ public class AbstractEventValue extends FtsRemoteData implements EventValue
 	else return UNKNOWN_PROPERTY; //to be overloaded
     }
     
-    
+    public JPopupMenu getPopupMenu()
+    {
+	return null;
+    }
     /**
      * This implementation returns an EmptyEnumeration */
     public Enumeration getPropertyNames()
@@ -76,3 +80,6 @@ public class AbstractEventValue extends FtsRemoteData implements EventValue
     private String name;
     protected Hashtable properties = new Hashtable();
 }
+
+
+

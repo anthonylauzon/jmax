@@ -64,7 +64,7 @@ abstract public class Adapter implements MappingListener{
      */
     public int getX(TrackEvent e) 
     {
-	if (XMapper != null) return XMapper.get(e);
+	if (XMapper != null) return (int) XMapper.get(e);
 	else return 0;
     }
 
@@ -81,7 +81,7 @@ abstract public class Adapter implements MappingListener{
     /**
      * Returns the value of the X coordinate in the given graphic context.
      * e_m_ will be in the future the only one? */
-    public int getX(TrackEvent e, GraphicContext gc)
+    public /*int*/double getX(TrackEvent e, GraphicContext gc)
     {
 	return getX(e);
     }
@@ -98,7 +98,7 @@ abstract public class Adapter implements MappingListener{
   /**
    * get the value of the parameter associated with the graphic X
    */
-  abstract public int getInvX(int x);
+    abstract public /*int*/double getInvX(int x);
   
 
   /**
@@ -112,7 +112,8 @@ abstract public class Adapter implements MappingListener{
    */
   public void setX(TrackEvent e, int x) 
   {
-    XMapper.set(e, x);
+      //XMapper.set(e, x);
+      XMapper.set(e, getInvX(x));
   }
 
 
@@ -194,7 +195,7 @@ abstract public class Adapter implements MappingListener{
 
 
   //--- Fields
-  public Mapper XMapper;
+  public DoubleMapper XMapper;
   public Mapper YMapper;
   public Mapper LenghtMapper;
   public Mapper HeigthMapper;
@@ -205,4 +206,6 @@ abstract public class Adapter implements MappingListener{
 
   public final static int NOTE_DEFAULT_HEIGTH = 3;
 }
+
+
 

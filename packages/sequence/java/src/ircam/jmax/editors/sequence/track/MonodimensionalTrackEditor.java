@@ -27,6 +27,8 @@
 package ircam.jmax.editors.sequence.track;
 
 import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.renderers.*;
+import ircam.jmax.editors.sequence.menus.*;
 import ircam.jmax.toolkit.*;
 import java.awt.*;
 import java.beans.*;
@@ -98,57 +100,28 @@ public class MonodimensionalTrackEditor extends PopupToolbarPanel implements Lis
 	setOpaque(false);
     }
     
+    public JMenu getToolsMenu()
+    {
+	return gc.getToolbar().itsMenu;
+    }
+    
     public JPopupMenu getMenu()
     {
-	return gc.getToolbar().itsPopupMenu;
+	MonodimensionalTrackPopupMenu.getInstance().update(this);
+	return MonodimensionalTrackPopupMenu.getInstance();
+	//return gc.getToolbar().itsPopupMenu;
     }
 
+    public int trackCount()
+    {
+	//return gc.getSequenceRemoteData().trackCount();
+	return gc.getFtsSequenceObject().trackCount();
+    }
 
     public void paint(Graphics g) 
     {
-	super.paint(g);
-	int x = 0;
-	int y = 0;
-	int w = gc.getGraphicDestination().getSize().width;
-	int h = gc.getGraphicDestination().getSize().height;
-
-	g.setColor(Color.white);
-	g.fillRect(x, y, w, h);
-
-	g.setColor(Color.black);
-	g.drawLine(x, y+h/2, x+w, y+h/2);
-
-	// paint what is needed:
-	Rectangle r = new Rectangle (0,0,w, h);
-	TrackEvent temp;
-	
-	for (Enumeration e = objectsIntersecting( r.x, r.y, r.width, r.height); e.hasMoreElements();) 
-	    {
-		temp = (TrackEvent) e.nextElement();
-		temp.getRenderer().render( temp, g, SequenceSelection.getCurrent().isInSelection(temp), gc);
-	    }
-	
-    }
-
-    
-    private Enumeration objectsIntersecting(int x, int y, int w, int h)
-    {
-	TrackEvent aTrackEvent;
-	Vector tempList = new Vector();
-
-	int startTime = gc.getAdapter().getInvX(x);
-	int endTime = gc.getAdapter().getInvX(x+w);
-
-	for (Enumeration e = track.getTrackDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
-	    {
-		aTrackEvent = (TrackEvent) e.nextElement();
-
-		if (aTrackEvent.getRenderer().touches(aTrackEvent, x, y, w, h, gc))
-		    {
-			tempList.addElement(aTrackEvent);
-		    }
-	    }
-	return tempList.elements();
+      Rectangle r = g.getClipBounds();
+      renderer.render(g, r); //et c'est tout	
     }
 
     private void createGraphicContext(Geometry geometry, TrackDataModel model)
@@ -161,43 +134,9 @@ public class MonodimensionalTrackEditor extends PopupToolbarPanel implements Lis
 
 	gc.setAdapter(new MonoDimensionalAdapter(geometry, MONODIMENSIONAL_TRACK_OFFSET));
 
-	gc.setRenderManager(new AbstractRenderer() {
-	    /**
-	     * returns the first event containg the given point */
-	    public Object firstObjectContaining(int x, int y)
-		{
-		    TrackEvent aTrackEvent;
-		    TrackEvent last = null;
-		    
-		    int time = gc.getAdapter().getInvX(x);
-		    
-		    for (Enumeration e = track.getTrackDataModel().intersectionSearch(time, time +1); e.hasMoreElements();) 
-			
-			{      
-			    aTrackEvent = (TrackEvent) e.nextElement();
-			    
-			    if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
-				last = aTrackEvent;
-			}
-		    
-		    return last;
-		}
-	    
-	    /**
-	     * returns an enumeration of all the events whose graphic representation
-	     * intersects the given rectangle.
-	     */
-	    public Enumeration objectsIntersecting(int x, int y, int w, int h) 
-		{
-		    return MonodimensionalTrackEditor.this.objectsIntersecting(x, y, w, h);
-		}
-	    
-	    
-	    
-	});
+	renderer = new MonodimensionalTrackRenderer(gc);
+	gc.setRenderManager(renderer);
     }
-
-
 
     /**
      * ListSelectionListener interface
@@ -222,11 +161,21 @@ public class MonodimensionalTrackEditor extends PopupToolbarPanel implements Lis
 	return gc;
     }
 
+    public void dispose()
+    {
+    }
+
+    public SequenceSelection getSelection()
+    {
+	return selection;
+    }
+
     // good old f*****g HTML-style...
 
     public Dimension getMinimumSize()
     {
 	return new Dimension(400, 80);
+	//return new Dimension(400, 40);for split
     }
 
     public Dimension getPreferredSize()
@@ -234,12 +183,18 @@ public class MonodimensionalTrackEditor extends PopupToolbarPanel implements Lis
 	return new Dimension(400, 80);
     }
 
+    public Track getTrack()
+    {
+	return track;
+    }
 
     //--- FricativeTrackEditor fields
     Geometry geometry;
     SequenceGraphicContext gc;
     SequenceSelection selection;
     static int MONODIMENSIONAL_TRACK_OFFSET = 0;
+    MonodimensionalTrackRenderer renderer;
 
     Track track;
 }
+

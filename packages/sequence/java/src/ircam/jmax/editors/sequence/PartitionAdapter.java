@@ -24,6 +24,8 @@
 // 
 
 package ircam.jmax.editors.sequence;
+
+import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.track.*;
 
 import ircam.jmax.toolkit.*;
@@ -67,18 +69,28 @@ public class PartitionAdapter extends Adapter {
     return (int) ((temp+geometry.getXTransposition())*geometry.getXZoom()) + ScoreBackground.KEYEND;
   }
 
+    /**
+   * it returns the X graphic value corresponding to the x
+   * logical value.
+   */
+  public int getX(int x) 
+  {
+    if (geometry.getXInvertion()) x = -x;
+
+    return (int) ((x+geometry.getXTransposition())*geometry.getXZoom()) + ScoreBackground.KEYEND;
+  }
 
   /**
    * inherited from Adapter.
    * Returns the time associated with the value of an X coordinate after
    * the coordinate conversion.
    */
-  public int getInvX(int x) 
+    public /*int*/double getInvX(int x) 
   {
 
-    if (geometry.getXInvertion()) return (int) (geometry.getXTransposition() -(x-ScoreBackground.KEYEND)/geometry.getXZoom());
+      if (geometry.getXInvertion()) return /*(int)*/(double) (geometry.getXTransposition() -(x-ScoreBackground.KEYEND)/geometry.getXZoom());
 
-    else return (int) ((x-ScoreBackground.KEYEND)/geometry.getXZoom() - geometry.getXTransposition());
+      else return /*(int)*/(double) ((x-ScoreBackground.KEYEND)/geometry.getXZoom() - geometry.getXTransposition());
     
   }
 
@@ -86,10 +98,10 @@ public class PartitionAdapter extends Adapter {
   /**
    * set the time of the event associated with the graphic X
    */
-  public void setX(TrackEvent e, int x) 
-  {  
-    super.setX(e, getInvX(x));
-  }
+    /*public void setX(TrackEvent e, int x) 
+      {  
+      super.setX(e, getInvX(x));
+      }*/
 
 
   /**
@@ -99,11 +111,21 @@ public class PartitionAdapter extends Adapter {
    */
   public int getY(TrackEvent e) 
   {  
+    int q, r;
     int temp = super.getY(e);
     
-    if (geometry.getYInvertion()) temp = -temp;
-    
-    return (int) ((temp+geometry.getYTransposition())*geometry.getYZoom());  
+    if(viewMode==MidiTrackEditor.PIANOROLL_VIEW)
+    {
+      if (geometry.getYInvertion()) temp = -temp;
+      return (int) ((temp+geometry.getYTransposition())*geometry.getYZoom());  
+    }
+    else//NMS_VIEW
+    {
+      q = temp/12;
+      r = getRestFromIntervall(temp - q*12);
+      temp = PartitionBackground.SC_BOTTOM-9-(q*7+r)*4 - 3;
+      return temp;
+    }
   }
 
 
@@ -113,15 +135,95 @@ public class PartitionAdapter extends Adapter {
    */  
   public int getInvY(int y) 
   {
-    int temp;
+    int temp , rest, q, r;
 
-    if (geometry.getYInvertion()) temp = (int) (geometry.getYTransposition() -y/geometry.getYZoom());
-    else temp = (int) (y/geometry.getYZoom() - geometry.getYTransposition());
-  
+    if(viewMode==MidiTrackEditor.PIANOROLL_VIEW)
+    {
+      if (geometry.getYInvertion()) temp = (int) (geometry.getYTransposition() -(int)(y/geometry.getYZoom()));
+      else temp = (int) (y/geometry.getYZoom() - geometry.getYTransposition());  
+    }
+    else//NMS_VIEW
+    {
+	temp = (PartitionBackground.SC_BOTTOM-9-y)/4;
+	rest = (PartitionBackground.SC_BOTTOM-9-y) - temp*4;
+
+	q = temp/7;
+	r = temp - q*7;
+	temp = q*12 + getIntervallFromRest(r, rest);
+    }
+    if(temp<0) temp = 0;
+    else if(temp>127) temp = 127;
     return temp;
   }
 
+    int getIntervallFromRest(int r, int rest)
+    {
+	switch(r)
+	    {
+	    case 1: 
+		if(rest<2)
+		    return 1;
+		else
+		    return 2;
+	    case 2: 
+		if(rest<2)
+		    return 3;
+		else
+		    return 4;
+	    case 3: return 5;
+	    case 4: 
+		if(rest<2)
+		    return 6;
+		else
+		    return 7;
+	    case 5: 
+		if(rest<2)
+		    return 8;
+		else
+		    return 9;
+	    case 6: 
+		if(rest<2)
+		    return 10;
+		else
+		    return 11;
+	    default: return 0;
+	    }
+    }
 
+  int getRestFromIntervall(int i)
+  {
+    switch(i)
+	{
+	case 2: return 1;
+	case 3:
+	case 4: return 2;
+	case 5: 
+	case 6: return 3;
+	case 7: 
+	case 8: return 4;
+	case 9: return 5;
+	case 10:
+	case 11: return 6;
+	default: return 0;
+	}
+  }
+
+  public int getAlteration(TrackEvent e)
+  {
+    int q, r;
+    int temp = super.getY(e);
+    q = temp/12;
+    r = temp-q*12;
+    switch(r)
+      {
+      case 1:
+      case 6:
+      case 8: return ALTERATION_DIESIS;
+      case 3:
+      case 10: return ALTERATION_BEMOLLE;
+      default: return ALTERATION_NOTHING;
+      }
+  }
   /**
    * set the parameter of the event associated with the graphic y
    */
@@ -206,10 +308,32 @@ public class PartitionAdapter extends Adapter {
       }
 
   }
+    public boolean isDisplayLabels()
+    {
+	return displayLabels;
+    }
+    public void setDisplayLabels(boolean display)
+    {
+	displayLabels = display;
+    }
+
   //------------- Fields
-
-
+    public void setViewMode(int mode)
+    {
+	viewMode = mode;
+    }
+    public int getViewMode()
+    {
+	return viewMode;
+    }
     public static final int NOTE_DEFAULT_HEIGTH = 3;
+    int viewMode = MidiTrackEditor.PIANOROLL_VIEW;
+    boolean displayLabels = true;
+
+    public static final int ALTERATION_DIESIS = 1;
+    public static final int ALTERATION_BEMOLLE = -1;
+    public static final int ALTERATION_NOTHING = 0;
+    
 }
 
 

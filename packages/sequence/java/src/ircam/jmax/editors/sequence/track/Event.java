@@ -4,7 +4,7 @@ package ircam.jmax.editors.sequence.track;
 import ircam.jmax.fts.*;
 
 /**
- * The interface of the objects that can be put in a sequence. They have a starting time, a duration, 
+ * The interface of the objects that can be put in a sequence. They have a starting time   
  * and a value that can be of different types - ex. Ambitus notes, silences, fricatives, etc... 
  * The value field is an FtsRemoteData. 
  * The setProperty and getProperty methods are used to assign parameters without knowing 
@@ -15,24 +15,16 @@ public interface Event
 
     /**
      * Get the initial time for this event */
-    public abstract int getTime();
+    public abstract /*int*/double getTime();
 
     /**
      * This is the method that must be called by the editors to
      * change the initial time of an event. It takes care of
      * keeping the data base consistency */
-    public abstract void move(int time);
+    public abstract void move(/*int*/double time);
     /**
      * Set the time for this event */
-    public abstract void setTime(int time);
-
-    /**
-     * Get the duration of this event */
-    public abstract int getDuration();
-
-    /**
-     * Set the duration of this event */
-    public abstract void setDuration(int duration);
+    public abstract void setTime(/*int*/double time);
 
     /**
      * Set the named property */

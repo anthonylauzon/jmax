@@ -23,26 +23,29 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.sequence.track;
+package ircam.jmax.editors.sequence.renderers;
 
 import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.track.*;
+
 import ircam.jmax.toolkit.*;
 
 import java.awt.*;
 
 /**
- * An CueValue event renderer. It is represented as a vertical black bar
+ * The piano-roll event renderer in a Score with an ambitus: the line-based event, 
+ * with a lenght , variable width, black color, a label.
  */
-public class CueEventRenderer implements ObjectRenderer {
+public class FricativeEventRenderer implements ObjectRenderer {
 
-  public CueEventRenderer()
+  public FricativeEventRenderer()
     {
     } 
 
   /**
    * constructor.
    */
-  public CueEventRenderer(SequenceGraphicContext theGc) 
+  public FricativeEventRenderer(SequenceGraphicContext theGc) 
   {
     gc = theGc;
   }
@@ -66,26 +69,32 @@ public class CueEventRenderer implements ObjectRenderer {
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 
     int x = gc.getAdapter().getX(e);
-    int heigth = CUE_DIAMETER;
-    int y =  gc.getGraphicDestination().getSize().height/2 - CUE_DIAMETER;
-    int length = CUE_DIAMETER; //fixed length
+    int y = gc.getAdapter().getY(e, gc);
+    int lenght = gc.getAdapter().getLenght(e);
+    int height;
 
+    height = 2;
+
+    //internal rectangle
+    g.setColor(Color.lightGray);
+    g.fillRect(x-6, y-6, lenght, 12);
 
     if (selected) 
 	g.setColor(Color.red);
     else 
-	g.setColor(Color.black);
+	g.setColor(Color.blue);
 
-    //event's Oval
-    g.drawOval(x, y+CUE_DIAMETER/2, length, heigth);
-    g.setColor(Color.white);
-    g.fillOval(x+1, y+CUE_DIAMETER/2+1, length-2, heigth-2);
+    //external Rectangle
+    g.drawRect(x-7, y-7, lenght, 14);
 
-    tempFont = g.getFont();
-    g.setFont(cueFont);
-    g.setColor(Color.black);
-    g.drawString(""+e.getProperty("integer"), x+5, y+CUE_DIAMETER+ERROR);
-    g.setFont(tempFont);
+    // the little 'f'
+    backupFont = g.getFont();
+
+    g.setFont(fricativeFont);
+    g.drawString("f", x+1, y+8);
+
+    g.setFont(backupFont);
+
   }
   
   /**
@@ -105,9 +114,11 @@ public class CueEventRenderer implements ObjectRenderer {
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 
     int evtx = gc.getAdapter().getX(e);
-    int evty =  gc.getGraphicDestination().getSize().height/2 - CUE_DIAMETER;
+    int evty = gc.getAdapter().getY(e, gc);
+    int evtlenght = gc.getAdapter().getLenght(e);
+    int evtheight = FRICATIVE_HEIGHT;
 
-    return  (evtx<=x && (evtx+CUE_DIAMETER >= x) && evty<=y && (evty+CUE_DIAMETER) >= y);
+    return  (evtx-10<=x && (evtx+evtlenght-10 >= x) && evty-evtheight/2<=y && (evty+evtheight/2) >= y);
   }
 
 
@@ -131,29 +142,25 @@ public class CueEventRenderer implements ObjectRenderer {
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 
     int evtx = gc.getAdapter().getX(e);
-    int evtheigth = CUE_DIAMETER;
-    int evty = gc.getGraphicDestination().getSize().height/2 - CUE_DIAMETER;
-    int evtlenght = CUE_DIAMETER;
+    int evtlenght = gc.getAdapter().getLenght(e);
 
-    eventRect.setBounds(evtx, evty, evtlenght, evtheigth);
-    tempRect.setBounds(x, y, w, h);
-    return  eventRect.intersects(tempRect);
-
+    return  evtx > x-10 && evtx < (x+w+10);
   }
 
-    public static CueEventRenderer getRenderer()
+    public static FricativeEventRenderer getRenderer()
     {
 	if (staticInstance == null)
-	    staticInstance = new CueEventRenderer();
+	    staticInstance = new FricativeEventRenderer();
 
 	return staticInstance;
     }
 
   //------------Fields
-    final static int ERROR = 6;
-    final static int CUE_DIAMETER = 25;
+    final static int FRICATIVE_HEIGHT = 12;
+
     SequenceGraphicContext gc;
-    public static CueEventRenderer staticInstance;
-    private static Font cueFont = new Font("Helvetica", Font.BOLD, 14);
-    private Font tempFont;
+    public static FricativeEventRenderer staticInstance;
+    public static Font fricativeFont = new Font("helvetica", Font.PLAIN, 14); 
+    private Font backupFont;
+ 
 }

@@ -151,17 +151,17 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	return index;
     }
     
-    public Enumeration intersectionSearch(int start, int end)
+    public Enumeration intersectionSearch(/*int*/double start, /*int*/double end)
     {
 	return new Intersection(start,end);
     }
     
-    public Enumeration inclusionSearch(int start, int end)
+    public Enumeration inclusionSearch(/*int*/double start, /*int*/double end)
     {
 	return new Inclusion(start, end);
     }
     
-    public int getFirstEventAt(int time)
+    public int getFirstEventAt(/*int*/double time)
     {
 	if (events_fill_p == 0) 
 	    return EMPTY_COLLECTION;
@@ -259,7 +259,7 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
     /**
      * move an event in the database
      */
-    public void moveEvent(TrackEvent event, int newTime)
+    public void moveEvent(TrackEvent event, /*int*/double newTime)
     {
 	int index = indexOf(event);     // Find the event
 	int newIndex = getIndexAfter(newTime); //Find where to place it
@@ -493,7 +493,7 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
     
     /* Private methods */
     
-    final int getIndexAfter(int time)
+    final int getIndexAfter(/*int*/double time)
     {
 	if (events_fill_p == 0) 
 	    return EMPTY_COLLECTION;
@@ -601,7 +601,7 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
     /**
      * an utility class to implement the intersection with a range */
     class Intersection implements Enumeration {
-	Intersection(int start, int end)
+	Intersection(/*int*/double start, /*int*/double end)
 	{
 	    endTime = end;
 	    startTime = start;
@@ -631,7 +631,7 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 		{
 		    e = events[index++];
 		    if (e.getTime() >= startTime ||
-			e.getTime()+e.getDuration() >= startTime )
+			e.getTime()+((Integer)e.getProperty("duration")).intValue() >= startTime )
 			{
 			    return e;
 			}
@@ -641,8 +641,8 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	
 	
 	//--- Intersection Fields
-	int endTime;
-	int startTime;
+	/*int*/double endTime;
+	/*int*/double startTime;
 	int index;
 	Object nextObject = null;
     }    
@@ -653,7 +653,7 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
      * in a temporal range */
     class Inclusion implements Enumeration {
 	
-	Inclusion(int start, int end)
+	Inclusion(/*int*/double start, /*int*/double end)
 	{
 	    this.endTime = end;
 	    index = getIndexAfter(start);
@@ -678,8 +678,8 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	    while(index < endIndex)
 		{
 		    e = events[index++];
-		    if (e.getTime()+e.getDuration() <=endTime)
-			{
+		    if (e.getTime()+((Integer)e.getProperty("duration")).intValue() <=endTime)
+		    {
 			    return e;
 			}
 		}
@@ -689,7 +689,7 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	
 	
 	//--- Inclusion internal class fields
-	int endTime;
+	/*int*/double endTime;
 	int index;
 	int endIndex;
 	Object nextObject = null;
@@ -785,3 +785,9 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
     public static DataFlavor flavors[];
     public static DataFlavor sequenceFlavor = new DataFlavor(ircam.jmax.editors.sequence.SequenceSelection.class, "SequenceSelection");
 }
+
+
+
+
+
+

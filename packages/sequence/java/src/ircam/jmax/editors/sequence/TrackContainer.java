@@ -31,11 +31,13 @@ class TrackContainer extends JPanel {
 	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
       }
     catch(FileNotFoundException e){
-      System.err.println("Couldn't locate sequence images");
+	//System.err.println("Couldn't locate sequence images");
+	path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
     }
 
     activationButton = new JToggleButton(new ImageIcon(path+"unselected_track.gif"));
     activationButton.setSelectedIcon(new ImageIcon(path+"selected_track.gif"));
+    activationButton.setPreferredSize(new Dimension(BUTTON_WIDTH, 70));
     add(activationButton, BorderLayout.WEST);
     add(trackEditor.getComponent(), BorderLayout.CENTER);
     
@@ -85,9 +87,14 @@ class TrackContainer extends JPanel {
     AbstractButton b;
   }
 
+    public TrackEditor getTrackEditor()
+    {
+	return trackEditor;
+    }
 
   //--- Fields
   TrackEditor trackEditor;
   Track track;
   JToggleButton activationButton;
+  public static final int BUTTON_WIDTH = 30;
 }

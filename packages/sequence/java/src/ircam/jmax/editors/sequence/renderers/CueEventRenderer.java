@@ -23,27 +23,28 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.sequence.track;
+package ircam.jmax.editors.sequence.renderers;
 
 import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.track.*;
+
 import ircam.jmax.toolkit.*;
 
 import java.awt.*;
 
 /**
- * The piano-roll event renderer in a Score with an ambitus: the line-based event, 
- * with a lenght , variable width, black color, a label.
+ * An CueValue event renderer. It is represented as a vertical black bar
  */
-public class AmbitusEventRenderer implements ObjectRenderer {
+public class CueEventRenderer implements ObjectRenderer {
 
-  public AmbitusEventRenderer()
+  public CueEventRenderer()
     {
     } 
 
   /**
    * constructor.
    */
-  public AmbitusEventRenderer(SequenceGraphicContext theGc) 
+  public CueEventRenderer(SequenceGraphicContext theGc) 
   {
     gc = theGc;
   }
@@ -67,30 +68,26 @@ public class AmbitusEventRenderer implements ObjectRenderer {
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 
     int x = gc.getAdapter().getX(e);
-    int y = gc.getAdapter().getY(e);
-    int lenght = gc.getAdapter().getLenght(e);
-    int label = gc.getAdapter().getLabel(e);
-    int heigth = gc.getAdapter().getHeigth(e);
+    int heigth = CUE_DIAMETER;
+    int y =  gc.getGraphicDestination().getSize().height/2 - CUE_DIAMETER;
+    int length = CUE_DIAMETER; //fixed length
 
-    if (heigth == 0)
-	heigth = Adapter.NOTE_DEFAULT_HEIGTH;
-
-    y = y-heigth/2;
 
     if (selected) 
-      {
 	g.setColor(Color.red);
-	if (SequenceSelection.getCurrent().getModel() != gc.getDataModel()) g.drawRect(x, y, lenght, heigth);
-	else g.fillRect(x, y, lenght, heigth);
-      }
     else 
-      {
 	g.setColor(Color.black);
-	g.fillRect(x, y, lenght, heigth);
-      }
 
-    g.drawString(""+label, x, y-5);
-  
+    //event's Oval
+    g.drawOval(x, y+CUE_DIAMETER/2, length, heigth);
+    g.setColor(Color.white);
+    g.fillOval(x+1, y+CUE_DIAMETER/2+1, length-2, heigth-2);
+
+    tempFont = g.getFont();
+    g.setFont(cueFont);
+    g.setColor(Color.black);
+    g.drawString(""+e.getProperty("integer"), x+5, y+CUE_DIAMETER+ERROR);
+    g.setFont(tempFont);
   }
   
   /**
@@ -110,11 +107,9 @@ public class AmbitusEventRenderer implements ObjectRenderer {
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 
     int evtx = gc.getAdapter().getX(e);
-    int evty = gc.getAdapter().getY(e);
-    int evtlenght = gc.getAdapter().getLenght(e);
-    int evtheigth = gc.getAdapter().getHeigth(e);
+    int evty =  gc.getGraphicDestination().getSize().height/2 - CUE_DIAMETER;
 
-    return  (evtx<=x && (evtx+evtlenght >= x) && evty-evtheigth/2<=y && (evty+evtheigth/2) >= y);
+    return  (evtx<=x && (evtx+CUE_DIAMETER >= x) && evty<=y && (evty+CUE_DIAMETER) >= y);
   }
 
 
@@ -138,29 +133,29 @@ public class AmbitusEventRenderer implements ObjectRenderer {
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 
     int evtx = gc.getAdapter().getX(e);
-    int evty = gc.getAdapter().getY(e);
-    int evtlenght = gc.getAdapter().getLenght(e);
-    int evtheigth = gc.getAdapter().getHeigth(e);
+    int evtheigth = CUE_DIAMETER;
+    int evty = gc.getGraphicDestination().getSize().height/2 - CUE_DIAMETER;
+    int evtlenght = CUE_DIAMETER;
 
-    tempRect.setBounds(x, y, w, h);
     eventRect.setBounds(evtx, evty, evtlenght, evtheigth);
-    return  tempRect.intersects(eventRect);
+    tempRect.setBounds(x, y, w, h);
+    return  eventRect.intersects(tempRect);
+
   }
 
-    public static AmbitusEventRenderer getRenderer()
+    public static CueEventRenderer getRenderer()
     {
 	if (staticInstance == null)
-	    staticInstance = new AmbitusEventRenderer();
+	    staticInstance = new CueEventRenderer();
 
 	return staticInstance;
     }
 
   //------------Fields
-  final static int NOTE_DEFAULT_WIDTH = 5;
-    //final static int NOTE_DEFAULT_HEIGHT = 3;
-  SequenceGraphicContext gc;
-  public static AmbitusEventRenderer staticInstance;
- 
-  int oldX, oldY;
-
+    final static int ERROR = 6;
+    final static int CUE_DIAMETER = 25;
+    SequenceGraphicContext gc;
+    public static CueEventRenderer staticInstance;
+    private static Font cueFont = new Font("Helvetica", Font.BOLD, 14);
+    private Font tempFont;
 }

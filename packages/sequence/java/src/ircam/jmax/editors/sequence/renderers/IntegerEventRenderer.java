@@ -23,27 +23,28 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.sequence.track;
+package ircam.jmax.editors.sequence.renderers;
 
 import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.track.*;
+
 import ircam.jmax.toolkit.*;
 
 import java.awt.*;
 
 /**
- * The piano-roll event renderer in a Score with an ambitus: the line-based event, 
- * with a lenght , variable width, black color, a label.
+ * An IntegerValue event renderer. It is represented as a vertical black bar
  */
-public class LogicEventRenderer implements ObjectRenderer {
+public class IntegerEventRenderer implements ObjectRenderer {
 
-  public LogicEventRenderer()
+  public IntegerEventRenderer()
     {
     } 
 
   /**
    * constructor.
    */
-  public LogicEventRenderer(SequenceGraphicContext theGc) 
+  public IntegerEventRenderer(SequenceGraphicContext theGc) 
   {
     gc = theGc;
   }
@@ -66,29 +67,21 @@ public class LogicEventRenderer implements ObjectRenderer {
     TrackEvent e = (TrackEvent) obj;
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 
-    int x = gc.getAdapter().getX(e) - LOGIC_XDIAMETER/2;
-    int y = gc.getGraphicDestination().getSize().height/2 - LOGIC_YDIAMETER/2;
+    int x = gc.getAdapter().getX(e);
+    int heigth = gc.getAdapter().getHeigth(e);
+    int y =  (heigth > 0 )? (gc.getGraphicDestination().getSize().height/2 - gc.getAdapter().getHeigth(e))
+	                  : gc.getGraphicDestination().getSize().height/2;
+    int lenght = gc.getAdapter().getLenght(e); //fixed length
 
-
-    //internal oval
-    g.setColor(Color.lightGray);
-    g.fillOval(x+1, y+1, LOGIC_XDIAMETER-2, LOGIC_YDIAMETER-2);
+    heigth = (heigth > 0)?heigth:-heigth;
 
     if (selected) 
 	g.setColor(Color.red);
     else 
-	g.setColor(Color.blue);
+	g.setColor(Color.black);
 
-    //external Oval
-    g.drawOval(x, y, LOGIC_XDIAMETER, LOGIC_YDIAMETER);
-
-    // the little 'l'
-    backupFont = g.getFont();
-
-    g.setFont(LogicFont);
-    g.drawString("L", x+6, y+LOGIC_YDIAMETER-5);
-
-    g.setFont(backupFont);
+    //event's Rectangle
+    g.fillRect(x, y, lenght, heigth);
 
   }
   
@@ -108,13 +101,20 @@ public class LogicEventRenderer implements ObjectRenderer {
     TrackEvent e = (TrackEvent) obj;
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 
-    int evtx = gc.getAdapter().getX(e)-LOGIC_XDIAMETER/2;
-    int evty = gc.getGraphicDestination().getSize().height/2-LOGIC_YDIAMETER/2;
+    int evtx = gc.getAdapter().getX(e);
+    int evtheigth = gc.getAdapter().getHeigth(e);
+    int evty = (gc.getAdapter().getHeigth(e) > 0) ? gc.getGraphicDestination().getSize().height/2 - evtheigth
+	                                          : gc.getGraphicDestination().getSize().height/2;
+    int evtlenght = gc.getAdapter().getLenght(e);
 
+    evtheigth = (evtheigth > 0)? evtheigth : -evtheigth;
 
-    return  (evtx<=x && (evtx+LOGIC_XDIAMETER >= x) && evty<=y && (evty+LOGIC_YDIAMETER) >= y);
+    return  (evtx<=x && (evtx+evtlenght >= x) && evty<=y && (evty+evtheigth) >= y);
   }
 
+
+  Rectangle eventRect = new Rectangle();
+  Rectangle tempRect = new Rectangle();
 
   /**
    * returns true if the representation of the given event "touches" the given rectangle
@@ -124,9 +124,6 @@ public class LogicEventRenderer implements ObjectRenderer {
 	return touches(obj, x, y, w, h, gc);
     } 
 
-  Rectangle eventRect = new Rectangle();
-  Rectangle tempRect = new Rectangle();
-
   /**
    * returns true if the representation of the given event "touches" the given rectangle
    */
@@ -135,30 +132,32 @@ public class LogicEventRenderer implements ObjectRenderer {
     TrackEvent e = (TrackEvent) obj;
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 
-    int evtx = gc.getAdapter().getX(e)-LOGIC_XDIAMETER/2;
-    int evty = gc.getGraphicDestination().getSize().height/2 - LOGIC_YDIAMETER/2;
+    int evtx = gc.getAdapter().getX(e);
+    int evtheigth = gc.getAdapter().getHeigth(e);
+    int evty = (gc.getAdapter().getHeigth(e) > 0) ? gc.getGraphicDestination().getSize().height/2 - evtheigth
+	                                          : gc.getGraphicDestination().getSize().height/2;
+    int evtlenght = gc.getAdapter().getLenght(e);
 
-    eventRect.setBounds(evtx, evty, LOGIC_XDIAMETER, LOGIC_YDIAMETER);
+    evtheigth = (evtheigth > 0)? evtheigth:-evtheigth;
+
+    eventRect.setBounds(evtx, evty, evtlenght, evtheigth);
     tempRect.setBounds(x, y, w, h);
     return  eventRect.intersects(tempRect);
 
   }
 
-    public static LogicEventRenderer getRenderer()
+    public static IntegerEventRenderer getRenderer()
     {
 	if (staticInstance == null)
-	    staticInstance = new LogicEventRenderer();
+	    staticInstance = new IntegerEventRenderer();
 
 	return staticInstance;
     }
 
   //------------Fields
-    final static int LOGIC_XDIAMETER = 20;
-    final static int LOGIC_YDIAMETER = LOGIC_XDIAMETER-4;
+    final static int Integer_HEIGHT = 12;
 
     SequenceGraphicContext gc;
-    public static LogicEventRenderer staticInstance;
-    public static Font LogicFont = new Font("helvetica", Font.BOLD, 14); 
-    private Font backupFont;
+    public static IntegerEventRenderer staticInstance;
  
 }

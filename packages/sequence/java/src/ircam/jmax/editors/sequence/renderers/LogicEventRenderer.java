@@ -23,27 +23,29 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.sequence.track;
+package ircam.jmax.editors.sequence.renderers;
 
 import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.track.*;
+
 import ircam.jmax.toolkit.*;
 
 import java.awt.*;
 
 /**
- * The renderer of a string in a track: simply writes the string in the position given by
- * the adapter.
+ * The piano-roll event renderer in a Score with an ambitus: the line-based event, 
+ * with a lenght , variable width, black color, a label.
  */
-public class StringEventRenderer implements ObjectRenderer {
+public class LogicEventRenderer implements ObjectRenderer {
 
-  public StringEventRenderer()
+  public LogicEventRenderer()
     {
     } 
 
   /**
    * constructor.
    */
-  public StringEventRenderer(SequenceGraphicContext theGc) 
+  public LogicEventRenderer(SequenceGraphicContext theGc) 
   {
     gc = theGc;
   }
@@ -58,7 +60,7 @@ public class StringEventRenderer implements ObjectRenderer {
     } 
 
   /**
-   * Draw the given event in the given graphic context.
+   * draw the given event in the given graphic context.
    * It takes into account the selection state.
    */
   public void render(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
@@ -66,19 +68,27 @@ public class StringEventRenderer implements ObjectRenderer {
     TrackEvent e = (TrackEvent) obj;
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 
-    int x = gc.getAdapter().getX(e);
-    int y = gc.getAdapter().getY(e);
+    int x = gc.getAdapter().getX(e) - LOGIC_XDIAMETER/2;
+    int y = gc.getGraphicDestination().getSize().height/2 - LOGIC_YDIAMETER/2;
 
+
+    //internal oval
+    g.setColor(Color.lightGray);
+    g.fillOval(x+1, y+1, LOGIC_XDIAMETER-2, LOGIC_YDIAMETER-2);
 
     if (selected) 
 	g.setColor(Color.red);
     else 
-	g.setColor(Color.black);
+	g.setColor(Color.blue);
 
+    //external Oval
+    g.drawOval(x, y, LOGIC_XDIAMETER, LOGIC_YDIAMETER);
+
+    // the little 'l'
     backupFont = g.getFont();
 
-    g.setFont(StringFont);
-    g.drawString((String) e.getProperty("text"), x, y);
+    g.setFont(LogicFont);
+    g.drawString("L", x+6, y+LOGIC_YDIAMETER-5);
 
     g.setFont(backupFont);
 
@@ -99,16 +109,12 @@ public class StringEventRenderer implements ObjectRenderer {
   {
     TrackEvent e = (TrackEvent) obj;
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
-    Adapter a = gc.getAdapter();
-    
-    int evtx = a.getX(e);
-    int evty = a.getY(e);
-    int evtLenght = a.getLenght(e);
-    int evtHeigth = a.getHeigth(e);
 
-    tempRect.setBounds(evtx, evty, evtLenght, evtHeigth);
+    int evtx = gc.getAdapter().getX(e)-LOGIC_XDIAMETER/2;
+    int evty = gc.getGraphicDestination().getSize().height/2-LOGIC_YDIAMETER/2;
 
-    return  tempRect.contains(x, y);
+
+    return  (evtx<=x && (evtx+LOGIC_XDIAMETER >= x) && evty<=y && (evty+LOGIC_YDIAMETER) >= y);
   }
 
 
@@ -130,32 +136,31 @@ public class StringEventRenderer implements ObjectRenderer {
   {
     TrackEvent e = (TrackEvent) obj;
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
-    Adapter a = gc.getAdapter();
 
-    int evtx = a.getX(e);
-    int evty = a.getY(e);
-    int evtLenght = a.getLenght(e);
-    int evtHeigth = a.getHeigth(e);
+    int evtx = gc.getAdapter().getX(e)-LOGIC_XDIAMETER/2;
+    int evty = gc.getGraphicDestination().getSize().height/2 - LOGIC_YDIAMETER/2;
 
-    eventRect.setBounds(evtx, evty, evtLenght, evtHeigth);
+    eventRect.setBounds(evtx, evty, LOGIC_XDIAMETER, LOGIC_YDIAMETER);
     tempRect.setBounds(x, y, w, h);
     return  eventRect.intersects(tempRect);
 
   }
 
-    public static StringEventRenderer getRenderer()
+    public static LogicEventRenderer getRenderer()
     {
 	if (staticInstance == null)
-	    staticInstance = new StringEventRenderer();
+	    staticInstance = new LogicEventRenderer();
 
 	return staticInstance;
     }
 
   //------------Fields
+    final static int LOGIC_XDIAMETER = 20;
+    final static int LOGIC_YDIAMETER = LOGIC_XDIAMETER-4;
 
     SequenceGraphicContext gc;
-    public static StringEventRenderer staticInstance;
-    public static Font StringFont = new Font("helvetica", Font.BOLD, 14); 
+    public static LogicEventRenderer staticInstance;
+    public static Font LogicFont = new Font("helvetica", Font.BOLD, 14); 
     private Font backupFont;
  
 }

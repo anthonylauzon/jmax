@@ -23,26 +23,29 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.sequence.track;
+package ircam.jmax.editors.sequence.renderers;
 
 import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.track.*;
+
 import ircam.jmax.toolkit.*;
 
 import java.awt.*;
 
 /**
- * An IntegerValue event renderer. It is represented as a vertical black bar
+ * The renderer of a string in a track: simply writes the string in the position given by
+ * the adapter.
  */
-public class IntegerEventRenderer implements ObjectRenderer {
+public class StringEventRenderer implements ObjectRenderer {
 
-  public IntegerEventRenderer()
+  public StringEventRenderer()
     {
     } 
 
   /**
    * constructor.
    */
-  public IntegerEventRenderer(SequenceGraphicContext theGc) 
+  public StringEventRenderer(SequenceGraphicContext theGc) 
   {
     gc = theGc;
   }
@@ -57,7 +60,7 @@ public class IntegerEventRenderer implements ObjectRenderer {
     } 
 
   /**
-   * draw the given event in the given graphic context.
+   * Draw the given event in the given graphic context.
    * It takes into account the selection state.
    */
   public void render(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
@@ -66,20 +69,20 @@ public class IntegerEventRenderer implements ObjectRenderer {
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 
     int x = gc.getAdapter().getX(e);
-    int heigth = gc.getAdapter().getHeigth(e);
-    int y =  (heigth > 0 )? (gc.getGraphicDestination().getSize().height/2 - gc.getAdapter().getHeigth(e))
-	                  : gc.getGraphicDestination().getSize().height/2;
-    int lenght = gc.getAdapter().getLenght(e); //fixed length
+    int y = gc.getAdapter().getY(e);
 
-    heigth = (heigth > 0)?heigth:-heigth;
 
     if (selected) 
 	g.setColor(Color.red);
     else 
 	g.setColor(Color.black);
 
-    //event's Rectangle
-    g.fillRect(x, y, lenght, heigth);
+    backupFont = g.getFont();
+
+    g.setFont(StringFont);
+    g.drawString((String) e.getProperty("text"), x, y);
+
+    g.setFont(backupFont);
 
   }
   
@@ -98,21 +101,18 @@ public class IntegerEventRenderer implements ObjectRenderer {
   {
     TrackEvent e = (TrackEvent) obj;
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
+    Adapter a = gc.getAdapter();
+    
+    int evtx = a.getX(e);
+    int evty = a.getY(e);
+    int evtLenght = a.getLenght(e);
+    int evtHeigth = a.getHeigth(e);
 
-    int evtx = gc.getAdapter().getX(e);
-    int evtheigth = gc.getAdapter().getHeigth(e);
-    int evty = (gc.getAdapter().getHeigth(e) > 0) ? gc.getGraphicDestination().getSize().height/2 - evtheigth
-	                                          : gc.getGraphicDestination().getSize().height/2;
-    int evtlenght = gc.getAdapter().getLenght(e);
+    tempRect.setBounds(evtx, evty, evtLenght, evtHeigth);
 
-    evtheigth = (evtheigth > 0)? evtheigth : -evtheigth;
-
-    return  (evtx<=x && (evtx+evtlenght >= x) && evty<=y && (evty+evtheigth) >= y);
+    return  tempRect.contains(x, y);
   }
 
-
-  Rectangle eventRect = new Rectangle();
-  Rectangle tempRect = new Rectangle();
 
   /**
    * returns true if the representation of the given event "touches" the given rectangle
@@ -122,6 +122,9 @@ public class IntegerEventRenderer implements ObjectRenderer {
 	return touches(obj, x, y, w, h, gc);
     } 
 
+  Rectangle eventRect = new Rectangle();
+  Rectangle tempRect = new Rectangle();
+
   /**
    * returns true if the representation of the given event "touches" the given rectangle
    */
@@ -129,33 +132,32 @@ public class IntegerEventRenderer implements ObjectRenderer {
   {
     TrackEvent e = (TrackEvent) obj;
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
+    Adapter a = gc.getAdapter();
 
-    int evtx = gc.getAdapter().getX(e);
-    int evtheigth = gc.getAdapter().getHeigth(e);
-    int evty = (gc.getAdapter().getHeigth(e) > 0) ? gc.getGraphicDestination().getSize().height/2 - evtheigth
-	                                          : gc.getGraphicDestination().getSize().height/2;
-    int evtlenght = gc.getAdapter().getLenght(e);
+    int evtx = a.getX(e);
+    int evty = a.getY(e);
+    int evtLenght = a.getLenght(e);
+    int evtHeigth = a.getHeigth(e);
 
-    evtheigth = (evtheigth > 0)? evtheigth:-evtheigth;
-
-    eventRect.setBounds(evtx, evty, evtlenght, evtheigth);
+    eventRect.setBounds(evtx, evty, evtLenght, evtHeigth);
     tempRect.setBounds(x, y, w, h);
     return  eventRect.intersects(tempRect);
 
   }
 
-    public static IntegerEventRenderer getRenderer()
+    public static StringEventRenderer getRenderer()
     {
 	if (staticInstance == null)
-	    staticInstance = new IntegerEventRenderer();
+	    staticInstance = new StringEventRenderer();
 
 	return staticInstance;
     }
 
   //------------Fields
-    final static int Integer_HEIGHT = 12;
 
     SequenceGraphicContext gc;
-    public static IntegerEventRenderer staticInstance;
+    public static StringEventRenderer staticInstance;
+    public static Font StringFont = new Font("helvetica", Font.BOLD, 14); 
+    private Font backupFont;
  
 }

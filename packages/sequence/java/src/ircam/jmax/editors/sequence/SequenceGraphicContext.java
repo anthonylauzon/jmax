@@ -150,6 +150,14 @@ public class SequenceGraphicContext extends GraphicContext {
 	return ((Sequence) getFrame()).itsSequencePanel.statusBar;
     }
 
+    /*public SequenceRemoteData getSequenceRemoteData()
+      {
+      return ((Sequence) getFrame()).sequenceData;
+      }*/
+    public FtsSequenceObject getFtsSequenceObject()
+    {
+	return ((Sequence) getFrame()).sequenceData;
+    }
 
     public  EditorToolbar getToolbar()
     {

@@ -13,4 +13,11 @@ public interface TrackEditor {
     /**
      * Returns the graphic context for this editor */
     public SequenceGraphicContext getGraphicContext();
+
+    public Track getTrack();
+
+    public void dispose();
+    public SequenceSelection getSelection();
 }
+
+
