@@ -176,7 +176,7 @@ start_it ()
 	OPTION_ROOTDIR="-jmaxRoot $ROOTDIR"
     fi
 
-    JAVA_CMD="java $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.JMaxApplication -jmaxServerDir ${ftsdir} $OPTION_ROOTDIR $JMAXOPT "
+    JAVA_CMD="@JAVA@ $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.JMaxApplication -jmaxServerDir ${ftsdir} $OPTION_ROOTDIR $JMAXOPT "
 
     ECHO_CMD="CLASSPATH=${CLASSPATH} ; export CLASSPATH ; $JAVA_CMD"
 
