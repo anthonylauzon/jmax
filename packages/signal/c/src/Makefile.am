@@ -8,6 +8,7 @@ harmtap.c \
 matrix.c \
 osc.c \
 osc_ieeewrap.c \
+paste.c \
 pick.c \
 pink.c \
 playfvec.c \

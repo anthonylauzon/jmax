@@ -41,6 +41,7 @@ extern void signal_harmtap_config(void);
 
 extern void signal_pick_config(void);
 extern void signal_cut_config(void);
+extern void signal_paste_config(void);
 
 extern void signal_play_fvec_config(void);
 extern void signal_rec_fvec_config(void);
@@ -62,6 +63,7 @@ signal_config(void)
 
   signal_pick_config();
   signal_cut_config();
+  signal_paste_config();
 
   signal_play_fvec_config();
   signal_rec_fvec_config();

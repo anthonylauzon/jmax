@@ -35,7 +35,7 @@ typedef struct
   int ring_size; /* size of ring buffer in samples */
   int size; /* virtual delay line size in samples */
   int alloc_size; /* size of allocation (NOT real size) */
-  double length; /* delay line size given for delwrite~ in msec */
+  double length; /* delay line size given in msec */
   double sr;
   int n_tick;
 } delayline_t;
@@ -47,7 +47,8 @@ typedef struct
 #define delayline_get_sr(d) ((d)->sr)
 #define delayline_get_n_tick(d) ((d)->n_tick)
 
-extern fts_metaclass_t *delayline_metaclass;
+extern fts_metaclass_t *dline_metaclass;
+extern fts_metaclass_t *drain_metaclass;
 
 #endif
 

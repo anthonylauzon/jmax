@@ -367,7 +367,7 @@ harmtap_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   if(ac > 0)
     {
       /* first set delay line */
-      if(fts_is_a(at, delayline_metaclass))
+      if(fts_is_a(at, dline_metaclass))
 	harmtap_set_delayline(o, 0, 0, 1, at);  
       
       switch(ac)

@@ -365,7 +365,7 @@ matrix_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, matrix_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, matrix_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("put"), matrix_put);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, matrix_put);
     
   fts_method_define_varargs(cl, n_ins, fts_s_list, matrix_node);
   fts_method_define_varargs(cl, n_ins, fts_new_symbol("in"), matrix_in);

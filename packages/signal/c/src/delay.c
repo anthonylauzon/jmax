@@ -5,7 +5,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * of the License, or (at your option) any later version.b
  * 
  * See file LICENSE for further informations on licensing terms.
  * 
@@ -28,11 +28,13 @@
 #include <utils.h>
 #include "delay.h"
 
-static fts_symbol_t sym_delay = 0;
+static fts_symbol_t sym_dline = 0;
+static fts_symbol_t sym_drain = 0;
 static fts_symbol_t sym_tap = 0;
 static fts_symbol_t sym_tap_signal = 0;
 
-fts_metaclass_t *delayline_metaclass;
+fts_metaclass_t *dline_metaclass;
+fts_metaclass_t *drain_metaclass;
 
 /************************************************************
  *
@@ -91,7 +93,7 @@ delayline_reset(delayline_t *this, double sr, int n_tick)
 }
 
 static void
-delayline_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dline_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   delayline_t *this = (delayline_t *)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -105,11 +107,11 @@ delayline_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
   fts_set_int(a + 2, n_tick);
   
-  fts_dsp_add_function(sym_delay, 3, a);
+  fts_dsp_add_function(sym_dline, 3, a);
 }
 
 static void 
-delayline_ftl(fts_word_t *argv)
+dline_ftl(fts_word_t *argv)
 {
   delayline_t * restrict this = (delayline_t *)fts_word_get_pointer(argv + 0);
   float * restrict in = (float *)fts_word_get_pointer(argv + 1);
@@ -120,15 +122,51 @@ delayline_ftl(fts_word_t *argv)
   for (i=0; i<n_tick; i++)
     this->samples[phase + i] = in[i];
 
-  if (this->phase >= this->ring_size) /* ring buffer wrap around */
+  if(this->phase >= this->ring_size) /* ring buffer wrap around */
     {
       this->phase = n_tick;
 
-      for (i=0; i<n_tick; i++)
+      for(i=0; i<n_tick; i++)
 	this->samples[i] = in[i];
     }
   else
     this->phase += n_tick;
+}
+
+static void
+drain_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  delayline_t *this = (delayline_t *)o;
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
+  double sr = fts_dsp_get_output_srate(dsp, 0);
+  int n_tick = fts_dsp_get_output_size(dsp, 0);
+  fts_atom_t a[3];
+  
+  delayline_reset(this, sr, n_tick);  
+  
+  fts_set_object(a + 0, o);
+  fts_set_symbol(a + 1, fts_dsp_get_output_name(dsp, 0));
+  fts_set_int(a + 2, n_tick);
+  
+  fts_dsp_add_function(sym_drain, 3, a);
+}
+
+static void 
+drain_ftl(fts_word_t *argv)
+{
+  delayline_t * restrict this = (delayline_t *)fts_word_get_pointer(argv + 0);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 1);
+  int n_tick = fts_word_get_int(argv + 2);
+  int phase = this->phase;
+  int i;
+
+  for(i=0; i<n_tick; i++)
+    {
+      out[i] = this->samples[phase + i];
+      this->samples[phase + i] = 0.0;
+    }
+
+  this->phase += n_tick;
 }
 
 static void
@@ -180,7 +218,7 @@ delayline_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t pr
 }
 
 static fts_status_t
-delayline_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+dline_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(delayline_t), 1, 1, 0);
 
@@ -188,7 +226,24 @@ delayline_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, delayline_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, delayline_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, delayline_put);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, dline_put);
+
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
+
+  return fts_Success;
+}
+
+static fts_status_t
+drain_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(delayline_t), 1, 1, 0);
+
+  fts_class_add_daemon(cl, obj_property_get, fts_s_state, delayline_get_state);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, delayline_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, delayline_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, drain_put);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
@@ -260,10 +315,10 @@ tap_control_ftl(fts_word_t *argv)
 
   onset = delayline->phase - delay - n_tick;
 
-  if (onset < 0)
+  if(onset < 0)
     onset += delayline->ring_size; /* ring buffer wrap around */
 
-  for (i=0; i<n_tick; i++)
+  for(i=0; i<n_tick; i++)
     out[i] = delayline->samples[onset + i];
 }
 
@@ -276,39 +331,31 @@ tap_signal_ftl(fts_word_t *argv)
   int n_tick = fts_word_get_int(argv + 3);
   delayline_t *delayline = data->delayline;
   float * restrict samples = delayline->samples;
-  float max_delay = (float)delayline->size;
-  float conv = 0.001 * delayline->sr;
-  int phase = delayline->phase - n_tick - 2; /* -2 for interpolation  */
+  double max_delay = delayline->size;
+  double conv = 0.001 * delayline->sr;
+  double phase = delayline->phase - n_tick;
   int i;
 
   for(i=0; i<n_tick; i++)
     {
-      float delay = in[i] * conv;
-      int i_delay;
-      int onset;
-      float one_plus_f;
-      float one_minus_f;
-      float two_minus_f;
-      float f;
+      double delay = in[i] * conv;
+      double onset;
 
-      if(delay < 0.0f)
-	delay = 0.0f;
-      else if(delay > max_delay)
-	delay = max_delay;
+      if(delay < 1.0f)
+	out[i] = samples[delayline->phase - n_tick + i];
+      else
+	{
+	  if(delay > max_delay)
+	    delay = max_delay;
+	  
+	  onset = phase - delay;
+	  if(onset < 1.0)
+	    onset += (double)delayline->ring_size;
+	  
+	  fts_cubic_interpolate(samples, (int)onset, onset, out + i);
+	}
 
-      i_delay = (int)delay;
-
-      onset = phase - i_delay + i;
-      if(onset < 0)
-	onset += delayline->ring_size;
-
-      f = delay - (float)i_delay;
-      one_plus_f = 1.0f + f;
-      one_minus_f = 1.0f - f;
-      two_minus_f = 2.0f - f;
-
-      out[i] = 0.5f * one_plus_f * two_minus_f * (one_minus_f * samples[onset + 2] + f * samples[onset + 1]) -
-	0.1666667f * f * one_minus_f * (two_minus_f * samples[onset + 3] + one_plus_f * samples[onset + 0]);
+      phase += 1.0;
     }
 }
 
@@ -335,6 +382,52 @@ tap_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
+tap_set_tie(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  tap_t *this = (tap_t *)o;
+  tap_ftl_t *data = ftl_data_get_ptr(this->ftl_data);
+
+  if(fts_is_symbol(at))
+    {
+      fts_symbol_t tie = fts_get_symbol(at);
+
+      if(tie == fts_s_yes)
+	fts_connection_new(FTS_HIDDEN, (fts_object_t *)data->delayline, 0, (fts_object_t *)this, 0);
+      else if(tie != fts_s_no)
+	fts_object_signal_runtime_error(o, "cannot set tie to %s", tie);
+    }
+  else if(fts_is_a(at, dline_metaclass))
+    {
+      fts_object_t *dline = fts_get_object(at);
+      fts_connection_new(FTS_HIDDEN, dline, 0, (fts_object_t *)this, 0);
+    }
+  else if(fts_is_tuple(at))
+    {
+      fts_tuple_t *tup = fts_get_tuple(at);
+      int tac = fts_tuple_get_size(tup);
+      fts_atom_t *tat = fts_tuple_get_atoms(tup);
+      int i;
+
+      for(i=0; i<tac; i++)
+	{
+	  if(fts_is_a(tat + i, dline_metaclass))
+	    {
+	      fts_object_t *dline = fts_get_object(tat + i);
+	      fts_connection_new(FTS_HIDDEN, dline, 0, (fts_object_t *)this, 0);
+	    }
+	}
+    }
+  else
+    fts_object_signal_runtime_error(o, "unknown argument for tie");    
+}
+
+static void
+tap_set_tie_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
+{
+  tap_set_tie(o, 0, 0, 1, value);
+}
+
+static void
 tap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   tap_t *this = (tap_t *)o;
@@ -351,7 +444,7 @@ tap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   data->delayline = NULL;
   data->delay = -1;
 
-  if(ac > 0 && fts_is_a(at, delayline_metaclass))
+  if(ac > 0 && fts_is_a(at, dline_metaclass))
     tap_set_delayline(o, 0, 0, 1, at);
 
   if(ac > 1)
@@ -384,6 +477,8 @@ tap_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, tap_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, tap_put);
 
+  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("tie"), tap_set_tie_prop);  
+
   if(ac > 1)
     {
       fts_method_define_varargs(cl, 0, fts_s_int, tap_set_time);
@@ -405,14 +500,17 @@ tap_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 signal_delay_config(void)
 {
-  sym_delay = fts_new_symbol("delay~");
+  sym_dline = fts_new_symbol("dline~");
+  sym_drain = fts_new_symbol("drain~");
   sym_tap = fts_new_symbol("tap~");
   sym_tap_signal = fts_new_symbol("tap~ (signal)");
 
-  delayline_metaclass = fts_class_install(sym_delay, delayline_instantiate);
+  dline_metaclass = fts_class_install(sym_dline, dline_instantiate);
+  drain_metaclass = fts_class_install(sym_drain, drain_instantiate);
   fts_metaclass_install(sym_tap, tap_instantiate, fts_arg_type_equiv);
 
-  fts_dsp_declare_function(sym_delay, delayline_ftl);
+  fts_dsp_declare_function(sym_dline, dline_ftl);
+  fts_dsp_declare_function(sym_dline, drain_ftl);
   fts_dsp_declare_function(sym_tap, tap_control_ftl);
   fts_dsp_declare_function(sym_tap_signal, tap_signal_ftl);
 }
