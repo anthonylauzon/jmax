@@ -56,8 +56,13 @@ typedef struct _fts_dsp_graph_
 } fts_dsp_graph_t;
 
 #define fts_dsp_graph_is_compiled(g) ((g)->status == status_compiled)
+
 #define fts_dsp_graph_get_tick_size(g) ((g)->tick_size)
 #define fts_dsp_graph_get_sample_rate(g) ((g)->sample_rate)
+
+#define fts_dsp_graph_set_tick_size(g, x) ((g)->tick_size = (x))
+#define fts_dsp_graph_set_sample_rate(g, x) ((g)->sample_rate = (x))
+
 #define fts_dsp_graph_get_time(g) ((g)->time)
 
 extern void fts_dsp_graph_init(fts_dsp_graph_t *graph, int vector_size, double sample_rate);

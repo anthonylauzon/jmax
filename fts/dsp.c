@@ -126,7 +126,8 @@ dsp_reset(void)
   dsp_tick_duration = dsp_tick_size * 1000.0 / dsp_sample_rate;
   
   fts_dsp_graph_reset(&main_dsp_graph);
-  fts_dsp_graph_init(&main_dsp_graph, dsp_tick_size, dsp_sample_rate);
+  fts_dsp_graph_set_tick_size(&main_dsp_graph, dsp_tick_size);
+  fts_dsp_graph_set_sample_rate(&main_dsp_graph, dsp_sample_rate);  
 
   /* reset audio ports !!! */
   /* redefine global system variable $SampleRate (todo!) */

@@ -81,7 +81,7 @@ seqrec_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   switch(this->status)
     {
     case status_reset:
-      if(ac && fts_is_number(at))
+      if(ac > 0 && fts_is_number(at))
 	time = fts_get_number_float(at);
 
       /* set start location  */
@@ -168,7 +168,7 @@ seqrec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   this->start_location = 0.0;
   this->start_time = 0.0;
 
-  if(track_atom_is(at))
+  if(ac > 0 && track_atom_is(at))
     {
       this->track = (track_t *)fts_get_object(at);
       fts_object_refer(this->track);

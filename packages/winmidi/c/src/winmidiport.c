@@ -424,6 +424,10 @@ winmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     }
 
     /* try opening the default port */
+    res = midiOutGetDevCaps(0, &out_caps, sizeof(MIDIOUTCAPS));
+    if (res == MMSYSERR_NOERROR) {
+      fts_log("[winmidiport]: trying to open midi out port \"%s\"\n", out_caps.szPname);
+    }
     err = midiOutOpen(&this->hmidiout, MIDI_MAPPER, 0, 0, CALLBACK_NULL);
     if (err != MMSYSERR_NOERROR) {
       post("Warning: winmidiport: couldn't open default MIDI out device: %s (error %d)\n", winmidiport_output_error(err), err);

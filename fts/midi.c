@@ -1026,7 +1026,8 @@ remove_listener(fts_midiport_listener_t **list, fts_object_t *o)
 void 
 fts_midiport_add_listener(fts_midiport_t *port, enum midi_type type, int id, int number, fts_object_t *obj, fts_midiport_function_t fun)
 {
-  fts_midiport_listener_t **list = &port->listeners[type + 1][(number + 1) * (n_midi_channels + 1) + (id + 1)];
+  fts_midiport_listener_t **type_list = port->listeners[type + 1]; 
+  fts_midiport_listener_t **list = type_list + (number + 1) * (n_midi_channels + 1) + (id + 1);
 
   add_listener(list, obj, fun);
 }
@@ -1034,7 +1035,8 @@ fts_midiport_add_listener(fts_midiport_t *port, enum midi_type type, int id, int
 void
 fts_midiport_remove_listener(fts_midiport_t *port, enum midi_type type, int id, int number, fts_object_t *obj)
 {
-  fts_midiport_listener_t **list = &port->listeners[type + 1][(number + 1) * (n_midi_channels + 1) + (id + 1)];
+  fts_midiport_listener_t **type_list = port->listeners[type + 1]; 
+  fts_midiport_listener_t **list = type_list + (number + 1) * (n_midi_channels + 1) + (id + 1);
 
   remove_listener(list, obj);
 }
@@ -1089,7 +1091,7 @@ fts_midiport_input(fts_midiport_t *port, fts_midievent_t *event, double time)
     }
 
   /* fire callbacks for any event */
-  l = port->listeners[0][0];
+  l = *(port->listeners[0]);
   while(l)
     {
       l->callback(l->listener, event, time);

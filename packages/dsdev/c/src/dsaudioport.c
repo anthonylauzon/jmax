@@ -244,6 +244,13 @@ dsaudioport_xrun(fts_audioport_t *port)
   return 0;
 }
 
+static BOOL 
+dsaudioport_enum_callback(LPGUID lpGuid, LPCSTR lpcstrDescription, 
+			  LPCSTR lpcstrModule, LPVOID lpContext)
+{
+  fts_log("[dsaudioport]: %s: %s\n", lpcstrModule, lpcstrDescription);
+}
+
 static void 
 dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -258,6 +265,12 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   ac--;
   at++;
 
+  fts_log("[dsaudioport]: Available audio output devices\n");
+  DirectSoundEnumerate(dsaudioport_enum_callback, NULL);
+
+  fts_log("[dsaudioport]: Available audio input devices\n");
+  DirectSoundCaptureEnumerate(dsaudioport_enum_callback, NULL);
+ 
   fts_log("[dsaudioport]: Opening audio port\n");
 
   /* initialize the audioport */

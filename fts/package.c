@@ -157,7 +157,7 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
 fts_package_t*
 fts_package_load(fts_symbol_t name)
 {
-  fts_package_t* pkg;
+  fts_package_t* pkg = NULL;
   char path[MAXPATHLEN];
   char filename[MAXPATHLEN];
   fts_atom_t n, p;
@@ -174,7 +174,7 @@ fts_package_load(fts_symbol_t name)
     fts_log("[package]: Couldn't find package %s\n", fts_symbol_name(name));
     pkg = fts_package_new(name);
     pkg->state = fts_package_corrupt;
-    return pkg;
+    goto graceful_exit;
   }
   
   /* load the definition file */
@@ -192,6 +192,8 @@ fts_package_load(fts_symbol_t name)
   
   /* load the default files */
   fts_package_load_default_files(pkg);
+
+ graceful_exit:
 
   /* put the package in the hashtable */
   fts_set_symbol(&n, name);

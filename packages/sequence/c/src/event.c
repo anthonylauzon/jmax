@@ -190,7 +190,6 @@ event_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   fts_atom_void(&this->value);
 
-  this->value = at[1];
   this->time = 0.0;
   this->track = 0;
   this->prev = 0;
