@@ -678,6 +678,7 @@ packages/sequence/java/ircam/jmax/editors/sequence/renderers/Makefile
 packages/sequence/java/ircam/jmax/editors/sequence/tools/Makefile
 packages/sequence/java/ircam/jmax/editors/sequence/track/Makefile
 packages/sequence/help/Makefile
+packages/sequence/fonts/Makefile
 packages/sequence/images/Makefile
 packages/sequence/winbuild/Makefile
 packages/signal/Makefile

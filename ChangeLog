@@ -1,3 +1,14 @@
+2004-04-05  Riccardo Borghesi  <borghesi@livorno.ircam.fr>
+
+	* added fonts for music notation in sequence package (MusiSync.ttf and MusiTone.ttf). The
+	fonts are distributed under Free Public Licence and are Copyright of Robert Allgeyer.
+
+2004-03-29  Riccardo Borghesi  <borghesi@livorno.ircam.fr>
+
+	* 1) added trackeditor object (trackeditor.c, FtsTrackEditorObject.java)in sequence package: implements
+	editor data save/restore (window position, zoom, etc...) in order to keep track light.
+	* 2) fixed bug in hilightEvents;
+
 2004-03-18  Norbert Schnell  <Norbert.Schnell@ircam.fr>
 
 	* fundamental changes in the management of names and persistence in FTS needing minor adaptation in the packages (no API changes!!)

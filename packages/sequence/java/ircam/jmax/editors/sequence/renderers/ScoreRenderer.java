@@ -52,13 +52,13 @@ public class ScoreRenderer extends AbstractRenderer{
     gc.setRenderManager(this);
     {//-- prepares the parameters for the geometry object
 			
-			Geometry g = gc.getAdapter().getGeometry();
-			g.setXZoom(20);
-			g.setYZoom(300);
-			g.setYInvertion(true);
-			g.setYTransposition(136);//??
+      Geometry g = gc.getAdapter().getGeometry();
+      g.setXZoom(20);
+      g.setYZoom(300);
+      g.setYInvertion(true);
+      g.setYTransposition(136);//??
     }
-		
+    
     tempList = new MaxVector();
 		
     scoreBackground = new ScoreBackground(gc);
@@ -72,30 +72,29 @@ public class ScoreRenderer extends AbstractRenderer{
 
 public int getViewMode()
 {
-	return viewMode;
+  return viewMode;
 }
 
 public void setViewMode(int mode)
 {
-	//per ora solo il background
-	if(viewMode!=mode)
-	{
-		viewMode=mode;
-		itsLayers.removeElementAt(0);
-		if(viewMode==MidiTrackEditor.PIANOROLL_VIEW)
-			itsLayers.insertElementAt(scoreBackground, 0);
-		else
-			itsLayers.insertElementAt(partitionBackground, 0);
-	}
+  if(viewMode!=mode)
+    {
+      viewMode=mode;
+      itsLayers.removeElementAt(0);
+      if(viewMode==MidiTrackEditor.PIANOROLL_VIEW)
+	itsLayers.insertElementAt(scoreBackground, 0);
+      else
+	itsLayers.insertElementAt(partitionBackground, 0);
+    }
 }
 /**
 * returns its (current) event renderer
  */
 public ObjectRenderer getObjectRenderer() 
 {
-	return null;
-	//the renderer depends from the object, here...
-	//return itsForegroundLayer.getObjectRenderer();
+  return null;
+  //the renderer depends from the object, here...
+  //return itsForegroundLayer.getObjectRenderer();
 }
 
 /**
@@ -104,21 +103,21 @@ public ObjectRenderer getObjectRenderer()
  */
 public Enumeration objectsContaining(int x, int y) 
 {  
-	TrackEvent aTrackEvent;
+  TrackEvent aTrackEvent;
 	
-	tempList.removeAllElements();
+  tempList.removeAllElements();
+  
+  double startTime = gc.getAdapter().getInvX(0);
+  double endTime = gc.getAdapter().getInvX(gc.getGraphicDestination().getSize().width);
+  
+  for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();)
+    {      
+      aTrackEvent = (TrackEvent) e.nextElement();
+      if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
+	tempList.addElement(aTrackEvent);
+    }
 	
-	double startTime = gc.getAdapter().getInvX(0);
-	double endTime = gc.getAdapter().getInvX(gc.getGraphicDestination().getSize().width);
-	
-	for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();)
-	{      
-		aTrackEvent = (TrackEvent) e.nextElement();
-		if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
-			tempList.addElement(aTrackEvent);
-	}
-	
-	return tempList.elements();
+  return tempList.elements();
 }
 
 /**
@@ -127,21 +126,21 @@ public Enumeration objectsContaining(int x, int y)
  * the topmost in the visual hyerarchy*/
 public Object firstObjectContaining(int x, int y)
 {
-	TrackEvent aTrackEvent;
-	TrackEvent last = null;
+  TrackEvent aTrackEvent;
+  TrackEvent last = null;
+  
+  double startTime = gc.getAdapter().getInvX(x);
+  double endTime = gc.getAdapter().getInvX(x+AmbitusEventRenderer.CUE_WIDTH+2);
+  
+  for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
+    {      
+      aTrackEvent = (TrackEvent) e.nextElement();
+      
+      if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
+	last = aTrackEvent;
+    }
 	
-	double startTime = gc.getAdapter().getInvX(x);
-	double endTime = gc.getAdapter().getInvX(x+AmbitusEventRenderer.CUE_WIDTH+2);
-		
-	for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
-	{      
-		aTrackEvent = (TrackEvent) e.nextElement();
-				
-		if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
-			last = aTrackEvent;
-	}
-	
-	return last;
+  return last;
 }
 
 /**
@@ -150,24 +149,29 @@ public Object firstObjectContaining(int x, int y)
  */
 public Enumeration objectsIntersecting(int x, int y, int w, int h) 
 {
-	TrackEvent aTrackEvent;
+  TrackEvent aTrackEvent;
 	
-	tempList.removeAllElements();
-	double startTime = gc.getAdapter().getInvX(x);
-	double endTime = gc.getAdapter().getInvX(x+w);
-	
-	for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
+  tempList.removeAllElements();
+  double startTime = gc.getAdapter().getInvX(x);
+  double endTime = gc.getAdapter().getInvX(x+w);
+  
+  for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
+    {
+      aTrackEvent = (TrackEvent) e.nextElement();
+      
+      if (aTrackEvent.getRenderer().touches(aTrackEvent, x, y, w, h, gc))
 	{
-		aTrackEvent = (TrackEvent) e.nextElement();
-		
-		if (aTrackEvent.getRenderer().touches(aTrackEvent, x, y, w, h, gc))
-	  {
-	    tempList.addElement(aTrackEvent);
-	  }
+	  tempList.addElement(aTrackEvent);
 	}
-	return tempList.elements();
+    }
+  return tempList.elements();
 }
 
+public static void setScoreFont(Font font)
+{
+  originalFont = font;
+  scoreFont = font.deriveFont((float)48);
+}
 
 //------------------  Fields
 SequenceGraphicContext gc;
@@ -184,6 +188,8 @@ public static final int XINTERVAL = 10;
 public static final int YINTERVAL = 3;
 
 private MaxVector tempList;
+static Font scoreFont;
+static Font originalFont;
 }
 
 

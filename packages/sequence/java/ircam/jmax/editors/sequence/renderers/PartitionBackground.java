@@ -76,6 +76,9 @@ public class PartitionBackground implements Layer, ImageObserver{
 
     Dimension d = gc.getGraphicDestination().getSize();
 
+    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);	
+    g.setFont(ScoreRenderer.scoreFont);
+
     if(!locked)
 	g.setColor(Color.white);
     else
@@ -96,7 +99,7 @@ public class PartitionBackground implements Layer, ImageObserver{
       }
 
     int positionY = SC_BOTTOM;
-    g.setFont(gridSubdivisionFont);
+    /*g.setFont(gridSubdivisionFont);*/
 
     // the minor subdivision
     for(int k=0;k<2;k++)
@@ -107,7 +110,8 @@ public class PartitionBackground implements Layer, ImageObserver{
 	    positionY = SC_BOTTOM-(i+k*7)*step -delta;
 	    g.drawLine(KEYX, positionY, d.width, positionY);
 	  }
-	g.drawImage(SequenceImages.getImage("faClef"), KEYX+4, positionY-1, this);
+	/*g.drawImage(SequenceImages.getImage("faClef"), KEYX+4, positionY-1, this);*/
+	g.drawString("?", KEYX+4, positionY+32);
 
 	g.setColor(horizontalGridLinesColor);
      
@@ -127,7 +131,8 @@ public class PartitionBackground implements Layer, ImageObserver{
 	g.drawLine(KEYX, positionY, d.width, positionY);
       }
 	
-    g.drawImage(SequenceImages.getImage("faClef"), KEYX+4, positionY-1, this);
+    /*g.drawImage(SequenceImages.getImage("faClef"), KEYX+4, positionY-1, this);*/
+    g.drawString("?", KEYX+4, positionY+32);
 
     g.setColor(horizontalGridLinesColor);
     positionY = SC_BOTTOM-(19*step) -delta;
@@ -142,7 +147,8 @@ public class PartitionBackground implements Layer, ImageObserver{
 	    g.drawLine(KEYX, positionY, d.width, positionY);
 	  }
 	
-	g.drawImage(SequenceImages.getImage("violinClef"), KEYX+4, positionY-7, this);
+	/*g.drawImage(SequenceImages.getImage("violinClef"), KEYX+4, positionY-7, this);*/
+	g.drawString("G", KEYX+4, positionY+32);
 
 	g.setColor(horizontalGridLinesColor);
      
@@ -160,7 +166,8 @@ public class PartitionBackground implements Layer, ImageObserver{
 	g.drawLine(KEYX, positionY, d.width, positionY);
       }
 
-    g.drawImage(SequenceImages.getImage("violinClef"), KEYX+4, SC_TOP-7 -delta, this);
+    /*g.drawImage(SequenceImages.getImage("violinClef"), KEYX+4, SC_TOP-7 -delta, this);*/
+    g.drawString("G", KEYX+4, SC_TOP/*-delta*/+32);
 
     /*g.drawString("15", KEYEND-9, SC_TOP+2 -delta);
     g.drawString("8", KEYEND-6, SC_TOP+step*7+2 -delta);*/

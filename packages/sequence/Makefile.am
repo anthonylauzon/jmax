@@ -1,8 +1,12 @@
-# $Id: Makefile.am,v 1.13 2003/05/26 11:28:47 p_tisserand Exp $
+# $Id: Makefile.am,v 1.14 2003/07/23 12:16:12 p_tisserand Exp $
 #
 # sequence package Makefile.am
 #
 # $Log: Makefile.am,v $
+# Revision 1.14  2003/07/23 12:16:12  p_tisserand
+# Changed installation directory of packages.
+# Now packages are installed in ${libdir}/jmax/packages.
+#
 # Revision 1.13  2003/05/26 11:28:47  p_tisserand
 # Added Visual C++ files in distribution.
 #
@@ -18,7 +22,7 @@ else
 JAVA_SRC_DIR= 
 endif
 
-SUBDIRS=c $(JAVA_SRC_DIR) help images winbuild
+SUBDIRS=c $(JAVA_SRC_DIR) help fonts images winbuild
 
 packagedir=$(pkglibdir)/packages/sequence
 package_DATA=sequence.jpkg
