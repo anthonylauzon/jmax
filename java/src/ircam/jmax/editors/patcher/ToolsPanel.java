@@ -83,6 +83,19 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 	return toolsPanel;
     }
 
+    public static ToolsPanel find(Fts fts, FtsObject obj)
+    {
+	if (toolsPanel == null)
+	    toolsPanel = new ToolsPanel(fts);
+	
+	toolsPanel.tabbedPane.setSelectedComponent(toolsPanel.getFinder());
+	toolsPanel.setVisible(true);
+	if(obj!=null) toolsPanel.getFinder().findFriends(obj);
+	else toolsPanel.getFinder().find();
+	
+	return toolsPanel;
+    }
+
   public static ToolsPanel getInstance(Fts fts)
   {
     if (toolsPanel == null)
@@ -127,12 +140,19 @@ public class ToolsPanel extends JFrame implements FtsActionListener
     runErrorTable.setObjectSelectedListener(objSelListener);
     runErrorTable.setSelectionListener(listSelListener);
 
+    /* Finder Panel */
+    finderTable = new FinderTablePanel(fts);
+    finderTable.setObjectSelectedListener(objSelListener);
+    finderTable.setSelectionListener(listSelListener);
+
     currentTableModel = errorTable.getToolTableModel();
 
     tabbedPane = new JTabbedPane();
     tabbedPane.addTab("Errors", errorTable);
-    tabbedPane.setSelectedIndex(0);
     tabbedPane.addTab("Runtime Errors", runErrorTable);
+    tabbedPane.addTab("Finder", finderTable);    
+
+    tabbedPane.setSelectedIndex(0);
     tabbedPane.addChangeListener(new ChangeListener(){
 	    public void stateChanged(ChangeEvent e)
 	    {		
@@ -223,6 +243,7 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 	      DefaultMutableTreeNode top, node, start;
 	      top = start = node = null;
 	      FtsObject ftsObj;			
+	      String nodeText;
 	      ////////????????????????? comment eviter ca?????????
 	      if(currentTableModel instanceof RuntimeErrorsTableModel)
 		  ftsObj = ((RuntimeError)currentTableModel.getListModel().getElementAt(selRow)).getObject();
@@ -240,7 +261,9 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 			  }				
 		      else
 			  {
-			      node = new FtsMutableTreeNode(ftsObj, ftsObj.getDescription());
+			      nodeText = ftsObj.getDescription();
+			      if(nodeText.equals("")) nodeText = ftsObj.getComment();
+			      node = new FtsMutableTreeNode(ftsObj, nodeText);
 			      top.add(node);
 			      top = node;
 			  }
@@ -285,12 +308,18 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 
   /*///////////////////////////////////////////////////////////////////*/
 
+  public FinderTablePanel getFinder()
+  {
+      return finderTable;
+  }
+
   private static ToolsPanel toolsPanel = null;
   private ToolTableModel currentTableModel;
   
   private JTabbedPane tabbedPane;
   private ErrorTablePanel errorTable;
   private RuntimeErrorsTablePanel runErrorTable;
+  private FinderTablePanel finderTable;
 
   /* JTree variables */
   private JTree tree;

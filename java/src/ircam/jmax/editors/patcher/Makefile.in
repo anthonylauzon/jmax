@@ -79,7 +79,7 @@ SUBDIRS = actions interactions menus objects
 
 EXTRA_DIST = package.html
 noinst_PROGRAMS = package
-package_SOURCES =  AddPopUp.java ConnectionAction.java DisplayList.java EditField.java ErmesModule.java ErmesPatcherListener.java ErmesSelection.java ErmesSketchPad.java ErmesSketchWindow.java ErmesToolBar.java ErmesToolButton.java FindPanel.java ErrorPanel.java ErrorTableModel.java ErrorTablePanel.java FontCache.java FpePanel.java IconRenderer.java JMaxToolPanel.java KeyEventClient.java KeyEventsManager.java KeyMap.java MaxRepaintManager.java MessageDisplayer.java MoreObjectsButton.java ObjectAction.java ObjectRenderer.java PatcherClipboardManager.java PatcherFontManager.java PatcherPrintManager.java PatcherSaveManager.java RuntimeError.java RuntimeErrorsPanel.java RuntimeErrorsTableModel.java RuntimeErrorsTablePanel.java ScaleDialog.java ScaleTransform.java Settings.java TextRenderer.java ToolsPanel.java ToolTableModel.java
+package_SOURCES =  AddPopUp.java ConnectionAction.java DisplayList.java EditField.java ErmesModule.java ErmesPatcherListener.java ErmesSelection.java ErmesSketchPad.java ErmesSketchWindow.java ErmesToolBar.java ErmesToolButton.java FindPanel.java ErrorTableModel.java ErrorTablePanel.java FinderTableModel.java FinderTablePanel.java FontCache.java IconRenderer.java JMaxToolPanel.java KeyEventClient.java KeyEventsManager.java KeyMap.java MaxRepaintManager.java MessageDisplayer.java MoreObjectsButton.java ObjectAction.java ObjectRenderer.java PatcherClipboardManager.java PatcherFontManager.java PatcherPrintManager.java PatcherSaveManager.java RuntimeError.java RuntimeErrorsTableModel.java RuntimeErrorsTablePanel.java ScaleDialog.java ScaleTransform.java Settings.java TextRenderer.java ToolsPanel.java ToolTableModel.java
 
 
 JAVACX = @JAVACX@
@@ -102,16 +102,17 @@ package_OBJECTS =  AddPopUp.class ConnectionAction.class \
 DisplayList.class EditField.class ErmesModule.class \
 ErmesPatcherListener.class ErmesSelection.class ErmesSketchPad.class \
 ErmesSketchWindow.class ErmesToolBar.class ErmesToolButton.class \
-FindPanel.class ErrorPanel.class ErrorTableModel.class \
-ErrorTablePanel.class FontCache.class FpePanel.class IconRenderer.class \
-JMaxToolPanel.class KeyEventClient.class KeyEventsManager.class \
-KeyMap.class MaxRepaintManager.class MessageDisplayer.class \
-MoreObjectsButton.class ObjectAction.class ObjectRenderer.class \
-PatcherClipboardManager.class PatcherFontManager.class \
-PatcherPrintManager.class PatcherSaveManager.class RuntimeError.class \
-RuntimeErrorsPanel.class RuntimeErrorsTableModel.class \
-RuntimeErrorsTablePanel.class ScaleDialog.class ScaleTransform.class \
-Settings.class TextRenderer.class ToolsPanel.class ToolTableModel.class
+FindPanel.class ErrorTableModel.class ErrorTablePanel.class \
+FinderTableModel.class FinderTablePanel.class FontCache.class \
+IconRenderer.class JMaxToolPanel.class KeyEventClient.class \
+KeyEventsManager.class KeyMap.class MaxRepaintManager.class \
+MessageDisplayer.class MoreObjectsButton.class ObjectAction.class \
+ObjectRenderer.class PatcherClipboardManager.class \
+PatcherFontManager.class PatcherPrintManager.class \
+PatcherSaveManager.class RuntimeError.class \
+RuntimeErrorsTableModel.class RuntimeErrorsTablePanel.class \
+ScaleDialog.class ScaleTransform.class Settings.class \
+TextRenderer.class ToolsPanel.class ToolTableModel.class
 package_LDADD = $(LDADD)
 package_DEPENDENCIES = 
 package_LDFLAGS = 

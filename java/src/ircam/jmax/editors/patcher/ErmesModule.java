@@ -54,7 +54,7 @@ public class ErmesModule
 	//MaxApplication.getFts().addUpdateGroupListener(manager);
 
 	// Register the find panel and the fpe panel
-	FindPanel.registerFindPanel();
+	//FindPanel.registerFindPanel();
 	//FpePanel.registerFpePanel();
 	ToolsPanel.registerToolsPanel();
       }

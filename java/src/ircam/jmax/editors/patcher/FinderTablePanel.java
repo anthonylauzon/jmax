@@ -29,6 +29,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
@@ -37,10 +38,10 @@ import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.widgets.*;
 
-public class ErrorTablePanel extends JPanel implements JMaxToolPanel{
+public class FinderTablePanel extends JPanel implements JMaxToolPanel{
 
   /*private final static Color selectedColor = new Color(204, 204, 255);*/
-  static class ErrorTableCellRenderer extends DefaultTableCellRenderer
+  static class FinderTableCellRenderer extends DefaultTableCellRenderer
   {
     public Component getTableCellRendererComponent(JTable table, Object obj, 
 						   boolean selected, boolean hasFocus, int row, int column)
@@ -48,15 +49,18 @@ public class ErrorTablePanel extends JPanel implements JMaxToolPanel{
 	  super.getTableCellRendererComponent(table, obj, selected, hasFocus, row, column);
 	  
 	  setText((String) obj);
-	  setIcon( ErrorTablePanel.errorIcon);
+	  setIcon(ObjectSetViewer.getObjectIcon((FtsObject)((FinderTableModel)table.getModel()).
+						getListModel().getElementAt(row)));
 	  
 	  return this;
       }
   }
 
-  public ErrorTablePanel(Fts fts)
+  public FinderTablePanel(Fts fts)
   {
     this.fts = fts;
+
+    setLayout( new BoxLayout( this, BoxLayout.Y_AXIS));
     
     try
 	{
@@ -66,15 +70,41 @@ public class ErrorTablePanel extends JPanel implements JMaxToolPanel{
 	{
 	    System.out.println("System error: cannot get objectSet object");
 	}
-    
-    //tableModel = model;
-    tableModel = new ErrorTableModel(set);
+
+    /* ############ TextField ###################### */
+    JPanel labelPanel = new JPanel();
+    labelPanel.setBorder( new EmptyBorder( 15, 15, 15, 15));
+    labelPanel.setLayout( new BoxLayout( labelPanel, BoxLayout.X_AXIS));
+    labelPanel.setOpaque( false);
+
+    JLabel label = new JLabel("Find: ");
+    label.setHorizontalTextPosition(label.RIGHT);
+    label.setDisplayedMnemonic('T');
+    label.setToolTipText("The labelFor and displayedMnemonic properties work!");
+
+    textField = new JTextField( 30);
+
+    textField.setBackground( Color.white); // ???
+
+    label.setLabelFor( textField);
+    textField.getAccessibleContext().setAccessibleName( label.getText());
+    textField.addActionListener( new ActionListener() {
+      public void actionPerformed( ActionEvent event)
+	{
+	  find();
+	}
+    });
+
+    labelPanel.add( label);
+    labelPanel.add( textField);
+
+    /* ############################################################ */
+
+    tableModel = new FinderTableModel(set);
     table = new JTable(tableModel);
     table.setPreferredScrollableViewportSize(new Dimension(400, 200));
     table.setRowHeight(17);
-    table.getColumnModel().getColumn(0).setPreferredWidth(150);
-    table.getColumnModel().getColumn(0).setMaxWidth(150);
-    table.getColumnModel().getColumn(0).setCellRenderer(new ErrorTableCellRenderer());
+    table.getColumnModel().getColumn(0).setCellRenderer(new FinderTableCellRenderer());
 
     table.addMouseListener(new MouseListener(){
 	    public void mouseEntered(MouseEvent e) {} 
@@ -102,11 +132,7 @@ public class ErrorTablePanel extends JPanel implements JMaxToolPanel{
     
     JScrollPane scrollPane = new JScrollPane(table);
 
-    scrollPane.setAlignmentX( LEFT_ALIGNMENT);
-    scrollPane.setAlignmentY( TOP_ALIGNMENT);
-
-    setLayout( new BoxLayout( this, BoxLayout.Y_AXIS));
-    
+    add( labelPanel);
     add( scrollPane);
 
     set.addListDataListener(new ListDataListener(){
@@ -118,42 +144,38 @@ public class ErrorTablePanel extends JPanel implements JMaxToolPanel{
 	    };
 	    public void intervalRemoved(ListDataEvent e){};
 	    public void intervalAdded(ListDataEvent e){};
-	});
-    
-    fts.addEditListener(new FtsEditListener(){	    
-	    public void objectAdded(FtsObject object)
-	    {
-		if(!atomic) 
-		    SwingUtilities.invokeLater(new Runnable() {
-			    public void run()
-			    { 
-				findErrors();
-			    }});
-	    };
-	    public void objectRemoved(FtsObject object)
-	    {
-		if(!atomic) 
-		    SwingUtilities.invokeLater(new Runnable() {
-			    public void run()
-			    { 
-				findErrors();
-			    }});
-	    };
-	    public void connectionAdded(FtsConnection connection){};
-	    public void connectionRemoved(FtsConnection connection){};
-	    public void atomicAction(boolean active)
-	    {
-		atomic = active;
-		if(!atomic) findErrors();
-	    };
-	});
-
-    findErrors();
+	}); 
   }
 
-  public void findErrors()
+ public void find()
   {
-      fts.getErrorFinder().findErrors(fts.getRootObject(), set);
+    String query;
+    MaxVector args;
+    Cursor temp = getCursor();
+
+    setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+
+    query = textField.getText();
+    args = new MaxVector();
+    FtsParse.parseAtoms(query, args);
+    
+    if(args.size()>0)
+	fts.getFinder().find(fts.getRootObject(), set, args);
+
+    setCursor(temp);
+  }
+
+  public void findFriends(FtsObject object)
+  {
+    if(object.isError()) return;
+
+    Cursor temp = getCursor();
+    setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+    textField.setText("");
+
+    fts.getFinder().findFriends(object, set);    
+
+    setCursor(temp);
   }
 
   public void setObjectSelectedListener(ObjectSelectedListener objectSelectedListener)
@@ -178,13 +200,12 @@ public class ErrorTablePanel extends JPanel implements JMaxToolPanel{
   
   private boolean atomic = false;
   
-  protected JTable table;
+  protected JTable table;  
+  private JTextField textField;
   protected Fts fts;
   private FtsObjectSet set;
-  protected ErrorTableModel tableModel;
+  protected FinderTableModel tableModel;
   private ObjectSelectedListener objectSelectedListener;
-  public static ImageIcon errorIcon = SystemIcons.get("_error_object_");
-  public static ImageIcon patcherIcon = SystemIcons.get("_patcher_");
 }
 
 

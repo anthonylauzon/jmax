@@ -14,9 +14,10 @@ ErmesSketchPad.java\
 ErmesSketchWindow.java\
 ErmesToolBar.java\
 ErmesToolButton.java\
-FindPanel.java\
 ErrorTableModel.java\
 ErrorTablePanel.java\
+FinderTableModel.java\
+FinderTablePanel.java\
 FontCache.java\
 IconRenderer.java\
 JMaxToolPanel.java\

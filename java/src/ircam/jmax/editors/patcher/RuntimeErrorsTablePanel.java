@@ -93,7 +93,8 @@ public class RuntimeErrorsTablePanel extends JPanel implements JMaxToolPanel{
 			    {
 				if (objectSelectedListener != null)
 				{
-				    FtsObject object=(FtsObject) tableModel.getListModel().getElementAt(index);
+				    FtsObject object = ((RuntimeError)tableModel.
+						      getListModel().getElementAt(index)).getObject();
 				    
 				    objectSelectedListener.objectSelected(object);
 				}

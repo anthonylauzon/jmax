@@ -37,10 +37,10 @@ import ircam.jmax.fts.*;
  * A table model used to represent the content of an objectset of error objects
  * in a JTable. 
  */
-class ErrorTableModel extends AbstractTableModel implements ToolTableModel
+class FinderTableModel extends AbstractTableModel implements ToolTableModel
 {
   
-  ErrorTableModel(FtsObjectSet set)
+  FinderTableModel(FtsObjectSet set)
   {
     super();
     this.objectSet = set;
@@ -50,7 +50,7 @@ class ErrorTableModel extends AbstractTableModel implements ToolTableModel
    * The number of columns in this model */
   public int getColumnCount() 
   { 
-      return 2;
+      return 1;
   }
   
   public Class getColumnClass(int col)
@@ -68,7 +68,7 @@ class ErrorTableModel extends AbstractTableModel implements ToolTableModel
       if(col == 0)
 	  return "object";
       else 
-	  return "error description";
+	  return "";
   }
 
   public int getRowCount() { 
@@ -80,10 +80,10 @@ class ErrorTableModel extends AbstractTableModel implements ToolTableModel
       FtsObject obj = (FtsObject)objectSet.getElementAt(row);
       if(obj==null) return " ";
 
-      if(col == 0)
-	  return obj.getDescription();
-      else
-	  return obj.getErrorDescription();    
+      String val = obj.getDescription();
+      if(val.equals("")) val = obj.getComment();
+
+      return val;
   }
   
   public ListModel getListModel()
