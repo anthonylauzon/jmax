@@ -47,10 +47,7 @@ public class AmbitusValue extends AbstractEventValue
   private void setDefaultProperties()
   {
     setProperty("duration", new Double(100.0));
-    setProperty("pitch", new Integer(0));
-    setProperty("midi_velocity", new Integer(64));
-    setProperty("midi_channel", new Integer(1));
-    setProperty("ambitus", new Integer(0));
+    //setProperty("pitch", new Integer(0));
   }
 
   Object pitch, duration, velocity, channel, ambitus;
@@ -68,14 +65,12 @@ public class AmbitusValue extends AbstractEventValue
       }
     else if(name.equals("duration"))
       duration = value;
-    else if(name.equals("midi_velocity"))
+    else if(name.equals("velocity"))
       velocity = value;
-    else if(name.equals("midi_channel"))
+    else if(name.equals("channel"))
       channel = value;
-    else if(name.equals("ambitus"))
-      ambitus = value;
-    else
-      super.setProperty(name, value);
+    //else
+    super.setProperty(name, value);
   }
   public Object getProperty(String name)
   {
@@ -83,14 +78,12 @@ public class AmbitusValue extends AbstractEventValue
 	  return pitch;
       else if(name.equals("duration"))
 	  return duration;
-      else if(name.equals("midi_velocity"))
+      else if(name.equals("velocity"))
 	  return velocity;
-      else if(name.equals("midi_channel"))
+      else if(name.equals("channel"))
 	  return channel;
-      else if(name.equals("ambitus"))
-	  return ambitus;
       else
-	  return super.getProperty(name);
+	return super.getProperty(name);
   }
 
   public ValueInfo getValueInfo()
@@ -157,8 +150,8 @@ public class AmbitusValue extends AbstractEventValue
   {
     return ((((Integer)getProperty("pitch")).intValue() == ((Integer)args[0]).intValue()) &&
 	    (((Double)getProperty("duration")).floatValue() == ((Double)args[1]).floatValue()) &&
-	    (((Integer)getProperty("midi_velocity")).intValue() == ((Integer)args[2]).intValue()) &&
-	    (((Integer)getProperty("midi_channel")).intValue() == ((Integer)args[3]).intValue()));
+	    (((Integer)getProperty("velocity")).intValue() == ((Integer)args[2]).intValue()) &&
+	    (((Integer)getProperty("channel")).intValue() == ((Integer)args[3]).intValue()));
   }
 
   //--- Fields
@@ -177,6 +170,13 @@ public class AmbitusValue extends AbstractEventValue
     AMBITUS_ICON = new ImageIcon(path+"note.gif");
   }
 }
+
+
+
+
+
+
+
 
 
 

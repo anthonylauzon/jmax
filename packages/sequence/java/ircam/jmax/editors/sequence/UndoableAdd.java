@@ -61,8 +61,8 @@ class UndoableAdd extends AbstractUndoableEdit {
     SequenceSelection.getCurrent().deselectAll();
     trkObj.requestEventCreation((float)itsEvent.getTime(), 
 				itsEvent.getValue().getValueInfo().getName(), 
-				itsEvent.getValue().getDefinedPropertyCount(),
-				itsEvent.getValue().getDefinedPropertyValues());
+				itsEvent.getValue().getDefinedPropertyCount()*2,
+				itsEvent.getValue().getDefinedPropertyNamesAndValues());
   }  
   
   public void undo()

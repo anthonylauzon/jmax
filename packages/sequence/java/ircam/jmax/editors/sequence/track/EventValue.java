@@ -114,7 +114,7 @@ public interface EventValue
      * This is a situation in which we have no choices: the value
      * here is suited to be represented in Renderer that handle (at least) midi-like
      * values */
-    public Object DEFAULT_PROPERTY = new Integer(64);
+  //public Object DEFAULT_PROPERTY = new Integer(64);
 
     public static int UNKNOWN_TYPE = -1;
     public static int INTEGER_TYPE =  0;

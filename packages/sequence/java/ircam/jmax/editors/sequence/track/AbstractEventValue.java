@@ -99,7 +99,7 @@ public class AbstractEventValue implements EventValue
     for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
       {
 	prop = getProperty( (String)e.nextElement());
-	if( prop != UNKNOWN_PROPERTY)
+	if((prop != null) && (prop != UNKNOWN_PROPERTY))
 	  propertyValuesArray[i++] = prop;
       }      
     return propertyValuesArray;
@@ -124,7 +124,7 @@ public class AbstractEventValue implements EventValue
       {
 	name = (String)e.nextElement();
 	value = getProperty( name);
-	if( value != UNKNOWN_PROPERTY)
+	if((value != null) && (value != UNKNOWN_PROPERTY))
 	  {
 	    propertyValuesArray[i++] = name;
 	    propertyValuesArray[i++] = value;
@@ -142,9 +142,16 @@ public class AbstractEventValue implements EventValue
   public int getDefinedPropertyCount()
   {
     int i = 0;
+    String name;
+    Object prop;
+
     for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
-      if( getProperty( (String)e.nextElement()) != UNKNOWN_PROPERTY) i++;
-  
+      {
+	name = (String)e.nextElement();
+	prop = getProperty( name);
+	
+	if((prop != null) && (prop != UNKNOWN_PROPERTY)) i++;
+      }
     return i;
   }
   public boolean samePropertyValues(Object args[])

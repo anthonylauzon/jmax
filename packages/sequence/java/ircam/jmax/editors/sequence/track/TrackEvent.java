@@ -347,6 +347,7 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
     evtValue.setPropertyValues( getValue().getDefinedPropertyCount()*2, getValue().getDefinedPropertyNamesAndValues());
     evtValue.setLocalPropertyValues( getValue().getLocalPropertyCount(), getValue().getLocalPropertyValues());
     evt.setValue(evtValue);
+    evt.setDataModel( getDataModel());
     return evt;
   }
 

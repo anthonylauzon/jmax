@@ -1039,7 +1039,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
     if (SequenceSelection.getCurrent().getModel() != this) 
       return;
     SequenceSelection.getCurrent().prepareACopy();
-    JMaxApplication.getSystemClipboard().setContents(SequenceSelection.getCurrent(), this);
+    JMaxApplication.getSystemClipboard().setContents( SequenceSelection.getCurrent(), this);
   }  
     
   public void paste()
@@ -1066,11 +1066,11 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 			       SequenceDataFlavor.getInstance().getHumanPresentableName());
 	  }		
       }
-
+    
     if (objectsToPaste != null)
       {
 	Event event;
-	
+
 	SequenceSelection.getCurrent().deselectAll();
 	
 	if(objectsToPaste.hasMoreElements())
@@ -1091,19 +1091,18 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 
 	      beginUpdate();  //the paste is undoable
 
-	      
 	      requestEventCreationWithoutUpload((float)event.getTime(), 
 						event.getValue().getValueInfo().getName(), 
-						getPropertyCount(), 
-						event.getValue().getPropertyValues());
+						event.getValue().getDefinedPropertyCount()*2, 
+						event.getValue().getDefinedPropertyNamesAndValues());
 	      
 	      while (objectsToPaste.hasMoreElements())
 		{
 		  event = (Event) objectsToPaste.nextElement();
 		  requestEventCreationWithoutUpload((float)event.getTime(), 
 						    event.getValue().getValueInfo().getName(), 
-						    getPropertyCount(), 
-						    event.getValue().getPropertyValues());
+						    event.getValue().getDefinedPropertyCount()*2, 
+						    event.getValue().getDefinedPropertyNamesAndValues());
 		}
 		    
 	      requestUpload();
@@ -1362,8 +1361,8 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 	  event = (Event) e.nextElement();
 	  requestEventCreationWithoutUpload((float)event.getTime(), 
 					    event.getValue().getValueInfo().getName(), 
-					    getPropertyCount(), 
-					    event.getValue().getPropertyValues());
+					    event.getValue().getDefinedPropertyCount()*2, 
+					    event.getValue().getDefinedPropertyNamesAndValues());
 	}	    
 
       try{

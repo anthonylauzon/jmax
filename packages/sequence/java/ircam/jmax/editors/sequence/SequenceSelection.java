@@ -407,7 +407,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   /** Transferable interface */
   public Object getTransferData(DataFlavor flavor) 
   {
-      return itsCopy.elements(); 
+    return itsCopy.elements(); 
   }
 
   /** Transferable interface */
@@ -553,7 +553,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 
     TrackEvent s;
     try {
-
+      
       for (Enumeration e= new ReadOnlyEnum(); e.hasMoreElements();)
 	{
 	  s = (TrackEvent) e.nextElement();

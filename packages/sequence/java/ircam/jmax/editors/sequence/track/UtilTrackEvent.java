@@ -78,40 +78,39 @@ public class UtilTrackEvent implements Event, Drawable
      * Set the named property */
     public void setProperty(String name, Object theValue)
     {
+      //int intVal;
+      double doubleVal;
 
-	//int intVal;
-	double doubleVal;
-
-	if (theValue instanceof Double) 
-	    {
-		doubleVal = ((Double)theValue).doubleValue();
-		if (name.equals("time"))
-		    setTime(doubleVal);
-		else  {
-		    if (value != null) value.setProperty(name, theValue); //unknown Double property
-		}
-	    }
-	else if (value != null)
-	    value.setProperty(name, theValue); //unknow not-Integer property, delegate it to the value object
+      if (theValue instanceof Double) 
+	{
+	  doubleVal = ((Double)theValue).doubleValue();
+	  if (name.equals("time"))
+	    setTime(doubleVal);
+	  else  {
+	    if (value != null) value.setProperty(name, theValue); //unknown Double property
+	  }
+	}
+      else if (value != null)
+	value.setProperty(name, theValue); //unknow not-Integer property, delegate it to the value object
     }
 
   public void unsetProperty(String name){}
-
+  
     /**
      * Get the given property.
      * The property can be either a time or a
      * property handled by this object's value field.
      * Usually, the time property is not get with the getProperty method, 
      * but via the direct methods getTime() */
-    public Object getProperty(String name)
-    {
-	if (name.equals("time"))
-	    return new Double(time);
-	else if (value != null && !value.getProperty(name).equals(EventValue.UNKNOWN_PROPERTY))
-	    return value.getProperty(name); //this is not a know property, ask to the value object
-	else return EventValue.DEFAULT_PROPERTY;
-
-    }
+  public Object getProperty(String name)
+  {
+    if (name.equals("time"))
+      return new Double(time);
+    else if (value != null && !value.getProperty(name).equals(EventValue.UNKNOWN_PROPERTY))
+      return value.getProperty(name); //this is not a know property, ask to the value object
+    //else return EventValue.DEFAULT_PROPERTY;
+    else return null;
+  }
 
     /**
      * Returns the value of this event */
@@ -159,6 +158,21 @@ public class UtilTrackEvent implements Event, Drawable
 	for(int i = 0; i<count; i++)
 	    value.setProperty(names[i], localValues[i]);
     }
+
+  /**
+   * Sets the data model this event belongs to */
+  public void setDataModel(TrackDataModel model)
+  {
+    this.model = model;
+    value.setDataModel( model);
+  }
+
+  /**
+   * Gets the data model this event belongs to */
+  public TrackDataModel getDataModel()
+  {
+    return model;
+  }
 
     /* --------- Drawable interface ----------*/
 
