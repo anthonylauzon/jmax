@@ -28,6 +28,7 @@ package ircam.jmax.guiobj;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import javax.swing.*;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
@@ -55,9 +56,14 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
   }
 
   public void redefined()
-  {
-    setDefaults();
-    //fitToText();
+  {    
+    SwingUtilities.invokeLater(new Runnable(){
+	public void run()
+	{
+	  setDefaults();
+	  //fitToText();
+	}
+      });
   }
 
   public String getArgs()
