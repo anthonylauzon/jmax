@@ -194,6 +194,8 @@ config_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       fts_set_symbol( &a, this->file_name);
       fts_client_send_message( o, fts_s_name, 1, &a);
     }
+
+  fts_client_send_message( o, fts_s_end_upload, 0, 0);
 }
 
 static void

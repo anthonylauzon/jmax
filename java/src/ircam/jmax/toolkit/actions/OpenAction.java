@@ -79,7 +79,7 @@ public class OpenAction extends EditorAction
 	      }
 	    catch(IOException e)
 	      {
-		System.err.println("[ProjectEditor]: I/O error loading project "+fileName);
+		System.err.println("[OpenAction]: I/O error loading project "+fileName);
 	      }
 	  }
 	/* open a jmax package*/
@@ -95,8 +95,13 @@ public class OpenAction extends EditorAction
 	      }
 	    catch(IOException e)
 	      {
-		System.err.println("[ProjectEditor]: I/O error loading package "+fileName);
+		System.err.println("[OpenAction]: I/O error loading package "+fileName);
 	      }
+	  }
+	/* open a jmax configuration*/
+	else if( fileName.endsWith("jcfg"))
+	  {
+	    JMaxApplication.getConfig().load( fileName);
 	  }
 	/* open jmax patch file*/
 	else

@@ -41,6 +41,7 @@ import ircam.jmax.dialogs.*;
 
 import ircam.fts.client.*;
 import ircam.jmax.editors.console.*;
+import ircam.jmax.editors.configuration.*;
 import ircam.jmax.editors.patcher.*;
 
 class FtsSystemOutConsole extends FtsObject {

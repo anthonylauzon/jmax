@@ -26,7 +26,7 @@ import java.util.*;
 
 import ircam.fts.client.*;
 import ircam.jmax.*;
-import ircam.jmax.editors.project.*;
+import ircam.jmax.editors.configuration.*;
 
 public class FtsConfig extends FtsObject
 {
@@ -60,6 +60,12 @@ public class FtsConfig extends FtsObject
 	 public void invoke( FtsObject obj, FtsArgs args)
 	 {
 	   ((FtsConfig)obj).setDirty( args.getInt( 0) == 1);
+	 }
+       });
+     FtsObject.registerMessageHandler( FtsConfig.class, FtsSymbol.get("endUpload"), new FtsMessageHandler(){
+	 public void invoke( FtsObject obj, FtsArgs args)
+	 {
+	   ConfigurationEditor.updateEditor();
 	 }
        });
   }
@@ -118,6 +124,21 @@ public class FtsConfig extends FtsObject
     catch(IOException e)
       {
 	System.err.println("FtsConfig: I/O Error sending save Message!");
+	e.printStackTrace(); 
+      }
+  }
+
+  public void load( String fileName)
+  {
+    args.clear();
+    args.addSymbol( FtsSymbol.get( fileName));
+    try
+      {
+	send( FtsSymbol.get("load"), args);
+      }
+    catch(IOException e)
+      {
+	System.err.println("FtsConfig: I/O Error sending load Message!");
 	e.printStackTrace(); 
       }
   }

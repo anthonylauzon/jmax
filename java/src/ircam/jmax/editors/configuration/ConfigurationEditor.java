@@ -62,6 +62,16 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
     return configEditor;
   }
 
+  public static void updateEditor()
+  {    
+    if (configEditor != null && configEditor.isVisible())
+      {
+	configEditor.update();
+	configEditor.validate();
+	configEditor.pack();
+      }
+  }
+    
   public static ConfigurationEditor getInstance()
   {
     return configEditor;

@@ -1134,8 +1134,8 @@ static void client_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol( "set_object_property"), client_set_object_property);
   fts_class_message_varargs(cl, fts_new_symbol( "connect_object"), client_connect_object);
   fts_class_message_varargs(cl, fts_new_symbol( "load"), client_load_patcher_file);
-  fts_class_message_varargs(cl, fts_new_symbol( "load_project"), client_load_project);
   fts_class_message_varargs(cl, fts_new_symbol( "load_package"), client_load_package);
+  fts_class_message_varargs(cl, fts_new_symbol( "load_project"), client_load_project);
   fts_class_message_varargs(cl, fts_new_symbol( "load_summary"), client_load_summary);
 
   fts_class_message_varargs(cl, fts_new_symbol( "shutdown"), client_shutdown);
