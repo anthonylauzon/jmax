@@ -96,6 +96,13 @@ fts_object_destroy(fts_object_t *obj)
   fts_object_free(obj);
 }
 
+#ifdef WIN32
+fts_symbol_t fts_object_get_class_name(fts_object_t *obj)
+{
+  return fts_class_get_name((obj)->cl);
+}
+#endif
+
 /*****************************************************************************
 *
 *  client
