@@ -28,7 +28,7 @@
 # Constants
 # ***************************************************************************
 DEFAULT_ARCH=r10k-irix6.5
-DEFAULT_BUILD_DIR=/data1/build
+DEFAULT_BUILD_DIR=/data/build
 DEFAULT_DEST_DIR=/u/worksta/jmaxdev/releases
 
 # ***************************************************************************
