@@ -46,7 +46,8 @@ public class OpenHelpPatchAction extends EditorAction
     if (ErmesSelection.patcherSelection.ownedBy( (ErmesSketchPad)container.getEditor()))
       {
 	if (! ErmesSelection.patcherSelection.openHelpPatches())
-	  new ErrorDialog( container.getFrame(), "Sorry, no help for object ");
+	    JOptionPane.showMessageDialog(container.getFrame(), "Sorry, no help for object ", 
+					  "Warning", JOptionPane.INFORMATION_MESSAGE); 
       }
   }
 }

@@ -1362,7 +1362,8 @@ public class FtsServer implements Runnable
 	catch (FtsQuittedException e)
 	  {
 	    /* open a dialog to quit jmax */
-	    JOptionPane.showMessageDialog(null, "Fts Server Quitted!", "Fatal Error", JOptionPane.ERROR_MESSAGE); 
+	    JOptionPane.showMessageDialog(null, "jMax server connection lost! \n Quit user interface.", 
+					  "Fatal Error", JOptionPane.ERROR_MESSAGE); 
 
 	    ftsQuitted();
 	    running = false;

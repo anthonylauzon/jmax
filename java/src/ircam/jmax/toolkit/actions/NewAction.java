@@ -54,7 +54,8 @@ public class NewAction extends EditorAction
     catch (MaxDocumentException ex)
       {
 	container.getFrame().setCursor(temp);
-	new ErrorDialog(container.getFrame(), ex.toString());
+	JOptionPane.showMessageDialog(container.getFrame(), ex.toString(), 
+				      "Error", JOptionPane.ERROR_MESSAGE); 
       }
   }
 }

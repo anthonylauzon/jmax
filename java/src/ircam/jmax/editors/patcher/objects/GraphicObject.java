@@ -263,7 +263,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     return ScaleTransform.getInstance().scaleX(ftsObject.getX());
   }
 
-  protected void setX( int x) 
+  public void setX( int x) 
   {
     ftsObject.setX(ScaleTransform.getInstance().invScaleX(x));
     itsSketchPad.getDisplayList().updateConnectionsFor(this);
@@ -274,7 +274,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     return ScaleTransform.getInstance().scaleY(ftsObject.getY());
   }
 
-  protected void setY( int y) 
+  public void setY( int y) 
   {
     ftsObject.setY(ScaleTransform.getInstance().invScaleY(y));
     itsSketchPad.getDisplayList().updateConnectionsFor(this);
@@ -431,7 +431,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     setFont(FontCache.lookupFont(itsFont.getName(), itsFont.getSize() + 2, itsFont.getStyle()));
   }
 
-  protected void setFont( Font theFont) 
+  public void setFont( Font theFont) 
   {
     itsFont = theFont;
     itsFontMetrics = itsSketchPad.getFontMetrics( theFont);
@@ -439,8 +439,6 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     ftsObject.setFont(itsFont.getName());
     ftsObject.setFontSize(itsFont.getSize());
     ftsObject.setFontStyle(itsFont.getStyle());
-
-    //if(itsSketchPad.isAutomaticFitToText()) fitToText();
   }
 
   public void fitToText()

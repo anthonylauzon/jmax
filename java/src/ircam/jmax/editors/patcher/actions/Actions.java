@@ -123,8 +123,8 @@ public class Actions
   public static EditorAction fontPopUpAction = new FontPopUpAction();
   public static EditorAction jmaxFontPopUpAction = new JMaxFontPopUpAction();
     //public static EditorAction inspectObjectAction = new InspectObjectAction();
-    //public static EditorAction changeSliderOrientationAction = new ChangeSliderOrientation();
 }
+
 
 
 

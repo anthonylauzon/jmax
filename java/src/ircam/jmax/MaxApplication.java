@@ -427,24 +427,21 @@ public class MaxApplication extends Object
     }
 
     // in such case, should give the offer to cancel the quit.
-
     if (someOneNeedSave)
       {
-	QuitDialog quitDialog = new QuitDialog(MaxWindowManager.getWindowManager().getTopFrame());
-
-	switch (quitDialog.getAnswer())
-	  {
-	  case QuitDialog.JUST_QUIT:
-	    doTheSave = false;
-	    break;
-	  case QuitDialog.REVIEW_AND_QUIT:
-	    doTheSave = true;
-	    break;
-	  case QuitDialog.CANCEL:
+	Object[] options = { "Quit", "Review unsaved and quit", "Cancel" };
+	int result = JOptionPane.showOptionDialog(null, 
+						  "There are unsaved documents; you really want to Quit ?", 
+						  "Quit", 
+						  JOptionPane.YES_NO_CANCEL_OPTION,
+						  JOptionPane.QUESTION_MESSAGE,
+						  null, options, options[0]);
+	if(result == JOptionPane.YES_OPTION)
+	    doTheSave = false;	
+	if(result == JOptionPane.NO_OPTION)
+	    doTheSave = true;	
+	if(result == JOptionPane.CANCEL_OPTION)
 	    return;
-	  }
-
-	quitDialog.dispose();
       }
 
     // dispose (and optionally save) all the documents
@@ -460,9 +457,12 @@ public class MaxApplication extends Object
 	
 	    if (doTheSave && (! document.isSaved()))
 	      {
-
-		if (YesOrNo.ask(MaxWindowManager.getWindowManager().getTopFrame(),
-				"Save " + document.getName(), "Save", "Don't Save"))
+		  int result = JOptionPane.showConfirmDialog(MaxWindowManager.getWindowManager().getTopFrame(),
+							     "Save "+document.getName()+" ?",
+							     "Warning",
+							     JOptionPane.YES_NO_OPTION,
+							     JOptionPane.QUESTION_MESSAGE);  
+		  if (result == JOptionPane.OK_OPTION)
 		  {
 		    if (! document.canSave())
 		      {
@@ -485,9 +485,10 @@ public class MaxApplication extends Object
 			  }
 		      }
 		    else
-		      {
-			new ErrorDialog(MaxWindowManager.getWindowManager().getTopFrame(),
-					"Cannot Save " + document.getName());
+		      { 
+			  JOptionPane.showMessageDialog(MaxWindowManager.getWindowManager().getTopFrame(), 
+							"Cannot Save "+document.getName(), 
+							"Error", JOptionPane.ERROR_MESSAGE); 
 		      }
 		  }		    
 

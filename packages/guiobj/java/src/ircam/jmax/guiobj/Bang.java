@@ -154,24 +154,14 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
 	      
 		itsSketchPad.prepareImage(image, this);
 		
-		/*Graphics g = image.getGraphics();
-		  g.setColor( Settings.sharedInstance().getUIColor());		
-		  g.fillRect(0, 0, w-5, w-5);
-		  g.setColor(Color.black);		
-		  g.drawOval(1, 1, w-7, w-7);*/
-
-		/*****************/
-		//jdk117-->jdk1.3//
 		Graphics2D g2 = (Graphics2D)image.getGraphics();
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
 				    RenderingHints.VALUE_ANTIALIAS_ON);
 		
 		g2.setPaint(Settings.sharedInstance().getUIColor());
 		g2.fill(new Rectangle2D.Double(0, 0, w-5, w-5));
-		//g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
 		g2.setPaint(Color.black);
 		g2.draw(new Ellipse2D.Double(1, 1, w-7, w-7));
-		/*****************/
 		
 		imageTable.put(key, image);	      
 	    }
@@ -188,19 +178,6 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
 	      
 	      itsSketchPad.prepareImage(image, this);
 
-	      /*****************/
-	      //jdk117-->jdk1.3//
-
-	      /*Graphics g = image.getGraphics();
-		g.setColor( Settings.sharedInstance().getUIColor());
-		g.fillRect(0, 0, w-5, w-5);
-	      
-		g.setColor(ColorPopUpMenu.getColorByIndex(color));
-		g.fillOval(1, 1, w-7, w-7);
-	      
-		g.setColor(Color.black);
-		g.drawOval(1, 1, w-7, w-7);*/
-	      
 	      Graphics2D g2 = (Graphics2D)image.getGraphics();
 	      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
 				  RenderingHints.VALUE_ANTIALIAS_ON);
@@ -211,7 +188,6 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
 	      g2.fill(el);
 	      g2.setPaint(Color.black);
 	      g2.draw(el);
-	      /*****************/
 
 	      imageTable.put(key, image);
 	  }	
@@ -237,11 +213,6 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
 	    g.setColor( Settings.sharedInstance().getUIColor());
 	
 	g.fill3DRect( x + 1, y + 1, w - 2, h - 2, true);
-
-	/*****************/
-	//jdk117-->jdk1.3//
-	//((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
-	//RenderingHints.VALUE_ANTIALIAS_ON);
 
 	if(isSelected() || isResizing)
 	    {		
@@ -273,11 +244,6 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
 		else
 		    updateImages(w, flashColorIndex);
 	    }
-
-	/*****************/
-	//jdk117-->jdk1.3//
-	//((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
-	//RenderingHints.VALUE_ANTIALIAS_OFF);
 
 	super.paint( g);
     }

@@ -77,9 +77,8 @@ public class JMaxFontSizesAction extends EditorAction
 	    }});
       }
       catch (Exception e){
-	ErrorDialog aErr = new ErrorDialog(container.getFrame(), "This font does not exist on this platform");
-	aErr.setLocation( 100, 100);
-	aErr.show();  
+	  JOptionPane.showMessageDialog(container.getFrame(), "This font does not exist on this platform", 
+					"Warning", JOptionPane.WARNING_MESSAGE);
       }
     }
     else

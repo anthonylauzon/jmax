@@ -26,6 +26,7 @@
 package ircam.jmax.editors.patcher.interactions;
 
 import java.awt.*;
+import javax.swing.*;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.dialogs.*;
@@ -62,8 +63,9 @@ class HelpInteraction extends Interaction
 
 	if (object != null)
 	  if (! FtsHelpPatchTable.openHelpPatch( object.getFtsObject()))
-	    new ErrorDialog( editor.getEditorContainer().getFrame(),
-			     "Sorry, no help for object " + object.getFtsObject().getClassName());
+	      JOptionPane.showMessageDialog(editor.getEditorContainer().getFrame(), 
+					    "Sorry, no help for object "+object.getFtsObject().getClassName(), 
+					    "Warning", JOptionPane.INFORMATION_MESSAGE); 
 
 	locked = false;
 	editor.endInteraction();

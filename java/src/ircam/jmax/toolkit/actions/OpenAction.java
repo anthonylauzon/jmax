@@ -72,7 +72,8 @@ public class OpenAction extends EditorAction
 	catch (MaxDocumentException e)
 	  {
 	    container.getFrame().setCursor(temp);
-	    new ErrorDialog(container.getFrame(), e.toString());
+	    JOptionPane.showMessageDialog(container.getFrame(), e.toString(), 
+					  "Error", JOptionPane.ERROR_MESSAGE);
 	  }
       }
   }

@@ -65,7 +65,8 @@ public class PatcherSaveManager
 	  }
 	catch ( MaxDocumentException e)
 	  {
-	    new ErrorDialog( container.getFrame(), e.getMessage());
+	      JOptionPane.showMessageDialog(container.getFrame(), e.getMessage(), 
+					    "Error", JOptionPane.ERROR_MESSAGE); 
 	  }
       }
     else
@@ -141,7 +142,9 @@ public class PatcherSaveManager
       }
     catch ( MaxDocumentException e)
       {
-	new ErrorDialog( container.getFrame(), e.getMessage());
+	  /*new ErrorDialog( container.getFrame(), e.getMessage());*/
+	  JOptionPane.showMessageDialog(container.getFrame(), e.getMessage(), 
+					"Error", JOptionPane.ERROR_MESSAGE); 
       }
     return saved;
   }
@@ -197,7 +200,9 @@ public class PatcherSaveManager
       }
     catch ( MaxDocumentException e)
       {
-	new ErrorDialog( window , e.getMessage());
+	  /*new ErrorDialog( window , e.getMessage());*/
+	  JOptionPane.showMessageDialog( window, e.getMessage(), 
+					"Error", JOptionPane.ERROR_MESSAGE); 
       }
     return saved;
   }
@@ -215,7 +220,9 @@ public class PatcherSaveManager
 	  }
 	catch ( MaxDocumentException e)
 	  {
-	    new ErrorDialog( container.getFrame(), e.getMessage());
+	      /*new ErrorDialog( container.getFrame(), e.getMessage());*/
+	      JOptionPane.showMessageDialog(container.getFrame(), e.getMessage(), 
+					    "Error", JOptionPane.ERROR_MESSAGE); 
 	  }
       }
     else
@@ -286,7 +293,9 @@ public class PatcherSaveManager
       }
     catch ( MaxDocumentException e)
       {
-	new ErrorDialog(container.getFrame(), e.getMessage());
+	  /*new ErrorDialog(container.getFrame(), e.getMessage());*/
+	  JOptionPane.showMessageDialog(container.getFrame(), e.getMessage(), 
+					"Error", JOptionPane.ERROR_MESSAGE); 
       }
   }
   
@@ -300,18 +309,26 @@ public class PatcherSaveManager
 
     if(document.isRootData(patcherData) && (!document.isSaved()))
       {
-	FileNotSavedDialog aDialog = new FileNotSavedDialog(container.getFrame(), document, doCancel);
-	
-	aDialog.setLocation( 300, 300);
-	aDialog.setVisible( true);
-	
-	if (aDialog.getNothingToDoFlag())
-	  toClose = false;
-	
-	if (aDialog.getToSaveFlag())
-	  toClose = save(container);
+	  String message;
+	  if(document.getDocumentFile() != null)
+	      message = "File " + document.getDocumentFile() + " is not saved.\n Do you want to save it now?";
+	  else {
+	      if(document.getName()!=null)   
+		  message = ("Patch " + document.getName() + " is not saved.\n Do you want to save it now?");
+	      else
+		  message = ("Patch " + container.getFrame().getTitle() + " is not saved.\n Do you want to save it now?");
+	  }
 
-	aDialog.dispose();
+	  Object[] options = { "Save", "Don't save", "Cancel" };
+	  int result = JOptionPane.showOptionDialog(null, message, "File Not Saved", 
+						    JOptionPane.YES_NO_CANCEL_OPTION,
+						    JOptionPane.QUESTION_MESSAGE,
+						    null, options, options[0]);
+
+	  if(result == JOptionPane.CANCEL_OPTION)
+	      toClose = false;
+	  if(result == JOptionPane.YES_OPTION)
+	      toClose = save(container);	  
       }
     return toClose;
   }
