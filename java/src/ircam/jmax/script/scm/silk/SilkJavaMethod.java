@@ -23,17 +23,20 @@
 // Authors: Peter Hanappe
 // 
 
-/** SilkJavaMethod
- *
- * An addation of Peter Norvig's JavaMethod class. It corrects a bug
- * in the conversion of strings, such the (method obj "text") will be
- * called with a String instead of a char array. Hopefully these
- * changes will get integrated into the Silk package.  */
 package ircam.jmax.script.scm.silk;
 
 import java.lang.reflect.*;
 import silk.*;
 
+/**
+ * SilkJavaMethod
+ *
+ * An addation of Peter Norvig's JavaMethod class (Silk package). It
+ * corrects a bug in the conversion of strings, such the (method obj
+ * "text") will be called with a String instead of a char
+ * array. Hopefully these changes will get integrated into the Silk
+ * package.  http://www.norvig.com 
+ */
 public class SilkJavaMethod extends Procedure {
 
     Class[] argClasses;
@@ -41,6 +44,8 @@ public class SilkJavaMethod extends Procedure {
     boolean isStatic;
     boolean returnsString;
     boolean returnsBoolean;
+    String methodName;
+    String className;
 
     public static class Factory extends Procedure {
 	public Object apply(Scheme interpreter, Object args) {
@@ -54,21 +59,21 @@ public class SilkJavaMethod extends Procedure {
 	return new Factory();
     }
 
-    public SilkJavaMethod(String methodName, Object targetClassName, 
-			  Object argClassNames) {
+    public SilkJavaMethod(String methodName, Object targetClassName, Object argClassNames) {
 	//this.name = targetClassName + "." + methodName;
 	try {
 	    argClasses = classArray(argClassNames);
+	    className = (String) targetClassName;
 	    method = toClass(targetClassName).getMethod(methodName, argClasses);
+	    this.methodName = methodName;
 	    isStatic = Modifier.isStatic(method.getModifiers());
 	    returnsString = (method.getReturnType() == "".getClass());
 	    returnsBoolean = (method.getReturnType() == Boolean.TYPE);
 	} catch (ClassNotFoundException e) { 
-	    error("Bad class, can't get method " + methodName); 
+	    error("Can't find class of method " + className + "." + methodName); 
 	} catch (NoSuchMethodException e) { 
-	    error("Can't get tmethod " + methodName); 
+	    error("Can't get method " + className + "." + methodName); 
 	}
-    
     }
 
     /** Apply the method to a list of arguments. **/
@@ -89,9 +94,9 @@ public class SilkJavaMethod extends Procedure {
 	    }
 	    return r;
 	} catch (Exception e) { 
-	    e.printStackTrace(); 
-	    System.out.println(e.getMessage());
-	    return error("Bad Java Method application:" ); 
+	    String m = (e.getMessage() == null) ? e.getClass().getName() : e.getMessage();
+	    System.out.println("Can't invoke Java method " + className + "." + methodName + ": " + m); 
+	    return truth(false);
 	}
     }
 

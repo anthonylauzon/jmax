@@ -23,14 +23,16 @@
 // Authors: Peter Hanappe
 // 
 
-/** SilkJavaConstructor
- *
- * An addation of Peter Norvig's JavaMethod class for constructors.
- */
 package ircam.jmax.script.scm.silk;
 import java.lang.reflect.*;
 import silk.*;
 
+/**
+ * SilkJavaConstructor
+ *
+ * An addation of Peter Norvig's JavaMethod class (Silk package) for constructors.
+ * http://www.norvig.com
+ */
 public class SilkJavaConstructor extends Procedure {
     Class[] argClasses;
     Constructor constructor;

@@ -47,6 +47,10 @@ public class SilkInterpreter extends SchemeInterpreter
     /** The Silk object ued for the evaluation. */
     Scheme itsInterp;
 
+    public Scheme getScheme() {
+	return itsInterp;
+    } 
+
     /** The input port. */
     InputPort input;
 
@@ -113,7 +117,6 @@ public class SilkInterpreter extends SchemeInterpreter
 		 * and "this-package" manually */
 		define("dir", root);
 		define("this-package", "");
-
 		/* Load the "jmaxboot.scm" file that will do whatever is needed to
 		 * create the startup configuration, included reading user files
 		 * installing editors, data types and data handlers. */
@@ -228,6 +231,8 @@ public class SilkInterpreter extends SchemeInterpreter
 	    return new DefaultSchemeScript(this, (String) script);
 	} else if (script instanceof char[]) {
 	    return new DefaultSchemeScript(this, new String((char[]) script));
+	} else if (script instanceof Procedure) {
+	    return new SilkScript(this, (Procedure) script);
 	} else {
 	    throw new ScriptException("Invalid script.");
 	}
@@ -260,6 +265,28 @@ public class SilkInterpreter extends SchemeInterpreter
     public String getScriptLanguage()
     {
 	return "scheme";
+    }
+
+    public Object convertToScheme(String value, String type) {
+	try {
+	    if (type.equals("int")) {
+		return new Long(value);
+	    } else if (type.equals("float")) {
+		return new Double(value);
+	    } else if (type.equals("string")) {
+		char[] c = new char[value.length()];
+		value.getChars(0, value.length(), c, 0);
+		return c;
+	    } else if (type.equals("symbol")) {
+		return value.intern();
+	    } else if (type.equals("boolean")) {
+		return (value.equals("true")) ? Boolean.TRUE : Boolean.FALSE;
+	    } else {
+		return "Unknown type: " + type;
+	    }
+	} catch (Exception e) {
+	    return  (e.getMessage() != null) ? e.getMessage() : e.getClass().getName();
+	}
     }
 
     /** This method implements the readEvalWriteLoop from silk.Scheme,
