@@ -992,6 +992,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   public void mouseClicked(MouseEvent e){}
 
   public void mousePressed(MouseEvent e){
+    MaxApplication.itsSketchWindow = itsSketchWindow; //demo only: 4/03/98 0:55
     itsSketchWindow.requestFocus();//???
     
     //create the object whose name is objectNames[addObject] in coord x, y
