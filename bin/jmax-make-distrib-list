@@ -81,7 +81,7 @@ do_it_non_verbose_no_check ()
 {
     if [ \! -f $3/distrib ]; then echo "File $3/distrib missing" >&2 ; exit 1 ; fi
 
-    {
+    sed "s/ARCH/$1/" < $3/distrib | {
 	read ARCH_F TYPE_F NAME OTHERS
 	while [ $ARCH_F ] 
 	do
@@ -99,7 +99,7 @@ do_it_non_verbose_no_check ()
 	    fi
 	    read ARCH_F TYPE_F NAME OTHERS
 	done
-    }  < $3/distrib
+    } 
 }
 
 # args: ARCH TYPE DIR
@@ -107,7 +107,7 @@ do_it_non_verbose_check ()
 {
     if [ \! -f $3/distrib ]; then echo "File $3/distrib missing" >&2 ; exit 1 ; fi
 
-    {
+    sed "s/ARCH/$1/" < $3/distrib | {
 	read ARCH_F TYPE_F NAME OTHERS
 	while [ $ARCH_F ] 
 	do
@@ -126,7 +126,7 @@ do_it_non_verbose_check ()
 	    fi
 	    read ARCH_F TYPE_F NAME OTHERS
 	done
-    }  < $3/distrib
+    }
 }
 
 # args: ARCH TYPE DIR
@@ -134,7 +134,7 @@ do_it_verbose_check ()
 {
     if [ \! -f $3/distrib ]; then echo "File $3/distrib missing" >&2 ; exit 1 ; fi
 
-    {
+    sed "s/ARCH/$1/" < $3/distrib | {
 	read ARCH_F TYPE_F NAME OTHERS
 	if [ $VERBOSE ] ; then echo Read $ARCH_F $TYPE_F $NAME >&2 ; fi
 
@@ -158,7 +158,7 @@ do_it_verbose_check ()
 	    read ARCH_F TYPE_F NAME OTHERS
 	    if [ $VERBOSE ] ; then echo Read $ARCH_F $TYPE_F $NAME >&2 ; fi
 	    done
-    }  < $3/distrib
+    }
 }
 
 # args: ARCH TYPE DIR
@@ -166,7 +166,7 @@ do_it_verbose_no_check ()
 {
     if [ \! -f $3/distrib ]; then echo "File $3/distrib missing" >&2 ; exit 1 ; fi
 
-    {
+    sed "s/ARCH/$1/" < $3/distrib | {
 	read ARCH_F TYPE_F NAME OTHERS
 	if [ $VERBOSE ] ; then echo Read $ARCH_F $TYPE_F $NAME >&2 ; fi
 
@@ -189,7 +189,7 @@ do_it_verbose_no_check ()
 	    read ARCH_F TYPE_F NAME OTHERS
 	    if [ $VERBOSE ] ; then echo Read $ARCH_F $TYPE_F $NAME >&2 ; fi
 	    done
-    }  < $3/distrib
+    }
 }
 
 
