@@ -68,6 +68,13 @@ public class FtsOutletObject  extends FtsObject
     return position;
   }
 
+  public void delete()
+  {
+    super.delete();
+
+    parent.removeOutlet(this, position);
+  }
+
   /** Save the object to a TCL stream. */
 
   public void saveAsTcl(PrintWriter writer)

@@ -49,6 +49,16 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
 
   public void setNumberOfInlets(int ninlets)
   {
+    // delete unneeded inlets 
+
+    for (int i = ninlets; i < this.ninlets; i++)
+      {
+	FtsObject obj;
+
+	obj = (FtsObject) inlets.elementAt(i);
+	obj.delete();
+      }
+
     super.setNumberOfInlets(ninlets);
     this.inlets.setSize(ninlets);
   }
@@ -57,6 +67,16 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
 
   public void setNumberOfOutlets(int noutlets)
   {
+    // delete unneeded inlets 
+
+    for (int i = noutlets; i < this.noutlets; i++)
+      {
+	FtsObject obj;
+
+	obj = (FtsObject) outlets.elementAt(i);
+	obj.delete();
+      }
+
     super.setNumberOfOutlets(noutlets);
     this.outlets.setSize(noutlets);
   }
@@ -96,6 +116,14 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
   {
     inlets.addElement(in);
   }
+  
+  /** Remove an inlet from the container */
+
+  final void removeInlet(FtsInletObject in, int pos)
+  {
+    if (pos < ninlets)
+      inlets.setElementAt(null, pos);
+  }
 
   /** Add an oulet. */
 
@@ -120,6 +148,14 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
   final void addOutlet(FtsObject in)
   {
     outlets.addElement(in);
+  }
+
+  /** Remove an outlet from the container */
+
+  final void removeOutlet(FtsOutletObject out, int pos)
+  {
+    if (pos < ninlets)
+      inlets.setElementAt(null, pos);
   }
 
   /** Open tell FTS that this patcher is "alive" */
@@ -213,8 +249,6 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
 
     interp.eval(list, 0);
 
-
-    interp.eval(script, 0);
     containerStack.pop();
   }
 

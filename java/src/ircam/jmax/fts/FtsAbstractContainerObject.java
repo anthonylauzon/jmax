@@ -24,11 +24,11 @@ abstract public class FtsAbstractContainerObject extends FtsObject
 {
   /** The objects contained in the patcher */
 
-  Vector objects     = new Vector();
+  protected Vector objects     = new Vector();
 
   /** All the connections between these objects */
 
-  Vector connections = new Vector();
+  protected Vector connections = new Vector();
 
   /** Just for the building of the root object */
 
@@ -55,6 +55,21 @@ abstract public class FtsAbstractContainerObject extends FtsObject
 
   final void removeObjectFromContainer(FtsObject obj)
   {
+    put("deletedObject", obj); // the deleteObject property keep the last object deleted
+
+    // First, look in the connections, and delete the 
+    // connections from/to the object
+
+    for (int i = 0; i < connections.size() ; i++)
+      {
+	FtsConnection c;
+
+	c = (FtsConnection) connections.elementAt(i);
+	
+	if ((c.from == obj) || (c.to == obj))
+	  c.delete();
+      }
+
     objects.removeElement(obj);
   }
 
@@ -89,6 +104,7 @@ abstract public class FtsAbstractContainerObject extends FtsObject
 
   final void removeConnectionFromContainer(FtsConnection obj)
   {
+    put("deleteConnection", obj); // the deleteConnection property keep the last connection deleted
     connections.removeElement(obj);
   }
 

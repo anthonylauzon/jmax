@@ -961,7 +961,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   public void eval(Interp interp, String  script) throws tcl.lang.TclException
   {
-    eval (interp, TclString.newInstance(script));
+    eval(interp, TclString.newInstance(script));
   }
 
   /** as the previous one, getting the script as tclObject */

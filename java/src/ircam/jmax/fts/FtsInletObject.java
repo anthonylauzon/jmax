@@ -68,6 +68,13 @@ public class FtsInletObject  extends FtsObject
     return position;
   }
 
+  public void delete()
+  {
+    super.delete();
+
+    parent.removeInlet(this, position);
+  }
+
   /** Save the object to a TCL stream. */
 
   public void saveAsTcl(PrintWriter writer)
