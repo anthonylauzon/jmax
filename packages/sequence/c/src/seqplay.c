@@ -98,7 +98,10 @@ seqplay_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_timebase_add_call(this->timebase, o, seqplay_next, 0, (event_get_time(next) - time) / speed);
     }
   else
-    seqplay_reset(this);  
+    {
+      seqplay_reset(this);  
+      fts_outlet_bang(o, 1);
+    }
 }
 
 static void
@@ -131,7 +134,7 @@ seqplay_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   double time = 0.0;
   event_t *event;
       
-  if(ac && fts_is_number(at))
+  if(ac > 0 && fts_is_number(at))
     time = fts_get_number_float(at);
   
   /* locate */
@@ -146,6 +149,8 @@ seqplay_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       /* set start time */
       this->last_location = time;
     }
+
+  this->status = status_ready;
 }
 
 static void 
@@ -363,7 +368,7 @@ seqplay_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static fts_status_t
 seqplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(seqplay_t), 3, 1, 0);
+  fts_class_init(cl, sizeof(seqplay_t), 3, 2, 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqplay_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqplay_delete);
