@@ -5,12 +5,18 @@
 
 <CENTER> <H1> jMax release notes for version 2.3.6 </H1> </CENTER>
 
-
 <H2> Fixed bugs </H2>
 
 The following bugs have been fixed:
 <UL>
-<LI> 
+<LI> crashes when loading big patches and running high priority. In this case,
+locking the memory (so that FTS is not swapped) caused a crash when physical
+memory was exhausted. Fixed both in kernel setting for Octanes and in
+FTS.
+<LI> table: values for x > 127 were not displayed
+<LI> #99: Objects sizes (partially: only for bang)
+<LI> #112: exception when deleting an object
+<LI> #113: Exceptions in copy/paste
 </UL>
 
 For bugs reported via the bug report system
@@ -18,24 +24,19 @@ For bugs reported via the bug report system
 please refer to this page for information.
 
 
-<H2> New features </H2>
+<H2> Outstanding bugs </H2>
 
+The following bugs are outstanding:
 <UL>
-<LI> 
-</UL>
-
-
-<H2> Known bugs </H2>
-
-<UL>
-<LI> 
-</UL>
-
-
-<H2> Outstanding bugs and features </H2>
-
-<UL>
-<LI> 
+<LI> #115: fast graphic updates with dsp on. <BR>
+As workaround, try the following settings in .jmaxrc:
+<PRE>
+ucs set updates_per_ticks  25
+ucs set update_period      40
+</PRE>
+<LI> #114: CTRL-e in text field
+<LI> #116: typing in objects
+<LI> #110: Deleting an outlet in a template crashes jMax
 </UL>
 
 </HTML>
