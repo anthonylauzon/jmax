@@ -75,7 +75,7 @@ public class FtsObjectSet extends FtsRemoteData
 
   /* Client to server queries */
 
-  void find(FtsObject context, String name)
+  public void find(FtsObject context, String name)
   {
     Object args[] = new Object[2];
 
@@ -87,7 +87,7 @@ public class FtsObjectSet extends FtsRemoteData
   }
 
 
-  void find(FtsObject context, String names[])
+  public void find(FtsObject context, String names[])
   {
     Object args[] = new Object[names.length + 1];
 
@@ -101,7 +101,7 @@ public class FtsObjectSet extends FtsRemoteData
   }
 
 
-  void findErrors(FtsObject context)
+  public void findErrors(FtsObject context)
   {
     Object args[] = new Object[1];
 
@@ -112,7 +112,7 @@ public class FtsObjectSet extends FtsRemoteData
   }
 
 
-  void findFriends(FtsObject context, FtsObject target)
+  public void findFriends(FtsObject context, FtsObject target)
   {
     Object args[] = new Object[2];
 

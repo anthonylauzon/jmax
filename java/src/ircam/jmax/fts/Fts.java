@@ -227,7 +227,7 @@ public class Fts
 
   /* Data objects */
 
-  public FtsRemoteData newRemoteData(String name, Object args[])
+  public static FtsRemoteData newRemoteData(String name, Object args[])
   {
     return FtsRemoteMetaData.getRemoteMetaData().newInstance(name, args);
   }
