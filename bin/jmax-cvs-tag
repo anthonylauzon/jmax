@@ -10,13 +10,13 @@ Usage:
 Does a ``cvs tag'' of the sources of jMax.
 
 The tag used is the following string:
-V_M_N_P<qualifier>
+V_M_N_P_<qualifier>
 where M, N and P are respectively the major number, minor number and
 patch level of the current release, taken from file VERSION.
 
 Options:
-  -qualifier <qualifier>           (optional)
-    defines the qualifier part of the tag
+  -qualifier <qualifier>           (mandatory)
+    defines the qualifier part of the tag (for instance, TRY1 or FINAL)
 
 HELP_EOF
 }
@@ -24,7 +24,7 @@ HELP_EOF
 # ---------------------------------------------------------------------------
 # Options decrypting
 OPT="none"
-QUALIFIER=
+QUALIFIER="none"
 
 for ARG in $@
 do
@@ -63,6 +63,12 @@ then
     exit 1
 fi
 
+if [ $QUALIFIER = "none"]
+then
+    help
+    exit 2
+fi
+
 # ---------------------------------------------------------------------------
 MAJOR=`awk '$1=="MAJOR" { print $2; }' VERSION`
 MINOR=`awk '$1=="MINOR" { print $2; }' VERSION`
@@ -71,7 +77,7 @@ PATCH_LEVEL=`awk '$1=="PATCH_LEVEL" { print $2; }' VERSION`
 VERSION=$MAJOR.$MINOR.$PATCH_LEVEL
 
 V=`echo $VERSION | sed -e 's/^/V_/' -e 's/\./_/g'`
-TAG="${V}${QUALIFIER}"
+TAG="${V}_${QUALIFIER}"
 
 echo "... Tagging sources with tag $TAG"
 cvs tag $TAG
