@@ -35,7 +35,7 @@
 typedef struct
 {
     fts_audioport_t head;
-    jack_client_t* client;
+/*     jack_client_t* client; */
     /* TODO: 
        Change structure if we want several input and output .
        But maybe it should be several jackaudioport, in this case we have to choose
@@ -177,8 +177,8 @@ jackaudioport_halt(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const ft
     fts_sched_remove(o);
     fts_log("[jackaudioport] jackaudioport removed from scheduler \n");
 
-    /* Activate jack client */
     
+    /* Activate jack client */    
     if (jack_activate(client) == -1)
     {
 	fts_log("[jackaudioport] cannot activate JACK client \n");
@@ -186,7 +186,15 @@ jackaudioport_halt(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const ft
 	return;
     }
 
+
     fts_log("[jackaudioport] jack client activated \n");
+
+    /* DEBUG */
+    /* connect to alsa_pcm:playback_1 ... */
+    if (jack_connect(client, jack_port_name(this->output_port), "alsa_pcm:playback_1"))
+    {
+      fts_log("[jackaudioport] cannot connect to alsa_pcm:plyback_1\n");
+    }
 
     /* Stop FTS scheduler */
     FD_ZERO(&rfds);
@@ -194,7 +202,7 @@ jackaudioport_halt(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const ft
     /* check return value of select */
     if (select(1, &rfds, NULL, NULL, NULL) < 0)
     {
-	fprintf(stderr, "[jackaudioport] select falied \n");
+	fts_log("[jackaudioport] select falied \n");
     }
 
     fts_log("[jackaudioport] FTS scheduler stopped \n");
@@ -216,6 +224,14 @@ jackaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 	fts_object_set_error(o, "[jackaudioport] cannot create jack client \n");
 	return;
     }
+
+    /* JACK client process callback setting */
+    jack_set_process_callback(client,
+			      jackaudioport_process, /* callback function */
+			      (void*)this);          /* we need to have our object
+							in our callback function
+						     */
+    fts_log("[jackaudioport] set jackaudioport process callback \n");
     
     /* JACK input/output port registering */
     this->input_port = jack_port_register(client,                   /* client structure */
@@ -237,13 +253,6 @@ jackaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 					   0);
     fts_log("[jackaudioport] output port registered \n");
 
-    /* JACK client process callback setting */
-    jack_set_process_callback(client, 
-			      jackaudioport_process, /* callback function */
-			      (void*)this);          /* we need to have our object 
-							in our callback function 
-						     */
-    fts_log("[jackaudioport] set jackaudioport process callback \n");
 
     /* memory allocation for input/output buffer */
     this->input_buffer = fts_malloc(JACKAUDIOPORT_DEFAULT_FRAME_SIZE * sizeof(float));
@@ -298,7 +307,7 @@ jackaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     }
 
     /* go back to fts scheduling */
-    /* fts_sched_unsuspend(); */
+/*     fts_sched_unsuspend(); */
 }
 
 static void jackaudioport_instantiate(fts_class_t *cl)
