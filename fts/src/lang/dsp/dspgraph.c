@@ -5,6 +5,8 @@
 
 #include <stdio.h>
 
+#define DEBUG_DSP_COMPILER
+
 #define ASSERT(e) if (!(e)) { post("assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}
 
 
@@ -169,6 +171,65 @@ dsp_list_lookup(fts_object_t *o)
   else
     return 0;
 }
+
+static int
+is_connected_to_dsp_objects( fts_object_t *object)
+{
+  fts_connection_t **conn;
+  fts_outlet_decl_t *outlet;
+  int n, noutlets, connected;
+
+  if (fts_object_is_outlet( object))
+    {
+      fts_object_t *patcher;
+      int pos;
+
+      pos = ((fts_outlet_t *)object)->position;
+      patcher = (fts_object_t *) fts_object_get_patcher( object);
+      outlet = &(patcher->cl->outlets[pos]);
+      conn = &(patcher->out_conn[pos]);
+      noutlets = 1;
+    }
+  else
+    {
+      outlet = object->cl->outlets;
+      conn = object->out_conn;
+      noutlets = fts_object_get_outlets_number(object);
+    }
+
+  for (n = 0; n < noutlets; n++)
+    {
+      if (outlet->tmess.symb == fts_s_sig || !outlet->tmess.symb)
+	{
+	  fts_connection_t *c;
+
+	  for ( c = *conn; c; c = c->next_same_src)
+	    {
+	      if (fts_object_is_patcher( c->dst))
+		{
+		  fts_object_t *inlet;
+
+		  inlet = fts_patcher_get_inlet( c->dst, c->winlet);
+
+		  if (inlet && is_connected_to_dsp_objects(inlet))
+		    return 1;
+		}
+	      else if (fts_object_is_outlet( c->dst))
+		{
+		  if (is_connected_to_dsp_objects(c->dst))
+		    return 1;
+		}
+	      else if ( dsp_list_lookup( c->dst))
+		return 1;
+	    }
+	}
+      outlet++;
+      conn++;
+    }
+
+  return 0;
+}
+
 
 static void
 dsp_succ_realize( dsp_node_t *node, edge_fun_t fun)
@@ -373,12 +434,20 @@ dsp_chain_create_end(void)
 }
 
 
-static void
-dsp_object_schedule(dsp_node_t *g)
+static void dsp_object_schedule(dsp_node_t *g)
 {
   dsp_signal **sig;
   fts_atom_t a;
-  int i;
+  int i, dead_code;
+
+  dead_code = 0;
+  /* (FD): 
+     must not schedule objects which (are inlets or outlets) and (are not connected to DSP objects) 
+     */
+  if ( (fts_object_is_inlet( g->o) || fts_object_is_outlet( g->o)) && !is_connected_to_dsp_objects( g->o))
+    {
+      dead_code = 1;
+    }
 
   if (! g->descr)
     {
@@ -413,11 +482,13 @@ dsp_object_schedule(dsp_node_t *g)
      object put method; it become a private function,
      and is not part of the API !!
    */
+  if (!dead_code)
+    {
+      dsp_gen_outputs(g->o, g->descr);
 
-  dsp_gen_outputs(g->o, g->descr);
-
-  fts_set_ptr(&a, g->descr);
-  fts_message_send(g->o, fts_SystemInlet, fts_s_put, 1, &a);
+      fts_set_ptr(&a, g->descr);
+      fts_message_send(g->o, fts_SystemInlet, fts_s_put, 1, &a);
+    }
 
   g->pred_cnt = IS_SCHEDULED;
 
@@ -426,9 +497,9 @@ dsp_object_schedule(dsp_node_t *g)
   /* This is to free the unreferenced signals, after having computed the reference count 
 	  of all the outputs signals. This happens in case of dsp outlets which are not connected */
   for (i = 0, sig = g->descr->out; i < g->descr->noutputs; i++, sig++)
-	 if ( *sig)
-		if ( (*sig)->refcnt == 0)
-		  Sig_free( *sig);
+    if ( *sig)
+      if ( (*sig)->refcnt == 0)
+	Sig_free( *sig);
 
   if (g->descr->ninputs)
     fts_block_free((char *) g->descr->in, sizeof(dsp_signal *) * g->descr->ninputs);
@@ -447,7 +518,7 @@ dsp_schedule_depth(dsp_node_t *src, int woutlet, dsp_node_t *dest, int winlet, d
 
   if ( dest->pred_cnt == 0)
     {
-      dsp_object_schedule( dest);  
+      dsp_object_schedule( dest);
 
       dsp_succ_realize( dest, dsp_schedule_depth);
 
@@ -472,28 +543,7 @@ dsp_chain_create(int vs)
   /* schedule all nodes without predecessors */
   for( node = dsp_graph; node; node = node->next)
     if ( node->pred_cnt == 0)
-      {
-	/* (FD): must not schedule objects which (are inlets and are not connected to DSP objects) */
-	if ( fts_object_is_inlet( node->o))
-	  {
-	    fts_connection_t **conn = node->o->out_conn;
-	    fts_connection_t *c;
-	    int must_schedule_inlet = 0;
-
-	    for ( c = *conn; c; c = c->next_same_src)
-	      {
-		if ( dsp_list_lookup( c->dst) || fts_object_is_patcher( c->dst) )
-		  must_schedule_inlet = 1;
-	      }
-
-	    if (must_schedule_inlet)
-	      dsp_schedule_depth( 0, 0, node, 0, 0);
-	    else
-	      node->pred_cnt = IS_SCHEDULED;
-	  }
-	else /* object is not inlet */
-	  dsp_schedule_depth( 0, 0, node, 0, 0);
-      }
+      dsp_schedule_depth( 0, 0, node, 0, 0);
 
   /* Add a dac syncronization/zero call for each out device not used by an object */
 
