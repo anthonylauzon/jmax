@@ -25,7 +25,7 @@
 #ifndef _MESS_DICT_H_
 #define _MESS_DICT_H_
 
-#include "data.h"
+#include <data/c/include/data.h>
 
 typedef struct dict
 {

@@ -26,7 +26,7 @@
 
 #include <fts/fts.h>
 #include <float.h>
-#include "bpf.h"
+#include <data/c/include/bpf.h>
 
 static fts_symbol_t env_symbol = 0;
 static fts_symbol_t sym_sustain = 0;

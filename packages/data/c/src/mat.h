@@ -25,7 +25,7 @@
 #ifndef _DATA_MAT_H_
 #define _DATA_MAT_H_
 
-#include "data.h"
+#include <data/c/include/data.h>
 
 DATA_API fts_metaclass_t *mat_type;
 DATA_API fts_symbol_t mat_symbol;

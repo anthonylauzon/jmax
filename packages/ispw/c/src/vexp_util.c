@@ -29,7 +29,7 @@
 #include <fts/fts.h>
 #include "vexp.h"
 #include "vexp_util.h"
-#include "ivec.h"
+#include <data/c/include/ivec.h>
 #include "naming.h"
 
 #define	MAXBUF	256

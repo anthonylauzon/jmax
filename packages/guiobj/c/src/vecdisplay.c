@@ -27,10 +27,10 @@
 #include <math.h>
 #include <string.h>
 #include <fts/fts.h>
-#include "utils.h"
-#include "ivec.h"
-#include "fvec.h"
-#include "cvec.h"
+#include <utils/c/include/utils.h>
+#include <data/c/include/ivec.h>
+#include <data/c/include/fvec.h>
+#include <data/c/include/cvec.h>
 
 typedef struct 
 {

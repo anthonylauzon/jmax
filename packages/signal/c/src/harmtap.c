@@ -26,7 +26,7 @@
 
 #include <math.h>
 #include <fts/fts.h>
-#include <utils.h>
+#include <utils/c/include/utils.h>
 #include "delay.h"
 
 #define random_get(min, max) ((min) + (((max) - (min)) * rand() / RAND_MAX))

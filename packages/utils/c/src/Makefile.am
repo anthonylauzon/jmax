@@ -14,9 +14,8 @@ vec_fft.c
 
 noinst_HEADERS= \
 cfft.h \
-rfft_shuffle.h \
-utils.h
+rfft_shuffle.h
 
 libutils_la_LDFLAGS= -module
 
-INCLUDES=-I$(top_srcdir)/include
+INCLUDES=-I$(top_srcdir)/packages -I$(top_srcdir)/include 

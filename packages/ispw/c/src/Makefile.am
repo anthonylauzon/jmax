@@ -93,7 +93,7 @@ vexp_util.c \
 voxalloc.c \
 wavetab.c
 
-INCLUDES=-I$(top_srcdir)/include -I$(top_srcdir)/packages/data/c/src -I$(top_srcdir)/packages/utils/c/src -I$(top_srcdir)/packages/signal/c/src
+INCLUDES=-I$(top_srcdir)/packages -I$(top_srcdir)/include
 
 noinst_HEADERS= \
 Rsend.h \

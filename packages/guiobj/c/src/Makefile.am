@@ -25,7 +25,7 @@ vecdisplay.c \
 matdisplay.c \
 xypad.c
 
-INCLUDES=-I$(top_srcdir)/include -I$(top_srcdir)/packages/utils/c/src -I$(top_srcdir)/packages/data/c/src
+INCLUDES=-I$(top_srcdir)/include -I$(top_srcdir)/packages
 
 noinst_HEADERS= \
 guiobj.h \

@@ -20,9 +20,9 @@
  */
 
 #include <fts/fts.h>
-#include <utils.h>
-#include "cvec.h"
-#include "fvec.h"
+#include <utils/c/include/utils.h>
+#include <data/c/include/cvec.h>
+#include <data/c/include/fvec.h>
 
 #include <stdlib.h>
 #include <ctype.h>

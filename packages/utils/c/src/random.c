@@ -38,7 +38,7 @@
 
 /* just another one to remind: seed = 1664525 * seed + 1013904223; */
 
-#include "utils.h"
+#include <utils/c/include/utils.h>
 
 
 #define RA 16807 /* multiplier */

@@ -26,7 +26,7 @@
 #define _DATA_CVEC_H_
 
 #include "data.h"
-#include "utils.h"
+#include <utils/c/include/utils.h>
 
 typedef struct _cvec_
 {

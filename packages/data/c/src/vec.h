@@ -25,7 +25,7 @@
 #ifndef _DATA_VEC_H_
 #define _DATA_VEC_H_
 
-#include "data.h"
+#include <data/c/include/data.h>
 #include "mat.h"
 
 DATA_API fts_metaclass_t *vec_type;

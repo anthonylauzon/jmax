@@ -20,7 +20,7 @@
  */
 
 
-#include "utils.h"
+#include <utils/c/include/utils.h>
 #include <math.h>
 #include <assert.h>
 

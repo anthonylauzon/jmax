@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include "data.h"
+#include <data/c/include/data.h>
 
 extern void value_config(void);
 extern void vec_config(void);

@@ -26,10 +26,10 @@
 #include <math.h>
 #include <string.h>
 #include <fts/fts.h>
-#include "ivec.h"
-#include "fvec.h"
-#include "cvec.h"
-#include "fmat.h"
+#include <data/c/include/ivec.h>
+#include <data/c/include/fvec.h>
+#include <data/c/include/cvec.h>
+#include <data/c/include/fmat.h>
 
 typedef struct 
 {

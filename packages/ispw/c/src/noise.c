@@ -20,7 +20,7 @@
  */
 
 #include <fts/fts.h>
-#include <utils.h>
+#include <utils/c/include/utils.h>
 
 typedef struct noise_t {
   fts_object_t _o;

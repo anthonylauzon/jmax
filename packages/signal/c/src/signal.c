@@ -25,7 +25,7 @@
  */
 
 #include "signal.h"
-#include <utils.h>
+#include <utils/c/include/utils.h>
 
 extern void signal_binop_config(void);
 extern void signal_abs_config(void);

@@ -21,9 +21,9 @@
  */
 #include <fts/fts.h>
 #include <float.h>
-#include "bpf.h"
-#include "ivec.h"
-#include "fvec.h"
+#include <data/c/include/bpf.h>
+#include <data/c/include/ivec.h>
+#include <data/c/include/fvec.h>
 
 /******************************************************
  *

@@ -25,7 +25,7 @@
 #ifndef _DATA_COL_H_
 #define _DATA_COL_H_
 
-#include "data.h"
+#include <data/c/include/data.h>
 #include "mat.h"
 
 DATA_API fts_symbol_t col_symbol;

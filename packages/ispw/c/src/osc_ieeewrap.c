@@ -23,7 +23,7 @@
 #include <fts/fts.h>
 #include <ftsconfig.h>
 
-#include <utils.h>
+#include <utils/c/include/utils.h>
 #include "wavetab.h"
 #include "osc.h"
 

@@ -28,7 +28,7 @@
 
 #include <fts/fts.h>
 #include "naming.h"
-#include "ivec.h"
+#include <data/c/include/ivec.h>
 
 #define funbuff_first(FB) (FB)->head.next
   

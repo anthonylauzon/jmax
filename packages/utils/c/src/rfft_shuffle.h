@@ -26,7 +26,7 @@
 #ifndef _RFFT_SHUFFLE_H_
 #define _RFFT_SHUFFLE_H_
 
-#include "utils.h"
+#include <utils/c/include/utils.h>
 
 /*****************************************************************************************
  *

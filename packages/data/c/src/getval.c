@@ -21,8 +21,8 @@
  */
 #include <fts/fts.h>
 #include "value.h"
-#include "ivec.h"
-#include "fvec.h"
+#include <data/c/include/ivec.h>
+#include <data/c/include/fvec.h>
 #include "vec.h"
 #include "mat.h"
 #include "dict.h"

@@ -23,7 +23,7 @@
  */
 
 
-#include "utils.h"
+#include <utils/c/include/utils.h>
 #include "rfft_shuffle.h"
 #include "cfft.h"
 

@@ -20,8 +20,8 @@
  */
 
 #include <fts/fts.h>
-#include <utils.h>
-#include "ivec.h"
+#include <utils/c/include/utils.h>
+#include <data/c/include/ivec.h>
 
 #include <stdlib.h>
 

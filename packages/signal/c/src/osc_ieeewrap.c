@@ -26,7 +26,7 @@
 
 
 #include <fts/fts.h>
-#include <utils.h>
+#include <utils/c/include/utils.h>
 #include "osc.h"
 
 /***************************************************************************

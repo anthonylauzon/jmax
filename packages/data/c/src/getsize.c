@@ -21,8 +21,8 @@
  */
 #include <fts/fts.h>
 #include "vec.h"
-#include "ivec.h"
-#include "fvec.h"
+#include <data/c/include/ivec.h>
+#include <data/c/include/fvec.h>
 #include "mat.h"
 
 /******************************************************

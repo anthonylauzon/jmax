@@ -49,7 +49,7 @@
 #undef __STRICT_BSD__
 
 #include <fts/fts.h>
-#include "ivec.h"
+#include <data/c/include/ivec.h>
 #include "vexp.h"
 #include "vexp_util.h"
 
