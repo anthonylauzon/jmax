@@ -80,28 +80,7 @@ public class ZoomTool extends Tool implements  DirectionListener, DynamicDragLis
     {
 	BpfGraphicContext egc = (BpfGraphicContext) gc;
 	Geometry geometry = egc.getAdapter().getGeometry();
-	/*if(egc.getAdapter().isVerticalZoomable())
-	  {
-	  if((direction & SelectionMover.HORIZONTAL_MOVEMENT) != 0)
-	    {
-		geometry.incrXZoom(deltaX);
-		egc.getStatusBar().post(egc.getToolManager().getCurrentTool(),""+(int)(geometry.getXZoom()*100)+"%");
-	    }	
-	    else
-		if((direction & SelectionMover.VERTICAL_MOVEMENT) != 0)
-		    {
-			//vertical zoom
-			((VerticalZoomable)egc.getAdapter()).incrYZoom(deltaY);
-			egc.getStatusBar().post(egc.getToolManager().getCurrentTool(),
-						""+((VerticalZoomable)egc.getAdapter()).getYZoom()+"%");
-			egc.getGraphicDestination().repaint();
-		    }
-	}
-	else
-	{*/
 	geometry.incrXZoom(deltaX);
-	egc.getStatusBar().post(egc.getToolManager().getCurrentTool(),""+(int)(geometry.getXZoom()*100)+"%");
-	//}	
     }
     public void dragEnd(int x, int y){}
     public void updateStartingPoint(int deltaX, int deltaY){}
