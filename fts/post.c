@@ -207,9 +207,6 @@ void fts_spost_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t *at)
 
 static fts_stack_t *post_stack = NULL;
 
-/* forward declaration */
-static fts_bytestream_t *fts_get_default_console_stream( void);
-
 static void post_output_chars( char *buffer, int n)
 {
   if (fts_get_default_console_stream())

@@ -84,10 +84,10 @@ fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   if (cl->ninlets)
     obj->in_conn = (fts_connection_t **) fts_calloc(cl->ninlets * sizeof(fts_connection_t *));
-  
+
   /* &@#!@#$%*@#$ "at - 1": very nice hack to survive until this gets really fixed (Merci Francois!) */
   if(fts_class_get_constructor(cl))
-    fts_class_get_constructor(cl)(obj, fts_SystemInlet, fts_s_init, ac + 1, at - 1);
+      fts_class_get_constructor(cl)(obj, fts_SystemInlet, fts_s_init, ac + 1, at - 1); 
 
   return obj;
 }
@@ -513,11 +513,11 @@ fts_object_unclient(fts_object_t *obj)
   /* if no id or object ID belongs to new client, do nothing */
   if (obj->head.id != FTS_NO_ID && !OBJECT_ID_CLIENT( obj->head.id))
     {
-      /* tell the client to release the Java part */
-      fts_client_release_object(obj);
-      
-      /* remove the object from the object table */
-      fts_object_table_remove(obj->head.id);
+	/* tell the client to release the Java part */
+	fts_client_release_object(obj);
+
+	/* remove the object from the object table */
+	fts_object_table_remove(obj->head.id);
     }
 }
 
@@ -590,7 +590,7 @@ fts_object_delete_from_patcher(fts_object_t *obj)
 
   /* release all client components (no patcher, no appearance) */
   fts_object_unclient(obj);
-  
+
   /* destroy or set no patcher */
   if(obj->refcnt == 0)
     fts_object_free(obj);
@@ -634,7 +634,7 @@ fts_object_recompute(fts_object_t *old)
 	/*if (old->head.id != FTS_NO_ID)
 	  fts_client_release_object_data(old);*/
 
-      obj = fts_object_redefine(old, old->head.id, old->argc, old->argv);
+      obj = fts_object_redefine(old, old->head.id, 1, old->argc, old->argv);
 
       /* Error property handling; currently it is a little bit
 	 of an hack beacause we need a explit "zero"  error
@@ -650,14 +650,14 @@ fts_object_recompute(fts_object_t *old)
 
 
 fts_object_t *
-fts_object_redefine(fts_object_t *old, int new_id, int ac, const fts_atom_t *at)
+fts_object_redefine(fts_object_t *old, int new_id, int doclient, int ac, const fts_atom_t *at)
 {
   int do_client;
   fts_symbol_t  var;
   fts_object_t  *new;
 
   /* If the new and the old id are the same, or if old do not have an id, don't do any update on the client side */
-  do_client = ((old->head.id != FTS_NO_ID) && (old->head.id != new_id));
+  do_client = ((old->head.id != FTS_NO_ID) && (old->head.id != new_id) && doclient);
 
   /* check for the "var : <obj> syntax" and  extract the variable name if any */
   if (fts_object_description_defines_variable(ac, at))
@@ -1030,6 +1030,49 @@ fts_object_send_properties(fts_object_t *obj)
     }
 }
 
+
+void
+fts_object_send_properties_immediately(fts_object_t *obj)
+{
+  /* If the object have an ID (i.e. was created by the client, or a property has
+     been assigned to it),
+     ask the object to send the ninlets and noutlets  properties,
+     and name and declaration if any. */
+  if (obj->head.id != FTS_NO_ID) 
+    { 
+      fts_client_send_property(obj, fts_s_x);
+      fts_client_send_property(obj, fts_s_y);
+      fts_client_send_property(obj, fts_s_height);
+      fts_client_send_property(obj, fts_s_width);
+
+      fts_client_send_property(obj, fts_s_font);
+      fts_client_send_property(obj, fts_s_fontSize);
+      fts_client_send_property(obj, fts_s_fontStyle);
+
+      if (fts_object_is_patcher(obj) && (! fts_object_is_error(obj)))
+	{
+	  fts_client_send_property(obj, fts_s_wx);
+	  fts_client_send_property(obj, fts_s_wy);
+	  fts_client_send_property(obj, fts_s_wh);
+	  fts_client_send_property(obj, fts_s_ww);
+	}
+
+      fts_client_send_property(obj, fts_s_ninlets);
+      fts_client_send_property(obj, fts_s_noutlets);
+      fts_client_send_property(obj, fts_s_error);
+      fts_client_send_property(obj, fts_s_error_description);
+
+      /* Usefull for comment or object with comments */
+      
+      fts_client_send_property(obj, fts_s_comment);
+      fts_client_send_property(obj, fts_s_layer);
+      fts_client_send_property(obj, fts_s_color);
+      fts_client_send_property(obj, fts_s_flash);
+
+      /* Ask the object to send to the client object specific properties */
+      fts_send_message(obj, fts_SystemInlet, fts_s_send_properties, 0, 0);
+    }
+}
 
 /* properties used by the ui (value for the moment) at run time (update related) */
 void

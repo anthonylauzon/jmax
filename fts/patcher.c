@@ -82,12 +82,26 @@ fts_symbol_t sym_setWW = 0;
 fts_symbol_t sym_setWH = 0;
 fts_symbol_t sym_addObject = 0;
 fts_symbol_t sym_addConnection = 0;
+/*fts_symbol_t sym_deleteObject = 0;
+  fts_symbol_t sym_deleteObjects = 0;*/
+fts_symbol_t sym_redefineObject = 0;
+fts_symbol_t sym_redefineTemplateObject = 0;
+fts_symbol_t sym_objectRedefined = 0;
 fts_symbol_t sym_setRedefined = 0;
 fts_symbol_t sym_blip = 0;
+fts_symbol_t sym_setDescription;
 
 #define set_editor_open(q) ((q)->editor_open = 1)
 #define set_editor_close(q) ((q)->editor_open = 0)
 #define editor_is_open(q) ((q)->editor_open != 0)
+
+static void
+printf_mess(const char *msg, int ac, const fts_atom_t *av)
+{
+  fprintf(stderr, "%s (%d args): ", msg, ac);
+  /*fprintf_atoms(stderr, ac, av);*/
+  fprintf(stderr, "\n");
+}
 
 extern fts_status_t receive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
 extern fts_status_t send_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
@@ -817,7 +831,7 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
   else
     this->inlets = 0;
-  
+
   if (noutlets)
     {
       this->outlets = (fts_outlet_t **) fts_malloc(sizeof(fts_outlet_t *) * noutlets);
@@ -1214,12 +1228,10 @@ patcher_get_patcher_type(fts_daemon_action_t action, fts_object_t *obj, fts_symb
 static void fts_patcher_start_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   patcher_open(o, fts_SystemInlet, fts_s_open, 0, 0);
-  /*fts_send_message(o, fts_SystemInlet, fts_s_open, 0, 0);*/
 }
 static void fts_patcher_stop_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   patcher_close(o, fts_SystemInlet, fts_s_close, 0, 0);
-  /*fts_send_message(o, fts_SystemInlet, fts_s_close, 0, 0);*/  
 }
 
 /**
@@ -1271,6 +1283,253 @@ static void fts_patcher_set_ww( fts_object_t *o, int winlet, fts_symbol_t s, int
 {
   fts_object_put_prop(o, fts_s_ww, at);
 }
+
+/****************************************************************/
+/********* ASYNCRONOUS ADDING       ******************************/
+static void 
+fts_patcher_add_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *)o;
+  fts_object_t *obj;
+  /*if (ac >= 1 && fts_is_int(&at[0]))
+    {*/
+  if(this)
+    {
+      //int id = fts_get_int(&at[0]);	  
+      obj = fts_eval_object_description((fts_patcher_t *)this, ac - 2, at + 2);
+      
+      fts_object_table_register(obj);	  
+      //fts_object_set_id(obj, id);
+	  
+      /***********************************************************/
+      /*   same code of fts_client_send_message in OLDclient    **/
+      /***********************************************************/
+      fts_client_start_msg(CLIENTMESS_CODE);
+      fts_client_add_object((fts_object_t *)this);
+      fts_client_add_symbol(sym_addObject);
+      fts_client_add_int(fts_object_get_id(obj));/*??*/
+      fts_client_add_atoms(obj->argc, obj->argv);
+      fts_client_done_msg();
+      /***********************************************************/
+      fts_object_send_properties(obj);
+      fts_send_message(obj, fts_SystemInlet, fts_s_upload, 0, 0);//????
+    }
+  else
+    printf_mess("System Error in FOS message NEW:  parent not found", ac, at);
+  /*}
+    else
+    printf_mess("System Error in FOS message NEW: bad args", ac, at); */
+}
+
+static void 
+fts_patcher_redefine_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *)o;
+  fts_object_t *obj;
+  fts_atom_t a[1];
+  int do_var = 0;
+
+  if (ac >= 2 && fts_is_object(&at[0]) && fts_is_int(&at[1]))
+    {
+      if(this)
+	{
+	  /* without object upload */
+	  fts_object_t *oldobj = fts_get_object(&at[0]);
+	  int newid = fts_get_int(&at[1]);
+
+	  obj = fts_object_redefine(oldobj, newid, 0, ac - 2, at + 2);
+
+	  if(fts_object_description_defines_variable(obj->argc, obj->argv))
+	    do_var = 1;
+
+	  /***********************************************************/
+	  /*   same code of fts_client_send_message in OLDclient    **/
+	  /***********************************************************/
+	  fts_client_start_msg(CLIENTMESS_CODE);
+	  fts_client_add_object((fts_object_t *)this);
+	  fts_client_add_symbol(fts_object_is_template(obj) ? sym_redefineTemplateObject : sym_redefineObject);
+	  fts_client_add_int(do_var);
+	  fts_client_add_int(newid);
+	  fts_client_add_atoms(obj->argc, obj->argv);
+	  fts_client_done_msg();
+	  /***********************************************************/
+
+	  fts_object_send_properties_immediately(obj);
+	  fts_send_message(obj, fts_SystemInlet, fts_s_upload, 0, 0);
+
+	  fts_set_object(&a[0], obj);
+	  fts_client_send_message((fts_object_t *)this, sym_objectRedefined, 1, a);
+	}
+      else
+	printf_mess("System Error in redefine_object:  parent not found", ac, at);
+    }
+  else
+    printf_mess("System Error in redefine_object: bad args", ac, at);  
+}
+
+static void 
+fts_patcher_redefine_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *)o;
+  
+  if (ac >= 0)
+    {
+      fts_atom_t argv[512];
+      int argc;
+
+      if (fts_object_description_defines_variable(ac, at))
+	{
+	  fts_set_symbol(&argv[0], fts_s_patcher); 
+
+	  /* copy arguments (ignoring variable) */
+	  for (argc = 1; (argc < ac - 1) && (argc < 512) ; argc++) 
+	    argv[argc] = at[argc+1];
+	}
+      else
+	{
+	  /* Plain syntax */
+	  fts_set_symbol(&argv[0], fts_s_patcher);
+
+	  for (argc = 1; (argc <= ac) && (argc < 512) ; argc++)
+	    argv[argc] = at[argc-1];
+	}
+
+      fts_patcher_redefine(this, argc, argv);
+
+      fts_client_send_message((fts_object_t *)this, sym_setDescription, argc - 1, argv + 1);
+    }
+  else
+    printf_mess("System Error in FOS message REDEFINE PATCHER: bad args", ac, at);
+}
+
+/*static void 
+  fts_patcher_delete_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+  {
+  if ((ac == 1) && fts_is_object(&at[0]))
+  {
+  fts_object_t *obj;
+  fts_atom_t a[1];
+  
+  obj = fts_get_object(&at[0]);
+  
+  if (obj)
+  {
+  fts_set_int(&a[0], fts_object_get_id(obj));
+  
+  fts_object_delete_from_patcher(obj);
+  
+  fts_client_send_message(o, sym_deleteObject, 1, a);
+  }      
+  else
+  printf_mess("System Error in message DELETE OBJECT: deleting a non existing object", ac, at);
+  }
+  else
+  printf_mess("System Error in message DELETE OBJECT: bad args", ac, at);
+  }
+
+  static void 
+  fts_patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+  {
+  post("delete objects %d \n", ac);
+  
+  if (ac >= 1)
+  {
+  fts_object_t *obj;
+  fts_atom_t a[ac];
+  int i;
+  
+  for(i=0; i<ac; i++)
+  {
+  obj = fts_get_object(&at[i]);
+  if (obj)
+  {
+  fts_set_int(&a[i], fts_object_get_id(obj));
+  fts_object_delete_from_patcher(obj);
+  }
+  else
+  printf_mess("System Error in message DELETE OBJECTS: deleting a non existing object", ac, at);
+  }
+  
+  fts_client_start_msg(CLIENTMESS_CODE);
+  fts_client_add_object(o);
+  fts_client_add_symbol(sym_deleteObjects);
+  fts_client_add_atoms(ac, a);
+  fts_client_done_msg();
+  }
+  else
+  printf_mess("System Error in message DELETE OBJECT: bad args", ac, at);
+  }*/
+
+static void 
+fts_patcher_add_connection_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *)o;
+  fts_object_t *obj;
+  fts_atom_t a[6];
+
+  if((ac == 5) &&
+     fts_is_int(&at[0]) &&
+     fts_is_object(&at[1]) &&
+     fts_is_int(&at[2]) &&
+     fts_is_object(&at[3]) &&
+     fts_is_int(&at[4]))
+      {
+	  int inlet, outlet;
+	  int id;
+	  fts_object_t *from, *to;
+	  fts_status_t ret;
+	  fts_connection_t *connection;
+
+	  id     = fts_get_int(&at[0]);
+	  from   = fts_get_object(&at[1]);
+	  outlet = fts_get_int(&at[2]);
+	  to     = fts_get_object(&at[3]);
+	  inlet  = fts_get_int(&at[4]);
+
+	  if (to && from)
+	      {
+		  connection = fts_connection_new( id, from, outlet, to, inlet);
+		  
+		  if (! connection)
+		      {
+			  return;
+		      }
+
+		  fts_set_int(&a[0],id);
+		  fts_set_object(&a[1], from);
+		  fts_set_int(&a[2], outlet);
+		  fts_set_object(&a[3], to);
+		  fts_set_int(&a[4], inlet);
+		  fts_set_int(&a[5], connection->type);
+		  fts_client_send_message((fts_object_t *)this, sym_addConnection, 6, a);
+	      }
+	  else
+	      printf_mess("System Error in FOS message CONNECT: Error trying to connect non existing objects", ac, at);
+      }
+  else
+      printf_mess("System Error in FOS message CONNECT: bad args", ac, at);
+}
+
+static void 
+fts_patcher_delete_connection_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  if ((ac == 1) && fts_is_connection(&at[0]))
+    {
+      fts_connection_t *c;
+
+      c = fts_get_connection(&at[0]);
+
+      if (c)
+	  fts_connection_delete(c);
+      else
+	  printf_mess("System Error in message DELETE CONNECTION: disconnecting non existing connection", ac, at);
+    }
+  else
+      printf_mess("System Error in message DELETE CONNECTION: bad args", ac, at);
+}
+
+/****************************************************************/
+/****************************************************************/
 
 /* daemon for getting the property "state". */
 static void
@@ -1342,6 +1601,20 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_wy"), fts_patcher_set_wy);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_ww"), fts_patcher_set_ww);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_wh"), fts_patcher_set_wh);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_object"), fts_patcher_add_object_from_client);
+  /*fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("delete_object"), 
+    fts_patcher_delete_object_from_client);
+    fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("delete_objects"), 
+    fts_patcher_delete_objects_from_client);*/
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_connection"), 
+			    fts_patcher_add_connection_from_client);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("delete_connection"),
+			    fts_patcher_delete_connection_from_client);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("redefine_object"),
+			    fts_patcher_redefine_object_from_client);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("redefine_patcher"),
+			    fts_patcher_redefine_from_client);
 
   fts_method_define_varargs( cl, fts_SystemInlet, fts_new_symbol("save_dotpat_file"), patcher_save_dotpat_file); 
   fts_method_define_varargs( cl, fts_SystemInlet, fts_new_symbol("load_jmax_file"), patcher_load_jmax_file); 
@@ -1951,7 +2224,6 @@ fts_create_root_patcher()
 
   fts_set_symbol(a, fts_new_symbol("root"));
   fts_root_patcher = (fts_patcher_t *)fts_object_create(patcher_class, 1, a);
-
   fts_object_set_id((fts_object_t *)fts_root_patcher, 1);  
 }
 
@@ -2017,8 +2289,12 @@ void fts_kernel_patcher_init(void)
   sym_setWH = fts_new_symbol("setWH");
   sym_addObject = fts_new_symbol("addObject");
   sym_addConnection = fts_new_symbol("addConnection");
+  sym_redefineObject = fts_new_symbol("redefineObject");
+  sym_redefineTemplateObject = fts_new_symbol("redefineTemplateObject");
+  sym_objectRedefined = fts_new_symbol("objectRedefined");
   sym_setRedefined = fts_new_symbol("setRedefined");
   sym_blip = fts_new_symbol("setMessage");
+  sym_setDescription = fts_new_symbol("setDescription");
 
   fts_register_object_doctor(fts_new_symbol("patcher"), patcher_doctor);
 

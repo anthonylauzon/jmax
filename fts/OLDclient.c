@@ -1022,7 +1022,7 @@ static fts_heap_t *changes_heap;
 static struct changes *changes_queue_head = 0;
 
 
-static void fts_client_send_property(fts_object_t *obj, fts_symbol_t name)
+void fts_client_send_property(fts_object_t *obj, fts_symbol_t name)
 {
   fts_atom_t a;
 
@@ -1301,7 +1301,7 @@ fts_client_updates_init(void)
 
 static fts_symbol_t fts_s_download;
 static fts_symbol_t fts_s_load_init;
-static fts_symbol_t fts_s_setDescription;
+/*static fts_symbol_t fts_s_setDescription;*/
 
 /******************************************************************************/
 /*                                                                            */
@@ -1573,52 +1573,47 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
    in the future it will be the client to do the work.
    */
 
-static void
-fts_mess_client_redefine_patcher(int ac, const fts_atom_t *av)
-{
+/*static void
+  fts_mess_client_redefine_patcher(int ac, const fts_atom_t *av)
+  {
   trace_mess("Received redefine patcher", ac, av);
 
   if (ac >= 1)
-    {
-      fts_atom_t argv[512];
-      int argc;
-      fts_patcher_t  *patcher;
+  {
+  fts_atom_t argv[512];
+  int argc;
+  fts_patcher_t  *patcher;
+  
+  patcher = (fts_patcher_t *) fts_get_object(&av[0]);
 
-      patcher = (fts_patcher_t *) fts_get_object(&av[0]);
-
-      if (! patcher)
-	{
-	  printf_mess("System Error in FOS message REDEFINE PATCHER: redefining a non existing patcher", ac, av);
-	  return;
-	}
-
-      if (fts_object_description_defines_variable(ac - 1, av + 1))
-	{
-	  /* Variable syntax */
-	  /* argv[0] = av[1]; */
-	  /* argv[1] = av[2]; */
-	  fts_set_symbol(&argv[0], fts_s_patcher); /* "jpatcher" */
-
-	  /* copy arguments (ignoring variable) */
-	  for (argc = 1; (argc < ac - 2) && (argc < 512) ; argc++) 
-	    argv[argc] = av[argc + 2];
-	}
-      else
-	{
-	  /* Plain syntax */
-	  fts_set_symbol(&argv[0], fts_s_patcher);
-
-	  for (argc = 1; (argc < ac) && (argc < 512) ; argc++)
-	    argv[argc] = av[argc];
-	}
-
-      fts_patcher_redefine(patcher, argc, argv);
-
-      fts_client_send_message((fts_object_t *)patcher, fts_s_setDescription, argc - 1, argv + 1);
-    }
+  if (! patcher)
+  {
+  printf_mess("System Error in FOS message REDEFINE PATCHER: redefining a non existing patcher", ac, av);
+  return;
+  }
+  
+  if (fts_object_description_defines_variable(ac - 1, av + 1))
+  {
+  fts_set_symbol(&argv[0], fts_s_patcher); 
+  
+  for (argc = 1; (argc < ac - 2) && (argc < 512) ; argc++) 
+  argv[argc] = av[argc + 2];
+  }
   else
-    printf_mess("System Error in FOS message REDEFINE PATCHER: bad args", ac, av);
-}
+  {
+  fts_set_symbol(&argv[0], fts_s_patcher);
+  
+  for (argc = 1; (argc < ac) && (argc < 512) ; argc++)
+  argv[argc] = av[argc];
+  }
+  
+  fts_patcher_redefine(patcher, argc, argv);
+  
+  fts_client_send_message((fts_object_t *)patcher, fts_s_setDescription, argc - 1, argv + 1);
+  }
+  else
+  printf_mess("System Error in FOS message REDEFINE PATCHER: bad args", ac, av);
+  }*/
 
 /*
    REDEFINE_OBJECT (obj)object (int) new_id [<args>]*
@@ -1638,7 +1633,7 @@ fts_mess_client_redefine_object(int ac, const fts_atom_t *av)
 
       object = fts_get_object(&av[0]);
       new_id = fts_get_int(&av[1]);
-      fts_object_redefine(object, new_id, ac - 2, av + 2);
+      fts_object_redefine(object, new_id, 1, ac - 2, av + 2);
     
     }
   else
@@ -1906,7 +1901,7 @@ static void fts_messtile_init(void)
 {
   fts_s_download = fts_new_symbol("download");
   fts_s_load_init = fts_new_symbol("load_init");
-  fts_s_setDescription = fts_new_symbol("setDescription");
+  /*fts_s_setDescription = fts_new_symbol("setDescription");*/
 
   fts_client_install(SAVE_PATCHER_BMAX_CODE, fts_mess_client_save_patcher_bmax);
 
@@ -1923,7 +1918,7 @@ static void fts_messtile_init(void)
   fts_client_install(DOWNLOAD_CONNECTION_CODE, fts_mess_client_download_connection);
 
   fts_client_install(NEW_OBJECT_CODE,  fts_mess_client_new);  
-  fts_client_install(REDEFINE_PATCHER_CODE,  fts_mess_client_redefine_patcher);
+  /*fts_client_install(REDEFINE_PATCHER_CODE,  fts_mess_client_redefine_patcher);*/
   fts_client_install(REDEFINE_OBJECT_CODE,  fts_mess_client_redefine_object);
   fts_client_install(DELETE_OBJECT_CODE,  fts_mess_client_delete_object);
 
@@ -1934,7 +1929,6 @@ static void fts_messtile_init(void)
   fts_client_install(PUTPROP_CODE,  fts_mess_client_put_prop);
   fts_client_install(GETPROP_CODE,  fts_mess_client_get_prop);
   fts_client_install(GETALLPROP_CODE,  fts_mess_client_get_all_prop);
-  /*fts_client_install(REMOTE_CALL_CODE,  fts_mess_client_remote_call);*/
   fts_client_install(RECOMPUTE_ERRORS_CODE, fts_mess_client_recompute_errors);
   fts_client_install(FTS_SHUTDOWN_CODE,  fts_mess_client_shutdown);
 }

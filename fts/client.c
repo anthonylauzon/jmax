@@ -594,9 +594,11 @@ static void end_symbol_index_action( unsigned char input, void *data)
 static void end_symbol_cache_action( unsigned char input, void *data)
 {
   protocol_decoder_t *decoder = (protocol_decoder_t *)data;
-  fts_symbol_t s = fts_new_symbol_copy( fts_stack_get_base( &decoder->buffer));
+  fts_symbol_t s;
   fts_atom_t a;
 
+  fts_stack_push( &decoder->buffer, unsigned char, '\0');
+  s = fts_new_symbol_copy( fts_stack_get_base( &decoder->buffer));
   symbol_cache_put( &decoder->from_client_cache, s, decoder->ival);
   fts_set_symbol( &a, s);
   fts_stack_push( &decoder->args, fts_atom_t, a);
