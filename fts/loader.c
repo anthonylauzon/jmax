@@ -115,6 +115,7 @@ static int fts_binary_file_map( FILE *f, fts_binary_file_desc_t *desc)
 
   if (fread( desc->code, sizeof(char), header.code_size, f) < header.code_size)
     {
+      fts_free( desc->code);
 #ifdef LOAD_DEBUG
       perror( "fts_binary_file_map");
 #endif
