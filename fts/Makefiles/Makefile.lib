@@ -1,0 +1,133 @@
+#                        Copyright (c) 1995 by IRCAM
+#                            All rights reserved.
+#
+#  For any information regarding this and other IRCAM software, please
+#  send email to:
+#                              manager@ircam.fr
+#
+#
+# $Revision: 1.23 $ IRCAM $Date: 1997/07/11 14:35:59 $
+#
+# Eric Viara for Ircam March 1995
+#
+# Makefile.common
+#
+
+#
+# Variables that architecture and application may or have to define
+#
+#
+
+#
+# ARCH_CFLAGS : CFLAGS defined for the architecture, in global or module 
+#              Makefile.$(ARCH) files.
+#
+# MODE_CFLAGS: CFLAGS defined for the compilation mode, in the global
+#              Makefile.$(MODE) files.
+#
+#
+# MODULE_CFLAGS: CFLAGS defined for the module, in the module Makefile.
+#             Note that at least you have to put the include path
+#             you use, beacause include path are not defined here.
+#             This variable may also be modified by the module Makefile.$(ARCH)
+#             file, for example to add architecture specific include path.
+#
+# ARCH_LDFLAGS : LDFLAGS defined for the architecture.
+# MODE_LDFLAGS : LDFLAGS defined for the mode.
+# MODULE_LDFLAGS : LDFLAGS defined in the module; should not include the libraries.
+#
+# ARCH_SOFLAGS : SOFLAGS (flags for producing .so libraries) defined for the architecture.
+# MODE_SOFLAGS : SOFLAGS defined for the mode.
+# MODULE_SOFLAGS : SOFLAGS defined in the module; should not include the libraries.
+#
+# CC         : C compiler to use; define in the global Makefile.$(ARCH), default to cc
+#
+# LD         : Linker command to use; define in the global Makefile.$(ARCH), default to cc.
+#
+# RANLIB     : ranlib command to use, if needed; define in the global Makefile.$(ARCH); default
+#              to a void command                
+#
+# SYSLIB     : system libraries to use; to define in the local makefiles of the module
+#                where the linking happen (either ARCH or whatever) and not here; here we provide FTS_SYS_LIBS,
+#                that are the equivalent for FST only executables.
+#
+# SOURCES    : sources to compile for a module
+#
+# ARCH_SOURCE: sources to compile that depend on the architecture.
+#
+#
+# Notes: Since this global makefile do not refer to applications, includes directory
+# must be specified at the module level, for each module.
+#
+#
+#
+#
+#   COMMON TARGETS
+#
+# Default target: compile the current module.
+# all           : compile the current module.
+#
+# cleanobjs : delete the objects of the current modules.
+# clean     : delete every intermediate product of the module compilation
+#             that is not included in the distribution; usually, objs and
+#             libs, unless the library *is* distributed, as the client library.
+#
+# cleanall  : delete everything produced by the compilation, including things
+#             intended to be distributed.
+#
+# Use clean before recompiling, or to spare disk space without destroying the distribution.
+# The target all is necessary so that we can give multiple targets in compilation commands
+# like "clean all", but it must implemented in all the module Makefiles.
+#
+
+
+##
+## Default names for system programs; some architecture may change these names
+## so we define them before loading other architecture dependent makefile
+
+CC = cc
+AR = ar
+RANLIB = @$(DISTDIR)/scripts/void
+AS = as
+LD = cc
+
+## includes
+
+include $(DISTDIR)/Makefiles/Makefile.$(ARCH)
+include $(DISTDIR)/Makefiles/Makefile.$(MODE)
+
+##
+## OBJROOT exists to simplify the makefile for "external" modules
+
+
+ifeq ($(strip $(OBJROOT)),)
+OBJROOT = $(PACKAGEROOT)/obj
+endif
+
+ifeq ($(strip $(OBJDIR)),)
+OBJDIR  = $(OBJROOT)/$(ARCH)/$(MODE)
+endif
+
+ifeq ($(strip $(LIBDIR)),)
+LIBDIR  = $(PACKAGEROOT)/lib/$(ARCH)/$(MODE)
+endif
+
+ifeq ($(strip $(BINDIR)),)
+BINDIR  = $(PACKAGEROOT)/bin/$(ARCH)/$(MODE)
+endif
+
+OBJECTS = $(addprefix $(OBJDIR)/, $(addsuffix .o , $(basename $(SOURCES))))
+
+
+CFLAGS = -I$(DISTDIR)/src/ $(MODULE_CFLAGS) $(MODE_CFLAGS) $(ARCH_CFLAGS) 
+ARFLAGS = rc $(MODE_ARFLAGS) $(ARCH_ARFLAGS)
+LDFLAGS =  $(MODULE_LDFLAGS) $(MODE_LDFLAGS) $(ARCH_LDFLAGS) 
+OBJCFLAGS = 
+
+FTS_LDFLAGS = $(MODULE_LDFLAGS) $(MODE_LDFLAGS) $(ARCH_LDFLAGS) $(FTS_ARCH_LDFLAGS) 
+FTS_SOFLAGS = $(MODULE_SOFLAGS) $(MODE_SOFLAGS) $(ARCH_SOFLAGS) $(FTS_ARCH_SOFLAGS) 
+
+
+
+
+

@@ -1,0 +1,2 @@
+SOURCES = ucs.c messtile.c dsptile.c startup.c
+

@@ -1,0 +1,8 @@
+#
+# Makefile.debug
+#
+
+MODE_CFLAGS  = -g -DDEBUG
+MODE_LDFLAGS = -g
+MODE_SOFLAGS = 
+

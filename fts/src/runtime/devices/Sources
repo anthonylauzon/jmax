@@ -1,0 +1,22 @@
+ifeq ($(AUDIO_LIBRARY),sgial)
+AUDIO_SOURCES = sgidev.c
+endif
+
+ifeq ($(AUDIO_LIBRARY),sgial2)
+AUDIO_SOURCES = sgial2dev.c
+endif
+
+ifeq ($(AUDIO_LIBRARY),oss)
+AUDIO_SOURCES = ossdev.c
+endif
+
+ifeq ($(OS_TYPE),unix)
+OS_SOURCES = unixdev.c
+endif
+
+SOURCES = devconf.c \
+	  devices.c \
+	  profdev.c \
+	  $(OS_SOURCES) \
+	  $(AUDIO_SOURCES)
+

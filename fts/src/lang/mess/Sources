@@ -1,0 +1,12 @@
+SOURCES = class.c      \
+	  classes.c    \
+	  events.c     \
+	  mess.c       \
+	  objects.c    \
+	  objtable.c   \
+	  patcher.c    \
+	  properties.c \
+	  symbols.c    \
+	  atoms.c     \
+	  compatibility.c
+

@@ -1,0 +1,10 @@
+
+ROOTDIR := ../..
+
+include Makefile.common
+
+exports_file:
+	cc -E $(FTS_FULL_INCLUDES) -DSGI $(ROOTDIR)/Makefiles/exports.c | fgrep extern  
+.PHONY: exports_file
+
+#	cc -E $(FTS_FULL_INCLUDES) -DSGI $(ROOTDIR)/src/Makefiles/exports.c | fgrep extern   >! $(ROOTDIR)/Makefiles/exports_file

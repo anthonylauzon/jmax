@@ -1,0 +1,5 @@
+SOURCES = \
+	dspgraph.c	\
+	signal.c	\
+	dsp.c	
+

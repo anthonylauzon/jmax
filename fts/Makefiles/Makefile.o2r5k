@@ -1,0 +1,32 @@
+##
+## Flags for an O2 with r5k
+##
+
+VENDOR := sgi
+AUDIO_LIBRARY := sgial2
+OS_TYPE := unix
+
+SYSTEM_CFLAGS := -mips4 -n32 -r5000 -DIRIX63 
+SYSTEM_LDFLAGS := -mips4 -n32 -lmalloc
+SYSTEM_SOFLAGS := -mips4 -n32 
+
+SYSTEM_OPT_CFLAGS := -Ofast=ip32 -IPA -OPT:roundoff=3 -OPT:IEEE_arithmetic=3
+SYSTEM_OPT_LDFLAGS = -Ofast=ip32 -IPA -Wl,-exports_file,$(EXPORTS_FILE) 
+SYSTEM_OPT_SOFLAGS = -IPA
+
+
+ARCH_CFLAGS := $(SYSTEM_CFLAGS) -DSGI
+ARCH_LDFLAGS := $(SYSTEM_LDFLAGS)
+ARCH_SOFLAGS := $(SYSTEM_SOFLAGS)
+
+ARCH_OPT_CFLAGS := $(SYSTEM_OPT_CFLAGS)
+ARCH_OPT_LDFLAGS = $(SYSTEM_OPT_LDFLAGS)
+ARCH_OPT_SOFLAGS = $(SYSTEM_OPT_SOFLAGS)
+
+##
+## FTS specific declarations
+##
+
+FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm 
+FTS_ARCH_LIBS = 
+FTS_USER_LIBS_FLAGS = -all

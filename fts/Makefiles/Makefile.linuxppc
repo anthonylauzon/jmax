@@ -1,0 +1,19 @@
+#
+#Gnu mode, force the compilation with the gcc compiler on any architecture
+# with the -Wall flag set, and no other special flags; may not work in all the
+# architectures
+#
+
+VENDOR := gnu
+AUDIO_LIBRARY := oss
+OS_TYPE := unix
+CC := gcc
+
+ARCH_CFLAGS := -Wall -DGNU 
+ARCH_LDFLAGS :=
+
+
+ARCH_OPT_CFLAGS := -O3
+ARCH_OPT_LDFLAGS := 
+
+FTS_SYS_LIBS = -lm 
