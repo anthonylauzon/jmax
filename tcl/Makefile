@@ -66,7 +66,7 @@ FTSDIR = ${exec_prefix}/bin
 FTS_SYS_LIBS = -ldl -laudiofile -lpthread
 JAVACFLAGSX = 
 JAVACX = javac
-JMAX_VERSION = 3.0.0_latest_cvs
+JMAX_VERSION = 3.0.1_latest_cvs
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LN_S = ln -s
 MAKEINFO = makeinfo
@@ -75,7 +75,7 @@ PACKAGE = jmax
 PLATFORM_PACKAGES = alsa oss unixdtd
 RANLIB = ranlib
 ROOTDIR = ${prefix}/share/jmax
-VERSION = 3.0.0_latest_cvs
+VERSION = 3.0.1_latest_cvs
 
 pkgtcldir = $(pkgdatadir)/tcl
 pkgtcl_DATA =  icons.tcl jmaxboot.tcl linuxpc.tcl o2r10k.tcl origin.tcl projects.tcl indyr4k.tcl jmaxpkg.tcl macosx.tcl o2r5k.tcl packages.tcl site.tcl defaults.tcl intrinsics.tcl linuxmac.tcl menu.tcl octane.tcl params.tcl startup.tcl require.tcl

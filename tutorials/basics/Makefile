@@ -66,7 +66,7 @@ FTSDIR = ${exec_prefix}/bin
 FTS_SYS_LIBS = -ldl -laudiofile -lpthread
 JAVACFLAGSX = 
 JAVACX = javac
-JMAX_VERSION = 3.0.0_latest_cvs
+JMAX_VERSION = 3.0.1_latest_cvs
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LN_S = ln -s
 MAKEINFO = makeinfo
@@ -75,7 +75,7 @@ PACKAGE = jmax
 PLATFORM_PACKAGES = alsa oss unixdtd
 RANLIB = ranlib
 ROOTDIR = ${prefix}/share/jmax
-VERSION = 3.0.0_latest_cvs
+VERSION = 3.0.1_latest_cvs
 
 tutorialdir = $(pkgdatadir)/tutorials/basics
 tutorial_DATA =   BASICS.jmax  bang.tutorial.jmax  comment.tutorial.jmax  coucou.jmax  labels.tutorial.jmax  lists.tutorial.jmax  message.tutorial.jmax  metro.tutorial.jmax  numbers.tutorial.jmax  order.tutorial.jmax  order1.tutorial.jmax  order2.tutorial.jmax  order3.tutorial.jmax  patchers.tutorial.jmax  project.env  recursion.tutorial.jmax  system.summary.jmax  variables.tutorial.jmax 

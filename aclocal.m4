@@ -576,5 +576,3 @@ AC_DEFUN([ACX_C_RESTRICT],
  fi
 ])
 
-
-

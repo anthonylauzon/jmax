@@ -43,10 +43,27 @@ public class OpenAction extends EditorAction
 {
   Frame frame;
     Fts fts;
+  private File preset_file;
+  
+  public OpenAction()
+  {
+    preset_file = null;
+  }
+
+  public OpenAction(File file)
+  {
+     preset_file = file;
+  }
   
   public void doAction(EditorContainer container)
   {
-    File file = MaxFileChooser.chooseFileToOpen(container.getFrame());
+    File file;
+
+    if (preset_file == null)
+      file = MaxFileChooser.chooseFileToOpen(container.getFrame());
+    else
+      file = preset_file;
+
     frame = container.getFrame();
     fts = container.getEditor().getFts();
 
@@ -57,6 +74,10 @@ public class OpenAction extends EditorAction
 	    fts.fireAtomicAction(true);
 
 	    MaxDocument document = Mda.loadDocument(fts, file);
+	    
+	    RecentFileHistory recentFileHistory = MaxApplication.getRecentFileHistory();
+            recentFileHistory.addFile(file);
+
 	    try
 	      {		
 		  frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));  

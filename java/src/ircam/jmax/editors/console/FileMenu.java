@@ -33,6 +33,8 @@ import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
 import ircam.jmax.toolkit.actions.*;
 
+//import ircam.jmax.editors.console.*;
+
 /** Implement the console editor File Menu */
 
 public class FileMenu extends DefaultFileMenu

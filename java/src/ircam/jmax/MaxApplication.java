@@ -54,11 +54,21 @@ import ircam.jmax.script.pkg.*;
  * - file format versions handling
  * - system properties
  * - creation of new windows (new, double-click on a subpatcher, etc.)
+ * - recent file history
  * - quit of the application
  */
 
 public class MaxApplication extends Object
 {
+    // Recent file history
+
+    static RecentFileHistory recentFileHistory = new RecentFileHistory(5);
+
+    public static RecentFileHistory getRecentFileHistory()
+    {
+	return recentFileHistory;
+    }
+
   // The global server
 
   static Fts fts;
@@ -424,6 +434,11 @@ public class MaxApplication extends Object
 	return;
       }
 
+    // Load recent file history
+    // This should be really here, right before we eventually
+    // open command line documents
+    recentFileHistory.load();
+
     // Look if there are documents to open in the 
     // command line.
 
@@ -628,6 +643,8 @@ public class MaxApplication extends Object
 	      }
 	  }
       }
+
+    recentFileHistory.save();
 
     // Now, the quit is sure, we execute the exit hooks
 

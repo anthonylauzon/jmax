@@ -25,6 +25,8 @@
 
 package ircam.jmax.toolkit.menus;
 
+import java.io.*;
+
 import java.awt.*;
 import java.awt.event.*;
 
@@ -48,6 +50,9 @@ public class DefaultFileMenu extends EditorMenu
 
     add(DefaultActions.newAction, "New", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_N);
     add(DefaultActions.openAction, "Open", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_O);
+
+    RecentMenu recentMenu = new RecentMenu();
+    add(recentMenu);
 
     addSeparator();
 

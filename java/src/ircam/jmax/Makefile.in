@@ -79,7 +79,7 @@ SUBDIRS = dialogs editors fts mda script toolkit widgets
 
 EXTRA_DIST = package.html
 noinst_PROGRAMS = package
-package_SOURCES =  MaxApplication.java MaxToolFinder.java MaxVector.java MaxVersion.java MaxWhenHookTable.java MaxWindowManager.java ObjectCreatorManager.java Platform.java
+package_SOURCES =  RecentFileHistory.java MaxApplication.java MaxToolFinder.java MaxVector.java MaxVersion.java MaxWhenHookTable.java MaxWindowManager.java ObjectCreatorManager.java Platform.java
 
 
 JAVACX = @JAVACX@
@@ -98,9 +98,10 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../../../include
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-package_OBJECTS =  MaxApplication.class MaxToolFinder.class \
-MaxVector.class MaxVersion.class MaxWhenHookTable.class \
-MaxWindowManager.class ObjectCreatorManager.class Platform.class
+package_OBJECTS =  RecentFileHistory.class MaxApplication.class \
+MaxToolFinder.class MaxVector.class MaxVersion.class \
+MaxWhenHookTable.class MaxWindowManager.class \
+ObjectCreatorManager.class Platform.class
 package_LDADD = $(LDADD)
 package_DEPENDENCIES = 
 package_LDFLAGS = 

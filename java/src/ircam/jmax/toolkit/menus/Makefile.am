@@ -4,7 +4,8 @@ package_SOURCES = \
 DefaultFileMenu.java\
 DefaultHelpMenu.java\
 EditorMenu.java\
-MaxWindowJMenu.java
+MaxWindowJMenu.java\
+RecentMenu.java
 
 JAVACX=@JAVACX@
 JAVACFLAGSX=@JAVACFLAGSX@
