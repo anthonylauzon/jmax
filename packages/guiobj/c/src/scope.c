@@ -471,7 +471,7 @@ scope_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   at++;
 
   this->data = 0;
-  this->sr = 1.0;
+  this->sr = fts_get_sample_rate();
   this->period_msec = 100.0;
 
   this->data = ftl_data_alloc(sizeof(scope_ftl_t));
