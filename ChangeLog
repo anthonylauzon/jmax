@@ -1,3 +1,8 @@
+2001-03-30  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* fts/src/runtime/devices/bytestream.c: bug fix (bytestream
+	listener can now remove itself)
+
 2001-03-29  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* added package macosx, containing HAL audio port for Mac OS X

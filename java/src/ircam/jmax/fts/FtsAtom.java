@@ -182,6 +182,15 @@ public class FtsAtom {
 		    setVoid();
     }
 
+  public final float getNumberAsFloat()
+  {
+    if(isInt())
+      return (float)intValue;
+    else if (isFloat())
+      return floatValue;
+    else
+      return (float)0.0;
+  }
 
   public int type;
   public int intValue;

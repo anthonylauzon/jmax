@@ -184,6 +184,8 @@ abstract public class GraphicObject implements DisplayObject
       gobj = new ircam.jmax.editors.patcher.objects.Comment( sketch, object);
     else if ( theName.equals( "slider"))
       gobj = new ircam.jmax.editors.patcher.objects.Slider( sketch, object);
+    else if ( theName.equals( "vecdisplay"))
+      gobj = new ircam.jmax.editors.patcher.objects.VectorDisplay( sketch, object);
     else if (theName.equals( "fork"))
       gobj = new ircam.jmax.editors.patcher.objects.Fork( sketch, object);
     else if (theName.equals( "inlet"))

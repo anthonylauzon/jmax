@@ -134,6 +134,8 @@ public class FtsObject
 	  obj =  new FtsMessConstObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
 	else if (className == "display")
 	  obj =  new FtsDisplayObject(fts, parent);
+	else if (className == "vecdisplay")
+	  obj =  new FtsVectorDisplayObject(fts, parent);
 	else if (className == "slider")
 	  obj =  new FtsSliderObject(fts, parent);
 	else if (className == "intbox")
@@ -427,14 +429,19 @@ public class FtsObject
 
   /** Set the Width property. Tell it to the server, too. */
 
-    public /*final*/ void setWidth(float w)
+  public final void setWidth(float w)
   {
-      if (this.width != w)
-	  {
-	      fts.getServer().putObjectProperty(this, "w", (int)w);
-	      this.width = w;
-	      setDirty();
-	  }
+    if (this.width != w)
+      {
+	fts.getServer().putObjectProperty(this, "w", (int)w);
+	this.width = w;
+	setDirty();
+      }
+  }
+
+  public final void setWidthSilently(float w)
+  {
+    this.width = w;
   }
 
     /** Get the Height property */
@@ -447,7 +454,7 @@ public class FtsObject
 
   /** Set the Height property. Tell it to the server, too. */
 
-    public final void setHeight(float h)
+  public final void setHeight(float h)
     {
 	if (this.height != h)
 	    {

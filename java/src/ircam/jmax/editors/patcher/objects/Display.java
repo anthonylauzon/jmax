@@ -49,7 +49,20 @@ class Display extends GraphicObject implements FtsMessageListener
   {
     super(theSketchPad, theFtsObject);
 
-    redefine("###");
+    display = "###";
+
+    int w = getFontMetrics().stringWidth(display) + 4;
+    int h = getFontMetrics().getHeight() + 4;
+
+    if(w < minWidth)
+      ftsObject.setWidthSilently(ScaleTransform.getInstance().invScaleX(minWidth));
+    else
+      ftsObject.setWidthSilently(ScaleTransform.getInstance().invScaleX(w));
+
+    if(w < underWidthMax)
+      underWidth = w;
+    else
+      underWidth = underWidthMax;
 
     setFont(getFont());
   }
@@ -63,31 +76,26 @@ class Display extends GraphicObject implements FtsMessageListener
     return display;
   }
 
-  public void redefine( String text) 
+  // Set the text when FTS change the display content
+  public void messageChanged(String text)
   {
     int w = getFontMetrics().stringWidth(text) + 4;
     int h = getFontMetrics().getHeight() + 4;
 
+    redraw();
+
     display = text;
 
     if(w < minWidth)
-      super.setWidth(minWidth);
+      ftsObject.setWidthSilently(ScaleTransform.getInstance().invScaleX(minWidth));
     else
-      super.setWidth( w);
-
-    super.setHeight( h);
+      ftsObject.setWidthSilently(ScaleTransform.getInstance().invScaleX(w));
 
     if(w < underWidthMax)
       underWidth = w;
     else
       underWidth = underWidthMax;
-  }
 
-  // Set the text when FTS change the display content
-  public void messageChanged(String text)
-  {
-    redraw();
-    redefine( text);
     redraw();
   }
 

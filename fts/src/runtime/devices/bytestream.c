@@ -93,8 +93,10 @@ fts_bytestream_input(fts_bytestream_t *stream, int n, const unsigned char *c)
 
   while(l)
     {
+      fts_bytestream_listener_t *next = l->next;
+
       l->callback(l->listener, n, c);
-      l = l->next;
+      l = next;
     }
 }
 

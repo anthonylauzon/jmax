@@ -33,39 +33,12 @@ import ircam.jmax.*;
 
 public class FtsDisplayObject extends FtsObject
 {
-  /*****************************************************************************/
-  /*                                                                           */
-  /*                               CONSTRUCTORS                                */
-  /*                                                                           */
-  /*****************************************************************************/
-
   public FtsDisplayObject(Fts fts, FtsObject parent)
   {
     super(fts, parent, null, "display", "");
     
     ninlets = 1;
     noutlets = 0;
-  }
-
-  public final void setWidth(int w)
-  {
-    if (this.width != w)
-      {
-	fts.getServer().putObjectProperty(this, "w", w);
-	this.width = w;
-      }
-  }
-
-  static private DecimalFormat formatter;
-
-  static
-  {
-    // Number format for messages coming from FTS (to be cleaned up:
-    // the text should be sent by FTS as text alread).
-    
-    formatter = new DecimalFormat("0.######;-0.######");
-    formatter.setGroupingUsed(false);
-    formatter.setDecimalSeparatorAlwaysShown(true);
   }
 
   public void handleMessage(String selector, int nArgs, FtsAtom args[])

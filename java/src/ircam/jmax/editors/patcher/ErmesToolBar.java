@@ -207,7 +207,7 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
 
     addButton( "", "_object_", path+"cursor_standard.gif", "Adding New Object");
     addButton( "messbox", "_message_box_", path+"cursor_message.gif", "Adding New Message Box");
-    addButton( "messconst", "_messconst_", path+"cursor_messconst.gif", "Adding New Message");
+    addButton( "messconst", "_messconst_", path+"cursor_messconst.gif", "Adding New Message or Constant");
     addButton( "jpatcher", "_patcher_", path+"cursor_patcher.gif", "Adding New Patcher");
     addButton( "inlet -1", "_inlet_", path+"cursor_in.gif", "Adding New Inlet");
     addButton( "outlet -1","_outlet_", path+"cursor_out.gif", "Adding New Outlet");
@@ -218,7 +218,8 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
     addButton( "slider",  "_slider_", path+"cursor_slider.gif","Adding New Slider");
     addButton( "intbox",   "_intbox_", path+"cursor_integer.gif", "Adding New Integer Box");
     addButton( "floatbox", "_floatbox_", path+"cursor_float.gif", "Adding New Float Box");
-    addButton( "display", "_display_", path+"cursor_display.gif", "Adding New Display Box");
+    addButton( "display", "_display_", path+"cursor_display.gif", "Adding New Display Object");
+    addButton( "vecdisplay", "_display_", path+"cursor_display.gif", "Adding New Vector Display Object");
     AddPopUp.initDone();//????
   }
 
