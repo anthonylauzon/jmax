@@ -1,14 +1,26 @@
 dnl m4 macro to use with autoconf
 dnl
-dnl this macro find jmax-config and jmax.pc pkg-config file to get include directory, library directory and package directory
+dnl This file define AM_JMAX_CONFIG m4 macro.
+dnl You can use this macro to get jMax external packages compilation and linking flag
+dnl and for installation into jMax default packages path
+dnl
+dnl This macro will substitute the following variables:
+dnl
+dnl JMAX_INCLUDES : cflags needed for jMax external packages compilation
+dnl JMAX_LDFLAGS: ldflags needed for jMax external packages linking with fts
+dnl JMAX_PACKAGE_DIR: default package path for jMax
+dnl
  
 AC_DEFUN([AM_JMAX_CONFIG],[
 dnl ##################################################
 dnl jmax-config
 dnl ##################################################
-
-
 JMAX_FLAGS_SET="false"
+
+
+dnl ##################################################
+dnl User flag for jmax-config
+dnl ##################################################
 AC_ARG_WITH(jmax-config,
 	[ --with-jmax-config=PATH	path to jmax-config [optional]],
 	[ JMAX_CONFIG="$withval";
@@ -22,10 +34,6 @@ AC_ARG_WITH(jmax-config,
 	  AC_MSG_WARN([*** Try to find jmax-config ***])
 	]
 	)
-
-dnl ##################################################
-dnl User flag for jmax-config
-dnl ##################################################
 
 if test $JMAX_FLAGS_SET = "false"; then dnl need automatic check for jmax-config
 
