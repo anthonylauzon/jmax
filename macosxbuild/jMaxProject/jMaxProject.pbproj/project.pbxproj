@@ -17515,6 +17515,18 @@
 			);
 			isa = PBXFrameworksBuildPhase;
 		};
+		F8A4E73902D3775D01664092 = {
+			isa = PBXFileReference;
+			name = "scope~.help.jmax";
+			path = "../../packages/guiobj/help/scope~.help.jmax";
+			refType = 2;
+		};
+		F8A4E73B02D3776E01664092 = {
+			fileRef = F8A4E73902D3775D01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F8A9635302D36AC001664092 = {
 			children = (
 				F8A9635402D36AE201664092,
@@ -19511,12 +19523,12 @@
 				F8DC5EC10286845701664092,
 				F8DC5EC20286845701664092,
 				F8DC5EC30286845701664092,
-				F8DC5EC40286845701664092,
 				F8DC5EC50286845701664092,
 				F8DC5EC60286845701664092,
 				F8DC5EC70286845701664092,
 				F86E9E9A02A5330001664092,
 				F820646602AE1B1601664092,
+				F8A4E73902D3775D01664092,
 			);
 			isa = PBXGroup;
 			name = help;
@@ -20570,12 +20582,6 @@
 			path = ../../packages/guiobj/help/messbox.help.jmax;
 			refType = 2;
 		};
-		F8DC5EC40286845701664092 = {
-			isa = PBXFileReference;
-			name = scope.help.jmax;
-			path = ../../packages/guiobj/help/scope.help.jmax;
-			refType = 2;
-		};
 		F8DC5EC50286845701664092 = {
 			isa = PBXFileReference;
 			name = slider.help.jmax;
@@ -20779,12 +20785,12 @@
 				F8DC5EEA028685AF01664092,
 				F8DC5EEB028685AF01664092,
 				F8DC5EEC028685AF01664092,
-				F8DC5EED028685AF01664092,
 				F8DC5EEE028685AF01664092,
 				F8DC5EEF028685AF01664092,
 				F8DC5EF0028685AF01664092,
 				F86E9E9C02A5330801664092,
 				F820646802AE1B4901664092,
+				F8A4E73B02D3776E01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
 		};
@@ -20826,12 +20832,6 @@
 		};
 		F8DC5EEC028685AF01664092 = {
 			fileRef = F8DC5EC30286845701664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8DC5EED028685AF01664092 = {
-			fileRef = F8DC5EC40286845701664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
