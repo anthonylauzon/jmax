@@ -312,6 +312,15 @@ to be equal to the ones of the old object.
 <p>
 <li> Offer the two objects a chance to exchange  data by means of a <code>redefining</code>
 message, only if the old object defined a method for the <code>release</code> message.
+<i>Note that this feature, recently introduced, is not compatible with
+the current variable propagation algorithm; while it will work in
+direct editing of an object, when an object is recomputed due to a
+complex propagation pattern, the object can be recomputed multiple
+times, some of which producing a temporary error object; this will
+prevent any transfer of data from the old to the new object. In order
+to fix this problem (if it is a problem), the propagation algorithm
+need to be changed to do the redefinition just once for each object;
+it can also be seen as an optimization.</i>
 <p>
 <li> Move all the  connections from the old object to the new one, keeping their client
 identity if any.

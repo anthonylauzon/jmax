@@ -37,7 +37,7 @@
 /* #define HELP_PURIFY  */
 #endif
 
-/* #include "smem.h"  */
+/* #include "smem.h" */
 
 
 #include <stdlib.h>

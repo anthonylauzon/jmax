@@ -31,13 +31,32 @@
 #include "lang/mess/messP.h"
 #include "lang/datalib.h"
 
-/* #define TRACE_DEBUG  */
+/* #define TRACE_DEBUG */
 
 static void fts_binding_add_definition(fts_binding_t *var, fts_object_t *object);
 
 /* Errors */
 
 static fts_status_description_t fts_redefinedVariable = {"Redefined variable"};
+
+/* DEBUG */
+
+
+static void fts_object_list_describe(fts_object_list_t *u, const char *msg)
+{
+  int i;
+
+  fprintf(stderr, "Object list %s:\n", msg);
+
+  while (u)
+    {
+      fprintf(stderr, "Object %lx, Next %lx\n", (unsigned long) u->obj, (unsigned long) u->next);
+      u = u->next;
+    }
+
+  fprintf(stderr, "Done.\n");
+}
+     
 
   
 /****************************************************************************/
@@ -290,6 +309,7 @@ void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object)
 	  break;
 	}
 
+
   /* remove the var_refs in the object */
 
   for (b = &(object->var_refs); *b; b = &((*b)->next))
@@ -303,12 +323,6 @@ void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object)
 	  fts_heap_free((char *)p, var_refs_heap);
 	  break;
 	}
-
-  /* Then, if no user are left, and if there are no owner (i.e. undefined variable)
-     delete the binding */
-
-  if ((var->users == 0) && (var->definitions == 0))
-    fts_binding_delete(var);
 }
 
 
@@ -425,12 +439,6 @@ static void fts_binding_remove_definition(fts_binding_t *var, fts_object_t *obje
       
 	  fts_object_recompute(var->definitions->obj);
 	}
-      else if (! var->definitions)
-	{
-	  /* if there are no definition left, remove the binding */
-
-	  fts_binding_delete(var);
-	}
     }
 }
 
@@ -445,7 +453,6 @@ void fts_env_init(fts_env_t *env, fts_object_t *patcher)
   env->first = 0;
   env->patcher = patcher;
 }
-
 
 static fts_binding_t *fts_env_add_binding(fts_env_t *env, fts_symbol_t name, fts_atom_t *value)
 {
@@ -559,7 +566,9 @@ static fts_binding_t *fts_variable_get_binding(fts_patcher_t *scope, fts_symbol_
       v = fts_env_get_binding(fts_patcher_get_env(patcher), name);
 
       if (v)
-	return v;
+	{
+	  return v;
+	}
       
       patcher = fts_object_get_patcher((fts_object_t *) patcher);
     }
@@ -628,7 +637,9 @@ void fts_variable_define(fts_patcher_t *scope, fts_symbol_t name)
 
 	      fts_binding_remove_user(up_v, user);
 	      fts_binding_add_user(v, user);
-	      fts_variable_suspend(user->patcher, fts_object_get_variable(user));
+
+	      if (fts_object_get_variable(user))
+		fts_variable_suspend(user->patcher, fts_object_get_variable(user));
 	    }
 	  else
 	    u = &((*u)->next);
@@ -705,8 +716,6 @@ void fts_variable_undefine(fts_patcher_t *scope, fts_symbol_t name, fts_object_t
 
 void fts_variables_undefine(fts_patcher_t *scope, fts_object_t *owner)
 {
-  fts_binding_t *v;
-
   fts_env_remove_bindings(fts_patcher_get_env(scope), owner);
 }
 
@@ -740,15 +749,11 @@ void fts_variable_suspend(fts_patcher_t *scope, fts_symbol_t name)
 
 void fts_variables_suspend(fts_patcher_t *scope, fts_object_t *owner)
 {
-  fts_binding_t *v;
-
   fts_env_suspend_bindings(fts_patcher_get_env(scope), owner);
 }
 
 void fts_variables_undefine_suspended(fts_patcher_t *scope, fts_object_t *owner)
 {
-  fts_binding_t *v;
-
   fts_env_remove_suspended_bindings(fts_patcher_get_env(scope), owner);
 }
 
@@ -787,16 +792,18 @@ fts_atom_t *fts_variable_get_value(fts_patcher_t *scope, fts_symbol_t name)
 
   if (! v)
     {
-      /* make the root void variable here */
-
       fts_atom_t a;
+
+      /* make the root void variable here */
 
       fts_set_void(&a);
       v = fts_env_add_binding(fts_patcher_get_env(fts_get_root_patcher()), name, &a);
     }
 
   if (fts_binding_is_suspended(v))
-    return 0;
+    {
+      return 0;
+    }
   else
     return &(v->value);
 }

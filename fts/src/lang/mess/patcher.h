@@ -34,6 +34,8 @@ extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *tem
 
 #define fts_patcher_get_env(p)           (&((p)->env))
 
+#define fts_patcher_being_deleted(p)      ((p)->deleted == 1)
+
 #define fts_object_is_abstraction(o) (fts_object_is_patcher((o)) &&  \
 				      fts_patcher_is_abstraction((fts_patcher_t *) (o)))
 

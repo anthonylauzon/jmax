@@ -66,6 +66,10 @@ extern fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 
 #define fts_object_get_id(o)     ((o)->id)
 
+/* Return true if the object is being deleted, i.e. if 
+   the patcher (or an ancestor of the patcher) is being deleted */
+
+extern int fts_object_being_deleted(fts_object_t *obj);
 
 /* Test recursively if an object is inside a patcher (or its subpatchers) */
 

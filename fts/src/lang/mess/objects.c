@@ -888,6 +888,26 @@ static void fts_object_free(fts_object_t *obj, int release)
   fts_block_free((char *)obj, obj->cl->size);
 }
 
+/* Return true if the object is being deleted, i.e. if 
+   the patcher (or an ancestor of the patcher) is being deleted */
+
+
+int fts_object_being_deleted(fts_object_t *obj)
+{
+  fts_patcher_t *p;
+
+  p = fts_object_get_patcher(obj);
+
+  while (p)
+    {
+      if (fts_patcher_being_deleted(p))
+	return 1;
+      
+      p = fts_object_get_patcher((fts_object_t *) p);
+    }
+
+  return 0;
+}
 
 /******************************************************************************/
 /*                                                                            */
