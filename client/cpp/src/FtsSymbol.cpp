@@ -24,6 +24,8 @@
 
 using namespace ircam::fts::client;
 
+Hashtable<const char*, FtsSymbol*> FtsSymbol::_symbolTable;
+
 const FtsSymbol *FtsSymbol::get( const char *s)
 {
   FtsSymbol *symbol;
