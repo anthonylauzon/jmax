@@ -156,7 +156,7 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 				newVal = args[i+1].getValue();
 				oldVal = value.getProperty(name);
 								
-				if(!oldVal.toString().equals(newVal.toString()))
+				if( oldVal == null || !oldVal.toString().equals(newVal.toString()))
 				{
 					if (itsTrackDataModel != null)
 					{
