@@ -323,19 +323,18 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener, C
       ErmesSketchPad.inspectSelection();
   }
 
+  /**
+   * Cut the current selection, i.e. put it in the clipboard and delete it.*/
   protected void Cut()
   {
+    Copy();
+
     if (itsSketchPad.canCopyText())
-      {
-	textClipboard = itsSketchPad.getSelectedText(); 
-	itsSketchPad.deleteSelectedText();
-      }
+      itsSketchPad.deleteSelectedText();
     else if (ErmesSketchPad.currentSelection.getOwner() == itsSketchPad)
       {
 	Cursor temp = getCursor();
 	setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-	ftsClipboard.copy( Fts.getSelection());
-	lastCopyCount = ftsClipboard.getCopyCount();
 	itsSketchPad.resetPaste(0);
 	itsSketchPad.DeleteSelected();
 
@@ -345,15 +344,17 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener, C
 
   private int lastCopyCount;
 
+  /**
+   * Copy the current selection in the clipboard */ 
   protected void Copy()
   {
-    if (itsSketchPad.canCopyText())
+    if (itsSketchPad.canCopyText() && itsSketchPad.getSelectedText() != null)
       {
-	textClipboard = itsSketchPad.getSelectedText(); 
-	MaxApplication.systemClipboard.setContents(new StringSelection(textClipboard), this);
+	MaxApplication.systemClipboard.setContents(new StringSelection(itsSketchPad.getSelectedText()), this);
       }
-    else if (ErmesSketchPad.currentSelection.getOwner() == itsSketchPad)
+    else if (!ErmesSketchPad.currentSelection.isEmpty() && ErmesSketchPad.currentSelection.getOwner() == itsSketchPad)
       {
+	MaxApplication.systemClipboard.setContents(ErmesSketchPad.currentSelection, this);
 	Cursor temp = getCursor();
 	setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
@@ -365,8 +366,15 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener, C
       }
   }
 
+
   private boolean pasting = false;
 
+  /**
+   * Paste the content of clipboard.
+   * The patcher supports text and "patcherSelection" DataFlavor.
+   * A text can be pasted only if an editable field is currently opened,
+   * and a patcher selection can be pasted if we're not currently editing
+   * a text. */
   protected void Paste()
   {
     if (isLocked())
@@ -374,57 +382,69 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener, C
 
     Cursor temp = getCursor();
 
-    setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-
     Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
-    if (clipboardContent != null && itsSketchPad.canPasteText()  && clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor))
-      {
-	try {
-	  textClipboard = (String) clipboardContent.getTransferData(DataFlavor.stringFlavor);
-	  itsSketchPad.pasteText(textClipboard);
-	}
-	catch (Exception e) {System.err.println("error while pasting text: "+e);}
-      
-      }
-    else 
-      {
-	pasting = true;
 
+    if (clipboardContent == null) return;
+
+    if (itsSketchPad.canPasteText())
+      {
+	if (clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor))
+	  {
+	    try {
+	      textClipboard = (String) clipboardContent.getTransferData(DataFlavor.stringFlavor);
+	      itsSketchPad.pasteText(textClipboard);
+	    }
+	    catch (Exception e) {System.err.println("error while pasting text: "+e);}
+	  }
+      }
+    else if (clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelection))
+      
+      {
+	setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+
+	pasting = true;
+	
 	if (lastCopyCount != ftsClipboard.getCopyCount())
 	  {
 	    itsSketchPad.resetPaste(-1);
 	    lastCopyCount = ftsClipboard.getCopyCount();
 	  }
-
+	
 	ftsClipboard.paste( itsPatcher);
-
+	
 	itsPatcherData.update();
 	Fts.sync();
-
+	
 	pasting = false;
-
+	
 	// make the sketch do the graphic job
-
+	
 	if (!ftsObjectsPasted.isEmpty() || ! ftsConnectionsPasted.isEmpty())
 	  {
 	    itsSketchPad.PasteObjects( ftsObjectsPasted, ftsConnectionsPasted);
 	    itsSketchPad.RequestOffScreen();
 	    itsSketchPad.repaint();
 	  }
-
+	
 	ftsObjectsPasted.removeAllElements();
 	ftsConnectionsPasted.removeAllElements();
       }
-
+    
     setCursor( temp);
   }
+  
 
+  /**
+   * Transferable interface */
   public void lostOwnership(Clipboard c, Transferable t) 
   {
   }
 
+  /**
+   * Duplicate the current selection. */
   protected void Duplicate()
   {
+    // implementation Note: that this changes the content of the clipboard
     Copy(); 
     Paste();
 

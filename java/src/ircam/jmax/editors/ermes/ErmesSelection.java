@@ -2,6 +2,7 @@
 package ircam.jmax.editors.ermes;
 
 import java.util.*;
+import java.awt.datatransfer.*;
 
 import ircam.jmax.utils.*;
 import ircam.jmax.fts.*;
@@ -14,14 +15,34 @@ import ircam.jmax.fts.*;
 // of the insertElementAt() problem: public this function is infact "final".
 // 2) This class is then a wrapper (redefinition) of a set of methods of Vector
 //
-public class ErmesSelection
+public class ErmesSelection implements Transferable
 {
   public MaxVector itsObjects = new MaxVector();
   public MaxVector itsConnections = new MaxVector();
   public ErmesSketchPad itsOwner;
 
+  public static DataFlavor patcherSelection = new DataFlavor(ircam.jmax.fts.FtsSelection.class, "PatcherSelection");
+  public static DataFlavor flavors[];
+
+  public Object getTransferData(DataFlavor flavor)
+  {
+    return Fts.getSelection();
+  } 
+
+  public DataFlavor[]  getTransferDataFlavors() 
+  {
+    return flavors;
+  }
+
+  public boolean isDataFlavorSupported(DataFlavor flavor) 
+  {
+    return flavor.equals(patcherSelection);
+  } 
+
   public ErmesSelection() 
   {
+    if (flavors == null) flavors = new DataFlavor[1];
+    flavors[0] = patcherSelection;
   }
 
   public void select(ErmesObject object) 
