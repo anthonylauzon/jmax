@@ -60,15 +60,15 @@
 #include "messP.h"
 #include <fts/runtime.h>
 
-extern fts_metaclass_t *inlet_metaclass;
-extern fts_metaclass_t *outlet_metaclass;
+extern fts_class_t *inlet_class;
+extern fts_class_t *outlet_class;
 
 fts_metaclass_t *patcher_metaclass = 0;
 
 static fts_class_t *patcher_class;
 
-#define fts_object_is_outlet(o) ((o)->head.cl->mcl == outlet_metaclass)
-#define fts_object_is_inlet(o) ((o)->head.cl->mcl == inlet_metaclass)
+#define fts_object_is_outlet(o) (fts_object_get_class(o) == outlet_class)
+#define fts_object_is_inlet(o) (fts_object_get_class(o) == inlet_class)
 
 /*************************************************************
  *

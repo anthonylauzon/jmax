@@ -31,8 +31,8 @@
 #include <signal.h>
 #include <sys/fpu.h>
 #include <sigfpe.h>
+#include <fts/sys/hw.h>
 
-#include "sys/hw.h"
 /* (fd) HACK !!! */
 extern void fts_fpe_handler( int which);
 

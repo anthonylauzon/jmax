@@ -29,12 +29,11 @@
 #include "messP.h"
 
 static fts_class_t *label_class = 0;
+fts_class_t *inlet_class = 0;
+fts_class_t *outlet_class = 0;
 
-fts_metaclass_t *inlet_metaclass = 0;
-fts_metaclass_t *outlet_metaclass = 0;
-
-#define fts_object_is_outlet(o) ((o)->head.cl->mcl == outlet_metaclass)
-#define fts_object_is_inlet(o) ((o)->head.cl->mcl == inlet_metaclass)
+#define fts_object_is_outlet(o) (fts_object_get_class(o) == outlet_class)
+#define fts_object_is_inlet(o) (fts_object_get_class(o) == inlet_class)
 
 extern void fts_patcher_remove_inlet(fts_patcher_t *patcher, fts_inlet_t *this);
 extern void fts_patcher_remove_outlet(fts_patcher_t *patcher, fts_outlet_t *this);
@@ -133,6 +132,11 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
   else if(fts_is_a(at + 1, fts_s_label))
     label = (label_t *)fts_get_object(at + 1);
+  else
+    {
+      fts_object_set_error(o, "Wrong argument");
+      return;
+    }
 
   fts_object_refer((fts_object_t *)label);
   fts_channel_add_origin(label_get_channel(label), (fts_access_t *)this);  
@@ -193,6 +197,11 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
   else if(fts_is_a(at + 1, fts_s_label))
     label = (label_t *)fts_get_object(at + 1);
+  else
+    {
+      fts_object_set_error(o, "Wrong argument");
+      return;
+    }
 
   fts_object_refer((fts_object_t *)label);
   fts_channel_add_target(label_get_channel(label), (fts_access_t *)this);
@@ -314,7 +323,7 @@ inlet_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 static int
 inout_check(int ac, const fts_atom_t *at)
 {
-  return (ac == 1 && (fts_is_int(at) || fts_is_symbol(at) || fts_is_a(at, fts_s_label)));
+  return (ac == 0 || (ac == 1 && (fts_is_int(at) || fts_is_symbol(at) || fts_is_a(at, fts_s_label))));
 }
 
 static fts_status_t
@@ -325,7 +334,7 @@ inlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   if(inout_check(ac, at))
     {
-      if(fts_is_int(at))
+      if(ac == 0 || fts_is_int(at))
 	{
 	  /* initialize the class */
 	  fts_class_init(cl, sizeof(fts_inlet_t),  1, 1, 0);
@@ -456,7 +465,7 @@ outlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   if(inout_check(ac, at))
     {
-      if(fts_is_int(at))
+      if(ac == 0 || fts_is_int(at))
 	{
 	  fts_class_init(cl, sizeof(fts_outlet_t), 1, 1, 0);
 	  
@@ -481,8 +490,10 @@ outlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static int
 inout_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
-  if(inout_check(ac1 - 1, at1 + 1))
-    return (fts_get_type(at0 + 1) == fts_get_type(at1 + 1));
+  if((ac0 == 0 || fts_is_int(at0)) && (ac1 == 0 || fts_is_int(at1)))
+    return 1;
+  else if(ac0 == 1 && ac1 == 1 && fts_get_type(at0) == fts_get_type(at1))
+    return 1;
   else
     return 0;
 }
@@ -492,11 +503,9 @@ fts_inout_config(void)
 {
   fts_metaclass_install(fts_s_inlet, inlet_instantiate, inout_equiv);
   fts_metaclass_install(fts_s_outlet, outlet_instantiate, inout_equiv);
-
-  inlet_metaclass = fts_metaclass_get_by_name(fts_s_inlet);
-  outlet_metaclass = fts_metaclass_get_by_name(fts_s_outlet);
-
   fts_class_install(fts_s_label, label_instantiate);
 
+  inlet_class = fts_class_get_by_name(fts_s_inlet);
+  outlet_class = fts_class_get_by_name(fts_s_outlet);
   label_class = fts_class_get_by_name(fts_s_label);
 }

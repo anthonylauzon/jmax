@@ -115,7 +115,8 @@ int fts_mess_get_run_time_check()
 }
 
 
-fts_status_t fts_send_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fts_status_t 
+fts_send_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_status_t status;
 
