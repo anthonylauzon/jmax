@@ -32,6 +32,7 @@
 #include <Carbon/Carbon.h>
 #include <CoreAudio/AudioHardware.h>
 #include <unistd.h>
+#include <string.h>
 
 #include <fts/fts.h>
 
@@ -74,8 +75,13 @@ static void halaudioport_output( fts_word_t *argv)
 
   this->count += n * channels;
 
+/*    post( "*** this->count %d\n", this->count); */
+
   if (this->count >= this->buffer_size)
-    this->count = 0;
+    {
+/*        post( "*** Wrap\n"); */
+      this->count = 0;
+    }
 }
 
 OSStatus halaudioport_ioproc( AudioDeviceID inDevice, 
@@ -87,8 +93,18 @@ OSStatus halaudioport_ioproc( AudioDeviceID inDevice,
 			      void *inClientData)
 {
   halaudioport_t *this = (halaudioport_t *)inClientData;
+  int n;
 
-  memcpy( outOutputData->mBuffers[0].mData, this->buffer, this->buffer_size);
+/*    post( "*** Running scheduler for %d bytes\n", outOutputData->mBuffers[0].mDataByteSize); */
+
+  for ( n = 0; n < outOutputData->mBuffers[0].mDataByteSize; n += fts_get_tick_size()*2*sizeof( float))
+    {
+/*        post( "*** Running scheduler for 1 tick (%d bytes)\n", fts_get_tick_size()*2*sizeof( float)); */
+      fts_sched_run_one_tick();
+    }
+
+  memcpy( outOutputData->mBuffers[0].mData, this->buffer, outOutputData->mBuffers[0].mDataByteSize);
+/*    memset( outOutputData->mBuffers[0].mData, 0, outOutputData->mBuffers[0].mDataByteSize); */
 
   return noErr;
 }
@@ -98,6 +114,17 @@ static int halaudioport_xrun( fts_audioport_t *port)
   halaudioport_t *halport = (halaudioport_t *)port;
 
   return 0;
+}
+
+static void hal_halt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fd_set rfds;
+
+  FD_ZERO( &rfds);
+  FD_SET( 0, &rfds);
+
+  if (select( 1, &rfds, NULL, NULL, NULL) < 0)
+    fprintf( stderr, "select() failed\n");
 }
 
 static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -136,15 +163,11 @@ static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 
   fts_audioport_set_output_function( (fts_audioport_t *)this, halaudioport_output);
 
-  this->buffer = (float *)fts_malloc( bufferSizeProperty * sizeof(float));
-  this->buffer_size = bufferSizeProperty;
+  post( "*** Buffer size %d\n", bufferSizeProperty);
 
-  if ( pipe( this->pipe) < 0)
-    {
-      fts_object_set_error( o, "Cannot open pipe");
-      return;
-    }
-    
+  this->buffer = (float *)fts_malloc( bufferSizeProperty);
+  this->buffer_size = bufferSizeProperty / sizeof( float);
+
   err = AudioDeviceAddIOProc( this->device, halaudioport_ioproc, this);
   if (err != noErr)
     {
@@ -158,6 +181,8 @@ static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
       fts_object_set_error( o, "Cannot start device");
       return;
     }
+
+  hal_halt( 0, 0, 0, 0, 0);
 }
 
 static void halaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

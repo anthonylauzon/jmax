@@ -34,9 +34,9 @@ static void macosx_init(void);
 
 fts_module_t macosx_module = { "macosx", "MAC OS X objects", macosx_init, 0, 0};
 
-extern void macosxaudioport_config( void);
+extern void halaudioport_config( void);
 
 static void macosx_init(void)
 {
-  macosxaudioport_config();
+  halaudioport_config();
 }
