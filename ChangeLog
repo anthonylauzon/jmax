@@ -1,3 +1,8 @@
+2003-04-07  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* include/fts/patcher.h, fts/patcher.c: added fts_patcher_get_objects function which return an iterator 
+	to enumerate all objects contained in a given patcher
+
 2003-04-04  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* changed the client and object id C declarations in include/fts/object.h: used a bit field that 
