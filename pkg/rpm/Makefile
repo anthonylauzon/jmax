@@ -1,7 +1,7 @@
 
 include ../../VERSION
 
-version=$(MAJOR).$(MINOR).$(PATCH_LEVEL)$(SNAPSHOT)
+version=$(MAJOR).$(MINOR).$(PATCH_LEVEL)
 
 all: jmax.spec
 

@@ -31,8 +31,8 @@ endif
 
 include VERSION
 
-version=$(MAJOR).$(MINOR).$(PATCH_LEVEL)$(SNAPSHOT)
-disttag=V$(MAJOR)_$(MINOR)_$(PATCH_LEVEL)$(SNAPSHOT)
+version=$(MAJOR).$(MINOR).$(PATCH_LEVEL)
+disttag=V$(MAJOR)_$(MINOR)_$(PATCH_LEVEL)
 distdir=jmax-$(version)
 distfile=jmax-$(version)-src.tar.gz
 
@@ -218,34 +218,24 @@ install-includes:
 .PHONY: install-includes
 
 #
-# new-snapshot, new-patch, new-minor, new-major
+# new-patch, new-minor, new-major
 # version number manipulation
-# 'make new-snapshot' and 'make new-patch' are the most frequent
+# 'make new-patch' is the most frequent
 #
-new-snapshot:
-	echo "MAJOR=$(MAJOR)" > VERSION
-	echo "MINOR=$(MINOR)" >> VERSION
-	echo "PATCH_LEVEL=$(PATCH_LEVEL)" >> VERSION
-	echo "SNAPSHOT="`echo $(SNAPSHOT) | tr a-yz b-za` >> VERSION
-	$(MAKE) spec-files
-
 new-patch:
 	echo "MAJOR=$(MAJOR)" > VERSION
 	echo "MINOR=$(MINOR)" >> VERSION
 	echo "PATCH_LEVEL="`expr $(PATCH_LEVEL) + 1` >> VERSION
-	echo "SNAPSHOT=a" >> VERSION
 	$(MAKE) spec-files
 
 new-minor:
 	echo "MAJOR=$(MAJOR)" > VERSION
 	echo "MINOR="`expr $(MINOR) + 1` >> VERSION
 	echo "PATCH_LEVEL=0" >> VERSION
-	echo "SNAPSHOT=a" >> VERSION
 	$(MAKE) spec-files
 
 new-major:
 	echo "MAJOR="`expr $(MAJOR) + 1` > VERSION
 	echo "MINOR=0" >> VERSION
 	echo "PATCH_LEVEL=0" >> VERSION
-	echo "SNAPSHOT=a" >> VERSION
 	$(MAKE) spec-files

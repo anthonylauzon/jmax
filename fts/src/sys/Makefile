@@ -40,8 +40,7 @@ version.h: $(ROOTDIR)/../VERSION
 $$1=="MAJOR" {ma=$$2;} \
 $$1=="MINOR" {mi=$$2;} \
 $$1=="PATCH_LEVEL" {pa=$$2;} \
-$$1=="SNAPSHOT"  {sn=$$2;} \
-END { printf("#define FTS_VERSION_STRING \"jMax server version %d.%d.%d%s\"\n",ma,mi,pa,sn); } \
+END { printf("#define FTS_VERSION_STRING \"jMax server version %d.%d.%d\"\n",ma,mi,pa); } \
 ' < $(ROOTDIR)/../VERSION >> version.h
 
 install-includes:

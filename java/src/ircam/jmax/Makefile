@@ -53,8 +53,7 @@ MaxVersion.java: $(ROOTDIR)/VERSION
 $$1=="MAJOR" {ma=$$2;} \
 $$1=="MINOR" {mi=$$2;} \
 $$1=="PATCH_LEVEL" {pa=$$2;} \
-$$1=="SNAPSHOT"  {sn=$$2;} \
-END { printf( "  return \"jMax version %d.%d.%d%s\";\n", ma, mi, pa, sn); } \
+END { printf( "  return \"jMax version %d.%d.%d\";\n", ma, mi, pa); } \
 ' < $(ROOTDIR)/VERSION >> MaxVersion.java
 	echo ' }' >> MaxVersion.java
 	echo '}' >> MaxVersion.java
