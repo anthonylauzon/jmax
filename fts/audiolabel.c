@@ -32,7 +32,10 @@ static fts_symbol_t audiolabel_s_name;
 
 static fts_symbol_t audiolabel_s_label_type;
 
+static fts_symbol_t audiolabel_s_in_channel;
 static fts_symbol_t audioconfig_s_input_channel;
+
+static fts_symbol_t audiolabel_s_out_channel;
 static fts_symbol_t audioconfig_s_output_channel;
 
 
@@ -41,6 +44,8 @@ audiolabel_set_stereo(audiolabel_t* label, int stereo_flag)
 {
 #warning NOT YET IMPLEMENTED (audiolabel_set_stereo)
   /* check if stereo ccan be done with current channel, and current input/output audioport */
+
+  label->stereo_flag = stereo_flag;
 }
 
 void
@@ -52,6 +57,8 @@ audiolabel_set_input_channel(audiolabel_t* label, int channel)
   {
 
   }
+
+  label->input_channel = channel;
 }
 
 void
@@ -70,6 +77,8 @@ audiolabel_set_output_channel(audiolabel_t* label, int channel)
   {
 
   }
+
+  label->output_channel = channel;
 }
 
 void
@@ -101,22 +110,60 @@ audiolabel_client_send_message(fts_object_t* o, fts_symbol_t selector, audiolabe
 static void
 audiolabel_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-#warning NOT YET IMPLEMENTED (audiolabel_input)
+#warning NOT YET IMPLEMENTED (audiolabel_input), only test for communication
   audiolabel_t* self = (audiolabel_t*)o;
   fts_symbol_t name = fts_get_symbol(at);
 
+  post("[audiolabel:] audiolabel_input, label name: %s, output device: %s\n", self->name, name);
+
+  /* Make a query on audiomanager to retreive corresponding fts_audioport_t* */
 }
 
 static void
 audiolabel_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-#warning NOT YET IMPLEMENTED (audiolabel_output)
+#warning NOT YET IMPLEMENTED (audiolabel_output), only test for communication
   audiolabel_t* self = (audiolabel_t*)o;
   fts_symbol_t name = fts_get_symbol(at);
 
+  post("[audiolabel:] audiolabel_output, label name: %s, output device: %s\n", self->name, name);
+  /* Make a query on audiomanager to retreive corresponding fts_audioport_t* */
 
 }
 
+static void
+audiolabel_in_channel(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  audiolabel_t* self = (audiolabel_t*)o;
+  int in_channel = fts_get_int(at);
+
+  post("[audiolabel] label name: %s, in channel: %d\n", self->name, in_channel);
+
+  audiolabel_set_input_channel(self, in_channel);
+}
+
+
+static void
+audiolabel_out_channel(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  audiolabel_t* self = (audiolabel_t*)o;
+  int out_channel = fts_get_int(at);
+
+  post("[audiolabel] label name: %s, out channel: %d\n", self->name, out_channel);
+
+  audiolabel_set_output_channel(self, out_channel);
+}
+
+static void
+audiolabel_label_type(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  audiolabel_t* self = (audiolabel_t*)o;
+  int label_type = fts_get_int(at);
+
+  post("[audiolabel] label name: %s, label type: %d\n", self->name, label_type);
+
+  audiolabel_set_stereo(self, label_type);
+}
 
 static void
 audiolabel_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -167,11 +214,19 @@ audiolabel_instantiate(fts_class_t* cl)
   fts_class_message_varargs(cl, fts_s_input, audiolabel_input);
   fts_class_message_varargs(cl, fts_s_output, audiolabel_output);
 
+  fts_class_message_varargs(cl, audiolabel_s_in_channel, audiolabel_in_channel);
+  fts_class_message_varargs(cl, audiolabel_s_out_channel, audiolabel_out_channel);
+
+  fts_class_message_varargs(cl, audiolabel_s_label_type, audiolabel_label_type);
 }
 
 void fts_audiolabel_config(void)
 {    
   audiolabel_s_name = fts_new_symbol("__audiolabel");
+  audiolabel_s_in_channel = fts_new_symbol("in_channel");  
+  audiolabel_s_out_channel = fts_new_symbol("out_channel");
+  audiolabel_s_label_type = fts_new_symbol("label_type");
+
   audiolabel_type = fts_class_install(audiolabel_s_name, audiolabel_instantiate);
 
 }
