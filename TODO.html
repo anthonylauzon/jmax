@@ -1,301 +1,359 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>jMax TODO list</title>
+  <title>jMax TODO list</title>
 </head>
-
-<body bgcolor="white">
-
-<p>
-<center>
+ <body bgcolor="white">
+  
+<center> 
 <h1>jMax TODO list</h1>
-</center>
-
+ </center>
+  
 <p>
-Content:
+ Content:
+</p>
 <ul>
-<li><A HREF="#tasks for release 3.1">tasks for release 3.1</A>
-<li><A HREF="#tasks for release 3.2">tasks for release 3.2</A>
-<li><A HREF="#non release related tasks">non release related tasks</A>
+ 
+  <li><a href="#tasks for release 3.1">tasks for release 3.1</a>
+ </li>
+  <li><a href="#tasks for release 3.2">tasks for release 3.2</a>
+ </li>
+  <li><a href="#non release related tasks">non release related tasks</a>
+ </li>
 </ul>
 
-
-<!-- ---------------------------------------------------------------------- -->
 <!-- ---------------------------------------------------------------------- -->
 <p>
-<A NAME="tasks for release 3.1"></A>
-<TABLE width="100%" bgcolor="#ccccff" cellspacing=0 cellpadding=0>
-<tr>
-<td valign="middle"><h2>Tasks for release 3.1</h2></td>
-</tr>
-</TABLE>
-<!-- ---------------------------------------------------------------------- -->
-<!-- ---------------------------------------------------------------------- -->
+ <a name="tasks for release 3.1"></a>
+ 
+<table width="100%" bgcolor="#ccccff" cellspacing=0 cellpadding=0>
+ <tbody>
+    <tr>
+ <td valign="Middle">
+      <h2>Tasks for release 3.1</h2>
+      </td>
+ </tr>
+ 
+  </tbody>
+</table>
+</p>
 
 <!-- ---------------------------------------------------------------------- -->
 <h3>Dynamic client/server connection</h3>
-
+  
 <p>
-Change the client table to a stack, not a hashtable (can be costly because
+ Change the client table to a stack, not a hashtable (can be costly because 
 it must be accessed for each message from FTS to the client).
+</p>
 
 <p>
-Implement string cache on both sides, using hashtables.
+ Implement string cache on both sides, using hashtables.
+</p>
 
 <p>
-Introduce unparsed strings in the protocol
+ Introduce unparsed strings in the protocol: unparsed strings are parsed
+by a simple Bison parser that accepts
+plain lists of {int, float, symbols}.
+</p>
 
 <p>
-Reimplement what is done yet with client/server properties using messages.
-Reimplement updates using time-delayed messages (use timebases). Then
-remove properties in the client/server communication (remove properties at all ???)
+ Reimplement what is done yet with client/server properties using messages. 
+Reimplement updates using time-delayed messages (a client object that supports
+updates has a cyclic alarm, objects that want to be updated add a callback
+(fts_callback_t) to a hashtable and in the callback send a message to the
+client; the alarm handler does {update group start; call callbacks; update
+group end}). Then remove properties in the client/server communication (remove
+properties at all ???)
+</p>
 
 <p>
-Create a udpstream derived from bytestream
+Implement a "remote" file box, derived from the Swing JFileChooser, but 
+that takes the file list from FTS, using objects and messages. This because 
+the machine running the client and the machine running the server do no longer
+share file system via NFS, and the files are loaded on the server.
+</p>
 
 <p>
-Implement a "remote" file box, derived from the Swing JFileChooser, but
-that takes the file list from FTS, using objects and messages. This because
-the machine running the client and the machine running the server do no
-longer share file system via NFS, and the files are loaded on the server.
+Intelligent client connection process (auto connect to running server)
+</p>
 
-
+<p>
+ Create a udpstream derived from bytestream
+</p>
 
 <!-- ---------------------------------------------------------------------- -->
 <h3>Project, package and configuration</h3>
+  
+<p>
+[Remove Tcl configuration commands and use a patch for audio and midi
+configuration]
+</p>
 
 <p>
-Remove Tcl configuration commands and use a patch for audio and midi configuration
+[Remove UCS]
+</p>
 
 <p>
-Remove UCS
+Separated client and server package path
+</p>
 
 <p>
-Add something to "protect" variables so that a patch cannot redefine DefaultAudio
-or SamplingRate
+Java package loading triggered by server
+</p>
 
 <p>
-Replace Tcl definition of packages and projects by patches (objects or messages)
+Help file handling
+</p>
 
 <p>
-Add an "import" directive in a patch (template) that defines the packages imported
-by a patch, and create classes, templates, abstractions in packages.
+Configuration script for installation (see contributions from Christian
+Klippel)
+</p>
 
 <p>
-Configuration script for installation (see contributions from Christian Klippel)
-
-<p>
+Configuration editor [see <a href="notes/config.html">notes/config.html</a>]
+</p>
 
 <!-- ---------------------------------------------------------------------- -->
-<H3>Platform embedding</h3>
+<h3>Platform embedding</h3>
+  
+<p>
+ Do GNOME and KDE apps
+</p>
 
 <p>
-Do GNOME and KDE apps
-
-<p>
-Do a Mac OS X application: use either the invocation API (as on Windows and Linux)
-or use the OS X framework for building JAVA applications.
-
+ Do a Mac OS X application: use either the invocation API (as on Windows
+and Linux) or use the OS X framework for building JAVA applications.
+</p>
 
 <!-- ---------------------------------------------------------------------- -->
 <h3>Changes in the object set</h3>
+  
+<p>
+ Finish integration of variables (sampread/write,...) ?
+</p>
 
 <p>
-Finish integration of variables (sampread/write,...) ?
-
-<p>
-Table float ?
-
+ Table float ?
+</p>
 
 <!-- ---------------------------------------------------------------------- -->
 <h3>Changes in the FTS expression parser</h3>
-
+ 
 <!-- ---------------------------------------------------------------------- -->
 <h3>Portable soundfile I/O</h3>
+  
+<p>
+ Put fts_soundfile_t in a separate package, that can be loaded dynamicaly
+(as audio and MIDI ports).
+ Question: do we want to support several sound file access libraries simultaneously
+or not ? 
+ This is related to autoconf subject.
+</p>
 
 <p>
-Put fts_soundfile_t in a separate package, that can be loaded
-dynamicaly (as audio and MIDI ports).<br>
-Question: do we want to support several sound file access libraries
-simultaneously or not ? <BR>
-This is related to autoconf subject.
+ Do a very simple implementation of audio file access, working only for
+.wav for instance.
+</p>
 
-<P>
-Do a very simple implementation of audio file access, working only
-for .wav for instance.
-
-
+<!-- ---------------------------------------------------------------------- -->
 <h3>Misc</h3>
+  
+<p>
+ Once the cache is no longer in the symbol_descriptor structure, remove
+ also the "operator" field and replace it by a hash table (very simple, it
+is accessed through a macro). Then do a "typedef const char *fts_symbol_t"
+and remove fts_symbol_name().
+</p>
 
 <p>
-Once the cache is no longer in the symbol_descriptor structure, remove 
-also the "operator" field and replace it by a hash table (very simple, it is accessed
-through a macro). Then do a "typedef const char *fts_symbol_t" and remove fts_symbol_name().
+<a name="tasks for release 3.2"></a>
+<table width="100%" bgcolor="#ccccff" cellspacing=0 cellpadding=0>
+ <tbody>
+    <tr>
+ <td valign="Middle">
+      <h2>Tasks for release 3.2</h2>
+      </td>
+ </tr>
+ 
+  </tbody>
+</table>
+</p>
 
-
-
-<!-- ---------------------------------------------------------------------- -->
-<!-- ---------------------------------------------------------------------- -->
-<p>
-<A NAME="tasks for release 3.2"></A>
-<TABLE width="100%" bgcolor="#ccccff" cellspacing=0 cellpadding=0>
-<tr>
-<td valign="middle"><h2>Tasks for release 3.2</h2></td>
-</tr>
-</TABLE>
-
-<!-- ---------------------------------------------------------------------- -->
-<!-- ---------------------------------------------------------------------- -->
-
+ 
 <!-- ---------------------------------------------------------------------- -->
 <h3>Multi-thread</h3>
+  
+<p>
+ Implement a message fifo. The message arguments should be in  a separate
+buffer (allocator?) so that one message arguments are contiguous and cannot
+overlap.
+</p>
 
 <p>
-Implement a message fifo. The message arguments should be in 
-a separate buffer (allocator?) so that one message arguments
-are contiguous and cannot overlap.
+ Implement thread pool. A thread pool is a collection of thread that execute
+messages. An API allows to execute a message in a thread of the pool and
+to receive a callback when message has completed.
+</p>
 
 <p>
-Implement thread pool. A thread pool is a collection of thread that
-execute messages. An API allows to execute a message in a thread of the
-pool and to receive a callback when message has completed.
+ Reimplement the udp, serial, midi using threads and not select(). This
+must be discussed: does it improve efficiency or not ? This question is also
+related to the Mac OS X implementation: do we run the FTS scheduler inside
+the IOProc or in a feeder thread (that must be a time-constrained thread)?
+If we run inside the IOProc, then client polling must be done in a separate
+thread, as well as MIDI input.
+</p>
 
 <p>
-Reimplement the udp, serial, midi using threads and not select(). This must be
-discussed: does it improve efficiency or not ? This question is also related
-to the Mac OS X implementation: do we run the FTS scheduler inside the IOProc
-or in a feeder thread (that must be a time-constrained thread)? If we run
-inside the IOProc, then client polling must be done in a separate thread,
-as well as MIDI input.
+ Do a DSP profiler using a thread and an object set for viewing results
+(sorted by objects, classes and patches)
+</p>
 
 <p>
-Do a DSP profiler using a thread and an object set for viewing results (sorted
-by objects, classes and patches)
+ Do an async file reader (based on methods callback)
+</p>
 
 <p>
-Do an async file reader (based on methods callback)
-
-<p>
-Do a threaded Direct-to-Disk, using fifos and inter-thread messages
-
-
-
+Do a threaded Direct-to-Disk, using fifos and inter-thread messages   
+</p>
 
 <!-- ---------------------------------------------------------------------- -->
-<!-- ---------------------------------------------------------------------- -->
 <p>
-<A NAME="non release related tasks"></A>
-<TABLE width="100%" bgcolor="#ccccff" cellspacing=0 cellpadding=0>
-<tr>
-<td valign="middle"><h2>Non release related tasks</h2></td>
-</tr>
-</TABLE>
-<!-- ---------------------------------------------------------------------- -->
-<!-- ---------------------------------------------------------------------- -->
+<a name="non release related tasks"></a>
+</p>
+<table width="100%" bgcolor="#ccccff" cellspacing=0 cellpadding=0>
+ <tbody>
+    <tr>
+ <td valign="Middle">
+      <h2>Non release related tasks</h2>
+      </td>
+ </tr>
+  </tbody>
+</table>
+</p>
 
-
+ 
 <!-- ---------------------------------------------------------------------- -->
 <h3>Audio</h3>
-
+  
 <p>
-ALSA
+ ALSA
+</p>
 <ul>
-<li>latest version</li>
-<li>buffer size</li>
-<li>mmap mode ardour-like with snd_pcm_mmap_forward
-<li>fix arguments (mmap + interleaved)
-<li>channel numbers / audioport channels</li>
-<li>error messages</li>
+  <li>latest version</li>
+  <li>buffer size</li>
+  <li>mmap mode ardour-like with snd_pcm_mmap_forward </li>
+  <li>fix arguments (mmap + interleaved) </li>
+  <li>channel numbers / audioport channels</li>
+  <li>error messages</li>
 </ul>
-
-<P>
-Help patches for SGI audio port
+  
+<p>
+ Help patches for SGI audio port
+</p>
 
 <p>
-Fix adc~ with 0 channels ?
-
+?? Fix adc~ with 0 channels
+</p>
 
 <!-- ---------------------------------------------------------------------- -->
 <h3>Compilation issues</h3>
-
-<P>
-Reintegrate compilation stuff for compilation date.
+  
+<p>
+ Reintegrate compilation stuff for compilation date.
+</p>
 
 <p>
-Add the autoconf macros for guessing the JDK
-
+ Add the autoconf macros for guessing the JDK
+</p>
 
 <!-- ---------------------------------------------------------------------- -->
 <h3>Documentation</h3>
+  
+<p>
+ Update compiling
+</p>
 
 <p>
-Update compiling
+ Make automaticaly a list of packages and classes
+</p>
 
 <p>
-Make automaticaly a list of packages and classes
-
-<p>
-Doxygenate all .h
-
+ Doxygenate all .h
+</p>
 
 <!-- ---------------------------------------------------------------------- -->
 <h3>User interface</h3>
-
+  
 <p>
-Unique menu for all editors (fits better in Mac OS X L&amp;F):
+ Unique menu for all editors (fits better in Mac OS X L&amp;F):
+</p>
+
 <ul>
-<li>standards menus (File, Edit, Windows, Help)
-<li>a unique menu bar
-<li>each editor can add its menu when class is loaded: either one menu per
-editor, or one "Editors" menu with either sub-menus or item with separators
-<li>first, needs to check all the current menu items
+  <li>standards menus (File, Edit, Windows, Help) </li>
+  <li>a unique menu bar </li>
+  <li>each editor can add its menu when class is loaded: either one menu
+per editor, or one "Editors" menu with either sub-menus or item with separators 
+  </li>
+  <li>first, needs to check all the current menu items </li>
 </ul>
-
+  
 <p>
-Errors:
+ Errors:
+</p>
 <ul>
-<li>automaticaly display error panel after loading a patch
-<li>remove CTRL-Z (error display in the patch editor) and chose to display annotation with a menu item
+ 
+  <li>automaticaly display error panel after loading a patch </li>
+  <li>remove CTRL-Z (error display in the patch editor) and chose to display
+annotation with a menu item </li>
+  </li>
 </ul>
-
+  
 <p>
-Move graphic objects to packages:
+ Move graphic objects to packages:
+</p>
 <ul>
-<li>graphic object defines Java class, FTS class, button, cursor
-<li>use of reflection API and JavaBeans property descriptors
+  <li>graphic object defines Java class, FTS class, button, cursor </li>
+  <li>use of reflection API and JavaBeans property descriptors </li>
 </ul>
-
+  
 <p>
-Check editors on-line help
-
+ Check editors on-line help
+</p>
 
 <!-- ---------------------------------------------------------------------- -->
 <h3>Packaging</h3>
+  
+<p>
+ RPM: distribute JRE (test running with JRE first)
+</p>
 
 <p>
-RPM: distribute JRE (test running with JRE first)
+ Mac OS X: do a package using PackageMaker
+</p>
 
 <p>
-Mac OS X: do a package using PackageMaker
-
-<p>
-Move tutorials to a separate source tree and make a rpm from it.
-
-<h2>Misc</h2>
-
-<p>
-Use same mechanism for fts_midiport_class_init and fts_bytestream_class_init
-as in fts_audioport_class_init
-
-<p>
-Implement file loading and saving by using "loader" and "saver" objects, that register themself
-as loaders and that are tried in turn when a file is opened. This way, you
-can open a text file as long as you have a loader object that understand text files.
-Caveat: the text file loader must be tried after the .pat loader, or it must
-understand that the file is a .pat and refuse to load it (which implies some
-knowledger between the different loader objects).
+ Move tutorials to a separate source tree and make a rpm from it.
+</p>
 
 <!-- ---------------------------------------------------------------------- -->
-<hr>
+<h3>Misc</h3>
+  
+<p>
+ Use same mechanism for fts_midiport_class_init and fts_bytestream_class_init 
+as in fts_audioport_class_init
+</p>
+
+<p>
+ Implement file loading and saving by using "loader" and "saver" objects,
+that register themself as loaders and that are tried in turn when a file
+is opened. This way, you can open a text file as long as you have a loader
+object that understand text files. Caveat: the text file loader must be tried
+after the .pat loader, or it must understand that the file is a .pat and
+refuse to load it (which implies some knowledger between the different loader
+objects).
+</p>
 
 </body>
 </html>
