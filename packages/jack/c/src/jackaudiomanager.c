@@ -31,7 +31,7 @@
 #include "jackaudio.h"
 
 #define DEFAULT_DELAY_MS 100
-#define DEFAULT_THREAD_FIFO_SIZE 40
+#define DEFAULT_THREAD_FIFO_SIZE 1000
 
 #define FTS_JACK_CREATE_THREAD 1
 
