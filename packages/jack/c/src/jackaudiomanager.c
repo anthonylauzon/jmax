@@ -195,7 +195,6 @@ void jackaudiomanager_port_registration_callback(jack_port_id_t port_id, int n, 
     if (fts_hashtable_get(&jack_port_input_ht, &k, &v))
     {
       fts_object_t* port = fts_get_object(&v);
-      fts_object_release(port);
       fts_hashtable_remove(&jack_port_input_ht, &k);
       fts_log("[jackaudiomanager] remove %s from input hashtable \n", port_name);
       fts_audiomanager_remove_port(port_name);
@@ -203,7 +202,6 @@ void jackaudiomanager_port_registration_callback(jack_port_id_t port_id, int n, 
     if (fts_hashtable_get(&jack_port_output_ht, &k, &v))
     {
       fts_object_t* port = fts_get_object(&v);
-      fts_object_release(port);
       fts_hashtable_remove(&jack_port_output_ht, &k);
       fts_log("[jackaudiomanager] remove %s from output hashtable \n", port_name);
       fts_audiomanager_remove_port(port_name);
@@ -547,7 +545,6 @@ create_thread(fts_object_t* obj, fts_symbol_t mess)
   fts_thread_function_t* thread_job = fts_malloc(sizeof(fts_thread_function_t));
 
   thread_job->object = obj;
-  fts_object_refer(obj);
   
   thread_job->method = fts_class_get_method_varargs(fts_object_get_class(thread_job->object),
 						    mess);
@@ -575,7 +572,6 @@ static void
 delete_thread(fts_thread_worker_t* worker)
 {
   fts_thread_manager_cancel_thread(worker);
-  fts_object_release(worker->thread_function->object);
   fts_free(worker->thread_function);
   fts_free(worker);
 }
@@ -667,6 +663,7 @@ jackaudiomanager_scan_ports(fts_hashtable_t* ht, int flags)
       fts_set_int(at, flags);
       fts_set_symbol(at + 1, fts_new_symbol(ports[i]));
       port = (fts_audioport_t*)fts_object_create(jackaudioport_type, 2, at);
+      fts_object_refer((fts_object_t*)port);
       fts_audiomanager_put_port(cur_sym, port);
       fts_set_object(&a,(fts_object_t*)port);
       fts_hashtable_put(ht, &k, &a);
@@ -815,6 +812,25 @@ jackaudiomanager_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 
+static void
+jackaudiomanager_sched_listener(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  jackaudiomanager_t* self = (jackaudiomanager_t*)o;
+  jackaudiomanager_thread_t* manager_object;
+  fts_fifo_t* run_fifo;
+
+  if (!fts_sched_is_running())
+  {
+    /* add src and dest symbol to thread fifo */
+    manager_object = (jackaudiomanager_thread_t*)self->jack_communication;
+    run_fifo = &manager_object->run_fifo;
+    if (0 != add_symbol_to_fifo(run_fifo, s_deactivate))
+    {
+      fts_log("[jackaudiomanager_sched_listener] cannot add deactivate symbol in run FIFO \n");
+    }
+  }
+}
+
 /* This function is used to remove object from scheduler and to activate JACK client */
 static void
 jackaudiomanager_halt(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -882,7 +898,6 @@ jackaudiomanager_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
 
   /* create jack communication object */
   self->jack_communication = fts_object_create(jackaudiomanager_thread_type, 0, 0);
-  fts_object_refer(self->jack_communication);
 
   /* create connections thread */
   create_run_thread(self);
@@ -892,6 +907,8 @@ jackaudiomanager_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
   jack_set_port_registration_callback(manager_jack_client,
 				      jackaudiomanager_port_registration_callback,
 				      NULL);
+
+  fts_sched_running_add_listener(o, jackaudiomanager_sched_listener);
 }
 
 static void
@@ -900,25 +917,22 @@ jackaudiomanager_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
   jackaudiomanager_t* self = (jackaudiomanager_t*)o;
   jackaudiomanager_thread_t* manager_object;
   fts_fifo_t* run_fifo;
-  FILE* mytmp = fopen("/var/tmp/jack_exit.txt", "w");
 
-  fprintf(mytmp, "[jackaudiomanager] destructor called \n");
+  fts_sched_running_remove_listener(o);
+  post("jackaudiomanager_delete called !!!!! \n");
 
   manager_object = (jackaudiomanager_thread_t*)self->jack_communication;
   run_fifo = &manager_object->run_fifo;
   if (0 != add_symbol_to_fifo(run_fifo, s_deactivate))
   {
-    fprintf(mytmp,"[jackaudiomanager] cannot add deactivate symbol in run FIFO \n");
+    fts_log("[jackaudiomanager] cannot add deactivate symbol in run FIFO \n");
   }
 
 #ifdef FTS_JACK_CREATE_THREAD
   delete_run_thread(self);
-  fprintf(mytmp, "delete_run_thread \n");
 #endif
 
   jackaudiomanager_unset_jack_client(self);  
-  fprintf(mytmp, "jackaudiomanager_unset_jack_client \n");
-  fclose(mytmp);
 }
 
 static void 
@@ -990,7 +1004,7 @@ void jackaudiomanager_config( void)
   jackaudiomanager_object = fts_object_create(jackaudiomanager_type, 0, NULL);
 
   /* in case of fts quit */
-  atexit(jackaudiomanager_at_exit);
+/*   atexit(jackaudiomanager_at_exit); */
 }
 
 
