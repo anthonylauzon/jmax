@@ -384,7 +384,6 @@ void setLastBar(TrackEvent evt)
 		lastBar.getValue().setProperty("last_bar", Boolean.TRUE);
 	}	
 }
-
 //=================== MouseListener interface ===========================
 public void mouseClicked(MouseEvent e){}
 public void mousePressed(MouseEvent e)
@@ -475,7 +474,32 @@ public void objectAdded(Object whichObject, int index)
   repaint();
 }
 public void objectsAdded(int maxTime){repaint();}
-public void objectDeleted(Object whichObject, int oldIndex){repaint();}
+public void objectDeleted(Object whichObject, int oldIndex)
+{
+	if(whichObject == lastBar)
+	{
+		lastBarTime = -1.0;
+		lastBar = null;
+
+		int i = oldIndex-1;
+		String lastType = "";
+		TrackEvent last = markersTrack.getEventAt(i);
+		if(last != null)
+			lastType = (String)last.getProperty("type");
+		while(last == null || !lastType.equals("bar"))
+		{
+			i--;
+			last = markersTrack.getEventAt(i);
+			if(last != null)
+				lastType = (String)last.getProperty("type");
+			else
+				lastType = "";
+		}
+		if(last != null)
+			setLastBar(last);
+	}
+	repaint();
+}
 public void trackCleared(){repaint();}
 public void startTrackUpload( TrackDataModel track, int size){}
 public void endTrackUpload( TrackDataModel track){ initPropertiesToDraw();}
