@@ -250,8 +250,10 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   int channels, sample_rate, i, fifo_size, frames;
   dsaudioport_t *dev = (dsaudioport_t *)o;
   DSBUFFERDESC desc;
-  DSCBUFFERDESC cdesc;
   HRESULT hr;
+#if CAPTURE
+  DSCBUFFERDESC cdesc;
+#endif
 
   ac--;
   at++;
@@ -386,6 +388,7 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_audioport_set_output_function((fts_audioport_t *) dev, dsaudioport_output);
 
   /*************************** input ********************************/
+#if CAPTURE
 
   /* initialize the input buffer description */
   ZeroMemory(&cdesc, sizeof(DSCBUFFERDESC));
@@ -436,13 +439,16 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   fts_audioport_set_input_channels((fts_audioport_t *) dev, channels);
   fts_audioport_set_input_function((fts_audioport_t *) dev, dsaudioport_input);
+#endif
 
   /*************************** finish and start ********************************/
 
+#if CAPTURE
   hr = IDirectSoundCaptureBuffer_Start(dev->dscBuffer, DSCBSTART_LOOPING);
   if (hr != S_OK) {
     /* FIXME */
   }
+#endif
 
   hr = IDirectSoundBuffer_Play(dev->dsBuffer, 0, 0, DSBPLAY_LOOPING);
   if (hr != S_OK) {
@@ -472,6 +478,8 @@ static void
 dsaudioport_cleanup(dsaudioport_t *dev)
 {
   int i;
+
+#if CAPTURE
 
   /* delete all things related to the input buffer */
 
@@ -505,6 +513,7 @@ dsaudioport_cleanup(dsaudioport_t *dev)
 /*      IDirectSoundCaptureBuffer_Release(dev->dscBuffer); */
     dev->dscBuffer = NULL;
   }
+#endif
 
 
   /* delete all things related to the output buffer */
@@ -654,6 +663,7 @@ fts_close_direct_sound()
 int 
 fts_open_direct_sound_capture(char *device)
 {
+#if CAPTURE
   HRESULT hr;
   int err = 0;
 
@@ -667,6 +677,7 @@ fts_open_direct_sound_capture(char *device)
     fts_direct_sound_capture = NULL;
     return -1;
   }
+#endif
 
   return 0;
 }
@@ -674,10 +685,12 @@ fts_open_direct_sound_capture(char *device)
 int 
 fts_close_direct_sound_capture()
 {
+#if CAPTURE
   if (fts_direct_sound_capture != NULL) {
     IDirectSoundCapture_Release(fts_direct_sound_capture); 
     fts_direct_sound_capture = NULL;
   }
+#endif
   return 0;
 }
 
