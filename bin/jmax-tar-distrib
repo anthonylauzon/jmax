@@ -140,11 +140,11 @@ echo Copying files
 copy_files $ARCH $TYPE . ${DEST_DIR}
 
 # Create the tar file
-if [ ! -d /u/worksta/jmax/releases/${TYPE}/${ARCH} ]
+if [ ! -d /u/worksta/jmaxdev/releases/${TYPE}/${ARCH} ]
 then
-    mkdir -p /u/worksta/jmax/releases/${TYPE}/${ARCH}
+    mkdir -p /u/worksta/jmaxdev/releases/${TYPE}/${ARCH}
 fi
-TARFILE=/u/worksta/jmax/releases/${TYPE}/${ARCH}/jmax.${TYPE}.${ARCH}.${VERSION}.tar.gz
+TARFILE=/u/worksta/jmaxdev/releases/${TYPE}/${ARCH}/jmax.${TYPE}.${ARCH}.${VERSION}.tar.gz
 echo "Creating tar file $TARFILE"
 (cd /tmp ; tar cvf - max-${VERSION} ) | gzip -9 > $TARFILE
 chmod 644 $TARFILE
