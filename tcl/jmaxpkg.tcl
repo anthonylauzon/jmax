@@ -80,6 +80,9 @@ proc jmaxPkgUnknown {name version {exact {}}} {
 	set packageDir [file join [lindex $jmaxPkgPath $i] $name]
 	set file [file join $packageDir $name.jpk ]
 
+	#qui bisognerebbe registrare da qualche parte nomePkg/packageDir 
+	setSystemProperty "$name\PackageDir" $packageDir
+
 	if {[file exists $file]} then {
 
 	    if [catch {sourceFile $file} msg] {
