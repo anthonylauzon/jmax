@@ -14,7 +14,7 @@ import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
-import ircam.jmax.editors.project.*;
+import ircam.jmax.editors.console.*;
 
 
 /**
@@ -38,11 +38,11 @@ class MaxOpenCmd implements Command {
   {
     if (argv.length == 2)
       {
-	ProjectWindow aProjectWindow = MaxApplication.itsProjectWindow;
+	//ProjectWindow aProjectWindow = MaxApplication.itsProjectWindow;
 
 	// Should call MaxApplication.Open, not the project !!!
 
-	aProjectWindow.OpenFile(new File(new String(argv[1].toString())));
+	MaxApplication.GetConsoleWindow().OpenFile(new File(new String(argv[1].toString())));
 	// Should return the document produced !!!
       }
     else

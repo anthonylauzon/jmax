@@ -15,7 +15,7 @@ import java.util.*;
 
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
-import ircam.jmax.editors.project.*;
+//#import ircam.jmax.editors.project.*;
 
 
 /**
@@ -34,8 +34,8 @@ class MaxSplashCmd implements Command
     if (argv.length == 2)
       {
 	String fileName = new String(argv[1].toString());
-
-	new SplashDialog(MaxApplication.itsProjectWindow, fileName);    
+	//We have no windows for now so, no splashes
+	new SplashDialog(MaxApplication.GetConsoleWindow()/*itsProjectWindow*/, fileName);    
       }
     else
       {	

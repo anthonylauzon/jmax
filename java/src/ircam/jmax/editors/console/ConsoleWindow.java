@@ -1,6 +1,7 @@
-
 package ircam.jmax.editors.console;
+
 import ircam.jmax.*;
+import ircam.jmax.dialogs.*;
 import java.io.*;
 import java.util.*;
 /**
@@ -37,7 +38,7 @@ public class ConsoleWindow extends MaxEditor {
   public boolean OpenFile(File file){
     String aExtension = GetExtension(file);
     MaxResourceId aResId = null;
-
+    
     if(aExtension.equals("tpa")){
 	try {
 	  MaxApplication.getTclInterp().evalFile(file.getPath());
@@ -77,11 +78,11 @@ public class ConsoleWindow extends MaxEditor {
       if(placeHolder instanceof MaxDocument){
 	if(placeHolder instanceof MaxEditor){
 	  MaxEditor aEditor = (MaxEditor) placeHolder;
-	  aEditor.Init(itsProject);
+	  aEditor.Init(/*itsProject*/);
 	}
 	
 	aDocument = (MaxDocument) placeHolder;
-	aDocument.InitDoc(file.getName(), file, itsProject);
+	aDocument.InitDoc(file.getName(), file/*, itsProject*/);
 	MaxApplication.itsEditorsFrameList.addElement(aDocument.GetWindow());
 	MaxApplication.SetCurrentWindow(aDocument.GetWindow());
 	MaxApplication.AddThisFrameToMenus(aDocument.GetTitle());
@@ -99,6 +100,7 @@ public class ConsoleWindow extends MaxEditor {
     String theFileName = theFile.getName();
     int aLength = theFileName.length();
     
+
     if (aLength > 4){
       String aExtension = theFileName.substring(aLength-3, aLength);
       if(theFileName.endsWith("."+aExtension)) return aExtension;
@@ -128,16 +130,25 @@ public class ConsoleWindow extends MaxEditor {
   }
   
   public void SetupMenu(){
-    itsFileMenu.getItem(3).setEnabled(false);
-    itsFileMenu.getItem(7).setEnabled(false);
-    itsFileMenu.getItem(8).setEnabled(false);
-    itsFileMenu.getItem(10).setEnabled(false);
-    itsEditMenu.getItem(0).setEnabled(false);
-    itsEditMenu.getItem(1).setEnabled(false);
-    itsEditMenu.getItem(2).setEnabled(false);
-    itsEditMenu.getItem(3).setEnabled(false);
+    GetCloseMenu().setEnabled(false);
+    GetSaveMenu().setEnabled(false);
+    GetSaveAsMenu().setEnabled(false);
+    GetPrintMenu().setEnabled(false);
+    GetCutMenu().setEnabled(false);
+    GetCopyMenu().setEnabled(false);
+    GetPasteMenu().setEnabled(false);
+    GetClearMenu().setEnabled(false);
+  }
+
+  public boolean CustomMenuActionPerformed(MenuItem theMenuItem, String theString){
+    return true;
+  }
+
+  public boolean CustomMenuItemStateChanged(CheckboxMenuItem theMenuItem, String theString){
+    return true;
   }
 }
+
 
 
 

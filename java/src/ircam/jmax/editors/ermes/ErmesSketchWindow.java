@@ -33,7 +33,7 @@ public class ErmesSketchWindow extends JFrame implements MaxWindow, KeyListener,
   ErmesScrollerView itsScrollerView = new ErmesScrollerView(this, itsSketchPad);
   ErmesSwToolbar itsToolBar = new ErmesSwToolbar(itsSketchPad);
   ErmesSketchWindow itsTopWindow = null;
-  ProjectEntry itsProjectEntry = null;
+  //ProjectEntry itsProjectEntry = null;
   static String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
   ErmesSwVarEdit itsVarEdit;//created when we need a variable editor (abstractions)!
 
@@ -45,7 +45,7 @@ public class ErmesSketchWindow extends JFrame implements MaxWindow, KeyListener,
   public Menu itsTextMenu;	
   public Menu itsSizesMenu;	
   public Menu itsFontsMenu;
-  public Menu itsProjectMenu;	
+  //public Menu itsProjectMenu;	
   public Menu itsWindowsMenu;	
   public Menu itsSubWindowsMenu;
   CheckboxMenuItem itsCurrentSizesMenu;
@@ -135,8 +135,8 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     itsTextMenu = CreateTextMenu();	//this assigns also the itsSizesMenu...
     mb.add(itsTextMenu);
       
-    itsProjectMenu = CreateProjectMenu();
-    mb.add(itsProjectMenu);
+    //itsProjectMenu = CreateProjectMenu();
+    //mb.add(itsProjectMenu);
     
     itsWindowsMenu = CreateWindowsMenu();
     mb.add(itsWindowsMenu);
@@ -322,7 +322,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     return false;
   }
 
-  private Menu CreateProjectMenu() {
+  /*private Menu CreateProjectMenu() {
     MenuItem aMenuItem;
     Menu ProjectMenu = new Menu("Project");
     ProjectMenu.add(aMenuItem = new MenuItem("Add Window"));
@@ -332,11 +332,11 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     ProjectMenu.add(aMenuItem = new MenuItem("Remove files"));
     aMenuItem.addActionListener(this);
     return ProjectMenu;
-  }
+    }*/
   
-  private boolean IsInProjectMenu(String theName) {
+  /*private boolean IsInProjectMenu(String theName) {
     return(theName.equals("Add Window")||theName.equals("Add files...")||theName.equals("Remove files"));
-  }
+    }*/
 
   private Menu CreateWindowsMenu() {
     MenuItem aMenuItem;
@@ -603,9 +603,9 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   //	GetProjectEntry
   //	returns the associated ProjectEntry
   //--------------------------------------------------------
-  public ProjectEntry GetProjectEntry(){
+  /*public ProjectEntry GetProjectEntry(){
     return itsProjectEntry;
-  }
+    }*/
 
   /////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////keyListener --inizio  
@@ -618,9 +618,9 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     if(e.isControlDown()){
       if(aInt == 74) MaxApplication.GetConsoleWindow().ToFront();//j
       else if(aInt == 65) itsSketchPad.SelectAll();//a
-      else if(aInt == 77) MaxApplication.GetProjectWindow().toFront();//m
-      else if(aInt == 78) MaxApplication.itsProjectWindow.New();//n
-      else if(aInt == 79) MaxApplication.itsProjectWindow.Open();//o
+      //#else if(aInt == 77) MaxApplication.GetProjectWindow().toFront();//m
+      else if(aInt == 78) MaxApplication.GetConsoleWindow().New();//n
+      else if(aInt == 79) MaxApplication.GetConsoleWindow()/*itsProjectWindow*/.Open();//o
       else if(aInt == 80) MaxApplication.ObeyCommand(MaxApplication.PRINT_WINDOW);//p
       else if(aInt == 81) MaxApplication.Quit(); //q
       else if(aInt == 83)itsDocument.Save();//s
@@ -709,7 +709,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 	fileToOpen = FtsHelpPatchTable.getHelpPatch(aObject.itsFtsObject);
 	
 	if (fileToOpen != null)
-	  MaxApplication.itsProjectWindow.OpenFile(fileToOpen);
+	  MaxApplication./*itsProjectWindow.*/GetConsoleWindow().OpenFile(fileToOpen);
       }
     }
   }
@@ -746,7 +746,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     
       if (IsInFileMenu(itemName)) FileMenuAction(aMenuItem, itemName);
       if (IsInEditMenu(itemName)) EditMenuAction(aMenuItem, itemName);
-      if (IsInProjectMenu(itemName)) ProjectMenuAction(aMenuItem, itemName);
+      //if (IsInProjectMenu(itemName)) ProjectMenuAction(aMenuItem, itemName);
       if (IsInWindowsMenu(itemName)) WindowsMenuAction(aMenuItem, itemName);
       if (IsInAlignObjectsMenu(itemName)) AlignObjectsMenuAction(aMenuItem, itemName);
     }
@@ -796,15 +796,15 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       if(aDialog.GetNothingToDoFlag()) return false;
       if(aDialog.GetToSaveFlag()){
 	if(!GetDocument().Save()) return false;
-	if(itsProjectEntry!=null) {
+	/*if(itsProjectEntry!=null) {
 	  if(GetDocument().GetNeverSavedFlag()) DiscardFromProject();
 	  else itsProjectEntry.Reset();
-	}
+	  }*/
       }
-      else if(itsProjectEntry!=null) DiscardFromProject();
+      //#else if(itsProjectEntry!=null) DiscardFromProject();
       aDialog.dispose();
     }
-    else if(itsProjectEntry!=null) itsProjectEntry.Reset();
+    //else if(itsProjectEntry!=null) itsProjectEntry.Reset();
     
 
     CloseAllSubWindows();//?????
@@ -846,17 +846,17 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     }
   }
 
-  private void DiscardFromProject(){
-    itsProjectEntry.itsProject.RemoveFromProject(GetDocument());
+  /*#abolita private void DiscardFromProject(){
+     itsProjectEntry.itsProject.RemoveFromProject(GetDocument());
     ErmesObjPatcher aPatcher;
     ProjectEntry aEntry;
     for (Enumeration e = itsSketchPad.itsPatcherElements.elements(); e.hasMoreElements();){
       aPatcher = (ErmesObjPatcher)e.nextElement();
       aEntry = MaxApplication.GetProjectWindow().GetProject().GetTheEntry(aPatcher.GetName());
-      aEntry.DecAbstractionNumber();
-      if(aEntry.GetAbstractionNumber()==0) itsProjectEntry.itsProject.RemoveFromProject(aEntry);
+	aEntry.DecAbstractionNumber();
+	if(aEntry.GetAbstractionNumber()==0) itsProjectEntry.itsProject.RemoveFromProject(aEntry);
     }
-  }
+  }*/
 
 
   private void EditMenuAction(MenuItem theMenuItem, String theString) {
@@ -893,22 +893,22 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     itsCurrentFontMenu.setState(true);
   }
 
-  private void ProjectMenuAction(MenuItem theMenuItem, String theString) {
+  /*private void ProjectMenuAction(MenuItem theMenuItem, String theString) {
     if (theString.equals("Add Window")) {
-      MaxApplication.ObeyCommand(MaxApplication.ADD_WINDOW);
+    MaxApplication.ObeyCommand(MaxApplication.ADD_WINDOW);
     }
     else if (theString.equals("Add files...")) {
-      File file = MaxFileChooser.chooseFileToOpen(this, "Add To Project");
+    File file = MaxFileChooser.chooseFileToOpen(this, "Add To Project");
 
-      if (file != null)
-	MaxApplication.AddToProject(file);
-      else
-	return;
+    if (file != null)
+    MaxApplication.AddToProject(file);
+    else
+    return;
     }
     else if (theString.equals("Remove files")) {
-      MaxApplication.ObeyCommand(MaxApplication.REMOVE_FILES);
+    MaxApplication.ObeyCommand(MaxApplication.REMOVE_FILES);
     }
-  }
+    }*/
 
 
   private void WindowsMenuAction(MenuItem theMenuItem, String theString) {
@@ -933,9 +933,9 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       itsSketchPad.SetRunMode(false);
       itsToolBar.setRunMode(false);
     }
-    else if (theString.equals("Project Manager Ctrl+M")) {
-      MaxApplication.GetProjectWindow().toFront();
-    }
+    //else if (theString.equals("Project Manager Ctrl+M")) {
+    //# MaxApplication.GetProjectWindow().toFront();
+    //}
     else if (theString.equals("jMax Console  Ctrl+J")) {
       MaxApplication.GetConsoleWindow().ToFront();
     }
@@ -1056,29 +1056,29 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     getContentPane().paintComponents(g);
   }
 
-    //--------------------------------------------------------
-    //	SetSnapToGrid
-    //--------------------------------------------------------
-    public void SetSnapToGrid(){
-      itsSketchPad.SetSnapToGrid();
-    }
-    
-    //--------------------------------------------------------
-    //	SetEntry
-    //--------------------------------------------------------
-    public void SetEntry(ProjectEntry theProjectEntry){
-    	itsProjectEntry = theProjectEntry;
-    	/*MenuBar aMenuBar = MaxApplication.GetProjectWindow().getMenuBar();
-    	aMenuBar.getMenu(2).getItem(3).enable();*/
-    }
+  //--------------------------------------------------------
+  //	SetSnapToGrid
+  //--------------------------------------------------------
+  public void SetSnapToGrid(){
+    itsSketchPad.SetSnapToGrid();
+  }
+  
+  //--------------------------------------------------------
+  //	SetEntry
+  //--------------------------------------------------------
+  /*public void SetEntry(ProjectEntry theProjectEntry){
+    itsProjectEntry = theProjectEntry;
+    MenuBar aMenuBar = MaxApplication.GetProjectWindow().getMenuBar();
+    aMenuBar.getMenu(2).getItem(3).enable();
+    }*/
 
 
-    //--------------------------------------------------------
-    //	SetAutorouting
-    //--------------------------------------------------------
-    public void SetAutorouting(){
-    	itsSketchPad.SetAutorouting();
-    }
+  //--------------------------------------------------------
+  //	SetAutorouting
+  //--------------------------------------------------------
+  public void SetAutorouting(){
+    itsSketchPad.SetAutorouting();
+  }
   
 
 

@@ -32,7 +32,7 @@ public class ErmesPatcherDoc implements MaxDocument {
   public boolean alreadySaved =/*false*/true;
   protected boolean neverSaved =true;
   
-  public void InitDoc(String theTitle, File theFile, Project theProject) {
+  public void InitDoc(String theTitle, File theFile/*, Project theProject*/) {
   }
   
   public ErmesPatcherDoc() {
@@ -207,8 +207,8 @@ public class ErmesPatcherDoc implements MaxDocument {
     if(!oldTitle.equals(itsTitle)){
       MaxApplication.ChangeWinNameMenus(oldTitle, itsTitle);
       itsSketchWindow.setTitle(itsTitle);
-      if (itsSketchWindow.itsProjectEntry != null)
-	itsSketchWindow.itsProjectEntry.SetFile(itsFile);
+      // if (itsSketchWindow.itsProjectEntry != null)
+      //itsSketchWindow.itsProjectEntry.SetFile(itsFile);
     }
     return true;
   }

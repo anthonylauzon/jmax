@@ -16,7 +16,7 @@ public class ConsoleDocument implements MaxDocument {
   public boolean Load(File file){return true;}
   public boolean Save(){return true;}
 	
-  public void InitDoc(String theTitle, File theFile, Project theProject){}
+  public void InitDoc(String theTitle, File theFile/*, Project theProject*/){}
   public String GetTitle(){return "jMax Console";}
   public File GetFile(){return null;}
   public String GetType(){return "";}

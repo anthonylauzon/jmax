@@ -490,11 +490,11 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
       if(placeHolder instanceof MaxDocument){
 	if(placeHolder instanceof MaxEditor){
 	  MaxEditor aEditor = (MaxEditor) placeHolder;
-	  aEditor.Init(itsProject);
+	  aEditor.Init(/*itsProject*/);
 	}
 	
 	aDocument = (MaxDocument) placeHolder;
-	aDocument.InitDoc(file.getName(), file, itsProject);
+	aDocument.InitDoc(file.getName(), file/*, itsProject*/);
 	MaxApplication.itsEditorsFrameList.addElement(aDocument.GetWindow());
 	MaxApplication.SetCurrentWindow(aDocument.GetWindow());
 	MaxApplication.AddThisFrameToMenus(aDocument.GetTitle());

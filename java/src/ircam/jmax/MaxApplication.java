@@ -12,17 +12,17 @@ import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.console.*;
 import ircam.jmax.editors.ermes.*;
-import ircam.jmax.editors.project.*;
+//63import ircam.jmax.editors.project.*;
 import tcl.lang.*;
 
 /**
  * The main application class in Ermes. Contains the global parameters 
  * and/or the global functionalities of the system. 
- * It is also the entry point for ermes TCL commands. It handles, for example:
+ * It is also the entry point for several TCL commands. It handles, for example:
  * - the startup process, the TCL initialization
  * - the FTS connection
  * - the resource definition loading
- * - the project manager activation
+ * - the project manager activation (no more)
  * - a set of global functions related to the window list (stack, tile, close)
  * - file format versions handling
  * - system properties
@@ -64,7 +64,7 @@ public class MaxApplication extends Object {
   static final int MAX_RESOURCE_FILE_LENGHT = 1024;
   public static ErmesSketchWindow itsSketchWindow;
   public static MaxWindow itsWindow;
-  public static ProjectWindow itsProjectWindow;
+  //public static ProjectWindow itsProjectWindow;
 
   static MaxWhenHookTable  itsHookTable;
   public final static int NEW_COMMAND = 0;
@@ -136,18 +136,6 @@ public class MaxApplication extends Object {
 	return;
       }
     }
-		
-
-    
-    /*for(Enumeration e = resourceVector.elements(); e.hasMoreElements();) {
-      aResId = (MaxResourceId) e.nextElement();
-      System.out.println("RESOURCE TYPE "+aResId.resourceName);
-      System.out.println("associated extensions: ");
-      for (Enumeration e1 = aResId.resourceExtensions.elements(); e1.hasMoreElements();) {
-      System.out.println("\""+e1.nextElement()+"\"");
-      }
-      System.out.println("associated handler: "+aResId.preferred_resource_handler);
-      }*/
   }
   
   static boolean Start_resource_type_list(StringTokenizer aST) {
@@ -206,10 +194,6 @@ public class MaxApplication extends Object {
   
   public static void Load(File file)
   {
-    //for now, only '.pat' accepted...
-    // so, if file does not terminate with '.pat', error
-
-    //files .pat always charged without autorouting
 
     boolean temp = doAutorouting;
 
@@ -238,7 +222,7 @@ public class MaxApplication extends Object {
     catch (Exception e)
       {
 	e.printStackTrace(); // temporary, MDC
-	ErrorDialog aErr = new ErrorDialog(itsProjectWindow, "Error " + e + " while importing "+ file);
+	ErrorDialog aErr = new ErrorDialog(/*#*/GetConsoleWindow(), "Error " + e + " while importing "+ file);
 	aErr.setLocation(100, 100);
 	aErr.setVisible(true);
 	return;
@@ -251,11 +235,11 @@ public class MaxApplication extends Object {
     CheckboxMenuItem aEditMenuItem = (CheckboxMenuItem)itsSketchWindow.itsEditMenu.getItem(8);
     aEditMenuItem.setState(doAutorouting);
 
-    if(itsProjectWindow.itsProject.GetItems().size()==0)
+    /*#if(itsProjectWindow.itsProject.GetItems().size()==0)
       itsSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
 
     if(itsSketchWindowList.size() == 1)
-      itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);
+      itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);*/
 
     AddThisWindowToMenus(itsSketchWindow);
     itsSketchWindow.setVisible(true);
@@ -291,8 +275,8 @@ public class MaxApplication extends Object {
     if (!found)
       aType = "unknown";
 
-    itsProjectWindow.itsProject.AddToProject(file.getName(), aType, file);
-    UpdateProjectMenu();
+    /*#itsProjectWindow.itsProject.AddToProject(file.getName(), aType, file);
+    UpdateProjectMenu();*/
   }
 	
   static public void AddThisWindowToMenus(ErmesSketchWindow theSketchWindow){
@@ -308,7 +292,7 @@ public class MaxApplication extends Object {
 	aWindow = (MaxWindow)itsEditorsFrameList.elementAt(i);
 	aWindow.AddWindowToMenu(theSketchWindow.getTitle());
       }
-      itsProjectWindow.AddWindowToMenu(theSketchWindow.getTitle());
+      //#itsProjectWindow.AddWindowToMenu(theSketchWindow.getTitle());
 
       if (itsConsoleWindow != null)
 	itsConsoleWindow.AddWindowToMenu(theSketchWindow.getTitle());
@@ -327,7 +311,7 @@ public class MaxApplication extends Object {
 	if(!theName.equals(aWindow.GetDocument().GetTitle()))
 	  aWindow.AddWindowToMenu(theName);
     }
-    itsProjectWindow.AddWindowToMenu(theName);
+    //#itsProjectWindow.AddWindowToMenu(theName);
 
     if (itsConsoleWindow != null)
       itsConsoleWindow.AddWindowToMenu(theName);
@@ -345,7 +329,7 @@ public class MaxApplication extends Object {
       aWindow = (MaxWindow)itsEditorsFrameList.elementAt(i);
       aWindow.AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
     }
-    itsProjectWindow.AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
+    //#itsProjectWindow.AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
 
     if (itsConsoleWindow != null)
       itsConsoleWindow.AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
@@ -363,7 +347,7 @@ public class MaxApplication extends Object {
       aWindow = (MaxWindow)itsEditorsFrameList.elementAt(i);
       aWindow.RemoveFromSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theLastItem);
     }
-    itsProjectWindow.RemoveFromSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(),theLastItem);
+    //#itsProjectWindow.RemoveFromSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(),theLastItem);
     if (itsConsoleWindow != null)
       itsConsoleWindow.RemoveFromSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theLastItem);
 
@@ -384,7 +368,7 @@ public class MaxApplication extends Object {
       if(aWindow != theWindow)
 	aWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetTitle());
     }
-    itsProjectWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetTitle());
+    //#itsProjectWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetTitle());
 
     if (itsConsoleWindow != null)
       itsConsoleWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetTitle());
@@ -401,7 +385,7 @@ public class MaxApplication extends Object {
       aWindow = (MaxWindow)itsEditorsFrameList.elementAt(i);
       aWindow.ChangeWinNameMenu(theOldName,theNewName);
     }
-    itsProjectWindow.ChangeWinNameMenu(theOldName, theNewName);
+    //#itsProjectWindow.ChangeWinNameMenu(theOldName, theNewName);
 
     if (itsConsoleWindow != null)
       itsConsoleWindow.ChangeWinNameMenu(theOldName, theNewName);
@@ -420,10 +404,10 @@ public class MaxApplication extends Object {
     itsSketchWindow.inAnApplet = false;
     itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetTitle());
     aPatcherDoc.SetWindow(itsSketchWindow);
-    if(itsProjectWindow.itsProject.GetItems().size()==0)
+    /*#if(itsProjectWindow.itsProject.GetItems().size()==0)
       itsSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
-    if(itsSketchWindowList.size() == 1)
-      itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);
+      if(itsSketchWindowList.size() == 1)
+      itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);*/
     itsSketchWindow.setVisible(true);
     return itsSketchWindow;
   }
@@ -443,42 +427,11 @@ public class MaxApplication extends Object {
     aSketchWindow.inAnApplet = false;
     aSketchWindow.setTitle(aSketchWindow.GetDocument().GetTitle());
     aPatcherDoc.SetWindow(aSketchWindow);
-    //CheckboxMenuItem aEditMenuItem = (CheckboxMenuItem)aSketchWindow.itsEditMenu.getItem(9);
-    //aEditMenuItem.setState(temp);
-    //if(itsProjectWindow.itsProject.GetItems().size()==0)
-    //  aSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
-    //if(itsSketchWindowList.size() == 1)
-    //  itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);
     aSketchWindow.pack();
     aSketchWindow.setVisible(false);
     return aSketchWindow;
   }
   
-  /* public static ErmesSketchWindow NewSubPatcherWindow(FtsContainerObject theFtsPatcher) {
-    ErmesPatcherDoc aPatcherDoc = new ErmesPatcherDoc(theFtsPatcher);
-    aPatcherDoc.alreadySaved = true;
-    boolean temp = itsSketchWindow.itsSketchPad.doAutorouting;
-    itsSketchWindow = new ErmesSketchWindow(true, itsSketchWindow);
-    itsSketchWindow.itsSketchPad.doAutorouting = temp;
-    theFtsPatcher.open();
-    itsSketchWindow.repaint();
-    itsWindow = itsSketchWindow;
-    itsSketchWindow.InitFromDocument(aPatcherDoc);
-    itsSketchWindowList.addElement(itsSketchWindow);
-    itsSketchWindow.inAnApplet = false;
-    itsSketchWindow.setTitle(itsSketchWindow.GetDocument().GetTitle());
-    aPatcherDoc.SetWindow(itsSketchWindow);
-    CheckboxMenuItem aEditMenuItem = (CheckboxMenuItem)itsSketchWindow.itsEditMenu.getItem(9);
-    aEditMenuItem.setState(temp);
-    if(itsProjectWindow.itsProject.GetItems().size()==0)
-     itsSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
-    if(itsSketchWindowList.size() == 1)
-      itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);
-    itsSketchWindow.pack();
-    itsSketchWindow.setVisible(true);
-    return itsSketchWindow;
-  }*/
-
 
   public static ErmesSketchWindow NewDefaultSubPatcher( FtsContainerObject theFtsPatcher) {//to use just for 'patcher' externals
     theFtsPatcher.setWindowDescription(new FtsWindowDescription(100, 100, 300, 300));
@@ -504,10 +457,10 @@ public class MaxApplication extends Object {
       itsSketchWindow.setLocation(40,40);
       //itsSketchWindow.setRunMode(true);
       itsSketchWindow.setRunMode(false);
-      if(itsProjectWindow.itsProject.GetItems().size()==0)
+      /*#if(itsProjectWindow.itsProject.GetItems().size()==0)
 	itsSketchWindow.itsProjectMenu.getItem(2).setEnabled(false);
-      if(itsSketchWindowList.size() == 1)
-	itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);
+	if(itsSketchWindowList.size() == 1)
+	itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);*/
       AddThisWindowToMenus(itsSketchWindow);
       itsSketchWindow.setVisible(true);
       break;	
@@ -526,10 +479,10 @@ public class MaxApplication extends Object {
       itsSketchWindow.setLocation(40,40);
       //itsSketchWindow.setRunMode(true);
       itsSketchWindow.setRunMode(false);
-      if(itsProjectWindow.itsProject.GetItems().size()==0)
+      /*#if(itsProjectWindow.itsProject.GetItems().size()==0)
 	itsSketchWindow.itsProjectMenu.getItem(2).setEnabled(false);
-      if(itsSketchWindowList.size() == 1)
-	itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);
+	if(itsSketchWindowList.size() == 1)
+	itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);*/
       AddThisWindowToMenus(itsSketchWindow);
       itsSketchWindow.setVisible(true);
       break;	
@@ -538,13 +491,14 @@ public class MaxApplication extends Object {
       doAutorouting = !doAutorouting;
       //qui controlla lo stato del menu corrispondeente e gli adatta quello
       //dei menu delle altre finestre.....
-      CheckboxMenuItem aMenuItem = (CheckboxMenuItem)itsProjectWindow.getMenuBar().getMenu(0).getItem(4);
-      aMenuItem.setState(doAutorouting);
-      for(int i=0; i<itsSketchWindowList.size(); i++){
+      /*#fallo sulla console
+	CheckboxMenuItem aMenuItem = (CheckboxMenuItem)itsProjectWindow.getMenuBar().getMenu(0).getItem(4);
+	aMenuItem.setState(doAutorouting);
+	for(int i=0; i<itsSketchWindowList.size(); i++){
 	aSketchWindow = (ErmesSketchWindow) itsSketchWindowList.elementAt(i);
 	aMenuItem = (CheckboxMenuItem)aSketchWindow.getMenuBar().getMenu(0).getItem(4);
 	aMenuItem.setState(doAutorouting);
-      }
+	}*/
       break;
     case SNAP_TO_GRID:
       for (int k=0; k<itsSketchWindowList.size(); k++) {
@@ -564,7 +518,7 @@ public class MaxApplication extends Object {
 	itsSketchWindow = null;
 	if(itsEditorsFrameList.isEmpty()){
 	  itsWindow = null;	
-	  itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(false);
+	  //#itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(false);
 	}
       } 
       break;
@@ -577,18 +531,19 @@ public class MaxApplication extends Object {
       aPrintJob.end();
       break;
     case ADD_WINDOW:
-      itsProjectWindow.itsProject.AddToProject((ErmesPatcherDoc)itsSketchWindow.GetDocument(), itsSketchWindow);
+      //#itsProjectWindow.itsProject.AddToProject((ErmesPatcherDoc)itsSketchWindow.GetDocument(), itsSketchWindow);
       UpdateProjectMenu();
       break;
     case REMOVE_FILES:
-      itsProjectWindow.itsProject.RemoveFromProject();
-      if(itsProjectWindow.itsProject.GetItems().size()==0){
+      //#itsProjectWindow.itsProject.RemoveFromProject();
+      /*if(itsProjectWindow.itsProject.GetItems().size()==0){
 	itsProjectWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
 	for(int m=0; m<itsSketchWindowList.size(); m++){
-	  aSketchWindow = (ErmesSketchWindow) itsSketchWindowList.elementAt(m);
-	  aSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
+	aSketchWindow = (ErmesSketchWindow) itsSketchWindowList.elementAt(m);
+	aSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
 	}
-      }
+	}
+      */
       break;
     }	
   }
@@ -706,34 +661,34 @@ public class MaxApplication extends Object {
   public static void SetCurrentWindow(MaxWindow theWindow){
     if(theWindow instanceof ErmesSketchWindow)itsSketchWindow = (ErmesSketchWindow)theWindow;
     itsWindow = theWindow;
-    GetCurrentProject().SetCurrentEntry(itsWindow.GetDocument().GetTitle());
+    //#ahioGetCurrentProject().SetCurrentEntry(itsWindow.GetDocument().GetTitle());
   }
   
   public static ErmesSketchWindow GetCurrentWindow() {
     return itsSketchWindow;
   }
 	
-  public static ProjectWindow GetProjectWindow() {
-    return itsProjectWindow;
-  }
+/*#abolita public static ProjectWindow GetProjectWindow() {
+  return itsProjectWindow;
+  }*/
 	
   public static ConsoleWindow GetConsoleWindow() {
     return itsConsoleWindow;
   }
 
-  public static Project GetCurrentProject() {
-    return itsProjectWindow.itsProject;
-  }
+/*#abolita public static Project GetCurrentProject() {
+  return itsProjectWindow.itsProject;
+  }*/
 	
   public static void UpdateProjectMenu(){
     ErmesSketchWindow aSketchWindow;
-    if(itsProjectWindow.itsProject.GetItems().size()==1){
+    /*if(itsProjectWindow.itsProject.GetItems().size()==1){
       itsProjectWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(true);
       for(int m=0; m<itsSketchWindowList.size(); m++){
-	aSketchWindow = (ErmesSketchWindow) itsSketchWindowList.elementAt(m);
-	aSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(true);
+      aSketchWindow = (ErmesSketchWindow) itsSketchWindowList.elementAt(m);
+      aSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(true);
       }
-    }
+      }*/
   }
 
   /** Functions to add application hooks */
@@ -782,7 +737,7 @@ public class MaxApplication extends Object {
 
     LoadResources();
 
-    itsProjectWindow = new ProjectWindow();
+    //#ahio itsProjectWindow = new ProjectWindow();
 
     itsInterp = new tcl.lang.Interp(); // should go away here !!!
 
@@ -794,7 +749,7 @@ public class MaxApplication extends Object {
 
     if (itsServer == null)
       {
-	new ConnectionDialog(itsProjectWindow);
+	new ConnectionDialog(GetConsoleWindow()/*#itsProjectWindow*/);
 	MaxApplication.runHooks("start");
       }
   }
@@ -864,7 +819,7 @@ public class MaxApplication extends Object {
     System.setOut(itsConsole.getPrintStream());
 
     itsConsoleWindow = new ConsoleWindow(itsConsole, "jMax Console");
-    itsConsoleWindow.Init(itsProjectWindow.itsProject);
+    itsConsoleWindow.Init(/*#itsProjectWindow.itsProject*/);
     itsConsoleWindow.setLocation(0,0);
     itsConsoleWindow.pack();
     itsConsoleWindow.setVisible(true);
@@ -892,9 +847,9 @@ public class MaxApplication extends Object {
     if (itsConsoleWindow != null)
       {
 	itsConsoleWindow.setVisible(false);
-	itsProjectWindow.setVisible(false);
+	//#itsProjectWindow.setVisible(false);
 	itsConsoleWindow.dispose();
-	itsProjectWindow.dispose();
+	//#itsProjectWindow.dispose();
       }
 
     if (itsServer != null)
