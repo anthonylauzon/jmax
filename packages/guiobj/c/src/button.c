@@ -6,13 +6,15 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.3 $ IRCAM $Date: 1998/10/30 17:49:30 $
+ *      $Revision: 1.4 $ IRCAM $Date: 1998/11/17 14:32:01 $
  *
  * Use a timer for blinking because Java timing is not reilable.
  * 
  */
 
 #include "fts.h"
+
+#define DEFAULT_DURATION 125.0f
 
 static void button_tick(fts_alarm_t *alarm, void *calldata);
 
@@ -50,7 +52,7 @@ button_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   fts_alarm_init(&(this->alarm), 0, button_tick, this);
   this->value = 0;
-  this->duration = 150.0f;
+  this->duration = DEFAULT_DURATION;
   this->color = 1;
 }
 
