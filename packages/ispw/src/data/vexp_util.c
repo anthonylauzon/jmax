@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.2 $ IRCAM $Date: 1998/09/28 15:39:41 $
+ *      $Revision: 1.3 $ IRCAM $Date: 1998/11/02 10:37:20 $
  *
  */
 #include <stdio.h>		/* for sprintf */
@@ -200,6 +200,10 @@ argstostr(int argc, const fts_atom_t *argv, char *buf, int size)
       argv++;
     }
 }
+
+
+
+
 
 
 

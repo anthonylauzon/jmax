@@ -7,7 +7,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1998/05/13 11:43:04 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:26 $
  *
  */
 
@@ -17,7 +17,6 @@
 
 /*------------------------- expr class -------------------------------------*/
 
-#define	MAXBUF	256
 
 /*#define EXPR_DEBUG*/
 
@@ -221,9 +220,9 @@ expr_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static fts_status_t
 expr_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[64];
+  const char *buf;
+  fts_symbol_t a[4];
   struct expr *x;
-  char buf[MAXBUF];
   int i, mark;
   int varnum;
   struct ex_ex *eptr;
@@ -235,7 +234,8 @@ expr_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   x = (t_expr *)fts_zalloc(sizeof(t_expr)); /* never freed ? */
   x->exp_stack = (struct ex_ex *)0;
-  argstostr(ac, at, buf, MAXBUF);
+
+  buf = fts_symbol_name(fts_get_symbol(at));
 
   if (ex_new(x, buf))
     {
@@ -258,9 +258,11 @@ expr_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(t_expr), (varnum ? varnum : 1), 1, (void *)x);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, expr_init);
+  a[0] = fts_s_symbol;
+  a[1] = fts_s_symbol;
+  fts_method_define(cl, fts_SystemInlet, fts_s_init, expr_init, 2, a);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, expr_delete, 0, a);
+  fts_method_define(cl, fts_SystemInlet, fts_s_delete, expr_delete, 0, 0);
 
   a[0] = fts_s_number;
   fts_method_define(cl, 0, fts_s_int, expr_int, 1, a);
@@ -275,9 +277,6 @@ expr_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_list, expr_list);
 
-#if 0
-  for (i = 1, eptr = x->exp_var;  ; eptr++, i++)
-#endif
   mark = 0;
   for (i = MAX_VARS-1, eptr = &x->exp_var[MAX_VARS-1]; i > 0 ; i--, eptr--)
     {
@@ -330,5 +329,5 @@ expr_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 expr_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("expr"),expr_instantiate, fts_arg_equiv_or_float);
+  fts_metaclass_create(fts_new_symbol("expr"),expr_instantiate, fts_arg_equiv);
 }

@@ -696,7 +696,7 @@ public class FtsParse
   {
     String keywords[] = { "(", ")",
 			  "[", "]", "{", "}", ",", 
-			  ":", "$",
+			  ":", "$", ".",
 			  ";", "'" };
     
     for (int i = 0 ; i < keywords.length; i++)
@@ -712,7 +712,7 @@ public class FtsParse
   {
     char chars[] = { '$', ',', '(', ')', '[', ']',
 		     '{', '}', 
-		     ':',
+		     ':', '.',
 		     ';', '\'', '\t', ' ' };
 
     for (int i = 0 ; i < chars.length; i++)
