@@ -72,8 +72,13 @@ abstract class ErmesObjNumberBox extends ErmesObject implements KeyEventClient {
   {
     super.setFont( theFont);
 
-    super.setWidth( getMinWidth());
-    super.setHeight( getMinHeight());
+    int minWidth = getMinWidth();
+    if (getWidth() < minWidth)
+      super.setWidth( minWidth);
+
+    int minHeight = getMinHeight();
+    if ( getHeight() < minHeight)
+      super.setHeight( minHeight);
   }
 
   // ----------------------------------------

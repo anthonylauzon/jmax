@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.52 $ IRCAM $Date: 1998/11/02 11:44:08 $
+ *      $Revision: 1.53 $ IRCAM $Date: 1998/11/18 15:03:57 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -745,7 +745,6 @@ void fts_object_reset_description(fts_object_t *obj)
 
 void fts_object_set_id(fts_object_t *obj, int id)
 {
-  
   /* set the id and put the object in the object table */
 
   if (obj->id != FTS_NO_ID)

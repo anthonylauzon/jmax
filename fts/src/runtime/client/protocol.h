@@ -107,12 +107,13 @@
 
 #define INT_CODE            0x03
 #define FLOAT_CODE          0x04
-#define SYMBOL_CODE         0x05
+#define SYMBOL_CACHED_CODE  0x05
 #define SYMBOL_AND_DEF_CODE 0x06
-#define OBJECT_CODE         0x07
-#define CONNECTION_CODE     0x08
-#define DATA_CODE           0x09
-#define EOM_CODE            0x0a
+#define SYMBOL_CODE         0x07
+#define OBJECT_CODE         0x08
+#define CONNECTION_CODE     0x09
+#define DATA_CODE           0x0a
+#define EOM_CODE            0x0b
 
 
 #endif

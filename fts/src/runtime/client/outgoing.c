@@ -41,13 +41,10 @@
 
    We send the values as we get them; the device implement buffering
    if it need it.
-
-   1024 char max per atom.
 */
 
-static char outbuf[1024];
 
-static void fts_client_send_string(char *msg)
+static void fts_client_send_string(const char *msg)
 {
   int i;
 
@@ -58,12 +55,7 @@ static void fts_client_send_string(char *msg)
 #endif
 
       for (i = 0; msg[i] != '\0' ; i++)
-	{
-	  if (i >= 1024)
-	    fprintf(stderr, "String too long >%s<\n", msg); 
-
-	  fts_char_dev_put(client_dev, msg[i]);
-	}
+	fts_char_dev_put(client_dev, msg[i]);
     }
 }
 
@@ -130,56 +122,65 @@ void fts_client_mess_add_float(float value)
   fts_client_mess_send_float(value);
 }
 
-#define MAX_CACHE_INDEX 512
-static int first_unused_cache_index = 0;
 
 void fts_client_mess_add_symbol(fts_symbol_t s)
 {
-  if (fts_symbol_is_cached(s))
+  if (fts_symbol_is_reserve_cached(s))
     {
-      fts_char_dev_put(client_dev, SYMBOL_CODE);
-      fts_client_mess_send_int(fts_symbol_get_cache_index(s));
-    }
-  else if (first_unused_cache_index < MAX_CACHE_INDEX)
-    {
-      /* Define the symbol cached, and send a symbol and definition with a good index */
-
-      fts_symbol_set_cache_index(s, first_unused_cache_index++);
+      fts_symbol_cache(s);
       fts_char_dev_put(client_dev, SYMBOL_AND_DEF_CODE);
       fts_client_mess_send_int(fts_symbol_get_cache_index(s));
-      fts_client_mess_add_symbol_string(s);
+      fts_char_dev_put(client_dev, STRING_START_CODE);
+      fts_client_send_string(fts_symbol_name(s));
+      fts_char_dev_put(client_dev, STRING_END_CODE);
+    }
+  else if (fts_symbol_is_cached(s))
+    {
+      fts_char_dev_put(client_dev, SYMBOL_CACHED_CODE);
+      fts_client_mess_send_int(fts_symbol_get_cache_index(s));
     }
   else
     {
-      /* No place in the cache, don't define the symbol cached,
+      /* Not cached, don't define the symbol cached,
 	 and send a symbol and definition with a good index;
-	 Here we may reuse a cache line (but think about intern).
 	 */
 
-      fts_char_dev_put(client_dev, SYMBOL_AND_DEF_CODE);
-      fts_client_mess_send_int(-1);
-      fts_client_mess_add_symbol_string(s);
+      fts_char_dev_put(client_dev, SYMBOL_CODE);
+      fts_char_dev_put(client_dev, STRING_START_CODE);
+      fts_client_send_string(fts_symbol_name(s));
+      fts_char_dev_put(client_dev, STRING_END_CODE);
     }
 }
 
-void fts_client_mess_add_symbol_string(fts_symbol_t s)
+void fts_client_mess_add_symbol_as_string(fts_symbol_t s)
 {
-  sprintf(outbuf, "%c%s%c", STRING_START_CODE, fts_symbol_name(s), STRING_END_CODE);
-  fts_client_send_string(outbuf);
-}
-
-void fts_client_mess_add_string(const char *sp)
-{
-  if (sp)
+  if (fts_symbol_is_reserve_cached(s))
     {
-      sprintf(outbuf, "%c%s%c", STRING_START_CODE, sp, STRING_END_CODE);
-      fts_client_send_string(outbuf);
+      fts_symbol_cache(s);
+      fts_char_dev_put(client_dev, SYMBOL_AND_DEF_CODE);
+      fts_client_mess_send_int(fts_symbol_get_cache_index(s));
+      fts_char_dev_put(client_dev, STRING_START_CODE);
+      fts_client_send_string(fts_symbol_name(s));
+      fts_char_dev_put(client_dev, STRING_END_CODE);
+    }
+  else if (fts_symbol_is_cached(s))
+    {
+      fts_char_dev_put(client_dev, SYMBOL_CACHED_CODE);
+      fts_client_mess_send_int(fts_symbol_get_cache_index(s));
     }
   else
     {
-      sprintf(outbuf, "%c%c", STRING_START_CODE, STRING_END_CODE);
-      fts_client_send_string(outbuf);
+      fts_char_dev_put(client_dev, STRING_START_CODE);
+      fts_client_send_string(fts_symbol_name(s));
+      fts_char_dev_put(client_dev, STRING_END_CODE);
     }
+}
+
+void fts_client_mess_add_string(const char *s)
+{
+  fts_char_dev_put(client_dev, STRING_START_CODE);
+  fts_client_send_string(s);
+  fts_char_dev_put(client_dev, STRING_END_CODE);
 }
 
 
@@ -191,12 +192,12 @@ void fts_client_mess_add_atoms(int ac, const fts_atom_t *args)
 
   for (i = 0; i < ac; i++)
     {
-      if (fts_is_long(&args[i]))
-	fts_client_mess_add_long(fts_get_long(&args[i]));
+      if (fts_is_int(&args[i]))
+	fts_client_mess_add_int(fts_get_long(&args[i]));
       else  if (fts_is_float(&args[i]))
 	fts_client_mess_add_float(fts_get_float(&args[i]));
       else  if (fts_is_symbol(&args[i]))
-	fts_client_mess_add_symbol_string(fts_get_symbol(&args[i]));
+	fts_client_mess_add_symbol_as_string(fts_get_symbol(&args[i]));
       else  if (fts_is_string(&args[i]))
 	fts_client_mess_add_string(fts_get_string(&args[i]));
       else  if (fts_is_object(&args[i]))
@@ -278,12 +279,27 @@ void fts_client_upload_object(fts_object_t *obj)
 
   if (do_var)
     {
-      fts_client_mess_add_symbol_string(fts_get_symbol(&obj->argv[0]));
-      fts_client_mess_add_atoms(obj->argc - 2, obj->argv + 2);
+      fts_client_mess_add_symbol_as_string(fts_get_symbol(&obj->argv[0]));
+
+      if (fts_is_symbol(obj->argv + 2))
+	{
+	  fts_client_mess_add_symbol(fts_get_symbol(obj->argv + 2));
+	  fts_client_mess_add_atoms(obj->argc - 3, obj->argv + 3);
+	}
+      else
+	fts_client_mess_add_atoms(obj->argc - 2, obj->argv + 2);
     }
   else
     {
-      fts_client_mess_add_atoms(obj->argc, obj->argv);
+      if ((obj->argc > 0) && (fts_is_symbol(&obj->argv[0])))
+	{
+	  fts_client_mess_add_symbol(fts_get_symbol(&obj->argv[0]));
+	  fts_client_mess_add_atoms(obj->argc - 1, obj->argv + 1);
+	}
+      else
+	{
+	  fts_client_mess_add_atoms(obj->argc, obj->argv);
+	}
     }
 
   fts_client_mess_send_msg();

@@ -21,7 +21,6 @@ abstract public class FtsStream
 {
   /** Local Exception represeting a crash in the FTS server. */
 
-
   String name;
   FtsServer server;
 
@@ -353,10 +352,25 @@ abstract public class FtsStream
    * @exception ircam.jmax.fts.FtsQuittedExcepetion For some reason the FTS server quitted.
    */
 
-  final private int symbolCacheSize = 512;
-  private String[] symbolCache = new String[symbolCacheSize];
+  private String[] symbolCache = new String[1024];
   private StringBuffer s = new StringBuffer();
   private int status = FtsClientProtocol.end_of_message; // the parser status, usually next arg type
+
+  private final void reallocateSymbolCache(int idx)
+  {
+    int size;
+    String[] newCache;
+
+    size = symbolCache.length;
+
+    while (idx < size)
+      size = 2 * size;
+
+    newCache = new String[size];
+    System.arraycopy(newCache, 0, symbolCache, 0, symbolCache.length);
+
+    symbolCache = newCache;
+  }
 
   private final void skipToEnd()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
@@ -392,12 +406,15 @@ abstract public class FtsStream
   public final boolean nextIsSymbol()
   {
     return ((status == FtsClientProtocol.symbol_type) ||
+	    (status == FtsClientProtocol.symbol_cached_type) ||
 	    (status == FtsClientProtocol.symbol_and_def_type));
   }
 
   public final boolean nextIsString()
   {
-    return status == FtsClientProtocol.string_start;
+    return ((status == FtsClientProtocol.symbol_type) ||
+	    (status == FtsClientProtocol.symbol_and_def_type) || 
+	    (status == FtsClientProtocol.string_start));
   }
 
   public final boolean nextIsObject()
@@ -456,7 +473,6 @@ abstract public class FtsStream
     r = r | ((read() & 0xff) << 0);
 
     status = read();
-
     return Float.intBitsToFloat(r);
   }
 
@@ -485,30 +501,7 @@ abstract public class FtsStream
      strings are generally not sent as symbol, unless we want the interned/cached
      version */
 
-
-  public final String getNextSymbolArgument()
-       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
-  {
-    if (status == FtsClientProtocol.symbol_type)
-      {
-	int idx;
-	idx = getNextIntArgument();
-
-	return symbolCache[idx];
-      }
-    else
-      {
-	int idx = getNextIntArgument();
-	String str = getNextStringArgument().intern();
-
-	if ((idx >= 0) && (idx < symbolCacheSize))
-	  symbolCache[idx] = str;
-
-	return str;
-      }
-  }
-
-  public final String getNextStringArgument()
+  private final String getNextString()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     String str;
@@ -537,6 +530,45 @@ abstract public class FtsStream
   }
 
 
+  public final String getNextSymbolArgument()
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
+  {
+    if (status == FtsClientProtocol.symbol_cached_type)
+      {
+	int idx;
+	idx = getNextIntArgument();
+	return symbolCache[idx];
+      }
+    else if (status == FtsClientProtocol.symbol_and_def_type)
+      {
+	int idx = getNextIntArgument();
+	String str = getNextString().intern();
+
+	if (idx >= symbolCache.length)
+	  reallocateSymbolCache(idx);
+
+	symbolCache[idx] = str; 
+
+	return str;
+      }
+    else if (status == FtsClientProtocol.symbol_type)
+      {
+	return getNextString().intern();
+      }
+    else
+      return "";
+  }
+
+  public final String getNextStringArgument()
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
+  {
+    if (nextIsSymbol())
+      return getNextSymbolArgument();
+    else
+      return getNextString();
+  }
+
+
   public final Object getNextArgument()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
@@ -559,6 +591,11 @@ abstract public class FtsStream
 
       case FtsClientProtocol.string_start:
 	return getNextStringArgument();
+
+      case FtsClientProtocol.symbol_cached_type:
+      case FtsClientProtocol.symbol_and_def_type:
+      case FtsClientProtocol.symbol_type:
+	return getNextSymbolArgument();
 
       default:
 	return null;

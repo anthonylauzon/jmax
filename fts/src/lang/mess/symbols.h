@@ -23,8 +23,12 @@ extern const char *fts_symbol_name(fts_symbol_t sym)
 
 #define fts_symbol_get_cache_index(sym)      ((sym)->cache_index)
 #define fts_symbol_set_cache_index(sym, idx) (((struct fts_symbol_descr *) sym)->cache_index = (idx))
-#define fts_symbol_is_cached(sym)            ((sym)->cache_index != (-1))
 
+#define fts_symbol_is_cached(sym)            ((sym)->cache_index > 0)
+#define fts_symbol_is_reserve_cached(sym)    ((sym)->cache_index < 0)
+#define fts_symbol_cache(sym)                (((struct fts_symbol_descr *) sym)->cache_index = ((-1) * ((sym)->cache_index)))
+
+extern void fts_symbol_reserve_cache(fts_symbol_t s);
 
 
 /* Predefined symbols used in the lang module */

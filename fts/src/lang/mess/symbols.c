@@ -354,12 +354,14 @@ fts_new_symbol(const char *name)
   sp = (struct fts_symbol_descr *) fts_heap_alloc(symbol_heap);
   sp->name        = name;
   sp->operator    = -1;
-  sp->cache_index = -1;
+  sp->cache_index = 0;
 
   /* third, add the new symbol in the hash table */
 
   sp->next_in_table = (struct fts_symbol_descr *) symbol_table.symbol_hash_table[hash];
   symbol_table.symbol_hash_table[hash] = sp;
+
+  fts_symbol_reserve_cache(sp);
 
   return sp;
 }
@@ -396,14 +398,28 @@ fts_new_symbol_copy(const char *name)
 
   sp->name = s;
   sp->operator = -1;
-  sp->cache_index = -1;
+  sp->cache_index = 0;
 
   /* third, add the new symbol in the has table */
 
   sp->next_in_table = (struct fts_symbol_descr *) symbol_table.symbol_hash_table[hash];
   symbol_table.symbol_hash_table[hash] = sp;
 
+  fts_symbol_reserve_cache(sp);
+
   return sp;
 }
 
 
+
+/* Handling symbol cache */
+
+#define MAX_CACHE_INDEX 1024
+
+static int first_unused_symbol_cache_index = 0;
+
+void fts_symbol_reserve_cache(fts_symbol_t s)
+{
+  if (first_unused_symbol_cache_index < MAX_CACHE_INDEX)
+    fts_symbol_set_cache_index(s, (-1) * first_unused_symbol_cache_index++);
+}

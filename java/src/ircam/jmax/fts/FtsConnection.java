@@ -85,7 +85,7 @@ public class FtsConnection
    *  indirectly called by FTS.
    */
 
-  public void release()
+ void release()
   {
     deleted = true;
 

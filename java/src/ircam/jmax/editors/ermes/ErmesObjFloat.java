@@ -152,3 +152,13 @@ class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueListener
       } 
   }
 }
+
+
+
+
+
+
+
+
+
+

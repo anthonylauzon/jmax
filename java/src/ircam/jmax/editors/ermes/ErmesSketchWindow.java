@@ -392,7 +392,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
   
   void DeleteGraphicObject( FtsObject object)
   {
-    itsSketchPad.DeleteGraphicObject(itsSketchPad.getErmesObjectFor(object), false);
+    itsSketchPad.DeleteGraphicObject(itsSketchPad.getErmesObjectFor(object));
     itsSketchPad.paintDirtyList(); // SHould be a repaint
   }
 
@@ -407,7 +407,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
     
     if (conn != null)
       {
-	itsSketchPad.DeleteGraphicConnection( itsSketchPad.getErmesConnectionFor(c), false);
+	itsSketchPad.DeleteGraphicConnection( itsSketchPad.getErmesConnectionFor(c));
 	itsSketchPad.paintDirtyList(); // SHould be a repaint
       }
   }

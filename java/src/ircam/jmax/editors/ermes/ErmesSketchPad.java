@@ -46,34 +46,13 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     return normalizedRect;
   }
   
-  public boolean isInGroup = false;
-  public boolean drawPending = false;
-  public boolean copyPending = false;
   
   public void updateGroupStart() 
   {
-    isInGroup = true;
   }
   
   public void updateGroupEnd() 
   {
-    isInGroup = false;
-
-    if (drawPending) 
-      {
-	Graphics g = getGraphics();
-	DrawOffScreen( g);
-	g.dispose();
-      }
-    else if (copyPending) 
-      {
-	Graphics g = getGraphics();
-	CopyTheOffScreen( g);
-	g.dispose();
-      }
-    drawPending = false;
-    copyPending = false;
-
     theToolkit.sync();
   }
 
@@ -481,18 +460,11 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
   void CopyTheOffScreen( Graphics g) 
   {
-    if ( (g != null) && (offScreenPresent) )
+    if ( (g != null) && (offScreenPresent))
       {
-	if (isInGroup || copyPending) 
-	  {
-	    copyPending = true;
-	  }
-	else 
-	  {
-	    g.drawImage( offImage, 0,0, this);
-	    emptyDirtyLists();
-	  }    
-      }
+	g.drawImage( offImage, 0,0, this);
+	emptyDirtyLists();
+      }    
   }
 
   final void DoNothing() 
@@ -526,12 +498,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   
   void DrawOffScreen( Graphics g) 
   {
-    if (drawPending || isInGroup) 
-      {
-	drawPending = true;
-	return;
-      }
-    
     if (editStatus == AREA_SELECT)
       return; //we are only painting the selection rect
 
@@ -568,6 +534,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
     offGraphics.setFont( getFont());
     offGraphics.setColor( getBackground());
+
     offGraphics.fillRect( 0, 0, d.width, d.height);	//prepare the offscreen to be used by me
     offGraphics.setColor( Color.black);
     
@@ -2096,7 +2063,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   //	DeleteConnection
   //	delete one connection routine
   //--------------------------------------------------------
-  void DeleteGraphicConnection( ErmesConnection theConnection, boolean paintNow)
+  void DeleteGraphicConnection( ErmesConnection theConnection)
   {
     /* Removing from the selection may be redundant if the deleting was started
        from the UI, but is needed if the deleted has been started by FTS */
@@ -2105,9 +2072,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     itsConnections.removeElement( theConnection);
 
     markSketchAsDirty();
-
-    if (paintNow)
-      paintDirtyList();
   }
 
 
@@ -2115,15 +2079,15 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   //	DeleteObject
   //	delete one object routine
   //--------------------------------------------------------
-  void DeleteObject( ErmesObject theObject, boolean paintNow) 
+  void DeleteObject( ErmesObject theObject) 
   {
-    DeleteGraphicObject( theObject, paintNow);
+    DeleteGraphicObject( theObject);
 
     if (theObject.itsFtsObject != null)
       theObject.itsFtsObject.delete();
   }
   
-  void DeleteGraphicObject( ErmesObject theObject, boolean paintNow) 
+  void DeleteGraphicObject( ErmesObject theObject) 
   {
     //removes theObject from the selected elements list	
 
@@ -2135,9 +2099,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     theObject.dispose();
 
     markSketchAsDirty();
-    
-    if (paintNow)
-      paintDirtyList();
   }
   
   //--------------------------------------------------------
@@ -2156,7 +2117,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     while (! currentSelection.itsObjects.isEmpty()) 
       {
 	ErmesObject aObject = (ErmesObject) currentSelection.itsObjects.elementAt( 0);
-	DeleteObject( aObject, false);
+	DeleteObject( aObject);
       }
       
     GetSketchWindow().DeselectionUpdateMenu();

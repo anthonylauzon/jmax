@@ -96,6 +96,9 @@ abstract class ErmesObject implements ErmesDrawable {
 
     itsSelected = false;
 
+    itsRectangle = new Rectangle( theFtsObject.getX(), theFtsObject.getY(),
+				  theFtsObject.getWidth(), theFtsObject.getHeight());
+
     String aFont = itsFtsObject.getFont();
 
     fontSize = itsFtsObject.getFontSize();
@@ -118,8 +121,6 @@ abstract class ErmesObject implements ErmesDrawable {
 	setFont( new Font( aFont, itsSketchPad.sketchFont.getStyle(), fontSize));
       }
 
-    itsRectangle = new Rectangle( theFtsObject.getX(), theFtsObject.getY(),
-				  theFtsObject.getWidth(), theFtsObject.getHeight());
   }
 
   protected final int getX() 
@@ -259,14 +260,7 @@ abstract class ErmesObject implements ErmesDrawable {
 
   public void Paint( Graphics g)  // (fd) public, because public in ErmesDrawable...
   {
-    if ( itsSketchPad.isInGroup) 
-      {
-	//emergency situation: ignore the Graphics and paint offScreen
-	Paint_specific( itsSketchPad.GetOffGraphics());
-	itsSketchPad.drawPending = true;
-      } 
-    else
-      Paint_specific( g);
+    Paint_specific( g);
   }
 
   protected void DoublePaint() 

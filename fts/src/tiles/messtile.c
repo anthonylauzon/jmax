@@ -149,9 +149,7 @@ fts_mess_client_save_patcher_bmax(int ac, const fts_atom_t *av)
       filename = fts_get_symbol(&av[1]);
 
       if (patcher)
-	{
-	  fts_save_patcher_as_bmax(filename, patcher);
-	}
+	fts_save_patcher_as_bmax(filename, patcher);
       else
 	post_mess("System Error in FOS message SAVE PATCHER BMAX: null patcher", ac, av);
     }

@@ -1163,18 +1163,15 @@ public class FtsServer  implements Runnable
     inputThread.setPriority(Thread.MAX_PRIORITY);
     inputThread.start(); 
 
-    if (! syncToFts(5000))
-      {
-	System.err.println("Connection to FTS failed !!!");
-      }
-    else
-      {
-	// Build the root patcher, by mapping directly to object id 1 on FTS
-	// (this is guaranteed)
+    //if (! syncToFts(10000))
+    // System.err.println("Connection to FTS failed !!!");
 
-	root = new FtsPatcherObject(null, null, "", 1);
-	registerObject(root);
-      }
+
+    // Build the root patcher, by mapping directly to object id 1 on FTS
+    // (this is guaranteed)
+
+    root = new FtsPatcherObject(null, null, "", 1);
+    registerObject(root);
   }
 
   /** Stop the server. */
