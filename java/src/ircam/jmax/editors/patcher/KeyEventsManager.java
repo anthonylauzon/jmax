@@ -45,7 +45,7 @@ public class KeyEventsManager implements KeyListener
   {
       try
 	{
-	   ftsKeyServer = new FtsObject(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("__keyserver"));
+	   ftsKeyServer = new FtsObject(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("_keyserver"));
 	}
     catch(IOException e)
 	{
