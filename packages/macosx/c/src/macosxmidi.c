@@ -421,10 +421,10 @@ mm_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void 
 macosxmidi_config( void)
 {
-  fts_class_install(fts_new_symbol("mm"), mm_instantiate);
-
   fts_metaclass_t *mc = fts_class_install(fts_new_symbol("macosxmidi"), macosxmidi_instantiate);
   fts_midimanager_t *mm = (fts_midimanager_t *)fts_object_create(mc, 0, 0);
 
+  fts_class_install(fts_new_symbol("mm"), mm_instantiate);
+  
   fts_midimanager_set(mm);
 }
