@@ -18,15 +18,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Francois Dechelle, Norbert Schnell.
- *
  */
 
 /* 
  * This file include the jMax ALSA audio port.
- * Based on Ardour's alsa_device.cc by Paul Barton-Davis
  */
 
 #include <stdio.h>
@@ -175,24 +170,35 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
   if ((err = snd_pcm_hw_params_set_buffer_size( st->handle, hwparams, fifo_size)) < 0)
     return err;
 
+#if 1
+  snd_pcm_hw_params_dump( hwparams, log);
+#endif
+
   /*
    * Set hardware parameters
    */
   if ((err = snd_pcm_hw_params( st->handle, hwparams)) < 0)
     {
-/*        snd_pcm_hw_params_dump( hwparams, log); */
+      snd_pcm_hw_params_dump( hwparams, log);
       return err;
     }
 
   snd_pcm_sw_params_current( st->handle, swparams);
 
-#if 0
-  if ((err = snd_pcm_sw_params_set_period_step( st->handle, swparams, 1)) < 0)
+  /* start transfer when the buffer is full */
+  if ((err = snd_pcm_sw_params_set_start_threshold(handle, swparams, fifo_size)) < 0)
     return err;
-#endif
 
   if ((err = snd_pcm_sw_params_set_avail_min( st->handle, swparams, fifo_size / periods)) < 0) 
     return err;
+
+  /* align all transfers to 1 samples */
+  if ((err = snd_pcm_sw_params_set_xfer_align( st->handle, swparams, 1)) < 0)
+    return err;
+
+#if 1
+  snd_pcm_sw_params_dump(swparams, log);
+#endif
 
   if ((err = snd_pcm_sw_params( st->handle, swparams)) < 0) 
     {
