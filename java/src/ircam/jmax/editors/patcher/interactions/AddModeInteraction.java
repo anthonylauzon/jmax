@@ -26,6 +26,7 @@
 package ircam.jmax.editors.patcher.interactions;
 
 import java.awt.*;
+import java.awt.event.*;
 
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
@@ -44,6 +45,7 @@ class AddModeInteraction extends Interaction
   void configureInputFilter(InteractionEngine filter)
   {
     filter.setFollowingMoves(true);
+    filter.setKeyListening(true);  
   }
 
   void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
@@ -66,6 +68,13 @@ class AddModeInteraction extends Interaction
 	editor.resetMessage();
 	editor.setEditModeInteraction();
 	break;
+      
+      case Squeack.SHIFT_UP:
+	editor.setCursor(Cursor.getDefaultCursor());
+	editor.resetMessage();
+	editor.setEditModeInteraction();
+	break;
       }
-  }
+  }  
 }
+

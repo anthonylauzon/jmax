@@ -26,6 +26,7 @@
 package ircam.jmax.editors.patcher.interactions;
 
 import java.awt.*;
+import java.awt.event.*;
 
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;

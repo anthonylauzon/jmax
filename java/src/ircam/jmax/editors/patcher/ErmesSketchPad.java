@@ -306,7 +306,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
     displayList = new DisplayList(this);
     engine      = new InteractionEngine(this);
-    keyMap      = new KeyMap(this/*, this.getSketchWindow()*/);
+    keyMap      = new KeyMap(this);
 
     // Next two temporary (mdc)
 

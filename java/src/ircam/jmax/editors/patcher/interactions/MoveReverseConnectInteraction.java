@@ -47,6 +47,7 @@ class MoveReverseConnectInteraction extends Interaction
     filter.setFollowingInOutletLocations(true);
     filter.setFollowingOutletLocations(true);
     filter.setAutoScrolling(true);
+    filter.setKeyListening(true);  
   }
 
   // Utility method
@@ -171,6 +172,15 @@ class MoveReverseConnectInteraction extends Interaction
 	editor.getDisplayList().redrawDragLine();
 	editor.getDisplayList().setDragLine(moveStart.x, moveStart.y, mouse.x, mouse.y);
 	editor.getDisplayList().redrawDragLine();
+      }
+    else if(squeack==Squeack.SHIFT_UP)
+      {
+	editor.getDisplayList().redrawDragLine();
+	editor.getDisplayList().noDrag();
+	editor.setConnectingObject(null);
+	destinationChoosen = false;
+	
+	editor.endInteraction();
       }
   }
 }

@@ -80,6 +80,7 @@ public class Squeack
 
   static public final int SHIFT    = 0x10;
   static public final int CTRL     = 0x20;
+  static public final int SHIFT_UP = 0x30;
   static public final int ALT      = 0x40;
 
   static public final int MODIFICATION_MASK     = 0xf0;

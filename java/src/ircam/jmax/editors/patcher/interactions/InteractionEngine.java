@@ -73,7 +73,7 @@ import ircam.jmax.editors.patcher.objects.*;
 
   */
 
-final public class InteractionEngine implements MouseMotionListener, MouseListener
+final public class InteractionEngine implements MouseMotionListener, MouseListener, KeyListener
 {
   // The input filter can be set in different status;
   // they regard the different granularity input events
@@ -106,6 +106,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   private boolean followingMoves     = false;
   private boolean followingInletLocations = false;
   private boolean followingOutletLocations = false;
+  private boolean keyListening = false;
 
   final void setFollowingMoves(boolean v)
   {
@@ -126,6 +127,25 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   final boolean isFollowingMoves()
   {
     return followingMoves;
+  }
+
+  final void setKeyListening(boolean listening){
+    if (keyListening)
+      {
+	if (!listening)
+	  sketch.removeKeyListener(this); 
+      }
+    else
+      {
+	if (listening)
+	  sketch.addKeyListener(this); 
+      }
+
+    keyListening = listening;
+  }
+
+  final boolean isKeyListening(){
+    return keyListening;
   }
 
   final void setFollowingLocations(boolean v)
@@ -229,6 +249,15 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
 
     if (area != null)
       area.dispose();
+  }
+
+  final private void processKeyEvent(int squeack, KeyEvent e)
+  {
+    ErmesSketchPad editor = (ErmesSketchPad) e.getSource();
+    editor.cleanAnnotations();
+
+    if (! scrollTimer.isRunning())
+      sendSqueack(editor, squeack, null, null, null);
   }
 
   // Scroll handling
@@ -356,6 +385,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     setFollowingInOutletLocations(false);
     setFollowingInletLocations(false);
     setFollowingOutletLocations(false);
+    setKeyListening(false);
     setAutoScrolling(false);
 
     interaction.configureInputFilter(this);
@@ -374,6 +404,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     setFollowingInOutletLocations(false);
     setFollowingInletLocations(false);
     setFollowingOutletLocations(false);
+    setKeyListening(false);
     setAutoScrolling(false);
 
     interaction.configureInputFilter(this);
@@ -465,6 +496,14 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   public void mouseExited( MouseEvent e)
   {
     // sketch.stopTextEditing();
+  }
+
+  public void keyTyped(KeyEvent e){}
+  public void keyPressed(KeyEvent e){}
+  public void keyReleased(KeyEvent e){
+    if(e.getKeyCode()==KeyEvent.VK_SHIFT){
+      processKeyEvent(Squeack.SHIFT_UP, e);
+    }
   }
 }
 
