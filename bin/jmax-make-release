@@ -12,11 +12,15 @@
 #  for DISCLAIMER OF WARRANTY.
 #  
 #
-# $Log$
+# $Log: jmax-make-release,v $
+# Revision 1.9  1999/06/01  15:15:47  dechelle
+# Trying $Log$
+#
 
 # ***************************************************************************
 # Constants
 # ***************************************************************************
+HOST_FOR_CVS=maelzel
 
 
 # ***************************************************************************
@@ -40,17 +44,20 @@ Options:
     defines the architectures of the release (origin, linuxpc, ...)
 
 Description:
+
 The script runs the following steps:
   - check that all files are synchronous with the CVS repository
   - check that nothing needs to be recompiled
-  - tag the sources with a tag that contains the version number
   - for each architecture { for each type { create the tar file } }
-
-Notes:
- - as this script uses intensively CVS, it checks that it runs on a machine
-   that has a valid CVS installation.
+  - tag the sources with a tag that contains the version number
 
 HELP_EOF
+}
+
+# ---------------------------------------------------------------------------
+inform ()
+{
+    echo "jmax-make-release: $@"
 }
 
 # ---------------------------------------------------------------------------
@@ -98,7 +105,7 @@ check_options()
 
     if [ \! -r VERSION ]
     then
-	echo "Cannot find file VERSION (probably you're not in the correct directory ...)"
+	inform "cannot find file VERSION (probably you're not in the correct directory ...)"
 	exit 1
     fi
 
@@ -108,45 +115,201 @@ check_options()
 # Check that all files are synchronous with the CVS repository
 check_cvs_sync ()
 {
-    if cvs -n update | egrep -s '^[UARMC] '
+    inform checking CVS
+    ME=`whoami`
+    HERE=`pwd | sed "s/.*$ME\///"`
+    if rsh $HOST_FOR_CVS cd $HERE \; cvs -n update 2>&1 | egrep -s '^[UARMC] ' 
     then
-	echo "Working directory is not synchronized with repository: update and retry..."
-	exit 1
+	inform "working directory is not synchronized with repository (update or commit and retry)"
+	clean_exit 1
     fi
+}
+
+# ---------------------------------------------------------------------------
+sub_archs ()
+{
+    case $1 in
+	linuxpc)
+	    echo "linuxpc" ;;
+	linuxppc)
+	    echo "linuxppc" ;;
+	sgi)
+	    echo "irix63r5k irix63r10k irix65r4k irix65r5k irix65r10k" ;;
+	*)
+	    echo "UNKNOWN" ;;
+    esac
 }
 
 # ---------------------------------------------------------------------------
 # Check that nothing needs to be recompiled
 check_recompile ()
 {
+    inform checking compilation date
+
     for ARCH in $ARCHS
     do
-	if make -q ARCH=$ARCH MODE=opt all  > /dev/null 2>&1 || (exit 0)
-	then
-	    echo "$ARCH must be recompiled: recompile and retry..."
-	    exit 1
-	fi
+	for SUB_ARCH in `sub_archs $ARCH`
+	do
+	    if make -q ARCH=$SUB_ARCH MODE=opt all  > /dev/null 2>&1 || (exit 0)
+	    then
+		inform "architecture \"$SUB_ARCH\" must be recompiled (recompile and retry)"
+		clean_exit 1
+	    fi
+	done
     done
 }
 
 # ---------------------------------------------------------------------------
 # Generate the version number
-VERSION_NUMBER=`awk '
-$1=="MAJOR" {m=$2;} 
-$1=="MINOR" {n=$2;}
-$1=="PATCH_LEVEL" {p=$2;}
-END { printf("%d.%d.%d\n",m,n,p);}
-' VERSION`
+compute_version_number ()
+{
+    VERSION_NUMBER=`awk '
+    $1=="MAJOR" {m=$2;} 
+    $1=="MINOR" {n=$2;}
+    $1=="PATCH_LEVEL" {p=$2;}
+    END { printf("%d.%d.%d\n",m,n,p);}' VERSION`
+}
+
+# ---------------------------------------------------------------------------
+create_dest_dir()
+{
+    DEST_DIR=${TMP}/$$/max-${VERSION}
+    if [ -d ${DEST_DIR} ]
+    then
+	/bin/rm -rf ${DEST_DIR}
+    fi
+    mkdir -p ${DEST_DIR}
+    chmod 755 ${DEST_DIR}
+}
+
+# ---------------------------------------------------------------------------
+# args: DIR
+create_dir ()
+{
+    D=`echo $1 | sed 's+^\.\/++'`
+    mkdir -p $DEST_DIR/$D
+
+    i=$DEST_DIR
+    for d in `echo $D | sed 's+\/+ +g'`
+    do
+	i="$i/$d"
+	chmod 755 $i
+    done
+}
+
+# ---------------------------------------------------------------------------
+# args: TYPE ARCH RELATIVE_DIR PATTERN
+copy_files()
+{
+    for F in `ls -d $4`
+    do
+	if [ -f $F ]
+  	then
+
+  	    DST=`echo $3/$F | sed 's+^\.\/++'`
+
+  	    D=`dirname $DST`
+  	    if [ ! -d $DEST_DIR/$D ]
+  	    then
+  		create_dir $D
+  	    fi
+
+  	    cp $F $DEST_DIR/$DST
+  	    if ls -l $F | awk '{ exit(!(substr($1,4,1)=="x")); }'
+  	    then
+  		chmod 755 $DEST_DIR/$DST
+  	    else
+  		chmod 644 $DEST_DIR/$DST
+  	    fi
+
+  	elif [ -d $F ]
+  	then
+
+  	    create_dir $3/$F
+  	    (cd $F ; select_files $1 $2 $3/$F )
+
+  	else
+  	    inform "file or directory $F not found" >&2
+
+#  	    if [ $QUIET = "false" ]
+#  	    then
+  		clean_exit 1
+#  	    fi
+  	fi
+      done
+}
+
+
+# ---------------------------------------------------------------------------
+# args: TYPE ARCH RELATIVE_DIR
+select_files ()
+{
+    if [ \! -f distrib ]
+    then
+	inform "file $1/distrib missing" >&2
+	clean_exit 1
+    fi
+
+      {
+  	inform Processing $3
+
+  	read TYPE_F ARCH_F PATTERN NEW_NAME
+
+  	while [ $ARCH_F ] 
+  	do
+  	    if [ \( $TYPE_F = $1 -o $TYPE_F = "all" \) -a \( $ARCH_F = $2 -o $ARCH_F = "all" \) ]
+  	    then
+  		copy_files $1 $2 $3 "$PATTERN"
+  	    fi
+
+  	    read TYPE_F ARCH_F PATTERN NEW_NAME
+  	done
+      } < distrib
+
+}
+
+# ---------------------------------------------------------------------------
+# Create the tar file
+# args: TYPE ARCH 
+create_tar ()
+{
+    TARDIR=${RELEASES_DIR}/${VERSION}
+    if [ ! -d ${TARDIR} ]
+    then
+	mkdir -p ${TARDIR}
+    fi
+    if [ ! -w ${TARDIR} ]
+    then
+	chmod u+w ${TARDIR}
+    fi
+
+    TARFILE=${TARDIR}/jmax.$1.$2.${VERSION}.tar.gz
+
+    if [ ! -w ${TARFILE} ]
+    then
+	chmod u+w ${TARFILE}
+    fi
+
+    inform "creating tar file $TARFILE"
+    (cd ${DEST_DIR}/.. ; tar cvf - max-${VERSION} ) | gzip -9 > $TARFILE
+
+    chmod 444 ${TARFILE}
+    chmod 555 ${TARDIR}
+}
 
 # ---------------------------------------------------------------------------
 create_tars ()
 {
+    create_dest_dir
+
     # - for each type { for each architecture { create the tar file } }
     for TYPE in $TYPES
     do
 	for ARCH in $ARCHS
 	do
-	    echo zob
+	    select_files $TYPE $ARCH .
+
+	    create_tar $TYPE $ARCH 
 	done
     done
 }
@@ -155,8 +318,30 @@ create_tars ()
 tag_files ()
 {
     TAG=`echo $VERSION_NUMBER | sed -e 's/^/V_/' -e 's/\./_/g'`
-    echo "... Tagging sources with tag $TAG"
+    inform "tagging sources with tag $TAG"
     cvs tag -F $TAG
+}
+
+
+# ---------------------------------------------------------------------------
+remove_dest_dir()
+{
+    /bin/rm -rf ${TMP}/$$
+}
+
+
+# ---------------------------------------------------------------------------
+# args: STATUS
+clean_exit()
+{
+	remove_dest_dir
+	exit $1
+}
+
+# ---------------------------------------------------------------------------
+bye ()
+{
+    clean_exit 0
 }
 
 # ***************************************************************************
@@ -171,8 +356,10 @@ check_cvs_sync
 
 check_recompile
 
-tag_files
+compute_version_number
 
 create_tars
+
+tag_files
 
 bye
