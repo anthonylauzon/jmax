@@ -1,8 +1,12 @@
 2003-02-07  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* 4.0.1 released
+
 	* add "Open Configuration" menu implementation
 
 	* add "Save As Default Configuration" menu implementation
+
+	* remove preprocessor warning in audioconfig.c, sysinfo.c and adc_tilda.c
 	
 2003-02-07  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
