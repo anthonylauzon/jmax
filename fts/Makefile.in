@@ -75,7 +75,7 @@ VERSION = @VERSION@
 
 lib_LTLIBRARIES = libfts.la
 
-libfts_la_SOURCES =  @PLATFORM@.c OLDclient.c OLDftsdata.c OLDpatcherdata.c OLDucs.c abstraction.c array.c atom.c atomfile.c audio.c autosave.c bytestream.c class.c clipboard.c connection.c doctor.c dsp.c dspgraph.c errobj.c expression.c file.c fpe.c ftl.c ftlmem.c fts.c hashtable.c inout.c loader.c mem.c message.c midi.c midifile.c object.c objectlist.c objectset.c objtable.c param.c patcher.c patparser.c post.c property.c saver.c sched.c selection.c sigconn.c soundfile.c soundfile_af.c srconv.c stack.c symbol.c template.c time.c variable.c version.c vm.c 
+libfts_la_SOURCES =  @PLATFORM@.c OLDclient.c OLDftsdata.c OLDpatcherdata.c OLDucs.c abstraction.c array.c atom.c atomfile.c audio.c autosave.c bytestream.c class.c clipboard.c connection.c doctor.c dsp.c dspgraph.c errobj.c expression.c file.c fpe.c ftl.c ftlmem.c fts.c hashtable.c inout.c loader.c mem.c message.c midi.c midifile.c object.c objectlist.c objectset.c objtable.c param.c patcher.c patparser.c post.c property.c saver.c sched.c selection.c sigconn.c soundfile.c soundfile_af.c srconv.c stack.c symbol.c template.c time.c variable.c version.c vm.c list.c 
 
 
 bin_PROGRAMS = fts
@@ -105,7 +105,7 @@ message.lo midi.lo midifile.lo object.lo objectlist.lo objectset.lo \
 objtable.lo param.lo patcher.lo patparser.lo post.lo property.lo \
 saver.lo sched.lo selection.lo sigconn.lo soundfile.lo soundfile_af.lo \
 srconv.lo stack.lo symbol.lo template.lo time.lo variable.lo version.lo \
-vm.lo
+vm.lo list.lo
 PROGRAMS =  $(bin_PROGRAMS)
 
 fts_OBJECTS =  main.o
@@ -128,8 +128,8 @@ DEP_FILES =  .deps/@PLATFORM@.P .deps/OLDclient.P .deps/OLDftsdata.P \
 .deps/bytestream.P .deps/class.P .deps/clipboard.P .deps/connection.P \
 .deps/doctor.P .deps/dsp.P .deps/dspgraph.P .deps/errobj.P \
 .deps/expression.P .deps/file.P .deps/fpe.P .deps/ftl.P .deps/ftlmem.P \
-.deps/fts.P .deps/hashtable.P .deps/inout.P .deps/loader.P .deps/main.P \
-.deps/mem.P .deps/message.P .deps/midi.P .deps/midifile.P \
+.deps/fts.P .deps/hashtable.P .deps/inout.P .deps/list.P .deps/loader.P \
+.deps/main.P .deps/mem.P .deps/message.P .deps/midi.P .deps/midifile.P \
 .deps/object.P .deps/objectlist.P .deps/objectset.P .deps/objtable.P \
 .deps/param.P .deps/patcher.P .deps/patparser.P .deps/post.P \
 .deps/property.P .deps/saver.P .deps/sched.P .deps/selection.P \
@@ -143,7 +143,7 @@ all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .S .c .lo .o .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --foreign fts/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu fts/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -279,7 +279,7 @@ distdir: $(DISTFILES)
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign fts/Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu fts/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
