@@ -1,6 +1,5 @@
 class FtsObject:
     # private static member
-    messageHandlersTable = {}
     __lookupEntry = "TO FIXED"
     
     # public:
