@@ -1116,7 +1116,9 @@
 				F8446937028BCAD101664092,
 			);
 			buildSettings = {
+				DEBUGGING_SYMBOLS = NO;
 				HEADER_SEARCH_PATHS = "../../packages ../../include";
+				OPTIMIZATION_CFLAGS = "-O3";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -2388,7 +2390,9 @@
 				F8446AA5028BCC2401664092,
 			);
 			buildSettings = {
+				DEBUGGING_SYMBOLS = NO;
 				HEADER_SEARCH_PATHS = "../../packages ../../include";
+				OPTIMIZATION_CFLAGS = "-O3";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -6063,7 +6067,9 @@
 				F85122A6028BDFF401664092,
 			);
 			buildSettings = {
+				DEBUGGING_SYMBOLS = NO;
 				HEADER_SEARCH_PATHS = ../../include;
+				OPTIMIZATION_CFLAGS = "-O3";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -6491,7 +6497,9 @@
 				F85122E0028BE16701664092,
 			);
 			buildSettings = {
+				DEBUGGING_SYMBOLS = NO;
 				HEADER_SEARCH_PATHS = ../../include;
+				OPTIMIZATION_CFLAGS = "-O3";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -6813,7 +6821,9 @@
 				F8512304028BE32C01664092,
 			);
 			buildSettings = {
+				DEBUGGING_SYMBOLS = NO;
 				HEADER_SEARCH_PATHS = ../../include;
+				OPTIMIZATION_CFLAGS = "-O3";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -7024,7 +7034,9 @@
 				F851231B028BE41401664092,
 			);
 			buildSettings = {
+				DEBUGGING_SYMBOLS = NO;
 				HEADER_SEARCH_PATHS = ../../include;
+				OPTIMIZATION_CFLAGS = "-O3";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -7460,7 +7472,9 @@
 				F851235C028BE5ED01664092,
 			);
 			buildSettings = {
+				DEBUGGING_SYMBOLS = NO;
 				HEADER_SEARCH_PATHS = "../../packages ../../include";
+				OPTIMIZATION_CFLAGS = "-O3";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -7924,7 +7938,10 @@
 				F851239F028BE77D01664092,
 			);
 			buildSettings = {
+				DEBUGGING_SYMBOLS = NO;
 				HEADER_SEARCH_PATHS = ../../include;
+				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
+				OPTIMIZATION_CFLAGS = "-O3";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -12076,8 +12093,10 @@
 				F88000900283072101664092,
 			);
 			buildSettings = {
+				DEBUGGING_SYMBOLS = NO;
 				FRAMEWORK_SEARCH_PATHS = build;
 				HEADER_SEARCH_PATHS = "../../packages ../../include";
+				OPTIMIZATION_CFLAGS = "-O3";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -13008,12 +13027,14 @@
 				F880FDC30282FA3901664092,
 			);
 			buildSettings = {
+				DEBUGGING_SYMBOLS = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_SEARCH_PATHS = build;
 				FRAMEWORK_VERSION = A;
 				HEADER_SEARCH_PATHS = "../../client/include ../../include";
 				INSTALL_PATH = "@executable_path/../lib";
+				OPTIMIZATION_CFLAGS = "-O3";
 				OTHER_CFLAGS = "-Wno-unused -DREIMPLEMENTING_VARIABLES";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_LIBTOOL_FLAGS = "";
@@ -16914,9 +16935,11 @@
 				F880FFF5028301DA01664092,
 			);
 			buildSettings = {
+				DEBUGGING_SYMBOLS = NO;
 				FRAMEWORK_SEARCH_PATHS = build;
 				HEADER_SEARCH_PATHS = ../../include;
 				LIBRARY_SEARCH_PATHS = "";
+				OPTIMIZATION_CFLAGS = "-O3";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -17501,9 +17524,10 @@
 				F8B8E4D702867E1C01664092,
 			);
 			buildSettings = {
+				DEBUGGING_SYMBOLS = NO;
 				FRAMEWORK_SEARCH_PATHS = build;
 				HEADER_SEARCH_PATHS = "../../packages ../../include";
-				OPTIMIZATION_CFLAGS = "-O0";
+				OPTIMIZATION_CFLAGS = "-O3";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -19017,8 +19041,10 @@
 				F8B8E5C60286822601664092,
 			);
 			buildSettings = {
+				DEBUGGING_SYMBOLS = NO;
 				FRAMEWORK_SEARCH_PATHS = build;
 				HEADER_SEARCH_PATHS = "../../packages ../../include";
+				OPTIMIZATION_CFLAGS = "-O3";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -20334,7 +20360,9 @@
 				F8DC5F040286A1FB01664092,
 			);
 			buildSettings = {
+				DEBUGGING_SYMBOLS = NO;
 				HEADER_SEARCH_PATHS = ../../include;
+				OPTIMIZATION_CFLAGS = "-O3";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -20547,7 +20575,9 @@
 				F8DC5F2C0286BF2501664092,
 			);
 			buildSettings = {
+				DEBUGGING_SYMBOLS = NO;
 				HEADER_SEARCH_PATHS = ../../include;
+				OPTIMIZATION_CFLAGS = "-O3";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
