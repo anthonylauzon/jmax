@@ -31,6 +31,7 @@ struct fts_template {
   fts_package_t *package;
 };
 
+#define fts_template_get_name(t) ((t)->name)
 #define fts_template_get_filename(t) ((t)->filename)
 #define fts_template_set_filename(t, n) ((t)->filename = (n))
 
