@@ -1,3 +1,9 @@
+2003-01-21  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* update alsa audioport. Works with input and output
+
+	* update jack audioport. Works with input and output
+	
 2003-01-20  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* fixed channel_used updating (channels were set as used but were never reset).
