@@ -237,8 +237,7 @@ fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s,
    The function is left here so that a user can compile an object with -g to test it
 */
 
-#ifdef DEBUG
-
+#undef fts_outlet_send
 fts_status_t
 fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s,
 		int ac, const fts_atom_t *at)
@@ -298,8 +297,8 @@ fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s,
    -g also with -O compiled libraries.
 */
 
-void
-fts_outlet_int(fts_object_t *o, int woutlet, int n)
+#undef fts_outlet_int
+void fts_outlet_int(fts_object_t *o, int woutlet, int n)
 {
   fts_connection_t *conn;
   fts_atom_t atom;
@@ -316,8 +315,8 @@ fts_outlet_int(fts_object_t *o, int woutlet, int n)
     }
 }
 
-void
-fts_outlet_float(fts_object_t *o, int woutlet, float f)
+#undef fts_outlet_float
+void fts_outlet_float(fts_object_t *o, int woutlet, float f)
 {
   fts_connection_t *conn;
   fts_atom_t atom;
@@ -334,8 +333,8 @@ fts_outlet_float(fts_object_t *o, int woutlet, float f)
     }
 }
 
-void
-fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s)
+#undef fts_outlet_symbol
+void fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s)
 {
   fts_connection_t *conn;
   fts_atom_t atom;
@@ -352,8 +351,8 @@ fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s)
     }
 }
 
-void
-fts_outlet_list(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at)
+#undef fts_outlet_list
+void fts_outlet_list(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at)
 {
   fts_connection_t *conn;
 
@@ -367,9 +366,8 @@ fts_outlet_list(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at)
     }
 }
 
-
-void
-fts_outlet_bang(fts_object_t *o, int woutlet)
+#undef fts_outlet_bang
+void fts_outlet_bang(fts_object_t *o, int woutlet)
 {
   fts_connection_t *conn = o->out_conn[woutlet];
 
@@ -380,8 +378,6 @@ fts_outlet_bang(fts_object_t *o, int woutlet)
       conn = conn->next_same_src;
     }
 }
-
-#endif
 
 /* 
    function to get values by name;  later, argument by name will be supported in
