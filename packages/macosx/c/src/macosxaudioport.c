@@ -84,11 +84,14 @@ static void macosxaudioport_output(fts_audioport_t* port)
  * The audioport copy function copies the samples in the native format to a float buffer
  * for a given channel.
  */
-static void macosxaudioport_input_copy_fun( fts_audioport_t *port, float *buff, int buffsize, int channel)
+static void macosxaudioport_input_copy( fts_audioport_t *port, float *buff, int buffsize, int channel)
 {
   macosxaudioport_t* macosx_port = (macosxaudioport_t*)port;
   int channels = fts_audioport_get_max_channels( port, FTS_AUDIO_INPUT);
   int i, j;
+
+  /* @@@ */
+  return;
 
   j = channel;
   for (i = 0; i < buffsize; i++)
@@ -98,11 +101,14 @@ static void macosxaudioport_input_copy_fun( fts_audioport_t *port, float *buff, 
     }
 }
 
-static void macosxaudioport_output_copy_fun( fts_audioport_t *port, float *buff, int buffsize, int channel)
+static void macosxaudioport_output_copy( fts_audioport_t *port, float *buff, int buffsize, int channel)
 {
   macosxaudioport_t* macosx_port = (macosxaudioport_t*)port;
   int channels = fts_audioport_get_max_channels( port, FTS_AUDIO_OUTPUT);
   int i, j;
+
+  /* @@@ */
+  return;
 
   j = channel;
 
@@ -186,37 +192,23 @@ static void macosxaudioport_halt(fts_object_t *o, int winlet, fts_symbol_t s, in
 }
 
 static int
-macosxaudioport_set_channels( macosxaudioport_t *self, int direction)
+get_channels( AudioDeviceID device, Boolean isInput)
 {
   OSStatus status;
   AudioBufferList *buffer_list;
-  UInt32 count, channels;
-  Boolean isInput = (direction == FTS_AUDIO_INPUT) ? true : false;
+  UInt32 count, channels, i;
 
   /* Get the number of channels */
-  if ((status = AudioDeviceGetPropertyInfo( self->device, 0, isInput, kAudioDevicePropertyStreamConfiguration, &count, NULL)) != noErr)
-    {
-      fts_object_error( (fts_object_t *)self, "cannot get device configuration");
-      return -1;
-    }
+  if ((status = AudioDeviceGetPropertyInfo( device, 0, isInput, kAudioDevicePropertyStreamConfiguration, &count, NULL)) != noErr)
+    return -1;
 
   buffer_list = (AudioBufferList *)alloca( count);
-  if ((status = AudioDeviceGetProperty( self->device, 0, isInput, kAudioDevicePropertyStreamConfiguration, &count, buffer_list)) != noErr)
-    {
-      fts_object_error( (fts_object_t *)self, "cannot get device configuration");
-      return -1;
-    }
+  if ((status = AudioDeviceGetProperty( device, 0, isInput, kAudioDevicePropertyStreamConfiguration, &count, buffer_list)) != noErr)
+    return -1;
 
-  /* We assume that there is only one buffer */
-  if ( buffer_list->mNumberBuffers != 1)
-    {
-      fts_object_error( (fts_object_t *)self, "buffer_list->mNumberBuffers != 1");
-      return -1;
-    }
-
-  channels = buffer_list->mBuffers[0].mNumberChannels;
-
-  fts_audioport_set_max_channels( (fts_audioport_t *)self, direction, channels);
+  channels = 0;
+  for (i = 0; i < buffer_list->mNumberBuffers; i++) 
+    channels += buffer_list->mBuffers[i].mNumberChannels;
 
   return channels;
 }
@@ -227,12 +219,17 @@ static void macosxaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, i
   macosxaudioport_t* self = (macosxaudioport_t*)o;
   OSStatus err;
   UInt32 count, buffer_size;
-  int fifo_size = 4096;
+  int fifo_size = 4096, channels;
 
-  if (macosxaudioport_set_channels( self, FTS_AUDIO_INPUT) < 0)
-    return;
-  if (macosxaudioport_set_channels( self, FTS_AUDIO_OUTPUT) < 0)
-    return;
+  if ((channels = get_channels( self->device, true)) < 0)
+    fts_object_error( (fts_object_t *)self, "cannot get device configuration");
+
+  fts_audioport_set_max_channels( (fts_audioport_t *)self, FTS_AUDIO_INPUT, channels);
+
+  if ((channels = get_channels( self->device, false)) < 0)
+    fts_object_error( (fts_object_t *)self, "cannot get device configuration");
+
+  fts_audioport_set_max_channels( (fts_audioport_t *)self, FTS_AUDIO_OUTPUT, channels);
 
   buffer_size = 2 * sizeof( float) * fifo_size;
   count = sizeof( buffer_size);
@@ -242,10 +239,10 @@ static void macosxaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, i
       post( "cannot set buffer size");
     }
 
-  fts_audioport_set_io_fun( (fts_audioport_t *)self, FTS_AUDIO_INPUT, macosxaudioport_input);
-  fts_audioport_set_io_fun( (fts_audioport_t *)self, FTS_AUDIO_OUTPUT, macosxaudioport_output);
+  fts_audioport_set_open( (fts_audioport_t *)self, FTS_AUDIO_INPUT);
+  fts_audioport_set_open( (fts_audioport_t *)self, FTS_AUDIO_OUTPUT);
 
-  fts_sched_add( o, FTS_SCHED_ALWAYS);
+/*   fts_sched_add( o, FTS_SCHED_ALWAYS); */
 }
 
 static void macosxaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -256,6 +253,15 @@ static void macosxaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, i
 
   self->device = (AudioDeviceID)fts_get_int( at);
   self->name = fts_get_symbol( at+1);
+
+  fts_audioport_set_io_fun((fts_audioport_t*)self, FTS_AUDIO_INPUT, macosxaudioport_input);
+  fts_audioport_set_io_fun((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, macosxaudioport_output);
+
+  fts_audioport_set_copy_fun((fts_audioport_t*)self, FTS_AUDIO_INPUT, macosxaudioport_input_copy);
+  fts_audioport_set_copy_fun((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, macosxaudioport_output_copy);
+
+  fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_INPUT);
+  fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
 }
 
 static void macosxaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -346,7 +352,7 @@ macosxaudiomanager_scan_devices( void)
 
       fts_set_int( at, device_list[i]);
       fts_set_symbol( at+1, name);
-      port = (fts_audioport_t *)fts_object_create( macosxaudioport_class, NULL, 2, at);
+      port = (fts_audioport_t *)fts_object_create( macosxaudioport_class, 2, at);
       fts_audiomanager_put_port( name, port);
 
       fts_log( "registering device %d %s\n", i, name);

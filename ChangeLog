@@ -1,3 +1,7 @@
+2003-01-07  Francois Dechelle  <dechelle@mac-dechelle.ircam.fr>
+
+	* audio in progress on Mac OS X
+
 2003-01-03  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* update input~ object to use new audiolabel/audioport API

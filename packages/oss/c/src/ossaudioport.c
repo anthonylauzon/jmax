@@ -145,7 +145,6 @@ static void ossaudioport_output_copy_fun( fts_audioport_t *port, float *buff, in
     oss_port->dac_fmtbuf[j] = s0;
     j += channels;
   }
-
 }
 
 static int ossaudioport_xrun( fts_audioport_t *port)

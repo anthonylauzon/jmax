@@ -161,6 +161,18 @@
 			settings = {
 			};
 		};
+		F542CC8303CAF4A701664090 = {
+			isa = PBXFileReference;
+			name = tup.c;
+			path = /Users/dechelle/projects/jmax/packages/control/c/src/tup.c;
+			refType = 0;
+		};
+		F542CC8403CAF4A701664090 = {
+			fileRef = F542CC8303CAF4A701664090;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F544CD9303387B6001664092 = {
 			isa = PBXFileReference;
 			name = thread.c;
@@ -769,6 +781,18 @@
 		};
 		F5F40D720348A14401664092 = {
 			fileRef = F8F010CD028D861401664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5F7D25303C057E201664090 = {
+			isa = PBXFileReference;
+			name = macosxaudioport.c;
+			path = /Users/dechelle/projects/jmax/packages/macosx/c/src/macosxaudioport.c;
+			refType = 0;
+		};
+		F5F7D25403C057E201664090 = {
+			fileRef = F5F7D25303C057E201664090;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -6984,7 +7008,7 @@
 				F851228D028BDFF301664092,
 				F851228E028BDFF301664092,
 				F57835EB034B08D301664092,
-				F851228F028BDFF301664092,
+				F542CC8303CAF4A701664090,
 			);
 			isa = PBXGroup;
 			name = c;
@@ -7043,12 +7067,6 @@
 			name = sync.c;
 			path = ../../packages/control/c/src/sync.c;
 			refType = 2;
-		};
-		F851228F028BDFF301664092 = {
-			isa = PBXFileReference;
-			name = tup.c;
-			path = /Users/schnell/Projects/jmax/packages/control/c/src/tup.c;
-			refType = 0;
 		};
 		F8512290028BDFF301664092 = {
 			children = (
@@ -7175,7 +7193,6 @@
 				F85122A0028BDFF401664092,
 				F85122A2028BDFF401664092,
 				F85122A3028BDFF401664092,
-				F85122A4028BDFF401664092,
 				F8BB0B2802E738BA01664092,
 				F8BB0B2902E738BB01664092,
 				F8EE4BB0031CEE7001664092,
@@ -7186,6 +7203,7 @@
 				F8EE4BB7031CEE7001664092,
 				F57835EC034B08D301664092,
 				F519DF6E034B353A01664092,
+				F542CC8403CAF4A701664090,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7234,12 +7252,6 @@
 		};
 		F85122A3028BDFF401664092 = {
 			fileRef = F851228E028BDFF301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F85122A4028BDFF401664092 = {
-			fileRef = F851228F028BDFF301664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -17692,6 +17704,7 @@
 				F880FFF5028301DA01664092,
 			);
 			buildSettings = {
+				BUILD_SETTING = "";
 				DEBUGGING_SYMBOLS = NO;
 				FRAMEWORK_SEARCH_PATHS = build;
 				HEADER_SEARCH_PATHS = ../../include;
@@ -21019,22 +21032,16 @@
 		};
 		F8DC5EF50286A1FA01664092 = {
 			children = (
-				F8DC5EF60286A1FA01664092,
 				F8DC5EF70286A1FA01664092,
 				F8DC5EF80286A1FA01664092,
 				F8DC5EF90286A1FA01664092,
 				F78563BF02BA3BCE016640F1,
 				F889510702ED932301664092,
+				F5F7D25303C057E201664090,
 			);
 			isa = PBXGroup;
 			name = c;
 			refType = 4;
-		};
-		F8DC5EF60286A1FA01664092 = {
-			isa = PBXFileReference;
-			name = halaudioport.c;
-			path = ../../packages/macosx/c/src/halaudioport.c;
-			refType = 2;
 		};
 		F8DC5EF70286A1FA01664092 = {
 			isa = PBXFileReference;
@@ -21135,20 +21142,14 @@
 		F8DC5EFE0286A1FB01664092 = {
 			buildActionMask = 2147483647;
 			files = (
-				F8DC5EFF0286A1FB01664092,
 				F8DC5F000286A1FB01664092,
 				F8DC5F020286A1FB01664092,
 				F800EB8F02CB316E01664092,
 				F800EB9002CB316F01664092,
+				F5F7D25403C057E201664090,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F8DC5EFF0286A1FB01664092 = {
-			fileRef = F8DC5EF60286A1FA01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F8DC5F000286A1FB01664092 = {
 			fileRef = F8DC5EF70286A1FA01664092;
