@@ -867,7 +867,7 @@ void FtsServer::aEndMessage()
 	} 
       else
 	{
-	  ftsclient_log("[receive]: no callback found\n");
+	  ftsclient_log("[receive]: no callback found for message %s\n", (const char*) _selector);
 	}
     }
 }
