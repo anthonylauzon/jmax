@@ -1032,11 +1032,11 @@ Rectangle previousResizeRect = new Rectangle();
       else{
 	if (!itsCurrentInOutlet.GetSelected()) {// no previously selected
 	  itsCurrentInOutlet.GetOwner().ConnectionRequested(itsCurrentInOutlet);
-	  /*if (itsConnectingLet != null) { //we are going to START a connection
+	  if (itsConnectingLet != null) { //we are going to START a connection
 	    //(not to terminate one!!)
 	    editStatus = START_CONNECT;
 	    prepareForDynamicConnect(itsCurrentInOutlet);
-	  }*/
+	  }
 	}
 	else {
 	  itsCurrentInOutlet.GetOwner().ConnectionAbort(itsCurrentInOutlet, false); 
@@ -1083,7 +1083,7 @@ Rectangle previousResizeRect = new Rectangle();
   }
 
   public void mouseReleased(MouseEvent e){
-System.err.println("mouseRelease in stato "+editStatus);    
+    //System.err.println("mouseRelease in stato "+editStatus);    
     int x = e.getX();
     int y = e.getY();
 
