@@ -547,6 +547,9 @@ void fts_platform_init( void)
 
   fts_disable_fpe_traps();
 
+  /* load aflib package */
+  fts_package_load(fts_new_symbol("aflib"));
+
   /* load alsa package */
   fts_package_load(fts_new_symbol("alsa"));
 
