@@ -36,7 +36,7 @@ import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.interactions.*;
-
+import ircam.jmax.editors.patcher.actions.*;
 
 // The base class of all the graphic objects on the sketch.
 // This class has a knowledge of its corrisponding fos object. It contains
@@ -151,6 +151,10 @@ abstract public class GraphicObject implements DisplayObject
   protected Font itsFont = null;
   protected FontMetrics itsFontMetrics = null;
 
+  public static final int ON_INLET  = 0;
+  public static final int ON_OUTLET = 1;
+  public static final int ON_OBJECT = 2;
+
   // A Static method that work as a virtual constructor;
   // given an FTS object, build the proper FTS Object
 
@@ -209,7 +213,7 @@ abstract public class GraphicObject implements DisplayObject
     itsFont = FontCache.lookupFont(fontName, fontSize);
     itsFontMetrics = FontCache.lookupFontMetrics(fontName, fontSize);
 
-    updateInOutlets();
+    updateInOutlets();    
   }
 
   // Destructor 
@@ -336,6 +340,9 @@ abstract public class GraphicObject implements DisplayObject
     ftsObject.setFontSize(itsFont.getSize());;
   }
 
+  public void fitToText()
+  {
+  }
 
   public final int getOutletAnchorX(int outlet)
   {
@@ -844,16 +851,45 @@ abstract public class GraphicObject implements DisplayObject
     return area;
   }
 
-
   protected SensibilityArea findSensibilityArea( int mouseX, int mouseY)
   {
     return null;
   }
 
-  // This method is called to edit the object by means of a popup
-  // structure
+  int wherePopup = ON_OBJECT;
+  public int wherePopup()
+  {
+    return wherePopup;
+  }
+  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
+  {
+    JMenuItem item = ObjectPopUp.getMenuItem("Remove Connections");
+    if(onInlet)
+      {
+	wherePopup = ON_INLET;
+	item.setText("Disconnect Inlet n."+area.getNumber());
+	item.setEnabled(true);
+      }    
+    else if(onOutlet)
+      {
+	wherePopup = ON_OUTLET; 
+	item.setText("Disconnect Outlet n."+area.getNumber());
+	item.setEnabled(true);
+      }
+    else
+      {
+	wherePopup = ON_OBJECT;
+	item.setText("");
+	item.setEnabled(false);
+      }
+  }
 
   public void popUpEdit(Point p)
+  {
+    ObjectPopUp.popup(itsSketchPad, this, p.x, p.y);
+  }
+
+  public void popUpReset()
   {
   }
 

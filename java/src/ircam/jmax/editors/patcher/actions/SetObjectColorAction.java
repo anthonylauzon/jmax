@@ -23,45 +23,36 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.interactions;
+package ircam.jmax.editors.patcher.actions;
 
 import java.awt.*;
+import java.awt.event.*;
 
-import ircam.jmax.fts.*;
-import ircam.jmax.dialogs.*;
+import javax.swing.*;
+import javax.swing.event.*;
 
+import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
+import ircam.jmax.editors.patcher.menus.*;
 
-/** The interaction handling help patches; 
-  started, and completed, by a AltClick on an object.
-  */
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
 
 
-class PopUpInteraction extends Interaction
+public class SetObjectColorAction extends EditorAction
 {
-  boolean locked = false;
-
-  void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
+  String color;
+  public void actionPerformed(ActionEvent e)
   {
-    GraphicObject object = null;
+    color = ((JMenuItem)e.getSource()).getText();
+    super.actionPerformed(e);
+  }
 
-    if ((! locked) && Squeack.isPopUp(squeack))
-      {
-	locked = true;
-	object = (GraphicObject) area.getTarget();
-	object.popUpUpdate(Squeack.onInlet(squeack), Squeack.onOutlet(squeack), area);
-	object.popUpEdit(mouse);
-	locked = false;
-	editor.endInteraction();
-      }
+  public void doAction(EditorContainer container)
+  {
+    ((GraphicObject)ObjectPopUp.getPopUpTarget()).getFtsObject().setColor( ColorPopUpMenu.getColorIndex(color)+1);
   }
 }
-
-
-
-
-
-
 
 

@@ -28,10 +28,12 @@ package ircam.jmax.editors.patcher.objects;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.menus.*;
 
 /**
  * The "number box" graphic object base class
@@ -330,6 +332,18 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
     valueValid = true;
     currentText.setLength(0);
     redraw();
+  }
+
+  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
+  {
+    super.popUpUpdate(onInlet, onOutlet, area);
+    TextPopUpMenu.update(this);
+    ObjectPopUp.addMenu(TextPopUpMenu.getInstance());
+  }
+  public void popUpReset()
+  {
+    super.popUpReset();
+    ObjectPopUp.removeMenu(TextPopUpMenu.getInstance());
   }
 }
 

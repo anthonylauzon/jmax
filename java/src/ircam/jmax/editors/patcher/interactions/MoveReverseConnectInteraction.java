@@ -169,7 +169,7 @@ class MoveReverseConnectInteraction extends Interaction
 		destinationChoosen = false;
 		editor.resetHighlightedOutlet();
 		src = null;
-
+ 
 		editor.getDisplayList().dragLine();
 		editor.getDisplayList().redrawDragLine();
 		editor.getDisplayList().setDragLine(moveStart.x, moveStart.y, mouse.x, mouse.y);

@@ -34,7 +34,9 @@ import javax.swing.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.menus.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.menus.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
 //
@@ -253,6 +255,18 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   public void edit(Point point)
   {
     itsSketchPad.textEditObject(this, point);
+  }
+
+  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
+  {
+    super.popUpUpdate(onInlet, onOutlet, area);
+    TextPopUpMenu.update(this);
+    ObjectPopUp.addMenu(TextPopUpMenu.getInstance());
+  }
+  public void popUpReset()
+  {
+    super.popUpReset();
+    ObjectPopUp.removeMenu(TextPopUpMenu.getInstance());
   }
 }
 

@@ -86,6 +86,9 @@ class EditModeInteraction extends Interaction
 	    return Interactions.moveInteraction;
 
 	  case (Squeack.POP_UP | Squeack.OBJECT):
+	  case (Squeack.POP_UP | Squeack.TEXT):
+	  case (Squeack.POP_UP | Squeack.OUTLET):
+	  case (Squeack.POP_UP | Squeack.INLET):
 	    // Drag Select
 	    editor.resetHighlighted();
 	    return Interactions.popUpInteraction;

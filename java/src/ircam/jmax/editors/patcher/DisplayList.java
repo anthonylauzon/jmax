@@ -267,6 +267,37 @@ public class DisplayList
 	}
   }
 
+  public void deleteConnectionsForObject(GraphicObject obj)
+  {
+    MaxVector toDelete = new MaxVector();
+    Object[] values;
+    int size;
+
+    values = displayObjects.getObjectArray();
+    size = displayObjects.size();
+
+    for ( int i = 0; i < size; i++)
+      if (values[i] instanceof GraphicConnection)
+	{
+	  GraphicConnection connection = (GraphicConnection) values[i];
+
+	  if ((connection.getSourceObject() == obj)||(connection.getDestObject() == obj))
+	    toDelete.addElement(connection);
+	}
+
+    values = toDelete.getObjectArray();
+    size = toDelete.size();
+
+    for ( int i = 0; i < size; i++)
+      if (values[i] instanceof GraphicConnection)
+	{
+	  GraphicConnection connection = (GraphicConnection) values[i];
+
+	  connection.redraw();
+	  connection.delete();
+	}
+  }
+
   public void deleteConnectionsForOutlet(GraphicObject obj, int pos)
   {
     MaxVector toDelete = new MaxVector();
@@ -947,6 +978,8 @@ public class DisplayList
     sketch.repaint(dragRectangle.x, dragRectangle.y, dragRectangle.width + 1, dragRectangle.height + 1);
   }
 }
+
+
 
 
 

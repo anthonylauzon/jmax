@@ -23,45 +23,33 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.interactions;
+package ircam.jmax.editors.patcher.actions;
 
 import java.awt.*;
+import java.awt.event.*;
 
-import ircam.jmax.fts.*;
-import ircam.jmax.dialogs.*;
+import javax.swing.*;
+import javax.swing.event.*;
 
+import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-/** The interaction handling help patches; 
-  started, and completed, by a AltClick on an object.
-  */
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
 
-
-class PopUpInteraction extends Interaction
+public class RemoveInOutletConnectionsAction extends EditorAction
 {
-  boolean locked = false;
-
-  void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
+  public void doAction(EditorContainer container)
   {
-    GraphicObject object = null;
-
-    if ((! locked) && Squeack.isPopUp(squeack))
-      {
-	locked = true;
-	object = (GraphicObject) area.getTarget();
-	object.popUpUpdate(Squeack.onInlet(squeack), Squeack.onOutlet(squeack), area);
-	object.popUpEdit(mouse);
-	locked = false;
-	editor.endInteraction();
-      }
+    ErmesSketchPad sketch = (ErmesSketchPad) container.getEditor();
+    int where = ObjectPopUp.getPopUpTarget().wherePopup();
+    if(where == GraphicObject.ON_INLET)
+      sketch.getDisplayList().deleteConnectionsForInlet(ObjectPopUp.getPopUpTarget(), 
+							sketch.getHighlightedInlet());
+    else
+      if(where==GraphicObject.ON_OUTLET)
+	sketch.getDisplayList().deleteConnectionsForOutlet(ObjectPopUp.getPopUpTarget(),
+							   sketch.getHighlightedOutlet());
   }
 }
-
-
-
-
-
-
-
-

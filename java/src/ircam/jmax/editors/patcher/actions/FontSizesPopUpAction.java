@@ -23,44 +23,55 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.interactions;
+package ircam.jmax.editors.patcher.actions;
 
 import java.awt.*;
+import java.awt.event.*;
+import java.lang.*;
 
-import ircam.jmax.fts.*;
+import javax.swing.*;
+import javax.swing.event.*;
+
+import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
-
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-/** The interaction handling help patches; 
-  started, and completed, by a AltClick on an object.
-  */
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
 
-
-class PopUpInteraction extends Interaction
+public class FontSizesPopUpAction extends EditorAction
 {
-  boolean locked = false;
 
-  void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
+  int size;  
+  public  void actionPerformed(ActionEvent e)
   {
-    GraphicObject object = null;
-
-    if ((! locked) && Squeack.isPopUp(squeack))
-      {
-	locked = true;
-	object = (GraphicObject) area.getTarget();
-	object.popUpUpdate(Squeack.onInlet(squeack), Squeack.onOutlet(squeack), area);
-	object.popUpEdit(mouse);
-	locked = false;
-	editor.endInteraction();
-      }
+    try{
+      size = Integer.valueOf(((JMenuItem)e.getSource()).getText()).intValue();
+    }
+    catch (NumberFormatException  ne){
+      size=14;
+    }
+    super.actionPerformed(e);
+  }
+  
+  public void doAction(EditorContainer container)
+  {
+    GraphicObject object = ObjectPopUp.getPopUpTarget();
+    try{
+      object.redraw();
+      object.redrawConnections();
+      object.setFontSize(size);
+      object.redraw();
+      object.redrawConnections();
+    }
+    catch (Exception e){
+      ErrorDialog aErr = new ErrorDialog(container.getFrame(), "This font does not exist on this platform");
+      aErr.setLocation( 100, 100);
+      aErr.show();  
+    }
   }
 }
-
-
-
-
 
 
 

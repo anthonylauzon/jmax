@@ -99,6 +99,17 @@ public class Actions
 
   public static EditorAction openHelpPatchAction = new OpenHelpPatchAction();
   public static EditorAction showHtmlAction = new ShowHTMLAction();
+
+  //Object popup actions
+  public static EditorAction bringToFrontObjectAction = new BringToFrontObjectAction();
+  public static EditorAction sendToBackObjectAction = new SendToBackObjectAction();
+  public static EditorAction setObjectColorAction = new SetObjectColorAction();
+  public static EditorAction removeConnectionsAction = new RemoveInOutletConnectionsAction();
+  public static EditorAction fitToTextPopUpAction = new FitToTextPopUpAction();
+  public static EditorAction fontBiggerPopUpAction = new FontBiggerPopUpAction();
+  public static EditorAction fontSmallerPopUpAction = new FontSmallerPopUpAction();
+  public static EditorAction fontSizesPopUpAction = new FontSizesPopUpAction();
+  public static EditorAction fontPopUpAction = new FontPopUpAction();
 }
 
 

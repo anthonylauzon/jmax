@@ -28,17 +28,20 @@ package ircam.jmax.editors.patcher.objects;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import javax.swing.*;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
+
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.interactions.*;
+import ircam.jmax.editors.patcher.menus.*;
 
 //
 // The "bang" graphic object.
 //
 
-class Bang extends GraphicObject implements FtsIntValueListener
+public class Bang extends GraphicObject implements FtsIntValueListener
 {
   private Color itsFlashColor = Settings.sharedInstance().getUIColor();
   private static final int DEFAULT_WIDTH = 20;
@@ -77,34 +80,17 @@ class Bang extends GraphicObject implements FtsIntValueListener
       ftsObject.sendMessage( -1, "bang", null);
   }
 
-  static Color bangColors[] = 
-  {
-    Color.yellow,
-    Color.blue,
-    Color.cyan,
-    Color.green,
-    Color.magenta,
-    Color.orange,
-    Color.pink,
-    Color.red,
-    Color.white,
-    Color.black
-  };
-
   public void valueChanged(int value) 
   {
     int flash = value;
 
     if (flash <= 0)
       itsFlashColor = Settings.sharedInstance().getUIColor();
-    else if (flash > bangColors.length) 
-      itsFlashColor = Color.yellow;
-    else 
-      itsFlashColor = bangColors[flash - 1];
+    else
+      itsFlashColor = ColorPopUpMenu.getColorByIndex(flash);
 
     updateRedraw();
   }
-
 
   public void paint( Graphics g) 
   {
@@ -148,11 +134,17 @@ class Bang extends GraphicObject implements FtsIntValueListener
 		h - 2*(CIRCLE_ORIGIN+1) - 1);
   }
 
-  public void popUpEdit(Point p)
+  //popup interaction 
+  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
   {
-    ChooseColorIdPopUp.choose(itsSketchPad,
-			      (new NumberChoosenListener(){
-				 public void numberChoosen(int number) { ftsObject.setColor(number + 1);}
-			       }), p);
+    super.popUpUpdate(onInlet, onOutlet, area);
+    ObjectPopUp.addMenu(ColorPopUpMenu.getInstance());
+  }
+  public void popUpReset()
+  {
+    super.popUpReset();
+    ObjectPopUp.removeMenu(ColorPopUpMenu.getInstance());
   }
 }
+
+
