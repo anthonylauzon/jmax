@@ -439,6 +439,7 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
 
   private MaxEditor NewFile(String theFileType){
     if(theFileType.equals("patcher")) MaxApplication.ObeyCommand(MaxApplication.NEW_COMMAND);
+    else if (theFileType.equals("abstraction")) MaxApplication.ObeyCommand(MaxApplication.NEW_ABSTRACTION_COMMAND); //yes, I know...
     else if(theFileType.equals("")) return null;
     /* @@@@@@ Change new to use resources to find dynamically the editor
      */

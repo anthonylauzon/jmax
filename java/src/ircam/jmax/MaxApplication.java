@@ -68,6 +68,7 @@ public class MaxApplication extends Object {
 
   static MaxWhenHookTable  itsHookTable;
   public final static int NEW_COMMAND = 0;
+  public final static int NEW_ABSTRACTION_COMMAND = 1;
   public final static int SNAP_TO_GRID = 5;
   public final static int NEW_PROJECT = 6;
   public final static int CLOSE_WINDOW = 7;
@@ -99,7 +100,7 @@ public class MaxApplication extends Object {
       fis = new FileInputStream(pathForResources);
     }
     catch(FileNotFoundException e) {
-      System.out.println("ERROR: can't find resource configuration file in "+pathForResources);
+      System.err.println("ERROR: can't find resource configuration file in "+pathForResources);
       return;
     }
     try {
@@ -126,7 +127,10 @@ public class MaxApplication extends Object {
 	  System.out.println("failed to successfull parse resource");
 	  break;
 	}
-	else resourceVector.addElement(aResId); 
+	else {
+	resourceVector.addElement(aResId); 
+	//System.out.println(aResId.GetName());
+	}
       } else {
 	System.out.println("wrong resources.erm file");
 	return;
@@ -221,7 +225,7 @@ public class MaxApplication extends Object {
 
     // create the new SketchWindow based on the Document created....
 
-    itsSketchWindow = new ErmesSketchWindow(false, null);
+    itsSketchWindow = new ErmesSketchWindow(false, null, false);
     itsWindow = itsSketchWindow;
 
     //itsSketchWindow.addKeyListener(itsSketchWindow);
@@ -244,7 +248,7 @@ public class MaxApplication extends Object {
     itsSketchWindow.inAnApplet = false;
     itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetTitle());
     aPatcherDoc.SetWindow(itsSketchWindow);
-    CheckboxMenuItem aEditMenuItem = (CheckboxMenuItem)itsSketchWindow.itsEditMenu.getItem(9);
+    CheckboxMenuItem aEditMenuItem = (CheckboxMenuItem)itsSketchWindow.itsEditMenu.getItem(8);
     aEditMenuItem.setState(doAutorouting);
 
     if(itsProjectWindow.itsProject.GetItems().size()==0)
@@ -407,7 +411,7 @@ public class MaxApplication extends Object {
   public static ErmesSketchWindow NewPatcherWindow(FtsContainerObject theFtsPatcher) {
     ErmesPatcherDoc aPatcherDoc = new ErmesPatcherDoc(theFtsPatcher);
     aPatcherDoc.alreadySaved = true;
-    itsSketchWindow = new ErmesSketchWindow(false, itsSketchWindow);
+    itsSketchWindow = new ErmesSketchWindow(false, itsSketchWindow, false);
     theFtsPatcher.open();
     itsSketchWindow.repaint();
     itsWindow = itsSketchWindow;
@@ -430,7 +434,7 @@ public class MaxApplication extends Object {
     ErmesSketchWindow aSketchWindow;
     aPatcherDoc.alreadySaved = true;
     boolean temp = itsSketchWindow.itsSketchPad.doAutorouting;
-    aSketchWindow = new ErmesSketchWindow(true, itsSketchWindow);
+    aSketchWindow = new ErmesSketchWindow(true, itsSketchWindow, false);
     aSketchWindow.itsSketchPad.doAutorouting = temp;
     theFtsPatcher.open();
     //aSketchWindow.repaint();
@@ -488,7 +492,7 @@ public class MaxApplication extends Object {
     switch (command) {
     case NEW_COMMAND:
 
-      itsSketchWindow = new ErmesSketchWindow(false, null);
+      itsSketchWindow = new ErmesSketchWindow(false, null, false);
       itsWindow = itsSketchWindow;
 
       itsSketchWindowList.addElement(itsSketchWindow);
@@ -498,6 +502,8 @@ public class MaxApplication extends Object {
       itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetTitle());
       itsSketchWindow.pack();
       itsSketchWindow.setLocation(40,40);
+      //itsSketchWindow.setRunMode(true);
+      itsSketchWindow.setRunMode(false);
       if(itsProjectWindow.itsProject.GetItems().size()==0)
 	itsSketchWindow.itsProjectMenu.getItem(2).setEnabled(false);
       if(itsSketchWindowList.size() == 1)
@@ -506,6 +512,28 @@ public class MaxApplication extends Object {
       itsSketchWindow.setVisible(true);
       break;	
       
+    case NEW_ABSTRACTION_COMMAND://for test purposes only!!!!!!!
+
+      itsSketchWindow = new ErmesSketchWindow(false, null, true);
+      itsWindow = itsSketchWindow;
+
+      itsSketchWindowList.addElement(itsSketchWindow);
+      itsSketchWindow.inAnApplet = false;
+      itsSketchWindow.itsDocument.itsPatcher.open();	//remember to close
+      
+      itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetTitle());
+      itsSketchWindow.pack();
+      itsSketchWindow.setLocation(40,40);
+      //itsSketchWindow.setRunMode(true);
+      itsSketchWindow.setRunMode(false);
+      if(itsProjectWindow.itsProject.GetItems().size()==0)
+	itsSketchWindow.itsProjectMenu.getItem(2).setEnabled(false);
+      if(itsSketchWindowList.size() == 1)
+	itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);
+      AddThisWindowToMenus(itsSketchWindow);
+      itsSketchWindow.setVisible(true);
+      break;	
+
     case OPEN_WITH_AUTO_ROUTING:
       doAutorouting = !doAutorouting;
       //qui controlla lo stato del menu corrispondeente e gli adatta quello
@@ -769,7 +797,6 @@ public class MaxApplication extends Object {
 	new ConnectionDialog(itsProjectWindow);
 	MaxApplication.runHooks("start");
       }
-
   }
 
   /** This private method build the tcl interpreter, 

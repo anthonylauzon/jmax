@@ -3,6 +3,7 @@ package ircam.jmax.editors.console;
 import ircam.jmax.*;
 import java.io.*;
 import java.util.*;
+import com.sun.java.swing.*;
 /**
  A generic reusable panel containing a ConsoleThread
   */
@@ -40,6 +41,15 @@ public class Console extends Panel{
     itsKeyListener = new ConsoleKeyListener(this);
     itsTextArea.addKeyListener(itsKeyListener);
     itsTextArea.addMouseListener(new ConsoleMouseListener(this));
+    /*This was the first trial to see if we could insert swing objects... it worked
+      Panel aPanel = new Panel();
+      aPanel.setLayout(new GridLayout(0, 1));
+      aPanel.add(new JButton("cucu"));
+      aPanel.add(new JButton("reset")); 
+      aPanel.add(new JButton("reload"));
+      aPanel.add(new JButton("start script"));
+      add(aPanel);*/
+
     itsConsoleThread = new ConsoleThread(this);
     /*
      * The console thread runs as a daemon so that it gets terminated 

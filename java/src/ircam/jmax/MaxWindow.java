@@ -19,3 +19,4 @@ public interface MaxWindow {
   public abstract void AddToSubWindowsMenu(String theTopWinName, String theSubWinName, boolean theFirstItem);
   public abstract void RemoveFromSubWindowsMenu(String theTopWindowName,String theSubWindowName,boolean theLastItem);
 }
+
