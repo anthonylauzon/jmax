@@ -248,3 +248,36 @@ fts_object_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   if(ac > 0 && fts_is_number(at))
     fts_object_set_persistence(o, fts_get_number_int(at));
 }
+
+
+/* try import handlers from list in class until one returns true */
+void fts_object_import (fts_object_t *o, int winlet, fts_symbol_t s, 
+			int ac, const fts_atom_t *at)
+{
+    fts_array_t *handlers = &(fts_object_get_class(o)->import_handlers);
+    int i, done = 0;
+
+    for (i = 0; i < fts_array_get_size(handlers)  &&  !done; i++)
+    {
+	fts_method_t func = fts_get_pointer(fts_array_get_element(handlers, i));
+
+	/* try handler */
+	func(o, winlet, s, ac, at);
+
+	/* check if return atom is not void == success */
+	done = !fts_is_void(fts_get_return_value());
+    }
+    
+    if (!done)
+	fts_object_error(o, "import: cannot import file to %s", 
+			 fts_symbol_name(fts_object_get_class_name(o)));
+}
+
+/* open dialog and then call "import" method with the selected filename */
+void
+fts_object_import_dialog (fts_object_t *o, int winlet, fts_symbol_t s, 
+			  int ac, const fts_atom_t *at)
+{
+    fts_object_open_dialog(o, fts_s_import, 
+			   fts_new_symbol("Open file to import"));
+}

@@ -94,4 +94,13 @@ FTS_API void fts_object_upload(fts_object_t *obj);
 #define fts_object_set_context(o, c) ((o)->context = c)
 #define fts_object_get_container(o) (((o)->context != NULL)? ((o)->context->container): NULL)
 
-#endif
+/** try import handlers from list in class until one returns true */
+FTS_API void fts_object_import (fts_object_t *o, int winlet, fts_symbol_t s, 
+				int ac, const fts_atom_t *at);
+
+/** open dialog and then call "import" method with the selected filename */
+FTS_API void fts_object_import_dialog (fts_object_t *o, int wt, fts_symbol_t s,
+				       int ac, const fts_atom_t *at);
+
+
+#endif  /* _FTS_OBJECT_H_ */

@@ -56,10 +56,17 @@ default_equals_function (const fts_object_t *o, const fts_object_t *p)
 }
 
 static void
+default_array_function(fts_object_t *obj, fts_array_t *array)
+{
+}
+
+
+static void
 default_description_function(fts_object_t *obj, fts_array_t *array)
 {
   fts_array_append_symbol(array, fts_object_get_class_name(obj));
 }
+
 
 fts_class_t *
 fts_class_install (fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
@@ -75,6 +82,7 @@ fts_class_install (fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
   fts_class_set_copy_function (cl, NULL);
   fts_class_set_array_function (cl, NULL);
   fts_class_set_description_function (cl, default_description_function);
+  fts_array_init(&cl->import_handlers, 0, NULL);
 
   if (name != NULL)
   {
@@ -85,6 +93,7 @@ fts_class_install (fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 
   return cl;
 }
+
 
 void
 fts_class_instantiate (fts_class_t * cl)
@@ -207,6 +216,7 @@ dummy_method (fts_object_t * o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
 }
 
+
 void
 fts_class_init (fts_class_t * cl, unsigned int size, fts_method_t constructor, fts_method_t deconstructor)
 {
@@ -224,6 +234,9 @@ fts_class_init (fts_class_t * cl, unsigned int size, fts_method_t constructor, f
   cl->out_alloc = 0;
   cl->outlets = NULL;
 }
+
+
+
 
 /********************************************
 *
@@ -648,6 +661,19 @@ fts_class_doc(fts_class_t *cl, fts_symbol_t name, const char *args, const char *
   
   *list = line;
 }
+
+
+void 
+fts_class_add_import_handler (fts_class_t *cl, fts_method_t func)
+{
+    fts_atom_t a;
+
+    fts_set_pointer(&a, func);
+    fts_array_prepend(&cl->import_handlers, 1, &a);
+}
+
+
+
 
 /***********************************************************************
  *
