@@ -720,7 +720,12 @@ public class FtsParse
   }
 
 
-  static String unparseObjectDescription(int offset, FtsMessage msg)
+  static String unparseObjectDescription(FtsMessage msg)
+  {
+    return unparseObjectDescription(msg.getNextArgument(), msg);
+  }
+
+  static String unparseObjectDescription(Object initValue, FtsMessage msg)
   {
     boolean doNewLine = false;
     boolean addBlank = false;
@@ -730,12 +735,10 @@ public class FtsParse
 
     StringBuffer descr = new StringBuffer();
 
-    if (msg.getNumberOfArguments() == offset)
-      return "";
+    value2 = initValue;
+    value1 = value2;
 
-    value2 = msg.getArgument(offset);
-
-    for (int i = offset + 1; i < (msg.getNumberOfArguments() + 1); i++)
+    while (value1 != null)
       {
 	if (doNewLine)
 	  descr.append("\n");
@@ -744,12 +747,7 @@ public class FtsParse
 
 	doNewLine = false;
 
-	value1 = value2;
-
-	if (i < msg.getNumberOfArguments())
-	  value2 = msg.getArgument(i);
-	else
-	  value2 = null;
+	value2 = msg.getNextArgument();
 
 	if (value1 instanceof Float)
 	  descr.append(numberFormat.format(value1));
@@ -799,6 +797,8 @@ public class FtsParse
 	    else
 	      addBlank = true;	// if no body care, do a blank
 	  }
+
+	value1 = value2;
       }
 
     return descr.toString();
@@ -807,7 +807,7 @@ public class FtsParse
   // Version used for the comments, to avoid introducing quotes
   // in comments
 
-  static String simpleUnparseObjectDescription(int offset, FtsMessage msg)
+  static String simpleUnparseObjectDescription(FtsMessage msg)
   {
     boolean doNewLine = false;
     boolean addBlank = false;
@@ -817,12 +817,10 @@ public class FtsParse
 
     StringBuffer descr = new StringBuffer();
 
-    if (msg.getNumberOfArguments() == offset)
-      return "";
+    value2 = msg.getNextArgument();
+    value1 = value2;
 
-    value2 = msg.getArgument(offset);
-
-    for (int i = offset + 1; i < (msg.getNumberOfArguments() + 1); i++)
+    while (value1 != null)
       {
 	if (doNewLine)
 	  descr.append("\n");
@@ -831,12 +829,7 @@ public class FtsParse
 
 	doNewLine = false;
 
-	value1 = value2;
-
-	if (i < msg.getNumberOfArguments())
-	  value2 = msg.getArgument(i);
-	else
-	  value2 = null;
+	value2 = msg.getNextArgument();
 
 	if (value1 instanceof Float)
 	  descr.append(numberFormat.format(value1));
@@ -878,6 +871,8 @@ public class FtsParse
 	    else
 	      addBlank = true;	// if no body care, do a blank
 	  }
+
+	value1 = value2;
       }
 
     return descr.toString();

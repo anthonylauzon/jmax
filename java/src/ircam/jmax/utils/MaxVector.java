@@ -14,7 +14,7 @@ public class MaxVector
   }
 
   public final void ensureCapacity(int requestedSize)
-  {
+  {    
     if (requestedSize >= objects.length)
       {
 	int newSize = objects.length;

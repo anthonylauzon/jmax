@@ -401,6 +401,7 @@ struct fts_inlet
   fts_object_t o;
 
   int          position;	/* inlet position */
+  struct fts_inlet *next;	/* next inlet in the same position */
 };
 
    
@@ -409,6 +410,7 @@ struct fts_outlet
   fts_object_t o;		
 
   int          position;	/* outlet position */
+  struct fts_outlet *next;	/* next outlet in the same position */
 };
 
 

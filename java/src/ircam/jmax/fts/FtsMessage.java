@@ -82,28 +82,6 @@ final public class FtsMessage
   }
   
   /**
-   * Get a message argument
-   */
-
-  public final Object getArgument(int i)
-  {
-    if (i < args_fill)
-      return args[i];
-    else
-      return null;
-  }
-
-  /**
-   * Get a the number of arguments
-   */
-
-  public final int getNumberOfArguments()
-  {
-    return args_fill;
-  }
-
-
-  /**
    * Add an argument at the end
    */
 

@@ -242,3 +242,4 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
     AddButton( "floatbox", path + "tool_float.gif");
   }
 }
+

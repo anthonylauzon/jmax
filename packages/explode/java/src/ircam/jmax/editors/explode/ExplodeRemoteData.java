@@ -484,11 +484,11 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 	if (events_fill_p >= events_size)
 	  reallocateEvents();
 	events[events_fill_p++] = new ScrEvent(this,
-					       ((Integer) msg.getArgument(2)).intValue(), 
-					       ((Integer) msg.getArgument(3)).intValue(), 
-					       ((Integer) msg.getArgument(4)).intValue(), 
-					       ((Integer) msg.getArgument(5)).intValue(), 
-					       ((Integer) msg.getArgument(6)).intValue());
+					       ((Integer) msg.getNextArgument()).intValue(), 
+					       ((Integer) msg.getNextArgument()).intValue(), 
+					       ((Integer) msg.getNextArgument()).intValue(), 
+					       ((Integer) msg.getNextArgument()).intValue(), 
+					       ((Integer) msg.getNextArgument()).intValue());
 	break;
       default:
 	break;

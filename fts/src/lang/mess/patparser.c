@@ -7,7 +7,7 @@
 
 /* Auto scretch  */
 
-#define SCALE_MULT 23
+#define SCALE_MULT 20
 #define SCALE_DEN  18
 
 
@@ -760,11 +760,11 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
       if (in->ttype == FTS_LEX_EOC)
 	fts_patlex_push_back(in);
 
+      /* Create a non assigned inlet */
+
+
       fts_set_symbol(&description[0], fts_s_inlet);
-
-      /* Putting a symbol as position avoid inlet positioning */
-
-      fts_set_symbol(&description[1], fts_s_inlet); 
+      fts_set_int(&description[1], -2); 
       obj = fts_object_new((fts_patcher_t *)parent, 2, description);
 
       fts_patparse_set_square_graphic_properties(graphicDescr, obj);
@@ -780,11 +780,10 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
       if (in->ttype == FTS_LEX_EOC)
 	fts_patlex_push_back(in);
 
+      /* Create a non assigned outlet */
+
       fts_set_symbol(&description[0], fts_s_outlet);
-
-      /* Putting a symbol as position avoid outlet positioning */
-
-      fts_set_symbol(&description[1], fts_s_outlet); 
+      fts_set_int(&description[1], -2); 
       obj = fts_object_new((fts_patcher_t *)parent, 2, description);
 
       fts_patparse_set_square_graphic_properties(graphicDescr, obj);

@@ -1155,23 +1155,24 @@ public class FtsServer
       {
       case FtsClientProtocol.fts_property_value_cmd:
 	{
- 	  if (msg.getNumberOfArguments() >= 3)
- 	    {
- 	      FtsObject obj;
-	      String prop;
-	      Object value;
-	      
- 	      obj = (FtsObject) msg.getNextArgument();
-	      prop = ((String) msg.getNextArgument()).intern();
-	      value =  msg.getNextArgument();
+	  FtsObject obj;
+	  String prop;
+	  Object value;
+	  
+	  obj = (FtsObject) msg.getNextArgument();
+	  prop = ((String) msg.getNextArgument()).intern();
+	  value =  msg.getNextArgument();
+
+	  if ((obj == null) || (prop == null) || (value == null))
+ 	    System.err.println("Wrong property value message " + msg);
+	  else
+	    {
  	      if (obj != null)
  		obj.localPut(prop, value);
-
+	      
 	      if (FtsServer.debug)
  		System.err.println("SetPropertyValue " + obj + " " + prop + " " + value);
  	    }
- 	  else
- 	    System.err.println("Wrong property value message " + msg);
 	}
       break;
 
@@ -1310,26 +1311,17 @@ public class FtsServer
 
       case FtsClientProtocol.remote_call_code:
 	{
-	  if (msg.getNumberOfArguments() < 2)
-	    {
-	      System.err.println( "Wrong remote call message " + msg);
-	      break;
-	    }
-
 	  FtsRemoteData data = (FtsRemoteData) msg.getNextArgument();
+	  Integer value = (Integer) msg.getNextArgument();
 
-	  if (data != null)
+	  if ((data != null) && (value != null))
 	    {
-	      int key = ((Integer)  msg.getNextArgument()).intValue();
-
-	      // Args can be big (thousands), so in order to keep 
-	      // call as "primitive" as possible, we just pass
-	      // the msg; it is up to the called object to interpret
-	      // it
-
+	      int key = value.intValue();
+	      
 	      data.call(key, msg);
 	    }
-
+	  else
+	    System.err.println( "Wrong remote call message " + msg);
 	  break;
 	}
 

@@ -72,8 +72,8 @@ class FtsRemoteMetaData extends FtsRemoteData
 
   private void newFtsRemoteData( FtsMessage msg)
   {
-    int newId = ((Integer)msg.getArgument(2)).intValue();
-    String className = (String)msg.getArgument(3);
+    int newId        = ((Integer)msg.getNextArgument()).intValue();
+    String className = (String)msg.getNextArgument();
     Class dataJavaClass;
     FtsRemoteData newRemoteData;
 
@@ -107,7 +107,7 @@ class FtsRemoteMetaData extends FtsRemoteData
 
   private void releaseRemoteData( FtsMessage msg)
   {
-    FtsRemoteData data = (FtsRemoteData) msg.getArgument(2);
+    FtsRemoteData data = (FtsRemoteData) msg.getNextArgument();
 
     data.release();
   }

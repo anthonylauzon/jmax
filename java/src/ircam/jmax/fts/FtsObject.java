@@ -37,32 +37,34 @@ abstract public class FtsObject
     FtsContainerObject parent;
     int objId;
 
-    parent = (FtsContainerObject) msg.getArgument(0);
-    objId = ((Integer) msg.getArgument(1)).intValue();
+    parent = (FtsContainerObject) msg.getNextArgument();
+    objId = ((Integer) msg.getNextArgument()).intValue();
 
     /* Check for null description object */
 
-    if (msg.getNumberOfArguments() < 3)
-      return new FtsStandardObject(parent, "", "", objId);
+    className = (String) msg.getNextArgument();
 
-    className = ((String) msg.getArgument(2)).intern();
+    if (className == null)
+      return new FtsStandardObject(parent, "", "", objId);
+    else
+      className = className.intern();
 
     if (className == "jpatcher")
-      return new FtsPatcherObject(parent, FtsParse.unparseObjectDescription(3, msg), objId);
+      return new FtsPatcherObject(parent, FtsParse.unparseObjectDescription(msg), objId);
     else if (className == "inlet")
-      return new FtsInletObject(parent, ((Integer) msg.getArgument(3)).intValue(), objId);
+      return new FtsInletObject(parent, ((Integer) msg.getNextArgument()).intValue(), objId);
     else if (className == "outlet")
-      return new FtsOutletObject(parent, ((Integer) msg.getArgument(3)).intValue(), objId);
+      return new FtsOutletObject(parent, ((Integer) msg.getNextArgument()).intValue(), objId);
     else if (className == "messbox")
-      return new FtsMessageObject(parent, FtsParse.unparseObjectDescription(3, msg), objId);
+      return new FtsMessageObject(parent, FtsParse.unparseObjectDescription(msg), objId);
     else if (className == "comment")
-      return new FtsCommentObject(parent, FtsParse.simpleUnparseObjectDescription(3, msg), objId);
+      return new FtsCommentObject(parent, FtsParse.simpleUnparseObjectDescription(msg), objId);
     else if (className == "__selection")
       return new FtsSelection(parent, className, "__selection", objId);
     else if (className == "__clipboard")
       return new FtsClipboard(parent, className, "__clipboard", objId);
     else
-      return new FtsStandardObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
+      return new FtsStandardObject(parent, className, FtsParse.unparseObjectDescription(className, msg), objId);
   }
 
 
@@ -73,13 +75,13 @@ abstract public class FtsObject
     FtsContainerObject parent;
     int objId;
 
-    parent = (FtsContainerObject) msg.getArgument(0);
-    objId = ((Integer) msg.getArgument(1)).intValue();
-    className = (String) msg.getArgument(2);
+    parent    = (FtsContainerObject) msg.getNextArgument();
+    objId     = ((Integer) msg.getNextArgument()).intValue();
+    className = (String) msg.getNextArgument();
 
     /* if the object has been succesfully created, set the parent dirty */
 
-    return new FtsAbstractionObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
+    return new FtsAbstractionObject(parent, className, FtsParse.unparseObjectDescription(className, msg), objId);
   }
 
   /******************************************************************************/

@@ -5,9 +5,6 @@ extern fts_metaclass_t *patcher_metaclass;
 extern fts_metaclass_t *inlet_metaclass;
 extern fts_metaclass_t *outlet_metaclass;
 
-extern fts_object_t *fts_patcher_get_inlet(fts_object_t *patcher, int inlet);
-extern fts_object_t *fts_patcher_get_outlet(fts_object_t *patcher, int outlet);
-
 #define fts_object_is_patcher(o) ((o)->cl->mcl == patcher_metaclass)
 
 
@@ -48,6 +45,9 @@ extern fts_patcher_t *fts_patcher_redefine_description(fts_patcher_t *this, int 
 
 extern fts_object_t *fts_patcher_get_inlet(fts_object_t *patcher, int inlet);
 extern fts_object_t *fts_patcher_get_outlet(fts_object_t *patcher, int outlet);
+
+extern fts_object_t *fts_outlet_get_next_inlet(fts_object_t *outlet);
+extern fts_object_t *fts_inlet_get_next_inlet(fts_object_t *inlet);
 
 extern fts_patcher_t *fts_get_root_patcher();
 

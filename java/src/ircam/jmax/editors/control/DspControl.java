@@ -70,10 +70,7 @@ public class DspControl extends FtsRemoteData
     Integer oldValue, newValue;
     String prop;
 
-    if (msg.getNumberOfArguments() >= 2)
-      newValue = (Integer) msg.getArgument(2);
-    else
-      newValue = null;
+    newValue = (Integer) msg.getNextArgument();
 
     switch(key)
       {

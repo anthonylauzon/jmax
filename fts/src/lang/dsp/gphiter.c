@@ -91,15 +91,14 @@ static void handle_connection_to_system_object( graph_iterator_t *iter, fts_conn
   if (fts_object_is_patcher( system_object))
     {
       newobject = fts_patcher_get_inlet( system_object, connection->winlet);
-      if (newobject == 0)
-	{
-	  /* Got a lot of those */
-	  /* fprintf( stderr, "Warning (gphiter.c): patcher without inlet...\n"); */
-	  return;
-	}
 
-      if (!graph_iterator_is_object_already_in_stack( iter, newobject))
-	graph_iterator_push( iter, newobject, 0);
+      while (newobject)
+	{
+	  if (!graph_iterator_is_object_already_in_stack( iter, newobject))
+	    graph_iterator_push( iter, newobject, 0);
+
+	  newobject = fts_inlet_get_next_inlet(newobject);
+	}
     }
   else if (fts_object_is_outlet( system_object))
     {

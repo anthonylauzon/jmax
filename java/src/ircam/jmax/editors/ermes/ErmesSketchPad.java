@@ -436,7 +436,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     repaint();
   }
 
-  void inspectSelection() 
+  static void inspectSelection() 
   {
     Object[] objects = currentSelection.itsObjects.getObjectArray();
     int size = currentSelection.itsObjects.size();
@@ -622,7 +622,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	offGraphics = offImage.getGraphics();
       }
     else 
-      RequestOffScreen( this); //we already created an offscreen. To who it belongs?
+      RequestOffScreen(); //we already created an offscreen. To who it belongs?
 
     if ( (d.width != offDimension.width) || ( d.height != offDimension.height))
       {
@@ -708,7 +708,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	  {
 	    //this can happen...
 	    offGraphics = offImage.getGraphics();	
-	    RequestOffScreen( this);	//a call to this function change the offscreen property.
+	    RequestOffScreen();	//a call to this function change the offscreen property.
 	  }
       }
     return offGraphics;
@@ -938,9 +938,9 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     PrepareOutChoice();
   }
 	
-  static void RequestOffScreen( ErmesSketchPad theSketchPad) 
+  void RequestOffScreen() 
   {
-    if ( lastSketchWithOffScreen == theSketchPad || theSketchPad.offScreenPresent) 
+    if ( lastSketchWithOffScreen == this || offScreenPresent) 
       return;
 
     if (lastSketchWithOffScreen != null) 
@@ -950,9 +950,9 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	lastSketchWithOffScreen.offScreenPresent = false;
       }
 
-    theSketchPad.offScreenPresent = true;
-    lastSketchWithOffScreen = theSketchPad;
-    theSketchPad.paintForTheFirstTime = true;
+    offScreenPresent = true;
+    lastSketchWithOffScreen = this;
+    paintForTheFirstTime = true;
   }
   
 
@@ -1063,7 +1063,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     if ( !offScreenPresent)
       {
 	Graphics g = getGraphics();
-	RequestOffScreen( this);
+	RequestOffScreen();
 	DrawOffScreen( g);
 	g.dispose();
       }

@@ -3,3 +3,8 @@ SOURCES = \
 	MaxWindowMenu.java	\
 	SelectionHandler.java	\
 	SelectionListener.java	
+
+NEEDED_SOURCES = \
+	AbstractSelection.java	\
+	SelectionHandler.java	\
+	SelectionListener.java	

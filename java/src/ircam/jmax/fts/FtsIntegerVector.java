@@ -118,13 +118,13 @@ public class FtsIntegerVector extends FtsRemoteData
       case REMOTE_SET:
 	int size;
 	
-	size = ((Integer) msg.getArgument(2)).intValue();
+	size = ((Integer) msg.getNextArgument()).intValue();
 
 	if ((values == null) || size != values.length)
 	  values = new int[size];
 	
 	for (int i = 0 ; i < size; i++)
-	  values[i] = ((Integer) msg.getArgument(i + 3)).intValue();
+	  values[i] = ((Integer) msg.getNextArgument()).intValue();
 	break;
       default:
 	break;

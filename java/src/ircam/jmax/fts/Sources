@@ -18,11 +18,9 @@ SOURCES = \
 	FtsIntegerVector.java		\
 	FtsObjectSet.java               \
 	FtsMessage.java			\
-	FtsMessageHandler.java		\
 	FtsMessageObject.java		\
 	FtsModule.java			\
 	FtsObject.java			\
-	FtsObjectWithData.java		\
 	FtsOutletObject.java		\
 	FtsParse.java			\
 	FtsPatcherDocument.java		\

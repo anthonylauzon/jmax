@@ -101,12 +101,6 @@ public class MaxWindowMenu extends Menu implements WindowListener, ListDataListe
 				{public  void actionPerformed(ActionEvent e)
 				    { MaxWindowManager.getWindowManager().TileWindows();}});
 
-    mi = new MenuItem("Tile Vertical");
-    add(mi);
-    mi.addActionListener(new WindowActionListener(mi)
-				{public  void actionPerformed(ActionEvent e)
-				    { MaxWindowManager.getWindowManager().TileVerticalWindows();}});
-
     addSeparator();
 
     // Built the tool menu

@@ -202,28 +202,6 @@ public class MaxWindowManager implements WindowListener
   {
   }
 
-  /** Tile vertically the WIndows */
-
-  public void TileVerticalWindows()
-  {
-    Frame window;
-    int x = 7;
-    int y = 20;
-    int width = (int)java.lang.Math.floor(SCREENHOR / windows.size()) - 10;
-    int height = SCREENVERT - 35;
-
-    for (int i = 0; i < windows.size(); i++)
-      {
-	window = (Frame) windows.elementAt(i);
-
-	if (i > 0)
-	  x = x + width +7;
-
-	window.setBounds(x, y, width, height);
-      }
-  }
-
-
   public void TileWindows()
   {
     int width;
@@ -281,7 +259,7 @@ public class MaxWindowManager implements WindowListener
 	    else if(k>0)
 	      y += height + 25;
 	
-	    window.setBounds(x, y, width, height);
+	    window.setLocation(x, y);
 	  }
       } 
   }
@@ -298,14 +276,11 @@ public class MaxWindowManager implements WindowListener
 
     x = 50;
     y = 50;
-    // height = (int)java.lang.Math.floor(SCREENVERT/3);
-    // width = (int)java.lang.Math.floor(SCREENHOR/3);
 
     for (int i = 0; i < windows.size(); i++)
       {
 	window = (Frame) windows.elementAt(i);
 
-	// window.setBounds(x, y, width, height);
 	window.setLocation(x, y);
 	window.toFront();
 

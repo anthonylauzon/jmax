@@ -97,11 +97,17 @@ public class FtsAtomList extends FtsRemoteData
     switch( key)
       {
       case REMOTE_SET:
+	Object obj;
 
-	values.setSize(msg.getNumberOfArguments() - 2);
+	values.removeAllElements();
 
-	for (int i = 2 ; i < msg.getNumberOfArguments(); i++)
-	  values.setElementAt(msg.getArgument(i), i - 2);
+	obj = msg.getNextArgument();
+
+	while (obj != null)
+	  {
+	    values.addElement(obj);
+	    obj = msg.getNextArgument();
+	  }
 	break;
       default:
 	break;

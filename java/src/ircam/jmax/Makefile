@@ -19,7 +19,7 @@ include $(ROOTDIR)/java/Makefiles/Makefile.common
 
 all:  
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) -depend MaxApplication.java)
-	(cd toolkit ; $(MAKE) all)
+	(cd toolkit ; $(MAKE) needed)
 .PHONY: all
 
 

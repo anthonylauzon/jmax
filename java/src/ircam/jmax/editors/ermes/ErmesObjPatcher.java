@@ -81,6 +81,13 @@ class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandl
     else
       itsSketchPad.ClickOnObject( this, evt, x, y);
   }
+
+  /* Inspector */
+
+  public void inspect() 
+  {
+    ErmesPatcherInspector.inspect( (FtsContainerObject) itsFtsObject);
+  }
 	
   //--------------------------------------------------------
   // paint

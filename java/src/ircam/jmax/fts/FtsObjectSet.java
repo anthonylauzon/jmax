@@ -73,12 +73,15 @@ public class FtsObjectSet extends FtsRemoteData
 	break;
 
       case REMOTE_APPEND:
-	int size;
+	Object value;
 
-	size = msg.getNumberOfArguments();
+	value = msg.getNextArgument();
 
-	for (int i = 0 ; i < size - 2; i++)
-	  list.addElement(msg.getNextArgument());
+	while (value != null)
+	  {
+	    list.addElement(value);
+	    value = msg.getNextArgument();
+	  };
 	break;
 
       case REMOTE_REMOVE_ONE:

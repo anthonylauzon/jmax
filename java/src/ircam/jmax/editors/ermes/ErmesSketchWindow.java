@@ -325,23 +325,20 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
  	}
     });
 
-    // (fd) {
-    // As the inspector is not ready yet, the menu is not there.
-    // The correct order is :
-    // 1) implement an inspector for the object
-    // 2) add a command in a menu that calls the inspector
-    // and not the contrary...
-    //     MenuItem inspectMenuItem = new MenuItem("Inspect Ctrl+I");
-    //     editMenu.add(inspectMenuItem);
+    MenuItem inspectMenuItem = new MenuItem("Inspect Ctrl+I");
+    editMenu.add(new MenuItem("-"));
+    editMenu.add(inspectMenuItem);
 
-    //     inspectMenuItem.addActionListener( new MaxActionListener(inspectMenuItem) {
-    //       public void actionPerformed(ActionEvent e) 
-    // 	{
-    // 	  inspectAction();
-    // 	}
-    //     });
-    //     editMenu.add(new MenuItem("-"));
-    // } (fd)
+    inspectMenuItem.addActionListener( new MaxActionListener(inspectMenuItem) {
+      public void actionPerformed(ActionEvent e) 
+	{
+	  if (ErmesSketchPad.currentSelection.isEmpty())
+	    ErmesPatcherInspector.inspect(itsPatcher);
+	  else
+	    ErmesSketchPad.inspectSelection();
+	}
+    });
+
     GetCutMenu().setEnabled( true);
     GetCopyMenu().setEnabled( true);
     GetPasteMenu().setEnabled( true);
@@ -413,7 +410,7 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     if (!ftsObjectsPasted.isEmpty() || ! ftsConnectionsPasted.isEmpty())
       {
 	itsSketchPad.PasteObjects( ftsObjectsPasted, ftsConnectionsPasted);
-	ErmesSketchPad.RequestOffScreen( itsSketchPad);
+	itsSketchPad.RequestOffScreen();
 	itsSketchPad.repaint();
       }
     setCursor( temp);
@@ -700,7 +697,16 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
       }
     else if (e.isControlDown()) 
       {
-	if (aInt == 90)
+	if (aInt == 73)
+	  {
+	    // i
+
+	    if (ErmesSketchPad.currentSelection.isEmpty())
+	      ErmesPatcherInspector.inspect(itsPatcher);
+	    else
+	      ErmesSketchPad.inspectSelection();
+	  }
+	else if (aInt == 90)
 	  itsSketchPad.showAnnotations( "errdesc"); // z ??
 	else if (aInt == 65)
 	  itsSketchPad.SelectAll();//a
@@ -1064,7 +1070,7 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 	
   public void focusGained( FocusEvent e)
   {
-    ErmesSketchPad.RequestOffScreen( itsSketchPad);
+    itsSketchPad.RequestOffScreen();
 
     Graphics g = getGraphics();
 
