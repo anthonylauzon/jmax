@@ -128,7 +128,7 @@ scomark_set_tempo(scomark_t *self, double tempo)
     tempo = 0.0;
   
   fts_set_float(&a, tempo);
-  propobj_set_property_by_index((propobj_t *)self, scomark_propidx_tempo, &a);
+  propobj_set_property_by_index((propobj_t *)self, scomark_propidx_tempo, &a);  
 }
 
 void

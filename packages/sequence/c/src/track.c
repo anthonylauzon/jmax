@@ -376,6 +376,161 @@ track_merge(track_t *track, track_t *merge)
   merge->size = 0;
 }
 
+/* get segment by time ("after" is the next event after the segment) */
+void
+track_segment_get(track_t *self, double begin, double end, event_t **first, event_t **after)
+{
+  event_t *event = track_get_first(self);
+  
+  *first = *after = NULL;
+  
+  if(begin < 0.0)
+    begin = 0.0;
+  
+  if(end < begin)
+  {
+    double b = begin;
+    begin = end;
+    end = b;
+  }
+  
+  while(event && event_get_time(event) < begin)
+    event = event_get_next(event);
+  
+  *first = event;
+  
+  while(event && event_get_time(event) < end)
+    event = event_get_next(event);
+  
+  *after = event;
+}
+
+void
+track_segment_shift(track_t *self, event_t *first, event_t *after, double begin, double end, double shift)
+{
+  if(first != NULL && shift != 0.0)
+  {
+    event_t *event = first;
+    event_t *prev = event_get_prev(first);    
+    double before = 0.0;
+        
+    if(prev != NULL)
+      before = event_get_time(prev);
+    
+    while(event != after && event_get_time(event) + shift < before)
+    {
+      double time = event_get_time(event) + shift;
+      event_t *next = event_get_next(event);
+      
+      if(time < 0.0)
+        time = 0.0;
+      
+      track_move_event(self, event, time);
+      event = next;
+    }
+        
+    while(event != after && event_get_time(event) + shift < end)
+    {
+      event_set_time(event, event_get_time(event) + shift);
+      event = event_get_next(event);
+    }
+    
+    if(event != NULL)
+    {
+      prev = event_get_prev(event);
+      
+      if(after != NULL)
+        event = event_get_prev(after);
+      else
+        event = track_get_last(self);
+      
+      while(event != prev)
+      {
+        event_t *prev = event_get_prev(event);
+        
+        track_move_event(self, event, event_get_time(event) + shift);        
+        
+        event = prev;      
+      }
+    }
+  }
+}
+
+void
+track_segment_stretch(track_t *self, event_t *first, event_t *after, double begin, double end, double stretch)
+{
+  double shift = 0.0;
+  
+  if(stretch < 0.0)
+    stretch = 0.0;
+  
+  if(first != NULL && stretch != 1.0)
+  {
+    event_t *event = first;
+    
+    while(event != after)
+    {
+      event_set_time(event, begin + (event_get_time(event) - begin) * stretch);
+      event = event_get_next(event);
+    }
+    
+    shift = begin + (end - begin) * stretch;
+    
+    while(event != NULL)
+    {
+      event_set_time(event, shift + event_get_time(event));
+      event = event_get_next(event);
+    }    
+  }
+}
+
+void
+track_segment_quantize(track_t *self, event_t *first, event_t *after, double begin, double end, double quantize)
+{
+  int quantize_durations = 1;
+
+  if(quantize < 0.0)
+  {
+    quantize *= -1.0;
+    quantize_durations = 0;
+  }
+  
+  if(first != NULL && quantize > 0.0)
+  {
+    event_t *event = first;
+    double time = begin;
+    
+    while(event != after && time < end)
+    {
+      double next = time + quantize;
+      
+      while(event && fabs(event_get_time(event) - time) < fabs(event_get_time(event) - next))
+      {
+        event_t *next = event_get_next(event);
+        
+        if(time <= end)
+          event_set_time(event, time);
+        else
+          track_move_event(self, event, time);        
+        
+        if(quantize_durations > 0)
+        {
+          double dur = event_get_duration(event);
+          
+          if(dur > quantize)
+            event_set_duration(event, quantize * floor(dur / quantize + 0.5));
+          else if(dur >= 0.0)
+            event_set_duration(event, quantize);
+        }
+        
+        event = next;
+      }
+      
+      time = next;
+    }
+  }
+}
+
 void 
 track_copy(track_t *org, track_t *copy)
 {
@@ -448,6 +603,7 @@ track_insert_marker(track_t *track, double time, fts_symbol_t type)
   /* create a scomark */
   fts_set_symbol(&a, type);
   scomark = (scomark_t *)fts_object_create(scomark_class, 1, &a);
+  fts_object_set_context((fts_object_t *)scomark, (fts_context_t *)markers);
   
   /* create a new event with the scomark */
   fts_set_object(&a, (fts_object_t *)scomark);
@@ -476,6 +632,7 @@ track_insert_marker_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int
     /* create a scomark */
     fts_set_symbol(&a, sc_type);
     scomark = (scomark_t *)fts_object_create(scomark_class, 1, &a);
+    fts_object_set_context((fts_object_t *)scomark, (fts_context_t *)self);
     
     /* create a new event with the scomark */
     fts_set_object(&a, (fts_object_t *)scomark);
@@ -521,7 +678,7 @@ track_upload_markers(track_t *self)
 		fts_send_message((fts_object_t *)self->markers, fts_s_upload, 0, NULL);
 	}
 }
-  
+
 /******************************************************
  *
  *  persistence compatibility
@@ -645,7 +802,6 @@ track_move_events_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int a
   }
 	
   fts_client_send_message((fts_object_t *)self, seqsym_moveEvents, ac, at);
-	
   fts_object_set_state_dirty((fts_object_t *)self);
 }
 
@@ -715,7 +871,7 @@ track_get_next_by_time_after(track_t *track, double time, event_t *here)
 
 /******************************************************
 *
-*  client calls: highlighting
+*  client calls: highlight event, move segment
 *
 */
 
@@ -842,6 +998,29 @@ track_highlight_and_next(track_t *track, event_t *event)
   return event;
 }
 
+static void
+track_move_events_at_client(track_t *self, event_t *first, event_t *after)
+{
+  if(first != NULL)
+  {
+    event_t *event = first;
+    fts_array_t array;
+    
+    fts_array_init(&array, 0, NULL);
+    
+    while(event != after && event != NULL)
+    {
+      fts_array_append_object(&array, (fts_object_t *)event);
+      fts_array_append_float(&array, event_get_time(event));
+      event = event_get_next(event);
+    }
+    
+    fts_client_send_message((fts_object_t *)self, seqsym_moveEvents, fts_array_get_size(&array), fts_array_get_atoms(&array));
+    
+    fts_array_destroy(&array);
+  }
+}
+
 /******************************************************
 *
 *  user methods
@@ -961,8 +1140,9 @@ _track_shift(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   track_t *self = (track_t *)o;
   double begin = 0.0;
   double end = 2.0 * track_get_duration(self);
+  event_t *first = NULL;
+  event_t *after = NULL;
   double shift = 0.0;
-  double before = 0.0;
   
   switch(ac)
   {
@@ -980,48 +1160,12 @@ _track_shift(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       break;
   }
   
-  if(shift != 0.0 && begin < track_get_duration(self))
+  track_segment_get(self, begin, end, &first, &after);
+  if(first != NULL)
   {
-    event_t *event = track_get_first(self);
-
-    while(event && event_get_time(event) < begin)
-    {
-      before = event_get_time(event);
-      event = event_get_next(event);
-    }
-
-    if(event != NULL)
-    {
-      while(event && event_get_time(event) + shift < before)
-      {
-        double time = event_get_time(event) + shift;
-        event_t *next = event_get_next(event);
-      
-        if(time < 0.0)
-          time = 0.0;
-          
-        track_move_event(self, event, time);
-        
-        event = next;
-      }
-      
-      while(event && event_get_time(event) + shift < end)
-      {
-        event_set_time(event, event_get_time(event) + shift);
-        event = event_get_next(event);
-      }
-      
-      while(event && event_get_time(event) < end)
-      {
-        event_t *next = event_get_next(event);
-        
-        track_move_event(self, event, event_get_time(event) + shift);        
-        
-        event = next;
-      }
-      
-  		fts_object_set_dirty(o);
-    }
+    track_segment_shift(self, first, after, begin, end, shift);
+    track_move_events_at_client(self, first, after);
+    fts_object_set_dirty(o);
   }
 }
 
@@ -1031,8 +1175,10 @@ _track_stretch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   track_t *self = (track_t *)o;
   double begin = 0.0;
   double end = 2.0 * track_get_duration(self);
+  event_t *first = NULL;
+  event_t *after = NULL;
   double stretch = 1.0;
-  
+
   switch(ac)
   {
     default:
@@ -1049,38 +1195,12 @@ _track_stretch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       break;
   }
   
-  if(end < begin)
+  track_segment_get(self, begin, end, &first, &after);
+  if(first != NULL)
   {
-    double b = begin;
-    begin = end;
-    end = b;
-  }
-  
-  if(begin < 0.0)
-    begin = 0.0;
-  
-  if(stretch > 0.0 && begin < track_get_duration(self))
-  {
-    event_t *event = track_get_first(self);
-
-    while(event && event_get_time(event) < begin)
-      event = event_get_next(event);
-
-    while(event && event_get_time(event) < end)
-    {
-      event_set_time(event, begin + (event_get_time(event) - begin) * stretch);
-      event = event_get_next(event);
-    }
-
-    end = begin + (end - begin) * stretch;
-    
-    while(event)
-    {
-      event_set_time(event, end + event_get_time(event));
-      event = event_get_next(event);
-    }
-    
-		fts_object_set_dirty(o);
+    track_segment_stretch(self, first, after, begin, end, stretch);  
+    track_move_events_at_client(self, first, after);
+    fts_object_set_dirty(o);
   }
 }
 
@@ -1090,8 +1210,9 @@ _track_quantize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   track_t *self = (track_t *)o;
   double begin = 0.0;
   double end = 2.0 * track_get_duration(self);
+  event_t *first = NULL;
+  event_t *after = NULL;
   double quantize = 0.0;
-  int quantize_durations = 1;
   
   switch(ac)
   {
@@ -1109,55 +1230,12 @@ _track_quantize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       break;
   }
   
-  if(end < begin)
+  track_segment_get(self, begin, end, &first, &after);
+  if(first != NULL)
   {
-    double b = begin;
-    begin = end;
-    end = b;
-  }
-  
-  if(begin < 0.0)
-    begin = 0.0;
-  
-  if(quantize < 0)
-  {
-    quantize *= -1.0;
-    quantize_durations = 0;
-  }
-  
-  if(quantize > 0.0 && begin < track_get_duration(self))
-  {
-    event_t *event = track_get_first(self);
-    double time = begin;
-
-    while(event && event_get_time(event) < begin)
-      event = event_get_next(event);
-
-    while(event && event_get_time(event) < end && time < end)
-    {
-      double next = time + quantize;
-    
-      while(event && fabs(event_get_time(event) - time) < fabs(event_get_time(event) - next))
-      {
-        event_set_time(event, time);
-        
-        if(quantize_durations > 0)
-        {
-          double dur = event_get_duration(event);
-        
-          if(dur > quantize)
-            event_set_duration(event, quantize * floor(dur / quantize + 0.5));
-          else if(dur >= 0.0)
-            event_set_duration(event, quantize);
-        }
-        
-        event = event_get_next(event);
-      }
-      
-      time = next;
-    }
-    
-		fts_object_set_dirty(o);
+    track_segment_quantize(self, first, after, begin, end, quantize);
+    track_move_events_at_client(self, first, after);
+    fts_object_set_dirty(o);
   }
 }
 

@@ -324,6 +324,7 @@ public void moveEvents(int nArgs , FtsAtom args[])
   double maxTime = 0.0;
   TrackEvent maxEvent = null;
   int maxOldIndex = 0; int maxNewIndex = 0;
+    
   for(int i=0; i<nArgs; i+=2)
   {
     evt  = (TrackEvent)(args[i].objectValue);
