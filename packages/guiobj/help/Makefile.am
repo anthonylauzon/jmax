@@ -6,6 +6,7 @@ help_DATA=\
  display.help.jmax \
  floatbox.help.jmax \
  fork.help.jmax \
+ input~.help.jmax \
  intbox.help.jmax \
  jcomment.help.jmax \
  key.help.jmax \
