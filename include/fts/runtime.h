@@ -55,6 +55,7 @@
 #include <fts/runtime/midi/midiparser.h>
 /* Scheduler */
 #include <fts/runtime/sched/sched.h>
+#include <fts/runtime/sched/thread.h>
 /* Timing */
 #include <fts/runtime/time/time.h>
 

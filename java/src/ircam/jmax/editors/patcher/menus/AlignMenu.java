@@ -51,9 +51,9 @@ public class AlignMenu extends EditorMenu
     super("Align");
     setHorizontalTextPosition(AbstractButton.LEFT);
 
-    add(Actions.alignTopAction,    "Top",    Event./*META_MASK*/CTRL_MASK, KeyEvent.VK_UP);
-    add(Actions.alignLeftAction,   "Left",   Event./*META_MASK*/CTRL_MASK, KeyEvent.VK_LEFT);
-    add(Actions.alignBottomAction, "Bottom", Event./*META_MASK*/CTRL_MASK, KeyEvent.VK_DOWN);
-    add(Actions.alignRightAction,  "Right",  Event./*META_MASK*/CTRL_MASK, KeyEvent.VK_RIGHT);
+    add(Actions.alignTopAction,    "Top",    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_UP);
+    add(Actions.alignLeftAction,   "Left",   Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_LEFT);
+    add(Actions.alignBottomAction, "Bottom", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_DOWN);
+    add(Actions.alignRightAction,  "Right",  Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_RIGHT);
   }
 }

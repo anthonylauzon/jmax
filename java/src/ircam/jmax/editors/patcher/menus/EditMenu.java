@@ -84,10 +84,10 @@ public class EditMenu extends EditorMenu
 
     setHorizontalTextPosition(AbstractButton.LEFT);
 
-    cutItem       = add(Actions.cutAction, "Cut", Event.CTRL_MASK, KeyEvent.VK_X);
-    copyItem      = add(Actions.copyAction, "Copy", Event.CTRL_MASK, KeyEvent.VK_C);
-    pasteItem     = add(Actions.pasteAction, "Paste", Event.CTRL_MASK, KeyEvent.VK_V);
-    duplicateItem = add(Actions.duplicateAction, "Duplicate", Event.CTRL_MASK, KeyEvent.VK_D);
+    cutItem       = add(Actions.cutAction, "Cut", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_X);
+    copyItem      = add(Actions.copyAction, "Copy", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_C);
+    pasteItem     = add(Actions.pasteAction, "Paste", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_V);
+    duplicateItem = add(Actions.duplicateAction, "Duplicate", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_D);
 
     addSeparator();
 
@@ -95,11 +95,11 @@ public class EditMenu extends EditorMenu
 
     addSeparator();
 
-    selectAllItem = add(Actions.selectAllAction, "SelectAll", Event.CTRL_MASK, KeyEvent.VK_A);
+    selectAllItem = add(Actions.selectAllAction, "SelectAll", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_A);
 
     addSeparator();
 
-    add(Actions.findAction, "Find", Event.CTRL_MASK, KeyEvent.VK_F);
+    add(Actions.findAction, "Find", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_F);
     add(Actions.findErrorsAction, "Find Errors");
 
     addSeparator();
@@ -110,12 +110,12 @@ public class EditMenu extends EditorMenu
 
     addSeparator();
 
-    toFrontMenuItem = add(Actions.bringToFrontAction, "Bring To Front", Event.CTRL_MASK, KeyEvent.VK_U);
-    toBackMenuItem  = add(Actions.sendToBackAction, "Send To Back", Event.CTRL_MASK, KeyEvent.VK_B);
+    toFrontMenuItem = add(Actions.bringToFrontAction, "Bring To Front", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_U);
+    toBackMenuItem  = add(Actions.sendToBackAction, "Send To Back", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_B);
 
     addSeparator();
 
-    lockItem = add(Actions.lockAction, "Lock", Event.CTRL_MASK, KeyEvent.VK_E);
+    lockItem = add(Actions.lockAction, "Lock", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_E);
 
     addMenuListener(new EditMenuListener());
   }

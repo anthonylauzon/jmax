@@ -135,20 +135,8 @@ fts_get_client_logical_dev(int ac, const fts_atom_t *at)
 /*                                                                            */
 /******************************************************************************/
 
-/* experimentally, we do the real polling every 3 ticks */
-
 void fts_client_poll(void)
 {
-  static int poll_count = 0;
-
-  poll_count++;
-
-  if (poll_count >= 3)
-    {
-      poll_count = 0;
-      return;
-    }
-
   if (client_dev)
     {
       /* then, loop until there are data */

@@ -201,6 +201,9 @@ static void fts_sched_do_select( fts_sched_t *sched)
 	  }
       }
 
+  if (n_fd == 0)
+    return;
+
   r = select( n_fd+1, &rfds, &wfds, NULL, &tv);
 
   for ( callback = sched->fd_callback_head; callback; callback = callback->next)
@@ -239,9 +242,18 @@ void fts_halt(void)
 void fts_sched_run_one_tick( void)
 {
   fts_alarm_poll();
-  /* You are the next on the list. Keep cool!!! */
   fts_client_poll();
   fts_sched_do_select( fts_sched_get_current());
+  fts_dsp_chain_poll();
+
+  fts_sched_ticks += 1.0;
+  fts_sched_msecs = fts_sched_ticks * fts_sched_tick_duration;
+}
+
+void fts_sched_run_one_tick_without_select( void)
+{
+  fts_alarm_poll();
+  fts_client_poll();
   fts_dsp_chain_poll();
 
   fts_sched_ticks += 1.0;

@@ -36,6 +36,7 @@ import ircam.jmax.editors.patcher.actions.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
+import ircam.jmax.utils.*;
 
 /** Implement the patcher editor File Menu */
 
@@ -45,13 +46,13 @@ public class FileMenu extends DefaultFileMenu
   {
     if(sketch.isARootPatcher())
       {
-	insert(Actions.saveAction, "Save", Event.CTRL_MASK, KeyEvent.VK_S, 3);
+	insert(Actions.saveAction, "Save", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_S, 3);
 	insert(Actions.saveAsAction, "SaveAs", 4);
       }
     else
       if(sketch.isASubPatcher())
 	{
-	  insert(Actions.saveAction, "Save", Event.CTRL_MASK, KeyEvent.VK_S, 3);
+	    insert(Actions.saveAction, "Save", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_S, 3);
 	  insert(Actions.saveToAction, "Save As Template", 4);
 	}
       else //is a template
@@ -60,7 +61,7 @@ public class FileMenu extends DefaultFileMenu
 	  insert(Actions.saveToAction, "SaveAs", 4);
 	}
      insertSeparator(6);
-     insert(Actions.printAction, "Print", Event.CTRL_MASK, KeyEvent.VK_P, 7);
+     insert(Actions.printAction, "Print", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_P, 7);
   }
 }
 

@@ -21,7 +21,6 @@
  * Based on Max/ISPW by Miller Puckette.
  *
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- * (rewritten by Francois Dechelle)
  *
  */
 

@@ -29,6 +29,7 @@
 
 extern fts_module_t fts_utils_module;
 
+#include <fts/lang/utils/fifo.h>
 #include <fts/lang/utils/floatfuns.h>
 #include <fts/lang/utils/fourpoint.h>
 #include <fts/lang/utils/hashtab.h>

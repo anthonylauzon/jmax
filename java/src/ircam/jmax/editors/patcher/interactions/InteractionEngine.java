@@ -81,6 +81,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
 
   ErmesSketchPad sketch;
   DisplayList    displayList;
+  public static int SHORTCUT = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
   public InteractionEngine(ErmesSketchPad sketch)
   {
@@ -208,13 +209,13 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     int ret = 0;
 
     if (e.isShiftDown())
-      ret |= Squeack.SHIFT;
+	ret |= Squeack.SHIFT;
 
-    if (e.isControlDown())
-      ret |= Squeack.CTRL;
+    //if (e.isAltDown())
+    //ret |= Squeack.ALT;
 
-    if (e.isAltDown())
-      ret |= Squeack.ALT;
+    if((e.getModifiers() & SHORTCUT) != 0)
+	ret |= Squeack.SHORTCUT;
 
     return ret;
   }
@@ -239,7 +240,6 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     updateMouseHistory(e);
     
     squeack |= getModifiersBits(e);
-
 
     if (followingLocations || followingInOutletLocations)
       {
@@ -276,7 +276,8 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
 
   private boolean isCtrlEditInteraction( int squeack)
   {
-    return ( Squeack.isDown(squeack) && Squeack.isCtrl(squeack));
+      //return ( Squeack.isDown(squeack) && Squeack.isCtrl(squeack));
+      return ( Squeack.isDown(squeack) && Squeack.isShortcut(squeack));
   }
 
   // Scroll handling

@@ -47,7 +47,10 @@ public class FileMenu extends DefaultFileMenu
      insert(Actions.importAction, "Import", 3);
 
      insertSeparator(8);
-     insert(Actions.printAction, "Print", Event.CTRL_MASK, KeyEvent.VK_P, 9);
+     insert(Actions.printAction, "Print", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_P, 9);
   }
 }
+
+
+
 

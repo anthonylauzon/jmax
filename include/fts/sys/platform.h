@@ -62,7 +62,7 @@
 #define FTS_ARCH_NAME "MacOS-X"
 #define restrict
 #define HAS_UNIX
-#undef HAS_PTHREADS
+#define HAS_PTHREADS
 #define VECLIB_LOOP_UNROLL NO
 #define FTS_HAS_BIG_ENDIAN
 

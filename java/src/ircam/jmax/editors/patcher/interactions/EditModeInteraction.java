@@ -118,11 +118,16 @@ class EditModeInteraction extends Interaction
 	    // Drag connect
 	    return Interactions.dragReverseConnect;
 
-	  case (Squeack.CTRL | Squeack.DOWN | Squeack.OBJECT):
-	  case (Squeack.CTRL | Squeack.DOWN | Squeack.TEXT):
-	    // Ctrl drag for controllers
-	    editor.resetHighlighted();
-	    return Interactions.editCtrlInteraction;
+	    /*case (Squeack.CTRL | Squeack.DOWN | Squeack.OBJECT):
+	      case (Squeack.CTRL | Squeack.DOWN | Squeack.TEXT):
+	      // Ctrl drag for controllers
+	      editor.resetHighlighted();
+	      return Interactions.editCtrlInteraction;*/
+	  case (Squeack.SHORTCUT | Squeack.DOWN | Squeack.OBJECT):
+	  case (Squeack.SHORTCUT | Squeack.DOWN | Squeack.TEXT):
+              // Ctrl drag for controllers
+              editor.resetHighlighted();
+              return Interactions.editCtrlInteraction;
 
 	  case (Squeack.DOWN | Squeack.HRESIZE_HANDLE): 
 	  case (Squeack.SHIFT | Squeack.DOWN | Squeack.HRESIZE_HANDLE):
@@ -141,11 +146,16 @@ class EditModeInteraction extends Interaction
 	    editor.resetHighlighted();
 	    return Interactions.helpInteraction;
 
-	  case (Squeack.CTRL | Squeack.DOUBLE_CLICK | Squeack.TEXT):
-	  case (Squeack.CTRL | Squeack.DOUBLE_CLICK | Squeack.OBJECT):
-	    // Edit Content
-	    editor.resetHighlighted();
-	    return Interactions.doubleClickEdit;
+	    /*case (Squeack.CTRL | Squeack.DOUBLE_CLICK | Squeack.TEXT):
+	      case (Squeack.CTRL | Squeack.DOUBLE_CLICK | Squeack.OBJECT):
+	      // Edit Content
+	      editor.resetHighlighted();
+	      return Interactions.doubleClickEdit;*/
+	  case (Squeack.SHORTCUT | Squeack.DOUBLE_CLICK | Squeack.TEXT):
+	  case (Squeack.SHORTCUT | Squeack.DOUBLE_CLICK | Squeack.OBJECT):
+              // Edit Content
+              editor.resetHighlighted();
+              return Interactions.doubleClickEdit;
 
 	  default :
 	    return null;

@@ -100,7 +100,7 @@ OSStatus halaudioport_ioproc( AudioDeviceID inDevice,
   for ( n = 0; n < outOutputData->mBuffers[0].mDataByteSize; n += fts_get_tick_size()*2*sizeof( float))
     {
 /*        post( "*** Running scheduler for 1 tick (%d bytes)\n", fts_get_tick_size()*2*sizeof( float)); */
-      fts_sched_run_one_tick();
+      fts_sched_run_one_tick_without_select();
     }
 
   memcpy( outOutputData->mBuffers[0].mData, this->buffer, outOutputData->mBuffers[0].mDataByteSize);
@@ -182,7 +182,7 @@ static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
       return;
     }
 
-  hal_halt( 0, 0, 0, 0, 0);
+  fts_sched_add_fd( fts_sched_get_current(), 0, 1, hal_halt, o);
 }
 
 static void halaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

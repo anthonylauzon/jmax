@@ -36,6 +36,7 @@ import ircam.jmax.editors.console.actions.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
+import ircam.jmax.utils.*;
 
 /** Implement the console editor File Menu */
 
@@ -44,7 +45,7 @@ public class FileMenu extends DefaultFileMenu
   public FileMenu()
   {
     super();
-    insert(Actions.printAction, "Print", Event.CTRL_MASK, KeyEvent.VK_P, 3);
+    insert(Actions.printAction, "Print", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_P, 3);
 
     remove(4);
   }
