@@ -147,7 +147,7 @@ TAGS:
 # cvs-tag
 #
 cvs-tag:
-	if cvs -n update 2>&1 | egrep -s '^[UARMC] ' ; then \
+	if cvs -n update 2>&1 | egrep '^[UARMC] ' ; then \
 		echo "not sync with cvs (update or commit)" ; exit 1 ; \
 	fi
 	cvs tag -F $(disttag)

@@ -137,14 +137,14 @@ check_installation ()
     then
 	if [ ! -f ${ROOTDIR}/java/classes/ircam/jmax/MaxApplication.class ]
 	then
-	    echo "Cannot find file ircam/jmax/MaxApplication.class"
+	    echo "Cannot find file ${ROOTDIR}/java/classes/ircam/jmax/MaxApplication.class"
 	    echo "You have probably installed a source distribution and did not compile it !"
 	    exit 1
 	fi
     else
 	if [ ! -f ${ROOTDIR}/java/classes/jmax.jar ]
 	then
-	    echo "Cannot find file jmax.jar"
+	    echo "Cannot find file ${ROOTDIR}/java/classes/jmax.jar"
 	    echo "You have probably installed a source distribution and did not compile it !"
 	    exit 1
 	fi
