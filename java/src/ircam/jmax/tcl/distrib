@@ -3,7 +3,6 @@ src	all	MaxFtsConnectCmd.java
 src	all	MaxGetMaxVersionCmd.java
 src	all	MaxOpenCmd.java
 src	all	MaxOscilloscopeCmd.java
-src	all	MaxPreloadClassCmd.java
 src	all	MaxQuitCmd.java
 src	all	MaxRunHooksCmd.java
 src	all	MaxSetSystemPropertyCmd.java
