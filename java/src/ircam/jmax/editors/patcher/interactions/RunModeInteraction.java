@@ -53,15 +53,16 @@ class RunModeInteraction extends Interaction
   {
     switch (squeack)
       {
-	  /*case (Squeack.ALT | Squeack.DOWN | Squeack.TEXT):
-	    case (Squeack.ALT | Squeack.DOWN | Squeack.OBJECT):*/
+	/*case (Squeack.ALT | Squeack.DOWN | Squeack.TEXT):
+	  case (Squeack.ALT | Squeack.DOWN | Squeack.OBJECT):*/
       case (Squeack.MIDDLE_BUTTON | Squeack.DOWN | Squeack.TEXT):
       case (Squeack.MIDDLE_BUTTON | Squeack.DOWN | Squeack.OBJECT):
 	// Help
 	return Interactions.helpInteraction;
       case (Squeack.POP_UP | Squeack.OBJECT):
-	  return Interactions.runPopUpInteraction;
+	return Interactions.runPopUpInteraction;
       case (Squeack.DOWN | Squeack.OBJECT):
+      case (Squeack.SHIFT | Squeack.DOWN | Squeack.OBJECT):
 	// Normal controller operations
 	return Interactions.runCtrlInteraction;
       case (Squeack.DOWN | Squeack.TEXT):

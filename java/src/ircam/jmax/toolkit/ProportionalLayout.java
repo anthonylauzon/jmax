@@ -71,8 +71,10 @@ public class ProportionalLayout implements LayoutManager {
     for (int i = 0; i < 2; i++) 
       {
 	if (components[i] == comp)
-	  components[i] = null;
-	return;
+	  {
+	    components[i] = null;
+	    return;
+	  }
       }
     
     System.err.println("proportional layout error: trying to remove a not existing component");

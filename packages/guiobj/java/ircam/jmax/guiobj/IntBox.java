@@ -85,6 +85,11 @@ public class IntBox extends NumberBox implements FtsIntValueListener
     return String.valueOf(itsInteger);
   }
 
+  public int getIntZoneWidth()
+  {
+    return 0;
+  }
+
   //--------------------------------------------------------
   // mouse handlers
   //--------------------------------------------------------

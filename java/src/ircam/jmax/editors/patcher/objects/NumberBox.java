@@ -47,6 +47,7 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
   public static final int DEFAULT_WIDTH = 40;
   public static final int DEFAULT_HEIGHT = 15;
   private static final int DEFAULT_VISIBLE_DIGIT = 3;
+  private static Color floatColor = new Color(239, 239, 239); 
 
   public NumberBox(FtsGraphicObject theFtsObject, String filter) 
   {
@@ -152,6 +153,7 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
     int h = getHeight();
     int hd2 = h / 2;
     int hm1 = h - 1;
+    String aString;
 
     // Fill the background
     if ( !isSelected())
@@ -161,37 +163,44 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
 
     g.fillRect( x+1, y+1, w-2 , h-2);
 
-    g.setColor( Color.black);
-
-    // Draw or fill the triangle
 
     if ( valueValid) 
       {
+	// Fill float area
+	if( !isSelected())
+	  {
+	    g.setColor( floatColor);
+	    g.fillRect( x+getIntZoneWidth()+1, y+1, w-getIntZoneWidth()-2, h-2);
+	  }
+
+	// Draw the triangle
+	g.setColor( Color.black);
 	g.drawLine( xp1, y, xp1 + hd2, y + hd2);
 	g.drawLine( xp1 + hd2, y + hd2, xp1, y + hm1);
+      
+	// Get the value
+	aString = getVisibleString(getValueAsText());
       }
     else 
       {
+	// Fill the triangle
+	g.setColor( Color.black);
 	int xPoints[] = { xp1, xp1 + hd2, xp1};
 	int yPoints[] = { y, y + hd2, y + hm1};
 	g.fillPolygon( xPoints, yPoints, 3);
+	
+	// Get the value
+	aString = getVisibleString(currentText.toString());
       } 
 
     // Draw the value
-    String aString;
-
-    if(valueValid)
-      aString = getVisibleString(getValueAsText());
-    else 
-      aString = getVisibleString(currentText.toString());
-    
     g.setColor( Color.black);
 
     g.setFont( getFont());
     g.drawString( aString, 
 		  x + hd2 + 5, 
 		  y + getFontMetrics().getAscent() + (h - getFontMetrics().getHeight())/2 + 1);
-
+    
     super.paint( g);
   }
 
@@ -202,19 +211,29 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
     int w = getWidth();
     int h = getHeight();
     int hd2 = h / 2;
+    String aString;
+    
+    if( valueValid)
+      {
+	// Fill the background
+	g.setColor( Color.white);
+	g.fillRect( x+hd2+2, y+1, getIntZoneWidth()-(hd2+2), h-2);
+	
+	g.setColor( floatColor);
+	g.fillRect( x+getIntZoneWidth(), y+1, w-getIntZoneWidth()-2, h-2);
 
-    // Fill the background
-    g.setColor( Color.white);
-    g.fillRect( x+hd2+2, y+1, w-(hd2+2)-2, h-2);
+	// Get the value
+	aString = getVisibleString(getValueAsText());
+      }
+    else
+      {
+	g.setColor( Color.white);
+	g.fillRect( x+hd2+2, y+1, w-(hd2+2), h-2);
+
+	aString = getVisibleString(currentText.toString());
+      }
 
     // Draw the value
-    String aString;
-
-    if(valueValid)
-      aString = getVisibleString(getValueAsText());
-    else 
-      aString = getVisibleString(currentText.toString());
-    
     g.setColor( Color.black);
     g.setFont( getFont());
     g.drawString( aString, 
@@ -249,6 +268,8 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
     aString = aString + aString2;
     return aString;
   }
+
+  abstract public int getIntZoneWidth();
 
   public void keyPressed( KeyEvent e) 
   {

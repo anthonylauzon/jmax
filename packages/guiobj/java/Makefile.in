@@ -59,6 +59,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_alias = @host_alias@
 host_triplet = @host@
+ADDITIONAL_PACKAGES = @ADDITIONAL_PACKAGES@
 ALSA_CFLAGS = @ALSA_CFLAGS@
 ALSA_LIBS = @ALSA_LIBS@
 AS = @AS@
@@ -73,6 +74,8 @@ ECHO = @ECHO@
 EXEEXT = @EXEEXT@
 FTSDIR = @FTSDIR@
 FTS_SYS_LIBS = @FTS_SYS_LIBS@
+JACK_CFLAGS = @JACK_CFLAGS@
+JACK_LDFLAGS = @JACK_LDFLAGS@
 JAVA = @JAVA@
 JAVACFLAGSX = @JAVACFLAGSX@
 JAVACX = @JAVACX@
@@ -102,7 +105,7 @@ package_JAVA = Guiobj.java
 JAVAC = @JAVACX@
 JAVACFLAGS = @JAVACFLAGSX@
 JAVAROOT = $(top_builddir)/packages/guiobj/java
-CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(top_builddir)/java/src:$(top_builddir)/client/java/ftsclient.jar
+CLASSPATH_ENV = CLASSPATH=$(CLASSPATH):$(JAVAROOT):$(top_builddir)/java/src:$(top_builddir)/client/java/ftsclient.jar
 
 jardir = $(pkgdatadir)/packages/guiobj/java
 JARFILE = guiobj.jar

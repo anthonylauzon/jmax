@@ -48,20 +48,34 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
   private double increment;
   private double valInc;  
   private int itsLastY;
-
+  private int intZoneWidth = 0;
+  
   public FloatBox(FtsGraphicObject theFtsObject) 
   {
     super(theFtsObject, "-0123456789.");
 
-    value = (double)((FtsFloatValueObject)ftsObject).getValue();
+    value = (double)((FtsFloatValueObject)ftsObject).getValue();    
+  }
+
+  public void setDefaults()
+  {
+    super.setDefaults();
+    updateIntegerZone();
   }
 
   public void valueChanged(float v) 
   {
     this.value = (double)v;
+    updateIntegerZone();
     updateRedraw();
   }
 
+  void updateIntegerZone()
+  {
+    String val = getValueAsText();
+    val = val.substring(0, val.indexOf('.'));
+    intZoneWidth = getHeight()/2 + 5 + getFontMetrics().stringWidth( val);
+  }
   // ValueAsText property
 
   static private DecimalFormat formatter;
@@ -98,6 +112,12 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
     return formatter.format(value);
   }
 
+  public void setFont( Font theFont)
+  {
+    super.setFont( theFont);
+    updateIntegerZone();
+  }
+
   //--------------------------------------------------------
   // mouse handlers
   //--------------------------------------------------------
@@ -115,55 +135,27 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
       {
 	if(!dragged)
 	  {
-	    double valueAbs = Math.abs(value);
-
-	    if(valueAbs > 750.)
-	      {
-		increment = 1.;
-	      }
-	    else if(valueAbs > 0.1)
-	      {
-		double decade = Math.floor(Math.log(valueAbs) / Math.log(10.));
-		double decadeFactor = Math.exp(decade * Math.log(10.));
-		double factor = valueAbs / decadeFactor;
-
-		if(factor > 7.5)
-		  factor = 10.;
-		else if(factor > 3.5)
-		  factor = 5.;
-		else if(factor > 1.5)
-		  factor = 2.;
-		else
-		  factor = 1.;
-		
-		increment = 0.001 * factor * decadeFactor;
-	      }
+	    if( isInIntegerZone( mouse.x))
+	      increment = 1.0;
 	    else
-	      increment = 0.0001;
+	      increment = 0.001;
 	    
-	    if(mouse.y > itsLastY)
-	      valInc = Math.floor(value / increment); // move down
-	    else
-	      valInc = Math.ceil(value / increment); // move up
-
-	    value = valInc * increment;
 	    ((FtsFloatValueObject)ftsObject).setValue((float)value);
-
+	    
 	    itsLastY = mouse.y;
 	    dragged = true;
 	  }
-       else
-	 {
-	   if(Squeack.isShift(squeack))
-	     valInc += (double)(itsLastY - mouse.y) * 10.;
-	   else
-	     valInc += (double)(itsLastY - mouse.y);
-	   
-	    value = valInc * increment;
-	   ((FtsFloatValueObject)ftsObject).setValue((float)value);
+	else
+	  {
+	    if(Squeack.isShift(squeack))
+	      value = value + (double)(itsLastY - mouse.y) * increment * 10.;
+	    else
+	      value = value + (double)(itsLastY - mouse.y) * increment;
 
+	    ((FtsFloatValueObject)ftsObject).setValue((float)value);
+	    
 	    itsLastY = mouse.y;
-	 }
+	  }
       }
     else if(Squeack.isUp(squeack))
       {
@@ -173,7 +165,17 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
 	    setValueValid(false);
 	    return;
 	  }
-      }
+      }    
+  }
+
+  private boolean isInIntegerZone( int x)
+  {
+    return ( (x > getX()) && (x < getX()+intZoneWidth)); 
+  }
+
+  public int getIntZoneWidth()
+  {
+    return intZoneWidth;
   }
 }
 
