@@ -41,48 +41,55 @@ private:
 };
 
 /**
- * The value contained in a message.
- */
+* The value contained in a message.
+*/
 class FTSCLIENT_API FtsValue {
-  friend class FtsArgs;
-
+    friend class FtsArgs;
+    
 public:
-  FtsValue() : _type( FtsValue::EMPTY) {}
-
+    FtsValue() : _type( FtsValue::EMPTY) {}
+    
+    
 private:
-  static const int EMPTY;
-  static const int INT;
-  static const int FLOAT;
-  static const int STRING;
-  static const int OBJECT;
-
-  void set( int i) { 
-    _type = FtsValue::INT; 
-    _value._i = i; 
-  }
-
-  void set( float f) { 
-    _type = FtsValue::FLOAT; 
-    _value._f = f; 
-  }
-
-  void set( const char *s) { 
-    _type = FtsValue::STRING; 
-    _value._s = strcpy( new char[strlen(s)+1], s); 
-  }
-
-  void set( FtsObject *o) { 
-    _type = FtsValue::OBJECT; 
-    _value._o = o; 
-  }
-
-  void unset() { 
-    if (_type == FtsValue::STRING) 
-      delete [] _value._s; 
-  }
-
-  int _type;
-  FtsValueUnion _value;
+    static const int EMPTY;
+    static const int INT;
+    static const int FLOAT;
+    static const int STRING;
+    static const int OBJECT;
+   
+    void set( int i) { 
+        _type = FtsValue::INT; 
+        _value._i = i; 
+    }
+    
+    void set( float f) { 
+        _type = FtsValue::FLOAT; 
+        _value._f = f; 
+    }
+    
+    void set( const char *s) { 
+        _type = FtsValue::STRING; 
+        _value._s = strcpy( new char[strlen(s)+1], s); 
+    }
+    
+    void set( FtsObject *o) { 
+        _type = FtsValue::OBJECT; 
+        _value._o = o; 
+    }
+    
+    void unset() { 
+        if (_type == FtsValue::STRING) {
+            if(_value._s != NULL) {
+                delete [] _value._s;
+                _value._s = NULL;
+            }
+            
+        }
+        _type = FtsValue::EMPTY;
+    }
+    
+    int _type;
+    FtsValueUnion _value;
 };
 
 /**
@@ -141,7 +148,8 @@ public:
    */
   ostream &print( ostream &os);
 
-private:
+//FIXME: write 'private' back - this is for debugging purposes
+//private:
   FtsBuffer<FtsValue> _buffer;
 };
 
