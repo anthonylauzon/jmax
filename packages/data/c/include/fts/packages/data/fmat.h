@@ -25,7 +25,7 @@
 #ifndef _DATA_FMAT_H_
 #define _DATA_FMAT_H_
 
-#include <fts/packages/data/data.h>
+#include "data.h"
 
 typedef struct _fmat_
 {
@@ -34,6 +34,10 @@ typedef struct _fmat_
   int m;
   int n;
   int alloc;
+
+  int opened; /* non zero if editor open */
+  fts_object_t *editor;
+
 } fmat_t;
 
 DATA_API fts_symbol_t fmat_symbol;

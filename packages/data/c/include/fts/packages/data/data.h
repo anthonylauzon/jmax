@@ -21,6 +21,8 @@
 #ifndef _DATA_H
 #define _DATA_H
 
+#include <fts/fts.h>
+
 #ifdef WIN32
 #if defined(DATA_EXPORTS)
 #define DATA_API __declspec(dllexport)
@@ -31,8 +33,6 @@
 #define DATA_API extern
 #endif
 
-#include <fts/fts.h>
-
 typedef struct _data_object
 {
   fts_object_t o;
@@ -42,23 +42,17 @@ typedef struct _data_object
 enum data_object_persistence {data_object_persistence_args = -1, data_object_persistence_no = 0, data_object_persistence_yes = 1};
 
 #define data_object_persistence_args(o) (((data_object_t *)o)->persistence = data_object_persistence_args)
+
 #define data_object_is_persistent(o) (((data_object_t *)o)->persistence == data_object_persistence_yes)
 
 DATA_API void data_object_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 DATA_API void data_object_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 DATA_API void data_object_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-
+  
 DATA_API void data_object_set_dirty(fts_object_t *o);
-DATA_API void data_object_init(fts_object_t *o);
-DATA_API void data_config(void);
 
-#include <fts/packages/data/mat.h>
-#include <fts/packages/data/vec.h>
-#include <fts/packages/data/ivec.h>
-#include <fts/packages/data/fmat.h>
-#include <fts/packages/data/fvec.h>
-#include <fts/packages/data/cvec.h>
-#include <fts/packages/data/bpf.h>
-#include <fts/packages/data/dict.h>
+DATA_API void data_object_init(fts_object_t *o);
+
+DATA_API void data_config(void);
 
 #endif /* _DATA_H */

@@ -25,7 +25,8 @@
 #ifndef _DATA_FVEC_H_
 #define _DATA_FVEC_H_
 
-#include <fts/packages/data/data.h>
+#include "data.h"
+#include "fmat.h"
 
 DATA_API fts_symbol_t fvec_symbol;
 DATA_API fts_class_t *fvec_type;
@@ -45,5 +46,12 @@ DATA_API void fvec_copy(fvec_t *org, fvec_t *copy);
 DATA_API void fvec_set_const(fvec_t *vector, float c);
 
 DATA_API void fvec_set_with_onset_from_atoms(fvec_t *vector, int offset, int ac, const fts_atom_t *at);
+
+DATA_API float fvec_get_max_value(fvec_t *vector);
+DATA_API float fvec_get_max_abs_value_in_range(fvec_t *vector, int a, int b);
+
+#define fvec_set_editor_open(v) ((v)->opened = 1)
+#define fvec_set_editor_close(v) ((v)->opened = 0)
+#define fvec_editor_is_open(v) ((v)->opened)
 
 #endif

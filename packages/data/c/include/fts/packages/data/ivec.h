@@ -25,19 +25,19 @@
 #ifndef _DATA_IVEC_H_
 #define _DATA_IVEC_H_
 
-#include <fts/packages/data/data.h>
+#include "data.h"
 
 typedef struct _ivec_
 {
- data_object_t o;
+  data_object_t o;
 
- int *values;
- int size;
- int alloc;
- int opened; /* non zero if editor open */
- fts_object_t *editor;
+  int *values;
+  int size;
+  int alloc;
+  int opened; /* non zero if editor open */
+  
+  fts_object_t *editor;
 
- struct _ivec_ *copy;
 } ivec_t;
 
 DATA_API fts_symbol_t ivec_symbol;
@@ -66,5 +66,8 @@ DATA_API int ivec_get_sum(ivec_t *vector);
 DATA_API int ivec_get_sub_sum(ivec_t *vector, int from, int to);
 DATA_API int ivec_get_min_value(ivec_t *vector);
 DATA_API int ivec_get_max_value(ivec_t *vector);
+DATA_API int ivec_get_max_abs_value_in_range(ivec_t *vector, int a, int b);
 
 #endif
+
+
