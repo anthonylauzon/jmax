@@ -212,8 +212,6 @@ class Slider extends GraphicObject implements FtsIntValueListener
     int w = getWidth();
     int h = getHeight();
 
-    //g.setClip(x+2, y+2, w-4, h-4);
-
     /* Paint the box */
     g.setColor( Settings.sharedInstance().getUIColor());
     g.fillRect( x+2, y+2, w-4,  h-4);

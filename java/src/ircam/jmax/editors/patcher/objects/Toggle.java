@@ -119,8 +119,6 @@ class Toggle extends GraphicObject implements FtsIntValueListener
     int w = getWidth();
     int h = getHeight();
 
-    //g.setClip(x+2, y+2, w-4, h-4);
-    
     g.setColor( Settings.sharedInstance().getUIColor());
 
     g.fillRect( x + 3, y + 3, w - 6, h - 6);
