@@ -141,6 +141,7 @@ fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbol_t format, float
 {
   char full_path[1024];
   const char *path = fts_symbol_name(file_name);
+  AFfilesetup af_setup = afNewFileSetup();
   AFfilehandle af_handle;
 
   /* find file in all possible locations */
@@ -150,8 +151,6 @@ fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbol_t format, float
     {
       if(format == fts_s_float) /* read raw floats */
 	{
-	  AFfilesetup af_setup = afNewFileSetup();
-
 	  /* set file format to raw floats and open soundfile file */
 	  sgiaf_file_format_set_float(af_setup);
 	  af_handle = afOpenFile(full_path, "r", af_setup); /* open file */
@@ -168,6 +167,8 @@ fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbol_t format, float
       af_handle = afOpenFile(full_path, "r", NULL); /* open file */
     }
   
+  afFreeFileSetup(af_setup);
+
   /* return fts_soundfile "object" if successfull or 0 if not */
   if(af_handle != AF_NULL_FILEHANDLE)
     {  
@@ -194,8 +195,8 @@ fts_soundfile_open_write_float(fts_symbol_t file_name, fts_symbol_t format_name,
 {
   char full_path[1024];
   const char *path = fts_symbol_name(file_name);
-  AFfilehandle af_handle;
   AFfilesetup af_setup = afNewFileSetup();
+  AFfilehandle af_handle;
   int af_format;
 
   /* get full path of file location */
@@ -247,6 +248,8 @@ fts_soundfile_open_write_float(fts_symbol_t file_name, fts_symbol_t format_name,
     
   af_handle = afOpenFile(full_path, "w", af_setup);
 
+  afFreeFileSetup(af_setup);
+  
   if(af_handle == AF_NULL_FILEHANDLE)
     return 0;
   else
