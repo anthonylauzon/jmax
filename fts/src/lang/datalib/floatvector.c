@@ -263,7 +263,7 @@ fts_float_vector_remote_update( fts_data_t *data, int ac, const fts_atom_t *at)
 }
 
 
-fts_float_vector_t *
+fts_data_t *
 fts_float_vector_constructor(int ac, const fts_atom_t *at)
 {
   fts_float_vector_t *vec = 0;
@@ -280,7 +280,7 @@ fts_float_vector_constructor(int ac, const fts_atom_t *at)
   else
     vec = fts_float_vector_new(0);
   
-  return vec;
+  return (fts_data_t *)vec;
 }
 
 void fts_float_vector_config(void)

@@ -101,21 +101,6 @@ union fts_word
 };
 
 /*
- * FTS data
- * Are C structure plus an id and a ``class''
- * Used for low-level data communication with the client.
- */
-
-struct fts_data {
-  fts_data_class_t *class;
-  fts_symbol_t name;
-  int id;
-  int cnst; /* flag: non zero if data is constant */
-  int refcnt; /* reference counter */
-};
-
-
-/*
  * ATOMS
  *
  * Atoms are type-tagged words; i.e. an atom include a type tag,

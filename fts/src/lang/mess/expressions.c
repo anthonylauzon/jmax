@@ -469,6 +469,7 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 	      fts_atom_t *tos;
 	      int args;
 	      fts_atom_t result;
+	      fts_atom_array_t *array;
 
 	      tos = value_stack_top(e);
 	      args = 0;
@@ -485,7 +486,9 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 		}
 
 	      /* Make the array */
-	      fts_set_data(&result, fts_data_new_const(fts_s_atom_array, args, tos));
+	      array = fts_atom_array_new_from_atom_list(args, tos);
+	      fts_data_set_const((fts_data_t *)array);
+	      fts_set_data(&result, (fts_data_t *)array);
 
 	      /* Pop the stack, and push the result */
 	      value_stack_pop(e, args);
@@ -743,6 +746,7 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 	      fts_atom_t *tos;
 	      int args;
 	      fts_atom_t result;
+	      fts_atom_array_t *array;
 
 	      tos = value_stack_top(e);
 	      args = 0;
@@ -768,7 +772,9 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 		}
 
 	      /* Make the array */
-	      fts_set_data(&result, fts_data_new_const(fts_s_atom_array, args, tos + 1));
+	      array = fts_atom_array_new_from_atom_list(args, tos + 1);
+	      fts_data_set_const((fts_data_t *)array);
+	      fts_set_data(&result, (fts_data_t *)array);
 
 	      /* Pop the stack, and push the result */
 	      value_stack_pop(e, args);
@@ -1592,22 +1598,6 @@ static int get_array_element(int ac, const fts_atom_t *at, fts_atom_t *result)
     return FTS_EXPRESSION_SYNTAX_ERROR;
 }
   
-/* FTS data consructor function in expressions */
-static int
-fts_expressions_data_new(int ac, const fts_atom_t *at, fts_atom_t *result)
-{
-  fts_symbol_t class_name = fts_get_symbol(at);
-  fts_data_t *data = fts_data_new(class_name, ac, at);
-
-  if(data)
-    {
-      fts_set_data(result, data);
-      return FTS_EXPRESSION_OK;
-    }
-  else
-    return FTS_EXPRESSION_SYNTAX_ERROR;
-}
-
 /* Init function  */
 void
 fts_expressions_init(void)
@@ -1621,7 +1611,6 @@ fts_expressions_init(void)
   /* function installation */
   fts_expression_declare_fun(fts_new_symbol("unique"), unique);
   fts_expression_declare_fun(fts_new_symbol("_getElement"), get_array_element);
-  fts_expression_declare_fun(fts_new_symbol("new"), fts_expressions_data_new);
 
   /* operator declarations  */
   fts_symbol_set_operator(fts_s_plus,  FTS_OP_PLUS);

@@ -164,40 +164,5 @@ int fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const fts_at
   return 0;
 }
 
-/* reassign atom to a new value taking in account the fts_data referencies */
-void 
-fts_assign(fts_atom_t *atom, fts_atom_t assign)
-{
-  if(fts_is_data(atom))
-    {
-      fts_data_t *data = fts_get_data(atom);
-
-      /* release old content (if reference type) */
-      fts_data_release(data);
-
-      /* assign atom to new content */
-      *atom = assign;
-
-      /* refer to new content */
-      fts_data_refer(data);
-    }
-  else
-    *atom = assign;
-}
-
-/* reassign atom to a new value taking in account the fts_data referencies */
-void 
-fts_void(fts_atom_t *atom)
-{
-  /* if existing release reference */
-  if(fts_is_data(atom))
-    {
-      fts_data_t *data = fts_get_data(atom);
-      fts_data_release(data);
-    }
-
-  /* set atom to void */
-  fts_set_void(atom);
-}
 
 

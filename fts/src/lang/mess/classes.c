@@ -194,15 +194,19 @@ fts_metaclass_get_by_name(fts_symbol_t name)
 static void
 fts_class_register(fts_metaclass_t *mcl, int ac, const fts_atom_t *at, fts_class_t *cl)
 {
+  fts_atom_t *store;
   int i;
 
   cl->ac = ac;
   cl->at = fts_malloc(ac * sizeof(fts_atom_t));
+  store = (fts_atom_t *)cl->at;
 
   for(i=0; i<ac; i++)
     {
-      fts_set_void((fts_atom_t *)cl->at);
-      fts_assign((fts_atom_t *)cl->at + i, at[i]);
+      if(fts_is_data(at + i))
+	fts_data_refer(fts_get_data(at + i));
+
+      store[i] = at[i];
     }
 
   cl->next = mcl->inst_list;

@@ -693,7 +693,7 @@ static void patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   int ninlets, noutlets;
   fts_atom_t va;
   fts_patcher_t *this = (fts_patcher_t *) o;
-
+  
   /* allocate the data */
 
   this->data = fts_patcher_data_new(this);
@@ -703,7 +703,7 @@ static void patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   /* Define the "args" variable */
 
-  this->args = fts_data_new_const(fts_s_atom_array, ac - 1, at + 1);
+  this->args = (fts_data_t *)fts_atom_array_new_from_atom_list(ac - 1, at + 1);
   fts_data_refer(this->args);
 
   fts_variable_define(this, fts_s_args, o);
@@ -800,7 +800,8 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   /* Delete all the variables */
 
-  fts_data_release(this->args);
+  fts_data_derefer(this->args);
+  fts_atom_array_delete((fts_atom_array_t *)this->args);
   fts_variables_undefine(this, (fts_object_t *)this);
 
   /* delete the inlets and inlets tables */
@@ -1105,10 +1106,12 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
       fts_object_put_prop(obj, fts_s_error, &a);
 
       /* reallocate the atom array */
-      fts_data_release(this->args);
-      this->args = fts_data_new_const(fts_s_atom_array, ac - 1, at + 1);
+      fts_data_derefer(this->args);
+      fts_atom_array_delete((fts_atom_array_t *)this->args);
+
+      this->args = (fts_data_t *)fts_atom_array_new_from_atom_list(ac - 1, at + 1);
       fts_data_refer(this->args);
-  
+
       /* set the new variables */
       fts_expression_map_to_assignements(e, fts_patcher_assign_variable, (void *) this);
 

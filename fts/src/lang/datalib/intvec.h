@@ -29,6 +29,8 @@ extern fts_symbol_t fts_s_integer_vector;
 extern fts_integer_vector_t *fts_integer_vector_new(int size);
 extern void fts_integer_vector_delete(fts_integer_vector_t *this);
 
+fts_data_t *fts_integer_vector_constructor(int ac, const fts_atom_t *at);
+
 extern void fts_integer_vector_set_from_atom_list(fts_integer_vector_t *vector, int offset, int ac, const fts_atom_t *at);
 extern int fts_integer_vector_get_atoms(fts_integer_vector_t *vector, int ac, fts_atom_t *at);
 

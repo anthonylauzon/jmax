@@ -17,6 +17,7 @@
 #include "lang/utils.h"
 #include "lang/datalib.h"
 #include "lang/mess/messP.h"
+#include "lang/mess/ftsdata.h"
 
 /* (fd) I know, this is not correct. But it is needed ... */
 #include "runtime.h"
@@ -57,8 +58,6 @@
  *
  * fts_malloc are used instead malloc.
  */
-
-#define FUNCTION_TABLE_SIZE 32
 
 /**************************************************************************
  *
@@ -103,14 +102,6 @@ void fts_data_module_init()
  *   FTS data classes
  *
  */
-
-struct fts_data_class {
-  fts_symbol_t data_class_name;
-  fts_data_export_fun_t export_fun;
-  fts_data_remote_constructor_t remote_constructor;
-  fts_data_remote_destructor_t remote_destructor;
-  fts_data_fun_t functions_table[FUNCTION_TABLE_SIZE];
-};
 
 fts_data_class_t *
 fts_data_class_new( fts_symbol_t data_class_name)
@@ -164,25 +155,6 @@ void fts_data_class_define_function( fts_data_class_t *class, int key, fts_data_
   class->functions_table[key] = function;
 }
 
-fts_symbol_t 
-fts_data_get_class_name(fts_data_t *data)
-{
-  return data->class->data_class_name;
-}
-
-int
-fts_data_is(fts_data_t *data, fts_symbol_t class_name)
-{
-  return (data->class->data_class_name == class_name);
-}
-
-int 
-fts_data_is_class_name(fts_symbol_t class_name)
-{
-  fts_atom_t atom;
-  return (fts_hash_table_lookup(&fts_data_class_table, class_name, &atom));
-}
-
 /**************************************************************************
  *
  *   FTS data data
@@ -207,126 +179,6 @@ static int new_id(void)
    remotely, the constructors/destructors are used; this is tricky,
    the problem being the low level nature and use of fts data.
  */
-
-/* (nos:) pseudo generic "new" hack, implemented for: */
-
-extern fts_data_t *fts_integer_vector_constructor(int ac, const fts_atom_t *at);
-extern fts_data_t *fts_float_vector_constructor(int ac, const fts_atom_t *at);
-extern fts_data_t *fts_atom_array_constructor(int ac, const fts_atom_t *at);
-
-fts_data_t *
-fts_data_new(fts_symbol_t class_name, int ac, const fts_atom_t *at)
-{
-  fts_atom_t atom;
-  fts_data_t *data = 0;
-
-  if(class_name == fts_s_integer_vector)
-    data = fts_integer_vector_constructor(ac, at);
-  else if(class_name == fts_s_float_vector)
-    data = fts_float_vector_constructor(ac, at);
-  else if(class_name == fts_s_atom_array)
-    data = fts_atom_array_constructor(ac, at);
-
-  return data;
-}
-
-fts_data_t *
-fts_data_new_const(fts_symbol_t class_name, int ac, const fts_atom_t *at)
-{
-  fts_data_t *data = fts_data_new(class_name, ac, at);
-
-  /* overwrite constant flag set in fts_data_init */
-  data->cnst = 1;
-  
-  return data;
-}
-
-/* add reference */
-void 
-fts_data_refer(fts_data_t *data)
-{
-  data->refcnt++;
-}
-
-/* release reference and (if) deconstruct data */
-int 
-fts_data_release(fts_data_t *data)
-{
-  if(!--data->refcnt)
-    {
-      if(data->class == fts_integer_vector_data_class)
-	fts_integer_vector_delete((fts_integer_vector_t *)data);
-      else if(data->class == fts_float_vector_data_class)
-	fts_float_vector_delete((fts_float_vector_t *)data);
-      else if(data->class == fts_atom_array_data_class)
-	fts_atom_array_delete((fts_atom_array_t *)data);
-
-      return 0;
-    }
-
-  return data->refcnt;
-}
-
-/* get data size in # of atoms */
-int 
-fts_data_get_size(fts_data_t *data)
-{
-  if(data->class == fts_integer_vector_data_class)
-    return ((fts_integer_vector_t *)data)->size;
-  else if(data->class == fts_integer_vector_data_class)
-    return ((fts_float_vector_t *)data)->size;
-  else if(data->class == fts_atom_array_data_class)
-    return ((fts_atom_array_t *)data)->size;
-
-  return 0;
-}
-
-/* get data as array of atoms (takes pointer to pre-allocated (!) array) and
-   return original size (might be bigger or smaller than pre-allocated array with ac) */
-int
-fts_data_get_atoms(fts_data_t *data, int ac, fts_atom_t *at)
-{
-  if(data->class == fts_integer_vector_data_class)
-    return fts_integer_vector_get_atoms((fts_integer_vector_t *)data, ac, at);
-  else if(data->class == fts_float_vector_data_class)
-    return fts_float_vector_get_atoms((fts_float_vector_t *)data, ac, at);
-  else if(data->class == fts_atom_array_data_class)
-    return fts_atom_array_get_atoms((fts_atom_array_t *)data, ac, at);
-
-  return 0;
-}
-
-void
-fts_method_define_data(fts_class_t *class, int winlet, fts_method_t fun)
-{
-  fts_method_define_optargs(class, winlet, fts_s_integer_vector, fun, 1, &fts_s_data, 1);
-  fts_method_define_optargs(class, winlet, fts_s_float_vector, fun, 1, &fts_s_data, 1);
-  fts_method_define_optargs(class, winlet, fts_s_atom_array, fun, 1, &fts_s_data, 1);
-}
-
-void
-fts_outlet_data(fts_object_t *o, int woutlet, fts_data_t *data)
-{
-  fts_connection_t *conn;
-  fts_atom_t atom;
-
-  fts_set_data(&atom, data);
-
-  conn = o->out_conn[woutlet];
-
-  while(conn)
-    {
-      fts_send_message(conn->dst, conn->winlet, fts_data_get_class_name(data), 1, &atom); 
-
-      conn = conn->next_same_src;
-    }
-}
-
-/*******************************************************************
- *
- *  (nos): "old" stuff
- *
- */ 
 
 void fts_data_init(fts_data_t *data, fts_data_class_t *class)
 {

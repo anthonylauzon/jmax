@@ -28,6 +28,8 @@ extern fts_symbol_t fts_s_float_vector;
 extern fts_float_vector_t *fts_float_vector_new(int size);
 extern void fts_float_vector_delete(fts_float_vector_t *vector);
 
+fts_data_t *fts_float_vector_constructor(int ac, const fts_atom_t *at);
+
 extern void fts_float_vector_set_from_atom_list(fts_float_vector_t *vector, int offset, int ac, const fts_atom_t *at);
 extern int fts_float_vector_get_atoms(fts_float_vector_t *vector, int ac, fts_atom_t *at);
 

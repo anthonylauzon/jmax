@@ -53,7 +53,14 @@ static void atom_array_realloc(fts_atom_array_t *array, int size)
     {
       /* if shorter, void atoms at the end (release references) */
       for(i=size; i<array->size; i++)
-	fts_void(array->atoms + i);
+	{
+	  fts_atom_t *atom = array->atoms + i;
+	  
+	  if(fts_is_data(atom))
+	    fts_data_derefer(fts_get_data(atom));
+	  
+	  fts_set_void(atom);
+	}
     }
   
   array->size = size;
@@ -148,7 +155,14 @@ fts_atom_array_void(fts_atom_array_t *array)
   int i;
   
   for(i=0; i<array->size; i++)
-    fts_void(array->atoms + i);
+    {
+      fts_atom_t *atom = array->atoms + i;
+      
+      if(fts_is_data(atom))
+	fts_data_derefer(fts_get_data(atom));
+      
+      fts_set_void(atom);
+    }
 }
 
 /* set the size of the array */
