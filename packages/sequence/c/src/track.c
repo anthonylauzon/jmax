@@ -253,7 +253,7 @@ track_event_create(int ac, const fts_atom_t *at)
     at++;
     
     if(class_name == fts_s_int || class_name == fts_s_float || class_name == fts_s_symbol)
-      value = at[0];
+      value = at[1];
     else
     {
       fts_class_t *type = fts_get_class_by_name(class_name);

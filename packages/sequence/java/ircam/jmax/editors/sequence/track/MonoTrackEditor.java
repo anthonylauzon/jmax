@@ -52,7 +52,7 @@ public class MonoTrackEditor extends TrackBaseEditor
 
 public int getInitialHeight()
 {
-  return MONO_DEFAULT_HEIGHT;
+  return getDefaultHeight();
 }
 
 public void reinit(){}
@@ -99,7 +99,7 @@ void updateRange(Object whichObject){}
 
 public int getDefaultHeight()
 {
-  return DEFAULT_HEIGHT;
+  return MONO_DEFAULT_HEIGHT;
 }
 
 public void objectAdded(Object whichObject, int index) 
