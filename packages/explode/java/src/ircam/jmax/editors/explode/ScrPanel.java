@@ -1,6 +1,7 @@
 package ircam.jmax.editors.explode;
 
 import com.sun.java.swing.*;
+import com.sun.java.swing.plaf.*;
 import com.sun.java.swing.undo.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -167,37 +168,70 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    * note: can't create the toolbar in the constructor,
    * because the Frame is not available yet.
    * The EditorToolbar class uses the Frame information
-   * in order to correctly map graphic contexts on windows
+   * in order to correctly map graphic contexts on windows.
    */
   public EditorToolbar prepareToolbar() 
   {
-    EditorToolbar tb;
 
     gc.setFrame(GraphicContext.getFrame(this));
 
+    // create the unique instance of toolbar if it does not exist already
     if (Explode.toolbar == null) {
-       tb = new EditorToolbar(this);
+      tb = new EditorToolbar(this);
     }
     else tb = Explode.toolbar;
     
+    // add itself as a client of the toolbar
     linkToToolbar(tb);
+
+    // prepare the Panel containing the toolbar when anchored
     JPanel c = new JPanel() {
+
+      // this callback is called when the user anchors the tooolbar
+      protected void addImpl(Component comp,
+			     Object constraints,
+			     int index)
+	{
+	  if (! toolbarAnchored && GraphicContext.getFrame(tb) != null)
+	    {
+	      GraphicContext.getFrame(tb).setVisible(false);
+	      GraphicContext.getFrame(tb).dispose();
+	    }
+
+	  super.addImpl(comp, constraints, index);
+	  ScrPanel.toolbarAnchored = true;
+	}
+
+      // the tolbar is going to be unanchored
       public void remove(Component c)
 	{
 	  super.remove(c);
+	  ScrPanel.toolbarAnchored = false;
 	  repaint();
-
 	}
-
+      
     };
+
     c.setLayout(new BorderLayout());
-    // Component tbc = EditorToolbar.getToolbar();
-    tb.setSize(200, 30);
-    c.add(tb, BorderLayout.CENTER);
+    c.setOpaque(false);
+    
     c.setSize(200, 30);
- 
+    
     itsStatusBar.addWidgetAt(c, 2);
 
+    // in case the toolbar is anchored, a new window "steals" it 
+    // from the preceding owner.
+    // the c.add() call invokes indirectly the addImpl method of the toolbar's JPanel.
+    // PROBLEM for (future?) developers: when the Toolbar changes owner, there's
+    // no way to anchor it in the preceding owner. Why? Is there a UI method
+    // to do this? Note anyway that this is a non standard behaviour..
+    if ( toolbarAnchored)
+      {
+	tb.setSize(200, 30);
+	c.add(tb, BorderLayout.CENTER);
+      }
+
+ 
     return tb;
   }
 
@@ -410,6 +444,9 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   Scrollbar itsTimeZoom;
   JLabel itsZoomLabel;
 
+  EditorToolbar tb;
+  static boolean toolbarAnchored = true;
+  
   InfoPanel itsStatusBar;
   JPanel itsScore;
 

@@ -163,7 +163,7 @@ public class ScoreBackground implements Layer{
   public void debugImage()
   {
     Graphics g = gc.getGraphicDestination().getGraphics();
-    Dimension d = gc.getGraphicDestination().size();
+    Dimension d = gc.getGraphicDestination().getSize();
     g.setColor(Color.red);
     g.fillRect(d.width-30, d.height-30, 10, 10);
     Thread.dumpStack();
