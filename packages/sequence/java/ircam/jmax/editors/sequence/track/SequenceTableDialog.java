@@ -68,7 +68,10 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
 			public void componentMoved(ComponentEvent e){}
 		});
   
-		setSize(((FtsTrackObject)track.getTrackDataModel()).editorObject.tab_w, ((FtsTrackObject)track.getTrackDataModel()).editorObject.tab_h);
+		int tab_w = ((FtsTrackObject)track.getTrackDataModel()).editorObject.tab_w;
+		int tab_h = ((FtsTrackObject)track.getTrackDataModel()).editorObject.tab_h;
+		if( tab_w != -1 && tab_h != -1)
+			setSize(tab_w, tab_h);
 	}
 
     /**

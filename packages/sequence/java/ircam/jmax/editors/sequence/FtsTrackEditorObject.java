@@ -66,6 +66,8 @@ public FtsTrackEditorObject(FtsServer server, FtsObject parent, int objId)
 		wy = -1;
 		ww = -1;
 		wh = -1;
+		tab_w = -1;
+		tab_h = -1;
 		label = "";
 		zoom = (float)0.2;
 		transp = 0;
@@ -106,11 +108,11 @@ public void restoreTableColumns( int nArgs, FtsAtom args[])
 }
 
 public void restoreTableSize( int nArgs, FtsAtom args[])
-{
+{	
 	if(nArgs==2)
 	{
 		this.tab_w = args[0].intValue;
-		this.tab_h = args[1].intValue;
+		this.tab_h = args[1].intValue;	
 	}
 }
 
