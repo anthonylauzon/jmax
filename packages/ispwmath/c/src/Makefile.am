@@ -7,6 +7,6 @@ ispwmath.c
 noinst_HEADERS= \
 ispwmath.h
 
-libispwmath_la_LDFLAGS= -L$(top_builddir)/fts -lfts  -module
+libispwmath_la_LDFLAGS= -L$(top_builddir)/fts -lfts  -module -release @JMAX_VERSION@
 
 INCLUDES=-I$(top_srcdir)/include
