@@ -2,16 +2,14 @@ packagedir=$(pkgdatadir)/packages/dtd/c
 package_LTLIBRARIES=libdtd.la
 libdtd_la_SOURCES= \
 dtd.c \
+dtd_thread.c \
 readsf.c \
-writesf.c \
-libtime.c 
+writesf.c
 
 libdtd_la_LDFLAGS=-laudiofile -lpthread
 
 noinst_HEADERS=  \
-dtddefs.h \
-dtdfifo.h \
-dtdserver.h \
-libtime.h
+dtd_buffer.h \
+dtd_thread.h
 
 INCLUDES=-I$(top_srcdir)/include

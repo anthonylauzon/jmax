@@ -22,18 +22,34 @@
  *
  */
 
-#ifndef DTD_BUFFER_H_
-#define DTD_BUFFER_H_ 1
+#ifndef DTD_THREAD_H_
+#define DTD_THREAD_H_ 1
 
+#include <fts/fts.h>
+#include "dtd_buffer.h"
+
+/**************************************************
+ *
+ * dtd thread
+ *
+ */
 typedef struct
 {
-    int size;
-    int n_channels;
-    float** buffer; /* n_channels * size */
-    int full; /* 0: empty
-		 1: full
-	      */
-    int end_index; /* need for writing */
-} dtd_buffer_t;
+    fts_object_t head;
+    /* sound file */
+    fts_audiofile_t* sf;
 
-#endif /* DTD_BUFFER_H_ */
+    /* inter thread communication buffer */
+    dtd_buffer_t* com_buffer;
+
+    /* index of buffer write by FTS */
+    const int* const buffer_index;
+    
+    /* delay for nanosleep (see fts_thread_manager) */
+    int delay_ms;
+} dtd_thread_t;
+
+
+fts_metaclass_t* dtd_thread_type;
+
+#endif /* DTD_THREAD_H_ */

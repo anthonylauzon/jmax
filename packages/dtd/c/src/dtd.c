@@ -26,11 +26,13 @@
 
 #include <fts/fts.h>
 
+extern void dtd_thread_config(void);
 extern void readsf_config(void);
 extern void writesf_config(void);
 
 void dtd_config(void)
 {
-    writesf_config();
+    dtd_thread_config();
     readsf_config();
+    writesf_config();
 }
