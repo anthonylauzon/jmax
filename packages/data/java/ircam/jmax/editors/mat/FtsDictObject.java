@@ -245,16 +245,14 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
   public void requestDeleteRows(int startIndex, int size)
   {
     args.clear();
-    args.addInt( startIndex);
-    if(size > 1)
-      args.addInt(size);
-    
+    for(int i = 0; i<size; i++)
+      args.add( getValueAt(startIndex+i, 0));
     try{
-      send( FtsSymbol.get("delete"), args);
+      send( FtsSymbol.get("remove_entries"), args);
     }
     catch(IOException e)
     {
-      System.err.println("FtsDictObject: I/O Error sending delete Message!");
+      System.err.println("FtsDictObject: I/O Error sending remove_entries Message!");
       e.printStackTrace(); 
     }    
   }

@@ -28,6 +28,7 @@ fts_class_t *dict_type = 0;
 
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_coll = 0;
+static fts_symbol_t sym_remove_entries = 0;
 
 #define dict_set_editor_open(m) ((m)->opened = 1)
 #define dict_set_editor_close(m) ((m)->opened = 0)
@@ -333,6 +334,21 @@ dict_remove_entry(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   dict_remove(self, at);
   fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
 
+  if(dict_editor_is_open(self))
+    dict_upload(self);
+}
+
+static void
+dict_remove_entries(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dict_t *self = (dict_t *)o;
+  int i = 0;
+  
+  for(i = 0; i<ac; i++)
+    dict_remove(self, at+i);
+  
+  fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
+  
   if(dict_editor_is_open(self))
     dict_upload(self);
 }
@@ -837,6 +853,7 @@ dict_instantiate(fts_class_t *cl)
   
   fts_class_message_number(cl, fts_s_remove, dict_remove_entry);
   fts_class_message_symbol(cl, fts_s_remove, dict_remove_entry);
+  fts_class_message_varargs(cl, sym_remove_entries, dict_remove_entries);
 
   fts_class_message_number(cl, fts_s_get_element, _dict_get_element);
   fts_class_message_symbol(cl, fts_s_get_element, _dict_get_element);
@@ -864,6 +881,7 @@ dict_config(void)
 {
   sym_text = fts_new_symbol("text");
   sym_coll = fts_new_symbol("coll");
+  sym_remove_entries = fts_new_symbol("remove_entries");
   dict_symbol = fts_new_symbol("dict");
 
   dict_type = fts_class_install(dict_symbol, dict_instantiate);
