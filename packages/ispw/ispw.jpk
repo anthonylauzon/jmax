@@ -40,5 +40,5 @@ sourceFile $dir/help/signal/signal.help.index.tcl
 ## load the reference manual data base
 #sourceFile $dir/doc/reference.tcl
 
-post "package: ispw (ISPW standard class library)"
+post "package: ISPW (ISPW standard class library)"
 

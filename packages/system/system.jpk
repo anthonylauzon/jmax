@@ -20,7 +20,6 @@ ucs load module system $dir/c/lib/$jmaxArch/$jmaxMode/libsystem.so
 #help
 helpPatch var $dir/help/var.help.jmax
 helpPatch const $dir/help/const.help.jmax
-#helpSummary "system classes" $dir/help/system.summary.jmax
 
 # load silently
 #post "package: system"

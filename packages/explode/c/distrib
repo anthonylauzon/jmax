@@ -1,4 +1,4 @@
-src	all	Makefile
 ircam	all	lib
 free	all	lib
+src	all	Makefile
 src	all	src

@@ -1,4 +1,5 @@
 src	all	Makefile
 all	all	system.jpk
 all	all	c
+all	all	help/var.help.jmax
 

@@ -11,12 +11,12 @@
 #  for DISCLAIMER OF WARRANTY.
 #  
 all:
-	(cd java ; $(MAKE) all)
+#	(cd java ; $(MAKE) all)
 	(cd c ; $(MAKE) all)
 .PHONY: all
 
 clean:
-	(cd java ; $(MAKE) clean)
+#	(cd java ; $(MAKE) clean)
 	(cd c ; $(MAKE) clean)
 .PHONY: clean
 

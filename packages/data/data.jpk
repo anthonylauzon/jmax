@@ -18,7 +18,9 @@ package provide data
 global jmaxArch jmaxMode
 ucs load module data $dir/c/lib/$jmaxArch/$jmaxMode/libdata.so
 
-## load the help patch data base
-#sourceFile $dir/help/data.help.index.tcl
+#help
+helpPatch binop $dir/help/binop.help.jmax
+helpPatch atom $dir/help/atom.help.jmax
+helpSummary "Data handling" $dir/help/data.summary.jmax
 
 post "package: data (basic data handling classes)"
