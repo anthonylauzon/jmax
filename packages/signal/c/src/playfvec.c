@@ -372,6 +372,17 @@ play_ftl(fts_word_t *argv)
   /* convert to idefix representation */
   fts_idefix_set_float(&index, position);
   
+  /* if vector is empty we output zero ... */
+  if (0 == fvec_get_size(fvec))
+  {
+      int j;
+      for (j = 0; j < n_tick; ++j)
+      {
+	  out[j] = 0.0f;
+      }
+      return;
+  }
+
   if(this->mode <= mode_pause)
     {
       /* stop or pause */
