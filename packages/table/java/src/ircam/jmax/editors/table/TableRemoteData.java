@@ -4,7 +4,7 @@ package ircam.jmax.editors.table;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import java.util.*;
-import com.sun.java.swing.undo.*;
+import javax.swing.undo.*;
 
 /**
  * A TableDataModel linked to an FtsIntegerVector.

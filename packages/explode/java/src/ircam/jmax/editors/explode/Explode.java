@@ -10,9 +10,9 @@ import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
 
-import com.sun.java.swing.*;
-import com.sun.java.swing.table.*;
-import com.sun.java.swing.undo.*;
+import javax.swing.*;
+import javax.swing.table.*;
+import javax.swing.undo.*;
 
 
 /**

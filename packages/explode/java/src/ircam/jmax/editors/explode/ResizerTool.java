@@ -4,8 +4,8 @@ import ircam.jmax.toolkit.*;
 
 import java.awt.*;
 import java.util.*;
-import com.sun.java.swing.ImageIcon;
-import com.sun.java.swing.undo.*;
+import javax.swing.ImageIcon;
+import javax.swing.undo.*;
 
 
 /**

@@ -4,7 +4,7 @@ package ircam.jmax.editors.table;
 import java.awt.*;
 import java.util.*;
 
-import com.sun.java.swing.undo.*;
+import javax.swing.undo.*;
 
 /**
  * An UndoableEdit to undo a single value set in a table */

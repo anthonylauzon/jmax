@@ -6,7 +6,7 @@ import java.awt.datatransfer.*;
 import java.util.*;
 import java.io.*;
 
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.utils.*;

@@ -5,7 +5,7 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.datatransfer.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 import tcl.lang.*;
 

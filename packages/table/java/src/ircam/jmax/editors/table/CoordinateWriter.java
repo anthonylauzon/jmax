@@ -1,7 +1,7 @@
 
 package ircam.jmax.editors.table;
 
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 import ircam.jmax.toolkit.*;
 

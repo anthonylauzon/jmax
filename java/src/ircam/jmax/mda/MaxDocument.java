@@ -2,7 +2,7 @@ package ircam.jmax.mda;
 
 import java.util.*;
 import java.io.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /**
  * Superclass for all the Max Document

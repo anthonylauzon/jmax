@@ -7,8 +7,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-import com.sun.java.swing.ImageIcon;
-import com.sun.java.swing.undo.*;
+import javax.swing.ImageIcon;
+import javax.swing.undo.*;
 
 
 /**

@@ -1,7 +1,7 @@
 package ircam.jmax.toolkit;
 
 import java.awt.*;
-import com.sun.java.swing.event.*;
+import javax.swing.event.*;
 
 /**
  * The context for a generic editing session.

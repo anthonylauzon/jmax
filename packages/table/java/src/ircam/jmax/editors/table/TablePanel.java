@@ -9,7 +9,7 @@ import java.util.*;
 import java.awt.event.*;
 import java.io.*;
 import tcl.lang.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /**
  * The panel in the Table editor's window, containing the toolbar, the CenterPanel 

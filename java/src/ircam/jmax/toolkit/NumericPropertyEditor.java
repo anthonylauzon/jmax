@@ -4,7 +4,7 @@ import java.beans.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.lang.reflect.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 import java.util.*;
 
 /**

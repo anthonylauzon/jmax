@@ -4,7 +4,7 @@ package ircam.jmax.editors.explode;
 import java.awt.*;
 import java.util.*;
 
-import com.sun.java.swing.undo.*;
+import javax.swing.undo.*;
 
 
 /** Undo support: this class knows how to undo an "add note" action. 

@@ -14,7 +14,7 @@ import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 
 //

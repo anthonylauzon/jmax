@@ -6,7 +6,7 @@ import java.util.*;
 import java.io.*;
 import java.awt.*;
 
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /** A Document Handler is an object able to load a Max Document 
  *  from a document file; the class also handle the document base of all

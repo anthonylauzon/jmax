@@ -3,8 +3,8 @@ package ircam.jmax.editors.explode;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import com.sun.java.swing.*;
-import com.sun.java.swing.border.*;
+import javax.swing.*;
+import javax.swing.border.*;
 
 /**
  * basic inspector for a generic adapter.

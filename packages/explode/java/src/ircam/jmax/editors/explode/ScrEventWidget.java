@@ -1,7 +1,7 @@
 
 package ircam.jmax.editors.explode;
 
-import com.sun.java.swing.*;
+import javax.swing.*;
 import ircam.jmax.toolkit.*;
 import java.awt.*;
 import java.util.*;

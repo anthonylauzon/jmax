@@ -4,13 +4,13 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import java.io.*;
 import java.util.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 /**
  A generic reusable panel containing a ConsoleThread
   */
 
 import java.awt.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 import java.awt.event.*;
 import tcl.lang.*;
 

@@ -3,8 +3,8 @@ package ircam.jmax.editors.ermes;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
-import com.sun.java.swing.*;
-import com.sun.java.swing.border.*;
+import javax.swing.*;
+import javax.swing.border.*;
 
 import ircam.jmax.*;
 import ircam.jmax.utils.*;

@@ -1,7 +1,7 @@
 package ircam.jmax.mda; 
 
 import java.util.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /** This class represent a type of editable document, with 
  * all its interesting properties.

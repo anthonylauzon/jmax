@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
 
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 public class ColorPropertyEditor extends PropertyEditorSupport {
 

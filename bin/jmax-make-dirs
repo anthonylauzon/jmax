@@ -79,12 +79,12 @@ do_it ()
 	    then
 		for a in $ARCHS
 		do
-		    echo mkdir -p $i/$a/debug $i/$a/opt
+		    echo mkdir -p $i/$a/debug $i/$a/opt  $i/$a/profile
 		    if [ $NOEXEC ]
 		    then
 			echo > /dev/null
 		    else
-			mkdir -p $i/$a/debug $i/$a/opt
+			mkdir -p $i/$a/debug $i/$a/opt $i/$a/profile
 		   fi
 		done
 	   fi

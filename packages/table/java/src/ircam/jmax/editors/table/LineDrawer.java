@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import ircam.jmax.toolkit.*;
 
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /**
  * A line-drawer interaction module, used by the LinerTool.

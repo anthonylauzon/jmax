@@ -3,7 +3,7 @@ package ircam.jmax.toolkit;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 public class IconCache {
   private static Hashtable table = new Hashtable();

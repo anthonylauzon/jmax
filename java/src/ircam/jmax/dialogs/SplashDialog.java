@@ -5,7 +5,7 @@ import java.awt.event.*;
 import java.awt.image.*;
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
-import com.sun.java.swing.Timer;
+import javax.swing.Timer;
 
 /**
  * The initial dialog.

@@ -2,7 +2,7 @@ package ircam.jmax.fts;
 
 import java.io.*;
 import java.util.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 import ircam.jmax.utils.*;
 import ircam.jmax.mda.*;

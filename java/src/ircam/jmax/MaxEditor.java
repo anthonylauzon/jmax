@@ -9,7 +9,7 @@ import ircam.jmax.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /**
  * The abstract base class for all the Ermes editors. It provides utility methods

@@ -1,7 +1,7 @@
 
 package ircam.jmax.toolkit;
 
-import com.sun.java.swing.undo.*;
+import javax.swing.undo.*;
 
 /** 
  * An utility class implementing the UndoableData interface.

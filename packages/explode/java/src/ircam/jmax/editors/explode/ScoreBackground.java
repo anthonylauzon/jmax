@@ -8,7 +8,7 @@ import java.awt.*;
 import java.awt.image.ImageObserver;
 import java.io.File;
 
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /**
  * The background layer of a score. It builds the background Image for the 

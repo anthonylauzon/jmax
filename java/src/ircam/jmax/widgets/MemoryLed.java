@@ -5,7 +5,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.lang.*;
 
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 public class MemoryLed extends Led {
 

@@ -6,8 +6,8 @@ import ircam.jmax.utils.*;
 import java.util.*;
 import java.awt.Component;
 
-import com.sun.java.swing.ImageIcon;
-import com.sun.java.swing.undo.*;
+import javax.swing.ImageIcon;
+import javax.swing.undo.*;
 
 /**
  * the tool used to perform an erase operation.

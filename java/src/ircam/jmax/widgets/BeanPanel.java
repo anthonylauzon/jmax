@@ -6,8 +6,8 @@ import java.beans.*;
 import java.lang.reflect.*;
 import java.util.*;
 
-import com.sun.java.swing.*;
-import com.sun.java.swing.border.*;
+import javax.swing.*;
+import javax.swing.border.*;
 
 /**
   A Swing component that displays the properties of a Java Bean.

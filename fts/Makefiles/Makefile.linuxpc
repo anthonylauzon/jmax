@@ -8,8 +8,9 @@ VENDOR := gnu
 AUDIO_LIBRARY := oss
 OS_TYPE := unix
 CC := gcc
+LD := gcc
 
-ARCH_CFLAGS := -Wall -Wno-unused -DLINUX -DLINUXPC
+ARCH_CFLAGS := -pipe -Wall -Wno-unused -DLINUX -DLINUXPC
 ARCH_LDFLAGS := -rdynamic  
 LD_ALL_FLAG := --whole-archive
 LD_NONE_FLAG := --no-whole-archive
@@ -18,7 +19,8 @@ CC_NONE_FLAG := -Xlinker --no-whole-archive
 
 # Pentium gcc special options; you need the compiler on linotte do use this !!!
 #ARCH_OPT_CFLAGS := -O6 -mpentiumpro -funroll-loops
-ARCH_OPT_CFLAGS := -O6 -mpentiumpro 
+#ARCH_OPT_CFLAGS := -O6 -mpentiumpro 
+ARCH_OPT_CFLAGS := -O6 -mpentium
 
 ARCH_OPT_LDFLAGS := 
 

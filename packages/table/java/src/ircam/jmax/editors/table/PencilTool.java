@@ -4,8 +4,8 @@ import ircam.jmax.toolkit.*;
 
 import java.awt.event.*;
 import java.awt.*;
-import com.sun.java.swing.ImageIcon;
-import com.sun.java.swing.undo.*;
+import javax.swing.ImageIcon;
+import javax.swing.undo.*;
 
 /**
  * The class implementing the behaviour of the pencil in the Table editor.

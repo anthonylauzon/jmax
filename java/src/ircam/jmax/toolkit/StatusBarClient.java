@@ -1,6 +1,6 @@
 package ircam.jmax.toolkit;
 
-import com.sun.java.swing.ImageIcon;
+import javax.swing.ImageIcon;
 
 /**
  * The objects that use the StatusBar must implement this

@@ -3,7 +3,7 @@ package ircam.jmax.editors.table;
 import java.awt.*;
 import java.util.*;
 import java.awt.event.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 import ircam.jmax.toolkit.*;
 

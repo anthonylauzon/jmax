@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /**
  * The class used to implement the behaviour of the "line" tool of the 

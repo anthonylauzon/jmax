@@ -7,8 +7,8 @@ import ircam.jmax.toolkit.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import com.sun.java.swing.*;
-import com.sun.java.swing.undo.*;
+import javax.swing.*;
+import javax.swing.undo.*;
 
 /** 
  * The table editor

@@ -4,7 +4,7 @@ import ircam.jmax.toolkit.*;
 
 import java.awt.*;
 import java.util.Enumeration;
-import com.sun.java.swing.ImageIcon;
+import javax.swing.ImageIcon;
 
 
 /**

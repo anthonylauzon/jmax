@@ -3,13 +3,13 @@ package ircam.jmax.mda;
 import java.util.*;
 import java.io.*;
 
-import com.sun.java.swing.*;
-import com.sun.java.swing.filechooser.*;
+import javax.swing.*;
+import javax.swing.filechooser.*;
 
 // Tmp packages
 
-// import com.sun.java.swing.preview.*;
-// import com.sun.java.swing.preview.filechooser.*;
+// import javax.swing.preview.*;
+// import javax.swing.preview.filechooser.*;
 
 import ircam.jmax.utils.*;
 

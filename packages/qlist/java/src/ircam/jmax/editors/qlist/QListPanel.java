@@ -8,7 +8,7 @@ import java.awt.event.*;
 import java.awt.AWTEvent.*;
 import java.io.*;
 import tcl.lang.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 public class QListPanel extends JPanel implements ActionListener {
   

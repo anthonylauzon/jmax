@@ -3,7 +3,7 @@ package ircam.jmax.toolkit;
 
 import java.awt.*;
 import java.awt.event.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 public class Widget extends JPanel {
 

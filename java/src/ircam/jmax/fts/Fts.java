@@ -3,7 +3,7 @@ package ircam.jmax.fts;
 import java.util.*;
 import java.net.*;
 
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
@@ -44,8 +44,8 @@ public class Fts
       server = new FtsServer(serverName, new FtsSocketStream(serverName, Integer.parseInt(port)));
     else if (mode.equals("udp")) 
       server = new FtsServer(serverName, new FtsDatagramStream(serverName, ftsDir, ftsName));
-    else if (mode.equals("udprx")) 
-      server = new FtsServer(serverName, new FtsRexecDatagramStream(serverName, ftsDir, ftsName));
+    // else if (mode.equals("udprx")) 
+    // server = new FtsServer(serverName, new FtsRexecDatagramStream(serverName, ftsDir, ftsName));
     else if (mode.equals("udpclient")) 
       server = new FtsServer(serverName + ":" + port,
 			     new FtsDatagramClientStream(serverName, ftsDir, ftsName, Integer.parseInt(port)));

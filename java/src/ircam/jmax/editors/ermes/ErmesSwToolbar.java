@@ -5,10 +5,9 @@ import java.awt.event.*;
 import java.util.*;
 import java.io.*;
 
-import com.sun.java.swing.*;
-import com.sun.java.swing.border.*;
-import com.sun.java.swing.plaf.*;
-import com.sun.java.swing.plaf.motif.*;
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.plaf.*;
 
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;

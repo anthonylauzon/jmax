@@ -46,7 +46,6 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/FtsRemoteUndoableData.java	\
 	$(INCLUDE_PATH)/FtsRemoteDataID.java		\
 	$(INCLUDE_PATH)/FtsRemoteMetaData.java		\
-	$(INCLUDE_PATH)/FtsRexecDatagramStream.java	\
 	$(INCLUDE_PATH)/FtsSelection.java		\
 	$(INCLUDE_PATH)/FtsServer.java			\
 	$(INCLUDE_PATH)/FtsSocketStream.java		\

@@ -4,7 +4,7 @@ package ircam.jmax.editors.explode;
 import java.awt.*;
 import java.util.*;
 
-import com.sun.java.swing.undo.*;
+import javax.swing.undo.*;
 
 /**
  * A simple UndoableEdit that can be used when  the action to undo 

@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /**
  * The base class of all the tools that use a selection

@@ -3,7 +3,7 @@ package ircam.jmax.editors.explode;
 import ircam.jmax.toolkit.*;
 
 import java.awt.*;
-import com.sun.java.swing.event.*;
+import javax.swing.event.*;
 
 /**
  * The context for an explode editing session.

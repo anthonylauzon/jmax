@@ -2,8 +2,8 @@
 package ircam.jmax.fts;
 
 import ircam.jmax.toolkit.*;
-import com.sun.java.swing.undo.*;
-import com.sun.java.swing.event.*;
+import javax.swing.undo.*;
+import javax.swing.event.*;
 
 /**
  * An fts remote data that offers a built-in undo support.

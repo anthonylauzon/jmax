@@ -1,6 +1,6 @@
 package ircam.jmax.toolkit;
 
-import com.sun.java.swing.ImageIcon;
+import javax.swing.ImageIcon;
 
 /**
  * The base class for tools: it handles the name and the icon,

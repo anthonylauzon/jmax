@@ -5,8 +5,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
 
-import com.sun.java.swing.*;
-import com.sun.java.swing.border.*;
+import javax.swing.*;
+import javax.swing.border.*;
 
 import ircam.jmax.widgets.*;
 import ircam.jmax.fts.*;

@@ -5,8 +5,8 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import com.sun.java.swing.*;
-import com.sun.java.swing.filechooser.*; // tmp !!
+import javax.swing.*;
+import javax.swing.filechooser.*; // tmp !!
 
 
 import ircam.jmax.*;

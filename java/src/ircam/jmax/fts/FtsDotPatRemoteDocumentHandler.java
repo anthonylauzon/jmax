@@ -5,7 +5,7 @@ import java.io.*;
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /** An instance of this document handler can load MaxDocument from
  *  a bmax binary file.
