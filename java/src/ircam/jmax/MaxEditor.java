@@ -392,10 +392,12 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
     itsDuplicateMenuItem = new MenuItem("Duplicate", new MenuShortcut(KeyEvent.VK_D));
     editMenu.add(itsDuplicateMenuItem);
-    itsDuplicateMenuItem.addActionListener(new MaxActionListener(itsDuplicateMenuItem)
-				{
-				  public  void actionPerformed(ActionEvent e)
-				    { Copy(); Paste();}});
+    itsDuplicateMenuItem.addActionListener( new MaxActionListener(itsDuplicateMenuItem)	{
+      public  void actionPerformed(ActionEvent e)
+	{ 
+	  Duplicate();
+	}
+    });
 
     return editMenu;
   }
@@ -427,6 +429,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   protected void Cut(){};
   protected void Copy(){};
   protected void Paste(){};
+  protected void Duplicate(){};
 
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////focusListener --inizio
