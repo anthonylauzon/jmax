@@ -11,24 +11,7 @@
 #  for DISCLAIMER OF WARRANTY.
 #  
 
-include $(ROOTDIR)/Makefiles/Makefile.$(ARCH)
-
-CC= cc
-CFLAGS= $(ARCH_CFLAGS)
-
-AR= ar
-ARFLAGS= rc $(ARCH_ARFLAGS)
-
-LIBDIR  = $(ROOTDIR)/lib/$(ARCH)
-OBJDIR  = $(ROOTDIR)/obj/$(ARCH)
-
-OBJECTS = $(addprefix $(OBJDIR)/, $(addsuffix .o , $(basename $(SOURCES))))
-
-
-
-
-
-
+ARCH_CFLAGS := -mips4 -n32 
 
 
 
