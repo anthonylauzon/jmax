@@ -32,6 +32,8 @@
 #include <ftsprivate/midi.h> /* require bmaxfile.h */
 #include <ftsprivate/config.h> /* require audioconfig.h and midi.h */
 
+#include <ftsprivate/client.h> /* provide fts_client_pipe_start and fts_client_tcp_start */
+
 #include <fts/project.h>
 
 
@@ -247,13 +249,8 @@ static void fts_kernel_init( void)
   _K_DECNCALL( fts_kernel_time_init);
   _K_DECNCALL( fts_kernel_sched_init);
   _K_DECNCALL( fts_kernel_audiofile_init);
-}
 
-/*
- * Installation of kernel packages 
- */
-static void fts_kernel_classes_config( void)
-{
+  /* code from fts_kernel_classes_config */
   _K_DECNCALL( fts_patcher_config);
   _K_DECNCALL( fts_error_object_config);
   _K_DECNCALL( fts_message_config);
@@ -269,6 +266,7 @@ static void fts_kernel_classes_config( void)
   _K_DECNCALL( fts_selection_config);
   _K_DECNCALL( fts_saver_config);
   _K_DECNCALL( fts_thread_manager_config);
+
 }
 
 void fts_init( int argc, char **argv)
@@ -290,9 +288,12 @@ void fts_init( int argc, char **argv)
 
   fts_log("[fts]: Initializing kernel classes\n");
 
-  /* Installation of kernel classes */
-  fts_kernel_classes_config();
-
+  /* check whether we should use a piped connection thru the stdio file handles */
+  if ( fts_cmd_args_get( fts_new_symbol( "stdio")) != NULL ) 
+    fts_client_pipe_start();
+  else
+    fts_client_tcp_start();
+  
   fts_log("[fts]: Loading project\n");
 
   /* Load the initial project */
