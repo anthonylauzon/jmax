@@ -18,15 +18,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Francois Dechelle, Riccardo Borghesi, Norbert Schnell, .
- *
  */
 
 /*
  * This file include the jMax HAL audio port for Mac OS X
+ *
+ * Current implementation restrictions:
+ * - only interleaved
+ * - only output
+ * - don't know how to get (and set?) the number of channels
  */
+
+#undef PRINT_A_LOT
+/*  #define PRINT_A_LOT */
 
 #include <stdio.h>
 #include <Carbon/Carbon.h>
@@ -34,6 +38,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <pthread.h>
+#include <mach/mach.h>
+#include <sys/sysctl.h>
 
 #include <fts/fts.h>
 
@@ -42,83 +48,117 @@
 #define DEFAULT_CHANNELS 2
 
 typedef struct {
-  pthread_mutex_t *mutex;        /* synchronisation mutex to access the fifo */
-  pthread_cond_t *awaiting_cond; /* to signal fts waiting to put data in the fifo */  
+  pthread_mutex_t mutex;        /* synchronisation mutex to access the fifo */
+  pthread_cond_t awaiting_cond; /* to signal fts waiting to put data in the fifo */  
+
   volatile int fts_is_waiting;            /*flag to signal fts is waiting*/
 
   float *data;
-  int fifo_length;
+  int length; /* in floats */
 
   volatile int read_index;  
   volatile int write_index;
 } halaudioport_fifo_t;
 
+typedef struct {
+  fts_audioport_t head;
+  halaudioport_fifo_t *fifo;
+  AudioDeviceID device;
+  int xrun;
+} halaudioport_t;
+
+
+static void fzero( float *buf, int n)
+{
+  int i;
+
+  for ( i = 0; i < n; i++)
+    buf[i] = 0.0;
+}
+
+static void fcpy( float *dst, const float *src, int n)
+{
+  int i;
+
+  for ( i = 0; i < n; i++)
+    dst[i] = src[i];
+}
+
+
+/***********************************************************************
+ *
+ * Fifo
+ *
+ */
+
 #define FIFO_READ_LEVEL(FIFO)						\
 (((FIFO)->write_index - (FIFO)->read_index < 0)				\
- ? (FIFO)->write_index - (FIFO)->read_index + (FIFO)->fifo_length	\
+ ? (FIFO)->write_index - (FIFO)->read_index + (FIFO)->length	\
  : (FIFO)->write_index - (FIFO)->read_index)
 
 #define FIFO_WRITE_LEVEL(FIFO)						\
 (((FIFO)->read_index - (FIFO)->write_index - 1 < 0)			\
- ? (FIFO)->read_index - (FIFO)->write_index - 1 + (FIFO)->fifo_length	\
+ ? (FIFO)->read_index - (FIFO)->write_index - 1 + (FIFO)->length	\
  : (FIFO)->read_index - (FIFO)->write_index - 1)
 
 #define FIFO_INCR_READ_INDEX(FIFO, INCR) 					\
-(FIFO)->read_index = ((FIFO)->read_index + (INCR)) % (FIFO)->fifo_length
+(FIFO)->read_index = ((FIFO)->read_index + (INCR)) % (FIFO)->length
 
 #define FIFO_INCR_WRITE_INDEX(FIFO, INCR) 					\
-(FIFO)->write_index = ((FIFO)->write_index + (INCR)) % (FIFO)->fifo_length
+(FIFO)->write_index = ((FIFO)->write_index + (INCR)) % (FIFO)->length
 
-halaudioport_fifo_t *halaudioport_fifo_new(int channels, int fifo_length)
+#define FIFO_READ_LOCATION( FIFO) ((FIFO)->data + (FIFO)->read_index)
+#define FIFO_WRITE_LOCATION( FIFO) ((FIFO)->data + (FIFO)->write_index)
+
+
+halaudioport_fifo_t *halaudioport_fifo_new( int length)
 {
   halaudioport_fifo_t *fifo;
 
-  fifo = (halaudioport_fifo_t *) malloc(sizeof(halaudioport_fifo_t));
+  fifo = (halaudioport_fifo_t *) fts_malloc( sizeof(halaudioport_fifo_t));
 
-  if (!fifo)
-    return 0;
-  memset(fifo, 0, sizeof(halaudioport_fifo_t));
-
-  fifo->fifo_length = fifo_length*channels*sizeof(float);
-
-  fifo->data = (float*) malloc(channels * fifo->fifo_length * sizeof(float));
-  memset(fifo->data, 0, channels * fifo->fifo_length * sizeof(float));
+  fifo->length = length;
+  fifo->data = (float *)fts_malloc( length * sizeof( float));
+  fzero( fifo->data, length);
   
-  fifo->mutex = malloc(sizeof(pthread_mutex_t));
-  pthread_mutex_init(fifo->mutex, NULL);
-  
-  fifo->awaiting_cond = malloc(sizeof(pthread_cond_t));
-  pthread_cond_init(fifo->awaiting_cond, NULL);
-  fifo->fts_is_waiting = 0;
-
   fifo->read_index = 0;
   fifo->write_index = 0;
+
+  pthread_mutex_init( &fifo->mutex, NULL);
+  pthread_cond_init( &fifo->awaiting_cond, NULL);
+
+  fifo->fts_is_waiting = 0;
 
   return fifo;
 }
 
 void halaudioport_fifo_delete(halaudioport_fifo_t *fifo)
 {
-  if (fifo == NULL) {
-    return;
-  }
-  if (fifo->data != NULL) {
-    fts_free(fifo->data);
-  }
-  if (fifo->mutex != NULL) {
-    pthread_mutex_destroy(fifo->mutex);
-  }
-  if (fifo->awaiting_cond != NULL) {
-    pthread_cond_destroy(fifo->awaiting_cond);
-  }
+  fts_free(fifo->data);
+  pthread_mutex_destroy( &fifo->mutex);
+  pthread_cond_destroy( &fifo->awaiting_cond);
   fts_free(fifo);
 }
 
-typedef struct {
-  fts_audioport_t head;
-  halaudioport_fifo_t *fifo;
-  AudioDeviceID device;
-} halaudioport_t;
+void halaudioport_fifo_debug( halaudioport_fifo_t *fifo, const char *msg)
+{
+  fprintf( stderr, "%s: ri=%-5d wi=%-5d rl=%-5d wl=%-5d w=%-1d\n", 
+	   msg,
+	   fifo->read_index,
+	   fifo->write_index,
+	   FIFO_READ_LEVEL( fifo),
+	   FIFO_WRITE_LEVEL( fifo),
+	   fifo->fts_is_waiting);
+
+  assert( FIFO_READ_LEVEL( fifo) >= 0 && FIFO_READ_LEVEL( fifo) < fifo->length);
+  assert( FIFO_WRITE_LEVEL( fifo) >= 0 && FIFO_WRITE_LEVEL( fifo) < fifo->length);
+}
+
+/***********************************************************************
+ *
+ * The audioport itself
+ *
+ */
 
 static void halaudioport_input( fts_word_t *argv)
 {
@@ -134,13 +174,19 @@ static void halaudioport_output( fts_word_t *argv)
   channels = fts_audioport_get_output_channels( (fts_audioport_t *)this);
 
   /* first pthread mutex lock */
-  pthread_mutex_lock(this->fifo->mutex);
+  pthread_mutex_lock( &this->fifo->mutex);
 
   /* wait until there's the right space available */
-  while (FIFO_WRITE_LEVEL(this->fifo) < n*channels*sizeof(float)) {
-    this->fifo->fts_is_waiting = 1;
-    pthread_cond_wait(this->fifo->awaiting_cond, this->fifo->mutex);    
-  }
+  while ( FIFO_WRITE_LEVEL(this->fifo) < n * channels)
+    {
+      this->fifo->fts_is_waiting = 1;
+      pthread_cond_wait( &this->fifo->awaiting_cond, &this->fifo->mutex);
+    }
+
+  pthread_mutex_unlock( &this->fifo->mutex);
+
+  if (this->fifo->write_index + n*channels > this->fifo->length)
+    halaudioport_fifo_debug( this->fifo, "Wraparound in output");
 
   /* then store the data and increment the write pointer */
   for ( ch = 0; ch < channels; ch++)
@@ -150,14 +196,12 @@ static void halaudioport_output( fts_word_t *argv)
       j = this->fifo->write_index + ch;
       for ( i = 0; i < n; i++)
 	{
-	  this->fifo->data[j] = in[i];/*?????*/
+	  this->fifo->data[j] = in[i];
 	  j += channels;
 	}
     }
 
-  FIFO_INCR_WRITE_INDEX(this->fifo, n*channels*sizeof(float));
-
-  pthread_mutex_unlock(this->fifo->mutex);
+  FIFO_INCR_WRITE_INDEX( this->fifo, n*channels);
 }
 
 OSStatus halaudioport_ioproc( AudioDeviceID inDevice, 
@@ -169,71 +213,117 @@ OSStatus halaudioport_ioproc( AudioDeviceID inDevice,
 			      void *inClientData)
 {
   halaudioport_t *this = (halaudioport_t *)inClientData;
-  int n, aval, rest;
-  /* first pthread mutex lock */
-  pthread_mutex_lock(this->fifo->mutex);
+  int requested, available, missing, copied;
 
-  aval = FIFO_READ_LEVEL(this->fifo);
-  if(aval >= outOutputData->mBuffers[0].mDataByteSize)
-    { 
-      memcpy( outOutputData->mBuffers[0].mData, 
-	      this->fifo->data + this->fifo->read_index, 
-	      outOutputData->mBuffers[0].mDataByteSize);
-    
-      FIFO_INCR_READ_INDEX(this->fifo, outOutputData->mBuffers[0].mDataByteSize);
+  requested = outOutputData->mBuffers[0].mDataByteSize / sizeof( float);
+  available = FIFO_READ_LEVEL( this->fifo);
+
+  if ( available >= requested)
+    copied = requested;
+  else
+    copied = available;
+
+  if ( this->fifo->read_index + copied > this->fifo->length)
+    {
+      /* There is a wrap */
+      int before_wrap = this->fifo->length - this->fifo->read_index;
+      int after_wrap = copied - before_wrap;
+
+      fcpy( (float *)outOutputData->mBuffers[0].mData, FIFO_READ_LOCATION( this->fifo), before_wrap);
+      fcpy( (float *)outOutputData->mBuffers[0].mData+before_wrap, this->fifo->data, after_wrap);
     }
   else
-    {
-      rest = outOutputData->mBuffers[0].mDataByteSize - aval;
-      memcpy( outOutputData->mBuffers[0].mData, 
-	      this->fifo->data + this->fifo->read_index,
-	      aval);
-      memset( outOutputData->mBuffers[0].mData, 0, rest);
-      FIFO_INCR_READ_INDEX(this->fifo, aval);
+    { 
+      fcpy( (float *)outOutputData->mBuffers[0].mData, FIFO_READ_LOCATION( this->fifo), copied);
     }
 
-  if(this->fifo->fts_is_waiting)
+  FIFO_INCR_READ_INDEX( this->fifo, copied);
+
+  if (copied < requested)
     {
-      pthread_cond_signal(this->fifo->awaiting_cond);
+      fzero( (float *)outOutputData->mBuffers[0].mData + copied, requested - copied);
+
+      this->xrun = 1;
+    }
+
+  pthread_mutex_lock( &this->fifo->mutex);
+
+  if ( this->fifo->fts_is_waiting)
+    {
       this->fifo->fts_is_waiting = 0;
+      pthread_cond_signal( &this->fifo->awaiting_cond);
     }
 
-  pthread_mutex_unlock(this->fifo->mutex);
+  pthread_mutex_unlock( &this->fifo->mutex);
 
   return noErr;
 }
 
 static int halaudioport_xrun( fts_audioport_t *port)
 {
-  halaudioport_t *halport = (halaudioport_t *)port;
+  halaudioport_t *this = (halaudioport_t *)port;
+  int xrun = this->xrun;
 
-  return 0;
+  this->xrun = 0;
+
+  return xrun;
 }
 
-/*
- * Current implementation restrictions:
- * - only interleaved
- * - only output
- * - don't know how to get (and set?) the number of channels
- */
+static int get_bus_speed( void)
+{
+  int mib[2];
+  unsigned int miblen;
+  int busspeed;
+  int retval;
+  size_t len;
+          
+  mib[0]=CTL_HW;
+  mib[1]=HW_BUS_FREQ;
+  miblen=2;
+  len=4;
+  /* Note: you should really check retval here, see man sysctl for info */
+  retval = sysctl( mib, miblen, &busspeed, &len, NULL, 0);
+
+  return busspeed;
+}
+
+static void set_real_time( float rate)
+{
+  thread_t s;
+  kern_return_t r;
+  integer_t info;
+  mach_msg_type_number_t count;
+  boolean_t b;
+  thread_time_constraint_policy_data_t ttcpolicy;
+
+  s = mach_thread_self();
+
+  /* This is in AbsoluteTime units, which are equal to
+     1/4 the bus speed on most machines. */
+          
+  ttcpolicy.period = (int)((get_bus_speed() / 4) / rate);
+  ttcpolicy.computation = (int)(0.8 * ttcpolicy.period);
+  ttcpolicy.constraint = (int)(0.9 * ttcpolicy.period);
+  ttcpolicy.preemptible = TRUE;
+                  
+  if ( (r = thread_policy_set( mach_thread_self(), THREAD_TIME_CONSTRAINT_POLICY, (thread_policy_t)&ttcpolicy, THREAD_TIME_CONSTRAINT_POLICY_COUNT)) != KERN_SUCCESS)
+    post( "Can't do thread_policy_set (%d)\n", r);
+}
+
 
 static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   halaudioport_t *this = (halaudioport_t *)o;
-  int fifo_size, channels, buffer_size;
   OSStatus err;
   UInt32 count;
-  UInt32 bufferSizeProperty;
+  UInt32 channels;
+  UInt32 buffer_size;
+  Boolean writable;
+  AudioBufferList *buffer_list;
 
   fts_audioport_init( &this->head);
 
-  ac--;
-  at++;
-  fifo_size = fts_param_get_int( fts_s_fifo_size, DEFAULT_FIFO_SIZE);
-
-  channels = fts_get_int_arg( ac, at, 1, DEFAULT_CHANNELS);
-  buffer_size = fts_get_int_arg( ac, at, 2, fts_dsp_get_tick_size());
-
+  /* Get the default device */
   count = sizeof( this->device);
   if ((err = AudioHardwareGetProperty( kAudioHardwarePropertyDefaultOutputDevice, &count, (void *)&this->device)) != noErr)
     {
@@ -241,20 +331,57 @@ static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
       return;
     }
 
-  bufferSizeProperty = channels * sizeof( float) * buffer_size;
-  count = sizeof( bufferSizeProperty);
-  
-  if ((err = AudioDeviceSetProperty( this->device, NULL, 0, false, kAudioDevicePropertyBufferSize, count, &bufferSizeProperty)) != noErr)
+  /* Get the number of channels and the buffer size */
+  if ((err = AudioDeviceGetPropertyInfo( this->device, 0, false, kAudioDevicePropertyStreamConfiguration, &count, &writable)) != noErr)
     {
-      fts_object_set_error( o, "Cannot set buffer size");
+      fts_object_set_error( o, "Cannot get device configuration");
+      post( "Cannot get device configuration\n");
       return;
     }
+
+  buffer_list = (AudioBufferList *)alloca( count);
+  if ((err = AudioDeviceGetProperty( this->device, 0, false, kAudioDevicePropertyStreamConfiguration, &count, buffer_list)) != noErr)
+    {
+      fts_object_set_error( o, "Cannot get device configuration");
+      post( "Cannot get device configuration\n");
+      return;
+    }
+
+  /* We assume that there is only one buffer */
+  if ( buffer_list->mNumberBuffers != 1)
+    {
+      fts_log( "buffer_list->mNumberBuffers != 1\n");
+      fts_object_set_error( o, "buffer_list->mNumberBuffers != 1");
+      return;
+    }
+
+
+#if 0
+  /* For now, we don't set the buffer size and we reuse the default one. */
+  {
+    UInt32 bufferSizeProperty = 2 * sizeof( float) * fifo_size;
+    count = sizeof( bufferSizeProperty);
+  
+    if ((err = AudioDeviceSetProperty( this->device, NULL, 0, false, kAudioDevicePropertyBufferSize, count, &bufferSizeProperty)) != noErr)
+      {
+	fts_object_set_error( o, "Cannot set buffer size");
+	return;
+      }
+  }
+#endif
+
+  channels = buffer_list->mBuffers[0].mNumberChannels;
+  buffer_size = buffer_list->mBuffers[0].mDataByteSize;
 
   fts_audioport_set_output_channels( (fts_audioport_t *)this, channels);
   fts_audioport_set_output_function( (fts_audioport_t *)this, halaudioport_output);
 
-  /* Create the fifo and fill it */
-  this->fifo = halaudioport_fifo_new(channels, fifo_size);
+  set_real_time( fts_dsp_get_sample_rate() / (buffer_size / (sizeof(float)*channels)) );
+
+  /* Create the fifo 
+   * We make a fifo of 2 buffers. May be 3 would be better.
+   */
+  this->fifo = halaudioport_fifo_new( (2 * buffer_size) / sizeof( float));
 
   if ((err = AudioDeviceAddIOProc( this->device, halaudioport_ioproc, this)) != noErr)
     {

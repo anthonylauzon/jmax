@@ -94,10 +94,11 @@ fts_get_system_config( void)
 #define odbc_private_extern 
 
 static char error_description[1024];
-static fts_status_description_t load_library_error = { error_description};
+static fts_status_description_t load_library_error = { &error_description[0]};
 
 odbc_private_extern void undefined_symbol_handler( const char *symbolName) 
 {
+  fts_log( "undefined symbol: %s", symbolName);
   sprintf( error_description, "undefined symbol: %s", symbolName);
 } 
 
@@ -111,6 +112,8 @@ odbc_private_extern NSModule multiple_symbol_handler( NSSymbol s, NSModule old, 
      * (See Radar 2262020 against dyld). 
      */ 
 
+  fts_log( "multiply defined symbol: %s (old %s new %s)", NSNameOfSymbol(s), NSNameOfModule(old), NSNameOfModule(new)); 
+
   sprintf( error_description, "multiply defined symbol: %s (old %s new %s)", NSNameOfSymbol(s), NSNameOfModule(old), NSNameOfModule(new)); 
 
   return new; 
@@ -118,6 +121,8 @@ odbc_private_extern NSModule multiple_symbol_handler( NSSymbol s, NSModule old, 
 
 odbc_private_extern void linkEdit_symbol_handler (NSLinkEditErrors c, int errorNumber, const char *fileName, const char *errorString) 
 { 
+  fts_log( "errors during link edit for file %s : %s", fileName, errorString); 
+
   sprintf( error_description, "errors during link edit for file %s : %s", fileName, errorString); 
 } 
 
@@ -147,10 +152,20 @@ fts_status_t fts_load_library( const char *filename, const char *symbol)
   if ( (ret = NSCreateObjectFileImageFromFile( filename, &image)) != NSObjectFileImageSuccess )
     return &load_library_error;
 
-  module = NSLinkModule( image, filename, NSLINKMODULE_OPTION_BINDNOW);
+  module = NSLinkModule( image, filename, NSLINKMODULE_OPTION_BINDNOW | NSLINKMODULE_OPTION_RETURN_ON_ERROR);
 
   if ( !module)
-    return &load_library_error;
+    {
+      NSLinkEditErrors errors;
+      int error_number;
+      const char *filename;
+      const char *error_string;
+
+      NSLinkEditError( &errors, &error_number, &filename, &error_string);
+      fts_log( "%d %s %s\n", error_number, filename, error_string);
+      
+      return &load_library_error;
+    }
 
   full_sym_name = (char *)alloca( strlen( symbol) + 2);
   strcpy( full_sym_name, "_");

@@ -1183,6 +1183,7 @@ static void fts_patcher_start_updates( fts_object_t *o, int winlet, fts_symbol_t
 {
   patcher_open(o, fts_SystemInlet, fts_s_open, 0, 0);
 }
+
 static void fts_patcher_stop_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   patcher_close(o, fts_SystemInlet, fts_s_close, 0, 0);

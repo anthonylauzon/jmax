@@ -486,7 +486,7 @@ static void protocol_encoder_write_symbol( protocol_encoder_t *encoder, fts_symb
     }
 
 #ifdef CACHE_REPORT
-  if (cache->naccess % 32 == 0)
+  if (cache->naccess % 1024 == 0)
     {
       fts_log( "[client] output symbol cache hit: %6.2f%%\n", ((100.0 * cache->nhit) / cache->naccess));
     }
@@ -731,9 +731,11 @@ static void end_message_action( unsigned char input, void *data)
   argc -= 2;
   argv += 2;
 
+#ifdef CLIENT_LOG
   fts_log( "[client]: Received message dest=0x%x selector=%s args=", target, selector);
   fts_log_atoms( argc, argv);
   fts_log( "\n");
+#endif
 
   /* Client messages are sent to the system inlet */
   if (target)
@@ -956,8 +958,6 @@ static void client_set_object_property( fts_object_t *o, int winlet, fts_symbol_
 
       obj  = fts_get_object(&at[0]);
       name = fts_get_symbol(&at[1]);
-
-      fts_log("client set Obj property %s\n", name);
 
       fts_object_put_prop(obj, name, &at[2]);
 
@@ -1385,8 +1385,6 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
 
   fts_connection_new( FTS_NO_ID, from, 0, (fts_object_t *)this, 0);
   fts_connection_new( FTS_NO_ID, (fts_object_t *)this, 0, to, 0);
-
-  fts_log( "[client]: Created controller on %s %s channel %d\n", target_class_name, fts_object_get_variable( target), channel_number);
 }
 
 static void client_controller_delete_dummy(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1402,9 +1400,11 @@ static void client_controller_anything_fts(fts_object_t *o, int winlet, fts_symb
   if ( !this->echo && this->gate )
     return;
 
+#ifdef CLIENT_LOG
   fts_log( "[client]: Sending \"%s ", s);
   fts_log_atoms( ac, at);
   fts_log( "\"\n");
+#endif
 
   fts_client_send_message( o, s, ac, at);
 }
@@ -1415,9 +1415,11 @@ static void client_controller_anything_client(fts_object_t *o, int winlet, fts_s
 
   this->gate = 1;
 
+#ifdef CLIENT_LOG
   fts_log( "[client]: Received \"");
   fts_log_atoms( ac, at);
   fts_log( "\"\n");
+#endif
 
   fts_outlet_send( o, 0, s, ac, at);
 
@@ -1535,9 +1537,11 @@ void fts_client_done_message( fts_object_t *obj)
 
 void fts_client_send_message( fts_object_t *obj, fts_symbol_t selector, int ac, const fts_atom_t *at)
 {
+#ifdef CLIENT_LOG
   fts_log( "[client]: Send message dest=0x%x selector=%s ac=%d args=", obj, selector, ac);
   fts_log_atoms( ac, at);
   fts_log( "\n");
+#endif
 
   fts_client_start_message( obj, selector);
   fts_client_add_atoms( obj, ac, at);
