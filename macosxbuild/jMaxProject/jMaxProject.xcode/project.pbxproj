@@ -178,6 +178,30 @@
 			settings = {
 			};
 		};
+		3B56B5C707130E0A0008FF53 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = marker.c;
+			path = ../../packages/sequence/c/src/marker.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B56B5C807130E0A0008FF53 = {
+			fileRef = 3B56B5C707130E0A0008FF53;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3B56B5C907130E2B0008FF53 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = marker.h;
+			path = ../../packages/sequence/c/include/fts/packages/sequence/marker.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
 		3B5AB8950610995A00412ACC = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -6301,6 +6325,7 @@
 				5C54280805AB0B900042B7A2,
 				5C54280905AB0B900042B7A2,
 				3B5AB8960610995A00412ACC,
+				3B56B5C807130E0A0008FF53,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -13482,6 +13507,7 @@
 		5CCF7F230662C663006958F9 = {
 			children = (
 				5CCF7F240662C6A4006958F9,
+				3B56B5C907130E2B0008FF53,
 				5CCF7F250662C6A4006958F9,
 				5CCF7F260662C6A4006958F9,
 				5CCF7F270662C6A4006958F9,
@@ -18436,6 +18462,7 @@
 			children = (
 				F851236B028BE77C01664092,
 				F851236E028BE77C01664092,
+				3B56B5C707130E0A0008FF53,
 				F851236F028BE77C01664092,
 				F8512370028BE77C01664092,
 				F8512372028BE77C01664092,
