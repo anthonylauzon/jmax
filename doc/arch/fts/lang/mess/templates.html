@@ -12,7 +12,7 @@
 <!-- for DISCLAIMER OF WARRANTY.                                          -->
 <!--                                                                      -->
 <HEAD>
-<TITLE>The FTS Computational Engine: |NAME| </TITLE>
+<TITLE>Templates </TITLE>
 </HEAD>
 
 <BODY TEXT="#000000" BGCOLOR="#CCCCCC">
@@ -45,13 +45,13 @@
 </UL>
 
 <p>
-<font size=+3 color=#FFFFFF><b>|NAME|</b></font>
+<font size=+3 color=#FFFFFF><b>Templates</b></font>
 
 <p>
 <hr noshade size=1>
 
 <UL TYPE=DOT>
-  <LI><A HREF="#chapter"> Chapter </A>
+  <LI><A HREF="#introduction"> Introduction</A>
 </UL>
 
 <p>
@@ -60,17 +60,46 @@
 <TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
 <TR><TD>
   
-<A NAME="chapter"> 
-<H2> Chapter </H2> 
+<A NAME="introduction"> 
+<H2> Introduction</H2> 
 
-<P>
-
-Blah Blah.
+The template module actually handle only the template looks up; the
+actual template instantiation is exactly loading a jmax file (see <A
+href="loading.html">the chapter on loading and saving </a>) and the
+variable mechanism of templates is exactly the same as the patchers;
+actually the template is implemented with a patcher, whose arguments
+are the same of the template (see <a href="objects.html"> the chapter
+on objects</a>).
 <p>
+The template table handle is pretty straighforward: it handle the
+templateDirectory and the templatePath declarations; two things to
+note: when a template is access thru a path, its file name is cached:
+this means that if the file is moved while <i>j</i>Max is still
+runnig, it will not be found anymore; this choice is due to
+performance reasons: looking for a file is very expensive compared to
+loading it.
+<p>
+The other important point: currently there is primitive support to store
+the text of a template in binary form; this is used now to install
+protected template from C code, but it can be easily transformed in 
+a template cache; template text caching should speed up quite a lot
+patch loading, because profiling show that a significant part of
+the loading time is spent in I/O operations.
+<P>
+<A NAME="files"> 
+<H2> Related Files</H2> 
+<P>
+<ul> 
+<li> <code>templates.c</code>
+<li> <code>templates.h</code>
+</ul> 
+
+</TABLE>
 
 <HR NOSHADE SIZE=1>
 
 </BODY>
 </HTML>
+
 
 

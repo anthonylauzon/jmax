@@ -12,7 +12,7 @@
 <!-- for DISCLAIMER OF WARRANTY.                                          -->
 <!--                                                                      -->
 <HEAD>
-<TITLE>The FTS Computational Engine: |NAME| </TITLE>
+<TITLE>The FTS Run Time </TITLE>
 </HEAD>
 
 <BODY TEXT="#000000" BGCOLOR="#CCCCCC">
@@ -39,13 +39,13 @@
 </UL>
 
 <p>
-<font size=+3 color=#FFFFFF><b>|NAME|</b></font>
+<font size=+3 color=#FFFFFF><b>The FTS Runtime</b></font>
 
 <p>
 <hr noshade size=1>
 
 <UL TYPE=DOT>
-  <LI><A HREF="#chapter"> Chapter </A>
+  <LI><A HREF="#logdev"> Logical Devices </A>
 </UL>
 
 <p>
@@ -54,13 +54,97 @@
 <TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
 <TR><TD>
   
-<A NAME="chapter"> 
-<H2> Chapter </H2> 
+<A NAME="logdev"> 
+<H2> Logical Devices</H2> 
 
 <P>
-
-Blah Blah.
+Logical devices are mapping between device descriptions (a list of atoms
+describing a device) and phisical devices.
 <p>
+The system do not provide any implementation of a logical device,
+it just provide an API to declare the logical device, by installing a set
+of functions to access it; the mapping
+between the device description and the device itself is implement inside
+the logical device, and not at the system level.
+<p>
+The system provide a registration system for logical devices; each logical
+device is named, and can be accessed thru its name.
+<p>
+Also, the system provides an API to open and install a phisical device
+on a logical device, and to close it.
+<p>
+At the end, a logical device is a way to implement variables bound to devices,
+where the variable name is composed by the logical device name and the device
+description.
+<p>
+This level of indirection allow an indipendency between the system
+(and the patches) and the actual running configuration; an other way
+to describe a logical device can be the concept of busses, where an
+output bus is addressed by name from the system, and connected in the
+back to an actual phisical device at the configuration time; mind that
+the logical device system deal only with opening/closing the device,
+and accessing it by name, not with the I/O itself, so the bus implementation
+is not included in the logical device module.
+<p>
+The system currently predefine a fixed number of logical devices, on which
+a number of phisical devices can be installed:
+<ul>
+<li> <code>midi</code><br> The logical device used for MIDI input and output operations;
+the logical device use an integer to index multiple phisical devices; this derive from
+historical reasons: on most of the multiport MIDI system ports are numbered, not named.
+<li> <code>in~</code><br> The logical device used for audio input; index by a single symbol
+name.
+<li> <code>out~</code><br> The logical device used for audio output; index by a single symbol
+name.
+<li> <code>client</code><br>The logical device used for communication with the client;
+only one phisical device accepted
+</ul>
+
+<p>
+Logical devices come historically before patcher variables; a good argument
+of discussion is if they are still needed, or if they can be substituted completely
+with variables declared by objects.
+The main point to remember is that a logical device is mainly a way to class devices
+and to connect them to specific functionalities; when we write the ucs command
+<code>open device midi 1 as sgiMidi port /dev/ttya</code>, we say different things:
+<p>
+<ol> 
+<li> Open the phisical device sgiMidi, with arguments /dev/ttya
+<li> Declare this device as a device of the midi family, and <b>start polling</b> it.
+<li> Give it the name "1", inside the MIDI family
+</ol>
+<p>
+A similar thing happen with audio in/out.  This is quite more than
+just giving a name to a phisical device: it is associating
+computational resources, and also a semantic; creating an <code>midiin
+1 1</code> object will not just associate the <code>midiin</code>
+object to the sgiMIDI port, but it actually associate it with the
+polling activity of this port.
+<p>
+This imply that any solution based on a patcher needs at least two levels;
+for example, the above level would translate in three objects (fake syntax used):
+<p>
+<pre>
+mididev : device sgiMIDI port /dev/ttya
+midibus1 : inputMidiBus $mididev
+midiin 1 $midibus1
+</pre>
+<p>
+One object declare the phisical device, the other declare the bus and allocate the
+computing resources to do the polling, and also allows for the sharing of the midi port
+between multiple objects,  and the third one is an example of use of
+the defined bus. 
+<p>
+There is an other problem: expecially with audio devices, is usually essential that if
+the device is open, then I/O operations are performed on it, also if no object actually
+use it; this is to avoid noises due to underun/overrun of the i/o fifos; this imply 
+that a device is not opened when created, but opened at a second time, when
+it is actually connected to a bus or object using it; this imply some change
+in the phisical device implementation (currently a creating a device and
+opening a device is the same operation, so a un-opened device do not
+exists).
+<p>
+</TABLE>
 
 <HR NOSHADE SIZE=1>
 

@@ -46,12 +46,12 @@
 
 <p>
 <font size=+3 color=#FFFFFF><b>Expression</b></font>
-
 <p>
 <hr noshade size=1>
 
 <UL TYPE=DOT>
-  <LI><A HREF="#expressions"> Expressions </A>
+  <LI><A HREF="#introduction"> The Expression Interpreter</A>
+  <LI><A HREF="#functions"> Code Structure</A
   <LI><A HREF="#files"> Related Files </A>
 </UL>
 
@@ -61,12 +61,56 @@
 <TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
 <TR><TD>
   
-<A NAME="expressions"> 
-<H2>Expressions</H2> 
 
-The Evalution engine: classical recursive descending parser,
-with a value stack/operand stack precedence machine, and
-a generic operators evaluator function.
+<A NAME="introduction"> 
+<H2>The Expression Interpreter</H2>
+
+The expression interpreter is a classical expression interpreter
+based on a recursive descending parser; the code wait a volunteer
+to rewrite it with tools like yacc; in this case, all the evalution
+code should still be valid, only the parser would need to be rewritten.
+<p>
+The Interpreter use a classical structure based on an operand
+stack and a value stack, using operator priority to trigger
+operator evaluation
+<p>
+Refer to the user documentation for the exact syntax accepted.
+<p>
+
+<i>Note: there is a small memory leak bug in the handling of array
+constants <code>{1 2 3}</code>: memory for the constant is allocated
+at each evaluation, and never freed. </i>
+
+<A NAME="functions"> 
+<H2>Code Structure</H2> 
+
+The interpreter structure is kept in the <code>fts_expression_state_t</code>
+structure; one is allocated for each evalution, so that recursive
+calls are possible; together with the structure there are a number of
+functions handling the evalution machine stacks and status.
+<p>
+Then follows two version of the recursive parser, one for simple expressions
+(as define in the syntax) <code> fts_expression_eval_simple</code>
+and the other for full expressions <code>fts_expression_eval_one</code>.
+<p>
+These two functions call the <code>fts_op_eval</code> that apply the top of
+the stack operator to the top of the stack values, popping the values
+and popping the result; it implement standard C like type promotion,
+plus promotion to symbols; currently implements the scope operator,
+also if not supported by the variable algorithm.
+<p>
+Finally, the <code>fts_expression_eval</code> take an object description,
+interpret it as a list of expressions and evaluate them all; the result
+is stored in the <code>fts_expression_state_t</code>, together with 
+some additional information, like the variables referenced during the
+evaluation, and the assignement constructs parsed at the end of the expression
+list.
+<p>
+The <code>fts_expression_init</code> initialize a number of essential tables
+for operator type (unary/binary) and priority; for the sake of efficency,
+symbols are reconized as operators by a kernel supported additional
+flag in the symbol structure itself, that work also as an index in the
+operator type and priority tables; these indexes are initialized in this function.
 <p>
 <A NAME="files"> 
 <H2> Related Files</H2> 

@@ -174,17 +174,24 @@ value is destroied, and all the object using this value are recomputed,
 and no pending reference to the destroyed value are left anywhere.
 <p>
 Supporting a run time use of variable values imply substituting this
-mechanisms with equivalent run-time mechanisms; not that in general
+mechanisms with equivalent run-time mechanisms; note that in general
 garbage collection is not always sufficent, because a garbage collected
-based system do not support the concept of "owner" of an object; immagine
-for example a <code>device</code> object that define a variable bound to 
-an open device; destroying the device object imply closing the device;
-it is not possible to leave the device closing to the garbage collector (think
-of a sound file device where at the end you find an undetermined amount
-of silence added waiting for the garbage collector to close the file);
-but then any reference to the device made with a means different from
-a variable evaluation need to be updated when the device is closed,
-in order to keep the global system consistency.
+based system do not work very well with object that have an explicit,
+intentional, close/destroy operation.
+<p>
+Immagine for example a <code>device</code> object that define a
+variable bound to an open device; destroying the device object imply,
+at least, closing the device; suppose that there are references to
+this device created passing a reference to this device at run time;
+the standard garbage collector technique would be to wait that this
+device is de-referenced before closing it; this is of course not
+possible (think of a sound file device where at the end you find an
+undetermined amount of silence added waiting for the garbage collector
+to close the file); all the references to this object must have a way
+to know when the object is closed/destroyed.
+<p>
+Garbage collectors techniques work well when the semantic of a value
+is not tied to its existence, but its use.
 <p>
 Solutions for this kind of problems exists, but their complexity is surely
 quite bigger than the current set of solutions and algorithm.
