@@ -1,6 +1,6 @@
 Name: jmax
 Summary: a visual programming environment for real-time, interactive multimedia applications
-Version: 2.5.2
+Version: 2.5.3_latest_cvs
 Release: 1
 Copyright: GPL
 Group: Applications/Multimedia
