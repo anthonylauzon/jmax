@@ -73,8 +73,6 @@ public class CueValue extends IntegerValue
 
     }
 
-
-
     /**
      * Returns its specialized renderer (an AmbitusEventRenderer) */
     public ObjectRenderer getRenderer()

@@ -29,6 +29,7 @@ import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.script.pkg.*;
 import ircam.jmax.script.*;
+import ircam.jmax.editors.sequence.track.*;
 /**
  * The sequence extension; install the sequence data type,
  * register the remote data class, installs
@@ -43,6 +44,7 @@ public class SequenceExtension extends tcl.lang.Extension implements JavaExtensi
       //Fts.registerRemoteDataClass( "sequence_data", ircam.jmax.editors.sequence.SequenceRemoteData.class);
 
     FtsObject.registerFtsObjectCreator("sequence", new FtsSequenceObjectCreator());
+    FtsObject.registerFtsObjectCreator("seqevent", new FtsEventObjectCreator());
   }
 
     /* this method should be removed as soon as jacl is completely forgotten about */
@@ -53,6 +55,7 @@ public class SequenceExtension extends tcl.lang.Extension implements JavaExtensi
       //Fts.registerRemoteDataClass( "sequence_data", ircam.jmax.editors.sequence.SequenceRemoteData.class);
 
     FtsObject.registerFtsObjectCreator("sequence", new FtsSequenceObjectCreator());
+    FtsObject.registerFtsObjectCreator("seqevent", new FtsEventObjectCreator());
   }
 }
 

@@ -88,7 +88,7 @@ public class MonodimensionalTrackBackground implements Layer{
   private void drawVerticalGrid(Graphics g, int w, int h)
   {
     AmbitusValue value = new AmbitusValue();
-    TrackEvent tempEvent = new TrackEvent(value);
+    UtilTrackEvent tempEvent = new UtilTrackEvent(value);
     int windowTime = (int)(gc.getAdapter().getInvX(w) - gc.getAdapter().getInvX(KEYEND)) - 1 ;
     int timeStep;
     
@@ -104,7 +104,7 @@ public class MonodimensionalTrackBackground implements Layer{
     {
       snappedTime = (i/timeStep)*timeStep;
       tempEvent.setTime(snappedTime);
-      xPosition = gc.getAdapter().getX(tempEvent)/*+1*/;
+      xPosition = gc.getAdapter().getX(tempEvent);
       
       g.drawLine(xPosition, 0, xPosition, h);
     }

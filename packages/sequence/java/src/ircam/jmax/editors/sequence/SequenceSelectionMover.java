@@ -26,6 +26,7 @@
 package ircam.jmax.editors.sequence;
 
 import ircam.jmax.editors.sequence.track.*;
+import ircam.jmax.editors.sequence.track.Event;
 import ircam.jmax.editors.sequence.renderers.*;
 
 import ircam.jmax.toolkit.*;
@@ -65,7 +66,7 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
     class SequenceScrollDragAction implements ActionListener
     {
 	SequencePanel sequencePanel;
-	TrackEvent event;
+	Event event;
 	private int delta = 10;
 	
 	public void actionPerformed(ActionEvent ae)
@@ -80,7 +81,7 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	{
 	    this.sequencePanel = editor;
 	}
-	void setEvent(TrackEvent evt)
+	void setEvent(Event evt)
 	{
 	    event = evt;
 	}
@@ -271,7 +272,7 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 
   //--- Fields
   Rectangle enclosingRect = new Rectangle();
-  TrackEvent tempEvent = new TrackEvent(new AmbitusValue());
+  UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue());
     // every event type would be OK, but we also need to handle the little keyboard in the
     // left side of the window... so we need an event that knows about the "pitch" property
 }

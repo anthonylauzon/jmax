@@ -62,10 +62,20 @@ public class TrackBase implements Track{
     public void setId(int id)
     {
 	this.id = id;
+	if(name.equals(""))
+	    name = "track"+id;
     }
     public int getId()
     {
 	return id;
+    }
+    public String getName()
+    {
+	return name;
+    }
+    public void setName(String name)
+    {
+	this.name = name;
     }
 
     //--- Fields
@@ -73,6 +83,7 @@ public class TrackBase implements Track{
     PropertyChangeSupport propertySupport = new PropertyChangeSupport(this);
     TrackDataModel model;
     private int id;
+    private String name = "";
 }
 
 

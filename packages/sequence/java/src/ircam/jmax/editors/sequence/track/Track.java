@@ -74,6 +74,12 @@ public interface Track {
     /**
      * Returns the unique identifier of this track.*/
     public int getId();
+     /**
+     * Set the unique name of this track.*/
+    public void setName(String name);
+    /**
+     * Returns the unique name of this track.*/
+    public String getName();
 }
 
 

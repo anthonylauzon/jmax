@@ -35,7 +35,7 @@ public class ChannelMapper extends Mapper {
   /**
    * set the given channel in the given event
    */
-  public void set(TrackEvent e, int value) 
+    public void set(Event e, int value) 
   {
     e.setProperty("channel", new Integer(value));
   }
@@ -43,7 +43,7 @@ public class ChannelMapper extends Mapper {
   /**
    * get the channel of the given event
    */
-  public int get(TrackEvent e) 
+    public int get(Event e) 
   {
     return ((Integer)e.getProperty("channel")).intValue();
   }

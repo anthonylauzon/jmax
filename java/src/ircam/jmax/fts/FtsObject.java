@@ -114,39 +114,41 @@ public class FtsObject
 	Object ctr = creators.get(className);
 	
 	if(ctr != null)
-	  obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, objId, className, nArgs, args);
+	    obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, className, nArgs, args);
 	else if (className == "jpatcher")
-	  obj =  new FtsPatcherObject(fts, parent, objId, FtsParse.unparseArguments(nArgs, args));
+	    obj =  new FtsPatcherObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
 	else if (className == "inlet")
-	  obj =  new FtsInletObject(fts, parent, objId, args[0].intValue);
+	    obj =  new FtsInletObject(fts, parent, args[0].intValue);
 	else if (className == "outlet")
-	  obj =  new FtsOutletObject(fts, parent, objId, args[0].intValue);
+	    obj =  new FtsOutletObject(fts, parent, args[0].intValue);
 	else if (className == "jcomment")
-	  obj =  new FtsCommentObject(fts, parent, objId);
+	    obj =  new FtsCommentObject(fts, parent);
 	else if (className == "messbox")
-	  obj =  new FtsMessageObject(fts, parent, objId, FtsParse.unparseArguments(nArgs, args));
+	    obj =  new FtsMessageObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
 	else if (className == "slider")
-	  obj =  new FtsSliderObject(fts, parent, objId);
+	    obj =  new FtsSliderObject(fts, parent);
 	else if (className == "intbox")
-	  obj =  new FtsIntValueObject(fts, parent, objId, className);
+	    obj =  new FtsIntValueObject(fts, parent, className);
 	else if (className == "toggle")
-	  obj =  new FtsIntValueObject(fts, parent, objId, className);
+	    obj =  new FtsIntValueObject(fts, parent, className);
 	else if (className == "button")
-	  obj =  new FtsIntValueObject(fts, parent, objId, className);
+	    obj =  new FtsIntValueObject(fts, parent, className);
 	else if (className == "floatbox")
-	  obj =  new FtsFloatValueObject(fts, parent, objId, className);
+	    obj =  new FtsFloatValueObject(fts, parent, className);
 	else if (className == "__selection")
-	  obj =  new FtsSelection(fts, parent, objId);
+	    obj =  new FtsSelection(fts, parent);
 	else if (className == "__clipboard")
-	  obj =  new FtsClipboard(fts, parent, objId);
+	    obj =  new FtsClipboard(fts, parent);
 	else if (variable != null)
-	  obj = new FtsObject(fts, parent, objId, variable, className, variable + " : " + className + " " + FtsParse.unparseArguments(nArgs, args));
+	    obj = new FtsObject(fts, parent, variable, className, variable + " : " + className + " " + FtsParse.unparseArguments(nArgs, args));
 	else
-	  obj = new FtsObject(fts, parent, objId, null, className, className + " " + FtsParse.unparseArguments(nArgs, args));
+	    obj = new FtsObject(fts, parent, null, className, className + " " + FtsParse.unparseArguments(nArgs, args));
       }
     else
-      obj = new FtsObject(fts, parent, objId, null, null, "");
+	obj = new FtsObject(fts, parent, null, null, "");
     
+    obj.setObjectId(objId);
+
     if (data != null)
       data.addObject(obj);
     
@@ -572,15 +574,15 @@ public class FtsObject
    * @param className the class name or null
    * @param description the object description
    */
-  protected FtsObject(Fts fts, FtsObject parent, int objId, String variableName, String className, String description)
+    protected FtsObject(Fts fts, FtsObject parent/*, int objId*/, String variableName, String className, String description)
   {
     super();
 
     this.fts = fts;
     this.parent = parent;
 
-    if (objId != -1)
-      setObjectId(objId);
+    /*if (objId != -1)
+      setObjectId(objId);*/
 
     this.variableName = variableName;
     this.className = className;
@@ -873,8 +875,7 @@ public class FtsObject
 	    methodArgs[0] = new Integer(nArgs);
 	    methodArgs[1] = args;
 	    methodCache.invoke(this, methodArgs);
-	  }
-	
+	  }	
       }
     catch ( IllegalAccessException exc)
       {

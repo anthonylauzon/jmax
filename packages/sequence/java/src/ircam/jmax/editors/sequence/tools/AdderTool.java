@@ -26,6 +26,7 @@
 package ircam.jmax.editors.sequence.tools;
 
 import ircam.jmax.*;
+import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.track.*;
@@ -81,16 +82,6 @@ public class AdderTool extends Tool implements PositionListener {
 	
 	egc.getTrack().setProperty("active", Boolean.TRUE);
 	
-	/*if (egc.getTrack().getTrackDataModel() instanceof MultiSequence)
-	  {
-	  // In case of multitrack, the operation is postponed:
-	  // a popup is shown to allow the user to choose the type of event to add.
-	  popupChoose(x, y, egc.getTrack());
-	  return;
-	  }
-	  else  
-	  addEvent(x, y, (EventValue) egc.getTrack().getValueInfo().newInstance());*/
-
 	if (egc.getTrack().getTrackDataModel().getNumTypes()>1)
 	  {
 	      // In case of multitrack, the operation is postponed:
@@ -105,29 +96,48 @@ public class AdderTool extends Tool implements PositionListener {
 	    }
     }
     
+    
+    static FtsAtom[] sendArgs = new FtsAtom[128];
+    static
+    {
+	for(int i=0; i<128; i++)
+	    sendArgs[i]= new FtsAtom();
+    }
+
     void addEvent(int x, int y, EventValue value)
     {
-	TrackEvent aEvent = new TrackEvent(value); // create a new event with the given FtsRemoteData type
+	UtilTrackEvent aEvent = new UtilTrackEvent(value); // create a new event with the given FtsRemoteData type
 	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 	
 	egc.getAdapter().setX(aEvent, x);
 	egc.getAdapter().setY(aEvent, y);
 
 	// starts an undoable transition
-	((UndoableData) egc.getDataModel()).beginUpdate();
+	/*((UndoableData) egc.getDataModel()).beginUpdate();
 	
-	egc.getDataModel().addEvent(aEvent);
+	  egc.getDataModel().addEvent(aEvent);
 	
-	// ends the undoable transition
-	((UndoableData) egc.getDataModel()).endUpdate();
+	  // ends the undoable transition
+	  ((UndoableData) egc.getDataModel()).endUpdate();*/
 
-	//only for now: 
-	egc.getDataModel().sendAddEventMessage(egc.getTrack().getId(),
-					       MaxApplication.getFts().FTS_NO_ID,
-					       (float)aEvent.getTime(), 
-					       value.getValueInfo().getName(), 
-					       value.getPropertyCount(), 
-					       value.getPropertyValues());
+	requestEventCreation(egc.getTrack().getName(),
+			     (float)aEvent.getTime(), 
+			     value.getValueInfo().getName(), 
+			     value.getPropertyCount(), 
+			     value.getPropertyValues());
+    }
+
+    private void requestEventCreation(String trackName, float time, String type, int nArgs, Object args[])
+    {
+	sendArgs[0].setObject(((SequenceGraphicContext)gc).getFtsSequenceObject()); 
+	sendArgs[1].setString(trackName); 
+	sendArgs[2].setFloat(time); 
+	sendArgs[3].setString(type);
+      
+	for(int i=0; i<nArgs; i++)
+	    sendArgs[4+i].setValue(args[i]);
+
+	MaxApplication.getFts().makeFtsObjectAsync("seqevent", 4+nArgs, sendArgs);
     }
 
     void popupChoose(int x, int y, Track track)

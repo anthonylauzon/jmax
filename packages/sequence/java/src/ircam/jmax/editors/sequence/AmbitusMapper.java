@@ -35,7 +35,7 @@ public class AmbitusMapper extends Mapper {
   /**
    * set the ambitus of this event
    */
-  public void set(TrackEvent e, int value) 
+    public void set(Event e, int value) 
   {
       if (value < 0)
 	  {
@@ -49,7 +49,7 @@ public class AmbitusMapper extends Mapper {
   /**
    * get the ambitus of this event
    */
-  public int get(TrackEvent e) 
+    public int get(Event e) 
   {
       return ((Integer)e.getProperty("ambitus")).intValue();
   }

@@ -384,6 +384,8 @@ sequence_add_event(sequence_t *sequence, sequence_track_t *track, sequence_event
     sequence_insert_event_before(sequence, next, event);
   else
     sequence_append_event(sequence, event);
+
+  sequence_event_set_track(event, track);
 }
 
 void
@@ -451,14 +453,14 @@ sequence_get_event_by_time(sequence_t *sequence, double time)
 {
   sequence_event_t *event = 0;
 
-  if(time <= sequence->end->time)
+  if(sequence_get_size(sequence) > 0 && time <= sequence->end->time)
     {
       event = sequence->begin;
-
+      
       while(time > event->time)
 	event = event->next;
     }
-
+  
   return event;  
 }
 
@@ -477,3 +479,12 @@ sequence_get_event_in_track_by_time(sequence_t *sequence, sequence_track_t *trac
 
   return event;  
 }
+
+
+
+
+
+
+
+
+

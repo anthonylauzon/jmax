@@ -38,26 +38,18 @@ import ircam.jmax.toolkit.*;
  * and a value (a FtsRemoteData).
  */
 
-public class TrackEvent extends FtsRemoteData implements Event, Drawable, UndoableData, Cloneable
+public class TrackEvent extends FtsObject implements Event, Drawable, UndoableData, Cloneable
 {
-
-    public TrackEvent()
+    public TrackEvent(Fts fts, FtsSequenceObject sequence, String trackName, double time, EventValue value)
     {
-	time = DEFAULT_TIME;
+	super(fts, null, null, "seqevent", "seqevent");
+	
+	this.time = time;
+
+	setValue(value);
+	
+	sequence.getTrackByName(trackName).getTrackDataModel().addEvent(this);
     }
-
-
-    public void call(int i, FtsStream stream)
-    {
-	//to be implemented 
-    }
-
-    public TrackEvent(TrackDataModel model, EventValue value)
-    {
-	time = DEFAULT_TIME;
-	itsTrackDataModel = model;
-    }
-
 
     /**
      * Sets the data model this event belongs to */
@@ -66,7 +58,6 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
 	itsTrackDataModel = model;
     }
 
-
     /**
      * Gets the data model this event belongs to */
     public TrackDataModel getDataModel()
@@ -74,17 +65,9 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
 	return itsTrackDataModel;
     }
 
-
-    public TrackEvent(EventValue value)
-    {
-	time = DEFAULT_TIME;
-
-	setValue(value);
-    }
-
     /**
      * Get the initial time for this event */
-    public /*int*/double getTime()
+    public double getTime()
     {
 	return time;
     }
@@ -93,7 +76,7 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
      * Set the initial time for this event. Use move() when the event is into a 
      * model (i.e. always for the editors, the exception are Events created on-the-fly 
      * by specific intereaction modules), in order to keep the DB consistency. */
-    public void setTime(/*int*/double time)
+    public void setTime(double time)   
     {
 	this.time = time;
     }
@@ -102,7 +85,7 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
      * This is the method that must be called by the editors to
      * change the initial time of an event. It takes care of
      * keeping the data base consistency */
-    public void move(/*int*/double time)
+    public void move(double time)
     {
 	if (time < 0) time = 0;
 	if (itsTrackDataModel != null)
@@ -138,16 +121,6 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
 		    if (value != null) value.setProperty(name, theValue); //unknown Double property
 		}
 	    }
-	/*if (theValue instanceof Integer) 
-	  {
-	  intVal = ((Integer)theValue).intValue();
-	  
-	  if (name.equals("time"))
-	  setTime(intVal);
-	  else  {
-	  if (value != null) value.setProperty(name, theValue); //unknown Integer property
-	  }
-	  }*/
 	else if (value != null)
 	    value.setProperty(name, theValue); //unknow not-Integer property, delegate it to the value object
 	
@@ -169,7 +142,6 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
     public Object getProperty(String name)
     {
 	if (name.equals("time"))
-	    //return new Integer(time);
 	    return new Double(time);
 	else if (value != null && !value.getProperty(name).equals(EventValue.UNKNOWN_PROPERTY))
 	    return value.getProperty(name); //this is not a know property, ask to the value object
@@ -189,8 +161,6 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
     {
 	this.value = value;
     }
-
-
 
     /* --------- Drawable interface ----------*/
 
@@ -216,7 +186,6 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
 	((UndoableData) itsTrackDataModel).beginUpdate();
 	inGroup = true;
     }
-
     
     /**
      * posts an undo edit in the buffers */
@@ -251,7 +220,6 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
     {
     }
     
-
     /*--------------  Editable interface --------------------*/
     public ValueEditor getValueEditor()
     {
@@ -267,12 +235,10 @@ public class TrackEvent extends FtsRemoteData implements Event, Drawable, Undoab
 
 
     //--- Fields
-    //private int time;
     private double time;
     private EventValue value;
     private boolean inGroup = false;
 
-    //public static int DEFAULT_TIME = 0;
     public static double DEFAULT_TIME = 0;
 
     private TrackDataModel itsTrackDataModel;

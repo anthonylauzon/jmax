@@ -58,6 +58,9 @@ public class AbstractEventValue extends FtsRemoteData implements EventValue
     {
 	return propertyValuesArray;
     }
+    public void setPropertyValues(int nArgs, Object args[])
+    {
+    }
 
     /**
      * Returns the renderer for this object */

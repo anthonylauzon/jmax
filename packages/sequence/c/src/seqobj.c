@@ -25,13 +25,13 @@ void
 seqevt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_event_t *this = (sequence_event_t *)o;
-  sequence_t *sequence = (sequence_t *)fts_get_object(at + 0);
-  fts_symbol_t track_name = fts_get_symbol(at + 1);
-  double time = fts_get_float(at + 2);
-  fts_symbol_t selector = fts_get_symbol(at + 3);
+  sequence_t *sequence = (sequence_t *)fts_get_object(at + 1);
+  fts_symbol_t track_name = fts_get_symbol(at + 2);
+  double time = fts_get_float(at + 3);
+  fts_symbol_t selector = fts_get_symbol(at + 4);
 
   sequence_event_set_time(this, time);
-  sequence_event_set_value(this, selector, ac - 4, at + 4);
+  sequence_event_set_value(this, selector, ac - 5, at + 5);
 
   sequence_add_event(sequence, sequence_get_track_by_name(sequence, track_name), this);
 }
@@ -61,7 +61,7 @@ seqevt_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     a[i + 4] = this->at[i];
 
   /* send event to client */
-  fts_client_upload(o, sym_seqevent, ac, at);
+  fts_client_upload(o, sym_seqevent, this->ac + 4, a);
 }
 
 static fts_status_t

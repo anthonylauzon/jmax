@@ -38,12 +38,12 @@ public class MonoDimensionalAdapter extends PartitionAdapter {
 	this.constant = constant;
     }
 
-    public int getY(TrackEvent e, GraphicContext gc)
+    public int getY(Event e, GraphicContext gc)
     {
 	return gc.getGraphicDestination().getSize().height/2+constant;
     }
 
-    public void setY(TrackEvent e, int y)
+    public void setY(Event e, int y)
     {
 	;
     }

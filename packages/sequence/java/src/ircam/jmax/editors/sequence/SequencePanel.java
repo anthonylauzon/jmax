@@ -27,6 +27,7 @@ package ircam.jmax.editors.sequence;
 
 import ircam.jmax.editors.sequence.tools.*;
 import ircam.jmax.editors.sequence.track.*;
+import ircam.jmax.editors.sequence.track.Event;
 import ircam.jmax.editors.sequence.renderers.*;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -436,7 +437,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	    }
     }
     
-    public boolean eventIsVisible(TrackEvent evt)
+    public boolean eventIsVisible(Event evt)
     {
 	int time = (int)evt.getTime();
 	int dur = ((Integer)evt.getProperty("duration")).intValue();
@@ -509,7 +510,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	    int xPosition;
 	    int snappedTime;
 	    AmbitusValue value = new AmbitusValue();
-	    TrackEvent tempEvent = new TrackEvent(value);
+	    UtilTrackEvent tempEvent = new UtilTrackEvent(value);
 	    int logicalTime = -geometry.getXTransposition();
 	    int windowTime = getMaximumVisibleTime();	    
 

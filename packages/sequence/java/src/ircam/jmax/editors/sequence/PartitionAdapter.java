@@ -60,7 +60,7 @@ public class PartitionAdapter extends Adapter {
    * it returns the X value of the event,
    * making the needed cordinate conversions.
    */
-  public int getX(TrackEvent e) 
+    public int getX(Event e) 
   {
     int temp = super.getX(e);
     
@@ -109,7 +109,7 @@ public class PartitionAdapter extends Adapter {
    * it returns the Y value of the event,
    * making the needed cordinate conversions.
    */
-  public int getY(TrackEvent e) 
+    public int getY(Event e) 
   {  
     int q, r;
     int temp = super.getY(e);
@@ -208,7 +208,7 @@ public class PartitionAdapter extends Adapter {
 	}
   }
 
-  public int getAlteration(TrackEvent e)
+    public int getAlteration(Event e)
   {
     int q, r;
     int temp = super.getY(e);
@@ -227,7 +227,7 @@ public class PartitionAdapter extends Adapter {
   /**
    * set the parameter of the event associated with the graphic y
    */
-  public void setY(TrackEvent e, int y) 
+    public void setY(Event e, int y) 
   {
     super.setY(e, getInvY(y));
   }
@@ -238,7 +238,7 @@ public class PartitionAdapter extends Adapter {
    * returns the lenght value of the event,
    * making the needed cordinate conversions (zooming).
    */
-  public int getLenght(TrackEvent e) 
+    public int getLenght(Event e) 
   {
     return (int) (super.getLenght(e)*geometry.getXZoom());
   }
@@ -247,20 +247,20 @@ public class PartitionAdapter extends Adapter {
   /**
    * set the duration of the event associated with the graphic lenght l.
    */
-  public  void setLenght(TrackEvent e, int l) 
+    public  void setLenght(Event e, int l) 
   {
     super.setLenght(e, (int) (l/geometry.getXZoom()));
   }
 
     /**
      * returns the heigth of this event */
-    public int getHeigth(TrackEvent e) 
+    public int getHeigth(Event e) 
     {
 	if (HeigthMapper != null) return 3*(2*HeigthMapper.get(e)+1);
 	else return NOTE_DEFAULT_HEIGTH;
     }
     
-    public void setHeigth(TrackEvent e, int heigth)
+    public void setHeigth(Event e, int heigth)
     {
 	HeigthMapper.set(e, (heigth-3)/6);
     }

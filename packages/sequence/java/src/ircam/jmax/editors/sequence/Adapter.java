@@ -62,7 +62,7 @@ abstract public class Adapter implements MappingListener{
     /**
      * Get the X value for the given event
      */
-    public int getX(TrackEvent e) 
+    public int getX(Event e) 
     {
 	if (XMapper != null) return (int) XMapper.get(e);
 	else return 0;
@@ -72,7 +72,7 @@ abstract public class Adapter implements MappingListener{
     /**
      * Get the Y value for the given event
      */
-    public int getY(TrackEvent e) 
+    public int getY(Event e) 
     {
 	if (YMapper != null) return YMapper.get(e);
 	else return 0;
@@ -81,7 +81,7 @@ abstract public class Adapter implements MappingListener{
     /**
      * Returns the value of the X coordinate in the given graphic context.
      * e_m_ will be in the future the only one? */
-    public /*int*/double getX(TrackEvent e, GraphicContext gc)
+    public /*int*/double getX(Event e, GraphicContext gc)
     {
 	return getX(e);
     }
@@ -90,7 +90,7 @@ abstract public class Adapter implements MappingListener{
     /**
      * Returns the value of the X coordinate in the given graphic context.
      * e_m_ will be in the future the only one? */
-    public int getY(TrackEvent e, GraphicContext gc)
+    public int getY(Event e, GraphicContext gc)
     {
 	return getY(e);
     }
@@ -110,7 +110,7 @@ abstract public class Adapter implements MappingListener{
   /**
    * set the parameter of the event associated with the graphic X
    */
-  public void setX(TrackEvent e, int x) 
+    public void setX(Event e, int x) 
   {
       //XMapper.set(e, x);
       XMapper.set(e, getInvX(x));
@@ -120,7 +120,7 @@ abstract public class Adapter implements MappingListener{
   /**
    * set the parameter of the event associated with the Y
    */
-  public void setY(TrackEvent e, int y) 
+    public void setY(Event e, int y) 
   {
     YMapper.set(e, y);
   }
@@ -129,7 +129,7 @@ abstract public class Adapter implements MappingListener{
   /**
    * get the Lenght value for this event
    */
-  public int getLenght(TrackEvent e) 
+    public int getLenght(Event e) 
   {
     if (LenghtMapper != null) return LenghtMapper.get(e);
     else return 0;
@@ -138,16 +138,16 @@ abstract public class Adapter implements MappingListener{
   /**
    * sets the parameter of the event associated with the Lenght
    */
-  public void setLenght(TrackEvent e, int lenght) 
+    public void setLenght(Event e, int lenght) 
   {
     LenghtMapper.set(e, lenght);
   }
 
-    public void setHeigth(TrackEvent e, int heigth)
+    public void setHeigth(Event e, int heigth)
     {
     }
 
-    public int getHeigth(TrackEvent e)
+    public int getHeigth(Event e)
     {
 	return NOTE_DEFAULT_HEIGTH;
     }
@@ -155,7 +155,7 @@ abstract public class Adapter implements MappingListener{
   /**
    * get the label value (int) for this event
    */
-  public int getLabel(TrackEvent e) 
+    public int getLabel(Event e) 
   {
     if (LabelMapper != null) return LabelMapper.get(e);
     else return 0;
@@ -164,7 +164,7 @@ abstract public class Adapter implements MappingListener{
   /**
    * sets the parameter of the event associated with the Label
    */
-  public void setLabel(TrackEvent e, int lenght) 
+    public void setLabel(Event e, int lenght) 
   {
     LabelMapper.set(e, lenght);
   }
@@ -206,6 +206,11 @@ abstract public class Adapter implements MappingListener{
 
   public final static int NOTE_DEFAULT_HEIGTH = 3;
 }
+
+
+
+
+
 
 
 

@@ -36,7 +36,7 @@ public class PositionMapper extends Mapper {
   /**
    * set the given Position in the given event
    */
-  public void set(TrackEvent e, int val) 
+    public void set(Event e, int val) 
   {
     e.setProperty("position", new Integer(val));
   }
@@ -45,7 +45,7 @@ public class PositionMapper extends Mapper {
   /**
    * get the Position from the given event
    */
-  public int get(TrackEvent e) 
+    public int get(Event e) 
   {
     return ((Integer)e.getProperty("Position")).intValue();
   }

@@ -150,17 +150,17 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	return index;
     }
     
-    public Enumeration intersectionSearch(/*int*/double start, /*int*/double end)
+    public Enumeration intersectionSearch(double start, double end)
     {
 	return new Intersection(start,end);
     }
     
-    public Enumeration inclusionSearch(/*int*/double start, /*int*/double end)
+    public Enumeration inclusionSearch(double start, double end)
     {
 	return new Inclusion(start, end);
     }
     
-    public int getFirstEventAt(/*int*/double time)
+    public int getFirstEventAt(double time)
     {
 	if (events_fill_p == 0) 
 	    return EMPTY_COLLECTION;
@@ -187,19 +187,6 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	else return NO_SUCH_EVENT;
     }
     
-    public void addNewEvent(int objId, double timeTag, String valueType, int nArgs, Object args[])
-    {
-	/*
-	  1) crea un TrackValue con tipo e parametri passati
-	  2) crea un TrackEvent (FtsSequenceEventObject) con timeTag e TrackValue associati
-	  3) lo aggiunge alla traccia chiamando addEvent(TrackEvent)
-	 
-	*/
-	//EventValue evtValue = ValueInfoTable.getValueInfo(valueType).newInstance();
-	//evtValue.setArgs(args);//set arguments
-	//addEvent(new TrackEvent(objId, timeTag, value));
-    }
-
     /**
      * adds an event in the database
      */
@@ -227,27 +214,6 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	    }
     }
 
-    static FtsAtom[] sendArgs = new FtsAtom[128];
-    static
-    {
-	for(int i=0; i<128; i++)
-	    sendArgs[i]= new FtsAtom();
-    }
-
-    public void sendAddEventMessage(int trackId, int objId, float time, String type, int nArgs, Object args[])
-    {    
-	sendArgs[0].setInt(trackId); 
-	sendArgs[1].setInt(objId);
-	sendArgs[2].setFloat(time); 
-	sendArgs[3].setString(type);
-	sendArgs[4].setInt(nArgs);
-
-	for(int i=0; i<nArgs; i++)
-	    sendArgs[5+i].setValue(args[i]);
-
-	((FtsSequenceObject)sequenceData).sendMessage(FtsObject.systemInlet, "event_add", 5+nArgs , sendArgs);
-    }
-    
     /**
      * generic change of an event in the database.
      * Call this function to signal the parameters changing of the event, except
@@ -261,19 +227,8 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	
 	if (index == NO_SUCH_EVENT || index == EMPTY_COLLECTION)
 	    return;
-	
-	// Send the change command to fts (to be implemented)
-	/*
-	  Object args[] = new Object[6];
-	  
-	  args[0] = new Integer(index);
-	  args[1] = new Integer(event.getTime());
-	  args[2] = new Integer(event.getPitch());
-	  args[3] = new Integer(event.getVelocity());
-	  args[4] = new Integer(event.getDuration());
-	  args[5] = new Integer(event.getChannel());
-	  
-	  remoteCall(REMOTE_CHANGE, args);*/
+
+	//????????????????
 	
 	notifyObjectChanged(event);
     }
@@ -301,18 +256,6 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	event.setTime(newTime);
 	
 	// inform FTS (to be implemented)
-	/*
-	  Object args[] = new Object[6];
-	  
-	  args[0] = new Integer(index);
-	  args[1] = new Integer(event.getTime());
-	  args[2] = new Integer(event.getPitch());
-	  args[3] = new Integer(event.getVelocity());
-	  args[4] = new Integer(event.getDuration());
-	  args[5] = new Integer(event.getChannel());
-	  
-	  remoteCall(REMOTE_CHANGE, args);
-	*/
 	
 	// rearranges the events in the DB 
 	if (index < newIndex) 
@@ -370,11 +313,7 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	deleteRoomAt(removeIndex);
 	
 	// Send the remove command to fts (to be implemented)
-	/*
-	  Object args[] = new Object[1];
-	  args[0] = new Integer(removeIndex);
-	  remoteCall(REMOTE_REMOVE, args);
-	*/
+
 	notifyObjectDeleted(event, removeIndex);
     }
 
@@ -623,7 +562,7 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
     /**
      * an utility class to implement the intersection with a range */
     class Intersection implements Enumeration {
-	Intersection(/*int*/double start, /*int*/double end)
+	Intersection(double start, double end)
 	{
 	    endTime = end;
 	    startTime = start;
@@ -663,8 +602,8 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	
 	
 	//--- Intersection Fields
-	/*int*/double endTime;
-	/*int*/double startTime;
+	double endTime;
+	double startTime;
 	int index;
 	Object nextObject = null;
     }    
@@ -675,7 +614,7 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
      * in a temporal range */
     class Inclusion implements Enumeration {
 	
-	Inclusion(/*int*/double start, /*int*/double end)
+	Inclusion(double start, double end)
 	{
 	    this.endTime = end;
 	    index = getIndexAfter(start);
@@ -711,7 +650,7 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	
 	
 	//--- Inclusion internal class fields
-	/*int*/double endTime;
+	double endTime;
 	int index;
 	int endIndex;
 	Object nextObject = null;

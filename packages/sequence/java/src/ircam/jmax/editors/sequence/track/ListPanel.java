@@ -383,11 +383,11 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	if(currentEvent!=null)
 	    {
 		
-		TrackEvent aEvent = new TrackEvent((EventValue) currentEvent.getValue().getValueInfo().newInstance());						
-		aEvent.setTime(currentEvent.getTime());
-		aEvent.setProperty("duration", currentEvent.getProperty("duration"));
-		aEvent.setProperty("pitch", currentEvent.getProperty("pitch"));
-		data.addEvent(aEvent);
+		/*TrackEvent aEvent = new TrackEvent((EventValue) currentEvent.getValue().getValueInfo().newInstance());						
+		  aEvent.setTime(currentEvent.getTime());
+		  aEvent.setProperty("duration", currentEvent.getProperty("duration"));
+		  aEvent.setProperty("pitch", currentEvent.getProperty("pitch"));
+		  data.addEvent(aEvent);*/
 	    }
     }
 

@@ -126,35 +126,7 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
     int deltaY = y-startingPoint.y;
     int deltaX = x-startingPoint.x;
 
-    /*if (itsMoveMode == CLONE) 
-      {
-	// starts a serie of undoable add transition
-	((UndoableData)egc.getDataModel()).beginUpdate();
-	for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
-	  {
-	    aEvent = (TrackEvent) e.nextElement();
-	    newEvent = new TrackEvent(aEvent.getDataModel(),
-				    aEvent.getTime(),
-				    aEvent.getPitch(),
-				    aEvent.getVelocity(),
-				    aEvent.getDuration(),
-				    aEvent.getChannel(),
-				    aEvent.getAmbitus());
-	    // must add the event to the model before moving it...
-	    aEvent.getDataModel().addEvent(newEvent);
-
-	    egc.getAdapter().setX(newEvent, egc.getAdapter().getX(aEvent)+deltaX);
-	    egc.getAdapter().setY(newEvent, egc.getAdapter().getY(aEvent)+deltaY);
-	    
-
-	  }
-	((UndoableData) egc.getDataModel()).endUpdate();
-      }
-
-    else
-    {*/
-    // starts a serie of undoable moves
-	
+    // starts a serie of undoable moves	
     ((UndoableData) egc.getDataModel()).beginUpdate();
     
     for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
@@ -169,8 +141,6 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
     
     ((UndoableData) egc.getDataModel()).endUpdate();
 	
-    //}
-    
     mountIModule(itsSelecter);
     gc.getGraphicDestination().repaint();    
   }

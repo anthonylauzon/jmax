@@ -35,7 +35,7 @@ public class PitchMapper extends Mapper {
   /**
    * set the given pitch in the given event
    */
-  public void set(TrackEvent e, int val) 
+    public void set(Event e, int val) 
   {
     e.setProperty("pitch", new Integer(val));
   }
@@ -44,7 +44,7 @@ public class PitchMapper extends Mapper {
   /**
    * get the pitch from the given event
    */
-  public int get(TrackEvent e) 
+    public int get(Event e) 
   {
     return ((Integer)e.getProperty("pitch")).intValue();
   }

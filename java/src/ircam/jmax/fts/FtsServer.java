@@ -328,6 +328,7 @@ public class FtsServer implements Runnable
    *
    * @param patcher the parent patcher (can be null)
    * @param id the object id (object dosn't exist yet on server)
+   * @param className the object class name
    * @param nArgs number of valid arguments in args array
    * @param args arguments of object creation
    */
@@ -343,6 +344,36 @@ public class FtsServer implements Runnable
       {
 	stream.sendCmd(FtsClientProtocol.fts_new_object_cmd);
 	stream.sendObject(patcher);
+	stream.sendInt(id);
+	stream.sendString(className);
+	stream.sendArray(args, 0, nArgs);
+	stream.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+  /**
+   * Send a "new object" messages to the server with arguments in form of an array of FtsAtom
+   * used for objects created 
+   *
+   * @param id the object id (object dosn't exist yet on server)
+   * @param className the object class name
+   * @param nArgs number of valid arguments in args array
+   * @param args arguments of object creation
+   */
+  final void newObject(int id, String className, int nArgs, FtsAtom args[])
+  {
+    if (! connected)
+      return;
+
+    if (FtsServer.debug)
+      System.err.println("> newObject(" + id + ", " + className + ", " + nArgs + "args)");
+
+    try
+      {
+	stream.sendCmd(FtsClientProtocol.fts_new_object_cmd);
 	stream.sendInt(id);
 	stream.sendString(className);
 	stream.sendArray(args, 0, nArgs);
@@ -1347,7 +1378,9 @@ public class FtsServer implements Runnable
     // Build the root patcher, by mapping directly to object id 1 on FTS
     // (this is guaranteed)
 
-    root = new FtsPatcherObject(fts, null, 1, "");
+    root = new FtsPatcherObject(fts, null/*, 1*/, "");
+    root.setObjectId(1);
+
     registerObject(root);
   }
 

@@ -37,14 +37,21 @@ public abstract class Mapper {
   /**
    * set the given value in the given event
    */
-  public abstract void set(TrackEvent e, int val);
+    public abstract void set(Event e, int val);
 
 
   /**
    * get the value from the given event
    */
-  public abstract int get(TrackEvent e);
+    public abstract int get(Event e);
 
 
 }
+
+
+
+
+
+
+
 

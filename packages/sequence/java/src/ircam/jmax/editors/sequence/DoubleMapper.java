@@ -37,13 +37,13 @@ public abstract class DoubleMapper {
   /**
    * set the given value in the given event
    */
-  public abstract void set(TrackEvent e, double val);
+    public abstract void set(Event e, double val);
 
 
   /**
    * get the value from the given event
    */
-  public abstract double get(TrackEvent e);
+    public abstract double get(Event e);
 
 
 }

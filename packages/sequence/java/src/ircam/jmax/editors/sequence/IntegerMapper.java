@@ -35,7 +35,7 @@ public class IntegerMapper extends Mapper {
   /**
    * set the Integer of this event
    */
-  public void set(TrackEvent e, int value) 
+    public void set(Event e, int value) 
   {
 
       e.setProperty("integer", new Integer(value));
@@ -44,7 +44,7 @@ public class IntegerMapper extends Mapper {
   /**
    * get the Integer of this event
    */
-  public int get(TrackEvent e) 
+    public int get(Event e) 
   {
       return ((Integer)e.getProperty("integer")).intValue();
   }

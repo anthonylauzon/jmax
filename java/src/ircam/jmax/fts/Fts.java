@@ -60,13 +60,13 @@ import ircam.jmax.utils.*;
 
 public class Fts implements MaxContext
 {
-  /** The FTS server */
-
-  private FtsServer server = null;
+  public final static int FTS_NO_ID = -1; 
+ /** The FTS server */
+  FtsServer server = null;
 
   /** Get the FtsServer object for this server */
 
-  FtsServer getServer()
+  public FtsServer getServer()
   {
     return server;
   }
@@ -220,6 +220,20 @@ public class Fts implements MaxContext
       throw new FtsException("Instantiation error : " + description);
   }
   
+  /** 
+   * Start creation of an FtsObject. Create an Id and then request Fts to create an FtsObject. 
+   * there is not a Sync point. Will receive the created object in asynchronous way with a message.
+   * (used in Sequence editor)
+   */
+  public void makeFtsObjectAsync(String className, int nArgs, FtsAtom args[])
+  {
+    int id;
+
+    id = server.getNewObjectId();
+
+    server.newObject( id, className, nArgs, args);
+  }
+    
 
   /** Make a Connection.
     It ask FTS to create the connection, and then upload it

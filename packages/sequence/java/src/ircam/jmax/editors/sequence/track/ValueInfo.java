@@ -32,3 +32,4 @@ public interface ValueInfo {
      * used inside the Sequencer editor */
     abstract public Component newWidget(SequenceGraphicContext gc);
 }
+

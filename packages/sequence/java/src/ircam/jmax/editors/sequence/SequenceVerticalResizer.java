@@ -55,7 +55,7 @@ public class SequenceVerticalResizer extends SelectionResizer {
 
 	try {
 
-	    tempEvent = new TrackEvent();
+	    tempEvent = new UtilTrackEvent();
 
 	}
 	catch (Exception e ){}
@@ -115,7 +115,7 @@ public class SequenceVerticalResizer extends SelectionResizer {
 
   //---- Fields
 
-    static TrackEvent tempEvent;
+    static UtilTrackEvent tempEvent;
 }
 
 

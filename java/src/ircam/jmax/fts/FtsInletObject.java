@@ -46,9 +46,9 @@ public class FtsInletObject  extends FtsInOutletObject
    * Create a FtsInletObject object.
    */
   
-  public FtsInletObject(Fts fts, FtsObject parent, int objId, int position)
+    public FtsInletObject(Fts fts, FtsObject parent/*, int objId*/, int position)
   {
-    super(fts, parent, objId, "inlet", position);
+      super(fts, parent/*, objId*/, "inlet", position);
 
     ninlets = 0;
     noutlets = 1;

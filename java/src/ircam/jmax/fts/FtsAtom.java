@@ -147,6 +147,21 @@ public class FtsAtom {
     return null;
   }
 
+    public final void setValue(Object value)
+    {
+	if(value instanceof Integer)
+	    setInt(((Integer)value).intValue());
+	else
+	    if(value instanceof Float)
+		setFloat(((Float)value).floatValue());
+	    else 
+		if(value instanceof String)
+		    setString((String)value);
+		else
+		    setVoid();
+    }
+
+
   public int type;
   public int intValue;
   public float floatValue;
@@ -154,3 +169,8 @@ public class FtsAtom {
   public FtsSymbol symbolValue;
   public FtsObject objectValue;
 }
+
+
+
+
+

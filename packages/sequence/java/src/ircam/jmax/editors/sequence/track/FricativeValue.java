@@ -79,6 +79,12 @@ public class FricativeValue extends AbstractEventValue
 	return propertyValuesArray;
     }
 
+    public void setPropertyValues(int nArgs, Object args[])
+    {
+	for(int i = 0; i<nArgs; i++)
+	    setProperty(nameArray[i], args[i]);
+    }
+
     //--- Fields
 
     public static final String fs = File.separator;

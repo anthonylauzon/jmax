@@ -50,12 +50,12 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
   /**
    * constructor.
    */
-  public FtsSequenceObject(Fts fts, FtsObject parent, String description, int objId)
-  {
-    super(fts, parent, objId, null, "sequence", description);
-      
-    listeners = new MaxVector();
-  }
+    public FtsSequenceObject(Fts fts, FtsObject parent, String classname)
+    {
+	super(fts, parent, null, "sequence", "sequence");
+	
+	listeners = new MaxVector();
+    }
 
    /**
    * MESSAGES called from fts.
@@ -80,21 +80,11 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
     }
   }
     
-  static Object[] evtArgs = new Object[128];
+  /*static Object[] evtArgs = new Object[128];
   
-  public void addEvent(int nArgs , FtsAtom args[])
-  {
-      int trackId = args[0].getInt();
-      int objId = args[1].getInt();
-      double time = (double)args[2].getFloat();
-      String type = args[3].getString();
-      int numArgs = args[4].getInt();
-      
-      for(int i = 0; i<numArgs; i++)
-	  evtArgs[i] = args[5+i].getValue();
-
-      getTrackById(trackId).getTrackDataModel().addNewEvent(objId, time, type, numArgs, evtArgs);
-  }
+    public void addEvent(int nArgs , FtsAtom args[])
+    {
+    }*/
 
   /**
    * how many events in the data base?
@@ -132,6 +122,19 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
   }
 
   /**
+   * Returns the track with this name */
+  public Track getTrackByName(String name)
+  {
+    Track track;
+    for(Enumeration e = tracks.elements(); e.hasMoreElements();)
+      {
+	track = (Track)e.nextElement();
+	if(track.getName().equals(name)) return track;
+      }
+    return null;
+  }
+
+  /**
    * Adds a track
    */
   public void addTrack(Track track)
@@ -139,11 +142,11 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
     track.setId(trackId++);
     tracks.addElement(track);
   
-    MaxVector vect = new MaxVector();
-    vect.addElement("track"+track.getId());
-    vect.addElement("anything");
+    messVect.removeAllElements();
+    messVect.addElement(track.getName());
+    messVect.addElement("anything");
       
-    sendMessage(FtsObject.systemInlet, "track_add", vect);
+    sendMessage(FtsObject.systemInlet, "track_add", messVect);
 
     notifyTrackAdded(track);
   }
@@ -155,6 +158,11 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
   {
     if(track==null) return;
     tracks.removeElement(track);
+
+    /*messVect.removeAllElements();
+      messVect.addElement(track);
+      
+      sendMessage(FtsObject.systemInlet, "track_delete", messVect);*/
 
     notifyTrackRemoved(track);
   }
@@ -187,24 +195,14 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
       ((TrackListener)(e.nextElement())).trackRemoved(track);
   }
 
-
-  /* The method inherited from FtsRemoteData */
-
-  public void call( int key, FtsStream stream)
-    throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
-  {
-    switch( key) {
-      //to be implemented
-    }
-  }
-
-
   //----- Fields
   /** Key for remote call add */
   
   Vector tracks = new Vector();
   MaxVector listeners = new MaxVector();
+  MaxVector messVect = new MaxVector();
   String name = new String("unnamed"); //to be assigned by FTS, usually via a specialized KEY
+
   //unic id for a track, starting from zero;
   private int trackId = 0; 
   static final int REMOTE_TRACK_ADD = 0; 

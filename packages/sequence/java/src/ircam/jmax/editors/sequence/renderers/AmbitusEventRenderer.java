@@ -27,6 +27,7 @@ package ircam.jmax.editors.sequence.renderers;
 
 import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.track.*;
+import ircam.jmax.editors.sequence.track.Event;
 import ircam.jmax.toolkit.*;
 
 import java.awt.*;
@@ -64,7 +65,7 @@ public class AmbitusEventRenderer implements ObjectRenderer {
    */
   public void render(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
   {
-    TrackEvent e = (TrackEvent) obj;
+    Event e = (Event) obj;
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
     PartitionAdapter pa = (PartitionAdapter)gc.getAdapter();
 
@@ -124,7 +125,7 @@ public class AmbitusEventRenderer implements ObjectRenderer {
    */
   public boolean contains(Object obj, int x, int y, GraphicContext theGc) 
   {
-    TrackEvent e = (TrackEvent) obj;
+    Event e = (Event) obj;
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 
     int evtx = gc.getAdapter().getX(e);
@@ -152,7 +153,7 @@ public class AmbitusEventRenderer implements ObjectRenderer {
    */
   public boolean touches(Object obj, int x, int y, int w, int h, GraphicContext theGc) 
   {
-    TrackEvent e = (TrackEvent) obj;
+    Event e = (Event) obj;
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 
     int evtx = gc.getAdapter().getX(e);

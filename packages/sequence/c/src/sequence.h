@@ -70,6 +70,7 @@ extern void sequence_event_delete(sequence_event_t *event);
 #define sequence_event_set_time(e, t) ((e)->time = (t))
 #define sequence_event_get_time(e) ((e)->time)
 
+#define sequence_event_set_track(e, t) ((e)->track = (t))
 #define sequence_event_get_track(e) ((e)->track)
 
 /*extern void sequence_event_set_value(sequence_event_t *event, fts_atom_t value);*/

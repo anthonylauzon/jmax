@@ -52,7 +52,12 @@ public interface EventValue
      * Returns all the property values known by this
      * EventValue like a FtsAtom array */
     public abstract Object[] getPropertyValues();
-
+   
+    /**
+     * Returns all the property values known by this
+     * EventValue like a FtsAtom array */
+    public abstract void setPropertyValues(int nArgs, Object args[]);
+    
     /**
      * getProperty on an unknown property should return this value */
     public static Object UNKNOWN_PROPERTY = new Integer(Integer.MAX_VALUE);

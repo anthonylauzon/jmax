@@ -97,5 +97,5 @@ public class SequenceSelectionResizer extends SelectionResizer {
 
   //---- Fields
 
-  TrackEvent tempEvent = new TrackEvent(new AmbitusValue());
+  UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue());
 }

@@ -87,7 +87,7 @@ public interface TrackDataModel {
      * @param nArgs the num of args for this value
      * @param args the Vector of arguments (Objects)
      */
-    public abstract void addNewEvent(int objId, double timeTag, String valueType, int nArgs, Object args[]);
+    //public abstract void addNewEvent(int objId, double timeTag, String valueType, int nArgs, Object args[]);
     
     /**
      * send a addEvent message to fts
@@ -98,7 +98,7 @@ public interface TrackDataModel {
      * @param nArgs the num of args for this value
      * @param args the Vector of arguments (Objects)
      */
-    public abstract void sendAddEventMessage(int trackId, int objId, float time, String valueType, int nArgs, Object args[]);
+    //public abstract void sendAddEventMessage(int trackId, int objId, float time, String valueType, int nArgs, Object args[]);
 
     /**
      * generic change of an event in the database.
