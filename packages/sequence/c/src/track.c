@@ -35,10 +35,10 @@ fts_class_t *track_class = 0;
 static void track_upload_event(track_t *this, event_t *event, fts_array_t *temp_array);
 
 /******************************************************
-*
-*  preset dumper utility
-*
-*/
+ *
+ *  preset dumper utility
+ *
+ */
 
 typedef struct
 {
@@ -479,6 +479,16 @@ track_post_function(fts_object_t *o, fts_bytestream_t *stream)
     fts_spost_symbol(stream, fts_class_get_name(track_type));
     fts_spost(stream, ">");
   }
+}
+
+static void
+track_description_function(fts_object_t *o,  fts_array_t *array)
+{
+  track_t *this = (track_t *)o;
+  fts_class_t *type = track_get_type(this);
+  
+  fts_array_append_symbol(array, seqsym_track);
+  fts_array_append_symbol(array, fts_class_get_name(type));
 }
 
 /******************************************************
@@ -959,10 +969,10 @@ track_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 /******************************************************
-*
-*  upload
-*
-*/
+ *
+ *  upload
+ *
+ */
 
 static void
 track_upload_property_list(track_t *this, fts_array_t *temp_array)
@@ -1855,6 +1865,7 @@ track_instantiate(fts_class_t *cl)
   
   fts_class_set_copy_function(cl, track_copy_function);
   fts_class_set_post_function(cl, track_post_function);
+  fts_class_set_description_function(cl, track_description_function);
   
   fts_class_doc(cl, seqsym_track, "[<sym: type>]", "sequence of time-tagged values");
   fts_class_doc(cl, fts_s_clear, NULL, "erase all events");

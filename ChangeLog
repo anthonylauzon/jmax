@@ -1,3 +1,9 @@
+2004-08-18  Norbert Schnell  <Norbert.Schnell@ircam.fr>
+
+	* class.c: introduced description_function to class
+          (append object description to array which creates an empty object of the same kind - default function returns class name)
+	* stack.h: added some macros for int and object (fts_object_t *) stacks
+
 2004-08-13  Norbert Schnell  <Norbert.Schnell@ircam.fr>
 
 	* expression.c: (bug fix) undefined but formerly used variables were void but not stated as undefined

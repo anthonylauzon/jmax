@@ -75,6 +75,12 @@ default_array_function(fts_object_t *obj, fts_array_t *array)
 {
 }
 
+static void
+default_description_function(fts_object_t *o,  fts_array_t *array)
+{
+  fts_array_append_symbol(array, fts_object_get_class_name(o));
+}
+
 fts_class_t *
 fts_class_install (fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 {
@@ -89,13 +95,14 @@ fts_class_install (fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
   fts_class_set_copy_function (cl, default_copy_function);
   fts_class_set_post_function (cl, default_post_function);
   fts_class_set_array_function (cl, default_array_function);
+  fts_class_set_description_function (cl, default_description_function);
 
   if (name != NULL)
-    {
-      if (fts_package_add_class (fts_get_current_package (), cl, name) !=
-	  fts_ok)
-	return 0;
-    }
+  {
+    if (fts_package_add_class (fts_get_current_package (), cl, name) !=
+        fts_ok)
+      return 0;
+  }
 
   return cl;
 }

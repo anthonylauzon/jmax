@@ -205,6 +205,7 @@ typedef struct
   fts_method_t method;
 } fts_message_cache_t;
 
+FTS_API void fts_message_cache_init(fts_message_cache_t *cache);
 FTS_API fts_message_cache_t *fts_message_cache_new(void);
 FTS_API void fts_message_cache_free(fts_message_cache_t *cache);
 

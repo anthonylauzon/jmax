@@ -143,5 +143,13 @@ FTS_API int __fts_stack_realloc( fts_stack_t *b);
  */
 #define fts_stack_size(S) ((S)->top + 1)
 
+#define fts_stack_init_int(s) __fts_stack_init(s, sizeof(int))
+#define fts_stack_push_int(s, o) fts_stack_push(s, int, o)
+#define fts_stack_top_int(s) (((s)->top >= 0)? (((int *)fts_stack_base(s))[(s)->top]): NULL)
+#define fts_stack_get_int(s, i) (((i) >= 0 && (i) <= (s)->top)? (((int *)fts_stack_base(s))[(i)]): NULL)
 
+#define fts_stack_init_object(s) __fts_stack_init(s, sizeof(fts_object_t *))
+#define fts_stack_push_object(s, o) fts_stack_push(s, fts_object_t *, o)
+#define fts_stack_top_object(s) (((s)->top >= 0)? (((fts_object_t **)fts_stack_base(s))[(s)->top]): NULL)
+#define fts_stack_get_object(s, i) (((i) >= 0 && (i) <= (s)->top)? (((fts_object_t **)fts_stack_base(s))[(i)]): NULL)
 
