@@ -193,10 +193,10 @@ int pt_common_init(pt_common_obj_t *x, long n_points, long n_period)
    if(n_points <= 0) n_points = DEF_n_points;
    if(
       n_points > pt_common_MAX_n_points ||
-      fts_fft_declaresize(n_points) != fts_Success
+      !fts_fft_declaresize(n_points)
    ){
       post("%s: frame size must be a power of 2 between %d and %d\n",
-         CLASS_NAME, FTS_MIN_FFT_SIZE, MAXIMUM(pt_common_MAX_n_points, FTS_MAX_FFT_SIZE)
+         CLASS_NAME, FTS_FFT_MIN_SIZE, MAXIMUM(pt_common_MAX_n_points, FTS_FFT_MAX_SIZE)
       );
       return(0);
    }      
