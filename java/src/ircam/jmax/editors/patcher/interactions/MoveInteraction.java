@@ -23,10 +23,8 @@ class MoveInteraction extends Interaction
 
   void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
-    switch (squeack)
+    if (Squeack.isDown(squeack) && Squeack.onObject(squeack))
       {
-      case (Squeack.DOWN | Squeack.OBJECT):
-	
 	object = (ErmesObject) dobject;
 	editor.getDisplayList().objectToFront(object);
 
@@ -41,17 +39,17 @@ class MoveInteraction extends Interaction
 	    ErmesSelection.patcherSelection.select(object);
 	    object.redraw();
 	  }
-	editor.setCursor(Cursor.getDefaultCursor());
-	break;
 
-      case Squeack.DRAG:
+	editor.setCursor(Cursor.getDefaultCursor());
+      }
+    else if (Squeack.isDrag(squeack))
+      {
 	ErmesSelection.patcherSelection.moveAllBy(mouse.x - oldMouse.x, mouse.y - oldMouse.y);
 	editor.fixSize(); 
-	break;
-
-      case Squeack.UP:
+      }
+    else if (Squeack.isUp(squeack))
+      {
 	editor.endInteraction();
-	break;
       }
   }
 }

@@ -10,6 +10,8 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/EditCtrlInteraction.java \
 	$(INCLUDE_PATH)/HResizeInteraction.java \
 	$(INCLUDE_PATH)/HelpInteraction.java \
+	$(INCLUDE_PATH)/PopUpInteraction.java \
+	$(INCLUDE_PATH)/BackgroundPopUpInteraction.java \
 	$(INCLUDE_PATH)/Interaction.java \
 	$(INCLUDE_PATH)/InteractionEngine.java \
 	$(INCLUDE_PATH)/MoveEditInteraction.java \

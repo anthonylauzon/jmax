@@ -30,6 +30,10 @@ class EditModeInteraction extends Interaction
       }
     else switch (squeack)
       {
+      case (Squeack.POP_UP | Squeack.BACKGROUND):
+	// Drag Select
+	return Interactions.backgroundPopUpInteraction;
+
       case (Squeack.DOWN | Squeack.BACKGROUND):
 	// Drag Select
 	return Interactions.dragSelectInteraction;
@@ -42,6 +46,10 @@ class EditModeInteraction extends Interaction
       case (Squeack.DOWN | Squeack.OBJECT):
 	// Drag Select
 	return Interactions.moveInteraction;
+
+      case (Squeack.POP_UP | Squeack.OBJECT):
+	// Drag Select
+	return Interactions.popUpInteraction;
 
       case (Squeack.DOWN | Squeack.TEXT):
 	// Drag Select

@@ -15,21 +15,36 @@ import ircam.jmax.editors.patcher.objects.*;
 
 class HelpInteraction extends Interaction
 {
+  boolean locked = false;
+
   void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
     ErmesObject object = null;
 
-    if (Squeack.onObject(squeack))
-      object = (ErmesObject) dobject;
-    else if (Squeack.onText(squeack))
-      object = ((TextSensibilityArea) dobject).getObject();
+    /* Please notes that since the ErrorDialog is modal, this interaction
+       will continue to receive events, and will not execute the "endInteraction"
+       until the OK button is pressed; that is why we have the locked flag; also,
+       it is happening in the same thread (the show method of the error dialog)
+       so there is nothing to do using synchronized and so on; we just need to ignore
+       events different than the first one.
+       */
 
-    if (object != null)
-      if (! FtsHelpPatchTable.openHelpPatch( object.getFtsObject()))
-	new ErrorDialog( editor.getSketchWindow(),
-			 "Sorry, no help for object " + object.getFtsObject().getClassName());
+    if ((! locked) && Squeack.isDown(squeack))
+      {
+	locked = true;
+	if (Squeack.onObject(squeack))
+	  object = (ErmesObject) dobject;
+	else if (Squeack.onText(squeack))
+	  object = ((TextSensibilityArea) dobject).getObject();
 
-    editor.endInteraction();
+	if (object != null)
+	  if (! FtsHelpPatchTable.openHelpPatch( object.getFtsObject()))
+	    new ErrorDialog( editor.getSketchWindow(),
+			     "Sorry, no help for object " + object.getFtsObject().getClassName());
+
+	locked = false;
+	editor.endInteraction();
+      }
   }
 }
 

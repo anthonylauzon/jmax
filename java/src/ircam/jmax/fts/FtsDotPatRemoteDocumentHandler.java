@@ -32,7 +32,7 @@ public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
 
   public FtsDotPatRemoteDocumentHandler()
   {
-    patDocumentIcon = IconCache.getIcon("mini_icon_pat.gif");
+    patDocumentIcon = Icons.get("_max_patcher_file_");
   }
 
   /** We can load from a file start with the "max v2" string*/

@@ -58,8 +58,8 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
 
     // Should depend on a flag.
 
-    if (MaxApplication.getProperty("jmaxNoConsole") == null ||
-	MaxApplication.getProperty("jmaxNoConsole").equals("false"))
+    if ((MaxApplication.getProperty("jmaxNoConsole") == null) || 
+	(MaxApplication.getProperty("jmaxNoConsole").equals("false")))
       {
 	System.setOut(itsConsole.getPrintStream());
       }

@@ -16,6 +16,7 @@ public class Squeack
   static public final int DOWN         = 0x3;
   static public final int UP           = 0x4;
   static public final int DOUBLE_CLICK = 0x5;
+  static public final int POP_UP       = 0x6;
 
   static public final int MOUSE_MASK  = 0xf;
 
@@ -43,6 +44,11 @@ public class Squeack
   static final public boolean isDoubleClick(int squeack)
   {
     return (squeack & MOUSE_MASK) == DOUBLE_CLICK;
+  }
+
+  static final public boolean isPopUp(int squeack)
+  {
+    return (squeack & MOUSE_MASK) == POP_UP;
   }
 
   // Modifiers, 4 bit reserved, multiple value possible, but not currently generated

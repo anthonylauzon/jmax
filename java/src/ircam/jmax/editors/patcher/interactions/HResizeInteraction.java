@@ -27,21 +27,20 @@ class HResizeInteraction extends Interaction
   {
     HResizeSensibilityArea area = (HResizeSensibilityArea) dobject;
 
-    switch (squeack)
+    if (Squeack.isDown(squeack) && Squeack.onHResizeHandle(squeack))
       {
-      case (Squeack.DOWN | Squeack.HRESIZE_HANDLE):
 	object = area.getObject();
 	editor.setCursor( Cursor.getPredefinedCursor( Cursor.E_RESIZE_CURSOR));
-	break;
-
-      case Squeack.DRAG:
+      }
+    else if (Squeack.isDrag(squeack))
+      {
 	object.redraw();
 	object.setWidth(mouse.x - object.getX());
 	object.redraw();
-	editor.fixSize(); 
-	break;
-
-      case Squeack.UP:
+	editor.fixSize();
+      }
+    else if (Squeack.isUp(squeack))
+      {
 	editor.setCursor(Cursor.getDefaultCursor());
 	editor.endInteraction();
       }

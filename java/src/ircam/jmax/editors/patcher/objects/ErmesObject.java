@@ -416,6 +416,27 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
       return null;
     }
 
+  // This method is called to edit the object by means of a popup
+  // structure
+
+  public void popUpEdit(Point p)
+  {
+  }
+
+  // This method is called when we want to edit the object 
+  // within this editor (its text content or equivalent)
+  // The point argument give the mouse click location, when
+  // it is usefull
+
+  public void edit()
+  {
+    edit(null);
+  }
+
+  public void edit(Point p)
+  {
+  }
+
   // This method is called whenever we want to edit the content of
   // an object within a separate editor; do nothing by default
 

@@ -63,10 +63,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjec
 	System.out.println("Error in redefining object, action cancelled");
       }
 
-    
-    // (em) adjust the size
-
-    updateDimensions();
+    super.redefine(text);
   }
 
 

@@ -35,9 +35,7 @@ public class ErmesObjComment extends ErmesObjEditableObject {
   {
     ((FtsCommentObject)itsFtsObject).setComment( text);
 
-    // Adjust the size
-
-    updateDimensions();
+    super.redefine(text);
   }
 
   // ----------------------------------------

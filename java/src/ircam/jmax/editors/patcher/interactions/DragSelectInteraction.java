@@ -29,14 +29,15 @@ class DragSelectInteraction extends Interaction
 
   void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
-    switch (squeack)
+    if (Squeack.isDown(squeack) && Squeack.onBackground(squeack))
       {
-      case (Squeack.DOWN | Squeack.BACKGROUND):
 	dragged = false;
 	dragStart.setLocation(mouse);
-	break;
-
-      case Squeack.DRAG:
+	ErmesSelection.patcherSelection.redraw();
+	ErmesSelection.patcherSelection.deselectAll();
+      }
+    else if (Squeack.isDrag(squeack))
+      {
 	if (dragged)
 	  editor.getDisplayList().redrawDragRectangle();
 
@@ -46,22 +47,12 @@ class DragSelectInteraction extends Interaction
 	editor.getDisplayList().selectExactly(editor.getDisplayList().getDragRectangle());
 	editor.getDisplayList().redrawDragRectangle();
 	dragged = true;
-	break;
-
-      case Squeack.UP:
-	if (dragged)
-	  {
-	    editor.getDisplayList().noDrag();
-	    editor.getDisplayList().redrawDragRectangle();
-	  }
-	else
-	  {
-	    ErmesSelection.patcherSelection.redraw();
-	    ErmesSelection.patcherSelection.deselectAll();
-	  }
-
+      }
+    else if (Squeack.isUp(squeack))
+      {
+	editor.getDisplayList().noDrag();
+	editor.getDisplayList().redrawDragRectangle();
 	editor.endInteraction();
-	break;
       }
   }
 }

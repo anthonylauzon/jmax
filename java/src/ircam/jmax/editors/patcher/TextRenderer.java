@@ -11,9 +11,10 @@ import javax.swing.event.*;
 
 //
 // The edit field contained in the editable objects (ErmesObjMessage, ErmesObjExternal).
-//
+// Must subclass JTextArea instead of just using it, because the getColumnWidth is
+// protected in JTextArea, and we *need* to know.
 
-public class TextRenderer extends JTextArea
+public class TextRenderer extends JTextArea implements ObjectRenderer
 {
   private ErmesObjEditableObject owner;
 
@@ -47,4 +48,27 @@ public class TextRenderer extends JTextArea
   {
     return width > getColumnWidth();
   }
+
+  public int getHeight()
+  {
+    return getPreferredSize().height;
+  }
+
+  public int getWidth()
+  {
+    return getPreferredSize().width;
+  }
+
+  public void setBackground(Color color)
+  {
+    super.setBackground(color);
+  }
+
+  static Container ic = new Panel();
+
+  public void render(Graphics g, int x, int y, int w, int h)
+  {
+    SwingUtilities.paintComponent(g, this, ic, x, y, w, h);
+  }
 }
+

@@ -8,51 +8,93 @@ import javax.swing.*;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
+import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.patcher.*;
 
 
 //
-// The base class of the ermes objects which are user-editable (ErmesObjMessage, ErmesObjExternal, ErmesObjPatcher).
+// The base class of the ermes objects which are user-editable
+// (ErmesObjMessage, ErmesObjExternal, ErmesObjPatcher).
 //
 
 abstract public class ErmesObjEditableObject extends ErmesObject implements FtsInletsListener, FtsOutletsListener
 {
   boolean editing = false;
-  TextRenderer textRenderer;
+  ircam.jmax.editors.patcher.ObjectRenderer renderer;
 
   ErmesObjEditableObject( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject);
 
-    textRenderer = new TextRenderer(this);
-    textRenderer.update();
+    Icon icon = Icons.get(itsFtsObject.getClassName());
 
-    if (getWidth() == -1)
-      setWidth( getFontMetrics().stringWidth( "pack 1 2 3") + 2*getTextXOffset());
+    if (icon != null)
+      {
+	renderer = new IconRenderer(this, icon);
+	renderer.update();
+	updateDimensions();
+      }
+    else
+      {
+	renderer = new TextRenderer(this);
+	renderer.update();
+
+	if (getWidth() == -1)
+	  setWidth( getFontMetrics().stringWidth( "pack 1 2 3") + 2*getTextXOffset());
+      }
   }
 
   public void updateDimensions()
   {
-    textRenderer.update();
-    super.setHeight(textRenderer.getPreferredSize().height + getTextHeightOffset());
+    renderer.update();
+    super.setHeight(renderer.getHeight() + getTextHeightOffset());
+    super.setWidth(renderer.getWidth() + getTextWidthOffset());
   }
 
   public void updateDimensionsNoConnections()
   {
-    textRenderer.update();
-    super.setHeightNoConnections(textRenderer.getPreferredSize().height + getTextHeightOffset());
+    renderer.update();
+    super.setHeightNoConnections(renderer.getHeight() + getTextHeightOffset());
   }
+
+  public void redefine( String text) 
+  {
+    // Change the renderer if needed
+
+    Icon icon = Icons.get(itsFtsObject.getClassName());
+
+    if (icon != null)
+      {
+	redraw();
+	renderer = new IconRenderer(this, icon);
+	renderer.update();
+	redraw();
+      }
+    else if (! (renderer instanceof TextRenderer))
+      {
+	redraw();
+	renderer = new TextRenderer(this);
+	renderer.update();
+	redraw();
+      }
+
+    
+    updateDimensions();
+
+    super.redefine(text);
+  }
+
 
   // redefined from base class
 
   public  void setWidth(int w) 
   {
-    // textRenderer.update();
+    // renderer.update();
 
-    if (textRenderer.canResizeWidthTo(w - getTextWidthOffset()))
+    if (renderer.canResizeWidthTo(w - getTextWidthOffset()))
       {
 	super.setWidth(w);
-	super.setHeight(textRenderer.getPreferredSize().height + getTextHeightOffset());
+	super.setHeight(renderer.getHeight() + getTextHeightOffset());
       }
   }
 
@@ -69,9 +111,8 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
   public void setFont( Font f)
   {
     super.setFont( f);
-    textRenderer.setFont(f);
-    textRenderer.update();
-    super.setHeight(textRenderer.getPreferredSize().height + getTextHeightOffset());
+    renderer.update();
+    super.setHeight(renderer.getHeight() + getTextHeightOffset());
   }
 
   // ----------------------------------------
@@ -116,22 +157,20 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
     itsSketchPad.getDisplayList().updateConnectionsFor(this);
   }
 
-  static Container ic = new Panel();
+
 
   public void DrawParsedString(Graphics g) 
   {
     if (editing)
       return;
 
-    textRenderer.setBackground(getTextBackground());
+    renderer.setBackground(getTextBackground());
 
-    SwingUtilities.paintComponent(g,
-				  textRenderer,
-				  ic,
-				  getX() + getTextXOffset(),
-				  getY() + getTextYOffset(),
-				  getWidth() - getTextWidthOffset(),
-				  getHeight() - getTextHeightOffset());
+    renderer.render(g, 
+		    getX() + getTextXOffset(),
+		    getY() + getTextYOffset(),
+		    getWidth() - getTextWidthOffset(),
+		    getHeight() - getTextHeightOffset());
   }
 
   // Text Sensibility area 
@@ -151,6 +190,13 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
       }
     else
       return super.findSensibilityArea( mouseX, mouseY);
+  }
+
+  // Edit
+
+  public void edit(Point point)
+  {
+    itsSketchPad.textEditObject(this, point);
   }
 }
 

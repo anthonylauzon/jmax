@@ -37,11 +37,11 @@ public class ObjectSetViewer extends JPanel {
 
     private static void loadImages()
     {
-      patcherIcon = IconCache.getIcon("tool_patcher.gif");
-      objectIcon  = IconCache.getIcon("tool_ext.gif");
-      errorIcon   = IconCache.getIcon("tool_err.gif");
-      commentIcon = IconCache.getIcon("tool_text.gif");
-      messageIcon = IconCache.getIcon("tool_mess.gif");
+      patcherIcon = Icons.get("_patcher_");
+      objectIcon  = Icons.get("_object_");
+      errorIcon   = Icons.get("_error_object_");
+      commentIcon = Icons.get("_comment_");
+      messageIcon = Icons.get("_message_box_");
     }
 
     public ObjectCellRenderer() 

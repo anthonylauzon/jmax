@@ -28,21 +28,20 @@ class VResizeInteraction extends Interaction
   {
     VResizeSensibilityArea area = (VResizeSensibilityArea) dobject;
 
-    switch (squeack)
+    if (Squeack.isDown(squeack) && Squeack.onVResizeHandle(squeack))
       {
-      case (Squeack.DOWN | Squeack.VRESIZE_HANDLE):
 	object = area.getObject();
 	editor.setCursor( Cursor.getPredefinedCursor( Cursor.S_RESIZE_CURSOR));
-	break;
-
-      case Squeack.DRAG:
+      }
+    else if (Squeack.isDrag(squeack))
+      {
 	object.redraw();
 	object.setHeight(mouse.y - object.getY());
 	object.redraw();
 	editor.fixSize(); 
-	break;
-
-      case Squeack.UP:
+      }
+    else if (Squeack.isUp(squeack))
+      {
 	editor.setCursor(Cursor.getDefaultCursor());
 	editor.endInteraction();
       }

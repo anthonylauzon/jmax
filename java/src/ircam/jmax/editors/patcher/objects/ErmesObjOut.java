@@ -60,11 +60,11 @@ public class ErmesObjOut extends ErmesObjInOut
     super.paint( g);
   }
 
-  public void editContent()
+  public void popUpEdit(Point p)
   {
     //we want to choose among the different Outlet number
 
     itsSketchPad.itsOutPop.SetNewOwner( this); //make the Choice pointing to this
-    itsSketchPad.itsOutPop.show( itsSketchPad, getX(), getY());
+    itsSketchPad.itsOutPop.show( itsSketchPad, p.x, p.y);
   }
 }

@@ -68,11 +68,9 @@ public class ErmesObjIn extends ErmesObjInOut {
     super.paint( g);
   }
 
-  public void editContent()
+  public void popUpEdit(Point p)
   {
-    //we want to choose among the different Inlet number
-
     itsSketchPad.itsInPop.SetNewOwner(this);
-    itsSketchPad.itsInPop.show(itsSketchPad, getX(), getY());
+    itsSketchPad.itsInPop.show(itsSketchPad, p.x, p.y);
   }
 }

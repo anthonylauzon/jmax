@@ -65,9 +65,7 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListen
   {
     ((FtsMessageObject)itsFtsObject).setMessage( text);
 
-    // adjust the size
-
-    updateDimensions();
+    super.redefine(text);
   }
 
   // Set the text when FTS change the message content

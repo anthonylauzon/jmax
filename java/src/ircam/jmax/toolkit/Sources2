@@ -23,7 +23,7 @@ SOURCES = \
 	$(INCLUDE_PATH)/EditorToolbar.java		\
 	$(INCLUDE_PATH)/GraphicContext.java		\
 	$(INCLUDE_PATH)/GraphicSelectionListener.java	\
-	$(INCLUDE_PATH)/IconCache.java			\
+	$(INCLUDE_PATH)/Icons.java			\
 	$(INCLUDE_PATH)/InfoPanel.java			\
 	$(INCLUDE_PATH)/InteractionModule.java		\
 	$(INCLUDE_PATH)/Layer.java			\

@@ -308,7 +308,10 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   
   final public Interaction getCurrentInteraction()
   {
-    return interactionStack[tos];
+    if (tos < 0)
+      return null;
+    else
+      return interactionStack[tos];
   }
 
   final public void popInteraction()
@@ -358,7 +361,9 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     sketch.stopTextEditing();
     sketch.requestFocus();
 
-    if (e.getClickCount() > 1)
+    if (e.isPopupTrigger())
+      processEvent(Squeack.POP_UP, e);
+    else if (e.getClickCount() > 1)
       processEvent(Squeack.DOUBLE_CLICK, e);
     else
       processEvent(Squeack.DOWN, e);

@@ -52,7 +52,7 @@ public class RegisterDialog {
 				  "Register", 
 				  JOptionPane.DEFAULT_OPTION, 
 				  JOptionPane.INFORMATION_MESSAGE, 
-				  IconCache.getIcon( "jmax_logo_tiny.gif"), 
+				  Icons.get( "_jmax_tiny_logo_"), 
 				  options, 
 				  options[0]);
   }

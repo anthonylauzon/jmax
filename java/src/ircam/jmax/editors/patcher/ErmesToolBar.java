@@ -38,10 +38,10 @@ public class ErmesToolBar extends JPanel  {
 
     setLayout( new BorderLayout());    
 
-    lockEditButton = new JToggleButton( IconCache.getIcon( "tool_lock_mode.gif"));
+    lockEditButton = new JToggleButton( Icons.get( "_lock_mode_"));
     lockEditButton.setDoubleBuffered( false);
     lockEditButton.setMargin( new Insets(0,0,0,0));
-    lockEditButton.setSelectedIcon( IconCache.getIcon( "tool_edit_mode.gif"));
+    lockEditButton.setSelectedIcon( Icons.get( "_edit_mode_"));
     lockEditButton.setFocusPainted( false);
     lockEditButton.addItemListener( new ItemListener() {
       public void itemStateChanged(ItemEvent e)
@@ -58,7 +58,7 @@ public class ErmesToolBar extends JPanel  {
     if ((sketch.itsPatcher.getParent() != null) &&
 	(sketch.itsPatcher.getParent() != Fts.getRootObject()))
       {
-	upButton = new JButton(IconCache.getIcon( "tool_up.gif"));
+	upButton = new JButton(Icons.get( "_up_"));
 	upButton.setDoubleBuffered( false);
 	upButton.setMargin( new Insets(0,0,0,0));
 	upButton.addActionListener( new ActionListener() {
@@ -142,21 +142,21 @@ public class ErmesToolBar extends JPanel  {
 
   private void addButton( String descr, String iconName)
   {
-    toolBar.add( new ErmesToolButton(this, descr, IconCache.getIcon(iconName)));
+    toolBar.add( new ErmesToolButton(this, descr, Icons.get(iconName)));
   }
 
   private void insertButtons()
   {
-    addButton( "", "tool_ext.gif");
-    addButton( "messbox", "tool_mess.gif");
-    addButton( "jpatcher", "tool_patcher.gif");
-    addButton( "inlet -1", "tool_in.gif");
-    addButton( "outlet -1","tool_out.gif");
-    addButton( "comment", "tool_text.gif");
-    addButton( "button",  "tool_bang.gif");
-    addButton( "toggle",  "tool_toggle.gif");
-    addButton( "slider",  "tool_slider.gif");
-    addButton( "intbox",   "tool_int.gif");
-    addButton( "floatbox", "tool_float.gif");
+    addButton( "", "_object_");
+    addButton( "messbox", "_message_box_");
+    addButton( "jpatcher", "_patcher_");
+    addButton( "inlet -1", "_inlet_");
+    addButton( "outlet -1","_outlet_");
+    addButton( "comment", "_comment_");
+    addButton( "button",  "_button_");
+    addButton( "toggle",  "_toggle_");
+    addButton( "slider",  "_slider_");
+    addButton( "intbox",   "_intbox_");
+    addButton( "floatbox", "_floatbox_");
   }
 }

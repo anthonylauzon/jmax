@@ -33,7 +33,7 @@ class DragConnectInteraction extends Interaction
 
   void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
-    if (squeack == (Squeack.DOWN | Squeack.OUTLET))
+    if (Squeack.isDown(squeack) && Squeack.onOutlet(squeack))
       {
 	OutletSensibilityArea area = (OutletSensibilityArea) dobject;
 
@@ -84,7 +84,7 @@ class DragConnectInteraction extends Interaction
 
 	editor.endInteraction();
       }
-    else if (squeack == (Squeack.DRAG | Squeack.INLET))
+    else if (Squeack.isDrag(squeack) && Squeack.onInlet(squeack))
       {
 	if (! destinationChoosen)
 	  {

@@ -51,10 +51,10 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
 
     setLayout( new BorderLayout());    
 
-    lockEditButton = new JToggleButton( IconCache.getIcon( "tool_lock_mode.gif"));
+    lockEditButton = new JToggleButton( Icons.get( "_lock_mode_"));
     lockEditButton.setDoubleBuffered( false);
     lockEditButton.setMargin( new Insets(0,0,0,0));
-    lockEditButton.setSelectedIcon( IconCache.getIcon( "tool_edit_mode.gif"));
+    lockEditButton.setSelectedIcon( Icons.get( "_edit_mode_"));
     lockEditButton.setFocusPainted( false);
     lockEditButton.addItemListener( new ItemListener() {
       public void itemStateChanged(ItemEvent e)
@@ -71,7 +71,7 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
     if ((itsSketchPad.itsPatcher.getParent() != null) &&
 	(itsSketchPad.itsPatcher.getParent() != Fts.getRootObject()))
       {
-	upButton = new JButton(IconCache.getIcon( "tool_up.gif"));
+	upButton = new JButton(Icons.get( "_up_"));
 	upButton.setDoubleBuffered( false);
 	upButton.setMargin( new Insets(0,0,0,0));
 	upButton.addActionListener( new ActionListener() {
@@ -227,23 +227,23 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
 
   private void addButton( Container toolbar, String descr, String iconName)
   {
-    ErmesSwToggleButton aToggleButton = new ErmesSwToggleButton( descr, IconCache.getIcon( iconName) );
+    ErmesSwToggleButton aToggleButton = new ErmesSwToggleButton( descr, Icons.get( iconName) );
     toolbar.add( aToggleButton);
     aToggleButton.addMouseListener( this);
   }
 
   private void insertButtons( Container toolbar)
   {
-    addButton( toolbar, "", "tool_ext.gif");
-    addButton( toolbar, "messbox", "tool_mess.gif");
-    addButton( toolbar, "jpatcher", "tool_patcher.gif");
-    addButton( toolbar, "inlet -1", "tool_in.gif");
-    addButton( toolbar, "outlet -1","tool_out.gif");
-    addButton( toolbar, "comment", "tool_text.gif");
-    addButton( toolbar, "button", "tool_bang.gif");
-    addButton( toolbar, "toggle", "tool_toggle.gif");
-    addButton( toolbar, "slider", "tool_slider.gif");
-    addButton( toolbar, "intbox", "tool_int.gif");
-    addButton( toolbar, "floatbox", "tool_float.gif");
+    addButton( toolbar, "", "_object_");
+    addButton( toolbar, "messbox", "_message_box_");
+    addButton( toolbar,"jpatcher", "_patcher_");
+    addButton( toolbar, "inlet -1", "_inlet_");
+    addButton( toolbar, "outlet -1","_outlet_");
+    addButton( toolbar, "comment", "_comment_");
+    addButton( toolbar, "button",  "_button_");
+    addButton( toolbar, "toggle",  "_toggle_");
+    addButton( toolbar, "slider",  "_slider_");
+    addButton( toolbar, "intbox",   "_intbox_");
+    addButton( toolbar, "floatbox", "_floatbox_");
   }
 }

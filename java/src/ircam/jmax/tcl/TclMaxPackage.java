@@ -47,11 +47,11 @@ public class TclMaxPackage
     /* Splash screen support */
 
     interp.createCommand("splash", new MaxSplashCmd());
+
+    /* Declare Icon */
+
+    interp.createCommand("declareIcon", new MaxDeclareIconCmd());
     
-    /* Preload command */
-
-    interp.createCommand("preloadClass", new MaxPreloadClassCmd());
-
     /* hooks */
 
     interp.createCommand("when", new MaxWhenCmd());

@@ -36,6 +36,8 @@ public class Interactions
   public static Interaction followInteraction      = new FollowInteraction();
   public static Interaction connectionSelectInteraction       = new ConnectionSelectInteraction();
   public static Interaction connectionToggleSelectInteraction = new ConnectionToggleSelectInteraction();
+  public static Interaction popUpInteraction = new PopUpInteraction();
+  public static Interaction backgroundPopUpInteraction = new BackgroundPopUpInteraction();
 }
 
 

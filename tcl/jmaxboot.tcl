@@ -59,6 +59,12 @@ source $jmaxRootDir/tcl/jmaxpkg.tcl
 source $jmaxRootDir/tcl/defaults.tcl
 
 ##
+## Load the system icons
+##
+
+source $jmaxRootDir/tcl/icons.tcl
+
+##
 ## Declare the 'virtual' jmax package
 ##
 

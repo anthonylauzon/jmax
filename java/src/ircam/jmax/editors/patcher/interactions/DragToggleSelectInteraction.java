@@ -29,9 +29,8 @@ class DragToggleSelectInteraction extends Interaction
 
   void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
-    switch (squeack)
+    if (Squeack.isDrag(squeack) && Squeack.isShift(squeack) && Squeack.onObject(squeack))
       {
-      case (Squeack.SHIFT | Squeack.DOWN | Squeack.OBJECT):
 	// Fake a drag of 1 pixel, to select the object we are in
 	// But do not draw the rectangle
 
@@ -39,16 +38,14 @@ class DragToggleSelectInteraction extends Interaction
 	dragStart.setLocation(mouse);
 	editor.getDisplayList().setDragRectangle(dragStart.x, dragStart.y, 1, 1);
 	editor.getDisplayList().toggleSelect(editor.getDisplayList().getDragRectangle());
-	break;
-
-      case (Squeack.SHIFT | Squeack.DOWN | Squeack.BACKGROUND):
-
+      }
+    else if (Squeack.isDrag(squeack) && Squeack.isShift(squeack) && Squeack.onBackground(squeack))
+      {
 	dragged = false;
 	dragStart.setLocation(mouse);
-	break;
-
-      case (Squeack.SHIFT | Squeack.DRAG):
-      case Squeack.DRAG:
+      }
+    else if (Squeack.isDrag(squeack))
+      {
 	if (dragged)
 	  {
 	    editor.getDisplayList().toggleSelect(editor.getDisplayList().getDragRectangle());
@@ -61,10 +58,9 @@ class DragToggleSelectInteraction extends Interaction
 	editor.getDisplayList().toggleSelect(editor.getDisplayList().getDragRectangle());
 	editor.getDisplayList().redrawDragRectangle();
 	dragged = true;
-	break;
-
-      case  Squeack.UP:
-      case (Squeack.SHIFT | Squeack.UP):
+      }
+    else if (Squeack.isUp(squeack))
+      {
 	if (dragged)
 	  {
 	    editor.getDisplayList().noDrag();
@@ -72,7 +68,6 @@ class DragToggleSelectInteraction extends Interaction
 	  }
 
 	editor.endInteraction();
-	break;
       }
   }
 }

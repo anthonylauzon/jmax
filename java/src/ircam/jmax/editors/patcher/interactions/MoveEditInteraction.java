@@ -24,18 +24,14 @@ class MoveEditInteraction extends Interaction
 
   void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
-    switch (squeack)
+    if (Squeack.isDown(squeack) && Squeack.onText(squeack))
       {
-      case (Squeack.DOWN | Squeack.TEXT):
-	
 	object = ((SensibilityArea) dobject).getObject();
 	editor.getDisplayList().objectToFront(object);
 	dragged = false;
-
-	break;
-
-      case Squeack.DRAG:
-
+      }
+    else if (Squeack.isDrag(squeack))
+      {
 	if (! dragged)
 	  {
 	    editor.setCursor(Cursor.getDefaultCursor());
@@ -57,9 +53,9 @@ class MoveEditInteraction extends Interaction
 
 	ErmesSelection.patcherSelection.moveAllBy(mouse.x - oldMouse.x, mouse.y - oldMouse.y);
 	editor.fixSize(); 
-	break;
-
-      case Squeack.UP:
+      }
+    else if (Squeack.isUp(squeack))
+      {
 	if (! dragged)
 	  {
 	    if (! ErmesSelection.patcherSelection.isEmpty() )
@@ -68,10 +64,10 @@ class MoveEditInteraction extends Interaction
 		ErmesSelection.patcherSelection.deselectAll();
 	      }
 
-	    editor.textEditObject((ErmesObjEditableObject)object, mouse);
+	    object.edit(mouse);
 	  }
+
 	editor.endInteraction();
-	break;
       }
   }
 }

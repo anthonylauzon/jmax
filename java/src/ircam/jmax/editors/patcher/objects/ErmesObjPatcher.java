@@ -39,8 +39,7 @@ class ErmesObjPatcher extends ErmesObjEditableObject
   {
     ( (FtsPatcherObject)itsFtsObject).redefinePatcher( text);
     
-    // adjust the size
-    updateDimensions();
+    super.redefine(text);
   }
 	
 

@@ -277,7 +277,7 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 
     displayList = new DisplayList(this);
     engine      = new InteractionEngine(this);
-
+    addPopUp    = new AddPopUp(this);
     keyMap = new KeyMap(this, this.getSketchWindow());
 
     // Next two temporary (mdc)
@@ -777,10 +777,22 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 
   void selectionChanged()
   {
+    // BUG ?? 
+
+    if (itsSketchWindow == null)
+      System.err.println("window null in sketch " + this);
+
     itsSketchWindow.selectionChanged();
   }
 
   // Support for the new Interaction Model
+
+  private AddPopUp addPopUp;
+
+  public void showAddPopUp(Point p)
+  {
+    addPopUp.show(this, p.x, p.y);
+  }
 
   private InteractionEngine engine;
 
