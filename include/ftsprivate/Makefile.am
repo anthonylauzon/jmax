@@ -25,6 +25,7 @@ patfile.h \
 platform.h \
 property.h \
 protocol.h \
+sched.h \
 selection.h \
 sigconn.h \
 template.h \
