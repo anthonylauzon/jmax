@@ -108,7 +108,7 @@ static void writesf_dsp( fts_word_t *argv)
 {
   writesf_t *self = (writesf_t *)fts_word_get_pointer( argv + 0);
   int n_tick = fts_word_get_int(argv + 1);
-  float* in = (float*)fts_word_get_pointer(argv + 2);
+  float* in;
   int n;
   int channels;
 
@@ -286,7 +286,6 @@ static void writesf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
 
   n_channels = fts_get_int_arg(ac, at, 0, 1);
   self->n_channels = (n_channels < 1) ? 1 : n_channels;
-
   if(ac == 2 && fts_is_symbol( at + 1))
   {
     self->filename = fts_get_symbol( at + 1);
@@ -320,8 +319,9 @@ static void writesf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
   /* start the fts_thread_manager */
   fts_thread_manager_start();
 
-  fts_dsp_object_init((fts_dsp_object_t *)o);
   fts_object_set_inlets_number(o, n_channels);
+
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void writesf_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
