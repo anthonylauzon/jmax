@@ -43,6 +43,8 @@
 
 /* just another one to remind: seed = 1664525 * seed + 1013904223; */
 
+#include <fts/fts.h>
+
 #define RA 16807 /* multiplier */
 #define RM 2147483647L /* 2**31 - 1 */
 #define RQ 127773L /* m div a */

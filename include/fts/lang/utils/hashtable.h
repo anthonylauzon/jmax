@@ -94,7 +94,7 @@ typedef struct {
  * @param initial_capacity the initial capacity of the hashtable. Can be one of: 
  * FTS_HASHTABLE_SMALL, FTS_HASHTABLE_MEDIUM, FTS_HASHTABLE_BIG 
  */
-extern void fts_hashtable_init( fts_hashtable_t *h, fts_type_t key_type, int initial_capacity);
+FTS_API void fts_hashtable_init( fts_hashtable_t *h, fts_type_t key_type, int initial_capacity);
 
 /**
  * Clears hashtable's content.<BR>
@@ -112,7 +112,7 @@ extern void fts_hashtable_clear( fts_hashtable_t *h);
  * @fn void fts_hashtable_destroy( fts_hashtable_t *h)
  * @param h the hashtable
  */
-extern void fts_hashtable_destroy( fts_hashtable_t *h);
+FTS_API void fts_hashtable_destroy( fts_hashtable_t *h);
 
 /**
  * Retrieve value mapped to specified key.
@@ -123,7 +123,7 @@ extern void fts_hashtable_destroy( fts_hashtable_t *h);
  * @param value a pointer for returning the retrieved value
  * @return 1 if key is mapped, 0 if not
  */
-extern int fts_hashtable_get( const fts_hashtable_t *h, const fts_atom_t *key, fts_atom_t *value);
+FTS_API int fts_hashtable_get( const fts_hashtable_t *h, const fts_atom_t *key, fts_atom_t *value);
 
 /**
  * Insert specified key mapped to specified value.
@@ -134,7 +134,7 @@ extern int fts_hashtable_get( const fts_hashtable_t *h, const fts_atom_t *key, f
  * @param value a pointer to the value to be inserted
  * @return 1 if entry was already mapped, 0 if not
  */
-extern int fts_hashtable_put( fts_hashtable_t *h, const fts_atom_t *key, fts_atom_t *value);
+FTS_API int fts_hashtable_put( fts_hashtable_t *h, const fts_atom_t *key, fts_atom_t *value);
 
 /**
  * Removes specified key 
@@ -144,9 +144,9 @@ extern int fts_hashtable_put( fts_hashtable_t *h, const fts_atom_t *key, fts_ato
  * @param key a pointer to the key to be removed
  * @return 1 if entry was mapped, 0 if not
  */
-extern int fts_hashtable_remove( fts_hashtable_t *h, const fts_atom_t *key);
+FTS_API int fts_hashtable_remove( fts_hashtable_t *h, const fts_atom_t *key);
 
-extern void fts_hashtable_stats( fts_hashtable_t *h);
+FTS_API void fts_hashtable_stats( fts_hashtable_t *h);
 
 /**
  * Returns an iterator to enumerate the keys contained in the hashtable
@@ -155,7 +155,7 @@ extern void fts_hashtable_stats( fts_hashtable_t *h);
  * @param h the hashtable
  * @param i the iterator
  */
-void fts_hashtable_get_keys( const fts_hashtable_t *h, fts_iterator_t *i);
+FTS_API void fts_hashtable_get_keys( const fts_hashtable_t *h, fts_iterator_t *i);
 
 /**
  * Returns an iterator to enumerate the values contained in the hashtable
@@ -164,6 +164,6 @@ void fts_hashtable_get_keys( const fts_hashtable_t *h, fts_iterator_t *i);
  * @param h the hashtable
  * @param i the iterator
  */
-void fts_hashtable_get_values( const fts_hashtable_t *h, fts_iterator_t *i);
+FTS_API void fts_hashtable_get_values( const fts_hashtable_t *h, fts_iterator_t *i);
 
 #endif

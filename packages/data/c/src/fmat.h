@@ -27,7 +27,7 @@
 #ifndef _DATA_FMAT_H_
 #define _DATA_FMAT_H_
 
-#include <fts/fts.h>
+#include "data.h"
 
 typedef struct _fmat_
 {
@@ -39,9 +39,9 @@ typedef struct _fmat_
   fts_symbol_t keep;
 } fmat_t;
 
-extern fts_class_t *fmat_class;
-extern fts_symbol_t fmat_symbol;
-extern fts_type_t fmat_type;
+DATA_API fts_class_t *fmat_class;
+DATA_API fts_symbol_t fmat_symbol;
+DATA_API fts_type_t fmat_type;
 
 #define fmat_get_m(x) ((x)->m)
 #define fmat_get_n(x) ((x)->n)
@@ -51,10 +51,10 @@ extern fts_type_t fmat_type;
 #define fmat_get_element(m, i, j) ((m)->values[(i) * (m)->n + (j)])
 #define fmat_set_element(m, i, j, x) ((m)->values[(i) * (m)->n + (j)] = (x))
 
-extern void fmat_set_const(fmat_t *mat, float c);
+DATA_API void fmat_set_const(fmat_t *mat, float c);
 #define fmat_zero(m) fmat_set_const((m), 0.0)
 
-extern void fmat_set_from_atom_list(fmat_t *mat, int offset, int ac, const fts_atom_t *at);
+DATA_API void fmat_set_from_atom_list(fmat_t *mat, int offset, int ac, const fts_atom_t *at);
 
 /* fmat atoms */
 #define fmat_atom_set(ap, x) fts_set_object_with_type((ap), (x), fmat_type)

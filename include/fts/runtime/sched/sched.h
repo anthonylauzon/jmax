@@ -56,7 +56,7 @@
  *
  * @ingroup sched
  */
-extern double fts_get_time(void);
+FTS_API double fts_get_time(void);
 
 /* make alias */
 #define fts_get_time_in_msec() (fts_get_time())

@@ -3489,7 +3489,7 @@
 	
 
 ..\fts\src\runtime\audio\nullaudioport.c : \
-	"..\..\..\progra~1\micros~1\vc98\include\basetsd.h"\
+	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\lang.h"\
 	"..\include\fts\lang\datalib.h"\
@@ -4875,7 +4875,7 @@
 	
 
 ..\fts\src\runtime\sched\sched.c : \
-	"..\..\..\progra~1\micros~1\vc98\include\basetsd.h"\
+	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	"..\include\fts\lang.h"\
 	"..\include\fts\lang\datalib.h"\
 	"..\include\fts\lang\datalib\atomlist.h"\
@@ -11171,5 +11171,5 @@
 	
 
 "..\fts\src\non-portable\win32.c" : \
-	"..\..\..\progra~1\micros~1\vc98\include\basetsd.h"\
+	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	

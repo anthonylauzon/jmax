@@ -27,7 +27,7 @@
 #ifndef _DATA_VALUE_H_
 #define _DATA_VALUE_H_
 
-#include <fts/fts.h>
+#include "data.h"
 
 typedef struct _value_
 {
@@ -35,11 +35,11 @@ typedef struct _value_
   fts_atom_t a;		
 } value_t;
 
-extern fts_class_t *value_class;
-extern fts_symbol_t value_symbol;
-extern fts_type_t value_type;
+DATA_API fts_class_t *value_class;
+DATA_API fts_symbol_t value_symbol;
+DATA_API fts_type_t value_type;
 
-extern void value_set(value_t *value, fts_atom_t a);
+DATA_API void value_set(value_t *value, fts_atom_t a);
 #define value_get(v) ((v)->a)
 
 /* value atoms */

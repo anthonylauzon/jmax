@@ -27,7 +27,7 @@
 #ifndef _DATA_BPF_H_
 #define _DATA_BPF_H_
 
-#include <fts/fts.h>
+#include "data.h"
 
 /*************************************************
  *
@@ -55,9 +55,9 @@ typedef struct _bpf_
   int opened; /* non zero if editor open */
 } bpf_t;
 
-extern fts_data_class_t *bpf_data_class;
-extern fts_symbol_t bpf_symbol;
-extern fts_type_t bpf_type;
+DATA_API fts_data_class_t *bpf_data_class;
+DATA_API fts_symbol_t bpf_symbol;
+DATA_API fts_type_t bpf_type;
 
 #define bpf_get_size(b) ((b)->size)
 
@@ -69,7 +69,7 @@ extern fts_type_t bpf_type;
 #define bpf_get_target(b) ((b)->points[(b)->size - 1].value)
 
 /* search index by time */
-extern int bpf_search_index(bpf_t *bpf, double time, int index);
+DATA_API int bpf_search_index(bpf_t *bpf, double time, int index);
 #define bpf_get_index(b, t) (bpf_search_index((b), (t), (b)->size / 2))
 
 /* bpf atoms */

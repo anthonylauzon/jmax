@@ -160,7 +160,7 @@
 #define HAVE_PROCESS_H 1
 #define HAVE_IO_H 1
 
-#define COMPILATION_ARCH_STRING "iX86-win32"
+#define COMPILATION_ARCH_STRING "i386-win32"
 
 #ifdef _DEBUG
 #define COMPILATION_MODE_STRING "debug"
@@ -168,7 +168,7 @@
 #define COMPILATION_MODE_STRING "opt"
 #endif
 
-#define COMPILATION_INFO_STRING "(compiled for iX86-win32)"
+#define COMPILATION_INFO_STRING "(compiled for i386-win32)"
 
 #if defined(FTSDLL_EXPORTS)
 #define FTS_API __declspec(dllexport)
@@ -187,6 +187,7 @@
 #define isatty _isatty
 #define alloca _alloca
 #define getpid _getpid
+#define snprintf _snprintf
 #define bcopy(src,dst,n)  memcpy(dst,src,n)
 
 #define realpath  win32_realpath

@@ -26,7 +26,7 @@ typedef struct _sample
   int length; /* source length */ 
   float amp; /* amplitude */
 
-  enum state {state_fadein, state_sustain, state_fadeout};
+  enum {state_fadein, state_sustain, state_fadeout} state;
   int fadein; /* duration in samples */
   int sustain;
   int fadeout;

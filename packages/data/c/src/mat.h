@@ -27,11 +27,11 @@
 #ifndef _DATA_MAT_H_
 #define _DATA_MAT_H_
 
-#include <fts/fts.h>
+#include "data.h"
 
-extern fts_type_t mat_type;
-extern fts_symbol_t mat_symbol;
-extern fts_class_t *mat_class;
+DATA_API fts_type_t mat_type;
+DATA_API fts_symbol_t mat_symbol;
+DATA_API fts_class_t *mat_class;
 
 typedef struct
 {
@@ -42,29 +42,29 @@ typedef struct
   int alloc; /* current alloc size for lazy allocation */
 } mat_t;
 
-extern void mat_set_size(mat_t *mat, int m, int n);
+DATA_API void mat_set_size(mat_t *mat, int m, int n);
 #define mat_get_m(x) ((x)->m)
 #define mat_get_n(x) ((x)->n)
 
 #define mat_get_ptr(x) ((x)->data)
 
-extern void mat_set_element(mat_t *mat, int i, int j, fts_atom_t atom);
+DATA_API void mat_set_element(mat_t *mat, int i, int j, fts_atom_t atom);
 #define mat_get_element(x, i, j) ((x)->data[(i) * (x)->n + (j)])
-extern void mat_void_element(mat_t *mat, int i, int j);
+DATA_API void mat_void_element(mat_t *mat, int i, int j);
 
 #define mat_get_row(x, i) ((x)->data + (i) * (x)->n)
 
-extern void mat_void(mat_t *mat);
-extern void mat_set_const(mat_t *mat, fts_atom_t atom);
+DATA_API void mat_void(mat_t *mat);
+DATA_API void mat_set_const(mat_t *mat, fts_atom_t atom);
 
-extern void mat_set_from_atom_list(mat_t *mat, int offset, int ac, const fts_atom_t *at);
+DATA_API void mat_set_from_atom_list(mat_t *mat, int offset, int ac, const fts_atom_t *at);
 
-extern int mat_read_atom_file_newline(mat_t *mat, fts_symbol_t file_name);
-extern int mat_write_atom_file_newline(mat_t *mat, fts_symbol_t file_name);
+DATA_API int mat_read_atom_file_newline(mat_t *mat, fts_symbol_t file_name);
+DATA_API int mat_write_atom_file_newline(mat_t *mat, fts_symbol_t file_name);
 
-extern int mat_read_atom_file_separator(mat_t *mat, fts_symbol_t file_name, 
+DATA_API int mat_read_atom_file_separator(mat_t *mat, fts_symbol_t file_name, 
 					      fts_symbol_t separator, int ac, const fts_atom_t *at);
-extern int mat_write_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t separator);
+DATA_API int mat_write_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t separator);
 
 /* mat atoms */
 #define mat_atom_set(ap, x) fts_set_object_with_type((ap), (x), mat_type)

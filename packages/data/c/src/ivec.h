@@ -27,7 +27,7 @@
 #ifndef _DATA_IVEC_H_
 #define _DATA_IVEC_H_
 
-#include <fts/fts.h>
+#include "data.h"
 
 typedef struct _ivec_
 {
@@ -44,14 +44,14 @@ typedef struct _ivec_
   struct _ivec_ *copy;
 } ivec_t;
 
-extern fts_class_t *ivec_class;
-extern fts_symbol_t ivec_symbol;
-extern fts_type_t ivec_type;
+DATA_API fts_class_t *ivec_class;
+DATA_API fts_symbol_t ivec_symbol;
+DATA_API fts_type_t ivec_type;
 
-extern void ivec_set_from_atom_list(ivec_t *vector, int offset, int ac, const fts_atom_t *at);
+DATA_API void ivec_set_from_atom_list(ivec_t *vector, int offset, int ac, const fts_atom_t *at);
 
 #define ivec_get_size(v) ((v)->size)
-extern void ivec_set_size(ivec_t *vector, int size);
+DATA_API void ivec_set_size(ivec_t *vector, int size);
 
 #define ivec_get_ptr(v) ((v)->values)
 
@@ -61,12 +61,12 @@ extern void ivec_set_size(ivec_t *vector, int size);
 void ivec_set_const(ivec_t *vector, int c);
 #define ivec_zero(v) ivec_set_const((v), 0)
 
-extern void ivec_set_from_atom_list(ivec_t *vector, int offset, int ac, const fts_atom_t *at);
+DATA_API void ivec_set_from_atom_list(ivec_t *vector, int offset, int ac, const fts_atom_t *at);
 
-extern int ivec_get_sum(ivec_t *vector);
-extern int ivec_get_sub_sum(ivec_t *vector, int from, int to);
-extern int ivec_get_min_value(ivec_t *vector);
-extern int ivec_get_max_value(ivec_t *vector);
+DATA_API int ivec_get_sum(ivec_t *vector);
+DATA_API int ivec_get_sub_sum(ivec_t *vector, int from, int to);
+DATA_API int ivec_get_min_value(ivec_t *vector);
+DATA_API int ivec_get_max_value(ivec_t *vector);
 
 /* ivec atoms */
 #define ivec_atom_set(ap, x) fts_set_object_with_type((ap), (x), ivec_type)

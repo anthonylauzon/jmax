@@ -26,7 +26,6 @@
 
 #include <fts/fts.h>
 
-extern void ucs_config(void);
 extern void dsp_config(void);
 extern void arch_config(void);
 
@@ -42,7 +41,6 @@ extern void bus_tilda_config(void);
 static void
 system_module_init(void)
 {
-  ucs_config();
   dsp_config();
   arch_config();
 

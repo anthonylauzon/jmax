@@ -27,11 +27,11 @@
 #ifndef _DATA_COL_H_
 #define _DATA_COL_H_
 
-#include <fts/fts.h>
+#include "data.h"
 
-extern fts_type_t col_type;
-extern fts_symbol_t col_symbol;
-extern fts_class_t *col_class;
+DATA_API fts_type_t col_type;
+DATA_API fts_symbol_t col_symbol;
+DATA_API fts_class_t *col_class;
 
 typedef struct
 {
@@ -42,17 +42,17 @@ typedef struct
 
 #define col_get_size(x) ((x)->n)
 
-extern void col_set_element(col_t *col, int i, fts_atom_t atom);
+DATA_API void col_set_element(col_t *col, int i, fts_atom_t atom);
 #define col_get_element(x, i) ((x)->mat->data[(i) * (x)->mat->n + (x)->(j)])
 
 #define col_check(x) ((x)->j < (x)->mat->n)
 #define col_get_onset(x) 
 #define col_get_step(x) 
 
-extern void col_void(col_t *col);
-extern void col_set_const(col_t *col, fts_atom_t atom);
+DATA_API void col_void(col_t *col);
+DATA_API void col_set_const(col_t *col, fts_atom_t atom);
 
-extern void col_set_from_list(col_t *col, int ac, const fts_atom_t *at);
+DATA_API void col_set_from_list(col_t *col, int ac, const fts_atom_t *at);
 
 /* col atoms */
 #define col_atom_set(ap, x) fts_set_object_with_type((ap), (x), col_type)

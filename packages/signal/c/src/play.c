@@ -25,9 +25,8 @@
  */
 
 #include <fts/fts.h>
+#include <float.h>
 #include "play.h"
-
-#define MAX_DOUBLE ((double)179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.0)
 
 static fts_hashtable_t signal_play_class_table;
 static fts_symbol_t signal_play_symbol = 0;
@@ -35,13 +34,13 @@ static fts_symbol_t signal_play_symbol = 0;
 void
 signal_play_set_conv_position(signal_play_t *this, double c)
 {
-  if(this->begin < MAX_DOUBLE)
+  if(this->begin < DBL_MAX)
     this->begin *= c / this->conv_position;
 
-  if(this->end < MAX_DOUBLE)
+  if(this->end < DBL_MAX)
     this->end *= c / this->conv_position;
 
-  if(this->position < MAX_DOUBLE)
+  if(this->position < DBL_MAX)
     this->position *= c / this->conv_position;
 
   this->conv_position = c;
@@ -245,7 +244,7 @@ signal_play_init(signal_play_t *this, int ac, const fts_atom_t *at)
 { 
   this->position = 0.0;
   this->begin = 0.0;
-  this->end = MAX_DOUBLE;
+  this->end = DBL_MAX;
   this->step = 1.0;
 
   this->conv_position = 1.0;

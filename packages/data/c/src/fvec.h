@@ -27,7 +27,7 @@
 #ifndef _DATA_FVEC_H_
 #define _DATA_FVEC_H_
 
-#include <fts/fts.h>
+#include "data.h"
 
 typedef struct _fvec_
 {
@@ -39,29 +39,29 @@ typedef struct _fvec_
   float sr; /* sr > 0: force sample rate when loading sample files, sr <= 0: sample rate of current file */
 } fvec_t;
 
-extern fts_class_t *fvec_class;
-extern fts_symbol_t fvec_symbol;
-extern fts_type_t fvec_type;
+DATA_API fts_class_t *fvec_class;
+DATA_API fts_symbol_t fvec_symbol;
+DATA_API fts_type_t fvec_type;
 
 #define fvec_get_sr(v) ((((v)->sr) > 0)? ((v)->sr): (-(v)->sr))
 
 #define fvec_get_size(v) ((v)->size)
-extern void fvec_set_size(fvec_t *vector, int size);
+DATA_API void fvec_set_size(fvec_t *vector, int size);
 
 #define fvec_get_ptr(v) ((v)->values)
 
 #define fvec_get_element(v, i) ((v)->values[i])
 #define fvec_set_element(v, i, x) ((v)->values[i] = (x))
 
-extern void fvec_set_const(fvec_t *vector, float c);
+DATA_API void fvec_set_const(fvec_t *vector, float c);
 #define fvec_zero(v) fvec_set_const((v), 0.0)
 
-extern void fvec_set_from_atom_list(fvec_t *vector, int offset, int ac, const fts_atom_t *at);
+DATA_API void fvec_set_from_atom_list(fvec_t *vector, int offset, int ac, const fts_atom_t *at);
 
-extern float fvec_get_sum(fvec_t *vector);
-extern float fvec_get_sub_sum(fvec_t *vector, int from, int to);
-extern float fvec_get_min_value(fvec_t *vector);
-extern float fvec_get_max_value(fvec_t *vector);
+DATA_API float fvec_get_sum(fvec_t *vector);
+DATA_API float fvec_get_sub_sum(fvec_t *vector, int from, int to);
+DATA_API float fvec_get_min_value(fvec_t *vector);
+DATA_API float fvec_get_max_value(fvec_t *vector);
 
 /* fvec atoms */
 #define fvec_atom_set(ap, x) fts_set_object_with_type((ap), (x), fvec_type)

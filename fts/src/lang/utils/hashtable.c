@@ -22,6 +22,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <fts/sys.h>
 #include <fts/lang.h>
 
 #define FTS_HASHTABLE_STANDARD_LOAD_FACTOR  0.75
