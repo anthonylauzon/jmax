@@ -173,8 +173,7 @@ wave_init_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   wave_t *this = (wave_t *)o;
 
   wave_init(o, 0, 0, 0, 0);
-
-  wave_set_fvec(o, 0, 0, 1, at + 1);
+  wave_set_fvec(o, 0, 0, 1, at);
 }
 
 /***************************************************************************************

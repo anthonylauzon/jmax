@@ -1235,9 +1235,6 @@ __fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_package_t* pkg = (fts_package_t *)o;
   fts_atom_t a;
 
-  ac--;
-  at++;
-
   if ((ac > 0) && fts_is_symbol(at)) { 
     pkg->name = fts_get_symbol(at);
   } else {
@@ -1628,7 +1625,7 @@ fts_kernel_package_init(void)
   /* create the system package */
   system_symbol = fts_new_symbol("_system_");
   fts_s_package = fts_new_symbol("package");
-  fts_set_symbol(&a, fts_s_package);
+
 
   /* since we need a class to construct a package and a package to
      find a class, we have to do some non standard hacking to
@@ -1643,9 +1640,10 @@ fts_kernel_package_init(void)
   fts_system_package->object.out_conn = 0;
   fts_system_package->object.in_conn = (fts_connection_t **) fts_zalloc(sizeof(fts_connection_t *));
   
-  __fts_package_init((fts_object_t*) fts_system_package, 0, fts_s_init, 1, &a); 
+  __fts_package_init((fts_object_t*) fts_system_package, 0, fts_s_init, 0, 0); 
   fts_package_set_state(fts_system_package, fts_package_loaded); 
 
+  fts_set_symbol(&a, fts_new_symbol("builtin"));
   fts_set_pointer(&p, fts_system_package);
   fts_hashtable_put(&fts_packages, &a, &p);
 

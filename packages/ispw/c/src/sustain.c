@@ -138,8 +138,8 @@ sustain_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   sustain_t *this = (sustain_t *)o;
 
   this->sustained_notes = 0;
-  this->vel = fts_get_int_arg(ac, at, 1, 0);
-  this->sust = fts_get_int_arg(ac, at, 2, 0);
+  this->vel = fts_get_int_arg(ac, at, 0, 0);
+  this->sust = fts_get_int_arg(ac, at, 1, 0);
 }
 
 

@@ -49,7 +49,7 @@ static fts_symbol_t s_mmap_noninterleaved, s_mmap_interleaved, s_rw_noninterleav
 #define DEFAULT_FORMAT s_s32_le
 #define DEFAULT_ACCESS s_mmap_noninterleaved
 #define DEFAULT_SAMPLING_RATE (44100.)
-#define DEFAULT_FIFO_SIZE 512
+#define DEFAULT_FIFO_SIZE 4096
 #define DEFAULT_INPUT_CHANNELS 26
 #define DEFAULT_OUTPUT_CHANNELS 26
 
@@ -670,8 +670,6 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
 
   fts_audioport_init( &this->head);
 
-  ac--;
-  at++;
   sr = fts_dsp_get_sample_rate();
   sampling_rate = (int)sr ;
   fifo_size = fts_param_get_int(fts_s_fifo_size, DEFAULT_FIFO_SIZE);

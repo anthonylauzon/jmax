@@ -52,7 +52,7 @@ select_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   select_t *this = (select_t *)o;
   int i;
 
-  this->compare = fts_get_int_arg(ac, at, 1, 0);
+  this->compare = fts_get_int_arg(ac, at, 0, 0);
 }
 
 static void
@@ -65,7 +65,7 @@ select_multi_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   this->compare = (int *)fts_malloc(this->n_compares * sizeof(int));
 
   for(i=0; i<this->n_compares; i++)
-    this->compare[i] = fts_get_int_arg(ac, at, i+1, 0);    
+    this->compare[i] = fts_get_int_arg(ac, at, i, 0);
 }
 
 static void

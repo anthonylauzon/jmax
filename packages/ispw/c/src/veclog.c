@@ -202,9 +202,6 @@ veclog_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   veclog_t *obj = (veclog_t *)o;
 
-  ac--;
-  at++;
-
   if(ac > 0 && fts_is_number(at))
     veclog_set_base(o, 0, 0, 1, at);
   else
@@ -218,9 +215,6 @@ siglog_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   veclog_t *obj = (veclog_t *)o;
 
-  ac--;
-  at++;
- 
   if(ac > 0 && fts_is_number(at))
     siglog_set_base(o, 0, 0, 1, at);
   else

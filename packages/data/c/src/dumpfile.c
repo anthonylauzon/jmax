@@ -319,9 +319,6 @@ dumpfile_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   dumpfile_t *this = (dumpfile_t *)o;
 
-  ac--;
-  at++;
-
   /* init super */
   fts_dumper_init((fts_dumper_t *)this, dumpfile_dumper_send);
 

@@ -460,9 +460,6 @@ seqplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   seqplay_t *this = (seqplay_t *)o;
   fts_timebase_t *pseudo = (fts_timebase_t *)o;
   
-  ac--;
-  at++;
-
   fts_timebase_init(pseudo); /* init local (pseudo) timebase */
 
   this->timebase = fts_get_timebase();

@@ -48,9 +48,6 @@ tabpoke_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   tabpoke_t *this = (tabpoke_t *)o;
 
-  ac--;
-  at++;
-
   if(ac > 0 && fts_is_symbol(at))
     {
       fts_symbol_t tab_name = fts_get_symbol(at);

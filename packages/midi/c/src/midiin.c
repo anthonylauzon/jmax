@@ -270,9 +270,6 @@ midiin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 { 
   midiin_t *this = (midiin_t *)o;
 
-  ac--;
-  at++;
-
   this->port = midiin_get_port(o, ac, at);
   
   if(this->port)
@@ -291,9 +288,6 @@ static void
 notein_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   midiin_t *this = (midiin_t *)o;
-
-  ac--;
-  at++;
 
   this->type = midi_note;
   this->port = midiin_get_port(o, ac, at);
@@ -317,9 +311,6 @@ polyin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 { 
   midiin_t *this = (midiin_t *)o;
   
-  ac--;
-  at++;
-
   this->type = midi_poly_pressure;
   this->port = midiin_get_port(o, ac, at);
 
@@ -341,9 +332,6 @@ ctlin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 { 
   midiin_t *this = (midiin_t *)o;
   
-  ac--;
-  at++;
-
   this->type = midi_control_change;
   this->port = midiin_get_port(o, ac, at);
 
@@ -365,9 +353,6 @@ pgmin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 { 
   midiin_t *this = (midiin_t *)o;
   
-  ac--;
-  at++;
-
   this->type = midi_program_change;
   this->port = midiin_get_port(o, ac, at);
 
@@ -387,9 +372,6 @@ touchin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 { 
   midiin_t *this = (midiin_t *)o;
   
-  ac--;
-  at++;
-
   this->type = midi_channel_pressure;
   this->port = midiin_get_port(o, ac, at);
 
@@ -409,9 +391,6 @@ bendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 { 
   midiin_t *this = (midiin_t *)o;
   
-  ac--;
-  at++;
-
   this->type = midi_pitch_bend;
   this->port = midiin_get_port(o, ac, at);
 
@@ -431,9 +410,6 @@ xbendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 { 
   midiin_t *this = (midiin_t *)o;
   
-  ac--;
-  at++;
-
   this->type = midi_pitch_bend;
   this->port = midiin_get_port(o, ac, at);
 

@@ -409,9 +409,6 @@ vecdisplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
 
-  ac--;
-  at++;
-
   /* silent agreement with client */
   this->min = 0.0;
   this->max = 127.0;

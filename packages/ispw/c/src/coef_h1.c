@@ -100,22 +100,29 @@ sigcoef_hlshelf1_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 /*  int i, z = 0, b; */
 
 
-  k0 = fts_get_float_arg(ac, at, 1, 0.0f);   
-  k1 = fts_get_float_arg(ac, at, 2, 0.0f);   
-  k2 = fts_get_float_arg(ac, at, 3, 0.0f);   
-  f1 = fts_get_float_arg(ac, at, 4, 0.0f);   
-  f2 = fts_get_float_arg(ac, at, 5, 0.0f);   
+  k0 = fts_get_float_arg(ac, at, 0, 0.0f);   
+  k1 = fts_get_float_arg(ac, at, 1, 0.0f);   
+  k2 = fts_get_float_arg(ac, at, 2, 0.0f);   
+  f1 = fts_get_float_arg(ac, at, 3, 0.0f);   
+  f2 = fts_get_float_arg(ac, at, 4, 0.0f);   
 
-  if (f1 == 0.0f && f2 == 0.0f){ /* all gains = 0db */
-   f1 = 150.0f;	
-    f2 = 5000.0f;
-  }
-  if (f1 < 0) f1 = 0.0f;
-  if (f2 > MAXSRATE) f2 = .5f*MAXSRATE;
-  if (f1 >= f2){
-    post("sigcoef_hlshelf1_new: low shelf Fq. >=  high shelf Fq. - can't continue\n");
-    return;
-  }
+  if (f1 == 0.0f && f2 == 0.0f)
+    { /* all gains = 0db */
+      f1 = 150.0f;	
+      f2 = 5000.0f;
+    }
+
+  if (f1 < 0) 
+    f1 = 0.0f;
+
+  if (f2 > MAXSRATE) 
+    f2 = .5f*MAXSRATE;
+
+  if (f1 >= f2)
+    {
+      post("sigcoef_hlshelf1_new: low shelf Fq. >=  high shelf Fq. - can't continue\n");
+      return;
+    }
  
   this->s_rate = MAXSRATE;		/* srate default  */
   this->s_gain0 = k0;

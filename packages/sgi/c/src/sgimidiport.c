@@ -302,7 +302,7 @@ static void
 sgimidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   sgimidiport_t *this = (sgimidiport_t *)o;
-  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
+  fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
   int open = 0;
 
   this->in = 0;

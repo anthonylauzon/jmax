@@ -433,9 +433,6 @@ play_fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 { 
   play_fvec_t *this = (play_fvec_t *)o;
 
-  ac--;
-  at++;
-
   this->fvec = 0;
 
   this->position = 0.0;

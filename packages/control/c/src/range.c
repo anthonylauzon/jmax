@@ -46,15 +46,15 @@ range_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   range_t *this = (range_t *)o;
   int i, n;
 
-  if(ac < 2)
+  if(ac == 0)
     n = 1;
   else 
-    n = ac - 1;
+    n = ac;
 
   this->i_points = fts_malloc(sizeof(int) * n);
   this->f_points = fts_malloc(sizeof(float) * n);
 
-  if(ac <= 1)
+  if(ac == 0)
     {
       this->i_points[0] = 0;
       this->f_points[0] = 0.0f;
@@ -63,7 +63,7 @@ range_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     {
       for(i=0; i<n; i++)
 	{
-	  const fts_atom_t *ap = at + 1 + i;
+	  const fts_atom_t *ap = at + i;
 	  
 	  if(fts_is_int(ap))
 	    {

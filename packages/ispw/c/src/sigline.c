@@ -141,7 +141,7 @@ static void
 sigline_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigline_t *this = (sigline_t *)o;
-  int down = fts_get_int_arg(ac, at, 1, 0);
+  int down = fts_get_int_arg(ac, at, 0, 0);
   double df;
   float f;
   int i;

@@ -66,7 +66,7 @@ getval_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   getval_t *this = (getval_t *)o;
 
-  this->obj = fts_get_object(at + 1);
+  this->obj = fts_get_object(at);
   fts_object_refer(this->obj);
 }
 
@@ -75,15 +75,15 @@ getelem_vec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   getelem_vec_t *this = (getelem_vec_t *)o;
 
-  if(ac == 2)
+  if(ac == 1)
     {
       this->i = 0;
-      this->obj = fts_get_object(at + 1);
+      this->obj = fts_get_object(at);
     }
   else
     {
-      this->i = fts_get_number_int(at + 1);
-      this->obj = fts_get_object(at + 2);
+      this->i = fts_get_number_int(at + 0);
+      this->obj = fts_get_object(at + 1);
     }
 
   fts_object_refer(this->obj);
@@ -94,34 +94,34 @@ getelem_mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   getelem_mat_t *this = (getelem_mat_t *)o;
 
-  if(ac == 2)
+  if(ac == 1)
     {
       this->i = 0;
       this->j = 0;
-      this->obj = fts_get_object(at + 1);
+      this->obj = fts_get_object(at);
     }
-  else if(ac == 3)
+  else if(ac == 2)
     {
       this->i = 0;
 
-      if(fts_is_number(at + 1))
-	this->j = fts_get_number_int(at + 1);
+      if(fts_is_number(at))
+	this->j = fts_get_number_int(at);
       else
 	fts_object_set_error(o, "Invalid index argument");
 
-      this->obj = fts_get_object(at + 2);
+      this->obj = fts_get_object(at + 1);
     }
   else
     {
-      if(fts_is_number(at + 1) && fts_is_number(at + 2))
+      if(fts_is_number(at + 0) && fts_is_number(at + 1))
 	{
-	  this->i = fts_get_number_int(at + 1);
-	  this->j = fts_get_number_int(at + 2);
+	  this->i = fts_get_number_int(at + 0);
+	  this->j = fts_get_number_int(at + 1);
 	}
       else
 	fts_object_set_error(o, "Invalid index argument");
 
-      this->obj = fts_get_object(at + 3);
+      this->obj = fts_get_object(at + 2);
     }
 
   fts_object_refer(this->obj);

@@ -273,9 +273,6 @@ line_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   line_t *this = (line_t *)o;
 
-  ac--;
-  at++;
-
   this->target = 0.0;
   this->steps = 0;
   this->inval = 0;

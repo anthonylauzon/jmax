@@ -99,9 +99,6 @@ iroute_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   iroute_t *this = (iroute_t *)o;
   int i;
 
-  ac--;
-  at++;
-
   this->ns = ac;
   this->ints = (int *)fts_malloc(sizeof(int) * ac);
 
@@ -251,9 +248,6 @@ mroute_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   mroute_t *this = (mroute_t *)o;
   int i;
-
-  ac--; 
-  at++;
 
   this->ns = ac;
   this->symbols = (fts_symbol_t *)fts_malloc(sizeof(fts_symbol_t) * ac);

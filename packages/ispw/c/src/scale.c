@@ -162,8 +162,6 @@ scale_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_
   scale_t *x = (scale_t *)o;
   int  i;
 
-  ac--; at++;			/* throw away class name argument */
-
   if (ac > 0)
     {
       for (i = 0; i < ac; i++)

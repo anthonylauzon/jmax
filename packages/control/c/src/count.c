@@ -459,9 +459,6 @@ count_int_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 { 
   count_int_t *this = (count_int_t *)o;
 
-  ac--;
-  at++;
-  
   this->mode = mode_wrap;
   this->value = 0;
   this->begin = 0;
@@ -478,9 +475,6 @@ count_float_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 { 
   count_float_t *this = (count_float_t *)o;
 
-  ac--;
-  at++;
-  
   this->mode = mode_wrap;
   this->value = 0.0;
   this->begin = 0.0;

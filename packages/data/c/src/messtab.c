@@ -610,9 +610,6 @@ getmess_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   getmess_t *this = (getmess_t *)o;
 
-  ac--;
-  at++;
-
   this->messtab = 0;
   fts_set_int(&this->key, 0);
   
@@ -712,9 +709,6 @@ messtab_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   messtab_t *this = (messtab_t *)o;
   int i;
-
-  ac--;
-  at++;
 
   fts_hashtable_init(&this->table_int, FTS_HASHTABLE_INT, FTS_HASHTABLE_SMALL);
   fts_hashtable_init(&this->table_symbol, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);

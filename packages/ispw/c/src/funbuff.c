@@ -1075,9 +1075,6 @@ funbuff_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   funbuff_t *this = (funbuff_t *)o;
 
-  ac--;
-  at++;
-
   this->head.prev = 0;
   this->head.next = 0;
   this->head.x = -0x0FFFFFFFF;

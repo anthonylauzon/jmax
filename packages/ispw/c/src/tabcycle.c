@@ -60,9 +60,6 @@ tabcycle_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   tabcycle_t *this = (tabcycle_t *)o;
 
-  ac--;
-  at++;
-
   if(ac == 2 && fts_is_symbol(at) && fts_is_int(at + 1))
     {
       fts_symbol_t tab_name = fts_get_symbol_arg(ac, at, 0, 0);

@@ -133,9 +133,6 @@ access_tilda_bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, cons
   access_tilda_bus_t *this = (access_tilda_bus_t *)o;
   fts_signal_bus_t **bus;
 
-  ac--;
-  at++;
-
   this->bus = 0;
   this->n_channels = 0;
 
@@ -184,9 +181,6 @@ access_tilda_channel_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, 
   access_tilda_channel_t *this = (access_tilda_channel_t *)o;
   int *channel;
 
-  ac--;
-  at++;
-  
   this->bus = 0;
   this->channel = 0;
 
@@ -685,9 +679,6 @@ bus_tilda_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_a
   fts_atom_t a;
   int n_channels = 0;
   
-  ac--;
-  at++;
-
   if(ac == 0)
     n_channels = 1;
   else if(ac == 1 && fts_is_int(at))

@@ -170,8 +170,6 @@ static void ossaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 
   fts_audioport_init( &this->head);
 
-  ac--;
-  at++;
   sr = fts_dsp_get_sample_rate();
   sample_rate = (int)sr ;
   this->fifo_size = fts_param_get_int(fts_s_fifo_size, DEFAULT_FIFO_SIZE);

@@ -43,8 +43,8 @@ static void
 demux_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   demux_t *this = (demux_t *)o;
-  int n = fts_get_int_arg(ac, at, 1, 0);
-  int i = fts_get_int_arg(ac, at, 2, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
+  int i = fts_get_int_arg(ac, at, 1, 0);
   
   if(n < 2)
     this->n = 2;

@@ -61,8 +61,8 @@ sigprint_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   sigprint_t *x = ((sigprint_t *)o);
 
-  x->sym = fts_get_symbol_arg(ac, at, 1, fts_new_symbol(""));
-  x->init = fts_get_int_arg(ac, at, 2, 0);
+  x->sym = fts_get_symbol_arg(ac, at, 0, fts_new_symbol(""));
+  x->init = fts_get_int_arg(ac, at, 1, 0);
   x->buf = 0; /* will be allocated in _put */
   x->size = 0;
   x->alloc = 0;

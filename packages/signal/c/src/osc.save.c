@@ -129,7 +129,7 @@ static void
 osc_ctl_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   osc_ctl_t *this = (osc_ctl_t *)o;
-  fvec_t *fvec = fvec_atom_get(at + 2);
+  fvec_t *fvec = fvec_atom_get(at + 1);
   osc_ctl_data_t *data;
 
   fts_dsp_add_object(o);
@@ -151,7 +151,7 @@ osc_ctl_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   this->sr = FTS_INTPHASE_RANGE;
 
-  osc_ctl_set_freq(o, 0, 0, 1, at + 1);
+  osc_ctl_set_freq(o, 0, 0, 1, at);
 }
 
 static void

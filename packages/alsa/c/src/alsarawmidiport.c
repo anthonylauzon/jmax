@@ -139,9 +139,6 @@ alsarawmidiport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   int err, fd;
   fts_atom_t k, a;
   
-  ac--;
-  at++;
-
   this->manager = (alsamidi_t *)fts_get_object(at);
   this->name = fts_get_symbol(at + 1);
   this->hw_name = fts_get_symbol(at + 2);

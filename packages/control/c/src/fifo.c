@@ -160,9 +160,6 @@ fifo_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fts_atom_t *atoms;
   int i;
   
-  ac--;
-  at++;
-
   if(ac > 0 && fts_is_number(at))
     size = fts_get_number_int(at);
 

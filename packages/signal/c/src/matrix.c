@@ -49,9 +49,6 @@ matrix_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   matrix_t *this = (matrix_t *)o;
   
-  ac--;
-  at++;
-
   if(ac > 1 && fts_is_int(at) && fts_is_int(at + 1))
     {
       int n_ins = fts_get_int(at); /* # of ins */

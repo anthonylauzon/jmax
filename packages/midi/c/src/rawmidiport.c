@@ -166,7 +166,7 @@ rawmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   rawmidiport_t *this = (rawmidiport_t *)o;
   fts_midiparser_t *parser = (fts_midiparser_t *)o;
 
-  this->stream = (fts_bytestream_t *)fts_get_object(at + 1);
+  this->stream = (fts_bytestream_t *)fts_get_object(at);
 
   fts_midiport_init(&this->port);
   fts_midiparser_init(&this->parser);

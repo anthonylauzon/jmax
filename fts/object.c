@@ -83,9 +83,8 @@ fts_object_create(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
       if (cl->ninlets)
 	obj->in_conn = (fts_connection_t **) fts_zalloc(cl->ninlets * sizeof(fts_connection_t *));
       
-      /* &@#!@#$%*@#$ "at - 1": very nice hack to survive until this gets really fixed (Merci Francois!) */
       if(fts_class_get_constructor(cl))
-	fts_class_get_constructor(cl)(obj, fts_SystemInlet, fts_s_init, ac + 1, at - 1); 
+	fts_class_get_constructor(cl)(obj, fts_SystemInlet, fts_s_init, ac, at); 
     }
 
   return obj;
@@ -154,7 +153,7 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
     obj->in_conn = (fts_connection_t **) fts_zalloc(cl->ninlets * sizeof(fts_connection_t *));
     
   if(fts_class_get_constructor(cl))
-    fts_class_get_constructor(cl)(obj, fts_SystemInlet, fts_s_init, ac, at);
+    fts_class_get_constructor(cl)(obj, fts_SystemInlet, fts_s_init, ac - 1, at + 1);
 
   error = fts_object_get_error(obj);
   

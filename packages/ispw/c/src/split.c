@@ -70,8 +70,8 @@ split_bound(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 split_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  split_bound(o, 1, 0, 1, at + 1);
-  split_bound(o, 2, 0, 1, at + 2);
+  split_bound(o, 1, 0, 1, at);
+  split_bound(o, 2, 0, 1, at + 1);
 }
 
 static void

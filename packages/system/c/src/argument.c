@@ -50,9 +50,6 @@ argument_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   int size = fts_tuple_get_size(args);
   int index;
 
-  ac--;
-  at++;
-
   fts_set_void(&this->def);
 
   index = fts_get_int(at);

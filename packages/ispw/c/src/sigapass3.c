@@ -47,17 +47,19 @@ static void
 sigapass3_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigapass3_t *this = (sigapass3_t *)o;
+  biquad_coefs_t *data;
   float zero = 0.0f;
   float one = 1.0f;
 
   this->biquad_state = ftl_data_new(biquad_state_t);
   this->biquad_coefs = ftl_data_new(biquad_coefs_t);
 
-  ftl_data_set(biquad_coefs_t, this->biquad_coefs, a0, &zero);
-  ftl_data_set(biquad_coefs_t, this->biquad_coefs, a1, &zero);
-  ftl_data_set(biquad_coefs_t, this->biquad_coefs, a2, &one);
-  ftl_data_set(biquad_coefs_t, this->biquad_coefs, b1, &zero);
-  ftl_data_set(biquad_coefs_t, this->biquad_coefs, b2, &zero);
+  data = ftl_data_get_ptr(this->biquad_coefs);
+  data->a0 = 0.0;
+  data->a1 = 0.0;
+  data->a2 = 1.0;
+  data->b1 = 0.0;
+  data->b2 = 0.0;
 
   fts_dsp_add_object(o); /* just put object in list */
 }

@@ -33,16 +33,16 @@
 
 typedef struct voice
 {
-  long state;
-  long pitch;
+  int state;
+  int pitch;
 } voice_t;
 
 typedef struct poly
 {
   fts_object_t ob;
-  long in1;
-  long nvoice;
-  long count;
+  int in1;
+  int nvoice;
+  int count;
   struct voice *v;
   int strat;
 } poly_t;
@@ -54,8 +54,8 @@ static void
 poly_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   poly_t *x = (poly_t *)o;
-  long n = (long) fts_get_int_arg(ac, at, 0, 0);
-  long i;
+  int n = (int) fts_get_int_arg(ac, at, 0, 0);
+  int i;
   voice_t *v;
 
   if (x->in1)	/* if velo nonzero */
@@ -64,8 +64,8 @@ poly_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	{
 	  voice_t *von = 0;
 	  voice_t *voff = 0;
-	  long ion = 0;
-	  long ioff = 0;
+	  int ion = 0;
+	  int ioff = 0;
 
 	  for (i = 0, v = x->v; i < x->nvoice; i++, v++)
 	    {
@@ -89,7 +89,7 @@ poly_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	  
 	  if (! voff)	/* if all notes are on steal one */
 	    {
-	      long pwas = von->pitch;
+	      int pwas = von->pitch;
 
 	      von->state = ((x->count++) * 2) + 1;
 	      von->pitch = n;
@@ -149,7 +149,7 @@ static void
 poly_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   poly_t *x = (poly_t *)o;
-  long n = (long) fts_get_int_arg(ac, at, 0, 0);
+  int n = (int) fts_get_int_arg(ac, at, 0, 0);
 
   x->in1 = ((n > 0) ? n : 0);
 }
@@ -169,7 +169,7 @@ static void
 poly_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   poly_t *x = (poly_t *)o;
-  long i;
+  int i;
   voice_t *v;
 
   for (i = 0, v = x->v; i < x->nvoice; i++, v++)
@@ -186,7 +186,7 @@ static void
 poly_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   poly_t *x = (poly_t *)o;
-  long i;
+  int i;
   voice_t *v;
 
   for (v = x->v, i = x->nvoice; i--; v++)
@@ -200,9 +200,9 @@ static void
 poly_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   poly_t *x = (poly_t *)o;
-  long pit = fts_get_int_arg(ac, at, 0, 0);
-  long vel = fts_get_int_arg(ac, at, 1, 0);
-  long which = fts_get_int_arg(ac, at, 2, 0);
+  int pit = fts_get_int_arg(ac, at, 0, 0);
+  int vel = fts_get_int_arg(ac, at, 1, 0);
+  int which = fts_get_int_arg(ac, at, 2, 0);
   voice_t *v;
 
   v = x->v + (which - 1);
@@ -225,9 +225,9 @@ static void
 poly_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   poly_t *x  = (poly_t *)o;
-  long n     = fts_get_int_arg(ac, at, 1, 0);
-  long strat = fts_get_int_arg(ac, at, 2, 0);
-  long i;
+  int n = fts_get_int_arg(ac, at, 0, 0);
+  int strat = fts_get_int_arg(ac, at, 1, 0);
+  int i;
   voice_t *v;
 
   if (n < 1)

@@ -106,7 +106,7 @@ ibinop_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom
   ibinop_t *this = (ibinop_t *)o;
 
   this->value = 0;
-  this->operator = fts_get_int_arg(ac, at, 1, 0);
+  this->operator = fts_get_int_arg(ac, at, 0, 0);
 }
 
 
@@ -187,7 +187,7 @@ fbinop_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fbinop_t *this = (fbinop_t *)o;
 
   this->value = 0.0f;
-  this->operator = fts_get_float_arg(ac, at, 1, 0.0f);
+  this->operator = fts_get_float_arg(ac, at, 0, 0.0f);
 }
 
 
@@ -266,7 +266,7 @@ sbinop_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom
   sbinop_t *this = (sbinop_t *)o;
 
   this->value = 0;
-  this->operator = fts_get_symbol_arg(ac, at, 1, 0);
+  this->operator = fts_get_symbol_arg(ac, at, 0, 0);
 }
 
 

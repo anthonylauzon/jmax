@@ -126,12 +126,12 @@ static void
 value_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   value_t *x = (value_t *)o;
-  fts_symbol_t sym = fts_get_symbol_arg(ac, at, 1, 0);
+  fts_symbol_t sym = fts_get_symbol_arg(ac, at, 0, 0);
 
   x->v = get_keeper(sym);
 
-  if (ac >= 3)
-    x->v->atom = at[2];
+  if (ac >= 2)
+    x->v->atom = at[1];
   else
     fts_set_int(&x->v->atom, 0);
 

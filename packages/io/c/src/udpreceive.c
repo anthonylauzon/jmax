@@ -242,10 +242,8 @@ static void udpreceive_receive( fts_object_t *o, int winlet, fts_symbol_t s, int
 static void udpreceive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   udpreceive_t *this = (udpreceive_t *)o;
-  int port;
+  int port = fts_get_int_arg( ac, at, 0, 0);
   struct sockaddr_in addr;
-
-  port = fts_get_int_arg( ac, at, 1, 0);
 
   this->socket = socket(AF_INET, SOCK_DGRAM, 0);
 

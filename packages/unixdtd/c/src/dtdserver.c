@@ -259,11 +259,11 @@ static void dtdserver_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   const char *base_name;
   int len;
 
-  this->block_frames = fts_get_int_arg( ac, at, 1, DEFAULT_BLOCK_FRAMES);
-  this->max_channels = fts_get_int_arg( ac, at, 2, DEFAULT_MAX_CHANNELS);
-  this->fifo_blocks = fts_get_int_arg( ac, at, 3, DEFAULT_FIFO_BLOCKS);
-  this->preload_frames = fts_get_int_arg( ac, at, 4, DEFAULT_PRELOAD_FRAMES);
-  this->loop_milliseconds = fts_get_int_arg( ac, at, 5, DEFAULT_LOOP_MILLISECONDS);
+  this->block_frames = fts_get_int_arg( ac, at, 0, DEFAULT_BLOCK_FRAMES);
+  this->max_channels = fts_get_int_arg( ac, at, 1, DEFAULT_MAX_CHANNELS);
+  this->fifo_blocks = fts_get_int_arg( ac, at, 2, DEFAULT_FIFO_BLOCKS);
+  this->preload_frames = fts_get_int_arg( ac, at, 3, DEFAULT_PRELOAD_FRAMES);
+  this->loop_milliseconds = fts_get_int_arg( ac, at, 4, DEFAULT_LOOP_MILLISECONDS);
 
   /* fork the server */
   if ( pipe( from_child_pipe) < 0)

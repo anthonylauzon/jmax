@@ -56,8 +56,8 @@ sigtab1_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
 {
   fts_atom_t data, k;
   sigtab1_t *this = (sigtab1_t *)o;
-  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-  fts_symbol_t wrap_mode = fts_get_symbol_arg(ac, at, 2, 0);
+  fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
+  fts_symbol_t wrap_mode = fts_get_symbol_arg(ac, at, 1, 0);
 
   if(name)
     {    
@@ -136,7 +136,7 @@ static void
 osc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   osc_t *this = (osc_t *)o;
-  fts_symbol_t sym = fts_get_symbol_arg(ac, at, 1, 0);
+  fts_symbol_t sym = fts_get_symbol_arg(ac, at, 0, 0);
 
   this->ftl_data = osc_ftl_data_new();
   this->sym = sym;

@@ -177,14 +177,14 @@ tilda_init_const(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->time = 0.0;
   this->cr = 1.0;
 
-  if(ac == 2)
-    tilda_set_const(o, 0, 0, 1, at + 1);  
+  if(ac == 1)
+    tilda_set_const(o, 0, 0, 1, at);  
   else
     {
-      fts_atom_t a[1];
+      fts_atom_t a;
       
-      fts_set_int(a, 0);
-      tilda_set_const(o, 0, 0, 1, a);
+      fts_set_int(&a, 0);
+      tilda_set_const(o, 0, 0, 1, &a);
     }
 }
 

@@ -156,9 +156,6 @@ event_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   event_t *this = (event_t *)o;  
 
-  ac--;
-  at++;
-
   fts_set_void(&this->value);
 
   this->time = 0.0;

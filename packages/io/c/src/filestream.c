@@ -310,9 +310,6 @@ filestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 { 
   filestream_t *this = (filestream_t *)o;
 
-  ac--;
-  at++;
-
   this->name = NULL;
   this->fd = -1;
   this->in_buf = NULL;

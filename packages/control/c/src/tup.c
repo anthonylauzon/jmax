@@ -335,9 +335,6 @@ tup_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   int n = 0;
   int i;
 
-  ac--;
-  at++;
-
   /* void state */
   for(i=0; i<TUP_MAX_SIZE; i++)
     fts_set_int(this->a + i, 0);
@@ -401,9 +398,6 @@ untup_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   untup_t *this = (untup_t *)o;
   int n = 0;
-
-  ac--;
-  at++;
 
   if(ac == 1 && fts_is_int(at))
     n = fts_get_int(at);

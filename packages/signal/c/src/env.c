@@ -573,9 +573,6 @@ env_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 { 
   env_t *this = (env_t *)o;
 
-  ac--;
-  at++;
-
   this->status = status_hold;
   this->mode = mode_continue;
 

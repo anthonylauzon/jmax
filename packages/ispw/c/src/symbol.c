@@ -75,9 +75,6 @@ symbol_obj_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   symbol_obj_t *this = (symbol_obj_t *) o;
   
-  ac--;
-  at++;
-
   if(ac > 0 && fts_is_symbol(at))
     this->s = fts_get_symbol(at);
   else

@@ -90,9 +90,6 @@ fts_signal_bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const 
   int n_channels;
   int n;
 
-  ac--;
-  at++;
-
   if(ac > 0)
     {
       n_channels = fts_get_int(at);

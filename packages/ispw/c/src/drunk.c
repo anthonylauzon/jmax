@@ -145,8 +145,8 @@ static void
 drunk_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   drunk_t *x = (drunk_t *)o;
-  long int range       = (long) fts_get_int_arg(ac, at, 1, 0);
-  long int correlation = (long) fts_get_int_arg(ac, at, 2, 0);
+  long int range       = (long) fts_get_int_arg(ac, at, 0, 0);
+  long int correlation = (long) fts_get_int_arg(ac, at, 1, 0);
 
   if (range <= 0)
     range = 128;

@@ -195,8 +195,8 @@ osc_init_cosine(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   osc_init(o, 0, 0, 0, 0);
 
-  if(ac == 2)
-    osc_set_freq(o, 0, 0, 1, at + 1);
+  if(ac == 1)
+    osc_set_freq(o, 0, 0, 1, at);
 
   osc_data_set_ptr(this->data, fts_fftab_get_cosine(OSC_TABLE_SIZE));
 }
@@ -209,13 +209,13 @@ osc_init_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   osc_init(o, 0, 0, 0, 0);
 
-  if(ac == 3)
+  if(ac == 2)
     {
-      osc_set_freq(o, 0, 0, 1, at + 1);
-      osc_set_fvec(o, 0, 0, 1, at + 2);
+      osc_set_freq(o, 0, 0, 1, at + 0);
+      osc_set_fvec(o, 0, 0, 1, at + 1);
     }
   else
-    osc_set_fvec(o, 0, 0, 1, at + 1);
+    osc_set_fvec(o, 0, 0, 1, at);
 }
 
 /***************************************************************************************

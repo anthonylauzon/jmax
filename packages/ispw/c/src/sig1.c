@@ -49,8 +49,8 @@ static void
 sig_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigobj_t *this = (sigobj_t *)o;
-  int down = fts_get_int_arg(ac, at, 2, 0);
-  float value = (float) fts_get_float_arg(ac, at, 1, 0.0f);
+  int down = fts_get_int_arg(ac, at, 1, 0);
+  float value = (float) fts_get_float_arg(ac, at, 0, 0.0f);
 
   this->sig_ftl_data = ftl_data_new(float);
   ftl_data_copy(float, this->sig_ftl_data, &value);

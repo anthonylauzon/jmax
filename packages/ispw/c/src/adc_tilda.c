@@ -36,9 +36,6 @@ static void adc_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   adc_tilda_t *this = (adc_tilda_t *)o;
   int i, outlets;
 
-  ac--;
-  at++;
-
   this->port = fts_audioport_get_default(o);
   if ( !this->port)
     {

@@ -127,9 +127,6 @@ seqfind_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 { 
   seqfind_t *this = (seqfind_t *)o;
 
-  ac--;
-  at++;
-
   this->track = 0;
   this->mode = sym_first;
 

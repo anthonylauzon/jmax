@@ -75,9 +75,6 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   float size;
   float *samp_buf;
 
-  ac--;
-  at++;
-
   name = fts_get_symbol_arg(ac, at, 0, 0);
   unit = samples_unit_get_arg(ac, at, 1);
   size = (unit ? fts_get_float_arg(ac, at, 2, 0.0f) : fts_get_float_arg(ac, at, 1, 0.0f));

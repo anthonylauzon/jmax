@@ -96,9 +96,6 @@ monitor_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   monitor_t *this = (monitor_t *)o;
 
-  ac--;
-  at++;
-
   this->port = 0;
 
   this->port = fts_audioport_get_default(o);

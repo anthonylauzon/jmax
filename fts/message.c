@@ -68,9 +68,6 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   fts_message_t *this = (fts_message_t *)o;
 
-  ac--;
-  at++;
-
   this->s = 0;
   fts_array_init(&this->args, 0, 0);
 

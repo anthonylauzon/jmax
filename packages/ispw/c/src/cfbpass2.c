@@ -239,9 +239,9 @@ static void
 sigcoef_bpass2_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigcoef_bpass2_t *this = (sigcoef_bpass2_t *)o;
-  float g = fts_get_float_arg(ac, at, 1, 0.0f);
-  float f = fts_get_float_arg(ac, at, 2, 500);
-  float w = fts_get_float_arg(ac, at, 3, 0.5f);
+  float g = fts_get_float_arg(ac, at, 0, 0.0f);
+  float f = fts_get_float_arg(ac, at, 1, 500);
+  float w = fts_get_float_arg(ac, at, 2, 0.5f);
 
   if (!InRange(f,0, MAXSRATE/2) || !InRange(w,0, MAXOCTAVE))
     {

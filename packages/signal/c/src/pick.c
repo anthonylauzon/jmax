@@ -157,9 +157,6 @@ pick_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   int size = 1024;
   fvec_t *fvec;
 
-  ac--;
-  at++;
-
   this->fvec = NULL;
   this->index = 0;
   this->conv = 0.0;

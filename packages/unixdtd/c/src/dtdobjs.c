@@ -234,9 +234,6 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   int n_channels;
   fts_symbol_t filename;
 
-  ac--;
-  at++;
-
   this->server = 0;
   this->filename = 0;
 
@@ -604,9 +601,6 @@ writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   writesf_t *this = (writesf_t *)o;
   int n_channels;
-
-  ac--;
-  at++;
 
   this->server = 0;
   this->filename = 0;

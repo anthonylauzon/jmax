@@ -660,9 +660,6 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   sequence_t *this = (sequence_t *)o;
 
-  ac--;
-  at++;
-
   this->tracks = 0;
   this->size = 0;
   this->open = 0;  

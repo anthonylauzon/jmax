@@ -125,10 +125,10 @@ sigarctan2_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     {
       int i;
 
-      atan_table = fts_malloc((TABLE_SIZE+2) * sizeof(float));
+      atan_table = fts_malloc((TABLE_SIZE + 2) * sizeof(float));
 
-      for(i=0;i<=TABLE_SIZE;i++)
-	atan_table[i] = atan(((float)i)/((float)TABLE_SIZE));
+      for(i=0; i<=TABLE_SIZE; i++)
+	atan_table[i] = atan(((float)i) / ((float)TABLE_SIZE));
 
       atan_table[TABLE_SIZE+1] = atan(1.0f);	/* extra point for interp. */
     }

@@ -263,9 +263,6 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   DSCBUFFERDESC cdesc;
 #endif
 
-  ac--;
-  at++;
-
 /*    fts_log("[dsaudioport]: Available audio output devices\n"); */
 /*    DirectSoundEnumerate((LPDSENUMCALLBACK) dsaudioport_enum_callback, NULL); */
 

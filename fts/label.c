@@ -207,9 +207,6 @@ label_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   fts_label_t *this = (fts_label_t *) o;
 
-  ac--;
-  at++;
-
   fts_channel_init(&this->channel);
 
   if(ac == 0 || !fts_is_void(at))
@@ -277,9 +274,6 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   send_t *this = (send_t *) o;
   fts_label_t *label = 0;
-
-  ac--;
-  at++;
 
   if(fts_is_symbol(at))
     {
@@ -359,9 +353,6 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   receive_t *this = (receive_t *)o;
   fts_label_t *label = 0;
-
-  ac--;
-  at++;
 
   if(fts_is_symbol(at))
     {

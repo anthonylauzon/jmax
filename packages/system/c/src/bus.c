@@ -136,9 +136,6 @@ throw_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_
 {
   access_t *this = (access_t *)o;
 
-  ac--;
-  at++;
-  
   this->bus = (bus_t *)fts_get_object(at + 0);
   fts_object_refer((fts_object_t *)this->bus);
   
@@ -253,9 +250,6 @@ catch_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_
 {
   access_t *this = (access_t *)o;
 
-  ac--;
-  at++;
-  
   this->bus = (bus_t *)fts_get_object(at + 0);
   fts_object_refer((fts_object_t *)this->bus);
   
@@ -341,9 +335,6 @@ bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t 
   int n_channels = 0;
   int i;
   
-  ac--;
-  at++;
-
   if(ac == 0)
     n_channels = 1;
   else if(ac == 1 && fts_is_int(at))

@@ -167,9 +167,6 @@ cut_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   int size = 1024;
   fvec_t *fvec = NULL;
 
-  ac--;
-  at++;
-
   this->buf = NULL;
   this->index = 0;
   this->size = 0;

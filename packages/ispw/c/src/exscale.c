@@ -198,9 +198,6 @@ exscale_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
 {
   exscale_t *this = (exscale_t *)o;
 
-  at++; 
-  ac--;
-
   this->inlow = 0.0;
   this->inhigh = 0.0;
   this->outlow = 0.0;

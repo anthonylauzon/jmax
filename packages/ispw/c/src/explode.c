@@ -987,7 +987,7 @@ static void
 explode_init_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explode_t *this = (explode_t *)o;
-  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
+  fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
 
   this->n1 = 0;
   this->n2 = 0;

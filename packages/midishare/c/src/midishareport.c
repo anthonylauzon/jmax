@@ -449,7 +449,7 @@ midishareport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   midishare_reference_t *ref;
   int port = 0;
   
-  midishareport_check(ac - 1, at + 1, &name, &port);
+  midishareport_check(ac, at, &name, &port);
 
   fts_midiport_init(&this->head);
   fts_midiport_set_input(&this->head);

@@ -104,7 +104,7 @@ static void
 sigswitch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigswitch_t *this = (sigswitch_t *)o;
-  int state = fts_get_int_arg(ac, at, 1, 0);
+  int state = fts_get_int_arg(ac, at, 0, 0);
 
   this->switch_ftl_data = ftl_data_new( int);
   ftl_data_copy( int, this->switch_ftl_data, &state);

@@ -173,9 +173,6 @@ static void udpsend_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 {
   udpsend_t *this = (udpsend_t *)o;
 
-  ac--;
-  at++;
-
   if(ac > 0 && fts_is_symbol(at))
     {
       int port;

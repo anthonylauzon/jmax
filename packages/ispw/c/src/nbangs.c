@@ -82,7 +82,7 @@ nbangs_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   nbangs_t *this = (nbangs_t *) o;
 
-  this->count = fts_get_int_arg(ac, at, 1, 0);
+  this->count = fts_get_int_arg(ac, at, 0, 0);
 }
 
 

@@ -173,7 +173,7 @@ static void
 bag_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bag_t *x = (bag_t *)o;
-  fts_symbol_t s_arg = fts_get_symbol_arg(ac, at, 1, 0);
+  fts_symbol_t s_arg = fts_get_symbol_arg(ac, at, 0, 0);
 
   x->value_list = 0;
   x->multi = (s_arg != 0);

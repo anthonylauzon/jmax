@@ -57,10 +57,8 @@ static void udp_receive( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 static void udp_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   udp_t *this = (udp_t *)o;
-  int port;
+  int port = fts_get_int_arg( ac, at, 0, 0);
   struct sockaddr_in addr;
-
-  port = fts_get_int_arg( ac, at, 1, 0);
 
   post( "Created UDP object on port %d\n", port);
 

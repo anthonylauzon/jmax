@@ -72,9 +72,6 @@ int_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 {
   int_t *this = (int_t *) o;
   
-  ac--;
-  at++;
-
   this->i = 0.0;
 
   if (ac > 0 && fts_is_number(at))

@@ -235,9 +235,6 @@ sigthres_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   sigthres_t *this = (sigthres_t *)o;
   
-  ac--;
-  at++;
-
   this->ctl.object = o;
   this->ctl.status = 0;
   this->ctl.wait = 0;

@@ -60,7 +60,7 @@ for_int_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->limit = 0;
   this->incr = 1;
 
-  for_int_set(o, 0, 0, ac - 1, at + 1);
+  for_int_set(o, 0, 0, ac, at);
 }
 
 static void
@@ -72,7 +72,7 @@ for_float_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   this->limit = 0.0;
   this->incr = 1.0;
 
-  for_float_set(o, 0, 0, ac - 1, at + 1);
+  for_float_set(o, 0, 0, ac, at);
 }
 
 /************************************************************

@@ -120,9 +120,6 @@ makenote_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   makenote_t *this = (makenote_t *)o;
 
-  ac--;
-  at++;
-
   switch(ac)
     {
     default:

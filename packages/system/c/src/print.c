@@ -45,7 +45,7 @@ print_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   print_t *this = (print_t *)o;
 
-  this->prompt = fts_get_symbol_arg(ac, at, 1, fts_s_print);
+  this->prompt = fts_get_symbol_arg(ac, at, 0, fts_s_print);
 }
 
 

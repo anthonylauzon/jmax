@@ -45,8 +45,8 @@ const_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   const_t *this = (const_t *)o;
 
-  if(ac > 1)
-    this->a = at[1];
+  if(ac > 0)
+    this->a = at[0];
   else
     fts_object_set_error(o, "No value given");
 }

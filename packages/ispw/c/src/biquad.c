@@ -254,9 +254,6 @@ biquad_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   biquad_t *this = (biquad_t *)o;
 
-  ac--;
-  at++;
-
   this->biquad_state = ftl_data_alloc(sizeof(biquad_state_t));
   this->biquad_coefs = ftl_data_alloc(sizeof(biquad_coefs_t));
 

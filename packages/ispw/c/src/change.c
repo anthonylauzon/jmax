@@ -61,9 +61,6 @@ change_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   change_t *this = (change_t *)o;
 
-  ac--;
-  at++;
-
   this->state = 0;
 
   change_set(o, 0, 0, 1, at);  

@@ -47,8 +47,8 @@ static void
 samppeek_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   samppeek_t *obj = (samppeek_t *)o;
-  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-  fts_symbol_t unit = samples_unit_get_arg(ac, at, 2);
+  fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
+  fts_symbol_t unit = samples_unit_get_arg(ac, at, 1);
 
   obj->tab_name = name;
 

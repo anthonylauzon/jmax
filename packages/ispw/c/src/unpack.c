@@ -77,9 +77,6 @@ unpack_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   unpack_t *this = (unpack_t *)o;
   int i;
 
-  ac--;
-  at++;
-
   if(ac > 0)
     {
       this->n = ac;

@@ -50,9 +50,6 @@ tabpeek_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_symbol_t tab_name = fts_get_symbol_arg(ac, at, 1, 0);
   sampbuf_t *null = 0;
 
-  ac--;
-  at++;
-
   this->tab_name = 0;
   this->ftl_data = 0;
   

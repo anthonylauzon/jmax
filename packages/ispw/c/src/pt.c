@@ -279,8 +279,8 @@ static void dsp_fun_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 static void pt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pt_t *x = (pt_t *)o;
-  long pt_common_arg_0 = fts_get_int_arg(ac, at, 1, 0);
-  long pt_common_arg_1 = fts_get_int_arg(ac, at, 2, 0);
+  long pt_common_arg_0 = fts_get_int_arg(ac, at, 0, 0);
+  long pt_common_arg_1 = fts_get_int_arg(ac, at, 1, 0);
 	
   if(!pt_common_init(&x->pt, pt_common_arg_0, pt_common_arg_1)) 
     return;

@@ -497,9 +497,6 @@ matdisplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   matdisplay_t * this = (matdisplay_t *)o;
   
-  ac--;
-  at++;
-
   this->min = 0.0;
   this->max = 1.0;
   this->m_size = 1;

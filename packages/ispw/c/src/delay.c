@@ -83,9 +83,6 @@ delay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   delay_t *this = (delay_t *)o;
   
-  ac--;
-  at++;
-
   this->del = 0.001;
   this->active = 0;
 

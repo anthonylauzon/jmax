@@ -336,10 +336,10 @@ static void
 pbank_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pbank_t *this = (pbank_t *)o;
-  int n = fts_get_int_arg(ac, at, 1, 0);
-  int m = fts_get_int_arg(ac, at, 2, 0);
-  fts_symbol_t name = fts_get_symbol_arg(ac, at, 3, 0);
-  fts_symbol_t receive = fts_get_symbol_arg(ac, at, 4, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
+  int m = fts_get_int_arg(ac, at, 1, 0);
+  fts_symbol_t name = fts_get_symbol_arg(ac, at, 2, 0);
+  fts_symbol_t receive = fts_get_symbol_arg(ac, at, 3, 0);
   
   if (n <= 0)
     {

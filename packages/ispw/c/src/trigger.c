@@ -305,7 +305,7 @@ trigger_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   trigger_t *x = (trigger_t *)o;
 
   x->trigger_outlet_table = (trigger_outlet_t *)fts_object_get_user_data(o);
-  x->noutlets = ac - 1;		/* don't count the class name in the arguments !!! */
+  x->noutlets = ac;
 }
 
 static fts_status_t

@@ -93,9 +93,6 @@ out_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 { 
   out_t *this = (out_t *)o;
 
-  ac--;
-  at++;
-
   if(ac && fts_is_object(at))
     {
       fts_object_t *obj = fts_get_object(at);

@@ -123,9 +123,6 @@ mess_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 { 
   mess_t *this = (mess_t *)o;
   
-  ac--;
-  at++;
-
   this->selector = 0;
   this->object = 0;
   this->method = 0;

@@ -90,12 +90,10 @@ zerocross_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   zerocross_t *this = (zerocross_t *)o;
 
   /* initialise control */
-
   this->count = 0;
   this->lastsample = 0.0f;
 
   /* just put object in the dsp list */
-
   fts_dsp_add_object(o); 
 }
 

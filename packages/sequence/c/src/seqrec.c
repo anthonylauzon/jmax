@@ -159,9 +159,6 @@ seqrec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 { 
   seqrec_t *this = (seqrec_t *)o;
 
-  ac--;
-  at++;
-
   this->status = status_reset;
   this->timebase = fts_get_timebase();
   this->track = 0;

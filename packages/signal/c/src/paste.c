@@ -159,9 +159,6 @@ paste_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   paste_t *this = (paste_t *)o;
   int size = 1024;
 
-  ac--;
-  at++;
-
   this->buf = NULL;
   this->size = 0;
   this->ring_size = 0;

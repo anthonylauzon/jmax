@@ -986,9 +986,6 @@ track_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   track_t *this = (track_t *)o;
 
-  ac--;
-  at++;
-
   this->sequence = 0;
   this->next = 0;
 

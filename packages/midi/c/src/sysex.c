@@ -50,9 +50,6 @@ sysexin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   sysex_t *this = (sysex_t *)o;
   fts_symbol_t name;
 
-  ac--;
-  at++;
-
   this->port = NULL;
 
   name = fts_get_symbol(at);
@@ -124,9 +121,6 @@ sysexout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   sysex_t *this = (sysex_t *)o;
   fts_symbol_t name;
-
-  ac--;
-  at++;
 
   this->port = NULL;
 

@@ -282,9 +282,9 @@ explay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   explay_t *this = (explay_t *)o;
 
-  if(ac > 1 && fts_is_symbol(at))
+  if(ac > 0 && fts_is_symbol(at))
     {
-      this->explode_name = fts_get_symbol_arg(ac, at, 1, 0);
+      this->explode_name = fts_get_symbol_arg(ac, at, 0, 0);
       this->current = 0;
     }
 

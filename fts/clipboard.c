@@ -58,7 +58,6 @@ clipboard_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   this->file = tmpfile();
 #else
-  const char *tmp;
   const char *name;
   char buf[1024];
   fts_clipboard_t *this  = (fts_clipboard_t *) o;
@@ -68,12 +67,7 @@ clipboard_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   else
     name = fts_get_symbol(at);
 
-  tmp = getenv ("JMAX_TMP");
-
-  if (tmp)
-    sprintf(buf, "%s/jmax.%s.%d", tmp, name, getpid());
-  else
-    sprintf(buf, "/tmp/jmax.%s.%d", name, getpid());
+  sprintf(buf, "/tmp/jmax.clipboard.%d", getpid());
 
   this->file = fopen(buf, "w+b");
 

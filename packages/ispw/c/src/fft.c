@@ -79,9 +79,6 @@ fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   complex *spec = 0;
   long spec_size;
 
-  ac--;
-  at++;
-
   if(!check_args(ac, at, &type, &real_spec))
     {
       post("error: %s: bad arguments\n", x->name);

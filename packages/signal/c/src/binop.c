@@ -980,7 +980,7 @@ binop_const_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   this->data = ftl_data_alloc(sizeof(float));
 
-  binop_set_const(o, 0, 0, 1, at + 1);
+  binop_set_const(o, 0, 0, 1, at);
   
   fts_dsp_add_object(o);
 }

@@ -296,9 +296,6 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   messconst_t *this = (messconst_t *)o;
   int i;
   
-  ac--;
-  at++;
-
   fts_parser_init( &this->parser, 0, 0);
   fts_array_init( &this->tmp, 0, 0);
 

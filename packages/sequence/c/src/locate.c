@@ -179,9 +179,6 @@ locate_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   locate_t *this = (locate_t *)o;
   fts_timebase_t *pseudo = (fts_timebase_t *)o;
   
-  ac--;
-  at++;
-
   this->track = 0;
   this->epsilon = 0.0;
   this->mode = seqsym_event;

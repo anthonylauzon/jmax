@@ -289,9 +289,6 @@ rec_fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 { 
   rec_fvec_t *this = (rec_fvec_t *)o;
 
-  ac--;
-  at++;
-
   fts_dsp_add_object(o);
 
   this->index = 0.0;

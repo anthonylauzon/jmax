@@ -64,8 +64,8 @@ static void
 vd_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vd_t *this = (vd_t *)o;
-  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-  fts_symbol_t unit = samples_unit_get_arg(ac, at, 2);
+  fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
+  fts_symbol_t unit = samples_unit_get_arg(ac, at, 1);
 
   this->name = name;
 
@@ -77,14 +77,14 @@ vd_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
   if(unit)
     {
       this->unit = unit;
-      at += 3; 
-      ac -= 3;
+      at += 2;
+      ac -= 2;
     }
   else
     {
       this->unit = samples_unit_get_default();
-      at += 2; 
-      ac -= 2;
+      at++; 
+      ac--;
     }
 
   if(ac && fts_is_number(at))

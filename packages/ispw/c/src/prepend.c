@@ -86,7 +86,7 @@ prepend_set_realize(fts_object_t *o, int ac, const fts_atom_t *at)
 static void
 prepend_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  prepend_set_realize(o, ac-1, at+1);
+  prepend_set_realize(o, ac, at);
 }
 
 static void

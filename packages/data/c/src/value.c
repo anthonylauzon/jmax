@@ -122,9 +122,6 @@ value_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   value_t *this = (value_t *)o;
 
-  ac--;
-  at++;
-
   fts_set_void(&this->a);
   data_object_set_keep((data_object_t *)o, fts_s_no);
 

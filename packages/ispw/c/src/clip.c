@@ -83,7 +83,8 @@ clip_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   x->i_max = 0;
   x->f_min = 0.;
   x->f_max = 0.;
-  clip_set(o, winlet, s, ac-1, at+1);
+
+  clip_set(o, winlet, s, ac, at);
 }
 
 static void

@@ -60,12 +60,11 @@ static void
 voxalloc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   voxalloc_t *this = (voxalloc_t *) o;
-
-  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-  int n_vox = fts_get_int_arg(ac, at, 2, 16);
-  int n_args = fts_get_int_arg(ac, at, 3, 6);
-  int i_dur = fts_get_int_arg(ac, at, 4, 0);
-  int dur = fts_get_int_arg(ac, at, 5, 0);
+  fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
+  int n_vox = fts_get_int_arg(ac, at, 1, 16);
+  int n_args = fts_get_int_arg(ac, at, 2, 6);
+  int i_dur = fts_get_int_arg(ac, at, 3, 0);
+  int dur = fts_get_int_arg(ac, at, 4, 0);
   char rec_name[MAX_size_rec_name + 1];
   int i;
 
@@ -75,24 +74,30 @@ voxalloc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->time_over = (float *) fts_malloc(sizeof(float) * n_vox);
 	
   this->n_args = n_args;
-  if(i_dur < 0) i_dur = -i_dur;
-  if(i_dur > n_args) i_dur = n_args;
+
+  if(i_dur < 0) 
+    i_dur = -i_dur;
+
+  if(i_dur > n_args) 
+    i_dur = n_args;
+
   this->i_dur = i_dur - 1;
   this->dur = dur;
   this->last_dur = 0.;
   this->list_store  = (fts_atom_t *) fts_malloc(sizeof(fts_atom_t) * n_args);
 	
-  for(i = 0; i < n_vox; i++){
-    sprintf(rec_name,"%d-%s", i, name);
-    rec_name[MAX_size_rec_name] = '\0';
-    this->sym_receive[i] = fts_new_symbol_copy(rec_name);
-  }
+  for(i = 0; i < n_vox; i++)
+    {
+      sprintf(rec_name,"%d-%s", i, name);
+      rec_name[MAX_size_rec_name] = '\0';
+      this->sym_receive[i] = fts_new_symbol_copy(rec_name);
+    }
 	
   for(i = 0; i < n_vox; i++)
     this->time_over[i] = (float)0;
-	
+  
   for(i = 0; i < n_args; i++)
-    fts_set_int(&this->list_store[i], 0);
+    fts_set_int(this->list_store + i, 0);
 
   this->half_tick = 500.0 * fts_dsp_get_tick_size() / fts_dsp_get_sample_rate();
 }

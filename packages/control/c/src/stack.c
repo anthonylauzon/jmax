@@ -136,9 +136,6 @@ stack_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 { 
   stack_t *this = (stack_t *)o;
   
-  ac--;
-  at++;
-
   fts_stack_init(&this->stack, fts_atom_t);
 }
 

@@ -111,8 +111,8 @@ static void update_group_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 {
   update_group_t *this = (update_group_t *)o;
 
-  this->period = fts_get_int_arg( ac, at, 1, DEFAULT_PERIOD);
-  this->max_updates = fts_get_int_arg( ac, at, 2, DEFAULT_MAX_UPDATES);
+  this->period = fts_get_int_arg( ac, at, 0, DEFAULT_PERIOD);
+  this->max_updates = fts_get_int_arg( ac, at, 1, DEFAULT_MAX_UPDATES);
   this->update_fifo = 0;
   this->object_count = 0;
 }

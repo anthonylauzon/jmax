@@ -260,9 +260,6 @@ static void fts_socketstream_init( fts_object_t *o, int winlet, fts_symbol_t s, 
 {
   fts_socketstream_t *this = (fts_socketstream_t *) o;
 
-  ac--;
-  at++;
-
   fts_bytestream_init((fts_bytestream_t *) this);
   
   this->socket = fts_get_int_arg( ac, at, 0, INVALID_SOCKET);
@@ -477,9 +474,6 @@ static int duplicate_std_in_out( fts_pipestream_t *this)
 static void fts_pipestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_pipestream_t *this = (fts_pipestream_t *) o;
-
-  ac--;
-  at++;
 
   fts_bytestream_init((fts_bytestream_t *) this);
   

@@ -100,7 +100,7 @@ harmtap_params_init(harmtap_params_t *params)
 static void
 harmtap_reset_window(harmtap_params_t *params)
 {
-  double size = (double)delayline_get_size(params->delayline);
+  double size = (double)delayline_get_delay_size(params->delayline);
 
   if(params->window < 4.0)
     params->window = 4.0;
@@ -129,7 +129,7 @@ harmtap_reset_fade(harmtap_params_t *params)
 static void
 harmtap_reset_delay(harmtap_params_t *params)
 {
-  double del_size = (double)delayline_get_size(params->delayline);
+  double del_size = (double)delayline_get_delay_size(params->delayline);
   double del_tick = (double)delayline_get_n_tick(params->delayline);
   double delay;
 
@@ -157,7 +157,7 @@ harmtap_reset_frames(harmtap_params_t *params)
 static void
 harmtap_params_reset(harmtap_params_t *params, double sr, int n_tick)
 {
-  double del_size = (double)delayline_get_size(params->delayline);
+  double del_size = (double)delayline_get_delay_size(params->delayline);
 
   sr *= 0.001; /* convert to samples per msec */
 
@@ -289,9 +289,9 @@ ftl_harmtap(fts_word_t *argv)
       secondary_frac = fts_cubic_intphase_scale(secondary_int_delay - secondary_delay);
       
       if(primary_index < 1)
-	primary_index += delayline_get_size(dl);
+	primary_index += delayline_get_ring_size(dl);
       if(secondary_index < 1)
-	secondary_index += delayline_get_size(dl);
+	secondary_index += delayline_get_ring_size(dl);
       
       wp = harmtap_window[fts_intphase_get_index(phi, WINDOW_BITS)];
       ws = harmtap_window[fts_intphase_get_index(pho, WINDOW_BITS)];
@@ -366,7 +366,7 @@ harmtap_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   if(ac > 0)
     {
       /* first set delay line */
-      if(fts_is_a(at, dline_metaclass))
+      if(fts_is_a(at, delayline_metaclass))
 	harmtap_set_delayline(o, 0, 0, 1, at);  
       
       switch(ac)
@@ -424,9 +424,6 @@ harmtap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   harmtap_t *this = (harmtap_t *)o;
   harmtap_params_t *params;
-
-  ac--;
-  at++;
 
   fts_dsp_add_object(o);
 

@@ -88,7 +88,7 @@ static void fts_atom_list_cell_free( fts_atom_list_cell_t *cell)
 static void fts_atom_list_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_atom_list_t *this = (fts_atom_list_t *)o;
-  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
+  fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
 
   if(name) 
       this->name = name;

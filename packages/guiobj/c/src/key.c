@@ -154,21 +154,21 @@ key_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 {
   fts_key_t *this = (fts_key_t *)o;
 
-  if(ac == 1)
+  if(ac == 0)
     {
       keyserver_add_listener(0, o, key_multi_action);
       this->code = 0;
     }
   else
     {
-      int code = get_code(at + 1);
+      int code = get_code(at);
 
       if(code > 0)
 	keyserver_add_listener(code, o, key_action);
       else
 	{
 	  post("key: unknown key specifier: ");
-	  post_atoms(1, at + 1);
+	  post_atoms(1, at);
 	  post("\n");
 	}
 
@@ -238,21 +238,21 @@ keystat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   fts_key_t *this = (fts_key_t *)o;
 
-  if(ac == 1)
+  if(ac == 0)
     {
       keyserver_add_listener(0, o, keystat_multi_action);
       this->code = 0;
     }
   else
     {
-      int code = get_code(at + 1);
+      int code = get_code(at);
 
       if(code > 0)
 	keyserver_add_listener(code, o, keystat_action);
       else
 	{
 	  post("keystat: unknown key specifier: ");
-	  post_atoms(1, at + 1);
+	  post_atoms(1, at);
 	  post("\n");
 	}
 

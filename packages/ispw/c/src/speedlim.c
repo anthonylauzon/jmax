@@ -87,9 +87,6 @@ speedlim_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   speedlim_t *this = (speedlim_t *)o;
 
-  ac--;
-  at++;
-
   fts_set_void(&this->atom);
   this->gate = 1;
   this->time = 0.0;

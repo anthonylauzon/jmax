@@ -72,9 +72,9 @@ static void
 delread_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   delread_t *this = (delread_t *)o;
-  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-  fts_symbol_t unit = samples_unit_get_arg(ac, at, 2);
-  float time = (unit ? fts_get_float_arg(ac, at, 3, 0.0f): fts_get_float_arg(ac, at, 2, 0.0f));
+  fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
+  fts_symbol_t unit = samples_unit_get_arg(ac, at, 1);
+  float time = (unit ? fts_get_float_arg(ac, at, 2, 0.0f): fts_get_float_arg(ac, at, 1, 0.0f));
   float conv;
 
   if(!unit) 

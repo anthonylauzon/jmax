@@ -63,9 +63,6 @@ preset_dumper_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   preset_dumper_t *this = (preset_dumper_t *)o;
 
-  ac--;
-  at++;
-
   /* init super */
   fts_dumper_init((fts_dumper_t *)this, preset_dumper_send);
 
@@ -393,9 +390,6 @@ preset_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   preset_t *this = (preset_t *)o;
   int n_objects = 0;
   int i;
-
-  ac--;
-  at++;
 
   /* check arguments */
   for(i=0; i<ac; i++)

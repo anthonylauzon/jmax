@@ -57,7 +57,7 @@ gate_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   gate_t *this = (gate_t *)o;
 
-  this->opened = fts_get_int_arg(ac, at, 1, 0);
+  this->opened = fts_get_int_arg(ac, at, 0, 0);
 }
 
 static fts_status_t

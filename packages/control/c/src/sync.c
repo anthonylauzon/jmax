@@ -207,9 +207,6 @@ sync_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   int n = 0;
   int i;
 
-  ac--;
-  at++;
-
   /* void state */
   for(i=0; i<SYNC_MAX_SIZE; i++)
     fts_set_int(this->a + i, 0);

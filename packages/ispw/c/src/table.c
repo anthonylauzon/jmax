@@ -281,9 +281,6 @@ table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_atom_t a;
   int size = FTS_TABLE_DEFAULT_SIZE;
 
-  ac--;
-  at++;
-
   this->name = NULL;
   this->vec = NULL;
 

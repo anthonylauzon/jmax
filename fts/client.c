@@ -221,9 +221,6 @@ static void client_manager_init( fts_object_t *o, int winlet, fts_symbol_t s, in
       return;
     }
 
-  ac--;
-  at++;
-
   port = fts_get_int_arg( ac, at, 0, CLIENT_DEFAULT_PORT);
 
   this->socket = socket( AF_INET, SOCK_STREAM, 0);
@@ -949,9 +946,6 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 {
   client_t *this = (client_t *)o;
 
-  ac--;
-  at++;
-
   this->stream = (fts_bytestream_t *)fts_get_object_arg( ac, at, 0, NULL);
 
   if ( this->stream == NULL 
@@ -1096,9 +1090,6 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
 
   /* By default, we don't echo the message coming from the client to the client */
   this->echo = 0;
-
-  ac--;
-  at++;
 
   if ( !((ac == 1 || ac == 2) && fts_is_symbol( at) && ( (ac==2) ? fts_is_int( at+1) : 1)) )
     {

@@ -301,7 +301,7 @@ sig2p2z_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   this->ftl_data = ftl_data_new(ctlf2p2z_t);
 
-  sig2p2z_set(o, winlet, s, ac-1, at+1);
+  sig2p2z_set(o, winlet, s, ac, at);
 
   fts_dsp_add_object(o);
 }

@@ -181,9 +181,6 @@ col_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 {
   col_t *this = (col_t *)o;
 
-  ac--;
-  at++;
-
   if(mat_atom_is(at + 0))
     {
       mat_t *mat = mat_atom_get(at + 0);

@@ -51,7 +51,7 @@ getinter_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   getinter_t *this = (getinter_t *)o;
 
-  this->obj = fts_get_object(at + 1);
+  this->obj = fts_get_object(at);
   fts_object_refer(this->obj);
 }
 

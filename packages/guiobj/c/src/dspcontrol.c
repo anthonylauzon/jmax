@@ -151,9 +151,6 @@ static void fts_dsp_control_init(fts_object_t *o, int winlet, fts_symbol_t s, in
 {
   fts_dsp_control_t *this = (fts_dsp_control_t *)o;
 
-  ac--;
-  at++;
-
   if (ac > 0 && fts_is_number(at))
     this->poll_interval = fts_get_number_int(at + 0);
   else

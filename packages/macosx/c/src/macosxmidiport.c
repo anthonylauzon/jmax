@@ -180,9 +180,6 @@ macosxmidi_input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   fts_symbol_t name;
   fts_atom_t k, a;
   
-  ac--;
-  at++;
-
   manager = (macosxmidi_t *)fts_get_object(at);
   name = fts_get_symbol(at + 1);
 
@@ -247,9 +244,6 @@ macosxmidi_output_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   macosxmidi_t *manager;
   fts_symbol_t name;
   fts_atom_t k, a;
-
-  ac--;
-  at++;
 
   manager = (macosxmidi_t *)fts_get_object(at);
   name = fts_get_symbol(at + 1);

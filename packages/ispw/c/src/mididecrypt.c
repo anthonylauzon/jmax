@@ -276,25 +276,27 @@ static void decrypt_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   for( i = 0; i < M_FORMAT; i++)
     this->Elm[i]  = 0;
 
-  if( ac != 1)
+  if( ac > 0)
     {
-      if( ac > M_FORMAT+2)
-	ac = M_FORMAT+2;
+      if( ac > M_FORMAT+1)
+	ac = M_FORMAT+1;
 
-      for( i = 2; i < ac; i++)
-	if ( ! fts_is_int( &at[i]))
-	  {
-	    post("%s: argument %d non valide (%s)\n", NOM, i, fts_get_selector( &at[i]));
-	    return;
-	  }
-
-      Chanel2( this, fts_get_int( &at[1]));
-
-      if (ac > 2)
+      for(i = 1; i < ac; i++)
 	{
-	  this->nb_elm = ac-2;
-	  for( i = 2; i < ac; i++)
-	    this->Format[i-2] = App2( fts_get_int( &at[i]), FORMAT_MIN, FORMAT_MAX);
+	  if (!fts_is_int(at + i))
+	    {
+	      post("%s: argument %d non valide (%s)\n", NOM, i, fts_get_selector( &at[i]));
+	      return;
+	    }
+	}
+
+      Chanel2( this, fts_get_int(at));
+
+      if (ac > 1)
+	{
+	  this->nb_elm = ac - 1;
+	  for(i=1; i<ac; i++)
+	    this->Format[i - 1] = App2(fts_get_int(at + i), FORMAT_MIN, FORMAT_MAX);
 	}
     }
 }

@@ -109,7 +109,7 @@ static void in_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 {
   in_tilda_t *this = (in_tilda_t *)o;
 
-  if ( !in_out_check( o, ac-1, at+1, &this->port, &this->channel))
+  if ( !in_out_check( o, ac, at, &this->port, &this->channel))
     return;
 
   if (this->channel >= 0)
@@ -175,7 +175,7 @@ static void out_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 {
   out_tilda_t *this = (out_tilda_t *)o;
 
-  in_out_check( o, ac-1, at+1, &this->port, &this->channel);
+  in_out_check( o, ac, at, &this->port, &this->channel);
 }
 
 static void out_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

@@ -272,7 +272,7 @@ qlist_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   qlist_t *this = (qlist_t *)o;
   fts_atom_t a[1];
-  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
+  fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
 
   this->open = 0;
  

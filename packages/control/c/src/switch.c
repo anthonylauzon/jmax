@@ -43,7 +43,7 @@ switch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 { 
   switch_t *this = (switch_t *)o;
   
-  this->on = fts_get_int_arg(ac, at, 1, 0);
+  this->on = fts_get_int_arg(ac, at, 0, 0);
 }
 
 /************************************************************

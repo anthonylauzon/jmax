@@ -441,8 +441,8 @@ static void
 pitch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pitch_t *x = (pitch_t *)o;
-  long pt_common_arg_0 = fts_get_int_arg(ac, at, 1, 0);
-  long pt_common_arg_1 = fts_get_int_arg(ac, at, 2, 0);
+  long pt_common_arg_0 = fts_get_int_arg(ac, at, 0, 0);
+  long pt_common_arg_1 = fts_get_int_arg(ac, at, 1, 0);
   int i;
   
   if(!pt_common_init(&x->pt, pt_common_arg_0, pt_common_arg_1)) 

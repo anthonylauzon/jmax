@@ -49,13 +49,13 @@ iir_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 {
   iir_t *this = (iir_t *)o;
 
-  if(ac > 1 && ac <= 5)
+  if(ac > 0 && ac <= 4)
     {
       float *coefs;
       long n_order;
       long i;
       
-      n_order = ac - 1;
+      n_order = ac;
       
       this->n_order = n_order;
       this->coefs = ftl_data_alloc(sizeof(float) * n_order);
@@ -66,7 +66,7 @@ iir_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       for(i=0; i<n_order; i++)
 	{
 	  if(fts_is_number(at + i))
-	    coefs[i] = fts_get_float_arg(ac, at, i + 1, 0.0f);
+	    coefs[i] = fts_get_float_arg(ac, at, i, 0.0f);
 	  else
 	    coefs[i] = 0.0;
 	}

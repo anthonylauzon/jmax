@@ -113,9 +113,6 @@ invoke_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 { 
   invoke_t *this = (invoke_t *)o;
   
-  ac--;
-  at++;
-
   this->selector = NULL;
   this->class = NULL;
   this->method = NULL;

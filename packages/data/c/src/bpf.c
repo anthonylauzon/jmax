@@ -555,9 +555,6 @@ bpf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 { 
   bpf_t *this = (bpf_t *)o;
 
-  ac--;
-  at++;
-
   this->points = 0;
   this->alloc = 0;
   this->size = 0;

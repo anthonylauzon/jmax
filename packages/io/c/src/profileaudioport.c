@@ -92,9 +92,6 @@ static void profileaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, 
   fts_audioport_set_output_channels( (fts_audioport_t *)this, 2);
   fts_audioport_set_output_function( (fts_audioport_t *)this, profileaudioport_output);
 
-  ac--;
-  at++;
-
   this->profile_interval = fts_get_int_arg( ac, at, 0, DEFAULT_PROFILE_INTERVAL);
 
 #ifdef WIN32

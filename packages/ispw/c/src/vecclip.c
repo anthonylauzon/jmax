@@ -118,9 +118,6 @@ sigclip_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   float *min;
   float *max;
 
-  ac--;
-  at++;
-
   this->ftl_data_min = ftl_data_alloc(sizeof(float));
   this->ftl_data_max = ftl_data_alloc(sizeof(float));
 

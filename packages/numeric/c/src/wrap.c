@@ -41,8 +41,8 @@ static void
 wrap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   wrap_t *this = (wrap_t *)o;
-  float a = fts_get_float_arg(ac, at, 1, 0.0f);
-  float b = fts_get_float_arg(ac, at, 2, 0.0f);
+  float a = fts_get_float_arg(ac, at, 0, 0.0f);
+  float b = fts_get_float_arg(ac, at, 1, 0.0f);
 
   if(a <= b)
     {

@@ -86,9 +86,6 @@ seqmess_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   seqmess_t *this = (seqmess_t *)o;
 
-  ac--;
-  at++;
-  
   this->s = fts_s_bang;
   this->position = 0;
 

@@ -290,9 +290,6 @@ midievent_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
 
-  ac--;
-  at++;
-
   /* set type */
   if(ac > 0 && fts_is_int(at))
     this->type = fts_get_int(at);
