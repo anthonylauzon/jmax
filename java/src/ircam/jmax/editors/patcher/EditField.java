@@ -229,7 +229,6 @@ public class EditField extends JTextArea implements FocusListener
     owner.redraw();
     owner.redrawConnections();
 
-    sketch.requestFocus();
     owner = null;
   }
 
