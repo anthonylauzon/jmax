@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.objects;
+package ircam.jmax.guiobj;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -31,21 +31,22 @@ import java.util.*;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.menus.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
-class Scope extends VectorDisplay
+public class Scope extends VectorDisplay
 {
+  private static final Color scopeBackgroundColor = new Color((float)0.4, (float)0.75, (float)0.8);
+  private static final Color scopeMarkerColor = scopeBackgroundColor.darker();
+  private static final Color scopeLineColor = new Color((float)0.8196, (float)1.0, (float)0.9569);
+
   int onset = 0;
   int last = 0;
 
   public Scope(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
     super(theSketchPad, theFtsObject);
-
-    super.setBackgroundColor(new Color((float)0.0, (float)0.5, (float)0.4));
-    super.setMarkerColor(new Color((float)0.0, (float)0.25, (float)0.2));
-    super.setLineColor(Color.cyan);
   }
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
@@ -72,5 +73,43 @@ class Scope extends VectorDisplay
 	    last = x;
 	  }
       }
+
+    redraw();
   }
+
+  public void setWidth(int w) 
+  {
+    super.setWidth(w);
+
+    if(onset >= size)
+      onset = size - 1;
+  }
+
+  public Color getBackgroundColor()
+  {
+    if (isSelected())
+      return scopeBackgroundColor.darker();
+    else
+      return scopeBackgroundColor;
+  }
+
+  public Color getLineColor()
+  {
+    return scopeLineColor;
+  }
+
+  public void drawMarkers(Graphics g, int x, int y)
+  {
+    int zero = (int)((float)0.5 * (float)(range - 1) + (float)0.5);
+      
+    if (isSelected())
+      g.setColor(scopeMarkerColor.darker());
+    else
+      g.setColor(scopeMarkerColor);
+
+    if(onset > 0)
+      g.drawLine(x + onset, y - zero - 5, x + onset, y - zero + 5);
+    
+    g.drawLine(x, y - zero, x + size, y - zero);
+  }    
 }

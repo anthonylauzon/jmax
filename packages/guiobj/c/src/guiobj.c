@@ -40,6 +40,7 @@ extern void keyserver_config(void);
 extern void key_config(void);
 extern void display_config(void);
 extern void vecdisplay_config(void);
+extern void scope_config(void);
 
 static void
 fts_guiobj_init(void)
@@ -58,6 +59,7 @@ fts_guiobj_init(void)
   key_config();
   display_config();
   vecdisplay_config();
+  scope_config();
 }
 
 fts_module_t guiobj_module = {"guiobj", "standard GUI objects", fts_guiobj_init, 0, 0};

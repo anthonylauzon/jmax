@@ -20,22 +20,27 @@
 // 
 // Based on Max/ISPW by Miller Puckette.
 //
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+// Authors: Riccardo Borghesi, Francois Dechelle, Norbert Schnell.
 // 
 
-package ircam.jmax.fts;
+package ircam.jmax.guiobj;
 
+import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.text.*;
 
 import ircam.jmax.*;
+import ircam.jmax.fts.*;
 
 public class FtsScopeObject extends FtsVectorDisplayObject
 {
-  public FtsScopeObject(Fts fts, FtsObject parent, String className)
+  public FtsScopeObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
   {
-    super(fts, parent, className);
+    super(fts, parent, variable, className, nArgs, args);
+    
+    min = (float)-1.0;
+    max = (float)1.0;
   }
 
   public void setOnset(int n)

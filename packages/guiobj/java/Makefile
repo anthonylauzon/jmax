@@ -20,35 +20,30 @@
 # 
 # Based on Max/ISPW by Miller Puckette.
 #
-# Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+# Authors: Riccardo Borghesi, Francois Dechelle, Norbert Schnell.
 #
 
-JMAXDISTDIR=../..
+JMAXDISTDIR=../../..
 include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 
 all:
-	(cd c; $(MAKE) -k all)
-	(cd java ; $(MAKE) all)	
+	(cd src ; $(MAKE) all)
+	(cd src ; $(MAKE) jar)
 .PHONY: all
 
 clean:
-	(cd java ; $(MAKE) clean)	
-	(cd c; $(MAKE) clean)
-.PHONY: clean
-
-all_java:
-	(cd java ; $(MAKE) all)
-.PHONY: all
-
-clean_java:
-	(cd java ; $(MAKE) clean)
+	(cd src ; $(MAKE) clean)
 .PHONY: clean
 
 install:
-	$(INSTALL_DIR) $(lib_install_dir)/packages/guiobj
-	$(INSTALL_DATA) guiobj.jpk $(lib_install_dir)/packages/guiobj/guiobj.jpk
-	$(INSTALL_DATA) guiobj.scm $(lib_install_dir)/packages/guiobj/guiobj.scm
-	( cd help; $(MAKE) $@)
-	( cd java; $(MAKE) $@)
-	( cd c; $(MAKE) $@)
+	$(INSTALL_DIR) $(lib_install_dir)/packages/guiobj/java/classes
+	( \
+		cd classes ; \
+		$(INSTALL_DATA) guiobj.jar $(lib_install_dir)/packages/guiobj/java/classes/guiobj.jar ; \
+	)
 .PHONY: install
+
+
+
+
+

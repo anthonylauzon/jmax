@@ -48,6 +48,7 @@ install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw
 	$(INSTALL_DATA) ispw.jpk $(lib_install_dir)/packages/ispw/ispw.jpk
 	$(INSTALL_DATA) ispw.scm $(lib_install_dir)/packages/ispw/ispw.scm
+	( cd images; $(MAKE) $@)
 	( cd abs ; $(MAKE) $@)
 	( cd help; $(MAKE) $@)
 	( cd sounds; $(MAKE) $@)

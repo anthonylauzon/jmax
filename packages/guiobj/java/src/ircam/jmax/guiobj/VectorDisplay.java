@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.objects;
+package ircam.jmax.guiobj;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -31,10 +31,11 @@ import java.util.*;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.menus.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
-class VectorDisplay extends GraphicObject implements FtsDisplayListener
+public class VectorDisplay extends GraphicObject implements FtsDisplayListener
 {
   private static final int minWidth = 18;
   private static final int minHeight = 18;
@@ -46,9 +47,8 @@ class VectorDisplay extends GraphicObject implements FtsDisplayListener
   private static final int defaultWidth = 130;
   private static final int defaultHeight = 130;
 
-  Color backgroundColor = new Color((float)1.0, (float)0.98, (float)0.9);
-  Color markerColor = new Color((float)0.9, (float)0.88, (float)0.8);
-  Color lineColor = Color.black;
+  private static final Color displayYellow = new Color((float)1.0, (float)0.98, (float)0.9);
+  private static final Color markerYellow = new Color((float)0.9, (float)0.88, (float)0.8);
 
   int size = 0;
   int range = 0;
@@ -75,21 +75,6 @@ class VectorDisplay extends GraphicObject implements FtsDisplayListener
   public void display()
   {
     redraw();
-  }
-
-  public void setBackgroundColor(Color c) 
-  {
-    backgroundColor = c;
-  }
-
-  public void setMarkerColor(Color c) 
-  {
-    markerColor = c;
-  }
-
-  public void setLineColor(Color c) 
-  {
-    lineColor = c;
   }
 
   public void setWidth(int w) 
@@ -135,24 +120,103 @@ class VectorDisplay extends GraphicObject implements FtsDisplayListener
       return super.findSensibilityArea( mouseX, mouseY);
   }
 
-  private void paintVector(Graphics g, int x, int y, int[] values, int n)
+  public Color getBackgroundColor()
+  {
+    if (isSelected())
+      return displayYellow.darker();
+    else
+      return displayYellow;
+  }
+
+  public Color getLineColor()
+  {
+    return Color.black;;
+  }
+
+  public void drawMarkers(Graphics g, int x, int y)
+  {
+    int zero = ((FtsVectorDisplayObject)ftsObject).getZero();
+
+    if(zero > 0)
+      {
+	if (isSelected())
+	  g.setColor(markerYellow.darker());
+	else
+	  g.setColor(markerYellow);
+	
+	g.drawLine(x, y - zero, x + size, y - zero);
+      }    
+  }
+
+  public void drawWrappedVector(Graphics g, int x, int y, int[] values, int n, int wrap)
+  {
+    int from;
+    int fromX, fromY;
+    int m, i, j;
+
+    m = FtsVectorDisplayObject.MAX_SIZE - wrap;
+    if(m > n)
+      m = n;
+
+    from = values[wrap];
+    
+    if(from > range)
+      from = range;
+    
+    fromX = x;
+    fromY = y - from;
+
+    g.setColor(getLineColor());
+    
+    for(i=1, j=wrap+1; i<m; i++, j++)
+      {
+	int to = values[j];
+	
+	if(to > range)
+	  to = range;
+	
+	int toX = x + i;
+	int toY = y - to;
+	
+	g.drawLine(fromX, fromY, toX, toY);
+	
+	fromX = toX;
+	fromY = toY;
+      }
+
+    for(j=0; i<n; i++, j++)
+      {
+	int to = values[j];
+	
+	if(to > range)
+	  to = range;
+	
+	int toX = x + i;
+	int toY = y - to;
+	
+	g.drawLine(fromX, fromY, toX, toY);
+	
+	fromX = toX;
+	fromY = toY;
+      }
+  }
+
+  public void drawVector(Graphics g, int x, int y, int[] values, int n)
   {
     int from = values[0];
     
-    /* security for dynamic resize */
     if(from > range)
       from = range;
     
     int fromX = x;
     int fromY = y - from;
 
-    g.setColor(lineColor);
+    g.setColor(getLineColor());
     
     for(int i=1; i<n; i++)
       {
 	int to = values[i];
 	
-	/* security for dynamic resize */
 	if(to > range)
 	  to = range;
 	
@@ -175,7 +239,6 @@ class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
     int n = ((FtsVectorDisplayObject)ftsObject).getNValues();
     int[] values = ((FtsVectorDisplayObject)ftsObject).getValues();
-    int zero = ((FtsVectorDisplayObject)ftsObject).getZero();
 
     int orgX = x + 1;
     int orgY = y + h - 2;
@@ -183,22 +246,11 @@ class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
     ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 
-    if (isSelected())
-      g.setColor(backgroundColor.darker());
-    else
-      g.setColor(backgroundColor);
-
+    /* draw background */
+    g.setColor(getBackgroundColor());
     g.fillRect( x, y, w - 1, h - 1);
 
-    if(zero > 0)
-      {
-	if (isSelected())
-	  g.setColor(markerColor.darker());
-	else
-	  g.setColor(markerColor);
-	
-	g.drawLine(orgX, orgY - zero, orgX + size, orgY - zero);
-      }
+    drawMarkers(g, orgX, orgY);
 
     g.setColor(Color.black);
     g.drawRect( x, y, w - 1, h - 1);
@@ -209,7 +261,14 @@ class VectorDisplay extends GraphicObject implements FtsDisplayListener
       n = size;
 
     if(n > 1)
-      paintVector(g, orgX, orgY, values, n);
+      {
+	int wrap = ((FtsVectorDisplayObject)ftsObject).getWrap();
+
+	if(wrap > 0)
+	  drawWrappedVector(g, orgX, orgY, values, n, wrap);
+	else
+	  drawVector(g, orgX, orgY, values, n);
+      }
 
     ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
   }
@@ -224,6 +283,6 @@ class VectorDisplay extends GraphicObject implements FtsDisplayListener
       n = size;
 
     if(n > 1)
-      paintVector(g, getX() + 1, getY() + getHeight() - 2, values, n);
+      drawVector(g, getX() + 1, getY() + getHeight() - 2, values, n);
   }
 }

@@ -39,3 +39,4 @@ keyserver.c \
 key.c \
 display.c \
 vecdisplay.c \
+scope.c \

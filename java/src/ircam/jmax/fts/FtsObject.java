@@ -140,10 +140,6 @@ public class FtsObject /*extends Object*/
 	  obj =  new FtsMessConstObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
 	else if (className == "display")
 	  obj =  new FtsDisplayObject(fts, parent);
-	else if (className == "vecdisplay")
-	  obj =  new FtsVectorDisplayObject(fts, parent, className);
-	else if (className == "scope")
-	  obj =  new FtsScopeObject(fts, parent, className);
 	else if (className == "slider")
 	  obj =  new FtsSliderObject(fts, parent);
 	else if (className == "intbox")

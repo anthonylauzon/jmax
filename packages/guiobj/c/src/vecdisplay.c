@@ -43,10 +43,12 @@ typedef struct
   double period;
   int gate;
   int pending;
+  int scroll;
 } vecdisplay_t;
 
 static fts_symbol_t sym_vecdisplay = 0;
 static fts_symbol_t sym_display = 0;
+static fts_symbol_t sym_scroll = 0;
 static fts_symbol_t sym_bounds = 0;
 
 /************************************************************
@@ -62,7 +64,12 @@ vecdisplay_deliver(vecdisplay_t *this)
       this->pending = 0;
       this->gate = 0;
 
-      fts_client_send_message((fts_object_t *)this, sym_display, this->n, this->a);
+      if(this->scroll)
+	fts_client_send_message((fts_object_t *)this, sym_scroll, this->n, this->a);
+      else
+	fts_client_send_message((fts_object_t *)this, sym_display, this->n, this->a);
+
+      this->n = 0;
 
       fts_alarm_set_delay(&this->alarm, this->period);
       fts_alarm_arm(&this->alarm);
@@ -81,8 +88,13 @@ vecdisplay_alarm(fts_alarm_t *alarm, void *o)
       this->gate = 0;
       this->pending = 0;
       
-      fts_client_send_message(o, sym_display, this->n, this->a);
-      
+      if(this->scroll)
+	fts_client_send_message(o, sym_scroll, this->n, this->a);
+      else
+	fts_client_send_message(o, sym_display, this->n, this->a);
+
+      this->n = 0;
+
       fts_alarm_set_delay(&this->alarm, this->period);
       fts_alarm_arm(&this->alarm);
     }
@@ -113,12 +125,22 @@ vecdisplay_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       else if (value > max)
 	value = max;
 
-      display = (int)((this->range - 1) * (value - min) / value_range + 0.5);
+      if(!this->scroll)
+	{
+	  this->n = 0;
+	  this->scroll = 1;
+	}
 
-      fts_set_int(this->a, display);
-      this->n = 1;
-      
-      vecdisplay_deliver(this);
+      if(this->n < this->size)
+	{
+	  display = (int)((this->range - 1) * (value - min) / value_range + 0.5);
+	  
+	  fts_set_int(this->a + this->n, display);
+	  
+	  this->n++;
+	  
+	  vecdisplay_deliver(this);
+	}
     }
 }
 
@@ -138,6 +160,12 @@ vecdisplay_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       float max = this->max;
       float value_range = max - min;
       int i;
+
+      if(!this->scroll)
+	{
+	  this->n = 0;
+	  this->scroll = 1;
+	}
 
       for(i=0; i<n; i++)
 	{
@@ -173,6 +201,9 @@ vecdisplay_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   ivec_t * vec = ivec_atom_get(at);
   int *ptr = ivec_get_ptr(vec);
   int n = ivec_get_size(vec);
+  
+  /* display vector */
+  this->scroll = 0;
   
   if(n > size)
     n = size;
@@ -213,6 +244,9 @@ vecdisplay_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fvec_t * vec = fvec_atom_get(at);
   float *ptr = fvec_get_ptr(vec);
   int n = fvec_get_size(vec);
+
+  /* display vector */
+  this->scroll = 0;
   
   if(n > size)
     n = size;
@@ -243,6 +277,16 @@ vecdisplay_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       
       vecdisplay_deliver(this);
     }
+}
+
+static void 
+vecdisplay_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vecdisplay_t * this = (vecdisplay_t *)o;
+
+  this->n = 0;
+  
+  vecdisplay_deliver(this);  
 }
 
 static void
@@ -329,15 +373,17 @@ vecdisplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   at++;
 
   /* silent agreement with client */
-  this->min = -1.0;
-  this->max = 1.0;
+  this->min = 0.0;
+  this->max = 127.0;
   this->size = 128;
   this->range = 128;
 
   this->n = 0;
-  this->period = 50.0;
+  this->period = 100.0;
   this->gate = 1;
   this->pending = 0;
+
+  this->scroll = 0;
 
   fts_alarm_init(&this->alarm, 0, vecdisplay_alarm, (void *)this);
 }
@@ -366,9 +412,11 @@ vecdisplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, sym_bounds, vecdisplay_set_bounds);
   
   fts_method_define_varargs(cl, 0, fts_s_int, vecdisplay_number);
+  fts_method_define_varargs(cl, 0, fts_s_float, vecdisplay_number);
   fts_method_define_varargs(cl, 0, fts_s_list, vecdisplay_list);
   fts_method_define_varargs(cl, 0, fvec_symbol, vecdisplay_fvec);
   fts_method_define_varargs(cl, 0, ivec_symbol, vecdisplay_ivec);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), vecdisplay_clear);
 
   return fts_Success;
 }
@@ -378,6 +426,7 @@ vecdisplay_config(void)
 {
   sym_vecdisplay = fts_new_symbol("vecdisplay");
   sym_display = fts_new_symbol("display");
+  sym_scroll = fts_new_symbol("scroll");
   sym_bounds = fts_new_symbol("bounds");
 
   fts_class_install(sym_vecdisplay, vecdisplay_instantiate);

@@ -20,22 +20,23 @@
 // 
 // Based on Max/ISPW by Miller Puckette.
 //
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+// Authors: Riccardo Borghesi, Francois Dechelle, Norbert Schnell.
 // 
 
-package ircam.jmax.fts;
+package ircam.jmax.guiobj;
 
 import java.io.*;
 import java.util.*;
 import java.text.*;
 
 import ircam.jmax.*;
+import ircam.jmax.fts.*;
 
 public class FtsVectorDisplayObject extends FtsObject
 {
   public static final int MAX_SIZE = 1024;
-  private static final float defaultMin = (float)-1.0;
-  private static final float defaultMax = (float)1.0;
+  private static final float defaultMin = (float)0.0;
+  private static final float defaultMax = (float)127.0;
 
   int size = 0;
   int range = 0;
@@ -44,8 +45,9 @@ public class FtsVectorDisplayObject extends FtsObject
   float min = defaultMin;
   float max = defaultMax;
   int zero = 0; /* y position of zero axis */
+  int wrap = 0;
 
-  public FtsVectorDisplayObject(Fts fts, FtsObject parent, String className)
+  public FtsVectorDisplayObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
   {
     super(fts, parent, null, className, "");
     
@@ -68,7 +70,8 @@ public class FtsVectorDisplayObject extends FtsObject
 
   public void setSize(int n)
   {
-    nValues = 0;
+    //    nValues = 0;
+    //    wrap = 0;
 
     size = n;
 
@@ -84,6 +87,7 @@ public class FtsVectorDisplayObject extends FtsObject
   public void setRange(int n)
   {
     nValues = 0;
+    wrap = 0;
 
     range = n;
 
@@ -91,11 +95,6 @@ public class FtsVectorDisplayObject extends FtsObject
     sendMessage(FtsObject.systemInlet, "range", 1, sendArgs);
 
     computeZero();
-  }  
-
-  public int getZero()
-  {
-    return zero;
   }  
 
   public int getNValues()
@@ -108,9 +107,21 @@ public class FtsVectorDisplayObject extends FtsObject
     return values;
   }  
 
+  public int getZero()
+  {
+    return zero;
+  }  
+
+  public int getWrap()
+  {
+    return wrap;
+  }  
+
   public void display(int nArgs, FtsAtom args[])
   {
     int i;
+    
+    wrap = 0;
 
     for(i=0; i<nArgs; i++)
       values[i] = args[i].getInt();
@@ -120,9 +131,39 @@ public class FtsVectorDisplayObject extends FtsObject
     ((FtsDisplayListener) listener).display();
   }
 
+  public void scroll(int nArgs, FtsAtom args[])
+  {
+    if(wrap >= nArgs)
+      {
+	wrap -= nArgs;
+	
+	for(int i=0; i<nArgs; i++)
+	  values[wrap + i] = args[nArgs - i - 1].getInt();
+      }
+    else
+      {
+	for(int i=0; i<wrap; i++)
+	  values[wrap - i - 1] = args[i].getInt();
+	
+	int tail = nArgs - wrap;
+
+	for(int i=0; i<tail; i++)
+	  values[MAX_SIZE - i - 1] = args[wrap + i].getInt();
+	
+	wrap = MAX_SIZE - tail;
+      }
+    
+    nValues += nArgs;
+    if(nValues > size)
+      nValues = size;
+
+    ((FtsDisplayListener) listener).display();
+  }
+
   public void bounds(int nArgs, FtsAtom args[])
   {
     nValues = 0;
+    wrap = 0;
 
     min = args[0].getFloat();
     max = args[1].getFloat();

@@ -20,35 +20,42 @@
 # 
 # Based on Max/ISPW by Miller Puckette.
 #
-# Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+# Authors: Riccardo Borghesi, Francois Dechelle, Norbert Schnell.
 #
 
-JMAXDISTDIR=../..
-include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
+JMAXROOTDIR= ../../../..
+PACKAGE_ROOT = ../..
+PACKAGE_DIR =  
 
-all:
-	(cd c; $(MAKE) -k all)
-	(cd java ; $(MAKE) all)	
+include $(JMAXROOTDIR)/java/Makefiles/Makefile.package
+
+DOC_PACKAGES =  ircam.jmax.guiobj
+
+JAR_FILE= guiobj.jar
+
+ALL_CLASSES=$(shell find $(JAVA_CLASSES_ROOT)/ircam -name '*.class')
+
+all: $(JAVA_CLASSES_ROOT)
+	(cd ircam ; $(MAKE) all)
 .PHONY: all
 
 clean:
-	(cd java ; $(MAKE) clean)	
-	(cd c; $(MAKE) clean)
+	(cd ircam ; $(MAKE) clean)
 .PHONY: clean
 
-all_java:
-	(cd java ; $(MAKE) all)
-.PHONY: all
+doc:  
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javadoc -d $(PACKAGE_DIR)/java/doc $(ALL_PACKAGES))
+.PHONY: doc
 
-clean_java:
-	(cd java ; $(MAKE) clean)
-.PHONY: clean
+doc_private:  
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javadoc -private -d $(ROOTDIR)/java/doc_private $(ALL_PACKAGES))
+.PHONY: doc_private
 
-install:
-	$(INSTALL_DIR) $(lib_install_dir)/packages/guiobj
-	$(INSTALL_DATA) guiobj.jpk $(lib_install_dir)/packages/guiobj/guiobj.jpk
-	$(INSTALL_DATA) guiobj.scm $(lib_install_dir)/packages/guiobj/guiobj.scm
-	( cd help; $(MAKE) $@)
-	( cd java; $(MAKE) $@)
-	( cd c; $(MAKE) $@)
-.PHONY: install
+jar: $(JAVA_CLASSES_ROOT)/$(JAR_FILE)
+.PHONY: jar
+
+$(JAVA_CLASSES_ROOT)/$(JAR_FILE): $(ALL_CLASSES)
+	(cd $(JAVA_CLASSES_ROOT) ; /bin/rm -f $(JAR_FILE) ; jar -cvf $(JAR_FILE) ircam )
+
+include $(JMAXROOTDIR)/java/Makefiles/Makefile.package.misc
+

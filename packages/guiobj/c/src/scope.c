@@ -438,7 +438,7 @@ scope_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   data->size = 128;
   this->range = 128;
-  data->period = 2000;
+  data->period = 4000;
   data->pre = 0;
   data->start = 0;
   fts_alarm_init(&(data->alarm), 0, scope_send_to_client, (void *)this);
@@ -487,7 +487,7 @@ scope_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 }
 
 void
-signal_scope_config(void)
+scope_config(void)
 {
   scope_symbol = fts_new_symbol("scope");
   sym_display = fts_new_symbol("display");
