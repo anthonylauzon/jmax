@@ -3407,7 +3407,6 @@
 				F851211D028BD5E101664092,
 				F851211E028BD5E101664092,
 				F851211F028BD5E101664092,
-				F8512120028BD5E101664092,
 				F8512121028BD5E101664092,
 				F8512122028BD5E101664092,
 				F8512123028BD5E101664092,
@@ -3863,7 +3862,6 @@
 				F8512113028BD5E001664092,
 				F8512114028BD5E001664092,
 				F8512115028BD5E001664092,
-				F8512116028BD5E001664092,
 				F8512117028BD5E001664092,
 			);
 			isa = PBXGroup;
@@ -4097,12 +4095,6 @@
 			path = ../../packages/ispw/java/ircam/jmax/editors/qlist/actions/PasteAction.java;
 			refType = 2;
 		};
-		F8512116028BD5E001664092 = {
-			isa = PBXFileReference;
-			name = PrintAction.java;
-			path = ../../packages/ispw/java/ircam/jmax/editors/qlist/actions/PrintAction.java;
-			refType = 2;
-		};
 		F8512117028BD5E001664092 = {
 			isa = PBXFileReference;
 			name = SetAction.java;
@@ -4153,12 +4145,6 @@
 		};
 		F851211F028BD5E101664092 = {
 			fileRef = F8512115028BD5E001664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8512120028BD5E101664092 = {
-			fileRef = F8512116028BD5E001664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -8715,7 +8701,6 @@
 				F8512458028BEAB401664092,
 				F8512459028BEAB401664092,
 				F851245A028BEAB401664092,
-				F851245B028BEAB401664092,
 				F851245C028BEAB401664092,
 				F851245D028BEAB401664092,
 				F851245E028BEAB401664092,
@@ -8847,7 +8832,6 @@
 				F85123AF028BEAB301664092,
 				F85123B0028BEAB301664092,
 				F85123B1028BEAB301664092,
-				F85123B2028BEAB301664092,
 				F85123B3028BEAB301664092,
 				F85123B4028BEAB301664092,
 				F85123B5028BEAB301664092,
@@ -8920,12 +8904,6 @@
 			isa = PBXFileReference;
 			name = PasteAction.java;
 			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/actions/PasteAction.java;
-			refType = 2;
-		};
-		F85123B2028BEAB301664092 = {
-			isa = PBXFileReference;
-			name = PrintAction.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/actions/PrintAction.java;
 			refType = 2;
 		};
 		F85123B3028BEAB301664092 = {
@@ -10024,12 +10002,6 @@
 		};
 		F851245A028BEAB401664092 = {
 			fileRef = F85123B1028BEAB301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F851245B028BEAB401664092 = {
-			fileRef = F85123B2028BEAB301664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -13635,7 +13607,6 @@
 				F880FDCE0283013E01664092,
 				F880FDCF0283013E01664092,
 				F880FDD00283013E01664092,
-				F880FDD10283013E01664092,
 			);
 			isa = PBXGroup;
 			name = console;
@@ -13657,12 +13628,6 @@
 			isa = PBXFileReference;
 			name = ControlPanel.java;
 			path = ../../java/src/ircam/jmax/editors/console/ControlPanel.java;
-			refType = 2;
-		};
-		F880FDD10283013E01664092 = {
-			isa = PBXFileReference;
-			name = FileMenu.java;
-			path = ../../java/src/ircam/jmax/editors/console/FileMenu.java;
 			refType = 2;
 		};
 		F880FDD20283013E01664092 = {
@@ -13750,13 +13715,10 @@
 				F880FDF20283013E01664092,
 				F880FDF30283013E01664092,
 				F880FDF40283013E01664092,
-				F880FDF50283013E01664092,
 				F880FDF60283013E01664092,
 				F880FDF70283013E01664092,
 				F880FDF80283013E01664092,
 				F880FDF90283013E01664092,
-				F880FDFA0283013E01664092,
-				F880FDFB0283013E01664092,
 				F880FDFC0283013E01664092,
 				F880FDFD0283013E01664092,
 				F880FDFE0283013E01664092,
@@ -13968,12 +13930,6 @@
 			path = ../../java/src/ircam/jmax/editors/patcher/actions/PasteAction.java;
 			refType = 2;
 		};
-		F880FDF50283013E01664092 = {
-			isa = PBXFileReference;
-			name = PrintAction.java;
-			path = ../../java/src/ircam/jmax/editors/patcher/actions/PrintAction.java;
-			refType = 2;
-		};
 		F880FDF60283013E01664092 = {
 			isa = PBXFileReference;
 			name = RemoveInOutletConnection.java;
@@ -13996,18 +13952,6 @@
 			isa = PBXFileReference;
 			name = ResizeToMaxWidthAction.java;
 			path = ../../java/src/ircam/jmax/editors/patcher/actions/ResizeToMaxWidthAction.java;
-			refType = 2;
-		};
-		F880FDFA0283013E01664092 = {
-			isa = PBXFileReference;
-			name = SaveAction.java;
-			path = ../../java/src/ircam/jmax/editors/patcher/actions/SaveAction.java;
-			refType = 2;
-		};
-		F880FDFB0283013E01664092 = {
-			isa = PBXFileReference;
-			name = SaveAsAction.java;
-			path = ../../java/src/ircam/jmax/editors/patcher/actions/SaveAsAction.java;
 			refType = 2;
 		};
 		F880FDFC0283013E01664092 = {
@@ -14893,36 +14837,20 @@
 		};
 		F880FE7C0283013E01664092 = {
 			children = (
-				F880FE7D0283013E01664092,
 				F880FE7E0283013E01664092,
-				F880FE7F0283013E01664092,
 				F880FE800283013E01664092,
 				F880FE810283013E01664092,
 				F880FE820283013E01664092,
 				F880FE830283013E01664092,
-				F880FE840283013E01664092,
-				F880FE850283013E01664092,
 			);
 			isa = PBXGroup;
 			name = actions;
 			refType = 4;
 		};
-		F880FE7D0283013E01664092 = {
-			isa = PBXFileReference;
-			name = CloseAction.java;
-			path = ../../java/src/ircam/jmax/toolkit/actions/CloseAction.java;
-			refType = 2;
-		};
 		F880FE7E0283013E01664092 = {
 			isa = PBXFileReference;
 			name = DefaultActions.java;
 			path = ../../java/src/ircam/jmax/toolkit/actions/DefaultActions.java;
-			refType = 2;
-		};
-		F880FE7F0283013E01664092 = {
-			isa = PBXFileReference;
-			name = DSPAction.java;
-			path = ../../java/src/ircam/jmax/toolkit/actions/DSPAction.java;
 			refType = 2;
 		};
 		F880FE800283013E01664092 = {
@@ -14947,18 +14875,6 @@
 			isa = PBXFileReference;
 			name = OpenHelpSummaryAction.java;
 			path = ../../java/src/ircam/jmax/toolkit/actions/OpenHelpSummaryAction.java;
-			refType = 2;
-		};
-		F880FE840283013E01664092 = {
-			isa = PBXFileReference;
-			name = QuitAction.java;
-			path = ../../java/src/ircam/jmax/toolkit/actions/QuitAction.java;
-			refType = 2;
-		};
-		F880FE850283013E01664092 = {
-			isa = PBXFileReference;
-			name = StatisticsAction.java;
-			path = ../../java/src/ircam/jmax/toolkit/actions/StatisticsAction.java;
 			refType = 2;
 		};
 		F880FE860283013E01664092 = {
@@ -15564,7 +15480,6 @@
 				F880FEF50283013E01664092,
 				F880FEF60283013E01664092,
 				F880FEF70283013E01664092,
-				F880FEF80283013E01664092,
 				F880FEF90283013E01664092,
 				F880FEFA0283013E01664092,
 				F880FEFB0283013E01664092,
@@ -15637,13 +15552,10 @@
 				F880FF3E0283013F01664092,
 				F880FF3F0283013F01664092,
 				F880FF400283013F01664092,
-				F880FF410283013F01664092,
 				F880FF420283013F01664092,
 				F880FF430283013F01664092,
 				F880FF440283013F01664092,
 				F880FF450283013F01664092,
-				F880FF460283013F01664092,
-				F880FF470283013F01664092,
 				F880FF480283013F01664092,
 				F880FF490283013F01664092,
 				F880FF4A0283013F01664092,
@@ -15778,15 +15690,11 @@
 				F880FFCF0283013F01664092,
 				F880FFD00283013F01664092,
 				F880FFD10283013F01664092,
-				F880FFD20283013F01664092,
 				F880FFD30283013F01664092,
-				F880FFD40283013F01664092,
 				F880FFD50283013F01664092,
 				F880FFD60283013F01664092,
 				F880FFD70283013F01664092,
 				F880FFD80283013F01664092,
-				F880FFD90283013F01664092,
-				F880FFDA0283013F01664092,
 				F880FFDB0283013F01664092,
 				F880FFDC0283013F01664092,
 				F880FFDD0283013F01664092,
@@ -15952,12 +15860,6 @@
 		};
 		F880FEF70283013E01664092 = {
 			fileRef = F880FDD00283013E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F880FEF80283013E01664092 = {
-			fileRef = F880FDD10283013E01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -16394,12 +16296,6 @@
 			settings = {
 			};
 		};
-		F880FF410283013F01664092 = {
-			fileRef = F880FDF50283013E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F880FF420283013F01664092 = {
 			fileRef = F880FDF60283013E01664092;
 			isa = PBXBuildFile;
@@ -16420,18 +16316,6 @@
 		};
 		F880FF450283013F01664092 = {
 			fileRef = F880FDF90283013E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F880FF460283013F01664092 = {
-			fileRef = F880FDFA0283013E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F880FF470283013F01664092 = {
-			fileRef = F880FDFB0283013E01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -17240,20 +17124,8 @@
 			settings = {
 			};
 		};
-		F880FFD20283013F01664092 = {
-			fileRef = F880FE7D0283013E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F880FFD30283013F01664092 = {
 			fileRef = F880FE7E0283013E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F880FFD40283013F01664092 = {
-			fileRef = F880FE7F0283013E01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -17278,18 +17150,6 @@
 		};
 		F880FFD80283013F01664092 = {
 			fileRef = F880FE830283013E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F880FFD90283013F01664092 = {
-			fileRef = F880FE840283013E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F880FFDA0283013F01664092 = {
-			fileRef = F880FE850283013E01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
