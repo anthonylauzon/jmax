@@ -56,18 +56,21 @@ void sgi_midi_init(void)
 {
   fts_dev_class_t *sgi_midi_dev_class;
 
-  if (mdInit() <= 0)
-    return;
-
   /* adding device functions: the device support only basic 
    character i/o; no callback functions, no sync functions */
 
   sgi_midi_dev_class = fts_dev_class_new(fts_char_dev, fts_new_symbol("sgi_midi"));
 
+  /* (fd) HACK : the sgi midi device is no longer used */
+#if 0
+  if (mdInit() <= 0)
+    return;
+
   fts_dev_class_set_open_fun(sgi_midi_dev_class, sgi_midi_open);
   fts_dev_class_set_close_fun(sgi_midi_dev_class, sgi_midi_close);
   fts_dev_class_char_set_get_fun(sgi_midi_dev_class, sgi_midi_get);
   fts_dev_class_char_set_put_fun(sgi_midi_dev_class, sgi_midi_put);
+#endif
 }
 
 

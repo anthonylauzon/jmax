@@ -31,8 +31,24 @@ include $(JMAXROOTDIR)/Makefiles/Makefile.$(ARCH)
 endif
 
 # Architecture dependant packages are supposed to be C...
-C_PACKAGES=control data guiobj io ispw ispwmath lists math mess numeric reftype sources system $(ARCH_PACKAGES) 
+C_PACKAGES= $(ARCH_PACKAGES) \
+	control \
+	data \
+	guiobj \
+	io \
+	ispw \
+	ispwmath \
+	lists \
+	math \
+	mess \
+	midi \
+	numeric \
+	reftype \
+	sources \
+	system
+
 JAVA_PACKAGES=table
+
 MIXED_PACKAGES=explode qlist sequence
 
 all: all_c all_java

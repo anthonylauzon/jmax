@@ -89,7 +89,7 @@ static void
 makenote_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   makenote_t *x = (makenote_t *)o;
-  long n = fts_get_float_arg(ac, at, 0, 0.0f);
+  long n = fts_get_int_arg(ac, at, 0, 0);
   struct linknote *newnote;
 
   /* send the output messages */
@@ -122,7 +122,7 @@ makenote_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   makenote_t *x = (makenote_t *)o;
 
-  x->vel = fts_get_float_arg(ac, at, 0, 0.0f);
+  x->vel = fts_get_int_arg(ac, at, 0, 0);
 }
 
 static void
@@ -130,7 +130,7 @@ makenote_number_2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   makenote_t *x = (makenote_t *)o;
 
-  x->dur = (float) fts_get_float_arg(ac, at, 0, 0.0f);
+  x->dur = fts_get_float_arg(ac, at, 0, 0.0f);
 }
 
 static void
