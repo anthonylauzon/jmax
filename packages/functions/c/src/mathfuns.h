@@ -7,6 +7,8 @@ FUN(atan)
 FUN(sinh)
 FUN(cosh)
 FUN(tanh)
+#ifndef WIN32
 FUN(asinh)
 FUN(acosh)
 FUN(atanh)
+#endif
