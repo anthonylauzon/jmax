@@ -28,7 +28,7 @@ ROOTDIR=../..
 spec-files: jmax.spec
 
 jmax.spec: $(ROOTDIR)/VERSION
-	awk -v version=`cat $(ROOTDIR)/VERSION` '\
+	awk -v version=`cut -f1 -d\  $(ROOTDIR)/VERSION` '\
 $$1 == "Version:" { printf( "Version: %s\n", version ); } \
 $$1 != "Version:" { print} \
 ' jmax.spec > jmax.spec.out

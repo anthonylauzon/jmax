@@ -42,7 +42,7 @@ install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/unixdtd/bin/$(ARCH)/opt
 	( \
 		cd bin/$(ARCH)/opt ; \
-		$(INSTALL_PROGRAM) dtd $(lib_install_dir)/packages/unixdtd/bin/$(ARCH)/opt/dtd ; \
+		$(INSTALL_SETUID) dtd $(lib_install_dir)/packages/unixdtd/bin/$(ARCH)/opt/dtd ; \
 	)
 .PHONY: install
 

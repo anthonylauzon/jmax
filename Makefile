@@ -132,7 +132,7 @@ cvs-tag: spec-files
 		exit 1 ; \
 	fi
 	( \
-		TTT=V`sed 's/\./_/g' VERSION` ; \
+		TTT=V`cut -f1 -d\ VERSION | sed 's/\./_/g'` ; \
 		echo "Tagging with tag $$TTT" ; \
 		cvs tag -F $$TTT ; \
 	)
@@ -154,8 +154,8 @@ spec-files:
 dist:
 	( \
 		umask 22 ; \
-		VVV=`cat VERSION` ; \
-		TTT=V`sed 's/\./_/g' VERSION` ; \
+		VVV=`cut -f1 -d\ VERSION` ; \
+		TTT=V`cut -f1 -d\ VERSION | sed 's/\./_/g'` ; \
 		mkdir .$$$$ ; \
 		cd .$$$$ ; \
 		cvs export -r$$TTT jmax ; \
@@ -223,13 +223,16 @@ install-includes:
 # version number manipulation ('make new-patch' is the most frequent...)
 #
 new-patch:
-	awk -F. '{printf( "%d.%d.%d\n", $1, $2, $3+1);}' VERSION
+	awk '{ split( $$1, a, "."); printf( "%d.%d.%d\n", a[1], a[2], a[3]+1) }' VERSION > VERSION.out
+	mv VERSION.out VERSION
 	$(MAKE) spec-files
 
 new-minor:
-	awk -F. '{printf( "%d.%d.%d\n", $1, $2+1, 0);}' VERSION
+	awk '{ split( $$1, a, "."); printf( "%d.%d.%d\n", a[1], a[2]+1, a[3]) }'  VERSION > VERSION.out
+	mv VERSION.out VERSION
 	$(MAKE) spec-files
 
 new-major:
-	awk -F. '{printf( "%d.%d.%d\n", $1+1, 0, 0);}' VERSION
+	awk '{ split( $$1, a, "."); printf( "%d.%d.%d\n", a[1]+1, a[2], a[3]) }'  VERSION > VERSION.out
+	mv VERSION.out VERSION
 	$(MAKE) spec-files
