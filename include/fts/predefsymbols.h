@@ -37,6 +37,7 @@
 /* Messages and names */
 PREDEF_SYMBOL( fts_s_void, "void")
 PREDEF_SYMBOL( fts_s_float, "float")
+PREDEF_SYMBOL( fts_s_double, "double")
 PREDEF_SYMBOL( fts_s_int, "int")
 PREDEF_SYMBOL( fts_s_number, "number")
 PREDEF_SYMBOL( fts_s_pointer, "pointer")
