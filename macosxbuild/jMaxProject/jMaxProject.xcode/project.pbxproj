@@ -32,6 +32,21 @@
 			settings = {
 			};
 		};
+		3B6C0F200679CE5D00A89F54 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = EmptySequencePopupMenu.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/menus/EmptySequencePopupMenu.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B6C0F210679CE5D00A89F54 = {
+			fileRef = 3B6C0F200679CE5D00A89F54;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		3B75E8D906624AD4005BE87F = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -10054,6 +10069,7 @@
 				3BFD0F5E066CC9C7009D9668,
 				3BFBB6F8066E20EB00C7446F,
 				3BA5DEB706789BC90010BF0D,
+				3B6C0F210679CE5D00A89F54,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -18284,6 +18300,7 @@
 			children = (
 				F85123B7028BEAB301664092,
 				F85123B8028BEAB301664092,
+				3B6C0F200679CE5D00A89F54,
 				F85123B9028BEAB301664092,
 				F85123BB028BEAB301664092,
 				F85123BC028BEAB301664092,

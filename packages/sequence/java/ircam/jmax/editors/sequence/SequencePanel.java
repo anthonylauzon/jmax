@@ -46,7 +46,7 @@ import ircam.jmax.toolkit.Geometry;
 /**
 * The graphic component containing the tracks of a Sequence.
  */
-public class SequencePanel extends JPanel implements SequenceEditor, TrackListener, TrackDataListener, ListSelectionListener, ScrollManager, Serializable{
+public class SequencePanel extends /*JPanel*/PopupToolbarPanel implements SequenceEditor, TrackListener, TrackDataListener, ListSelectionListener, ScrollManager, Serializable{
 	
   FtsSequenceObject ftsSequenceObject;
   SequenceDataModel sequenceData;
@@ -73,6 +73,8 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
   
   static public Color violetColor = new Color(102, 102, 153);
   static public Font rulerFont = new Font("SansSerif", Font.PLAIN, 10);
+	
+	transient EmptySequencePopupMenu popup = null;
 	
   transient Component verticalGlue = Box.createVerticalGlue();
   /**
@@ -206,6 +208,34 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
 				}
 			}
 		};
+		
+	scrollTracks.addMouseListener(new MouseListener(){
+			public void mouseClicked(MouseEvent e){}
+			public void mousePressed(MouseEvent e){	
+				if(sequenceData.trackCount() == 0)
+					SequencePanel.this.processMouseEvent(e);
+			}
+			public void mouseReleased(MouseEvent e){}
+			public void mouseEntered(MouseEvent e)
+		  {
+				requestFocus();
+			}
+			public void mouseExited(MouseEvent e){}
+		});
+	}
+	
+	public JPopupMenu getMenu()
+	{	
+		if(popup == null)
+			createPopup();
+		
+		popup.update();
+		return popup;
+	}
+	
+	void createPopup()
+	{
+		popup = new EmptySequencePopupMenu(this);
 	}
 	
 	/**

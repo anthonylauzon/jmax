@@ -2,6 +2,7 @@ packagedir=$(pkglibdir)/packages/sequence/java/classes/ircam/jmax/editors/sequen
 package_JAVA = \
 ClosedTrackPopupMenu.java \
 EditMenu.java \
+EmptySequencePopupMenu.java \
 FileMenu.java \
 MidiTrackPopupMenu.java \
 MonoTrackPopupMenu.java \
