@@ -23,5 +23,11 @@ public class ErmesModule
 
     FtsPropertyDescriptor.setPersistent("autorouting", true);    
     FtsPropertyDescriptor.setDefaultValue("autorouting", "on");
+
+    FtsPropertyDescriptor.setPersistent("maxValue", true);    
+    FtsPropertyDescriptor.setDefaultValue("maxValue", new Integer(0));
+
+    FtsPropertyDescriptor.setPersistent("minValue", true);    
+    FtsPropertyDescriptor.setDefaultValue("minValue", new Integer(128));
   }
 }

@@ -21,19 +21,19 @@ public class FtsDotPatParser
     int x = 0;
     int y = 0;
     int width = 0;
-    int height = 0;
+    int range = 0;
     int fontSize = 12;
 
     /** Called only if it make sense */
 
-    void setHeight(FtsDotPatTokenizer in) throws java.io.IOException
+    void setRange(FtsDotPatTokenizer in) throws java.io.IOException
     {
       int n;
 
       n = in.getNVal();
       in.nextToken();
 
-      height = n;
+      range = n;
     }
 
     void setFontIndex(FtsDotPatTokenizer in) throws java.io.IOException
@@ -82,12 +82,14 @@ public class FtsDotPatParser
 	obj.put("fs", fontSize);
     }
 
-    void setGraphicProperties(FtsObject obj)
+    void setSliderGraphicProperties(FtsObject obj)
     {
       obj.setX(x);
       obj.setY(y);
       obj.setWidth(width);
-      obj.setHeight(height);
+      obj.setHeight(range + 20);
+      obj.put("minValue", 0);
+      obj.put("maxValue", range);
     }
 
     void setSquareGraphicProperties(FtsObject obj)
@@ -571,10 +573,10 @@ public class FtsDotPatParser
 
     if (objclass.equals("slider"))
       {
-	graphicDescr.setHeight(in);
+	graphicDescr.setRange(in);
 
 	obj = FtsObject.makeFtsObject(parent, "slider");
-	graphicDescr.setGraphicProperties(obj);
+	graphicDescr.setSliderGraphicProperties(obj);
 	return obj;
       }
     else if (objclass.equals("newex"))
