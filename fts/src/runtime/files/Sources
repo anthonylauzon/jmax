@@ -1,4 +1,24 @@
-SOURCES = files.c post.c parser.c
+ifeq ($(VENDOR),sgi)
+  ARCH_SOURCES = sgiaf.c
+endif
+
+ifeq ($(VENDOR),gnu)
+  ARCH_SOURCES = soundfiles.c
+endif
+
+ifeq ($(VENDOR),solaris2)
+  ARCH_SOURCES = soundfiles.c
+endif
+
+SOURCES = \
+  $(ARCH_SOURCES) \
+  files.c \
+  directories.c \
+  atomfiles.c \
+  post.c \
+  parser.c \
+  soundformats.c
+
 
 
 
