@@ -28,8 +28,9 @@ package ircam.jmax;
 
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 import ircam.jmax.editors.patcher.PatcherFontManager;
-
+import ircam.jmax.editors.patcher.Settings;
 //=====================================================
 //   Platform 
 //=====================================================
@@ -94,6 +95,69 @@ public class Platform
       {
 	setDefaultValues();
       }
+
+    
+    //setDefaultUIColors(Color.red);
+  }
+
+  static protected void setDefaultUIComponentsFont(String defFont)
+  {
+      Font plain = new Font(defFont, Font.PLAIN, 12);
+
+      UIManager.put("List.font", plain);
+      UIManager.put("TextArea.font", plain);
+      UIManager.put("TextField.font", plain);      
+      UIManager.put("Table.font", plain);
+      UIManager.put("TableHeader.font", plain);
+
+      Font bold = new Font(defFont, Font.BOLD, 12);
+
+      UIManager.put("Button.font", bold);
+      UIManager.put("CheckBox.font", bold);
+      UIManager.put("CheckBoxMenuItem.font", bold);
+      UIManager.put("ColorChooser.font", bold);
+      UIManager.put("ComboBox.font", bold);
+      UIManager.put("FileChooser.font", bold);
+      UIManager.put("Frame.font", bold);
+      UIManager.put("Label.font", bold);   
+      UIManager.put("Menu.font", bold);
+      UIManager.put("MenuBar.font", bold);
+      UIManager.put("MenuItem.font", bold);
+      UIManager.put("OptionPane.font", bold);
+      UIManager.put("Panel.font", bold);
+      UIManager.put("PopupMenu.font", bold);
+      UIManager.put("RadioButton.font", bold);
+      UIManager.put("RadioButtonMenuItem.font", bold);
+      UIManager.put("TabbedPane.font", bold);
+      UIManager.put("TitledBorder.font", bold);
+      UIManager.put("ToggleButton.font", bold);
+      UIManager.put("ToolBar.font", bold);
+      UIManager.put("ToolTip.font", bold);
+      UIManager.put("Tree.font", bold);
+  }
+
+  static protected void setDefaultUIColors(Color color)
+  {
+      UIManager.put("Panel.background", color);
+      UIManager.put("Viewport.background", color);
+      UIManager.put("MenuItem.background", color);
+      UIManager.put("MenuItem.selectionBackground", color);
+      UIManager.put("MenuBar.background", color);
+      UIManager.put("ScrollBar.background", color);
+      UIManager.put("Menu.background", color);
+      UIManager.put("OptionPane.background", color);
+      UIManager.put("ToolBar.background", color);
+      UIManager.put("ScrollPane.background", color);
+      UIManager.put("ToolBar.floatingBackground", color);
+      UIManager.put("Button.background", color);
+      UIManager.put("ComboBox.disabledBackground", color);
+      UIManager.put("ToolBar.dockingBackground", color);
+      UIManager.put("ToggleButton.background", color);
+      UIManager.put("CheckBoxMenuItem.background", color);
+      UIManager.put("RadioButtonMenuItem.background", color);
+      UIManager.put("Separator.background", color);
+
+      Settings.sharedInstance().setCoolColors();
   }
 
   //------------------------------------------
@@ -106,11 +170,10 @@ public class Platform
     NEWLINECHAR   = '\n';
     DELETE_KEY    = 8;
     BACKSPACE_KEY = 127;
-    ENTER_KEY     = /*3*/10;
+    ENTER_KEY     = 10;
     RETURN_KEY    = 10;
-    FONT_SIZE     = /*9*/10;
+    FONT_SIZE     = 10;
     FONT_STYLE    = Font.PLAIN;
-    //FONT_NAME     = new String("monaco");
     FONT_NAME = PatcherFontManager.getInstance().getFontName("Variable Width Font");
   }
 
@@ -130,9 +193,16 @@ public class Platform
     DOWN_KEY    = 40;
     ENTER_KEY   = 10;
     RETURN_KEY  = 10;
+
     FONT_SIZE   = 10;
     FONT_STYLE  = Font.PLAIN;
-    FONT_NAME   = new String("SansSerif");
+    FONT_NAME   = new String("Palatino");
+    
+    PatcherFontManager.getInstance().setRecoveringFont(FONT_NAME);
+    String[] fonts = {"SansSerif", "default", "Lucida Sans"};
+    PatcherFontManager.getInstance().setToRecoverFonts(fonts);
+
+    setDefaultUIComponentsFont(FONT_NAME);
   }
 
   //------------------------------------------
@@ -164,7 +234,6 @@ public class Platform
     ENTER_KEY   = 10;
     RETURN_KEY  = 10;
     FONT_NAME = new String("Arial");
-//      FONT_NAME = PatcherFontManager.getInstance().getFontName("Variable Width Font");
     FONT_SIZE   = 10;
     FONT_STYLE  = Font.PLAIN;
   }
@@ -190,14 +259,9 @@ public class Platform
     BACKSPACE_KEY = 127;
     ENTER_KEY   = 10;
     RETURN_KEY  = 10;
-    //FONT_NAME = new String("default");
     FONT_NAME = PatcherFontManager.getInstance().getFontName("Variable Width Font");
     FONT_SIZE   = 10;
     FONT_STYLE  = Font.PLAIN;
   }
 }
  
-
-
-
-
