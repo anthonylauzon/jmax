@@ -36,6 +36,7 @@ public class FileMenu extends DefaultFileMenu
 {
   public FileMenu(ErmesSketchPad sketch)
   {
+/*
     if(!sketch.isARootPatcher())
       {
 	if(sketch.isASubPatcher())
@@ -47,6 +48,7 @@ public class FileMenu extends DefaultFileMenu
 	     replace(Actions.saveTemplateAction, "Save Template", 3);
 	   }
       }
+*/
   }
 }
 

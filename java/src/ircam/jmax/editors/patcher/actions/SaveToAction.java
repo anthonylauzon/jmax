@@ -33,7 +33,7 @@ public class SaveToAction extends EditorAction
 {
   public SaveToAction()
   {
-    super("save to");
+    super("Save to...", null, KeyEvent.VK_T, KeyEvent.VK_UNDEFINED, true);
   }
 
   public void doAction(EditorContainer container)
