@@ -26,6 +26,8 @@
 ## package declaration
 package provide ispw
 
+package require reftype
+
 # load the dynamic libraries in FTS
 global jmaxArch jmaxMode
 ucs load module control $dir/lib/$jmaxArch/$jmaxMode/libcontrol.so

@@ -40,10 +40,11 @@ INSTALL=install
 INSTALL_DATA=$(INSTALL) -m 644
 INSTALL_PROGRAM=$(INSTALL) -m 755
 INSTALL_SETUID=$(INSTALL) -m 4755
+INSTALL_LIB=$(INSTALL) -m 755
 INSTALL_DIR=$(INSTALL) -d -m 755
 prefix=/usr
-doc_install_dir=$(prefix)/webdocs/jmax/$(version)/
-lib_install_dir=$(prefix)/lib/jmax/$(version)/
+doc_install_dir=$(prefix)/webdocs/jmax/
+lib_install_dir=$(prefix)/lib/jmax/
 include_install_dir=$(prefix)/include/
 bin_install_dir=$(prefix)/bin
 SUB_ARCHS=irix65r10k irix65r5k
@@ -53,10 +54,11 @@ INSTALL=install
 INSTALL_DATA=$(INSTALL) --mode=0644
 INSTALL_PROGRAM=$(INSTALL) --mode=0755
 INSTALL_SETUID=$(INSTALL) --mode=4755
+INSTALL_LIB=$(INSTALL) --mode=0755
 INSTALL_DIR=$(INSTALL) -d --mode=0755
 prefix=/usr
-doc_install_dir=$(prefix)/doc/jmax/$(version)/
-lib_install_dir=$(prefix)/lib/jmax/$(version)/
+doc_install_dir=$(prefix)/doc/jmax/
+lib_install_dir=$(prefix)/lib/jmax/
 include_install_dir=$(prefix)/include/
 bin_install_dir=$(prefix)/bin
 SUB_ARCHS=linuxpc
@@ -150,18 +152,18 @@ install-doc:
 .PHONY: install-doc
 
 install-exec:
-	( cd bin ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" bin_install_dir=$(bin_install_dir) $@ )
+	( cd bin ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DIR="$(INSTALL_DIR)" bin_install_dir=$(bin_install_dir) $@ )
 	$(INSTALL_DIR) $(lib_install_dir)
-	( cd config ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
-	( cd fts ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_SETUID="$(INSTALL_SETUID)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
-	( cd images ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
-	( cd java ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
-	( cd tcl ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
-	( cd packages ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) SUB_ARCHS="$(SUB_ARCHS)" $@ )
+	( cd config ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
+	( cd fts ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_SETUID="$(INSTALL_SETUID)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
+	( cd images ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
+	( cd java ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
+	( cd tcl ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
+	( cd packages ; $(MAKE) INSTALL_LIB="$(INSTALL_LIB)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) SUB_ARCHS="$(SUB_ARCHS)" $@ )
 .PHONY: install-exec
 
 install-includes:
-	( cd fts ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" include_install_dir=$(include_install_dir) $@ )
+	( cd fts ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" include_install_dir=$(include_install_dir) $@ )
 .PHONY: install-includes
 
 

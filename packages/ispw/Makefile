@@ -37,14 +37,14 @@ install-exec:
 	for d in $(SUB_ARCHS) ; do $(INSTALL_DIR) $(lib_install_dir)packages/ispw/lib/$$d/opt ; done
 	for d in $(SUB_ARCHS) ; do \
 		( cd lib/$$d/opt ; \
-			$(INSTALL_DATA) libcontrol.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_DATA) libdata.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_DATA) libfilters.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_DATA) libio.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_DATA) libmidi.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_DATA) libpitch.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_DATA) libsampling.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
-			$(INSTALL_DATA) libsignal.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_LIB) libcontrol.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_LIB) libdata.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_LIB) libfilters.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_LIB) libio.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_LIB) libmidi.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_LIB) libpitch.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_LIB) libsampling.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_LIB) libsignal.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
 		) ; done
 	( cd abs ; $(MAKE) $@)
 	( cd help; $(MAKE) $@)

@@ -35,7 +35,7 @@ install-exec:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/lists
 	$(INSTALL_DATA) lists.jpk $(lib_install_dir)/packages/lists
 	for d in $(SUB_ARCHS) ; do $(INSTALL_DIR) $(lib_install_dir)packages/lists/lib/$$d/opt ; done
-	for d in $(SUB_ARCHS) ; do ( cd lib/$$d/opt ; $(INSTALL_DATA) liblists.so $(lib_install_dir)packages/lists/lib/$$d/opt ) ; done
+	for d in $(SUB_ARCHS) ; do ( cd lib/$$d/opt ; $(INSTALL_LIB) liblists.so $(lib_install_dir)packages/lists/lib/$$d/opt ) ; done
 	( cd help; $(MAKE) $@)
 	( cd templates; $(MAKE) $@)
 .PHONY: install-exec

@@ -25,6 +25,8 @@
 
 package provide generic
 
+package require reftype
+
 global jmaxArch jmaxMode
 ucs load module generic $dir/c/lib/$jmaxArch/$jmaxMode/libgeneric.so
 

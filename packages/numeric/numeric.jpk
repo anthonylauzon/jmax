@@ -25,6 +25,8 @@
 
 package provide numeric
 
+package require reftype
+
 global jmaxArch jmaxMode
 ucs load module numeric $dir/c/lib/$jmaxArch/$jmaxMode/libnumeric.so
 
