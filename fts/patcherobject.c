@@ -994,7 +994,8 @@ fts_object_save_dialog(fts_object_t *o, fts_symbol_t callback, fts_symbol_t prom
 void
 fts_object_update_gui_property(fts_object_t *o, fts_symbol_t property, const fts_atom_t *value)
 {
-  fts_client_send_message(o, property, 1, value);
+  if(fts_object_has_id(o))
+	fts_client_send_message(o, property, 1, value);
 }
 
 /*********************************************************************************

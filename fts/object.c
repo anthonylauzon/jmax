@@ -110,7 +110,7 @@ void
 fts_object_set_name(fts_object_t *obj, fts_symbol_t sym)
 {
   fts_patcher_t *patcher = fts_object_get_patcher(obj);
-
+  fts_atom_t a;
   if(patcher != NULL)
   {
     /* reset current definition */
@@ -122,8 +122,7 @@ fts_object_set_name(fts_object_t *obj, fts_symbol_t sym)
       fts_patcher_t *scope = fts_patcher_get_scope(patcher);
       fts_symbol_t name = fts_name_get_unused(scope, sym);
       fts_definition_t *def = fts_definition_get(scope, name);
-      fts_atom_t a;
-
+      
       /* set new definiton */
       fts_set_object(&a, obj);
       fts_definition_update(def, &a);
@@ -132,23 +131,16 @@ fts_object_set_name(fts_object_t *obj, fts_symbol_t sym)
       fts_object_set_definition(obj, def);
 
       /* set name of object */
-      if(fts_object_has_id(obj))
-      {
-        fts_set_symbol(&a, name);
-		fts_object_update_gui_property(obj, fts_s_name, &a);
-	  }
+	  fts_set_symbol(&a, name);
+	  fts_object_update_gui_property(obj, fts_s_name, &a);
     }
     else 
     {
-	/* we cleared the name since we have an empty string */
-	fts_object_remove_name(obj);
-	if(fts_object_has_id(obj))
-	{
-	    fts_atom_t a;
-	    
-	    fts_set_symbol(&a, fts_s_empty_string);
+		/* we cleared the name since we have an empty string */
+		fts_object_remove_name(obj);
+	
+		fts_set_symbol(&a, fts_s_empty_string);
 		fts_object_update_gui_property(obj, fts_s_name, &a);
-	}
     }
   }
 }
