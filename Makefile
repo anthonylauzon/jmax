@@ -170,7 +170,7 @@ src-dist: spec-files
 	rm -rf $(distdir)
 	umask 22
 	mkdir $(distdir)
-	cvs export -r $(disttag) -d $(distdir) max
+	cvs export -r $(disttag) -d $(distdir) jmax
 	tar cvf - $(distdir) | gzip -c --best > $(distfile)
 	chmod 644 $(distfile)
 	rm -rf $(distdir)
