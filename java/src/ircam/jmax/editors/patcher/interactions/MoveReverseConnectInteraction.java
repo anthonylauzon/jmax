@@ -149,17 +149,28 @@ class MoveReverseConnectInteraction extends Interaction
       {
 	if ((! destinationChoosen) || src != (GraphicObject) area.getTarget() || outlet != area.getNumber())
 	  {
-	    src    = (GraphicObject) area.getTarget();
-	    outlet = area.getNumber();
-	    editor.setHighlightedOutlet(src, outlet);
-	    destinationChoosen = true;
-	  }
 
-	editor.getDisplayList().dragLine();
-	editor.getDisplayList().redrawDragLine();
-	editor.getDisplayList().setDragLine(moveStart.x, moveStart.y, 
-					    src.getOutletAnchorX(outlet), src.getOutletAnchorY(outlet));
-	editor.getDisplayList().redrawDragLine();
+	    if(!editor.getDisplayList().thisConnectionExist((GraphicObject) area.getTarget(), area.getNumber(),
+							    dst, inlet))
+	      {
+		src    = (GraphicObject) area.getTarget();
+		outlet = area.getNumber();
+		editor.setHighlightedOutlet(src, outlet);
+		destinationChoosen = true;
+		editor.getDisplayList().dragLine();
+		editor.getDisplayList().redrawDragLine();
+		editor.getDisplayList().setDragLine(moveStart.x, moveStart.y, 
+						    src.getOutletAnchorX(outlet), src.getOutletAnchorY(outlet));
+		editor.getDisplayList().redrawDragLine();
+	      }
+	    else 
+	      {
+		editor.getDisplayList().dragLine();
+		editor.getDisplayList().redrawDragLine();
+		editor.getDisplayList().setDragLine(moveStart.x, moveStart.y, mouse.x, mouse.y);
+		editor.getDisplayList().redrawDragLine();
+	      }
+	  }
       }
     else if (Squeack.isMove(squeack))
       {

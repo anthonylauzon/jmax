@@ -146,19 +146,28 @@ class MoveConnectInteraction extends Interaction
       {
 	if ((! destinationChoosen) || dst != (GraphicObject) area.getTarget() || inlet != area.getNumber())
 	  {
-	    dst   = (GraphicObject) area.getTarget();
-	    inlet = area.getNumber();
-
-	    editor.setHighlightedInlet(dst, inlet);
-	    destinationChoosen = true;
+	   
+	    if(!editor.getDisplayList().thisConnectionExist(src, outlet, 
+							    (GraphicObject) area.getTarget(), area.getNumber()))
+	      {
+		dst   = (GraphicObject) area.getTarget();
+		inlet = area.getNumber();
+		editor.setHighlightedInlet(dst, inlet);
+		destinationChoosen = true;
+		editor.getDisplayList().dragLine();
+		editor.getDisplayList().redrawDragLine();
+		editor.getDisplayList().setDragLine(moveStart.x, moveStart.y,
+						    dst.getInletAnchorX(inlet), dst.getInletAnchorY(inlet));
+		editor.getDisplayList().redrawDragLine();
+	      }
+	    else
+	      {
+		editor.getDisplayList().dragLine();
+		editor.getDisplayList().redrawDragLine();
+		editor.getDisplayList().setDragLine(moveStart.x, moveStart.y, mouse.x, mouse.y);
+		editor.getDisplayList().redrawDragLine();
+	      }
 	  }
-
-
-	editor.getDisplayList().dragLine();
-	editor.getDisplayList().redrawDragLine();
-	editor.getDisplayList().setDragLine(moveStart.x, moveStart.y,
-					    dst.getInletAnchorX(inlet), dst.getInletAnchorY(inlet));
-	editor.getDisplayList().redrawDragLine();
       }
     else if (Squeack.isMove(squeack))
       {

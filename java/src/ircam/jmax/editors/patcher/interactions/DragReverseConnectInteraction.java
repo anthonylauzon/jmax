@@ -150,19 +150,30 @@ class DragReverseConnectInteraction extends Interaction
     else if (Squeack.isDrag(squeack) && Squeack.onOutlet(squeack))
       {
 	dragged = true;
+
 	if ((! destinationChoosen) || src != (GraphicObject) area.getTarget() || outlet != area.getNumber())
 	  {
-	    src    = (GraphicObject) area.getTarget();
-	    outlet = area.getNumber();
-	    editor.setHighlightedOutlet(src, outlet);
-	    destinationChoosen = true;
+	    if(!editor.getDisplayList().thisConnectionExist((GraphicObject) area.getTarget(), area.getNumber(),
+							    dst, inlet))
+	      {
+		src    = (GraphicObject) area.getTarget();
+		outlet = area.getNumber();
+		editor.setHighlightedOutlet(src, outlet);
+		destinationChoosen = true;
+		editor.getDisplayList().dragLine();
+		editor.getDisplayList().redrawDragLine();
+		editor.getDisplayList().setDragLine(dragStart.x, dragStart.y, 
+						    src.getOutletAnchorX(outlet), src.getOutletAnchorY(outlet));
+		editor.getDisplayList().redrawDragLine();
+	      }
+	    else 
+	      {
+		editor.getDisplayList().dragLine();
+		editor.getDisplayList().redrawDragLine();
+		editor.getDisplayList().setDragLine(dragStart.x, dragStart.y, mouse.x, mouse.y);
+		editor.getDisplayList().redrawDragLine();
+	      }
 	  }
-	  
-	editor.getDisplayList().dragLine();
-	editor.getDisplayList().redrawDragLine();
-	editor.getDisplayList().setDragLine(dragStart.x, dragStart.y, 
-					    src.getOutletAnchorX(outlet), src.getOutletAnchorY(outlet));
-	editor.getDisplayList().redrawDragLine();
       }
     else if (Squeack.isDrag(squeack))
       {

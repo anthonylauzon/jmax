@@ -215,6 +215,26 @@ public class DisplayList
     return null;
   }
 
+  public boolean thisConnectionExist(GraphicObject src, int out, GraphicObject dst, int in)
+  {
+    GraphicConnection connection;
+    Object[] values = displayObjects.getObjectArray();
+    int size = displayObjects.size();
+    
+    for ( int i = 0; i < size; i++)
+      if (values[i] instanceof GraphicConnection)
+	{
+	  connection = (GraphicConnection) values[i];
+
+	  if ((connection.getSourceObject() == src) &&
+	      (connection.getOutlet()==out) && 
+	      (connection.getDestObject() == dst) &&
+	      (connection.getInlet()==in))
+	    return true;
+	}
+    return false;
+  }
+
   public void redrawConnectionsFor(GraphicObject obj)
   {
     Object[] values = displayObjects.getObjectArray();
@@ -323,7 +343,7 @@ public class DisplayList
 	action.processConnection((GraphicConnection) values[i]);
   }
 
-
+  
   // Magic sorting for objects and connections
   // essentially, keep objects are they are
   // and move the connections
@@ -455,6 +475,7 @@ public class DisplayList
     return candidateArea;
   }
 
+  //colled during connection and in runMode
   public SensibilityArea getObjectSensibilityAreaAt(int x, int y)
   {
     Object values[] = displayObjects.getObjectArray();
@@ -468,6 +489,7 @@ public class DisplayList
 	DisplayObject object = (DisplayObject) values[i];
 	 
 	if(object instanceof GraphicObject){ 
+	  
 	  SensibilityArea area = object.getSensibilityAreaAt( x, y);
 
 	  if (area != null)
@@ -831,7 +853,7 @@ public class DisplayList
 	width = (-1) * width;
 	x = x - width;
       }
-
+ 
     dragRectangle.x = x;
     dragRectangle.y = y;
     dragRectangle.width = width;
