@@ -29,14 +29,33 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.fts.client.*;
 
-public class FtsDefineObject extends FtsGraphicObject
+public class FtsDefineObject extends FtsIntValueObject
 {
+  static
+  {
+    FtsObject.registerMessageHandler( FtsDefineObject.class, FtsSymbol.get("type"), new FtsMessageHandler(){
+	  public void invoke(FtsObject obj, FtsArgs args)
+	  {
+	    ((FtsDefineObject)obj).setType( args.getSymbol(0).toString());
+	  }
+	});
+      FtsObject.registerMessageHandler( FtsDefineObject.class, FtsSymbol.get("expression"), new FtsMessageHandler(){
+	  public void invoke(FtsObject obj, FtsArgs args)
+	  {
+	    ((FtsDefineObject)obj).setExpression( args.getSymbol(0).toString());
+	  }
+	});
+    }
+
   public FtsDefineObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom[] args, int offset, int length)
   {
     super(server, parent, id, className, args[offset].stringValue);
 
     ninlets = 0;
     noutlets = 0;
+    
+    type = "const";
+    expression = "";
   }
 
   public int getNumberOfInlets()
@@ -47,6 +66,65 @@ public class FtsDefineObject extends FtsGraphicObject
   {
     return 0;
   }
+  
+  public void requestSetExpression( String expression)
+  {
+    this.expression = expression;
+
+    args.clear();
+    args.addRawString( expression);
+    
+    try
+      {
+	send( FtsSymbol.get("expression"), args);
+      }
+    catch( IOException e)
+      {
+	System.err.println("FtsDefineObject: I/O Error sending expression Message!");
+	e.printStackTrace(); 
+      }
+  }
+  
+  public void requestSetType( String type)
+  {
+    this.type = type;
+
+    args.clear();
+    args.addSymbol( FtsSymbol.get( type));
+    
+    try
+      {
+	send( FtsSymbol.get("type"), args);
+      }
+    catch( IOException e)
+      {
+	System.err.println("FtsDefineObject: I/O Error sending setType Message!");
+	e.printStackTrace(); 
+      }
+  }
+  
+  public String getExpression()
+  {
+    return expression;
+  }
+  
+  public void setExpression( String expression)
+  {
+    this.expression = expression;
+  }
+  
+  public String getType()
+  {
+    return type;
+  }
+  
+  public void setType( String type)
+  {
+    this.type = type;
+  }
+  
+  private String expression;
+  private String type;
 }
 
 

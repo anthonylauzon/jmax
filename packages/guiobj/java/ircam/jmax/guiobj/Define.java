@@ -30,50 +30,33 @@ import javax.swing.SwingUtilities;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
+import ircam.jmax.toolkit.*;
 
-public class Define extends Editable implements FtsObjectErrorListener{
+public class Define extends Editable implements FtsObjectErrorListener, FtsIntValueListener{
 
   private static final int DEFAULT_WIDTH = 44;
   private static final int MINIMUM_WIDTH = 20;
+
+  private static final int  statusInvalid = 0;
+  private static final int  statusValid = 1;
+  private int status = 1;
 
   private String variableName;
   private String variableValue;
   protected FontMetrics boldFontMetrics = null;
   protected Font boldFont = null;
 
-  public Define( FtsGraphicObject theFtsObject) 
+  int typeWidth = 0;
+
+  public Define( FtsDefineObject theFtsObject) 
   {
     super( theFtsObject);
     setDefaultWidth(MINIMUM_WIDTH);
         
-    setNameAndValue();
     boldFont = getFont().deriveFont( Font.BOLD | Font.ITALIC);
     boldFontMetrics = itsSketchPad.getFontMetrics( boldFont);
-  }
-
-  void setNameAndValue()
-  {
-    String descr = ftsObject.getDescription().trim();
-
-    if(descr != null)
-      {
-	int space = descr.indexOf(' ');
-	if( space != -1)
-	  {
-	    variableName = descr.substring( 0, space);
-	    variableValue = descr.substring( space+1);
-	  }
-	else
-	  {
-	    variableName = descr;
-	    variableValue = "";
-	  }
-      }
-    else
-      {
-	variableName = "";
-	variableValue = "";
-      }
+    
+    typeWidth = boldFontMetrics.stringWidth( theFtsObject.getType());
   }
 
   public boolean isResizable()
@@ -87,12 +70,16 @@ public class Define extends Editable implements FtsObjectErrorListener{
     updateDimensions();
   }
 
-  public int getVariableSize()
+  public void setType( String type)
   {
-    if( variableName!= null && !isEditing())
-      return boldFontMetrics.stringWidth( variableName);
-    else
-      return 0;
+    ((FtsDefineObject)ftsObject).requestSetType( type);
+    typeWidth = boldFontMetrics.stringWidth( type);
+    redraw();
+  }
+  
+  public int getTypeWidth()
+  {
+    return typeWidth;
   }
 
   public String getArgs()
@@ -132,10 +119,7 @@ public class Define extends Editable implements FtsObjectErrorListener{
 
   public void redefine( String text) 
   {
-    text = "define "+text;
-    ((FtsPatcherObject)ftsObject.getParent()).requestRedefineObject(ftsObject, text);
-    itsSketchPad.getDisplayList().remove(this);
-    dispose();
+    ((FtsDefineObject)ftsObject).requestSetExpression( text);
   }
 
   public void redefined()
@@ -154,9 +138,16 @@ public class Define extends Editable implements FtsObjectErrorListener{
     redraw();
   } 
 
+  public void valueChanged(int value) 
+  {
+    status = value;
+
+    redraw();
+  }
+
   public void fitToText()
   {
-    forceWidth(  getTextHeightOffset() + getVariableSize() + getFontMetrics().stringWidth(" ") + getFontMetrics().stringWidth( variableValue) + 6);
+    forceWidth(  getTextHeightOffset() + getTypeWidth() + getFontMetrics().stringWidth(" ") + getFontMetrics().stringWidth( variableValue) + 6);
   }
 
   public Dimension getMinimumSize() 
@@ -173,7 +164,7 @@ public class Define extends Editable implements FtsObjectErrorListener{
 
   public int getTextXOffset()
   {
-    return getTextHeightOffset() + getVariableSize() +2;
+    return getTextHeightOffset() + getTypeWidth() +2;
   }
 
   public int getTextYOffset()
@@ -183,7 +174,7 @@ public class Define extends Editable implements FtsObjectErrorListener{
 
   public int getTextWidthOffset()
   {
-    return  getTextHeightOffset() + getVariableSize() + 4;
+    return  getTextHeightOffset() + getTypeWidth() + 4;
   }
 
   public int getTextHeightOffset()
@@ -193,15 +184,15 @@ public class Define extends Editable implements FtsObjectErrorListener{
     
   public Color getTextForeground()
   {
-    if(ftsObject.isError())
+    if(status == statusValid)
+      return Color.black;
+    else
       {
 	if(isSelected())
 	  return Color.gray.darker();
 	else
 	  return Color.gray;
       }
-    else
-      return Color.black;
   }
 
   public Color getTextBackground()
@@ -223,13 +214,28 @@ public class Define extends Editable implements FtsObjectErrorListener{
     super.edit( point);
   }
 
+  public ObjectControlPanel getControlPanel()
+  {
+    return new DefineControlPanel( this);
+  }
+
+  public boolean isInspectable()
+  {
+    return true;
+  }
+  
+  public String getType()
+  {
+    return ((FtsDefineObject)ftsObject).getType();
+  }
+
   public void paint(Graphics g) 
   {
     int x = getX();
     int y = getY();
     int w = getWidth();
     int h = getHeight();
-    int hLine = (getVariableSize() > 0) ? getTextHeightOffset() + getVariableSize() + 4 : getTextHeightOffset() + 2;
+    int hLine = (getTypeWidth() > 0) ? getTextHeightOffset() + getTypeWidth() + 4 : getTextHeightOffset() + 2;
 
     g.setColor( getTextBackground());
 
@@ -242,9 +248,9 @@ public class Define extends Editable implements FtsObjectErrorListener{
 
 	int bottom = getFontMetrics().getAscent() + (h - getFontMetrics().getHeight())/2;
 	g.setFont( boldFont);
-	g.drawString( variableName, x + 4, y + bottom);
+	g.drawString( ((FtsDefineObject)ftsObject).getType(), x + 4, y + bottom);
 	g.setFont( getFont());
-	g.drawString( variableValue, x + hLine + 1, y + bottom);
+	g.drawString( ((FtsDefineObject)ftsObject).getExpression(), x + hLine + 1, y + bottom);
       }
     super.paint( g);
   }

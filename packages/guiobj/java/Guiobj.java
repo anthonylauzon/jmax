@@ -144,12 +144,12 @@ public class Guiobj implements JMaxPackage {
 	  return new XYPad( new FtsXYPadObject( server, parent, objId, className, args, offset, length));
 	}
       };
-    /*JMaxObjectCreator defineCreator = new JMaxObjectCreator() {
+    JMaxObjectCreator defineCreator = new JMaxObjectCreator() {
 	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
 	{
 	  return new Define( new FtsDefineObject( server, parent, objId, className, args, offset, length));
 	}
-      };*/
+      };
     JMaxObjectCreator inputCreator = new JMaxObjectCreator() {
 	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
 	{
@@ -161,6 +161,7 @@ public class Guiobj implements JMaxPackage {
     JMaxClassMap.put( "jpatcher", patcherCreator, "/icons/jpatcher.gif", "/icons/jpatcher_cursor.gif", "patcher", this);
     JMaxClassMap.put( "receive", inletCreator, "/icons/inlet.gif", "/icons/inlet_cursor.gif", "inlet label", this);
     JMaxClassMap.put( "send", outletCreator, "/icons/outlet.gif", "/icons/outlet_cursor.gif", "outlet label", this);
+    JMaxClassMap.put( "define", defineCreator, "/icons/define.gif", "/icons/define_cursor.gif", "define", this);
     JMaxClassMap.put( "fork", forkCreator, "/icons/fork.gif", "/icons/fork_cursor.gif", "fork", this);
     JMaxClassMap.put( "jcomment", jcommentCreator, "/icons/jcomment.gif", "/icons/jcomment_cursor.gif", "comment", this);
     JMaxClassMap.put( "messconst", messconstCreator, "/icons/messconst.gif", "/icons/messconst_cursor.gif", "message",this);
