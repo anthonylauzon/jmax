@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.2 $ IRCAM $Date: 1998/10/28 15:50:31 $
+ *      $Revision: 1.3 $ IRCAM $Date: 1999/01/19 16:58:10 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -14,6 +14,8 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
+/* (fd) For post */
+#include "runtime/files.h"
 
 #ifdef DEBUG 
 #define INIT_CHECK_STATUS 1

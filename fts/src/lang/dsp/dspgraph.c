@@ -5,6 +5,8 @@
 #include "lang/ftl.h"
 #include "lang/dsp.h"
 #include "gphiter.h"
+/* (fd) For post */
+#include "runtime/files.h"
 
 
 #define ASSERT(e) if (!(e)) { fprintf( stderr, "Assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}

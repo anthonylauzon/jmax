@@ -18,9 +18,6 @@
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
 
-/* (fd) */
-#include <stdio.h>
-
 typedef struct fts_param
 {
   fts_symbol_t name;
@@ -59,9 +56,6 @@ void fts_param_set_by(fts_symbol_t name, const fts_atom_t *value, const void *au
 {
   fts_param_t *p;
   int value_not_changed = 0;
-
-  /* (fd) */
-  fprintf( stderr, "setting parameter %s by 0x%x\n", fts_symbol_name( name), author);
 
   /* First, check if there, otherwise add it */
 
@@ -116,9 +110,6 @@ void fts_param_add_listener(fts_symbol_t name, void *listener,
   fts_param_listener_t *p;
   fts_param_t *pp;
 
-  /* (fd) */
-  fprintf( stderr, "adding listener 0x%x for %s\n", listener_fun, fts_symbol_name( name));
-
   /* Add the listener to the list */
 
   p = (fts_param_listener_t *) fts_heap_alloc(param_listener_heap);
@@ -147,8 +138,6 @@ static void fts_param_run_listeners(fts_symbol_t name, const fts_atom_t *value, 
   for (p = param_listener_list; p ; p = p->next)
     if ((p->name == name) && (author == 0 || p->listener != author))
       {
-	/* (fd) */
-	fprintf( stderr, "calling listener 0x%x for %s value %d\n", p->listener_fun, fts_symbol_name( name), fts_get_int(value));
 	(* p->listener_fun)(p->listener, name, value);
       }
 }

@@ -2,6 +2,8 @@
 #include "lang/mess.h"
 #include "lang/ftl.h"
 #include "lang/dsp.h"
+/* (fd) For post */
+#include "runtime/files.h"
 
 static int Sig_count = 0;
 static int Sig_defaultVectorSize = DEFAULTVS;

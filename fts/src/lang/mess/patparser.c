@@ -4,6 +4,8 @@
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
 #include "lang/mess/patlex.h"
+/* (fd) For post */
+#include "runtime/files.h"
 
 /* Auto scretch  */
 

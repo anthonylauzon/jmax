@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.59 $ IRCAM $Date: 1998/12/07 17:09:36 $
+ *      $Revision: 1.60 $ IRCAM $Date: 1998/12/29 16:16:08 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -18,6 +18,8 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
+/* (fd) For post */
+#include "runtime/files.h"
 
 extern void fts_client_release_object(fts_object_t *c);
 extern void fts_client_release_object_data(fts_object_t *c);
