@@ -33,6 +33,7 @@
 #include <fts/fts.h>
 #include <ftsprivate/OLDclient.h>
 #include <ftsconfig.h>
+#include <common/config.h>
 
 
 /******************************************************************************/
@@ -227,10 +228,14 @@ void fts_log_init(void)
 {
   FILE* log;
   char buf[1024];
+  char logfilename[1024];
 
 #ifdef WIN32
-  log_file = "C:\\fts_log.txt";
+  strcpy(logfilename, fts_config_get_log_dir());
+  strcat(logfilename, "\\fts_log.txt");
+  log_file = strdup(logfilename);
 #else
+  // TODO: remove and merge within config.c
   char* home = getenv("HOME");
   if (home) {
     snprintf(buf, 1024, "%s/.fts_log", home);
