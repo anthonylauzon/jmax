@@ -364,6 +364,12 @@ jackaudiomanager_thread_run(fts_object_t* o, int winlet, fts_symbol_t s, int ac,
 		      port->port_name, 
 		      jack_port_name(port->input_port));
 	    }
+	    else
+	    {
+	      fts_log("[jackaudiomanager] error while disconnection %s to %s \n",
+		      port->port_name,
+		      jack_port_name(port->input_port));
+	    }
 
 	    /* call jack_port_unregister */
 	    if (-1 != jack_port_unregister(manager_jack_client, port->input_port))
@@ -379,10 +385,18 @@ jackaudiomanager_thread_run(fts_object_t* o, int winlet, fts_symbol_t s, int ac,
 	  if (NULL != port->output_port)
 	  {
 	    /* call jack_disconnect */
-	    jack_port_disconnect(manager_jack_client, port->output_port);
-	    fts_log("[jackaudiomanager] disconnect %s to %s \n", 
-		    jack_port_name(port->output_port), 
-		    port->port_name);
+	    if (-1 != jack_port_disconnect(manager_jack_client, port->output_port))
+	    {
+	      fts_log("[jackaudiomanager] disconnect %s to %s \n", 
+		      jack_port_name(port->output_port), 
+		      port->port_name);
+	    }
+	    else
+	    {
+	      fts_log("[jackaudiomanager] error while disconnection %s to %s \n",
+		      jack_port_name(port->output_port),
+		      port->port_name);
+	    }
 
 	    /* call jack_port_unregister */
 	    if (-1 != jack_port_unregister(manager_jack_client, port->output_port))
@@ -698,7 +712,7 @@ jackaudiomanager_open_port(fts_object_t* port, fts_symbol_t port_name, fts_symbo
   fts_fifo_t* run_fifo;
   jackaudiomanager_t* self = (jackaudiomanager_t*)jackaudiomanager_get_manager_object();
 
-  fts_log("[jackaudiomanager] open a new jack audio port \n");
+  fts_log("[jackaudiomanager] open a new jack audio port %p\n", port);
 
   /* add src and dest symbol to thread fifo */
   manager_object = (jackaudiomanager_thread_t*)self->jack_communication;
@@ -850,6 +864,7 @@ jackaudiomanager_halt(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
 						   */
   fts_log("[jackaudiomanager] set jackaudiomanager process callback \n");
     
+  fts_dsp_set_sample_rate((double)jack_get_sample_rate(client));
   /* Activate jack client */    
   if (jack_activate(client) == -1)
   {
