@@ -205,7 +205,6 @@ static void fts_kernel_classes_config( void)
   _K_DECNCALL( fts_label_config);
   _K_DECNCALL( fts_midi_config);
   _K_DECNCALL( fts_objectset_config);
-  _K_DECNCALL( fts_post_config);
   _K_DECNCALL( fts_selection_config);
   _K_DECNCALL( fts_saver_config);
 }

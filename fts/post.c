@@ -43,9 +43,9 @@
  */
 
 /* Forward declaration */
-static int mempost_atoms( char **pp, int *psize, int ac, const fts_atom_t *at);
+static int mempost_atoms( char **pp, int *psize, int offset, int ac, const fts_atom_t *at);
 
-static int vmempost( char **pp, int *psize, const char *format, va_list ap)
+static int vmempost( char **pp, int *psize, int offset, const char *format, va_list ap)
 {
   int n;
 
@@ -60,15 +60,15 @@ static int vmempost( char **pp, int *psize, const char *format, va_list ap)
   while (1) 
     {
       /* Try to print in the allocated space. */
-      n = vsnprintf( *pp, *psize, format, ap);
+      n = vsnprintf( *pp+offset, *psize-offset, format, ap);
 
       /* If that worked, exit the loop. */
-      if (n > -1 && n < *psize)
+      if (n > -1 && n < *psize-offset)
 	break;
 
       /* Else try again with more space. */
       if (n > -1)    /* glibc 2.1 */
-	*psize = n + 1; /* precisely what is needed */
+	*psize = offset + n + 1; /* precisely what is needed */
       else           /* glibc 2.0 */
 	*psize *= 2;  /* twice the old size */
 
@@ -79,83 +79,83 @@ static int vmempost( char **pp, int *psize, const char *format, va_list ap)
   return n;
 }
 
-static int mempost( char **pp, int *psize, const char *format, ...)
+static int mempost( char **pp, int *psize, int offset, const char *format, ...)
 {
   va_list ap;
   int n;
 
   va_start( ap, format);
-  n = vmempost( pp, psize, format, ap);
+  n = vmempost( pp, psize, offset, format, ap);
   va_end( ap);
 
   return n;
 }
 
-static int mempost_symbol( int *psize, char **pp, fts_symbol_t s)
+static int mempost_symbol( int *psize, char **pp, int offset, fts_symbol_t s)
 {
   if ( strchr( s, ' ') != NULL)
-    return mempost( pp, psize, "\"%s\"", s);
+    return mempost( pp, psize, offset, "\"%s\"", s);
 
-  return mempost( pp, psize, "%s", s);
+  return mempost( pp, psize, offset, "%s", s);
 }
 
-static int mempost_object( char **pp, int *psize, fts_object_t *obj)
+static int mempost_object( char **pp, int *psize, int offset, fts_object_t *obj)
 {
   if (! obj)
-    return mempost( pp, psize, "{NULL OBJ}");
+    return mempost( pp, psize, offset, "{NULL OBJ}");
 
   if (obj->argv)
     {
-      int n;
+      int n = 0;
 
-      n = mempost( pp, psize, "{");
-      n += mempost_atoms( pp, psize, obj->argc, obj->argv);
-      n += mempost( pp, psize, "}");
+      n += mempost( pp, psize, offset+n, "{");
+      n += mempost_atoms( pp, psize, offset+n, obj->argc, obj->argv);
+      n += mempost( pp, psize, offset+n, "}");
 
       return n;
     }
 
-  return mempost( pp, psize, "<\"%s\" #%d>", fts_object_get_class_name(obj), fts_object_get_id(obj));
+  return mempost( pp, psize, offset, "<\"%s\" #%d>", fts_object_get_class_name(obj), fts_object_get_id(obj));
 }
 
 /* To be removed */
-static int mempost_connection( char **pp, int *psize, fts_connection_t *connection)
+static int mempost_connection( char **pp, int *psize, int offset, fts_connection_t *connection)
 {
   if (connection != 0)
-    return mempost( pp, psize, "<CONNECTION %d.%d %d.%d #%d>",
+    return mempost( pp, psize, offset, "<CONNECTION %d.%d %d.%d #%d>",
 		    connection->src->head.id, connection->woutlet, connection->dst->head.id, connection->winlet, connection->id);
 
-  return mempost( pp, psize, "<CONNECTION null>");
+  return mempost( pp, psize, offset, "<CONNECTION null>");
 }
 
-static int mempost_atoms( char **pp, int *psize, int ac, const fts_atom_t *at)
+static int mempost_atoms( char **pp, int *psize, int offset, int ac, const fts_atom_t *at)
 {
   int i, n = 0;
 
   for ( i = 0; i < ac; i++, at++)
     {
       if ( fts_is_void( at))
-	n += mempost( pp, psize, "<void>");
+	n += mempost( pp, psize, offset+n, "<void>");
       else if ( fts_is_int( at))
-	n += mempost( pp, psize, "%d", fts_get_int( at));
+	n += mempost( pp, psize, offset+n, "%d", fts_get_int( at));
       else if ( fts_is_float( at))
-	n += mempost( pp, psize, "%f", fts_get_float( at));
+	n += mempost( pp, psize, offset+n, "%f", fts_get_float( at));
       else if ( fts_is_symbol( at))
-	n += mempost( pp, psize, "%s", fts_get_symbol( at));
+	n += mempost( pp, psize, offset+n, "%s", fts_get_symbol( at));
       else if ( fts_is_object( at))
-	n += mempost_object( pp, psize, fts_get_object( at));
+	n += mempost_object( pp, psize, offset+n, fts_get_object( at));
       else if ( fts_is_pointer( at) )
-	n += mempost( pp, psize, "%p", fts_get_pointer( at));
+	n += mempost( pp, psize, offset+n, "%p", fts_get_pointer( at));
       else if ( fts_is_string( at))
-	n += mempost( pp, psize, "%s", fts_get_string( at));
+	n += mempost( pp, psize, offset+n, "%s", fts_get_string( at));
       /* To be removed */
       else if ( fts_is_connection( at))
-	n += mempost_connection( pp, psize, fts_get_connection( at));
+	n += mempost_connection( pp, psize, offset+n, fts_get_connection( at));
       else
-	n += mempost( pp, psize, "<UNKNOWN TYPE>%x", fts_get_int( at));
+	n += mempost( pp, psize, offset+n, "<UNKNOWN TYPE>%x", fts_get_int( at));
 
       if ( i != ac-1)
-	n += mempost( pp, psize, " ");
+	n += mempost( pp, psize, offset+n, " ");
     }
 
   return n;
@@ -174,7 +174,7 @@ static void fts_vspost( fts_bytestream_t *stream, const char *format, va_list ap
 {
   int n;
 
-  n = vmempost( &post_buffer, &post_buffer_size, format, ap);
+  n = vmempost( &post_buffer, &post_buffer_size, 0, format, ap);
 
   fts_bytestream_output( stream, n, post_buffer);
   fts_bytestream_flush( stream);
@@ -193,7 +193,7 @@ void fts_spost_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t *at)
 {
   int n;
 
-  n = mempost_atoms( &post_buffer, &post_buffer_size, ac, at);
+  n = mempost_atoms( &post_buffer, &post_buffer_size, 0, ac, at);
 
   fts_bytestream_output( stream, n, post_buffer);
   fts_bytestream_flush( stream);
@@ -239,7 +239,7 @@ void post( const char *format, ...)
   int n;
 
   va_start( ap, format);
-  n = vmempost( &post_buffer, &post_buffer_size, format, ap);
+  n = vmempost( &post_buffer, &post_buffer_size, 0, format, ap);
   va_end( ap);
 
   post_output_chars( post_buffer, n);
@@ -249,7 +249,7 @@ void post_atoms( int ac, const fts_atom_t *at)
 {
   int n;
 
-  n = mempost_atoms( &post_buffer, &post_buffer_size, ac, at);
+  n = mempost_atoms( &post_buffer, &post_buffer_size, 0, ac, at);
 
   post_output_chars( post_buffer, n);
 }
@@ -357,7 +357,7 @@ void fts_log_atoms( int ac, const fts_atom_t *at)
   if (log == NULL)
     return;
 
-  n = mempost_atoms( &log_buffer, &log_buffer_size, ac, at);
+  n = mempost_atoms( &log_buffer, &log_buffer_size, 0, ac, at);
 
   fwrite( log_buffer, n, 1, log);
 
@@ -397,70 +397,5 @@ void fts_set_default_console_stream( fts_bytestream_t *stream)
       fts_bytestream_output( stream, fts_stack_get_top( post_stack), fts_stack_get_base( post_stack));
       fts_bytestream_flush( stream);
     }
-}
-
-/***********************************************************************
- *
- * Hack
- *
- */
-
-static void stderrstream_output(fts_bytestream_t *stream, int count, const unsigned char *buf)
-{
-  fwrite( buf, count, 1, stderr);
-}
-
-static void stderrstream_output_char(fts_bytestream_t *stream, unsigned char c)
-{
-  stderrstream_output( stream, 1, &c);
-}
-
-static void stderrstream_flush( fts_bytestream_t *stream)
-{
-  fflush( stderr);
-}
-
-static void stderrstream_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_bytestream_init( (fts_bytestream_t *)o);
-
-  fts_bytestream_set_output( (fts_bytestream_t *)o, 
-			     stderrstream_output,
-			     stderrstream_output_char,
-			     stderrstream_flush);
-}
-
-static fts_status_t stderrstream_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init( cl, sizeof(fts_bytestream_t), 0, 0, 0);
-  fts_bytestream_class_init( cl);
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, stderrstream_init);
-
-  return fts_Success;
-}
-
-
-/***********************************************************************
- *
- * Initialization
- *
- */
-
-void fts_post_config( void)
-{
-  /* hack */
-  {
-    fts_symbol_t s;
-    fts_atom_t argv[1];
-    fts_object_t *stderrstream;
-
-    s = fts_new_symbol( "stderrstream");
-    fts_class_install( s, stderrstream_instantiate);
-
-    fts_set_symbol( argv, s);
-    fts_object_new_to_patcher( fts_get_root_patcher(), 1, argv, &stderrstream);
-
-    fts_set_default_console_stream( (fts_bytestream_t *)stderrstream);
-  }
 }
 
