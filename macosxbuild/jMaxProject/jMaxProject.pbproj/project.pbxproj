@@ -284,6 +284,17 @@
 			settings = {
 			};
 		};
+		F594D066036557D601664092 = {
+			isa = PBXFileReference;
+			path = jmax.icns;
+			refType = 2;
+		};
+		F594D067036557D601664092 = {
+			fileRef = F594D066036557D601664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F5999CC1032E295001664092 = {
 			children = (
 				F5999CC2032E298301664092,
@@ -11886,9 +11897,9 @@
 			children = (
 				F8A9635302D36AC001664092,
 				F88000010283043C01664092,
-				F880002F0283043C01664092,
 				F5F80BF203420AB201664092,
 				F854950002D2514001664092,
+				F594D066036557D601664092,
 			);
 			isa = PBXGroup;
 			name = Resources;
@@ -12202,18 +12213,6 @@
 			name = tux.gif;
 			path = ../../images/tux.gif;
 			refType = 2;
-		};
-		F880002F0283043C01664092 = {
-			isa = PBXFileReference;
-			name = jmax.icns;
-			path = ../../images/jmax.icns;
-			refType = 2;
-		};
-		F88000300283043C01664092 = {
-			fileRef = F880002F0283043C01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F88000350283043C01664092 = {
 			buildActionMask = 12;
@@ -17767,8 +17766,8 @@
 		F880FFFA0283022401664092 = {
 			buildActionMask = 2147483647;
 			files = (
-				F88000300283043C01664092,
 				F5F80BF403420AC901664092,
+				F594D067036557D601664092,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
