@@ -12923,6 +12923,74 @@
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
+		5CCF7F230662C663006958F9 = {
+			children = (
+				5CCF7F240662C6A4006958F9,
+				5CCF7F250662C6A4006958F9,
+				5CCF7F260662C6A4006958F9,
+				5CCF7F270662C6A4006958F9,
+				5CCF7F280662C6A4006958F9,
+				5CCF7F290662C6A4006958F9,
+			);
+			isa = PBXGroup;
+			name = include;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		5CCF7F240662C6A4006958F9 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = event.h;
+			path = ../../packages/sequence/c/include/fts/packages/sequence/event.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5CCF7F250662C6A4006958F9 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = note.h;
+			path = ../../packages/sequence/c/include/fts/packages/sequence/note.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5CCF7F260662C6A4006958F9 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = seqsym.h;
+			path = ../../packages/sequence/c/include/fts/packages/sequence/seqsym.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5CCF7F270662C6A4006958F9 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = sequence.h;
+			path = ../../packages/sequence/c/include/fts/packages/sequence/sequence.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5CCF7F280662C6A4006958F9 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = track.h;
+			path = ../../packages/sequence/c/include/fts/packages/sequence/track.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5CCF7F290662C6A4006958F9 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = trackeditor.h;
+			path = ../../packages/sequence/c/include/fts/packages/sequence/trackeditor.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
 		5CE316CA056ED1CD00DBD41F = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -17803,6 +17871,7 @@
 			children = (
 				F85124F1028BEC7D01664092,
 				3B9E15010621ADD500CDEBB6,
+				5CCF7F230662C663006958F9,
 				F851236A028BE77C01664092,
 				F8512380028BE77C01664092,
 				F8512382028BE77C01664092,

@@ -38,32 +38,32 @@ get_stripped_file_name_with_index(char *name_str, fts_symbol_t name, int index)
   const char *s = fts_symbol_name(name);
   int size;
   int i = strlen(s) - 1;
-
+  
   while(i > 0 && s[i] != '/' && s[i] != '.')
     i--;
-
+  
   if(s[i] == '.')
     size = i;
   else
     size = strlen(s);
-
+  
   while(i > 0 && s[i - 1] != '/')
     i--;
-
+  
   size -= i;
-
+  
   if(size > STRING_SIZE - 5)
     size = STRING_SIZE - 5;
-
+  
   snprintf(name_str, size + 1, "%s", s + i);
   snprintf(name_str + size, 4, "-%d", index);
 }
 
 /**************************************************************************
- *
- *  read utilities
- *
- */
+*
+*  read utilities
+*
+*/
 typedef struct _seqmidi_read_data_
 {
   sequence_t *sequence; 
@@ -95,17 +95,17 @@ miditrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
   double time = fts_midifile_get_time(file);
   event_t *event;
   fts_atom_t a;
-    
+  
   /* create a new event with the event */
   fts_set_object(&a, midievt);
   event = (event_t *)fts_object_create(event_class, 1, &a);
-
+  
   /* claim object */
   fts_object_refer(midievt);
   
   /* add the event to track */
   track_append_event(track, time, event);
-
+  
   data->size++;
 }
 
@@ -113,7 +113,7 @@ static void
 miditrack_read_track_end(fts_midifile_t *file)
 {
   seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
-
+  
   /* merge to track */
   track_merge(data->merge, data->track);
 }
@@ -124,7 +124,7 @@ scoobtrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
   seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
   track_t *track = data->track;
   double time = fts_midifile_get_time(file);
-
+  
   if(fts_midievent_is_note(midievt))
   {
     int channel = fts_midievent_channel_message_get_channel(midievt);
@@ -132,54 +132,55 @@ scoobtrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
     int velocity = fts_midievent_channel_message_get_second(midievt);
     
     if(velocity == 0 && data->note_is_on[channel - 1][pitch] != 0)
+    {
+      if(data->n_note_on[channel - 1][pitch] == 1)
       {
-        if(data->n_note_on[channel - 1][pitch] == 1)
-        {
-          event_t *event = data->note_is_on[channel - 1][pitch];
-          scoob_t *scoob = (scoob_t *)event_get_object(event);
-          
-          scoob_set_duration(scoob, time - event_get_time(event));
-          data->note_is_on[channel - 1][pitch] = 0;
-          data->n_note_on[channel - 1][pitch] = 0;
-        }
+        event_t *event = data->note_is_on[channel - 1][pitch];
+        scoob_t *scoob = (scoob_t *)event_get_object(event);
+        
+        scoob_set_duration(scoob, time - event_get_time(event));
+        data->note_is_on[channel - 1][pitch] = 0;
+        data->n_note_on[channel - 1][pitch] = 0;
+      }
       else
         data->n_note_on[channel - 1][pitch]--;
-      }
+    }
     else if(velocity > 0)
+    {
+      scoob_t *scoob;
+      event_t *event;
+      fts_atom_t a[3];
+      
+      if(data->note_is_on[channel - 1][pitch] != 0)
       {
-        scoob_t *scoob;
-        event_t *event;
-        fts_atom_t a[3];
-
-        if(data->note_is_on[channel - 1][pitch] != 0)
-        {
-          event_t *event = data->note_is_on[channel - 1][pitch];
-          scoob_t *scoob = (scoob_t *)event_get_object(event);
-
-          scoob_set_duration(scoob, time - event_get_time(event));
-        }          
+        event_t *event = data->note_is_on[channel - 1][pitch];
+        scoob_t *scoob = (scoob_t *)event_get_object(event);
         
-        /* create a scoob */
-        fts_set_int(a + 0, pitch);
-        fts_set_float(a + 1, 0.0);
-        scoob = (scoob_t *)fts_object_create(scoob_class, 2, a);
-
-        scoob_set_velocity(scoob, velocity);
-        scoob_set_channel(scoob, channel);
-        
-        /* create a new event with the scoob */
-        fts_set_object(a, (fts_object_t *)scoob);
-        event = (event_t *)fts_object_create(event_class, 1, a);
-        
-        /* add the event to track */
-        track_append_event(track, time, event);
-        data->size++;
-        
-        /* register note as on */
-        data->note_is_on[channel - 1][pitch] = event;
-        data->n_note_on[channel - 1][pitch]++;
-        data->last = event;
-      }
+        scoob_set_duration(scoob, time - event_get_time(event));
+      }          
+      
+      /* create a scoob */
+      fts_set_symbol(a, seqsym_note);
+      fts_set_int(a + 1, pitch);
+      fts_set_float(a + 2, 0.0);
+      scoob = (scoob_t *)fts_object_create(scoob_class, 3, a);
+      
+      scoob_set_velocity(scoob, velocity);
+      scoob_set_channel(scoob, channel);
+      
+      /* create a new event with the scoob */
+      fts_set_object(a, (fts_object_t *)scoob);
+      event = (event_t *)fts_object_create(event_class, 1, a);
+      
+      /* add the event to track */
+      track_append_event(track, time, event);
+      data->size++;
+      
+      /* register note as on */
+      data->note_is_on[channel - 1][pitch] = event;
+      data->n_note_on[channel - 1][pitch]++;
+      data->last = event;
+    }
   }
   else if(fts_midievent_is_poly_pressure(midievt))
   {
@@ -192,7 +193,7 @@ scoobtrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
       scoob_t *scoob = (scoob_t *)event_get_object(data->last);
       
       /* set scoob type (interval, rest, trill) and interval */
-      scoob_set_type(scoob, channel);
+      scoob_set_type_by_index(scoob, channel);
       scoob_set_interval(scoob, value);
     }
   }
@@ -201,13 +202,13 @@ scoobtrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
     /* set cue = 100 * cue + program */
     int channel = fts_midievent_channel_message_get_channel(midievt);
     int number = fts_midievent_channel_message_get_first(midievt);
-
+    
     if(data->last)
     {
       scoob_t *scoob = (scoob_t *)event_get_object(data->last);
       int cue = 0;
       fts_atom_t a;
-
+      
       fts_set_void(&a);
       scoob_property_get(scoob, seqsym_cue, &a);
       
@@ -231,21 +232,21 @@ scoobtrack_read_track_end(fts_midifile_t *file)
   
   /* shut down all pending note ons */
   for(i=0; i<n_midi_channels; i++)
-    {
-      for(j=0; j<n_midi_notes; j++)
-        if(data->note_is_on[i][j] != 0)
-          {
-            event_t *event = data->note_is_on[i][j];
-            scoob_t *scoob = (scoob_t *)event_get_object(event);
-            
-            scoob_set_duration(scoob, time - event_get_time(event));
-            data->note_is_on[i][j] = 0;
-            data->n_note_on[i][j] = 0;
-          }
-    }
-
-  track_merge(data->merge, data->track);
-  data->track_index++;
+  {
+    for(j=0; j<n_midi_notes; j++)
+      if(data->note_is_on[i][j] != 0)
+      {
+        event_t *event = data->note_is_on[i][j];
+        scoob_t *scoob = (scoob_t *)event_get_object(event);
+        
+        scoob_set_duration(scoob, time - event_get_time(event));
+        data->note_is_on[i][j] = 0;
+        data->n_note_on[i][j] = 0;
+      }
+  }
+    
+    track_merge(data->merge, data->track);
+    data->track_index++;
 }
 
 static void
@@ -253,25 +254,25 @@ inttrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
 {
   seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
   int type = fts_midievent_get_type(midievt);
-
+  
   if(type < midi_system_exclusive)
-    {
-      track_t *track = data->track;
-      double time = fts_midifile_get_time(file);
-      int number = fts_midievent_channel_message_get_first(midievt);
-      int value = number;
-      event_t *event;
-      fts_atom_t a;
-      
-      if(fts_midievent_is_control_change(midievt))
-        value = fts_midievent_channel_message_get_second(midievt);
-
-      fts_set_int(&a, value);
-      event = (event_t *)fts_object_create(event_class, 1, &a);
-      
-      /* add event to track */
-      track_append_event(track, time, event);
-    }
+  {
+    track_t *track = data->track;
+    double time = fts_midifile_get_time(file);
+    int number = fts_midievent_channel_message_get_first(midievt);
+    int value = number;
+    event_t *event;
+    fts_atom_t a;
+    
+    if(fts_midievent_is_control_change(midievt))
+      value = fts_midievent_channel_message_get_second(midievt);
+    
+    fts_set_int(&a, value);
+    event = (event_t *)fts_object_create(event_class, 1, &a);
+    
+    /* add event to track */
+    track_append_event(track, time, event);
+  }
 }
 
 static void
@@ -281,17 +282,17 @@ sequence_read_track_start(fts_midifile_t *file)
   fts_symbol_t name = fts_midifile_get_name(file);
   char str[STRING_SIZE];
   fts_atom_t a;
-
+  
   if(data->track)
     fts_object_release(data->track);
-
+  
   fts_set_symbol(&a, fts_s_midievent);
   data->track = (track_t *)fts_object_create(track_class, 1, &a);
   fts_object_refer(data->track);
-
+  
   get_stripped_file_name_with_index(str, name, data->track_index);
   fts_object_set_name((fts_object_t *)data->track, fts_new_symbol(str));
-
+  
   data->track_index++;
 }
 
@@ -299,70 +300,70 @@ static void
 sequence_read_track_end(fts_midifile_t *file)
 {
   seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
-
+  
   if(data->track)
-    {
-      if(data->sequence && track_get_size(data->track) > 0)
-        sequence_add_track(data->sequence, data->track);
-      
-      fts_object_release(data->track);
-      data->track = 0;
-    }
+  {
+    if(data->sequence && track_get_size(data->track) > 0)
+      sequence_add_track(data->sequence, data->track);
+    
+    fts_object_release(data->track);
+    data->track = 0;
+  }
 }
 
 /**************************************************************************
- *
- *  import MIDI files to track
- *
- */
+*
+*  import MIDI files to track
+*
+*/
 int
 track_import_from_midifile(track_t *track, fts_midifile_t *file)
 {
   fts_midifile_read_functions_t read;
   seqmidi_read_data_t data;
-      
+  
   seqmidi_read_data_init(&data);
   fts_midifile_set_user_data(file, &data);
   fts_midifile_read_functions_init(&read);
   fts_midifile_set_read_functions(file, &read);
   
   if(track_get_type(track) == fts_midievent_type || track_get_type(track) == NULL)
-    {
-      read.track_end = miditrack_read_track_end;
-      read.midi_event = miditrack_read_midievent;
-    }
+  {
+    read.track_end = miditrack_read_track_end;
+    read.midi_event = miditrack_read_midievent;
+  }
   else if(track_get_type(track) == scoob_class)
-    {
-      int i, j;
-
-      /* set oll notes to off */
-      for(i=0; i<n_midi_channels; i++)
-        for(j=0; j<n_midi_notes; j++)
-        {
-          data.note_is_on[i][j] = 0;
-          data.n_note_on[i][j] = 0;
-        }
-      
-      read.track_end = scoobtrack_read_track_end;
-      read.midi_event = scoobtrack_read_midievent;
-    }
+  {
+    int i, j;
+    
+    /* set oll notes to off */
+    for(i=0; i<n_midi_channels; i++)
+      for(j=0; j<n_midi_notes; j++)
+      {
+        data.note_is_on[i][j] = 0;
+        data.n_note_on[i][j] = 0;
+      }
+        
+        read.track_end = scoobtrack_read_track_end;
+    read.midi_event = scoobtrack_read_midievent;
+  }
   else if(track_get_type(track) == fts_int_class)
-    {
-      read.track_end = miditrack_read_track_end;
-      read.midi_event = inttrack_read_midievent;
-    }
+  {
+    read.track_end = miditrack_read_track_end;
+    read.midi_event = inttrack_read_midievent;
+  }
   else
     return 0;
- 
+  
   data.merge = track; /* merge all MIDI tracks */
-
+  
   data.track = (track_t *)fts_object_create(track_class, 0, 0); /* read to temporary track */
   fts_object_refer(data.track);
-
+  
   fts_midifile_read(file);
   
   fts_object_release(data.track);
-
+  
   return data.size;
 }
 
@@ -371,7 +372,7 @@ sequence_import_from_midifile(sequence_t *sequence, fts_midifile_t *file)
 {
   fts_midifile_read_functions_t read;
   seqmidi_read_data_t data;
-      
+  
   seqmidi_read_data_init(&data);
   fts_midifile_set_user_data(file, &data);
   fts_midifile_read_functions_init(&read);
@@ -385,19 +386,19 @@ sequence_import_from_midifile(sequence_t *sequence, fts_midifile_t *file)
   read.track_end = sequence_read_track_end;
   
   fts_midifile_read(file);
-
+  
   /* be sure that this is cleaned */
   if(data.track)
     fts_object_release(data.track);
-
+  
   return data.size;
 }
 
 /**************************************************************************
- *
- *  writing MIDI files
- *
- */
+*
+*  writing MIDI files
+*
+*/
 
 typedef struct _seqmidi_write_data_
 {
@@ -415,29 +416,29 @@ seqmidi_write_note_on(fts_midifile_t *file, double time, scoob_t *scoob)
   int channel = scoob_get_channel(scoob);
   double off_time = time + scoob_get_duration(scoob);
   long time_in_ticks = fts_midifile_time_to_ticks(file, time);
-
+  
   if(channel == 0)
     channel = 1;
-
+  
   if(velocity == 0)
     velocity = 64;
   
   fts_midifile_write_channel_message(file, time_in_ticks, midi_note, channel, pitch, velocity);
   data->size++;
-
-  if(scoob_get_type(scoob) > scoob_note)
-  {
-    int type = scoob_get_type(scoob);
-    int interval = scoob_get_interval(scoob);
   
+  if(scoob_get_type_index(scoob) > scoob_note)
+  {
+    int type = scoob_get_type_index(scoob);
+    int interval = scoob_get_interval(scoob);
+    
     fts_midifile_write_channel_message(file, time_in_ticks, midi_poly_pressure, type, pitch, interval);
     data->size++;    
   }
-
+  
   /* write cue */
   {
     fts_atom_t a;
-
+    
     fts_set_void(&a);
     scoob_property_get(scoob, seqsym_cue, &a);
     
@@ -458,7 +459,7 @@ seqmidi_write_note_on(fts_midifile_t *file, double time, scoob_t *scoob)
         
         if(cue > max_cue)
           cue = max_cue;
-          
+        
         for(dec=max_cue/100; dec>=1; dec/=100)
         {
           if(cue > dec)
@@ -471,16 +472,16 @@ seqmidi_write_note_on(fts_midifile_t *file, double time, scoob_t *scoob)
       }
     }
   }
-
+  
   /* schedule note off */  
   {
     event_t *off;
     fts_atom_t a;
-
+    
     /* create new event */
     fts_set_int(&a, (pitch << 8) + channel);
     off = (event_t *)fts_object_create(event_class, 1, &a);
-
+    
     /* add event to note on track */
     track_add_event(data->off_track, off_time, off);
   }
@@ -492,23 +493,23 @@ seqmidi_write_note_offs(fts_midifile_t *file, double time)
 {
   seqmidi_write_data_t *data = (seqmidi_write_data_t *)fts_midifile_get_user_data(file);
   event_t *off = track_get_first(data->off_track);
-
+  
   while(off && event_get_time(off) <= time)
-    {
-      long off_time_in_ticks = fts_midifile_time_to_ticks(file, event_get_time(off));
-      int off_pitch = event_get_int(off) >> 8;
-      int off_channel = event_get_int(off) & 0xff;
-      
-      /* write note off */
-      fts_midifile_write_channel_message(file, off_time_in_ticks, midi_note, off_channel, off_pitch, 0);
-      data->size++;
-
-      /* move off event to free track */
-      track_remove_event(data->off_track, off);
-
-      /* get next note off in sequence */
-      off = track_get_first(data->off_track);
-    }
+  {
+    long off_time_in_ticks = fts_midifile_time_to_ticks(file, event_get_time(off));
+    int off_pitch = event_get_int(off) >> 8;
+    int off_channel = event_get_int(off) & 0xff;
+    
+    /* write note off */
+    fts_midifile_write_channel_message(file, off_time_in_ticks, midi_note, off_channel, off_pitch, 0);
+    data->size++;
+    
+    /* move off event to free track */
+    track_remove_event(data->off_track, off);
+    
+    /* get next note off in sequence */
+    off = track_get_first(data->off_track);
+  }
 }
 
 int
@@ -516,85 +517,85 @@ track_export_to_midifile(track_t *track, fts_midifile_t *file)
 {
   fts_class_t *track_type = track_get_type(track);
   int track_size = track_get_size(track);
-
+  
   if(track_size <= 0)
     return 0;
-
+  
   if(track_type == scoob_class)
+  {
+    seqmidi_write_data_t data;
+    event_t *event;
+    
+    fts_midifile_set_user_data(file, &data);
+    
+    data.track = track;
+    data.size = 0;
+    
+    /* create dummy track for creating note offs */
+    data.off_track = (track_t *)fts_object_create(track_class, 0, 0);
+    
+    /* write file header */
+    fts_midifile_write_header(file, 0, 1, 384);
+    fts_midifile_write_track_begin(file);
+    fts_midifile_write_tempo(file, 500000);
+    
+    /* write events */
+    event = track_get_first(track);
+    while(event)
     {
-      seqmidi_write_data_t data;
-      event_t *event;
+      double time = event_get_time(event);
       
-      fts_midifile_set_user_data(file, &data);
+      seqmidi_write_note_offs(file, time);
+      seqmidi_write_note_on(file, time, (scoob_t *)fts_get_object(&event->value));      
       
-      data.track = track;
-      data.size = 0;
-      
-      /* create dummy track for creating note offs */
-      data.off_track = (track_t *)fts_object_create(track_class, 0, 0);
-      
-      /* write file header */
-      fts_midifile_write_header(file, 0, 1, 384);
-      fts_midifile_write_track_begin(file);
-      fts_midifile_write_tempo(file, 500000);
-      
-      /* write events */
-      event = track_get_first(track);
-      while(event)
-        {
-          double time = event_get_time(event);
-          
-          seqmidi_write_note_offs(file, time);
-          seqmidi_write_note_on(file, time, (scoob_t *)fts_get_object(&event->value));      
-          
-          event = event_get_next(event);
-        }  
-      
-      /* write pending note-offs */
-      if(track_get_size(data.off_track) > 0)
-        seqmidi_write_note_offs(file, event_get_time(track_get_last(data.off_track)));
-      
-      /* delete dummy tracks */
-      fts_object_destroy((fts_object_t *)(data.off_track));
-      
-      /* close file */
-      fts_midifile_write_track_end(file);
-      
-      return data.size;
-    }
+      event = event_get_next(event);
+    }  
+    
+    /* write pending note-offs */
+    if(track_get_size(data.off_track) > 0)
+      seqmidi_write_note_offs(file, event_get_time(track_get_last(data.off_track)));
+    
+    /* delete dummy tracks */
+    fts_object_destroy((fts_object_t *)(data.off_track));
+    
+    /* close file */
+    fts_midifile_write_track_end(file);
+    
+    return data.size;
+  }
   else if(track_type == fts_midievent_type)
+  {
+    seqmidi_write_data_t data;
+    event_t *event;
+    
+    fts_midifile_set_user_data(file, &data);
+    
+    data.track = track;
+    data.size = 0;
+    
+    /* write file header */
+    fts_midifile_write_header(file, 0, 1, 384);
+    fts_midifile_write_track_begin(file);
+    fts_midifile_write_tempo(file, 500000);
+    
+    /* write events */
+    event = track_get_first(track);
+    while(event)
     {
-      seqmidi_write_data_t data;
-      event_t *event;
+      double time = event_get_time(event);
+      long time_in_ticks = fts_midifile_time_to_ticks(file, time);
       
-      fts_midifile_set_user_data(file, &data);
+      fts_midifile_write_midievent(file, time_in_ticks, (fts_midievent_t *)fts_get_object(&event->value));
+      data.size++;
       
-      data.track = track;
-      data.size = 0;
-      
-      /* write file header */
-      fts_midifile_write_header(file, 0, 1, 384);
-      fts_midifile_write_track_begin(file);
-      fts_midifile_write_tempo(file, 500000);
-      
-      /* write events */
-      event = track_get_first(track);
-      while(event)
-        {
-          double time = event_get_time(event);
-          long time_in_ticks = fts_midifile_time_to_ticks(file, time);
-          
-          fts_midifile_write_midievent(file, time_in_ticks, (fts_midievent_t *)fts_get_object(&event->value));
-          data.size++;
-
-          event = event_get_next(event);
-        }  
-      
-      /* close file */
-      fts_midifile_write_track_end(file);
-      
-      return data.size;
-    }
+      event = event_get_next(event);
+    }  
+    
+    /* close file */
+    fts_midifile_write_track_end(file);
+    
+    return data.size;
+  }
   else if(track_type == NULL)
   {
     seqmidi_write_data_t data;

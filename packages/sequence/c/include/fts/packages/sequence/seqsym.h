@@ -48,7 +48,9 @@ extern fts_symbol_t seqsym_pitch;
 extern fts_symbol_t seqsym_duration;
 extern fts_symbol_t seqsym_velocity;
 extern fts_symbol_t seqsym_channel;
+extern fts_symbol_t seqsym_tempo;
 extern fts_symbol_t seqsym_cue;
+extern fts_symbol_t seqsym_section;
 
 /* messages */
 extern fts_symbol_t seqsym_insert;

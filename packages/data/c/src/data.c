@@ -243,6 +243,455 @@ expr_instantiate(fts_class_t *cl)
 }
 
 /***********************************************************************
+*
+*  enumeration type support
+*
+*/
+fts_hashtable_t global_enumeration_table; 
+
+#define ENUMERATION_ALLOC_BLOCK 32
+
+enumeration_t *
+enumeration_new(fts_symbol_t name)
+{
+  fts_atom_t k, v;
+  
+  fts_set_symbol(&k, name);
+  if(!fts_hashtable_get(&global_enumeration_table, &k, &v))
+  {
+    enumeration_t *e = (enumeration_t *)fts_malloc(sizeof(enumeration_t));
+    
+    fts_hashtable_init(&e->hash, FTS_HASHTABLE_MEDIUM);
+    e->array = (fts_symbol_t *)fts_malloc(ENUMERATION_ALLOC_BLOCK * sizeof(fts_symbol_t));
+    e->alloc = ENUMERATION_ALLOC_BLOCK;
+    e->size = 0;
+    
+    fts_set_pointer(&v, e);
+    fts_hashtable_put(&global_enumeration_table, &k, &v);
+    
+    return e;
+  }
+  
+  return NULL;
+}
+
+enumeration_t *
+enumeration_get_by_name(fts_symbol_t name)
+{
+  fts_atom_t k, v;
+  
+  fts_set_symbol(&k, name);
+  if(fts_hashtable_get(&global_enumeration_table, &k, &v))
+    return (enumeration_t *)fts_get_pointer(&v);
+  
+  return NULL;
+}
+
+fts_symbol_t 
+enumeration_add_name(enumeration_t *e, fts_symbol_t name)
+{
+  fts_atom_t k, a;
+  
+  fts_set_symbol(&k, name);
+  if(!fts_hashtable_get(&e->hash, &k, &a))
+  {
+    int index = e->size;
+    
+    fts_set_int(&a, index);
+    fts_hashtable_put(&e->hash, &k, &a);
+    
+    if(index >= e->alloc)
+    {
+      e->alloc += ENUMERATION_ALLOC_BLOCK;
+      fts_realloc(e->array, e->alloc * sizeof(fts_symbol_t));
+    }
+    
+    e->array[index] = name;
+    e->size++;
+    
+    return name;
+  }
+  
+  return NULL;
+}
+
+int
+enumeration_get_index(enumeration_t *e, const fts_symbol_t name)
+{
+  fts_atom_t k, a;
+  
+  fts_set_symbol(&k, name);
+  if(fts_hashtable_get(&e->hash, &k, &a))
+    return fts_get_int(&a);
+  
+  return -1;
+}
+
+fts_symbol_t 
+enumeration_get_name(enumeration_t *e, int index)
+{
+  if(index >= 0 && index < e->size)
+    return e->array[index];
+  
+  return NULL;
+}
+
+/***********************************************************************
+ *
+ *  propobj, base class with dynamic properties
+ *
+ */
+void
+propobj_get_property(propobj_t *self, propobj_property_t *prop, fts_atom_t *p)
+{
+  if(prop->index < fts_array_get_size(&self->properties))
+    *p = *fts_array_get_element(&self->properties, prop->index);
+  else
+    fts_set_void(p);
+}
+
+void
+propobj_set_property(propobj_t *self, propobj_property_t *prop, const fts_atom_t *value)
+{  
+  if(prop->index > 0)
+    fts_array_set_element(&self->properties, prop->index, value);
+}
+
+void
+propobj_get_property_by_index(propobj_t *self, int index, fts_atom_t *p)
+{
+  if(index >= 0 && index < fts_array_get_size(&self->properties))
+    *p = *fts_array_get_element(&self->properties, index);
+  else
+    fts_set_void(p);
+}
+
+void
+propobj_set_property_by_index(propobj_t *self, int index, const fts_atom_t *value)
+{
+  fts_array_set_element(&self->properties, index, value);
+}
+
+void
+propobj_get_property_by_name(propobj_t *self, fts_symbol_t name, fts_atom_t *p)
+{
+  propobj_property_t *prop = propobj_class_get_property_by_name(fts_object_get_class((fts_object_t *)self), name);
+  
+  if(prop != NULL)
+    propobj_get_property_by_index(self, prop->index, p);
+  else
+    fts_set_void(p);
+}
+
+void
+propobj_set_property_by_name(propobj_t *self, fts_symbol_t name, const fts_atom_t *value)
+{
+  propobj_property_t *prop = propobj_class_get_property_by_name(fts_object_get_class((fts_object_t *)self), name);
+  
+  if(prop != NULL)
+    propobj_set_property_by_index(self, prop->index, value);
+}
+
+static void
+propobj_remove_property(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  propobj_t *self = (propobj_t *)o;
+  fts_symbol_t name = fts_get_symbol(at);
+  
+  propobj_set_property_by_name(self, name, fts_null);
+}
+
+void
+propobj_append_properties(propobj_t *self, fts_array_t *array)
+{
+  propobj_class_description_t *descr = propobj_get_descritption(self);
+  int size = fts_array_get_size(&self->properties);
+  fts_atom_t *atoms = fts_array_get_atoms(&self->properties);
+  int i;
+  
+  for(i=0; i<size; i++)
+  {
+    if(!fts_is_void(atoms + i))
+    {
+      fts_array_append_symbol(array, descr->array[i].name);
+      fts_array_append(array, 1, atoms + i);
+    }
+  }
+}
+
+void
+propobj_post_properties(propobj_t *self, fts_bytestream_t *stream)
+{
+  propobj_class_description_t *descr = propobj_get_descritption(self);
+  int size = fts_array_get_size(&self->properties);
+  fts_atom_t *atoms = fts_array_get_atoms(&self->properties);
+  int i;
+  
+  for(i=0; i<size; i++)
+  {
+    if(!fts_is_void(atoms + i))
+    {
+      fts_spost(stream, ", %s: ", fts_symbol_name(descr->array[i].name));
+      fts_spost_atoms(stream, 1, atoms + i);
+    }
+  }
+}
+
+void
+propobj_dump_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  propobj_t *self = (propobj_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  fts_class_t *cl = fts_object_get_class(o);
+  propobj_class_description_t *descr = (propobj_class_description_t *)fts_object_get_context((fts_object_t *)cl);
+  int size = fts_array_get_size(&self->properties);
+  fts_atom_t *atoms = fts_array_get_atoms(&self->properties);
+  int i;
+  
+  for(i=0; i<size; i++)
+  {
+    if(!fts_is_void(atoms + i))
+      fts_dumper_send(dumper, descr->array[i].name, 1, atoms + i);
+  }
+}
+
+void 
+propobj_copy(propobj_t *org, propobj_t *copy)
+{
+  int size = fts_array_get_size(&org->properties);
+  fts_atom_t *atoms = fts_array_get_atoms(&org->properties);
+  
+  fts_array_set(&copy->properties, size, atoms);
+}
+
+void
+propobj_copy_function(const fts_atom_t *from, fts_atom_t *to)
+{
+  propobj_copy((propobj_t *)fts_get_object(from), (propobj_t *)fts_get_object(to));
+}
+
+int
+propobj_equals(const fts_atom_t *a, const fts_atom_t *b)
+{
+  propobj_t *o = (propobj_t *)fts_get_object(a);
+  propobj_t *p = (propobj_t *)fts_get_object(b);
+  int o_n_prop = fts_array_get_size(&o->properties);
+  int p_n_prop = fts_array_get_size(&p->properties);
+  int i;
+  
+  /* send a message for each of the optional properties */
+  for(i=0; i<o_n_prop; i++)
+  {
+    fts_atom_t *o_prop = fts_array_get_element(&o->properties, i);
+    
+    if(i < p_n_prop)
+    {
+      if(!fts_atom_equals(o_prop, fts_array_get_element(&p->properties, i)))
+        return 0;
+    }
+    else if(!fts_is_void(o_prop))
+      return 0;
+  }
+  
+  for(; i<p_n_prop; i++)
+    if(!fts_is_void(fts_array_get_element(&p->properties, i)))
+      return 0;
+  
+  return 1;
+}
+
+/************************************************************************************
+ *
+ *  propobj class
+ *
+ */
+#define PROPOBJ_ALLOC_BLOCK 32
+
+void
+propobj_init(fts_object_t *o)
+{
+  propobj_t *self = (propobj_t *)o;
+  
+  fts_array_init(&self->properties, 0, 0);
+}
+
+void
+propobj_delete(fts_object_t *o)
+{
+  propobj_t *self = (propobj_t *)o;
+  
+  fts_array_destroy(&self->properties);
+}
+
+void
+propobj_class_init(fts_class_t *cl)
+{
+  propobj_class_description_t *descr = fts_malloc(sizeof(propobj_class_description_t));
+  
+  descr->array = (propobj_property_t *)fts_malloc(PROPOBJ_ALLOC_BLOCK * sizeof(propobj_property_t));
+  descr->alloc = PROPOBJ_ALLOC_BLOCK;
+  fts_hashtable_init(&descr->hash, FTS_HASHTABLE_SMALL);
+  descr->n_properties = 0;
+  
+  fts_object_set_context((fts_object_t *)cl, (fts_context_t *)descr);  
+  
+  fts_class_message_symbol(cl, fts_s_remove, propobj_remove_property);
+}
+
+propobj_class_description_t *
+propobj_class_get_descritption(fts_class_t *cl)
+{
+  return (propobj_class_description_t *)fts_object_get_context((fts_object_t *)cl);
+}
+
+propobj_class_description_t *
+propobj_get_descritption(propobj_t *self)
+{
+  fts_class_t *cl = fts_object_get_class((fts_object_t *)self);
+  return (propobj_class_description_t *)fts_object_get_context((fts_object_t *)cl);
+}
+
+static void
+_set_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  propobj_t *self = (propobj_t *)o;
+  
+  propobj_set_property_by_name(self, s, at);
+}
+
+static void
+_set_int_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  propobj_t *self = (propobj_t *)o;
+  fts_atom_t a;
+  
+  fts_set_int(&a, fts_get_number_int(at));
+  propobj_set_property_by_name(self, s, &a);
+}
+
+static void
+_set_float_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  propobj_t *self = (propobj_t *)o;
+  fts_atom_t a;
+  
+  fts_set_float(&a, fts_get_number_float(at));
+  propobj_set_property_by_name(self, s, &a);
+}
+
+static void
+_get_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  propobj_t *self = (propobj_t *)o;
+  
+  propobj_get_property_by_name(self, s, fts_get_return_value());
+}
+
+static int 
+propobj_class_insert_property(fts_class_t *cl, fts_symbol_t name, fts_symbol_t type)
+{
+  propobj_class_description_t *descr = propobj_class_get_descritption(cl);
+  int index = descr->n_properties;
+  fts_atom_t k, a;
+  
+  fts_set_symbol(&k, name);
+  fts_set_pointer(&a, descr->array + index);
+  fts_hashtable_put(&descr->hash, &k, &a);
+  
+  if(index >= descr->alloc)
+  {
+    descr->alloc += PROPOBJ_ALLOC_BLOCK;
+    fts_realloc(descr->array, descr->alloc * sizeof(propobj_property_t));      
+  }
+  
+  descr->array[index].index = index;
+  descr->array[index].name = name;
+  descr->array[index].type = type;  
+  descr->n_properties++;
+  
+  return index;
+}
+
+int 
+propobj_class_add_int_property(fts_class_t *cl, fts_symbol_t name)
+{
+  int index;
+  
+  fts_class_instantiate(cl);
+  index = propobj_class_insert_property(cl, name, fts_s_int);
+  
+  fts_class_message_number(cl, name, _set_int_method);
+  fts_class_message_void(cl, name, _get_method);
+  
+  return index;
+}
+
+int 
+propobj_class_add_float_property(fts_class_t *cl, fts_symbol_t name)
+{
+  int index;
+  
+  fts_class_instantiate(cl);
+  index = propobj_class_insert_property(cl, name, fts_s_float);
+  
+  fts_class_message_number(cl, name, _set_float_method);
+  fts_class_message_void(cl, name, _get_method);
+  
+  return index;
+}
+
+int 
+propobj_class_add_symbol_property(fts_class_t *cl, fts_symbol_t name, enumeration_t *e)
+{
+  int index;
+  
+  fts_class_instantiate(cl);
+  index = propobj_class_insert_property(cl, name, fts_s_symbol);
+  
+  fts_class_message_symbol(cl, name, _set_method);
+  fts_class_message_void(cl, name, _get_method);
+  
+  return index;
+}
+
+propobj_property_t *
+propobj_class_get_property_by_name(fts_class_t *cl, fts_symbol_t name)
+{
+  propobj_class_description_t *descr = propobj_class_get_descritption(cl);
+  fts_atom_t k, v;
+  
+  fts_set_symbol(&k, name);
+  if(fts_hashtable_get(&descr->hash, &k, &v))
+    return (propobj_property_t *)fts_get_pointer(&v);
+  else
+    return NULL;
+}
+
+propobj_property_t *
+propobj_class_get_property_by_index(fts_class_t *cl, int index)
+{
+  propobj_class_description_t *descr = propobj_class_get_descritption(cl);
+  
+  if(index >= 0 && index < descr->n_properties)
+    return descr->array + index;
+  else
+    return NULL;
+}
+
+void
+propobj_class_append_properties(fts_class_t *cl, fts_array_t *array)
+{
+  propobj_class_description_t *descr = propobj_class_get_descritption(cl);
+  int i;
+  
+  for(i=0; i<descr->n_properties; i++)
+  {
+    fts_array_append_symbol(array, descr->array[i].name);
+    fts_array_append_symbol(array, descr->array[i].type);
+  }
+}
+
+/***********************************************************************
  *
  *  config
  *
@@ -267,4 +716,6 @@ data_config(void)
   getrange_config();  
 
   dumpfile_config();
+  
+  fts_hashtable_init(&global_enumeration_table, FTS_HASHTABLE_MEDIUM);
 }

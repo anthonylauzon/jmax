@@ -1164,8 +1164,6 @@ fslice_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("exp"), NULL, "calulate exponent function of current values");
   fts_class_doc(cl, fts_new_symbol("sqrabs"), NULL, "calulate square of absolute values of current values");
   fts_class_doc(cl, fts_new_symbol("sqrt"), NULL, "calulate square root of absolute values of current values");
-  fts_class_doc(cl, fts_new_symbol("fft"), NULL, "calulate inplace FFT of real or complex vector (vec or rect format)");
-  fts_class_doc(cl, fts_new_symbol("rifft"), NULL, "calulate inplace real IFFT of complex vector (rect format)");
 
   fts_class_doc(cl, fts_new_symbol("min"), NULL, "get minimum value");
   fts_class_doc(cl, fts_new_symbol("mini"), NULL, "get index of minimum value");

@@ -24,75 +24,86 @@
 #define _SEQUENCE_scoob_H_
 
 #include <fts/fts.h>
+#include <fts/packages/data/data.h>
 #include <fts/packages/sequence/event.h>
 
 /*{ 
- *  Scoob score object (generalisation of note)
- */
-
-
-extern fts_class_t *scoob_class;
-
-enum scoob_type_enum
+*  scooob, score object (generalization of note)
+*/
+typedef struct
 {
-  scoob_none = 0,
-  scoob_note,
-  scoob_interval,
-  scoob_rest,
-  scoob_trill,
-  n_scoob_types
-};
-
-typedef struct _scoob_
-{
-  fts_object_t head;
-  enum scoob_type_enum type;
+  propobj_t propobj;
+  fts_symbol_t type;
   double pitch;
   double interval;
   double duration;
-  fts_array_t properties;
 } scoob_t;
 
-#define scoob_DEF_PITCH 64
-#define scoob_DEF_DURATION 100
+enum scoob_type_enum
+{
+  scoob_note = 0,
+  scoob_interval,
+  scoob_rest,
+  scoob_trill
+};
 
-#define scoob_set_type(n, x) ((n)->type = (x))
-#define scoob_get_type(n) ((n)->type)
+extern fts_class_t *scoob_class;
+extern enumeration_t *scoob_type_enumeration;
 
-#define scoob_set_pitch(n, x) ((n)->pitch = (x))
-#define scoob_get_pitch(n) ((n)->pitch)
+#define scoob_set_pitch(s, x) ((s)->pitch = (x))
+#define scoob_get_pitch(s) ((s)->pitch)
 
-#define scoob_set_interval(n, x) ((n)->interval = (x))
-#define scoob_get_interval(n) ((n)->interval)
+#define scoob_set_interval(s, x) ((s)->interval = (x))
+#define scoob_get_interval(s) ((s)->interval)
 
-#define scoob_set_duration(n, x) ((n)->duration = (x))
-#define scoob_get_duration(n) ((n)->duration)
+#define scoob_set_duration(s, x) ((s)->duration = (x))
+#define scoob_get_duration(s) ((s)->duration)
 
+void scoob_set_velocity(scoob_t *self, int velocity);
+int scoob_get_velocity(scoob_t *self);
+void scoob_set_channel(scoob_t *self, int channel);
+int scoob_get_channel(scoob_t *self);
+
+#define scoob_get_type_index(s) (enumeration_get_index(scoob_type_enumeration, (s)->type))
+#define scoob_set_type_by_index(s, i) ((s)->type = enumeration_get_name(scoob_type_enumeration, (i)))
+
+/* scoob default MIDI properties */
+void scoob_set_velocity(scoob_t *self, int velocity);
+int scoob_get_velocity(scoob_t *self);
+
+void scoob_set_channel(scoob_t *self, int channel);
+int scoob_get_channel(scoob_t *self);
+
+/* scoob properties */
+#define scoob_property_get(s, n, p) propobj_get_property_by_name((propobj_t *)(s), (n), (p))
+#define scoob_property_set(s, n, v) propobj_set_property_by_name((propobj_t *)(s), (n), (v))
+
+#define scoob_property_get_by_index(s, i, p) propobj_get_property_by_index((propobj_t *)(s), (i), (p))
+#define scoob_property_set_by_index(s, i, v) propobj_set_property_by_index((propobj_t *)(s), (i), (v))
+
+void scoob_copy(scoob_t *org, scoob_t *copy);
+
+/*} */
 
 /*{ 
- * Properties
- */
+*  scomark, score marker (bars, tempo, etc.)
+*/
+typedef struct
+{
+  propobj_t propobj;
+  fts_symbol_t type;
+  double tempo;
+} scomark_t;
 
-int  scoob_declare_property(fts_symbol_t name, fts_symbol_t type);
-int  scoob_property_get_index(fts_symbol_t name);
+enum scomark_type_enum
+{
+  scomark_tempo = 0,
+  scomark_bar,
+  scomark_end,
+  scomark_double
+};
 
-/* general */
-void scoob_property_get(scoob_t *this, fts_symbol_t name, fts_atom_t *p);
-int  scoob_property_set(scoob_t *this, fts_symbol_t name, const fts_atom_t *value);
-
-void scoob_property_get_by_index(scoob_t *this, int index, fts_atom_t *p);
-void scoob_property_set_by_index(scoob_t *this, int index, const fts_atom_t *value);
-
-/* standard */
-void scoob_set_velocity(scoob_t *this, int velocity);
-int  scoob_get_velocity(scoob_t *this);
-
-void scoob_set_channel(scoob_t *this, int channel);
-int  scoob_get_channel(scoob_t *this);
-
-/*} */
-
-/*} */
-
+extern fts_class_t *scomark_class;
+extern enumeration_t *scomark_type_enumeration;
 
 #endif

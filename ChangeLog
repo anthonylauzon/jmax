@@ -1,3 +1,10 @@
+2004-05-25  Norbert Schnell  <Norbert.Schnell@ircam.fr>
+
+	* data.c: introduced enumeration_t enum support
+	* data.c: introduced propobj base class (class with dynamic properties, derived from scoob_class of sequence package)
+	* note.c: redesigned scoob_class based on propobj
+	* note.c: added first sketch scomark_class (for score markers such as tempo changes, bars, etc.)
+
 2004-05-18  Norbert Schnell  <Norbert.Schnell@ircam.fr>
 
 	* expression.c: removed default return of object for method invocation without return value
