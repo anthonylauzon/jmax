@@ -44,7 +44,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   char* s;
   int state = 0;  
 
-  DebugBreak();
+/*    DebugBreak(); */
 
   argv[argc++] = "fts";
 
