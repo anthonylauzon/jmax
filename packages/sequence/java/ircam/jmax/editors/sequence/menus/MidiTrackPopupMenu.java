@@ -69,6 +69,15 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
 		});	
     add(item);
     
+    item = new JMenuItem("Append Bar");
+    item.addActionListener( new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+		  {
+				((MidiTrackEditor)target).getTrack().getFtsTrack().appendBar();
+		  }
+		});	
+    add(item);
+    
     addSeparator();
 		
     labelTypesMenu = new JMenu("Labels");

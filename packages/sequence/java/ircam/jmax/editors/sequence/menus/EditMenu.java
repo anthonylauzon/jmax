@@ -66,6 +66,10 @@ public class EditMenu extends EditorMenu
     addSeparator();
     
     add(Actions.selectAllAction);
+    
+    addSeparator();
+    
+    add(Actions.appendBarAction);
   }
 
   public void updateMenu()

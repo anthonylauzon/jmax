@@ -28,6 +28,7 @@ import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
 import ircam.jmax.editors.sequence.*;
+import ircam.jmax.fts.*;
 
 /** This class define a set of static variables 
  *  containing all the standard actions used for the
@@ -46,6 +47,7 @@ public class Actions
   public static EditorAction undoAction      = new UndoAction();
   public static EditorAction redoAction      = new RedoAction();
   public static EditorAction selectAllAction = new SelectAllAction();
+  public static EditorAction appendBarAction = new AppendBarAction();
 
   public static EditorAction removeTrackAction  = new RemoveTrackAction();
 
@@ -137,6 +139,20 @@ public class Actions
     public void doAction(EditorContainer container)
     {
       ((SequenceEditor)container.getEditor()).selectAll();
+    }
+  }
+  
+  public static class AppendBarAction extends EditorAction
+  {
+    public AppendBarAction()
+    { 
+      super("Append Bar", null, KeyEvent.VK_B, KeyEvent.VK_B, true);
+    }
+    public void doAction(EditorContainer container)
+    {
+      FtsGraphicObject fobj = ((SequenceEditor)container.getEditor()).getFtsObject();
+      if(fobj  instanceof FtsTrackObject)
+        ((FtsTrackObject) fobj).appendBar();
     }
   }
 }

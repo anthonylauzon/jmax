@@ -722,8 +722,30 @@ _track_append_marker(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   marker_track_append_marker(markers, time, ac - 1, at + 1, &event);
 }
 
+static void
+_track_append_bar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *self = (track_t *)o;
+  track_t *markers = self;
+  event_t *new_bar = NULL;
+  fts_array_t temp_array;
+  fts_symbol_t tr_type = fts_class_get_name( track_get_type(self));
+  
+  if(tr_type != seqsym_scomark)
+  {
+    markers = track_get_or_make_markers(self);
+    track_upload_markers(self);
+  }
+  new_bar = marker_track_append_bar( markers);
+ 
+  /* upload the event */
+  fts_array_init(&temp_array, 0, 0);
+  track_upload_event(markers, new_bar, &temp_array);
+  fts_array_destroy(&temp_array);
+}
+
 #define MARKERS_BAR_TOLERANCE 20.0 /* tolerance for bars */
-#define MARKERS_BAR_EPSILON 0.1
+#define MARKERS_BAR_EPSILON 0.001
 
 static void
 _track_make_bars(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1561,8 +1583,6 @@ _track_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 
-
-
 /******************************************************
 *
 *  upload
@@ -2216,6 +2236,7 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_export, fts_object_export);
   fts_class_message_varargs(cl, seqsym_export_midifile, track_export_midifile);
   
+  fts_class_message_void(cl, fts_new_symbol("append_bar"), _track_append_bar);
   fts_class_message_void(cl, fts_new_symbol("make-bars"), _track_make_bars);
   fts_class_message_varargs(cl, fts_new_symbol("make_trill"), _track_make_trill);
   fts_class_message_varargs(cl, seqsym_marker, _track_append_marker);
