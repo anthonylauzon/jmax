@@ -491,7 +491,7 @@ static void protocol_encoder_write_symbol( protocol_encoder_t *encoder, fts_symb
 #ifdef CACHE_REPORT
   if (cache->naccess % 32 == 0)
     {
-      fts_log( "[client] output symbol cache hit: %d%%\n", ((100.0 * cache->nhit) / cache->naccess));
+      fts_log( "[client] output symbol cache hit: %6.2f%%\n", ((100.0 * cache->nhit) / cache->naccess));
     }
 #endif
 }

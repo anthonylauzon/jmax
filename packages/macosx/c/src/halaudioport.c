@@ -307,7 +307,7 @@ static fts_status_t halaudioport_instantiate(fts_class_t *cl, int ac, const fts_
 void halaudioport_config( void)
 {
   fts_symbol_t halaudioport_symbol = fts_new_symbol("halaudioport");
+
   fts_class_install( halaudioport_symbol, halaudioport_instantiate);
   fts_audioport_set_default_class(halaudioport_symbol);
-  fts_log("halaudioport config\n");
 }

@@ -682,8 +682,6 @@ int fts_audioport_report_xrun( void)
 /*                                                                        */
 /* ********************************************************************** */
 
-#ifdef WIN32
-
 static fts_audioport_t *default_audioport = 0;
 static fts_symbol_t default_audioport_class = 0;
 
@@ -720,38 +718,18 @@ void fts_audioport_set_default_class( fts_symbol_t name)
 
 fts_audioport_t *fts_audioport_get_default( fts_object_t *obj)
 {
-  if ((default_audioport == 0) && (default_audioport_class != 0)) {
-    fts_atom_t a[1];
-    fts_log("[audioport]: No default audioport was installed, instanciating the default class %s\n", default_audioport_class);
-    fts_set_symbol(a, default_audioport_class);
-    fts_audioport_set_default(1, a);
+  if ((default_audioport == 0) && (default_audioport_class != 0))
+    {
+      fts_atom_t a[1];
+
+      fts_log("[audioport]: No default audioport was installed, instanciating the default class %s\n", default_audioport_class);
+
+      fts_set_symbol(a, default_audioport_class);
+      fts_audioport_set_default(1, a);
   }
+
   return default_audioport;  
 }
-
-#else
-
-fts_audioport_t *fts_audioport_get_default( fts_object_t *obj)
-{
-  fts_atom_t *value;
-  fts_audioport_t *default_audioport = 0;
-
-  value = fts_variable_get_value_or_void( fts_object_get_patcher( obj), s_default_audio_port);
-
-  if (value && fts_is_object(value))
-    default_audioport = (fts_audioport_t *)fts_get_object( value);
-  
-  if (obj)
-    fts_variable_add_user( fts_object_get_patcher(obj), s_default_audio_port, obj);
-
-  return default_audioport;
-}
-
-void fts_audioport_set_default_class( fts_symbol_t name)
-{
-}
-
-#endif
 
 
 /***********************************************************************

@@ -1,3 +1,7 @@
+2002-03-12  François Déchelle  <dechelle@mac-dechelle.ircam.fr>
+
+	* fts/audio.c: fixed code for installing default audio port class
+
 2002-03-08  François Déchelle  <dechelle@mac-dechelle.ircam.fr>
 
 	* fixed packages compilation problems on Mac OS X:
