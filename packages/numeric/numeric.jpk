@@ -32,6 +32,6 @@ puts "package: numeric (numeric classes)"
 
 # help
 sourceFile $dir/help/numeric.help.index.tcl
-helpSummary "Numeric" $dir/help/numeric.summary.jmax
+helpSummary "numeric summary" $dir/help/numeric.summary.jmax
 
 

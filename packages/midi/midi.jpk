@@ -28,7 +28,7 @@ package provide midi
 global jmaxArch jmaxMode
 ucs load module midi $dir/c/lib/$jmaxArch/$jmaxMode/libmidi.so
 
-helpSummary MIDI $dir/help/midi.summary.jmax
+helpSummary "MIDI summary" $dir/help/midi.summary.jmax
 sourceFile $dir/help/midi.help.index.tcl
 
 puts "package: midi (basic MIDI i/o objects)"

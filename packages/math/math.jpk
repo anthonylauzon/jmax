@@ -32,6 +32,6 @@ puts "package: math (math classes)"
 
 # help
 sourceFile $dir/help/math.help.index.tcl
-helpSummary "Math" $dir/help/math.summary.jmax
+helpSummary "math summary" $dir/help/math.summary.jmax
 
 

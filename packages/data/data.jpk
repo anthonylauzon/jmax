@@ -34,7 +34,7 @@ java::load -classpath "$dir/java/classes" ircam.jmax.editors.table.TableExtensio
 
 # load the help patch data base
 sourceFile $dir/help/data.help.index.tcl
-helpSummary "Data" $dir/help/data.summary.jmax
+helpSummary "data summary" $dir/help/data.summary.jmax
 
 puts "package: data (data structures)"
 

@@ -32,7 +32,7 @@ global jmaxArch jmaxMode
 ucs load module alsa $dir/lib/$jmaxArch/$jmaxMode/libalsa.so
 
 # summary and help patches
-helpSummary "ALSA" $dir/help/alsa.summary.jmax
+helpSummary "ALSA summary" $dir/help/alsa.summary.jmax
 helpPatch alsaaudioport $dir/help/alsaaudioport.help.jmax
 
 post "package: alsa (ALSA objects)"

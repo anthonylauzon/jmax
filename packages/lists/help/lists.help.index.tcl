@@ -22,6 +22,7 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
+helpSummary "lists summary" $dir/lists.summary.jmax
 
 helpPatch list $dir/list.help.jmax
 helpPatch l $dir/list.help.jmax
@@ -88,5 +89,3 @@ helpPatch lsum $dir/listsum.help.jmax
 
 helpPatch listtail $dir/listtail.help.jmax
 helpPatch ltail $dir/listtail.help.jmax
-
-helpSummary Lists $dir/lists.summary.jmax

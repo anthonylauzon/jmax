@@ -32,4 +32,4 @@ ucs load module system $dir/c/lib/$jmaxArch/$jmaxMode/libsystem.so
 
 #help
 sourceFile $dir/help/system.help.index.tcl
-helpSummary "System" $dir/help/system.summary.jmax
+helpSummary "system summary" $dir/help/system.summary.jmax

@@ -1,4 +1,4 @@
-helpSummary "Signal" $dir/signal.summary.jmax
+helpSummary "signal summary" $dir/signal.summary.jmax
 dataDirectory $dir
 
 ## generators

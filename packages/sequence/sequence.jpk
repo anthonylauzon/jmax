@@ -35,7 +35,7 @@ java::load -classpath "$dir/java/classes" ircam.jmax.editors.sequence.SequenceEx
 
 ## load the help patch data base
 sourceFile $dir/help/sequence.help.index.tcl
-helpSummary Sequence $dir/help/sequence.summary.jmax
+helpSummary "sequence summary" $dir/help/sequence.summary.jmax
 
 puts "package: sequence (sequencing classes)"
 

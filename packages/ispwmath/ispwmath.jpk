@@ -32,4 +32,4 @@ puts "package: ISPW math (ISPW math classes)"
 
 # help
 sourceFile $dir/help/ispwmath.help.index.tcl
-helpSummary "ISPW math" $dir/help/ispwmath.summary.jmax
+helpSummary "ISPW math summary" $dir/help/ispwmath.summary.jmax
