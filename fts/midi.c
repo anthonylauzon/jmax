@@ -286,8 +286,8 @@ midievent_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	    }
 	}
       else if(fts_midievent_is_real_time(this))
-	if(fts_is_number(at))
-	  fts_midievent_real_time_set(this, fts_get_number_int(at));
+	if(fts_is_number(at + 1))
+	  fts_midievent_real_time_set(this, fts_get_number_int(at + 1));
     }
 }
   
@@ -339,10 +339,9 @@ midievent_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-
   int type = fts_midievent_get_type(this);
 
-  fts_spost(stream, "(:midievent %s ", fts_midi_types[midi_note]);
+  fts_spost(stream, "(:midievent %s ", fts_midi_types[type]);
 
   switch (type)
     {
@@ -473,6 +472,7 @@ fts_midififo_poll(fts_midififo_t *fifo)
   if(fts_fifo_read_level(&fifo->data) >= sizeof(fts_midififo_entry_t)) 
     {
       fts_midififo_entry_t *entry = (fts_midififo_entry_t *)fts_fifo_read_pointer(&fifo->data);
+      double time = entry->time - fts_get_time();
       double delay;
       fts_atom_t a;
       
@@ -480,20 +480,22 @@ fts_midififo_poll(fts_midififo_t *fifo)
       fts_set_object(&a, entry->event);
       
       /* time == 0.0 means: send now */
-      if(entry->time != 0.0) 
-	{
+      if(time > 0.0) 
+	{        
 	  /* adjust delta time on very first fifo entry */
 	  if(fifo->delta == 0.0)
-	    fifo->delta = entry->time;
+	    fifo->delta = time;
 	  
 	  /* translate event time to delay */
-	  delay = entry->time - fifo->delta;
+	  delay = time - fifo->delta;
+          
+          post("midififo_poll: entry %f, delta %f, delay %f\n", entry->time,  fifo->delta, delay);
 	  
 	  /* adjust delta time */
 	  if(delay < 0.0) 
 	    {
 	      delay = 0.0;
-	      fifo->delta = entry->time;
+	      fifo->delta = time;
 	    }
 	  
 	  /* schedule midiport input call */

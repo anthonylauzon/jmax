@@ -65,6 +65,9 @@ macosxmidiport_parse_input(const MIDIPacketList *pktlist, void *o, void *src)
         fts_midievent_t *parsed = fts_midiparser_byte(parser, packet->data[j]);
 
         if(parsed != NULL) {
+        
+        post("macosxmidiport input: %f\n", time);
+        
           /* write fifo entry */
           fts_midififo_write(fifo, o, time);
 
