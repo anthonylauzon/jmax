@@ -31,6 +31,10 @@
 
 fts_class_t *track_class = 0;
 
+
+static void track_upload_event(track_t *this, event_t *event, fts_array_t *temp_array);
+
+
 /******************************************************
 *
 *  preset dumper utility
@@ -318,6 +322,23 @@ track_add_event(track_t *track, double time, event_t *event)
 }
 
 void
+track_add_event_and_upload(track_t *track, double time, event_t *event)
+{
+  fts_array_t temp_array;
+
+  track_add_event(track, time, event);
+  
+  if(track_editor_is_open(track))
+    {
+      fts_array_init(&temp_array, 0, 0);
+      track_upload_event( track, event, &temp_array);
+      fts_array_destroy(&temp_array);
+    }
+
+  track_set_dirty( track);
+}
+
+void
 track_append_event(track_t *track, double time, event_t *event)
 {
   append_event(track, event);
@@ -335,6 +356,22 @@ track_remove_event(track_t *track, event_t *event)
   event->next = event->prev = 0;
 
   fts_object_release(event);
+}
+
+/* delete event and upload changes to client */
+void
+track_remove_event_and_upload(track_t *track, event_t *event)
+{
+  fts_atom_t at;
+
+  fts_set_object(&at, (fts_object_t *) event);
+
+  /*  remove event objects from client */
+  fts_client_send_message((fts_object_t *) track, seqsym_removeEvents, 1, &at);
+
+  track_remove_event(track, event);
+
+  track_set_dirty(track);
 }
 
 static void
@@ -1042,6 +1079,7 @@ track_remove_events_by_client_request(fts_object_t *o, int winlet, fts_symbol_t 
   track_set_dirty( this);
 }
 
+
 /* move event by client request */
 static void
 track_move_events_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1392,22 +1430,7 @@ track_notify_gui_listeners(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   }
 }
 
-void
-track_add_event_and_upload(track_t *track, double time, event_t *event)
-{
-  fts_array_t temp_array;
 
-  track_add_event(track, time, event);
-  
-  if(track_editor_is_open(track))
-    {
-      fts_array_init(&temp_array, 0, 0);
-      track_upload_event( track, event, &temp_array);
-      fts_array_destroy(&temp_array);
-    }
-
-  track_set_dirty( track);
-}
 
 /******************************************************
 *
