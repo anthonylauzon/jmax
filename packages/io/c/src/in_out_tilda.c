@@ -41,20 +41,22 @@ static int in_out_check( fts_object_t *o, int ac, const fts_atom_t *at, fts_audi
 
   if (!*port)
     {
-      *port = fts_audioport_get_default( o);
+#warning (OLD API) fts_audioport_get_default (OLD API)
+/*       *port = fts_audioport_get_default( o); */
 
-      if ( !*port)
-	{
-	  fts_object_set_error( o, "default audio port is not defined");
-	  return 0;
-	}
+/*       if ( !*port) */
+/* 	{ */
+/* 	  fts_object_set_error( o, "default audio port is not defined"); */
+/* 	  return 0; */
+/* 	} */
     }
 
-  if ( !fts_object_is_audioport( (fts_object_t *)*port) )
-    {
-      fts_object_set_error( o, "argument must be an audio port");
-      return 0;
-    }
+#warning (OLD API) fts_object_is_audioport (OLD API)
+/*   if ( !fts_object_is_audioport( (fts_object_t *)*port) ) */
+/*     { */
+/*       fts_object_set_error( o, "argument must be an audio port"); */
+/*       return 0; */
+/*     } */
 
   return 1;
 }
@@ -73,8 +75,9 @@ static void in_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 {
   in_tilda_t *this = (in_tilda_t *)o;
 
-  if (in_out_check( o, ac, at, &this->port, &this->channel))
-    fts_audioport_add_input_object( this->port, this->channel, (fts_object_t *)this);
+#warning (OLD API) fts_audioport_add_input_object (OLD API)
+/*   if (in_out_check( o, ac, at, &this->port, &this->channel)) */
+/*     fts_audioport_add_input_object( this->port, this->channel, (fts_object_t *)this); */
 }
 
 static void in_tilda_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -86,13 +89,14 @@ static void in_tilda_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac
       if (this->channel >= 0)
 	{
 	  int i;
-	  
-	  for ( i = 0; i < fts_object_get_outlets_number( o); i++)
-	    fts_audioport_remove_input_object( this->port, i, (fts_object_t *)this);
+#warning (OLD API) fts_audioport_remove_input_object (OLD API)	  
+/* 	  for ( i = 0; i < fts_object_get_outlets_number( o); i++) */
+/* 	    fts_audioport_remove_input_object( this->port, i, (fts_object_t *)this); */
 	}
       else
 	{
-	  fts_audioport_remove_input_object( this->port, this->channel, (fts_object_t *)this);
+#warning (OLD API) fts_audioport_remove_input_object (OLD API)	  
+/* 	  fts_audioport_remove_input_object( this->port, this->channel, (fts_object_t *)this); */
 	}
     }
 }
@@ -127,10 +131,11 @@ static void out_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t 
   out_tilda_t *this  = (out_tilda_t *)o;
   fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);
   void *propagate_context = fts_get_pointer(at + 1);
-  fts_object_t *outdispatcher = fts_audioport_get_output_dispatcher( this->port);
+#warning (OLD API) fts_audioport_get_output_dispatcher (OLD API)
+/*   fts_object_t *outdispatcher = fts_audioport_get_output_dispatcher( this->port); */
 
-  if ( outdispatcher)
-    (*propagate_fun)( propagate_context, outdispatcher, this->channel);
+/*   if ( outdispatcher) */
+/*     (*propagate_fun)( propagate_context, outdispatcher, this->channel); */
 }
 
 static void out_tilda_instantiate(fts_class_t *cl)

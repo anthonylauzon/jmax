@@ -37,8 +37,8 @@ static void dac_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
     inlets = 2;
   else
     inlets = ac;
-
-  this->port = fts_audioport_get_default( o);
+#warning (OLD API) fts_audioport_get_default (OLD API)
+/*   this->port = fts_audioport_get_default( o); */
   if ( !this->port)
     {
       fts_object_set_error( o, "default audio port is not defined");
@@ -86,11 +86,13 @@ static void dac_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t 
   int i;
   fts_object_t *outdispatcher;
 
-  outdispatcher = fts_audioport_get_output_dispatcher( this->port);
-  i = this->indexes[ inlet];
+#warning (OLD API) fts_audioport_get_output_dispatcher (OLD API)
+/*   outdispatcher = fts_audioport_get_output_dispatcher( this->port); */
+/*   i = this->indexes[ inlet]; */
 
-  if ( outdispatcher && i >= 0 && i < fts_audioport_get_output_channels( this->port))
-    (*propagate_fun)( propagate_context, outdispatcher, i);
+#warning (OLD API) fts_audioport_get_output_channels (OLD API)
+/*   if ( outdispatcher && i >= 0 && i < fts_audioport_get_output_channels( this->port)) */
+/*     (*propagate_fun)( propagate_context, outdispatcher, i); */
 }
 
 static void dac_tilda_instantiate(fts_class_t *cl)
