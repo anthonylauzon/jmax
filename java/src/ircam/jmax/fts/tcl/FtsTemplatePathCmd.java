@@ -46,6 +46,7 @@ class FtsTemplatePathCmd implements Command
 	path = argv[1].toString();
 
 	Fts.getServer().sendTemplateDeclarePath(path);
+	Fts.recomputeErrorObjects();
       }
     else
       {

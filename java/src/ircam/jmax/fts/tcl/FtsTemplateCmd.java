@@ -47,7 +47,13 @@ class FtsTemplateCmd implements Command
 	name = argv[1].toString();
 	filename = argv[2].toString();
 
-	Fts.getServer().sendTemplateDeclare(name, filename);
+	if (Fts.getServer() != null)
+	  {
+	    Fts.getServer().sendTemplateDeclare(name, filename);
+	    Fts.recomputeErrorObjects();
+	  }
+	else
+	  throw new TclException(interp, "cannot declare a template before startup");
       }
     else
       {

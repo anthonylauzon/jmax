@@ -193,10 +193,15 @@ public class Fts
 
   public static FtsObject redefineFtsObject(FtsObject oldObject, String description) throws FtsException
   {
+    Object listener;
     FtsObject newObject;
     FtsObject parent;
     int oldInlets, oldOutlets;
     Object data;
+
+    // Get the listener, to move it to the new object
+
+    listener = oldObject.getObjectListener();
 
     // Get the data, and quit the editors connected to the data
 
@@ -234,7 +239,10 @@ public class Fts
     newObject = server.getObjectByFtsId(newId);
     
     if (newObject != null)
-      newObject.setDirty();
+      {
+	newObject.setDirty();
+	newObject.setObjectListener(listener);
+      }
     else
       throw new FtsException("Instantiation Error: " + description);
 

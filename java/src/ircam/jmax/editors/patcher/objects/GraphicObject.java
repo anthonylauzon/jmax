@@ -108,35 +108,35 @@ abstract public class GraphicObject implements DisplayObject
 
   static public GraphicObject makeGraphicObject( ErmesSketchPad sketch, FtsObject object) 
   {
-    GraphicObject eobj;
+    GraphicObject gobj;
     String theName = object.getClassName();
 
     if (theName.equals( "messbox"))
-      eobj = new ircam.jmax.editors.patcher.objects.Message( sketch, object);
+      gobj = new ircam.jmax.editors.patcher.objects.Message( sketch, object);
     else if (theName.equals( "button"))
-      eobj = new ircam.jmax.editors.patcher.objects.Bang( sketch, object);
+      gobj = new ircam.jmax.editors.patcher.objects.Bang( sketch, object);
     else if (theName.equals( "toggle"))
-      eobj = new ircam.jmax.editors.patcher.objects.Toggle( sketch, object);
+      gobj = new ircam.jmax.editors.patcher.objects.Toggle( sketch, object);
     else if (theName.equals( "intbox"))
-      eobj = new ircam.jmax.editors.patcher.objects.IntBox( sketch, object);
+      gobj = new ircam.jmax.editors.patcher.objects.IntBox( sketch, object);
     else if (theName.equals( "floatbox"))
-      eobj = new ircam.jmax.editors.patcher.objects.FloatBox( sketch, object);
+      gobj = new ircam.jmax.editors.patcher.objects.FloatBox( sketch, object);
     else if (theName.equals( "jcomment"))
-      eobj = new ircam.jmax.editors.patcher.objects.Comment( sketch, object);
+      gobj = new ircam.jmax.editors.patcher.objects.Comment( sketch, object);
     else if ( theName.equals( "slider"))
-      eobj = new ircam.jmax.editors.patcher.objects.Slider( sketch, object);
+      gobj = new ircam.jmax.editors.patcher.objects.Slider( sketch, object);
     else if (theName.equals( "inlet"))
-      eobj = new ircam.jmax.editors.patcher.objects.Inlet( sketch, object);
+      gobj = new ircam.jmax.editors.patcher.objects.Inlet( sketch, object);
     else if (theName.equals( "outlet"))
-      eobj = new ircam.jmax.editors.patcher.objects.Outlet( sketch, object);
+      gobj = new ircam.jmax.editors.patcher.objects.Outlet( sketch, object);
     else if (theName.equals( "jpatcher"))
-      eobj = new ircam.jmax.editors.patcher.objects.Patcher( sketch, object);
+      gobj = new ircam.jmax.editors.patcher.objects.Patcher( sketch, object);
     else
-      eobj = new ircam.jmax.editors.patcher.objects.Standard( sketch, object);
+      gobj = new ircam.jmax.editors.patcher.objects.Standard( sketch, object);
 
-    object.setObjectListener(eobj);
+    object.setObjectListener(gobj);
 
-    return eobj;
+    return gobj;
   }
 
   protected GraphicObject( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 

@@ -337,7 +337,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     
 	setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
-	// @@@@: Should get the fts clipboard from the System.clipboard content !!!!!
+	// Should get the fts clipboard from the System.clipboard content !!!!!
 
 	pasting = true;
 

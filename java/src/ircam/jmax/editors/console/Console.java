@@ -126,9 +126,6 @@ public class Console extends JPanel {
 	itsInterp.eval(s);
 
 	// Ask FTS to recompute the error objects if needed
-	// A command can change the configuration.
-
-	Fts.recomputeErrorObjects();
 
 	String result = itsInterp.getResult().toString();
 	if (result.length() > 0) {

@@ -183,6 +183,7 @@ public class FtsObject
 	else
 	  isError = true;
 
+
 	if (listener instanceof FtsObjectErrorListener)
 	  ((FtsObjectErrorListener)listener).errorChanged(isError);
       }
@@ -237,6 +238,11 @@ public class FtsObject
   public void setObjectListener(Object obj)
   {
     listener = obj;
+  }
+
+  public Object getObjectListener()
+  {
+    return listener;
   }
 
   /******************************************************************************/
