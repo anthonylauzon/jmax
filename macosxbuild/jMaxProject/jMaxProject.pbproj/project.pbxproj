@@ -3204,6 +3204,7 @@
 				JAVA_ARCHIVE_TYPE = JAR;
 				JAVA_CLASS_SEARCH_PATHS = "build/ftsclient.jar build/jmax.jar";
 				JAVA_COMPILER = /usr/bin/javac;
+				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
 				OTHER_CFLAGS = "";
@@ -8163,6 +8164,7 @@
 				JAVA_ARCHIVE_TYPE = JAR;
 				JAVA_CLASS_SEARCH_PATHS = "build/jmax.jar build/ftsclient.jar";
 				JAVA_COMPILER = /usr/bin/javac;
+				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
 				OTHER_CFLAGS = "";
@@ -12487,6 +12489,7 @@
 				JAVA_ARCHIVE_CLASSES = YES;
 				JAVA_ARCHIVE_TYPE = JAR;
 				JAVA_COMPILER = /usr/bin/javac;
+				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
 				OTHER_CFLAGS = "";
@@ -15105,7 +15108,7 @@
 				JAVA_ARCHIVE_CLASSES = YES;
 				JAVA_ARCHIVE_TYPE = JAR;
 				JAVA_CLASS_SEARCH_PATHS = build/ftsclient.jar;
-				JAVA_COMPILER = /usr/bin/javac;
+				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
 				OTHER_CFLAGS = "";
@@ -17761,6 +17764,7 @@
 				JAVA_ARCHIVE_TYPE = JAR;
 				JAVA_CLASS_SEARCH_PATHS = "build/jmax.jar build/ftsclient.jar";
 				JAVA_COMPILER = /usr/bin/javac;
+				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
 				OTHER_CFLAGS = "";
@@ -19293,6 +19297,7 @@
 				JAVA_ARCHIVE_TYPE = JAR;
 				JAVA_CLASS_SEARCH_PATHS = "build/ftsclient.jar build/jmax.jar";
 				JAVA_COMPILER = /usr/bin/javac;
+				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
 				OTHER_CFLAGS = "";
@@ -19326,7 +19331,6 @@
 				F8DC5E79028683C301664092,
 				F8DC5E7A028683C301664092,
 				F8DC5E7B028683C301664092,
-				F8DC5E7C028683C301664092,
 				F8DC5E7D028683C301664092,
 				F8DC5E7E028683C301664092,
 				F8DC5E7F028683C301664092,
@@ -19441,7 +19445,6 @@
 				F8DC5E51028683C301664092,
 				F8DC5E52028683C301664092,
 				F8DC5E53028683C301664092,
-				F8DC5E54028683C301664092,
 				F8DC5E55028683C301664092,
 				F8DC5E56028683C301664092,
 				F8DC5E57028683C301664092,
@@ -19531,12 +19534,6 @@
 			isa = PBXFileReference;
 			name = FtsCommentObject.java;
 			path = ../../packages/guiobj/java/ircam/jmax/guiobj/FtsCommentObject.java;
-			refType = 2;
-		};
-		F8DC5E54028683C301664092 = {
-			isa = PBXFileReference;
-			name = FtsDisplayListener.java;
-			path = ../../packages/guiobj/java/ircam/jmax/guiobj/FtsDisplayListener.java;
 			refType = 2;
 		};
 		F8DC5E55028683C301664092 = {
@@ -19769,12 +19766,6 @@
 		};
 		F8DC5E7B028683C301664092 = {
 			fileRef = F8DC5E53028683C301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8DC5E7C028683C301664092 = {
-			fileRef = F8DC5E54028683C301664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
