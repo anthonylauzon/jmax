@@ -24,6 +24,8 @@ public class FtsClipboard  extends FtsObject
    * Create a Fts clipboard;
    */
 
+  boolean empty = true; // Empty only before its first copy
+
   int copyCount = 0;
 
   protected  FtsClipboard(FtsObject parent, String className, String description, int objId)
@@ -33,6 +35,7 @@ public class FtsClipboard  extends FtsObject
 
   public void copy(FtsSelection sel)
   {
+    empty = false;
     copyCount++;
     Fts.getServer().sendObjectMessage(this, -1, "copy", sel);
   }
@@ -45,6 +48,11 @@ public class FtsClipboard  extends FtsObject
   public int getCopyCount()
   {
     return copyCount;
+  }
+
+  public boolean isEmpty()
+  {
+    return empty;
   }
 }
 

@@ -19,7 +19,8 @@ public class FtsModule
     // Not yet
     // Mda.installDocumentHandler( new FtsBmaxRemoteDocumentHandler());
 
-    Mda.installDocumentType(new FtsPatcherDocumentType());
+    Fts.setPatcherDocumentType(new FtsPatcherDocumentType());
+    Mda.installDocumentType(Fts.getPatcherDocumentType());
 
     // Install the FTS tcl commands
 

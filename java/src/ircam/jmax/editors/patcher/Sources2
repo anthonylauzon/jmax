@@ -1,0 +1,34 @@
+
+LOCAL_PATH := $(INCLUDE_PATH)
+INCLUDE_PATH := $(INCLUDE_PATH)/objects
+include $(INCLUDE_PATH)/Sources2
+
+INCLUDE_PATH := $(LOCAL_PATH)
+
+SOURCES := $(SOURCES)\
+	$(INCLUDE_PATH)/DisplayList.java  \
+	$(INCLUDE_PATH)/ErmesConnection.java  \
+	$(INCLUDE_PATH)/ErmesDataEditor.java  \
+	$(INCLUDE_PATH)/ErmesDrawable.java  \
+	$(INCLUDE_PATH)/ErmesModule.java  \
+	$(INCLUDE_PATH)/ErmesObjEditField.java  \
+	$(INCLUDE_PATH)/ErmesObjInOutPop.java  \
+	$(INCLUDE_PATH)/ErmesPatcherFactory.java  \
+	$(INCLUDE_PATH)/ErmesPatcherListener.java  \
+	$(INCLUDE_PATH)/ErmesSelection.java  \
+	$(INCLUDE_PATH)/ErmesSketchPad.java  \
+	$(INCLUDE_PATH)/ErmesSketchWindow.java  \
+	$(INCLUDE_PATH)/FileMenu.java  \
+	$(INCLUDE_PATH)/EditMenu.java  \
+	$(INCLUDE_PATH)/AlignMenu.java  \
+	$(INCLUDE_PATH)/TextMenu.java  \
+	$(INCLUDE_PATH)/HelpMenu.java  \
+	$(INCLUDE_PATH)/ErmesToolButton.java  \
+	$(INCLUDE_PATH)/ErmesToolBar.java  \
+	$(INCLUDE_PATH)/FindPanel.java  \
+	$(INCLUDE_PATH)/FontCache.java  \
+	$(INCLUDE_PATH)/FpePanel.java  \
+	$(INCLUDE_PATH)/Interaction.java  \
+	$(INCLUDE_PATH)/KeyEventClient.java  \
+	$(INCLUDE_PATH)/MultiLineText.java  \
+	$(INCLUDE_PATH)/Settings.java

@@ -384,6 +384,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener, C
 
     Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
 
+
     if (clipboardContent == null) return;
 
     if (itsSketchPad.canPasteText())
@@ -398,7 +399,6 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener, C
 	  }
       }
     else if (clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelection))
-      
       {
 	setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
@@ -847,10 +847,10 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener, C
 	    aDialog.setLocation( 300, 300);
 	    aDialog.setVisible( true);
 
-	    if (aDialog.GetNothingToDoFlag())
+	    if (aDialog.getNothingToDoFlag())
 	      return;
 
-	    if (aDialog.GetToSaveFlag())
+	    if (aDialog.getToSaveFlag())
 	      Save();
 
 	    aDialog.dispose();

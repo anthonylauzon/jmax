@@ -16,7 +16,9 @@ SOURCES = \
 	$(INCLUDE_PATH)/InteractionModule.java		\
 	$(INCLUDE_PATH)/Layer.java			\
 	$(INCLUDE_PATH)/MaxToolsMenu.java		\
+	$(INCLUDE_PATH)/MaxToolsJMenu.java		\
 	$(INCLUDE_PATH)/MaxWindowMenu.java		\
+	$(INCLUDE_PATH)/MaxWindowJMenu.java		\
 	$(INCLUDE_PATH)/MouseTracker.java		\
 	$(INCLUDE_PATH)/NumericPropertyEditor.java	\
 	$(INCLUDE_PATH)/NumericalWidget.java		\

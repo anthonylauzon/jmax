@@ -89,11 +89,11 @@ public class FileNotSavedDialog extends Dialog implements ActionListener, KeyLis
     }
   }
 
-  public boolean GetToSaveFlag(){
+  public boolean getToSaveFlag(){
     return itsToSave;
   }
 
-  public boolean GetNothingToDoFlag(){
+  public boolean getNothingToDoFlag(){
     return itsNothingToDo;
   }
   

@@ -38,11 +38,10 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
 
     setLayout( new BorderLayout());    
 
-    String path = MaxApplication.getProperty( "root" ) + File.separator + "images" + File.separator;
-    lockEditButton = new JToggleButton( IconCache.getIcon( path + "tool_lock_mode.gif"));
+    lockEditButton = new JToggleButton( IconCache.getIcon( "tool_lock_mode.gif"));
     lockEditButton.setDoubleBuffered( false);
     lockEditButton.setMargin( new Insets(0,0,0,0));
-    lockEditButton.setSelectedIcon( IconCache.getIcon( path + "tool_edit_mode.gif"));
+    lockEditButton.setSelectedIcon( IconCache.getIcon( "tool_edit_mode.gif"));
     lockEditButton.setFocusPainted( false);
     lockEditButton.addItemListener( new ItemListener() {
       public void itemStateChanged(ItemEvent e)
@@ -59,7 +58,7 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
     if ((itsSketchPad.itsPatcher.getParent() != null) &&
 	(itsSketchPad.itsPatcher.getParent() != Fts.getRootObject()))
       {
-	upButton = new JButton(IconCache.getIcon( path + "tool_up.gif"));
+	upButton = new JButton(IconCache.getIcon( "tool_up.gif"));
 	upButton.setDoubleBuffered( false);
 	upButton.setMargin( new Insets(0,0,0,0));
 	upButton.addActionListener( new ActionListener() {
@@ -218,28 +217,25 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
     pressed = false;
   }
 
-  private void addButton( Container toolbar, String descr, String gifFilePath)
+  private void addButton( Container toolbar, String descr, String iconName)
   {
-    ErmesSwToggleButton aToggleButton = new ErmesSwToggleButton( descr, IconCache.getIcon( gifFilePath) );
+    ErmesSwToggleButton aToggleButton = new ErmesSwToggleButton( descr, IconCache.getIcon( iconName) );
     toolbar.add( aToggleButton);
     aToggleButton.addMouseListener( this);
   }
 
   private void insertButtons( Container toolbar)
   {
-    String fs = File.separator;
-    String path = MaxApplication.getProperty( "root" ) + fs + "images" + fs;
-
-    addButton( toolbar, "", path + "tool_ext.gif");
-    addButton( toolbar, "messbox", path + "tool_mess.gif");
-    addButton( toolbar, "jpatcher",  path + "tool_patcher.gif");
-    addButton( toolbar, "inlet -1", path + "tool_in.gif");
-    addButton( toolbar, "outlet -1", path + "tool_out.gif");
-    addButton( toolbar, "comment", path + "tool_text.gif");
-    addButton( toolbar, "button", path + "tool_bang.gif");
-    addButton( toolbar, "toggle", path + "tool_toggle.gif");
-    addButton( toolbar, "slider", path + "tool_slider.gif");
-    addButton( toolbar, "intbox", path + "tool_int.gif");
-    addButton( toolbar, "floatbox", path + "tool_float.gif");
+    addButton( toolbar, "", "tool_ext.gif");
+    addButton( toolbar, "messbox", "tool_mess.gif");
+    addButton( toolbar, "jpatcher", "tool_patcher.gif");
+    addButton( toolbar, "inlet -1", "tool_in.gif");
+    addButton( toolbar, "outlet -1","tool_out.gif");
+    addButton( toolbar, "comment", "tool_text.gif");
+    addButton( toolbar, "button", "tool_bang.gif");
+    addButton( toolbar, "toggle", "tool_toggle.gif");
+    addButton( toolbar, "slider", "tool_slider.gif");
+    addButton( toolbar, "intbox", "tool_int.gif");
+    addButton( toolbar, "floatbox", "tool_float.gif");
   }
 }

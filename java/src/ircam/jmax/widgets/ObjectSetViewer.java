@@ -24,14 +24,11 @@ public class ObjectSetViewer extends JPanel {
 
     private static void loadImages()
     {
-      String fs = File.separator;
-      String path = MaxApplication.getProperty( "root" ) + fs + "images" + fs;
-
-      patcherIcon = IconCache.getIcon( path + "tool_patcher.gif");
-      objectIcon  = IconCache.getIcon( path + "tool_ext.gif");
-      errorIcon   = IconCache.getIcon( path + "tool_err.gif");
-      commentIcon = IconCache.getIcon( path + "tool_text.gif");
-      messageIcon = IconCache.getIcon( path + "tool_mess.gif");
+      patcherIcon = IconCache.getIcon("tool_patcher.gif");
+      objectIcon  = IconCache.getIcon("tool_ext.gif");
+      errorIcon   = IconCache.getIcon("tool_err.gif");
+      commentIcon = IconCache.getIcon("tool_text.gif");
+      messageIcon = IconCache.getIcon("tool_mess.gif");
     }
 
     public ObjectCellRenderer() 

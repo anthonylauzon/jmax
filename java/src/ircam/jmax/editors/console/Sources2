@@ -1,4 +1,3 @@
-## je suis ircam/jmax/editors/console
 
 CONSOLE_PATH := $(INCLUDE_PATH)
 INCLUDE_PATH := $(INCLUDE_PATH)/tcl

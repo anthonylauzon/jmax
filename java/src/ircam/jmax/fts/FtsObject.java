@@ -223,6 +223,10 @@ public class FtsObject
 
   private int ftsId = -1;
 
+  /** A flag to handle double deletes from the editor; should be done better */
+
+  private boolean deleted = false;
+
   /** The parent object. Usually the container patcher or abstraction or template */
 
   FtsObject parent;
@@ -545,9 +549,12 @@ public class FtsObject
 
   public void delete()
   {
-    Fts.getSelection().removeObject(this);
-    parent.setDirty();
-    Fts.getServer().deleteObject(this);
+    if (! deleted)
+      {
+	Fts.getSelection().removeObject(this);
+	parent.setDirty();
+	Fts.getServer().deleteObject(this);
+      }
   }
 
 
@@ -571,7 +578,9 @@ public class FtsObject
   {
     // If we have data, dispose it, so that all
     // the editors will be closed.
-    
+
+    deleted = true;
+
     releaseData();
 
     parent.setDirty();

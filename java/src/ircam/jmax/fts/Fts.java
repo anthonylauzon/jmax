@@ -472,4 +472,19 @@ public class Fts
     for (int i = 0; i < editListeners.size(); i++)
       ((FtsEditListener) editListeners.elementAt(i)).objectRemoved(object);
   }
+
+
+  // MDA SUpport
+
+  private static MaxDocumentType patcherType;
+
+  static void setPatcherDocumentType(MaxDocumentType type)
+  {
+    patcherType = type;
+  }
+
+  static public MaxDocumentType  getPatcherDocumentType()
+  {
+    return patcherType;
+  }
 }

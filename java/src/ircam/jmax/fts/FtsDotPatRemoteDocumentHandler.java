@@ -19,15 +19,7 @@ public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
 
   public FtsDotPatRemoteDocumentHandler()
   {
-    String iconName;
-
-    iconName = (MaxApplication.getProperty( "root" ) +
-		File.separator +
-		"images" + 
-		File.separator +
-		"mini_icon_pat.gif");
-
-    patDocumentIcon = IconCache.getIcon(iconName);
+    patDocumentIcon = IconCache.getIcon("mini_icon_pat.gif");
   }
 
   /** We can load from a file start with the "max v2" string*/

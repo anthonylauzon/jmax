@@ -128,7 +128,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   public MaxEditor(String title, boolean register)
   {
     super(title);
-    
+
     if (register) 
       MaxWindowManager.getWindowManager().addWindow(this);
   }
