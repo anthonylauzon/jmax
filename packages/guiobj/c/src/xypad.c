@@ -67,7 +67,8 @@ xypad_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 static void xypad_set_couple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   xypad_t *this = (xypad_t *)o;
-  int x, y;
+  int x = 0;
+  int y = 0;
 
   switch(ac)
     {
@@ -175,7 +176,8 @@ static void
 xypad_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   xypad_t *this = (xypad_t *)o;
-  int x, y;
+  int x = 0;
+  int y = 0;
   
   switch(ac)
     {

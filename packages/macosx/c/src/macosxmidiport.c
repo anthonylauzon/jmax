@@ -92,13 +92,20 @@ macosxmidiport_output(fts_object_t *o, fts_midievent_t *event, double time)
   MIDIPacketList pktlist;
   MIDIPacket *pkt = MIDIPacketListInit(&pktlist);
   UInt64 hosttime = AudioGetCurrentHostTime();
-  UInt64 ftstime = Audioconvertnanostohosttime((UInt64)(1000000.0 * fts_get_time()));
-
+  UInt64 ftstime = AudioConvertNanosToHostTime((UInt64)(1000000.0 * fts_get_time()));
+  static UInt64 lasthost = 0;
+  static UInt64 lastfts = 0;
+  
   if(this->manager->delta == 0)
     this->manager->delta = hosttime - ftstime;
   
   pkt->timeStamp = ftstime + this->manager->delta;
 
+  /*post("1 sec: %u, freq: %f\n", (unsigned int)AudioConvertNanosToHostTime(1000000000), AudioGetHostClockFrequency());*/
+  post("host: %u (%u), fts: %u (%u), tag: %u\n", (unsigned int)hosttime, (unsigned int)(hosttime - lasthost), (unsigned int)ftstime, (unsigned int)(ftstime - lastfts), (unsigned int)pkt->timeStamp);
+  lasthost = hosttime;
+  lastfts = ftstime;
+  
   if(pkt->timeStamp < hosttime) {
     this->manager->delta = hosttime - ftstime;
     pkt->timeStamp = hosttime;
