@@ -24,6 +24,15 @@
 #define _FTS_PRIVATE_PARSERDATA_H_
 
 typedef struct {
+  void (*_int)();
+  void (*_float)();
+  void (*_symbol)();
+  void (*_begin_expression)();
+  void (*_end_expression)();
+} parser_actions_t;
+
+typedef struct {
+  parser_actions_t *actions;
   int (*yylex)( YYSTYPE *lvalp, void *data);
   int ac;
   int total;

@@ -104,6 +104,16 @@ FTS_API void fts_stack_destroy( fts_stack_t *stack);
 FTS_API int __fts_stack_realloc( fts_stack_t *b);
 
 /**
+ * Pop n elements off the stack.<BR>
+ *
+ * @fn void fts_stack_pop( b, n)
+ * @param b the stack
+ * @param n the number of elements to pop
+ * @ingroup stack
+ */
+#define fts_stack_pop(B,N) ((B)->top -= (N))
+
+/**
  * Get the content of a stack
  * 
  * @fn void *fts_stack_get_base( b)
@@ -114,12 +124,21 @@ FTS_API int __fts_stack_realloc( fts_stack_t *b);
 #define fts_stack_get_base(S) ((S)->buffer)
 
 /**
- * Get the number of elements in a stack
+ * Get the top of a stack
  * 
  * @fn int fts_stack_get_top( b)
  * @param b the stack
- * @return the number of elements
- * @ingroup array
+ * @return the stack top
+ * @ingroup stack
  */
 #define fts_stack_get_top(S) ((S)->top)
 
+/**
+ * Set the top of a stack
+ * 
+ * @fn void fts_stack_set_top( s, top)
+ * @param s the stack
+ * @param top the new stack top
+ * @ingroup stack
+ */
+#define fts_stack_set_top(S,TOP) ((S)->top = (TOP))

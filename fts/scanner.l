@@ -27,7 +27,8 @@
 #include "parser.h"
 
 #define YY_DECL int fts_string_lex( YYSTYPE *lvalp, void *data)
-#define RETURN(S) fprintf( stderr, "Token %s\n", #S); return S; 
+/*  #define RETURN(S) fprintf( stderr, "Token %s\n", #S); return S;  */
+#define RETURN(S) return S; 
 
 static fts_hashtable_t token_table;
 
@@ -80,6 +81,7 @@ float		[+-]?{decdigit}+(\.{decdigit}*)?([eE][+-]?{decdigit}+)?
 \.        { RETURN( FTS_TOKEN_DOT); }
 \[        { RETURN( FTS_TOKEN_LSBRA); }
 \]        { RETURN( FTS_TOKEN_RSBRA); }
+\$        { RETURN( FTS_TOKEN_DOLLAR); }
 
 %%
 
@@ -137,7 +139,7 @@ static void scanner_put_symbol_token( fts_symbol_t s, int token)
   fts_hashtable_put( &token_table, &k, &v);
 }
 
-void fts_kernel_parser_init( void)
+void fts_kernel_scanner_init( void)
 {
   fts_hashtable_init( &token_table, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_MEDIUM);
 

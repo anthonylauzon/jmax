@@ -128,7 +128,7 @@ PLATFORM_PACKAGES="alsa $PLATFORM_PACKAGES"
 else
 CONFIG_FILE=config_linux_oss.jmax
 fi
-FTS_SYS_LIBS="-ldl -lpthread `test $check_memory = yes && echo -lmpatrol -lbfd -liberty` -laudiofile"
+FTS_SYS_LIBS="-ldl -lpthread `test $check_memory = yes && echo -lmpatrol -lbfd -liberty`"
 ACX_C_RESTRICT
 ;;
 
