@@ -1,3 +1,8 @@
+2000-11-30  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* added ENABLE_ALSA in jmax.spec. By defining the environment variable ENABLE_ALSA=yes,
+	the rpm will be compiled with ALSA (0.5.x yet)
+
 2000-11-07  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* I think I've fixed the bug of dtd server going up to 99% CPU.
