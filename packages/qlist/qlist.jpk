@@ -1,0 +1,15 @@
+## package declaration
+
+package provide qlist
+
+## Load the qlist class
+## The qlist extension will install
+## the data type and handler
+##
+
+java::load -classpath "$dir/java/classes" ircam.jmax.editors.qlist.QListExtension
+
+puts "QList Loaded"
+
+
+
