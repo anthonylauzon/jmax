@@ -63,6 +63,13 @@ public class MonoTrackBackground implements Layer, ImageObserver{
 			toRepaintBack = true;
 			gc.getGraphicDestination().repaint();
 		    }
+		else
+		    if(e.getPropertyName().equals("locked"))
+			{
+			    locked = ((Boolean)e.getNewValue()).booleanValue();
+			    toRepaintBack = true;
+			    gc.getGraphicDestination().repaint();
+			}
 	    }
     });
     fm = gc.getGraphicDestination().getFontMetrics(ToggleBar.toggleBarFont);
@@ -100,20 +107,17 @@ public class MonoTrackBackground implements Layer, ImageObserver{
 
   private void drawHorizontalLine(Graphics g, int w, int h)
   {
-      //FontMetrics fm = gc.getGraphicDestination().getFontMetrics(ToggleBar.toggleBarFont);
-    g.setColor(Color.white);
+    if(!locked)
+      g.setColor(Color.white);
+    else
+      g.setColor(ScoreBackground.OUT_RANGE_COLOR);
+    
     g.fillRect(0, 0, w, h);
 
     // the track name
     g.setColor(Color.gray);
     g.setFont(ToggleBar.toggleBarFont);
-
-    //String maxString = ""+((MonoDimensionalAdapter)gc.getAdapter()).getInvY(0);
-    //String minString = ""+((MonoDimensionalAdapter)gc.getAdapter()).getInvY(gc.getGraphicDestination().getSize().height);  
-
     g.drawString(gc.getTrack().getName(), 2, h-17);
-    //g.drawString(maxString, PartitionBackground.KEYEND - SwingUtilities.computeStringWidth(fm, maxString)-2, 10);
-    //g.drawString(minString, PartitionBackground.KEYEND - SwingUtilities.computeStringWidth(fm, minString)-2, h-2);   
 
     Image image;
     int i=0;
@@ -136,7 +140,6 @@ public class MonoTrackBackground implements Layer, ImageObserver{
 
   private void drawVerticalGrid(Graphics g, int w, int h)
   {
-      //FontMetrics fm = gc.getGraphicDestination().getFontMetrics(ToggleBar.toggleBarFont);
     UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue());
     int windowTime = (int)(gc.getAdapter().getInvX(w) - gc.getAdapter().getInvX(KEYEND)) - 1 ;
     int timeStep;
@@ -227,6 +230,7 @@ public class MonoTrackBackground implements Layer, ImageObserver{
   SequenceGraphicContext gc;
   Image itsImage;
   boolean toRepaintBack = false;
+  boolean locked = false;
   FontMetrics fm;
   
   public static final int KEYX = 31;

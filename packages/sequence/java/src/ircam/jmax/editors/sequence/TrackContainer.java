@@ -8,6 +8,7 @@ import java.io.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import ircam.jmax.editors.sequence.track.*;
+import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.MaxApplication;
 
 /**
@@ -22,26 +23,12 @@ public class TrackContainer extends JPanel {
     this.track = t;
     this.trackEditor = trackEditor;
     
-    // icons: 
-    String fs = File.separator;
-    String path = null;
-
-    try
-      {
-	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-      }
-    catch(FileNotFoundException e){
-	//System.err.println("Couldn't locate sequence images");
-	path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-    }
-
-    activationButton = new JToggleButton(new ImageIcon(path+"unselected_track.gif"));
-    activationButton.setSelectedIcon(new ImageIcon(path+"selected_track.gif"));
+    activationButton = new JToggleButton(SequenceImages.getImageIcon("unselected_track"));
+    activationButton.setSelectedIcon(SequenceImages.getImageIcon("selected_track"));
     activationButton.setPreferredSize(new Dimension(BUTTON_WIDTH, 70));
-    add(activationButton, BorderLayout.WEST);
 
     /////////////////////////
-    openButton = new JButton(new ImageIcon(path+"opened_track_arrow.gif"));
+    openButton = new JButton(SequenceImages.getImageIcon("opened_track"));
     openButton.setPreferredSize(new Dimension(BUTTON_WIDTH, 20));
 
     buttonPanel = new JPanel();
@@ -66,7 +53,7 @@ public class TrackContainer extends JPanel {
 	    {
 		track.setProperty("opened", Boolean.FALSE);
 	    }
-    });
+	});
 
     toggleBar = new ToggleBar(trackEditor);
     add(toggleBar, BorderLayout.NORTH);

@@ -6,6 +6,7 @@ import java.awt.event.*;
 import java.awt.image.*;
 import java.io.*;
 import java.util.*;
+import javax.swing.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.*;
@@ -41,13 +42,23 @@ public class SequenceImages {
 	image = Toolkit.getDefaultToolkit().getImage(path+"faClef.gif");
 	Toolkit.getDefaultToolkit().prepareImage(image, 23, 30, observer);
 	images.put("faClef", image);
+
+	imageIcons.put("opened_track", new ImageIcon(path+"opened_track_arrow.gif"));
+	imageIcons.put("closed_track", new ImageIcon(path+"closed_track_arrow.gif"));
+	imageIcons.put("unselected_track", new ImageIcon(path+"unselected_track.gif"));
+	imageIcons.put("selected_track", new ImageIcon(path+"selected_track.gif"));
     }
 
     public static Image getImage(String name)
     {
 	return (Image)(images.get(name));
     }
+    public static ImageIcon getImageIcon(String name)
+    {
+	return (ImageIcon)(imageIcons.get(name));
+    }
 
     //---
     private static Hashtable images = new Hashtable();
+    private static Hashtable imageIcons = new Hashtable();
 }

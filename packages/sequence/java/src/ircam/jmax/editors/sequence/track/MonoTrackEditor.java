@@ -103,6 +103,17 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 		}
 	    });
 
+	itsTrack.getTrackDataModel().addLockListener(new LockListener(){
+		public void lock(boolean lock)
+		{
+		    for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
+			((TrackEvent) e.nextElement()).setHighlighted(false);
+
+		    oldElements.removeAllElements();
+		    getTrack().setProperty("locked", new Boolean(lock));
+		}
+	    });
+
 	geometry.addTranspositionListener(new TranspositionListener() {
 	    public void transpositionChanged(int newTranspose)
 		{

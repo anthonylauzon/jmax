@@ -118,8 +118,6 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     
     trackPanel.add(verticalGlue);
 
-    //ftsSequenceObject.requestTrackCreation("noteevt");
-
     setLayout(new BorderLayout());
 
     JPanel separate_tracks = new JPanel();
@@ -133,7 +131,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     statusBar = new InfoPanel();
 
     manager.addToolListener(new ToolListener() {
-	public void toolChanged(ToolChangeEvent e) 
+	    public void toolChanged(ToolChangeEvent e) 
 	    {
 		
 		if (e.getTool() != null) 
@@ -141,13 +139,13 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 			statusBar.post(e.getTool(), "");
 		    }
 	    }
-    });
+	});
  
     statusBar.setSize(300, 30);
 
     JPanel toolbarPanel = new JPanel();
-    toolbarPanel.setSize(/*156*//*180*//*204*/228, 25);
-    toolbarPanel.setPreferredSize(new Dimension(/*156*//*180*//*204*/228, 25));
+    toolbarPanel.setSize(228, 25);
+    toolbarPanel.setPreferredSize(new Dimension(228, 25));
     toolbarPanel.setLayout(new BorderLayout());
     toolbarPanel.add(toolbar, BorderLayout.CENTER);
     toolbarPanel.validate();
@@ -526,7 +524,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     {
 	Rectangle r = itsContainer.getViewRectangle();
 	return ((x > r.x + ScoreBackground.KEYEND) && (x < r.x + r.width - TrackContainer.BUTTON_WIDTH));
-    }
+    } 
 
     private int scrollingDelta = 10;//the automatic scrolling delta for the scrollbar  
     private int scrolledDelta = 2;//the corresponding graphic delta
