@@ -161,7 +161,7 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 
 	      if (!target)
 		{
-		  post("qlist: %s: no such object\n", fts_symbol_name(fts_get_symbol(av)));
+		  post("qlist: %s: no such object\n", fts_get_symbol(av));
 		  continue;
 		}
 
@@ -340,7 +340,7 @@ static void qlist_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int a
   file = (FILE *)fts_get_pointer( at);
 
   if ( o->argc > 1)
-    fprintf( file, "#N qlist %s;\n", fts_symbol_name( fts_get_symbol( o->argv + 1)));
+    fprintf( file, "#N qlist %s;\n", fts_get_symbol( o->argv + 1));
   else
     fprintf( file, "#N qlist;\n");
 
@@ -363,9 +363,9 @@ static void qlist_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int a
 	  fts_symbol_t s = fts_get_symbol( p);
 
 	  if (s == fts_s_semi || s == fts_s_comma)
-	    fprintf( file, " \\%s", fts_symbol_name( s));
+	    fprintf( file, " \\%s", s);
 	  else
-	    fprintf( file, " %s", fts_symbol_name( s));
+	    fprintf( file, " %s", s);
 	}
 
       count++;

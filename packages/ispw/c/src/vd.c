@@ -164,7 +164,7 @@ vd_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
     {
       buf = delay_table_get_delbuf(this->name);
       if(!buf){
-	post("vd~: can't find delay line: %s\n", fts_symbol_name(this->name));
+	post("vd~: can't find delay line: %s\n", this->name);
 	return;
       }
 

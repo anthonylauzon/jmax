@@ -132,13 +132,13 @@ tabcycle_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
       if(this->size % n_tick || this->size <= 0)
 	{
-	  post("tabcycle~: %s: size must be a multiple of %d\n", fts_symbol_name(this->tab_name), n_tick);
+	  post("tabcycle~: %s: size must be a multiple of %d\n", this->tab_name, n_tick);
 	  return;
 	}
 
       if (buf->size < this->size)
 	{
-	  post("tabcycle~: %s: table to short\n", fts_symbol_name(this->tab_name));
+	  post("tabcycle~: %s: table to short\n", this->tab_name);
 	  return;
 	}
       
@@ -156,7 +156,7 @@ tabcycle_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_dsp_add_function(tabcycle_fun_symbol, 3, argv);
     }
   else
-    post("tabcycle~: %s: can't find table~\n", fts_symbol_name(this->tab_name));
+    post("tabcycle~: %s: can't find table~\n", this->tab_name);
 }
 
 /******************************************************************
@@ -194,7 +194,7 @@ tabcycle_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
 	}
     }
   else
-    post("tabcycle~: %s: can't find table~\n", fts_symbol_name(this->tab_name));
+    post("tabcycle~: %s: can't find table~\n", this->tab_name);
 }
 
 /******************************************************************

@@ -249,7 +249,7 @@ expr_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   x = (t_expr *)fts_zalloc(sizeof(t_expr)); /* never freed ? */
   x->exp_stack = (struct ex_ex *)0;
 
-  buf = fts_symbol_name(fts_get_symbol(at));
+  buf = fts_get_symbol(at);
 
   if (ex_new(x, buf))
     {

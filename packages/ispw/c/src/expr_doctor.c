@@ -124,7 +124,7 @@ static fts_symbol_t get_expr_symbol(int argc, const fts_atom_t *argv)
 	  char c;
 	  int quoted = 0;
 
-	  s = (const char *)fts_symbol_name(fts_get_symbol(argv));
+	  s = (const char *)fts_get_symbol(argv);
 
 	  while ((c = *s++))
 	    {

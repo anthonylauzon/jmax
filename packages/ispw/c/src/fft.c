@@ -84,7 +84,7 @@ fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   if(!check_args(ac, at, &type, &real_spec))
     {
-      post("error: %s: bad arguments\n", fts_symbol_name(x->name));
+      post("error: %s: bad arguments\n", x->name);
       return;
     }
 
@@ -100,13 +100,13 @@ fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   
   if(!fts_fft_declaresize(size))
     {
-      post("error: %s: no fft size: %d\n", fts_symbol_name(x->name), size);
+      post("error: %s: no fft size: %d\n", x->name, size);
       return;
     }
 
   if(hop % size || hop <= 0)
     {
-      post("error: %s: hop must be a multiple of the FFT size\n", fts_symbol_name(x->name));
+      post("error: %s: hop must be a multiple of the FFT size\n", x->name);
       return;
     }
 
@@ -122,7 +122,7 @@ fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   if(!buf)
     {
-      post("error: %s: can't allocate buffers\n", fts_symbol_name(x->name));
+      post("error: %s: can't allocate buffers\n", x->name);
       return;
     }
   
@@ -132,7 +132,7 @@ fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     spec = (complex *)fts_malloc(sizeof(complex) * spec_size);
   if (!spec)
     {
-      post("error: %s: can't allocate buffers\n", fts_symbol_name(x->name));
+      post("error: %s: can't allocate buffers\n", x->name);
       return;
     }
 
@@ -220,11 +220,11 @@ fft_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
     }
 
   if(sig_tick > size){
-    post("%s: FFT size to small (< tick size)\n", fts_symbol_name(x->name));
+    post("%s: FFT size to small (< tick size)\n", x->name);
     return;
   }
   if(phase % sig_tick){
-    post("%s: phase must be multiple of tick size: %d\n", fts_symbol_name(x->name), sig_tick);
+    post("%s: phase must be multiple of tick size: %d\n", x->name, sig_tick);
     return;
   }
 
@@ -328,11 +328,11 @@ ifft_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     }
 
   if(sig_tick > size){
-    post("%s: FFT size to small (< tick size)\n", fts_symbol_name(x->name));
+    post("%s: FFT size to small (< tick size)\n", x->name);
     return;
   }
   if(phase % sig_tick){
-    post("%s: phase must be multiple of tick size: %d\n", fts_symbol_name(x->name), sig_tick);
+    post("%s: phase must be multiple of tick size: %d\n", x->name, sig_tick);
     return;
   }
 

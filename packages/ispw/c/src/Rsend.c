@@ -68,7 +68,7 @@ static void
 Rsend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   Rsend_t *this = (Rsend_t *)o;
-  const char *name = fts_symbol_name(s);
+  const char *name = s;
   char string[STRLENMAX];
   fts_atom_t a;
   int i, j;
@@ -101,7 +101,7 @@ Rsend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       else if (fts_is_symbol(at + i))
 	{
 	  string[0] = (char)RSEND_SYM;
-	  snprintf(string + 1, STRLENMAX, "%s", fts_symbol_name(fts_get_symbol(at + i)));
+	  snprintf(string + 1, STRLENMAX, "%s", fts_get_symbol(at + i));
 	}
       else
 	{

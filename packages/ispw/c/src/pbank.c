@@ -70,11 +70,11 @@ pbank_data_read_file(pbank_data_t *data, fts_symbol_t file_name)
   char c;
   int j, i;
 
-  f = fts_atom_file_open(fts_symbol_name(file_name), "r");
+  f = fts_atom_file_open(file_name, "r");
 
   if(!f)
     {
-      post("pbank: can't open file to read: %s\n", fts_symbol_name(file_name));
+      post("pbank: can't open file to read: %s\n", file_name);
       return(0);
     }
 
@@ -84,7 +84,7 @@ pbank_data_read_file(pbank_data_t *data, fts_symbol_t file_name)
 
   if ((! ret) || (! fts_is_symbol(&a)) || (fts_get_symbol(&a) != fts_new_symbol("pbank")))
     {
-      post("pbank: file hasn't pbank format: %s\n", fts_symbol_name(file_name));
+      post("pbank: file hasn't pbank format: %s\n", file_name);
       return(0);
     }
 
@@ -131,10 +131,10 @@ pbank_data_write_file(pbank_data_t *data, fts_symbol_t file_name)
   fts_atom_file_t *f;
   int i, j;
 
-  f = fts_atom_file_open(fts_symbol_name(file_name), "w");
+  f = fts_atom_file_open(file_name, "w");
   if(!f)
     {
-      post("pbank: can't open file to write: %s\n", fts_symbol_name(file_name));
+      post("pbank: can't open file to write: %s\n", file_name);
       return(0);
     }
 
@@ -176,10 +176,10 @@ pbank_data_export_ascii(pbank_data_t *data, fts_symbol_t file_name)
   fts_atom_file_t *f;
   int i, j;
 
-  f = fts_atom_file_open(fts_symbol_name(file_name), "w");
+  f = fts_atom_file_open(file_name, "w");
   if(!f)
     {
-      post("pbank: can't open file to write: %s\n", fts_symbol_name(file_name));
+      post("pbank: can't open file to write: %s\n", file_name);
       return(0);
     }
 
@@ -221,7 +221,7 @@ pbank_data_get(fts_symbol_t name, int n, int m)
 
       if(data->n != n || data->m != m)
 	{
-	  post("pbank: %s %d %d: dimensions don't match\n", fts_symbol_name(name), data->n, data->m);
+	  post("pbank: %s %d %d: dimensions don't match\n", name, data->n, data->m);
 	  return 0;
 	}
       else
@@ -369,7 +369,7 @@ pbank_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	{
 	  char buf[256];
 
-	  sprintf(buf, "%d-%s", j, fts_symbol_name(receive));
+	  sprintf(buf, "%d-%s", j, receive);
 	  this->receives[j] = fts_new_symbol_copy(buf);
 	}
     }

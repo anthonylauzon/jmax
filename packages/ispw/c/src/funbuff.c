@@ -792,7 +792,7 @@ funbuff_interptab(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       
       if (! tab)
 	{
-	  post("funbuff interptab: %s is not a known table\n", fts_symbol_name(sym));
+	  post("funbuff interptab: %s is not a known table\n", sym);
 	  return;
 	}
       

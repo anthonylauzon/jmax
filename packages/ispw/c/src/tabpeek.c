@@ -118,7 +118,7 @@ tabpeek_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	  return;
 	}
 
-      post("tabpeek: can't find table~: %s\n", fts_symbol_name(this->tab_name));
+      post("tabpeek: can't find table~: %s\n", this->tab_name);
     }
 }
 
@@ -180,7 +180,7 @@ tabpeek_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	  this->tab_name = tab_name;
 	}
       else
-	post("tabpeek: can't find table~: %s\n", fts_symbol_name(tab_name));
+	post("tabpeek: can't find table~: %s\n", tab_name);
     }
 }
 
@@ -204,7 +204,7 @@ tabpeek_set_by_int(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const f
       this->tab_name = tab_name;
     }
   else
-    post("tabpeek: can't find table~: %s\n", fts_symbol_name(tab_name));
+    post("tabpeek: can't find table~: %s\n", tab_name);
 }
   
 

@@ -110,7 +110,7 @@ sampwrite_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       fts_dsp_add_function(dsp_symbol, 3, argv);
     }
   else
-    post("sampwrite~: %s: can't find table~\n", fts_symbol_name(this->tab_name));
+    post("sampwrite~: %s: can't find table~\n", this->tab_name);
 }
 
 /******************************************************************
@@ -147,7 +147,7 @@ sampwrite_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
       ftl_data_set(sampwrite_ctl_t, this->sampwrite_data, onset, &l);
     }
   else
-    post("sampwrite~: %s: can't find table~\n", fts_symbol_name(tab_name));
+    post("sampwrite~: %s: can't find table~\n", tab_name);
 }
 
 static void
@@ -174,7 +174,7 @@ sampwrite_set_by_int(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const
       ftl_data_set(sampwrite_ctl_t, this->sampwrite_data, onset, &l);
     }
   else
-    post("sampwrite~: %s: can't find table~\n", fts_symbol_name(tab_name));
+    post("sampwrite~: %s: can't find table~\n", tab_name);
 }
 
 /******************************************************************

@@ -227,7 +227,7 @@ static void table_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int a
   fprintf( file, "#N vtable %d %d %d %d %d %d %d", size, x_left, y_top, x_right, y_bottom, flags, range);
 
   if ( this->name)
-    fprintf( file, " %s", fts_symbol_name( this->name)); 
+    fprintf( file, " %s", this->name); 
 
   fprintf( file, ";\n");
 
@@ -263,7 +263,7 @@ static void table_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int a
   fprintf( file, "#P newobj %d %d %d %d table", x, y, w, font_index);
 
   if ( this->name)
-    fprintf( file, " %s", fts_symbol_name( this->name)); 
+    fprintf( file, " %s", this->name); 
 
   fprintf( file, ";\n");
 }
@@ -310,7 +310,7 @@ table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	      this->vec = (ivec_t *)obj;
 	    }
 	  else
-	    fts_object_set_error(o, "Object %s is not a table", fts_symbol_name(name));
+	    fts_object_set_error(o, "Object %s is not a table", name);
 
 	  return;
 	}

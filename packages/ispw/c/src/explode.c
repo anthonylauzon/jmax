@@ -395,7 +395,7 @@ explode_export_midifile(explode_t *this, fts_symbol_t file_name)
       fts_midifile_close(file);
     }
   else
-    post("explode export: cannot open file %s\n", fts_symbol_name(file_name));
+    post("explode export: cannot open file %s\n", file_name);
 }
 
 /****************************************************************************/
@@ -967,7 +967,7 @@ explode_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       if(this->data.name)
 	{
 	  char s[1024];
-	  snprintf(s, 1024, "%s.mid", fts_symbol_name(this->data.name));
+	  snprintf(s, 1024, "%s.mid", this->data.name);
 	  file_name = fts_new_symbol_copy(s);
 	}
       else
@@ -1013,7 +1013,7 @@ explode_init_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       this->data.name = name;
     else
       {
-	post("explode: %s: named already exists\n", fts_symbol_name(name));
+	post("explode: %s: named already exists\n", name);
 	this->data.name = 0;
       }
   else
@@ -1048,7 +1048,7 @@ explode_put_name_daemon(fts_daemon_action_t action, fts_object_t *obj, fts_symbo
 	this->data.name = name;
       else
 	{
-	  post("explode: %s: named already exists\n", fts_symbol_name(name));
+	  post("explode: %s: named already exists\n", name);
 	  this->data.name = 0;
 
 	  return;
@@ -1140,7 +1140,7 @@ static void explode_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
   fprintf( file, "#N explode");
 
   if ( this->data.name)
-    fprintf( file, " %s", fts_symbol_name( this->data.name)); 
+    fprintf( file, " %s", this->data.name); 
 
   fprintf( file, ";\n");
 
@@ -1166,7 +1166,7 @@ static void explode_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
   fprintf( file, "#P newobj %d %d %d %d explode", x, y, w, font_index);
 
   if ( this->data.name)
-    fprintf( file, " %s", fts_symbol_name( this->data.name)); 
+    fprintf( file, " %s", this->data.name); 
 
   fprintf( file, ";\n");
 }

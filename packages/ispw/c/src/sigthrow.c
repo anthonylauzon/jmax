@@ -60,9 +60,9 @@ sigcatch_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
     {
       fts_set_symbol( &k, name);
       
-      if (fts_symbol_name(name) != "" && fts_hashtable_get(&catch_table, &k, &a))
+      if (name != "" && fts_hashtable_get(&catch_table, &k, &a))
 	{
-	  post("catch~: duplicated name: %s (last ignored)\n", fts_symbol_name(name));
+	  post("catch~: duplicated name: %s (last ignored)\n", name);
 	  this->name = 0;
 	}
       else
@@ -148,7 +148,7 @@ sigcatch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
   else if(this->n_tick != n_tick)
     {
-      post("catch~ %s: tick size doesn't match\n", fts_symbol_name(this->name));
+      post("catch~ %s: tick size doesn't match\n", this->name);
       return;
     }
   
@@ -303,7 +303,7 @@ sigthrow_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	}
       else if(sigcatch->n_tick != n_tick)
 	{
-	  post("throw~ %s: tick size doesn't match\n", fts_symbol_name(this->name));
+	  post("throw~ %s: tick size doesn't match\n", this->name);
 	  *bufp = 0;
 	}
       else
@@ -346,7 +346,7 @@ sigthrow_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
 
       if(sigcatch->n_tick != 0 && sigcatch->n_tick != this->n_tick)
 	{
-	  post("throw~ %s: tick size doesn't match\n", fts_symbol_name(this->name));
+	  post("throw~ %s: tick size doesn't match\n", this->name);
 	  *bufp = 0;
 	}
       else
