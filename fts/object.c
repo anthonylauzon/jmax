@@ -557,6 +557,9 @@ fts_object_delete_from_patcher(fts_object_t *obj)
   /* remove connections */
   fts_object_unconnect(obj);
 
+  /* take the object away from the update queue (if there) and free it */
+  fts_object_reset_changed(obj);
+
   /* unreference by hand */
   obj->refcnt--;
 
@@ -567,9 +570,6 @@ fts_object_delete_from_patcher(fts_object_t *obj)
   /* remove from patcher */
   if(obj->patcher)
     fts_patcher_remove_object(obj->patcher, obj);
-
-  /* take the object away from the update queue (if there) and free it */
-  fts_object_reset_changed(obj);
 
   /* release all client components (no patcher, no appearance) */
   fts_object_unclient(obj);
