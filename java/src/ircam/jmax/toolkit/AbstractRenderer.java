@@ -7,7 +7,9 @@ import java.util.*;
 import java.awt.*;
 
 /**
- * An handy base class implementing the RenderManager interface
+ * An handy base class implementing the RenderManager interface. It handles
+ * the layers adding/removing, and the invocation of each Layer in turn on the 
+ * render() calls.
  * @see RenderManager
  */
 public class AbstractRenderer implements RenderManager {

@@ -2,7 +2,11 @@ package ircam.jmax.toolkit;
 
 /**
  * The interface used by objects that listen to dragging operations,
- * such as the moving tools.
+ * such as the moving tools. The information passed back is limited 
+ * to the end of the interaction.
+ * Use DynamicDragListener for richer set of informations.
+ * @see SelectionMover
+ * @see DynamicDragListener 
  */
 public interface DragListener {
   
@@ -11,3 +15,6 @@ public interface DragListener {
    */
   public abstract void dragEnd(int x, int y);
 }
+
+
+

@@ -7,7 +7,7 @@ import ircam.jmax.toolkit.UndoableData;
 import java.util.Enumeration;
 
 /**
- * the functionalities of the model for the table data. 
+ * The functionalities of the model for the jMax table data. 
  * TableRemoteData implements it.
  */
 public interface TableDataModel extends UndoableData{

@@ -39,7 +39,7 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
 
   /* Private methods */
 
-  private final int getIndexAfter(int time)
+  final int getIndexAfter(int time)
   {
     if (events_fill_p == 0) 
       return EMPTY_COLLECTION;
@@ -422,9 +422,8 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
 
   public void moveEvent(ScrEvent event, int newTime)
   {
-    // Find the object
-    int index = binarySearch(event);
-    int newIndex = getIndexAfter(newTime);
+    int index = binarySearch(event);     // Find the event
+    int newIndex = getIndexAfter(newTime); //Find where to place it
     
     if (newIndex == NO_SUCH_EVENT) newIndex = events_fill_p-1;
     else if (event.getTime() < newTime) newIndex -=1;
@@ -433,7 +432,10 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
     if (index == NO_SUCH_EVENT)
       {
 	System.err.println("no such event error");
-	Thread.dumpStack();
+	for (int i = 0; i < length(); i++)
+	  {
+	    System.err.println("#"+i+" t "+getEventAt(i).getTime()+" p "+getEventAt(i).getPitch());
+	  }
 	return; //should rise an exception instead
       }
 
@@ -585,7 +587,6 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
     
     case REMOTE_APPEND:
       {
-	System.err.println("called remote append: integrity check?");
 	// add a note, after an FTS computation.
 	int index;
 	
@@ -603,6 +604,7 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
 	
 	postEdit(new UndoableAdd(events[index]));
 	endUpdate();
+	notifyObjectAdded(events[index]);
       }
     break;
     

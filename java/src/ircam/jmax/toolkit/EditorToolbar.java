@@ -6,10 +6,11 @@ import java.awt.*;
 import java.awt.event.*;
 
 /**
- * a generic class implementing an editor's toolbar. It can have a set of listeners
+ * A specific component used as a container of buttons 
+ * corresponding to Tools. It can have a set of listeners
  * to be called when the user selects a new tool.
- * EditorToolbar class keeps a JPopupMenu with all the tools inserted.
- * This Popup can be accessed and used as an alternative for choosing 
+ * EditorToolbar class keeps a JPopupMenu with all the tools inserted;
+ * this Popup can be accessed and used as an alternative for choosing 
  * a tool (example, right-mouse click).
  */
 public class EditorToolbar extends JToolBar implements ActionListener, WindowListener{
@@ -42,18 +43,18 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
 	}
       }
 
-    /*itsFrame = new JFrame("tools");    
-      itsFrame.getContentPane().add(this);
-      
-      itsFrame.pack();
-      itsFrame.setVisible(true);*/
-    
     setTool(theProvider.getDefaultTool());
 
   }
 
   /**
-   * another graphic context  wants to be a client of this toolbar */
+   * Another graphic context  wants to be a client of this toolbar.
+   * This means that the current Tool and Interaction Module will be redirect 
+   * to act on the given Graphic context when the corresponding 
+   * window is activated 
+   * @see Tool
+   * @see InteractionModule
+   * @see GraphicContext*/
   public void addClient(GraphicContext gc)
   {
     itsClients.put(gc.getFrame(), gc);
@@ -61,7 +62,7 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
   }
 
   /**
-   * remove a client graphic context */
+   * Remove a client graphic context */
   public void removeClient(GraphicContext gc)
   {
     itsClients.remove(gc.getFrame());
@@ -80,7 +81,7 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
   }
 
   /**
-   * inscribe a new listener to this toolbar
+   * Inscribe a new listener to this toolbar
    */
   public void addToolListener(ToolListener tl) 
   {  
@@ -88,7 +89,7 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
   }
 
   /**
-   * remove a listener
+   * remove a tool change listener
    */
   public void removeToolListener(ToolListener tl) 
   {  

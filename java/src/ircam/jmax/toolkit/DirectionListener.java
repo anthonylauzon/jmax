@@ -2,7 +2,9 @@
 package ircam.jmax.toolkit;
 
 /**
- * The interface associated to the DirectionChooser interface module
+ * The interface associated to the DirectionChooser interface module.
+ * Used by objects that need to be informed on the direction choosed
+ * by the user with the mouse.
  */
 public interface DirectionListener {
 
@@ -14,6 +16,9 @@ public interface DirectionListener {
    */
   public abstract void directionAbort();
 
+  //--- Fields
+  public static final int HORIZONTAL_MOVEMENT = DirectionChooser.HORIZONTAL_MOVEMENT;
+  public static final int VERTICAL_MOVEMENT = DirectionChooser.VERTICAL_MOVEMENT;
 }
 
 

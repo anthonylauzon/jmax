@@ -8,10 +8,38 @@ import com.sun.java.swing.undo.*;
  * @see UndoableData */
 public abstract class AbstractUndoableObject implements UndoableData {
   
-  public void beginUpdate(){}
+  /**
+   * Start an undoable section */
+  public void beginUpdate()
+  {
+    inGroup = true;
+  }
+
+  /**
+   * Add the given UndoableEdit to the undo Buffers */
   public void postEdit(UndoableEdit e){}
-  public void endUpdate() {}
+
+  /**
+   * Signal that the undoable section ended */
+  public void endUpdate() 
+  {
+    inGroup = false;
+  }
+
+  /**
+   * undo the last section */
   public void undo(){}
+
+  /** redo the last (undone) section */
   public void redo(){}
-  public boolean isInGroup() {return false;}
+
+  /**
+   * Return true if an undoable section have been opened, and not closed yet*/
+  public boolean isInGroup() 
+  {
+    return inGroup;
+  }
+
+  //--- Fields
+  boolean inGroup = false;
 }

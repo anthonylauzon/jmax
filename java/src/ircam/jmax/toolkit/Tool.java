@@ -6,7 +6,7 @@ import com.sun.java.swing.ImageIcon;
  * The base class for tools: it handles the name and the icon,
  * the mounting of the interaction modules, and the activation/deactivation. 
  */
-//notes: try to merge this class with the concept of Action
+//impl. note: try to merge this class with the swing concept of Action
 abstract public class Tool implements StatusBarClient{
 
   /**

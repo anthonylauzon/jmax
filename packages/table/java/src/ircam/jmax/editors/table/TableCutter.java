@@ -80,3 +80,8 @@ public class TableCutter extends Tool implements GraphicSelectionListener {
   //--- Fields
   StripeSelecter itsSelecter;
 }
+
+
+
+
+

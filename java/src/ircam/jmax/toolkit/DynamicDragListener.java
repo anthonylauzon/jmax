@@ -4,8 +4,9 @@ package ircam.jmax.toolkit;
 /**
  * The interface of the objects that wants to 
  * dynamically follow drag operations. Unlike the DragListener interface,
- * this IM tracks the movements, not just the end.
- * @see DragListener */
+ * this IM tracks the beginning and every movement, not just the end.
+ * @see DragListener 
+ * @see InteractionModule*/
 public interface DynamicDragListener extends DragListener {
   
   /**

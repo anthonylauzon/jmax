@@ -32,111 +32,22 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 
     tools = new Vector();
 
-    //-- prepares the NORTH Status bar 
-    // WARNING:
-    // make a superclass! Explode.ScrPanel is very similar
-    JPanel northSection = new JPanel();
-    northSection.setLayout(new BoxLayout(northSection, BoxLayout.Y_AXIS));
+    //make the NORTH Status bar 
+    prepareStatusBar();
+
+    //... the center panel (the sensible area)
+    prepareCenterPanel();
+
+    //... the Graphic context (and the Renderer)
+    prepareGraphicContext(tm);
     
-    itsStatusBar = new InfoPanel();
-    
-    itsStatusBar.setSize(300, 20);
+    //... the vertical position controller
+    prepareVerticalScrollbar();
 
-    northSection.add(itsStatusBar);
-
-    add(northSection, BorderLayout.NORTH);
-    
-    //prepares the center panel (the sensible area)
-    itsCenterPanel = new CenterPanel();
- 
-    itsCenterPanel.setBounds(10, itsStatusBar.getSize().height+10, PANEL_WIDTH, PANEL_HEIGHT);
-
-    itsCenterPanel.setBackground(Color.white);
-    itsCenterPanel.setDoubleBuffered(true);
-
-    add(itsCenterPanel, BorderLayout.CENTER);
-
-    { //prepares the graphic context
-      gc = new TableGraphicContext(tm);
-      gc.setGraphicSource(itsCenterPanel);
-      gc.setGraphicDestination(itsCenterPanel);
-
-      TableSelection.createSelection(tm);
-      gc.setRenderManager(new TableRenderer(gc));
-      gc.setStatusBar(itsStatusBar);
-      TableAdapter ta = new TableAdapter();
-      setOriginAndZoom(ta);
-      gc.setAdapter(ta);
-      gc.setStatusBar(itsStatusBar);
-    }
-
-    // prepares the vertical position controller
-    itsPositionControl = new Scrollbar(Scrollbar.VERTICAL, 128, 100, -2000, 2000);
-
-    itsPositionControl.addAdjustmentListener( new AdjustmentListener() {
-      public void adjustmentValueChanged( AdjustmentEvent e)
-	{
-	  gc.getAdapter().setOY(256-e.getValue());
-
-	  repaint();
-	}
-    });
-
-    add(itsPositionControl, BorderLayout.EAST);
+    //... the widgets in the statusBar
+    addWidgets();
 
     tm.addListener(this);
-
-    itsXZoom = new ZoomWidget("x Zoom", (int)(gc.getAdapter().getXZoom()*100), ZoomWidget.HORIZONTAL);
-    itsYZoom = new ZoomWidget("y Zoom", (int)(gc.getAdapter().getYZoom()*100), ZoomWidget.VERTICAL);
-
-    itsXZoom.setSize(150, InfoPanel.INFO_HEIGHT);
-    itsYZoom.setSize(150, InfoPanel.INFO_HEIGHT);
-
-    itsYZoom.getLessButton().addActionListener( new ActionListener() {
-      public void actionPerformed(ActionEvent e)
-	{
-	  float  newValue = gc.getAdapter().getYZoom()/2;
-	  gc.getAdapter().setYZoom(newValue);
-	  itsYZoom.setValue((int)(newValue*100));
-	  repaint();
-	}
-    });
-
-    itsYZoom.getMoreButton().addActionListener( new ActionListener() {
-      public void actionPerformed(ActionEvent e)
-	{
-	  float  newValue = gc.getAdapter().getYZoom()*2;
-		  
-	  gc.getAdapter().setYZoom(newValue);
-	  itsYZoom.setValue((int) (newValue*100));
-	  repaint();
-	}
-    });
-
-    itsXZoom.getLessButton().addActionListener( new ActionListener() {
-      public void actionPerformed(ActionEvent e)
-	{
-	  float newValue = gc.getAdapter().getXZoom()/2;
-
-	  gc.getAdapter().setXZoom(newValue);
-	  itsXZoom.setValue((int)(newValue*100));
-	  repaint();
-	}
-    });
-
-    itsXZoom.getMoreButton().addActionListener( new ActionListener() {
-      public void actionPerformed(ActionEvent e)
-	{
-	  float newValue = gc.getAdapter().getXZoom()*2;
-	  gc.getAdapter().setXZoom(newValue);
-	  
-	  itsXZoom.setValue((int)(newValue*100));
-	  repaint();
-	}
-    });
-
-    itsStatusBar.addWidget(itsYZoom);
-    itsStatusBar.addWidget(itsXZoom);
 
     initTools();
   }
@@ -255,7 +166,7 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 	{
 	  super.remove(c);
 	  TablePanel.toolbarAnchored = false;
-	  repaint();
+	  doLayout();
 	}
       
     };
@@ -271,12 +182,22 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     // in emptying jp, resizing the main container, jp will desappear,
     // and the JToolbar cannot be anchored again.
     // must put jp in another panel instead
-    JPanel aPanel = new JPanel();
-    aPanel.setSize(30, 200);
-    aPanel.setLayout(new BorderLayout());
-    aPanel.add(c, BorderLayout.CENTER);
+    toolbarPanel = new JPanel() {
+      public Dimension getMinimumSize()
+	{
+	  return toolbarDimension;
+	}
 
-    add(aPanel, BorderLayout.WEST);
+      public Dimension getPreferredSize()
+	{
+	  return toolbarDimension;
+	}
+    };
+    toolbarPanel.setSize(toolbarDimension.width, toolbarDimension.height);
+    toolbarPanel.setLayout(new BorderLayout());
+    toolbarPanel.add(c, BorderLayout.CENTER);
+
+    add(toolbarPanel, BorderLayout.WEST);
 
     
     // in case the toolbar is anchored, a new window "steals" it 
@@ -293,6 +214,126 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 
  
     return tb;
+  }
+
+  private void prepareStatusBar()
+  {
+    // WARNING:
+    // make a superclass! Explode.ScrPanel is very similar
+    JPanel northSection = new JPanel();
+    northSection.setLayout(new BoxLayout(northSection, BoxLayout.Y_AXIS));
+    
+    itsStatusBar = new InfoPanel();
+    
+    itsStatusBar.setSize(300, 20);
+
+    northSection.add(itsStatusBar);
+
+    add(northSection, BorderLayout.NORTH);
+
+  }
+  
+
+  private void addWidgets()
+  {
+    itsXZoom = new ZoomWidget("x Zoom", (int)(gc.getAdapter().getXZoom()*100), ZoomWidget.HORIZONTAL);
+    itsYZoom = new ZoomWidget("y Zoom", (int)(gc.getAdapter().getYZoom()*100), ZoomWidget.VERTICAL);
+
+    itsXZoom.setSize(150, InfoPanel.INFO_HEIGHT);
+    itsYZoom.setSize(150, InfoPanel.INFO_HEIGHT);
+
+    itsYZoom.getLessButton().addActionListener( new ActionListener() {
+      public void actionPerformed(ActionEvent e)
+	{
+	  float  newValue = gc.getAdapter().getYZoom()/2;
+	  gc.getAdapter().setYZoom(newValue);
+	  itsYZoom.setValue((int)(newValue*100));
+	  repaint();
+	}
+    });
+
+    itsYZoom.getMoreButton().addActionListener( new ActionListener() {
+      public void actionPerformed(ActionEvent e)
+	{
+	  float  newValue = gc.getAdapter().getYZoom()*2;
+		  
+	  gc.getAdapter().setYZoom(newValue);
+	  itsYZoom.setValue((int) (newValue*100));
+	  repaint();
+	}
+    });
+
+    itsXZoom.getLessButton().addActionListener( new ActionListener() {
+      public void actionPerformed(ActionEvent e)
+	{
+	  float newValue = gc.getAdapter().getXZoom()/2;
+
+	  gc.getAdapter().setXZoom(newValue);
+	  itsXZoom.setValue((int)(newValue*100));
+	  repaint();
+	}
+    });
+
+    itsXZoom.getMoreButton().addActionListener( new ActionListener() {
+      public void actionPerformed(ActionEvent e)
+	{
+	  float newValue = gc.getAdapter().getXZoom()*2;
+	  gc.getAdapter().setXZoom(newValue);
+	  
+	  itsXZoom.setValue((int)(newValue*100));
+	  repaint();
+	}
+    });
+
+    itsStatusBar.addWidget(itsYZoom);
+    itsStatusBar.addWidget(itsXZoom);
+
+
+  }
+
+  private void prepareCenterPanel()
+  {
+    itsCenterPanel = new CenterPanel();
+ 
+    itsCenterPanel.setBounds(10, itsStatusBar.getSize().height+10, PANEL_WIDTH, PANEL_HEIGHT);
+
+    itsCenterPanel.setBackground(Color.white);
+    itsCenterPanel.setDoubleBuffered(true);
+
+    add(itsCenterPanel, BorderLayout.CENTER);
+  }
+
+
+  private void prepareGraphicContext(TableDataModel tm)
+    { //prepares the graphic context
+      gc = new TableGraphicContext(tm);
+      gc.setGraphicSource(itsCenterPanel);
+      gc.setGraphicDestination(itsCenterPanel);
+
+      TableSelection.createSelection(tm);
+      gc.setRenderManager(new TableRenderer(gc));
+      gc.setStatusBar(itsStatusBar);
+      TableAdapter ta = new TableAdapter();
+      setOriginAndZoom(ta);
+      gc.setAdapter(ta);
+      gc.setStatusBar(itsStatusBar);
+    }
+
+
+  private void prepareVerticalScrollbar()
+  {
+    itsPositionControl = new Scrollbar(Scrollbar.VERTICAL, 128, 100, -2000, 2000);
+
+    itsPositionControl.addAdjustmentListener( new AdjustmentListener() {
+      public void adjustmentValueChanged( AdjustmentEvent e)
+	{
+	  gc.getAdapter().setOY(256-e.getValue());
+
+	  repaint();
+	}
+    });
+    add(itsPositionControl, BorderLayout.EAST);
+
   }
 
   /**
@@ -443,7 +484,10 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
   EditorToolbar tb;
   TableGraphicContext gc;
   CenterPanel itsCenterPanel;
+
   static boolean toolbarAnchored = true;
+  JPanel toolbarPanel;
+  static Dimension toolbarDimension = new Dimension(40, 200);
 
   ZoomWidget itsXZoom;
   ZoomWidget itsYZoom;

@@ -5,9 +5,10 @@ import java.util.*;
 import ircam.jmax.utils.*;
 
 /**
- * An abstract base class implementing the selection interface.
- * It takes care of the listener's mechanism. Actually, only the 
+ * An abstract base class implementing the selection interface,
+ * taking care of the listener's mechanism; actually, only the 
  * selectAll() method needs to be implemented.
+ * @see SelectionHandler
  */
 public abstract class AbstractSelection implements SelectionHandler {
   
@@ -47,7 +48,7 @@ public abstract class AbstractSelection implements SelectionHandler {
   }
 
   /**
-   * remove the object from the selection
+   * remove the object from the selection (deselect the given object)
    */
   public void deSelect(Object obj) 
   {
@@ -56,7 +57,8 @@ public abstract class AbstractSelection implements SelectionHandler {
   }
 
   /**
-   * remove the Enumeration of object from the selection
+   * remove the Enumeration of object from the selection (deselect the given
+   * enumeration of objects)
    */
   public void deSelect(Enumeration e) 
   {
@@ -90,14 +92,15 @@ public abstract class AbstractSelection implements SelectionHandler {
     return selected.elements();
   }
 
-
+  /**
+   * returns the lenght of the selection (how many selected elements) */
   public int size()
   {
     return selected.size();
   }
 
   /**
-   * deselects all the objects
+   * deselects all the objects currently selected
    */
   public void deselectAll() 
   {
