@@ -335,6 +335,23 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     MenuItem aMenuItem;
     Menu editMenu = new Menu("Edit");
 
+    aMenuItem = new MenuItem("Undo  Ctrl+Z", new MenuShortcut(90));
+    editMenu.add(aMenuItem);
+    
+    aMenuItem.addActionListener(new ActionListener()
+      {
+	public void actionPerformed(ActionEvent e)
+	  { Undo();}
+      });
+
+    aMenuItem = new MenuItem("Redo  Ctrl+R", new MenuShortcut(82));
+    editMenu.add(aMenuItem);
+
+    aMenuItem.addActionListener(new ActionListener()
+				{
+				  public void actionPerformed(ActionEvent e)
+				    { Redo();}});
+
     aMenuItem = new MenuItem("Cut  Ctrl+X");
     editMenu.add(aMenuItem);
     aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
@@ -385,6 +402,8 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     setVisible(false);
   }
 
+  protected void Undo() {};
+  protected void Redo() {};
   protected void Cut(){};
   protected void Copy(){};
   protected void Paste(){};
@@ -490,6 +509,8 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     int aInt = e.getKeyCode();
     if (e.isControlDown())
       {
+	//if (aInt == 85) Undo(); //u
+	//else if (aInt == 82) Redo(); //r
 	if (aInt == 67) Copy();//c
 	else if (aInt == 78)
 	  {
