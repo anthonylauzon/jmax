@@ -30,7 +30,6 @@
 #include "track.h"
 #include "eventtrk.h"
 #include "noteevt.h"
-#include "noteoffevt.h"
 #include "intevt.h"
 
 #define N_MIDI_CHANNELS 16
@@ -77,7 +76,7 @@ seqmidi_set_note_off(noteevt_t *note, double time)
 {
   double duration = time - event_get_time((event_t *)note);
 
-  noteevt_set_duration(note,  duration);
+  noteevt_set_duration(note, duration);
 }
 
 static int
@@ -115,7 +114,7 @@ seqmidi_read_note_on(fts_midifile_t *file, int chan, int pitch, int vel)
       seqmidi_set_note_off(data->note_is_on[chan][pitch], time);
       data->note_is_on[chan][pitch] = 0;
     }
-  else
+  else if(vel != 0)
     {
       fts_object_t *note;
       fts_atom_t a[3];
@@ -124,6 +123,9 @@ seqmidi_read_note_on(fts_midifile_t *file, int chan, int pitch, int vel)
       fts_set_int(a + 1, pitch);
       fts_set_float(a + 2, 0.0);
       fts_object_new(0, 3, a, &note);
+
+      noteevt_set_midi_channel((noteevt_t *)note, chan);
+      noteevt_set_midi_velocity((noteevt_t *)note, vel);
 
       /* add event to track */
       eventtrk_add_event(track, time, (event_t *)note);
@@ -183,10 +185,10 @@ seqmidi_read_controller(fts_midifile_t *file, int chan, int ctrl_num, int value)
   fts_set_symbol(a + 0, intevt_symbol);
   fts_set_int(a + 1, value);
   fts_object_new(0, 2, a, &intevt);
-  
+
   /* add event to track */
   eventtrk_add_event(track, time, (event_t *)intevt);
-  
+
   return 1;
 }
 
@@ -268,30 +270,70 @@ sequence_read_midifile(sequence_t *sequence, fts_symbol_t name)
  *
  */
 
+/* note status pseudo event (used to keep track of note offs while writing midi files) */
+typedef struct _notestat_
+{
+  event_t event;
+  int channel;
+  int pitch;
+  int status;
+} notestat_t;
+
+#define notestat_get_channel(e) ((e)->channel)
+#define notestat_get_pitch(e) ((e)->pitch)
+#define notestat_is_on(e) ((e)->status == 1)
+#define notestat_set_off(e) ((e)->status = 0)
+#define notestat_set_on(e) ((e)->status = 1)
+
+static void
+notestat_init(notestat_t *off, int channel, int pitch)
+{
+  event_init((event_t *)off);
+
+  off->channel = channel;
+  off->pitch = pitch;
+  off->status = 0;
+}
+
 typedef struct _seqmidi_write_data_
 {
   eventtrk_t *track;
-  noteoffevt_t *note_offs[128]; /* array of note_off events */
+  eventtrk_t *note_off_track;
+  notestat_t notestats[17][128]; /* matrix of note_off events (channels x pitches) */
 } seqmidi_write_data_t;
 
-eventtrk_t *
-seqmidi_write_get_track(fts_midifile_t *file)
+void
+seqmidi_write_note(fts_midifile_t *file, double time, int channel, int pitch, int velocity, double duration)
 {
   seqmidi_write_data_t *data = (seqmidi_write_data_t *)fts_midifile_get_user_data(file);
-  
-  return data->track;
-}
+  double off_time = time + duration;
+  long time_in_ticks = fts_midifile_seconds_to_ticks(file, 0.001 * time);
+  notestat_t *stat = &(data->notestats[channel][pitch]);
 
-noteoffevt_t *
-seqmidi_write_get_note_off(fts_midifile_t *file, int i)
-{
-  seqmidi_write_data_t *data = (seqmidi_write_data_t *)fts_midifile_get_user_data(file);
-  
-  return data->note_offs[i];
+  /* in case of overlapping note of same pitch */
+  if(notestat_is_on(stat))
+    {
+      /* write note off of previous note */
+      fts_midifile_write_note_off(file, time_in_ticks, channel, pitch, 0); 
+
+      /* remove note off event from sequence */
+      eventtrk_remove_event((event_t *)stat);
+      
+      fts_midifile_write_note_on(file, time_in_ticks, channel, pitch, velocity);
+    }
+  else
+    /* write note on */
+    fts_midifile_write_note_on(file, time_in_ticks, channel, pitch, velocity);
+ 
+  /* set note status to on */
+  notestat_set_on(stat);
+
+  /* add corresponding note to note off track */
+  eventtrk_add_event(data->note_off_track, off_time, (event_t *)stat);
 }
 
 int
-eventtrk_write_midifile(eventtrk_t *track, fts_symbol_t file_name)
+seqmidi_write_midifile_from_event_track(eventtrk_t *track, fts_symbol_t file_name)
 {
   fts_symbol_t track_name = track_get_name(&track->head);
   fts_midifile_t *file = fts_midifile_open_write(file_name);
@@ -300,47 +342,101 @@ eventtrk_write_midifile(eventtrk_t *track, fts_symbol_t file_name)
     {
       fts_symbol_t sym_export_midi = fts_new_symbol("export_midi");
       seqmidi_write_data_t data;
-      fts_atom_t a[2];
+      fts_atom_t a[3];
       event_t *event;
-      int i;
+      notestat_t *stat;
+      int i, j;
+
+      /* set midi file user data to write data structure */
+      fts_midifile_set_user_data(file, &data);
 
       /* init note track */
       data.track = track;
 	  
-      /* init note offs array */
-      fts_set_symbol(a, noteoffevt_symbol);
-      for(i=0; i<N_MIDI_PITCHES; i++)
-	{
-	  fts_set_int(a + 1, i);
-	  fts_object_new(0, 2, a, (fts_object_t **)(data.note_offs + i));
-	}
+      /* make note off track */
+      fts_set_symbol(a + 0, eventtrk_symbol); /* event track */
+      fts_set_symbol(a + 1, sym_export_midi); /* track name */
+      fts_set_symbol(a + 2, sym_export_midi); /* event type */
+      fts_object_new(0, 3, a, (fts_object_t **)&(data.note_off_track));
+      
+      /* init array of note status events */
+      for(i=0; i<=N_MIDI_CHANNELS; i++)
+	for(j=0; j<N_MIDI_PITCHES; j++)
+	  notestat_init(&(data.notestats[i][j]), i, j);
 	  
-      fts_midifile_set_user_data(file, &data);
-
-	  /* start wrtiting the file */
-      fts_midifile_write_header(file, 0, 1, 96); /* format 0, 1 track, division = 96 */
-      fts_midifile_write_tempo(file, 500000); /* 120 bpm */
+      /* start writing the file */
+      fts_midifile_write_header(file, 0, 1, 384); /* format 0, 1 track, division = 384 */
 	  
+      /* write track header */
       fts_midifile_write_track_begin(file);
 
-      /* to send file to event */
+      /* write tempo */
+      fts_midifile_write_tempo(file, 500000); /* 120 bpm */
+
+      /* set file argument for export message to event */
       fts_set_ptr(a, file);
 
+      /* write events */
       event = eventtrk_get_first(track);
       while(event)
 	{
-	  event_t *next = event_get_next(event);
+	  double time = event_get_time(event);
+	  
+	  /* write all pending note offs before the next event */
+	  stat = (notestat_t *)eventtrk_get_first(data.note_off_track);
+	  while(stat && event_get_time((event_t *)stat) <= time)
+	    {
+	      long off_time_in_ticks = fts_midifile_seconds_to_ticks(file, 0.001 * event_get_time((event_t *)stat));
+	      int off_channel = notestat_get_channel(stat);
+	      int off_pitch = notestat_get_pitch(stat);
 
+	      /* write note off */
+	      fts_midifile_write_note_off(file, off_time_in_ticks, off_channel, off_pitch, 0); 
+
+	      /* set note to off */
+	      notestat_set_off(stat);
+
+	      /* remove note off event from note off track */
+	      eventtrk_remove_event((event_t *)stat);
+
+	      /* get next note off in sequence */
+	      stat = (notestat_t *)eventtrk_get_first(data.note_off_track);
+	    }
+
+	  /* send export message to event */
 	  fts_send_message((fts_object_t *)event, fts_SystemInlet, sym_export_midi, 1, a);
-	  event = next;
+	  
+	  /* go to next event */
+	  event = event_get_next(event);
 	}  
 	  
+      /* write all pending note offs */
+      stat = (notestat_t *)eventtrk_get_first(data.note_off_track);
+      while(stat)
+	{
+	  long off_time_in_ticks = fts_midifile_seconds_to_ticks(file, 0.001 * event_get_time((event_t *)stat));
+	  int off_channel = notestat_get_channel(stat);
+	  int off_pitch = notestat_get_pitch(stat);
+	  
+	  /* write note off */
+	  fts_midifile_write_note_off(file, off_time_in_ticks, off_channel, off_pitch, 0); /* channel 1 */
+	  
+	  /* set note to off */
+	  notestat_set_off(stat);
+	  
+	  /* remove note off event from note off track */
+	  eventtrk_remove_event((event_t *)stat);
+
+	  stat = (notestat_t *)eventtrk_get_first(data.note_off_track);
+	}
+      
+      /* delete note off track */
+      fts_object_delete((fts_object_t *)(data.note_off_track));
+
+      /* write track footer */
       fts_midifile_write_track_end(file);	  
-	  
-	  /* destroy note offs array */	  
-      for(i=0; i<N_MIDI_PITCHES; i++)
-	fts_object_delete((fts_object_t *)(data.note_offs[i]));
-	  
+
+      /* close midi file */
       fts_midifile_close(file);
     }
   else

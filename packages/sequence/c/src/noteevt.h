@@ -36,12 +36,20 @@ typedef struct _noteevt_
   event_t head;
   int pitch;
   double duration;
+  int midi_channel; /* optinal property for MIDI notes (will get fts property */
+  int midi_velocity; /* optinal property for MIDI notes (will get fts property */
 } noteevt_t;
 
-#define noteevt_set_pitch(n, p) ((n)->pitch = (p))
+#define noteevt_set_pitch(n, x) ((n)->pitch = (x))
 #define noteevt_get_pitch(n) ((n)->pitch)
 
-#define noteevt_set_duration(n, d) ((n)->duration = (d))
+#define noteevt_set_duration(n, x) ((n)->duration = (x))
 #define noteevt_get_duration(n) ((n)->duration)
+
+#define noteevt_set_midi_channel(n, x) ((n)->midi_channel = (x))
+#define noteevt_get_midi_channel(n) ((n)->midi_channel)
+
+#define noteevt_set_midi_velocity(n, x) ((n)->midi_velocity = (x))
+#define noteevt_get_midi_velocity(n) ((n)->midi_velocity)
 
 #endif

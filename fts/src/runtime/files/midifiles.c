@@ -123,7 +123,7 @@ fts_midifile_get_current_time_in_seconds(fts_midifile_t *file)
 long
 fts_midifile_seconds_to_ticks(fts_midifile_t *file, double seconds)
 {
-  return (long)((seconds * 1000.0 / 4.0 * file->division) / file->tempo);
+  return (long)((seconds * (double)file->division) / (0.000001 * (double)file->tempo) + 0.5);
 }
 
 /*************************************************************
@@ -247,7 +247,7 @@ fts_midifile_read(fts_midifile_t *file)
   if(read_header(file) == 0)
     return 0;
 
-  while ( read_track(file) > 0)
+  while (read_track(file) > 0)
     n_tracks++;
 
   return n_tracks;
@@ -299,7 +299,6 @@ egetc(fts_midifile_t *file)
 static int
 read_header(fts_midifile_t *file)		/* read a header chunk */
 {
-  int format, n_tracks, division;
   FILE *fp = file->fp;
   char c;
 
@@ -553,7 +552,7 @@ static void
 read_channel_message(fts_midifile_t *file, int status, int c1, int c2)
 {
   fts_midifile_read_functions_t *read = file->read;
-  int chan = status & 0xf;
+  int chan = (status & 0xf) + 1;
 
   switch (status & 0xf0) 
     {
@@ -778,6 +777,8 @@ fts_midifile_write_header(fts_midifile_t *file, int format, int n_tracks, int di
   write16bit(file, n_tracks);
   write16bit(file, division);
 
+  file->division = division;
+
   return 1;
 }
 
@@ -806,6 +807,7 @@ fts_midifile_write_track_end(fts_midifile_t *file)
 {
   unsigned long trkhdr = MTrk;
   long place_marker;
+  long size;
 
   /* write end of track meta event */
   eputc(file, 0);
@@ -825,9 +827,11 @@ fts_midifile_write_track_end(fts_midifile_t *file)
       return EOF;
     }
 
+  size = file->size; /* get number of written bytes until HERE! */
+
   /* Re-write the track chunk header with right length */
   write32bit(file, trkhdr);
-  write32bit(file, file->size);
+  write32bit(file, size);
 
   fseek(file->fp, place_marker, 0);
 
@@ -847,16 +851,17 @@ fts_midifile_write_track_end(fts_midifile_t *file)
  *
  */ 
 
-#define clip_channel(ch) ((ch > 15)? 15: ((ch < 0)? 0: ch))
+#define clip_channel(c) (((c) > 15)? 15: (((c) < 0)? 0: (c)))
 
 void 
-fts_midifile_write_note_off(fts_midifile_t *file, long time, int channel, int number)
+fts_midifile_write_note_off(fts_midifile_t *file, long time, int channel, int number, int velocity)
 {
   writevarlen(file, time - file->currtime);
   file->currtime = time;
 
-  eputc(file, NOTE_OFF | clip_channel(channel));  
+  eputc(file, NOTE_OFF | clip_channel(channel - 1));  
   eputc(file, number & 127);  
+  eputc(file, velocity & 127);  
 }
 
 void 
@@ -865,7 +870,7 @@ fts_midifile_write_note_on(fts_midifile_t *file, long time, int channel, int num
   writevarlen(file, time - file->currtime);
   file->currtime = time;
 
-  eputc(file, NOTE_ON | clip_channel(channel));  
+  eputc(file, NOTE_ON | clip_channel(channel - 1));  
   eputc(file, number & 127);  
   eputc(file, velocity & 127);  
 }
@@ -876,7 +881,7 @@ fts_midifile_write_poly_pressure(fts_midifile_t *file, long time, int channel, i
   writevarlen(file, time - file->currtime);
   file->currtime = time;
 
-  eputc(file, POLY_PRESSURE | clip_channel(channel));  
+  eputc(file, POLY_PRESSURE | clip_channel(channel - 1));  
   eputc(file, number & 127);  
   eputc(file, value & 127);  
 }
@@ -887,7 +892,7 @@ fts_midifile_write_control_change(fts_midifile_t *file, long time, int channel, 
   writevarlen(file, time - file->currtime);
   file->currtime = time;
 
-  eputc(file, CONTROL_CHANGE | clip_channel(channel));  
+  eputc(file, CONTROL_CHANGE | clip_channel(channel - 1));  
   eputc(file, number & 127);  
   eputc(file, value & 127);  
 }
@@ -898,7 +903,7 @@ fts_midifile_write_program_change(fts_midifile_t *file, long time, int channel, 
   writevarlen(file, time - file->currtime);
   file->currtime = time;
 
-  eputc(file, PROGRAM_CHANGE | clip_channel(channel));  
+  eputc(file, PROGRAM_CHANGE | clip_channel(channel - 1));  
   eputc(file, number & 127);  
 }
 
@@ -908,7 +913,7 @@ fts_midifile_write_channel_pressure(fts_midifile_t *file, long time, int channel
   writevarlen(file, time - file->currtime);
   file->currtime = time;
 
-  eputc(file, CHANNEL_PRESSURE | clip_channel(channel));  
+  eputc(file, CHANNEL_PRESSURE | clip_channel(channel - 1));  
   eputc(file, value & 127);  
 }
 
@@ -918,7 +923,7 @@ fts_midifile_write_pitch_bend(fts_midifile_t *file, long time, int channel, int 
   writevarlen(file, time - file->currtime);
   file->currtime = time;
 
-  eputc(file, PITCH_BEND | clip_channel(channel));  
+  eputc(file, PITCH_BEND | clip_channel(channel - 1));  
   eputc(file, value & 127);
   eputc(file, (value >> 7) & 127);
 }
@@ -972,6 +977,8 @@ fts_midifile_write_tempo(fts_midifile_t *file, int tempo)
   eputc(file, (unsigned)(0xff & (tempo >> 16)));
   eputc(file, (unsigned)(0xff & (tempo >> 8)));
   eputc(file, (unsigned)(0xff & tempo));
+
+  file->tempo = tempo;
 }
 
 /*************************************************************

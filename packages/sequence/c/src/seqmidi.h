@@ -29,12 +29,10 @@
 
 #include "sequence.h"
 #include "eventtrk.h"
-#include "noteoffevt.h"
 
 extern int sequence_read_midifile(sequence_t *sequence, fts_symbol_t name);
 
-extern int eventtrk_write_midifile(eventtrk_t *track, fts_symbol_t file_name);
-extern eventtrk_t *seqmidi_write_get_track(fts_midifile_t *file);
-extern noteoffevt_t *seqmidi_write_get_note_off(fts_midifile_t *file, int i);
+extern int seqmidi_write_midifile_from_event_track(eventtrk_t *track, fts_symbol_t file_name);
+extern void seqmidi_write_note(fts_midifile_t *file, double time, int channel, int pitch, int velocity, double duration);
 
 #endif

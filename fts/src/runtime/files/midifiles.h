@@ -119,7 +119,7 @@ extern int fts_midifile_write_track_end(fts_midifile_t *file);
 
 extern void fts_midifile_write_tempo(fts_midifile_t *file, int tempo);
 
-extern void fts_midifile_write_note_off(fts_midifile_t *file, long time, int channel, int number);
+extern void fts_midifile_write_note_off(fts_midifile_t *file, long time, int channel, int number, int velocity);
 extern void fts_midifile_write_note_on(fts_midifile_t *file, long time, int channel, int number, int velocity);
 extern void fts_midifile_write_poly_pressure(fts_midifile_t *file, long time, int channel, int number, int value);
 extern void fts_midifile_write_control_change(fts_midifile_t *file, long time, int channel, int number, int value);

@@ -198,7 +198,8 @@ seqobj_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 1, 0);
   track_t *track = sequence_get_track_by_name(this, track_name);
 
-  fts_send_message((fts_object_t *)track, fts_SystemInlet, sym_export_midi, 1, at + 1);  
+  if(track)
+    fts_send_message((fts_object_t *)track, fts_SystemInlet, sym_export_midi, 1, at + 1);  
 }
 
 void

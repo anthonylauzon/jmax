@@ -232,6 +232,196 @@ explode_clear(explode_t *this)
   this->current = 0;
 }
 
+/***************************************************************************
+ *
+ *  export to standard MIDI file
+ *
+ */
+
+
+typedef struct _notestat_
+{
+  long time;
+  int pitch;
+  int status;
+  int channel;
+  struct _notestat_ *next;
+} notestat_t;
+
+#define NOTESTAT_OFF 0
+#define NOTESTAT_ON 1
+
+static void
+notestat_init(notestat_t *notestat, int channel, int pitch)
+{
+  notestat->time = 0;
+  notestat->pitch = pitch;
+  notestat->status = NOTESTAT_OFF;
+  notestat->channel = channel;
+  notestat->next = 0;  
+}
+
+static void
+notestat_insert(notestat_t **list, notestat_t *this, long time)
+{
+  this->time = time;
+
+  if(*list == 0 || (*list)->time > time)
+    {
+      this->next = *list;
+      *list = this;
+    }
+  else
+    {
+      notestat_t *elem = *list;
+      notestat_t *next = elem->next;
+      
+      while(next && next->time <= time)
+	{
+	  elem = next;
+	  next = next->next;
+	}
+      
+      elem->next = this;
+      this->next = next;
+    }
+}
+
+static void
+notestat_remove(notestat_t **list, notestat_t *this)
+{
+  if(*list == this)
+    *list = this->next;
+  else
+    {
+      notestat_t *elem = *list;
+      notestat_t *next = elem->next;
+      
+      while(next && next != this)
+	{
+	  elem = next;
+	  next = next->next;
+	}
+      
+      elem->next = next->next;
+      this->next = 0;
+    }
+}
+
+static void
+explode_export_midifile(explode_t *this, fts_symbol_t file_name)
+{
+  fts_midifile_t *file = fts_midifile_open_write(file_name);
+ 
+  if(file)
+    {
+      notestat_t *noteoffs = 0; /* sequence of note status */
+      notestat_t notestats[17][128]; /* matrix of note status (pitch x channel) */
+      notestat_t *stat;
+      evt_t *event;
+      int i, j;
+
+      /* init array of note status events */
+      for(i=0; i<=16; i++)
+	for(j=0; j<128; j++)
+	  notestat_init(&notestats[i][j], i, j);
+	  
+      /* start writing the file */
+      fts_midifile_write_header(file, 0, 1, 1000); /* format 0, 1 track, division = 1000 */
+	  
+      /* write track header */
+      fts_midifile_write_track_begin(file);
+
+      /* write tempo */
+      fts_midifile_write_tempo(file, 1000000); /* 60 bpm */
+
+      event = this->data.evt;
+      while(event)
+	{
+	  double time = event->time;
+	  long time_in_ticks = fts_midifile_seconds_to_ticks(file, 0.001 * (double)time);
+	  long off_time = event->time + event->dur;
+	  int channel = (event->chan >= 1)? ((event->chan <= 16)? event->chan: 16): 1;
+	  int pitch = event->pit & 127;
+	  int velocity = event->vel & 127;
+	  
+	  /* write all pending note offs before the next event */
+	  stat = noteoffs;
+	  while(stat && stat->time <= time)
+	    {
+	      long off_time_in_ticks = fts_midifile_seconds_to_ticks(file, 0.001 * stat->time);
+
+	      /* write note off */
+	      fts_midifile_write_note_off(file, off_time_in_ticks, stat->channel, stat->pitch, 0); 
+
+	      /* set note to off */
+	      stat->status = NOTESTAT_OFF;
+
+	      /* remove note off event from note off track */
+	      notestat_remove(&noteoffs, stat);
+
+	      stat = noteoffs;
+	    }
+	  
+	  /* get status corresponding to current event */
+	  stat = &notestats[channel][pitch];
+	  
+	  /* write event */
+	  if(stat->status == NOTESTAT_ON) /* if overlapping note of same pitch */
+	    {
+	      /* write note off of previous note */
+	      fts_midifile_write_note_off(file, time_in_ticks, channel, pitch, 0); 
+	      
+	      /* remove note off event from sequence */
+	      notestat_remove(&noteoffs, stat);
+	      
+	      /* write new note on */
+	      fts_midifile_write_note_on(file, time_in_ticks, channel, pitch, velocity);
+	    }
+	  else
+	    {
+	      /* write note on */
+	      fts_midifile_write_note_on(file, time_in_ticks, channel, pitch, velocity);
+	      
+	      /* set note status to on */
+	      stat->status = NOTESTAT_ON;
+	    }
+	  
+	  /* add corresponding note to note off track */
+	  notestat_insert(&noteoffs, stat, off_time);
+	  
+	  /* go to next event */
+	  event = event->next;
+	}  
+	  
+      /* write all pending note offs */
+      stat = noteoffs;
+      while(stat)
+	{
+	  long time_in_ticks = fts_midifile_seconds_to_ticks(file, 0.001 * stat->time);
+	  
+	  /* write note off */
+	  fts_midifile_write_note_off(file, time_in_ticks, stat->channel, stat->pitch, 0);
+	  
+	  /* set note to off */
+	  stat->status = NOTESTAT_OFF;
+	  
+	  /* remove note off event from note off track */
+	  notestat_remove(&noteoffs, stat);
+
+	  stat = noteoffs; /* get next pending note off */
+	}
+      
+      /* write track footer */
+      fts_midifile_write_track_end(file);	  
+
+      /* close midi file */
+      fts_midifile_close(file);
+    }
+  else
+    post("explode export: cannot open file %s\n", fts_symbol_name(file_name));
+}
+
 /****************************************************************************/
 /*                                                                          */
 /*                   Score follower utility functions                       */
@@ -778,6 +968,21 @@ explode_list_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     explode_number_mth(o, winlet, s, 1, at);
 }
 
+static void
+explode_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  explode_t *this = (explode_t *)o;
+  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
+
+  if(!file_name)
+    {
+      char s[1024];
+      snprintf(s, 1024, "%s.mid", fts_symbol_name(this->data.name));
+      file_name = fts_new_symbol_copy(s);
+    }
+  
+  explode_export_midifile(this, file_name);
+}
 
 /****************************************************************************/
 /*                                                                          */
@@ -1341,8 +1546,10 @@ explode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[2] = fts_s_int;
   fts_method_define(cl, 0, fts_new_symbol("params"), explode_params_mth, 3, a);
 
-  /* Type the outlet */
+  /* export standard MIDI file */
+  fts_method_define_varargs(cl, 0, fts_new_symbol("export"), explode_export);
 
+  /* Type the outlet */
   a[0] = fts_s_int;
   fts_outlet_type_define(cl, 0,	fts_s_int, 1, a);
   fts_outlet_type_define(cl, 1,	fts_s_int, 1, a);

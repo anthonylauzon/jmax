@@ -381,14 +381,23 @@ eventtrk_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     }  
 }
 
-
 static void 
 eventtrk_export_to_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   eventtrk_t *this = (eventtrk_t *)o;
-  fts_symbol_t file_name = fts_get_symbol(at);
+  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
 
-  eventtrk_write_midifile(this, file_name);
+  if(!file_name)
+    {
+      char s[1024];
+      fts_symbol_t track_name = track_get_name(&this->head);
+
+      snprintf(s, 1024, "%s.mid", fts_symbol_name(track_name));
+      
+      file_name = fts_new_symbol_copy(s);
+    }
+  
+  seqmidi_write_midifile_from_event_track(this, file_name);
 }
 
 static fts_status_t
@@ -402,7 +411,7 @@ eventtrk_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, eventtrk_upload);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, eventtrk_print);
 
-  /*fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("export_midi"), eventtrk_export_to_midifile);*/
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("export_midi"), eventtrk_export_to_midifile);
     
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("event_new"), eventtrk_event_new_by_client_request);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("event_add"), eventtrk_event_add_by_client_request);
