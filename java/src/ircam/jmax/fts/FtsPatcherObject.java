@@ -139,7 +139,8 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("addObject"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
 	{
-	    ((FtsPatcherObject)obj).addObject(argc, argv);
+	  System.err.println("[FtsPatcherObject] : invoke addObject ");
+	  ((FtsPatcherObject)obj).addObject(argc, argv);
 	}
       });
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("redefineObject"), new FtsMessageHandler(){
@@ -679,6 +680,8 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   boolean doedit = false;
   public void addObject(int nArgs , FtsAtom args[]) 
   {
+    System.err.println("[FtsPatcherObject]: addObject nArgs "+nArgs);
+
       if((nArgs==1)&&(args[0].isObject()))
 	  addObject((FtsGraphicObject)args[0].objectValue);
       else
@@ -687,17 +690,21 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	      int x = args[1].intValue;
 	      int y = args[2].intValue;
 	      
+	      System.err.println("[FtsPatcherObject]: addObject id "+objId+" x "+x+" y "+y);
+
 	      String className = null;
 	      //doedit = false;
 	      int startIndex, numArgs = 0;
 	      FtsAtom[] arguments = null;
 	      if(nArgs>3)
 		  {
-		      if(args[3].isString()) 
+		    //if(args[3].isString()) 
+		    if(args[3].isSymbol()) 
 			  {
-			      className = args[3].stringValue;
-			      numArgs = nArgs-4;
-			      startIndex = 4; 
+			    //className = args[3].stringValue;
+			    className = args[3].symbolValue.toString();
+			    numArgs = nArgs-4;
+			    startIndex = 4; 
 			  }
 			  else
 			      { 
@@ -710,6 +717,8 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 			  arguments[i] = args[startIndex+i];
 		  }
 	      
+	      System.err.println("[FtsPatcherObject]: addObject className "+className+" numArgs "+numArgs);
+
 	      FtsGraphicObject newObj = makeFtsObjectFromServer(getServer(), this, objId, className, numArgs, arguments);
 	      
 	      newObj.setX(x);
