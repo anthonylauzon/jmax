@@ -106,11 +106,4 @@ public class ErmesObjInOutPop extends PopupMenu
 	aMenuItem.addActionListener( new ErmesInOutPopActionListener(aMenuItem, i));
       }
   }
-
-  public void removeNotify()
-  {
-    window = null;
-    itsOwner = null;
-    super.removeNotify();
-  }
 }

@@ -96,13 +96,6 @@ public class ErmesToolBar extends JPanel  {
     cards.add( "edit", toolBar);
   }
 
-  public void removeNotify()
-  {
-    // ?? Should may remove the listeners from the buttons ??? !!!
-
-    sketch = null;
-  }
-
   void buttonChanged(ErmesToolButton button)
   {
     if (button.isSelected())

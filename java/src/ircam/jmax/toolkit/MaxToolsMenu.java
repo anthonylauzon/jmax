@@ -71,13 +71,6 @@ public class MaxToolsMenu extends Menu implements ListDataListener
   }
 
 
-  public void removeNotify()
-  {
-    disposeActionListeners();
-    toolFinders.removeListDataListener(this);
-    super.removeNotify();
-  }
-
   private void rebuildToolsMenu()
   {
     // First, dispose all the action listener (Java VM GC bug !)

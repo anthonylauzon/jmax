@@ -10,10 +10,16 @@ import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-public class AlignTopAction extends MenuAction
+public class AlignTopAction extends SubMenuAction
 {
   public void doAction(ErmesSketchWindow editor)
   {
+    if (editor == null)
+      System.err.println("NUll editor in Aligntop");
+
+    if (ErmesSelection.patcherSelection == null)
+      System.err.println("Huga huga !!!");
+
     if (ErmesSelection.patcherSelection.ownedBy(editor.itsSketchPad))
       ErmesSelection.patcherSelection.alignTop();
   }

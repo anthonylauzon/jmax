@@ -23,7 +23,7 @@ abstract class PatcherMenu extends JMenu
     setDelay(0); // ?? Usefull ?
   }
 
-  public JMenuItem add(MenuAction action, String name, int modifiers, int mnemonic)
+  public JMenuItem add(ActionListener action, String name, int modifiers, int mnemonic)
   {
     JMenuItem item;
 
@@ -36,11 +36,12 @@ abstract class PatcherMenu extends JMenu
     return item;
   }
 
-  public JMenuItem add(MenuAction action, String name)
+  public JMenuItem add(ActionListener action, String name)
   {
     JMenuItem item;
 
     item = new JMenuItem(name);
+    item.addActionListener(action);
     add(item);
 
     return item;

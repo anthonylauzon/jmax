@@ -9,21 +9,23 @@ import javax.swing.event.*;
 import ircam.jmax.editors.patcher.*;
 
 /** An utility class that provide a constructor to make
-  actions suitable to be put in an ErmesSketchWindow menu.
+  actions suitable to be put in an ErmesSketchWindow sub menu (menu inside a menu).
   */
 
-abstract public class MenuAction implements ActionListener
+abstract public class SubMenuAction implements ActionListener
 {
-  public MenuAction()
+  public SubMenuAction()
   {
   }
 
   public  void actionPerformed(ActionEvent e)
   {
-    Component        invoker;
+    Component menu;
+    Component invoker;
     ErmesSketchWindow editor;
 
-    invoker = ((JPopupMenu) ((JMenuItem)e.getSource()).getParent()).getInvoker();
+    menu    = ((JPopupMenu) ((JMenuItem)e.getSource()).getParent()).getInvoker();
+    invoker = ((JPopupMenu) menu.getParent()).getInvoker();
 
     editor = (ErmesSketchWindow) SwingUtilities.getAncestorOfClass(ErmesSketchWindow.class,
 								   invoker);

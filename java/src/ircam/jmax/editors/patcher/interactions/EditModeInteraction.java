@@ -71,6 +71,7 @@ class EditModeInteraction extends Interaction
 	// Vertical Resize
 	return Interactions.vResizeInteraction;
 
+      case (Squeack.ALT | Squeack.DOWN | Squeack.TEXT):
       case (Squeack.ALT | Squeack.DOWN | Squeack.OBJECT):
 	// Help
 	return Interactions.helpInteraction;

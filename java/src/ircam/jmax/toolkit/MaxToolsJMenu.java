@@ -56,12 +56,6 @@ public class MaxToolsJMenu extends JMenu implements ListDataListener
     rebuildToolsMenu();
   }
 
-  public void removeNotify()
-  {
-    toolFinders.removeListDataListener(this);
-    super.removeNotify();
-  }
-
   private void rebuildToolsMenu()
   {
     JMenuItem mi;

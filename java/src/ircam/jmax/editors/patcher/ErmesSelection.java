@@ -447,11 +447,12 @@ public class ErmesSelection implements Transferable
   
   int maxY()
   {
-    int max = Integer.MAX_VALUE;
+    int max = 0;
 
     for( Enumeration e = objects.elements(); e.hasMoreElements(); )
       {
-	ErmesObject	object = (ErmesObject)e.nextElement();
+	ErmesObject object = (ErmesObject)e.nextElement();
+
 	if (max < object.getY() + object.getHeight()) 
 	  max = object.getY() + object.getHeight();
       }
@@ -461,7 +462,7 @@ public class ErmesSelection implements Transferable
 
   int maxX()
   {
-    int max = Integer.MAX_VALUE;
+    int max = 0;
 
     for( Enumeration e = objects.elements(); e.hasMoreElements(); )
       {

@@ -144,7 +144,10 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     ErmesSelection.patcherSelection.setOwner(this); 
 
     if (! ErmesSelection.patcherSelection.isEmpty())
-      ErmesSelection.patcherSelection.deselectAll();
+      {
+	ErmesSelection.patcherSelection.redraw(); 
+	ErmesSelection.patcherSelection.deselectAll();
+      }
 
     fo = (FtsObject)objectVector.elementAt( 0);
 

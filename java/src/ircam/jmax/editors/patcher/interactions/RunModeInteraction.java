@@ -28,6 +28,7 @@ class RunModeInteraction extends Interaction
   {
     switch (squeack)
       {
+      case (Squeack.ALT | Squeack.DOWN | Squeack.TEXT):
       case (Squeack.ALT | Squeack.DOWN | Squeack.OBJECT):
 	// Help
 	return Interactions.helpInteraction;

@@ -109,11 +109,6 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
     cards.add( "edit", toolbar);
   }
 
-  public void removeNotify()
-  {
-    itsSketchPad = null;
-  }
-
   void SelectAButton(ErmesSwToggleButton theButton)
   {
     theButton.setSelected(true);

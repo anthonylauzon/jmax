@@ -284,6 +284,8 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
 	setCursor( temp);
       }
+
+    itsEditMenu.clipboardChanged();
   }
 
   private int lastCopyCount;
@@ -307,6 +309,8 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
 	setCursor( temp);
       }
+
+    itsEditMenu.clipboardChanged();
   }
 
   private boolean pasting = false;

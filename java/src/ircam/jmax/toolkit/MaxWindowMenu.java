@@ -71,17 +71,6 @@ public class MaxWindowMenu extends Menu implements WindowListener, ListDataListe
     toDispose.removeAllElements();
   }
 
-
-  public void removeNotify()
-  {
-    disposeActionListeners();
-    removeAll();
-    windowList.removeListDataListener(this);
-    frame.removeWindowListener(this);
-    frame = null;
-    super.removeNotify();
-  }
-
   private void rebuildWindowMenuIfNeeded()
   {
     if (windowOperationCount < MaxWindowManager.getWindowManager().getWindowOperationCount())

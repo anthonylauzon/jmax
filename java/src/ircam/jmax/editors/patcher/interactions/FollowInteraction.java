@@ -22,23 +22,26 @@ class FollowInteraction extends Interaction
 
   void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
-    if (squeack == (Squeack.MOVE | Squeack.BACKGROUND))
-      editor.setCursor(Cursor.getDefaultCursor());
-    if (squeack == (Squeack.MOVE | Squeack.OBJECT))
-      editor.setCursor(Cursor.getDefaultCursor());
-    if (squeack == (Squeack.MOVE | Squeack.CONNECTION))
-      editor.setCursor(Cursor.getDefaultCursor());
-    if (squeack == (Squeack.MOVE | Squeack.HRESIZE_HANDLE))
-      editor.setCursor( Cursor.getPredefinedCursor( Cursor.E_RESIZE_CURSOR));
-    if (squeack == (Squeack.MOVE | Squeack.VRESIZE_HANDLE))
-      editor.setCursor( Cursor.getPredefinedCursor( Cursor.S_RESIZE_CURSOR));
-    if (squeack == (Squeack.MOVE | Squeack.INLET))
-      editor.setCursor(Cursor.getDefaultCursor());
-    if (squeack == (Squeack.MOVE | Squeack.OUTLET))
-      editor.setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
-    if (squeack == (Squeack.MOVE | Squeack.TEXT))
-      editor.setCursor(Cursor.getDefaultCursor());
-    
+    if (Squeack.isMove(squeack))
+      {
+	if (Squeack.onBackground(squeack))
+	  editor.setCursor(Cursor.getDefaultCursor());
+	if (Squeack.onObject(squeack))
+	  editor.setCursor(Cursor.getDefaultCursor());
+	if (Squeack.onConnection(squeack))
+	  editor.setCursor(Cursor.getDefaultCursor());
+	if (Squeack.onHResizeHandle(squeack))
+	  editor.setCursor( Cursor.getPredefinedCursor( Cursor.E_RESIZE_CURSOR));
+	if (Squeack.onVResizeHandle(squeack))
+	  editor.setCursor( Cursor.getPredefinedCursor( Cursor.S_RESIZE_CURSOR));
+	if (Squeack.onInlet(squeack))
+	  editor.setCursor(Cursor.getDefaultCursor());
+	if (Squeack.onOutlet(squeack))
+	  editor.setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
+	if (Squeack.onText(squeack))
+	  editor.setCursor(Cursor.getDefaultCursor());
+      }
+
     editor.endInteraction();
   }
 }

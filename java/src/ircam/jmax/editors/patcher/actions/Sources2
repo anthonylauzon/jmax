@@ -1,5 +1,6 @@
 SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/MenuAction.java  \
+	$(INCLUDE_PATH)/SubMenuAction.java  \
 	$(INCLUDE_PATH)/OpenAction.java  \
 	$(INCLUDE_PATH)/NewAction.java  \
 	$(INCLUDE_PATH)/SaveAction.java  \

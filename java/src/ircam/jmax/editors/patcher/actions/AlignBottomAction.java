@@ -10,7 +10,7 @@ import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-public class AlignBottomAction extends MenuAction
+public class AlignBottomAction extends SubMenuAction
 {
   public  void doAction(ErmesSketchWindow editor)
   {

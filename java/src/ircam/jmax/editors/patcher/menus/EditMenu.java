@@ -109,6 +109,11 @@ public class EditMenu extends PatcherMenu
     updateMenus();
   }
 
+  public void clipboardChanged()
+  {
+    updateMenus();
+  }
+
   private void updateMenus()
   {
     if (locked)

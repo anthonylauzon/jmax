@@ -17,16 +17,19 @@ class HelpInteraction extends Interaction
 {
   void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
-    if (squeack == (Squeack.ALT | Squeack.DOWN | Squeack.OBJECT))
-	{
-	  ErmesObject object = (ErmesObject) dobject;
+    ErmesObject object = null;
 
-	  if (! FtsHelpPatchTable.openHelpPatch( object.getFtsObject()))
-	    new ErrorDialog( editor.getSketchWindow(),
-			     "Sorry, no help for object " + object.getFtsObject().getClassName());
+    if (Squeack.onObject(squeack))
+      object = (ErmesObject) dobject;
+    else if (Squeack.onText(squeack))
+      object = ((TextSensibilityArea) dobject).getObject();
 
-	  editor.endInteraction();
-	}
+    if (object != null)
+      if (! FtsHelpPatchTable.openHelpPatch( object.getFtsObject()))
+	new ErrorDialog( editor.getSketchWindow(),
+			 "Sorry, no help for object " + object.getFtsObject().getClassName());
+
+    editor.endInteraction();
   }
 }
 

@@ -1,6 +1,8 @@
 package ircam.jmax.editors.patcher.actions;
 
+import java.awt.event.*;
 import javax.swing.*;
+
 
 /** This class define a set of static variables 
  *  containing all the standard actions used for the
@@ -43,30 +45,30 @@ public class Actions
   // the actionPerformed method; the two kind of actions use different methods.
   // Also, currently the Menu actions define their shortcuts .. together with the name.
 
-  public static MenuAction alignTopAction    = new AlignTopAction();
-  public static MenuAction alignLeftAction   = new AlignLeftAction();
-  public static MenuAction alignBottomAction = new AlignBottomAction();
-  public static MenuAction alignRightAction  = new AlignRightAction();
+  public static ActionListener alignTopAction    = new AlignTopAction();
+  public static ActionListener alignLeftAction   = new AlignLeftAction();
+  public static ActionListener alignBottomAction = new AlignBottomAction();
+  public static ActionListener alignRightAction  = new AlignRightAction();
 
-  public static MenuAction cutAction       = new CutAction();
-  public static MenuAction copyAction      = new CopyAction();
-  public static MenuAction pasteAction     = new PasteAction();
-  public static MenuAction duplicateAction = new DuplicateAction();
-  public static MenuAction selectAllAction = new SelectAllAction();
-  public static MenuAction findAction      = new FindAction();
-  public static MenuAction findErrorsAction= new FindErrorsAction();
-  public static MenuAction inspectAction   = new InspectAction();
-  public static MenuAction lockAction      = new LockAction();
+  public static ActionListener cutAction       = new CutAction();
+  public static ActionListener copyAction      = new CopyAction();
+  public static ActionListener pasteAction     = new PasteAction();
+  public static ActionListener duplicateAction = new DuplicateAction();
+  public static ActionListener selectAllAction = new SelectAllAction();
+  public static ActionListener findAction      = new FindAction();
+  public static ActionListener findErrorsAction= new FindErrorsAction();
+  public static ActionListener inspectAction   = new InspectAction();
+  public static ActionListener lockAction      = new LockAction();
 
-  public static MenuAction newAction      = new NewAction();
-  public static MenuAction openAction     = new OpenAction();
-  public static MenuAction saveAction     = new SaveAction();
-  public static MenuAction saveAsAction   = new SaveAsAction();
-  public static MenuAction saveToAction   = new SaveToAction();
-  public static MenuAction closeAction    = new CloseAction();
-  public static MenuAction printAction    = new PrintAction();
-  public static MenuAction statisticsAction = new StatisticsAction();
-  public static MenuAction quitAction     = new QuitAction();
+  public static ActionListener newAction      = new NewAction();
+  public static ActionListener openAction     = new OpenAction();
+  public static ActionListener saveAction     = new SaveAction();
+  public static ActionListener saveAsAction   = new SaveAsAction();
+  public static ActionListener saveToAction   = new SaveToAction();
+  public static ActionListener closeAction    = new CloseAction();
+  public static ActionListener printAction    = new PrintAction();
+  public static ActionListener statisticsAction = new StatisticsAction();
+  public static ActionListener quitAction     = new QuitAction();
 }
 
 

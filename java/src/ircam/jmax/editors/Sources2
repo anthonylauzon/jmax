@@ -21,6 +21,12 @@ include $(INCLUDE_PATH)/Sources2
 
 EDITORS_ACC := $(EDITORS_ACC) $(SOURCES)
 
+############################### patcher
+#INCLUDE_PATH := $(EDITORS_PATH)/patcher
+#include $(INCLUDE_PATH)/Sources2
+
+#EDITORS_ACC := $(EDITORS_ACC) $(SOURCES)
+
 ############################### console
 INCLUDE_PATH := $(EDITORS_PATH)/console
 include $(INCLUDE_PATH)/Sources2

@@ -53,13 +53,6 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     itsOwner = owner;
   }
 
-  public void removeNotify()
-  {
-    removeKeyListener(this);
-    removeFocusListener(this);
-    super.removeNotify();
-  }
-
   protected void AbortEdit() 
   {
     setVisible( false);
