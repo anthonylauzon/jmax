@@ -111,6 +111,10 @@ case "$debug" in
 esac
 AC_SUBST(JAVACFLAGSX)
 
+
+dnl Run configure in subdirectories
+AC_CONFIG_SUBDIRS(client)
+
 AC_OUTPUT(
 Makefile
 fts/Makefile

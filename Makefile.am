@@ -4,7 +4,7 @@
 ## generate libtool files
 ## libtoolize --automake -c
 ## automake --add-missing --copy --foreign
-SUBDIRS=fts java packages bin tcl images tutorials config
+SUBDIRS=client fts java packages bin tcl images tutorials config
 
 
 #

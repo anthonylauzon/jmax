@@ -70,38 +70,37 @@ static void clean_exit( int sig)
 
 main( int ac, char **av)
 {
-  Fts *fts;
+  FtsProcess *fts;
 
   signal( SIGINT, clean_exit);
   signal( SIGTERM, clean_exit);
 
   try
     {
-      FtsArgs args;
-
       if (ac < 2)
 	{
 	  fprintf( stderr, "usage: %s patch\n", av[0]);
 	  return -1;
 	}
 
-//        fts = new FtsProcess( "xterm");
-//        args.clear();
+      FtsArgs args;
+
 //        args.add( "-e");
 //        args.add( "gdb");
 //        args.add( "-exec");
 //        args.add( "/u/worksta/dechelle/projects/jmax/3.0.0/jmax-install/bin/fts");
 //        args.add( "-x");
 //        args.add( "/u/worksta/dechelle/.gdbinit-fts");
-//        fts->run( args);
+//        fts = new FtsProcess( "xterm", args);
 
-      fts = new FtsProcess( "/u/worksta/dechelle/projects/jmax/3.0.0/jmax-install/bin/fts");
-      args.clear();
       args.add( "--no-watchdog");
-      fts->run( args);
+      args.add( "--stdio");
 
-      server = new FtsServer();
-      server->connect();
+      fts = new FtsProcess( "/u/worksta/dechelle/projects/jmax/3.0.0/jmax-install/bin/fts", args);
+
+      FtsPipeConnection *connection = new FtsPipeConnection( fts);
+
+      server = new FtsServer( connection);
 
       // load a patch
       args.clear();

@@ -77,13 +77,12 @@ RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
 VERSION = @VERSION@
 
-helpdir = $(pkgdatadir)/packages/ispwmath/help
-help_DATA =   arith.help.jmax  compare.help.jmax  ispwmath.help.index.tcl  ispwmath.summary.jmax  logic.help.jmax  shift.help.jmax 
-
+templatedir = $(pkgdatadir)/packages/lists/templates
+template_DATA = listcompose.jmax listdecompose.jmax
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
-DATA =  $(help_DATA)
+DATA =  $(template_DATA)
 
 DIST_COMMON =  Makefile.am Makefile.in
 
@@ -95,30 +94,30 @@ GZIP_ENV = --best
 all: all-redirect
 .SUFFIXES:
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --foreign packages/ispwmath/help/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --foreign packages/lists/templates/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 
-install-helpDATA: $(help_DATA)
+install-templateDATA: $(template_DATA)
 	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(helpdir)
-	@list='$(help_DATA)'; for p in $$list; do \
+	$(mkinstalldirs) $(DESTDIR)$(templatedir)
+	@list='$(template_DATA)'; for p in $$list; do \
 	  if test -f $(srcdir)/$$p; then \
-	    echo " $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(helpdir)/$$p"; \
-	    $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(helpdir)/$$p; \
+	    echo " $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(templatedir)/$$p"; \
+	    $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(templatedir)/$$p; \
 	  else if test -f $$p; then \
-	    echo " $(INSTALL_DATA) $$p $(DESTDIR)$(helpdir)/$$p"; \
-	    $(INSTALL_DATA) $$p $(DESTDIR)$(helpdir)/$$p; \
+	    echo " $(INSTALL_DATA) $$p $(DESTDIR)$(templatedir)/$$p"; \
+	    $(INSTALL_DATA) $$p $(DESTDIR)$(templatedir)/$$p; \
 	  fi; fi; \
 	done
 
-uninstall-helpDATA:
+uninstall-templateDATA:
 	@$(NORMAL_UNINSTALL)
-	list='$(help_DATA)'; for p in $$list; do \
-	  rm -f $(DESTDIR)$(helpdir)/$$p; \
+	list='$(template_DATA)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(templatedir)/$$p; \
 	done
 tags: TAGS
 TAGS:
@@ -126,14 +125,14 @@ TAGS:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = packages/ispwmath/help
+subdir = packages/lists/templates
 
 distdir: $(DISTFILES)
 	here=`cd $(top_builddir) && pwd`; \
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign packages/ispwmath/help/Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign packages/lists/templates/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
@@ -155,20 +154,20 @@ installcheck: installcheck-am
 install-exec-am:
 install-exec: install-exec-am
 
-install-data-am: install-helpDATA
+install-data-am: install-templateDATA
 install-data: install-data-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 install: install-am
-uninstall-am: uninstall-helpDATA
+uninstall-am: uninstall-templateDATA
 uninstall: uninstall-am
 all-am: Makefile $(DATA)
 all-redirect: all-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs:
-	$(mkinstalldirs)  $(DESTDIR)$(helpdir)
+	$(mkinstalldirs)  $(DESTDIR)$(templatedir)
 
 
 mostlyclean-generic:
@@ -199,10 +198,10 @@ maintainer-clean-am:  maintainer-clean-generic distclean-am
 
 maintainer-clean: maintainer-clean-am
 
-.PHONY: uninstall-helpDATA install-helpDATA tags distdir info-am info \
-dvi-am dvi check check-am installcheck-am installcheck install-exec-am \
-install-exec install-data-am install-data install-am install \
-uninstall-am uninstall all-redirect all-am all installdirs \
+.PHONY: uninstall-templateDATA install-templateDATA tags distdir info-am \
+info dvi-am dvi check check-am installcheck-am installcheck \
+install-exec-am install-exec install-data-am install-data install-am \
+install uninstall-am uninstall all-redirect all-am all installdirs \
 mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 

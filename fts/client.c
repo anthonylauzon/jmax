@@ -49,11 +49,11 @@ int win_close(int socket)
 
 typedef unsigned int socklen_t;
 typedef SOCKET socket_t;
-typedef HANDLE pipe_t;
 
 #else
 
 #include <sys/types.h>
+#include <fcntl.h>
 #if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
@@ -76,7 +76,6 @@ typedef HANDLE pipe_t;
 #define INVALID_PIPE -1
 #define SOCKET_ERROR -1
 typedef int socket_t;
-typedef int pipe_t;
 #define client_error(mess)  post("%s (%s)\n", mess, strerror( errno))
 
 #endif
@@ -171,9 +170,13 @@ static void fts_socketstream_flush(fts_bytestream_t *stream);
 struct _fts_pipestream_t
 {
   fts_bytestream_t bytestream;
-  pipe_t in;
-  pipe_t out;
-  pipe_t _stdout;
+#ifdef WIN32
+  HANDLE in;
+  HANDLE out;
+#else
+  int in;
+  int out;
+#endif
 };
 
 typedef struct _fts_pipestream_t fts_pipestream_t;
@@ -1041,7 +1044,11 @@ static void
 fts_pipestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_pipestream_t *this = (fts_pipestream_t *) o;
-  pipe_t _stdin;
+#ifdef WIN32
+  HANDLE _stdin, _stdout;
+#else
+  int _stdout;
+#endif
 
   ac--;
   at++;
@@ -1054,7 +1061,6 @@ fts_pipestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 			    fts_pipestream_flush);
 
 #ifdef WIN32
-
   /* obtain stdin and stdout */
   _stdin = GetStdHandle(STD_INPUT_HANDLE); 
   this->out = GetStdHandle(STD_OUTPUT_HANDLE); 
@@ -1075,16 +1081,31 @@ fts_pipestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   CloseHandle(_stdin);
 
   /* redirect stdout to a file */
-  this->_stdout = CreateFile("C:\\fts_stdout.txt", 
-			     GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 
-			     FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH, NULL);
-  if ((this->_stdout == INVALID_HANDLE_VALUE) 
-      || !SetStdHandle(STD_OUTPUT_HANDLE, this->_stdout)) {
+  _stdout = CreateFile("C:\\fts_stdout.txt", 
+		       GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 
+		       FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH, NULL);
+  if ((_stdout == INVALID_HANDLE_VALUE) 
+      || !SetStdHandle(STD_OUTPUT_HANDLE, _stdout)) {
     fts_log("Failed to redirect the stdout. Stdout will not be available.\n");
   }
 
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_ALWAYS);  
 #else
+  if ( (this->in = dup( 0)) < 0)
+    fts_log( "[pipe] dup() failed");
+  if ( (this->out = dup( 1)) < 0)
+    fts_log( "[pipe] dup() failed");
+
+  close( 0);
+
+  if ( (_stdout = open( "/tmp/fts.stdout", O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
+    fts_log( "[pipe] cannot open /tmp/fts.stdout");
+
+  if ( (dup2( _stdout, 1)) < 0)
+    fts_log( "[pipe] dup2() failed");
+    
+  close( _stdout);
+
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->in);  
 #endif
 
@@ -1106,11 +1127,11 @@ fts_pipestream_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     CloseHandle(this->out);
     this->out = INVALID_HANDLE_VALUE;
   }  
-  if (this->_stdout != INVALID_HANDLE_VALUE) {
-    CloseHandle(this->_stdout);
-    this->_stdout = INVALID_HANDLE_VALUE;
-  }  
 #else
+  close( this->in);
+  close( this->out);
+  this->in = -1;
+  this->out = -1;
 #endif
 
   fts_bytestream_destroy((fts_bytestream_t *) this);
@@ -1126,11 +1147,15 @@ fts_pipestream_receive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 #if WIN32
   DWORD size = 0, available = 0;
 
-  if (PeekNamedPipe(this->in, (LPVOID) buffer, NN, &size, &available, NULL) && (size > 0)) {
+  if (PeekNamedPipe(this->in, (LPVOID) buffer, NN, &size, &available, NULL)) {
       fts_bytestream_input((fts_bytestream_t *) this, size, buffer);
   } 
 
 #else
+  int n;
+
+  n = read( this->in, buffer, NN);
+  fts_bytestream_input((fts_bytestream_t *) this, n, buffer);
 #endif
 }
 
@@ -1152,6 +1177,8 @@ fts_pipestream_output(fts_bytestream_t *stream, int n, const unsigned char *c)
     LocalFree(msg);
   }
 #else
+  if ( write( this->out, c, n) < n)
+    fts_log("[pipe]: failed to write to pipe: (%s)\n", strerror( errno));
 #endif
 }
 
@@ -1168,7 +1195,6 @@ fts_pipestream_flush(fts_bytestream_t *stream)
 
 #if WIN32
   FlushFileBuffers(this->out);
-#else
 #endif
 }
 

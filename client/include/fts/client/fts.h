@@ -36,15 +36,29 @@
 class FTSCLIENT_API Fts {
  public:
   virtual ~Fts() {}
-  virtual void run( FtsArgs &args) throw( FtsClientException) = 0;
-  void run() throw( FtsClientException) { FtsArgs args; run( args); }
 };
 
 class FTSCLIENT_API FtsProcess : public Fts {
  public:
-  FtsProcess( const char *path = 0);
-  virtual ~FtsProcess() {}
-  virtual void run( FtsArgs &args) throw( FtsClientException);
+  FtsProcess() throw( FtsClientException) {
+    FtsArgs args;
+
+    init( 0, args);
+  }
+
+  FtsProcess( const char *path) throw( FtsClientException) {
+    FtsArgs args;
+
+    init( path, args);
+  }
+
+  FtsProcess( FtsArgs &args) throw( FtsClientException) {
+    init( 0, args);
+  }
+
+  FtsProcess( const char *path, FtsArgs &args) throw( FtsClientException) {
+    init( path, args);
+  }
 
   pipe_t getInputPipe() {
     return _in;
@@ -55,6 +69,7 @@ class FTSCLIENT_API FtsProcess : public Fts {
   }
 
  private:
+  void init( const char *path, FtsArgs &args) throw( FtsClientException);
   void findDefaultPath() throw( FtsClientException);
 
   const char *_path;
@@ -68,11 +83,21 @@ class FTSCLIENT_API FtsProcess : public Fts {
 
 class FTSCLIENT_API FtsPlugin : public Fts {
  public:
-  FtsPlugin();
-  virtual ~FtsPlugin();
-  virtual void run( int argc, const char **argv) throw( FtsClientException);
+  FtsPlugin() throw( FtsClientException) {
+    FtsArgs args;
+
+    init( args);
+  }
+    
+  FtsPlugin( FtsArgs &args) throw( FtsClientException) {
+    init( args);
+  }
+
+  ~FtsPlugin();
 
  private:
+
+  void init( FtsArgs &args) throw( FtsClientException);
 
 #ifdef WIN32
   static DWORD WINAPI main(LPVOID data);
@@ -85,13 +110,13 @@ class FTSCLIENT_API FtsPlugin : public Fts {
   static void closeLibrary(library_t lib);
   static library_symbol_t getSymbol(library_t lib, char* name);
 
-  void (*init_function)(int argc, char **argv);
-  void (*run_function)(void);
-  void (*halt_function)(void);
+  void (*_init_function)(int argc, const char **argv);
+  void (*_run_function)(void);
+  void (*_halt_function)(void);
 
-  library_t library;
-  thread_t thread;
-  int argc;
-  char **argv;
+  library_t _library;
+  thread_t _thread;
+  int _argc;
+  const char **_argv;
 };
 

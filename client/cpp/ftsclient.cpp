@@ -482,7 +482,12 @@ int FtsPipeConnection::read( unsigned char *buffer, int n) throw( FtsClientExcep
   return count;
 
 #else
-  return 0;
+  int r;
+
+  if ( (r = ::read( _in, buffer, n)) < 0)
+    throw FtsClientException( "Error in sending message", LASTERROR);
+
+  return r;
 #endif
 }
 
@@ -507,7 +512,12 @@ int FtsPipeConnection::write( const unsigned char *buffer, int n) throw( FtsClie
   return count;
 
 #else
-  return 0;
+  int r;
+
+  if ( (r = ::write( _out, buffer, n)) < 0)
+    throw FtsClientException( "Error in sending message", LASTERROR);
+
+  return r;
 #endif
 }
 
@@ -576,11 +586,6 @@ FtsServer::FtsServer( FtsServerConnection *connection, int threaded)
 
   signal( SIGPIPE, SIG_IGN);
 #endif
-}
-
-FtsServer::FtsServer() throw( FtsClientException)
-{
-  FtsServer( new FtsSocketConnection(), 1);
 }
 
 FtsServer::~FtsServer()
@@ -1059,162 +1064,11 @@ void FtsObject::install( FtsCallback *callback)
 }
 
 /***************************************************
- * FtsPlugin
- */
-
-#ifdef WIN32
-#define FTS_LIBRARY      "fts.dll"
-#else
-#define FTS_LIBRARY      "libfts.so"
-#endif
-
-FtsPlugin::FtsPlugin()
-{
-  thread = (thread_t)NULL;
-  library = NULL;
-  init_function = NULL;
-  run_function = NULL;
-  halt_function = NULL;
-  argc = 0;
-  argv = NULL;
-
-  library = openLibrary(FTS_LIBRARY);
-  if (library == NULL) {
-    throw FtsClientException("Can't open library");
-  }
-
-  init_function = (void (*)(int,char **)) getSymbol(library, "fts_init");
-  if (init_function == NULL) {
-    throw FtsClientException("Can't find initialization function");
-  }
-
-  run_function = (void (*)(void)) getSymbol(library, "fts_sched_run");
-  if (run_function == NULL) {
-    throw FtsClientException("Can't find run function");
-  }
-
-  halt_function = (void (*)(void)) getSymbol(library, "fts_sched_halt");
-  if (halt_function == NULL) {
-    throw FtsClientException("Can't find halt function");
-  }
-}
-
-void FtsPlugin::run( int ac, const char **av) throw( FtsClientException)
-{
-#ifdef WIN32
-  unsigned long threadID;
-#endif
-
-  int i;
-
-  argc = ac + 1;
-  argv = (char**) malloc((argc + 1) * sizeof(char*));
-  
-  /* add "fts" as the first argument */
-  argv[0] = "fts";
-  for (i = 0; i < ac; i++) {
-    argv[i + 1] = (char *)av[i];
-  }
-  argv[argc] = NULL;
-  
-#ifdef WIN32
-  thread = CreateThread(NULL, 0, &FtsPlugin::main, (LPVOID) this, 0, &threadID);
-  if (thread == NULL) {
-    throw FtsClientException("Can't create thread");
-  }
-#else
-  if (pthread_create(&thread, NULL, &FtsPlugin::main, (void*) this)) {
-    throw FtsClientException("Can't create thread");
-  }
-#endif
-}
-
-FtsPlugin::~FtsPlugin(void)
-{
-  if (halt_function) {
-    halt_function();
-  }
-  if (argv) {
-    free(argv);
-  }
-  if (thread) {
-#ifdef WIN32
-    WaitForSingleObject(thread, INFINITE);
-    CloseHandle(thread);
-#else
-    pthread_join(thread, NULL);
-#endif
-  }
-  if (library) {
-    closeLibrary(library);
-  }
-}
-
-#ifdef WIN32
-DWORD WINAPI FtsPlugin::main(LPVOID data)
-{
-  FtsPlugin* self = (FtsPlugin*) data;
-  self->init_function(self->argc, self->argv);
-  self->run_function();
-  ExitThread(0);
-  return 0;
-}
-#else
-void* FtsPlugin::main(void* data)
-{
-  FtsPlugin* self = (FtsPlugin*) data;
-  self->init_function(self->argc, self->argv);
-  self->run_function();
-
-  pthread_exit(NULL);
-  return NULL;
-}
-#endif
-
-library_t 
-FtsPlugin::openLibrary(char* name)
-{
-#ifdef WIN32
-  return LoadLibrary(name);
-#else
-  return dlopen(name, RTLD_NOW | RTLD_GLOBAL);
-#endif
-}
-
-void 
-FtsPlugin::closeLibrary(library_t lib)
-{
-#ifdef WIN32
-  FreeLibrary(lib);
-#else
-  dlclose(lib);
-#endif
-}
-
-library_symbol_t 
-FtsPlugin::getSymbol(library_t lib, char* name)
-{	
-#ifdef WIN32
-  return GetProcAddress(lib, name);
-#else
-  return dlsym(lib, name);
-#endif
-}
-
-
-/***************************************************
  * FtsProcess
  */
 
-FtsProcess::FtsProcess( const char *path) 
-{
-  _path = (path)? strdup(path) : 0;
-  _in = INVALID_PIPE;
-  _out = INVALID_PIPE;
-}
-
 #if WIN32
-void FtsProcess::run( FtsArgs &args) throw( FtsClientException)
+FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientException)
 {
   BOOL result;
   char cmdLine[2048];
@@ -1224,12 +1078,15 @@ void FtsProcess::run( FtsArgs &args) throw( FtsClientException)
   SECURITY_ATTRIBUTES attr; 
   int i;
 
+  _path = (path)? strdup(path) : 0;
+  _in = INVALID_PIPE;
+  _out = INVALID_PIPE;
+
   if (_path == 0) {
     findDefaultPath();
   }
 
   ftsclient_log("[fts]: path %s\n", _path);
-
   cmdLine[0] = 0;
   strcat(cmdLine, _path);
   strcat(cmdLine, " ");
@@ -1292,10 +1149,17 @@ void FtsProcess::run( FtsArgs &args) throw( FtsClientException)
   }
 }
 #else
-void FtsProcess::run( FtsArgs &args) throw( FtsClientException)
+void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientException)
 {
   int from_fts_pipe[2];
   int to_fts_pipe[2];
+
+  _path = (path)? strdup(path) : 0;
+  _in = INVALID_PIPE;
+  _out = INVALID_PIPE;
+
+  if (_path == 0)
+    findDefaultPath();
 
   if ( pipe( from_fts_pipe) < 0)
     throw FtsClientException( "Can't open pipe", errno);
@@ -1310,7 +1174,6 @@ void FtsProcess::run( FtsArgs &args) throw( FtsClientException)
   else if ( !_childPid)
     {
       char **argv;
-      int i;
 
       /* FTS standard input is to_fts_pipe */
       close( to_fts_pipe[1]);
@@ -1324,14 +1187,15 @@ void FtsProcess::run( FtsArgs &args) throw( FtsClientException)
 	throw FtsClientException( "dup2() failed");
       close( from_fts_pipe[1]);
 
+      int i;
+
       argv = new char *[args.length()+2];
 
       argv[0] = (char *)_path;
+
       for ( i = 0; i < args.length(); i++)
-	{
-	  if ( args.isString(i))
-	    argv[i+1] = (char *)args.getString( i);
-	}
+	if ( args.isString(i))
+	  argv[i+1] = (char *)args.getString( i);
 
       argv[i+1] = NULL;
 
@@ -1402,3 +1266,147 @@ void FtsProcess::findDefaultPath() throw( FtsClientException)
   _path = "fts";
 }
 #endif
+
+/***************************************************
+ * FtsPlugin
+ */
+
+#ifdef WIN32
+#define FTS_LIBRARY      "fts.dll"
+#else
+#define FTS_LIBRARY      "libfts.so"
+#endif
+
+void FtsPlugin::init( FtsArgs &args) throw( FtsClientException)
+{
+#ifdef WIN32
+  unsigned long threadID;
+#endif
+  int i;
+
+  _thread = (thread_t)NULL;
+  _library = NULL;
+  _init_function = NULL;
+  _run_function = NULL;
+  _halt_function = NULL;
+  _argc = 0;
+  _argv = NULL;
+
+  _library = openLibrary(FTS_LIBRARY);
+  if (_library == NULL) {
+    throw FtsClientException("Can't open library");
+  }
+
+  _init_function = (void (*)(int,const char **)) getSymbol(_library, "fts_init");
+  if (_init_function == NULL) {
+    throw FtsClientException("Can't find initialization function");
+  }
+
+  _run_function = (void (*)(void)) getSymbol( _library, "fts_sched_run");
+  if (_run_function == NULL) {
+    throw FtsClientException("Can't find run function");
+  }
+
+  _halt_function = (void (*)(void)) getSymbol( _library, "fts_sched_halt");
+  if (_halt_function == NULL) {
+    throw FtsClientException("Can't find halt function");
+  }
+
+  _argc = args.length() + 1;
+  _argv = new const char *[args.length()+1];
+  
+  /* add "fts" as the first argument */
+  _argv[0] = "fts";
+
+  for (i = 0; i < args.length(); i++) {
+    if ( args.isString(i))
+      _argv[i + 1] = args.getString( i);
+  }
+
+  _argv[_argc] = NULL;
+  
+#ifdef WIN32
+  thread = CreateThread(NULL, 0, &FtsPlugin::main, (LPVOID) this, 0, &threadID);
+  if (thread == NULL) {
+    throw FtsClientException("Can't create thread");
+  }
+#else
+  if (pthread_create(&_thread, NULL, &FtsPlugin::main, (void*) this)) {
+    throw FtsClientException("Can't create thread");
+  }
+#endif
+}
+
+FtsPlugin::~FtsPlugin()
+{
+  if (_halt_function) {
+    _halt_function();
+  }
+  if (_argv) {
+    free(_argv);
+  }
+  if (_thread) {
+#ifdef WIN32
+    WaitForSingleObject(_thread, INFINITE);
+    CloseHandle(_thread);
+#else
+    pthread_join( _thread, NULL);
+#endif
+  }
+  if (_library) {
+    closeLibrary( _library);
+  }
+}
+
+#ifdef WIN32
+DWORD WINAPI FtsPlugin::main(LPVOID data)
+{
+  FtsPlugin* self = (FtsPlugin*) data;
+  self->_init_function(self->argc, self->argv);
+  self->_run_function();
+  ExitThread(0);
+  return 0;
+}
+#else
+void* FtsPlugin::main(void* data)
+{
+  FtsPlugin* self = (FtsPlugin*) data;
+  self->_init_function( self->_argc, self->_argv);
+  self->_run_function();
+
+  pthread_exit(NULL);
+  return NULL;
+}
+#endif
+
+library_t 
+FtsPlugin::openLibrary(char* name)
+{
+#ifdef WIN32
+  return LoadLibrary(name);
+#else
+  return dlopen(name, RTLD_NOW | RTLD_GLOBAL);
+#endif
+}
+
+void 
+FtsPlugin::closeLibrary(library_t lib)
+{
+#ifdef WIN32
+  FreeLibrary(lib);
+#else
+  dlclose(lib);
+#endif
+}
+
+library_symbol_t 
+FtsPlugin::getSymbol(library_t lib, char* name)
+{	
+#ifdef WIN32
+  return GetProcAddress(lib, name);
+#else
+  return dlsym(lib, name);
+#endif
+}
+
+

@@ -29,8 +29,7 @@ class FTSCLIENT_API FtsServer {
 public:
   static const int DEFAULT_RECEIVE_BUFFER_SIZE;
 
-  FtsServer( FtsServerConnection *connection, int threaded);
-  FtsServer() throw( FtsClientException);
+  FtsServer( FtsServerConnection *connection, int threaded = 1);
 
   ~FtsServer();
 
