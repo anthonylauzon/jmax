@@ -1,6 +1,6 @@
-//
+ //
 // jMax
-// Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
+// Copyright (C) 1999 by IRCAM
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,31 +18,36 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
-// Based on Max/ISPW by Miller Puckette.
-//
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
 package ircam.jmax.mda;
 
-/** The mda module; the init function is called at init time
- *  by jmax, and install module related things.
+import java.io.*;
+import ircam.jmax.script.*;
+
+/**
+ * This interface defines the minimal requirements on 
+ * a MaxDocument instance in order to save and store this content
+ * as a script; this also a way to check if an instance supports
+ * the script format.
  */
 
-public class MdaModule
+public interface MaxScriptDocument 
 {
-  static public void initModule()
-  {
-    // Install the local mda entities
+    /** Ask the content to save itself as tcl code to
+     * the given printwriter
+     */
 
-    // Mda.installDocumentHandler( new MaxTclFileDocumentHandler());
-
-      // moved to script.tcl.TclInterpreter.
-      //Mda.installDocumentHandler( new MaxTclExecutedDocumentHandler());
-      //Mda.installDocumentType(new MaxTclExecutedDocumentType());
-
-    // Install the tcl commands for Mda
-
-    /* ircam.jmax.mda.tcl.TclMdaPackage.installPackage(); Moved to ircam.jmax.script.tcl.TclInterpreter */
-  }
+    public void saveContentAsScript(PrintWriter pw);
 }
+
+
+
+
+
+
+
+
+
+

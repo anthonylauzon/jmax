@@ -1,6 +1,6 @@
 //
 // jMax
-// Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
+// Copyright (C) 1999 by IRCAM
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,31 +18,28 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
-// Based on Max/ISPW by Miller Puckette.
-//
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.mda;
+package ircam.jmax.mda; 
 
-/** The mda module; the init function is called at init time
- *  by jmax, and install module related things.
+
+/**
+ * A MaxExecutedScriptDocument is an empty document resulting from
+ * the execution of a simple script file; it exists so that we
+ * can execute scripts files with "Open".
  */
 
-public class MdaModule
+abstract public class MaxExecutedScriptDocument extends MaxDocument 
 {
-  static public void initModule()
+  public MaxExecutedScriptDocument(MaxContext context, String extension)
   {
-    // Install the local mda entities
-
-    // Mda.installDocumentHandler( new MaxTclFileDocumentHandler());
-
-      // moved to script.tcl.TclInterpreter.
-      //Mda.installDocumentHandler( new MaxTclExecutedDocumentHandler());
-      //Mda.installDocumentType(new MaxTclExecutedDocumentType());
-
-    // Install the tcl commands for Mda
-
-    /* ircam.jmax.mda.tcl.TclMdaPackage.installPackage(); Moved to ircam.jmax.script.tcl.TclInterpreter */
+    super(context, Mda.getDocumentTypeByName(extension));
   }
 }
+
+
+
+
+
+

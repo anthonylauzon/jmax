@@ -28,11 +28,10 @@ package ircam.jmax.mda;
 import java.io.*;
 import java.util.*;
 
-import tcl.lang.*;
-
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.script.*;
 
 /**
  * This class represent the environement where a patch is loaded.
@@ -105,10 +104,10 @@ public class MaxEnv
 	command.addElement(dir);
 
 	MaxApplication.getFts().ucsCommand(command);
-	MaxApplication.getTclInterp().eval("sourceFile " + file.getPath());
+	MaxApplication.getInterpreter().load(file);
 
       }
-    catch (tcl.lang.TclException e)
+    catch (ScriptException e)
       {
       }
   }

@@ -335,8 +335,8 @@ public class Mda
     throw new MaxDocumentException("Cannot create document for " + data);
   }
 
-
-  static private class MaxAllDocumentFileFilter extends FileFilter
+    /* Added full class name to FileFilter because clash with java.io.FileFilter in JDK 1.2 */
+  static private class MaxAllDocumentFileFilter extends javax.swing.filechooser.FileFilter
   {
     public boolean accept(File f)
     {
@@ -356,13 +356,13 @@ public class Mda
    * jMax document
    */
 
-  static public FileFilter getAllDocumentsFileFilter()
+  static public javax.swing.filechooser.FileFilter getAllDocumentsFileFilter()
   {
     return new MaxAllDocumentFileFilter();
   }
 
 
-  static private class MaxDocumentFileFilter extends FileFilter
+  static private class MaxDocumentFileFilter extends javax.swing.filechooser.FileFilter
   {
     MaxDocumentHandler documentHandler;
 
