@@ -4,7 +4,7 @@ Version: @VERSION@
 Release: 1
 Copyright: GPL
 Group: Applications/Multimedia
-Source: ftp://ftp.ircam.fr/pub/IRCAM/equipes/temps-reel/jmax/releases/jmax-%{version}.tar.gz
+Source: ftp://freesoftware.ircam.fr/pub/jmax/releases/%{version}/jmax-%{version}.tar.gz
 BuildRoot: /var/tmp/jmax-%{version}-root
 Provides: %{name}-common = %{version}, %{name}-java = %{version}
 
@@ -14,6 +14,24 @@ Provides: %{name}-common = %{version}, %{name}-java = %{version}
 %define desktop_utils   %(if which desktop-file-install 2>&1 >/dev/null ; then echo "yes" ; fi)
 
 %define vendor_name ircam
+
+# These macros doesn't seems to be defined on RedHat 9
+%define ifdef() %if %{expand:%%{?%{1}:1}%%{!?%{1}:0}}
+%define ifndef() %if %{expand:%%{?%{1}:0}%%{!?%{1}:1}}
+
+# We use these macros to set path to java, javac and jar when calling rpmbuild
+# Use the --define='' flag of rpmbuild
+# e.g:
+# rpmbuild --define='javac /usr/java/j2sdk1.4.1_02/bin/javac' --define='java /usr/java/j2sdk1.4.1_02/bin/java' -ba jmax.spec
+%ifndef java
+%define java java
+%endif
+%ifndef javac
+%define javac javac
+%endif
+%ifndef jar
+%define jar jar
+%endif
 
 %description
 jMax is a visual programming environment for developing real-time, interactive multimedia applications. 
@@ -55,7 +73,10 @@ Jack Audio Connection Kit support for jMax
 %prep
 %setup -n jmax-%{version}
 %build
-./configure --with-java=java --with-javac=javac --enable-jack
+# Use the --define='' flag of rpmbuild to set which java, javac and jar to use.
+# e.g:
+# rpmbuild --define='javac /usr/java/j2sdk1.4.1_02/bin/javac' --define='java /usr/java/j2sdk1.4.1_02/bin/java' -ba jmax.spec
+./configure --with-java=%{java} --with-javac=%{javac} --with-jar=%{jar} --enable-jack
 make
 
 %install
@@ -67,10 +88,10 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
 
 # remove jack to avoid libjack dependency in jmax package and common subpackage
-find $RPM_BUILD_ROOT%{_datadir}/jmax ! -type d ! -name "*.jar"| grep -v "jack" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.common.list
+find $RPM_BUILD_ROOT%{_libdir}/jmax ! -type d ! -name "*.jar"| grep -v "jack" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.common.list
 
 # for java rpm
-find $RPM_BUILD_ROOT%{_datadir}/jmax -name "*.jar" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.java.list
+find $RPM_BUILD_ROOT%{_libdir}/jmax -name "*.jar" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.java.list
 
 # for global rpm (without jack support)
 cat /var/tmp/rpm.jmax.java.list /var/tmp/rpm.jmax.common.list >> /var/tmp/rpm.jmax.global.list
@@ -108,7 +129,7 @@ rm -rf $RPM_BUILD_DIR/jmax-%{version}
 
 %files -f /var/tmp/rpm.jmax.global.list
 %defattr(-, root, root)
-%doc LICENCE.fr LICENSE README doc/*
+%doc COPYING README AUTHORS ChangeLog doc/*
 %{_bindir}/jmax
 %attr(4755, root, root) %{_bindir}/fts
 %{_libdir}/libfts-%{version}.so
@@ -146,13 +167,18 @@ rm -rf $RPM_BUILD_DIR/jmax-%{version}
 %defattr(-,root,root)
 %{_includedir}/fts/client
 %{_libdir}/libftsclient.*
-%{_datadir}/jmax/client/python
+%{_libdir}/jmax/client/python
 
 %files jack
 %defattr(-,root,root)
-%{_datadir}/jmax/packages/jack
+%{_libdir}/jmax/packages/jack
 
 %changelog
+* Thu Jul 24 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
+- added macros to set path for java, javac and jar. (use --define='java path_to_java' when calling rpmbuild).
+- removed obsolete files (LICENCE.fr, LICENSE).
+- added new licence file COPYING.
+- added ChangeLog and AUTHORS in doc directory.
 * Wed May 28 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
 - removed file list in %clean script
 - removed directory created when sources are extracted from tarball
