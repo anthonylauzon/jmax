@@ -20,3 +20,4 @@ iomodule.h
 
 libio_la_LDFLAGS= -module
 
+INCLUDES=-I$(top_srcdir)/include

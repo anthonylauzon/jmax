@@ -6,7 +6,7 @@ fit.c \
 rewrap.c \
 wrap.c 
 
-INCLUDES=-I@top_srcdir@/packages/data/c/src -I@top_srcdir@/packages/utils/c/src
+INCLUDES=-I$(top_srcdir)/include -I$(top_srcdir)/packages/data/c/src -I$(top_srcdir)/packages/utils/c/src
 
 noinst_HEADERS= \
 numeric.h

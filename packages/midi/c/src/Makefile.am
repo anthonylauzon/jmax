@@ -12,3 +12,4 @@ midi.h
 
 libmidi_la_LDFLAGS= -module
 
+INCLUDES=-I$(top_srcdir)/include
