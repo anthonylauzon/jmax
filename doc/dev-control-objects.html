@@ -401,19 +401,12 @@ which is usually called when initializing the class. This function defines
 to which message the method will be associated, and which kind of
 arguments it expects.
 
-<ul>
-<li> <a href="#The fts_method_define Function">The <code>fts_method_define</code> Function</a>
-<li> <a href="#Method Arguments Types">Method Arguments Types</a>
-<li> <a href="#Method Definition Example">Method Definition Example</a>
-<li> <a href="#Methods with Variable Arguments Number">Methods with Variable Arguments Number</a>
-</ul>
+<h3>The <code>fts_method_define</code> Function</h3>
 
-<a name="The fts_method_define Function"><h3>The <code>fts_method_define</code> Function</h3></a>
-
-<code>fts_status_t fts_method_define( fts_class_t *<i>class</i>, int <i>winlet</i>, fts_symbol_t <i>selector</i>, fts_method_t <i>method</i>, int <i>argc</i>, fts_type_t *<i>argtypes</i> )</code> <p>
+<code>fts_status_t fts_method_define_varargs( fts_class_t *<i>class</i>, int <i>winlet</i>, fts_symbol_t <i>selector</i>, fts_method_t <i>method</i>)</code> <p>
 
 <p>
-The arguments of <code>fts_method_define</code> have the following meaning :
+The arguments of <code>fts_method_define_varargs</code> have the following meaning :
 <dl>
 <dt> <i> class</i> <dd> 
 the class in which the definition is valid
@@ -425,50 +418,9 @@ selector, the method will be called with the message arguments, after
 arguments type checking
 <dt> <i> method</i> <dd> 
 the method : a function having the signature already defined
-<dt> <i> argc</i> <dd> 
-the count of expected arguments
-<dt> <i> argtypes</i> <dd> 
-the types of expected arguments : the type checking mechanism will be detailed 
-later
 </dl>
 
-
-<a name="Method Arguments Types"><h3>Method Arguments Types</h3></a>
- 
-<p>
-When defining a method associated with a message, it is necessary to define 
-the arguments types which are expected. This will be used by the system
-to do a type checking, at connection-time and at run-time (with some
-optimizations).
-
-
-<p>
-This type definition is done with 
-the <i>argtypes</i> argument of function <code>fts_method_define</code>.
-This argument is an array of elements of type <code>fts_type_t</code>,
-each element defining the expected type of the argument having
-same index in the arguments array.
-        
-<p>
-The elements of the array <i>argtypes</i> can take the following values:
-<dl>
-<dt> <code> fts_t_int</code> <dd> 
-argument must be of type <code>int</code>, initialized with <code>fts_set_int</code>
-<dt> <code> fts_t_float</code> <dd> 
-argument must be of type <code>float</code>, initialized with <code>fts_set_float</code>
-<dt> <code> fts_t_symbol</code> <dd> 
-argument must be of type <code>symbol</code>, initialized with <code>fts_set_symbol</code>
-<dt> <code> fts_t_ptr</code> <dd> 
-argument must be of type <code>ptr</code>, initialized with <code>fts_set_ptr</code>
-</dl>
-
-<p>
-For method taking one argument, the function <code>fts_type_get_selector</code>
-returns the selector (as a <code>fts_symbol_t</code>) associated with the type.
-
-
-
-<a name="Method Definition Example"><h3>Method Definition Example</h3></a>
+<h3>Method Definition Example</h3>
 
 <p>
 Below is an example showing the installation of the method <code>integer_in1</code>
@@ -478,51 +430,7 @@ inlet number 1 and takes one argument of type <code>int</code>.
 <pre>
 fts_status_t integer_instantiate( fts_class_t *class, int ac, fts_atom_t *at)
 {
-  fts_type_t t;
-
-  t = fts_t_int;
-  fts_method_define( class, 1, fts_type_get_selector(fts_t_int), integer_in1, 1, &t);
-}
-</pre>
-
-
-<a name="Methods with Variable Arguments Number"><h3>Methods with Variable Arguments Number</h3></a>
-
-<p>
-A method accepting a variable number of arguments is defined using function 
-<code>fts_method_define_optargs</code>.
-
-<code>fts_status_t fts_method_define_optargs( fts_class_t *<i>class</i>, int <i>winlet</i>, fts_symbol_t <i>selector</i>, fts_method_t <i>method</i>, int <i>argc</i>, fts_type_t *<i>argtypes</i>, int <i>min_argc</i> )</code> <p>
-
-<p>
-The arguments of <code>fts_method_define_optargs</code> are similar to <code>fts_method_define</code>,
-except for the last supplementary arguments:
-<dl>
-<dt> <i> min_argc</i> <dd> 
-the minimum count of expected arguments
-</dl>
-
-<p>
-Below is an example showing the installation of a method <code>integer_incr</code>
-for the <code>integer</code> object. This method takes zero or one argument of type <code>int</code>.
-
-<pre>
-
-void integer_incr( fts_object_t *object, int winlet, fts_symbol_t selector, 
-                  int ac, const fts_atom_t *at)
-{
-  integer_t *this = (integer_t *)object;
-  int incr = fts_get_int_arg( ac, at, 0, 1);
-
-  this->n += incr;
-}
-
-fts_status_t integer_instantiate( fts_class_t *class, int ac, fts_atom_t *at)
-{
-  fts_type_t t;
-
-  t = fts_t_int;
-  fts_method_define_optargs( class, 0, fts_new_symbol("incr"), integer_incr, 1, &t, 0);
+  fts_method_define_varargs( class, 1, fts_type_get_selector(fts_t_int), integer_in1);
 }
 </pre>
 
@@ -594,11 +502,7 @@ This method is installed by the following code :
 <pre>
 fts_status_t integer_instantiate( fts_class_t *class, int ac, fts_atom_t *at)
 {
-  fts_type_t t[2];
-
-  t[0] = fts_t_symbol;
-  t[1] = fts_t_int;
-  fts_method_define( class, fts_SystemInlet, fts_s_init, integer_init, 2, t);
+  fts_method_define_varargs( class, fts_SystemInlet, fts_s_init, integer_init);
 }
 </pre>
 
@@ -615,7 +519,7 @@ extern void fts_object_set_error(fts_object_t *obj, const char *format, ...);
 The obj argument should be the object being initialized; the format
 argument is a string in the "printf" format, followed by a variable
 number of arguments; the user interface will then show the object
-as an error object (red) and the string passed by format and the
+as an invalid object (greyed) and the string passed by format and the
 following arguments will be used as error message for the object.
 <p>
 
@@ -635,8 +539,7 @@ A delete method can be installed for the <code>integer</code> object by the foll
 <pre>
 fts_status_t integer_instantiate( fts_class_t *class, int ac, fts_atom_t *at)
 {
-  fts_method_define( class, fts_SystemInlet, fts_s_delete, integer_delete, 
-                     0, 0);
+  fts_method_define_varargs( class, fts_SystemInlet, fts_s_delete, integer_delete);
 }
 </pre>
 
@@ -707,19 +610,12 @@ is going to send only one kind of message selector, this selector and
 the types of associated arguments can be declared using the <code>fts_outlet_type_define</code>
 function.
 
-<ul>
-<li> <a href="#The fts_outlet_type_define Function">The <code>fts_outlet_type_define</code> Function</a>
-<li> <a href="#Outlet Typing Example">Outlet Typing Example</a>
-</ul>
+<h3>The <code>fts_outlet_type_define</code> Function</h3>
 
-
-<a name="The fts_outlet_type_define Function"><h3>The <code>fts_outlet_type_define</code> Function</h3></a>
-
-
-<code>fts_status_t fts_outlet_type_define( fts_class_t *<i>class</i>, int <i>woutlet</i>, fts_symbol_t <i>selector</i>,int <i>argc</i>, fts_type_t *<i>argtypes</i>)</code> <p>
+<code>fts_status_t fts_outlet_type_define_varargs( fts_class_t *<i>class</i>, int <i>woutlet</i>, fts_symbol_t <i>selector</i>)</code> <p>
 
 <p>
-The arguments of <code>fts_outlet_type_define</code> have the following meaning :
+The arguments of <code>fts_outlet_type_define_varargs</code> have the following meaning :
 <dl>
 <dt> <i> class</i> <dd> 
 the class for which the type is defined
@@ -727,15 +623,7 @@ the class for which the type is defined
 the number of the outlet for which the type is defined
 <dt> <i> selector</i> <dd> 
 the associated message selector
-<dt> <i> argc</i> <dd> 
-the count of arguments
-<dt> <i> argtypes</i> <dd> 
-the types of message arguments
 </dl>
-
-<p>
-The types of message arguments are the same as for function <code>fts_method_define</code>.
- 
 
 <p>
 The type of an outlet will be used by the system
@@ -753,7 +641,7 @@ it must <i>not</i> be typed; this means that the symbol <code>fts_s_anything</co
 is not accepted as argument to this function.
 
 
-<a name="Outlet Typing Example"><h3>Outlet Typing Example</h3></a>
+<h3>Outlet Typing Example</h3>
 
 <p>
 The following code defines the type of the outlet for the <code>integer</code>
@@ -763,10 +651,7 @@ with selector <code>int</code> and one argument of type <code>int</code>.
 <pre>
 fts_status_t integer_instantiate( fts_class_t *class, int ac, fts_atom_t *at)
 {
-  fts_type_t a;
-
-  a = fts_t_int;
-  fts_outlet_type_define(class, 0, fts_type_get_selector( fts_t_int), 1, &t);
+  fts_outlet_type_define_varargs(class, 0, fts_type_get_selector( fts_t_int));
 }
 </pre>
 
@@ -925,27 +810,22 @@ The objects of this class have 2 inlets and 1 outlet :
 <pre>
 fts_status_t integer_instantiate( fts_class_t *class, int ac, fts_atom_t *at)
 {
-  fts_type_t t[2];
-
   fts_class_init( class, sizeof( integer_t), 2, 1, 0);
 
-  t[0] = fts_t_symbol;
-  t[1] = fts_t_int;
   /* init method */
-  fts_method_define( class, fts_SystemInlet, fts_s_init, integer_init, 2, t);
+  fts_method_define_varargs( class, fts_SystemInlet, fts_s_init, integer_init);
 
-  t[0] = fts_t_int;
   /* message "int" on inlet 0 method */
-  fts_method_define( class, 0, fts_type_get_selector( fts_t_int), integer_int, 1, t);
+  fts_method_define_varargs( class, 0, fts_type_get_selector( fts_t_int), integer_int);
 
   /* message "int" on inlet 1 method */
-  fts_method_define( class, 1, fts_type_get_selector( fts_t_int), integer_in1, 1, t);
+  fts_method_define_varargs( class, 1, fts_type_get_selector( fts_t_int), integer_in1);
 
   /* message "bang" on inlet 0 method */
-  fts_method_define( class, 0, fts_s_bang, integer_bang, 0, 0);
+  fts_method_define_varargs( class, 0, fts_s_bang, integer_bang, 0, 0);
 
   /* outlet type is int */
-  fts_outlet_type_define(class, 0, fts_type_get_selector( fts_t_int), 1, t);
+  fts_outlet_type_define_varargs(class, 0, fts_type_get_selector( fts_t_int));
 
   return fts_Success;
 }
@@ -1130,11 +1010,9 @@ static fts_status_t bangbang_instantiate(fts_class_t *class, int ac, const fts_a
 
   fts_class_init(class, sizeof(bangbang_t), 1, noutlets, 0);
 
-  fts_method_define(class, 0, fts_s_bang, bangbang_bang, 0, 0);
+  fts_method_define_varargs(class, 0, fts_s_bang, bangbang_bang);
 
-  t[0] = fts_t_symbol;
-  t[1] = fts_t_int;
-  fts_method_define( class, fts_SystemInlet, fts_s_init, bangbang_init, 2, &a);
+  fts_method_define_varargs( class, fts_SystemInlet, fts_s_init, bangbang_init);
 
   for (i = 0; i < noutlets; i++)
     fts_outlet_type_define( class, i, fts_s_bang, 0, 0);
