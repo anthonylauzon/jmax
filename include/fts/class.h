@@ -83,7 +83,8 @@ struct fts_class {
   fts_class_copy_function_t copy_function;
   fts_class_array_function_t array_function;
   fts_class_interpolation_select_t interpolation_select;
-  fts_array_t import_handlers;	  /* list of import handlers */
+  fts_list_t *import_handlers;	  /* list of import handlers */
+  fts_list_t *export_handlers;	  /* list of export handlers */
 
   fts_instantiate_fun_t instantiate_fun;
 
@@ -214,10 +215,21 @@ FTS_API void fts_class_input_handler(fts_class_t *cl, fts_method_t method);
  *  An import handler is called with the object to import into, and
  *  the list of filename and arguments.  It should examine the object
  *  type (or subtype), and the file, to see if it can be imported.  If
- *  not, just return false and don't make any fuss (don't print error
- *  messages).
+ *  not, just return false (a void atom with fts_return) and don't
+ *  make any fuss (don't print error messages).
  */
 FTS_API void fts_class_add_import_handler (fts_class_t *cl, fts_method_t func);
+
+
+/** prepend export handler to list of handlers to try 
+ *
+ *  An export handler is called with the object to export from, and
+ *  the list of filename and arguments.  It should examine the object
+ *  type (or subtype), and the filename extension, to see if it can
+ *  export to that type of file.  If not, just return a void atom and don't
+ *  make any fuss (don't print error messages).
+ */
+FTS_API void fts_class_add_export_handler (fts_class_t *cl, fts_method_t func);
 
 
 /**

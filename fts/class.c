@@ -89,7 +89,8 @@ fts_class_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
   fts_class_set_array_function (cl, NULL);
   fts_class_set_interpolation_select (cl, default_interpolation_select);
   
-  fts_array_init(&cl->import_handlers, 0, NULL);
+  cl->import_handlers = NULL;
+  cl->export_handlers = NULL;
 
   if (name != NULL)
   {
@@ -673,7 +674,16 @@ fts_class_add_import_handler (fts_class_t *cl, fts_method_t func)
     fts_atom_t a;
 
     fts_set_pointer(&a, func);
-    fts_array_prepend(&cl->import_handlers, 1, &a);
+    cl->import_handlers = fts_list_prepend(cl->import_handlers, &a);
+}
+
+void 
+fts_class_add_export_handler (fts_class_t *cl, fts_method_t func)
+{
+    fts_atom_t a;
+
+    fts_set_pointer(&a, func);
+    cl->export_handlers = fts_list_prepend(cl->export_handlers, &a);
 }
 
 

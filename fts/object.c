@@ -254,24 +254,48 @@ fts_object_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 void fts_object_import (fts_object_t *o, int winlet, fts_symbol_t s, 
 			int ac, const fts_atom_t *at)
 {
-    fts_array_t *handlers = &(fts_object_get_class(o)->import_handlers);
-    int i, done = 0;
+    fts_list_t *handlers = fts_object_get_class(o)->import_handlers;
 
-    for (i = 0; i < fts_array_get_size(handlers)  &&  !done; i++)
-    {
-	fts_method_t func = fts_get_pointer(fts_array_get_element(handlers, i));
-
-	/* try handler */
-	func(o, winlet, s, ac, at);
-
-	/* check if return atom is not void == success */
-	done = !fts_is_void(fts_get_return_value());
-    }
-    
-    if (!done)
+    if (!fts_object_try_handlers(handlers, o, winlet, s, ac, at))
 	fts_object_error(o, "import: cannot import file to %s", 
 			 fts_symbol_name(fts_object_get_class_name(o)));
 }
+
+
+/* try export handlers from list in class until one returns true */
+void fts_object_export (fts_object_t *o, int winlet, fts_symbol_t s, 
+			int ac, const fts_atom_t *at)
+{
+    fts_list_t *handlers = fts_object_get_class(o)->export_handlers;
+
+    if (!fts_object_try_handlers(handlers, o, winlet, s, ac, at))
+	fts_object_error(o, "import: cannot export file to %s", 
+			 fts_symbol_name(fts_object_get_class_name(o)));
+}
+
+
+/* try list of functions until one returns true (anything but void) */
+int fts_object_try_handlers (fts_list_t *handlers, fts_object_t *o, int w, 
+			     fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+    int done = 0;
+
+    while (handlers  &&  !done)
+    {
+	fts_method_t func = fts_get_pointer(fts_list_get(handlers));
+
+	/* try handler */
+	func(o, w, s, ac, at);
+
+	/* check if return atom is not void == success */
+	done = !fts_is_void(fts_get_return_value());
+
+	handlers = fts_list_next(handlers);
+    }
+    
+    return done;
+}
+
 
 /* open dialog and then call "import" method with the selected filename */
 void
@@ -280,4 +304,17 @@ fts_object_import_dialog (fts_object_t *o, int winlet, fts_symbol_t s,
 {
     fts_object_open_dialog(o, fts_s_import, 
 			   fts_new_symbol("Open file to import"));
+}
+
+
+/* open dialog and then call "export" method with the selected filename */
+void
+fts_object_export_dialog (fts_object_t *o, int winlet, fts_symbol_t s, 
+			  int ac, const fts_atom_t *at)
+{
+    fts_symbol_t default_name = fts_new_symbol("untitled");
+
+    fts_object_save_dialog(o, fts_s_export, 
+			   fts_new_symbol("Select file to export"),
+			   fts_project_get_dir(), default_name);
 }

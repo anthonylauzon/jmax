@@ -202,7 +202,8 @@ static fts_class_t VAR =                                        \
   0, /* array_function */                                       \
   0, /* description_function */                                 \
   0, /* interpolation_select */                                 \
-  { 0, 0, 0, 0 }, /* struct fts_array import_handlers */        \
+  0, /* fts_list_t *import_handlers */				\
+  0, /* fts_list_t *export_handlers */				\
   0, /* instantiate_fun */                                      \
   0, /* constructor */                                          \
   0, /* deconstructor */                                        \

@@ -49,6 +49,7 @@ struct fts_object {
   fts_context_t *context; /* (back) pointer to container (or container related data structure) */
 };
 
+
 /**
  * Create an instance of a class.
  *
@@ -94,12 +95,23 @@ FTS_API void fts_object_upload(fts_object_t *obj);
 #define fts_object_set_context(o, c) ((o)->context = c)
 #define fts_object_get_container(o) (((o)->context != NULL)? ((o)->context->container): NULL)
 
-/** try import handlers from list in class until one returns true */
+
+/** try import handlers from class with the given arguments
+    until one returns true */
 FTS_API void fts_object_import (fts_object_t *o, int winlet, fts_symbol_t s, 
 				int ac, const fts_atom_t *at);
 
+/** try export handlers from class with the given arguments
+    until one returns true */
+FTS_API void fts_object_export (fts_object_t *o, int winlet, fts_symbol_t s, 
+				int ac, const fts_atom_t *at);
+
 /** open dialog and then call "import" method with the selected filename */
-FTS_API void fts_object_import_dialog (fts_object_t *o, int wt, fts_symbol_t s,
+FTS_API void fts_object_import_dialog (fts_object_t *o, int w, fts_symbol_t s,
+				       int ac, const fts_atom_t *at);
+
+/** open dialog and then call "export" method with the selected filename */
+FTS_API void fts_object_export_dialog (fts_object_t *o, int w, fts_symbol_t s, 
 				       int ac, const fts_atom_t *at);
 
 
