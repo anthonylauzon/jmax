@@ -22,5 +22,6 @@ public class VerboseMouseTracker extends MouseTracker {
 			   (egc.getAdapter().getInvX(e.getX()))+
 			   ", "+
 			   (egc.getAdapter().getInvY(e.getY())));
+    ScoreBackground.pressKey(egc.getAdapter().getInvY(e.getY()), egc);
   }
 }

@@ -29,7 +29,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     setSize(PANEL_WIDTH, PANEL_HEIGHT);
     setLayout(new BorderLayout());
     setBackground(Color.white);
-    setDoubleBuffered(true);
+    setDoubleBuffered(false);
 
     tools = new Vector();
 
@@ -73,7 +73,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     };
 
     itsScore.setBounds(0, itsStatusBar.getSize().height, PANEL_WIDTH, PANEL_HEIGHT);
-
+    itsScore.setDoubleBuffered(false);
     add(itsScore, BorderLayout.CENTER);
 
     { //-- prepares the graphic context

@@ -109,10 +109,9 @@ public class ExplodeSelectionMover extends SelectionMover  implements XORPainter
 
     Graphics g = gc.getGraphicDestination().getGraphics();
     g.setColor(Color.gray);
-    g.setXORMode(Color.white); //there's an assumption here on the color of the background.
+    g.setXORMode(Color.white); 
 
     if (dragMode == RECT_DRAG) {
-      // if there are more then 20 elements to move, move the enclosing rect
       
       if ((itsMovements & MoverTool.HORIZONTAL_MOVEMENT) != 0) 
 	enclosingRect.x += dx-previousX;
@@ -127,11 +126,11 @@ public class ExplodeSelectionMover extends SelectionMover  implements XORPainter
 	ScrEvent aScrEvent;
 	Adapter a = ((ExplodeGraphicContext) gc).getAdapter();
 	ObjectRenderer er = gc.getRenderManager().getObjectRenderer();
-
+	boolean singleObject = ExplodeSelection.getSelection().size()==1;
 	for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
 	  {
 	    aScrEvent = (ScrEvent) e.nextElement();
-	    
+
 	    a.setX(tempEvent, a.getX(aScrEvent));
 	    a.setY(tempEvent, a.getY(aScrEvent));
 	    a.setLenght(tempEvent, a.getLenght(aScrEvent));
@@ -142,6 +141,8 @@ public class ExplodeSelectionMover extends SelectionMover  implements XORPainter
 	      a.setY(tempEvent, a.getY(aScrEvent)+dy);
 	    
 	    er.render(tempEvent, g, true);
+	    if (singleObject) 
+	      ScoreBackground.pressKey(tempEvent.getPitch(), gc);
 	  }
       }
     

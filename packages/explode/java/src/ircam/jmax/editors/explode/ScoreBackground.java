@@ -36,6 +36,7 @@ public class ScoreBackground implements Layer{
     g.fillRect(0, 0, d.width, d.height);
     int positionY;
 
+    // the minor subdivision
     g.setColor(horizontalGridLinesColor);
     for (int i = 0; i < 381; i+=9)
       {
@@ -43,20 +44,67 @@ public class ScoreBackground implements Layer{
 	g.drawLine(31, positionY, d.width, positionY);
       }
 
+    // the major subdivision lines and numbers
     g.setColor(Color.black);
-
     for (int j = 0; j < 381; j+=36)
       {
 	positionY = 409-j;
-	g.drawLine(31, positionY, d.width, positionY);
+	g.drawLine(56, positionY, d.width, positionY);
 	g.drawString(""+j/3, 10, positionY+3);
       }
 
-    // and the last line...
-    g.drawLine(31, 28, d.width, 28);
+    // the last (127) line and number
+    g.drawLine(56, 28, d.width, 28);
     g.drawString(""+127, 10, 31);
+
+    // and the piano keys...
+    for (int i = 0; i < 127; i++)
+      {
+	positionY = 409-(i*3)-1;
+	if (isAlteration(i)) 
+	  {
+	    g.setColor(Color.darkGray);
+	    g.fillRect(31, positionY, 24, 3);
+	  }
+	else 
+	  {
+	    g.setColor(Color.lightGray);
+	    g.fillRect(31, positionY, 25, 3);
+	  }
+      }
   }
 
+  public static boolean isAlteration(int note)
+  {
+    int local = note % 12;
+    return (local == 1 || local == 3 || local == 6 || local == 8 || local == 10);
+  }
+
+  static int currentPressedKey = -1;
+  static public void pressKey(int key, GraphicContext sgc)
+  {
+    if (key < 0 || key > 127) return;
+    if (currentPressedKey != -1 && currentPressedKey != key) releaseKey(sgc);
+    int positionY = 409-(key*3)-1;
+    Graphics g = sgc.getGraphicDestination().getGraphics();
+    g.setColor(Color.white);
+    g.fillRect(31, positionY, 25, 3);
+    g.dispose();
+    currentPressedKey = key;
+  }
+
+  static public void releaseKey(GraphicContext sgc)
+  {
+    if (currentPressedKey == -1) return;
+    int positionY = 409-(currentPressedKey*3)-1;
+    Graphics g = sgc.getGraphicDestination().getGraphics();
+    if (isAlteration(currentPressedKey))
+      g.setColor(Color.darkGray);
+    else g.setColor(Color.lightGray);
+    g.fillRect(31, positionY, 25, 3);
+    g.dispose();
+    currentPressedKey = -1;
+  }
 
   /**
    * Layer interface. Draw the background */
