@@ -37,7 +37,7 @@ public class FtsOutletObject  extends FtsObject
     FtsServer.getServer().newOutletObject(parent, this); // create the fts outlet
 
     ninlets = 1;
-    noutlets = 1;
+    noutlets = 0;
   }
 
 
@@ -52,7 +52,7 @@ public class FtsOutletObject  extends FtsObject
     FtsServer.getServer().newOutletObject(parent, this, position);// create the fts inlet
 
     ninlets = 1;
-    noutlets = 1;
+    noutlets = 0;
   }
 
 

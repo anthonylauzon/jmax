@@ -36,7 +36,7 @@ public class FtsInletObject  extends FtsObject
 
     FtsServer.getServer().newInletObject(parent, this); // create the fts inlet
 
-    ninlets = 1;
+    ninlets = 0;
     noutlets = 1;
   }
 
@@ -51,7 +51,7 @@ public class FtsInletObject  extends FtsObject
 
     FtsServer.getServer().newInletObject(parent, this, position);// create the fts inlet
 
-    ninlets = 1;
+    ninlets = 0;
     noutlets = 1;
   }
 

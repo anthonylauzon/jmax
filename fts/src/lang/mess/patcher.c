@@ -119,7 +119,7 @@ inlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* initialize the class */
 
-  fts_class_init(cl, sizeof(fts_inlet_t),  1, 1, 0);
+  fts_class_init(cl, sizeof(fts_inlet_t),  0, 1, 0);
 
   /* define the system methods */
 
@@ -231,7 +231,7 @@ outlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* initialize the class */
 
-  fts_class_init(cl, sizeof(fts_outlet_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(fts_outlet_t), 1, 0, 0);
 
   /* define the init system method */
 
@@ -295,7 +295,8 @@ patcher_replace(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   for (i = fts_object_get_inlets_number((fts_object_t *) new);
        i < fts_object_get_inlets_number((fts_object_t *) old);
        i++)
-    fts_object_delete((fts_object_t *) (old->inlets[i]));
+    if (old->inlets[i])
+      fts_object_delete((fts_object_t *) (old->inlets[i]));
     
   /* Move the other inlets to the new patcher (if any) */
 
@@ -317,7 +318,8 @@ patcher_replace(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   for (i = fts_object_get_outlets_number((fts_object_t *) new);
        i < fts_object_get_outlets_number((fts_object_t *) old);
        i++)
-    fts_object_delete((fts_object_t *) (old->outlets[i]));
+    if (old->outlets[i])
+      fts_object_delete((fts_object_t *) (old->outlets[i]));
 
   /* Move the other outlets to the new patcher, leaving to zero
      the non-initialized inlets.

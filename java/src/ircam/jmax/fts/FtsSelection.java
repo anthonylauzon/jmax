@@ -91,7 +91,7 @@ public class FtsSelection extends FtsAbstractContainerObject
     // First, store the declarations; declaration don't have
     // connections, so we don't store them in variables.
 
-    writer.println(" {");
+    // writer.println(" {");
 
     if (writer instanceof IndentedPrintWriter)
       ((IndentedPrintWriter)writer).indentMore();
@@ -136,7 +136,7 @@ public class FtsSelection extends FtsAbstractContainerObject
     if (writer instanceof IndentedPrintWriter)
       ((IndentedPrintWriter)writer).indentLess();
     
-    writer.print("}");
+    // writer.print("}");
   }
 }
 

@@ -815,7 +815,7 @@ sgi_midi_put(fts_dev_t *dev, unsigned char c)
 	  mdSend(data->out_port, &(data->out_midi_event), 1);
 
 	  /* keep status to sysex, setting count to 0 and msg[0] to 0xf0 */
-
+z
 	  data->out_sysex_count = 0;
 
 	  data->output_status = getting_sysex;
