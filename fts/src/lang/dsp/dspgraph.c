@@ -663,8 +663,8 @@ fts_dsp_graph_remove_object(fts_dsp_graph_t *graph, fts_object_t *o)
   fts_dsp_node_t **nodes_ptr = &graph->nodes;
   fts_dsp_node_t *node;
   fts_dsp_node_t *prev_node;
-
-  fts_dsp_graph_reset(graph);
+  
+  fts_param_set_int(fts_s_dsp_on, 0);
 
   _fts_object_remove_prop(o, fts_s_dsp_descr);
   
@@ -727,3 +727,4 @@ fts_dsp_graph_config(void)
   sym_builtin_add = fts_new_symbol( "__builtin_add");
   dsp_declare_function( sym_builtin_add, dsp_graph_builtin_add);
 }
+
