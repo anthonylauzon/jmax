@@ -598,20 +598,8 @@
 			path = ../../fts/audioconfig.c;
 			refType = 2;
 		};
-		F5A2D68B03A1193601664092 = {
-			isa = PBXFileReference;
-			name = audiolabel.c;
-			path = ../../fts/audiolabel.c;
-			refType = 2;
-		};
 		F5A2D68C03A1193601664092 = {
 			fileRef = F5A2D68A03A1193601664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F5A2D68D03A1193601664092 = {
-			fileRef = F5A2D68B03A1193601664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -13441,7 +13429,6 @@
 				F880FD4A0282FA3901664092,
 				F5A2D68A03A1193601664092,
 				F880FD4B0282FA3901664092,
-				F5A2D68B03A1193601664092,
 				F880FD4C0282FA3901664092,
 				F8677A5F02E5C2CF01664092,
 				F880FD4D0282FA3901664092,
@@ -13936,7 +13923,6 @@
 				F5BE0CA2035DAA3201664092,
 				F52946EB039E799A01664092,
 				F5A2D68C03A1193601664092,
-				F5A2D68D03A1193601664092,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
