@@ -81,16 +81,19 @@ static void in_tilda_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac
 {
   in_tilda_t *this = (in_tilda_t *)o;
 
-  if (this->channel >= 0)
+  if(this->port)
     {
-      int i;
-
-      for ( i = 0; i < fts_object_get_outlets_number( o); i++)
-	fts_audioport_remove_input_object( this->port, i, (fts_object_t *)this);
-    }
-  else
-    {
-      fts_audioport_remove_input_object( this->port, this->channel, (fts_object_t *)this);
+      if (this->channel >= 0)
+	{
+	  int i;
+	  
+	  for ( i = 0; i < fts_object_get_outlets_number( o); i++)
+	    fts_audioport_remove_input_object( this->port, i, (fts_object_t *)this);
+	}
+      else
+	{
+	  fts_audioport_remove_input_object( this->port, this->channel, (fts_object_t *)this);
+	}
     }
 }
 
