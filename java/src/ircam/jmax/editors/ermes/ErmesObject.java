@@ -237,9 +237,8 @@ public class ErmesObject implements FtsPropertyHandler {
       }
       if(offGraphics!= null) itsSketchPad.repaint();//???????
     }
-
+    
     //prepare to be waked up when values change
-
     if(NeedPropertyHandler()){
       itsFtsObject.watch("value", this);
     }

@@ -32,7 +32,9 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     setVisible(false);
     setLocation(-200,-200);
     focused = false;
-    itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
+
+    if(itsSketchPad.itsToolBar.locked) itsSketchPad.editStatus = ErmesSketchPad.START_ADD;
+    else itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
     itsOwner.itsInEdit = false;
 
     if (itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
