@@ -21,17 +21,7 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
     super();
   }
 
-  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-    super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
-    return true;
-  }
-
-  public boolean Init(ErmesSketchPad theSketchPad,FtsObject theFtsObject) {
-    super.Init(theSketchPad, theFtsObject);
-    return true;
-  }
-
-  // starting of the graphic/FTS mix
+  
   
   public void makeFtsObject() {
     try
@@ -49,6 +39,7 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
     
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
     if (itsSketchPad.itsRunMode || evt.isControlDown()) {
+      
       itsFtsObject.sendMessage(0, "bang", null);
     }
     else 
@@ -62,8 +53,6 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
     
     if (on_off == 1) {
       itsFlashing = true;
-      //      if (whichToProbe == this) 
-      //itsProbe.mark("bang");
     }
     else {
        itsFlashing = false;

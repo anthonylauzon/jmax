@@ -35,58 +35,37 @@ import ircam.jmax.fts.*;
   }
 
   //--------------------------------------------------------
-  // Init
+  // Init from skratch
   //--------------------------------------------------------
-  //this 'glue' method is called when the external (or the message) have not their arguments yet
-  //and we have to create also the (static) ErmesObjEditableField 
-  public boolean Init(ErmesSketchPad theSketchPad, int x, int y) {
-    super.Init(theSketchPad, x, y, "");
+
+  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
+    super.Init(theSketchPad, x, y, theString);
     
-    FIELD_HEIGHT = itsFontMetrics.getHeight();
-    FIELD_WIDTH = itsFontMetrics.stringWidth("0");
-    preferredSize = new Dimension(70/*FIELD_WIDTH+2*WIDTH_DIFF*/,FIELD_HEIGHT+2*HEIGHT_DIFF);
-    itsSketchPad.GetEditField().setFont(getFont());
-    itsSketchPad.GetEditField().setText("");
-    itsSketchPad.GetEditField().itsOwner = this; //redirect the only editable field to point here...
-    setJustification(itsSketchPad.itsJustificationMode);
-    makeCurrentRect(x,y); //redo it..
-    
-    itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight() + 20);
-    //DoublePaint();
-    itsSketchPad.editStatus = itsSketchPad.EDITING_OBJECT;
-    
-    itsSketchPad.GetEditField().setVisible(true);
-    itsSketchPad.GetEditField().requestFocus();
- 
-    return true;
-  }
-  
-  //--------------------------------------------------------
-  // Init
-  //--------------------------------------------------------
-  //this method is called when the external (or the message) have their arguments
-  //this happens (for now) just when we are instantiating from a script
-  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String args) {
-    super.Init(theSketchPad, x, y, args);//new
-    /*old setFont(itsSketchPad.sketchFont);
-      itsFontMetrics = itsSketchPad.getFontMetrics(getFont()); 
-      itsJustification = itsSketchPad.itsJustificationMode;
+    if (theString.equals("")) {
       FIELD_HEIGHT = itsFontMetrics.getHeight();
       FIELD_WIDTH = itsFontMetrics.stringWidth("0");
       preferredSize = new Dimension(70, FIELD_HEIGHT+2*HEIGHT_DIFF);
-      super.Init(theSketchPad, x, y, args);
+      itsSketchPad.GetEditField().setFont(getFont());
+      itsSketchPad.GetEditField().setText("");
+      itsSketchPad.GetEditField().itsOwner = this; //redirect the only editable field to point here...
+      setJustification(itsSketchPad.itsJustificationMode);
+      makeCurrentRect(x,y); //redo it..
       
-      ResizeToText(0, 0);	//will it work?*/
+      itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight() + 20);
+      //DoublePaint();
+      itsSketchPad.editStatus = itsSketchPad.EDITING_OBJECT;
+      
+      itsSketchPad.GetEditField().setVisible(true);
+      itsSketchPad.GetEditField().requestFocus();
+    }
     return true;
   }
+  
 
   //--------------------------------------------------------
-  // Init
+  // Init from ftsObjects
   //--------------------------------------------------------
   public boolean Init(ErmesSketchPad theSketchPad,  FtsObject theFtsObject) {
-  	//the Fontmetrics problem: the ErmesObject.Init function need the currentRect already set, 
-  	// but for editable objects this depends from itsFontMetrics.
-  	// malheureusement, the itsFontMetrics field is built... in ErmesObject.Init !
 
     // MDC: itsArgs is set by the Init methods of the subclasses
 
@@ -272,10 +251,6 @@ import ircam.jmax.fts.*;
     }
   }
 
-  /*void putOtherProperties(FtsObject theFObject){
-    if (getJustification() != itsSketchPad.itsJustificationMode)
-      theFObject.put("jsf", getJustification());
-  }*/
 
   protected void DrawParsedString(Graphics theGraphics){
     String aString;

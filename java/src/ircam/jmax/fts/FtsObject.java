@@ -344,7 +344,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 	  setDirty();
 
 	Fts.getServer().putObjectProperty(this, name, value);
-
+	
 	localPut(name, value, author);
       }
   }

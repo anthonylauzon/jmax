@@ -18,15 +18,6 @@ class ErmesObjMessage extends ErmesObjEditableObject {
   }
 	
 	
-  //--------------------------------------------------------
-  // Init
-  //--------------------------------------------------------
-  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-    if (theString.equals("")) super.Init(theSketchPad, x, y);	//we don't have arguments yet
-    else super.Init(theSketchPad, x, y, theString);//OK, we have the args
-    return true;
-  }
-
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
     // Added by MDC; get the correct String from the object, and then call super
     // It is needed because ErmesObjExternal and ErmesObjMessage use different methods

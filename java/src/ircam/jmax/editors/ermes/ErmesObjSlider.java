@@ -125,7 +125,7 @@ class ErmesObjSlider extends ErmesObject {
     int temp = theCurrentInt.intValue();        
     int clippedValue = (temp<itsRangeMin)?itsRangeMin:((temp>=itsRangeMax)?itsRangeMax:temp);
     itsInteger = clippedValue;
-    itsFtsObject.put("value", new Integer(itsInteger));
+    sendValue(new Integer(itsInteger));
     //Double Paint??
   }
 
@@ -144,13 +144,15 @@ class ErmesObjSlider extends ErmesObject {
       //Ok, the buffer is working, the value is the one we sent...
       receiving_index += 1;
       if (receiving_index == transmission_index) {
+	
 	receiving_index = 0;
 	transmission_index = 0;
       }
       return;
     }
     else {
-      // we're receiving other values
+      // we're receiving other values, discard the buffer
+      
       transmission_index = 0;
       receiving_index = 0;
       if (itsInteger != temp) {
@@ -184,6 +186,7 @@ class ErmesObjSlider extends ErmesObject {
       return true;
     }
     if(itsSketchPad.itsRunMode || evt.isControlDown()){
+      
       if(IsInThrottle(x,y)){
 	itsMovingThrottle = true;
 	return true;
@@ -192,8 +195,8 @@ class ErmesObjSlider extends ErmesObject {
 	if(getItsY()+getItsHeight()-BOTTOM_OFFSET>=y && getItsY()+UP_OFFSET<y) {
 	  //compute the value and send to FTS
 	  itsInteger = (int)(((getItsY()+getItsHeight())-y-BOTTOM_OFFSET)*itsStep);
-	  Trust(itsInteger);
-	  itsFtsObject.put("value", new Integer(itsInteger));
+	  //Trust(itsInteger);
+	  sendValue(new Integer(itsInteger));
 
 	  itsThrottle.Move(itsThrottle.itsX, y-2);
 	  itsMovingThrottle = true;
@@ -202,15 +205,15 @@ class ErmesObjSlider extends ErmesObject {
 	}
 	else if(getItsY()+getItsHeight()-BOTTOM_OFFSET<y){
 	  itsInteger = itsRangeMin/*0*/;
-	  Trust(itsRangeMin);
-	  itsFtsObject.put("value", new Integer(itsRangeMin));
+	  //Trust(itsRangeMin);
+	  sendValue(new Integer(itsRangeMin));
 	  itsThrottle.Move(itsThrottle.itsX, getItsY()+getItsHeight()-BOTTOM_OFFSET-2);
 
 	  Paint_specific(itsSketchPad.getGraphics());
 	}
 	else if(getItsY()+UP_OFFSET>=y){
-	  Trust(itsRangeMax);
-	  itsFtsObject.put("value", new Integer(itsRangeMax));
+	  //Trust(itsRangeMax);
+	  sendValue(new Integer(itsRangeMax));
 	  itsInteger = itsRangeMax;
 	  itsThrottle.Move(itsThrottle.itsX, getItsY()+UP_OFFSET-2);
 
@@ -223,30 +226,38 @@ class ErmesObjSlider extends ErmesObject {
     return false;
   }
 
+  private void sendValue(Integer theValue) {
+    
+    itsFtsObject.put("value", theValue, this);//don't call me back
+  }
 
   public boolean MouseDrag_specific(MouseEvent evt,int x, int y){
     if((itsSketchPad.itsRunMode || evt.isControlDown())
        &&(itsMovingThrottle == true)){
-      if(getItsY()+getItsHeight()-BOTTOM_OFFSET>=y && getItsY()+UP_OFFSET<y) {
+      if(getItsY()+getItsHeight()-BOTTOM_OFFSET>=y && getItsY()+UP_OFFSET<=y) {
 	//compute the value and send to FTS
-	if (itsInteger == (int)(((getItsY()+getItsHeight())-y-BOTTOM_OFFSET)*itsStep)) return false;
+	if (itsInteger == (int)(((getItsY()+getItsHeight())-y-BOTTOM_OFFSET)*itsStep)) 
+	    return false;
+	
 	itsInteger = (int)(((getItsY()+getItsHeight())-y-BOTTOM_OFFSET)*itsStep);
-	Trust(itsInteger+itsRangeMin);
-	itsFtsObject.put("value", new Integer(itsInteger+itsRangeMin));
+	//Trust(itsInteger+itsRangeMin);
+	sendValue(new Integer(itsInteger+itsRangeMin));
 	itsThrottle.Move(itsThrottle.itsX, y-2);
 	Paint_specific(itsSketchPad.getGraphics());
       }
       else if(getItsY()+getItsHeight()-BOTTOM_OFFSET<y){
-	Trust(itsRangeMin);
-	itsFtsObject.put("value", new Integer(itsRangeMin));
+	
+	//Trust(itsRangeMin);
+	sendValue(new Integer(itsRangeMin));
 	itsInteger = itsRangeMin;
 	itsThrottle.Move(itsThrottle.itsX, getItsY()+getItsHeight()-BOTTOM_OFFSET-2);
 
 	Paint_specific(itsSketchPad.getGraphics());
       }
-      else if(getItsY()+UP_OFFSET>=y){
-	Trust(itsRangeMax);
-	itsFtsObject.put("value", new Integer(itsRangeMax));
+      else if(getItsY()+UP_OFFSET>y){
+	
+	//Trust(itsRangeMax);
+	sendValue(new Integer(itsRangeMax));
 	itsInteger = itsRangeMax;
 	itsThrottle.Move(itsThrottle.itsX, getItsY()+UP_OFFSET-2);
 
@@ -263,7 +274,7 @@ class ErmesObjSlider extends ErmesObject {
     if(itsSketchPad.itsRunMode || evt.isControlDown() || itsMovingThrottle){
 
       itsMovingThrottle = false;
-      
+      itsFtsObject.put("value", itsInteger);
       Fts.getServer().syncToFts();
 
       return true;
@@ -328,7 +339,7 @@ class ErmesObjSlider extends ErmesObject {
     return preferredSize;
   }
 
-  void Trust (int theInt) {
+  /*  void Trust (int theInt) {
     if (transmission_index == TRUST) {
       //we sent more then TRUST values without acknowledge...
       //write a message? FTS, are you there?
@@ -339,5 +350,5 @@ class ErmesObjSlider extends ErmesObject {
     else {
       transmission_buffer[transmission_index++] = theInt;
     }
-  }
+  }*/
 }

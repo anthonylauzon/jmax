@@ -16,12 +16,10 @@ import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
 import com.sun.java.swing.*;
 
-//import com.sun.java.swing.jlf.*;
 
 /**
- * The window that contains the sketchpad. It knows the document
- * it is showing, and the fospatcher to which it is associated.
- * It handles all the sketch menus, it knows how to load from a fospatcher.
+ * The window that contains the sketchpad. It knows the ftspatcher it is editing.
+ * It handles all the sketch menus, it knows how to load from a ftspatcher.
  */
 
 public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPropertyHandler, ComponentListener{
