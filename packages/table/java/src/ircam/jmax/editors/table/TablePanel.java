@@ -734,6 +734,7 @@ public class TablePanel extends JPanel implements ToolProvider, ToolListener, St
   
   public void Close(boolean doCancel){
     ((Component)itsEditorContainer).setVisible(false);
+    MaxWindowManager.getWindowManager().removeWindow((Frame)itsEditorContainer);
   }
 }
 

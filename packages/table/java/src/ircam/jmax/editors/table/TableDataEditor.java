@@ -26,6 +26,7 @@
 package ircam.jmax.editors.table;
 
 import ircam.jmax.fts.*;
+import ircam.jmax.*;
 import ircam.jmax.mda.*;
 
 /*
@@ -61,8 +62,10 @@ public class TableDataEditor extends AbstractMaxDataEditor
     // do the work here.
 
     if (! window.isVisible())
-      window.setVisible(true);
-
+	{
+	    window.setVisible(true);
+	    MaxWindowManager.getWindowManager().addWindow(window);
+	}    
     window.itsPanel.getData().forceUpdate();
     window.toFront();
   }

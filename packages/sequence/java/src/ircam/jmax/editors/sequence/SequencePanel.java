@@ -499,7 +499,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
   }
   public void Close(boolean doCancel){
     itsContainer.getFrame().setVisible(false);
-    ftsSequenceObject.closeEditor();
+    ftsSequenceObject.closeEditor(); 
+    MaxWindowManager.getWindowManager().removeWindow((Frame)itsContainer);
   }
     
     /**

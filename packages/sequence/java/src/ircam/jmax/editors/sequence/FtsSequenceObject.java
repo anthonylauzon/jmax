@@ -29,7 +29,7 @@ import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.editors.sequence.renderers.*;
 
 /* FIXME: check how many imports are really needed */
-import ircam.jmax.MaxApplication;
+import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
@@ -83,7 +83,10 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 	  setEditorFrame(sequence);
       }
     if (! sequence.isVisible())
-      sequence.setVisible(true);
+	{
+	    sequence.setVisible(true);
+	    MaxWindowManager.getWindowManager().addWindow(sequence);
+	}   
     sequence.toFront();
   }
 
