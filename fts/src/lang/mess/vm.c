@@ -104,13 +104,14 @@
 #define OBJECT_TABLE_STACK_DEPTH 4096
 
 static fts_atom_t eval_stack[EVAL_STACK_DEPTH];
-static fts_atom_t *eval_tos = eval_stack + EVAL_STACK_DEPTH;
+static int        eval_tos = EVAL_STACK_DEPTH;
 
 static fts_object_t *object_stack[OBJECT_STACK_DEPTH];
-static fts_object_t **object_tos = object_stack + OBJECT_STACK_DEPTH;
+static int           object_tos = OBJECT_STACK_DEPTH;
 
 static fts_object_t **object_table_stack[OBJECT_TABLE_STACK_DEPTH];
-static fts_object_t ***object_table_tos = object_table_stack + OBJECT_TABLE_STACK_DEPTH;
+static int            object_table_size_stack[OBJECT_TABLE_STACK_DEPTH];
+static int            object_table_tos = OBJECT_TABLE_STACK_DEPTH;
 static fts_object_t **object_table = 0;
 
 #define MAX_BUILTIN_SYMBOLS 88
@@ -121,17 +122,17 @@ static fts_symbol_t builtin_symbols[MAX_BUILTIN_SYMBOLS];
 #ifdef  VM_SAFE
 #define CHECK_OBJ_STACK   \
       { \
-	if (object_tos < object_stack) \
+	if (object_tos < 0) \
          fprintf(stderr, "Object Stack overflow\n"); \
-      else if (object_tos > object_stack + OBJECT_STACK_DEPTH) \
+      else if (object_tos > OBJECT_STACK_DEPTH) \
          fprintf(stderr, "Object Stack underflow\n"); \
       }
 
 #define CHECK_EVAL_STACK   \
       { \
-	if (eval_tos < eval_stack) \
+	if (eval_tos <  0) \
          fprintf(stderr, "Eval Stack overflow\n"); \
-      else if (eval_tos > eval_stack + OBJECT_STACK_DEPTH) \
+      else if (eval_tos > OBJECT_STACK_DEPTH) \
          fprintf(stderr, "Eval Stack underflow\n"); \
       }
 
@@ -173,15 +174,15 @@ static void fts_object_push_assignement(fts_symbol_t name, fts_atom_t *value, vo
   fts_atom_t a;
 
   eval_tos--;
-  *eval_tos = *value;
+  eval_stack[eval_tos] = *value;
 
   fts_set_symbol(&a, fts_s_equal);
   eval_tos--;
-  *eval_tos = a;
+  eval_stack[eval_tos] = a;
 
   fts_set_symbol(&a, name);
   eval_tos--;
-  *eval_tos = a;
+  eval_stack[eval_tos] = a;
 }
 
 fts_object_t *fts_run_mess_vm(fts_object_t *parent,
@@ -194,14 +195,6 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
   unsigned char cmd;
   unsigned char *p;
   int lambda;
-
-  /* initialize the vm; this part of the code is not recursive, but it should,
-   because the vm can be called recursively for templates*/
-
-
-  /* eval_tos = eval_stack + EVAL_STACK_DEPTH; */  /* point to the actually filled cell */
-  /* object_tos = object_stack + OBJECT_STACK_DEPTH; */
-  /* object_table_tos = object_table_stack + OBJECT_TABLE_STACK_DEPTH; */
 
   /* if there is an expression argument, push the assignement description
      in the stack, so that templates will accept argument by name
@@ -219,14 +212,14 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
   /* setting arguments and parent */
 
   object_tos--;
-  *object_tos = parent;
+  object_stack[object_tos] = parent;
 
   for (i = ac - 1; i >= 0; i--)
     {
       /* Push the atoms in the value stack */
 
       eval_tos--;
-      *eval_tos = at[i];
+      eval_stack[eval_tos] = at[i];
     }
 
   /* Do the evaluation */
@@ -250,7 +243,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 #endif
 
 	    eval_tos--;
-	    fts_set_int(eval_tos, GET_B(p));
+	    fts_set_int(&eval_stack[eval_tos], GET_B(p));
 	    p++;
 	  }
 	break;
@@ -264,7 +257,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 #endif
 
 	    eval_tos--;
-	    fts_set_int(eval_tos, GET_S(p));
+	    fts_set_int(&eval_stack[eval_tos], GET_S(p));
 	    p += 2;
 	  }
 	break;
@@ -278,7 +271,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 #endif
 
 	    eval_tos--;
-	    fts_set_int(eval_tos, GET_L(p));
+	    fts_set_int(&eval_stack[eval_tos], GET_L(p));
 	    p += 4;
 	  }
 	break;
@@ -292,7 +285,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 #endif
 	    
 	    eval_tos--;
-	    fts_set_float(eval_tos, GET_F(p));
+	    fts_set_float(&eval_stack[eval_tos], GET_F(p));
 	    p += 4;
 	  }
 	break;
@@ -310,7 +303,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 #endif
 
 	    eval_tos--;
-	    fts_set_symbol(eval_tos, s);
+	    fts_set_symbol(&eval_stack[eval_tos], s);
 	    p++;
 	  }
 	break;
@@ -329,7 +322,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 #endif
 
 	    eval_tos--;
-	    fts_set_symbol(eval_tos, s);
+	    fts_set_symbol(&eval_stack[eval_tos], s);
 	    p++;
 	  }
 	break;
@@ -347,7 +340,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 #endif
 
 	    eval_tos--;
-	    fts_set_symbol(eval_tos, s);
+	    fts_set_symbol(&eval_stack[eval_tos], s);
 	    p += 2;
 	  }
 	break;
@@ -365,7 +358,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 #endif
 
 	    eval_tos--;
-	    fts_set_symbol(eval_tos, s);
+	    fts_set_symbol(&eval_stack[eval_tos], s);
 	    p += 4;
 	  }
 	break;
@@ -378,7 +371,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "SET_INT_B %d\n", GET_B(p));
 #endif
 
-	    fts_set_int(eval_tos, GET_B(p));
+	    fts_set_int(&eval_stack[eval_tos], GET_B(p));
 	    p++;
 	  }
 	break;
@@ -391,7 +384,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "SET_INT_S %d\n", GET_S(p));
 #endif
 
-	    fts_set_int(eval_tos, GET_S(p));
+	    fts_set_int(&eval_stack[eval_tos], GET_S(p));
 	    p += 2;
 	  }
 	break;
@@ -404,7 +397,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "SET_INT_L %d\n", GET_L(p));
 #endif
 
-	    fts_set_int(eval_tos, GET_L(p));
+	    fts_set_int(&eval_stack[eval_tos], GET_L(p));
 	    p += 4;
 	  }
 	break;
@@ -417,7 +410,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "SET_FLOAT %f\n", GET_F(p));
 #endif
 	    
-	    fts_set_float(eval_tos, GET_F(p));
+	    fts_set_float(&eval_stack[eval_tos], GET_F(p));
 	    p += 4;
 	  }
 	break;
@@ -430,7 +423,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "SET_BUILTIN_SYM %d\n", GET_B(p));
 #endif
 	    
-	    fts_set_symbol(eval_tos, builtin_symbols[GET_B(p)]);
+	    fts_set_symbol(&eval_stack[eval_tos], builtin_symbols[GET_B(p)]);
 	    p++;
 	  }
 	break;
@@ -444,7 +437,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "SET_SYM_B %d\n", GET_B(p));
 #endif
 
-	    fts_set_symbol(eval_tos, symbol_table[GET_B(p)]);
+	    fts_set_symbol(&eval_stack[eval_tos], symbol_table[GET_B(p)]);
 	    p++;
 	  }
 	break;
@@ -457,7 +450,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "SET_SYM_S %d\n", GET_S(p));
 #endif
 
-	    fts_set_symbol(eval_tos, symbol_table[GET_S(p)]);
+	    fts_set_symbol(&eval_stack[eval_tos], symbol_table[GET_S(p)]);
 	    p += 2;
 	  }
 	break;
@@ -470,7 +463,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "SET_SYM_L %d\n", GET_L(p));
 #endif
 
-	    fts_set_symbol(eval_tos, symbol_table[GET_L(p)]);
+	    fts_set_symbol(&eval_stack[eval_tos], symbol_table[GET_L(p)]);
 	    p += 4;
 	  }
 	break;
@@ -526,7 +519,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 #endif
 
 	    object_tos--;
-	    *object_tos =  object_table[GET_B(p)];
+	    object_stack[object_tos] = object_table[GET_B(p)];
 	    p += 1;
 	  }
 	break;
@@ -540,7 +533,8 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 #endif
 
 	    object_tos--;
-	    *object_tos =  object_table[GET_S(p)];
+	    object_stack[object_tos] = object_table[GET_S(p)];
+
 	    p += 2;
 	  }
 	break;
@@ -554,7 +548,8 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 #endif
 
 	    object_tos--;
-	    *object_tos =  object_table[GET_L(p)];
+	    object_stack[object_tos] = object_table[GET_L(p)];
+
 	    p += 4;
 	  }
 	break;
@@ -567,7 +562,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "MV_OBJ_B %d\n", GET_B(p));
 #endif
 
-	    object_table[GET_B(p)] = *object_tos;
+	    object_table[GET_B(p)] = object_stack[object_tos];
 	    p += 1;
 	  }
 	break;
@@ -580,7 +575,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "MV_OBJ_S %d\n", GET_S(p));
 #endif
 
-	    object_table[GET_S(p)] = *object_tos;
+	    object_table[GET_S(p)] = object_stack[object_tos];
 	    p += 2;
 	  }
 	break;
@@ -593,7 +588,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "MV_OBJ_L %d\n", GET_L(p));
 #endif
 
-	    object_table[GET_L(p)] = *object_tos;
+	    object_table[GET_L(p)] = object_stack[object_tos];
 	    p += 4;
 	  }
 	break;
@@ -652,12 +647,18 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "MAKE_OBJ_B %d\n", nargs);
 #endif
 
-	    new  = fts_object_new((fts_patcher_t *) (*object_tos), nargs, eval_tos);
+	    new  = fts_object_new((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
+
+#ifdef VM_DEBUG
+	    fprintf(stderr, "\t");
+	    fprintf_object(stderr, new);
+	    fprintf(stderr, "\n");
+#endif
 
 	    /* Push the object in the object stack */
 
 	    object_tos--;
-	    *object_tos = new;
+	    object_stack[object_tos] = new;
 	    p += 1;
 	  }
 	  break;	
@@ -673,12 +674,12 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "MAKE_OBJ_S %d\n", nargs);
 #endif
 
-	    new  = fts_object_new((fts_patcher_t *) (*object_tos), nargs, eval_tos);
+	    new  = fts_object_new((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
 
 	    object_tos--;
-	    *object_tos = new;
+	    object_stack[object_tos] = new;
 	    p += 2;
 	  }
 	  break;	
@@ -695,12 +696,12 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "MAKE_OBJ_L %d\n", nargs);
 #endif
 
-	    new  = fts_object_new((fts_patcher_t *) (*object_tos), nargs, eval_tos);
+	    new  = fts_object_new((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
 
 	    object_tos--;
-	    *object_tos = new;
+	    object_stack[object_tos] = new;
 	    p += 4;
 	  }
 	  break;	
@@ -716,12 +717,13 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "MAKE_TOP_OBJ_B %d\n", nargs);
 #endif
 
-	    new  = fts_object_new((fts_patcher_t *) (*object_tos), nargs + lambda, eval_tos);
+	    new  = fts_object_new((fts_patcher_t *) object_stack[object_tos], nargs + lambda,
+				  &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
 
 	    object_tos--;
-	    *object_tos = new;
+	    object_stack[object_tos] = new;
 	    p += 1;
 	  }
 	  break;	
@@ -737,12 +739,13 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "MAKE_TOP_OBJ_S %d\n", nargs);
 #endif
 
-	    new  = fts_object_new((fts_patcher_t *) (*object_tos), nargs + lambda, eval_tos);
+	    new  = fts_object_new((fts_patcher_t *) object_stack[object_tos], nargs + lambda,
+				  &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
 
 	    object_tos--;
-	    *object_tos = new;
+	    object_stack[object_tos] = new;
 	    p += 2;
 	  }
 	  break;	
@@ -758,13 +761,13 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 #ifdef VM_DEBUG
 	    fprintf(stderr, "MAKE_OBJ_L %d\n", nargs);
 #endif
-
-	    new  = fts_object_new((fts_patcher_t *) (*object_tos), nargs + lambda, eval_tos);
+	    new  = fts_object_new((fts_patcher_t *) object_stack[object_tos], nargs + lambda,
+				  &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
 
 	    object_tos--;
-	    *object_tos = new;
+	    object_stack[object_tos] = new;
 	    p += 4;
 	  }
 	  break;	
@@ -781,7 +784,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "PUT_PROP_B %s\n", fts_symbol_name(prop));
 #endif
 
-	    fts_object_put_prop(*object_tos, prop, eval_tos);
+	    fts_object_put_prop(object_stack[object_tos], prop, &eval_stack[eval_tos]);
 	    p += 1;
 	  }
 	break;
@@ -797,8 +800,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 #ifdef VM_DEBUG
 	    fprintf(stderr, "PUT_PROP_S %s\n", fts_symbol_name(prop));
 #endif
-
-	    fts_object_put_prop(*object_tos, prop, eval_tos);
+	    fts_object_put_prop(object_stack[object_tos], prop, &eval_stack[eval_tos]);
 	    p += 2;
 	  }
 	break;
@@ -815,7 +817,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "PUT_PROP_S %s\n", fts_symbol_name(prop));
 #endif
 
-	    fts_object_put_prop(*object_tos, prop, eval_tos);
+	    fts_object_put_prop(object_stack[object_tos], prop, &eval_stack[eval_tos]);
 	    p += 4;
 	  }
 	break;
@@ -832,7 +834,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "PUT_BUILTIN_PROP %s\n", fts_symbol_name(prop));
 #endif
 
-	    fts_object_put_prop(*object_tos, prop, eval_tos);
+	    fts_object_put_prop(object_stack[object_tos], prop, &eval_stack[eval_tos]);
 	  }
 	break;
 
@@ -855,7 +857,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "OBJ_MESS %d %s %d\n", inlet, fts_symbol_name(sel), nargs);
 #endif
 
-	    fts_send_message(*object_tos, inlet, sel, nargs, eval_tos);
+	    fts_send_message(object_stack[object_tos], inlet, sel, nargs, &eval_stack[eval_tos]);
 	  }
 	break;
 
@@ -878,7 +880,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "OBJ_BUILTIN_MESS %d %s %d\n", inlet, fts_symbol_name(sel), nargs);
 #endif
 
-	    fts_send_message(*object_tos, inlet, sel, nargs, eval_tos);
+	    fts_send_message(object_stack[object_tos], inlet, sel, nargs, &eval_stack[eval_tos]);
 	  }
 	break;
 
@@ -889,8 +891,8 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 #ifdef VM_DEBUG
 	    fprintf(stderr, "CONNECT\n");
 #endif
-	    fts_connection_new(FTS_NO_ID, *object_tos, fts_get_int(eval_tos),
-			       *(object_tos + 1), fts_get_int((eval_tos + 1)));
+	    fts_connection_new(FTS_NO_ID, object_stack[object_tos], fts_get_int(&eval_stack[eval_tos]),
+			       object_stack[object_tos + 1], fts_get_int(&eval_stack[eval_tos + 1]));
 	  }
 	break;
 
@@ -911,7 +913,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    object_table = fts_malloc(sizeof(fts_object_t *) * size);
 
 	    object_table_tos--;
-	    (* object_table_tos) = object_table;
+	    object_table_stack[object_table_tos] = object_table;
 	  }
 	break;
 
@@ -930,7 +932,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    object_table = fts_malloc(sizeof(fts_object_t *) * size);
 
 	    object_table_tos--;
-	    (* object_table_tos) = object_table;
+	    object_table_stack[object_table_tos] = object_table;
 	  }
 	break;
 
@@ -951,7 +953,8 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    object_table = fts_malloc(sizeof(fts_object_t *) * size);
 
 	    object_table_tos--;
-	    (* object_table_tos) = object_table;
+	    object_table_stack[object_table_tos] = object_table;
+	    object_table_size_stack[object_table_tos] = size;
 	  }
 	break;
 
@@ -965,7 +968,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 
 	    fts_free(object_table);
 	    object_table_tos++;
-	    object_table = *object_table_tos;
+	    object_table = object_table_stack[object_table_tos];
 	  }
 	break;
 
@@ -977,10 +980,10 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "RETURN\n");
 #endif
 
-	    if (object_tos == object_stack + OBJECT_STACK_DEPTH)
+	    if (object_tos == OBJECT_STACK_DEPTH)
 	      return 0;
 	    else
-	      return *object_tos;
+	      return object_stack[object_tos];
 	  }
 	}
 

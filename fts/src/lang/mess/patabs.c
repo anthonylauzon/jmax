@@ -25,12 +25,12 @@
 #include "lang/utils.h"
 #include "lang/mess/messP.h"
 
+enum abstraction_mode {fts_abstraction_cache, fts_abstraction_declaration};
 
 typedef struct fts_abstraction
 {
   fts_symbol_t name;
   fts_symbol_t filename;
-  
 } fts_abstraction_t;
  
 static fts_hash_table_t abstraction_table;
@@ -50,7 +50,7 @@ void fts_abstraction_init()
 }
 
 
-void fts_abstraction_declare(fts_symbol_t name, fts_symbol_t filename)
+static void fts_abstraction_add_declaration(fts_symbol_t name, fts_symbol_t filename)
 {
   fts_abstraction_t *abs;
   fts_atom_t a;
@@ -67,9 +67,12 @@ void fts_abstraction_declare(fts_symbol_t name, fts_symbol_t filename)
 
   fts_set_ptr(&a, abs);
   fts_hash_table_insert(&abstraction_table, name, &a);
+}
 
-  /* Try to fix some error object */
 
+void fts_abstraction_declare(fts_symbol_t name, fts_symbol_t filename)
+{
+  fts_abstraction_add_declaration(name, filename);
   fts_recompute_errors();
 }
 
@@ -174,7 +177,7 @@ static FILE *fts_abstraction_find_path_file(fts_symbol_t name)
 	{
 	  /* found, declare it and return */
 
-	  fts_abstraction_declare(name, fts_new_symbol_copy(buf));
+	  fts_abstraction_add_declaration(name, fts_new_symbol_copy(buf));
 
 	  return file;
 	}
