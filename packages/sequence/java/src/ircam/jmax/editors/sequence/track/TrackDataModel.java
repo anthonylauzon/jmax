@@ -88,6 +88,8 @@ public interface TrackDataModel {
     public abstract Enumeration inclusionSearch(double start, double end);
     
     public abstract int getFirstEventAt(double time);
+
+    public abstract TrackEvent getLastEvent();
     
     /**
      * adds an event in the database
@@ -203,6 +205,11 @@ public interface TrackDataModel {
     public int NO_SUCH_EVENT = Integer.MIN_VALUE;
   
 }
+
+
+
+
+
 
 
 

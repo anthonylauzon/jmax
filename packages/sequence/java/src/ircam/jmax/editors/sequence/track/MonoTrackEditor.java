@@ -246,19 +246,7 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     public void processKeyEvent(KeyEvent e)
     {
 	if(SequenceTextArea.isDeleteKey(e))
-	    {
-		MaxVector v = new MaxVector();
-
-		// copy the selected elements in another MaxVector (cannot remove
-		// elements of a Vector inside a loop based on an enumeration of this vector, it simply does'nt work...)
-		for (Enumeration en = selection.getSelected(); en.hasMoreElements();)
-		    v.addElement(en.nextElement());
-	    
-		// remove them
-		for (int i = 0; i< v.size(); i++)
-		    gc.getDataModel().removeEvent((TrackEvent)(v.elementAt(i)));
-		v = null;
-	    }
+	    selection.deleteAll();
     }
 
     //--- FricativeTrackEditor fields

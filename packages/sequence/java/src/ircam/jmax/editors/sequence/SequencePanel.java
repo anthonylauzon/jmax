@@ -55,7 +55,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     SequenceDataModel sequenceData;
     EditorContainer itsContainer;
     public InfoPanel statusBar;
-    public JPanel ruler;
+    public SequenceRuler ruler;
     
     Box trackPanel;
     JScrollPane scrollTracks;
@@ -156,6 +156,10 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	    {
 		statusBar.post(manager.getCurrentTool(),"zoom "+((int)(zoom*100))+"%");
 		repaint();
+		//deve anche controllare che l'evento piu' lontano sia ancora visibile
+		TrackEvent lastEvent = sequenceData.getLastEvent();
+		if(lastEvent!=null)
+		    resizePanelToTime((int)lastEvent.getTime()+((Integer)lastEvent.getProperty("duration")).intValue());
 	    }
     });
 
@@ -486,11 +490,6 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     /////////////////ScrollerManager Interface
     public void scrollIfNeeded(int time)
     {
-	/*int startTime = -geometry.getXTransposition(); 
-	  int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
-	  
-	  if(time>endTime)
-	  itsTimeScrollbar.setValue(time-endTime+startTime+10);*/
 	resizePanelToTime(time);
     }
 }

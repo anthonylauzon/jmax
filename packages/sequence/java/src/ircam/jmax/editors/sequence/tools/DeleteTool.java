@@ -78,34 +78,17 @@ public class DeleteTool extends Tool implements PositionListener {
     if (aEvent != null) 
       {
 	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
-	// starts an undoable transition
-	
+
+	// starts an undoable transition	
 	//((UndoableData) egc.getDataModel()).beginUpdate();
 
-	if (egc.getSelection().isInSelection(aEvent))
-	  {
-	    Enumeration e;
-	    MaxVector v = new MaxVector();
-
-	    // copy the selected elements in another MaxVector (cannot remove
-	    // elements of a Vector inside a loop based on an enumeration of this vector, it simply does'nt work...)
-	    for ( e = egc.getSelection().getSelected();
-		  e.hasMoreElements();)
-	      {
-		v.addElement(e.nextElement());
-	      }
-	    
-	    // remove them
-	    for (int i = 0; i< v.size(); i++)
-		egc.getDataModel().removeEvent((TrackEvent)(v.elementAt(i)));
-	    v = null;
-	  }
+	if( egc.getSelection().isInSelection(aEvent))
+	    egc.getSelection().deleteAll();
 	else
-	  {
-	      egc.getDataModel().removeEvent(aEvent);
-	      
-	      egc.getSelection().deselectAll();
-	  }
+	    {
+		egc.getDataModel().removeEvent(aEvent);		
+		egc.getSelection().deselectAll();
+	    }
 
 	//((UndoableData) egc.getDataModel()).endUpdate();
       }

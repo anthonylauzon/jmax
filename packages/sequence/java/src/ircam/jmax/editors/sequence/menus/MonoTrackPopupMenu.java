@@ -70,6 +70,7 @@ public class MonoTrackPopupMenu extends JPopupMenu
 
     addSeparator();
     
+    ////////////////////// Range Menu //////////////////////////////
     item = new JMenuItem("Change Range");
     item.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
@@ -82,6 +83,7 @@ public class MonoTrackPopupMenu extends JPopupMenu
 
     addSeparator();
     
+    ////////////////////// View Menu //////////////////////////////
     JMenu viewMenu = new JMenu("Change View");
     item = new JMenuItem("Peaks view");
     item.addActionListener(new SetViewAction(MonoTrackEditor.PEAKS_VIEW));
@@ -105,7 +107,19 @@ public class MonoTrackPopupMenu extends JPopupMenu
     add(item);
 
     addSeparator();
+    ////////////////////// others  //////////////////////////////
+    item = new JMenuItem("Select All");
+    item.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	    MonoTrackPopupMenu.getPopupTarget().getSelection().selectAll();
+	    MonoTrackPopupMenu.getPopupTarget().getGraphicContext().getGraphicDestination().requestFocus();
+	}
+    });
+    add(item);
 
+    addSeparator();
+     ////////////////////////////////////////////////////////////
     item = new JMenuItem("Remove Track");
     item.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)

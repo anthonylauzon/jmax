@@ -207,6 +207,23 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
     notifyTrackChanged(track);
   }
 
+    public TrackEvent getLastEvent()
+    {
+	Track track;
+	TrackEvent evt;
+	TrackEvent lastEvt = null;
+	for(Enumeration e = tracks.elements(); e.hasMoreElements();)
+	    {
+		track = (Track)e.nextElement();
+		evt = track.getTrackDataModel().getLastEvent();
+		if(lastEvt == null) lastEvt = evt;
+		else 
+		    if(evt!=null)		    
+			if(lastEvt.getTime() < evt.getTime()) lastEvt = evt;
+	    }
+	return lastEvt;
+    }
+
     public void requestTrackCreation(String type)
     {
 	sendArgs[0].setString(type); 

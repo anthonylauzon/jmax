@@ -392,6 +392,30 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
     temp[dim+1]=flavor;
     flavors = temp;
   }
+
+    /////////////////////////////////////////////////////////////////
+    /////////////// Operation On the Selection //////////////////////
+
+    public void deleteAll()
+    {
+	if(size()==itsModel.length())
+	    {			
+		deselectAll();
+		itsModel.removeAllEvents();			    
+	    }
+	else
+	    {
+		MaxVector v = new MaxVector();		    
+		for (Enumeration en = getSelected(); en.hasMoreElements();)
+		    v.addElement(en.nextElement());
+
+		deselectAll();
+
+		for (int i = 0; i< v.size(); i++)
+		    itsModel.removeEvent((TrackEvent)(v.elementAt(i)));
+		v = null;
+	    }
+    }
   
   /**
    * An usefull (and fast) class to traverse the selection, to be used

@@ -53,7 +53,7 @@ public class Sequence extends JFrame implements EditorContainer{
     FtsSequenceObject sequenceData;
 
     public final int DEFAULT_WIDTH = 800;
-    public final int DEFAULT_HEIGHT = 565;
+    public final int DEFAULT_HEIGHT = 553;
 
 
   /**

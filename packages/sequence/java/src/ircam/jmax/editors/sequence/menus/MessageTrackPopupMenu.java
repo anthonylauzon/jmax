@@ -69,7 +69,7 @@ public class MessageTrackPopupMenu extends JPopupMenu
     add(moveMenu);
 
     addSeparator();
-    
+    ///////////////////// View Menu //////////////////////////
     item = new JMenuItem("View as list");
     item.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
@@ -81,6 +81,19 @@ public class MessageTrackPopupMenu extends JPopupMenu
 
     addSeparator();
 
+    /////////////////// others ///////////////////////////////
+    item = new JMenuItem("Select All");
+    item.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	    MessageTrackPopupMenu.getPopupTarget().getSelection().selectAll();
+	    MessageTrackPopupMenu.getPopupTarget().getGraphicContext().getGraphicDestination().requestFocus();
+	}
+    });
+    add(item);
+
+    addSeparator();
+    
     item = new JMenuItem("Remove Track");
     item.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)

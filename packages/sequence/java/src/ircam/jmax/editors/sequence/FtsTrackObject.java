@@ -226,6 +226,14 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 	else return null;
     }
     
+    public TrackEvent getLastEvent()
+    {
+	if(events_fill_p > 0)
+	    return events[events_fill_p-1];
+	else
+	    return null;
+    }
+
     /**
      * return the index of the given event, if it exists, or the error constants
      * NO_SUCH_EVENT, EMPTY_COLLECTION */
@@ -444,7 +452,6 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 	removeEventAt(removeIndex);
 
 	sendArgs[0].setObject(event);
-	//((FtsSequenceObject)sequenceData).sendMessage(FtsObject.systemInlet, "event_remove", 1, sendArgs);
 	sendMessage(FtsObject.systemInlet, "event_remove", 1, sendArgs);
     }
     
@@ -453,10 +460,12 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
     {
 	// help a little the garbage collector
 	for (int i = 0; i<events_fill_p; i++)
-	    events[i] = null;
-
+	    {
+		sendArgs[0].setObject(events[i]);
+		sendMessage(FtsObject.systemInlet, "event_remove", 1, sendArgs);
+		events[i] = null;
+	    }
 	events_fill_p = 0;
-	infos = new MaxVector();
     }
 
     private void removeEventAt(int removeIndex)
@@ -618,7 +627,7 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
     
     /* Private methods */
     
-    final int getIndexAfter(/*int*/double time)
+    final int getIndexAfter(double time)
     {
 	if (events_fill_p == 0) 
 	    return EMPTY_COLLECTION;
@@ -686,7 +695,7 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
      */
     private final void deleteRoomAt(int index)
     {
-	for (int i = index;  i < events_fill_p; i++)
+	for (int i = index;  i < events_fill_p-1; i++)
 	    events[i] = events[i + 1];
 	
 	events_fill_p--;

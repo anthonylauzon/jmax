@@ -16,7 +16,7 @@ class ListDialog extends JDialog implements TrackDataListener, TrackListListener
     
     ListDialog(Track track, Frame frame, SequenceGraphicContext gc)
     {
-	super(frame, "list dialog", false);
+	super(frame, "list dialog: track <"+track.getName()+">", false);
 	this.frame = frame;
 	this.track = track;
 

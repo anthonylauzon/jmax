@@ -74,6 +74,7 @@ public class MidiTrackPopupMenu extends JPopupMenu
 
     addSeparator();
 
+    ////////////////////// Range Menu //////////////////////////////
     JMenu rangeMenu = new JMenu("Change Range");
     JMenu maxRangeMenu = new JMenu("Maximum");
     JMenu minRangeMenu = new JMenu("Minimum");
@@ -138,6 +139,7 @@ public class MidiTrackPopupMenu extends JPopupMenu
 
     add(rangeMenu);
 
+    ////////////////////// View Menu //////////////////////////////
     JMenu viewMenu = new JMenu("Change View");
     item = new JMenuItem("Pianoroll view");
     item.addActionListener(new SetViewAction(MidiTrackEditor.PIANOROLL_VIEW));
@@ -158,6 +160,8 @@ public class MidiTrackPopupMenu extends JPopupMenu
     });
     add(item);
     addSeparator();
+
+    ////////////////////// others  //////////////////////////////
     displayLabelItem = new JMenuItem("Hide label");
     displayLabelItem.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
@@ -166,6 +170,17 @@ public class MidiTrackPopupMenu extends JPopupMenu
 	}
     });
     add(displayLabelItem);
+
+    item = new JMenuItem("Select All");
+    item.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	    MidiTrackPopupMenu.getPopupTarget().getSelection().selectAll();
+	    MidiTrackPopupMenu.getPopupTarget().getGraphicContext().getGraphicDestination().requestFocus();
+	}
+    });
+    add(item);
+
     addSeparator();
     item = new JMenuItem("Remove Track");
     item.addActionListener(new ActionListener(){

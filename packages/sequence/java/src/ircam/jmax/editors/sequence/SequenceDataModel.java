@@ -59,6 +59,8 @@ public interface SequenceDataModel {
   public abstract void removeTrack(Track track);
 
 
+  public TrackEvent getLastEvent();
+
   /**
    * requires to be notified when this database changes
    */
