@@ -32,6 +32,8 @@ ARCH_CFLAGS := -pipe -Wall -Wno-unused -DMACOSX
 LDSO = cc
 LDSOFLAGS = -bundle -undefined suppress
 
+CC_ALL_FLAG := -Xlinker -all_load
+CC_NONE_FLAG := 
 LD_ALL_FLAG = --whole-archive
 LD_NONE_FLAG = --no-whole-archive
 
