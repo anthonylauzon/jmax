@@ -162,14 +162,21 @@ play_fvec_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void 
+play_fvec_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  play_fvec_t *this = (play_fvec_t *)o;
+
+  this->position = this->start;
+  this->mode = mode_play;
+}
+
+static void 
 play_fvec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   play_fvec_t *this = (play_fvec_t *)o;
 
   play_fvec_set(o, 0, 0, ac, at);
-
-  this->position = this->start;
-  this->mode = mode_play;
+  play_fvec_bang(o, 0, 0, 0, 0);
 }
 
 static void 
@@ -219,25 +226,6 @@ play_fvec_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   play_fvec_t *this = (play_fvec_t *)o;
 
   this->mode = mode_stop;
-}
-
-static void 
-play_fvec_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  play_fvec_t *this = (play_fvec_t *)o;
-
-  switch(this->mode)
-    {
-    case mode_stop:
-      this->position = this->start;
-    case mode_pause:
-      this->mode = mode_play;
-      break;
-    case mode_play:
-      break;
-    default:
-      this->mode = mode_pause;
-    }
 }
 
 /************************************************************

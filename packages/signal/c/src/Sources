@@ -36,5 +36,6 @@ wave_ieeewrap.c \
 cut.c \
 matrix.c \
 playfvec.c\
+recfvec.c\
 
 #playbpf.c \
