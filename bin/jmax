@@ -171,7 +171,7 @@ start_it ()
 	echo "CLASSPATH=${CLASSPATH}"
     fi
 
-    if [ x${ROODIR} != x ]
+    if [ x${ROOTDIR} != x ]
     then
 	OPTION_ROOTDIR="-jmaxRoot $ROOTDIR"
     fi

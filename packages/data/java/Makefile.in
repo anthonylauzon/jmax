@@ -59,7 +59,12 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_alias = @host_alias@
 host_triplet = @host@
+ALSA_CFLAGS = @ALSA_CFLAGS@
+ALSA_LIBS = @ALSA_LIBS@
 AS = @AS@
+AUDIOFILE_CFLAGS = @AUDIOFILE_CFLAGS@
+AUDIOFILE_CONFIG = @AUDIOFILE_CONFIG@
+AUDIOFILE_LIBS = @AUDIOFILE_LIBS@
 CC = @CC@
 CONFIG_FILE = @CONFIG_FILE@
 DLLTOOL = @DLLTOOL@
@@ -68,8 +73,11 @@ ECHO = @ECHO@
 EXEEXT = @EXEEXT@
 FTSDIR = @FTSDIR@
 FTS_SYS_LIBS = @FTS_SYS_LIBS@
+JAVA = @JAVA@
 JAVACFLAGSX = @JAVACFLAGSX@
 JAVACX = @JAVACX@
+JAVAFLAGS = @JAVAFLAGS@
+JAVAPREFIX = @JAVAPREFIX@
 LEX = @LEX@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -84,6 +92,7 @@ ROOTDIR = @ROOTDIR@
 STRIP = @STRIP@
 VERSION = @VERSION@
 YACC = @YACC@
+uudecode = @uudecode@
 
 SUBDIRS = ircam
 
@@ -96,20 +105,22 @@ JAVAROOT = @top_srcdir@/packages/data/java
 CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):@top_srcdir@/java/src:@top_srcdir@/packages/guiobj/java/guiobj.jar:@top_srcdir@/client/java/ftsclient.jar
 
 jardir = $(pkgdatadir)/packages/data/java
-JAR = data.jar
-jar_DATA = $(JAR)
+JARFILE = data.jar
+jar_DATA = $(JARFILE)
 
 JAR_DEP = \
-classpackage.stamp \
-ircam/jmax/editors/bpf/classpackage.stamp \
-ircam/jmax/editors/bpf/renderers/classpackage.stamp \
-ircam/jmax/editors/bpf/tools/classpackage.stamp \
-ircam/jmax/editors/table/classpackage.stamp \
-ircam/jmax/editors/table/actions/classpackage.stamp \
-ircam/jmax/editors/table/menus/classpackage.stamp \
-ircam/jmax/editors/table/renderers/classpackage.stamp \
-ircam/jmax/editors/table/tools/classpackage.stamp 
+	classpackage.stamp \
+	ircam/jmax/editors/bpf/classpackage.stamp \
+	ircam/jmax/editors/bpf/renderers/classpackage.stamp \
+	ircam/jmax/editors/bpf/tools/classpackage.stamp \
+	ircam/jmax/editors/table/classpackage.stamp \
+	ircam/jmax/editors/table/actions/classpackage.stamp \
+	ircam/jmax/editors/table/menus/classpackage.stamp \
+	ircam/jmax/editors/table/renderers/classpackage.stamp \
+	ircam/jmax/editors/table/tools/classpackage.stamp 
 
+
+CLEANFILES = $(JARFILE)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
@@ -327,6 +338,7 @@ installdirs-am:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-rm -f Makefile $(CONFIG_CLEAN_FILES)
@@ -371,9 +383,12 @@ installdirs mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
-$(JAR): $(JAR_DEP)	
-	-test -f $(JAR) || rm -f $(JAR)
-	jar -cvf $(JAR) *.class ircam/jmax/editors/bpf/*.class ircam/jmax/editors/bpf/renderers/*.class ircam/jmax/editors/bpf/tools/*.class ircam/jmax/editors/table/*.class ircam/jmax/editors/table/actions/*.class ircam/jmax/editors/table/menus/*.class ircam/jmax/editors/table/renderers/*.class ircam/jmax/editors/table/tools/*.class
+$(JARFILE): $(JAR_DEP)	
+	if test -f $(JARFILE); then \
+		jar -uvf $(JARFILE) `find . -name "*.class" -newer $(JARFILE)` ; \
+	else \
+		jar -cvf $(JARFILE) `find . -name "*.class"`; \
+	fi
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

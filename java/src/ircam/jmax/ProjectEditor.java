@@ -27,7 +27,6 @@ package ircam.jmax;
 
 import javax.swing.*;
 import javax.swing.table.*;
-//import javax.swing.tree.*;
 import java.util.*;
 
 import ircam.fts.client.*;
@@ -61,95 +60,19 @@ public class ProjectEditor extends JFrame
   {
     super( "Project Editor");
     
-    String[] names = {"require", "template_path", "abstraction_template", "data_path"};
-    TableCellEditor[] editors = { null, 
-				  ConfigTablePanel.createPathCellEditor(), 
-    ConfigTablePanel.createPathCellEditor(), 
-				  ConfigTablePanel.createPathCellEditor()};
-    
-    initDataModel( JMaxApplication.getProject());
-    
-    tablePanel = new ConfigTablePanel( this, model, names, editors);
-    getContentPane().add( tablePanel);
+    packagePanel = new ConfigPackagePanel( this, JMaxApplication.getProject());
+    getContentPane().add( packagePanel);
     validate();
     pack();
   }
 
-  void initDataModel( FtsPackage project)
-  {
-    if(project == null) return;
-    
-    model = new ConfigTableModel();
-    
-    for(Enumeration e = project.getRequires(); e.hasMoreElements();)
-      model.addRow("require", e.nextElement());
-    
-    for(Enumeration e = project.getTemplatePaths(); e.hasMoreElements();)
-      model.addRow("template_path", e.nextElement());
-    
-    for(Enumeration e = project.getAbstractionPaths(); e.hasMoreElements();)
-      model.addRow("abstraction_path", e.nextElement());
-    
-    for(Enumeration e = project.getDataPaths(); e.hasMoreElements();)
-      model.addRow("data_path", e.nextElement());    
-    
-    model.setFtsPackage( project);
-  }
-  
   void update()
   {
-    initDataModel( JMaxApplication.getProject());
-    tablePanel.update( model);
-  }  
-  private ConfigTablePanel tablePanel;
-  private ConfigTableModel model;
+    JMaxApplication.getProject().update();
+    //packagePanel.update();
+  } 
+ 
+  private ConfigPackagePanel packagePanel;
   private static ProjectEditor projectEditor = null;
-
-  /*protected ProjectEditor()
-    {
-    super( "Project Editor");
-    
-    initDataModel( JMaxApplication.getProject());
-    
-    treePanel = new ConfigTreePanel( this, model, names, editors);
-    getContentPane().add( treePanel);
-    
-    validate();
-    pack();
-    }
-
-    void initDataModel( FtsPackage project)
-    {
-    if(project == null) return;
-    
-    model = new ConfigTreeModel( names);
-    
-    for(Enumeration e = project.getRequires(); e.hasMoreElements();)
-    model.addRow("require", (String)e.nextElement());
-    
-    for(Enumeration e = project.getTemplatePaths(); e.hasMoreElements();)
-    model.addRow("template_path", (String)e.nextElement());
-    
-    for(Enumeration e = project.getAbstractionPaths(); e.hasMoreElements();)
-    model.addRow("abstraction_path", (String)e.nextElement());
-    
-    for(Enumeration e = project.getDataPaths(); e.hasMoreElements();)
-    model.addRow("data_path", (String)e.nextElement());    
-    
-    model.setFtsPackage( project);
-    }
-
-    void update()
-    {
-    initDataModel( JMaxApplication.getProject());
-    treePanel.update( model);
-    }
-
-    private ConfigTreePanel treePanel;
-    private ConfigTreeModel model;
-    private static ProjectEditor projectEditor = null;
-    String[] names = {"require", "template_path", "abstraction_template", "data_path"};
-    TreeCellEditor[] editors = { null, ConfigTreePanel.createPathCellEditor(), ConfigTreePanel.createPathCellEditor(), 
-    ConfigTreePanel.createPathCellEditor()};*/
 }
 

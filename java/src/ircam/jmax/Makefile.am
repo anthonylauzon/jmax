@@ -2,10 +2,7 @@ SUBDIRS=dialogs editors fts toolkit widgets
 
 packagedir=$(pkgdatadir)/java/classes/ircam/jmax
 package_JAVA =					\
-ConfigTableModel.java				\
-ConfigTablePanel.java				\
-ConfigTreeModel.java				\
-ConfigTreePanel.java				\
+ConfigPackagePanel.java				\
 JMaxApplication.java				\
 JMaxClassMap.java				\
 JMaxIcons.java					\

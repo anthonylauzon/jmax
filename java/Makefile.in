@@ -59,7 +59,12 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_alias = @host_alias@
 host_triplet = @host@
+ALSA_CFLAGS = @ALSA_CFLAGS@
+ALSA_LIBS = @ALSA_LIBS@
 AS = @AS@
+AUDIOFILE_CFLAGS = @AUDIOFILE_CFLAGS@
+AUDIOFILE_CONFIG = @AUDIOFILE_CONFIG@
+AUDIOFILE_LIBS = @AUDIOFILE_LIBS@
 CC = @CC@
 CONFIG_FILE = @CONFIG_FILE@
 DLLTOOL = @DLLTOOL@
@@ -68,8 +73,13 @@ ECHO = @ECHO@
 EXEEXT = @EXEEXT@
 FTSDIR = @FTSDIR@
 FTS_SYS_LIBS = @FTS_SYS_LIBS@
+JAVA = @JAVA@
+JAVAC = @JAVAC@
+JAVACFLAGS = @JAVACFLAGS@
 JAVACFLAGSX = @JAVACFLAGSX@
 JAVACX = @JAVACX@
+JAVAFLAGS = @JAVAFLAGS@
+JAVAPREFIX = @JAVAPREFIX@
 LEX = @LEX@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -84,14 +94,16 @@ ROOTDIR = @ROOTDIR@
 STRIP = @STRIP@
 VERSION = @VERSION@
 YACC = @YACC@
+uudecode = @uudecode@
 
 SUBDIRS = src
 
 jardir = $(pkgdatadir)/java
-JAR = jmax.jar
-jar_DATA = $(JAR)
+JARFILE = jmax.jar
+jar_DATA = $(JARFILE)
 
 JAR_DEP = \
+	src/jmax.jar.root \
 	src/ircam/jmax/classpackage.stamp \
 	src/ircam/jmax/dialogs/classpackage.stamp \
 	src/ircam/jmax/editors/console/classpackage.stamp \
@@ -107,7 +119,7 @@ JAR_DEP = \
 	src/ircam/jmax/widgets/classpackage.stamp 
 
 
-CLEANFILES = ${JAR}
+CLEANFILES = $(JARFILE)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
@@ -340,24 +352,12 @@ installdirs mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
-$(JAR): $(JAR_DEP)	
-	-test -f $(JAR) || rm -f $(JAR)
-	@echo "root" > jmax.jar.root
-	jar -cvf $(JAR)	jmax.jar.root
-	@rm jmax.jar.root
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/dialogs/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/console/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/patcher/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/patcher/actions/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/patcher/interactions/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/patcher/menus/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/patcher/objects/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/fts/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/toolkit/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/toolkit/actions/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/toolkit/menus/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/widgets/*.class )
+$(JARFILE): $(JAR_DEP)
+	if test -f $(JARFILE); then \
+		cd src ; jar -uvf ../$(JARFILE) jmax.jar.root `find . -name "*.class" -newer ../$(JARFILE)` ; \
+	else \
+		cd src ; jar -cvf ../$(JARFILE) jmax.jar.root `find . -name "*.class"`; \
+	fi
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

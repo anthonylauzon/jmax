@@ -43,6 +43,7 @@
 #define PACKAGE_STACK_SIZE    32
 
 fts_symbol_t s_setName = 0;
+fts_symbol_t s_updateDone = 0;
 
 static fts_hashtable_t fts_packages;
 static fts_list_t* fts_package_paths = NULL;
@@ -882,6 +883,8 @@ __fts_package_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   fts_package_t* pkg = (fts_package_t *)o;
   int i;
 
+  pkg->packages = NULL; 
+
   for (i = 0; i < ac; i++) {
     if (fts_is_symbol(&at[i])) {
       fts_package_require(pkg, fts_get_symbol(&at[i]));
@@ -904,6 +907,8 @@ __fts_package_template_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 {
   fts_package_t* pkg = (fts_package_t *)o;
   int i;
+
+  pkg->template_paths = NULL;  
 
   for (i = 0; i < ac; i++) {
     if (fts_is_symbol(&at[i])) {
@@ -940,7 +945,9 @@ __fts_package_data_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 {
   fts_package_t* pkg = (fts_package_t *)o;
   int i;
-  
+
+  pkg->data_paths = NULL;  
+
   for (i = 0; i < ac; i++) {
     if (fts_is_symbol(&at[i])) {
       fts_package_add_data_path(pkg, fts_get_symbol(&at[i]));
@@ -1182,6 +1189,13 @@ __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   fts_client_send_message( o, s_setName, 1, a);  
 }
 
+static void 
+__fts_package_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  __fts_package_upload( o, winlet, s, 0, 0);
+  fts_client_send_message( o, s_updateDone, 0, 0);  
+}
+
 static fts_status_t
 fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
@@ -1190,6 +1204,7 @@ fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, __fts_package_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, __fts_package_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, __fts_package_upload);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_update, __fts_package_update);
 
   fts_method_define_varargs(cl, 0, fts_s_print, __fts_package_print);
 
@@ -1321,6 +1336,7 @@ fts_kernel_package_init(void)
   int i;
 
   s_setName = fts_new_symbol("setName");
+  s_updateDone = fts_new_symbol("updateDone");
 
   for (i = 0; i < PACKAGE_STACK_SIZE; i++) {
     fts_package_stack[i] = NULL;

@@ -63,6 +63,12 @@ public class FtsPackage extends FtsObject
 	  ((FtsPackage)obj).setName( args.getSymbol( 0));
 	}
       });
+    FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("updateDone"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPackage)obj).listener.ftsActionDone();
+	}
+      });
   }
     
   public FtsPackage() throws IOException
@@ -85,11 +91,36 @@ public class FtsPackage extends FtsObject
     dataPaths = new Vector();
   }
 
-  public void set(String message, String value)
+  public void setFtsActionListener(FtsActionListener listener)
+  {
+    this.listener = listener;
+  }
+
+  public void set(String message, Enumeration values)
   {
     args.clear();
-    args.addSymbol( FtsSymbol.get(value));
+
+    for(; values.hasMoreElements();)
+      args.addSymbol( FtsSymbol.get( (String)values.nextElement()));
       
+    try
+      {
+	send( FtsSymbol.get(message), args);
+      }
+    catch(IOException e)
+      {
+	System.err.println("FtsPackage: I/O Error sending "+message+" Message!");
+	e.printStackTrace(); 
+      }
+  }
+
+  public void set(String message, String[] values)
+  {
+    args.clear();
+
+    for(int i = 0; i< values.length; i++)
+      args.addSymbol( FtsSymbol.get(values[i]));
+     
     try
       {
 	send( FtsSymbol.get(message), args);
@@ -113,6 +144,23 @@ public class FtsPackage extends FtsObject
     catch(IOException e)
       {
 	System.err.println("FtsPackage: I/O Error sending save Message!");
+	e.printStackTrace(); 
+      }
+  }
+
+  public void update()
+  {
+    requires.removeAllElements();
+    templatePaths.removeAllElements();
+    dataPaths.removeAllElements();
+
+    try
+      {
+	send( FtsSymbol.get("update"));
+      }
+    catch(IOException e)
+      {
+	System.err.println("FtsPackage: I/O Error sending update Message!");
 	e.printStackTrace(); 
       }
   }
@@ -179,5 +227,6 @@ public class FtsPackage extends FtsObject
   private Vector absPaths;
   private Vector dataPaths;
   private FtsSymbol name;
+  private FtsActionListener listener;
 }
 
