@@ -355,7 +355,7 @@ bpf_add_point_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int
   set_size(this, size + 1);
   
   /* kick points to the back */
-  for(i=size-1; i>index; i--)
+  for(i=size; i>index; i--)
     this->points[i] = this->points[i - 1];
 
   /* set new point */
