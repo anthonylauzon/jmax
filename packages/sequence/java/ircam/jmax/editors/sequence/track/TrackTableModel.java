@@ -31,137 +31,137 @@ import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.sequence.*;
 
 /**
- * A table model used to represent the content of an track object
+* A table model used to represent the content of an track object
  * in a JTable. TrackTableModel is a swing TableModel
  * built on top of an TableDataModel object. 
  */
 class TrackTableModel extends AbstractTableModel{
   
   /**
-   * An trackTableModel is created starting from an TrackDataModel (es. an
-   * FtsTrackObject) */
+	* An trackTableModel is created starting from an TrackDataModel (es. an
+																																	 * FtsTrackObject) */
   TrackTableModel(TrackDataModel model)
-  {
+{
     super();
     this.model = model;
-  }
+}
 
-  /**
-   * The number of columns in this model */
-  public int getColumnCount() 
-  { 
-    return 2 + model.getPropertyCount();
-  }
-  
-  /**
-   * The class representing a generic entry in (a column of) the table */
-  public Class getColumnClass(int col)
-  {
-    int type;
-    if(col == 0)
-      return Integer.class;
-    else 
-      if(col == 1) 
-	return Double.class;
-      else	      
-	return model.getPropertyType(col-2);
-  }
+/**
+* The number of columns in this model */
+public int getColumnCount() 
+{ 
+	return 2 + model.getPropertyCount();
+}
 
-  /**
-   * SetValue method: invoked by the cellEditor, sets the given value
-   * in the Explode. Row is the event number, column is the field to change. 
-   * @see WholeNumberField*/
-  public void setValueAt(java.lang.Object aValue, int rowIndex, int columnIndex) 
-  {
-    if(columnIndex == 0) return;
-      
-    Event event = model.getEventAt(rowIndex);
+/**
+* The class representing a generic entry in (a column of) the table */
+public Class getColumnClass(int col)
+{
+	int type;
+	if(col == 0)
+		return Integer.class;
+	else 
+		if(col == 1) 
+			return Double.class;
+	else	      
+		return model.getPropertyType(col-2);
+}
 
-    if (model instanceof UndoableData) //can't make assumptions...
-      ((UndoableData) model).beginUpdate(); 
-
-    if(columnIndex == 1)
-      event.move(((Double) aValue).doubleValue());
-    else
-      if( aValue == null)
-	event.unsetProperty( getColumnName(columnIndex));
-      else 
-	event.setProperty( getColumnName(columnIndex), aValue);
-
-    if (model instanceof UndoableData)
-      ((UndoableData) model).endUpdate();
-  }
-
-  /**
-   * Every field in an explode is editable, except the event number */
-  public boolean isCellEditable(int row, int col)
-  {
-    return col != 0;
-  }
-
-  /**
-   * Returns the Name of the given column */
-  public String getColumnName(int col)
-  {
-    String name;
-    if(col == 0)
-      return "evt. no";
-    else 
-      {
-	if(col == 1)
-	  return "time";
+/**
+* SetValue method: invoked by the cellEditor, sets the given value
+ * in the Explode. Row is the event number, column is the field to change. 
+ * @see WholeNumberField*/
+public void setValueAt(java.lang.Object aValue, int rowIndex, int columnIndex) 
+{
+	if(columnIndex == 0) return;
+	
+	Event event = model.getEventAt(rowIndex);
+	
+	if (model instanceof UndoableData) //can't make assumptions...
+		((UndoableData) model).beginUpdate(); 
+	
+	if(columnIndex == 1)
+		event.move(((Double) aValue).doubleValue());
 	else
+		if( aValue == null)
+			event.unsetProperty( getColumnName(columnIndex));
+	else 
+		event.setProperty( getColumnName(columnIndex), aValue);
+	
+	if (model instanceof UndoableData)
+		((UndoableData) model).endUpdate();
+}
+
+/**
+* Every field in an explode is editable, except the event number */
+public boolean isCellEditable(int row, int col)
+{
+	return col != 0;
+}
+
+/**
+* Returns the Name of the given column */
+public String getColumnName(int col)
+{
+	String name;
+	if(col == 0)
+		return "evt. no";
+	else 
+	{
+		if(col == 1)
+			return "time";
+		else
 	  {
 	    int i = 2;
 	    for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
-	      {
-		name = (String)e.nextElement();
-		if(i==col)
-		  return name;
-		i++;
-	      }
+			{
+				name = (String)e.nextElement();
+				if(i==col)
+					return name;
+				i++;
+			}
 	  }
-      }
-    return "";
-  }
+	}
+	return "";
+}
 
-  /**
-   * How many events in the database? */
-  public int getRowCount() { 
-    return model.length(); 
-  }
-  
-  /**
-   * Returns the value of the given field of the given Event */
-  public Object getValueAt(int row, int col) { 
+/**
+* How many events in the database? */
+public int getRowCount() { 
+	return model.length(); 
+}
 
-    if(col == 0)
-      return new Integer(row);
-    else 
-      {
-	Event temp = model.getEventAt(row);    
+/**
+* Returns the value of the given field of the given Event */
+public Object getValueAt(int row, int col) { 
 	
-	if(col == 1)
-	  return new Float(temp.getTime());
-	else
+	if(col == 0)
+		return new Integer(row);
+	else 
+	{
+		Event temp = model.getEventAt(row);    
+		
+		if(col == 1)
+			return new Float(temp.getTime());
+		else
 	  {
 	    Object val = temp.getValue().getPropertyValues()[col-2];
 	    if( val != EventValue.UNKNOWN_PROPERTY) 
 	      return val;
 	    else return null;
 	  }
-      }
-  }
-  
-  /**
-   * Method to access the TrackData this table refers to */
-  public TrackDataModel getTrackDataModel()
-  {
-    return model;
-  }
+	}
+}
 
-  //--- Fields
-  TrackDataModel model;
+/**
+* Method to access the TrackData this table refers to */
+public TrackDataModel getTrackDataModel()
+{
+	return model;
+}
+
+//--- Fields
+TrackDataModel model;
 }
 
 

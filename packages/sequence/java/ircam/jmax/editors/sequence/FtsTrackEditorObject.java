@@ -44,6 +44,18 @@ public class FtsTrackEditorObject extends FtsObject
 				((FtsTrackEditorObject)obj).setEditorState(args.getLength(), args.getAtoms());		  
 		  }
 		});
+		FtsObject.registerMessageHandler( FtsTrackEditorObject.class, FtsSymbol.get("columns"), new FtsMessageHandler(){
+			public void invoke( FtsObject obj, FtsArgs args)
+		  {
+				((FtsTrackEditorObject)obj).restoreTableColumns(args.getLength(), args.getAtoms());		  
+		  }
+		});
+		FtsObject.registerMessageHandler( FtsTrackEditorObject.class, FtsSymbol.get("tableSize"), new FtsMessageHandler(){
+			public void invoke( FtsObject obj, FtsArgs args)
+		  {
+				((FtsTrackEditorObject)obj).restoreTableSize(args.getLength(), args.getAtoms());		  
+		  }
+		});
   }
 
 public FtsTrackEditorObject(FtsServer server, FtsObject parent, int objId)
@@ -60,6 +72,7 @@ public FtsTrackEditorObject(FtsServer server, FtsObject parent, int objId)
 		view = 0;
 		rangeMode = 0;
 		trackObj = (FtsTrackObject)parent;		
+		columnNames = new Vector();
 }
 
 public void setEditorState( int nArgs, FtsAtom args[])
@@ -83,6 +96,29 @@ public void setEditorState( int nArgs, FtsAtom args[])
 			this.view = view; this.rangeMode = rangeMode;
 			trackObj.restoreEditorState();   
 		}
+}
+
+public void restoreTableColumns( int nArgs, FtsAtom args[])
+{
+	columnNames.removeAllElements();
+	for(int i = 0; i<nArgs; i++)
+		columnNames.add( args[i].symbolValue.toString());
+}
+
+public void restoreTableSize( int nArgs, FtsAtom args[])
+{
+	if(nArgs==2)
+	{
+		this.tab_w = args[0].intValue;
+		this.tab_h = args[1].intValue;
+	}
+}
+
+public Enumeration getTableColumns()
+{
+	if(columnNames.size() > 0)
+		return columnNames.elements();
+	else return null;
 }
 
 public void requestSetWindow()
@@ -220,6 +256,57 @@ public void setRangeMode(int rangeMode)
 			}
 		}
 }
+
+public void setTableSize(int tw, int th)
+{	
+	if(tw == -1 || th == -1)
+		return;
+	
+	if(this.tab_w != tw || this.tab_h != th)
+	{
+		tab_w = tw;
+		tab_h = th;
+		args.clear();
+		args.addInt( tw);
+		args.addInt( th);
+		
+		try{
+			send( FtsSymbol.get("tableSize"), args);
+		}
+		catch(IOException e)
+		{
+			System.err.println("FtsTrackEditorObject: I/O Error sending tableSize Message!");
+			e.printStackTrace(); 
+		}
+	}
+}
+
+public void setTableColumnOrder(int size, Enumeration colNames)
+{	
+	this.columnNames.removeAllElements();
+	args.clear();
+	
+	String name;
+	for(Enumeration e = colNames; e.hasMoreElements(); )
+	{
+		name = (String)e.nextElement();
+		this.columnNames.add( name);
+		args.addSymbol( FtsSymbol.get(name));
+	}
+	
+	if( args.getLength() > 0)
+	{
+		try{
+			send( FtsSymbol.get("columns"), args);
+		}
+		catch(IOException e)
+	  {
+			System.err.println("FtsTrackEditorObject: I/O Error sending table_column_order Message!");
+			e.printStackTrace(); 
+		}
+	}
+}
+
 
 public void requestSetEditorState(Rectangle bounds)
 {	
@@ -383,9 +470,10 @@ public void deleteEvents(Enumeration events)
 
 //////////////////////////////////////////////////////////////////////////////////	
 
-public int wx, wy, ww, wh, transp, view, rangeMode;
+public int wx, wy, ww, wh, transp, view, rangeMode, tab_w, tab_h;
 public String label;
 public float zoom;
+public Vector columnNames;
 FtsTrackObject trackObj;
 protected transient FtsArgs args = new FtsArgs();
 }

@@ -32,17 +32,20 @@ struct _track_editor
 { 
   fts_object_t o;
 
-  track_t *track; /* the track */
+  track_t *track;      /* the track */
 
-  int win_x;          /* editor window's bounds */
+  int win_x;           /* editor window's bounds */
   int win_y;
   int win_w;
   int win_h;
-  fts_symbol_t label; /* property event label */
-  float zoom;         /* editor zoom_factor */
-  int transp;         /* editor x_transposition */
-  int view;           /* editor view mode */
-  int range_mode;     /* editor displayed range mode */
+  fts_symbol_t label;  /* property event label */
+  float zoom;          /* editor zoom_factor */
+  int transp;          /* editor x_transposition */
+  int view;            /* editor view mode */
+  int range_mode;      /* editor displayed range mode */
+  int tab_w;           /* table editor width */
+  int tab_h;           /* table editor height */
+  fts_array_t columns; /* list of table column names */
 };
 
 extern void track_editor_upload(track_editor_t *this);

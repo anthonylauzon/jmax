@@ -35,11 +35,11 @@ import ircam.jmax.editors.sequence.menus.*;
 
 class SequenceTableDialog extends JDialog implements TrackDataListener{
     
-  SequenceTableDialog(Track track, Frame frame, SequenceGraphicContext gc)
+  SequenceTableDialog(Track trk, Frame frame, SequenceGraphicContext gc)
   {
-    super(frame, "table dialog: track <"+track.getName()+">", false);
+    super(frame, "table dialog: track <"+trk.getName()+">", false);
     this.frame = frame;
-    this.track = track;
+    this.track = trk;
     
     TrackTableModel tabModel = new TrackTableModel(track.getTrackDataModel());
     tabPanel = new SequenceTablePanel(tabModel, gc);
@@ -57,8 +57,19 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
     
     getContentPane().validate();
     validate();
-    pack();
-  }
+    pack();		
+		
+		addComponentListener( new ComponentAdapter() {
+			public void componentResized(ComponentEvent e)
+			{
+				Rectangle bounds = SequenceTableDialog.this.getBounds();
+				((FtsTrackObject)track.getTrackDataModel()).editorObject.setTableSize(bounds.width, bounds.height);
+			}
+			public void componentMoved(ComponentEvent e){}
+		});
+  
+		setSize(((FtsTrackObject)track.getTrackDataModel()).editorObject.tab_w, ((FtsTrackObject)track.getTrackDataModel()).editorObject.tab_h);
+	}
 
     /**
      * TrackDataListener interface
@@ -110,6 +121,11 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
   public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){}
   public void trackNameChanged(String oldName, String newName){};
 
+	public SequenceTablePanel getPanel()
+	{
+		return tabPanel;
+	}
+	
   Track track;
   SequenceTablePanel tabPanel;
   Frame frame;

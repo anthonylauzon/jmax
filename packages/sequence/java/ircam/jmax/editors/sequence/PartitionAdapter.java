@@ -359,7 +359,10 @@ public int getRangeMode()
 
 public int getRangeHeight()
 {
-	return (getY(minPitch)-getY(maxPitch) + 2*ScoreBackground.SC_TOP);
+	 if(viewMode==MidiTrackEditor.PIANOROLL_VIEW)
+		 return (getY(minPitch)-getY(maxPitch) + 2*ScoreBackground.SC_TOP);
+	else
+		return (getY(minPitch)-getY(maxPitch) + 2*PartitionBackground.SC_TOP);
 }
 
 public int getVerticalTransp()

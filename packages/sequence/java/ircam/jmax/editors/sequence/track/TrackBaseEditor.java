@@ -56,10 +56,11 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 		
     track.getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e)
-		{	  
-				if (e.getPropertyName().equals("selected") && e.getNewValue().equals(Boolean.TRUE))
+		  {	  
+				String name = e.getPropertyName();
+				if (name.equals("selected") && e.getNewValue().equals(Boolean.TRUE))
 					SequenceSelection.setCurrent(selection);
-		}
+			}
 		});
 		
     geometry.addTranspositionListener(new TranspositionListener() {
@@ -133,13 +134,13 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 					{
 						SwingUtilities.invokeLater(new Runnable(){
 							public void run()
-						  {
+						{
 								if(scrollEvent != null)
 								{
 									gc.getScrollManager().makeVisible(scrollEvent);
 									scrollEvent = null;
 								}
-							}
+						}
 						});
 						first = false;
 					}

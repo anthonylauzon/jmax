@@ -34,132 +34,130 @@ import java.io.*;
 import java.util.*;
 
 /**
- * The EventValue object that represents a midi-like note with "ambitus" information */
+* The EventValue object that represents a midi-like note with "ambitus" information */
 public class AmbitusValue extends AbstractEventValue
 {
   public AmbitusValue()
-  {
+{
     super();
     
     setDefaultProperties();
-  }
-  
-  private void setDefaultProperties()
-  {
-    setProperty("duration", new Double(100.0));
-    //setProperty("pitch", new Integer(0));
-  }
+}
 
-  Object pitch, duration, velocity, channel, ambitus;
-  
-  public void setProperty(String name, Object value)
-  {
-    if(name.equals("pitch"))
-      {
-	if(value instanceof Double)
-	  value = new Integer( ((Double)value).intValue());
-	
-	if(((Integer)value).intValue() > 127)
-	  value = new Integer(127);
-	pitch = value;
-      }
-    else if(name.equals("duration"))
-      duration = value;
-    else if(name.equals("velocity"))
-      velocity = value;
-    else if(name.equals("channel"))
-      channel = value;
-    //else
-    super.setProperty(name, value);
-  }
-  public Object getProperty(String name)
-  {
-      if(name.equals("pitch"))
+private void setDefaultProperties()
+{
+	setProperty("duration", new Double(100.0));
+	//setProperty("pitch", new Integer(0));
+}
+
+Object pitch, duration, velocity, channel, ambitus;
+
+public void setProperty(String name, Object value)
+{
+	if(name.equals("pitch"))
+	{
+		if(value instanceof Double)
+			value = new Integer( ((Double)value).intValue());
+		
+		if(((Integer)value).intValue() > 127)
+			value = new Integer(127);
+		pitch = value;
+	}
+	else if(name.equals("duration"))
+		duration = value;
+	else if(name.equals("velocity"))
+		velocity = value;
+	else if(name.equals("channel"))
+		channel = value;
+	//else
+	super.setProperty(name, value);
+}
+public Object getProperty(String name)
+{
+	if(name.equals("pitch"))
 	  return pitch;
-      else if(name.equals("duration"))
+	else if(name.equals("duration"))
 	  return duration;
-      else if(name.equals("velocity"))
+	else if(name.equals("velocity"))
 	  return velocity;
-      else if(name.equals("channel"))
+	else if(name.equals("channel"))
 	  return channel;
-      else
-	return super.getProperty(name);
-  }
+	else
+		return super.getProperty(name);
+}
 
-  public ValueInfo getValueInfo()
-  {
-    return info;
-  }
-  
-  static class AmbitusValueInfo extends AbstractValueInfo {
-    /**
-     * Returns the name of this value object */
-    public String getName()
-    {
-      return AMBITUS_NAME;
-    }
+public ValueInfo getValueInfo()
+{
+	return info;
+}
 
-    public String getPublicName()
-    {
-      return AMBITUS_PUBLIC_NAME;
-    }
-    
-    public ImageIcon getIcon()
-    {
-      return AMBITUS_ICON;
-    }
-    
-    /**
-     * Create an instance of the associated EventValue */
-    public Object newInstance()
-    {
-      return new AmbitusValue();
-    }
+static class AmbitusValueInfo extends AbstractValueInfo {
+	/**
+	* Returns the name of this value object */
+	public String getName()
+	{
+		return AMBITUS_NAME;
+	}
+	
+	public String getPublicName()
+	{
+		return AMBITUS_PUBLIC_NAME;
+	}
+	
+	public ImageIcon getIcon()
+	{
+		return AMBITUS_ICON;
+	}
+	
+	/**
+	* Create an instance of the associated EventValue */
+	public Object newInstance()
+	{
+		return new AmbitusValue();
+	}
+	
+	public DataFlavor getDataFlavor()
+	{
+		return AmbitusValueDataFlavor.getInstance();
+	}
+}
 
-    public DataFlavor getDataFlavor()
-    {
-      return AmbitusValueDataFlavor.getInstance();
-    }
-  }
+public JPopupMenu getPopupMenu()
+{
+	return null;
+} 
 
-  public JPopupMenu getPopupMenu()
-  {
-    return null;
-  } 
+/**
+* Returns its specialized renderer (an AmbitusEventRenderer) */
+public SeqObjectRenderer getRenderer()
+{
+	return AmbitusEventRenderer.getRenderer();
+}
 
-  /**
-   * Returns its specialized renderer (an AmbitusEventRenderer) */
-  public SeqObjectRenderer getRenderer()
-  {
-    return AmbitusEventRenderer.getRenderer();
-  }
-  
-  public void setPropertyValues(int nArgs, Object args[])
-  {
-    if( nArgs == 2)
-      {
-	setProperty( "pitch", args[0]);
-	setProperty( "duration", args[1]);
-      }
-    else
-      super.setPropertyValues( nArgs, args);
-  }
+public void setPropertyValues(int nArgs, Object args[])
+{
+	if( nArgs == 2)
+	{
+		setProperty( "pitch", args[0]);
+		setProperty( "duration", args[1]);
+	}
+	else
+		super.setPropertyValues( nArgs, args);
+}
 
-  //--- Fields
-  /*public static final int DEFAULT_MAX_PITCH = 127;
-  public static final int DEFAULT_MIN_PITCH = 0;*/
-  public static final String fs = File.separator;
-  public static final String AMBITUS_NAME = "scoob";
-  public static final String AMBITUS_PUBLIC_NAME = "scoob";
-  static String path;
-  public static ImageIcon AMBITUS_ICON;
-  public static AmbitusValueInfo info = new AmbitusValueInfo();
+//--- Fields
+public static final String fs = File.separator;
+public static final String AMBITUS_NAME = "scoob";
+public static final String AMBITUS_PUBLIC_NAME = "scoob";
+static String path;
+public static ImageIcon AMBITUS_ICON;
+public static AmbitusValueInfo info = new AmbitusValueInfo();
 
-  static 
-  {
-    path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
-    AMBITUS_ICON = new ImageIcon(path+"note.gif");
-  }
+static 
+{
+	path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
+	AMBITUS_ICON = new ImageIcon(path+"note.gif");
+}
 }
 
 

@@ -31,161 +31,220 @@ import javax.swing.*;
 import ircam.jmax.editors.sequence.*;
 
 /**
- * The panel containing the JTable representation of an Explode.
+* The panel containing the JTable representation of an Explode.
  * The editing of a generic entry is handled by a DefaultCellEditor object.
  * See the setUpIntegerEditor method in this class for details. */
 class SequenceTablePanel extends JPanel implements ListSelectionListener {
-
+	
   SequenceTablePanel(TrackTableModel model, SequenceGraphicContext gc)
   {
     this.tmodel = model;
     this.gc = gc;
-    TrackDataModel trackModel = tmodel.getTrackDataModel();
-    
-    /************/
-    JComboBox combo = new JComboBox( ((FtsTrackObject)trackModel).getEventTypes());
-    combo.setBackground(Color.white);
-    typeEditor = new ComboCellEditor( combo);
-    /***********/
+    this.trackObj = (FtsTrackObject)tmodel.getTrackDataModel();
 
-    table = new JTable(tmodel){
-	public TableCellEditor getCellEditor(int row, int column)
-	{
-	  if( tmodel.getColumnName(column).equals("type"))
-	    return typeEditor;
-	  else
-	    return super.getCellEditor( row, column);
-	}
-      };
+		table = new JTable(tmodel);
+		table.setGridColor(ircam.jmax.editors.sequence.renderers.PartitionBackground.horizontalGridLinesColor);
+		table.setShowGrid(true);				
+		/************/
+    JComboBox combo = new JComboBox( trackObj.getEventTypes());
+    combo.setBackground(Color.white);
+    typeEditor = new ComboCellEditor( combo);		
+		table.getColumnModel().getColumn(2).setCellEditor(typeEditor);
+		/************/
+		
     combo.setFont(table.getFont());
     
     table.setPreferredScrollableViewportSize(new Dimension(600, 300));
     table.setRowHeight(17);
     table.getColumnModel().getColumn(0).setPreferredWidth(50);
     table.getColumnModel().getColumn(0).setMaxWidth(50);
-
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		
     scrollPane = new JScrollPane(table);
-
+		
     setLayout(new BorderLayout());
     add(BorderLayout.CENTER, scrollPane);
-
+		
     table.setSelectionModel(gc.getSelection());
     gc.getSelection().addListSelectionListener(this);
-
-    trackModel.addHighlightListener(new HighlightListener() {
-	public void highlight(Enumeration hhElements, double time)
-	{
-	  TrackEvent evt;
-	  int index;	      
-	  Rectangle rect = null;
-	  for (Enumeration e = hhElements; e.hasMoreElements();) 
-	    {
-	      evt = (TrackEvent) e.nextElement();			  
-	      index = tmodel.getTrackDataModel().indexOf(evt);
-	      
-	      if(rect!=null)
-		rect = rect.union(table.getCellRect(index, 0, true));
-	      else
-		rect = table.getCellRect(index, 0, true);
-	    }
-	  if(rect != null)
-	    table.scrollRectToVisible(rect);
-	}
-      });
+		
+    trackObj.addHighlightListener(new HighlightListener() {
+			public void highlight(Enumeration hhElements, double time)
+		  {
+				TrackEvent evt;
+				int index;	      
+				Rectangle rect = null;
+				for (Enumeration e = hhElements; e.hasMoreElements();) 
+				{
+					evt = (TrackEvent) e.nextElement();			  
+					index = trackObj.indexOf(evt);
+					
+					if(rect!=null)
+						rect = rect.union(table.getCellRect(index, 0, true));
+					else
+						rect = table.getCellRect(index, 0, true);
+				}
+				if(rect != null)
+					table.scrollRectToVisible(rect);
+		}
+		});
     
     // make this panel a listener of the Sequence data base: changing
     // of the content will result in the right repaint()
-    trackModel.addListener( new TrackDataListener() {
-
-	public void objectChanged(Object spec, String propName, Object propValue)
-	{
-	  repaint();
-	}
-	public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex)
-	{
-	  repaint();
-	}
-	public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
-	public void objectAdded(Object whichObject, int index)
-	{
-	  if( !uploading)
-	    table.revalidate();
-	}
-	public void objectsAdded(int maxTime)
-	{
-	  table.revalidate();
-	}
-	public void objectDeleted(Object whichObject, int oldIndex)
-	{
-	  table.revalidate();
-	}
-	public void trackCleared()
-	{
-	  table.revalidate();
-	}
-	boolean uploading = false;
-	public void startTrackUpload( TrackDataModel track, int size)
-	{
-	  uploading  = true;
-	}
-	public void endTrackUpload( TrackDataModel track)
-	{
-	  uploading = false;
-	  table.revalidate();
-	}
-	public void startPaste(){}
-	public void endPaste(){}
-	public void trackNameChanged(String oldName, String newName) {}
+    trackObj.addListener( new TrackDataListener() {
+			public void objectChanged(Object spec, String propName, Object propValue){
+				repaint();
+		  }
+			public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){
+				repaint();
+			}
+			public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
+			public void objectAdded(Object whichObject, int index)
+		  {
+				if( !uploading)
+					table.revalidate();
+			}
+			public void objectsAdded(int maxTime)
+		  {
+				table.revalidate();
+			}
+			public void objectDeleted(Object whichObject, int oldIndex)
+		  {
+				table.revalidate();
+			}
+			public void trackCleared()
+		  {
+				table.revalidate();
+			}
+			boolean uploading = false;
+			public void startTrackUpload( TrackDataModel track, int size)
+			{
+				uploading  = true;
+			}
+			public void endTrackUpload( TrackDataModel track)
+			{
+				uploading = false;
+				table.revalidate();
+			}
+			public void startPaste(){}
+			public void endPaste(){}
+			public void trackNameChanged(String oldName, String newName) {}
     });
-  }
+		
+		table.getColumnModel().addColumnModelListener(new TableColumnModelListener(){
+			public void columnAdded(TableColumnModelEvent e){};
+			public void columnRemoved(TableColumnModelEvent e){};
+			public void columnMoved(TableColumnModelEvent e)
+			{
+				if(!restoring && e.getToIndex() != e.getFromIndex())
+				{
+					Vector names = getTableColumnNames();
+					trackObj.editorObject.setTableColumnOrder(names.size(), names.elements() );
+				}
+			};
+			public void columnMarginChanged(ChangeEvent e){};
+			public void columnSelectionChanged(ListSelectionEvent e){};
+		});
+		
+		restoreColumnNames();
+}
 
-    /*
-      listSelectionListener interface
-    */
-  public void valueChanged(ListSelectionEvent e)
-  {
-    Rectangle rect;
-    ListSelectionModel selection = table.getSelectionModel();
-    
-    if(selection.isSelectionEmpty() || selection.getValueIsAdjusting()) return;
-    
-    int minIndex = selection.getMinSelectionIndex();
-    int maxIndex = selection.getMaxSelectionIndex();
-    
-    rect = table.getCellRect(minIndex, 0, true);
-    
-    if(minIndex!=maxIndex)
-      rect = rect.union(table.getCellRect(maxIndex, 0, true));
-    
-    table.scrollRectToVisible(rect);      
-  }
+Vector getTableColumnNames()
+{
+	Vector names = new Vector();
+	for(int i = 0; i< table.getColumnCount(); i++)
+		names.add(table.getColumnName(i));
 
-  /*
-    CellEditor for "type" parameter
-   */
-  public class ComboCellEditor extends DefaultCellEditor
-  {
-    JComboBox combo;
-    public ComboCellEditor(JComboBox combo)
-    {
-      super(combo);
-      this.combo = combo;
-    }
-    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column)
-    {
-      combo.setSelectedItem(table.getValueAt(row, column));
-      return combo;
-    }
-    public Object getCellEditorValue() {
-      return combo.getSelectedItem();
-    }
-  }
+	return names;
+}
 
-  transient TrackTableModel tmodel;
-  transient SequenceGraphicContext gc;
-  transient JScrollPane scrollPane; 
-  transient JTable table;
-  ComboCellEditor typeEditor;
+void restoreColumnNames()
+{
+	Enumeration names = trackObj.editorObject.getTableColumns();
+	if(names == null) return;
+	else
+	{
+		int i = 0;
+		String name;
+		TableColumn col;
+		int idx = -1;
+		restoring = true;
+		for(Enumeration e = names; e.hasMoreElements();)
+		{
+			name = (String)e.nextElement();
+			col = table.getColumn(name);
+			if(col != null)
+			{
+				for(int j = 0; j < table.getColumnCount(); j++)
+				{
+					if(name.equals(table.getColumnName(j)))
+					{
+						idx = j;
+						break;
+					}
+				}
+				if(i != idx && idx!=-1)
+				{
+					table.getColumnModel().moveColumn(idx, i);
+					table.validate();
+				}
+				i++;
+			}
+    }	
+		restoring  = false;
+		table.revalidate();
+		validate();
+	}
+}
+/*
+ listSelectionListener interface
+ */
+public void valueChanged(ListSelectionEvent e)
+{
+	Rectangle rect;
+	ListSelectionModel selection = table.getSelectionModel();
+	
+	if(selection.isSelectionEmpty() || selection.getValueIsAdjusting()) return;
+	
+	int minIndex = selection.getMinSelectionIndex();
+	int maxIndex = selection.getMaxSelectionIndex();
+	
+	rect = table.getCellRect(minIndex, 0, true);
+	
+	if(minIndex!=maxIndex)
+		rect = rect.union(table.getCellRect(maxIndex, 0, true));
+	
+	table.scrollRectToVisible(rect);      
+}
+
+/*
+ CellEditor for "type" parameter
+ */
+public class ComboCellEditor extends DefaultCellEditor
+{
+	JComboBox combo;
+	public ComboCellEditor(JComboBox combo)
+	{
+		super(combo);
+		this.combo = combo;
+	}
+	public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column)
+	{
+		combo.setSelectedItem(table.getValueAt(row, column));
+		return combo;
+	}
+	public Object getCellEditorValue() {
+		return combo.getSelectedItem();
+	}
+}
+
+transient TrackTableModel tmodel;
+transient FtsTrackObject trackObj;
+transient SequenceGraphicContext gc;
+transient JScrollPane scrollPane; 
+transient JTable table;
+ComboCellEditor typeEditor;
+boolean restoring = false;
 }
 
 
