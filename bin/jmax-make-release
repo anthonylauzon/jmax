@@ -13,14 +13,22 @@
 #  
 #
 # $Log: jmax-make-release,v $
+# Revision 1.10  1999/06/02  12:09:22  dechelle
+# *** empty log message ***
+#
 # Revision 1.9  1999/06/01  15:15:47  dechelle
-# Trying $Log$
+# Trying $Log: jmax-make-release,v $
+# Revision 1.10  1999/06/02  12:09:22  dechelle
+# *** empty log message ***
+#
 #
 
 # ***************************************************************************
 # Constants
 # ***************************************************************************
 HOST_FOR_CVS=maelzel
+RELEASES_DIR=/u/worksta/jmaxdev/releases
+TMP=/tmp
 
 
 # ***************************************************************************
@@ -55,9 +63,24 @@ HELP_EOF
 }
 
 # ---------------------------------------------------------------------------
+# args: STATUS
+clean_exit()
+{
+	remove_dest_dir
+	exit $1
+}
+
+# ---------------------------------------------------------------------------
 inform ()
 {
     echo "jmax-make-release: $@"
+}
+
+# ---------------------------------------------------------------------------
+error ()
+{
+    echo "jmax-make-release: error: $@" >&2
+    clean_exit 1
 }
 
 # ---------------------------------------------------------------------------
@@ -105,8 +128,7 @@ check_options()
 
     if [ \! -r VERSION ]
     then
-	inform "cannot find file VERSION (probably you're not in the correct directory ...)"
-	exit 1
+	error "cannot find file VERSION (probably you're not in the correct directory ...)"
     fi
 
 }
@@ -120,8 +142,7 @@ check_cvs_sync ()
     HERE=`pwd | sed "s/.*$ME\///"`
     if rsh $HOST_FOR_CVS cd $HERE \; cvs -n update 2>&1 | egrep -s '^[UARMC] ' 
     then
-	inform "working directory is not synchronized with repository (update or commit and retry)"
-	clean_exit 1
+	error "working directory is not synchronized with repository (update or commit and retry)"
     fi
 }
 
@@ -152,8 +173,7 @@ check_recompile ()
 	do
 	    if make -q ARCH=$SUB_ARCH MODE=opt all  > /dev/null 2>&1 || (exit 0)
 	    then
-		inform "architecture \"$SUB_ARCH\" must be recompiled (recompile and retry)"
-		clean_exit 1
+		error "architecture \"$SUB_ARCH\" must be recompiled (recompile and retry)"
 	    fi
 	done
     done
@@ -229,12 +249,9 @@ copy_files()
   	    (cd $F ; select_files $1 $2 $3/$F )
 
   	else
-  	    inform "file or directory $F not found" >&2
 
-#  	    if [ $QUIET = "false" ]
-#  	    then
-  		clean_exit 1
-#  	    fi
+  	    error "file or directory $F not found"
+
   	fi
       done
 }
@@ -246,8 +263,7 @@ select_files ()
 {
     if [ \! -f distrib ]
     then
-	inform "file $1/distrib missing" >&2
-	clean_exit 1
+	error "file $1/distrib missing"
     fi
 
       {
