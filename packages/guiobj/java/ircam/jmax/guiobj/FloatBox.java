@@ -27,7 +27,6 @@ package ircam.jmax.guiobj;
 
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
 import java.util.*;
 import java.text.*;
 

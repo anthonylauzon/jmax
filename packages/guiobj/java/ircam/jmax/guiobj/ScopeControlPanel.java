@@ -29,8 +29,20 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.*;
-import javax.swing.event.*;
+//import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSeparator;
+import javax.swing.JSlider;
+
+//import javax.swing.event.*;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;

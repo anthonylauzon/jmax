@@ -29,8 +29,14 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.*;
-import javax.swing.event.*;
+//import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.JTextField;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;

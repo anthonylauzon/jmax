@@ -29,8 +29,8 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.*;
-import javax.swing.event.*;
+//import javax.swing.*;
+import javax.swing.JPopupMenu;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;

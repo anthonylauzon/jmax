@@ -31,7 +31,6 @@ import java.awt.geom.*;
 import java.awt.image.*;
 import java.awt.image.ImageObserver;
 import java.util.*;
-import javax.swing.*;
 import java.beans.*;
 
 import ircam.jmax.fts.*;

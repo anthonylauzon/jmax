@@ -26,7 +26,9 @@
 package ircam.jmax.guiobj;
 
 import java.awt.*;
-import javax.swing.*;
+//import javax.swing.*;
+import javax.swing.JPopupMenu;
+
 import java.awt.event.*;
 import java.util.*;
 

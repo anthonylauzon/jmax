@@ -24,7 +24,8 @@ package ircam.jmax.guiobj;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import javax.swing.*;
+//import javax.swing.*;
+import javax.swing.SwingUtilities;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
