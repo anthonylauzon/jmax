@@ -1,4 +1,12 @@
+2001-07-10  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* changed the scheduler API (fts_sched_add, fts_sched_remove). Changed
+	all the objects using it.
+
 2001-07-06  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* remove fts_method_exists, which was a complete duplication of 
+	fts_class_has_method...
 
 	* fixed watchdogs not exiting on FTS crash
 

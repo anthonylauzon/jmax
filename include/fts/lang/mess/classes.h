@@ -91,8 +91,6 @@ extern fts_status_t fts_method_define_optargs(fts_class_t *cl, int winlet, fts_s
 #define fts_method_define_anything(class, winlet, fun) \
   fts_method_define_optargs(class, winlet, fts_s_anything, fun, 0, 0, FTS_VAR_ARGS);
 
-extern int fts_method_exists(fts_class_t *cl, int winlet, fts_symbol_t s);
-
 /* outlet type definition */
 #define fts_outlet_type_define(class, woutlet, s, ac, at)  \
           fts_outlet_type_define_optargs(class, woutlet, s, ac, at, ac) 
@@ -105,7 +103,9 @@ extern fts_status_t fts_outlet_type_define_optargs(fts_class_t *cl, int woutlet,
 
 extern fts_symbol_t fts_get_class_name(fts_class_t *cl);
 
-extern int fts_class_has_method(fts_class_t *cl, int inlet, fts_symbol_t s);
+extern fts_method_t fts_class_get_method( fts_class_t *cl, int inlet, fts_symbol_t s);
+
+#define fts_class_has_method(C,I,S) (fts_class_get_method((C),(I),(S))!=0)
 
 #define fts_class_get_user_data(c) ((cl)->user_data)
 #define fts_class_set_user_data(c, d) ((cl)->user_data = (d))

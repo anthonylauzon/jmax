@@ -134,9 +134,3 @@ fts_symbol_t fts_new_symbol_copy(const char *name)
   return symbol_new_aux( name, 1);
 }
 
-void fprintf_symbol( FILE *file, fts_symbol_t symbol)
-{
-  struct fts_symbol_descr *sp = (struct fts_symbol_descr *)symbol;
-
-  fprintf( file, "<SYMBOL> %s [%d] ", sp->name, sp->cache_index);
-}

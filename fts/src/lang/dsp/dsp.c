@@ -59,13 +59,13 @@ void
 fts_dsp_run_tick(void)
 {
   /* advance clock to end of the tick (fire alarms) */
-  fts_sched_advance_clock(fts_sched_get_current(), fts_dsp_get_time() + dsp_tick_duration_minus_one_sample);
+  fts_sched_advance_clock( fts_dsp_get_time() + dsp_tick_duration_minus_one_sample);
   
   /* increment dsp time to next tick */
   fts_dsp_time += dsp_tick_duration;
 
   /* set scheduler time (cheating a little for the alarms set in the dsp code) */
-  fts_sched_set_time(fts_sched_get_current(), fts_dsp_get_time());
+  fts_sched_set_time( fts_dsp_get_time());
 
   /* run DSP chain (or idle) */
   if (fts_dsp_graph_is_compiled(&main_dsp_graph))
@@ -244,7 +244,7 @@ fts_dsp_add_function(fts_symbol_t symb, int ac, fts_atom_t *av)
 int 
 fts_dsp_is_sig_inlet(fts_object_t *o, int num)
 {
-  return fts_method_exists(fts_object_get_class(o), num, fts_s_sig);
+  return fts_class_has_method( fts_object_get_class(o), num, fts_s_sig);
 }
 
 int 

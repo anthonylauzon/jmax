@@ -272,7 +272,7 @@ static void udpreceive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
       return;
     }
 
-  fts_sched_add_fd( fts_sched_get_current(), this->socket, 1, udpreceive_receive, (fts_object_t *)this);
+  fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
 }
 
 static void udpreceive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -281,8 +281,7 @@ static void udpreceive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int a
 
   if ( this->socket >= 0)
     {
-      fts_sched_remove_fd( fts_sched_get_current(), this->socket);
-
+      fts_sched_remove( (fts_object_t *)this);
       close( this->socket);
     }
 }
@@ -299,6 +298,7 @@ static fts_status_t udpreceive_instantiate(fts_class_t *cl, int ac, const fts_at
   fts_method_define(cl, fts_SystemInlet, fts_s_init, udpreceive_init, 2, t);
 
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, udpreceive_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, udpreceive_receive);
 
   return fts_Success;
 }

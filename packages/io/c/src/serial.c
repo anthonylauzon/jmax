@@ -426,7 +426,7 @@ serial_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  this->in_buf = (unsigned char *)fts_malloc(size);
 	  
 	  /* add fd to FTS scheduler */
-	  fts_sched_add_fd(fts_sched_get_current(), this->fd, 1, serial_read, o);
+	  fts_sched_add( o, FTS_SCHED_READ, this->fd);
 	  
 	  /* set bytestream callback functions */
 	  fts_bytestream_set_input(&this->head);
@@ -455,7 +455,7 @@ serial_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   if(this->fd >= 0)
     {
       fts_bytestream_remove_listener(&this->head, o);
-      fts_sched_remove_fd(fts_sched_get_current(), this->fd);
+      fts_sched_remove( o);
       close( this->fd);
     }
 }
@@ -473,6 +473,7 @@ serial_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, serial_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, serial_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, serial_read);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, serial_bang);
   fts_method_define_varargs(cl, 0, fts_s_int, serial_int);

@@ -33,10 +33,6 @@
 /**
  * The FTS scheduler abstraction
  *
- * Basically, each thread has its own fts_sched_t instance. 
- * As there is yet only one thread, there is one fts_sched_t instance.
- * The scheduler of a the current thread can be accessed by the function fts_sched_get_current().
- *
  * @defgroup sched scheduler
  */
 
@@ -45,49 +41,15 @@
  *  scheduler
  *
  */
+
+
 /** 
- * @name The FTS scheduler structure
- */
-/*@{*/
-/**
- * The FTS scheduler structure.
- *
- * @typedef fts_sched_t
- *
- * @ingroup sched
- */
-
-typedef struct fd_callback
-{
-  int fd;
-  int read; /* if 1, the file descriptor will be added to the read fdset, if not to the write fd set */
-  fts_method_t method;
-  fts_object_t *object;
-  struct fd_callback *next;
-} fd_callback_t;
-
-typedef struct fts_sched
-{
-  fd_callback_t *fd_callback_head; 
-  enum {sched_ready, sched_halted} status;
-  fts_clock_t clock; /* clock of logical time */
-} fts_sched_t;
-
-
-/*@}*/ /* The FTS scheduler structure */
-
-/*************************************************************************
- *
- *  scheduler of current thread
- *
- */
-/** 
- * @name Scheduler of the current thread
+ * @name logical time
  */
 /*@{*/
 
 /**
- * Get logical time of the current thread in milliseconds
+ * Get logical time in milliseconds
  *
  * @fn double fts_get_time(void)
  * @return logical time in msecs
@@ -99,17 +61,7 @@ extern double fts_get_time(void);
 /* make alias */
 #define fts_get_time_in_msec() (fts_get_time())
 
-/**
- * Get a pointer to the scheduler (fts_sched_t) of the current thread
- *
- * @fn fts_sched_t *fts_sched_get_current(void)
- * @return scheduler of the current thread
- *
- * @ingroup sched
- */
-extern fts_sched_t *fts_sched_get_current(void);
-
-/*@}*/ /* current thread */
+/*@}*/ /* logical time */
 
 /** 
  * @name Handling scheduler callbacks
@@ -118,68 +70,102 @@ extern fts_sched_t *fts_sched_get_current(void);
  */
 /*@{*/
 
+
+#define FTS_SCHED_ALWAYS 1
+#define FTS_SCHED_READ 2
+#define FTS_SCHED_WRITE 3
+
 /**
- * Add a file descriptor to the file descriptor set of the sched and declare a method
- * that will be called when the file descriptor is set (i.e. a read() or write() call 
- * will not block).
+ * Add an object to the scheduler
  *
- * @fn fts_sched_add_fd(fts_sched_t *sched, int fd, int read, fts_method_t method, fts_object_t *object)
- * @param sched the sched owning the file descriptor set to which the file descriptor will be added
- * @param fd the file descriptor
- * @param read if one, the file descriptor is added to the read set, else to the write set
- * @param method the method to call when file descriptor is set
- * @param object the object on which to call the method
+ * If flags is FTS_SCHED_READ or FTS_SCHED_WRITE, third argument is a file descriptor
+ * (an int) and the object will be notified when the file descriptor is set in the 
+ * corresponding file descriptor set of the select() system call (i.e. a read() or 
+ * write() call will not block).
+ *
+ * If flags is FTS_SCHED_ALWAYS, object will be notified at each scheduler tick.
+ *
+ * An object is notified by a "sched_ready" message. A method for this message
+ * must therefore be defined.
+ *
+ * The object will be also notified of an error on the file descriptor that was
+ * passed to fts_sched_add; this error will be notified by a "sched_error" message. 
+ * Similarly, a method must have been defined.
+ *
+ * An example of use:
+ * In class instantiation:
+ * <TT>
+ * fts_method_define( cl, fts_SystemInlet, fts_s_sched_ready, mth_ready);
+ * fts_method_define( cl, fts_SystemInlet, fts_s_sched_error, mth_error);
+ * </TT>
+ * In init method:
+ * <TT>
+ * socket = socket(...);
+ * fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, socket);
+ * </TT>
+ *
+ * @fn int fts_sched_add( fts_object_t *object, int flags, int fd)
+ * @param object the object that will be notified
+ * @param flags is one of FTS_SCHED_ALWAYS, FTS_SCHED_READ or FTS_SCHED_WRITE
+ * @param fd the file descriptor if flags specified FTS_SCHED_READ or FTS_SCHED_WRITE
+ * @return -1 if an error occured, 0 if not
  *
  * @ingroup sched
  */
-extern void fts_sched_add_fd(fts_sched_t *sched, int fd, int read, fts_method_t method, fts_object_t *object);
+extern int fts_sched_add( fts_object_t *obj, int flags, ...);
+
 
 /**
- * Remove a file descriptor from the file descriptor set of the sched.
+ * Remove from the sched an object that has been added with fts_sched_add.
  *
- * @fn fts_sched_remove_fd(fts_sched_t *sched, int fd)
- * @param sched the sched owning the file descriptor set to which the file descriptor will be removed
- * @param fd the file descriptor
- *
- * @ingroup sched
- */
-extern void fts_sched_remove_fd( fts_sched_t *sched, int fd);
-
-/**
- * Add to the sched a method that will be at each scheduler cycle.
- *
- * @fn fts_sched_add( fts_sched_t *sched, fts_method_t method, fts_object_t *object)
- * @param sched the schedudler
- * @method the method to call
- * @param the object on which to call the method
- *
- * @ingroup sched
- */
-extern void fts_sched_add( fts_sched_t *sched, fts_method_t method, fts_object_t *object);
-
-/**
- * Remove from the sched a method that has been added with fts_sched_add.
- *
- * @fn fts_sched_remove( fts_sched_t *sched, fts_object_t *object)
- * @param sched the scheduler
+ * @fn int fts_sched_remove( fts_object_t *object)
  * @param object the object to remove
+ * @return -1 if an error occured, 0 if not
  * @ingroup sched
  */
-extern void fts_sched_remove( fts_sched_t *sched, fts_object_t *object);
+extern int fts_sched_remove( fts_object_t *obj);
 
 /*@}*/ /* Handling scheduler callbacks */
 
-/* system macros */
-#define fts_sched_get_clock(s) (&(s)->clock)
-#define fts_sched_is_halted(s) ((s)->status == sched_halted)
+/** 
+ * @name Scheduler clock
+ *
+ * Functions to manipulate scheduler clock
+ *
+ * @{
+ */
 
-/* API functions defined as macros */
-#define fts_sched_advance_clock(s, t) (fts_clock_advance(&(s)->clock, (t)))
-#define fts_sched_set_time(s, t) (fts_clock_set_time(&(s)->clock, (t)))
+/**
+ * Get scheduler clock
+ *
+ * @fn fts_clock_t *fts_sched_get_clock()
+ * @return a pointer to the scheduler clock
+ */
+extern fts_clock_t *fts_sched_get_clock( void);
+
+/**
+ * Advance scheduler clock
+ *
+ * @fn void fts_sched_advance_clock( double time)
+ * @param time given time 
+ */
+extern void fts_sched_advance_clock( double time);
+
+/**
+ * Set scheduler time
+ *
+ * @fn void fts_sched_set_time( double time)
+ * @param time given time 
+ */
+extern void fts_sched_set_time( double time);
+
+/**
+ * @}
+ */ /* Scheduler clock */
+
 
 /* system functions */
-extern void fts_sched_init(fts_sched_t *sched);
-extern void fts_sched_run(fts_sched_t *sched);
-extern void fts_sched_halt(fts_sched_t *sched);
+extern void fts_sched_run( void);
+extern void fts_sched_halt( void);
 
 #endif

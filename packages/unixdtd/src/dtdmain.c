@@ -50,7 +50,7 @@
 /*
  * Define this if you want a lot of debug printout, in particular timing
  */
-#define DTD_SERVER_ENABLE_DEBUG
+#undef DTD_SERVER_ENABLE_DEBUG
 
 #ifdef DTD_SERVER_ENABLE_DEBUG
 #include <stdarg.h>
@@ -111,14 +111,16 @@ static short *block;
 
 static int dtd_read_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, int n_frames, int n_channels)
 {
-  int n_read, index, buffer_size, size, n;
+  int frames_to_read, n_read, index, buffer_size, size, n;
   volatile float *dst;
 
-  /* This should never happen because it is tested before the call to dtd_read_block() */
-  if ( (unsigned int)dtdfifo_get_write_level( fifo) < n_frames * n_channels * sizeof( float))
-    return -1;
+  n = dtdfifo_get_write_level( fifo) / (n_channels * sizeof( float));
+  frames_to_read = ( n < n_frames) ? n : n_frames;
 
-  n_read = afReadFrames( file, AF_DEFAULT_TRACK, buffer, n_frames);
+  if (frames_to_read == 0)
+    return 0;
+
+  n_read = afReadFrames( file, AF_DEFAULT_TRACK, buffer, frames_to_read);
 
   if (n_read < 0)
     return -1;
@@ -155,7 +157,7 @@ static int dtd_read_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, in
 
   dtdfifo_incr_write_index( fifo, size * sizeof( float));
 
-  if (n_read < n_frames)
+  if (n_read < frames_to_read)
     {
       dtdfifo_set_used( fifo, DTD_SIDE, 0);
     }
@@ -165,19 +167,21 @@ static int dtd_read_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, in
 
 static int dtd_write_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, int n_frames, int n_channels)
 {
-  int n_write, index, buffer_size, size, n;
+  int frames_to_write, n_write, index, buffer_size, size, n;
   volatile float *src;
   short *p;
 
-  /* This should never happen because it is tested before the call to dtd_write_block() */
-  if ( (unsigned int)dtdfifo_get_read_level( fifo) < n_frames * n_channels * sizeof( float))
-    return -1;
+  n = dtdfifo_get_read_level( fifo) / (n_channels * sizeof( float));
+  frames_to_write = ( n < n_frames) ? n : n_frames;
+
+  if (frames_to_write == 0)
+    return 0;
 
   src = (volatile float *)dtdfifo_get_read_pointer( fifo);
 
   index = dtdfifo_get_read_index( fifo)/sizeof( float);
   buffer_size = dtdfifo_get_buffer_size( fifo)/sizeof( float);
-  size = n_frames * n_channels;
+  size = frames_to_write * n_channels;
 
   p = buffer;
   if ( index + size < buffer_size )
@@ -202,9 +206,9 @@ static int dtd_write_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, i
 	}
     }
 
-  n_write = afWriteFrames( file, AF_DEFAULT_TRACK, buffer, n_frames);
+  n_write = afWriteFrames( file, AF_DEFAULT_TRACK, buffer, frames_to_write);
 
-  if (n_write < 0)
+  if (n_write < frames_to_write)
     return -1;
 
   dtdfifo_incr_read_index( fifo, size * sizeof( float));
@@ -300,14 +304,12 @@ static void dtd_open_read( const char *line)
   int id, n_channels, i;
   char filename[N], path[N];
   dtdhandle_t *handle;
-  dtdfifo_t *fifo;
 
   sscanf( line, "%*s%d%s%s%d", &id, filename, path, &n_channels);
 
   handle = &handle_table[id];
-  fifo = handle->fifo;
   
-  dtdfifo_set_used( fifo, DTD_SIDE, 1);
+  dtdfifo_set_used( handle->fifo, DTD_SIDE, 1);
 
   if ((handle->file = dtd_open_file_read( filename, path, n_channels)) == AF_NULL_FILEHANDLE)
     return;
@@ -317,33 +319,46 @@ static void dtd_open_read( const char *line)
 
   for ( i = 0; i < _block_frames / _preload_frames; i++)
     {
-      int ret;
-
-      ret = dtd_read_block( handle->file, fifo, block, _preload_frames, n_channels);
+      dtd_read_block( handle->file, handle->fifo, block, _preload_frames, n_channels);
     }
 
   DTD_DEBUG( _dbg( "preloaded `%s'", filename) );
 }
 
+static struct extension2format {
+  char *extension;
+  int format;
+} extension2format_table[] = {
+  { ".wav", AF_FILE_WAVE},
+  { ".aiff", AF_FILE_AIFF},
+  { ".snd", AF_FILE_NEXTSND},
+  { ".voc", AF_FILE_VOC},
+  { ".sf", AF_FILE_IRCAM}
+};
+
 static void dtd_open_write( const char *line)
 {
   AFfilehandle file;
-  int id, n_channels, i, af_format;
+  int id, n_channels, af_format;
+  unsigned int i;
   char filename[N], path[N];
   dtdhandle_t *handle;
   double sr;
-  dtdfifo_t *fifo;
   char *extension;
 
   sscanf( line, "%*s%d%s%s%lf%d", &id, filename, path, &sr, &n_channels);
 
   handle = &handle_table[id];
-  fifo = handle->fifo;
   
-  dtdfifo_set_used( fifo, DTD_SIDE, 1);
+  dtdfifo_set_used( handle->fifo, DTD_SIDE, 1);
 
-  af_format = AF_FILE_AIFF;
+  extension = strrchr( filename, '.');
+  af_format = AF_FILE_RAWDATA;
 
+  for ( i = 0; i < sizeof( extension2format_table)/sizeof( struct extension2format); i++)
+    if (!strcmp( extension, extension2format_table[i].extension))
+      af_format = extension2format_table[i].format;
+  
   if ((handle->file = dtd_open_file_write( filename, path, af_format, sr, n_channels)) == AF_NULL_FILEHANDLE)
     return;
 
@@ -355,17 +370,27 @@ static void dtd_close( const char *line)
 {
   int id;
   dtdhandle_t *handle;
-  dtdfifo_t *fifo;
 
   sscanf( line, "%*s%d", &id);
 
   handle = &handle_table[id];
-  fifo = handle->fifo;
 
-  if ( !dtdfifo_is_used( fifo, DTD_SIDE) )
+  if ( !dtdfifo_is_used( handle->fifo, DTD_SIDE) )
     return;
 
-  dtdfifo_set_used( fifo, DTD_SIDE, 0);
+  if (handle->state == handle_state_write)
+    {
+      /* empty fifo */
+      int r;
+
+      do
+	{
+	  r = dtd_write_block( handle->file, handle->fifo, block, _block_frames, handle->n_channels);
+	}
+      while ( r > 0);
+    }
+
+  dtdfifo_set_used( handle->fifo, DTD_SIDE, 0);
 
   if ( handle->file != AF_NULL_FILEHANDLE)
     {

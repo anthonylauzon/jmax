@@ -165,7 +165,7 @@ fts_client_poll(void)
 	    {
 	      /* End of file for client device (do a shutdown) */
 
-	      fts_sched_halt(fts_sched_get_current());
+	      fts_sched_halt();
 
 	      return;
 	    }

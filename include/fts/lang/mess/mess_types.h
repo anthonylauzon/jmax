@@ -227,7 +227,7 @@ struct fts_class
   int noutlets;
   fts_outlet_decl_t *outlets;
 
-  unsigned int size;
+  int size;
 
   /* Class Instance Data Base support */
   int ac;
@@ -283,8 +283,8 @@ struct fts_connection
 
 struct fts_inlet_decl
 {
-  unsigned int nmess;
-  unsigned int nalloc;
+  int nmess;
+  int nalloc;
   fts_class_mess_t **messlist;
 };
 

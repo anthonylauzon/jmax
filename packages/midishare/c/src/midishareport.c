@@ -133,7 +133,7 @@ midishare_register(fts_symbol_t name, int num, fts_midiport_t *port)
 
       /* add MidiShare polling to the scheduler (for now it is one entry per reference) */
       if(midishare_no_reference(ref))
-	fts_sched_add(fts_sched_get_current(), midishare_dispatch, (fts_object_t *)ref);
+	fts_sched_add( (fts_object_t *)ref, FTS_SCHED_ALWAYS);
 
       midishare_refer(ref);
 
@@ -156,7 +156,7 @@ midishare_unregister(midishare_reference_t *ref, int num)
 
   /* remove MidiShare polling from the scheduler */
   if(midishare_no_reference(ref))
-    fts_sched_remove(fts_sched_get_current(), (fts_object_t *)ref);
+    fts_sched_remove( (fts_object_t *)ref);
 }
 
 /*************************************************

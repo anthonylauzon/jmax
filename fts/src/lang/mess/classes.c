@@ -403,31 +403,6 @@ fts_method_define_optargs(fts_class_t *cl, int winlet, fts_symbol_t s, fts_metho
   return fts_Success;
 }
 
-int
-fts_method_exists(fts_class_t *cl, int winlet, fts_symbol_t s)
-{
-  fts_inlet_decl_t *in;
-  fts_class_mess_t **mess;
-  int i;
-
-  if(winlet == fts_SystemInlet)
-    in = cl->sysinlet;
-  else if (winlet < cl->ninlets && winlet >= 0)
-    in = &cl->inlets[winlet];
-  else
-    return 0;
-
-  mess = in->messlist;
-
-  for(i=0; i<(int)in->nmess; i++)
-    {
-      if (mess[i]->tmess.symb == s)
-	return 1;
-    }
-  
-  return 0;
-}
-
 fts_status_t 
 fts_outlet_type_define_optargs( fts_class_t *cl, int woutlet, fts_symbol_t s, int ac, fts_symbol_t *at, int mandatory_args)
 {
@@ -552,8 +527,7 @@ fts_class_mess_exists(fts_inlet_decl_t *in, fts_class_mess_t *msg)
   return 0;
 }
 
-int
-fts_class_has_method(fts_class_t *cl, int inlet, fts_symbol_t s)
+fts_method_t fts_class_get_method( fts_class_t *cl, int inlet, fts_symbol_t s)
 {
   fts_inlet_decl_t *in;
   fts_class_mess_t **mess;
@@ -563,13 +537,15 @@ fts_class_has_method(fts_class_t *cl, int inlet, fts_symbol_t s)
     in = cl->sysinlet;
   else if (inlet < cl->ninlets && inlet >= 0)
     in = &cl->inlets[inlet];
+  else
+    return 0;
 
   mess = in->messlist;
 
-  for(i=0; i<(int)in->nmess; i++)
+  for( i = 0; i < in->nmess; i++)
     {
       if ((*mess)->tmess.symb == s)
-	return 1;
+	return (*mess)->mth;
 
       mess++; 
     }

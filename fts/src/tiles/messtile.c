@@ -826,7 +826,7 @@ fts_mess_client_shutdown(int ac, const fts_atom_t *av)
 {
   trace_mess("Received shutdown", ac, av);
 
-  fts_sched_halt(fts_sched_get_current());
+  fts_sched_halt();
 }
 
 

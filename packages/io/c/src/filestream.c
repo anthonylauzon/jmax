@@ -326,7 +326,7 @@ filestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       if(in)
 	{
 	  /* add file descriptor for input select */
-	  fts_sched_add_fd(fts_sched_get_current(), fd, 1, filestream_read, o);
+	  fts_sched_add( o, FTS_SCHED_READ, fd);
 
 	  /* set byte input */
 	  fts_bytestream_set_input(&this->head);
@@ -371,7 +371,7 @@ filestream_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     {
       close(this->fd);
       fts_bytestream_remove_listener(&this->head, o);
-      fts_sched_remove_fd(fts_sched_get_current(), this->fd);
+      fts_sched_remove( (fts_object_t *)this);
     }
 }
 
@@ -407,6 +407,7 @@ filestream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, filestream_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, filestream_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, filestream_read);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, filestream_bang);
   fts_method_define_varargs(cl, 0, fts_s_int, filestream_int);

@@ -239,7 +239,7 @@ static void alsarawmidiport_init( fts_object_t *o, int winlet, fts_symbol_t s, i
 
   this->fd = fds.fd;
 
-  fts_sched_add_fd( fts_sched_get_current(), this->fd, 1, alsarawmidiport_select, (fts_object_t *)this);
+  fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->fd);
 
   fts_midiport_init( port);
   fts_midiparser_init( parser);
@@ -253,6 +253,8 @@ static void alsarawmidiport_init( fts_object_t *o, int winlet, fts_symbol_t s, i
 static void alsarawmidiport_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   alsarawmidiport_t *this = (alsarawmidiport_t *)o;
+
+  fts_sched_remove( (fts_object_t *)this);
 
   if (this->handle_in)
     {
@@ -285,6 +287,7 @@ static fts_status_t alsarawmidiport_instantiate(fts_class_t *cl, int ac, const f
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, alsarawmidiport_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, alsarawmidiport_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, alsarawmidiport_select);
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, alsarawmidiport_get_state);
 

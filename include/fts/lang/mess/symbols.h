@@ -30,70 +30,65 @@
 #include <stdio.h>
 
 /**
-   Symbols are canonical representations of C strings that can be 
-   compared for equality using == instead of strcmp() for better
-   efficiency, i.e.:
-   if a and b are 2 C strings such as strcmp( a, b) == 0,
-   then it is guaranted that fts_new_symbol( a) == fts_new_symbol( b)
+ * Symbols are canonical representations of C strings that can be 
+ * compared for equality using == instead of strcmp() for better
+ * efficiency. They are the equivalent of the JAVA "interned" strings.
+ *
+ * @defgroup symbols symbols
  */
 
 /**
-   Lookup a symbol and create a new definition if symbol
-   was not found.
-   
-   NOTE: this function must be used ONLY for constant strings
-   because it stores the string that is passed and does not 
-   copy it !
-
-   [in] name     a string that will be stored in the symbol definition.
-                 This string must be a constant, as in
-		 fts_new_symbol( "foo")
-   [return] the fts_symbol_t that was retrieved or created. This is
-            a pointer to an opaque structure
+ * Lookup a symbol and create a new definition if symbol
+ * was not found.
+ * 
+ * NOTE: this function must be used ONLY for constant strings
+ * because it stores the string that is passed and does not 
+ * copy it !
+ * 
+ * @fn fts_symbol_t fts_new_symbol( const char *name)
+ * @param name a string that will be stored in the symbol definition.
+ * This string must be a constant, as in fts_new_symbol( "foo")
+ * @return the fts_symbol_t that was retrieved or created. This is
+ * a pointer to an opaque structure
+ * @ingroup symbols
 */
 extern fts_symbol_t fts_new_symbol( const char *name);
 
 /**
-   Lookup a symbol and create a new definition if symbol
-   was not found.
-   
-   NOTE: this function is the same as fts_new_symbol, except
-   that it copies the string that is passed to a memory area
-   allocated using fts_malloc. It can be safely used with non-constant 
-   strings.
-
-   [in] name     a string that will be stored in the symbol definition
-   [return] the fts_symbol_t that was retrieved or created. This is
-            a pointer to an opaque structure
-*/
+ * Lookup a symbol and create a new definition if symbol
+ * was not found.
+ * 
+ * NOTE: this function is the same as <TT>fts_new_symbol</TT>, except
+ * that it copies the string that is passed to a memory area
+ * allocated using fts_malloc. It can be safely used with non-constant 
+ * strings.
+ * 
+ * @param name     a string that will be stored in the symbol definition
+ * @return the fts_symbol_t that was retrieved or created. This is
+ * a pointer to an opaque structure
+ * @ingroup symbols
+ */
 extern fts_symbol_t fts_new_symbol_copy( const char *name);
 
 
 /**
    Get the symbol name from a symbol.
-   [in] symbol   the symbol
-   [return] the symbol name (i.e. the string that was passed
+   @param symbol   the symbol
+   @return the symbol name (i.e. the string that was passed
             to the fts_new_symbol() that created this symbol).
 */
 #define fts_symbol_name(symbol)                 ((symbol)->name)
 
 
-/**
-   Debug utility function.
-   Prints a full description of a symbol on a FILE *.
-   [in] symbol the symbol
-*/
-extern void fprintf_symbol( FILE *file, fts_symbol_t symbol);
-
 /*
    Symbol cache index access.
    These macros are used by the client protocol handling code.
 */
-/**
+/*
    Get the symbol's cache index.
 */
 #define fts_symbol_get_cache_index(sym)      ((sym)->cache_index)
-/**
+/*
    Set the symbol's cache index
 */
 #define fts_symbol_set_cache_index(sym, index) (((struct fts_symbol_descr *) sym)->cache_index = (index))

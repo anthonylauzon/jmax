@@ -322,7 +322,7 @@ sgimidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       fts_midiport_set_input(&this->head);
       fts_midiport_set_output(&this->head, &sgimidiport_output_functions);
 
-      fts_sched_add_fd(fts_sched_get_current(), mdGetFd(this->in), 1, sgimidiport_dispatch, o);
+      fts_sched_add( o, FTS_SCHED_READ, mdGetFd(this->in));
     }
 
   /* init sysex buffer */
@@ -338,7 +338,7 @@ sgimidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
   if(this->in)
     {
-      fts_sched_remove_fd(fts_sched_get_current(), mdGetFd(this->in));
+      fts_sched_remove( o);
       sgimidiport_close(this);
     }
 
@@ -375,6 +375,7 @@ sgimidiport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sgimidiport_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sgimidiport_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, sgimidiport_dispatch);
 
   /* define variable */
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, sgimidiport_get_state);

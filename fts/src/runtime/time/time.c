@@ -102,7 +102,7 @@ fts_alarm_init(fts_alarm_t *alarm, fts_clock_t *clock, void (* fun)(fts_alarm_t 
   if(clock)
     alarm->clock = clock;
   else
-    alarm->clock = fts_sched_get_clock(fts_sched_get_current());
+    alarm->clock = fts_sched_get_clock();
 
   alarm->next = 0;
   alarm->active = 0;
@@ -224,7 +224,7 @@ fts_timer_init(fts_timer_t *timer, fts_clock_t *clock)
   if(clock)
     timer->clock = clock;
   else
-    timer->clock = fts_sched_get_clock(fts_sched_get_current());
+    timer->clock = fts_sched_get_clock();
 
   timer->running = 0;
   timer->time = 0.0;

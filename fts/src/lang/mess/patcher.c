@@ -618,7 +618,7 @@ patcher_save_objects( FILE *file, fts_object_t *object)
 	  fprintf( file, ";\n");
 	}
       else if ( ! fts_object_is_patcher( object)
-		&& fts_object_has_method( object, fts_SystemInlet, fts_s_save_dotpat) )
+		&& fts_class_has_method( fts_object_get_class(object), fts_SystemInlet, fts_s_save_dotpat) )
 	{
  	  fts_atom_t a;
 

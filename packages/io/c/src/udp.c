@@ -89,7 +89,7 @@ static void udp_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       return;
     }
 
-  fts_sched_add_fd( fts_sched_get_current(), this->socket, 1, udp_receive, (fts_object_t *)this);
+  fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
 }
 
 static void udp_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -98,7 +98,7 @@ static void udp_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
   if ( this->socket >= 0)
     {
-      fts_sched_remove_fd( fts_sched_get_current(), this->socket);
+      fts_sched_remove( (fts_object_t *)this);
 
       close( this->socket);
     }
@@ -115,6 +115,7 @@ static fts_status_t udp_instantiate(fts_class_t *cl, int ac, const fts_atom_t *a
   fts_method_define(cl, fts_SystemInlet, fts_s_init, udp_init, 2, t);
 
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, udp_delete, 0, 0);
+  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_sched_ready, udp_receive);
 
   t[0] = fts_t_int;
   fts_outlet_type_define( cl, 0, fts_type_get_selector(fts_t_int), 1, t);

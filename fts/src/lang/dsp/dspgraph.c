@@ -108,7 +108,7 @@ dsp_input_get(fts_object_t *obj, int winlet)
   int i, n;
 
   for (i = 0, n = 0; i < winlet; i++)
-    if (fts_object_has_method(obj, i, fts_s_sig))
+    if (fts_class_has_method( fts_object_get_class( obj), i, fts_s_sig))
       n++;
 
   return n;

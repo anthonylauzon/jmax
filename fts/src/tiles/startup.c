@@ -147,7 +147,7 @@ int main(int argc, char **argv)
 #endif
 
   /* Run the audio scheduler */
-  fts_sched_run(fts_sched_get_current());
+  fts_sched_run();
 
   /* When and if the scheduler exit, run the shutdown functions and return */
   fts_modules_shutdown();

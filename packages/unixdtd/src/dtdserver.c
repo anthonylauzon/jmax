@@ -308,7 +308,7 @@ static void dtdserver_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   /* Read the port number from server */
   read( from_child_pipe[0], &this->server_port, 4);
 
-  fts_sched_add_fd( fts_sched_get_current(), from_child_pipe[0], 1, dtdserver_select, (fts_object_t *)this);
+  fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, from_child_pipe[0]);
 
   this->server_stdout = fdopen( from_child_pipe[0], "r");
 
@@ -336,6 +336,8 @@ static void dtdserver_delete( fts_object_t *o, int winlet, fts_symbol_t s, int a
 
 /*    fprintf( stderr, "Killing DTD server (pid = %d)\n", this->server_pid); */
 
+  fts_sched_remove( (fts_object_t *)this);
+
   /* stop the server */
   kill( this->server_pid, SIGKILL);
 
@@ -351,8 +353,8 @@ static fts_status_t dtdserver_instantiate( fts_class_t *cl, int ac, const fts_at
   fts_class_init( cl, sizeof(dtdserver_t), 0, 0, 0);
 
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, dtdserver_init);
-
-  fts_method_define( cl, fts_SystemInlet, fts_s_delete, dtdserver_delete, 0, 0);
+  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_delete, dtdserver_delete);
+  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_sched_ready, dtdserver_select);
 
   return fts_Success;
 }

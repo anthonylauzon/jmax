@@ -192,10 +192,6 @@ void fts_client_add_symbol(fts_symbol_t s)
   if (! client_dev)
     return;
 
-#ifdef OUTGOING_DEBUG_TRACE      
-  fprintf_symbol( stderr, s);
-#endif
-  
   if ( fts_symbol_get_cache_index(s) >= 0 )   /* Is symbol cached ? */
     {
       fts_char_dev_put( client_dev, SYMBOL_CACHED_CODE);
