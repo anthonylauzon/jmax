@@ -406,14 +406,24 @@ sigthrow_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_object_t *
 sigthrow_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
-  if(ac == 2 && fts_is_symbol(at + 1))
+  if(ac == 1)
+    {
+      fts_object_t *obj;
+      fts_atom_t a[1];
+
+      fts_set_symbol(a, fts_new_symbol("thrxw~"));      
+      obj = fts_eval_object_description(patcher, 1, a);
+
+      return obj;
+    }
+  else if(ac == 2 && fts_is_symbol(at + 1))
     {
       fts_object_t *obj;
       fts_atom_t a[2];
-
+      
+      
       fts_set_symbol(a, fts_new_symbol("thrxw~"));
       a[1] = at[1];
-      
       obj = fts_eval_object_description(patcher, 2, a);
 
       return obj;
@@ -425,14 +435,24 @@ sigthrow_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 static fts_object_t *
 sigcatch_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
-  if(ac == 2 && fts_is_symbol(at + 1))
+  if(ac == 1)
+    {
+      fts_object_t *obj;
+      fts_atom_t a[1];
+
+      fts_set_symbol(a, fts_new_symbol("cxtch~"));      
+      obj = fts_eval_object_description(patcher, 1, a);
+
+      return obj;
+    }
+  else if(ac == 2 && fts_is_symbol(at + 1))
     {
       fts_object_t *obj;
       fts_atom_t a[2];
-
+      
+      
       fts_set_symbol(a, fts_new_symbol("cxtch~"));
       a[1] = at[1];
-      
       obj = fts_eval_object_description(patcher, 2, a);
 
       return obj;
