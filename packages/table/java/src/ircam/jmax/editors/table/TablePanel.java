@@ -51,9 +51,6 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     //make the NORTH Status bar 
     prepareStatusBar();
 
-    //... the panel that will contain the toolbar
-    prepareToolbarPanel();
-
     //... the center panel
     prepareCenterPanel();
 
@@ -61,14 +58,17 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     gc = new TableGraphicContext(tm);
     prepareGraphicContext();
 
+    //... the panel that will contain the toolbar
+    prepareToolbarPanel();
+
+
+    //... the renderer
     itsTableRenderer = new TableRenderer(gc);
     itsCenterPanel.setRenderer(itsTableRenderer);
     gc.setRenderManager(itsTableRenderer);
     
-
     //... the vertical position controller
     prepareVerticalScrollbar();
-
 
     //... the widgets in the statusBar
     addWidgets();
@@ -87,16 +87,20 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 	}
     });
 
-    //the repaints due to selection's state change are
+    //the repaints due to selection's ownership change are
     //handled in the SelectionLayer level of the RenderManager
  
     initTools();
   }
 
 
-
+  /**
+   * Prepare the panel containing the toolbar AND the scale */
   private void prepareToolbarPanel()
   {
+    // toolbarPanel is a Box containing the toolbar 
+    // scalePanel is a Box containing the scale
+
     toolbarPanel = new Box(BoxLayout.Y_AXIS) {
       public Dimension getMinimumSize()
 	{
@@ -108,10 +112,103 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 	  return toolbarDimension;
 	}
     };
+
     toolbarPanel.setSize(toolbarDimension.width, toolbarDimension.height);
     
+    scalePanel = new ScalePanel();
+
+    scalePanelFont = new Font(getFont().getName(), Font.BOLD, 10);
+    scalePanel.setBorder(new EtchedBorder());
   }
   
+  /** The scale panel on the left */
+  class ScalePanel extends JPanel {
+      
+    ScalePanel()
+    {
+      addComponentListener( new ComponentAdapter() {
+	public void componentResized(ComponentEvent e)
+	  {
+	    updateScale();
+	    //repaint()??
+	  }
+      });
+
+      gc.getAdapter().addYZoomListener(new ZoomListener() {
+	public void zoomChanged(float zoom) 
+	  {
+	    updateScale();
+	  }
+      });
+
+      setSize(scaleDimension);
+    }
+
+    public void updateScale()
+    {
+      computeScaleParameters();
+      //repaint();??
+    }
+    public void paint(Graphics g)
+    {
+      if (step == 0 || Math.abs(startValue) > 36535) 
+	return; //"emergency exit!!!
+	  
+      TableAdapter ta = gc.getAdapter();
+      g.setColor(Color.black);
+
+      g.setFont(scalePanelFont);
+      
+      for (int i = startValue; i > ta.getInvY(gc.getGraphicDestination().getSize().height); i-= step)
+	{
+	  g.drawString(""+i, 1, ta.getY(i));
+	  g.drawLine(getWidth()-5, ta.getY(i), getWidth(), ta.getY(i));
+	}
+    }
+    
+    /** The main computing routine.
+     * It is called when the window is resized, scrolled or zoomed*/
+    void computeScaleParameters()
+    {
+      TableAdapter ta = gc.getAdapter();
+      int range = ta.getInvY(0)-ta.getInvY(gc.getGraphicDestination().getSize().height);
+      
+      if (range < 10) 
+	step = 5;
+	  else if (range <50)
+	    step = 10;
+      else if (range <100)
+	step = 25;
+      else if (range <500)
+	    step = 25;
+      else if (range <1000)
+	step = 50; 
+      else if (range <10000)
+	step = 100;
+	  else 
+	    {
+	      startValue = (ta.getInvY(0)/1000)*1000; 
+	      step = 500;
+	    }
+      
+      startValue = (ta.getInvY(0)/step)*step;
+      
+    }
+
+    public Dimension getMinimumSize()
+    {
+      return scaleDimension;
+	}
+    public Dimension getPreferredSize()
+    {
+      return scaleDimension;
+    }
+
+    //--- Fields
+    int startValue = 0;
+    int step = 0;
+  }
+
   /**
    * note: can't create the toolbar in the constructor,
    * because the Frame is not available yet.
@@ -163,7 +260,11 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     
     toolbarPanel.add(c);
 
-    add(toolbarPanel, BorderLayout.WEST);
+    JPanel mess = new JPanel();
+    mess.setLayout(new BorderLayout());
+    mess.add(BorderLayout.WEST, toolbarPanel);
+    mess.add(BorderLayout.EAST, scalePanel);
+    add(mess, BorderLayout.WEST);
 
     
     if ( toolbarAnchored)
@@ -241,13 +342,16 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 	}
     });
 
-    //-- increment listeners and controllers
+    //**-- zoom increment listeners and controllers.
+    // The 0.9, 1.9 constants are used to avoid rounding errors
+    // when passing from the '1/n' to the 'n' form of the zoom values. 
+    // (i.e. when we reach 100% zoom value coming from 50% or less)
     IncrementListener xil = new IncrementListener() {
       public void increment()
 	{
 	  TableAdapter a = gc.getAdapter();
-	  if (a.getXZoom()>=1)
-	    a.setXZoom(a.getXZoom()+1);
+	  if (a.getXZoom()>=0.9)
+	    a.setXZoom(Math.round(a.getXZoom())+1);
 	  else
 	    a.setXZoom(a.getXZoom()*(1/(1-a.getXZoom())));
 
@@ -256,8 +360,8 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
       public void decrement()
 	{
 	  TableAdapter a = gc.getAdapter();
-	  if (a.getXZoom()>1)
-	    a.setXZoom(a.getXZoom()-1);
+	  if (a.getXZoom()>1.9) 
+	    a.setXZoom(Math.round(a.getXZoom())-1);
 	  else
 	    a.setXZoom(a.getXZoom()*(1/(1+a.getXZoom())));
 	}
@@ -268,8 +372,8 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
       public void increment()
 	{
 	  TableAdapter a = gc.getAdapter();
-	  if (a.getYZoom()>=1)
-	    a.setYZoom(a.getYZoom()+1);
+	  if (a.getYZoom()>0.9)
+	    a.setYZoom(Math.round(a.getYZoom())+1);
 	  else
 	    a.setYZoom(a.getYZoom()*(1/(1-a.getYZoom())));
 
@@ -278,8 +382,8 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
       public void decrement()
 	{
 	  TableAdapter a = gc.getAdapter();
-	  if (a.getYZoom()>1)
-	    a.setYZoom(a.getYZoom()-1);
+	  if (a.getYZoom() > 1.9 )
+	    a.setYZoom(Math.round(a.getYZoom())-1);
 	  else
 	    a.setYZoom(a.getYZoom()*(1/(1+a.getYZoom())));
 	}
@@ -329,13 +433,12 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
       
     };
  
-    itsCenterPanel.setBounds(toolbarPanel.getSize().width, 
-			     InfoPanel.INFO_WIDTH, 
-			     getSize().width-toolbarPanel.getSize().width-SCROLLBAR_SIZE, 
-			     getSize().height-InfoPanel.INFO_HEIGHT);
-
     itsCenterPanel.setBackground(Color.white);
     itsCenterPanel.setDoubleBuffered(true);
+    itsCenterPanel.setBounds(toolbarDimension.width+scaleDimension.width, 
+			     InfoPanel.INFO_WIDTH, 
+			     getSize().width-toolbarDimension.width-scaleDimension.width-SCROLLBAR_SIZE, 
+			     getSize().height-InfoPanel.INFO_HEIGHT);
 
     add(itsCenterPanel, BorderLayout.CENTER);
   }
@@ -380,7 +483,7 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
       public void adjustmentValueChanged( AdjustmentEvent e)
 	{
 	  gc.getAdapter().setOY(256-e.getValue());
-
+	  scalePanel.updateScale(); //this adapter informs the scale... (?!)
 	  repaint();
 	}
     });
@@ -535,8 +638,11 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 
   static boolean toolbarAnchored = true;
   Box toolbarPanel;
+  ScalePanel scalePanel;
+  Font scalePanelFont;
 
   static Dimension toolbarDimension = new Dimension(30, 200);
+  static Dimension scaleDimension = new Dimension(30, 200);
 
   static TablePanel instance;
 

@@ -153,7 +153,7 @@ public class TableAdapter {
     MaxVector listeners;
     if (whichOne == X_ZOOM) listeners = xZoomListeners; 
     else if (whichOne == Y_ZOOM) listeners = yZoomListeners; 
-    else return; //can add other zooms here
+    else return; //can add other zooms here (?)
 
     ZoomListener zl;
     for (int i = 0; i< listeners.size(); i++)

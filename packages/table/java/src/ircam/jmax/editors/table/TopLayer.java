@@ -44,7 +44,6 @@ public class TopLayer extends AbstractLayer {
     //unused vertical area
     g.setColor(Color.lightGray);
     g.fillRect(end+1, 0, tgc.getGraphicDestination().getSize().width-end, tgc.getGraphicDestination().getSize().height);
-    //no unused horizontal area... for now?
 
   }
 
