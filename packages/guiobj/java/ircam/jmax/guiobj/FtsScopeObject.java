@@ -85,6 +85,8 @@ public class FtsScopeObject extends FtsVectorDisplayObject
   
   public void setPeriod(float period)
   {
+    if(this.period == period) return;
+
     args.clear();
     args.addFloat(period);
 
@@ -109,6 +111,8 @@ public class FtsScopeObject extends FtsVectorDisplayObject
   }  
   public void setThreshold(float th)
   {
+    if(this.threshold == th) return;
+
     args.clear();
 
     if(th==THRESHOLD_AUTO)
@@ -117,7 +121,7 @@ public class FtsScopeObject extends FtsVectorDisplayObject
       args.addString("off");
     else
       args.addFloat(th);
-    
+
     try{
       send(FtsSymbol.get("setThreshold"), args);
     }
@@ -130,17 +134,17 @@ public class FtsScopeObject extends FtsVectorDisplayObject
   
   public void setCurrentThreshold(FtsAtom arg)
   {      
-    if(arg.isString())
+    if(arg.isSymbol())
       {
-	String tType = arg.stringValue;
+	String tType = arg.symbolValue.toString();
 	if(tType.equals("auto"))
 	  this.threshold = THRESHOLD_AUTO;
-	else
+	else	  
 	  this.threshold = THRESHOLD_OFF;
       }
     else
       this.threshold = arg.floatValue;    
-  } 
+  }
   
   public float getThreshold()
   {

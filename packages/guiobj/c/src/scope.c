@@ -462,13 +462,25 @@ scope_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
-  fts_atom_t a[1];
+  fts_atom_t a;
 
-  fts_set_float(a, this->period_msec);
-  fts_client_send_message(o, sym_set_period, 1, a);
+  fts_set_float(&a, this->period_msec);
+  fts_client_send_message(o, sym_set_period, 1, &a);
 
-  fts_set_float(a, data->threshold);
-  fts_client_send_message(o, sym_set_threshold, 1, a);
+  switch(data->trigger)
+    {
+    case scope_period:
+      fts_set_symbol(&a, sym_off);
+      break;
+    case scope_auto:
+      fts_set_symbol(&a, sym_auto);
+      break;
+    case scope_threshold:
+      fts_set_float(&a, data->threshold);
+      break;
+    }
+
+  fts_client_send_message(o, sym_set_threshold, 1, &a);
 }
 
 static void
@@ -524,6 +536,7 @@ scope_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, scope_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, scope_delete);      
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, scope_upload); 
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, scope_put);
   

@@ -123,13 +123,13 @@ public class ScopeControlPanel extends JPanel implements ObjectControlPanel
 
     offItem = new JRadioButton("off");
     offItem.addItemListener(new ItemListener(){
-	    public void itemStateChanged(ItemEvent e)
-	    {
-		if(e.getStateChange() == ItemEvent.SELECTED)
-		    ((FtsScopeObject)target.getFtsObject()).
-			setThreshold(FtsScopeObject.THRESHOLD_OFF);
-	    }
-	});
+	public void itemStateChanged(ItemEvent e)
+	{
+	  if(e.getStateChange() == ItemEvent.SELECTED)
+	    ((FtsScopeObject)target.getFtsObject()).
+	      setThreshold(FtsScopeObject.THRESHOLD_OFF);
+	}
+      });
     thresholdButtonGroup.add(offItem);    
     JPanel offPanel = new JPanel();
     offPanel.setLayout(new BoxLayout(offPanel, BoxLayout.X_AXIS));
@@ -140,22 +140,22 @@ public class ScopeControlPanel extends JPanel implements ObjectControlPanel
 
     thresholdItem = new JRadioButton("threshold");
     thresholdItem.addItemListener(new ItemListener(){
-	    public void itemStateChanged(ItemEvent e)
+	public void itemStateChanged(ItemEvent e)
+	{
+	  if(e.getStateChange() == ItemEvent.SELECTED)
 	    {
-		if(e.getStateChange() == ItemEvent.SELECTED)
-		    {
-			thresholdSlider.setEnabled(true);
-			float th = thresholdSlider.getValue()/(float)100.0;
-			thresholdLabel.setText(""+th);
-			((FtsScopeObject)target.getFtsObject()).setThreshold(th);
-		    }		
-		else
-		    {
-			thresholdSlider.setEnabled(false);
-			thresholdLabel.setText("");
-		    }
+	      thresholdSlider.setEnabled(true);
+	      float th = thresholdSlider.getValue()/(float)100.0;
+	      thresholdLabel.setText(""+th);
+	      ((FtsScopeObject)target.getFtsObject()).setThreshold(th);
+	    }		
+	  else
+	    {
+	      thresholdSlider.setEnabled(false);
+	      thresholdLabel.setText("");
 	    }
-	});
+	}
+      });
     thresholdButtonGroup.add(thresholdItem); 
 
     thresholdLabel  = new JLabel("", JLabel.CENTER);
@@ -172,17 +172,17 @@ public class ScopeControlPanel extends JPanel implements ObjectControlPanel
     
     thresholdPanel.add(thresholdBox);
 
-    thresholdSlider = new JSlider(JSlider.HORIZONTAL, 1, 99, 1);
+    thresholdSlider = new JSlider(JSlider.HORIZONTAL, 1, 99, 50);
     thresholdSlider.setBorder(BorderFactory.createEmptyBorder(0,0,0,10));
     thresholdSlider.addChangeListener(new ChangeListener(){
 	public void stateChanged(ChangeEvent e) {
 	  JSlider source = (JSlider)e.getSource();
 	  float th = source.getValue()/(float)100.0;
-
+	  
 	  if(!source.getValueIsAdjusting())
 	    {
-		if((target!=null))
-		    ((FtsScopeObject)target.getFtsObject()).setThreshold(th);
+	      if((target!=null))
+		((FtsScopeObject)target.getFtsObject()).setThreshold(th);
 	    }      
 	  thresholdLabel.setText(""+th);
 	}
@@ -202,14 +202,21 @@ public class ScopeControlPanel extends JPanel implements ObjectControlPanel
 
     float threshold = ((FtsScopeObject)obj.getFtsObject()).getThreshold();
     if(threshold==FtsScopeObject.THRESHOLD_AUTO)
+      {
 	autoItem.setSelected(true);
+	thresholdSlider.setEnabled( false);
+      }
     else if(threshold==FtsScopeObject.THRESHOLD_OFF)
+      {
 	offItem.setSelected(true);
+	thresholdSlider.setEnabled( false);
+      }
     else
-	{
-	    thresholdItem.setSelected(true);
-	    thresholdSlider.setValue((int)(threshold*100));
-	}
+      {
+	thresholdItem.setSelected(true);
+	thresholdSlider.setEnabled(true);
+	thresholdSlider.setValue((int)(threshold*100));
+      }
     revalidate();
   }
 
