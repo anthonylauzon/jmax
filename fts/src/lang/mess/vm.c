@@ -909,7 +909,10 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    size = GET_B(p);
 	    p += 1;
 
-	    object_table = fts_malloc(sizeof(fts_object_t *) * size);
+	    if (size == 0)
+	      object_table = 0;
+	    else
+	      object_table = fts_malloc(sizeof(fts_object_t *) * size);
 
 	    object_table_tos--;
 	    object_table_stack[object_table_tos] = object_table;

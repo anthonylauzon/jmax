@@ -80,6 +80,9 @@ void *fts_malloc(int size)
 {
   void *p;
 
+  if (size == 0)
+    return (void *)0;
+
   p = real_malloc(size);
 
   if (p == 0)
@@ -90,7 +93,7 @@ void *fts_malloc(int size)
 	  p = real_malloc(size);
 	  
 	  if (p == 0)
-	    fprintf(stderr, "Out of virtual memory\n");
+	    fprintf(stderr, "Out of virtual memory");
 	  else
 	    {
 	      post("Cannot allocate more physical memory, switching to non real-time mode\n");
@@ -98,7 +101,7 @@ void *fts_malloc(int size)
 	    }
 	}
       else
-	fprintf(stderr, "Out of memory\n");
+	fprintf(stderr, "Out of memory");
     }
 
   return p;
