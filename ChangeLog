@@ -1,3 +1,8 @@
+2003-10-27  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* packages/ispw/c/src/delwrite.c (delwrite_init): fixed bug "[ 822061 ] delwrite~ causes jmax crash".
+	Use "default" as default name instead of NULL pointer.
+
 2003-10-13  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 	
 	* bin/jmax.in: added check_java function for java checking.
