@@ -11,7 +11,7 @@ import javax.swing.Timer;
  * The initial dialog.
  */
 
-public class SplashDialog extends Dialog implements KeyListener, MouseListener, ActionListener{
+public class SplashDialog extends Dialog implements KeyListener, MouseListener, ActionListener {
   static final int SPLASH_WIDTH = 500;
   static final int SPLASH_HEIGHT = 280;
   String itsVersionString;
@@ -43,13 +43,14 @@ public class SplashDialog extends Dialog implements KeyListener, MouseListener, 
     //end 2003
   }
 	
-  public void actionPerformed(ActionEvent e) {
-    setVisible(false);
-    itsImage = null;
-    dispose();
-    Timer aTimer = (Timer) e.getSource();
-    aTimer.stop();
-  }
+   public void actionPerformed(ActionEvent e) {
+     setVisible(false);
+     itsImage = null;
+     dispose();
+     Timer aTimer = (Timer) e.getSource();
+     aTimer.stop();
+   }
+
   /////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////mouseListener--inizio
   public void mouseClicked(MouseEvent e){}

@@ -109,7 +109,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 
   public ErmesSketchWindow( FtsPatcherData patcherData) 
   {
-    super( Mda.getDocumentTypeByName( "patcher"));
+    super();
 
     // (fd)
     keyEventClient = null;

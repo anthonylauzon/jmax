@@ -56,6 +56,11 @@ public class MaxFileChooser
 
   public static File chooseFileToOpen(Frame frame)
   {
+    return chooseFileToOpen(frame, "Open");
+  }
+
+  public static File chooseFileToOpen(Frame frame, String title)
+  {
     File dir;
 
     if (fd == null)
@@ -65,9 +70,9 @@ public class MaxFileChooser
       configure();
 
     dir = fd.getCurrentDirectory();
-    fd.setDialogTitle("Open"); 
+    fd.setDialogTitle(title); 
     fd.rescanCurrentDirectory();
-    if (fd.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION)
+    if (fd.showDialog(frame, title) == JFileChooser.APPROVE_OPTION)
       return fd.getSelectedFile();
     else
       {
@@ -81,6 +86,11 @@ public class MaxFileChooser
   }
 
   /* CHoose a file to save, having an old File as initial content of the dialog box */
+
+  public static File chooseFileToSave(Frame frame, File oldFile)
+  {
+    return chooseFileToSave(frame, oldFile, "Save");
+  }
 
   public static File chooseFileToSave(Frame frame, File oldFile, String title)
   {

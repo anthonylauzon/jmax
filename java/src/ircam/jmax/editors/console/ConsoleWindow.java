@@ -36,7 +36,7 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
 
 
   public ConsoleWindow() {
-    super("jMax Console", Mda.getDocumentTypeByName("patcher"), false);
+    super("jMax Console", false);
 
     MaxWindowManager.setTopFrame(this);
 
