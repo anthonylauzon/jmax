@@ -31,9 +31,15 @@ clean:
 	(cd src; $(MAKE) clean)
 .PHONY: clean
 
+install-noarch:
+	$(INSTALL_DIR) $(lib_install_dir)/syspackages/alsadev-0.4
+	$(INSTALL_DATA) alsadev-0.4.jpk $(lib_install_dir)/syspackages/alsadev-0.4
+	$(INSTALL_DATA) alsadev-0.4.scm $(lib_install_dir)/syspackages/alsadev-0.4
+.PHONY: install-noarch
+
 install-arch:
-	$(INSTALL_DIR) $(lib_install_dir)/syspackages/alsadev/c/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libalsadev.so $(lib_install_dir)/syspackages/alsadev/c/lib/$(ARCH)/opt )
+	$(INSTALL_DIR) $(lib_install_dir)/syspackages/alsadev-0.4/lib/$(ARCH)/opt
+	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libalsadev-0.4.so $(lib_install_dir)/syspackages/alsadev-0.4/lib/$(ARCH)/opt )
 .PHONY: install-arch
 
 

@@ -25,11 +25,11 @@
 
 
 ## package declaration
-package provide alsadev
+package provide alsadev-0.4
 
 # load dynamic libraries into the server
 global jmaxArch jmaxMode
-ucs load module alsadev $dir/c/lib/$jmaxArch/$jmaxMode/libalsadev.so
+ucs load module alsadev $dir/lib/$jmaxArch/$jmaxMode/libalsadev-0.4.so
 
 # devices definitions
 defineDevice alsaStereoIn     { alsa_adc } "ALSA audio in"
@@ -37,4 +37,4 @@ defineDevice alsaStereoIn     { alsa_adc } "ALSA audio in"
 defineDevice alsaStereoOut    { alsa_dac } "ALSA audio out"
 defineDevice alsaQuadOut      { alsa_dac channels 4 } "ALSA quad audio out"
 
-post "package: alsedev (ALSA devices)"
+post "package: alsadev-0.4 (ALSA devices version 0.4)"

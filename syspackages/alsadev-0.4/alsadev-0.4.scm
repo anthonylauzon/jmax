@@ -25,15 +25,14 @@
 
 
 ;;;; package declaration
-(provide-package "alsadev" "0.0.0")
+(provide-package "alsadev-0.4" "0.0.0")
 
 ;; load dynamic libraries into the server
-(ucs "load" "module" "alsadev" (file-cat dir "c" "lib" jmax-arch jmax-mode "libalsadev.so"))
+(ucs "load" "module" "alsadev-0.4" (file-cat dir "lib" jmax-arch jmax-mode "libalsadev-0.4.so"))
 
 ;; devices definitions
 (define-device "alsaStereoIn" "alsa_adc" "ALSA audio in")
 (define-device "alsaStereoOut" "alsa_dac" "ALSA audio out")
 (define-device "alsaQuadOut"  (list "alsa_dac" "channels" "4") "ALSA quad audio out")
 
-(println "package: ALSA devices")
-
+(println "package: alsadev-0.4 (ALSA devices version 0.4)")
