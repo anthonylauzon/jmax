@@ -170,7 +170,7 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 	    value.setProperty(name, propVal);
 	
 	    if (itsTrackDataModel != null)
-	      itsTrackDataModel.changeEvent(this, name, theValue);
+	      itsTrackDataModel.changeEvent(this, name, propVal);
 
 	    ((FtsTrackObject)itsTrackDataModel).setDirty();
 	  }
