@@ -1,3 +1,7 @@
+2003-06-16  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* fts/parser.y: fixed first syntax incompatibility with jMax 2.5, i.e. the fact that you cannot pass a + (or any other operator) as argument to an object. As it introduces an incompatibilty with jMax 4.0.x, the version number is moved to 4.1.0.
+
 2003-06-13  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* packages/asio/: this package add ASIO support on Windows version.

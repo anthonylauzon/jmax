@@ -1,6 +1,6 @@
 #!/bin/sh
 # Create fts/version.c and java/src/ircam/jmax/JMaxVersion files
-# Run this script in jmax top source directory.
+# Run this script in this directory
 
 . ../JMAX-VERSION 
 JMAX_VERSION=${JMAX_MAJOR_VERSION}.${JMAX_MINOR_VERSION}.${JMAX_PATCH_VERSION}${JMAX_VERSION_STATUS}

@@ -29,6 +29,7 @@
   /* #define this to 1 if you want a lot of debug printout of the parser */
 #define YYDEBUG 0
 
+static int lex_par = 0;
 static int yylex();
 
 static int yyerror( const char *msg);
@@ -210,8 +211,8 @@ primitive: TK_INT
 		{ $$ = fts_parsetree_new( TK_SYMBOL, &($1), 0, 0); }
 ;
 
-par: TK_OPEN_PAR expression TK_CLOSED_PAR
-		{ $$ = fts_parsetree_new( TK_PAR, 0, 0, $2); }
+par: TK_OPEN_PAR { lex_par++; } expression { lex_par--; } TK_CLOSED_PAR
+		{ $$ = fts_parsetree_new( TK_PAR, 0, 0, $3); }
 ;
 
 unary: TK_PLUS term %prec TK_UPLUS
@@ -271,20 +272,24 @@ function: TK_DOT TK_SYMBOL term_list
 ;
 %%
 
-#ifndef STANDALONE
-
-/* **********************************************************************
- *
- * FTS code
- *
- */
-
-static fts_hashtable_t fts_token_table;
 
 static int yyerror( const char *msg)
 {
   return 0;
 }
+
+/* **********************************************************************
+ *
+ * Lexical analyser
+ *
+ */
+
+static fts_hashtable_t token_table;
+
+struct token_definition {
+  int token;
+  int operator;
+};
 
 static int yylex()
 {
@@ -295,9 +300,27 @@ static int yylex()
   if ( fts_is_symbol(parser_data.at))
     {
       fts_atom_t v;
+      struct token_definition *def;
 
-      if (fts_hashtable_get( &fts_token_table, parser_data.at, &v))
-	token = fts_get_int( &v);
+      /* Is it a token symbol? */
+      if (fts_hashtable_get( &token_table, parser_data.at, &v))
+	{
+	  def = (struct token_definition *)fts_get_pointer( &v);
+
+	  if (def->operator)
+	    {
+	      /* if operator, return it as token if inside parenthesis */
+	      if (lex_par > 0)
+		token = def->token;
+	      else
+		{
+		  token = TK_SYMBOL;
+		  yylval.a = *parser_data.at;
+		}
+	    }
+	  else 
+	    token = def->token;  /* not an operator: always return it as token */
+	}
       else
 	{
 	  token = TK_SYMBOL;
@@ -319,6 +342,56 @@ static int yylex()
   parser_data.ac--;
 
   return token;
+}
+
+static void
+token_table_put_entry( fts_symbol_t s, int token, int operator)
+{
+  fts_atom_t k, v;
+  struct token_definition *def;
+
+  def = (struct token_definition *)fts_malloc( sizeof(struct token_definition));
+  def->token = token;
+  def->operator = operator;
+
+  fts_set_symbol( &k, s);
+  fts_set_pointer( &v, def);
+  fts_hashtable_put( &token_table, &k, &v);
+}
+
+static void
+token_table_init( void)
+{
+  fts_hashtable_init( &token_table, FTS_HASHTABLE_MEDIUM);
+
+  token_table_put_entry( fts_s_dollar, TK_DOLLAR, 0);
+  token_table_put_entry( fts_s_semi, TK_SEMI, 0);
+  token_table_put_entry( fts_s_comma, TK_COMMA, 0);
+  token_table_put_entry( fts_s_plus, TK_PLUS, 1);
+  token_table_put_entry( fts_s_minus, TK_MINUS, 1);
+  token_table_put_entry( fts_s_times, TK_TIMES, 1);
+  token_table_put_entry( fts_s_div, TK_DIV, 1);
+  token_table_put_entry( fts_s_power, TK_POWER, 1);
+  token_table_put_entry( fts_s_open_par, TK_OPEN_PAR, 0);
+  token_table_put_entry( fts_s_closed_par, TK_CLOSED_PAR, 0);
+  token_table_put_entry( fts_s_open_sqpar, TK_OPEN_SQPAR, 1);
+  token_table_put_entry( fts_s_closed_sqpar, TK_CLOSED_SQPAR, 1);
+  token_table_put_entry( fts_s_open_cpar, TK_OPEN_CPAR, 0);
+  token_table_put_entry( fts_s_closed_cpar, TK_CLOSED_CPAR, 0);
+  token_table_put_entry( fts_s_dot, TK_DOT, 0);
+  token_table_put_entry( fts_s_percent, TK_PERCENT, 1);
+  token_table_put_entry( fts_s_shift_left, TK_SHIFT_LEFT, 1);
+  token_table_put_entry( fts_s_shift_right, TK_SHIFT_RIGHT, 1);
+  token_table_put_entry( fts_s_logical_and, TK_LOGICAL_AND, 1);
+  token_table_put_entry( fts_s_logical_or, TK_LOGICAL_OR, 1);
+  token_table_put_entry( fts_s_logical_not, TK_LOGICAL_NOT, 1);
+  token_table_put_entry( fts_s_equal_equal, TK_EQUAL_EQUAL, 1);
+  token_table_put_entry( fts_s_not_equal, TK_NOT_EQUAL, 1);
+  token_table_put_entry( fts_s_greater, TK_GREATER, 1);
+  token_table_put_entry( fts_s_greater_equal, TK_GREATER_EQUAL, 1);
+  token_table_put_entry( fts_s_smaller, TK_SMALLER, 1);
+  token_table_put_entry( fts_s_smaller_equal, TK_SMALLER_EQUAL, 1);
+  token_table_put_entry( fts_s_colon, TK_COLON, 0);
 }
 
 /* **********************************************************************
@@ -383,194 +456,10 @@ void fts_kernel_parser_init( void)
 {
   parsetree_heap = fts_heap_new( sizeof( fts_parsetree_t));
 
-  fts_hashtable_init( &fts_token_table, FTS_HASHTABLE_MEDIUM);
-
-#define PUT_TOKEN(S,T)					\
- {							\
-   fts_atom_t k, v;					\
-							\
-   fts_set_symbol( &k, S);				\
-   fts_set_int( &v, T);					\
-   fts_hashtable_put( &fts_token_table, &k, &v);	\
- }
-
-  PUT_TOKEN( fts_s_dollar, TK_DOLLAR);
-  PUT_TOKEN( fts_s_semi, TK_SEMI);
-  PUT_TOKEN( fts_s_comma, TK_COMMA);
-  PUT_TOKEN( fts_s_plus, TK_PLUS);
-  PUT_TOKEN( fts_s_minus, TK_MINUS);
-  PUT_TOKEN( fts_s_times, TK_TIMES);
-  PUT_TOKEN( fts_s_div, TK_DIV);
-  PUT_TOKEN( fts_s_power, TK_POWER);
-  PUT_TOKEN( fts_s_open_par, TK_OPEN_PAR);
-  PUT_TOKEN( fts_s_closed_par, TK_CLOSED_PAR);
-  PUT_TOKEN( fts_s_open_sqpar, TK_OPEN_SQPAR);
-  PUT_TOKEN( fts_s_closed_sqpar, TK_CLOSED_SQPAR);
-  PUT_TOKEN( fts_s_open_cpar, TK_OPEN_CPAR);
-  PUT_TOKEN( fts_s_closed_cpar, TK_CLOSED_CPAR);
-  PUT_TOKEN( fts_s_dot, TK_DOT);
-  PUT_TOKEN( fts_s_percent, TK_PERCENT);
-  PUT_TOKEN( fts_s_shift_left, TK_SHIFT_LEFT);
-  PUT_TOKEN( fts_s_shift_right, TK_SHIFT_RIGHT);
-  PUT_TOKEN( fts_s_logical_and, TK_LOGICAL_AND);
-  PUT_TOKEN( fts_s_logical_or, TK_LOGICAL_OR);
-  PUT_TOKEN( fts_s_logical_not, TK_LOGICAL_NOT);
-  PUT_TOKEN( fts_s_equal_equal, TK_EQUAL_EQUAL);
-  PUT_TOKEN( fts_s_not_equal, TK_NOT_EQUAL);
-  PUT_TOKEN( fts_s_greater, TK_GREATER);
-  PUT_TOKEN( fts_s_greater_equal, TK_GREATER_EQUAL);
-  PUT_TOKEN( fts_s_smaller, TK_SMALLER);
-  PUT_TOKEN( fts_s_smaller_equal, TK_SMALLER_EQUAL);
-  PUT_TOKEN( fts_s_colon, TK_COLON);
+  token_table_init();
 
 #if YYDEBUG
   yydebug = 1;
 #endif
 }
 
-#else
-
-/* **********************************************************************
- *
- * Standalone code
- *
- */
-
-#define PREDEF_SYMBOL(V,S) fts_symbol_t V = S;
-#include <fts/predefsymbols.h>
-
-static int yyerror( const char *msg)
-{
-  fprintf( stderr, "***** %s\n", msg);
-  return 0;
-}
-
-static fts_parsetree_t *fts_parsetree_new( int token, fts_atom_t *value, fts_parsetree_t *left, fts_parsetree_t *right)
-{
-  fts_parsetree_t *tree;
-
-  tree = (fts_parsetree_t *)malloc( sizeof( fts_parsetree_t));
-
-  tree->token = token;
-
-  if (value)
-    tree->value = *value;
-  else
-    fts_set_void( &tree->value);
-
-  tree->left = left;
-  tree->right = right;
-
-  return tree;
-}
-
-fts_status_t fts_parsetree_parse( int ac, const fts_atom_t *at, fts_parsetree_t **ptree)
-{
-  parser_data.ac = ac;
-  parser_data.at = at;
-
-  if (yyparse())
-    {
-      *ptree = NULL;
-      return syntax_error_status;
-    }
-
-  *ptree = parser_data.tree;
-  return fts_ok;
-}
-
-void fts_parsetree_delete( fts_parsetree_t *tree)
-{
-  if (!tree)
-    return;
-
-  fts_parsetree_delete( tree->left);
-  fts_parsetree_delete( tree->right);
-  free( tree);
-}
-
-static void parsetree_print_aux( fts_parsetree_t *tree, int indent)
-{
-  int i;
-
-  fprintf( stderr, "%d:", indent);
-
-  if (!tree)
-    {
-      fprintf( stderr, "\n");
-      return;
-    }
-
-  for ( i = 0; i < indent; i++)
-    fprintf( stderr, "   ");
-
-  switch( tree->token) {
-  case TK_DOT: fprintf( stderr, ".%s\n", fts_get_symbol( &tree->value)); break;
-  case TK_COLON: fprintf( stderr, ": %s\n", fts_get_symbol( &tree->value)); break;
-  case TK_COMMA: fprintf( stderr, ",\n"); break;
-  case TK_SPACE: fprintf( stderr, "SPACE\n"); break;
-  case TK_INT: fprintf( stderr, "INT %d\n", fts_get_int( &tree->value)); break;
-  case TK_FLOAT: fprintf( stderr, "FLOAT %g\n", fts_get_float( &tree->value)); break;
-  case TK_SYMBOL: 
-    {
-      fts_symbol_t s = fts_get_symbol( &tree->value);
-      fprintf( stderr, "SYMBOL %s\n", (s != NULL) ? s : "null");
-    }
-    break;
-  case TK_PAR: fprintf( stderr, "()\n"); break;
-  case TK_CPAR: fprintf( stderr, "{}\n"); break;
-  case TK_SQPAR: fprintf( stderr, "[]\n"); break;
-  case TK_DOLLAR: 
-    if (fts_is_int( &tree->value))
-      fprintf( stderr, "$%d\n", fts_get_int( &tree->value)); 
-    else if (fts_is_symbol( &tree->value))
-      fprintf( stderr, "$%s\n", fts_get_symbol( &tree->value)); 
-    break;
-  case TK_UPLUS: fprintf( stderr, "+u\n"); break;
-  case TK_UMINUS: fprintf( stderr, "-u\n"); break;
-  case TK_LOGICAL_NOT: fprintf( stderr, "!\n"); break;
-  case TK_PLUS: fprintf( stderr, "+\n"); break;
-  case TK_MINUS: fprintf( stderr, "-\n"); break;
-  case TK_TIMES: fprintf( stderr, "*\n"); break;
-  case TK_DIV: fprintf( stderr, "/\n"); break;
-  case TK_POWER: fprintf( stderr, "**\n"); break;
-  case TK_PERCENT: fprintf( stderr, "%%\n"); break;
-  case TK_SHIFT_LEFT: fprintf( stderr, "<<\n"); break;
-  case TK_SHIFT_RIGHT: fprintf( stderr, ">>\n"); break;
-  case TK_LOGICAL_AND: fprintf( stderr, "&&\n"); break;
-  case TK_LOGICAL_OR: fprintf( stderr, "||\n"); break;
-  case TK_EQUAL_EQUAL: fprintf( stderr, "==\n"); break;
-  case TK_NOT_EQUAL: fprintf( stderr, "!=\n"); break;
-  case TK_GREATER: fprintf( stderr, ">\n"); break;
-  case TK_GREATER_EQUAL: fprintf( stderr, ">=\n"); break;
-  case TK_SMALLER: fprintf( stderr, "<\n"); break;
-  case TK_SMALLER_EQUAL: fprintf( stderr, "<=\n"); break;
-  default: fprintf( stderr, "UNKNOWN %d\n", tree->token); 
-  }
-
-  parsetree_print_aux( tree->left, indent+1);
-  parsetree_print_aux( tree->right, indent+1);
-}
-
-void fts_parsetree_print( fts_parsetree_t *tree)
-{
-  parsetree_print_aux( tree, 0);
-}
-
-main( int argc, char **argv)
-{
-  fts_parsetree_t *tree;
-
-#if YYDEBUG
-  yydebug = 1;
-#endif
-
-  tokenizer_init( argv[1]);
-
-  if (fts_parsetree_parse( 0, 0, &tree) == fts_ok)
-    fts_parsetree_print( tree);
-  else
-    fprintf( stderr, "Syntax error\n");
-}
-
-#endif
