@@ -56,13 +56,13 @@ FTS_API char* fts_make_absolute_path(const char* parent, const char* file, char*
 /** 
  * Find a file name in paths using first the project paths and then its required packages.
  *
- * @fn char *fts_file_find( const char *filenname, char *buf, int len)
+ * @fn char *fts_file_find (const char *filenname, char *buf, int len)
  * @param filename the name of the file
  * @param buf the user allocated buffer which will contain the full path
  * @param len the length of the buffer 
- * @returns 0 if the file was not found, 1 if the directory was found 
+ * @returns NULL if the file was not found, pointer to buf if the file was found 
  */
-FTS_API char *fts_file_find( const char *filename, char *buf, int len);
+FTS_API char *fts_file_find (const char *filename, char *buf, int len);
 
 /*
  * Find a file on a set of paths.

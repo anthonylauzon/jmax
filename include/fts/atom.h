@@ -372,9 +372,10 @@ FTS_API fts_class_t *fts_string_class;
 #define fts_atom_release(p) do {if(fts_is_object(p)) fts_object_release(fts_get_object(p));} while(0)
 
 /**
- * Assignment between atoms.<br>
- * This macro takes care of dereferencing the destination if it was an object
- * and referencing the source if it was an object.
+ * Assignment between atoms.<br> 
+ * This macro takes care of dereferencing the destination if it was an
+ * object and, if the source is an object, referencing it to account
+ * for the new reference from dest.
  *
  * @fn void fts_atom_assign( fts_atom_t *dest, const fts_atom_t *src)
  * @param dest pointer to the destination atom
