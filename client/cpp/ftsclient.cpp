@@ -383,13 +383,7 @@ int FtsSocketConnection::poll() throw( FtsClientException)
   r = select( _socket+1, &readfds, NULL, NULL, &tv);
 
   if (r < 0)
-    {
-#if defined(WIN32)
-      throw FtsClientException( "Error in select()", WSAGetLastError());
-#else
-      throw FtsClientException( "Error in select()", errno);
-#endif
-    }
+    throw FtsClientException( "Error in select()", LASTERROR);
 
   return r;
 }
@@ -452,7 +446,6 @@ int FtsSocketConnection::write( const unsigned char *buffer, int n) throw( FtsCl
 
 FtsPipeConnection::FtsPipeConnection( FtsProcess *fts)
 {
-  _fts = fts;
   _in = fts->getInputPipe();
   _out = fts->getOutputPipe();
 }
@@ -1284,6 +1277,15 @@ void FtsProcess::run( FtsArgs &args) throw( FtsClientException)
 #else
 void FtsProcess::run( FtsArgs &args) throw( FtsClientException)
 {
+  int from_fts_pipe[2];
+  int to_fts_pipe[2];
+
+  if ( pipe( from_fts_pipe) < 0)
+    throw FtsClientException( "Can't open pipe", errno);
+
+  if ( pipe( to_fts_pipe) < 0)
+    throw FtsClientException( "Can't open pipe", errno);
+
   if ( (_childPid = fork()) < 0)
     {
       throw FtsClientException( "Can't fork FTS", errno);
@@ -1292,6 +1294,18 @@ void FtsProcess::run( FtsArgs &args) throw( FtsClientException)
     {
       char **argv;
       int i;
+
+      /* FTS standard input is to_fts_pipe */
+      close( to_fts_pipe[1]);
+      if ( dup2( to_fts_pipe[0], 0) < 0)
+	throw FtsClientException( "dup2() failed");
+      close( to_fts_pipe[0]);
+
+      /* FTS standard output is from_fts_pipe */
+      close( from_fts_pipe[0]);
+      if ( dup2( from_fts_pipe[1], 1) < 0)
+	throw FtsClientException( "dup2() failed");
+      close( from_fts_pipe[1]);
 
       argv = new char *[args.length()+2];
 
@@ -1310,6 +1324,11 @@ void FtsProcess::run( FtsArgs &args) throw( FtsClientException)
 	}
 
       exit( 1);
+    }
+  else
+    {
+      _in = from_fts_pipe[0];
+      _out = to_fts_pipe[1];
     }
 }
 #endif

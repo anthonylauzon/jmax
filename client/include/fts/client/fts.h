@@ -50,16 +50,8 @@ class FTSCLIENT_API FtsProcess : public Fts {
     return _in;
   }
 
-  void setInputPipe(pipe_t in) {
-    _in = in;
-  }
-
   pipe_t getOutputPipe() {
     return _out;
-  }
-
-  void setOutputPipe(pipe_t out) {
-    _out = out;
   }
 
  private:

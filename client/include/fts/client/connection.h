@@ -87,7 +87,6 @@ public:
   int write( const unsigned char *buffer, int n) throw( FtsClientException);
 
 private:
-  FtsProcess *_fts;
   pipe_t _in;
   pipe_t _out;
 };
