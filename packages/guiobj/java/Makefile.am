@@ -21,8 +21,8 @@ CLEANFILES=$(JARFILE)
 
 $(JARFILE): $(JAR_DEP)	
 	if test -f $(JARFILE); then \
-		jar -uvf $(JARFILE) `find . -name "*.class" -newer $(JARFILE)` ; \
+		jar -uvf $(JARFILE) `find . -name "*.class" -newer $(JARFILE)` `find . -name "*.gif" -newer $(JARFILE)` ; \
 	else \
-		jar -cvf $(JARFILE) `find . -name "*.class"`; \
+		jar -cvf $(JARFILE) `find . -name "*.class"` `find . -name "*.gif"` ; \
 	fi
 

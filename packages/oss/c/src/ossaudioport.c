@@ -215,12 +215,12 @@ static void ossaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 #endif
 
   /* Set 16 bit format */
-#ifdef FTS_HAS_BIG_ENDIAN
+#if WORDS_BIGENDIAN
   format = AFMT_S16_BE;
-#endif
-#ifdef FTS_HAS_BIG_ENDIAN
+#else
   format = AFMT_S16_LE;
 #endif
+
   wanted_format = format;
   if ( (ioctl( this->fd, SNDCTL_DSP_SETFMT, &format) == -1) || (format != wanted_format))
     {
