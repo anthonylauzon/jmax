@@ -75,7 +75,7 @@ class FollowInteraction extends Interaction
 	  }
 	else if (Squeack.onText(squeack))
 	  {
-	    editor.resetMessage();
+	    ((GraphicObject) area.getTarget()).assistOnObject();
 	    editor.setCursor(Cursor.getDefaultCursor());
 	  }
       }

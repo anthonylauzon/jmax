@@ -129,7 +129,6 @@ slider_put_value(fts_daemon_action_t action, fts_object_t *obj,
   fts_object_ui_property_changed(obj, fts_s_value);
 }
 
-static int count = 0;		/* @@@@  */
 
 static void
 slider_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -148,14 +147,9 @@ slider_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     }
   else if (cmd == fts_s_outlet)
     {
-      if (count++ < 5)
-	{
-	  int n = fts_get_int_arg(ac, at, 1, 0);
+      int n = fts_get_int_arg(ac, at, 1, 0);
 
-	  fts_object_blip(o, "I am a nice Outlet %d, am'nt i ?", n);
-	}
-      else
-	fts_object_blip(o, "Then, have you decided ??");
+      fts_object_blip(o, "I am a nice Outlet %d, am'nt i ?", n);
     }
 }
 
