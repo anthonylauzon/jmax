@@ -1,3 +1,11 @@
+2003-08-25  Carl Seleborg  <seleborg@licorne.ircam.fr>
+
+	* fts/fts.c (fts_get_user_directory): Added fts_get_user_directory() as a wrapper
+	to (private) get_user_directory().
+	* fts/cwppc.c, linux.c, macosx.c : made get_user_directory() extern.
+	* include/fts/fts.h : declared the fts_get_user_directory() function - Fixed some typoes in the comments.
+	* include/ftsprivate/connection.h : exported fts_connection_set_type() to make VideoDSP happy (dirty!!!)
+
 2003-08-22  Riccardo Borghesi  <borghesi@livorno.ircam.fr>
 
 	*  packages/guiobj/java/ircam/jmax/guiobj/Display>java (messageChanged): 
