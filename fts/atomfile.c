@@ -36,7 +36,7 @@
 
 struct _fts_atom_file_t_
 {
-  int fd;
+  FILE* fd;
   char mode;			/* "r" for read, "w" for write */
 
   /* read part  */
@@ -94,7 +94,7 @@ fts_atom_file_close(fts_atom_file_t *f)
 static void
 fts_atom_file_read_more(fts_atom_file_t *f)
 {
-  f->count = read(f->fd, f->buf, ATOM_FILE_BUF_SIZE);
+  f->count = fread(f->buf, 1, ATOM_FILE_BUF_SIZE, f->fd);
   f->read = 0;
 }
 
@@ -462,7 +462,7 @@ fts_atom_file_write(fts_atom_file_t *f, const fts_atom_t *at, char separator)
     /* write void atom: symbol "()" */
     sprintf(buf, "()%c", separator);
 
-  write(f->fd, buf + offset, strlen(buf) - offset);
+  fwrite(buf + offset, 1, strlen(buf) - offset, f->fd);
 
   return 1;
 }

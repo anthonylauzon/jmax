@@ -159,7 +159,7 @@ sigtable_read(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   float *buf_ptr = this->buf.samples;
   int samps_left, samps_to_read, samps_read;
   char tempbuf[TEMPBUFSIZE+320];
-  int fd;
+  FILE* fd;
 
   if(!this->name)
     return;
@@ -169,7 +169,7 @@ sigtable_read(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
     return;
   }
 
-  if (lseek(fd, onset, 0) < 0){
+  if (fseek(fd, onset, 0) < 0){
     post("table~: %s: can't seek to beginning\n", fts_symbol_name(file_name));
     fts_file_close(fd);
     return;
@@ -181,7 +181,7 @@ sigtable_read(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
     char *rats;
     if (gimme > TEMPBUFSAMPS) gimme = TEMPBUFSAMPS;
 
-    bytes_read = read(fd, tempbuf, gimme * sizeof(filesamp_t));
+    bytes_read = fread(tempbuf, 1, gimme * sizeof(filesamp_t), fd);
     if (bytes_read & 1){
       post("table~: dropping odd byte\n");
       bytes_read &= ~1;
@@ -212,7 +212,7 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
 {
   sigtable_t *this = (sigtable_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
-  int fd;
+  FILE* fd;
   int samps_to_write;
   char tempbuf[TEMPBUFSIZE];
   SNDSoundStruct header;
@@ -234,7 +234,7 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
   header.channelCount = 1;
   header.info = 0x0;
 
-  if (write(fd, (char *)&header, sizeof(header)) < (int)sizeof(header)){
+  if (fwrite((char *)&header, 1, sizeof(header), fd) < (int)sizeof(header)){
     post("table~: write error in header of file: %s\n", fts_symbol_name(file_name));
     fts_file_close(fd);
     return;
@@ -264,7 +264,7 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
         shit[1] = rats[0];
       }
     }
-    if (write(fd, tempbuf, writehere*sizeof(filesamp_t)) < (int)(writehere * sizeof(filesamp_t))){
+    if (fwrite(tempbuf, 1, writehere*sizeof(filesamp_t), fd) < (int)(writehere * sizeof(filesamp_t))){
       post("table~: error writing file: %s\n",  fts_symbol_name(file_name));
       break;
     }

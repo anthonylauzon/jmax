@@ -215,20 +215,17 @@ void fts_file_get_write_path(const char *path, char *full_path)
 }
 
 
-static int
+static FILE*
 fts_do_file_open(const char *path, const char *mode)
 {
   if (*mode == 'w')
-#ifdef SGI
-    return open(path, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
-#else
-    return open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-#endif
+    return fopen(path, "wb");
   else
-    return open(path, O_RDONLY);
+    return fopen(path, "rb");
 }
 
-int fts_file_open(const char *name,  const char *mode)
+FILE* 
+fts_file_open(const char *name,  const char *mode)
 {
   char path[1024];
 
@@ -248,9 +245,9 @@ int fts_file_open(const char *name,  const char *mode)
 }
 
 int 
-fts_file_close(int fd)
+fts_file_close(FILE* fd)
 {
-  return close(fd);
+  return fclose(fd);
 }
 
 int 

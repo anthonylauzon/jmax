@@ -55,8 +55,8 @@ FTS_API void fts_file_get_write_path(const char *path, char *full_path);
 
 FTS_API int fts_file_get_read_path(const char *name, char *pathname);
 
-FTS_API int fts_file_open(const char *name, const char *mode);
-FTS_API int fts_file_close(int fd);
+FTS_API FILE* fts_file_open(const char *name, const char *mode);
+FTS_API int fts_file_close(FILE* fd);
 
 FTS_API int fts_file_is_text( fts_symbol_t file_name);
 
