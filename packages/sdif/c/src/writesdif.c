@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: writesdif.c,v 1.1 2002/08/30 14:07:13 schwarz Exp $
  *
  * jMax
  * Copyright (C) 1994, 1995, 1998, 1999, 2002 by IRCAM-Centre Georges Pompidou, Paris, France.
@@ -25,13 +25,13 @@
   This file's authors:  Diemo Schwarz, 9.8.2002
  
   Message Interface:
-  - INIT [str]:		str = filename::selection, store matrix selection
+  - INIT [str]:		str = filename::selection, store filename and 
+			matrix selection
   - DEFINE typedef	add sdif description types in string typedef 
-  - OPEN [name]:	store matrix selection for output data
-			todo: open the file and write the header, 
+  - OPEN [name]:	store filename and matrix selection for output data,
+			open the file
   - START/RECORD/bang:	set start time,
-			open the file and write the header
-			todo: don't open, only rewind, truncate file, 
+			rewind and truncate file and write the header
   - STOP/CLOSE:		stop writing and close the file
   - DELETE:		close the file if still open
   - PAUSE, toggle:	todo: pause recording
@@ -41,6 +41,8 @@
   - matrix:		todo: write matrix
 
   TODO: 
+  - how to write multiple matrices in one frame?
+  - how to write multiple frames in one file? --> multi inputs
 
   DONE:
   - remove mem leaks with selection/filename
@@ -48,7 +50,12 @@
  */
 
 /* 
- $Log$
+ * $Log: writesdif.c,v $
+ * Revision 1.1  2002/08/30 14:07:13  schwarz
+ * First working version of sdif package.
+ * In/out of scalars (singleton matrices).
+ * Definition of file-scope description types.
+ * Compiles under jmax 2.5.3 and 3.
  */ 
 
 #include <stdlib.h>
@@ -57,6 +64,7 @@
 #include <assert.h>
 
 #include <fts/fts.h>
+#include <fmat.h>
 #include "jmaxsdif.h"
 
 
@@ -64,7 +72,7 @@
 
 
 /* NOT const, since changed in putNVTgeneral by strtoNV */
-static char CVSID [] = "$Id$";
+static char CVSID [] = "$Id: writesdif.c,v 1.1 2002/08/30 14:07:13 schwarz Exp $";
 
 
 typedef struct
@@ -152,7 +160,7 @@ fts_status_t writesdif_instantiate(fts_class_t *c, int ac, const fts_atom_t *at)
     fts_method_define_varargs(c, 0, fts_s_float, writesdif_list);
     fts_method_define_varargs(c, 0, fts_s_int,   writesdif_list);
     fts_method_define_varargs(c, 0, fts_s_list,  writesdif_list);
-    /* fts_method_define_varargs(c, 0, fts_s_matrix, writesdif_matrix); */
+    fts_method_define_varargs(c, 0, fmat_symbol, writesdif_matrix);
 
     return fts_Success;
 }
@@ -209,9 +217,8 @@ static void writesdif_delete(fts_object_t *o, int winlet, fts_symbol_t s,
 }
 
 
-/* rather: set file name
+/* set file name, open file, but don't write headers yet
  * arguments: filename (with selection)
- *
  */
 static void writesdif_open(fts_object_t *o, int winlet, fts_symbol_t s, 
 			  int ac, const fts_atom_t *at)
@@ -312,6 +319,7 @@ static void writesdif_stop(fts_object_t *obj, int winlet, fts_symbol_t s,
 }
 
 
+/* called on input of a scalar (numerical atom) or list */
 static void writesdif_list(fts_object_t *obj, int winlet, fts_symbol_t s, 
 			   int ac, const fts_atom_t *at)
 {
@@ -338,6 +346,23 @@ static void writesdif_list(fts_object_t *obj, int winlet, fts_symbol_t s,
 	writesdif_writeframe(this, eFloat4, 1, n, data);
     }
 }
+
+
+static void writesdif_matrix(fts_object_t *obj, int winlet, fts_symbol_t s, 
+			     int ac, const fts_atom_t *at)
+{
+    writesdif_t *this    = (writesdif_t *) obj;
+    fmat_t	*x	 = fmat_atom_get(at);
+    int		m	 = fmat_get_m(x);
+    int		n	 = fmat_get_n(x);
+    float	*data    = fmat_get_ptr(x);
+
+    /* if (fts_get_symbol(at) == fmat_symbol) */
+    post("matrix (%d, %d) o %d\n", m, n, fts_is_object(at));
+    x = (fmat_t*) fts_get_object(at);
+    writesdif_writeframe(this, eFloat4, m, n, data);
+}
+
 
 
 
