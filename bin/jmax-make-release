@@ -179,10 +179,7 @@ check_recompile ()
 	do
 	    # Java Makefiles do not allow yet to check recompilation with -q option
 	    # (all is a phony target ...)
-	    if gmake -q ARCH=$SUB_ARCH MODE=opt all_c  > /dev/null 2>&1 || (exit 0)
-	    then
-		error "architecture \"$SUB_ARCH\" must be recompiled (recompile and retry)"
-	    fi
+	    gmake -q ARCH=$SUB_ARCH MODE=opt all_c  > /dev/null 2>&1 || error "architecture \"$SUB_ARCH\" must be recompiled (recompile and retry)"
 	done
     done
 }
