@@ -34,19 +34,48 @@ import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-//
-// The abstract base class graphic in/outlet contained in subpatchers
-//
+public class Define extends Editable implements FtsObjectErrorListener{
 
-abstract public class InOutlet extends Editable implements FtsObjectErrorListener{
+  private static final int DEFAULT_WIDTH = 54;
+  private static final int MINIMUM_WIDTH = 20;
 
-  private static final int DEFAULT_WIDTH = 64;
-  private static final int MINIMUM_WIDTH = 30;
+  private String variableName;
+  private String variableValue;
+  protected FontMetrics boldFontMetrics = null;
+  protected Font boldFont = null;
 
-  InOutlet( FtsGraphicObject theFtsObject) 
+  public Define( FtsGraphicObject theFtsObject) 
   {
     super( theFtsObject);
     setDefaultWidth(MINIMUM_WIDTH);
+        
+    setNameAndValue();
+    boldFont = getFont().deriveFont( Font.BOLD);
+    boldFontMetrics = itsSketchPad.getFontMetrics( boldFont);
+  }
+
+  void setNameAndValue()
+  {
+    String descr = ftsObject.getDescription();
+    if(descr != null)
+      {
+	int space = descr.indexOf(' ');
+	if( space != -1)
+	  {
+	    variableName = descr.substring( 0, space);
+	    variableValue = descr.substring( space+1);
+	  }
+	else
+	  {
+	    variableName = descr;
+	    variableValue = "";
+	  }
+      }
+  }
+
+  public boolean isResizable()
+  {
+    return false;
   }
 
   public void setDefaults()
@@ -55,25 +84,20 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
     updateDimensions();
   }
 
-  public boolean isResizable()
+  public int getVariableWidth()
   {
-    return false;
-  }
-
-  public void redefined()
-  {    
-    SwingUtilities.invokeLater(new Runnable(){
-	public void run()
-	{
-	  setDefaults();
-	  //fitToText();
-	}
-      });
+    if( variableName!= null && !isEditing())
+      return boldFontMetrics.stringWidth( variableName) + 2;
+    else
+      return 0;
   }
 
   public String getArgs()
   {
-     return ftsObject.getDescription();
+    if( variableName != null)
+      return variableName+" "+variableValue;
+    else 
+      return "";
   }
 
   // redefined from base class
@@ -85,30 +109,55 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
       theWidth = MINIMUM_WIDTH;
 
     super.setWidth( theWidth);
-    
-    fitToText();
   }
 
   public void setFont( Font theFont)
   {
-    super.setFont( theFont);
-    setWidth(getWidth());
-    fitToText();    
+    super.forceFont( theFont);
+    boldFont = getFont().deriveFont( Font.BOLD);
+    boldFontMetrics = itsSketchPad.getFontMetrics( boldFont);
+    
+    forceWidth( getWidth());
+    forceHeight( getFontMetrics().getHeight() + getTextHeightOffset());
+    fitToText(); 
+    redraw();
+  }
+
+  public void setCurrentFont( Font font)
+  {
+    super.setCurrentFont( font);
+    boldFont = font.deriveFont( Font.BOLD);
+    boldFontMetrics = itsSketchPad.getFontMetrics( boldFont);
   }
 
   public void redefine( String text) 
   {
-    text = ((this instanceof Inlet) ? "inlet" : "outlet") +" "+text;
-
+    text = "define "+text;
     ((FtsPatcherObject)ftsObject.getParent()).requestRedefineObject(ftsObject, text);
     itsSketchPad.getDisplayList().remove(this);
     dispose();
+  }
+
+  public void redefined()
+  {    
+    SwingUtilities.invokeLater(new Runnable(){
+	public void run()
+	{
+	  fitToText();
+	  redraw();
+	}
+      });
   }
 
   public void errorChanged(boolean value) 
   {
     redraw();
   } 
+
+  public void fitToText()
+  {
+    forceWidth(  getTextHeightOffset() + getVariableWidth() + 4 + getFontMetrics().stringWidth( variableValue) + 3);
+  }
 
   public Dimension getMinimumSize() 
   {
@@ -124,7 +173,7 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
 
   public int getTextXOffset()
   {
-    return getHeight()+TEXT_X_OFFSET;
+    return getTextHeightOffset() + getVariableWidth() +2;
   }
 
   public int getTextYOffset()
@@ -134,7 +183,7 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
 
   public int getTextWidthOffset()
   {
-    return getHeight()+5;
+    return  getTextHeightOffset() + getVariableWidth() + 4;
   }
 
   public int getTextHeightOffset()
@@ -157,15 +206,21 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
 
   public Color getTextBackground()
   {
-      if(isSelected())
-	  return Settings.sharedInstance().getObjColor().darker();
-      else
-	  return Settings.sharedInstance().getObjColor();
+    if(isSelected())
+      return Settings.sharedInstance().getObjColor().darker();
+    else
+      return Settings.sharedInstance().getObjColor();
   }
 
   public boolean isMultiline()
   {
-      return false;
+    return false;
+  }
+
+  public void edit(Point point)
+  {
+    redraw();
+    super.edit( point);
   }
 
   public void paint(Graphics g) 
@@ -174,18 +229,24 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
     int y = getY();
     int w = getWidth();
     int h = getHeight();
-    int hLine = ((TextRenderer)renderer).getRHeight()+getTextHeightOffset();
+    int hLine = getTextHeightOffset() + getVariableWidth()+2;
 
-    g.setColor(getTextBackground());
+    g.setColor( getTextBackground());
 
     g.fillRect( x + 1, y + 1, w - 2,  h - 2);
     g.fill3DRect( x + 1, y + 1, hLine - 2,  h-2, true);
 
-    drawTriangle(g, x, y, w, hLine);
-    drawContent( g);
+    if( variableName != null && !isEditing())
+      {
+	g.setColor( getTextForeground());
 
+	int bottom = getFontMetrics().getAscent() + (h - getFontMetrics().getHeight())/2;
+	g.setFont( boldFont);
+	g.drawString( variableName, x + 4, y + bottom);
+	g.setFont( getFont());
+	g.drawString( variableValue, x + hLine + 1, y + bottom);
+      }
     super.paint( g);
   }
-
-  abstract void drawTriangle(Graphics g, int x, int y, int w, int h);
 }
+

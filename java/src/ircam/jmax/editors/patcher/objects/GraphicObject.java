@@ -752,9 +752,10 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 
 	// Check for horizantal resize area (assuming a point inside the rectangle)
 
-	if ( mouseX >= x + w - ObjectGeometry.H_RESIZE_SENSIBLE_WIDTH 
-	     && mouseY > y + ObjectGeometry.H_RESIZE_SENSIBLE_WIDTH
-	     && mouseY < y + h - ObjectGeometry.H_RESIZE_SENSIBLE_WIDTH)
+	
+	if( ( isResizable()) && ( mouseX >= x + w - ObjectGeometry.H_RESIZE_SENSIBLE_WIDTH 
+				  && mouseY > y + ObjectGeometry.H_RESIZE_SENSIBLE_WIDTH
+				  && mouseY < y + h - ObjectGeometry.H_RESIZE_SENSIBLE_WIDTH))
 	  {
 	    return SensibilityArea.get(this, Squeack.HRESIZE_HANDLE);
 	  }
@@ -1034,6 +1035,11 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   }
 
   public void resizing(boolean isResizing){}
+
+  public boolean isResizable()
+  {
+    return true;
+  }
 
   // Get the bounds in a rectangle
 

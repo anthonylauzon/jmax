@@ -33,6 +33,8 @@ extern fts_class_t *fts_error_object_class;
 
 #define fts_error_object_get_description(e) ((e)->description)
 
+extern fts_class_t *fts_error_object_get_class(fts_error_object_t *obj);
+
 extern void fts_error_object_fit_inlet(fts_object_t *obj, int ninlet);
 extern void fts_error_object_fit_outlet(fts_object_t *obj, int noutlet);
 

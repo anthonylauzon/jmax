@@ -144,6 +144,12 @@ public class Guiobj implements JMaxPackage {
 	  return new XYPad( new FtsXYPadObject( server, parent, objId, className, args, offset, length));
 	}
       };
+    JMaxObjectCreator defineCreator = new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+	{
+	  return new Define( new FtsDefineObject( server, parent, objId, className, args, offset, length));
+	}
+      };
 
     JMaxClassMap.put( "standard", standardCreator, "/icons/standard.gif", "/icons/standard_cursor.gif", "standard", this);
     JMaxClassMap.put( "jpatcher", patcherCreator, "/icons/jpatcher.gif", "/icons/jpatcher_cursor.gif", "patcher", this);
@@ -159,6 +165,7 @@ public class Guiobj implements JMaxPackage {
     JMaxClassMap.put( "intbox", intboxCreator, "/icons/intbox.gif", "/icons/intbox_cursor.gif", "integer", this);
     JMaxClassMap.put( "floatbox", floatboxCreator, "/icons/floatbox.gif", "/icons/floatbox_cursor.gif", "float", this);
     JMaxClassMap.put( "display", displayCreator, "/icons/display.gif", "/icons/display_cursor.gif", "generic display", this);
+    JMaxClassMap.put( "define", defineCreator, "/icons/define.gif", "/icons/define_cursor.gif", "define", this);
     JMaxClassMap.put( "vecdisplay", vecdisplayCreator, "/icons/vecdisplay.gif", "/icons/vecdisplay_cursor.gif", "vector display", this);
     JMaxClassMap.put( "matdisplay", matdisplayCreator, "/icons/matdisplay.gif", "/icons/matdisplay_cursor.gif", "matrix display", this);
     JMaxClassMap.put( "scope~", scopeCreator, "/icons/scope.gif", "/icons/scope_cursor.gif", "oscilloscope", this);

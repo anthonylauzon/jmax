@@ -4,12 +4,14 @@ Bang.java \
 BangControlPanel.java \
 Comment.java \
 CommentControlPanel.java \
+Define.java \
 Display.java \
 FloatBox.java \
 FloatBoxControlPanel.java \
 Fork.java \
 FtsBangObject.java \
 FtsCommentObject.java \
+FtsDefineObject.java \
 FtsDisplayObject.java \
 FtsFloatValueListener.java \
 FtsFloatValueObject.java \

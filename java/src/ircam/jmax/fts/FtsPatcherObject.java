@@ -880,31 +880,17 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     int numIns = args[5].intValue;
     int numOuts = args[6].intValue;
     int layer = args[7].intValue;
-    int error = args[8].intValue;
-    String errorDescription = "";
-    String className = null;
+    String errorDescription = args[8].symbolValue.toString();
+    String className = args[9].symbolValue.toString();
 
-    boolean isTemplate;
-    int offset = 9;
-
-    if( error!=0)
-      {
-	errorDescription = args[offset++].stringValue;
-	
-	if((offset < nArgs) && args[offset+1].isString()) 
-	  className = args[offset+1].stringValue;
-      }    
-    else
-      className = args[offset++].symbolValue.toString();
-
-    isTemplate = (args[offset++].intValue == 1);
+    boolean isTemplate = (args[10].intValue == 1);
 
     GraphicObject newObj;
     
     if(isTemplate)
-      newObj = new Standard( new FtsTemplateObject( getServer(), this, objId, className, args, offset, nArgs-offset));
+      newObj = new Standard( new FtsTemplateObject( getServer(), this, objId, className, args, 11, nArgs-11));
     else
-      newObj = makeGraphicObjectFromServer( getServer(), this, objId, className, args, offset, nArgs-offset);
+      newObj = makeGraphicObjectFromServer( getServer(), this, objId, className, args, 11, nArgs-11);
 
     newObj.getFtsObject().setCurrentLayer( layer);
 
@@ -912,12 +898,14 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     
     newObj.getFtsObject().setNumberOfInlets(numIns);
     newObj.getFtsObject().setNumberOfOutlets(numOuts);
-    
-    if(error != 0)
+
+    if( !errorDescription.equals( "no_error"))
       {
-	newObj.getFtsObject().setError(error);
+	newObj.getFtsObject().setError( 1);
 	newObj.getFtsObject().setErrorDescription(errorDescription);
       }
+    else
+      newObj.getFtsObject().setError( 0);
 
     addObject(newObj.getFtsObject());
 

@@ -52,6 +52,12 @@ fts_definition_new(void)
   return def;
 }
 
+static void
+define_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc-2, o->argv+2);
+}
+
 fts_definition_t *
 fts_definition_get(fts_patcher_t *scope, fts_symbol_t name)
 {
@@ -209,6 +215,8 @@ static void
 define_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(define_t), define_init, define_delete);
+  
+  fts_class_message_varargs(cl, fts_s_spost_description, define_spost_description); 
 }
 
 /***********************************************************************

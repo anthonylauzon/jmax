@@ -55,13 +55,38 @@ error_object_instantiate(fts_class_t *cl)
   fts_class_set_default_handler(cl, error_object_default_handler);
 }
 
+fts_class_t *
+fts_error_object_get_class(fts_error_object_t *obj)
+{
+  fts_object_t *o = (fts_object_t *)obj;
+  fts_symbol_t package_name = NULL;
+  fts_symbol_t class_name = NULL;
+  fts_class_t *class = NULL;
+  
+  if(o->argc > 1 && fts_is_symbol(o->argv) && fts_get_symbol(o->argv) == fts_s_colon && fts_is_symbol(o->argv + 1))
+    class_name = fts_get_symbol(o->argv + 1);
+  else if(o->argc > 2 && 
+	  fts_is_symbol(o->argv) &&
+	  fts_is_symbol(o->argv + 1) && 
+	  fts_is_symbol(o->argv + 2) && 
+	  fts_get_symbol(o->argv + 1) == fts_s_colon)
+    {
+      package_name = fts_get_symbol(o->argv);
+      class_name = fts_get_symbol(o->argv + 2);
+    }
+
+  if(class_name != NULL)
+    return fts_class_get_by_name( package_name, class_name);
+  else
+    return fts_error_object_class;
+}
+
 void
 fts_error_object_fit_inlet(fts_object_t *obj, int ninlet)
 {
   if (fts_object_get_inlets_number(obj) <= ninlet)
     fts_object_set_inlets_number(obj, ninlet + 1);
 }
-
 
 void 
 fts_error_object_fit_outlet(fts_object_t *obj, int noutlet)

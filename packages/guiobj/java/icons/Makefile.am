@@ -1,6 +1,8 @@
 noinst_DATA= 					\
 button.gif					\
 button_cursor.gif				\
+define.gif					\
+define_cursor.gif				\
 display.gif					\
 display_cursor.gif				\
 floatbox.gif					\

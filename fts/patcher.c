@@ -1512,48 +1512,51 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
     }
   else
     {
-      fts_method_t spost_method = fts_class_get_method(fts_object_get_class(obj), fts_s_spost_description);
+      fts_class_t *class;
+      fts_method_t spost_method;
       fts_memorystream_t *stream;
-      fts_atom_t a[9];
+      fts_atom_t a_x, a_y, a_w, a_h, a_layer, a_font[3];
       fts_atom_t b[1];
 
-      fts_object_get_prop(obj, fts_s_x, a);
-      fts_object_get_prop(obj, fts_s_y, a+1);
-      fts_object_get_prop(obj, fts_s_width, a+2);
-      fts_object_get_prop(obj, fts_s_height, a+3);
+      fts_object_get_prop(obj, fts_s_x, &a_x);
+      fts_object_get_prop(obj, fts_s_y, &a_y);
+      fts_object_get_prop(obj, fts_s_width, &a_w);
+      fts_object_get_prop(obj, fts_s_height, &a_h);
 
-      fts_set_int(a+4, obj->n_inlets);
-      fts_set_int(a+5, obj->n_outlets);
-
-      fts_object_get_prop(obj, fts_s_layer, a+6);
+      fts_object_get_prop(obj, fts_s_layer, &a_layer);
 
       fts_client_start_message( this, sym_addObject);
       fts_client_add_int( this, fts_get_object_id(obj));
-      fts_client_add_int( this, fts_get_int(a));
-      fts_client_add_int( this, fts_get_int(a+1));
-      fts_client_add_int( this, fts_get_int(a+2));      
-      fts_client_add_int( this, fts_get_int(a+3));
-      fts_client_add_int( this, fts_get_int(a+4));
-      fts_client_add_int( this, fts_get_int(a+5));
-      fts_client_add_int( this, fts_get_int(a+6));
+      fts_client_add_int( this, fts_get_int(&a_x));
+      fts_client_add_int( this, fts_get_int(&a_y));
+      fts_client_add_int( this, fts_get_int(&a_w));      
+      fts_client_add_int( this, fts_get_int(&a_h));
+      fts_client_add_int( this, obj->n_inlets);
+      fts_client_add_int( this, obj->n_outlets);
+      fts_client_add_int( this, fts_get_int(&a_layer));
 
       if(fts_object_is_error(obj))
 	{
-	  fts_client_add_int( this, 1);
-	  fts_client_add_string( this, fts_error_object_get_description((fts_error_object_t *)obj));
+	  fts_client_add_symbol( this, fts_error_object_get_description((fts_error_object_t *)obj));
+	  
+	  class = fts_error_object_get_class((fts_error_object_t *)obj);
 	}
       else
 	{
-	  fts_client_add_int( this, 0);      
-	  fts_client_add_symbol( this, fts_object_get_class_name( obj));
+	  fts_client_add_symbol( this, fts_s_no_error);
+
+	  class = fts_object_get_class(obj);
 	}
       
+      fts_client_add_symbol( this, fts_class_get_name(class));
       fts_client_add_int( this, fts_object_is_template(obj));
       
       stream = patcher_get_memory_stream();
       fts_memorystream_reset( stream);
       
       fts_set_object( b, stream);
+
+      spost_method = fts_class_get_method(class, fts_s_spost_description);
 
       if(spost_method != NULL)
 	(*spost_method)(obj, fts_system_inlet, fts_s_spost_description, 1, b);
@@ -1565,13 +1568,13 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
       
       fts_client_done_message( this);
       
-      fts_object_get_prop(obj, fts_s_font, a);
+      fts_object_get_prop(obj, fts_s_font, a_font);
       
-      if( fts_get_symbol(a))
+      if( fts_get_symbol(a_font))
 	{
-	  fts_object_get_prop(obj, fts_s_fontSize, a+1);
-	  fts_object_get_prop(obj, fts_s_fontStyle, a+2);
-	  fts_client_send_message(obj, fts_s_setFont, 3, a);
+	  fts_object_get_prop(obj, fts_s_fontSize, a_font + 1);
+	  fts_object_get_prop(obj, fts_s_fontStyle, a_font + 2);
+	  fts_client_send_message(obj, fts_s_setFont, 3, a_font);
 	}
 
       /* send gui properties */
