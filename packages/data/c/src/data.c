@@ -35,6 +35,7 @@ extern void ref_config(void);
 
 extern void ivec_config(void);
 extern void fvec_config(void);
+extern void vec_config(void);
 extern void mat_config(void);
 
 extern void getelem_config(void);
@@ -52,6 +53,7 @@ data_init(void)
 
   ivec_config();
   fvec_config();
+  vec_config();
   mat_config();
 
   getelem_config();  

@@ -29,6 +29,7 @@ val.c \
 ref.c \
 ivec.c \
 fvec.c \
+vec.c \
 mat.c \
 getelem.c \
 getsize.c \
