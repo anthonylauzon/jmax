@@ -23,12 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
 
-install-includes:
+install:
 	$(INSTALL_DIR) $(include_install_dir)/fts/lang/veclib/include
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/lang/veclib/include ; done
-.PHONY: install-includes
+.PHONY: install
 
-# remove the files copied by make install ?
-uninstall:
-.PHONY: uninstall
 

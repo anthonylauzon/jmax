@@ -38,10 +38,10 @@ version.h: $(ROOTDIR)/../VERSION
 	echo '' >> version.h
 	echo '#define FTS_VERSION_STRING "jMax server version' `cat $(ROOTDIR)/../VERSION` '"' >> version.h
 
-install-includes:
+install:
 	$(INSTALL_DIR) $(include_install_dir)/fts/sys
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/sys ; done
-.PHONY: install-includes
+.PHONY: install
 
 TOCLEAN = $(MODULE_LIB)
 

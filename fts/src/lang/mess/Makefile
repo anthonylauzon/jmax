@@ -33,14 +33,10 @@ MODULE_LIB=$(LIBDIR)/libMess.a
 
 all: $(LIBDIR) $(OBJDIR) $(MODULE_LIB)
 
-install-includes:
+install:
 	$(INSTALL_DIR) $(include_install_dir)/fts/lang/mess
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/lang/mess ; done
-.PHONY: install-includes
-
-# remove the files copied by make install ?
-uninstall:
-.PHONY: uninstall
+.PHONY: install
 
 TOCLEAN = $(MODULE_LIB)
 

@@ -42,9 +42,9 @@ clean:
 	(cd devices; $(MAKE) $@)
 .PHONY: all
 
-install-includes:
+install:
 	$(INSTALL_DIR) $(include_install_dir)/fts/runtime
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/runtime ; done
 	for d in audio client devices files midi sched time ; do ( cd $$d ; $(MAKE) $@ ) ; done
-.PHONY: install-includes
+.PHONY: install
 

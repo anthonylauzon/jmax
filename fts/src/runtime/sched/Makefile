@@ -31,10 +31,10 @@ MODULE_LIB=$(LIBDIR)/libSched.a
 
 all: $(LIBDIR) $(OBJDIR) $(MODULE_LIB)
 
-install-includes:
+install:
 	$(INSTALL_DIR) $(include_install_dir)/fts/runtime/sched
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/runtime/sched ; done
-.PHONY: install-includes
+.PHONY: install
 
 TOCLEAN = $(MODULE_LIB)
 

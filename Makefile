@@ -209,7 +209,6 @@ install-bin:
 	( cd tcl ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install )
 	( cd fts ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install ) ; \
 	( cd packages ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install )
-	done
 .PHONY: install-bin
 
 install-includes:

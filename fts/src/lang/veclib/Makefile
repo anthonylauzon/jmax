@@ -43,16 +43,12 @@ portable_clean:
 	(cd portable; $(MAKE) clean)	
 .PHONY: portable_clean
 
-install-includes:
+install:
 	$(INSTALL_DIR) $(include_install_dir)/fts/lang/veclib
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/lang/veclib ; done
-	(cd include ; $(MAKE) install-includes)
-	(cd portable ; $(MAKE) install-includes)
-.PHONY: install-includes
-
-# remove the files copied by make install ?
-uninstall:
-.PHONY: uninstall
+	(cd include ; $(MAKE) install)
+	(cd portable ; $(MAKE) install)
+.PHONY: install
 
 TOCLEAN = $(MODULE_LIB)
 
