@@ -108,6 +108,7 @@ void fts_channel_propagate_input( fts_channel_t *channel, fts_propagate_fun_t pr
 
 static fts_hashtable_t *default_labels = 0;
 fts_class_t *fts_label_class = 0;
+fts_metaclass_t *fts_label_metaclass = 0;
 
 static fts_label_t *
 label_get_or_create(fts_patcher_t *scope, fts_symbol_t name)

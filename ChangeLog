@@ -1,3 +1,7 @@
+2002-03-05  François Déchelle  <dechelle@mac-dechelle.ircam.fr>
+
+	* porting of version 3.1 to Mac OS X: fixed automake problems, compilation problems
+
 2002-02-21  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* reimplemented updates with the new client connection. Changed a little

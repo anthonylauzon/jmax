@@ -34,6 +34,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/param.h> 
+#include <sys/time.h> 
 #include <mach-o/dyld.h> 
 
 #include <ftsprivate/fpe.h>
@@ -51,8 +53,7 @@ fts_symbol_t fts_get_default_root_directory( void)
   return fts_new_symbol( DEFAULT_ROOT);
 }
 
-fts_symbol_t
-fts_get_user_config( void)
+fts_symbol_t fts_get_user_config( void)
 {
   char* home;
   char path[MAXPATHLEN];
@@ -92,19 +93,17 @@ fts_get_system_config( void)
 */ 
 #define odbc_private_extern 
 
-static char *stored_error_message;
+static char error_description[1024];
+static fts_status_description_t load_library_error = { error_description};
 
 odbc_private_extern void undefined_symbol_handler( const char *symbolName) 
 {
-  fprintf( stderr, "undefined symbol: %s\n", symbolName);
-
-/*    if( stored_error_message) */
-/*      sprintf( stored_error_message, "undefined symbol: %s", symbolName);  */
+  sprintf( error_description, "undefined symbol: %s", symbolName);
 } 
 
 odbc_private_extern NSModule multiple_symbol_handler( NSSymbol s, NSModule old, NSModule new) 
 { 
-    /* 
+  /* 
      * Since we can't unload symbols, we're going to run into this 
      * every time we reload a module. Workaround here is to just 
      * rebind to the new symbol, and forget about the old one. 
@@ -112,28 +111,25 @@ odbc_private_extern NSModule multiple_symbol_handler( NSSymbol s, NSModule old, 
      * (See Radar 2262020 against dyld). 
      */ 
 
-  if( stored_error_message)
-    sprintf( stored_error_message, "multiply defined symbol: %s (old %s new %s)", NSNameOfSymbol(s), NSNameOfModule(old), NSNameOfModule(new)); 
+  sprintf( error_description, "multiply defined symbol: %s (old %s new %s)", NSNameOfSymbol(s), NSNameOfModule(old), NSNameOfModule(new)); 
 
   return new; 
 } 
 
 odbc_private_extern void linkEdit_symbol_handler (NSLinkEditErrors c, int errorNumber, const char *fileName, const char *errorString) 
 { 
-  if( stored_error_message)
-    sprintf( stored_error_message, "errors during link edit for file %s : %s", fileName, errorString); 
+  sprintf( error_description, "errors during link edit for file %s : %s", fileName, errorString); 
 } 
 
 fts_status_t fts_load_library( const char *filename, const char *symbol)
 {
-  static char error_description[1024];
-  static fts_status_description_t load_library_error = { error_description};
   static int dl_init = 0;
-  static char *full_sym_name;
-  static int full_sym_name_length;
+  char *full_sym_name;
   NSSymbol s; 
   NSObjectFileImage image; 
-  void *ret;
+  NSModule module;
+  NSObjectFileImageReturnCode ret;
+  void(*fun)(void);
 
   if ( !dl_init)
     {
@@ -148,31 +144,25 @@ fts_status_t fts_load_library( const char *filename, const char *symbol)
       dl_init = 1;
     }
 
-  stored_error_message = error_description;
-
-  if ( NSCreateObjectFileImageFromFile( filename, &image) != NSObjectFileImageSuccess )
+  if ( (ret = NSCreateObjectFileImageFromFile( filename, &image)) != NSObjectFileImageSuccess )
     return &load_library_error;
 
-  if ( !NSLinkModule( image, filename, NSLINKMODULE_OPTION_BINDNOW))
+  module = NSLinkModule( image, filename, NSLINKMODULE_OPTION_BINDNOW);
+
+  if ( !module)
     return &load_library_error;
 
-  if ( !full_sym_name || strlen( symbol) + 2 >= full_sym_name_length)
-    {
-      full_sym_name_length = strlen( symbol) + 2;
-      full_sym_name = (char *)malloc( full_sym_name_length);
-    }
-
+  full_sym_name = (char *)alloca( strlen( symbol) + 2);
   strcpy( full_sym_name, "_");
   strcat( full_sym_name, symbol);
 
-  s = NSLookupSymbolInModule( (NSModule)handle, full_sym_name); 
+  s = NSLookupSymbolInModule( module, full_sym_name); 
 
   fun = (void (*)(void))NSAddressOfSymbol( s);
 
-  stored_error_message = 0;
-
   if ( !fun)
     {
+      sprintf( error_description, "symbol %s not found", full_sym_name);
       return &load_library_error;
     }
 
@@ -218,7 +208,7 @@ int fts_unlock_memory( void)
 /*                                                                             */
 /* *************************************************************************** */
 
-void fts_platform_init( int argc, char **argv)
+void fts_platform_init( void)
 {
 }
 
@@ -232,6 +222,7 @@ void fts_platform_init( int argc, char **argv)
 double fts_systime()
 {
   struct timeval now;
+
   gettimeofday(&now, NULL);
   return (double) now.tv_sec * 1000.0 + (double) now.tv_usec / 1000.0;
 }

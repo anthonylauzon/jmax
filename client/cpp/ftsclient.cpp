@@ -30,7 +30,9 @@
 #include <netdb.h>
 #include <errno.h>
 #include <unistd.h>
+#ifdef HAVE_DLOPEN
 #include <dlfcn.h>
+#endif
 #include <signal.h>
 #define LASTERROR errno
 #else

@@ -51,9 +51,12 @@ static int fts_package_stack_top = 0;
 
 static fts_status_description_t fts_DuplicatedMetaclass = {"Duplicated metaclass"};
 
-#ifdef WIN32
+#if defined(WIN32)
 #define fts_lib_prefix   ""
 #define fts_lib_postfix  ".dll"
+/* #elif defined(__APPLE__) && defined(__MACH__) */
+/* #define fts_lib_prefix   "lib" */
+/* #define fts_lib_postfix  ".dylib" */
 #else
 #define fts_lib_prefix   "lib"
 #define fts_lib_postfix  ".so"

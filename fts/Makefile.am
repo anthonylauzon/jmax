@@ -46,9 +46,6 @@ saver.c \
 sched.c \
 selection.c \
 sigconn.c \
-soundfile.c \
-soundfile_af.c \
-srconv.c \
 stack.c \
 symbol.c \
 template.c \
@@ -61,11 +58,11 @@ bin_PROGRAMS=fts
 fts_SOURCES=main.c
 fts_LDADD=-L.libs -lfts @FTS_SYS_LIBS@ -lm
 #fts_LDADD=-lfts @FTS_SYS_LIBS@ -lm
+libfts_la_LDFLAGS = -no-undefined
 
 EXTRA_DIST=linux.c sgi.c macosx.c win32.c
 
 INCLUDES=-I$(top_srcdir)/include
-
 
 
 
