@@ -270,20 +270,13 @@ static void readsf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   }
   else
   {
-    fts_atom_t a[4];
-      
-    fts_set_symbol(a, fts_s_open);
-    fts_set_symbol(a + 1, s_open_file);
-    fts_set_symbol(a + 2, fts_project_get_dir());
+	fts_symbol_t name;
     if (NULL != self->filename)
-    {
-      fts_set_symbol(a + 3, self->filename);
-    }
+      name = self->filename;
     else
-    {
-      fts_set_symbol(a + 3, fts_new_symbol(" "));
-    }
-    fts_client_send_message(o, fts_s_openFileDialog, 4, a);
+      name = fts_new_symbol(" ");
+	  	
+	fts_object_open_dialog(o, fts_s_open, s_open_file, fts_project_get_dir(), name);
   }
 }
 

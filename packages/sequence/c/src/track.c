@@ -1140,21 +1140,7 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 static void
 track_import_midifile_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  track_t *this = (track_t *)o;
-  fts_symbol_t track_name = track_get_name(this);
-  fts_symbol_t default_name;
-  char str[1024];
-  fts_atom_t a[4];
-
-  snprintf(str, 1024, "%s.mid", track_name? fts_symbol_name(track_name): "untitled");
-  default_name = fts_new_symbol(str);
-
-  fts_set_symbol(a, seqsym_import_midifile);
-  fts_set_symbol(a + 1, fts_new_symbol("Open standard MIDI file"));
-  fts_set_symbol(a + 2, fts_project_get_dir());
-  fts_set_symbol(a + 3, default_name);
-
-  fts_client_send_message((fts_object_t *)this, seqsym_openFileDialog, 4, a);
+	fts_object_open_dialog(o, seqsym_import_midifile, fts_new_symbol("Open standard MIDI file"), fts_project_get_dir(), fts_new_symbol(" "));
 }
 
 static void
@@ -1210,15 +1196,7 @@ track_export_midifile_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac
 
   snprintf(str, 1024, "%s.mid", track_name? fts_symbol_name(track_name): "untitled");
   default_name = fts_new_symbol(str);
-
-  /* fts_client_open_file_dialog(seqsym_export_midifile, fts_new_symbol("Save standard MIDI file"), fts_project_get_dir(), default_name) */
-  
-  fts_set_symbol(a, seqsym_export_midifile);
-  fts_set_symbol(a + 1, fts_new_symbol("Save standard MIDI file"));
-  fts_set_symbol(a + 2, fts_project_get_dir());
-  fts_set_symbol(a + 3, default_name);
-
-  fts_client_send_message((fts_object_t *)this, seqsym_openFileDialog, 4, a);
+  fts_object_save_dialog(o, seqsym_export_midifile, fts_new_symbol("Save standard MIDI file"), fts_project_get_dir(), default_name);
 }
 
 static void

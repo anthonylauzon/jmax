@@ -258,10 +258,10 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     renderer.setForeground(getTextForeground());
 
     renderer.render(g, 
-		    getX() + getTextXOffset(),
-		    getY() + getTextYOffset(),
-		    getWidth() - getVariableWidth() - getTextWidthOffset(),
-		    getHeight() - getTextHeightOffset());
+                    getX() + getTextXOffset(),
+                    getY() + getTextYOffset(),
+                    getWidth() - getVariableWidth() - getTextWidthOffset(),
+                    getHeight() - getTextHeightOffset());
   }
 
   // Text Sensibility area 

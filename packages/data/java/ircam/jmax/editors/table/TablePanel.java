@@ -24,7 +24,6 @@ package ircam.jmax.editors.table;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
-import ircam.jmax.widgets.*;
 
 import ircam.jmax.editors.table.tools.*;
 import ircam.jmax.editors.table.renderers.*;

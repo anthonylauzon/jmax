@@ -46,7 +46,7 @@ static fts_symbol_t
 macosxmidi_reference_get_name(MIDIEndpointRef ref)
 {
   CFStringRef cfsr;
-  MIDIObjectGetStringProperty((MIDIObjectRef)ref, kMIDIPropertyName, &cfsr);  
+  MIDIObjectGetStringProperty((MIDIObjectRef)ref, kMIDIPropertyName, &cfsr);
   return fts_new_symbol(CFStringGetCStringPtr(cfsr, CFStringGetSystemEncoding()));
 }
 

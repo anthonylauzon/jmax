@@ -324,15 +324,7 @@ sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
       fts_post("table~: %s: can't load samples from file \"%s\"\n", this->name, file_name);      
   }
   else
-  {
-    fts_atom_t a[4];
-    
-    fts_set_symbol(a, fts_s_load);
-    fts_set_symbol(a + 1, fts_new_symbol("open file"));
-    fts_set_symbol(a + 2, fts_project_get_dir());
-    fts_set_symbol(a + 3, fts_new_symbol(" "));
-    fts_client_send_message(o, fts_s_openFileDialog, 4, a);
-  }
+	fts_object_open_dialog(o, fts_s_load, fts_new_symbol("open file"), fts_project_get_dir(), fts_new_symbol(" "));
 }
 
 static void

@@ -30,7 +30,6 @@ import javax.swing.event.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.dialogs.*;
 
 import ircam.jmax.editors.table.*;
 

@@ -1536,15 +1536,7 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       data_object_set_dirty( o);
     }
   else
-    {
-      fts_atom_t a[4];
-      
-      fts_set_symbol(a, fts_s_load);
-      fts_set_symbol(a + 1, sym_open_file);
-      fts_set_symbol(a + 2, fts_project_get_dir());
-      fts_set_symbol(a + 3, fts_new_symbol(" "));
-      fts_client_send_message(o, fts_s_openFileDialog, 4, a);
-    }
+	fts_object_open_dialog(o, fts_s_load, sym_open_file, fts_project_get_dir(), fts_new_symbol(" "));
 }
 
 static void
