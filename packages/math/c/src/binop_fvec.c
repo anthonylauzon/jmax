@@ -1000,7 +1000,7 @@ binop_fvec_number_vid_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
-/* fvec x number comparison */
+/* number x fvec comparison */
 
 static void
 binop_fvec_number_ee_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1140,7 +1140,7 @@ binop_fvec_number_le_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   fts_outlet_send(o, 0, fvec_symbol, 1, &this->out);
 }
 
-/* fvec x number min/max */
+/* number x fvec min/max */
 
 static void
 binop_fvec_number_min_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

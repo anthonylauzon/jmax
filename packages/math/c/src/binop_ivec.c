@@ -869,6 +869,352 @@ binop_ivec_max_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 
 /**************************************************************************************
  *
+ *  number x fvec
+ *
+ */
+
+/* number x ivec arithmetics */
+
+static void
+binop_ivec_number_add_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_ivec_t *this = (binop_ivec_t *)o;
+  float left = fts_get_number_float(at);
+  ivec_t *vec = this->right;
+  ivec_t *res = this->res;
+  int size = ivec_get_size(vec);
+  int res_size = ivec_get_size(res);
+  int i;
+
+  if(res_size < size)
+    ivec_set_size(res, size);
+
+  for(i=0; i<size; i++)
+    {
+      float right = ivec_get_element(vec, i);
+      ivec_set_element(res, i, left + right);
+    }
+
+  fts_outlet_send(o, 0, ivec_symbol, 1, &this->out);
+}
+
+static void
+binop_ivec_number_sub_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_ivec_t *this = (binop_ivec_t *)o;
+  float left = fts_get_number_float(at);
+  ivec_t *vec = this->right;
+  ivec_t *res = this->res;
+  int size = ivec_get_size(vec);
+  int res_size = ivec_get_size(res);
+  int i;
+
+  if(res_size < size)
+    ivec_set_size(res, size);
+
+  for(i=0; i<size; i++)
+    {
+      float right = ivec_get_element(vec, i);
+      ivec_set_element(res, i, left - right);
+    }
+
+  fts_outlet_send(o, 0, ivec_symbol, 1, &this->out);
+}
+
+static void
+binop_ivec_number_mul_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_ivec_t *this = (binop_ivec_t *)o;
+  float left = fts_get_number_float(at);
+  ivec_t *vec = this->right;
+  ivec_t *res = this->res;
+  int size = ivec_get_size(vec);
+  int res_size = ivec_get_size(res);
+  int i;
+
+  if(res_size < size)
+    ivec_set_size(res, size);
+
+  for(i=0; i<size; i++)
+    {
+      float right = ivec_get_element(vec, i);
+      ivec_set_element(res, i, left * right);
+    }
+
+  fts_outlet_send(o, 0, ivec_symbol, 1, &this->out);
+}
+
+static void
+binop_ivec_number_div_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_ivec_t *this = (binop_ivec_t *)o;
+  float left = fts_get_number_float(at);
+  ivec_t *vec = this->right;
+  ivec_t *res = this->res;
+  int size = ivec_get_size(vec);
+  int res_size = ivec_get_size(res);
+  int i;
+
+  if(res_size < size)
+    ivec_set_size(res, size);
+
+  for(i=0; i<size; i++)
+    {
+      float right = ivec_get_element(vec, i);
+
+      if(right != 0.0)
+	ivec_set_element(res, i, left / right);
+      else
+	ivec_set_element(res, i, 0.0);	
+    }
+
+  fts_outlet_send(o, 0, ivec_symbol, 1, &this->out);
+}
+
+static void
+binop_ivec_number_bus_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_ivec_t *this = (binop_ivec_t *)o;
+  float left = fts_get_number_float(at);
+  ivec_t *vec = this->right;
+  ivec_t *res = this->res;
+  int size = ivec_get_size(vec);
+  int res_size = ivec_get_size(res);
+  int i;
+
+  if(res_size < size)
+    ivec_set_size(res, size);
+
+  for(i=0; i<size; i++)
+    {
+      float right = ivec_get_element(vec, i);
+      ivec_set_element(res, i, right - left);
+    }
+
+  fts_outlet_send(o, 0, ivec_symbol, 1, &this->out);
+}
+
+static void
+binop_ivec_number_vid_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_ivec_t *this = (binop_ivec_t *)o;
+  float left = fts_get_number_float(at);
+  ivec_t *vec = this->right;
+  ivec_t *res = this->res;
+  int size = ivec_get_size(vec);
+  int res_size = ivec_get_size(res);
+  int i;
+
+  if(res_size < size)
+    ivec_set_size(res, size);
+
+  if(left != 0.0)
+    {
+      for(i=0; i<size; i++)
+	{
+	  float right = ivec_get_element(vec, i);
+	  ivec_set_element(res, i, right / left);
+	}
+    }
+  else
+    {
+      for(i=0; i<size; i++)
+	ivec_set_element(res, i, 0.0);
+    }
+
+  fts_outlet_send(o, 0, ivec_symbol, 1, &this->out);
+}
+
+/* number x ivec comparison */
+
+static void
+binop_ivec_number_ee_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_ivec_t *this = (binop_ivec_t *)o;
+  float left = fts_get_number_float(at);
+  ivec_t *vec = this->right;
+  ivec_t *res = this->res;
+  int size = ivec_get_size(vec);
+  int res_size = ivec_get_size(res);
+  int i;
+
+  if(res_size < size)
+    ivec_set_size(res, size);
+
+  for(i=0; i<size; i++)
+    {
+      float right = ivec_get_element(vec, i);
+      ivec_set_element(res, i, left == right);
+    }
+
+  fts_outlet_send(o, 0, ivec_symbol, 1, &this->out);
+}
+
+static void
+binop_ivec_number_ne_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_ivec_t *this = (binop_ivec_t *)o;
+  float left = fts_get_number_float(at);
+  ivec_t *vec = this->right;
+  ivec_t *res = this->res;
+  int size = ivec_get_size(vec);
+  int res_size = ivec_get_size(res);
+  int i;
+
+  if(res_size < size)
+    ivec_set_size(res, size);
+
+  for(i=0; i<size; i++)
+    {
+      float right = ivec_get_element(vec, i);
+      ivec_set_element(res, i, left != right);
+    }
+
+  fts_outlet_send(o, 0, ivec_symbol, 1, &this->out);
+}
+
+static void
+binop_ivec_number_gt_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_ivec_t *this = (binop_ivec_t *)o;
+  float left = fts_get_number_float(at);
+  ivec_t *vec = this->right;
+  ivec_t *res = this->res;
+  int size = ivec_get_size(vec);
+  int res_size = ivec_get_size(res);
+  int i;
+
+  if(res_size < size)
+    ivec_set_size(res, size);
+
+  for(i=0; i<size; i++)
+    {
+      float right = ivec_get_element(vec, i);
+      ivec_set_element(res, i, left > right);
+    }
+
+  fts_outlet_send(o, 0, ivec_symbol, 1, &this->out);
+}
+
+static void
+binop_ivec_number_ge_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_ivec_t *this = (binop_ivec_t *)o;
+  float left = fts_get_number_float(at);
+  ivec_t *vec = this->right;
+  ivec_t *res = this->res;
+  int size = ivec_get_size(vec);
+  int res_size = ivec_get_size(res);
+  int i;
+
+  if(res_size < size)
+    ivec_set_size(res, size);
+
+  for(i=0; i<size; i++)
+    {
+      float right = ivec_get_element(vec, i);
+      ivec_set_element(res, i, left >= right);
+    }
+
+  fts_outlet_send(o, 0, ivec_symbol, 1, &this->out);
+}
+
+static void
+binop_ivec_number_lt_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_ivec_t *this = (binop_ivec_t *)o;
+  float left = fts_get_number_float(at);
+  ivec_t *vec = this->right;
+  ivec_t *res = this->res;
+  int size = ivec_get_size(vec);
+  int res_size = ivec_get_size(res);
+  int i;
+
+  if(res_size < size)
+    ivec_set_size(res, size);
+
+  for(i=0; i<size; i++)
+    {
+      float right = ivec_get_element(vec, i);
+      ivec_set_element(res, i, left < right);
+    }
+
+  fts_outlet_send(o, 0, ivec_symbol, 1, &this->out);
+}
+
+static void
+binop_ivec_number_le_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_ivec_t *this = (binop_ivec_t *)o;
+  float left = fts_get_number_float(at);
+  ivec_t *vec = this->right;
+  ivec_t *res = this->res;
+  int size = ivec_get_size(vec);
+  int res_size = ivec_get_size(res);
+  int i;
+
+  if(res_size < size)
+    ivec_set_size(res, size);
+
+  for(i=0; i<size; i++)
+    {
+      float right = ivec_get_element(vec, i);
+      ivec_set_element(res, i, left <= right);
+    }
+
+  fts_outlet_send(o, 0, ivec_symbol, 1, &this->out);
+}
+
+/* number x ivec min/max */
+
+static void
+binop_ivec_number_min_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_ivec_t *this = (binop_ivec_t *)o;
+  float left = fts_get_number_float(at);
+  ivec_t *vec = this->right;
+  ivec_t *res = this->res;
+  int size = ivec_get_size(vec);
+  int res_size = ivec_get_size(res);
+  int i;
+      
+  if(res_size < size)
+    ivec_set_size(res, size);
+
+  for(i=0; i<size; i++)
+    {
+      float right = ivec_get_element(vec, i);
+      ivec_set_element(res, i, (right <= left)? right: left);
+    }
+
+  fts_outlet_send(o, 0, ivec_symbol, 1, &this->out);
+}
+
+static void
+binop_ivec_number_max_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_ivec_t *this = (binop_ivec_t *)o;
+  float left = fts_get_number_float(at);
+  ivec_t *vec = this->right;
+  ivec_t *res = this->res;
+  int size = ivec_get_size(vec);
+  int res_size = ivec_get_size(res);
+  int i;
+      
+  if(res_size < size)
+    ivec_set_size(res, size);
+
+  for(i=0; i<size; i++)
+    {
+      float right = ivec_get_element(vec, i);
+      ivec_set_element(res, i, (right >= left)? right: left);
+    }
+
+  fts_outlet_send(o, 0, ivec_symbol, 1, &this->out);
+}
+
+/**************************************************************************************
+ *
  *  class
  *
  */
@@ -885,98 +1231,154 @@ binop_ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_add_number);
       else
-	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_add_ivec);
+	{
+	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_add_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_add_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_ivec_number_add_ivec);
+	}
     }
   else if(name == math_sym_sub)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_sub_number);
       else
-	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_sub_ivec);
+	{
+	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_sub_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_sub_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_ivec_number_sub_ivec);
+	}
     }
   else if(name == math_sym_mul)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_mul_number);
       else
-	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_mul_ivec);
+	{
+	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_mul_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_mul_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_ivec_number_mul_ivec);
+	}
     }
   else if(name == math_sym_div)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_div_number);
       else
-	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_div_ivec);
+	{
+	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_div_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_div_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_ivec_number_div_ivec);
+	}
     }
   else if(name == math_sym_bus)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_bus_number);
       else
-	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_bus_ivec);
+	{
+	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_bus_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_bus_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_ivec_number_bus_ivec);
+	}
     }
   else if(name == math_sym_vid)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_vid_number);
       else
-	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_vid_ivec);
+	{
+	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_vid_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_vid_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_ivec_number_vid_ivec);
+	}
     }
   else if(name == math_sym_ee)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ee_number);
       else
-	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ee_ivec);
+	{
+	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ee_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_ee_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_ivec_number_ee_ivec);
+	}
     }
   else if(name == math_sym_ne)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ne_number);
       else
-	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ne_ivec);
+	{
+	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ne_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_ne_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_ivec_number_ne_ivec);
+	}
     }
   else if(name == math_sym_gt)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_gt_number);
       else
-	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_gt_ivec);
+	{
+	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_gt_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_gt_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_ivec_number_gt_ivec);
+	}
     }
   else if(name == math_sym_ge)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ge_number);
       else
-	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ge_ivec);
+	{
+	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_ge_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_ge_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_ivec_number_ge_ivec);
+	}
     }
   else if(name == math_sym_lt)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_lt_number);
       else
-	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_lt_ivec);
+	{
+	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_lt_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_lt_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_ivec_number_lt_ivec);
+	}
     }
   else if(name == math_sym_le)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_le_number);
       else
-	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_le_ivec);
+	{
+	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_le_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_le_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_ivec_number_le_ivec);
+	}
     }
   else if(name == math_sym_min)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_min_number);
       else
-	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_min_ivec);
+	{
+	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_min_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_min_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_ivec_number_min_ivec);
+	}
     }
   else if(name == math_sym_max)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_max_number);
       else
-	fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_max_ivec);
+	{
+	  fts_method_define_varargs(cl, 0, ivec_symbol, binop_ivec_max_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_ivec_number_max_ivec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_ivec_number_max_ivec);
+	}
     }
   
   if(fts_is_number(at + 1))
