@@ -160,17 +160,14 @@ public class SelectionMover extends InteractionModule implements XORPainter {
 	  {
 	    aScrEvent = (ScrEvent) e.nextElement();
 	    
+	    gc.getAdapter().setX(tempEvent, gc.getAdapter().getX(aScrEvent));
+	    gc.getAdapter().setY(tempEvent, gc.getAdapter().getY(aScrEvent));
+	    gc.getAdapter().setLenght(tempEvent, gc.getAdapter().getLenght(aScrEvent));
 	    if ((itsMovements & MoverTool.HORIZONTAL_MOVEMENT) != 0) 
 	      gc.getAdapter().setX(tempEvent, gc.getAdapter().getX(aScrEvent)+dx);
-	    else   
-	      gc.getAdapter().setX(tempEvent, gc.getAdapter().getX(aScrEvent));
 	    
 	    if ((itsMovements & MoverTool.VERTICAL_MOVEMENT) != 0) 
 	      gc.getAdapter().setY(tempEvent, gc.getAdapter().getY(aScrEvent)+dy);
-	    else
-	      gc.getAdapter().setY(tempEvent, gc.getAdapter().getY(aScrEvent));
-	    
-	    gc.getAdapter().setLenght(tempEvent, gc.getAdapter().getLenght(aScrEvent));
 	    
 	    gc.getRenderer().getEventRenderer().render(tempEvent, g, true);
 	  }

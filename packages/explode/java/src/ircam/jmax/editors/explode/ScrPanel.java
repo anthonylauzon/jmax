@@ -46,7 +46,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     //-- prepares the CENTER panel (the score)
     // a simple panel, that just uses a Renderer as its paint method...
     // it takes care of the popup showing.
-    // NOTE: the popup cannot be shown outside this inner class, since
+    // NOTE: the popup cannot be shown from a simple listener, since
     // being a MouseListener for this panel does not prevent the panel
     // itself (and then the current tool) to receive the same events.
     itsScore = new JPanel() {
@@ -64,9 +64,12 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
 
       protected void processMouseEvent(MouseEvent e)
 	{
-	  if (e.isPopupTrigger())
+	  if (e.isPopupTrigger()) 
 	    ScrToolbar.getToolbar().itsPopupMenu.show (e.getComponent(), e.getX(), e.getY());
-	  else super.processMouseEvent(e);
+	  
+	  else 
+	    super.processMouseEvent(e);
+	  
 	}
     };
 

@@ -3,7 +3,8 @@ package ircam.jmax.editors.explode;
 import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
-
+import java.io.File;
+import ircam.jmax.MaxApplication;
 
 /**
  * The main class for a score representation.
@@ -39,9 +40,12 @@ public class ScoreRenderer implements Renderer, ImageObserver{
    */
   private void init() 
   {    
+    String fs = File.separator;
+    String path = MaxApplication.getProperty("root")+fs+"packages/explode/images"+fs;
+
     if (itsImage == null) 
       {
-	itsImage = Toolkit.getDefaultToolkit().getImage("/u/worksta/maggi/projects/max/packages/explode/images/pianoroll2tr.gif");
+	itsImage = Toolkit.getDefaultToolkit().getImage(path+"pianoroll2tr.gif");
 	itsImage.getWidth(this); //call any method on the image starts loading it
       }
   }
