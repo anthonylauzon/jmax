@@ -227,7 +227,7 @@ message_table_atom_buf_grow(fts_atom_t *buf, int size, int more)
 }
 
 int 
-message_table_file_read_acsii(message_table_t *mt, fts_symbol_t file_name)
+message_table_file_import_ascii(message_table_t *mt, fts_symbol_t file_name)
 {
   fts_atom_file_t *file;
   fts_atom_t a;
@@ -300,7 +300,7 @@ message_table_file_read_acsii(message_table_t *mt, fts_symbol_t file_name)
 }
 
 int 
-message_table_file_write_ascii(message_table_t *mt, fts_symbol_t file_name)
+message_table_file_export_ascii(message_table_t *mt, fts_symbol_t file_name)
 {
   fts_atom_t  a;
   fts_atom_file_t *file;

@@ -36,24 +36,6 @@
 
 #include <string.h>
 
-/* utility function to find the real path */
-
-
-static char buf[1024];
-
-static const char *get_readsf_path(fts_symbol_t filename)
-{
-  fts_file_get_read_path(fts_symbol_name(filename), buf);
-  
-  return buf;
-}
-
-static const char *get_writesf_path(fts_symbol_t filename)
-{
-  fts_file_get_write_path(fts_symbol_name(filename), buf);
-  return buf;
-}
-
 /*
  * readsf~
  *
@@ -69,7 +51,7 @@ static const char *get_writesf_path(fts_symbol_t filename)
  * Accept the following messages, like in the ISPW:
  *
  * 
- * open filename
+ * open file_name
  * <int> 1 -> start play, or resume playing after a pause
  * <int> 0 -> stop play, and close the file.
  *
@@ -107,70 +89,58 @@ static const char *get_writesf_path(fts_symbol_t filename)
 typedef struct
 {
   fts_object_t _o;
-  fts_symbol_t filename;
+  fts_symbol_t file_name;
   fts_dev_t *device;
   enum {idle, playing, pause} status;
   int nchans;
 } readsf_t;
 
 /* Service functions */
-
 static void readsf_file_open(readsf_t *this)
 {
-  if (this->status == idle)
-    {
-      fts_status_t ret;
-      fts_atom_t a[3];
+  fts_status_t ret;
+  fts_atom_t a[3];
+  char file_path[1024];
 
+  if(fts_file_get_read_path(fts_symbol_name(this->file_name), file_path))
+    {  
       /* Build the open arg list: current version, use the default device fifosize and fileblock size */
-
-      fts_set_symbol(&a[0], fts_new_symbol_copy( get_readsf_path( this->filename)));
+      fts_set_symbol(&a[0], fts_new_symbol_copy(file_path));
       fts_set_symbol(&a[1], fts_new_symbol("channels"));
-      fts_set_int(&a[2],    this->nchans);
-
+      fts_set_int(&a[2], this->nchans);
+      
       /* Open the device; note that the device is opened not active !! */
-
-      ret = fts_dev_open(&(this->device), fts_new_symbol("readsf"), 3, a);
-
-      if (ret != fts_Success)
-	post("readsf~: cannot open file '%s' for reading\n", fts_symbol_name(this->filename));
-      else
-	this->status = pause;
+      fts_dev_open(&(this->device), fts_new_symbol("readsf"), 3, a);
+      
+      this->status = pause;
     }
+  else
+    post("readsf~: cannot open file '%s' for reading\n", fts_symbol_name(this->file_name));
 }
 
 
 static void
 readsf_file_close(readsf_t *this)
 {
-  if (this->status != idle)
-    {
-      fts_dev_close(this->device);
-      this->device = 0;
-      this->status = idle;
-    }
+  fts_dev_close(this->device);
+  this->device = 0;
+  this->status = idle;
 }
 
 
 static void
 readsf_file_start(readsf_t *this)
 {
-  if (this->status == pause)
-    {
-      fts_sig_dev_activate(this->device);
-      this->status = playing;
-    }
+  fts_sig_dev_activate(this->device);
+  this->status = playing;
 }
 
 
 static void
 readsf_file_pause(readsf_t *this)
 {
-  if (this->status == playing)
-    {
-      fts_sig_dev_deactivate(this->device);
-      this->status = pause;
-    }
+  fts_sig_dev_deactivate(this->device);
+  this->status = pause;
 }
 
 /* Methods */
@@ -179,16 +149,28 @@ static void readsf_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 {
   readsf_t *this = (readsf_t *)o;
 
-  readsf_file_start(this);
+  if (this->status == pause)
+    readsf_file_start(this);
 }
 
+static void
+readsf_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  readsf_t *this = (readsf_t *)o;
+
+  if (this->status == playing)
+    readsf_file_pause(this);
+  else if (this->status == pause)
+    readsf_file_start(this);
+}
 
 static void
 readsf_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   readsf_t *this = (readsf_t *)o;
 
-  readsf_file_pause(this);
+  if (this->status == playing)
+    readsf_file_pause(this);
 }
 
 
@@ -197,7 +179,8 @@ readsf_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   readsf_t *this = (readsf_t *)o;
 
-  readsf_file_close(this);
+  if (this->status != idle)
+    readsf_file_close(this);
 }
 
 
@@ -205,14 +188,14 @@ static void
 readsf_open(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   readsf_t *this = (readsf_t *)o;
-  fts_symbol_t filename = fts_get_symbol_arg(ac, at, 0, 0);
+  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
 
   if (this->status != idle)
     readsf_file_close(this);
 
-  if (filename)
+  if (file_name)
     {
-      this->filename = filename;
+      this->file_name = file_name;
       readsf_file_open(this);
     }
 }
@@ -221,12 +204,12 @@ static void
 readsf_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   readsf_t *this = (readsf_t *)o;
-  int cmd = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
-  if (cmd == 0)
-    readsf_stop(o, winlet, s, ac, at);
-  else if (cmd == 1)
-    readsf_start(o, winlet, s, ac, at);
+  if (n == 0 && this->status == playing)
+    readsf_file_pause(this);
+  else if (n == 1 && this->status == pause)
+    readsf_file_start(this);
 }
 
 
@@ -339,10 +322,10 @@ readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[0] = fts_s_float;
   fts_method_define(cl, 0, fts_s_float, readsf_number, 1, a);
 
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_new_symbol("start"), readsf_start, 1, a);
-  fts_method_define(cl, 0, fts_new_symbol("stop"),  readsf_stop, 1, a);
-  fts_method_define(cl, 0, fts_new_symbol("pause"), readsf_pause, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_bang, readsf_bang);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("start"), readsf_start);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), readsf_stop);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), readsf_pause);
 
   a[0] = fts_s_symbol;
   a[1] = fts_s_int;
@@ -379,7 +362,7 @@ readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
  * Accept the following messages, like in the ISPW:
  *
  * 
- * open filename
+ * open file_name
  * <int> 1 -> start writing, or resume writing after a pause
  * <int> 0 -> stop writing, and close the file.
  *
@@ -416,7 +399,7 @@ readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 typedef struct
 {
   fts_object_t _o;
-  fts_symbol_t filename;
+  fts_symbol_t file_name;
   fts_symbol_t format;
   float sampling_rate;
   int nchans;
@@ -426,10 +409,10 @@ typedef struct
   enum
   {
     writesf_idle,
-    writesf_playing,
+    writesf_pending_pausing,
     writesf_pausing,
     writesf_pending_playing,
-    writesf_pending_pausing
+    writesf_playing
   } status;
 
 } writesf_t;
@@ -438,31 +421,29 @@ typedef struct
 
 static fts_status_t writesf_file_open(writesf_t *this)
 {
-  const char *filename;
+  char file_path[1024];
   fts_status_t ret;
   fts_atom_t a[7];
   int ac;
 
   /* Build the open arg list: current version, use the default device fifosize and fileblock size */
-
-  filename = get_writesf_path(this->filename);
-
   ac = 0;
-  fts_set_symbol(&a[ac], fts_new_symbol_copy(filename)); ac++;
+  fts_set_symbol(&a[ac], fts_new_symbol_copy(file_path)); ac++;
   fts_set_symbol(&a[ac], fts_new_symbol("channels")); ac++;
-  fts_set_int(&a[ac],    this->nchans); ac++;
+  fts_set_int(&a[ac], this->nchans); ac++;
   fts_set_symbol(&a[ac], fts_s_sampling_rate);  ac++;
-  fts_set_float(&a[ac],  this->sampling_rate); ac++;
-
+  fts_set_float(&a[ac], this->sampling_rate); ac++;
+  
   if (this->format != fts_s_void)
     {
       fts_set_symbol(&a[ac], fts_new_symbol("format")); ac++;
       fts_set_symbol(&a[ac], this->format); ac++;
     }
-
-  /* Open the device; note that the device is opened not active !! */
-
+  
+  /* Open the device; note that the device is opened not active !! */      
   return fts_dev_open(&(this->device), fts_new_symbol("writesf"), ac, a);
+
+  /* post("readsf~: cannot open file '%s' for writing\n", fts_symbol_name(this->file_name)); */
 }
 
 
@@ -571,23 +552,20 @@ static void
 writesf_open(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   writesf_t *this = (writesf_t *)o;
-  fts_symbol_t filename = fts_get_symbol_arg(ac, at, 0, 0);
+  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
   fts_symbol_t format = fts_get_symbol_arg(ac, at, 1, fts_s_void);
 
   /* Clean up if needed */
-
   writesf_stop(o, 0, 0, 0, 0);
 
   /* Store the state */
-
-  if (filename)
+  if (file_name)
     {
-      this->filename = filename;
+      this->file_name = file_name;
       this->format   = format;
     }
 
   /* Open or set the state */
-
   if (dsp_is_running())
     {
       fts_status_t ret;
@@ -595,7 +573,7 @@ writesf_open(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
       ret = writesf_file_open(this);
 
       if (ret != fts_Success)
-	post("writesf~: cannot open file '%s' for reading\n", fts_symbol_name(this->filename));
+	post("writesf~: cannot open file '%s' for reading\n", fts_symbol_name(this->file_name));
       else
 	this->status = writesf_pausing;
     }
@@ -608,15 +586,24 @@ static void
 writesf_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   writesf_t *this = (writesf_t *)o;
-  int cmd = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
-  if (cmd == 0)
+  if (n == 0 && this->status >= writesf_playing)
     writesf_stop(o, winlet, s, ac, at);
-  else if (cmd == 1)
+  else if (n == 1  && this->status >= writesf_pausing)
     writesf_start(o, winlet, s, ac, at);
 }
 
+static void
+writesf_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  writesf_t *this = (writesf_t *)o;
 
+  if (this->status >= writesf_playing)
+    writesf_pause(o, winlet, s, ac, at);
+  else if (this->status >= writesf_pausing)
+    writesf_start(o, winlet, s, ac, at);
+}
 
 static void
 writesf_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -773,10 +760,10 @@ writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[0] = fts_s_float;
   fts_method_define(cl, 0, fts_s_float, writesf_number, 1, a);
 
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_new_symbol("start"), writesf_start, 1, a);
-  fts_method_define(cl, 0, fts_new_symbol("stop"),  writesf_stop, 1, a);
-  fts_method_define(cl, 0, fts_new_symbol("pause"), writesf_pause, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_bang, writesf_bang);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("start"), writesf_start);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"),  writesf_stop);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), writesf_pause);
 
   a[0] = fts_s_symbol;
   a[1] = fts_s_int;
@@ -797,11 +784,3 @@ void disk_config(void)
   fts_metaclass_install(fts_new_symbol("readsf~"), readsf_instantiate, fts_first_arg_equiv);
   fts_metaclass_install(fts_new_symbol("writesf~"), writesf_instantiate, fts_first_arg_equiv);
 }
-
-
-
-
-
-
-
-

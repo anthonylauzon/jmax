@@ -104,25 +104,25 @@ messtab_set_buffer(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-messtab_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messtab_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messtab_t *this = (messtab_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
   int n;
   
-  n = message_table_file_read(this->tab, name);
+  n = message_table_file_import_ascii(this->tab, name);
   
   if(n)
     fts_outlet_int(o, 1, n);
 }
 
 static void
-messtab_write(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messtab_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messtab_t *this = (messtab_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
   
-  message_table_file_write(this->tab, name);
+  message_table_file_export_ascii(this->tab, name);
 }
 
 static void
@@ -155,7 +155,7 @@ messtab_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	  fts_object_blip(o, "recalled message", n);
 	  break;
 	case 1:
-	  fts_object_blip(o, "<int>: # of messages read from file (= current table size)");
+	  fts_object_blip(o, "<int>: # of messages read from file");
 	}
     }
 }
@@ -202,8 +202,8 @@ messtab_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* message in */
   fts_method_define_varargs(cl, 1, fts_s_anything, messtab_set_buffer);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("read"), messtab_read);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("write"), messtab_write);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("import"), messtab_import);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("export"), messtab_export);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), messtab_assist); 
 
