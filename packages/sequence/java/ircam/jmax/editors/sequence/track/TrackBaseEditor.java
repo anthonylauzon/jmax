@@ -110,6 +110,21 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 			public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
 		  {
 				markersSelection.addListSelectionListener(TrackBaseEditor.this);
+				
+				gc.getMarkersTrack().addListener( new TrackDataListener() {
+						public void objectChanged(Object spec, String propName, Object propValue){repaint();}
+						public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){repaint();}
+						public void objectMoved(Object whichObject, int oldIndex, int newIndex){repaint();}
+						public void objectAdded(Object whichObject, int index){repaint();}
+						public void objectsAdded(int maxTime){repaint();}
+						public void objectDeleted(Object whichObject, int oldIndex){repaint();}
+						public void trackCleared(){repaint();}
+						public void startTrackUpload( TrackDataModel track, int size){}
+						public void endTrackUpload( TrackDataModel track){}
+						public void startPaste(){}
+						public void endPaste(){}
+						public void trackNameChanged(String oldName, String newName) {}
+					});
 			}
 		});
 		

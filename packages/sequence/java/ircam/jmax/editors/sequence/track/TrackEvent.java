@@ -41,11 +41,11 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
   static
   {
     FtsObject.registerMessageHandler( TrackEvent.class, FtsSymbol.get("set"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((TrackEvent)obj).setCurrentProperties( args.getLength(), args.getAtoms());
-	}
-      });
+			public void invoke( FtsObject obj, FtsArgs args)
+			{
+				((TrackEvent)obj).setCurrentProperties( args.getLength(), args.getAtoms());
+			}
+		});
   }
 
   public TrackEvent(FtsServer server, FtsObject parent, int objId, String className, FtsAtom args[], int offset, int length)

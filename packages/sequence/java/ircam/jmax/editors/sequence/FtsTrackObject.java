@@ -539,22 +539,97 @@ public void requestNotifyEndUpdate()
     e.printStackTrace();
 }
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////
 public void requestEventCreation(float time, String type, int nArgs, Object arguments[])
 {
-  editorObject.requestEventCreation(time, type, nArgs, arguments);
+		args.clear();
+		args.addDouble( (double)time);
+		args.addSymbol( FtsSymbol.get(type));
+		
+		for(int i=0; i<nArgs; i++)
+		{
+			if( arguments[i] instanceof Double)
+				args.addDouble(((Double)arguments[i]).floatValue());
+			else
+				if(  arguments[i] instanceof String)
+					args.addSymbol( FtsSymbol.get( (String)arguments[i]));
+			else
+				args.add(arguments[i]);
+		}
+		try{
+			send( FtsSymbol.get("addEvent"), args);
+		}
+		catch(IOException e)
+		{
+			System.err.println("FtsTrackObject: I/O Error sending addEvent Message!");
+			e.printStackTrace(); 
+		}
 }
+
 public void requestEventCreationWithoutUpload(float time, String type, int nArgs, Object arguments[])
 {
-  editorObject.requestEventCreationWithoutUpload(time, type, nArgs, arguments);
+	args.clear();
+	args.addDouble( (double)time);
+	args.addSymbol( FtsSymbol.get( type));
+	
+	for(int i=0; i<nArgs; i++)
+		if(arguments[i] instanceof Double)
+			args.addDouble(((Double)arguments[i]).doubleValue());
+		else
+			if( arguments[i] instanceof String)
+				args.addSymbol( FtsSymbol.get( (String)arguments[i]));
+		else
+			args.add(arguments[i]);
+	
+	try{
+		send( FtsSymbol.get("makeEvent"), args);
+	}
+	catch(IOException e)
+	{
+		System.err.println("FtsTrackObject: I/O Error sending makeEvent Message!");
+		e.printStackTrace(); 
+	}   
 }
+
 public void requestEventMove(TrackEvent evt, double newTime)
 {
-  editorObject.requestEventMove(evt, newTime);
+	args.clear();
+	args.addObject( evt);
+	args.addDouble(newTime);
+	
+	try{
+		send( FtsSymbol.get("moveEvents"), args);
+	}
+	catch(IOException e)
+	{
+		System.err.println("FtsTrackObject: I/O Error sending moveEvents Message!");
+		e.printStackTrace(); 
+	}   
 }
+
 public void requestEventsMove(Enumeration events, int deltaX, Adapter a)
 {
-  editorObject.requestEventsMove(events, deltaX, a);
+	TrackEvent aEvent;
+	
+	args.clear();
+	for (Enumeration e = events; e.hasMoreElements();) 
+	{	  
+		aEvent = (TrackEvent) e.nextElement();		    
+		args.addObject( aEvent);
+		args.addDouble((double)a.getInvX(a.getX(aEvent)+deltaX));
+	}
+	
+	try{
+		send( FtsSymbol.get("moveEvents"), args);
+	}
+	catch(IOException e)
+	{
+		System.err.println("FtsTrackObject: I/O Error sending moveEvents Message!");
+		e.printStackTrace(); 
+	}   
 }
+
 public void requestSetSaveEditor(boolean save)
 {  
   if(saveEditor!=save)
@@ -863,14 +938,38 @@ public void moveEvent(TrackEvent event, double newTime)
 /**
 * deletes an event from the database
  */
-public void deleteEvent(TrackEvent event)
+ 
+ public void deleteEvent(TrackEvent event)
 {
-  editorObject.deleteEvent(event);
+	args.clear();
+	args.add(event);
+	
+	try{
+		send( FtsSymbol.get("removeEvents"), args);
+	}
+	catch(IOException e)
+	{
+		System.err.println("FtsTrackObject: I/O Error sending removeEvents Message!");
+		e.printStackTrace(); 
+	}  
 }
+
 public void deleteEvents(Enumeration events)
 {
-  editorObject.deleteEvents(events);
+	args.clear();
+	for (Enumeration e = events; e.hasMoreElements();) 
+		args.add((TrackEvent) e.nextElement());
+	
+	try{
+		send( FtsSymbol.get("removeEvents"), args);
+	}
+	catch(IOException e)
+	{
+		System.err.println("FtsTrackObject: I/O Error sending removeEvents Message!");
+		e.printStackTrace(); 
+	}  
 }
+
 public void deleteAllEvents()
 {
   while(events_fill_p != 0)
@@ -1091,18 +1190,18 @@ public void paste()
 
         beginUpdate();  //the paste is undoable
 
-        editorObject.requestEventCreation((float)event.getTime(),
-                                          event.getValue().getValueInfo().getName(),
-                                          event.getValue().getDefinedPropertyCount()*2,
-                                          event.getValue().getDefinedPropertyNamesAndValues());
+        requestEventCreation((float)event.getTime(),
+														event.getValue().getValueInfo().getName(),
+														event.getValue().getDefinedPropertyCount()*2,
+														event.getValue().getDefinedPropertyNamesAndValues());
 
         while (objectsToPaste.hasMoreElements())
         {
           event = (Event) objectsToPaste.nextElement();
-          editorObject.requestEventCreation((float)event.getTime(),
-                                            event.getValue().getValueInfo().getName(),
-                                            event.getValue().getDefinedPropertyCount()*2,
-                                            event.getValue().getDefinedPropertyNamesAndValues());
+          requestEventCreation((float)event.getTime(),
+															event.getValue().getValueInfo().getName(),
+														  event.getValue().getDefinedPropertyCount()*2,
+															event.getValue().getDefinedPropertyNamesAndValues());
         }
 
         requestEndPaste();
@@ -1357,10 +1456,10 @@ public void mergeModel(TrackDataModel model)
     for (Enumeration e = model.getEvents(); e.hasMoreElements();)
     {
       event = (Event) e.nextElement();
-      editorObject.requestEventCreationWithoutUpload((float)event.getTime(),
-                                                     event.getValue().getValueInfo().getName(),
-                                                     event.getValue().getDefinedPropertyCount()*2,
-                                                     event.getValue().getDefinedPropertyNamesAndValues());
+      requestEventCreationWithoutUpload((float)event.getTime(),
+																				event.getValue().getValueInfo().getName(),
+																				event.getValue().getDefinedPropertyCount()*2,
+																				event.getValue().getDefinedPropertyNamesAndValues());
     }
 
     try{

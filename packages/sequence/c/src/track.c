@@ -431,6 +431,126 @@ track_copy_function(const fts_atom_t *from, fts_atom_t *to)
   track_copy((track_t *)fts_get_object(from), (track_t *)fts_get_object(to));
 }
 
+/******************************************************
+*
+*  client calls
+*
+*/
+static event_t *
+track_create_event(int ac, const fts_atom_t *at)
+{
+  event_t *event = NULL;
+  fts_symbol_t class_name;
+
+  if(fts_is_symbol(at) && fts_get_symbol(at) == fts_s_colon)
+  {
+    ac--;
+    at++;
+  }
+
+  class_name = fts_get_symbol(at);
+  ac--;
+  at++;
+
+  if(class_name == fts_s_int || class_name == fts_s_float || class_name == fts_s_symbol)
+    event = (event_t *)fts_object_create(event_class, 1, at + 1);
+  else
+  {
+    fts_class_t *type = fts_get_class_by_name(class_name);
+
+    if(type)
+    {
+      fts_object_t *obj = fts_object_create(type, 0, 0);
+
+      if(obj)
+      {
+        fts_atom_t a;
+        int i;
+
+        for(i=0; i<ac-1; i+=2)
+        {
+          if(fts_is_symbol(at + i))
+          {
+            fts_symbol_t prop = fts_get_symbol(at + i);
+
+            fts_send_message(obj, prop, 1, at + i + 1);
+          }
+        }
+        fts_set_object(&a, obj);
+        event = (event_t *)fts_object_create(event_class, 1, &a);
+      }
+    }
+  }
+  return event;
+}
+
+/* create new event and upload by client request */
+static void
+track_add_event_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  double time = fts_get_float(at + 0);
+  event_t *event = track_create_event(ac - 1, at + 1);
+	
+  if(event)
+    track_add_event_and_upload( this, time, event);
+}
+
+static void
+track_make_event_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  double time = fts_get_float(at + 0);
+  event_t *event;
+	
+  /* make new event object */
+  event = track_create_event(ac - 1, at + 1);
+	
+  /* add event to track */
+  if(event)
+    track_add_event(this, time, event);
+	
+  fts_object_set_state_dirty((fts_object_t *)this);
+}
+
+static void
+track_remove_events_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  int i;
+	
+  /*  remove event objects from client */
+  fts_client_send_message((fts_object_t *)this, seqsym_removeEvents, ac, at);
+	
+  for(i=0; i<ac; i++)
+  {
+    fts_object_t *event = fts_get_object(at + i);
+    track_remove_event(this, (event_t *)event);
+  }
+	
+  fts_object_set_state_dirty((fts_object_t *)this);
+}
+
+/* move event by client request */
+static void
+track_move_events_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  int i;
+	
+  for(i=0; i<ac; i+=2)
+  {
+    event_t *event = (event_t *)fts_get_object(at + i);
+    float time = fts_get_float(at + i + 1);
+		
+    track_move_event(this, (event_t *)event, time);
+  }
+	
+  fts_client_send_message((fts_object_t *)this, seqsym_moveEvents, ac, at);
+	
+  fts_object_set_state_dirty((fts_object_t *)this);
+}
+
 /*********************************************************
 *
 *  get events
@@ -1509,6 +1629,11 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_number(cl, seqsym_active, track_active);
 
   fts_class_message_void(cl, fts_s_clear, track_clear_method);
+	
+	fts_class_message_varargs(cl, seqsym_addEvent, track_add_event_from_client);
+  fts_class_message_varargs(cl, seqsym_makeEvent, track_make_event_from_client);
+  fts_class_message_varargs(cl, seqsym_removeEvents, track_remove_events_from_client);
+  fts_class_message_varargs(cl, seqsym_moveEvents, track_move_events_from_client);
 
   fts_class_message_varargs(cl, seqsym_insert, track_insert);  
   fts_class_message_atom(cl, seqsym_remove, track_remove);
