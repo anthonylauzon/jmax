@@ -174,7 +174,7 @@ seqobj_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 void
-seqobj_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqobj_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -184,6 +184,38 @@ seqobj_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   if(sequence_editor_open(this))
     seqobj_update(o, 0, 0, 0, 0);
+}
+
+void 
+seqobj_import_midifile_with_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+  fts_symbol_t default_name;
+  char str[1024];
+  fts_atom_t a[4];
+
+  snprintf(str, 1024, " ");
+  default_name = fts_new_symbol_copy(str);
+      
+  fts_set_symbol(a, seqsym_import_midi);
+  fts_set_symbol(a + 1, fts_new_symbol("Import standard MIDI file"));
+  fts_set_symbol(a + 2, fts_get_project_dir());
+  fts_set_symbol(a + 3, default_name);
+  fts_client_send_message((fts_object_t *)this, seqsym_dialogFileSave, 4, a);
+}
+
+void
+seqobj_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+  if(ac > 0 && fts_is_symbol(at))
+    {
+      seqobj_import_midifile(o, winlet, s, ac, at);
+    }
+  else
+    {
+      seqobj_import_midifile_with_dialog(o, winlet, s, ac, at);
+    }
 }
 
 void
@@ -263,6 +295,9 @@ seqobj_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_s_print, seqobj_print);
       fts_method_define_varargs(cl, 0, fts_new_symbol("import"), seqobj_import);
       fts_method_define_varargs(cl, 0, fts_new_symbol("export"), seqobj_export_track_by_name);
+
+      fts_method_define_varargs(cl, fts_SystemInlet, seqsym_import_midi_dialog, seqobj_import_midifile_with_dialog);
+      fts_method_define_varargs(cl, fts_SystemInlet, seqsym_import_midi, seqobj_import_midifile);
       
       return fts_Success;
     }

@@ -47,6 +47,8 @@ extern fts_symbol_t seqsym_midi_velocity;
 /* messages */
 extern fts_symbol_t seqsym_export_midi;
 extern fts_symbol_t seqsym_export_midi_dialog;
+extern fts_symbol_t seqsym_import_midi;
+extern fts_symbol_t seqsym_import_midi_dialog;
 
 /* messages to client */
 extern fts_symbol_t seqsym_openEditor;
@@ -56,3 +58,4 @@ extern fts_symbol_t seqsym_addEvents;
 extern fts_symbol_t seqsym_dialogFileSave;
 
 #endif
+

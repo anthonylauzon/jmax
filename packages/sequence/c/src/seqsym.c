@@ -45,6 +45,8 @@ fts_symbol_t seqsym_midi_velocity = 0;
 /* messages */
 fts_symbol_t seqsym_export_midi = 0;
 fts_symbol_t seqsym_export_midi_dialog = 0;
+fts_symbol_t seqsym_import_midi = 0;
+fts_symbol_t seqsym_import_midi_dialog = 0;
 
 /* messages to client */
 fts_symbol_t seqsym_openEditor = 0;
@@ -75,6 +77,8 @@ seqsym_config(void)
   /* messages */
   seqsym_export_midi = fts_new_symbol("export_midi");
   seqsym_export_midi_dialog = fts_new_symbol("export_midi_dialog");
+  seqsym_import_midi = fts_new_symbol("import_midi");
+  seqsym_import_midi_dialog = fts_new_symbol("import_midi_dialog");
 
   /* messages to client */
   seqsym_openEditor = fts_new_symbol("openEditor");

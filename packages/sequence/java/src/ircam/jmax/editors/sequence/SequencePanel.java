@@ -419,6 +419,11 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     public Frame getFrame(){
 	return itsContainer.getFrame();
     }
+
+    public FtsSequenceObject getFtsSequenceObject()
+    {
+	return ftsSequenceObject;
+    }
   //------------------- Editor interface ---------------
   final public Fts getFts()
   {

@@ -218,6 +218,11 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 	sendMessage(FtsObject.systemInlet, "track_add", 1, sendArgs);
     }
 
+    public void importMidiFile()
+    {
+	sendMessage(FtsObject.systemInlet, "import_midi_dialog", 0, null);
+    }
+
   /**
    * Require to be notified when database change
    */
