@@ -282,6 +282,9 @@ final class InputFilter implements MouseMotionListener, MouseListener
 
   public void mousePressed( MouseEvent e)
   {
+    sketch.stopTextEditing();
+    sketch.requestFocus();
+
     if (e.getClickCount() > 1)
       processEvent(Squeack.DOUBLE_CLICK, e);
     else
@@ -301,10 +304,12 @@ final class InputFilter implements MouseMotionListener, MouseListener
 
   public void mouseEntered( MouseEvent e)
   {
+    // sketch.requestFocus();
   } 
 
   public void mouseExited( MouseEvent e)
   {
+    // sketch.stopTextEditing();
   }
 }
 

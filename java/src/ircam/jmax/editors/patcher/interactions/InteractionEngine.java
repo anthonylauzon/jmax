@@ -64,11 +64,13 @@ final public class InteractionEngine
 
   public void setAddMode()
   {
+    sketch.stopTextEditing();
     setInteraction(addMaster);
   }
 
   public void setRunMode()
   {
+    sketch.stopTextEditing();
     setInteraction(runMaster);
   }
 

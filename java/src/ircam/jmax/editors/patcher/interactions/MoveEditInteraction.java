@@ -62,11 +62,11 @@ class MoveEditInteraction extends SubInteraction
 	break;
 
       case Squeack.UP:
-	if (editAtUp && (object instanceof ErmesObjEditable))
+	if (editAtUp && (object instanceof ErmesObjEditableObject))
 	  {
 	    ErmesSelection.patcherSelection.redraw();
 	    ErmesSelection.patcherSelection.deselectAll();
-	    ((ErmesObjEditable)object).restartEditing();
+	    engine.getSketch().textEditObject((ErmesObjEditableObject)object);
 	  }
 	end();
 	break;
