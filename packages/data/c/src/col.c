@@ -92,12 +92,6 @@ col_set_from_atoms(col_t *this, int onset, int ac, const fts_atom_t *at)
  */
 
 static void
-col_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_outlet_object(o, 0, o);
-}
-
-static void
 col_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   col_t *this = (col_t *)o;
@@ -177,27 +171,16 @@ col_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_object_release((fts_object_t *)this->mat);
 }
 
-static fts_status_t
-col_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+col_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(col_t), 1, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, col_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, col_delete);
+  fts_class_init(cl, sizeof(col_t), col_init, col_delete);
   
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, col_getobj);
   
-  /* user methods */
-  fts_method_define_varargs(cl, 0, fts_s_bang, col_output);
-  
-  fts_method_define_varargs(cl, 0, fts_s_fill, col_fill);      
-  fts_method_define_varargs(cl, 0, fts_s_set, col_set);
-  
-  /* type outlet */
-  fts_outlet_type_define(cl, 0, col_symbol);
-  
-  return fts_ok;
-}
+  fts_class_method_varargs(cl, fts_s_fill, col_fill);      
+  fts_class_method_varargs(cl, fts_s_set, col_set);
+  }
 
 void
 col_config(void)

@@ -70,19 +70,15 @@ abs_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-abs_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+abs_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_object_t), 1, 1, 0); 
+  fts_class_init(cl, sizeof(fts_object_t), abs_init, abs_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, abs_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, abs_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, abs_put);
+  fts_class_method_varargs(cl, fts_s_put, abs_put);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-
-  return fts_ok;
 }
 
 void

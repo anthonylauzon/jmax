@@ -94,21 +94,20 @@ demux_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
  *  class
  *
  */
-static fts_status_t
-demux_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+demux_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(demux_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(demux_t), demux_init, demux_delete);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, demux_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, demux_delete);
+  fts_class_set_default_handler(cl, demux_input);
+  fts_class_inlet(cl, 0, NULL, demux_input);
   
-  fts_method_define_varargs(cl, 0, fts_s_anything, demux_input);
-  
-  fts_method_define_varargs(cl, 1, fts_s_int, demux_set);
-  fts_method_define_varargs(cl, 1, fts_s_float, demux_set);
-  
-  return fts_ok;
-}
+  fts_class_inlet_int(cl, 1, demux_set);
+  fts_class_inlet_float(cl, 1, demux_set);
+
+  fts_class_outlet_anything(cl, 0);
+  fts_class_outlet_anything(cl, 1);
+  }
 
 void
 demux_config(void)

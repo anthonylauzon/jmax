@@ -432,7 +432,7 @@ static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_a
 		    }
 		  else
 		    {
-		      ev_sym = fts_get_selector(lex_out_value);
+		      ev_sym = NULL;
 		      PUSH_ATOM(lex_out_value);
 		      ev_argc++;
 		      ev_status = ev_got_first;
@@ -489,7 +489,7 @@ static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_a
 		case lex_type_value:
 		  PUSH_ATOM(lex_out_value);
 		  ev_argc++;
-		  ev_sym = fts_s_list;
+		  ev_sym = NULL;
 		  ev_status = ev_get_args;
 		  break;
 		case lex_type_comma:
@@ -530,7 +530,7 @@ static int messbox_list_is_primitive(int ac, const fts_atom_t *at)
     {
       if(fts_is_object(at + i))
 	{
-	  post("messbox: can't set value of type <%s>\n", fts_get_selector(at + i));
+	  post("messbox: can't set value of type <%s>\n", fts_get_class_name(at + i));
 	  return 0;
 	}
     }
@@ -600,31 +600,6 @@ static void messbox_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 {
   messbox_update(o);
 }
-
-static void messbox_set_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  messbox_t *this = (messbox_t *) o;
-  
-  if(messbox_list_is_primitive(ac, at))
-    fts_atom_list_set(this->atom_list, ac, at);
-}
-
-static void messbox_append_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  messbox_t *this = (messbox_t *) o;
-
-  if(messbox_list_is_primitive(ac, at))
-    fts_atom_list_append(this->atom_list, ac, at);
-}
-
-
-static void messbox_clear_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  messbox_t *this = (messbox_t *) o;
-
-  fts_atom_list_clear(this->atom_list);
-}
-
 
 static void messbox_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -744,7 +719,17 @@ static void messbox_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   if(messbox_list_is_primitive(ac, at))
     fts_atom_list_set(this->atom_list, ac, at);
 
-  if (fts_patcher_is_open( fts_object_get_patcher( (fts_object_t *) this)) )
+  if (winlet == 0 && fts_patcher_is_open( fts_object_get_patcher( (fts_object_t *) this)) )
+    messbox_update(o);
+}
+
+static void messbox_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  messbox_t *this = (messbox_t *) o;
+
+  fts_atom_list_clear(this->atom_list);
+
+  if (winlet == 0 && fts_patcher_is_open( fts_object_get_patcher( (fts_object_t *) this)))
     messbox_update(o);
 }
 
@@ -755,7 +740,7 @@ static void messbox_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   if(messbox_list_is_primitive(ac, at))
     fts_atom_list_append(this->atom_list, ac, at);
 
-  if (fts_patcher_is_open( fts_object_get_patcher( (fts_object_t *) this)))
+  if (winlet == 0 && fts_patcher_is_open( fts_object_get_patcher( (fts_object_t *) this)))
     messbox_update(o);
 }
 
@@ -768,24 +753,17 @@ static void messbox_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 }
 
 
-static void messbox_eval_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {  
   messbox_t *this = (messbox_t *) o;
 
-  if(this->value == 0)
+  if(this->value == 0 && winlet == fts_system_inlet)
     {
       this->value = 1;
       fts_update_request(o);
 
       fts_timebase_add_call(fts_get_timebase(), o, messbox_off, 0, DEFAULT_DURATION);
     }
-
-  fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
-}
-
-static void messbox_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{  
-  messbox_t *this = (messbox_t *) o;
 
   fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
 }
@@ -823,43 +801,35 @@ static void messbox_get_value(fts_daemon_action_t action, fts_object_t *obj, fts
   fts_set_int(value, this->value);
 }
 
-static fts_status_t messbox_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void messbox_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(messbox_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(messbox_t), messbox_init, messbox_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, messbox_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, messbox_delete);
+  fts_class_method_varargs(cl, fts_s_find, messbox_find);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, messbox_set);
+  /* atom list saving/loading/update support */
+  fts_class_method_varargs(cl, fts_s_upload, messbox_upload);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_find, messbox_find);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_bang, messbox_eval_and_update);
+  fts_class_method_varargs(cl, fts_s_dump, messbox_dump);
+  fts_class_method_varargs(cl, fts_s_save_dotpat, messbox_save_dotpat); 
 
-  /* Atom list saving/loading/update support */
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_upload, messbox_upload);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_append,  messbox_append_noupdate);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_clear,  messbox_clear_noupdate);
+  fts_class_method_varargs(cl, fts_s_update_gui, messbox_update_gui); 
+  fts_class_method_varargs(cl, fts_s_update_real_time, messbox_update_real_time); 
+  fts_class_method_varargs(cl, fts_s_spost_description, messbox_spost_description); 
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, messbox_dump);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save_dotpat, messbox_save_dotpat); 
-
-  fts_method_define_varargs( cl, fts_system_inlet, fts_s_update_gui, messbox_update_gui); 
-  fts_method_define_varargs( cl, fts_system_inlet, fts_s_update_real_time, messbox_update_real_time); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_spost_description, messbox_spost_description); 
-
-  fts_method_define_varargs(cl, 0, fts_s_bang, messbox_eval);
-  fts_method_define_varargs(cl, 0, fts_s_int, messbox_eval);
-  fts_method_define_varargs(cl, 0, fts_s_float, messbox_eval);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, messbox_eval);
-
-  fts_method_define_varargs(cl, 0, fts_s_list, messbox_eval);
-  fts_method_define_varargs(cl, 0, fts_s_set, messbox_set);
-  fts_method_define_varargs(cl, 0, fts_s_append, messbox_append);
-
-  /* value daemons */
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, messbox_get_value);
 
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_s_bang, messbox_eval);
+  fts_class_method_varargs(cl, fts_s_set, messbox_set);
+  fts_class_method_varargs(cl, fts_s_append, messbox_append);
+  fts_class_method_varargs(cl, fts_s_clear, messbox_clear);
+
+  fts_class_inlet_int(cl, 0, messbox_eval);
+  fts_class_inlet_float(cl, 0, messbox_eval);
+  fts_class_inlet_symbol(cl, 0, messbox_eval);
+  fts_class_inlet_varargs(cl, 0, messbox_eval);
+
+  fts_class_outlet_anything(cl, 0);
 }
 
 void messbox_config(void)

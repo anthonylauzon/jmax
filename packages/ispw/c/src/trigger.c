@@ -77,171 +77,11 @@ typedef struct
 } trigger_t;
 
 static void
-trigger_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  trigger_t *x = (trigger_t *)o;
-  int outlet = x->noutlets;
-
-  while (outlet--)
-    {
-      trigger_outlet_t tot = x->trigger_outlet_table[outlet];
-      
-      if (tot == trigger_outlet_int)
-	fts_outlet_int(o, outlet, fts_get_int(at));
-      else if (tot == trigger_outlet_bang)
-	fts_outlet_bang(o, outlet);
-      else if (tot == trigger_outlet_float)
-	fts_outlet_float(o, outlet, (float)fts_get_int(at));
-      else if (tot == trigger_outlet_symbol)
-	fts_outlet_symbol(o, outlet, fts_new_symbol(""));	/* ???? */
-      else if (tot == trigger_outlet_list)
-	fts_outlet_int(o, outlet, fts_get_int(at));
-      else if (tot == trigger_outlet_thru)
-	fts_outlet_int(o, outlet, fts_get_int(at));
-    }
-}
-
-
-/* Trigger bang is installed also for anything */
-
-static void
-trigger_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  trigger_t *x = (trigger_t *)o;
-  int outlet = x->noutlets;
-
-  while (outlet--)
-    {
-      trigger_outlet_t tot = x->trigger_outlet_table[outlet];
-
-      if (tot == trigger_outlet_bang)
-	fts_outlet_bang(o, outlet);
-      else if (tot == trigger_outlet_int)
-	fts_outlet_int(o, outlet, 0);
-      else if (tot == trigger_outlet_float)
-	fts_outlet_float(o, outlet, 0.0f);
-      else if (tot == trigger_outlet_symbol)
-	fts_outlet_symbol(o, outlet, fts_new_symbol(""));	/* ???? */
-      else if (tot == trigger_outlet_list)
-	fts_outlet_int(o, outlet, 0);
-      else if (tot == trigger_outlet_thru)
-	fts_outlet_bang(o, outlet);
-    }
-}
-
-static void
-trigger_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  trigger_t *x = (trigger_t *)o;
-  int outlet = x->noutlets;
-
-  while (outlet--)
-    {
-      trigger_outlet_t tot = x->trigger_outlet_table[outlet];
-
-      if (tot == trigger_outlet_float)
-	fts_outlet_float(o, outlet, fts_get_float(at));
-      else if (tot == trigger_outlet_int)
-	fts_outlet_int(o, outlet, (int)fts_get_float(at));
-      else if (tot == trigger_outlet_symbol)
-	fts_outlet_symbol(o, outlet, fts_new_symbol(""));	/* ??? */
-      else if (tot == trigger_outlet_list)
-	fts_outlet_float(o, outlet, fts_get_float(at));
-      else if (tot == trigger_outlet_bang)
-	fts_outlet_bang(o, outlet);
-      else if (tot == trigger_outlet_thru)
-	fts_outlet_float(o, outlet, fts_get_float(at));
-    }
-}
-
-static void
-trigger_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  trigger_t *x = (trigger_t *)o;
-  int outlet = x->noutlets;
-
-  while (outlet--)
-    {
-      trigger_outlet_t tot = x->trigger_outlet_table[outlet];
-
-      if (tot == trigger_outlet_int)
-	fts_outlet_int(o, outlet, 0L);
-      else if (tot == trigger_outlet_float)
-	fts_outlet_float(o, outlet, 0.0f);
-      else if (tot == trigger_outlet_symbol)
-	fts_outlet_symbol(o, outlet, fts_get_symbol(at));
-      else if (tot == trigger_outlet_list)
-	fts_outlet_symbol(o, outlet, fts_get_symbol(at));
-      else if (tot == trigger_outlet_bang)
-	fts_outlet_bang(o, outlet);
-      else if (tot == trigger_outlet_thru)
-	fts_outlet_symbol(o, outlet, fts_get_symbol(at));
-    }
-}
-  
-static void
-trigger_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if (ac)
-    {
-      trigger_t *x = (trigger_t *)o;
-      int outlet = x->noutlets;
-
-      while (outlet--)
-	{
-	  switch (x->trigger_outlet_table[outlet])
-	    {
-	    case trigger_outlet_int:
-	      {
-		int x = 0;
-
-		if (fts_is_number(at))
-		  x = fts_get_number_int(at);
-
-		fts_outlet_int(o, outlet, x);
-	      }
-	      break;
-
-	    case trigger_outlet_float:
-	      {
-		float x = 0;
-
-		if (fts_is_number(at))
-		  x = fts_get_number_float(at);
-
-		fts_outlet_float(o, outlet, x);
-	      }
-	      break;
-
-	    case trigger_outlet_symbol:
-	      if (fts_is_symbol(at))
-		fts_outlet_symbol(o, outlet, fts_get_symbol(at));
-	      else
-		fts_outlet_symbol(o, outlet, fts_new_symbol(""));
-	      break;
-
-	    case trigger_outlet_list:
-	      fts_outlet_atoms(o, outlet, ac, at);
-	      break;
-
-	    case trigger_outlet_bang:
-	      fts_outlet_bang(o, outlet);
-	      break;
-
-	    case trigger_outlet_thru:
-	      fts_outlet_atoms(o, outlet, ac, at);
-	      break;
-	    }
-	}
-    }
-}
-
-static void
 trigger_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   trigger_t *x = (trigger_t *)o;
   int outlet = x->noutlets;
-  
+
   while (outlet--)
     {
       switch (x->trigger_outlet_table[outlet])
@@ -259,7 +99,7 @@ trigger_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	  
 	case trigger_outlet_float:
 	  {
-	    float x = 0;
+	    double x = 0.0;
 	    
 	    if (fts_is_number(at))
 	      x = fts_get_number_float(at);
@@ -276,7 +116,7 @@ trigger_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	  break;
 	  
 	case trigger_outlet_list:
-	  fts_outlet_atoms(o, outlet, ac, at);
+	  fts_outlet_varargs(o, outlet, ac, at);
 	  break;
 	  
 	case trigger_outlet_bang:
@@ -360,99 +200,23 @@ trigger_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_object_set_outlets_number(o, noutlets);
 }
 
-static fts_status_t
-trigger_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+trigger_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(trigger_t), 1, 1, 0);
+  trigger_t *x = (trigger_t *)o;
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, trigger_init);
-
-  fts_method_define_varargs(cl, 0, fts_s_bang, trigger_bang);
-  fts_method_define_varargs(cl, 0, fts_s_int, trigger_int);
-  fts_method_define_varargs(cl, 0, fts_s_float, trigger_float);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, trigger_symbol);
-  fts_method_define_varargs(cl, 0, fts_s_list, trigger_list);
-  fts_method_define_varargs(cl, 0, fts_s_anything, trigger_anything);
-
-  return fts_ok;
+  fts_free(x->trigger_outlet_table);
 }
 
-
-static int
-trigger_atoms_conforms(const fts_atom_t *a1, const fts_atom_t *a2)
+static void
+trigger_instantiate(fts_class_t *cl)
 {
-  if (fts_is_float(a1))
-    return (fts_is_float(a2) || (fts_is_symbol(a2) && (fts_get_symbol(a2)[0] == 'f')));
-  else if (fts_is_int(a1))
-    return (fts_is_int(a2) || (fts_is_symbol(a2) && (fts_get_symbol(a2)[0] == 'i')));
-  else if (fts_is_symbol(a1))
-    {
-      if  (fts_is_symbol(a2))
-	return ((fts_get_symbol(a1))[0] == (fts_get_symbol(a2))[0]);
-      else if (fts_is_float(a2))
-	return ((fts_get_symbol(a1))[0] == 'f');
-      else if (fts_is_int(a2))
-	return ((fts_get_symbol(a1))[0] == 'i');
-    }
+  fts_class_init(cl, sizeof(trigger_t), trigger_init, trigger_delete);
 
-  return 1;		/* should not be reached */
-}
+  fts_class_inlet_varargs(cl, 0, trigger_anything);
+  fts_class_set_default_handler(cl, trigger_anything);
 
-
-static int
-trigger_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
-{
-  if (ac0 == 0)
-    {
-      if (ac1 == 0)
-	return 1;
-      else if (ac1 == 2)
-	{
-	  /* look if at1 is two ints */
-
-	  fts_atom_t a;
-
-	  fts_set_int(&a, 0);
-
-	  return (trigger_atoms_conforms(&a, at1) &&
-		  trigger_atoms_conforms(&a, at1 + 1));
-	}
-      else
-	return 0;
-    }
-  else
-    {
-      if (ac1 == 0)
-	{
-	  if (ac0 == 2)
-	    {
-	      /* look if at0 is two ints */
-
-	      fts_atom_t a;
-
-	      fts_set_int(&a, 0);
-
-	      return (trigger_atoms_conforms(&a, at0) &&
-		      trigger_atoms_conforms(&a, at0 + 1));
-	    }
-	  else
-	    return 0;
-	}
-      else if (ac1 == ac0)
-	{
-	  /* do the complete test */
-
-	  int i;
-
-	  for (i = 0; i < ac0; i++)
-	    if (! trigger_atoms_conforms(at0 + i, at1 + i))
-	      return 0;
-
-	  return 1;
-	}
-      else
-	return 0;
-    }
+  fts_class_outlet_anything(cl, 0);
 }
 
 

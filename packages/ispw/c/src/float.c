@@ -78,25 +78,18 @@ float_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     this->f = fts_get_number_float(at);
 }
 
-static fts_status_t
-float_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+float_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(float_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(float_t), float_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, float_init);
+  fts_class_method_varargs(cl, fts_s_bang, float_bang);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, float_bang);
-  fts_method_define_varargs(cl, 0, fts_s_int, float_input);
-  fts_method_define_varargs(cl, 0, fts_s_float, float_input);
-  fts_method_define_varargs(cl, 0, fts_s_list, float_list);
+  fts_class_inlet_varargs(cl, 0, float_list);
+  fts_class_inlet_number(cl, 0, float_input);
+  fts_class_inlet_number(cl, 1, float_set);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, float_set);
-  fts_method_define_varargs(cl, 1, fts_s_float, float_set);
-
-  fts_outlet_type_define_varargs(cl, 0, fts_s_float);
-
-
-  return fts_ok;
+  fts_class_outlet_float(cl, 0);
 }
 
 void

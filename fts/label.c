@@ -233,12 +233,6 @@ label_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_label_t *this = (fts_label_t *) o;
 
   fts_channel_init(&this->channel);
-
-  if(ac == 0 || !fts_is_void(at))
-    {
-      /* add label as its own receive */
-      fts_channel_add_target(&this->channel, o);
-    }
 }
 
 static void
@@ -251,27 +245,20 @@ label_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   fts_channel_propagate_input( &this->channel, propagate_fun, propagate_context, 0);
 }
 
-static fts_status_t
-label_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+label_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_label_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(fts_label_t), label_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, label_init);
+  fts_class_method_varargs(cl, fts_s_propagate_input, label_propagate_input);
+  fts_class_method_varargs(cl, fts_s_find_friends, label_find_friends);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_propagate_input, label_propagate_input);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_find_friends, label_find_friends);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_input, label_send);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_add_listener, label_add_listener);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_remove_listener, label_remove_listener);
+  fts_class_method_varargs(cl, fts_s_input, label_send);
+  fts_class_method_varargs(cl, fts_s_add_listener, label_add_listener);
+  fts_class_method_varargs(cl, fts_s_remove_listener, label_remove_listener);
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, label_get_state);
-
-  /* sending anything else to lable is like sending to all channel targets */
-  fts_method_define_varargs(cl, 0, fts_s_anything, label_send);
-
-  return fts_ok;
-}
+  }
 
 void 
 fts_label_config(void)

@@ -73,17 +73,12 @@ gint_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-gint_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gint_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   gint_t *this = (gint_t *)o;
 
-  if (ac && fts_is_number(at))
-    {
-      int n = fts_get_number_int(at);
-
-      gint_update(this, n);
-      fts_outlet_int(o, 0, n);
-    }
+  if(ac && fts_is_number(at))
+    gint_number(o, 0, 0, 1, at);
 }
 
 static void
@@ -130,29 +125,23 @@ gint_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fprintf( file, "#P number %d %d %d %d;\n", x, y, w, font_index);
 }
 
-static fts_status_t gint_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void gint_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(gint_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(gint_t), 0, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save_dotpat, gint_save_dotpat);
+  fts_class_method_varargs(cl, fts_s_save_dotpat, gint_save_dotpat);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, gint_update_real_time); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_value, gint_number); 
+  fts_class_method_varargs(cl, fts_s_update_real_time, gint_update_real_time); 
+  fts_class_method_varargs(cl, fts_s_value, gint_number); 
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, gint_bang);
+  fts_class_method_varargs(cl, fts_s_bang, gint_bang);
+  fts_class_method_varargs(cl, fts_s_set, gint_set);
+  fts_class_method_varargs(cl, fts_new_symbol("incr"), gint_incr);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, gint_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, gint_number);
+  fts_class_inlet_number(cl, 0, gint_number);
+  fts_class_inlet_varargs(cl, 0, gint_varargs);
 
-  fts_method_define_varargs(cl, 0, fts_s_list, gint_list);
-
-  fts_method_define_varargs(cl, 0, fts_new_symbol("incr"), gint_incr);
-
-  fts_method_define_varargs(cl, 0, fts_s_set, gint_set);
-
-  fts_outlet_type_define_varargs(cl, 0, fts_s_int);
-
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
 }
 
 void

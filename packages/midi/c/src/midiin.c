@@ -430,92 +430,68 @@ midiin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     fts_midiport_remove_listener(this->port, this->type, this->channel, this->number, o);
 }
 
-static fts_status_t
-midiin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+midiin_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(midiin_t), 0, 1, 0);
+  fts_class_init(cl, sizeof(midiin_t), midiin_init, midiin_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, midiin_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midiin_delete);
-
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
 }
 
-static fts_status_t
-notein_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+notein_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(midiin_t), 0, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, notein_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midiin_delete);
+  fts_class_init(cl, sizeof(midiin_t), notein_init, midiin_delete);
 
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
 }
 
-static fts_status_t
-polyin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+polyin_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(midiin_t), 0, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, polyin_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midiin_delete);
+  fts_class_init(cl, sizeof(midiin_t), polyin_init, midiin_delete);
 
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
 }
 
-static fts_status_t
-ctlin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+ctlin_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(midiin_t), 0, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, ctlin_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midiin_delete);
+  fts_class_init(cl, sizeof(midiin_t), ctlin_init, midiin_delete);
 
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
 }
 
-static fts_status_t
-pgmin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+pgmin_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(midiin_t), 0, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, pgmin_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midiin_delete);
+  fts_class_init(cl, sizeof(midiin_t), pgmin_init, midiin_delete);
 
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
 }
 
-static fts_status_t
-touchin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+touchin_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(midiin_t), 0, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, touchin_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midiin_delete);
+  fts_class_init(cl, sizeof(midiin_t), touchin_init, midiin_delete);
 
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
 }
 
-static fts_status_t
-bendin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+bendin_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(midiin_t), 0, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, bendin_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midiin_delete);
+  fts_class_init(cl, sizeof(midiin_t), bendin_init, midiin_delete);
  
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
 }
 
-static fts_status_t
-xbendin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+xbendin_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(midiin_t), 0, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, xbendin_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midiin_delete);
+  fts_class_init(cl, sizeof(midiin_t), xbendin_init, midiin_delete);
 
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
 }
 
 void

@@ -114,28 +114,24 @@ toggle_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t pro
   fts_set_int(value, this->value);
 }
 
-static fts_status_t 
-toggle_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+toggle_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(toggle_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(toggle_t), 0, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, toggle_update_real_time); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_bang, toggle_toggle);
+  fts_class_method_varargs(cl, fts_s_update_real_time, toggle_update_real_time); 
+  fts_class_method_varargs(cl, fts_s_save_dotpat, toggle_save_dotpat); 
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save_dotpat, toggle_save_dotpat); 
+  fts_class_method_varargs(cl, fts_s_bang, toggle_toggle);
+  fts_class_method_varargs(cl, fts_s_set, toggle_set);
 
-  fts_method_define_varargs(cl, 0, fts_s_set, toggle_set);
-
-  fts_method_define_varargs(cl, 0, fts_s_bang, toggle_toggle);
-  fts_method_define_varargs(cl, 0, fts_s_int, toggle_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, toggle_number);
-  fts_method_define_varargs(cl, 0, fts_s_list, toggle_list);
+  fts_class_inlet_int(cl, 0, toggle_number);
+  fts_class_inlet_float(cl, 0, toggle_number);
+  fts_class_inlet_varargs(cl, 0, toggle_list);
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, toggle_get_value);
 
-  fts_outlet_type_define_varargs(cl, 0, fts_s_int);
-
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
 }
 
 void 

@@ -98,16 +98,11 @@ message_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_array_destroy(&this->args);
 }
 
-static fts_status_t
-message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+message_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_message_t), 0, 0, 0);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, message_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, message_delete);
-  
-  return fts_ok;
-}
+  fts_class_init(cl, sizeof(fts_message_t), message_init, message_delete);
+  }
 
 void
 fts_message_config(void)
@@ -166,219 +161,296 @@ fts_dumper_send(fts_dumper_t *dumper, fts_symbol_t s, int ac, const fts_atom_t *
  *
  */
 
-/* Return Status */
-fts_status_description_t fts_MethodNotFound = {"method not found"};
-fts_status_description_t fts_StackOverflow = {"method stack overflow"};
+/* return Status */
 fts_status_description_t fts_ArgumentMissing = {"argument missing"};
 fts_status_description_t fts_ArgumentTypeMismatch = {"argument type mismatch"};
-fts_status_description_t fts_InvalidMessage = {"invalid symbol message"};
 
-/* The object stack */
-
-int fts_objstack_top = 0; /* Next free slot; can overflow, must be checked */
-fts_object_t *fts_objstack[FTS_OBJSTACK_SIZE];
-
-fts_status_t 
+void
 fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_class_t *cl = o->head.cl;
   fts_method_t meth = fts_class_get_method(cl, s);
 
-  if (meth && !FTS_REACHED_MAX_CALL_DEPTH())
+  if(meth)
     {
-      FTS_OBJSTACK_PUSH(o);
-      meth(o, 0, s, ac, at);
-      FTS_OBJSTACK_POP(o);
-
-      return fts_ok;
+      const fts_atom_t *a;
+      int n;
+      
+      /* unpack tuple */
+      if(ac == 1 && fts_is_tuple(at))
+	{
+	  fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(at);
+	  
+	  meth(o, fts_system_inlet, s, fts_tuple_get_size(tuple), fts_tuple_get_atoms(tuple));
+	}
+      else
+	meth(o, fts_system_inlet, s, ac, at);
     }
-
-  return &fts_MethodNotFound;
 }
 
-static fts_status_t
-message_outlet(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+/************************************************
+ *
+ *  outlet handling
+ *
+ */
+
+int fts_objstack_top = 0; /* Next free slot; can overflow, must be checked */
+fts_object_t *fts_objstack[FTS_OBJSTACK_SIZE];
+
+static int
+check_outlet(fts_object_t *o, int woutlet)
 {
-  fts_class_t *cl = o->head.cl;
-  fts_symbol_t selector = fts_class_outlet_get_selector(cl, woutlet);
+  if (woutlet >= fts_object_get_outlets_number(o) || woutlet < 0)
+    {
+      fts_object_signal_runtime_error(o, "outlet (%d) out of range", woutlet);
+      return 0;
+    }
+  else
+    return 1;
+}
+
+static void
+output_message(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
   fts_connection_t *conn = o->out_conn[woutlet];
 
-  if (selector != NULL && selector != s)
-    return &fts_InvalidMessage;
+  if(!check_outlet(o, woutlet))
+    return;
 
   if (!FTS_REACHED_MAX_CALL_DEPTH()) 
     {
       while(conn)
 	{
-	  if ((conn->symb == s) || (conn->symb == NULL && conn->mth != NULL))
+	  if(conn->selector == s)
 	    {
-	      /* call cashed method */
+	      /* call cached method */
 	      FTS_OBJSTACK_PUSH(conn->dst);
-	      (*conn->mth)(conn->dst, conn->winlet, s, ac, at);
+	      (*conn->method)(conn->dst, conn->winlet, s, ac, at);
 	      FTS_OBJSTACK_POP(conn->dst);
 	    }
 	  else
 	    {
-	      /* search method and cache if found */
-	      fts_method_t meth = fts_class_inlet_get_method(fts_object_get_class(conn->dst), conn->winlet, s);
+	      /* get method for given selector */
+	      fts_method_t method = fts_class_get_method(fts_object_get_class(conn->dst), s);
 	      
-	      if(meth)
-		{
-		  conn->symb = s;
-		  conn->mth = meth;
-		  
-		  FTS_OBJSTACK_PUSH(o);
-		  (*meth)(conn->dst, conn->winlet, s, ac, at);
-		  FTS_OBJSTACK_POP(o);
-		}
-	      else
-		fts_object_signal_runtime_error(conn->dst, "Received unknown message %s at inlet %d", s, conn->winlet);
+	      /* get default handler */
+	      if(method == NULL)
+		method = fts_class_get_default_handler(fts_object_get_class(conn->dst));
+
+	      /* update cache */
+	      conn->selector = s;
+	      conn->class = NULL; /* all varargs for now */
+	      conn->method = method;
+	      
+	      /* call method */
+	      FTS_OBJSTACK_PUSH(conn->dst);
+	      (*method)(conn->dst, conn->winlet, s, ac, at);
+	      FTS_OBJSTACK_POP(conn->dst);
 	    }
-	  
+
 	  conn = conn->next_same_src;
 	}
     }
   else
-    {
-      fts_object_signal_runtime_error(o, "Message stack overflow at inlet %d", conn->winlet);
-      return &fts_StackOverflow;
-    }
-
-  return fts_ok;
+    fts_object_signal_runtime_error(o, "Message stack overflow at inlet %d", conn->winlet);
 }
 
-
-fts_status_t
-fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+/* output single value */
+static void
+output_value(fts_object_t *o, int woutlet, const fts_atom_t *at)
 {
-  fts_class_t *cl = o->head.cl;
-  const fts_atom_t *a;
-  int n;
+  fts_connection_t *conn = o->out_conn[woutlet];
 
-  if(ac == 1 && fts_is_tuple(at))
+  if(!check_outlet(o, woutlet))
+    return;
+
+  if (!FTS_REACHED_MAX_CALL_DEPTH()) 
     {
-      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(at);
+      fts_metaclass_t *class = fts_get_class(at);
 
-      n = fts_tuple_get_size(tuple);
-      a = fts_tuple_get_atoms(tuple);
+      while(conn)
+	{
+	  if(conn->selector == NULL && conn->class == class)
+	    {
+	      /* call cached method */
+	      FTS_OBJSTACK_PUSH(conn->dst);
+	      (*conn->method)(conn->dst, conn->winlet, 0, 1, at);
+	      FTS_OBJSTACK_POP(conn->dst);
+	    }
+	  else
+	    {
+	      /* get method for given class at given inlet */
+	      fts_method_t method = fts_class_inlet_get_method(fts_object_get_class(conn->dst), conn->winlet, class);
+	      
+	      /* ... or get varargs method at given inlet */
+	      if(method == NULL)
+		method = fts_class_inlet_get_method(fts_object_get_class(conn->dst), conn->winlet, NULL);
+
+	      /* ... or get default handler */
+	      if(method == NULL)
+		method = fts_class_get_default_handler(fts_object_get_class(conn->dst));
+
+	      /* update cache */
+	      conn->selector = NULL;
+	      conn->class = class;
+	      conn->method = method;
+	      
+	      /* call method */
+	      FTS_OBJSTACK_PUSH(conn->dst);
+	      (*method)(conn->dst, conn->winlet, 0, 1, at);
+	      FTS_OBJSTACK_POP(conn->dst);
+	    }
+
+	  conn = conn->next_same_src;
+	}
     }
   else
+    fts_object_signal_runtime_error(o, "Message stack overflow at inlet %d", conn->winlet);
+}
+
+static void
+output_varargs(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at)
+{
+  fts_connection_t *conn = o->out_conn[woutlet];
+  fts_metaclass_t *class = fts_get_class(at);
+
+  if(!check_outlet(o, woutlet))
+    return;
+
+  if (!FTS_REACHED_MAX_CALL_DEPTH()) 
     {
-      n = ac;
-      a = at;
+      while(conn)
+	{
+	  if(conn->selector == NULL && conn->class == NULL && conn->method != NULL)
+	    {
+	      /* call cached method */
+	      FTS_OBJSTACK_PUSH(conn->dst);
+	      (*conn->method)(conn->dst, conn->winlet, 0, ac, at);
+	      FTS_OBJSTACK_POP(conn->dst);
+	    }
+	  else
+	    {
+	      /* get varargs method at given inlet */
+	      fts_method_t method = fts_class_inlet_get_method(fts_object_get_class(conn->dst), conn->winlet, NULL);
+	      
+	      /* get default handler */
+	      if(method == NULL)
+		method = fts_class_get_default_handler(fts_object_get_class(conn->dst));
+
+	      /* ... or update cache */
+	      conn->selector = NULL;
+	      conn->class = NULL;
+	      conn->method = method;
+	      
+	      /* call method */
+	      FTS_OBJSTACK_PUSH(conn->dst);
+	      (*method)(conn->dst, conn->winlet, 0, ac, at);
+	      FTS_OBJSTACK_POP(conn->dst);
+	    }
+
+	  conn = conn->next_same_src;
+	}
     }
-
-  if (woutlet >= fts_object_get_outlets_number(o) || woutlet < 0)
-    return &fts_OutletOutOfRange;
-
-  return message_outlet(o, woutlet, s, n, a);
+  else
+    fts_object_signal_runtime_error(o, "Message stack overflow at inlet %d", conn->winlet);
 }
 
 void 
 fts_outlet_int(fts_object_t *o, int woutlet, int n)
 {
   fts_atom_t a;
-
+  
   fts_set_int(&a, n);
-  message_outlet(o, woutlet, fts_s_int, 1, &a);
+  output_value(o, woutlet, &a);
 }
 
 void 
 fts_outlet_float(fts_object_t *o, int woutlet, float f)
 {
   fts_atom_t a;
-
+  
   fts_set_float(&a, f);
-  message_outlet(o, woutlet, fts_s_float, 1, &a);
+  output_value(o, woutlet, &a);
 }
 
 void 
 fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s)
 {
   fts_atom_t a;
-
+  
   fts_set_symbol(&a, s);
-  message_outlet(o, woutlet, fts_s_symbol, 1, &a);
+  output_value(o, woutlet, &a);
 }
 
 void 
 fts_outlet_bang(fts_object_t *o, int woutlet)
 {
-  message_outlet(o, woutlet, fts_s_bang, 0, 0);
+  output_message(o, woutlet, fts_s_bang, 0, 0);
 }
 
 void
 fts_outlet_object(fts_object_t *o, int woutlet, fts_object_t *obj)
 {
   fts_atom_t a;
-
+  
   fts_set_object(&a, obj);
-
-  fts_object_refer(obj);
-  message_outlet(o, woutlet, fts_metaclass_get_selector(fts_object_get_metaclass(obj)), 1, &a);
-  fts_object_release(obj);
+  output_value(o, woutlet, &a);
 }
 
 void
-fts_outlet_primitive(fts_object_t *o, int woutlet, const fts_atom_t *a)
+fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  message_outlet(o, woutlet, fts_get_selector(a), 1, a);
-}
-
-void
-fts_outlet_atom(fts_object_t *o, int woutlet, const fts_atom_t* a)
-{
-  if(fts_is_tuple(a))
-    fts_tuple_output(o, woutlet, (fts_tuple_t *)fts_get_object(a));
-  else if(!fts_is_void(a))
-    message_outlet(o, woutlet, fts_get_selector(a), 1, a);
-}
-
-void
-fts_outlet_atoms(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at)
-{
-  if(ac == 1)
-    fts_outlet_atom(o, woutlet, at);
-  else if(ac > 1)
-   message_outlet(o, woutlet, fts_s_list, ac, at);
-}
-
-void
-fts_outlet_atoms_copy(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at)
-{
-  if(ac == 1)
+  if(check_outlet(o, woutlet))
     {
-      fts_atom_t output;
-
-      output = *at;
-      fts_atom_refer(&output);
-
-      fts_outlet_atom(o, woutlet, &output);
-
-      fts_atom_release(&output);
-    }
-  else if(ac > 1)
-    {
-      fts_atom_t *output = alloca(sizeof(fts_atom_t) * ac);
-      int i;
+      const fts_atom_t *a;
+      int n;
       
-      for(i=0; i<ac; i++)
+      /* unpack tuple */
+      if(ac == 1 && fts_is_tuple(at))
 	{
-	  output[i] = at[i];
-	  fts_atom_refer(output + i);
+	  fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(at);
+	  
+	  n = fts_tuple_get_size(tuple);
+	  a = fts_tuple_get_atoms(tuple);
+	}
+      else
+	{
+	  n = ac;
+	  a = at;
 	}
       
-      message_outlet(o, woutlet, fts_s_list, ac, at);
-      
-      for(i=0; i<ac; i++)
-	fts_atom_release(output + i);
+      if(s == 0)
+	{
+	  if(ac == 1)
+	    output_value(o, woutlet, at);
+	  else
+	    output_varargs(o, woutlet, ac, at);
+	}
+      else
+	output_message(o, woutlet, s, ac, at);
     }
 }
 
+void
+fts_outlet_varargs(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at)
+{
+  if(ac == 1)
+    {
+      if(fts_is_tuple(at))
+	{
+	  fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(at);
+	  output_varargs(o, woutlet, fts_tuple_get_size(tuple), fts_tuple_get_atoms(tuple));
+	}
+      else
+	output_value(o, woutlet, at);
+    }
+  else if(ac > 1)
+    output_varargs(o, woutlet, ac, at);
+}
 
-/* **********************************************************************
+/***********************************************************************
  *
- * Return mechanism for methods/functions
+ * return mechanism for methods/functions
  *
  */
 

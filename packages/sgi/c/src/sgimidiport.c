@@ -365,21 +365,14 @@ sgimidiport_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t 
  *  class
  *
  */
-static fts_status_t
-sgimidiport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sgimidiport_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(sgimidiport_t), 1, 0, 0);
-
-  fts_midiport_class_init(cl);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sgimidiport_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sgimidiport_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_sched_ready, sgimidiport_dispatch);
+  fts_class_init(cl, sizeof(sgimidiport_t), sgimidiport_init, sgimidiport_delete);
+  fts_class_method_varargs(cl, fts_s_sched_ready, sgimidiport_dispatch);
 
   /* define variable */
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, sgimidiport_get_state);
-
-  return fts_ok;
 }
 
 void

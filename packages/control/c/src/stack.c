@@ -58,21 +58,12 @@ stack_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     stack_input_atom(o, 0, 0, 1, at);
   else if(ac > 1)
     {
-      fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_object_t *tuple = fts_object_create(fts_tuple_metaclass, ac, at);
       fts_atom_t a;
       
-      fts_set_object(&a, (fts_object_t *)tuple);
+      fts_set_object(&a, tuple);
       stack_input_atom(o, 0, 0, 1, &a);
     }
-}
-
-static void
-stack_input_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(ac > 0 && s == fts_get_selector(at))
-    stack_input_atom(o, 0, 0, ac, at);
-  else
-    fts_object_signal_runtime_error(o, "Don't understand message %s", s);
 }
 
 static void
@@ -93,7 +84,7 @@ stack_pop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   while(n-- && top >= 0)
     {
-      fts_outlet_atom(o, 0, stack + top);
+      fts_outlet_varargs(o, 0, 1, stack + top);
       fts_atom_void(stack + top);
       fts_stack_pop(&this->stack, 1);
 
@@ -110,7 +101,7 @@ stack_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   while(top >= 0)
     {
-      fts_outlet_atom(o, 0, stack + top);
+      fts_outlet_varargs(o, 0, 1, stack + top);
       fts_atom_void(stack + top);
       fts_stack_pop(&this->stack, 1);
       top = fts_stack_top(&this->stack);
@@ -153,26 +144,21 @@ stack_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_stack_destroy(&this->stack);
 }
 
-static fts_status_t
-stack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+stack_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(stack_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(stack_t), stack_init, stack_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, stack_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, stack_delete);
+  fts_class_inlet_number(cl, 0, stack_input_atom);
+  fts_class_inlet_symbol(cl, 0, stack_input_atom);
+  fts_class_inlet_varargs(cl, 0, stack_input_atoms);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, stack_input_atom);
-  fts_method_define_varargs(cl, 0, fts_s_float, stack_input_atom);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, stack_input_atom);
-  fts_method_define_varargs(cl, 0, fts_s_list, stack_input_atoms);
-  fts_method_define_varargs(cl, 0, fts_s_anything, stack_input_anything);
+  fts_class_method_varargs(cl, fts_s_bang, stack_pop);
+  fts_class_method_varargs(cl, fts_new_symbol("pop"), stack_pop);
+  fts_class_method_varargs(cl, fts_s_flush, stack_flush);
+  fts_class_method_varargs(cl, fts_s_clear, stack_clear);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, stack_pop);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("pop"), stack_pop);
-  fts_method_define_varargs(cl, 0, fts_s_flush, stack_flush);
-  fts_method_define_varargs(cl, 0, fts_s_clear, stack_clear);
-
-  return fts_ok;
+  fts_class_outlet_varargs(cl, 0);
 }
 
 void

@@ -162,23 +162,19 @@ ftl_wahwah(fts_word_t *argv)
   state[1] = ynp3; /* y(n-1) */
 }
 
-static fts_status_t
-wahwah_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+wahwah_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(wahwah_t), 3, 1, 0);
+  fts_class_init(cl, sizeof(wahwah_t), wahwah_init, wahwah_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, wahwah_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, wahwah_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, wahwah_put);
+  fts_class_method_varargs(cl, fts_s_put, wahwah_put);
   
   /* signal inlets and outlets */
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_inlet(cl, 1);
   fts_dsp_declare_inlet(cl, 2);
   fts_dsp_declare_outlet(cl, 0);
-  
-  return fts_ok;
-}
+  }
 
 void
 signal_wahwah_config(void)

@@ -253,26 +253,25 @@ poly_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_free((void *)x->v);
 }
 
-static fts_status_t
-poly_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+poly_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(poly_t), 2, 3, 0); 
+  fts_class_init(cl, sizeof(poly_t), poly_init, poly_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, poly_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, poly_delete);
+  fts_class_method_varargs(cl, fts_s_stop, poly_stop);
+  fts_class_method_varargs(cl, fts_s_clear, poly_clear);
 
-  fts_method_define_varargs(cl, 0, fts_s_stop, poly_stop);
-  fts_method_define_varargs(cl, 0, fts_s_clear, poly_clear);
+  fts_class_method_varargs(cl, fts_s_set, poly_set);
+  fts_class_inlet_varargs(cl, 0, poly_list);
+  fts_class_inlet_int(cl, 0, poly_number);
+  fts_class_inlet_float(cl, 0, poly_number);
 
-  fts_method_define_varargs(cl, 0, fts_s_set, poly_set);
-  fts_method_define_varargs(cl, 0, fts_s_list, poly_list);
-  fts_method_define_varargs(cl, 0, fts_s_int, poly_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, poly_number);
+  fts_class_inlet_int(cl, 1, poly_number_1);
+  fts_class_inlet_float(cl, 1, poly_number_1);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, poly_number_1);
-  fts_method_define_varargs(cl, 1, fts_s_float, poly_number_1);
-
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
+  fts_class_outlet_int(cl, 1);
+  fts_class_outlet_int(cl, 2);    
 }
 
 void

@@ -164,44 +164,13 @@ throw_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
   fts_object_release((fts_object_t *)this->bus);  
 }
 
-static fts_status_t
-throw_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+throw_instantiate(fts_class_t *cl)
 {
-  if(ac > 0 && fts_is_a( at, bus_type) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))  
-    {
-      if(ac == 1) 
-	{
-	  /* bus */
-	  bus_t *bus = (bus_t *)fts_get_object(at);
-	  int n_channels = bus_get_size(bus);
-	  int i;
-
-	  fts_class_init(cl, sizeof(access_t), n_channels + 1, 0, 0);
-	  
-	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, throw_init);
-	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, throw_delete);
-	  
-	  for(i=0; i<n_channels; i++)
-	    fts_method_define_varargs(cl, i, fts_s_anything, throw_bus_input);
-	  
-	  fts_method_define_varargs(cl, n_channels, bus_symbol, throw_set_bus);
-	}
-      else
-	{
-	  /* channel */
-	  fts_class_init(cl, sizeof(access_t), 2, 0, 0);
-	  
-	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, throw_init);
-	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, throw_delete);
-	  
-	  fts_method_define_varargs(cl, 0, fts_s_anything, throw_channel_input);
-	  fts_method_define_varargs(cl, 1, fts_s_int, throw_set_channel);
-	}
-
-      return fts_ok;
-    }
-  else
-    return &fts_CannotInstantiate;
+  fts_class_init(cl, sizeof(access_t), throw_init, throw_delete);
+  
+  fts_class_inlet_varargs(cl, 0, throw_bus_input);
+  fts_class_set_default_handler(cl, throw_bus_input);
 }
 
 /*****************************************************************************
@@ -278,39 +247,12 @@ catch_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
   fts_object_release((fts_object_t *)this->bus);  
 }
 
-static fts_status_t
-catch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+catch_instantiate(fts_class_t *cl)
 {
-  if(ac > 0 && fts_is_a(at, bus_type) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))
-    {
-      if(ac == 1) 
-	{
-	  /* bus */
-	  bus_t *bus = (bus_t *)fts_get_object(at);
-	  int n_channels = bus_get_size(bus);
-
-	  fts_class_init(cl, sizeof(access_t), 1, n_channels, 0);
-	  
-	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, catch_init);
-	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, catch_delete);
-	  
-	  fts_method_define_varargs(cl, 0, bus_symbol, catch_set_bus);
-	}
-      else
-	{
-	  /* channel */
-	  fts_class_init(cl, sizeof(access_t), 1, 1, 0);
-	  
-	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, catch_init);
-	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, catch_delete);
-	  
-	  fts_method_define_varargs(cl, 0, fts_s_int, catch_set_channel);
-	}
-
-      return fts_ok;
-    }
-  else
-    return &fts_CannotInstantiate;
+  fts_class_init(cl, sizeof(access_t), catch_init, catch_delete);
+  
+  fts_class_method_varargs(cl, bus_symbol, catch_set_bus);
 }
 
 /*****************************************************************************
@@ -348,6 +290,8 @@ bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t 
   this->n_channels = n_channels;
 
   fts_channel_add_target(bus_get_channel(this, BUS_CHANNEL), o);  
+  fts_object_set_inlets_number(o, n_channels);
+  fts_object_set_outlets_number(o, n_channels);
 }
 
 static void
@@ -364,31 +308,16 @@ bus_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t proper
   fts_set_object(value, obj);
 }
 
-static fts_status_t
-bus_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+bus_instantiate(fts_class_t *cl)
 {
-  int n_channels = 0;
-  int i;
+  fts_class_init(cl, sizeof(bus_t), bus_init, bus_delete);
 
-  if(ac == 0)
-    n_channels = 1;
-  else if(ac == 1 && fts_is_int(at))
-    n_channels = fts_get_int(at);
-  else
-    return &fts_CannotInstantiate;
+  fts_class_inlet_varargs(cl, 0, bus_input);
+  fts_class_set_default_handler(cl, bus_input);
 
-  fts_class_init(cl, sizeof(bus_t), n_channels, n_channels, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, bus_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, bus_delete);
-
-  for(i=0; i<n_channels; i++)
-    fts_method_define_varargs(cl, i, fts_s_anything, bus_input);
-	  
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, bus_get_state);
-  
-  return fts_ok;
-}
+  }
 
 void
 bus_config(void)

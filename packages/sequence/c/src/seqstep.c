@@ -38,7 +38,6 @@ typedef struct _seqstep_
   track_t *track;
   event_t *prev;
   event_t *next;
-  fts_array_t array;
 } seqstep_t;
 
 /************************************************************
@@ -147,11 +146,8 @@ seqstep_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       /* output events of cluster */
       next = event;
       while(next && event_get_time(next) == time)
-	{
-	  fts_array_clear(&this->array);
-	  event_get_array(next, &this->array);
-	  
-	  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->array), fts_array_get_atoms(&this->array));
+	{	  
+	  fts_outlet_varargs(o, 0, 1, event_get_value(next));
 	  
 	  event = next;
 	  next = event_get_next(next);
@@ -207,12 +203,8 @@ seqstep_prev(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       prev = event;
       while(prev && event_get_time(prev) == time)
 	{
-	  fts_array_clear(&this->array);
-	  event_get_array(prev, &this->array);
-	  
-	  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->array), fts_array_get_atoms(&this->array));
-	  
 	  event = prev;
+	  fts_outlet_varargs(o, 0, 1, event_get_value(prev));
 	  prev = event_get_prev(prev);
 	}
 	
@@ -262,8 +254,6 @@ seqstep_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       this->track = (track_t *)fts_get_object(at);
       fts_object_refer(this->track);
-      
-      fts_array_init(&this->array, 0, 0);
     }
   else
     fts_object_set_error(o, "Argument of event track required");
@@ -275,28 +265,25 @@ seqstep_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   seqstep_t *this = (seqstep_t *)o;
 
   if(this->track)
-    {
-      fts_object_release(this->track);
-      fts_array_destroy(&this->array);
-    }
+    fts_object_release(this->track);
 }
 
-static fts_status_t
-seqstep_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+seqstep_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(seqstep_t), 2, 2, 0);
+  fts_class_init(cl, sizeof(seqstep_t), seqstep_init, seqstep_delete);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, seqstep_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, seqstep_delete);
+  fts_class_method_varargs(cl, fts_new_symbol("goto"), seqstep_goto);
+  fts_class_method_varargs(cl, fts_new_symbol("reset"), seqstep_reset);
+  fts_class_method_varargs(cl, fts_new_symbol("prev"), seqstep_prev);
+  fts_class_method_varargs(cl, fts_s_next, seqstep_next);
+  fts_class_method_varargs(cl, fts_s_bang, seqstep_next);
   
-  fts_method_define_varargs(cl, 0, fts_new_symbol("goto"), seqstep_goto);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("reset"), seqstep_reset);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("prev"), seqstep_prev);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("next"), seqstep_next);
+  fts_class_inlet_anything(cl, 0);
+  fts_class_inlet(cl, 1, track_type, seqstep_set_reference);
   
-  fts_method_define_varargs(cl, 1, seqsym_track, seqstep_set_reference);
-  
-  return fts_ok;
+  fts_class_outlet_varargs(cl, 0);
+  fts_class_outlet_float(cl, 1);
 }
 
 void

@@ -1,3 +1,8 @@
+2002-09-26  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* reimplemented fts message system (API to be documented)...
+	* adapted object set to new API
+
 2002-09-25  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* added parsing of object expressions to the expression parser/evaluator.

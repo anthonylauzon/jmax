@@ -43,14 +43,12 @@ static void fts_error_finder_find( fts_object_t *o, int winlet, fts_symbol_t s, 
   fts_send_message(scope, fts_s_find_errors, 1, &a);
 }
 
-static fts_status_t
-error_finder_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+error_finder_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_error_finder_t), 0, 0, 0); 
+  fts_class_init(cl, sizeof(fts_error_finder_t), NULL, NULL); 
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("error_finder_find"), fts_error_finder_find);
-
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_new_symbol("error_finder_find"), fts_error_finder_find);
 }
 
 /***********************************************************************

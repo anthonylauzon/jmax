@@ -92,7 +92,7 @@ static void out_list( decrypt_t *x)
   for( i = 0; i < x->nb_elm; i++)
     fts_set_int( &(x->lstout[i]), x->Elm[i]);
 
-  fts_outlet_atoms( (fts_object_t *)x, 0, x->nb_elm, x->lstout);
+  fts_outlet_varargs( (fts_object_t *)x, 0, x->nb_elm, x->lstout);
 }
 
 static void Calcul2( decrypt_t *x)
@@ -285,7 +285,7 @@ static void decrypt_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 	{
 	  if (!fts_is_int(at + i))
 	    {
-	      post("%s: argument %d non valide (%s)\n", NOM, i, fts_get_selector( &at[i]));
+	      post("%s: argument %d non valide (%s)\n", NOM, i, fts_get_class_name( &at[i]));
 	      return;
 	    }
 	}
@@ -305,21 +305,20 @@ static void decrypt_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 /* Class instantiation                                                      */
 /*--------------------------------------------------------------------------*/
 
-static fts_status_t decrypt_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
+static void decrypt_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(decrypt_t), 2, 2, 0);
+  fts_class_init(cl, sizeof(decrypt_t), decrypt_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, decrypt_init);
+  fts_class_method_varargs(cl, fts_new_symbol( "enable"), decrypt_enable);
+  fts_class_method_varargs(cl, fts_new_symbol( "format"), decrypt_format);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol( "enable"), decrypt_enable);
-  fts_method_define_varargs(cl, 0, fts_new_symbol( "format"), decrypt_format);
+  fts_class_method_varargs(cl, fts_s_bang, decrypt_bang);
+  fts_class_inlet_int(cl, 0, decrypt_int);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, decrypt_bang);
-  fts_method_define_varargs(cl, 0, fts_s_int, decrypt_int);
+  fts_class_inlet_int(cl, 1, decrypt_chn);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, decrypt_chn);
-
-  return fts_ok;
+  fts_class_outlet_varargs(cl, 0);
+  fts_class_outlet_int(cl, 1);
 }
 
 

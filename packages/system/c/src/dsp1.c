@@ -113,28 +113,24 @@ dsp_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 
-static fts_status_t
-dsp_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+dsp_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(dsp_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(dsp_t), dsp_init, dsp_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, dsp_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, dsp_delete);
+  fts_class_method_varargs(cl, fts_s_start, dsp_start);
+  fts_class_method_varargs(cl, fts_s_stop, dsp_stop);
 
-  fts_method_define_varargs(cl, 0, fts_s_start, dsp_start);
-  fts_method_define_varargs(cl, 0, fts_s_stop, dsp_stop);
-
-  fts_method_define_varargs(cl, 0, fts_s_int, dsp_on_off);
-  fts_method_define_varargs(cl, 0, fts_s_float, dsp_on_off);
+  fts_class_inlet_int(cl, 0, dsp_on_off);
+  fts_class_inlet_float(cl, 0, dsp_on_off);
   
-  fts_method_define_varargs(cl, 0, fts_s_bang, dsp_print);
-  fts_method_define_varargs(cl, 0, fts_s_print, dsp_print);
+  fts_class_method_varargs(cl, fts_s_bang, dsp_print);
+  fts_class_method_varargs(cl, fts_s_print, dsp_print);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("save"), dsp_save);
+  fts_class_method_varargs(cl, fts_new_symbol("save"), dsp_save);
+  fts_class_method_varargs(cl, fts_new_symbol("print-signals"), dsp_print_signals);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("print-signals"), dsp_print_signals);
-  
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
 }
 
 void

@@ -236,22 +236,20 @@ sigline_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 
-static fts_status_t
-sigline_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sigline_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(sigline_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(sigline_t), sigline_init, sigline_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sigline_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sigline_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, sigline_put);
+  fts_class_method_varargs(cl, fts_s_put, sigline_put);
   
-  fts_method_define_varargs(cl, 0, fts_s_list, sigline_list);
+  fts_class_inlet_varargs(cl, 0, sigline_list);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, sigline_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, sigline_number);
+  fts_class_inlet_int(cl, 0, sigline_number);
+  fts_class_inlet_float(cl, 0, sigline_number);
   
-  fts_method_define_varargs(cl, 1, fts_s_float, sigline_number_1);
-  fts_method_define_varargs(cl, 1, fts_s_int, sigline_number_1);
+  fts_class_inlet_float(cl, 1, sigline_number_1);
+  fts_class_inlet_int(cl, 1, sigline_number_1);
   
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
@@ -261,8 +259,6 @@ sigline_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   sigline_64_function = fts_new_symbol("ftl_line64");
   fts_dsp_declare_function(sigline_64_function, ftl_line_64);
-
-  return fts_ok;
 }
 
 void

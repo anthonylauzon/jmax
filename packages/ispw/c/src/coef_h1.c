@@ -272,37 +272,40 @@ sigcoef_hlshelf1_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-sigcoef_hlshelf1_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sigcoef_hlshelf1_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(sigcoef_hlshelf1_t), 5, 6, 0);
+  fts_class_init(cl, sizeof(sigcoef_hlshelf1_t), sigcoef_hlshelf1_init, sigcoef_hlshelf1_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sigcoef_hlshelf1_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sigcoef_hlshelf1_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, sigcoef_hlshelf1_put);
+  fts_class_method_varargs(cl, fts_s_put, sigcoef_hlshelf1_put);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, sigcoef_hlshelf1_bang);
+  fts_class_method_varargs(cl, fts_s_bang, sigcoef_hlshelf1_bang);
 
-  fts_method_define_varargs(cl, 0, fts_s_float, sigcoef_hlshelf1_in0);
-  fts_method_define_varargs(cl, 1, fts_s_float, sigcoef_hlshelf1_in1);
-  fts_method_define_varargs(cl, 2, fts_s_float, sigcoef_hlshelf1_in2);
-  fts_method_define_varargs(cl, 3, fts_s_float, sigcoef_hlshelf1_in3);
-  fts_method_define_varargs(cl, 4, fts_s_float, sigcoef_hlshelf1_in4);
+  fts_class_inlet_float(cl, 0, sigcoef_hlshelf1_in0);
+  fts_class_inlet_float(cl, 1, sigcoef_hlshelf1_in1);
+  fts_class_inlet_float(cl, 2, sigcoef_hlshelf1_in2);
+  fts_class_inlet_float(cl, 3, sigcoef_hlshelf1_in3);
+  fts_class_inlet_float(cl, 4, sigcoef_hlshelf1_in4);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, sigcoef_hlshelf1_in0);
-  fts_method_define_varargs(cl, 1, fts_s_int, sigcoef_hlshelf1_in1);
-  fts_method_define_varargs(cl, 2, fts_s_int, sigcoef_hlshelf1_in2);
-  fts_method_define_varargs(cl, 3, fts_s_int, sigcoef_hlshelf1_in3);
-  fts_method_define_varargs(cl, 4, fts_s_int, sigcoef_hlshelf1_in4);
+  fts_class_inlet_int(cl, 0, sigcoef_hlshelf1_in0);
+  fts_class_inlet_int(cl, 1, sigcoef_hlshelf1_in1);
+  fts_class_inlet_int(cl, 2, sigcoef_hlshelf1_in2);
+  fts_class_inlet_int(cl, 3, sigcoef_hlshelf1_in3);
+  fts_class_inlet_int(cl, 4, sigcoef_hlshelf1_in4);
 
   fts_dsp_declare_inlet(cl, 0);
-  
-  return fts_ok;
+
+  fts_class_outlet_float(cl, 0);
+  fts_class_outlet_float(cl, 1);
+  fts_class_outlet_float(cl, 2);
+  fts_class_outlet_float(cl, 3);
+  fts_class_outlet_float(cl, 4);
+  fts_class_outlet_float(cl, 5);
 }
 
 void
 sigcoef_hlshelf1_config(void)
 {
-  fts_metaclass_t *mcl = fts_class_install(fts_new_symbol("coef_hlshelf1~"),sigcoef_hlshelf1_instantiate);
+  fts_metaclass_t *mcl = fts_class_install(fts_new_symbol("coef_hlshelf1~"), sigcoef_hlshelf1_instantiate);
   fts_class_alias(mcl, fts_new_symbol("coef_h~"));
 }

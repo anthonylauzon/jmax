@@ -63,7 +63,7 @@ const_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   const_t *this = (const_t *) o;
 
-  fts_outlet_atom(o, 0, &this->a);
+  fts_outlet_varargs(o, 0, 1, &this->a);
 }
 
 static void
@@ -74,19 +74,16 @@ const_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prop
   *value = this->a;
 }
 
-static fts_status_t
-const_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+const_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(const_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(const_t), const_init, const_delete);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, const_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, const_delete);
-  
-  fts_method_define_varargs(cl, 0, fts_s_bang, const_bang);
+  fts_class_method_varargs(cl, fts_s_bang, const_bang);
   
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, const_get_state);
   
-  return fts_ok;
+  fts_class_outlet_varargs(cl, 0);
 }
 
 void

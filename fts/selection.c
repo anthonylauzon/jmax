@@ -162,20 +162,15 @@ selection_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 
-static fts_status_t
-selection_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+selection_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_selection_t), 0, 0, 0); 
+  fts_class_init(cl, sizeof(fts_selection_t), selection_init, selection_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, selection_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, selection_delete);
+  fts_class_method_varargs(cl, fts_new_symbol("add"),  selection_add);
+  fts_class_method_varargs(cl, fts_new_symbol("remove"), selection_remove);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("add"),  selection_add);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("remove"), selection_remove);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_clear, selection_clear);
-
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_s_clear, selection_clear);
 }
 
 

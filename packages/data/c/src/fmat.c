@@ -400,12 +400,6 @@ fmat_write_atom_file_separator(fmat_t *fmat, fts_symbol_t file_name, fts_symbol_
  */
 
 static void
-fmat_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_outlet_object(o, 0, o);
-}
-
-static void
 fmat_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *this = (fmat_t *)o;
@@ -1293,59 +1287,43 @@ fmat_get_fmat(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t proper
   fts_set_object(value, obj);
 }
 
-static fts_status_t
-fmat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+fmat_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fmat_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(fmat_t), fmat_init, fmat_delete);
   
-  /* init / delete */
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fmat_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fmat_delete);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, fmat_post); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, fmat_print); 
+  fts_class_method_varargs(cl, fts_s_post, fmat_post); 
+  fts_class_method_varargs(cl, fts_s_print, fmat_print); 
 
+  fts_class_method_varargs(cl, fts_s_set_from_instance, fmat_set_from_instance);
+  fts_class_method_varargs(cl, fts_s_dump, fmat_dump);
+  
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, fmat_get_fmat);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_instance, fmat_set_from_instance);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, fmat_set_elements);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_row, fmat_set_row_elements);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_size, fmat_size);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, fmat_dump);
+  fts_class_method_varargs(cl, fts_s_fill, fmat_fill);
+  fts_class_method_varargs(cl, fts_s_set, fmat_set_elements);
+  fts_class_method_varargs(cl, fts_s_row, fmat_set_row_elements);
   
-  fts_method_define_varargs(cl, 0, fts_s_bang, fmat_output);
+  fts_class_method_varargs(cl, fts_new_symbol("add"), fmat_add);
+  fts_class_method_varargs(cl, fts_new_symbol("sub"), fmat_sub);
+  fts_class_method_varargs(cl, fts_new_symbol("mul"), fmat_mul);
+  fts_class_method_varargs(cl, fts_new_symbol("div"), fmat_div);
+  fts_class_method_varargs(cl, fts_new_symbol("bus"), fmat_bus);
+  fts_class_method_varargs(cl, fts_new_symbol("vid"), fmat_vid);
+  fts_class_method_varargs(cl, fts_new_symbol("ee"), fmat_ee);
+  fts_class_method_varargs(cl, fts_new_symbol("ne"), fmat_ne);
+  fts_class_method_varargs(cl, fts_new_symbol("gt"), fmat_gt);
+  fts_class_method_varargs(cl, fts_new_symbol("ge"), fmat_ge);
+  fts_class_method_varargs(cl, fts_new_symbol("lt"), fmat_lt);
+  fts_class_method_varargs(cl, fts_new_symbol("le"), fmat_le);
+  fts_class_method_varargs(cl, fts_new_symbol("min"), fmat_min);
+  fts_class_method_varargs(cl, fts_new_symbol("max"), fmat_max);
+  fts_class_method_varargs(cl, fts_s_size, fmat_size);
   
-  fts_method_define_varargs(cl, 0, fts_s_fill, fmat_fill);
-  fts_method_define_varargs(cl, 0, fts_s_set, fmat_set_elements);
-  fts_method_define_varargs(cl, 0, fts_s_row, fmat_set_row_elements);
-  
-  fts_method_define_varargs(cl, 0, fts_s_print, fmat_print); 
-
-  fts_method_define_varargs(cl, 0, fts_new_symbol("add"), fmat_add);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("sub"), fmat_sub);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("mul"), fmat_mul);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("div"), fmat_div);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("bus"), fmat_bus);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("vid"), fmat_vid);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("ee"), fmat_ee);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("ne"), fmat_ne);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("gt"), fmat_gt);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("ge"), fmat_ge);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("lt"), fmat_lt);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("le"), fmat_le);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("min"), fmat_min);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("max"), fmat_max);
-
-  fts_method_define_varargs(cl, 0, fts_s_size, fmat_size);
-            
-  fts_method_define_varargs(cl, 0, fts_s_import, fmat_import);
-  fts_method_define_varargs(cl, 0, fts_s_export, fmat_export);
-    
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_s_import, fmat_import);
+  fts_class_method_varargs(cl, fts_s_export, fmat_export);
 }
 
 void 

@@ -75,7 +75,7 @@ split_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-split_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+split_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   if(ac >= 1)
     {
@@ -92,25 +92,18 @@ split_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     split_bound(o, 2, 0, 1, at + 2);
 }
 
-static fts_status_t
-split_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+split_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(split_t), 3, 2, 0);
+  fts_class_init(cl, sizeof(split_t), split_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, split_init);
+  fts_class_inlet_varargs(cl, 0, split_varargs);
+  fts_class_inlet_number(cl, 0, split_int);
+  fts_class_inlet_number(cl, 1, split_bound);
+  fts_class_inlet_number(cl, 2, split_bound);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, split_int);
-  fts_method_define_varargs(cl, 0, fts_s_float, split_float);
-
-  fts_method_define_varargs(cl, 1, fts_s_int, split_bound);
-  fts_method_define_varargs(cl, 1, fts_s_float, split_bound);
-
-  fts_method_define_varargs(cl, 2, fts_s_int, split_bound);
-  fts_method_define_varargs(cl, 2, fts_s_float, split_bound);
-
-  fts_method_define_varargs(cl, 0, fts_s_list, split_list);
-
-  return fts_ok;
+  fts_class_outlet_number(cl, 0);
+  fts_class_outlet_number(cl, 1);
 }
 
 void

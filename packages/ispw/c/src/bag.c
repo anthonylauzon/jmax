@@ -181,30 +181,21 @@ bag_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 
-static fts_status_t
-bag_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+bag_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(bag_t), 2, 1, 0); 
+  fts_class_init(cl, sizeof(bag_t), bag_init, bag_clear);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, bag_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, bag_clear);
+  fts_class_method_varargs(cl, fts_s_bang, bag_bang);
+  fts_class_method_varargs(cl, fts_s_clear, bag_clear);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, bag_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, bag_number);
-  fts_method_define_varargs(cl, 0, fts_s_list, bag_list);
+  fts_class_method_varargs(cl, fts_new_symbol("cut"), bag_cut);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, bag_number_1);
-  fts_method_define_varargs(cl, 1, fts_s_float, bag_number_1);
+  fts_class_inlet_varargs(cl, 0, bag_list);
+  fts_class_inlet_number(cl, 0, bag_number);
+  fts_class_inlet_number(cl, 1, bag_number_1);
 
-
-  fts_method_define_varargs(cl, 0, fts_s_bang, bag_bang);
-  fts_method_define_varargs(cl, 0, fts_s_clear, bag_clear);
-
-  fts_method_define_varargs(cl, 0, fts_new_symbol("cut"), bag_cut);
-
-  fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
-
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
 }
 
 

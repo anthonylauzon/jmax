@@ -85,7 +85,7 @@ static void
 oneshot_switch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   oneshot_t *this = (oneshot_t *)o;
-  int n = fts_get_int(at);
+  int n = fts_get_number_int(at);
   
   this->open = (n != 0);
 }
@@ -95,18 +95,18 @@ oneshot_switch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  *  class
  *
  */
-static fts_status_t
-oneshot_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+oneshot_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(oneshot_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(oneshot_t), oneshot_init, NULL);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, oneshot_init);
+  fts_class_set_default_handler(cl, oneshot_input);
 
-  fts_method_define_varargs(cl, 0, fts_s_anything, oneshot_input);
-  fts_method_define_varargs(cl, 1, fts_s_bang, oneshot_open);
-  fts_method_define_varargs(cl, 1, fts_s_int, oneshot_switch);
+  fts_class_inlet_varargs(cl, 0, oneshot_input);
+  fts_class_inlet_int(cl, 1, oneshot_switch);
+  fts_class_inlet_float(cl, 1, oneshot_switch);
 
-  return fts_ok;
+  fts_class_outlet_anything(cl, 0);
 }
 
 void

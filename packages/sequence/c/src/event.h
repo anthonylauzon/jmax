@@ -61,7 +61,7 @@ struct _event_
 #define event_get_float(e) fts_get_float(&(e)->value)
 #define event_get_object(e) fts_get_object(&(e)->value)
 
-#define event_get_type(e) (fts_get_selector(&(e)->value))
+#define event_get_type(e) (fts_get_class_name(&(e)->value))
 
 extern void event_get_array(event_t *event, fts_array_t *array);
 extern void event_dump(event_t *event, fts_dumper_t *dumper);

@@ -155,26 +155,22 @@ clip_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+class_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(clip_t), 3, 1, 0);
+  fts_class_init(cl, sizeof(clip_t), clip_init, clip_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, clip_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, clip_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, clip_put);
+  fts_class_method_varargs(cl, fts_s_put, clip_put);
   
-  fts_method_define_varargs(cl, 1, fts_s_int, clip_set_min);
-  fts_method_define_varargs(cl, 1, fts_s_float, clip_set_min);
+  fts_class_inlet_int(cl, 1, clip_set_min);
+  fts_class_inlet_float(cl, 1, clip_set_min);
 
-  fts_method_define_varargs(cl, 2, fts_s_int, clip_set_max);
-  fts_method_define_varargs(cl, 2, fts_s_float, clip_set_max);
+  fts_class_inlet_int(cl, 2, clip_set_max);
+  fts_class_inlet_float(cl, 2, clip_set_max);
   
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-  
-  return fts_ok;
-}
+  }
 
 void
 signal_clip_config(void)

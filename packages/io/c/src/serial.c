@@ -454,24 +454,20 @@ serial_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     }
 }
 
-static fts_status_t 
-serial_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+serial_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof( serial_t), 1, 1, 0);
+  fts_class_init( cl, sizeof( serial_t), serial_init, serial_delete, 0);
   fts_bytestream_class_init(cl);
 
   /* define variable */
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, serial_get_state);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, serial_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, serial_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_sched_ready, serial_read);
+  fts_class_method_varargs(cl, fts_s_sched_ready, serial_read);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, serial_bang);
-  fts_method_define_varargs(cl, 0, fts_s_int, serial_int);
-  fts_method_define_varargs(cl, 0, fts_s_list, serial_list);
-
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_s_bang, serial_bang);
+  fts_class_inlet_int(cl, 0, serial_int);
+  fts_class_inlet_varargs(cl, 0, serial_list);
 }
 
 void serial_config( void)

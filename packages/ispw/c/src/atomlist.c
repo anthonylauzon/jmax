@@ -439,20 +439,16 @@ fts_atom_list_dump(fts_atom_list_t *list, fts_dumper_t *dumper, fts_object_t *ta
   fts_atom_list_iterator_free(iterator);
 }
 
-static fts_status_t
-atom_list_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+atom_list_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_atom_list_t), 0, 0, 0); 
+  fts_class_init(cl, sizeof(fts_atom_list_t), fts_atom_list_init, fts_atom_list_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fts_atom_list_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fts_atom_list_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_upload, fts_atom_list_upload);
+  fts_class_method_varargs(cl, fts_s_upload, fts_atom_list_upload);
 
-  fts_method_define_varargs(cl, fts_system_inlet, sym_atomlist_set, fts_atom_list_client_set);
-  fts_method_define_varargs(cl, fts_system_inlet, sym_atomlist_set_name, fts_atom_list_set_name);
-  fts_method_define_varargs(cl, fts_system_inlet, sym_atomlist_update, fts_atom_list_update);
-
-  return fts_ok;
+  fts_class_method_varargs(cl, sym_atomlist_set, fts_atom_list_client_set);
+  fts_class_method_varargs(cl, sym_atomlist_set_name, fts_atom_list_set_name);
+  fts_class_method_varargs(cl, sym_atomlist_update, fts_atom_list_update);
 }
 
 /********************************************************************/

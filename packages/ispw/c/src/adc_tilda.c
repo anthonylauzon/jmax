@@ -81,19 +81,14 @@ static void adc_tilda_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   fts_dsp_desactivate();
 }
 
-static fts_status_t adc_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void adc_tilda_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof( adc_tilda_t), 1, 1, 0);
+  fts_class_init( cl, sizeof( adc_tilda_t), adc_tilda_init, adc_tilda_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, adc_tilda_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, adc_tilda_delete);
-
-  fts_method_define_varargs( cl, 0, fts_s_start, adc_tilda_start);
-  fts_method_define_varargs( cl, 0, fts_s_stop, adc_tilda_stop);
+  fts_class_method_varargs(cl, fts_s_start, adc_tilda_start);
+  fts_class_method_varargs(cl, fts_s_stop, adc_tilda_stop);
 
   fts_dsp_declare_outlet( cl, 0);
-
-  return fts_ok;
 }
 
 void adc_tilda_config( void)

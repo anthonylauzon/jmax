@@ -110,22 +110,16 @@ zerocross_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 
-static fts_status_t
-zerocross_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+zerocross_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(zerocross_t), 1, 1, 0); 
+  fts_class_init(cl, sizeof(zerocross_t), zerocross_init, zerocross_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, zerocross_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, zerocross_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, zerocross_put);
-
-  fts_method_define_varargs(cl, 0, fts_s_bang, zerocross_bang);
+  fts_class_method_varargs(cl, fts_s_put, zerocross_put);
+  fts_class_method_varargs(cl, fts_s_bang, zerocross_bang);
 
   fts_dsp_declare_inlet(cl, 0);
-
-  fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
-
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
 }
 
 void

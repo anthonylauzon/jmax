@@ -93,21 +93,16 @@ static void dac_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t 
     (*propagate_fun)( propagate_context, outdispatcher, i);
 }
 
-static fts_status_t dac_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void dac_tilda_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof( dac_tilda_t), 1, 0, 0);
+  fts_class_init( cl, sizeof( dac_tilda_t), dac_tilda_init, dac_tilda_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, dac_tilda_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, dac_tilda_delete);
+  fts_class_method_varargs(cl, fts_s_propagate_input, dac_tilda_propagate_input);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_propagate_input, dac_tilda_propagate_input);
-
-  fts_method_define_varargs( cl, 0, fts_s_start, dac_tilda_start);
-  fts_method_define_varargs( cl, 0, fts_s_stop, dac_tilda_stop);
+  fts_class_method_varargs(cl, fts_s_start, dac_tilda_start);
+  fts_class_method_varargs(cl, fts_s_stop, dac_tilda_stop);
 
   fts_dsp_declare_inlet( cl, 0);
-
-  return fts_ok;
 }
 
 void dac_tilda_config( void)

@@ -252,7 +252,7 @@ line_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-line_int_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_int_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   switch(ac)
     {
@@ -272,7 +272,7 @@ line_int_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-line_float_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_float_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   switch(ac)
     {
@@ -292,14 +292,14 @@ line_float_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-line_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   line_t *this = (line_t *)o;
 
   if(this->is_int)
-    line_int_atoms(o, 0, 0, ac, at);
+    line_int_varargs(o, 0, 0, ac, at);
   else
-    line_float_atoms(o, 0, 0, ac, at);    
+    line_float_varargs(o, 0, 0, ac, at);    
 }
 
 static void
@@ -328,28 +328,20 @@ line_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
 }
 
-static fts_status_t
-line_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+line_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(line_t), 3, 1, 0); 
+  fts_class_init(cl, sizeof(line_t), line_init, NULL);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, line_init);
+  fts_class_method_varargs(cl, fts_s_stop, line_stop);
+  fts_class_method_varargs(cl, fts_s_set, line_set_value);
 
-  fts_method_define_varargs(cl, 0, fts_s_stop, line_stop);
+  fts_class_inlet_varargs(cl, 0, line_varargs);
+  fts_class_inlet_number(cl, 0, line_number);
+  fts_class_inlet_number(cl, 1, line_set_time);
+  fts_class_inlet_number(cl, 2, line_set_period);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, line_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, line_number);
-  fts_method_define_varargs(cl, 0, fts_s_list, line_atoms);
-  
-  fts_method_define_varargs(cl, 0, fts_s_set, line_set_value);
-
-  fts_method_define_varargs(cl, 1, fts_s_int, line_set_time);
-  fts_method_define_varargs(cl, 1, fts_s_float, line_set_time);
-
-  fts_method_define_varargs(cl, 2, fts_s_int, line_set_period);
-  fts_method_define_varargs(cl, 2, fts_s_float, line_set_period);
-
-  return fts_ok;
+  fts_class_outlet_number(cl, 0);
 }
 
 void

@@ -212,25 +212,21 @@ tabpeek_set_by_int(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const f
  *
  */
 
-static fts_status_t
-tabpeek_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+tabpeek_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(tabpeek_t), 1, 1, 0); 
+  fts_class_init(cl, sizeof(tabpeek_t), tabpeek_init, tabpeek_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, tabpeek_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tabpeek_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, tabpeek_put);
+  fts_class_method_varargs(cl, fts_s_put, tabpeek_put);
 
-  fts_method_define_varargs(cl, 0, fts_s_set, tabpeek_set);
-  fts_method_define_varargs(cl, 0, fts_s_int, tabpeek_set_by_int);
+  fts_class_method_varargs(cl, fts_s_set, tabpeek_set);
+  fts_class_inlet_int(cl, 0, tabpeek_set_by_int);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
 
   dsp_symbol = fts_new_symbol("tabpeek");
   fts_dsp_declare_function(dsp_symbol, ftl_tabpeek);
-
-  return fts_ok;
 }
 
 void

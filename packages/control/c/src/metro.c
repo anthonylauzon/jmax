@@ -107,27 +107,30 @@ metro_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     metro_set_period(o, 0, 0, 1, at);
 }
 
-
-static fts_status_t
-metro_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+metro_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(metro_t), 2, 1, 0); 
+  metro_t *this = (metro_t *)o;
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, metro_init);
+  metro_stop(o, 0, 0, 0, 0);
+}
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, metro_start);
-  fts_method_define_varargs(cl, 0, fts_s_start, metro_start);
-  fts_method_define_varargs(cl, 0, fts_s_stop, metro_stop);
+static void
+metro_instantiate(fts_class_t *cl)
+{
+  fts_class_init(cl, sizeof(metro_t), metro_init, metro_delete);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, metro_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, metro_number);
+  fts_class_method_varargs(cl, fts_s_bang, metro_start);
+  fts_class_method_varargs(cl, fts_s_start, metro_start);
+  fts_class_method_varargs(cl, fts_s_stop, metro_stop);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, metro_set_period);
-  fts_method_define_varargs(cl, 1, fts_s_float, metro_set_period);
+  fts_class_inlet_int(cl, 0, metro_number);
+  fts_class_inlet_float(cl, 0, metro_number);
 
-  fts_outlet_type_define_varargs(cl, 0,	fts_s_bang);
+  fts_class_inlet_int(cl, 1, metro_set_period);
+  fts_class_inlet_float(cl, 1, metro_set_period);
 
-  return fts_ok;
+  fts_class_outlet_bang(cl, 0);
 }
 
 

@@ -37,12 +37,13 @@ import ircam.fts.client.*;
 
 public class FtsConnection extends FtsObject
 {
-  /* numbering doubled on server side (mess_types.h) */
-  public static final int fts_connection_invalid = 0; /* from error object or type missmatch */
-  public static final int fts_connection_anything = 1; /* message which is not one of the following */
-  public static final int fts_connection_atom = 2; /* single atom (value) */
-  public static final int fts_connection_object = 3; /* objects */
-  public static final int fts_connection_signal = 4; /* signal connection */
+  /* numbering doubled on server side (connection.h) */
+  public static final int fts_connection_invalid = -1; /* from error object or type missmatch */
+  public static final int fts_connection_anything = 0; /* message which is not one of the following */
+  public static final int fts_connection_message = 1; /* message */
+  public static final int fts_connection_value = 2; /* varargs (unpacked tuple) or single value */
+  public static final int fts_connection_signal = 3; /* signal connection */
+  public static final int fts_connection_signal_active = 4; /* active signal connection */
 
   private transient int id;
 

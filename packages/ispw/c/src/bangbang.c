@@ -22,7 +22,7 @@
 #include <fts/fts.h>
 
 static void
-bangbang_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bangbang_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   int i;
 
@@ -43,15 +43,15 @@ bangbang_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_object_set_outlets_number(o, noutlets);
 }
 
-static fts_status_t
-bangbang_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+bangbang_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_object_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(fts_object_t), 0, 0);
 
-  fts_method_define_varargs(cl, 0, fts_s_anything, bangbang_bang);
-  fts_outlet_type_define(cl, 0, fts_s_bang);
+  fts_class_inlet_varargs(cl, 0, bangbang_input);
+  fts_class_set_default_handler(cl, bangbang_input);
 
-  return fts_ok;
+  fts_class_outlet_bang(cl, 0);
 }
 
 void

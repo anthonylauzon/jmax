@@ -47,7 +47,7 @@ static fts_symbol_t sym_all = 0;
  */
 
 static void 
-seqfind_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqfind_find_single(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqfind_t *this = (seqfind_t *)o;
   event_t *event = track_get_first(this->track);
@@ -59,7 +59,7 @@ seqfind_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       if(fts_atom_compare(value, at))
 	{
 	  fts_outlet_float(o, 1, (float)event_get_time(event));
-	  fts_outlet_send(o, 0, fts_get_selector(value), 1, value);
+	  fts_outlet_varargs(o, 0, 1, value);
 
 	  if(this->mode == sym_first)
 	    break;
@@ -69,15 +69,21 @@ seqfind_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }  
 }
 
-static void 
-seqfind_any_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
+static void
+seqfind_find_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
   seqfind_t *this = (seqfind_t *)o;
 
-  if(ac == 1 && fts_get_selector(at) == s)
-    seqfind_find(o, winlet, s, 1, at);
-  else
-    fts_object_signal_runtime_error(o, "doesn't understand message %s", s);
+  if(ac == 1)
+    seqfind_find_single(o, 0, 0, 1, at);
+  else if(ac > 1)
+    {
+      fts_object_t *tuple = fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_atom_t a;
+      
+      fts_set_object(&a, tuple);
+      seqfind_find_single(o, 0, 0, 1, &a);
+    }
 }
 
 static void
@@ -148,26 +154,21 @@ seqfind_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     fts_object_release(this->track);
 }
 
-static fts_status_t
-seqfind_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+seqfind_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(seqfind_t), 2, 2, 0);
+  fts_class_init(cl, sizeof(seqfind_t), seqfind_init, seqfind_delete);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, seqfind_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, seqfind_delete);
-  
-  fts_method_define_varargs(cl, 0, fts_new_symbol("mode"), seqfind_set_mode);
+  fts_class_method_varargs(cl, fts_new_symbol("mode"), seqfind_set_mode);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("mode"), seqfind_set_mode_prop);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, seqfind_find);
-  fts_method_define_varargs(cl, 0, fts_s_float, seqfind_find);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, seqfind_find);
-  fts_method_define_varargs(cl, 0, fts_s_list, seqfind_find);
-  fts_method_define_varargs(cl, 0, fts_s_anything, seqfind_any_value);
-  
-  fts_method_define_varargs(cl, 1, seqsym_track, seqfind_set_track);
-  
-  return fts_ok;
+  fts_class_inlet_number(cl, 0, seqfind_find_single);
+  fts_class_inlet_symbol(cl, 0, seqfind_find_single);
+  fts_class_inlet_varargs(cl, 0, seqfind_find_varargs);
+  fts_class_inlet(cl, 1, track_type, seqfind_set_track);
+
+  fts_class_outlet_varargs(cl, 0);
+  fts_class_outlet_float(cl, 1);
 }
 
 void

@@ -1658,12 +1658,12 @@ fts_bmax_code_put_prop(fts_bmax_file_t *f, fts_symbol_t sym)
   fts_bmax_write_int(f, value);
 }
 
-void fts_bmax_code_obj_mess(fts_bmax_file_t *f, int inlet, fts_symbol_t sel, int nargs)
+void fts_bmax_code_obj_mess(fts_bmax_file_t *f, fts_symbol_t sel, int nargs)
 {
   /* OBJ_MESS   <inlet> <sel> <nargs> */
 
   fts_bmax_write_opcode(f, FVM_OBJ_MESS);
-  fts_bmax_write_l_int(f, inlet);
+  fts_bmax_write_l_int(f, fts_system_inlet);
   fts_bmax_write_l_int(f, fts_bmax_add_symbol(f, sel));
   fts_bmax_write_l_int(f, nargs);
 }
@@ -2094,7 +2094,7 @@ saver_dumper_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   saver_dumper_t *this = (saver_dumper_t *)o;
   
   fts_bmax_code_push_atoms(this->file, ac, at);
-  fts_bmax_code_obj_mess(this->file, fts_system_inlet, s, ac);
+  fts_bmax_code_obj_mess(this->file, s, ac);
   fts_bmax_code_pop_args(this->file, ac);
 }
 
@@ -2110,15 +2110,10 @@ saver_dumper_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   fts_dumper_destroy((fts_dumper_t *)o);
 }
   
-static fts_status_t
-saver_dumper_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+saver_dumper_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(saver_dumper_t), 0, 0, 0);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, saver_dumper_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, saver_dumper_delete);
-
-  return fts_ok;
+  fts_class_init(cl, sizeof(saver_dumper_t), saver_dumper_init, saver_dumper_delete);
 }
 
 void

@@ -112,16 +112,14 @@ sigup_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-sigup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sigup_instantiate(fts_class_t *cl)
 {
   fts_atom_t a;
 
-  fts_class_init(cl, sizeof(sigup_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(sigup_t), sigup_init, sigup_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sigup_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sigup_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, sigup_put);
+  fts_class_method_varargs(cl, fts_s_put, sigup_put);
 
   fts_set_int(&a, 1);
   fts_class_put_prop(cl, fts_s_dsp_upsampling, &a);
@@ -131,9 +129,7 @@ sigup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   sigup_function = fts_new_symbol("up");
   fts_dsp_declare_function(sigup_function, ftl_up);
-  
-  return fts_ok;
-}
+  }
 
 void
 sigup_config(void)
@@ -188,16 +184,14 @@ sigdown_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-sigdown_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sigdown_instantiate(fts_class_t *cl)
 {
   fts_atom_t a;
 
-  fts_class_init(cl, sizeof(sigdown_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(sigdown_t), sigdown_init, sigdown_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sigdown_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sigdown_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, sigdown_put);
+  fts_class_method_varargs(cl, fts_s_put, sigdown_put);
 
   fts_set_int(&a, 1);
   fts_class_put_prop(cl, fts_s_dsp_downsampling, &a);
@@ -207,8 +201,6 @@ sigdown_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   sigdown_function = fts_new_symbol("down");
   fts_dsp_declare_function(sigdown_function, ftl_down);
-
-  return fts_ok;
 }
 
 void

@@ -211,26 +211,21 @@ tilda_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   ftl_data_free(this->data);
 }
 
-static fts_status_t
-tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+tilda_instantiate(fts_class_t *cl)
 {
   /* slide with ramp */
-  fts_class_init(cl, sizeof(tilda_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(tilda_t), tilda_init, tilda_delete);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, tilda_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tilda_delete);
+  fts_class_method_varargs(cl, fts_s_put, tilda_put);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, tilda_put);
+  fts_class_inlet_int(cl, 0, tilda_set_value);
+  fts_class_inlet_float(cl, 0, tilda_set_value);
   
-  fts_method_define_varargs(cl, 0, fts_s_int, tilda_set_value);
-  fts_method_define_varargs(cl, 0, fts_s_float, tilda_set_value);
-  
-  fts_method_define_varargs(cl, 1, fts_s_int, tilda_set_time);
-  fts_method_define_varargs(cl, 1, fts_s_float, tilda_set_time);
+  fts_class_inlet_int(cl, 1, tilda_set_time);
+  fts_class_inlet_float(cl, 1, tilda_set_time);
 
   fts_dsp_declare_outlet(cl, 0);
-
-  return fts_ok;
 }
 
 void

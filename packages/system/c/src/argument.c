@@ -90,7 +90,7 @@ argument_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   argument_t *this = (argument_t *) o;
 
-  fts_outlet_atom(o, 0, this->arg);
+  fts_outlet_varargs(o, 0, 1, this->arg);
 }
 
 /********************************************************************
@@ -108,17 +108,13 @@ argument_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t p
   *value = *(this->arg);
 }
 
-static fts_status_t
-argument_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+argument_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(argument_t), 1, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, argument_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, argument_delete);
+  fts_class_init(cl, sizeof(argument_t), argument_init, argument_delete);
   
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, argument_get_state);
-  
-  return fts_ok;
+  fts_class_outlet_varargs(cl, 0);
 }
 
 void

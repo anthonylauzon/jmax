@@ -107,21 +107,17 @@ out_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   fts_object_set_error(o, "First argument of input bytestream required");
 }
 
-static fts_status_t
-out_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+out_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(out_t), 2, 0, 0);
+  fts_class_init(cl, sizeof(out_t), out_init, 0);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, out_init);
-  
-  fts_method_define_varargs(cl, 0, fts_s_bang, out_bang);
-  fts_method_define_varargs(cl, 0, fts_s_int, out_int_and_flush);
-  fts_method_define_varargs(cl, 0, fts_s_list, out_list_and_flush);
-  fts_method_define_varargs(cl, 1, fts_s_int, out_int);
-  fts_method_define_varargs(cl, 1, fts_s_list, out_list);
-  
-  return fts_ok;
-}
+  fts_class_method_varargs(cl, fts_s_bang, out_bang);
+  fts_class_inlet_int(cl, 0, out_int_and_flush);
+  fts_class_inlet_varargs(cl, 0, out_list_and_flush);
+  fts_class_inlet_int(cl, 1, out_int);
+  fts_class_inlet_varargs(cl, 1, out_list);
+  }
 
 void
 out_config(void)

@@ -34,8 +34,6 @@ typedef struct
   double time;
 } timer_t;
 
-/* store time-now on default bang message */
-
 static void
 timer_zero(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -105,25 +103,19 @@ timer_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->time = 0.0;
 }
 
-static fts_status_t
-timer_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+timer_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(timer_t), 2, 1, 0); 
+  fts_class_init(cl, sizeof(timer_t), timer_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, timer_init);
+  fts_class_method_varargs(cl, fts_new_symbol("zero"), timer_zero);
+  fts_class_method_varargs(cl, fts_s_start, timer_start);
+  fts_class_method_varargs(cl, fts_s_stop, timer_stop);
+  fts_class_method_varargs(cl, fts_new_symbol("continue"), timer_continue);
+  fts_class_method_varargs(cl, fts_new_symbol("time"), timer_send_time);
+  fts_class_method_varargs(cl, fts_s_bang, timer_send_time);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("zero"), timer_zero);
-  fts_method_define_varargs(cl, 0, fts_s_start, timer_start);
-  fts_method_define_varargs(cl, 0, fts_s_stop, timer_stop);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("continue"), timer_continue);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("time"), timer_send_time);
-
-  fts_method_define_varargs(cl, 0, fts_s_bang, timer_zero);
-  fts_method_define_varargs(cl, 1, fts_s_bang, timer_send_time);
-
-  fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
-
-  return fts_ok;
+  fts_class_outlet_float(cl, 0);
 }
 
 void

@@ -339,46 +339,17 @@ throw_tilda_write_to_channel(fts_word_t *a)
     }
 }
 
-static fts_status_t
-throw_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+throw_tilda_instantiate(fts_class_t *cl)
 {
-  if(ac == 1) 
-    {
-      int n_channels = 1;
-      int i;
-	  
-      if(fts_is_a(at, fts_signal_bus_type))
-	{
-	  fts_signal_bus_t *bus = (fts_signal_bus_t *)fts_get_object(at);
+  fts_class_init(cl, sizeof(access_tilda_bus_t), access_tilda_bus_init, access_tilda_bus_delete);
 
-	  n_channels = fts_signal_bus_get_size(bus);
-	}
-	  
-      fts_class_init(cl, sizeof(access_tilda_bus_t), n_channels + 1, 0, 0);
+  fts_class_method_varargs(cl, fts_s_put, throw_tilda_bus_put);
       
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, access_tilda_bus_init);
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, access_tilda_bus_delete);
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, throw_tilda_bus_put);
-      
-      for(i=0; i<n_channels; i++)
-	fts_dsp_declare_inlet(cl, i);
-      
-      fts_method_define_varargs(cl, n_channels, fts_signal_bus_symbol, access_tilda_set_bus);
-    }
-  else
-    {
-      fts_class_init(cl, sizeof(access_tilda_channel_t), 2, 0, 0);
-      
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, access_tilda_channel_init);
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, access_tilda_channel_delete);
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, throw_tilda_channel_put);
-      
-      fts_dsp_declare_inlet(cl, 0);
-      fts_method_define_varargs(cl, 1, fts_s_int, access_tilda_set_channel);
-    }
-  
-  return fts_ok;
-}
+  fts_class_method_varargs(cl, fts_signal_bus_symbol, access_tilda_set_bus);
+
+  fts_dsp_declare_inlet(cl, 0);
+  }
 
 /*****************************************************************************
  *
@@ -497,48 +468,17 @@ catch_tilda_read_from_channel(fts_word_t *a)
     }
 }
 
-static fts_status_t
-catch_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+catch_tilda_instantiate(fts_class_t *cl)
 {
-  if(ac == 1) 
-    {
-      int n_channels = 1;
-      int i;
+  fts_class_init(cl, sizeof(access_tilda_bus_t), access_tilda_bus_init, access_tilda_bus_delete);
 
-      if(fts_is_a(at, fts_signal_bus_type))
-	{
-	  fts_signal_bus_t *bus = (fts_signal_bus_t *)fts_get_object(at);
+  fts_class_method_varargs(cl, fts_s_put, catch_tilda_bus_put);
 
-	  n_channels = fts_signal_bus_get_size(bus);
-	}
-	  
-      fts_class_init(cl, sizeof(access_tilda_bus_t), 1, n_channels, 0);
+  fts_class_method_varargs(cl, fts_signal_bus_symbol, access_tilda_set_bus);
       
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, access_tilda_bus_init);
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, access_tilda_bus_delete);
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, catch_tilda_bus_put);
-      
-      fts_method_define_varargs(cl, 0, fts_signal_bus_symbol, access_tilda_set_bus);
-      
-      for(i=0; i<n_channels; i++)
-	fts_dsp_declare_outlet(cl, i);
-    }
-  else
-    {
-      /* channel */
-      fts_class_init(cl, sizeof(access_tilda_channel_t), 1, 1, 0);
-      
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, access_tilda_channel_init);
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, access_tilda_channel_delete);
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, catch_tilda_channel_put);
-      
-      fts_method_define_varargs(cl, 0, fts_s_int, access_tilda_set_channel);
-      
-      fts_dsp_declare_outlet(cl, 0);
-    }
-  
-  return fts_ok;
-}
+  fts_dsp_declare_outlet(cl, 0);
+  }
 
 /*****************************************************************************
  *
@@ -689,6 +629,9 @@ bus_tilda_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_a
   fts_object_refer((fts_object_t *)this->bus);
 
   fts_dsp_add_object(o);
+
+  fts_object_set_inlets_number(o, n_channels);
+  fts_object_set_outlets_number(o, n_channels);
 }
 
 static void
@@ -709,35 +652,18 @@ bus_tilda_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t 
   fts_set_object(value, this->bus);
 }
 
-static fts_status_t
-bus_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+bus_tilda_instantiate(fts_class_t *cl)
 {
-  int n_channels = 0;
-  int i;
+  fts_class_init(cl, sizeof(bus_tilda_t), bus_tilda_init, bus_tilda_delete);
 
-  if(ac == 0)
-    n_channels = 1;
-  else if(ac == 1 && fts_is_int(at))
-    n_channels = fts_get_int(at);
-  else
-    return &fts_CannotInstantiate;
-
-  fts_class_init(cl, sizeof(bus_tilda_t), n_channels, n_channels, 0);
+  fts_class_method_varargs(cl, fts_s_put, bus_tilda_put);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, bus_tilda_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, bus_tilda_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, bus_tilda_put);
-  
-  for(i=0; i<n_channels; i++)
-    {
-      fts_dsp_declare_inlet(cl, i);
-      fts_dsp_declare_outlet(cl, i);
-    }
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
 	  
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, bus_tilda_get_state);
-  
-  return fts_ok;
-}
+  }
 
 void
 bus_tilda_config(void)

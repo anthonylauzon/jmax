@@ -97,18 +97,13 @@ static void udp_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
     }
 }
 
-static fts_status_t udp_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void udp_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof( udp_t), 0, 1, 0);
+  fts_class_init( cl, sizeof( udp_t), udp_init, udp_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, udp_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, udp_delete);
+  fts_class_method_varargs(cl, fts_s_sched_ready, udp_receive);
 
-  fts_method_define_varargs( cl, fts_system_inlet, fts_s_sched_ready, udp_receive);
-
-  fts_outlet_type_define_varargs( cl, 0, fts_s_int);
-
-  return fts_ok;
+  fts_class_outlet( cl, 0, fts_s_int);
 }
 
 void udp_config( void)

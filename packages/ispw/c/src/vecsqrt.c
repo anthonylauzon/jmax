@@ -104,35 +104,27 @@ vecsqrt_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-sqrt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sqrt_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(vecsqrt_t), 1, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, vecsqrt_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, vecsqrt_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, sqrt_put);
+  fts_class_init(cl, sizeof(vecsqrt_t), vecsqrt_init, vecsqrt_delete);
+
+  fts_class_method_varargs(cl, fts_s_put, sqrt_put);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-  
-  return fts_ok;
-}
+  }
 
-static fts_status_t
-rsqrt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+rsqrt_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(vecsqrt_t), 1, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, vecsqrt_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, vecsqrt_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, rsqrt_put);
+  fts_class_init(cl, sizeof(vecsqrt_t), vecsqrt_init, vecsqrt_delete);
+
+  fts_class_method_varargs(cl, fts_s_put, rsqrt_put);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-  
-  return fts_ok;
-}
+  }
 
 void
 vecsqrt_config(void)

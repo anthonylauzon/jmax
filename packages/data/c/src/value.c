@@ -39,23 +39,39 @@ value_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   value_t *this = (value_t *)o;
   
-  fts_outlet_atom(o, 0, &this->a);
+  fts_outlet_varargs(o, 0, 1, &this->a);
 }
 
 static void
-value_set_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+value_set_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   value_t *this = (value_t *)o;
 
-  if(ac > 0) 
-    fts_atom_assign(&this->a, at);
+  fts_atom_assign(&this->a, at);
+}
+
+static void
+value_set_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  value_t *this = (value_t *)o;
+
+  if(ac == 1)
+    value_set_atom(o, winlet, s, 1, at);
+  else
+    {
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_atom_t a;
+      
+      fts_set_object(&a, (fts_object_t *)tuple);
+      value_set_atom(o, winlet, s, 1, &a);
+    }
 }
 
 static void
 value_set_and_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  value_set_value(o, 0, 0, 1, at);
-  value_output(o, 0, 0, 1, at);
+  value_set_atoms(o, 0, 0, ac, at);
+  value_output(o, 0, 0, 0, 0);
 }
 
 static void
@@ -120,7 +136,7 @@ value_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   if(ac > 0)
     {
-      value_set_value(o, 0, 0, 1, at);
+      value_set_atom(o, 0, 0, 1, at);
       data_object_set_keep((data_object_t *)o, fts_s_args);
     }
 }
@@ -139,35 +155,29 @@ value_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prop
   fts_set_object(value, obj);
 }
 
-static fts_status_t
-value_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+value_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(value_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(value_t), value_init, value_delete);
+
+  fts_class_method_varargs(cl, fts_s_post, value_post);
+
+  fts_class_method_varargs(cl, fts_s_set_from_instance, value_set_from_instance);
+  fts_class_method_varargs(cl, fts_s_dump, value_dump);
+
+  fts_class_method_varargs(cl, fts_s_get_array, value_get_array);
+  fts_class_method_varargs(cl, fts_s_set_from_array, value_set_from_array);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, value_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, value_delete);
+  fts_class_method_varargs(cl, fts_s_bang, value_output);
+  fts_class_method_varargs(cl, fts_s_set, value_set_atom);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, value_post);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_instance, value_set_from_instance);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, value_dump);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, value_get_array);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_array, value_set_from_array);
+  fts_class_inlet_varargs(cl, 0, value_set_and_output);
+  fts_class_inlet_varargs(cl, 1, value_set_atoms);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, value_set_value);
-
-  fts_method_define_varargs(cl, 0, fts_s_bang, value_output);
-  fts_method_define_varargs(cl, 0, fts_s_anything, value_set_and_output);
-
-  fts_method_define_varargs(cl, 1, fts_s_anything, value_set_value);
-
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, value_get_state);
-  
-  return fts_ok;
-}
+  }
 
 void
 value_config(void)

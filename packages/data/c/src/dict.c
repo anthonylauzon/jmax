@@ -212,7 +212,7 @@ dict_get(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       fts_atom_t a;
       
       fts_hashtable_get(hash, at, &a);
-      fts_outlet_atom(o, 0, &a);
+      fts_outlet_varargs(o, 0, 1, &a);
     }
 }
 
@@ -663,40 +663,30 @@ dict_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   dict_clear(o, 0, 0, 0, 0);
 }
 
-static fts_status_t
-dict_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+dict_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(dict_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(dict_t), dict_init, dict_delete);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, dict_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, dict_delete);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_instance, dict_set_from_instance);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, dict_set); /* from file */
+  fts_class_method_varargs(cl, fts_s_set_from_instance, dict_set_from_instance);
+  fts_class_method_varargs(cl, fts_s_get_array, dict_get_array);
+  fts_class_method_varargs(cl, fts_s_dump, dict_dump);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, dict_get_array);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_clear, dict_clear);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, dict_dump);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, dict_post);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, dict_print);
+  fts_class_method_varargs(cl, fts_s_post, dict_post);
+  fts_class_method_varargs(cl, fts_s_print, dict_print);
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, dict_get_state);
   
-  fts_method_define_varargs(cl, 0, fts_s_import, dict_import);
-  fts_method_define_varargs(cl, 0, fts_s_export, dict_export);
+  fts_class_method_varargs(cl, fts_s_import, dict_import);
+  fts_class_method_varargs(cl, fts_s_export, dict_export);
   
-  fts_method_define_varargs(cl, 0, fts_s_put, dict_set);
-  fts_method_define_varargs(cl, 0, fts_s_set, dict_set);
-  fts_method_define_varargs(cl, 0, fts_s_get, dict_get);
-  fts_method_define_varargs(cl, 0, fts_s_clear, dict_clear);
-  
-  return fts_ok;
-}
+  fts_class_method_varargs(cl, fts_s_put, dict_set);
+  fts_class_method_varargs(cl, fts_s_set, dict_set);
+  fts_class_method_varargs(cl, fts_s_get, dict_get);
+  fts_class_method_varargs(cl, fts_s_clear, dict_clear);
+  }
 
 void
 dict_config(void)

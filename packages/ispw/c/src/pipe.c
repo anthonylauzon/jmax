@@ -46,7 +46,7 @@ pipe_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   /* output single atoms of current list */
   for(i=this->ac-1; i>=0; i--)
     {
-      fts_outlet_atom(o, i, atoms + i);
+      fts_outlet_varargs(o, i, 1, atoms + i);
       fts_atom_void(atoms + i);
     }
 
@@ -208,28 +208,25 @@ pipe_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_heap_free(this->at, this->heap);
 }
 
-static fts_status_t
-pipe_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+pipe_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(pipe_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(pipe_t), pipe_init, pipe_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, pipe_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, pipe_delete);
+  fts_class_method_varargs(cl, fts_s_bang,  pipe_bang);
+  fts_class_method_varargs(cl, fts_s_clear, pipe_clear);
+  fts_class_method_varargs(cl, fts_s_flush, pipe_flush);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang,  pipe_bang);
-  fts_method_define_varargs(cl, 0, fts_s_clear, pipe_clear);
-  fts_method_define_varargs(cl, 0, fts_s_flush, pipe_flush);
-
-  fts_method_define_varargs(cl, 0, fts_s_list, pipe_list);
-  fts_method_define_varargs(cl, 0, fts_s_int, pipe_atom_trigger);
-  fts_method_define_varargs(cl, 0, fts_s_float, pipe_atom_trigger);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, pipe_atom_trigger);
+  fts_class_inlet_varargs(cl, 0, pipe_list);
+  fts_class_inlet_int(cl, 0, pipe_atom_trigger);
+  fts_class_inlet_float(cl, 0, pipe_atom_trigger);
+  fts_class_inlet_symbol(cl, 0, pipe_atom_trigger);
   
-  fts_method_define_varargs(cl, 1, fts_s_int, pipe_atom_right);
-  fts_method_define_varargs(cl, 1, fts_s_float, pipe_atom_right);
-  fts_method_define_varargs(cl, 1, fts_s_symbol, pipe_atom_right);
+  fts_class_inlet_int(cl, 1, pipe_atom_right);
+  fts_class_inlet_float(cl, 1, pipe_atom_right);
+  fts_class_inlet_symbol(cl, 1, pipe_atom_right);
 
-  return fts_ok;
+  fts_class_outlet_varargs(cl, 0);
 }
 
 void

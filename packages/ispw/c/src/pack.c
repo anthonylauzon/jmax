@@ -92,13 +92,13 @@ pack_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   for (i = 0; i < ac; i++) 
    set_value_preserve_type(&at[i], &(x->argv[i]));
 
-  fts_outlet_atoms(o, 0, x->argc, x->argv);
+  fts_outlet_varargs(o, 0, x->argc, x->argv);
 }
 
 static void
 pack_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_atoms(o, 0, ((pack_t *)o)->argc, ((pack_t *)o)->argv);
+  fts_outlet_varargs(o, 0, ((pack_t *)o)->argc, ((pack_t *)o)->argv);
 }
 
 static void
@@ -109,7 +109,7 @@ pack_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   if (ac > 0)
     set_value_preserve_type(&at[0], &(x->argv[0]));
 
-  fts_outlet_atoms(o, 0, x->argc, x->argv);
+  fts_outlet_varargs(o, 0, x->argc, x->argv);
 }
 
 static void
@@ -161,29 +161,20 @@ pack_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_free( x->argv);
 }
 
-static fts_status_t
-pack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+pack_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(pack_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(pack_t), pack_init, pack_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, pack_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, pack_delete);
+  fts_class_method_varargs(cl, fts_s_bang, pack_bang);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, pack_bang);
+  fts_class_inlet_varargs(cl, 0, pack_list);
+  fts_class_inlet_number(cl, 0, pack_send);
+  fts_class_inlet_symbol(cl, 0, pack_send);
+  fts_class_inlet_number(cl, 1, pack_inlet);
+  fts_class_inlet_symbol(cl, 1, pack_inlet);
 
-  fts_method_define_varargs(cl, 0, fts_s_list, pack_list);
-
-  fts_method_define_varargs(cl, 0, fts_s_int, pack_send);
-  fts_method_define_varargs(cl, 0, fts_s_float, pack_send);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, pack_send);
-
-  fts_method_define_varargs(cl, 1, fts_s_int, pack_inlet);
-  fts_method_define_varargs(cl, 1, fts_s_float, pack_inlet);
-  fts_method_define_varargs(cl, 1, fts_s_symbol, pack_inlet);
-
-  fts_outlet_type_define_varargs(cl, 0,	fts_s_list);
-
-  return fts_ok;
+  fts_class_outlet_varargs(cl, 0);
 }
 
 void

@@ -78,7 +78,7 @@ event_get_description(event_t *event, fts_array_t *array)
   if(fts_is_object(&event->value))
     {
       fts_object_t *obj = (fts_object_t *)fts_get_object(&event->value);
-      fts_symbol_t type = fts_get_selector(&event->value);
+      fts_symbol_t type = fts_get_class_name(&event->value);
       fts_atom_t a[2];
       
       fts_set_pointer(a, array);
@@ -90,7 +90,7 @@ event_get_description(event_t *event, fts_array_t *array)
     }
   else if(!fts_is_void(&event->value))
     {
-      fts_symbol_t type = fts_get_selector(&event->value);
+      fts_symbol_t type = fts_get_class_name(&event->value);
       
       fts_array_append_float(array, (float)event->time);
       fts_array_append(array, 1, &event->value);
@@ -157,16 +157,12 @@ event_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_atom_void(&this->value);
 }
 
-static fts_status_t
-event_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+event_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(event_t), 0, 0, 0); 
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, event_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, event_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, event_set);
+  fts_class_init(cl, sizeof(event_t), event_init, event_delete);
 
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_s_set, event_set);
 }
 
 /*****************************************************************

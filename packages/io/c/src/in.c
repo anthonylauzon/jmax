@@ -92,15 +92,12 @@ in_check(int ac, const fts_atom_t *at)
   return 0;
 }
 
-static fts_status_t
-in_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+in_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(in_t), 0, 1, 0);
+  fts_class_init(cl, sizeof(in_t), in_init, in_delete);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, in_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, in_delete);
-  
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
 }
 
 void

@@ -658,7 +658,7 @@ wacom_init_callback(fts_object_t *o, int n, const unsigned char *c)
 		    fts_set_int(a + 2, this->range_z);
 		    fts_set_int(a + 3, this->range_tilt_x);
 		    fts_set_int(a + 4, this->range_tilt_y);
-		    fts_outlet_atoms(o, wacom_outlet_init, 5, a);
+		    fts_outlet_varargs(o, wacom_outlet_init, 5, a);
 		    
 		    break;
 		  }
@@ -811,18 +811,13 @@ wacom_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     fts_bytestream_remove_listener(this->stream, o);
 }
 
-static fts_status_t
-wacom_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+wacom_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(wacom_t), 1, wacom_n_outlets, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, wacom_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, wacom_delete);
+  fts_class_init(cl, sizeof(wacom_t), wacom_init, wacom_delete);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("reset"), wacom_reset);
-  
-  return fts_ok;
-}
+  fts_class_method_varargs(cl, fts_new_symbol("reset"), wacom_reset);
+  }
 
 void
 wacom_config(void)

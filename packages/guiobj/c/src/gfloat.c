@@ -73,17 +73,12 @@ gfloat_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-gfloat_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gfloat_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   gfloat_t *this = (gfloat_t *)o;
 
   if (ac && fts_is_number(at))
-    {
-      double f = fts_get_number_float(at);
-      
-      gfloat_update(this, f);
-      fts_outlet_float(o, 0, this->value);
-    }
+    gfloat_number(o, 0, 0, 1, at);
 }
 
 static void
@@ -130,30 +125,23 @@ gfloat_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fprintf( file, "#P flonum %d %d %d %d;\n", x, y, w, font_index);
 }
 
-static fts_status_t
-gfloat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+gfloat_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(gfloat_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(gfloat_t), 0, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, gfloat_update_real_time); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_value, gfloat_number);
+  fts_class_method_varargs(cl, fts_s_update_real_time, gfloat_update_real_time); 
+  fts_class_method_varargs(cl, fts_s_value, gfloat_number);
+  fts_class_method_varargs(cl, fts_s_save_dotpat, gfloat_save_dotpat); 
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, gfloat_bang);
+  fts_class_method_varargs(cl, fts_s_bang, gfloat_bang);
+  fts_class_method_varargs(cl, fts_s_set, gfloat_set);
+  fts_class_method_varargs(cl, fts_new_symbol("incr"), gfloat_incr);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, gfloat_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, gfloat_number);
+  fts_class_inlet_number(cl, 0, gfloat_number);
+  fts_class_inlet_varargs(cl, 0, gfloat_varargs);
 
-  fts_method_define_varargs(cl, 0, fts_s_list, gfloat_list);
-
-  fts_method_define_varargs(cl, 0, fts_new_symbol("incr"), gfloat_incr);
-
-  fts_method_define_varargs(cl, 0, fts_s_set, gfloat_set);
-
-  fts_method_define_varargs( cl, fts_system_inlet, fts_s_save_dotpat, gfloat_save_dotpat); 
-
-  fts_outlet_type_define_varargs(cl, 0, fts_s_float);
-
-  return fts_ok;
+  fts_class_outlet_float(cl, 0);
 }
 
 void

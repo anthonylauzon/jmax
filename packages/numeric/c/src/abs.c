@@ -53,19 +53,17 @@ abs_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	out[i] = at[i];
     }
 
-  fts_outlet_atoms(o, 0, ac, out);
+  fts_outlet_varargs(o, 0, ac, out);
 }
 
-static fts_status_t
-abs_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+abs_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_object_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(fts_object_t), 0, 0);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, abs_int);
-  fts_method_define_varargs(cl, 0, fts_s_float, abs_float);
-  fts_method_define_varargs(cl, 0, fts_s_list, abs_atoms);
-
-  return fts_ok;
+  fts_class_inlet_int(cl, 0, abs_int);
+  fts_class_inlet_float(cl, 0, abs_float);
+  fts_class_inlet_varargs(cl, 0, abs_atoms);
 }
 
 void

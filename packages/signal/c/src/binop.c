@@ -717,17 +717,15 @@ binop_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 
-static fts_status_t
-binop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, binop_definition_t *definition)
+static void
+binop_instantiate(fts_class_t *cl, binop_definition_t *definition)
 {
-  fts_class_init(cl, sizeof(binop_t), 2, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, binop_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, binop_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, definition->put);
+  fts_class_init(cl, sizeof(binop_t), binop_init, binop_delete);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, binop_set_scalar);
-  fts_method_define_varargs(cl, 1, fts_s_float, binop_set_scalar);
+  fts_class_method_varargs(cl, fts_s_put, definition->put);
+
+  fts_class_inlet_int(cl, 1, binop_set_scalar);
+  fts_class_inlet_float(cl, 1, binop_set_scalar);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_inlet(cl, 1);
@@ -736,8 +734,6 @@ binop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, binop_definitio
   fts_dsp_declare_function(definition->signal.symbol, definition->signal.function);
   fts_dsp_declare_function(definition->scalar.symbol, definition->scalar.function);
   fts_dsp_declare_function(definition->inplace.symbol, definition->inplace.function);
-    
-  return fts_ok;
 }
 
 /************************************************
@@ -746,88 +742,76 @@ binop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, binop_definitio
  *
  */
 
-static fts_status_t 
-binop_add_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+binop_add_instantiate(fts_class_t *cl)
 {
-  binop_instantiate(cl, ac, at, &binop_add);
-  return fts_ok;
+  binop_instantiate(cl, &binop_add);
 }
 
-static fts_status_t 
-binop_sub_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+binop_sub_instantiate(fts_class_t *cl)
 {
-  binop_instantiate(cl, ac, at, &binop_sub);
-  return fts_ok;
+  binop_instantiate(cl, &binop_sub);
 }
 
-static fts_status_t 
-binop_mul_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+binop_mul_instantiate(fts_class_t *cl)
 {
-  binop_instantiate(cl, ac, at, &binop_mul);
-  return fts_ok;
+  binop_instantiate(cl, &binop_mul);
 }
 
-static fts_status_t 
-binop_div_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+binop_div_instantiate(fts_class_t *cl)
 {
-  binop_instantiate(cl, ac, at, &binop_div);
-  return fts_ok;
+  binop_instantiate(cl, &binop_div);
 }
 
-static fts_status_t 
-binop_bus_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+binop_bus_instantiate(fts_class_t *cl)
 {
-  binop_instantiate(cl, ac, at, &binop_bus);
-  return fts_ok;
+  binop_instantiate(cl, &binop_bus);
 }
 
-static fts_status_t 
-binop_vid_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+binop_vid_instantiate(fts_class_t *cl)
 {
-  binop_instantiate(cl, ac, at, &binop_vid);
-  return fts_ok;
+  binop_instantiate(cl, &binop_vid);
 }
 
-static fts_status_t 
-binop_ee_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+binop_ee_instantiate(fts_class_t *cl)
 {
-  binop_instantiate(cl, ac, at, &binop_ee);
-  return fts_ok;
+  binop_instantiate(cl, &binop_ee);
 }
 
-static fts_status_t 
-binop_ne_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+binop_ne_instantiate(fts_class_t *cl)
 {
-  binop_instantiate(cl, ac, at, &binop_ne);
-  return fts_ok;
+  binop_instantiate(cl, &binop_ne);
 }
 
-static fts_status_t 
-binop_ge_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+binop_ge_instantiate(fts_class_t *cl)
 {
-  binop_instantiate(cl, ac, at, &binop_ge);
-  return fts_ok;
+  binop_instantiate(cl, &binop_ge);
 }
 
-static fts_status_t 
-binop_le_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+binop_le_instantiate(fts_class_t *cl)
 {
-  binop_instantiate(cl, ac, at, &binop_le);
-  return fts_ok;
+  binop_instantiate(cl, &binop_le);
 }
 
-static fts_status_t 
-binop_gt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+binop_gt_instantiate(fts_class_t *cl)
 {
-  binop_instantiate(cl, ac, at, &binop_gt);
-  return fts_ok;
+  binop_instantiate(cl, &binop_gt);
 }
 
-static fts_status_t 
-binop_lt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+binop_lt_instantiate(fts_class_t *cl)
 {
-  binop_instantiate(cl, ac, at, &binop_lt);
-  return fts_ok;
+  binop_instantiate(cl, &binop_lt);
 }
 
 void

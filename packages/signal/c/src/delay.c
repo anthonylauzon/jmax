@@ -203,18 +203,14 @@ delayline_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t pr
   fts_set_object(value, o);
 }
 
-static fts_status_t
-delayline_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+delayline_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(delayline_t), 0, 0, 0);
+  fts_class_init(cl, sizeof(delayline_t), delayline_init, delayline_delete);
+
+  fts_class_method_varargs(cl, fts_s_put_epilogue, delayline_put);
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, delayline_get_state);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, delayline_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, delayline_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put_epilogue, delayline_put);
-
-  return fts_ok;
 }
 
 /************************************************************
@@ -383,22 +379,18 @@ delay_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-delay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+delay_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(delay_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(delay_t), delay_init, delay_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, delay_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, delay_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, delay_put);
+  fts_class_method_varargs(cl, fts_s_put, delay_put);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, delay_set_time);
-  fts_method_define_varargs(cl, 1, fts_s_float, delay_set_time);
+  fts_class_inlet_int(cl, 1, delay_set_time);
+  fts_class_inlet_float(cl, 1, delay_set_time);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-
-  return fts_ok;
 }
 
 /************************************************************
@@ -574,42 +566,35 @@ tap_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-tapin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+tapin_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(delay_t), 3, 1, 0);
+  fts_class_init(cl, sizeof(delay_t), tapin_init, tap_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, tapin_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tap_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, tapin_put);
+  fts_class_method_varargs(cl, fts_s_put, tapin_put);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, delay_set_time);
-  fts_method_define_varargs(cl, 1, fts_s_float, delay_set_time);
-  fts_method_define_varargs(cl, 2, sym_delayline, delay_set_line);  
+  fts_class_inlet_int(cl, 1, delay_set_time);
+  fts_class_inlet_float(cl, 1, delay_set_time);
+  fts_class_inlet(cl, 2, delayline_metaclass, delay_set_line);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0); /* hidden orderforcing connection */
-
-  return fts_ok;
 }
 
-static fts_status_t
-tapout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+tapout_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(delay_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(delay_t), tapout_init, tap_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, tapout_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tap_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, tapout_put);
+  fts_class_method_varargs(cl, fts_s_put, tapout_put);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, delay_set_time);
-  fts_method_define_varargs(cl, 0, fts_s_float, delay_set_time);
-  fts_method_define_varargs(cl, 1, sym_delayline, delay_set_line);  
+  fts_class_inlet_int(cl, 0, delay_set_time);
+  fts_class_inlet_float(cl, 0, delay_set_time);
 
-  fts_dsp_declare_inlet(cl, 0); /* hidden orderforcing connection */
+  fts_class_inlet(cl, 1, delayline_metaclass, delay_set_line);
+
+  fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-
-  return fts_ok;
 }
 
 /************************************************************
@@ -721,22 +706,18 @@ retap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_dsp_after_edge(o, delayline_get_edge(this->line));
 }
 
-static fts_status_t
-retap_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+retap_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(delay_t), 3, 0, 0);
+  fts_class_init(cl, sizeof(delay_t), retap_init, tap_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, retap_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tap_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, retap_put);
+  fts_class_method_varargs(cl, fts_s_put, retap_put);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, retap_set_time);
-  fts_method_define_varargs(cl, 1, fts_s_float, retap_set_time);
-  fts_method_define_varargs(cl, 2, sym_delayline, delay_set_line);  
+  fts_class_inlet_int(cl, 1, retap_set_time);
+  fts_class_inlet_float(cl, 1, retap_set_time);
+  fts_class_inlet(cl, 2, delayline_metaclass, delay_set_line);
 
   fts_dsp_declare_inlet(cl, 0);
-
-  return fts_ok;
 }
 
 /************************************************************
@@ -852,21 +833,17 @@ vtap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fts_dsp_after_edge(o, delayline_get_edge(this->line));
 }
 
-static fts_status_t
-vtap_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+vtap_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(delay_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(delay_t), vtap_init, tap_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, vtap_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tap_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, vtap_put);
+  fts_class_method_varargs(cl, fts_s_put, vtap_put);
 
-  fts_method_define_varargs(cl, 1, sym_delayline, delay_set_line);  
+  fts_class_inlet(cl, 1, delayline_metaclass, delay_set_line);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-
-  return fts_ok;
 }
 
 /************************************************************

@@ -59,27 +59,40 @@ sync_output(sync_t *this)
   int i;
 
   for(i=this->n-1; i>=0; i--)
-    fts_outlet_atom((fts_object_t *)this, i, this->a + i);
+    fts_outlet_varargs((fts_object_t *)this, i, 1, this->a + i);
 }
 
 static void
-sync_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sync_input_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sync_t *this = (sync_t *)o;
+  unsigned int bit = 1 << winlet;
   
-  if(ac)
+  fts_atom_assign(this->a + winlet, at);
+  
+  this->wait &= ~bit;
+  
+  if(!this->wait && (this->trigger & bit))
     {
-      unsigned int bit = 1 << winlet;
+      sync_output(this);
+      this->wait |= this->reset & this->require;
+    }
+}
+
+static void
+sync_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sync_t *this = (sync_t *)o;
+
+  if(ac == 1)
+    sync_input_atom(o, 0, 0, 1, at);
+  else if(ac > 1)
+    {
+      fts_object_t *tuple = fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_atom_t a;
       
-      fts_atom_assign(this->a + winlet, at);
-      
-      this->wait &= ~bit;
-      
-      if(!this->wait && (this->trigger & bit))
-	{
-	  sync_output(this);
-	  this->wait |= this->reset & this->require;
-	}
+      fts_set_object(&a, tuple);
+      sync_input_atom(o, 0, 0, 1, &a);
     }
 }
 
@@ -246,20 +259,20 @@ sync_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fts_object_set_outlets_number(o, n);
 }
 
-static fts_status_t
-sync_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sync_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(sync_t), 1, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sync_init);
+  fts_class_init(cl, sizeof(sync_t), sync_init, NULL);
 
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("trigger"), sync_set_trigger_prop);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("require"), sync_set_require_prop);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("mode"), sync_set_mode_prop);
       
-  fts_method_define_varargs(cl, 0, fts_s_anything, sync_input);
-  
-  return fts_ok;
+  fts_class_inlet_varargs(cl, 0, sync_input_atoms);
+  fts_class_inlet_number(cl, 0, sync_input_atom);
+  fts_class_inlet_symbol(cl, 0, sync_input_atom);
+
+  fts_class_outlet_varargs(cl, 0);
 }
 
 void

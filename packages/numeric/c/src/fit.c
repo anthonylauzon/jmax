@@ -133,21 +133,15 @@ fit_point(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
  *  class
  *
  */
-static fts_status_t
-fit_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+fit_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fit_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(fit_t), fit_init, fit_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fit_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fit_delete);
+  fts_class_inlet_number(cl, 0, fit_input);
+  fts_class_inlet_number(cl, 1, fit_point);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, fit_input);
-  fts_method_define_varargs(cl, 0, fts_s_float, fit_input);
-
-  fts_method_define_varargs(cl, 1, fts_s_int, fit_point);
-  fts_method_define_varargs(cl, 1, fts_s_float, fit_point);
-
-  return fts_ok;
+  fts_class_outlet_float(cl, 0);
 }
 
 void

@@ -113,7 +113,7 @@ seqrec_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void 
-seqrec_record(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqrec_record_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   seqrec_t *this = (seqrec_t *)o;
 
@@ -124,15 +124,38 @@ seqrec_record(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
       if(here > 0.0)
 	{
-	  event_t *event = (event_t *)fts_object_create(event_type, 1, at);
 	  fts_symbol_t track_type = track_get_type(this->track);
-	  
-	  if(track_type == fts_s_void || event_get_type(event) == track_type)
+
+	  if(track_type == fts_s_void || fts_get_class_name(at) == track_type)
 	    {
+	      event_t *event = (event_t *)fts_object_create(event_type, 1, at);
+	  
 	      /* add event to recording track */
 	      track_append_event(this->recording, here, event);
 	    }
+	  else
+	    fts_object_signal_runtime_error(o, "Cannot record event of type %s", fts_get_class_name(at));
 	}
+    }
+}
+
+static void 
+seqrec_record_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  seqrec_t *this = (seqrec_t *)o;
+
+  if(this->status == status_recording)
+    {
+      if(ac == 1)
+	seqrec_record_atom(o, 0, 0, 1, at);
+      else if(ac > 1)
+	{
+	  fts_object_t *tuple = fts_object_create(fts_tuple_metaclass, ac, at);
+	  fts_atom_t a;
+	  
+	  fts_set_object(&a, tuple);
+	  seqrec_record_atom(o, 0, 0, 1, &a);
+	}  
     }
 }
 
@@ -185,27 +208,22 @@ seqrec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     fts_object_release(this->track);
 }
 
-static fts_status_t
-seqrec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+seqrec_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(seqrec_t), 2, 0, 0);
+  fts_class_init(cl, sizeof(seqrec_t), seqrec_init, seqrec_delete);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, seqrec_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, seqrec_delete);
+  fts_class_method_varargs(cl, fts_s_start, seqrec_start);
+  fts_class_method_varargs(cl, fts_new_symbol("pause"), seqrec_pause);
+  fts_class_method_varargs(cl, fts_s_stop, seqrec_stop);
   
-  fts_method_define_varargs(cl, 0, fts_s_start, seqrec_start);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), seqrec_pause);
-  fts_method_define_varargs(cl, 0, fts_s_stop, seqrec_stop);
+  fts_class_inlet_int(cl, 0, seqrec_record_atom);
+  fts_class_inlet_float(cl, 0, seqrec_record_atom);
+  fts_class_inlet_symbol(cl, 0, seqrec_record_atom);
+  fts_class_inlet_varargs(cl, 0, seqrec_record_atoms);
   
-  fts_method_define_varargs(cl, 0, fts_s_int, seqrec_record);
-  fts_method_define_varargs(cl, 0, fts_s_float, seqrec_record);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, seqrec_record);
-  fts_method_define_varargs(cl, 0, fts_s_midievent, seqrec_record);
-  
-  fts_method_define_varargs(cl, 1, seqsym_track, seqrec_set_reference);
-  
-  return fts_ok;
-}
+  fts_class_inlet(cl, 1, track_type, seqrec_set_reference);
+  }
 
 void
 seqrec_config(void)

@@ -32,7 +32,6 @@
 
 #include <fts/fts.h>
 
-
 struct value_keeper
 {
   fts_atom_t atom;
@@ -83,18 +82,6 @@ free_keeper(struct value_keeper *v)
     }
 }
 
-
-/******************************************************************************/
-/*                                                                            */
-/*        The VALUE object                                                    */
-/*                                                                            */
-/******************************************************************************/
-
-/* remember a value. Use a private hash table, so  a
- private name space for values; in MP versions, the values
- are local to a processor.*/
-
-
 typedef struct value
 {
   fts_object_t ob;
@@ -102,17 +89,14 @@ typedef struct value
   fts_symbol_t name;
 } value_t;
 
-
 static void
 value_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   value_t *x = (value_t *)o;
   fts_atom_t a = x->v->atom;
   
-  fts_outlet_atom(o, 0, &a);
+  fts_outlet_varargs(o, 0, 1, &a);
 }
-
-/* Installed for int, floats and symbols */
 
 static void
 value_scalar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -146,24 +130,20 @@ value_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   free_keeper(x->v);
 }
 
-static fts_status_t
-value_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+value_instantiate(fts_class_t *cl)
 {
-  /* initialize the class */
-  fts_class_init(cl, sizeof(value_t), 1, 1, 0); 
+  fts_class_init(cl, sizeof(value_t), value_init, value_delete);
 
-  /* define the system methods */
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, value_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, value_delete);
+  fts_class_method_varargs(cl, fts_s_bang, value_bang);
 
-  /* Value args */
-  fts_method_define_varargs(cl, 0, fts_s_bang, value_bang);
+  fts_class_inlet_int(cl, 0, value_scalar);
+  fts_class_inlet_float(cl, 0, value_scalar);
+  fts_class_inlet_symbol(cl, 0, value_scalar);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, value_scalar);
-  fts_method_define_varargs(cl, 0, fts_s_float, value_scalar);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, value_scalar);
-
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
+  fts_class_outlet_float(cl, 0);
+  fts_class_outlet_symbol(cl, 0);
 }
 
 void

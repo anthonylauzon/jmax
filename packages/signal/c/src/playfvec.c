@@ -460,46 +460,43 @@ play_fvec_set_period_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbo
   play_fvec_set_conv_step(this, 1000.0 / (fts_dsp_get_sample_rate() * period));
 }
 
-static fts_status_t
-play_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+play_fvec_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(play_fvec_t), 4, 2, 0);
+  fts_class_init(cl, sizeof(play_fvec_t), play_fvec_init, play_fvec_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, play_fvec_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, play_fvec_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, play_fvec_put);
+  fts_class_method_varargs(cl, fts_s_put, play_fvec_put);
 
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("period"), play_fvec_set_period_prop);
   
-  fts_method_define_varargs(cl, 0, fts_s_bang, play_fvec_bang);
-  fts_method_define_varargs(cl, 0, fts_s_start, play_fvec_start);
-  fts_method_define_varargs(cl, 0, fts_s_stop, play_fvec_stop);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("loop"), play_fvec_loop);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("cycle"), play_fvec_cycle);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), play_fvec_pause);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("rewind"), play_fvec_rewind);
+  fts_class_method_varargs(cl, fts_s_bang, play_fvec_bang);
+  fts_class_method_varargs(cl, fts_s_start, play_fvec_start);
+  fts_class_method_varargs(cl, fts_s_stop, play_fvec_stop);
+  fts_class_method_varargs(cl, fts_new_symbol("loop"), play_fvec_loop);
+  fts_class_method_varargs(cl, fts_new_symbol("cycle"), play_fvec_cycle);
+  fts_class_method_varargs(cl, fts_new_symbol("pause"), play_fvec_pause);
+  fts_class_method_varargs(cl, fts_new_symbol("rewind"), play_fvec_rewind);
 
-  fts_method_define_varargs(cl, 0, fvec_symbol, play_fvec_set_object);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("begin"), play_fvec_set_begin);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("end"), play_fvec_set_end);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("speed"), play_fvec_set_speed);
+  fts_class_method_varargs(cl, fts_new_symbol("begin"), play_fvec_set_begin);
+  fts_class_method_varargs(cl, fts_new_symbol("end"), play_fvec_set_end);
+  fts_class_method_varargs(cl, fts_new_symbol("speed"), play_fvec_set_speed);
 
-  fts_method_define_varargs(cl, 0, fts_s_set, play_fvec_set);
-  fts_method_define_varargs(cl, 0, fts_s_list, play_fvec_list);
+  fts_class_method_varargs(cl, fts_s_set, play_fvec_set);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, play_fvec_set_begin);
-  fts_method_define_varargs(cl, 1, fts_s_float, play_fvec_set_begin);
+  fts_class_inlet(cl, 0, fvec_type, play_fvec_set_object);
+  fts_class_inlet_varargs(cl, 0, play_fvec_list);
 
-  fts_method_define_varargs(cl, 2, fts_s_int, play_fvec_set_end);
-  fts_method_define_varargs(cl, 2, fts_s_float, play_fvec_set_end);
+  fts_class_inlet_int(cl, 1, play_fvec_set_begin);
+  fts_class_inlet_float(cl, 1, play_fvec_set_begin);
 
-  fts_method_define_varargs(cl, 3, fts_s_int, play_fvec_set_speed);
-  fts_method_define_varargs(cl, 3, fts_s_float, play_fvec_set_speed);
+  fts_class_inlet_int(cl, 2, play_fvec_set_end);
+  fts_class_inlet_float(cl, 2, play_fvec_set_end);
+
+  fts_class_inlet_int(cl, 3, play_fvec_set_speed);
+  fts_class_inlet_float(cl, 3, play_fvec_set_speed);
 
   fts_dsp_declare_function(play_fvec_symbol, play_fvec_ftl);
   fts_dsp_declare_outlet(cl, 0);
-
-  return fts_ok;
 }
 
 void

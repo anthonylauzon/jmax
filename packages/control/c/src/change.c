@@ -40,20 +40,28 @@ change_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   change_t *this = (change_t *)o;
 
-  if(!fts_atom_equals(at, &this->state))
+  if(!fts_atom_compare(&this->state, at))
     {
       fts_atom_assign(&this->state, at);
-      fts_outlet_atom(o, 0, at);
+      fts_outlet_varargs(o, 0, 1, at);
     }
 }
 
 static void
-change_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+change_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if(ac > 0 && s == fts_get_selector(at))
-    change_atom(o, 0, 0, ac, at);
+  change_t *this = (change_t *)o;
+
+  if(ac == 1)
+    change_atom(o, 0, 0, 1, at);
   else
-    fts_object_signal_runtime_error(o, "Don't understand message %s", s);
+    {
+      fts_object_t *tuple = fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_atom_t a;
+
+      fts_set_object(&a, tuple);
+      change_atom(o, 0, 0, 1, &a);
+    }
 }
 
 static void
@@ -82,20 +90,15 @@ change_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_atom_void(&this->state);
 }
 
-static fts_status_t
-change_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+change_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(change_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(change_t), change_init, change_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, change_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, change_delete);
+  fts_class_method_varargs(cl, fts_s_set, change_set);
 
-  fts_method_define_varargs(cl, 0, fts_s_anything, change_anything);
-  fts_method_define_varargs(cl, 0, fts_s_set, change_set);
-
-  fts_outlet_type_define_varargs(cl, 0, fts_s_int);
-
-  return fts_ok;
+  fts_class_inlet_varargs(cl, 0, change_atoms);
+  fts_class_outlet_varargs(cl, 0);
 }
 
 void

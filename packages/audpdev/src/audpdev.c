@@ -233,6 +233,7 @@ static fts_status_t audp_dac_open( fts_dev_t *dev, int nargs, const fts_atom_t *
      check for I/O errors */
   fts_dsp_set_dac_slip_dev( dev);
   post("AUDP audio out open\n");
+
   return fts_ok;
 }
 

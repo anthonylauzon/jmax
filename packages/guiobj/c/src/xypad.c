@@ -95,7 +95,7 @@ static void xypad_set_couple(fts_object_t *o, int winlet, fts_symbol_t s, int ac
       fts_update_request(o);
     }
 
-  fts_outlet_atoms(o, 0, ac, at); 
+  fts_outlet_varargs(o, 0, ac, at); 
 }
 
 static void
@@ -106,7 +106,7 @@ xypad_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       
   fts_set_int(a + 0, this->x);
   fts_set_int(a + 1, this->y);
-  fts_outlet_atoms(o, 0, 2, a); 
+  fts_outlet_varargs(o, 0, 2, a); 
 }
 
 static void
@@ -252,29 +252,27 @@ xypad_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_dumper_send(dumper, sym_setYMaxValue, 1, a);
 }
 
-static fts_status_t
-xypad_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+xypad_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(xypad_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(xypad_t), xypad_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, xypad_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, xypad_dump);  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, xypad_update_real_time); 
+  fts_class_method_varargs(cl, fts_s_update_real_time, xypad_update_real_time); 
+  fts_class_method_varargs(cl, fts_s_dump, xypad_dump);  
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_gui, xypad_update_gui); 
-  fts_method_define_varargs(cl, fts_system_inlet, sym_setXMinValue, xypad_set_xminvalue); 
-  fts_method_define_varargs(cl, fts_system_inlet, sym_setXMaxValue, xypad_set_xmaxvalue); 
-  fts_method_define_varargs(cl, fts_system_inlet, sym_setYMinValue, xypad_set_yminvalue); 
-  fts_method_define_varargs(cl, fts_system_inlet, sym_setYMaxValue, xypad_set_ymaxvalue); 
-  fts_method_define_varargs(cl, fts_system_inlet, sym_position, xypad_set_couple); 
+  fts_class_method_varargs(cl, fts_s_update_gui, xypad_update_gui); 
+  fts_class_method_varargs(cl, sym_setXMinValue, xypad_set_xminvalue); 
+  fts_class_method_varargs(cl, sym_setXMaxValue, xypad_set_xmaxvalue); 
+  fts_class_method_varargs(cl, sym_setYMinValue, xypad_set_yminvalue); 
+  fts_class_method_varargs(cl, sym_setYMaxValue, xypad_set_ymaxvalue); 
+  fts_class_method_varargs(cl, sym_position, xypad_set_couple); 
 
-  fts_method_define_varargs(cl, 0, fts_s_set, xypad_set);
-  fts_method_define_varargs(cl, 0, fts_s_bang, xypad_bang);
-  fts_method_define_varargs(cl, 0, fts_s_list, xypad_set_couple);
+  fts_class_method_varargs(cl, fts_s_set, xypad_set);
+  fts_class_method_varargs(cl, fts_s_bang, xypad_bang);
 
-  fts_outlet_type_define_varargs(cl, 0, fts_s_list);
+  fts_class_inlet_varargs(cl, 0, xypad_set_couple);
 
-  return fts_ok;
+  fts_class_outlet_varargs(cl, 0);
 }
 
 void

@@ -108,15 +108,10 @@ fts_objectset_method_destroy(fts_object_t *o, int winlet, fts_symbol_t s, int ac
   fts_hashtable_destroy( &this->hashtable);
 }
 
-static fts_status_t
-objectset_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+objectset_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_objectset_t), 0, 0, 0); 
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fts_objectset_method_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fts_objectset_method_destroy);
-
-  return fts_ok;
+  fts_class_init(cl, sizeof(fts_objectset_t), fts_objectset_method_init, fts_objectset_method_destroy);
 }
 
 /***********************************************************************

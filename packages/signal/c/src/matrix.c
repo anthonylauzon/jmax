@@ -347,24 +347,20 @@ matrix_all(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
  *
  */
 
-static fts_status_t 
-matrix_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+matrix_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(matrix_t), 1, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, matrix_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, matrix_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, matrix_put);
+  fts_class_init(cl, sizeof(matrix_t), matrix_init, matrix_delete);
+
+  fts_class_method_varargs(cl, fts_s_put, matrix_put);
     
-  fts_method_define_varargs(cl, 0, fts_s_set, matrix_node);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("in"), matrix_in);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("out"), matrix_out);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("all"), matrix_all);
+  fts_class_method_varargs(cl, fts_s_set, matrix_node);
+  fts_class_method_varargs(cl, fts_new_symbol("in"), matrix_in);
+  fts_class_method_varargs(cl, fts_new_symbol("out"), matrix_out);
+  fts_class_method_varargs(cl, fts_new_symbol("all"), matrix_all);
     
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-  
-  return fts_ok;
 }
 
 void 

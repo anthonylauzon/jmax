@@ -547,30 +547,25 @@ scope_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
 }
 
-static fts_status_t
-scope_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+scope_instantiate(fts_class_t *cl)
 {  
-  fts_class_init(cl, sizeof(scope_t), 1, 0, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, scope_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, scope_delete);      
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_gui, scope_upload); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, scope_update_real_time); 
+  fts_class_init(cl, sizeof(scope_t), scope_init, scope_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, scope_put);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_size, scope_set_size_by_client);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("range"), scope_set_range_by_client);
-  fts_method_define_varargs(cl, fts_system_inlet, sym_set_period, scope_set_period);
-  fts_method_define_varargs(cl, fts_system_inlet, sym_set_threshold, scope_set_threshold);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("onset"), scope_set_pre_delay);
+  fts_class_method_varargs(cl, fts_s_update_gui, scope_upload); 
+  fts_class_method_varargs(cl, fts_s_update_real_time, scope_update_real_time); 
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, scope_dump); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_upload, scope_upload); 
+  fts_class_method_varargs(cl, fts_s_put, scope_put);
+  fts_class_method_varargs(cl, fts_s_dump, scope_dump); 
+  fts_class_method_varargs(cl, fts_s_upload, scope_upload);   
+  fts_class_method_varargs(cl, fts_s_size, scope_set_size_by_client);
+  fts_class_method_varargs(cl, fts_new_symbol("range"), scope_set_range_by_client);
+
+  fts_class_method_varargs(cl, sym_set_period, scope_set_period);
+  fts_class_method_varargs(cl, sym_set_threshold, scope_set_threshold);
+  fts_class_method_varargs(cl, fts_new_symbol("onset"), scope_set_pre_delay);
 
   fts_dsp_declare_inlet(cl, 0);
-
-  return fts_ok;
 }
 
 void

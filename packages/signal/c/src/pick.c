@@ -201,22 +201,18 @@ pick_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-pick_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+pick_instantiate(fts_class_t *cl)
 {  
-  fts_class_init(cl, sizeof(pick_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(pick_t), pick_init, pick_delete);      
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, pick_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, pick_delete);      
+  fts_class_method_varargs(cl, fts_s_put, pick_put);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, pick_put);
-  
-  fts_method_define_varargs(cl, 0, fts_s_bang, pick_bang);
-  fts_method_define_varargs(cl, 1, fvec_symbol, pick_set_fvec);
+  fts_class_method_varargs(cl, fts_s_bang, pick_bang);
+  fts_class_inlet(cl, 1, fvec_type, pick_set_fvec);
 
   fts_dsp_declare_inlet(cl, 0);
-
-  return fts_ok;
+  fts_class_outlet(cl, 0, fvec_type);
 }
 
 void

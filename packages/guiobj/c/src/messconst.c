@@ -56,7 +56,7 @@ messconst_expression_callback( int ac, const fts_atom_t *at, void *data)
   if (fts_is_symbol( at))
     fts_outlet_send( (fts_object_t *)data, 0, fts_get_symbol(at), ac-1, at+1);
   else
-    fts_outlet_atoms( (fts_object_t *)data, 0, ac, at);
+    fts_outlet_varargs( (fts_object_t *)data, 0, ac, at);
 }
 
 static void
@@ -76,7 +76,7 @@ messconst_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   messconst_t *this = (messconst_t *)o;
 
-  if(this->value == 0)
+  if(winlet < 0 && this->value == 0)
     {
       /* messbox on */
       this->value = 1;
@@ -88,12 +88,6 @@ messconst_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   messconst_eval( this);
 }
 
-static void
-messconst_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  messconst_eval( (messconst_t *)o);
-}
- 
 static void
 messconst_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -161,35 +155,24 @@ messconst_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-messconst_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  messconst_t *this = (messconst_t *)o;
-  fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
-  fts_atom_t a;
-  
-  fts_set_object(&a, (fts_object_t *)tuple);
-  fts_atom_assign(this->at + winlet, at);
-
-  if (winlet == 0)
-    messconst_eval( this);
-}
-
-static void
-messconst_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messconst_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messconst_t *this = (messconst_t *) o;
   fts_status_t status;
 
-  if (ac == 1 && s == fts_get_selector( at))
-    {
-      fts_atom_assign(this->at + winlet, at);
-
-      if (winlet == 0)
-	messconst_eval( this);
-    }
+  if(ac == 1)
+    fts_atom_assign(this->at + winlet, at);
   else
-    fts_object_signal_runtime_error(o, "Don't understand message %s", s);
+    {
+      fts_object_t *tuple = fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_atom_t a;
+      
+      fts_set_object(&a, tuple);
+      fts_atom_assign(this->at + winlet, at);
+    }
 
+  if (winlet == 0)
+    messconst_eval( this);
 }
 
 /************************************************
@@ -255,29 +238,21 @@ messconst_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_free( this->at);
 }
 
-static fts_status_t
-messconst_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+messconst_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(messconst_t), 1, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, messconst_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, messconst_delete);
+  fts_class_init(cl, sizeof(messconst_t), messconst_init, messconst_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, messconst_set);
+  fts_class_method_varargs(cl, fts_s_set, messconst_set);
+  fts_class_method_varargs(cl, fts_s_dump, messconst_dump);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, messconst_dump);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, messconst_update_real_time); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_spost_description, messconst_spost_description); 
+  fts_class_method_varargs(cl, fts_s_update_real_time, messconst_update_real_time); 
+  fts_class_method_varargs(cl, fts_s_spost_description, messconst_spost_description); 
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_bang, messconst_send);
+  fts_class_method_varargs(cl, fts_s_bang, messconst_send);
   
-  fts_method_define_varargs(cl, 0, fts_s_bang, messconst_bang);
-  
-  fts_method_define_varargs(cl, 0, fts_s_list, messconst_tuple);
-  fts_method_define_varargs(cl, 0, fts_s_anything, messconst_anything);
-
-  return fts_ok;
+  fts_class_inlet_varargs(cl, 0, messconst_varargs);
+  fts_class_outlet_anything(cl, 0);
 }
 
 void

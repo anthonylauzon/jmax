@@ -549,7 +549,7 @@ track_event_upload(track_t *this, event_t *event)
       else if(!fts_is_void(&event->value))
 	{ 
 	  fts_set_float(a + 0, (float)event_get_time(event));
-	  fts_set_symbol(a + 1, fts_get_selector(&event->value));
+	  fts_set_symbol(a + 1, fts_get_class_name(&event->value));
 	  a[2] = event->value;
 	  fts_client_add_atoms( (fts_object_t *)this, 3, a);
 	  fts_client_done_message( (fts_object_t *)this);
@@ -684,7 +684,7 @@ track_insert(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       fts_symbol_t track_type = track_get_type(this);
       
-      if(track_type == fts_s_void || fts_get_selector(at + 1) == track_type)
+      if(track_type == fts_s_void || fts_get_class_name(at + 1) == track_type)
 	{
 	  double time = fts_get_number_float(at);
 	  event_t *event = (event_t *)fts_object_create(event_type, 1, at + 1);
@@ -1051,49 +1051,41 @@ track_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   track_clear(this);
 }
 
-static fts_status_t
-track_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+track_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(track_t), 1, 0, 0); 
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, track_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, track_delete);
+  fts_class_init(cl, sizeof(track_t), track_init, track_delete);
+
+  fts_class_method_varargs(cl, fts_s_dump, track_dump);
+  fts_class_method_varargs(cl, seqsym_add_event, track_add_event_from_array);
+
+  fts_class_method_varargs(cl, fts_s_upload, track_upload);
+  fts_class_method_varargs(cl, fts_s_post, track_post);
+  fts_class_method_varargs(cl, fts_s_print, track_print);
+
+  fts_class_method_varargs(cl, seqsym_import_midifile_dialog, track_import_midifile_dialog);
+  fts_class_method_varargs(cl, seqsym_import_midifile, track_import_midifile);
+
+  fts_class_method_varargs(cl, seqsym_export_midifile_dialog, track_export_midifile_dialog);
+  fts_class_method_varargs(cl, seqsym_export_midifile, track_export_midifile);
+
+  fts_class_method_varargs(cl, seqsym_setName, track_set_name_by_client_request);
+  fts_class_method_varargs(cl, seqsym_addEvent, track_add_event_by_client_request);
+  fts_class_method_varargs(cl, seqsym_makeEvent, track_make_event_by_client_request);
+  fts_class_method_varargs(cl, seqsym_removeEvents, track_remove_events_by_client_request);
+  fts_class_method_varargs(cl, seqsym_moveEvents, track_move_events_by_client_request);
+
+  fts_class_method_varargs(cl, seqsym_active, track_active);
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, track_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, track_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, track_get_state);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, track_dump);
-  fts_method_define_varargs(cl, fts_system_inlet, seqsym_add_event, track_add_event_from_array);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_upload, track_upload);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, track_post);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, track_print);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_clear, track_clear_method);
-
-  fts_method_define_varargs(cl, fts_system_inlet, seqsym_import_midifile_dialog, track_import_midifile_dialog);
-  fts_method_define_varargs(cl, fts_system_inlet, seqsym_import_midifile, track_import_midifile);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_import, track_import);
-
-  fts_method_define_varargs(cl, fts_system_inlet, seqsym_export_midifile_dialog, track_export_midifile_dialog);
-  fts_method_define_varargs(cl, fts_system_inlet, seqsym_export_midifile, track_export_midifile);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_export, track_export);
-
-  fts_method_define_varargs(cl, fts_system_inlet, seqsym_setName, track_set_name_by_client_request);
-  fts_method_define_varargs(cl, fts_system_inlet, seqsym_addEvent, track_add_event_by_client_request);
-  fts_method_define_varargs(cl, fts_system_inlet, seqsym_makeEvent, track_make_event_by_client_request);
-  fts_method_define_varargs(cl, fts_system_inlet, seqsym_removeEvents, track_remove_events_by_client_request);
-  fts_method_define_varargs(cl, fts_system_inlet, seqsym_moveEvents, track_move_events_by_client_request);
-
-  fts_method_define_varargs(cl, fts_system_inlet, seqsym_active, track_active);
-
-  fts_method_define_varargs(cl, 0, seqsym_insert, track_insert);
-  fts_method_define_varargs(cl, 0, seqsym_remove, track_remove);
-
-  fts_method_define_varargs(cl, 0, fts_s_import, track_import);
-  fts_method_define_varargs(cl, 0, fts_s_export, track_export);
-
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_s_clear, track_clear_method);
+  fts_class_method_varargs(cl, seqsym_insert, track_insert);
+  fts_class_method_varargs(cl, seqsym_remove, track_remove);
+  fts_class_method_varargs(cl, fts_s_import, track_import);
+  fts_class_method_varargs(cl, fts_s_export, track_export);
 }
 
 void
@@ -1101,8 +1093,3 @@ track_config(void)
 {
   track_type = fts_class_install(seqsym_track, track_instantiate);
 }
-
-
-
-
-

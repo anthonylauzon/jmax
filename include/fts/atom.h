@@ -47,15 +47,15 @@
 #define fts_get_class(p) (p)->type
 
 /**
- * Get the selector associated with the type of the atom.
+ * Get the name associated with the type of the atom.
  * This selector will be used when sending this atom in a message.
  * 
- * @fn fts_symbol_t fts_get_selector( const fts_atom_t *p)
+ * @fn fts_symbol_t fts_get_class_name( const fts_atom_t *p)
  * @param p pointer to the atom
  * @return the selector
  * @ingroup atom
  */
-#define fts_get_selector(p) fts_metaclass_get_selector( fts_get_class(p))
+#define fts_get_class_name(p) fts_metaclass_get_name( fts_get_class(p))
 
 #define fts_is_a(p,c) ((p)->type == (c))
 

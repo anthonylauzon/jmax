@@ -116,22 +116,18 @@ note_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   note_set_from_array(o, 0, 0, ac, at);  
 }
 
-static fts_status_t
-note_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+note_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(note_t), 1, 0, 0); 
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, note_init);
+  fts_class_init(cl, sizeof(note_t), note_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, note_get_array);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_array, note_set_from_array);
+  fts_class_method_varargs(cl, fts_s_get_array, note_get_array);
+  fts_class_method_varargs(cl, fts_s_set_from_array, note_set_from_array);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, note_post);
+  fts_class_method_varargs(cl, fts_s_post, note_post);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("duration"), note_duration);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("pitch"), note_pitch);
-
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_new_symbol("duration"), note_duration);
+  fts_class_method_varargs(cl, fts_new_symbol("pitch"), note_pitch);
 }
 
 void

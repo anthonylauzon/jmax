@@ -121,27 +121,22 @@ sigswitch_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-sigswitch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sigswitch_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(sigswitch_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(sigswitch_t), sigswitch_init, sigswitch_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sigswitch_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sigswitch_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, sigswitch_put);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("put_after_successors"), sigswitch_put_after);
+  fts_class_method_varargs(cl, fts_s_put, sigswitch_put);
+  fts_class_method_varargs(cl, fts_new_symbol("put_after_successors"), sigswitch_put_after);
   
-  fts_method_define_varargs(cl, 0, fts_s_int, sigswitch_switch);
-  fts_method_define_varargs(cl, 1, fts_s_int, sigswitch_switch);
+  fts_class_inlet_int(cl, 0, sigswitch_switch);
+  fts_class_inlet_int(cl, 1, sigswitch_switch);
   
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
   
   switch_function = fts_new_symbol("switch");
   fts_dsp_declare_function( switch_function, call_ftl_subr_cond);
-
-  return fts_ok;
 }
 
 void

@@ -159,22 +159,18 @@ loopback_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t pro
  *  class
  *
  */
-static fts_status_t
-loopback_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+loopback_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(loopback_t), 1, 1, 0);
-
-  fts_bytestream_class_init(cl);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, loopback_init);
+  fts_class_init(cl, sizeof(loopback_t), loopback_init, 0);
   
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, loopback_get_state);
   
-  fts_method_define_varargs(cl, 0, fts_s_int, loopback_int);
-  fts_method_define_varargs(cl, 0, fts_s_float, loopback_float);
-  fts_method_define_varargs(cl, 0, fts_s_list, loopback_list);
+  fts_class_inlet_int(cl, 0, loopback_int);
+  fts_class_inlet_float(cl, 0, loopback_float);
+  fts_class_inlet_varargs(cl, 0, loopback_list);
   
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
 }
 
 void

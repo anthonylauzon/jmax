@@ -307,16 +307,12 @@ static void fts_socketstream_receive(fts_object_t *o, int winlet, fts_symbol_t s
   fts_bytestream_input((fts_bytestream_t *) this, size, buffer);
 }
 
-static fts_status_t fts_socketstream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void fts_socketstream_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_socketstream_t), 0, 0, 0);
+  fts_class_init(cl, sizeof(fts_socketstream_t), fts_socketstream_init, fts_socketstream_delete);
   fts_bytestream_class_init(cl);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fts_socketstream_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fts_socketstream_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_sched_ready, fts_socketstream_receive);
-
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_s_sched_ready, fts_socketstream_receive);
 }
 
 /***********************************************************************
@@ -535,16 +531,12 @@ static void fts_pipestream_delete(fts_object_t *o, int winlet, fts_symbol_t s, i
   fts_bytestream_destroy((fts_bytestream_t *) this);
 }
 
-static fts_status_t fts_pipestream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void fts_pipestream_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_pipestream_t), 0, 0, 0);
+  fts_class_init(cl, sizeof(fts_pipestream_t), fts_pipestream_init, fts_pipestream_delete);
   fts_bytestream_class_init(cl);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fts_pipestream_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fts_pipestream_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_sched_ready, fts_pipestream_receive);
-
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_s_sched_ready, fts_pipestream_receive);
 }
 
 /***********************************************************************
@@ -601,16 +593,10 @@ static void fts_memorystream_delete( fts_object_t *o, int winlet, fts_symbol_t s
   fts_stack_destroy( &this->output_buffer);
 }
 
-static fts_status_t fts_memorystream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void fts_memorystream_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_memorystream_t), 0, 0, 0);
-
+  fts_class_init(cl, sizeof(fts_memorystream_t), fts_memorystream_init, fts_memorystream_delete);
   fts_bytestream_class_init(cl);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fts_memorystream_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fts_memorystream_delete);
-
-  return fts_ok;
 }
 
 unsigned char *fts_memorystream_get_bytes( fts_memorystream_t *stream)

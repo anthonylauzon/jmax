@@ -279,6 +279,8 @@ FTS_API fts_metaclass_t *fts_dsp_edge_metaclass;
 FTS_API void fts_dsp_after_edge(fts_object_t *o, fts_dsp_edge_t *edge);
 FTS_API void fts_dsp_before_edge(fts_object_t *o, fts_dsp_edge_t *edge);
 
+FTS_API fts_metaclass_t *fts_dsp_signal_metaclass;
+
 /*@}*/ /* Object declarations */
 
 /** 

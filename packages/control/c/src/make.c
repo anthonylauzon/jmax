@@ -69,17 +69,6 @@ make_args(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-make_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  make_t *this = (make_t *)o;
-
-  if(ac == 1 && fts_get_selector(at) == s)
-    make_args(o, 0, 0, 1, at);
-  else
-    fts_object_signal_runtime_error(o, "Doesn't understand '%s'", s);
-}
-
-static void
 make_set_classname(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   make_t *this = (make_t *)o;
@@ -113,22 +102,15 @@ make_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     fts_object_set_error(o, "Invalid class name");
 }
 
-static fts_status_t
-make_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+make_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(make_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(make_t), make_init, NULL);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, make_init);
+  fts_class_inlet_varargs(cl, 0, make_args);
+  fts_class_inlet_symbol(cl, 1, make_set_classname);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, make_args);
-  fts_method_define_varargs(cl, 0, fts_s_float, make_args);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, make_args);
-  fts_method_define_varargs(cl, 0, fts_s_list, make_args);
-  fts_method_define_varargs(cl, 0, fts_s_anything, make_anything);
-
-  fts_method_define_varargs(cl, 1, fts_s_symbol, make_set_classname);
-
-  return fts_ok;
+  fts_class_outlet_varargs(cl, 0);
 }
 
 void

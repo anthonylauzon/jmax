@@ -152,19 +152,20 @@ graph_iterator_step( graph_iterator_t *iter)
   else 
     {
       /* try to replace object by */
-      stack_element_t *oldtop = iter->top;
       fts_object_t *dest = iter->top->connection->dst;
-      fts_atom_t a[3];
-      fts_status_t stat;
+      fts_method_t propagate = fts_class_get_method(fts_object_get_class(dest), fts_s_propagate_input);
 
-      /* try to get successor of eventual "thru" object */
-      fts_set_pointer(a + 0, graph_iterator_push);
-      fts_set_pointer(a + 1, iter);
-      fts_set_int(a + 2, iter->top->connection->winlet);
-      stat = fts_send_message(dest, fts_s_propagate_input, 3, a);
-
-      if(stat == fts_ok)
+      if(propagate != NULL)
 	{
+	  stack_element_t *oldtop = iter->top;
+	  fts_atom_t a[3];
+
+	  /* try to get successor of eventual "thru" object */
+	  fts_set_pointer(a + 0, graph_iterator_push);
+	  fts_set_pointer(a + 1, iter);
+	  fts_set_int(a + 2, iter->top->connection->winlet);
+	  propagate(dest, fts_system_inlet, fts_s_propagate_input, 3, a);
+
 	  /* skip "thru" object */
 	  oldtop->connection_to_thru = oldtop->connection;
 	  oldtop->connection = oldtop->connection->next_same_src;	  
@@ -422,9 +423,7 @@ post_object( fts_object_t *obj)
 static int
 dsp_class_is_outlet(fts_class_t *cl, int out)
 {
-  fts_symbol_t selector = fts_class_outlet_get_selector(cl, out);
-  
-  return (selector == fts_s_sig || selector == NULL);
+  return fts_class_outlet_has_type(cl, out, fts_dsp_signal_metaclass);
 }
 
 static int 
@@ -433,7 +432,7 @@ dsp_input_get(fts_object_t *obj, int winlet)
   int i, n;
 
   for (i = 0, n = 0; i < winlet; i++)
-    if (fts_class_inlet_get_method( fts_object_get_class( obj), i, fts_s_sig) != NULL)
+    if (fts_class_inlet_get_method( fts_object_get_class( obj), i, fts_dsp_signal_metaclass) != NULL)
       n++;
 
   return n;
@@ -634,7 +633,6 @@ dsp_graph_succ_realize(fts_dsp_graph_t *graph, fts_dsp_node_t *node, edge_fun_t 
 {
   fts_object_t *obj = node->o;
   fts_class_t *cl = fts_object_get_class(obj);
-  fts_outlet_decl_t *outlets = fts_object_get_class(obj)->outlets;
   int i;
 
   for(i=0; i<fts_object_get_outlets_number(obj); i++)
@@ -766,7 +764,7 @@ dsp_graph_schedule_depth(fts_dsp_graph_t *graph, fts_dsp_node_t *src, int woutle
   if ( dest->pred_cnt == 0)
     {
       dsp_graph_schedule_node(graph, dest);
-      dsp_graph_succ_realize(graph, dest, dsp_graph_schedule_depth, fts_c_signal);
+      dsp_graph_succ_realize(graph, dest, dsp_graph_schedule_depth, fts_c_signal_active);
 
       fts_send_message( dest->o, fts_new_symbol("put_after_successors"), 0, 0);
     }

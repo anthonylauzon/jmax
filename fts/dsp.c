@@ -51,6 +51,7 @@ static fts_timebase_t *dsp_timebase = 0;
 static fts_param_t *dsp_active_param = 0;
 
 fts_metaclass_t *fts_dsp_edge_metaclass = 0;
+fts_metaclass_t *fts_dsp_signal_metaclass = 0;
 
 /*********************************************************
  *
@@ -86,18 +87,13 @@ dsp_timebase_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   fts_timebase_reset(this);
 }
 
-static fts_status_t
-dsp_timebase_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+dsp_timebase_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_timebase_t), 0, 0, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, dsp_timebase_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, dsp_timebase_delete);
+  fts_class_init(cl, sizeof(fts_timebase_t), dsp_timebase_init, dsp_timebase_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_sched_ready, dsp_timebase_advance);
-  
-  return fts_ok;
-}
+  fts_class_method_varargs(cl, fts_s_sched_ready, dsp_timebase_advance);
+  }
 
 void
 fts_dsp_timebase_configure(void)
@@ -161,13 +157,13 @@ sig_dummy( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 void 
 fts_dsp_declare_inlet(fts_class_t *cl, int num)
 {
-  fts_method_define_varargs(cl, num, fts_s_sig, sig_dummy);
+  fts_class_inlet(cl, num, fts_dsp_signal_metaclass, sig_dummy);
 }
 
 void 
 fts_dsp_declare_outlet(fts_class_t *cl, int num)
 {
-  fts_outlet_type_define(cl, num, fts_s_sig);
+  fts_class_outlet(cl, num, fts_dsp_signal_metaclass);
 }
 
 void 
@@ -191,7 +187,7 @@ fts_dsp_add_function(fts_symbol_t symb, int ac, fts_atom_t *av)
 int 
 fts_dsp_is_sig_inlet(fts_object_t *o, int num)
 {
-  return fts_class_inlet_get_method( fts_object_get_class(o), num, fts_s_sig) != NULL;
+  return fts_class_inlet_get_method(fts_object_get_class(o), num, fts_dsp_signal_metaclass) != NULL;
 }
 
 int 
@@ -292,22 +288,17 @@ dsp_edge_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-dsp_edge_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+dsp_edge_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_dsp_edge_t), 1, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, dsp_edge_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, dsp_edge_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, dsp_edge_put);
+  fts_class_init(cl, sizeof(fts_dsp_edge_t), dsp_edge_init, dsp_edge_delete);
+  fts_class_method_varargs(cl, fts_s_put, dsp_edge_put);
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, dsp_edge_get_state);  
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-  
-  return fts_ok;
-}
+  }
 
 void
 fts_dsp_after_edge(fts_object_t *o, fts_dsp_edge_t *edge)
@@ -328,6 +319,12 @@ fts_dsp_before_edge(fts_object_t *o, fts_dsp_edge_t *edge)
  *  kernel ftl functions
  *
  */
+
+/* DSP signal dummy metaclass */
+static void
+dsp_signal_instantiate(fts_class_t *cl)
+{
+  fts_class_init(cl, sizeof(fts_object_t), 0, 0);}
 
 static void
 dsp_zero_fun(fts_word_t *argv)
@@ -510,6 +507,9 @@ void fts_kernel_dsp_init(void)
 
   /* DSP edge class */
   fts_dsp_edge_metaclass = fts_class_install(NULL, dsp_edge_instantiate);
+
+  /* DSP signal dummy class */
+  fts_dsp_signal_metaclass = fts_class_install(NULL, dsp_signal_instantiate);
 
   /* create DSP parameter */
   dsp_active_param = (fts_param_t *)fts_object_create(fts_param_metaclass, 0, 0);

@@ -102,34 +102,26 @@ mtof_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   mtof_tune(o, 0, 0, ac, at);
 }
 
-static fts_status_t
-mtof_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+mtof_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(mtof_t), 1, 1, 0); 
+  fts_class_init(cl, sizeof(mtof_t), mtof_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, mtof_init);
+  fts_class_method_varargs(cl, fts_new_symbol("tune"), mtof_tune);
+  fts_class_inlet_number(cl, 0, mtof_number);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, mtof_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, mtof_number);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("tune"), mtof_tune);
-
-  fts_outlet_type_define_varargs(cl, 0,	fts_s_float);
-
-  return fts_ok;
+  fts_class_outlet_float(cl, 0);
 }
 
-static fts_status_t
-ftom_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+ftom_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(mtof_t), 1, 1, 0); 
+  fts_class_init(cl, sizeof(mtof_t), mtof_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, mtof_init);
+  fts_class_method_varargs(cl, fts_new_symbol("tune"), mtof_tune);
+  fts_class_inlet_number(cl, 0, ftom_number);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, ftom_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, ftom_number);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("tune"), mtof_tune);
-
-  return fts_ok;
+  fts_class_outlet_float(cl, 0);
 }
 
 void

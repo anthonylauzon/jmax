@@ -262,16 +262,12 @@ static void udpsend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac
     }
 }
 
-static fts_status_t udpsend_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+udpsend_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof( udpsend_t), 1, 0, 0);
+  fts_class_init( cl, sizeof( udpsend_t), udpsend_init, udpsend_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, udpsend_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, udpsend_delete);
-
-  fts_method_define_varargs(cl, 0, fts_s_anything, udpsend_anything);
-
-  return fts_ok;
+  /*fts_class_method_varargs(cl, fts_s_anything, udpsend_anything);*/
 }
 
 void udpsend_config( void)

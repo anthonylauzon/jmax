@@ -132,31 +132,27 @@ makenote_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     }
 }
 
-static fts_status_t
-makenote_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+makenote_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(makenote_t), 3, 2, 0); 
+  fts_class_init(cl, sizeof(makenote_t), makenote_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, makenote_init);
+  fts_class_method_varargs(cl, fts_s_clear, makenote_clear);
+  fts_class_method_varargs(cl, fts_s_stop, makenote_stop);
 
-  fts_method_define_varargs(cl, 0, fts_s_clear, makenote_clear);
-  fts_method_define_varargs(cl, 0, fts_s_stop, makenote_stop);
+  fts_class_inlet_int(cl, 0, makenote_pitch);
+  fts_class_inlet_float(cl, 0, makenote_pitch);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, makenote_pitch);
-  fts_method_define_varargs(cl, 0, fts_s_float, makenote_pitch);
+  fts_class_inlet_int(cl, 1, makenote_set_velocity);
+  fts_class_inlet_float(cl, 1, makenote_set_velocity);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, makenote_set_velocity);
-  fts_method_define_varargs(cl, 1, fts_s_float, makenote_set_velocity);
+  fts_class_inlet_int(cl, 2, makenote_set_duration);
+  fts_class_inlet_float(cl, 2, makenote_set_duration);
 
-  fts_method_define_varargs(cl, 2, fts_s_int, makenote_set_duration);
-  fts_method_define_varargs(cl, 2, fts_s_float, makenote_set_duration);
+  fts_class_inlet_varargs(cl, 0, makenote_list);
 
-  fts_method_define_varargs(cl, 0, fts_s_list, makenote_list);
-
-  fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
-  fts_outlet_type_define_varargs(cl, 1,	fts_s_int);
-
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
+  fts_class_outlet_int(cl, 1);
 }
 
 

@@ -87,6 +87,48 @@ sysinfo_classes(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   post("</html>\n");
 }
 
+extern fts_metaclass_t *fts_package_get_metaclass(fts_package_t* pkg, fts_symbol_t name);
+
+static void
+sysinfo_noouts(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t *pkg;
+  fts_iterator_t pkg_iter;
+  fts_iterator_t mcl_iter;
+  fts_atom_t pkg_name;
+  fts_atom_t mcl_name;
+
+  fts_get_package_names(&pkg_iter);
+  while (fts_iterator_has_more(&pkg_iter))
+    {
+      fts_iterator_next(&pkg_iter, &pkg_name);
+      pkg = fts_package_get(fts_get_symbol(&pkg_name));
+
+      if(pkg != NULL && fts_package_get_state(pkg) != fts_package_corrupt)
+	{
+	  fts_package_get_metaclass_names(pkg, &mcl_iter);
+	  while(fts_iterator_has_more(&mcl_iter)) 
+	    {
+	      fts_metaclass_t *mcl;
+	      fts_class_t *cl;
+	      fts_symbol_t name;
+
+	      fts_iterator_next(&mcl_iter, &mcl_name);	      
+	      name = fts_get_symbol(&mcl_name);		      
+
+	      mcl = fts_package_get_metaclass(pkg, name);
+	      if(mcl)
+		{
+		  cl = mcl->inst_list;
+
+		  if(cl && cl->noutlets == 0)
+		    post("class %s has no outputs\n", name);
+		}
+	    }
+	}
+    }
+}
+
 static void
 sysinfo_audio(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -103,17 +145,17 @@ sysinfo_midi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_send_message(config, fts_s_print, ac, at);
 }
 
-static fts_status_t
-sysinfo_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sysinfo_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(sysinfo_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(sysinfo_t), 0, 0);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("arch"), sysinfo_arch);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("classes"), sysinfo_classes);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("audio"), sysinfo_audio);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("midi"), sysinfo_midi);
-  
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_new_symbol("arch"), sysinfo_arch);
+  fts_class_method_varargs(cl, fts_new_symbol("classes"), sysinfo_classes);
+  fts_class_method_varargs(cl, fts_new_symbol("audio"), sysinfo_audio);
+  fts_class_method_varargs(cl, fts_new_symbol("midi"), sysinfo_midi);
+
+  fts_class_method_varargs(cl, fts_new_symbol("noouts"), sysinfo_noouts);  
 }
 
 void

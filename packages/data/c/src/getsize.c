@@ -64,7 +64,7 @@ getsize_mat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_set_int(list, mat_get_m(mat));
   fts_set_int(list + 1, mat_get_n(mat));
 
-  fts_outlet_atoms(o, 0, 2, list);
+  fts_outlet_varargs(o, 0, 2, list);
 }
 
 /******************************************************
@@ -73,17 +73,17 @@ getsize_mat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  *
  */
 
-static fts_status_t
-getsize_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+getsize_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_object_t), 1, 1, 0); 
+  fts_class_init(cl, sizeof(fts_object_t), NULL, NULL); 
   
-  fts_method_define_varargs(cl, 0, vec_symbol, getsize_vec);
-  fts_method_define_varargs(cl, 0, ivec_symbol, getsize_ivec);
-  fts_method_define_varargs(cl, 0, fvec_symbol, getsize_fvec);
-  fts_method_define_varargs(cl, 0, mat_symbol, getsize_mat);
+  fts_class_inlet(cl, 0, vec_type, getsize_vec);
+  fts_class_inlet(cl, 0, ivec_type, getsize_ivec);
+  fts_class_inlet(cl, 0, fvec_type, getsize_fvec);
+  fts_class_inlet(cl, 0, mat_type, getsize_mat);
   
-  return fts_ok;
+  fts_class_outlet_number(cl, 0);
 }
 
 void

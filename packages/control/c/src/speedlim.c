@@ -49,7 +49,7 @@ speedlim_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	  fts_set_void(&this->state);
 	  
 	  /* send atom */
-	  fts_outlet_atom(o, 0, &output);
+	  fts_outlet_varargs(o, 0, 1, &output);
 	  
 	  /* clear stack */
 	  fts_atom_void(&output);
@@ -74,7 +74,7 @@ speedlim_thru_and_close(fts_object_t *o, int winlet, int ac, const fts_atom_t *a
   fts_timebase_add_call(fts_get_timebase(), o, speedlim_output, NULL, this->time);
   
   /* let values thru */
-  fts_outlet_atoms(o, 0, ac, at);
+  fts_outlet_varargs(o, 0, ac, at);
 }
 
 static void
@@ -101,29 +101,13 @@ speedlim_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 	speedlim_input_atom(o, 0, 0, 1, at);
       else if(ac > 1)
 	{
-	  fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
+	  fts_object_t *tuple = fts_object_create(fts_tuple_metaclass, ac, at);
 	  fts_atom_t a;
 	  
-	  fts_set_object(&a, (fts_object_t *)tuple);
+	  fts_set_object(&a, tuple);
 	  speedlim_input_atom(o, 0, 0, 1, &a);
 	}
     }
-}
-
-static void
-speedlim_input_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  speedlim_t *this = (speedlim_t *)o;
-
-  if(ac == 1 && s == fts_get_selector(at))
-    {
-      if(this->gate)
-	speedlim_thru_and_close(o, 0, 1, at);
-      else
-	speedlim_input_atom(o, 0, 0, 1, at);
-    }
-  else
-    fts_object_signal_runtime_error(o, "Don't understand message %s", s);
 }
 
 static void
@@ -151,24 +135,17 @@ speedlim_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     speedlim_set_time(o, 0, 0, 1, at);
 }
 
-static fts_status_t
-speedlim_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+speedlim_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(speedlim_t), 2, 1, 0); 
+  fts_class_init(cl, sizeof(speedlim_t), speedlim_init, 0);
 
-  /* define the system methods */
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, speedlim_init);
+  fts_class_inlet_varargs(cl, 0, speedlim_input_atoms);
+  fts_class_inlet_number(cl, 0, speedlim_input_atom);
+  fts_class_inlet_symbol(cl, 0, speedlim_input_atom);
+  fts_class_inlet_number(cl, 1, speedlim_set_time);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, speedlim_input_atom);
-  fts_method_define_varargs(cl, 0, fts_s_float, speedlim_input_atom);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, speedlim_input_atom);
-  fts_method_define_varargs(cl, 0, fts_s_list, speedlim_input_atoms);
-  fts_method_define_varargs(cl, 0, fts_s_anything, speedlim_input_anything);
-
-  fts_method_define_varargs(cl, 1, fts_s_int, speedlim_set_time);
-  fts_method_define_varargs(cl, 1, fts_s_float, speedlim_set_time);
-
-  return fts_ok;
+  fts_class_outlet_varargs(cl, 0);
 }
 
 void

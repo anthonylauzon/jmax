@@ -314,16 +314,16 @@ extern void fts_package_set_dirty(fts_package_t *this, int is_dirty);
  *   Config objects
  */
 
-fts_status_t fts_require_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
+fts_status_t fts_require_instantiate(fts_class_t *cl);
 void fts_require_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
-fts_status_t fts_template_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
+fts_status_t fts_template_instantiate(fts_class_t *cl);
 void fts_template_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
-fts_status_t fts_template_path_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
+fts_status_t fts_template_path_instantiate(fts_class_t *cl);
 void fts_template_path_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
-fts_status_t fts_data_path_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
+fts_status_t fts_data_path_instantiate(fts_class_t *cl);
 void fts_data_path_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 

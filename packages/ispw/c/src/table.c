@@ -80,7 +80,7 @@ table_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
 
 static void
-table_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   if ((ac >= 2) && (fts_is_number(&at[1])))
     table_store_value(o, winlet, s, 1, at + 1);
@@ -351,46 +351,37 @@ table_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fts_send_message((fts_object_t *)this->vec, fts_s_openEditor, 0, 0);
 }
 
-static fts_status_t
-table_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+table_instantiate(fts_class_t *cl)
 {
   /* table [int] */
-  fts_class_init(cl, sizeof(table_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(table_t), table_init, table_delete);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, table_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, table_delete);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_openEditor, table_open_editor);
+  fts_class_method_varargs(cl, fts_s_openEditor, table_open_editor);
   
   /* save/load bmax file if not instantiated with reference */
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, table_set_with_onset_from_atoms);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save, table_save);  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save_dotpat, table_save_dotpat); 
+  fts_class_method_varargs(cl, fts_s_save, table_save);  
+  fts_class_method_varargs(cl, fts_s_save_dotpat, table_save_dotpat); 
   
   /* user methods */
-  fts_method_define_varargs(cl, 0, fts_s_int, table_index);
-  fts_method_define_varargs(cl, 0, fts_s_float, table_index);
+  fts_class_method_varargs(cl, fts_s_set, table_set_with_onset_from_atoms);
   
-  fts_method_define_varargs(cl, 0, fts_s_list, table_list);
-  fts_method_define_varargs(cl, 0, fts_s_set, table_set_with_onset_from_atoms);
+  fts_class_method_varargs(cl, fts_new_symbol("const"), table_const);
+  fts_class_method_varargs(cl, fts_s_clear, table_clear);
   
-  fts_method_define_varargs(cl, 0, fts_new_symbol("const"), table_const);
-  fts_method_define_varargs(cl, 0, fts_s_clear, table_clear);
+  fts_class_method_varargs(cl, fts_new_symbol("inv"), table_inv);
+  fts_class_method_varargs(cl, fts_new_symbol("quantile"), table_quantile);
+  fts_class_method_varargs(cl, fts_s_bang, table_get_random);
   
-  fts_method_define_varargs(cl, 0, fts_new_symbol("inv"), table_inv);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("quantile"), table_quantile);
-  fts_method_define_varargs(cl, 0, fts_s_bang, table_get_random);
+  fts_class_method_varargs(cl, fts_new_symbol("sum"), table_sum);  
+  fts_class_method_varargs(cl, fts_s_size, table_size);
   
-  fts_method_define_varargs(cl, 0, fts_new_symbol("sum"), table_sum);
+  fts_class_inlet_number(cl, 0, table_index);
+  fts_class_inlet_varargs(cl, 0, table_varargs);
+
+  fts_class_inlet_number(cl, 1, table_store_value);
   
-  fts_method_define_varargs(cl, 0, fts_s_size, table_size);
-  
-  fts_method_define_varargs(cl, 1, fts_s_int, table_store_value);
-  fts_method_define_varargs(cl, 1, fts_s_float, table_store_value);
-  
-  fts_outlet_type_define_varargs(cl, 0, fts_s_int);
-  
-  return fts_ok;
+  fts_class_outlet_varargs(cl, 0);
 }
 
 void

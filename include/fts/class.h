@@ -20,16 +20,16 @@
  * 
  */
 
-typedef fts_status_t (*fts_instantiate_fun_t)(fts_class_t *, int, const fts_atom_t *);
+typedef void (*fts_instantiate_fun_t)(fts_class_t *);
 typedef int (*fts_equiv_fun_t)(int, const fts_atom_t *, int, const fts_atom_t *);
 
-typedef struct fts_inlet_decl fts_inlet_decl_t;
-typedef struct fts_outlet_decl fts_outlet_decl_t;
+typedef struct fts_class_outlet fts_class_outlet_t;
 
 /* Predefined typeids */
 #define FTS_FIRST_OBJECT_TYPEID   16
 
-struct fts_metaclass {
+struct fts_metaclass 
+{
   fts_symbol_t name; /* name of the metaclass, i.e. the first name used to register it */
 
   /* Selector used if an instance of this class is send in a message.
@@ -49,19 +49,23 @@ struct fts_metaclass {
   struct fts_metaclass *next; /* next metaclass with the same name in the same package */
 };
 
-struct fts_class {
+struct fts_class 
+{
   /* Object management */
   fts_metaclass_t *mcl;
-  fts_inlet_decl_t *sysinlet;
 
   fts_method_t constructor;
   fts_method_t deconstructor;
 
+  fts_hashtable_t messages;
+
   int ninlets;
-  fts_inlet_decl_t *inlets;
+  fts_hashtable_t inlets;
+  fts_method_t default_handler;
 
   int noutlets;
-  fts_outlet_decl_t *outlets;
+  int out_alloc;
+  fts_class_outlet_t *outlets;
 
   int size;
   fts_heap_t *heap;
@@ -75,9 +79,6 @@ struct fts_class {
   fts_plist_t *properties;		/* class' dynamic properties */
 
   struct daemon_list *daemons;
-
-  /* User data */
-  void *user_data;
 };
 
 
@@ -101,53 +102,52 @@ FTS_API fts_status_description_t fts_CannotInstantiate;
  * @return the created object, NULL if instantiation failed
  */
 FTS_API fts_object_t *fts_metaclass_new_instance( fts_metaclass_t *cl, fts_patcher_t *parent, int ac, const fts_atom_t *at);
+FTS_API fts_metaclass_t *fts_metaclass_get_by_name( fts_symbol_t package_name, fts_symbol_t class_name);
 
-
-/* Meta classes functions */
 FTS_API fts_metaclass_t *fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun);
 FTS_API void fts_class_alias(fts_metaclass_t *mcl, fts_symbol_t alias);
 
-#define fts_metaclass_get_selector(MCL) ((MCL)->selector ? (MCL)->selector : (MCL)->name)
 #define fts_metaclass_is_primitive(MCL) ((MCL)->typeid < FTS_FIRST_OBJECT_TYPEID)
 
-/* Class functions  and macros */
-#define FTS_VAR_ARGS  -1
+FTS_API fts_status_t fts_class_init( fts_class_t *cl, unsigned int size, fts_method_t constructor, fts_method_t deconstructor);
 
-FTS_API fts_status_t fts_class_init( fts_class_t *, unsigned int, int ninlets, int noutlets, void *);
-FTS_API fts_class_t *fts_class_instantiate(fts_metaclass_t *mcl, int ac, const fts_atom_t *at);
-
-FTS_API fts_metaclass_t *fts_metaclass_get_by_name( fts_symbol_t package_name, fts_symbol_t class_name);
+/* default input handler */
+#define fts_class_get_default_handler(c) ((c)->default_handler)
+#define fts_class_set_default_handler(c, m) ((c)->default_handler = (m))
 
 /* method definition */
-FTS_API void fts_method_define(fts_class_t *cl, int winlet, fts_symbol_t s, fts_method_t fun);
-#define fts_method_define_varargs(class, winlet, s, fun)  \
-  fts_method_define(class, winlet, s, fun)
+FTS_API void fts_class_method_varargs(fts_class_t *cl, fts_symbol_t s, fts_method_t mth);
+FTS_API void fts_class_inlet(fts_class_t *cl, int winlet, fts_metaclass_t *type, fts_method_t mth);
+FTS_API void fts_class_inlet_anything(fts_class_t *cl, int woutlet);
 
-#define fts_method_define_int(class, winlet, fun) \
-  fts_method_define(class, winlet, fts_s_int, fun);
+/* outlet definition */
+FTS_API void fts_class_outlet(fts_class_t *cl, int woutlet, fts_metaclass_t *type);
+FTS_API void fts_class_outlet_message(fts_class_t *cl, int woutlet, fts_symbol_t selector);
+FTS_API void fts_class_outlet_anything(fts_class_t *cl, int woutlet);
 
-#define fts_method_define_float(class, winlet, fun) \
-  fts_method_define(class, winlet, fts_s_float, fun);
+/* marcros for most popular inlet types */
+#define fts_class_inlet_int(c, i, m) fts_class_inlet((c), (i), fts_t_int, (m))
+#define fts_class_inlet_float(c, i, m) fts_class_inlet((c), (i), fts_t_float, (m))
+#define fts_class_inlet_number(c, i, m) do{ \
+  fts_class_inlet((c), (i), fts_t_int, (m)); \
+  fts_class_inlet((c), (i), fts_t_float, (m));} while(0)
+#define fts_class_inlet_symbol(c, i, m) fts_class_inlet((c), (i), fts_t_symbol, (m))
+#define fts_class_inlet_varargs(c, i, m) fts_class_inlet((c), (i), NULL, (m))
 
-#define fts_method_define_number(class, winlet, fun) \
-  fts_method_define(class, winlet, fts_s_int, fun); \
-  fts_method_define(class, winlet, fts_s_float, fun);
+/* marcros for most popular outlet types */
+#define fts_class_outlet_int(c, i) fts_class_outlet((c), (i), fts_t_int)
+#define fts_class_outlet_float(c, i) fts_class_outlet((c), (i), fts_t_float)
+#define fts_class_outlet_number(c, i) do{ \
+  fts_class_outlet((c), (i), fts_t_int); \
+  fts_class_outlet((c), (i), fts_t_float);} while(0)
+#define fts_class_outlet_symbol(c, i) fts_class_outlet((c), (i), fts_t_symbol)
+#define fts_class_outlet_varargs(c, i) fts_class_outlet((c), (i), NULL)
 
-#define fts_method_define_symbol(class, winlet, fun) \
-  fts_method_define(class, winlet, fts_s_symbol, fun);
-
-#define fts_method_define_bang(class, winlet, fun) \
-  fts_method_define(class, winlet, fts_s_bang, fun);
-
-#define fts_method_define_anything(class, winlet, fun) \
-  fts_method_define(class, winlet, fts_s_anything, fun);
-
-/* outlet type definition */
-FTS_API void fts_outlet_type_define(fts_class_t *cl, int woutlet, fts_symbol_t s);
-#define fts_outlet_type_define_varargs(class, woutlet, s)  \
-          fts_outlet_type_define(class, woutlet, s) 
+/* marcros for most popular outlet messages */
+#define fts_class_outlet_bang(c, i) fts_class_outlet_message((c), (i), fts_s_bang)
 
 #define fts_class_get_name(C) ((C)->mcl->name)
+#define fts_metaclass_get_name(C) ((C)->name)
 
 FTS_API fts_method_t fts_class_get_method(fts_class_t *cl, fts_symbol_t s);
 #define fts_class_get_constructor(c) ((c)->constructor)
@@ -178,16 +178,3 @@ FTS_API const int fts_system_inlet;
  */
 
 typedef void (*fts_propagate_fun_t)(void *ptr, fts_object_t *object, int outlet);
-
-/*****************************************************************************
- *
- *  equivalence function library
- *
- */
-FTS_API int fts_arg_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
-FTS_API int fts_arg_equiv_or_float( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
-FTS_API int fts_first_arg_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
-FTS_API int fts_narg_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
-FTS_API int fts_never_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
-FTS_API int fts_arg_type_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
-

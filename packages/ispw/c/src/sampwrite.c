@@ -180,22 +180,18 @@ sampwrite_set_by_int(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const
  *
  */
  
-static fts_status_t
-class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+class_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(sampwrite_t), 1, 0, 0);
+  fts_class_init(cl, sizeof(sampwrite_t), sampwrite_init, sampwrite_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sampwrite_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sampwrite_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, sampwrite_put);
+  fts_class_method_varargs(cl, fts_s_put, sampwrite_put);
   
-  fts_method_define_varargs(cl, 0, fts_s_set, sampwrite_set);  
-  fts_method_define_varargs(cl, 0, fts_s_bang, sampwrite_bang);
-  fts_method_define_varargs(cl, 0, fts_s_int, sampwrite_set_by_int);
+  fts_class_method_varargs(cl, fts_s_set, sampwrite_set);  
+  fts_class_method_varargs(cl, fts_s_bang, sampwrite_bang);
+  fts_class_inlet_int(cl, 0, sampwrite_set_by_int);
   
   fts_dsp_declare_inlet(cl, 0);
-
-  return fts_ok;
 }
 
 void

@@ -143,30 +143,20 @@ sustain_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 
-static fts_status_t
-sustain_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sustain_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(sustain_t), 3, 2, 0); 
+  fts_class_init(cl, sizeof(sustain_t), sustain_init, sustain_clear);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sustain_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sustain_clear);
+  fts_class_method_varargs(cl, fts_s_clear, sustain_clear);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, sustain_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, sustain_number);
-  fts_method_define_varargs(cl, 0, fts_s_list, sustain_list);
+  fts_class_inlet_number(cl, 0, sustain_number);
+  fts_class_inlet_varargs(cl, 0, sustain_list);
+  fts_class_inlet_number(cl, 1, sustain_number_1);
+  fts_class_inlet_number(cl, 2, sustain_number_2);
 
-  fts_method_define_varargs(cl, 0, fts_s_clear, sustain_clear);
-
-  fts_method_define_varargs(cl, 1, fts_s_int, sustain_number_1);
-  fts_method_define_varargs(cl, 1, fts_s_float, sustain_number_1);
-
-  fts_method_define_varargs(cl, 2, fts_s_int, sustain_number_2);
-  fts_method_define_varargs(cl, 2, fts_s_float, sustain_number_2);
-
-  fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
-  fts_outlet_type_define_varargs(cl, 1,	fts_s_int);
-
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
+  fts_class_outlet_int(cl, 1);
 }
 
 

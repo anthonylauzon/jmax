@@ -48,7 +48,7 @@ gate_realize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   gate_t *this = (gate_t *)o;
 
-  if(this->opened)
+  if(this->opened && winlet == 1)
     fts_outlet_send(o, 0, s, ac, at);
 }
 
@@ -60,20 +60,20 @@ gate_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   this->opened = fts_get_int_arg(ac, at, 0, 0);
 }
 
-static fts_status_t
-gate_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+gate_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(gate_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(gate_t), gate_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, gate_init);
+  fts_class_set_default_handler(cl, gate_realize);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, gate_open);
-  fts_method_define_varargs(cl, 0, fts_s_float, gate_open);
-  fts_method_define_varargs(cl, 0, fts_s_list, gate_open);
+  fts_class_inlet_int(cl, 0, gate_open);
+  fts_class_inlet_float(cl, 0, gate_open);
+  fts_class_inlet_varargs(cl, 0, gate_open);
 
-  fts_method_define_varargs(cl, 1, fts_s_anything, gate_realize);
+  fts_class_inlet_varargs(cl, 1, gate_realize);
 
-  return fts_ok;
+  fts_class_outlet_anything(cl, 0);
 }
 
 void

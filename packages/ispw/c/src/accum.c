@@ -105,26 +105,24 @@ accum_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   accum_set(o, 0, 0, 1, at);
 }
 
-static fts_status_t
-accum_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+accum_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(accum_t), 3, 1, 0);
+  fts_class_init(cl, sizeof(accum_t), accum_init, NULL);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, accum_init);
+  fts_class_method_varargs(cl, fts_s_set, accum_set);
 
-  fts_method_define_varargs(cl, 0, fts_s_set, accum_set);
+  fts_class_inlet_int(cl, 1, accum_add);
+  fts_class_inlet_float(cl, 1, accum_add);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, accum_add);
-  fts_method_define_varargs(cl, 1, fts_s_float, accum_add);
+  fts_class_inlet_int(cl, 2, accum_mul);
+  fts_class_inlet_float(cl, 2, accum_mul);
 
-  fts_method_define_varargs(cl, 2, fts_s_int, accum_mul);
-  fts_method_define_varargs(cl, 2, fts_s_float, accum_mul);
+  fts_class_method_varargs(cl, fts_s_bang, accum_bang);
+  fts_class_inlet_int(cl, 0, accum_number);
+  fts_class_inlet_float(cl, 0, accum_number);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, accum_bang);
-  fts_method_define_varargs(cl, 0, fts_s_int, accum_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, accum_number);
-  
-  return fts_ok;
+  fts_class_outlet_number(cl, 0);
 }
 
 void

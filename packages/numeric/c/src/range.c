@@ -191,21 +191,15 @@ range_point(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  *  class
  *
  */
-static fts_status_t
-range_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+range_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(range_t), 2, 2, 0);
+  fts_class_init(cl, sizeof(range_t), range_init, range_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, range_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, range_delete);
+  fts_class_inlet_number(cl, 0, range_int);
+  fts_class_inlet_number(cl, 1, range_point);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, range_int);
-  fts_method_define_varargs(cl, 0, fts_s_float, range_float);
-
-  fts_method_define_varargs(cl, 1, fts_s_int, range_point);
-  fts_method_define_varargs(cl, 1, fts_s_float, range_point);
-
-  return fts_ok;
+  fts_class_outlet_number(cl, 0);
 }
 
 void

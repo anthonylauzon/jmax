@@ -329,14 +329,11 @@ static void jackaudioport_get_state( fts_daemon_action_t action, fts_object_t *o
     fts_set_object( value, o);
 }
 
-static fts_status_t jackaudioport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void jackaudioport_instantiate(fts_class_t *cl)
 {
-    fts_class_init( cl, sizeof( jackaudioport_t), 0, 0, 0);
+    fts_class_init( cl, sizeof( jackaudioport_t), jackaudioport_init, jackaudioport_delete);
     
-    fts_method_define_varargs( cl, fts_system_inlet, fts_s_init, jackaudioport_init);
-    fts_method_define_varargs( cl, fts_system_inlet, fts_s_delete, jackaudioport_delete);
-    
-    fts_method_define_varargs( cl, fts_system_inlet, fts_s_sched_ready, jackaudioport_halt);
+    fts_class_method_varargs(cl, fts_s_sched_ready, jackaudioport_halt);
     
     fts_class_add_daemon( cl, obj_property_get, fts_s_state, jackaudioport_get_state);
     

@@ -64,6 +64,8 @@
 
 typedef struct _fts_list_t fts_list_t;
 
+#define fts_list_init(l) ((l) = NULL)
+
 /**
  * Appends a new node with the given data to the end of the list. The
  * functions returns the list. If the argument "list" is NULL, a new

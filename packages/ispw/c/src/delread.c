@@ -189,25 +189,21 @@ delread_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  *
  */
 
-static fts_status_t
-delread_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+delread_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(delread_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(delread_t), delread_init, delread_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, delread_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, delread_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, delread_put);
+  fts_class_method_varargs(cl, fts_s_put, delread_put);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, delread_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, delread_number);
+  fts_class_inlet_int(cl, 0, delread_number);
+  fts_class_inlet_float(cl, 0, delread_number);
 
   fts_dsp_declare_inlet(cl, 0); /* for order forcing (shadock) */
   fts_dsp_declare_outlet(cl, 0);        
   
   delread_function_symbol = fts_new_symbol("delread");
   fts_dsp_declare_function(delread_function_symbol, ftl_delread);
-
-  return fts_ok;
 }
 
 void

@@ -43,15 +43,7 @@ retard_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   retard_t *this = (retard_t *)o;
 
-  if(fts_is_tuple(at))
-    {
-      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(at);
-
-      fts_tuple_output(o, 0, tuple);
-      fts_object_release((fts_object_t *)tuple);
-    }
-  else
-    fts_outlet_atom(o, 0, at);
+  fts_outlet_varargs(o, 0, 1, at);
 }
 
 static void
@@ -62,7 +54,7 @@ retard_input_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   if(this->time > 0.0)
     fts_timebase_add_call(fts_get_timebase(), o, retard_output, at, this->time);
   else
-    fts_outlet_atom(o, 0, at);
+    fts_outlet_varargs(o, 0, 1, at);
 }
 
 static void
@@ -76,32 +68,15 @@ retard_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 	retard_input_atom(o, 0, 0, 1, at);
       else if(ac > 1)
 	{
-	  fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
+	  fts_object_t *tuple = fts_object_create(fts_tuple_metaclass, ac, at);
 	  fts_atom_t a;
 	  
-	  fts_set_object(&a, (fts_object_t *)tuple);
-	  fts_object_refer((fts_object_t *)tuple);
+	  fts_set_object(&a, tuple);
 	  retard_input_atom(o, 0, 0, 1, &a);
 	}
     }
   else
-    fts_outlet_atoms(o, 0, ac, at);
-}
-
-static void
-retard_input_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  retard_t *this = (retard_t *)o;
-
-  if(ac == 1 && s == fts_get_selector(at))
-    {
-      if(this->time > 0.0)
-	retard_input_atom(o, 0, 0, 1, at);
-      else
-	fts_outlet_atom(o, 0, at);
-    }
-  else
-    fts_object_signal_runtime_error(o, "Don't understand message %s", s);
+    fts_outlet_varargs(o, 0, ac, at);
 }
 
 static void
@@ -158,28 +133,24 @@ retard_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   retard_clear(o, 0, 0, 0, 0);
 }
 
-static fts_status_t
-retard_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+retard_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(retard_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(retard_t), retard_init, retard_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, retard_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, retard_delete);
+  fts_class_method_varargs(cl, fts_s_flush, retard_flush);
+  fts_class_method_varargs(cl, fts_s_clear, retard_clear);
+  fts_class_method_varargs(cl, fts_s_stop, retard_clear);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, retard_input_atom);
-  fts_method_define_varargs(cl, 0, fts_s_float, retard_input_atom);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, retard_input_atom);
-  fts_method_define_varargs(cl, 0, fts_s_list, retard_input_atoms);
-  fts_method_define_varargs(cl, 0, fts_s_anything, retard_input_anything);
+  fts_class_inlet_int(cl, 0, retard_input_atom);
+  fts_class_inlet_float(cl, 0, retard_input_atom);
+  fts_class_inlet_symbol(cl, 0, retard_input_atom);
+  fts_class_inlet_varargs(cl, 0, retard_input_atoms);
 
-  fts_method_define_varargs(cl, 0, fts_s_flush, retard_flush);
-  fts_method_define_varargs(cl, 0, fts_s_clear, retard_clear);
-  fts_method_define_varargs(cl, 0, fts_s_stop, retard_clear);
+  fts_class_inlet_int(cl, 1, retard_set_time);
+  fts_class_inlet_float(cl, 1, retard_set_time);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, retard_set_time);
-  fts_method_define_varargs(cl, 1, fts_s_float, retard_set_time);
-
-  return fts_ok;
+  fts_class_outlet_varargs(cl, 0);
 }
 
 void

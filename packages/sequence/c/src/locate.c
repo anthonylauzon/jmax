@@ -90,7 +90,7 @@ locate_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      fts_atom_t *value = event_get_value(event);
 	      
 	      fts_outlet_float(o, 1, (float)event_get_time(event));
-	      fts_outlet_send(o, 0, fts_get_selector(value), 1, value);
+	      fts_outlet_varargs(o, 0, 1, value);
 	      
 	      event = event_get_next(event);
 	    }
@@ -114,7 +114,7 @@ locate_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 		  fts_atom_t *value = event_get_value(event);
 
 		  fts_outlet_float(o, 1, (float)event_get_time(event));
-		  fts_outlet_send(o, 0, fts_get_selector(value), 1, value);
+		  fts_outlet_varargs(o, 0, 1, value);
 		}
 
 	      event = event_get_next(event);
@@ -198,26 +198,22 @@ locate_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     fts_object_release(this->track);
 }
 
-static fts_status_t
-locate_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+locate_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(locate_t), 2, 2, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, locate_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, locate_delete);
+  fts_class_init(cl, sizeof(locate_t), locate_init, locate_delete);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("mode"), locate_set_mode);
+  fts_class_method_varargs(cl, fts_new_symbol("mode"), locate_set_mode);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("mode"), locate_set_mode_prop);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("epsilon"), locate_set_epsilon);
+  fts_class_method_varargs(cl, fts_new_symbol("epsilon"), locate_set_epsilon);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("epsilon"), locate_set_epsilon_prop);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, locate_locate);
-  fts_method_define_varargs(cl, 0, fts_s_float, locate_locate);
-  
-  fts_method_define_varargs(cl, 1, seqsym_track, locate_set_track);
-  
-  return fts_ok;
+  fts_class_inlet_number(cl, 0, locate_locate);
+  fts_class_inlet(cl, 1, track_type, locate_set_track);
+
+  fts_class_outlet_varargs(cl, 0);
+  fts_class_outlet_float(cl, 1);  
 }
 
 void

@@ -440,25 +440,23 @@ harmtap_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-harmtap_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+harmtap_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(harmtap_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(harmtap_t), harmtap_init, harmtap_delete);
+
+  fts_class_method_varargs(cl, fts_s_put, harmtap_put);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, harmtap_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, harmtap_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, harmtap_put);
+  fts_class_method_varargs(cl, fts_s_set, harmtap_set);
+  fts_class_method_varargs(cl, fts_new_symbol("window"), harmtap_set_window);
+  fts_class_method_varargs(cl, fts_new_symbol("fade"), harmtap_set_fade);
+  fts_class_method_varargs(cl, fts_new_symbol("delayline"), harmtap_set_delayline);
   
-  fts_method_define_varargs(cl, 0, fts_s_set, harmtap_set);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("window"), harmtap_set_window);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("fade"), harmtap_set_fade);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("delayline"), harmtap_set_delayline);
+  fts_class_inlet_int(cl, 0, harmtap_set_pitch);
+  fts_class_inlet_float(cl, 0, harmtap_set_pitch);
   
-  fts_method_define_varargs(cl, 0, fts_s_int, harmtap_set_pitch);
-  fts_method_define_varargs(cl, 0, fts_s_float, harmtap_set_pitch);
-  
-  fts_method_define_varargs(cl, 1, fts_s_int, harmtap_set_delay);
-  fts_method_define_varargs(cl, 1, fts_s_float, harmtap_set_delay);
+  fts_class_inlet_int(cl, 1, harmtap_set_delay);
+  fts_class_inlet_float(cl, 1, harmtap_set_delay);
   
   dsp_sig_inlet(cl, 0);
   dsp_sig_outlet(cl, 0);        
@@ -468,9 +466,7 @@ harmtap_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   if(!harmtap_window)
     harmtap_window = fts_fftab_get_sine_first_half(WINDOW_SIZE);
-  
-  return fts_ok;
-}
+  }
 
 void
 signal_harmtap_config(void)

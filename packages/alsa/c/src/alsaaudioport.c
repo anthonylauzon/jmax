@@ -1050,19 +1050,14 @@ alsaaudioport_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 
-static fts_status_t alsaaudioport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void alsaaudioport_instantiate(fts_class_t *cl)
 {
-    fts_class_init( cl, sizeof( alsaaudioport_t), 0, 0, 0);
-
-    fts_method_define_varargs( cl, fts_system_inlet, fts_s_init, alsaaudioport_init);
-    fts_method_define_varargs( cl, fts_system_inlet, fts_s_delete, alsaaudioport_delete);
+    fts_class_init( cl, sizeof( alsaaudioport_t), alsaaudioport_init, alsaaudioport_delete);
 
     /* debug print */
-    fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, alsaaudioport_print);
+    fts_class_method_varargs(cl, fts_s_print, alsaaudioport_print);
 
     fts_class_add_daemon( cl, obj_property_get, fts_s_state, alsaaudioport_get_state);
-
-    return fts_ok;
 }
 
 /***********************************************************************

@@ -22,21 +22,9 @@
 #include <fts/fts.h>
 #include <ftsconfig.h>
 
-/* Don't call this type sig_t, it conflict with system
-   types in a lot of systems
-*/
-
 static fts_symbol_t sig_dsp_function = 0;
 static fts_symbol_t sig_64_dsp_function = 0;
 
-#define CLASS_NAME "sig~"
-
-/**********************************************************
- *
- *    object
- *
- */
- 
 typedef struct 
 {
   fts_object_t _o;
@@ -143,30 +131,20 @@ sig_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   ftl_data_copy(float, this->sig_ftl_data, &value);
 }
 
-static void
-sig_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  /* 0.26 compatibility ... */
-}
-
 /**********************************************************
  *
  *    class
  *
  */
  
-static fts_status_t
-sig_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sig_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(sigobj_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(sigobj_t), sig_init, sig_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sig_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sig_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, sig_put_dsp_function);
+  fts_class_method_varargs(cl, fts_s_put, sig_put_dsp_function);
 
-  fts_method_define_varargs(cl, 0, fts_s_float, sig_number);
-  fts_method_define_varargs(cl, 0, fts_s_int, sig_number);
-  fts_method_define_varargs(cl, 0, fts_s_bang, sig_bang);
+  fts_class_inlet_number(cl, 0, sig_number);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
@@ -176,12 +154,10 @@ sig_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   sig_64_dsp_function = fts_new_symbol("sig64");
   fts_dsp_declare_function(sig_64_dsp_function, ftl_sig_64);
-
-  return fts_ok;
 }
 
 void
 sig_config(void)
 {
-  fts_class_install(fts_new_symbol(CLASS_NAME),sig_instantiate);
+  fts_class_install(fts_new_symbol("sig~"),sig_instantiate);
 }

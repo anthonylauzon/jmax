@@ -426,33 +426,28 @@ static void readsf_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
     readsf_state_machine( (readsf_t *)o, s_pause, ac, at);
 }
 
-static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void readsf_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(readsf_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(readsf_t), readsf_init, readsf_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, readsf_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, readsf_delete);
+  fts_class_method_varargs(cl, fts_s_put, readsf_put);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, readsf_put);
+  fts_class_method_varargs(cl, s_open,  readsf_open);
 
-  fts_method_define_varargs(cl, 0, s_open,  readsf_open);
+  fts_class_method_varargs(cl, fts_s_bang, readsf_start);
+  fts_class_inlet_int(cl, 0, readsf_number);
 
-  fts_method_define_varargs( cl, 0, fts_s_bang, readsf_start);
-  fts_method_define_varargs( cl, 0, fts_s_int, readsf_number);
+  fts_class_method_varargs(cl, s_play, readsf_start);
+  fts_class_method_varargs(cl, fts_s_start, readsf_start);
 
-  fts_method_define_varargs( cl, 0, s_play, readsf_start);
-  fts_method_define_varargs( cl, 0, fts_s_start, readsf_start);
+  fts_class_method_varargs(cl, s_pause, readsf_pause);
 
-  fts_method_define_varargs( cl, 0, s_pause, readsf_pause);
-
-  fts_method_define_varargs( cl, 0, fts_s_stop, readsf_stop);
-  fts_method_define_varargs( cl, 0, s_close, readsf_stop);
+  fts_class_method_varargs(cl, fts_s_stop, readsf_stop);
+  fts_class_method_varargs(cl, s_close, readsf_stop);
 
   fts_dsp_declare_outlet(cl, 0);
 
   fts_dsp_declare_function( readsf_symbol, readsf_dsp);
-
-  return fts_ok;
 }
 
 
@@ -746,34 +741,29 @@ static void writesf_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
     writesf_state_machine( (writesf_t *)o, s_close, ac, at);
 }
 
-static fts_status_t 
-writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+writesf_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(writesf_t), 1, 0, 0);
+  fts_class_init(cl, sizeof(writesf_t), writesf_init, writesf_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, writesf_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, writesf_delete);
+  fts_class_method_varargs(cl, fts_s_put, writesf_put);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, writesf_put);
+  fts_class_method_varargs(cl, s_open, writesf_open);
 
-  fts_method_define_varargs(cl, 0, s_open, writesf_open);
+  fts_class_method_varargs(cl, fts_s_bang, writesf_record);
+  fts_class_inlet_int(cl, 0, writesf_number);
 
-  fts_method_define_varargs( cl, 0, fts_s_bang, writesf_record);
-  fts_method_define_varargs( cl, 0, fts_s_int, writesf_number);
+  fts_class_method_varargs(cl, s_record, writesf_record);
+  fts_class_method_varargs(cl, fts_s_start, writesf_record);
 
-  fts_method_define_varargs( cl, 0, s_record, writesf_record);
-  fts_method_define_varargs( cl, 0, fts_s_start, writesf_record);
+  fts_class_method_varargs(cl, s_pause, writesf_pause);
 
-  fts_method_define_varargs( cl, 0, s_pause, writesf_pause);
-
-  fts_method_define_varargs( cl, 0, fts_s_stop, writesf_close);
-  fts_method_define_varargs( cl, 0, s_close, writesf_close);
+  fts_class_method_varargs(cl, fts_s_stop, writesf_close);
+  fts_class_method_varargs(cl, s_close, writesf_close);
 
   fts_dsp_declare_inlet(cl, 0);
 
   fts_dsp_declare_function( writesf_symbol, writesf_dsp);
-
-  return fts_ok;
 }
 
 /* ********************************************************************** */

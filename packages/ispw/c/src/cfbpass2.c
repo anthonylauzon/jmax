@@ -267,30 +267,26 @@ sigcoef_bpass2_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 
-static fts_status_t
-sigcoef_bpass2_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sigcoef_bpass2_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(sigcoef_bpass2_t), 3, 6, 0); 
+  fts_class_init(cl, sizeof(sigcoef_bpass2_t), sigcoef_bpass2_init, sigcoef_bpass2_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sigcoef_bpass2_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sigcoef_bpass2_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, sigcoef_bpass2_put);
+  fts_class_method_varargs(cl, fts_s_put, sigcoef_bpass2_put);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, sigcoef_bpass2_bang);
-  fts_method_define_varargs(cl, 0, fts_s_float, sigcoef_bpass2_float);
-  fts_method_define_varargs(cl, 1, fts_s_float, sigcoef_bpass2_float_1);
-  fts_method_define_varargs(cl, 2, fts_s_float, sigcoef_bpass2_float_2);
+  fts_class_method_varargs(cl, fts_s_bang, sigcoef_bpass2_bang);
+  fts_class_inlet_float(cl, 0, sigcoef_bpass2_float);
+  fts_class_inlet_float(cl, 1, sigcoef_bpass2_float_1);
+  fts_class_inlet_float(cl, 2, sigcoef_bpass2_float_2);
 
-  fts_outlet_type_define_varargs(cl, 0,	fts_s_float);
-  fts_outlet_type_define_varargs(cl, 1,	fts_s_float);
-  fts_outlet_type_define_varargs(cl, 2,	fts_s_float);
-  fts_outlet_type_define_varargs(cl, 3,	fts_s_float);
-  fts_outlet_type_define_varargs(cl, 4,	fts_s_float);
-  fts_outlet_type_define_varargs(cl, 5,	fts_s_float);
+  fts_class_outlet_float(cl, 0);
+  fts_class_outlet_float(cl, 1);
+  fts_class_outlet_float(cl, 2);
+  fts_class_outlet_float(cl, 3);
+  fts_class_outlet_float(cl, 4);
+  fts_class_outlet_float(cl, 5);
 
   fts_dsp_declare_inlet(cl, 0);
-
-  return fts_ok;
 }
 
 void

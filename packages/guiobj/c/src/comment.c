@@ -149,24 +149,21 @@ comment_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   fprintf( file, ";\n");
 }
 
-static fts_status_t 
-comment_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+comment_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof( comment_t), 0, 0, 0);
+  fts_class_init(cl, sizeof( comment_t), comment_init, NULL);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, comment_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, comment_dump);
+  fts_class_method_varargs(cl, fts_s_dump, comment_dump);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save_dotpat, comment_save_dotpat); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_gui, comment_update_gui); 
+  fts_class_method_varargs(cl, fts_s_save_dotpat, comment_save_dotpat); 
+  fts_class_method_varargs(cl, fts_s_update_gui, comment_update_gui); 
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_comment, comment_set_text);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_color, comment_set_color); 
+  fts_class_method_varargs(cl, fts_s_comment, comment_set_text);
+  fts_class_method_varargs(cl, fts_s_color, comment_set_color); 
 
   /* property daemon for compatibilty with older bmax files */
   fts_class_add_daemon(cl, obj_property_put, fts_s_comment, comment_put_text);
-
-  return fts_ok;
 }
 
 void 

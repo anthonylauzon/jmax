@@ -499,53 +499,33 @@ fft_setphase(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  *
  */
 
-static fts_status_t
-fft_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+fft_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fft_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(fft_t), fft_init, fft_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fft_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fft_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, fft_put);
+  fts_class_method_varargs(cl, fts_s_put, fft_put);
   
-  fts_method_define_varargs(cl, 0, fts_s_bang, fft_bang);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("setphase"), fft_setphase);
+  fts_class_method_varargs(cl, fts_s_bang, fft_bang);
+  fts_class_method_varargs(cl, fts_new_symbol("setphase"), fft_setphase);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-  
-  return fts_ok;
-}
+  }
 
-static fts_status_t
-ifft_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+ifft_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fft_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(fft_t), ifft_init, fft_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, ifft_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fft_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, ifft_put);
+  fts_class_method_varargs(cl, fts_s_put, ifft_put);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, fft_bang);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("setphase"), fft_setphase);
+  fts_class_method_varargs(cl, fts_s_bang, fft_bang);
+  fts_class_method_varargs(cl, fts_new_symbol("setphase"), fft_setphase);
 
-  return fts_ok;
-}
-
-static int
-fft_class_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
-{
-  fts_symbol_t type0 = 0, type1 = 0;
-  fts_symbol_t real_spec0 = 0, real_spec1 = 0;
-
-  if(
-     !check_args(ac0, at0, &type0, &real_spec0) ||
-     !check_args(ac1, at1, &type1, &real_spec1)
-     )
-    return 1; /* check failed --> don't instantiate new class! */
-  else
-    return (type0 == type1 && real_spec0 == real_spec1);
-}
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
+  }
 
 void
 fft_ispw_config(void)

@@ -505,39 +505,30 @@ pitch_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t 
-class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+class_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(pitch_t), 1, 4, 0);
-  pt_common_instantiate(cl);
+  fts_class_init(cl, sizeof(pitch_t), pitch_init, pitch_delete);
 
-  /* the system methods */
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, pitch_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, pitch_delete);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, pitch_put);
+  fts_class_method_varargs(cl, fts_s_put, pitch_put);
   
   /* class' own methods */
-  fts_method_define_varargs(cl, 0, fts_new_symbol("vibrato"), pitch_vibrato);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("max-error"), pitch_max_error);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("reattack"), pitch_reattack);
+  fts_class_method_varargs(cl, fts_new_symbol("vibrato"), pitch_vibrato);
+  fts_class_method_varargs(cl, fts_new_symbol("max-error"), pitch_max_error);
+  fts_class_method_varargs(cl, fts_new_symbol("reattack"), pitch_reattack);
   
-  fts_method_define_varargs(cl, 0, fts_new_symbol("loud"), pitch_loud);
-  fts_method_define_varargs(cl, 0, fts_s_print, pitch_print);
+  fts_class_method_varargs(cl, fts_new_symbol("loud"), pitch_loud);
+  fts_class_method_varargs(cl, fts_s_print, pitch_print);
 
-  /* classes signal inlets and outlets */
   fts_dsp_declare_inlet(cl, 0);
 
-  /* classes outlets */
-  fts_outlet_type_define_varargs(cl, 0, fts_s_float);
-  fts_outlet_type_define_varargs(cl, 1, fts_s_bang);
-  fts_outlet_type_define_varargs(cl, 2, fts_s_float);
-  fts_outlet_type_define_varargs(cl, 3, fts_s_float);
+  fts_class_outlet_float(cl, 0);
+  fts_class_outlet_bang(cl, 1);
+  fts_class_outlet_float(cl, 2);
+  fts_class_outlet_float(cl, 3);
 
   dsp_symbol = fts_new_symbol(DSP_NAME);
   fts_dsp_declare_function(dsp_symbol, pt_common_dsp_function);
-
-  return(fts_ok);
 }
 
 void 

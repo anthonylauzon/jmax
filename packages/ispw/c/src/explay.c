@@ -281,31 +281,27 @@ explay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 
-static fts_status_t
-explay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+explay_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(explay_t), 2, 5, 0); 
+  fts_class_init(cl, sizeof(explay_t), explay_init, NULL);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, explay_init);
+  fts_class_method_varargs(cl, fts_s_bang, explay_bang);
+  fts_class_inlet_int(cl, 0, explay_number);
+  fts_class_inlet_float(cl, 0, explay_number);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, explay_bang);
-  fts_method_define_varargs(cl, 0, fts_s_int, explay_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, explay_number);
+  fts_class_inlet_int(cl, 1, explay_number_1);
+  fts_class_inlet_float(cl, 1, explay_number_1);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, explay_number_1);
-  fts_method_define_varargs(cl, 1, fts_s_float, explay_number_1);
+  fts_class_method_varargs(cl, fts_s_set, explay_set);
+  fts_class_method_varargs(cl, fts_new_symbol("nth"), explay_nth);
+  fts_class_method_varargs(cl, fts_new_symbol("startat"), explay_startat);
 
-  fts_method_define_varargs(cl, 0, fts_s_set, explay_set);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("nth"), explay_nth);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("startat"), explay_startat);
-
-  fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
-  fts_outlet_type_define_varargs(cl, 1,	fts_s_int);
-  fts_outlet_type_define_varargs(cl, 2,	fts_s_int);
-  fts_outlet_type_define_varargs(cl, 3,	fts_s_int);
-  fts_outlet_type_define_varargs(cl, 4,	fts_s_int);
-
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
+  fts_class_outlet_int(cl, 1);
+  fts_class_outlet_int(cl, 2);
+  fts_class_outlet_int(cl, 3);
+  fts_class_outlet_int(cl, 4);
 }
 
 void

@@ -378,24 +378,20 @@ iir_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-iir_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+iir_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(iir_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(iir_t), iir_init, iir_delete);
+
+  fts_class_method_varargs(cl, fts_s_put, iir_put);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, iir_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, iir_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, iir_put);
-  
-  fts_method_define_varargs(cl, 0, fts_s_clear, iir_clear);
+  fts_class_method_varargs(cl, fts_s_clear, iir_clear);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
   
-  fts_method_define_varargs(cl, 1, fts_s_int, iir_set_coef);
-  fts_method_define_varargs(cl, 1, fts_s_float, iir_set_coef);
-
-  return fts_ok;
+  fts_class_inlet_int(cl, 1, iir_set_coef);
+  fts_class_inlet_float(cl, 1, iir_set_coef);
 }
 
 void

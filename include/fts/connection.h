@@ -21,18 +21,7 @@
  */
 
 
-FTS_API fts_metaclass_t *fts_connection_type;
-
-typedef enum fts_connection_type
-{
-  fts_c_order_forcing = -2, /* order forcing */
-  fts_c_hidden = -1, /* hidden connection */
-  fts_c_invalid = 0, /* from error object or type missmatch */
-  fts_c_anything = 1, /* message which is not one of the following */
-  fts_c_atom = 2, /* single atom (value) */
-  fts_c_object = 3, /* objects */
-  fts_c_signal = 4 /* signal connection */
-} fts_connection_type_t;
+FTS_API fts_metaclass_t *fts_connection_metaclass;
 
 struct fts_connection
 {
@@ -44,10 +33,11 @@ struct fts_connection
   fts_object_t *dst;
   int winlet;
 
-  fts_symbol_t symb; /* the message cache: the symbol: if null, means anything ! */
-  fts_method_t mth; /* the message  cache: the method */
+  fts_symbol_t selector; /* cache message selector */
+  fts_metaclass_t *class; /* message cache class (type, NULL == varargs) */
+  fts_method_t method; /* message cache method */
 
-  fts_connection_type_t type; /* user visible connection type */
+  fts_connection_type_t type;
 
   fts_connection_t *next_same_dst;
   fts_connection_t *next_same_src;
@@ -58,7 +48,7 @@ FTS_API fts_connection_t *fts_connection_new(fts_object_t *src, int out, fts_obj
 FTS_API void fts_connection_delete(fts_connection_t *conn);
 FTS_API fts_connection_t *fts_connection_get(fts_object_t *src, int out, fts_object_t *dst, int in);
 
-#define fts_is_connection(p) (fts_object_get_metaclass(p) == fts_connection_type)
+#define fts_is_connection(p) (fts_object_get_metaclass(p) == fts_connection_metaclass)
 
 FTS_API void fts_object_trim_inlets_connections(fts_object_t *obj, int inlets);
 FTS_API void fts_object_trim_outlets_connections(fts_object_t *obj, int outlets);

@@ -81,7 +81,7 @@ param_call_listeners(fts_param_t *param)
 	}
       
       /* send from outlet */
-      fts_outlet_atoms((fts_object_t *)param, 0, n, a);
+      fts_outlet_varargs((fts_object_t *)param, 0, n, a);
     }
   else if(!fts_is_void(&param->value))
     {
@@ -95,7 +95,7 @@ param_call_listeners(fts_param_t *param)
 	}
       
       /* send from outlet */
-      fts_outlet_atom((fts_object_t *)param, 0, &param->value);
+      fts_outlet_varargs((fts_object_t *)param, 0, 1, &param->value);
     }
 }
 
@@ -163,18 +163,9 @@ param_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-param_input_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(ac == 1 && s == fts_get_selector(at))
-    param_input_atoms(o, 0, 0, ac, at);
-  else
-    fts_object_signal_runtime_error(o, "Don't understand message %s", s);
-}
-
-static void
 param_output_from_recieve(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_atoms(o, 0, ac, at);
+  fts_outlet_varargs(o, 0, ac, at);
 }
 
 static void
@@ -304,44 +295,35 @@ param_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prop
   fts_set_object(value, obj);
 }
 
-static fts_status_t
-param_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+param_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_param_t), 1, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, param_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, param_delete);
+  fts_class_init(cl, sizeof(fts_param_t), param_init, param_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, param_post);
+  fts_class_method_varargs(cl, fts_s_post, param_post);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_instance, param_set_from_instance);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, param_set_atoms);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, param_dump);
+  fts_class_method_varargs(cl, fts_s_set_from_instance, param_set_from_instance);
+  fts_class_method_varargs(cl, fts_s_set, param_set_atoms);
+  fts_class_method_varargs(cl, fts_s_dump, param_dump);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, param_get_array);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_array, param_set_atoms);
+  fts_class_method_varargs(cl, fts_s_get_array, param_get_array);
+  fts_class_method_varargs(cl, fts_s_set_from_array, param_set_atoms);
 
-  fts_method_define_varargs(cl,fts_system_inlet, fts_new_symbol("load_init"), param_update);
+  fts_class_method_varargs(cl, fts_new_symbol("load_init"), param_update);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_input, param_input_atoms);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_add_listener, param_add_listener);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_remove_listener, param_remove_listener);
+  fts_class_method_varargs(cl, fts_s_input, param_input_atoms);
+  fts_class_method_varargs(cl, fts_s_add_listener, param_add_listener);
+  fts_class_method_varargs(cl, fts_s_remove_listener, param_remove_listener);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, param_update);
-
-  fts_method_define_varargs(cl, 0, fts_s_int, param_input_atoms);
-  fts_method_define_varargs(cl, 0, fts_s_float, param_input_atoms);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, param_input_atoms);
-  fts_method_define_varargs(cl, 0, fts_s_list, param_input_atoms);
-  fts_method_define_varargs(cl, 0, fts_s_anything, param_input_anything);
-
-  fts_method_define_varargs(cl, 0, fts_s_clear, param_clear);
+  fts_class_method_varargs(cl, fts_s_bang, param_update);
+  fts_class_method_varargs(cl, fts_s_clear, param_clear);
   
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, param_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, param_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, param_get_state);
   
-  return fts_ok;
+  fts_class_inlet_varargs(cl, 0, param_input_atoms);
+  fts_class_outlet_varargs(cl, 0);
 }
 
 /***********************************************************************

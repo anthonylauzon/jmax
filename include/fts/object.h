@@ -59,7 +59,6 @@ struct fts_object
   int refcnt;
 };
 
-
 FTS_API fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int ac, const fts_atom_t *at);
 
 /* create/destroy object without patcher */
@@ -99,7 +98,6 @@ FTS_API fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 #define fts_object_get_id(o) ((o)->head.id)
 #define fts_object_get_class(o) ((o)->head.cl)
 #define fts_object_get_metaclass(o) ((o)->head.cl->mcl)
-#define fts_object_get_user_data(o) ((o)->head.cl->user_data)
 
 /* test recursively if an object is inside a patcher (or its subpatchers) */
 FTS_API int fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher);

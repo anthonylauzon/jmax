@@ -41,7 +41,7 @@ sysexin_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
 
-  fts_outlet_atoms(o, 0, fts_midievent_system_exclusive_get_size(event), fts_midievent_system_exclusive_get_atoms(event));
+  fts_outlet_varargs(o, 0, fts_midievent_system_exclusive_get_size(event), fts_midievent_system_exclusive_get_atoms(event));
 }
 
 static void
@@ -79,18 +79,13 @@ sysexin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     fts_midiport_remove_listener(this->port, midi_system_exclusive, midi_channel_any, midi_controller_any, o);
 }
 
-static fts_status_t
-sysexin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sysexin_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(sysex_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(sysex_t), sysexin_init, sysexin_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sysexin_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sysexin_delete);
-
-  fts_method_define_varargs(cl, 0, fts_s_midievent, sysexin_output);
-  
-  return fts_ok;
-}
+  fts_class_method_varargs(cl, fts_s_midievent, sysexin_output);
+  }
 
 /************************************************************
  *
@@ -104,10 +99,14 @@ sysexout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   sysex_t *this = (sysex_t *)o;
   fts_midievent_t *event = fts_midievent_system_exclusive_new(ac, at);
 
+  fts_object_refer((fts_object_t *)event);
+
   if(this->port)
     fts_midiport_output(this->port, event, 0.0);
   else
     fts_outlet_object((fts_object_t *)this, 0, (fts_object_t *)event);
+
+  fts_object_release((fts_object_t *)event);
 }
 
 static void
@@ -138,19 +137,15 @@ sysexout_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   sysex_t *this = (sysex_t *)o;
 }
 
-static fts_status_t
-sysexout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sysexout_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(sysex_t), 1, 1, 0);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sysexout_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sysexout_delete);
+  fts_class_init(cl, sizeof(sysex_t), sysexout_init, sysexout_delete);
   
-  fts_method_define_varargs(cl, 0, fts_s_int, sysexout_send);
-  fts_method_define_varargs(cl, 0, fts_s_float, sysexout_send);
-  fts_method_define_varargs(cl, 0, fts_s_list, sysexout_send);
-  
-  return fts_ok;
-}
+  fts_class_inlet_int(cl, 0, sysexout_send);
+  fts_class_inlet_float(cl, 0, sysexout_send);
+  fts_class_inlet_varargs(cl, 0, sysexout_send);
+  }
 
 void
 sysex_config(void)

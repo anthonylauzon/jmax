@@ -59,7 +59,9 @@ int fts_atom_compare( const fts_atom_t *p1, const fts_atom_t *p2)
 {
   if (fts_atom_same_type( p1, p2))
     {
-      if (fts_is_number( p1))
+      if (fts_is_int( p1))
+	return fts_get_number_int( p1) == fts_get_number_int( p2);
+      else if (fts_is_float( p1))
 	return fts_get_number_float( p1) == fts_get_number_float( p2);
       else if ( fts_is_symbol( p1))
 	return fts_get_symbol( p1) == fts_get_symbol( p2);
@@ -164,12 +166,11 @@ fts_metaclass_t *fts_t_string = &string_metaclass;
 
 void fts_kernel_atom_init( void)
 {
-  fts_metaclass_set_selector( &int_metaclass, fts_s_int);
-  fts_metaclass_set_selector( &float_metaclass, fts_s_float);
-  fts_metaclass_set_selector( &symbol_metaclass, fts_s_symbol);
-  fts_metaclass_set_selector( &pointer_metaclass, fts_s_pointer);
-  fts_metaclass_set_selector( &string_metaclass, fts_s_string);
+  fts_metaclass_set_name( &int_metaclass, fts_s_int);
+  fts_metaclass_set_name( &float_metaclass, fts_s_float);
+  fts_metaclass_set_name( &symbol_metaclass, fts_s_symbol);
+  fts_metaclass_set_name( &pointer_metaclass, fts_s_pointer);
+  fts_metaclass_set_name( &string_metaclass, fts_s_string);
 
   fts_set_void( &__fts_null);
 }
-

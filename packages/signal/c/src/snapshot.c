@@ -96,22 +96,20 @@ snapshot_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-snapshot_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+snapshot_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(snapshot_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(snapshot_t), snapshot_init, snapshot_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, snapshot_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, snapshot_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, snapshot_put);
+  fts_class_method_varargs(cl, fts_s_put, snapshot_put);
   
-  fts_method_define_varargs(cl, 0, fts_s_int, snapshot_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, snapshot_number);
-  fts_method_define_varargs(cl, 0, fts_s_bang, snapshot_bang);
-  
+  fts_class_method_varargs(cl, fts_s_bang, snapshot_bang);
+
   fts_dsp_declare_inlet(cl, 0);
 
-  return fts_ok;
+  fts_class_inlet_number(cl, 0, snapshot_number);
+  
+  fts_class_outlet_float(cl, 0);
 }
 
 void

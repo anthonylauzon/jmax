@@ -32,19 +32,7 @@
 #include "pt_tools.h"
 #include "pt_meth.h"
 
-#define CLASS_NAME "pt~"
-#define ALIAS_NAME "pitchtrack~"
-#define DSP_NAME "_pt"
-
-#define INLET_sig 0
-#define N_INLETS 1
-
-#define OUTLET_midi 0
-#define OUTLET_freq 1
-#define N_OUTLETS 2
-
-/* shared by all objects of class */
-static fts_symbol_t dsp_symbol = 0;
+static fts_symbol_t sym_pt_tilda = 0;
 
 typedef struct
 {
@@ -85,7 +73,7 @@ static void pt_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 {
   pt_t *x = (pt_t *)o;
 
-  fts_outlet_int(o, OUTLET_midi, x->out.pitch);
+  fts_outlet_int(o, 0, x->out.pitch);
 }
 
 /*************************************************
@@ -199,7 +187,7 @@ static void analysis(fts_object_t *o)
 static void pt_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pt_t *x = (pt_t *)o;
-  fts_outlet_float(o, OUTLET_freq, x->out.freq);
+  fts_outlet_float(o, 1, x->out.freq);
 }
 
 static void pt_gliss_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -241,7 +229,7 @@ static void pt_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 	
   x->ctl.print_me = (n > 0)? n: 0;
 	
-  post("%s:\n", CLASS_NAME);
+  post("pt~:\n");
   post("  gliss-time %d\n", (int)x->ctl.gliss_time);
   post("  reattack %f %d\n", x->ctl.reattack_slope_thresh, (int)x->ctl.reattack_time);
 	
@@ -273,7 +261,7 @@ static void dsp_fun_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_set_pointer(a+1, analysis);
   fts_set_symbol(a+2, fts_dsp_get_input_name(dsp, 0));
   fts_set_int(a+3, fts_dsp_get_input_size(dsp, 0));
-  fts_dsp_add_function(dsp_symbol, 4, a);
+  fts_dsp_add_function(sym_pt_tilda, 4, a);
 }
 
 static void pt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -314,40 +302,31 @@ static void pt_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t pt_class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void pt_class_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(pt_t), N_INLETS, N_OUTLETS, 0);
-  pt_common_instantiate(cl);
-	
-  /* the system methods */
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, pt_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, pt_delete);
+  fts_class_init(cl, sizeof(pt_t), pt_init, pt_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, dsp_fun_put);
+  fts_class_method_varargs(cl, fts_s_put, dsp_fun_put);
 	
-  /* class' own methods */
-  fts_method_define_varargs(cl, 0, fts_s_bang, pt_bang);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("gliss-time"), pt_gliss_time);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("reattack"), pt_reattack);
+  fts_class_method_varargs(cl, fts_s_bang, pt_bang);
+  fts_class_method_varargs(cl, fts_new_symbol("gliss-time"), pt_gliss_time);
+  fts_class_method_varargs(cl, fts_new_symbol("reattack"), pt_reattack);
+  fts_class_method_varargs(cl, fts_s_print, pt_print);
 	
-  fts_method_define_varargs(cl, 0, fts_s_print, pt_print);
-	
-  /* classes signal inlets and outlets */
-  fts_dsp_declare_inlet(cl, INLET_sig);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_class_outlet_number(cl, 0);
 
-  /* classes outlets */
-  fts_outlet_type_define_varargs(cl, OUTLET_midi, fts_s_int);
-  fts_outlet_type_define_varargs(cl, OUTLET_freq, fts_s_float);
-
-  dsp_symbol = fts_new_symbol(DSP_NAME);
-  fts_dsp_declare_function(dsp_symbol, pt_common_dsp_function);
-
-  return(fts_ok);
+  fts_dsp_declare_function(sym_pt_tilda, pt_common_dsp_function);
 }
 
 void
 pt_config(void)
 {
-  fts_metaclass_t *mcl = fts_class_install(fts_new_symbol(CLASS_NAME), pt_class_instantiate);
-  fts_class_alias(mcl, fts_new_symbol(ALIAS_NAME));
+  fts_metaclass_t *thiscl;
+
+  sym_pt_tilda = fts_new_symbol("pt~");
+  fts_dsp_declare_function(sym_pt_tilda, pt_common_dsp_function);  
+
+  thiscl = fts_class_install(sym_pt_tilda, pt_class_instantiate);
+  fts_class_alias(thiscl, fts_new_symbol("pitchtrack~"));
 }

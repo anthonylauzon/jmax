@@ -147,31 +147,26 @@ samppeek_set_by_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
  *
  */
  
-static fts_status_t
-class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+samppeek_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(samppeek_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(samppeek_t), samppeek_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, samppeek_init);
+  fts_class_method_varargs(cl, fts_s_init, samppeek_mess_init);
+  fts_class_method_varargs(cl, fts_s_set, samppeek_set);
 
-  fts_method_define_varargs(cl, 0,  fts_s_init, samppeek_mess_init);
+  fts_class_inlet_int(cl, 0, samppeek_int);
+  fts_class_inlet_float(cl, 0, samppeek_float);
 
-  fts_method_define_varargs(cl, 0, fts_s_set, samppeek_set);
+  fts_class_inlet_int(cl, 1, samppeek_set_by_int);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, samppeek_int);
-  fts_method_define_varargs(cl, 0, fts_s_float, samppeek_float);
-
-  fts_method_define_varargs(cl, 1, fts_s_int, samppeek_set_by_int);
-
-  fts_outlet_type_define_varargs(cl, 0, fts_s_float);
-
-  return fts_ok;
+  fts_class_outlet_float(cl, 0);
 }
 
 void
 samppeek_config(void)
 {
-  fts_metaclass_t *mcl = fts_class_install(fts_new_symbol("samppeek"), class_instantiate);
+  fts_metaclass_t *mcl = fts_class_install(fts_new_symbol("samppeek"), samppeek_instantiate);
   fts_class_alias(mcl, fts_new_symbol("samppeek~"));
 }
 

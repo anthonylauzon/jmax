@@ -151,14 +151,12 @@ sigapass3_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-sigapass3_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sigapass3_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(sigapass3_t), 3, 1, 0); 
+  fts_class_init(cl, sizeof(sigapass3_t), sigapass3_init, sigapass3_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sigapass3_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sigapass3_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, sigapass3_put);
+  fts_class_method_varargs(cl, fts_s_put, sigapass3_put);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_inlet(cl, 1);
@@ -167,8 +165,6 @@ sigapass3_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   sigapass3_function = fts_new_symbol("apass3");
   fts_dsp_declare_function(sigapass3_function, ftl_apass3);
-
-  return fts_ok;
 }
 
 void

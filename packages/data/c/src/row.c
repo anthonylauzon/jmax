@@ -92,12 +92,6 @@ row_set_from_atoms(row_t *this, int onset, int ac, const fts_atom_t *at)
  */
 
 static void
-row_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_outlet_object(o, 0, o);
-}
-
-static void
 row_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   row_t *this = (row_t *)o;
@@ -177,25 +171,16 @@ row_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_object_release((fts_object_t *)this->mat);
 }
 
-static fts_status_t
-row_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+row_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(row_t), 1, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, row_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, row_delete);
+  fts_class_init(cl, sizeof(row_t), row_init, row_delete);
   
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, row_getobj);
   
-  fts_method_define_varargs(cl, 0, fts_s_bang, row_output);
-  
-  fts_method_define_varargs(cl, 0, fts_s_fill, row_fill);      
-  fts_method_define_varargs(cl, 0, fts_s_set, row_set);
-  
-  fts_outlet_type_define(cl, 0, row_symbol);
-  
-  return fts_ok;
-}
+  fts_class_method_varargs(cl, fts_s_fill, row_fill);      
+  fts_class_method_varargs(cl, fts_s_set, row_set);
+  }
 
 void
 row_config(void)

@@ -132,7 +132,7 @@ matdisplay_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void 
-matdisplay_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   /* todo: same as matdisplay_fvec */
 
@@ -541,37 +541,28 @@ matdisplay_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fts_array_destroy(&this->a);
 }
 
-static fts_status_t 
-matdisplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+matdisplay_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(matdisplay_t), 1, 0, 0);
+  fts_class_init(cl, sizeof(matdisplay_t), matdisplay_init, matdisplay_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, matdisplay_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, matdisplay_delete);
+  fts_class_method_varargs(cl, fts_s_update_gui, matdisplay_update_gui); 
+  fts_class_method_varargs(cl, fts_s_update_real_time, matdisplay_update_real_time); 
+  fts_class_method_varargs(cl, fts_s_dump, matdisplay_dump);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_gui, matdisplay_update_gui); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, matdisplay_dump);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, matdisplay_update_real_time); 
+  fts_class_method_varargs(cl, sym_window, matdisplay_set_window_size_by_client);
+  fts_class_method_varargs(cl, sym_zoom, matdisplay_set_zoom_by_client);
 
-  fts_method_define_varargs(cl, fts_system_inlet, sym_window, matdisplay_set_window_size_by_client);
-  fts_method_define_varargs(cl, fts_system_inlet, sym_zoom, matdisplay_set_zoom_by_client);
-
-  fts_method_define_varargs(cl, fts_system_inlet, sym_range, matdisplay_set_range);
-  fts_method_define_varargs(cl, 0, sym_range, matdisplay_set_range);
+  fts_class_method_varargs(cl, sym_range, matdisplay_set_range);
+  fts_class_method_varargs(cl, sym_color, matdisplay_set_color);
+  fts_class_method_varargs(cl, fts_s_clear, matdisplay_clear);
  
-  fts_method_define_varargs(cl, fts_system_inlet, sym_color, matdisplay_set_color);
-  fts_method_define_varargs(cl, 0, sym_color, matdisplay_set_color);
- 
-  fts_method_define_varargs(cl, 0, fts_s_int, matdisplay_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, matdisplay_number);
-  fts_method_define_varargs(cl, 0, fts_s_list, matdisplay_list);
-  fts_method_define_varargs(cl, 0, fvec_symbol, matdisplay_fvec);
-  fts_method_define_varargs(cl, 0, ivec_symbol, matdisplay_ivec);
-  fts_method_define_varargs(cl, 0, cvec_symbol, matdisplay_cvec);
-  fts_method_define_varargs(cl, 0, fmat_symbol, matdisplay_fmat);
-  fts_method_define_varargs(cl, 0, fts_s_clear, matdisplay_clear);
-
-  return fts_ok;
+  fts_class_inlet_number(cl, 0, matdisplay_number);
+  fts_class_inlet_varargs(cl, 0, matdisplay_varargs);
+  fts_class_inlet(cl, 0, fvec_type, matdisplay_fvec);
+  fts_class_inlet(cl, 0, ivec_type, matdisplay_ivec);
+  fts_class_inlet(cl, 0, cvec_type, matdisplay_cvec);
+  fts_class_inlet(cl, 0, fmat_type, matdisplay_fmat);
 }
 
 void 

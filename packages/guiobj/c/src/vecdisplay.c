@@ -438,34 +438,28 @@ vecdisplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   this->scroll = 0;
 }
 
-static fts_status_t 
-vecdisplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+vecdisplay_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(vecdisplay_t), 1, 0, 0);
+  fts_class_init(cl, sizeof(vecdisplay_t), vecdisplay_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, vecdisplay_init);
+  fts_class_method_varargs(cl, fts_s_dump, vecdisplay_dump);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, vecdisplay_dump);
+  fts_class_method_varargs(cl, fts_s_update_gui, vecdisplay_update_gui); 
+  fts_class_method_varargs(cl, fts_s_update_real_time, vecdisplay_update_real_time); 
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_gui, vecdisplay_update_gui); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, vecdisplay_update_real_time); 
+  fts_class_method_varargs(cl, fts_s_size, vecdisplay_set_size_by_client);
+  fts_class_method_varargs(cl, fts_new_symbol("range"), vecdisplay_set_range_by_client);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_size, vecdisplay_set_size_by_client);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("range"), vecdisplay_set_range_by_client);
-
-  fts_method_define_varargs(cl, fts_system_inlet, sym_bounds, vecdisplay_set_bounds);
-
-  fts_method_define_varargs(cl, 0, sym_bounds, vecdisplay_set_bounds);
+  fts_class_method_varargs(cl, sym_bounds, vecdisplay_set_bounds);
+  fts_class_method_varargs(cl, fts_s_clear, vecdisplay_clear);
   
-  fts_method_define_varargs(cl, 0, fts_s_int, vecdisplay_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, vecdisplay_number);
-  fts_method_define_varargs(cl, 0, fts_s_list, vecdisplay_list);
-  fts_method_define_varargs(cl, 0, ivec_symbol, vecdisplay_ivec);
-  fts_method_define_varargs(cl, 0, fvec_symbol, vecdisplay_fvec);
-  fts_method_define_varargs(cl, 0, cvec_symbol, vecdisplay_cvec);
-  fts_method_define_varargs(cl, 0, fts_s_clear, vecdisplay_clear);
-
-  return fts_ok;
+  fts_class_inlet_int(cl, 0, vecdisplay_number);
+  fts_class_inlet_float(cl, 0, vecdisplay_number);
+  fts_class_inlet_varargs(cl, 0, vecdisplay_list);
+  fts_class_inlet(cl, 0, ivec_type, vecdisplay_ivec);
+  fts_class_inlet(cl, 0, fvec_type, vecdisplay_fvec);
+  fts_class_inlet(cl, 0, cvec_type, vecdisplay_cvec);
 }
 
 void 

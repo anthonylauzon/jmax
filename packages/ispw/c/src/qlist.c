@@ -108,20 +108,14 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 		}
 
 	      if (count == 1)
-		fts_outlet_primitive(o, 0, av);
+		fts_outlet_varargs(o, 0, 1, av);
 	      else 
 		{
 		  if (count > 10)
 		    count = 10;
 
-		  fts_outlet_atoms(o, 0, count, waka);
+		  fts_outlet_varargs(o, 0, count, waka);
 		}
-	      break;
-	    }
-	  else if (fts_is_int(av))
-	    {
-	      fts_outlet_primitive(o, 0, av);
-
 	      break;
 	    }
 	}
@@ -424,39 +418,31 @@ qlist_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     }
 }
 
-static fts_status_t
-qlist_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+qlist_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(qlist_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(qlist_t), qlist_init, qlist_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, qlist_init);
+  fts_class_method_varargs(cl, fts_s_upload, qlist_upload);
+  fts_class_method_varargs(cl, fts_s_dump, qlist_dump);
+  fts_class_method_varargs(cl, fts_s_save_dotpat, qlist_save_dotpat); 
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, qlist_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_upload, qlist_upload);
+  fts_class_method_varargs(cl, fts_s_openEditor, qlist_open_editor);
+  fts_class_method_varargs(cl, fts_s_destroyEditor, qlist_destroy_editor);
+  fts_class_method_varargs(cl, fts_s_closeEditor, qlist_close_editor); 
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_clear, qlist_clear);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, qlist_dump);
+  fts_class_method_varargs(cl, fts_new_symbol("rewind"), qlist_rewind);
+  fts_class_method_varargs(cl, fts_new_symbol("flush"), qlist_flush);
+  fts_class_method_varargs(cl, fts_s_clear, qlist_clear);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save_dotpat, qlist_save_dotpat); 
+  fts_class_method_varargs(cl, fts_new_symbol("next"), qlist_next);
+  fts_class_method_varargs(cl, fts_new_symbol("read"), qlist_read);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_append, qlist_append);
+  fts_class_method_varargs(cl, fts_s_set, qlist_set);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_openEditor, qlist_open_editor);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_destroyEditor, qlist_destroy_editor);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_closeEditor, qlist_close_editor); 
+  fts_class_method_varargs(cl, fts_s_append, qlist_append);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("rewind"), qlist_rewind);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("flush"), qlist_flush);
-  fts_method_define_varargs(cl, 0, fts_s_clear, qlist_clear);
-
-  fts_method_define_varargs(cl, 0, fts_new_symbol("next"), qlist_next);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("read"), qlist_read);
-
-  fts_method_define_varargs(cl, 0, fts_s_set, qlist_set);
-
-  fts_method_define_varargs(cl, 0, fts_s_append, qlist_append);
-
-  return fts_ok;
+  fts_class_outlet_anything(cl, 0);
 }
 
 

@@ -35,7 +35,7 @@ typedef struct
 } select_t;
 
 static void
-select_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+select_input_single(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   select_t *this = (select_t *)o;
   int n = fts_array_get_size(&this->compare);
@@ -51,31 +51,28 @@ select_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	}
     }
 
-  fts_outlet_atom(o, n, at);
+  fts_outlet_varargs(o, n, 1, at);
 }
 
 static void
-select_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+select_input_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   select_t *this = (select_t *)o;
-  fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
-  fts_atom_t a;
-  
-  fts_set_object(&a, (fts_object_t *)tuple);
-  select_atom(o, 0, 0, 1, &a);
-}
 
-static void
-select_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(ac > 0 && s == fts_get_selector(at))
-    select_atom(o, 0, 0, ac, at);
+  if(ac == 1)
+    select_input_single(o, 0, 0, 1, at);
   else
-    fts_object_signal_runtime_error(o, "Don't understand message %s", s);
+    {
+      fts_object_t *tuple = fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_atom_t a;
+      
+      fts_set_object(&a, tuple);
+      select_input_single(o, 0, 0, 1, &a);
+    }
 }
 
 static void
-select_set_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+select_set_single(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   select_t *this = (select_t *)o;
   fts_atom_t *a = fts_array_get_atoms(&this->compare);
@@ -84,12 +81,20 @@ select_set_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-select_set_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+select_set_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if(ac > 0 && s == fts_get_selector(at))
-    select_set_atom(o, winlet, 0, ac, at);
+  select_t *this = (select_t *)o;
+
+  if(ac == 1)
+    select_set_single(o, winlet, 0, 1, at);
   else
-    fts_object_signal_runtime_error(o, "Don't understand message %s", s);
+    {
+      fts_object_t *tuple = fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_atom_t a;
+      
+      fts_set_object(&a, tuple);
+      select_set_single(o, winlet, 0, 1, &a);
+    }
 }
 
 /***************************************
@@ -127,20 +132,21 @@ select_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_array_destroy(&this->compare);
 }
 
-static fts_status_t 
-select_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+select_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(select_t), 2, 2, 0);
+  fts_class_init(cl, sizeof(select_t), select_init, select_delete);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, select_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, select_delete);
-  
-  fts_method_define_varargs(cl, 0, fts_s_anything, select_anything);
-  fts_method_define_varargs(cl, 0, fts_s_list, select_tuple);
+  fts_class_inlet_varargs(cl, 0, select_input_varargs);
+  fts_class_inlet_number(cl, 0, select_input_single);
+  fts_class_inlet_symbol(cl, 0, select_input_single);
 
-  fts_method_define_varargs(cl, 1, fts_s_anything, select_set_anything);
+  fts_class_inlet_varargs(cl, 1, select_set_varargs);
+  fts_class_inlet_number(cl, 1, select_set_single);
+  fts_class_inlet_symbol(cl, 1, select_set_single);
 
-  return fts_ok;
+  fts_class_outlet_bang(cl, 0);
+  fts_class_outlet_varargs(cl, 1);
 }
 
 void

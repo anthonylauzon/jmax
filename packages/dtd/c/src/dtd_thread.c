@@ -104,18 +104,15 @@ dtd_thread_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
     self->sf = 0;
 }
 
-static fts_status_t
+static void
 dtd_thread_instantiate(fts_class_t* cl, int ac, const fts_atom_t* at)
 {
-    fts_class_init(cl, sizeof(dtd_thread_t), 1, 0, 0);
+    fts_class_init(cl, sizeof(dtd_thread_t), dtd_thread_init, dtd_thread_delete);
+    fts_class_method_varargs(cl, fts_s_write, dtd_thread_write);
+    fts_class_method_varargs(cl, fts_s_read, dtd_thread_read);
 
-    fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, dtd_thread_init);
-    fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, dtd_thread_delete);
-    fts_method_define_varargs(cl, fts_system_inlet, fts_s_write, dtd_thread_write);
-    fts_method_define_varargs(cl, fts_system_inlet, fts_s_read, dtd_thread_read);
-
-    fts_method_define_varargs(cl, 0, fts_s_write, dtd_thread_write);
-    fts_method_define_varargs(cl, 0, fts_s_read, dtd_thread_read);
+    fts_class_method_varargs(cl, fts_s_write, dtd_thread_write);
+    fts_class_method_varargs(cl, fts_s_read, dtd_thread_read);
     return fts_ok;
 }
 

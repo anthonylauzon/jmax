@@ -106,12 +106,6 @@ cvec_copy(cvec_t *org, cvec_t *copy)
  */
 
 static void
-cvec_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_outlet_object(o, 0, o);
-}
-
-static void
 cvec_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   cvec_t *this = (cvec_t *)o;
@@ -674,49 +668,37 @@ cvec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     fts_free(this->values);
 }
 
-static fts_status_t
-cvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+cvec_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(cvec_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(cvec_t), cvec_init, cvec_delete);
   
-  /* init / delete */
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, cvec_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, cvec_delete);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, cvec_post); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, cvec_print); 
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, cvec_set_elements);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_instance, cvec_set_from_instance);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_size, cvec_size);
+  fts_class_method_varargs(cl, fts_s_post, cvec_post); 
+  fts_class_method_varargs(cl, fts_s_print, cvec_print); 
+  fts_class_method_varargs(cl, fts_s_set_from_instance, cvec_set_from_instance);
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, cvec_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, cvec_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, cvec_get_state);
   
-  fts_method_define_varargs(cl, 0, fts_s_bang, cvec_output);
-  
-  fts_method_define_varargs(cl, 0, fts_s_fill, cvec_fill); 
-  fts_method_define_varargs(cl, 0, fts_s_set, cvec_set_elements);
+  fts_class_method_varargs(cl, fts_s_fill, cvec_fill); 
+  fts_class_method_varargs(cl, fts_s_set, cvec_set_elements);
 
-  fts_method_define_varargs(cl, 0, fts_s_assign, cvec_assign);
+  fts_class_method_varargs(cl, fts_s_assign, cvec_assign);
  
-  fts_method_define_varargs(cl, 0, fts_new_symbol("add"), cvec_add);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("sub"), cvec_sub);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("mul"), cvec_mul);
+  fts_class_method_varargs(cl, fts_new_symbol("add"), cvec_add);
+  fts_class_method_varargs(cl, fts_new_symbol("sub"), cvec_sub);
+  fts_class_method_varargs(cl, fts_new_symbol("mul"), cvec_mul);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("abs"), cvec_abs);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("log"), cvec_log);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("exp"), cvec_log);
+  fts_class_method_varargs(cl, fts_new_symbol("abs"), cvec_abs);
+  fts_class_method_varargs(cl, fts_new_symbol("log"), cvec_log);
+  fts_class_method_varargs(cl, fts_new_symbol("exp"), cvec_log);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("fft"), cvec_fft);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("ifft"), cvec_ifft);
+  fts_class_method_varargs(cl, fts_new_symbol("fft"), cvec_fft);
+  fts_class_method_varargs(cl, fts_new_symbol("ifft"), cvec_ifft);
 
-  fts_method_define_varargs(cl, 0, fts_s_size, cvec_size);
-  
-  return fts_ok;
-}
+  fts_class_method_varargs(cl, fts_s_size, cvec_size);
+  }
 
 /********************************************************************
  *

@@ -47,17 +47,6 @@ mess_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-mess_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  mess_t *this = (mess_t *)o;
-
-  if(ac == 1 && fts_get_selector(at) == s)
-    mess_atoms(o, 0, 0, 1, at);
-  else
-    fts_object_signal_runtime_error(o, "Don't understand message %s", s);
-}
-
-static void
 mess_set_selector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mess_t *this = (mess_t *)o;
@@ -77,23 +66,17 @@ mess_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     mess_set_selector(o, 0, 0, 1, at);
 }
 
-static fts_status_t
-mess_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+mess_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(mess_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(mess_t), mess_init, NULL);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, mess_init);
-  
-  fts_method_define_varargs(cl, 0, fts_s_bang, mess_atoms);
-  fts_method_define_varargs(cl, 0, fts_s_int, mess_atoms);
-  fts_method_define_varargs(cl, 0, fts_s_float, mess_atoms);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, mess_atoms);
-  fts_method_define_varargs(cl, 0, fts_s_list, mess_atoms);
-  fts_method_define_varargs(cl, 0, fts_s_anything, mess_anything);
-  
-  fts_method_define_varargs(cl, 1, fts_s_symbol, mess_set_selector);
+  fts_class_method_varargs(cl, fts_s_bang, mess_atoms);
 
-  return fts_ok;
+  fts_class_inlet_varargs(cl, 0, mess_atoms);  
+  fts_class_inlet_symbol(cl, 1, mess_set_selector);
+
+  fts_class_outlet_anything(cl, 0);
 }
 
 void

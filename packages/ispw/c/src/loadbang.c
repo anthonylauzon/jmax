@@ -37,16 +37,14 @@ loadbang_load_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_outlet_bang(o, 0);
 }
 
-static fts_status_t
-loadbang_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+loadbang_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(loadbang_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(loadbang_t), 0, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("load_init"), loadbang_load_init);
+  fts_class_method_varargs(cl, fts_new_symbol("load_init"), loadbang_load_init);
 
-  fts_outlet_type_define_varargs(cl, 0, fts_s_bang);
-
-  return fts_ok;
+  fts_class_outlet_bang(cl, 0);
 }
 
 

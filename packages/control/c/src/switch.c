@@ -53,11 +53,11 @@ switch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  */
 
 static void
-switch_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+switch_default(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   switch_t *this = (switch_t *)o;
 
-  if(this->on != 0)
+  if(winlet == 0 && this->on != 0)
     fts_outlet_send(o, 0, s, ac, at);
 }
 
@@ -74,19 +74,18 @@ switch_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  *  class
  *
  */
-static fts_status_t
-switch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+switch_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(switch_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(switch_t), switch_init, NULL);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, switch_init);
+  fts_class_inlet_varargs(cl, 0, switch_default);
+  fts_class_set_default_handler(cl, switch_default);
 
-  fts_method_define_varargs(cl, 0, fts_s_anything, switch_input);
+  fts_class_inlet_int(cl, 1, switch_set);
+  fts_class_inlet_float(cl, 1, switch_set);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, switch_set);
-  fts_method_define_varargs(cl, 1, fts_s_float, switch_set);
-
-  return fts_ok;
+  fts_class_outlet_anything(cl, 0);
 }
 
 void

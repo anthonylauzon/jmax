@@ -322,12 +322,6 @@ fvec_load_audiofile(fvec_t *vec, fts_symbol_t file_name, int onset, int n_read)
  */
 
 static void
-fvec_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_outlet_object(o, 0, o);
-}
-
-static void
 fvec_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
@@ -1155,9 +1149,7 @@ fvec_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
     {
       size = fvec_read_atom_file(this, file_name);
       
-      if(size > 0)
-	fvec_output(o, 0, 0, 0, 0);
-      else
+      if(size <= 0)
 	fts_object_signal_runtime_error(o, "cannot import from text file \"%s\"\n", file_name);
     }
   else
@@ -1211,9 +1203,6 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	size = fvec_read_atom_file(this, file_name);
       else
 	size = fvec_load_audiofile(this, file_name, onset, n_read);
-
-      if(size > 0)
-	fvec_output(o, 0, 0, 0, 0);
     }
   else
     {
@@ -1510,75 +1499,61 @@ fvec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     fts_free(this->values - FTS_CUBIC_HEAD);
 }
 
-static fts_status_t
-fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+fvec_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fvec_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(fvec_t), fvec_init, fvec_delete);
   
-  /* init / delete */
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fvec_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fvec_delete);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, fvec_post); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, fvec_print); 
+  fts_class_method_varargs(cl, fts_s_post, fvec_post); 
+  fts_class_method_varargs(cl, fts_s_print, fvec_print); 
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, fvec_set_elements);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_instance, fvec_set_from_instance);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_array, fvec_set_from_array);
+  fts_class_method_varargs(cl, fts_s_set_from_instance, fvec_set_from_instance);
+  fts_class_method_varargs(cl, fts_s_set_from_array, fvec_set_from_array);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_size, fvec_size);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, fvec_get_array);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, fvec_dump);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save, fvec_save_soundfile); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_load, fvec_load);
+  fts_class_method_varargs(cl, fts_s_get_array, fvec_get_array);
+  fts_class_method_varargs(cl, fts_s_dump, fvec_dump);
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, fvec_get_state);
   
-  fts_method_define_varargs(cl, 0, fts_s_bang, fvec_output);
-  
-  fts_method_define_varargs(cl, 0, fts_s_fill, fvec_fill);
-  fts_method_define_varargs(cl, 0, fts_s_set, fvec_set_elements);
+  fts_class_method_varargs(cl, fts_s_fill, fvec_fill);
+  fts_class_method_varargs(cl, fts_s_set, fvec_set_elements);
 
-  fts_method_define_varargs(cl, 0, fts_s_assign, fvec_assign);
+  fts_class_method_varargs(cl, fts_s_assign, fvec_assign);
   
-  fts_method_define_varargs(cl, 0, fts_new_symbol("reverse"), fvec_reverse);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("rotate"), fvec_rotate);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("sort"), fvec_sort);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("scramble"), fvec_scramble);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("normalize"), fvec_normalize);
+  fts_class_method_varargs(cl, fts_new_symbol("reverse"), fvec_reverse);
+  fts_class_method_varargs(cl, fts_new_symbol("rotate"), fvec_rotate);
+  fts_class_method_varargs(cl, fts_new_symbol("sort"), fvec_sort);
+  fts_class_method_varargs(cl, fts_new_symbol("scramble"), fvec_scramble);
+  fts_class_method_varargs(cl, fts_new_symbol("normalize"), fvec_normalize);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("add"), fvec_add);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("sub"), fvec_sub);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("mul"), fvec_mul);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("div"), fvec_div);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("bus"), fvec_bus);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("vid"), fvec_vid);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("ee"), fvec_ee);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("ne"), fvec_ne);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("gt"), fvec_gt);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("ge"), fvec_ge);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("lt"), fvec_lt);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("le"), fvec_le);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("min"), fvec_min);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("max"), fvec_max);
+  fts_class_method_varargs(cl, fts_new_symbol("add"), fvec_add);
+  fts_class_method_varargs(cl, fts_new_symbol("sub"), fvec_sub);
+  fts_class_method_varargs(cl, fts_new_symbol("mul"), fvec_mul);
+  fts_class_method_varargs(cl, fts_new_symbol("div"), fvec_div);
+  fts_class_method_varargs(cl, fts_new_symbol("bus"), fvec_bus);
+  fts_class_method_varargs(cl, fts_new_symbol("vid"), fvec_vid);
+  fts_class_method_varargs(cl, fts_new_symbol("ee"), fvec_ee);
+  fts_class_method_varargs(cl, fts_new_symbol("ne"), fvec_ne);
+  fts_class_method_varargs(cl, fts_new_symbol("gt"), fvec_gt);
+  fts_class_method_varargs(cl, fts_new_symbol("ge"), fvec_ge);
+  fts_class_method_varargs(cl, fts_new_symbol("lt"), fvec_lt);
+  fts_class_method_varargs(cl, fts_new_symbol("le"), fvec_le);
+  fts_class_method_varargs(cl, fts_new_symbol("min"), fvec_min);
+  fts_class_method_varargs(cl, fts_new_symbol("max"), fvec_max);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("abs"), fvec_abs);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("log"), fvec_log);
+  fts_class_method_varargs(cl, fts_new_symbol("abs"), fvec_abs);
+  fts_class_method_varargs(cl, fts_new_symbol("log"), fvec_log);
 
-  fts_method_define_varargs(cl, 0, fts_s_size, fvec_size);
+  fts_class_method_varargs(cl, fts_s_size, fvec_size);
   
-  fts_method_define_varargs(cl, 0, fts_s_import, fvec_import);
-  fts_method_define_varargs(cl, 0, fts_s_export, fvec_export);
+  fts_class_method_varargs(cl, fts_s_import, fvec_import);
+  fts_class_method_varargs(cl, fts_s_export, fvec_export);
   
-  fts_method_define_varargs(cl, 0, fts_s_load, fvec_load);
-  fts_method_define_varargs(cl, 0, fts_s_save, fvec_save_soundfile);
-  
-  return fts_ok;
-}
+  fts_class_method_varargs(cl, fts_s_load, fvec_load);
+  fts_class_method_varargs(cl, fts_s_save, fvec_save_soundfile);
+  }
 
 /********************************************************************
  *

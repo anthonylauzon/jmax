@@ -340,21 +340,16 @@ patcher_inout_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int a
   propagate_fun(propagate_context, (fts_object_t *)patcher, this->index);
 }
 
-static fts_status_t
-patcher_inout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+patcher_inout_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(patcher_inout_t), 0, 1, 0);
-      
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, patcher_inout_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, patcher_inout_delete);
+  fts_class_init(cl, sizeof(patcher_inout_t), patcher_inout_init, patcher_inout_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_propagate_input, patcher_inout_propagate_input);
+  fts_class_method_varargs(cl, fts_s_propagate_input, patcher_inout_propagate_input);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_input, patcher_inout_input);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_add_listener, patcher_inout_add_listener);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_remove_listener, patcher_inout_remove_listener);
-  
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_s_input, patcher_inout_input);
+  fts_class_method_varargs(cl, fts_s_add_listener, patcher_inout_add_listener);
+  fts_class_method_varargs(cl, fts_s_remove_listener, patcher_inout_remove_listener);
 }
 
 static void
@@ -563,17 +558,15 @@ receive_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
     }
 }
 
-static fts_status_t
-receive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+receive_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_receive_t), 0, 1, 0);
-      
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, receive_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, receive_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save_dotpat, receive_save_dotpat);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_spost_description, receive_spost_description); 
+  fts_class_init(cl, sizeof(fts_receive_t),  receive_init, receive_delete);
+
+  fts_class_method_varargs(cl, fts_s_save_dotpat, receive_save_dotpat);
+  fts_class_method_varargs(cl, fts_s_spost_description, receive_spost_description); 
   
-  return fts_ok;
+  fts_class_outlet_anything(cl, 0);
 }
 
 typedef struct
@@ -584,7 +577,7 @@ typedef struct
 } fts_send_t;
 
 static void
-send_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+send_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_send_t *this = (fts_send_t *) o;
   
@@ -702,23 +695,20 @@ send_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   fts_send_message(this->obj, fts_s_propagate_input, ac, at);
 }
 
-static fts_status_t
-send_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+send_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_send_t), 1, 0, 0);
-      
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, send_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, send_delete);
+  fts_class_init(cl, sizeof(fts_send_t), send_init, send_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_propagate_input, send_propagate_input); 
+  fts_class_method_varargs(cl, fts_s_propagate_input, send_propagate_input); 
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save_dotpat, send_save_dotpat); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_spost_description, receive_spost_description); 
+  fts_class_method_varargs(cl, fts_s_save_dotpat, send_save_dotpat); 
+  fts_class_method_varargs(cl, fts_s_spost_description, receive_spost_description); 
 
-  fts_method_define_varargs(cl, 0, fts_s_anything, send_anything);
-  
-  return fts_ok;
-}
+  fts_class_set_default_handler(cl, send_input);
+  fts_class_inlet_anything(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  }
 
 /*************************************************************
  *
@@ -728,19 +718,23 @@ send_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
  *  output messages are directly send to the patcher outlets by the outlet objects
  */
 static void
-patcher_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
+patcher_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
 {
   fts_patcher_t *this  = (fts_patcher_t *) o;
-  patcher_inout_t *inlet = this->inlets[winlet];
 
-  if(inlet)
+  if(winlet < this->n_inlets)
     {
-      fts_objectlist_t *targets = fts_channel_get_targets(&inlet->channel);
-      fts_objectlist_cell_t *p;
+      patcher_inout_t *inlet = this->inlets[winlet];
       
-      /* send input directly from output of inlet (receive) objects */
-      for (p=fts_objectlist_get_head(targets); p; p=fts_objectlist_get_next(p))
-	fts_outlet_send(fts_objectlist_get_object(p), 0, s, ac, at);
+      if(inlet)
+	{
+	  fts_objectlist_t *targets = fts_channel_get_targets(&inlet->channel);
+	  fts_objectlist_cell_t *p;
+	  
+	  /* send input directly from output of inlet (receive) objects */
+	  for (p=fts_objectlist_get_head(targets); p; p=fts_objectlist_get_next(p))
+	    fts_outlet_send(fts_objectlist_get_object(p), 0, s, ac, at);
+	}
     }
 }
 
@@ -870,25 +864,18 @@ patcher_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       if (fts_object_is_object(p))
 	{
-	  if (! fts_object_is_error(p))
+	  if (!fts_object_is_error(p))
 	    {
+	      fts_method_t find_method = fts_class_get_method(fts_object_get_class(p), fts_s_find);
+
 	      /* send the find message to the object; if the object do not implement it, do the standard check */
-	      ret = fts_send_message(p, s, ac, at);
-	      
-	      if (ret == &fts_MethodNotFound)
-	        if (fts_atom_is_subsequence(ac - 1, at + 1, p->argc, p->argv))
-		  {
-		    fts_objectset_add(set, p);
-		  }
+	      if(find_method != NULL)
+		(*find_method)(p, fts_system_inlet, fts_s_find, ac, at);
+	      else if (fts_atom_is_subsequence(ac - 1, at + 1, p->argc, p->argv))
+		fts_objectset_add(set, p);
 	    }
-	  else
-	    {
-	      /* for error objects do the check */
-	      if (fts_atom_is_subsequence(ac - 1, at + 1, p->argc, p->argv))
-		{
-		  fts_objectset_add(set, p);
-		}
-	    }
+	  else if (fts_atom_is_subsequence(ac - 1, at + 1, p->argc, p->argv))
+	    fts_objectset_add(set, p);
 	}
     }
 
@@ -1518,11 +1505,6 @@ static fts_memorystream_t * patcher_get_memory_stream()
 void 
 fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
 {
-  fts_atom_t a[9];
-  fts_atom_t b[1];
-  fts_memorystream_t *stream;
-  fts_status_t stat;
-  
   if(fts_object_get_class_name(obj) == fts_s_connection)
     {
       fts_connection_t *conn = (fts_connection_t *)obj;
@@ -1542,6 +1524,11 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
     }
   else
     {
+      fts_method_t spost_method = fts_class_get_method(fts_object_get_class(obj), fts_s_spost_description);
+      fts_memorystream_t *stream;
+      fts_atom_t a[9];
+      fts_atom_t b[1];
+
       fts_object_get_prop(obj, fts_s_x, a);
       fts_object_get_prop(obj, fts_s_y, a+1);
       fts_object_get_prop(obj, fts_s_width, a+2);
@@ -1578,11 +1565,12 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
       fts_memorystream_reset( stream);
       
       fts_set_object( b, stream);
-      stat = fts_send_message( obj, fts_s_spost_description, 1, b);
-      if(stat != fts_ok)
-	{
-	  fts_spost_object_description( (fts_bytestream_t *)stream, obj);
-	}
+
+      if(spost_method != NULL)
+	(*spost_method)(obj, fts_system_inlet, fts_s_spost_description, 1, b);
+      else
+	fts_spost_object_description((fts_bytestream_t *)stream, obj);
+
       fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
       fts_client_add_string( this, fts_memorystream_get_bytes( stream));
       
@@ -1870,58 +1858,51 @@ patcher_set_noutlets(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t
     patcher_redefine_number_of_outlets((fts_patcher_t *)obj, n_outlets);
 }
 
-static fts_status_t
-patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+patcher_instantiate(fts_class_t *cl)
 {
   /* initialize the class */
-  fts_class_init(cl, sizeof(fts_patcher_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(fts_patcher_t), patcher_init, patcher_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, patcher_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, patcher_delete);
+  fts_class_method_varargs(cl, fts_s_upload, fts_patcher_upload);
+  fts_class_method_varargs(cl, fts_s_upload_child, fts_patcher_upload_child);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_upload, fts_patcher_upload);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_upload_child, fts_patcher_upload_child);
+  fts_class_method_varargs(cl, fts_s_find, patcher_find);
+  fts_class_method_varargs(cl, fts_s_find_errors, patcher_find_errors);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_find, patcher_find);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_find_errors, patcher_find_errors);
+  fts_class_method_varargs(cl, fts_s_propagate_input, patcher_propagate_input);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_propagate_input, patcher_propagate_input);
+  fts_class_method_varargs(cl, fts_new_symbol("load_init"), patcher_load_init); 
+  fts_class_method_varargs(cl, fts_new_symbol("open_help_patch"), fts_patcher_open_help_patch); 
+  fts_class_method_varargs(cl, fts_s_save, fts_patcher_save_from_client); 
+  fts_class_method_varargs(cl, fts_s_paste, fts_patcher_paste); 
 
-  fts_method_define_varargs(cl, 0, fts_s_anything, patcher_anything);
+  fts_class_method_varargs(cl, fts_s_openEditor, patcher_open_editor);
+  fts_class_method_varargs(cl, fts_s_destroyEditor, patcher_destroy_editor);
+  fts_class_method_varargs(cl, fts_s_closeEditor, patcher_close_editor); 
+  fts_class_method_varargs(cl, fts_new_symbol("show_object"), show_object);
+  fts_class_method_varargs(cl, fts_new_symbol("stop_waiting"), stop_waiting);
 
-  fts_method_define_varargs(cl,fts_system_inlet, fts_new_symbol("load_init"), patcher_load_init); 
- 
-  fts_method_define_varargs(cl,fts_system_inlet, fts_new_symbol("open_help_patch"), fts_patcher_open_help_patch); 
+  fts_class_method_varargs(cl, fts_new_symbol("start_updates"), fts_patcher_start_updates);
+  fts_class_method_varargs(cl, fts_new_symbol("stop_updates"), fts_patcher_stop_updates);
+  fts_class_method_varargs(cl, fts_new_symbol("patcher_update"), fts_patcher_update);
+  fts_class_method_varargs(cl, fts_new_symbol("set_wx"), fts_patcher_set_wx);
+  fts_class_method_varargs(cl, fts_new_symbol("set_wy"), fts_patcher_set_wy);
+  fts_class_method_varargs(cl, fts_new_symbol("set_ww"), fts_patcher_set_ww);
+  fts_class_method_varargs(cl, fts_new_symbol("set_wh"), fts_patcher_set_wh);
 
-  fts_method_define_varargs(cl,fts_system_inlet, fts_s_save, fts_patcher_save_from_client); 
+  fts_class_method_varargs(cl, fts_new_symbol("add_object"), fts_patcher_add_object_from_client);
 
-  fts_method_define_varargs(cl,fts_system_inlet, fts_s_paste, fts_patcher_paste); 
+  fts_class_method_varargs(cl, fts_new_symbol("delete_objects"), fts_patcher_delete_objects_from_client);
+  fts_class_method_varargs(cl, fts_new_symbol("add_connection"), fts_patcher_add_connection_from_client);
+  fts_class_method_varargs(cl, fts_new_symbol("delete_connection"), fts_patcher_delete_connection_from_client);
+  fts_class_method_varargs(cl, fts_new_symbol("redefine_object"), fts_patcher_redefine_object_from_client);
+  fts_class_method_varargs(cl, fts_new_symbol("redefine_patcher"), fts_patcher_redefine_from_client);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_openEditor, patcher_open_editor);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_destroyEditor, patcher_destroy_editor);
-  fts_method_define_varargs(cl,fts_system_inlet, fts_s_closeEditor, patcher_close_editor); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("show_object"), show_object);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("stop_waiting"), stop_waiting);
+  fts_class_method_varargs(cl, fts_s_spost_description, patcher_spost_description); 
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("start_updates"), fts_patcher_start_updates);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("stop_updates"), fts_patcher_stop_updates);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("patcher_update"), fts_patcher_update);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("set_wx"), fts_patcher_set_wx);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("set_wy"), fts_patcher_set_wy);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("set_ww"), fts_patcher_set_ww);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("set_wh"), fts_patcher_set_wh);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("add_object"), fts_patcher_add_object_from_client);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("delete_objects"), fts_patcher_delete_objects_from_client);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("add_connection"), fts_patcher_add_connection_from_client);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("delete_connection"), fts_patcher_delete_connection_from_client);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("redefine_object"), fts_patcher_redefine_object_from_client);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("redefine_patcher"), fts_patcher_redefine_from_client);
-
-  fts_method_define_varargs( cl, fts_system_inlet, fts_s_spost_description, patcher_spost_description); 
-
-  return fts_ok;
+  fts_class_set_default_handler(cl, patcher_input);
+  fts_class_outlet_anything(cl, 0);
 }
 
 /*************************************************************
@@ -2176,13 +2157,10 @@ void fts_kernel_patcher_init(void)
   sym_noHelp = fts_new_symbol("noHelp");
 
   patcher_metaclass = fts_class_install(fts_s_patcher, patcher_instantiate);
-  fts_class_instantiate(patcher_metaclass, 0, 0);
-
   patcher_inout_metaclass = fts_class_install(NULL, patcher_inout_instantiate);
 
   receive_metaclass = fts_class_install(fts_s_receive, receive_instantiate);
   send_metaclass = fts_class_install(fts_s_send, send_instantiate);
-
   fts_class_alias(receive_metaclass, fts_s_inlet);
   fts_class_alias(send_metaclass, fts_s_outlet);
 

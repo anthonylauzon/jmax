@@ -363,27 +363,23 @@ filestream_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t p
  *  class
  *
  */
-static fts_status_t
-filestream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+filestream_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(filestream_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(filestream_t), filestream_init, filestream_delete);
   fts_bytestream_class_init(cl);
 
   /* define variable */
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, filestream_get_state);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, filestream_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, filestream_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_sched_ready, filestream_read);
-
+  fts_class_method_varargs(cl, fts_s_sched_ready, filestream_read);
   
-  fts_method_define_varargs(cl, 0, fts_s_open, filestream_open);
-  fts_method_define_varargs(cl, 0, fts_s_close, filestream_close);
-  fts_method_define_varargs(cl, 0, fts_s_bang, filestream_bang);
-  fts_method_define_varargs(cl, 0, fts_s_int, filestream_int);
-  fts_method_define_varargs(cl, 0, fts_s_list, filestream_list);
+  fts_class_method_varargs(cl, fts_s_open, filestream_open);
+  fts_class_method_varargs(cl, fts_s_close, filestream_close);
+  fts_class_method_varargs(cl, fts_s_bang, filestream_bang);
+  fts_class_inlet_int(cl, 0, filestream_int);
+  fts_class_inlet_varargs(cl, 0, filestream_list);
 
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
 }
 
 void

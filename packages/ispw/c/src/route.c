@@ -26,283 +26,196 @@
 
 #include <fts/fts.h>
 
-/********************************************
- *
- *  iroute
- *
- */
-
 typedef struct 
 {
   fts_object_t o;
   int ns;
   int *ints;
-} iroute_t;
-
-static void
-iroute_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  iroute_t *this = (iroute_t *)o;
-  int ns = this->ns;
-  int n = fts_get_number_int(at);
-  int match = 0;
-  int i;
-
-  for(i=ns-1; i>=0; i--)
-    {
-      if(this->ints[i] == n)
-	{
-	  match = 1;
-	  fts_outlet_bang(o, i);
-	}
-    }
-
-  if (!match)
-    fts_outlet_send(o, ns, s, ac, at);
-}
-
-static void
-iroute_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  iroute_t *this = (iroute_t *)o;
-  int ns = this->ns;
-  int n = fts_get_int_arg(ac, at, 0, 0);
-  int match = 0;
-  int i;
-
-  for(i=ns-1; i>=0; i--)
-    {
-      if (this->ints[i] == n)
-	{
-	  match = 1;
-
-	  if(ac == 1)
-	    fts_outlet_bang(o, i);
-	  else if (fts_is_symbol(at))
-	    {
-	      fts_symbol_t sel = fts_get_symbol(at);
-	      
-	      fts_outlet_send(o, i, sel, ac - 2, at + 2);
-	    }
-	  else 
-	    fts_outlet_atoms(o, i, ac - 1, at + 1);
-	}
-    }
-
-  if (!match)
-    fts_outlet_atoms(o, ns, ac, at);
-}
-
-static void
-iroute_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  iroute_t *this = (iroute_t *)o;
-  int i;
-
-  fts_object_set_outlets_number(o, ac + 1);
-
-  this->ns = ac;
-  this->ints = (int *)fts_malloc(sizeof(int) * ac);
-
-  for(i=0; i<ac; i++)
-    {
-      if(fts_is_int(at + i))
-	this->ints[i] = fts_get_int(at + i);
-      else
-	fts_object_set_error(o, "All arguments of int required");
-    }
-}
-
-static void
-iroute_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  iroute_t *this = (iroute_t *)o;
-
-  fts_free(this->ints);
-}
-
-static fts_status_t
-iroute_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init(cl, sizeof(iroute_t), 1, 1, 0);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, iroute_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, iroute_delete);
-
-  fts_method_define_varargs(cl, 0, fts_s_int, iroute_int);
-  fts_method_define_varargs(cl, 0, fts_s_float, iroute_int);
-
-  fts_method_define_varargs(cl, 0, fts_s_list, iroute_list);
-
-  return fts_ok;
-}
-
-/********************************************
- *
- *  mroute
- *
- */
-
-typedef struct 
-{
-  fts_object_t o;
-  int ns;
   fts_symbol_t *symbols;
-} mroute_t;
+} route_t;
 
 static void
-mroute_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+route_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  mroute_t *this = (mroute_t *)o;
-  int ns = this->ns;
-  int match = 0;
-  int i;
+  route_t *this = (route_t *)o;
 
-  for(i=ns-1; i>=0; i--)
+  if(this->ints != NULL)
     {
-      if (this->symbols[i] == fts_s_bang)
+      /* int route */
+      int ns = this->ns;
+      int n = fts_get_int_arg(ac, at, 0, 0);
+      int match = 0;
+      int i;
+      
+      for(i=ns-1; i>=0; i--)
 	{
-	  match = 1;
-	  fts_outlet_bang(o, i);
-	}
-    }
-
-  if (!match)
-    fts_outlet_bang(o, ns);
-}
-
-static void
-mroute_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  mroute_t *this = (mroute_t *)o;
-  int ns = this->ns;
-  int match = 0;
-  int i;
-
-  for(i=ns-1; i>=0; i--)
-    {
-      if (this->symbols[i] == fts_get_selector(at))
-	{
-	  match = 1;
-	  fts_outlet_atom(o, i, at);
-	}
-    }
-
-  if (!match)
-    fts_outlet_atom(o, ns, at);
-}
-
-static void
-mroute_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  mroute_t *this = (mroute_t *)o;
-  int ns = this->ns;
-  int match = 0;
-  int i;
-
-  for(i=ns-1; i>=0; i--)
-    {
-      if (this->symbols[i] == fts_s_list)
-	{
-	  match = 1;
-	  fts_outlet_atoms(o, i, ac, at);
-	}
-    }
-
-  if (!match)
-    fts_outlet_atoms(o, ns, ac, at);
-}
-
-static void
-mroute_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  mroute_t *this = (mroute_t *)o;
-  int ns = this->ns;
-  int match = 0;
-  int i;
-
-  for(i=ns-1; i>=0; i--)
-    {
-      if (this->symbols[i] == s)
-	{
-	  match = 1;
-
-	  if (ac == 0)
-	    fts_outlet_bang(o, i);
-	  else if (fts_is_symbol(at))
+	  if (this->ints[i] == n)
 	    {
-	      fts_symbol_t sel = fts_get_symbol(at);
+	      match = 1;
 	      
-	      fts_outlet_send(o, i, sel, ac - 1, at + 1);
+	      if(ac == 1)
+		fts_outlet_bang(o, i);
+	      else if (fts_is_symbol(at))
+		{
+		  fts_symbol_t sel = fts_get_symbol(at);
+		  
+		  fts_outlet_send(o, i, sel, ac - 2, at + 2);
+		}
+	      else 
+		fts_outlet_varargs(o, i, ac - 1, at + 1);
 	    }
-	  else
-	    fts_outlet_atoms(o, i, ac, at);
+	}
+      
+      if (!match)
+	fts_outlet_varargs(o, ns, ac, at);
+    }
+  else
+    {
+      /* route single value or list */
+      int ns = this->ns;
+      int match = 0;
+      int i;
+
+      if(ac == 1)
+	{
+	  /* route single value regarding its selector */
+	  for(i=ns-1; i>=0; i--)
+	    {
+	      if (this->symbols[i] == fts_get_class_name(at))
+		{
+		  match = 1;
+		  fts_outlet_varargs(o, i, 1, at);
+		}
+	    }
+
+	  if (!match)
+	    fts_outlet_varargs(o, ns, 1, at);
+	}
+      else if(ac > 0)
+	{
+	  /* route "list" at "list" selector */
+	  for(i=ns-1; i>=0; i--)
+	    {
+	      if (this->symbols[i] == fts_s_list)
+		{
+		  match = 1;
+		  fts_outlet_varargs(o, i, ac, at);
+		}
+	    }
+	  
+	  if (!match)
+	    fts_outlet_varargs(o, ns, ac, at);
 	}
     }
-
-  if (!match)
-    fts_outlet_send(o, ns, s, ac, at);
 }
 
-
 static void
-mroute_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+route_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  mroute_t *this = (mroute_t *)o;
-  int i;
+  route_t *this = (route_t *)o;
 
-  fts_object_set_outlets_number(o, ac + 1);
-
-  this->ns = ac;
-  this->symbols = (fts_symbol_t *)fts_malloc(sizeof(fts_symbol_t) * ac);
-
-  for(i=0; i<ac; i++)
+  if(this->symbols != NULL)
     {
-      if(fts_is_symbol(at + i))
-	this->symbols[i] = fts_get_symbol(at + i);
-      else
-	fts_object_set_error(o, "All arguments of symbol required");
+      int ns = this->ns;
+      int match = 0;
+      int i;
+
+      /* message */
+      for(i=ns-1; i>=0; i--)
+	{
+	  if (this->symbols[i] == s)
+	    {
+	      match = 1;
+	      
+	      if (ac == 0)
+		fts_outlet_bang(o, i);
+	      else if (fts_is_symbol(at))
+		{
+		  fts_symbol_t sel = fts_get_symbol(at);
+		  
+		  fts_outlet_send(o, i, sel, ac - 1, at + 1);
+		}
+	      else
+		fts_outlet_varargs(o, i, ac, at);
+	    }
+	}
+      
+      if (!match)
+	fts_outlet_send(o, ns, s, ac, at);
     }
+  else
+    fts_object_signal_runtime_error(o, "Don't understand %s", s);
 }
 
 static void
-mroute_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+route_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  mroute_t *this = (mroute_t *)o;
+  route_t *this = (route_t *)o;
 
-  fts_free(this->symbols);
-}
-
-static fts_status_t
-mroute_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init(cl, sizeof(mroute_t), 1, 0, 0);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, mroute_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, mroute_delete);
-
-  fts_method_define_varargs(cl, 0, fts_s_bang, mroute_bang);
-  fts_method_define_varargs(cl, 0, fts_s_int, mroute_atom);
-  fts_method_define_varargs(cl, 0, fts_s_float, mroute_atom);
-  fts_method_define_varargs(cl, 0, fts_s_list, mroute_list);
-
-  fts_method_define_varargs(cl, 0, fts_s_anything, mroute_anything);
-
-  return fts_ok;
-}
-
-static fts_status_t
-route_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
   if(ac > 0)
     {
-      if(fts_is_int(at))
-	return iroute_instantiate(cl, ac, at);
-      else if(fts_is_symbol(at))
-	return mroute_instantiate(cl, ac, at);	
-    }
+      int all_int = 1;
+      int all_symbol = 1;
+      int i;
+      
+      for(i=0; i<ac; i++)
+	{
+	  if(!fts_is_int(at + 1))
+	    all_int = 0;
+	  
+	  if(!fts_is_symbol(at + 1))
+	    all_symbol = 0;
+	}
+      
+      if(all_int)
+	{	  
+	  this->ns = ac;
+	  this->ints = (int *)fts_malloc(sizeof(int) * ac);
+	  this->symbols = NULL;
+	  
+	  for(i=0; i<ac; i++)
+	    this->ints[i] = fts_get_int(at + i);
 
-  return &fts_CannotInstantiate;
+	  fts_object_set_outlets_number(o, ac + 1);
+	}
+      else if(all_symbol)
+	{
+	  this->ns = ac;
+	  this->ints = NULL;
+	  this->symbols = (fts_symbol_t *)fts_malloc(sizeof(fts_symbol_t) * ac);
+	  
+	  for(i=0; i<ac; i++)
+	    this->symbols[i] = fts_get_symbol(at + i);
+	  
+	  fts_object_set_outlets_number(o, ac + 1);
+	}
+      else
+	fts_object_set_error(o, "Bad arguments");
+    }
+  else
+    fts_object_set_error(o, "Arguments missing");
+}
+
+static void
+route_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  route_t *this = (route_t *)o;
+
+  if(this->ints != NULL)
+    fts_free(this->ints);
+  else if(this->symbols != NULL)
+    fts_free(this->symbols);
+}
+
+static void
+route_instantiate(fts_class_t *cl)
+{
+  fts_class_init(cl, sizeof(route_t), route_init, route_delete);
+
+  fts_class_set_default_handler(cl, route_message);
+  fts_class_inlet_varargs(cl, 0, route_varargs);
+
+  fts_class_outlet_varargs(cl, 0);
 }
 
 void

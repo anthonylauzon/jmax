@@ -200,25 +200,21 @@ tabcycle_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
  *
  */
  
-static fts_status_t
-class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+class_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(tabcycle_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(tabcycle_t), tabcycle_init, tabcycle_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, tabcycle_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tabcycle_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, tabcycle_put);
+  fts_class_method_varargs(cl, fts_s_put, tabcycle_put);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, tabcycle_bang);
-  fts_method_define_varargs(cl, 0, fts_s_set, tabcycle_set);
+  fts_class_method_varargs(cl, fts_s_bang, tabcycle_bang);
+  fts_class_method_varargs(cl, fts_s_set, tabcycle_set);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
 
   tabcycle_fun_symbol = fts_new_symbol("tabcycle");
   fts_dsp_declare_function(tabcycle_fun_symbol, tabcycle_dsp_function);
-
-  return fts_ok;
 }
 
 void

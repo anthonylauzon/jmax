@@ -95,22 +95,18 @@ delay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     delay_set_time(o, 0, 0, 1, at);
 }
 
-static fts_status_t
-delay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+delay_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(delay_t), 2, 1, 0); 
+  fts_class_init(cl, sizeof(delay_t), delay_init, NULL);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, delay_init);
+  fts_class_method_varargs(cl, fts_s_bang, delay_input);
+  fts_class_method_varargs(cl, fts_s_stop, delay_stop);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, delay_input);
-  fts_method_define_varargs(cl, 0, fts_s_stop, delay_stop);
+  fts_class_inlet_int(cl, 1, delay_set_time);
+  fts_class_inlet_float(cl, 1, delay_set_time);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, delay_set_time);
-  fts_method_define_varargs(cl, 1, fts_s_float, delay_set_time);
-
-  fts_outlet_type_define(cl, 0,	fts_s_bang);
-
-  return fts_ok;
+  fts_class_outlet_bang(cl, 0);
 }
 
 void

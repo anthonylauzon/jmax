@@ -27,81 +27,62 @@
 
 #include <fts/fts.h>
 
-/*------------------------- gint class -------------------------------------*/
-
 typedef struct
 {
   fts_object_t o;
   long count;
 } nbangs_t;
 
-
-
 static void
-nbangs_any(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  nbangs_t *this = (nbangs_t *) o;
-  int i;
-    
-  for (i = 0; i < this->count; i++)
-    {
-      fts_outlet_int(o, 1, i);
-      fts_outlet_bang(o, 0);
-    }
-}
-
-
-static void
-nbangs_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  nbangs_t *this = (nbangs_t *) o;
-  int i;
-
-  if ((ac >= 2) && fts_is_number(&at[1]))
-    this->count = fts_get_number_int(&at[1]);
-    
-  for (i = 0; i < this->count; i++)
-    {
-      fts_outlet_int(o, 1, i);
-      fts_outlet_bang(o, 0);
-    }
-}
-
-
-static void
-nbangs_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+nbangs_set_n(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   nbangs_t *this = (nbangs_t *) o;
 
   this->count = fts_get_number_int(at);
 }
 
+static void
+nbangs_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  nbangs_t *this = (nbangs_t *) o;
+  
+  if(winlet == 0)
+    {
+      int i;
+      
+      if(ac > 1 && fts_is_number(at + 1))
+	nbangs_set_n(o, 0, 0, 1, at + 1);
+      
+      for(i=0; i<this->count; i++)
+	{
+	  fts_outlet_int(o, 1, i);
+	  fts_outlet_bang(o, 0);
+	}
+    }
+}
 
 static void
 nbangs_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   nbangs_t *this = (nbangs_t *) o;
 
-  this->count = fts_get_int_arg(ac, at, 0, 0);
+  if(ac > 1 && fts_is_number(at + 1))
+    nbangs_set_n(o, 0, 0, 1, at);
 }
 
-
-static fts_status_t
-nbangs_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+nbangs_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(nbangs_t), 2, 2, 0);
+  fts_class_init(cl, sizeof(nbangs_t), nbangs_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, nbangs_init);
+  fts_class_inlet_varargs(cl, 0, nbangs_input);
+  fts_class_set_default_handler(cl, nbangs_input);
 
-  fts_method_define_varargs(cl, 0, fts_s_list, nbangs_list);
-  fts_method_define_varargs(cl, 0, fts_s_anything, nbangs_any);
-  fts_method_define_varargs(cl, 1, fts_s_int, nbangs_number_1);
-  fts_method_define_varargs(cl, 1, fts_s_float, nbangs_number_1);
+  fts_class_inlet_int(cl, 1, nbangs_set_n);
+  fts_class_inlet_float(cl, 1, nbangs_set_n);
 
-  fts_outlet_type_define_varargs(cl, 0, fts_s_bang);
-  fts_outlet_type_define_varargs(cl, 1, fts_s_int);
-
-  return fts_ok;
+  fts_class_outlet_bang(cl, 0);
+  fts_class_outlet_int(cl, 1);
 }
 
 void

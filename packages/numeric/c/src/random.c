@@ -31,7 +31,7 @@
 typedef struct random
 {
   fts_object_t o;
-  long range;
+  int range;
 } random_t;
 
 extern int rand (void);
@@ -46,12 +46,12 @@ random_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-random_in1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+random_set_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   random_t *this = (random_t *)o;
-  long n = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_number_int(at);
 
-  if (n <= 1)
+  if(n <= 1)
     n = 1;
 
   this->range = n;
@@ -61,26 +61,19 @@ static void
 random_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   random_t *this = (random_t *)o;
-  long n = fts_get_int_arg(ac, at, 0, 0);
 
-  if (n < 1)
-    n = 1;
-  this->range = n;
+  if(ac > 0 && fts_is_number(at))
+    random_set_range(o, 0, 0, 1, at);
 }
 
-static fts_status_t
-random_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+random_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(random_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(random_t), random_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, random_init);
-
-  fts_method_define_varargs(cl, 0, fts_s_bang, random_bang);
-  fts_method_define_varargs(cl, 1, fts_s_int, random_in1);
-
-  fts_outlet_type_define_varargs(cl, 0, fts_s_int);
-
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_s_bang, random_bang);
+  fts_class_inlet_number(cl, 1, random_set_range);
+  fts_class_outlet_int(cl, 0);
 }
 
 void

@@ -207,36 +207,21 @@ logscale_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   logscale_set(o, 0, 0, ac, at);
 }
 
-static fts_status_t
-logscale_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+logscale_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(logscale_t), 6, 1, 0);
+  fts_class_init(cl, sizeof(logscale_t), logscale_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, logscale_init);
+  fts_class_method_varargs(cl, fts_s_set, logscale_set);
 
-  fts_method_define_varargs(cl, 0, fts_s_set, logscale_set);
+  fts_class_inlet_number(cl, 0, logscale_number);
+  fts_class_inlet_number(cl, 1, logscale_set_inlow);
+  fts_class_inlet_number(cl, 2, logscale_set_inhigh);
+  fts_class_inlet_number(cl, 3, logscale_set_outlow);
+  fts_class_inlet_number(cl, 4, logscale_set_outhigh);
+  fts_class_inlet_number(cl, 5, logscale_set_base);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, logscale_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, logscale_number);
-
-  fts_method_define_varargs(cl, 1, fts_s_int, logscale_set_inlow);
-  fts_method_define_varargs(cl, 1, fts_s_float, logscale_set_inlow);
-
-  fts_method_define_varargs(cl, 2, fts_s_int, logscale_set_inhigh);
-  fts_method_define_varargs(cl, 2, fts_s_float, logscale_set_inhigh);
-
-  fts_method_define_varargs(cl, 3, fts_s_int, logscale_set_outlow);
-  fts_method_define_varargs(cl, 3, fts_s_float, logscale_set_outlow);
-
-  fts_method_define_varargs(cl, 4, fts_s_int, logscale_set_outhigh);
-  fts_method_define_varargs(cl, 4, fts_s_float, logscale_set_outhigh);
-
-  fts_method_define_varargs(cl, 5, fts_s_int, logscale_set_base);
-  fts_method_define_varargs(cl, 5, fts_s_float, logscale_set_base);
-
-  fts_outlet_type_define_varargs(cl, 0, fts_s_float);
-  
-  return fts_ok;
+  fts_class_outlet_float(cl, 0);
 }
 
 void

@@ -30,21 +30,55 @@
 
 /* #define TRACE_DEBUG */
 
-/******************************************************************************/
-/*                                                                            */
-/*                            Connections                                     */
-/*                                                                            */
-/******************************************************************************/
-  
-fts_metaclass_t *fts_connection_type = 0;
+fts_metaclass_t *fts_connection_metaclass = 0;
+
+static int
+connection_check(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet)
+{
+  fts_iterator_t iter;
+
+  /* connection to object with its own default handler is always ok */
+  if(fts_class_get_default_handler(fts_object_get_class(dst)) != fts_class_default_error_handler)
+    return 1;
+
+  /* connection to outlet without declarations is always ok */
+  if(fts_class_outlet_get_declarations(fts_object_get_class(src), woutlet, &iter))
+    {
+      while ( fts_iterator_has_more( &iter)) 
+	{
+	  fts_atom_t a;
+
+	  fts_iterator_next(&iter, &a);
+
+	  if(fts_is_pointer(&a))
+	    {
+	      fts_metaclass_t *class = (fts_metaclass_t *)fts_get_pointer(&a);
+
+	      if(fts_class_inlet_get_method(fts_object_get_class(dst), winlet, class) != NULL)
+		return 1; /* found inlet type match */
+	    }	
+	  else if(fts_is_symbol(&a))
+	    {
+	      fts_symbol_t selector = fts_get_symbol(&a);
+
+	      if(fts_class_get_method(fts_object_get_class(dst), selector) != NULL)
+		return 1; /* found message match */
+	    }
+	}
+
+      return 0; /* no match found */
+    }
+  else
+    return 1;
+}
 
 fts_connection_t *
 fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet, fts_connection_type_t type)
 {
-  fts_method_t meth = NULL;
   fts_symbol_t selector = NULL;
-  fts_connection_t *conn;
   int valid = 1;
+  fts_connection_t *conn;
+  fts_connection_t *p;
 
   /* first of all, if one of the two object is an error object, add the required inlets/outlets to it */
   if (fts_object_is_error(src))
@@ -67,10 +101,6 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
       valid = 0;
     }
 
-  /* don't keep an invalid connection between valid objects */
-  if(valid && type == fts_c_invalid) 
-    type = fts_c_anything;
-
   /* check the outlet range (should never happen, a part from loading) */
   if (woutlet >= fts_object_get_outlets_number(src) || woutlet < 0)
     {
@@ -78,75 +108,47 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
       return NULL;
     }
 
-  /* check againsts double connections */
-  { 
-    fts_connection_t *p;
-    
-    for (p = src->out_conn[woutlet]; p ; p = p->next_same_src)
-      {
-	if ((p->dst == dst) && (p->winlet == winlet))
-	  {
-	    /* Found, return error message */
-	    
-	    fts_object_signal_runtime_error(src, "Double connection, cannot connect.");
-	    return NULL;
-	  }
-      }
-  }
-  
-  /* find the outlet and the inlet in the class structure */
-  selector = fts_class_outlet_get_selector(src->head.cl, woutlet);
-
-  if(selector != NULL)
+  /* check for double connections */
+  for (p = src->out_conn[woutlet]; p ; p = p->next_same_src)
     {
-      fts_method_t propagate = fts_class_inlet_get_method(dst->head.cl, winlet, fts_s_propagate_input);
-
-      meth = fts_class_inlet_get_method(dst->head.cl, winlet, selector);
-
-      if((meth == NULL) || 
-	 (selector == fts_s_sig && meth == fts_class_inlet_get_anything(dst->head.cl, winlet) && propagate == 0))
+      if ((p->dst == dst) && (p->winlet == winlet))
 	{
-	  fts_object_signal_runtime_error(src, "Type mismatch, cannot connect");
-
+	  fts_object_signal_runtime_error(dst, "Double connection ignored");
 	  return NULL;
 	}
     }
+  
+  /* connections are at least anything between valid objects */
+  if(valid && type == fts_c_null) 
+    type = fts_c_anything;
 
-  conn = (fts_connection_t *) fts_object_create(fts_connection_type, 0, 0);
+  /* check connection */
+  if(connection_check(src, woutlet, dst, winlet) == 0)
+    {
+      fts_object_signal_runtime_error(dst, "Cannot connect");
+      return NULL;
+    }
+
+  /* init connection */
+  conn = (fts_connection_t *)fts_object_create(fts_connection_metaclass, 0, 0);
   conn->src = src;
   conn->woutlet = woutlet;
   conn->dst = dst;
   conn->winlet = winlet;
   conn->type = type;
 
+  /* set patcher */
   ((fts_object_t *)conn)->patcher = conn->src->patcher;
 
-  /* initialize the cache */
-  if(meth)
-    {
-      if(selector != NULL || fts_class_inlet_has_anything_only(dst->head.cl, winlet))
-	{
-	  /* lock cache to anything method because outlet is typed or its anyway the only method */
-	  conn->symb = 0;
-	  conn->mth  = meth;
-	}
-      else
-	{
-	  /* init cache to */
-	  conn->symb = selector;
-	  conn->mth  = meth;
-	}
-    }
-  else
-    {
-      conn->symb = 0;
-      conn->mth  = 0;
-    }
+  /* init cache */
+  conn->selector = NULL;
+  conn->class = NULL;
+  conn->method = NULL;
 
   /* add the connection to the outlet list and to the inlet list  */
-  if (! src->out_conn[woutlet])
+  if (src->out_conn[woutlet] == NULL)
     {
-      conn->next_same_src = 0;
+      conn->next_same_src = NULL;
       src->out_conn[woutlet] = conn;
     }
   else
@@ -155,9 +157,9 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
       src->out_conn[woutlet] = conn;
     }
 
-  if (! dst->in_conn[winlet])
+  if (dst->in_conn[winlet] == NULL)
     {
-      conn->next_same_dst = 0;
+      conn->next_same_dst = NULL;
       dst->in_conn[winlet] = conn;
     }
   else
@@ -176,7 +178,7 @@ fts_connection_delete(fts_connection_t *conn)
   fts_object_t *dst;
   fts_connection_t **p; /* indirect precursor */
 
-  /* First, release the client representation of the connection, if any */
+  /* release the client representation of the connection */
   if ( fts_object_has_id( (fts_object_t *)conn) && conn->type > fts_c_hidden)
     fts_patcher_release_connection((fts_object_t *)conn->src->patcher, conn);
 
@@ -334,12 +336,10 @@ fts_connection_set_type(fts_connection_t *connection, fts_connection_type_t type
     }
 }
 
-static fts_status_t
-connection_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+connection_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_connection_t), 0, 0, 0); 
-
-  return fts_ok;
+  fts_class_init(cl, sizeof(fts_connection_t), 0, 0); 
 }
 
 /***********************************************************************
@@ -350,6 +350,6 @@ connection_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
 void fts_kernel_connection_init()
 {
-  fts_connection_type = fts_class_install(fts_s_connection, connection_instantiate);
+  fts_connection_metaclass = fts_class_install(fts_s_connection, connection_instantiate);
 }
 

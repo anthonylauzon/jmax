@@ -94,19 +94,14 @@ sigtab1_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_a
     }
 }
 
-static fts_status_t
-sigtab1_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sigtab1_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(sigtab1_t), 1, 0, 0);
+  fts_class_init(cl, sizeof(sigtab1_t), sigtab1_init, sigtab1_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sigtab1_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sigtab1_delete);
-
-  fts_method_define_varargs(cl, 0, fts_s_bang, sigtab1_reload);
+  fts_class_method_varargs(cl, fts_s_bang, sigtab1_reload);
   
   wavetable_init();
-
-  return fts_ok;
 }
 
 /***************************************************************************************
@@ -215,26 +210,22 @@ osc_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-osc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+osc_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(osc_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(osc_t), osc_init, osc_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, osc_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, osc_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, osc_put);
+  fts_class_method_varargs(cl, fts_s_put, osc_put);
 
-  fts_method_define_varargs(cl, 0, fts_s_set, osc_set);
+  fts_class_method_varargs(cl, fts_s_set, osc_set);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, osc_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, osc_number);
+  fts_class_inlet_int(cl, 0, osc_number);
+  fts_class_inlet_float(cl, 0, osc_number);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_inlet(cl, 1);
   fts_dsp_declare_outlet(cl, 0);
-  
-  return fts_ok;
-}
+  }
 
 /******************************************************************
  *
@@ -313,23 +304,18 @@ phasor_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-phasor_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+phasor_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(phasor_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(phasor_t), phasor_init, phasor_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, phasor_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, phasor_delete);
+  fts_class_method_varargs(cl, fts_s_put, phasor_put);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, phasor_put);
-
-  fts_method_define_varargs(cl, 0, fts_s_int, phasor_set);
-  fts_method_define_varargs(cl, 0, fts_s_float, phasor_set);
+  fts_class_inlet_int(cl, 0, phasor_set);
+  fts_class_inlet_float(cl, 0, phasor_set);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-
-  return fts_ok;
 }
 
 void

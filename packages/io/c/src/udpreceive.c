@@ -279,16 +279,11 @@ static void udpreceive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int a
     }
 }
 
-static fts_status_t udpreceive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void udpreceive_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof( udpreceive_t), 0, 1, 0);
+  fts_class_init( cl, sizeof( udpreceive_t), udpreceive_init, udpreceive_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, udpreceive_init);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, udpreceive_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_sched_ready, udpreceive_receive);
-
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_s_sched_ready, udpreceive_receive);
 }
 
 void udpreceive_config( void)

@@ -157,24 +157,17 @@ rewrap_b(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
  *  class
  *
  */
-static fts_status_t
-rewrap_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+rewrap_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(rewrap_t), 3, 2, 0);
+  fts_class_init(cl, sizeof(rewrap_t), rewrap_init, rewrap_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, rewrap_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, rewrap_delete);
+  fts_class_inlet_number(cl, 0, rewrap_number);
+  fts_class_inlet_number(cl, 1, rewrap_a);
+  fts_class_inlet_number(cl, 2, rewrap_b);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, rewrap_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, rewrap_number);
-
-  fts_method_define_varargs(cl, 1, fts_s_int, rewrap_a);
-  fts_method_define_varargs(cl, 1, fts_s_float, rewrap_a);
-
-  fts_method_define_varargs(cl, 2, fts_s_int, rewrap_b);
-  fts_method_define_varargs(cl, 2, fts_s_float, rewrap_b);
-
-  return fts_ok;
+  fts_class_outlet_float(cl, 0);
+  fts_class_outlet_int(cl, 1);
 }
 
 void

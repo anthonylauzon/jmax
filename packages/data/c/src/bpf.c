@@ -277,12 +277,6 @@ bpf_set_client(bpf_t *bpf)
  */
 
 static void
-bpf_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_outlet_object(o, 0, o);
-}
-
-static void
 bpf_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
@@ -636,46 +630,36 @@ bpf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     fts_free(this->points);
 }
 
-static fts_status_t
-bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+bpf_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(bpf_t), 1, 1, 0); 
+  fts_class_init(cl, sizeof(bpf_t), bpf_init, bpf_delete);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, bpf_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, bpf_delete);
+  fts_class_method_varargs(cl, fts_s_set_from_instance, bpf_set_from_instance);
+  fts_class_method_varargs(cl, fts_s_dump, bpf_dump);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_instance, bpf_set_from_instance);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, bpf_dump);
+  fts_class_method_varargs(cl, fts_s_get_array, bpf_get_array);
+  fts_class_method_varargs(cl, fts_s_set_from_array, bpf_set);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, bpf_get_array);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_array, bpf_set);
+  fts_class_method_varargs(cl, fts_s_post, bpf_post);
+  fts_class_method_varargs(cl, fts_s_print, bpf_print);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, bpf_post);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, bpf_print);
+  fts_class_method_varargs(cl, fts_s_openEditor, bpf_open_editor);
+  fts_class_method_varargs(cl, fts_s_closeEditor, bpf_close_editor); 
+  fts_class_method_varargs(cl, fts_s_destroyEditor, bpf_destroy_editor);
+  
+  fts_class_method_varargs(cl, fts_new_symbol("add_point"), bpf_add_point_by_client_request);
+  fts_class_method_varargs(cl, fts_new_symbol("remove_points"), bpf_remove_points_by_client_request);
+  fts_class_method_varargs(cl, fts_new_symbol("set_points"), bpf_set_points_by_client_request);
   
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, bpf_get_state);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, bpf_set);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_append, bpf_append);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_clear, bpf_set_clear);
-  
-  /* graphical editor */
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_openEditor, bpf_open_editor);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_closeEditor, bpf_close_editor); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_destroyEditor, bpf_destroy_editor);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("add_point"), bpf_add_point_by_client_request);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("remove_points"), bpf_remove_points_by_client_request);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("set_points"), bpf_set_points_by_client_request);
-  
-  fts_method_define_varargs(cl, 0, fts_s_bang, bpf_output);  
-  fts_method_define_varargs(cl, 0, fts_s_set, bpf_set);
-  fts_method_define_varargs(cl, 0, fts_s_clear, bpf_set_clear);
-  
-  return fts_ok;
-}
+  fts_class_method_varargs(cl, fts_s_clear, bpf_set_clear);
+  fts_class_method_varargs(cl, fts_s_set, bpf_set);
+  fts_class_method_varargs(cl, fts_s_append, bpf_append);
+  }
 
 void
 bpf_config(void)

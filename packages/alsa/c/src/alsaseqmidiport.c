@@ -80,7 +80,10 @@ alsaseqmidiport_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 		  fts_atom_t a;
 	      
 		  fts_set_object(&a, (fts_object_t *)event);
+
+		  fts_object_refer((fts_object_t *)event);
 		  fts_midiport_input(o, 0, 0, 1, &a);
+		  fts_object_release((fts_object_t *)event);
 	      }
 	  }
       }  
@@ -466,32 +469,19 @@ alsaseqmidiport_output_delete(fts_object_t* o, int winlet, fts_symbol_t s, int a
 }
 
 
-static fts_status_t
-alsaseqmidiport_input_instantiate(fts_class_t* cl, int ac, const fts_atom_t* at)
+static void
+alsaseqmidiport_input_instantiate(fts_class_t* cl)
 {
-    fts_class_init(cl, sizeof(alsaseqmidiport_t), 0, 0, 0);
+    fts_class_init(cl, sizeof(alsaseqmidiport_t), alsaseqmidiport_input_init, alsaseqmidiport_input_delete);
 
-    fts_midiport_class_init(cl);
-
-    fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, alsaseqmidiport_input_init);
-    fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, alsaseqmidiport_input_delete);
-    fts_method_define_varargs(cl, fts_system_inlet, fts_s_sched_ready, alsaseqmidiport_select);
-
-    return fts_ok;
+    fts_class_method_varargs(cl, fts_s_sched_ready, alsaseqmidiport_select);
 }
 
 
-static fts_status_t
-alsaseqmidiport_output_instantiate(fts_class_t* cl, int ac, const fts_atom_t* at)
+static void
+alsaseqmidiport_output_instantiate(fts_class_t* cl)
 {
-    fts_class_init(cl, sizeof(alsaseqmidiport_t), 0, 0, 0);
-
-    fts_midiport_class_init(cl);
-
-    fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, alsaseqmidiport_output_init);
-    fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, alsaseqmidiport_output_delete);
-
-    return fts_ok;
+    fts_class_init(cl, sizeof(alsaseqmidiport_t), alsaseqmidiport_output_init, alsaseqmidiport_output_delete);
 }
 
 

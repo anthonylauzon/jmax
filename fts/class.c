@@ -34,6 +34,11 @@
 const int fts_system_inlet = -1;
 static int typeid = FTS_FIRST_OBJECT_TYPEID;
 
+#define CLASS_INLET_MAX 255
+#define CLASS_TYPEID_MAX ((1 << 23) - 1)
+
+enum fts_connection_type;
+
 /* Return Status declarations */
 fts_status_description_t fts_DuplicatedMetaclass = {"Duplicated metaclass"};
 fts_status_description_t fts_ClassAlreadyInitialized = {"class already initialized"};
@@ -47,24 +52,19 @@ fts_status_description_t fts_CannotInstantiate = {"Cannot instantiate class"};
 /*                                                                            */
 /******************************************************************************/
 
-static fts_class_t *fts_class_new(fts_metaclass_t *mcl, int ac, const fts_atom_t *at);
-
 static fts_metaclass_t*
-fts_metaclass_new(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_equiv_fun_t equiv_fun)
+fts_metaclass_new(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 {
   fts_metaclass_t *mcl = fts_zalloc(sizeof(fts_metaclass_t));
 
   mcl->name = name;
   mcl->instantiate_fun = instantiate_fun;
-  mcl->equiv_fun = equiv_fun;
+  mcl->equiv_fun = NULL;
   mcl->selector = name;
   mcl->package = NULL;
+  mcl->inst_list = NULL;
 
   mcl->typeid = typeid++;
-
-  /* for simple classes create class instance without arguments */
-  if(equiv_fun == 0)
-    fts_class_new(mcl, 0, 0);
 
   return mcl;
 }
@@ -72,7 +72,7 @@ fts_metaclass_new(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_
 fts_metaclass_t *
 fts_class_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 {
-  fts_metaclass_t *mcl = fts_metaclass_new(name, instantiate_fun, 0);
+  fts_metaclass_t *mcl = fts_metaclass_new(name, instantiate_fun);
 
   if(name != NULL)
     {
@@ -89,6 +89,7 @@ fts_class_alias(fts_metaclass_t *mcl, fts_symbol_t alias)
 {
   fts_package_add_metaclass(fts_get_current_package(), mcl, alias);
 }
+
 
 static fts_metaclass_t *get_metaclass( fts_symbol_t package_name, fts_symbol_t class_name)
 {
@@ -145,39 +146,18 @@ fts_metaclass_get_by_name( fts_symbol_t package_name, fts_symbol_t class_name)
   return NULL;
 }
 
-fts_object_t *fts_metaclass_new_instance( fts_metaclass_t *mcl, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+fts_object_t *
+fts_metaclass_new_instance( fts_metaclass_t *mcl, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t error;
-  fts_class_t *cl = 0;
-  fts_object_t *obj;
+  fts_class_t *cl = fts_class_instantiate( mcl);
+  fts_object_t *obj = fts_object_new( cl);
 
-  if ( mcl->name == fts_s_patcher)
-    {
-      /* Patcher behave differently w.r.t. than other objects;
-	 the metaclass do not depend on the arguments, but on the inlets/outlets.
-	 New patchers are created with zero in zero outs, and changed later 
-      */
-      fts_atom_t a[2];
-
-      fts_set_int(a, 0);
-      fts_set_int(a + 1, 0);
-      cl = fts_class_instantiate( patcher_metaclass, 2, a);
-    }
-  else
-    cl = fts_class_instantiate( mcl, ac, at);
-
-  if (!cl)
-    return NULL;
-
-  obj = fts_object_new( cl);
   obj->patcher = patcher;
 
   if ( fts_class_get_constructor(cl))
     fts_class_get_constructor(cl)(obj, fts_system_inlet, fts_s_init, ac, at);
 
-  error = fts_object_get_error(obj);
-  
-  if (error)
+  if ( fts_object_get_error(obj) != NULL)
     {
       fts_object_free(obj);
       
@@ -190,114 +170,156 @@ fts_object_t *fts_metaclass_new_instance( fts_metaclass_t *mcl, fts_patcher_t *p
   return obj;
 }
 
-/******************************************************************************/
-/*                                                                            */
-/*              Class  Creation, Definition And Handling                      */
-/*                                                                            */
-/******************************************************************************/
+/********************************************
+ *
+ * inlet/outlet utils
+ *
+ */
+#define CLASS_INOUT_BLOCK_SIZE 4
 
-
-static void 
-fts_class_register( fts_metaclass_t *mcl, int ac, const fts_atom_t *at, fts_class_t *cl)
+static void
+class_set_inlets_number(fts_class_t *cl, int n)
 {
-  fts_class_t **p;
-  fts_atom_t *store;
-  int i;
-
-  cl->ac = ac;
-  cl->at = fts_malloc(ac * sizeof(fts_atom_t));
-  cl->next = 0;
-
-  store = (fts_atom_t *)cl->at;
-
-  for(i=0; i<ac; i++)
-    {
-      store[i] = at[i];
-
-      if(fts_is_object(at + i))
-	{
-	  /* NOTE: here we access the atom structure fields directly,
-	     without using the macros, because the macro fts_set_object does not
-	     accept to set the atom to type object and null value.
-	     However, this is related to metaclass mechanism, which we hope to
-	     remove soon.
-	  */
-	  store[i].type = fts_get_class( at+i);
-	  fts_word_set_object( &store[i].value, 0);
-	}
-    }
-
-  /* append class to end is instance list */
-  p = &(mcl->inst_list);
-
-  while(*p)
-    p = &((*p)->next);
-
-  *p = cl;
+  cl->ninlets = n;
 }
 
-
-static fts_class_t *
-fts_class_get( fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
+static void
+class_set_outlets_number(fts_class_t *cl, int n)
 {
-  fts_class_t *cl = mcl->inst_list;
+  int n_alloc = cl->out_alloc;
+  int i;
 
-  while(cl)
+  if(n > n_alloc)
     {
-      if ((! mcl->equiv_fun) || mcl->equiv_fun(cl->ac, cl->at, ac, at))
-	return cl;
+      while(n_alloc < n)
+	n_alloc += CLASS_INOUT_BLOCK_SIZE;
 
-      cl = cl->next;
+      cl->outlets = fts_realloc(cl->outlets, n_alloc * sizeof(fts_class_outlet_t));
+
+      /* init new outlets */
+      for(i=cl->out_alloc; i<n_alloc; i++)
+	fts_list_init(cl->outlets[i].declarations);
+
+      cl->out_alloc = n_alloc;  
     }
 
+  /* delete outlets cut off */
+  for(i=n; i<cl->noutlets; i++)
+    fts_list_delete(cl->outlets[i].declarations);
+
+  cl->noutlets = n;
+}
+
+static int
+class_inlet_key(int winlet, fts_metaclass_t *type)
+{
+  if(type == NULL)
+    return winlet;
+  else
+    return (fts_metaclass_get_typeid(type) << 8) + winlet;
+}
+
+static fts_class_outlet_t *
+class_get_outlet(fts_class_t *cl, int woutlet)
+{
+  if(cl->outlets != NULL)
+    {
+      if(woutlet < 0)
+	woutlet = 0;
+      else if(woutlet >= cl->noutlets)
+	woutlet = cl->noutlets - 1;
+
+      return cl->outlets + woutlet;
+    }
+  else
+    return NULL;
+}
+
+static void
+class_outlet_add_declaration(fts_class_outlet_t *out, const fts_atom_t *a)
+{
+  out->declarations = fts_list_append(out->declarations, a);
+}
+
+int 
+class_outlet_get_declarations(fts_class_outlet_t *out, fts_iterator_t *iter)
+{
+  fts_list_get_values(out->declarations, iter);
+  
+  if(fts_iterator_has_more(iter))
+    return 1;
+
+  return 0;
+
+}
+
+int
+class_outlet_has_declaration(fts_class_outlet_t *out, const fts_atom_t *p)
+{
+  fts_iterator_t iter;
+
+  if(class_outlet_get_declarations(out, &iter))
+    {
+      while(fts_iterator_has_more(&iter)) 
+	{
+	  fts_atom_t a;
+
+	  fts_iterator_next(&iter, &a);
+
+	  if(fts_atom_equals(p, &a))
+	    return 1;
+	}
+    }
+  
   return 0;
 }
 
-static fts_class_t *
-fts_class_new(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
+void
+fts_class_default_error_handler(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_class_t *cl;
-  fts_status_t s;
-
-  cl = fts_zalloc(sizeof(fts_class_t));
-  
-  cl->constructor = 0;
-  cl->deconstructor = 0;
-
-  cl->properties  = 0;
-  cl->daemons = 0;
-  cl->user_data = 0;
-  
-  cl->mcl = mcl;
-  s = mcl->instantiate_fun(cl, ac, at);
-  
-  if (s == fts_ok)
+  if(s == 0)
     {
-      fts_atom_t a;
+      if(ac > 0)
+	fts_object_signal_runtime_error(o, "No tuple method at inlet %d", s, winlet);
+      else
+	fts_object_signal_runtime_error(o, "No method for %s at inlet %d", fts_get_class_name(at), winlet);
+    }
+  else
+    fts_object_signal_runtime_error(o, "Don't understand %s", s);    
+}
+
+/********************************************
+ *
+ *  class
+ *
+ */
+
+fts_class_t *
+fts_class_instantiate(fts_metaclass_t *mcl)
+{
+  if(mcl->inst_list == NULL)
+    {
+      fts_class_t *cl = fts_zalloc(sizeof(fts_class_t));
       
-      fts_class_register(mcl, ac, at, cl);
+      cl->constructor = 0;
+      cl->deconstructor = 0;
+      
+      cl->properties  = 0;
+      cl->daemons = 0;
+      
+      cl->mcl = mcl;
+      mcl->instantiate_fun(cl);
+      
+      mcl->inst_list = cl;
+
       return cl;
     }
   else
-    {
-      fts_free(cl);
-      return 0;
-    }
-}
-
-fts_class_t *
-fts_class_instantiate(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
-{
-  fts_class_t *cl = fts_class_get(mcl, ac, at);
-
-  if(!cl)
-    cl = fts_class_new(mcl, ac, at);
-
-  return cl;
+    return mcl->inst_list;
 }
 
 fts_status_t 
-fts_class_init( fts_class_t *cl, unsigned int size, int ninlets, int noutlets, void *user_data)
+fts_class_init( fts_class_t *cl, unsigned int size, fts_method_t constructor, fts_method_t deconstructor)
 {
   int i;
 
@@ -307,353 +329,202 @@ fts_class_init( fts_class_t *cl, unsigned int size, int ninlets, int noutlets, v
   cl->size = size;
   cl->heap = fts_heap_new(size);
 
-  /* allocate system inlet declaration */
-  cl->sysinlet = fts_zalloc(sizeof(fts_inlet_decl_t));
+  if(constructor != NULL)
+    cl->constructor = constructor;
 
-  fts_hashtable_init(&(cl->sysinlet->messhash), FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
-  cl->sysinlet->anything = NULL;
+  if(deconstructor != NULL)
+    cl->deconstructor = deconstructor;
 
-  /* allocate inlet declarations */
-  cl->ninlets = ninlets;
-  if (ninlets)
-    cl->inlets = fts_zalloc(ninlets * sizeof(fts_inlet_decl_t));
+  fts_hashtable_init(&cl->messages, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_MEDIUM);
+  cl->default_handler = fts_class_default_error_handler;
 
-  /* init message hashtable and anything method for all inlets */
-  for(i=0; i<ninlets; i++)
-    {
-      fts_hashtable_init(&(cl->inlets[i].messhash), FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
-      cl->inlets[i].anything = NULL;
-    }
+  cl->ninlets = 0;
+  fts_hashtable_init(&cl->inlets, FTS_HASHTABLE_INT, FTS_HASHTABLE_MEDIUM);
 
-  /* allocate outlet declarations */
-  cl->noutlets = noutlets;
-  if (noutlets)
-    cl->outlets = fts_zalloc(noutlets * sizeof(fts_outlet_decl_t));
-
-  cl->user_data = user_data;
+  cl->noutlets = 0;
+  cl->out_alloc = 0;
+  cl->outlets = NULL;
 
   return fts_ok;
 }
 
+/********************************************
+ *
+ * inlet/outlet definitions
+ *
+ */
 void
-fts_method_define(fts_class_t *cl, int winlet, fts_symbol_t s, fts_method_t mth)
+fts_class_method_varargs(fts_class_t *cl, fts_symbol_t s, fts_method_t mth)
 {
   if(s != NULL)
     {    
-      fts_inlet_decl_t *in;
+      fts_atom_t k, a;
       
-      if (winlet == fts_system_inlet)
-	{
-	  if(s == fts_s_init)
-	    {
-	      cl->constructor = mth;
-	      return;
-	    }
-	  else if(s == fts_s_delete)
-	    {
-	      cl->deconstructor = mth;
-	      return;
-	    }
-	  
-	  in = cl->sysinlet;
-	}
-      else if (winlet < cl->ninlets && winlet >= 0)
-	in = cl->inlets + winlet;
-      else
-	{
-	  post("inlet number %d out of range [0..%d] for class `%s', method `%s'\n", winlet, cl->ninlets, fts_class_get_name(cl), s); 
-	  return;
-	}
-      
-      if(s == fts_s_anything)
-	{
-	  if(in->anything != NULL)
-	    post("message \"%s\" doubly defined for class %s %d\n", s, fts_class_get_name(cl), winlet);
-	  else
-	    in->anything = mth;
-	}
-      else
-	{
-	  fts_atom_t k, a;
+      fts_set_symbol(&k, s);
 
-	  fts_set_symbol(&k, s);
-	  if(fts_hashtable_get(&in->messhash, &k, &a))
-	    post("message \"%s\" doubly defined for class %s %d\n", s, fts_class_get_name(cl), winlet);
-	  else
-	    {
-	      fts_set_pointer(&a, mth);
-	      fts_hashtable_put(&in->messhash, &k, &a);
-	    }
+      if(fts_hashtable_get(&cl->messages, &k, &a))
+	post("message \"%s\" doubly defined for class %s\n", s, fts_class_get_name(cl));
+      else
+	{
+	  fts_set_pointer(&a, mth);
+	  fts_hashtable_put(&cl->messages, &k, &a);
 	}
     }
   else
-    post("method definition with NULL selector for class %s\n", winlet, fts_class_get_name(cl)); 
+    post("method definition with NULL selector for class %s\n", fts_class_get_name(cl)); 
 }
 
 void
-fts_outlet_type_define( fts_class_t *cl, int woutlet, fts_symbol_t s)
+fts_class_inlet(fts_class_t *cl, int winlet, fts_metaclass_t *type, fts_method_t mth)
 {
-  fts_outlet_decl_t *out;
-
-  if (woutlet >= cl->noutlets || woutlet < 0)
-    {
-      post("fts_outlet_type_define: outlet out of range #%d for class `%s'\n", woutlet, fts_class_get_name(cl));
-      return;
-    }
-  out = &cl->outlets[woutlet];
-
-  if (out->selector)
-    {
-      post("outlet %d doubly defined for class `%s'\n", woutlet, fts_class_get_name(cl));
-      return;
-    }
-
-  out->selector = s;
-}
-
-static fts_inlet_decl_t *
-class_get_inlet_decl(fts_class_t *cl, int inlet)
-{
-  fts_inlet_decl_t *in;
-
-  if(inlet >= cl->ninlets)
-    inlet = cl->ninlets - 1;
+  fts_atom_t k, a;
   
-  if(inlet >= 0)
-    return cl->inlets + inlet;
-
-  return NULL;
-}
-
-static fts_outlet_decl_t *
-class_get_outlet_decl(fts_class_t *cl, int outlet)
-{
-  if(outlet < 0)
-    outlet = 0;
-  else if(outlet >= cl->noutlets)
-    outlet = cl->noutlets - 1;
+  if(winlet < 0)
+    winlet = 0;
+  else if(winlet > CLASS_INLET_MAX)
+    winlet = CLASS_INLET_MAX;
   
-  return cl->outlets + outlet;
+  fts_set_int(&k, class_inlet_key(winlet, type));
+  
+  if(fts_hashtable_get(&cl->inlets, &k, &a))
+    post("%s method doubly defined for class %s at inlet %d\n", type->name, fts_class_get_name(cl), winlet);
+  else
+    {
+      /* register inlet method */
+      fts_set_pointer(&a, mth);
+      fts_hashtable_put(&cl->inlets, &k, &a);
+      
+      if(winlet >= cl->ninlets)
+	class_set_inlets_number(cl, winlet + 1);
+    }
 }
 
-static fts_method_t
-inlet_get_method(fts_inlet_decl_t *in, fts_symbol_t s)
+void
+fts_class_inlet_anything(fts_class_t *cl, int winlet)
+{
+  if(winlet < 0)
+    winlet = 0;
+  else if(winlet > CLASS_INLET_MAX)
+    winlet = CLASS_INLET_MAX;
+  
+  if(winlet >= cl->ninlets)
+    class_set_inlets_number(cl, winlet + 1);
+}
+
+void
+fts_class_outlet(fts_class_t *cl, int woutlet, fts_metaclass_t *class)
+{
+  fts_class_outlet_t *out;
+  fts_atom_t a;
+
+  if(woutlet >= cl->noutlets)
+    class_set_outlets_number(cl, woutlet + 1);
+    
+  out = class_get_outlet(cl, woutlet);
+
+  fts_set_pointer(&a, class);
+  class_outlet_add_declaration(out, &a);
+}
+
+void
+fts_class_outlet_message(fts_class_t *cl, int woutlet, fts_symbol_t selector)
+{
+  fts_class_outlet_t *out;
+  fts_atom_t a;
+
+  if(woutlet >= cl->noutlets)
+    class_set_outlets_number(cl, woutlet + 1);
+    
+  out = class_get_outlet(cl, woutlet);
+
+  fts_set_symbol(&a, selector);
+  class_outlet_add_declaration(out, &a);
+}
+
+void
+fts_class_outlet_anything(fts_class_t *cl, int woutlet)
+{
+  if(woutlet >= cl->noutlets)
+    class_set_outlets_number(cl, woutlet + 1);
+}
+
+/********************************************
+ *
+ *  request inlet/outlet methods and definitions
+ *
+ */
+fts_method_t 
+fts_class_get_method(fts_class_t *cl, fts_symbol_t s)
 {
   fts_atom_t k, a;
 
   fts_set_symbol(&k, s);
-  if(fts_hashtable_get(&in->messhash, &k, &a))
-    return fts_get_pointer(&a);
+  
+  if(fts_hashtable_get(&cl->messages, &k, &a))
+    return (fts_method_t)fts_get_pointer(&a);
   else
-    return in->anything;
+    return NULL;	
 }
 
-fts_method_t 
-fts_class_get_method(fts_class_t *cl, fts_symbol_t s)
+fts_method_t
+fts_class_inlet_get_method(fts_class_t *cl, int winlet, fts_metaclass_t *type)
 {
-  fts_inlet_decl_t *in = cl->sysinlet;
-
-  return inlet_get_method(in, s);
-}
-
-fts_method_t 
-fts_class_inlet_get_method(fts_class_t *cl, int inlet, fts_symbol_t s)
-{
-  fts_inlet_decl_t *in = class_get_inlet_decl(cl, inlet);
-
-  if(in != NULL)
-    return inlet_get_method(in, s);
-
-  return NULL;
-}
-
-fts_method_t 
-fts_class_inlet_get_anything(fts_class_t *cl, int inlet)
-{
-  fts_inlet_decl_t *in = class_get_inlet_decl(cl, inlet);
-
-  return in->anything;
+  fts_atom_t k, a;
+  
+  if(winlet < 0)
+    winlet = 0;
+  else if(winlet >= cl->ninlets)
+    winlet = cl->ninlets - 1;
+  
+  fts_set_int(&k, class_inlet_key(winlet, type));
+  
+  if(fts_hashtable_get(&cl->inlets, &k, &a))
+    return (fts_method_t)fts_get_pointer(&a);
+  else
+    return NULL;	
 }
 
 int
-fts_class_inlet_has_anything_only(fts_class_t *cl, int inlet)
+fts_class_outlet_get_declarations(fts_class_t *cl, int woutlet, fts_iterator_t *iter)
 {
-  fts_inlet_decl_t *in = class_get_inlet_decl(cl, inlet);
+  fts_class_outlet_t *out = class_get_outlet(cl, woutlet);
 
-  return (fts_hashtable_get_size(&in->messhash) == 0) && (in->anything != NULL);
-}
-
-fts_symbol_t 
-fts_class_outlet_get_selector(fts_class_t *cl, int outlet)
-{
-  fts_outlet_decl_t *out = class_get_outlet_decl(cl, outlet);
-
-  return out->selector;
-}
-
-/*****************************************************************************
- *
- *  equivalence function library
- *
- */
-int
-fts_arg_type_equiv(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_t *at1)
-{
-  int i;
-
-  if (ac0 != ac1)
+  if(out)
+    return class_outlet_get_declarations(out, iter);
+  else
     return 0;
-
-  for (i=0; i<ac0; i++)
-    if (!fts_atom_same_type(at0 + i, at1 + i))
-      return 0;
-
-  return 1;
 }
 
-int fts_arg_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
+int 
+fts_class_outlet_has_type(fts_class_t *cl, int woutlet, fts_metaclass_t *type)
 {
-  int i;
+  fts_class_outlet_t *out = class_get_outlet(cl, woutlet);
 
-  if (ac0 != ac1)
-    return 0;
-
-  for (i=0; i<ac0; i++)
+  if(out)  
     {
-      if ( !fts_atom_same_type( at0 + i, at1 + i))
-	return 0;
+      fts_atom_t a;
 
-      if (fts_is_int(at0 + i))
-	{
-	  if (fts_get_int(at0 + i) != fts_get_int(at1 + i))
-	    return 0;
-	}
-      else if (fts_is_float(at0 + i))
-	{
-	  if (fts_get_float(at0 + i) != fts_get_float(at1 + i))
-	    return 0;
-	}
-      else if (fts_is_symbol(at0 + i))
-	{
-	  if (fts_get_symbol(at0 + i) != fts_get_symbol(at1 + i))
-	    return 0;
-	}
-      else if (fts_is_string(at0 + i))
-	{
-	  if (strcmp(fts_get_string(at0 + i), fts_get_string(at1 + i)))
-	    return 0;
-	}
-      else if (fts_is_pointer(at0 + i))
-	{
-	  if (fts_get_pointer(at0 + i) != fts_get_pointer(at1 + i))
-	    return 0;
-	}
-    }
-
-  return 1;
-}
-
-/* as the previous, but in case of float values, just test type equivalence;
-   may be needed because the client protocol do not guarantee that two equal
-   floats are actually float (see expr, that is broken anyway).
-*/
-
-int
-fts_arg_equiv_or_float(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_t *at1)
-{
-  int i;
-
-  if (ac0 != ac1)
-    return 0;
-
-  for (i=0; i<ac0; i++)
-    {
-      if ( !fts_atom_same_type( at0 + i, at1 + i))
-	return 0;
-
-      if (fts_is_int(at0 + i))
-	{
-	  if (fts_get_int(at0 + i) != fts_get_int(at1 + i))
-	    return 0;
-	}
-      else if (fts_is_float(at0 + i))
-	{
-	  if (! fts_is_float(at1 + i))
-	    return 0;
-	}
-      else if (fts_is_symbol(at0 + i))
-	{
-	  if (fts_get_symbol(at0 + i) != fts_get_symbol(at1 + i))
-	    return 0;
-	}
-      else if (fts_is_string(at0 + i))
-	{
-	  if (strcmp(fts_get_string(at0 + i), fts_get_string(at1 + i)))
-	    return 0;
-	}
-      else if (fts_is_pointer(at0 + i))
-	{
-	  if (fts_get_pointer(at0 + i) != fts_get_pointer(at1 + i))
-	    return 0;
-	}
-    }
-
-  return 1;
-}
-
-/* if there is no first arg, return 1 */
-int
-fts_first_arg_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
-{
-  if (ac0 == 0  && ac1 == 0)
-    return 1;
-  else if (ac0 > 0 && ac1 > 0)
-    {
-      if ( !fts_atom_same_type( at0, at1))
-	{
-	  if (fts_is_int(at0))
-	    {
-	      if (fts_get_int(at0) == fts_get_int(at1))
-		return 1;
-	    }
-	  else if (fts_is_float(at0))
-	    {
-	      if (fts_get_float(at0) == fts_get_float(at1))
-		return 1;
-	    }
-	  else if (fts_is_symbol(at0))
-	    {
-	      if (fts_get_symbol(at0) == fts_get_symbol(at1))
-		return 1;
-	    }
-	  else if (fts_is_string(at0))
-	    {
-	      if (! strcmp(fts_get_string(at0), fts_get_string(at1)))
-		return 1;
-	    }
-	  else if (fts_is_pointer(at0))
-	    {
-	      if (fts_get_pointer(at0) == fts_get_pointer(at1))
-		return 1;
-	    }
-	}
-
-      return 0;
+      fts_set_pointer(&a, type);
+      return class_outlet_has_declaration(out, &a);
     }
   else
     return 0;
 }
 
-int
-fts_narg_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
+int 
+fts_class_outlet_has_message(fts_class_t *cl, int woutlet, fts_symbol_t selector)
 {
-  return ac0 == ac1;
-}
+  fts_class_outlet_t *out = class_get_outlet(cl, woutlet);
 
-int
-fts_never_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
-{
-  return 0;
+  if(out)  
+    {
+      fts_atom_t a;
+
+      fts_set_symbol(&a, selector);
+      return class_outlet_has_declaration(out, &a);
+    }
+  else
+    return 0;
 }
 
 /***********************************************************************

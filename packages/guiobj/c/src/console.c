@@ -93,17 +93,11 @@ static void consolestream_set_default( fts_object_t *o, int winlet, fts_symbol_t
   fts_set_default_console_stream( (fts_bytestream_t *)o);
 }
 
-static fts_status_t consolestream_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
+static void consolestream_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof(consolestream_t), 0, 0, 0);
+  fts_class_init( cl, sizeof(consolestream_t), consolestream_init, consolestream_delete);
 
-  fts_bytestream_class_init( cl);
-  fts_method_define_varargs( cl, fts_system_inlet, fts_s_init, consolestream_init);
-  fts_method_define_varargs( cl, fts_system_inlet, fts_s_delete, consolestream_delete);
-
-  fts_method_define_varargs( cl, fts_system_inlet, fts_new_symbol("set_default"), consolestream_set_default);
-
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_new_symbol("set_default"), consolestream_set_default);
 }
 
 void console_config( void)

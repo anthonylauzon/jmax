@@ -35,7 +35,7 @@ typedef struct dispatch
 static void
 dispatch_values(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_send(o, 1, s, ac, at); 
+  fts_outlet_varargs(o, 1, ac, at);
 }
 
 static void
@@ -69,21 +69,23 @@ dispatch_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   propagate_fun(propagate_context, o, 0);
 }
 
-static fts_status_t
-dispatch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+dispatch_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(dispatch_t), 1, 3, 0);
+  fts_class_init(cl, sizeof(dispatch_t), NULL, NULL);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_propagate_input, dispatch_propagate_input);
+  fts_class_method_varargs(cl, fts_s_propagate_input, dispatch_propagate_input);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, dispatch_values);
-  fts_method_define_varargs(cl, 0, fts_s_float, dispatch_values);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, dispatch_values);
-  fts_method_define_varargs(cl, 0, fts_s_list, dispatch_values);
+  fts_class_inlet_int(cl, 0, dispatch_values);
+  fts_class_inlet_float(cl, 0, dispatch_values);
+  fts_class_inlet_symbol(cl, 0, dispatch_values);
+  fts_class_inlet_varargs(cl, 0, dispatch_values);
 
-  fts_method_define_varargs(cl, 0, fts_s_anything, dispatch_send);
+  fts_class_set_default_handler(cl, dispatch_send);
 
-  return fts_ok;
+  fts_dsp_declare_outlet(cl, 0);
+  fts_class_outlet_varargs(cl, 1);
+  fts_class_outlet_anything(cl, 2);
 }
 
 void

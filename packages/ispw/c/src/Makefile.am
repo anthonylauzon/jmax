@@ -7,8 +7,6 @@ package_LTLIBRARIES=libispw.la
 
 libispw_la_SOURCES= \
 osc_ieeewrap.c \
-Rreceive.c \
-Rsend.c \
 accum.c \
 adc_tilda.c \
 atomlist.c \
@@ -96,7 +94,6 @@ wavetab.c
 INCLUDES=-I$(top_srcdir)/packages -I$(top_srcdir)/include
 
 noinst_HEADERS= \
-Rsend.h \
 atomlist.h \
 delbuf.h \
 deltable.h \

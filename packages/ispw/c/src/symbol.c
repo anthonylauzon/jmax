@@ -56,13 +56,12 @@ symbol_obj_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_a
 {
   symbol_obj_t *this = (symbol_obj_t *) o;
 
-  if(fts_is_symbol(at))
-    this->s = fts_get_symbol(at);
+  this->s = fts_get_symbol(at);
 }
 
 
 static void
-symbol_obj_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+symbol_obj_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   symbol_obj_t *this = (symbol_obj_t *) o;
   
@@ -81,22 +80,17 @@ symbol_obj_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     fts_object_set_error(o, "Argument required");
 }
 
-static fts_status_t
-symbol_obj_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+symbol_obj_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(symbol_obj_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(symbol_obj_t), symbol_obj_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, symbol_obj_init);
+  fts_class_method_varargs(cl, fts_s_bang, symbol_obj_bang);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, symbol_obj_bang);
-  fts_method_define_varargs(cl, 0, fts_s_int, symbol_obj_symbol);
-  fts_method_define_varargs(cl, 0, fts_s_list, symbol_obj_list);
+  fts_class_inlet_varargs(cl, 0, symbol_obj_varargs);
+  fts_class_inlet_symbol(cl, 1, symbol_obj_set);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, symbol_obj_set);
-
-  fts_outlet_type_define_varargs(cl, 0, fts_s_symbol);
-
-  return fts_ok;
+  fts_class_outlet_symbol(cl, 0);
 }
 
 void

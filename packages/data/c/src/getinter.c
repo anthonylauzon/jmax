@@ -204,20 +204,17 @@ getinter_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_object_release(this->obj);
 }
 
-static fts_status_t
-getinter_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+getinter_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(getinter_t), 2, 1, 0); 
+  fts_class_init(cl, sizeof(getinter_t), getinter_init, getinter_delete);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, getinter_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, getinter_delete);
+  fts_class_inlet_int(cl, 0, getinter_input);
+  fts_class_inlet_float(cl, 0, getinter_input);
   
-  fts_method_define_varargs(cl, 0, fts_s_int, getinter_input);
-  fts_method_define_varargs(cl, 0, fts_s_float, getinter_input);
-  
-  fts_method_define_varargs(cl, 1, ivec_symbol, getinter_set_reference);
+  fts_class_inlet(cl, 1, ivec_type, getinter_set_reference);
 
-  return fts_ok;
+  fts_class_outlet_float(cl, 0);
 }
 
 void

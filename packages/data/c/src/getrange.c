@@ -91,15 +91,16 @@ getrange_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
  *
  */
 
-static fts_status_t
-getrange_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+getrange_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_object_t), 1, 2, 0); 
+  fts_class_init(cl, sizeof(fts_object_t), NULL, NULL); 
   
-  fts_method_define_varargs(cl, 0, ivec_symbol, getrange_ivec);
-  fts_method_define_varargs(cl, 0, fvec_symbol, getrange_fvec);
-  
-  return fts_ok;
+  fts_class_inlet(cl, 0, ivec_type, getrange_ivec);
+  fts_class_inlet(cl, 0, fvec_type, getrange_fvec);
+
+  fts_class_outlet_number(cl, 0);
+  fts_class_outlet_number(cl, 1);
 }
 
 void

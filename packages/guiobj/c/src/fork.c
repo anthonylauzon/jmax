@@ -61,17 +61,15 @@ fork_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fts_object_set_outlets_number(o, n);
 }
 
-static fts_status_t 
-fork_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void 
+fork_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_object_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(fts_object_t), fork_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fork_init);
-  fts_method_define_varargs(cl, 0, fts_s_anything, fork_input);
+  fts_class_inlet_varargs(cl, 0, fork_input);
+  fts_class_set_default_handler(cl, fork_input);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("set_outlets"), fork_set_outlets);
-
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_new_symbol("set_outlets"), fork_set_outlets);
 }
 
 void fork_config(void)

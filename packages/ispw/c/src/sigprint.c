@@ -151,24 +151,19 @@ sigprint_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_dsp_add_function(fts_s_print, 3, argv);
 }
 
-static fts_status_t
-sigprint_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sigprint_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(sigprint_t), 1, 0, 0);
+  fts_class_init(cl, sizeof(sigprint_t), sigprint_init, sigprint_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sigprint_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sigprint_delete);
+  fts_class_method_varargs(cl, fts_s_put, sigprint_put);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, sigprint_put);
-
-  fts_method_define_varargs(cl, 0, fts_s_bang, sigprint_bang);
-  fts_method_define_varargs(cl, 0, fts_s_int, sigprint_int);
+  fts_class_method_varargs(cl, fts_s_bang, sigprint_bang);
+  fts_class_inlet_int(cl, 0, sigprint_int);
 
   fts_dsp_declare_function(fts_s_print, ftl_sigprint);
 
   fts_dsp_declare_inlet(cl, 0);
-
-  return fts_ok;
 }
 
 void

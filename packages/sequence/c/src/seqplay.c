@@ -116,7 +116,7 @@ seqplay_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	{
 	  fts_atom_t *a = event_get_value(event);
 	  
-	  fts_outlet_send(o, 0, fts_get_selector(a), 1, a);
+	  fts_outlet_varargs(o, 0, 1, a);
 	  event = event_get_next(event);
 	}
     }
@@ -426,7 +426,7 @@ seqplay_sync(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      fts_atom_t *a = event_get_value(event);
 
 	      if(track_is_active(this->track))
-		fts_outlet_send(o, 0, fts_get_selector(a), 1, a);
+		fts_outlet_varargs(o, 0, 1, a);
 
 	      event = event_get_next(event);
 	    }
@@ -496,42 +496,35 @@ seqplay_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     }
 }
 
-static fts_status_t
-seqplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+seqplay_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(seqplay_t), 4, 2, 0);
+  fts_class_init(cl, sizeof(seqplay_t), seqplay_init, seqplay_delete);
+
+  fts_class_method_varargs(cl, fts_new_symbol("locate"), seqplay_locate);
+  fts_class_method_varargs(cl, fts_s_start, seqplay_start);
+  fts_class_method_varargs(cl, fts_s_stop, seqplay_stop);
+  fts_class_method_varargs(cl, fts_new_symbol("pause"), seqplay_pause);
+  /* fts_class_method_varargs(cl, fts_new_symbol("loop"), seqplay_loop); */
+
+  fts_class_method_varargs(cl, fts_new_symbol("begin"), seqplay_set_begin);
+  fts_class_method_varargs(cl, fts_new_symbol("end"), seqplay_set_end);
+  fts_class_method_varargs(cl, fts_new_symbol("speed"), seqplay_set_speed);
+  fts_class_method_varargs(cl, fts_new_symbol("duration"), seqplay_set_duration);
+  fts_class_method_varargs(cl, fts_s_set, seqplay_set);
+
+  fts_class_method_varargs(cl, fts_new_symbol("sync"), seqplay_sync);
+
+  fts_class_method_varargs(cl, fts_s_bang, seqplay_play);
+  fts_class_method_varargs(cl, seqsym_track, seqplay_play);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, seqplay_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, seqplay_delete);
+  fts_class_inlet_varargs(cl, 0, seqplay_play);
+  fts_class_inlet_number(cl, 1, seqplay_set_begin);
+  fts_class_inlet_number(cl, 2, seqplay_set_end);
+  fts_class_inlet_number(cl, 3, seqplay_set_speed);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("locate"), seqplay_locate);
-  fts_method_define_varargs(cl, 0, fts_s_start, seqplay_start);
-  fts_method_define_varargs(cl, 0, fts_s_stop, seqplay_stop);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), seqplay_pause);
-  /* fts_method_define_varargs(cl, 0, fts_new_symbol("loop"), seqplay_loop); */
-
-  fts_method_define_varargs(cl, 0, fts_new_symbol("begin"), seqplay_set_begin);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("end"), seqplay_set_end);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("speed"), seqplay_set_speed);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("duration"), seqplay_set_duration);
-  fts_method_define_varargs(cl, 0, fts_s_set, seqplay_set);
-
-  fts_method_define_varargs(cl, 0, fts_new_symbol("sync"), seqplay_sync);
-
-  fts_method_define_varargs(cl, 0, fts_s_bang, seqplay_play);
-  fts_method_define_varargs(cl, 0, seqsym_track, seqplay_play);
-  fts_method_define_varargs(cl, 0, fts_s_list, seqplay_play);
-  
-  fts_method_define_varargs(cl, 1, fts_s_int, seqplay_set_begin);
-  fts_method_define_varargs(cl, 1, fts_s_float, seqplay_set_begin);
-
-  fts_method_define_varargs(cl, 2, fts_s_int, seqplay_set_end);
-  fts_method_define_varargs(cl, 2, fts_s_float, seqplay_set_end);
-
-  fts_method_define_varargs(cl, 3, fts_s_int, seqplay_set_speed);
-  fts_method_define_varargs(cl, 3, fts_s_float, seqplay_set_speed);
-  
-  return fts_ok;
+  fts_class_outlet_varargs(cl, 0);
+  fts_class_outlet_bang(cl, 1);
 }
 
 void

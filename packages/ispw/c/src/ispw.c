@@ -24,7 +24,6 @@
 /* control */
 extern void ispw_naming_init(void);
 extern void bangbang_config(void);
-extern void gate_config(void);
 extern void ispwcomp_config(void);
 extern void loadbang_config(void);
 extern void atom_list_config(void);
@@ -34,6 +33,7 @@ extern void pack_config(void);
 extern void pipe_config(void);
 extern void poly_config(void);
 extern void prepend_config(void);
+extern void gate_config(void);
 extern void route_config(void);
 extern void split_config(void);
 extern void timer_config(void);
@@ -72,8 +72,6 @@ extern void adc_tilda_config(void);
 extern void makenote_config(void);
 extern void stripnote_config(void);
 extern void sustain_config(void);
-extern void Rreceive_config(void);
-extern void Rsend_config(void);
 extern void mididecrypt_config( void);
 
 /* sampling */
@@ -121,7 +119,6 @@ ispw_config(void)
   /* control init */
   ispw_naming_init();
   bangbang_config();
-  gate_config();
   ispwcomp_config();
   loadbang_config();
   atom_list_config();
@@ -131,6 +128,7 @@ ispw_config(void)
   pipe_config();
   poly_config();
   prepend_config();
+  gate_config();
   route_config();
   split_config();
   timer_config();
@@ -169,8 +167,6 @@ ispw_config(void)
   makenote_config();
   stripnote_config();
   sustain_config();
-  Rreceive_config();
-  Rsend_config();
   mididecrypt_config();
 
   /* sampling */

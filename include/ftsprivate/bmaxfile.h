@@ -176,7 +176,7 @@ struct fts_bmax_file {
 extern void fts_bmax_code_push_atoms(fts_bmax_file_t *f, int ac, const fts_atom_t *at);
 extern void fts_bmax_code_push_symbol(fts_bmax_file_t *f, fts_symbol_t sym);
 extern void fts_bmax_code_pop_args(fts_bmax_file_t *f, int value);
-extern void fts_bmax_code_obj_mess(fts_bmax_file_t *f, int inlet, fts_symbol_t sel, int nargs);
+extern void fts_bmax_code_obj_mess(fts_bmax_file_t *f, fts_symbol_t sel, int nargs);
 extern void fts_bmax_code_return(fts_bmax_file_t *f);
 extern void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx);
 

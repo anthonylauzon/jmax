@@ -277,35 +277,31 @@ biquad_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 
-static fts_status_t
-biquad_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+biquad_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(biquad_t), 6, 1, 0);
+  fts_class_init(cl, sizeof(biquad_t), biquad_init, biquad_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, biquad_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, biquad_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, biquad_put);
+  fts_class_method_varargs(cl, fts_s_put, biquad_put);
   
-  fts_method_define_varargs(cl, 1, fts_s_float, biquad_set_coef_a0);
-  fts_method_define_varargs(cl, 2, fts_s_float, biquad_set_coef_a1);
-  fts_method_define_varargs(cl, 3, fts_s_float, biquad_set_coef_a2);
-  fts_method_define_varargs(cl, 4, fts_s_float, biquad_set_coef_b1);
-  fts_method_define_varargs(cl, 5, fts_s_float, biquad_set_coef_b2);
+  fts_class_inlet_float(cl, 1, biquad_set_coef_a0);
+  fts_class_inlet_float(cl, 2, biquad_set_coef_a1);
+  fts_class_inlet_float(cl, 3, biquad_set_coef_a2);
+  fts_class_inlet_float(cl, 4, biquad_set_coef_b1);
+  fts_class_inlet_float(cl, 5, biquad_set_coef_b2);
   
-  fts_method_define_varargs(cl, 1, fts_s_int, biquad_set_coef_a0);
-  fts_method_define_varargs(cl, 2, fts_s_int, biquad_set_coef_a1);
-  fts_method_define_varargs(cl, 3, fts_s_int, biquad_set_coef_a2);
-  fts_method_define_varargs(cl, 4, fts_s_int, biquad_set_coef_b1);
-  fts_method_define_varargs(cl, 5, fts_s_int, biquad_set_coef_b2);
+  fts_class_inlet_int(cl, 1, biquad_set_coef_a0);
+  fts_class_inlet_int(cl, 2, biquad_set_coef_a1);
+  fts_class_inlet_int(cl, 3, biquad_set_coef_a2);
+  fts_class_inlet_int(cl, 4, biquad_set_coef_b1);
+  fts_class_inlet_int(cl, 5, biquad_set_coef_b2);
   
-  fts_method_define_varargs(cl, 0, fts_s_set, biquad_set_coefs);
-  fts_method_define_varargs(cl, 0, fts_s_clear, biquad_state_clear);
+  fts_class_method_varargs(cl, fts_s_set, biquad_set_coefs);
+  fts_class_method_varargs(cl, fts_s_clear, biquad_state_clear);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-  
-  return fts_ok;
-}
+  }
 
 void
 signal_biquad_config(void)

@@ -110,18 +110,13 @@ clipboard_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fclose(this->file);
 }
 
-static fts_status_t
-clipboard_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+clipboard_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_clipboard_t), 0, 0, 0); 
+  fts_class_init(cl, sizeof(fts_clipboard_t), clipboard_init, clipboard_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init,  clipboard_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete,  clipboard_delete);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_paste,  clipboard_paste_in);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_copy,   clipboard_copy_selection);
-
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_s_paste,  clipboard_paste_in);
+  fts_class_method_varargs(cl, fts_s_copy,   clipboard_copy_selection);
 }
 
 

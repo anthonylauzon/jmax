@@ -166,27 +166,20 @@ for_set_and_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  *
  */
 
-static fts_status_t
-for_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+for_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(for_t), 3, 1, 0);
+  fts_class_init(cl, sizeof(for_t), for_init, NULL);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, for_init);
+  fts_class_method_varargs(cl, fts_s_set, for_set);
+  fts_class_method_varargs(cl, fts_s_bang, for_go);
+  fts_class_inlet_varargs(cl, 0, for_set_and_go);
 
-  fts_method_define_varargs(cl, 0, fts_s_set, for_set);
-  fts_method_define_varargs(cl, 0, fts_s_bang, for_go);
-  fts_method_define_varargs(cl, 0, fts_s_list, for_set_and_go);
+  fts_class_inlet_number(cl, 0, for_set_init_and_go);
+  fts_class_inlet_number(cl, 1, for_set_limit);
+  fts_class_inlet_number(cl, 2, for_set_incr);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, for_set_init_and_go);
-  fts_method_define_varargs(cl, 0, fts_s_float, for_set_init_and_go);
-
-  fts_method_define_varargs(cl, 1, fts_s_int, for_set_limit);
-  fts_method_define_varargs(cl, 1, fts_s_float, for_set_limit);
-
-  fts_method_define_varargs(cl, 2, fts_s_int, for_set_incr);
-  fts_method_define_varargs(cl, 2, fts_s_float, for_set_incr);
-
-  return fts_ok;
+  fts_class_outlet_number(cl, 0);
 }
 
 void

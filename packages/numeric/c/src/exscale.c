@@ -207,34 +207,21 @@ exscale_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
   exscale_set(o, 0, 0, ac, at);
 }
 
-static fts_status_t
-exscale_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+exscale_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(exscale_t), 6, 1, 0);
+  fts_class_init(cl, sizeof(exscale_t), exscale_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, exscale_init);
+  fts_class_method_varargs(cl, fts_s_set, exscale_set);
 
-  fts_method_define_varargs(cl, 0, fts_s_set, exscale_set);
+  fts_class_inlet_number(cl, 0, exscale_number);
+  fts_class_inlet_number(cl, 1, exscale_set_inlow);
+  fts_class_inlet_number(cl, 2, exscale_set_inhigh);
+  fts_class_inlet_number(cl, 3, exscale_set_outlow);
+  fts_class_inlet_number(cl, 4, exscale_set_outhigh);
+  fts_class_inlet_number(cl, 5, exscale_set_base);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, exscale_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, exscale_number);
-
-  fts_method_define_varargs(cl, 1, fts_s_int, exscale_set_inlow);
-  fts_method_define_varargs(cl, 1, fts_s_float, exscale_set_inlow);
-
-  fts_method_define_varargs(cl, 2, fts_s_int, exscale_set_inhigh);
-  fts_method_define_varargs(cl, 2, fts_s_float, exscale_set_inhigh);
-
-  fts_method_define_varargs(cl, 3, fts_s_int, exscale_set_outlow);
-  fts_method_define_varargs(cl, 3, fts_s_float, exscale_set_outlow);
-
-  fts_method_define_varargs(cl, 4, fts_s_int, exscale_set_outhigh);
-  fts_method_define_varargs(cl, 4, fts_s_float, exscale_set_outhigh);
-
-  fts_method_define_varargs(cl, 5, fts_s_int, exscale_set_base);
-  fts_method_define_varargs(cl, 5, fts_s_float, exscale_set_base);
-
-  return fts_ok;
+  fts_class_outlet_float(cl, 0);
 }
 
 void

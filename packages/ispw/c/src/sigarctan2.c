@@ -144,15 +144,12 @@ sigarctan2_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 
-static fts_status_t
-sigarctan2_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sigarctan2_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(sigarctan2_t), 2, 1, 0); 
+  fts_class_init(cl, sizeof(sigarctan2_t), sigarctan2_init, sigarctan2_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sigarctan2_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sigarctan2_delete);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, sigarctan2_put);
+  fts_class_method_varargs(cl, fts_s_put, sigarctan2_put);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_inlet(cl, 1);
@@ -160,8 +157,6 @@ sigarctan2_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   sigarctan2_function = fts_new_symbol("arctan2");
   fts_dsp_declare_function(sigarctan2_function, ftl_arctan2);
-
-  return fts_ok;
 }
 
 void

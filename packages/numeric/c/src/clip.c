@@ -117,7 +117,7 @@ clip_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-clip_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clip_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   clip_t *this = (clip_t *)o;
   fts_atom_t *out = alloca(ac * sizeof(fts_atom_t));
@@ -147,29 +147,23 @@ clip_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	out[i] = at[i];
     }
 
-  fts_outlet_atoms(o, 0, ac, out);
+  fts_outlet_varargs(o, 0, ac, out);
 }
 
-static fts_status_t
-clip_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+clip_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(clip_t), 3, 1, 0);
+  fts_class_init(cl, sizeof(clip_t), clip_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, clip_init);
+  fts_class_method_varargs(cl, fts_s_set, clip_set);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, clip_int);
-  fts_method_define_varargs(cl, 0, fts_s_float, clip_float);
+  fts_class_inlet_varargs(cl, 0, clip_varargs);
+  fts_class_inlet_int(cl, 0, clip_int);
+  fts_class_inlet_float(cl, 0, clip_float);
+  fts_class_inlet_number(cl, 1, clip_set_min);
+  fts_class_inlet_number(cl, 2, clip_set_max);
 
-  fts_method_define_varargs(cl, 0, fts_s_set, clip_set);
-  fts_method_define_varargs(cl, 0, fts_s_list, clip_atoms);
-
-  fts_method_define_varargs(cl, 1, fts_s_int, clip_set_min);
-  fts_method_define_varargs(cl, 1, fts_s_float, clip_set_min);
-
-  fts_method_define_varargs(cl, 2, fts_s_int, clip_set_max);
-  fts_method_define_varargs(cl, 2, fts_s_float, clip_set_max);
-
-  return fts_ok;
+  fts_class_outlet_varargs(cl, 0);
 }
 
 void

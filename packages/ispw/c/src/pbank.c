@@ -323,13 +323,13 @@ typedef struct
 } pbank_t;
 
 static void
-pbank_send_message_to_label(pbank_t *this, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
+pbank_send_message_to_label(pbank_t *this, int i, int ac, const fts_atom_t *at)
 {
   fts_symbol_t name = this->receives[i];
   fts_label_t *label = fts_label_get(fts_object_get_patcher((fts_object_t *)this), name);
 
   if(label)
-    fts_label_send(label, s, ac, at);
+    fts_label_send(label, 0, ac, at);
 }
 
 static void
@@ -494,7 +494,7 @@ pbank_get_row_to_receives(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
       fts_atom_t *atom = row + j;
 
       this->data->buffer[j] = *atom;
-      pbank_send_message_to_label(this, j, fts_get_selector(atom), 1, atom);
+      pbank_send_message_to_label(this, j, 1, atom);
     }
 }
 
@@ -526,7 +526,7 @@ pbank_get_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  this->out_list[j] = row[j];
 	}
       
-      fts_outlet_atoms(o, 0, n, this->out_list);
+      fts_outlet_varargs(o, 0, n, this->out_list);
     }
   else
     pbank_get_row_to_receives(o, 0, 0, ac, at);
@@ -557,7 +557,7 @@ pbank_recall_to_receives(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
       fts_atom_t *atom = row + j;
 
       this->data->buffer[j] = *atom;
-      pbank_send_message_to_label(this, j, fts_get_selector(atom), 1, atom);
+      pbank_send_message_to_label(this, j, 0, atom);
     }
 }
 
@@ -598,12 +598,12 @@ pbank_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      /* buaaaarrrrrrrgg zaaaaaaaaaaaaack!!!!!!!*&(*@#&^(*^&*(%#$ */
 	      fts_set_symbol((out_list + 1), fts_s_symbol);
 	      out_list[2] = row[j];
-	      fts_outlet_atoms(o, 0, 3, out_list);
+	      fts_outlet_varargs(o, 0, 3, out_list);
 	    }
 	  else 
 	    {
 	      out_list[1] = row[j];
-	      fts_outlet_atoms(o, 0, 2, out_list);
+	      fts_outlet_varargs(o, 0, 2, out_list);
 	    }
 	}
     }
@@ -662,7 +662,7 @@ pbank_set_and_get_to_receives(fts_object_t *o, int winlet, fts_symbol_t s, int a
 
   if(ac == 2) 
     /* read atom from matrix and send to receives */
-    pbank_send_message_to_label(this, j, fts_get_selector(atom), 1, atom);
+    pbank_send_message_to_label(this, j, 1, atom);
   else
     {
       /* write atom to matrix */
@@ -710,12 +710,12 @@ pbank_set_and_get(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 	      /* ones more: buaaaarrrrrrrgg zaaaaaaaaaaaaack!!!!!!!*&(*@#&^(*^&*(%#$ */
 	      fts_set_symbol(out_list + 1, fts_s_symbol);
 	      out_list[2] = *atom;
-	      fts_outlet_atoms(o, 0, 3, out_list);
+	      fts_outlet_varargs(o, 0, 3, out_list);
 	    }
 	  else 
 	    {
 	      out_list[1] = *atom;
-	      fts_outlet_atoms(o, 0, 2, out_list);
+	      fts_outlet_varargs(o, 0, 2, out_list);
 	    }
 	}
       else
@@ -764,31 +764,26 @@ pbank_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  *
  */
 
-static fts_status_t
-pbank_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+pbank_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(pbank_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(pbank_t), pbank_init, pbank_delete);
+
+  fts_class_inlet_varargs(cl, 0, pbank_set_and_get);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, pbank_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, pbank_delete);
-
-  fts_method_define_varargs(cl, 0, fts_s_list, pbank_set_and_get);
+  fts_class_inlet_int(cl, 0, pbank_get_row);
+  fts_class_method_varargs(cl, fts_new_symbol("recall"), pbank_recall);
   
-  fts_method_define_varargs(cl, 0, fts_s_int, pbank_get_row);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("recall"), pbank_recall);
-  
-  fts_method_define_varargs(cl, 0, fts_s_set, pbank_set);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("put"), pbank_put);
+  fts_class_method_varargs(cl, fts_s_set, pbank_set);
+  fts_class_method_varargs(cl, fts_new_symbol("put"), pbank_put);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("store"), pbank_store);
+  fts_class_method_varargs(cl, fts_new_symbol("store"), pbank_store);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("write"), pbank_write);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("read"), pbank_read);
-  fts_method_define_varargs(cl, 0, fts_s_export, pbank_export);
+  fts_class_method_varargs(cl, fts_new_symbol("write"), pbank_write);
+  fts_class_method_varargs(cl, fts_new_symbol("read"), pbank_read);
+  fts_class_method_varargs(cl, fts_s_export, pbank_export);
 
-  fts_outlet_type_define_varargs(cl, 0, fts_s_list);
-
-  return fts_ok;
+  fts_class_outlet_varargs(cl, 0);
 }
 
 void

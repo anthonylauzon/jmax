@@ -292,7 +292,7 @@ static void readsf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
   fts_thread_manager_start();
 
   fts_dsp_add_object(o);
-
+  fts_object_set_outlets_number(o, n_channels);
 }
 
 static void readsf_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -320,42 +320,24 @@ static void readsf_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
 }
 
 
-static fts_status_t
+static void
 readsf_instantiate(fts_class_t* cl, int ac, const fts_atom_t* at)
 {
-    int n_channels;
-    int i;
-    
-    n_channels = fts_get_int_arg(ac, at, 0, 1);
+  fts_class_init(cl, sizeof(readsf_t), readsf_init, readsf_delete);
+  fts_class_method_varargs(cl, fts_s_put, readsf_put);
+  
+  fts_class_method_varargs(cl, fts_s_open, readsf_open);
+  fts_class_method_varargs(cl, fts_s_close, readsf_close);
+  
+  /* not yet implemented */
+  fts_class_method_varargs(cl, fts_s_start, readsf_start);
+  fts_class_method_varargs(cl, fts_s_stop, readsf_stop);
+  fts_class_method_varargs(cl, s_pause, readsf_pause);
+  
+  fts_dsp_declare_outlet(cl, 0);
 
-    if (n_channels < 1)
-    {
-	n_channels = 1;
-    }
-
-    fts_class_init(cl, sizeof(readsf_t), 1, n_channels + 1, 0);
-    
-    fts_method_define_varargs(cl ,fts_system_inlet, fts_s_init, readsf_init);
-    fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, readsf_delete);
-    fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, readsf_put);
-
-    fts_method_define_varargs(cl, 0, fts_s_open, readsf_open);
-    fts_method_define_varargs(cl, 0, fts_s_close, readsf_close);
-
-    /* not yet implemented */
-    fts_method_define_varargs(cl, 0, fts_s_start, readsf_start);
-    fts_method_define_varargs(cl, 0, fts_s_stop, readsf_stop);
-    fts_method_define_varargs(cl, 0, s_pause, readsf_pause);
-
-    for (i = 0; i < n_channels; ++i)
-    {
-	fts_dsp_declare_outlet(cl, i);
-    }
-
-    fts_dsp_declare_function(readsf_symbol, readsf_dsp);
-    
-    return fts_ok;
-}
+  fts_dsp_declare_function(readsf_symbol, readsf_dsp);
+  }
 
 
 
@@ -366,9 +348,9 @@ readsf_instantiate(fts_class_t* cl, int ac, const fts_atom_t* at)
  */
 void readsf_config(void)
 {
-    s_play = fts_new_symbol( "play");
-    s_pause = fts_new_symbol( "pause");
-
-    readsf_symbol = fts_new_symbol("readsf~");
-    fts_metaclass_install(readsf_symbol, readsf_instantiate, fts_first_arg_equiv);
+  s_play = fts_new_symbol( "play");
+  s_pause = fts_new_symbol( "pause");
+  
+  readsf_symbol = fts_new_symbol("readsf~");
+  fts_class_install(readsf_symbol, readsf_instantiate);
 }

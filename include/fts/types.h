@@ -66,3 +66,14 @@ typedef void (*fts_function_t) (int, const fts_atom_t *);
 /* typedef void (*fts_return_t) (fts_object_t *, int, fts_symbol_t , int, const fts_atom_t *, fts_atom_t *ret); */
 /* typedef void (*fts_function_t) (int, const fts_atom_t *, fts_atom_t *ret); */
 
+typedef enum fts_connection_type
+{
+  fts_c_order_forcing = -3, /* order forcing */
+  fts_c_hidden = -2, /* hidden connection */
+  fts_c_null = -1, /* from error object or type missmatch */
+  fts_c_anything = 0, /* message, value or signal */
+  fts_c_message = 1, /* message, value or signal */
+  fts_c_value = 2, /* varargs (unpacked tuple) or single value */
+  fts_c_signal = 3, /* signal connection */
+  fts_c_signal_active = 4 /* active signal connection */
+} fts_connection_type_t;

@@ -139,7 +139,7 @@ drunk_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
 
 static void
-drunk_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+drunk_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   switch(ac)
     {
@@ -175,27 +175,21 @@ drunk_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 
-static fts_status_t
-drunk_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+drunk_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(drunk_t), 3, 1, 0); 
+  fts_class_init(cl, sizeof(drunk_t), drunk_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, drunk_init);
+  fts_class_method_varargs(cl, fts_s_set, drunk_set);
 
-  fts_method_define_varargs(cl, 0, fts_s_set, drunk_set);
+  fts_class_method_varargs(cl, fts_s_bang, drunk_bang);
+  fts_class_inlet_number(cl, 0, drunk_number);
+  fts_class_inlet_varargs(cl, 0, drunk_varargs);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, drunk_bang);
-  fts_method_define_varargs(cl, 0, fts_s_int, drunk_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, drunk_number);
-  fts_method_define_varargs(cl, 0, fts_s_list, drunk_atoms);
+  fts_class_inlet_number(cl, 1, drunk_set_range);
+  fts_class_inlet_number(cl, 2, drunk_set_correlation);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, drunk_set_range);
-  fts_method_define_varargs(cl, 1, fts_s_float, drunk_set_range);
-
-  fts_method_define_varargs(cl, 2, fts_s_int, drunk_set_correlation);
-  fts_method_define_varargs(cl, 2, fts_s_float, drunk_set_correlation);
-
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
 }
 
 void

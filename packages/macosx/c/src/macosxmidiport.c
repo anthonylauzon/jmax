@@ -361,31 +361,21 @@ macosxmidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   fts_midiport_reset((fts_midiport_t *)this);
 }
 
-static fts_status_t
-macosxmidi_input_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+macosxmidi_input_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof( macosxmidiport_t), 0, 0, 0);
-  
-  fts_midiport_class_init(cl);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, macosxmidi_input_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, macosxmidiport_delete);
-  
-  return fts_ok;
-}
+  fts_class_init(cl, sizeof( macosxmidiport_t), macosxmidi_input_init, macosxmidiport_delete);
 
-static fts_status_t
-macosxmidi_output_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+  fts_midiport_class_init(cl);  
+  }
+
+static void
+macosxmidi_output_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof( macosxmidiport_t), 0, 0, 0);
-  
+  fts_class_init(cl, sizeof( macosxmidiport_t), macosxmidi_output_init, macosxmidiport_delete);
+
   fts_midiport_class_init(cl);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, macosxmidi_output_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, macosxmidiport_delete);
-  
-  return fts_ok;
-}
+    }
 
 void 
 macosxmidiport_config( void)

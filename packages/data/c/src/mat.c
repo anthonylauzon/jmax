@@ -398,12 +398,6 @@ mat_write_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t s
  */
 
 static void
-mat_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_outlet_object(o, 0, o);
-}
-
-static void
 mat_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *this = (mat_t *)o;
@@ -701,41 +695,29 @@ mat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     fts_free(this->data);
 }
 
-static fts_status_t
-mat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+mat_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(mat_t), 1, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, mat_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, mat_delete);
+  fts_class_init(cl, sizeof(mat_t), mat_init, mat_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, mat_post); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, mat_print); 
+  fts_class_method_varargs(cl, fts_s_post, mat_post); 
+  fts_class_method_varargs(cl, fts_s_print, mat_print); 
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, mat_get_mat);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_instance, mat_set_from_instance);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, mat_set_elements);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_row, mat_set_row_elements);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_size, mat_size);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, mat_dump);
+  fts_class_method_varargs(cl, fts_s_set_from_instance, mat_set_from_instance);
+  fts_class_method_varargs(cl, fts_s_dump, mat_dump);
   
-  fts_method_define_varargs(cl, 0, fts_s_bang, mat_output);
+  fts_class_method_varargs(cl, fts_s_fill, mat_fill);      
+  fts_class_method_varargs(cl, fts_s_set, mat_set_elements);
+  fts_class_method_varargs(cl, fts_s_row, mat_set_row_elements);
 
-  fts_method_define_varargs(cl, 0, fts_s_fill, mat_fill);      
-  fts_method_define_varargs(cl, 0, fts_s_set, mat_set_elements);
-  fts_method_define_varargs(cl, 0, fts_s_row, mat_set_row_elements);
-
-  fts_method_define_varargs(cl, 0, fts_s_size, mat_size);
+  fts_class_method_varargs(cl, fts_s_size, mat_size);
             
-  fts_method_define_varargs(cl, 0, fts_s_import, mat_import); 
-  fts_method_define_varargs(cl, 0, fts_s_export, mat_export); 
-
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_s_import, mat_import); 
+  fts_class_method_varargs(cl, fts_s_export, mat_export); 
 }
 
 void

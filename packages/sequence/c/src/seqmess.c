@@ -93,18 +93,15 @@ seqmess_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   seqmess_set_from_array(o, 0, 0, ac, at);
 }
 
-static fts_status_t
-seqmess_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+seqmess_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(seqmess_t), 0, 0, 0); 
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, seqmess_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, seqmess_post);
+  fts_class_init(cl, sizeof(seqmess_t), seqmess_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, seqmess_get_array);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_array, seqmess_set_from_array);
+  fts_class_method_varargs(cl, fts_s_post, seqmess_post);
 
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_s_get_array, seqmess_get_array);
+  fts_class_method_varargs(cl, fts_s_set_from_array, seqmess_set_from_array);
 }
 
 void

@@ -35,24 +35,15 @@ typedef struct
 } stripnote_t;
 
 static void
-stripnote_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+stripnote_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   stripnote_t *x = (stripnote_t *)o;
 
   if (x->n)
     {
       fts_outlet_int(o, 1, x->n);
-      fts_outlet_int(o, 0, fts_get_int(at));
+      fts_outlet_int(o, 0, fts_get_number_int(at));
     }
-}
-
-static void
-stripnote_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  stripnote_t *x = (stripnote_t *)o;
-
-  if (x->n)
-    fts_outlet_int(o, 0, (long) fts_get_float(at));
 }
 
 static void
@@ -60,41 +51,31 @@ stripnote_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   stripnote_t *x = (stripnote_t *)o;
 
-  x->n = fts_get_int_arg(ac, at, 0, 0);
+  x->n = fts_get_number_int(at);
 }
 
 
 static void
 stripnote_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if ((ac >= 2) && fts_is_number(&at[1]))
+  if (ac > 1 && fts_is_number(at + 1))
     stripnote_number_1(o, winlet, s, 1, at + 1);
 
-  if (ac >= 1)
-    {
-      if (fts_is_int(&at[0]))
-	stripnote_int(o, winlet, s, 1, at);
-      else
-	if (fts_is_float(&at[0]))
-	  stripnote_float(o, winlet, s, 1, at);
-    }
+  if (ac > 0 && fts_is_number(at))
+    stripnote_number(o, winlet, s, 1, at);
 }
 
-static fts_status_t
-stripnote_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+stripnote_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(stripnote_t), 2, 2, 0); 
+  fts_class_init(cl, sizeof(stripnote_t), 0, 0); 
 
-  fts_method_define_varargs(cl, 0, fts_s_int, stripnote_int);
-  fts_method_define_varargs(cl, 0, fts_s_float, stripnote_float);
+  fts_class_inlet_varargs(cl, 0, stripnote_list);
+  fts_class_inlet_number(cl, 0, stripnote_number);
+  fts_class_inlet_number(cl, 1, stripnote_number_1);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, stripnote_number_1);
-  fts_method_define_varargs(cl, 1, fts_s_list, stripnote_list);
-
-  fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
-  fts_outlet_type_define_varargs(cl, 1,	fts_s_int);
-
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
+  fts_class_outlet_int(cl, 1);
 }
 
 void

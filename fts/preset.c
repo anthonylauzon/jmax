@@ -81,13 +81,10 @@ preset_dumper_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   fts_dumper_destroy((fts_dumper_t *)this);
 }
   
-static fts_status_t
-preset_dumper_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+preset_dumper_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(preset_dumper_t), 0, 0, 0);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, preset_dumper_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, preset_dumper_delete);
+  fts_class_init(cl, sizeof(preset_dumper_t), preset_dumper_init, preset_dumper_delete);
 
   return fts_Success;
 }
@@ -446,29 +443,26 @@ preset_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     fts_object_release(this->objects[i]);
 }
 
-static fts_status_t
-preset_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+preset_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(preset_t), 1, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, preset_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, preset_delete);
+  fts_class_init(cl, sizeof(preset_t), preset_init, preset_delete);
 
   /* save and restore to/from bmax file */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, preset_dump); 
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_new_preset, preset_new_preset);
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_dump_mess, preset_dump_mess);
+  fts_class_method_varargs(cl, fts_s_dump, preset_dump); 
+  fts_class_method_varargs(cl, sym_new_preset, preset_new_preset);
+  fts_class_method_varargs(cl, sym_dump_mess, preset_dump_mess);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, preset_get_array);
+  fts_class_method_varargs(cl, fts_s_get_array, preset_get_array);
 
   /* persistency */
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, preset_get_state);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("store"), preset_store);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("recall"), preset_recall);
-  fts_method_define_varargs(cl, 0, fts_s_clear, preset_clear);
+  fts_class_method_varargs(cl, fts_new_symbol("store"), preset_store);
+  fts_class_method_varargs(cl, fts_new_symbol("recall"), preset_recall);
+  fts_class_method_varargs(cl, fts_s_clear, preset_clear);
 
   return fts_Success;
 }

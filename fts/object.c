@@ -44,7 +44,8 @@ static void fts_object_unbind(fts_object_t *obj);
  *
  */
 
-fts_object_t *fts_object_new( fts_class_t *cl)
+fts_object_t *
+fts_object_new( fts_class_t *cl)
 {
   fts_object_t *obj = (fts_object_t *)fts_heap_zalloc(cl->heap);
 
@@ -120,13 +121,13 @@ fts_object_create(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
   fts_class_t *cl = mcl->inst_list;
   fts_object_t *obj = 0;
 
-  if (cl)
-    {
-      obj = fts_object_new( cl);
-      
-      if(fts_class_get_constructor(cl))
-	fts_class_get_constructor(cl)(obj, fts_system_inlet, fts_s_init, ac, at); 
-    }
+  if(!cl)
+    cl = fts_class_instantiate(mcl);
+
+  obj = fts_object_new( cl);
+  
+  if(fts_class_get_constructor(cl))
+    fts_class_get_constructor(cl)(obj, fts_system_inlet, fts_s_init, ac, at); 
 
   return obj;
 }
@@ -158,14 +159,14 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
 
       fts_set_int(a, 0);
       fts_set_int(a + 1, 0);
-      cl = fts_class_instantiate(patcher_metaclass, 2, a);
+      cl = fts_class_instantiate(patcher_metaclass);
     }
   else
     {
       fts_metaclass_t *mcl = fts_metaclass_get_by_name(NULL, fts_get_symbol(at));
       
       if (mcl)
-	cl = fts_class_instantiate(mcl, ac - 1, at + 1);
+	cl = fts_class_instantiate(mcl);
     }
 
   if (!cl)

@@ -197,32 +197,19 @@ scale_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_
 }
 
 
-static fts_status_t
-scale_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+scale_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(scale_t), 6, 1, 0);
+  fts_class_init(cl, sizeof(scale_t), scale_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, scale_init);
+  fts_class_inlet_number(cl, 0, scale_input);
+  fts_class_inlet_number(cl, 1, scale_set_ilow);
+  fts_class_inlet_number(cl, 2, scale_set_ihi);
+  fts_class_inlet_number(cl, 3, scale_set_olow);
+  fts_class_inlet_number(cl, 4, scale_set_ohi);
+  fts_class_inlet_number(cl, 5, scale_set_logincr);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, scale_input);
-  fts_method_define_varargs(cl, 0, fts_s_float, scale_input);
-
-  fts_method_define_varargs(cl, 1, fts_s_int, scale_set_ilow);
-  fts_method_define_varargs(cl, 1, fts_s_float, scale_set_ilow);
-
-  fts_method_define_varargs(cl, 2, fts_s_int, scale_set_ihi);
-  fts_method_define_varargs(cl, 2, fts_s_float, scale_set_ihi);
-
-  fts_method_define_varargs(cl, 3, fts_s_int, scale_set_olow);
-  fts_method_define_varargs(cl, 3, fts_s_float, scale_set_olow);
-
-  fts_method_define_varargs(cl, 4, fts_s_int, scale_set_ohi);
-  fts_method_define_varargs(cl, 4, fts_s_float, scale_set_ohi);
-
-  fts_method_define_varargs(cl, 5, fts_s_int, scale_set_logincr);
-  fts_method_define_varargs(cl, 5, fts_s_float, scale_set_logincr);
-
-  return fts_ok;
+  fts_class_outlet_number(cl, 0);
 }
 
 void

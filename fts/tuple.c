@@ -78,20 +78,15 @@ tuple_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_array_destroy(&this->args);
 }
 
-static fts_status_t
-tuple_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+tuple_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_tuple_t), 0, 0, 0);
+  fts_class_init(cl, sizeof(fts_tuple_t), tuple_init, tuple_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, tuple_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tuple_delete);
+  fts_class_method_varargs(cl, fts_s_post, tuple_post);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, tuple_post);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_compare, tuple_compare);
-  
-  return fts_ok;
-}
+  fts_class_method_varargs(cl, fts_s_compare, tuple_compare);
+  }
 
 void
 fts_kernel_tuple_init(void)

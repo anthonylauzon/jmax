@@ -105,77 +105,61 @@ prepend_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-prepend_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  prepend_t *x = (prepend_t *)o;
-  fts_atom_t sat[max_prepend];
-  int n;
-
-  if (ac + x->ac >= max_prepend)
-    {
-      post("prepend: input list too long (total %d max)\n", max_prepend);
-      ac = max_prepend - x->ac;
-    }
-
-  n = ac + x->ac;
-  memcpy(&sat[0],     x->at, x->ac * sizeof(fts_atom_t));
-  memcpy(&sat[x->ac], at,    ac    * sizeof(fts_atom_t));
-
-  if (x->presym)
-    fts_outlet_send(o, 0, x->presym, n, sat);
-  else
-    fts_outlet_atoms(o, 0, n, sat);
-}
-
-/* As list, but prepend the selector; shadock shadock, but for compatibility 
-   with Max 0.26
-*/
-
-static void
-prepend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+prepend_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   prepend_t *x = (prepend_t *)o;
   fts_atom_t sat[max_prepend];
   int n;
 
   if (ac + x->ac + 1 >= max_prepend)
-    {
-      post("prepend: input list too long (total %d max)\n", max_prepend);
-      ac = max_prepend - x->ac - 1;
-    }
-
+    ac = max_prepend - x->ac - 1;
+  
   n = ac + x->ac + 1;
-  memcpy(&sat[0],     x->at, x->ac * sizeof(fts_atom_t));
+  memcpy(&sat[0], x->at, x->ac * sizeof(fts_atom_t));
   fts_set_symbol(&sat[x->ac], s);
-  memcpy(&sat[x->ac + 1], at,    ac    * sizeof(fts_atom_t));
-
+  memcpy(&sat[x->ac + 1], at, ac * sizeof(fts_atom_t));
+  
   if (x->presym)
     fts_outlet_send(o, 0, x->presym, n, sat);
   else
-    fts_outlet_atoms(o, 0, n, sat);
+    fts_outlet_varargs(o, 0, n, sat);
 }
 
-static fts_status_t
-prepend_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+prepend_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(prepend_t), 1, 1, 0);
+  prepend_t *x = (prepend_t *)o;
+  fts_atom_t sat[max_prepend];
+  int n;
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, prepend_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, prepend_delete);
+  if(ac + x->ac >= max_prepend)
+    ac = max_prepend - x->ac;
+  
+  n = ac + x->ac;
+  memcpy(&sat[0], x->at, x->ac * sizeof(fts_atom_t));
+  memcpy(&sat[x->ac], at, ac * sizeof(fts_atom_t));
+  
+  if (x->presym)
+    fts_outlet_send(o, 0, x->presym, n, sat);
+  else
+    fts_outlet_varargs(o, 0, n, sat);
+}
 
-  fts_method_define_varargs(cl, 0, fts_s_set, prepend_set);
+static void
+prepend_instantiate(fts_class_t *cl)
+{
+  fts_class_init(cl, sizeof(prepend_t), prepend_init, prepend_delete);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, prepend_list);
-  fts_method_define_varargs(cl, 0, fts_s_float, prepend_list);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, prepend_list);
-  fts_method_define_varargs(cl, 0, fts_s_list, prepend_list);
-  fts_method_define_varargs(cl, 0, fts_s_anything, prepend_anything);
+  fts_class_method_varargs(cl, fts_s_set, prepend_set);
 
-  return fts_ok;
+  fts_class_set_default_handler(cl, prepend_message);
+  fts_class_inlet_varargs(cl, 0, prepend_varargs);
+
+  fts_class_outlet_anything(cl, 0);
 }
 
 void
 prepend_config(void)
 {
-  fts_class_install(fts_new_symbol("prepend"),prepend_instantiate);
+  fts_class_install(fts_new_symbol("prepend"), prepend_instantiate);
 }

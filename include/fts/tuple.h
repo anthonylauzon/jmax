@@ -48,9 +48,3 @@ FTS_API fts_metaclass_t *fts_tuple_metaclass;
 #define fts_tuple_get_array( t) (&(t)->args)
 
 #define fts_is_tuple(p) (fts_is_a(p, fts_tuple_metaclass))
-
-#define fts_tuple_output(o, i, t) do { \
-  fts_object_refer((fts_object_t *)(t)); \
-  fts_outlet_atoms((o), (i), fts_tuple_get_size(t), fts_tuple_get_atoms(t)); \
-  fts_object_release((fts_object_t *)(t)); \
-} while(0)

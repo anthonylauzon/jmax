@@ -75,22 +75,17 @@ white_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-white_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+white_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(white_t), 0, 1, 0);
+  fts_class_init(cl, sizeof(white_t), white_init, white_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, white_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, white_delete);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, white_put);
+  fts_class_method_varargs(cl, fts_s_put, white_put);
 
   white_ftl_sym = fts_new_symbol("white");
   fts_dsp_declare_function(white_ftl_sym, white_ftl);
 
   fts_dsp_declare_outlet(cl, 0);
-
-  return fts_ok;
 }
 
 void

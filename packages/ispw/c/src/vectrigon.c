@@ -236,73 +236,69 @@ vectrigon_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-vectrigon_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t put_method)
+static void
+vectrigon_instantiate(fts_class_t *cl, fts_method_t put_method)
 {
-  fts_class_init(cl, sizeof(vectrigon_t), 1, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, vectrigon_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, vectrigon_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, put_method);
+  fts_class_init(cl, sizeof(vectrigon_t), vectrigon_init, vectrigon_delete);
+
+  fts_class_method_varargs(cl, fts_s_put, put_method);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-  
-  return fts_ok;
 }
 
-static fts_status_t
-sin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sin_instantiate(fts_class_t *cl)
 {
-  return vectrigon_instantiate(cl, ac, at, sin_put);
+  vectrigon_instantiate(cl, sin_put);
 }
 
-static fts_status_t
-cos_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+cos_instantiate(fts_class_t *cl)
 {
-  return vectrigon_instantiate(cl, ac, at, cos_put);
+  vectrigon_instantiate(cl, cos_put);
 }
 
-static fts_status_t
-tan_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+tan_instantiate(fts_class_t *cl)
 {
-  return vectrigon_instantiate(cl, ac, at, tan_put);
+  vectrigon_instantiate(cl, tan_put);
 }
 
-static fts_status_t
-asin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+asin_instantiate(fts_class_t *cl)
 {
-  return vectrigon_instantiate(cl, ac, at, asin_put);
+  vectrigon_instantiate(cl, asin_put);
 }
 
-static fts_status_t
-acos_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+acos_instantiate(fts_class_t *cl)
 {
-  return vectrigon_instantiate(cl, ac, at, acos_put);
+  vectrigon_instantiate(cl, acos_put);
 }
 
-static fts_status_t
-atan_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+atan_instantiate(fts_class_t *cl)
 {
-  return vectrigon_instantiate(cl, ac, at, atan_put);
+  vectrigon_instantiate(cl, atan_put);
 }
 
-static fts_status_t
-sinh_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sinh_instantiate(fts_class_t *cl)
 {
-  return vectrigon_instantiate(cl, ac, at, sinh_put);
+  vectrigon_instantiate(cl, sinh_put);
 }
 
-static fts_status_t
-cosh_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+cosh_instantiate(fts_class_t *cl)
 {
-  return vectrigon_instantiate(cl, ac, at, cosh_put);
+  vectrigon_instantiate(cl, cosh_put);
 }
 
-static fts_status_t
-tanh_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+tanh_instantiate(fts_class_t *cl)
 {
-  return vectrigon_instantiate(cl, ac, at, tanh_put);
+  vectrigon_instantiate(cl, tanh_put);
 }
 
 void

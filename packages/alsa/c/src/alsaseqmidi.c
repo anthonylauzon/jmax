@@ -440,25 +440,21 @@ alsaseqmidi_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
     alsaseqmidi_scan_hashtable(&this->destinations);
 }
 
-static fts_status_t
-alsaseqmidi_instantiate(fts_class_t* cl, int ac, const fts_atom_t* at)
+static void
+alsaseqmidi_instantiate(fts_class_t* cl)
 {
-    fts_class_init(cl, sizeof(alsaseqmidi_t), 1, 0, 0);
-
-    fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, alsaseqmidi_init);
-    fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, alsaseqmidi_delete);
+    fts_class_init(cl, sizeof(alsaseqmidi_t), alsaseqmidi_init, alsaseqmidi_delete);
 
     /* FTS MIDI manager interface implementation */
-    fts_method_define_varargs(cl, fts_system_inlet, fts_midimanager_s_get_default_input, alsaseqmidi_get_default_input);
-    fts_method_define_varargs(cl, fts_system_inlet, fts_midimanager_s_get_default_output, alsaseqmidi_get_default_output);
-    fts_method_define_varargs(cl, fts_system_inlet, fts_midimanager_s_append_input_names, alsaseqmidi_append_inputs);
-    fts_method_define_varargs(cl, fts_system_inlet, fts_midimanager_s_append_output_names, alsaseqmidi_append_outputs);
-    fts_method_define_varargs(cl, fts_system_inlet, fts_midimanager_s_get_input, alsaseqmidi_get_input);
-    fts_method_define_varargs(cl, fts_system_inlet, fts_midimanager_s_get_output, alsaseqmidi_get_output);
+    fts_class_method_varargs(cl, fts_midimanager_s_get_default_input, alsaseqmidi_get_default_input);
+    fts_class_method_varargs(cl, fts_midimanager_s_get_default_output, alsaseqmidi_get_default_output);
+    fts_class_method_varargs(cl, fts_midimanager_s_append_input_names, alsaseqmidi_append_inputs);
+    fts_class_method_varargs(cl, fts_midimanager_s_append_output_names, alsaseqmidi_append_outputs);
+    fts_class_method_varargs(cl, fts_midimanager_s_get_input, alsaseqmidi_get_input);
+    fts_class_method_varargs(cl, fts_midimanager_s_get_output, alsaseqmidi_get_output);
 
     /* debug print */
-    fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, alsaseqmidi_print);
-    return fts_ok;
+    fts_class_method_varargs(cl, fts_s_print, alsaseqmidi_print);
 }
 
 void

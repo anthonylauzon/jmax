@@ -250,7 +250,7 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
 
   public void paint( Graphics g) 
   {
-    if(type == FtsConnection.fts_connection_signal)	
+    if(type == FtsConnection.fts_connection_signal_active)	
       {
 	g.setColor(Color.black);
 

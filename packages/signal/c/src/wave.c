@@ -167,21 +167,16 @@ wave_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-wave_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+wave_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(wave_t), 2, 1, 0);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, wave_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, wave_delete);
+  fts_class_init(cl, sizeof(wave_t), wave_init, wave_delete);
       
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("put"), wave_put);
+  fts_class_method_varargs(cl, fts_new_symbol("put"), wave_put);
   
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-    
-  return fts_ok;
-}
+    }
 
 void
 signal_wave_config(void)

@@ -176,23 +176,20 @@ expr_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
 }
 
-static fts_status_t
-expr_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+expr_instantiate(fts_class_t *cl)
 {
   /* declaring the class */
-  fts_class_init(cl, sizeof(t_expr), 1, 1, 0);
+  fts_class_init(cl, sizeof(t_expr), expr_init, expr_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, expr_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, expr_delete);
+  fts_class_method_varargs(cl, fts_s_bang, expr_bang);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, expr_bang);
+  fts_class_inlet_int(cl, 0, expr_atom);
+  fts_class_inlet_float(cl, 0, expr_atom);
+  fts_class_inlet_symbol(cl, 0, expr_atom);
+  fts_class_inlet_varargs(cl, 0, expr_atoms);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, expr_atom);
-  fts_method_define_varargs(cl, 0, fts_s_float, expr_atom);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, expr_atom);
-  fts_method_define_varargs(cl, 0, fts_s_list, expr_atoms);
-
-  return fts_ok;
+  fts_class_outlet_number(cl, 0);
 }
 
 void

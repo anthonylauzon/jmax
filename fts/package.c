@@ -816,7 +816,7 @@ fts_package_save_list( fts_bmax_file_t *f, fts_list_t *list, fts_symbol_t select
   int ac;
 
   ac = fts_package_save_list_aux( f, list);
-  fts_bmax_code_obj_mess( f, fts_system_inlet, selector, ac);
+  fts_bmax_code_obj_mess( f, selector, ac);
   fts_bmax_code_pop_args( f, ac);
 }
 
@@ -839,7 +839,7 @@ fts_package_save_hashtable( fts_bmax_file_t *f, fts_hashtable_t *ht, fts_symbol_
 	(*fun)(a+1);
 
       fts_bmax_code_push_atoms(f, 2, a);
-      fts_bmax_code_obj_mess(f, fts_system_inlet, selector, 2);
+      fts_bmax_code_obj_mess(f, selector, 2);
       fts_bmax_code_pop_args(f, 2);
     }
 }
@@ -1119,7 +1119,7 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 	i+=2;
       }      
     fts_bmax_code_push_atoms(&f, i, a);
-    fts_bmax_code_obj_mess(&f, fts_system_inlet, fts_s_help, i);
+    fts_bmax_code_obj_mess(&f, fts_s_help, i);
     fts_bmax_code_pop_args(&f, i);
   
 #ifndef HAVE_ALLOCA
@@ -1131,7 +1131,7 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       fts_atom_t a[1];
       fts_set_symbol(a, this->midi_config);
       fts_bmax_code_push_atoms(&f, 1, a);
-      fts_bmax_code_obj_mess(&f, fts_system_inlet, fts_s_midi_config, 1);
+      fts_bmax_code_obj_mess(&f, fts_s_midi_config, 1);
       fts_bmax_code_pop_args(&f, 1);
     }
   if( this->audio_config)
@@ -1139,7 +1139,7 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       fts_atom_t a[1];
       fts_set_symbol(a, this->audio_config);
       fts_bmax_code_push_atoms(&f, 1, a);
-      fts_bmax_code_obj_mess(&f, fts_system_inlet, fts_s_audio_config, 1);
+      fts_bmax_code_obj_mess(&f, fts_s_audio_config, 1);
       fts_bmax_code_pop_args(&f, 1);
     }
 
@@ -1446,43 +1446,27 @@ __fts_package_set_as_current_project(fts_object_t *o, int winlet, fts_symbol_t s
   fts_client_send_message(o, fts_s_openEditor, 0, 0);
 }
 
-static fts_status_t
-fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+fts_package_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_package_t), 1, 0, 0);
+  fts_class_init(cl, sizeof(fts_package_t), __fts_package_init, __fts_package_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, __fts_package_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, __fts_package_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_upload, __fts_package_upload);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update, __fts_package_update);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, __fts_package_print);
+  fts_class_method_varargs(cl, fts_s_upload, __fts_package_upload);
+  fts_class_method_varargs(cl, fts_s_update, __fts_package_update);
+  fts_class_method_varargs(cl, fts_s_print, __fts_package_print);
 
-  fts_method_define_varargs(cl, 0, fts_s_require, __fts_package_require);
-  fts_method_define_varargs(cl, 0, fts_s_template, __fts_package_template);
-  fts_method_define_varargs(cl, 0, fts_s_template_path, __fts_package_template_path);
-  fts_method_define_varargs(cl, 0, fts_s_abstraction, __fts_package_abstraction);
-  fts_method_define_varargs(cl, 0, fts_s_abstraction_path, __fts_package_abstraction_path);
-  fts_method_define_varargs(cl, 0, fts_s_data_path, __fts_package_data_path);
-  fts_method_define_varargs(cl, 0, fts_s_help, __fts_package_help);
-  fts_method_define_varargs(cl, 0, fts_s_save, __fts_package_save);
-
-  /* All these methods are also defined for SystemInlet, as bmax saving
-     allows only messages to SystemInlet... 
-  */
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_require, __fts_package_require);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_template, __fts_package_template);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_template_path, __fts_package_template_path);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_abstraction, __fts_package_abstraction);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_abstraction_path, __fts_package_abstraction_path);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_data_path, __fts_package_data_path);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_help, __fts_package_help);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save, __fts_package_save);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_openEditor, __fts_package_open_editor);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("set_as_current_project"), __fts_package_set_as_current_project);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_midi_config, __fts_package_midi_config);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_audio_config, __fts_package_audio_config);
-
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_s_require, __fts_package_require);
+  fts_class_method_varargs(cl, fts_s_template, __fts_package_template);
+  fts_class_method_varargs(cl, fts_s_template_path, __fts_package_template_path);
+  fts_class_method_varargs(cl, fts_s_abstraction, __fts_package_abstraction);
+  fts_class_method_varargs(cl, fts_s_abstraction_path, __fts_package_abstraction_path);
+  fts_class_method_varargs(cl, fts_s_data_path, __fts_package_data_path);
+  fts_class_method_varargs(cl, fts_s_help, __fts_package_help);
+  fts_class_method_varargs(cl, fts_s_save, __fts_package_save);
+  fts_class_method_varargs(cl, fts_s_openEditor, __fts_package_open_editor);
+  fts_class_method_varargs(cl, fts_new_symbol("set_as_current_project"), __fts_package_set_as_current_project);
+  fts_class_method_varargs(cl, fts_s_midi_config, __fts_package_midi_config);
+  fts_class_method_varargs(cl, fts_s_audio_config, __fts_package_audio_config);
 }
 
 /***********************************************
@@ -1558,21 +1542,18 @@ static void loader_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
     }
 
   /* Send a "print" message to the result */
-  if ( (status = fts_send_message( obj, fts_s_print, 0, 0)) != fts_ok)
-    post( "Message send failed (%s)\n", fts_status_get_description(status));
+  fts_send_message( obj, fts_s_print, 0, 0);
 
   if (fts_object_get_metaclass(obj) == fts_package_type) {
     post( "Loaded package\n");
   }
 }
 
-static fts_status_t loader_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void loader_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof(fts_object_t), 1, 0, 0);
+  fts_class_init( cl, sizeof(fts_object_t), 0, 0);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol( "load"), loader_load);
-
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_new_symbol( "load"), loader_load);
 }
 
 /***********************************************************************

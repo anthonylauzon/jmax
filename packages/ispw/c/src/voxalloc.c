@@ -178,7 +178,7 @@ voxalloc_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       idx = 0;
 
     if(idx == here){
-      fts_outlet_atoms(o, 0, ac, at);	
+      fts_outlet_varargs(o, 0, ac, at);	
       this->idx = idx;
       return;
     }
@@ -204,18 +204,6 @@ voxalloc_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-voxalloc_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  voxalloc_list(o, winlet, fts_s_list, 1, at);	
-}
-
-static void
-voxalloc_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  voxalloc_list(o, winlet, fts_s_list, 1, at);	
-}
-
-static void
 voxalloc_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   voxalloc_list(o, winlet, fts_s_list, 0, 0);	
@@ -228,31 +216,19 @@ voxalloc_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
  *
  */
 
-static fts_status_t
-voxalloc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+voxalloc_instantiate(fts_class_t *cl)
 {
-  if(fts_get_int_arg(ac, at, 3, 0) == 0)
-    fts_class_init(cl, sizeof(voxalloc_t), 2, 2, 0); /* no dur arg in list -> dur inlet */
-  else
-    fts_class_init(cl, sizeof(voxalloc_t), 1, 2, 0); /* no dur inlet */
+  fts_class_init(cl, sizeof(voxalloc_t), voxalloc_init, voxalloc_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, voxalloc_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, voxalloc_delete);
+  fts_class_method_varargs(cl, fts_s_bang, voxalloc_bang);
+  fts_class_method_varargs(cl, fts_new_symbol("used"), voxalloc_used);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, voxalloc_bang);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("used"), voxalloc_used);
-
-  fts_method_define_varargs(cl, 0, fts_s_list, voxalloc_list);
-  fts_method_define_varargs(cl, 0, fts_s_int, voxalloc_int);
-  fts_method_define_varargs(cl, 0, fts_s_float, voxalloc_float);
-
-  fts_method_define_varargs(cl, 1, fts_s_int, voxalloc_number_1);
-  fts_method_define_varargs(cl, 1, fts_s_float, voxalloc_number_1);
+  fts_class_inlet_varargs(cl, 0, voxalloc_list);
+  fts_class_inlet_number(cl, 1, voxalloc_number_1);
   
-  fts_outlet_type_define_varargs(cl, 0,	fts_s_bang);
-  fts_outlet_type_define_varargs(cl, 1,	fts_s_int);
-
-  return fts_ok;
+  fts_class_outlet_varargs(cl, 0);
+  fts_class_outlet_int(cl, 1);
 }
 
 	

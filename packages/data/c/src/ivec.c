@@ -421,12 +421,6 @@ ivec_append_pixels(ivec_t *ivec, int deltax, int deltap)
 }
 
 static void
-ivec_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_outlet_object(o, 0, o);
-}
-
-static void
 ivec_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *this = (ivec_t *)o;
@@ -1101,66 +1095,50 @@ ivec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     fts_free(this->values);
 }
 
-static fts_status_t
-ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+ivec_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(ivec_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(ivec_t), ivec_init, ivec_delete);
   
-  /* init / delete */
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, ivec_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, ivec_delete);
-  
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, ivec_post); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, ivec_print); 
+  fts_class_method_varargs(cl, fts_s_post, ivec_post); 
+  fts_class_method_varargs(cl, fts_s_print, ivec_print); 
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, ivec_set_elements);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_instance, ivec_set_from_instance);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_array, ivec_set_from_array);
+  fts_class_method_varargs(cl, fts_s_set_from_instance, ivec_set_from_instance);
+  fts_class_method_varargs(cl, fts_s_set_from_array, ivec_set_from_array);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_size, ivec_size);
+  fts_class_method_varargs(cl, fts_s_get_array, ivec_get_array);
+  fts_class_method_varargs(cl, fts_s_dump, ivec_dump);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, ivec_get_array);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, ivec_dump);
-
-  fts_method_define_varargs(cl, 0, fts_new_symbol("reverse"), ivec_reverse);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("rotate"), ivec_rotate);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("sort"), ivec_sort);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("scramble"), ivec_scramble);
+  /* graphical editor */
+  fts_class_method_varargs(cl, fts_s_openEditor, ivec_open_editor);
+  fts_class_method_varargs(cl, fts_s_closeEditor, ivec_close_editor);
+  fts_class_method_varargs(cl, fts_s_destroyEditor, ivec_destroy_editor);
+  fts_class_method_varargs(cl, fts_new_symbol("set_from_client"), ivec_set_elements);
+  fts_class_method_varargs(cl, fts_new_symbol("get_from_client"), ivec_get_to_client);
+  fts_class_method_varargs(cl, fts_new_symbol("get_pixels_from_client"), ivec_get_pixels_to_client);
+  fts_class_method_varargs(cl, fts_new_symbol("set_visible_window"), ivec_set_visible_window);
+  fts_class_method_varargs(cl, fts_new_symbol("end_edit"), ivec_end_edit);
+  fts_class_method_varargs(cl, fts_new_symbol("copy_from_client"), ivec_copy_by_client_request);
+  fts_class_method_varargs(cl, fts_new_symbol("paste_from_client"), ivec_paste_by_client_request);
+  fts_class_method_varargs(cl, fts_new_symbol("cut_from_client"), ivec_cut_by_client_request);
+  fts_class_method_varargs(cl, fts_new_symbol("insert_from_client"), ivec_insert_by_client_request);
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, ivec_get_state);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, ivec_output);
+  fts_class_method_varargs(cl, fts_new_symbol("reverse"), ivec_reverse);
+  fts_class_method_varargs(cl, fts_new_symbol("rotate"), ivec_rotate);
+  fts_class_method_varargs(cl, fts_new_symbol("sort"), ivec_sort);
+  fts_class_method_varargs(cl, fts_new_symbol("scramble"), ivec_scramble);
 
-  fts_method_define_varargs(cl, 0, fts_s_fill, ivec_fill);
-  fts_method_define_varargs(cl, 0, fts_s_set, ivec_set_elements);
+  fts_class_method_varargs(cl, fts_s_fill, ivec_fill);
+  fts_class_method_varargs(cl, fts_s_set, ivec_set_elements);
       
-  fts_method_define_varargs(cl, 0, fts_s_size, ivec_size);
+  fts_class_method_varargs(cl, fts_s_size, ivec_size);
 
-  fts_method_define_varargs(cl, 0, fts_s_import, ivec_import);
-  fts_method_define_varargs(cl, 0, fts_s_export, ivec_export);
-
-  fts_method_define_varargs(cl, 0, fts_s_print, ivec_print); 
-
-      /* graphical editor */
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_openEditor, ivec_open_editor);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_closeEditor, ivec_close_editor);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_destroyEditor, ivec_destroy_editor);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("set_from_client"), ivec_set_elements);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("get_from_client"), ivec_get_to_client);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("get_pixels_from_client"), ivec_get_pixels_to_client);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("set_visible_window"), ivec_set_visible_window);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("end_edit"), ivec_end_edit);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("copy_from_client"), ivec_copy_by_client_request);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("paste_from_client"), ivec_paste_by_client_request);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("cut_from_client"), ivec_cut_by_client_request);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("insert_from_client"), ivec_insert_by_client_request);
-
-  /* type outlet */
-  fts_outlet_type_define(cl, 0, ivec_symbol);
-
-  return fts_ok;
+  fts_class_method_varargs(cl, fts_s_import, ivec_import);
+  fts_class_method_varargs(cl, fts_s_export, ivec_export);
 }
 
 /********************************************************************

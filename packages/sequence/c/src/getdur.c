@@ -43,15 +43,13 @@ getdur_track(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  *
  */
 
-static fts_status_t
-getdur_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+getdur_instantiate(fts_class_t *cl)
 {
-  /* initialize the class */
-  fts_class_init(cl, sizeof(fts_object_t), 1, 1, 0); 
+  fts_class_init(cl, sizeof(fts_object_t), 0, 0); 
   
-  fts_method_define_varargs(cl, 0, seqsym_track, getdur_track);
-  
-  return fts_ok;
+  fts_class_inlet(cl, 0, track_type, getdur_track);
+  fts_class_outlet_float(cl, 0);
 }
 
 void

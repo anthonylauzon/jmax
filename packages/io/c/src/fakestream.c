@@ -130,22 +130,19 @@ fakestream_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t p
  *  class
  *
  */
-static fts_status_t
-fakestream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+fakestream_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_bytestream_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(fts_bytestream_t), fakestream_init, 0);
 
   fts_bytestream_class_init(cl);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fakestream_init);
-  
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, fakestream_get_state);
   
-  fts_method_define_varargs(cl, 0, fts_s_int, fakestream_int);
-  fts_method_define_varargs(cl, 0, fts_s_float, fakestream_float);
-  fts_method_define_varargs(cl, 0, fts_s_list, fakestream_list);
-  
-  return fts_ok;
+  fts_class_inlet_number(cl, 0, fakestream_int);
+  fts_class_inlet_varargs(cl, 0, fakestream_list);
+
+  fts_class_outlet_int(cl, 0);
 }
 
 void

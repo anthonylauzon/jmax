@@ -38,7 +38,7 @@ invoke_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   invoke_t *this = (invoke_t *)o;
 
-  if(fts_is_object(at))
+  if(ac == 1 && fts_is_object(at))
     {
       fts_object_t *object = fts_get_object(at);
       fts_class_t *class = fts_object_get_class(object);
@@ -92,17 +92,6 @@ invoke_set_arguments(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   fts_array_set(&this->args, ac, at);
 }
 
-static void
-invoke_set_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  invoke_t *this = (invoke_t *)o;
-
-  if(ac == 1 && fts_get_selector(at) == s)
-    invoke_set_arguments(o, 0, 0, 1, at);
-  else
-    fts_object_signal_runtime_error(o, "Don't understand message %s", s);
-}
-
 /************************************************************
  *
  *  class
@@ -134,25 +123,14 @@ invoke_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_array_destroy(&this->args);
 }
   
-static fts_status_t
-invoke_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+invoke_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(invoke_t), 3, 1, 0);
+  fts_class_init(cl, sizeof(invoke_t), invoke_init, invoke_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, invoke_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, invoke_delete);
-
-  fts_method_define_varargs(cl, 0, fts_s_anything, invoke_object);
-
-  fts_method_define_varargs(cl, 1, fts_s_symbol, invoke_set_selector);
-
-  fts_method_define_varargs(cl, 2, fts_s_int, invoke_set_arguments);
-  fts_method_define_varargs(cl, 2, fts_s_float, invoke_set_arguments);
-  fts_method_define_varargs(cl, 2, fts_s_symbol, invoke_set_arguments);
-  fts_method_define_varargs(cl, 2, fts_s_list, invoke_set_arguments);
-  fts_method_define_varargs(cl, 2, fts_s_anything, invoke_set_arguments);
-
-  return fts_ok;
+  fts_class_inlet_varargs(cl, 0, invoke_object);
+  fts_class_inlet_symbol(cl, 1, invoke_set_selector);
+  fts_class_inlet_varargs(cl, 2, invoke_set_arguments);
 }
 
 void

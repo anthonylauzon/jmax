@@ -278,40 +278,36 @@ slider_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 
-static fts_status_t
-slider_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+slider_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(slider_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(slider_t), slider_init, NULL); 
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, slider_init); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, slider_dump); 
+  fts_class_method_varargs(cl, fts_s_dump, slider_dump); 
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_gui, slider_update_gui); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, slider_update_real_time); 
+  fts_class_method_varargs(cl, fts_s_update_gui, slider_update_gui); 
+  fts_class_method_varargs(cl, fts_s_update_real_time, slider_update_real_time); 
+  fts_class_method_varargs(cl, fts_s_save_dotpat, slider_save_dotpat); 
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_value, slider_set_value); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_min_value, slider_set_min); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_max_value, slider_set_max); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_orientation, slider_set_orientation); 
+  fts_class_method_varargs(cl, fts_s_value, slider_set_value); 
+  fts_class_method_varargs(cl, fts_s_min_value, slider_set_min); 
+  fts_class_method_varargs(cl, fts_s_max_value, slider_set_max); 
+  fts_class_method_varargs(cl, fts_s_orientation, slider_set_orientation); 
 
-  fts_method_define_varargs(cl, 0, fts_s_set, slider_set);
-  fts_method_define_varargs(cl, 0, fts_s_range, slider_set_range);
+  fts_class_method_varargs(cl, fts_s_bang, slider_bang);
+  fts_class_method_varargs(cl, fts_s_set, slider_set);
+  fts_class_method_varargs(cl, fts_s_range, slider_set_range);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, slider_bang);
-  fts_method_define_varargs(cl, 0, fts_s_int, slider_int);
-  fts_method_define_varargs(cl, 0, fts_s_float, slider_float);
-  fts_method_define_varargs(cl, 0, fts_s_list, slider_list);
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_save_dotpat, slider_save_dotpat); 
+  fts_class_inlet_int(cl, 0, slider_int);
+  fts_class_inlet_float(cl, 0, slider_float);
+  fts_class_inlet_varargs(cl, 0, slider_list);
 
   /* property daemons for compatibilty with older bmax files */
   fts_class_add_daemon(cl, obj_property_put, fts_s_min_value, slider_put_min);
   fts_class_add_daemon(cl, obj_property_put, fts_s_max_value, slider_put_max);
   fts_class_add_daemon(cl, obj_property_put, fts_s_orientation, slider_put_orientation);
 
-  fts_outlet_type_define_varargs(cl, 0, fts_s_int);
-
-  return fts_ok;
+  fts_class_outlet_number(cl, 0);
 }
 
 void

@@ -43,15 +43,10 @@ static void fts_runtime_errors_delete(fts_object_t *o, int winlet, fts_symbol_t 
   fts_runtime_error_handler_remove(o);
 }
 
-static fts_status_t
-runtime_errors_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+runtime_errors_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_runtime_errors_t), 0, 0, 0); 
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fts_runtime_errors_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fts_runtime_errors_delete);
-
-  return fts_ok;
+  fts_class_init(cl, sizeof(fts_runtime_errors_t), fts_runtime_errors_init, fts_runtime_errors_delete);
 }
 
 /***********************************************************************

@@ -304,21 +304,16 @@ thread_manager_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
 
 
 
-static fts_status_t
-thread_manager_instantiate(fts_class_t* cl, int ac, const fts_atom_t* at)
+static void
+thread_manager_instantiate(fts_class_t* cl)
 {
-    fts_class_init(cl, sizeof(thread_manager_t), 1, 0, 0);
+    fts_class_init(cl, sizeof(thread_manager_t), thread_manager_init, thread_manager_delete);
 
-    fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, thread_manager_init);
-    fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, thread_manager_delete);
+    fts_class_method_varargs(cl, fts_s_print, thread_manager_print);
 
-    fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, thread_manager_print);
+    fts_class_method_varargs(cl, thread_manager_s_create_thread, thread_manager_create_thread);
 
-    fts_method_define_varargs(cl, fts_system_inlet, thread_manager_s_create_thread, thread_manager_create_thread);
-
-    fts_method_define_varargs(cl, 0, fts_s_start, thread_manager_start);
-
-    return fts_ok;
+    fts_class_method_varargs(cl, fts_s_start, thread_manager_start);
 }
 
 

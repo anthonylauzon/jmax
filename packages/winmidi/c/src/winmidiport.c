@@ -193,7 +193,9 @@ winmidiport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     }
 
     if (event != NULL) {
+      fts_object_refer((fts_object_t *)event);
       fts_midiport_input((fts_midiport_t *) this, event, 0.0);
+      fts_object_release((fts_object_t *)event);
     }
   }
 
@@ -216,7 +218,9 @@ winmidiport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 	  fts_midievent_system_exclusive_append(sysex, this->inhdr[i].lpData[j]);
 	}
 
+	fts_object_refer((fts_object_t *)sysex);
 	fts_midiport_input((fts_midiport_t *) this, sysex, 0.0);
+	fts_object_release((fts_object_t *)sysex);
       }
 
       /* unprepare the buffer and flag it as available */
@@ -626,27 +630,17 @@ winmidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_sched_remove(o);
 }
 
-static int 
-winmidiport_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
-{ 
-  return 1;
-}
-
-static fts_status_t
-winmidiport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+winmidiport_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(winmidiport_t), 1, 0, 0);
-      
+  fts_class_init(cl, sizeof(winmidiport_t), winmidiport_init, winmidiport_delete);
+
   fts_midiport_class_init(cl);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, winmidiport_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, winmidiport_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_sched_ready, winmidiport_dispatch);
+  fts_class_method_varargs(cl, fts_s_sched_ready, winmidiport_dispatch);
   
   /* define variable */
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, winmidiport_get_state);
-  
-  return fts_ok;
 }
 
 void

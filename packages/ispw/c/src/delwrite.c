@@ -66,10 +66,11 @@ delwrite_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   this->name = 0;
   
-  if(delay_table_get_delbuf(name)){
-    post("delwrite~: %s: multiply defined (last ignored)\n", name);
-    return;
-  }
+  if(delay_table_get_delbuf(name))
+    {
+      fts_object_set_error(o, "name multiply defined: %s\n", name);
+      return;
+    }
 
   this->name = name;
   this->unit = unit;
@@ -110,16 +111,16 @@ delwrite_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   long n_tick = fts_dsp_get_input_size(dsp, 0);
   float sr = fts_dsp_get_input_srate(dsp, 0);
   
-  if(!this->name){
-    post("error: delwrite~: dead object (guess which :-)\n");
-  }
+  if(!this->name)
+    fts_object_signal_runtime_error(o, "unnamed delwrite~\n");
 
   if(delbuf_is_init(this->buf))
     {
-      if(delbuf_get_tick_size(this->buf) != n_tick){
-	post("error: delwrite~: %s: sample rate does not match with delay line\n", this->name);
-	return;
-      }
+      if(delbuf_get_tick_size(this->buf) != n_tick)
+	{
+	  fts_object_signal_runtime_error(o, "write sample rate does not match with delay line %s\n", this->name);
+	  return;
+	}
     }
   else
     {
@@ -146,7 +147,9 @@ static void
 delwrite_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   delwrite_t *this = (delwrite_t *)o;
-  if(this->name) delbuf_clear_delayline(this->buf);
+
+  if(this->name) 
+    delbuf_clear_delayline(this->buf);
 }
 
 static void
@@ -155,9 +158,8 @@ delwrite_realloc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   delwrite_t *this = (delwrite_t *)o;
   float size  = fts_get_float_arg(ac, at, 1, 0.0f);
 
-  if(!this->name) return;
-
-  delbuf_set_size(this->buf, size, this->unit);
+  if(this->name)
+    delbuf_set_size(this->buf, size, this->unit);
 }
 
 
@@ -168,25 +170,21 @@ delwrite_realloc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
  */
 
 
-static fts_status_t
-delwrite_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+delwrite_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(delwrite_t), 1, 1, 0); 
+  fts_class_init(cl, sizeof(delwrite_t), delwrite_init, delwrite_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, delwrite_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, delwrite_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, delwrite_put);
+  fts_class_method_varargs(cl, fts_s_put, delwrite_put);
 
-  fts_method_define_varargs(cl, 0, fts_s_clear, delwrite_clear);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("realloc"), delwrite_realloc);
+  fts_class_method_varargs(cl, fts_s_clear, delwrite_clear);
+  fts_class_method_varargs(cl, fts_new_symbol("realloc"), delwrite_realloc);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
   
   dsp_symbol = fts_new_symbol("delwrite");
   fts_dsp_declare_function(dsp_symbol, ftl_delwrite);
-
-  return fts_ok;
 }
 
 void

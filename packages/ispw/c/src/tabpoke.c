@@ -173,31 +173,24 @@ tabpoke_center(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  *
  */
  
-static fts_status_t
-class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+tabpoke_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(tabpoke_t), 2, 1, 0); 
-
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, tabpoke_init);
+  fts_class_init(cl, sizeof(tabpoke_t), tabpoke_init, 0);
   
-  fts_method_define_varargs(cl, 0, fts_s_set, tabpoke_set);
-  fts_method_define_varargs(cl, 0, fts_s_int, tabpoke_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, tabpoke_number);
-  fts_method_define_varargs(cl, 0, fts_s_list, tabpoke_list);
+  fts_class_method_varargs(cl, fts_s_set, tabpoke_set);
+  fts_class_method_varargs(cl, fts_new_symbol("center"), tabpoke_center);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("center"), tabpoke_center);
+  fts_class_inlet_varargs(cl, 0, tabpoke_list);
+  fts_class_inlet_number(cl, 0, tabpoke_number);
+  fts_class_inlet_number(cl, 1, tabpoke_set_value);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, tabpoke_set_value);
-  fts_method_define_varargs(cl, 1, fts_s_float, tabpoke_set_value);
-
-  fts_outlet_type_define_varargs(cl, 0,	fts_s_float);
-
-  return fts_ok;
+  fts_class_outlet_float(cl, 0);
 }
 
 void
 tabpoke_config(void)
 {
-  fts_class_install(fts_new_symbol("tabpoke"), class_instantiate);
+  fts_class_install(fts_new_symbol("tabpoke"), tabpoke_instantiate);
 }
 

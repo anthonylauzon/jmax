@@ -103,7 +103,7 @@ noteoff_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-noteoff_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+noteoff_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   noteoff_t *this = (noteoff_t *)o;
 
@@ -162,35 +162,23 @@ noteoff_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
 }
 
-static fts_status_t
-noteoff_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+noteoff_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(noteoff_t), 4, 3, 0); 
+  fts_class_init(cl, sizeof(noteoff_t), noteoff_init, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, noteoff_init);
+  fts_class_method_varargs(cl, fts_s_clear, noteoff_clear);
+  fts_class_method_varargs(cl, fts_s_stop, noteoff_stop);
 
-  fts_method_define_varargs(cl, 0, fts_s_clear, noteoff_clear);
-  fts_method_define_varargs(cl, 0, fts_s_stop, noteoff_stop);
+  fts_class_inlet_varargs(cl, 0, noteoff_varargs);
+  fts_class_inlet_number(cl, 0, noteoff_pitch);
+  fts_class_inlet_number(cl, 1, noteoff_set_velocity);
+  fts_class_inlet_number(cl, 2, noteoff_set_channel);
+  fts_class_inlet_number(cl, 3, noteoff_set_duration);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, noteoff_pitch);
-  fts_method_define_varargs(cl, 0, fts_s_float, noteoff_pitch);
-
-  fts_method_define_varargs(cl, 0, fts_s_list, noteoff_atoms);
-
-  fts_method_define_varargs(cl, 1, fts_s_int, noteoff_set_velocity);
-  fts_method_define_varargs(cl, 1, fts_s_float, noteoff_set_velocity);
-
-  fts_method_define_varargs(cl, 2, fts_s_int, noteoff_set_channel);
-  fts_method_define_varargs(cl, 2, fts_s_float, noteoff_set_channel);
-
-  fts_method_define_varargs(cl, 3, fts_s_int, noteoff_set_duration);
-  fts_method_define_varargs(cl, 3, fts_s_float, noteoff_set_duration);
-
-  fts_outlet_type_define_varargs(cl, 0, fts_s_int);
-  fts_outlet_type_define_varargs(cl, 1, fts_s_int);
-  fts_outlet_type_define_varargs(cl, 2, fts_s_int);
-
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
+  fts_class_outlet_int(cl, 1);
+  fts_class_outlet_int(cl, 2);
 }
 
 

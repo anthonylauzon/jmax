@@ -243,41 +243,26 @@ threshold_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+class_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(threshold_t), 5, 2, 0);
+  fts_class_init(cl, sizeof(threshold_t), threshold_init, threshold_delete);
 
-  /* system methods */
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, threshold_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, threshold_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, threshold_put);
+  fts_class_method_varargs(cl, fts_s_put, threshold_put);
   
-  /* user methods */  
-  fts_method_define_varargs(cl, 0, fts_s_int, threshold_status_int);
-  fts_method_define_varargs(cl, 0, fts_s_float, threshold_status_float);
-
-  fts_method_define_varargs(cl, 0, fts_s_set, threshold_set);
+  fts_class_method_varargs(cl, fts_s_set, threshold_set);
   
-  fts_method_define_varargs(cl, 1, fts_s_float, threshold_hi_thresh);
-  fts_method_define_varargs(cl, 1, fts_s_int, threshold_hi_thresh);
-
-  fts_method_define_varargs(cl, 2, fts_s_float, threshold_hi_time);
-  fts_method_define_varargs(cl, 2, fts_s_int, threshold_hi_time);
-
-  fts_method_define_varargs(cl, 3, fts_s_float, threshold_lo_thresh);
-  fts_method_define_varargs(cl, 3, fts_s_int, threshold_lo_thresh);
-
-  fts_method_define_varargs(cl, 4, fts_s_float, threshold_lo_time);
-  fts_method_define_varargs(cl, 4, fts_s_int, threshold_lo_time);
-
   fts_dsp_declare_inlet(cl, 0);
 
-  fts_outlet_type_define_varargs(cl, 0, fts_s_bang);
-  fts_outlet_type_define_varargs(cl, 1, fts_s_bang);
-  
-  return fts_ok;
-}
+  fts_class_inlet_number(cl, 0, threshold_status_int);
+  fts_class_inlet_number(cl, 1, threshold_hi_thresh);
+  fts_class_inlet_number(cl, 2, threshold_hi_time);
+  fts_class_inlet_number(cl, 3, threshold_lo_thresh);
+  fts_class_inlet_number(cl, 4, threshold_lo_time);
+
+  fts_class_outlet_bang(cl, 0);
+  fts_class_outlet_bang(cl, 1);
+  }
 
 void
 signal_threshold_config(void)

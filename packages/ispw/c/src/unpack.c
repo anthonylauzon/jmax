@@ -121,19 +121,19 @@ unpack_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_free(this->types);
 }
 
-static fts_status_t
-unpack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+unpack_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(unpack_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(unpack_t), unpack_init, unpack_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, unpack_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, unpack_delete);
+  fts_class_inlet_varargs(cl, 0, unpack_send);
+  fts_class_inlet_int(cl, 0, unpack_send);
+  fts_class_inlet_float(cl, 0, unpack_send);
+  fts_class_inlet_symbol(cl, 0, unpack_send);
 
-  fts_method_define_varargs(cl, 0, fts_s_list, unpack_send);
-  fts_method_define_varargs(cl, 0, fts_s_int, unpack_send);
-  fts_method_define_varargs(cl, 0, fts_s_float, unpack_send);
-
-  return fts_ok;
+  fts_class_outlet_int(cl, 0);
+  fts_class_outlet_float(cl, 0);
+  fts_class_outlet_symbol(cl, 0);
 }
 
 void

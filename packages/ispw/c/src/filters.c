@@ -342,38 +342,34 @@ sig2p2z_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_dsp_remove_object(o);
 }
 
-static fts_status_t
-sig2p2z_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+sig2p2z_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(sig2p2z_t), 7, 1, 0);
+  fts_class_init(cl, sizeof(sig2p2z_t), sig2p2z_init, sig2p2z_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sig2p2z_init);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, sig2p2z_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, sig2p2z_put);
+  fts_class_method_varargs(cl, fts_s_put, sig2p2z_put);
   
-  fts_method_define_varargs(cl, 0, fts_s_clear, sig2p2z_state_clear);
+  fts_class_method_varargs(cl, fts_s_clear, sig2p2z_state_clear);
 
-  fts_method_define_varargs(cl, 0, fts_s_set, sig2p2z_set);
+  fts_class_method_varargs(cl, fts_s_set, sig2p2z_set);
   
-  fts_method_define_varargs(cl, 1, fts_s_float, sig2p2z_gain_c0);
-  fts_method_define_varargs(cl, 2, fts_s_float, sig2p2z_fbcoef1_c1);
-  fts_method_define_varargs(cl, 3, fts_s_float, sig2p2z_fbcoef2_c2);
-  fts_method_define_varargs(cl, 4, fts_s_float, sig2p2z_ffcoef0_c3);
-  fts_method_define_varargs(cl, 5, fts_s_float, sig2p2z_ffcoef1_c4);
-  fts_method_define_varargs(cl, 6, fts_s_float, sig2p2z_ffcoef2_c5);
+  fts_class_inlet_float(cl, 1, sig2p2z_gain_c0);
+  fts_class_inlet_float(cl, 2, sig2p2z_fbcoef1_c1);
+  fts_class_inlet_float(cl, 3, sig2p2z_fbcoef2_c2);
+  fts_class_inlet_float(cl, 4, sig2p2z_ffcoef0_c3);
+  fts_class_inlet_float(cl, 5, sig2p2z_ffcoef1_c4);
+  fts_class_inlet_float(cl, 6, sig2p2z_ffcoef2_c5);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, sig2p2z_gain_c0);
-  fts_method_define_varargs(cl, 2, fts_s_int, sig2p2z_fbcoef1_c1);
-  fts_method_define_varargs(cl, 3, fts_s_int, sig2p2z_fbcoef2_c2);
-  fts_method_define_varargs(cl, 4, fts_s_int, sig2p2z_ffcoef0_c3);
-  fts_method_define_varargs(cl, 5, fts_s_int, sig2p2z_ffcoef1_c4);
-  fts_method_define_varargs(cl, 6, fts_s_int, sig2p2z_ffcoef2_c5);
+  fts_class_inlet_int(cl, 1, sig2p2z_gain_c0);
+  fts_class_inlet_int(cl, 2, sig2p2z_fbcoef1_c1);
+  fts_class_inlet_int(cl, 3, sig2p2z_fbcoef2_c2);
+  fts_class_inlet_int(cl, 4, sig2p2z_ffcoef0_c3);
+  fts_class_inlet_int(cl, 5, sig2p2z_ffcoef1_c4);
+  fts_class_inlet_int(cl, 6, sig2p2z_ffcoef2_c5);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-  
-  return fts_ok;
-}
+  }
 
 static void 
 sig2p2z_config(void)
