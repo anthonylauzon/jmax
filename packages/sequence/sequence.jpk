@@ -34,10 +34,10 @@ ucs load module sequence $dir/c/lib/$jmaxArch/$jmaxMode/libsequence.so
 java::load -classpath "$dir/java/classes" ircam.jmax.editors.sequence.SequenceExtension
 
 ## load the help patch data base
-##sourceFile $dir/help/sequence.help.index.tcl
-##helpSummary Explode $dir/sequence.summary.jmax
+sourceFile $dir/help/sequence.help.index.tcl
+helpSummary Sequence $dir/help/sequence.summary.jmax
 
-puts "package: EXPERIMENTAL sequence package..."
+puts "package: sequence (EXPERIMENTAL sequencing classes)"
 
 
 
