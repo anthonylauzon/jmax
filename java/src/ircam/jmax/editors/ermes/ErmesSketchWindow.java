@@ -344,7 +344,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     windowsMenu.add(aMenuItem = new MenuItem("Run mode Ctrl+E"));
     aMenuItem.addActionListener(this);
     windowsMenu.add(new MenuItem("-"));
-    windowsMenu.add(aMenuItem = new MenuItem("Project Manager Ctrl+M"));
+    //#windowsMenu.add(aMenuItem = new MenuItem("Project Manager Ctrl+M"));
     aMenuItem.addActionListener(this);
     windowsMenu.add(aMenuItem = new MenuItem("jMax Console  Ctrl+J"));
     aMenuItem.addActionListener(this);
@@ -419,7 +419,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   }
 
   private boolean IsInWindowsMenu(String theName) {
-    return(theName.equals("Edit mode Ctrl+E")||theName.equals("Run mode Ctrl+E")||theName.equals("Project Manager Ctrl+M")||theName.equals("jMax Console  Ctrl+J")||IsAWindowName(theName)|| IsAnEditorFrameName(theName));
+    return(theName.equals("Edit mode Ctrl+E")||theName.equals("Run mode Ctrl+E")||theName.equals("jMax Console  Ctrl+J")||IsAWindowName(theName)|| IsAnEditorFrameName(theName));
   }
 	
   private boolean IsAWindowName(String theName){
@@ -939,7 +939,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     else if (theString.equals("jMax Console  Ctrl+J")) {
       MaxApplication.GetConsoleWindow().ToFront();
     }
-    else BringToFront(theString);
+    else BringToFront(theString); 
   }
     
   private void BringToFront(String theName){
