@@ -48,6 +48,8 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
     setBackground(Color.white);
     setLayout( new BoxLayout( this, BoxLayout.Y_AXIS));
 		
+    setPreferredSize( new Dimension(SequenceWindow.DEFAULT_WIDTH-TrackContainer.BUTTON_WIDTH, DEFAULT_HEIGHT));
+    
     setOpaque(false);
 		
     gc = createGraphicContext(geometry, track);
@@ -215,7 +217,7 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 		
 		if( isInSequence && gc.getMarkersTrack() != null)
 			listenToMarkers( gc.getMarkersTrack(), gc.getMarkersSelection());
-	
+    
     component = this;
 }
 
@@ -369,6 +371,8 @@ public void dispose()
 		listDialog.dispose();
 }
 
+/****************** TrackEditor interface **********************************/
+
 public Component getComponent()
 {
 	return component;
@@ -382,11 +386,6 @@ public void setComponent(Component c)
 public SequenceGraphicContext getGraphicContext()
 {
 	return gc;
-}
-
-public Dimension getPreferredSize()
-{
-	return new Dimension(SequenceWindow.DEFAULT_WIDTH-TrackContainer.BUTTON_WIDTH, DEFAULT_HEIGHT);
 }
 
 public Track getTrack()
@@ -424,6 +423,11 @@ public void showListDialog()
 	if(listDialog==null) 
 		createListDialog();
 	listDialog.setVisible(true);
+}
+
+public void setContainer(SequenceEditor container)
+{
+  this.container = container;
 }
 
 private void createListDialog()
@@ -488,6 +492,8 @@ public int DEFAULT_HEIGHT = 430;
 public int viewMode, rangeMode;
 TrackBasePopupMenu popup = null;
 JLabel displayLabel;
+
+public transient SequenceEditor container = null;
 
 int gridMode = TIME_GRID;
 }

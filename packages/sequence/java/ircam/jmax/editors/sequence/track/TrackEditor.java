@@ -51,6 +51,8 @@ public interface TrackEditor {
 
     public void showListDialog();    
 		
+    public void setContainer(SequenceEditor container);
+    
 		static public final int TIME_GRID = 0;
 		static public final int MEASURES_GRID = 1;
 }

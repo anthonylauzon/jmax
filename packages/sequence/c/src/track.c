@@ -824,6 +824,9 @@ track_clear_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   
   track_clear(this);
   
+  if(this->markers)
+    track_clear(this->markers);
+  
   fts_object_set_state_dirty(o);
 }
 

@@ -131,6 +131,8 @@ public class MidiTrackEditor extends TrackBaseEditor
     ((ScoreRenderer)renderer).setViewMode(viewMode);
 		if(!gc.isInSequence())
 			((FtsTrackObject)gc.getDataModel()).editorObject.setViewMode(viewMode);
+     
+    resizeToPreferredSize();
   }
 	
 	public void setGridMode(int gridMode)
@@ -163,6 +165,8 @@ public class MidiTrackEditor extends TrackBaseEditor
       getTrack().setProperty("rangeMode", new Integer(rangeMode));
       if(!gc.isInSequence())
         ((FtsTrackObject)gc.getDataModel()).editorObject.setRangeMode(rangeMode);
+      
+      resizeToPreferredSize();
     }
     else
       forceBackgroundRepaint();
@@ -189,6 +193,16 @@ public class MidiTrackEditor extends TrackBaseEditor
     return ((PartitionAdapter)gc.getAdapter()).getRangeHeight();
   }
 
+  public void resizeToPreferredSize()
+  {
+    Dimension d = getSize();
+    d.height = ((PartitionAdapter)gc.getAdapter()).getPreferredHeight();
+    setSize(d.width, d.height);
+    setPreferredSize(d);
+    validate();
+    container.getEditorContainer().getFrame().pack();
+  }
+  
    //--- MidiTrackEditor fields
   transient MaxVector oldElements = new MaxVector();
   transient SequenceTableDialog listDialog = null;

@@ -157,7 +157,6 @@ public FtsGraphicObject getFtsObject()
 		return parent;
 	else
 	  return (FtsTrackObject)itsDataModel;
-	/*return ((SequenceEditor)((EditorContainer) getFrame()).getEditor()).getFtsObject();*/
 }
 
 public void setScrollManager(ScrollManager manager)

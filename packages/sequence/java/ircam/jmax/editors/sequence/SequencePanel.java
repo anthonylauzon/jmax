@@ -247,6 +247,8 @@ public class SequencePanel extends /*JPanel*/PopupToolbarPanel implements Sequen
     teditor.getGraphicContext().setToolManager(manager);
     teditor.getGraphicContext().setFrame(itsContainer.getFrame());
     teditor.getGraphicContext().setScrollManager(this);
+    teditor.setContainer(this);
+    
     manager.addContextSwitcher(new ComponentContextSwitcher(teditor.getComponent(), teditor.getGraphicContext()));
     
     trackPanel.remove(verticalGlue);

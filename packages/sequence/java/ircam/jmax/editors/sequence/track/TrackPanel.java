@@ -112,6 +112,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     trackEditor.getGraphicContext().setFrame( itsContainer.getFrame());
     trackEditor.getGraphicContext().setScrollManager( this);
     trackEditor.getSelection().addListSelectionListener(this);
+    trackEditor.setContainer(this);
     SequenceSelection.setCurrent( trackEditor.getSelection());
     data.addListener(this); 
     data.addHighlightListener(ruler);

@@ -468,6 +468,11 @@ public int getMaxScoreY()
 {
 	return maxScoreY;
 }
+
+public int getPreferredHeight()
+{
+  return maxScoreY-minScoreY+2*PartitionBackground.SC_TOP;
+}
 ////////////////// PropertyChangeListener interface
 public void propertyChange(PropertyChangeEvent e)
 {
