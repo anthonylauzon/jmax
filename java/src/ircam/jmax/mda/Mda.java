@@ -2,6 +2,7 @@ package ircam.jmax.mda;
 
 import java.util.*;
 import java.io.*;
+
 import com.sun.java.swing.*;
 import com.sun.java.swing.filechooser.*;
 
@@ -189,6 +190,49 @@ public class Mda
     throw new MaxDocumentException("Internal error: cannot load from " + file);
   }
 
+  /** Static method to find a Document File description.
+   *  We take the description from the document handler, and not from
+   * the document type, because this is the description of the document;
+   * a document file can produce diffent document types (for example,
+   * a scheme/tcl file).
+   */
+
+  public static String getFileDescription(File file)
+  {
+    for (int i = 0; i < allHandlers.size() ; i++)
+      {
+	MaxDocumentHandler documentHandler;
+
+	documentHandler = (MaxDocumentHandler) allHandlers.elementAt(i);
+
+	if (documentHandler.canLoadFrom(file))
+	  return documentHandler.getDescription();
+      }
+
+    return null;
+  }
+
+
+  /** Static method to find a Document file icon.
+   */
+
+  public static Icon getFileIcon(File file)
+  {
+    for (int i = 0; i < allHandlers.size() ; i++)
+      {
+	MaxDocumentHandler documentHandler;
+
+	documentHandler = (MaxDocumentHandler) allHandlers.elementAt(i);
+
+	if (documentHandler.canLoadFrom(file))
+	  return documentHandler.getIcon();
+      }
+
+    return null;
+  }
+
+
+
   /** Static method to find a Document Handler for a given Document file/document pair;
    */
 
@@ -321,6 +365,48 @@ public class Mda
   static public Enumeration getDocumentFileFilters()
   {
     return new FileFilterEnumeration();
+  }
+
+
+  // Generate a FileView based on Mda suitable for a JFileChooser dialog
+
+  static class MaxDocumentFileView extends FileView {
+    public String getName(File f) {
+	return null; // let the L&F FileView figure this out
+    }
+    
+    public String getDescription(File f) {
+	return null; // let the L&F FileView figure this out
+    }
+    
+    public String getTypeDescription(File f) {
+      return Mda.getFileDescription(f);
+    }
+    
+    public Icon getIcon(File f) {
+      return Mda.getFileIcon(f);
+    }
+    
+    public Boolean isTraversable(File f) {
+	return null; // let the L&F FileView figure this out
+    }
+    
+    // Get the extension of this file. Code is factored out
+    // because we use this in both getIcon and getTypeDescription
+    private String getExtension(File f) {
+	String ext = null;
+	String s = f.getName();
+	int i = s.lastIndexOf('.');
+	if(i > 0 &&  i < s.length() - 1) {
+	    ext = s.substring(i+1).toLowerCase();
+	}
+	return ext;
+    }
+  }
+
+  public static FileView getFileView()
+  {
+    return new  MaxDocumentFileView();
   }
 }
 

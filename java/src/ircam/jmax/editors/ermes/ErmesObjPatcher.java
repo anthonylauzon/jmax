@@ -90,15 +90,20 @@ public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsProper
       {
 	try
 	  {
+	    MaxDataEditor editor;
 	    MaxData data;
-	    Cursor temp = itsSketchPad.getCursor();
-	    itsSketchPad.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
+	    itsSketchPad.waiting();
 
 	    data = ((FtsObjectWithData) itsFtsObject).getData();
 
-	    Mda.edit(data);
+	    editor = Mda.edit(data);
 
-	    itsSketchPad.setCursor(temp);
+	    // Add ready listener
+
+	    editor.addEditorReadyListener(new MaxEditorReadyListener() {
+	      public void editorReady(MaxDataEditor editor) { itsSketchPad.stopWaiting();}
+	    });
 	  }
 	catch (MaxDocumentException e)
 	  {

@@ -8,9 +8,6 @@ import java.awt.event.*;
 import com.sun.java.swing.*;
 import com.sun.java.swing.filechooser.*; // tmp !!
 
-// Tmp packages
-// import com.sun.java.swing.preview.*;
-// import com.sun.java.swing.preview.filechooser.*;
 
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
@@ -39,6 +36,8 @@ public class MaxFileChooser
       fd.addChoosableFileFilter((FileFilter) e.nextElement());
 
     fd.addChoosableFileFilter(fd.getAcceptAllFileFilter());
+
+    fd.setFileView(Mda.getFileView());
   }
 
   /** New Loading structure (beginning): global "Open" FileDialog that handle current directory */

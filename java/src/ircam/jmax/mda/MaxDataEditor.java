@@ -47,6 +47,16 @@ public interface MaxDataEditor
    */
 
   abstract public void showObject(Object object);
+
+  /**
+   * Add an editorReady listener
+   * The correct default implementation (for a synchronius editor)
+   * is to call l.editorReady(this) immediately.
+   * Use AbstractMaxDataEditor to build a new one easily.
+   */
+
+  abstract void addEditorReadyListener(MaxEditorReadyListener l);
+  abstract void removeEditorReadyListener(MaxEditorReadyListener l);
 }
 
 

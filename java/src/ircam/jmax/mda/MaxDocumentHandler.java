@@ -1,7 +1,12 @@
 package ircam.jmax.mda; 
 
+
+
 import java.util.*;
 import java.io.*;
+import java.awt.*;
+
+import com.sun.java.swing.*;
 
 /** A Document Handler is an object able to load a Max Document 
  *  from a document file; the class also handle the document base of all
@@ -65,6 +70,11 @@ abstract public class MaxDocumentHandler
     */
 
   abstract public String getDescription();
+
+  public Icon getIcon()
+  {
+    return null;
+  }
 }
 
 

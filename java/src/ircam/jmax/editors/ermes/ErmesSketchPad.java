@@ -2646,7 +2646,28 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
 	g.dispose();
       }
   }
+
+  // The waiting/stopWaiting service
+
+  private int waiting = 0;
+
+  void waiting()
+  {
+    if (waiting >= 0)
+      setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+
+    waiting++;
+  }
+
+  void stopWaiting()
+  {
+    waiting--;
+
+    if (waiting <= 0)
+      setCursor(Cursor.getDefaultCursor());
+  }
 }
+
 
 
 

@@ -93,6 +93,20 @@ public class Explode extends MaxEditor implements MaxDataEditor, AAAReadme {
   }
 
   /**
+   * We should Use AbstractMaxDataEditor to build a separate MaxDataEditor
+   * object.
+   */
+
+  public void addEditorReadyListener(MaxEditorReadyListener l)
+  {
+    l.editorReady(this);
+  }
+
+  public void removeEditorReadyListener(MaxEditorReadyListener l)
+  {
+  }
+
+  /**
    * personalize the menubar (adds the settings menu)
    */
   public void SetupMenu()

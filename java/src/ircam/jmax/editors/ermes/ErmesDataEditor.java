@@ -7,11 +7,10 @@ import ircam.jmax.mda.*;
  * The Ermes Data Editor; represent the sketch window in the Mda system.
  */
 
-public class ErmesDataEditor implements  MaxDataEditor
+public class ErmesDataEditor extends AbstractMaxDataEditor
 {
   private ErmesSketchWindow window = null;
   private FtsContainerObject patcher;
-
   
   public ErmesDataEditor(FtsContainerObject p)
   {
@@ -21,7 +20,9 @@ public class ErmesDataEditor implements  MaxDataEditor
       setSketchWindow(new ErmesSketchWindow(patcher));
     else
       patcher.download(new Runnable() {
-	public void run() { ErmesDataEditor.this.setSketchWindow(new ErmesSketchWindow(patcher));
+	public void run() {
+	  ErmesDataEditor.this.setSketchWindow(new ErmesSketchWindow(patcher));
+	  ErmesDataEditor.this.fireEditorReadyListeners();
 	}
       });
   }
@@ -73,16 +74,6 @@ public class ErmesDataEditor implements  MaxDataEditor
 	window.itsPatcher = null; // (fd) ???
 	window.Destroy();
       }
-  }
-
-  /** Tell the editor to syncronize, i.e. to store in the
-   * data all the information possibly cached in the editor
-   * and still not passed to the data instance; this usually
-   * happen before saving an instance.
-   */
-
-  public void syncData()
-  {
   }
 
   /*

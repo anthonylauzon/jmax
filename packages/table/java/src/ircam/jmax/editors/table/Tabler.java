@@ -158,6 +158,22 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
 
   public void  showObject(Object obj){}
 
+
+  /**
+   * We should Use AbstractMaxDataEditor to build a separate MaxDataEditor
+   * object.
+   */
+
+  public void addEditorReadyListener(MaxEditorReadyListener l)
+  {
+    l.editorReady(this);
+  }
+
+  public void removeEditorReadyListener(MaxEditorReadyListener l)
+  {
+  }
+
+
   //end of the MaxDataEditor interface
 
 

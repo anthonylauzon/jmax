@@ -141,7 +141,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
 	  {
 	    // Fall back the old obsolete behaviour
 	    // Should be substituted by the previous one
-	    // need changes to table, qlist and patcher (?)
+	    // need changes tqlist and patcher (?)
 	    // for this
 
 	    data = ((FtsObjectWithData) itsFtsObject).getData();	   
@@ -149,22 +149,25 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
 
 	if (data != null)
 	  {
-	    Cursor temp = itsSketchPad.getCursor();
-
-	    itsSketchPad.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+	    itsSketchPad.waiting();
 
 	    try
 	      {
-		Mda.edit(data);
+		MaxDataEditor editor;
+
+		editor = Mda.edit(data);
+
+		// Add ready listener
+
+		editor.addEditorReadyListener(new MaxEditorReadyListener() {
+		  public void editorReady(MaxDataEditor editor) { itsSketchPad.stopWaiting();}
+		});
 	      }
 	    catch ( MaxDocumentException e)
 	      {
 		// SHould do something better
 		System.err.println( e);
 	      }
-
-
-	    itsSketchPad.setCursor(temp);
 	  }
       }
     else if ( !itsSketchPad.itsRunMode) 

@@ -22,7 +22,7 @@ public class ObjectSetViewer extends JPanel {
 
     private static void loadImages()
     {
-      String fs = MaxApplication.getProperty( "file.separator");
+      String fs = File.separator;
       String path = MaxApplication.getProperty( "root" ) + fs + "images" + fs;
 
       patcherIcon = new ImageIcon( path + "tool_patcher.gif");
