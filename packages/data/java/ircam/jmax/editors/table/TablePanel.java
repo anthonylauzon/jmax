@@ -345,11 +345,11 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
    * TableDataListener interface */
   public void valueChanged(int index1, int index2)
   {
-     itsCenterPanel.rangePaint(index1, index2);
+    itsCenterPanel.rangePaint(index1, index2);
   }
   public void valueChanged(int index)
   {
-      itsCenterPanel.singlePaint(index);
+    itsCenterPanel.singlePaint(index);
   }
   public void tableSetted()
   {

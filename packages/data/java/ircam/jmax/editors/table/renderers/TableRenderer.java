@@ -61,42 +61,37 @@ public class TableRenderer extends AbstractRenderer implements Layer{
   private void render(Graphics g, int x, int y)
   {
     int zero = gc.getAdapter().getY(0);
-
+    
     int width = (int)( gc.getAdapter().getXZoom());
     int height;
 
     if (width < 1) width = 1;
     
     // erase the old point
-    //g.setColor(Color.white);
     g.setColor( backColor);
-    g.fillRect(x, 0, width, gc.getGraphicDestination().getSize().height);
+    g.fillRect(x, 1, width, gc.getGraphicDestination().getSize().height-2);    
 
     // redraw it
-    //g.setColor(Color.black);
     g.setColor( foreColor);
     
     if (itsMode == SOLID)
       {
 	int startY = (y <= zero)?y:zero; //remember: y are (graphically) INVERTED!  
 	height = Math.abs(zero-y);
-
+	
 	g.fillRect(x, startY, width, height);
       }
     else
       {
 	height = (int) gc.getAdapter().getYZoom();
 	if (height == 0) height = 1;
-
+	
 	g.fillRect(x,  y, width, height);
       }
-  
+    
     // draw the red line
     g.setColor(Color.red);
-    //g.setXORMode(Color.white);
-    g.setXORMode( backColor);
     g.fillRect(x, zero, width, 1);
-    g.setPaintMode();
   }
 
   /**
@@ -104,56 +99,90 @@ public class TableRenderer extends AbstractRenderer implements Layer{
   public void renderPoint(Graphics g, int index)
   {
     if (index < 0 || index >= gc.getDataModel().getSize()) return;
-    int val = gc.getDataModel().getValue(index);
+    int val = gc.getFtsObject().getVisibleValue(index);
 
     render(g, gc.getAdapter().getX(index), gc.getAdapter().getY(val));
   }
 
   public void renderPoint(Graphics g, int index, int value)
   {
-    //render(g, gc.getAdapter().getX(index), gc.getAdapter().getY(value));
     render(g, (int)(index*gc.getAdapter().getXZoom()), gc.getAdapter().getY(value));
+  }
+
+  public void drawSolidPoint( Graphics g, int x, int y, int zero)
+  {
+    int width = (int)( gc.getAdapter().getXZoom());
+    int height = Math.abs(zero-y);
+    
+    if (width < 1) width = 1;
+    
+    int startY = (y <= zero) ? y : zero; //remember: y are (graphically) INVERTED!  
+    
+    g.fillRect( x, startY, width, height);
+  }
+
+  public void drawHollowPoint( Graphics g, int x, int y)
+  {
+    int width = (int)( gc.getAdapter().getXZoom());
+    int height = (int) gc.getAdapter().getYZoom();
+    
+    if (width < 1) width = 1;    
+    if (height == 0) height = 1;
+
+    g.fillRect(x,  y, width, height);
   }
   /**
    * From the Layer interface: renders the content of the table (except the
    * zero line and the surrounding gray, that are rendered by the TopLayer */
   public void render(Graphics g, int order)
   {
-      /*g.setColor(Color.black);
-
-	for (int i = 0; i< gc.getDataModel().getSize(); i++)
-	{
-	renderPoint(g, i);
-	}*/
-      render(g, gc.getGraphicDestination().getBounds(), order);
+    render(g, gc.getGraphicDestination().getBounds(), order);
   }
 
   /** 
    * Layer interface */
   public void render(Graphics g, Rectangle r, int order)
   {    
-      //g.setColor(Color.white);
-      //g.fillRect(r.x, r.y, r.width, r.height);
-      if(gc.getAdapter().getXZoom()>0.5)
-	{
-	  if((gc.getFtsObject().getVisibleSize()==0)||(gc.getFtsObject().getLastUpdatedIndex()==0)) return;
-	  int index = gc.getFirstVisibleIndex();
-	  int visibleSize = gc.getVisibleHorizontalScope();
-	  int tableSize = gc.getFtsObject().getSize();
+    g.setColor( backColor);
+    g.fillRect(r.x, r.y, r.width, r.height);
+   
+    g.setColor( foreColor);
+    
+    if(gc.getAdapter().getXZoom()>0.5)
+      {
+	if((gc.getFtsObject().getVisibleSize()==0)||(gc.getFtsObject().getLastUpdatedIndex()==0)) return;
+	int index = gc.getFirstVisibleIndex();
+	int visibleSize = gc.getVisibleHorizontalScope();
+	int tableSize = gc.getFtsObject().getSize();
 
+	if( itsMode == SOLID)
+	  {
+	    int zero = gc.getAdapter().getY(0);
+	    for (int i = 0; (i < visibleSize)&&(index+i<tableSize); i++)
+	      drawSolidPoint(g, (int)(i*gc.getAdapter().getXZoom()), 
+			     gc.getAdapter().getY( gc.getFtsObject().getVisibleValue(index+i)), zero);
+	  }
+	else
 	  for (int i = 0; (i < visibleSize)&&(index+i<tableSize); i++)
-	    renderPoint(g, i, gc.getFtsObject().getVisibleValue(index+i));
-	}
-      else
-	{
-	  int pixSize = gc.getFtsObject().getPixelsSize();	      
+	    drawHollowPoint(g, (int)(i*gc.getAdapter().getXZoom()), 
+			    gc.getAdapter().getY( gc.getFtsObject().getVisibleValue(index+i)));
+      }
+    else
+      {
+	int pixSize = gc.getFtsObject().getPixelsSize();	      
+	if( itsMode == SOLID)
+	  {
+	    int zero = gc.getAdapter().getY(0);
+	    for (int i = 0; i < pixSize; i++)
+	      drawSolidPoint( g, i, gc.getAdapter().getY(gc.getFtsObject().getPixel(i)), zero);
+	  }
+	else
 	  for (int i = 0; i < pixSize; i++)
-	    render(g, i, gc.getAdapter().getY(gc.getFtsObject().getPixel(i)));
-	}
-      /*g.setColor(Color.red);
-	g.setXORMode(Color.white);
-	g.fillRect(0, gc.getAdapter().getY(0), r.width, 1);
-	g.setPaintMode();*/
+	    drawHollowPoint( g, i, gc.getAdapter().getY(gc.getFtsObject().getPixel(i)));
+      }
+    
+    g.setColor( Color.red);
+    g.drawLine( 0, gc.getAdapter().getY(0), r.width, gc.getAdapter().getY(0));
   }
 
 

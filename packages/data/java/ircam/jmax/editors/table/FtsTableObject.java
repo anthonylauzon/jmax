@@ -102,6 +102,12 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
     vector = parent;
 
     listeners = new MaxVector();
+    type = (parent instanceof FtsIvecObject);
+  }
+
+  public boolean isIvec()
+  {
+    return type;
   }
 
   //////////////////////////////////////////////////////////////////////////////////////
@@ -140,8 +146,8 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
 	  visibles[i] = args[i+2].intValue;
 	}
     else
-	for(i = 0; i<nArgs-2; i++)
-	    visibles[i] = args[i+2].intValue;
+      for(i = 0; i<nArgs-2; i++)
+	visibles[i] = args[i+2].intValue;
     
     lastIndex = i;
     
@@ -172,7 +178,13 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
     
     if(startIndex+i > lastIndex)
 	lastIndex = startIndex+i;
-    notifySet();
+    
+    if( i == 1)
+      notifyValueChanged( startIndex);
+    else if( i <= 10)
+      notifyValueChanged( startIndex, startIndex+i-1);
+    else
+      notifySet();
   }  
   
   public void startEdit()
@@ -183,27 +195,27 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
   {
     endUpdate();
   }
-    void printVisibles()
-    {
-	System.err.println("printvisibles ");
-	for(int i=0;i<visibleSize-9;i+=10)
-	    {
-		System.err.println(" "+visibles[i]+" "+visibles[i+1]+" "+visibles[i+2]+" "+visibles[i+3]+" "+visibles[i+4]+
-				   " "+visibles[i+5]+" "+visibles[i+6]+" "+visibles[i+7]+" "+visibles[i+8]+" "+visibles[i+9]);
-	    }
-    }
+  void printVisibles()
+  {
+    System.err.println("printvisibles ");
+    for(int i=0;i<visibleSize-9;i+=10)
+      {
+	System.err.println(" "+visibles[i]+" "+visibles[i+1]+" "+visibles[i+2]+" "+visibles[i+3]+" "+visibles[i+4]+
+			   " "+visibles[i+5]+" "+visibles[i+6]+" "+visibles[i+7]+" "+visibles[i+8]+" "+visibles[i+9]);
+      }
+  }
 
   public void setPixels(int nArgs , FtsAtom args[])
   {
-      int i = 0;      
-      pixelsSize = args[0].intValue;    
-      pixels = new int[pixelsSize];
+    int i = 0;      
+    pixelsSize = args[0].intValue;    
+    pixels = new int[pixelsSize + 10];
 
-      for(i = 0; i<nArgs-1; i++)
-	  pixels[i] = args[i+1].intValue;
-
-      if(pixelsSize <= nArgs-1)
-	  notifySet();
+    for(i = 0; i<nArgs-1; i++)
+      pixels[i] = args[i+1].intValue;
+    
+    if(pixelsSize <= nArgs-1)
+      notifySet();
   }
     
   public void appendPixels(int nArgs , FtsAtom args[])
@@ -211,11 +223,11 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
     int startIndex = args[0].intValue;
     int i=0;
 
-    for(i = 0; i<nArgs-1; i++)
-	pixels[startIndex+i] = args[i+1].intValue;
+    for(i = 0; (i < nArgs-1)&&(startIndex+i < pixels.length) ; i++)
+      pixels[startIndex+i] = args[i+1].intValue;
 
     if(pixelsSize <= startIndex+nArgs-1)
-	notifySet();
+      notifySet();
   }
 
   public void addPixels(int nArgs , FtsAtom args[])
@@ -223,22 +235,22 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
     int startIndex = args[0].intValue;
     int i=0;
     int newp = nArgs-1;
-    int[] temp = new int[pixelsSize];    
+    int[] temp = new int[pixelsSize + 10];    
 
     if(startIndex==0)
     {
-	for(i = 0; i < newp; i++)
-	    temp[i] = args[i+1].intValue;
-	for(i = newp; i< pixelsSize; i++)
-	    temp[i] = pixels[i-newp];
+      for(i = 0; i < newp; i++)
+	temp[i] = args[i+1].intValue;
+      for(i = newp; i< pixelsSize; i++)
+	temp[i] = pixels[i-newp];
     }
     else
-    {
+      {
 	for(i = 0; i<pixelsSize-newp; i++)
 	  temp[i] = pixels[i+newp];
 	for(i = 1; i<= newp; i++)
-	    temp[pixelsSize-newp-1+i] = args[i].intValue;
-    }
+	  temp[pixelsSize-newp-1+i] = args[i].intValue;
+      }
     pixels = temp;
     notifySet();
   }
@@ -246,67 +258,67 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
   /*
   ** Requests to the server
   */
-    public void requestSetValue( int index, int value)
-    {
-	args.clear();
-	args.addInt( index);
-	args.addInt( value);
+  public void requestSetValue( int index, int value)
+  {
+    args.clear();
+    args.addInt( index);
+    args.addInt( value);
       
-	try{
-	  send( FtsSymbol.get("set_from_client"), args);
-	}
-	catch(IOException e)
-	  {
-	    System.err.println("FtsTableObject: I/O Error sending set_from_client Message!");
-	    e.printStackTrace(); 
-	  }
+    try{
+      send( FtsSymbol.get("set_from_client"), args);
     }
-    public void requestSetValues(int[] values, int startIndex, int size)
-    {
-	args.clear();
-	args.addInt( startIndex);
-		
-	for(int i=0; i < size; i++)
-	  args.addInt( values[i]);
-
-	try{
-	  send( FtsSymbol.get("set_from_client"), args);
-	}
-	catch(IOException e)
-	  {
-	    System.err.println("FtsTableObject: I/O Error sending set_from_client Message!");
-	    e.printStackTrace(); 
-	  }
+    catch(IOException e)
+      {
+	System.err.println("FtsTableObject: I/O Error sending set_from_client Message!");
+	e.printStackTrace(); 
+      }
+  }
+  public void requestSetValues(int[] values, int startIndex, int size)
+  {
+    args.clear();
+    args.addInt( startIndex);
+    
+    for(int i=0; i < size; i++)
+      args.addInt( values[i]);
+    
+    try{
+      send( FtsSymbol.get("set_from_client"), args);
     }
+    catch(IOException e)
+      {
+	System.err.println("FtsTableObject: I/O Error sending set_from_client Message!");
+	e.printStackTrace(); 
+      }
+  }
   
-    public void requestSetVisibleWindow(int size, int startIndex, float zoom, int sizePixels)
-    {
-      args.clear();
-      args.addInt(size+10);
-      args.addInt(startIndex);
-      args.addFloat(zoom);
-      args.addInt(sizePixels);
-	
-      try{
-	send( FtsSymbol.get("set_visible_window"), args);
-      }
-      catch(IOException e)
-	{
-	  System.err.println("FtsTableObject: I/O Error sending set_visible_window Message!");
-	  e.printStackTrace(); 
-	}
+  public void requestSetVisibleWindow(int size, int startIndex, float zoom, int sizePixels)
+  {
+    args.clear();
+    args.addInt(size+10);
+    args.addInt(startIndex);
+    args.addFloat(zoom);
+    args.addInt(sizePixels);
+    
+    try{
+      send( FtsSymbol.get("set_visible_window"), args);
     }
-    public void requestEndEdit()
-    {
-      try{
-	send( FtsSymbol.get("end_edit"));
+    catch(IOException e)
+      {
+	System.err.println("FtsTableObject: I/O Error sending set_visible_window Message!");
+	e.printStackTrace(); 
       }
-      catch(IOException e)
-	{
-	  System.err.println("FtsTableObject: I/O Error sending end_edit Message!");
-	  e.printStackTrace(); 
-	}
+  }
+  public void requestEndEdit()
+  {
+    try{
+      send( FtsSymbol.get("end_edit"));
     }
+    catch(IOException e)
+      {
+	System.err.println("FtsTableObject: I/O Error sending end_edit Message!");
+	e.printStackTrace(); 
+      }
+  }
 
   private boolean firstTime = false;
   public void requestGetValues()
@@ -341,6 +353,7 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
 	  }
       }
   }
+
   public void requestGetPixels(int deltax, int deltap)
   { 
     if(deltax==0)	    
@@ -568,6 +581,18 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
       ((TableDataListener) e.nextElement()).tableSetted();
   }
 
+  private void notifyValueChanged( int i)
+  {
+    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+      ((TableDataListener) e.nextElement()).valueChanged( i);
+  }
+
+  private void notifyValueChanged( int start, int end)
+  {
+    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+      ((TableDataListener) e.nextElement()).valueChanged( start, end);
+  }
+
   private void notifyClear()
   {
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
@@ -579,6 +604,7 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
   MaxVector listeners = new MaxVector();
   private int size = 0;
   private FtsObject vector;
+  private boolean type; /* true if vector is an FtsIvecObject */
 }
 
 

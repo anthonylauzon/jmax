@@ -51,10 +51,7 @@ static fts_symbol_t sym_insert_client = 0;
  *  utility functions
  *
  */
-
-#define tabeditor_set_editor_open(b) ((b)->opened = 1)
-#define tabeditor_set_editor_close(b) ((b)->opened = 0)
-#define tabeditor_editor_is_open(b) ((b)->opened)
+#define tabeditor_is_ivec(t) ((t)->type = 1)
 
 /*********************************************************
 *
@@ -465,9 +462,15 @@ tabeditor_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   this->pixsize = 1;
   
   if(ac == 1 && fts_is_object(at))
-    this->vec = fts_get_object( at);
+    {
+      this->vec = fts_get_object( at);
+      this->type = (fts_object_get_class(this->vec) == ivec_type);
+    }
   else
-    this->vec = 0; 
+    {
+      this->vec = 0; 
+      this->type = -1;
+   }
 }
 
 static void

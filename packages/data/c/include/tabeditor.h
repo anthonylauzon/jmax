@@ -36,7 +36,8 @@ typedef struct _tabeditor_
   int vindex; /* first visible point */
   float zoom; /* current zoom */
   int pixsize; /* visible pixels size */
-
+  
+  int type; /* zero if vec is an fvec, non zero if is an ivec */
   fts_object_t *vec;
 
 } tabeditor_t;

@@ -174,21 +174,19 @@ public class TableDisplay extends PopupToolbarPanel
   public void rangePaint(int index1, int index2)
   {
      Graphics g = getGraphics();
-
-      for (int i = index1; i<= index2; i++)
-	  tr.renderPoint(g, i);
-    
-      g.dispose();
+     for (int i = index1; i<= index2; i++)
+       tr.renderPoint(g, i);
+     
+     g.dispose();
   }
   
     /**
      * paints a single point */
   public void singlePaint(int index)
   {
-      Graphics g = getGraphics();
-      
-      tr.renderPoint(g, index);
-      g.dispose();
+    Graphics g = getGraphics();
+    tr.renderPoint(g, index);
+    g.dispose();
   }
 
   public int getDisplayMode()
