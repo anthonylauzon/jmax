@@ -1551,8 +1551,8 @@ marker_track_import_labels_txt (fts_object_t *o, int winlet, fts_symbol_t s,
     fts_bytestream_t *memstream;
     enum { TIME, TEXT, ERROR } waitingfor = TIME;
 
-    memstream = fts_object_create(fts_memorystream_class, 0, NULL);
-    fts_object_refer(memstream);
+    memstream = (fts_bytestream_t *)fts_object_create(fts_memorystream_class, 0, NULL);
+    fts_object_refer((fts_object_t *)memstream);
 
     /* check file name for .txt? */
 
@@ -1574,7 +1574,7 @@ marker_track_import_labels_txt (fts_object_t *o, int winlet, fts_symbol_t s,
             time = fts_get_number_float(&a) * 1000;  /* convert to millisec */
 
             /* prepare collection of label */
-            fts_memorystream_reset(memstream);
+            fts_memorystream_reset((fts_memorystream_t *)memstream);
             waitingfor = TEXT;
           }
           else
@@ -1596,8 +1596,8 @@ marker_track_import_labels_txt (fts_object_t *o, int winlet, fts_symbol_t s,
                                              seqsym_marker, &event);
 
             /* get and zero-terminate label string (NOT KOSHER!) */
-            lab = fts_memorystream_get_bytes(memstream);
-            lab[fts_memorystream_get_size(memstream)] = 0;
+            lab = (char *)fts_memorystream_get_bytes((fts_memorystream_t *)memstream);
+            lab[fts_memorystream_get_size((fts_memorystream_t *)memstream)] = 0;
             
             scomark_set_label(mrk, fts_new_symbol(lab));
 
