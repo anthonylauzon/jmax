@@ -27,7 +27,6 @@
 #define _TRACK_H_
 
 #include <fts/fts.h>
-#include "track.h"
 #include "event.h"
 
 extern fts_class_t *track_type;

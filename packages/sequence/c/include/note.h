@@ -23,11 +23,12 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
+
 #ifndef _NOTE_H_
 #define _NOTE_H_
 
 #include <fts/fts.h>
-#include <sequence/c/include/event.h>
+#include "event.h"
 
 extern fts_class_t *note_type;
 

@@ -1,3 +1,9 @@
+# $Id$
+#
+# sequence package Makefile.am
+#
+# $Log$
+
 if COND_COMPILE_JAVA
 JAVA_SRC_DIR= java
 else

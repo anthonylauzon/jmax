@@ -24,9 +24,9 @@
  *
  */
 #include <fts/fts.h>
-#include <sequence/c/include/event.h>
-#include <sequence/c/include/note.h>
-#include "seqsym.h"
+#include <event.h>
+#include <note.h>
+#include <seqsym.h>
 #include "seqmess.h"
 
 fts_class_t *event_type = 0;

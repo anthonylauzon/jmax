@@ -24,9 +24,9 @@
  *
  */
 #include <fts/fts.h>
-#include <sequence/c/include/sequence.h>
-#include <sequence/c/include/track.h>
-#include <sequence/c/include/note.h>
+#include <sequence.h>
+#include <track.h>
+#include <note.h>
 #include "seqsym.h"
 
 fts_class_t *note_type = 0;
