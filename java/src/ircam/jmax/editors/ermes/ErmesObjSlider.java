@@ -189,7 +189,7 @@ class ErmesObjSlider extends ErmesObject {
   public void Paint_specific(Graphics g) {
     
     if (g==null) {
-      MaxApplication.getPostStream().println("Error in graphic update: null graphic contest");
+      MaxApplication.GetPrintStream().println("Error in graphic update: null graphic contest");
       return;
     }
     if(!itsSelected) g.setColor(itsUINormalColor);

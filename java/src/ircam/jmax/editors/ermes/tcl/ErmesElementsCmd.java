@@ -47,7 +47,7 @@ class ErmesElementsCmd implements Command
 	interp.setResult(list);
       }
     else
-      throw new TclException(interp, "wrong number of args: usage: elements");
+      throw new TclNumArgsException(interp, 1, argv, "");
   }
 }
 

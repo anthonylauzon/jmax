@@ -32,10 +32,6 @@ MaxOpenCmd:
 	javac $(JFLAGS) MaxOpenCmd.java
 .PHONY: MaxOpenCmd
 
-MaxPostCmd:
-	javac $(JFLAGS) MaxPostCmd.java
-.PHONY: MaxPostCmd
-
 MaxQuitCmd:
 	javac $(JFLAGS) MaxQuitCmd.java
 .PHONY: MaxQuitCmd
@@ -52,8 +48,25 @@ MaxWhenCmd:
 	javac $(JFLAGS) MaxWhenCmd.java
 .PHONY: MaxWhenCmd
 
+MaxOpenConsoleCmd:	
+	javac $(JFLAGS) MaxOpenConsoleCmd.java
+.PHONY: MaxOpenConsoleCmd
+
+MaxSourceCmd:
+	javac $(JFLAGS) MaxSourceCmd.java
+.PHONY: MaxSourceCmd
+
+MaxSysSourceCmd:
+	javac $(JFLAGS) MaxSysSourceCmd.java
+.PHONY: MaxSysSourceCmd
+
+MaxSplashCmd:
+	javac $(JFLAGS) MaxSplashCmd.java
+.PHONY: MaxSplashCmd
+
 TclMaxPackage:
 	javac $(JFLAGS) TclMaxPackage.java
 .PHONY: TclMaxPackage
+
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

@@ -33,10 +33,6 @@ public class ConsoleWindow extends MaxEditor {
     add(itsConsole);
   }
   
-  public PrintWriter getPrintWriter() {
-    return itsConsole.getPrintWriter();
-  }
-
   public boolean OpenFile(String thename, String thePath){
     return true;
   }

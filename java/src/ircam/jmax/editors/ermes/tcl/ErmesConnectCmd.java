@@ -41,7 +41,7 @@ class ErmesConnectCmd implements Command
 	interp.setResult(ReflectObject.newInstance(interp, aConnection));
       }
     else
-      throw new TclException(interp, "wrong number of arguments: usage: connect srcObjId, srcOutlet, destObjId, destInlet");
+      throw new TclNumArgsException(interp, 1, argv, "srcObj srcOutlet destObj destInlet");
   }
 }
 

@@ -37,7 +37,7 @@ class ErmesGraphicsOnCmd implements Command
 	MaxApplication.getApplication().itsSketchWindow.itsSketchPad.repaint();
       }
     else
-      throw new TclException(interp, "wrong number of arguments: usage: graphicsoff");
+      throw new TclNumArgsException(interp, 1, argv, "");
   }
 }
 

@@ -37,7 +37,7 @@ class FtsReferenceURLCmd implements Command
       }
     else
       {
-	throw new TclException(interp, "missing argument; usage: referenceURL <name> <url>");
+	throw new TclNumArgsException(interp, 1, argv, "<name> <url>");
       }
   }
 }

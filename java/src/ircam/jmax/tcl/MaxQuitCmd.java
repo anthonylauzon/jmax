@@ -28,7 +28,7 @@ class MaxQuitCmd implements Command
     if (argv.length == 1)
       MaxApplication.getApplication().ObeyCommand(MaxApplication.QUIT_APPLICATION);
     else
-      throw new TclException(interp, "wrong number of arguments: usage: quit");
+      throw new TclNumArgsException(interp, 1, argv, "");
   }
 }
 

@@ -35,7 +35,7 @@ class FtsClassNameCmd implements Command
       }
     else
       {
-	throw new TclException(interp, "missing or wrong argument; usage: className <obj>");
+	throw new TclNumArgsException(interp, 1, argv, "<obj>");
       }
   }
 }

@@ -3,6 +3,5 @@ SOURCES = \
            ErrorDialog.java \
            FileNotSavedDialog.java \
            SplashDialog.java \
-           SplashDialogThread.java \
            StatisticsDialog.java
 

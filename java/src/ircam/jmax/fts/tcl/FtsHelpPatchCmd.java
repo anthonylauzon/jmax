@@ -38,7 +38,7 @@ class FtsHelpPatchCmd implements Command
       }
     else
       {
-	throw new TclException(interp, "missing argument; usage: helpPatch <name> <filename>");
+	throw new TclNumArgsException(interp, 1, argv, "<name> <filename>");
       }
   }
 }

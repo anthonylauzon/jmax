@@ -9,7 +9,7 @@ import java.io.*;
  * files.
  */
 
-class FtsSaveStream extends PrintWriter
+class FtsSaveStream extends PrintStream
 {
   int indentation = 0;
 

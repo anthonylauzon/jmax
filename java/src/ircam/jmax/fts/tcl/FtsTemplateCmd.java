@@ -46,7 +46,7 @@ class FtsTemplateCmd implements Command
       }
     else
       {
-	throw new TclException(interp, "missing argument; usage: template <name> [<proc>]");
+	throw new TclNumArgsException(interp, 1, argv, "<name> [<proc>]");
       }
   }
 }

@@ -35,7 +35,7 @@ class ErmesObjectGetPositionXCmd implements Command
       }
     else
       {
-	throw new TclException(interp, "wrong # args: should be \"" + new String(argv[0].toString()) + "<obj>\"");
+	throw new TclNumArgsException(interp, 1, argv, "<obj>");
       }
   }
 }

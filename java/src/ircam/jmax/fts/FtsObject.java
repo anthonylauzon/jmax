@@ -487,7 +487,7 @@ public class FtsObject
 	  }
  	catch (tcl.lang.TclException e)
 	  {
-	    MaxApplication.getPostStream().println("TCL Error in template " + className + ":" + e);
+	    MaxApplication.GetPrintStream().println("TCL Error in template " + className + ":" + e);
 	  }
 
 	loaded();	// activate the post-load init, like loadbangs

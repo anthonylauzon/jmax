@@ -15,7 +15,7 @@ public class Console extends Panel{
   StringBuffer itsSbuf = new StringBuffer();
   TextArea itsTextArea;
   Interp itsInterp;
-  PrintWriter itsPrintWriter;
+  PrintStream itsPrintStream; 
   ConsoleThread itsConsoleThread;
 
   public Console(Interp i) {
@@ -41,15 +41,16 @@ public class Console extends Panel{
      * The console thread runs as a daemon so that it gets terminated 
      * automatically when all other user threads are terminated.
      */
-    itsPrintWriter = new PrintWriter(new ConsoleWriter(this));
+    itsPrintStream = new PrintStream(new ConsoleWriter(this));
   }
 
   public void Start(){
     itsConsoleThread.start();
   }
 
-  public PrintWriter getPrintWriter() {
-    return itsPrintWriter;
+
+  public PrintStream getPrintStream() {
+    return itsPrintStream;
   }
 
   public TextArea getTextArea() {

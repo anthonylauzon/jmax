@@ -27,11 +27,10 @@ class MaxWhenHookTable
       if (this.name.equals(name))
 	try
 	{
-	  System.err.println("runHook: eval of :>>" + code + "<<");
 	  interp.eval(code);
 	}
       catch (TclException e) {
-	MaxApplication.getPostStream().println("TCL error running hook " + name + " : " + e);
+	MaxApplication.GetPrintStream().println("TCL error running hook " + name + " : " + e);
       }
     }
   }

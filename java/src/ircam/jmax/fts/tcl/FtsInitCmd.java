@@ -36,7 +36,7 @@ class FtsInitCmd implements Command
       }
     else
       {
-	throw new TclException(interp, "wrong number of args: usage:  init  <patcher>");
+	throw new TclNumArgsException(interp, 1, argv, "<patcher>");
       }
   }
 }

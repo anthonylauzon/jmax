@@ -26,33 +26,38 @@ class FtsUcsCmd implements Command
 
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if (argv.length < 2)
+    if (argv.length >  1)
       {
-	throw new TclException(interp, "wrong # args: usage: ucs <arg_list>");
-      }
+	Vector args = new Vector();
 
-    Vector args = new Vector();
-
-    for (int i = 1; i < argv.length; i++)
-      {
-	try
-	  {
-	    args.addElement(new Integer(TclInteger.get(interp, argv[i])));
-	  }
-	catch (TclException e)
+	for (int i = 1; i < argv.length; i++)
 	  {
 	    try
 	      {
-		args.addElement(new Float(TclDouble.get(interp, argv[i])));
+		args.addElement(new Integer(TclInteger.get(interp, argv[i])));
 	      }
-	    catch (TclException e2)
+	    catch (TclException e)
 	      {
-		args.addElement(new String(argv[i].toString()));
+		try
+		  {
+		    args.addElement(new Float(TclDouble.get(interp, argv[i])));
+		  }
+		catch (TclException e2)
+		  {
+		    args.addElement(new String(argv[i].toString()));
+		  }
 	      }
 	  }
-      }
 
-    MaxApplication.getFtsServer().ucsMessage(args);
+	MaxApplication.getFtsServer().ucsMessage(args);
+	interp.resetResult();
+      }
+    else
+      {
+	throw new TclNumArgsException(interp, 1, argv, "[args]*");
+      }
   }
 }
+
+
 

@@ -55,7 +55,7 @@ class ErmesObjNewObjCmd implements Command
 	  throw new TclException(interp, "error in object creation");
       }
     else
-      throw new TclException(interp, "wrong number of arguments: usage: new <name> <x> <y>");
+      throw new TclNumArgsException(interp, 1, argv, "<name> <x> <y>");
   }
 }
 

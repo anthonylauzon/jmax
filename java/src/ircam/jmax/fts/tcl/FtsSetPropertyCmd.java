@@ -59,7 +59,7 @@ class FtsSetPropertyCmd implements Command
       }
     else
       {
-	throw new TclException(interp, "missing argument; usage: setProperty  <obj> <prop> <value>");
+	throw new TclNumArgsException(interp, 1, argv, "obj prop value");
       }
   }
 }

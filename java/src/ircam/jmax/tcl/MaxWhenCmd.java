@@ -24,7 +24,7 @@ class MaxWhenCmd implements Command {
       MaxApplication.getApplication().addHook(new String(argv[1].toString()),
 					      new String(argv[2].toString()));
     else
-      throw new TclException(interp, "usage: when name { body } ");
+      	throw new TclNumArgsException(interp, 1, argv, "name { body } ");
   }
 }
 

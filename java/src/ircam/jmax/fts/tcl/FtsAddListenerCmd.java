@@ -70,9 +70,7 @@ class FtsAddListenerCmd implements Command
       }
     else
       {
-	//addListener <objId> <TCL function name!>
-      
-	throw new TclException(interp, "wrong number of args: usage: addListener <objId> <TCL function>");
+      	throw new TclNumArgsException(interp, 1, argv, "<objId> <TCL function>");
       }
   }
 }

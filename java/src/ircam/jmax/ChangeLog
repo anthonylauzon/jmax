@@ -1,0 +1,30 @@
+Mon Jan 26 16:27:46 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Added the "splash" tcl command, to pop up a splash screen;
+	  any gif filename can be given as argument, the image will
+	  be scaled; the jMax splash screen run from it, and user packages
+	  can use it to have special additional splash screen.
+
+	* Added the jMax package system, and converted the boot file to
+	  use it; fts1.5 is a normal package now.
+
+	* Added the "sourceFile" tcl command, that do not stop recursive
+	  loading in case of errors like the built-in "source"; this allow
+          finishing the boot process in case of errors in sub files.
+	
+	* Added tcl command openConsole, that create and install the system
+	  console; the command will be executed by the installation configuration
+	  script, so that a dedicated installation can work without the console;
+	  note that if the console is not there, all the printouts go to the
+	  standard output.
+
+	* Changed the bootstrap tcl structure: there is only one boot file,
+	  jmaxboot.tcl, stored in ~/projects/max/tcl, that actually include
+	  the config/ermesrc.tcl and ~/.ermesrc file; see the comments in the
+	  file for more information.
+	  
+	* MaxApplication.java: Changed PrintWriter back to PrintStream (also
+	in all the code), in order to use the console as System.out; System.out
+	has not yet been converted to printwriter in 1.1. !!
+	The tcl 
+

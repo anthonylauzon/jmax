@@ -48,7 +48,7 @@ class FtsDeclareCmd implements Command
       }
     else
       {
-	throw new TclException(interp, "missing argument; usage: declare <parent> <description> [<graphic>]");
+	throw new TclNumArgsException(interp, 1, argv, "<parent> <description> [<graphic>]");
       }
   }
 }

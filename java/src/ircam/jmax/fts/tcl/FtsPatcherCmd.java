@@ -104,7 +104,7 @@ class FtsPatcherCmd implements Command
       }
     else
       {
-	throw new TclException(interp, "missing argument; usage: patcher <patcher> <name> <ninlets> <noutlets> [<graphic_data> <window_data>], patcher [<window_data>]");
+	throw new TclNumArgsException(interp, 1, argv, "<patcher> <name> <ninlets> <noutlets> [<graphic_data> <window_data>], patcher [<window_data>]");
       }
   }
 }

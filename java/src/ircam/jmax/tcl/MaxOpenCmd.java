@@ -60,7 +60,7 @@ class MaxOpenCmd implements Command {
       }
     else
       {	
-      	throw new TclException(interp, "wrong # args: should be open <filename>");
+      	throw new TclNumArgsException(interp, 1, argv, "<filename>");
       }
   }
 }

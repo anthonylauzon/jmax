@@ -31,7 +31,7 @@ class FtsMessCmd implements Command
 
     if (argv.length < 4)
       {
-	throw new TclException(interp, "wrong number of args: usage: mess <obj> <inlet> <selector> <arg_list>");
+	throw new TclNumArgsException(interp, 1, argv, "<obj> <inlet> <selector> <arg_list>");
       }
 
     Vector args = new Vector();

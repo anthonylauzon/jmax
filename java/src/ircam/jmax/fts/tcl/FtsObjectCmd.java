@@ -46,7 +46,7 @@ class FtsObjectCmd implements Command
       }
     else
       {
-	throw new TclException(interp, "missing argument; usage: object <patcher> <description> [<graphic>]");
+	throw new TclNumArgsException(interp, 1, argv, "<patcher> <description> [<graphic>]");
       }
   }
 }

@@ -40,7 +40,7 @@ class ErmesDisconnectCmd implements Command
       }
     else
       {
-	throw new TclException(interp, "wrong number of arguments: usage: disconnect srcObjId, srcOutlet, destObjId, destInlet");
+	throw new TclNumArgsException(interp, 1, argv, "srcObj srcOutlet destObj destInlet");
       }
   }
 }

@@ -10,13 +10,15 @@
 #
 
 
+global ftsArch ftsMidiPort
+
 if {$ftsArch == "mips1" || $ftsArch == "irix5.3" || $ftsArch == "origin"} {
-    post "FTS default MIDI configuration"
-    post "(make sure that you lauched the MIDI deamon using the startmidi command)"
-    post "  port: $ftsMidiPort"
+    puts "FTS default MIDI configuration"
+    puts "(make sure that you lauched the MIDI deamon using the startmidi command)"
+    puts "  port: $ftsMidiPort"
     ucs open device midi 0 as sgi_midi port $ftsMidiPort
 } elseif {$ftsArch == "o2r5k" || $ftsArch == "o2r10k"} {
-    post "(MIDI not configured)"
+    puts "(MIDI not configured)"
 }
 
 # shell commands for startmidi

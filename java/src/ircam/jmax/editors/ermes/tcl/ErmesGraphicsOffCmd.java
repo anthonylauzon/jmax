@@ -31,7 +31,7 @@ class ErmesGraphicsOffCmd implements Command
     if (argv.length == 1)
       MaxApplication.getApplication().itsSketchWindow.itsSketchPad.itsGraphicsOn = false;
     else
-      throw new TclException(interp, "wrong number of arguments: usage: graphicsoff");
+      throw new TclNumArgsException(interp, 1, argv, "");
   }
 }
 

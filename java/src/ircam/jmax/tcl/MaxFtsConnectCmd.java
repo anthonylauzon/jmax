@@ -42,7 +42,7 @@ class MaxFtsConnectCmd implements Command
 						 new String(argv[4].toString()),
 						 null);
     else
-      throw new TclException(interp, "wrong # args: should be ftsconnect  <type> ftsdir ftsname socket server port");
+      throw new TclNumArgsException(interp, 1, argv, "<type> <ftsdir> <ftsname> <socket> <server> <port>");
   }
 }
 

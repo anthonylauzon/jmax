@@ -1,8 +1,11 @@
 SOURCES = MaxFtsConnectCmd.java\
           MaxOpenCmd.java      \
-          MaxPostCmd.java      \
           MaxQuitCmd.java      \
           MaxRunHooksCmd.java  \
           MaxSystemPropertyCmd.java \
           MaxWhenCmd.java           \
+	  MaxOpenConsoleCmd.java      \
+	  MaxSourceCmd.java      \
+	  MaxSysSourceCmd.java      \
+	  MaxSplashCmd.java        \
 	  TclMaxPackage.java

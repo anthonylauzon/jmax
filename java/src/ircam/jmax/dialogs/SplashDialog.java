@@ -8,28 +8,62 @@ import ircam.jmax.utils.*;
 /**
  * The initial dialog.
  */
-public class SplashDialog extends Dialog {
-  Frame parent;
-  Image itsImage;
-  Button b;
-  
-  public SplashDialog(Frame dw) {
-    super(dw, "ermes",/* true*/false);
-    parent = dw;
+
+public class SplashDialog extends Dialog
+{
+  static final int SPLASH_WIDTH = 500;
+  static final int SPLASH_HEIGHT = 280;
+
+  /** An inner class that is the thread used for make the splash
+   * dialog go away, after a while.
+   */
+
+  class SplashDialogTimeout extends Thread
+  {
+    int time;
+
+    public SplashDialogTimeout(int time)
+    {
+      super("SplashDialogTimeoutThread");
+      this.time = time;
+
+      run();
+    }
     
-    Toolkit toolkit = Toolkit.getDefaultToolkit();
-    String fs = MaxApplication.ermesProperties.getProperty("file.separator");
-    String imagesPath = MaxApplication.ermesProperties.getProperty("root")+fs+"ermes"+fs+"images";
-    itsImage = toolkit.getImage(imagesPath+fs+"Splash.gif");
+    public void run()
+    {
+      try
+	{
+	  sleep(time);
+	}
+      catch (InterruptedException e)
+	{
+	}
+
+      SplashDialog.this.hide();
+      SplashDialog.this.dispose();
+    }
+  }
+
+  Image itsImage;
+  SplashDialogTimeout to;
+
+  public SplashDialog(Frame dw, String filename) {
+    super(dw, "ermes",/* true*/false);
+    
+    itsImage = Toolkit.getDefaultToolkit().getImage(filename).getScaledInstance(SPLASH_WIDTH,
+										SPLASH_HEIGHT,
+										Image.SCALE_DEFAULT);
+
     //Initialize this dialog to its preferred size.
+
+    move(200,200);
     pack();
+    show();
+
+    to = new SplashDialogTimeout(2000);
   }
 	
-  /* public boolean action(Event event, Object arg) {
-     hide();
-     return true;
-  }*/
-
   public boolean mouseDown(Event evt, int x, int y) {
     hide();
     return true;
@@ -44,7 +78,7 @@ public class SplashDialog extends Dialog {
   }
 
   public Dimension minimumSize() {
-    Dimension d = new Dimension(500, 280);
+    Dimension d = new Dimension(SPLASH_WIDTH, SPLASH_HEIGHT);
     return d;
   }    
   

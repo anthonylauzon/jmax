@@ -39,8 +39,7 @@ class FtsAbstractionCmd implements Command
       }
     else
       {
-	throw new TclException(interp, 
-			       "missing argument; usage: abstraction <name> <path>");
+	throw new TclNumArgsException(interp, 1, argv, "<name> <path>");
       }
   }
 }

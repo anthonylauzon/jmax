@@ -19,15 +19,25 @@ public class TclMaxPackage
 {
   static public void installPackage(Interp interp)
   {
+    /* TCL generic */
+
+    interp.createCommand("_sysSourceFile", new MaxSysSourceCmd());
+    interp.createCommand("sourceFile", new MaxSourceCmd());
+
     /* FTS */
     interp.createCommand("ftsconnect", new MaxFtsConnectCmd());
-
-    /* misc */
-    interp.createCommand("post", new MaxPostCmd());
 
     /* browser */
     interp.createCommand("open", new MaxOpenCmd());
 
+    /* console */
+
+    interp.createCommand("openConsole", new MaxOpenConsoleCmd());
+
+    /* Splash screen support */
+
+    interp.createCommand("splash", new MaxSplashCmd());
+    
     /* hooks */
 
     interp.createCommand("when", new MaxWhenCmd());

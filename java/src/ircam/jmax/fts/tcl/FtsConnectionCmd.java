@@ -42,7 +42,7 @@ class FtsConnectionCmd implements Command
       }
     else
       {
-	throw new TclException(interp, "missing argument; usage: connect <from> <outlet> <to> <inlet>");
+	throw new TclNumArgsException(interp, 1, argv, "<from> <outlet> <to> <inlet>");
       }
   }
 }

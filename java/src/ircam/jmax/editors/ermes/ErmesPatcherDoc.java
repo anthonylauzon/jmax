@@ -130,7 +130,7 @@ public class ErmesPatcherDoc implements MaxDocument {
     try {
       MaxApplication.getTclInterp().evalFile(theName);
     } catch (tcl.lang.TclException e) {
-      MaxApplication.getPostStream().println("error reading .tpa "+ theName + e);
+      MaxApplication.GetPrintStream().println("error reading .tpa "+ theName + e);
       e.printStackTrace();// proviamo ...
     }
     return true;  //change this!
@@ -143,7 +143,7 @@ public class ErmesPatcherDoc implements MaxDocument {
       itsPatcher = FtsDotPatParser.importPatcher(MaxApplication.getFtsServer(), new File(FMiller));
       itsPatcher.open();
     } catch (Exception e) {
-      MaxApplication.getPostStream().println(e.toString() + " can't import "+ theWholeName);
+      MaxApplication.GetPrintStream().println(e.toString() + " can't import "+ theWholeName);
       e.printStackTrace(); // temporary, MDC
       return false;
     }
@@ -159,7 +159,7 @@ public class ErmesPatcherDoc implements MaxDocument {
       temp = itsSketchWindow.itsSketchPad.SaveTo(o);
     }
     catch (IOException e) {
-      MaxApplication.getPostStream().println("ERROR while writing " + GetWholeName());
+      MaxApplication.GetPrintStream().println("ERROR while writing " + GetWholeName());
       e.printStackTrace(); // temporary, MDC
       return false;
     }
@@ -193,7 +193,7 @@ public class ErmesPatcherDoc implements MaxDocument {
       fs = new FileOutputStream(GetWholeName());
     }
     catch(IOException e) {
-      MaxApplication.getPostStream().println("ERROR while opening " + GetWholeName());
+      MaxApplication.GetPrintStream().println("ERROR while opening " + GetWholeName());
       e.printStackTrace(); // temporary, MDC
       return false;
     }
@@ -205,7 +205,7 @@ public class ErmesPatcherDoc implements MaxDocument {
     try {
       fs.close();
     } catch (IOException e) {
-      MaxApplication.getPostStream().println("ERROR while closing " + GetWholeName());
+      MaxApplication.GetPrintStream().println("ERROR while closing " + GetWholeName());
       e.printStackTrace(); // temporary, MDC
       return false;
     }

@@ -29,7 +29,7 @@ class ErmesShowCmd implements Command {
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
     if (argv.length < 2)
-      throw new TclException(interp, "wrong # args: should be show <obj>");
+      throw new TclNumArgsException(interp, 1, argv, "<obj>");
 
     MaxApplication.getApplication().NewPatcherWindow((FtsObject) ReflectObject.get(interp, argv[1]));
   }

@@ -86,11 +86,11 @@ public class ErmesSketchWindow extends Frame implements MaxWindow,KeyListener,Fo
       
       itsDocument = (ErmesPatcherDoc)theDocument;
       /* if (itsDocument == null) {
-	MaxApplication.getPostStream().println("INTERNAL ERROR: try to initialize a window with a null document");
+	MaxApplication.GetPrintStream().println("INTERNAL ERROR: try to initialize a window with a null document");
 	return;
 	} *//*
       else if (itsDocument.GetFtsPatcher() == null) {
-	MaxApplication.getPostStream().println("INTERNAL ERROR: document has a null FtsPatcher");
+	MaxApplication.GetPrintStream().println("INTERNAL ERROR: document has a null FtsPatcher");
 	return;
       }*/
 

@@ -1,32 +1,49 @@
 
 /**
  * The Print Writer associated with the console
- *
+ * Changed to OutputStream by MDC, in order to work
+ * with the System.out.
  */
 
 package ircam.jmax.editors.console;
 import java.io.*;
 
-class ConsoleWriter extends Writer {
+class ConsoleWriter extends OutputStream
+{
   Console itsConsole;
-  StringBuffer temp = new StringBuffer();
+  StringBuffer buffer = new StringBuffer();
 
-  public ConsoleWriter(Console theConsole){
+  public ConsoleWriter(Console theConsole)
+  {
     super();
     itsConsole = theConsole;
   }
 
-  public void write(char cbuf[],
+  public void write(int b) 
+  {
+    buffer.append((char)b);
+
+    if (b == '\n')
+      flush();
+  }
+
+  /*  public void write(char cbuf[],
 		    int off,
-		    int len) throws IOException {				 
-		      temp.setLength(0);
-		      temp.append(cbuf, off, len);
-		      itsConsole.getTextArea().append(temp.toString());
-		      //System.err.println("Console Output:"+temp.toString());
+		    int len) throws IOException
+  {
+    flush();
+    itsConsole.getTextArea().append(new String(cbuf));
   }
-  public void flush() {
+  */
+
+  public void flush()
+  {
+    itsConsole.getTextArea().append(buffer.toString());
+    buffer.setLength(0);
   }
-  public void close() {
+
+  public void close()
+  {
   }  
 }
 

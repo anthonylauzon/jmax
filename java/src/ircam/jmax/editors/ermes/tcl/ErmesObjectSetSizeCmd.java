@@ -48,7 +48,7 @@ class ErmesObjectSetSizeCmd implements Command
 	aSketchPad.repaint();
       }
     else
-      throw new TclException(interp, "wrong # args: should be \"" + new String(argv[0].toString()) + "<id> <width> <height>\"");
+      throw new TclNumArgsException(interp, 1, argv, "<obj> <width> <height>");
   }
 }
 
