@@ -2040,7 +2040,7 @@ track_export_dialog (fts_object_t *o, int winlet, fts_symbol_t s,
 {
   fts_symbol_t track_name   = track_get_name(self);   /* why always NULL? */
   fts_symbol_t default_name = track_name  ?  track_name  
-                                          :  fts_new_symbol("untitled");
+                                          :  fts_new_symbol("untitled.mid");
   
   /* todo: ask export handlers for their extensions (when called with 0 args)
     construct dialog with permitted extensions in popup 

@@ -66,6 +66,7 @@ public class TrackSimpleMenu extends EditorMenu
     addSeparator();
     
     add(Actions.appendBarAction);
+		add(Actions.collapseMarkersAction);
     
     addSeparator();
      
