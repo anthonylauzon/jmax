@@ -41,7 +41,7 @@ do
 	    help ;
 	    exit 2 ;;
 	*)
-	    CVSOPT="$CVSOPT $arg" ;;
+	    CVSOPT="$CVSOPT $ARG" ;;
 	esac
     else
 	case $OPT in
