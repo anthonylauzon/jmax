@@ -46,6 +46,12 @@ class PopUpInteraction extends Interaction
   {
     GraphicObject object = null;
 
+    //deselect
+    if (ErmesSelection.patcherSelection.hasObjects()){
+      ErmesSelection.patcherSelection.deselectAll( );
+      editor.repaint();
+    }
+
     if ((! locked) && Squeack.isPopUp(squeack))
       {
 	locked = true;
