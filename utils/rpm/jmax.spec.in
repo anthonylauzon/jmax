@@ -11,6 +11,7 @@ Provides: %{name}-common = %{version}, %{name}-java = %{version}
 # gnome and kde menu
 %define _gnome_menu_dir /usr/share/gnome/apps/Multimedia
 %define _kde_menu_dir /usr/share/applnk/Multimedia
+%define _pixmaps_dir /usr/share/pixmaps
 
 %description
 jMax is a visual programming environment for developing real-time, interactive multimedia applications. 
@@ -62,16 +63,10 @@ rm -f /var/tmp/rpm.jmax.global.list
 rm -rf $RPM_BUILD_ROOT
 
 make DESTDIR=$RPM_BUILD_ROOT install
-# library files for common rpm 
-# remove jack to avoid libjack dependency in jmax package and common subpackage
-find $RPM_BUILD_ROOT%{_datadir}/jmax/packages -name "lib*.so" | grep -v "jack" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.common.list
 
-# jpkg files for common rpm
 # remove jack to avoid libjack dependency in jmax package and common subpackage
-find $RPM_BUILD_ROOT%{_datadir}/jmax/packages -name "*.jpkg" | grep -v "jack" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.common.list
+find $RPM_BUILD_ROOT%{_datadir}/jmax ! -type d ! -name "*.jar"| grep -v "jack" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.common.list
 
-# help files for common rpm
-find $RPM_BUILD_ROOT%{_datadir}/jmax/packages -type d -name "help" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.common.list
 # for java rpm
 find $RPM_BUILD_ROOT%{_datadir}/jmax -name "*.jar" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.java.list
 
@@ -86,6 +81,11 @@ install -c -m 644 ./utils/linux_desktop/%{name}.desktop $RPM_BUILD_ROOT%{_gnome_
 mkdir -p $RPM_BUILD_ROOT%{_kde_menu_dir}
 install -c -m 644 ./utils/linux_desktop/%{name}.desktop $RPM_BUILD_ROOT%{_kde_menu_dir}
 
+# jMax icons
+mkdir -p $RPM_BUILD_ROOT%{_pixmaps_dir}
+install -c -m 644 ./images/jmax_icon_48x48.png $RPM_BUILD_ROOT%{_pixmaps_dir}/jmax_icon.png
+
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -95,17 +95,20 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-, root, root)
 %doc LICENCE.fr LICENSE README doc/*
 %{_bindir}/jmax
-%{_bindir}/fts
+%attr(4755, root, root) %{_bindir}/fts
 %{_libdir}/libfts-%{version}.so
 %{_libdir}/libfts.so
 %{_kde_menu_dir}/*
 %{_gnome_menu_dir}/*
+%{_pixmaps_dir}/*
+
 
 %files common -f /var/tmp/rpm.jmax.common.list
 %defattr(-,root,root)
-%{_bindir}/fts
+%attr(4755, root, root) %{_bindir}/fts
 %{_libdir}/libfts-%{version}.so
 %{_libdir}/libfts.so
+
 
 %files devel
 %defattr(-,root,root)
@@ -122,7 +125,7 @@ rm -rf $RPM_BUILD_ROOT
 %files client
 %defattr(-,root,root)
 %{_includedir}/fts/client
-%{_libdir}/libftsclient.so*
+%{_libdir}/libftsclient.*
 %{_datadir}/jmax/client/python
 
 %files jack
@@ -130,6 +133,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/jmax/packages/jack
 
 %changelog
+* Mon Mar  3 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
+- add icon for jMax in KDE and GNOME menus
+- add suid flag for %{_bindir}/fts
+- fix common files list
 * Fri Feb 28 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
 - add jMax in KDE and GNOME menus
 * Fri Feb  7 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
