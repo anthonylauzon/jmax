@@ -52,9 +52,12 @@ class MoveEditInteraction extends Interaction
     if (Squeack.isDown(squeack) && Squeack.onText(squeack))
       {
 	object = (GraphicObject) area.getTarget();
-	editor.getDisplayList().objectToFront(object);
-	object.redraw();
-	object.redrawConnections();
+	//**********************
+	// "to front" feature removed in order to make faster mouseclick objects selection 
+	//**********************
+	//editor.getDisplayList().objectToFront(object);
+	//object.redraw();
+	//object.redrawConnections();
 	dragged = false;
       }
     else if (Squeack.isDrag(squeack))

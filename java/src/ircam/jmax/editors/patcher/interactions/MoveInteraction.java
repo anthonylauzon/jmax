@@ -51,8 +51,9 @@ class MoveInteraction extends Interaction
     if (Squeack.isDown(squeack) && Squeack.onObject(squeack))
       {
 	object = (GraphicObject) area.getTarget();
-	//to made faster the mouseclick objects selection we lost "to front" feature 
-
+	//**********************
+	// "to front" feature removed in order to make faster mouseclick objects selection 
+	//**********************
 	//editor.getDisplayList().objectToFront(object);
 	//object.redraw();
 	//object.redrawConnections();
