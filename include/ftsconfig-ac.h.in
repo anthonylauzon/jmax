@@ -36,6 +36,7 @@
 #undef WORDS_BIGENDIAN
 
 #undef DEFAULT_ROOT
+#undef restrict
 
 /* Define if you have the acosf function.  */
 #undef HAVE_ACOSF

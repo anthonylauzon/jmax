@@ -134,14 +134,35 @@ int fts_sched_remove( fts_object_t *obj)
   return -1;
 }
 
+static void my_fd_zero( fd_set *fds) __attribute__ ((no_check_memory_usage));
+
+static void my_fd_zero( fd_set *fds)
+{
+  FD_ZERO( fds);
+}
+
+static void my_fd_set( int fd, fd_set *fds) __attribute__ ((no_check_memory_usage));
+
+static void my_fd_set( int fd, fd_set *fds)
+{
+  FD_SET( fd, fds);
+}
+
+static int my_fd_isset( int fd, fd_set *fds) __attribute__ ((no_check_memory_usage));
+
+static int my_fd_isset( int fd, fd_set *fds)
+{
+  return FD_ISSET( fd, fds);
+}
+
 static int compute_fds( fts_sched_t *sched, fd_set *readfds, fd_set *writefds, fd_set *exceptfds)
 {
   sched_callback_t *callback;
   int n_fd = 0;
 
-  FD_ZERO( readfds);
-  FD_ZERO( writefds);
-  FD_ZERO( exceptfds);
+  my_fd_zero( readfds);
+  my_fd_zero( writefds);
+  my_fd_zero( exceptfds);
 
   n_fd = 0;
   for ( callback = sched->callback_head; callback; callback = callback->next)
@@ -153,11 +174,11 @@ static int compute_fds( fts_sched_t *sched, fd_set *readfds, fd_set *writefds, f
 	n_fd = callback->fd;
 
       if (callback->flags == FTS_SCHED_READ)
-	FD_SET( callback->fd, readfds);
+	my_fd_set( callback->fd, readfds);
       else
-	FD_SET( callback->fd, writefds);
+	my_fd_set( callback->fd, writefds);
 
-      FD_SET( callback->fd, exceptfds);
+      my_fd_set( callback->fd, exceptfds);
     }
 
   return n_fd;
@@ -195,12 +216,12 @@ static void run_select( fts_sched_t *sched, int n_fd, fd_set *readfds, fd_set *w
 
       fts_set_int( &a, fd);
 
-      if ( callback->error_mth && FD_ISSET( fd, exceptfds))
+      if ( callback->error_mth && my_fd_isset( fd, exceptfds))
 	(*callback->error_mth)( callback->object, fts_SystemInlet, fts_s_sched_error, 1, &a);
       else
 	{
-	  if ( (callback->flags == FTS_SCHED_READ && FD_ISSET( fd, readfds))
-	       || (callback->flags == FTS_SCHED_WRITE && FD_ISSET( fd, writefds)) )
+	  if ( (callback->flags == FTS_SCHED_READ && my_fd_isset( fd, readfds))
+	       || (callback->flags == FTS_SCHED_WRITE && my_fd_isset( fd, writefds)) )
 	    (*callback->ready_mth)( callback->object, fts_SystemInlet, fts_s_sched_ready, 1, &a);
 	}
     }

@@ -194,6 +194,8 @@ static void linux_fpe_signal_handler( int sig)
   fts_fpe_handler( fts_check_fpe());
 }
 
+void fts_enable_fpe_traps( void) __attribute__ ((no_check_memory_usage));
+
 void fts_enable_fpe_traps( void)
 {
   unsigned  int cw;
@@ -214,6 +216,8 @@ void fts_enable_fpe_traps( void)
   _FPU_SET_CW( cw);
 }
 
+void fts_disable_fpe_traps( void) __attribute__ ((no_check_memory_usage));
+
 void fts_disable_fpe_traps( void)
 {
   unsigned  int cw;
@@ -230,6 +234,8 @@ void fts_disable_fpe_traps( void)
 
   _FPU_SET_CW( cw);
 }
+
+unsigned int fts_check_fpe( void) __attribute__ ((no_check_memory_usage));
 
 unsigned int fts_check_fpe( void)
 {
@@ -327,6 +333,20 @@ static void watchdog_low( void)
     }
 }
 
+static void my_fd_zero( fd_set *fds) __attribute__ ((no_check_memory_usage));
+
+static void my_fd_zero( fd_set *fds)
+{
+  FD_ZERO( fds);
+}
+
+static void my_fd_set( int fd, fd_set *fds) __attribute__ ((no_check_memory_usage));
+
+static void my_fd_set( int fd, fd_set *fds)
+{
+  FD_SET( fd, fds);
+}
+
 static void watchdog_high( void)
 {
   int armed = 0;
@@ -343,8 +363,8 @@ static void watchdog_high( void)
       timeout.tv_sec = (armed) ? 1 : 5;
       timeout.tv_usec = 0;
 
-      FD_ZERO( &rfds);
-      FD_SET( wdpipe[0], &rfds);
+      my_fd_zero( &rfds);
+      my_fd_set( wdpipe[0], &rfds);
       
       r = select( wdpipe[0]+1, &rfds, 0, 0, &timeout);
 

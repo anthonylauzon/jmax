@@ -41,6 +41,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <sys/stat.h>
 
 #include <fts/fts.h>
 
@@ -108,6 +109,51 @@ static dtdhandle_t handle_table[DTD_MAX_FIFOS];
 static short *block;
 
 #define N 2048
+
+/* 
+ * Path searching, copied from FTS
+ */
+static const char *splitpath( const char *path, char *result, char sep)
+{
+  if ( *path == '\0')
+    return 0;
+
+  while ( *path != sep && *path != '\0')
+    {
+      *result++ = *path++;
+    }
+
+  *result = '\0';
+
+  return ( *path != '\0') ? path+1 : path;
+}
+
+static int file_exists( const char *filename)
+{
+  struct stat statbuf;
+  return stat( filename, &statbuf) == 0;
+}
+
+static int file_search_in_path( const char *filename, const char *search_path, char *full_path)
+{
+  if (*filename == '/')
+    {
+      strcpy( full_path, filename);
+
+      return file_exists( full_path);
+    }
+
+  while ( (search_path = splitpath( search_path, full_path, ':')) )
+    {
+      strcat( full_path, "/");
+      strcat( full_path, filename);
+
+      if (file_exists( full_path))
+	  return 1;
+    }
+
+  return 0;
+}
 
 static int dtd_read_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, int n_frames, int n_channels)
 {
@@ -222,7 +268,7 @@ static AFfilehandle dtd_open_file_read( const char *filename, const char *path, 
   AFfilehandle file;
   int file_channels, sampfmt, sampwidth;
 
-  if ( !fts_file_search_in_path( filename, path, full_path) )
+  if ( !file_search_in_path( filename, path, full_path) )
     {
       printf( "[dtdserver] cannot open sound file %s\n", filename);
       fflush( stdout);

@@ -18,12 +18,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- */
-
-/*
- * This file's authors: Francois Dechelle.
  */
 
 #include <unistd.h>
@@ -36,17 +30,17 @@
 #include "dtdserver.h"
 
 extern void dtdserver_config( void);
-extern void dtdobjs_init( void);
+extern void dtdobjs_config( void);
 
 void unixdtd_config( void)
 {
   dtdserver_config();
-  dtdobjs_init();
+  dtdobjs_config();
 }
 
 void unixdtd_shutdown( void)
 {
-#error FIXME: add atexit()
+/*  #error FIXME: add atexit() */
   dtdserver_stop();
 }
 

@@ -65,6 +65,7 @@ typedef struct {
   dtdfifo_t *fifo;
   int can_post_data_late;
   fts_symbol_t filename;
+  fts_timebase_t *timebase;
 } readsf_t;
 
 static fts_symbol_t readsf_symbol;
@@ -214,14 +215,17 @@ static void readsf_state_machine( readsf_t *this, fts_symbol_t message, int ac, 
 }
 
 static void 
-readsf_alarm(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+readsf_can_post_data_late_alarm(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   readsf_t *this = (readsf_t *)o;
 
-  if(timer == this->eof_timer)
-    fts_outlet_bang( o, fts_object_get_outlets_number(o) - 1);
-  else
-    this->can_post_data_late = 1;
+  this->can_post_data_late = 1;
+}
+
+static void 
+readsf_eof_alarm(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_outlet_bang( o, fts_object_get_outlets_number(o) - 1);
 }
 
 static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -257,6 +261,8 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   this->can_post_data_late = 1;
 
   fts_dsp_add_object(o);
+
+  this->timebase = fts_get_timebase();
 }
 
 static void readsf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -265,8 +271,7 @@ static void readsf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 
   dtdserver_remove_object( this->server, this);
 
-  fts_timer_delete(this->eof_timer);	
-  fts_timer_delete(this->post_data_late_timer);	
+  fts_timebase_remove_object( this->timebase, (fts_object_t *)this);	
 
   fts_dsp_remove_object(o);
 }
@@ -354,7 +359,7 @@ static void readsf_dsp( fts_word_t *argv)
 	if ( !dtdfifo_is_used( this->fifo, DTD_SIDE))
 	  {
 	    /* end of file */
-	    fts_timer_set_delay(this->eof_timer, 0.0, 0);
+	    fts_timebase_add_call( this->timebase, (fts_object_t *)this, readsf_eof_alarm, 0, 0.0);
 
 	    dtdfifo_set_used( this->fifo, FTS_SIDE, 0);
 
@@ -367,8 +372,7 @@ static void readsf_dsp( fts_word_t *argv)
 
 	    this->can_post_data_late = 0;
 
-	    fts_timer_reset(this->post_data_late_timer);
-	    fts_timer_set_delay(this->post_data_late_timer, 200.0, 0);
+	    fts_timebase_add_call( this->timebase, (fts_object_t *)this, readsf_can_post_data_late_alarm, 0, 200.0);
 	  }
 
 	clear_outputs( n, n_channels, outputs);
@@ -440,7 +444,6 @@ static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, readsf_delete);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, readsf_put);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, readsf_alarm);
 
   fts_method_define_varargs(cl, 0, s_open,  readsf_open);
 
@@ -488,6 +491,7 @@ typedef struct {
   dtdfifo_t *fifo;
   int can_post_fifo_overflow;
   fts_symbol_t filename;
+  fts_timebase_t *timebase;
 } writesf_t;
 
 static fts_symbol_t writesf_symbol;
@@ -628,6 +632,8 @@ writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->can_post_fifo_overflow = 1;
 
   fts_dsp_add_object(o);
+
+  this->timebase = fts_get_timebase();
 }
 
 static void writesf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -636,7 +642,7 @@ static void writesf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
   dtdserver_remove_object( this->server, this);
 
-  fts_timer_delete(this->post_fifo_overflow_timer);
+  fts_timebase_remove_object( this->timebase, (fts_object_t *)this);	
 
   fts_dsp_remove_object(o);
 }
@@ -699,8 +705,7 @@ static void writesf_dsp( fts_word_t *argv)
 
 	    this->can_post_fifo_overflow = 0;
 
-	    fts_timer_reset(this->post_fifo_overflow_timer);
-	    fts_timer_set_delay(this->post_fifo_overflow_timer, 200.0, 0);
+	    fts_timebase_add_call( this->timebase, (fts_object_t *)this, writesf_post_fifo_overflow_alarm, 0, 200.0);
 	  }
       }
   }
@@ -769,7 +774,6 @@ writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, writesf_delete);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, writesf_put);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, writesf_post_fifo_overflow_alarm);
 
   fts_method_define_varargs(cl, 0, s_open, writesf_open);
 
@@ -800,7 +804,7 @@ writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 /* ********************************************************************** */
 /* ********************************************************************** */
 
-void dtdobjs_init( void)
+void dtdobjs_config( void)
 {
   readsf_symbol = fts_new_symbol( "readsf~");
   writesf_symbol = fts_new_symbol( "writesf~");

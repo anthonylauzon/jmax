@@ -209,7 +209,7 @@ dtdfifo_t *dtdserver_open_write( dtdserver_t *server, const char *filename, int 
 
       sr = (double)fts_dsp_get_sample_rate();
 
-      sprintf( buffer, "openwrite %d %s %s %f %d", id, filename, fts_symbol_name(fts_get_project_dir()), sr, n_channels);
+      sprintf( buffer, "openwrite %d %s %s %f %d", id, filename, fts_symbol_name(fts_project_get_dir()), sr, n_channels);
       dtdserver_send_command( server, buffer);
     }
 
@@ -281,6 +281,7 @@ static void dtdserver_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
     {
       char exe[256];
       char buff1[32], buff2[32], buff3[32], buff4[32], buff5[32];
+      fts_package_t *package;
 
       close( from_child_pipe[0]);
       if ( dup2( from_child_pipe[1], 1) < 0)
@@ -290,7 +291,8 @@ static void dtdserver_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 	}
       close( from_child_pipe[1]);
 
-      sprintf( exe, "%s/packages/unixdtd/bin/%s/%s/dtd", fts_get_root_dir(), fts_get_arch(), fts_get_mode());
+      package = fts_package_get( fts_new_symbol( "unixdtd"));
+      sprintf( exe, "%s/c/dtd", fts_symbol_name( fts_package_get_dir( package)));
       sprintf( buff1, "%d", this->block_frames);
       sprintf( buff2, "%d", this->max_channels);
       sprintf( buff3, "%d", this->fifo_blocks);
