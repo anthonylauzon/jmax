@@ -57,7 +57,9 @@ ircam/jmax/toolkit/menus	\
 
 JAR_FILE= jmax.jar
 
-ALL_CLASSES=$(shell find $(JAVA_CLASSES_ROOT)/ircam -name '*.class')
+ALL_CLASSES=\
+	$(shell find $(JAVA_CLASSES_ROOT)/ircam -name '*.class') \
+	$(shell find $(JAVA_CLASSES_ROOT)/silk -name '*.class') \
 
 all: $(JAVA_CLASSES_ROOT)
 	(cd ircam ; $(MAKE) $@)
@@ -81,7 +83,7 @@ jar: $(JAVA_CLASSES_ROOT)/$(JAR_FILE)
 .PHONY: jar
 
 $(JAVA_CLASSES_ROOT)/$(JAR_FILE): $(ALL_CLASSES)
-	(cd $(JAVA_CLASSES_ROOT) ; /bin/rm -f $(JAR_FILE) ; jar -cvf $(JAR_FILE) ircam )
+	(cd $(JAVA_CLASSES_ROOT) ; /bin/rm -f $(JAR_FILE) ; jar -cvf $(JAR_FILE) ircam silk )
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 
