@@ -6,15 +6,13 @@ pythonclient_DATA = \
 BinaryProtocolDecoder.py \
 BinaryProtocolEncoder.py \
 BinaryProtocol.py \
-Buffer.py \
-FtsArgs.py \
-FtsAtom.py \
 FtsClientException.py \
 FtsObject.py \
+FtsRawString.py \
 FtsServerConnection.py \
 FtsSocketConnection.py \
 HashTable.py \
-__init__.py \
-SymbolCache.py 
+SymbolCache.py \
+__init__.py 
 
 EXTRA_DIST = $(pythonclient_DATA)

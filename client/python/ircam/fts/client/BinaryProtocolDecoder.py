@@ -2,8 +2,6 @@
 from Buffer import Buffer
 from SymbolCache import SymbolCache
 from BinaryProtocol import BinaryProtocol
-#from FtsArgs import FtsArgs
-import FtsArgs
 from FtsClientException import FtsClientException
 from HashTable import HashTable
 
@@ -49,9 +47,9 @@ class BinaryProtocolDecoder:
         self.__argsCount = 0
         self.__currentState = qInitial
         self.__lval = 0
-        self.__buffer = Buffer()
+        self.__buffer = ""
         self.__selector = ""
-        self.__args = FtsArgs.FtsArgs()
+        self.__args = []
         self.__symbolCache = SymbolCache()
 
     def getState(self):
@@ -67,25 +65,25 @@ class BinaryProtocolDecoder:
         self.__lval = self.__lval << 8 | input
     
     def bufferClearAction(self, input):
-        self.__buffer.clear()
+        self.__buffer = ""
     
     def clearAllAction(self, input):
         self.__lval = 0
-        self.__buffer.clear()
+        self.__buffer = ""
 
     def bufferShiftAction(self, input):
-        self.__buffer.append(chr(input))
+        self.__buffer += chr(input)
     
     def endIntAction(self, input):
         self.__lval = self.__lval << 8 | input
         if self.__argsCount >= 2:
-            self.__args.addInt(self.__lval)
+            self.__args.append(self.__lval)
         self.__argsCount += 1
     
     def endFloatAction(self, input):
         self.__lval = self.__lval << 8 | input
         if self.__argsCount >= 2:
-            self.__args.addDouble(3.14)
+            self.__args.append(3.14)
         self.__argsCount += 1
     
     def endSymbolIndexAction(self, input):
@@ -94,11 +92,11 @@ class BinaryProtocolDecoder:
         if self.__argsCount == 1:
             self.__selector = s
         else:
-            self.__args.addSymbol(s)
+            self.__args.append(s)
         self.__argsCount += 1
     
     def endSymbolCacheAction(self, input):
-        p = self.__buffer.getBytes()
+        p = self.__buffer
         status, symbol = BinaryProtocolDecoder.symbolTable.get(p)
         if status == 0:
             symbol = p
@@ -111,12 +109,12 @@ class BinaryProtocolDecoder:
         if self.__argsCount == 1:
             self.__selector = symbol
         else:
-            self.__args.addSymbol(symbol)
+            self.__args.append(symbol)
         self.__argsCount += 1
     
     def endStringAction(self, input):
         if self.__argsCount >= 2:
-            self.__args.addString(self.__buffer.getBytes())
+            self.__args.append(self.__buffer)
         self.__argsCount += 1
     
     def endObjectAction(self, input):
@@ -125,14 +123,17 @@ class BinaryProtocolDecoder:
         if self.__argsCount == 0:
             self.__target = obj
         else:
-            self.__args.addObject(obj)
+            self.__args.append(obj)
         
         self.__argsCount += 1
     
     def endMessageAction(self, input):
-        from FtsObject import FtsObject
-        FtsObject.invokeMessageHandler(self.__target, self.__selector, self.__args)
-        self.__args.clear()
+        if hasattr(self.__target, self.__selector):
+            apply(getattr(self.__target, self.__selector), self.__args)
+        else:
+            print "ERROR: no method in", self.__target, " for selector:", self.__selector
+        
+        self.__args = []
         self.__argsCount = 0
     
     def nextState(self, input):

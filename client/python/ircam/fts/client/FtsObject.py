@@ -45,7 +45,6 @@ class FtsObject:
                 return
     
     def send(self, selector, *args):
-        from FtsArgs import FtsArgs
         if len(args) > 1:
             print "FtsObject.send want only 2 arguments"
             return
@@ -53,8 +52,8 @@ class FtsObject:
         self.__serverConnection.writeObject(self)
         self.__serverConnection.writeSymbol(selector)
         if len(args) == 1:
-            if not issubclass(args[0].__class__,FtsArgs):
-                print "FtsObject.send want a FtsArgs as last parameters"
+            if not type(args[0])==list:
+                print "FtsObject.send want a list as last parameters"
                 return
             
             self.__serverConnection.writeArgs(args[0])
@@ -66,28 +65,7 @@ class FtsObject:
     
     def getServerConnection(self):
         return self.__serverConnection
-    
-    def registerMessageHandler(ftsClass, selector, messageHandler):
-        entry = (ftsClass, selector)
-        FtsObject.messageHandlersTable[entry] = messageHandler
-        return
-
-    registerMessageHandler = staticmethod(registerMessageHandler)
-    
-    def invokeMessageHandler(obj, selector, args):
-        if  selector == obj.selectorCache:
-            obj.messageHandlerCache.invoke(obj, args)
-            return
-        entry = (obj.__class__, selector)
-
-        if FtsObject.messageHandlersTable.has_key(entry):
-            messageHandler = FtsObject.messageHandlersTable[entry]
-            obj.selectorCache = selector
-            obj.messageHandlerCache = messageHandler
-            obj.messageHandlerCache.invoke(obj, args)
         
-    invokeMessageHandler = staticmethod(invokeMessageHandler)
-    
     def getID(self):
         return self.__id
     
