@@ -96,13 +96,11 @@ fts_project_open(const char* filename)
   sym = fts_new_symbol(name);
 
   if(sym == fts_new_symbol("config"))
-    post("open default project\n", name);
-  else if(sym == fts_new_symbol(".jmax"))
-    post("open user defined default project\n", name);
+    post("open default project\n");
   else
-    post("open project: %s\n", name);
+    post("open project: %s\n", sym);
 
-  fts_project = fts_package_load_from_file(sym_project, filename);
+  fts_project = fts_package_load_from_file(sym, filename);
 
   loading_project_dir = NULL;
 
