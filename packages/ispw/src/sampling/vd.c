@@ -1,6 +1,4 @@
 #include "fts.h"
-
-
 #include "deltable.h"
 #include "delbuf.h"
 #include "vd.h"
@@ -25,9 +23,9 @@ typedef struct
 {
   fts_object_t  obj;
   fts_symbol_t name;
+  fts_object_t *next; /* DCE: pointer to the other vd for the same delay line */ 
   fts_symbol_t unit;
   ftl_data_t vd_data;
-  fts_object_t *next; /* DCE: pointer to the other vd for the same delay line */ 
 } vd_t;
 
 
