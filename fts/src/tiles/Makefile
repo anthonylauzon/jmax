@@ -18,7 +18,7 @@ include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
 DATE:= $(shell date)
-MODULE_CFLAGS:= -DCOMPILATION_DATE_STRING='"Compiled on $(DATE)\n"'
+MODULE_CFLAGS:= -DCOMPILATION_INFO_STRING='"Compiled by $(USER) for $(ARCH) on $(DATE)\n"'
 
 FTS_BIN = $(BINDIR)/fts
 

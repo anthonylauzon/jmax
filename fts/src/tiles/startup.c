@@ -29,10 +29,9 @@ static void fts_assign_boot_devices();
    module init function */
 
 static fts_welcome_t version_welcome = {FTS_VERSION_STRING};
-static fts_welcome_t compilation_date_welcome = {COMPILATION_DATE_STRING};
 static fts_welcome_t author_welcome = {"by Francois Dechelle, Maurizio De Cecco and Norbert Schnell\n"};
 static fts_welcome_t author_email_welcome = {"  dechelle@ircam.fr   dececco@ircam.fr  schnell@ircam.fr\n"};
-static fts_welcome_t miller_welcome = {"A new implementation of Miller Puckette's FTS\n"};
+static fts_welcome_t compilation_info_welcome = {COMPILATION_INFO_STRING};
 
 #ifdef DEBUG
 static fts_welcome_t debug_welcome = {"Compiled for DEBUG\n"};
@@ -68,7 +67,7 @@ main(int argc, char **argv)
   fts_add_welcome(&version_welcome);
   fts_add_welcome(&author_welcome);
   fts_add_welcome(&author_email_welcome);
-  fts_add_welcome(&miller_welcome);
+  fts_add_welcome(&compilation_info_welcome);
 
 #ifdef DEBUG
   fts_add_welcome(&debug_welcome);
