@@ -70,4 +70,9 @@
   ((_p[1] == ':') && (_p[2] == '/')) || \
   ((_p[1] == ':') && (_p[2] == '\\')))
 
+
+#include <stdlib.h>
+#include <windows.h>
+
+
 #endif /* _CONFIG_WIN32_H */
