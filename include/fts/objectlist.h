@@ -45,4 +45,6 @@ FTS_API void fts_objectlist_remove( fts_objectlist_t *list, fts_object_t *object
 #define fts_objectlist_get_object(C) ((C)->object)
 #define fts_objectlist_get_next(C) ((C)->next)
 
+#define fts_objectlist_is_empty(L) (!(L)->head)
+
 #endif

@@ -36,7 +36,7 @@ typedef struct _fts_channel_
   fts_objectlist_t origins; /* list of origins */
 } fts_channel_t;
 
-#define fts_channel_has_target(c) (!fts_object_list_is_empty( &(c)->targets))
+#define fts_channel_has_target(c) (!fts_objectlist_is_empty( &(c)->targets))
 
 FTS_API void fts_channel_init(fts_channel_t *channel);
 
