@@ -53,9 +53,9 @@ INSTALL_DIR=$(INSTALL) -d --mode=0755
 
 prefix=
 doc_install_dir=$(prefix)/Library/Documentation/jMax-$(JMAX_VERSION)
-lib_install_dir=$(prefix)/Applications/jmax
+lib_install_dir=$(prefix)/Applications/jMax
 include_install_dir=$(prefix)/usr/include
-bin_install_dir=$(prefix)/Applications/jmax
+bin_install_dir=$(prefix)/Applications/jMax
 
 ARCH_PACKAGES=macosx
 
