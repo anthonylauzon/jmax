@@ -23,9 +23,10 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.sequence;
+package ircam.jmax.editors.sequence.tools;
 
 import ircam.jmax.toolkit.*;
+import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.track.*;
 import java.awt.event.*;
 import java.awt.*;

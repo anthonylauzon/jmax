@@ -47,17 +47,6 @@ import ircam.jmax.toolkit.menus.*;
 
 public class OptionsMenu extends EditorMenu
 {
-  class OptionsMenuListener implements MenuListener
-  {
-    public void menuSelected(MenuEvent e){
-      updateMenu();
-    }
-    public void menuDeselected(MenuEvent e){}
-    public void menuCanceled(MenuEvent e){}
-  }
-
-  JMenuItem settingsItem;
-
   EditorContainer container;
   
   public OptionsMenu(EditorContainer container)
@@ -68,15 +57,7 @@ public class OptionsMenu extends EditorMenu
 
     setHorizontalTextPosition(AbstractButton.LEFT);
 
-    settingsItem          = add(Actions.settingsAction, "Settings...");
-    add(Actions.mergeAction, "Merge Tracks...");
-
-    addMenuListener(new OptionsMenuListener());
-  }
-
-  private void updateMenu()
-  {
-      settingsItem.setEnabled(true);
+    add(Actions.settingsAction, "Settings...");
   }
 }
 

@@ -23,8 +23,9 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.sequence;
+package ircam.jmax.editors.sequence.tools;
 
+import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.toolkit.*;
 
@@ -35,20 +36,20 @@ import javax.swing.undo.*;
 
 
 /**
- * the tool used to resize the AMBITUS of a selection of events.
+ * the tool used to resize a selection of events.
  * It uses a SelectionResizer to actually resize the
  * objects.
  */
-public class VResizerTool extends SelecterTool implements DragListener {
+public class ResizerTool extends SelecterTool implements DragListener {
 
   /**
    * constructor.
    */
-  public VResizerTool(ImageIcon theIcon) 
+  public ResizerTool(ImageIcon theIcon) 
   {
-    super("VResizer", theIcon);
+    super("Resizer", theIcon);
     
-    itsSelectionResizer = new SequenceVerticalResizer(this);
+    itsSelectionResizer = new SequenceSelectionResizer(this);
 
   }
 
@@ -85,9 +86,7 @@ public class VResizerTool extends SelecterTool implements DragListener {
   {
     TrackEvent aEvent;
 
-    int deltaY = y-startingPoint.y;
-
-
+    int deltaX = x-startingPoint.x;
     SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 
     // starts a serie of undoable transitions
@@ -97,8 +96,8 @@ public class VResizerTool extends SelecterTool implements DragListener {
       {
 	aEvent = (TrackEvent) e.nextElement();
 
-	egc.getAdapter().setHeigth(aEvent, egc.getAdapter().getHeigth(aEvent)+deltaY);
-	   
+	if (egc.getAdapter().getLenght(aEvent)+deltaX > 0)
+	  egc.getAdapter().setLenght(aEvent, egc.getAdapter().getLenght(aEvent)+deltaX);
       }
 
     ((UndoableData) egc.getDataModel()).endUpdate();

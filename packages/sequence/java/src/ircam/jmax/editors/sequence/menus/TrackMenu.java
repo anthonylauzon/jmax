@@ -27,17 +27,11 @@ package ircam.jmax.editors.sequence.menus;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.datatransfer.*;
 
 import java.util.*;
 import javax.swing.*;
-import javax.swing.event.*;
 
 import ircam.jmax.*;
-import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
-import ircam.jmax.dialogs.*;
-import ircam.jmax.utils.*;
 
 import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.actions.*;
@@ -68,6 +62,9 @@ public class TrackMenu extends EditorMenu
     
     removeTrackItem = add(Actions.removeTrackAction, "Remove Tracks");
 
+    addSeparator();
+
+    add(Actions.mergeAction, "Merge Tracks...", java.awt.Event.CTRL_MASK, KeyEvent.VK_M);
   }
     
   private void FillAddTrackMenu( JMenu menu)
@@ -83,24 +80,24 @@ public class TrackMenu extends EditorMenu
   }
 
 
-    class AddTrackAction extends AbstractAction {
-	AddTrackAction(ValueInfo info)
-	{
-	    super(info.getName(), info.getIcon());
-
-	    this.info = info;
-	}
-	
-	public void actionPerformed(ActionEvent e)
-	{
-	    sequenceModel.addTrack(new TrackBase(new AbstractSequence(info)));
-	}
-	
-	ValueInfo info;    
+  class AddTrackAction extends AbstractAction {
+    AddTrackAction(ValueInfo info)
+    {
+      super(info.getName(), info.getIcon());
+      
+      this.info = info;
     }
+    
+    public void actionPerformed(ActionEvent e)
+    {
+      sequenceModel.addTrack(new TrackBase(new AbstractSequence(info)));
+    }
+	
+    ValueInfo info;    
+  }
 
-    //---
-    SequenceDataModel sequenceModel;
+  //---
+  SequenceDataModel sequenceModel;
 }
 
 

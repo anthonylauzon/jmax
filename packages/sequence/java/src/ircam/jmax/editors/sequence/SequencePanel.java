@@ -25,6 +25,7 @@
 
 package ircam.jmax.editors.sequence;
 
+import ircam.jmax.editors.sequence.tools.*;
 import ircam.jmax.editors.sequence.track.*;
 import javax.swing.*;
 import javax.swing.border.*;
