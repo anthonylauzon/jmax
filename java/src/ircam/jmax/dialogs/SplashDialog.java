@@ -2,6 +2,7 @@ package ircam.jmax.dialogs;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.*;
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
 
@@ -13,6 +14,7 @@ import ircam.jmax.utils.*;
 public class SplashDialog extends Dialog implements KeyListener, MouseListener{
   static final int SPLASH_WIDTH = 500;
   static final int SPLASH_HEIGHT = 280;
+  String itsVersionString;
 
   /** An inner class that is the thread used for make the splash
    * dialog go away, after a while.
@@ -48,23 +50,21 @@ public class SplashDialog extends Dialog implements KeyListener, MouseListener{
   Image itsImage;
   SplashDialogTimeout to;
 
-  public SplashDialog(Frame dw, String filename) {
+
+  public SplashDialog(Frame dw, String filename, String version) {
     super(dw, "ermes",/* true*/false);
     
-    // itsImage = Toolkit.getDefaultToolkit().getImage(filename).getScaledInstance(SPLASH_WIDTH,
-    // SPLASH_HEIGHT,
-    // Image.SCALE_DEFAULT);
-
+    itsVersionString = version;
     itsImage = Toolkit.getDefaultToolkit().getImage(filename);
-
-    //Initialize this dialog to its preferred size.
+    
+    
     addKeyListener(this);
     addMouseListener(this);
     
     setLocation(200,200);
     pack();
     setVisible(true);
-
+    
     to = new SplashDialogTimeout(2000);
   }
 	
@@ -108,6 +108,8 @@ public class SplashDialog extends Dialog implements KeyListener, MouseListener{
     g.setColor(Color.white);
     g.fillRect(0, 0, d.width, d.height);        
     g.drawImage(itsImage, /*4*/12, /*4*/20,this);
+    g.setColor(Color.black);
+    g.drawString(itsVersionString, 24, d.height-24);
   }
 }
 

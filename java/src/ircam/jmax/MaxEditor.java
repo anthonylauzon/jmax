@@ -10,12 +10,13 @@ import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.project.*; // @@@ !!
 import ircam.jmax.editors.ermes.*; // @@@ !!
+import com.sun.java.swing.*;
 
 /**
  * The abstract base class for all the Ermes editors. It provides utility methods
  * such as the Window menu handling, initialisation, and others.
  */
-public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,FocusListener,WindowListener,ActionListener, ItemListener{
+public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener,FocusListener,WindowListener,ActionListener, ItemListener{
   public Menu itsFileMenu;
   //public Menu itsProjectMenu;
   public Menu itsNewFileMenu;

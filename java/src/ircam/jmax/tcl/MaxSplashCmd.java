@@ -31,16 +31,19 @@ class MaxSplashCmd implements Command
   
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if (argv.length == 2)
-      {
-	String fileName = new String(argv[1].toString());
-	//We have no windows for now so, no splashes
-	new SplashDialog(MaxApplication.GetConsoleWindow()/*itsProjectWindow*/, fileName);    
-      }
-    else
-      {	
-      	throw new TclNumArgsException(interp, 1, argv, "<filename>");
-      }
+    String Version;
+    if (argv.length == 3) Version = new String(argv[2].toString());
+    else if (argv.length == 2) Version = new String("");
+    else {	
+      throw new TclNumArgsException(interp, 2, argv, "<filename> <version number>");
+    }
+    
+    String fileName = new String(argv[1].toString());
+    //it's going to become a window instead of a dialog (no assumptions 
+    //shoul be made on the presence of a frame on top of which "mount"
+    //the splash)
+    new SplashDialog(MaxApplication.GetConsoleWindow()/*itsProjectWindow*/, fileName, Version);    
+
   }
 }
 

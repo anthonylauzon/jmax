@@ -48,7 +48,6 @@ public class MaxApplication extends Object {
     return itsInterp;
   }
 
-
   static Interp itsInterp;//e.m.
   public static Vector itsSketchWindowList;
   public static Vector itsEditorsFrameList;
@@ -725,6 +724,9 @@ public class MaxApplication extends Object {
       //user didn't specify the root. Take the /usr/local/max default directory.
       jmaxProperties.put("root", "/usr/local/max");
     }
+
+    //the version number as a system property
+    jmaxProperties.put("version", " version 2.1 beta");
 
     itsHookTable = new MaxWhenHookTable(); 
 

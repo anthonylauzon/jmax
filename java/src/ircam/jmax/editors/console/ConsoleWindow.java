@@ -22,7 +22,7 @@ public class ConsoleWindow extends MaxEditor {
     itsConsole = theConsole;
     GridBagLayout gridbag = new GridBagLayout();
     GridBagConstraints c = new GridBagConstraints();
-    setLayout(gridbag);
+    getContentPane().setLayout(gridbag);
     
     c.weightx = 1.0;
     c.weighty = 1.0;
@@ -31,7 +31,7 @@ public class ConsoleWindow extends MaxEditor {
     c.fill = GridBagConstraints.BOTH;
     c.anchor = GridBagConstraints.NORTHWEST;
     gridbag.setConstraints(theConsole, c);
-    add(itsConsole);
+    getContentPane().add(itsConsole);
     itsConsole.SetContainer(this);
   }
   
