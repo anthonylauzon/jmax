@@ -148,6 +148,7 @@ seqrec_record(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       /* add event to track (look for right position starting from last event) */
       eventtrk_add_event_after(seqref_get_track(o), time, event, this->event);
 
+      /* upload while recording */
       /*
       if(sequence_editor_is_open(this->sequence))
 	{

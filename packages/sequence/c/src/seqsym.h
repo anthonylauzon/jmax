@@ -39,6 +39,7 @@ extern fts_symbol_t seqsym_float;
 extern fts_symbol_t seqsym_int;
 extern fts_symbol_t seqsym_symbol;
 extern fts_symbol_t seqsym_note;
+extern fts_symbol_t seqsym_midival;
 extern fts_symbol_t seqsym_message;
 
 /* properties */

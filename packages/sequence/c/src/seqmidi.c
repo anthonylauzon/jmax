@@ -31,6 +31,7 @@
 #include "track.h"
 #include "eventtrk.h"
 #include "note.h"
+#include "midival.h"
 
 #define N_MIDI_CHANNELS 16
 #define N_MIDI_PITCHES 128
@@ -51,7 +52,8 @@ typedef struct _seqmidi_read_data_
   event_t *note_is_on[N_MIDI_CHANNELS][N_MIDI_PITCHES];
 
   /* for reading midi controllers */
-  eventtrk_t *controller_tracks[N_MIDI_CONTROLLERS];
+  eventtrk_t *control_track;
+  eventtrk_t *program_track;
 
 } seqmidi_read_data_t;
 
@@ -62,9 +64,8 @@ seqmidi_read_track_start(fts_midifile_t *file)
   int i;
 
   data->note_track = 0;
-
-  for(i=0; i<N_MIDI_CONTROLLERS; i++)
-    data->controller_tracks[i] = 0;
+  data->control_track = 0;
+  data->program_track = 0;
 
   return 1;
 }
@@ -149,31 +150,75 @@ seqmidi_read_note_off(fts_midifile_t *file, int chan, int pitch, int vel)
 }
 
 static int
-seqmidi_read_controller(fts_midifile_t *file, int chan, int ctrl_num, int value)
+seqmidi_read_control_change(fts_midifile_t *file, int chan, int number, int value)
 {
   seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
-  eventtrk_t *track = data->controller_tracks[ctrl_num];
+  eventtrk_t *track = data->control_track;
   double time = 1000.0 * fts_midifile_get_current_time_in_seconds(file);
   event_t *event;
-  fts_atom_t a[1];
+  midival_t *midival;
+  fts_atom_t a[3];
   
   if(!track)
     {
       sequence_t *sequence = data->sequence;
-      fts_atom_t a[1];
 
       /* create new track */
-      fts_set_symbol(a, seqsym_int);  
+      fts_set_symbol(a, seqsym_midival);  
       track = (eventtrk_t *)fts_object_create(eventtrk_class, 1, a);
 
       /* add track to sequence */
       sequence_add_track(sequence, (track_t *)track);
       
       /* store track as current */
-      data->controller_tracks[ctrl_num] = track;
+      data->control_track = track;
     }
   
-  fts_set_int(a, value);
+  fts_set_int(a + 0, value);
+  fts_set_int(a + 1, number);
+  fts_set_int(a + 2, chan);
+  midival = (midival_t *)fts_object_create(midival_class, 3, a);
+  
+  fts_set_object(a, (fts_object_t *)midival);
+  event = (event_t *)fts_object_create(event_class, 1, a);
+  
+  /* add event to track */
+  eventtrk_add_event(track, time, event);
+
+  return 1;
+}
+
+static int
+seqmidi_read_program_change(fts_midifile_t *file, int chan, int program)
+{
+  seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
+  eventtrk_t *track = data->program_track;
+  double time = 1000.0 * fts_midifile_get_current_time_in_seconds(file);
+  event_t *event;
+  midival_t *midival;
+  fts_atom_t a[3];
+  
+  if(!track)
+    {
+      sequence_t *sequence = data->sequence;
+
+      /* create new track */
+      fts_set_symbol(a, seqsym_midival);
+      track = (eventtrk_t *)fts_object_create(eventtrk_class, 1, a);
+
+      /* add track to sequence */
+      sequence_add_track(sequence, (track_t *)track);
+      
+      /* store track as current */
+      data->program_track = track;
+    }
+  
+  fts_set_int(a + 0, program);
+  fts_set_int(a + 1, 0);
+  fts_set_int(a + 2, chan);
+  midival = (midival_t *)fts_object_create(midival_class, 3, a);
+  
+  fts_set_object(a, (fts_object_t *)midival);
   event = (event_t *)fts_object_create(event_class, 1, a);
   
   /* add event to track */
@@ -203,8 +248,8 @@ seqmidi_read_track_end(fts_midifile_t *file)
 
   /* close tracks */
   data->note_track = 0;
-  for(i=0; i<N_MIDI_CONTROLLERS; i++)
-    data->controller_tracks[i] = 0;
+  data->control_track = 0;
+  data->program_track = 0;
 
   return 1;
 }
@@ -226,7 +271,8 @@ sequence_read_midifile(sequence_t *sequence, fts_symbol_t name)
       read.track_end = seqmidi_read_track_end;
       read.note_on = seqmidi_read_note_on;
       read.note_off = seqmidi_read_note_off;
-      read.control_change = seqmidi_read_controller;
+      read.control_change = seqmidi_read_control_change;
+      read.program_change = seqmidi_read_program_change;
 
       fts_midifile_set_read_functions(file, &read);
 
@@ -241,8 +287,8 @@ sequence_read_midifile(sequence_t *sequence, fts_symbol_t name)
 	  data.note_is_on[i][j] = 0;
 
       /* init controller track */
-      for(i=0; i<N_MIDI_CONTROLLERS; i++)
-	data.controller_tracks[i] = 0;
+      data.control_track = 0;
+      data.program_track = 0;
 
       fts_midifile_set_user_data(file, &data);
       
@@ -418,3 +464,4 @@ seqmidi_write_midifile_from_note_track(eventtrk_t *track, fts_symbol_t file_name
 
   return 1;
 }
+

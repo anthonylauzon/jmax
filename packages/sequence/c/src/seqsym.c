@@ -37,6 +37,7 @@ fts_symbol_t seqsym_int = 0;
 fts_symbol_t seqsym_float = 0;
 fts_symbol_t seqsym_symbol = 0;
 fts_symbol_t seqsym_note = 0;
+fts_symbol_t seqsym_midival = 0;
 fts_symbol_t seqsym_message = 0;
 
 /* properties */
@@ -85,6 +86,7 @@ seqsym_config(void)
   seqsym_float = fts_new_symbol("float");
   seqsym_symbol = fts_new_symbol("symbol");
   seqsym_note = fts_new_symbol("note");
+  seqsym_midival = fts_new_symbol("midival");
   seqsym_message = fts_new_symbol("message");
   
   /* properties */

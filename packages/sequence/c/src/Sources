@@ -32,6 +32,7 @@ event.c \
 seqmidi.c \
 eventtrk.c \
 note.c \
+midival.c \
 message.c \
 seqref.c \
 seqfind.c \

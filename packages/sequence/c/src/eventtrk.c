@@ -52,14 +52,18 @@ create_event(int ac, const fts_atom_t *at)
   else
     {
       fts_class_t *class = fts_class_get_by_name(type);
-      fts_object_t *obj = fts_object_create(class, ac - 1, at + 1);
 
-      if(obj)
+      if(class)
 	{
-	  fts_atom_t a[1];
-
-	  fts_set_object(a, obj);
-	  event = (event_t *)fts_object_create(event_class, 1, a);
+	  fts_object_t *obj = fts_object_create(class, ac - 1, at + 1);
+	  
+	  if(obj)
+	    {
+	      fts_atom_t a[1];
+	      
+	      fts_set_object(a, obj);
+	      event = (event_t *)fts_object_create(event_class, 1, a);
+	    }
 	}
     }
 

@@ -65,6 +65,7 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 	ValueInfoTable.registerInfo(IntegerValue.info);
 	ValueInfoTable.registerInfo(MessageValue.info);
 	ValueInfoTable.registerInfo(FloatValue.info);
+	ValueInfoTable.registerInfo(MidiValue.info);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////

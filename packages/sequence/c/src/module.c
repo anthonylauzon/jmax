@@ -33,6 +33,7 @@ extern void eventtrk_config(void);
 extern void event_config(void);
 
 extern void note_config(void);
+extern void midival_config(void);
 extern void message_config(void);
 
 extern void seqfind_config(void);
@@ -52,6 +53,7 @@ sequence_module_init(void)
   event_config();
 
   note_config();
+  midival_config();
   message_config();
 
   seqfind_config();

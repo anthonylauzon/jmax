@@ -106,6 +106,7 @@ public class Sequence extends JFrame implements EditorContainer{
 	TrackEditorFactoryTable.setFactoryFor(IntegerValue.info, IntegerTrackEditorFactory.instance);
 	TrackEditorFactoryTable.setFactoryFor(FloatValue.info, FloatTrackEditorFactory.instance);
 	TrackEditorFactoryTable.setFactoryFor(MessageValue.info, MessageTrackEditorFactory.instance);
+	TrackEditorFactoryTable.setFactoryFor(MidiValue.info, IntegerTrackEditorFactory.instance);
 	//TrackEditorFactoryTable.setFactoryFor(FricativeValue.info, MonoTrackEditorFactory.instance);
 	//TrackEditorFactoryTable.setFactoryFor(LogicValue.info, MonoTrackEditorFactory.instance);
 	//TrackEditorFactoryTable.setFactoryFor(CueValue.info, MonoTrackEditorFactory.instance);	

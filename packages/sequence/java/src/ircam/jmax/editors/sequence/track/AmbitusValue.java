@@ -1,4 +1,3 @@
-
 package ircam.jmax.editors.sequence.track;
 
 import ircam.jmax.*;
@@ -33,37 +32,35 @@ public class AmbitusValue extends AbstractEventValue
     
     setProperty("duration", new Double(100.0));
     setProperty("ambitus", new Integer(0));
-    setProperty("midi_channel", new Integer(1));
     setProperty("midi_velocity", new Integer(64));
+    setProperty("midi_channel", new Integer(1));
   }
 
-  Object duration, channel, velocity;
+  Object duration, velocity, channel;
   
   public void setProperty(String name, Object value)
   {
-      if(name.equals("duration"))
-	  duration = value;
-      else if(name.equals("pitch") && ((Integer)value).intValue() > 127)
-	  value = new Integer(127);
-      else if(name.equals("midi_channel"))
-	channel = value;
-      else if(name.equals("midi_velocity"))
-	velocity = value;
+    if(name.equals("duration"))
+      duration = value;
+    else if(name.equals("pitch") && ((Integer)value).intValue() > 127)
+      value = new Integer(127);
+    else if(name.equals("midi_velocity"))
+      velocity = value;
+    else if(name.equals("midi_channel"))
+      channel = value;
 
-      super.setProperty(name, value);
+    super.setProperty(name, value);
   }
   public Object getProperty(String name)
   {
-      if(name.equals("duration"))
-	  return duration;
-      else
-	if(name.equals("midi_channel"))
-	  return channel;
-	else
-	  if(name.equals("midi_velocity"))
-	    return velocity;
-	  else
-	    return super.getProperty(name);
+    if(name.equals("duration"))
+      return duration;
+    else if(name.equals("midi_velocity"))
+      return velocity;
+    else if(name.equals("midi_channel"))
+      return channel;
+    else
+      return super.getProperty(name);
   }
 
   public ValueInfo getValueInfo()
@@ -98,45 +95,45 @@ public class AmbitusValue extends AbstractEventValue
 
     /**
      * Create a new Widget for the associated Value */ 
-      /*public Component newWidget(SequenceGraphicContext gc)
-	{
-	ScrEventWidget widget = new ScrEventWidget(BoxLayout.Y_AXIS, gc);
-	return widget;
-	}*/
+    /*public Component newWidget(SequenceGraphicContext gc)
+      {
+      ScrEventWidget widget = new ScrEventWidget(BoxLayout.Y_AXIS, gc);
+      return widget;
+      }*/
    
     public Enumeration getPropertyNames()
-      {
-	  return new ArrayEnumeration(defNamesArray);
-      }
+    {
+      return new ArrayEnumeration(defNamesArray);
+    }
 
 
     public int getPropertyCount()
-      {
-	  return defPropertyCount;
-      }
+    {
+      return defPropertyCount;
+    }
 
     public DataFlavor getDataFlavor()
-      {
-	  return AmbitusValueDataFlavor.getInstance();
-      }
+    {
+      return AmbitusValueDataFlavor.getInstance();
+    }
 
-      public Class getPropertyType(int index)
-      {
-	  if(index < defPropertyCount)
-	      return propertyTypesArray[index];
-	  else
-	      return Integer.class;
-      }
+    public Class getPropertyType(int index)
+    {
+      if(index < defPropertyCount)
+	return propertyTypesArray[index];
+      else
+	return Integer.class;
+    }
  
-      String defNamesArray[] = {"pitch", "duration", "midi_channel", "midi_velocity"};
-      Class propertyTypesArray[] = {Integer.class, Double.class, Integer.class, Integer.class};
-      int defPropertyCount = 4;
+    String defNamesArray[] = {"pitch", "duration", "midi_velocity", "midi_channel"};
+    Class propertyTypesArray[] = {Integer.class, Double.class, Integer.class, Integer.class};
+    int defPropertyCount = 4;
   }
 
   public JPopupMenu getPopupMenu()
   {
-      //return MidiEventPopupMenu.getInstance();
-      return null;
+    //return MidiEventPopupMenu.getInstance();
+    return null;
   } 
 
   /**
@@ -157,42 +154,42 @@ public class AmbitusValue extends AbstractEventValue
 
   public int getPropertyType(int index)
   {
-      if(index < propertyCount)
-	  return propertyTypes[index];
-      else return UNKNOWN_TYPE;
+    if(index < propertyCount)
+      return propertyTypes[index];
+    else return UNKNOWN_TYPE;
   }
 
-    public Object[] getPropertyValues()
-    {
-	for(int i = 0; i<propertyCount; i++)
-	    propertyValuesArray[i] = getProperty(nameArray[i]);
+  public Object[] getPropertyValues()
+  {
+    for(int i = 0; i<propertyCount; i++)
+      propertyValuesArray[i] = getProperty(nameArray[i]);
 
-	return propertyValuesArray;
-    }
+    return propertyValuesArray;
+  }
 
-    public void setPropertyValues(int nArgs, Object args[])
-    {
-	for(int i = 0; i<nArgs; i++)
-	    setProperty(nameArray[i], args[i]);
-    }
+  public void setPropertyValues(int nArgs, Object args[])
+  {
+    for(int i = 0; i<nArgs; i++)
+      setProperty(nameArray[i], args[i]);
+  }
 
-    public boolean samePropertyValues(Object args[])
-    {
-      return ((((Integer)getProperty("pitch")).intValue() == ((Integer)args[0]).intValue()) &&
-	      (((Double)getProperty("duration")).floatValue() == ((Double)args[1]).floatValue()) &&
-	      (((Integer)getProperty("midi_channel")).intValue() == ((Integer)args[2]).intValue()) &&
-	      (((Integer)getProperty("midi_velocity")).intValue() == ((Integer)args[3]).intValue()));
-    }
+  public boolean samePropertyValues(Object args[])
+  {
+    return ((((Integer)getProperty("pitch")).intValue() == ((Integer)args[0]).intValue()) &&
+	    (((Double)getProperty("duration")).floatValue() == ((Double)args[1]).floatValue()) &&
+	    (((Integer)getProperty("midi_velocity")).intValue() == ((Integer)args[2]).intValue()) &&
+	    (((Integer)getProperty("midi_channel")).intValue() == ((Integer)args[3]).intValue()));
+  }
 
   //--- Fields
-    public static final int DEFAULT_MAX_PITCH = 127;
-    public static final int DEFAULT_MIN_PITCH = 0;
-    public static final String fs = File.separator;
-    public static final String AMBITUS_NAME = "note";
-    public static final String AMBITUS_PUBLIC_NAME = "note";
-    static String path;
-    public static ImageIcon AMBITUS_ICON;
-    public static AmbitusValueInfo info = new AmbitusValueInfo();
+  public static final int DEFAULT_MAX_PITCH = 127;
+  public static final int DEFAULT_MIN_PITCH = 0;
+  public static final String fs = File.separator;
+  public static final String AMBITUS_NAME = "note";
+  public static final String AMBITUS_PUBLIC_NAME = "note";
+  static String path;
+  public static ImageIcon AMBITUS_ICON;
+  public static AmbitusValueInfo info = new AmbitusValueInfo();
 
   static 
   {
@@ -201,18 +198,13 @@ public class AmbitusValue extends AbstractEventValue
 	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
       }
     catch(FileNotFoundException e){
-	//System.err.println("Couldn't locate sequence images");
-	path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
+      //System.err.println("Couldn't locate sequence images");
+      path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
     }
     AMBITUS_ICON = new ImageIcon(path+"note.gif");
   }
 
-    static String nameArray[] = {"pitch", "duration", "midi_channel", "midi_velocity"};
-    static int propertyTypes[] = {INTEGER_TYPE, DOUBLE_TYPE, INTEGER_TYPE, INTEGER_TYPE};
-    static int propertyCount = 4;
+  static String nameArray[] = {"pitch", "duration", "midi_velocity", "midi_channel"};
+  static int propertyTypes[] = {INTEGER_TYPE, DOUBLE_TYPE, INTEGER_TYPE, INTEGER_TYPE};
+  static int propertyCount = 4;
 }
-
- 
-
-
-
