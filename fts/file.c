@@ -122,7 +122,11 @@ fts_get_basename(const char *path) {
     int i;
     i = strlen(path);
     while((--i>0) && (path[i]!=fts_file_separator));
-    return &path[i+1];
+
+    if(i<=0)
+        return &path[i];
+    else
+        return &path[i+1];
 }
 
 int 
