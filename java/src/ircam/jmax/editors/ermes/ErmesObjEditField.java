@@ -54,7 +54,7 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       itsSketchPad.itsSketchWindow.requestFocus();
     }
     String aTextString = getText();
-    if (aTextString.compareTo("") == 0 || aTextString.compareTo(" ") == 0) {
+    if (aTextString.equals("") && !(itsOwner instanceof ErmesObjMessage)) {
       AbortEdit();
       return true; 
     }

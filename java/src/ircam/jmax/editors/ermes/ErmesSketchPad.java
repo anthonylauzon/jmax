@@ -1107,7 +1107,10 @@ Rectangle previousResizeRect = new Rectangle();
 
     if (editStatus == START_CONNECT) {
       if (itsHelper.IsInInOutLet(x,y)) {
-	if (itsCurrentInOutlet == itsConnectingLet) return;
+	if (itsCurrentInOutlet == itsConnectingLet) {
+	  editStatus = DOING_NOTHING;
+	  return;
+	}
  	if (!itsCurrentInOutlet.GetSelected()) {// no previously selected
 	  itsCurrentInOutlet.GetOwner().ConnectionRequested(itsCurrentInOutlet);
 	  setCursor(Cursor.getDefaultCursor());
@@ -1121,6 +1124,7 @@ Rectangle previousResizeRect = new Rectangle();
 	startConnectPoint.setLocation(0,0);
 	previousConnectPoint.setLocation(0,0);
 	CopyTheOffScreen(getGraphics());
+	editStatus = DOING_NOTHING;
       }
     }
     else if (editStatus == AREA_SELECT) {
