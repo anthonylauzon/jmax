@@ -10,15 +10,19 @@ import java.io.*;
 import tcl.lang.*;
 import com.sun.java.swing.*;
 
-public class QListPanel extends JPanel {
+public class QListPanel extends JPanel implements ActionListener {
   
   QList itsQList;
   TextArea itsTextArea;
+  Button itsSendButton;
   
-  public QListPanel(QList theQList) {
+  public QListPanel(QList theQList) { 
     super();
     itsTextArea = new TextArea(40, 40);
+    itsSendButton = new Button("Send");
+
     setLayout(new BorderLayout());
+    add("North", itsSendButton);
     add("Center", itsTextArea);
     validate();
     itsQList = theQList;
@@ -29,6 +33,9 @@ public class QListPanel extends JPanel {
     itsTextArea.setText(theContent.getValuesAsText());
   }
  
+  public void actionPerformed(ActionEvent e) {
+  }
+
   public Dimension preferredSize() {
     Dimension d = new Dimension(512, 412);
     return d;
