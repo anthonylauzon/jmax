@@ -4,10 +4,57 @@
 
 clean:
 	(cd $(JAVA_CLASSES_ROOT)/$(PACKAGE_DIR) ; find . -name "*.class" -exec /bin/rm -f '{}' \; )
+.PHONY: clean
 
 tags:
 	(cd $(JAVA_SRC_ROOT) ; find . -name "*.java" -print | etags - )
+.PHONY: tags
 
+help:
+	@echo We have no magic recipes for Java Makefiles, yet,
+	@echo so the compilation will not always be the shortest
+	@echo possible compilation you can get.
+	@echo The following targets are availables:
+	@echo
+	@echo     all: always recompile the current package and
+	@echo          all the subpacakges\; in ircam.jmax use
+	@echo          the most efficent -depend, and take care
+	@echo          of dynamically loaded files\; do a make all
+	@echo          in ircam.jmax if you want to be sure that
+	@echo          everything is up to date.
+	@echo  
+	@echo     clean: clean all the .classes files of current package
+	@echo            and all the subpackages.
+	@echo  
+	@echo     tags: make a global tag file for all the .java files
+	@echo           in ~/project/max/src/TAGS
+	@echo  
+	@echo     doc: only valid in ~/projects/max/src: produce the javadoc
+	@echo          documentation \(public classes\) in ~/projects/max/doc.
+	@echo 
+	@echo     doc_private: only valid in ~/projects/max/src: produce the javadoc
+	@echo          documentation \(public and private classes\) in ~/projects/max/doc_private
+	@echo 
+	@echo Also, in each package, a target for each file is defined, as the filename without
+	@echo the .java extension, that will recompile just that file.
+	@echo
+	@echo This makefile need two parameter in the command line\:
+	@echo
+	@echo           ARCH=\<arch\> MODE=\<mode\>
+	@echo
+	@echo Where \<arch\> are the standard arch for fts \(origin, o2r5k, o2r10k, 
+	@echo irix6.2, irix5.3, linuxpc, linuxppc, rhapsody\), and \<mode\> can be debug or opt.
+	@echo For the Java part, if they are not specified, they default to ARCH=origin, MODE=debug
+	@echo
+	@echo By specifying\:
+	@echo
+	@echo          DEPRECATION=yes
+	@echo
+	@echo to the make command, the compiler will be called with the -deprecation flag
+	@echo so all the use of old and deprecated APIs will be signalled.
+	@echo
+
+.PHONY: help
 
 .SUFFIXES: .class
 

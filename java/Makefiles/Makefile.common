@@ -26,12 +26,18 @@
 # 
 #
 
+DEPFLAG =  -deprecation
+
 ifeq ($(strip $(ARCH)),)
 ARCH  = origin
 endif
 
 ifeq ($(strip $(MODE)),)
 MODE  = debug
+endif
+
+ifeq ($(strip $(DEPRECATION)),)
+DEPFLAG =
 endif
 
 ## includes
@@ -49,7 +55,7 @@ JAVA_LIBS_CLASSPATH = /u/worksta/dececco/tmp/java/
 
 JAVA_CLASSPATH = $(JAVA_SRC_ROOT):$(JAVA_LIBS_CLASSPATH):$(JAVA_CLASSES_ROOT):$(SYSTEM_CLASSPATH)
 
-JFLAGS = -d $(JAVA_CLASSES_ROOT) -classpath  $(JAVA_CLASSPATH) $(JAVAC_FLAGS) 
+JFLAGS = -d $(JAVA_CLASSES_ROOT) -classpath  $(JAVA_CLASSPATH) $(JAVAC_FLAGS) $(DEPFLAG)
 
 CLASS_FILES = $(addprefix $(JAVA_CLASSES_ROOT)/$(PACKAGE_DIR)/, $(addsuffix .class , $(basename $(SOURCES))))
 
