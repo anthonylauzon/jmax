@@ -48,6 +48,9 @@ static fts_symbol_t sym_im = 0;
 static fts_symbol_t sym_mag = 0;
 static fts_symbol_t sym_arg = 0;
 
+
+
+
 /********************************************************
  *
  *  fmat format
@@ -138,17 +141,33 @@ fmat_adapt_format(fmat_t *self)
 }
 
 
+
+
 /********************************************************
  *
  *  utility functions
  *
  */
+
 #define HEAD_ROWS 8 /* extra points for interpolation at start of vector */
 #define TAIL_ROWS 8 /* extra points for interpolation at end of vector */
 #define HEAD_TAIL_COLS 2 /* interpolation head and tail for 1 or 2 column vectors only */
 #define HEAD_POINTS (HEAD_TAIL_COLS * HEAD_ROWS)
 #define TAIL_POINTS (HEAD_TAIL_COLS * TAIL_ROWS)
 
+
+/* create fmat with m rows and n columns */
+fmat_t *fmat_create(int m, int n)
+{
+    fts_atom_t size[2];
+
+    fts_set_int(&size[0], m);
+    fts_set_int(&size[1], n);
+    return ((fmat_t *) fts_object_create(fmat_type, 2, size));
+}
+
+
+/* change matrix "form", leaving underlying data vector untouched */
 void
 fmat_reshape(fmat_t *self, int m, int n)
 {
@@ -266,6 +285,8 @@ fmat_set_n(fmat_t *self, int n)
   }
 }
 
+
+/* change matrix size, copying data around */
 void
 fmat_set_size(fmat_t *self, int m, int n)
 {
@@ -492,6 +513,9 @@ fmat_get_min_value_in_range(fmat_t *mat, int a, int b)
   return min;
 }
 
+
+
+
 /********************************************************
  *
  *  files
@@ -670,6 +694,9 @@ fmat_export_audiofile(fmat_t *mat, fts_symbol_t file_name)
   return size;
 }
 
+
+
+
 /********************************************************************
  *
  *  check & errors
@@ -758,6 +785,9 @@ fmat_error_format_and_dimensions(fmat_t *fmat, fmat_t *op, const char *prefix)
                    fts_symbol_name(fmat_format_get_name(op_format)), op_m, op_n, 
                    fts_symbol_name(fmat_format_get_name(format)), m, n);
 }
+
+
+
 
 /********************************************************************
  *
@@ -1294,6 +1324,9 @@ fmat_get_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_return_object(obj);
 }
 
+
+
+
 /******************************************************************************
  *
  * functions, i.e. methods that return a value but don't change the object
@@ -1429,6 +1462,9 @@ fmat_get_zc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     fts_return_int(zc);
   }
 }
+
+
+
 
 /******************************************************************************
  *
@@ -1670,6 +1706,9 @@ fmat_vid_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_return_object(o);
 }
 
+
+
+
 /******************************************************************************
  *
  *  real comparison
@@ -1910,6 +1949,9 @@ fmat_le_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_return_object(o);
 }
 
+
+
+
 /******************************************************************************
  *
  *  complex arithmetics
@@ -2111,6 +2153,9 @@ fmat_cmul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     fts_object_error((fts_object_t *)self, "cmul: can't multiply %s matrix %d x %d with number", fts_symbol_name(fmat_format_get_name(format)), m, n);
 }
 
+
+
+
 /******************************************************************************
  *
  *  vector and matrix multiplication
@@ -2141,6 +2186,9 @@ fmat_get_dot(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   else
     fts_object_error(o, "dot: matrices must be column vectors");
 }
+
+
+
 
 /******************************************************************************
  *
@@ -2568,6 +2616,9 @@ fmat_normalize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_return_object(o);
 }
 
+
+
+
 /********************************************************************
  *
  *  row order operations
@@ -2830,6 +2881,9 @@ fmat_scramble(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_return_object(o);
 }
 
+
+
+
 /******************************************************************************
  *
  *  envelopes
@@ -3078,6 +3132,9 @@ fmat_apply_expr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_return_object(o);
 }
 
+
+
+
 /******************************************************************************
  *
  *  format conversion
@@ -3244,6 +3301,9 @@ fmat_convert_real(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fts_return_object(o);
 }
 
+
+
+
 /******************************************************************************
  *
  *  load, save, import, export
@@ -3327,6 +3387,9 @@ fmat_export_dialog(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const f
   fts_object_save_dialog(o, fts_s_export, fts_new_symbol("export fmat"), fts_project_get_dir(), fts_new_symbol(".aiff"));
 }
 
+
+
+
 /*********************************************************
  *
  *  editor
@@ -3379,6 +3442,9 @@ fmat_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     fts_client_send_message((fts_object_t *)self, fts_s_closeEditor, 0, 0);  
   }
 }
+
+
+
 
 /********************************************************************
  *
@@ -3491,6 +3557,9 @@ fmat_equals(const fts_atom_t *a, const fts_atom_t *b)
   return 0;
 }
 
+
+
+
 /*********************************************************
  *
  *  class init/delete
@@ -3599,6 +3668,9 @@ fmat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   if(self->values != NULL)
     fts_free(self->values - HEAD_POINTS);
 }
+
+
+
 
 /*********************************************************
  *
@@ -3732,7 +3804,10 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_inlet_thru(cl, 0);
   fts_class_outlet_thru(cl, 0);
   
-  /* fmat class documentation */
+
+  /* 
+   * fmat class documentation 
+   */
   
   fts_class_doc(cl, fmat_symbol, "[<num: # of rows> [<num: # of columns (def 1)> [<num: init values> ...]]]", "matrix of floats");
   

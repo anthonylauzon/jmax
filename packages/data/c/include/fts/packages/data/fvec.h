@@ -20,16 +20,25 @@
  * 
  */
 
+
 #ifndef _DATA_FVEC_H_
 #define _DATA_FVEC_H_
 
+
 /******************************************************************************
-*
-*  fvec compatibility
-*  
-*  Note: fvec is now fmat! here is the code for matrix slices fcol and frow
-*
-*/
+ * @defgroup fvec
+ *
+ *
+ * fvec compatibility
+ *  
+ * Note: fvec is now fmat! here is the code for matrix slices fcol and frow
+ *
+ * A float vector fvec is a mere alias to fmat, with the constraint of having 
+ * only one column.
+ *
+ * @{
+ */
+
 #include <fts/packages/data/data.h>
 
 #define fvec_get_size(v) ((v)->m)
@@ -43,12 +52,19 @@
 #define fvec_set_const(v, c) fmat_set_const((v), (c))
 #define fvec_set_with_onset_from_atoms(v, o, n, a) fmat_set_from_atoms((v), (o), 1, (n), (a))
 
+/* @} end of group fvec */
+
+
+
 
 /******************************************************************************
-*
-*  fmat slice: fcol, frow
-*
-*/
+ * @defgroup fslice
+ *
+ * an fmat slice is a reference to an fmat, either as fcol or as frow
+ *
+ * @{
+ */
+
 typedef struct
 {
   fts_object_t o;
@@ -97,6 +113,10 @@ DATA_API fts_class_t *frow_class;
 #define frow_check_index(f) ((f)->index < fmat_get_m((f)->fmat))
 #define fcol_check_index(f) ((f)->index < fmat_get_n((f)->fmat))
 
+/** copy row or col from matrix reference to an fvec (1 column matrix) */
 DATA_API void fslice_copy_to_fmat(fslice_t *org, fmat_t *copy);
+
+/* @} end of group fslice */
+
 
 #endif

@@ -37,11 +37,15 @@ fts_class_t *fcol_class = NULL;
 fts_symbol_t frow_symbol = NULL;
 fts_symbol_t fcol_symbol = NULL;
 
+
+
+
 /********************************************************************
  *
  *  utilities
  *
  */
+
 /* copy matrix row or col reference to an fvec */
 void
 fslice_copy_to_fmat(fslice_t *org, fmat_t *copy)
@@ -75,11 +79,14 @@ fslice_copy_to_fmat(fslice_t *org, fmat_t *copy)
 }
 
 
+
+
 /********************************************************************
  *
  *  check & errors
  *
  */
+
 void
 fslice_error_index(fslice_t *slice, fslice_t *op, const char *prefix)
 {
@@ -100,11 +107,15 @@ fslice_error_index(fslice_t *slice, fslice_t *op, const char *prefix)
   }
 }
 
+
+
+
 /******************************************************************************
  *
  *  envelopes
  *
  */
+
 static void
 fslice_lookup_fmat_or_slice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -301,11 +312,15 @@ fslice_apply_expr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     fslice_error_index(self, NULL, "env");
 }
 
+
+
+
 /******************************************************************************
  *
  *  arithmetics
  *
  */
+
 static void
 fslice_add_fslice(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
@@ -600,6 +615,9 @@ fslice_vid_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const ft
     fslice_error_index(self, NULL, "vid");
 }
 
+
+
+
 /******************************************************************************
  *
  *  misc math funs
@@ -730,6 +748,9 @@ fslice_sqrt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   else
     fslice_error_index(self, NULL, "sqtr");
 }
+
+
+
 
 /******************************************************************************
  *
@@ -962,6 +983,9 @@ fslice_get_zc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   }
 }
 
+
+
+
 /****************************************************************************
  *
  *  post and print
@@ -1017,6 +1041,9 @@ fslice_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     fts_spost(stream, "}\n");
   }
 }
+
+
+
 
 /******************************************************************************
  *
@@ -1119,7 +1146,11 @@ fslice_instantiate(fts_class_t *cl)
 
   fts_class_message(cl, fts_new_symbol("apply"), expr_class, fslice_apply_expr);
 
-  /* fcol/frow class documentation */  
+
+  /*
+   * fcol/frow class documentation
+   */  
+
   fts_class_doc(cl, fts_new_symbol("add"), "<num|fcol|frow: operand>", "add given scalar, fcol or frow (element by element) to current values");
   fts_class_doc(cl, fts_new_symbol("sub"), "<num|fcol|frow: operand>", "substract given scalar, fcol or frow (element by element)");
   fts_class_doc(cl, fts_new_symbol("mul"), "<num|fcol|frow: operand>", "multiply current values by given scalar, fcol or frow (element by element)");

@@ -25,11 +25,13 @@
 
 #include <fts/packages/data/data.h>
 
-/********************************************************************************
-*
-*  fmat format
-*
-*/
+
+
+/******************************************************************************
+ *
+ *  fmat format
+ *
+ */
 
 #define FMAT_FORMATS_MAX 256
 
@@ -62,11 +64,16 @@ DATA_API fmat_format_t *fmat_format_register(fts_symbol_t name);
 DATA_API void fmat_format_add_column(fmat_format_t *format, fts_symbol_t label);
 DATA_API fmat_format_t *fmat_format_get_by_name(fts_symbol_t name);
 
-/********************************************************************************
-*
-*  fmat
-*
-*/
+
+
+
+/******************************************************************************
+ * @defgroup fmat 
+ *  
+ * float matrices and vectors
+ *
+ * @{
+ */
 
 typedef struct
 {
@@ -83,29 +90,23 @@ typedef struct
   fts_object_t *editor;
 } fmat_t;
 
-/**
-* @ingroup fmat
- */
+/** */
 DATA_API fts_symbol_t fmat_symbol;
 
-/**
-* @ingroup fmat
- */
+/** */
 DATA_API fts_class_t *fmat_class;
 #define fmat_type fmat_class
 
 /** Get number of rows of matrix x.
-*
-* @fn int fmat_get_m(fmat_t *x)
-* @ingroup fmat
-*/
+ *
+ *  @fn int fmat_get_m(fmat_t *x)
+ */
 #define fmat_get_m(x) ((x)->m)
 
 /** Get number of columns of matrix x.
-*
-* @fn int fmat_get_n(fmat_t *x)
-* @ingroup fmat
-*/
+ *
+ *  @fn int fmat_get_n(fmat_t *x)
+ */
 #define fmat_get_n(x) ((x)->n)
 
 #define fmat_get_format(x) ((x)->format)
@@ -115,30 +116,29 @@ DATA_API fts_class_t *fmat_class;
 #define fmat_editor_set_open(m) ((m)->opened = 1)
 #define fmat_editor_set_close(m) ((m)->opened = 0)
 
-/**
-* @ingroup fmat
- */
+/** create fmat with m rows and n columns. */
+DATA_API fmat_t *fmat_create(int m, int n);
+
+/** change matrix "form", leaving underlying data vector untouched. */
 DATA_API void fmat_reshape(fmat_t *fmat, int m, int n);
+
+/** change matrix size, copying data around */
 DATA_API void fmat_set_size(fmat_t *fmat, int m, int n);
 DATA_API void fmat_set_m(fmat_t *fmat, int m);
 DATA_API void fmat_set_n(fmat_t *fmat, int n);
 
-/**
-* @fn float *fmat_get_ptr(fmat_t *x)
- * @ingroup fmat
+/** get pointer to raw float data vector.
+ *  @fn float *fmat_get_ptr(fmat_t *x)
  */
 #define fmat_get_ptr(m) ((m)->values)
 
-
 /**
-* @fn float *fmat_get_element(fmat_t *x, int i, int j)
- * @ingroup fmat
+ *  @fn float *fmat_get_element(fmat_t *x, int i, int j)
  */
 #define fmat_get_element(m, i, j) ((m)->values[(i) * (m)->n + (j)])
 
 /**
-* @fn float *fmat_set_element(fmat_t *x, int i, int j, float val)
- * @ingroup fmat
+ *  @fn float *fmat_set_element(fmat_t *x, int i, int j, float val)
  */
 #define fmat_set_element(m, i, j, x) ((m)->values[(i) * (m)->n + (j)] = (x))
 
@@ -151,38 +151,43 @@ DATA_API void fmat_set_n(fmat_t *fmat, int n);
 #define fmat_set_domain(fm, f) ((fm)->domain = (f))
 #define fmat_get_domain(fm) (((fm)->domain > 0.0)? ((fm)->domain): ((double)(fm)->m))
 
-/* check class and get dimensions for fmat, fcol or frow vector */
+/** check class and get dimensions for fmat, fcol or frow vector */
 DATA_API int fmat_or_slice_vector(fts_object_t *obj, float **ptr, int *size, int *stride);
 
-/**
-* @ingroup fmat
- */
+/** */
 DATA_API void fmat_set_const(fmat_t *mat, float c);
 
-/**
-* @ingroup fmat
- */
+/** */
 DATA_API void fmat_copy(fmat_t *orig, fmat_t *copy);
 
-/**
-* @ingroup fmat
- */
+/** */
 DATA_API void fmat_set_from_atoms(fmat_t *mat, int onset, int step, int ac, const fts_atom_t *at);
 
 DATA_API float fmat_get_max_abs_value_in_range(fmat_t *mat, int a, int b);
 DATA_API float fmat_get_max_value_in_range(fmat_t *mat, int a, int b);
 DATA_API float fmat_get_min_value_in_range(fmat_t *mat, int a, int b);
 
+/* @} end of group fmat */
+
+
+
+
 /******************************************************************************
-*
-*  fvec
-*
-*/
+ * @defgroup fvec
+ *
+ * A float vector fvec is a mere alias to fmat, with the constraint of having 
+ * only one column.
+ *
+ * @{
+ */
 
 typedef fmat_t fvec_t;
 
 DATA_API fts_symbol_t fvec_symbol;
 DATA_API fts_class_t *fvec_class;
 #define fvec_type fvec_class
+
+/* @} end of group fvec */
+
 
 #endif
