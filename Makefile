@@ -200,19 +200,11 @@ sgi-pkg:
 
 #
 # rpm
-# creates a rpm
+# creates a binary rpm
 #
-rpm:
-	echo $(version)
-	(cd pkg/rpm ; $(MAKE) version=$(version) rpm)
-.PHONY: rpm
-
-#
-# uninstall
-# remove the files copied by make install
-# (to be completed)
-uninstall:
-.PHONY: uninstall
+bin-rpm:
+	rpm -bb --rcfile pkg/rpm/rpmrc pkg/rpm/jmax-local.spec
+.PHONY: bin-rpm
 
 
 #
