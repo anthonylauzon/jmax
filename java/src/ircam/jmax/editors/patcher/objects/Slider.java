@@ -48,6 +48,7 @@ class Slider extends GraphicObject implements FtsIntValueListener
 
   static final int THROTTLE_LATERAL_OFFSET = 2;
   static final int THROTTLE_HEIGHT = 5;
+  private static final int MINIMUM_DIMENSION = 15;
   protected final static int BOTTOM_OFFSET = 5;
   protected final static int UP_OFFSET = 5;
 
@@ -105,16 +106,18 @@ class Slider extends GraphicObject implements FtsIntValueListener
 
   public void setWidth(int w)
   {
-    if (w < 10)
-      return;
-
+    if (w < MINIMUM_DIMENSION)
+      //return;
+      w=MINIMUM_DIMENSION;
+    
     super.setWidth(w);
   }
 
   public void setHeight(int h)
   {
-    if (h < 10)
-      return;
+    if (h < MINIMUM_DIMENSION)
+      //return;
+      h=MINIMUM_DIMENSION;
 
     super.setHeight(h);
   }
