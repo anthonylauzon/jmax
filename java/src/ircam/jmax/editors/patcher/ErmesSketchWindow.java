@@ -47,7 +47,7 @@ import ircam.jmax.toolkit.menus.*;
 // The window that contains the sketchpad. It knows the ftspatcher it is editing.
 // It handles all the sketch menus, it knows how to load from a ftspatcher.
 //
-public class ErmesSketchWindow extends JFrame implements ComponentListener, WindowListener, EditorContainer, MessageDisplayer
+public class ErmesSketchWindow extends JMaxEditor implements ComponentListener, WindowListener, MessageDisplayer
 {
   public ErmesSketchPad itsSketchPad;
   JScrollPane  itsScrollerView;
@@ -68,16 +68,10 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     ToolsPanel.registerToolsPanel();
   }
 
-  // ------ editorContainer interface ---------------
+  // ------ JMaxEditor---------------
 
   public Editor getEditor(){
     return itsSketchPad;
-  }
-  public Frame getFrame(){
-    return this;
-  }
-  public Point getContainerLocation(){
-    return getLocation();
   }
   public Rectangle getViewRectangle(){
       JViewport port;

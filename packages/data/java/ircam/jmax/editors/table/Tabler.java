@@ -35,7 +35,7 @@ import ircam.jmax.editors.table.menus.*;
 /** 
  * The table editor
  */
-public class Tabler extends JFrame implements EditorContainer {
+public class Tabler extends JMaxEditor{
   
   //--- Fields 
   TablePanel itsPanel;
@@ -215,15 +215,9 @@ public class Tabler extends JFrame implements EditorContainer {
     validate();
   }
     
-  // ------ editorContainer interface ---------------
+  // ------ JMaxEditor ---------------
   public Editor getEditor(){
     return itsPanel;
-  }
-  public Frame getFrame(){
-    return this;
-  }
-  public Point getContainerLocation(){
-    return getLocation();
   }
   public Rectangle getViewRectangle(){
     return getContentPane().getBounds();

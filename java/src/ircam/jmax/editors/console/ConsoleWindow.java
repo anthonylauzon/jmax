@@ -51,7 +51,7 @@ import ircam.fts.client.*;
  * Window containing a console
  */
  
-public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Printable {
+public class ConsoleWindow extends JMaxEditor implements Editor, Printable {
 
   private ConsoleArea consoleArea;
   private ControlPanel controlPanel;
@@ -198,22 +198,11 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
     }
   }
 
-  // Methods from interface EditorContainer
+  // Methods from JMaxEditor
   public Editor getEditor()
   {
     return this;
   }
-
-  public Frame getFrame()
-  {
-    return this;
-  }
-
-  public Point getContainerLocation()
-  {
-    return getLocation();
-  }
-
   public Rectangle getViewRectangle()
   {
     return getContentPane().getBounds();

@@ -23,6 +23,7 @@ GraphicSelectionListener.java\
 InfoPanel.java\
 InteractionModule.java\
 InteractionSemaphore.java\
+JMaxEditor.java\
 Layer.java\
 LockListener.java\
 MouseDragTracker.java\

@@ -38,7 +38,7 @@ import ircam.jmax.editors.explode.menus.*;
  * It inherits from MaxEditor, and implements the MaxDataEditor Interface.
  * This implementation builds a ScrPanel and a ExplodeTablePanel to represent the data.
  */
-public class ExplodeWindow extends JFrame implements EditorContainer, AAAReadme {
+public class ExplodeWindow extends JMaxEditor implements AAAReadme {
 
   //------------------- fields
   FtsExplodeObject explodeObject;
@@ -134,15 +134,9 @@ public class ExplodeWindow extends JFrame implements EditorContainer, AAAReadme 
     setJMenuBar(mb);  
   }
 
-  // ------ editorContainer interface ---------------
+  // ------ JMaxEditor  ---------------
   public Editor getEditor(){
     return itsExplodePanel;
-  }
-  public Frame getFrame(){
-    return this;
-  }
-  public Point getContainerLocation(){
-    return getLocation();
   }
   public Rectangle getViewRectangle(){
     return getContentPane().getBounds();

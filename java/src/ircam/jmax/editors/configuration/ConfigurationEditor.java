@@ -36,7 +36,7 @@ import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
 
-public class ConfigurationEditor extends JFrame implements EditorContainer
+public class ConfigurationEditor extends JMaxEditor
 {    
   public ConfigurationEditor( FtsConfig config)
   {
@@ -250,18 +250,10 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
     singleInstance = null;
   }
 
-  /************* interface EditorContainer ************************/
+  /************* JMaxEditor ************************/
   public Editor getEditor()
   {
     return (Editor)tabbedPane.getSelectedComponent();
-  }
-  public Frame getFrame()
-  {
-    return this;
-  }
-  public Point getContainerLocation()
-  {
-    return getLocation();
   }
   public Rectangle getViewRectangle()
   {

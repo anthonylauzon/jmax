@@ -37,7 +37,7 @@ import javax.swing.table.*;
 /**
 * This implementation builds a SequencePanel to represent the data.
  */
-public class MatWindow extends JFrame implements EditorContainer{
+public class MatWindow extends JMaxEditor {
   
   //------------------- fields
   MatPanel itsMatPanel;
@@ -140,15 +140,9 @@ public class MatWindow extends JFrame implements EditorContainer{
     setJMenuBar(mb);
   }
   
-  // ------ editorContainer interface ---------------
+  // ------ JMaxEditor  ---------------
   public Editor getEditor(){
     return itsMatPanel;
-  }
-  public Frame getFrame(){
-    return this;
-  }
-  public Point getContainerLocation(){
-    return getLocation();
   }
   public Rectangle getViewRectangle(){
     return null;

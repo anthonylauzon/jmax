@@ -44,7 +44,7 @@ import ircam.jmax.editors.patcher.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
 
-public class ProjectEditor extends JFrame implements EditorContainer
+public class ProjectEditor extends JMaxEditor 
 {    
   public ProjectEditor(FtsPackage pkg)
   {
@@ -336,19 +336,12 @@ public class ProjectEditor extends JFrame implements EditorContainer
 	  }
       }
   }
-  /************* interface EditorContainer ************************/
+  /************* JMaxEditor ************************/
   public Editor getEditor()
   {
     return packagePanel;
   }
-  public Frame getFrame()
-  {
-    return this;
-  }
-  public Point getContainerLocation()
-  {
-    return getLocation();
-  }
+
   public Rectangle getViewRectangle()
   {
     return getContentPane().getBounds();

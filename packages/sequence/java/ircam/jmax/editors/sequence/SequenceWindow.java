@@ -40,7 +40,7 @@ import ircam.jmax.editors.sequence.menus.*;
 /**
 * This implementation builds a SequencePanel to represent the data.
  */
-public class SequenceWindow extends JFrame implements EditorContainer{
+public class SequenceWindow extends JMaxEditor {
   
   //------------------- fields
   SequencePanel itsSequencePanel;
@@ -141,15 +141,9 @@ public class SequenceWindow extends JFrame implements EditorContainer{
     setJMenuBar(mb);
   }
   
-  // ------ editorContainer interface ---------------
+  // ------ JMaxEditor  ---------------
   public Editor getEditor(){
     return itsSequencePanel;
-  }
-  public Frame getFrame(){
-    return this;
-  }
-  public Point getContainerLocation(){
-    return getLocation();
   }
   public Rectangle getViewRectangle(){
     return itsSequencePanel.scrollTracks.getViewport().getViewRect();

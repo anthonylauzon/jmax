@@ -236,6 +236,21 @@
 			settings = {
 			};
 		};
+		3B6D539406D11770004013FE = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = JMaxEditor.java;
+			path = ../../java/src/ircam/jmax/toolkit/JMaxEditor.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B6D539506D11770004013FE = {
+			fileRef = 3B6D539406D11770004013FE;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		3B75E8D906624AD4005BE87F = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -7668,6 +7683,7 @@
 				5C5429BF05AB0B970042B7A2,
 				5C5429C005AB0B970042B7A2,
 				3B02488106B94BDA002BEB0D,
+				3B6D539506D11770004013FE,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -23503,6 +23519,7 @@
 				F880FE9C0283013E01664092,
 				F880FE9D0283013E01664092,
 				F880FE9E0283013E01664092,
+				3B6D539406D11770004013FE,
 				F880FE9F0283013E01664092,
 				F880FEA00283013E01664092,
 				F880FEA10283013E01664092,

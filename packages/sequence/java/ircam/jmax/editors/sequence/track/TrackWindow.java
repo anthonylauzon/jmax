@@ -40,7 +40,7 @@ import ircam.jmax.editors.sequence.menus.*;
 /**
 * This implementation builds a SequencePanel to represent the data.
  */
-public class TrackWindow extends JFrame implements EditorContainer{
+public class TrackWindow extends JMaxEditor {
 	
   //------------------- fields
   transient TrackPanel trackPanel;
@@ -120,6 +120,8 @@ public class TrackWindow extends JFrame implements EditorContainer{
 		
     if(JMaxApplication.getProperty("no_menus") == null)
       makeMenuBar();
+    else
+      makeSimpleMenuBar();
 		
     validate();
 		if(trackData.editorObject != null && !trackData.editorObject.haveContent())
@@ -152,21 +154,25 @@ public class TrackWindow extends JFrame implements EditorContainer{
 		
     setJMenuBar(mb);
   }
+  
+  private final void makeSimpleMenuBar()
+  {
+    JMenuBar mb = new JMenuBar();
+    mb.add( new DefaultFileMenu());
+    editMenu = new EditMenu(this);
+    mb.add(editMenu);
+		
+    setJMenuBar(mb);
+  }
 	
   public EditMenu getEditMenu()
   {
     return editMenu;
   }
 	
-  // ------ editorContainer interface ---------------
+  // ------ JMaxEditor ---------------
   public Editor getEditor(){
     return trackPanel;
-  }
-  public Frame getFrame(){
-    return this;
-  }
-  public Point getContainerLocation(){
-    return getLocation();
   }
   public Rectangle getViewRectangle(){
     return trackPanel.scrollTracks.getViewport().getViewRect();

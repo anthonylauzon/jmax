@@ -37,7 +37,7 @@ import ircam.jmax.editors.qlist.menus.*;
  * The qlist editor. It uses a QListPanel to show its data and
  * a couple of buttons (set, get) to synchronize with FTS.
  */
-public class QListWindow extends JFrame implements EditorContainer {
+public class QListWindow extends JMaxEditor {
   
   QListPanel itsQListPanel;
   Dimension preferred = new Dimension(512,412);
@@ -113,15 +113,9 @@ public class QListWindow extends JFrame implements EditorContainer {
     return preferred;
   }
 
-  // ------ editorContainer interface ---------------
+  // ------ JMaxEditor  ---------------
   public Editor getEditor(){
     return itsQListPanel;
-  }
-  public Frame getFrame(){
-    return this;
-  }
-  public Point getContainerLocation(){
-    return getLocation();
   }
   public Rectangle getViewRectangle(){
     return getContentPane().getBounds();
