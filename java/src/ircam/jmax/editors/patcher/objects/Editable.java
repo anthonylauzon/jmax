@@ -114,6 +114,10 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
 	super.setWidth(w);
 	super.setHeight(renderer.getHeight() + getTextHeightOffset());
       }
+    else{
+      super.setWidth(((TextRenderer)renderer).getColWidth()+ getTextWidthOffset());
+      super.setHeight(renderer.getHeight() + getTextHeightOffset());
+    } 
   }
 
   // redefined from base class, only when not editing

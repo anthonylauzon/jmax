@@ -57,7 +57,8 @@ class HResizeInteraction extends Interaction
       }
     else if (Squeack.isDrag(squeack))
       {
-	if(!object.isSelected()){
+	if((!object.isSelected())||
+	   ((object.isSelected())&&(ErmesSelection.patcherSelection.isSingleton()))){
 	  object.redraw();
 	  object.redrawConnections();
 	  object.setWidth(mouse.x - object.getX());

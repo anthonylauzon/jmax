@@ -166,6 +166,10 @@ public class TextRenderer implements ObjectRenderer
       return area.getRHeight();
   }
 
+  public int getColWidth(){
+    return area.getColWidth();
+  }
+
   public int getWidth()
   {
     return area.getPreferredSize().width;

@@ -76,7 +76,7 @@ class Message extends Editable implements FtsMessageListener, FtsIntValueListene
 
   public int getTextWidthOffset()
   {
-    return 6;
+    return /*6*/8;
   }
 
   public int getTextHeightOffset()
