@@ -162,8 +162,11 @@ bus_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_
 {
   bus_t *this = (bus_t *)o;
 
-  fts_free(this->buf[0]);
-  fts_free(this->buf[1]);
+  if(this->buf[0] != NULL)
+    fts_free(this->buf[0]);
+
+  if(this->buf[1] != NULL)
+    fts_free(this->buf[1]);
 
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
@@ -309,8 +312,6 @@ access_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 {
   access_t *this = (access_t *)o;
 
-  fts_dsp_object_delete((fts_dsp_object_t *)o);
-
   if(this->bus)
   {
     bus_t **bus = ftl_data_get_ptr(this->bus);
@@ -323,6 +324,8 @@ access_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 
   if(this->index)
     ftl_data_free(this->index);
+
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 /*****************************************************************************

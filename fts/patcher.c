@@ -1310,6 +1310,7 @@ patcher_redefine_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s
 {
   fts_object_t *old = fts_get_object(at);
   int dsp_restart = fts_dsp_is_active() && fts_is_dsp_object(old);
+  
   fts_object_t *obj;
   fts_atom_t a;
 
@@ -1868,6 +1869,9 @@ patcher_delete_objects( fts_object_t *obj)
   if (obj == NULL)
     return;
 
+  if(fts_dsp_is_active() && fts_is_dsp_object(obj))
+    fts_dsp_desactivate();
+
   fts_update_reset(obj);
   fts_client_release_object(obj);
   fts_object_set_id(obj, FTS_DELETE);
@@ -1883,7 +1887,8 @@ static void
 patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *self = (fts_patcher_t *) o;
-
+  int dsp_restart = fts_dsp_is_active();
+    
   if(editor_is_open(self))
   {
     set_editor_close(self);
@@ -1910,6 +1915,9 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   if (self->outlets)
     fts_free( self->outlets);
+
+  if(dsp_restart)
+    fts_dsp_activate();
 }
 
 static void
