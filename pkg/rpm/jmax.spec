@@ -5,8 +5,7 @@ Release: 1
 Copyright: GPL
 Group: Development/Languages
 Source: ftp://ftp.ircam.fr/pub/IRCAM/equipes/temps-reel/jmax/releases/jmax-%{version}.tar.gz
-#Requires: swing
-BuildRoot: /var/tmp/jmax-root
+BuildRoot: /var/tmp/jmax-%{version}-root
 %description
 jMax (``Java Max'') is a graphical programming environment 
 for developing real-time, interactive audio applications. 

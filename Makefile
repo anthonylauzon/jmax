@@ -176,6 +176,17 @@ src-dist: spec-files cvs-tag
 	rm -rf $(distdir)
 .PHONY: src-dist
 
+
+#
+# rpm
+# builds a rpm
+#
+rpm: $(distfile)
+	umask 22
+	cp -fv $(distfile) /usr/src/redhat/SOURCES
+	tar xvzf $(distfile) -O jmax-$(version)/pkg/rpm/jmax.spec > /usr/src/redhat/SPECS/jmax.spec
+	(cd /usr/src/redhat/SPECS ; rpm -ba jmax.spec)
+
 #
 # install
 # copies the files to the right directories
