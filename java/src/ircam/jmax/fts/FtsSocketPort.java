@@ -29,8 +29,8 @@ class FtsSocketPort extends FtsPort
     try
       {
 	socket = new Socket(host, port);
-	out_stream = socket.getOutputStream();
-	in_stream  = socket.getInputStream();
+	out_stream = new BufferedOutputStream(socket.getOutputStream(), 1024);
+	in_stream  = new BufferedInputStream(socket.getInputStream(), 1024);
       }
     catch (UnknownHostException e)
       {

@@ -718,23 +718,24 @@ public class FtsServer
       {
       case FtsClientProtocol.fts_property_value_cmd:
 	{
-	  if (msg.getNumberOfArguments() >= 3)
-	    {
-	      FtsObject obj;
 
-	      obj = (FtsObject) msg.getArgument(0);
+ 	  if (msg.getNumberOfArguments() >= 3)
+ 	    {
+ 	      FtsObject obj;
 
-	      if (obj == null)
-		System.err.println("Null object in property value message " + msg);
-	      else
-		obj.localPut((String) msg.getArgument(1), msg.getArgument(2));
+ 	      obj = (FtsObject) msg.getArgument(0);
 
-	      if (FtsServer.debug)
-		System.err.println("SetPropertyValue " + obj + " " + msg.getArgument(1)
-				   + " " + msg.getArgument(2));
-	    }
-	  else
-	    System.err.println("Wrong property value message " + msg);
+ 	      if (obj == null)
+ 		System.err.println("Null object in property value message " + msg);
+ 	      else
+ 		obj.localPut((String) msg.getArgument(1), msg.getArgument(2));
+
+ 	      if (FtsServer.debug)
+ 		System.err.println("SetPropertyValue " + obj + " " + msg.getArgument(1)
+ 				   + " " + msg.getArgument(2));
+ 	    }
+ 	  else
+ 	    System.err.println("Wrong property value message " + msg);
 	}
       break;
 

@@ -194,7 +194,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 
     if (className.equals("table"))
       obj = new FtsTableObject(parent, className, makeDescription(2, msg), objId);
-    if (className.equals("qlist"))
+    else if (className.equals("qlist"))
       obj = new FtsQlistObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("patcher"))
       obj = new FtsPatcherObject(parent, (String) msg.getArgument(3),
