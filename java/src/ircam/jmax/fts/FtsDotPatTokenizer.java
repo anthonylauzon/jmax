@@ -82,7 +82,7 @@ class FtsDotPatTokenizer
   Object getEnvValue(int idx)
   {
     if (idx > env.size())
-      return "0";
+      return new FtsParse.IntegerString("0");
     else
       return env.elementAt(idx - 1);
   }
@@ -240,7 +240,7 @@ class FtsDotPatTokenizer
 		  }
 		else
 		  {
-		    buf.append((char) '$');
+		    buf.append((char) '#');
 		    buf.append((char) c);
 		    status = tt_in_string;
 		  }

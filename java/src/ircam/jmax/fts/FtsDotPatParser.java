@@ -590,6 +590,7 @@ public class FtsDotPatParser
 
 	    return new FtsVoidObject(parent);
 	  }
+
 	if (in.ttype == FtsDotPatTokenizer.TT_STRING)
 	  {
 	    description.append(in.sval);
