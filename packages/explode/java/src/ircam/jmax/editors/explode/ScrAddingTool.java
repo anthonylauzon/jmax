@@ -41,7 +41,7 @@ public class ScrAddingTool extends ScrTool implements PositionListener {
   
   //----------- PositionListener interface ------------
   
-  public void positionChoosen(int x, int y) {
+  public void positionChoosen(int x, int y, int modifiers) {
     ScrEvent aEvent = new ScrEvent();
     itsAdapterProvider.getAdapter().setX(aEvent, x);
     itsAdapterProvider.getAdapter().setY(aEvent, y);

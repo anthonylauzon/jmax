@@ -54,6 +54,7 @@ public class ScrToolbar extends JToolBar implements ActionListener{
   public ScrToolbar(ToolbarProvider theProvider) {
 
     super();
+    setDoubleBuffered(false);
     installTools(theProvider);
 
   }

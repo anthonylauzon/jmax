@@ -9,10 +9,11 @@ import java.util.Enumeration;
 public interface SelectionHandler {
 
   public abstract void select(Object obj);
-  public abstract void selectArea(int x, int y, int w, int h);
   public abstract void deSelect(Object obj);
   public abstract boolean isInSelection(Object obj);
   public abstract Enumeration getSelected();
   public abstract void selectAll();
   public abstract void deselectAll();
+
+  public abstract void selectArea(int x, int y, int w, int h);
 }

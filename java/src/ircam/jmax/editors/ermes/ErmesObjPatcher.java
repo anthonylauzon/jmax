@@ -19,7 +19,6 @@ public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsProper
 
   public ErmesSketchWindow itsSubWindow = null;
   Dimension preferredSize = new Dimension(80,24);
-  String pathForLoading;
  
   /* Note: propertyChanged moved to the upper class, because inlets and outlets
      can change for standard objects also (if they are abstractions that we are
@@ -119,28 +118,6 @@ public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsProper
   }
   
 	
-  //--------------------------------------------------------
-  // GetName
-  //--------------------------------------------------------
-  public String GetName(){
-    return itsNameString;
-  }
-	
-  //--------------------------------------------------------
-  // GetPath
-  //--------------------------------------------------------
-  public String GetPath(){
-    return pathForLoading;
-  }
-	
-  public int MaxWidth(int uno, int due, int tre, int quattro){
-    int MaxInt = uno;
-    if(due>MaxInt) MaxInt=due;
-    if(tre>MaxInt) MaxInt=tre;
-    if(quattro>MaxInt) MaxInt=quattro;
-    return MaxInt;
-  }
-
   public int MaxWidth(int uno, int due, int tre){
     int MaxInt = uno;
     if(due>MaxInt) MaxInt=due;

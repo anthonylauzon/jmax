@@ -24,11 +24,14 @@ public class Selecter extends InteractionModule {
   }
   
   public void mousePressed(MouseEvent e) {
-    oldX = e.getX();  //vars used to XOR-paint the selection rectangle
-    oldY = e.getY();
-    startSelection.setLocation(oldX, oldY);
-
+    interactionBeginAt(e.getX(), e.getY());
   } 
+
+  public void interactionBeginAt(int x, int y) {
+    oldX = x;  //vars used to XOR-paint the selection rectangle
+    oldY = y;
+    startSelection.setLocation(oldX, oldY);
+  }
 
   public void mouseDragged(MouseEvent e) {
 
@@ -44,6 +47,7 @@ public class Selecter extends InteractionModule {
 
     tempRect.setBounds(startSelection.x, startSelection.y, x-startSelection.x, y-startSelection.y);
     normalizeRectangle(tempRect);
+    
     itsListener.selectionChoosen(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
   }
 

@@ -109,8 +109,9 @@ if {$jmaxSplashScreen != "hide"} then {
 }
 
 # boot jMax server
-puts "jMax starting server for $jmaxArch on $jmaxHost"
+
 set jmaxBinDir $jmaxRootDir/fts/bin/$jmaxArch/$jmaxMode
+puts "jMax starting server with parameters $jmaxBinDir $jmaxServerName $jmaxConnection $jmaxHost $jmaxPort" 
 ftsconnect $jmaxBinDir $jmaxServerName $jmaxConnection $jmaxHost $jmaxPort
 
 # hello server
@@ -136,3 +137,6 @@ sourceFile $jmaxRootDir/config/midi.tcl
 # run the start Hooks, by hand !!!
 # so we are sure the correct configuration is there ...
 runHooks start
+
+
+

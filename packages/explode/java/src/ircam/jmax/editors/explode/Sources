@@ -1,4 +1,5 @@
 SOURCES = \
+	ArrowTool.java		\
 	DurationMapper.java	\
 	Explode.java		\
 	ExplodeDataModel.java	\
@@ -19,11 +20,11 @@ SOURCES = \
 	PitchMapper.java	\
 	PositionListener.java	\
 	Renderer.java		\
+	RenderProvider.java	\
 	ScoreRenderer.java	\
 	ScrAddingTool.java	\
 	ScrEvent.java		\
 	ScrPanel.java		\
-	ScrSelectingTool.java	\
 	ScrTool.java		\
 	ScrToolbar.java		\
 	Selecter.java		\

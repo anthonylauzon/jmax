@@ -22,7 +22,7 @@ public class MouseTracker extends InteractionModule {
   
   public void mousePressed(MouseEvent e) {
     
-    itsListener.positionChoosen(e.getX(), e.getY());
+    itsListener.positionChoosen(e.getX(), e.getY(), e.getModifiers());
 
   } 
 }

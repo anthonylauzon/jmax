@@ -24,13 +24,20 @@ public class PartitionEventRenderer implements EventRenderer {
     int lenght = itsAdapterProvider.getAdapter().getLenght(e);
 
     if (selected) g.setColor(Color.red);
+    else g.setColor(Color.black);
 
     g.fillRect(x, y, lenght, NOTE_DEFAULT_HEIGHT);
     g.drawString(""+e.getPitch(), x, y-5);
 
-    if (selected) g.setColor(Color.black);
   }
   
+  public boolean contains(ScrEvent e, int x, int y) {
+    int evtx = itsAdapterProvider.getAdapter().getX(e);
+    int evty = itsAdapterProvider.getAdapter().getY(e);
+    int evtlenght = itsAdapterProvider.getAdapter().getLenght(e);
+
+    return  (evtx<=x && (evtx+evtlenght >= x) && evty<=y && (evty+NOTE_DEFAULT_HEIGHT) >= evty);
+  }
 }
 
 

@@ -24,6 +24,8 @@ public class ScoreRenderer implements Renderer, ImageObserver{
   public static final int XINTERVAL = 10;
   public static final int YINTERVAL = 3;
 
+  int firstIndexDisplayed = 0;
+  int lastIndexDisplayed = 0;
 
   /**
    * Constructor with the graphic container and the ExplodeDataModel (the data base)
@@ -87,7 +89,8 @@ public class ScoreRenderer implements Renderer, ImageObserver{
       itsEventRenderer.render(temp, g, itsSelection.isInSelection(temp));
       
     }
-    
+    firstIndexDisplayed = startEvent;
+    lastIndexDisplayed = endEvent;
   }
   
   boolean prepareBackground(Graphics g) {
@@ -99,13 +102,23 @@ public class ScoreRenderer implements Renderer, ImageObserver{
       
     }
     else {
-      
+      g.setColor(Color.white);
+      g.fillRect(0, 0, 1000, 1000);
       if (!g.drawImage(itsImage, 0/*12*/, -1/*20*/, this))
 	System.err.println("OH-OH something wrong: incomplete Image  ");
     }
     return true;
   }
   
+  public ScrEvent eventContaining(int x, int y) {
+
+    ScrEvent aScrEvent;
+    for (int i=firstIndexDisplayed; i<=lastIndexDisplayed; i++) {
+      aScrEvent = itsExplodeDataModel.getEventAt(i);
+      if (itsEventRenderer.contains(aScrEvent, x, y))
+	return aScrEvent;
+    }
+    return null;
+  }
+
 }
-
-

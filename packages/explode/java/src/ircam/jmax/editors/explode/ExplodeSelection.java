@@ -49,13 +49,8 @@ public class ExplodeSelection implements SelectionHandler {
     int upperPitch = itsAdapter.getInvY(y);
     int lowerPitch = itsAdapter.getInvY(y+h);
 
-    int startIndex = itsModel.indexOfFirstEventAfter(startTime);
-    int endIndex = itsModel.indexOfLastEventBefore(endTime);
-    
-    /*System.err.println("----selecting area");
-    System.err.println("startTime "+startTime+" endTime "+endTime);
-    System.err.println("upperPitch "+upperPitch+" lowerPitch "+lowerPitch);
-    System.err.println("beginIndex "+startIndex+" endIndex "+endIndex);*/
+    int startIndex = itsModel.indexOfLastEventEndingBefore(startTime)+1;
+    int endIndex = itsModel.indexOfFirstEventStartingAfter(endTime)-1;
 
     ScrEvent aScrEvent;
     for (int i = startIndex; i<= endIndex; i++) {

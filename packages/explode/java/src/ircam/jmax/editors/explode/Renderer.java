@@ -10,4 +10,6 @@ public interface Renderer {
 
   abstract public void render(Graphics g, int startEvent, int endEvent);
   abstract public EventRenderer getEventRenderer();
+  abstract public ScrEvent eventContaining(int x, int y);
+
 }

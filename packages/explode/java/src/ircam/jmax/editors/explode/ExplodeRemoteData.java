@@ -127,20 +127,18 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
     int index;
 
     index = getIndexAfter(event.getTime());
-    System.err.println("index "+index);
+
     makeRoomAt(index);
     events[index] = event;
-    System.err.println("added event ["+index+"] time: "+event.getTime()+" pitch: "+event.getPitch());
-
-    // Send the new event to fts
     
     Object args[] = new Object[6];
     args[0] = new Integer(index);
-    args[1] = new Integer(evt.getTime());
-    args[2] = new Integer(evt.getPitch());
-    args[3] = new Integer(evt.getVelocity());
-    args[4] = new Integer(evt.getDuration());
-    args[5] = new Integer(evt.getSomething());
+    args[1] = new Integer(event.getTime());
+    args[2] = new Integer(event.getPitch());
+    args[3] = new Integer(event.getVelocity());
+    args[4] = new Integer(event.getDuration());
+    args[5] = new Integer(event.getSomething());
+
     remoteCall(REMOTE_ADD, args);
 
     notifyListeners();
@@ -163,7 +161,7 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 	    // Send the remove command to fts
 
 	    Object args[] = new Object[1];
-	    args[0] = new Integer(index);
+	    args[0] = new Integer(removeIndex);
 	    remoteCall(REMOTE_REMOVE, args);
 
 	    notifyListeners();
@@ -193,7 +191,7 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
     return events[index];
   }
 
-  public int indexOfFirstEventAfter(int time) {
+  public int indexOfFirstEventStartingAfter(int time) {
     int index;
 
     index = getIndexAfter(time);
@@ -204,13 +202,43 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
       return index;
   }
 
-  public int indexOfLastEventBefore(int time) {
+  public int indexOfLastEventEndingBefore(int time) {
     int index;
 
     index = getIndexAfter(time);
-    if (index == 0) return 0;
-    else return index-1;
+    
+    for (;index>=0;index--) {
+      if (events[index].getTime()+events[index].getDuration() < time)
+	break;
+    }
+    return index;
 
+  }
+
+  private class ExplodeLivingEnumeration implements Enumeration {
+    
+    int index;
+    int time;
+    
+    private ExplodeLivingEnumeration(int theTime) {
+      time = theTime;
+      index = indexOfLastEventEndingBefore(time);
+      while(events[index].getTime()+events[index].getDuration() < time ) 
+	index++;
+    }
+
+    public boolean hasMoreElements() {
+      return events[index].getTime() <= time;
+    }
+    
+    public Object nextElement() {
+      return events[index++];
+    }
+    
+  }
+  
+  public Enumeration eventsLivingAt(int time) {
+    return new ExplodeLivingEnumeration(time);
   }
 
   /* a method inherited from FtsRemoteData */

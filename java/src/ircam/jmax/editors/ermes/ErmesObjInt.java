@@ -109,25 +109,11 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
     
     int temp = ((Integer) value).intValue();
     
-    last_value = temp;
-    if (receiving_index < transmission_index && temp == transmission_buffer[receiving_index]) {
-      //Ok, the buffer is working, the value is the one we sent...
-      receiving_index += 1;
-      if (receiving_index == transmission_index) {
-	receiving_index = 0;
-	transmission_index = 0;
-      }
-      return;
+    if (itsInteger != temp) {
+      itsInteger = temp;
+      Paint_specific(itsSketchPad.getGraphics());
     }
-    else {
-      // we're receiving other values
-      transmission_index = 0;
-      receiving_index = 0;
-      if (itsInteger != temp) {
-	itsInteger = temp;//era solo questo
-	Paint_specific(itsSketchPad.getGraphics());
-      }
-    }		
+    
   }
 
   public void FromDialogValueChanged(int theInt){
@@ -198,7 +184,7 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
 	  itsStartingY = itsInteger;
 
 	itsFtsObject.put("value", new Integer(itsInteger));
-	Trust(itsInteger);
+	
       }
     else 
       itsSketchPad.ClickOnObject(this, evt, x, y);
@@ -218,17 +204,6 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
     //itsIntegerDialog.setVisible(true);
   }
 
-  void Trust (int theInt) {
-    if (transmission_index == TRUST) {
-      //we sent more then TRUST values without acknowledge...
-      //write a message? FTS, are you there?
-      itsInteger = last_value;
-      DoublePaint();
-    }
-    else {
-      transmission_buffer[transmission_index++] = theInt;
-    }
-  }
 	
   //--------------------------------------------------------
   //  mouseUp
@@ -260,7 +235,7 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
 	itsInteger = itsStartingY + (itsFirstY - y);
 	itsFtsObject.put( "value", new Integer(itsInteger));
 	DoublePaint();
-	Trust( itsInteger);
+	
 	return true;
       }
     else
@@ -397,6 +372,7 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
 	      {
 		int value = Integer.parseInt( currentText.toString());
 
+		itsInteger = value;
 		itsFtsObject.put( "value", new Integer( value));
 	      }
 	    catch ( NumberFormatException exception)
@@ -416,7 +392,7 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
 	  }
 
 	DoublePaint();
-	Trust( itsInteger);
+
       }
   }
 

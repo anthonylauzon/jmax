@@ -45,6 +45,7 @@ public class SplashDialog extends Dialog implements KeyListener, MouseListener, 
 	
   public void actionPerformed(ActionEvent e) {
     setVisible(false);
+    itsImage = null;
     dispose();
     Timer aTimer = (Timer) e.getSource();
     aTimer.stop();

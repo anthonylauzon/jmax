@@ -30,13 +30,19 @@ public interface ExplodeDataModel {
    * access the first event whose starting time is 
    * after a given time
    */
-  public abstract int indexOfFirstEventAfter(int time);
+  public abstract int indexOfFirstEventStartingAfter(int time);
 
   /**
-   * access the last event whose ending time is 
+   * access the last event whose ENDING time is 
    * before a given time
    */
-  public abstract int indexOfLastEventBefore(int time);
+  public abstract int indexOfLastEventEndingBefore(int time);
+
+
+  /**
+   * the enumeration of all the events active in a given moment
+   */
+  public abstract Enumeration eventsLivingAt(int time);
 
   /**
    * adds an event in the database

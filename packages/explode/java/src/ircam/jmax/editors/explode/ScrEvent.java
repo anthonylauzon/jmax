@@ -69,6 +69,10 @@ public class ScrEvent {
     return itsDuration;
   }
 
+  public final int getSomething() {
+    return itsSomethingElse;
+  }
+  
   /* the corresponding set functions.. */
   public final void setTime(int time) {
     itsTime = time;

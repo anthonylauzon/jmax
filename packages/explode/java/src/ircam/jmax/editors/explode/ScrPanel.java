@@ -13,7 +13,7 @@ import java.util.*;
    * The user interaction is handled by the tools. 
    * 
    */
-public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProvider, ToolListener, AdapterProvider{
+public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProvider, ToolListener, AdapterProvider, RenderProvider{
   
   public final int PANEL_WIDTH = 800;
   public final int PANEL_HEIGHT = 400;
@@ -39,7 +39,9 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    */
   public ScrPanel(ExplodeDataModel ep) {
     
+    setSize(PANEL_WIDTH, PANEL_HEIGHT);
     setLayout(new BorderLayout());
+    setBackground(Color.white);
     setExplodeDataModel(ep);
     setAdapter(new PartitionAdapter());
     itsSelection = new ExplodeSelection(itsExplodeDataModel, itsAdapter);
@@ -70,8 +72,9 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     }
     itsTimeScrollbar = new Scrollbar(Scrollbar.HORIZONTAL, 0, 1000, 0, totalTime);
     
-    itsTimeScrollbar.setUnitIncrement(windowTimeWidth()/100);
-    itsTimeScrollbar.setBlockIncrement(windowTimeWidth()/3);
+    //WARN: setUnitIncrement seems not to work, while setBlockIncrement do
+    itsTimeScrollbar.setUnitIncrement(windowTimeWidth()/10);
+    itsTimeScrollbar.setBlockIncrement(windowTimeWidth());
 
     itsTimeScrollbar.addAdjustmentListener(new AdjustmentListener() {
       public void adjustmentValueChanged(AdjustmentEvent e) {
@@ -79,15 +82,14 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
 	logicalTime = e.getValue();
 	int maxIndex = itsExplodeDataModel.length();
 	
-	int howMany = itsExplodeDataModel.indexOfLastEventBefore(logicalTime+windowTimeWidth());
+	int first = itsExplodeDataModel.indexOfLastEventEndingBefore(logicalTime)+1;
+	int last = itsExplodeDataModel.indexOfFirstEventStartingAfter(logicalTime+windowTimeWidth())-1;
 
-	int temp = itsExplodeDataModel.indexOfFirstEventAfter(logicalTime);
 
-	if (temp != -1) 
+	if (first != -1) 
 	  {
 	    ((PartitionAdapter)itsAdapter).setXTransposition(-logicalTime);
-	    if (maxIndex < temp+howMany) howMany = maxIndex-temp; 
-	    itsRenderer.render(getGraphics(), temp, temp+howMany);
+	    itsRenderer.render(getGraphics(), first, last);
 	  }
 	
 	itsLabel.setText("starting time: "+logicalTime+"msec"+"                 zoomfactor"+itsTimeZoom.getValue()+"%");
@@ -163,7 +165,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    * and activate the default tool (the selecter)
    */
   private void initTools() {
-    currentTool = new ScrSelectingTool(this, itsSelection);
+    currentTool = new ArrowTool(this, this, itsSelection);
     tools.addElement(new ScrAddingTool(this, this, itsExplodeDataModel));
     tools.addElement(currentTool);
 
@@ -206,22 +208,19 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     repaint();
   }
 
-  public void update(Graphics g) {
-    if (((ScoreRenderer)itsRenderer).prepareBackground(g))
-      paint(g);
-    else return;
-  }
   
+  public void update(Graphics g) {}
+  /* avoid to paint gray (and then paint white)*/
+
   /**
    * The paint method.
    * Delegated to the current Renderer
    */
   public void paint(Graphics g) {
   
-    int temp1 = itsExplodeDataModel.indexOfFirstEventAfter(logicalTime);
-    //int temp2 = temp1+10;
+    int temp1 = itsExplodeDataModel.indexOfFirstEventStartingAfter(logicalTime);
    
-    int temp2 = itsExplodeDataModel.indexOfLastEventBefore(logicalTime+windowTimeWidth());
+    int temp2 = itsExplodeDataModel.indexOfLastEventEndingBefore(logicalTime+windowTimeWidth());
     itsRenderer.render(g, temp1, temp2);
   }
 
@@ -230,7 +229,8 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   }
 
   int windowTimeWidth() {
-    return (int)(PANEL_WIDTH/(((PartitionAdapter)itsAdapter).getXZoom()));
+    //return (int)(PANEL_WIDTH/(((PartitionAdapter)itsAdapter).getXZoom()));
+    return (int)(getSize().width/(((PartitionAdapter)itsAdapter).getXZoom()));
   }
 
   /**
