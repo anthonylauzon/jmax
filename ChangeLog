@@ -1,3 +1,12 @@
+2003-06-24  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* configure.in, packages/Makefile.am, packages/midishare: updated midishare package to jMax 4.x
+	  - added configure flag for compilation/installation of midishare package.
+	  - midishare package only allow one input and one output port.
+	  - input tested with msplayer
+	  - output tested with msdisplay
+	  - connection with msplayer and msdisplay made by msconnect.
+
 2003-06-17  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* fts/audio.c, fts/client.c, fts/main.c, fts/sched.c, include/fts/sched.h, include/ftsprivate/sched.h:
