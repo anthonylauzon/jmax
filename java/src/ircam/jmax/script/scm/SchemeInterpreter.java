@@ -112,9 +112,9 @@ public abstract class SchemeInterpreter implements Interpreter
 	    File file = new File(filename);
 	    String dir = file.getParent();
 	    Object old_dir = lookup("dir");
-	    // define("dir", dir);
+	    define("dir", dir);
 	    Object result = load(file);
-	    // define("dir", old_dir);
+	    define("dir", old_dir);
 	    return result;
 	} catch (Exception e) {
 	    System.out.println("Can't load " + e.getMessage());

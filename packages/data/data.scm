@@ -36,7 +36,7 @@
 
 ;; help
 (sshh-load (file-cat dir "help" "data.help.index.scm"))
-(help-summary "data summary" (file-cat dir "help" "data.summary.jmax"))
+(help-summary "Data summary" (file-cat dir "help" "data.summary.jmax"))
 
 (println "package: data (data structures)")
 

@@ -1,0 +1,5 @@
+(help-patch "sequence" (file-cat dir "sequence.help.jmax"))
+(help-patch "seqstep" (file-cat dir "seqstep.help.jmax"))
+(help-patch "seqplay" (file-cat dir "seqplay.help.jmax"))
+(help-patch "seqrec" (file-cat dir "seqrec.help.jmax"))
+(help-patch "seqfind" (file-cat dir "seqfind.help.jmax"))

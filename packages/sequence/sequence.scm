@@ -33,7 +33,7 @@
 
 ;; load the help patch data base
 (sshh-load (file-cat dir "help" "sequence.help.index.scm"))
-(help-summary "sequence summary" (file-cat dir "help" "sequence.summary.jmax"))
+(help-summary "Sequence summary" (file-cat dir "help" "sequence.summary.jmax"))
 
 (println "package: sequence (sequencing classes)")
 
