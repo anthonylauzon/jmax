@@ -12,6 +12,20 @@ import ircam.jmax.mda.*;
 
 public class FtsTableObject extends FtsObject implements FtsIntegerVectorObject, FtsDataObject
 {
+  /**
+   * TableMessageHandler interpret the dedicated messages 
+   * coming from FTS to the table object
+   */
+
+  class TableMessageHandler implements FtsMessageHandler
+  {
+    public void handleMessage(FtsMessage msg)
+    {
+      if (vector != null)
+	vector.updateFromMessage(msg);
+    }
+  }
+
   MaxData data = null;
   FtsIntegerVector vector = null;
   int vectorSize = 128;
@@ -42,6 +56,8 @@ public class FtsTableObject extends FtsObject implements FtsIntegerVectorObject,
 
     if ((args.size() >= 3) && (args.elementAt(0) instanceof Integer))
       vectorSize = ((Integer) args.elementAt(0)).intValue();
+
+    installMessageHandler(new TableMessageHandler());
 
     if (parent.isOpen())
       FtsServer.getServer().syncToFts();
@@ -90,8 +106,6 @@ public class FtsTableObject extends FtsObject implements FtsIntegerVectorObject,
   public MaxDataType getObjectDataType()
   {
     return MaxDataType.getTypeByName("integerVector");
-
-
   }
 
   public MaxData getData()

@@ -81,6 +81,16 @@ public class FtsIntegerVector
     FtsServer.getServer().sendObjectMessage(object, -1, "update", null);
   }
 
+  void updateFromMessage(FtsMessage msg)
+  {
+    int updateSize;
+
+    updateSize = ((Integer) msg.getArgument(2)).intValue();
+
+    for (int i = 0 ; i < updateSize; i++)
+      values[i] = ((Integer) msg.getArgument(i + 3)).intValue();
+  }
+
   /** Declare that a range in the vector has been changed
    * and this range need to be sent to FTS
    */
