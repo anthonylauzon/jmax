@@ -52,36 +52,37 @@ if {$jmaxArch == "irix6.2"} {
 
 } elseif {$jmaxArch == "origin"} {
 
-#     one ADAT card
+# one ADAT card
 
-#    puts "    multi: 8/8 (default)"
-#    ucs open device in~ multi as SgiALIn ALdevice ADATIn channels 8 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ multi as SgiALOut ALdevice ADATOut channels 8 fifo_size $jmaxAudioBuffer
+#    puts "    default: 8/8 (default)"
+#    ucs open device in~ default as SgiALIn ALdevice ADATIn channels 8 fifo_size $jmaxAudioBuffer
+#    ucs open device out~ default as SgiALOut ALdevice ADATOut channels 8 fifo_size $jmaxAudioBuffer
 
-#    puts "    stereo: 2/2"
-#    ucs open device in~ stereo as SgiALIn ALdevice AESIn channels 2 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ stereo as SgiALOut ALdevice AESOut channels 2 fifo_size $jmaxAudioBuffer
-#
-#    ucs default in~ multi
-#    ucs default out~ multi
+#    puts "    default: 2/2"
+#    ucs open device in~ default as SgiALIn ALdevice AESIn channels 2 fifo_size $jmaxAudioBuffer
+#    ucs open device out~ default as SgiALOut ALdevice AESOut channels 2 fifo_size $jmaxAudioBuffer
+
+#    ucs default in~ default
+#    ucs default out~ default
 #     two ADAT cards
 
+# two ADAT cards
 
-#    puts "    multi1: 8/8 (default)"
-#    ucs open device in~ multi1 as SgiALIn ALdevice RAD1.ADATIn channels 8 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ multi1 as SgiALOut ALdevice RAD1.ADATOut channels 8 fifo_size $jmaxAudioBuffer
+#    puts "    default: 8/8 (default)"
+#    ucs open device in~ default as SgiALIn ALdevice RAD1.ADATIn channels 8 fifo_size $jmaxAudioBuffer
+#    ucs open device out~ default as SgiALOut ALdevice RAD1.ADATOut channels 8 fifo_size $jmaxAudioBuffer
 
-#    puts "    stereo1: 2/2"
-#    ucs open device in~ stereo1 as SgiALIn ALdevice RAD1.AESIn channels 2 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ stereo1 as SgiALOut ALdevice RAD1.AESOut channels 2 fifo_size $jmaxAudioBuffer
+#    puts "    default: 2/2"
+#    ucs open device in~ default as SgiALIn ALdevice RAD1.AESIn channels 2 fifo_size $jmaxAudioBuffer
+#    ucs open device out~ default as SgiALOut ALdevice RAD1.AESOut channels 2 fifo_size $jmaxAudioBuffer
 
-#    puts "    multi2: 8/8"
-#    ucs open device in~ multi2 as SgiALIn ALdevice RAD2.ADATIn channels 8 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ multi2 as SgiALOut ALdevice RAD2.ADATOut channels 8 fifo_size $jmaxAudioBuffer
+#    puts "    default: 8/8"
+#    ucs open device in~ default as SgiALIn ALdevice RAD2.ADATIn channels 8 fifo_size $jmaxAudioBuffer
+#    ucs open device out~ default as SgiALOut ALdevice RAD2.ADATOut channels 8 fifo_size $jmaxAudioBuffer
 
-#    puts "    stereo2: 2/2"
-#    ucs open device in~ stereo2 as SgiALIn ALdevice RAD2.AESIn channels 2 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ stereo2 as SgiALOut ALdevice RAD2.AESOut channels 2 fifo_size $jmaxAudioBuffer
+#    puts "    default: 2/2"
+#    ucs open device in~ default as SgiALIn ALdevice RAD2.AESIn channels 2 fifo_size $jmaxAudioBuffer
+#    ucs open device out~ default as SgiALOut ALdevice RAD2.AESOut channels 2 fifo_size $jmaxAudioBuffer
 
 #    ucs default in~ default
 #    ucs default out~ default
