@@ -268,6 +268,7 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener, Compone
       int toolbarwidth = getSize().width - 2*BUTTON_WIDTH-10;
       int visibleButtons = ((toolbarwidth/BUTTON_WIDTH)> numButtons)? numButtons: toolbarwidth/BUTTON_WIDTH;
       int numPopButtons = numButtons - visibleButtons;
+
       if(numPopButtons == 1) 
 	  {
 	      numPopButtons = 0;
@@ -283,7 +284,7 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener, Compone
 
 	  for(int i = 0; i < toRemove; i++)
 	  {
-	      if(where-2>0)
+	      if(where-2 >= 0)
 		  {
 		      button = (ErmesToolButton)(toolBar.getComponent(where-2));
 		      toolBar.remove(where-2);
