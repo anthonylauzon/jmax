@@ -373,17 +373,17 @@ jmax_get_available_jvm(void)
   }
   
   /* check in the windows registry for IBM's and Sun's JVMs */
+  if (jmax_get_jvm_from_registry(buf, _MAX_PATH, SUN_JRE_13, SUN_RELEASE_13)) {
+    if (_stat(buf, &statbuf) == 0) {
+      jmax_append_jvm(buf);
+    }
+  }
   if (jmax_get_jvm_from_registry(buf, _MAX_PATH, IBM_JRE_13, IBM_RELEASE_13)) {
     if (_stat(buf, &statbuf) == 0) {
       jmax_append_jvm(buf);
     }
   }
 
-  if (jmax_get_jvm_from_registry(buf, _MAX_PATH, SUN_JRE_13, SUN_RELEASE_13)) {
-    if (_stat(buf, &statbuf) == 0) {
-      jmax_append_jvm(buf);
-    }
-  }
 }
 
 static int

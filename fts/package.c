@@ -46,9 +46,24 @@ static int fts_package_stack_top = 0;
 
 static fts_status_description_t fts_DuplicatedMetaclass = {"Duplicated metaclass"};
 
-static fts_symbol_t fts_s_require;
-static fts_symbol_t fts_s_template_path;
-static fts_symbol_t fts_s_data_path;
+static fts_symbol_t fts_s_require = 0;
+static fts_symbol_t fts_s_template_path = 0;
+static fts_symbol_t fts_s_data_path = 0;
+static fts_symbol_t fts_s_package = 0;
+
+
+static int fts_package_load(fts_package_t* pkg);
+
+static fts_status_t fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
+static void __fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void __fts_package_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void __fts_package_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void __fts_package_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void __fts_package_template(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void __fts_package_template_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void __fts_package_abstraction(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void __fts_package_abstraction_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void __fts_package_data_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 
 #ifdef WIN32
@@ -83,11 +98,17 @@ fts_kernel_package_init(void)
   fts_package_set_state(fts_system_package, fts_package_loaded); /* FIXME: hack [pH07] */
   fts_push_package(fts_system_package);
 
+  /* define the package (meta-) class */
+  fts_s_package = fts_new_symbol("package");
+  fts_metaclass_install(fts_s_package, fts_package_instantiate, fts_always_equiv);
+
+  /******************** FIXME to be removed***********************************/
+
   /* create the package configuration objects */
   fts_s_require = fts_new_symbol("require");
   fts_s_template_path = fts_new_symbol("template-path");
   fts_s_data_path = fts_new_symbol("data-path");
-  
+
   fts_metaclass_install(fts_s_require, fts_require_instantiate, fts_always_equiv);
   fts_metaclass_install(fts_s_template, fts_template_instantiate, fts_always_equiv);
   fts_metaclass_install(fts_s_template_path, fts_template_path_instantiate, fts_always_equiv);
@@ -213,21 +234,44 @@ fts_pop_package(void)
 
 /***********************************************
  *
- *  Package object 
+ *  Package class 
  */
 
-fts_package_t* 
-new_fts_package(fts_symbol_t name)
+static fts_status_t
+fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_package_t* pkg;
+  fts_class_init(cl, sizeof(fts_package_t), 1, 0, 0);
 
-  pkg = fts_malloc(sizeof(fts_package_t));
-  if (pkg == NULL) {
-    return NULL;
-  }
-  pkg->name = name;
-  pkg->dir = fts_new_symbol("");
-  pkg->state = fts_package_defined;
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, __fts_package_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, __fts_package_delete);
+
+  fts_method_define_varargs(cl, 0, fts_new_symbol("load"), __fts_package_load);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("require"), __fts_package_require);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("template"), __fts_package_template);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("template-path"), __fts_package_template_path);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("abstraction"), __fts_package_abstraction);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("abstraction-path"), __fts_package_abstraction_path);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("data-path"), __fts_package_data_path);
+
+  return fts_Success;
+}
+
+/***********************************************
+ *
+ *  Package object: implemetation of fts methods 
+ */
+
+void 
+__fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+
+  ac--;
+  at++;
+
+  pkg->name = NULL;
+  pkg->dir = NULL;
+  pkg->state = fts_package_loaded;
   pkg->error = NULL;
   pkg->patcher = NULL;
   pkg->packages = NULL;
@@ -243,13 +287,12 @@ new_fts_package(fts_symbol_t name)
 
   pkg->help = NULL;
   pkg->data_paths = NULL;
-
-  return pkg;
 }
 
 void 
-delete_fts_package(fts_package_t* pkg)
+__fts_package_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  fts_package_t* pkg = (fts_package_t *)o;
   if (pkg->packages != NULL) {
     fts_list_delete(pkg->packages);
   }
@@ -283,9 +326,105 @@ delete_fts_package(fts_package_t* pkg)
   if (pkg->patcher != NULL) {
     fts_object_destroy(pkg->patcher);
   }
-
-  fts_free(pkg);
 }
+
+static void 
+__fts_package_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+
+  fts_package_load(pkg);
+}
+
+static void 
+__fts_package_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+  int i;
+
+  for (i = 0; i < ac; i++) {
+    if (fts_is_symbol(&at[i])) {
+      fts_package_require(pkg, fts_get_symbol(&at[i]));
+    }
+  }
+}
+
+static void 
+__fts_package_template(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+
+  if ((ac >= 2) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1])) {
+    fts_package_add_template(pkg, fts_get_symbol(&at[0]), fts_get_symbol(&at[1]));
+  }
+}
+
+static void 
+__fts_package_template_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+  int i;
+
+  for (i = 0; i < ac; i++) {
+    if (fts_is_symbol(&at[i])) {
+      fts_package_add_template_path(pkg, fts_get_symbol(&at[i]));
+    }
+  }
+}
+
+static void 
+__fts_package_abstraction(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+
+  if ((ac >= 2) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1])) {
+    fts_package_add_abstraction(pkg, fts_get_symbol(&at[0]), fts_get_symbol(&at[1]));
+  }
+}
+
+static void 
+__fts_package_abstraction_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+  int i;
+
+  for (i = 0; i < ac; i++) {
+    if (fts_is_symbol(&at[i])) {
+      fts_package_add_abstraction_path(pkg, fts_get_symbol(&at[i]));
+    }
+  }
+}
+
+static void 
+__fts_package_data_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+  int i;
+  
+  for (i = 0; i < ac; i++) {
+    if (fts_is_symbol(&at[i])) {
+      fts_package_add_data_path(pkg, fts_get_symbol(&at[i]));
+    }
+  }
+}
+
+/***********************************************
+ * 
+ *  package object: old methods 
+ */
+
+fts_package_t* 
+new_fts_package(fts_symbol_t name)
+{
+  return (fts_package_t *) fts_object_create(fts_class_get_by_name(fts_s_package), 0, 0);
+}
+
+void 
+delete_fts_package(fts_package_t* pkg)
+{
+  fts_object_destroy( (fts_object_t*) pkg);
+}
+
 
 fts_symbol_t 
 fts_package_get_name(fts_package_t* pkg)
@@ -550,6 +689,10 @@ fts_package_get_template_from_file(fts_package_t* pkg, fts_symbol_t filename)
     if (fts_template_get_filename(template) == filename) {
       return template;
     }
+  }
+
+  if (pkg->templates_in_path == NULL) {
+    return NULL;    
   }
 
   fts_hashtable_get_values(pkg->templates_in_path, &iter);
