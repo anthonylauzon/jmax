@@ -154,18 +154,18 @@ abstract public class Adapter implements MappingListener{
   /**
    * get the label value (int) for this event
    */
-    public int getLabel(Event e) 
+    public String getLabel(Event e) 
   {
     if (LabelMapper != null) return LabelMapper.get(e);
-    else return 0;
+    else return "";
   }
 
   /**
    * sets the parameter of the event associated with the Label
    */
-    public void setLabel(Event e, int lenght) 
+  public void setLabel(Event e, String label) 
   {
-    LabelMapper.set(e, lenght);
+    LabelMapper.set(e, label);
   }
 
   /**
@@ -198,7 +198,7 @@ abstract public class Adapter implements MappingListener{
   public Mapper YMapper;
   public Mapper LenghtMapper;
   public Mapper HeigthMapper;
-  public Mapper LabelMapper;
+  public StringMapper LabelMapper;
 
     Geometry geometry; //package private
   String itsName;

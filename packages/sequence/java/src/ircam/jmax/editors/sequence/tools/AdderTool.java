@@ -120,7 +120,6 @@ public class AdderTool extends Tool implements PositionListener {
 	
 	  // ends the undoable transition
 	  ((UndoableData) egc.getDataModel()).endUpdate();*/
-
 	egc.getTrack().getFtsTrack().requestEventCreation((float)aEvent.getTime(), 
 							  value.getValueInfo().getName(), 
 							  value.getPropertyCount(), 

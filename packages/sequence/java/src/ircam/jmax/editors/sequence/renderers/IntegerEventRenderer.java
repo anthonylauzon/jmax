@@ -88,11 +88,6 @@ public class IntegerEventRenderer implements ObjectRenderer {
 	      Event prev;
 	      if(e instanceof UtilTrackEvent)//during the XOR draw
 		  {
-		      /*per disegnare anche le linee tra punti spostati
-			dovrei farmi dare dal mio UtilTrackEvent il deltaX e
-			il deltaY che lo distinguono dall'originale. Con quelli potrei
-			aggiornare il next e prev se selezionati e disegnare le rette*/
-
 		      TrackEvent original = ((UtilTrackEvent)e).getOriginal();
 		      prev = model.getPreviousEvent(e.getTime());
 		      
@@ -105,8 +100,14 @@ public class IntegerEventRenderer implements ObjectRenderer {
 		      if(next == original)
 			  next = model.getNextEvent(original);
 		  
-		      if((next != null)&&(!SequenceSelection.getCurrent().isInSelection(next)))
-			  g.drawLine(x, y, adapter.getX(next), adapter.getY(next)); 
+		      if(next != null)
+			 if (!SequenceSelection.getCurrent().isInSelection(next))
+			     g.drawLine(x, y, adapter.getX(next), adapter.getY(next));
+			 else
+			     {//qui anche il next e' selezionato
+				 g.drawLine(x, y, adapter.getX(next)+((UtilTrackEvent)e).getDeltaX(adapter), 
+					    adapter.getY(next)+((UtilTrackEvent)e).getDeltaY(adapter));
+			     }
 		  }
 	      else //normal paint
 		  {

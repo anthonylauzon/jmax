@@ -64,6 +64,11 @@ public class AmbitusValue extends AbstractEventValue
     {
       return AMBITUS_NAME;
     }
+
+    public String getPublicName()
+    {
+      return AMBITUS_PUBLIC_NAME;
+    }
     
 
     public ImageIcon getIcon()
@@ -140,6 +145,7 @@ public class AmbitusValue extends AbstractEventValue
     public static final int DEFAULT_MIN_PITCH = 0;
     public static final String fs = File.separator;
     public static final String AMBITUS_NAME = "noteevt";
+    public static final String AMBITUS_PUBLIC_NAME = "note";
     static String path;
     public static ImageIcon AMBITUS_ICON;
     public static AmbitusValueInfo info = new AmbitusValueInfo();

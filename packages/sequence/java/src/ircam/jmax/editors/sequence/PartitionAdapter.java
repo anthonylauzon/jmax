@@ -50,7 +50,7 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
       YMapper = PitchMapper.getMapper();
       LenghtMapper = DurationMapper.getMapper();
       HeigthMapper = AmbitusMapper.getMapper();
-      LabelMapper = PitchMapper.getMapper();
+      LabelMapper = PitchLabelMapper.getMapper();
       
       itsName = "Standard Adapter";
       this.gc = gc;
@@ -329,13 +329,13 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
     else if (graphicName.equals("label")) 
       {
 	if (scoreName.equals("pitch"))
-	  LabelMapper = PitchMapper.getMapper();
-	else if (scoreName.equals("duration"))
-	  LabelMapper = DurationMapper.getMapper();
-	else if (scoreName.equals("velocity"))
-	  LabelMapper = VelocityMapper.getMapper();
-	else if (scoreName.equals("channel"))
-	  LabelMapper = ChannelMapper.getMapper();
+	  LabelMapper = PitchLabelMapper.getMapper();
+	/*else if (scoreName.equals("duration"))
+	  LabelMapper = DurationLabelMapper.getMapper();
+	  else if (scoreName.equals("velocity"))
+	  LabelMapper = VelocityLabelMapper.getMapper();
+	  else if (scoreName.equals("channel"))
+	  LabelMapper = ChannelLabelMapper.getMapper();*/
       }
 
   }

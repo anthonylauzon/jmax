@@ -35,7 +35,6 @@ public class LogicValue extends AbstractEventValue
 	    return LOGIC_NAME;
 	}
 
-
 	public ImageIcon getIcon()
 	{
 	    return LOGIC_ICON;

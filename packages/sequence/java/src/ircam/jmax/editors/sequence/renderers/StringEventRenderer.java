@@ -71,7 +71,6 @@ public class StringEventRenderer implements ObjectRenderer {
     int x = gc.getAdapter().getX(e);
     int y = gc.getAdapter().getY(e);
 
-
     if (selected) 
 	g.setColor(Color.red);
     else 

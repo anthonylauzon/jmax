@@ -18,6 +18,11 @@ public class AbstractValueInfo implements ValueInfo {
 	return "unknown";
     }
 
+    public String getPublicName()
+    {
+	return "unknown";
+    }
+
     public ImageIcon getIcon()
     {
 	return GENERIC_ICON;

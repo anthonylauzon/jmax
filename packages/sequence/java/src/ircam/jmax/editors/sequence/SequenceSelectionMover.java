@@ -66,13 +66,10 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
     class SequenceScrollDragAction implements ActionListener
     {
 	SequencePanel sequencePanel;
-	//int delta = 2;
-	//private int count = 0;
 	int x, y, delta;
 	public void actionPerformed(ActionEvent ae)
 	{
 	    delta = sequencePanel.scrollBy(x, y);
-	    //count += delta;
 	    updateStart(-delta, 0);
 	    getListener().updateStartingPoint(-delta, 0);
 
@@ -245,13 +242,15 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	    tempEvent.setTime(movTrackEvent.getTime());
 	    
 	    a.setY(tempEvent, a.getY(movTrackEvent));
+	    a.setLabel(tempEvent, a.getLabel(movTrackEvent));//???
+
 	    a.setLenght(tempEvent, a.getLenght(movTrackEvent));
 	    a.setHeigth(tempEvent, a.getHeigth(movTrackEvent));
 	    if ((itsMovements & HORIZONTAL_MOVEMENT) != 0) 
 		a.setX(tempEvent, a.getX(movTrackEvent) + dx);
-	    
+
 	    if ((itsMovements & VERTICAL_MOVEMENT) != 0) 
-	      a.setY(tempEvent, a.getY(movTrackEvent)+dy);
+		    a.setY(tempEvent, a.getY(movTrackEvent)+dy);
 
 	    movTrackEvent.getRenderer().render(tempEvent, g, true, gc);
 

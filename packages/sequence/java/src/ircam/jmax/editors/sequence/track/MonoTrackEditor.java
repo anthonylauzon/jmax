@@ -47,12 +47,12 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     public MonoTrackEditor(Geometry g, Track track)
     {
 	super();
-	if(track.getProperty("maximumValue")==null)
-	    track.setProperty("maximumValue", new Integer(IntegerValue.DEFAULT_MAX_VALUE));
-	if(track.getProperty("minimumValue")==null)
-	    track.setProperty("minimumValue", new Integer(IntegerValue.DEFAULT_MIN_VALUE));
-	if(track.getProperty("viewMode")==null)
-	    track.setProperty("viewMode", new Integer(viewMode));
+	/*if(track.getProperty("maximumValue")==null)
+	  track.setProperty("maximumValue", new Integer(IntegerValue.DEFAULT_MAX_VALUE));
+	  if(track.getProperty("minimumValue")==null)
+	  track.setProperty("minimumValue", new Integer(IntegerValue.DEFAULT_MIN_VALUE));
+	  if(track.getProperty("viewMode")==null)
+	  track.setProperty("viewMode", new Integer(viewMode));*/
 
 	this.geometry = g;
 	this.track = track;
@@ -117,7 +117,6 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     {
 	MonoTrackPopupMenu.getInstance().update(this);
 	return MonoTrackPopupMenu.getInstance();
-	//return gc.getToolbar().itsPopupMenu;
     }
 
     public int trackCount()

@@ -43,8 +43,12 @@ public class MonoDimensionalAdapter extends PartitionAdapter {
 	this.constant = constant;
 	
 	YMapper = IntegerMapper.getMapper();
-	LabelMapper = IntegerMapper.getMapper();
 	viewMode = MonoTrackEditor.PEAKS_VIEW;
+    }
+
+    public void setLabelMapper(StringMapper mapper)
+    {
+	LabelMapper = mapper;
     }
 
     /**

@@ -72,7 +72,7 @@ public class AmbitusEventRenderer implements ObjectRenderer {
     int x = pa.getX(e);
     int y = pa.getY(e);
     int lenght = pa.getLenght(e);
-    int label = pa.getLabel(e);
+    String label = pa.getLabel(e);
     int heigth = pa.getHeigth(e);
 
     if (heigth == 0)
@@ -108,7 +108,7 @@ public class AmbitusEventRenderer implements ObjectRenderer {
     if(pa.isDisplayLabels())
 	{
 	    g.setFont(SequencePanel.rulerFont);
-	    g.drawString(""+label, x, y-5);
+	    g.drawString(label, x, y-5);
 	}
   }
   

@@ -17,6 +17,8 @@ public interface ValueInfo {
      * Returns the name of the Value */
     abstract public String getName();
 
+    abstract public String getPublicName();
+
     abstract public ImageIcon getIcon();
 
     /**
