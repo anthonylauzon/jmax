@@ -2119,7 +2119,4 @@ track_config(void)
 
   /* the midifile importer will be the last handler tried */
   fts_class_add_import_handler(track_class, track_import_midifile);
-  
-  content_dumper_class = fts_class_install(NULL, content_dumper_instantiate);
-  content_dumper = (content_dumper_t *)fts_object_create(content_dumper_class, 0, 0);
 }
