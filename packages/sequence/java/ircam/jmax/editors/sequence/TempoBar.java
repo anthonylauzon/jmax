@@ -36,7 +36,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
 
-public class TempoBar extends PopupToolbarPanel implements TrackDataListener, TrackStateListener, TrackListener, ListSelectionListener
+public class TempoBar extends PopupToolbarPanel implements TrackDataListener, TrackStateListener, TrackListener, ListSelectionListener, MouseListener
 {
   public TempoBar( Geometry geom, FtsGraphicObject obj, SequenceEditor ed)
 	{
@@ -72,17 +72,7 @@ public class TempoBar extends PopupToolbarPanel implements TrackDataListener, Tr
 		}
 		});
 		
-		addMouseListener(new MouseListener(){
-			public void mouseClicked(MouseEvent e){}
-			public void mousePressed(MouseEvent e){}
-			public void mouseReleased(MouseEvent e){}
-			public void mouseEntered(MouseEvent e)
-		  {
-				requestFocus();
-		  }
-			public void mouseExited(MouseEvent e){}
-		});				
-		
+		addMouseListener(this);		
 		validate();
 	}
 
@@ -250,6 +240,65 @@ int getXIndentation()
 		return 0;
 }
 
+public TrackEvent firstMarkerContaining(int x, int y)
+{
+  TrackEvent mark;
+  TrackEvent currMark = null;
+  int mark_x;
+  Dimension d = getSize();	
+  
+  for (Enumeration e = markersTrack.intersectionSearch( pa.getInvX(ScoreBackground.KEYEND), 
+                                                        pa.getInvX(d.width-ScoreBackground.KEYEND)); e.hasMoreElements();) 
+  {
+    mark = (TrackEvent) e.nextElement();
+    mark_x = pa.getX(mark);
+    
+    if( x <= mark_x + 3 && x >= mark_x - 3)
+      currMark = mark;
+  }
+  return currMark;
+}
+
+//=================== MouseListener interface ===========================
+public void mouseClicked(MouseEvent e){}
+public void mousePressed(MouseEvent e)
+{
+  if(markersTrack != null)
+  {
+    int x = e.getX();
+    int y = e.getY();
+    int modifiers = e.getModifiers();    
+		TrackEvent currMark = firstMarkerContaining(x, y);
+
+    if(currMark!=null)
+    { //click on marker				
+      if ( !markersSelection.isInSelection( currMark)) 
+      {
+        if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
+         markersSelection.deselectAll();
+        
+        markersSelection.select( currMark);
+      }
+    }
+    else	
+    {//click on empty
+      if ((modifiers & InputEvent.SHIFT_MASK) == 0)
+      {
+        if( markersSelection != null)
+          markersSelection.deselectAll();
+      }
+      if(!isInSequence)
+        ((FtsTrackObject)ftsObj).requestNotifyGuiListeners( pa.getInvX(x), null);
+    }
+  }
+}
+
+public void mouseReleased(MouseEvent e){}
+public void mouseEntered(MouseEvent e)
+{
+  requestFocus();
+}
+public void mouseExited(MouseEvent e){}
 //=================== TrackDataListener interface ========================
 
 public void objectChanged(Object spec, String propName, Object propValue){repaint();}

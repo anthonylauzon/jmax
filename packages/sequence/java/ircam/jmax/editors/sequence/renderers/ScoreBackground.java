@@ -50,7 +50,7 @@ public class ScoreBackground implements Layer{
 			public void propertyChange(PropertyChangeEvent e)
 		{		
 				String name = e.getPropertyName();
-				if (name.equals("rangeMode") || name.equals("trackName"))
+				if (name.equals("rangeMode") || name.equals("trackName") || e.getPropertyName().equals("repaint"))
 				{
 					toRepaintBack = true;
 					gc.getGraphicDestination().repaint();

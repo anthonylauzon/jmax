@@ -106,7 +106,7 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 				if(!editorState.label.equals(""))
 					setLabelType(editorState.label);
 				setViewMode(editorState.view);				
-				setRangeMode(editorState.rangeMode);
+				setRangeMode(editorState.rangeMode, true);
 			};
 			public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
 		  {
@@ -327,8 +327,7 @@ public void startTrackUpload( TrackDataModel track, int size)
 public void endTrackUpload( TrackDataModel track)
 {
 	uploading  = false;
-	setRangeMode(getRangeMode());
-	repaint();
+	setRangeMode(getRangeMode(), false);
 }
 public void startPaste(){}
 public void endPaste(){}
@@ -411,7 +410,7 @@ public int getViewMode()
 	return viewMode;
 }
 
-public void setRangeMode(int rangeMode)
+public void setRangeMode(int rangeMode, boolean changed)
 {
 	this.rangeMode = rangeMode;
 }
@@ -458,6 +457,15 @@ public void paintComponent(Graphics g)
 	renderer.render(g, r);
 }
 
+public void forceBackgroundRepaint()
+{
+  Object obj = getTrack().getProperty("repaint");
+  boolean rep = true;
+  if( obj !=  null)
+    rep = !((Boolean)obj).booleanValue();
+  
+  getTrack().setProperty("repaint", new Boolean(rep)); //to repaint background
+}
 public void setLabelType(String type){}
 
 //--- MidiTrack fields

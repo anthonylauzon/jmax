@@ -139,9 +139,9 @@ public class MidiTrackEditor extends TrackBaseEditor
 		geometry.setProperty("gridMode", new Integer(gridMode));
 	}
 	
-	public void setRangeMode(int rangeMode)
+	public void setRangeMode(int rangeMode, boolean changed)
   {
-		super.setRangeMode(rangeMode);
+		super.setRangeMode(rangeMode, changed);
 		if(rangeMode == MidiTrackEditor.WHOLE_RANGE)
 		{
 			getTrack().setProperty("maximumPitch", new Integer(SequenceDefaults.DEFAULT_MAX_PITCH));
@@ -152,10 +152,15 @@ public class MidiTrackEditor extends TrackBaseEditor
 			getTrack().setProperty("maximumPitch", new Integer(getMaximumPitchInTrack()));
 			getTrack().setProperty("minimumPitch", new Integer(getMinimumPitchInTrack()));			
 		}
-		getTrack().setProperty("rangeMode", new Integer(rangeMode));
-
-		if(!gc.isInSequence())
-			((FtsTrackObject)gc.getDataModel()).editorObject.setRangeMode(rangeMode);
+    
+    if(changed)
+    {
+      getTrack().setProperty("rangeMode", new Integer(rangeMode));
+      if(!gc.isInSequence())
+        ((FtsTrackObject)gc.getDataModel()).editorObject.setRangeMode(rangeMode);
+    }
+    else
+      forceBackgroundRepaint();
 	}
 
   String labelType = "none";

@@ -512,21 +512,24 @@ track_insert_marker(track_t *track, double time, fts_symbol_t type)
 static void 
 track_upload_markers(track_t *this)
 {
-	if(this->markers != NULL && !fts_object_has_id((fts_object_t *)this->markers))
-	{
-		fts_atom_t a[2];
-		fts_class_t *markers_type = track_get_type(this->markers);
+	if(this->markers != NULL)
+  {
+    if(!fts_object_has_id((fts_object_t *)this->markers))
+    {
+      fts_atom_t a[2];
+      fts_class_t *markers_type = track_get_type(this->markers);
 		
-		fts_client_register_object((fts_object_t *)this->markers, fts_object_get_client_id((fts_object_t *)this));
+      fts_client_register_object((fts_object_t *)this->markers, fts_object_get_client_id((fts_object_t *)this));
+      
+      fts_set_int(a, fts_object_get_id((fts_object_t *)this->markers));
 		
-		fts_set_int(a, fts_object_get_id((fts_object_t *)this->markers));
+      if(markers_type != NULL)
+        fts_set_symbol(a + 1, fts_class_get_name(markers_type));
+      else
+        fts_set_symbol(a + 1, fts_s_void);     		
 		
-		if(markers_type != NULL)
-      fts_set_symbol(a + 1, fts_class_get_name(markers_type));
-    else
-      fts_set_symbol(a + 1, fts_s_void);     		
-		
-		fts_client_send_message((fts_object_t *)this, seqsym_markers, 2, a);
+      fts_client_send_message((fts_object_t *)this, seqsym_markers, 2, a);
+    }
     
 		fts_send_message((fts_object_t *)this->markers, fts_s_upload, 0, NULL);
 	}
@@ -1088,7 +1091,7 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     event = event_get_next(event);
   }
 	
-	if( this->markers != NULL && !fts_object_has_id((fts_object_t *)this->markers))
+	if( this->markers != NULL /*&& !fts_object_has_id((fts_object_t *)this->markers)*/)
 		track_upload_markers(this);
 	
   fts_client_send_message((fts_object_t *)this, fts_s_end_upload, 0, 0);

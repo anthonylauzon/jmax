@@ -325,6 +325,10 @@ public void clear()
 
     deleteRoomAt(0);
   }
+  
+  if( markersTrack != null)
+    markersTrack.clear();
+    
   notifyTrackCleared();
 
   endUpdate();
@@ -1580,6 +1584,18 @@ public SequenceSelection getMarkersSelection()
 public void setSaveEditor(boolean save)
 {
   saveEditor = save;
+}
+
+public void createMarkers()
+{
+  try{
+    send( FtsSymbol.get("make-bars"));
+  }
+  catch(IOException e)
+ {
+    System.err.println("FtsTrackObject: I/O Error sending make-bars Message!");
+    e.printStackTrace();
+ }
 }
 
 /********************************************************

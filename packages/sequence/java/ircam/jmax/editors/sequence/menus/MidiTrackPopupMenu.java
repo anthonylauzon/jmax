@@ -49,6 +49,17 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
     super(editor, isInSequence);
 		
     addSeparator();
+    
+    JMenuItem item = new JMenuItem("Create Bars");
+    item.addActionListener( new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+		  {
+				((MidiTrackEditor)target).getTrack().getFtsTrack().createMarkers();
+		  }
+		});	
+    add(item);
+    
+    addSeparator();
 		
     labelTypesMenu = new JMenu("Labels");
     add( labelTypesMenu);
@@ -66,7 +77,7 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
     usedRangeItem.addActionListener( new ActionListener(){
 			public void actionPerformed(ActionEvent e)
 		  {
-				((MidiTrackEditor)target).setRangeMode( MidiTrackEditor.USED_RANGE);
+				((MidiTrackEditor)target).setRangeMode( MidiTrackEditor.USED_RANGE, true);
 		  }
 		});
     rangeMenuGroup.add(usedRangeItem);
@@ -75,7 +86,7 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
     wholeRangeItem.addActionListener( new ActionListener(){
 			public void actionPerformed(ActionEvent e)
 		  {
-				((MidiTrackEditor)target).setRangeMode( MidiTrackEditor.WHOLE_RANGE);
+				((MidiTrackEditor)target).setRangeMode( MidiTrackEditor.WHOLE_RANGE, true);
 		  }
 		});		
     rangeMenuGroup.add(wholeRangeItem);

@@ -45,12 +45,12 @@ import javax.swing.*;
 public abstract class SelecterTool extends Tool implements GraphicSelectionListener{
   
   public SelecterTool(String theName, ImageIcon theImageIcon)
-{
+ {
     super(theName, theImageIcon);
 		
     //itsSelecter = new Selecter(this);
     itsSelecter = new SequenceSelecter(this);
-}
+ }
 
 /**
 * the default InteractionModule for this kind of tools
