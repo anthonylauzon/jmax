@@ -40,13 +40,11 @@ static void
 alsaseqmidiport_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   alsaseqmidiport_t *this = (alsaseqmidiport_t *)o;
-  alsaseqmidi_t* manager = this->manager;
   
   fts_midiparser_t *parser = &this->parser;
   int n, i;
   int event_size = 0;
   snd_seq_event_t* ev;
-
 
   do 
   {  
@@ -58,20 +56,18 @@ alsaseqmidiport_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
       /* Check if buffer_size is enough */
       if (event_size > this->buffer_size)
       {
-	  fts_log("[alsaseqmidiport] need to resize buffer for decoding MIDI stream \n");
-	  fts_log("[alsaseqmidiport] event_size : %d, old buffe size: %d\n", event_size, this->buffer_size);
+	  fts_log("[alsaseqmidiport] Resize buffer for decoding MIDI stream : %d, old buffe size: %d\n", event_size, this->buffer_size);
 	  this->buffer = realloc(this->buffer, event_size * sizeof(unsigned char));
 	  snd_midi_event_resize_buffer(this->midi_event_parser, event_size * sizeof(unsigned char));
 	  this->buffer_size = event_size;
       }
-      fts_log("[alsaseqmidiport] reset decoder \n");
       snd_midi_event_reset_decode(this->midi_event_parser);
       /* Try to decode event */
       n = snd_midi_event_decode(this->midi_event_parser, this->buffer, this->buffer_size, ev);
 
       if (0 > n)
       {
-	  fts_object_set_error(o, "cannot decode event");
+	  fts_object_set_error(o, "[alsaseqmidiport] Cannot decode event");
       }
       else
       {
@@ -79,7 +75,6 @@ alsaseqmidiport_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	  for ( i = 0; i < n; ++i)
 	  {	  
 	      fts_midievent_t *event = fts_midiparser_byte( parser, this->buffer[i]);
-	      fts_log("[alsaseqmidiport] parse byte %d of %d \n", i, n);      
 	      if(event != NULL)
 	      {
 		  fts_atom_t a;
@@ -88,9 +83,7 @@ alsaseqmidiport_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 		  fts_midiport_input(o, 0, 0, 1, &a);
 	      }
 	  }
-      }
-  
-      fts_log("[alsaseqmidiport] free memory allocated for event \n");
+      }  
       snd_seq_free_event(ev);
   } while (snd_seq_event_input_pending(this->seq, 0) > 0); 
 
@@ -104,10 +97,8 @@ alsaseqmidiport_output(fts_object_t* o, fts_midievent_t* event, double time)
     snd_seq_event_t ev;
     long buf_size = 0;
 
-    fts_log("[alsaseqmidiport] output function call \n");
     if (fts_midievent_is_channel_message(event))
     {
-	fts_log("[alsaseqmidiport] try to send a channel message \n");
 	snd_seq_ev_clear(&ev);
 	snd_midi_event_reset_encode(this->midi_event_parser);
 	
@@ -119,6 +110,7 @@ alsaseqmidiport_output(fts_object_t* o, fts_midievent_t* event, double time)
 	    buffer[1] = (unsigned char)(fts_midievent_channel_message_get_first(event) & 0x7f);
 	    buffer[2] = (unsigned char)(fts_midievent_channel_message_get_second(event) & 0x7f);
 
+	    /* Encode MIDI bytecode to alsa sequencer event structure */
 	    buf_size = snd_midi_event_encode(this->midi_event_parser, buffer, 3, &ev);
 	    /* Check value of buf_size */
 	    if (3 != buf_size)
@@ -133,6 +125,7 @@ alsaseqmidiport_output(fts_object_t* o, fts_midievent_t* event, double time)
 	    buffer[0] = (unsigned char)fts_midievent_channel_message_get_status_byte(event);
 	    buffer[1] = (unsigned char)(fts_midievent_channel_message_get_first(event) & 0x7f);
 
+	    /* Encode MIDI bytecode to alsa sequencer event structure */
 	    buf_size = snd_midi_event_encode(this->midi_event_parser, buffer, 3, &ev);
 	    /* Check value of buf_size */
 	    if (2 != buf_size)
@@ -142,13 +135,9 @@ alsaseqmidiport_output(fts_object_t* o, fts_midievent_t* event, double time)
 	}
     }
     
-    fts_log("[alsaseqmidiport] set subs \n");
     snd_seq_ev_set_subs(&ev);
-    fts_log("[alsaseqmidiport] set direct \n");
     snd_seq_ev_set_direct(&ev);
-    fts_log("[alsaseqmidiport] set source \n");
     snd_seq_ev_set_source(&ev, this->port_id);
-    fts_log("[alsaseqmidiport] event_output_direct \n");
     snd_seq_event_output_direct(this->seq, &ev);
 }
 
@@ -213,52 +202,86 @@ alsaseqmidiport_midi_parser_init(alsaseqmidiport_t* this)
 }
 
 static void
-alsaseqmidiport_input_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+alsaseqmidiport_midi_parser_delete(alsaseqmidiport_t* this)
 {
-    alsaseqmidiport_t* this = (alsaseqmidiport_t*)o;
+    free(this->buffer);
+    this->buffer= 0;
+    this->buffer_size = 0;
+    snd_midi_event_free(this->midi_event_parser);
+}
+
+static int
+alsaseqmidiport_io_init(alsaseqmidiport_t* this, 
+			fts_symbol_t device_name, 
+			fts_symbol_t label_name, 
+			fts_symbol_t port_address, 
+			int port_type)
+{
+    int err = 0;
     fts_midiparser_t* parser = &this->parser;
-    struct pollfd fds;
-    int err, fd;
-    fts_atom_t k, a;
+    fts_atom_t k;
+    fts_atom_t a;
     char port_name[NAME_SIZE];
     char label_name_str[NAME_SIZE];
-    fts_symbol_t device_name;
-    fts_symbol_t label_name;
-    fts_symbol_t port_address;
 
-    fts_log("[alsaseqmidiport] alsaseqmidiport_init\n");
-    this->manager = (alsaseqmidi_t*)fts_get_object(at);
-    label_name = fts_get_symbol(at + 1);
-    device_name = fts_get_symbol(at + 2);
-    port_address = fts_get_symbol(at + 3);
-
-    fts_log("[alsaseqmidiport] label name %s\n", label_name);
-    fts_log("[alsaseqmidiport] device name %s\n", device_name);
-    fts_log("[alsaseqmidiport] port address %s\n", port_address);
     snd_seq_port_info_malloc(&this->port_info);
     alsaseqmidiport_midi_parser_init(this);
 
     /* Open handle to ALSA sequencer */
-    err = snd_seq_open(&this->seq, "default", SND_SEQ_OPEN_INPUT, 0);
+    if (INPUT_TYPE == port_type)
+    {
+	err = snd_seq_open(&this->seq, "default", SND_SEQ_OPEN_INPUT, 0);
+    }
+    else
+    {
+	err = snd_seq_open(&this->seq, "default", SND_SEQ_OPEN_OUTPUT, 0);
+    }
+
     if (err < 0)
     {
-	fts_log("[alsaseqmidiport] cannot open handle to ALSA sequencer \n");
+	fts_log("[alsaseqmidiport] alsaseqmidiport_io_init: Cannot open handle to ALSA sequencer \n");
     }
-    /* Append jmax: to client name */
-    snprintf(label_name_str, NAME_SIZE, "jmax:%s", label_name); 
-    this->name = fts_new_symbol_copy(label_name_str);
 
+    /* Append jMax: to client name */
+    snprintf(label_name_str, NAME_SIZE - 1, "jMax:%s", label_name); 
+    label_name_str[NAME_SIZE - 1] = '\0';
     /* Set name of the client */
-    snd_seq_set_client_name(this->seq, this->name);
+    snd_seq_set_client_name(this->seq, label_name_str);
 
-    /* Create port */
-    fts_log("[alsaseqmidiport] try to create bidirectionnal simple port \n");
-    snprintf(port_name, NAME_SIZE, "input");
-    if ((err = snd_seq_create_simple_port(this->seq, port_name,
-					  SND_SEQ_PORT_CAP_WRITE|SND_SEQ_PORT_CAP_SUBS_WRITE,
-					  SND_SEQ_PORT_TYPE_APPLICATION)) < 0)
+
+    if (INPUT_TYPE == port_type)
     {
-	fts_object_set_error(o, "Error opening ALSA sequencer MIDI port (%s)", snd_strerror(err));
+	/* Create port */
+	snprintf(port_name, NAME_SIZE - 1, "input");
+	port_name[NAME_SIZE - 1] = '\0';
+	err = snd_seq_create_simple_port(this->seq, port_name,
+					 SND_SEQ_PORT_CAP_WRITE|SND_SEQ_PORT_CAP_SUBS_WRITE,
+					 SND_SEQ_PORT_TYPE_APPLICATION);
+	snprintf(label_name_str + strlen(label_name_str), 
+		 NAME_SIZE - strlen(label_name_str) - 1, 
+		 ":%s", port_name);
+	label_name_str[NAME_SIZE - 1] = '\0';
+	this->name = fts_new_symbol_copy(label_name_str);
+
+    }
+    else
+    {
+	/* Create port */
+	snprintf(port_name, NAME_SIZE - 1, "output");
+	port_name[NAME_SIZE - 1] = '\0';
+	err = snd_seq_create_simple_port(this->seq, port_name,
+					 SND_SEQ_PORT_CAP_READ|SND_SEQ_PORT_CAP_SUBS_READ,
+					 SND_SEQ_PORT_TYPE_APPLICATION);
+	snprintf(label_name_str + strlen(label_name_str), 
+		 NAME_SIZE - 1 - strlen(label_name_str) - 1, 
+		 ":%s", port_name);
+	label_name_str[NAME_SIZE - 1] = '\0';
+	this->name = fts_new_symbol_copy(label_name_str);
+
+    }
+    if (err < 0)
+    {
+	fts_object_set_error((fts_object_t*)this, "Error opening ALSA sequencer MIDI port (%s)", snd_strerror(err));
 	fts_log("alsaseqmidiport: cannot open ALSA sequencer MIDI port %s (%s)",port_name, snd_strerror(err)); 
     }
     else
@@ -266,16 +289,77 @@ alsaseqmidiport_input_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, 
 	this->port_id = err;       
 	fts_log("[alsaseqmidiport] input simple port created \n");
     }
-
+	
     snd_seq_get_port_info(this->seq, this->port_id, this->port_info);
 
     /* Etablish connection */
-    alsaseqmidiport_etablish_connection(this, port_address, INPUT_TYPE);
+    alsaseqmidiport_etablish_connection(this, port_address, port_type);
     fts_log("[alsaseqmidiport] connection etablished \n");
 
-    fts_log("[alsaseqmidiport] set poll descriptors \n");
-    fts_log("[alsaseqmidiport] number of poll descriptors: %d\n",
-	    snd_seq_poll_descriptors_count(this->seq, POLLIN));
+
+    if (INPUT_TYPE == port_type)
+    {
+	fts_midiparser_init(parser);
+    }
+    fts_midiport_init((fts_midiport_t *)this);
+    if (INPUT_TYPE == port_type)
+    {
+	fts_midiport_set_input((fts_midiport_t *)this);
+    }
+    else
+    {
+	fts_midiport_set_output((fts_midiport_t*)this, alsaseqmidiport_output);
+    }
+    
+    /* insert into device hashtable */
+    fts_log("[alsaseqmidiport] insert into device hashtable \n");
+    fts_set_symbol(&k, this->name);
+    fts_set_object(&a, (fts_object_t*)this);
+    fts_log("[alsaseqmidiport] put object in hashtable with key %s \n", this->name);
+
+    if (INPUT_TYPE == port_type)
+    {	
+/*	fts_hashtable_put(&this->manager->destinations, &k, &a); */
+	fts_hashtable_put(&this->manager->inputs, &k, &a);
+    }
+    else
+    {
+/*	fts_hashtable_put(&this->manager->sources, &k, &a); 	*/
+	fts_hashtable_put(&this->manager->outputs, &k, &a);
+    }
+
+    return err;
+}
+
+static void
+alsaseqmidiport_input_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+    alsaseqmidiport_t* this = (alsaseqmidiport_t*)o;
+    alsaseqmidi_t* manager;
+    struct pollfd fds;
+    int err;
+    fts_symbol_t device_name;
+    fts_symbol_t label_name;
+    fts_symbol_t port_address;
+
+    fts_log("[alsaseqmidiport] alsaseqmidiport_init\n");
+    manager = (alsaseqmidi_t*)fts_get_object(at);
+    label_name = fts_get_symbol(at + 1);
+    device_name = fts_get_symbol(at + 2);
+    port_address = fts_get_symbol(at + 3);
+
+    this->manager = manager;
+    this->seq = NULL;
+    this->midi_event_parser = NULL;
+    this->port_info = NULL;
+    this->subs = NULL;
+    
+    fts_log("[alsaseqmidiport] label name %s\n", label_name);
+    fts_log("[alsaseqmidiport] device name %s\n", device_name);
+    fts_log("[alsaseqmidiport] port address %s\n", port_address);
+
+    err = alsaseqmidiport_io_init(this, device_name, label_name, port_address, INPUT_TYPE);
+
     if (0 == snd_seq_poll_descriptors(this->seq, &fds, 1, POLLIN))
     {
 	fts_object_set_error(o, "Cannot get file descriptor");
@@ -285,24 +369,6 @@ alsaseqmidiport_input_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, 
     this->fd = fds.fd;    
     
     fts_sched_add(o, FTS_SCHED_READ, this->fd);
-
-
-    fts_midiparser_init(parser);
-    fts_midiport_init((fts_midiport_t *)this);
-    fts_midiport_set_input((fts_midiport_t *)this);
-    
-    /* insert into device hashtable */
-    fts_log("[alsaseqmidiport] insert into device hashtable \n");
-    fts_set_symbol(&k, this->name);
-    fts_set_object(&a, o);
-    fts_log("[alsaseqmidiport] put object in hashtable with key %s \n", this->name);
-    fts_hashtable_put(&this->manager->sources, &k, &a);
-/*    fts_hashtable_put(&this->manager->destinations, &k, &a); */
-/*    fts_hashtable_put(&this->manager->inputs, &k, &a);    */
-/* fts_hashtable_put(&this->manager->outputs, &k, &a); */
-
-
-    fts_log("[alsaseqmidiport] FOO: end of init \n");
     
 }
 	
@@ -311,115 +377,89 @@ static void
 alsaseqmidiport_output_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
     alsaseqmidiport_t* this = (alsaseqmidiport_t*)o;
-    fts_midiparser_t* parser = &this->parser;
-    fts_atom_t k, a;
+    alsaseqmidi_t* manager;
     int err;
-    char port_name[NAME_SIZE];
-    char label_name_str[NAME_SIZE];
     fts_symbol_t device_name;
     fts_symbol_t label_name;
     fts_symbol_t port_address;
 
 
-    fts_log("[alsaseqmidiport] alsaseqmidiport_output_init\n");
-    this->manager = (alsaseqmidi_t*)fts_get_object(at);
+    manager = (alsaseqmidi_t*)fts_get_object(at);
     label_name = fts_get_symbol(at + 1);
     device_name = fts_get_symbol(at + 2);
     port_address = fts_get_symbol(at + 3);
+
+    this->manager = manager;
+    this->seq = NULL;
+    this->midi_event_parser = NULL;
+    this->port_info = NULL;
+    this->subs = NULL;
 
     fts_log("[alsaseqmidiport] label name %s\n", label_name);
     fts_log("[alsaseqmidiport] device name %s\n", device_name);
     fts_log("[alsaseqmidiport] port address %s\n", port_address);
 
-    snd_seq_port_info_malloc(&this->port_info);
-    alsaseqmidiport_midi_parser_init(this);
-
-    /* Open handle to ALSA sequencer */
-
-    err = snd_seq_open(&this->seq, "default", SND_SEQ_OPEN_OUTPUT, 0);
-    if (err < 0)
-    {
-	fts_log("[alsaseqmidiport] cannot open handle to ALSA sequencer \n");
-    }
-
-    /* Append jmax: to client name */
-    snprintf(label_name_str, NAME_SIZE, "jmax:%s", label_name);
-    this->name = fts_new_symbol_copy(label_name_str);
-
-    /* Set name of the client */
-    snd_seq_set_client_name(this->seq, this->name);
-
-    /* Create port */
-    snprintf(port_name, NAME_SIZE, "output");
-    fts_log("[alsaseqmidiport] try to create output simple port \n");
-    if ((err = snd_seq_create_simple_port(this->seq, port_name,
-					  SND_SEQ_PORT_CAP_READ|SND_SEQ_PORT_CAP_SUBS_READ,
-					  SND_SEQ_PORT_TYPE_APPLICATION)) < 0)
-    {
-	fts_object_set_error(o, "[alsaseqmidiport] Error opening ALSA sequencer MIDI port (%s)", snd_strerror(err));
-	fts_log("[alsaseqmidiport] cannot create ALSA sequencer MIDI port %s (%s)",port_name, snd_strerror(err)); 
-    }
-    else
-    {
-	this->port_id = err;       
-	fts_log("[alsaseqmidiport] input simple port created \n");
-    }
-
-    snd_seq_get_port_info(this->seq, this->port_id, this->port_info);
-    
-    /* Etablish connection */
-    alsaseqmidiport_etablish_connection(this, port_address, OUTPUT_TYPE);
-    fts_log("[alsaseqmidiport] connection established \n");
-
-    fts_midiparser_init(parser);
-    fts_midiport_init((fts_midiport_t*) this);
-    fts_midiport_set_output((fts_midiport_t *)this, alsaseqmidiport_output);
-    
-    /* insert into device hashtable */
-    fts_log("[alsaseqmidiport] insert into device hashtable \n");
-    fts_set_symbol(&k, this->name);
-    fts_set_object(&a, o);
-    fts_log("[alsaseqmidiport] put object in hashtable with key %s \n", this->name);
-/*    fts_hashtable_put(&this->manager->sources, &k, &a); */
-    fts_hashtable_put(&this->manager->destinations, &k, &a);
-/*    fts_hashtable_put(&this->manager->inputs, &k, &a); */
-/*    fts_hashtable_put(&this->manager->outputs, &k, &a); */
-
-
-
-    fts_log("[alsaseqmidiport] FOO: end of init \n");
-    
+    err = alsaseqmidiport_io_init(this, device_name, label_name, port_address, OUTPUT_TYPE);
 }
 	
 
 static void
-alsaseqmidiport_sub_delete(alsaseqmidiport_t* this)
+alsaseqmidiport_io_delete(alsaseqmidiport_t* this, int port_type)
 {
-    free(this->buffer);
-    snd_midi_event_free(this->midi_event_parser);
+    fts_hashtable_t* ht;
+    fts_atom_t k;
+
+    fts_midiparser_t* parser = &this->parser;
+    alsaseqmidiport_midi_parser_delete(this);
     snd_seq_port_info_free(this->port_info);
     snd_seq_unsubscribe_port(this->seq, this->subs);
     snd_seq_delete_port(this->seq, this->port_id);
     snd_seq_close(this->seq);
+
+    /* Remove MIDIport from sources/destinations hashtables */    
+    if (INPUT_TYPE == port_type)
+    {
+	fts_midiparser_reset(parser);
+/*	ht = &this->manager->destinations; */
+    }
+    else
+    {
+/*	ht = &this->manager->sources; */
+    }
+#if 0
+    fts_set_symbol(&k, this->name);
+    fts_hashtable_remove(ht, &k);
+#endif
+
+    /* Remove MIDIport from inputs/outputs hashtables */    
+    if (INPUT_TYPE == port_type)
+    {
+	ht = &this->manager->inputs;
+    }
+    else
+    {
+	ht = &this->manager->outputs;
+    }
+    
+    fts_set_symbol(&k, this->name);
+    fts_hashtable_remove(ht, &k);
+
+    fts_midiport_reset((fts_midiport_t*)this);
 }
 
 static void
 alsaseqmidiport_input_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
     alsaseqmidiport_t* this = (alsaseqmidiport_t*)o;
-    fts_midiparser_t* parser = &this->parser;
+    alsaseqmidiport_io_delete(this, INPUT_TYPE);
     fts_sched_remove(o);
-    fts_midiparser_reset(parser);
-    alsaseqmidiport_sub_delete(this);
 }
 
 static void
 alsaseqmidiport_output_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
     alsaseqmidiport_t* this = (alsaseqmidiport_t*)o;
-    fts_midiparser_t* parser = &this->parser;
-    fts_midiparser_reset(parser);
-    alsaseqmidiport_sub_delete(this);
+    alsaseqmidiport_io_delete(this, OUTPUT_TYPE);
 }
 
 
@@ -428,7 +468,6 @@ alsaseqmidiport_input_instantiate(fts_class_t* cl, int ac, const fts_atom_t* at)
 {
     fts_class_init(cl, sizeof(alsaseqmidiport_t), 0, 0, 0);
 
-    fts_log("[alsaseqmidiport] alsaseqmidiport_input_instantiate\n");
     fts_midiport_class_init(cl);
 
     fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, alsaseqmidiport_input_init);
@@ -444,7 +483,6 @@ alsaseqmidiport_output_instantiate(fts_class_t* cl, int ac, const fts_atom_t* at
 {
     fts_class_init(cl, sizeof(alsaseqmidiport_t), 0, 0, 0);
 
-    fts_log("[alsaseqmidiport] alsaseqmidiport_output_instantiate\n");
     fts_midiport_class_init(cl);
 
     fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, alsaseqmidiport_output_init);
