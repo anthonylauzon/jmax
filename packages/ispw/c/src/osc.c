@@ -312,7 +312,7 @@ phasor_instantiate(fts_class_t *cl)
 }
 
 void
-osc_config(void)
+ispw_osc_config(void)
 {
   fts_class_install(fts_new_symbol("tab1~"),sigtab1_instantiate);
 

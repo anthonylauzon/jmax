@@ -102,7 +102,7 @@ extern void sigline_config(void);
 extern void sig_config(void);
 extern void sigdown_config(void);
 extern void sigup_config(void);
-extern void osc_config(void);
+extern void ispw_osc_config(void);
 extern void noise_config(void);
 extern void sigparam_config(void);
 extern void vectrigon_config(void);
@@ -196,7 +196,7 @@ ispw_config(void)
   sig_config();
   sigdown_config();
   sigup_config();
-  osc_config();
+  ispw_osc_config();
   noise_config();
   sigparam_config();
   vectrigon_config();
