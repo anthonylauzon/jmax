@@ -577,7 +577,7 @@ public class FtsObject implements Serializable
 
   public void updateData()
   {
-    fts.getServer().askObjectProperty(this, "data");
+      fts.getServer().askObjectProperty(this, "data");
   }
 
   /** Get the comment property of this object.*/

@@ -44,13 +44,6 @@ public class FtsModule
     // Mda.installDocumentHandler( new FtsBmaxRemoteDocumentHandler());
     Mda.installDocumentType( new FtsPatcherDocumentType());
 
-    // Install the FTS tcl commands
-    /* ircam.jmax.fts.tcl.TclFtsPackage.installPackage(); Moved to ircam.jmax.script.tcl.TclInterpreter */
-
-    // Install the Integer vector class
-    Fts.registerRemoteDataClass("ivec", ircam.jmax.fts.FtsIntegerVector.class);
-    Fts.registerRemoteDataClass("fvec", ircam.jmax.fts.FtsIntegerVector.class);
-
     // Install the Object set class
     /*Fts.registerRemoteDataClass("object_set_data", ircam.jmax.fts.FtsObjectSet.class);*/
 
