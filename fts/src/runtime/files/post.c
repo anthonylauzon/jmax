@@ -90,21 +90,61 @@ post_atoms(int ac, const fts_atom_t *at)
     }
 }
 
+#define POST_LINE_MAXLENGTH 512
+#define POST_BUFFER_LENGTH 4096
 
 void post( const char *format, ...)
 {
+  static char post_buffer[POST_BUFFER_LENGTH + POST_LINE_MAXLENGTH];
+  static char *fill_p = post_buffer;
+  static char *flush_p = post_buffer;
+
   va_list ap;
-  char buf[512];
+  char buf[POST_LINE_MAXLENGTH];
+  char *p;
 
   va_start( ap, format);
+  vsprintf( buf, format, ap);
+  va_end( ap);
 
-  vsprintf(buf, format, ap);
+  p = buf;
+  while ( *p)
+    {
+      *fill_p = *p;
+      fill_p++;
 
-  va_end(ap);
+      if (*p == '\n' && fill_p >= post_buffer + POST_BUFFER_LENGTH)
+	fill_p = post_buffer;
 
-  fts_client_mess_start_msg(POST_CODE);
-  fts_client_mess_add_string(buf);
-  fts_client_mess_send_msg();
+      p++;
+    }
+  *fill_p = '\0';
+
+  if (!client_dev)
+    return;
+
+  p = flush_p;
+
+  while ( *p)
+    {
+      if (*p == '\n')
+	{
+	  /* End of line, flush current line to client */
+	  *p = '\0';
+	  p++;
+
+	  fts_client_mess_start_msg( POST_LINE_CODE);
+	  fts_client_mess_add_string( flush_p);
+	  fts_client_mess_send_msg();
+
+	  if ( p >= post_buffer + POST_BUFFER_LENGTH)
+	    p = post_buffer;
+
+	  flush_p = p;
+	}
+      else
+	p++;
+    }
 }
 
 
