@@ -37,7 +37,8 @@
 typedef struct
 {
   fts_object_t o;
-	enum {fvec_type_column, fvec_type_row, fvec_type_diagonal, fvec_type_unwrap, fvec_type_vector, fvec_n_types} type;
+  enum { fvec_type_column, fvec_type_row, fvec_type_diagonal, 
+	 fvec_type_unwrap, fvec_type_vector, fvec_n_types } type;
   fmat_t *fmat; /* pointer to fmat */
   int index; /* index of column (col) or index of row (row)  or row onset (diag) */
   int onset; /* row onset (col) or column onset (row) or column onset (diag) */
@@ -58,6 +59,12 @@ typedef struct
 
 DATA_API fts_symbol_t fvec_symbol;
 DATA_API fts_class_t *fvec_class;
+
+/** get element, no checks */
+DATA_API float fvec_get_element(fvec_t *self, int i);
+
+/** set element, no checks */
+DATA_API void  fvec_set_element(fvec_t *self, int i, float value);
 
 DATA_API void fvec_set_dimensions(fvec_t *fvec, int ac, const fts_atom_t *at);
 DATA_API int fvec_vector(fts_object_t *obj, float **ptr, int *size, int *stride);
