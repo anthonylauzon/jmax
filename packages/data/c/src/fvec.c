@@ -249,9 +249,11 @@ fvec_get_vector(fvec_t *fvec, float **ptr, int *size, int *stride)
 
     case fvec_type_unwrap:
       
+      /* row onset */
       if(fvec_index > fmat_m)
         fvec_index = fmat_m;
       
+      /* column onset */
       if(fvec_onset > fmat_n)
         fvec_onset = fmat_n;
         
@@ -329,7 +331,7 @@ fvec_array_function(fts_object_t *o, fts_array_t *array)
   fts_array_set_size(array, onset + size);
   atoms = fts_array_get_atoms(array) + onset;
   
-  for(i=0, j=0; i<size; i++, j+=stride)
+  for(i=0, j=0; i<size*stride; i++, j+=stride)
     fts_set_float(atoms + i, values[j]);
 }
 
@@ -1060,7 +1062,7 @@ fvec_get_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     float min = p[0];
     int i;
     
-    for (i=stride; i<size; i+=stride)
+    for (i=stride; i<size*stride; i+=stride)
     {
       if (p[i] < min)
         min = p[i];
@@ -1084,7 +1086,7 @@ fvec_get_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     float max = p[0]; /* start with first element */
     int i;
     
-    for (i=stride; i<size; i+=stride)
+    for (i=stride; i<size*stride; i+=stride)
     {
       if(p[i] > max)
         max = p[i];
@@ -1108,7 +1110,7 @@ fvec_get_absmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     float max = fabsf(p[0]); /* start with first element */
     int i;
     
-    for (i=stride; i<size; i+=stride)
+    for (i=stride; i<size*stride; i+=stride)
     {
       if (fabsf(p[i]) > max)
         max = fabsf(p[i]);
@@ -1133,7 +1135,7 @@ fvec_get_min_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     int mini = 0;
     int i, j;
     
-    for(i=1, j=stride; i<size; i++, j+=stride)
+    for(i=1, j=stride; i<size*stride; i++, j+=stride)
     {
       if(p[j] < min)
       {
@@ -1161,7 +1163,7 @@ fvec_get_max_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     int maxi = 0;
     int i, j;
     
-    for(i=1, j=stride; i<size; i++, j+=stride)
+    for(i=1, j=stride; i<size*stride; i++, j+=stride)
     {
       if (p[j] > max)
       {
@@ -1366,7 +1368,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   self->type = fvec_type_column;
   self->index = 0;
   self->onset = 0;
-  self->size = INT_MAX;
+  self->size = INT_MAX >> 2;
   
   if(ac > 0)
   {

@@ -867,8 +867,14 @@ fmat_set_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     ac--;
     at++;
 
-    if(row >= 0 && row < m)
+    if(row >= 0)
     {
+      if(row >= m)
+      {
+        fmat_set_m(self, row + 1);
+        m = row + 1;
+      }
+      
       if(fts_is_number(at))
       {
         /* clip to # of cloumns */
@@ -917,8 +923,14 @@ fmat_set_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     ac--;
     at++;
     
-    if(col >= 0 && col < n)
+    if(col >= 0)
     {
+      if(col >= n)
+      {
+        fmat_set_n(self, col + 1);
+        n = col + 1;
+      }
+      
       if(fts_is_number(at))
       {
         /* clip to # of rows */
@@ -1040,7 +1052,7 @@ fmat_fill_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-fmat_zero(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fmat_fill_zero(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
   int size = fmat_get_m(self) * fmat_get_n(self);
@@ -1066,10 +1078,13 @@ fmat_zero(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-fmat_random(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fmat_fill_random(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
+  float *values = self->values;
+  int size = self->m * self->n;
   double lower, upper;
+  int i;
   
   switch(ac)
   {
@@ -1098,7 +1113,8 @@ fmat_random(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       break;
   }
   
-  fmat_set_const(self, (float)fts_random_range(lower, upper));
+  for(i=0; i<size; i++)
+    values[i] = (float)fts_random_range(lower, upper);
   
   fts_object_changed(o);
   fts_return_object(o);
@@ -3907,17 +3923,23 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message(cl, fts_s_set, bpf_type, fmat_set_from_bpf);
   fts_class_message(cl, fts_s_set, ivec_type, fmat_set_from_ivec);
   
-  fts_class_message_varargs(cl, fts_s_col, fmat_get_col);
-  fts_class_message_varargs(cl, fts_s_row, fmat_get_row);
-  fts_class_message_varargs(cl, fts_new_symbol("diag"), fmat_get_diag);
+  fts_class_message_number(cl, fts_s_col, fmat_get_col);
+  fts_class_message_number(cl, fts_s_row, fmat_get_row);
+  fts_class_message_number(cl, fts_new_symbol("diag"), fmat_get_diag);
+  fts_class_message_varargs(cl, fts_new_symbol("col"), fmat_set_col);
+  fts_class_message_varargs(cl, fts_new_symbol("row"), fmat_set_row);
+  
+  fts_class_message_varargs(cl, fts_new_symbol("getcol"), fmat_get_col);
+  fts_class_message_varargs(cl, fts_new_symbol("getrow"), fmat_get_row);
+  fts_class_message_varargs(cl, fts_new_symbol("getdiag"), fmat_get_diag);
   
   fts_class_message_varargs(cl, fts_new_symbol("setcol"), fmat_set_col);
   fts_class_message_varargs(cl, fts_new_symbol("setrow"), fmat_set_row);
   
   fts_class_message_number(cl, fts_s_fill, fmat_fill_number);
   fts_class_message_varargs(cl, fts_s_fill, fmat_fill_varargs);
-  fts_class_message_varargs(cl, fts_new_symbol("zero"), fmat_zero);
-  fts_class_message_varargs(cl, fts_new_symbol("random"), fmat_random);
+  fts_class_message_varargs(cl, fts_new_symbol("zero"), fmat_fill_zero);
+  fts_class_message_varargs(cl, fts_new_symbol("random"), fmat_fill_random);
   
   fts_class_message_varargs(cl, fts_s_append, fmat_append_row_varargs);
   fts_class_message(cl, fts_s_append, cl, fmat_append_row_fmat);
