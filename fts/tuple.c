@@ -2,7 +2,7 @@
  * jMax
  * Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
  * 
- * This program is free software; you can redistribute it and/or
+ * self program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation; either version 2.1
  * of the License, or (at your option) any later version.
@@ -73,71 +73,81 @@ tuple_copy_function(const fts_object_t *from, fts_object_t *to)
 }
 
 static void
-tuple_post(fts_object_t *o, fts_bytestream_t *stream)
+tuple_post_function(fts_object_t *o, fts_bytestream_t *stream)
 {
-  fts_tuple_t *this = (fts_tuple_t *)o;
+  fts_tuple_t *self = (fts_tuple_t *)o;
   
   fts_spost(stream, "{");
-  fts_spost_atoms(stream, fts_tuple_get_size(this), fts_tuple_get_atoms(this));
+  fts_spost_atoms(stream, fts_tuple_get_size(self), fts_tuple_get_atoms(self));
   fts_spost(stream, "}");
+}
+
+static void
+tuple_description_function(fts_object_t *o,  fts_array_t *array)
+{
+  fts_tuple_t *self = (fts_tuple_t *)o;
+  int size = fts_tuple_get_size(self);
+  fts_atom_t *atoms = fts_tuple_get_atoms(self);
+  
+  fts_array_append(array, size, atoms);
 }
 
 static void
 tuple_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_tuple_t *this = (fts_tuple_t *)o;
+  fts_tuple_t *self = (fts_tuple_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
   fts_message_t *mess = fts_dumper_message_new(dumper, fts_s_set);
   
-  fts_message_append(mess, fts_array_get_size(&this->args), fts_array_get_atoms(&this->args));
+  fts_message_append(mess, fts_array_get_size(&self->args), fts_array_get_atoms(&self->args));
   fts_dumper_message_send(dumper, mess);
 }
 
 static void
 tuple_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_tuple_t *this = (fts_tuple_t *) o;
+  fts_tuple_t *self = (fts_tuple_t *) o;
   fts_atom_t ret;
   
-  fts_set_int(&ret, fts_tuple_get_size(this));
+  fts_set_int(&ret, fts_tuple_get_size(self));
   fts_return(&ret);
 }
 
 static void
 tuple_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_tuple_t *this = (fts_tuple_t *)o;
+  fts_tuple_t *self = (fts_tuple_t *)o;
   int index = fts_get_int_arg(ac, at, 0, -1);
   
-  if (index >= 0 && index < fts_array_get_size( &this->args))
-    fts_return( fts_array_get_atoms( &this->args) + index);
+  if (index >= 0 && index < fts_array_get_size( &self->args))
+    fts_return( fts_array_get_atoms( &self->args) + index);
 }
 
 static void
 tuple_first(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_tuple_t *this = (fts_tuple_t *) o;
+  fts_tuple_t *self = (fts_tuple_t *) o;
   
-  if (fts_array_get_size( &this->args) > 0)
-    fts_return( fts_array_get_atoms( &this->args) + 0);
+  if (fts_array_get_size( &self->args) > 0)
+    fts_return( fts_array_get_atoms( &self->args) + 0);
 }
 
 static void
 tuple_second(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_tuple_t *this = (fts_tuple_t *) o;
+  fts_tuple_t *self = (fts_tuple_t *) o;
   
-  if (fts_array_get_size( &this->args) > 1)
-    fts_return( fts_array_get_atoms( &this->args) + 1);
+  if (fts_array_get_size( &self->args) > 1)
+    fts_return( fts_array_get_atoms( &self->args) + 1);
 }
 
 static void
 tuple_third(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_tuple_t *this = (fts_tuple_t *) o;
+  fts_tuple_t *self = (fts_tuple_t *) o;
   
-  if (fts_array_get_size( &this->args) > 2)
-    fts_return( fts_array_get_atoms( &this->args) + 2);
+  if (fts_array_get_size( &self->args) > 2)
+    fts_return( fts_array_get_atoms( &self->args) + 2);
 }
 
 static void
@@ -148,24 +158,24 @@ tuple_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   if(ac > 0 && fts_is_object(at))
     stream = (fts_bytestream_t *)fts_get_object(at);
 
-  tuple_post(o, stream);
+  tuple_post_function(o, stream);
   fts_post("\n");
 }
 
 static void
 tuple_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_tuple_t *this = (fts_tuple_t *)o;
+  fts_tuple_t *self = (fts_tuple_t *)o;
 
-  fts_array_init(&this->args, ac, at);
+  fts_array_init(&self->args, ac, at);
 }
 
 static void
 tuple_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_tuple_t *this = (fts_tuple_t *)o;
+  fts_tuple_t *self = (fts_tuple_t *)o;
 
-  fts_array_destroy(&this->args);
+  fts_array_destroy(&self->args);
 }
 
 static void
@@ -186,7 +196,8 @@ tuple_instantiate(fts_class_t *cl)
 
   fts_class_set_equals_function(cl, tuple_equals_function);
   fts_class_set_copy_function(cl, tuple_copy_function);
-  fts_class_set_post_function(cl, tuple_post);
+  fts_class_set_post_function(cl, tuple_post_function);
+  fts_class_set_description_function(cl, tuple_description_function);
 
   fts_class_doc(cl, fts_s_tuple, "[<any: value> ...]", "immutable array of any values");
   fts_class_doc(cl, fts_new_symbol("first"), NULL, "get first value");

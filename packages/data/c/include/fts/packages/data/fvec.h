@@ -179,6 +179,8 @@ DATA_API fts_class_t *frow_class;
 /** copy row or col from matrix reference to an fvec (1 column matrix) */
 DATA_API void fslice_copy_to_fmat(fslice_t *org, fmat_t *copy);
 
+#define fslice_get_fmat(f) ((f)->fmat)
+
 /** @} end of group fslice */
 
 

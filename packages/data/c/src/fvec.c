@@ -1106,8 +1106,9 @@ fslice_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   int index = fslice_get_index(self);
   int size = fslice_get_size(self);
   int stride = fslice_get_stride(self);
-  int m = fslice_get_m(self);
-  int n = fslice_get_n(self);
+  fmat_t *fmat = fslice_get_fmat(self);
+  int m = fmat_get_m(fmat);
+  int n = fmat_get_n(fmat);
   fts_bytestream_t* stream = fts_get_default_console_stream();
   int i;
   

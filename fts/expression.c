@@ -73,7 +73,7 @@ static fts_status_description_t invalid_environment_variable_error_description =
 static fts_status_t invalid_environment_variable_error = &invalid_environment_variable_error_description;
 
 static fts_status_description_t invalid_parenthized_expression_error_description = {
-  "parenthesis syntax error"
+  "invalid expression within parenthesis"
 };
 static fts_status_t invalid_parenthized_expression_error = &invalid_parenthized_expression_error_description;
 
