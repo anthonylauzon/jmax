@@ -76,6 +76,7 @@ struct _track_
 
 #define track_set_markers(t, m) ((t)->markers = (m))
 #define track_get_markers(t) ((t)->markers)
+#define track_is_marker(t) (track_get_type(t) == scomark_class)
 
 extern void track_add_event(track_t *track, double time, event_t *event);
 extern void track_add_event_after(track_t *track, double time, event_t *event, event_t *after);

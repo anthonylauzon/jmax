@@ -1541,18 +1541,20 @@ void
 marker_track_import_labels_txt (fts_object_t *o, int winlet, fts_symbol_t s, 
                                 int ac, const fts_atom_t *at)
 {
-  if (ac > 0  &&  fts_is_symbol(at))
+  track_t *self = (track_t *) o;
+
+  if (track_is_marker(self)  &&  ac > 0  &&  fts_is_symbol(at))
   {
     fts_symbol_t      filename = fts_get_symbol(at);
     fts_atom_file_t  *file;
     fts_atom_t        a;
     char              c;
     double            time;
-    fts_bytestream_t *memstream;
+    fts_memorystream_t *memstream;
     enum { TIME, TEXT, ERROR } waitingfor = TIME;
 
-    memstream = (fts_bytestream_t *)fts_object_create(fts_memorystream_class, 0, NULL);
-    fts_object_refer((fts_object_t *)memstream);
+    memstream = (fts_memorystream_t *) fts_object_create(fts_memorystream_class, 0, NULL);
+    fts_object_refer((fts_object_t *) memstream);
 
     /* check file name for .txt? */
 
@@ -1574,7 +1576,7 @@ marker_track_import_labels_txt (fts_object_t *o, int winlet, fts_symbol_t s,
             time = fts_get_number_float(&a) * 1000;  /* convert to millisec */
 
             /* prepare collection of label */
-            fts_memorystream_reset((fts_memorystream_t *)memstream);
+            fts_memorystream_reset(memstream);
             waitingfor = TEXT;
           }
           else
@@ -1584,35 +1586,35 @@ marker_track_import_labels_txt (fts_object_t *o, int winlet, fts_symbol_t s,
         break;
 
         case TEXT:
-          fts_spost_atoms(memstream, 1, &a);
+          fts_spost_atoms((fts_bytestream_t *) memstream, 1, &a);
 
           if (c == '\n')
           { /* end of label: create marker event, set label */
-            event_t      *event;
+            event_t      *ev;
             scomark_t    *mrk;
             char         *lab;
             
-            mrk = marker_track_insert_marker((track_t *) o, time, 
-                                             seqsym_marker, &event);
+            mrk = marker_track_insert_marker(self, time, seqsym_marker, &ev);
 
             /* get and zero-terminate label string (NOT KOSHER!) */
-            lab = (char *)fts_memorystream_get_bytes((fts_memorystream_t *)memstream);
-            lab[fts_memorystream_get_size((fts_memorystream_t *)memstream)] = 0;
+            lab = (char *) fts_memorystream_get_bytes(memstream);
+            lab[fts_memorystream_get_size(memstream)] = 0;
             
             scomark_set_label(mrk, fts_new_symbol(lab));
 
             waitingfor = TIME;
           }
           else
-            fts_spost(memstream, "%c", c);
+            fts_spost((fts_bytestream_t *) memstream, "%c", c);
         break;
       }
     }
 
     fts_object_release(memstream); 
     fts_atom_file_close(file);
-    fts_return_object(o);       
+    fts_return_object((fts_object_t *) self);       
   }
+  /* else: no marker track or wrong args -> don't handle this file */
 }
 
 
