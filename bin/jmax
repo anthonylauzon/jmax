@@ -104,48 +104,27 @@ start_it ()
 	echo "CLASSPATH=${CLASSPATH}"
     fi
 
-    if [ $NOFORK ]
-    then
-	if [ $VERBOSE ]
-	then
-	    echo "java $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT"
-	fi
-	( CLASSPATH=${CLASSPATH} ; export CLASSPATH ; java $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT )
-    else
-	if [ $VERBOSE ]
-	then
-	    echo "java $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT &"
-	fi
-	( CLASSPATH=${CLASSPATH} ; export CLASSPATH ; java $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT & )
-    fi
-}
+    JAVA_CMD="java $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT "
 
-# ---------------------------------------------------------------------------
-# Special version for SGI architecture:
-# For obscure reasons, starting java without -classpath option doesn't work
-start_it_SGI ()
-{
+    ECHO_CMD="CLASSPATH=${CLASSPATH} ; export CLASSPATH ; $JAVA_CMD"
+
+    if [ _${NOFORK}_ = __ ]
+    then
+	ECHO_CMD="$ECHO_CMD &"
+    fi
+
     if [ $VERBOSE ]
     then
-	echo "CLASSPATH=${CLASSPATH}"
+	echo "( $ECHO_CMD )"
     fi
 
-    if [ $NOFORK ]
+    if [ _${NOFORK}_ = __ ]
     then
-	if [ $VERBOSE ]
-	then
-	    echo "java $JAVA_DEFAULT_OPTIONS $JAVAOPT -classpath ${CLASSPATH} ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT"
-	fi
-	java $JAVA_DEFAULT_OPTIONS $JAVAOPT -classpath ${CLASSPATH} ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT
+	( CLASSPATH=${CLASSPATH} ; export CLASSPATH ; $JAVA_CMD & )
     else
-	if [ $VERBOSE ]
-	then
-	    echo "java $JAVA_DEFAULT_OPTIONS $JAVAOPT -classpath ${CLASSPATH} ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT &"
-	fi
-	java $JAVA_DEFAULT_OPTIONS $JAVAOPT -classpath ${CLASSPATH} ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT &
+	( CLASSPATH=${CLASSPATH} ; export CLASSPATH ; $JAVA_CMD )
     fi
 }
-
 
 # ***************************************************************************
 # Beginning of script
@@ -165,16 +144,29 @@ fi
 
 JACL_CLASSPATH=${ROOTDIR}/java/lib/jacl1.0/jacl.jar
 
-CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${JACL_CLASSPATH}
+SWING_DISTRIB_CLASSPATH=
 
+if [ -f ${ROOTDIR}/java/lib/swing/swingall.jar ]
+then
+    if echo $CLASSPATH | grep -s swing
+    then
+	echo "CLASSPATH already contains Swing:"
+	echo $CLASSPATH
+	exit 2
+    fi
+    SWING_DISTRIB_CLASSPATH=${ROOTDIR}/java/lib/swing/swingall.jar
+fi
 
-#if [ -r /usr/java/lib/rt.jar ]
-#then
-    # Probably we are on a SGI. In this case, we must use Java option -classpath.
-    # Don't ask me why...
-#    CLASSPATH=/usr/java/lib/rt.jar:${CLASSPATH}
-#    start_it_SGI
-#else
-    start_it
-#fi
+if [ $CLASSPATH ]
+then
+    if [ $SWING_DISTRIB_CLASSPATH ]
+    then
+	CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${SWING_DISTRIB_CLASSPATH}:${JACL_CLASSPATH}
+    else
+	CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${JACL_CLASSPATH}
+    fi
+else
+    CLASSPATH=${JMAX_CLASSPATH}:${SWING_DISTRIB_CLASSPATH}:${JACL_CLASSPATH}
+fi
 
+start_it
