@@ -1,0 +1,3 @@
+SOURCES =  \
+	ConsoleOpenCmd.java \
+	TclConsolePackage.java
