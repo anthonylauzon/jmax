@@ -86,9 +86,7 @@ class Slider extends GraphicObject implements FtsIntValueListener
   }
 
   private Throttle itsThrottle;
-  private int itsInteger = 0;
-
-  boolean itsMovingThrottle = false;
+  private int value = 0;
 
   private int itsRangeMax;
   private int itsRangeMin;
@@ -161,7 +159,7 @@ class Slider extends GraphicObject implements FtsIntValueListener
     itsThrottle.setWidth( getWidth() - 2 * THROTTLE_LATERAL_OFFSET);
 
     itsThrottle.move( itsThrottle.itsX,
-			      (int)(getY() + getHeight() - BOTTOM_OFFSET - 2 - itsInteger/itsStep));
+			      (int)(getY() + getHeight() - BOTTOM_OFFSET - 2 - value/itsStep));
   }
 
   public void setWidth(int w)
@@ -190,28 +188,18 @@ class Slider extends GraphicObject implements FtsIntValueListener
     itsRange = itsRangeMax - itsRangeMin;
     itsStep = (float)itsRange / itsPixelRange;
 
-    itsInteger = (theCurrentInt < itsRangeMin) ? itsRangeMin:( (theCurrentInt >= itsRangeMax) ? itsRangeMax:theCurrentInt);
-    ((FtsSliderObject)ftsObject).setValue(itsInteger);
+    value = (theCurrentInt < itsRangeMin) ? itsRangeMin:( (theCurrentInt >= itsRangeMax) ? itsRangeMax:theCurrentInt);
+    ((FtsSliderObject)ftsObject).setValue(value);
   }
 
-  public void valueChanged( int value) 
+  public void valueChanged(int v) 
   {
-    if ( itsMovingThrottle) 
-      return;
-
-    if ( itsInteger != value) 
-      {
-	itsInteger = value;
-	int clippedValue = ( value < itsRangeMin) ? itsRangeMin: ((value >= itsRangeMax) ? itsRangeMax : value);
-	clippedValue -= itsRangeMin;
+    value = v;
+    int clippedValue = ( value < itsRangeMin) ? itsRangeMin: ((value >= itsRangeMax) ? itsRangeMax : value);
+    clippedValue -= itsRangeMin;
       
-	if ( itsThrottle != null) 
-	  {
-	    itsThrottle.move( itsThrottle.itsX, (int) (getY() + getHeight() - BOTTOM_OFFSET - 2 -clippedValue/itsStep));
-	  }
-	
-	updateRedraw();
-      }
+    itsThrottle.move( itsThrottle.itsX, (int) (getY() + getHeight() - BOTTOM_OFFSET - 2 -clippedValue/itsStep));
+    updateRedraw();
   }
 
   public void inspect()
@@ -222,106 +210,22 @@ class Slider extends GraphicObject implements FtsIntValueListener
       itsSliderDialog = new SliderDialog();
 
     itsSliderDialog.setLocation( aPoint.x + getX(), aPoint.y + getY() - 25);
-    itsSliderDialog.ReInit( String.valueOf( itsRangeMax), String.valueOf( itsRangeMin), String.valueOf( itsInteger), this, itsSketchPad.getSketchWindow());
+    itsSliderDialog.ReInit( String.valueOf( itsRangeMax), String.valueOf( itsRangeMin), String.valueOf( value), this, itsSketchPad.getSketchWindow());
   }
-
-  public void sliderDown(Point mouse)
-  {  
-    int x, y;
-
-    x = mouse.x;
-    y = mouse.y;
-
-    if( itsThrottle.contains( x, y))
-      {
-	itsMovingThrottle = true;
-	return;
-      }
-
-    if ( getY() + getHeight() - BOTTOM_OFFSET >= y && getY() + UP_OFFSET < y) 
-      {
-	itsInteger = (int)((( getY() + getHeight()) - y - BOTTOM_OFFSET) * itsStep);
-
-	itsThrottle.move( itsThrottle.itsX, y - 2);
-	itsMovingThrottle = true;
-      }
-    else if( getY() + getHeight() - BOTTOM_OFFSET < y)
-      {
-	itsInteger = itsRangeMin;
-	itsThrottle.move( itsThrottle.itsX, getY() + getHeight() - BOTTOM_OFFSET - 2);
-      }
-    else if( getY() + UP_OFFSET >= y)
-      {
-	itsInteger = itsRangeMax;
-	itsThrottle.move( itsThrottle.itsX, getY() + UP_OFFSET - 2);
-      }
-
-    ((FtsSliderObject)ftsObject).setValue(itsInteger);	
-
-    redraw();
-  }
-
-  public void sliderDrag(Point mouse)
-  {
-    int x, y;
-
-    x = mouse.x;
-    y = mouse.y;
-
-    if (itsMovingThrottle )
-      {
-	if( getY() + getHeight() - BOTTOM_OFFSET >= y && getY() + UP_OFFSET <=y )
-	  {
-	    //compute the value and send to FTS
-	    if ( itsInteger == (int)( ((getY() + getHeight()) - y - BOTTOM_OFFSET) * itsStep) )
-	      return;
-	
-	    itsInteger = (int)(((getY() + getHeight()) - y - BOTTOM_OFFSET) * itsStep);
-
-	    ((FtsSliderObject)ftsObject).setValue(itsInteger + itsRangeMin);
-	
-	    itsThrottle.move( itsThrottle.itsX, y - 2);
-	  }
-	else if( getY() + getHeight() - BOTTOM_OFFSET < y)
-	  {
-	    itsInteger = itsRangeMin;
-	    ((FtsSliderObject)ftsObject).setValue(itsInteger);
-
-	    itsThrottle.move( itsThrottle.itsX, getY() + getHeight() - BOTTOM_OFFSET - 2);
-	  }
-	else if( getY() + UP_OFFSET > y)
-	  {
-	    itsInteger = itsRangeMax;
-	    ((FtsSliderObject)ftsObject).setValue(itsInteger);
-
-	    itsThrottle.move( itsThrottle.itsX, getY() + UP_OFFSET - 2);
-	  }
-
-	redraw();
-      }
-  }
-
-  public void sliderUp(Point mouse)
-  {
-    if (itsMovingThrottle)
-      {
-	itsMovingThrottle = false;
-	((FtsSliderObject)ftsObject).updateValue();
-	Fts.sync();
-      }
-  }
-
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
-    if (Squeack.isDown(squeack))
-      sliderDown(mouse);
-    else if (Squeack.isDrag(squeack))
-      sliderDrag(mouse);
-    else if (Squeack.isUp(squeack))
-      sliderUp(mouse);
+    int newValue;
+
+    if ( getY() + getHeight() - BOTTOM_OFFSET >= mouse.y && getY() + UP_OFFSET < mouse.y) 
+      newValue = (int)((( getY() + getHeight()) - mouse.y - BOTTOM_OFFSET) * itsStep);
+    else if( getY() + getHeight() - BOTTOM_OFFSET < mouse.y)
+      newValue = itsRangeMin;
+    else 
+      newValue = itsRangeMax;
+
+    ((FtsSliderObject)ftsObject).setValue(newValue);
   }
-	
 
   public void paint( Graphics g) 
   {
@@ -352,7 +256,6 @@ class Slider extends GraphicObject implements FtsIntValueListener
       }
     else
       return super.findSensibilityArea( mouseX, mouseY);
-
   }
 }
 

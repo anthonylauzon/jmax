@@ -126,6 +126,7 @@ slider_put_value(fts_daemon_action_t action, fts_object_t *obj,
   this->n = fts_get_int(value);
 
   fts_outlet_send(obj, 0, fts_s_int, 1, value);
+  fts_object_ui_property_changed(obj, fts_s_value);
 }
 
 static fts_status_t
