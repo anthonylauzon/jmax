@@ -67,7 +67,7 @@ library (this requires big cleanup of the current ircam.jmax.fts.FtsPatcherObjec
 object should be introduced and all object creation from client side is delegated to 
 the 'parent' argument that is a FtsContainerObject. The client object is also a FtsContainerObject.
 <li>Add a UDP socket: create a udpstream derived from bytestream, add packet numbering 
-and may be simple packet reordering (window of N packets, with N < 10), add methods for
+and very simple flow control (no more than N packets in a tick), add methods for
 sending message over the UDP socket instead of TCP
 </li>
 <li> finish C++ reorganisation: split FtsServer into several classes (protocol encoder, decoder),
@@ -129,6 +129,25 @@ by selector+typeid ? sin(3.14) is a method of class __primitive_float ?
 Evaluate variables.c reimplementation
 </p>
  
+<p>
+Remove copies in fts_return: 
+<pre>
+extern fts_atom_t *fts_return_value;
+
+#define fts_return_int(I) (fts_set_int( fts_return_value, i), return)
+#define fts_return(P) (*fts_return_value = *P, return)
+
+and in expression.c:
+fts_return_value = expression->stack[ expression->top];
+fts_set_void( fts_return_value);
+(*mth)(ac, at);
+fts_return_value = NULL;
+
+Note: check if we must reintroduce specific place for return value in stack
+frame (otherwise return value is first argument, but should not hurt w.r.t.
+fts_return returns from the method)
+</pre>
+</p>
  
 <!-- ---------------------------------------------------------------------- -->
 <h3>Multi-thread</h3>
@@ -349,7 +368,9 @@ annotation with a menu item </li>
 </ul>
   
 <p>
-Delete JMaxApplication.getProperty() and use system properties.
+Use system properties: options must use -- as
+in FTS, property names must be "jmax.root" instead of "jmaxRoot", remove JMaxApplication.getProperty
+and replace all calls by System.getProperty()
 </p>
 
 <p>

@@ -30,8 +30,6 @@ extern void fts_abstraction_set_filename(fts_abstraction_t *abstraction, fts_sym
 
 extern fts_symbol_t fts_abstraction_get_original_filename(fts_abstraction_t *abstraction);
 
-extern void fts_abstraction_init(void);
-
 extern void fts_abstraction_declare(fts_symbol_t name, fts_symbol_t filename);
 extern void fts_abstraction_declare_path(fts_symbol_t path);
 

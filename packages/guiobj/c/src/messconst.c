@@ -113,7 +113,10 @@ messconst_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 messconst_expression_callback( int ac, const fts_atom_t *at, void *data)
 {
-  fts_outlet_atoms( (fts_object_t *)data, 0, ac, at);
+  if (fts_is_symbol( at))
+    fts_outlet_send( (fts_object_t *)data, 0, fts_get_symbol(at), ac-1, at+1);
+  else
+    fts_outlet_atoms( (fts_object_t *)data, 0, ac, at);
 }
 
 void
@@ -196,23 +199,34 @@ messconst_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
+messconst_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  messconst_t *this = (messconst_t *)o;
+  fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
+  fts_atom_t a;
+  
+  fts_set_tuple(&a, tuple);
+  fts_atom_assign(this->at + winlet, at);
+
+  if (winlet == 0)
+    fts_expression_reduce( this->expression, this->ac, this->at, messconst_expression_callback, this);
+}
+
+static void
 messconst_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messconst_t *this = (messconst_t *) o;
 
-  if (ac == 1)
-    fts_atom_assign(this->at + winlet, at);
-  else
+  if (ac == 1 && s == fts_get_selector( at))
     {
-      fts_tuple_t *t = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
-      fts_atom_t a;
+      fts_atom_assign(this->at + winlet, at);
 
-      fts_set_object(&a, (fts_object_t *)t);
-      fts_atom_assign(this->at + winlet, &a);
+      if (winlet == 0)
+	fts_expression_reduce( this->expression, this->ac, this->at, messconst_expression_callback, this);
     }
+  else
+    fts_object_signal_runtime_error(o, "Don't understand %s", s);
 
-  if (winlet == 0)
-    fts_expression_reduce( this->expression, this->ac, this->at, messconst_expression_callback, this);
 }
 
 /************************************************
@@ -316,7 +330,10 @@ messconst_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_bang, messconst_bang);
   
   for (i = 0; i < ninlets; i ++)
-    fts_method_define_varargs(cl, i, fts_s_anything, messconst_anything);
+    {
+      fts_method_define_varargs(cl, i, fts_s_list, messconst_tuple);
+      fts_method_define_varargs(cl, i, fts_s_anything, messconst_anything);
+    }
 
   /* value daemons */
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, messconst_get_value);

@@ -6,19 +6,19 @@
 # define	FTS_TOKEN_INT	257
 # define	FTS_TOKEN_FLOAT	258
 # define	FTS_TOKEN_SYMBOL	259
-# define	FTS_TOKEN_COLON	260
-# define	FTS_TOKEN_PAR	261
-# define	FTS_TOKEN_OPEN_PAR	262
-# define	FTS_TOKEN_CLOSED_PAR	263
-# define	FTS_TOKEN_CPAR	264
-# define	FTS_TOKEN_OPEN_CPAR	265
-# define	FTS_TOKEN_CLOSED_CPAR	266
-# define	FTS_TOKEN_SQPAR	267
-# define	FTS_TOKEN_OPEN_SQPAR	268
-# define	FTS_TOKEN_CLOSED_SQPAR	269
-# define	FTS_TOKEN_HIDDEN_MESSAGE	270
-# define	FTS_TOKEN_HIDDEN_OBJECT	271
-# define	FTS_TOKEN_SEMI	272
+# define	FTS_TOKEN_SEMI	260
+# define	FTS_TOKEN_COLON	261
+# define	FTS_TOKEN_PAR	262
+# define	FTS_TOKEN_TOPLEVEL_PAR	263
+# define	FTS_TOKEN_OPEN_PAR	264
+# define	FTS_TOKEN_CLOSED_PAR	265
+# define	FTS_TOKEN_CPAR	266
+# define	FTS_TOKEN_OPEN_CPAR	267
+# define	FTS_TOKEN_CLOSED_CPAR	268
+# define	FTS_TOKEN_SQPAR	269
+# define	FTS_TOKEN_OPEN_SQPAR	270
+# define	FTS_TOKEN_CLOSED_SQPAR	271
+# define	FTS_TOKEN_COMMA	272
 # define	FTS_TOKEN_TUPLE	273
 # define	FTS_TOKEN_EQUAL	274
 # define	FTS_TOKEN_LOGICAL_OR	275
@@ -81,12 +81,12 @@ typedef union {
 
 
 
-#define	YYFINAL		65
+#define	YYFINAL		69
 #define	YYFLAG		-32768
 #define	YYNTBASE	43
 
 /* YYTRANSLATE(YYLEX) -- Bison token number corresponding to YYLEX. */
-#define YYTRANSLATE(x) ((unsigned)(x) <= 296 ? yytranslate[x] : 53)
+#define YYTRANSLATE(x) ((unsigned)(x) <= 296 ? yytranslate[x] : 54)
 
 /* YYTRANSLATE[YYLEX] -- Bison token number corresponding to YYLEX. */
 static const char yytranslate[] =
@@ -126,25 +126,27 @@ static const char yytranslate[] =
 #if YYDEBUG
 static const short yyprhs[] =
 {
-       0,     0,     2,     6,     8,     9,    12,    14,    16,    18,
-      20,    22,    24,    26,    28,    30,    34,    37,    40,    43,
-      47,    51,    55,    59,    63,    67,    71,    75,    79,    83,
-      87,    91,    95,    99,   103,   107,   109,   114,   117
+       0,     0,     2,     6,     8,     9,    13,    15,    18,    20,
+      22,    24,    26,    28,    30,    32,    34,    36,    40,    43,
+      46,    49,    53,    57,    61,    65,    69,    73,    77,    81,
+      85,    89,    93,    97,   101,   105,   109,   113,   115,   120,
+     123
 };
 static const short yyrhs[] =
 {
-      44,     0,    44,    18,    45,     0,    45,     0,     0,    45,
-      46,     0,    46,     0,    47,     0,    48,     0,    49,     0,
-      50,     0,    51,     0,     3,     0,     4,     0,     5,     0,
-       8,    45,     9,     0,    33,    46,     0,    34,    46,     0,
-      38,    46,     0,    46,    33,    46,     0,    46,    34,    46,
-       0,    46,    35,    46,     0,    46,    36,    46,     0,    46,
-      39,    46,     0,    46,    37,    46,     0,    46,    31,    46,
-       0,    46,    32,    46,     0,    46,    22,    46,     0,    46,
-      21,    46,     0,    46,    23,    46,     0,    46,    24,    46,
-       0,    46,    25,    46,     0,    46,    26,    46,     0,    46,
-      27,    46,     0,    46,    28,    46,     0,    52,     0,    52,
-      14,    45,    15,     0,    42,     5,     0,    42,     3,     0
+      44,     0,    44,    18,    45,     0,    45,     0,     0,    10,
+      46,    11,     0,    46,     0,    46,    47,     0,    47,     0,
+      48,     0,    49,     0,    50,     0,    51,     0,    52,     0,
+       3,     0,     4,     0,     5,     0,    10,    46,    11,     0,
+      33,    47,     0,    34,    47,     0,    38,    47,     0,    47,
+      33,    47,     0,    47,    34,    47,     0,    47,    35,    47,
+       0,    47,    36,    47,     0,    47,    39,    47,     0,    47,
+      37,    47,     0,    47,    31,    47,     0,    47,    32,    47,
+       0,    47,    22,    47,     0,    47,    21,    47,     0,    47,
+      23,    47,     0,    47,    24,    47,     0,    47,    25,    47,
+       0,    47,    26,    47,     0,    47,    27,    47,     0,    47,
+      28,    47,     0,    53,     0,    53,    16,    46,    17,     0,
+      42,     5,     0,    42,     3,     0
 };
 
 #endif
@@ -153,10 +155,11 @@ static const short yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined. */
 static const short yyrline[] =
 {
-       0,   128,   132,   134,   136,   140,   142,   146,   147,   148,
-     149,   150,   153,   155,   157,   161,   165,   167,   169,   173,
-     175,   177,   179,   181,   183,   185,   187,   189,   191,   193,
-     195,   197,   199,   201,   203,   207,   208,   211,   213
+       0,   118,   122,   124,   126,   130,   132,   136,   138,   142,
+     143,   144,   145,   147,   150,   152,   154,   158,   162,   164,
+     166,   170,   172,   174,   176,   178,   180,   182,   184,   186,
+     188,   190,   192,   194,   196,   198,   200,   213,   214,   217,
+     219
 };
 #endif
 
@@ -167,40 +170,43 @@ static const short yyrline[] =
 static const char *const yytname[] =
 {
   "$", "error", "$undefined.", "FTS_TOKEN_INT", "FTS_TOKEN_FLOAT", 
-  "FTS_TOKEN_SYMBOL", "FTS_TOKEN_COLON", "FTS_TOKEN_PAR", 
-  "FTS_TOKEN_OPEN_PAR", "FTS_TOKEN_CLOSED_PAR", "FTS_TOKEN_CPAR", 
-  "FTS_TOKEN_OPEN_CPAR", "FTS_TOKEN_CLOSED_CPAR", "FTS_TOKEN_SQPAR", 
-  "FTS_TOKEN_OPEN_SQPAR", "FTS_TOKEN_CLOSED_SQPAR", 
-  "FTS_TOKEN_HIDDEN_MESSAGE", "FTS_TOKEN_HIDDEN_OBJECT", "FTS_TOKEN_SEMI", 
-  "FTS_TOKEN_TUPLE", "FTS_TOKEN_EQUAL", "FTS_TOKEN_LOGICAL_OR", 
-  "FTS_TOKEN_LOGICAL_AND", "FTS_TOKEN_EQUAL_EQUAL", "FTS_TOKEN_NOT_EQUAL", 
-  "FTS_TOKEN_GREATER", "FTS_TOKEN_GREATER_EQUAL", "FTS_TOKEN_SMALLER", 
+  "FTS_TOKEN_SYMBOL", "FTS_TOKEN_SEMI", "FTS_TOKEN_COLON", 
+  "FTS_TOKEN_PAR", "FTS_TOKEN_TOPLEVEL_PAR", "FTS_TOKEN_OPEN_PAR", 
+  "FTS_TOKEN_CLOSED_PAR", "FTS_TOKEN_CPAR", "FTS_TOKEN_OPEN_CPAR", 
+  "FTS_TOKEN_CLOSED_CPAR", "FTS_TOKEN_SQPAR", "FTS_TOKEN_OPEN_SQPAR", 
+  "FTS_TOKEN_CLOSED_SQPAR", "FTS_TOKEN_COMMA", "FTS_TOKEN_TUPLE", 
+  "FTS_TOKEN_EQUAL", "FTS_TOKEN_LOGICAL_OR", "FTS_TOKEN_LOGICAL_AND", 
+  "FTS_TOKEN_EQUAL_EQUAL", "FTS_TOKEN_NOT_EQUAL", "FTS_TOKEN_GREATER", 
+  "FTS_TOKEN_GREATER_EQUAL", "FTS_TOKEN_SMALLER", 
   "FTS_TOKEN_SMALLER_EQUAL", "FTS_TOKEN_UMINUS", "FTS_TOKEN_UPLUS", 
   "FTS_TOKEN_SHIFT_LEFT", "FTS_TOKEN_SHIFT_RIGHT", "FTS_TOKEN_PLUS", 
   "FTS_TOKEN_MINUS", "FTS_TOKEN_TIMES", "FTS_TOKEN_DIV", 
   "FTS_TOKEN_PERCENT", "FTS_TOKEN_LOGICAL_NOT", "FTS_TOKEN_POWER", 
   "FTS_TOKEN_ARRAY_INDEX", "FTS_TOKEN_DOT", "FTS_TOKEN_DOLLAR", 
-  "jmax_expression", "message", "tuple", "term", "primitive", "par_op", 
-  "unary_op", "binary_op", "ref", "variable", 0
+  "jmax_expression", "comma_expression_list", "expression", "term_list", 
+  "term", "primitive", "par_op", "unary_op", "binary_op", "ref", 
+  "variable", 0
 };
 #endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives. */
 static const short yyr1[] =
 {
-       0,    43,    44,    44,    44,    45,    45,    46,    46,    46,
-      46,    46,    47,    47,    47,    48,    49,    49,    49,    50,
-      50,    50,    50,    50,    50,    50,    50,    50,    50,    50,
-      50,    50,    50,    50,    50,    51,    51,    52,    52
+       0,    43,    44,    44,    44,    45,    45,    46,    46,    47,
+      47,    47,    47,    47,    48,    48,    48,    49,    50,    50,
+      50,    51,    51,    51,    51,    51,    51,    51,    51,    51,
+      51,    51,    51,    51,    51,    51,    51,    52,    52,    53,
+      53
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN. */
 static const short yyr2[] =
 {
-       0,     1,     3,     1,     0,     2,     1,     1,     1,     1,
-       1,     1,     1,     1,     1,     3,     2,     2,     2,     3,
-       3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
-       3,     3,     3,     3,     3,     1,     4,     2,     2
+       0,     1,     3,     1,     0,     3,     1,     2,     1,     1,
+       1,     1,     1,     1,     1,     1,     1,     3,     2,     2,
+       2,     3,     3,     3,     3,     3,     3,     3,     3,     3,
+       3,     3,     3,     3,     3,     3,     3,     1,     4,     2,
+       2
 };
 
 /* YYDEFACT[S] -- default rule to reduce with in state S when YYTABLE
@@ -208,73 +214,80 @@ static const short yyr2[] =
    error. */
 static const short yydefact[] =
 {
-       4,    12,    13,    14,     0,     0,     0,     0,     0,     1,
-       3,     6,     7,     8,     9,    10,    11,    35,     0,    16,
-      17,    18,    38,    37,     0,     5,     0,     0,     0,     0,
+       4,    14,    15,    16,     0,     0,     0,     0,     0,     1,
+       3,     6,     8,     9,    10,    11,    12,    13,    37,     0,
+       0,    18,    19,    20,    40,    39,     0,     7,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,    15,     2,    28,    27,    29,    30,    31,
-      32,    33,    34,    25,    26,    19,    20,    21,    22,    24,
-      23,     0,    36,     0,     0,     0
+       0,     0,     0,     0,     0,     0,    17,     2,    30,    29,
+      31,    32,    33,    34,    35,    36,    27,    28,    21,    22,
+      23,    24,    26,    25,     0,    17,    38,     0,     0,     0
 };
 
 static const short yydefgoto[] =
 {
-      63,     9,    10,    11,    12,    13,    14,    15,    16,    17
+      67,     9,    10,    11,    12,    13,    14,    15,    16,    17,
+      18
 };
 
 static const short yypact[] =
 {
-      54,-32768,-32768,-32768,    54,    54,    54,    54,     1,   -15,
-      54,    76,-32768,-32768,-32768,-32768,-32768,    -7,     7,    32,
-      32,   -31,-32768,-32768,    54,    76,    54,    54,    54,    54,
-      54,    54,    54,    54,    54,    54,    54,    54,    54,    54,
-      54,    54,    54,-32768,    54,    94,   111,   126,   126,    32,
-      32,    32,    32,   133,   133,    43,    43,   -31,   -31,   -31,
-  -32768,    39,-32768,     9,    14,-32768
+      62,-32768,-32768,-32768,    84,    84,    84,    84,     2,     1,
+  -32768,    84,   106,-32768,-32768,-32768,-32768,-32768,     5,    84,
+      41,   -23,   -23,   -22,-32768,-32768,    62,   106,    84,    84,
+      84,    84,    84,    84,    84,    84,    84,    84,    84,    84,
+      84,    84,    84,    84,    84,    44,     4,-32768,   124,   141,
+     156,   156,   -23,   -23,   -23,   -23,    72,    72,    21,    21,
+     -22,   -22,   -22,-32768,    59,-32768,-32768,    20,    39,-32768
 };
 
 static const short yypgoto[] =
 {
-  -32768,-32768,    13,    -5,-32768,-32768,-32768,-32768,-32768,-32768
+  -32768,-32768,    15,    -1,    -5,-32768,-32768,-32768,-32768,-32768,
+  -32768
 };
 
 
-#define	YYLAST		172
+#define	YYLAST		195
 
 
 static const short yytable[] =
 {
-      19,    20,    21,    24,    22,    25,    23,    42,    41,    64,
-       1,     2,     3,    25,    65,     4,    43,    18,     0,     0,
-       0,    45,    46,    47,    48,    49,    50,    51,    52,    53,
-      54,    55,    56,    57,    58,    59,    60,    44,     0,    25,
-       5,     6,     1,     2,     3,     7,     0,     4,     0,     8,
-       0,     0,     0,     0,    62,    61,    25,     1,     2,     3,
-       0,     0,     4,    34,    35,    36,    37,    38,    39,    40,
-       0,    41,     5,     6,     0,     0,     0,     7,    38,    39,
-      40,     8,    41,     0,     0,     0,     0,     5,     6,     0,
-       0,     0,     7,     0,     0,     0,     8,    26,    27,    28,
-      29,    30,    31,    32,    33,     0,     0,    34,    35,    36,
-      37,    38,    39,    40,     0,    41,    27,    28,    29,    30,
-      31,    32,    33,     0,     0,    34,    35,    36,    37,    38,
-      39,    40,     0,    41,    28,    29,    30,    31,    32,    33,
-       0,     0,    34,    35,    36,    37,    38,    39,    40,     0,
-      41,    30,    31,    32,    33,     0,     0,    34,    35,    36,
-      37,    38,    39,    40,     0,    41,    36,    37,    38,    39,
-      40,     0,    41
+      21,    22,    23,    20,    -5,    24,    27,    25,    36,    37,
+      38,    39,    40,    41,    42,    27,    43,    43,    45,    26,
+      68,    44,    -5,    48,    49,    50,    51,    52,    53,    54,
+      55,    56,    57,    58,    59,    60,    61,    62,    63,    69,
+      27,    47,     0,    64,     1,     2,     3,     1,     2,     3,
+       0,    19,    46,     0,    19,    65,    40,    41,    42,    27,
+      43,     0,     1,     2,     3,     1,     2,     3,     0,    19,
+       0,     0,     4,     0,     5,     6,    66,     5,     6,     7,
+       0,     0,     7,     8,     0,     0,     8,     1,     2,     3,
+       0,     0,     5,     6,    19,     5,     6,     7,     0,     0,
+       7,     8,     0,     0,     8,    38,    39,    40,    41,    42,
+       0,    43,     0,     0,     0,     0,     0,     5,     6,     0,
+       0,     0,     7,     0,     0,     0,     8,    28,    29,    30,
+      31,    32,    33,    34,    35,     0,     0,    36,    37,    38,
+      39,    40,    41,    42,     0,    43,    29,    30,    31,    32,
+      33,    34,    35,     0,     0,    36,    37,    38,    39,    40,
+      41,    42,     0,    43,    30,    31,    32,    33,    34,    35,
+       0,     0,    36,    37,    38,    39,    40,    41,    42,     0,
+      43,    32,    33,    34,    35,     0,     0,    36,    37,    38,
+      39,    40,    41,    42,     0,    43
 };
 
 static const short yycheck[] =
 {
-       5,     6,     7,    18,     3,    10,     5,    14,    39,     0,
-       3,     4,     5,    18,     0,     8,     9,     4,    -1,    -1,
-      -1,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    39,    40,    41,    24,    -1,    44,
-      33,    34,     3,     4,     5,    38,    -1,     8,    -1,    42,
-      -1,    -1,    -1,    -1,    15,    42,    61,     3,     4,     5,
-      -1,    -1,     8,    31,    32,    33,    34,    35,    36,    37,
-      -1,    39,    33,    34,    -1,    -1,    -1,    38,    35,    36,
-      37,    42,    39,    -1,    -1,    -1,    -1,    33,    34,    -1,
+       5,     6,     7,     4,     0,     3,    11,     5,    31,    32,
+      33,    34,    35,    36,    37,    20,    39,    39,    19,    18,
+       0,    16,    18,    28,    29,    30,    31,    32,    33,    34,
+      35,    36,    37,    38,    39,    40,    41,    42,    43,     0,
+      45,    26,    -1,    44,     3,     4,     5,     3,     4,     5,
+      -1,    10,    11,    -1,    10,    11,    35,    36,    37,    64,
+      39,    -1,     3,     4,     5,     3,     4,     5,    -1,    10,
+      -1,    -1,    10,    -1,    33,    34,    17,    33,    34,    38,
+      -1,    -1,    38,    42,    -1,    -1,    42,     3,     4,     5,
+      -1,    -1,    33,    34,    10,    33,    34,    38,    -1,    -1,
+      38,    42,    -1,    -1,    42,    33,    34,    35,    36,    37,
+      -1,    39,    -1,    -1,    -1,    -1,    -1,    33,    34,    -1,
       -1,    -1,    38,    -1,    -1,    -1,    42,    21,    22,    23,
       24,    25,    26,    27,    28,    -1,    -1,    31,    32,    33,
       34,    35,    36,    37,    -1,    39,    22,    23,    24,    25,
@@ -282,8 +295,7 @@ static const short yycheck[] =
       36,    37,    -1,    39,    23,    24,    25,    26,    27,    28,
       -1,    -1,    31,    32,    33,    34,    35,    36,    37,    -1,
       39,    25,    26,    27,    28,    -1,    -1,    31,    32,    33,
-      34,    35,    36,    37,    -1,    39,    33,    34,    35,    36,
-      37,    -1,    39
+      34,    35,    36,    37,    -1,    39
 };
 #define YYPURE 1
 
@@ -995,127 +1007,131 @@ yyreduce:
   switch (yyn) {
 
 case 1:
-#line 129 "parser.y"
+#line 119 "parser.y"
 { ((struct _parser_data *)data)->tree = yyvsp[0].n; }
     break;
 case 2:
-#line 133 "parser.y"
-{ yyval.n = fts_parsetree_new_node( FTS_TOKEN_SEMI, 0, yyvsp[-2].n, yyvsp[0].n); }
+#line 123 "parser.y"
+{ yyval.n = fts_parsetree_new_node( FTS_TOKEN_COMMA, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
 case 3:
-#line 135 "parser.y"
-{ yyval.n = fts_parsetree_new_node( FTS_TOKEN_SEMI, 0, 0, yyvsp[0].n); }
+#line 125 "parser.y"
+{ yyval.n = fts_parsetree_new_node( FTS_TOKEN_COMMA, 0, 0, yyvsp[0].n); }
     break;
 case 4:
-#line 137 "parser.y"
+#line 127 "parser.y"
 { yyval.n = 0; }
     break;
 case 5:
-#line 141 "parser.y"
+#line 131 "parser.y"
+{ yyval.n = fts_parsetree_new_node( FTS_TOKEN_TOPLEVEL_PAR, 0, 0, yyvsp[-1].n); }
+    break;
+case 7:
+#line 137 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_TUPLE, 0, yyvsp[-1].n, yyvsp[0].n); }
     break;
-case 6:
-#line 143 "parser.y"
+case 8:
+#line 139 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_TUPLE, 0, 0, yyvsp[0].n); }
     break;
-case 12:
-#line 154 "parser.y"
+case 14:
+#line 151 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_INT, &(yyvsp[0].a), 0, 0); }
     break;
-case 13:
-#line 156 "parser.y"
+case 15:
+#line 153 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_FLOAT, &(yyvsp[0].a), 0, 0); }
     break;
-case 14:
-#line 158 "parser.y"
+case 16:
+#line 155 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_SYMBOL, &(yyvsp[0].a), 0, 0); }
     break;
-case 15:
-#line 162 "parser.y"
+case 17:
+#line 159 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_PAR, 0, 0, yyvsp[-1].n); }
     break;
-case 16:
-#line 166 "parser.y"
+case 18:
+#line 163 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_UPLUS, 0, yyvsp[0].n, 0); }
     break;
-case 17:
-#line 168 "parser.y"
+case 19:
+#line 165 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_UMINUS, 0, yyvsp[0].n, 0); }
     break;
-case 18:
-#line 170 "parser.y"
+case 20:
+#line 167 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_LOGICAL_NOT, 0, yyvsp[0].n, 0); }
     break;
-case 19:
-#line 174 "parser.y"
+case 21:
+#line 171 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_PLUS, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
-case 20:
-#line 176 "parser.y"
+case 22:
+#line 173 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_MINUS, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
-case 21:
-#line 178 "parser.y"
+case 23:
+#line 175 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_TIMES, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
-case 22:
-#line 180 "parser.y"
+case 24:
+#line 177 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_DIV, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
-case 23:
-#line 182 "parser.y"
+case 25:
+#line 179 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_POWER, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
-case 24:
-#line 184 "parser.y"
+case 26:
+#line 181 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_PERCENT, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
-case 25:
-#line 186 "parser.y"
+case 27:
+#line 183 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_SHIFT_LEFT, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
-case 26:
-#line 188 "parser.y"
+case 28:
+#line 185 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_SHIFT_RIGHT, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
-case 27:
-#line 190 "parser.y"
+case 29:
+#line 187 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_LOGICAL_AND, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
-case 28:
-#line 192 "parser.y"
+case 30:
+#line 189 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_LOGICAL_OR, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
-case 29:
-#line 194 "parser.y"
+case 31:
+#line 191 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_EQUAL_EQUAL, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
-case 30:
-#line 196 "parser.y"
+case 32:
+#line 193 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_NOT_EQUAL, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
-case 31:
-#line 198 "parser.y"
+case 33:
+#line 195 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_GREATER, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
-case 32:
-#line 200 "parser.y"
+case 34:
+#line 197 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_GREATER_EQUAL, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
-case 33:
-#line 202 "parser.y"
+case 35:
+#line 199 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_SMALLER, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
-case 34:
-#line 204 "parser.y"
+case 36:
+#line 201 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_SMALLER_EQUAL, 0, yyvsp[-2].n, yyvsp[0].n); }
     break;
-case 37:
-#line 212 "parser.y"
+case 39:
+#line 218 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_DOLLAR, &(yyvsp[0].a), 0, 0); }
     break;
-case 38:
-#line 214 "parser.y"
+case 40:
+#line 220 "parser.y"
 { yyval.n = fts_parsetree_new_node( FTS_TOKEN_DOLLAR, &(yyvsp[0].a), 0, 0); }
     break;
 }
@@ -1351,10 +1367,10 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 217 "parser.y"
+#line 223 "parser.y"
 
 
-static fts_hashtable_t token_table;
+static fts_hashtable_t fts_token_table;
 
 static int yyerror( const char *msg)
 {
@@ -1376,17 +1392,24 @@ static int yylex( YYSTYPE *lvalp, void *data)
       fts_atom_t k, v;
 
       k = *parser_data->at;
-      if (fts_hashtable_get( &token_table, &k, &v))
+      if (fts_hashtable_get( &fts_token_table, &k, &v))
 	token = fts_get_int( &v);
       else
-	token = FTS_TOKEN_SYMBOL;
+	{
+	  token = FTS_TOKEN_SYMBOL;
+	  lvalp->a = *parser_data->at;
+	}
     }
   else if (fts_is_int( parser_data->at))
-    token = FTS_TOKEN_INT;
+    {
+      token = FTS_TOKEN_INT;
+      lvalp->a = *parser_data->at;
+    }
   else if (fts_is_float( parser_data->at))
-    token = FTS_TOKEN_FLOAT;
-
-  lvalp->a = *parser_data->at;
+    {
+      token = FTS_TOKEN_FLOAT;
+      lvalp->a = *parser_data->at;
+    }
 
   parser_data->at++;
   parser_data->ac--;
@@ -1453,43 +1476,44 @@ void fts_kernel_parser_init( void)
 {
   parsetree_heap = fts_heap_new( sizeof( fts_parsetree_t));
 
-  fts_hashtable_init( &token_table, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_MEDIUM);
+  fts_hashtable_init( &fts_token_table, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_MEDIUM);
 
-#define PUT(S,T) 				\
- {						\
-   fts_atom_t k, v;				\
-						\
-   fts_set_symbol( &k, S);			\
-   fts_set_int( &v, T);				\
-   fts_hashtable_put( &token_table, &k, &v);	\
+#define PUT_TOKEN(S,T)					\
+ {							\
+   fts_atom_t k, v;					\
+							\
+   fts_set_symbol( &k, S);				\
+   fts_set_int( &v, T);					\
+   fts_hashtable_put( &fts_token_table, &k, &v);	\
  }
 
-  PUT( fts_s_dollar, FTS_TOKEN_DOLLAR);
-  PUT( fts_s_semi, FTS_TOKEN_SEMI);
-  PUT( fts_s_plus, FTS_TOKEN_PLUS);
-  PUT( fts_s_minus, FTS_TOKEN_MINUS);
-  PUT( fts_s_times, FTS_TOKEN_TIMES);
-  PUT( fts_s_div, FTS_TOKEN_DIV);
-  PUT( fts_s_power, FTS_TOKEN_POWER);
-  PUT( fts_s_open_par, FTS_TOKEN_OPEN_PAR);
-  PUT( fts_s_closed_par, FTS_TOKEN_CLOSED_PAR);
-  PUT( fts_s_open_sqpar, FTS_TOKEN_OPEN_SQPAR);
-  PUT( fts_s_closed_sqpar, FTS_TOKEN_CLOSED_SQPAR);
-  PUT( fts_s_open_cpar, FTS_TOKEN_OPEN_CPAR);
-  PUT( fts_s_closed_cpar, FTS_TOKEN_CLOSED_CPAR);
-  PUT( fts_s_dot, FTS_TOKEN_DOT);
-  PUT( fts_s_percent, FTS_TOKEN_PERCENT);
-  PUT( fts_s_shift_left, FTS_TOKEN_SHIFT_LEFT);
-  PUT( fts_s_shift_right, FTS_TOKEN_SHIFT_RIGHT);
-  PUT( fts_s_logical_and, FTS_TOKEN_LOGICAL_AND);
-  PUT( fts_s_logical_or, FTS_TOKEN_LOGICAL_OR);
-  PUT( fts_s_logical_not, FTS_TOKEN_LOGICAL_NOT);
-  PUT( fts_s_equal_equal, FTS_TOKEN_EQUAL_EQUAL);
-  PUT( fts_s_not_equal, FTS_TOKEN_NOT_EQUAL);
-  PUT( fts_s_greater, FTS_TOKEN_GREATER);
-  PUT( fts_s_greater_equal, FTS_TOKEN_GREATER_EQUAL);
-  PUT( fts_s_smaller, FTS_TOKEN_SMALLER);
-  PUT( fts_s_smaller_equal, FTS_TOKEN_SMALLER_EQUAL);
-  PUT( fts_s_colon, FTS_TOKEN_COLON);
-  PUT( fts_s_equal, FTS_TOKEN_EQUAL);
+  PUT_TOKEN( fts_s_dollar, FTS_TOKEN_DOLLAR);
+  PUT_TOKEN( fts_s_semi, FTS_TOKEN_SEMI);
+  PUT_TOKEN( fts_s_comma, FTS_TOKEN_COMMA);
+  PUT_TOKEN( fts_s_plus, FTS_TOKEN_PLUS);
+  PUT_TOKEN( fts_s_minus, FTS_TOKEN_MINUS);
+  PUT_TOKEN( fts_s_times, FTS_TOKEN_TIMES);
+  PUT_TOKEN( fts_s_div, FTS_TOKEN_DIV);
+  PUT_TOKEN( fts_s_power, FTS_TOKEN_POWER);
+  PUT_TOKEN( fts_s_open_par, FTS_TOKEN_OPEN_PAR);
+  PUT_TOKEN( fts_s_closed_par, FTS_TOKEN_CLOSED_PAR);
+  PUT_TOKEN( fts_s_open_sqpar, FTS_TOKEN_OPEN_SQPAR);
+  PUT_TOKEN( fts_s_closed_sqpar, FTS_TOKEN_CLOSED_SQPAR);
+  PUT_TOKEN( fts_s_open_cpar, FTS_TOKEN_OPEN_CPAR);
+  PUT_TOKEN( fts_s_closed_cpar, FTS_TOKEN_CLOSED_CPAR);
+  PUT_TOKEN( fts_s_dot, FTS_TOKEN_DOT);
+  PUT_TOKEN( fts_s_percent, FTS_TOKEN_PERCENT);
+  PUT_TOKEN( fts_s_shift_left, FTS_TOKEN_SHIFT_LEFT);
+  PUT_TOKEN( fts_s_shift_right, FTS_TOKEN_SHIFT_RIGHT);
+  PUT_TOKEN( fts_s_logical_and, FTS_TOKEN_LOGICAL_AND);
+  PUT_TOKEN( fts_s_logical_or, FTS_TOKEN_LOGICAL_OR);
+  PUT_TOKEN( fts_s_logical_not, FTS_TOKEN_LOGICAL_NOT);
+  PUT_TOKEN( fts_s_equal_equal, FTS_TOKEN_EQUAL_EQUAL);
+  PUT_TOKEN( fts_s_not_equal, FTS_TOKEN_NOT_EQUAL);
+  PUT_TOKEN( fts_s_greater, FTS_TOKEN_GREATER);
+  PUT_TOKEN( fts_s_greater_equal, FTS_TOKEN_GREATER_EQUAL);
+  PUT_TOKEN( fts_s_smaller, FTS_TOKEN_SMALLER);
+  PUT_TOKEN( fts_s_smaller_equal, FTS_TOKEN_SMALLER_EQUAL);
+  PUT_TOKEN( fts_s_colon, FTS_TOKEN_COLON);
+  PUT_TOKEN( fts_s_equal, FTS_TOKEN_EQUAL);
 }

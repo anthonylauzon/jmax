@@ -34,5 +34,7 @@ FTS_API int fts_expression_reduce( fts_expression_t *expression, int env_ac, con
 
 FTS_API void fts_expression_delete( fts_expression_t *expression);
 
+FTS_API void fts_expression_declare_function( fts_symbol_t name, fts_function_t function);
+
 
 

@@ -21,10 +21,12 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 #include <fts/fts.h>
 #include <ftsprivate/parser.h>
+#include <ftsprivate/message.h>
 #include "parser.h"
 
 static fts_heap_t *expression_heap;
@@ -36,7 +38,84 @@ struct _fts_expression_t {
   int fp;                       /* frame pointer */
 };
 
+/* #define EXPRESSION_DEBUG */
+#undef EXPRESSION_DEBUG
+
 static void fts_expression_print( fts_expression_t *expression);
+
+/* **********************************************************************
+ *
+ * Functions
+ *
+ */
+
+#if 0
+void fts_expression_declare_function( fts_symbol_t name, fts_function_t function)
+{
+  fts_atom_t k, v;
+
+  fts_set_symbol( &k, name);
+  fts_set_pointer( &v, function);
+  fts_hashtable_put( &fts_token_table, &k, &v);
+}
+
+static void unique_function(int ac, const fts_atom_t *at)
+{
+  static int seed = 1;
+  fts_atom_t ret[1];						\
+
+  fts_set_int( ret, seed++);
+  
+  fts_return( ret);
+}
+
+#define DEFINE_FUN(FUN)						\
+static void FUN##_function( int ac, const fts_atom_t *at)	\
+{								\
+  fts_atom_t ret[1];						\
+								\
+  if (ac == 1 && fts_is_number( at))				\
+    fts_set_float( ret, FUN( fts_get_number_float( at)));	\
+								\
+  fts_return( ret);						\
+}
+
+#define FUN DEFINE_FUN
+FUN(sin);
+FUN(cos)
+FUN(tan)
+FUN(asin)
+FUN(acos)
+FUN(atan)
+FUN(sinh)
+FUN(cosh)
+FUN(tanh)
+FUN(asinh)
+FUN(acosh)
+FUN(atanh)
+
+static void declare_functions( void)
+{
+#define DECLARE_FUN(FUN)							\
+  fts_expression_declare_function( fts_new_symbol( #FUN), FUN##_function);
+
+#define FUN DECLARE_FUN
+  FUN(unique);
+  FUN(sin);
+  FUN(cos);
+  FUN(tan);
+  FUN(asin);
+  FUN(acos);
+  FUN(atan);
+  FUN(sinh);
+  FUN(cosh);
+  FUN(tanh);
+  FUN(asinh);
+  FUN(acosh);
+  FUN(atanh);
+}
+#endif
+
 
 /* **********************************************************************
  *
@@ -89,7 +168,7 @@ static void expression_stack_print( fts_expression_t *expression, const char *ms
 	  current_fp = fts_get_int( p+i);
 	}
       else
-	fts_log( "  ");
+	fprintf( stderr, "  ");
 
       if (fts_is_int( p+i))
 	fprintf( stderr, "INT %d\n", fts_get_int(p+i));
@@ -99,6 +178,8 @@ static void expression_stack_print( fts_expression_t *expression, const char *ms
 	fprintf( stderr, "VOID\n");
       else if (fts_is_symbol( p+i))
 	fprintf( stderr, "SYMBOL %s\n", fts_get_symbol(p+i));
+      else if (fts_is_object( p+i))
+	fprintf( stderr, "OBJECT %s\n", fts_object_get_class_name( fts_get_object(p+i)));
     }
 }
 #endif
@@ -138,7 +219,7 @@ static void expression_stack_pop_frame( fts_expression_t *expression)
 
 
 /*
- * Evaluator callbacks
+ * Operators
  */
 
 #define UNOP_EVAL(OP)								\
@@ -214,7 +295,7 @@ void expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *expression, i
   
   switch( tree->token) {
 
-  case FTS_TOKEN_SEMI:
+  case FTS_TOKEN_COMMA:
     expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data);
 
     expression_stack_push_frame( expression);
@@ -228,6 +309,31 @@ void expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *expression, i
     (*callback)( ac, at, data);
     break;
 
+  case FTS_TOKEN_TOPLEVEL_PAR:
+    expression_stack_push_frame( expression);
+
+    expression_eval_aux( tree->left, expression, env_ac, env_at, callback, data);
+    expression_eval_aux( tree->right, expression, env_ac, env_at, callback, data);
+
+    ac = expression_stack_frame_count( expression);
+    at = expression_stack_frame( expression);
+    expression_stack_pop_frame( expression);
+
+    {
+      fts_atom_t ret[1];
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create( fts_tuple_metaclass, ac, at);
+
+      /* FIXME */
+      /* When is this tuple released ? Should we go through the stack when
+	 popping a frame and release the tuples ? */
+      fts_object_refer( tuple);
+      
+      fts_set_tuple( ret, tuple);
+      
+      expression_stack_push( expression, ret);
+    }
+    break;
+
   case FTS_TOKEN_PAR:
     expression_stack_push_frame( expression);
 
@@ -238,6 +344,7 @@ void expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *expression, i
     at = expression_stack_frame( expression);
     expression_stack_pop_frame( expression);
 
+    /* we don't create a tuple if there is only one atom in the frame */
     if ( ac == 1)
       expression_stack_push( expression, at);
     else
@@ -389,12 +496,36 @@ void expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *expression, i
   case FTS_TOKEN_SMALLER_EQUAL:
     LBINOP_EVAL(<=);
     break;
+
+#if 0
+  case FTS_TOKEN_FUNCALL:
+    expression_stack_push_frame( expression);
+
+    expression_eval_aux( tree->right, expression, env_ac, env_at, callback, data);
+
+    ac = expression_stack_frame_count( expression);
+    at = expression_stack_frame( expression);
+
+    expression_stack_pop_frame( expression);
+
+    fts_set_void( fts_get_return_value());
+
+    (*(fts_function_t)fts_get_pointer( &tree->value))( ac, at);
+
+    expression_stack_push( expression, fts_get_return_value());
+
+    break;
+#endif
   }
 }
 
 
 int fts_expression_reduce( fts_expression_t *expression, int env_ac, const fts_atom_t *env_at, fts_expression_callback_t callback, void *data)
 {
+#ifdef EXPRESSION_DEBUG
+  fts_expression_print( expression);
+#endif
+
   expression_eval_aux( expression->tree, expression, env_ac, env_at, callback, data);
 
   return 1;
@@ -456,7 +587,7 @@ static void parsetree_print_aux( fts_parsetree_t *tree, int indent)
     fprintf( stderr, "   ");
 
   switch( tree->token) {
-  case FTS_TOKEN_SEMI: fprintf( stderr, ";\n"); break;
+  case FTS_TOKEN_COMMA: fprintf( stderr, ",\n"); break;
   case FTS_TOKEN_TUPLE: fprintf( stderr, "TUPLE\n"); break;
   case FTS_TOKEN_INT: fprintf( stderr, "INT %d\n", fts_get_int( &tree->value)); break;
   case FTS_TOKEN_FLOAT: fprintf( stderr, "FLOAT %g\n", fts_get_float( &tree->value)); break;
@@ -558,5 +689,9 @@ void fts_expression_delete( fts_expression_t *expression)
 void fts_kernel_expression_init( void)
 {
   expression_heap = fts_heap_new( sizeof( fts_expression_t));
+
+#if 0
+  declare_functions();
+#endif
 }
 

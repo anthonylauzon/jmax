@@ -1,3 +1,8 @@
+2002-07-31  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* fixed message box w.r.t. tuple and messages. To summarize, start 1 2 3 is
+	a message and (start 1 2 3) is a tuple.
+
 2002-07-25  Patrice Tisserand  <tisseran@lithium.ircam.fr>
 
 	* first integration of ALSA sequencer objects.

@@ -286,16 +286,16 @@ static void yy_fatal_error YY_PROTO(( yyconst char msg[] ));
 	*yy_cp = '\0'; \
 	yy_c_buf_p = yy_cp;
 
-#define YY_NUM_RULES 35
-#define YY_END_OF_BUFFER 36
+#define YY_NUM_RULES 36
+#define YY_END_OF_BUFFER 37
 static yyconst short int yy_accept[62] =
     {   0,
-        0,    0,   36,   34,    1,    1,   24,   34,    5,   19,
-       34,   12,   13,    9,    7,   35,    8,   18,   10,    2,
-        2,   31,    6,   29,   32,   27,   14,   15,   16,   34,
-       17,   34,    1,    1,   26,   34,    0,   22,   11,    2,
-        2,    4,    2,   34,   34,   20,   30,   25,   28,   21,
-       23,   33,   33,    0,    4,   34,    4,    3,    0,    4,
+        0,    0,   37,   35,    1,    1,   25,   35,    5,   20,
+       35,   13,   14,   10,    8,    7,    9,   19,   11,    2,
+        2,   32,    6,   30,   33,   28,   15,   16,   17,   35,
+       18,   35,    1,    1,   27,   35,    0,   23,   12,    2,
+        2,    4,    2,   35,   35,   21,   31,   26,   29,   22,
+       24,   34,   34,    0,    4,   35,    4,    3,    0,    4,
         0
     } ;
 
@@ -604,7 +604,7 @@ YY_DECL
 	register char *yy_cp = NULL, *yy_bp = NULL;
 	register int yy_act;
 
-#line 80 "tokenizer.l"
+#line 81 "tokenizer.l"
 
 
 #line 611 "lex.yy.c"
@@ -692,180 +692,185 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 82 "tokenizer.l"
+#line 83 "tokenizer.l"
 
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 83 "tokenizer.l"
+#line 84 "tokenizer.l"
 { SET_INT( yytext); return 1; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 84 "tokenizer.l"
+#line 85 "tokenizer.l"
 { SET_HEXINT( yytext+2); return 1; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 85 "tokenizer.l"
+#line 86 "tokenizer.l"
 { SET_FLOAT( yytext); return 1; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 86 "tokenizer.l"
+#line 87 "tokenizer.l"
 { SET_SYMBOL( fts_s_dollar); return 1; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 87 "tokenizer.l"
+#line 88 "tokenizer.l"
 { SET_SYMBOL( fts_s_semi); return 1; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 88 "tokenizer.l"
-{ SET_SYMBOL( fts_s_plus); return 1; }
+#line 89 "tokenizer.l"
+{ SET_SYMBOL( fts_s_comma); return 1; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 89 "tokenizer.l"
-{ SET_SYMBOL( fts_s_minus); return 1; }
+#line 90 "tokenizer.l"
+{ SET_SYMBOL( fts_s_plus); return 1; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 90 "tokenizer.l"
-{ SET_SYMBOL( fts_s_times); return 1; }
+#line 91 "tokenizer.l"
+{ SET_SYMBOL( fts_s_minus); return 1; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 91 "tokenizer.l"
-{ SET_SYMBOL( fts_s_div); return 1; }
+#line 92 "tokenizer.l"
+{ SET_SYMBOL( fts_s_times); return 1; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 92 "tokenizer.l"
-{ SET_SYMBOL( fts_s_power); return 1; }
+#line 93 "tokenizer.l"
+{ SET_SYMBOL( fts_s_div); return 1; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 93 "tokenizer.l"
-{ SET_SYMBOL( fts_s_open_par); return 1; }
+#line 94 "tokenizer.l"
+{ SET_SYMBOL( fts_s_power); return 1; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 94 "tokenizer.l"
-{ SET_SYMBOL( fts_s_closed_par); return 1; }
+#line 95 "tokenizer.l"
+{ SET_SYMBOL( fts_s_open_par); return 1; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 95 "tokenizer.l"
-{ SET_SYMBOL( fts_s_open_sqpar); return 1; }
+#line 96 "tokenizer.l"
+{ SET_SYMBOL( fts_s_closed_par); return 1; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 96 "tokenizer.l"
-{ SET_SYMBOL( fts_s_closed_sqpar); return 1; }
+#line 97 "tokenizer.l"
+{ SET_SYMBOL( fts_s_open_sqpar); return 1; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 97 "tokenizer.l"
-{ SET_SYMBOL( fts_s_open_cpar); return 1; }
+#line 98 "tokenizer.l"
+{ SET_SYMBOL( fts_s_closed_sqpar); return 1; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 98 "tokenizer.l"
-{ SET_SYMBOL( fts_s_closed_cpar); return 1; }
+#line 99 "tokenizer.l"
+{ SET_SYMBOL( fts_s_open_cpar); return 1; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 99 "tokenizer.l"
-{ SET_SYMBOL( fts_s_dot); return 1; }
+#line 100 "tokenizer.l"
+{ SET_SYMBOL( fts_s_closed_cpar); return 1; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 100 "tokenizer.l"
-{ SET_SYMBOL( fts_s_percent); return 1; }
+#line 101 "tokenizer.l"
+{ SET_SYMBOL( fts_s_dot); return 1; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 101 "tokenizer.l"
-{ SET_SYMBOL( fts_s_shift_left); return 1; }
+#line 102 "tokenizer.l"
+{ SET_SYMBOL( fts_s_percent); return 1; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 102 "tokenizer.l"
-{ SET_SYMBOL( fts_s_shift_right); return 1; }
+#line 103 "tokenizer.l"
+{ SET_SYMBOL( fts_s_shift_left); return 1; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 103 "tokenizer.l"
-{ SET_SYMBOL( fts_s_logical_and); return 1; }
+#line 104 "tokenizer.l"
+{ SET_SYMBOL( fts_s_shift_right); return 1; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 104 "tokenizer.l"
-{ SET_SYMBOL( fts_s_logical_or); return 1; }
+#line 105 "tokenizer.l"
+{ SET_SYMBOL( fts_s_logical_and); return 1; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 105 "tokenizer.l"
-{ SET_SYMBOL( fts_s_logical_not); return 1; }
+#line 106 "tokenizer.l"
+{ SET_SYMBOL( fts_s_logical_or); return 1; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 106 "tokenizer.l"
-{ SET_SYMBOL( fts_s_equal_equal); return 1; }
+#line 107 "tokenizer.l"
+{ SET_SYMBOL( fts_s_logical_not); return 1; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 107 "tokenizer.l"
-{ SET_SYMBOL( fts_s_not_equal); return 1; }
+#line 108 "tokenizer.l"
+{ SET_SYMBOL( fts_s_equal_equal); return 1; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 108 "tokenizer.l"
-{ SET_SYMBOL( fts_s_greater); return 1; }
+#line 109 "tokenizer.l"
+{ SET_SYMBOL( fts_s_not_equal); return 1; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 109 "tokenizer.l"
-{ SET_SYMBOL( fts_s_greater_equal); return 1; }
+#line 110 "tokenizer.l"
+{ SET_SYMBOL( fts_s_greater); return 1; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 110 "tokenizer.l"
-{ SET_SYMBOL( fts_s_smaller); return 1; }
+#line 111 "tokenizer.l"
+{ SET_SYMBOL( fts_s_greater_equal); return 1; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 111 "tokenizer.l"
-{ SET_SYMBOL( fts_s_smaller_equal); return 1; }
+#line 112 "tokenizer.l"
+{ SET_SYMBOL( fts_s_smaller); return 1; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 112 "tokenizer.l"
-{ SET_SYMBOL( fts_s_colon); return 1; }
+#line 113 "tokenizer.l"
+{ SET_SYMBOL( fts_s_smaller_equal); return 1; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 113 "tokenizer.l"
-{ SET_SYMBOL( fts_s_equal); return 1; }
+#line 114 "tokenizer.l"
+{ SET_SYMBOL( fts_s_colon); return 1; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 114 "tokenizer.l"
-{ yytext[yyleng-1] = '\0'; SET_SYMBOL_COPY( yytext+1); return 1; }
+#line 115 "tokenizer.l"
+{ SET_SYMBOL( fts_s_equal); return 1; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 115 "tokenizer.l"
-{ SET_SYMBOL_COPY( yytext); return 1; }
+#line 116 "tokenizer.l"
+{ yytext[yyleng-1] = '\0'; SET_SYMBOL_COPY( yytext+1); return 1; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
 #line 117 "tokenizer.l"
+{ SET_SYMBOL_COPY( yytext); return 1; }
+	YY_BREAK
+case 36:
+YY_RULE_SETUP
+#line 119 "tokenizer.l"
 ECHO;
 	YY_BREAK
-#line 869 "lex.yy.c"
+#line 874 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1746,7 +1751,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 117 "tokenizer.l"
+#line 119 "tokenizer.l"
 
 
 void fts_tokenizer_init_string( fts_tokenizer_t *tokenizer, const char *s)

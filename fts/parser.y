@@ -57,8 +57,10 @@ struct _parser_data {
 %token <a> FTS_TOKEN_FLOAT
 %token <a> FTS_TOKEN_SYMBOL
 
+%token FTS_TOKEN_SEMI
 %token FTS_TOKEN_COLON
 %token FTS_TOKEN_PAR
+%token FTS_TOKEN_TOPLEVEL_PAR
 %token FTS_TOKEN_OPEN_PAR
 %token FTS_TOKEN_CLOSED_PAR
 %token FTS_TOKEN_CPAR
@@ -68,15 +70,12 @@ struct _parser_data {
 %token FTS_TOKEN_OPEN_SQPAR
 %token FTS_TOKEN_CLOSED_SQPAR
 
-%token FTS_TOKEN_HIDDEN_MESSAGE
-%token FTS_TOKEN_HIDDEN_OBJECT
-
 /*
  * Operators
  */
 
 
-%left FTS_TOKEN_SEMI
+%left FTS_TOKEN_COMMA
 %left FTS_TOKEN_TUPLE
 %right FTS_TOKEN_EQUAL
 %left FTS_TOKEN_LOGICAL_OR
@@ -89,21 +88,24 @@ struct _parser_data {
 %left FTS_TOKEN_TIMES FTS_TOKEN_DIV FTS_TOKEN_PERCENT
 %right FTS_TOKEN_LOGICAL_NOT
 %left FTS_TOKEN_POWER
+/* %left FTS_TOKEN_FUNCALL */
 %left FTS_TOKEN_ARRAY_INDEX
 %left FTS_TOKEN_DOT
 %right FTS_TOKEN_DOLLAR
 
 
 %type <n> jmax_expression
-%type <n> message
-/* %type <n> object */
-%type <n> tuple
+%type <n> comma_expression_list
+%type <n> expression
+%type <n> term_list
+/* %type <n> opt_term_list */
 %type <n> term
 %type <n> primitive
 %type <n> par_op
 %type <n> unary_op
 %type <n> binary_op
 %type <n> ref
+/* %type <n> funcall */
 %type <n> variable
 
 %%
@@ -113,31 +115,25 @@ struct _parser_data {
  *
  */
 
-/* jmax_expression: FTS_TOKEN_HIDDEN_MESSAGE message */
-/* 		{ ((struct _parser_data *)data)->tree = $2; } */
-/* 	| FTS_TOKEN_HIDDEN_OBJECT object */
-/* 		{ ((struct _parser_data *)data)->tree = $2; } */
-/* ; */
-
-/* object: FTS_TOKEN_SYMBOL FTS_TOKEN_COLON tuple */
-/* 		{ $$ = 0; } */
-/* 	| tuple */
-/* 		{ $$ = 0; } */
-/* ; */
-
-jmax_expression: message
+jmax_expression: comma_expression_list
 		{ ((struct _parser_data *)data)->tree = $1; }
 ;
 
-message: message FTS_TOKEN_SEMI tuple
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_SEMI, 0, $1, $3); }
-	| tuple
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_SEMI, 0, 0, $1); }
+comma_expression_list: comma_expression_list FTS_TOKEN_COMMA expression
+		{ $$ = fts_parsetree_new_node( FTS_TOKEN_COMMA, 0, $1, $3); }
+	| expression
+		{ $$ = fts_parsetree_new_node( FTS_TOKEN_COMMA, 0, 0, $1); }
 	| 
 		{ $$ = 0; }
 ;
 
-tuple: tuple term   %prec FTS_TOKEN_TUPLE   
+expression: FTS_TOKEN_OPEN_PAR term_list FTS_TOKEN_CLOSED_PAR
+		{ $$ = fts_parsetree_new_node( FTS_TOKEN_TOPLEVEL_PAR, 0, 0, $2); }
+	| term_list
+;
+
+
+term_list: term_list term   %prec FTS_TOKEN_TUPLE   
 		{ $$ = fts_parsetree_new_node( FTS_TOKEN_TUPLE, 0, $1, $2); }
 	| term
 		{ $$ = fts_parsetree_new_node( FTS_TOKEN_TUPLE, 0, 0, $1); }
@@ -147,6 +143,7 @@ term: primitive
 	| par_op
 	| unary_op
 	| binary_op
+/* 	| funcall */
 	| ref
 ;
 
@@ -158,7 +155,7 @@ primitive: FTS_TOKEN_INT
 		{ $$ = fts_parsetree_new_node( FTS_TOKEN_SYMBOL, &($1), 0, 0); }
 ;
 
-par_op: FTS_TOKEN_OPEN_PAR tuple FTS_TOKEN_CLOSED_PAR
+par_op: FTS_TOKEN_OPEN_PAR term_list FTS_TOKEN_CLOSED_PAR
 		{ $$ = fts_parsetree_new_node( FTS_TOKEN_PAR, 0, 0, $2); }
 ;
 
@@ -204,8 +201,17 @@ binary_op: term FTS_TOKEN_PLUS term
 		{ $$ = fts_parsetree_new_node( FTS_TOKEN_SMALLER_EQUAL, 0, $1, $3); }
 ;
 
+/* opt_term_list: term_list */
+/* 	| /\* empty *\/ */
+/* 		{ $$ = 0; } */
+/* ; */
+
+/* funcall: FTS_TOKEN_FUNCTION FTS_TOKEN_OPEN_PAR opt_term_list FTS_TOKEN_CLOSED_PAR /\* %prec FTS_TOKEN_FUNCALL *\/ */
+/* 		{ $$ = fts_parsetree_new_node(FTS_TOKEN_FUNCALL, &($1), 0, $3) ; } */
+/* ; */
+
 ref: variable
-	| variable FTS_TOKEN_OPEN_SQPAR tuple FTS_TOKEN_CLOSED_SQPAR %prec FTS_TOKEN_ARRAY_INDEX
+	| variable FTS_TOKEN_OPEN_SQPAR term_list FTS_TOKEN_CLOSED_SQPAR %prec FTS_TOKEN_ARRAY_INDEX
 ;
 
 variable: FTS_TOKEN_DOLLAR FTS_TOKEN_SYMBOL
@@ -216,7 +222,7 @@ variable: FTS_TOKEN_DOLLAR FTS_TOKEN_SYMBOL
 
 %%
 
-static fts_hashtable_t token_table;
+static fts_hashtable_t fts_token_table;
 
 static int yyerror( const char *msg)
 {
@@ -238,17 +244,24 @@ static int yylex( YYSTYPE *lvalp, void *data)
       fts_atom_t k, v;
 
       k = *parser_data->at;
-      if (fts_hashtable_get( &token_table, &k, &v))
+      if (fts_hashtable_get( &fts_token_table, &k, &v))
 	token = fts_get_int( &v);
       else
-	token = FTS_TOKEN_SYMBOL;
+	{
+	  token = FTS_TOKEN_SYMBOL;
+	  lvalp->a = *parser_data->at;
+	}
     }
   else if (fts_is_int( parser_data->at))
-    token = FTS_TOKEN_INT;
+    {
+      token = FTS_TOKEN_INT;
+      lvalp->a = *parser_data->at;
+    }
   else if (fts_is_float( parser_data->at))
-    token = FTS_TOKEN_FLOAT;
-
-  lvalp->a = *parser_data->at;
+    {
+      token = FTS_TOKEN_FLOAT;
+      lvalp->a = *parser_data->at;
+    }
 
   parser_data->at++;
   parser_data->ac--;
@@ -315,43 +328,44 @@ void fts_kernel_parser_init( void)
 {
   parsetree_heap = fts_heap_new( sizeof( fts_parsetree_t));
 
-  fts_hashtable_init( &token_table, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_MEDIUM);
+  fts_hashtable_init( &fts_token_table, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_MEDIUM);
 
-#define PUT(S,T) 				\
- {						\
-   fts_atom_t k, v;				\
-						\
-   fts_set_symbol( &k, S);			\
-   fts_set_int( &v, T);				\
-   fts_hashtable_put( &token_table, &k, &v);	\
+#define PUT_TOKEN(S,T)					\
+ {							\
+   fts_atom_t k, v;					\
+							\
+   fts_set_symbol( &k, S);				\
+   fts_set_int( &v, T);					\
+   fts_hashtable_put( &fts_token_table, &k, &v);	\
  }
 
-  PUT( fts_s_dollar, FTS_TOKEN_DOLLAR);
-  PUT( fts_s_semi, FTS_TOKEN_SEMI);
-  PUT( fts_s_plus, FTS_TOKEN_PLUS);
-  PUT( fts_s_minus, FTS_TOKEN_MINUS);
-  PUT( fts_s_times, FTS_TOKEN_TIMES);
-  PUT( fts_s_div, FTS_TOKEN_DIV);
-  PUT( fts_s_power, FTS_TOKEN_POWER);
-  PUT( fts_s_open_par, FTS_TOKEN_OPEN_PAR);
-  PUT( fts_s_closed_par, FTS_TOKEN_CLOSED_PAR);
-  PUT( fts_s_open_sqpar, FTS_TOKEN_OPEN_SQPAR);
-  PUT( fts_s_closed_sqpar, FTS_TOKEN_CLOSED_SQPAR);
-  PUT( fts_s_open_cpar, FTS_TOKEN_OPEN_CPAR);
-  PUT( fts_s_closed_cpar, FTS_TOKEN_CLOSED_CPAR);
-  PUT( fts_s_dot, FTS_TOKEN_DOT);
-  PUT( fts_s_percent, FTS_TOKEN_PERCENT);
-  PUT( fts_s_shift_left, FTS_TOKEN_SHIFT_LEFT);
-  PUT( fts_s_shift_right, FTS_TOKEN_SHIFT_RIGHT);
-  PUT( fts_s_logical_and, FTS_TOKEN_LOGICAL_AND);
-  PUT( fts_s_logical_or, FTS_TOKEN_LOGICAL_OR);
-  PUT( fts_s_logical_not, FTS_TOKEN_LOGICAL_NOT);
-  PUT( fts_s_equal_equal, FTS_TOKEN_EQUAL_EQUAL);
-  PUT( fts_s_not_equal, FTS_TOKEN_NOT_EQUAL);
-  PUT( fts_s_greater, FTS_TOKEN_GREATER);
-  PUT( fts_s_greater_equal, FTS_TOKEN_GREATER_EQUAL);
-  PUT( fts_s_smaller, FTS_TOKEN_SMALLER);
-  PUT( fts_s_smaller_equal, FTS_TOKEN_SMALLER_EQUAL);
-  PUT( fts_s_colon, FTS_TOKEN_COLON);
-  PUT( fts_s_equal, FTS_TOKEN_EQUAL);
+  PUT_TOKEN( fts_s_dollar, FTS_TOKEN_DOLLAR);
+  PUT_TOKEN( fts_s_semi, FTS_TOKEN_SEMI);
+  PUT_TOKEN( fts_s_comma, FTS_TOKEN_COMMA);
+  PUT_TOKEN( fts_s_plus, FTS_TOKEN_PLUS);
+  PUT_TOKEN( fts_s_minus, FTS_TOKEN_MINUS);
+  PUT_TOKEN( fts_s_times, FTS_TOKEN_TIMES);
+  PUT_TOKEN( fts_s_div, FTS_TOKEN_DIV);
+  PUT_TOKEN( fts_s_power, FTS_TOKEN_POWER);
+  PUT_TOKEN( fts_s_open_par, FTS_TOKEN_OPEN_PAR);
+  PUT_TOKEN( fts_s_closed_par, FTS_TOKEN_CLOSED_PAR);
+  PUT_TOKEN( fts_s_open_sqpar, FTS_TOKEN_OPEN_SQPAR);
+  PUT_TOKEN( fts_s_closed_sqpar, FTS_TOKEN_CLOSED_SQPAR);
+  PUT_TOKEN( fts_s_open_cpar, FTS_TOKEN_OPEN_CPAR);
+  PUT_TOKEN( fts_s_closed_cpar, FTS_TOKEN_CLOSED_CPAR);
+  PUT_TOKEN( fts_s_dot, FTS_TOKEN_DOT);
+  PUT_TOKEN( fts_s_percent, FTS_TOKEN_PERCENT);
+  PUT_TOKEN( fts_s_shift_left, FTS_TOKEN_SHIFT_LEFT);
+  PUT_TOKEN( fts_s_shift_right, FTS_TOKEN_SHIFT_RIGHT);
+  PUT_TOKEN( fts_s_logical_and, FTS_TOKEN_LOGICAL_AND);
+  PUT_TOKEN( fts_s_logical_or, FTS_TOKEN_LOGICAL_OR);
+  PUT_TOKEN( fts_s_logical_not, FTS_TOKEN_LOGICAL_NOT);
+  PUT_TOKEN( fts_s_equal_equal, FTS_TOKEN_EQUAL_EQUAL);
+  PUT_TOKEN( fts_s_not_equal, FTS_TOKEN_NOT_EQUAL);
+  PUT_TOKEN( fts_s_greater, FTS_TOKEN_GREATER);
+  PUT_TOKEN( fts_s_greater_equal, FTS_TOKEN_GREATER_EQUAL);
+  PUT_TOKEN( fts_s_smaller, FTS_TOKEN_SMALLER);
+  PUT_TOKEN( fts_s_smaller_equal, FTS_TOKEN_SMALLER_EQUAL);
+  PUT_TOKEN( fts_s_colon, FTS_TOKEN_COLON);
+  PUT_TOKEN( fts_s_equal, FTS_TOKEN_EQUAL);
 }

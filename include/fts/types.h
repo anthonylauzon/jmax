@@ -21,7 +21,6 @@
  */
 
 typedef const char *fts_symbol_t;
-typedef void (*fts_fun_t)(void);
 typedef struct fts_object fts_object_t;
 typedef union  fts_word fts_word_t;
 typedef struct fts_atom fts_atom_t;
@@ -62,6 +61,8 @@ struct fts_atom {
 
 
 typedef void (*fts_method_t) (fts_object_t *, int, fts_symbol_t , int, const fts_atom_t *);
-
 typedef void (*fts_function_t) (int, const fts_atom_t *);
+
+/* typedef void (*fts_return_t) (fts_object_t *, int, fts_symbol_t , int, const fts_atom_t *, fts_atom_t *ret); */
+/* typedef void (*fts_function_t) (int, const fts_atom_t *, fts_atom_t *ret); */
 

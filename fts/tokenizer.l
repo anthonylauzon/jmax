@@ -48,6 +48,7 @@ hexint		0x{hexdigit}+
 float		-?{decdigit}+(\.{decdigit}*)?([eE][+-]?{decdigit}+)?
 dollar		\$
 semi		;
+comma		,
 plus		\+
 minus		\-
 times		\*
@@ -85,6 +86,7 @@ quoted_symbol	\"[^\"]+\"
 {float} 	{ SET_FLOAT( yytext); return 1; }
 {dollar}	{ SET_SYMBOL( fts_s_dollar); return 1; }
 {semi}		{ SET_SYMBOL( fts_s_semi); return 1; }
+{comma}		{ SET_SYMBOL( fts_s_comma); return 1; }
 {plus}		{ SET_SYMBOL( fts_s_plus); return 1; }
 {minus}		{ SET_SYMBOL( fts_s_minus); return 1; }
 {times}		{ SET_SYMBOL( fts_s_times); return 1; }
