@@ -449,9 +449,14 @@ patcher_get_name(fts_daemon_action_t action, fts_object_t *obj,
 
 	  *value = obj->argv[2];
 	}
-      else
+      /* (fd) trying to fix the `empty object' crash */
+      else if ( objc->argc > 0)
 	{
 	  *value = obj->argv[0];
+	}
+      else
+	{
+	  fts_set_symbol( value, fts_s_void);
 	}
     }
 }
