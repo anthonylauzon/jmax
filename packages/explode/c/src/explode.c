@@ -969,7 +969,7 @@ explode_list_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-explode_export_track_by_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explode_t *this = (explode_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -983,22 +983,11 @@ explode_export_track_by_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac
 	  file_name = fts_new_symbol_copy(s);
 	}
       else
-	{
-	  char s[] = "explode.mid";
-	}
-
+	file_name = fts_new_symbol("explode.mid");
     }
   
   explode_export_midifile(this, file_name);
 }
-
-/****************************************************************************/
-/*                                                                          */
-/*                      System methods: @@@@@@@@                            */
-/*                                                                          */
-/****************************************************************************/
-
-
 
 /****************************************************************************/
 /*                                                                          */
@@ -1555,7 +1544,7 @@ explode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl, 0, fts_new_symbol("params"), explode_params_mth, 3, a);
 
   /* export standard MIDI file */
-  fts_method_define_varargs(cl, 0, fts_new_symbol("export"), explode_export_track_by_name);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("export"), explode_export);
 
   /* Type the outlet */
   a[0] = fts_s_int;
