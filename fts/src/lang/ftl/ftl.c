@@ -14,7 +14,6 @@ typedef enum {
   FTL_OPCODE_NOP = 123,      /* no operation */
   FTL_OPCODE_RETURN,         /* return from FTL interpreter */
   FTL_OPCODE_CALL,           /* call a wrapper function */
-  FTL_OPCODE_CALL_SUBR_COND  /* call a FTL subroutine conditionnaly */
 } ftl_opcode_t;
 
 
@@ -38,8 +37,9 @@ struct _ftl_subroutine_t {
   fts_word_t *bytecode;
 
   int instruction_count;
-
   ftl_debug_info_table_t debug_info_table;
+
+  ftl_program_t *program;
 };
 
 
@@ -48,6 +48,10 @@ struct _ftl_program_t {
   ftl_subroutine_t *subroutines;
   ftl_subroutine_t *current_subroutine, *main;
   fts_hash_table_t symbol_table;
+
+  /* Information for pc sampling profiling */
+  int pc;
+  ftl_subroutine_t *subr;
 };
 
 static fts_hash_table_t *ftl_functions_table = 0;
@@ -66,9 +70,6 @@ fts_status_description_t ftl_error_uninitialized_program =
 {
   "uninitialized FTL program"
 };
-
-static void ftl_call_subr_cond( fts_word_t *argv);
-
 
 /* --------------------------------------------------------------------------- */
 /*                                                                             */
@@ -117,7 +118,7 @@ static void ftl_debug_info_table_destroy( ftl_debug_info_table_t *table)
 /* ********************************************************************** */
 
 static ftl_subroutine_t *
-ftl_subroutine_new( fts_symbol_t name)
+ftl_subroutine_new( ftl_program_t *prog, fts_symbol_t name)
 {
   ftl_subroutine_t *newsubr;
 
@@ -133,6 +134,8 @@ ftl_subroutine_new( fts_symbol_t name)
   newsubr->instruction_count = 0;
 
   ftl_debug_info_table_init( &newsubr->debug_info_table);
+
+  newsubr->program = prog;
 
   return newsubr;
 }
@@ -169,7 +172,6 @@ ftl_subroutine_add_call( ftl_subroutine_t *subr, fts_symbol_t name, int argc, co
 
   /* add debugging info */
   ftl_debug_info_table_set( &subr->debug_info_table, subr->instruction_count, object);
-
   subr->instruction_count++;
 
   return fts_Success;
@@ -183,31 +185,13 @@ ftl_subroutine_add_return( ftl_subroutine_t *subr)
   fts_set_long( &a, FTL_OPCODE_RETURN);
   fts_atom_list_append( &(subr->instructions), 1, &a);
 
-  /* add debugging info to be done */
+  /* add debugging info */
+  ftl_debug_info_table_set( &subr->debug_info_table, subr->instruction_count, 0);
   subr->instruction_count++;
 
   return fts_Success;
 }
 
-static fts_status_t
-ftl_subroutine_add_call_subroutine_cond( ftl_subroutine_t *subr, int *pstate, ftl_subroutine_t *called_subr)
-{
-  fts_atom_t a;
-
-  fts_set_long( &a, FTL_OPCODE_CALL_SUBR_COND);
-  fts_atom_list_append( &(subr->instructions), 1, &a);
-
-  fts_set_ptr( &a, pstate);
-  fts_atom_list_append( &(subr->instructions), 1, &a);
-
-  fts_set_ptr( &a, called_subr);
-  fts_atom_list_append( &(subr->instructions), 1, &a);
-
-  /* add debugging info to be done */
-  subr->instruction_count++;
-
-  return fts_Success;
-}
 
 /* ********************************************************************** */
 /* Instructions and directives insertion                                  */
@@ -225,7 +209,7 @@ ftl_program_add_subroutine( ftl_program_t *prog, fts_symbol_t name)
 	return 0;
     }
 
-  newsubr = ftl_subroutine_new( name);
+  newsubr = ftl_subroutine_new( prog, name);
   *subr = newsubr;
 
   return newsubr;
@@ -256,13 +240,6 @@ ftl_program_add_call( ftl_program_t *prog, fts_symbol_t name, int argc, const ft
     return &ftl_error_uninitialized_program;
 
   return ftl_subroutine_add_call( prog->current_subroutine, name, argc, argv, object );
-}
-
-
-fts_status_t
-ftl_program_add_call_subroutine_cond( ftl_program_t *prog, int *pstate, ftl_subroutine_t *called_subr)
-{
-  return ftl_subroutine_add_call_subroutine_cond( prog->current_subroutine, pstate, called_subr);
 }
 
 
@@ -318,6 +295,8 @@ ftl_program_init( ftl_program_t *prog)
   prog->buffers = 0;
   prog->subroutines = 0;
   prog->current_subroutine = 0;
+  prog->main = 0;
+  prog->subr = 0;
 
   fts_hash_table_init( &(prog->symbol_table) );
 }
@@ -381,8 +360,7 @@ typedef fts_status_t (*state_fun_t)( int state, int newstate, fts_atom_t *a, voi
 
 typedef enum { 
   ST_OPCODE, 
-  ST_CALL_FUN, ST_CALL_ARGC, ST_CALL_ARGV,
-  ST_CSUBRCND_STATE, ST_CSUBRCOND_SUBR 
+  ST_CALL_FUN, ST_CALL_ARGC, ST_CALL_ARGV
 } state_t;
 
 static fts_status_t
@@ -413,9 +391,6 @@ ftl_state_machine( fts_atom_list_t *alist, state_fun_t fun, void *user_data)
 	    case FTL_OPCODE_RETURN:
 	    case FTL_OPCODE_NOP:
 	      newstate = ST_OPCODE;
-	      break;
-	    case FTL_OPCODE_CALL_SUBR_COND:
-	      newstate = ST_CSUBRCND_STATE;
 	      break;
 	    default:
 	      return &ftl_error_invalid_program;
@@ -449,18 +424,6 @@ ftl_state_machine( fts_atom_list_t *alist, state_fun_t fun, void *user_data)
 	else
 	  newstate = ST_CALL_ARGV;
 	break;
-      case ST_CSUBRCND_STATE:
-	if ( fts_is_ptr( a))
-	  newstate = ST_CSUBRCOND_SUBR;
-	else
-	  return &ftl_error_invalid_program;
-	break;
-      case ST_CSUBRCOND_SUBR:
-	if ( fts_is_ptr( a))
-	  newstate = ST_OPCODE;
-	else
-	  return &ftl_error_invalid_program;
-	break;
       }
 
       ret = (*fun)(state, newstate, a, user_data);
@@ -473,31 +436,6 @@ ftl_state_machine( fts_atom_list_t *alist, state_fun_t fun, void *user_data)
 }
 
 
-
-/* ********************************************************************** */
-/* Validity check                                                         */
-/* ********************************************************************** */
-
-static fts_status_t
-is_valid_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
-{
-  return fts_Success;
-}
-
-int
-ftl_program_is_valid( ftl_program_t *prog)
-{
-  ftl_subroutine_t *subr;
-  fts_status_t ret;
-
-  for( subr = prog->subroutines; subr; subr = subr->next)
-    {
-      ret = ftl_state_machine( &subr->instructions, is_valid_state_fun, 0);
-      if( ret != fts_Success)
-	return 0;
-    }
-  return 1;
-}
 
 /* ********************************************************************** */
 /* Compilation                                                            */
@@ -600,16 +538,9 @@ compile_portable_state_fun( int state, int newstate, fts_atom_t *a, void *user_d
     else
       *bytecode++ = a->value;
     break;
-  case ST_CSUBRCND_STATE:
-    fts_word_set_ptr( bytecode++, (void *) ftl_call_subr_cond);
-    fts_word_set_long( bytecode++, 2);
-    fts_word_set_ptr( bytecode++, (void *) fts_get_ptr(a));
-    break;
-  case ST_CSUBRCOND_SUBR:
-    fts_word_set_ptr( bytecode++, (void *) fts_get_ptr(a));
-    break;
   }
   info->bytecode = bytecode;
+
   return fts_Success;
 }
 
@@ -626,9 +557,6 @@ bytecode_size_state_fun( int state, int newstate, fts_atom_t *a, void *user_data
   case ST_CALL_ARGC:
     *ps += (fts_get_long( a) + 2);
     return fts_Success;
-  case ST_CSUBRCND_STATE:
-    *ps += 4;
-    return fts_Success;
   default:
     return fts_Success;
   }
@@ -640,9 +568,7 @@ ftl_program_compile_portable( ftl_program_t *prog)
   ftl_subroutine_t *subr;
   fts_status_t ret;
   struct compile_info_portable info;
-
-  if ( !ftl_program_is_valid( prog))
-    return 0;
+  int pc;
 
   if ( !ftl_program_allocate_signals( prog))
     return 0;
@@ -673,7 +599,6 @@ ftl_program_compile_portable( ftl_program_t *prog)
   return 1;
 }
 
-
 int
 ftl_program_compile( ftl_program_t *prog)
 {
@@ -681,263 +606,12 @@ ftl_program_compile( ftl_program_t *prog)
 }
 
 
-
-/* ********************************************************************** */
-/* C code generation functions                                            */
-/* ********************************************************************** */
-
-static void
-ftl_print_atom( char *s, const fts_atom_t *a)
-{
-  if (fts_is_long(a))
-    sprintf( s, "%ld", fts_get_long(a));
-  else if (fts_is_float(a))
-    sprintf( s, "%f", fts_get_float(a));
-  else if (fts_is_symbol(a))
-    sprintf( s, "%s", fts_symbol_name(fts_get_symbol(a)));
-  else if (fts_is_ptr(a))
-    sprintf( s, "0x%x", fts_get_ptr(a));
-  else
-    sprintf( s, "?");
-}
-
-static void
-ftl_program_generate_C_signals_declarations( const ftl_program_t *prog)
-{
-  fts_hash_table_iterator_t iter;
-
-  post( "/* FTL signals declarations */\n");
-
-  for( fts_hash_table_iterator_init( &iter, &(prog->symbol_table));
-      ! fts_hash_table_iterator_end( &iter);
-      fts_hash_table_iterator_next( &iter) )
-    {
-      ftl_memory_declaration *m;
-      fts_symbol_t s;
-
-      m = (ftl_memory_declaration *)fts_hash_table_iterator_current_data( &iter);
-      s = fts_hash_table_iterator_current_symbol( &iter);
-      post( "static float %s[%d];\n", fts_symbol_name(s), m->size); 
-    }
-    
-  post("\n");
-}
-
-static int variable_counter = 0;
-
-typedef struct variable_t {
-  struct {
-    const char *type_name;
-    char variable_name[32];
-    void *p;
-  } var;
-  struct variable_t *next;
-} variable_t;
-
-static variable_t *variable_list = 0;
-
-static void
-variable_new( void *p)
-{
-  variable_t **ppv, *tmp;
-  const char *type_name;
-
-  ppv = &variable_list;
-  while (*ppv)
-    {
-      if ( (*ppv)->var.p == p)
-	return;
-
-      ppv = &( (*ppv)->next );
-    }
-
-  tmp = fts_malloc( sizeof( variable_t));
-  if (!tmp)
-    return;
-
-  type_name = ftl_data_get_type_name( p);
-  if (!type_name)
-    return;
-
-  tmp->var.type_name = type_name;
-  sprintf( tmp->var.variable_name, "_ftl_data__%d", variable_counter);
-  variable_counter++;
-  tmp->var.p = p;
-  tmp->next = 0;
-
-  *ppv = tmp;
-}
-
-static void
-variable_list_free( void)
-{
-  variable_t *pv, *next;
-
-  pv = variable_list;
-  while (pv)
-    {
-      next = pv->next;
-      fts_free( pv);
-      pv = next;
-    }
-
-  variable_list = 0;
-}
-
-static char *
-variable_get( void *p)
-{
-  variable_t *pv;
-
-  pv = variable_list;
-  while (pv)
-    {
-      if (pv->var.p == p)
-	return pv->var.variable_name;
-      pv = pv->next;
-    }
-
-  return 0;
-}
-
-
-static void
-variable_generate_declarations( void)
-{
-  variable_t *pv;
-
-  post( "/* FTL states declarations */\n");
-  for ( pv = variable_list; pv; pv = pv->next)
-    {
-      post( "static %s %s;\n", pv->var.type_name, pv->var.variable_name);
-    }
-  post("\n");
-
-}
-
-
-static fts_status_t
-generate_C_variable_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
-{
-  if ( state == ST_CALL_ARGV && fts_is_ptr(a))
-    {
-      variable_new( fts_get_ptr(a) );
-    }
-
-  return fts_Success;
-}
-
-struct generate_c_info {
-  int call_count;
-  char line[256];
-};
-
-static fts_status_t
-generate_C_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
-{
-  struct generate_c_info *info = (struct generate_c_info *)user_data;
-  char buffer[64];
-
-  switch( state) {
-  case ST_OPCODE:
-    break;
-  case ST_CALL_FUN:
-    sprintf( info->line, "  %s_ ## PART ( %d, ", fts_symbol_name(fts_get_symbol(a)), info->call_count);
-    info->call_count++;
-    break;
-  case ST_CALL_ARGV:
-    if (fts_is_ptr(a))
-      {
-	const char *name;
-
-	name = variable_get( fts_get_ptr(a) );
-	if (name)
-	  sprintf( buffer, "%s", name); /* &%s or not &%s. We choose not & */
-	else
-	  sprintf( buffer, "(void *)0x%x", fts_get_ptr(a));
-      }
-    else
-      ftl_print_atom( buffer, a);
-    strcat( info->line, buffer);
-    if ( newstate == ST_OPCODE)
-      {
-	strcat( info->line, " ); \\\n");
-	post( info->line);
-      }
-    else
-      strcat( info->line, ", ");
-    break;
-  case ST_CSUBRCND_STATE:
-    post( "  if ( *((int *)0x%x))\n", fts_get_ptr(a));
-    break;
-  case ST_CSUBRCOND_SUBR:
-    {
-      ftl_subroutine_t *subr = (ftl_subroutine_t *)fts_get_ptr(a);
-
-      post( "    %s();\n", fts_symbol_name( subr->name));
-    }
-    break;
-  }
-  return fts_Success;
-}
-
-void
-ftl_program_generate_C_code( const ftl_program_t *prog )
-{
-  ftl_subroutine_t *subr;
-
-  ftl_program_generate_C_signals_declarations( prog);
-
-  variable_list_free();
-  for( subr = prog->subroutines; subr; subr = subr->next)
-    ftl_state_machine( &subr->instructions, generate_C_variable_state_fun, 0);
-
-  variable_generate_declarations();
-
-  for( subr = prog->subroutines; subr; subr = subr->next)
-    {
-      struct generate_c_info info;
-
-      info.call_count = 0;
-
-      post( "#undef %s_DSPCHAIN\n", fts_symbol_name( subr->name));
-      post( "#define %s_DSPCHAIN(PART) \\\n", fts_symbol_name( subr->name));
-      ftl_state_machine( &subr->instructions, generate_C_state_fun, &info);
-      post( "\n");
-
-      post( "%s( void )\n", fts_symbol_name( subr->name));
-      post( "{\n");
-      post( "  int i;\n");
-      post( "  /* Declarations */\n");
-      post( "  %s_DSPCHAIN(declarations);\n", fts_symbol_name( subr->name));
-      post( "\n");
-
-      post( "  /* Loop prelude */\n");
-      post( "  %s_DSPCHAIN(prelude);\n", fts_symbol_name( subr->name));
-      post( "\n");
-
-      post( "  /* Loop body */\n");
-      post( "  for ( i = 0; i < 64 /* !!! */; i++)\n");
-      post( "    {\n");
-      post( "      %s_DSPCHAIN(body);\n", fts_symbol_name( subr->name));
-      post( "    }\n");
-      post( "\n");
-
-      post( "  /* Loop postlude */\n");
-      post( "  %s_DSPCHAIN(postlude);\n", fts_symbol_name( subr->name));
-      post( "\n");
-
-      post( "}\n");
-    }
-}
-
 /* ********************************************************************** */
 /* Print functions                                                        */
 /* ********************************************************************** */
 
 #ifdef DEBUG
-static void
-ftl_print_functions_table( void)
+static void ftl_print_functions_table( void)
 {
   fts_hash_table_iterator_t it;
   ftl_function_declaration *decl;
@@ -954,8 +628,21 @@ ftl_print_functions_table( void)
 }
 #endif
 
-void
-ftl_program_print_signals( const ftl_program_t *prog)
+static void ftl_print_atom( char *s, const fts_atom_t *a)
+{
+  if (fts_is_long(a))
+    sprintf( s, "%ld", fts_get_long(a));
+  else if (fts_is_float(a))
+    sprintf( s, "%f", fts_get_float(a));
+  else if (fts_is_symbol(a))
+    sprintf( s, "%s", fts_symbol_name(fts_get_symbol(a)));
+  else if (fts_is_ptr(a))
+    sprintf( s, "0x%x", fts_get_ptr(a));
+  else
+    sprintf( s, "?");
+}
+
+void ftl_program_print_signals( const ftl_program_t *prog)
 {
   fts_hash_table_iterator_t iter;
 
@@ -976,8 +663,7 @@ ftl_program_print_signals( const ftl_program_t *prog)
   post( "\n");
 }
 
-void
-ftl_program_print_signals_count( const ftl_program_t *prog)
+void ftl_program_print_signals_count( const ftl_program_t *prog)
 {
   post( "ftl_program : signals %d\n", 
        fts_hash_table_get_count(&(prog->symbol_table)));
@@ -989,8 +675,7 @@ struct print_info {
   ftl_instr_debug_info_t *debug_info;
 };
 
-static fts_status_t
-print_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
+static fts_status_t print_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
 {
   struct print_info *info = (struct print_info *)user_data;
   char buffer[64];
@@ -1001,14 +686,11 @@ print_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
   case ST_OPCODE:
     switch( fts_get_long( a)) {
     case FTL_OPCODE_RETURN:
-      post( "return;\n");
+      post( "/* %4d */   return;\n", info->pc);
       break;
     case FTL_OPCODE_CALL:
       pc = info->pc;
       info->pc++;
-      break;
-    case FTL_OPCODE_CALL_SUBR_COND:
-      strcpy( info->line, "call subroutine conditionnaly ");
       break;
     }
     break;
@@ -1017,15 +699,7 @@ print_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
     break;
   case ST_CALL_ARGV:
     if (fts_is_ptr(a))
-      {
-	const char *name;
-
-	name = variable_get( fts_get_ptr(a) );
-	if (name)
-	  sprintf( buffer, "%s", name); /* &%s or not &%s. We choose not & */
-	else
-	  sprintf( buffer, "(void *)0x%x", fts_get_ptr(a));
-      }
+      sprintf( buffer, "(void *)0x%x", fts_get_ptr(a));
     else
       ftl_print_atom( buffer, a);
     strcat( info->line, buffer);
@@ -1045,26 +719,13 @@ print_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
     else
       strcat( info->line, ", ");
     break;
-  case ST_CSUBRCND_STATE:
-    ftl_print_atom( buffer+1, a);
-    strcat( info->line, buffer);
-    break;
-  case ST_CSUBRCOND_SUBR:
-    {
-      ftl_subroutine_t *subr = (ftl_subroutine_t *)fts_get_ptr(a);
-
-      sprintf( buffer+1, "%s", fts_symbol_name( subr->name));
-    }
-    strcat( info->line, buffer);
-    break;
   }
 
   return fts_Success;
 }
 
 
-void
-ftl_program_print( const ftl_program_t *prog )
+void ftl_program_print( const ftl_program_t *prog )
 {
   ftl_subroutine_t *subr;
   struct print_info info;
@@ -1084,9 +745,9 @@ ftl_program_print( const ftl_program_t *prog )
 }
 
 
-void
-ftl_program_print_bytecode( const ftl_program_t *prog)
+void ftl_program_print_bytecode( const ftl_program_t *prog)
 {
+#if 0
   ftl_subroutine_t *subr;
 
   for( subr = prog->subroutines; subr; subr = subr->next)
@@ -1103,6 +764,7 @@ ftl_program_print_bytecode( const ftl_program_t *prog)
 	  }
       post( "}\n");
     }
+#endif
 }
 
 
@@ -1110,10 +772,17 @@ ftl_program_print_bytecode( const ftl_program_t *prog)
 /* Run functions                                                          */
 /* ********************************************************************** */
 
-static void
-ftl_run_portable_bytecode( fts_word_t *bytecode)
+void ftl_program_call_subr( ftl_subroutine_t *subr)
 {
-  for( ; fts_word_get_long(bytecode); )
+  fts_word_t *bytecode;
+  int *ppc;
+
+  subr->program->subr = subr;
+  ppc = &(subr->program->pc);
+  *ppc = 0;
+
+  bytecode = subr->bytecode;
+  while (fts_word_get_long(bytecode))
     {
       ftl_wrapper_t w;
       int argc;
@@ -1122,22 +791,31 @@ ftl_run_portable_bytecode( fts_word_t *bytecode)
       argc = fts_word_get_long( bytecode+1);
       (*w)(bytecode+2);
       bytecode += (argc + 2);
+      (*ppc)++;
     }
 }
 
-void
-ftl_program_run( const ftl_program_t *prog )
+void ftl_program_run( ftl_program_t *prog )
 {
-  ftl_run_portable_bytecode( prog->main->bytecode);
+  ftl_program_call_subr( prog->main);
+  prog->subr = 0;
 }
 
+/* --------------------------------------------------------------------------- */
+/*                                                                             */
+/* Auxiliary function for profiling                                            */
+/*                                                                             */
+/* --------------------------------------------------------------------------- */
 
-static void
-ftl_call_subr_cond( fts_word_t *argv)
+fts_object_t *ftl_program_pc_sample( ftl_program_t *prog)
 {
-  ftl_subroutine_t *subr = (ftl_subroutine_t *)fts_word_get_ptr(argv+1);
-  int *p = (int *)fts_word_get_ptr(argv);
+  ftl_subroutine_t *subr;
+  int pc;
 
-  if (*p)
-    ftl_run_portable_bytecode( subr->bytecode);
+  subr = prog->subr;
+  pc = prog->pc;
+  if (subr)
+    return subr->debug_info_table.info[pc].object;
+  else
+    return 0;
 }
