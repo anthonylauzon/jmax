@@ -687,7 +687,8 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
       obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, argc + 1 , description);
 
-      fts_patparse_set_text_graphic_properties(graphicDescr, obj);
+      if (obj)
+	fts_patparse_set_text_graphic_properties(graphicDescr, obj);
     }
   else if (objclass == fts_s_newobj)
     {
