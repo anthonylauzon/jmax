@@ -46,6 +46,8 @@ extern void fts_object_delete(fts_object_t *);
 extern void fts_object_send_properties(fts_object_t *obj);
 extern void fts_object_send_ui_properties(fts_object_t *obj);
 
+extern fts_object_t *fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at);
+
 /* This is only for object doctors (macros) */
 extern fts_status_t fts_object_new(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_t **ret);
 

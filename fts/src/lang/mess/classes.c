@@ -267,57 +267,82 @@ static fts_class_t *fts_class_get( fts_metaclass_t *mcl, int ac, const fts_atom_
   return 0;
 }
 
-fts_class_t *fts_class_instantiate( int ac, const fts_atom_t *at)
+static fts_class_t *
+fts_class_new(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
+{
+  fts_class_t *cl;
+  fts_status_t s;
+  
+  cl = fts_zalloc(sizeof(fts_class_t));
+  
+  cl->properties  = 0;
+  cl->daemons = 0;
+  cl->user_data = 0;
+  
+  cl->mcl = mcl;
+  s = mcl->instantiate_fun(cl, ac, at);
+  
+  if (s == fts_Success)
+    {
+      fts_atom_t a;
+      
+      fts_class_register(mcl, ac, at, cl);
+      
+      /* put the ninlets and noutlets in the class */
+      fts_set_int(&a, cl->ninlets);
+      fts_class_put_prop(cl, fts_s_ninlets, &a);
+      
+      fts_set_int(&a, cl->noutlets);
+      fts_class_put_prop(cl, fts_s_noutlets, &a);
+    }
+  else
+    {
+      fts_free(cl);
+      return 0;
+    }
+
+  return cl;
+}
+
+fts_class_t *
+fts_class_instantiate( int ac, const fts_atom_t *at)
 {
   fts_metaclass_t *mcl;
   fts_class_t *cl;
 
   mcl = fts_metaclass_get_by_name(fts_get_symbol(&at[0]));
 
-  if (! mcl)
+  if (!mcl)
     return 0;
 
   cl = fts_class_get(mcl, ac, at);
 
-  if (cl)
-    return cl;
-  else
-    {
-      fts_status_t s;
+  if(!cl)
+    cl = fts_class_new(mcl, ac, at);
 
-      cl = fts_zalloc(sizeof(fts_class_t));
-
-      cl->properties  = 0;
-      cl->daemons = 0;
-      cl->user_data = 0;
-
-      cl->mcl = mcl;
-      s = mcl->instantiate_fun(cl, ac, at);
-
-      if (s == fts_Success)
-	{
-	  fts_atom_t a;
-
-	  fts_class_register(mcl, ac, at, cl);
-	  
-	  /* put the ninlets and noutlets in the class */
-	  fts_set_int(&a, cl->ninlets);
-	  fts_class_put_prop(cl, fts_s_ninlets, &a);
-
-	  fts_set_int(&a, cl->noutlets);
-	  fts_class_put_prop(cl, fts_s_noutlets, &a);
-
-	  return cl;
-	}
-      else
-	fts_free(cl);
-    }
-
-  return 0;
+  return cl;
 }
 
 
-fts_status_t fts_class_init( fts_class_t *cl, unsigned int size, int ninlets, int noutlets, void *user_data)
+fts_class_t *
+fts_class_get_by_name(fts_symbol_t name)
+{
+  fts_metaclass_t *mcl = fts_metaclass_get_by_name(name);
+  fts_class_t *cl = 0;
+  
+  if(mcl)
+    {
+      cl = mcl->inst_list;
+      
+      if(!cl)
+	cl = fts_class_new(mcl, 0, 0);
+    }
+
+  return cl;
+}
+
+fts_status_t 
+fts_class_init( fts_class_t *cl, unsigned int size, int ninlets, int noutlets, void *user_data)
 {
   if (cl->size)
     return &fts_ClassAlreadyInitialized;
@@ -328,23 +353,19 @@ fts_status_t fts_class_init( fts_class_t *cl, unsigned int size, int ninlets, in
 
   cl->ninlets = ninlets;
   if (ninlets)
-    cl->inlets = fts_zalloc(ninlets*sizeof(fts_inlet_decl_t));
+    cl->inlets = fts_zalloc(ninlets * sizeof(fts_inlet_decl_t));
 
   cl->noutlets = noutlets;
   if (noutlets)
-    cl->outlets = fts_zalloc(noutlets*sizeof(fts_outlet_decl_t));
+    cl->outlets = fts_zalloc(noutlets * sizeof(fts_outlet_decl_t));
 
   cl->user_data = user_data;
 
   return fts_Success;
 }
 
-
-
-fts_status_t fts_method_define_optargs( fts_class_t *cl, int winlet, fts_symbol_t s,
-					fts_method_t mth, 
-					int nargs, fts_symbol_t *arg_types,
-					int mandatory_args)
+fts_status_t
+fts_method_define_optargs(fts_class_t *cl, int winlet, fts_symbol_t s, fts_method_t mth, int nargs, fts_symbol_t *arg_types, int mandatory_args)
 {
   fts_inlet_decl_t *in;
   fts_class_mess_t *msg;
@@ -379,9 +400,8 @@ fts_status_t fts_method_define_optargs( fts_class_t *cl, int winlet, fts_symbol_
 }
 
 
-fts_status_t fts_outlet_type_define_optargs( fts_class_t *cl, int woutlet, fts_symbol_t s,
-					     int ac, fts_symbol_t *at,
-					     int mandatory_args)
+fts_status_t 
+fts_outlet_type_define_optargs( fts_class_t *cl, int woutlet, fts_symbol_t s, int ac, fts_symbol_t *at, int mandatory_args)
 {
   fts_outlet_decl_t *out;
 

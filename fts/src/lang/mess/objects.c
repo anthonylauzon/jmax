@@ -65,6 +65,28 @@ void fts_objects_init()
 
 static fts_status_description_t fts_CannotInstantiate = {"Cannot instantiate class"};
 
+fts_object_t *
+fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_object_t *obj = (fts_object_t *)fts_block_zalloc(cl->size);
+
+  obj->head.cl = cl;
+  obj->head.id = FTS_NO_ID;
+  obj->properties = 0;
+  obj->varname = 0;
+  
+  if (cl->noutlets)
+    obj->out_conn = (fts_connection_t **) fts_block_zalloc(cl->noutlets * sizeof(fts_connection_t *));
+  
+  if (cl->ninlets)
+    obj->in_conn = (fts_connection_t **) fts_block_zalloc(cl->ninlets * sizeof(fts_connection_t *));
+  
+  /* &@#!@#$%*@#$ very nice hack to survive until jMax 3 (Merci Francois!) */
+  fts_message_send(obj, fts_SystemInlet, fts_s_init, ac + 1, at - 1);
+
+  return obj;
+}
+
 fts_status_t 
 fts_object_new(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_t **ret)
 {
