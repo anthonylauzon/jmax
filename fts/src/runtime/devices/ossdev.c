@@ -79,7 +79,7 @@ static void oss_audio_set_parameters()
   int format, stereo, sr, fragsize;
 
   /* Set fragment size */
-  fragsize = 0x00800008; /* 128 fragments of 256 bytes, latency: 0.18s */
+  fragsize = 0x0008000a; /* 8 fragments of 1024 bytes, latency: 0.046s */
   if (ioctl( oss_audio_data.fd, SNDCTL_DSP_SETFRAGMENT, &fragsize))
     post( "Error setting SNDCTL_DSP_SETFRAGMENT\n");
 
