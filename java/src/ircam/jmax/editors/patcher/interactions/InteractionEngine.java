@@ -30,6 +30,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
@@ -495,12 +496,18 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     //jdk bug fix: in macosx platform isPopupTrigger() function return true with
     //both CTRL and ALT keys pressed. We want that CTRL is popupTrigger (so right button) 
     //and ALT is middleButton. More: e.isALtdown return true in both CTRL and ALT case  
-    if (e.isPopupTrigger())
-	processEvent(Squeack.POP_UP, e);
-    else if (e.getClickCount() > 1)
-	processEvent(Squeack.DOUBLE_CLICK, e);
+    boolean isPopup;
+    if( JMaxApplication.getProperty("macosx") != null)
+      isPopup = e.isPopupTrigger() && e.isControlDown();
     else
-	processEvent(Squeack.DOWN, e);	    
+      isPopup = e.isPopupTrigger();
+
+    if ( isPopup)
+      processEvent(Squeack.POP_UP, e);
+    else if (e.getClickCount() > 1)
+      processEvent(Squeack.DOUBLE_CLICK, e);
+    else
+      processEvent(Squeack.DOWN, e);	    
   }
 
   public void mouseReleased( MouseEvent e)
