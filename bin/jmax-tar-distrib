@@ -147,6 +147,4 @@ fi
 TARFILE=/u/worksta/jmax/releases/${TYPE}/${ARCH}/jmax.${TYPE}.${ARCH}.${VERSION}.tar.gz
 echo "Creating tar file $TARFILE"
 (cd /tmp ; tar cvf - max-${VERSION} ) | gzip -9 > $TARFILE
-
-
-
+chmod 644 $TARFILE
