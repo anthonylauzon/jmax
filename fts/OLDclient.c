@@ -93,7 +93,7 @@ typedef struct _oldclient_t {
   char input_buffer[UDP_PACKET_SIZE];
   /* Output */
   char sequence;
-  fts_buffer_t output_buffer;
+  fts_stack_t output_buffer;
 } oldclient_t;
 
 static void oldclient_flush( oldclient_t *this);
@@ -169,7 +169,7 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       return;
     }
 
-  fts_buffer_init( &this->output_buffer, unsigned char);
+  fts_stack_init( &this->output_buffer, unsigned char);
 
   if (this->stream) 
     {
@@ -235,9 +235,9 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	  return;
 	}
 
-      fts_buffer_append( &this->output_buffer, unsigned char, 0);
-      fts_buffer_append( &this->output_buffer, unsigned char, 0);
-      fts_buffer_append( &this->output_buffer, unsigned char, 0);
+      fts_stack_push( &this->output_buffer, unsigned char, 0);
+      fts_stack_push( &this->output_buffer, unsigned char, 0);
+      fts_stack_push( &this->output_buffer, unsigned char, 0);
     }
 
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
@@ -302,9 +302,9 @@ static void oldclient_put_char( oldclient_t *this, unsigned char c)
   if (!this)
     return;
 
-  fts_buffer_append( &this->output_buffer, unsigned char, c);
+  fts_stack_push( &this->output_buffer, unsigned char, c);
 
-  if (fts_buffer_get_length( &this->output_buffer) >= UDP_PACKET_SIZE)
+  if (fts_stack_get_size( &this->output_buffer) >= UDP_PACKET_SIZE)
     oldclient_flush( this);
 }
 
@@ -316,14 +316,14 @@ static void oldclient_flush( oldclient_t *this)
   if (!this)
     return;
 
-  len = fts_buffer_get_length( &this->output_buffer);
+  len = fts_stack_get_size( &this->output_buffer);
 
   if (this->stream) 
     {
       if (len <= 0)
 	return;
 
-      p = (unsigned char *)fts_buffer_get_ptr( &this->output_buffer);
+      p = (unsigned char *)fts_stack_get_ptr( &this->output_buffer);
       
       /* Send an init packet: empty content, just the packet */
 #if WIN32
@@ -336,14 +336,14 @@ static void oldclient_flush( oldclient_t *this)
 	  return;
 	}
       
-      fts_buffer_clear( &this->output_buffer);
+      fts_stack_clear( &this->output_buffer);
     } 
   else
     {
       if (len <= 3)
 	return;
 
-      p = (unsigned char *)fts_buffer_get_ptr( &this->output_buffer);
+      p = (unsigned char *)fts_stack_get_ptr( &this->output_buffer);
       
       p[0] = this->sequence;
       
@@ -383,10 +383,10 @@ static void oldclient_flush( oldclient_t *this)
       if ( r != len)
 	fprintf( stderr, "[oldclient] error sending (%s)\n", strerror( errno));
 
-      fts_buffer_clear( &this->output_buffer);
-      fts_buffer_append( &this->output_buffer, unsigned char, 0);
-      fts_buffer_append( &this->output_buffer, unsigned char, 0);
-      fts_buffer_append( &this->output_buffer, unsigned char, 0);
+      fts_stack_clear( &this->output_buffer);
+      fts_stack_push( &this->output_buffer, unsigned char, 0);
+      fts_stack_push( &this->output_buffer, unsigned char, 0);
+      fts_stack_push( &this->output_buffer, unsigned char, 0);
     }
 }
 

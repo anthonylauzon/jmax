@@ -79,7 +79,7 @@ extern "C" {
 #include <fts/symbol.h>
 
 #include <fts/array.h>
-#include <fts/buffer.h>
+#include <fts/stack.h>
 #include <fts/iterator.h>
 #include <fts/hashtable.h>
 #include <fts/objectlist.h>
@@ -129,6 +129,11 @@ FTS_API void fts_init( int argc, char **argv);
  * Command line arguments access
  */
 FTS_API fts_symbol_t fts_cmd_args_get( fts_symbol_t name);
+
+/*
+ * Root directory
+ */
+FTS_API fts_symbol_t fts_get_root_directory( void);
 
 #ifdef __cplusplus
 }

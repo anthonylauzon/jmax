@@ -157,6 +157,19 @@ static void fts_cmd_args_parse( int argc, char **argv)
     }
 }
 
+fts_symbol_t fts_get_root_directory( void)
+{
+  fts_symbol_t r;
+
+  /* get it from command line */
+  r = fts_cmd_args_get( fts_new_symbol( "root"));
+  if ( r)
+    return r;
+
+  /* if not passed on command line, use the platform specific default value */
+  return fts_get_default_root_directory();
+}
+
 
 /***********************************************************************
  *

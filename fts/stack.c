@@ -22,28 +22,28 @@
 
 #include <fts/fts.h>
 
-void __fts_buffer_init( fts_buffer_t *b, int element_size)
+void __fts_stack_init( fts_stack_t *s, int element_size)
 {
-  b->len = 256;
-  b->element_size = element_size;
-  b->buffer = fts_malloc( b->len * b->element_size);
-  b->fill = 0;
+  s->alloc = 256;
+  s->element_size = element_size;
+  s->buffer = fts_malloc( s->alloc * s->element_size);
+  s->top = 0;
 }
 
-void fts_buffer_destroy( fts_buffer_t *b)
+void fts_stack_destroy( fts_stack_t *s)
 {
-  fts_free( b->buffer);
+  fts_free( s->buffer);
 }
 
-void fts_buffer_clear( fts_buffer_t *b)
+void fts_stack_clear( fts_stack_t *s)
 {
-  b->fill = 0;
+  s->top = 0;
 }
 
-int __fts_buffer_realloc( fts_buffer_t *b)
+int __fts_stack_realloc( fts_stack_t *s)
 {
-  b->len *= 2;
-  b->buffer = fts_realloc( b->buffer, b->len * b->element_size);
+  s->alloc *= 2;
+  s->buffer = fts_realloc( s->buffer, s->alloc * s->element_size);
 
   return 0;
 }

@@ -12,7 +12,6 @@ atom.c \
 atomfile.c \
 audio.c \
 autosave.c \
-buffer.c \
 bytestream.c \
 class.c \
 clipboard.c \
@@ -50,6 +49,7 @@ sigconn.c \
 soundfile.c \
 soundfile_af.c \
 srconv.c \
+stack.c \
 symbol.c \
 template.c \
 time.c \

@@ -52,14 +52,8 @@
  *
  */
 
-fts_symbol_t fts_get_root_directory( void)
+fts_symbol_t fts_get_default_root_directory( void)
 {
-  fts_symbol_t r;
-
-  r = fts_cmd_args_get( fts_new_symbol( "root"));
-  if ( r)
-    return r;
-
   return fts_new_symbol( DEFAULT_ROOT);
 }
 
