@@ -236,19 +236,23 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   public void inletsChanged(int n)
   {
     updateInOutlets();
-    redraw();
-    redrawConnections();
-    itsSketchPad.getDisplayList().updateConnectionsFor(this);
+    if(itsSketchPad != null)
+    {
+      redraw();
+      redrawConnections();
+      itsSketchPad.getDisplayList().updateConnectionsFor(this);
+    }
   }
-
   public void outletsChanged(int n)
   {
     updateInOutlets();
-    redraw();
-    redrawConnections();
-    itsSketchPad.getDisplayList().updateConnectionsFor(this);
+    if(itsSketchPad != null)
+    {
+      redraw();
+      redrawConnections();
+      itsSketchPad.getDisplayList().updateConnectionsFor(this);
+    }
   }
-
   public void drawContent(Graphics g) 
   {
     if (editing)

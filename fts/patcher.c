@@ -1973,10 +1973,9 @@ patcher_delete_objects( fts_object_t *obj)
       fts_connection_t *c;
       
       for (c = fts_object_get_outlet_connections(obj, outlet); c ; c = c->next_same_src)
-	fts_client_release_object( (fts_object_t *)c);
+        fts_client_release_object( (fts_object_t *)c);
     }
       
-  
     fts_update_reset(obj);
     fts_client_release_object(obj);
     fts_object_set_status(obj, FTS_OBJECT_STATUS_PENDING_DELETE);

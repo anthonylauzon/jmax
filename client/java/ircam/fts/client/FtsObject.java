@@ -26,41 +26,41 @@ import java.util.*;
 
 class MessageHandlerEntry {
   MessageHandlerEntry( Class cl, FtsSymbol selector)
-  {
+{
     this.cl = cl;
     this.selector = selector;
-  }
+}
 
-  public int hashCode()
-  {
-    return cl.hashCode() + selector.hashCode();
-  }
+public int hashCode()
+{
+  return cl.hashCode() + selector.hashCode();
+}
 
-  public boolean equals( Object obj)
-  {
-    if ( ! (obj instanceof MessageHandlerEntry))
-      return false;
+public boolean equals( Object obj)
+{
+  if ( ! (obj instanceof MessageHandlerEntry))
+    return false;
+  
+  return ((MessageHandlerEntry)obj).cl.equals(cl) && ((MessageHandlerEntry)obj).selector == selector;
+}
 
-    return ((MessageHandlerEntry)obj).cl.equals(cl) && ((MessageHandlerEntry)obj).selector == selector;
-  }
-
-  Class cl;
-  FtsSymbol selector;
+Class cl;
+FtsSymbol selector;
 }
 
 public class FtsObject implements Serializable
 {
   public static final int NO_ID = -1;
-
+  
   public FtsObject( FtsServer server, FtsObject parent, FtsSymbol ftsClassName) throws IOException
   {
     this.server = server;
     this.parent = parent;
     encoder = server.getEncoder();
-
+    
     id = server.getNewObjectID();
     server.putObject( id, this);
-
+    
     encoder.writeObject( FtsServer.CLIENT_OBJECT_ID);
     encoder.writeSymbol( sNewObject );
     encoder.writeObject( parent);
@@ -68,16 +68,16 @@ public class FtsObject implements Serializable
     encoder.writeSymbol( ftsClassName);
     encoder.flush();
   }
-
+  
   public FtsObject( FtsServer server, FtsObject parent, FtsSymbol ftsClassName, FtsArgs args) throws IOException
   {
     this.server = server;
     this.parent = parent;
     encoder = server.getEncoder();
-
+    
     id = server.getNewObjectID();
     server.putObject( id, this);
-
+    
     encoder.writeObject( FtsServer.CLIENT_OBJECT_ID);
     encoder.writeSymbol( sNewObject );
     encoder.writeObject( parent);
@@ -86,19 +86,19 @@ public class FtsObject implements Serializable
     encoder.writeArgs( args);
     encoder.flush();
   }
-
+  
   public FtsObject( FtsServer server, FtsObject parent, int id)
   {
     this.server = server;
     this.parent = parent;
-
+    
     encoder = server.getEncoder();
-
+    
     this.id = id;
     if ( id != NO_ID)
       server.putObject( id, this);
   }
-
+  
   public void send( FtsSymbol selector, FtsArgs args) throws IOException
   {
     encoder.writeObject( this);
@@ -106,14 +106,14 @@ public class FtsObject implements Serializable
     encoder.writeArgs( args);
     encoder.flush();
   }
-
+  
   public void send( FtsSymbol selector) throws IOException
   {
     encoder.writeObject( this);
     encoder.writeSymbol( selector);
     encoder.flush();
   }
-
+  
   public void sendProperty(FtsArgs args) throws IOException
   {
     encoder.writeObject( FtsServer.CLIENT_OBJECT_ID);
@@ -124,7 +124,7 @@ public class FtsObject implements Serializable
   }
   
   /**
-   * Unmap the object in the client object table
+    * Unmap the object in the client object table
    *
    */
   public void dispose()
@@ -135,78 +135,89 @@ public class FtsObject implements Serializable
     parent = null;
     encoder = null;
   }
-
+  
   public static void registerMessageHandler( Class cl, FtsSymbol selector, FtsMessageHandler messageHandler)
   {
     if (selector == null)
       throw new NullPointerException();
-
+    
     messageHandlersTable.put( new MessageHandlerEntry( cl, selector), messageHandler);
   }
-
+  
   static void invokeMessageHandler( FtsObject obj, FtsSymbol selector, FtsArgs args)
-  {
+  {    
     if (selector == obj.selectorCache)
-      {
-	obj.messageHandlerCache.invoke( obj, args);
-	return;
-      }
-
+    {
+      obj.messageHandlerCache.invoke( obj, args);
+      return;
+    }
+    
     Class cl = obj.getClass();
-
+    
     lookupEntry.selector = selector;
-
+    
     do
+    {
+      lookupEntry.cl = cl;
+      
+      FtsMessageHandler messageHandler = (FtsMessageHandler)messageHandlersTable.get( lookupEntry);
+      
+      if (messageHandler != null)
       {
-	lookupEntry.cl = cl;
-
-	FtsMessageHandler messageHandler = (FtsMessageHandler)messageHandlersTable.get( lookupEntry);
-
-	if (messageHandler != null)
-	  {
-	    obj.selectorCache = selector;
-	    obj.messageHandlerCache = messageHandler;
-	    obj.messageHandlerCache.invoke( obj, args);
-	    return;
-	  }
-
-	cl = cl.getSuperclass();
+        obj.selectorCache = selector;
+        obj.messageHandlerCache = messageHandler;
+        obj.messageHandlerCache.invoke( obj, args);
+        return;
       }
+      
+      cl = cl.getSuperclass();
+    }
     while (cl != null);
   }
-
+  
   public FtsObject getParent()
   {
     return parent;
   }
-
+  
   public final FtsServer getServer()
   {
     return server;
   }
-
-  final int getID()
+  
+  final public int getID()
   {
     return id;
   }
-
+  
   final void setID( int id)
   {
     this.id = id;
   }
-
+  
+  public String getDescription()
+  {
+    return description;
+  }
+  public void setDescription(String descr)
+  {
+    description = descr;
+  }  
+  
   private int id;
   private transient FtsServer server;
   private transient BinaryProtocolEncoder encoder;
-
+  
   private transient FtsObject parent;
-
+  
+  private String description;
+  
   private transient FtsSymbol selectorCache;
   private transient FtsMessageHandler messageHandlerCache;
-
+  
   private transient static HashMap messageHandlersTable = new HashMap();
   private transient static MessageHandlerEntry lookupEntry = new MessageHandlerEntry( null, null);
-
+  
   private transient static FtsSymbol sNewObject = FtsSymbol.get( "new_object");
   private transient static FtsSymbol sDelObject = FtsSymbol.get( "delete_object");
 }

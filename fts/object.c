@@ -129,13 +129,17 @@ fts_object_destroy(fts_object_t *obj)
 void
 fts_object_upload(fts_object_t *obj)
 {
-  if(fts_object_has_client(obj) == 0)
+  if(!fts_object_has_client(obj))
   {
     fts_object_t *container = (fts_object_t *)fts_object_get_container(obj);
     
     if(container != NULL)
     {
       fts_atom_t a;
+
+      if(!fts_object_has_client(container))
+        fts_object_upload(container);
+
       fts_client_register_object(obj, -1);
       
       fts_set_object(&a, obj);

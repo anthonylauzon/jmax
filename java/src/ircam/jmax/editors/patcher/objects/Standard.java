@@ -34,7 +34,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
 {
   private String varName = null;
   private int varWidth = 0;
-
+  
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
@@ -42,7 +42,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
   {
     super( theFtsObject);    
   }
-    
+  
   // ----------------------------------------
   // ``Args'' property
   // ----------------------------------------
@@ -50,116 +50,118 @@ public class Standard extends Editable implements FtsObjectErrorListener
   {
     return ftsObject.getDescription();
   }
-    
+  
   public void errorChanged(boolean value) 
   {
-    redraw();
+    if(itsSketchPad!=null)
+      redraw();
   }
-    
+  
   public void redefine( String text) 
   {
     ((FtsPatcherObject)ftsObject.getParent()).requestRedefineObject(ftsObject, text);    
   }
-
+  
   public void editContent()
   {
     if( !ftsObject.isError())
+    {
+      if( ftsObject instanceof FtsObjectWithEditor)
       {
-	if( ftsObject instanceof FtsObjectWithEditor)
-	  {
-	    itsSketchPad.waiting();
-
-	    if(ftsObject instanceof FtsPatcherObject)
-	      ((FtsPatcherObject)ftsObject).requestSubPatcherUpload();
-	    else
-	      ((FtsObjectWithEditor)ftsObject).requestOpenEditor();
-
-	    ((FtsPatcherObject)ftsObject.getParent()).requestStopWaiting(null);
-	  }
-	else
-	  ftsObject.sendDoubleClick();
+        itsSketchPad.waiting();
+        
+        if(ftsObject instanceof FtsPatcherObject)
+          ((FtsPatcherObject)ftsObject).requestSubPatcherUpload();
+        else
+          ((FtsObjectWithEditor)ftsObject).requestOpenEditor();
+        
+        ((FtsPatcherObject)ftsObject.getParent()).requestStopWaiting(null);
       }
+      else
+        ftsObject.sendDoubleClick();
+    }
   }
-
+  
   public boolean hasContent()
   {
     return true;
   }
-
+  
   public void setCurrentName( String name)
   {
     if( name.equals(""))
-      {
-	varName = "";
-	varWidth = 0;
-      }
+    {
+      varName = "";
+      varWidth = 0;
+    }
     else
-      {
-	varName = name;	
-	varWidth = getFontMetrics().stringWidth( varName) + 6;
-      }
-
-    redraw();
+    {
+      varName = name;	
+      varWidth = getFontMetrics().stringWidth( varName) + 6;
+    }
+    
+    if(itsSketchPad != null)
+      redraw();
   }
-
+  
   public String getName()
   {
     return varName;
   }
-
+  
   public void setFont( Font theFont)
   {
     super.setFont( theFont);
     if( varName != null && !varName.equals(""))
-      {
-	int oldw = getWidth() - varWidth;
-	varWidth = getFontMetrics().stringWidth( varName) + 6;
-      }
+    {
+      int oldw = getWidth() - varWidth;
+      varWidth = getFontMetrics().stringWidth( varName) + 6;
+    }
   }
-
+  
   public void setCurrentFont( Font theFont)
   {
     super.setCurrentFont( theFont);
     if( varName != null)
-      {
-	int oldw = getWidth() - varWidth;
-	varWidth = getFontMetrics().stringWidth( varName) + 6;
-	setWidth( oldw + varWidth);
-      }
+    {
+      int oldw = getWidth() - varWidth;
+      varWidth = getFontMetrics().stringWidth( varName) + 6;
+      setWidth( oldw + varWidth);
+    }
   }
-
+  
   public int getVariableWidth()
   {
     return varWidth;
   }
-
+  
   // ----------------------------------------
   // Text area offset
   // ----------------------------------------
-
+  
   private static final int TEXT_X_OFFSET = 3; /*was 4 */
   private static final int TEXT_Y_OFFSET = 2;
-
+  
   public int getTextXOffset()
   {
     return TEXT_X_OFFSET;
   }
-
+  
   public int getTextYOffset()
   {
     return TEXT_Y_OFFSET;
   }
-
+  
   public int getTextWidthOffset()
   {
     return 5;
   }
-
+  
   public int getTextHeightOffset()
   {
     return 5;
   }
-    
+  
   public Color getTextForeground()
   {
     if (ftsObject.isError())
@@ -167,120 +169,120 @@ public class Standard extends Editable implements FtsObjectErrorListener
     else
       return Color.black;
   }
-
+  
   public Color getTextBackground()
   {
     if (isSelected())
       if (ftsObject.isError())
-	return Color.lightGray;
+        return Color.lightGray;
       else
-	if( ftsObject.isPersistent() == 1)
-	  return persistColor;
-	else
-	  return Settings.sharedInstance().getObjColor();
+        if( ftsObject.isPersistent() == 1)
+          return persistColor;
+      else
+        return Settings.sharedInstance().getObjColor();
     else	
       if(isEditing())
-	return Settings.sharedInstance().getEditBackgroundColor();
-      else
-	return Color.white;	    
+        return Settings.sharedInstance().getEditBackgroundColor();
+    else
+      return Color.white;	    
   }
-
+  
   public boolean isMultiline()
   {
-      return true;
+    return true;
   }
- 
+  
   // ----------------------------------------
   // Paint stuff
   // ----------------------------------------
-
+  
   public void paint(Graphics g) 
   {
     if (ftsObject.isError())
-      {
-	if (isSelected())
-	  g.setColor( Color.gray);
-	else
-	  g.setColor( Color.lightGray);
-      }
+    {
+      if (isSelected())
+        g.setColor( Color.gray);
+      else
+        g.setColor( Color.lightGray);
+    }
     else
-      {
-	if( ftsObject.isPersistent() == 1)
-	  if (isSelected())
-	    g.setColor( selPersistColor);
-	  else
-	    g.setColor( persistColor);
-	else
-	  if (isSelected())
-	    g.setColor( Settings.sharedInstance().getObjColor().darker());
-	  else
-	    g.setColor( Settings.sharedInstance().getObjColor());
-      }
-
+    {
+      if( ftsObject.isPersistent() == 1)
+        if (isSelected())
+          g.setColor( selPersistColor);
+        else
+          g.setColor( persistColor);
+      else
+        if (isSelected())
+          g.setColor( Settings.sharedInstance().getObjColor().darker());
+      else
+        g.setColor( Settings.sharedInstance().getObjColor());
+    }
+    
     int x = getX();
     int y = getY();
     int w = getWidth() - varWidth;
     int h = getHeight();
-
+    
     g.fill3DRect( x+1, y+1, w-2, h-2, true);
-
+    
     drawContent( g);
-
+    
     /* draw variable name */
-
+    
     if( varName!= null)
-      {	  
-	if (ftsObject.isError())
-	  if (isSelected())
-	    g.setColor( selVarErrorColor);
-	  else
-	    g.setColor( varErrorColor);	  
-	else
-	  if( ftsObject.isPersistent() == 1)
-	    if (isSelected())
-	      g.setColor( selVarPersistColor);
-	    else
-	      g.setColor( varPersistColor);
-	  else
-	    if( isSelected())
-	      g.setColor( selVarColor);
+    {	  
+      if (ftsObject.isError())
+        if (isSelected())
+          g.setColor( selVarErrorColor);
+        else
+          g.setColor( varErrorColor);	  
+      else
+        if( ftsObject.isPersistent() == 1)
+          if (isSelected())
+            g.setColor( selVarPersistColor);
+          else
+            g.setColor( varPersistColor);
+      else
+        if( isSelected())
+          g.setColor( selVarColor);
 	    else
 	      g.setColor( varColor);
-
-	g.fillRect( x+w, y+1, varWidth-1, h-2);
-
-	if (ftsObject.isError())
-	  if ( isSelected())
-	    g.setColor( Color.gray);
-	  else
-	    g.setColor( Color.lightGray);	  
-	else
-	  if( ftsObject.isPersistent() == 1)
-	    if (isSelected())
-	      g.setColor( selPersistColor);
-	    else
-	      g.setColor( persistColor);
-	  else
-	    if( isSelected())
-	      g.setColor( Settings.sharedInstance().getObjColor().darker());
+      
+      g.fillRect( x+w, y+1, varWidth-1, h-2);
+      
+      if (ftsObject.isError())
+        if ( isSelected())
+          g.setColor( Color.gray);
+        else
+          g.setColor( Color.lightGray);	  
+      else
+        if( ftsObject.isPersistent() == 1)
+          if (isSelected())
+            g.setColor( selPersistColor);
+          else
+            g.setColor( persistColor);
+      else
+        if( isSelected())
+          g.setColor( Settings.sharedInstance().getObjColor().darker());
 	    else
 	      g.setColor( Settings.sharedInstance().getObjColor());
-
-	g.drawLine( x+w-2, y+1, x+w-2, y+h-2);
-	g.setColor( getTextForeground());
-	g.drawLine( x+w-1, y+1, x+w-1, y+h-2);
-	g.setFont( getFont());
-	g.drawString( varName, x+w+2, y + getFontMetrics().getAscent() + (h - getFontMetrics().getHeight())/2);
-      }
-
+      
+      g.drawLine( x+w-2, y+1, x+w-2, y+h-2);
+      g.setColor( getTextForeground());
+      g.drawLine( x+w-1, y+1, x+w-1, y+h-2);
+      g.setFont( getFont());
+      g.drawString( varName, x+w+2, y + getFontMetrics().getAscent() + (h - getFontMetrics().getHeight())/2);
+    }
+    
     super.paint( g);
   }
-
+  
   public ObjectControlPanel getControlPanel()
   {
     return new StandardControlPanel( this);
   }
-
+  
   public boolean isInspectable()
   {
     return (( ftsObject.isPersistent() != -1) || ( varName != null));

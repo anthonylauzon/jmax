@@ -34,6 +34,7 @@ import java.io.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.fts.client.*;
 
   /**
    * The graphic component containing the tracks of a Sequence.
@@ -64,7 +65,7 @@ public class JMaxMatTable extends JTable
   
   public TableCellEditor getCellEditor(int row,int col)
   {
-    if( getModel().getValueAt(row, col) instanceof FtsGraphicObject)
+    if( getModel().getValueAt(row, col) instanceof FtsObject)
       return ftsObjEditor;
     else
       return super.getCellEditor(row, col);
@@ -72,7 +73,7 @@ public class JMaxMatTable extends JTable
   
   public TableCellRenderer getCellRenderer(int row,int col)
   {
-    if( getModel().getValueAt(row, col) instanceof FtsGraphicObject)
+    if( getModel().getValueAt(row, col) instanceof FtsObject)
       return ftsObjRenderer;
     else
       return super.getCellRenderer(row, col);
@@ -95,10 +96,13 @@ public class JMaxMatTable extends JTable
     public void actionPerformed(ActionEvent e) 
     {
       if (EDIT.equals(e.getActionCommand())) 
-      {          
-        ((FtsObjectWithEditor)currentObject).requestOpenEditor();
-        fireEditingStopped();
-      } 
+      {  
+        if(currentObject instanceof FtsObjectWithEditor)
+        {
+          ((FtsObjectWithEditor)currentObject).requestOpenEditor();
+          fireEditingStopped();
+        }
+      }
     }
   
     public Object getCellEditorValue() {
@@ -124,13 +128,17 @@ public class JMaxMatTable extends JTable
     
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,int row, int column) 
     {      
-      String name = ((FtsGraphicObject)value).getVariableName();
+      if(value instanceof FtsGraphicObject)
+      {
+        String name = ((FtsGraphicObject)value).getVariableName();
       
-      if( name != null && !name.equals(""))
-        setText(((FtsGraphicObject)value).getClassName()+" "+name);
+        if( name != null && !name.equals(""))
+          setText(name+" "+((FtsGraphicObject)value).getDescription());
+        else
+          setText("#"+((FtsGraphicObject)value).getObjectID()+" "+((FtsGraphicObject)value).getDescription());
+      }
       else
-        setText(((FtsGraphicObject)value).getClassName()+" #"+((FtsGraphicObject)value).getObjectID());
-      
+        setText("#"+((FtsObject)value).getID()+" "+((FtsObject)value).getDescription());
       setHorizontalTextPosition( SwingConstants.CENTER);
       return this;
     }

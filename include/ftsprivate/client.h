@@ -48,4 +48,6 @@ extern client_t *object_get_client( fts_object_t *obj);
  */
 extern fts_patcher_t *fts_client_load_patcher( fts_symbol_t file_name, int client_id);
 
+extern void fts_client_create_object(fts_object_t *obj, int client_id);
+
 #endif

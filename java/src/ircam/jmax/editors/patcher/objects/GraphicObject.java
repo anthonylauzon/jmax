@@ -159,42 +159,56 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 
   protected Font itsFont = null;
   protected FontMetrics itsFontMetrics = null;
-
+  
   public static final int ON_INLET  = 0;
   public static final int ON_OUTLET = 1;
   public static final int ON_OBJECT = 2;
 
   protected GraphicObject( FtsGraphicObject theFtsObject) 
   {
-    String fontName;
-    int fontSize;
-    int fontStyle;
-
     ftsObject = theFtsObject;
-    itsSketchPad = ((ErmesSketchWindow)((FtsPatcherObject)ftsObject.getParent()).getEditorFrame()).getSketchPad();
-
     ftsObject.setObjectListener(this);
 
     selected = false;
+      
+    if(((FtsPatcherObject)ftsObject.getParent()).getEditorFrame() != null)
+       setSketchPad( ((ErmesSketchWindow)((FtsPatcherObject)ftsObject.getParent()).getEditorFrame()).getSketchPad());
+    else
+      setDefaultFont();
+  }
 
+  public void setSketchPad(ErmesSketchPad sketch)
+  {
+    String fontName = null;
+    int fontSize = -1;
+    int fontStyle = -1;
+    
+    itsSketchPad = sketch;
+    
     fontName = ftsObject.getFont();
     fontSize = ftsObject.getFontSize();
     fontStyle = ftsObject.getFontStyle();
-
+    
     if (fontName == null)
       fontName = itsSketchPad.getDefaultFontName();
-
+    
     if (fontSize < 0)      
       fontSize = itsSketchPad.getDefaultFontSize();
     if (fontStyle < 0)      
       fontStyle = itsSketchPad.getDefaultFontStyle();
-
+    
     itsFont = FontCache.lookupFont(fontName, fontSize, fontStyle, itsSketchPad);
     itsFontMetrics = FontCache.lookupFontMetrics(fontName, fontSize, fontStyle, itsSketchPad);
-
-    updateInOutlets();    
+    
+    updateInOutlets();
   }
-
+  
+  void setDefaultFont()
+  {
+    itsFont = new Font(ircam.jmax.Platform.FONT_NAME, ircam.jmax.Platform.FONT_STYLE, ircam.jmax.Platform.FONT_SIZE);
+    itsFontMetrics = Toolkit.getDefaultToolkit().getFontMetrics(itsFont);
+  }
+  
   // Destructor 
 
   public void delete()
@@ -550,24 +564,25 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 
   public void redraw()
   {
-    itsSketchPad.repaint(getX(),
-			 getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
-			 ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP - 1,
-			 getWidth(),
-			 getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
-			 ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
-			 ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP + 2);
+    if(itsSketchPad != null)
+      itsSketchPad.repaint(getX(),
+                           getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
+                           ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP - 1,
+                           getWidth(),
+                           getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
+                           ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
+                           ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP + 2);
   }
 
   public void updateRedraw()
   {
     itsSketchPad.paintAtUpdateEnd(this, getX(),
-				  getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
-				  ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP,
-				  getWidth(),
-				  getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
-				  ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
-				  ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
+                                  getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
+                                  ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP,
+                                  getWidth(),
+                                  getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
+                                  ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
+                                  ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
   }
 
   public void redrawConnections()

@@ -177,7 +177,9 @@ public class JMaxClassMap implements JMaxObjectManager{
     if(creator != null)
       return creator.createFtsObject(JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), objId, className, args, 0, args.length);
     else
-      return null;
+    {
+      return new FtsObject(JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), objId);
+    }
   }
   
   static public JMaxClassMap getInstance()

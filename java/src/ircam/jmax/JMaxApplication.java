@@ -172,13 +172,18 @@ class JMaxClient extends FtsObject {
     {
       int id = argums[0].intValue;
       String className = argums[1].symbolValue.toString();
+      String description = argums[nArgs-1].symbolValue.toString();
       
       FtsObject obj = JMaxApplication.getFtsServer().getObject(id);
       if(obj == null)
       {
         args.clear();
-        args.addString(className);
-        JMaxApplication.getObjectManager().makeFtsObject(id, className, args.getAtoms());
+        for(int i = 1; i<nArgs-1; i++)
+          args.add(argums[i].getValue());
+        
+        obj = JMaxApplication.getObjectManager().makeFtsObject(id, className, args.getAtoms());
+        if(obj != null)
+          obj.setDescription(description);      
       }
     }  
   }  

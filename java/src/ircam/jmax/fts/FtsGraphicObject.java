@@ -160,7 +160,7 @@ public class FtsGraphicObject extends FtsObject {
   public FtsGraphicObject(FtsServer server, FtsObject parent, int id, String className, String description)
   {
     super(server, parent, id);
-    this.description = description;
+    setDescription(description);
     this.className = className;
     this.objectID = id;
   }
@@ -174,7 +174,7 @@ public class FtsGraphicObject extends FtsObject {
   public FtsGraphicObject(FtsServer server, FtsObject parent, FtsSymbol className) throws IOException
   {
     super(server, parent, className);
-    this.description = className.toString();
+   setDescription(className.toString());
   }
 
   /****************************************************************************/
@@ -684,15 +684,6 @@ public class FtsGraphicObject extends FtsObject {
     return className;
   }
 
-  public String getDescription()
-  {
-    return description;
-  }
-  public void setDescription(String descr)
-  {
-    description = descr;
-  }
-  
   public int getObjectID()
   {
     return objectID;
@@ -730,7 +721,6 @@ public class FtsGraphicObject extends FtsObject {
     return gen.elements();
   }
 
-  String description;
   String className;
   /*****************************************************************/
   //final variables used by invokeLater method
