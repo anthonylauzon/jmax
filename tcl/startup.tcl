@@ -29,7 +29,13 @@ if {$jmaxSplashScreen != "hide"} then {
 
 # start jMax server
 
-set jmaxBinDir "$jmaxRootDir/fts/bin/$jmaxArch/$jmaxMode"
+if {[systemProperty "jmaxServerDir"] != ""} then { 
+    set jmaxServerDir [systemProperty "jmaxServerDir"]
+} else { 
+    set jmaxServerDir "$jmaxRootDir/fts/bin/$jmaxArch/$jmaxMode"
+}
+
+puts $jmaxServerDir
 
 if {$jmaxConnection == "tcl"} {
   puts "jMax starting server on $jmaxHost via TCP/IP"
@@ -45,7 +51,7 @@ if {$jmaxMode == "debug"} {
   puts "jMax in DEBUG mode"
 }
 
-ftsconnect $jmaxBinDir $jmaxServerName $jmaxConnection $jmaxHost $jmaxPort
+ftsconnect $jmaxServerDir $jmaxServerName $jmaxConnection $jmaxHost $jmaxPort
 
 # hello server
 ucs show welcome
