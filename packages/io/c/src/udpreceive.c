@@ -86,6 +86,11 @@ static void udpreceive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 
   /* create binary protocol decoder */
   self->binary_protocol = (fts_binary_protocol_t*)fts_object_create(fts_binary_protocol_type, 0, NULL);
+  if (self->binary_protocol == NULL)
+  {
+    fts_object_error(o, "Cannot create binary protocol component");
+    return;
+  }
   fts_object_refer((fts_object_t*)self->binary_protocol);
 
   /* check number of argument */
@@ -102,6 +107,7 @@ static void udpreceive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
     if (self->udp_stream == NULL)
     {
       fts_object_error(o, "Cannot create udp stream component (%s)", fts_get_error());
+      return;
     }
   }
 
@@ -128,6 +134,7 @@ static void udpreceive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int a
   }
   if (self->udp_stream != NULL)
   {
+    fts_bytestream_remove_listener(self->udp_stream, o);
     fts_object_release((fts_object_t*)self->udp_stream);
   }
 }
