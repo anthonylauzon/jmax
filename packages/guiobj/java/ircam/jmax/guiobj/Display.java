@@ -107,6 +107,9 @@ public class Display extends GraphicObject implements FtsMessageListener
 
     display = text;
 
+    if( !itsSketchPad.isLocked())
+      redraw();
+    
     if( !itsSketchPad.isLocked() || (itsSketchPad.isLocked() && ( getWidth() < w)))
       {
 	if(w < minWidth)
