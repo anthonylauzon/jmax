@@ -110,6 +110,7 @@ void fts_audioport_set_channels( fts_audioport_t *port, int direction, int chann
 	buff[j] = 0.0;
 
       port->inout[direction].buffers[i] = buff;
+      port->inout[direction].channel_used[i] = 0;
     }
 }
 
