@@ -118,6 +118,18 @@ do_it ()
 	    fi
 	done
     done
+
+    for a in $ARCHS
+    do
+	for d in "lib" "obj"
+	do
+	    echo mkdir -p lib/protocol/$d/$a/debug lib/protocol/$d/$a/opt 
+	    if [ _${NOEXEC}_ = __ ]
+	    then
+		mkdir -p lib/protocol/$d/$a/debug lib/protocol/$d/$a/opt
+	    fi
+	done
+    done
 }
 
 # ***************************************************************************
