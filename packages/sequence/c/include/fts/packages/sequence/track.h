@@ -26,6 +26,11 @@
 #include <fts/fts.h>
 #include <fts/packages/sequence/marker.h>
 #include <fts/packages/sequence/sequence.h>
+#include <math.h>
+
+#ifdef WIN32 
+#define fmax(a,b) (((a)>(b))? (a) : (b))
+#endif
 
 FTS_API fts_class_t *track_class;
 
@@ -62,13 +67,8 @@ struct _track_
 #define track_get_size(t) ((t)->size)
 #define track_get_last_time(t) (((t)->last)? (t)->last->time: 0.0)
 
-#ifdef WIN32
-#define track_get_duration(t) 0
-//#error fmax non defini
-#else
 #define track_get_duration(t) \
   ((track_get_markers(t))? (fmax(track_get_last_time(track_get_markers(t)), track_get_last_time(t))): (track_get_last_time(t)))
-#endif
 
 #define track_is_active(t) ((t)->active != 0)
 #define track_do_save_editor(t) ((t)->save_editor != 0)

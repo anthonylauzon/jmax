@@ -28,7 +28,12 @@
 #include <ctype.h>
 #include <float.h>
 #include <string.h>
+
+#ifdef WIN32
+#include <malloc.h>
+#else
 #include <alloca.h>
+#endif
 
 fmat_t *fmat_null = NULL;
 fts_class_t *fmat_class = NULL;

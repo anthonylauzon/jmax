@@ -30,6 +30,13 @@
 #include <float.h>
 #include <limits.h>
 
+#ifdef WIN32
+#define logf log
+#define sqrtf sqrt
+#define expf exp
+#define fabsf fabs
+#endif
+
 fts_class_t *fvec_class = NULL;
 fts_symbol_t fvec_symbol = NULL;
 

@@ -280,7 +280,7 @@ enumeration_get_by_name(fts_symbol_t name)
 }
 
 fts_symbol_t 
-enumeration_add_name(enumeration_t *e, fts_symbol_t name)
+enumeration_add_name(enumeration_t *e, const fts_symbol_t name)
 {
   fts_atom_t k, a;
   

@@ -20,7 +20,12 @@
  *
  */
 
+#ifdef WIN32
+#include <malloc.h>
+#else
 #include <alloca.h>
+#endif
+
 #include <fts/fts.h>
 #include <ftsconfig.h>
 #include <fts/packages/data/data.h>

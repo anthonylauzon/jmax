@@ -190,7 +190,7 @@ static float cosf( float f)
 #ifndef HAVE_SQRTF
 static float sqrtf (float f)
 {
-  return (float) sqrtf(f);
+  return (float) sqrt(f);
 }
 #endif
 
