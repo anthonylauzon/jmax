@@ -145,7 +145,7 @@ do { \
   fts_connection_t *__conn; \
   fts_atom_t __a; \
  \
-  fts_set_long(&__a, (N)); \
+  fts_set_int(&__a, (N)); \
   \
   __conn = (O)->out_conn[(WOUTLET)]; \
  \

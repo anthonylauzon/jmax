@@ -80,7 +80,6 @@ extern fts_connection_type_t fts_object_get_thru_type(fts_object_t *obj);
 extern void fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets);
 extern void fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets);
 
-extern void fts_create_root_patcher(void);
 extern void fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj);
 extern void fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj);
 extern int  fts_patcher_get_objects_count( fts_patcher_t *this);

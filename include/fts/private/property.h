@@ -23,6 +23,6 @@
 #ifndef _FTS_PRIVATE_PROPERTY_H_
 #define _FTS_PRIVATE_PROPERTY_H_
 
-extern void fts_obj_prop_init(void);
+extern void fts_properties_free(fts_object_t *obj);
 
 #endif

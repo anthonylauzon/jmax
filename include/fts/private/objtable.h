@@ -49,9 +49,3 @@ extern fts_connection_t *fts_connection_table_get(int id);
 extern void fts_connection_table_delete_all(void);
 
 #endif
-
-
-
-
-
-

@@ -38,8 +38,3 @@ extern int fts_expression_map_to_assignements(fts_expression_state_t *e,
 					      void (* f)(fts_symbol_t name, fts_atom_t *value, void *data), void *data);
 
 #endif
-
-
-
-
-

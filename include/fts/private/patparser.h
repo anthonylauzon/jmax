@@ -24,10 +24,8 @@
 #define _FTS_PRIVATE_PATPARSER_H_
 
 
-/* **********************************************************************
- *
+/*
  * Lexical analyser
- *
  */
 
 /* Token types */
@@ -78,10 +76,8 @@ extern void fts_patlex_next_token(fts_patlex_t *this);
 #define token_sym_equals(in, sym)  (((in)->ttype == FTS_LEX_SYMBOL) && (fts_get_symbol(&((in)->val)) == (sym)))
 
 
-/* **********************************************************************
- *
+/*
  * Parser
- *
  */
 
 extern void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in);

@@ -97,10 +97,8 @@ extern void fprintf_data(FILE *f, fts_data_t *data);
 extern int fts_data_is_exported( fts_data_t *data);
 
 
-/************************************************************************
- *
+/*
  * FTS data IDs
- *
  */
 
 extern void fts_data_id_put( int id, fts_data_t *d);

@@ -104,6 +104,9 @@ extern "C" {
 #include <fts/sched.h>
 #include <fts/audio.h>
 
+
+  FTS_API void fts_init( void);
+
 #ifdef __cplusplus
 }
 #endif

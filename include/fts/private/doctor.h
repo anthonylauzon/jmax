@@ -18,19 +18,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
-#ifndef _LANG_DSP_H_
-#define _LANG_DSP_H_
+#ifndef _FTS_PRIVATE_DOCTOR_H_
+#define _FTS_PRIVATE_DOCTOR_H_
 
-#include <fts/lang/dsp/signal.h>
-#include <fts/lang/dsp/dspgraph.h>
-#include <fts/lang/dsp/dsp.h>
-#include <fts/lang/dsp/sigbus.h>
-#include <fts/lang/dsp/sigconn.h>
+extern fts_object_t *fts_call_object_doctor( fts_patcher_t *patcher, int ac, const fts_atom_t *at);
+extern int fts_object_doctor_exists( fts_symbol_t class_name);
 
 #endif
