@@ -28,7 +28,10 @@ package provide data
 global jmaxArch jmaxMode
 ucs load module data $dir/c/lib/$jmaxArch/$jmaxMode/libdata.so
 
-# help
+# load client java class
+java::load -classpath "$dir/java/classes" ircam.jmax.editors.bpf.BpfExtension
+
+# load the help patch data base
 sourceFile $dir/help/data.help.index.tcl
 helpSummary "Data" $dir/help/data.summary.jmax
 

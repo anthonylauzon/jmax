@@ -27,9 +27,12 @@
 
 (ucs "load" "module" "data" (file-cat dir "c" "lib" jmax-arch jmax-mode "libdata.so"))
 
+; load client java class
+(append-local-path this-package (file-cat "java" "classes"))
+(load-class this-package "ircam.jmax.editors.bpf.BpfExtension")
+
 ;; help
-;;(sshh-load (file-cat dir "help" "data.help.index.scm"))
-;;(help-summary "Data" (file-cat dir "help" "data.summary.jmax"))
+(sshh-load (file-cat dir "help" "data.help.index.scm"))
 
 (println "package: data (data structures)")
 

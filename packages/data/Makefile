@@ -27,10 +27,12 @@ JMAXDISTDIR=../..
 include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 
 all:
+	(cd java ; $(MAKE) all)	
 	(cd c ; $(MAKE) all)
 .PHONY: all
 
 clean:
+	(cd java ; $(MAKE) clean)	
 	(cd c ; $(MAKE) clean)
 .PHONY: clean
 
@@ -42,11 +44,22 @@ clean_c:
 	(cd c ; $(MAKE) clean)
 .PHONY: clean_c
 
+all_java:
+	(cd java ; $(MAKE) all)
+.PHONY: all
+
+clean_java:
+	(cd java ; $(MAKE) clean)
+.PHONY: clean
+
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/data
 	$(INSTALL_DATA) data.jpk $(lib_install_dir)/packages/data/data.jpk
 	$(INSTALL_DATA) data.scm $(lib_install_dir)/packages/data/data.scm
 	( cd help; $(MAKE) $@)
 	( cd c; $(MAKE) $@)
+	( cd java; $(MAKE) $@)
 .PHONY: install
+
+
 

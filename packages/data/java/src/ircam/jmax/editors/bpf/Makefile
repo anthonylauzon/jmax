@@ -1,4 +1,4 @@
-#
+# 
 # jMax
 # Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 # 
@@ -23,18 +23,29 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-SOURCES = \
-data.c \
-val.c \
-ref.c \
-ivec.c \
-fvec.c \
-vec.c \
-mat.c \
-getelem.c \
-getsize.c \
-getlist.c \
-fill.c \
-copy.c \
-bpf.c \
+JMAXROOTDIR = ../../../../../../../..
+PACKAGE_ROOT = ../../../../../..
+PACKAGE_DIR = ircam/jmax/editors/bpf
+
+include $(JMAXROOTDIR)/java/Makefiles/Makefile.package
+
+all: local_all
+	(cd renderers ; $(MAKE) all)
+	(cd tools ; $(MAKE) all)
+.PHONY: all
+
+local_all: $(CLASSES)
+.PHONY: local_all
+
+clean: local_clean
+	(cd renderers ; $(MAKE) clean)
+	(cd tools ; $(MAKE) clean)
+
+include $(JMAXROOTDIR)/java/Makefiles/Makefile.package.misc
+
+
+
+
+
+
 

@@ -1,4 +1,4 @@
-#
+# 
 # jMax
 # Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 # 
@@ -23,18 +23,27 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-SOURCES = \
-data.c \
-val.c \
-ref.c \
-ivec.c \
-fvec.c \
-vec.c \
-mat.c \
-getelem.c \
-getsize.c \
-getlist.c \
-fill.c \
-copy.c \
-bpf.c \
+JMAXDISTDIR=../../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
+
+all:
+	(cd src ; $(MAKE) all)
+	(cd src ; $(MAKE) jar)
+.PHONY: all
+
+clean:
+	(cd src ; $(MAKE) clean)
+.PHONY: clean
+
+install:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/data/java/classes
+	( \
+		cd classes ; \
+		$(INSTALL_DATA) data.jar $(lib_install_dir)/packages/data/java/classes/data.jar ; \
+	)
+.PHONY: install
+
+
+
+
 
