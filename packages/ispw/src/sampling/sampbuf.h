@@ -24,4 +24,7 @@ extern void sampbuf_realloc(sampbuf_t *buf, long size);
 extern void sampbuf_erase(sampbuf_t *buf);
 extern void sampbuf_zero(sampbuf_t *buf);
 
+/* (*&^#(*&^%#_^_#$%_*&%($ */
+extern void gensampname(char *buf, const char *base, long int n);
+
 #endif /* _SAMPBUF_H_ */

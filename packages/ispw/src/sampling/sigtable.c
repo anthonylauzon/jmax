@@ -1,5 +1,4 @@
 #include "fts.h"
-
 #include "sampbuf.h"
 
 #include <string.h>
@@ -22,8 +21,6 @@ typedef struct{
 
 #define TEMPBUFSIZE 16384
 #define TEMPBUFSAMPS (TEMPBUFSIZE/sizeof(filesamp_t))
-
-static fts_symbol_t fts_s_read, fts_s_write;
 
 /******************************************************************
  *
@@ -207,8 +204,6 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
 
   if (!this->name) return;
 
-  /* fts_io_creat(fts_symbol_name(file_name), 0666)) */
-
   if ((fd = fts_file_open(fts_symbol_name(file_name), this->volume, "w")) < 0){
     post("%s: can't create file: %s\n", CLASS_NAME, fts_symbol_name(file_name));
     return;
@@ -263,6 +258,77 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
 }
 
 static void
+sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+{
+  sigtable_t *this = (sigtable_t *)o;
+  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
+  float onset = fts_get_number_arg(ac, at, 1, 0);
+  float sr = fts_get_number_arg(ac, at, 2, 0.0);
+  fts_symbol_t format = fts_get_symbol_arg(ac, at, 3, 0);
+  long size = this->buf.size;
+  float *buf = this->buf.samples;
+  int n_onset;
+
+  if(onset > 0)
+    n_onset = fts_unit_convert_to_base(this->unit, onset, &sr);
+  else
+    n_onset = 0;
+
+  if(file_name)
+    {
+      fts_soundfile_t *sf = fts_soundfile_open_read_float(file_name, format, sr, onset);
+      
+      if(sf)
+	{
+	  int n_samples = fts_soundfile_read_float(sf, buf, size);
+
+	  fts_soundfile_close(sf);
+
+	  if(n_samples > 0)
+	    fts_outlet_int(o, 0, n_samples);
+	  else
+	    post("could not load samples from file %s\n", fts_symbol_name(file_name));
+	}
+    }
+}
+
+static void
+sigtable_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+{
+  sigtable_t *this = (sigtable_t *)o;
+  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
+  float save_size = fts_get_number_arg(ac, at, 1, 0);
+  float sr = fts_get_number_arg(ac, at, 2, 0.0f);
+  fts_symbol_t format = fts_get_symbol_arg(ac, at, 3, 0);
+  long size = this->buf.size;
+  float *buf = this->buf.samples;
+  long n_save;
+
+  if(save_size > 0)
+    n_save = fts_unit_convert_to_base(this->unit, save_size, &sr);
+  else
+    n_save = size;
+
+  if(sr <= 0.0f)
+    sr = fts_param_get_float(fts_s_sampling_rate, 44100.0f);
+
+  if(file_name)
+    {
+      fts_soundfile_t *sf = fts_soundfile_open_write_float(file_name, format, sr);
+      
+      if(sf)
+	{
+	  int n_samples = fts_soundfile_write_float(sf, buf, n_save);
+
+	  fts_soundfile_close(sf);
+
+	  if(n_samples <= 0)
+	    post("could not save samples to file %s\n", fts_symbol_name(file_name));
+	}
+    }
+}
+
+static void
 sigtable_clear(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   sigtable_t *this = (sigtable_t *)o;
@@ -301,7 +367,7 @@ sigtable_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[4];
 
-  fts_class_init(cl, sizeof(sigtable_t), 1, 0, 0);
+  fts_class_init(cl, sizeof(sigtable_t), 1, 1, 0);
 
   a[0] = fts_s_symbol; /* class */
   a[1] = fts_s_symbol; /* name */
@@ -316,13 +382,29 @@ sigtable_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   a[0] = fts_s_symbol;
   a[1] = fts_s_int;
-  fts_method_define_optargs(cl, 0, fts_s_read, sigtable_read, 2, a, 1);
+  fts_method_define_optargs(cl, 0, fts_new_symbol("read"), sigtable_read, 2, a, 1);
   
   a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_s_write, sigtable_write, 1, a);
+  fts_method_define(cl, 0, fts_new_symbol("write"), sigtable_write, 1, a);
+  
+  a[0] = fts_s_symbol; /* file name */
+  a[1] = fts_s_number; /* onset */
+  a[2] = fts_s_number; /* sampling rate (might cause implicit conversion) */
+  a[3] = fts_s_symbol; /* (raw) format causes reading of raw data */
+  fts_method_define_optargs(cl, 0, fts_new_symbol("load"), sigtable_load, 4, a, 1);
+  
+  a[0] = fts_s_symbol; /* file name */
+  a[1] = fts_s_number; /* length (in # of samples) */
+  a[2] = fts_s_number; /* sampling rate (might cause implicit conversion) */
+  a[3] = fts_s_symbol; /* (raw) format causes reading of raw data */
+  fts_method_define_optargs(cl, 0, fts_new_symbol("save"), sigtable_save, 4, a, 1);
   
   a[1] = fts_s_number; /* size */
   fts_method_define(cl, 0, fts_new_symbol("realloc"), sigtable_realloc, 1, a);
+
+  /* outlet */
+  a[0] = fts_s_int;
+  fts_outlet_type_define(cl, 0,	fts_s_int, 1, a); /* # of samples read from file */
 
   return fts_Success;
 }
@@ -331,7 +413,4 @@ void
 sigtable_config(void)
 {
   fts_metaclass_create(fts_new_symbol(CLASS_NAME),sigtable_instantiate, fts_always_equiv);
-
-  fts_s_read  = fts_new_symbol("read");
-  fts_s_write = fts_new_symbol("write");
 }

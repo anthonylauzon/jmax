@@ -114,3 +114,27 @@ sampbuf_zero(sampbuf_t *buf)
   buf->size = 0;
   buf->alloc_size = 0;
 }
+
+void
+gensampname(char *buf, const char *base, long int n)
+{
+  char b2[30];
+  char *s = b2+29;
+  *s = 0;
+
+  if (n < 0)
+    n = 0;
+
+  while ((*buf = *base++))
+    buf++;
+
+  if (!n)
+    *(--s) = '0';
+  else while (n)
+    {
+      *(--s) = '0' + (n%10);
+      n /= 10;
+    }
+  while ((*buf++ = *s++))
+    ;
+}
