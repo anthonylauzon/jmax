@@ -46,10 +46,22 @@ typedef struct
  */
 
 static void
+biquad_coeff_clear(biquad_t* self)
+{
+  biquad_coefs_t* coefs = (biquad_coefs_t*)ftl_data_get_ptr(self->biquad_coefs);
+  
+  coefs->a0 = 0.0F;
+  coefs->a1 = 0.0f;
+  coefs->a2 = 0.0f;
+  coefs->b1 = 0.0f;
+  coefs->b2 = 0.0f;
+}
+
+static void
 biquad_state_clear(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  biquad_t *this = (biquad_t *)o;
-  biquad_state_t *state = (biquad_state_t *)ftl_data_get_ptr(this->biquad_state);
+  biquad_t *self = (biquad_t *)o;
+  biquad_state_t *state = (biquad_state_t *)ftl_data_get_ptr(self->biquad_state);
 
   state->xnm1 = 0.0;
   state->xnm2 = 0.0;
@@ -60,8 +72,8 @@ biquad_state_clear(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_ato
 static void
 biquad_set_coef_a0(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  biquad_t *this = (biquad_t *)o;
-  biquad_coefs_t *coefs = (biquad_coefs_t *)ftl_data_get_ptr(this->biquad_coefs);
+  biquad_t *self = (biquad_t *)o;
+  biquad_coefs_t *coefs = (biquad_coefs_t *)ftl_data_get_ptr(self->biquad_coefs);
 
   coefs->a0 = fts_get_number_float(at);
 }
@@ -69,8 +81,8 @@ biquad_set_coef_a0(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static void
 biquad_set_coef_a1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  biquad_t *this = (biquad_t *)o;
-  biquad_coefs_t *coefs = (biquad_coefs_t *)ftl_data_get_ptr(this->biquad_coefs);
+  biquad_t *self = (biquad_t *)o;
+  biquad_coefs_t *coefs = (biquad_coefs_t *)ftl_data_get_ptr(self->biquad_coefs);
 
   coefs->a1 = fts_get_number_float(at);
 }
@@ -78,8 +90,8 @@ biquad_set_coef_a1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static void
 biquad_set_coef_a2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  biquad_t *this = (biquad_t *)o;
-  biquad_coefs_t *coefs = (biquad_coefs_t *)ftl_data_get_ptr(this->biquad_coefs);
+  biquad_t *self = (biquad_t *)o;
+  biquad_coefs_t *coefs = (biquad_coefs_t *)ftl_data_get_ptr(self->biquad_coefs);
 
   coefs->a2 = fts_get_number_float(at);
 }
@@ -87,8 +99,8 @@ biquad_set_coef_a2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static void
 biquad_set_coef_b1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  biquad_t *this = (biquad_t *)o;
-  biquad_coefs_t *coefs = (biquad_coefs_t *)ftl_data_get_ptr(this->biquad_coefs);
+  biquad_t *self = (biquad_t *)o;
+  biquad_coefs_t *coefs = (biquad_coefs_t *)ftl_data_get_ptr(self->biquad_coefs);
 
   coefs->b1 = fts_get_number_float(at);
 }
@@ -96,8 +108,8 @@ biquad_set_coef_b1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static void
 biquad_set_coef_b2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  biquad_t *this = (biquad_t *)o;
-  biquad_coefs_t *coefs = (biquad_coefs_t *)ftl_data_get_ptr(this->biquad_coefs);
+  biquad_t *self = (biquad_t *)o;
+  biquad_coefs_t *coefs = (biquad_coefs_t *)ftl_data_get_ptr(self->biquad_coefs);
 
   coefs->b2 = fts_get_number_float(at);
 }
@@ -110,19 +122,51 @@ biquad_set_coefs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     default:
     case 5:
       if(fts_is_number(at + 4))
+      {
 	biquad_set_coef_b2(o, 0, 0, 1, at + 4);
+      }
+      else
+      {
+	fts_object_error(o,"biquad 5th argument must be a number");
+      }
     case 4:
       if(fts_is_number(at + 3))
+      {
 	biquad_set_coef_b1(o, 0, 0, 1, at + 3);
+      }
+      else
+      {
+	fts_object_error(o,"biquad 4th argument must be a number");
+      }
     case 3:
       if(fts_is_number(at + 2))
+      {
 	biquad_set_coef_a2(o, 0, 0, 1, at + 2);
+      }
+      else
+      {
+	fts_object_error(o,"biquad 3th argument must be a number");
+      }
+
     case 2:
       if(fts_is_number(at + 1))
+      {
 	biquad_set_coef_a1(o, 0, 0, 1, at + 1);
+      }
+      else
+      {
+	fts_object_error(o,"biquad 2nd argument must be a number");
+      }
+
     case 1:
       if(fts_is_number(at + 0))
+      {
 	biquad_set_coef_a0(o, 0, 0, 1, at + 0);
+      }
+      else
+      {
+	fts_object_error(o,"biquad 1st argument must be a number");
+      }
     case 0:
       break;
     }
@@ -213,7 +257,7 @@ ftl_biquad_inplace(fts_word_t *argv)
 static void
 biquad_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  biquad_t *this = (biquad_t *)o;
+  biquad_t *self = (biquad_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   fts_atom_t argv[5];
 
@@ -221,8 +265,8 @@ biquad_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
     {
       fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
-      fts_set_ftl_data(argv+1, this->biquad_state);
-      fts_set_ftl_data(argv+2, this->biquad_coefs);
+      fts_set_ftl_data(argv+1, self->biquad_state);
+      fts_set_ftl_data(argv+2, self->biquad_coefs);
       fts_set_int(argv+3, fts_dsp_get_input_size(dsp, 0));
 
       biquad_state_clear(o, 0, 0, 0, 0);
@@ -232,8 +276,8 @@ biquad_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     {
       fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
       fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
-      fts_set_ftl_data(argv+2, this->biquad_state);
-      fts_set_ftl_data(argv+3, this->biquad_coefs);
+      fts_set_ftl_data(argv+2, self->biquad_state);
+      fts_set_ftl_data(argv+3, self->biquad_coefs);
       fts_set_int(argv+4, fts_dsp_get_input_size(dsp, 0));
 
       biquad_state_clear(o, 0, 0, 0, 0);
@@ -250,12 +294,13 @@ biquad_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 biquad_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  biquad_t *this = (biquad_t *)o;
+  biquad_t *self = (biquad_t *)o;
 
-  this->biquad_state = ftl_data_alloc(sizeof(biquad_state_t));
-  this->biquad_coefs = ftl_data_alloc(sizeof(biquad_coefs_t));
+  self->biquad_state = ftl_data_alloc(sizeof(biquad_state_t));
+  self->biquad_coefs = ftl_data_alloc(sizeof(biquad_coefs_t));
 
   biquad_state_clear(o, 0, 0, 0, 0);
+  biquad_coeff_clear(self);
   biquad_set_coefs(o, 0, 0, ac, at);
 
   fts_dsp_object_init((fts_dsp_object_t *)o);
@@ -264,10 +309,10 @@ biquad_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 biquad_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  biquad_t *this = (biquad_t *)o;
+  biquad_t *self = (biquad_t *)o;
 
-  ftl_data_free(this->biquad_coefs);
-  ftl_data_free(this->biquad_state);
+  ftl_data_free(self->biquad_coefs);
+  ftl_data_free(self->biquad_state);
 
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
@@ -310,3 +355,10 @@ signal_biquad_config(void)
 
   fts_class_install(sym_biquad, biquad_instantiate);
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
