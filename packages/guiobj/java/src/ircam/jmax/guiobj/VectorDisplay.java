@@ -133,7 +133,7 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
   public Color getLineColor()
   {
-    return Color.black;;
+    return Color.black;
   }
 
   public void drawMarkers(Graphics g, int x, int y)
