@@ -1,5 +1,7 @@
 2003-03-07  Riccardo Borghesi  <borghesi@livorno.ircam.fr>
 
+	* FloatBox and IntBox (NumberBox) inherit from Editable
+
 	* cleaned key bindings in patcher editor. 
 	The complete list of keybindings :
 	-) Cmd N : New patcher
