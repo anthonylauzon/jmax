@@ -20,12 +20,8 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell, Miller Puckette, Zack Settel.
  *
- */
-
-/* correlated random generator  <quick and rather dirty>
- * from the original code by (?) Zack Settel
  */
 
 #include "fts.h"
