@@ -1,17 +1,16 @@
-all		all		INSTALL.sh
-free		sgi		LICENSE
-free		linuxpc		LICENSE-BETA	LICENSE
-src		all		Makefile
-all		all 		README
-all		all		VERSION
-all		all		bin
-all		all		config
-all		all		doc
-all		all		examples
-all		all		fts
-all		all		images
-all		all		java
-all		all		packages
-all		all		tcl
-all		all		tests
-
+all	all	INSTALL.sh
+all	all 	README
+all	all	VERSION
+all	all	bin
+all	all	config
+all	all	doc
+all	all	examples
+all	all	fts
+all	all	images
+all	all	java
+all	all	packages
+all	all	tcl
+all	all	tests
+free	sgi	LICENSE
+free	linuxpc	LICENSE-BETA	LICENSE
+src	all	Makefile

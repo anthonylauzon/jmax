@@ -21,7 +21,6 @@ extern fts_module_t fts_utils_module;
 #include "utils/ramps.h"
 #include "utils/ramp_vectors.h"
 #include "utils/floatfuns.h"
-#include "utils/wto.h"
 #include "utils/ieeewrap.h"
 #include "utils/intphase.h"
 #include "utils/srconv.h"
