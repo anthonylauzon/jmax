@@ -11996,7 +11996,7 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = build;
 				HEADER_SEARCH_PATHS = ../../include;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = libutils;
@@ -13056,6 +13056,7 @@
 				FRAMEWORK_VERSION = A;
 				HEADER_SEARCH_PATHS = "../../client/include ../../include";
 				INSTALL_PATH = "";
+				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_LIBTOOL_FLAGS = "";
 				OTHER_REZFLAGS = "";
