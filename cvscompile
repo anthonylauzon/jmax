@@ -9,6 +9,5 @@ automake --foreign -v --add-missing --copy
     aclocal
     autoconf
 )
-
-
-
+./configure $*
+make
