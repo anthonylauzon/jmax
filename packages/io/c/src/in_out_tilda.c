@@ -20,91 +20,83 @@
  */
 
 #include <fts/fts.h>
+#include <ftsconfig.h>
 
-static int in_out_check( fts_object_t *o, int ac, const fts_atom_t *at, fts_audioport_t **port, int *channel)
-{
-  *port = 0;
-  *channel = 0;
-
-  if (ac == 1)
-    {
-      if (fts_is_int( at))
-	*channel = fts_get_int( at);
-      else if ( fts_is_object( at) )
-	*port = (fts_audioport_t *)fts_get_object( at);
-    }
-  else if ( ac == 2)
-    {
-      *channel = fts_get_int( at+1);
-      *port = (fts_audioport_t *)fts_get_object( at);
-    }
-
-  if (!*port)
-    {
-#warning (OLD API) fts_audioport_get_default (OLD API)
-/*       *port = fts_audioport_get_default( o); */
-
-/*       if ( !*port) */
-/* 	{ */
-/* 	  fts_object_error( o, "default audio port is not defined"); */
-/* 	  return 0; */
-/* 	} */
-    }
-
-#warning (OLD API) fts_object_is_audioport (OLD API)
-/*   if ( !fts_object_is_audioport( (fts_object_t *)*port) ) */
-/*     { */
-/*       fts_object_error( o, "argument must be an audio port"); */
-/*       return 0; */
-/*     } */
-
-  return 1;
-}
 
 /* ********************************************************************** */
 /* in~ object                                                             */
 /* ********************************************************************** */
 
 typedef struct {
-  fts_object_t head;
-  fts_audioport_t *port;
-  int channel;
+  fts_dsp_object_t head;
+  fts_audiolabel_t* label;
 } in_tilda_t;
+
+static fts_symbol_t in_tilda_symbol = 0;
+
+static void
+in_tilda_ftl(fts_word_t* argv)
+{
+  in_tilda_t* self = (in_tilda_t*)fts_word_get_pointer(argv+0);
+  float* restrict out = (float*)fts_word_get_pointer(argv+1);
+  int n_tick = fts_word_get_int(argv+2);
+
+  if (self->label)
+    fts_audiolabel_input(self->label, out, n_tick);
+}
+
+static void
+in_tilda_put(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  in_tilda_t* self = (in_tilda_t*)o;
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t*)fts_get_pointer(at);
+  fts_atom_t argv[3];
+  
+  fts_set_object(argv+0, self);
+  fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
+  fts_set_int(argv+2, fts_dsp_get_output_size(dsp, 0));
+
+  fts_dsp_add_function(in_tilda_symbol, 3, argv);
+}
 
 static void in_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  in_tilda_t *this = (in_tilda_t *)o;
+  in_tilda_t *self = (in_tilda_t *)o;
 
-#warning (OLD API) fts_audioport_add_input_object (OLD API)
-/*   if (in_out_check( o, ac, at, &this->port, &this->channel)) */
-/*     fts_audioport_add_input_object( this->port, this->channel, (fts_object_t *)this); */
+  fts_dsp_object_init((fts_dsp_object_t*)self);
+
+  if (ac > 0)
+  {
+    if (!fts_is_symbol(at))
+    {
+      fts_object_error(o, "in~ need an audiolabel as first argument \n");
+      return;
+    }
+
+    self->label = fts_audiolabel_get(fts_get_symbol(at));
+    if (NULL == self->label)
+    {
+      fts_object_error(o, "no such audiolabel !!! \n");
+      return;
+    }
+  }
+  else
+  {
+    self->label = fts_audiolabel_get(fts_s_default);
+  }
+
 }
 
 static void in_tilda_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  in_tilda_t *this = (in_tilda_t *)o;
-
-  if(this->port)
-    {
-      if (this->channel >= 0)
-	{
-	  int i;
-#warning (OLD API) fts_audioport_remove_input_object (OLD API)	  
-/* 	  for ( i = 0; i < fts_object_get_outlets_number( o); i++) */
-/* 	    fts_audioport_remove_input_object( this->port, i, (fts_object_t *)this); */
-	}
-      else
-	{
-#warning (OLD API) fts_audioport_remove_input_object (OLD API)	  
-/* 	  fts_audioport_remove_input_object( this->port, this->channel, (fts_object_t *)this); */
-	}
-    }
+  fts_dsp_object_delete((fts_dsp_object_t*)o);
 }
 
 static void in_tilda_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof( fts_object_t), in_tilda_init, in_tilda_delete);
-
+  
+  fts_class_message_varargs(cl, fts_s_put, in_tilda_put);
   fts_dsp_declare_outlet( cl, 0);
 }
 
@@ -114,41 +106,94 @@ static void in_tilda_instantiate(fts_class_t *cl)
 /* ********************************************************************** */
 
 typedef struct {
-  fts_object_t head;
-  fts_audioport_t *port;
-  int channel;
+  fts_dsp_object_t head;
+  fts_audiolabel_t *label;
 } out_tilda_t;
+
+static fts_symbol_t out_tilda_symbol = 0;
+
+static void
+out_tilda_ftl(fts_word_t* argv)
+{
+  out_tilda_t* self = (out_tilda_t*)fts_word_get_pointer(argv+0);
+  float* restrict in = (float*)fts_word_get_pointer(argv+1);
+  int n_tick = fts_word_get_int(argv+2);
+  
+  if (self->label)
+    fts_audiolabel_output(self->label, in, n_tick);
+}
+
+static void 
+out_tilda_put(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  out_tilda_t* self = (out_tilda_t*)o;
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t*)fts_get_pointer(at);
+  fts_atom_t argv[3];
+
+  fts_set_object(argv+0, self);
+  fts_set_symbol(argv+1, fts_dsp_get_input_name(dsp, 0));
+  fts_set_int(argv+2, fts_dsp_get_input_size(dsp, 0));
+
+  fts_dsp_add_function(out_tilda_symbol, 3, argv);
+}
 
 static void out_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  out_tilda_t *this = (out_tilda_t *)o;
+  out_tilda_t *self = (out_tilda_t *)o;
 
-  in_out_check( o, ac, at, &this->port, &this->channel);
+  fts_dsp_object_init((fts_dsp_object_t*)self);
+
+  if (ac > 0)
+  {
+    if (!fts_is_symbol(at))
+    {
+      fts_object_error(o, "out~ need an audiolabel as first argument \n");
+      return;
+    }
+
+    self->label = fts_audiolabel_get(fts_get_symbol(at));
+    if (NULL == self->label)
+    {
+      fts_object_error(o, "no such audiolabel !!! \n");
+      return;
+    }
+  }
+  else
+  {
+    self->label = fts_audiolabel_get(fts_s_default);
+  }
+
 }
 
-static void out_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void out_tilda_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  out_tilda_t *this  = (out_tilda_t *)o;
-  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);
-  void *propagate_context = fts_get_pointer(at + 1);
-#warning (OLD API) fts_audioport_get_output_dispatcher (OLD API)
-/*   fts_object_t *outdispatcher = fts_audioport_get_output_dispatcher( this->port); */
-
-/*   if ( outdispatcher) */
-/*     (*propagate_fun)( propagate_context, outdispatcher, this->channel); */
+  fts_dsp_object_delete((fts_dsp_object_t*)o);
 }
 
 static void out_tilda_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof( out_tilda_t), out_tilda_init, 0);
 
-  fts_class_message_varargs(cl, fts_s_propagate_input, out_tilda_propagate_input);
+  fts_class_message_varargs(cl, fts_s_put, out_tilda_put);
 
   fts_dsp_declare_inlet( cl, 0);
 }
 
 void in_out_tilda_config( void)
 {
-  fts_class_install( fts_new_symbol( "in~"), in_tilda_instantiate);
-  fts_class_install( fts_new_symbol( "out~"), out_tilda_instantiate);
+  in_tilda_symbol = fts_new_symbol( "in~");
+  out_tilda_symbol = fts_new_symbol( "out~");
+  fts_class_install(in_tilda_symbol, in_tilda_instantiate);
+  fts_class_install(out_tilda_symbol, out_tilda_instantiate);
+
+  fts_dsp_declare_function(in_tilda_symbol, in_tilda_ftl);
+  fts_dsp_declare_function(out_tilda_symbol, out_tilda_ftl);
 }
+
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
