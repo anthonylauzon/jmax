@@ -38,4 +38,7 @@
 NUMERIC_API void
 numeric_config(void);
 
+NUMERIC_API void
+random_config(void);
+
 #endif /* _NUMERIC_H */
