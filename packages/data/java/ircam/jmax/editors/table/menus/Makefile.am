@@ -5,7 +5,7 @@ TablePopupMenu.java \
 ViewMenu.java 
 
 JAVAC = @JAVACX@
-JAVACFLAGS=@JAVACFLAGSX@ -sourcepath $(top_srcdir)/packages/data/java
+JAVACFLAGS=@JAVACFLAGSX@
 JAVAROOT=$(top_builddir)/packages/data/java
-CLASSPATH_ENV=CLASSPATH=$(JAVAROOT):$(top_builddir)/java/src:$(top_builddir)/client/java/ftsclient.jar
+CLASSPATH_ENV=CLASSPATH=$(CLASSPATH):$(JAVAROOT):$(top_builddir)/java/src:$(top_builddir)/client/java/ftsclient.jar:$(top_srcdir)/packages/data/java
 
