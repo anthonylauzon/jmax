@@ -75,22 +75,27 @@ class ErmesToolButton extends JToggleButton
     this.message = message;
     this.toolBar = toolBar;
     
-    //if(Cursors.get(description) == null)
-    //{
-    ImageObserver observer =  new ImageObserver(){
-	    public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height)
+    if(Cursors.get(description) == null)
+    {
+	ImageObserver observer =  new ImageObserver(){
+		public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height)
+		{
+		    return true;
+		}
+	    };	
+	Image image = Toolkit.getDefaultToolkit().getImage(cursorName);
+	Toolkit.getDefaultToolkit().prepareImage(image, -1, -1, observer);
+	Dimension bestSize = Toolkit.getDefaultToolkit().getBestCursorSize(image.getWidth(observer), image.getHeight(observer));
+	BufferedImage bi = new BufferedImage(bestSize.width, bestSize.height, BufferedImage.TYPE_INT_ARGB);
+	Toolkit.getDefaultToolkit().prepareImage(bi, bestSize.width, bestSize.height, observer);
+	bi.createGraphics().drawImage(image, 0, 0, observer);
+
+	if((image.getWidth(observer)>0)&&(image.getHeight(observer)>0))
 	    {
-		return true;
+		Cursor cursor = Toolkit.getDefaultToolkit().createCustomCursor(bi, new Point(0,1), description+" cursor");    
+		Cursors.loadCursor(description, cursor);
 	    }
-	};	
-    Image image = Toolkit.getDefaultToolkit().getImage(cursorName);
-    Dimension bestSize = Toolkit.getDefaultToolkit().getBestCursorSize(image.getWidth(this), image.getHeight(this));
-    BufferedImage bi = new BufferedImage(bestSize.width, bestSize.height, BufferedImage.TYPE_INT_ARGB);
-    bi.createGraphics().drawImage(image, 0, 0, observer);
-    Cursor cursor = Toolkit.getDefaultToolkit().createCustomCursor(bi, new Point(0,1), description+" cursor");    
-    Cursors.loadCursor(description, cursor);
-    //}
-    
+    }    
     addMouseListener(ErmesToolButton.mListener);
   }
 
