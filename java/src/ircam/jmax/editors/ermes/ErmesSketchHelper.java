@@ -277,6 +277,7 @@ class ErmesSketchHelper extends Object{
     ErmesConnection aConnection;
     ErmesObjOutlet aOutlet;
     ErmesObjInlet aInlet;
+    
     if(theInOutlet.IsInlet()){
       for (Enumeration e = theInOutlet.GetConnections().elements(); e.hasMoreElements();) {
 	aConnection = (ErmesConnection)e.nextElement();
@@ -302,7 +303,9 @@ class ErmesSketchHelper extends Object{
 	else aInlet.ChangeState(false, true);
 	if(aConnection.itsAutorouted)
 	  itsSketchPad.RemoveConnRgn(aConnection);
+	if (aConnection.itsFtsConnection != null) aConnection.itsFtsConnection.delete();//enzo
       }
+
      ((ErmesObjOutlet)theInOutlet).GetConnectionSet().RemoveAllConnections();//svuota la lista
     }
     theInOutlet.GetConnections().removeAllElements();
