@@ -47,7 +47,7 @@ static void symbol_cache_init( fts_symbol_cache_t *cache)
 
 static void symbol_cache_destroy( fts_symbol_cache_t *cache)
 {
-  fts_free( cache->symbols);
+  fts_free((void*)cache->symbols);
 }
 
 static void symbol_cache_put( fts_symbol_cache_t *cache, fts_symbol_t s, int index)
@@ -57,7 +57,7 @@ static void symbol_cache_put( fts_symbol_cache_t *cache, fts_symbol_t s, int ind
     int i, old_length = cache->length;
 
     cache->length = index+1;
-    cache->symbols = fts_realloc( cache->symbols, cache->length * sizeof( fts_symbol_t));
+    cache->symbols = fts_realloc((void*)cache->symbols, cache->length * sizeof( fts_symbol_t));
 
     for ( i = old_length; i < cache->length; i++)
       cache->symbols[i] = 0;
@@ -189,9 +189,9 @@ static void end_raw_string_action( unsigned char input, fts_binary_protocol_t *b
 
 static void end_object_action( unsigned char input, fts_binary_protocol_t *binary_protocol)
 {
-  fts_object_t *obj = 0;
-  fts_atom_t v;
-  int id;
+/*  fts_object_t *obj = 0; */
+/*  fts_atom_t v; */
+/*  int id; */
 
 
   /* call registered callback */
@@ -214,14 +214,15 @@ static void end_object_action( unsigned char input, fts_binary_protocol_t *binar
 
 static void end_message_action( unsigned char input, fts_binary_protocol_t *binary_protocol)
 {
-  fts_object_t *target;
-  fts_symbol_t selector;
-  int argc;
-  fts_atom_t *argv;
-
   return;
+
   /* call registered callback */
   /* @@@@@ example of client specific code @@@@@ */
+/*  fts_object_t *target; */
+/*  fts_symbol_t selector; */
+/*  int argc; */
+/*  fts_atom_t *argv; */
+
 /*   argc = fts_stack_size( &client->input_args); */
 /*   argv = (fts_atom_t *)fts_stack_base( &client->input_args); */
 
