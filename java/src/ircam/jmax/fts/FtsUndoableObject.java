@@ -25,7 +25,7 @@
 
 package ircam.jmax.fts;
 
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 import ircam.jmax.toolkit.*;
 
 import javax.swing.undo.*;
@@ -38,36 +38,36 @@ import java.io.*;
  */
 public class FtsUndoableObject extends FtsGraphicObject implements UndoableData{
   
-    public FtsUndoableObject(FtsServer server, FtsObject parent, FtsSymbol ftsClassName, int nArgs, FtsAtom[] args, int id)
-    {
-	super(server, parent, ftsClassName, nArgs, args, id);
-	init();
-    }
+  public FtsUndoableObject(FtsServer server, FtsObject parent, int id, FtsAtom[] args, int offset, int length)
+  {
+    super(server, parent, id, args, offset, length);
+    init();
+  }
 
-    public FtsUndoableObject(FtsServer server, FtsObject parent, FtsSymbol ftsClassName, FtsArgs args) throws IOException
-    {
-	super(server, parent, ftsClassName, args);
-	init();
-    }
+  public FtsUndoableObject(FtsServer server, FtsObject parent, FtsSymbol ftsClassName, FtsArgs args) throws IOException
+  {
+    super(server, parent, ftsClassName, args);
+    init();
+  }
 
-    public FtsUndoableObject(FtsServer server, FtsObject parent, FtsSymbol ftsClassName) throws IOException
-    {
-	super(server, parent, ftsClassName);
-	init();
-    }
+  public FtsUndoableObject(FtsServer server, FtsObject parent, FtsSymbol ftsClassName) throws IOException
+  {
+    super(server, parent, ftsClassName);
+    init();
+  }
 
-    void init()
-    {
-	undoM = new UndoManager();
-	undo = new UndoableEditSupport();
-	undo.addUndoableEditListener(new UndoableEditListener() {
-		public void undoableEditHappened(UndoableEditEvent e)
-		{
-		    undoM.addEdit(e.getEdit());
-		} 
-	    });		
-    }
-
+  void init()
+  {
+    undoM = new UndoManager();
+    undo = new UndoableEditSupport();
+    undo.addUndoableEditListener(new UndoableEditListener() {
+	public void undoableEditHappened(UndoableEditEvent e)
+	{
+	  undoM.addEdit(e.getEdit());
+	} 
+      });		
+  }
+  
   /** NOTE: the begin update - endUpdate methods acts also as a
    * controller for the actions to undo. If no
    * beginUpdate has been call, the modification to the

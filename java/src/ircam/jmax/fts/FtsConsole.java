@@ -27,7 +27,7 @@ package ircam.jmax.fts;
 
 import java.io.*;
 
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.console.*;
 

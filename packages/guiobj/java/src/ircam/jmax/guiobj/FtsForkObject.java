@@ -30,13 +30,13 @@ import java.util.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 public class FtsForkObject extends FtsGraphicObject
 {
-    public FtsForkObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id)
+    public FtsForkObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
     {
-	super(server, parent, className, nArgs, args, id);
+	super(server, parent, id, args, offset, length);
     }
 
     public void setDefaults()
@@ -48,7 +48,7 @@ public class FtsForkObject extends FtsGraphicObject
     public void requestSetOutlets(int nOuts)
     {
 	args.clear();
-	args.add(nOuts);
+	args.addInt(nOuts);
 	
 	try{
 	    send( FtsSymbol.get("set_outlets"), args);

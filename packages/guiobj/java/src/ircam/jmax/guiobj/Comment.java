@@ -46,9 +46,9 @@ public class Comment extends Editable
   // CONSTRUCTOR
   //--------------------------------------------------------
 
-  public Comment( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject) 
+  public Comment(FtsGraphicObject theFtsObject) 
   {
-    super(theSketchPad, theFtsObject);
+    super(theFtsObject);
   }
 
   // ----------------------------------------

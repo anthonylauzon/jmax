@@ -182,18 +182,12 @@ static void fts_dsp_control_upload(fts_object_t *o, int winlet, fts_symbol_t s, 
   fts_dsp_control_t *this = (fts_dsp_control_t *)o;
   float sr;
 
-  fts_log("[dsp_control]: upload 1\n");
-
   fts_set_int(a, fts_param_get_int(fts_s_fifo_size, 0));
   fts_client_send_message((fts_object_t *)this, sym_fifo_size, 1, a);
-
-  fts_log("[dsp_control]: upload 2\n");
 
   sr = fts_dsp_get_sample_rate();
   fts_set_int(a, (int)sr );
   fts_client_send_message((fts_object_t *)this, sym_sampling_rate, 1, a);
-
-  fts_log("[dsp_control]: upload 3\n");
 }
 
 static void fts_dsp_control_fpe_start_collect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

@@ -31,30 +31,30 @@ import java.text.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 public class FtsVectorDisplayObject extends FtsGraphicObject
 {
   static
   {
-      ircam.ftsclient.FtsObject.registerMessageHandler( FtsVectorDisplayObject.class, FtsSymbol.get("display"), new FtsMessageHandler(){
-	      public void invoke( ircam.ftsclient.FtsObject obj, int argc, ircam.ftsclient.FtsAtom[] argv)
-	      {
-		  ((FtsVectorDisplayObject)obj).display(argc, argv);
-	      }
-	  });
-      ircam.ftsclient.FtsObject.registerMessageHandler( FtsVectorDisplayObject.class, FtsSymbol.get("scroll"), new FtsMessageHandler(){
-	      public void invoke( ircam.ftsclient.FtsObject obj, int argc, ircam.ftsclient.FtsAtom[] argv)
-	      {
-		  ((FtsVectorDisplayObject)obj).scroll(argc, argv);
-	      }
-	  });
-      ircam.ftsclient.FtsObject.registerMessageHandler( FtsVectorDisplayObject.class, FtsSymbol.get("setBounds"), new FtsMessageHandler(){
-	      public void invoke( ircam.ftsclient.FtsObject obj, int argc, ircam.ftsclient.FtsAtom[] argv)
-	      {
-		  ((FtsVectorDisplayObject)obj).setCurrentBounds(argv[0].floatValue, argv[1].floatValue);
-	      }
-	  });
+    FtsObject.registerMessageHandler( FtsVectorDisplayObject.class, FtsSymbol.get("display"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsVectorDisplayObject)obj).display(args.getLength(), args.getAtoms());
+	}
+      });
+    FtsObject.registerMessageHandler( FtsVectorDisplayObject.class, FtsSymbol.get("scroll"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsVectorDisplayObject)obj).scroll(args.getLength(), args.getAtoms());
+	}
+      });
+    FtsObject.registerMessageHandler( FtsVectorDisplayObject.class, FtsSymbol.get("setBounds"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsVectorDisplayObject)obj).setCurrentBounds(args.getFloat(0), args.getFloat(1));
+	}
+      });
   }
 
   public static final int MAX_SIZE = 1024;
@@ -70,9 +70,9 @@ public class FtsVectorDisplayObject extends FtsGraphicObject
   int zero = 0; /* y position of zero axis */
   int wrap = 0;
 
-  public FtsVectorDisplayObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id)
+  public FtsVectorDisplayObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
   {
-    super(server, parent, className, nArgs, args, id);
+    super(server, parent, id, args, offset, length);
     
     ninlets = 1;
     noutlets = 0;
@@ -102,7 +102,7 @@ public class FtsVectorDisplayObject extends FtsGraphicObject
     size = n;
 
     args.clear();
-    args.add(n);
+    args.addInt(n);
     try{
 	send( FtsSymbol.get("size"), args);
     }
@@ -126,7 +126,7 @@ public class FtsVectorDisplayObject extends FtsGraphicObject
     range = n;
 
     args.clear();
-    args.add(n);
+    args.addInt(n);
     try{
 	send( FtsSymbol.get("range"), args);
     }
@@ -219,8 +219,8 @@ public class FtsVectorDisplayObject extends FtsGraphicObject
   public void setBounds(float min, float max)
   {
       args.clear();
-      args.add(min);
-      args.add(max);
+      args.addFloat(min);
+      args.addFloat(max);
 
       try{
 	  send( FtsSymbol.get("setBounds"), args);

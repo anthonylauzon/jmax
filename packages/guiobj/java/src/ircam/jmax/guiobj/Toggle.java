@@ -49,9 +49,9 @@ public class Toggle extends GraphicObject implements FtsIntValueListener
 
   private boolean isToggled = false;
 
-  public Toggle( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject) 
+  public Toggle(FtsGraphicObject theFtsObject) 
   {
-    super( theSketchPad, theFtsObject);
+    super(theFtsObject);
 
     int width = getWidth();
     if (width == -1)

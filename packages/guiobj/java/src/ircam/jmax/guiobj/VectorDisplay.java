@@ -56,9 +56,9 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
   public static VecDispControlPanel controlPanel = new VecDispControlPanel();
 
-  public VectorDisplay(ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject)
+  public VectorDisplay(FtsGraphicObject theFtsObject)
   {
-    super(theSketchPad, theFtsObject);
+    super(theFtsObject);
 
     int w = getWidth();
     int h = getHeight();

@@ -41,9 +41,9 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
   int cornerSize = 0;
   int cornerSizeMax = 0;
 
-  public MessConst( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject) 
+  public MessConst(FtsGraphicObject theFtsObject) 
   {
-    super( theSketchPad, theFtsObject);
+    super(theFtsObject);
     cornerSizeMax = minWidth;
     setWidth(getWidth());
   }

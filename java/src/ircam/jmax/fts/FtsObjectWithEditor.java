@@ -25,7 +25,7 @@
 
 package ircam.jmax.fts;
 
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.*;
 import javax.swing.undo.*;
@@ -42,7 +42,7 @@ public abstract class FtsObjectWithEditor extends FtsUndoableObject {
     FtsObject.registerMessageHandler( FtsObjectWithEditor.class, FtsSymbol.get("openEditor"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsObjectWithEditor)obj).openEditor( args);
+	  ((FtsObjectWithEditor)obj).openEditor( args.getLength(), args.getAtoms());
 	}
       });
     FtsObject.registerMessageHandler( FtsObjectWithEditor.class, FtsSymbol.get("destroyEditor"), new FtsMessageHandler(){
@@ -53,9 +53,9 @@ public abstract class FtsObjectWithEditor extends FtsUndoableObject {
       });  
   }
   
-  public FtsObjectWithEditor(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom[] args, int id)
+  public FtsObjectWithEditor(FtsServer server, FtsObject parent, int id, FtsAtom[] args, int offset, int length)
   {
-    super(server, parent, className, nArgs, args, id);
+    super(server, parent, id, args, offset, length);
   }
 
   public FtsObjectWithEditor(FtsServer server, FtsObject parent, FtsSymbol ftsClassName, FtsArgs args) throws IOException

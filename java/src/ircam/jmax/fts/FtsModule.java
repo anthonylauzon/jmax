@@ -41,14 +41,14 @@ public class FtsModule
 	
 	Mda.installDocumentType( new FtsPatcherDocumentType());*/
 
-    ObjectCreatorManager.registerFtsClass("__selection", ircam.jmax.fts.FtsSelection.class);
-    ObjectCreatorManager.registerFtsClass("__clipboard", ircam.jmax.fts.FtsClipboard.class);
-    ObjectCreatorManager.registerFtsClass("__objectset", ircam.jmax.fts.FtsObjectSet.class);
-    ObjectCreatorManager.registerFtsClass("__atomlist", ircam.jmax.fts.FtsAtomList.class);
-    ObjectCreatorManager.registerFtsClass("__dspcontrol", ircam.jmax.fts.FtsDspControl.class);
-    ObjectCreatorManager.registerFtsClass("__finder", ircam.jmax.fts.FtsFinderObject.class);
-    ObjectCreatorManager.registerFtsClass("__errorfinder", ircam.jmax.fts.FtsErrorFinderObject.class);
-    ObjectCreatorManager.registerFtsClass("__runtimeerrors", ircam.jmax.fts.FtsRuntimeErrors.class);
+    /*ObjectCreatorManager.registerFtsClass("__selection", ircam.jmax.fts.FtsSelection.class);
+      ObjectCreatorManager.registerFtsClass("__clipboard", ircam.jmax.fts.FtsClipboard.class);
+      ObjectCreatorManager.registerFtsClass("__objectset", ircam.jmax.fts.FtsObjectSet.class);
+      ObjectCreatorManager.registerFtsClass("__atomlist", ircam.jmax.fts.FtsAtomList.class);
+      ObjectCreatorManager.registerFtsClass("__dspcontrol", ircam.jmax.fts.FtsDspControl.class);
+      ObjectCreatorManager.registerFtsClass("__finder", ircam.jmax.fts.FtsFinderObject.class);
+      ObjectCreatorManager.registerFtsClass("__errorfinder", ircam.jmax.fts.FtsErrorFinderObject.class);
+      ObjectCreatorManager.registerFtsClass("__runtimeerrors", ircam.jmax.fts.FtsRuntimeErrors.class);*/
   }
 }
 

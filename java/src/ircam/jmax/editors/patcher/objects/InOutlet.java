@@ -41,15 +41,15 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
   private static final int DEFAULT_WIDTH = 64;
   private static final int MINIMUM_WIDTH = 30;
 
-  InOutlet( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject) 
+  InOutlet( FtsGraphicObject theFtsObject) 
   {
-    super(theSketchPad, theFtsObject);
+    super( theFtsObject);
 
     int width = getWidth();
 
     setDefaultWidth(MINIMUM_WIDTH);
 
-    if (width == -1)
+    if ( width == -1)
 	setWidth( DEFAULT_WIDTH);
     else if (width <= MINIMUM_WIDTH)
 	setWidth( MINIMUM_WIDTH);
@@ -82,9 +82,11 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
 
   public void redefine( String text) 
   {
-      ((FtsPatcherObject)ftsObject.getParent()).requestRedefineObject(ftsObject, ftsObject.getClassName() + " " +text);
-      itsSketchPad.getDisplayList().remove(this);
-      dispose();
+    text = ((this instanceof Inlet) ? "inlet" : "outlet") + text;
+
+    ((FtsPatcherObject)ftsObject.getParent()).requestRedefineObject(ftsObject, text);
+    itsSketchPad.getDisplayList().remove(this);
+    dispose();
   }
 
   public void redefined()

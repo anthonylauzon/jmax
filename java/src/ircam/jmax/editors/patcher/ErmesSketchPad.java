@@ -40,7 +40,7 @@ import ircam.jmax.dialogs.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.interactions.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 import ircam.jmax.toolkit.*;
 
@@ -269,62 +269,47 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   // init
   // --------------------------------------------------------------
 
-  void InitFromFtsContainer(FtsPatcherObject theContainerObject)
-  {    
+  /*void InitFromFtsContainer(FtsPatcherObject theContainerObject)
+    {    
     FtsPatcherObject aFtsPatcherData = theContainerObject;
     Object[] objects = aFtsPatcherData.getObjects().getObjectArray();
     int osize = aFtsPatcherData.getObjects().size();
     boolean doLayers = false;
-
+    
     for ( int i = 0; i < osize; i++)
-      {
-	GraphicObject object = GraphicObject.makeGraphicObject( this, (FtsGraphicObject)objects[i]);
-
-	displayList.add( object);
-
-	if (object.getLayer() < 0)
-	  doLayers = true;
-      }
-
+    {
+    GraphicObject object = GraphicObject.makeGraphicObject( this, (FtsGraphicObject)objects[i]);
+    
+    displayList.add( object);
+    
+    if (object.getLayer() < 0)
+    doLayers = true;
+    }
+    
     MaxVector connectionVector = aFtsPatcherData.getConnections();
     Object[] connections = aFtsPatcherData.getConnections().getObjectArray();
     int csize = aFtsPatcherData.getConnections().size();
-
+    
     for ( int i = 0; i < csize; i++)
-      {
-	GraphicConnection connection;
-	FtsConnection fc = (FtsConnection)connections[i];
-
-	connection = new GraphicConnection(this, 
-					   displayList.getGraphicObjectFor(fc.getFrom()), fc.getFromOutlet(), 
-					   displayList.getGraphicObjectFor(fc.getTo()), fc.getToInlet(),
-					   fc.getType(), fc);
-	displayList.add(connection);
-	connection.updateDimensions();
-      }
-
+    {
+    GraphicConnection connection;
+    FtsConnection fc = (FtsConnection)connections[i];
+    
+    connection = new GraphicConnection(this, 
+    displayList.getGraphicObjectFor(fc.getFrom()), fc.getFromOutlet(), 
+    displayList.getGraphicObjectFor(fc.getTo()), fc.getToInlet(),
+    fc.getType(), fc);
+    displayList.add(connection);
+    connection.updateDimensions();
+    }
+    
     if (doLayers)
-      displayList.reassignLayers();
+    displayList.reassignLayers();
 
     displayList.sortDisplayList();
-
-    /* WARNING!!!!! */ 
-    //aFtsPatcherData.getDocument().setSaved(true);
-  
-    ///////////////////////////////////////////////////////////////
-    /*int width = ScaleTransform.getInstance().scaleX(aFtsPatcherData.getWindowWidth());
-      int height = ScaleTransform.getInstance().scaleY(aFtsPatcherData.getWindowHeight());
     
-      if (width <= 0)
-      width = ScaleTransform.getInstance().scaleX(480);
-      
-      if (height <= 0)
-      height =  ScaleTransform.getInstance().scaleY(500);
-
-      setSize(width, height);
-      setPreferredSize(new Dimension(width, height));*/
-    //////////////////////////////////////////////////////////////
-  }
+    //aFtsPatcherData.getDocument().setSaved(true);
+    }*/
 
   //--------------------------------------------------------
   //	CONSTRUCTOR
@@ -387,7 +372,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     itsEditField = new EditField( this);
     add( itsEditField);
 
-    InitFromFtsContainer( itsPatcher);
+    //InitFromFtsContainer( itsPatcher);
 
     fixSize();
 
@@ -484,11 +469,11 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     /*if (itsDocument.isRootData(itsPatcher))
       name = itsDocument.getName();
       else*/ if(itsPatcher instanceof FtsTemplateObject)
-	  name = "template " + itsPatcher.getClassName();
+	  name = "template " + itsPatcher.getDescription();
       else if (itsPatcher instanceof FtsPatcherObject)
 	  name = "patcher " + itsPatcher.getDescription();
       else 
-	  name = "template " + itsPatcher.getClassName();
+	  name = "template " + itsPatcher.getDescription();
     return name;
   }
 
@@ -571,26 +556,26 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   /***************************************************************/
   /*************** ASYNCRONOUS OBJECT CREATION *******************/
     
-  void addNewObject(FtsObject fo, boolean doEdit)
+  public void addNewObject(GraphicObject object, boolean doEdit)
   {
-      GraphicObject object = GraphicObject.makeGraphicObject( this, (FtsGraphicObject)fo);
+    //GraphicObject object = GraphicObject.makeGraphicObject( this, (FtsGraphicObject)fo);
       
-      displayList.add( object);	
-      displayList.reassignLayers();
+    displayList.add( object);	
+    displayList.reassignLayers();
 
-      object.redraw();
+    object.redraw();
 	
-      if (doEdit && newObjectEdit && (object instanceof Editable))
+    if (doEdit && newObjectEdit && (object instanceof Editable))
       {
-	  // The EditField is not really ready until the control
-	  // is returned back to the event loop; this is why we invoke textEditObject 
-	  // with an invoke later command.
+	// The EditField is not really ready until the control
+	// is returned back to the event loop; this is why we invoke textEditObject 
+	// with an invoke later command.
 	
-	  final Editable obj  = (Editable)object;
+	final Editable obj  = (Editable)object;
 	
-	  SwingUtilities.invokeLater(new Runnable() {
-		  public void run()
-		  { textEditObject((Editable)obj);}});
+	SwingUtilities.invokeLater(new Runnable() {
+	    public void run()
+	    { textEditObject((Editable)obj);}});
       }
   }
 

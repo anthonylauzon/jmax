@@ -33,7 +33,7 @@ import javax.swing.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.menus.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
@@ -301,6 +301,11 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 	super.setCursor(cursor);
 	itsSketchPad.setCursor(cursor);
     }
+
+  public ErmesSketchPad getSketchPad()
+  {
+    return itsSketchPad;
+  }
   /****************************************************************************/
   /*                                                                          */
   /*           LISTENERS                                                      */

@@ -335,10 +335,7 @@ static fts_object_t *client_get_object( client_t *this, int id)
   fts_set_int( &k, id);
 
   if ( !fts_hashtable_get( &this->object_table, &k, &v))
-    {
-      fprintf( stderr, "invalid object in protocol %d\n", id);
-      return 0;
-    }
+    return NULL;
 
   return fts_get_object( &v);
 }
@@ -634,7 +631,15 @@ static void end_object_action( unsigned char input, void *data)
 
   decoder->ival = (decoder->ival << 8) | input;
   obj = client_get_object( decoder->client, decoder->ival);
-  fts_set_object( &v, obj);
+
+  if (obj == NULL)
+    {
+      fts_log( "[client] invalid object id: %d\n", decoder->ival);
+      fts_set_void( &v);
+    }
+  else
+    fts_set_object( &v, obj);
+
   fts_stack_push( &decoder->args, fts_atom_t, v);
 }
 
@@ -648,8 +653,16 @@ static void end_message_action( unsigned char input, void *data)
 
   argc = fts_stack_get_top( &decoder->args);
   argv = (fts_atom_t *)fts_stack_get_base( &decoder->args);
-  target = fts_get_object( argv);
+
   selector = fts_get_symbol( argv+1);
+
+  if ( fts_is_void( argv))
+    {
+      fts_log( "[client] message %s to null object\n", selector);
+      goto skipped;
+    }
+    
+  target = fts_get_object( argv);
   argc -= 2;
   argv += 2;
 
@@ -661,6 +674,7 @@ static void end_message_action( unsigned char input, void *data)
   if (target)
     fts_send_message( target, fts_SystemInlet, selector, argc, argv);
 
+ skipped:
   fts_stack_clear( &decoder->args);
 }
 
@@ -1171,18 +1185,18 @@ static fts_status_t client_controller_instantiate(fts_class_t *cl, int ac, const
  */
 void fts_client_start_message( fts_object_t *obj, fts_symbol_t selector)
 {
-  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( o)) );
+  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( obj)) );
 
   if ( !client)
     return;
 
-  protocol_encoder_write_object( &client->encoder, o);
+  protocol_encoder_write_object( &client->encoder, obj);
   protocol_encoder_write_symbol( &client->encoder, selector);
 }
 
 void fts_client_add_int( fts_object_t *obj, int v)
 {
-  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( o)) );
+  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( obj)) );
 
   if ( !client)
     return;
@@ -1192,7 +1206,7 @@ void fts_client_add_int( fts_object_t *obj, int v)
 
 void fts_client_add_float( fts_object_t *obj, float v)
 {
-  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( o)) );
+  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( obj)) );
 
   if ( !client)
     return;
@@ -1202,7 +1216,7 @@ void fts_client_add_float( fts_object_t *obj, float v)
 
 void fts_client_add_symbol( fts_object_t *obj, fts_symbol_t v)
 {
-  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( o)) );
+  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( obj)) );
 
   if ( !client)
     return;
@@ -1212,7 +1226,7 @@ void fts_client_add_symbol( fts_object_t *obj, fts_symbol_t v)
 
 void fts_client_add_string( fts_object_t *obj, const char *v)
 {
-  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( o)) );
+  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( obj)) );
 
   if ( !client)
     return;
@@ -1222,7 +1236,7 @@ void fts_client_add_string( fts_object_t *obj, const char *v)
 
 void fts_client_add_object( fts_object_t *obj, fts_object_t *v)
 {
-  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( o)) );
+  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( obj)) );
 
   if ( !client)
     return;
@@ -1232,7 +1246,7 @@ void fts_client_add_object( fts_object_t *obj, fts_object_t *v)
 
 void fts_client_add_atoms( fts_object_t *obj, int ac, const fts_atom_t *at)
 {
-  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( o)) );
+  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( obj)) );
 
   if ( !client)
     return;
@@ -1240,9 +1254,9 @@ void fts_client_add_atoms( fts_object_t *obj, int ac, const fts_atom_t *at)
   protocol_encoder_write_atoms( &client->encoder, ac, at);
 }
 
-void fts_client_done_message( fts_object_t *o)
+void fts_client_done_message( fts_object_t *obj)
 {
-  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( o)) );
+  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( obj)) );
 
   if ( !client)
     return;
@@ -1252,13 +1266,13 @@ void fts_client_done_message( fts_object_t *o)
 
 void fts_client_send_message( fts_object_t *obj, fts_symbol_t selector, int ac, const fts_atom_t *at)
 {
-  fts_log( "[client]: Send message dest=0x%x selector=%s ac=%d args=", o, selector, ac);
+  fts_log( "[client]: Send message dest=0x%x selector=%s ac=%d args=", obj, selector, ac);
   fts_log_atoms( ac, at);
   fts_log( "\n");
 
-  fts_client_start_message( o, s);
-  fts_client_add_atoms( o, ac, at);
-  fts_client_done_message( o);
+  fts_client_start_message( obj, selector);
+  fts_client_add_atoms( obj, ac, at);
+  fts_client_done_message( obj);
 }
 
 

@@ -25,7 +25,7 @@
 
 package ircam.jmax.fts;
 
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 /** This interface define a listener of the changes
   inside a patcher. It is installed on a FtsPatcherData instance

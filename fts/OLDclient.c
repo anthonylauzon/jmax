@@ -664,44 +664,44 @@ static void fts_client_send_int(int value)
   oldclient_put_char( oldclient, (unsigned char) (((unsigned int) value) & 0xff));
 }
 
-void fts_client_start_msg( int type)
-{
+/*void fts_client_start_msg( int type)
+  {
   oldclient_put_char( oldclient, (char)type);
+  
+  }
 
-}
-
-void fts_client_start_clientmess(void)
-{
+  void fts_client_start_clientmess(void)
+  {
   fts_client_start_msg(CLIENTMESS_CODE);
-}
+  }
 
-void fts_client_add_int(int value)
-{
+  void fts_client_add_int(int value)
+  {
   oldclient_put_char( oldclient, INT_CODE);
   fts_client_send_int(value);
-}
+  }
 
 
-void fts_client_add_object(fts_object_t *obj)
-{  
+  void fts_client_add_object(fts_object_t *obj)
+  {  
   oldclient_put_char( oldclient, OBJECT_CODE);
   fts_client_send_int( obj ? fts_object_get_id(obj) : 0);
-}
+  }
 
 
-void fts_client_add_connection(fts_connection_t *c)
-{
+  void fts_client_add_connection(fts_connection_t *c)
+  {
   oldclient_put_char( oldclient, CONNECTION_CODE);
   fts_client_send_int(c ? fts_connection_get_id(c) : 0);
 
-}
+  }
 
 
-void fts_client_add_float(float value)
-{
+  void fts_client_add_float(float value)
+  {
   oldclient_put_char( oldclient, FLOAT_CODE);
   fts_client_send_int( *((unsigned int *)&value) );
-}
+  }*/
 
 /*
   Symbol cache handling
@@ -729,80 +729,79 @@ void fts_client_add_float(float value)
 
 static int first_unused_symbol_cache_index = 0;
 
-static int cache_symbol( fts_symbol_t s)
-{
+/*static int cache_symbol( fts_symbol_t s)
+  {
   if (first_unused_symbol_cache_index < MAX_CACHE_INDEX)
-    {
-      fts_symbol_set_cache_index( s, first_unused_symbol_cache_index++);
-      return 1;
-    }
-
+  {
+  fts_symbol_set_cache_index( s, first_unused_symbol_cache_index++);
+  return 1;
+  }
+  
   return 0;
-}
+  }
 
-void fts_client_add_symbol(fts_symbol_t s)
-{
-  if ( fts_symbol_get_cache_index(s) >= 0 )   /* Is symbol cached ? */
-    {
-      oldclient_put_char( oldclient, SYMBOL_CACHED_CODE);
-      fts_client_send_int( fts_symbol_get_cache_index(s));
-    }
-  else if (cache_symbol(s))   /* Try to cache it and if succeeded, send a cache definition */
-    {
-      oldclient_put_char( oldclient, SYMBOL_AND_DEF_CODE);
-      fts_client_send_int( fts_symbol_get_cache_index(s));
-      fts_client_send_string( fts_symbol_name(s));
-      oldclient_put_char( oldclient, STRING_END_CODE);
-    }
-  else   /* Send it as string, but with a SYMBOL_CODE */
-    {
-      oldclient_put_char( oldclient, SYMBOL_CODE);
-      fts_client_send_string(fts_symbol_name(s));
-      oldclient_put_char( oldclient, STRING_END_CODE);
-    }
-}
+  void fts_client_add_symbol(fts_symbol_t s)
+  {
+  if ( fts_symbol_get_cache_index(s) >= 0 ) 
+  {
+  oldclient_put_char( oldclient, SYMBOL_CACHED_CODE);
+  fts_client_send_int( fts_symbol_get_cache_index(s));
+  }
+  else if (cache_symbol(s)) 
+  {
+  oldclient_put_char( oldclient, SYMBOL_AND_DEF_CODE);
+  fts_client_send_int( fts_symbol_get_cache_index(s));
+  fts_client_send_string( fts_symbol_name(s));
+  oldclient_put_char( oldclient, STRING_END_CODE);
+  }
+  else 
+  {
+  oldclient_put_char( oldclient, SYMBOL_CODE);
+  fts_client_send_string(fts_symbol_name(s));
+  oldclient_put_char( oldclient, STRING_END_CODE);
+  }
+  }
 
-void fts_client_add_string(const char *s)
-{
+  void fts_client_add_string(const char *s)
+  {
   oldclient_put_char( oldclient, STRING_CODE);
   fts_client_send_string(s);
   oldclient_put_char( oldclient, STRING_END_CODE);
-}
+  }
 
-
-static void 
-fts_client_add_atom(const fts_atom_t *atom)
-{
+  
+  static void 
+  fts_client_add_atom(const fts_atom_t *atom)
+  {
   if (fts_is_int( atom))
-    fts_client_add_int( fts_get_int(atom));
+  fts_client_add_int( fts_get_int(atom));
   else  if (fts_is_float( atom))
-    fts_client_add_float( fts_get_float(atom));
+  fts_client_add_float( fts_get_float(atom));
   else  if (fts_is_symbol( atom))
-    fts_client_add_symbol( fts_get_symbol(atom));
+  fts_client_add_symbol( fts_get_symbol(atom));
   else  if (fts_is_string( atom))
-    fts_client_add_string( fts_get_string(atom));
+  fts_client_add_string( fts_get_string(atom));
   else  if (fts_is_object( atom))
-    fts_client_add_object( fts_get_object(atom));
+  fts_client_add_object( fts_get_object(atom));
   else
-    fts_log( "Wrong atom type in fts_client_add_atoms: %s\n", fts_get_selector(atom));
-}
+  fts_log( "Wrong atom type in fts_client_add_atoms: %s\n", fts_get_selector(atom));
+  }
 
-void 
-fts_client_add_atoms(int ac, const fts_atom_t *args)
-{
+  void 
+  fts_client_add_atoms(int ac, const fts_atom_t *args)
+  {
   int i;
   
   for (i=0; i<ac; i++)
-    fts_client_add_atom(&args[i]);
-}
+  fts_client_add_atom(&args[i]);
+  }
+  
 
-
-void 
-fts_client_done_msg(void)
-{
-  /*  Add the eom code  */
+  void 
+  fts_client_done_msg(void)
+  {
   oldclient_put_char( oldclient, (char) EOM_CODE);
-}
+  }*/
 
 /* 
    Utility to send a message to an client object;
@@ -813,11 +812,11 @@ fts_client_done_msg(void)
 
 void fts_old_client_send_message(fts_object_t *obj, fts_symbol_t selector, int argc, const fts_atom_t *args)
 {
-  fts_client_start_msg(CLIENTMESS_CODE);
-  fts_client_add_object(obj);
-  fts_client_add_symbol(selector);
-  fts_client_add_atoms(argc, args);
-  fts_client_done_msg();
+  /*fts_client_start_msg(CLIENTMESS_CODE);
+    fts_client_add_object(obj);
+    fts_client_add_symbol(selector);
+    fts_client_add_atoms(argc, args);
+    fts_client_done_msg();*/
 }
 
 /* (nos:) This is a new upload function, which is part of a generic object creation client/server API.
@@ -827,20 +826,19 @@ void fts_old_client_send_message(fts_object_t *obj, fts_symbol_t selector, int a
  */
 void fts_client_upload(fts_object_t *obj, fts_symbol_t classname, int ac, const fts_atom_t *at)
 {
-  if (!fts_object_has_id(obj))
+  /*if (!fts_object_has_id(obj))
     fts_object_table_register(obj);
 
-  fts_client_start_msg(NEW_OBJECT_CODE);
+    fts_client_start_msg(NEW_OBJECT_CODE);
 
-  /* this is to be compatible with the NEW_OBJECT_CODE */
-  fts_client_add_object((fts_object_t *)0);
+    fts_client_add_object((fts_object_t *)0);
 
-  fts_client_add_int(fts_object_get_id(obj));
-  fts_client_add_symbol(classname);
-  fts_client_add_atoms(ac, at);
-  fts_client_done_msg();
+    fts_client_add_int(fts_object_get_id(obj));
+    fts_client_add_symbol(classname);
+    fts_client_add_atoms(ac, at);
+    fts_client_done_msg();
 
-  fts_object_send_properties(obj);
+    fts_object_send_properties(obj);*/
 }
 
 void fts_client_upload_object(fts_object_t *obj)
@@ -865,29 +863,29 @@ void fts_client_upload_object(fts_object_t *obj)
   if(fts_object_description_defines_variable(obj->argc, obj->argv))
     do_var = 1;
   
-  if (do_var)
+  /*if (do_var)
     fts_client_start_msg(NEW_OBJECT_VAR_CODE);
-  else
+    else
     {
-      if(fts_object_is_template(obj))
-	fts_client_start_msg(NEW_TEMPLATE_INSTANCE_CODE);
-      else
-	fts_client_start_msg(NEW_OBJECT_CODE);
+    if(fts_object_is_template(obj))
+    fts_client_start_msg(NEW_TEMPLATE_INSTANCE_CODE);
+    else
+    fts_client_start_msg(NEW_OBJECT_CODE);
     }
-  fts_client_add_object((fts_object_t *) obj->patcher);
-  
-  fts_client_add_int(fts_object_get_id(obj));
-
-  if (do_var)
+    fts_client_add_object((fts_object_t *) obj->patcher);
+    
+    fts_client_add_int(fts_object_get_id(obj));
+    
+    if (do_var)
     {
-      fts_client_add_symbol(fts_get_symbol(&obj->argv[0]));
-
-      fts_client_add_atoms(obj->argc - 2, obj->argv + 2);
+    fts_client_add_symbol(fts_get_symbol(&obj->argv[0]));
+    
+    fts_client_add_atoms(obj->argc - 2, obj->argv + 2);
     }
-  else
+    else
     fts_client_add_atoms(obj->argc, obj->argv);
-
-  fts_client_done_msg();
+    
+    fts_client_done_msg();*/
 
   fts_object_send_properties(obj);
 
@@ -900,25 +898,23 @@ void fts_client_upload_connection(fts_connection_t *c)
 {
   /* CONNECT (obj)from (int)outlet (obj)to (int)inlet */
 
-  if (c->id == FTS_NO_ID)
+  /*if (c->id == FTS_NO_ID)
     fts_connection_table_register(c);
+    
+    fts_client_start_msg(NEW_CONNECTION_CODE);
 
-  fts_client_start_msg(NEW_CONNECTION_CODE);
-
-  if (c->src->patcher)
+    if (c->src->patcher)
     fts_client_add_object((fts_object_t *) c->src->patcher);
-  else
+    else
     fts_client_add_object((fts_object_t *) 0);
   
-  /****************************************/
-
-  fts_client_add_int(c->id);
-  fts_client_add_object(c->src);
-  fts_client_add_int(c->woutlet);
-  fts_client_add_object(c->dst);
-  fts_client_add_int(c->winlet);
-  fts_client_add_int(c->type);
-  fts_client_done_msg();
+    fts_client_add_int(c->id);
+    fts_client_add_object(c->src);
+    fts_client_add_int(c->woutlet);
+    fts_client_add_object(c->dst);
+    fts_client_add_int(c->winlet);
+    fts_client_add_int(c->type);
+    fts_client_done_msg();*/
 }
 
 
@@ -926,29 +922,29 @@ void fts_client_upload_connection(fts_connection_t *c)
 
 void fts_client_release_connection(fts_connection_t *c)
 {
-  fts_client_start_msg(CONNECTION_RELEASE_CODE);
-  fts_client_add_connection(c);
-  fts_client_done_msg();
+  /*fts_client_start_msg(CONNECTION_RELEASE_CODE);
+    fts_client_add_connection(c);
+    fts_client_done_msg();*/
 }
 
 
 void fts_client_redefine_connection(fts_connection_t *c)
 {
-  fts_client_start_msg(REDEFINE_CONNECTION_CODE);
-  fts_client_add_connection(c);
-  fts_client_add_object(c->src);
-  fts_client_add_int(c->woutlet);
-  fts_client_add_object(c->dst);
-  fts_client_add_int(c->winlet);
-  fts_client_add_int(c->type);
-  fts_client_done_msg();
+  /*fts_client_start_msg(REDEFINE_CONNECTION_CODE);
+    fts_client_add_connection(c);
+    fts_client_add_object(c->src);
+    fts_client_add_int(c->woutlet);
+    fts_client_add_object(c->dst);
+    fts_client_add_int(c->winlet);
+    fts_client_add_int(c->type);
+    fts_client_done_msg();*/
 }
 
 void fts_client_release_object(fts_object_t *obj)
 {
-  fts_client_start_msg(OBJECT_RELEASE_CODE);
-  fts_client_add_object(obj);
-  fts_client_done_msg();
+  /*fts_client_start_msg(OBJECT_RELEASE_CODE);
+    fts_client_add_object(obj);
+    fts_client_done_msg();*/
 }
 
 /***********************************************************************
@@ -966,10 +962,10 @@ void fts_client_release_object(fts_object_t *obj)
 
 static void fts_sync_dispatch(int ac, const fts_atom_t *av)
 {
-  fts_client_updates_sync();
+  /*fts_client_updates_sync();
 
-  fts_client_start_msg(SYNC_DONE_CODE);
-  fts_client_done_msg();
+    fts_client_start_msg(SYNC_DONE_CODE);
+    fts_client_done_msg();*/
 }
 
 static void fts_client_sync_init(void)
@@ -1057,26 +1053,26 @@ void fts_client_send_property(fts_object_t *obj, fts_symbol_t name)
       }
 #endif
 
-      fts_client_start_msg(CLIENTPROP_CODE);
-      fts_client_add_object(obj);
-      fts_client_add_symbol(name);
-      fts_client_add_atoms(1, &a);
-      fts_client_done_msg();
+      /*fts_client_start_msg(CLIENTPROP_CODE);
+	fts_client_add_object(obj);
+	fts_client_add_symbol(name);
+	fts_client_add_atoms(1, &a);
+	fts_client_done_msg();*/
     }
 }
 
 
 static void update_group_start(void)
 {
-  fts_client_start_msg(UPDATE_GROUP_START_CODE);
-  fts_client_done_msg();
+  /*fts_client_start_msg(UPDATE_GROUP_START_CODE);
+    fts_client_done_msg();*/
 }
 
 
 static void update_group_end(void)
 {
-  fts_client_start_msg(UPDATE_GROUP_END_CODE);
-  fts_client_done_msg();
+  /*fts_client_start_msg(UPDATE_GROUP_END_CODE);
+    fts_client_done_msg();*/
 }
 
 /* this is a method of the oldclient object above */

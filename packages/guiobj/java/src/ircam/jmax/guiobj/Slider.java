@@ -65,9 +65,9 @@ public class Slider extends GraphicObject implements FtsIntValueListener
 
   public static SliderControlPanel controlPanel = new SliderControlPanel();
 
-  public Slider( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject)
+  public Slider(FtsGraphicObject theFtsObject)
   {
-    super( theSketchPad, theFtsObject);
+    super(theFtsObject);
 
     rangeMin = ((FtsSliderObject)ftsObject).getMinValue();
     rangeMax = ((FtsSliderObject)ftsObject).getMaxValue();

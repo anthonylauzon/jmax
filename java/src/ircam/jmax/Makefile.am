@@ -4,6 +4,7 @@ packagedir=$(pkgdatadir)
 package_JAVA = \
 DefaultIcons.java\
 DefaultPackages.java\
+JMaxObjectCreator.java\
 JMaxPackage.java\
 JMaxVersion.java\
 MaxApplication.java\

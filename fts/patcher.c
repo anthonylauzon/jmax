@@ -1295,34 +1295,25 @@ fts_patcher_add_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s,
 {
   fts_patcher_t *this = (fts_patcher_t *)o;
   fts_object_t *obj;
-  /*if (ac >= 1 && fts_is_int(&at[0]))
-    {*/
+  fts_atom_t a[ac+3];
+
   if(this)
     {
-      //int id = fts_get_int(&at[0]);	  
+
       obj = fts_eval_object_description((fts_patcher_t *)this, ac - 2, at + 2);
       
-      fts_object_table_register(obj);	  
-      //fts_object_set_id(obj, id);
-	  
-      /***********************************************************/
-      /*   same code of fts_client_send_message in OLDclient    **/
-      /***********************************************************/
-      fts_client_start_msg(CLIENTMESS_CODE);
-      fts_client_add_object((fts_object_t *)this);
-      fts_client_add_symbol(sym_addObject);
-      fts_client_add_int(fts_object_get_id(obj));/*??*/
-      fts_client_add_atoms(obj->argc, obj->argv);
-      fts_client_done_msg();
-      /***********************************************************/
-      fts_object_send_properties(obj);
-      fts_send_message(obj, fts_SystemInlet, fts_s_upload, 0, 0);//????
+      fts_client_start_message((fts_object_t *)this, sym_addObject);
+      fts_client_add_int((fts_object_t *)this, fts_object_get_id(obj));
+      fts_client_add_int((fts_object_t *)this, fts_get_int(&at[0]));
+      fts_client_add_int((fts_object_t *)this, fts_get_int(&at[1]));
+      fts_client_add_atoms((fts_object_t *)this, obj->argc, obj->argv);
+      fts_client_done_message((fts_object_t *)this);
+
+      /*fts_object_send_properties(obj);
+	fts_send_message(obj, fts_SystemInlet, fts_s_upload, 0, 0);*/
     }
   else
     printf_mess("System Error in FOS message NEW:  parent not found", ac, at);
-  /*}
-    else
-    printf_mess("System Error in FOS message NEW: bad args", ac, at); */
 }
 
 static void 
@@ -1349,13 +1340,20 @@ fts_patcher_redefine_object_from_client( fts_object_t *o, int winlet, fts_symbol
 	  /***********************************************************/
 	  /*   same code of fts_client_send_message in OLDclient    **/
 	  /***********************************************************/
-	  fts_client_start_msg(CLIENTMESS_CODE);
-	  fts_client_add_object((fts_object_t *)this);
-	  fts_client_add_symbol(fts_object_is_template(obj) ? sym_redefineTemplateObject : sym_redefineObject);
-	  fts_client_add_int(do_var);
-	  fts_client_add_int(newid);
-	  fts_client_add_atoms(obj->argc, obj->argv);
-	  fts_client_done_msg();
+	  /*fts_client_start_msg(CLIENTMESS_CODE);
+	    fts_client_add_object((fts_object_t *)this);
+	    fts_client_add_symbol(fts_object_is_template(obj) ? sym_redefineTemplateObject : sym_redefineObject);
+	    fts_client_add_int(do_var);
+	    fts_client_add_int(newid);
+	    fts_client_add_atoms(obj->argc, obj->argv);
+	    fts_client_done_msg();*/
+	  fts_client_start_message((fts_object_t *)this, 
+				   fts_object_is_template(obj) ? sym_redefineTemplateObject : sym_redefineObject);
+	  fts_client_add_int((fts_object_t *)this, do_var);
+	  fts_client_add_int((fts_object_t *)this, newid);
+	  fts_client_add_atoms((fts_object_t *)this, obj->argc, obj->argv);
+	  fts_client_done_message((fts_object_t *)this);
+	  
 	  /***********************************************************/
 
 	  fts_object_send_properties_immediately(obj);

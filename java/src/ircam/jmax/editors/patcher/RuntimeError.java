@@ -27,7 +27,7 @@ package ircam.jmax.editors.patcher;
 
 import java.lang.*;
 import ircam.jmax.fts.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 public class RuntimeError 
 {

@@ -46,9 +46,9 @@ public class Display extends GraphicObject implements FtsMessageListener
   int underWidth = 0;
   int underWidthMax = 0;
 
-  public Display(ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject)
+  public Display(FtsGraphicObject theFtsObject)
   {
-    super(theSketchPad, theFtsObject);
+    super(theFtsObject);
 
     display = "###";
 

@@ -28,7 +28,7 @@ package ircam.jmax.fts;
 import java.beans.*;
 import java.io.*;
 
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 import ircam.jmax.*;
 
 /** Java class for the dsp control remote data class.
@@ -244,7 +244,7 @@ public class FtsDspControl extends FtsObject
   public void requestSetDspOn(boolean value)
   {
     args.clear();
-    args.add(value ? 1 : 0);
+    args.addBoolean(value);
       
     try{
       send( FtsSymbol.get("dsp_on"), args);
@@ -285,7 +285,7 @@ public class FtsDspControl extends FtsObject
   public void startFpeCollecting(FtsObjectSet set)
   {
     args.clear();
-    args.add(set);
+    args.addObject(set);
       
     try{
       send( FtsSymbol.get("fpe_start_collect"), args);

@@ -28,7 +28,7 @@ package ircam.jmax.fts;
 import ircam.jmax.*;
 import java.io.*;
 import java.util.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 /**
  * The proxy of an Fts connection.

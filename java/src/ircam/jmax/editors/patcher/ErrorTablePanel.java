@@ -33,7 +33,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;

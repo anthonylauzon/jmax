@@ -47,9 +47,9 @@ public class Fork extends GraphicObject
 
   private int nOutlets = 0; /* @@@@@*/
 
-  public Fork( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject) 
+  public Fork(FtsGraphicObject theFtsObject) 
   {
-    super( theSketchPad, theFtsObject);
+    super(theFtsObject);
 
     nOutlets = theFtsObject.getNumberOfOutlets();
     if(nOutlets==0)

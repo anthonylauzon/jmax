@@ -27,7 +27,7 @@ package ircam.jmax.guiobj;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 import java.io.*;
 
@@ -37,28 +37,28 @@ import java.io.*;
 
 public class FtsSliderObject extends FtsIntValueObject
 {
-   static
-    {
-	ircam.ftsclient.FtsObject.registerMessageHandler( FtsSliderObject.class, FtsSymbol.get("setMinValue"), new FtsMessageHandler(){
-		public void invoke( ircam.ftsclient.FtsObject obj, int argc, ircam.ftsclient.FtsAtom[] argv)
-		{
-		    ((FtsSliderObject)obj).minValue = argv[0].intValue;
-		}
-	    });
-	ircam.ftsclient.FtsObject.registerMessageHandler( FtsSliderObject.class, FtsSymbol.get("setMaxValue"), new FtsMessageHandler(){
-		public void invoke( ircam.ftsclient.FtsObject obj, int argc, ircam.ftsclient.FtsAtom[] argv)
-		{
-		    ((FtsSliderObject)obj).maxValue = argv[0].intValue;
-		}
-	    });
-	ircam.ftsclient.FtsObject.registerMessageHandler( FtsSliderObject.class, FtsSymbol.get("setOrientation"), new FtsMessageHandler(){
-		public void invoke( ircam.ftsclient.FtsObject obj, int argc, ircam.ftsclient.FtsAtom[] argv)
-		{
-		    ((FtsSliderObject)obj).orientation = argv[0].intValue;
-		}
-	    });
-    }
-
+  static
+  {
+    FtsObject.registerMessageHandler( FtsSliderObject.class, FtsSymbol.get("setMinValue"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsSliderObject)obj).minValue = args.getInt(0);
+	}
+      });
+    FtsObject.registerMessageHandler( FtsSliderObject.class, FtsSymbol.get("setMaxValue"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsSliderObject)obj).maxValue = args.getInt(0);
+	}
+      });
+    FtsObject.registerMessageHandler( FtsSliderObject.class, FtsSymbol.get("setOrientation"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsSliderObject)obj).orientation = args.getInt(0);
+	}
+      });
+  }
+  
   /*****************************************************************************/
   /*                                                                           */
   /*                               CONSTRUCTORS                                */
@@ -73,9 +73,12 @@ public class FtsSliderObject extends FtsIntValueObject
   /**
    * Create a FtsObject object;
    */
-  public FtsSliderObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id)
+  public FtsSliderObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
   {
-      super(server, parent, className, nArgs, args, id);
+      super(server, parent, id, args, offset, length);
+
+      setNumberOfInlets(1);
+      setNumberOfOutlets(1);
 
       maxValue = 127;
       minValue = 0;
@@ -96,7 +99,7 @@ public class FtsSliderObject extends FtsIntValueObject
     minValue = value;
 
     args.clear();
-    args.add(value);
+    args.addInt(value);
     try{
 	send( FtsSymbol.get("setMinValue"), args);
     }
@@ -116,7 +119,7 @@ public class FtsSliderObject extends FtsIntValueObject
     maxValue = value;
 
     args.clear();
-    args.add(value);
+    args.addInt(value);
     try{
 	send( FtsSymbol.get("setMaxValue"), args);
     }
@@ -134,7 +137,7 @@ public class FtsSliderObject extends FtsIntValueObject
     orientation = or;
 
     args.clear();
-    args.add(or);
+    args.addInt(or);
     try{
 	send( FtsSymbol.get("setOrientation"), args);
     }

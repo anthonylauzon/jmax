@@ -26,6 +26,9 @@
 package ircam.jmax.guiobj;
 
 import ircam.jmax.*;
+import ircam.jmax.fts.*;
+import ircam.jmax.editors.patcher.objects.GraphicObject;
+import ircam.fts.client.*;
 
 /**
  * The table extension; install the table data type
@@ -35,45 +38,79 @@ public class Guiobj extends JMaxPackage
 {
   public Guiobj()
   {
-      super("guiobj");
+    super("guiobj");
   }
 
   public void load()
-  {
-      ObjectCreatorManager.registerFtsClass("fork", ircam.jmax.guiobj.FtsForkObject.class);
-      ObjectCreatorManager.registerGraphicClass("fork", ircam.jmax.guiobj.Fork.class, "guiobj");
-      
-      ObjectCreatorManager.registerFtsClass("jcomment", ircam.jmax.guiobj.FtsCommentObject.class);
-      ObjectCreatorManager.registerGraphicClass("jcomment", ircam.jmax.guiobj.Comment.class, "guiobj");
-      
-      ObjectCreatorManager.registerFtsClass("messconst", ircam.jmax.guiobj.FtsMessConstObject.class);
-      ObjectCreatorManager.registerGraphicClass("messconst", ircam.jmax.guiobj.MessConst.class, "guiobj");
-	
-      ObjectCreatorManager.registerFtsClass("button", ircam.jmax.guiobj.FtsBangObject.class);
-      ObjectCreatorManager.registerGraphicClass("button", ircam.jmax.guiobj.Bang.class, "guiobj");
-      
-      ObjectCreatorManager.registerFtsClass("toggle", ircam.jmax.guiobj.FtsToggleObject.class);
-      ObjectCreatorManager.registerGraphicClass("toggle", ircam.jmax.guiobj.Toggle.class, "guiobj");
-      
-      ObjectCreatorManager.registerFtsClass("slider", ircam.jmax.guiobj.FtsSliderObject.class);
-      ObjectCreatorManager.registerGraphicClass("slider", ircam.jmax.guiobj.Slider.class, "guiobj");
-      
-      ObjectCreatorManager.registerFtsClass("intbox", ircam.jmax.fts.FtsIntValueObject.class);
-      ObjectCreatorManager.registerGraphicClass("intbox", ircam.jmax.guiobj.IntBox.class, "guiobj");
-      
-      ObjectCreatorManager.registerFtsClass("floatbox", ircam.jmax.guiobj.FtsFloatValueObject.class);
-      ObjectCreatorManager.registerGraphicClass("floatbox", ircam.jmax.guiobj.FloatBox.class, "guiobj");
-      
-      ObjectCreatorManager.registerFtsClass("display", ircam.jmax.guiobj.FtsDisplayObject.class);
-      ObjectCreatorManager.registerGraphicClass("display", ircam.jmax.guiobj.Display.class, "guiobj");
-      
-      ObjectCreatorManager.registerFtsClass("vecdisplay", ircam.jmax.guiobj.FtsVectorDisplayObject.class);
-      ObjectCreatorManager.registerGraphicClass("vecdisplay", ircam.jmax.guiobj.VectorDisplay.class, "guiobj");
-      
-      ObjectCreatorManager.registerFtsClass("scope", ircam.jmax.guiobj.FtsScopeObject.class);
-      ObjectCreatorManager.registerGraphicClass("scope", ircam.jmax.guiobj.Scope.class, "guiobj");
-      
-      ircam.jmax.editors.console.ConsoleWindow.append("package Guiobj loaded");	      
+  {    
+    ObjectCreatorManager.register( "fork", new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, FtsAtom[] args, int offset, int length) 
+	{
+	  return new Fork( new FtsForkObject( server, parent, objId, args, offset, length));
+	}
+      });
+    ObjectCreatorManager.register( "jcomment", new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, FtsAtom[] args, int offset, int length) 
+	{
+	  return new Comment( new FtsCommentObject( server, parent, objId, args, offset, length));
+	}
+      });
+    ObjectCreatorManager.register( "messconst", new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, FtsAtom[] args, int offset, int length) 
+	{
+	  return new MessConst( new FtsMessConstObject( server, parent, objId, args, offset, length));
+	}
+      });
+    ObjectCreatorManager.register( "button", new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, FtsAtom[] args, int offset, int length) 
+	{
+	  return new Bang( new FtsBangObject( server, parent, objId, args, offset, length));
+	}
+      });
+    ObjectCreatorManager.register( "toggle", new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, FtsAtom[] args, int offset, int length) 
+	{
+	  return new Toggle( new FtsToggleObject( server, parent, objId, args, offset, length));
+	}
+      });
+     ObjectCreatorManager.register( "slider", new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, FtsAtom[] args, int offset, int length) 
+	{
+	  return new Slider( new FtsSliderObject( server, parent, objId, args, offset, length));
+	}
+      });
+     ObjectCreatorManager.register( "intbox", new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, FtsAtom[] args, int offset, int length) 
+	{
+	  return new IntBox( new FtsIntValueObject( server, parent, objId, args, offset, length));
+	}
+       });
+     ObjectCreatorManager.register( "floatbox", new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, FtsAtom[] args, int offset, int length) 
+	{
+	  return new FloatBox( new FtsFloatValueObject( server, parent, objId, args, offset, length));
+	}
+       });
+     ObjectCreatorManager.register( "display", new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, FtsAtom[] args, int offset, int length) 
+	{
+	  return new Display( new FtsDisplayObject( server, parent, objId, args, offset, length));
+	}
+       });
+     ObjectCreatorManager.register( "vecdisplay", new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, FtsAtom[] args, int offset, int length) 
+	{
+	  return new VectorDisplay( new FtsVectorDisplayObject( server, parent, objId, args, offset, length));
+	}
+       });
+     ObjectCreatorManager.register( "scope", new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, FtsAtom[] args, int offset, int length) 
+	{
+	  return new Scope( new FtsScopeObject( server, parent, objId, args, offset, length));
+	}
+       });
+     
+     ircam.jmax.editors.console.ConsoleWindow.append("package Guiobj loaded (Java Classes)");	      
   }
 }
 

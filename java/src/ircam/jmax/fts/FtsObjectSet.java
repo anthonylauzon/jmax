@@ -30,7 +30,7 @@ import java.io.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 import ircam.jmax.*;
 
 /** Object set class.
@@ -94,10 +94,10 @@ public class FtsObjectSet extends FtsObject implements ListModel
     FtsPatcherObject.removeGlobalEditListener(editListener);
   }
 
-  public void append(int nArgs, FtsAtom[] args)
+  public void append(FtsArgs args)
   {
-    for(int i=0; i<nArgs; i++)
-      list.addElement(args[i].objectValue);
+    for(int i=0; i<args.getLength(); i++)
+      list.addElement(args.getObject(i));
 
     fireListChanged();
   }

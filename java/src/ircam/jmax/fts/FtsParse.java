@@ -29,7 +29,7 @@ import java.util.*;
 import java.text.*;
 
 import ircam.jmax.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 /** Lexical analyzer/unparser.
  * This class implement a lexical analizer for object and message box
@@ -997,7 +997,8 @@ public class FtsParse
   
   
   /*  Unparse a description passed as a array of FtsAtom */
-  static public String unparseArguments(int nArgs, FtsAtom args[])
+  //static public String unparseArguments(int nArgs, FtsAtom args[])
+  static public String unparseArguments(FtsAtom args[], int offset, int nArgs)
   {
     if (nArgs > 0)
       {
@@ -1009,9 +1010,9 @@ public class FtsParse
 	FtsAtom value2;
 	int i;
 
-	value2 = args[0];
+	value2 = args[offset];
 	value1 = value2;
-	i = 1;
+	i = offset+1;
 
 	while (value1 != null)
 	  {
@@ -1086,3 +1087,4 @@ public class FtsParse
       return "";
   }
 }
+

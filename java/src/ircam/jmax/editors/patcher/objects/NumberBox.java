@@ -48,9 +48,9 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
   public static final int DEFAULT_HEIGHT = 15;
   private static final int DEFAULT_VISIBLE_DIGIT = 3;
 
-  public NumberBox( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject, String filter) 
+  public NumberBox(FtsGraphicObject theFtsObject, String filter) 
   {
-    super( theSketchPad, theFtsObject);
+    super(theFtsObject);
 
     currentText = new StringBuffer();
 

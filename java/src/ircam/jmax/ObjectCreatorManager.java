@@ -25,7 +25,7 @@ import java.awt.*;
 import java.util.*;
 import javax.swing.*;
 
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.patcher.objects.*;
 
@@ -38,45 +38,39 @@ public class ObjectCreatorManager
     return creatorManager;
   }
 
-  /****************************************************************************/
+  public static void register(String nameclass, JMaxObjectCreator creator)
+  {
+    creatorManager.creatorsTable.put(nameclass, creator);
 
-  public static void registerFtsClass(String nameclass, Class theClass)
-  {
-     creatorManager.ftsClasses.put(nameclass, theClass);
+    /* to remove */
+    creatorManager.classNamesVector.addElement(nameclass);
+    //creatorManager.packageNames.put(nameclass, pkgName);
   }
-  public static void registerGraphicClass(String nameclass, Class theClass, String pkgName)
+
+  static public JMaxObjectCreator getCreator(String nameclass)
   {
-      creatorManager.graphicClasses.put(nameclass, theClass);
-      creatorManager.classNamesVector.addElement(nameclass);
-      creatorManager.packageNames.put(nameclass, pkgName);
+    return ((JMaxObjectCreator)creatorManager.creatorsTable.get(nameclass));
   }
-  static public Class getFtsClass(String nameclass)
-  {
-      return ((Class)creatorManager.ftsClasses.get(nameclass));
-  }
-  static public Class getGraphicClass(String nameclass)
-  {
-    return ((Class)creatorManager.graphicClasses.get(nameclass));
-  } 
+
+  private Hashtable creatorsTable = new Hashtable();
+
+
+  /******************************************************************/
+  /* to remove */
   static public String getPackageName(String nameclass)
   {
     return ((String)creatorManager.packageNames.get(nameclass));
   }
-  static public Enumeration getGraphicClasses()
-  {
-      return creatorManager.graphicClasses.elements();
-  }
+  
   static public Enumeration getClassNames()
   {
-      return creatorManager.classNamesVector.elements();
+    return creatorManager.classNamesVector.elements();
   }  
   static public boolean containsClass(String className)
   {
-      return  creatorManager.ftsClasses.containsKey(className);
+    return  creatorManager.creatorsTable.containsKey(className);
   } 
 
-  private Hashtable ftsClasses     = new Hashtable();
-  private Hashtable graphicClasses = new Hashtable();
   private Vector classNamesVector  = new Vector();
   private Hashtable packageNames   = new Hashtable();
 }

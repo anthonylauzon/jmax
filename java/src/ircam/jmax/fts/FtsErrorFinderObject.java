@@ -31,7 +31,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import ircam.jmax.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 /** Object set class.
  *  

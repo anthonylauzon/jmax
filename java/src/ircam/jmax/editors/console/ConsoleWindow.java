@@ -37,7 +37,7 @@ import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
 import ircam.jmax.widgets.ConsoleArea;
 
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 /**
  * Window containing a console

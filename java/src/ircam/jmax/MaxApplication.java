@@ -37,7 +37,7 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.dialogs.*;
 
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 import ircam.jmax.editors.console.*;
 
 // MaxApplication.getProperty should disappear, and properties stored in the system

@@ -74,9 +74,9 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
     }
     public static BangControlPanel controlPanel = new BangControlPanel();
 
-    public Bang( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject) 
+    public Bang(FtsGraphicObject theFtsObject) 
     {
-	super( theSketchPad, theFtsObject);
+	super(theFtsObject);
 
 	int width = getWidth();
 

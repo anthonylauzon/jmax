@@ -35,7 +35,7 @@ import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.interactions.*;
@@ -168,66 +168,62 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   // A Static method that work as a virtual constructor;
   // given an FTS object, build the proper FTS Object
 
-  static public GraphicObject makeGraphicObject( ErmesSketchPad sketch, FtsGraphicObject object) 
-  {
+  /*static public GraphicObject makeGraphicObject( ErmesSketchPad sketch, FtsGraphicObject object) 
+    {
     GraphicObject gobj = null;
     String theName = object.getClassName();
     Class aClass = ObjectCreatorManager.getGraphicClass(theName);
+    
+    System.err.println("[GraphicObject] makeGraphicObject className "+theName+" aClass "+aClass+" ftsObj "+object);
 
     if(aClass != null)
-      {
-	Object[] arg = new Object[] {sketch, object};
-	try
-	  {
-	    Constructor constr = aClass.getConstructors()[0];    
-	    if(constr != null)
-	      gobj = (GraphicObject)(constr.newInstance(arg));
-	    
-	  } 
-	catch (InstantiationException e) 
-	  {
-	    System.out.println(e);
-	  } 
-	catch (IllegalAccessException e) 
-	  {
-	    System.out.println(e);
-	  } 
-	catch (InvocationTargetException e) 
-	  {
-	      System.out.println(e);
-	  } 
-      }
+    {
+    Object[] arg = new Object[] {sketch, object};
+    try
+    {
+    Constructor constr = aClass.getConstructors()[0];    
+    if(constr != null)
+    gobj = (GraphicObject)(constr.newInstance(arg));
+    
+    } 
+    catch (InstantiationException e) 
+    {
+    System.out.println(e);
+    } 
+    catch (IllegalAccessException e) 
+    {
+    System.out.println(e);
+    } 
+    catch (InvocationTargetException e) 
+    {
+    System.out.println(e);
+    } 
+    }
     else if (theName.equals( "inlet"))
-      gobj = new ircam.jmax.editors.patcher.objects.Inlet( sketch, object);
+    gobj = new ircam.jmax.editors.patcher.objects.Inlet( sketch, object);
     else if (theName.equals( "outlet"))
-      gobj = new ircam.jmax.editors.patcher.objects.Outlet( sketch, object);
+    gobj = new ircam.jmax.editors.patcher.objects.Outlet( sketch, object);
     else if (theName.equals( "jpatcher"))
-      gobj = new ircam.jmax.editors.patcher.objects.Patcher( sketch, object);
+    gobj = new ircam.jmax.editors.patcher.objects.Patcher( sketch, object);
     else
-      gobj = new ircam.jmax.editors.patcher.objects.Standard( sketch, object);
-
+    gobj = new ircam.jmax.editors.patcher.objects.Standard( sketch, object);
+    
     if(gobj!=null)
-      object.setObjectListener(gobj);
-
+    object.setObjectListener(gobj);
+    
     return gobj;
-  }
+    }*/
 
-  protected GraphicObject( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject) 
+  protected GraphicObject( FtsGraphicObject theFtsObject) 
   {
     String fontName;
     int fontSize;
     int fontStyle;
 
-    /*if(assistArgs == null)
-      {
-      assistArgs = new FtsAtom[2];
-      
-      for(int i = 0; i < assistArgs.length; i++)
-      assistArgs[i] = new FtsAtom();
-      }*/
-    
-    itsSketchPad = theSketchPad;
     ftsObject = theFtsObject;
+    itsSketchPad = ((ErmesSketchWindow)((FtsPatcherObject)ftsObject.getParent()).getEditorFrame()).getSketchPad();
+
+    ftsObject.setObjectListener(this);
 
     selected = false;
 

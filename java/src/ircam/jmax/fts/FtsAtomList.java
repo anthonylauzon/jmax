@@ -29,7 +29,7 @@ import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 /** 
  * The Java Implementation for the atom list remote data class.
@@ -42,7 +42,7 @@ public class FtsAtomList extends FtsObject
     FtsObject.registerMessageHandler( FtsAtomList.class, FtsSymbol.get("setValues"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsAtomList)obj).setValues( args);
+	  ((FtsAtomList)obj).setValues( args.getLength(), args.getAtoms());
 	}
       });
     FtsObject.registerMessageHandler( FtsAtomList.class, FtsSymbol.get("setName"), new FtsMessageHandler(){

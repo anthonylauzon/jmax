@@ -27,7 +27,7 @@ package ircam.jmax.guiobj;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 import java.io.*;
 
@@ -43,12 +43,12 @@ public class FtsBangObject extends FtsIntValueObject
 {
     static
     {
-	ircam.ftsclient.FtsObject.registerMessageHandler( FtsBangObject.class, FtsSymbol.get("setFlash"), new FtsMessageHandler(){
-		public void invoke( ircam.ftsclient.FtsObject obj, int argc, ircam.ftsclient.FtsAtom[] argv)
-		{
-		    ((FtsBangObject)obj).setFlash(argv[0].intValue);
-		}
-	    });
+      FtsObject.registerMessageHandler( FtsBangObject.class, FtsSymbol.get("setFlash"), new FtsMessageHandler(){
+	  public void invoke(FtsObject obj, FtsArgs args)
+	  {
+	    ((FtsBangObject)obj).setFlash(args.getInt(0));
+	  }
+	});
     }
 
   /*****************************************************************************/
@@ -61,46 +61,49 @@ public class FtsBangObject extends FtsIntValueObject
   protected FtsArgs args = new FtsArgs();
 
   /* for the message box */
-  public FtsBangObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id) 
+  public FtsBangObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length) 
   {
-      super( server, parent, className, nArgs, args, id);
+      super( server, parent, id, args, offset, length);
+
+      setNumberOfInlets(1);
+      setNumberOfOutlets(1);
   }
 
-    public void setDefaults()
-    {
-	setWidth(Bang.DEFAULT_WIDTH);
-	setHeight(Bang.DEFAULT_WIDTH);
+  public void setDefaults()
+  {
+    setWidth(Bang.DEFAULT_WIDTH);
+    setHeight(Bang.DEFAULT_WIDTH);
+  }
+
+  public void setFlashDuration(int fd)
+  {
+    flashDuration = fd;
+    args.clear();
+    args.addInt(fd);
+    try{
+      send( FtsSymbol.get("setFlashDuration"), args);
     }
+    catch(IOException e)
+      {
+	System.err.println("FtsBangObject: I/O Error sending setFlashDuration Message!");
+	e.printStackTrace(); 
+      }
+    
+    setDirty();
+  }
 
-    public void setFlashDuration(int fd)
-    {
-	flashDuration = fd;
-	args.clear();
-	args.add(fd);
-	try{
-	    send( FtsSymbol.get("setFlashDuration"), args);
-	}
-	catch(IOException e)
-	    {
-		System.err.println("FtsBangObject: I/O Error sending setFlashDuration Message!");
-		e.printStackTrace(); 
-	    }
-	
-	setDirty();
-    }
-
-    public int getFlashDuration()
-    {
-	return flashDuration;
-    }
-
-    /* Over write the localPut message to handle value changes;
-     */
-
-    protected void setFlash(int newValue)
-    {
-	flashDuration = newValue;
-    }    
+  public int getFlashDuration()
+  {
+    return flashDuration;
+  }
+  
+  /* Over write the localPut message to handle value changes;
+   */
+  
+  protected void setFlash(int newValue)
+  {
+    flashDuration = newValue;
+  }    
 }
 
 

@@ -1,4 +1,4 @@
- //
+//
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -23,36 +23,27 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.objects;
+package ircam.jmax.guiobj;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.io.*;
 import java.util.*;
 
-import ircam.jmax.editors.patcher.*;
-
+import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.fts.client.*;
 
-//
-// The graphic inlet contained in subpatchers
-//
-
-public class Inlet extends InOutlet {
-  public Inlet( FtsGraphicObject theFtsObject) 
+public class FtsToggleObject extends FtsIntValueObject
+{
+  public FtsToggleObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
   {
-    super( theFtsObject);
+    super(server, parent, id, args, offset, length);
+    setNumberOfInlets(1);
+    setNumberOfOutlets(1);
   }
 
-  public void drawTriangle( Graphics g, int x, int y, int w, int h) 
+  public void setDefaults()
   {
-    Color color = g.getColor();
-    int offset = 2 * h/7;
-      
-    g.setColor( color.brighter());
-    g.drawLine( x + h - offset, y + offset, x + h/2, y + h - offset);
-      
-    g.setColor( color.darker());
-    g.drawLine( x + offset, y + offset, x + h - offset, y + offset);
-    g.drawLine( x + offset, y + offset, x + h/2 - 1, y + h - offset - 1);
+    setWidth(Toggle.DEFAULT_WIDTH);
+    setHeight(Toggle.DEFAULT_WIDTH);
   }
 }

@@ -48,32 +48,32 @@ public class DefaultPackages
 	  pkgClass = PackageClassLoader.instance.loadClass("ircam.jmax.guiobj.Guiobj", true);
 	  ((JMaxPackage)pkgClass.newInstance()).load();
 	  
-	  path = pkgPath+"data"+fs+"java"+fs+"data.jar";
-	  PackageClassLoader.instance.setJarPath(path);
-	  pkgClass = PackageClassLoader.instance.loadClass("ircam.jmax.editors.bpf.Bpf", true);
-	  ((JMaxPackage)pkgClass.newInstance()).load();
-	  pkgClass = PackageClassLoader.instance.loadClass("ircam.jmax.editors.table.Table", true);
-	  ((JMaxPackage)pkgClass.newInstance()).load();
-      
-	  path = pkgPath+"explode"+fs+"java"+fs+"explode.jar";
-	  PackageClassLoader.instance.setJarPath(path);
-	  pkgClass = PackageClassLoader.instance.loadClass("ircam.jmax.editors.explode.Explode", true);
-	  ((JMaxPackage)pkgClass.newInstance()).load();
-
-	  path = pkgPath+"ispw"+fs+"java"+fs+"ispw.jar";
-	  PackageClassLoader.instance.setJarPath(path);
-	  pkgClass = PackageClassLoader.instance.loadClass("ircam.jmax.ispw.Ispw", true);
-	  ((JMaxPackage)pkgClass.newInstance()).load();
-	  
-	  path = pkgPath+"qlist"+fs+"java"+fs+"qlist.jar";
-	  PackageClassLoader.instance.setJarPath(path);
-	  pkgClass = PackageClassLoader.instance.loadClass("ircam.jmax.editors.qlist.Qlist", true);
-	  ((JMaxPackage)pkgClass.newInstance()).load();
-	  
-	  path = pkgPath+"sequence"+fs+"java"+fs+"sequence.jar";
-	  PackageClassLoader.instance.setJarPath(path);
-	  pkgClass = PackageClassLoader.instance.loadClass("ircam.jmax.editors.sequence.Sequence", true);
-	  ((JMaxPackage)pkgClass.newInstance()).load();
+	  /*path = pkgPath+"data"+fs+"java"+fs+"data.jar";
+	    PackageClassLoader.instance.setJarPath(path);
+	    pkgClass = PackageClassLoader.instance.loadClass("ircam.jmax.editors.bpf.Bpf", true);
+	    ((JMaxPackage)pkgClass.newInstance()).load();
+	    pkgClass = PackageClassLoader.instance.loadClass("ircam.jmax.editors.table.Table", true);
+	    ((JMaxPackage)pkgClass.newInstance()).load();
+	    
+	    path = pkgPath+"explode"+fs+"java"+fs+"explode.jar";
+	    PackageClassLoader.instance.setJarPath(path);
+	    pkgClass = PackageClassLoader.instance.loadClass("ircam.jmax.editors.explode.Explode", true);
+	    ((JMaxPackage)pkgClass.newInstance()).load();
+	    
+	    path = pkgPath+"ispw"+fs+"java"+fs+"ispw.jar";
+	    PackageClassLoader.instance.setJarPath(path);
+	    pkgClass = PackageClassLoader.instance.loadClass("ircam.jmax.ispw.Ispw", true);
+	    ((JMaxPackage)pkgClass.newInstance()).load();
+	    
+	    path = pkgPath+"qlist"+fs+"java"+fs+"qlist.jar";
+	    PackageClassLoader.instance.setJarPath(path);
+	    pkgClass = PackageClassLoader.instance.loadClass("ircam.jmax.editors.qlist.Qlist", true);
+	    ((JMaxPackage)pkgClass.newInstance()).load();
+	    
+	    path = pkgPath+"sequence"+fs+"java"+fs+"sequence.jar";
+	    PackageClassLoader.instance.setJarPath(path);
+	    pkgClass = PackageClassLoader.instance.loadClass("ircam.jmax.editors.sequence.Sequence", true);
+	    ((JMaxPackage)pkgClass.newInstance()).load();*/
       }
       catch(IllegalAccessException e){
 	  System.err.println("Error in Package loading: "+e);

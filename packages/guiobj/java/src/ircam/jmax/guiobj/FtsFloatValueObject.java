@@ -27,7 +27,7 @@ package ircam.jmax.guiobj;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 import java.io.*;
 
@@ -41,27 +41,27 @@ import java.io.*;
 
 public class FtsFloatValueObject extends FtsGraphicObject
 {
-   static
-    {
-	ircam.ftsclient.FtsObject.registerMessageHandler(FtsFloatValueObject.class, FtsSymbol.get("setValue"), new FtsMessageHandler(){
-		public void invoke( ircam.ftsclient.FtsObject obj, int argc, ircam.ftsclient.FtsAtom[] argv)
-		{
-		    ((FtsFloatValueObject)obj).setCurrentValue(argv[0].floatValue);
-		}
-	    });
-    }
-
+  static
+  {
+    FtsObject.registerMessageHandler(FtsFloatValueObject.class, FtsSymbol.get("setValue"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsFloatValueObject)obj).setCurrentValue(args.getFloat(0));
+	}
+      });
+  }
+  
   /*****************************************************************************/
   /*                                                                           */
   /*                               CONSTRUCTORS                                */
   /*                                                                           */
   /*****************************************************************************/
-
+  
   private float value; 
   
-  public FtsFloatValueObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id)
+  public FtsFloatValueObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
   {
-    super(server, parent, className, nArgs, args, id);
+    super(server, parent, id, args, offset, length);
   }
 
   /** Set the value. Tell it to the server, also */
@@ -71,19 +71,19 @@ public class FtsFloatValueObject extends FtsGraphicObject
     this.value = value;
    
     args.clear();
-    args.add(value);
+    args.addFloat(value);
     try{
-	send( FtsSymbol.get("setValue"), args);
+      send( FtsSymbol.get("setValue"), args);
     }
     catch(IOException e)
-	{
-	    System.err.println("FtsFloatValueObject: I/O Error sending setValue Message!");
-	    e.printStackTrace(); 
-	}
+      {
+	System.err.println("FtsFloatValueObject: I/O Error sending setValue Message!");
+	e.printStackTrace(); 
+      }
   }
-
+  
   /** Get the current value */
-
+  
   public float getValue()
   {
     return value;
@@ -93,25 +93,25 @@ public class FtsFloatValueObject extends FtsGraphicObject
 
   public void updateValue()
   {
-      try{
-	  send(FtsSymbol.get("getValue"));
+    try{
+      send(FtsSymbol.get("getValue"));
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsFloatValueObject: I/O Error sending getValue Message!");
+	e.printStackTrace(); 
       }
-      catch(IOException e)
-	  {
-	      System.err.println("FtsFloatValueObject: I/O Error sending getValue Message!");
-	      e.printStackTrace(); 
-	  }
   }
-       
+  
   /** Over write the localPut message to handle value changes.
    */
 
   protected void setCurrentValue(float newValue)
   {
-      value = newValue;
-	
-      if (listener instanceof FtsFloatValueListener)
-	  ((FtsFloatValueListener) listener).valueChanged(newValue);
+    value = newValue;
+    
+    if (listener instanceof FtsFloatValueListener)
+      ((FtsFloatValueListener) listener).valueChanged(newValue);
   }
 }
 

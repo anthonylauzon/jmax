@@ -57,8 +57,8 @@ class ErmesPatcherListener implements FtsPatcherListener
       PatcherClipboardManager.getManager().addPastedObject(object);    
     /***************************************************************/
     /*************** ASYNCRONOUS OBJECT CREATION *******************/
-    else
-	sketch.addNewObject(object, doedit);
+    /*else
+      sketch.addNewObject(object, doedit);*/
     /***************************************************************/
     /***************************************************************/
   }

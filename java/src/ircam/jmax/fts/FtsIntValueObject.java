@@ -27,7 +27,7 @@ package ircam.jmax.fts;
 
 import java.io.*;
 
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.objects.NumberBox;
 
@@ -51,7 +51,6 @@ public class FtsIntValueObject extends FtsGraphicObject
       });
   }
 
-
   /*****************************************************************************/
   /*                                                                           */
   /*                               CONSTRUCTORS                                */
@@ -61,16 +60,16 @@ public class FtsIntValueObject extends FtsGraphicObject
   int value; 
   protected FtsArgs args = new FtsArgs();
 
-  public FtsIntValueObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id)
+  public FtsIntValueObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
   {
-    super(server, parent, className, nArgs, args, id);
+    super(server, parent, id, args, offset, length);
   }
 
   public void setValue(int value)
   {
     this.value = value;
     args.clear();
-    args.add(value);
+    args.addInt(value);
     try{
       send( FtsSymbol.get("setValue"), args);
     }
@@ -80,9 +79,9 @@ public class FtsIntValueObject extends FtsGraphicObject
 	e.printStackTrace(); 
       }
   }
-
+  
   /** Get the current value */
-
+  
   public int getValue()
   {
     return value;
@@ -101,7 +100,7 @@ public class FtsIntValueObject extends FtsGraphicObject
 	e.printStackTrace(); 
       }
   }
-
+  
   public void sendBang()
   {
     try{
@@ -115,11 +114,11 @@ public class FtsIntValueObject extends FtsGraphicObject
   }
   /* Over write the localPut message to handle value changes;
    */
-
+  
   void setCurrentValue(int newValue)
   {
     value = newValue;
-      
+    
     if (listener instanceof FtsIntValueListener)
       ((FtsIntValueListener) listener).valueChanged(newValue);
   }

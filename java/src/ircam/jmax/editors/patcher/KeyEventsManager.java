@@ -27,7 +27,7 @@ import java.util.*;
 import java.io.*;
 
 import ircam.jmax.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 public class KeyEventsManager implements KeyListener
 {
@@ -43,24 +43,24 @@ public class KeyEventsManager implements KeyListener
 
   public KeyEventsManager()
   {
-      try
-	{
-	   ftsKeyServer = new FtsObject(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("_keyserver"));
-	}
+    try
+      {
+	ftsKeyServer = new FtsObject(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("_keyserver"));
+      }
     catch(IOException e)
-	{
-	    System.err.println("[KeyEventsManager]: Error in KeyServer creation!");
-	    e.printStackTrace();
+      {
+	System.err.println("[KeyEventsManager]: Error in KeyServer creation!");
+	e.printStackTrace();
 	}      
   }
     
   static public KeyEventsManager getManager()
   {
-      if(keyEventsManager == null)
-	  createManager();
-      return keyEventsManager;
+    if(keyEventsManager == null)
+      createManager();
+    return keyEventsManager;
   }
-
+  
   private int getCode(KeyEvent e)
   {
     int code = 0;
@@ -147,8 +147,8 @@ public class KeyEventsManager implements KeyListener
     if ( code != 0)
       {
 	  args.clear();
-	  args.add(code);
-	  args.add(1);
+	  args.addInt(code);
+	  args.addInt(1);
 	  
 	  try{
 	      ftsKeyServer.send( FtsSymbol.get("key"), args);
@@ -171,8 +171,8 @@ public class KeyEventsManager implements KeyListener
     if ( code != 0)
       {
 	  args.clear();
-	  args.add(code);
-	  args.add(0);
+	  args.addInt(code);
+	  args.addInt(0);
 	  
 	  try{
 	      ftsKeyServer.send(  FtsSymbol.get("key"), args);

@@ -43,9 +43,9 @@ public class Patcher extends Editable implements FtsObjectErrorListener
   // Constructor
   // ----------------------------------------
 
-  Patcher( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject)
+  public Patcher(FtsGraphicObject theFtsObject)
   {
-    super( theSketchPad, theFtsObject);
+    super(theFtsObject);
 
     theFtsObject.setGraphicListener(new FtsGraphicListener(){
 	    public void redefined(FtsGraphicObject obj)

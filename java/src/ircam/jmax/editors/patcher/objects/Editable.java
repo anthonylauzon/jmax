@@ -32,7 +32,7 @@ import java.util.*;
 import javax.swing.*;
 
 import ircam.jmax.fts.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
 import ircam.jmax.editors.patcher.*;
@@ -50,9 +50,9 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   int defaultWidth = -1;
   public ircam.jmax.editors.patcher.ObjectRenderer renderer; // don't ask me why here we need the whole path
 
-  public Editable( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject) 
+  public Editable(FtsGraphicObject theFtsObject) 
   {
-    super( theSketchPad, theFtsObject);
+    super(theFtsObject);
 
     computeRenderer();
 

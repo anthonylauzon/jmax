@@ -38,12 +38,12 @@ import ircam.jmax.editors.patcher.*;
 
 public class Outlet extends InOutlet
 {
-  public Outlet(ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject)
+  public Outlet( FtsGraphicObject theFtsObject)
   {
-    super(theSketchPad, theFtsObject);
+    super( theFtsObject);
   }
 
-  public void drawTriangle(Graphics g, int x, int y, int w, int h) 
+  public void drawTriangle( Graphics g, int x, int y, int w, int h) 
   {
     Color color = g.getColor();
     int offset = 2*h/7;

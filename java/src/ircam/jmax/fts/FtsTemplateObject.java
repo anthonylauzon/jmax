@@ -30,7 +30,7 @@ import java.util.*;
 
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 /**
  * Proxy of an FTS patcher.
@@ -49,9 +49,9 @@ public class FtsTemplateObject extends FtsPatcherObject
    * Create a FtsTemplateObject object
    */
 
-  public FtsTemplateObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom[] args, int id)
+  public FtsTemplateObject(FtsServer server, FtsObject parent, int id, FtsAtom[] args, int offset, int length)
   {
-      super(server, parent, className, nArgs, args, id);
+      super(server, parent, id, args, offset, length);
   }
 }
 

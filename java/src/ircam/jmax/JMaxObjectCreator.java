@@ -1,4 +1,4 @@
- //
+//
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -20,39 +20,15 @@
 // 
 // Based on Max/ISPW by Miller Puckette.
 //
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+// Authors: Riccardo Borghesi, Francois Dechelle, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.objects;
+package ircam.jmax;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import ircam.fts.client.*;
+import ircam.jmax.editors.patcher.objects.*;
 
-import ircam.jmax.editors.patcher.*;
-
-import ircam.jmax.fts.*;
-
-//
-// The graphic inlet contained in subpatchers
-//
-
-public class Inlet extends InOutlet {
-  public Inlet( FtsGraphicObject theFtsObject) 
-  {
-    super( theFtsObject);
-  }
-
-  public void drawTriangle( Graphics g, int x, int y, int w, int h) 
-  {
-    Color color = g.getColor();
-    int offset = 2 * h/7;
-      
-    g.setColor( color.brighter());
-    g.drawLine( x + h - offset, y + offset, x + h/2, y + h - offset);
-      
-    g.setColor( color.darker());
-    g.drawLine( x + offset, y + offset, x + h - offset, y + offset);
-    g.drawLine( x + offset, y + offset, x + h/2 - 1, y + h - offset - 1);
-  }
+public interface JMaxObjectCreator
+{
+  public GraphicObject create( FtsServer server, FtsObject parent, int objId, FtsAtom[] at, int offset, int ac);
 }

@@ -64,7 +64,7 @@ class HelpInteraction extends Interaction
 	if (object != null)
 	  if (! FtsHelpPatchTable.openHelpPatch( object.getFtsObject()))
 	      JOptionPane.showMessageDialog(editor.getEditorContainer().getFrame(), 
-					    "Sorry, no help for object "+object.getFtsObject().getClassName(), 
+					    "Sorry, no help for object "+object.getFtsObject().getDescription(), 
 					    "Warning", JOptionPane.INFORMATION_MESSAGE); 
 
 	locked = false;

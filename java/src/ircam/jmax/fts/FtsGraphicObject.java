@@ -25,7 +25,7 @@
 
 package ircam.jmax.fts;
 
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 import ircam.jmax.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.patcher.*;
@@ -129,30 +129,20 @@ public class FtsGraphicObject extends FtsObject {
   
   protected FtsArgs args = new FtsArgs();
 
-  public FtsGraphicObject(FtsServer server, FtsObject parent, FtsSymbol ftsClassName, int nArgs, FtsAtom args[], int id)
+  public FtsGraphicObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
   {
     super(server, parent, id);
-
-    this.ftsClassName = ftsClassName.toString();
-
-    if(nArgs==0) 
-      description = this.ftsClassName;
-    else 
-      description = this.ftsClassName + " " + FtsParse.unparseArguments(nArgs, args);
+    description = FtsParse.unparseArguments(args, offset, length);
   }
-
   public FtsGraphicObject(FtsServer server, FtsObject parent, FtsSymbol ftsClassName, FtsArgs args) throws IOException
   {
     super(server, parent, ftsClassName, args);
-    this.ftsClassName = ftsClassName.toString();
-    this.description = this.ftsClassName;
+    this.description = ftsClassName.toString();
   }
-
   public FtsGraphicObject(FtsServer server, FtsObject parent, FtsSymbol ftsClassName) throws IOException
   {
     super(server, parent, ftsClassName);
-    this.ftsClassName = ftsClassName.toString();
-    this.description = this.ftsClassName;
+    this.description = ftsClassName.toString();
   }
 
   /****************************************************************************/
@@ -184,7 +174,7 @@ public class FtsGraphicObject extends FtsObject {
     if (this.x != x)
       {
 	args.clear();
-	args.add((int)x);
+	args.addInt((int)x);
       
 	try{
 	  send( FtsSymbol.get("setX"), args);
@@ -218,7 +208,7 @@ public class FtsGraphicObject extends FtsObject {
     if (this.y != y)
       {
 	args.clear();
-	args.add((int)y);
+	args.addInt((int)y);
       
 	try{
 	  send( FtsSymbol.get("setY"), args);
@@ -250,7 +240,7 @@ public class FtsGraphicObject extends FtsObject {
     if (this.width != w)
       {
 	args.clear();
-	args.add((int)w);
+	args.addInt((int)w);
       
 	try{
 	  send( FtsSymbol.get("setWidth"), args);
@@ -285,7 +275,7 @@ public class FtsGraphicObject extends FtsObject {
     if (this.height != h)
       {
 	args.clear();
-	args.add((int)h);
+	args.addInt((int)h);
       
 	try{
 	  send( FtsSymbol.get("setHeight"), args);
@@ -350,7 +340,7 @@ public class FtsGraphicObject extends FtsObject {
     if ((this.font == null) || (! this.font.equals(font)))
       {
 	args.clear();
-	args.add(font);
+	args.addString(font);
 	  
 	try{
 	  send( FtsSymbol.get("setFont"), args);
@@ -385,7 +375,7 @@ public class FtsGraphicObject extends FtsObject {
     if (this.fontSize != fontSize)
       {
 	args.clear();
-	args.add(fontSize);
+	args.addInt(fontSize);
 	  
 	try{
 	  send( FtsSymbol.get("setFontSize"), args);
@@ -419,7 +409,7 @@ public class FtsGraphicObject extends FtsObject {
     if (this.fontStyle != fontStyle)
       {
 	args.clear();
-	args.add(fontStyle);
+	args.addInt(fontStyle);
 	  
 	try{
 	  send( FtsSymbol.get("setFontStyle"), args);
@@ -453,7 +443,7 @@ public class FtsGraphicObject extends FtsObject {
     if (this.layer != layer)
       {
 	args.clear();
-	args.add(layer);
+	args.addInt(layer);
 	  
 	try{
 	  send( FtsSymbol.get("setLayer"), args);
@@ -480,7 +470,7 @@ public class FtsGraphicObject extends FtsObject {
   public final void setColor(int color)
   {
     args.clear();
-    args.add(color);
+    args.addInt(color);
 	  
     try{
       send( FtsSymbol.get("setColor"), args);
@@ -530,7 +520,7 @@ public class FtsGraphicObject extends FtsObject {
   public void setComment(String comment)
   {
     args.clear();
-    args.add(comment);
+    args.addString(comment);
 	  
     try{
       send( FtsSymbol.get("setComment"), args);
@@ -575,19 +565,12 @@ public class FtsGraphicObject extends FtsObject {
     return graphicListener;
   }  
 
-  /********************************************************************************/
-  public String getClassName()
-  {
-    return ftsClassName;
-  } 
-    
   /* WARNING: to implement when document stuff implemented */
   public void setDirty()
   {
     //nothing for now!!!!
   }
 
-  /* By default is className. Redefined if needed */
   public String getDescription()
   {
     return description;
@@ -620,9 +603,7 @@ public class FtsGraphicObject extends FtsObject {
     return gen.elements();
   }
 
-  String ftsClassName;
   String description;
-
   /*****************************************************************/
   //final variables used by invokeLater method
   private transient JFileChooser fd;
@@ -668,7 +649,7 @@ public class FtsGraphicObject extends FtsObject {
 		{
 		  String path = fd.getSelectedFile().getAbsolutePath();
 		  args.clear();
-		  args.add(path);
+		  args.addString(path);
       
 		  try{
 		    send( FtsSymbol.get(callbackMethod), args);

@@ -40,7 +40,7 @@ import ircam.jmax.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.widgets.*;
 import ircam.jmax.fts.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 public class ControlPanel extends JPanel
 {

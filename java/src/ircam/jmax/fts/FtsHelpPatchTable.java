@@ -28,7 +28,7 @@ package ircam.jmax.fts;
 import java.util.*;
 import java.io.*;
 
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 /**
  * This class provide a registration service for help Patches.

@@ -30,7 +30,7 @@ import java.util.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 /**
  * The proxy of an FTS comment object.
@@ -48,9 +48,9 @@ public class FtsCommentObject extends FtsGraphicObject
   /**
    * Create a FtsObject object;
    */
-    public FtsCommentObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id)
+    public FtsCommentObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
     {
-	super(server, parent, className, nArgs, args, id);
+	super(server, parent, id, args, offset, length);
 
 	ninlets = 0;
 	noutlets = 0;

@@ -84,9 +84,12 @@ VERSION = @VERSION@
 SUBDIRS = src
 
 packagedir = $(pkgdatadir)/packages/guiobj/java
-package_DATA = guiobj.jar
+JAR = guiobj.jar
+package_DATA = $(JAR)
 
-JAR_DEP = $(shell find src -name "*.java")
+JAR_DEP = src/ircam/jmax/guiobj/classpackage.stamp
+
+CLEANFILES = ${JAR}
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
@@ -278,6 +281,7 @@ installdirs-am:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-rm -f Makefile $(CONFIG_CLEAN_FILES)
@@ -318,8 +322,9 @@ installdirs mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
-guiobj.jar: $(JAR_DEP)	
-	( cd src; jar -cvf ../guiobj.jar `find ircam -name "*.class"` )
+$(JAR): $(JAR_DEP)	
+	-test -f $(JAR) || rm -f $(JAR)
+	( cd src; jar -cvf ../$(JAR) `find ircam -name "*.class"` )
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

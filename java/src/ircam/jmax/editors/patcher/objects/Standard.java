@@ -43,9 +43,9 @@ public class Standard extends Editable implements FtsObjectErrorListener
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
-  Standard( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject) 
+  public Standard( FtsGraphicObject theFtsObject) 
   {
-    super( theSketchPad, theFtsObject);
+    super( theFtsObject);
   }
     
   // ----------------------------------------
@@ -69,19 +69,19 @@ public class Standard extends Editable implements FtsObjectErrorListener
 
   public void redefine( String text) 
   {
-      ((FtsPatcherObject)ftsObject.getParent()).requestRedefineObject(ftsObject, text);
-      itsSketchPad.getDisplayList().remove(this);
-      dispose();
+    ((FtsPatcherObject)ftsObject.getParent()).requestRedefineObject(ftsObject, text);
+    itsSketchPad.getDisplayList().remove(this);
+    dispose();
   }
 
   public void editContent()
   {
-      if(!ftsObject.isError() && (ftsObject instanceof FtsObjectWithEditor))
-	  {
-	      itsSketchPad.waiting();
-	      ((FtsObjectWithEditor)ftsObject).requestOpenEditor();
-	      ((FtsPatcherObject)ftsObject.getParent()).requestStopWaiting(null);
-	  }
+    if( !ftsObject.isError() && ( ftsObject instanceof FtsObjectWithEditor))
+      {
+	itsSketchPad.waiting();
+	((FtsObjectWithEditor)ftsObject).requestOpenEditor();
+	((FtsPatcherObject)ftsObject.getParent()).requestStopWaiting(null);
+      }
   }
 
   public boolean hasContent()

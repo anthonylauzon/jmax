@@ -25,7 +25,7 @@ import java.awt.*;
 import java.io.*;
 import javax.swing.*;
 
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.dialogs.*;

@@ -47,9 +47,9 @@ public class Scope extends VectorDisplay
   int onset = 0;
   int last = 0;
 
-  public Scope(ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject)
+  public Scope(FtsGraphicObject theFtsObject)
   {
-    super(theSketchPad, theFtsObject);
+    super(theFtsObject);
   }
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)

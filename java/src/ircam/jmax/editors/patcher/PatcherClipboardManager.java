@@ -29,7 +29,7 @@ import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 import ircam.jmax.editors.patcher.objects.*;
 
 import ircam.jmax.toolkit.*;
@@ -219,77 +219,77 @@ public class PatcherClipboardManager implements ClipboardOwner
 
   void PasteObjects(ErmesSketchPad sketch) 
   {
-    FtsGraphicObject	fo;
-    FtsConnection fc;
-    DisplayList displayList = sketch.getDisplayList();
-    GraphicObject object;
-    GraphicConnection connection;
-    int  incrementalPasteOffsetX;
-    int  incrementalPasteOffsetY;
-    int pasteNum;
-
-    pasteNum = sketch.getPasteNumber();
-
-    if (sketch.isTextEditingObject())
+    /*FtsGraphicObject	fo;
+      FtsConnection fc;
+      DisplayList displayList = sketch.getDisplayList();
+      GraphicObject object;
+      GraphicConnection connection;
+      int  incrementalPasteOffsetX;
+      int  incrementalPasteOffsetY;
+      int pasteNum;
+      
+      pasteNum = sketch.getPasteNumber();
+    
+      if (sketch.isTextEditingObject())
       sketch.stopTextEditing();
 
-    ErmesSelection.patcherSelection.setOwner(sketch); 
+      ErmesSelection.patcherSelection.setOwner(sketch); 
 
-    if (! ErmesSelection.patcherSelection.isEmpty())
+      if (! ErmesSelection.patcherSelection.isEmpty())
       {
-	ErmesSelection.patcherSelection.redraw(); 
-	ErmesSelection.patcherSelection.deselectAll();
+      ErmesSelection.patcherSelection.redraw(); 
+      ErmesSelection.patcherSelection.deselectAll();
       }
+      
+      fo = (FtsGraphicObject)ftsObjectsPasted.elementAt( 0);
 
-    fo = (FtsGraphicObject)ftsObjectsPasted.elementAt( 0);
-
-    if (pasteNum == 0) 
-	sketch.setIncrementalPasteOffsets(0, 0);
-    else if (pasteNum == 1) 
+      if (pasteNum == 0) 
+      sketch.setIncrementalPasteOffsets(0, 0);
+      else if (pasteNum == 1) 
       {
-	sketch.setOldPastedObject(fo);
-	sketch.setIncrementalPasteOffsets(20, 20);
+      sketch.setOldPastedObject(fo);
+      sketch.setIncrementalPasteOffsets(20, 20);
       }
-    else if (pasteNum == 2) 
+      else if (pasteNum == 2) 
       sketch.setIncrementalPasteOffsets((int)(sketch.getOldPastedObject().getX() - fo.getX()),
-					(int)(sketch.getOldPastedObject().getY() - fo.getY()));
-
-    for ( Enumeration e = ftsObjectsPasted.elements(); e.hasMoreElements();) 
+      (int)(sketch.getOldPastedObject().getY() - fo.getY()));
+      
+      for ( Enumeration e = ftsObjectsPasted.elements(); e.hasMoreElements();) 
       {
-	fo = (FtsGraphicObject)e.nextElement();
+      fo = (FtsGraphicObject)e.nextElement();
 
-	float newPosX = fo.getX() + pasteNum*sketch.getPasteOffsetX();
-	float newPosY = fo.getY() + pasteNum*sketch.getPasteOffsetY();
-	
-	fo.setX( newPosX);
-	fo.setY( newPosY);
-
-	object = GraphicObject.makeGraphicObject( sketch, fo);
-	displayList.add( object);
-	ErmesSelection.patcherSelection.select( object);
-	object.redraw();
+      float newPosX = fo.getX() + pasteNum*sketch.getPasteOffsetX();
+      float newPosY = fo.getY() + pasteNum*sketch.getPasteOffsetY();
+      
+      fo.setX( newPosX);
+      fo.setY( newPosY);
+      
+      object = GraphicObject.makeGraphicObject( sketch, fo);
+      displayList.add( object);
+      ErmesSelection.patcherSelection.select( object);
+      object.redraw();
       }
-
-    GraphicObject fromObj, toObj;
-    
-    for ( Enumeration e2 = ftsConnectionsPasted.elements(); e2.hasMoreElements();) 
+      
+      GraphicObject fromObj, toObj;
+      
+      for ( Enumeration e2 = ftsConnectionsPasted.elements(); e2.hasMoreElements();) 
       {
-	fc = (FtsConnection)e2.nextElement();
+      fc = (FtsConnection)e2.nextElement();
+      
+      connection = new GraphicConnection( sketch, 
+      displayList.getGraphicObjectFor(fc.getFrom()), fc.getFromOutlet(), 
+      displayList.getGraphicObjectFor(fc.getTo()), fc.getToInlet(),
+      fc.getType(), fc);
+      
+      displayList.add( connection);
 
-	connection = new GraphicConnection( sketch, 
-					  displayList.getGraphicObjectFor(fc.getFrom()), fc.getFromOutlet(), 
-					  displayList.getGraphicObjectFor(fc.getTo()), fc.getToInlet(),
-					  fc.getType(), fc);
-
-	displayList.add( connection);
-
-	ErmesSelection.patcherSelection.select( connection);
-	connection.updateDimensions();
-	connection.redraw();
+      ErmesSelection.patcherSelection.select( connection);
+      connection.updateDimensions();
+      connection.redraw();
       }
-
-    displayList.reassignLayers();
-    displayList.sortDisplayList();
+      
+      displayList.reassignLayers();
+      displayList.sortDisplayList();*/
   }
 
 

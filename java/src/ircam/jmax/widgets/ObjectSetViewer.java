@@ -31,7 +31,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
@@ -137,7 +137,7 @@ public class ObjectSetViewer extends JPanel {
   public static ImageIcon getObjectIcon(FtsGraphicObject obj)
   {
       ImageIcon icon;
-      String className = obj.getClassName();
+      String className = obj.getDescription();
 
       if (obj instanceof FtsTemplateObject)
 	  icon = objectIcon;

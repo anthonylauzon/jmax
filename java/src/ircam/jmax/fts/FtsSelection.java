@@ -29,7 +29,7 @@ import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 /**
  * Implement the selection.
  * Only one instance for server is built.

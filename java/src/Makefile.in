@@ -81,7 +81,7 @@ ROOTDIR = @ROOTDIR@
 STRIP = @STRIP@
 VERSION = @VERSION@
 
-SUBDIRS = ircam silk
+SUBDIRS = ircam 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
