@@ -82,7 +82,7 @@ midiout_check(fts_object_t *o, int ac, const fts_atom_t *at, fts_midiport_t **po
 	    {
 	      int n = fts_get_number_int(at);
 	  
-	      *channel = (n < 0)? 0: ((n > 16)? 16: n);
+	      *channel = (n < 1)? 1: ((n > 16)? 16: n);
 	    }
 	  else
 	    return 0;
