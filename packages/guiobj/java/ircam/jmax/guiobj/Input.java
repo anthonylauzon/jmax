@@ -72,6 +72,11 @@ public class Input extends GraphicObject implements FtsIntValueListener
   {
   }
 
+  public void redefined()
+  {
+    setDefaults();
+  }
+
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
     if (Squeack.isDown(squeack))
