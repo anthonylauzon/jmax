@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax;
+package ircam.jmax.editors.project;
 
 import java.awt.*;
 import java.io.*;
@@ -35,6 +35,7 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 
 import ircam.fts.client.*;
+import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.widgets.*;
@@ -393,7 +394,7 @@ public class ConfigPackagePanel extends JPanel
   private FtsPackage ftsPkg;
   private JFileChooser fileChooser; 
   private final int DEFAULT_WIDTH = 450;
-  private final int DEFAULT_HEIGHT = 270;
+  private final int DEFAULT_HEIGHT = 280;
 }
 
 

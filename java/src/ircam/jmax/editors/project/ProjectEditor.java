@@ -23,19 +23,20 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax;
+package ircam.jmax.editors.project;
 
 import javax.swing.*;
 import javax.swing.table.*;
 import java.util.*;
 
 import ircam.fts.client.*;
+import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 
 public class ProjectEditor extends JFrame 
 {    
-  static void registerProjectEditor()
+  public static void registerProjectEditor()
   {
     MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
 	public String getToolName() { return "Project Editor";}

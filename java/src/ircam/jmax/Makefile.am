@@ -2,7 +2,6 @@ SUBDIRS=dialogs editors fts toolkit widgets
 
 packagedir=$(pkgdatadir)/java/classes/ircam/jmax
 package_JAVA =					\
-ConfigPackagePanel.java				\
 JMaxApplication.java				\
 JMaxClassMap.java				\
 JMaxIcons.java					\
@@ -17,7 +16,6 @@ MaxVector.java					\
 MaxWindowManager.java				\
 PackageClassLoader.java				\
 Platform.java					\
-ProjectEditor.java			    	\
 RecentFileHistory.java
 
 JAVAC= @JAVACX@

@@ -96,7 +96,7 @@ VERSION = @VERSION@
 YACC = @YACC@
 uudecode = @uudecode@
 
-SUBDIRS = console patcher
+SUBDIRS = console patcher project
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 

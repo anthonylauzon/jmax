@@ -61,7 +61,7 @@ class LoadPackageHandler implements FtsMessageHandler {
     if ( args.isSymbol( 0) )
       {
 	System.out.println( "package: " + args.getSymbol(0));
-
+	
 	try
 	  {
 	    JMaxPackageLoader.load( args.getSymbol( 0).toString());
@@ -70,7 +70,7 @@ class LoadPackageHandler implements FtsMessageHandler {
 	  {
 	    JMaxApplication.reportException( e);
 	  }
-
+	
 	for( int i = 1; i < args.getLength(); i += 2)
 	  FtsHelpPatchTable.addSummary( args.getSymbol( i).toString(), args.getSymbol( i+1).toString());
       }
@@ -500,7 +500,7 @@ public class JMaxApplication {
   private void initModules()
   {
     ircam.jmax.editors.patcher.ErmesModule.initModule();
-    ProjectEditor.registerProjectEditor();
+    ircam.jmax.editors.project.ProjectEditor.registerProjectEditor();
   }
 
   private void openConsole()

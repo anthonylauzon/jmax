@@ -1166,7 +1166,7 @@ __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 
   if ( this->packages)
     {
-      fts_get_package_names( &i);
+      fts_list_get_values( this->packages, &i);
       fts_package_send_list( o, i, fts_s_require);
     }
   if ( this->template_paths)

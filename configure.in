@@ -218,6 +218,7 @@ java/src/ircam/jmax/editors/patcher/actions/Makefile
 java/src/ircam/jmax/editors/patcher/interactions/Makefile
 java/src/ircam/jmax/editors/patcher/menus/Makefile
 java/src/ircam/jmax/editors/patcher/objects/Makefile
+java/src/ircam/jmax/editors/project/Makefile
 java/src/ircam/jmax/fts/Makefile
 java/src/ircam/jmax/toolkit/Makefile
 java/src/ircam/jmax/toolkit/actions/Makefile
