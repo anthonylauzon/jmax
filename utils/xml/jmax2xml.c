@@ -234,17 +234,17 @@ static fts_object_t **object_table = 0;
 #define CHECK_OBJ_STACK   \
       { \
 	if (object_tos < 0) \
-	 post("While loading: Object Stack overflow\n"); \
+	 fts_post("While loading: Object Stack overflow\n"); \
       else if (object_tos > OBJECT_STACK_DEPTH) \
-         post("While Loading: Object Stack underflow\n"); \
+         fts_post("While Loading: Object Stack underflow\n"); \
       }
 
 #define CHECK_EVAL_STACK   \
       { \
 	if (eval_tos <  0) \
-         post("While loading: Eval Stack overflow\n"); \
+         fts_post("While loading: Eval Stack overflow\n"); \
       else if (eval_tos > OBJECT_STACK_DEPTH) \
-         post("While loading: Eval Stack underflow\n"); \
+         fts_post("While loading: Eval Stack underflow\n"); \
       }
 
 #else
