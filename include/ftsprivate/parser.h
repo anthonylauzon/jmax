@@ -18,46 +18,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
+#ifndef _FTS_PRIVATE_PARSER_H_
+#define _FTS_PRIVATE_PARSER_H_
 
-/*
-  Messbox doctor.
+typedef struct _fts_parsetree_t {
+  int token;
+  fts_atom_t value;
+  struct _fts_parsetree_t *left, *right;
+} fts_parsetree_t;
 
-  Fix messbox boxes created with as argument the content of the messbox.
-  Message box like that are present in some binary and tcl patches
-  around, saved before 20/5/1998.
- */
+extern fts_parsetree_t *fts_parsetree_new( int ac, const fts_atom_t *at);
 
-#include <fts/fts.h>
+extern void fts_parsetree_delete( fts_parsetree_t *tree);
 
-static fts_object_t *messbox_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
-{
-  if (ac >= 1)
-    {
-      fts_object_t *obj;
-
-      fts_object_new_to_patcher(patcher, 1, at, &obj);
-
-      if (ac > 1)
-	{
-	  fts_send_message(obj, fts_SystemInlet, fts_s_clear, 0, 0);
-	  fts_send_message(obj, fts_SystemInlet, fts_s_append, ac - 1, at + 1);
-	}
-
-      return obj;
-    }
-  else
-    return 0;
-}
-
-
-void messbox_doctor_init(void)
-{
-  /*fts_register_object_doctor(fts_new_symbol("messbox"), messbox_doctor);*/
-}
-
+#endif

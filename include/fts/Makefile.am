@@ -9,9 +9,9 @@ bytestream.h \
 class.h \
 client.h \
 connection.h \
-doctor.h \
 dsp.h \
 errobj.h \
+expression.h \
 fifo.h \
 file.h \
 fifo.h \
@@ -32,7 +32,6 @@ objectlist.h \
 objectset.h \
 package.h \
 param.h \
-parser.h \
 patcher.h \
 post.h \
 predefsymbols.h \

@@ -37,7 +37,6 @@ unsigned int debugid = 0;
 #include <ftsprivate/client.h>
 #include <ftsprivate/class.h>
 #include <ftsprivate/connection.h>
-#include <ftsprivate/doctor.h>
 #include <ftsprivate/errobj.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/patcher.h>
@@ -181,7 +180,7 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
 {
   fts_object_t  *obj = 0;
   fts_symbol_t  var;
-  fts_expression_state_t *e = 0;
+  fts_oldexpression_state_t *e = 0;
   fts_atom_t state;
   int ac = 0;
   const fts_atom_t *at = 0;
@@ -276,6 +275,7 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
    *
    */
 
+#if 0
   /* 1-  try the doctor */
   if ((! obj) && fts_is_symbol(&at[0]) && fts_object_doctor_exists(fts_get_symbol(&at[0])))
     {
@@ -283,17 +283,18 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
 	 to do this particular object, so we just continue */
       obj = fts_call_object_doctor(patcher, ac, at);
     }
+#endif
 
   /* 2- Expression evaluate */
   if (!obj)
     {
       /* Compute the expressions with the correct offset */
-      e = fts_expression_eval(patcher, ac, at,  1024, new_args);
+      e = fts_oldexpression_eval(patcher, ac, at,  1024, new_args);
 	  
-      if (fts_expression_get_status(e) != FTS_EXPRESSION_OK)
+      if (fts_oldexpression_get_status(e) != FTS_OLDEXPRESSION_OK)
 	{
 	  /* Error in expression */
-	  obj = fts_error_object_new(patcher, aoc, aot, fts_expression_get_msg(e), fts_expression_get_err_arg(e));
+	  obj = fts_error_object_new(patcher, aoc, aot, fts_oldexpression_get_msg(e), fts_oldexpression_get_err_arg(e));
 	}
       else if (! fts_is_symbol(&new_args[0]))
 	{
@@ -303,7 +304,7 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
       else
 	{
 	  at = new_args;
-	  ac = fts_expression_get_result_count(e);
+	  ac = fts_oldexpression_get_result_count(e);
 	}
     }
 
@@ -313,6 +314,7 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
   fts_log( "\n");
 #endif
 
+#if 0
   /* 3- Retry the object doctor */
   if ((! obj) && fts_is_symbol(&at[0]) && fts_object_doctor_exists(fts_get_symbol(&at[0])))
     {
@@ -320,6 +322,7 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
 	 to do this particular object, so we just continue */
       obj = fts_call_object_doctor(patcher, ac, at);
     }
+#endif
 
   /* 4- explicitly declared template  */
   if (! obj)
@@ -411,7 +414,7 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
      it is an error object, because we may try to recompute, and recover,
      the object, if one of this variables have been redefined. */
   if (e)
-    fts_expression_add_variables_user(e, obj);
+    fts_oldexpression_add_variables_user(e, obj);
 
   /* 
      If it is not an error, and not a template, assign the local variables/properties.
@@ -421,14 +424,14 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
   if (e && (! fts_object_is_error(obj)) && (! fts_object_is_template(obj)))
     {
       if (fts_object_is_patcher(obj))
-	fts_expression_map_to_assignements(e, fts_patcher_assign_variable, (void *) obj);
+	fts_oldexpression_map_to_assignements(e, fts_patcher_assign_variable, (void *) obj);
       else
-	fts_expression_map_to_assignements(e, fts_object_assign, (void *) obj);
+	fts_oldexpression_map_to_assignements(e, fts_object_assign, (void *) obj);
     }
 
   /* Free the expression state structure if any */
   if (e)
-    fts_expression_state_free(e);
+    fts_oldexpression_state_free(e);
 
   /* then, assign it to the variable if any */
   if (var != 0)

@@ -2,6 +2,7 @@ lib_LTLIBRARIES= libfts.la
 
 libfts_la_SOURCES= \
 @PLATFORM@.c \
+OLDexpression.c \
 abstraction.c \
 array.c \
 atom.c \
@@ -15,7 +16,6 @@ class.c \
 client.c \
 clipboard.c \
 connection.c \
-doctor.c \
 dsp.c \
 dspgraph.c \
 errobj.c \

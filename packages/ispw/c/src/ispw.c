@@ -33,7 +33,6 @@ extern void line_config(void);
 extern void loadbang_config(void);
 extern void atom_list_config(void);
 extern void messbox_config(void);
-extern void messbox_doctor_init(void);
 extern void metro_config(void);
 extern void nbangs_config(void);
 extern void pack_config(void);
@@ -73,7 +72,6 @@ extern void ispw_value_config(void);
 
 /* expression */
 extern void expr_config(void);
-extern void expr_doctor_init(void);
 
 /* filters */
 extern void biquad_config(void);
@@ -157,7 +155,6 @@ ispw_config(void)
   loadbang_config();
   atom_list_config();
   messbox_config();
-  messbox_doctor_init();
   metro_config();
   nbangs_config();
   pack_config();
@@ -197,7 +194,6 @@ ispw_config(void)
 
   /* expr */
   expr_config();
-  expr_doctor_init();
 
   /* filters */
   biquad_config();

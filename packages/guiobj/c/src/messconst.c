@@ -34,7 +34,7 @@ fts_symbol_t s_messconst = 0;
 typedef struct {
   fts_object_t o;
   int value; /* for blinking */
-  fts_parser_t parser;
+  fts_expression_t *expression;
   fts_array_t tmp;
   /* inlet values */
   int ac;
@@ -49,59 +49,6 @@ static fts_metaclass_t *messconst_metaclass;
  *
  */
  
-static void dollar_postfix_eval( int token, fts_atom_t *value, void *data)
-{
-  int *ninlets_p = (int *)data;
-  int n;
-
-  if ( fts_is_int( value))
-    {
-      n = fts_get_int( value) + 1;
-      if (n > *ninlets_p)
-	*ninlets_p = n;
-    }
-}
-
-static fts_parser_callback_table_t count_inlets_callbacks = {
-  /* semi             */   { 0, 0, 0},
-  /* tuple            */   { 0, 0, 0},
-  /* c_int            */   { 0, 0, 0},
-  /* c_float          */   { 0, 0, 0},
-  /* symbol           */   { 0, 0, 0},
-  /* par              */   { 0, 0, 0},
-  /* cpar             */   { 0, 0, 0},
-  /* sqpar            */   { 0, 0, 0},
-  /* dollar           */   { 0, 0, dollar_postfix_eval},
-  /* uplus            */   { 0, 0, 0},
-  /* uminus           */   { 0, 0, 0},
-  /* logical_not      */   { 0, 0, 0},
-  /* plus             */   { 0, 0, 0},
-  /* minus            */   { 0, 0, 0},
-  /* times            */   { 0, 0, 0},
-  /* div              */   { 0, 0, 0},
-  /* power            */   { 0, 0, 0},
-  /* percent          */   { 0, 0, 0},
-  /* shift_left       */   { 0, 0, 0},
-  /* shift_right      */   { 0, 0, 0},
-  /* logical_and      */   { 0, 0, 0},
-  /* logical_or       */   { 0, 0, 0},
-  /* equal_equal      */   { 0, 0, 0},
-  /* not_equal        */   { 0, 0, 0},
-  /* greater          */   { 0, 0, 0},
-  /* greater_equal    */   { 0, 0, 0},
-  /* smaller          */   { 0, 0, 0},
-  /* smaller_equal    */   { 0, 0, 0}
-};
-
-static int count_inlets( messconst_t *this)
-{
-  int ninlets = 1;
-
-  fts_parser_apply( &this->parser, &count_inlets_callbacks, &ninlets);
-  
-  return ninlets;
-}
-
 /*
  * Copied from fts/patcher.c.
  * Really ugly code.
@@ -165,6 +112,12 @@ messconst_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
+messconst_expression_callback( int ac, const fts_atom_t *at, void *data)
+{
+  fts_outlet_atoms( (fts_object_t *)data, 0, ac, at);
+}
+
+void
 messconst_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messconst_t *this = (messconst_t *)o;
@@ -178,7 +131,7 @@ messconst_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       fts_timebase_add_call(fts_get_timebase(), o, messconst_off, 0, MESSCONST_FLASH_TIME);
     }
 
-  fts_parser_eval( &this->parser, (fts_object_t *)this, this->ac, this->at);
+  fts_expression_reduce( this->expression, this->ac, this->at, messconst_expression_callback, this);
 }
 
 static void
@@ -186,7 +139,7 @@ messconst_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   messconst_t *this = (messconst_t *)o;
 
-  fts_parser_eval( &this->parser, (fts_object_t *)this, this->ac, this->at);
+  fts_expression_reduce( this->expression, this->ac, this->at, messconst_expression_callback, this);
 }
  
 static void
@@ -208,10 +161,13 @@ static void messconst_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   messconst_t *this = (messconst_t *) o;
   int ninlets;
 
-  fts_parser_init( &this->parser, ac, at);
+  fts_expression_set( this->expression, ac, at, fts_object_get_patcher( (fts_object_t *)this));
   fts_array_init( &this->tmp, ac, at);
 
-  ninlets = count_inlets( this);
+  ninlets = fts_expression_get_env_count( this->expression);
+  if (ninlets == 0)
+    ninlets = 1;
+
   messconst_redefine_number_of_inlets( (fts_object_t *)this, ninlets);
 
   if (ninlets != this->ac)
@@ -257,7 +213,7 @@ messconst_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     }
 
   if (winlet == 0)
-    fts_parser_eval( &this->parser, (fts_object_t *)this, this->ac, this->at);
+    fts_expression_reduce( this->expression, this->ac, this->at, messconst_expression_callback, this);
 }
 
 /************************************************
@@ -296,7 +252,7 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   messconst_t *this = (messconst_t *)o;
   int i;
   
-  fts_parser_init( &this->parser, 0, 0);
+  this->expression = fts_expression_new( 0, 0, fts_object_get_patcher( (fts_object_t *)this));
   fts_array_init( &this->tmp, 0, 0);
 
   this->ac = fts_object_get_inlets_number( (fts_object_t *)this);
@@ -322,7 +278,7 @@ messconst_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   messconst_t *this = (messconst_t *)o;
 
-  fts_parser_destroy( &this->parser);
+  fts_expression_delete( this->expression);
   fts_array_destroy( &this->tmp);
   fts_free( this->at);
 }
@@ -378,5 +334,4 @@ messconst_config(void)
 {
   s_messconst = fts_new_symbol("messconst");
   messconst_metaclass = fts_metaclass_install( s_messconst, messconst_instantiate, fts_arg_equiv);
-  fts_class_install( fts_new_symbol("messconst"), messconst_instantiate);
 }

@@ -30,7 +30,6 @@ delread.c \
 deltable.c \
 delwrite.c \
 drunk.c \
-expr_doctor.c \
 exscale.c \
 explay.c \
 explode.c \
@@ -55,7 +54,6 @@ loadbang.c \
 logscale.c \
 makenote.c \
 message.c \
-message_doctor.c \
 metro.c \
 mididecrypt.c \
 mtof.c \

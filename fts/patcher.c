@@ -1817,7 +1817,7 @@ fts_patcher_t *
 fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
 {
   fts_object_t *obj;
-  fts_expression_state_t *e;
+  fts_oldexpression_state_t *e;
   int ac;
   fts_atom_t at[1024];
   int rac;
@@ -1848,16 +1848,16 @@ fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
   fts_variables_suspend(this, obj);
 
   /* eval the expression */
-  e = fts_expression_eval(obj->patcher, rac, rat, 1024, at);
-  ac = fts_expression_get_result_count(e);
+  e = fts_oldexpression_eval(obj->patcher, rac, rat, 1024, at);
+  ac = fts_oldexpression_get_result_count(e);
 
-  if (fts_expression_get_status(e) != FTS_EXPRESSION_OK)
+  if (fts_oldexpression_get_status(e) != FTS_OLDEXPRESSION_OK)
     {
       /* undefine all the variables, and set the error property */
       fts_variables_undefine_suspended(this, obj);
 
       /* set error to expression error */
-      fts_object_set_error(obj, fts_expression_get_msg(e), fts_expression_get_err_arg(e));
+      fts_object_set_error(obj, fts_oldexpression_get_msg(e), fts_oldexpression_get_err_arg(e));
     }
   else
     {
@@ -1869,20 +1869,20 @@ fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
       fts_tuple_set( this->args, ac - 1, at + 1);
 
       /* set the new variables */
-      fts_expression_map_to_assignements(e, fts_patcher_assign_variable, (void *) this);
+      fts_oldexpression_map_to_assignements(e, fts_patcher_assign_variable, (void *) this);
 
       fts_set_tuple(&a, this->args);
       fts_variable_restore(this, fts_s_args, &a, obj);
 
       /* register the patcher as user of the used variables */
-      fts_expression_add_variables_user(e, obj);
+      fts_oldexpression_add_variables_user(e, obj);
 
       /* undefine all the locals that are still suspended  */
       fts_variables_undefine_suspended(this, obj);
     }
 
   /* free the expression state structure */
-  fts_expression_state_free(e);
+  fts_oldexpression_state_free(e);
 
   /* inform the UI that the name is probabily changed (the type cannot change) and the error property too. */
 
@@ -2365,39 +2365,6 @@ fts_get_root_patcher(void)
   return fts_root_patcher;
 }
 
-/*************************************************************
- *
- *  module init
- *
- */
-
-/* converter/doctor for the old patcher format */
-static fts_object_t *
-patcher_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
-{
-  fts_atom_t a[2];
-  fts_object_t *obj;
-
-  fts_set_symbol(&a[0], fts_s_patcher);
-
-  if (ac >= 2)
-    {
-      a[1] = at[1];
-      fts_object_new_to_patcher(patcher, 2, a, &obj);
-      fts_object_set_description(obj, 2, a);
-
-      if (ac >= 3)
-	fts_object_put_prop(obj, fts_s_ninlets, &at[2]);
-
-      if (ac >= 4)
-	fts_object_put_prop(obj, fts_s_noutlets, &at[3]);
-    }
-  else
-    fts_object_new_to_patcher(patcher, 1, at , &obj);
-
-  return obj;
-}
-
 /***********************************************************************
  *
  * Initialization/shutdown
@@ -2431,8 +2398,6 @@ void fts_kernel_patcher_init(void)
   sym_startPaste = fts_new_symbol("startPaste");
   sym_endPaste = fts_new_symbol("endPaste");
   sym_noHelp = fts_new_symbol("noHelp");
-
-  /*fts_register_object_doctor(fts_new_symbol("patcher"), patcher_doctor);*/
 
   patcher_metaclass = fts_metaclass_install(fts_s_patcher, patcher_instantiate, fts_arg_equiv);
   fts_class_instantiate(patcher_metaclass, 0, 0);

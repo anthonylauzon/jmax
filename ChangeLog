@@ -1,3 +1,12 @@
+2002-07-23  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* removed all doctors
+	* moved old expression evaluation to OLDexpression.[ch]. Renamed in calling code 
+	(fts/patcher.c, fts/object.c) fts_expression to fts_oldexpression.
+	* separated implementation of expression evaluator in fts/parser.c (the parser that
+	creates the parse tree) and fts/expression.c (the evaluator that goes through the
+	parse tree to evaluate it).
+
 2002-07-17  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* removing old expression implementation and moving to the new

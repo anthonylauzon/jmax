@@ -23,46 +23,39 @@
 #ifndef _FTS_PRIVATE_OLDEXPRESSION_H_
 #define _FTS_PRIVATE_OLDEXPRESSION_H_
 
-typedef struct fts_expression_state fts_expression_state_t;
-typedef struct fts_expression_assignement fts_expression_assignement_t;
-typedef int (* fts_expression_fun_t)(int ac, const fts_atom_t *at, fts_atom_t *result) ;
+typedef struct fts_oldexpression_state fts_oldexpression_state_t;
+typedef struct fts_oldexpression_assignement fts_oldexpression_assignement_t;
+typedef int (* fts_oldexpression_fun_t)(int ac, const fts_atom_t *at, fts_atom_t *result) ;
 
-FTS_API fts_expression_state_t *fts_expression_eval(fts_patcher_t *scope, int expr_size, const fts_atom_t *expr, int result_size, fts_atom_t *result);
+FTS_API fts_oldexpression_state_t *fts_oldexpression_eval(fts_patcher_t *scope, int expr_size, const fts_atom_t *expr, int result_size, fts_atom_t *result);
 
-FTS_API void fts_expression_state_free(fts_expression_state_t *e);
+FTS_API void fts_oldexpression_state_free(fts_oldexpression_state_t *e);
 
 /* Error codes must be negative numbers */
-#define FTS_EXPRESSION_OK 0
-#define FTS_EXPRESSION_SYNTAX_ERROR -1
-#define FTS_EXPRESSION_UNDEFINED_VARIABLE -2
-#define FTS_EXPRESSION_OP_TYPE_ERROR -3
-#define FTS_EXPRESSION_ERROR_OBJECT_REFERENCE -4
-#define FTS_EXPRESSION_UNDEFINED_FUNCTION -5
-#define FTS_EXPRESSION_ARRAY_ACCESS_ERROR -6
+#define FTS_OLDEXPRESSION_OK 0
+#define FTS_OLDEXPRESSION_SYNTAX_ERROR -1
+#define FTS_OLDEXPRESSION_UNDEFINED_VARIABLE -2
+#define FTS_OLDEXPRESSION_OP_TYPE_ERROR -3
+#define FTS_OLDEXPRESSION_ERROR_OBJECT_REFERENCE -4
+#define FTS_OLDEXPRESSION_UNDEFINED_FUNCTION -5
+#define FTS_OLDEXPRESSION_ARRAY_ACCESS_ERROR -6
 
-FTS_API int fts_expression_get_status(fts_expression_state_t *e);
+FTS_API int fts_oldexpression_get_status(fts_oldexpression_state_t *e);
 
-FTS_API void fts_expression_declare_fun(fts_symbol_t name, fts_expression_fun_t f);
+FTS_API void fts_oldexpression_declare_fun(fts_symbol_t name, fts_oldexpression_fun_t f);
 
 extern void fts_expressions_init(void);
 
 
-extern int fts_expression_get_result_count(fts_expression_state_t *e);
+extern int fts_oldexpression_get_result_count(fts_oldexpression_state_t *e);
 
-extern const char *fts_expression_get_msg(fts_expression_state_t *e);
-extern const char *fts_expression_get_err_arg(fts_expression_state_t *e);
+extern const char *fts_oldexpression_get_msg(fts_oldexpression_state_t *e);
+extern const char *fts_oldexpression_get_err_arg(fts_oldexpression_state_t *e);
 
-extern void fts_expression_add_variables_user(fts_expression_state_t *e, fts_object_t *obj);
+extern void fts_oldexpression_add_variables_user(fts_oldexpression_state_t *e, fts_object_t *obj);
 
-extern int fts_expression_map_to_assignements(fts_expression_state_t *e, 
+extern int fts_oldexpression_map_to_assignements(fts_oldexpression_state_t *e, 
 					      void (* f)(fts_symbol_t name, fts_atom_t *value, void *data), void *data);
-
-/*
- * non documented 
- */
-extern int fts_symbol_get_operator( fts_symbol_t s);
-extern void fts_symbol_set_operator( fts_symbol_t s, int op);
-extern int fts_symbol_is_operator( fts_symbol_t s);
 
 
 #endif

@@ -27,9 +27,7 @@
 
 /*
  * The comment object is just a place holder for a comment property; it does
- * absolutely nothing; it is called jcomment, because the comment doctor
- * translate from old comments to new ones (i.e. comment text move from
- * arguments to the propriety).
+ * absolutely nothing.
  * The property is stored as normal property, no daemons used.
  */
 

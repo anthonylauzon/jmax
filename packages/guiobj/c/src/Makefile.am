@@ -3,7 +3,6 @@ package_LTLIBRARIES=libguiobj.la
 libguiobj_la_SOURCES= \
 button.c \
 comment.c \
-comment_doctor.c \
 console.c \
 display.c \
 dspcontrol.c\
