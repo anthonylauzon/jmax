@@ -17,9 +17,11 @@ PACKAGE_DIR = ircam/jmax
 
 include $(ROOTDIR)/java/Makefiles/Makefile.common
 
+INCLUDE_PATH := $(JAVA_SRC_ROOT)/$(PACKAGE_DIR)
+include Sources2
+
 all:  
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) -depend MaxApplication.java)
-	(cd toolkit ; $(MAKE) all)
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
 .PHONY: all
 
 
@@ -48,5 +50,11 @@ MaxVersion:
 .PHONY: MaxVersion
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
+
+
+
+
+
+
 
 

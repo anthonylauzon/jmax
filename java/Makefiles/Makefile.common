@@ -48,6 +48,8 @@ JAVA_CLASSES_ROOT =  $(ROOTDIR)/java/classes
 JAVA_SRC_ROOT =  $(ROOTDIR)/java/src
 JAVA_LIBS_CLASSPATH = $(ROOTDIR)/java/lib/jacl1.0/jacl.jar:$(ROOTDIR)/java/lib/swing/swingall.jar:$(ROOTDIR)/java/lib/NetComponents.jar
 
+LOCAL_PATH = $(ROOTDIR)/$(PACKAGE_DIR)
+
 JMAX_CLASSPATH = $(JAVA_SRC_ROOT):$(JAVA_CLASSES_ROOT):$(JAVA_LIBS_CLASSPATH)
 
 JFLAGS = -d $(JAVA_CLASSES_ROOT) $(JAVAC_FLAGS) $(DEPFLAG)

@@ -2,8 +2,11 @@ ROOTDIR = ../..
 PACKAGE_DIR = 
 
 include $(ROOTDIR)/java/Makefiles/Makefile.common
+INCLUDE_PATH := $(JAVA_SRC_ROOT)/ircam/jmax
 
-BASIC_PACKAGES =  ircam.jmax ircam.jmax.tcl ircam.jmax.utils ircam.jmax.dialogs ircam.jmax.widgets
+include $(INCLUDE_PATH)/Sources2
+
+BASIC_PACKAGES =  ircam.jmax ircam.jmax.tcl ircam.jmax.utils ircam.jmax.dialogs ircam.jmax.widgets ircam.jmax.toolkit
 
 FTS_PACKAGES = ircam.jmax.fts ircam.jmax.fts.tcl
 EDITORS_PACKAGES = ircam.jmax.editors.console ircam.jmax.editors.console.tcl
@@ -11,7 +14,7 @@ ERMES_PACKAGES = ircam.jmax.editors.ermes ircam.jmax.editors.ermes.tcl
 ALL_PACKAGES = $(BASIC_PACKAGES) $(FTS_PACKAGES) $(EDITORS_PACKAGES) $(ERMES_PACKAGES)
 
 all: 
-	(cd ircam ; $(MAKE) all)
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
 .PHONY: all
 
 doc:  

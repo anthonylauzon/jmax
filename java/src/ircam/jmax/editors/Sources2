@@ -1,0 +1,24 @@
+## je suis ircam/jmax/editors
+
+EDITORS_PATH := $(INCLUDE_PATH)
+EDITORS_ACC:=
+
+############################### ermes
+INCLUDE_PATH := $(EDITORS_PATH)/ermes
+include $(INCLUDE_PATH)/Sources2
+
+EDITORS_ACC := $(EDITORS_ACC) $(SOURCES)
+
+############################### console
+INCLUDE_PATH := $(EDITORS_PATH)/console
+include $(INCLUDE_PATH)/Sources2
+
+EDITORS_ACC := $(EDITORS_ACC) $(SOURCES)
+
+############################### control
+INCLUDE_PATH := $(EDITORS_PATH)/control
+include $(INCLUDE_PATH)/Sources2
+
+SOURCES := $(EDITORS_ACC) $(SOURCES)
+
+

@@ -1,0 +1,57 @@
+## je suis ircam/jmax
+
+IRCAM_JMAX_PATH := $(INCLUDE_PATH)
+ACC := 
+
+
+############################### dialogs
+INCLUDE_PATH := $(IRCAM_JMAX_PATH)/dialogs
+include $(INCLUDE_PATH)/Sources2
+
+ACC := $(ACC) $(SOURCES)
+
+############################### editors
+INCLUDE_PATH := $(IRCAM_JMAX_PATH)/editors
+include $(INCLUDE_PATH)/Sources2
+
+ACC := $(ACC) $(SOURCES)
+
+############################### fts
+INCLUDE_PATH := $(IRCAM_JMAX_PATH)/fts
+include $(INCLUDE_PATH)/Sources2
+
+ACC := $(ACC) $(SOURCES)
+
+############################### mda
+INCLUDE_PATH := $(IRCAM_JMAX_PATH)/mda
+include $(INCLUDE_PATH)/Sources2
+
+ACC := $(ACC) $(SOURCES)
+
+############################### tcl
+INCLUDE_PATH := $(IRCAM_JMAX_PATH)/tcl
+include $(INCLUDE_PATH)/Sources2
+
+ACC := $(ACC) $(SOURCES)
+
+############################### toolkit
+INCLUDE_PATH := $(IRCAM_JMAX_PATH)/toolkit
+include $(INCLUDE_PATH)/Sources2
+
+ACC := $(ACC) $(SOURCES)
+
+############################### utils
+INCLUDE_PATH := $(IRCAM_JMAX_PATH)/utils
+include $(INCLUDE_PATH)/Sources2
+
+ACC := $(ACC)$(SOURCES)
+
+INCLUDE_PATH := $(IRCAM_JMAX_PATH)
+SOURCES := $(ACC) \
+	$(INCLUDE_PATH)/MaxApplication.java \
+       	$(INCLUDE_PATH)/MaxEditor.java      \
+        $(INCLUDE_PATH)/MaxWhenHookTable.java \
+	$(INCLUDE_PATH)/MaxVersion.java \
+	$(INCLUDE_PATH)/MaxWindowManager.java \
+	$(INCLUDE_PATH)/MaxToolFinder.java
+
