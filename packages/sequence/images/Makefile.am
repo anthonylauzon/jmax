@@ -12,10 +12,8 @@ img_DATA=\
  arrow.gif \
  edit.gif \
  delete.gif \
- hresize.gif \
- vresize.gif \
+ resizer.gif \
  zoomer.gif \
- scroller.gif \
  liner.gif \
  comber.gif \
  genericAdder.gif \

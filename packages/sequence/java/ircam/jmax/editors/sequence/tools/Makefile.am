@@ -5,7 +5,6 @@ ArrowTool.java \
 CombTool.java \
 LinerTool.java \
 ResizerTool.java \
-ScrollerTool.java \
 SelecterTool.java \
 SequenceTools.java \
 VResizerTool.java \
