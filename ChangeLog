@@ -1,5 +1,7 @@
 2002-11-07  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
+	* added message handler management and receive thread to the C++ client library
+
 	* cleaned the C++ version of the client library: removed FtsSymbol
 	(now const char *), remove FtsServer (merged into FtsServerConnection).
 	Client to FTS communication works. FTS to client not yet implemented.

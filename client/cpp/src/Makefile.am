@@ -26,6 +26,6 @@ SymbolCache.h
 
 bin_PROGRAMS=test1
 test1_SOURCES=test1.cpp
-test1_LDADD= -lftsclient #-lpthread -ldl
+test1_LDADD= -lftsclient -lpthread #-ldl
 #test1_LDFLAGS=-rpath @TOP_DIR_PATH@/cpp/.libs
 CXXFLAGS=-g -I../include

@@ -13,6 +13,37 @@ namespace client {
 
   extern unsigned int getNextPrime( unsigned int n);
 
+  static inline unsigned int hash( int k)
+  {
+    return k;
+  }
+
+  static inline unsigned int hash( const char *s)
+  {
+    unsigned int h = 0;
+
+    while( *s)
+      h = (h<<1) + *s++;
+    
+    return h;
+  }
+
+  static inline unsigned int hash( void *p)
+  {
+    return reinterpret_cast<unsigned int>(p) >> 3;
+  }
+
+  template <typename T>
+  static inline int equals( const T &k1, const T &k2)
+  {
+    return k1 == k2; 
+  }
+
+  static inline int equals( const char *&s1, const char *&s2)
+  {
+    return std::strcmp(s1, s2) == 0; 
+  }
+
 #define FTSHASHTABLE_DEFAULT_INITIAL_CAPACITY 101
 #define FTSHASHTABLE_STANDARD_LOAD_FACTOR 0.75
 
@@ -46,33 +77,6 @@ namespace client {
     int remove( KeyT key);
 
     void stats( ostream &os);
-
-    static unsigned int hash( const char *s);
-
-    static unsigned int hash( int k)
-      {
-	return (unsigned int)k; 
-      }
-
-    static unsigned int hash( void *p)
-      {
-	return (unsigned int)p>>3; 
-      }
-
-    static int equals( int k1, int k2)
-      {
-	return k1 == k2; 
-      }
-
-    static int equals( const char *s1, const char *s2)
-      {
-	return std::strcmp(s1, s2) == 0; 
-      }
-
-    static int equals( void *p1, void *p2)
-      {
-	return p1 == p2; 
-      }
 
   protected:
 
@@ -121,22 +125,11 @@ namespace client {
     }
 
   template <class KeyT, class ValT> 
-    unsigned int Hashtable< KeyT, ValT>::hash( const char *s)
-    {
-      unsigned int h = 0;
-
-      while( *s)
-	h = (h<<1) + *s++;
-
-      return h;
-    }
-
-  template <class KeyT, class ValT> 
     HashtableCell<KeyT, ValT> **Hashtable< KeyT, ValT>::lookupCell( const KeyT &key)
     {
       HashtableCell< KeyT, ValT> **c;
 
-      c = &_table[ Hashtable<KeyT, ValT>::hash( key) % _length];
+      c = &_table[ hash( key) % _length];
 
       while (*c && !equals( (*c)->_key, key))
 	c = &(*c)->_next;
@@ -181,7 +174,7 @@ namespace client {
 
 	  for ( c = oldTable[i]; c; c = next)
 	    {
-	      int index = Hashtable<KeyT, ValT>::hash( c->_key) % _length;
+	      int index = hash( c->_key) % _length;
 
 	      next = c->_next;
 	      c->_next = _table[index];

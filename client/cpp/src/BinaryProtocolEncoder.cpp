@@ -93,28 +93,23 @@ namespace client {
     write( id);
   }
 
-  void BinaryProtocolEncoder::writeAtoms( const FtsAtom *atoms, int length) throw (FtsClientException)
-  {
-    for ( int i = 0; i < length; i++)
-      {
-	if ( atoms[i].isInt())
-	  writeInt( atoms[i].intValue);
-	else if ( atoms[i].isDouble())
-	  writeDouble( atoms[i].doubleValue);
-	else if ( atoms[i].isSymbol())
-	  writeSymbol( atoms[i].symbolValue);
-	else if ( atoms[i].isString())
-	  writeString( atoms[i].stringValue);
-	else if ( atoms[i].isRawString())
-	  writeRawString( atoms[i].stringValue);
-	else if ( atoms[i].isObject())
-	  writeObject( atoms[i].objectValue);
-      }
-  }
-
   void BinaryProtocolEncoder::writeArgs( const FtsArgs &v) throw( FtsClientException)
   {
-    writeAtoms( v.getAtoms(), v.getLength());
+    for ( int i = 0; i < v.getLength(); i++)
+      {
+	if ( v.isInt(i))
+	  writeInt( v.getInt(i));
+	else if ( v.isDouble(i))
+	  writeDouble( v.getDouble(i));
+	else if ( v.isSymbol(i))
+	  writeSymbol( v.getSymbol(i));
+	else if ( v.isString(i))
+	  writeString( v.getString(i));
+	else if ( v.isRawString(i))
+	  writeRawString( v.getString(i));
+	else if ( v.isObject(i))
+	  writeObject( v.getObject(i));
+      }
   }
 
   void BinaryProtocolEncoder::endOfMessage() throw( FtsClientException)

@@ -26,13 +26,15 @@ namespace fts {
 namespace client {
 
   template <class KeyT, class ValT> class FTSCLIENT_API Hashtable;
+  class BinaryProtocolDecoder;
   class BinaryProtocolEncoder;
 
   class FTSCLIENT_API FtsServerConnection {
   public:
-    static const int CLIENT_OBJECT_ID = 0;
+    static const int DEFAULT_RECEIVE_BUFFER_SIZE;
+    static const int CLIENT_OBJECT_ID;
 
-    FtsServerConnection();
+    FtsServerConnection() throw( FtsClientException);
     ~FtsServerConnection();
 
     // FIXME
@@ -49,7 +51,6 @@ namespace client {
     void writeObject( const FtsObject *v) throw( FtsClientException);
     /* This version is used for object that have predefined IDs */
     void writeObject( int id) throw( FtsClientException);
-    void writeAtoms( const FtsAtom *atoms, int length) throw (FtsClientException);
     void writeArgs( const FtsArgs &v) throw( FtsClientException);
 
     void endOfMessage() throw( FtsClientException);
@@ -61,9 +62,14 @@ namespace client {
     virtual void write( const unsigned char *b, int len) throw (FtsClientException) = 0;
 
   private:
+    static void *receiveThread( void *arg);
+
     int _newObjectID;
     Hashtable< int, FtsObject *> *_objectTable;
     BinaryProtocolEncoder *_encoder;
+    BinaryProtocolDecoder *_decoder;
+    unsigned char *_receiveBuffer;
+    pthread_t _receiveThread;
   };
 
 };

@@ -48,8 +48,6 @@ namespace client {
     /* This version is used for object that have predefined IDs */
     void writeObject( int id) throw( FtsClientException);
 
-    void writeAtoms( const FtsAtom *atoms, int length) throw (FtsClientException);
-
     void writeArgs( const FtsArgs &v) throw( FtsClientException);
 
     void endOfMessage() throw( FtsClientException);

@@ -19,6 +19,9 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
+#ifndef _SYMBOLCACHE_H_
+#define _SYMBOLCACHE_H_
+
 #include <fts/ftsclient.h>
 #include "Hashtable.h"
 
@@ -42,7 +45,7 @@ namespace client {
 
     int index( const char *s)
     {
-      return Hashtable< const char *, int>::hash(s) % _length;
+      return hash(s) % _length;
     }
 
     void put( int index, const char *s)
@@ -76,5 +79,4 @@ namespace client {
 };
 };
 
-
-
+#endif

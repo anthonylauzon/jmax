@@ -19,7 +19,10 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
+#include <pthread.h>
+#include <errno.h>
 #include <fts/ftsclient.h>
+#include "BinaryProtocolDecoder.h"
 #include "BinaryProtocolEncoder.h"
 #include "Hashtable.h"
 
@@ -27,13 +30,46 @@ namespace ircam {
 namespace fts {
 namespace client {
 
-  FtsServerConnection::FtsServerConnection()
-  {
-    _encoder = new BinaryProtocolEncoder();
+  const int FtsServerConnection::DEFAULT_RECEIVE_BUFFER_SIZE = 65536;
+  const int FtsServerConnection::CLIENT_OBJECT_ID = 0;
 
+  void *FtsServerConnection::receiveThread( void *arg)
+  {
+    FtsServerConnection *connection = reinterpret_cast<FtsServerConnection *>(arg);
+
+  try
+    {
+      while(1)
+	{
+	  int n = connection->read( connection->_receiveBuffer, DEFAULT_RECEIVE_BUFFER_SIZE);
+  
+	  if (n < 0)
+	    throw FtsClientException( "Failed to read the input connection");
+	  if (n == 0)
+	    throw FtsClientException( "End of input");
+
+	  connection->_decoder->decode( connection->_receiveBuffer, n);
+	}
+    }
+  catch( FtsClientException e)
+    {
+      pthread_exit( 0);
+    }
+
+  return 0;
+  }
+  
+  FtsServerConnection::FtsServerConnection() throw( FtsClientException)
+  {
     _newObjectID = 16; // Ids 0 to 15 are reserved for pre-defined system objects
 
     _objectTable = new Hashtable<int, FtsObject*>();
+
+    _decoder = new BinaryProtocolDecoder( this);
+    _encoder = new BinaryProtocolEncoder();
+
+    if ( pthread_create( &_receiveThread, NULL, receiveThread, this))
+      throw FtsClientException( "Cannot start receive thread", errno);
   }
 
   FtsServerConnection::~FtsServerConnection()
@@ -91,11 +127,6 @@ namespace client {
   void FtsServerConnection::writeObject( int id) throw( FtsClientException) 
   {
     _encoder->writeObject( id); 
-  }
-
-  void FtsServerConnection::writeAtoms( const FtsAtom *atoms, int length) throw (FtsClientException) 
-  {
-    _encoder->writeAtoms( atoms, length); 
   }
 
   void FtsServerConnection::writeArgs( const FtsArgs &v) throw( FtsClientException) 

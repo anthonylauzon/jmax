@@ -67,65 +67,65 @@ namespace client {
       _array[_current++].setObject( value);
     }
 
-    int isInt( int index)
+    int isInt( int index) const
     {
       return _array[index].isInt();
     }
 
-    int isDouble( int index)
+    int isDouble( int index) const
     {
       return _array[index].isDouble();
     }
 
-    int isSymbol( int index)
+    int isSymbol( int index) const
     {
       return _array[index].isSymbol();
     }
 
-    int isString( int index)
+    int isString( int index) const
     {
       return _array[index].isString();
     }
 
-    int isRawString( int index)
+    int isRawString( int index) const
     {
       return _array[index].isRawString();
     }
 
-    int isObject( int index)
+    int isObject( int index) const
     {
       return _array[index].isObject();
     }
 
 
-    int getInt( int index)
+    int getInt( int index) const
     {
-      return _array[index].intValue;
+      return _array[index].value.intValue;
     }
 
-    double getDouble( int index)
+    double getDouble( int index) const
     {
-      return _array[index].doubleValue;
+      return _array[index].value.doubleValue;
     }
 
-    const char *getSymbol( int index)
+    const char *getSymbol( int index) const
     {
-      return _array[index].symbolValue;
+      return _array[index].value.symbolValue;
     }
 
-    const char *getString( int index)
+    const char *getString( int index) const
     {
-      return _array[index].stringValue;
+      return _array[index].value.stringValue;
     }
 
-    const char *getRawString( int index)
+    const char *getRawString( int index) const
     {
-      return _array[index].stringValue;
+      return _array[index].value.stringValue;
     }
 
-    FtsObject *getObject( int index)
+    FtsObject *getObject( int index) const
     {
-      return _array[index].objectValue;
+      return _array[index].value.objectValue;
     }
 
     void clear()

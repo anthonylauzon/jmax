@@ -28,6 +28,7 @@ namespace client {
 
   class FTSCLIENT_API FtsObject {
     friend class BinaryProtocolEncoder;
+    friend class BinaryProtocolDecoder;
   public:
     static const int NO_ID = -1;
 
@@ -52,7 +53,7 @@ namespace client {
     static void registerMessageHandler( const type_info &ftsClass, const char *selector, FtsMessageHandler *messageHandler);
 
   private:
-    void invokeMessageHandler( FtsObject *obj, const char *selector, FtsArgs *args);
+    static void invokeMessageHandler( FtsObject *obj, const char *selector, const FtsArgs &args);
 
     int getID() const
     {
@@ -72,8 +73,7 @@ namespace client {
     const char *_selectorCache;
     FtsMessageHandler *_messageHandlerCache;
 
-    static Hashtable<MessageHandlerEntry *, FtsMessageHandler *> *messageHandlersTable;
-    static MessageHandlerEntry lookupEntry;
+    static Hashtable<MessageHandlerEntry, FtsMessageHandler *> messageHandlersTable;
   };
 
 };

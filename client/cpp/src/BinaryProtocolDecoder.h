@@ -61,16 +61,16 @@ namespace client {
     FtsServerConnection *_serverConnection;
 
     long _lval;
-    Buffer *_buffer;
+    Buffer _buffer;
 
     FtsObject *_target;
     const char *_selector;
-    FtsArgs *_args;
+    FtsArgs _args;
     int _argsCount;
 
     int _currentState;
 
-    SymbolCache *_symbolCache;
+    SymbolCache _symbolCache;
 
     static Hashtable< const char *, const char *> symbolTable;
   };

@@ -35,32 +35,9 @@ namespace client {
    */
 
   class FTSCLIENT_API FtsAtom {
+    friend class FtsArgs;
+    friend std::ostream &operator<<( std::ostream &os, const FtsAtom &a);
   public:
-    /**
-     * If the atom is a integer, holds the integer value
-     */
-    int intValue;
-
-    /**
-     * If the atom is a double, holds the double value
-     */
-    double doubleValue;
-
-    /**
-     * If the atom is a "symbol", holds the "symbol" value
-     */
-    const char *symbolValue;
-
-    /**
-     * If the atom is a string, holds the string value
-     */
-    const char *stringValue;
-
-    /**
-     * If the atom is a FtsObject, holds the object value
-     */
-    FtsObject *objectValue;
-
     /**
      * Tests if atom contains a 'void' value (i.e. no valid value)
      * 
@@ -148,7 +125,7 @@ namespace client {
     void setInt( int i)
     {
       _type = INT;
-      intValue = i;
+      value.intValue = i;
     }
 
     /**
@@ -159,7 +136,7 @@ namespace client {
     void setDouble( double f)
     {
       _type = DOUBLE;
-      doubleValue = f;
+      value.doubleValue = f;
     }
 
     /**
@@ -170,7 +147,7 @@ namespace client {
     void setSymbol( const char *s)
     {
       _type = SYMBOL;
-      symbolValue = s;
+      value.symbolValue = s;
     }
 
     /**
@@ -181,7 +158,7 @@ namespace client {
     void setString( const char *s)
     {
       _type = STRING;
-      stringValue = s;
+      value.stringValue = s;
     }
 
     /**
@@ -192,7 +169,7 @@ namespace client {
     void setRawString( const char *s)
     {
       _type = RAW_STRING;
-      stringValue = s;
+      value.stringValue = s;
     }
 
     /**
@@ -203,10 +180,18 @@ namespace client {
     void setObject( FtsObject *o)
     {
       _type = OBJECT;
-      objectValue = o;
+      value.objectValue = o;
     }
 
   private:
+
+    union {
+      int intValue;
+      double doubleValue;
+      const char *symbolValue;
+      const char *stringValue;
+      FtsObject *objectValue;
+    } value;
 
     static const int VOID        = 1;
     static const int INT         = 2;

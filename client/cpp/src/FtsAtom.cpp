@@ -31,13 +31,13 @@ namespace client {
     if ( a.isVoid())
       os << "void";
     else if ( a.isInt())
-      os << a.intValue;
+      os << a.value.intValue;
     else if ( a.isDouble())
-      os << a.doubleValue;
+      os << a.value.doubleValue;
     else if ( a.isSymbol())
-      os << (const char *)a.symbolValue;
+      os << (const char *)a.value.symbolValue;
     else if ( a.isString() || a.isRawString())
-      os << a.stringValue;
+      os << a.value.stringValue;
     //   else if ( a.isObject())
     //     os << a.objectValue();
 

@@ -38,5 +38,8 @@ main( int ac, char **av)
       cerr << e << endl;
     }
 
+  char c;
+  cin >> c;
+
   std::exit( 0);
 }

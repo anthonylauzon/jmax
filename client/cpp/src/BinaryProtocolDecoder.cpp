@@ -81,18 +81,18 @@ namespace client {
 
   void BinaryProtocolDecoder::bufferClearAction( int input)
   {
-    _buffer->clear();
+    _buffer.clear();
   }
 
   void BinaryProtocolDecoder::clearAllAction( int input)
   {
     _lval = 0;
-    _buffer->clear();
+    _buffer.clear();
   }
 
   void BinaryProtocolDecoder::bufferShiftAction( int input)
   {
-    _buffer->append( (char)input);
+    _buffer.append( (char)input);
   }
 
   void BinaryProtocolDecoder::endIntAction( int input)
@@ -100,7 +100,7 @@ namespace client {
     _lval = _lval << 8 | input;
 
     if (_argsCount >= 2)
-      _args->addInt( (int)_lval);
+      _args.addInt( (int)_lval);
 
     _argsCount++;
   }
@@ -111,7 +111,7 @@ namespace client {
 
     // FIXME
     if (_argsCount >= 2)
-      _args->addDouble( 3.14);
+      _args.addDouble( 3.14);
 
     _argsCount++;
   }
@@ -120,12 +120,12 @@ namespace client {
   {
     _lval = _lval << 8 | input;
 
-    const char *s = _symbolCache->get( (int)_lval);
+    const char *s = _symbolCache.get( (int)_lval);
 
     if (_argsCount == 1)
       _selector = s;
     else
-      _args->addSymbol( s);
+      _args.addSymbol( s);
 
     _argsCount++;
   }
@@ -135,7 +135,7 @@ namespace client {
     const char *symbol;
     char *p;
 
-    p = (char *)_buffer->getBytes();
+    p = (char *)_buffer.getBytes();
 
     if ( !symbolTable.get( p, symbol))
       {
@@ -143,12 +143,12 @@ namespace client {
 	symbolTable.put( symbol, symbol);
       }
   
-    _symbolCache->put( (int)_lval, symbol);
+    _symbolCache.put( (int)_lval, symbol);
 
     if (_argsCount == 1)
       _selector = symbol;
     else
-      _args->addSymbol( symbol);
+      _args.addSymbol( symbol);
 
     _argsCount++;
   }
@@ -156,7 +156,7 @@ namespace client {
   void BinaryProtocolDecoder::endStringAction( int input)
   {
     if (_argsCount >= 2)
-      _args->addString( (char *)_buffer->getBytes());
+      _args.addString( (char *)_buffer.getBytes());
 
     _argsCount++;
   }
@@ -170,15 +170,15 @@ namespace client {
     if (_argsCount == 0)
       _target = obj;
     else
-      _args->addObject( obj);
+      _args.addObject( obj);
 
     _argsCount++;
   }
 
   void BinaryProtocolDecoder::endMessageAction( int input)
   {
-    //  FtsObject.invokeMessageHandler( target, selector, _args);
-    _args->clear();
+    FtsObject::invokeMessageHandler( _target, _selector, _args);
+    _args.clear();
     _argsCount = 0;
   }
 
@@ -347,11 +347,7 @@ namespace client {
   {
     _serverConnection = serverConnection;
 
-    _buffer = new Buffer();
-    _args = new FtsArgs();
     _argsCount = 0;
-
-    _symbolCache = new SymbolCache();
 
     _currentState = qInitial;
   }

@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
+#include <typeinfo>
 #include <fts/ftsclient.h>
 #include "Hashtable.h"
 #include "BinaryProtocolEncoder.h"
@@ -27,15 +28,32 @@ namespace ircam {
 namespace fts {
 namespace client {
 
+  Hashtable<MessageHandlerEntry, FtsMessageHandler *> FtsObject::messageHandlersTable;
+
   class MessageHandlerEntry {
   public:
-    const type_info *_ftsClass;
+    MessageHandlerEntry( const type_info &tid, const char *selector) 
+      : _tid( tid), _selector( selector)
+    {
+    }
+
+    const char *className() const { return _tid.name();}
+
+    const char *selector() const { return _selector;}
+
+    bool operator ==( const MessageHandlerEntry &rhs ) const 
+    {
+      return _tid == rhs._tid && equals( _selector, rhs._selector);
+    }
+
+  private:
+    const type_info &_tid;
     const char *_selector;
   };
 
-  int hash( MessageHandlerEntry &m)
+  unsigned int hash( const MessageHandlerEntry &m)
   {
-    return reinterpret_cast<int>(m._ftsClass)  + reinterpret_cast<int>(m._selector);
+    return hash(m.className()) + hash(m.selector());
   }
 
   FtsObject::FtsObject(FtsServerConnection* serverConnection, FtsObject* parent, const char* ftsClassName) throw(FtsClientException)
@@ -93,10 +111,37 @@ namespace client {
     _serverConnection->endOfMessage();
   }
 
-  void FtsObject::registerMessageHandler(const type_info &ftsClass, const char* selector, FtsMessageHandler* messageHandler)
+  void FtsObject::registerMessageHandler(const type_info &tid, const char* selector, FtsMessageHandler* messageHandler)
   {
+    MessageHandlerEntry entry( tid, selector);
+
+    messageHandlersTable.put( entry, messageHandler);
   }
 
+  void FtsObject::invokeMessageHandler( FtsObject *obj, const char *selector, const FtsArgs &args)
+  {
+    /*
+      We can compare the strings using == because the protocol decoder "interns" the symbol
+      that it receives
+    */
+    if (selector == obj->_selectorCache)
+      {
+	obj->_messageHandlerCache->invoke( obj, args);
+	return;
+      }
+
+    MessageHandlerEntry entry( typeid(*obj), selector);
+
+    FtsMessageHandler *messageHandler; ;
+
+    if (messageHandlersTable.get( entry, messageHandler))
+      {
+	obj->_selectorCache = selector;
+	obj->_messageHandlerCache = messageHandler;
+	obj->_messageHandlerCache->invoke( obj, args);
+	return;
+      }
+  }
 };
 };
 };
