@@ -900,8 +900,9 @@ _track_append_bar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 		start_bar = (event_t *)fts_get_object(at);
 	
   new_bar = marker_track_append_bar( markers, start_bar);
-
-  track_upload_event(markers, new_bar);
+  
+  if(new_bar != NULL)
+    track_upload_event(markers, new_bar);
 }
 
 #define MARKERS_BAR_EPSILON 0.001
@@ -1123,6 +1124,7 @@ _track_make_trill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       fts_post("error: more than two pitches in selection, impossible to make a trill !\n");
   }
 }
+
 /******************************************************
 *
 *  persistence compatibility
@@ -2363,9 +2365,9 @@ track_instantiate(fts_class_t *cl)
   
   /* markers */
   fts_class_message_void(cl, fts_new_symbol("getmarkers"), _track_get_markers);
-  fts_class_message_void(cl, fts_new_symbol("append_bar"), _track_append_bar);
   fts_class_message_void(cl, fts_new_symbol("make_bars"), _track_make_bars);
   fts_class_message_void(cl, fts_new_symbol("renumber_bars"), _track_renumber_bars);
+	fts_class_message_varargs(cl, fts_new_symbol("append_bar"), _track_append_bar);
   fts_class_message_varargs(cl, fts_new_symbol("make_trill"), _track_make_trill);
   fts_class_message_varargs(cl, seqsym_marker, _track_append_marker);
   
