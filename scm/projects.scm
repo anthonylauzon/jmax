@@ -1,4 +1,3 @@
-;;
 ;; jMax
 ;; Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 ;; 
@@ -17,11 +16,6 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program; if not, write to the Free Software
 ;; Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-;; 
-;; Based on Max;ISPW by Miller Puckette.
-;; 
-;; Author: Peter Hanappe
-;;
 
 ;;
 ;;  Configuration commands (for project.env and .jmaxrc)
@@ -74,7 +68,7 @@
 ;;
 (define (jmax-set-sample-rate rate)
   (set! jmax-sample-rate rate)
-  (ucs "set" "param" "sampling_rate" (number->string rate)))
+  (ucs "set" "param" "sample_rate" rate))
 
 ;;
 ;; get-sample-rate

@@ -82,7 +82,7 @@ public class Platform
       {
 	setIrixValues();
       }  
-    else if (SYSTEM.equals("windows"))
+    else if (SYSTEM.toLowerCase().startsWith("windows"))
       {
 	setWindowsValues();
       }  
@@ -157,7 +157,16 @@ public class Platform
    
   static protected void setWindowsValues() 
   {
-    setDefaultValues();
+    NEWLINE     = "\n";
+    NEWLINECHAR = '\n';
+    DELETE_KEY  = 8;
+    BACKSPACE_KEY = 127;
+    ENTER_KEY   = 10;
+    RETURN_KEY  = 10;
+    FONT_NAME = new String("Arial");
+//      FONT_NAME = PatcherFontManager.getInstance().getFontName("Variable Width Font");
+    FONT_SIZE   = 10;
+    FONT_STYLE  = Font.PLAIN;
   }
 
   //------------------------------------------

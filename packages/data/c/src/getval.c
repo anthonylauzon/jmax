@@ -75,18 +75,23 @@ getelem_vec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   getelem_vec_t *this = (getelem_vec_t *)o;
 
-  if(ac == 2)
+  ac--;
+  at++;
+
+  if(ac == 1)
     {
       this->i = 0;
+      this->obj = fts_get_object(at);
+      fts_object_refer(this->obj);
+    }
+  else if(ac == 2)
+    {
+      this->i = fts_get_number_int(at + 0);
       this->obj = fts_get_object(at + 1);
+      fts_object_refer(this->obj);
     }
   else
-    {
-      this->i = fts_get_number_int(at + 1);
-      this->obj = fts_get_object(at + 2);
-    }
-
-  fts_object_refer(this->obj);
+    fts_object_set_error(o, "Too many arguments");
 }
 
 static void
@@ -94,37 +99,43 @@ getelem_mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   getelem_mat_t *this = (getelem_mat_t *)o;
 
-  if(ac == 2)
+  ac--;
+  at++;
+
+  if(ac == 1)
     {
       this->i = 0;
       this->j = 0;
-      this->obj = fts_get_object(at + 1);
+      this->obj = fts_get_object(at);
+      fts_object_refer(this->obj);
     }
-  else if(ac == 3)
+  else if(ac == 2)
     {
       this->i = 0;
 
-      if(fts_is_number(at + 1))
-	this->j = fts_get_number_int(at + 1);
+      if(fts_is_number(at + 0))
+	this->j = fts_get_number_int(at + 0);
       else
 	fts_object_set_error(o, "Invalid index argument");
 
-      this->obj = fts_get_object(at + 2);
+      this->obj = fts_get_object(at + 1);
+      fts_object_refer(this->obj);
     }
-  else
+  else if(ac == 3)
     {
-      if(fts_is_number(at + 1) && fts_is_number(at + 2))
+      if(fts_is_number(at + 0) && fts_is_number(at + 1))
 	{
-	  this->i = fts_get_number_int(at + 1);
-	  this->j = fts_get_number_int(at + 2);
+	  this->i = fts_get_number_int(at + 0);
+	  this->j = fts_get_number_int(at + 1);
 	}
       else
 	fts_object_set_error(o, "Invalid index argument");
 
-      this->obj = fts_get_object(at + 3);
+      this->obj = fts_get_object(at + 2);
+      fts_object_refer(this->obj);
     }
-
-  fts_object_refer(this->obj);
+  else
+    fts_object_set_error(o, "Too many arguments");
 }
 
 static void
@@ -718,7 +729,13 @@ setval_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac >= 2 && vec_atom_is(at + ac - 1))
+  ac--;
+  at++;
+  
+  if(ac == 0)
+    return &fts_CannotInstantiate;
+
+  if(vec_atom_is(at + ac - 1))
     {
       fts_class_init(cl, sizeof(getelem_vec_t), 3, 0, 0); 
       
@@ -733,7 +750,7 @@ setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 2, vec_symbol, getval_set_reference);
     }
-  else if(ac >= 2 && ivec_atom_is(at + ac - 1))
+  else if(ivec_atom_is(at + ac - 1))
     {
       fts_class_init(cl, sizeof(getelem_vec_t), 3, 0, 0); 
       
@@ -749,7 +766,7 @@ setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 2, ivec_symbol, getval_set_reference);
     }
-  else if(ac >= 2 && fvec_atom_is(at + ac - 1))
+  else if(fvec_atom_is(at + ac - 1))
     {
       fts_class_init(cl, sizeof(getelem_vec_t), 3, 0, 0); 
       
@@ -765,7 +782,7 @@ setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 2, fvec_symbol, getval_set_reference);
     }
-  else if(ac >= 2 && mat_atom_is(at + ac - 1))
+  else if(mat_atom_is(at + ac - 1))
     {
       fts_class_init(cl, sizeof(getelem_mat_t), 4, 0, 0); 
       
@@ -786,7 +803,7 @@ setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     }
   else
     return &fts_CannotInstantiate;
-  
+
   return fts_Success;
 }
 
