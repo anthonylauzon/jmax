@@ -65,6 +65,7 @@
   <LI><A HREF="#audio">Audio Configuration</A>
   <LI><A HREF="#midi">MIDI Configuration</A>
   <LI><A HREF="#hosttype">Supported host types</A>
+  <li><a href="#using ALSA">Using ALSA</a>
 </UL>
 
 <p>
@@ -555,6 +556,62 @@ MIDI configuration commands:
   </TR>
 </TABLE>
 </CENTER>
+
+
+
+<p>
+<hr>
+<a name="using ALSA">
+ <h2>Using ALSA</h2>
+</a>
+
+<p>
+The Linux ALSA sound drivers are supported by a dynamically loaded package,
+named <i>alsadev-0.4</i>. The currently supported ALSA version is 0.4.
+
+<p>
+To use <i>j</i>Max with the Linux ALSA sound drivers, <i>j</i>Max must be compiled
+with ALSA support (see <a href="compiling.html">Compiling <i>j</i>Max</a> for further information.
+The ALSA package can then be loaded by adding the following line in your <code>.jmaxrc</code> file, inside the <i>start</i> hook:
+<table border=1>
+ <tr><td>
+  <code><pre>
+<code><pre>
+	package require alsadev-0.4
+</pre></code>
+ </td></tr>
+</table>
+
+<p>
+The <i>alsadev</i> package defines the following devices: <code>alsaStereoIn</code> for audio input,
+<code>alsaStereoOutput</code> for audio output. These devices can be used by adding the following
+line in your <code>.jmaxrc</code> file, inside a <i>start</i> hook:
+<table border=1>
+ <tr><td>
+  <code><pre>
+<code><pre>
+	openDefaultAudioIn alsaStereoIn
+	openDefaultAudioOut alsaStereoOut
+</pre></code>
+</td></tr>
+</table>
+
+<p>Below is an example of a <code>.jmaxrc</code> file for using ALSA
+audio input and ouput:
+<table border=1>
+ <tr><td>
+  <code><pre>
+when start {
+	package require alsadev-0.4
+	jmaxSetSampleRate 44100
+	jmaxSetAudioBuffer 2048
+
+	openDefaultAudioIn alsaStereoIn
+	openDefaultAudioOut alsaStereoOut
+}
+</pre></code>
+</td></tr>
+</table>
 
 <!-- ---------------------------------------------------------------------- -->
 <!-- ---------------------------------------------------------------------- -->
