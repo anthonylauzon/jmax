@@ -1027,13 +1027,20 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     * Fts callback: open the editor associated with this FtsSequenceObject.
    * If not exist create them else show them.
    */
+  public void createEditor()
+  {
+    if(getEditorFrame() == null) 
+      setEditorFrame(new ErmesSketchWindow(FtsPatcherObject.this));
+  }
+  
+  
   public void openEditor(int nArgs, FtsAtom[] args)
   {
     if(getEditorFrame() == null) 
     {
       SwingUtilities.invokeLater(new Runnable() {
         public void run() {
-          setEditorFrame(new ErmesSketchWindow(FtsPatcherObject.this));
+          createEditor();
           showEditor();
         }
       });

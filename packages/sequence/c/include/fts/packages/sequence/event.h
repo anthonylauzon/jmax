@@ -38,6 +38,8 @@ struct _event_
   event_t *next; /* next in track */
 };
 
+#define event_get_track(e) ((e)->track)
+
 #define event_set_time(e, t) ((e)->time = (t))
 #define event_get_time(e) ((e)->time)
 

@@ -1584,11 +1584,14 @@ public void createMarkers()
 *  FtsObjectWithEditor
 ********************************************************/
 public boolean opening = false;
-public void openEditor(int argc, FtsAtom[] argv)
+public void createEditor()
 {  
   if(getEditorFrame() == null)
     setEditorFrame( new TrackWindow(this));
-  
+}
+public void openEditor(int argc, FtsAtom[] argv)
+{  
+  createEditor();
   showEditor();
 }
 

@@ -418,10 +418,10 @@ track_segment_shift(track_t *self, event_t *first, event_t *after, double begin,
     event_t *event = first;
     event_t *prev = event_get_prev(first);    
     double before = 0.0;
-        
+    
     if(prev != NULL)
       before = event_get_time(prev);
-    
+   
     while(event != after && event_get_time(event) + shift < before)
     {
       double time = event_get_time(event) + shift;
@@ -433,17 +433,17 @@ track_segment_shift(track_t *self, event_t *first, event_t *after, double begin,
       track_move_event(self, event, time);
       event = next;
     }
-        
+   
     while(event != after && event_get_time(event) + shift < end)
     {
       event_set_time(event, event_get_time(event) + shift);
       event = event_get_next(event);
     }
-    
+        
     if(event != NULL)
     {
       prev = event_get_prev(event);
-      
+  
       if(after != NULL)
         event = event_get_prev(after);
       else
@@ -465,27 +465,77 @@ void
 track_segment_stretch(track_t *self, event_t *first, event_t *after, double begin, double end, double stretch)
 {
   double shift = 0.0;
+  fts_atom_t a[2];
   
   if(stretch < 0.0)
     stretch = 0.0;
   
-  if(first != NULL && stretch != 1.0)
+  if(stretch != 1.0)
   {
+    fts_method_t meth_stretch = fts_class_get_method_varargs(track_get_type(self), seqsym_stretch);
     event_t *event = first;
     
-    while(event != after)
+    fts_set_float(a, stretch);
+    
+    if(first != track_get_first(self) && meth_stretch != NULL)
     {
-      event_set_time(event, begin + (event_get_time(event) - begin) * stretch);
-      event = event_get_next(event);
+      event = track_get_first(self);
+      
+      while(event != first)
+      {
+        double time = event_get_time(event);
+        double duration = event_get_duration(event);
+        
+        if(time + duration > begin)
+        {
+          if(time + duration > end)
+            duration = end - begin;
+          else
+            duration -= begin - time;
+          
+          fts_set_float(a + 1, duration);
+          (*meth_stretch)(fts_get_object( event_get_value(event)), 0, NULL, 2, a);
+          
+          if( track_editor_is_open(self))
+            event_set_at_client(event);
+        }
+        event = event_get_next(event);
+      }
     }
     
-    shift = begin + (end - begin) * stretch;
-    
-    while(event != NULL)
+    if(first != NULL)
     {
-      event_set_time(event, shift + event_get_time(event));
-      event = event_get_next(event);
-    }    
+      while(event != after)
+      {
+        double time = event_get_time(event);
+        
+        event_set_time(event, begin + (time - begin) * stretch);
+        
+        if(meth_stretch != NULL)
+        {
+          double duration = event_get_duration(event);
+          
+          if(time + duration > end)
+            duration = end - time;
+          
+          fts_set_float(a + 1, duration);
+          (*meth_stretch)(fts_get_object( event_get_value(event)), 0, NULL, 2, a);
+          
+          if( track_editor_is_open(self)) 
+            event_set_at_client(event);
+        }
+        
+        event = event_get_next(event);
+      }
+      
+      shift = (end - begin) * (stretch - 1.0);
+      
+      while(event != NULL)
+      {
+        event_set_time(event, shift + event_get_time(event));
+        event = event_get_next(event);
+      }    
+    }
   }
 }
 
@@ -524,7 +574,7 @@ track_segment_quantize(track_t *self, event_t *first, event_t *after, double beg
           
           if(dur > quantize)
             event_set_duration(event, quantize * floor(dur / quantize + 0.5));
-          else if(dur >= 0.0)
+          else if(dur > 0.0)
             event_set_duration(event, quantize);
         }
         
@@ -603,6 +653,7 @@ track_get_or_make_markers(track_t *track)
     
     fts_set_symbol(&a, seqsym_scomark);
     markers = (track_t *)fts_object_create(track_class, 1, &a);
+    fts_object_set_context((fts_object_t *)markers, (fts_context_t *)track);
     
     track_set_markers(track, markers);
   }
@@ -621,11 +672,14 @@ track_insert_marker(track_t *track, double time, fts_symbol_t type)
   /* create a scomark */
   fts_set_symbol(&a, type);
   scomark = (scomark_t *)fts_object_create(scomark_class, 1, &a);
-  fts_object_set_context((fts_object_t *)scomark, (fts_context_t *)markers);
   
   /* create a new event with the scomark */
   fts_set_object(&a, (fts_object_t *)scomark);
   event = (event_t *)fts_object_create(event_class, 1, &a);
+  
+  /* point back to event and marker track */
+  fts_object_set_context((fts_object_t *)event, (fts_context_t *)markers);
+  fts_object_set_context((fts_object_t *)scomark, (fts_context_t *)event);
   
   track_add_event(markers, time, event);
   
@@ -650,11 +704,14 @@ track_insert_marker_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int
     /* create a scomark */
     fts_set_symbol(&a, sc_type);
     scomark = (scomark_t *)fts_object_create(scomark_class, 1, &a);
-    fts_object_set_context((fts_object_t *)scomark, (fts_context_t *)self);
     
     /* create a new event with the scomark */
     fts_set_object(&a, (fts_object_t *)scomark);
     event = (event_t *)fts_object_create(event_class, 1, &a);
+    
+    /* point back to event and marker track */
+    fts_object_set_context((fts_object_t *)event, (fts_context_t *)self);
+    fts_object_set_context((fts_object_t *)scomark, (fts_context_t *)event);
     
     track_add_event(self, time, event);    
     
@@ -1016,7 +1073,7 @@ track_highlight_and_next(track_t *track, event_t *event)
   return event;
 }
 
-static void
+void
 track_move_events_at_client(track_t *self, event_t *first, event_t *after)
 {
   if(first != NULL)
@@ -1216,8 +1273,8 @@ _track_stretch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   track_segment_get(self, begin, end, &first, &after);
   if(first != NULL)
   {
-    track_segment_stretch(self, first, after, begin, end, stretch);  
-    track_move_events_at_client(self, first, after);
+    track_segment_stretch(self, first, after, begin, end, stretch);
+    track_move_events_at_client(self, first, NULL);
     fts_object_set_dirty(o);
   }
 }
@@ -1489,9 +1546,7 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	
 	if( self->markers != NULL)
 		track_upload_markers(self);
-	
-  fts_client_send_message((fts_object_t *)self, fts_s_end_upload, 0, 0);
-  
+	  
   fts_array_destroy(&temp_array);
   
   /* upload editor stuff */
@@ -1515,6 +1570,8 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     
 		track_editor_upload(self->editor);
 	}  
+
+  fts_client_send_message((fts_object_t *)self, fts_s_end_upload, 0, 0);
 }
 
 static void
@@ -1803,9 +1860,10 @@ track_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 		track_set_editor_at_client(o, 0, 0, 0, 0);
 	
   track_set_editor_open( self);
-  fts_client_send_message( o, fts_s_openEditor, 0, 0);
+  fts_client_send_message( o, fts_s_createEditor, 0, 0);
   track_upload(o, 0, 0, 0, 0);
 	track_editor_upload(self->editor);
+  fts_client_send_message( o, fts_s_openEditor, 0, 0);
 }
 
 static void
@@ -2064,12 +2122,11 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_append, _track_append);
   fts_class_message_varargs(cl, seqsym_remove, _track_remove);
   
-  fts_class_message_varargs(cl, fts_new_symbol("shift"),    _track_shift);
-  fts_class_message_varargs(cl, fts_new_symbol("stretch"),  _track_stretch);
-  fts_class_message_varargs(cl, fts_new_symbol("quantize"), _track_quantize);
+  fts_class_message_varargs(cl, seqsym_shift, _track_shift);
+  fts_class_message_varargs(cl, seqsym_stretch, _track_stretch);
+  fts_class_message_varargs(cl, seqsym_quantize, _track_quantize);
   fts_class_message_void   (cl, fts_new_symbol("duration"), _track_get_duration);
   fts_class_message_void   (cl, fts_new_symbol("size"),     _track_get_size);
-  
 
   /* im/export */
   fts_class_message_void   (cl, fts_s_import, fts_object_import_dialog);

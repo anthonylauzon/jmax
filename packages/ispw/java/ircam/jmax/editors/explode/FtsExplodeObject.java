@@ -643,11 +643,14 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
    * Fts callback: open the editor associated with this FtsSequenceObject.
    * If not exist create them else show them.
    */
-  public void openEditor(int argc, FtsAtom[] argv)
+  public void createEditor()
   {
     if(getEditorFrame() == null)	    
       setEditorFrame( new ExplodeWindow(this));
-    
+  }
+  public void openEditor(int argc, FtsAtom[] argv)
+  {
+    createEditor();  
     showEditor();
   }
   

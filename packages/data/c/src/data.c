@@ -386,6 +386,30 @@ propobj_set_property_by_name(propobj_t *self, fts_symbol_t name, const fts_atom_
 }
 
 void
+propobj_set_int_property_by_name(propobj_t *self, fts_symbol_t name, const fts_atom_t *value)
+{
+  propobj_property_t *prop = propobj_class_get_property_by_name(fts_object_get_class((fts_object_t *)self), name);  
+  fts_atom_t a;
+  
+  fts_set_int(&a, fts_get_number_int(value));
+  
+  if(prop != NULL)
+    propobj_set_property_by_index(self, prop->index, value);
+}
+
+void
+propobj_set_float_property_by_name(propobj_t *self, fts_symbol_t name, const fts_atom_t *value)
+{
+  propobj_property_t *prop = propobj_class_get_property_by_name(fts_object_get_class((fts_object_t *)self), name);
+  fts_atom_t a;
+  
+  fts_set_float(&a, fts_get_number_float(value));
+  
+  if(prop != NULL)
+    propobj_set_property_by_index(self, prop->index, value);
+}
+
+void
 propobj_remove_property(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   propobj_t *self = (propobj_t *)o;
@@ -541,7 +565,7 @@ propobj_get_descritption(propobj_t *self)
 }
 
 static void
-_set_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_default_set_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   propobj_t *self = (propobj_t *)o;
   
@@ -549,27 +573,23 @@ _set_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-_set_int_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_default_set_int_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   propobj_t *self = (propobj_t *)o;
-  fts_atom_t a;
-  
-  fts_set_int(&a, fts_get_number_int(at));
-  propobj_set_property_by_name(self, s, &a);
+
+  propobj_set_int_property_by_name(self, s, at);
 }
 
 static void
-_set_float_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_default_set_float_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   propobj_t *self = (propobj_t *)o;
-  fts_atom_t a;
-  
-  fts_set_float(&a, fts_get_number_float(at));
-  propobj_set_property_by_name(self, s, &a);
+
+  propobj_set_float_property_by_name(self, s, at);
 }
 
 static void
-_get_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_default_get_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   propobj_t *self = (propobj_t *)o;
   
@@ -602,43 +622,55 @@ propobj_class_insert_property(fts_class_t *cl, fts_symbol_t name, fts_symbol_t t
 }
 
 propobj_property_t * 
-propobj_class_add_int_property(fts_class_t *cl, fts_symbol_t name)
+propobj_class_add_int_property(fts_class_t *cl, fts_symbol_t name, fts_method_t set_method)
 {
   propobj_property_t *prop;
   
   fts_class_instantiate(cl);
   prop = propobj_class_insert_property(cl, name, fts_s_int);
   
-  fts_class_message_number(cl, name, _set_int_method);
-  fts_class_message_void(cl, name, _get_method);
+  if(set_method != NULL)
+    fts_class_message_number(cl, name, set_method);
+  else
+    fts_class_message_number(cl, name, _default_set_int_method);
+
+  fts_class_message_void(cl, name, _default_get_method);
   
   return prop;
 }
 
 propobj_property_t * 
-propobj_class_add_float_property(fts_class_t *cl, fts_symbol_t name)
+propobj_class_add_float_property(fts_class_t *cl, fts_symbol_t name, fts_method_t set_method)
 {
   propobj_property_t *prop;
   
   fts_class_instantiate(cl);
   prop = propobj_class_insert_property(cl, name, fts_s_float);
   
-  fts_class_message_number(cl, name, _set_float_method);
-  fts_class_message_void(cl, name, _get_method);
+  if(set_method != NULL)
+    fts_class_message_number(cl, name, set_method);
+  else
+    fts_class_message_number(cl, name, _default_set_float_method);
+  
+  fts_class_message_void(cl, name, _default_get_method);
   
   return prop;
 }
 
 propobj_property_t * 
-propobj_class_add_symbol_property(fts_class_t *cl, fts_symbol_t name)
+propobj_class_add_symbol_property(fts_class_t *cl, fts_symbol_t name, fts_method_t set_method)
 {
   propobj_property_t *prop;
   
   fts_class_instantiate(cl);
   prop = propobj_class_insert_property(cl, name, fts_s_symbol);
   
-  fts_class_message_symbol(cl, name, _set_method);
-  fts_class_message_void(cl, name, _get_method);
+  if(set_method != NULL)
+    fts_class_message_symbol(cl, name, set_method);
+  else
+    fts_class_message_symbol(cl, name, _default_set_method);
+  
+  fts_class_message_void(cl, name, _default_get_method);
   
   return prop;
 }

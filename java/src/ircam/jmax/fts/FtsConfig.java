@@ -149,12 +149,15 @@ public class FtsConfig extends FtsObjectWithEditor
 // 	e.printStackTrace(); 
 //       }
 //   }
-
-  public void openEditor(int nArgs, FtsAtom[] args)
+  public void createEditor()
   {
     if(getEditorFrame() == null)
       setEditorFrame( new ConfigurationEditor(this));
-    
+  }
+  
+  public void openEditor(int nArgs, FtsAtom[] args)
+  {
+    createEditor();  
     showEditor();
   }
 

@@ -97,12 +97,14 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
   //////////////////////////////////////////////////////////////////////////////////////
   //// MESSAGES called from the server
   //////////////////////////////////////////////////////////////////////////////////////
-  
-  public void openEditor(int argc, FtsAtom[] argv)
+  public void createEditor()
   {
     if(getEditorFrame() == null)
       setEditorFrame( new MatWindow(this));
-    
+  }
+  public void openEditor(int argc, FtsAtom[] argv)
+  {
+    createEditor();
     showEditor();
   }
   

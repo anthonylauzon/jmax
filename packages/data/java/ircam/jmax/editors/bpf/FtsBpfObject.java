@@ -96,12 +96,14 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
   //////////////////////////////////////////////////////////////////////////////////////
   //// MESSAGES called from fts.
   //////////////////////////////////////////////////////////////////////////////////////
-  
-  public void openEditor(int argc, FtsAtom[] argv)
+  public void createEditor()
   {
     if(getEditorFrame() == null)
-      setEditorFrame( new BpfWindow(this));
-    
+      setEditorFrame( new BpfWindow(this));    
+  }    
+  public void openEditor(int argc, FtsAtom[] argv)
+  {
+    createEditor();    
     showEditor();
   }
   

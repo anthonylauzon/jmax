@@ -59,6 +59,8 @@ struct _track_
 #define track_get_last(t) ((t)->last)
 #define track_get_size(t) ((t)->size)
 #define track_get_duration(t) (((t)->last)? (t)->last->time: 0.0)
+#define track_get_total_duration(t) \
+  ((track_get_markers(t))? (fmax(track_get_duration(track_get_markers(t)), track_get_duration(t))): (track_get_duration(t)))
 
 #define track_is_active(t) ((t)->active != 0)
 #define track_do_save_editor(t) ((t)->save_editor != 0)
@@ -93,6 +95,12 @@ extern event_t *track_get_next_by_time_after(track_t *track, double time, event_
 
 extern track_t *track_get_or_make_markers(track_t *track);
 extern scomark_t *track_insert_marker(track_t *track, double time, fts_symbol_t type);
+
+extern void track_segment_get(track_t *self, double begin, double end, event_t **first, event_t **after);
+extern void track_segment_shift(track_t *self, event_t *first, event_t *after, double begin, double end, double shift);
+extern void track_segment_stretch(track_t *self, event_t *first, event_t *after, double begin, double end, double stretch);
+extern void track_segment_quantize(track_t *self, event_t *first, event_t *after, double begin, double end, double quantize);
+extern void track_move_events_at_client(track_t *self, event_t *first, event_t *after);
 
 /** @name highlighting events in editor
  *  @{ */

@@ -374,12 +374,14 @@ public class FtsPackage extends FtsObjectWithEditor
     if( hasSummaryHelp)
       FtsHelpPatchTable.addSummary( name.toString(), dir + "/help/" + name + ".summary.jmax");
   }
-
-  public void openEditor(int nArgs, FtsAtom[] args)
+  public void createEditor()
   {
     if(getEditorFrame() == null)
       setEditorFrame( new ProjectEditor(this));
-    
+  }
+  public void openEditor(int nArgs, FtsAtom[] args)
+  {
+    createEditor();
     showEditor();
   }
   public void destroyEditor()

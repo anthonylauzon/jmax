@@ -76,12 +76,14 @@ public class FtsQListObject extends FtsObjectWithEditor {
   //////////////////////////////////////////////////////////////////////////////////////
   //// MESSAGES called from fts.
   //////////////////////////////////////////////////////////////////////////////////////
-
-  public void openEditor(int argc, FtsAtom[] argv)
+  public void createEditor()
   {
     if(getEditorFrame() == null)	    
       setEditorFrame( new QListWindow(this));
-	
+  }
+  public void openEditor(int argc, FtsAtom[] argv)
+  {
+    createEditor(); 
     showEditor();
   }
 

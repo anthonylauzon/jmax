@@ -38,7 +38,7 @@ double
 event_get_duration(event_t *event)
 {
   fts_atom_t *value = &event->value;
-  double duration = -1.0;
+  double duration = 0.0;
   
   if(fts_is_a(value, scoob_class))
   {
@@ -141,13 +141,11 @@ event_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   {
     fts_object_t *obj = (fts_object_t *)fts_get_object(&this->value);
     int i;
-    
     for(i=0; i<ac; i+=2)
     {
       if(ac > i + 1 && fts_is_symbol(at + i))
       {
         fts_symbol_t property = fts_get_symbol(at + i);
-        
         fts_send_message(obj, property, 1, at + i + 1);
       }
     }

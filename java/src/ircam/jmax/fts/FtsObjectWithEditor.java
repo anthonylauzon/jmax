@@ -35,6 +35,12 @@ import java.io.*;
 public abstract class FtsObjectWithEditor extends FtsUndoableObject {
   
   static{
+    FtsObject.registerMessageHandler( FtsObjectWithEditor.class, FtsSymbol.get("createEditor"), new FtsMessageHandler(){
+      public void invoke( FtsObject obj, FtsArgs args)
+    {
+        ((FtsObjectWithEditor)obj).createEditor();
+    }
+    });    
     FtsObject.registerMessageHandler( FtsObjectWithEditor.class, FtsSymbol.get("openEditor"), new FtsMessageHandler(){
       public void invoke( FtsObject obj, FtsArgs args)
       {
@@ -153,7 +159,8 @@ public abstract class FtsObjectWithEditor extends FtsUndoableObject {
 	e.printStackTrace(); 
       }
   }
-
+  
+  public abstract void createEditor();
   public abstract void openEditor(int argc, FtsAtom[] argv);
   public abstract void destroyEditor();
 

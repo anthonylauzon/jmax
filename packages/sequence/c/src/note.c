@@ -197,6 +197,30 @@ scoob_set_from_scoob(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   scoob_copy((scoob_t *)fts_get_object(at), self);
 }
 
+static void
+_scoob_stretch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  scoob_t *self = (scoob_t *)o;
+  double stretch = 1.0;
+  double duration = self->duration;
+  
+  switch(ac)
+  {
+    default:
+    case 2:
+      if(fts_is_number(at + 1))
+        duration = fts_get_number_float(at + 1);        
+    case 1:
+      if(fts_is_number(at))
+        stretch = fts_get_number_float(at);
+    case 0:
+      break;
+  }
+  
+  if(stretch > 0.0)
+    self->duration = (self->duration - duration) + duration * stretch;
+}  
+
 /*
  * MIDI properties 
  */
@@ -327,10 +351,10 @@ scoob_instantiate(fts_class_t *cl)
   /* types and properties */
   propobj_class_init(cl);
   
-  propobj_class_add_int_property(cl, seqsym_velocity); /* scoob_propidx_velocity = 0 */
-  propobj_class_add_int_property(cl, seqsym_channel); /* scoob_propidx_channel = 1 */
-  propobj_class_add_int_property(cl, seqsym_cue);
-  propobj_class_add_float_property(cl, seqsym_offset);
+  propobj_class_add_int_property(cl, seqsym_velocity, NULL); /* scoob_propidx_velocity = 0 */
+  propobj_class_add_int_property(cl, seqsym_channel, NULL); /* scoob_propidx_channel = 1 */
+  propobj_class_add_int_property(cl, seqsym_cue, NULL);
+  propobj_class_add_float_property(cl, seqsym_offset, NULL);
   
   fts_class_message_symbol(cl, fts_s_remove, propobj_remove_property);
   
@@ -356,6 +380,8 @@ scoob_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_set, scoob_set);
   fts_class_message(cl, fts_s_set, cl, scoob_set_from_scoob);
+  
+  fts_class_message_varargs(cl, seqsym_stretch, _scoob_stretch);
   
   fts_class_doc(cl, seqsym_scoob, "[<'note'|'interval'|'rest'|'trill'|'unvoiced': type> [<num: pitch> [<num: interval> [<num: duration>]]]]", "score object");
   fts_class_doc(cl, fts_s_set, "[<'note'|'interval'|'rest'|'trill'|'unvoiced': type> [<num: pitch> [<num: interval> [<num: duration>]]]]", "set sccob");

@@ -68,12 +68,14 @@ public class FtsIvecObject extends FtsObjectWithEditor
   {
     return ftsEditor;
   }
-  
-  public void openEditor(int argc, FtsAtom[] argv)
+  public void createEditor()
   {
     if(getEditorFrame() == null)
       setEditorFrame( new Tabler( this, ftsEditor));
-    
+  }
+  public void openEditor(int argc, FtsAtom[] argv)
+  {
+    createEditor();
     showEditor();
   }
   

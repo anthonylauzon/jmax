@@ -91,6 +91,9 @@ fts_symbol_t seqsym_save_editor = 0;
 fts_symbol_t seqsym_editor_state = 0;
 fts_symbol_t seqsym_set_editor = 0;
 fts_symbol_t seqsym_markers = 0;
+fts_symbol_t seqsym_shift = 0;
+fts_symbol_t seqsym_stretch = 0;
+fts_symbol_t seqsym_quantize = 0;
 
 /* messages from/to client */
 fts_symbol_t seqsym_addTracks = 0;
@@ -180,6 +183,9 @@ seqsym_config(void)
 	seqsym_editor_state = fts_new_symbol("editor_state");
 	seqsym_set_editor = fts_new_symbol("set_editor");
 	seqsym_markers = fts_new_symbol("markers");
+  seqsym_shift = fts_new_symbol("shift");
+  seqsym_stretch = fts_new_symbol("stretch");
+  seqsym_quantize = fts_new_symbol("quantize");
 		
   /* messages to client */
   seqsym_addTracks = fts_new_symbol("addTracks");
