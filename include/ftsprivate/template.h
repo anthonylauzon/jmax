@@ -24,9 +24,10 @@
 #define _FTS_PRIVATE_TEMPLATE_H_
 
 
-extern fts_template_t* fts_new_template(fts_symbol_t name, fts_symbol_t filename, fts_symbol_t original_filename);
+extern fts_template_t* fts_template_new(fts_symbol_t name, fts_symbol_t filename, fts_symbol_t original_filename);
 extern void fts_template_redefine(fts_template_t *template, fts_symbol_t filename);
 extern fts_symbol_t fts_template_get_filename(fts_template_t *template);
+extern void fts_template_set_filename(fts_template_t *template, fts_symbol_t filename);
 extern void fts_template_add_instance(fts_template_t *template, fts_object_t *object);
 extern void fts_template_remove_instance(fts_template_t *template, fts_object_t *object);
 

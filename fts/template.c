@@ -94,33 +94,21 @@ static fts_object_t* fts_make_template_instance(fts_template_t *template,
  *
  */
 fts_template_t* 
-fts_new_template(fts_symbol_t name, fts_symbol_t filename, fts_symbol_t original_filename)
+fts_template_new(fts_symbol_t name, fts_symbol_t filename, fts_symbol_t original_filename)
 {
-  char buf[MAXPATHLEN];
   fts_template_t *template;
-
-  /* resolve the links in the path, so that we have a unique name 
-     for the file */
-  
-  fprintf(stderr, "before realpath: file=%s\n", fts_symbol_name(filename));
-
-  realpath(fts_symbol_name(filename), buf);
-  filename = fts_new_symbol_copy(buf);
-
-  fprintf(stderr, "after realpath: file=%s\n", fts_symbol_name(filename));
 
   /* Make the template */
   template = (fts_template_t *) fts_heap_alloc(template_heap);
 
   template->name = name;
   template->filename = filename;
+  template->original_filename = original_filename;
   template->instances = 0;
 
 #ifdef TEMPLATE_DEBUG 
-  fprintf(stderr, "New template %s, file %s\n", fts_symbol_name(name), fts_symbol_name(filename)); /* @@@ */
+  fprintf(stderr, "New template %s, file %s\n", fts_symbol_name(name), fts_symbol_name(original_filename)); /* @@@ */
 #endif
-
-  template->original_filename = original_filename;
 
   return template;
 }
@@ -223,6 +211,17 @@ fts_template_get_filename(fts_template_t *template)
   return template->filename;
 }
 
+void 
+fts_template_set_filename(fts_template_t *template, fts_symbol_t filename)
+{
+  template->filename = filename;
+}
+
+fts_symbol_t 
+fts_template_get_original_filename( fts_template_t *template)
+{
+  return template->original_filename;
+}
 
 /***********************************************************************
  *
@@ -249,7 +248,7 @@ fts_template_new_declared(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
 
   while ( fts_iterator_has_more( &pkg_iter)) {
     fts_iterator_next( &pkg_iter, &pkg_name);
-    pkg = fts_get_package(fts_get_symbol(&pkg_name));
+    pkg = fts_package_get(fts_get_symbol(&pkg_name));
     
     if (pkg == NULL) {
       continue;
@@ -284,7 +283,7 @@ fts_template_new_search(fts_patcher_t *patcher,	int ac, const fts_atom_t *at, ft
 
   while ( fts_iterator_has_more( &pkg_iter)) {
     fts_iterator_next( &pkg_iter, &pkg_name);
-    pkg = fts_get_package(fts_get_symbol(&pkg_name));
+    pkg = fts_package_get(fts_get_symbol(&pkg_name));
     
     if (pkg == NULL) {
       continue;
@@ -335,11 +334,6 @@ fts_template_file_modified(fts_symbol_t filename)
       fts_template_recompute_instances(template);
     }
   }
-}
-
-fts_symbol_t fts_template_get_original_filename( fts_template_t *template)
-{
-  return template->original_filename;
 }
 
 

@@ -23,8 +23,12 @@
 #ifndef _FTS_PRIVATE_ABSTRACTION_H_
 #define _FTS_PRIVATE_ABSTRACTION_H_
 
-extern fts_abstraction_t* fts_new_abstraction(fts_symbol_t name, fts_symbol_t filename);
-extern fts_symbol_t fts_template_get_filename(fts_template_t *template);
+extern fts_abstraction_t* fts_abstraction_new(fts_symbol_t name, fts_symbol_t filename, fts_symbol_t original_filename);
+
+extern fts_symbol_t fts_abstraction_get_filename(fts_abstraction_t *abstraction);
+extern void fts_abstraction_set_filename(fts_abstraction_t *abstraction, fts_symbol_t filename);
+
+extern fts_symbol_t fts_abstraction_get_original_filename(fts_abstraction_t *abstraction);
 
 extern void fts_abstraction_init(void);
 

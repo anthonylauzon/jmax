@@ -146,7 +146,7 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_atom_t a;
   struct sockaddr_in my_addr;
   char *address;
-  unsigned short port = 0;
+  unsigned short port = 2023;
   const char *host = "127.0.0.1";
   struct hostent *hostptr;
   fts_symbol_t value;
@@ -154,11 +154,13 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   /*
    * Get values from command line args
    */
-  if ((value = fts_cmd_args_get( fts_new_symbol( "port"))))
-    port = atoi( fts_symbol_name( value));
-
   if ((value = fts_cmd_args_get( fts_new_symbol( "host"))))
     host = fts_symbol_name( value);
+  else 
+    return;
+
+  if ((value = fts_cmd_args_get( fts_new_symbol( "port"))))
+    port = atoi( fts_symbol_name( value));
 
   this->stream = (fts_cmd_args_get( fts_new_symbol( "tcp")) != NULL);
 
@@ -713,10 +715,6 @@ void fts_client_add_object(fts_object_t *obj)
 #ifdef OUTGOING_DEBUG_TRACE      
   fprintf_object( stderr, obj);
 #endif
-
-  if (obj && fts_object_get_id(obj) == FTS_NO_ID) {
-    int dummy = 0;
-  }
 
   oldclient_put_char( oldclient, OBJECT_CODE);
   fts_client_send_int( obj ? fts_object_get_id(obj) : 0);

@@ -54,11 +54,12 @@ struct fts_abstraction
 {
   fts_symbol_t name;
   fts_symbol_t filename;
+  fts_symbol_t original_filename;
 };
 
 
 fts_abstraction_t* 
-fts_new_abstraction(fts_symbol_t name, fts_symbol_t filename)
+fts_abstraction_new(fts_symbol_t name, fts_symbol_t filename, fts_symbol_t original_filename)
 {
   fts_abstraction_t *abs;
 
@@ -69,6 +70,7 @@ fts_new_abstraction(fts_symbol_t name, fts_symbol_t filename)
 
   abs->name = name;
   abs->filename = filename;
+  abs->original_filename = original_filename;
   
   return abs;
 }
@@ -77,6 +79,18 @@ fts_symbol_t
 fts_abstraction_get_filename(fts_abstraction_t *abstraction)
 {
   return abstraction->filename;
+}
+
+void
+fts_abstraction_set_filename(fts_abstraction_t *abstraction, fts_symbol_t filename)
+{
+  abstraction->filename = filename;
+}
+
+fts_symbol_t 
+fts_abstraction_get_original_filename(fts_abstraction_t *abstraction)
+{
+  return abstraction->original_filename;
 }
 
 

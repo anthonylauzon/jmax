@@ -25,21 +25,6 @@
 
 /***********************************************
  *
- *  Package registry
- */
-
-/**
- * Registers a new package to the FTS kernel. If the package already
- * exists, nothing is done. Otherwise, a new package object is created
- * and inserted in the list of known packages. 
- *
- * @fn void fts_register_package(fts_symbol_t name)
- * @param name the name of the package
- * @ingroup package */
-void fts_register_package(fts_symbol_t name);
-
-/***********************************************
- *
  *  Package context and package stack
  */
 
@@ -76,13 +61,22 @@ void fts_package_push(fts_package_t* pkg);
  * @ingroup package */
 void fts_package_pop(void);
 
+/**
+ * Loads a jmax file as a package
+ *
+ * @fn fts_package_t* fts_package_load_from_file(fts_symbol_t name, char* filename)
+ * @param name the name of the package
+ * @param filename the path to the jmax file
+ * @ingroup package */
+fts_package_t* fts_package_load_from_file(fts_symbol_t name, const char* filename);
+
 /***********************************************
  *
  *  Package
  */
 
 struct _fts_package_t {
-  fts_object_t ob;
+  fts_object_t object;
 
   fts_symbol_t name;
   fts_symbol_t dir;
@@ -108,14 +102,22 @@ struct _fts_package_t {
  *
  * @param name the name of the package
  * @return a new package or NULL in case of error
- */
-fts_package_t* new_fts_package(fts_symbol_t name);
+ * @ingroup package */
+fts_package_t* fts_package_new(fts_symbol_t name);
 
 /** Deletes the ressources allocated by this package.
  *
  * @param pkg the package
- */
-void delete_fts_package(fts_package_t* pkg);
+ * @ingroup package */
+void fts_package_delete(fts_package_t* pkg);
+
+/**
+ * Try to load all the default files such as the shared library.
+ *
+ * @fn void fts_package_load_default_files(fts_package_t* pkg)
+ * @param pkg the package
+ * @ingroup package */
+void fts_package_load_default_files(fts_package_t* pkg);
 
 /**
  * Explicitely sets the state of the package. This should normally not

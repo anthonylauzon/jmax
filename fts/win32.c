@@ -151,7 +151,7 @@ int fts_unlock_memory( void)
 
 char* win32_realpath(const char* path, char* resolved_path)
 {
-  return strcpy(resolved_path, path);
+  return NULL;
 }
 
 /* *************************************************************************** */
@@ -218,9 +218,9 @@ fts_get_root_from_registry(char *buf, int bufsize)
     post("Error opening registry key '%s'\n", JMAX_KEY);
     return 0;
   }
-  
+
   if (!fts_get_string_from_registry(key, "ftsRoot", buf, bufsize)) {
-    post("Failed reading value of registry key:\n\t%s\\ftsRoot\n", JMAX_KEY);
+    post("Failed to read the value of registry key: %s\\ftsRoot\n", JMAX_KEY);
     RegCloseKey(key);
     return 0;
   }
@@ -238,7 +238,7 @@ fts_get_default_root_directory( void)
   if (!fts_get_root_from_registry(root, _MAX_PATH)) {
 
     /* otherwise, calculate the root from the current directory */
-    if (_getcwd(root, _MAX_PATH) == NULL) {
+    if (GetCurrentDirectory(_MAX_PATH, root) == 0) {
       return NULL;
     }
     /* move one directory up */
@@ -251,5 +251,53 @@ fts_get_default_root_directory( void)
     }
   }
 
-  return fts_new_symbol( root);
+  return fts_new_symbol_copy( root);
 }
+
+fts_symbol_t 
+fts_get_user_config( void)
+{
+  char cwd[_MAX_PATH];
+  char path[_MAX_PATH];
+
+  /* check for a config file in the current directory */
+  if (GetCurrentDirectory(_MAX_PATH, cwd) == 0) {
+    return NULL;
+  }
+
+  fts_make_absolute_path(cwd, "config.jmax", path, _MAX_PATH);
+  if (fts_file_exists(path) && fts_is_file(path)) {
+    return fts_new_symbol_copy(path);
+  }
+
+  return NULL;
+}
+
+fts_symbol_t 
+fts_get_system_config( void)
+{
+  fts_symbol_t root;
+  char win[_MAX_PATH];
+  char path[_MAX_PATH];
+
+  /* check the config file in the root directory */
+  root = fts_get_default_root_directory();
+
+  fts_make_absolute_path(fts_symbol_name(root), "config\\config.jmax", path, _MAX_PATH);
+  if (fts_file_exists(path) && fts_is_file(path)) {
+    return fts_new_symbol_copy(path);
+  }
+
+  /* check the config file in the windows directory */
+  if (GetWindowsDirectory(win, _MAX_PATH) == 0) {
+    return NULL;
+  }
+
+  fts_make_absolute_path(win, "config.jmax", path, _MAX_PATH);
+  if (fts_file_exists(path) && fts_is_file(path)) {
+    return fts_new_symbol_copy(path);
+  }
+
+  return NULL;
+}
+

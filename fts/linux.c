@@ -57,6 +57,34 @@ fts_symbol_t fts_get_default_root_directory( void)
   return fts_new_symbol( DEFAULT_ROOT);
 }
 
+fts_symbol_t
+fts_get_user_config( void)
+{
+  char* home;
+  char path[MAXPATHLEN];
+
+  home = getenv("HOME");
+  fts_make_absolute_path(home, ".jmaxcf", path, _MAX_PATH);
+  if (fts_file_exists(path) && fts_is_file(path)) {
+    return new_fts_symbol_copy(path);
+  }
+
+  return NULL;
+}
+
+fts_symbol_t 
+fts_get_system_config( void)
+{
+  char path[MAXPATHLEN];
+
+  fts_make_absolute_path(DEFAULT_ROOT, "config/config.jmax", path, _MAX_PATH);
+  if (fts_file_exists(path) && fts_is_file(path)) {
+    return new_fts_symbol_copy(path);
+  }
+
+  return NULL;  
+}
+
 /***********************************************************************
  *
  * Dynamic loader

@@ -198,7 +198,7 @@ fts_metaclass_get_by_name(fts_symbol_t name)
 
   while ( fts_iterator_has_more( &pkg_iter)) {
     fts_iterator_next( &pkg_iter, &pkg_name);
-    pkg = fts_get_package(fts_get_symbol(&pkg_name));
+    pkg = fts_package_get(fts_get_symbol(&pkg_name));
     
     if (pkg == NULL) {
       continue;

@@ -93,6 +93,19 @@ fts_is_directory(const char *name)
   return ( stat( name, &statbuf) == 0) && (statbuf.st_mode & S_IFDIR);
 }
 
+void 
+fts_dirname(const char *name, char* buf, int size)
+{
+  int len = strlen(name);
+  
+  snprintf(buf, len, "%s", name);
+  while (--len >= 0) {
+    if (buf[len] == fts_file_separator) {
+      buf[len] = 0;
+    }
+  }
+}
+
 int 
 fts_file_correct_separators( char *filename)
 {
@@ -181,12 +194,22 @@ fts_file_is_text( fts_symbol_t file_name)
 char*
 fts_make_absolute_path(const char* parent, const char* file, char* buf, int len)
 {
+  char path[MAXPATHLEN];
+
   if (!fts_path_is_absolute(file) && (parent != NULL)) {
-    snprintf(buf, len, "%s%c%s", parent, fts_file_separator, file);
+    snprintf(path, len, "%s%c%s", parent, fts_file_separator, file);
   } else {
-    snprintf(buf, len, "%s", file);
+    snprintf(path, len, "%s", file);
   }
-  fts_file_correct_separators(buf);
+
+  /* correct possible separators */
+  fts_file_correct_separators(path);
+
+  /* try to resolve symbolic links */
+  if (realpath(path, buf) == NULL) {
+    snprintf(buf, len, "%s", path);      
+  } 
+
   return buf;
 }
 

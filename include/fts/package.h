@@ -51,14 +51,15 @@ FTS_API void fts_get_packages(fts_iterator_t* i);
 
 /**
  * Returns the package with the specified name or NULL if the package
- * is not registered.
+ * couldn't be found. The package might be loaded is it isn't loaded,
+ * yet.
  *
- * @fn fts_package_t* fts_get_package(fts_symbol_t name)
+ * @fn fts_package_t* fts_package_get(fts_symbol_t name)
  * @param name the name of the package
  * @return a pointer to the package or NULL if the package could not
  * be found
  * @ingroup package */
-FTS_API fts_package_t* fts_get_package(fts_symbol_t name);
+FTS_API fts_package_t* fts_package_get(fts_symbol_t name);
 
 /**
  * Package

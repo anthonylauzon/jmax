@@ -172,6 +172,48 @@ fts_symbol_t fts_get_root_directory( void)
   return fts_get_default_root_directory();
 }
 
+void fts_load_config( void)
+{
+  fts_symbol_t config;
+  fts_symbol_t config_file;
+  fts_package_t* project = NULL;
+
+  config = fts_new_symbol( "config");
+
+  /* check if the user specified a config file on the command line  */
+  config_file = fts_cmd_args_get( config);
+  if (config_file != NULL) {
+    project = fts_package_load_from_file(config, fts_symbol_name( config_file));
+  }
+
+  /* check if the user has a config file in the home directory  */
+  if (project == NULL) {
+    config_file = fts_get_user_config();
+    if (config_file != NULL) {
+      project = fts_package_load_from_file(config, fts_symbol_name( config_file));
+    }
+  }
+
+  /* check if there's a system wide config */
+  if (project == NULL) {
+    config_file = fts_get_system_config();
+    if (config_file != NULL) {
+      project = fts_package_load_from_file(config, fts_symbol_name( config_file));
+    }
+  }
+
+  /* create an empty project */
+  if (project == NULL) {
+    fprintf(stderr, 
+	    "starting fts with an empty project. "
+	    "this is probably not what you want. "
+	    "make sure you have a valid config file.");
+    project = fts_package_new(config);
+  }
+
+  /* make the project the current package context */
+  fts_package_push(project);
+}
 
 /***********************************************************************
  *
@@ -228,12 +270,12 @@ void fts_init( int argc, char **argv)
   fts_kernel_atom_init();
   fts_kernel_objtable_init();
   fts_kernel_list_init();
-  fts_kernel_package_init();
   fts_kernel_class_init();
+  fts_kernel_property_init();
+  fts_kernel_package_init();
   fts_kernel_objectset_init();
   fts_kernel_doctor_init();
   fts_kernel_connection_init();
-  fts_kernel_property_init();
   fts_kernel_oldftsdata_init();
   fts_kernel_oldpatcherdata_init();
   fts_kernel_variable_init();
@@ -261,6 +303,13 @@ void fts_init( int argc, char **argv)
   fts_kernel_olducs_init();
   fts_kernel_time_init();
 
+  fts_cmd_args_parse( argc, argv);
+
+  fts_platform_init();
+
+  fts_load_config();
+
+#if 0
   {
     fts_package_t* project;
 
@@ -293,10 +342,7 @@ void fts_init( int argc, char **argv)
 #else
 #endif
   }
-
-  fts_cmd_args_parse( argc, argv);
-
-  fts_platform_init();
+#endif
 
   fts_oldclient_start();
 }

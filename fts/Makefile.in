@@ -123,7 +123,7 @@ DIST_COMMON =  Makefile.am Makefile.in version.c.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = gtar
+TAR = tar
 GZIP_ENV = --best
 DEP_FILES =  .deps/@PLATFORM@.P .deps/OLDclient.P .deps/OLDftsdata.P \
 .deps/OLDpatcherdata.P .deps/OLDucs.P .deps/abstraction.P .deps/array.P \

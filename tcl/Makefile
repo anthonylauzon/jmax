@@ -16,7 +16,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ..
-prefix = /u/worksta/dechelle/projects/jmax/3.0.0/jmax-install
+prefix = /usr/local
 exec_prefix = ${prefix}
 
 bindir = ${exec_prefix}/bin
@@ -57,8 +57,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-host_alias = i686-pc-linux
-host_triplet = i686-pc-linux-gnu
+host_alias = i586-pc-cygwin
+host_triplet = i586-pc-cygwin
 AS = @AS@
 CC = gcc
 DLLTOOL = @DLLTOOL@

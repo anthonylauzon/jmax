@@ -38,7 +38,7 @@ fts_open_project(char* filename)
     sym_project = fts_new_symbol("_project_");
   }
   
-  fts_project = new_fts_package(sym_project);
+  fts_project = fts_package_new(sym_project);
   if (fts_project == NULL) {
     return NULL;
   }
@@ -71,7 +71,7 @@ fts_close_project(void)
   /* pop the project of the package context stack */
   fts_package_pop();
   
-  delete_fts_package(fts_project);
+  fts_package_delete(fts_project);
   fts_project = NULL; 
 
   return 0;

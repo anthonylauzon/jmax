@@ -46,7 +46,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   argv[argc++] = "fts";
 
-  /* Tokenize the command line and append them to the command line */
+  /* Tokenize the command line and append them to the command line arguments */
   s = lpszCmdLine;
 
   /* Basic state machine:

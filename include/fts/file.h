@@ -29,6 +29,8 @@ FTS_API int fts_is_file(const char *name);
 
 FTS_API int fts_is_directory(const char *name);
 
+FTS_API void fts_dirname(const char *name, char* buf, int size);
+
 /**
  *
  * @return 0 if the filename remained unchanged, 1 if it was changed
