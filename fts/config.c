@@ -108,6 +108,7 @@ config_save(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     
   fts_make_absolute_path( project_dir, file_name, path, MAXPATHLEN);
 
+  post("CONFIG SAVE \n");
   if (fts_bmax_file_open( &f, path, 0, 0, 0) >= 0)
   {
     /* write config object */
@@ -183,7 +184,8 @@ static void
 config_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   config_t* self = (config_t*)o;
-    
+  
+  fts_object_release((fts_object_t*)self->audio_config);
   fts_object_release((fts_object_t*)self->midi_config);
 }
 
