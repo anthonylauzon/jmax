@@ -25,11 +25,3 @@
 JMAXDISTDIR = ../../..
 include $(JMAXDISTDIR)/Makefiles/Makefile.fts
 
-lib-recursive:
-	(cd $(PLATFORM); $(MAKE) lib)
-.PHONY: lib-recursive
-
-cleanobjs-recursive:
-	(cd $(PLATFORM); $(MAKE) cleanobjs)
-.PHONY: cleanobjs-recursive
-
