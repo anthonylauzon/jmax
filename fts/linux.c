@@ -151,12 +151,41 @@ fts_symbol_t
 fts_get_user_configuration( int create)
 {
   char path[MAXPATHLEN];
-  fts_make_absolute_path(fts_get_default_user_directory(), fts_s_default_config, path, MAXPATHLEN);
-  if (fts_file_exists(path) && fts_is_file(path)) {
-    return fts_new_symbol(path);
-  }
+  char* p;
 
-  return NULL;  
+  fts_make_absolute_path(fts_get_default_user_directory(), fts_s_default_config, path, MAXPATHLEN);
+
+  if (!create)
+  {
+    if (fts_file_exists(path) && fts_is_file(path)) {
+      return fts_new_symbol(path);
+    }
+
+    return NULL;  
+  }
+  
+  if (fts_file_exists(path) && fts_is_file(path))
+    return fts_new_symbol(path);
+
+  /* create the directory if necessary */
+  p = path + 1;
+  while ((p = strchr( p, '/')) != NULL)
+  {
+    *p = '\0';
+    
+    fprintf( stderr, "Creating \"%s\"\n", path);
+    
+    if (mkdir( path, 0755) < 0)
+    {
+      if (errno != EEXIST)
+	return NULL;
+    }
+    
+    *p = '/';
+    p++;
+  }
+  
+  return fts_new_symbol( path);
 }
 
 fts_symbol_t 
