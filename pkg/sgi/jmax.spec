@@ -7,7 +7,7 @@ product jmax
         subsys exec default
             id "jMax environment"
             replaces self
-            exp jmax.sw.exec
+            exp ALL
         endsubsys
     endimage
 endproduct
