@@ -195,6 +195,7 @@ static fts_status_t oldclient_instantiate(fts_class_t *cl, int ac, const fts_ato
 
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, oldclient_init);
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, oldclient_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, oldclient_receive);
 
   return fts_Success;
 }

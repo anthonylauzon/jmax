@@ -84,7 +84,7 @@ int fts_sched_add( fts_object_t *obj, int flags, ...)
 {
   va_list ap;
   fts_sched_t *sched = fts_sched_get_current();
-  sched_callback_t *callback, **p;
+  sched_callback_t *callback;
   int fd = -1;
   fts_method_t mth;
 
@@ -92,33 +92,22 @@ int fts_sched_add( fts_object_t *obj, int flags, ...)
   if (flags == FTS_SCHED_READ || flags == FTS_SCHED_WRITE)
     fd = va_arg( ap, int);
 
-  /* Add the new entry at end of list, so that the functions will be called in
-     order of add */
-  p = &sched->callback_head;
-
-  while (*p)
+  mth = fts_class_get_method( fts_object_get_class(obj), fts_SystemInlet, fts_s_sched_ready);
+  if ( !mth)
     {
-      if ( (*p)->object == obj)
-	return -1;
-
-      p = &(*p)->next;
+      fprintf( stderr, "[sched] object %s does not define a method for \"sched_ready\"\n", fts_symbol_name( fts_get_class_name( fts_object_get_class(obj))));
+      return -1;
     }
 
   callback = (sched_callback_t *)fts_malloc( sizeof( sched_callback_t));
   callback->object = obj;
   callback->flags = flags;
   callback->fd = fd;
-
-  mth = fts_class_get_method( fts_object_get_class(obj), fts_SystemInlet, fts_s_sched_ready);
-  if ( !mth)
-    return -1;
-
   callback->ready_mth = mth;
   callback->error_mth = fts_class_get_method( fts_object_get_class(obj), fts_SystemInlet, fts_s_sched_error);
 
-  callback->next = 0;
-
-  *p = callback;
+  callback->next = sched->callback_head;
+  sched->callback_head = callback;
 
   va_end( ap);
 
