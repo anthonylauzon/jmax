@@ -22,7 +22,7 @@ public class Console extends Panel{
   KeyListener itsContainer;
 
   public Console(Interp i) {
-    StringBuffer sSbuf = new StringBuffer();
+    StringBuffer itsSbuf = new StringBuffer();
     itsTextArea = new TextArea(40, 40);
     itsInterp = i;
 
@@ -75,6 +75,21 @@ public class Console extends Panel{
     return itsTextArea;
   }
   
+  /**
+   * Utility function that allows the insertion of text
+   * in such a way that the next carriage return will EXECUTE it.
+   * Example: copy and paste.
+   */
+  public void PutInKeyboardBuffer(String s) {
+    itsKeyListener.sbuf.append(s);
+    Put(s);
+  }
+
+  /**
+   * Utility function that allows the insertion of text
+   * in such a way that the next carriage return will NOT execute it.
+   * (Example: system messages)
+   */
   public void PutLine(String s) {
     //e.m.text.insert(s + "\n", 100000);
     itsTextArea.append(s + "\n");

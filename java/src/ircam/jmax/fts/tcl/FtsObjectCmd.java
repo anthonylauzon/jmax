@@ -2,7 +2,7 @@ package ircam.jmax.fts.tcl;
 
 
 import tcl.lang.*;
-
+import java.util.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 
@@ -28,15 +28,21 @@ class FtsObjectCmd implements Command
     if (argv.length == 3)
       {
 	FtsObject object;
-	FtsContainerObject parent;
+	FtsContainerObject parent=null;
 	String    description;
 	TclObject properties;
 	String    className;
 
 	// Retrieve the arguments
 
-	parent = (FtsContainerObject) FtsContainerObject.containerStack.peek();
-	description = argv[1].toString();
+	try {
+	  parent = (FtsContainerObject) FtsContainerObject.containerStack.peek();
+	}
+	catch(EmptyStackException e) {
+	  throw new TclException(interp, " context not defined for 'object' command");
+	}
+	if (parent == null)  throw new TclException(interp, " context not defined for 'object' command");
+	  description = argv[1].toString();
 	properties = argv[2];
 
 	className = FtsParse.parseClassName(description);

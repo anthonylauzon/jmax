@@ -28,9 +28,9 @@ import java.awt.event.*;
 public class ConsoleKeyListener implements KeyListener {
   public static final int DELETE = 177;
   public static final int BACK_SPACE = 8;
-  /*private*/ public StringBuffer sbuf;
+  public StringBuffer sbuf;
   public int intercept = 0;
-  /*AppletConsole*/ Console console;
+  Console console;
   boolean itsControlDown = false;
 
     public ConsoleKeyListener(/*AppletConsole*/Console c) {

@@ -38,7 +38,8 @@ class ConsoleWriter extends OutputStream
 
   public void flush()
   {
-    itsConsole.getTextArea().append(buffer.toString());
+    itsConsole.Put(buffer.toString());
+    //itsConsole.getTextArea().append(buffer.toString());
     buffer.setLength(0);
   }
 

@@ -1,7 +1,6 @@
 package ircam.jmax.editors.console;
 
 import ircam.jmax.*;
-import ircam.jmax.editors.ermes.*;//this is just to access the clipboard. is going to desappear soon
 import ircam.jmax.dialogs.*;
 import java.io.*;
 import java.util.*;
@@ -57,7 +56,6 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
   // start of ClipboardOwner, Tranferable interface methods
   public void lostOwnership(Clipboard clipboard, Transferable contents) {
     //nun me ne po' frega' de meno
-    System.err.println("dice che non e' piu' mia la clipboard");
   }
   //--
   public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
@@ -90,10 +88,9 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
     try {
       aPastingString = (String) aTransferable.getTransferData(DataFlavor.plainTextFlavor);
     } catch (Exception e) {
-      System.err.println("e mi sono beccato pure una eccezione" + e.toString());
     }
 
-    itsConsole.Put(aPastingString);
+    itsConsole.PutInKeyboardBuffer(aPastingString);
 
     return true;
   }
