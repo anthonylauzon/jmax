@@ -18,20 +18,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
-# Based on Max/ISPW by Miller Puckette.
-#
-# Author: Francois Dechelle.
-#
 
 ROOTDIR=../..
 include $(ROOTDIR)/VERSION
 
-spec-files: jmax.spec
+spec-files: jmax.spec buildrpm
 
 jmax.spec: $(ROOTDIR)/VERSION
-	awk -v version=$(JMAX_VERSION) '\
-$$1 == "Version:" { printf( "Version: %s\n", version); } \
-$$1 != "Version:" { print} \
-' jmax.spec > jmax.spec.out
+	sed -e 's/Version:.*/Version: $(JMAX_VERSION)/' jmax.spec > jmax.spec.out
 	mv jmax.spec.out jmax.spec
 
+buildrpm: $(ROOTDIR)/VERSION
+	sed -e 's/JMAX_VERSION=.*/JMAX_VERSION=$(JMAX_VERSION)/' buildrpm > buildrpm.out
+	mv buildrpm.out buildrpm

@@ -1,36 +1,23 @@
 #!/bin/sh
-
-#
 # This scripts builds a rpm for jMax. 
-# It requires that the sources are located in ../..
 # 
-# The optional argument is the architecture of the rpm
-# (i386, i686, ppc)
-#
 
 # Note: on Mandrake, rpm building directories are in /usr/src/RPM...
 # add an option to specify it
 
+JMAX_VERSION=2.5.3
 
-if [ $# -ge 1 ]
-then
-    ARCH=$1
-else
-    ARCH=`arch`
-fi
+ARCH=`arch`
 
-# The root directory of sources
-ROOT_DIR=../..
+DISTFILE=jmax-$JMAX_VERSION-src.tar.gz
+BINARY_RPM=jmax-$JMAX_VERSION*.$ARCH.rpm 
+SOURCE_RPM=jmax-$JMAX_VERSION*.src.rpm
 
-sed -e 's/(/{/g' -e 's/)/}/g' $ROOT_DIR/VERSION > $$
-. ./$$
-rm $$
-
-DISTFILE=$ROOT_DIR/../jmax-$JMAX_VERSION-src.tar.gz
 cp -fv $DISTFILE /usr/src/redhat/SOURCES
 cp -fv jmax.spec /usr/src/redhat/SPECS
 
 (cd /usr/src/redhat/SPECS ; rpm -ba --target=$ARCH jmax.spec )
-cp /usr/src/redhat/RPMS/$ARCH/jmax-$JMAX_VERSION*.$ARCH.rpm $ROOT_DIR/..
-cp /usr/src/redhat/SRPMS/jmax-$JMAX_VERSION*.src.rpm $ROOT_DIR/..
-chmod 644 $ROOT_DIR/../jmax-$JMAX_VERSION*.$ARCH.rpm $ROOT_DIR/../jmax-$JMAX_VERSION*.src.rpm
+
+cp /usr/src/redhat/RPMS/$ARCH/$BINARY_RPM .
+cp /usr/src/redhat/SRPMS/$SOURCE_RPM .
+chmod 644 $BINARY_RPM $SOURCE_RPM

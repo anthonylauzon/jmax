@@ -1,21 +1,16 @@
 #!/bin/sh
 # This script builds a SGI package.
-# It requires that the sources are located in ../..
 #
+
+# jMax version
+JMAX_VERSION=2.5.3
 
 # Defaults
 DEFAULT_BUILD_DIR=/data/jmax-build/src
 DEFAULT_MAKE=/usr/freeware/bin/gmake
 
 # Constants
-
-ROOT_DIR=../..   # The root directory of jmax sources
-
-sed -e 's/(/{/g' -e 's/)/}/g' $ROOT_DIR/VERSION > $$
-. ./$$
-rm $$
-
-DISTFILE=$ROOT_DIR/../jmax-$JMAX_VERSION-src.tar.gz
+DISTFILE=jmax-$JMAX_VERSION-src.tar.gz
 SRCROOTDIR=jmax-$JMAX_VERSION
 TMP_IDB_SORTED=/tmp/$$.idb.sorted
 TMP_SPEC=/tmp/$$.pkgdef
@@ -121,10 +116,9 @@ build_it ()
 	/bin/rm -f $RAWIDB $TMP_IDB_SORTED $TMP_SPEC
     )
 
-    PRODUCT=`cat $SPEC_FILE | awk '$1 == "product" { print $2;}'`
-    TARDIST=$ROOT_DIR/../$PRODUCT-$JMAX_VERSION.$ARCH.tardist
+    TARDIST=jmax-$JMAX_VERSION.$ARCH.tardist
 
-    ( cd $BUILD_DIR ; tar cvf - $PRODUCT $PRODUCT.idb $PRODUCT.sw ) > $TARDIST
+    ( cd $BUILD_DIR ; tar cvf - jmax jmax.idb jmax.sw ) > $TARDIST
     chmod 644 $TARDIST
 
     /bin/rm -rf $BUILD_DIR
