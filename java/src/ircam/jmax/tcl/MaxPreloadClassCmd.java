@@ -27,3 +27,4 @@ class MaxPreloadClassCmd implements Command
       throw new TclNumArgsException(interp, 1, argv, "iconFilePath");
   }
 }
+

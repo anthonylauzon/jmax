@@ -112,11 +112,13 @@ class ErmesObjSlider extends ErmesObject {
   //***************************
 
   protected void FtsValueChanged(Object value) {
-
+    
     int temp = ((Integer) value).intValue();
+    
     int clippedValue = (temp<itsRangeMin)?itsRangeMin:((temp>=itsRangeMax)?itsRangeMax:temp);
     clippedValue-=itsRangeMin;
-    last_value = temp;
+    //slmlast_value = temp;
+    itsInteger = temp;
     if ((itsThrottle != null) && (!itsMovingThrottle)) {
       itsThrottle.Move(itsThrottle.itsX, (int)(itsY+currentRect.height-BOTTOM_OFFSET-2-clippedValue/itsStep));
       Paint_specific(itsSketchPad.getGraphics());
@@ -153,6 +155,7 @@ class ErmesObjSlider extends ErmesObject {
 	  //compute the value and send to FTS
 	  itsInteger = (int)(((itsY+currentRect.height)-y-BOTTOM_OFFSET)*itsStep);
 	  itsFtsObject.put("value", new Integer(itsInteger+itsRangeMin));
+	  
 	  itsThrottle.Move(itsThrottle.itsX, y-2);
 	  itsMovingThrottle = true;
 	  //double

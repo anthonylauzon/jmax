@@ -7,7 +7,8 @@ import java.util.*;
 /**
  * A 'software' oscilloscope.
  * This version works in a thread, in a "polling" mode.
- * Usage: create the oscilloscope with two arguments:
+ * Usage: create (also statically via the "makeOscilloscope" call)
+ * the oscilloscope with two arguments:
  * - The source of data (an object that implements the OscillSource interface)
  * - The refresh rate (in Hz)
  *  In the Oscilloscope window, press the start button to see 
@@ -38,6 +39,21 @@ public class Oscilloscope extends Frame implements  OscillSource{
   Thread itsTimingThread;
   Dimension preferredSize = new Dimension(350, 300);
   Dimension minimumSize = new Dimension(350, 300);
+  static Oscilloscope globalOscilloscope;
+
+  /**
+   * create a "global" oscilloscope that can be accessed statically via
+   * the "globalOscilloscope" field.
+   * 
+   */
+  public static void makeOscilloscope(OscillSource theSource, int freq) {
+    if (globalOscilloscope == null)
+      globalOscilloscope = new Oscilloscope(theSource, freq);
+    else {
+      globalOscilloscope.setSource(theSource);
+      globalOscilloscope.setFrequency(freq);
+    }
+  }
 
   class MainPanel extends Panel{
     int window[];

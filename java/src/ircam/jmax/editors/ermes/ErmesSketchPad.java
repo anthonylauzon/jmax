@@ -872,7 +872,8 @@ Rectangle previousResizeRect = new Rectangle();
   static public void RequestOffScreen(ErmesSketchPad theSketchPad) {
     if (lastSketchWithOffScreen == theSketchPad || theSketchPad.offScreenPresent) return;
     if (lastSketchWithOffScreen!=null) {
-      lastSketchWithOffScreen.itsHelper.deselectAll(true);
+      if (!lastSketchWithOffScreen.itsRunMode)
+	lastSketchWithOffScreen.itsHelper.deselectAll(true);
       lastSketchWithOffScreen.offScreenPresent = false;
     }
     theSketchPad.offScreenPresent = true;

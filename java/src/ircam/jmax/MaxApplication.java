@@ -161,7 +161,7 @@ public class MaxApplication extends Object
     try {
       jmaxProperties.put("jmaxVersion", MaxVersion.getMaxVersion());
     } catch (java.lang.NoClassDefFoundError e) {
-      jmaxProperties.put("jmaxVersion", "version not available");
+      jmaxProperties.put("jmaxVersion", "version info not available");
     }
     
     itsHookTable = new MaxWhenHookTable(); 
