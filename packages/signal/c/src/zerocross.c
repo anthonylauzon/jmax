@@ -71,7 +71,7 @@ zerocross_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_atom_t argv[3];
 
   fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
-  fts_set_ftl_data(argv + 3, this->data);
+  fts_set_ftl_data(argv + 1, this->data);
   fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
 
   fts_dsp_add_function(sym_zerocross_tilda, 3, argv);
