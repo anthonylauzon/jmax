@@ -215,6 +215,19 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
       e.printStackTrace(); 
     }    
   }
+  
+  public void requestAppendColumn()
+  {
+    try{
+      send( FtsSymbol.get("append_column"));
+    }
+    catch(IOException e)
+    {
+      System.err.println("FtsFMatObject: I/O Error sending append_column Message!");
+      e.printStackTrace(); 
+    }   
+  }
+  
   /************************************************************************************
   ** MatDataModel interface
   *************************************************************************************/
@@ -234,6 +247,11 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
   }
   
   public boolean haveRowIdCol()
+  {
+    return true;
+  }
+  
+  public boolean canAppendColumn()
   {
     return true;
   }

@@ -211,7 +211,19 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
     }
     catch(IOException e)
     {
-      System.err.println("FtsMatObject: I/O Error sending append Message!");
+      System.err.println("FtsMatObject: I/O Error sending append_row Message!");
+      e.printStackTrace(); 
+    }    
+  }
+  
+  public void requestAppendColumn()
+  {
+    try{
+      send( FtsSymbol.get("append_column"));
+    }
+    catch(IOException e)
+    {
+      System.err.println("FtsMatObject: I/O Error sending append_column Message!");
       e.printStackTrace(); 
     }    
   }
@@ -234,6 +246,11 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
   }
   
   public boolean haveRowIdCol()
+  {
+    return true;
+  }
+  
+  public boolean canAppendColumn()
   {
     return true;
   }

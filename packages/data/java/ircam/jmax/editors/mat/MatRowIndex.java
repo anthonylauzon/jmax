@@ -29,7 +29,7 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class MatRowIndex extends JPanel 
+public class MatRowIndex extends PopupToolbarPanel 
 {
 	
   public MatRowIndex(MatDataModel data, MatPanel panel)
@@ -72,6 +72,7 @@ public class MatRowIndex extends JPanel
         repaint();
       }
     });
+    popup = new RowIndexPopupMenu(this);
 }
 
 void updateSize()
@@ -96,6 +97,12 @@ int getRowIndex(int y)
   int rows = data.getRows();
   if( id > rows-1) id =  rows-1;
   return id;
+}
+
+public JPopupMenu getMenu()
+{
+	popup.update();
+	return popup;
 }
 
 public void paintComponent(Graphics g)
@@ -130,6 +137,7 @@ Dimension sixNumDimension = new Dimension(ROW_WIDTH+10, ROW_HEIGHT);
 FontMetrics fm;
 MatDataModel data;
 MatPanel matPanel;
+RowIndexPopupMenu popup;
 public final static int ROW_WIDTH = 38; 
 public final static int ROW_HEIGHT = MatWindow.DEFAULT_HEIGHT; 
 Font rowIndexFont;

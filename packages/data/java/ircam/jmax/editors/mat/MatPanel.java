@@ -150,7 +150,6 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
         topCorner.setMaximumSize(new Dimension( MatRowIndex.ROW_WIDTH, MatPanel.ROW_HEIGHT));
         westPanel.validate();
         validate();
-        itsContainer.getFrame().pack();
       }
       else
       {
@@ -158,7 +157,6 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
         topCorner.setMaximumSize(new Dimension(MatRowIndex.ROW_WIDTH+10, MatPanel.ROW_HEIGHT));
         westPanel.validate();
         validate();
-        itsContainer.getFrame().pack();
       }
     }
   }

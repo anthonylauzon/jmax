@@ -16,6 +16,7 @@
 				3B84FF2606AEAF6300862F13,
 				3BB5F25C06A696CD00739298,
 				3B513E2F06A4299A00F1664A,
+				3BA55E0606B2CCE800418694,
 			);
 			isa = PBXGroup;
 			name = mat;
@@ -296,6 +297,21 @@
 			isa = PBXTargetDependency;
 			target = 5C54272F05AB0B8B0042B7A2;
 			targetProxy = 3BA4061806A57ADA0097A99B;
+		};
+		3BA55E0606B2CCE800418694 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = RowIndexPopupMenu.java;
+			path = ../../packages/data/java/ircam/jmax/editors/mat/RowIndexPopupMenu.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3BA55E0706B2CCE800418694 = {
+			fileRef = 3BA55E0606B2CCE800418694;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 		3BA5DEB606789BC90010BF0D = {
 			fileEncoding = 30;
@@ -9291,6 +9307,7 @@
 				3BA9870606AD60A600D18F4E,
 				3B84FF2706AEAF6300862F13,
 				3B8B4B8A06AFC7E90067B1E0,
+				3BA55E0706B2CCE800418694,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;

@@ -19,45 +19,55 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-
 package ircam.jmax.editors.mat;
 
-import ircam.jmax.fts.*;
+import java.util.*;
+import java.awt.*;
+import java.awt.event.*;
+
+import javax.swing.*;
+import javax.swing.event.*;
+
 import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
 
-import java.util.Enumeration;
+public class RowIndexPopupMenu extends JPopupMenu 
+{
+  public RowIndexPopupMenu(MatRowIndex rowId)
+  {
+    super();
+    JMenuItem item;
+    rowIndex = rowId;
+    item = new JMenuItem("Add Row");
+    item.addActionListener( new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+	  	{
+        rowIndex.data.requestAppendRow();
+			}
+    });
+		
+    add(item);
+		
+    if(rowIndex.data.canAppendColumn())
+    {
+      item = new JMenuItem("Add Column");
+      item.addActionListener( new ActionListener(){
+        public void actionPerformed(ActionEvent e)
+	  	  {
+          rowIndex.data.requestAppendColumn();
+        }
+      });
+      add(item);
+    }	
+    pack();
+	}
 
-public interface MatDataModel {
+	public void update(){}
 
-    public abstract int getSize();
- 
-    public abstract int getRows();
-    
-    public abstract String getColumnName(int col_id);
-    
-    public abstract boolean haveRowIdCol();
-    
-    public abstract boolean canAppendColumn();
-    
-    public abstract int getColumns();
-    
-    public abstract void setSize(int m, int n);
-    
-    public abstract void setRows(int m);
-    
-    public abstract void setColumns(int n);
-        
-    public abstract Object getValueAt(int m, int n);
-    
-    public abstract void setValueAt(int m, int n, Object value);
-    
-    public abstract void addMatListener(MatDataListener theListener);
-    public abstract void removeMatListener(MatDataListener theListener);    
-    
-    public abstract void requestSetValue( java.lang.Object aValue, int rowIndex, int columnIndex);
-    public abstract void requestAppendRow();
-    public abstract void requestAppendColumn();
+	MatRowIndex rowIndex;
 }
+
+
 
 
 

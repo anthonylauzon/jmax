@@ -226,6 +226,9 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
       e.printStackTrace(); 
     }    
   }
+  
+  public void requestAppendColumn(){}
+
   /************************************************************************************
   ** MatDataModel interface
   *************************************************************************************/
@@ -245,6 +248,11 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
   }
   
   public boolean haveRowIdCol()
+  {
+    return false;
+  }
+  
+  public boolean canAppendColumn()
   {
     return false;
   }
