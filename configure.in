@@ -12,7 +12,7 @@ AC_SUBST(JMAX_VERSION)
 
 AM_INIT_AUTOMAKE(jmax,${JMAX_VERSION})
 
-dnl AM_CONFIG_HEADER(config.h)
+AM_CONFIG_HEADER(fts/config.h)
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -24,12 +24,13 @@ AC_PROG_INSTALL
 AC_LIBTOOL_DLOPEN
 AM_PROG_LIBTOOL
 
-CFLAGS=-DFTS_API=
+CFLAGS="-DFTS_API=extern -Wall -Wno-unused"
 
 dnl Checks for libraries.
 
 dnl Checks for header files.
 AC_HEADER_STDC
+AC_HAVE_HEADERS( sys/param.h unistd.h alloca.h sys/time.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
