@@ -365,12 +365,12 @@ sequence_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   int size = sequence_get_size(this);
 
   if(size == 0)
-    fts_spost(stream, "(:sequence)");
+    fts_spost(stream, "<sequence>");
   else
   {
     track_t *track = sequence_get_first_track(this);
 
-    fts_spost(stream, "(:sequence");
+    fts_spost(stream, "<sequence");
 
     while(track != NULL)
     {
@@ -387,7 +387,7 @@ sequence_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       track = track_get_next(track);
     }
 
-    fts_spost(stream, ")");
+    fts_spost(stream, ">");
   }
 }
 

@@ -51,6 +51,8 @@ FTS_API fts_class_t *fts_tuple_class;
 
 #define fts_tuple_get_atoms( t) (fts_array_get_atoms(&(t)->args))
 #define fts_tuple_get_size( t) (fts_array_get_size(&(t)->args))
-#define fts_tuple_get_element( t, i) (fts_array_get_element(&(t)->args, i))
+
+#define fts_tuple_get_element(t, i) (fts_array_get_element(&(t)->args, (i)))
+#define fts_tuple_set_element(t, i, a) (fts_array_get_element(&(t)->args, (i), (a)))
 
 #define fts_is_tuple(p) (fts_is_a(p, fts_tuple_class))

@@ -25,19 +25,37 @@
 
 #include <fts/packages/data/data.h>
 
-typedef struct _fmat_
+enum fmat_format_enum {
+  fmat_real = 0, 
+  fmat_rect, 
+  fmat_polar
+};
+
+typedef struct
+{
+  fts_symbol_t name;
+  int index;
+  int n_columns;
+  fts_symbol_t columns[16];
+} fmat_format_t;
+
+DATA_API fmat_format_t *fmat_format_real;
+DATA_API fmat_format_t *fmat_format_rect;
+DATA_API fmat_format_t *fmat_format_polar;
+
+typedef struct
 {
   data_object_t o;
   float *values;
   int m;
   int n;
   int alloc;
-
-  int opened; /* non zero if editor open */
+  double sr; /* sample rate */
+  double onset; /* fractional onset */
+  fmat_format_t *format;
+  int opened;
   fts_object_t *editor;
-
 } fmat_t;
-
 
 /**
  * @ingroup fmat
@@ -90,6 +108,11 @@ DATA_API void fmat_set_size(fmat_t *fmat, int m, int n);
  */
 #define fmat_set_element(m, i, j, x) ((m)->values[(i) * (m)->n + (j)] = (x))
 
+#define fmat_set_sr(fm, f) ((fm)->sr = (f))
+#define fmat_get_sr(fm) ((fm)->sr)
+
+#define fmat_set_onset(fm, f) ((fm)->onset = (f))
+#define fmat_get_onset(fm) ((fm)->onset)
 
 /**
  * @ingroup fmat

@@ -70,10 +70,6 @@ fvec_set_size(fvec_t *vec, int size)
       vec->alloc = size;
     }
 
-  /* when shortening: zero old values */
-  for(i=size; i<vec->m; i++)
-    vec->values[i] = 0.0;
-
   vec->m = size;
 }
 
@@ -1593,15 +1589,15 @@ fvec_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     {
       int i;
       
-      fts_spost(stream, "(:fvec");
+      fts_spost(stream, "<fvec");
       
       for(i=0; i<size; i++)
 	fts_spost(stream, " %.7g", fvec_get_element(this, i));
 
-      fts_spost(stream, ")");      
+      fts_spost(stream, ">");      
     }
   else
-    fts_spost(stream, "(:fvec %d)", size);
+    fts_spost(stream, "<fvec %d>", size);
 }
 
 static void

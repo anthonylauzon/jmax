@@ -309,17 +309,17 @@ vec_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   int size = vec_get_size(this);
 
   if(size == 0)
-    fts_spost(stream, "(:vec)");
+    fts_spost(stream, "<vec>");
   else if(size <= FTS_POST_MAX_ELEMENTS)
     {
       fts_atom_t *p = vec_get_ptr(this);
       
-      fts_spost(stream, "(:vec ", size);
+      fts_spost(stream, "<vec ", size);
       fts_spost_atoms(stream, size, p);
-      fts_spost(stream, ")");
+      fts_spost(stream, ">");
     }
   else
-    fts_spost(stream, "(:vec %d)", size);
+    fts_spost(stream, "<vec %d>", size);
 }
 
 static void

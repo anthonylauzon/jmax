@@ -162,14 +162,14 @@ mempost_object( char **pp, int *psize, int offset, fts_object_t *obj)
 	}
       }
       
-      n = mempost( pp, psize, offset, "(:");
+      n = mempost( pp, psize, offset, "<");
       n += mempost_atoms( pp, psize, offset + n, ac, at);
-      n += mempost( pp, psize, offset + n, ")");
+      n += mempost( pp, psize, offset + n, ">");
     }
     else if(fts_object_get_class_name(obj) != NULL)
-      n = mempost( pp, psize, offset, "(:%s)", fts_symbol_name(fts_object_get_class_name(obj)));
+      n = mempost( pp, psize, offset, "<%s>", fts_symbol_name(fts_object_get_class_name(obj)));
     else
-      n = mempost( pp, psize, offset, "(:\?\?\?)");
+      n = mempost( pp, psize, offset, "<\?\?\?>");
   }
   else
     n = mempost( pp, psize, offset, "<null object>");
@@ -401,9 +401,9 @@ fts_spost_object(fts_bytestream_t *stream, fts_object_t *obj)
 	      n += mempost( &post_buffer, &post_buffer_size, n, ")");
 	    }
 	  else if(fts_object_get_class_name(obj) != NULL)
-	    n += mempost( &post_buffer, &post_buffer_size, 0, "(:%s)", fts_symbol_name(fts_object_get_class_name(obj)));
+	    n += mempost( &post_buffer, &post_buffer_size, 0, "<%s>", fts_symbol_name(fts_object_get_class_name(obj)));
 	  else
-	    n += mempost( &post_buffer, &post_buffer_size, 0, "(:\?\?\?)");
+	    n += mempost( &post_buffer, &post_buffer_size, 0, "<\?\?\?>");
 	}
     }
   else

@@ -55,6 +55,12 @@ default_equals_function (const fts_atom_t * p1, const fts_atom_t * p2)
   return fts_get_object (p1) == fts_get_object (p2);
 }
 
+static void
+default_copy_function (const fts_atom_t * p1, fts_atom_t * p2)
+{
+  fts_set_object(p2, fts_get_object(p1));
+}
+
 fts_class_t *
 fts_class_install (fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 {
@@ -66,6 +72,7 @@ fts_class_install (fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 
   fts_class_set_hash_function (cl, default_hash_function);
   fts_class_set_equals_function (cl, default_equals_function);
+  fts_class_set_copy_function (cl, default_copy_function);
 
   if (name != NULL)
     {
@@ -617,6 +624,88 @@ fts_class_outlet_has_message (fts_class_t * cl, int woutlet,
     }
   else
     return 0;
+}
+
+/***********************************************************************
+ *
+ *  class documentation
+ *
+ */
+void
+fts_class_doc_post(fts_class_t *cl)
+{
+  fts_class_doc_t *doc = fts_class_get_doc(cl);
+  fts_symbol_t class_name = fts_class_get_name(cl);
+  enum {state_ready, state_constructor, state_messages} state = state_ready;
+  
+  if(class_name != NULL)
+  {
+    while(doc != NULL)
+    {
+      fts_symbol_t name = fts_class_doc_get_name(doc);
+      const char *args = fts_class_doc_get_args(doc);
+      const char *comment = fts_class_doc_get_comment(doc);
+      
+      if(args == NULL)
+        args = "";
+      
+      /* constructor */
+      if(name == class_name && state != state_messages)
+      {
+        fts_post("%s %s ... %s\n", fts_symbol_name(name), args, comment);
+        state = state_constructor;
+      }
+      else
+      {
+        switch(state)
+        {
+          case state_ready:
+            fts_post("%s\n", fts_symbol_name(class_name));
+          case state_constructor:
+            fts_post("{\n");
+          case state_messages:
+          default:
+            fts_post("  %s %s ... %s\n", fts_symbol_name(name), args, comment);
+            state = state_messages;
+            break;
+        }
+      }
+      
+      doc = fts_class_doc_get_next(doc);
+    }
+    
+    if(state == state_messages)
+      fts_post("}\n");
+  }
+}
+
+void
+method_post_doc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_class_t *cl = fts_object_get_class(o);
+  
+  fts_class_doc_post(cl);
+}
+
+void
+fts_class_doc(fts_class_t *cl, fts_symbol_t name, const char *args, const char *comment)
+{
+  fts_class_doc_t *line = fts_malloc(sizeof(fts_class_doc_t));
+  fts_class_doc_t **list = &cl->doc;
+  
+  line->name = name;
+  line->args = args;
+  line->comment = comment;
+  line->next = NULL;
+  
+  /* declare doc method */
+  if(cl->doc == NULL)
+    fts_class_message(cl, fts_s_doc, fts_void_class, method_post_doc);
+  
+  while(*list != NULL)
+    list = &((*list)->next);
+  
+  *list = line;
 }
 
 /***********************************************************************

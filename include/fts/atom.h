@@ -443,6 +443,16 @@ FTS_API int fts_atom_identical(const fts_atom_t *p1, const fts_atom_t *p2);
 FTS_API int fts_atom_equals(const fts_atom_t *p1, const fts_atom_t *p2);
 
 /**
+ * Copies an atom
+ * For objects the copy function of the class is used
+ *
+ * @param from pointer to original
+ * @param to pointer to copy
+ * @ingroup atom
+ */
+FTS_API void fts_atom_copy( const fts_atom_t *from, fts_atom_t *to);
+
+/**
  * Constant representing a 'void' atom
  * @ingroup atom
  */

@@ -630,9 +630,9 @@ mat_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   int size = m * n;
   
   if(size == 0)
-    fts_spost(stream, "(:mat)");
+    fts_spost(stream, "<mat>");
   else
-    fts_spost(stream, "(:mat %d %d)", m, n);
+    fts_spost(stream, "<mat %d %d>", m, n);
 }
 
 static void

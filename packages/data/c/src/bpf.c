@@ -396,15 +396,15 @@ bpf_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   {
     int i;
 
-    fts_spost(stream, "(:bpf");
+    fts_spost(stream, "<bpf");
       
     for(i=0; i<this->size; i++)
       fts_spost(stream, " %.7g %.7g", this->points[i].time, this->points[i].value);
       
-    fts_spost(stream, ")");
+    fts_spost(stream, ">");
   }
   else
-    fts_spost(stream, "(:bpf)");
+    fts_spost(stream, "<bpf>");
 }
 
 static void

@@ -92,12 +92,14 @@ dict_remove_all(dict_t *dict)
   fts_hashtable_clear(&dict->hash);
 }
 
-void
+static void
 dict_copy(dict_t *org, dict_t *copy)
 {
   fts_iterator_t key_iterator;
   fts_iterator_t value_iterator;
 
+  dict_remove_all(copy);
+  
   /* iterate on org hash table */
   fts_hashtable_get_keys(&org->hash, &key_iterator);
   fts_hashtable_get_values(&org->hash, &value_iterator);
@@ -106,17 +108,25 @@ dict_copy(dict_t *org, dict_t *copy)
   {
     fts_atom_t key;
     fts_atom_t value;
+    fts_atom_t value_copy;
 
     /* get key */
     fts_iterator_next(&key_iterator, &key);
     fts_iterator_next(&value_iterator, &value);
 
-    /* claim entry */
-    fts_atom_refer(&value);
+    /* copy entry */
+    fts_atom_copy(&value, &value_copy);
+    fts_atom_refer(&value_copy);
 
     /* store entry to copy hash table */
-    fts_hashtable_put(&copy->hash, &key, &value);
+    fts_hashtable_put(&copy->hash, &key, &value_copy);
   }
+}
+
+static void
+dict_copy_function(const fts_atom_t *from, fts_atom_t *to)
+{
+  dict_copy((dict_t *)fts_get_object(from), (dict_t *)fts_get_object(to));
 }
 
 /**********************************************************
@@ -126,52 +136,50 @@ dict_copy(dict_t *org, dict_t *copy)
  */
 
 static void
-dict_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  dict_t *this = (dict_t *)o;
-  
-  if(ac > 0 && (fts_is_symbol(at) || fts_is_int(at)))
-    {
-      if(ac > 1)
-	dict_store_atoms(this, at, ac - 1, at + 1);
-      else
-	dict_remove(this, at);	
-    }
-}
-
-static void
-dict_return_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  dict_t *this = (dict_t *)o;
-  
-  if(ac > 0 && (fts_is_symbol(at) || fts_is_int(at)))
-  {
-    fts_atom_t a;
-
-    if(fts_hashtable_get(&this->hash, at, &a))
-      fts_return(&a);
-    else if(fts_is_symbol(at))
-      fts_object_error(o, "no entry for %s", fts_symbol_name(fts_get_symbol(at)));
-    else if(fts_is_int(at))
-      fts_object_error(o, "no entry for %d", fts_get_int(at));
-  }
-}
-
-static void
 dict_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dict_t *this = (dict_t *)o;
-
+  
   dict_remove_all(this);
 }
 
 static void
-dict_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dict_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dict_t *this = (dict_t *)o;
-  dict_t *in = (dict_t *)fts_get_object(at);
   
-  dict_copy(in, this);
+  if(ac > 1 && (fts_is_symbol(at) || fts_is_int(at)))
+    dict_store_atoms(this, at, ac - 1, at + 1);
+}
+
+static void
+dict_remove_entry(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dict_t *this = (dict_t *)o;
+  
+  dict_remove(this, at);	
+}
+
+static void
+_dict_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dict_t *this = (dict_t *)o;
+  fts_atom_t a;
+  
+  if(fts_hashtable_get(&this->hash, at, &a))
+    fts_return(&a);
+  else if(fts_is_symbol(at))
+    fts_object_error(o, "no entry for %s", fts_symbol_name(fts_get_symbol(at)));
+  else if(fts_is_int(at))
+    fts_object_error(o, "no entry for %d", fts_get_int(at));
+}
+
+static void
+dict_set_from_dict(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dict_t *this = (dict_t *)o;
+
+  dict_copy((dict_t *)fts_get_object(at), this);
 }
 
 static void
@@ -524,7 +532,7 @@ dict_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
 
-  fts_spost(stream, "(:dict)");
+  fts_spost(stream, "<dict>");
 }
 
 static void
@@ -620,7 +628,7 @@ dict_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_dump_state, dict_dump_state);
   fts_class_message_varargs(cl, fts_s_dump, dict_dump);
 
-  fts_class_message_varargs(cl, fts_s_set_from_instance, dict_set_from_instance);
+  fts_class_message_varargs(cl, fts_s_set_from_instance, dict_set_from_dict);
   fts_class_message_varargs(cl, fts_s_get_tuple, dict_get_keys);
 
   fts_class_message_varargs(cl, fts_s_post, dict_post);
@@ -629,16 +637,30 @@ dict_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_import, dict_import);
   fts_class_message_varargs(cl, fts_s_export, dict_export);
   
-  fts_class_message_varargs(cl, fts_s_set, dict_set);
-  fts_class_message_varargs(cl, fts_s_clear, dict_clear);
+  fts_class_message_void(cl, fts_s_clear, dict_clear);
 
-  fts_class_message_number(cl, fts_s_get_element, dict_return_element);
-  fts_class_message_symbol(cl, fts_s_get_element, dict_return_element);
+  fts_class_message_varargs(cl, fts_s_set, dict_set);
+  fts_class_message_number(cl, fts_s_set, dict_remove_entry);
+  fts_class_message_symbol(cl, fts_s_set, dict_remove_entry);
+  
+  fts_class_message_number(cl, fts_s_remove, dict_remove_entry);
+  fts_class_message_symbol(cl, fts_s_remove, dict_remove_entry);
+
+  fts_class_message_number(cl, fts_s_get_element, _dict_get_element);
+  fts_class_message_symbol(cl, fts_s_get_element, _dict_get_element);
   
   fts_class_inlet_bang(cl, 0, data_object_output);
 
   fts_class_inlet_thru(cl, 0);
   fts_class_outlet_thru(cl, 0);
+
+  fts_class_set_copy_function(cl, dict_copy_function);
+
+  fts_class_doc(cl, dict_symbol, "[<sym|int: key> <any: value> ...]", "dictionary");
+  fts_class_doc(cl, fts_s_clear, NULL, "erase all entries");
+  fts_class_doc(cl, fts_s_set, "<sym|int: key> <any: value>", "set entry");
+  fts_class_doc(cl, fts_s_remove, "<sym|int: key>", "remove entry");
+  fts_class_doc(cl, fts_s_print, NULL, "print list of entries");
 }
 
 void

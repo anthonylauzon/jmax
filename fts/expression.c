@@ -514,6 +514,8 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
       {
 	/* it is a plain parenthized term */
 	ret[0] = at[0];
+      
+      fts_atom_refer(ret);
 
 	expression_stack_pop_frame( exp);
 

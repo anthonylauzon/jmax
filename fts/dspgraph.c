@@ -371,12 +371,12 @@ post_object( fts_object_t *obj)
 
   if(ac > 0)
     {
-      fts_post("(:");
+      fts_post("<");
       fts_post_atoms(ac, at);
-      fts_post(") ");
+      fts_post("> ");
     }
   else
-    fts_post("(:\?\?\?) ");
+    fts_post("<\?\?\?> ");
 }
 #endif
 

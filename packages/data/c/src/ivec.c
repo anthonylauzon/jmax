@@ -655,15 +655,15 @@ ivec_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     {
       int i;
       
-      fts_spost(stream, "(:ivec");
+      fts_spost(stream, "<ivec");
       
       for(i=0; i<size; i++)
 	fts_spost(stream, " %d", ivec_get_element(this, i));
 
-      fts_spost(stream, ")");
+      fts_spost(stream, ">");
     }
   else
-    fts_spost(stream, "(:ivec %d)", size);
+    fts_spost(stream, "<ivec %d>", size);
 }
 
 static void

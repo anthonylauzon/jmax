@@ -475,12 +475,12 @@ cvec_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   complex *p = cvec_get_ptr(this);
 
   if(size == 0)
-    fts_spost(stream, "(:cvec)");
+    fts_spost(stream, "<cvec>");
   else if(size <= FTS_POST_MAX_ELEMENTS)
     {
       int i;
       
-      fts_spost(stream, "(:cvec", size);
+      fts_spost(stream, "<cvec");
       
       for(i=0; i<size; i++)
       {
@@ -488,10 +488,10 @@ cvec_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
         fts_spost_complex(stream, p[i].re, p[i].im);
       }
       
-      fts_spost(stream, ")");
+      fts_spost(stream, ">");
     }
   else
-    fts_spost(stream, "(:cvec %d)", size);
+    fts_spost(stream, "<cvec %d>", size);
 }
 
 static void

@@ -84,13 +84,27 @@ fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2)
 	      fts_class_t *class = fts_object_get_class(obj);
 	      fts_equals_function_t equals = fts_class_get_equals_function(class);
 
-	      if(fts_class_get_equals_function(class) != NULL)
-		return (*equals)(p1, p2);
+              return (*equals)(p1, p2);
 	    }
 	}
     }
   
   return 0;
+}
+
+void
+fts_atom_copy( const fts_atom_t *from, fts_atom_t *to)
+{
+  if(fts_is_object(from))
+  {
+    fts_object_t *obj = fts_get_object(from);
+    fts_class_t *class = fts_object_get_class(obj);
+    fts_copy_function_t copy = fts_class_get_copy_function(class);
+    
+    (*copy)(from, to);
+  }
+  else
+    *to = *from;
 }
 
 /***********************************************************************

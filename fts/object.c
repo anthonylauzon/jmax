@@ -207,4 +207,3 @@ fts_object_reset_client(fts_object_t *obj)
     fts_client_release_object(obj);
   }
 }
-
