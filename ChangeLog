@@ -1,5 +1,7 @@
 2003-10-27  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* packages/data/java/ircam/jmax/editors/bpf/FtsBpfObject.java (append): fixed bug "[ 827862 ] bpf persistence buggy".
+
 	* packages/ispw/c/src/delwrite.c (delwrite_init): fixed bug "[ 822061 ] delwrite~ causes jmax crash".
 	Use "default" as default name instead of NULL pointer.
 
