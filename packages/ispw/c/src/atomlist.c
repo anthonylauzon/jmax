@@ -51,16 +51,6 @@ fts_symbol_t sym_atomlist_update = 0;
 /*                                                                              */
 /********************************************************************************/
 
-#define FTS_ATOM_LIST_CELL_MAX_ATOMS 16
-
-typedef struct fts_atom_list_cell
-{
-  int n;
-  fts_atom_t atoms[FTS_ATOM_LIST_CELL_MAX_ATOMS];
-  struct fts_atom_list_cell *next;
-} fts_atom_list_cell_t;
-
-
 static fts_atom_list_cell_t *fts_atom_list_cell_new( void )
 {
   fts_atom_list_cell_t *cell;
@@ -94,17 +84,6 @@ static void fts_atom_list_cell_free( fts_atom_list_cell_t *cell)
 /*                           Atom List                                          */
 /*                                                                              */
 /********************************************************************************/
-
-struct fts_atom_list
-{
-  fts_object_t ob;
-
-  fts_symbol_t name;	       /* list name */
-  int size;
-  fts_atom_list_cell_t *head;
-  fts_atom_list_cell_t *tail;
-};
-
 
 static void fts_atom_list_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -264,6 +243,22 @@ static void fts_atom_list_update( fts_object_t *o, int winlet, fts_symbol_t s, i
 #ifndef HAVE_ALLOCA
     free(a);
 #endif
+}
+
+void fts_atom_list_get_atoms( fts_atom_list_t *list, fts_atom_t *a)
+{
+  fts_atom_list_iterator_t *iterator;
+  int i =0;
+
+  iterator = fts_atom_list_iterator_new( list);
+  
+  while (! fts_atom_list_iterator_end(iterator))
+    {
+      a[i] = *fts_atom_list_iterator_current(iterator);
+      fts_atom_list_iterator_next(iterator);
+      i++;
+    }  
+  fts_atom_list_iterator_free(iterator);
 }
 
 /* Check for subsequences */

@@ -24,11 +24,28 @@
 
 #include "ispw.h"
 
-struct fts_atom_list;
+#define FTS_ATOM_LIST_CELL_MAX_ATOMS 16
+
+typedef struct fts_atom_list_cell
+{
+  int n;
+  fts_atom_t atoms[FTS_ATOM_LIST_CELL_MAX_ATOMS];
+  struct fts_atom_list_cell *next;
+} fts_atom_list_cell_t;
+
+struct fts_atom_list
+{
+  fts_object_t ob;
+
+  fts_symbol_t name;	       /* list name */
+  int size;
+  fts_atom_list_cell_t *head;
+  fts_atom_list_cell_t *tail;
+};
+
 typedef struct fts_atom_list fts_atom_list_t;
 
-/*fts_atom_list_t *fts_atom_list_new( void);
-  void fts_atom_list_free( fts_atom_list_t *list);*/
+#define fts_atom_list_get_size(l)    ((l)->size)
 
 ISPW_API fts_metaclass_t *atomlist_type;
 ISPW_API fts_symbol_t sym_atomlist_set_name;
@@ -37,6 +54,7 @@ ISPW_API fts_symbol_t sym_atomlist_update;
 ISPW_API void fts_atom_list_clear( fts_atom_list_t *list);
 ISPW_API void fts_atom_list_append( fts_atom_list_t *list, int ac, const fts_atom_t *atom);
 ISPW_API void fts_atom_list_set( fts_atom_list_t *list, int ac, const fts_atom_t *atom);
+ISPW_API void fts_atom_list_get_atoms( fts_atom_list_t *list, fts_atom_t *a);
 ISPW_API int  fts_atom_list_is_subsequence( fts_atom_list_t *list, int ac, const fts_atom_t *at);
 
 /* Iterators */

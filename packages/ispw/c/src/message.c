@@ -522,20 +522,29 @@ static int messbox_list_is_primitive(int ac, const fts_atom_t *at)
   return 1;
 }
 
+static fts_memorystream_t *message_memory_stream ;
+
+static fts_memorystream_t * message_get_memory_stream()
+{
+  if( !message_memory_stream)
+    message_memory_stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_type, 0, 0);
+  return message_memory_stream;
+}
+
 static void fts_client_send_message_from_atom_list(fts_object_t *obj, fts_symbol_t selector, fts_atom_list_t *atom_list)
 {
-  fts_atom_list_iterator_t *iterator = fts_atom_list_iterator_new(atom_list);
+  fts_memorystream_t *stream = message_get_memory_stream();
+  int size = fts_atom_list_get_size( atom_list);
+  fts_atom_t a[ size];
+  fts_atom_list_get_atoms( atom_list, a);
+  
+  fts_memorystream_reset( stream);      
+  fts_spost_object_description_args( (fts_bytestream_t *)stream, size, a);
+  fts_memorystream_output_char((fts_bytestream_t *)stream,'\0');
 
   fts_client_start_message(obj, fts_s_set);
-
-  while (! fts_atom_list_iterator_end(iterator))
-    {
-      fts_client_add_atoms(obj, 1, fts_atom_list_iterator_current(iterator));
-      fts_atom_list_iterator_next(iterator);
-    }
-
+  fts_client_add_string( obj, fts_memorystream_get_bytes( stream));
   fts_client_done_message(obj);
-  fts_atom_list_iterator_free(iterator);
 }
 
 static void messbox_update(fts_object_t *o)
@@ -768,6 +777,12 @@ static void messbox_send_properties(fts_object_t *o, int winlet, fts_symbol_t s,
   messbox_update(o);
 }
 
+static void
+messbox_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc-1, o->argv+1);
+}
+
 /************************************************************
  *
  *  class
@@ -802,6 +817,7 @@ static fts_status_t messbox_instantiate(fts_class_t *cl, int ac, const fts_atom_
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, messbox_save_dotpat); 
 
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_send_properties, messbox_send_properties); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_spost_description, messbox_spost_description); 
 
   fts_method_define_varargs(cl, 0, fts_s_bang, messbox_eval);
   fts_method_define_varargs(cl, 0, fts_s_int, messbox_eval);

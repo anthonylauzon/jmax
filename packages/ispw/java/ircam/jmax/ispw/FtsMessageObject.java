@@ -47,7 +47,7 @@ public class FtsMessageObject extends FtsIntValueObject
     FtsObject.registerMessageHandler( FtsMessageObject.class, FtsSymbol.get("set"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsMessageObject)obj).setCurrentMessage(args.getLength(), args.getAtoms());
+	  ((FtsMessageObject)obj).setCurrentMessage( args.getString( 0));
 	}
       });
   }
@@ -98,9 +98,9 @@ public class FtsMessageObject extends FtsIntValueObject
   
   /** Over write the handle message to handle message box changes. */
   
-  public void setCurrentMessage(int nArgs, FtsAtom args[])
+  public void setCurrentMessage(String mess)
   {
-    this.message = FtsMessageObject.preParseMessage( FtsUnparse.unparseArguments(args, 0, nArgs));
+    message = FtsMessageObject.preParseMessage( mess);
     ((FtsMessageListener) listener).messageChanged(message);
   }
 
