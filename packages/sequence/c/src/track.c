@@ -1221,18 +1221,22 @@ track_remove_events_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int
 {
   track_t *self = (track_t *)o;
   int i;
-  
+ 
   if(fts_class_get_name( track_get_type(self)) == seqsym_scomark)
-    marker_track_unset_tempo_on_selection(self, ac, at);
-  
-  /*  remove event objects from client */
-  fts_client_send_message((fts_object_t *)self, seqsym_removeEvents, ac, at);
-  
-  for(i=0; i<ac; i++)
   {
-    fts_object_t *event = fts_get_object(at + i);
-    track_remove_event(self, (event_t *)event);
-  }
+		marker_track_unset_tempo_on_selection(self, ac, at);
+		marker_track_remove_events(self, ac, at);
+	}
+	else
+	{
+		for(i=0; i<ac; i++)
+		{
+			fts_object_t *event = fts_get_object(at + i);
+			track_remove_event(self, (event_t *)event);
+		}
+	}
+	 /*  remove event objects from client */
+  fts_client_send_message((fts_object_t *)self, seqsym_removeEvents, ac, at);
 	
   fts_object_set_state_dirty((fts_object_t *)self);
 }
