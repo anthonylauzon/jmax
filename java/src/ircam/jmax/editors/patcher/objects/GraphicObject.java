@@ -308,6 +308,11 @@ abstract public class GraphicObject implements DisplayObject
       }
   }
 
+  public void setColor(int color)
+  {
+    ftsObject.setColor(color);
+  }
+
   public Font getFont() 
   {
     return itsFont;
@@ -968,6 +973,8 @@ abstract public class GraphicObject implements DisplayObject
     if (dy != 0)
       setY( ftsObject.getY() + dy);
   }
+
+  public void resizing(boolean isResizing){}
 
   // Get the bounds in a rectangle
 

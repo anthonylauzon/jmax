@@ -82,15 +82,15 @@ class ErmesToolButton extends JToggleButton
     /*****************/
     //jdk117-->jdk1.3//
     /*ImageObserver observer =  new ImageObserver(){
-      public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height)
-      {
-      return true;
-      }
-      };	
-      Image image = Toolkit.getDefaultToolkit().getImage(cursorName);
-      Toolkit.getDefaultToolkit().prepareImage(image, 64, 64, observer);
-      Cursor cursor = Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(0,1), description+" cursor");
-      Cursors.loadCursor(description, cursor);*/
+	    public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height)
+	    {
+		return true;
+	    }
+	};	
+    Image image = Toolkit.getDefaultToolkit().getImage(cursorName);
+    Toolkit.getDefaultToolkit().prepareImage(image, 64, 64, observer);
+    Cursor cursor = Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(0,1), description+" cursor");
+    Cursors.loadCursor(description, cursor);*/
     /*****************/
 
     addMouseListener(ErmesToolButton.mListener);

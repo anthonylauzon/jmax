@@ -54,9 +54,20 @@ class HResizeInteraction extends Interaction
       {
 	object = (GraphicObject) area.getTarget();
 	editor.setCursor( Cursor.getPredefinedCursor( Cursor.E_RESIZE_CURSOR));
+
+	if((!object.isSelected())||
+	   ((object.isSelected())&&(ErmesSelection.patcherSelection.isSingleton())))
+	    object.resizing(true);
+	else
+	    if(ErmesSelection.patcherSelection.ownedBy(editor))
+		ErmesSelection.patcherSelection.apply(new ObjectAction() {
+			public void processObject(GraphicObject obj)
+			{
+			    obj.resizing(true);
+			}});
       }
     else if (Squeack.isDrag(squeack))
-      {
+      {	  
 	  if(!Squeack.isShift(squeack))
 	      {
 		  if((!object.isSelected())||
@@ -113,8 +124,19 @@ class HResizeInteraction extends Interaction
       }
     else if (Squeack.isUp(squeack))
       {
-	editor.setCursor(Cursor.getDefaultCursor());
-	editor.endInteraction();
+	  if((!object.isSelected())||
+	     ((object.isSelected())&&(ErmesSelection.patcherSelection.isSingleton())))
+	      object.resizing(false);
+	  else
+	      if(ErmesSelection.patcherSelection.ownedBy(editor))
+		  ErmesSelection.patcherSelection.apply(new ObjectAction() {
+			  public void processObject(GraphicObject obj)
+			  {
+			      obj.resizing(false);
+			  }});
+							   
+	  editor.setCursor(Cursor.getDefaultCursor());
+	  editor.endInteraction();
       }
   }
 }

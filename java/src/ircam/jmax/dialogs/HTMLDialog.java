@@ -80,7 +80,7 @@ public class HTMLDialog extends JDialog
 	dialog.setVisible(true);
       }    
     else
-      {
+	{
 	dialog.reinit(path+pageName, title); 
 	if(dialog.isVisible())
 	  dialog.toFront();
@@ -144,7 +144,7 @@ public class HTMLDialog extends JDialog
      String s = null;
      try {
         URL helpURL = new URL(urlName);
-       displayURL(helpURL, editorPane);
+	displayURL(helpURL, editorPane);
      } catch (Exception e) {
        System.err.println("Couldn't create help URL: " + urlName);
      }
@@ -161,11 +161,11 @@ public class HTMLDialog extends JDialog
 
   void reinit(String urlName, String title){
     try {
-      URL helpURL = new URL(urlName);
-      displayURL(helpURL, editorPane);
-      setTitle(title);
+	URL helpURL = new URL(urlName);
+	displayURL(helpURL, editorPane);
+	setTitle(title);
     } catch (Exception e) {
-      System.err.println("Couldn't create help URL: " + urlName);
+	System.err.println("Couldn't create help URL: " + urlName);
     }
   }
   

@@ -244,6 +244,33 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     sendArgs[1].setDouble(newTime);
     sendMessage(FtsObject.systemInlet, "move_events", 2, sendArgs);
   }
+
+  public void requestEventsMove(Enumeration events, int deltaX, Adapter a)
+  {
+      TrackEvent aEvent;
+      int i = 0;
+      for (Enumeration e = events; e.hasMoreElements();) 
+	  {	  
+	      aEvent = (TrackEvent) e.nextElement();		    
+	      if(i<NUM_ARGS-1)
+		  {
+		      sendArgs[i].setObject(aEvent);
+		      sendArgs[i+1].setDouble(a.getInvX(a.getX(aEvent)+deltaX));
+		      i+=2;
+		  }
+	      else
+		  {
+		      sendMessage(FtsObject.systemInlet, "move_events", i, sendArgs);
+		      i=0;
+		      sendArgs[i].setObject(aEvent);
+		      sendArgs[i+1].setDouble(a.getInvX(a.getX(aEvent)+deltaX));		      
+		  }
+	  }
+      
+      if(i!=0)
+	  sendMessage(FtsObject.systemInlet, "move_events", i, sendArgs);
+  }
+
   public void requestSetName(String newName)
   {
     sendArgs[0].setString(newName); 
@@ -557,11 +584,11 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
       int i = 0;
       for (Enumeration e = events; e.hasMoreElements();) 
 	  {	      
-	      if(i<128)
+	      if(i<NUM_ARGS)
 		  sendArgs[i++].setObject((TrackEvent) e.nextElement());
 	      else
 		  {
-		      sendMessage(FtsObject.systemInlet, "remove_events", 128, sendArgs); 
+		      sendMessage(FtsObject.systemInlet, "remove_events", NUM_ARGS, sendArgs); 
 		      i = 0;
 		  }
 	  }
@@ -1100,10 +1127,12 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 
     public static DataFlavor sequenceFlavor = new DataFlavor(ircam.jmax.editors.sequence.SequenceSelection.class, "SequenceSelection");
 
-    public static FtsAtom[] sendArgs = new FtsAtom[128];
+    public final static int NUM_ARGS = 256;
+    public static FtsAtom[] sendArgs = new FtsAtom[NUM_ARGS];
+
     static
     {
-	for(int i=0; i<128; i++)
+	for(int i=0; i<NUM_ARGS; i++)
 	    sendArgs[i]= new FtsAtom();
     }
 }

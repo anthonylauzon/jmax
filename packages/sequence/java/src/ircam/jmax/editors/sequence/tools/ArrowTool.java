@@ -135,42 +135,67 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 	    // starts a serie of undoable moves
 	    ((UndoableData) egc.getDataModel()).beginUpdate();
 	    
-	    if(!a.isHorizontalMovementBounded())
-		{
-		    int i = 0;
+	    if(a.isHorizontalMovementAllowed())
+		if(!a.isHorizontalMovementBounded())
+		    {
+			/*int i = 0;
+			  for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
+			  {
+			  aEvent = (TrackEvent) e.nextElement();		    
+			  FtsTrackObject.sendArgs[i].setObject(aEvent);
+			  FtsTrackObject.sendArgs[i+1].setDouble(a.getInvX(a.getX(aEvent)+deltaX));
+			  i+=2;
+
+			  if(i>=FtsTrackObject.NUM_ARGS-1)
+			  {	
+			  egc.getTrack().getFtsTrack().sendMessage(FtsObject.systemInlet,
+			  "move_events", 
+			  i, 
+			  FtsTrackObject.sendArgs);
+			  i=0;
+			  }
+			  }
+			  if(i!=0)
+			  egc.getTrack().getFtsTrack().sendMessage(FtsObject.systemInlet, 
+			  "move_events", i, FtsTrackObject.sendArgs);*/
+
+			//if(egc.getSelection().size()<egc.getTrack().getFtsTrack().NUM_ARGS/2)
+			
+			egc.getTrack().getFtsTrack().requestEventsMove(egc.getSelection().getSelected(), deltaX, a);
+			
+			/*else
+			  {
+			  MaxVector copy = new MaxVector();
+			  for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
+			  copy.addElement((TrackEvent) e.nextElement());
+			  
+			  egc.getTrack().getFtsTrack().requestEventsMove(copy.elements(), deltaX, a);
+			  }*/
+		    }
+		else
 		    for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
 			{
-			    aEvent = (TrackEvent) e.nextElement();		    
-			    FtsTrackObject.sendArgs[i].setObject(aEvent);
-			    FtsTrackObject.sendArgs[i+1].setDouble(a.getInvX(a.getX(aEvent)+deltaX));
-			    i+=2;
-			}
-		    egc.getTrack().getFtsTrack().sendMessage(FtsObject.systemInlet, "move_events", i, FtsTrackObject.sendArgs);
-		}
-	    else
-		for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
-		    {
-			int prevX = 0;
-			int nextX = 0;
+			    int prevX = 0;
+			    int nextX = 0;
 			
-			aEvent = (TrackEvent) e.nextElement();
+			    aEvent = (TrackEvent) e.nextElement();
 			
-			FtsTrackObject ftsTrk = egc.getTrack().getFtsTrack();
-			TrackEvent next = ftsTrk.getNextEvent(aEvent);
-			if(next!=null)
-			    nextX = a.getX(next)-1;
-			TrackEvent prev = ftsTrk.getPreviousEvent(aEvent);
-			if(prev!=null)
-			    prevX = a.getX(prev)+1;
+			    FtsTrackObject ftsTrk = egc.getTrack().getFtsTrack();
+			    TrackEvent next = ftsTrk.getNextEvent(aEvent);
+			    if(next!=null)
+				nextX = a.getX(next)-1;
+			    TrackEvent prev = ftsTrk.getPreviousEvent(aEvent);
+			    if(prev!=null)
+				prevX = a.getX(prev)+1;
 			
-			if((a.getX(aEvent) + deltaX > nextX)&&(next!=null))
-			    a.setX(aEvent, nextX);
-			else
-			    if((a.getX(aEvent) + deltaX < prevX)&&(prev!=null))
-				a.setX(aEvent, prevX);
+			    if((a.getX(aEvent) + deltaX > nextX)&&(next!=null))
+				a.setX(aEvent, nextX);
 			    else
-				a.setX(aEvent, a.getX(aEvent) + deltaX);
-		    }
+				if((a.getX(aEvent) + deltaX < prevX)&&(prev!=null))
+				    a.setX(aEvent, prevX);
+				else
+				    a.setX(aEvent, a.getX(aEvent) + deltaX);
+			}
 	}
     if(deltaY!=0)
 	{

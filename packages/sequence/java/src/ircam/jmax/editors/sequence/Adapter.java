@@ -199,6 +199,10 @@ abstract public class Adapter implements MappingListener{
   {
       return false;
   }
+  public boolean isHorizontalMovementAllowed()
+  {
+      return true;
+  }
   public boolean isDrawable()
   {
       return false;

@@ -95,11 +95,7 @@ public class TextMenu extends EditorMenu
 
     addSeparator();
 
-    /*****************/
-    //jdk117-->jdk1.3//
     automaticFitItem = new JRadioButtonMenuItem("Automatic Fit To Text");
-    //automaticFitItem = new AntialiasingRadioButtonMenuItem("Automatic Fit To Text");
-    /*****************/
 
     add(automaticFitItem);
     automaticFitItem.addActionListener(Actions.setAutomaticFitAction);
@@ -108,29 +104,17 @@ public class TextMenu extends EditorMenu
 
     addSeparator();
 
-    /*****************/
-    //jdk117-->jdk1.3//
     itsSizesMenu = new JMenu("Sizes");
-    //itsSizesMenu = new AntialiasingMenu("Sizes");
-    /*****************/
 
     FillSizesMenu( itsSizesMenu);    
     add(itsSizesMenu);
 
-    /*****************/
-    //jdk117-->jdk1.3//
     itsFontsMenu = new JMenu("Fonts");
-    //itsFontsMenu = new AntialiasingMenu("Fonts");
-    /*****************/
 
     FillFontMenu(itsFontsMenu);
     add(itsFontsMenu);
 
-    /*****************/
-    //jdk117-->jdk1.3//
     itsStylesMenu = new JMenu("Styles");
-    //itsStylesMenu = new AntialiasingMenu("Styles");
-    /*****************/
 
     FillStylesMenu(itsStylesMenu);
     add(itsStylesMenu);
@@ -149,12 +133,7 @@ public class TextMenu extends EditorMenu
 
     for (int i = 0; i < sizes.length; i++)
       {
-
-	  /*****************/
-	  //jdk117-->jdk1.3//
 	  item = new JRadioButtonMenuItem(Integer.toString(sizes[i]));
-	  //item = new AntialiasingRadioButtonMenuItem(Integer.toString(sizes[i]));
-	  /*****************/
 	  menu.add(item);
 	  item.addActionListener(Actions.fontSizesAction);
 	  itsSizesMenuGroup.add(item);
@@ -172,42 +151,53 @@ public class TextMenu extends EditorMenu
 
     for (int i = 0; i < styles.length; i++)
       {
-	  /*****************/
-	  //jdk117-->jdk1.3//
 	  item = new JRadioButtonMenuItem(styles[i]);
-	  //item = new AntialiasingRadioButtonMenuItem(styles[i]);
-	  /*****************/
 	  menu.add(item);
 	  item.addActionListener(Actions.fontStylesAction);
 	  itsStylesMenuGroup.add(item);
       }
   }
-  private void FillFontMenu( JMenu theFontMenu)
-  {
-      /*****************/
-      //jdk117-->jdk1.3//
-      String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
-      //String[] itsFontList = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-      /*****************/
+    private final int MAX_MENU_SIZE = 20;
+    private int numFontFloor = 1;
+    private void FillFontMenu( JMenu theFontMenu)
+    {
+	/*****************/
+	//jdk117-->jdk1.3//
+	String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
+	//String[] itsFontList = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+	/*****************/
 
-      JRadioButtonMenuItem item;
-      itsFontMenuGroup = new ButtonGroup();
+	JRadioButtonMenuItem item;
+	itsFontMenuGroup = new ButtonGroup();
+	
+	fakeFontButton = new JRadioButtonMenuItem( "fake");
+	itsFontMenuGroup.add(fakeFontButton);
 
-      fakeFontButton = new JRadioButtonMenuItem( "fake");
-      itsFontMenuGroup.add(fakeFontButton);
-
-      for ( int i = 0; i < itsFontList.length; i++)
-	  {
-	      /*****************/
-	      //jdk117-->jdk1.3//
-	      item = new JRadioButtonMenuItem(itsFontList[i]);
-	      //item = new AntialiasingRadioButtonMenuItem(itsFontList[i]);	      
-	      /*****************/
-	      theFontMenu.add(item);
-	      itsFontMenuGroup.add(item);
-	      item.addActionListener(Actions.fontAction);
-	  }
-  }
+	int num = 0;
+	JMenu currentMenu = theFontMenu;
+	for ( int i = 0; i < itsFontList.length; i++)
+	    {
+		if(num<MAX_MENU_SIZE)
+		    /*item = new JRadioButtonMenuItem(itsFontList[i]);
+		      theFontMenu.add(item);
+		      itsFontMenuGroup.add(item);
+		      item.addActionListener(Actions.fontAction);
+		      num++;*/
+		    num++;
+		else
+		    {
+			//qui crea un sotto menu
+			JMenu subMenu = new JMenu("more...");
+			currentMenu.add(subMenu);
+			currentMenu = subMenu;
+			num=1; numFontFloor++;		      
+		    }
+		item = new JRadioButtonMenuItem(itsFontList[i]);
+		currentMenu.add(item);
+		itsFontMenuGroup.add(item);
+		item.addActionListener(Actions.fontAction);
+	    }
+    }
 
   /** Set the font and size menu settings like this:
     If the selection is empty, set the default font.
@@ -258,16 +248,47 @@ public class TextMenu extends EditorMenu
 	return;
       }
 
-    for( int i = 0; i < itsFontsMenu.getItemCount(); i++)
-      {
-	item = (JRadioButtonMenuItem)itsFontsMenu.getItem( i);
+    if(numFontFloor>1)
+	{
+	    JMenu currentMenu = itsFontsMenu;
+	    for(int i = 0; i<numFontFloor; i++)
+		{
+		    for(int j = 0; j < currentMenu.getItemCount()-1; j++)
+			{
+			    item = (JRadioButtonMenuItem)currentMenu.getItem(j);
 
-	if (item.getText().equals(fontName))
-	  {
-	    item.setSelected(true);
-	    break;
-	  }
-      }
+			    if (item.getText().equals(fontName))
+				{
+				    item.setSelected(true);
+				    break;
+				}
+			}
+		    if(i!=numFontFloor-1)
+			currentMenu = (JMenu) (currentMenu.getItem(currentMenu.getItemCount()-1));
+		    else
+			{
+			    item = (JRadioButtonMenuItem)currentMenu.getItem(currentMenu.getItemCount()-1);
+			    
+			    if (item.getText().equals(fontName))
+				{
+				    item.setSelected(true);
+				    break;
+				}
+			}
+		}
+	}
+	else
+	    for( int i = 0; i < itsFontsMenu.getItemCount(); i++)
+		{
+		    item = (JRadioButtonMenuItem)itsFontsMenu.getItem( i);
+
+		    if (item.getText().equals(fontName))
+			{
+			    item.setSelected(true);
+			    break;
+			}
+		}
+
     boolean sizeExist = false;
     for ( int i = 0; i < itsSizesMenu.getItemCount(); i++)
       {

@@ -108,25 +108,44 @@ public class TextPopUpMenu extends JMenu
       }
   }
 
-  private void FillFontMenu( JMenu theFontMenu)
-  {
-      /*****************/
-      //jdk117-->jdk1.3//
-      String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
-      //String[] itsFontList = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-      /*****************/
+    private final int MAX_MENU_SIZE = 20;
+    private int numFontFloor = 1;
+    private void FillFontMenu( JMenu theFontMenu)
+    {
+	/*****************/
+	//jdk117-->jdk1.3//
+	String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
+	//String[] itsFontList = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+	/*****************/
 
-      JRadioButtonMenuItem item;
-      itsFontMenuGroup = new ButtonGroup();
-
-      for ( int i = 0; i < itsFontList.length; i++)
-	  {
-	      item = new JRadioButtonMenuItem(itsFontList[i]);
-	      theFontMenu.add(item);
-	      itsFontMenuGroup.add(item);
-	      item.addActionListener(Actions.fontPopUpAction);
-	  }
-  }
+	JRadioButtonMenuItem item;
+	itsFontMenuGroup = new ButtonGroup();
+	
+	int num = 0;
+	JMenu currentMenu = theFontMenu;
+	for ( int i = 0; i < itsFontList.length; i++)
+	    {
+		if(num<MAX_MENU_SIZE)
+		    /*item = new JRadioButtonMenuItem(itsFontList[i]);
+		      theFontMenu.add(item);
+		      itsFontMenuGroup.add(item);
+		      item.addActionListener(Actions.fontAction);
+		      num++;*/
+		    num++;
+		else
+		    {
+			//qui crea un sotto menu
+			JMenu subMenu = new JMenu("more...");
+			currentMenu.add(subMenu);
+			currentMenu = subMenu;
+			num=1; numFontFloor++;		      
+		    }
+		item = new JRadioButtonMenuItem(itsFontList[i]);
+		currentMenu.add(item);
+		itsFontMenuGroup.add(item);
+		item.addActionListener(Actions.fontPopUpAction);
+	    }
+    }
 
   private void FillStylesMenu( JMenu menu)
   {
@@ -155,42 +174,79 @@ public class TextPopUpMenu extends JMenu
     int fontSize = obj.getFontSize();
     int fontStyle = obj.getFontStyle();
 
-    for( int i = 0; i < textPopup.itsFontsMenu.getItemCount(); i++)
-      {
-	item = (JRadioButtonMenuItem)textPopup.itsFontsMenu.getItem( i);
-	
-	if (item.getText().equals(fontName))
-	  {
-	    item.setSelected(true);
-	    break;
-	  }
-      }
+    if(textPopup.numFontFloor>1)
+	{
+	    JMenu currentMenu = textPopup.itsFontsMenu;
+	    for(int i = 0; i<textPopup.numFontFloor; i++)
+		{
+		    for(int j = 0; j < currentMenu.getItemCount()-1; j++)
+			{
+			    item = (JRadioButtonMenuItem)currentMenu.getItem(j);
+			    
+			    if (item.getText().equals(fontName))
+				{
+				    item.setSelected(true);
+				    break;
+				}
+			}
+		    if(i!=textPopup.numFontFloor-1)
+			currentMenu = (JMenu) (currentMenu.getItem(currentMenu.getItemCount()-1));
+		    else
+			{
+			    item = (JRadioButtonMenuItem)currentMenu.getItem(currentMenu.getItemCount()-1);
+			    
+			    if (item.getText().equals(fontName))
+				{
+				    item.setSelected(true);
+				    break;
+				}
+			}
+		}
+	}
+	else
+	    for( int i = 0; i < textPopup.itsFontsMenu.getItemCount(); i++)
+		{
+		    item = (JRadioButtonMenuItem)textPopup.itsFontsMenu.getItem( i);
+
+		    if (item.getText().equals(fontName))
+			{
+			    item.setSelected(true);
+			    break;
+			}
+		}
+    
     for ( int i = 0; i < textPopup.itsSizesMenu.getItemCount(); i++)
-      {
-	item = (JRadioButtonMenuItem)textPopup.itsSizesMenu.getItem( i);
-	
-	if (Integer.parseInt(item.getText()) == fontSize)
-	  {
-	    item.setSelected(true);
-	    break;
-	  }
-      }
+	{
+	    item = (JRadioButtonMenuItem)textPopup.itsSizesMenu.getItem( i);
+	    
+	    if (Integer.parseInt(item.getText()) == fontSize)
+		{
+		    item.setSelected(true);
+		    break;
+		}
+	}
     
     switch(fontStyle)
-      {
-      case Font.PLAIN:
-	textPopup.itsStylesMenu.getItem(0).setSelected(true);
-	break;
-      case Font.BOLD:
-	textPopup.itsStylesMenu.getItem(1).setSelected(true);
-	break;
-      case Font.ITALIC:
-	textPopup.itsStylesMenu.getItem(2).setSelected(true);
-	break;
-      default:
-	textPopup.itsStylesMenu.getItem(0).setSelected(true);
-      }
+	{
+	case Font.PLAIN:
+	    textPopup.itsStylesMenu.getItem(0).setSelected(true);
+	    break;
+	case Font.BOLD:
+	    textPopup.itsStylesMenu.getItem(1).setSelected(true);
+	    break;
+	case Font.ITALIC:
+	    textPopup.itsStylesMenu.getItem(2).setSelected(true);
+	    break;
+	default:
+	    textPopup.itsStylesMenu.getItem(0).setSelected(true);
+	}
   }
 }
+
+
+
+
+
+
 
 

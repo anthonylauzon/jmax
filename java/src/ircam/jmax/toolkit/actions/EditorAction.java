@@ -57,10 +57,11 @@ abstract public class EditorAction extends AbstractAction
     if(e.getSource() instanceof JMenuItem){
       menu = ((JPopupMenu) ((JMenuItem)e.getSource()).getParent()).getInvoker();
       
-      if(menu.getParent() instanceof JPopupMenu)//submenu
-	invoker = ((JPopupMenu) menu.getParent()).getInvoker();
-      else//menu
-	invoker = menu;
+      
+      while(menu.getParent() instanceof JPopupMenu)
+	  menu = ((JPopupMenu) menu.getParent()).getInvoker();
+
+      invoker = menu;
     }
     else
       invoker = (Component)e.getSource();
@@ -70,3 +71,4 @@ abstract public class EditorAction extends AbstractAction
 
   abstract public void doAction(EditorContainer container);
 }
+

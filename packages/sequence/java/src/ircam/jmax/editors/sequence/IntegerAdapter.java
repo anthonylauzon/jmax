@@ -155,6 +155,14 @@ public class IntegerAdapter extends MonoDimensionalAdapter{
 	    return false;
     }
 
+    public boolean isHorizontalMovementAllowed()
+    {
+	if(getViewMode() == IntegerTrackEditor.STEPS_VIEW)
+	    return false;
+	else
+	    return true;
+    }
+
     public boolean isDrawable()
     {
 	return true;

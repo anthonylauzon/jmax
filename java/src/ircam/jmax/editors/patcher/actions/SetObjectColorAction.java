@@ -51,7 +51,7 @@ public class SetObjectColorAction extends EditorAction
 
   public void doAction(EditorContainer container)
   {
-    ((GraphicObject)ObjectPopUp.getPopUpTarget()).getFtsObject().setColor( ColorPopUpMenu.getColorIndex(color)+1);
+    ((GraphicObject)ObjectPopUp.getPopUpTarget()).setColor( ColorPopUpMenu.getColorIndex(color)+1);
   }
 }
 

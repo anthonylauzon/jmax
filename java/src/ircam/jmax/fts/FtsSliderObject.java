@@ -50,6 +50,8 @@ public class FtsSliderObject extends FtsIntValueObject
   public FtsSliderObject(Fts fts, FtsObject parent)
   {
       super(fts, parent, "slider", "slider");
+      localPut("maxValue", 127);
+      localPut("minValue", 0);
   }
 
 

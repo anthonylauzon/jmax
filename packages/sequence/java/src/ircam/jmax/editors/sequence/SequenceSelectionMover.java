@@ -119,10 +119,11 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
       System.err.println("-------------- GC NULL");
 
     if (((SequenceGraphicContext)gc).getSelection().size() > 20) 
-      {
-	dragMode = RECT_DRAG;
-	computeEnclosure(enclosingRect);
-      }
+	{
+	    dragMode = RECT_DRAG;
+	    previousX=0;previousY=0;
+	    computeEnclosure(enclosingRect);
+	}
     else dragMode = GROUP_DRAG;
 
   }
@@ -170,7 +171,7 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	if (a.getY(aEvent) > a.getY(max_y)) 
 	  max_y = aEvent;
       }
-    
+
     destination.setBounds(a.getX(min_x), a.getY(min_y),
 			  a.getX(max_x)+a.getLenght(max_x)-a.getX(min_x),
 			  a.getY(max_y)-a.getY(min_y)+10);
@@ -213,12 +214,13 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
     g.clipRect(clip.x, clip.y, clip.width, clip.height);
     
     g.setColor(Color.gray);
-    g.setXORMode(Color.white); 
 
     if (dragMode == RECT_DRAG) {
-      
+
+      g.setXORMode(Color.white);
+
       if ((itsMovements & HORIZONTAL_MOVEMENT) != 0) 
-	enclosingRect.x += dx-previousX;
+	  enclosingRect.x += dx-previousX;
       
       if ((itsMovements & VERTICAL_MOVEMENT) != 0) 
 	enclosingRect.y += dy-previousY;
@@ -227,6 +229,8 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
     }
     else // move every element
       {
+	g.setXORMode(Color.gray); 
+
 	PartitionAdapter a = (PartitionAdapter)((SequenceGraphicContext) gc).getAdapter();
 	boolean singleObject = ((SequenceGraphicContext)gc).getSelection().size()==1;
 	
@@ -248,29 +252,30 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	    a.setLenght(tempEvent, a.getLenght(movTrackEvent));
 	    a.setHeigth(tempEvent, a.getHeigth(movTrackEvent));
 	    if ((itsMovements & HORIZONTAL_MOVEMENT) != 0) 
-		if(!a.isHorizontalMovementBounded())
-		    a.setX(tempEvent, a.getX(movTrackEvent) + dx);
-		else
-		    {
-			int prevX = 0;
-			int nextX = 0;
-			FtsTrackObject ftsTrk = ((SequenceGraphicContext)gc).getTrack().getFtsTrack();
-			TrackEvent next = ftsTrk.getNextEvent(movTrackEvent);
-			if(next!=null)
-			    nextX = a.getX(next)-1;
-			TrackEvent prev = ftsTrk.getPreviousEvent(movTrackEvent);
-			if(prev!=null)
-			    prevX = a.getX(prev)+1;
+		if(a.isHorizontalMovementAllowed())
+		    if(!a.isHorizontalMovementBounded())
+			a.setX(tempEvent, a.getX(movTrackEvent) + dx);
+		    else
+			{
+			    int prevX = 0;
+			    int nextX = 0;
+			    FtsTrackObject ftsTrk = ((SequenceGraphicContext)gc).getTrack().getFtsTrack();
+			    TrackEvent next = ftsTrk.getNextEvent(movTrackEvent);
+			    if(next!=null)
+				nextX = a.getX(next)-1;
+			    TrackEvent prev = ftsTrk.getPreviousEvent(movTrackEvent);
+			    if(prev!=null)
+				prevX = a.getX(prev)+1;
 
-			if((a.getX(movTrackEvent) + dx > nextX)&&(next!=null))
-			    a.setX(tempEvent, nextX);
-			else
-			    if((a.getX(movTrackEvent) + dx < prevX)&&(prev!=null))
-				a.setX(tempEvent, prevX);
+			    if((a.getX(movTrackEvent) + dx > nextX)&&(next!=null))
+				a.setX(tempEvent, nextX);
 			    else
-				a.setX(tempEvent, a.getX(movTrackEvent) + dx);
-		    }		    
-
+				if((a.getX(movTrackEvent) + dx < prevX)&&(prev!=null))
+				    a.setX(tempEvent, prevX);
+				else
+				    a.setX(tempEvent, a.getX(movTrackEvent) + dx);
+			}		    
+	    
 	    if ((itsMovements & VERTICAL_MOVEMENT) != 0) 
 		a.setY(tempEvent, a.getY(movTrackEvent)+dy);
 

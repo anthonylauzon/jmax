@@ -146,7 +146,13 @@ public class FtsObject
 	else if (className == "__clipboard")
 	  obj =  new FtsClipboard(fts, parent);
 	else
-	  obj = new FtsObject(fts, parent, variableName, className, className + " " + FtsParse.unparseArguments(nArgs, args));
+	    {
+		String descrpt;
+		if(nArgs==0) descrpt = className;
+		else descrpt = className + " " + FtsParse.unparseArguments(nArgs, args);
+		    
+		obj = new FtsObject(fts, parent, variableName, className, descrpt);
+	    }
       }
     else
       obj = new FtsObject(fts, parent, null, null, "");
