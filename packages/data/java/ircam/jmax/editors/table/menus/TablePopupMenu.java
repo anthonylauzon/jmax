@@ -174,7 +174,8 @@ public class TablePopupMenu extends JPopupMenu
     try
       {
 	int max = Integer.valueOf( maxValueField.getText()).intValue();
-	target.panel.setMaximumValue(max);
+	if( target.getGraphicContext().getVerticalMaximum() != max)
+	  target.panel.setMaximumValue(max);
       }
     catch (NumberFormatException e1)
       {

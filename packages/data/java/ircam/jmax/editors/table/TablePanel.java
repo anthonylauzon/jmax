@@ -53,9 +53,9 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
   //--- Fields  
   final static int SCROLLBAR_SIZE = 30;
   final static int PANEL_WIDTH = 500;
-  final static int PANEL_HEIGHT = 240+SCROLLBAR_SIZE;
+  final static int PANEL_HEIGHT = 270;
 
-  JScrollBar itsVerticalControl, itsHorizontalControl;
+  public JScrollBar itsVerticalControl, itsHorizontalControl;
 
   Dimension size = new Dimension(PANEL_WIDTH, PANEL_HEIGHT);
 
@@ -66,9 +66,6 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
   TableDisplay itsCenterPanel;
   TableToolManager toolManager;
 
-  /*ScalePanel scalePanel;*/
-
-  //static Dimension toolbarDimension = new Dimension(30, 200);
   /**
    * Constructor. */
   public TablePanel(EditorContainer container, TableDataModel tm) {
@@ -168,7 +165,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     gc.setCoordWriter(new CoordinateWriter(gc));
     gc.setToolManager( toolManager);
     gc.setSelection(new TableSelection(tableData));
-    TableAdapter ta = new TableAdapter(tableData, itsCenterPanel.getSize(), gc.getVerticalMaximum());
+    TableAdapter ta = new TableAdapter(tableData, gc);
 
     ta.addXZoomListener(new ZoomListener() {
 	public void zoomChanged(float zoom, float oldZoom)
@@ -208,23 +205,22 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
   private void prepareVerticalScrollbar()
   {
     itsVerticalControl = new JScrollBar(Scrollbar.VERTICAL, 0, 100, -gc.getVerticalMaximum(), gc.getVerticalMaximum());
+    itsVerticalControl.setEnabled(false);
+    itsVerticalControl.setVisible(false);
+    itsVerticalControl.setValue(-gc.getVisibleVerticalScope()/2);
 
     itsVerticalControl.addAdjustmentListener( new AdjustmentListener() {
-      public void adjustmentValueChanged( AdjustmentEvent e)
+	public void adjustmentValueChanged( AdjustmentEvent e)
 	{
-	  //gc.getAdapter().setOY(-e.getValue());	    
-	  gc.getAdapter().setYTransposition( e.getValue());
-	  /*scalePanel.updateScale();*/
+	  int yT = itsVerticalControl.getModel().getExtent()/2 +e.getValue();
+	  gc.getAdapter().setYTransposition( -yT);
 	  repaint();
 	}
-    });
+      });
 
-    add(itsVerticalControl, BorderLayout.EAST);
-    start0 = gc.getAdapter().getY(0);
-    updateVerticalScrollbar();
+    add( itsVerticalControl, BorderLayout.EAST);
   }
 
-  int start0;
   void updateVerticalScrollbar()
   {
     int verticalScope = gc.getVisibleVerticalScope();
@@ -247,8 +243,11 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 	  }
 	int oldAmount = itsVerticalControl.getVisibleAmount();
 	int oldValue = itsVerticalControl.getValue();
-	itsVerticalControl.setVisibleAmount(verticalScope);
-	//itsVerticalControl.setValue(-Math.round(start0/gc.getAdapter().getYZoom()));
+	
+	itsVerticalControl.setVisibleAmount( verticalScope);
+	itsVerticalControl.setMaximum( (int) (gc.getVerticalMaximum()*gc.getAdapter().getYZoom()));
+	itsVerticalControl.setMinimum( -(int) (gc.getVerticalMaximum()*gc.getAdapter().getYZoom()));
+
 	itsVerticalControl.setValue( oldValue*verticalScope/oldAmount);
       }    
   }
@@ -273,19 +272,19 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 	    
 	    if(gc.getAdapter().getXZoom()>0.5)
 		if(hDelta<0)
-		    {
-			int lvi = gc.getLastVisibleIndex()+10;
-			if(lvi > gc.getFtsObject().getLastUpdatedIndex())
-			    gc.getFtsObject().requestGetValues(last+1, lvi);
-			else repaint();
-		    }	    
+		  {
+		    int lvi = gc.getLastVisibleIndex()+10;
+		    if(lvi > gc.getFtsObject().getLastUpdatedIndex())
+		      gc.getFtsObject().requestGetValues(last+1, lvi);
+		    else repaint();
+		  }	    
 		else
-		    repaint();
+		  repaint();
 	    else
-		{
-		    int deltax =  gc.getAdapter().getX(0)-gc.getAdapter().getX(hDelta); 
-		    gc.getFtsObject().requestGetPixels(deltax, -hDelta);
-		}
+	      {
+		int deltax =  gc.getAdapter().getX(0)-gc.getAdapter().getX(hDelta); 
+		gc.getFtsObject().requestGetPixels(deltax, -hDelta);
+	      }
 	}
     });
     
@@ -300,35 +299,35 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 
       if(extent >= tableData.getSize())
 	  {
-	      if(itsHorizontalControl.isVisible())
-		  {
-		      itsHorizontalControl.setValue(0);
-		      itsHorizontalControl.setEnabled(false);
-		      itsHorizontalControl.setVisible(false);		      
-		  }
+	    if(itsHorizontalControl.isVisible())
+	      {
+		itsHorizontalControl.setValue(0);
+		itsHorizontalControl.setEnabled(false);
+		itsHorizontalControl.setVisible(false);		      
+	      }
 	  }
       else
-	  {
-	      int last = gc.getLastVisibleIndex();
-	      int first = gc.getFirstVisibleIndex();
+	{
+	  int last = gc.getLastVisibleIndex();
+	  int first = gc.getFirstVisibleIndex();
+	  
+	  if(!itsHorizontalControl.isVisible())
+	    {
+	      itsHorizontalControl.setEnabled(true);
+	      itsHorizontalControl.setVisible(true);
+	    }
 
-	      if(!itsHorizontalControl.isVisible())
-		  {
-		      itsHorizontalControl.setEnabled(true);
-		      itsHorizontalControl.setVisible(true);
-		  }
+	  itsHorizontalControl.setVisibleAmount(extent);
 
-	      itsHorizontalControl.setVisibleAmount(extent);
+	  if(tableData.getSize() > 0)
+	    itsHorizontalControl.setMaximum(tableData.getSize()-1);
 
-	      if(tableData.getSize() > 0)
-		  itsHorizontalControl.setMaximum(tableData.getSize()-1);
-
-	      if(last < first+extent) 
-		  {
-		      itsHorizontalControl.setValue(itsHorizontalControl.getValue()-(first+extent-last));
-		      itsHorizontalControl.setVisibleAmount(gc.getVisibleHorizontalScope());
-		  }
-	  }    
+	  if(last < first+extent) 
+	    {
+	      itsHorizontalControl.setValue(itsHorizontalControl.getValue()-(first+extent-last));
+	      itsHorizontalControl.setVisibleAmount(gc.getVisibleHorizontalScope());
+	    }
+	}    
   }
 
   public void setMaximumValue(int value)
@@ -360,9 +359,8 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
   public void sizeChanged(int size)
   {
     updateHorizontalScrollbar();
-    updateVerticalScrollbar();
     if(!itsHorizontalControl.isVisible())
-	itsCenterPanel.repaint();
+      itsCenterPanel.repaint();
   }
 
   /**
@@ -419,14 +417,14 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     int sizeAfterCut = gc.getFtsObject().getSize()-selsize;
 
     if((sizeAfterCut >= gc.getLastVisibleIndex(sizeAfterCut))&&(sizeAfterCut> gc.getWindowHorizontalScope()))
-	{
-	    vsize = gc.getWindowHorizontalScope();
-	    pixsize = gc.getGraphicDestination().getSize().width;
-	} 
+      {
+	vsize = gc.getWindowHorizontalScope();
+	pixsize = gc.getGraphicDestination().getSize().width;
+      } 
     else
-	{
-	    vsize = sizeAfterCut-gc.getFirstVisibleIndex();
-	    pixsize = gc.getAdapter().getX(vsize);
+      {
+	vsize = sizeAfterCut-gc.getFirstVisibleIndex();
+	pixsize = gc.getAdapter().getX(vsize);
 	}
 
     gc.getFtsObject().requestCut(gc.getSelection().getFirstSelected(), selsize, vsize, pixsize);

@@ -76,89 +76,68 @@ public class ZoomTool extends TableTool implements  DirectionListener, TableDyna
    */
     public void dragStart(int x, int y, MouseEvent e)
     {
-	mountIModule(itsDirectionChooser, x, y);
-	tempX = x;
-	tempY = y;
-	
-	dddx = 0;
-	dddy = 0;
+      mountIModule(itsDirectionChooser, x, y);
+      tempX = x;
+      tempY = y;
+      
+      dddx = 0;
+      dddy = 0;
     }
 
     int dddx = 0;
     int dddy = 0;
     public void dynamicDrag(int deltaX, int deltaY, MouseEvent e)
     {
-	TableAdapter a = ((TableGraphicContext)gc).getAdapter();
-	if((direction & SelectionMover.HORIZONTAL_MOVEMENT) != 0)
+      TableAdapter a = ((TableGraphicContext)gc).getAdapter();
+      if((direction & SelectionMover.HORIZONTAL_MOVEMENT) != 0)
+	{
+	  float xZoom = a.getXZoom();
+	  dddx+=deltaX;
+	  if(dddx>35)
 	    {
-		float xZoom = a.getXZoom();
-		dddx+=deltaX;
-		if(dddx>35)
-		    {
-			if (xZoom>=0.9)
-			    a.setXZoom(Math.round(xZoom)+1);
-			else
-			    a.setXZoom(xZoom*(1/(1-xZoom)));
-			
-			dddx=0;
-		    }
-		else if(dddx<-35)
-		    {
-			if (xZoom>1.9) 
-			    a.setXZoom(Math.round(xZoom)-1);
-			else
-			    a.setXZoom(xZoom*(1/(1+xZoom)));
-			dddx=0;
-		    }		    
+	      if (xZoom>=0.9)
+		a.setXZoom(Math.round(xZoom)+1);
+	      else
+		a.setXZoom(xZoom*(1/(1-xZoom)));
+	      
+	      dddx=0;
 	    }
+	  else if(dddx<-35)
+	    {
+	      if (xZoom>1.9) 
+		a.setXZoom(Math.round(xZoom)-1);
+	      else
+		a.setXZoom(xZoom*(1/(1+xZoom)));
+	      dddx=0;
+	    }		    
+	}
 	else
-	    if((direction & SelectionMover.VERTICAL_MOVEMENT) != 0)
-	    {
-	      a.incrYZoom( -deltaY);
-	      /*float yZoom = a.getYZoom();
-		dddy+=deltaY;
-		if(dddy<-35)
-		{
-		if (yZoom>0.9)
-		a.setYZoom(Math.round(yZoom)+1);
-		else
-		a.setYZoom(yZoom*(1/(1-yZoom)));
-		
-		dddy=0;
-		}
-		else if(dddy>35)
-		{
-		if (yZoom > 1.9 )
-		a.setYZoom(Math.round(yZoom)-1);
-		else
-		a.setYZoom(yZoom*(1/(1+yZoom)));
-		
-		dddy=0;
-		}*/
-	    }
+	  if((direction & SelectionMover.VERTICAL_MOVEMENT) != 0)
+	    a.incrYZoom( -deltaY);
     }
     public void dragEnd(int x, int y){}
     public void updateStartingPoint(int deltaX, int deltaY){}
 
     public void doubleClick()
     {
-	TableAdapter a = ((TableGraphicContext)gc).getAdapter();
-	a.setXZoom((float)1.0);
+      TableAdapter a = ((TableGraphicContext)gc).getAdapter();
+      a.setXZoom((float)1.0);
+      if( a.getYZoom() != (float)1.0)
 	a.setYZoom((float)1.0);
     }
   
-    /**
-     * DirectionListener interface
-     */
-    public void directionChoosen(int theDirection) 
-    {
-	direction = theDirection;
-	mountIModule(itsMouseTracker, tempX , tempY);
-    }
-    public void directionAbort()
-    {
-	mountIModule(itsMouseTracker, tempX , tempY);
-    }
+  /**
+   * DirectionListener interface
+   */
+  public void directionChoosen(int theDirection) 
+  {
+    direction = theDirection;
+    mountIModule(itsMouseTracker, tempX , tempY);
+  }
+  public void directionAbort()
+  {
+    mountIModule(itsMouseTracker, tempX , tempY);
+  }
 
   //-------------- Fields
   TableMouseDragTracker itsMouseTracker;

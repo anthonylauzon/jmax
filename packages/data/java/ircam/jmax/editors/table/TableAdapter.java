@@ -51,11 +51,13 @@ public class TableAdapter {
    * The computed vertical zoom ensures that the table values range,
    * at least minVisibleValue points, will be contained
    * in the given vertical dimension, */
-  public TableAdapter(TableDataModel tm, Dimension d, int minVisibleValue)
+  public TableAdapter(TableDataModel tm, TableGraphicContext gc)
   {
+    this.gc = gc;
+
     float fx;
     if(tm.getSize()!=0)
-      fx = findZoomRatioClosestTo(((float)(d.width))/tm.getSize());
+      fx = findZoomRatioClosestTo(((float)(gc.getGraphicDestination().getSize().width))/tm.getSize());
     else
       fx = (float)1.0;
 
@@ -68,12 +70,10 @@ public class TableAdapter {
       maxY = minY;
     
     //maxY now contains the max absolute value in the table
-    if(maxY < minVisibleValue) maxY = minVisibleValue;
+    if(maxY < gc.getVerticalMaximum()) maxY = gc.getVerticalMaximum();
     
-    /*float fy = findZoomRatioClosestTo(((float)(d.height))/(float)(2*maxY));
-      setYZoom(fy);*/
-    setYZoom( ((float)(d.height))/(float)(2*maxY));
-      
+    setYZoom((float)1.0);
+  
     setYTransposition( maxY);
   } 
 
@@ -136,17 +136,22 @@ public class TableAdapter {
    * The y coordinates are implicitily inverted. */
   public int getY(int value)
   {
-    //if (value < 0);
-    //return (int) (oY-value * itsYZoom);
-    return (int) ((value - yTransposition) * itsYZoom);
+    int h = gc.getGraphicDestination().getSize().height;
+    if( gc.isVerticalScrollbarVisible())
+      return (int) (yTransposition + h/2 - value * itsYZoom);
+    else	
+      return (int) ( h/2 - value * itsYZoom);
   }
 
   /**
    * returns the value corresponding to the graphic y */ 
   public int getInvY(int y)
   {
-    //return (int) ((oY-y)/itsYZoom);
-    return (int) (yTransposition + y/itsYZoom);
+    int h = gc.getGraphicDestination().getSize().height;
+    if( gc.isVerticalScrollbarVisible())
+      return (int) ((yTransposition + h/2 - y)/itsYZoom);
+    else
+      return (int) (( h/2 - y)/itsYZoom);  
   }
 
   /**
@@ -270,6 +275,8 @@ public class TableAdapter {
   {
     xOffset = theOX;
   }
+
+  TableGraphicContext gc;
 }
 
 

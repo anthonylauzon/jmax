@@ -145,46 +145,50 @@ public class TableGraphicContext extends GraphicContext{
   ////////////////////////////////////////////////////
   public int getFirstVisibleIndex()
   {
-      return itsAdapter.getInvX(0);
+    return itsAdapter.getInvX(0);
   }
   public int getLastVisibleIndex()
   {      
-      int last = itsAdapter.getInvX(getGraphicDestination().getSize().width);
-      if((last > getFtsObject().getSize())&&( getFtsObject().getSize()!=0)) last = getFtsObject().getSize();
-      return last;
+    int last = itsAdapter.getInvX(getGraphicDestination().getSize().width);
+    if((last > getFtsObject().getSize())&&( getFtsObject().getSize()!=0)) last = getFtsObject().getSize();
+    return last;
   }
   public int getLastVisibleIndex(int newSize)
   {      
-      int last = itsAdapter.getInvX(getGraphicDestination().getSize().width);
-      if((last > newSize)&&( newSize!=0)) last = newSize;
-      return last;
+    int last = itsAdapter.getInvX(getGraphicDestination().getSize().width);
+    if((last > newSize)&&( newSize!=0)) last = newSize;
+    return last;
   } 
   public int getWindowHorizontalScope()
   {
-      return (itsAdapter.getInvX(getGraphicDestination().getSize().width) - itsAdapter.getInvX(0));
+    return (itsAdapter.getInvX(getGraphicDestination().getSize().width) - itsAdapter.getInvX(0));
   }
   
   public int getVisibleHorizontalScope()
   {
-      return getLastVisibleIndex() - getFirstVisibleIndex() + 1;
+    return getLastVisibleIndex() - getFirstVisibleIndex() + 1;
   }
 
   public int getVisibleVerticalScope()
   {
-    //return itsAdapter.getInvY(0) - itsAdapter.getInvY(getGraphicDestination().getSize().height);
-    return itsAdapter.getInvY(getGraphicDestination().getSize().height) - itsAdapter.getInvY(0);
+    return itsAdapter.getInvY(0) - itsAdapter.getInvY(getGraphicDestination().getSize().height);
+  }
+
+  public boolean isVerticalScrollbarVisible()
+  {
+    return ((TableDisplay)getGraphicDestination()).panel.itsVerticalControl.isVisible();
   }
 
   public int getVisiblePixelsSize()
   {
-      int pixsize;
-      int last = getLastVisibleIndex();
-
-      if(last == getFtsObject().getSize())
-	  pixsize = itsAdapter.getX(last);
-      else 
-	  pixsize = getGraphicDestination().getSize().width;	  
-      return pixsize;
+    int pixsize;
+    int last = getLastVisibleIndex();
+    
+    if(last == getFtsObject().getSize())
+      pixsize = itsAdapter.getX(last);
+    else 
+      pixsize = getGraphicDestination().getSize().width;	  
+    return pixsize;
   }
 
   int itsVerticalMaximum = DEFAULT_V_MAXIMUM;
@@ -192,11 +196,11 @@ public class TableGraphicContext extends GraphicContext{
 
   public int getVerticalMaximum()
   {
-      return itsVerticalMaximum;
+    return itsVerticalMaximum;
   }
   public void setVerticalMaximum(int max)
   {
-      itsVerticalMaximum = max;
+    itsVerticalMaximum = max;
   }
 
   /* display informations */

@@ -46,7 +46,6 @@ public class TableDisplay extends PopupToolbarPanel
 
     panel = tp;
     setBackground(Color.white);
-    //popup = new TablePopupMenu(this);
 
     /******** display labels **********/
     JPanel labelPanel = new JPanel();
@@ -91,7 +90,7 @@ public class TableDisplay extends PopupToolbarPanel
 	  if(!gc.getToolManager().getCurrentTool().getName().equals("zoomer"))
 	    {
 	      int index = gc.getAdapter().getInvX( e.getX());
-	      int value = -gc.getAdapter().getInvY( e.getY());
+	      int value = gc.getAdapter().getInvY( e.getY());
 	      if( index < 0) index = 0;
 
 	      if (index < gc.getDataModel().getSize() && index >=0)
@@ -106,7 +105,7 @@ public class TableDisplay extends PopupToolbarPanel
 	  if(!toolName.equals("zoomer"))
 	    {
 	      int index = gc.getAdapter().getInvX( e.getX());
-	      int value = -gc.getAdapter().getInvY( e.getY());
+	      int value = gc.getAdapter().getInvY( e.getY());
 	      if( index < 0) index = 0;
 	      
 	      if (index < gc.getDataModel().getSize() && index >=0)
@@ -167,7 +166,7 @@ public class TableDisplay extends PopupToolbarPanel
    * the representation of its data.*/
   public void paintComponent(Graphics g) 
   {
-      tr.render(g, g.getClipBounds());
+    tr.render(g, g.getClipBounds());
   }
   
   /**
