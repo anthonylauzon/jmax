@@ -3,6 +3,5 @@ all        all        getting_started.html
 all        all        index.html
 all        all        installation.html
 all        all        language.html
-all        all        packages.html
 all        all        patcher.html
-all        all        projects.html
+all        all        configuration
