@@ -59,6 +59,8 @@ typedef struct _scope_
   ftl_data_t data;
   fts_atom_t a[SCOPE_BUFFER_SIZE];
   int range;
+  double period_msec;
+  double sr;
 } scope_t;
 
 /***************************************************************************************
@@ -82,13 +84,14 @@ scope_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
-  int size = data->size;
-  int n = fts_get_number_int(at);
+  double duration = 1000. * data->size / this->sr;
+  double period_msec = fts_get_number_float(at);
 
-  if(n < size)
-    n = size;
+  if(period_msec < duration)
+    period_msec = duration;
 
-  data->period = n;
+  this->period_msec = period_msec;
+  data->period = 0.001 * period_msec * this->sr;
 
   scope_reset(data);
 }
@@ -263,6 +266,9 @@ scope_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   data->index = 0;
   scope_reset(data);
 
+  data->period = 0.001 * this->period_msec * sr;
+  this->sr = sr;
+
   fts_set_ftl_data(a + 0, this->data);
   fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
   fts_set_int(a + 2, n_tick);
@@ -428,6 +434,8 @@ scope_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   at++;
 
   this->data = 0;
+  this->sr = 1.0;
+  this->period_msec = 100.0;
 
   this->data = ftl_data_alloc(sizeof(scope_ftl_t));
   data = ftl_data_get_ptr(this->data);
@@ -438,9 +446,10 @@ scope_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   data->size = 128;
   this->range = 128;
-  data->period = 4000;
+  data->period = 0;
   data->pre = 0;
   data->start = 0;
+
   fts_alarm_init(&(data->alarm), 0, scope_send_to_client, (void *)this);
 
   scope_reset(data);
