@@ -44,16 +44,17 @@ midiout_check(fts_object_t *o, int ac, const fts_atom_t *at, fts_midiport_t **po
 	{
 	  fts_object_t *obj = fts_get_object(at);
 
-	  if(fts_object_is_midiport(obj) && fts_midiport_is_output((fts_midiport_t *)obj))
-	    {
-	      *port = (fts_midiport_t *)fts_get_object(at);
-	  
-	      /* skip port argument */
-	      ac--;
-	      at++;
-	    }
-	  else
-	    return 0;
+	  /* skip port argument */
+	  ac--;
+	  at++;
+
+	  /* grab midiport argument in init (o != 0) only */
+	  if (o != NULL) {
+	    if(fts_object_is_midiport(obj) && fts_midiport_is_output((fts_midiport_t *)obj)) 
+	      *port = (fts_midiport_t *) obj;
+	    else
+	      return 0;
+	  }
 	}
   
       if(ac == 2)
