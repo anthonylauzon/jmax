@@ -32,7 +32,7 @@ PartitionAdapter.java \
 PitchMapper.java \
 PositionMapper.java \
 ScrollManager.java \
-SequenceWindow.java \
+SequenceClipboard.java \
 SequenceDataFlavor.java \
 SequenceDataListener.java \
 SequenceDataModel.java \
@@ -45,6 +45,7 @@ SequenceSelection.java \
 SequenceSelectionMover.java \
 SequenceSelectionResizer.java \
 SequenceVerticalResizer.java \
+SequenceWindow.java \
 StringMapper.java \
 TimeMapper.java \
 TrackContainer.java \

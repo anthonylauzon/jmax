@@ -2582,6 +2582,18 @@
 			settings = {
 			};
 		};
+		F7E020880546D86601664058 = {
+			isa = PBXFileReference;
+			name = SequenceClipboard.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/SequenceClipboard.java;
+			refType = 2;
+		};
+		F7E020890546D86601664058 = {
+			fileRef = F7E020880546D86601664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F7E5D348043B319501664058 = {
 			isa = PBXFileReference;
 			name = socketstream.c;
@@ -4733,7 +4745,6 @@
 				JAVA_ARCHIVE_TYPE = JAR;
 				JAVA_CLASS_SEARCH_PATHS = "build/ftsclient.jar build/jmax.jar";
 				JAVA_COMPILER = /usr/bin/javac;
-				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
 				OTHER_CFLAGS = "";
@@ -8981,6 +8992,7 @@
 				F85123F9028BEAB301664092,
 				F85123FA028BEAB301664092,
 				F85123FB028BEAB301664092,
+				F7E020880546D86601664058,
 				F85123FC028BEAB301664092,
 				F85123FD028BEAB301664092,
 				F85123FE028BEAB301664092,
@@ -9229,7 +9241,6 @@
 				JAVA_ARCHIVE_TYPE = JAR;
 				JAVA_CLASS_SEARCH_PATHS = "build/jmax.jar build/ftsclient.jar";
 				JAVA_COMPILER = /usr/bin/javac;
-				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
 				OTHER_CFLAGS = "";
@@ -9404,6 +9415,7 @@
 				F7DA5E66052DDDD501664058,
 				F7DA5E68052DDDED01664058,
 				F7104CCB053EAE1C01664058,
+				F7E020890546D86601664058,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -13083,7 +13095,6 @@
 				JAVA_ARCHIVE_CLASSES = YES;
 				JAVA_ARCHIVE_TYPE = JAR;
 				JAVA_COMPILER = /usr/bin/javac;
-				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
 				OTHER_CFLAGS = "";
@@ -15613,7 +15624,6 @@
 				JAVA_ARCHIVE_CLASSES = YES;
 				JAVA_ARCHIVE_TYPE = JAR;
 				JAVA_CLASS_SEARCH_PATHS = build/ftsclient.jar;
-				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
 				OTHER_CFLAGS = "";
@@ -17563,7 +17573,6 @@
 				JAVA_ARCHIVE_CLASSES = NO;
 				JAVA_CLASS_SEARCH_PATHS = "build/jmax.jar build/ftsclient.jar";
 				JAVA_COMPILER = /usr/bin/javac;
-				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
 				JAVA_ONLY = YES;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_SEARCH_PATHS = "";
@@ -18119,7 +18128,6 @@
 				JAVA_ARCHIVE_TYPE = JAR;
 				JAVA_CLASS_SEARCH_PATHS = "build/jmax.jar build/ftsclient.jar";
 				JAVA_COMPILER = /usr/bin/javac;
-				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
 				OTHER_CFLAGS = "";
@@ -19590,7 +19598,6 @@
 				JAVA_ARCHIVE_TYPE = JAR;
 				JAVA_CLASS_SEARCH_PATHS = "build/ftsclient.jar build/jmax.jar";
 				JAVA_COMPILER = /usr/bin/javac;
-				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
 				OTHER_CFLAGS = "";
