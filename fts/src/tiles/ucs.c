@@ -585,11 +585,7 @@ fts_ucs_load_pat_file(int argc, const fts_atom_t *argv)
 
       gettimeofday(&before, 0); /* 0 is for compatibility with BSD */
 
-      fprintf(stderr, "Loading pat file %s\n", fts_symbol_name(file));
-
       ret = importPatcher(patcher, fts_symbol_name(file));
-
-      fprintf(stderr, "Loaded pat file %s\n", fts_symbol_name(file));
 
       if (ret == 0)
 	fprintf(stderr, "Error loading pat file %s\n", fts_symbol_name(file));
@@ -600,7 +596,7 @@ fts_ucs_load_pat_file(int argc, const fts_atom_t *argv)
   
       dsec = after.tv_sec - before.tv_sec;
 
-      if (after.tv_usec > before.tv_usec)
+      if (after.tv_usec >= before.tv_usec)
 	dusec = after.tv_usec - before.tv_usec;
       else
 	{
@@ -609,7 +605,6 @@ fts_ucs_load_pat_file(int argc, const fts_atom_t *argv)
 	}
 
       post("Loaded file %s in %d sec %d usec\n", fts_symbol_name(file), dsec, dusec);
-      fprintf(stderr, "Loaded file %s in %d sec %d usec\n", fts_symbol_name(file), dsec, dusec);
     }
 
   return fts_Success;

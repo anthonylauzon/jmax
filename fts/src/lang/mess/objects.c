@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.9 $ IRCAM $Date: 1998/04/02 16:21:55 $
+ *      $Revision: 1.10 $ IRCAM $Date: 1998/04/08 12:03:10 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -17,7 +17,6 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
-#include "lang/mess/abstractions.h"
 
 
 extern void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at); /* @@@ */
@@ -84,8 +83,18 @@ fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
 
   if (! cl)
     {
-      fprintf(stderr, "Class not found, trying abstraction\n");	/* @@@ */
-      return fts_abstraction_new(patcher, ac, at);
+      obj =  fts_abstraction_new(patcher, ac, at);
+
+#ifdef DEBUG
+      if (! obj)
+	{
+	  fprintf(stderr, "Unable to create :"); /* @@@ ERROR !!! */
+	  fprintf_atoms(stderr, ac, at); 
+	  fprintf(stderr, "\n");	/* @@@ ERROR !!! */
+	}
+#endif
+
+      return obj;
     }
 
   obj     = (fts_object_t *)fts_block_zalloc(cl->size);
@@ -304,10 +313,13 @@ fts_object_replace(fts_object_t *old, fts_object_t *new)
   /* swap old and new in the object table */
 
   id = new->id;
-  fts_object_table_remove(old->id);
+  if (old->id != FTS_NO_ID)
+    fts_object_table_remove(old->id);
 
   new->id = old->id;
-  fts_object_table_put(new->id, new);
+
+  if (new->id != FTS_NO_ID)
+    fts_object_table_put(new->id, new);
 
   old->id = id;
   fts_object_table_put(old->id, old);
@@ -410,8 +422,9 @@ fts_object_connect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
 
   if (woutlet >= out->cl->noutlets || woutlet < 0)
     {
-      fprintf(stderr,"fts_object_connect_perform: outlet out of range #%d for object %s(%d)\n", woutlet,	
-	   fts_symbol_name(fts_get_class_name(out->cl)), fts_object_get_id(out)); /* @@@@ ERROR !!! */
+      fprintf(stderr,"fts_object_connect: outlet %d out of range %d for object %s(%d)\n",
+	      woutlet,	out->cl->noutlets, 
+	      fts_symbol_name(fts_get_class_name(out->cl)), fts_object_get_id(out)); /* @@@@ ERROR !!! */
 
       return &fts_OutletOutOfRange;
     }
@@ -426,8 +439,9 @@ fts_object_connect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
     inlet = &in->cl->inlets[winlet];
   else
     {
-      fprintf(stderr,"fts_object_connect_perform: inlet out of range #%d for object %s(%d)\n", winlet, 
-	   fts_symbol_name(fts_get_class_name(in->cl)), fts_object_get_id(in));/* @@@@ ERROR !!! */
+      fprintf(stderr,"fts_object_connect: inlet %d out of range %d for object %s(%d)\n",
+	      winlet, in->cl->ninlets, 
+	      fts_symbol_name(fts_get_class_name(in->cl)), fts_object_get_id(in));/* @@@@ ERROR !!! */
 
       return &fts_InletOutOfRange;
     }
@@ -438,7 +452,7 @@ fts_object_connect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
 
       if (! mess)
 	{
-	  fprintf(stderr,"fts_object_connect_perform: cannot connect %s(%d) #%d to %s(%d) #%d\n", 
+	  fprintf(stderr,"fts_object_connect: cannot connect %s(%d) #%d to %s(%d) #%d\n", 
 		  fts_symbol_name(fts_get_class_name(out->cl)),
 		  fts_object_get_id(out),
 		  woutlet,
@@ -447,7 +461,7 @@ fts_object_connect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
 		  winlet
 		  );/* @@@@ ERROR !!! */
 
-	  fprintf(stderr, "fts_object_connect_perform: method for message %s not found\n",
+	  fprintf(stderr, "fts_object_connect: method for message %s not found\n",
 		  fts_symbol_name(outlet->tmess.symb));
 
 	  return &fts_ObjectCannotConnect;

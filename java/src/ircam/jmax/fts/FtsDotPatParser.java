@@ -415,6 +415,8 @@ public class FtsDotPatParser
 
 	readFromFtsDotPatTokenizer(parent, in);
 
+	in.close();
+
 	return parent;
       }
     catch (FileNotFoundException e)

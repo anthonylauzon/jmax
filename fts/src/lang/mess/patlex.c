@@ -35,7 +35,29 @@ fts_open_pat_lexer(const char *filename, int env_argc, const fts_atom_t *env_arg
 
   this = (fts_pat_lexer_t *) fts_malloc(sizeof(fts_pat_lexer_t));
   this->fd = fd;
-  this->filename = filename;
+  this->env_argc = env_argc;
+  this->env_argv = env_argv;
+  this->unique_var = unique_count++; /* the unique number used in variable  0 substitution */
+  this->pushedBack = 0;
+  this->lookahead_valid = 0;
+  this->env_argc = env_argc;
+  this->env_argv = env_argv;
+  this->buf_fill = 0;
+
+  return this;
+}
+
+/* Version of the above that already get a FILE * instead of the file name.
+   Used for abstractions, where we need to look for a file 
+   */
+
+fts_pat_lexer_t *
+fts_open_pat_lexer_file(FILE *file, int env_argc, const fts_atom_t *env_argv)
+{
+  fts_pat_lexer_t *this;
+
+  this = (fts_pat_lexer_t *) fts_malloc(sizeof(fts_pat_lexer_t));
+  this->fd = file;
   this->env_argc = env_argc;
   this->env_argv = env_argv;
   this->unique_var = unique_count++; /* the unique number used in variable  0 substitution */
@@ -192,6 +214,7 @@ void nextToken(fts_pat_lexer_t *this)
 		      if (v > this->env_argc)
 			{
 			  this->buf[this->buf_fill++] = '0';
+			  status = tt_in_number;
 			}
 		      else
 			{

@@ -1,9 +1,10 @@
+#include <stdio.h>		/* for error reporting, temp. */
+#include <string.h>
+
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
 #include "lang/mess/patlex.h"
-
-#include <stdio.h>		/* for error reporting, temp. */
 
 /* TODO: assigninletoutlets, setObjectName, better integration, of course */
 
@@ -221,8 +222,6 @@ fts_object_t *importPatcher(fts_object_t *patcher, const char *inputFile)
 {
   fts_pat_lexer_t *in; 
 
-  fprintf(stderr, "Called importPatcher %s\n", inputFile); /* @@@@ */
-
   /* Probabily the root patcher should be built here @@@@ !!! */
 
   in = fts_open_pat_lexer(inputFile, 0, 0);
@@ -232,6 +231,8 @@ fts_object_t *importPatcher(fts_object_t *patcher, const char *inputFile)
       fts_atom_t a;
 
       readFromPatLexer(patcher, in);
+
+      fts_close_pat_lexer(in);
 
       patcher = fts_patcher_assign_in_outlets_and_rename(patcher, fts_s_unnamed);
 
@@ -303,8 +304,8 @@ static void readFromPatLexer(fts_object_t *parent, fts_pat_lexer_t *in)
 
 static void parsePatcher(fts_object_t *parent, fts_pat_lexer_t *in) 
 {
-  fts_object_t *lastNObject;
-  fts_symbol_t  lastNObjectType;
+  fts_object_t *lastNObject = 0;
+  fts_symbol_t  lastNObjectType = 0;
 
   /* We don't try to do many checks, for the moment */
 
@@ -540,26 +541,6 @@ static void parsePatcher(fts_object_t *parent, fts_pat_lexer_t *in)
  * or the file contains an unimplemented construct.
  */
 
-fts_object_t *importAbstraction(fts_object_t *parent, const char *inputFile,
-				int env_argc, const fts_atom_t *env_argv)
-{
-  fts_pat_lexer_t *in; 
-
-  fprintf(stderr, "Called importPatcher %s\n", inputFile); /* @@@@ */
-
-  /* open the file */
-
-  in = fts_open_pat_lexer(inputFile, env_argc, env_argv);
-
-  if (in != 0)
-    {
-      readFromPatLexer(parent, in);
-
-      return parent;
-    }
-  else
-    return 0;
-}
 
 /*
  * Parse a connection. 
@@ -1005,8 +986,9 @@ fts_patcher_assign_in_outlets_and_rename(fts_object_t *obj, fts_symbol_t new_nam
   int outlets;
 
   /* Compute number of inlets and outlets */
+
   inlets = fts_patcher_count_inlet_objects(patcher);
-  outlets = fts_patcher_count_inlet_objects(patcher);
+  outlets = fts_patcher_count_outlet_objects(patcher);
 
   /* make a new patcher and redefine the old one */
 
@@ -1019,9 +1001,112 @@ fts_patcher_assign_in_outlets_and_rename(fts_object_t *obj, fts_symbol_t new_nam
 
   /* reassign inlet and outlets (in the patcher code) */
 
-  fts_patcher_reassign_inlets_and_outlets(patcher);
+  fts_patcher_reassign_inlets_and_outlets((fts_patcher_t *) new);
 
-  return obj;
+  return new;
 }
 
+
+/* The real abstraction loader */
+
+fts_object_t *fts_abstraction_new(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+{
+  fts_object_t *obj;
+  int extension;
+  char buf[1024];
+  char name[1024];
+  char *p;
+  FILE *file;
+
+  strcpy(name, fts_symbol_name(fts_get_symbol(&at[0])));
+
+  p = strrchr(name, '.');
+
+  if (! p)
+    {
+      /* No extension given in the name, ok */
+
+	extension = 0;
+    }
+  else
+    {
+      /* Extension given in the name, check for .pat or .abs */
+
+      if ((! strcmp(p, ".pat")) || 
+	  (! strcmp(p, ".abs")))
+
+	extension = 1;
+      else
+	extension = 0;
+    }
+
+  /* Find the file (HACK, to be substituted with the real thing) */
+
+  if (extension)
+    {
+      sprintf(buf, "/u/worksta/dececco/tmp/abs/%s", name);
+
+      file = fopen(buf, "r");
+    }
+  else
+    {
+      /* Try Nature */
+
+      sprintf(buf, "/u/worksta/dececco/tmp/abs/%s", name);
+
+      file = fopen(buf, "r");
+
+      if (! file)
+	{
+	  /* Try .abs */
+
+	  sprintf(buf, "/u/worksta/dececco/tmp/abs/%s.abs", name);
+
+	  file = fopen(buf, "r");
+
+	  if (! file)
+	    {
+	      /* Try .pat */
+
+	      sprintf(buf, "/u/worksta/dececco/tmp/abs/%s.pat", name);
+	      file = fopen(buf, "r");
+	    }
+	}
+    }
+
+  if (file)
+    {
+      fts_pat_lexer_t *in; 
+      fts_atom_t a;
+      fts_atom_t description[4];
+      fts_object_t *obj;
+
+      fts_set_symbol(&description[0], fts_s_patcher);
+      fts_set_symbol(&description[1], fts_new_symbol("unnamed"));
+      fts_set_int(&description[2], 0);
+      fts_set_int(&description[3], 0);
+
+      obj = fts_object_new((fts_patcher_t *)patcher, FTS_NO_ID, 4, description);
+
+      fts_set_symbol(&a, fts_s_autorouting);
+      fts_object_put_prop(obj, fts_s_off, &a);
+
+      /* get the lexer */
+
+      in = fts_open_pat_lexer_file(file, ac - 1, at + 1);
+
+      readFromPatLexer(obj, in);
+
+      obj = fts_patcher_assign_in_outlets_and_rename(obj, fts_get_symbol(&at[0]));
+
+      fts_close_pat_lexer(in);
+
+      return obj;
+    }
+
+
+  /* not found, return null */
+
+  return 0;
+}
 

@@ -15,6 +15,8 @@ extern void fts_patcher_init(void);
 extern void fts_events_init(void);
 extern void class_config(void);
 extern void send_config(void);
+extern void fts_patparser_init(void);
+extern void fts_mess_naming_init(void);
 
 /*
  * private class functions exported for the objects.c file

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.2 $ IRCAM $Date: 1998/03/27 16:10:15 $
+ *      $Revision: 1.3 $ IRCAM $Date: 1998/04/08 12:03:09 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -43,6 +43,10 @@ fts_mess_init(void)
   /* Initialize the property system */
 
   fts_properties_init();
+
+  /* Initialize object naming services */
+
+  fts_mess_naming_init();
 
   /* Initialize the message event/error system */
 

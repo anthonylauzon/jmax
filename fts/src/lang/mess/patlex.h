@@ -20,7 +20,6 @@ typedef struct fts_pat_lexer
   const fts_atom_t *env_argv;
   int env_argc;
 
-  const char *filename;
   FILE *fd;
 
   int pushedBack;
@@ -38,6 +37,7 @@ typedef struct fts_pat_lexer
 #define pushBack(this) ((this)->pushedBack = 1)
 
 extern fts_pat_lexer_t *fts_open_pat_lexer(const char *filename, int env_argc, const fts_atom_t *env_argv);
+extern fts_pat_lexer_t *fts_open_pat_lexer_file(FILE *file, int env_argc, const fts_atom_t *env_argv);
 extern void fts_close_pat_lexer(fts_pat_lexer_t *this);
 
 extern void nextToken(fts_pat_lexer_t *this);

@@ -10,11 +10,12 @@ mess.c		\
 objects.c	\
 objtable.c	\
 patcher.c	\
+naming.c        \
 properties.c	\
 symbols.c	\
 send.c          \
 patlex.c        \
-patparser.c     \
-abstractions.c
+patparser.c 
+
 
 

@@ -636,6 +636,7 @@ fts_patcher_reassign_inlets_and_outlets(fts_patcher_t *this)
     if (fts_object_is_inlet(p))
       {
 	this->inlets[inlet_count] = (fts_inlet_t *) p;
+
 	inlet_count++;
       }
 
@@ -647,6 +648,7 @@ fts_patcher_reassign_inlets_and_outlets(fts_patcher_t *this)
     if (fts_object_is_outlet(p))
       {
 	this->outlets[outlet_count] = (fts_outlet_t *) p;
+
 	outlet_count++;
       }
 
@@ -669,8 +671,8 @@ fts_patcher_reassign_inlets_and_outlets(fts_patcher_t *this)
 	    fts_inlet_t *tmp;
 
 	    tmp = this->inlets[i];
-	    this->inlets[j] = tmp;
 	    this->inlets[i] = this->inlets[j];
+	    this->inlets[j] = tmp;
 	  }
       }
 
@@ -693,8 +695,8 @@ fts_patcher_reassign_inlets_and_outlets(fts_patcher_t *this)
 	    fts_outlet_t *tmp;
 
 	    tmp = this->outlets[i];
-	    this->outlets[j] = tmp;
 	    this->outlets[i] = this->outlets[j];
+	    this->outlets[j] = tmp;
 	  }
       }
 
