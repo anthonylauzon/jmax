@@ -23,26 +23,4 @@
 #ifndef _DATA_CVEC_H_
 #define _DATA_CVEC_H_
 
-#include <fts/packages/data/data.h>
-#include <fts/packages/utils/utils.h>
-
-typedef fmat_t cvec_t;
-
-DATA_API fts_symbol_t cvec_symbol;
-DATA_API fts_class_t *cvec_type;
-
-#define cvec_get_size(v) ((v)->m)
-DATA_API void cvec_set_size(cvec_t *vector, int size);
-
-#define cvec_get_ptr(v) ((complex *)(v)->values)
-
-#define cvec_get_element(v, i) ((v)->values[i])
-#define cvec_set_element(v, i, x) ((v)->values[i] = (x))
-
-DATA_API void cvec_copy(cvec_t *org, cvec_t *copy);
-
-DATA_API void cvec_set_const(cvec_t *vector, complex c);
-
-DATA_API void cvec_set_with_onset_from_atoms(cvec_t *vector, int offset, int ac, const fts_atom_t *at);
-
 #endif

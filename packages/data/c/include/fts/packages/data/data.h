@@ -22,6 +22,7 @@
 #define _DATA_H
 
 #include <fts/fts.h>
+#include <fts/packages/utils/utils.h>
 
 #ifdef WIN32
 #if defined(DATA_EXPORTS)

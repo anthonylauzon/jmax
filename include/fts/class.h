@@ -20,8 +20,6 @@
  * 
  */
 
-typedef void (*fts_class_interpolation_function_t)(fts_object_t *obj0, fts_object_t *obj1, double inter, fts_object_t *result);
-
 /* "system methods" every class should implement */
 typedef void (*fts_instantiate_fun_t)(fts_class_t *);
 typedef unsigned int (*fts_class_hash_function_t)( const fts_atom_t *);
@@ -29,7 +27,6 @@ typedef int (*fts_class_equals_function_t)( const fts_object_t *, const fts_obje
 typedef void (*fts_class_description_function_t)(fts_object_t *obj, fts_array_t *array);
 typedef void (*fts_class_copy_function_t)( const fts_object_t *, fts_object_t *);
 typedef void (*fts_class_array_function_t)(fts_object_t *obj, fts_array_t *array);
-typedef fts_class_interpolation_function_t (*fts_class_interpolation_select_t)(fts_object_t *obj, fts_symbol_t mode);
 
 typedef struct fts_class_outlet fts_class_outlet_t;
 
@@ -72,9 +69,8 @@ struct fts_class {
   fts_object_t head;
   
   fts_symbol_t name; /* name of the class, i.e. the first name used to register it */
-  
-  /* A type id that separates primitive types from objects: lower values are primitive types */
-  int type_id;
+  int type_id; /* a type id that separates primitive types from objects: lower values are primitive types */
+  fts_class_t *super_class;
   
   /* The hash function and equality function for this class */
   fts_class_hash_function_t hash_function;
@@ -82,9 +78,8 @@ struct fts_class {
   fts_class_description_function_t description_function;
   fts_class_copy_function_t copy_function;
   fts_class_array_function_t array_function;
-  fts_class_interpolation_select_t interpolation_select;
-  fts_list_t *import_handlers;	  /* list of import handlers */
-  fts_list_t *export_handlers;	  /* list of export handlers */
+  fts_list_t *import_handlers; /* list of import handlers */
+  fts_list_t *export_handlers; /* list of export handlers */
   
   fts_instantiate_fun_t instantiate_fun;
   
@@ -109,6 +104,7 @@ struct fts_class {
 };
 
 #define fts_class_get_name(C) ((C)->name)
+#define fts_class_get_super(C) ((C)->super_class)
 
 #define fts_class_get_constructor(c) ((c)->constructor)
 #define fts_class_get_deconstructor(c) ((c)->deconstructor)
@@ -119,14 +115,14 @@ struct fts_class {
 #define fts_class_get_description_function(cl) ((cl)->description_function)
 #define fts_class_get_copy_function(cl) ((cl)->copy_function)
 #define fts_class_get_array_function(cl) ((cl)->array_function)
-#define fts_class_get_interpolation_function(cl, o, m) ((*(cl)->interpolation_select)(o, m))
+
+#define fts_class_set_super(C, s) ((C)->super_class = s)
 
 #define fts_class_set_hash_function( cl, f) ((cl)->hash_function = (f))
 #define fts_class_set_equals_function( cl, f) ((cl)->equals_function = (f))
 #define fts_class_set_description_function(cl, f) ((cl)->description_function = (f))
 #define fts_class_set_copy_function( cl, f) ((cl)->copy_function = (f))
 #define fts_class_set_array_function( cl, f) ((cl)->array_function = (f))
-#define fts_class_set_interpolation_select(cl, f) ((cl)->interpolation_select = (f))
 
 #define fts_class_is_primitive(CL) ((CL)->type_id < FTS_FIRST_OBJECT_TYPEID)
 

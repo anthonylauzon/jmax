@@ -30,11 +30,9 @@
 #include <string.h>
 #include <alloca.h>
 
+fmat_t *fmat_null = NULL;
 fts_class_t *fmat_class = NULL;
-fts_class_t *fvec_class = NULL;
-
 fts_symbol_t fmat_symbol = NULL;
-fts_symbol_t fvec_symbol = NULL;
 
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_getcol = 0;
@@ -640,52 +638,15 @@ fmat_or_slice_vector(fts_object_t *obj, float **ptr, int *size, int *stride)
   {
     fmat_t *fmat = (fmat_t *)obj;
     
+    /* return first column */
     *ptr = fmat_get_ptr(fmat);
     *size = fmat_get_m(fmat);
     *stride = fmat_get_n(fmat);
     
     return 1;
   }
-  else if(cl == fcol_class)
-  {
-    fslice_t *fcol = (fslice_t *)obj;
-    int index = fcol->index;
-    fmat_t *fmat = fcol->fmat;
-    float *fmat_ptr = fmat_get_ptr(fmat);
-    int fmat_m = fmat_get_m(fmat);
-    int fmat_n = fmat_get_n(fmat);
-
-    if(index > fmat_n)
-      index = fmat_n;
-
-    *ptr = fmat_ptr + index;
-    *size = fmat_m;
-    *stride = fmat_n;
   
-    return 1; 
-  }
-  else if(cl == frow_class)
-  {
-    fslice_t *frow = (fslice_t *)obj;
-    int index = frow->index;
-    fmat_t *fmat = frow->fmat;
-    float *fmat_ptr = fmat_get_ptr(fmat);
-    int fmat_m = fmat_get_m(fmat);
-    int fmat_n = fmat_get_n(fmat);
-
-    if(index > fmat_m)
-      index = fmat_m;
-
-    *ptr = fmat_ptr + index * fmat_n;
-    *size = fmat_n;
-    *stride = 1;
-  
-    return 1; 
-  }
-  
-  *ptr = NULL;
-
-  return 0;
+  return fvec_vector(obj, ptr, size, stride);
 }
 
 static void
@@ -796,7 +757,7 @@ fmat_set_from_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-fmat_set_from_fcol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fmat_set_from_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
   fts_object_t *obj = fts_get_object(at);
@@ -807,27 +768,6 @@ fmat_set_from_fcol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   
   fmat_or_slice_vector(obj, &vec, &vec_size, &vec_stride);
   fmat_reshape(self, vec_size, 1);
-  ptr = fmat_get_ptr(self);
-  
-  for(i=0, j=0; i<vec_size; i++, j+=vec_stride)
-    ptr[i] = vec[j];
-  
-  fts_object_changed(o);
-  fts_return_object(o);
-}
-
-static void
-fmat_set_from_frow(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *self = (fmat_t *)o;
-  fts_object_t *obj = fts_get_object(at);
-  int vec_size, vec_stride;
-  float *vec;
-  float *ptr;
-  int i, j;
-  
-  fmat_or_slice_vector(obj, &vec, &vec_size, &vec_stride);
-  fmat_reshape(self, 1, vec_size);
   ptr = fmat_get_ptr(self);
   
   for(i=0, j=0; i<vec_size; i++, j+=vec_stride)
@@ -1106,15 +1046,54 @@ fmat_zero(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   
   if(ac > 0 && fts_is_number(at))
     onset = fts_get_number_int(at);
-
+  
   if(ac > 1 && fts_is_number(at + 1))
     range = fts_get_number_int(at + 1);
-
+  
   if(onset + range > size)
     range = size - onset;
   
   for(i=onset; i<range+onset; i++)
     ptr[i] = 0.0;
+  
+  fts_object_changed(o);
+  fts_return_object(o);
+}
+
+static void
+fmat_random(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  double lower, upper;
+  
+  switch(ac)
+  {
+    case 0:
+      lower = 0.0;
+      upper = 1.0;
+      break;
+      
+    case 1:
+      lower = 0.0;
+      upper = 0.0;
+      
+      if(fts_is_number(at))
+        upper = fts_is_number(at);
+      break;
+      
+    default:
+      lower = 0.0;
+      upper = 0.0;
+      
+      if(fts_is_number(at))
+        lower = fts_is_number(at);
+
+      if(fts_is_number(at))
+        upper = fts_is_number(at);
+      break;
+  }
+  
+  fmat_set_const(self, (float)fts_random_range(lower, upper));
   
   fts_object_changed(o);
   fts_return_object(o);
@@ -1353,62 +1332,111 @@ fmat_get_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-fvec_pick_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fmat_pick_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  fmat_t *source = (fmat_t *)fts_get_object(at);
-  int source_size = fvec_get_size(source);
-  int size = fvec_get_size(self);
-  float *src = fvec_get_ptr(source);
-  float *ptr = fvec_get_ptr(self);
   int onset = 0;
+  int size = 0;
+  fmat_t *src;
+  float *src_ptr;
+  int src_m, src_n;
+  float *ptr;
   int i;
 
-  if(ac > 1 && fts_is_number(at + 1))
-    onset = fts_get_number_int(at + 1);
-
-  if(ac > 2 && fts_is_number(at + 2))
-    size = fts_get_number_int(at + 2);
-
-  if(onset + size > source_size)
-    size = source_size - onset;
-
-  if(size > 0)
+  switch(ac)
   {
-    fvec_set_size(self, size);
+    default:
+    case 3:
+      if(fts_is_number(at + 2))
+      {
+        size = fts_get_number_int(at + 2);
+        
+        if(size < 0)
+          size = 0;
+      }
+    case 2:
+      if(ac > 1 && fts_is_number(at + 1))
+      {
+        onset = fts_get_number_int(at + 1);
+        
+        if(onset < 0)
+          onset = 0;
+      }
+    case 1:
+      if(fts_is_object(at))
+      {
+        src = (fmat_t *)fts_get_object(at);
+        src_m = fmat_get_m(src);
+        src_n = fmat_get_n(src);
+        src_ptr = fmat_get_ptr(src) + onset * src_n;
+        break;
+      }
+    case 0:
+      return;  
+  }
 
-    for(i=0; i<size; i++)
-      ptr[i] = src[onset + i];
+  if(onset + size > src_m)
+    size = src_m - onset;
+
+  fmat_reshape(self, size, src_n);
+  ptr = fmat_get_ptr(self);
+  
+  for(i=0; i<size; i++)
+  {
+    int j;
+    
+    for(j=0; j<src_n; j++)
+      ptr[j] = src_ptr[j];
+    
+    ptr += src_n;
   }
   
   fts_return_object(o);
 }
 
+static void 
+fmat_get_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
+  
+  fvec_set_type(fvec, fvec_type_column);
+  fvec_set_fmat(fvec, self);
+  
+  if(ac > 0)
+    fvec_set_dimensions(fvec, ac, at);
+  
+  fts_return_object((fts_object_t *)fvec);
+}
 
 static void 
 fmat_get_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_t *obj;
-  fts_atom_t a[2];
+  fmat_t *self = (fmat_t *)o;
+  fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
   
-  fts_set_object(a, o);
-  a[1] = at[0];
-  obj = fts_object_create(frow_class, 2, a);
+  fvec_set_type(fvec, fvec_type_row);
+  fvec_set_fmat(fvec, self);
+
+  if(ac > 0)
+    fvec_set_dimensions(fvec, ac, at);
   
-  fts_return_object(obj);
+  fts_return_object((fts_object_t *)fvec);
 }
 
 static void 
-fmat_get_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fmat_get_diag(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_t *obj;
-  fts_atom_t a[2];
+  fmat_t *self = (fmat_t *)o;
+  fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
   
-  fts_set_object(a, o);
-  a[1] = at[0];
-  obj = fts_object_create(fcol_class, 2, a);
+  fvec_set_type(fvec, fvec_type_diagonal);
+  fvec_set_fmat(fvec, self);
+
+  if(ac > 0)
+    fvec_set_dimensions(fvec, ac, at);
   
-  fts_return_object(obj);
+  fts_return_object((fts_object_t *)fvec);
 }
 
 /** append a row of atoms, augment m, clip row to n 
@@ -1417,21 +1445,100 @@ fmat_get_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 * @param  atoms	row of atoms to append, will be clipped to width of matrix
 */
 static void
-fmat_append_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fmat_append_row_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *) o;
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
+  float *ptr;
   
   /* clip to row */
   if (ac > n)
     ac = n;
   
   /* add space, append data */
-  fmat_set_size(self, m + 1, n);
+  fmat_reshape(self, m + 1, n);
+  ptr = fmat_get_ptr(self) + m * n;
   
-  if(fmat_editor_is_open(self))
-    fts_client_send_message(o, fts_s_append, 0, 0);
+  if(ac > 0)
+  {
+    int i;
+    
+    for(i=0; i<ac; i++)
+    {
+      if(fts_is_number(at + i))
+        ptr[i] = fts_get_number_float(at + i);
+      else
+        ptr[i] = 0.0;
+    }
+  }
+  
+  fts_object_changed(o);
+  fts_return_object(o);
+}
+
+static void
+fmat_append_row_slice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  float *ptr;
+  fts_object_t *append_fmat = fts_get_object(at);
+  float *append_ptr;
+  int append_size, append_stride;
+  int i, j;
+  
+  fmat_or_slice_vector(append_fmat, &append_ptr, &append_size, &append_stride);
+  
+  if(append_size > n)
+    append_size = n;
+  
+  fmat_reshape(self, m + 1, n);
+  ptr = fmat_get_ptr(self) + m * n;
+  
+  for(i=0, j=0; i<append_size; i++, j+=append_stride)
+    ptr[i] = append_ptr[j];
+  
+  for(; i<n; i++)
+    ptr[i] = 0.0;    
+  
+  fts_object_changed(o);
+  fts_return_object(o);
+}
+
+static void
+fmat_append_row_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  float *ptr;
+  fmat_t *append_fmat = (fmat_t *)fts_get_object(at);
+  int append_m = fmat_get_m(append_fmat);
+  int append_n = fmat_get_n(append_fmat);
+  float *append_ptr = fmat_get_ptr(append_fmat);
+  int i;
+  
+  if(append_n > n)
+    n = append_n;
+  
+  fmat_reshape(self, m + append_m, n);
+  ptr = fmat_get_ptr(self) + m * n;
+  
+  for(i=0; i<append_m; i++)
+  {
+    int j;
+    
+    for(j=0; j<append_n; j++)
+      ptr[j] = append_ptr[j];
+    
+    for(; i<n; i++)
+      ptr[j] = 0.0;
+    
+    append_ptr += append_n;
+    ptr += n;
+  }
   
   fts_object_changed(o);
   fts_return_object(o);
@@ -1621,9 +1728,8 @@ fmat_delete_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
 /******************************************************************************
  *
- * functions, i.e. methods that return a value but don't change the object
+ *  functions, i.e. methods that return a value but don't change the object
  *
- * todo: to be called in functional syntax, e.g. (.max $myfvec)
  */
 
 static void
@@ -1634,7 +1740,7 @@ fmat_get_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   if(size > 0)
   {
-    const float *p = fvec_get_ptr(self);
+    const float *p = fmat_get_ptr(self);
     float min = p[0];
     int i;
 
@@ -2431,7 +2537,7 @@ fmat_convert_rect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     fts_return_object(o);
   }
   else
-    fmat_error_complex(self, "fmat rect:");
+    fmat_error_complex(self, "rect");
 }
 
 static void
@@ -2458,7 +2564,7 @@ fmat_convert_polar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     fts_return_object(o);
   }
   else
-    fmat_error_complex(self, "fmat polar:");
+    fmat_error_complex(self, "polar");
 }
 
 /******************************************************************************
@@ -2507,7 +2613,7 @@ fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       }
     }
     else
-      fmat_error_complex(right, "fmat cmul:");
+      fmat_error_complex(right, "cmul");
   }
   else if(n == 2)
   {
@@ -2536,7 +2642,7 @@ fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       }
     }
     else
-      fmat_error_complex(right, "fmat cmul:");
+      fmat_error_complex(right, "cmul");
     
     if(fmat_editor_is_open(self))
       fmat_upload(self);
@@ -2544,7 +2650,7 @@ fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     fts_return_object(o);
   }
   else
-    fmat_error_complex(self, "fmat cmul:");
+    fmat_error_complex(self, "cmul");
 }
 
 static void
@@ -2566,7 +2672,7 @@ fmat_cmul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     fts_return_object(o);
   }
   else
-    fmat_error_complex(self, "fmat cmul:");
+    fmat_error_complex(self, "cmul");
 }
 
 
@@ -2598,7 +2704,7 @@ fmat_cabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     fts_return_object(o);
   }
   else
-    fmat_error_complex(self, "fmat cabs:");
+    fmat_error_complex(self, "cabs");
 }
 
 static void
@@ -2629,7 +2735,7 @@ fmat_csqrabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     fts_return_object(o);
   }
   else
-    fmat_error_complex(self, "fmat csqrabs:");
+    fmat_error_complex(self, "csqrabs");
 }
 
 static void
@@ -2660,7 +2766,7 @@ fmat_clogabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     fts_return_object(o);
   }
   else
-    fmat_error_complex(self, "fmat clogabs:");
+    fmat_error_complex(self, "clogabs");
 }
 
 static void
@@ -2688,7 +2794,7 @@ fmat_clog(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     fts_return_object(o);
   }
   else
-    fmat_error_complex(self, "fmat clog:");
+    fmat_error_complex(self, "clog");
 }
 
 static void
@@ -2716,7 +2822,7 @@ fmat_cexp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     fts_return_object(o);
   }
   else
-    fmat_error_complex(self, "fmat cexp:");
+    fmat_error_complex(self, "cexp");
 }
 
 /******************************************************************************
@@ -2774,7 +2880,7 @@ fmat_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     fts_return_object(o);
   }
   else
-    fmat_error_complex(self, "fmat fft:");
+    fmat_error_complex(self, "fft");
 }
 
 static void
@@ -2800,7 +2906,7 @@ fmat_ifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     fts_return_object(o);
   }
   else
-    fmat_error_complex(self, "fmat ifft:");
+    fmat_error_complex(self, "ifft");
 }
 
 static void
@@ -2830,7 +2936,7 @@ fmat_rifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     fts_return_object(o);
   }
   else
-    fmat_error_complex(self, "fmat rifft:");
+    fmat_error_complex(self, "rifft");
 }
 
 /******************************************************************************
@@ -3747,40 +3853,6 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *self = (fmat_t *)o;
-  
-  fmat_initialize(self);
-  
-  if(ac == 0)
-    fmat_set_size(self, 0, 1);
-  else if(ac == 1)
-  {
-    if(fts_is_number(at))
-    {
-      int size = fts_get_number_int(at);
-     
-      if(size < 0)
-        size = 0;
-
-      fmat_set_size(self, size, 1);
-    }
-    else if(fts_is_symbol(at))
-      fmat_import(o, 0, s, 1, at);
-  }  
-  else
-  {
-    fmat_reshape(self, ac, 1);
-    fmat_set_from_atoms(self, 0, 1, ac, at);
-  }
-  
-  /* hack: there won't actually be any object of fvec_class */
-  fts_class_instantiate(fmat_class);
-  o->cl = fmat_class;
-}
-
-static void
 fmat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
@@ -3788,7 +3860,6 @@ fmat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   if(self->values != NULL)
     fts_free(self->values - HEAD_POINTS);
 }
-
 
 /*********************************************************
  *
@@ -3809,10 +3880,7 @@ fmat_message(fts_class_t *cl, fts_symbol_t s, fts_method_t marix_method, fts_met
 static void
 fmat_instantiate(fts_class_t *cl)
 {
-  if(cl == fmat_class)
-    fts_class_init(cl, sizeof(fmat_t), fmat_init, fmat_delete);
-  else
-    fts_class_init(cl, sizeof(fmat_t), fvec_init, fmat_delete);    
+  fts_class_init(cl, sizeof(fmat_t), fmat_init, fmat_delete);
   
   fts_class_set_copy_function(cl, fmat_copy_function);
   fts_class_set_equals_function(cl, fmat_equals_function);
@@ -3830,22 +3898,26 @@ fmat_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_set, fmat_set_from_list);
   fts_class_message(cl, fts_s_set, cl, fmat_set_from_fmat);
-  fts_class_message(cl, fts_s_set, fcol_class, fmat_set_from_fcol);
-  fts_class_message(cl, fts_s_set, frow_class, fmat_set_from_frow);
+  fts_class_message(cl, fts_s_set, fvec_class, fmat_set_from_fvec);
   fts_class_message(cl, fts_s_set, bpf_type, fmat_set_from_bpf);
   fts_class_message(cl, fts_s_set, ivec_type, fmat_set_from_ivec);
-
-  fts_class_message_number(cl, fts_s_row, fmat_get_row);
-  fts_class_message_varargs(cl, fts_s_row, fmat_set_row);
-
-  fts_class_message_number(cl, fts_s_col, fmat_get_col);
-  fts_class_message_varargs(cl, fts_s_col, fmat_set_col);
+  
+  fts_class_message_varargs(cl, fts_s_col, fmat_get_col);
+  fts_class_message_varargs(cl, fts_s_row, fmat_get_row);
+  fts_class_message_varargs(cl, fts_new_symbol("diag"), fmat_get_diag);
+  
+  fts_class_message_varargs(cl, fts_new_symbol("setcol"), fmat_set_col);
+  fts_class_message_varargs(cl, fts_new_symbol("setrow"), fmat_set_row);
   
   fts_class_message_number(cl, fts_s_fill, fmat_fill_number);
   fts_class_message_varargs(cl, fts_s_fill, fmat_fill_varargs);
   fts_class_message_varargs(cl, fts_new_symbol("zero"), fmat_zero);
+  fts_class_message_varargs(cl, fts_new_symbol("random"), fmat_random);
   
-  fts_class_message_varargs(cl, fts_s_append, fmat_append_row);
+  fts_class_message_varargs(cl, fts_s_append, fmat_append_row_varargs);
+  fts_class_message(cl, fts_s_append, cl, fmat_append_row_fmat);
+  fts_class_message(cl, fts_s_append, fvec_class, fmat_append_row_slice);
+  
   fts_class_message_varargs(cl, fts_s_insert, fmat_insert_rows);
   fts_class_message_varargs(cl, sym_insert_cols, fmat_insert_columns);
   fts_class_message_varargs(cl, fts_s_delete, fmat_delete_rows);
@@ -3915,13 +3987,11 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_new_symbol("scramble"), fmat_scramble);
 
   fts_class_message(cl, fts_new_symbol("lookup"), cl, fmat_lookup_fmat_or_slice);
-  fts_class_message(cl, fts_new_symbol("lookup"), fcol_class, fmat_lookup_fmat_or_slice);
-  fts_class_message(cl, fts_new_symbol("lookup"), frow_class, fmat_lookup_fmat_or_slice);
+  fts_class_message(cl, fts_new_symbol("lookup"), fvec_class, fmat_lookup_fmat_or_slice);
   fts_class_message(cl, fts_new_symbol("lookup"), bpf_type, fmat_lookup_bpf);
   
   fts_class_message(cl, fts_new_symbol("env"), cl, fmat_env_fmat_or_slice);
-  fts_class_message(cl, fts_new_symbol("env"), fcol_class, fmat_env_fmat_or_slice);
-  fts_class_message(cl, fts_new_symbol("env"), frow_class, fmat_env_fmat_or_slice);
+  fts_class_message(cl, fts_new_symbol("env"), fvec_class, fmat_env_fmat_or_slice);
   fts_class_message(cl, fts_new_symbol("env"), bpf_type, fmat_env_bpf);
 
   fts_class_message(cl, fts_new_symbol("apply"), expr_class, fmat_apply_expr);
@@ -3935,8 +4005,7 @@ fmat_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_openEditor, fmat_open_editor);
   fts_class_message_varargs(cl, fts_s_closeEditor, fmat_close_editor); 
-  fts_class_message_varargs(cl, fts_s_destroyEditor, fmat_destroy_editor);    
-
+  fts_class_message_varargs(cl, fts_s_destroyEditor, fmat_destroy_editor);
   
   fts_class_inlet_thru(cl, 0);
   fts_class_outlet_thru(cl, 0);
@@ -3947,23 +4016,26 @@ fmat_instantiate(fts_class_t *cl)
   
   fts_class_doc(cl, fmat_symbol, "[<num: # of rows> [<num: # of columns (def 1)> [<num: init values> ...]]]", "matrix of floats");
   
-  fts_class_doc(cl, fts_s_set, "<fmat: matrix>", "set dimension and values from given fmat");
-  fts_class_doc(cl, fts_s_set, "<num: row index> <num: column index> [<num:value> ...]" , "set values starting from indicated element (row by row)");
+  fts_class_doc(cl, fts_s_col, "<num: index>", "get column reference (creates fvec object)");
+  fts_class_doc(cl, fts_s_row, "<num: index>", "get row reference (creates fvec object)");
   
-  fts_class_doc(cl, fts_s_row, "<num: index>", "get row reference (creates frow object)");
-  fts_class_doc(cl, fts_s_row, "<num: index> [<num:value> ...]", "set values of given row from list");
-  fts_class_doc(cl, fts_s_row, "<num: index> <frow|fcol: row values>", "set values of given row from frow or fcol");
-  
-  fts_class_doc(cl, fts_s_col, "<num: index>", "get column reference (creates fcol object)");
-  fts_class_doc(cl, fts_s_col, "<num: index> [<num:value> ...]", "set values of given column from list");
-  fts_class_doc(cl, fts_s_col, "<num: index> <frow|fcol: col values>", "set values of given column from frow or fcol");
-  
-  fts_class_doc(cl, fts_s_fill, "<num: value>", "fill with given value or pattern of values");
-  fts_class_doc(cl, fts_s_fill, "<expr: expression>", "fill with given expression (use $self, $row and $col)");
-  fts_class_doc(cl, fts_new_symbol("zero"), "[<num: row index> <num: column index> [<num: # of elements>]]", "zero given number of elements starting from indicated element (row by row)");
   fts_class_doc(cl, fts_s_size, "[<num: # of rows> [<num: # of columns (def 1)>]]", "get/set dimensions");
   fts_class_doc(cl, fts_s_rows, "[<num: # of rows>]", "get/set # of rows");
   fts_class_doc(cl, fts_s_cols, "[<num: # of columns>]", "get/set # of columns");
+  fts_class_doc(cl, fts_s_fill, "<num: value>", "fill with given value or pattern of values");
+  fts_class_doc(cl, fts_s_fill, "<expr: expression>", "fill with given expression (use $self, $row and $col)");
+  fts_class_doc(cl, fts_new_symbol("zero"), "[<num: row index> <num: column index> [<num: # of elements>]]", "zero given number of elements starting from indicated element (row by row)");
+  fts_class_doc(cl, fts_s_append, "[<num: value> ...]", "append row with given values");
+  fts_class_doc(cl, fts_s_append, "<fvec: row values>", "append row with values from fvec");
+  fts_class_doc(cl, fts_s_append, "<fmat: row values>", "append rows with values from fmat");
+
+  fts_class_doc(cl, fts_s_set, "<fmat: matrix>", "set dimension and values from given fmat");
+  fts_class_doc(cl, fts_s_set, "<num: row index> <num: column index> [<num:value> ...]", "set values starting from indicated element (row by row)");
+  
+  fts_class_doc(cl, fts_new_symbol("setcol"), "<num: index> [<num: value> ...]", "set values of given column from list");
+  fts_class_doc(cl, fts_new_symbol("setcol"), "<num: index> <fvec: values>", "set values of given column from fmat or fvec");
+  fts_class_doc(cl, fts_new_symbol("setrow"), "<num: index> [<num: value> ...]", "set values of given row from list");
+  fts_class_doc(cl, fts_new_symbol("setrow"), "<num: index> <fvec: values>", "set values of given row from fmat or fvec");
   
   fts_class_doc(cl, fts_new_symbol("min"), NULL, "get minimum value");
   fts_class_doc(cl, fts_new_symbol("max"), NULL, "get maximum value");
@@ -4015,8 +4087,8 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_s_sortrev, "[<num: index of column>]", "sort rows by descending values of given column");
   fts_class_doc(cl, fts_new_symbol("scramble"), NULL, "scramble rows randomly");
 
-  fts_class_doc(cl, fts_new_symbol("lookup"), "<fmat|fcol|frow|bpf: function>", "apply given function to each value (by linear interpolation)");
-  fts_class_doc(cl, fts_new_symbol("env"), "<fmat|fcol|frow|bpf: envelope>", "multiply given envelope function to each column");
+  fts_class_doc(cl, fts_new_symbol("lookup"), "<fmat|fvec|bpf: function>", "apply given function to each value (by linear interpolation)");
+  fts_class_doc(cl, fts_new_symbol("env"), "<fmat|fvec|bpf: envelope>", "multiply given envelope function to each column");
 
   fts_class_doc(cl, fts_new_symbol("apply"), "<expr: expression>", "apply expression each value (use $self and $x)");
 
@@ -4025,13 +4097,18 @@ fmat_instantiate(fts_class_t *cl)
 
   fts_class_doc(cl, fts_s_import, "[<sym: file name]", "import data from file");
   fts_class_doc(cl, fts_s_export, "[<sym: file name]", "export data to file");
+  
+  if(fmat_null == NULL)
+  {
+    fmat_null = (fmat_t *)fts_object_create(fmat_class, 0, 0);
+    fts_object_refer((fts_object_t *)fmat_null);
+  }
 }
 
 void
 fmat_config(void)
 {
   fmat_symbol = fts_new_symbol("fmat");
-  fvec_symbol = fts_new_symbol("fvec");
 
   sym_getcol = fts_new_symbol("getcol");
   sym_getrow = fts_new_symbol("getrow");
@@ -4050,10 +4127,7 @@ fmat_config(void)
   sym_delete_cols = fts_new_symbol("delete_cols");
   
   fmat_class = fts_class_install(fmat_symbol, fmat_instantiate);
-  fvec_class = fts_class_install(fvec_symbol, fmat_instantiate);
-
-  /*fmat_null = (fmat_t *)fts_object_create(fmat_class, 0, 0);*/
-  /*fts_object_refer((fts_object_t *)fmat_null);*/
+  fmat_null = NULL;
 }
 
 /** EMACS **

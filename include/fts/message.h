@@ -98,6 +98,7 @@ FTS_API void fts_message_set_from_atoms(fts_message_t *mess, int ac, const fts_a
 #define fts_message_append_int(m, x) (fts_array_append_int(&(m)->args, (x)))
 #define fts_message_append_float(m, x) (fts_array_append_float(&(m)->args, (x)))
 #define fts_message_append_symbol(m, x) (fts_array_append_symbol(&(m)->args, (x)))
+#define fts_message_append_object(m, x) (fts_array_append_object(&(m)->args, (x)))
 
 #define fts_is_message(p) (fts_is_a(p, fts_message_class))
 

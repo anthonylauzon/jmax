@@ -92,7 +92,7 @@ tabeditor_send_visibles(tabeditor_t *tabeditor)
         fts_set_int(&a[i+veconset], ((ivec_t *)tabeditor->vec)->values[current+i]);
     else
       for(i = 0; ((i < send)&&( current+i < vecsize)); i++)
-        fts_set_float(&a[i+veconset], ((fvec_t *)tabeditor->vec)->values[current+i]);
+        fts_set_float(&a[i+veconset], ((fmat_t *)tabeditor->vec)->values[current+i]);
     
     if(!append)
     {
@@ -213,7 +213,7 @@ tabeditor_append_visibles(tabeditor_t *tabeditor, int first, int last)
         fts_set_int(&a[i+1], ((ivec_t *)tabeditor->vec)->values[current+i]);
     else
       for(i = 0; i < send; i++)
-        fts_set_float(&a[i+1], ((fvec_t *)tabeditor->vec)->values[current+i]);
+        fts_set_float(&a[i+1], ((fmat_t *)tabeditor->vec)->values[current+i]);
     
     fts_client_send_message((fts_object_t *)tabeditor, sym_append_visibles, send+1, a);
     
@@ -357,15 +357,15 @@ tabeditor_copy_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, in
     {
       float *src, *dst;
       
-      this_size = fvec_get_size( (fvec_t *)this->vec);
+      this_size = fmat_get_m( (fmat_t *)this->vec);
       
       if(!this->copy)
-        this->copy = fts_object_create(fvec_type, 1, at + 1);
+        this->copy = fts_object_create(fmat_type, 1, at + 1);
       else
-        fvec_set_size( (fvec_t *)this->copy, size);
+        fmat_set_m((fmat_t *)this->copy, size);
       
-      src = fvec_get_ptr( (fvec_t *)this->vec);
-      dst = fvec_get_ptr( (fvec_t *)this->copy);
+      src = fmat_get_ptr( (fmat_t *)this->vec);
+      dst = fmat_get_ptr( (fmat_t *)this->copy);
       
       if(start + size > this_size)
         size = this_size - start;
@@ -402,14 +402,14 @@ tabeditor_cut_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int
   else
   {
     float *ptr;
-    copy_size = fvec_get_size( (fvec_t *)this->copy);
-    size = fvec_get_size( (fvec_t *)this->vec);
-    ptr = fvec_get_ptr( (fvec_t *)this->vec);
+    copy_size = fmat_get_m( (fmat_t *)this->copy);
+    size = fmat_get_m( (fmat_t *)this->vec);
+    ptr = fmat_get_ptr( (fmat_t *)this->vec);
     
     for(i = start; i < size-copy_size; i++)
       ptr[i] = ptr[i + copy_size];
     
-    fvec_set_size((fvec_t *)this->vec, fvec_get_size( (fvec_t *)this->vec) - copy_size);
+    fmat_set_m((fmat_t *)this->vec, fmat_get_m( (fmat_t *)this->vec) - copy_size);
   }
   
   this->vsize = v_size;
@@ -456,11 +456,11 @@ tabeditor_paste_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, i
     else
     {
       float *src, *dst;
-      this_size = fvec_get_size((fvec_t *)this->vec);
-      copy_size = fvec_get_size((fvec_t *)this->copy);
+      this_size = fmat_get_m((fmat_t *)this->vec);
+      copy_size = fmat_get_m((fmat_t *)this->copy);
       
-      src = fvec_get_ptr((fvec_t *)this->copy);
-      dst = fvec_get_ptr((fvec_t *)this->vec);
+      src = fmat_get_ptr((fmat_t *)this->copy);
+      dst = fmat_get_ptr((fmat_t *)this->vec);
       
       if(size == 0)
         size = copy_size;
@@ -513,12 +513,12 @@ tabeditor_insert_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, 
     else
     {
       float *src, *dst;		
-      copy_size = fvec_get_size( (fvec_t *)this->copy);
-      fvec_set_size( (fvec_t *)this->vec, fvec_get_size( (fvec_t *)this->vec) + copy_size);
-      this_size = fvec_get_size( (fvec_t *)this->vec);
+      copy_size = fmat_get_m( (fmat_t *)this->copy);
+      fmat_set_m( (fmat_t *)this->vec, fmat_get_m( (fmat_t *)this->vec) + copy_size);
+      this_size = fmat_get_m( (fmat_t *)this->vec);
       
-      src = fvec_get_ptr((fvec_t *)this->copy);
-      dst = fvec_get_ptr((fvec_t *)this->vec);
+      src = fmat_get_ptr((fmat_t *)this->copy);
+      dst = fmat_get_ptr((fmat_t *)this->vec);
       
       for(i=this_size - 1; i>=start; i--)
         dst[i] = dst[i - copy_size];
@@ -564,9 +564,11 @@ tabeditor_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 	    }
       else
 	    {
-	      fvec_set_with_onset_from_atoms( (fvec_t *)this->vec, onset, ac - 1, at + 1);
+        fmat_t *fmat = (fmat_t *)this->vec;
         
-	      if( fmat_editor_is_open( (fvec_t *)this->vec))
+	      fmat_set_from_atoms(fmat, onset, fmat_get_n(fmat), ac - 1, at + 1);
+        
+	      if( fmat_editor_is_open( (fmat_t *)this->vec))
           tabeditor_insert_append( this, onset, ac, at);
 	    }
       
@@ -597,7 +599,7 @@ int tabeditor_get_size( tabeditor_t *tabeditor)
   if( tabeditor_is_ivec( tabeditor))
     size = ivec_get_size( ((ivec_t *)tabeditor->vec));
   else
-    size = fvec_get_size( ((fvec_t *)tabeditor->vec));
+    size = fmat_get_m( ((fmat_t *)tabeditor->vec));
   
   return size;
 }

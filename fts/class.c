@@ -67,12 +67,6 @@ default_description_function(fts_object_t *obj, fts_array_t *array)
   fts_array_append_symbol(array, fts_object_get_class_name(obj));
 }
 
-static fts_class_interpolation_function_t
-default_interpolation_select(fts_object_t *obj, fts_symbol_t mode)
-{
-  return NULL;
-}
-
 fts_class_t *
 fts_class_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 {
@@ -81,13 +75,13 @@ fts_class_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
   cl->name = name;
   cl->instantiate_fun = instantiate_fun;
   cl->type_id = type_id++;
+  cl->super_class = NULL;
   
   fts_class_set_hash_function (cl, default_hash_function);
   fts_class_set_equals_function (cl, default_equals_function);
   fts_class_set_description_function (cl, default_description_function);
   fts_class_set_copy_function (cl, NULL);
   fts_class_set_array_function (cl, NULL);
-  fts_class_set_interpolation_select (cl, default_interpolation_select);
   
   cl->import_handlers = NULL;
   cl->export_handlers = NULL;
@@ -695,8 +689,6 @@ fts_class_add_export_handler (fts_class_t *cl, fts_method_t func)
 }
 
 
-
-
 /***********************************************************************
 *
 * Initialization
@@ -720,6 +712,7 @@ fts_kernel_class_init (void)
   fts_class_class->name = NULL;
   fts_class_class->instantiate_fun = class_class_instantiate;
   fts_class_class->type_id = type_id++;
+  fts_class_class->super_class = NULL;
   
   fts_class_class->size = sizeof (fts_class_t);
   fts_class_class->heap = heap;

@@ -29,16 +29,88 @@
 #include <ctype.h>
 #include <float.h>
 
-/* fvec is now fmat! here is the code for matrix slices fcol and frow */
+fts_class_t *fvec_class = NULL;
+fts_symbol_t fvec_symbol = NULL;
 
-fts_class_t *frow_class = NULL;
-fts_class_t *fcol_class = NULL;
+static fts_symbol_t sym_col = NULL;
+static fts_symbol_t sym_row = NULL;
+static fts_symbol_t sym_diag = NULL;
+static fts_symbol_t sym_unwrap = NULL;
+static fts_symbol_t sym_vec = NULL;
+static fts_symbol_t sym_refer = NULL;
 
-fts_symbol_t frow_symbol = NULL;
-fts_symbol_t fcol_symbol = NULL;
+static fts_symbol_t fvec_type_names[fvec_n_types];
 
+static int
+fvec_get_type_from_symbol(fts_symbol_t sym)
+{
+  if(sym == sym_col)
+    return fvec_type_column;
+  else if(sym == sym_row)
+    return fvec_type_row;
+  else if(sym == sym_diag)
+    return fvec_type_diagonal;
+  else if(sym == sym_unwrap)
+    return fvec_type_unwrap;
+  else
+    return fvec_type_column;
+}
 
+/********************************************************************
+ *
+ *  easy creators
+ *
+ */
 
+fvec_t *
+fvec_create_column(fmat_t *fmat)
+{
+  fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
+
+  fvec->fmat = fmat;
+  fts_object_refer((fts_object_t *)fmat);
+  fvec->type = fvec_type_column;
+}
+
+fvec_t *
+fvec_create_row(fmat_t *fmat)
+{
+  fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
+  
+  fvec->fmat = fmat;
+  fts_object_refer((fts_object_t *)fmat);  
+  fvec->type = fvec_type_column;
+}
+
+fvec_t *
+fvec_create_diagonal(fmat_t *fmat)
+{
+  fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
+  
+  fvec->fmat = fmat;
+  fts_object_refer((fts_object_t *)fmat);  
+  fvec->type = fvec_type_diagonal;
+}
+
+fvec_t *
+fvec_create_unwrap(fmat_t *fmat)
+{
+  fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
+  
+  fvec->fmat = fmat;
+  fts_object_refer((fts_object_t *)fmat);  
+  fvec->type = fvec_type_unwrap;
+}
+
+fvec_t *
+fvec_create_vector(int size)
+{
+  fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
+  
+  fvec->fmat = fmat_create(size, 1);
+  fts_object_refer((fts_object_t *) fvec->fmat);  
+  fvec->type = fvec_type_vector;
+}
 
 /********************************************************************
  *
@@ -46,48 +118,193 @@ fts_symbol_t fcol_symbol = NULL;
  *
  */
 
-/* copy matrix row or col reference to an fvec */
 void
-fslice_copy_to_fmat(fslice_t *org, fmat_t *copy)
+fvec_set_dimensions(fvec_t *fvec, int ac, const fts_atom_t *at)
 {
-  if (fslice_check_index(org))
+  switch(ac)
   {
-    fmat_t *orgmat = org->fmat;
-    float  *orgptr = fslice_get_ptr(org);
-    int step = fslice_get_stride(org);
-    int size = fslice_get_size(org);
-    int i;
-
-    fmat_reshape(copy, size, 1);
-
-    for (i = 0; i < size; i++)
-    {
-      copy->values[i] = *orgptr;
-      orgptr += step;
-    }
-
-    copy->onset = orgmat->onset;
-    copy->domain = orgmat->domain;
-    copy->sr = orgmat->sr;
-    /* don't copy format from orgmat, since it's set to vector by fmat_reshape */
-  }
-  else
-  {
-    /* slice index out of range: set copy empty */
-    fmat_reshape(copy, 0, 0);
+    default :
+    case 3:
+      if(fts_is_number(at + 2))
+      {
+        int size = fts_get_number_int(at + 2);
+        
+        if(size > 0)
+          fvec->size = size;
+        else
+          fvec->size = 0;
+      }
+    case 2:
+      if(fts_is_number(at + 1))
+      {
+        int onset = fts_get_number_int(at + 1);
+        
+        if(onset > 0)
+          fvec->onset = onset;
+        else
+          fvec->onset = 0;
+      }
+    case 1:
+      if(fts_is_number(at))
+      {
+        int index = fts_get_number_int(at);
+        
+        if(index > 0)
+          fvec->index = index;
+        else
+          fvec->index = 0;
+      }
+    case 0:
+      break;
   }
 }
 
 static void
-fslice_array_function(fts_object_t *o, fts_array_t *array)
+fvec_get_vector(fvec_t *fvec, float **ptr, int *size, int *stride)
 {
-  fslice_t *self = (fslice_t *)o;
-  float *values = fslice_get_ptr(self);
-  int size = fslice_get_size(self);
-  int stride = fslice_get_stride(self);
+  fmat_t *fmat = fvec->fmat;
+  float *fmat_ptr = fmat_get_ptr(fmat);
+  int fmat_m = fmat_get_m(fmat);
+  int fmat_n = fmat_get_n(fmat);
+  int fvec_index = fvec->index;
+  int fvec_onset = fvec->onset;
+  int fvec_size = fvec->size;
+  
+  switch(fvec->type)
+  {
+    case fvec_type_column:
+      
+      if(fvec_index >= fmat_n)
+        fvec_index = fmat_n - 1;
+      
+      while(fvec_index < 0)
+        fvec_index += fmat_n;
+        
+      if(fvec_onset > fmat_m)
+        fvec_onset = fmat_m;
+          
+      if(fvec_onset + fvec_size > fmat_m)
+        fvec_size = fmat_m - fvec_onset;
+            
+      *ptr = fmat_ptr + fvec_index + fvec_onset * fmat_n;
+      *size = fvec_size;
+      *stride = fmat_n;
+      break;
+      
+    case fvec_type_row:
+      
+      if(fvec_index >= fmat_m)
+        fvec_index = fmat_m - 1;
+      
+      while(fvec_index < 0)
+        fvec_index += fmat_m;
+        
+      if(fvec_onset > fmat_n)
+        fvec_onset = fmat_n;
+          
+      if(fvec_onset + fvec_size > fmat_n)
+        fvec_size = fmat_n - fvec_onset;
+          
+      *ptr = fmat_ptr + fvec_index * fmat_n + fvec_onset;
+      *size = fvec_size;
+      *stride = 1;
+      break;
+      
+    case fvec_type_diagonal:
+      
+      if(fvec_index > fmat_m)
+        fvec_index = fmat_m;
+      
+      if(fvec_onset > fmat_n)
+        fvec_onset = fmat_n;
+        
+      if(fvec_index + fvec_size > fmat_m)
+        fvec_size = fmat_m - fvec_index;
+            
+      if(fvec_onset + fvec_size > fmat_n)
+        fvec_size = fmat_n - fvec_onset;
+          
+      *ptr = fmat_ptr + fvec_index * fmat_n + fvec_onset;
+      *size = fvec_size;
+      *stride = fmat_n + 1;
+      break;
+
+    case fvec_type_unwrap:
+      
+      if(fvec_index > fmat_m)
+        fvec_index = fmat_m;
+      
+      if(fvec_onset > fmat_n)
+        fvec_onset = fmat_n;
+        
+      if(fvec_index * fmat_n + fvec_onset + fvec_size > fmat_m * fmat_n)
+        fvec_size = fmat_m * fmat_n - fvec_index * fmat_n - fvec_onset;
+          
+      *ptr = fmat_ptr + fvec_index * fmat_n + fvec_onset;
+      *size = fvec_size;
+      *stride = 1;
+      break;
+      
+    case fvec_type_vector:
+      
+      *ptr = fmat_ptr;
+      *size = fvec_size;
+      *stride = 1;
+      break;
+      
+  }
+}
+
+int
+fvec_vector(fts_object_t *obj, float **ptr, int *size, int *stride)
+{
+  if(fts_object_get_class(obj) == fvec_class)
+  {
+    fvec_get_vector((fvec_t *)obj, ptr, size, stride);
+    return 1;
+  }
+
+  *ptr = NULL;
+  *size = 0;
+  *stride = 0;
+  return 0;
+}
+
+/* copy matrix row or col reference to an fvec */
+void
+fvec_copy_to_fmat(fvec_t *org, fmat_t *copy)
+{
+  fmat_t *orgmat = org->fmat;
+  float *orgptr;
+  int size, stride;
+  int i;
+  
+  fvec_get_vector(org, &orgptr, &size, &stride);
+  
+  fmat_reshape(copy, size, 1);
+  
+  for (i = 0; i < size; i++)
+  {
+    copy->values[i] = *orgptr;
+    orgptr += stride;
+  }
+  
+  copy->onset = orgmat->onset;
+  copy->domain = orgmat->domain;
+  copy->sr = orgmat->sr;
+}
+
+static void
+fvec_array_function(fts_object_t *o, fts_array_t *array)
+{
+  fvec_t *self = (fvec_t *)o;
   int onset = fts_array_get_size(array);
   fts_atom_t *atoms;
+  float *values;
+  int size, stride;
   int i, j;
+
+  fvec_get_vector(self, &values, &size, &stride);  
   
   fts_array_set_size(array, onset + size);
   atoms = fts_array_get_atoms(array) + onset;
@@ -96,45 +313,6 @@ fslice_array_function(fts_object_t *o, fts_array_t *array)
     fts_set_float(atoms + i, values[j]);
 }
 
-static void
-fslice_description_function(fts_object_t *o, fts_array_t *array)
-{
-  fslice_t *self = (fslice_t *)o;
-  
-  fts_array_append_symbol(array, fts_object_get_class_name(o));
-  fts_array_append_object(array, (fts_object_t *)fslice_get_fmat(self));
-  fts_array_append_int(array, fslice_get_index(self));
-}
-
-/********************************************************************
- *
- *  check & errors
- *
- */
-
-void
-fslice_error_index(fslice_t *slice, fslice_t *op, const char *prefix)
-{
-  if(!fslice_check_index(slice))
-  {
-    char *str = (slice->type == fslice_row)? "row": "column";
-    
-    fts_object_error((fts_object_t *)slice, "%s: referencing %s %d of matrix %d x %d", prefix, str, 
-                     frow_get_index(slice), fmat_get_m(slice->fmat), fmat_get_n(slice->fmat));
-  }
-
-  if(op != NULL && !fslice_check_index(op))
-  {
-    char *str = (op->type == fslice_row)? "row": "column";
-    
-    fts_object_error((fts_object_t *)slice, "%s: argument references %s %d of matrix %d x %d", prefix, str,
-                     frow_get_index(op), fmat_get_m(op->fmat), fmat_get_n(op->fmat));
-  }
-}
-
-
-
-
 /******************************************************************************
  *
  *  envelopes
@@ -142,138 +320,122 @@ fslice_error_index(fslice_t *slice, fslice_t *op, const char *prefix)
  */
 
 static void
-fslice_lookup_fmat_or_slice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_lookup_fmat_or_slice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
+  fvec_t *self = (fvec_t *)o;
+  fts_object_t *obj = fts_get_object(at);
+  float *ptr;
+  int size, stride;
+  float *env;
+  int env_size, env_stride;
+  int i;
   
-  if(fslice_check_index(self))
+  fvec_get_vector(self, &ptr, &size, &stride);
+  fmat_or_slice_vector(obj, &env, &env_size, &env_stride);
+  
+  for(i=0; i<size*stride; i+=stride)
   {
-    float *ptr = fslice_get_ptr(self);
-    int size = fslice_get_size(self);
-    int stride = fslice_get_stride(self);
-    fts_object_t *obj = fts_get_object(at);
-    float *env;
-    int env_size, env_stride;
-    int i;
+    double f_index = ptr[i];
     
-    fmat_or_slice_vector(obj, &env, &env_size, &env_stride);
-    
-    for(i=0; i<size*stride; i+=stride)
+    if(f_index < 0.0)
+      ptr[i] = env[0];
+    else 
     {
-      double f_index = ptr[i];
+      double i_index = floor(f_index);
+      int index = (int)i_index;
       
-      if(f_index < 0.0)
-        ptr[i] = env[0];
-      else 
+      if(index >= env_size - 1)
+        ptr[i] = env[(env_size - 1) * env_stride];
+      else
       {
-        double i_index = floor(f_index);
-        int index = (int)i_index;
-      
-        if(index >= env_size - 1)
-          ptr[i] = env[(env_size - 1) * env_stride];
-        else
-        {
-          double frac = f_index - i_index;
-          double env_0 = env[index * env_stride];
-          double env_1 = env[(index + 1) * env_stride];
-    
-          ptr[i] = (1.0 - frac) * env_0 + frac * env_1;
-        }
-      }
-    }
-  
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, NULL, "lookup");
-}
-
-static void
-fslice_lookup_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fslice_t *self = (fslice_t *)o;
-
-  if(fslice_check_index(self))
-  {
-    float *ptr = fslice_get_ptr(self);
-    int size = fslice_get_size(self);
-    int stride = fslice_get_stride(self);
-    bpf_t *bpf = (bpf_t *)fts_get_object(at);
-    int i;
-    
-    for(i=0; i<size*stride; i+=stride)
-      ptr[i] = bpf_get_interpolated(bpf, ptr[i]);
-  
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, NULL, "lookup");
-}
-    
-static void
-fslice_env_fmat_or_slice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fslice_t *self = (fslice_t *)o;  
-
-  if(fslice_check_index(self))
-  {
-    fts_object_t *obj = fts_get_object(at);
-    float *ptr = fslice_get_ptr(self);
-    int size = fslice_get_size(self);
-    int stride = fslice_get_stride(self);
-    float *env;
-    int env_size, env_stride;
-      
-    fmat_or_slice_vector(obj, &env, &env_size, &env_stride);
-
-    if(env_size == size)
-    {
-      int i, j;
-      
-      /* simply multiply */
-      for(i=0, j=0; i<size*stride; i+=stride, j+=env_stride)
-        ptr[i] *= env[j];
-    }
-    else
-    {
-      double incr = (double)env_size / (double)size;
-      double f_index = incr;
-      int i;
-      
-      /* apply envelope by linear interpolation */
-      for(i=0; i<size*stride; i+=stride)
-      {
-        double i_index = floor(f_index);
-        int index = (int)i_index;
         double frac = f_index - i_index;
         double env_0 = env[index * env_stride];
-        double env_1 = env[index * env_stride + env_stride];
+        double env_1 = env[(index + 1) * env_stride];
         
-        ptr[i] *= (1.0 - frac) * env_0 + frac * env_1;
-        
-        f_index += incr;
+        ptr[i] = (1.0 - frac) * env_0 + frac * env_1;
       }
     }
-  
-    fts_return_object(o);
   }
-  else
-    fslice_error_index(self, NULL, "env");
+  
+  fts_return_object(o);
 }
 
 static void
-fslice_env_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_lookup_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;  
+  fvec_t *self = (fvec_t *)o;
+  bpf_t *bpf = (bpf_t *)fts_get_object(at);
+  float *ptr;
+  int size, stride;
+  int i;
+  
+  fvec_get_vector(self, &ptr, &size, &stride);
+  
+  for(i=0; i<size*stride; i+=stride)
+    ptr[i] = bpf_get_interpolated(bpf, ptr[i]);
+  
+  fts_return_object(o);
+}
+    
+static void
+fvec_env_fmat_or_slice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *self = (fvec_t *)o;  
+  fts_object_t *obj = fts_get_object(at);
+  float *ptr;
+  int size, stride;
+  float *env;
+  int env_size, env_stride;
+  
+  fvec_get_vector(self, &ptr, &size, &stride);
+  fmat_or_slice_vector(obj, &env, &env_size, &env_stride);
+  
+  if(env_size == size)
+  {
+    int i, j;
+    
+    /* simply multiply */
+    for(i=0, j=0; i<size*stride; i+=stride, j+=env_stride)
+      ptr[i] *= env[j];
+  }
+  else
+  {
+    double incr = (double)env_size / (double)size;
+    double f_index = incr;
+    int i;
+    
+    /* apply envelope by linear interpolation */
+    for(i=0; i<size*stride; i+=stride)
+    {
+      double i_index = floor(f_index);
+      int index = (int)i_index;
+      double frac = f_index - i_index;
+      double env_0 = env[index * env_stride];
+      double env_1 = env[index * env_stride + env_stride];
+      
+      ptr[i] *= (1.0 - frac) * env_0 + frac * env_1;
+      
+      f_index += incr;
+    }
+  }
+  
+  fts_return_object(o);
+}
 
-  if(fslice_check_index(self))
+static void
+fvec_env_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *self = (fvec_t *)o;  
+  float *ptr;
+  int size, stride;
+  
+  fvec_get_vector(self, &ptr, &size, &stride);
+  
+  if(size > 0)
   {
     bpf_t *bpf = (bpf_t *)fts_get_object(at);
-    float *ptr = fslice_get_ptr(self);
-    int size = fslice_get_size(self);
-    int stride = fslice_get_stride(self);
-    double incr = bpf_get_duration(bpf) / (double)size;
     double time = 0.0;
+    double incr = bpf_get_duration(bpf) / (double)size;
     int i;
     
     for(i=0; i<size*stride; i+=stride)
@@ -281,71 +443,65 @@ fslice_env_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       ptr[i] *= bpf_get_interpolated(bpf, time);
       time += incr;  
     }
-  
-    fts_return_object(o);
   }
-  else
-    fslice_error_index(self, NULL, "env");
+  
+  fts_return_object(o);
 }
 
 static void
-fslice_apply_expr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_apply_expr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
-
-  if(fslice_check_index(self))
+  fvec_t *self = (fvec_t *)o;
+  expr_t *expr = (expr_t *)fts_get_object(at);
+  fts_hashtable_t locals;
+  fts_atom_t key_self, key_x, value;
+  fts_atom_t ret;
+  float *ptr;
+  int size, stride;
+  int i;
+  
+  fvec_get_vector(self, &ptr, &size, &stride);
+  
+  fts_hashtable_init(&locals, FTS_HASHTABLE_SMALL);
+  
+  fts_set_symbol(&key_self, fts_s_self);
+  fts_set_object(&value, self);
+  fts_hashtable_put(&locals, &key_self, &value);
+  
+  fts_set_symbol(&key_x, fts_s_x);
+  
+  for(i=0; i<size*stride; i+=stride)
   {
-    expr_t *expr = (expr_t *)fts_get_object(at);
-    int size = fslice_get_size(self);
-    int stride = fslice_get_stride(self);
-    float *ptr = fslice_get_ptr(self);
-    fts_hashtable_t locals;
-    fts_atom_t key_self, key_x, value;
-    fts_atom_t ret;
-    int i;
+    double f = (double)ptr[i];
     
-    fts_hashtable_init(&locals, FTS_HASHTABLE_SMALL);
+    fts_set_float(&value, f);
+    fts_hashtable_put(&locals, &key_x, &value);
     
-    fts_set_symbol(&key_self, fts_s_self);
-    fts_set_object(&value, self);
-    fts_hashtable_put(&locals, &key_self, &value);
+    expr_evaluate(expr, &locals, ac - 1, at + 1, &ret);
     
-    fts_set_symbol(&key_x, fts_s_x);
-    
-    for(i=0; i<size*stride; i+=stride)
-    {
-      double f = (double)ptr[i];
-    
-      fts_set_float(&value, f);
-      fts_hashtable_put(&locals, &key_x, &value);
-
-      expr_evaluate(expr, &locals, ac - 1, at + 1, &ret);
-      
-      if(fts_is_number(&ret))
-        ptr[i] = fts_get_number_float(&ret);
-      else
-        ptr[i] = 0.0;
-    }
-    
-    fts_hashtable_destroy(&locals);
-
-    fts_set_void(fts_get_return_value());
-  
-    fts_return_object(o);
+    if(fts_is_number(&ret))
+      ptr[i] = fts_get_number_float(&ret);
+    else
+      ptr[i] = 0.0;
   }
-  else
-    fslice_error_index(self, NULL, "env");
+  
+  fts_hashtable_destroy(&locals);
+  
+  fts_set_void(fts_get_return_value());
+  
+  fts_return_object(o);
 }
 
 static void
-fslice_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+fvec_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
-  float *ptr = fslice_get_ptr(self);
-  int stride = fslice_get_stride(self);
-  int size = fslice_get_size(self);
+  fvec_t *self = (fvec_t *)o;
+  float *ptr;
+  int size, stride;
   int i, j;
-  
+
+  fvec_get_vector(self, &ptr, &size, &stride);
+
   if(ac > size)
     ac = size;
   
@@ -359,32 +515,149 @@ fslice_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_
 }
 
 static void
-fslice_set_fmat_or_fslice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_set_from_fmat_or_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
+  fvec_t *self = (fvec_t *)o;
+  fts_object_t *obj = fts_get_object(at);
+  float *ptr;
+  int size, stride;
+  float *set;
+  int set_size, set_stride;
+  int i, j;
   
-  if(fslice_check_index(self))
+  fvec_get_vector(self, &ptr, &size, &stride);
+  fmat_or_slice_vector(obj, &set, &set_size, &set_stride);
+  
+  if(set_size > size)
+    set_size = size;
+  
+  for(i=0, j=0; i<set_size*stride; i+=stride, j+=set_stride)
+    ptr[i] = set[j];
+  
+  fts_return_object(o);
+}
+
+static void
+_fvec_set_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *self = (fvec_t *)o;
+  fmat_t *fmat = (fmat_t *)fts_get_object(at);
+  
+  fts_object_release((fts_object_t *)self->fmat);
+  self->fmat = fmat;
+  fts_object_refer((fts_object_t *)fmat);
+  
+  fts_return_object(o);
+}
+
+static void
+_fvec_set_fmat_and_dimensions(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *self = (fvec_t *)o;
+  
+  if(ac > 0 && fts_is_a(at, fmat_class))
   {
-    float *ptr = fslice_get_ptr(self);
-    int size = fslice_get_size(self);
-    int stride = fslice_get_stride(self);
-    fts_object_t *obj = fts_get_object(at);
-    float *set;
-    int set_size, set_stride;
-    int i, j;
+    _fvec_set_fmat(o, 0, NULL, 1, at);
+      
+    if(ac > 1 && fts_is_symbol(at + 1))
+    {
+      fts_symbol_t sym = fts_get_symbol(at + 1);
+      self->type = fvec_get_type_from_symbol(sym);
+    }
     
-    fmat_or_slice_vector(obj, &set, &set_size, &set_stride);
-    
-    if(set_size > size)
-      set_size = size;
-    
-    for(i=0, j=0; i<set_size*stride; i+=stride, j+=set_stride)
-      ptr[i] = set[j];
+    if(ac > 2)
+      fvec_set_dimensions(self, ac - 2, at + 2);
     
     fts_return_object(o);
   }
-  else
-    fslice_error_index(self, NULL, "set");
+}
+
+static void
+_fvec_set_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *self = (fvec_t *)o;
+  
+  self->type = fvec_type_column;
+  fvec_set_dimensions(self, ac, at);
+  
+  fts_return_object(o);
+}
+
+static void
+_fvec_set_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *self = (fvec_t *)o;
+  
+  self->type = fvec_type_row;
+  fvec_set_dimensions(self, ac, at);
+  
+  fts_return_object(o);
+}
+
+static void
+_fvec_set_diag(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *self = (fvec_t *)o;
+  
+  self->type = fvec_type_diagonal;
+  fvec_set_dimensions(self, ac, at);
+  
+  fts_return_object(o);
+}
+
+static void
+_fvec_set_unwrap(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *self = (fvec_t *)o;
+  
+  self->type = fvec_type_unwrap;
+  fvec_set_dimensions(self, ac, at);
+  
+  fts_return_object(o);
+}
+
+static void
+_fvec_set_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *self = (fvec_t *)o;
+  int size = 0;
+  
+  if(ac > 0 && fts_is_number(at))
+    size = fts_get_number_int(at);
+  
+  if(size < 0)
+    size = 0;
+  
+  fts_object_release((fts_object_t *)self->fmat);
+  self->fmat = fmat_create(size, 1);
+  fts_object_refer((fts_object_t *)self->fmat);
+  
+  self->type = fvec_type_vector;
+  
+  fts_return_object(o);
+}
+
+static void
+_fvec_get_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *self = (fvec_t *)o;
+  int size = fvec_get_size(self);
+  
+  fts_return_int(size);
+}
+
+static void
+_fvec_set_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *self = (fvec_t *)o;
+  int size = fts_get_number_int(at);
+  
+  if(size > 0 && fvec_get_type(self) == fvec_type_vector)
+    fmat_set_m(self->fmat, size);
+  
+  fvec_set_size(self, size);
+    
+  fts_return_int(size);
 }
 
 /******************************************************************************
@@ -394,301 +667,244 @@ fslice_set_fmat_or_fslice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
  */
 
 static void
-fslice_add_fslice(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+fvec_add_fvec(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
-  fslice_t *right = (fslice_t *)fts_get_object(at);
+  fvec_t *self = (fvec_t *)o;
+  fts_object_t *right = fts_get_object(at);
+  float *l, *r;
+  int l_size, r_size;
+  int l_stride, r_stride;
+  int size = l_size;
+  int i;
   
-  if(fslice_check_index(self) && fslice_check_index(right))
-  {
-    float *l = fslice_get_ptr(self);
-    float *r = fslice_get_ptr(right);
-    int l_stride = fslice_get_stride(self);
-    int r_stride = fslice_get_stride(right);
-    int size = fslice_get_size(self);
-    int i;
-    
-    if(size > fslice_get_size(right))
-      size = fslice_get_size(right);
-    
-    for(i=0; i<size; i++)
-      l[i * l_stride] += r[i * r_stride];
+  fvec_get_vector(self, &l, &l_size, &l_stride);
+  fmat_or_slice_vector(right, &r, &r_size, &r_stride);
   
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, right, "add");
+  if(size > r_size)
+    size = r_size;
+  
+  for(i=0; i<size; i++)
+    l[i * l_stride] += r[i * r_stride];
+  
+  fts_return_object(o);
 }
 
 static void
-fslice_add_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+fvec_add_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
+  fvec_t *self = (fvec_t *)o;
+  float r = (float)fts_get_number_float(at);
+  float *l;
+  int size, stride;
+  int i;
   
-  if(fslice_check_index(self))
-  {
-    float *l = fslice_get_ptr(self);
-    float r = (float)fts_get_number_float(at);
-    int stride = fslice_get_stride(self);
-    int size = fslice_get_size(self);
-    int i;
-    
-    for(i=0; i<size*stride; i+=stride)
-      l[i] += r;
+  fvec_get_vector(self, &l, &size, &stride);
   
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, NULL, "add");
+  for(i=0; i<size*stride; i+=stride)
+    l[i] += r;
+  
+  fts_return_object(o);
 }
 
 static void
-fslice_sub_fslice(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+fvec_sub_fvec(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
-  fslice_t *right = (fslice_t *)fts_get_object(at);
+  fvec_t *self = (fvec_t *)o;
+  fts_object_t *right = fts_get_object(at);
+  float *l, *r;
+  int l_size, r_size;
+  int l_stride, r_stride;
+  int size = l_size;
+  int i;
   
-  if(fslice_check_index(self) && fslice_check_index(right))
-  {
-    float *l = fslice_get_ptr(self);
-    float *r = fslice_get_ptr(right);
-    int l_stride = fslice_get_stride(self);
-    int r_stride = fslice_get_stride(right);
-    int size = fslice_get_size(self);
-    int i;
-    
-    if(size > fslice_get_size(right))
-      size = fslice_get_size(right);
-    
-    for(i=0; i<size; i++)
-      l[i * l_stride] -= r[i * r_stride];
+  fvec_get_vector(self, &l, &l_size, &l_stride);
+  fmat_or_slice_vector(right, &r, &r_size, &r_stride);
   
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, right, "sub");
+  if(size > r_size)
+    size = r_size;
+  
+  for(i=0; i<size; i++)
+    l[i * l_stride] -= r[i * r_stride];
+  
+  fts_return_object(o);
 }
 
 static void
-fslice_sub_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+fvec_sub_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
+  fvec_t *self = (fvec_t *)o;
+  float r = (float)fts_get_number_float(at);
+  float *l;
+  int size, stride;
+  int i;
   
-  if(fslice_check_index(self))
-  {
-    float *l = fslice_get_ptr(self);
-    float r = (float)fts_get_number_float(at);
-    int stride = fslice_get_stride(self);
-    int size = fslice_get_size(self);
-    int i;
-    
-    for(i=0; i<size*stride; i+=stride)
-      l[i] -= r;
+  fvec_get_vector(self, &l, &size, &stride);
   
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, NULL, "sub");
+  for(i=0; i<size*stride; i+=stride)
+    l[i] -= r;
+  
+  fts_return_object(o);
 }
 
 static void
-fslice_mul_fslice(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+fvec_mul_fvec(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
-  fslice_t *right = (fslice_t *)fts_get_object(at);
+  fvec_t *self = (fvec_t *)o;
+  fts_object_t *right = fts_get_object(at);
+  float *l, *r;
+  int l_size, r_size;
+  int l_stride, r_stride;
+  int size = l_size;
+  int i;
   
-  if(fslice_check_index(self) && fslice_check_index(right))
-  {
-    float *l = fslice_get_ptr(self);
-    float *r = fslice_get_ptr(right);
-    int l_stride = fslice_get_stride(self);
-    int r_stride = fslice_get_stride(right);
-    int size = fslice_get_size(self);
-    int i;
-    
-    if(size > fslice_get_size(right))
-      size = fslice_get_size(right);
-    
-    for(i=0; i<size; i++)
-      l[i * l_stride] *= r[i * r_stride];
+  fvec_get_vector(self, &l, &l_size, &l_stride);
+  fmat_or_slice_vector(right, &r, &r_size, &r_stride);
   
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, right, "mul");
+  if(size > r_size)
+    size = r_size;
+  
+  for(i=0; i<size; i++)
+    l[i * l_stride] *= r[i * r_stride];
+  
+  fts_return_object(o);
 }
 
 static void
-fslice_mul_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+fvec_mul_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
+  fvec_t *self = (fvec_t *)o;
+  float r = (float)fts_get_number_float(at);
+  float *l;
+  int size, stride;
+  int i;
   
-  if(fslice_check_index(self))
-  {
-    float *l = fslice_get_ptr(self);
-    float r = (float)fts_get_number_float(at);
-    int stride = fslice_get_stride(self);
-    int size = fslice_get_size(self);
-    int i;
-    
-    for(i=0; i<size*stride; i+=stride)
-      l[i] *= r;
+  fvec_get_vector(self, &l, &size, &stride);
   
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, NULL, "mul");
+  for(i=0; i<size*stride; i+=stride)
+    l[i] *= r;
+  
+  fts_return_object(o);
 }
 
 static void
-fslice_div_fslice(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+fvec_div_fvec(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
-  fslice_t *right = (fslice_t *)fts_get_object(at);
+  fvec_t *self = (fvec_t *)o;
+  fts_object_t *right = fts_get_object(at);
+  float *l, *r;
+  int l_size, r_size;
+  int l_stride, r_stride;
+  int size = l_size;
+  int i;
   
-  if(fslice_check_index(self) && fslice_check_index(right))
-  {
-    float *l = fslice_get_ptr(self);
-    float *r = fslice_get_ptr(right);
-    int l_stride = fslice_get_stride(self);
-    int r_stride = fslice_get_stride(right);
-    int size = fslice_get_size(self);
-    int i;
-    
-    if(size > fslice_get_size(right))
-      size = fslice_get_size(right);
-    
-    for(i=0; i<size; i++)
-      l[i * l_stride] /= r[i * r_stride];
+  fvec_get_vector(self, &l, &l_size, &l_stride);
+  fmat_or_slice_vector(right, &r, &r_size, &r_stride);
   
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, right, "div");
+  if(size > r_size)
+    size = r_size;
+  
+  for(i=0; i<size; i++)
+    l[i * l_stride] /= r[i * r_stride];
+  
+  fts_return_object(o);
 }
 
 static void
-fslice_div_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+fvec_div_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
+  fvec_t *self = (fvec_t *)o;
+  float r = (float)fts_get_number_float(at);
+  float *l;
+  int size, stride;
+  int i;
   
-  if(fslice_check_index(self))
-  {
-    float *l = fslice_get_ptr(self);
-    float r = (float)fts_get_number_float(at);
-    int stride = fslice_get_stride(self);
-    int size = fslice_get_size(self);
-    int i;
-    
-    for(i=0; i<size*stride; i+=stride)
-      l[i] /= r;
+  fvec_get_vector(self, &l, &size, &stride);
   
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, NULL, "div");
+  for(i=0; i<size*stride; i+=stride)
+    l[i] /= r;
+  
+  fts_return_object(o);
 }
 
 static void
-fslice_bus_fslice(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+fvec_bus_fvec(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
-  fslice_t *right = (fslice_t *)fts_get_object(at);
+  fvec_t *self = (fvec_t *)o;
+  fts_object_t *right = fts_get_object(at);
+  float *l, *r;
+  int l_size, r_size;
+  int l_stride, r_stride;
+  int size = l_size;
+  int i;
   
-  if(fslice_check_index(self) && fslice_check_index(right))
-  {
-    float *l = fslice_get_ptr(self);
-    float *r = fslice_get_ptr(right);
-    int l_stride = fslice_get_stride(self);
-    int r_stride = fslice_get_stride(right);
-    int size = fslice_get_size(self);
-    int i;
-    
-    if(size > fslice_get_size(right))
-      size = fslice_get_size(right);
-    
-    for(i=0; i<size; i++)
-      l[i * l_stride] = r[i * r_stride] - l[i * l_stride];
+  fvec_get_vector(self, &l, &l_size, &l_stride);
+  fmat_or_slice_vector(right, &r, &r_size, &r_stride);
   
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, right, "bus");
+  if(size > r_size)
+    size = r_size;
+  
+  for(i=0; i<size; i++)
+    l[i * l_stride] = r[i * r_stride] - l[i * l_stride];
+  
+  fts_return_object(o);
 }
 
 static void
-fslice_bus_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+fvec_bus_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
+  fvec_t *self = (fvec_t *)o;
+  float r = (float)fts_get_number_float(at);
+  float *l;
+  int size, stride;
+  int i;
   
-  if(fslice_check_index(self))
-  {
-    float *l = fslice_get_ptr(self);
-    float r = (float)fts_get_number_float(at);
-    int stride = fslice_get_stride(self);
-    int size = fslice_get_size(self);
-    int i;
-    
-    for(i=0; i<size*stride; i+=stride)
-      l[i] = r - l[i];
+  fvec_get_vector(self, &l, &size, &stride);
   
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, NULL, "bus");
+  for(i=0; i<size*stride; i+=stride)
+    l[i] = r - l[i];
+  
+  fts_return_object(o);
 }
 
 static void
-fslice_vid_fslice(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+fvec_vid_fvec(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
-  fslice_t *right = (fslice_t *)fts_get_object(at);
+  fvec_t *self = (fvec_t *)o;
+  fts_object_t *right = fts_get_object(at);
+  float *l, *r;
+  int l_size, r_size;
+  int l_stride, r_stride;
+  int size = l_size;
+  int i;
   
-  if(fslice_check_index(self) && fslice_check_index(right))
-  {
-    float *l = fslice_get_ptr(self);
-    float *r = fslice_get_ptr(right);
-    int l_stride = fslice_get_stride(self);
-    int r_stride = fslice_get_stride(right);
-    int size = fslice_get_size(self);
-    int i;
-    
-    if(size > fslice_get_size(right))
-      size = fslice_get_size(right);
-    
-    for(i=0; i<size; i++)
-      l[i * l_stride] = r[i * r_stride] / l[i * l_stride];
+  fvec_get_vector(self, &l, &l_size, &l_stride);
+  fmat_or_slice_vector(right, &r, &r_size, &r_stride);
   
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, right, "vid");
+  if(size > r_size)
+    size = r_size;
+  
+  for(i=0; i<size; i++)
+    l[i * l_stride] = r[i * r_stride] / l[i * l_stride];
+  
+  fts_return_object(o);
 }
 
 static void
-fslice_vid_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+fvec_vid_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
+  fvec_t *self = (fvec_t *)o;
+  float r = (float)fts_get_number_float(at);
+  float *l;
+  int size, stride;
+  int i;
   
-  if(fslice_check_index(self))
-  {
-    float *l = fslice_get_ptr(self);
-    float r = (float)fts_get_number_float(at);
-    int stride = fslice_get_stride(self);
-    int size = fslice_get_size(self);
-    int i;
-    
-    for(i=0; i<size*stride; i+=stride)
-      l[i] = r / l[i];
+  fvec_get_vector(self, &l, &size, &stride);
   
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, NULL, "vid");
+  for(i=0; i<size*stride; i+=stride)
+    l[i] = r / l[i];
+  
+  fts_return_object(o);
 }
-
-
-
 
 /******************************************************************************
  *
@@ -697,133 +913,100 @@ fslice_vid_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const ft
  */
 
 static void
-fslice_abs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_abs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
-
-  if(fslice_check_index(self))
-  {
-    float *ptr = fslice_get_ptr(self);
-    int stride = fslice_get_stride(self);
-    int size = fslice_get_size(self);
-    int i;
+  fvec_t *self = (fvec_t *)o;
+  float *ptr;
+  int size, stride;
+  int i;
+  
+  fvec_get_vector(self, &ptr, &size, &stride);
     
-    for(i=0; i<size*stride; i+=stride)
-      ptr[i] = fabsf(ptr[i]);
-    
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, NULL, "abs");
+  for(i=0; i<size*stride; i+=stride)
+    ptr[i] = fabsf(ptr[i]);
+  
+  fts_return_object(o);
 }
 
 static void
-fslice_logabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_logabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
-
-  if(fslice_check_index(self))
-  {
-    float *ptr = fslice_get_ptr(self);
-    int stride = fslice_get_stride(self);
-    int size = fslice_get_size(self);
-    int i;
+  fvec_t *self = (fvec_t *)o;
+  float *ptr;
+  int size, stride;
+  int i;
+  
+  fvec_get_vector(self, &ptr, &size, &stride);
     
-    for(i=0; i<size*stride; i+=stride)
-      ptr[i] = logf(fabsf(ptr[i]));
-    
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, NULL, "logabs");
+  for(i=0; i<size*stride; i+=stride)
+    ptr[i] = logf(fabsf(ptr[i]));
+  
+  fts_return_object(o);
 }
 
 static void
-fslice_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
-
-  if(fslice_check_index(self))
-  {
-    float *ptr = fslice_get_ptr(self);
-    int stride = fslice_get_stride(self);
-    int size = fslice_get_size(self);
-    int i;
-    
-    for(i=0; i<size*stride; i+=stride)
-      ptr[i] = logf(ptr[i]);
-    
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, NULL, "log");
+  fvec_t *self = (fvec_t *)o;
+  float *ptr;
+  int size, stride;
+  int i;
+  
+  fvec_get_vector(self, &ptr, &size, &stride);
+  
+  for(i=0; i<size*stride; i+=stride)
+    ptr[i] = logf(ptr[i]);
+  
+  fts_return_object(o);
 }
 
 static void
-fslice_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
-
-  if(fslice_check_index(self))
-  {
-    float *ptr = fslice_get_ptr(self);
-    int stride = fslice_get_stride(self);
-    int size = fslice_get_size(self);
-    int i;
+  fvec_t *self = (fvec_t *)o;
+  float *ptr;
+  int size, stride;
+  int i;
+  
+  fvec_get_vector(self, &ptr, &size, &stride);
     
-    for(i=0; i<size*stride; i+=stride)
-      ptr[i] = expf(ptr[i]);
-    
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, NULL, "exp");
+  for(i=0; i<size*stride; i+=stride)
+    ptr[i] = expf(ptr[i]);
+  
+  fts_return_object(o);
 }
 
 static void
-fslice_sqrabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_sqrabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
-
-  if(fslice_check_index(self))
-  {
-    float *ptr = fslice_get_ptr(self);
-    int stride = fslice_get_stride(self);
-    int size = fslice_get_size(self);
-    int i;
+  fvec_t *self = (fvec_t *)o;
+  float *ptr;
+  int size, stride;
+  int i;
+  
+  fvec_get_vector(self, &ptr, &size, &stride);
     
-    for(i=0; i<size*stride; i+=stride)
-      ptr[i] *= ptr[i];
-    
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, NULL, "sqrabs");
+  for(i=0; i<size*stride; i+=stride)
+    ptr[i] *= ptr[i];
+  
+  fts_return_object(o);
 }
 
 static void
-fslice_sqrt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_sqrt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
-
-  if(fslice_check_index(self))
-  {
-    float *ptr = fslice_get_ptr(self);
-    int stride = fslice_get_stride(self);
-    int size = fslice_get_size(self);
-    int i;
-    
-    for(i=0; i<size*stride; i+=stride)
-      ptr[i] = sqrtf(ptr[i]);
-    
-    fts_return_object(o);
-  }
-  else
-    fslice_error_index(self, NULL, "sqtr");
+  fvec_t *self = (fvec_t *)o;
+  float *ptr;
+  int size, stride;
+  int i;
+  
+  fvec_get_vector(self, &ptr, &size, &stride);
+  
+  for(i=0; i<size*stride; i+=stride)
+    ptr[i] = sqrtf(ptr[i]);
+  
+  fts_return_object(o);
 }
-
-
-
 
 /******************************************************************************
  *
@@ -832,212 +1015,176 @@ fslice_sqrt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  */
 
 static void
-fslice_get_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_get_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *) o;
+  fvec_t *self = (fvec_t *) o;
+  float *p;
+  int size, stride;
   
-  if(fslice_check_index(self))
+  fvec_get_vector(self, &p, &size, &stride);
+
+  if(size > 0)
   {
-    const int stride = fslice_get_stride(self);
-    const int size   = fslice_get_size(self) * stride;	/* index into fmat! */
+    float min = p[0];
+    int i;
     
-    if(size > 0)
+    for (i=stride; i<size; i+=stride)
     {
-      const float *p = fslice_get_ptr(self);
-      float min = p[0];
-      int i;
-        
-      for (i=stride; i<size; i+=stride)
-      {
-        if (p[i] < min)
-          min = p[i];
-      }
-      
+      if (p[i] < min)
+        min = p[i];
+    }
+    
       fts_return_float(min);
-    }
   }
-  else
-    fslice_error_index(self, NULL, "max");
 }
 
 static void
-fslice_get_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_get_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
-
-  if(fslice_check_index(self))
-  {
-    const int stride = fslice_get_stride(self);
-    const int size   = fslice_get_size(self) * stride;	/* index into fmat! */
-    
-    if(size > 0)
-    {
-      const float *p = fslice_get_ptr(self);
-      float max = p[0]; /* start with first element */
-      int i;
-      
-      for (i=stride; i<size; i+=stride)
-      {
-        if (p[i] > max)
-          max = p[i];
-      }
-      
-      fts_return_float(max);
-    }
-  }
-  else
-    fslice_error_index(self, NULL, "max");
-}
-
-
-static void
-fslice_get_absmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fslice_t *self = (fslice_t *)o;
-
-  if(fslice_check_index(self))
-  {
-    const int stride = fslice_get_stride(self);
-    const int size   = fslice_get_size(self) * stride;	/* index into fmat! */
-
-    if(size > 0)
-    {
-      const float *p = fslice_get_ptr(self);
-      float max = fabsf(p[0]); /* start with first element */
-      int i;
-      
-      for (i=stride; i<size; i+=stride)
-      {
-	if (fabsf(p[i]) > max)
-	  max = fabsf(p[i]);
-      }
-      
-      fts_return_float(max);
-    }
-  }
-  else
-    fslice_error_index(self, NULL, "absmax");
-}
-
-
-static void
-fslice_get_min_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fslice_t *self = (fslice_t *)o;
-
-  if(fslice_check_index(self))
-  {
-    const int stride = fslice_get_stride(self);
-    const int size   = fslice_get_size(self);   /* index into fvec! */
+  fvec_t *self = (fvec_t *)o;
+  float *p;
+  int size, stride;
   
-    if(size > 0)
+  fvec_get_vector(self, &p, &size, &stride);
+
+  if(size > 0)
+  {
+    float max = p[0]; /* start with first element */
+    int i;
+    
+    for (i=stride; i<size; i+=stride)
     {
-      const float *p = fslice_get_ptr(self);
-      float min = p[0];
-      int mini = 0;
-      int i, j;
-      
-      for(i=1, j=stride; i<size; i++, j+=stride)
+      if(p[i] > max)
+        max = p[i];
+    }
+    
+    fts_return_float(max);
+  }
+}
+
+static void
+fvec_get_absmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *self = (fvec_t *)o;
+  float *p;
+  int size, stride;
+  
+  fvec_get_vector(self, &p, &size, &stride);
+
+  if(size > 0)
+  {
+    float max = fabsf(p[0]); /* start with first element */
+    int i;
+    
+    for (i=stride; i<size; i+=stride)
+    {
+      if (fabsf(p[i]) > max)
+        max = fabsf(p[i]);
+    }
+    
+    fts_return_float(max);
+  }
+}
+
+static void
+fvec_get_min_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *self = (fvec_t *)o;
+  float *p;
+  int size, stride;
+  
+  fvec_get_vector(self, &p, &size, &stride);
+
+  if(size > 0)
+  {
+    float min = p[0];
+    int mini = 0;
+    int i, j;
+    
+    for(i=1, j=stride; i<size; i++, j+=stride)
+    {
+      if(p[j] < min)
       {
-        if(p[j] < min)
-        {
-          min = p[j];
-          mini = i;
-        }
+        min = p[j];
+        mini = i;
       }
-      
-      fts_return_int(mini);
     }
+    
+    fts_return_int(mini);
   }
-  else
-    fslice_error_index(self, NULL, "mini");
 }
 
 static void
-fslice_get_max_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_get_max_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
+  fvec_t *self = (fvec_t *)o;
+  float *p;
+  int size, stride;
+  
+  fvec_get_vector(self, &p, &size, &stride);
 
-  if(fslice_check_index(self))
+  if(size > 0)
   {
-    const int stride = fslice_get_stride(self);
-    const int size   = fslice_get_size(self);   /* index into fvec! */
- 
-    if(size > 0)
+    float max = p[0];
+    int maxi = 0;
+    int i, j;
+    
+    for(i=1, j=stride; i<size; i++, j+=stride)
     {
-      const float *p = fslice_get_ptr(self);
-      float max = p[0];
-      int maxi = 0;
-      int i, j;
-      
-      for(i=1, j=stride; i<size; i++, j+=stride)
+      if (p[j] > max)
       {
-        if (p[j] > max)
-        {
-          max = p[j];
-          maxi = i;
-        }
-      }   
-      
-      fts_return_int(maxi);
-    }
+        max = p[j];
+        maxi = i;
+      }
+    }   
+    
+    fts_return_int(maxi);
   }
-  else
-    fslice_error_index(self, NULL, "maxi");
 }
 
 static void
-fslice_get_sum(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_get_sum(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
-
-  if(fslice_check_index(self))
-  {
-    const float *p = fslice_get_ptr(self);
-    const int size = fslice_get_size(self);
-    const int stride = fslice_get_stride(self);
-    double sum = 0.0;
-    int i;
-    
-    for(i=0; i<size*stride; i+=stride)
-        sum += p[i];
-    
-    fts_return_float(sum);
-  }
-  else
-    fslice_error_index(self, NULL, "sum");
+  fvec_t *self = (fvec_t *)o;
+  double sum = 0.0;
+  float *p;
+  int size, stride;
+  int i;
+  
+  fvec_get_vector(self, &p, &size, &stride);
+  
+  for(i=0; i<size*stride; i+=stride)
+    sum += p[i];
+  
+  fts_return_float(sum);
 }
 
 static void
-fslice_get_mean(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_get_mean(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
-
-  if(fslice_check_index(self))
-  {
-    const float *p = fslice_get_ptr(self);
-    const int size = fslice_get_size(self);
-    const int stride = fslice_get_stride(self);
-    double sum = 0.0;
-    int i;
+  fvec_t *self = (fvec_t *)o;
+  double sum = 0.0;
+  float *p;
+  int size, stride;
+  int i;
+  
+  fvec_get_vector(self, &p, &size, &stride);
     
-    for(i=0; i<size*stride; i+=stride)
-        sum += p[i];
-    
-    fts_return_float(sum / (double)size);
-  }
-  else
-    fslice_error_index(self, NULL, "mean");
+  for(i=0; i<size*stride; i+=stride)
+    sum += p[i];
+  
+  fts_return_float(sum / (double)size);
 }
 
 static void
-fslice_get_zc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_get_zc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *) o;
-  const float *p = fslice_get_ptr(self);
-  const int size = fslice_get_size(self);
-  const int stride = fslice_get_stride(self);
-    
+  fvec_t *self = (fvec_t *) o;
+  float *p;
+  int size, stride;
+  
+  fvec_get_vector(self, &p, &size, &stride);
+
   if(size > 0)
   {
     float prev = p[0];
@@ -1059,33 +1206,59 @@ fslice_get_zc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   }
 }
 
-
-
-
 /****************************************************************************
  *
- *  element access
+ *  system mehods
  *
  */
 
 /* called by get element message */
 static void
-_fslice_get_element (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_fvec_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-    fslice_t *self = (fslice_t *) o;
-    int i = 0;
+  fvec_t *self = (fvec_t *) o;
+  float *ptr;
+  int size, stride;
+  int i = 0;
   
-    if (ac > 0  &&  fts_is_number(at))
-	i = fts_get_number_int(at);
+  fvec_get_vector(self, &ptr, &size, &stride);
+  
+  if(ac > 0  &&  fts_is_number(at))
+    i = fts_get_number_int(at);
 
-    if (i >= 0  &&  i < fslice_get_size(self))
-	fts_return_float(fslice_get_element(self, i));
-
-    /* todo: index < 0: from end */
+  if(i >= size)
+    i = size - 1;
+  
+  while(i < 0)
+    i += size;
+  
+  if (i >= 0  &&  i < size)
+    fts_return_float(ptr[i * stride]);
 }
 
-
-
+static void
+fvec_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *self = (fvec_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  
+  if(self->type == fvec_type_vector)
+  {
+    fts_message_t *mess = fts_dumper_message_new(dumper, fts_s_size);
+    fts_message_append_int(mess, self->size);
+    fts_dumper_message_send(dumper, mess);
+  }
+  else if(self->fmat != fmat_null)
+  {
+    fts_message_t *mess = fts_dumper_message_new(dumper, sym_refer);
+    fts_message_append_object(mess, (fts_object_t *)self->fmat);
+    fts_message_append_symbol(mess, fvec_type_names[self->type]);
+    fts_message_append_int(mess, self->index);
+    fts_message_append_int(mess, self->onset);
+    fts_message_append_int(mess, self->size);
+    fts_dumper_message_send(dumper, mess);
+  }
+}
 
 /****************************************************************************
  *
@@ -1094,41 +1267,55 @@ _fslice_get_element (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
  */
 
 static void
-fslice_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
-  float *ptr = fslice_get_ptr(self);
-  int index = fslice_get_index(self);
-  int size = fslice_get_size(self);
-  int stride = fslice_get_stride(self);
-  fmat_t *fmat = fslice_get_fmat(self);
+  fvec_t *self = (fvec_t *)o;
+  int index = fvec_get_index(self);
+  int onset = fvec_get_onset(self);
+  fmat_t *fmat = fvec_get_fmat(self);
   int m = fmat_get_m(fmat);
   int n = fmat_get_n(fmat);
   fts_bytestream_t* stream = fts_get_default_console_stream();
+  float *ptr;
+  int size, stride;
   int i;
+  
+  fvec_get_vector(self, &ptr, &size, &stride);
   
   if(ac > 0 && fts_is_object(at))
     stream = (fts_bytestream_t *)fts_get_object(at);
   
-  if(m * n == 0)
+  if(m * n * size == 0)
   {
-    if(self->type == fslice_column)
-      fts_spost(stream, "<fcol reference to column %d of empty fmat>\n", index);
-    else
-      fts_spost(stream, "<frow reference to row %d of empty fmat>\n", index);
+    if(self->type == fvec_type_column)
+      fts_spost(stream, "<empty fmat column (%d %d %d)>\n", index, onset, size);
+    else if(self->type == fvec_type_row)
+      fts_spost(stream, "<empty fmat row (%d %d %d)>\n", index, onset, size);
+    else if(self->type == fvec_type_diagonal)
+      fts_spost(stream, "<empty fmat diagonal (%d %d %d)>\n", index, onset, size);
+    else if(self->type == fvec_type_unwrap)
+      fts_spost(stream, "<empty fmat unwrap (%d %d %d)>\n", index, onset, size);
+    else if(self->type == fvec_type_vector)
+      fts_spost(stream, "<empty fvec>\n");
   }
   else
   {
-    if(self->type == fslice_column)
-      fts_spost(stream, "<fcol reference to column %d of fmat %dx%d>\n", index, m, n);
-    else
-      fts_spost(stream, "<frow reference to row %d of fmat %dx%d>\n", index, m, n);
-      
+    if(self->type == fvec_type_column)
+      fts_spost(stream, "<fvec column vector (%d %d %d) of %d x %d matrix>\n", index, onset, size, m, n);
+    else if(self->type == fvec_type_row)
+      fts_spost(stream, "<fvec row vector (%d %d %d) of %d x %d matrix>\n", index, onset, size, m, n);
+    else if(self->type == fvec_type_diagonal)
+      fts_spost(stream, "<fvec diagonal vector (%d %d %d) of %d x %d matrix>\n", index, onset, size, m, n);
+    else if(self->type == fvec_type_unwrap)
+      fts_spost(stream, "<fvec unwrap vector (%d %d %d) of %d x %d matrix>\n", index, onset, size, m, n);
+    else if(self->type == fvec_type_vector)
+      fts_spost(stream, "<fvec of %d elements>\n", size);
+    
     fts_spost(stream, "{\n");
-
+    
     for(i=0; i<size*stride; i+=stride)
       fts_spost(stream, "  %.7g\n", ptr[i]);
-
+    
     fts_spost(stream, "}\n");
   }
 }
@@ -1139,123 +1326,139 @@ fslice_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  *
  */
 static void
-fslice_init(fts_object_t *o, int type, int ac, const fts_atom_t *at)
+fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fslice_t *self = (fslice_t *)o;
+  fvec_t *self = (fvec_t *)o;
   
-  self->type = type;
-  self->fmat = NULL;
+  self->fmat = fmat_null;
+  self->type = fvec_type_column;
   self->index = 0;
+  self->onset = 0;
+  self->size = INT_MAX;
   
-  if(ac > 0 && fts_is_a(at, fmat_class))
+  if(ac > 0)
   {
-    self->fmat = (fmat_t *)fts_get_object(at);
-    fts_object_refer((fts_object_t *)self->fmat);
+    if(fts_is_a(at, fmat_class))
+    {
+      self->fmat = (fmat_t *)fts_get_object(at);
+      
+      if(ac > 1 && fts_is_symbol(at + 1))
+      {
+        fts_symbol_t sym = fts_get_symbol(at + 1);
+        self->type = fvec_get_type_from_symbol(sym);
+      }
+      
+      if(ac > 2)
+        fvec_set_dimensions(self, ac - 2, at + 2);
+    }
+    else if(fts_is_number(at))
+    {
+      int size = fts_get_number_int(at);
+      
+      self->fmat = fmat_create(size, 1);
+      self->type = fvec_type_vector;
+      self->size = size;
+      
+      if(ac > 1)
+        fvec_set(o, 0, NULL, ac - 1, at + 1);
+    }    
   }
-  else
-    fts_object_error(o, "fmat argument required");
   
-  if(ac > 1 && fts_is_number(at + 1))
-  {
-    int index = fts_get_number_int(at + 1);
-    
-    if(index > 0)
-      self->index = index;
-  }
+  fts_object_refer((fts_object_t *)self->fmat);
 }
 
 static void
-fcol_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fslice_init(o, fslice_column, ac, at);
-}
-
-static void
-frow_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fslice_init(o, fslice_row, ac, at);
-}
-
-static void
-fslice_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fslice_t *self = (fslice_t *)o;
+  fvec_t *self = (fvec_t *)o;
   
-  if(self->fmat != NULL)
-    fts_object_release(self->fmat);
+  fts_object_release((fts_object_t *)self->fmat);
 }
 
 static void
-fslice_message(fts_class_t *cl, fts_symbol_t s, fts_method_t slice_method, fts_method_t scalar_method)
+fvec_message(fts_class_t *cl, fts_symbol_t s, fts_method_t slice_method, fts_method_t scalar_method)
 {	
-	fts_class_message(cl, s, fcol_class, slice_method);
-	fts_class_message(cl, s, frow_class, slice_method);	  
+	fts_class_message(cl, s, fmat_class, slice_method);
+	fts_class_message(cl, s, fvec_class, slice_method);
 	fts_class_message_number(cl, s, scalar_method);	  
 }
 
 static void
-fslice_instantiate(fts_class_t *cl)
+fvec_instantiate(fts_class_t *cl)
 {
-  /* standard functions */
-  fts_class_message_varargs(cl, fts_s_print, fslice_print);
-  fts_class_message_varargs(cl, fts_s_get_element, _fslice_get_element);
-  fts_class_message_varargs(cl, fts_s_get, _fslice_get_element);
+  fts_class_init(cl, sizeof(fvec_t), fvec_init, fvec_delete);
   
-  fts_class_set_array_function(cl, fslice_array_function);
-  fts_class_set_description_function(cl, fslice_description_function);
+  /* standard functions */
+  fts_class_message_varargs(cl, fts_s_print, fvec_print);
+  fts_class_message_varargs(cl, fts_s_get_element, _fvec_get_element);
+  fts_class_message_varargs(cl, fts_s_get, _fvec_get_element);
+  
+  fts_class_set_array_function(cl, fvec_array_function);
+  fts_class_message_varargs(cl, fts_s_dump_state, fvec_dump_state);
 
-  fts_class_message_varargs(cl, fts_new_symbol("set"), fslice_set);
-  fts_class_message(cl, fts_new_symbol("set"), fcol_class, fslice_set_fmat_or_fslice);
-  fts_class_message(cl, fts_new_symbol("set"), frow_class, fslice_set_fmat_or_fslice);
-  fts_class_message(cl, fts_new_symbol("set"), fmat_class, fslice_set_fmat_or_fslice);
+  fts_class_message_varargs(cl, fts_new_symbol("set"), fvec_set);
+  fts_class_message(cl, fts_new_symbol("set"), fmat_class, fvec_set_from_fmat_or_fvec);
+  fts_class_message(cl, fts_new_symbol("set"), fvec_class, fvec_set_from_fmat_or_fvec);
+
+  fts_class_message(cl, sym_refer, fmat_class, _fvec_set_fmat);
+  fts_class_message_varargs(cl, sym_refer, _fvec_set_fmat_and_dimensions);
+  fts_class_message_varargs(cl, sym_col, _fvec_set_col);
+  fts_class_message_varargs(cl, sym_row, _fvec_set_row);
+  fts_class_message_varargs(cl, sym_unwrap, _fvec_set_unwrap);
+  fts_class_message_varargs(cl, sym_vec, _fvec_set_vector);
+  
+  fts_class_message_void(cl, fts_s_size, _fvec_get_size);
+  fts_class_message_number(cl, fts_s_size, _fvec_set_size);
 
   /* arithmetics */
-  fslice_message(cl, fts_new_symbol("add"), fslice_add_fslice, fslice_add_number);
-  fslice_message(cl, fts_new_symbol("sub"), fslice_sub_fslice, fslice_sub_number);
-  fslice_message(cl, fts_new_symbol("mul"), fslice_mul_fslice, fslice_mul_number);
-  fslice_message(cl, fts_new_symbol("div"), fslice_div_fslice, fslice_div_number);
-  fslice_message(cl, fts_new_symbol("bus"), fslice_bus_fslice, fslice_bus_number);
-  fslice_message(cl, fts_new_symbol("vid"), fslice_vid_fslice, fslice_vid_number);
+  fvec_message(cl, fts_new_symbol("add"), fvec_add_fvec, fvec_add_number);
+  fvec_message(cl, fts_new_symbol("sub"), fvec_sub_fvec, fvec_sub_number);
+  fvec_message(cl, fts_new_symbol("mul"), fvec_mul_fvec, fvec_mul_number);
+  fvec_message(cl, fts_new_symbol("div"), fvec_div_fvec, fvec_div_number);
+  fvec_message(cl, fts_new_symbol("bus"), fvec_bus_fvec, fvec_bus_number);
+  fvec_message(cl, fts_new_symbol("vid"), fvec_vid_fvec, fvec_vid_number);
 
-  fts_class_message_void(cl, fts_new_symbol("abs"), fslice_abs);
-  fts_class_message_void(cl, fts_new_symbol("logabs"), fslice_logabs);
-  fts_class_message_void(cl, fts_new_symbol("log"), fslice_log);
-  fts_class_message_void(cl, fts_new_symbol("exp"), fslice_exp);
-  fts_class_message_void(cl, fts_new_symbol("sqrabs"), fslice_sqrabs);
-  fts_class_message_void(cl, fts_new_symbol("sqrt"), fslice_sqrt);
+  fts_class_message_void(cl, fts_new_symbol("abs"), fvec_abs);
+  fts_class_message_void(cl, fts_new_symbol("logabs"), fvec_logabs);
+  fts_class_message_void(cl, fts_new_symbol("log"), fvec_log);
+  fts_class_message_void(cl, fts_new_symbol("exp"), fvec_exp);
+  fts_class_message_void(cl, fts_new_symbol("sqrabs"), fvec_sqrabs);
+  fts_class_message_void(cl, fts_new_symbol("sqrt"), fvec_sqrt);
 
-  fts_class_message_void(cl, fts_new_symbol("min"), fslice_get_min);
-  fts_class_message_void(cl, fts_new_symbol("max"), fslice_get_max);
-  fts_class_message_void(cl, fts_new_symbol("mini"), fslice_get_min_index);
-  fts_class_message_void(cl, fts_new_symbol("maxi"), fslice_get_max_index);
-  fts_class_message_void(cl, fts_new_symbol("absmax"), fslice_get_absmax);
-  fts_class_message_void(cl, fts_new_symbol("sum"), fslice_get_sum);
-  fts_class_message_void(cl, fts_new_symbol("mean"), fslice_get_mean);
-  fts_class_message_void(cl, fts_new_symbol("zc"), fslice_get_zc);
+  fts_class_message_void(cl, fts_new_symbol("min"), fvec_get_min);
+  fts_class_message_void(cl, fts_new_symbol("max"), fvec_get_max);
+  fts_class_message_void(cl, fts_new_symbol("mini"), fvec_get_min_index);
+  fts_class_message_void(cl, fts_new_symbol("maxi"), fvec_get_max_index);
+  fts_class_message_void(cl, fts_new_symbol("absmax"), fvec_get_absmax);
+  fts_class_message_void(cl, fts_new_symbol("sum"), fvec_get_sum);
+  fts_class_message_void(cl, fts_new_symbol("mean"), fvec_get_mean);
+  fts_class_message_void(cl, fts_new_symbol("zc"), fvec_get_zc);
 
-  fts_class_message(cl, fts_new_symbol("lookup"), fmat_class, fslice_lookup_fmat_or_slice);
-  fts_class_message(cl, fts_new_symbol("lookup"), frow_class, fslice_lookup_fmat_or_slice);
-  fts_class_message(cl, fts_new_symbol("lookup"), fcol_class, fslice_lookup_fmat_or_slice);
-  fts_class_message(cl, fts_new_symbol("lookup"), bpf_type, fslice_lookup_bpf);
+  fts_class_message(cl, fts_new_symbol("lookup"), fmat_class, fvec_lookup_fmat_or_slice);
+  fts_class_message(cl, fts_new_symbol("lookup"), fvec_class, fvec_lookup_fmat_or_slice);
+  fts_class_message(cl, fts_new_symbol("lookup"), bpf_type, fvec_lookup_bpf);
   
-  fts_class_message(cl, fts_new_symbol("env"), fmat_class, fslice_env_fmat_or_slice);
-  fts_class_message(cl, fts_new_symbol("env"), frow_class, fslice_env_fmat_or_slice);
-  fts_class_message(cl, fts_new_symbol("env"), fcol_class, fslice_env_fmat_or_slice);
-  fts_class_message(cl, fts_new_symbol("env"), bpf_type, fslice_env_bpf);
+  fts_class_message(cl, fts_new_symbol("env"), fmat_class, fvec_env_fmat_or_slice);
+  fts_class_message(cl, fts_new_symbol("env"), fvec_class, fvec_env_fmat_or_slice);
+  fts_class_message(cl, fts_new_symbol("env"), bpf_type, fvec_env_bpf);
 
-  fts_class_message(cl, fts_new_symbol("apply"), expr_class, fslice_apply_expr);
-
+  fts_class_message(cl, fts_new_symbol("apply"), expr_class, fvec_apply_expr);
 
   /*
-   * fcol/frow class documentation
-   */  
-
-  fts_class_doc(cl, fts_new_symbol("add"), "<num|fcol|frow: operand>", "add given scalar, fcol or frow (element by element) to current values");
-  fts_class_doc(cl, fts_new_symbol("sub"), "<num|fcol|frow: operand>", "substract given scalar, fcol or frow (element by element)");
-  fts_class_doc(cl, fts_new_symbol("mul"), "<num|fcol|frow: operand>", "multiply current values by given scalar, fcol or frow (element by element)");
-  fts_class_doc(cl, fts_new_symbol("div"), "<num|fcol|frow: operand>", "divide current values by given scalar, fcol or frow (element by element)");
-  fts_class_doc(cl, fts_new_symbol("bus"), "<num|fcol|frow: operand>", "subtract current values from given scalar, fcol or frow (element by element)");  
-  fts_class_doc(cl, fts_new_symbol("vid"), "<num|fcol|frow: operand>", "divide given scalar, fcol or frow (element by element) by current values");
+   * fvec class documentation
+   */
+  fts_class_doc(cl, fvec_symbol, "<'col'> <num: column index> [<num: row onset> [<num: size>]]", "vector reference to matrix column");
+  fts_class_doc(cl, fvec_symbol, "<'row'> <num: row index> [<num: column onset> [<num: size>]]", "vector reference to matrix row");
+  fts_class_doc(cl, fvec_symbol, "<'diag'> <num: row onset> [<num: column onset> [<num: size>]]", "vector reference to matrix diagonal");
+  fts_class_doc(cl, fvec_symbol, "<'unwrap'> <num: row onset> [<num: column onset> [<num: size>]]", "vector reference to unwrapped matrix");
+  fts_class_doc(cl, fvec_symbol, "<num: size>", "vector reference compatible float vector");
+  
+  fts_class_doc(cl, fts_new_symbol("add"), "<num|fvec: operand>", "add given scalar, fvec (element by element) to current values");
+  fts_class_doc(cl, fts_new_symbol("sub"), "<num|fvec: operand>", "substract given scalar, fvec (element by element)");
+  fts_class_doc(cl, fts_new_symbol("mul"), "<num|fvec: operand>", "multiply current values by given scalar, fvec (element by element)");
+  fts_class_doc(cl, fts_new_symbol("div"), "<num|fvec: operand>", "divide current values by given scalar, fvec (element by element)");
+  fts_class_doc(cl, fts_new_symbol("bus"), "<num|fvec: operand>", "subtract current values from given scalar, fvec (element by element)");  
+  fts_class_doc(cl, fts_new_symbol("vid"), "<num|fvec: operand>", "divide given scalar, fvec (element by element) by current values");
 
   fts_class_doc(cl, fts_new_symbol("abs"), NULL, "calulate absolute values of current values");
   fts_class_doc(cl, fts_new_symbol("logabs"), NULL, "calulate logarithm of absolute values of current values");
@@ -1273,39 +1476,32 @@ fslice_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("mean"), NULL, "get mean value of all values");
   fts_class_doc(cl, fts_new_symbol("zc"), NULL, "get number of zerocrossings");  
   
-  fts_class_doc(cl, fts_new_symbol("lookup"), "<fmat|fcol|frow|bpf: function>", "apply given function (by linear interpolation)");
-  fts_class_doc(cl, fts_new_symbol("env"), "<fmat|fcol|frow|bpf: envelope>", "multiply given envelope");
+  fts_class_doc(cl, fts_new_symbol("lookup"), "<fmat|fvec|bpf: function>", "apply given function (by linear interpolation)");
+  fts_class_doc(cl, fts_new_symbol("env"), "<fmat|fvec|bpf: envelope>", "multiply given envelope");
   fts_class_doc(cl, fts_new_symbol("apply"), "<expr: expression>", "apply expression each value (use $self and $x)");
-}
-
-static void
-fcol_instantiate(fts_class_t *cl)
-{
-  fts_class_init(cl, sizeof(fslice_t), fcol_init, fslice_delete);
-
-  fts_class_doc(cl, fcol_symbol, "<num: column index>", "reference to matrix column");
-  fslice_instantiate(cl);
-}
-
-static void
-frow_instantiate(fts_class_t *cl)
-{
-  fts_class_init(cl, sizeof(fslice_t), frow_init, fslice_delete);
   
-  fts_class_doc(cl, frow_symbol, "<num: row index>", "reference to matrix row");
-  fslice_instantiate(cl);
+  fts_class_set_super(cl, fvec_class);
 }
 
 void 
 fvec_config(void)
 {
-  frow_symbol = fts_new_symbol("frow");
-  fcol_symbol = fts_new_symbol("fcol");
-
-  frow_class = fts_class_install(frow_symbol, frow_instantiate);
-  fcol_class = fts_class_install(fcol_symbol, fcol_instantiate);
+  fvec_symbol = fts_new_symbol("fvec");
+  sym_col = fts_new_symbol("col");
+  sym_row = fts_new_symbol("row");
+  sym_diag = fts_new_symbol("diag");
+  sym_unwrap = fts_new_symbol("unwrap");
+  sym_vec = fts_new_symbol("vec");
+  sym_refer = fts_new_symbol("refer");
+  
+  fvec_type_names[fvec_type_column] = sym_col;
+  fvec_type_names[fvec_type_row] = sym_row;
+  fvec_type_names[fvec_type_diagonal] = sym_diag;
+  fvec_type_names[fvec_type_unwrap] = sym_unwrap;
+  fvec_type_names[fvec_type_vector] = sym_vec;
+  
+  fvec_class = fts_class_install(fvec_symbol, fvec_instantiate);
 }
-
 
 /** EMACS **
  * Local variables:

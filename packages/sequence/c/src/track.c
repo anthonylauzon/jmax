@@ -404,12 +404,13 @@ track_remove_event_and_upload(track_t *track, event_t *event)
 {
   fts_atom_t at;
 
-  fts_set_object(&at, (fts_object_t *) event);  
-  fts_client_send_message((fts_object_t *) track, seqsym_removeEvents, 1, &at);  
-  
   if(track_editor_is_open(track))
-    track_remove_event(track, event);
+  {
+    fts_set_object(&at, (fts_object_t *) event);  
+    fts_client_send_message((fts_object_t *) track, seqsym_removeEvents, 1, &at);  
+  }
   
+  track_remove_event(track, event);
   fts_object_set_state_dirty((fts_object_t *)track);
 }
 
@@ -1035,17 +1036,16 @@ _track_make_bars(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
 
 static void
-_track_renumber_bars (fts_object_t *o, int winlet, fts_symbol_t s, 
-                      int ac, const fts_atom_t *at)
+_track_renumber_bars (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-    track_t *markers = (track_t *) o;
-    fts_symbol_t tr_type = fts_class_get_name(track_get_type(markers));
+  track_t *markers = (track_t *) o;
+  fts_symbol_t tr_type = fts_class_get_name(track_get_type(markers));
   
-    if (tr_type != seqsym_scomark)
-        markers = track_get_or_make_markers(markers);
-
-    marker_track_renumber_bars(markers, track_get_first(markers), 
-                               FIRST_BAR_NUMBER, 1);
+  if (tr_type != seqsym_scomark)
+    markers = track_get_or_make_markers(markers);
+  
+  marker_track_renumber_bars(markers, track_get_first(markers), 
+                             FIRST_BAR_NUMBER, 1);
 }
 
 
@@ -1999,8 +1999,7 @@ track_import_midifile (fts_object_t *o, int winlet, fts_symbol_t s,
 
 /* default export handler: midifile */
 static void
-track_export_midifile (fts_object_t *o, int winlet, fts_symbol_t s, 
-                       int ac, const fts_atom_t *at)
+track_export_midifile (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *self = (track_t *) o;
   fts_symbol_t sym  = fts_get_symbol(at);
@@ -2033,8 +2032,7 @@ track_export_midifile (fts_object_t *o, int winlet, fts_symbol_t s,
 
 
 static void
-track_export_dialog (fts_object_t *o, int winlet, fts_symbol_t s, 
-                     int ac, const fts_atom_t *at)
+track_export_dialog (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_symbol_t track_name   = track_get_name(self);   /* why always NULL? */
   fts_symbol_t default_name = track_name  ?  track_name  
@@ -2045,13 +2043,8 @@ track_export_dialog (fts_object_t *o, int winlet, fts_symbol_t s,
     (ex: *.mid *.sdif *.*)
     */
   
-  fts_object_save_dialog(o, fts_s_export, 
-                         fts_new_symbol("Select file to export"), 
-                         fts_project_get_dir(), default_name);
+  fts_object_save_dialog(o, fts_s_export, fts_new_symbol("Select file to export"), fts_project_get_dir(), default_name);
 }
-
-
-
 
 /* editor */
 

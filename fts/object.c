@@ -72,6 +72,8 @@ fts_object_reset(fts_object_t *obj)
   
   /* release all client components */
   fts_object_reset_client(obj);
+
+  fts_object_set_status( obj, FTS_OBJECT_STATUS_CREATE);
 }  
 
 void 
@@ -88,6 +90,8 @@ fts_object_snatch(fts_object_t *obj, fts_object_t *replace)
   
   /* free the snatcher (no return for the body snatcher) */
   fts_object_free(replace);
+  
+  fts_object_set_status(obj, FTS_OBJECT_STATUS_OK);
 }
 
 fts_object_t *

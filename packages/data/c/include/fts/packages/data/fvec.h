@@ -24,164 +24,55 @@
 #ifndef _DATA_FVEC_H_
 #define _DATA_FVEC_H_
 
-
-/** Float vector classes.
- *
- *  @file fvec.h
- *  @ingroup data
- */
-
-
 /*****************************************************************************/
-/** @defgroup fvec fvec: backwards compatibility functions
+/** @defgroup fvec fvec: fmat row or column ref
  *  @ingroup  data
  *
- *  fvec compatibility
- *   
- *  Note: fvec is now fmat! here is the code for matrix slices fcol and frow
- *
- *  A float vector fvec is a mere alias to fmat, with the constraint of having 
- *  only one column.
+ *  an fmat slice is a reference to a colum, row or diagonal of an fmat
  *
  *  @{
  */
 
-#include <fts/packages/data/data.h>
-
-#define fvec_get_size(v) ((v)->m)
-#define fvec_set_size(v, s) fmat_set_size((v), (s), 1)
-
-#define fvec_get_ptr(v) ((v)->values)
-#define fvec_get_element(m, i) ((m)->values[(i)])
-#define fvec_set_element(v, i, x) ((v)->values[i] = (x))
-
-#define fvec_copy(o, c) fmat_copy((o), (c))
-#define fvec_set_const(v, c) fmat_set_const((v), (c))
-#define fvec_set_with_onset_from_atoms(v, o, n, a) fmat_set_from_atoms((v), (o), 1, (n), (a))
-
-/** @} end of group fvec */
-
-
-
-
-/*****************************************************************************/
-/** @defgroup fslice fslice: fmat row or column ref
- *  @ingroup  data
- *
- *  an fmat slice is a reference to an fmat, either as fcol or as frow
- *
- *  @{
- */
-
-/** fslice struct */
+/** fvec struct */
 typedef struct
 {
   fts_object_t o;
-	enum {fslice_column, fslice_row} type;
+	enum {fvec_type_column, fvec_type_row, fvec_type_diagonal, fvec_type_unwrap, fvec_type_vector, fvec_n_types} type;
   fmat_t *fmat; /* pointer to fmat */
-  int index; /* index of row or column */
-} fslice_t;
+  int index; /* index of column (col) or index of row (row)  or row onset (diag) */
+  int onset; /* row onset (col) or column onset (row) or column onset (diag) */
+  int size; /* number of elements  */
+} fvec_t;
 
-DATA_API fts_symbol_t fcol_symbol;
-DATA_API fts_symbol_t frow_symbol;
-DATA_API fts_class_t *fcol_class;
-DATA_API fts_class_t *frow_class;
+#define fvec_get_fmat(f) ((f)->fmat)
+#define fvec_get_type(f) ((f)->type)
+#define fvec_get_index(f) ((f)->index)
+#define fvec_get_onset(f) ((f)->onset)
+#define fvec_get_size(f) ((f)->size)
 
+#define fvec_set_fmat(f, x) do{fts_object_release((fts_object_t *)(f)->fmat); (f)->fmat = (x); fts_object_refer((fts_object_t *)(x)); } while(0)
+#define fvec_set_type(f, x) ((f)->type = (x))
+#define fvec_set_index(f, x) ((f)->index = (x))
+#define fvec_set_onset(f, x) ((f)->onset = (x))
+#define fvec_set_size(f, x) ((f)->size = (x))
 
-/** 
- *
- *  @fn
- */
-#define fslice_init_column(s, m, i) ((s)->type = fslice_column, (s)->fmat = (m), (s)->index = (i))
+DATA_API fts_symbol_t fvec_symbol;
+DATA_API fts_class_t *fvec_class;
 
-/** 
- *
- *  @fn
- */
-#define fslice_init_row(s, m, i) ((s)->type = fslice_row, (s)->fmat = (m), (s)->index = (i))
+DATA_API void fvec_set_dimensions(fvec_t *fvec, int ac, const fts_atom_t *at);
+DATA_API int fvec_vector(fts_object_t *obj, float **ptr, int *size, int *stride);
 
+DATA_API fvec_t *fvec_create_column(fmat_t *fmat);
+DATA_API fvec_t *fvec_create_row(fmat_t *fmat);
+DATA_API fvec_t *fvec_create_diagonal(fmat_t *fmat);
+DATA_API fvec_t *fvec_create_unwrap(fmat_t *fmat);
+DATA_API fvec_t *fvec_create_vector(int size);
 
-/** 
- *
- *  @fn
- */
-#define fslice_get_index(s) ((s)->index)
-
-/** 
- *
- *  @fn
- */
-#define fslice_check_index(s) (((s)->type == fslice_row)? \
-                               ((s)->index < fmat_get_m((s)->fmat)): \
-                               ((s)->index < fmat_get_n((s)->fmat)))
+/** copy row or col from matrix reference to an fmat (1 column matrix) */
+DATA_API void fvec_copy_to_fmat(fvec_t *org, fmat_t *copy);
 
 
-/** 
- *
- *  @fn
- */
-#define fslice_get_ptr(s) (((s)->type == fslice_row)? \
-                           (fmat_get_ptr((s)->fmat) + (s)->index * fmat_get_n((s)->fmat)): \
-                           (fmat_get_ptr((s)->fmat) + (s)->index))
-
-/** 
- *
- *  @fn
- */
-#define fslice_get_element(s, i) \
-        ((s)->type == fslice_row						\
-	 ?  *(fmat_get_ptr((s)->fmat) + (s)->index * fmat_get_n((s)->fmat) + i) \
-	 :  *(fmat_get_ptr((s)->fmat) + (s)->index + i * fmat_get_n((s)->fmat)))
-/* general formula: ptr + i * stride */
-
-/** 
- *
- *  @fn
- */
-#define fslice_get_stride(s) (((s)->type == fslice_row)? (1): (fmat_get_n((s)->fmat)))
-
-/** 
- *
- *  @fn
- */
-#define fslice_get_size(s) (((s)->type == fslice_row)? (fmat_get_n((s)->fmat)): (fmat_get_m((s)->fmat)))
-
-/** 
- *
- *  @fn
- */
-#define fslice_get_m(s) (((s)->type == fslice_row)? (1): (fmat_get_m((s)->fmat)))
-
-/** 
- *
- *  @fn
- */
-#define fslice_get_n(s) (((s)->type == fslice_row)? (fmat_get_n((s)->fmat)): (1))
-
-#define frow_get_ptr(f) (fmat_get_ptr((f)->fmat) + (f)->index * fmat_get_n((f)->fmat))
-#define fcol_get_ptr(f) (fmat_get_ptr((f)->fmat) + (f)->index)
-
-#define frow_get_stride(f) (1)
-#define fcol_get_stride(f) (fmat_get_n((f)->fmat))
-
-#define frow_get_n(f) (fmat_get_n((f)->fmat))
-#define fcol_get_n(f) (1)
-
-#define frow_get_m(f) (1)
-#define fcol_get_m(f) (fmat_get_m((f)->fmat))
-
-#define frow_get_index(f) ((f)->index)
-#define fcol_get_index(f) ((f)->index)
-
-#define frow_check_index(f) ((f)->index < fmat_get_m((f)->fmat))
-#define fcol_check_index(f) ((f)->index < fmat_get_n((f)->fmat))
-
-/** copy row or col from matrix reference to an fvec (1 column matrix) */
-DATA_API void fslice_copy_to_fmat(fslice_t *org, fmat_t *copy);
-
-#define fslice_get_fmat(f) ((f)->fmat)
-
-/** @} end of group fslice */
+/** @} end of group fvec */
 
 
 #endif

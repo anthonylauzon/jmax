@@ -125,7 +125,7 @@ DATA_API void fmat_set_n(fmat_t *fmat, int n);
 #define fmat_set_domain(fm, f) ((fm)->domain = (f))
 #define fmat_get_domain(fm) (((fm)->domain > 0.0)? ((fm)->domain): ((double)(fm)->m))
 
-/** check class and get dimensions for fmat, fcol or frow vector */
+/** check class and get dimensions for fmat, fvec vector */
 DATA_API int fmat_or_slice_vector(fts_object_t *obj, float **ptr, int *size, int *stride);
 
 /** */
@@ -141,27 +141,10 @@ DATA_API float fmat_get_max_abs_value_in_range(fmat_t *mat, int a, int b);
 DATA_API float fmat_get_max_value_in_range(fmat_t *mat, int a, int b);
 DATA_API float fmat_get_min_value_in_range(fmat_t *mat, int a, int b);
 
+DATA_API fmat_t *fmat_null;
+
 DATA_API void fmat_upload(fmat_t *mat);
+
 /** @} end of group fmat */
-
-
-
-
-/** @name fvec fvec backwards compatibility
- *
- * fvec is an alias/macro to fmat, with the constraint of having 
- * only one column.
- *
- * @{
- */
-
-typedef fmat_t fvec_t;
-
-DATA_API fts_symbol_t fvec_symbol;
-DATA_API fts_class_t *fvec_class;
-#define fvec_type fmat_class
-
-/** @} end of group fvec */
-
 
 #endif
