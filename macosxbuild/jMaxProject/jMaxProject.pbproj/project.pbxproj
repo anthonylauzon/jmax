@@ -2249,6 +2249,30 @@
 			settings = {
 			};
 		};
+		F7050A2204055D1C01664058 = {
+			isa = PBXFileReference;
+			name = LabelsMapper.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/LabelsMapper.java;
+			refType = 2;
+		};
+		F7050A2304055D1C01664058 = {
+			fileRef = F7050A2204055D1C01664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F7050A2404055D4401664058 = {
+			isa = PBXFileReference;
+			name = LabelTypesAction.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/actions/LabelTypesAction.java;
+			refType = 2;
+		};
+		F7050A2504055D4401664058 = {
+			fileRef = F7050A2404055D4401664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F7112B660401730701664058 = {
 			isa = PBXFileReference;
 			name = udpsend.c;
@@ -8698,11 +8722,11 @@
 				F85123E6028BEAB301664092,
 				F85123E7028BEAB301664092,
 				F85123E8028BEAB301664092,
-				F85123E9028BEAB301664092,
 				F85123EA028BEAB301664092,
 				F85123EB028BEAB301664092,
 				F85123EC028BEAB301664092,
 				F704740A04040A7901664058,
+				F7050A2204055D1C01664058,
 				F85123ED028BEAB301664092,
 				F85123EE028BEAB301664092,
 				F85123EF028BEAB301664092,
@@ -8714,7 +8738,6 @@
 				F85123F5028BEAB301664092,
 				F85123F6028BEAB301664092,
 				F85123F7028BEAB301664092,
-				F85123F8028BEAB301664092,
 				F85123F9028BEAB301664092,
 				F85123FA028BEAB301664092,
 				F85123FB028BEAB301664092,
@@ -8724,12 +8747,12 @@
 				F5EA5774038545B501664092,
 				F85123FF028BEAB301664092,
 				F8512400028BEAB301664092,
+				F8512406028BEAB301664092,
 				F8512401028BEAB301664092,
 				F8512402028BEAB301664092,
 				F8512403028BEAB301664092,
 				F8512404028BEAB301664092,
 				F8512405028BEAB301664092,
-				F8512406028BEAB301664092,
 				F8512407028BEAB301664092,
 				F8512408028BEAB301664092,
 				F8512409028BEAB301664092,
@@ -9011,7 +9034,6 @@
 				F8512422028BEAB401664092,
 				F8512423028BEAB401664092,
 				F8512424028BEAB401664092,
-				F8512425028BEAB401664092,
 				F8512426028BEAB401664092,
 				F8512427028BEAB401664092,
 				F8512428028BEAB401664092,
@@ -9026,7 +9048,6 @@
 				F8512431028BEAB401664092,
 				F8512432028BEAB401664092,
 				F8512433028BEAB401664092,
-				F8512434028BEAB401664092,
 				F8512435028BEAB401664092,
 				F8512436028BEAB401664092,
 				F8512437028BEAB401664092,
@@ -9155,6 +9176,8 @@
 				F5EA5779038545F201664092,
 				F5FD9479038BE7C701664092,
 				F704740B04040A7901664058,
+				F7050A2304055D1C01664058,
+				F7050A2504055D4401664058,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -9190,6 +9213,7 @@
 				F85123A7028BEAB301664092,
 				F85123AB028BEAB301664092,
 				F85123AC028BEAB301664092,
+				F7050A2404055D4401664058,
 				F85123AD028BEAB301664092,
 				F85123AE028BEAB301664092,
 				F85123AF028BEAB301664092,
@@ -9643,12 +9667,6 @@
 			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/IntegerAdapter.java;
 			refType = 2;
 		};
-		F85123E9028BEAB301664092 = {
-			isa = PBXFileReference;
-			name = IntegerLabelMapper.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/IntegerLabelMapper.java;
-			refType = 2;
-		};
 		F85123EA028BEAB301664092 = {
 			isa = PBXFileReference;
 			name = IntegerMapper.java;
@@ -9731,12 +9749,6 @@
 			isa = PBXFileReference;
 			name = PartitionAdapter.java;
 			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/PartitionAdapter.java;
-			refType = 2;
-		};
-		F85123F8028BEAB301664092 = {
-			isa = PBXFileReference;
-			name = PitchLabelMapper.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/PitchLabelMapper.java;
 			refType = 2;
 		};
 		F85123F9028BEAB301664092 = {
@@ -9997,12 +10009,6 @@
 			settings = {
 			};
 		};
-		F8512425028BEAB401664092 = {
-			fileRef = F85123E9028BEAB301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F8512426028BEAB401664092 = {
 			fileRef = F85123EA028BEAB301664092;
 			isa = PBXBuildFile;
@@ -10083,12 +10089,6 @@
 		};
 		F8512433028BEAB401664092 = {
 			fileRef = F85123F7028BEAB301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8512434028BEAB401664092 = {
-			fileRef = F85123F8028BEAB301664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
