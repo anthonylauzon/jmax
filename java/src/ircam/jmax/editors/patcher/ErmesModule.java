@@ -33,8 +33,6 @@ import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 
-import ircam.jmax.editors.patcher.tcl.*;
-
 /** The ermes module; the init function is called at init time
  *  by jmax, and install module related things
  */
