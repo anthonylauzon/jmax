@@ -12,6 +12,8 @@
 
 /* Include files */
 
+/* #define MIDI_SYSEX_DEBUG */
+
 #include <unistd.h>
 #ifdef IRIX63
 #include <sys/dmcommon.h>	/* for stamp_t on IRIX 6.3 */
@@ -904,6 +906,21 @@ sgi_midi_prepare_current_event(sgimidi_dev_data *data)
   if ((midi_event->msg[0] == MD_SYSEX) &&  midi_event->sysexmsg && midi_event->msglen > 0)
     {
       /* received sysex */
+
+#ifdef MIDI_SYSEX_DEBUG
+      {
+	int i;
+
+	fprintf(stderr, "EV[%d]: Received sysex, length %d, buffer %lx:", 
+		data->in_current_event, midi_event->msglen, midi_event->sysexmsg);
+
+	for (i = 0; i < midi_event->msglen; i++)
+	  fprintf(stderr, "%c", midi_event->sysexmsg[i]);
+
+	fprintf(stderr, "\n");
+      }
+#endif
+
       data->input_status = reading_sysex;
       data->in_current_char_count = 0;
 
@@ -943,7 +960,7 @@ sgi_midi_get(fts_dev_t *dev, unsigned char *cp)
 
 	  return fts_Success;
 	}
-      else if (data->in_current_event < data->in_event_count)
+      else if (data->in_current_event < (data->in_event_count - 1))
 	{
 	  /* No more bytes in the buffer,
 	     but more events received, look at the next event */
@@ -971,14 +988,13 @@ sgi_midi_get(fts_dev_t *dev, unsigned char *cp)
 	  /* More bytes in the buffer, just read the next byte */
 
 	  *cp = (char) (data->in_sysex_buf[data->in_current_char_count ++]);
+
 	  return fts_Success;
 	}
-      else if (data->in_current_event < data->in_event_count)
+      else if (data->in_current_event < (data->in_event_count - 1))
 	{
 	  /* No more bytes in the buffer,
 	     but more events received, look at the next event */
-
-	  mdFree(data->in_sysex_buf);
 
 	  (data->in_current_event)++;
 	  sgi_midi_prepare_current_event(data);

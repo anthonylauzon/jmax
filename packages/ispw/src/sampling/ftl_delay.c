@@ -9,13 +9,18 @@ ftl_delwrite(fts_word_t *argv)
   float *in = (float *)fts_word_get_ptr(argv + 0);
   del_buf_t *buf = (del_buf_t *)fts_word_get_ptr(argv + 1);
   long n_tick = fts_word_get_long(argv + 2);
-  
-  fts_vecx_fcpy(in, buf->delay_line + buf->phase, n_tick);
+  int i;
+  int phase = buf->phase;
+
+  for (i = 0; i < n_tick ; i++)
+    buf->delay_line[phase + i] = in[i];
 
   if (buf->phase >= buf->ring_size) /* ring buffer wrap around */
     {
       buf->phase = n_tick;
-      fts_vecx_fcpy(in, buf->delay_line, n_tick);
+
+      for (i = 0; i < n_tick ; i++)
+	buf->delay_line[phase + i] = in[i];
     }
   else
     buf->phase += n_tick;
@@ -25,11 +30,12 @@ ftl_delwrite(fts_word_t *argv)
 void
 ftl_delread(fts_word_t *argv)
 {
-  float *out = (float *) fts_word_get_ptr(argv + 0);
-  del_buf_t *buf = (del_buf_t *) fts_word_get_ptr(argv + 1);
+  float * restrict out = (float *) fts_word_get_ptr(argv + 0);
+  del_buf_t * restrict buf = (del_buf_t *) fts_word_get_ptr(argv + 1);
   long n_tick = fts_word_get_long(argv + 2);
   long *del_time = (long *)fts_word_get_ptr(argv + 3);
   long del = *del_time; 
+  int i;
 
   long phase;
   
@@ -38,7 +44,8 @@ ftl_delread(fts_word_t *argv)
   if (phase < 0)
     phase += buf->ring_size; /* ring buffer wrap around */
 
-  fts_vecx_fcpy(buf->delay_line + phase, out, n_tick);
+  for (i = 0; i < n_tick ; i++)
+    out[i] = buf->delay_line[phase + i];
 }
 
 

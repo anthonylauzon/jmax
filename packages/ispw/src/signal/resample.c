@@ -25,23 +25,24 @@ typedef struct up
 static void
 ftl_up(fts_word_t *argv)
 {
-  float *in  = (float *)fts_word_get_ptr(argv);
-  float *out = (float *)fts_word_get_ptr(argv+1);
+  float * restrict in  = (float *)fts_word_get_ptr(argv);
+  float * restrict out = (float *)fts_word_get_ptr(argv+1);
   up_state_t *x = (up_state_t *)fts_word_get_ptr(argv+2);
-  long int n = fts_word_get_long(argv+3);
+  int n = fts_word_get_long(argv+3);
+  int i, j;
   float x0;
   float x1 = x->last[0];
   float x2 = x->last[1];
   float x3 = x->last[2];
 
-  while (n--)
+  for (i = 0, j = 0; i < n; i++, j += 2)
     {
       x0 = x1;
       x1 = x2;
       x2 = x3;
-      x3 = *in++;
-      *out++ = .5625f * (x1 + x2) - .0625f * (x0 + x3);
-      *out++ = x2;
+      x3 = in[i];
+      out[j]  = .5625f * (x1 + x2) - .0625f * (x0 + x3);
+      out[j+1] = x2;
     }
 
   x->last[0] = x1;
