@@ -82,9 +82,9 @@ public class FtsPatcherObject extends FtsContainerObject
     
     name = FtsParse.parseObject(description, args);
 
-    setObjectName((String) args.elementAt(1));
-    setNumberOfInlets(((Integer) args.elementAt(2)).intValue());
-    setNumberOfOutlets(((Integer) args.elementAt(3)).intValue());
+    setObjectName((String) args.elementAt(0));
+    setNumberOfInlets(((Integer) args.elementAt(1)).intValue());
+    setNumberOfOutlets(((Integer) args.elementAt(2)).intValue());
     updateDescription();
 
     MaxApplication.getFtsServer().newPatcherObject(parent, this,
