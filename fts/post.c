@@ -631,11 +631,11 @@ static void log_date( FILE *log)
 static void log_init( void)
 {
   FILE *log;
-  char buf[1024];
 
 #ifdef WIN32
   log_file_name = "c:\\fts_log.txt";
 #else
+  char buf[1024];
   if (getenv("HOME"))
     {
       snprintf( buf, sizeof( buf), "%s/.fts_log", getenv("HOME"));
