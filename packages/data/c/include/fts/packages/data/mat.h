@@ -70,4 +70,12 @@ DATA_API int mat_read_atom_file_separator(mat_t *mat, fts_symbol_t file_name,
 					      fts_symbol_t separator, int ac, const fts_atom_t *at);
 DATA_API int mat_write_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t separator);
 
+
+/* editor interaction */
+#define mat_set_editor_open(m) ((m)->opened = 1)
+#define mat_set_editor_close(m) ((m)->opened = 0)
+#define mat_editor_is_open(m) ((m)->opened)
+
+DATA_API void mat_upload(mat_t *self);
+
 #endif

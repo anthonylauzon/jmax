@@ -31,9 +31,8 @@ static fts_symbol_t sym_comma = 0;
 static fts_symbol_t sym_mat_append_row = 0;
 static fts_symbol_t sym_register_obj = 0;
 
-#define mat_set_editor_open(m) ((m)->opened = 1)
-#define mat_set_editor_close(m) ((m)->opened = 0)
-#define mat_editor_is_open(m) ((m)->opened)
+
+
 
 /********************************************************
 *
@@ -555,7 +554,7 @@ mat_upload_data(mat_t *self)
   mat_upload_from_index(self, 0, 0, mat_get_m(self) * mat_get_n(self));
 }
 
-static void
+void
 mat_upload(mat_t *self)
 {
   mat_upload_size(self);
